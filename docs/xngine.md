@@ -149,8 +149,39 @@ and never sets AL, so the mode is the low byte of whatever EAX held (a pointer, 
 run). DOS rejects it and does not move, and the 0x400-byte read that follows only works if the
 file position is already right. The emulator logs it as a note each run.
 
-Next: drive the menus into the 3D world, then hook XnGine's entry points to capture calls and
-watch for writes into code.
+## 2026-10-02: phase 3, input, a scripted new game, and call records
+
+- **Input.** Keys go through the game's own int 9 handler (XnGine's, at `0x142840`). The
+  mouse driver behaves as the game uses it: XnGine polls absolute position (function 3) with
+  its own range, while some screens move the cursor from motion counters (function `0Bh`).
+  XnGine's mouse code (`0x12B196`) pairs two presses within 8 BIOS ticks and 4 pixels into a
+  double-click, so scripted clicks are 80+ timer ticks apart, and lists select with a
+  double-click.
+- **Snapshots** hold the whole machine and what the game wrote to its files, so each step of
+  a long scenario resumes in seconds. `tools/scenarios/newgame.txt` boots, creates a Breton
+  battlemage and skips the intro; it replays identically from boot.
+- **The install's missing files.** Bethesda's free release ships the CD's `ARENA2` without
+  `ARCH3D.BSA` and `DAGGER.SND`; the installer unpacks them from `PACKED.DAT` (`DAG_HUGE.LST`
+  says so). That file is 256 KB blocks of PKWARE DCL "implode" data, each with a 36-byte
+  header, and a directory of names and sizes at the end. `tools/blast.py` (after zlib's
+  blast.c) unpacks both, 27,143,532 and 7,661,766 bytes, into the run's overlay.
+- **Records** (`tools/xn_record.py`). An entry hook stops the CPU before a function's first
+  instruction (by moving EIP to a `hlt`), and the call then runs alone with memory hooks: the
+  record holds every byte it read before writing, the XnGine code bytes that differ from the
+  file (the self-modified state), registers and descriptors, and its writes, exit registers,
+  port I/O, and interrupts with what each service returned. Replay loads `FALL.EXE` fresh,
+  puts that input back, answers services from the record, and compares. **All 13 XnGine
+  functions that run at the main menu replay exactly.**
+- **Tracer** (`tools/xn_trace.py`): at the menu, 13 of 657 functions run, the planted-`ret`
+  loops make 4,400 opcode writes per 100 ticks, and nothing writes into code outside the known
+  patch fields.
+
+**Open: a divide fault entering the world.** After the intro is skipped with Esc, the first 3D
+frame faults in `func_0015BC42` (`idiv` computing 2^32 / `[edi+5Ch]`, a field that is 0), via
+`main` → `func_0001025B` → `func_00010B11` → XnGine `0x12A870` → `0x15BB8C`. The field comes
+from a perspective divide in `0x13EBxx`. Unicorn handles all three self-modification patterns
+correctly (tested), so the next check is whether the fault also happens when the intro ends on
+its own; if it does not, skipping the emperor video is a candidate original bug.
 
 Run: `.venv/bin/python tools/xn_disasm.py` regenerates `src/xngine/` (4 s);
 `.venv/bin/python tools/xn_link.py [module]` checks modules; `tools/build-and-verify.sh` builds.
