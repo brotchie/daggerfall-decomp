@@ -399,7 +399,7 @@ The batch found compiler differences that hand matching would have taken weeks t
    `BlockToCode()` at `-od`) frees the load. With that blocked by a temp flag, `AxeDeadCode()`
    does, and with that blocked too it still disappears, so there's a third pass. Reverted for
    now. Next: trace again with both blocked.
-3. **Byte/word compares through pointers** (open, about 100 functions). Watcom 10 compares
+3. **Byte/word compares** (open, about 150 functions; see the update below). Watcom 10 compares
    named variables and `*p` narrow (`cmp byte ptr [x], 2`: 687 globals, 548 locals, 138
    `*p == 0`), but widens fields read through pointer arithmetic (`mov al,[eax+0x22];
    and eax,0xff; cmp eax,2`, about 1,600 cases). OW narrows them all. Turning off demotion in
@@ -427,3 +427,19 @@ OK`** (also with `--blank`).
 
 Loop from here: `tools/lift_all.py` (2 s), fix the top cluster in the lifter or compiler,
 `tools/promote_lifted.py`, `tools/build-and-verify.sh`, commit.
+
+### Update: byte compares
+
+Tallied over the original's game code: compares of a byte global are narrow
+(`cmp byte ptr [D], K`) 686 times, only with `je`/`jne`, and widened
+(`xor eax,eax; mov al,[D]; cmp eax,K`) 354 times, including ordered compares. For byte locals
+it's 548 narrow (mostly unsigned `<`/`<=`) against 23 widened. One function (`func_000160D0`)
+has both side by side: `cmp byte [D_001966B1], 0` (probably a truth test, `if (flag)`) next to
+a widened `== 1`.
+
+In OW, the front end passes the raw byte operand to `TGCompare()` with an `int` compare type,
+and `ResultType()` demotes it (seen in lldb). A switchable policy in `TGCompare()`
+(never / only against 0 or 1 / only against 0, with or without locals) changed nothing for the
+widened cases: OW still emits `cmp byte` with demotion off there, so **a later,
+instruction-level pass also narrows**. Next: find that pass with lldb (break where the compare
+instruction gets a byte type class), then measure the policies again with the batch.
