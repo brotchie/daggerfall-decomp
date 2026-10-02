@@ -181,7 +181,7 @@ L51270:;
 L5127D:;
     *(int *)&l_18 = func_0005183B();
     if (l_18 == 0) goto L5130E;
-    *(int *)&l_18 = (int)(unsigned char)*(signed char *)(D_0018520B + (int)((char *)((((int)(short)*(short *)D_00190D68) - 1) * 3) + ((int)(short)l_18)));
+    *(int *)&l_18 = (int)(unsigned char)*(signed char *)(D_0018520B + (((((int)(short)*(short *)D_00190D68) - 1) * 3) + ((int)(short)l_18)));
     if (((int)(unsigned char)*(signed char *)(D_00199819 + ((int)(short)l_18))) >= 10) goto L512CA;
     (*(signed char *)(D_00199819 + ((int)(short)l_18)))++;
 L512CA:;

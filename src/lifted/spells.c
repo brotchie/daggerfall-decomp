@@ -427,7 +427,7 @@ void func_0003817F(int a1)
     short l_18;
 
     *(int *)&l_18 = (int)(unsigned char)*(signed char *)((char *)(int)(*(char **)D_00178A0A + (((int)(short)*(short *)D_00195F30) * 2)));
-    func_000A1023((int)D_0019961C, (((int)(unsigned char)*(signed char *)(D_0017AF6B + (int)((((int)(short)l_18) * 12) + (char *)((int)(short)*(short *)&a1)))) << 3) + ((int)D_0017AE13), 8, (int)D_00170B13, 1030, 8);
+    func_000A1023((int)D_0019961C, (((int)(unsigned char)*(signed char *)(D_0017AF6B + (((int)(short)*(short *)&a1) + (((int)(short)l_18) * 12)))) << 3) + ((int)D_0017AE13), 8, (int)D_00170B13, 1030, 8);
     *(signed char *)(*(char **)D_00178A0A + 1 + (((int)(short)*(short *)D_00195F30) * 2)) = *(signed char *)&a1;
     *(signed char *)D_0019962E = *(signed char *)(D_0017A94B + ((((int)(short)l_18) * 12) + ((int)(short)*(short *)&a1)));
     *(short *)D_00199628 = 0;

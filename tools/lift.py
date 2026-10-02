@@ -634,7 +634,16 @@ class Func:
             self.globals.add(g)
             parts.append(g)
             if base:
-                parts.append(self.reg(base, ins).p())
+                bv = self.reg(base, ins)
+                sp = split_sum(bv.text) if not bv.atom else None
+                if sp is not None and not os.environ.get("LIFT_NOFLATIDX"):
+                    # g + (x*48 + y*4): or g[x][y], (g + x*48) + y*4 (a choice point)
+                    self.choices.append(ins.address + 0.65625)
+                if sp is not None and (ins.address + 0.65625 in self.flips) != \
+                        bool(os.environ.get("LIFT_FLATIDX")):
+                    parts += [sp[0], sp[1]]
+                else:
+                    parts.append(bv.p())
         elif base and not index and self.reg(base, ins).tag and \
                 self.reg(base, ins).tag[0] == "padd" and size in (2, 4) and disp % size == 0 \
                 and re.fullmatch(r"\(\((.*) \* (2|3)\) \* 2\)", self.reg(base, ins).tag[2]) and \
@@ -1505,13 +1514,16 @@ class Func:
                 base_only = m == "add" and s.type == cx.X86_OP_REG and not ptr_hint and \
                     self.used_as_base(full) and not self.global_ptr(b) and \
                     not self.global_ptr(a)
+                gidx = False
                 if base_only:
                     # the sum is used as an address: pointer arithmetic, or an int sum (a
-                    # choice point)
+                    # choice point; an int sum by default when a global is the displacement:
+                    # g[x][y])
                     self.choices.append(ins.address + 0.375)
+                    gidx = self.base_of_global(full) and not os.environ.get("LIFT_NOGIDX")
                 if m == "add" and s.type == cx.X86_OP_REG and (
                         (self.used_as_base(full) and not (
-                            base_only and ins.address + 0.375 in self.flips)) or
+                            base_only and (ins.address + 0.375 in self.flips) != gidx)) or
                         self.global_ptr(b) or self.global_ptr(a) or
                         (ptr_hint and (ins.address + 0.375 in self.flips) ==
                          bool(os.environ.get("LIFT_NOPTRADD")))):
@@ -1907,6 +1919,22 @@ class Func:
             self.flags = None
             return
         raise Unsupported("instruction %s" % m)
+
+    def base_of_global(self, reg):
+        """Is `reg` next read as the base of a memory operand whose displacement is a
+        global's address ([eax + g])?"""
+        for ins in self.body[self.k + 1:]:
+            for op in sorted(ins.operands, key=lambda o: o.type != cx.X86_OP_MEM):
+                if op.type == cx.X86_OP_MEM and op.mem.base and \
+                        SUB.get(ins.reg_name(op.mem.base), (None,))[0] == reg:
+                    return ins.disp_size == 4 and \
+                        fixup_at(ins, ins.disp_offset) is not None
+                if op.type == cx.X86_OP_REG and \
+                        SUB.get(ins.reg_name(op.reg), (None,))[0] == reg:
+                    return False
+            if ins.mnemonic in ("call", "ret") or ins.mnemonic.startswith("j"):
+                return False
+        return False
 
     def used_as_base(self, reg):
         """Is `reg` next read as the base of a memory operand (so it holds a pointer)?"""
@@ -3080,6 +3108,17 @@ def loaded_ptr_k(e):
     """`*(int *)p + k`: a dword read plus a constant, perhaps a pointer and an offset."""
     mm = re.fullmatch(r"\*\(int \*\)(\w+|\((?:[^()]|\([^()]*\))*\)) \+ (\d+)", e.text)
     return (mm.group(1), mm.group(2)) if mm else None
+
+
+def split_sum(text):
+    """`A + B` at the top level of an expression: (A, B), else None."""
+    depth = 0
+    for k, ch in enumerate(text):
+        depth += ch == "("
+        depth -= ch == ")"
+        if depth == 0 and text.startswith(" + ", k):
+            return text[:k], text[k + 3:]
+    return None
 
 
 def negate(c):

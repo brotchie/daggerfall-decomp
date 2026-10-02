@@ -446,7 +446,7 @@ L90135:;
     l_24++;
     goto L90128;
 L9013D:;
-    l_18 = *(signed char *)(D_0017A94B + (int)((char *)((int)(unsigned char)*(signed char *)((char *)l_3C + l_24)) + (((int)(unsigned char)*(signed char *)((char *)l_34 + l_24)) * 12)));
+    l_18 = *(signed char *)(D_0017A94B + (((int)(unsigned char)*(signed char *)((char *)l_3C + l_24)) + (((int)(unsigned char)*(signed char *)((char *)l_34 + l_24)) * 12)));
     *(signed char *)((char *)((l_24 * 2) + a1)) = *(signed char *)((char *)l_34 + l_24);
     *(signed char *)((char *)((l_24 * 2) + a1) + 1) = *(signed char *)((char *)l_3C + l_24);
     if (((int)(unsigned char)(l_18 & 1)) == 0) goto L901BC;

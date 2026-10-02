@@ -456,7 +456,7 @@ L3288B:;
     *(short *)((char *)l_38 + 25) = *(short *)((char *)l_38 + 89);
     goto L328FB;
 L328C8:;
-    *(short *)((char *)l_38 + 27) = ((unsigned short)(unsigned char)*(signed char *)(D_0017A25C + (int)((char *)func_0007D6AE(0, 9) + (((int)(unsigned char)*(signed char *)D_001970DD) * 10)))) + 23296;
+    *(short *)((char *)l_38 + 27) = ((unsigned short)(unsigned char)*(signed char *)(D_0017A25C + (func_0007D6AE(0, 9) + (((int)(unsigned char)*(signed char *)D_001970DD) * 10)))) + 23296;
     *(short *)((char *)l_38 + 25) = 510;
 L328FB:;
     l_24 = func_000504D8((int)(unsigned short)*(short *)((char *)l_38 + 27));

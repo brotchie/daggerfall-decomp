@@ -1153,7 +1153,7 @@ L163F2:;
     return;
 L163F7:;
     if (*(signed char *)D_001966AE != 0) goto L16428;
-    func_0001652C((int)(short)*(short *)(D_00179A7E + (int)((char *)((*(int *)D_001965C0 * 30) + (*(int *)D_001965A4 * 6)) + (*(int *)D_001965BC * 2))));
+    func_0001652C((int)(short)*(short *)(D_00179A7E + (((*(int *)D_001965C0 * 30) + (*(int *)D_001965A4 * 6)) + (*(int *)D_001965BC * 2))));
     return;
 L16428:;
     if (((int)(unsigned char)*(signed char *)D_001966AE) != 1) goto L16440;
@@ -1164,7 +1164,7 @@ L16442:;
     func_0001652C(28);
     return;
 L1644E:;
-    func_0001652C((int)(short)*(short *)(D_00179A42 + (int)((char *)((*(int *)D_001965C0 * 30) + (*(int *)D_001965A4 * 6)) + (*(int *)D_001965BC * 2))));
+    func_0001652C((int)(short)*(short *)(D_00179A42 + (((*(int *)D_001965C0 * 30) + (*(int *)D_001965A4 * 6)) + (*(int *)D_001965BC * 2))));
 }
 }
 

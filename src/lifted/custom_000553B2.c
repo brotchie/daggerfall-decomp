@@ -14,7 +14,7 @@ void func_000553B2(int a1, int a2)
     int l_14;
 
 __dagger_tbl553C7:;
-    l_14 = (int)(unsigned char)*(signed char *)(D_00199821 + (int)((char *)(((int)(short)*(short *)D_00190D82) * 14) + (a1 * 2)));
+    l_14 = (int)(unsigned char)*(signed char *)(D_00199821 + ((((int)(short)*(short *)D_00190D82) * 14) + (a1 * 2)));
     switch (*(unsigned char *)(D_00199820 + ((((int)(short)*(short *)D_00190D82) * 14) + (a1 * 2)))) {
 case 0:
     func_000CE4B5(*(int *)D_00195BEC + 4, 8, a2);
