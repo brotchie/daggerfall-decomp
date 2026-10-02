@@ -1232,3 +1232,6 @@ Batch **1,927**; build **61.34%**.
   (`mov eax,[l]; and eax,0xff`) is `l & 255`. The search also backtracks (an earlier flip
   taken back, with a nearby new one) and its budget is settable (`LIFT_BUDGET`; a larger
   one finds nothing more). +1. Batch **2,124**.
+- `DAGGER_NODEMOTE` (keep arithmetic wide when a result is narrowed) no longer applies to
+  compound assignments: `p->flags |= 2` stays a byte `or` (`DAGGER_NODEMOTERMW` for the
+  old behaviour). +2. Batch **2,126**.

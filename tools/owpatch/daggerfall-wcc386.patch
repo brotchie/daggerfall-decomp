@@ -1831,19 +1831,20 @@ index e3c9f73344..f72e8cddb6 100644
       && temp->t.u.blk_id != BLK_ID_NONE ) {
          CalcRange( &st_temp, temp );
 diff --git a/bld/cg/c/tree.c b/bld/cg/c/tree.c
-index 23957dda5c..04a5666a40 100644
+index 23957dda5c..5b59d813c2 100644
 --- a/bld/cg/c/tree.c
 +++ b/bld/cg/c/tree.c
-@@ -31,6 +31,8 @@
+@@ -31,6 +31,9 @@
  
  
  #include "_cgstd.h"
 +extern const char *DaggerEnv( const char *name );
++extern bool DaggerDemoteRMW;
 +#include <stdlib.h>
  #include "coderep.h"
  #include "tree.h"
  #include "zoiks.h"
-@@ -71,6 +73,7 @@
+@@ -71,6 +74,7 @@
  #endif
  #ifdef DEVBUILD
      #include "echoapi.h"
@@ -1851,7 +1852,18 @@ index 23957dda5c..04a5666a40 100644
  #endif
  
  
-@@ -1691,7 +1694,21 @@ static  an  TNBitShift( an retv, tn node, bool already_masked )
+@@ -1123,7 +1127,10 @@ tn  DoTGPreGets( cg_op opcode, tn left, tn rite, const type_def *tipe,
+     case O_RSHIFT:
+         break;
+     default:
++        /* Daggerfall: DAGGER_NODEMOTE is about narrowing conversions, not `x |= 2` */
++        DaggerDemoteRMW = ( DaggerEnv( "DAGGER_NODEMOTERMW" ) == NULL );
+         TGDemote( rite, tipe );
++        DaggerDemoteRMW = false;
+         break;
+     }
+     if( TGCanDuplicate( left ) ) {
+@@ -1691,7 +1698,21 @@ static  an  TNBitShift( an retv, tn node, bool already_masked )
      }
      mask = TGMask64( node );
  #ifdef JUST_USE_SHIFTS
@@ -1874,7 +1886,7 @@ index 23957dda5c..04a5666a40 100644
          if( !already_masked ) {
              retv = BGBinary( O_AND, retv, Int64( mask ), tipeu, true );
          }
-@@ -1872,6 +1889,27 @@ static  an  TNBitOpGets( tn node, const type_def *tipe, bool yield_before_op )
+@@ -1872,6 +1893,27 @@ static  an  TNBitOpGets( tn node, const type_def *tipe, bool yield_before_op )
  }
  
  
@@ -1902,7 +1914,7 @@ index 23957dda5c..04a5666a40 100644
  an  TNPostGets( tn node )
  /************************
   * generate blocks for an x++ type node
-@@ -1881,13 +1919,25 @@ an  TNPostGets( tn node )
+@@ -1881,13 +1923,25 @@ an  TNPostGets( tn node )
      an      left;
      an      rite;
      an      leftp;
@@ -1930,7 +1942,7 @@ index 23957dda5c..04a5666a40 100644
          retv = BGAssign( retv, leftp, node->tipe );
          BGDone( BGOpGets( node->u1.t.op, left, rite, node->tipe, node->tipe ) );
 diff --git a/bld/cg/c/treeconv.c b/bld/cg/c/treeconv.c
-index c0838301a3..6ed7002f14 100644
+index c0838301a3..2726704554 100644
 --- a/bld/cg/c/treeconv.c
 +++ b/bld/cg/c/treeconv.c
 @@ -31,6 +31,8 @@
@@ -1959,13 +1971,18 @@ index c0838301a3..6ed7002f14 100644
              case O_ROUND:
                  can_demote = DemoteTree( name->u.left, tipe, just_test );
                  demote_this_node = true;
-@@ -131,6 +139,10 @@ static  bool    DemoteTree( tn name, const type_def *tipe, bool just_test ) {
+@@ -128,9 +136,15 @@ static  bool    DemoteTree( tn name, const type_def *tipe, bool just_test ) {
+ }
+ 
+ 
++bool    DaggerDemoteRMW;   /* a compound assignment's operand: DAGGER_NODEMOTE leaves it */
++
  void    TGDemote( tn name, const type_def *tipe )
  /***********************************************/
  {
 +    /* Daggerfall knob: DAGGER_NODEMOTE keeps arithmetic in its own width when the result is
 +     * narrowed (Watcom 10 often did: `and eax,0xff; add eax,0x41; mov dl,al`) */
-+    if( DaggerEnv( "DAGGER_NODEMOTE" ) != NULL )
++    if( DaggerEnv( "DAGGER_NODEMOTE" ) != NULL && !DaggerDemoteRMW )
 +        return;
      if( DemoteTree( name, tipe, true ) ) {
          DemoteTree( name, tipe, false );
