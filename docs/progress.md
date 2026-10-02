@@ -1138,3 +1138,5 @@ Batch **1,927**; build **61.34%**.
   them too. Two more per-function register allocation knobs: `DAGGER_CONFPOS` /
   `DAGGER_CONFPOSREV` break ties in savings by where each live range starts (globally each
   loses ~300; per function +5). Batch **2,007**.
+- The search also tries a nearby choice point together with each compiler knob, at every
+  new first difference it gets stuck on. +4. Batch **2,011**.

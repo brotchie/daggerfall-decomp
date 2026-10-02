@@ -155,6 +155,7 @@ void func_00087281(int);
 void func_00088A68(void);
 #pragma dagger DAGGER_CONFPOS func_00088A68
 #pragma dagger DAGGER_KEEPSUB func_00088B98
+#pragma dagger DAGGER_RMW func_00088281
 #pragma dagger KKND_CONFREV func_0008661C
 
 void func_00086314(void)
@@ -830,6 +831,101 @@ L881F4:;
     return;
 L88207:;
     goto L881CB;
+}
+
+void func_00088281(int a1, int a2)
+{
+    int l_34;
+    int l_30;
+    int l_2C;
+    int l_28;
+    int l_24;
+    int l_20;
+    int l_1C;
+    int l_18;
+    unsigned l_14;
+
+    if ((*(unsigned char *)(*(char **)D_00196A80 + 7) & 62) != 0) goto L88307;
+    l_20 = 1;
+    l_28 = (*(int *)(*(char **)D_00196A80 + 4) & 33554431) + 1536;
+    l_28 = (l_28 & 32767) >> 8;
+    l_24 = ((*(int *)(*(char **)D_00196A80 + 8) & 16777215) + ((((unsigned)*(int *)(*(char **)D_00196A80 + 8)) >> 28) << 12)) - 1537;
+    l_24 = 128 - ((l_24 & 32767) >> 8);
+    goto L8836E;
+L88307:;
+    l_20 = 2;
+    l_28 = (*(int *)(*(char **)D_00196A80 + 4) & 33554431) + 3584;
+    l_28 = (l_28 & 32767) >> 8;
+    l_24 = ((*(int *)(*(char **)D_00196A80 + 8) & 16777215) + (((((unsigned)*(int *)(*(char **)D_00196A80 + 8)) >> 28) - 1) << 12)) + 511;
+    l_24 = 128 - ((l_24 & 32767) >> 8);
+L8836E:;
+    l_34 = a1;
+    l_34 += l_24 << 8;
+    l_34 += l_28;
+    a1 = l_34;
+    a2 += l_24 << 8;
+    a2 += l_28;
+    l_1C = (((((unsigned)(*(int *)(*(char **)D_00196A80 + 8) << 4)) >> 28) - l_20) << 4) + 8;
+    l_18 = (((((unsigned)*(int *)(*(char **)D_00196A80 + 8)) >> 28) - l_20) << 4) + 8;
+    if (((128 - l_28) - 4) >= l_1C) goto L883E7;
+    l_1C = (128 - l_28) - 4;
+L883E7:;
+    if (((128 - l_24) - 4) >= l_18) goto L88405;
+    l_18 = (128 - l_24) - 4;
+L88405:;
+    l_30 = l_34 + (l_18 << 8);
+    l_14 = 0;
+    l_2C = 0;
+L88421:;
+    if (l_2C < l_1C) goto L88439;
+    goto L8844A;
+L8842B:;
+    l_2C++;
+    l_34++;
+    goto L88421;
+L88439:;
+    l_14 += (int)(unsigned char)(*(signed char *)((char *)l_34) & 127);
+    goto L8842B;
+L8844A:;
+    l_34 = a1 + 256;
+    l_2C = 0;
+L8845C:;
+    if ((l_18 - 2) > l_2C) goto L88471;
+    goto L8849C;
+L88469:;
+    l_2C++;
+    goto L8845C;
+L88471:;
+    l_14 += (int)(unsigned char)(*(signed char *)((char *)l_34) & 127);
+    l_14 += (int)(unsigned char)(*(signed char *)((char *)(l_34 + l_1C) - 1) & 127);
+    l_34 += 256;
+    goto L88469;
+L8849C:;
+    l_2C = 0;
+L884A3:;
+    if (l_2C < l_1C) goto L884BB;
+    goto L884CC;
+L884AD:;
+    l_2C++;
+    l_34++;
+    goto L884A3;
+L884BB:;
+    l_14 += (int)(unsigned char)(*(signed char *)((char *)l_34) & 127);
+    goto L884AD;
+L884CC:;
+    l_14 = ((unsigned)l_14) / ((int)&*(signed char *)((char *)((l_1C * 2) + (l_18 * 2)) - 4));
+    ++l_14;
+    if (((unsigned)l_14) <= 127) goto L884F5;
+    l_14 = 127;
+L884F5:;
+    l_34 = a1;
+L884FB:;
+    if (((unsigned)l_34) >= l_30) return;
+    func_000A0040(l_34, (int)(unsigned char)*(signed char *)&l_14, l_1C, (int)D_00176C94, 1250, 4);
+    func_000A0040(a2, 0, l_1C, (int)D_00176C94, 1251, 4);
+    l_34 += 256;
+    a2 += 256;
+    goto L884FB;
 }
 
 void func_000888C2(int a1, int a2)

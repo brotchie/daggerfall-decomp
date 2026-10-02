@@ -152,7 +152,7 @@ def work(va):
     # flipping each one near the first difference and keep the flip that moves the first
     # difference furthest; when no single flip helps, try pairs of the nearest.
     flips, tries = frozenset(), 0
-    tried_pairs = False
+    tried_pairs = set()      # first differences pairs were tried at
     best = (status, detail, at, c)
 
     def nbytes(d):
@@ -190,10 +190,13 @@ def work(va):
                 key = (at2, -nbytes(d2))
                 if found is None or key > found[:2]:
                     found = (at2, -nbytes(d2), flips | {a}, r)
-        if found is None and not tried_pairs:
-            tried_pairs = True
+        if found is None and at not in tried_pairs:
+            tried_pairs.add(at)
             pairs = [(x, y) for i, x in enumerate(near[:4]) for y in near[i + 1:5]
                      if x >= 0 and y >= 0]
+            if not os.environ.get("LIFT_NOKNOBPAIRS"):
+                # a nearby choice with a compiler knob
+                pairs += [(x, y) for x in near[:3] for y in func_level]
             for x, y in pairs:
                 if tries >= BUDGET:
                     break

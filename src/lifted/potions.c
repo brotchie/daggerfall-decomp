@@ -20,12 +20,16 @@ extern char D_00195AA4[];
 extern char D_00195AC4[];
 extern char D_00195B84[];
 extern char D_00195BE8[];
+extern char D_00195F28[];
 extern char D_00196036[];
 extern char D_0019626D[];
+extern char D_0019626E[];
 extern char D_0019626F[];
 extern char D_00196272[];
 extern char D_00196274[];
 extern char D_0019629A[];
+extern char D_001A9B8C[];
+extern char D_001A9B94[];
 extern char D_001A9BAC[];
 extern char D_001A9BB4[];
 extern char D_001A9BBC[];
@@ -51,16 +55,17 @@ extern void func_0005E540(int, int, int);
 extern void func_0007D3CA(int);
 extern void func_0008E3F7(int, int);
 extern void func_0008E4A8(int, int);
-extern void func_0008F89A(int);
 extern void func_00097101(int);
 int func_0008FCE7(int, int, int, int);
 int func_0009046D(int);
 void func_0008F11D(int);
+void func_0008F89A(int);
 void func_0008FBE8(int);
 void func_00090426(int);
 void func_00090572(int);
 #pragma dagger DAGGER_CONFLIST func_0008F11D
 #pragma dagger KKND_CONFREV func_0008EEBC
+#pragma dagger slots func_0008F89A a1 8 l_8C 120 l_4B 55 l_48 52 l_44 48 l_40 44 l_3C 40 l_38 36 l_34 32 l_30 28 l_2C 24 l_28 20 l_24 16 l_20 12 l_18 4
 #pragma dagger slots func_0008FCE7 a1 32 a2 40 a3 16 a4 36 l_A4 156 l_38 48 l_24 28 l_20 24 l_1C 20 l_14 12 l_10 8 ret 4
 
 void func_0008EEBC(void)
@@ -181,6 +186,39 @@ L8F305:;
     l_20 = 0;
 L8F30C:;
     return l_20;
+}
+}
+
+void func_0008F89A(int a1)
+{
+    int l_18;
+{
+    char l_8C[65];
+    unsigned char l_4B;
+    int l_48;
+    int l_44;
+    int l_40;
+    int l_3C;
+    int l_38;
+    int l_34;
+    int l_30;
+    int l_2C;
+    int l_28;
+    int l_24;
+    int l_20;
+
+    l_20 = 0;
+L8F8B2:;
+    if (*(int *)(D_001A9BBC + (l_20 << 2)) == 0) goto L8F8C9;
+    l_20++;
+    goto L8F8B2;
+L8F8C9:;
+    l_18 = (*(int *)(D_001A9BBC + (l_20 << 2)) = *(int *)(D_001A9BDC + (a1 << 2)));
+    func_0005E540((int)(unsigned short)*(short *)((char *)l_18 + 103), (int)(unsigned short)*(short *)((char *)l_18 + 105), (int)l_8C);
+    *(signed char *)(D_001A9BB4 + l_20) = l_4B;
+    *(signed char *)(D_001A9BAC + l_20) = *(signed char *)D_0019626D;
+    *(signed char *)(D_001A9B8C + l_20) = *(signed char *)D_00195F28;
+    *(signed char *)(D_001A9B94 + l_20) = *(signed char *)D_0019626E;
 }
 }
 
