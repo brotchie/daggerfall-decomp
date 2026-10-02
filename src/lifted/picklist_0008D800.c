@@ -5,22 +5,22 @@
 extern void func_0008D88B(int, int);
 #pragma dagger slots func_0008D800 a1 12 a2 8 a3 16 a4 4 l_20 24 ret 20
 
-int func_0008D800(int a1, int a2, int a3, int a4, int a5, int a6)
+int func_0008D800(int a1, int a2, short a3, short a4, int a5, int a6)
 {
     int l_20;
 
-    if ((short)(short)a5 >= *(short *)&a3) goto L8D82B;
+    if ((short)(short)a5 >= a3) goto L8D82B;
     func_0008D88B((int)&*(signed char *)&a5, (int)&a3);
 L8D82B:;
-    if ((short)(short)a6 >= *(short *)&a4) goto L8D83F;
+    if ((short)(short)a6 >= a4) goto L8D83F;
     func_0008D88B((int)&*(signed char *)&a6, (int)&a4);
 L8D83F:;
-    if ((short)(short)a1 < *(short *)&a3) goto L8D851;
+    if ((short)(short)a1 < a3) goto L8D851;
     if ((short)(short)a1 <= *(short *)&a5) goto L8D853;
 L8D851:;
     goto L8D85C;
 L8D853:;
-    if ((short)(short)a2 >= *(short *)&a4) goto L8D85E;
+    if ((short)(short)a2 >= a4) goto L8D85E;
 L8D85C:;
     goto L8D867;
 L8D85E:;

@@ -1254,3 +1254,7 @@ Batch **1,927**; build **61.34%**.
 - FP refinements: a `fistp` temp read once later, a word `fild` of a dword-stored temp
   (`(short)x`), double constants pushed as two dwords, no phantom local in a double's upper
   half. (3D2B6 and 9830F still differ in where the double and the conversion temps go.)
+- **Short division**: Watcom 10 divided two shorts at 16 bits (`mov eax,[l]; cwd; idiv bx`);
+  the compiler now demotes a division whose operands are only widened shorts or small
+  constants (`DAGGER_NODIVDEMOTE` keeps OW's), and the lifter reads `cwd`/`idiv r16`. An
+  address-taken variable read as a word is a short (a choice point). +2. Batch **2,136**.

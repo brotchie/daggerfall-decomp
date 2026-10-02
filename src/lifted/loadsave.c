@@ -701,7 +701,7 @@ int func_0007A983(int a1)
 {
     int l_24;
     int l_20;
-    short l_18;
+    unsigned short l_18;
 {
     char l_440[1024];
     char l_40[16];

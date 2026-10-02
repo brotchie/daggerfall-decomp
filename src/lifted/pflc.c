@@ -147,8 +147,8 @@ L52467:;
 void func_0005247B(int a1)
 {
     unsigned l_1C;
-    int l_18;
     unsigned short l_20;
+    short l_18;
 {
     char l_2C[8];
 
@@ -163,7 +163,7 @@ L524CE:;
     func_000A006E((int)(unsigned short)l_20, 8, 1);
     l_1C = 0;
 L524FD:;
-    if (*(unsigned short *)&l_1C < *(short *)&l_18) goto L52518;
+    if (*(unsigned short *)&l_1C < (short)l_18) goto L52518;
     goto L527A5;
 L52510:;
     l_1C++;

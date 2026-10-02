@@ -154,6 +154,7 @@ void func_00080F2F(void);
 void func_00081096(void);
 void func_000812A0(void);
 void func_00082376(int);
+#pragma dagger DAGGER_NODEMOTE func_0008036E
 #pragma dagger DAGGER_NOGIVEN func_00081425
 #pragma dagger reg func_00081425 93 edx
 

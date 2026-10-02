@@ -1942,7 +1942,7 @@ index 23957dda5c..5b59d813c2 100644
          retv = BGAssign( retv, leftp, node->tipe );
          BGDone( BGOpGets( node->u1.t.op, left, rite, node->tipe, node->tipe ) );
 diff --git a/bld/cg/c/treeconv.c b/bld/cg/c/treeconv.c
-index c0838301a3..2726704554 100644
+index c0838301a3..143bfcd919 100644
 --- a/bld/cg/c/treeconv.c
 +++ b/bld/cg/c/treeconv.c
 @@ -31,6 +31,8 @@
@@ -1954,7 +1954,29 @@ index c0838301a3..2726704554 100644
  #include "coderep.h"
  #include "addrname.h"
  #include "tree.h"
-@@ -58,9 +60,15 @@ static  bool    DemoteTree( tn name, const type_def *tipe, bool just_test ) {
+@@ -44,6 +46,21 @@
+ #include "typemap.h"
+ 
+ 
++/* Daggerfall: the width a division operand really has: a widened value's own width, or a
++ * constant's (Watcom 10 divided two shorts with `cwd; idiv bx`) */
++static type_length DaggerNarrowLen( tn name )
++{
++    if( name->class == TN_UNARY && name->u1.t.op == O_CONVERT
++      && TypeClass( name->u.left->tipe ) <= I4 )
++        return( name->u.left->tipe->length );
++    if( name->class == TN_CONS && name->u.name->c.const_type == CONS_ABSOLUTE ) {
++        signed_32 v = name->u.name->c.lo.u.int_value;
++        if( v >= -32768 && v <= 32767 )
++            return( 2 );
++    }
++    return( name->tipe->length );
++}
++
+ static  bool    DemoteTree( tn name, const type_def *tipe, bool just_test ) {
+ /***************************************************************************/
+ 
+@@ -58,9 +75,15 @@ static  bool    DemoteTree( tn name, const type_def *tipe, bool just_test ) {
          switch( name->class ) {
          case TN_UNARY: /* go left*/
              switch( name->u1.t.op ) {
@@ -1971,7 +1993,21 @@ index c0838301a3..2726704554 100644
              case O_ROUND:
                  can_demote = DemoteTree( name->u.left, tipe, just_test );
                  demote_this_node = true;
-@@ -128,9 +136,15 @@ static  bool    DemoteTree( tn name, const type_def *tipe, bool just_test ) {
+@@ -81,8 +104,11 @@ static  bool    DemoteTree( tn name, const type_def *tipe, bool just_test ) {
+                  break;
+             case O_DIV:
+             case O_MOD:
+-                if( name->u.left->tipe->length > tipe->length ||
+-                    name->u1.t.rite->tipe->length > tipe->length )
++                if( ( name->u.left->tipe->length > tipe->length
++                    || name->u1.t.rite->tipe->length > tipe->length )
++                  && !( DaggerIsOd() && DaggerEnv( "DAGGER_NODIVDEMOTE" ) == NULL
++                    && DaggerNarrowLen( name->u.left ) <= tipe->length
++                    && DaggerNarrowLen( name->u1.t.rite ) <= tipe->length ) )
+                     break;
+                 /* fall throught */
+ #endif
+@@ -128,9 +154,15 @@ static  bool    DemoteTree( tn name, const type_def *tipe, bool just_test ) {
  }
  
  

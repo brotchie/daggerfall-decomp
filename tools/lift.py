@@ -423,6 +423,13 @@ class Func:
                     sz = 2
             if off in addr:
                 sz = 4
+                if 2 in reads.get(off, set()) and 1 not in reads.get(off, set()) and \
+                        off in afirst and not os.environ.get("LIFT_NOADDRSHORT"):
+                    # an address-taken variable read as a word: a short (unless it is an
+                    # array; a choice point)
+                    self.choices.append(afirst[off] + 0.15625)
+                    if afirst[off] + 0.15625 not in self.flips:
+                        sz = 2
             hint = sign.get(off, set())
             if sz not in (1, 2, 4, 8):
                 raise Unsupported("%d-byte stack slot" % sz)
@@ -1207,6 +1214,11 @@ class Func:
             v = self.reg("eax", ins)
             self.set_reg("eax", E("(int)(short)" + v.p(), 4))
             return
+        if m == "cwd":
+            # sign-extend ax into dx: the start of a 16-bit division
+            v = self.reg("eax", ins)
+            self.set_reg("edx", E("%s >> 15" % v.p(), 2, tag=("sign16", v)))
+            return
         if m == "cdq":
             v = self.reg("eax", ins)
             self.set_reg("edx", E("%s >> 31" % v.p(), 4, tag=("sign", v)))
@@ -1266,6 +1278,21 @@ class Func:
             a = self.src(ops[1], ins)
             b = self.src(ops[2], ins)
             self.set_reg(full, E("%s * %s" % (a.p(), b.p()), 4))
+            return
+        if m == "idiv" and ops[0].size == 2:
+            # cwd; idiv bx: short division, quotient in ax, remainder in dx
+            a = self.reg("eax", ins)
+            d = self.regs.get("edx")
+            if not (d is not None and d.tag and d.tag[0] == "sign16"):
+                raise Unsupported("16-bit idiv without cwd")
+            b = self.src(ops[0], ins)
+            sa = a if a.size == 2 else \
+                E(a.text.replace("*(int *)", "*(short *)", 1), 2, True) \
+                if a.atom and a.text.startswith("*(int *)") else E("(short)%s" % a.p(), 2, True)
+            sb = b if b.size == 2 or re.fullmatch(r"-?\d+", b.text) else \
+                E("(short)%s" % b.p(), 2, True)
+            self.set_reg("eax", E("%s / %s" % (sa.p(), sb.p()), 2))
+            self.set_reg("edx", E("%s %% %s" % (sa.p(), sb.p()), 2))
             return
         if m in ("idiv", "div"):
             a = self.reg("eax", ins)
