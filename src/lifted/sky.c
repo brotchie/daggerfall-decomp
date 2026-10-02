@@ -10,6 +10,8 @@ extern char D_00136E24[];
 extern char D_0014294C[];
 extern char D_00143550[];
 extern char D_00147954[];
+extern char D_00150200[];
+extern char D_00150A00[];
 extern char D_00170A6C[];
 extern char D_00170A79[];
 extern char D_00170A86[];
@@ -62,6 +64,7 @@ extern int func_000A00AF();
 extern int func_000A0ED9(int, int);
 extern int func_000A0F5C(int, ...);
 extern int func_000A1023();
+extern int func_000C8167();
 extern int func_000C816E();
 extern int func_000C9A89();
 extern int func_000C9CB9();
@@ -71,7 +74,7 @@ extern int func_00136AD8();
 extern int func_00137000();
 extern int func_00137725();
 extern int func_0014BDDD();
-extern void func_000351B6(int, int, int, int);
+void func_000351B6(int, int, int, int);
 void func_00035A7F(void);
 void func_00035CE5(int);
 #pragma aux func_000A0ED9 parm routine [];
@@ -170,6 +173,26 @@ L350FF:;
 L35101:;
     func_000A0024(*(int *)D_001970E4, (int)D_00170A86, 371);
     *(int *)D_001970E4 = -1751672937;
+}
+
+void func_00035129(int a1, int a2, int a3)
+{
+    int l_10;
+
+    l_10 = ((1087 - ((a3 * 1087) / 720)) + 2015) & 2047;
+    *(int *)((char *)a1 + 8) = a2;
+    *(int *)((char *)a1) = func_000C8167(8192, *(int *)(D_00150A00 + (l_10 << 2)));
+    *(int *)((char *)a1 + 4) = -(func_000C8167(8192, *(int *)(D_00150200 + (l_10 << 2))));
+}
+
+void func_000351B6(int a1, int a2, int a3, int a4)
+{
+    int l_C;
+
+    l_C = (a3 << 11) / a4;
+    *(int *)((char *)a1 + 8) = a2;
+    *(int *)((char *)a1) = func_000C8167(8192, *(int *)(D_00150A00 + (l_C << 2)));
+    *(int *)((char *)a1 + 4) = -(func_000C8167(8192, *(int *)(D_00150200 + (l_C << 2))));
 }
 
 void func_0003522C(void)

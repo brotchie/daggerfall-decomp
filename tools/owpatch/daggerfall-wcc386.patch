@@ -723,7 +723,7 @@ index 1bab6746f0..493bf37016 100644
              cf_value = OkToNegate( ins->operands[1]->c.u.cfval, tipe );
              if( cf_value != NULL ) {
 diff --git a/bld/cg/c/generate.c b/bld/cg/c/generate.c
-index a7f606be70..cb330f17bb 100644
+index a7f606be70..2277ede253 100644
 --- a/bld/cg/c/generate.c
 +++ b/bld/cg/c/generate.c
 @@ -31,6 +31,9 @@
@@ -736,7 +736,16 @@ index a7f606be70..cb330f17bb 100644
  #include "coderep.h"
  #include "memcheck.h"
  #include "data.h"
-@@ -84,6 +87,7 @@
+@@ -67,6 +70,8 @@
+ #include "optimize.h"
+ #include "index.h"
+ #include "fixindex.h"
++
++static void DaggerDumpIns( const char *when );
+ #include "conflict.h"
+ #include "scmain.h"
+ #include "generate.h"
+@@ -84,6 +89,7 @@
  #include "condcode.h"
  #include "trecurse.h"
  #include "feprotos.h"
@@ -744,7 +753,7 @@ index a7f606be70..cb330f17bb 100644
  
  
  static  bool            abortCG;
-@@ -144,6 +148,126 @@ static  void    AddANop( void )
+@@ -144,6 +150,126 @@ static  void    AddANop( void )
  }
  
  
@@ -871,7 +880,7 @@ index a7f606be70..cb330f17bb 100644
  static  void            PreOptimize( void )
  /*****************************************/
  {
-@@ -333,8 +457,8 @@ static  void    ForceTempsMemory( void )
+@@ -333,8 +459,8 @@ static  void    ForceTempsMemory( void )
      ParmPropagate();
      for( op = Names[N_TEMP]; op != LastTemp; op = next ) {
          next = op->n.next_name;
@@ -882,7 +891,15 @@ index a7f606be70..cb330f17bb 100644
              op = DeAlias( op );
              op->v.usage |= NEEDS_MEMORY | USE_MEMORY;
              while( op->v.conflict != NULL ) {
-@@ -501,7 +625,12 @@ static  void    FlushBlocks( bool partly_done )
+@@ -413,6 +539,7 @@ static  void    BlockToCode( bool partly_done )
+         FixIndex();
+         FixSegments();
+         FPRegAlloc();
++        DaggerDumpIns( "block before regalloc" );
+         RegAlloc( true );
+         FreeConflicts();
+         HaveLiveInfo = false;
+@@ -501,7 +628,12 @@ static  void    FlushBlocks( bool partly_done )
          classes |= blk->class;
          CurrBlock = blk;
          BlockToCode( partly_done );
@@ -896,7 +913,71 @@ index a7f606be70..cb330f17bb 100644
      }
      CurrBlock = curr;
      HeadBlock = NULL;
-@@ -665,6 +794,9 @@ void    Generate( bool routine_done )
+@@ -542,6 +674,63 @@ static  void    FreeExtraSyms( name *last )
+ }
+ 
+ 
++
++/* Daggerfall debugging: DAGGER_DUMPINS=1 prints the instructions before register
++ * allocation (opcode, type, operands, result) */
++static void DaggerDumpName( name *op )
++{
++    if( op == NULL ) {
++        fprintf( stderr, " -" );
++        return;
++    }
++    switch( op->n.class ) {
++    case N_CONSTANT:
++        fprintf( stderr, " #%ld", (long)op->c.lo.u.int_value );
++        break;
++    case N_TEMP:
++        fprintf( stderr, " t%d%s+%d/%d", (int)op->t.v.id,
++                 ( op->v.usage & HAS_MEMORY ) ? "m" : "", (int)op->v.offset, (int)op->n.size );
++        break;
++    case N_MEMORY:
++        fprintf( stderr, " M%p/%d", (void *)op->v.symbol, (int)op->n.size );
++        break;
++    case N_REGISTER:
++        fprintf( stderr, " R" );
++        break;
++    case N_INDEXED:
++        fprintf( stderr, " [" );
++        DaggerDumpName( op->i.base );
++        fprintf( stderr, " +" );
++        DaggerDumpName( op->i.index );
++        fprintf( stderr, " *%d +%ld]", 1 << op->i.scale, (long)op->i.constant );
++        break;
++    default:
++        fprintf( stderr, " ?%d", op->n.class );
++    }
++}
++
++static void DaggerDumpIns( const char *when )
++{
++    block       *blk;
++    instruction *ins;
++    int         i;
++
++    if( getenv( "DAGGER_DUMPINS" ) == NULL )
++        return;
++    fprintf( stderr, "== %s %s\n", when, DaggerCurrProcName() );
++    for( blk = HeadBlock; blk != NULL; blk = blk->next_block ) {
++        fprintf( stderr, "block\n" );
++        for( ins = blk->ins.head.next; ins->head.opcode != OP_BLOCK; ins = ins->head.next ) {
++            fprintf( stderr, "  op%d c%d:", ins->head.opcode, ins->type_class );
++            for( i = 0; i < ins->num_operands; i++ )
++                DaggerDumpName( ins->operands[i] );
++            fprintf( stderr, " =>" );
++            DaggerDumpName( ins->result );
++            fprintf( stderr, "\n" );
++        }
++    }
++}
++
+ static  void    FinishIndex( void )
+ /*********************************/
+ {
+@@ -665,6 +854,9 @@ void    Generate( bool routine_done )
              InitStackMap();
              BlockByBlock = true;
          }
@@ -906,7 +987,7 @@ index a7f606be70..cb330f17bb 100644
          LNBlip( SrcLine );
          FlushBlocks( false );
          FreeExtraSyms( LastTemp );
-@@ -722,6 +854,11 @@ void    Generate( bool routine_done )
+@@ -722,6 +914,11 @@ void    Generate( bool routine_done )
          Panic( false );
          return;
      }
@@ -918,6 +999,14 @@ index a7f606be70..cb330f17bb 100644
      MakeConflicts();
      if( _IsModel( CGSW_GEN_LOOP_OPTIMIZATION ) ) {
          SplitVars();
+@@ -744,6 +941,7 @@ void    Generate( bool routine_done )
+     FixIndex();
+     FixSegments();
+     FPRegAlloc();
++    DaggerDumpIns( "before regalloc" );
+     if( !RegAlloc( false ) ) {
+         Panic( true );
+         HaveLiveInfo = false;
 diff --git a/bld/cg/c/intrface.c b/bld/cg/c/intrface.c
 index b473a42354..b860b0b1a3 100644
 --- a/bld/cg/c/intrface.c

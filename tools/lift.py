@@ -1275,6 +1275,15 @@ class Func:
                 raise Unsupported("read-modify-write of the return slot")
             lv = lhs if re.fullmatch(r"\w+", lhs) else "(%s)" % lhs
             prev = self.body[self.k - 1] if self.k else None
+            if m in ("neg", "not") and prev is not None and prev.mnemonic == "mov" and \
+                    prev.operands[0].type == cx.X86_OP_MEM and \
+                    prev.op_str.split(", ")[0] == ins.op_str and self.out and \
+                    self.out[-1].startswith("    %s = " % lhs) and \
+                    not os.environ.get("LIFT_NOSTORENEG"):
+                # mov [x],edx; neg [x] (the address not reloaded): x = -y, negated in place
+                rhs = self.out[-1][len("    %s = " % lhs):-1]
+                self.out[-1] = "    %s = %s(%s);" % (lhs, "-" if m == "neg" else "~", rhs)
+                return
             if m in ("inc", "dec") and prev is not None and prev.mnemonic == "mov" and \
                     prev.operands[0].type == cx.X86_OP_REG and \
                     prev.op_str.split(", ", 1)[1] == ins.op_str and \

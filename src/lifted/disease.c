@@ -981,32 +981,28 @@ L67FEB:;
 L6800B:;
     goto L68026;
 L6800D:;
-    *(int *)D_001A3AA8 = ((int)(short)*(short *)(*(char **)D_00195BE0 + 143)) >> 1;
-    *(int *)D_001A3AA8 = -(*(int *)D_001A3AA8);
+    *(int *)D_001A3AA8 = -(((int)(short)*(short *)(*(char **)D_00195BE0 + 143)) >> 1);
 L68026:;
     if (((int)(unsigned short)(*(short *)(*(char **)D_00195BEC + 4) & 64)) == 0) goto L68046;
     if (func_0004B192() == 0) goto L68048;
 L68046:;
     goto L6805F;
 L68048:;
-    *(int *)D_001A3AA8 = (int)(short)*(short *)(*(char **)D_00195BE0 + 143);
-    *(int *)D_001A3AA8 = -(*(int *)D_001A3AA8);
+    *(int *)D_001A3AA8 = -((int)(short)*(short *)(*(char **)D_00195BE0 + 143));
 L6805F:;
     if (((int)(unsigned short)(*(short *)(*(char **)D_00195BEC + 4) & 512)) == 0) goto L6807F;
     if (func_0004B192() != 0) goto L68081;
 L6807F:;
     goto L6809A;
 L68081:;
-    *(int *)D_001A3AA8 = ((int)(short)*(short *)(*(char **)D_00195BE0 + 143)) >> 1;
-    *(int *)D_001A3AA8 = -(*(int *)D_001A3AA8);
+    *(int *)D_001A3AA8 = -(((int)(short)*(short *)(*(char **)D_00195BE0 + 143)) >> 1);
 L6809A:;
     if (((int)(unsigned short)(*(short *)(*(char **)D_00195BEC + 4) & 256)) == 0) goto L680BA;
     if (func_0004B192() != 0) goto L680BC;
 L680BA:;
     return;
 L680BC:;
-    *(int *)D_001A3AA8 = (int)(short)*(short *)(*(char **)D_00195BE0 + 143);
-    *(int *)D_001A3AA8 = -(*(int *)D_001A3AA8);
+    *(int *)D_001A3AA8 = -((int)(short)*(short *)(*(char **)D_00195BE0 + 143));
 }
 
 void func_000686DA(int a1)

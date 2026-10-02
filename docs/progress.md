@@ -1167,3 +1167,7 @@ Batch **1,927**; build **61.34%**.
   f(.., t, u, w)` with single-use slots back into the call (only when arguments were
   spilled: an if/else on a variable of its own compiles the same diamond). +9.
   Batch **2,043**.
+- `mov [eax+4],edx; neg dword [eax+4]` with the address not reloaded is `p->f = -y`
+  (Watcom stores, then negates in memory). +5. Batch **2,048**. (The compiler also gained
+  a `DAGGER_DUMPINS=1` dump of the instruction stream before register allocation, for
+  studying allocation differences.)
