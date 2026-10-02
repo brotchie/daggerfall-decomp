@@ -186,6 +186,7 @@ class Func:
         self.fpst = []           # the x87 stack of double expressions
         self.fpcalls = {}        # functions returning doubles: name -> double arguments
         self.fild_val = {}       # temp slot -> the int an fild converts
+        self.slot_val = {}       # temp slot -> the value its one later read gets
         self.choices = []        # instruction addresses of operand-order choice points
         self.choice_sites = {}   # choice -> addresses where it shows (slot accesses)
         self.flips = frozenset()
@@ -491,6 +492,8 @@ class Func:
                 continue
             if any(o - 3 <= k <= o for k in known):
                 continue
+            if any(self.slot_type.get(k) == "double" and k - 7 <= o <= k for k in known):
+                continue                      # the upper half of a double
             self.slot_type[o] = "int"         # declared but never used
         # callers see the access-based parameter types; the layout plan only changes how the
         # function itself declares them
@@ -699,6 +702,9 @@ class Func:
             t = self.mem(op, ins, op.size)
             if t == "@RET":
                 raise Unsupported("read of the return slot")
+            off_ = ebp_slot(ins, op)
+            if off_ is not None and off_ in self.slot_val:
+                return self.slot_val.pop(off_)
             pre = getattr(self, "pre_ops", {})
             if t in pre:
                 # an in-place ++/-- done while the expression was being evaluated: --x
@@ -976,7 +982,13 @@ class Func:
             args = []
             for _ in range(n):
                 v = self.pushes.pop()
-                self.pushes.pop()           # the double's other half
+                w = self.pushes.pop()       # the double's other half
+                if v.size != 8 and re.fullmatch(r"-?\d+", v.text) and \
+                        re.fullmatch(r"-?\d+", w.text):
+                    # a double constant pushed as two dwords (low half last)
+                    import struct
+                    bits = (int(w.text) & 0xFFFFFFFF) << 32 | (int(v.text) & 0xFFFFFFFF)
+                    v = E(repr(struct.unpack("<d", struct.pack("<Q", bits))[0]), 8, True)
                 args.append(v.text)
             self.fpcalls[name] = n
             st.append(E("%s(%s)" % (name, ", ".join(args)), 8, atom=True))
@@ -1058,6 +1070,13 @@ class Func:
                 self.skip_addr = nxt.address
                 self.set_reg(subreg(nxt.reg_name(nxt.operands[0].reg))[0], v)
                 return True
+            if m == "fistp" and off is not None and \
+                    sum(1 for x in self.body for o in x.operands if ebp_slot(x, o) == off) == 2 \
+                    and not os.environ.get("LIFT_NOFISTPTEMP"):
+                # converted through a temp read once later: the read gets the conversion
+                self.temps.add(off)
+                self.slot_val[off] = v
+                return True
             if m == "fistp" and off is not None and nxt is not None and nxt.mnemonic == "push" \
                     and nxt.op_str == ins.op_str:
                 # converted through a temp slot and pushed as an argument
@@ -1109,11 +1128,14 @@ class Func:
             nx = self.body[self.k + 1] if self.k + 1 < len(self.body) else None
             off_ = ebp_slot(ins, d)
             if nx is not None and nx.mnemonic == "fild" and off_ is not None and \
-                    nx.op_str == ins.op_str.split(", ")[0] and d.size == 4 and \
+                    re.sub(r"^\w+ ptr ", "", nx.op_str) == \
+                    re.sub(r"^\w+ ptr ", "", ins.op_str.split(", ")[0]) and d.size == 4 and \
                     sum(1 for x in self.body for o in x.operands
                         if ebp_slot(x, o) == off_) == 2:
-                # an int stored to a temp only to be converted to a double
-                self.fild_val[off_] = v
+                # an int stored to a temp only to be converted to a double (a short one
+                # when read back as a word)
+                self.fild_val[off_] = v if nx.operands[0].size == 4 else \
+                    E("(short)%s" % v.p(), 2, atom=True)
                 self.temps.add(off_)
                 return
             lhs = self.mem(d, ins, d.size)

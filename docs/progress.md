@@ -1251,3 +1251,6 @@ Batch **1,927**; build **61.34%**.
   library functions taking and returning doubles on the stack
   (`#pragma aux f parm routine [] value [8087]`), and `fld y; fsubr [x]; fstp [x]` as
   `x -= y`. +5. Batch **2,134**.
+- FP refinements: a `fistp` temp read once later, a word `fild` of a dword-stored temp
+  (`(short)x`), double constants pushed as two dwords, no phantom local in a double's upper
+  half. (3D2B6 and 9830F still differ in where the double and the conversion temps go.)

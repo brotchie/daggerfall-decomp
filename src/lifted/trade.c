@@ -58,8 +58,9 @@ extern void func_00069B53(int);
 extern void func_0008C4E4(int);
 void func_0006899B(void);
 #pragma aux func_000A0ED9 parm routine [];
+#pragma dagger DAGGER_NOGIVEN func_0006899B
 #pragma dagger DAGGER_PUSHMEM func_00068731
-#pragma dagger reg func_0006899B 2 edx 3 edx 4 edx
+#pragma dagger reg func_0006899B 0 edx 1 edx 2 edx 3 edx
 
 void func_00068731(void)
 {
@@ -134,10 +135,7 @@ L68982:;
 
 void func_0006899B(void)
 {
-    short l_18;
-
-    *(int *)&l_18 = (int)(unsigned char)*(signed char *)(*(char **)D_00195A9C + 25);
-    *(double *)D_001A3AD4 = ((((*(double *)D_00175A9E - (l_18 * *(double *)D_00175A96)) + (*(short *)(*(char **)D_001A3AE0 + 283) * *(double *)D_00175AA6)) + (*(short *)(*(char **)D_001A3AE0 + 42) * *(double *)D_00175AA6)) + (*(short *)(*(char **)D_001A3AE0 + 147) * *(double *)D_00175AAE)) * (*(double *)D_001A3AB4 - *(double *)D_001A3AAC);
+    *(double *)D_001A3AD4 = ((((*(double *)D_00175A9E - ((short)((int)(unsigned char)*(signed char *)(*(char **)D_00195A9C + 25)) * *(double *)D_00175A96)) + (*(short *)(*(char **)D_001A3AE0 + 283) * *(double *)D_00175AA6)) + (*(short *)(*(char **)D_001A3AE0 + 42) * *(double *)D_00175AA6)) + (*(short *)(*(char **)D_001A3AE0 + 147) * *(double *)D_00175AAE)) * (*(double *)D_001A3AB4 - *(double *)D_001A3AAC);
 }
 
 int func_00068A1D(void)
