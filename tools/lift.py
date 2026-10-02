@@ -295,6 +295,7 @@ class Func:
         self.w16_stores = set()
         afirst = {}    # address-taken slot -> address of its first access
         sign = {}      # slot -> 's' / 'u' hints
+        fpu4 = set()   # slots the FPU reads or writes as floats
         addr = set()
         body = self.ins[self.body_start:self.body_end]
         R16 = {"eax": "ax", "edx": "dx", "ebx": "bx", "ecx": "cx"}
@@ -358,6 +359,10 @@ class Func:
                     afirst.setdefault(off, ins.address)
                     continue
                 acc.setdefault(off, set()).add(op.size)
+                if op.size == 4 and ins.mnemonic in ("fld", "fst", "fstp", "fadd", "fsub",
+                                                     "fsubr", "fmul", "fdiv", "fdivr",
+                                                     "fcom", "fcomp"):
+                    fpu4.add(off)
                 first.setdefault(off, ins.address)
                 sites.setdefault(off, []).append(ins.address)
                 if n == 0 and ins.mnemonic in ("mov", "add", "sub", "and", "or", "xor") and \
@@ -447,9 +452,12 @@ class Func:
             if sz not in (1, 2, 4, 8):
                 raise Unsupported("%d-byte stack slot" % sz)
             t = (UTYPE if hint == {"u"} or (sz == 1 and hint != {"s"}) else STYPE)[sz]
+            if sz == 4 and off in fpu4 and not os.environ.get("LIFT_NOFLOAT"):
+                t = "float"     # stored and loaded by the FPU as 4 bytes
             self.slot_type[off] = t
         self.size_of = {"signed char": 1, "unsigned char": 1, "short": 2,
-                        "unsigned short": 2, "int": 4, "unsigned": 4, "double": 8}
+                        "unsigned short": 2, "int": 4, "unsigned": 4, "double": 8,
+                        "float": 4}
         # stack parameters ([ebp+8], [ebp+12], ...): a narrow one makes callers push through a
         # register (`mov eax,0x9c; push eax`)
         self.stack_type = [self.slot_type.pop(-(8 + 4 * k), "int") for k in range(self.nstack)]
@@ -997,6 +1005,9 @@ class Func:
             return "(%s & %s) %s 0" % (a.p(), b.p(), opr)
         raise Unsupported("jcc on arithmetic flags")
 
+    def params_offs(self):
+        return {p[1] for p in self.params}
+
     def fpu_step(self, ins):
         """x87 code: an expression stack of doubles. Returns True when handled."""
         m, ops = ins.mnemonic, ins.operands
@@ -1010,7 +1021,7 @@ class Func:
             self.pushes.append(st.pop())
             return True
         if m == "call" and ops[0].type == cx.X86_OP_IMM and ops[0].imm == CHP and st:
-            st[-1] = E(st[-1].text, 8, st[-1].atom, tag=("chp",))
+            st[-1] = E(st[-1].text, 8, st[-1].atom, tag=("chp", st[-1].tag))
             return True
         if m == "call" and ops[0].type == cx.X86_OP_IMM and nxt is not None and \
                 nxt.mnemonic.startswith("f") and nxt.mnemonic not in ("fld", "fild", "fld1",
@@ -1085,20 +1096,48 @@ class Func:
                     a, b = b, a
                 # (the memory operand is the left one: maybe a compound assignment to it)
                 tag = ("fopm", a.text, opr, other) if rev or opr in ("+", "*") else None
-                st.append(E("%s %s %s" % (a.p(), opr, b.p()), 8, tag=tag))
+                e = E("%s %s %s" % (a.p(), opr, b.p()), 8, tag=tag)
+                e.fparts = (a, opr, b)
+                st.append(e)
                 return True
             else:
                 raise Unsupported("x87 register operation")
+            if a.size != 8 and b.size != 8 and not os.environ.get("LIFT_NOFPCAST"):
+                # two ints loaded with fild: a floating-point operation on them
+                a = E("(double)%s" % a.p(), 8, atom=True)
             st.append(E("%s %s %s" % (a.p(), opr, b.p()), 8))
             return True
         if m == "fcomp" and ops and ops[0].type == cx.X86_OP_MEM:
             a = st.pop()
             self.flags = ("fcmp", a, operand(ops[0]))
             return True
+        if m == "fstp" and ops[0].size == 4 and nxt is not None and nxt.mnemonic == "fld" and \
+                nxt.op_str == ins.op_str and not os.environ.get("LIFT_NOF32TEMP"):
+            off = ebp_slot(ins, ops[0])
+            uses = [x for x in self.body for o in x.operands
+                    if o.type == cx.X86_OP_MEM and ebp_slot(x, o) == off]
+            pairs = all(x.mnemonic in ("fstp", "fld") for x in uses)
+            if off is not None and pairs and off not in self.params_offs():
+                # rounded to a float through a temp: the expression's type is float
+                v = st.pop()
+                self.temps.add(off)
+                self.skip_addr = nxt.address
+                st.append(E("(float)%s" % v.p(), 8, atom=True, tag=("f32", v)))
+                return True
         if m in ("fstp", "fistp"):
             v = st.pop()
+            inner = v.tag[1] if v.tag and v.tag[0] == "chp" else v.tag
+            if m == "fistp" and inner and inner[0] == "f32" and \
+                    getattr(inner[1], "fparts", None) and not os.environ.get("LIFT_NOFCOMPOUND"):
+                # (int)(float)((float)x op y) stored back to x: x op= y
+                lhs = self.mem(ops[0], ins, ops[0].size)
+                fa, opr, fb = inner[1].fparts
+                if fa.tag and fa.tag[0] == "f32" and fa.tag[1].text == lhs:
+                    self.emit("%s %s= %s;" % (lhs, opr, fb.text))
+                    return True
             if m == "fistp":
-                v = E("(int)%s" % v.p(), 4)
+                # (a 64-bit store whose low half is read: the conversion to unsigned)
+                v = E("(%s)%s" % ("unsigned" if ops[0].size == 8 else "int", v.p()), 4)
             op = ops[0]
             off = ebp_slot(ins, op)
             if m == "fistp" and off is not None and nxt is not None and nxt.mnemonic == "mov" \

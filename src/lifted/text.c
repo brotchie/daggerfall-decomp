@@ -67,6 +67,7 @@ extern char D_00196279[];
 extern char D_0019627E[];
 extern char D_0019627F[];
 extern char D_0019628E[];
+extern char D_00196DA4[];
 extern char D_00199648[];
 extern char D_0019964C[];
 extern char D_00199650[];
@@ -89,7 +90,6 @@ extern int func_00020C87(int);
 extern int func_00023DE0(int, int);
 extern int func_0003D412(int, int, int);
 extern int func_000404D9(int, int);
-extern int func_00040983(int, int);
 extern int func_00062EF7(int, int, int);
 extern int func_00069938(int, int, int);
 extern int func_0006CB53(int, int);
@@ -142,6 +142,7 @@ int func_0004037E(void);
 int func_000406DC(int, int);
 int func_00040794(int, int);
 int func_0004083A(int, int, int);
+int func_00040983(int, int);
 int func_00040B83(int);
 void func_0003E942(int);
 void func_0003F25E(void);
@@ -156,6 +157,7 @@ void func_00040E9D(int);
 #pragma dagger slots func_0003E8A8 a1 8 a2 20 a3 4 l_24 24 l_18 12 ret 16
 #pragma dagger slots func_0003EAB4 a1 32 a2 8 a3 24 a4 4 l_24 28 l_18 16 l_14 12 ret 20
 #pragma dagger slots func_0003EDF4 a1 16 a2 4 a3 8 l_18 12
+#pragma dagger slots func_00040983 a1 48 a2 44 l_38 40 l_34 36 l_30 32 l_2C 28 l_28 24 l_24 20 l_20 16 l_1C 12 l_14 4 ret 8
 
 void func_0003E653(int a1, int a2)
 {
@@ -1191,6 +1193,54 @@ L4091D:;
     return 1;
 L4096A:;
     return func_00040983(a2, a3);
+}
+
+int func_00040983(int a1, int a2)
+{
+    int l_38;
+    int l_34;
+    int l_30;
+    int l_2C;
+    int l_28;
+    int l_24;
+    float l_20;
+    float l_1C;
+    unsigned char l_14;
+
+    a1 >>= 6;
+    a2 >>= 6;
+    a2 = ((((int)(unsigned char)*(signed char *)(*(char **)D_00195BDC + 33)) << 6) - a2) - 1;
+    l_38 = *(int *)(*(char **)D_00195AA4 + 7) - *(int *)(*(char **)D_00195AC4 + 7);
+    l_34 = *(int *)(*(char **)D_00195AA4 + 15) - *(int *)(*(char **)D_00195AC4 + 15);
+    l_38 >>= 6;
+    l_34 >>= 6;
+    l_34 = ((((int)(unsigned char)*(signed char *)(*(char **)D_00195BDC + 33)) << 6) - l_34) - 1;
+    l_30 = a1 - l_38;
+    l_2C = a2 - l_34;
+    l_28 = ((func_0009DEAC(l_30) > func_0009DEAC(l_2C)) ? func_0009DEAC(l_30) : func_0009DEAC(l_2C));
+    l_20 = (double)l_30 / l_28;
+    l_1C = (double)l_2C / l_28;
+    l_24 = 0;
+L40A5F:;
+    if ((l_28 + 1) > l_24) goto L40A75;
+    goto L40AEA;
+L40A6D:;
+    l_24++;
+    goto L40A5F;
+L40A75:;
+    l_14 = *(signed char *)((char *)(int)(*(char **)D_00196DA4 + (((((int)(unsigned char)*(signed char *)(*(char **)D_00195BDC + 32)) << 6) * l_34) + l_38)));
+    if (l_14 == 0) goto L40AA9;
+    if (((int)(unsigned char)l_14) < 100) goto L40AAB;
+L40AA9:;
+    goto L40AB4;
+L40AAB:;
+    return 1;
+L40AB4:;
+    l_38 += l_20;
+    l_34 += l_1C;
+    goto L40A6D;
+L40AEA:;
+    return 0;
 }
 
 int func_00040AFD(void)
