@@ -1184,3 +1184,6 @@ Batch **1,927**; build **61.34%**.
   generates it), so the table landed in front of the statement. The front end now emits a
   label before the mark, ending the block first. +4 (three of them 1.7–2.8 KB).
   Batch **2,076**.
+- Locals deeper in the frame than a switch's selector temp were declared in a block opened
+  inside the switch (a choice point when the frame has no parameters to tell). +2.
+  Batch **2,078**.

@@ -2242,6 +2242,22 @@ class Func:
         # Locals below every parameter were declared in a nested block: Watcom gives a
         # block's locals their slots when the block starts, after the function's own.
         nested = [o for o in rest + two if o in self.nested]
+        if not nested and self.cswitches and not os.environ.get("LIFT_NOTEMPNEST"):
+            # locals deeper than a switch's selector temp got their slots after the switch
+            # was reached: a block opened inside it (a choice point)
+            sw_temps = []
+            for sw in self.cswitches.values():
+                st = sw.get("store")
+                if st is not None:
+                    si = next((x for x in self.ins if x.address == st), None)
+                    if si is not None and ebp_slot(si, si.operands[0]) is not None:
+                        sw_temps.append(ebp_slot(si, si.operands[0]))
+            if sw_temps:
+                deeper = [o for o in rest + two if o > min(sw_temps)]
+                if deeper:
+                    self.choices.append(-2000)
+                    if -2000 not in self.flips:
+                        nested = deeper
         outer = [o for o in rest + two if o not in nested]
         used = set(re.findall(r"goto L([0-9A-F]+);", "\n".join(self.out)))
         body = []
