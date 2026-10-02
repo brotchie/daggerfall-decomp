@@ -47,6 +47,7 @@ tools/build-and-verify.sh
 | `tools/build_ow.sh` | build the patched Open Watcom toolchain (`tools/owpatch/`) |
 | `tools/le.py` | LE loader: objects, pages, fixups (from KKND-Decomp) |
 | `tools/find_functions.py` | function discovery → `config/functions.csv` |
+| `tools/split.py` | one symbolic asm listing per function → `asm/nonmatchings/` (gitignored) |
 | `tools/omf.py` | OMF object reader (from KKND-Decomp) |
 | `tools/match.py` | compile a C file and compare its functions with `FALL.EXE` |
 | `tools/cc_dis.py` | disassemble what the compiler makes of a C file |
