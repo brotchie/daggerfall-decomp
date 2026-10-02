@@ -40,6 +40,7 @@ extern char D_001997AE[];
 extern char D_001A5BE4[];
 
 extern int func_000192EE(short);
+extern int func_000309E8(int, int);
 extern int func_000310E1(int, int);
 extern int func_000332F7(int);
 extern int func_0004C075(int);
@@ -622,6 +623,28 @@ void func_0004CDE3(int a1)
     if (*(short *)((char *)a1 + 2) == 0) return;
     l_18 = func_000192EE((int)(short)*(short *)((char *)a1 + 2));
     func_0001B470(l_18, 5);
+}
+
+void func_0004CE24(int a1, int a2)
+{
+    int l_18;
+    int l_14;
+
+    l_18 = func_000309E8(a1, 3);
+    l_14 = 0;
+L4CE4E:;
+    if (((int)(short)*(short *)((char *)a1 + 22)) > l_14) goto L4CE6B;
+    return;
+L4CE5C:;
+    l_14++;
+    (*(char (**)[20])&l_18)++;
+    goto L4CE4E;
+L4CE6B:;
+    if (((int)(short)*(short *)((char *)l_18 + 4)) != 21) goto L4CEB3;
+    func_0001D766(a1, ((a2 != 0) ? 1008 : 1009), *(int *)(*(char **)((char *)l_18 + 12) + 31), 2);
+    return;
+L4CEB3:;
+    goto L4CE5C;
 }
 
 int func_0004CEBE(int a1)

@@ -47,7 +47,6 @@ extern int func_000C7FD9();
 extern int func_000C7FF4();
 extern int func_000C808D();
 extern void func_0006243B(int, int, int);
-extern void func_000633BC(int, int);
 extern void func_00073DF9(int, int);
 extern void func_00078566(int, int);
 extern void func_0008E3F7(int, int);
@@ -56,6 +55,7 @@ int func_0006299F(int);
 int func_000631AA(int);
 int func_00063ED8(int, int);
 void func_00062FBE(int);
+void func_000633BC(int, int);
 #pragma dagger slots func_0006310D a1 8 a2 12 l_24 20 l_20 16 l_14 4
 
 void func_000622EB(int a1, int a2, int a3, int a4)
@@ -498,6 +498,29 @@ L63275:;
 L6327C:;
     return l_24;
 }
+}
+
+void func_000633BC(int a1, int a2)
+{
+    int l_18;
+    int l_14;
+
+    l_18 = a1 + 71;
+    l_14 = (((int)(unsigned char)*(signed char *)((char *)l_18 + 506)) * 10) + 10000;
+    if (((int)(unsigned short)(*(short *)((char *)l_18 + 64) & 384)) == 0) goto L6347C;
+    if (a2 >= 128) goto L6344B;
+    func_00069938(((((signed char)func_0009DC25() & 3) != 0) ? l_14 + 2 : l_14 + 1), a1, 100);
+    goto L6347A;
+L6344B:;
+    if (func_0009DC25() >= 32000) goto L6346A;
+    func_00069938(l_14 + 1, a1, 100);
+    goto L6347A;
+L6346A:;
+    func_00069938(l_14, a1, 100);
+L6347A:;
+    return;
+L6347C:;
+    func_00069938(l_14, a1, 100);
 }
 
 int func_00063495(int a1)

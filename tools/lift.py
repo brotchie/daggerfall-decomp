@@ -2130,8 +2130,73 @@ class Func:
         return "    %s l_%X;" % (self.slot_type[o], o)
 
     # ---- output ------------------------------------------------------------------------
+    def ternaries(self):
+        """`if (c) goto A; t = x; goto B; A: t = y; B: ... t ...` with t a slot used only
+        there is `c ? y : x`, t the compiler's temp. Arguments of a call with a ternary
+        argument are evaluated into temps first (right to left), so single-use slots
+        stored just before go back into the call too."""
+        out = self.out
+        body = "\n".join(out)
+
+        def uses(v):
+            return len(re.findall(r"\b%s\b" % v, body))
+
+        def gotos(lab):
+            return len(re.findall(r"goto %s;" % lab, body))
+
+        changed = True
+        while changed:
+            changed = False
+            body = "\n".join(out)
+            for i in range(len(out) - 6):
+                m0 = re.fullmatch(r"    if \((.*)\) goto (L[0-9A-F]+);", out[i])
+                m1 = re.fullmatch(r"    (l_[0-9A-F]+) = (.*);", out[i + 1])
+                m2 = re.fullmatch(r"    goto (L[0-9A-F]+);", out[i + 2])
+                if not (m0 and m1 and m2) or out[i + 3] != m0.group(2) + ":;":
+                    continue
+                t = m1.group(1)
+                m4 = re.fullmatch(r"    %s = (.*);" % t, out[i + 4])
+                if not m4 or out[i + 5] != m2.group(1) + ":;" or \
+                        gotos(m0.group(2)) != 1 or gotos(m2.group(1)) != 1 or \
+                        uses(t) != 3 or len(re.findall(r"\b%s\b" % t, out[i + 6])) != 1 or \
+                        "&" + t in out[i + 6] or \
+                        re.match(r"\w+:;|case |default:", out[i + 6]):
+                    continue
+                off = int(t[2:], 16)
+                if off in self.arrays or self.slot_type.get(off) != "int":
+                    continue
+                tern = "%s ? %s : %s" % (negate(m0.group(1)), m1.group(2), m4.group(1))
+                use = re.sub(r"\b%s\b" % t, lambda _m: "(%s)" % tern, out[i + 6])
+                self.temps.add(off)
+                # the call's later arguments, stored into temps just before
+                j = i
+                # (only for a call statement whose argument the ternary is)
+                call = re.match(r"    (?:[\w*()& ]+ = )?func_[0-9A-F]{8}\(", out[i + 6])
+                if call and not re.search(r"\b%s\b" % t, out[i + 6][call.end():]):
+                    call = None
+                while j > 0 and call:
+                    mm = re.fullmatch(r"    (l_[0-9A-F]+) = (.*);", out[j - 1])
+                    if not mm or uses(mm.group(1)) != 2 or "&" + mm.group(1) in use or \
+                            not re.search(r"\b%s\b" % mm.group(1), use[call.end():]) or \
+                            len(re.findall(r"\b%s\b" % mm.group(1), use)) != 1 or \
+                            self.slot_type.get(int(mm.group(1)[2:], 16)) != "int" or \
+                            int(mm.group(1)[2:], 16) in self.arrays:
+                        break
+                    use = re.sub(r"\b%s\b" % mm.group(1), lambda _m: mm.group(2), use)
+                    self.temps.add(int(mm.group(1)[2:], 16))
+                    j -= 1
+                if j == i:
+                    # no argument spilled: an if/else on a variable of its own, as likely
+                    self.temps.discard(off)
+                    continue
+                out[j:i + 7] = [use]
+                changed = True
+                break
+
     def c(self):
         self.lift()
+        if not os.environ.get("LIFT_NOTERNARY"):
+            self.ternaries()
         name = sym(self.va)
         ps = []
         for k, (reg, off, _sz) in enumerate(self.params):
@@ -2299,6 +2364,25 @@ def loaded_ptr_k(e):
     """`*(int *)p + k`: a dword read plus a constant, perhaps a pointer and an offset."""
     mm = re.fullmatch(r"\*\(int \*\)(\w+|\((?:[^()]|\([^()]*\))*\)) \+ (\d+)", e.text)
     return (mm.group(1), mm.group(2)) if mm else None
+
+
+def negate(c):
+    """The opposite of a condition: its top-level comparison flipped, else !(c)."""
+    depth, ops = 0, []
+    for k, ch in enumerate(c):
+        depth += ch == "("
+        depth -= ch == ")"
+        if depth == 0:
+            for op in ("==", "!=", "<=", ">=", "<", ">"):
+                if c.startswith(op, k) and not (op in ("<", ">") and c[k + 1:k + 2] in "<>=") \
+                        and not (op in ("<", ">") and k and c[k - 1] in "<>"):
+                    ops.append((k, op))
+                    break
+    if len(ops) != 1 or "&&" in c or "||" in c:
+        return "!(%s)" % c
+    k, op = ops[0]
+    flip = {"==": "!=", "!=": "==", "<": ">=", ">=": "<", ">": "<=", "<=": ">"}[op]
+    return "(%s%s%s)" % (c[:k], flip, c[k + len(op):])
 
 
 def byteval(v):

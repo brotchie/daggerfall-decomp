@@ -1161,3 +1161,9 @@ Batch **1,927**; build **61.34%**.
 - Two post-increments in one expression (`*q++ = *p++`: `mov eax,[p]; inc [p]; mov edx,[q];
   inc [q]; mov al,[eax]; mov [edx],al`): the first one's old value waits in its register
   instead of being flushed as a statement. +6. Batch **2,034**.
+- **Ternaries in call arguments**: `f(a, c ? x : y, g, 2)` compiles the `?:` into a temp
+  through a branch diamond, and makes Watcom evaluate the arguments to its right into temps
+  first (right to left). The lifter turns `if (c) goto A; t = x; goto B; A: t = y; B:
+  f(.., t, u, w)` with single-use slots back into the call (only when arguments were
+  spilled: an if/else on a variable of its own compiles the same diamond). +9.
+  Batch **2,043**.

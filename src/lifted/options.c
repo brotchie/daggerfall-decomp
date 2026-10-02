@@ -491,6 +491,53 @@ void func_00043F64(void)
     func_000A1023((int)D_00195EB0, (int)D_0018484C, 38, (int)D_00170EE8, 432, 38);
 }
 
+void func_000441B6(int a1)
+{
+    int l_1C;
+    int l_18;
+
+    l_18 = a1;
+    func_000A1023(*(int *)D_00143550, *(int *)D_00199710, 64000, (int)D_00170EE8, 480, 4);
+    func_00144F68((int)(unsigned short)*(short *)((char *)l_18), (int)(unsigned short)*(short *)((char *)l_18 + 2), (int)(unsigned short)*(short *)((char *)l_18 + 4), (int)(unsigned short)*(short *)((char *)l_18 + 6), l_18 + 12);
+    *(signed char *)D_0012B508 = 246;
+    func_00144D00((int)(short)((*(signed char *)D_00195E7A == 0) ? 134 : 220), 47, 5, 5);
+    l_1C = 0;
+L4426E:;
+    if (((int)(unsigned char)*(signed char *)D_00195E7C) > l_1C) goto L44284;
+    goto L442BD;
+L4427C:;
+    l_1C++;
+    goto L4426E;
+L44284:;
+    func_00144F68((l_1C * 7) + 139, 108, (int)(unsigned short)*(short *)(*(char **)D_00195B5C + 4), (int)(unsigned short)*(short *)(*(char **)D_00195B5C + 6), *(int *)D_00195B5C + 12);
+    goto L4427C;
+L442BD:;
+    l_1C = 0;
+L442C4:;
+    if (((int)(unsigned char)*(signed char *)D_00195E7D) > l_1C) goto L442DA;
+    goto L44313;
+L442D2:;
+    l_1C++;
+    goto L442C4;
+L442DA:;
+    func_00144F68((l_1C * 7) + 139, 121, (int)(unsigned short)*(short *)(*(char **)D_00195B5C + 4), (int)(unsigned short)*(short *)(*(char **)D_00195B5C + 6), *(int *)D_00195B5C + 12);
+    goto L442D2;
+L44313:;
+    l_1C = 0;
+L4431A:;
+    if (((int)(unsigned char)(*(signed char *)D_00195E7B & 127)) > l_1C) goto L44335;
+    goto L4436E;
+L4432D:;
+    l_1C++;
+    goto L4431A;
+L44335:;
+    func_00144F68((l_1C * 7) + 139, 134, (int)(unsigned short)*(short *)(*(char **)D_00195B5C + 4), (int)(unsigned short)*(short *)(*(char **)D_00195B5C + 6), *(int *)D_00195B5C + 12);
+    goto L4432D;
+L4436E:;
+    if (((int)(unsigned char)(*(signed char *)D_00195E7B & 128)) == 0) return;
+    func_00144F68((int)(unsigned short)*(short *)(*(char **)D_00195B60), (int)(unsigned short)*(short *)(*(char **)D_00195B60 + 2), (int)(unsigned short)*(short *)(*(char **)D_00195B60 + 4), (int)(unsigned short)*(short *)(*(char **)D_00195B60 + 6), *(int *)D_00195B60 + 12);
+}
+
 int func_000443C9(void)
 {
     *(signed char *)D_00195E7A = 0;
