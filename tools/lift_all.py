@@ -67,20 +67,14 @@ def first_diff(ours, theirs, va, mask):
             continue
         if x.size != y.size or any(k + j not in mask and ours[k + j] != theirs[k + j]
                                    for j in range(y.size)):
-            return "%s | %s" % (norm(x), norm(y))
-    return "length %d | %d bytes" % (len(ours.rstrip(b"\x00")), len(theirs))
+            return "%s | %s" % (norm(x), norm(y)), y.address
+    return "length %d | %d bytes" % (len(ours.rstrip(b"\x00")), len(theirs)), va + len(theirs)
 
 
-def work(va):
+def check(name, c):
+    """Compile `c` and compare: (status, detail, address of the first difference or None)."""
     from omf import OMF
-    lift, match, build = W["lift"], W["match"], W["build"]
-    name = "func_%08X" % va
-    try:
-        c = lift.lift(va)
-    except lift.Unsupported as e:
-        return name, "unsupported", re.sub(r" at [0-9a-f]+$", "", str(e))
-    except Exception as e:  # a lifter bug: report, keep going
-        return name, "error", "lifter %s: %s" % (type(e).__name__, e)
+    match, build = W["match"], W["build"]
     path = os.path.join(OUT, name + ".c")
     with open(path, "w") as f:
         f.write(c)
@@ -95,11 +89,11 @@ def work(va):
         except SystemExit:
             msg = [l for l in err.getvalue().splitlines() if "Error" in l]
             msg = [re.sub(r"^.*?Error! E\d+: ", "", l) for l in msg]
-            return name, "error", "compile: " + (msg[0][:150] if msg else "failed")
+            return "error", "compile: " + (msg[0][:150] if msg else "failed"), None
         obj = OMF(objp)
     fns = {n.strip("_"): (si, off, sz) for n, si, off, sz in obj.functions()}
     if name not in fns:
-        return name, "error", "function not in object"
+        return "error", "function not in object", None
     tva, tsize = W["funcs"][name]
     ok, diff = match.compare(W["tgt"], obj, name, tva, tsize, quiet=True)
     si, off, csz = fns[name]
@@ -110,15 +104,60 @@ def work(va):
         mask = {fx.offset - off + j for fx in obj.fixups if fx.seg == si
                 and off <= fx.offset < off + csz for j in range(fx.size)}
         mask |= {k for k in range(tsize) if tva + k in W["tgt"].fix}
-        return name, "diff", "%d bytes (ours %d, target %d): %s" % (
-            diff, len(ours.rstrip(b"\x00")), tsize,
-            first_diff(ours, W["tgt"].bytes_at(tva, tsize), tva, mask))
+        desc, at = first_diff(ours, W["tgt"].bytes_at(tva, tsize), tva, mask)
+        return "diff", "%d bytes (ours %d, target %d): %s" % (
+            diff, len(ours.rstrip(b"\x00")), tsize, desc), at
     fields = {}
     bad = build.check_relocs(obj, si, off, off, csz, tva, W["tgt"], W["fix_at"], W["funcs"],
                              {}, W["tgt"].le, fields)
     if bad:
-        return name, "diff", "relocation: " + bad
-    return name, "ok", ""
+        return "diff", "relocation: " + bad, None
+    return "ok", "", None
+
+
+# operand-order search: how many choice points before a mismatch to try, and compiles at most
+NEAR = 8
+BUDGET = 80
+
+
+def work(va):
+    lift = W["lift"]
+    name = "func_%08X" % va
+    info = {}
+    try:
+        c = lift.lift(va, info=info)
+    except lift.Unsupported as e:
+        return name, "unsupported", re.sub(r" at [0-9a-f]+$", "", str(e))
+    except Exception as e:  # a lifter bug: report, keep going
+        return name, "error", "lifter %s: %s" % (type(e).__name__, e)
+    status, detail, at = check(name, c)
+    # Choice points (operand orders the code can't tell apart) just before the first
+    # difference: flip one at a time and keep a flip when the first difference moves on.
+    flips, tries = frozenset(), 0
+    best = (status, detail, at, c)
+    while status == "diff" and at is not None and tries < BUDGET and not os.environ.get("LIFT_NOSEARCH"):
+        near = sorted((a for a in info["choices"] if a not in flips), key=lambda a: abs(a - at))[:NEAR]
+        moved = False
+        for a in near:
+            tries += 1
+            info2 = {}
+            try:
+                c2 = lift.lift(va, flips | {a}, info=info2)
+            except Exception:
+                continue
+            s2, d2, at2 = check(name, c2)
+            if s2 == "ok" or (s2 == "diff" and at2 is not None and at2 > at):
+                flips, info = flips | {a}, info2
+                status, detail, at, c = s2, d2, at2, c2
+                best = (status, detail, at, c)
+                moved = True
+                break
+        if not moved:
+            break
+    status, detail, at, c = best
+    if c is not None:
+        check(name, c)          # leave the best version's .c and .bin on disk
+    return name, status, detail
 
 
 def main():

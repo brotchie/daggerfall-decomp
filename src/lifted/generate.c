@@ -3,6 +3,18 @@
 
 extern char D_00176F41[];
 extern char D_0018801E[];
+extern char D_001880C6[];
+extern char D_001880CA[];
+extern char D_001880D2[];
+extern char D_001880D6[];
+extern char D_001880DE[];
+extern char D_001880E2[];
+extern char D_001880EA[];
+extern char D_001880EE[];
+extern char D_001880F6[];
+extern char D_001880FA[];
+extern char D_00188102[];
+extern char D_00188106[];
 extern char D_00188186[];
 extern char D_0018818A[];
 extern char D_00188192[];
@@ -10,6 +22,12 @@ extern char D_00188196[];
 extern char D_00190CA8[];
 extern char D_00190D6A[];
 extern char D_00190D70[];
+extern char D_00190DE4[];
+extern char D_00190DE6[];
+extern char D_00190DE8[];
+extern char D_00190DF0[];
+extern char D_00190DF2[];
+extern char D_00190DF4[];
 extern char D_001940D6[];
 extern char D_001959D8[];
 extern char D_001959E8[];
@@ -111,6 +129,45 @@ L91205:;
 void func_0009166F(void)
 {
     func_00053A89(*(int *)D_00195BE0, 31, (int)func_00090C3A);
+}
+
+void func_0009169B(int a1)
+{
+{
+    int l_1C;
+
+__dagger_tbl916B1:;
+    l_1C = a1 - 2;
+    switch (l_1C) {
+case 0:
+case 1:
+case 2:
+    *(short *)D_00190DE4 = *(short *)(D_0018801E + (a1 * 12));
+    *(short *)D_001880C6 = *(short *)D_00190DE4;
+    *(short *)D_001880D2 = *(short *)D_001880C6;
+    *(short *)D_001880CA = *(short *)D_00190DE4 + 8;
+    *(short *)D_001880D6 = *(short *)D_001880CA;
+    *(short *)D_00190DF0 = a1 - 2;
+    return;
+case 3:
+case 4:
+case 5:
+    *(short *)D_00190DE6 = *(short *)(D_0018801E + (a1 * 12));
+    *(short *)D_001880DE = *(short *)D_00190DE6;
+    *(short *)D_001880EA = *(short *)D_001880DE;
+    *(short *)D_001880E2 = *(short *)D_00190DE6 + 8;
+    *(short *)D_001880EE = *(short *)D_001880E2;
+    *(short *)D_00190DF2 = a1 - 2;
+    return;
+default:
+    *(short *)D_00190DE8 = *(short *)(D_0018801E + (a1 * 12));
+    *(short *)D_001880F6 = *(short *)D_00190DE8;
+    *(short *)D_00188102 = *(short *)D_001880F6;
+    *(short *)D_001880FA = *(short *)D_00190DE8 + 8;
+    *(short *)D_00188106 = *(short *)D_001880FA;
+    *(short *)D_00190DF4 = a1 - 2;
+}
+}
 }
 
 void func_000917F0(int a1)

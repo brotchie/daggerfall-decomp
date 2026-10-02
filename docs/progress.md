@@ -723,3 +723,28 @@ The three compiler pieces outlined above, now done:
 `func_00015A50` and `func_0002814E` match. Batch **1,405**. Most switch functions are still
 held up by lifter gaps: several switches per function, sparse `repne scasb` switches, and an
 assignment nested in a call argument.
+
+## 2026-10-02: unit-relative table alignment, operand order and a search over it
+
+- **Several switches per function** in the lifter: each `switch` closes the previous one's
+  body, and case labels belong to the switch being emitted.
+- **Table alignment is relative to the unit, not the image.** The tables in one source file
+  share their address mod 4 (all of `links.c`'s are at 1, `guilds.c`'s at 2, `inven.c`'s at
+  0): Watcom aligned them in the object, and objects were linked at arbitrary byte offsets.
+  The marker label already carries the table's original address, so the front end passes
+  its low bits along and `x86esc.c` pads the table to land on the same address mod 16
+  (`DAGGER_NOTBLALIGN=1` turns it off). +6.
+- **Shift counts**: `x << n` with an `int n` loads only `cl` (`mov cl, byte [n]`); the lifter
+  now reads that as `n`, and `ecx` is no longer mistaken for a call argument afterwards.
+- **Operand order of commutative ops.** `TNBinary()` (`cg/c/tree.c`) evaluates the left
+  operand first when its tree has at least as many nodes (`kids`) as the right one, else the
+  right one first. So the operand the code computes first was the left one in the source,
+  unless it is the bigger one: then both orders compile to the same evaluation order and
+  only the register allocation tells them apart. The lifter now tracks where each value's
+  evaluation began, applies the rule, and records the ambiguous cases as *choice points*.
+- **Choice-point search** in `tools/lift_all.py`: when a function differs, flip the choice
+  points nearest the first difference one at a time and keep a flip when the first
+  difference moves later (up to 80 compiles per function). CPU instead of turns: the whole
+  batch still runs in 7 s. Further ambiguities can become choice points the same way.
+
+Batch **1,432** (from 1,405); build **1,435 functions, 36.85%** of game code.

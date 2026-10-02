@@ -80,7 +80,7 @@ L99C67:;
     goto L99C4F;
 L99C6F:;
     if (*(int *)((char *)(int)(*(char **)((char *)*(int *)D_00195BDC + 43) + (((int)(short)l_18) * 26)) + 20) != *(int *)((char *)a1 + 31)) goto L99CA1;
-    return *(int *)((char *)*(int *)D_00195BDC + 43) + (((int)(short)l_18) * 26);
+    return (((int)(short)l_18) * 26) + *(int *)((char *)*(int *)D_00195BDC + 43);
 L99CA1:;
     goto L99C67;
 L99CA3:;

@@ -664,7 +664,7 @@ int func_0001DA2D(int a1, int a2)
 {
     func_000A1023(a1, a2, 34, (int)D_00170464, 1873, 4);
     func_000A1023(a1 + 34, a2 + 34, *(int *)((char *)a2 + 26), (int)D_00170464, 1874, 4);
-    return *(int *)((char *)a2 + 26) + (a1 + 34);
+    return (a1 + 34) + *(int *)((char *)a2 + 26);
 }
 
 void func_0001DA9C(int a1, int a2)

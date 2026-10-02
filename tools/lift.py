@@ -68,6 +68,10 @@ def subreg(name):
     return SUB[name]
 
 
+# an address or number: the compiler loads constants late, whatever their source position
+CONST_RE = re.compile(r"\(int\)[DF][_a-z]*\w+|-?\d+")
+
+
 class E:
     """A C expression. `size` = how many low bytes are meaningful; `tag` marks idioms in
     progress (('sign', X) for X >> 31, ('half', X) for X - (X >> 31))."""
@@ -77,6 +81,12 @@ class E:
 
     def p(self):
         return self.text if self.atom else "(%s)" % self.text
+
+
+def kids(text):
+    """Rough size of an expression's code-generator tree: operands, operators, casts."""
+    t = re.sub(r"\((?:signed |unsigned )?(?:char|short|int)(?: \*)*\)", " C ", text)
+    return len(re.findall(r"[A-Za-z_]\w*|\d+|<<|>>|[-+*/%&|^~!]", t))
 
 
 class Image:
@@ -163,6 +173,9 @@ class Func:
         self.vcalls = set()      # func_ symbols called with stack arguments (caller pops)
         self.scalls = {}         # func_ symbol -> arg count, stack arguments (callee pops)
         self.regs = {}
+        self.born_hint = None
+        self.choices = []        # instruction addresses of operand-order choice points
+        self.flips = frozenset()
         self.pending = None      # call expression in eax not yet emitted
         self.pushes = []
         self.flags = None
@@ -468,7 +481,30 @@ class Func:
         cur = self.regs.get(name)
         if self.pending is not None and cur is self.pending and expr is not cur:
             self.flush_pending()
+        if not hasattr(expr, "born"):
+            # where the evaluation of this value started: the operand of a commutative op
+            # computed first was the left one in the source
+            expr.born = self.born_hint if self.born_hint is not None else getattr(self, "k", 0)
+        self.born_hint = None
         self.regs[name] = expr
+
+    def operand_order(self, ins, a, b, k0):
+        """Source order of a commutative op's operands; `a` is the destination register's.
+
+        The code generator (TNBinary) evaluates the left operand first when it has at least
+        as many tree nodes as the right one, else the right one first. So the operand the
+        code computed first is the left one, unless it is the bigger one: then either order
+        gives the same evaluation and this is a choice point, defaulting to the destination
+        register on the left. The batch driver (tools/lift_all.py) flips choice points near
+        a mismatch and keeps what helps."""
+        first, second = (b, a) if getattr(b, "born", k0) < getattr(a, "born", k0) else (a, b)
+        if kids(first.text) > kids(second.text):
+            self.choices.append(ins.address)
+            left, right = (first, second) if os.environ.get("LIFT_AMBIG") == "born" else (a, b)
+            if ins.address in self.flips:
+                left, right = right, left
+            return left, right
+        return first, second
 
     def lift(self):
         self.prologue()
@@ -482,11 +518,8 @@ class Func:
         for sw in self.switches.values():
             targets |= set(sw["entries"])
         self.targets = targets
-        self.case_at = {}
-        for sw in self.switches.values():
-            for i, t in enumerate(sw["entries"]):
-                self.case_at.setdefault(t, []).append(i + sw["bias"])
         self.open_switches = 0
+        self.current_switch = None
         body = self.ins[self.body_start:self.body_end]
         self.body = body
         # where each switch table sat: the compiler is told to put the table there
@@ -502,11 +535,13 @@ class Func:
                 self.out.append("__dagger_tbl%X:;" % table_end[ins.address])
             if ins.address in targets:
                 self.flush_pending()
-                for v in self.case_at.get(ins.address, []):
-                    if ins.address != self.default_at.get(v, None):
-                        self.out.append("case %d:" % v)
-                if ins.address in self.default_targets:
-                    self.out.append("default:")
+                sw = self.current_switch
+                if sw is not None:
+                    for i, t in enumerate(sw["entries"]):
+                        if t == ins.address and t != sw.get("default"):
+                            self.out.append("case %d:" % (i + sw["bias"]))
+                    if sw.get("default") == ins.address:
+                        self.out.append("default:")
                 self.out.append("L%X:;" % ins.address)
                 self.regs = {}
                 self.after_return = False
@@ -649,6 +684,14 @@ class Func:
                 full, sz = subreg(ins.reg_name(d.reg))
                 a = self.reg(full, ins)
                 b = self.src(s, ins)
+                k0 = getattr(self, "k", 0)
+                self.born_hint = min(getattr(a, "born", k0), getattr(b, "born", k0))
+                if m in ("shl", "sar", "shr") and s.type == cx.X86_OP_REG:
+                    # shift by cl: the compiler loads only the low byte of an int count
+                    mb = re.fullmatch(r"\*\((?:signed|unsigned) char \*\)&(\w+)", b.text)
+                    if mb:
+                        b = E(mb.group(1), 4, atom=True)
+                    self.regs.pop("ecx", None)      # the count is used up, not an argument
                 if m == "and" and s.type == cx.X86_OP_IMM and sz == 4 and s.imm in (0xFF, 0xFFFF):
                     t = "unsigned char" if s.imm == 0xFF else "unsigned short"
                     self.set_reg(full, E("(int)(%s)%s" % (t, a.p()), 4))
@@ -696,6 +739,10 @@ class Func:
                     self.set_reg(full, v)
                     self.flags = ("val", v, None)
                     return
+                if m in ("add", "imul", "and", "or", "xor") and s.type == cx.X86_OP_REG and \
+                        not CONST_RE.fullmatch(a.text) and not CONST_RE.fullmatch(b.text) and \
+                        "func_" not in a.text + b.text:
+                    a, b = self.operand_order(ins, a, b, k0)
                 v = E("%s %s %s" % (a.p(), opch, b.p()), max(sz, 1))
                 self.set_reg(full, v)
                 self.flags = ("val", v, None)
@@ -906,8 +953,13 @@ class Func:
             entries = [IMG.fix_at[t + 4 * i].target_va for i in range(n // 4)
                        if t + 4 * i in IMG.fix_at]
             found[ins.address] = {"table": t, "entries": entries, "bias": (t - disp) // 4}
-        if len(found) > 1:
-            raise Unsupported("several switches in one function")
+        # switch bodies run from their dispatch to the next dispatch (or the end): each
+        # switch's targets must lie in its own body
+        order = sorted(found)
+        for k, d in enumerate(order):
+            end = order[k + 1] if k + 1 < len(order) else 1 << 32
+            if any(not (d < t < end) for t in found[d]["entries"]):
+                raise Unsupported("switch targets outside the switch's own stretch")
         return found
 
     def switch_dispatch(self, ins, op):
@@ -940,14 +992,25 @@ class Func:
                 break
         if dflt is None:
             raise Unsupported("switch without a range check")
-        for v in range(sw["bias"], sw["bias"] + len(sw["entries"])):
-            self.default_at[v] = dflt
-        self.default_targets.add(dflt)
+        sw["default"] = dflt
+        if dflt == "END":
+            self.default_targets.add(dflt)
+        elif not (ins.address < dflt):
+            raise Unsupported("switch default before the dispatch")
+        if self.open_switches:
+            # the previous switch's body ends here
+            prev = self.current_switch
+            if prev.get("default") not in (None, "END") and prev["default"] > ins.address:
+                raise Unsupported("previous switch's default after this dispatch")
+            self.out.append("}")
+            self.open_switches -= 1
+        self.current_switch = sw
         text = re.sub(r"^\(int\)\((?:unsigned|signed) (?:char|short)\)", "", sel.text) \
             if sel.atom or sel.text.startswith("(int)(") else sel.text
         self.emit("switch (%s) {" % text)
         self.open_switches += 1
         self.regs = {}
+        self.born_hint = None
         return
 
     def var_type(self, name):
@@ -1126,9 +1189,17 @@ def init():
     return IMG
 
 
-def lift(va):
+def lift(va, flips=frozenset(), info=None):
+    """C for the function at `va`. `flips`: choice points (instruction addresses) to take
+    the other way; `info`, a dict, receives the list of choice points as info["choices"]."""
     init()
-    return Func(va).c()
+    f = Func(va)
+    f.flips = flips
+    try:
+        return f.c()
+    finally:
+        if info is not None:
+            info["choices"] = list(f.choices)
 
 
 def main():

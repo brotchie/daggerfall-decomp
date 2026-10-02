@@ -12,6 +12,8 @@ extern char D_00176A68[];
 extern char D_00176A72[];
 extern char D_00176A7C[];
 extern char D_001788CF[];
+extern char D_001789FD[];
+extern char D_001789FF[];
 extern char D_00178A01[];
 extern char D_00187B6E[];
 extern char D_00187BB8[];
@@ -27,6 +29,7 @@ extern char D_00187C9E[];
 extern char D_00187CA4[];
 extern char D_001940D4[];
 extern char D_001940DB[];
+extern char D_00195A8C[];
 extern char D_00195A98[];
 extern char D_00195AA4[];
 extern char D_00195AB0[];
@@ -92,10 +95,10 @@ extern int func_00144FB4();
 extern int func_00152D00();
 extern void func_000696A3(int);
 extern void func_0007EED8(void);
-extern void func_0008036E(void);
 extern void func_00080A72(int);
 int func_00080B58(void);
 int func_00082657(int);
+void func_0008036E(void);
 
 void func_000802B2(void)
 {
@@ -118,6 +121,16 @@ L8034A:;
     func_0012B45B(*(int *)D_00195C44, 0, 0);
     func_0008036E();
     *(signed char *)D_00196272 = 0;
+}
+
+void func_0008036E(void)
+{
+    *(short *)D_001A5B28 = ((int)(short)*(short *)D_001789FD) / 3;
+    *(short *)D_001A5B2A = ((int)(short)*(short *)D_001789FF) / 3;
+    *(short *)D_001A5B1C = (((int)(short)*(short *)D_001789FF) / 3) + ((int)(short)*(short *)D_00142944);
+    *(short *)D_001A5B1E = ((((int)(short)*(short *)D_001789FF) / 3) * 2) + ((int)(short)*(short *)D_00142944);
+    *(short *)D_001A5B20 = (((int)(short)*(short *)D_001789FD) / 3) + ((int)(short)*(short *)D_00142940);
+    *(short *)D_001A5B22 = ((((int)(short)*(short *)D_001789FD) / 3) * 2) + ((int)(short)*(short *)D_00142940);
 }
 
 void func_00080446(void)
@@ -170,6 +183,12 @@ void func_0008066F(int a1)
     *(int *)D_001A5B10 += *(int *)l_20;
 }
 
+void func_000807AD(void)
+{
+    *(int *)D_001A5AF4 = 0;
+    *(short *)D_00178A01 = (((int)(short)*(short *)D_00178A01) * ((int)(short)*(short *)D_001A5B2E)) / 220;
+}
+
 void func_000807F2(void)
 {
     *(int *)D_000C5400 = -8;
@@ -191,6 +210,35 @@ void func_00080929(void)
     *(int *)D_000C5400 = -8;
     *(int *)D_001A5AF4 = ((((((int)(short)*(short *)D_001A5B26) << 6) * *(int *)D_001A5AFC) * *(int *)D_00195AB0) / 1000) / 256;
     *(short *)D_00178A01 = 0;
+}
+
+void func_0008098C(void)
+{
+    int l_1C;
+    int l_18;
+
+    *(int *)D_000C5400 = 4;
+    *(short *)D_00178A01 = (((int)(short)*(short *)D_00178A01) * ((int)(short)*(short *)D_001A5B2C)) / 256;
+    *(int *)D_001A5B08 = -512;
+}
+
+void func_000809DC(void)
+{
+    int l_1C;
+    int l_18;
+
+    *(int *)D_001A5B08 = 1024;
+    *(short *)D_00178A01 = (((int)(short)*(short *)D_00178A01) * ((int)(short)*(short *)D_001A5B24)) / 256;
+}
+
+void func_00080A22(void)
+{
+    int l_1C;
+    int l_18;
+
+    *(int *)D_000C5400 = -4;
+    *(int *)D_001A5B08 = 512;
+    *(short *)D_00178A01 = (((int)(short)*(short *)D_00178A01) * ((int)(short)*(short *)D_001A5B26)) / 256;
 }
 
 int func_00080B58(void)
@@ -294,6 +342,14 @@ L80DD5:;
 L80DE1:;
     *(int *)D_00195AB8 += (*(int *)D_00195AB0 * 100352) / 1000;
     *(int *)((char *)a1 + 11) += ((*(int *)D_00195AB8 * *(int *)D_00195AB0) / 1000) / 256;
+}
+
+void func_00080E34(void)
+{
+    *(int *)D_00195A8C = ((((int)(short)*(short *)((char *)*(int *)D_00195BE0 + 44)) + ((int)(short)*(short *)((char *)*(int *)D_00195BE0 + 32))) / 2) + 50;
+    *(int *)D_00195A8C += (((int)(short)*(short *)((char *)*(int *)D_00195BE0 + 175)) * *(int *)D_00195A8C) / 100;
+    *(int *)D_00195A8C = -(*(int *)D_00195A8C);
+    *(int *)D_00195A8C <<= 8;
 }
 
 void func_00080EA4(int a1)

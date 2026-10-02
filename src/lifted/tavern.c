@@ -380,7 +380,7 @@ L1FC80:;
     goto L1FC6B;
 L1FC88:;
     if (*(int *)((char *)*(int *)((char *)a1 + 67) + 31) != *(int *)((char *)(int)(*(char **)((char *)*(int *)D_00195BDC + 43) + (l_20 * 26)) + 20)) goto L1FCB5;
-    l_1C = *(int *)((char *)*(int *)D_00195BDC + 43) + (l_20 * 26);
+    l_1C = (l_20 * 26) + *(int *)((char *)*(int *)D_00195BDC + 43);
 L1FCB5:;
     goto L1FC80;
 L1FCB7:;

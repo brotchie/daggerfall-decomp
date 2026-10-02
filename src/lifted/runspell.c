@@ -28,6 +28,7 @@ extern char D_00195B40[];
 extern char D_00195B48[];
 extern char D_00195B50[];
 extern char D_00195BE0[];
+extern char D_00195D5C[];
 extern char D_00195F28[];
 extern char D_00195F30[];
 extern char D_00195F62[];
@@ -38,8 +39,6 @@ extern char D_00199D64[];
 extern int func_0003A0C0(int, int);
 extern int func_0004B192(void);
 extern int func_0005AE5F(int);
-extern int func_0005AFD5(int, int);
-extern int func_0005B107(int, int, int);
 extern int func_00069938(int, int, int);
 extern int func_0007CBA1(int);
 extern int func_0007D6AE(int, int);
@@ -59,13 +58,20 @@ extern int func_000CE4E0();
 extern void func_0002F490(int, int, int);
 extern void func_0003A2AD(int, int);
 extern void func_0005BA28(int, unsigned short, int);
+extern void func_0005C1CA(int, int, int);
+extern void func_0005C6A2(int);
+extern void func_00067027(int);
 extern void func_0007D774(int, int);
+extern void func_0007D7BA(void);
 extern void func_0008A4E4(int);
 extern void func_0008A550(int, int, int);
 extern void func_0008E3F7(int, int);
+int func_0005AFD5(int, int);
+int func_0005B107(int, int, int);
 int func_0005B408(int, int);
 int func_0005B905(int, int, int, int);
 int func_0005B9DF(int, int, int);
+void func_0005ABE6(int, int, int);
 void func_0005B206(int);
 void func_0005C897(int);
 void func_0005CA28(int);
@@ -246,6 +252,81 @@ L5AE36:;
     return;
 L5AE4C:;
     func_0008DD46(a2, l_24);
+}
+
+int func_0005AFD5(int a1, int a2)
+{
+    int l_18;
+{
+    unsigned char l_24;
+
+    l_18 = a1 + 71;
+    *(int *)((char *)a1 + 47) = *(int *)D_00195AA0;
+    if (((int)(unsigned char)*(signed char *)((char *)l_18 + 73)) != 92) goto L5B037;
+    func_00067027(0);
+    return 1;
+__dagger_tbl5B023:;
+L5B037:;
+    l_24 = *(signed char *)((char *)l_18 + 7);
+    switch (l_24) {
+case 0:
+    func_0005ABE6(a1, *(int *)D_00195AA0, 0);
+    return 1;
+case 1:
+    func_0005ABE6(a1, a2, 0);
+    return 1;
+case 2:
+    func_0005ABE6(a1, a2, 0);
+    return 1;
+case 3:
+    *(int *)D_00195D5C = 0;
+    *(int *)((char *)a1 + 7) = *(int *)((char *)*(int *)D_00195AA4 + 7);
+    *(int *)((char *)a1 + 11) = *(int *)((char *)*(int *)D_00195AA4 + 11);
+    *(int *)((char *)a1 + 15) = *(int *)((char *)*(int *)D_00195AA4 + 15);
+    func_0005C6A2(a1);
+    func_0007D7BA();
+    return 1;
+case 4:
+    return 1;
+default:
+    return 1;
+}
+}
+}
+
+int func_0005B107(int a1, int a2, int a3)
+{
+    int l_14;
+{
+    unsigned char l_24;
+
+__dagger_tbl5B11F:;
+    l_14 = a1 + 71;
+    *(int *)((char *)a1 + 47) = a2;
+    l_24 = *(signed char *)((char *)l_14 + 7);
+    switch (l_24) {
+case 0:
+    func_0005ABE6(a1, a2, 0);
+    if (a2 == *(int *)D_00195AA0) goto L5B191;
+    func_0002F490(a2, 3, 3);
+L5B191:;
+    return 1;
+case 1:
+    func_0005ABE6(a1, a3, 0);
+    return 1;
+case 2:
+    func_0005C1CA(a1, a2, a3);
+    return 0;
+case 3:
+    func_0005ABE6(a1, a3, 0);
+    return 1;
+case 4:
+    func_0005C1CA(a1, a2, a3);
+    return 0;
+default:
+    return 1;
+}
+}
 }
 
 void func_0005B206(int a1)

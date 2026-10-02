@@ -41,12 +41,12 @@ extern void func_0007D723(void);
 extern void func_0007F87E(void);
 extern void func_00082487(void);
 extern void func_00089757(int, int, int);
-extern void func_0008A550(int, int, int);
 extern void func_0008B341(int);
 extern void func_0008E3F7(int, int);
 extern void func_00094E25(void);
 extern void func_00094F31(void);
 extern void func_00098941(int);
+void func_0008A550(int, int, int);
 
 void func_00089408(int a1, int a2)
 {
@@ -498,6 +498,112 @@ L8A515:;
     goto L8A50D;
 L8A53E:;
     func_0008DA91(a1);
+}
+
+void func_0008A550(int a1, int a2, int a3)
+{
+    int l_10;
+{
+    unsigned char l_20;
+
+__dagger_tbl8A56A:;
+    l_10 = a3 + 71;
+    l_20 = *(signed char *)((char *)((a2 * 2) + a1));
+    switch (l_20) {
+case 0:
+    *(signed char *)((char *)l_10 + 137) &= 254;
+    return;
+case 7:
+    *(short *)((char *)((((int)(unsigned char)*(signed char *)((char *)((a2 * 2) + a1) + 1)) * 2) + l_10) + 32) += *(short *)((char *)((a2 * 5) + a1) + 34);
+    return;
+case 8:
+    *(int *)((char *)l_10 + 137) &= ~*(int *)(D_00187FC6 + (((int)(unsigned char)*(signed char *)((char *)((a2 * 2) + a1) + 1)) << 2));
+    return;
+case 9:
+    *(short *)((char *)((((int)(unsigned char)*(signed char *)((char *)((a2 * 2) + a1) + 1)) * 2) + l_10) + 32) -= *(short *)((char *)((a2 * 2) + a1) + 80);
+    return;
+case 11:
+    return;
+case 13:
+    *(signed char *)((char *)l_10 + 137) &= 251;
+    return;
+case 14:
+    *(signed char *)((char *)l_10 + 137) &= 247;
+    return;
+case 15:
+    *(signed char *)((char *)l_10 + 137) &= 239;
+    return;
+case 16:
+    *(signed char *)((char *)l_10 + 137) &= 223;
+    return;
+case 17:
+    *(signed char *)((char *)l_10 + 137) &= 191;
+    return;
+case 18:
+    *(signed char *)((char *)l_10 + 137) &= 127;
+    return;
+case 19:
+    *(signed char *)((char *)l_10 + 138) &= 254;
+    return;
+case 20:
+    *(signed char *)((char *)l_10 + 138) &= 253;
+    return;
+case 21:
+    *(signed char *)((char *)l_10 + 138) &= 251;
+    return;
+case 22:
+    *(signed char *)((char *)l_10 + 138) &= 247;
+    return;
+case 23:
+    *(signed char *)((char *)l_10 + 138) &= 239;
+    return;
+case 24:
+    *(signed char *)((char *)l_10 + 138) &= 223;
+    return;
+case 25:
+    *(signed char *)((char *)l_10 + 138) &= 191;
+    return;
+case 26:
+    *(signed char *)((char *)l_10 + 138) &= 127;
+    return;
+case 27:
+    *(signed char *)((char *)l_10 + 139) &= 254;
+    return;
+case 28:
+    *(signed char *)((char *)l_10 + 139) &= 253;
+    return;
+case 29:
+    *(signed char *)((char *)l_10 + 139) &= 251;
+    return;
+case 30:
+    *(signed char *)((char *)l_10 + 139) &= 247;
+    return;
+case 31:
+    *(signed char *)((char *)l_10 + 139) &= 239;
+    return;
+case 32:
+    *(signed char *)((char *)l_10 + 139) &= 223;
+    return;
+case 35:
+    *(signed char *)((char *)l_10 + 139) &= 191;
+    return;
+case 39:
+    *(signed char *)((char *)l_10 + 139) &= 127;
+    return;
+case 42:
+    *(signed char *)((char *)l_10 + 140) &= 254;
+    return;
+case 44:
+    *(signed char *)((char *)l_10 + 140) &= 253;
+    return;
+case 45:
+    *(signed char *)((char *)l_10 + 140) &= 251;
+    return;
+case 46:
+    *(signed char *)((char *)l_10 + 140) &= 247;
+default:;
+}
+}
 }
 
 int func_0008A858(int a1, int a2, int a3)
