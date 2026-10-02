@@ -1626,7 +1626,10 @@ class Func:
                 prev.operands[0].type == cx.X86_OP_REG and \
                 re.sub(r"^\w+ ptr ", "", prev.op_str.split(", ", 1)[1]) == \
                 re.sub(r"^\w+ ptr ", "", ins.op_str)
-            if m in ("inc", "dec") and not dead_load and ebp_slot(ins, d) is not None and \
+            stack_param = d.type == cx.X86_OP_MEM and d.mem.base and \
+                ins.reg_name(d.mem.base) == "ebp" and not d.mem.index and d.mem.disp >= 8
+            if m in ("inc", "dec") and not dead_load and \
+                    (ebp_slot(ins, d) is not None or stack_param) and \
                     not os.environ.get("LIFT_NOPREINC"):
                 # no load of the old value first: Watcom 10 compiled a pre-increment (a
                 # post-increment statement reads the old value: mov eax,[x]; inc [x])
@@ -2802,7 +2805,11 @@ class Func:
                     name, " ".join("%s %d" % (n, d) for n, d in pins)))
         # register pins (#pragma dagger reg), set by the search at register-only
         # differences: flips -(3000 + 16 k + r)
-        pins = sorted(pin_decode(f) for f in self.flips if f <= -3000)
+        wins = sorted(win_decode(f) for f in self.flips if f <= -200000)
+        if wins:
+            decl.append("#pragma dagger confwin %s %s" % (
+                name, " ".join("%d %d" % (a, b) for a, b in wins)))
+        pins = sorted(pin_decode(f) for f in self.flips if -200000 < f <= -3000)
         if pins:
             decl.append("#pragma dagger reg %s %s" % (
                 name, " ".join("%d %s" % (k, r) for k, r in pins)))
@@ -2856,6 +2863,16 @@ PIN_REGS = ["eax", "ebx", "ecx", "edx", "esi", "edi", "ax", "bx", "cx", "dx", "s
 def pin_encode(k, reg):
     """The flip for `#pragma dagger reg <f> k reg`."""
     return -(3000 + 16 * k + PIN_REGS.index(reg))
+
+
+def win_encode(k1, k2):
+    """The flip for `#pragma dagger confwin <f> k1 k2`."""
+    return -(200000 + 64 * k1 + (k2 - k1))
+
+
+def win_decode(f):
+    n = -f - 200000
+    return n // 64, n // 64 + n % 64
 
 
 def pin_decode(f):

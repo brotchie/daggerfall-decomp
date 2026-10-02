@@ -156,6 +156,8 @@ def reg_log(c):
         import subprocess
         r = subprocess.run(cmd, capture_output=True, text=True, cwd=td,
                            env=dict(os.environ, DAGGER_REGLOG="1"))
+    W["confs"] = sum(int(ln.split()[2]) for ln in r.stderr.splitlines()
+                     if ln.startswith("confsort "))
     return [ln.split()[2] for ln in r.stderr.splitlines() if ln.startswith("reg ")]
 
 
@@ -174,7 +176,25 @@ def pin_search(name, va, c, detail, at, flips, attempt):
     log = reg_log(c)
     if not log:
         return None
-    used = {lift.pin_decode(f)[0] for f in flips if f <= -3000}
+    used = {lift.pin_decode(f)[0] for f in flips if -200000 < f <= -3000}
+    # first: a window of the allocation order taken latest-starting first
+    nconf = W.get("confs", 0)
+    if nconf and not os.environ.get("LIFT_NOCONFWIN") and \
+            not any(f <= -200000 for f in flips):
+        tva, tsize = W["funcs"][name]
+        c_est = nconf * (at - tva) / max(tsize, 1)
+        wins = sorted(((k1, k1 + L) for L in range(1, 6) for k1 in range(0, nconf)
+                       if k1 + L < nconf), key=lambda w: (abs((w[0] + w[1]) / 2 - c_est), w[1] - w[0]))
+        tries_w = 0
+        for k1, k2 in wins[:60]:
+            tries_w += 1
+            f2 = flips | {lift.win_encode(k1, k2)}
+            r = attempt(f2)
+            if r is None:
+                continue
+            s2, d2, at2 = r[0], r[1], r[2]
+            if s2 == "ok" or (s2 == "diff" and at2 is not None and at2 > at):
+                return ((1 << 40) if s2 == "ok" else at2, 0, f2, r, tries_w)
     if not pairs:
         # the registers don't line up (`mov edx,[g]` against `mov edx,eax`): any choice to
         # any register either instruction names

@@ -1281,3 +1281,9 @@ Batch **1,927**; build **61.34%**.
   pin pass converge. +4. Batch **2,158**.
 - A register used as an address since it was loaded (`mov edx,[g]; sub eax,[edx+0xb]`)
   has been consumed: not a further call argument. +5. Batch **2,163**.
+- Stack-parameter decrements without a dead load are pre-decrements (`--a5`). +2.
+- **Allocation-order windows (last resort)**: `#pragma dagger confwin <function> <k1>
+  <k2>` allocates the conflicts at sorted positions k1..k2 latest-starting first (Watcom
+  10's order for e.g. `(f(42)->x + f(108)->x) / 2`: the sum in the second operand's
+  register). The search tries windows around the difference's share of the function
+  before register pins (`confsort` lines in `DAGGER_REGLOG`). +3. Batch **2,167**.

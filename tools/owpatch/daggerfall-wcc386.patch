@@ -72,16 +72,17 @@ index ee6e5533cb..b42fafffb0 100644
          case OPR_FARPTR:                // segment :> offset
              op2 = PopCGName();          // - get offset
 diff --git a/bld/cc/c/cpragma.c b/bld/cc/c/cpragma.c
-index b8a6f1c7fd..de3576f0ae 100644
+index b8a6f1c7fd..6def29509c 100644
 --- a/bld/cc/c/cpragma.c
 +++ b/bld/cc/c/cpragma.c
-@@ -1487,6 +1487,69 @@ static void pragReadOnlyFile( void )
+@@ -1487,6 +1487,89 @@ static void pragReadOnlyFile( void )
  }
  
  
 +extern void DaggerFuncOptAdd( const char *opt, const char *func );
 +extern void DaggerSlotAdd( const char *func, const char *var, int depth );
 +extern void DaggerRegPinAdd( const char *func, int k, const char *reg );
++extern void DaggerConfWinAdd( const char *func, int k1, int k2 );
 +
 +static void pragDagger( void )
 +/*****************************
@@ -119,6 +120,25 @@ index b8a6f1c7fd..de3576f0ae 100644
 +        }
 +        return;
 +    }
++    if( strcmp( opt, "confwin" ) == 0 ) {
++        /* #pragma dagger confwin <function> <k1> <k2> ...: allocate the conflicts at sorted
++         * positions k1..k2 latest-starting first (a last resort) */
++        char    func[40];
++        int     k1;
++
++        strncpy( func, Buffer, sizeof( func ) - 1 );
++        func[sizeof( func ) - 1] = '\0';
++        PPNextToken();
++        while( CurToken == T_CONSTANT ) {
++            k1 = (int)U64Low( Constant64 );
++            PPNextToken();
++            if( CurToken != T_CONSTANT )
++                break;
++            DaggerConfWinAdd( func, k1, (int)U64Low( Constant64 ) );
++            PPNextToken();
++        }
++        return;
++    }
 +    if( strcmp( opt, "reg" ) == 0 ) {
 +        /* #pragma dagger reg <function> <k> <register> ...: the k-th register choice of
 +         * the function's allocator takes that register (a last resort) */
@@ -145,7 +165,7 @@ index b8a6f1c7fd..de3576f0ae 100644
  static void pragReadOnlyDir( void )
  /**********************************
   * forms:
-@@ -1821,6 +1884,8 @@ void CPragma( void )
+@@ -1821,6 +1904,8 @@ void CPragma( void )
              pragReadOnlyFile();
          } else if( pragmaNameRecog( "read_only_directory" ) ) {
              pragReadOnlyDir();
@@ -1467,7 +1487,7 @@ index 310489af1a..0f98337910 100644
      if( !LDone( oc ) ) {
          if( OC_BASE_CLASS( oc->oc_header.class ) != OC_INFO
 diff --git a/bld/cg/c/regalloc.c b/bld/cg/c/regalloc.c
-index 90c1857729..60b004f8f0 100644
+index 90c1857729..be8aa70773 100644
 --- a/bld/cg/c/regalloc.c
 +++ b/bld/cg/c/regalloc.c
 @@ -31,6 +31,9 @@
@@ -1505,7 +1525,7 @@ index 90c1857729..60b004f8f0 100644
                          break;
                      }
                  }
-@@ -922,6 +934,97 @@ static  void    NeighboursUse( conflict_node *conf )
+@@ -922,6 +934,114 @@ static  void    NeighboursUse( conflict_node *conf )
  }
  
  
@@ -1534,9 +1554,26 @@ index 90c1857729..60b004f8f0 100644
 +    }
 +}
 +
++static char         DaggerWinFunc[DAGGER_MAX_PINS][40];
++static int          DaggerWinK1[DAGGER_MAX_PINS];
++static int          DaggerWinK2[DAGGER_MAX_PINS];
++static int          DaggerWinCount;
++static int          DaggerConfBase;
++
++void    DaggerConfWinAdd( const char *func, int k1, int k2 )
++{
++    if( DaggerWinCount < DAGGER_MAX_PINS ) {
++        strncpy( DaggerWinFunc[DaggerWinCount], func, 39 );
++        DaggerWinK1[DaggerWinCount] = k1;
++        DaggerWinK2[DaggerWinCount] = k2;
++        DaggerWinCount++;
++    }
++}
++
 +void    DaggerRegReset( void )
 +{
 +    DaggerRegCount = 0;
++    DaggerConfBase = 0;
 +}
 +
 +static const char *DaggerRegNm[] = { "eax", "ebx", "ecx", "edx", "esi", "edi",
@@ -1603,7 +1640,7 @@ index 90c1857729..60b004f8f0 100644
  static hw_reg_set   GiveBestReg( conflict_node *conf, reg_tree *tree,
                                       hw_reg_set except, bool needs_one )
  /*************************************************************************
-@@ -986,13 +1089,24 @@ static hw_reg_set   GiveBestReg( conflict_node *conf, reg_tree *tree,
+@@ -986,13 +1106,24 @@ static hw_reg_set   GiveBestReg( conflict_node *conf, reg_tree *tree,
          all_true = true;
          for( possible = tree->regs; !HW_CEqual( *possible, HW_EMPTY ); ++possible ) {
              reg = *possible;
@@ -1630,7 +1667,7 @@ index 90c1857729..60b004f8f0 100644
                         && HW_Subset( GivenRegisters, reg )
                         && !HW_Subset( GivenRegisters, best ) ) ) {
                          best = reg;
-@@ -1004,6 +1118,23 @@ static hw_reg_set   GiveBestReg( conflict_node *conf, reg_tree *tree,
+@@ -1004,6 +1135,23 @@ static hw_reg_set   GiveBestReg( conflict_node *conf, reg_tree *tree,
                  }
              }
          }
@@ -1654,7 +1691,7 @@ index 90c1857729..60b004f8f0 100644
          if( all_true ) {
              HW_CAsgn( given, HW_EMPTY );
          } else if( HW_CEqual( best, HW_EMPTY ) ) {
-@@ -1193,12 +1324,24 @@ conflict_node   *GiveRegister( conflict_node *conf, bool needs_one )
+@@ -1193,12 +1341,24 @@ conflict_node   *GiveRegister( conflict_node *conf, bool needs_one )
  }
  
  
@@ -1680,7 +1717,7 @@ index 90c1857729..60b004f8f0 100644
  }
  
  
-@@ -1207,6 +1350,40 @@ static  void    SortConflicts( void )
+@@ -1207,7 +1367,95 @@ static  void    SortConflicts( void )
      Sort the conflicts in order of descending savings.
  */
  {
@@ -1719,9 +1756,64 @@ index 90c1857729..60b004f8f0 100644
 +    DaggerConfPos = DaggerEnv( "DAGGER_CONFPOS" ) != NULL ? 1
 +                  : DaggerEnv( "DAGGER_CONFPOSREV" ) != NULL ? -1 : 0;
      ConfList = SortList( ConfList, offsetof( conflict_node, next_conflict ), ConfBefore );
++    {
++        /* `#pragma dagger confwin`: positions k1..k2 (counted over the function's sorts)
++         * reordered latest-starting first */
++        const char      *func = DaggerCurrProcName();
++        conflict_node   **link;
++        conflict_node   *conf;
++        int             pos;
++        int             w;
++
++        for( w = 0; func != NULL && w < DaggerWinCount; w++ ) {
++            conflict_node   *sub = NULL;
++            conflict_node   **at = NULL;
++            int             k1 = DaggerWinK1[w] - DaggerConfBase;
++            int             k2 = DaggerWinK2[w] - DaggerConfBase;
++
++            if( strcmp( DaggerWinFunc[w], func ) != 0 || k2 < 0 )
++                continue;
++            pos = 0;
++            for( link = &ConfList; *link != NULL; ) {
++                conf = *link;
++                if( pos >= k1 && pos <= k2 ) {
++                    conflict_node   **ins_at;
++                    *link = conf->next_conflict;
++                    if( at == NULL )
++                        at = link;
++                    /* insert into sub by descending first instruction id */
++                    for( ins_at = &sub; *ins_at != NULL; ins_at = &(*ins_at)->next_conflict ) {
++                        if( conf->ins_range.first != NULL && (*ins_at)->ins_range.first != NULL
++                          && conf->ins_range.first->id > (*ins_at)->ins_range.first->id )
++                            break;
++                    }
++                    conf->next_conflict = *ins_at;
++                    *ins_at = conf;
++                } else {
++                    link = &conf->next_conflict;
++                }
++                pos++;
++            }
++            if( sub != NULL && at != NULL ) {
++                conflict_node   *tail = sub;
++
++                while( tail->next_conflict != NULL )
++                    tail = tail->next_conflict;
++                tail->next_conflict = *at;
++                *at = sub;
++            }
++        }
++        pos = 0;
++        for( conf = ConfList; conf != NULL; conf = conf->next_conflict )
++            pos++;
++        if( getenv( "DAGGER_REGLOG" ) != NULL )
++            fprintf( stderr, "confsort %d %d\n", DaggerConfBase, pos );
++        DaggerConfBase += pos;
++    }
  }
  
-@@ -1242,6 +1419,18 @@ static  enum allocation_state    AssignConflicts( void )
+ 
+@@ -1242,6 +1490,18 @@ static  enum allocation_state    AssignConflicts( void )
          }
      }
      ConstSavings();
@@ -1740,7 +1832,7 @@ index 90c1857729..60b004f8f0 100644
  
      SortConflicts();
      state = ALLOC_BITS;
-@@ -1265,7 +1454,9 @@ static  enum allocation_state    AssignConflicts( void )
+@@ -1265,7 +1525,9 @@ static  enum allocation_state    AssignConflicts( void )
              */
              if( !only_const_temps && opnd->n.class == N_TEMP && (opnd->t.temp_flags & CONST_TEMP) )
                  return( ALLOC_CONST_TEMP );
