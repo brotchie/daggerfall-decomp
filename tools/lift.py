@@ -277,6 +277,47 @@ class Func:
         sign = {}      # slot -> 's' / 'u' hints
         addr = set()
         body = self.ins[self.body_start:self.body_end]
+        R16 = {"eax": "ax", "edx": "dx", "ebx": "bx", "ecx": "cx"}
+        FAM = {r + s_: "e%sx" % r for r in "abcd" for s_ in ("l", "h", "x")}
+        FAM.update({"e%sx" % r: "e%sx" % r for r in "abcd"})
+
+        def is16(r32, j, depth):
+            """Whether r32 at body[j] (its last write at or before j) holds a value computed
+            as 16 bits: a word load, a high byte cleared, or whole-register arithmetic on
+            one (the high half garbage, so only the low half counts)."""
+            r16 = R16.get(r32)
+            while j >= 0 and k - j < 8 and depth < 3 and r16:
+                i = body[j]
+                ops_ = i.operands
+                if i.mnemonic in ("call",) or i.mnemonic.startswith("j"):
+                    return False
+                if not ops_ or ops_[0].type != cx.X86_OP_REG or \
+                        FAM.get(i.reg_name(ops_[0].reg)) != r32:
+                    j -= 1
+                    continue
+                dst = i.reg_name(ops_[0].reg)
+                if dst == r16 and i.mnemonic in ("mov", "movsx", "movzx", "add", "sub", "inc",
+                                                 "dec", "and", "or", "xor"):
+                    return True
+                if i.mnemonic == "xor" and dst == r16[0] + "h" and \
+                        i.op_str == "%sh, %sh" % (r16[0], r16[0]):
+                    return True
+                if dst != r32:
+                    return False
+                if i.mnemonic in ("add", "sub", "inc", "dec", "shl", "neg", "imul"):
+                    srcs = ops_[1:]
+                    if not all(o.type in (cx.X86_OP_IMM, cx.X86_OP_REG) for o in srcs):
+                        return False
+                    if i.mnemonic in ("add", "sub", "imul"):
+                        for o in srcs:
+                            if o.type == cx.X86_OP_REG and o.size == 4 and \
+                                    is16(i.reg_name(o.reg), j - 1, depth + 1):
+                                return True
+                    j -= 1
+                    continue
+                return False
+            return False
+
         for k, ins in enumerate(body):
             for n, op in enumerate(ins.operands):
                 lo = local_indexed(ins, op)
@@ -303,26 +344,11 @@ class Func:
                     # stored whole right after being computed as 16 bits (mov ax,[x];
                     # mov [l],eax): Watcom 10's store of a 2-byte variable
                     r32 = ins.reg_name(ins.operands[1].reg)
-                    r16 = {"eax": "ax", "edx": "dx", "ebx": "bx", "ecx": "cx"}.get(r32)
-                    j = k - 1
-                    # ... possibly through whole-register arithmetic on it (mov ax,[x];
-                    # sub eax,4; mov [l],eax: short arithmetic done in 32 bits)
-                    while j > 0 and k - j < 4 and body[j].mnemonic in (
-                            "add", "sub", "inc", "dec", "shl", "neg", "imul") and \
-                            body[j].operands[0].type == cx.X86_OP_REG and \
-                            body[j].reg_name(body[j].operands[0].reg) == r32 and \
-                            all(o.type == cx.X86_OP_IMM or (o.type == cx.X86_OP_REG and
-                                                           o.size == 4 and body[j].mnemonic in
-                                                           ("add", "sub", "imul"))
-                                for o in body[j].operands[1:]):
-                        j -= 1
-                    pv = body[j]
-                    if pv.operands and pv.operands[0].type == cx.X86_OP_REG and \
-                            (pv.reg_name(pv.operands[0].reg) == r16 or
-                             (pv.mnemonic == "xor" and r16 and
-                              pv.op_str == "%sh, %sh" % (r16[0], r16[0]))):
+                    if is16(r32, k - 1, 0):
                         wide16.add(off)
-                        if j < k - 1:
+                        if not (body[k - 1].operands and
+                                body[k - 1].operands[0].type == cx.X86_OP_REG and
+                                body[k - 1].operands[0].size == 2):
                             self.w16_stores.add(ins.address)
                 if not (n == 0 and ins.mnemonic == "mov"):
                     reads.setdefault(off, set()).add(op.size)

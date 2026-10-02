@@ -1155,3 +1155,6 @@ Batch **1,927**; build **61.34%**.
   constant (`x == (short)-1`; OW widens a compare with a negative int). +3. The compiler
   no longer narrows `and word [ebp-x],0xfffe` of a stack variable or local array to a byte
   (FALL.EXE has none). Batch **2,025**.
+- A value is 16 bits if any operand of the whole-register arithmetic producing it is (a
+  small recursive walk back from the store): `mov ax,[x]; inc eax; mov edx,[l]; add edx,eax;
+  mov [m],edx` stores a short. +3. Batch **2,028**.
