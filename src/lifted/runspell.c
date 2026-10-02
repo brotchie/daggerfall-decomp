@@ -83,7 +83,6 @@ extern int func_000CE70D();
 extern void func_0002F490(int, int, int);
 extern void func_0002F72F(int, int, int, int);
 extern void func_0003A2AD(int, int);
-extern void func_0005BA28(int, unsigned short, int);
 extern void func_0005C1CA(int, int, int);
 extern void func_00067027(int);
 extern void func_0007D774(int, int);
@@ -98,11 +97,13 @@ int func_0005B905(int, int, int, int);
 int func_0005B9DF(int, int, int);
 void func_0005ABE6(int, int, int);
 void func_0005B206(int);
+void func_0005BA28(int, unsigned short, int);
 void func_0005C6A2(int);
 void func_0005C856(int, int);
 void func_0005C897(int);
 void func_0005CA28(int);
 void func_0005CA87(int);
+#pragma dagger DAGGER_FIRSTUSE func_0005BA28
 
 int func_0005A9F8(int a1, int a2)
 {
@@ -554,6 +555,43 @@ int func_0005B9DF(int a1, int a2, int a3)
 
     l_14 = a1 + 71;
     return func_000CAE0E((int)(unsigned char)*(signed char *)((char *)((a2 * 2) + l_14)), a1, a2, a3);
+}
+
+void func_0005BA28(int a1, unsigned short a2, int a3)
+{
+    int l_18;
+
+    if (((int)(unsigned char)*(signed char *)((char *)a1 + 72)) < 200) goto L5BA56;
+    *(int *)&a2 = 8;
+L5BA56:;
+    l_18 = 0;
+L5BA5D:;
+    if (l_18 < 3) goto L5BA70;
+    return;
+L5BA68:;
+    l_18++;
+    goto L5BA5D;
+L5BA70:;
+    if (((int)(unsigned char)*(signed char *)((char *)((l_18 * 2) + a1))) == 255) goto L5BA68;
+    if (((int)(signed char)*(signed char *)((char *)((l_18 * 3) + a1) + 14)) == (-1)) goto L5BB26;
+    if (((int)(unsigned char)(*(signed char *)(D_0017A94B + (((int)(unsigned char)*(signed char *)((char *)((l_18 * 2) + a1))) * 12)) & 1)) == 0) goto L5BB16;
+    *(short *)((char *)((l_18 * 2) + a1) + 74) = ((((int)(signed char)*(signed char *)((char *)((l_18 * 3) + a1) + 14)) + (((int)(signed char)*(signed char *)((char *)((l_18 * 3) + a1) + 15)) * (((int)(unsigned short)a2) / ((int)(signed char)*(signed char *)((char *)((l_18 * 3) + a1) + 16))))) * a3) / 100;
+    goto L5BB24;
+L5BB16:;
+    *(short *)((char *)((l_18 * 2) + a1) + 74) = 0;
+L5BB24:;
+    goto L5BB34;
+L5BB26:;
+    *(short *)((char *)((l_18 * 2) + a1) + 74) = 65535;
+L5BB34:;
+    if (((int)(unsigned char)(*(signed char *)(D_0017A94B + (((int)(unsigned char)*(signed char *)((char *)((l_18 * 2) + a1))) * 12)) & 2)) == 0) goto L5BB99;
+    *(signed char *)((char *)(a1 + l_18) + 86) = ((int)(signed char)*(signed char *)((char *)((l_18 * 3) + a1) + 23)) + (((int)(signed char)*(signed char *)((char *)((l_18 * 3) + a1) + 24)) * (((int)(unsigned short)a2) / ((int)(signed char)*(signed char *)((char *)((l_18 * 3) + a1) + 25))));
+L5BB99:;
+    if (((int)(unsigned char)(*(signed char *)(D_0017A94B + (((int)(unsigned char)*(signed char *)((char *)((l_18 * 2) + a1))) * 12)) & 4)) == 0) goto L5BC4E;
+    *(short *)((char *)((l_18 * 2) + a1) + 80) = (a3 * (func_0007D6AE((int)(signed char)*(signed char *)((char *)((l_18 * 5) + a1) + 32), (int)(signed char)*(signed char *)((char *)((l_18 * 5) + a1) + 33)) + ((((int)(unsigned short)a2) / ((int)(signed char)*(signed char *)((char *)((l_18 * 5) + a1) + 36))) * func_0007D6AE((int)(signed char)*(signed char *)((char *)((l_18 * 5) + a1) + 34), (int)(signed char)*(signed char *)((char *)((l_18 * 5) + a1) + 35))))) / 100;
+    *(short *)((char *)((l_18 * 5) + a1) + 34) = 0;
+L5BC4E:;
+    goto L5BA68;
 }
 
 void func_0005BC5B(int a1, int a2)

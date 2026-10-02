@@ -902,3 +902,24 @@ Batch **1,612**.
   `LIFT_UGLOBALS=1`.)
 
 Batch **1,624**.
+
+## 2026-10-02: per-function code generator switches, searched
+
+Register allocation differs from Watcom 10 in ways that vary per function: reversing the
+order in which equal-savings temps get registers (`KKND_CONFREV`) fixes 17 functions and
+breaks 321 when applied everywhere. So the switches became per-function knobs:
+
+- `#pragma dagger <SWITCH> <function>` (front end, `cpragma.c`) turns a code generator
+  switch on for one function. All `DAGGER_*`/`KKND_*` switches in the code generator now go
+  through `DaggerEnv()`, which checks the environment and then the pragmas for the function
+  being generated.
+- The lifter offers 17 of them as function-level choice points; `lift_all.py` tries them
+  whenever nothing near the first difference helps. Settled so far: `DAGGER_DEADDEF` (21
+  functions), `KKND_CONFREV` (13), `DAGGER_FIRSTUSE` (6), `DAGGER_PUSHMEM` (5),
+  `DAGGER_RMW` (2). +46 in all. The batch takes 19 s.
+- Fixed a leak between functions found by the full build (the batch compiles functions
+  one at a time): the per-function list of slotless indirect-call symbols could survive into
+  the next function when its `proc_def` reused the address. Per-function lists now reset at
+  `CGProcDecl()`.
+
+Batch **1,670**; build **1,671 functions, 47.90%**.

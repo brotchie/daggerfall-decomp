@@ -130,6 +130,8 @@ extern int func_000C7FF4();
 extern int func_000C808D();
 extern int func_000CE8B2();
 extern int func_0012DB50();
+extern int func_00135DE4();
+extern int func_00135E39();
 extern int func_00144F68();
 extern void func_0003EC2A(int, int);
 extern void func_0003EDF4(int, short, int);
@@ -172,6 +174,7 @@ void func_0007FEB9(int);
 void func_0007FF73(int);
 void func_0007FFE7(int);
 #pragma aux func_000A0ED9 parm routine [];
+#pragma dagger DAGGER_DEADDEF func_0007E246
 
 void func_0007CB4F(int a1)
 {
@@ -587,6 +590,27 @@ void func_0007E14E(int a1)
     *(int *)((char *)*(int *)D_00195AA4 + 11) = *(int *)(D_0018DE18 + (a1 * 12));
     *(int *)((char *)*(int *)D_00195AA4 + 15) = *(int *)(D_0018DE1C + (a1 * 12));
     *(signed char *)D_001940D5 |= 2;
+}
+
+void func_0007E246(int a1)
+{
+    int l_1C;
+    int l_18;
+
+    l_1C = func_00135DE4(((int)(unsigned short)*(short *)((char *)a1 + 27)) >> 7, (int)(unsigned short)(*(short *)((char *)a1 + 27) & 127));
+    if (l_1C != 0) goto L7E2B2;
+    func_00135E39();
+    l_1C = func_00135DE4(((int)(unsigned short)*(short *)((char *)a1 + 27)) >> 7, (int)(unsigned short)(*(short *)((char *)a1 + 27) & 127));
+L7E2B2:;
+    l_18 = ((*(int *)D_001343C0 >> 5) - ((int)(unsigned short)*(short *)((char *)a1 + 19))) << 5;
+    if (l_18 < 0) goto L7E2DE;
+    if (l_18 <= 2000) goto L7E2EA;
+L7E2DE:;
+    l_18 = (int)(unsigned short)*(short *)((char *)l_1C + 22);
+L7E2EA:;
+    if (((int)(unsigned short)*(short *)((char *)l_1C + 22)) > l_18) return;
+    *(short *)((char *)a1 + 19) = *(int *)D_001343C0 >> 5;
+    (*(short *)((char *)a1 + 23))++;
 }
 
 void func_0007E31C(int a1)

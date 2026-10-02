@@ -97,6 +97,7 @@ void func_00039F94(void);
 void func_00039FD6(void);
 void func_0003A036(void);
 #pragma aux func_000A0ED9 parm routine [];
+#pragma dagger KKND_CONFREV func_00039E5F
 
 int func_00037732(void)
 {
@@ -589,6 +590,55 @@ L39E2C:;
     return 0;
 L39E4C:;
     return l_30;
+}
+
+int func_00039E5F(int a1)
+{
+    int l_34;
+    int l_30;
+    int l_2C;
+    short l_24;
+    short l_20;
+    short l_1C;
+    short l_18;
+
+    *(int *)&l_20 = func_000A1079(a1, 255, 1000) - a1;
+    l_34 = *(int *)D_00195C44 + 20000;
+    l_30 = *(int *)D_00195C44 + 21000;
+    l_2C = *(int *)D_00195C44;
+    func_0006CB53((int)D_00170B69, *(int *)D_00195C44);
+    *(int *)&l_18 = 0;
+    *(int *)&l_1C = *(int *)&l_18;
+L39EC7:;
+    if ((short)*(int *)&l_18 < l_20) goto L39EDD;
+    goto L39F61;
+L39ED5:;
+    (*(int *)&l_18)++;
+    goto L39EC7;
+L39EDD:;
+    *(int *)&l_24 = 0;
+L39EE4:;
+    if (*(int *)&l_24 >= 128) goto L39F1B;
+    if (*(signed char *)((char *)((*(int *)&l_24 * 89) + l_2C) + 47) == 0) goto L39F0F;
+    if (*(signed char *)((char *)((*(int *)&l_24 * 89) + l_2C) + 73) == *(signed char *)((char *)(((int)(short)l_18) + a1))) goto L39F11;
+L39F0F:;
+    goto L39F13;
+L39F11:;
+    goto L39F1B;
+L39F13:;
+    (*(int *)&l_24)++;
+    goto L39EE4;
+L39F1B:;
+    func_000A0AD9(l_30, ((*(int *)&l_24 * 89) + l_2C) + 47, 4, (int)D_00170B13, 1625);
+    *(int *)((char *)((((int)(short)(*(int *)&l_1C)++) << 2) + l_34)) = l_30;
+    l_30 += func_000A0DF4(l_30) + 1;
+    goto L39ED5;
+L39F61:;
+    *(int *)((char *)((((int)(short)l_1C) << 2) + l_34)) = 0;
+    if (l_1C != 0) goto L39F81;
+    return 0;
+L39F81:;
+    return l_34;
 }
 
 void func_00039F94(void)

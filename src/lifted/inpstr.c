@@ -2,6 +2,10 @@
  * do not edit: move a function to src/inpstr.c to work on it by hand) */
 
 extern char D_0012DA50[];
+extern char D_0014234F[];
+extern char D_00142353[];
+extern char D_00142355[];
+extern char D_00142357[];
 extern char D_00176E2C[];
 extern char D_00190B44[];
 extern char D_00195B94[];
@@ -11,11 +15,38 @@ extern char D_001A9AAE[];
 extern char D_001A9AB0[];
 extern char D_001A9AB1[];
 
+extern int func_0005A4A9(int);
 extern int func_000A0AD9();
 extern int func_000A0DD9();
 extern int func_000A0DF4();
 extern int func_00142790();
+extern int func_001427A8();
 extern int func_00144E84();
+#pragma dagger DAGGER_FIRSTUSE func_0008C462
+#pragma dagger DAGGER_FIRSTUSE func_0008C9D2
+
+int func_0008C462(void)
+{
+    unsigned char l_18;
+
+    l_18 = func_001427A8();
+    if (l_18 == 0) goto L8C488;
+    return (int)(unsigned char)l_18;
+L8C488:;
+    if (*(signed char *)D_00142353 == 0) goto L8C49A;
+    return 128;
+L8C49A:;
+    if (*(signed char *)D_00142355 == 0) goto L8C4AC;
+    return 129;
+L8C4AC:;
+    if (*(signed char *)D_0014234F == 0) goto L8C4BE;
+    return 131;
+L8C4BE:;
+    if (*(signed char *)D_00142357 == 0) goto L8C4D0;
+    return 130;
+L8C4D0:;
+    return 0;
+}
 
 void func_0008C4E4(int a1)
 {
@@ -27,6 +58,18 @@ void func_0008C4E4(int a1)
     *(short *)D_001A9AAE = func_000A0DF4((int)D_001A9AA0);
     *(short *)D_001A9AAC = 8;
     *(signed char *)D_001A9AB1 = *(signed char *)D_0012DA50;
+}
+
+int func_0008C9D2(int a1, short a2)
+{
+    unsigned char l_14;
+    short l_18;
+
+    l_14 = *(signed char *)((char *)(((int)(short)a2) + a1));
+    *(signed char *)((char *)(((int)(short)a2) + a1)) = 0;
+    *(int *)&l_18 = func_0005A4A9(a1);
+    *(signed char *)((char *)(((int)(short)a2) + a1)) = l_14;
+    return (int)(short)l_18;
 }
 
 void func_0008CA25(int a1)

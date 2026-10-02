@@ -114,6 +114,7 @@ int func_00086560(int, int);
 void func_00086397(int);
 void func_00086D37(unsigned short);
 void func_000871FA(int);
+#pragma dagger KKND_CONFREV func_0008661C
 
 void func_00086314(void)
 {
@@ -221,6 +222,24 @@ L86601:;
 L86609:;
     return 0;
 }
+}
+
+int func_0008661C(int a1, int a2)
+{
+    if (((int)(unsigned short)*(short *)((char *)*(int *)D_00195AC4 + 27)) == 65535) goto L866A1;
+    if (a1 <= *(int *)((char *)*(int *)D_00195AC4 + 7)) goto L8666C;
+    if (((((int)(unsigned char)*(signed char *)((char *)*(int *)D_00195BDC + 32)) << 12) + *(int *)((char *)*(int *)D_00195AC4 + 7)) > a1) goto L8666E;
+L8666C:;
+    goto L866A1;
+L8666E:;
+    if (a2 <= *(int *)((char *)*(int *)D_00195AC4 + 15)) goto L86696;
+    if (((((int)(unsigned char)*(signed char *)((char *)*(int *)D_00195BDC + 33)) << 12) + *(int *)((char *)*(int *)D_00195AC4 + 15)) > a2) goto L86698;
+L86696:;
+    goto L866A1;
+L86698:;
+    return 1;
+L866A1:;
+    return 0;
 }
 
 void func_000866B4(void)

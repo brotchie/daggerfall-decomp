@@ -2,23 +2,29 @@
  * do not edit: move a function to src/mplace.c to work on it by hand) */
 
 extern char D_00170788[];
+extern char D_001789FA[];
 extern char D_0017A028[];
 extern char D_00187B6E[];
 extern char D_001940D7[];
 extern char D_001940DB[];
 extern char D_001950EC[];
 extern char D_001951EC[];
+extern char D_001951ED[];
 extern char D_00195AA4[];
 extern char D_00195AC4[];
 extern char D_00195C74[];
+extern char D_00196274[];
 extern char D_00196277[];
+extern char D_00196294[];
 extern char D_00196299[];
+extern char D_001962A0[];
 extern char D_00196D64[];
 
 extern int func_0002257C(int, int, int, int);
 extern int func_00025BDD(int);
 extern int func_00077960(int, int, int);
 extern int func_0007D6AE(int, int);
+extern int func_0008661C(int, int);
 extern int func_0008DA91(int);
 extern int func_0008DCE3(int, int, int);
 extern int func_0008EB88(int);
@@ -32,6 +38,8 @@ extern void func_00078566(int, int);
 extern void func_0008E3F7(int, int);
 void func_0002631D(int);
 void func_000266C7(int);
+void func_0002675D(int);
+#pragma dagger KKND_CONFREV func_00026565
 
 void func_0002631D(int a1)
 {
@@ -106,6 +114,53 @@ L26539:;
 L26541:;
     func_000266C7((int)(unsigned char)*(signed char *)(D_0017A028 + (func_0009DC25() & 3)));
     goto L26539;
+}
+
+void func_00026565(int a1, int a2)
+{
+    if (*(signed char *)D_001962A0 != 0) return;
+    if (a2 != 0) goto L265AC;
+    if (*(signed char *)D_00196294 != 0) return;
+    if ((((unsigned)a1) % 12) != 0) return;
+L265AC:;
+    if (((int)(unsigned char)*(signed char *)D_001789FA) != 1) goto L26676;
+    a1 = ((unsigned)a1) % 1440;
+    if (func_0008661C(*(int *)((char *)*(int *)D_00195AA4 + 7), *(int *)((char *)*(int *)D_00195AA4 + 15)) == 0) goto L2662A;
+    if (a2 != 0) goto L265F4;
+    if (((unsigned)a1) >= 360) goto L265F6;
+L265F4:;
+    goto L265FF;
+L265F6:;
+    if (((unsigned)a1) <= 1080) goto L26628;
+L265FF:;
+    if (a2 != 0) goto L26615;
+    if (func_0007D6AE(0, 23) != 0) goto L26617;
+L26615:;
+    goto L2661C;
+L26617:;
+    return;
+L2661C:;
+    func_000266C7(func_00025BDD(0));
+L26628:;
+    goto L26674;
+L2662A:;
+    if (a2 != 0) goto L26668;
+    if (((unsigned)a1) < 360) goto L26642;
+    if (((unsigned)a1) <= 1080) goto L26658;
+L26642:;
+    if (func_0007D6AE(0, 23) != 0) return;
+    goto L26668;
+L26658:;
+    if (func_0007D6AE(0, 35) != 0) return;
+L26668:;
+    func_0002675D(func_00025BDD(0));
+L26674:;
+    return;
+L26676:;
+    if (((int)(unsigned char)*(signed char *)D_001789FA) != 3) return;
+    if (((int)(unsigned char)*(signed char *)D_00196274) != 16) return;
+    if (func_0007D6AE(0, 35) != 0) return;
+    func_000266C7((int)(unsigned char)*(signed char *)(D_001951ED + (func_0009DC25() % 6)));
 }
 
 void func_000266C7(int a1)

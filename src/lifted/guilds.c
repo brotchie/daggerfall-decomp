@@ -79,7 +79,6 @@ extern int func_0004C274(unsigned char, unsigned char, unsigned char, unsigned c
 extern int func_00069938(int, int, int);
 extern int func_0006CB53(int, int);
 extern int func_0006FDBE(void);
-extern int func_000700EE(int, int, int);
 extern int func_0007D6AE(int, int);
 extern int func_0007F2A8(int);
 extern int func_0008DA4D(int);
@@ -121,6 +120,7 @@ extern void func_0008E3F7(int, int);
 extern void func_000922F6(int, int, int);
 extern void func_00097A85(void);
 int func_0006F92F(void);
+int func_000700EE(int, int, int);
 int func_000702A0(unsigned char);
 int func_00070308(unsigned char);
 int func_0007069D(int);
@@ -128,6 +128,7 @@ void func_0006F73A(void);
 void func_000701F1(int);
 void func_00070624(int, unsigned char);
 void func_00070AFA(int);
+#pragma dagger DAGGER_DEADDEF func_000700EE
 
 int func_0006F484(int a1)
 {
@@ -346,6 +347,31 @@ L700CE:;
     l_2C = 9;
 L700DB:;
     return l_2C;
+}
+
+int func_000700EE(int a1, int a2, int a3)
+{
+    int l_20;
+    int l_1C;
+    int l_18;
+    int l_14;
+
+    l_20 = 0;
+    l_1C = -1;
+L70111:;
+    l_14 = (int)(short)*(short *)((char *)(int)(*(char **)D_00195BE0 + (((int)(unsigned char)*(signed char *)((char *)(a2 + l_20))) * 6)) + 157);
+    if (l_14 <= l_1C) goto L7014C;
+    if (((int)(unsigned char)*(signed char *)((char *)(a2 + l_20))) != a3) goto L7014E;
+L7014C:;
+    goto L70161;
+L7014E:;
+    l_1C = l_14;
+    l_18 = (int)(unsigned char)*(signed char *)((char *)(a2 + l_20));
+L70161:;
+    l_20++;
+    if (((int)(unsigned char)*(signed char *)((char *)(a2 + l_20))) != 255) goto L70111;
+    *(int *)((char *)a1) = l_18;
+    return l_1C;
 }
 
 void func_000701F1(int a1)

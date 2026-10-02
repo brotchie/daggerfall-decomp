@@ -1663,6 +1663,11 @@ class Func:
                     lines.append("}")
         lines.append("}")
         decl = ["/* lifted from 0x%08X */" % self.va] + sorted(self.structs)
+        # function-level choice points: code generator options (#pragma dagger)
+        self.choices.extend(-1 - k for k in range(len(FUNC_OPTS)))
+        for k, opt in enumerate(FUNC_OPTS):
+            if -1 - k in self.flips:
+                decl.append("#pragma dagger %s %s" % (opt, name))
         if self.conv == "sosconv":
             decl.append(SOSCONV)
             decl.append("#pragma aux (sosconv) %s;" % name)
@@ -1682,6 +1687,12 @@ SIGS = {}
 POPS = {}
 
 
+# Code generator switches the batch search may turn on for one function
+# (`#pragma dagger <SWITCH> <function>`, DaggerEnv() in the compiler)
+FUNC_OPTS = ["KKND_CONFREV", "DAGGER_LEFTPREF", "DAGGER_CHARAUTOSMALL", "DAGGER_CLRAFTER",
+             "DAGGER_WORDSTORE", "DAGGER_RMW", "DAGGER_PUSHMEM", "DAGGER_DEADDEF", "DAGGER_CDQ",
+             "DAGGER_FLUSH", "DAGGER_CHARPARMBIG", "DAGGER_SIGNEDBF", "KKND_CONSTREG",
+             "KKND_LINSEL", "KKND_NOROT", "KKND_STRETCH", "DAGGER_FIRSTUSE"]
 SOSCONV = '#pragma aux sosconv "*" parm caller [] value [eax] modify [eax ebx ecx edx];'
 SAVES = {}
 

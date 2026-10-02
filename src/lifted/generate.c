@@ -57,6 +57,7 @@ extern void func_0008DA1C(int);
 extern void func_00091B80(int);
 extern void func_00097101(int);
 extern void func_0009721F(void);
+#pragma dagger DAGGER_DEADDEF func_000919FE
 
 void func_00090E79(void)
 {
@@ -163,6 +164,14 @@ default:
 void func_000917F0(int a1)
 {
     func_00091B80((int)(short)(a1 - 20));
+}
+
+void func_000919FE(void)
+{
+    if (*(signed char *)D_00196279 != 0) return;
+    (*(signed char *)((char *)*(int *)D_00195BE0 + 128))--;
+    if (((int)(unsigned char)*(signed char *)((char *)*(int *)D_00195BE0 + 128)) <= 10) return;
+    *(signed char *)((char *)*(int *)D_00195BE0 + 128) = 9;
 }
 
 void func_00091A4B(void)

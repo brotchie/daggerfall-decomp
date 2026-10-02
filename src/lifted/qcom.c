@@ -33,6 +33,7 @@ extern void func_00031B47(int, int);
 extern void func_00050069(int);
 void func_0002C0A8(int);
 void func_0002CAB0(int);
+#pragma dagger DAGGER_DEADDEF func_0002CC40
 
 int func_0002B26B(int a1)
 {
@@ -520,6 +521,40 @@ L2CB95:;
     return;
 L2CB97:;
     *(signed char *)((char *)l_14 + 2) &= 191;
+}
+
+int func_0002CC40(int a1, int a2)
+{
+    int l_1C;
+    int l_18;
+
+    l_1C = a2 + 36;
+    l_18 = *(int *)((char *)a2 + 22);
+    if (*(signed char *)((char *)l_18 + 2) == 0) goto L2CC90;
+    if (*(signed char *)(D_001952EC + ((int)(unsigned char)*(signed char *)((char *)l_18 + 3))) == 0) goto L2CC8E;
+    return 0;
+L2CC8E:;
+    goto L2CCA2;
+L2CC90:;
+    if (*(signed char *)((char *)l_18 + 3) == 0) goto L2CCA2;
+    return 0;
+L2CCA2:;
+    if (*(int *)((char *)l_1C + 7) == 0) goto L2CCB1;
+    (*(int *)((char *)l_1C + 7))--;
+L2CCB1:;
+    if (*(int *)((char *)l_1C + 7) != 0) goto L2CCF9;
+    if (*(int *)((char *)a2 + 28) != (-1)) goto L2CCCC;
+    return 1;
+L2CCCC:;
+    if (*(signed char *)((char *)l_18 + 2) == 0) goto L2CCE9;
+    *(signed char *)(D_001952EC + ((int)(unsigned char)*(signed char *)((char *)l_18 + 3))) = 1;
+    goto L2CCF0;
+L2CCE9:;
+    *(signed char *)((char *)l_18 + 3) = 1;
+L2CCF0:;
+    return 1;
+L2CCF9:;
+    return 0;
 }
 
 void func_0002CD0C(int a1, int a2)

@@ -146,7 +146,9 @@ def work(va):
     flips, tries = frozenset(), 0
     best = (status, detail, at, c)
     while status == "diff" and at is not None and tries < BUDGET and not os.environ.get("LIFT_NOSEARCH"):
-        near = sorted((a for a in info["choices"] if a not in flips), key=lambda a: abs(a - at))[:NEAR]
+        near = sorted((a for a in info["choices"] if a >= 0 and a not in flips),
+                      key=lambda a: abs(a - at))[:NEAR]
+        near += [a for a in info["choices"] if a < 0 and a not in flips]   # function-level
         moved = False
         for a in near:
             tries += 1

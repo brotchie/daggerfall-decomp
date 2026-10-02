@@ -28,9 +28,10 @@ extern int func_00038067(void);
 extern int func_0006CB53(int, int);
 extern int func_000A0040();
 extern void func_000361B7(int);
-extern void func_00036DC9(int, int, int, unsigned char);
 void func_00036C6F(int, int, int, unsigned char);
+void func_00036DC9(int, int, int, unsigned char);
 void func_00036F18(int);
+#pragma dagger DAGGER_DEADDEF func_00036DC9
 
 void func_00036AA7(int a1)
 {
@@ -110,6 +111,38 @@ L36DAF:;
     func_00036F18(*(int *)D_001995EC);
 L36DB9:;
     *(signed char *)((char *)*(int *)D_001995EC + 10) = 0;
+}
+
+void func_00036DC9(int a1, int a2, int a3, unsigned char a4)
+{
+    (*(signed char *)((char *)*(int *)D_001995E4 + 10))++;
+    *(int *)D_001995EC = ((int)D_00199D78) + ((*(int *)D_001A3A78)++ * 39);
+    func_000A0040(*(int *)D_001995EC, 0, 39, (int)D_00170AB4, 490, 4);
+    *(short *)((char *)*(int *)D_001995EC) = *(short *)D_00199618;
+    if (a2 == 0) goto L36E94;
+    *(signed char *)((char *)*(int *)D_001995EC + 2) = *(signed char *)((char *)a1 + 14);
+    *(signed char *)((char *)*(int *)D_001995EC + 3) = *(signed char *)((char *)a1 + 18);
+    *(signed char *)((char *)*(int *)D_001995EC + 4) = *(signed char *)((char *)a2);
+    *(short *)((char *)*(int *)D_001995EC + 5) = *(short *)((char *)a2 + 1);
+    *(short *)((char *)*(int *)D_001995EC + 7) = *(short *)((char *)a2 + 3);
+    *(signed char *)((char *)*(int *)D_001995EC + 9) = *(signed char *)((char *)a2 + 9);
+    goto L36EE1;
+L36E94:;
+    if (a3 == 0) goto L36ED5;
+    *(signed char *)((char *)*(int *)D_001995EC + 2) = *(signed char *)((char *)a3 + 2);
+    *(signed char *)((char *)*(int *)D_001995EC + 3) = *(signed char *)((char *)a3 + 5);
+    *(signed char *)((char *)*(int *)D_001995EC + 4) = *(signed char *)((char *)a3 + 4);
+    *(signed char *)((char *)*(int *)D_001995EC + 9) = a4;
+    goto L36EE1;
+L36ED5:;
+    *(signed char *)((char *)*(int *)D_001995EC + 9) = a4;
+L36EE1:;
+    if (((int)(unsigned char)*(signed char *)((char *)*(int *)D_001995EC + 9)) <= 1) goto L36F05;
+    if (((int)(unsigned char)*(signed char *)((char *)*(int *)D_001995EC + 9)) < 8) goto L36F07;
+L36F05:;
+    return;
+L36F07:;
+    func_00036F18(*(int *)D_001995EC);
 }
 
 void func_00036F18(int a1)

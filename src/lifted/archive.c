@@ -2,6 +2,9 @@
  * do not edit: move a function to src/archive.c to work on it by hand) */
 
 extern char D_00170150[];
+extern char D_0017015A[];
+extern char D_00170172[];
+extern char D_00195C44[];
 extern char D_001962B4[];
 extern char D_00196304[];
 extern char D_0019632C[];
@@ -17,6 +20,12 @@ extern int func_000A00AF();
 extern int func_000A00CB();
 extern int func_000A0AD9();
 extern int func_000A0B42();
+extern int func_000A0E82();
+extern int func_000A0ED9(int, int);
+extern int func_000A0F5C(int, ...);
+extern void func_00050069(int);
+#pragma aux func_000A0ED9 parm routine [];
+#pragma dagger KKND_CONFREV func_00012FCE
 
 int func_00012E04(int a1, int a2, int a3)
 {
@@ -71,6 +80,57 @@ L12F9E:;
     *(int *)(D_001962B4 + (a1 << 2)) = 0;
     *(short *)(D_00196304 + (a1 * 2)) = 0;
     func_0009DEA7(a1);
+}
+
+int func_00012FCE(int a1, int a2, int a3)
+{
+    int l_1C;
+    int l_18;
+    int l_14;
+
+    if (((int)(short)*(short *)(D_00196304 + (a1 * 2))) != 256) goto L1304F;
+    l_1C = *(int *)(D_001962B4 + (a1 << 2));
+    l_14 = 0;
+L1300C:;
+    if (((int)(short)*(short *)(D_0019632C + (a1 * 2))) > l_14) goto L1302E;
+    goto L1304D;
+L1301F:;
+    l_14++;
+    (*(char (**)[18])&l_1C)++;
+    goto L1300C;
+L1302E:;
+    if (func_000A0E82(a2, l_1C, a3) != 0) goto L1304B;
+    return l_14;
+L1304B:;
+    goto L1301F;
+L1304D:;
+    goto L1309E;
+L1304F:;
+    l_18 = *(int *)(D_001962B4 + (a1 << 2));
+    l_14 = 0;
+L13065:;
+    if (((int)(short)*(short *)(D_0019632C + (a1 * 2))) > l_14) goto L13087;
+    goto L1309E;
+L13078:;
+    l_14++;
+    (*(char (**)[8])&l_18)++;
+    goto L13065;
+L13087:;
+    if (a3 != *(int *)((char *)l_18)) goto L1309C;
+    return l_14;
+L1309C:;
+    goto L13078;
+L1309E:;
+    if (((int)(short)*(short *)(D_00196304 + (a1 * 2))) != 256) goto L130E4;
+    func_000A0ED9(105, (int)D_00170150);
+    func_000A0F5C(*(int *)D_00195C44, (int)D_0017015A, a2, (a1 * 13) + ((int)D_00196354));
+    goto L13115;
+L130E4:;
+    func_000A0ED9(107, (int)D_00170150);
+    func_000A0F5C(*(int *)D_00195C44, (int)D_00170172, a3, (a1 * 13) + ((int)D_00196354));
+L13115:;
+    func_00050069(*(int *)D_00195C44);
+    return 0;
 }
 
 int func_00013131(int a1, int a2)

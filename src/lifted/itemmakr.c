@@ -79,7 +79,6 @@ extern void func_0003F09F(int, int);
 extern void func_0004F3F6(void);
 extern void func_000569D7(short);
 extern void func_00056CF8(short);
-extern void func_000571C7(short);
 extern void func_000576FF(int, short);
 extern void func_0007D3CA(int);
 extern void func_0008C566(int, short);
@@ -87,11 +86,14 @@ extern void func_0008E3F7(int, int);
 extern void func_00097101(int);
 int func_00057E76(void);
 int func_00057EDB(void);
+void func_000571C7(short);
 void func_00057266(int);
 void func_000574DA(int, int);
+void func_00058473(void);
 void func_000585D6(int, int);
 void func_00058AF7(void);
 #pragma aux func_000A0ED9 parm routine [];
+#pragma dagger KKND_CONFREV func_000571C7
 
 void func_00055F0F(void)
 {
@@ -206,6 +208,25 @@ void func_00057111(void)
     func_00097101(*(int *)D_0019990C);
     *(int *)D_00199908 = 0;
     *(int *)D_0019990C = 0;
+}
+
+void func_000571C7(short a1)
+{
+    if (((int)(short)a1) == (-1)) goto L571EE;
+    if (*(signed char *)(D_00199910 + ((int)(short)a1)) == 0) goto L571F0;
+L571EE:;
+    return;
+L571F0:;
+    if (((int)(signed char)*(signed char *)(D_00190CE4 + ((int)(short)a1))) != 1) goto L57211;
+    if (*(short *)(D_001998E0 + (((int)(short)a1) << 2)) == 0) goto L57213;
+L57211:;
+    goto L57218;
+L57213:;
+    func_00058473();
+L57218:;
+    func_000A0040((((int)(short)a1) * 10) + ((int)D_00199868), -1, 10, (int)D_001756A3, 511, 4);
+    *(signed char *)(D_00190CE4 + ((int)(short)a1)) = 255;
+    *(short *)(D_001998E2 + (((int)(short)a1) << 2)) = 0;
 }
 
 void func_00057266(int a1)

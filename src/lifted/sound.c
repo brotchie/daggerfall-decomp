@@ -13,7 +13,9 @@ extern char D_00195CB4[];
 extern char D_00195E2A[];
 extern char D_00196280[];
 extern char D_001962B3[];
+extern char D_001A3AE8[];
 extern char D_001A3BD8[];
+extern char D_001A3BE4[];
 extern char D_001A3EFC[];
 extern char D_001A3F08[];
 extern char D_001A3F18[];
@@ -57,6 +59,14 @@ int func_00069A62(int, int, int);
 void func_000696A3(int);
 void func_000697E3(void);
 void func_00069DAA(void);
+#pragma dagger KKND_CONFREV func_00068BA8
+
+void func_00068BA8(int a1, int a2)
+{
+    *(int *)(D_001A3BE4 + (a2 * 268)) = a1;
+    if (a1 == 0) return;
+    func_000A1023(((a2 * 268) + ((int)D_001A3AE8)) + 256, a1 + 7, 12, (int)D_00175ACC, 95, 4);
+}
 
 void func_00068DA6(int a1, int a2, int a3, int a4, int a5)
 {

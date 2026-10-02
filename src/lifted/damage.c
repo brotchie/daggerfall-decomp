@@ -74,6 +74,7 @@ void func_0002F288(int, int);
 void func_0002F2FA(int);
 void func_0002FB8B(int);
 void func_000303F1(void);
+#pragma dagger DAGGER_FIRSTUSE func_0003009A
 
 void func_0002F02C(int a1, int a2)
 {
@@ -454,6 +455,78 @@ int func_0002FF2C(int a1, int a2, int a3)
     return func_0009CEC4(*(int *)((char *)*(int *)D_00195AA4 + 7), *(int *)((char *)*(int *)D_00195AA4 + 11), *(int *)((char *)a3 + 7), *(int *)((char *)a3 + 11), 0) + 2880;
 L2FF74:;
     return func_0009CEC4(*(int *)((char *)a2 + 7), *(int *)((char *)a2 + 11), *(int *)((char *)a3 + 7), *(int *)((char *)a3 + 11), 0) + 2880;
+}
+
+void func_0003009A(int a1, int a2)
+{
+    char l_30[16];
+    int l_18;
+    int l_14;
+
+    l_14 = 0;
+    l_18 = (int)(short)*(short *)&l_14;
+L300BB:;
+    if (((int)(short)*(short *)&l_14) < 4) goto L300CE;
+    goto L30111;
+L300C6:;
+    l_14++;
+    goto L300BB;
+L300CE:;
+    if (*(int *)((char *)(((((int)(short)*(short *)&l_14) + 1) * 15) + a2) + 13) == (-1)) goto L300F0;
+    if (*(int *)((char *)(((((int)(short)*(short *)&l_14) + 1) * 15) + a2) + 13) != (-2)) goto L300F2;
+L300F0:;
+    goto L3010F;
+L300F2:;
+    *(int *)((char *)l_30 + (l_18++ << 2)) = *(int *)((char *)(a2 + ((((int)(short)*(short *)&l_14) + 1) * 15)) + 7);
+L3010F:;
+    goto L300C6;
+L30111:;
+    if (l_18 == 0) return;
+    if (l_18 != 1) goto L3014A;
+    if (*(signed char *)((char *)*(int *)l_30 + 2) == 0) goto L3013E;
+    *(signed char *)(D_001952EC + ((int)(unsigned char)*(signed char *)((char *)*(int *)l_30 + 3))) = 1;
+    goto L30145;
+L3013E:;
+    *(signed char *)((char *)*(int *)l_30 + 3) = 1;
+L30145:;
+    return;
+L3014A:;
+    l_14 = 0;
+L30151:;
+    if (((int)(short)*(short *)&l_14) < l_18) goto L30164;
+    goto L301A6;
+L3015C:;
+    l_14++;
+    goto L30151;
+L30164:;
+    if (*(signed char *)((char *)*(int *)((char *)l_30 + (((int)(short)*(short *)&l_14) << 2)) + 2) == 0) goto L30193;
+    if (*(signed char *)(D_001952EC + ((int)(unsigned char)*(signed char *)((char *)*(int *)((char *)l_30 + (((int)(short)*(short *)&l_14) << 2)) + 3))) != 0) goto L301A6;
+    goto L301A4;
+L30193:;
+    if (*(signed char *)((char *)*(int *)((char *)l_30 + (((int)(short)*(short *)&l_14) << 2)) + 3) != 0) goto L301A6;
+L301A4:;
+    goto L3015C;
+L301A6:;
+    if (((int)(short)*(short *)&l_14) != l_18) goto L301D8;
+    if (*(signed char *)((char *)*(int *)l_30 + 2) == 0) goto L301CC;
+    *(signed char *)(D_001952EC + ((int)(unsigned char)*(signed char *)((char *)*(int *)l_30 + 3))) = 1;
+    goto L301D3;
+L301CC:;
+    *(signed char *)((char *)*(int *)l_30 + 3) = 1;
+L301D3:;
+    return;
+L301D8:;
+    if (*(signed char *)((char *)*(int *)((char *)l_30 + (((int)(short)*(short *)&l_14) << 2)) + 2) == 0) goto L30205;
+    *(signed char *)(D_001952EC + ((int)(unsigned char)*(signed char *)((char *)*(int *)((char *)l_30 + (((int)(short)*(short *)&l_14) << 2)) + 3))) = 0;
+    goto L30214;
+L30205:;
+    *(signed char *)((char *)*(int *)((char *)l_30 + (((int)(short)*(short *)&l_14) << 2)) + 3) = 0;
+L30214:;
+    if (*(signed char *)((char *)*(int *)((char *)l_30 + (((((int)(short)*(short *)&l_14) + 1) % l_18) << 2)) + 2) == 0) goto L30254;
+    *(signed char *)(D_001952EC + ((int)(unsigned char)*(signed char *)((char *)*(int *)((char *)l_30 + (((((int)(short)*(short *)&l_14) + 1) % l_18) << 2)) + 3))) = 1;
+    return;
+L30254:;
+    *(signed char *)((char *)*(int *)((char *)l_30 + (((((int)(short)*(short *)&l_14) + 1) % l_18) << 2)) + 3) = 1;
 }
 
 void func_000303A0(int a1, int a2)

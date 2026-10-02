@@ -63,6 +63,48 @@ index ee6e5533cb..1ccc31bde2 100644
              break;
          case OPR_FARPTR:                // segment :> offset
              op2 = PopCGName();          // - get offset
+diff --git a/bld/cc/c/cpragma.c b/bld/cc/c/cpragma.c
+index b8a6f1c7fd..f2457a26b1 100644
+--- a/bld/cc/c/cpragma.c
++++ b/bld/cc/c/cpragma.c
+@@ -1487,6 +1487,28 @@ static void pragReadOnlyFile( void )
+ }
+ 
+ 
++extern void DaggerFuncOptAdd( const char *opt, const char *func );
++
++static void pragDagger( void )
++/*****************************
++ * Daggerfall: `#pragma dagger <option> <function>` switches a code generator heuristic
++ * for one function (see DaggerFuncOpt() in cg/c/generate.c)
++ */
++{
++    char    opt[32];
++
++    PPNextToken();
++    if( !IS_ID_OR_KEYWORD( CurToken ) )
++        return;
++    strncpy( opt, Buffer, sizeof( opt ) - 1 );
++    opt[sizeof( opt ) - 1] = '\0';
++    PPNextToken();
++    if( !IS_ID_OR_KEYWORD( CurToken ) )
++        return;
++    DaggerFuncOptAdd( opt, Buffer );
++    PPNextToken();
++}
++
+ static void pragReadOnlyDir( void )
+ /**********************************
+  * forms:
+@@ -1821,6 +1843,8 @@ void CPragma( void )
+             pragReadOnlyFile();
+         } else if( pragmaNameRecog( "read_only_directory" ) ) {
+             pragReadOnlyDir();
++        } else if( pragmaNameRecog( "dagger" ) ) {
++            pragDagger();
+         } else if( pragmaNameRecog( "once" ) ) {
+             pragOnce();
+         } else if( pragmaNameRecog( "unroll" ) ) {
 diff --git a/bld/cc/c/cstmt.c b/bld/cc/c/cstmt.c
 index 695dca7a99..631aedf961 100644
 --- a/bld/cc/c/cstmt.c
@@ -94,44 +136,62 @@ index 695dca7a99..631aedf961 100644
          if( label->defined ) {
              CErr2p( ERR_LABEL_ALREADY_DEFINED, label->name );
 diff --git a/bld/cg/c/addrfold.c b/bld/cg/c/addrfold.c
-index e800aac5b8..5d93ba83bb 100644
+index e800aac5b8..6a099109f4 100644
 --- a/bld/cg/c/addrfold.c
 +++ b/bld/cg/c/addrfold.c
-@@ -612,6 +612,12 @@ name    *GetValue( an addr, name *suggest )
+@@ -32,6 +32,7 @@
+ 
+ 
+ #include "_cgstd.h"
++extern const char *DaggerEnv( const char *name );
+ #include <stdlib.h>
+ #include "coderep.h"
+ #include "model.h"
+@@ -49,6 +50,7 @@
+ #include "bldins.h"
+ 
+ 
++
+ static  void    LoadTempInt( an addr );
+ 
+ typedef enum {
+@@ -612,6 +614,12 @@ name    *GetValue( an addr, name *suggest )
              break;
          case CL_TEMP_OFFSET:
              if( addr->u.n.offset != 0 ) {
 +                /* Daggerfall: like MakeGets(), `l = l + K` on a local keeps its temp at -od
 +                 * (Watcom 10: mov eax,[l]; add eax,K; mov [l],eax). DAGGER_RMW=1 restores OW. */
 +                if( suggest == addr->u.n.name && _IsModel( CGSW_GEN_NO_OPTIMIZATION )
-+                  && getenv( "DAGGER_RMW" ) == NULL ) {
++                  && DaggerEnv( "DAGGER_RMW" ) == NULL ) {
 +                    suggest = NULL;
 +                }
                  op = MaybeTemp( suggest, addr->u.n.name->n.type_class );
                  ins = MakeBinary( OP_ADD, addr->u.n.name,
                                      AllocS32Const( addr->u.n.offset ),
 diff --git a/bld/cg/c/bldcall.c b/bld/cg/c/bldcall.c
-index 14a056a76b..dd98919418 100644
+index 14a056a76b..4d0d0b1c60 100644
 --- a/bld/cg/c/bldcall.c
 +++ b/bld/cg/c/bldcall.c
-@@ -31,6 +31,8 @@
+@@ -31,6 +31,9 @@
  
  
  #include "_cgstd.h"
++extern const char *DaggerEnv( const char *name );
 +#include <stdio.h>
 +#include <stdlib.h>
  #include "coderep.h"
  #include "cgmem.h"
  #include "cgauxcc.h"
-@@ -65,6 +67,7 @@
+@@ -65,6 +68,8 @@
  #include "tree.h"
  #include "treeprot.h"
  #include "feprotos.h"
 +#include "temps.h"
++
  
  
  type_class_def  AddCallBlock( cg_sym_handle sym, const type_def *tipe )
-@@ -161,6 +164,112 @@ void    BGAddParm( cn call, an parm )
+@@ -161,6 +166,112 @@ void    BGAddParm( cn call, an parm )
  }
  
  
@@ -176,7 +236,7 @@ index 14a056a76b..dd98919418 100644
 +void    DaggerAllocAtDecl( name *temp, int kind )
 +/***********************************************/
 +{
-+    if( _IsntModel( CGSW_GEN_NO_OPTIMIZATION ) || getenv( "DAGGER_FIRSTUSE" ) != NULL )
++    if( _IsntModel( CGSW_GEN_NO_OPTIMIZATION ) || DaggerEnv( "DAGGER_FIRSTUSE" ) != NULL )
 +        return;
 +    if( DaggerProc != CurrProc ) {
 +        DaggerProc = CurrProc;
@@ -206,13 +266,13 @@ index 14a056a76b..dd98919418 100644
 +    /* 2-byte variables come first: parameters, then locals, last to first */
 +    for( i = DaggerCount; i-- > 0; ) {
 +        if( DaggerKinds[i] == DAGGER_PARM && ( DaggerDecls[i]->n.size == 2
-+          || ( DaggerDecls[i]->n.size == 1 && getenv( "DAGGER_CHARPARMBIG" ) == NULL ) ) ) {
++          || ( DaggerDecls[i]->n.size == 1 && DaggerEnv( "DAGGER_CHARPARMBIG" ) == NULL ) ) ) {
 +            DaggerAlloc( DaggerDecls[i] );
 +        }
 +    }
 +    for( i = DaggerCount; i-- > 0; ) {
 +        if( DaggerKinds[i] == DAGGER_AUTO && ( DaggerDecls[i]->n.size == 2
-+          || ( DaggerDecls[i]->n.size == 1 && getenv( "DAGGER_CHARAUTOSMALL" ) != NULL ) ) ) {
++          || ( DaggerDecls[i]->n.size == 1 && DaggerEnv( "DAGGER_CHARAUTOSMALL" ) != NULL ) ) ) {
 +            DaggerAlloc( DaggerDecls[i] );
 +        }
 +    }
@@ -244,7 +304,7 @@ index 14a056a76b..dd98919418 100644
  void    BGAutoDecl( cg_sym_handle sym, const type_def *tipe )
  /*************************************************************
   * declare an automatic variable with name "sym" and type "tipe". This
-@@ -168,6 +277,19 @@ void    BGAutoDecl( cg_sym_handle sym, const type_def *tipe )
+@@ -168,6 +279,19 @@ void    BGAutoDecl( cg_sym_handle sym, const type_def *tipe )
   */
  {
      BGDone( MakeAddrName( CG_FE, sym, tipe ) );
@@ -264,7 +324,7 @@ index 14a056a76b..dd98919418 100644
  }
  
  static  void    LinkParmIns( instruction *parm_def, instruction *ins )
-@@ -295,6 +417,10 @@ name    *DoParmDecl( cg_sym_handle sym, const type_def *tipe, hw_reg_set reg )
+@@ -295,6 +419,10 @@ name    *DoParmDecl( cg_sym_handle sym, const type_def *tipe, hw_reg_set reg )
      } else {
          temp = SAllocUserTemp( sym, TypeClass( tipe ), tipe->length );
          BGDone( MakeAddrName( CG_FE, sym, tipe ) );
@@ -275,40 +335,55 @@ index 14a056a76b..dd98919418 100644
      }
      temp->v.usage |= USE_IN_ANOTHER_BLOCK;
  
+@@ -887,3 +1015,12 @@ bool        AssgnParms( cn call, bool aux_inline )
+     call_ins->zap = &AllocRegName( CallZap( state ) )->r;
+     return( push_no_pop );
+ }
++
++
++void    DaggerNewProc( void )
++{
++    DaggerNoSlotCount = 0;
++    DaggerNoSlotProc = CurrProc;
++    DaggerCount = 0;
++    DaggerProc = CurrProc;
++}
 diff --git a/bld/cg/c/bldsel.c b/bld/cg/c/bldsel.c
-index 6dc64e437d..661164b7b9 100644
+index 6dc64e437d..690ce6e81f 100644
 --- a/bld/cg/c/bldsel.c
 +++ b/bld/cg/c/bldsel.c
-@@ -31,6 +31,8 @@
+@@ -31,6 +31,9 @@
  
  
  #include "_cgstd.h"
++extern const char *DaggerEnv( const char *name );
 +#include <stdlib.h>
 +#include <stdio.h>
  #include "coderep.h"
  #include "cgmem.h"
  #include "seldef.h"
-@@ -48,6 +50,9 @@
- #include "generate.h"
+@@ -49,6 +52,10 @@
  #include "i64.h"
+ 
  
 +extern int  DaggerTableState( void );
 +extern int  DaggerTableAlign;
 +
- 
++
  static const type_def   *SortTipe;
  
-@@ -445,7 +450,8 @@ static void DoBinarySearch( an node, const select_list *list, const type_def *ti
+ static  select_list *NewCase( const signed_64 *lo, const signed_64 *hi, label_handle label )
+@@ -445,7 +452,8 @@ static void DoBinarySearch( an node, const select_list *list, const type_def *ti
              return;
          }
      }
 -    if( hi == mid + 1 && U64isEq( mid_list->next->low, mid_list->next->high ) ) {
 +    if( hi == mid + 1 && U64isEq( mid_list->next->low, mid_list->next->high )
-+      && getenv( "KKND_LINSEL" ) != NULL ) {  /* KKND: Watcom 10.x had no linear shortcut */
++      && DaggerEnv( "KKND_LINSEL" ) != NULL ) {  /* KKND: Watcom 10.x had no linear shortcut */
          /*
           * a linear sequence for three different non-sequential cases where
           * c1<c2<c3, looks like:
-@@ -576,6 +582,7 @@ void    BGSelect( sel_handle s_node, an node, cg_switch_type allowed )
+@@ -576,6 +584,7 @@ void    BGSelect( sel_handle s_node, an node, cg_switch_type allowed )
  {
      cost_val    cost;
      cost_val    best;
@@ -316,12 +391,12 @@ index 6dc64e437d..661164b7b9 100644
      sel_kind    kind;
      unsigned_64 tmp;
  
-@@ -584,8 +591,19 @@ void    BGSelect( sel_handle s_node, an node, cg_switch_type allowed )
+@@ -584,8 +593,19 @@ void    BGSelect( sel_handle s_node, an node, cg_switch_type allowed )
          allowed = CG_SWITCH_ALL;
      }
      kind = 0;
 +    allowed0 = allowed;
-+    if( _IsModel( CGSW_GEN_NO_OPTIMIZATION ) && getenv( "DAGGER_NOSWFORCE" ) == NULL ) {
++    if( _IsModel( CGSW_GEN_NO_OPTIMIZATION ) && DaggerEnv( "DAGGER_NOSWFORCE" ) == NULL ) {
 +        /* Daggerfall: the lifter marks where each of FALL.EXE's jump tables sat
 +         * (DaggerTableHere): a switch with a pending mark had a table, one without had none */
 +        if( DaggerTableState() != 0 ) {
@@ -336,7 +411,7 @@ index 6dc64e437d..661164b7b9 100644
          best = MAX_COST;
          /*
           * sort signed
-@@ -637,6 +655,18 @@ void    BGSelect( sel_handle s_node, an node, cg_switch_type allowed )
+@@ -637,6 +657,18 @@ void    BGSelect( sel_handle s_node, an node, cg_switch_type allowed )
                  kind = U_IF;
              }
          }
@@ -355,7 +430,7 @@ index 6dc64e437d..661164b7b9 100644
          switch( kind ) {
          case S_SCAN:
          case S_JUMP:
-@@ -656,8 +686,15 @@ void    BGSelect( sel_handle s_node, an node, cg_switch_type allowed )
+@@ -656,8 +688,15 @@ void    BGSelect( sel_handle s_node, an node, cg_switch_type allowed )
           * once to index into the scan table. This would be bad if it
           * changed in between.
           */
@@ -364,7 +439,7 @@ index 6dc64e437d..661164b7b9 100644
 +        /* Daggerfall: Watcom 10 copies even a named selector into the temp, like OW (the
 +         * lifter now switches on the expression, not on `l = expr; switch( l )`).
 +         * DAGGER_SELDIRECT=1 switches on a declared local directly. */
-+        if( !( _IsModel( CGSW_GEN_NO_OPTIMIZATION ) && getenv( "DAGGER_SELDIRECT" ) != NULL
++        if( !( _IsModel( CGSW_GEN_NO_OPTIMIZATION ) && DaggerEnv( "DAGGER_SELDIRECT" ) != NULL
 +          && node->format == NF_NAME && node->u.n.name->n.class == N_TEMP
 +          && node->u.n.name->v.symbol != NULL ) ) {
 +            Set64ValZero( tmp );
@@ -374,24 +449,33 @@ index 6dc64e437d..661164b7b9 100644
          MergeListEntries( s_node );
  
 diff --git a/bld/cg/c/blktrim.c b/bld/cg/c/blktrim.c
-index 5b346d0eb8..6b6571c049 100644
+index 5b346d0eb8..d598c645f9 100644
 --- a/bld/cg/c/blktrim.c
 +++ b/bld/cg/c/blktrim.c
-@@ -31,6 +31,7 @@
+@@ -31,6 +31,8 @@
  
  
  #include "_cgstd.h"
++extern const char *DaggerEnv( const char *name );
 +#include <stdlib.h>
  #include "coderep.h"
  #include "cgmem.h"
  #include "data.h"
-@@ -256,7 +257,10 @@ static  bool    Retarget( block *blk )
+@@ -43,6 +45,7 @@
+ #include "blktrim.h"
+ 
+ 
++
+ static  instruction     *FindOneCond( block *blk )
+ /************************************************/
+ {
+@@ -256,7 +259,10 @@ static  bool    Retarget( block *blk )
      blk->input_edges = NULL;
      for( ; edge != NULL; edge = next ) {
          next = edge->next_source;
 -        if( _IsBlkAttr( edge->source, BLK_SELECT | BLK_LABEL_RETURN ) ) {
 +        if( _IsBlkAttr( edge->source, BLK_SELECT | BLK_LABEL_RETURN )
-+          || ( getenv( "KKND_NORETRET" ) != NULL
++          || ( DaggerEnv( "KKND_NORETRET" ) != NULL
 +            && _IsBlkAttr( edge->source, BLK_CONDITIONAL )
 +            && _IsBlkAttr( target, BLK_RETURN ) ) ) {
              success = false;   /* let the optimizer do it later on*/
@@ -480,40 +564,50 @@ index e54b1d0d83..ca9f15fe46 100644
  /**************************************************
  
 diff --git a/bld/cg/c/cse.c b/bld/cg/c/cse.c
-index 721fa0c6a9..bcb4e28a83 100644
+index 721fa0c6a9..902ba8fd22 100644
 --- a/bld/cg/c/cse.c
 +++ b/bld/cg/c/cse.c
-@@ -31,6 +31,7 @@
+@@ -31,6 +31,8 @@
  
  
  #include "_cgstd.h"
++extern const char *DaggerEnv( const char *name );
 +#include <stdlib.h>
  #include "coderep.h"
  #include "zoiks.h"
  #include "tree.h"
-@@ -1604,7 +1605,7 @@ bool    CommonSex( bool leave_indvars_alone )
+@@ -61,6 +63,7 @@
+ #include "feprotos.h"
+ 
+ 
++
+ /*
+  * block flag usage
+  *
+@@ -1604,7 +1607,7 @@ bool    CommonSex( bool leave_indvars_alone )
          change = false;
          if( DoPropagateMoves() )
              change = true;
 -        if( StretchEdges() ) {
-+        if( getenv( "KKND_STRETCH" ) != NULL && StretchEdges() ) {  /* KKND: off, Watcom 10.x did not thread these */
++        if( DaggerEnv( "KKND_STRETCH" ) != NULL && StretchEdges() ) {  /* KKND: off, Watcom 10.x did not thread these */
              change = true;
              loops_killed = true;
              CleanPartition();
 diff --git a/bld/cg/c/generate.c b/bld/cg/c/generate.c
-index a7f606be70..f326ee49b0 100644
+index a7f606be70..9a6ba2e651 100644
 --- a/bld/cg/c/generate.c
 +++ b/bld/cg/c/generate.c
-@@ -31,6 +31,8 @@
+@@ -31,6 +31,9 @@
  
  
  #include "_cgstd.h"
 +#include <stdlib.h>
 +#include <stdio.h>
++#include <string.h>
  #include "coderep.h"
  #include "memcheck.h"
  #include "data.h"
-@@ -84,6 +86,7 @@
+@@ -84,6 +87,7 @@
  #include "condcode.h"
  #include "trecurse.h"
  #include "feprotos.h"
@@ -521,11 +615,62 @@ index a7f606be70..f326ee49b0 100644
  
  
  static  bool            abortCG;
-@@ -144,6 +147,60 @@ static  void    AddANop( void )
+@@ -144,6 +148,111 @@ static  void    AddANop( void )
  }
  
  
 +extern void DaggerMarkNow( void );
++
++/* Daggerfall: per-function code generator options from `#pragma dagger <opt> <func>` */
++#define DAGGER_MAX_FUNC_OPTS    256
++static char DaggerOptName[DAGGER_MAX_FUNC_OPTS][16];
++static char DaggerOptFunc[DAGGER_MAX_FUNC_OPTS][40];
++static int  DaggerOptCount;
++
++void    DaggerFuncOptAdd( const char *opt, const char *func )
++{
++    if( DaggerOptCount < DAGGER_MAX_FUNC_OPTS ) {
++        strncpy( DaggerOptName[DaggerOptCount], opt, 15 );
++        strncpy( DaggerOptFunc[DaggerOptCount], func, 39 );
++        DaggerOptCount++;
++    }
++}
++
++bool    DaggerFuncOpt( const char *opt );
++
++const char *DaggerEnv( const char *name )
++/* Daggerfall: a switch is on when its environment variable is set, or for one function by
++ * `#pragma dagger <SWITCH> <function>` (so the lifter's search can try it per function) */
++{
++    const char  *v;
++
++    v = getenv( name );
++    if( v != NULL )
++        return( v );
++    return( DaggerFuncOpt( name ) ? "1" : NULL );
++}
++
++bool    DaggerFuncOpt( const char *opt )
++/* is option `opt` on for the function being generated? */
++{
++    cg_sym_handle   sym;
++    const char      *name;
++    int             i;
++
++    if( DaggerOptCount == 0 || CurrProc == NULL )
++        return( false );
++    sym = AskForLblSym( CurrProc->label );
++    if( sym == NULL )
++        return( false );
++    name = FEName( sym );
++    if( name == NULL )
++        return( false );
++    for( i = 0; i < DaggerOptCount; i++ ) {
++        if( strcmp( DaggerOptName[i], opt ) == 0 && strcmp( DaggerOptFunc[i], name ) == 0 )
++            return( true );
++    }
++    return( false );
++}
 +extern bool DaggerIsNoSlot( name *op );
 +extern bool DaggerMarkIsSet( void );
 +
@@ -582,7 +727,7 @@ index a7f606be70..f326ee49b0 100644
  static  void            PreOptimize( void )
  /*****************************************/
  {
-@@ -333,8 +390,8 @@ static  void    ForceTempsMemory( void )
+@@ -333,8 +442,8 @@ static  void    ForceTempsMemory( void )
      ParmPropagate();
      for( op = Names[N_TEMP]; op != LastTemp; op = next ) {
          next = op->n.next_name;
@@ -593,7 +738,7 @@ index a7f606be70..f326ee49b0 100644
              op = DeAlias( op );
              op->v.usage |= NEEDS_MEMORY | USE_MEMORY;
              while( op->v.conflict != NULL ) {
-@@ -501,7 +558,12 @@ static  void    FlushBlocks( bool partly_done )
+@@ -501,7 +610,12 @@ static  void    FlushBlocks( bool partly_done )
          classes |= blk->class;
          CurrBlock = blk;
          BlockToCode( partly_done );
@@ -602,12 +747,12 @@ index a7f606be70..f326ee49b0 100644
 +         * jump is fixed as near (and a jcc over a jmp is never inverted) before its label
 +         * arrives. Watcom 10 kept the queue: `cmp; jle else` with short jumps.
 +         * DAGGER_FLUSH=1 restores OW's flush. */
-+        if( getenv( "DAGGER_FLUSH" ) != NULL )
++        if( DaggerEnv( "DAGGER_FLUSH" ) != NULL )
 +            FlushOpt();
      }
      CurrBlock = curr;
      HeadBlock = NULL;
-@@ -665,6 +727,9 @@ void    Generate( bool routine_done )
+@@ -665,6 +779,9 @@ void    Generate( bool routine_done )
              InitStackMap();
              BlockByBlock = true;
          }
@@ -617,11 +762,11 @@ index a7f606be70..f326ee49b0 100644
          LNBlip( SrcLine );
          FlushBlocks( false );
          FreeExtraSyms( LastTemp );
-@@ -722,6 +787,11 @@ void    Generate( bool routine_done )
+@@ -722,6 +839,11 @@ void    Generate( bool routine_done )
          Panic( false );
          return;
      }
-+    if( getenv( "KKND_CONSTREG" ) != NULL ) {
++    if( DaggerEnv( "KKND_CONSTREG" ) != NULL ) {
 +        extern void KKNDConstToTempFunc( void );
 +        KKNDConstToTempFunc();
 +        FindReferences();
@@ -630,10 +775,26 @@ index a7f606be70..f326ee49b0 100644
      if( _IsModel( CGSW_GEN_LOOP_OPTIMIZATION ) ) {
          SplitVars();
 diff --git a/bld/cg/c/intrface.c b/bld/cg/c/intrface.c
-index b473a42354..4c909e7dc7 100644
+index b473a42354..b860b0b1a3 100644
 --- a/bld/cg/c/intrface.c
 +++ b/bld/cg/c/intrface.c
-@@ -857,9 +857,16 @@ temp_handle _CGAPI      CGTemp( cg_type tipe )
+@@ -31,6 +31,7 @@
+ 
+ 
+ #include "_cgstd.h"
++extern void DaggerNewProc( void );
+ #include <ctype.h>
+ #include "coderep.h"
+ #include "seldef.h"
+@@ -622,6 +623,7 @@ void _CGAPI     CGProcDecl( cg_sym_handle sym, cg_type tipe )
+     } else {
+         TellObjNewProc( sym );
+         BGProcDecl( sym, TypeAddress( tipe ) );
++        DaggerNewProc();            /* Daggerfall: per-function lists start empty */
+     }
+ }
+ 
+@@ -857,9 +859,16 @@ temp_handle _CGAPI      CGTemp( cg_type tipe )
  
      EchoAPI( "CGTemp( %t )", tipe );
      retn = (temp_handle)BGGlobalTemp( TypeAddress( tipe ) );
@@ -652,18 +813,27 @@ index b473a42354..4c909e7dc7 100644
  }
  
 diff --git a/bld/cg/c/loopopts.c b/bld/cg/c/loopopts.c
-index 9a81270076..df76f781b1 100644
+index 9a81270076..c0d4185e99 100644
 --- a/bld/cg/c/loopopts.c
 +++ b/bld/cg/c/loopopts.c
-@@ -31,6 +31,7 @@
+@@ -31,6 +31,8 @@
  
  
  #include "_cgstd.h"
++extern const char *DaggerEnv( const char *name );
 +#include <stdlib.h>
  #include "coderep.h"
  #include "indvars.h"
  #include "cgmem.h"
-@@ -3420,6 +3421,28 @@ static  void    DupNoncondInstrs( block *cond_blk, instruction *cond, block *pre
+@@ -62,6 +64,7 @@
+ #include "revcond.h"
+ 
+ 
++
+ /*
+  * block flag usage
+  *
+@@ -3420,6 +3423,28 @@ static  void    DupNoncondInstrs( block *cond_blk, instruction *cond, block *pre
  }
  #endif
  
@@ -692,11 +862,11 @@ index 9a81270076..df76f781b1 100644
  static  bool    TwistLoop( block_list *header_list, bool unroll )
  /****************************************************************
   * Try to fall into loops without testing the condition the first
-@@ -3551,6 +3574,10 @@ static  bool    TwistLoop( block_list *header_list, bool unroll )
+@@ -3551,6 +3576,10 @@ static  bool    TwistLoop( block_list *header_list, bool unroll )
              PointEdge( edge, cond_blk->edge[1].destination.u.blk );
              MoveDownLoop( cond_blk );
              new_head = loop_edge->destination.u.blk;
-+        } else if( getenv( "KKND_NOROT" ) == NULL && KKNDSingleExit( cond_blk ) ) {
++        } else if( DaggerEnv( "KKND_NOROT" ) == NULL && KKNDSingleExit( cond_blk ) ) {
 +            /* KKND: Watcom 10.x enters a single-exit loop at its bottom test */
 +            MoveDownLoop( cond_blk );
 +            new_head = loop_edge->destination.u.blk;
@@ -704,18 +874,27 @@ index 9a81270076..df76f781b1 100644
          if( new_head != NULL
            && new_head != Head ) {
 diff --git a/bld/cg/c/makeaddr.c b/bld/cg/c/makeaddr.c
-index 759b3b65c1..98a34a7f22 100644
+index 759b3b65c1..bdeab8319c 100644
 --- a/bld/cg/c/makeaddr.c
 +++ b/bld/cg/c/makeaddr.c
-@@ -32,6 +32,7 @@
+@@ -32,6 +32,8 @@
  
  
  #include "_cgstd.h"
++extern const char *DaggerEnv( const char *name );
 +#include <stdlib.h>
  #include "coderep.h"
  #include "zoiks.h"
  #include "freelist.h"
-@@ -241,6 +242,30 @@ static  name    *Display( cg_sym_handle symbol, level_depth level )
+@@ -50,6 +52,7 @@
+ #include "feprotos.h"
+ 
+ 
++
+ static    pointer       *AddrNameFrl;
+ 
+ static  void    CopyAddr( an src, an dst )
+@@ -241,6 +244,30 @@ static  name    *Display( cg_sym_handle symbol, level_depth level )
  }
  
  
@@ -730,7 +909,7 @@ index 759b3b65c1..98a34a7f22 100644
 +{
 +    opcnt   i;
 +
-+    if( _IsntModel( CGSW_GEN_NO_OPTIMIZATION ) || getenv( "DAGGER_RMW" ) != NULL )
++    if( _IsntModel( CGSW_GEN_NO_OPTIMIZATION ) || DaggerEnv( "DAGGER_RMW" ) != NULL )
 +        return( false );
 +    if( ins->num_operands < 2 )
 +        return( false );    /* unary ops did fold: `*p = -*p` is `neg dword ptr [eax]` */
@@ -746,7 +925,7 @@ index 759b3b65c1..98a34a7f22 100644
  an      MakeGets( an dst, an src, const type_def *tipe )
  /******************************************************/
  {
-@@ -253,7 +278,8 @@ an      MakeGets( an dst, an src, const type_def *tipe )
+@@ -253,7 +280,8 @@ an      MakeGets( an dst, an src, const type_def *tipe )
      InsToAddr( dst );
      dst_name = Points( dst, tipe );
      ins = src->u.i.ins;
@@ -757,22 +936,31 @@ index 759b3b65c1..98a34a7f22 100644
          src->format = NF_ADDR;  /* so instruction doesn't get freed! */
      } else {
 diff --git a/bld/cg/c/multiply.c b/bld/cg/c/multiply.c
-index 76c9e5daf1..abc589fae0 100644
+index 76c9e5daf1..1562a66f62 100644
 --- a/bld/cg/c/multiply.c
 +++ b/bld/cg/c/multiply.c
-@@ -31,6 +31,7 @@
+@@ -31,6 +31,8 @@
  
  
  #include "_cgstd.h"
++extern const char *DaggerEnv( const char *name );
 +#include <stdlib.h>
  #include "coderep.h"
  #include "data.h"
  #include "makeins.h"
-@@ -74,6 +75,20 @@ static  int     Factor( uint_32 num, int *cost )
+@@ -40,6 +42,7 @@
+ #include "multiply.h"
+ 
+ 
++
+ #define MAXOPS  20
+ 
+ typedef enum {
+@@ -74,6 +77,20 @@ static  int     Factor( uint_32 num, int *cost )
      if( num == 0xFFFFFFFF )
          return( i );
  
-+    if( getenv( "KKND_OWFACTOR" ) == NULL ) {
++    if( DaggerEnv( "KKND_OWFACTOR" ) == NULL ) {
 +        /* KKND: Watcom 10.x shifts out the trailing power of two last: n*56 = ((n<<3)-n)<<3 */
 +        shlcnt = 0;
 +        while( (num & 1) == 0 ) {
@@ -790,10 +978,18 @@ index 76c9e5daf1..abc589fae0 100644
      do {
          pow2 = 1;
 diff --git a/bld/cg/c/object.c b/bld/cg/c/object.c
-index 8deefcbc4c..5295696d79 100644
+index 8deefcbc4c..31d64c8983 100644
 --- a/bld/cg/c/object.c
 +++ b/bld/cg/c/object.c
-@@ -46,6 +46,12 @@
+@@ -31,6 +31,7 @@
+ 
+ 
+ #include "_cgstd.h"
++extern const char *DaggerEnv( const char *name );
+ #include "coderep.h"
+ #include "cgauxinf.h"
+ #include "zoiks.h"
+@@ -46,6 +47,13 @@
  #include "makeblk.h"
  #include "nullprop.h"
  #include "feprotos.h"
@@ -802,11 +998,12 @@ index 8deefcbc4c..5295696d79 100644
 +#include "expand.h"
 +#include "rgtbl.h"
 +
++
 +extern void DaggerPrologDone( void );
  
  
  /*
-@@ -93,6 +99,54 @@ static  source_line_number      DumpLineNum( source_line_number n,
+@@ -93,6 +101,54 @@ static  source_line_number      DumpLineNum( source_line_number n,
  }
  
  
@@ -821,7 +1018,7 @@ index 8deefcbc4c..5295696d79 100644
 +    name    *res;
 +    name    *op;
 +
-+    if( _IsntModel( CGSW_GEN_NO_OPTIMIZATION ) || getenv( "DAGGER_WORDSTORE" ) != NULL )
++    if( _IsntModel( CGSW_GEN_NO_OPTIMIZATION ) || DaggerEnv( "DAGGER_WORDSTORE" ) != NULL )
 +        return;
 +    if( ins->head.opcode != OP_MOV || ( ins->type_class != U2 && ins->type_class != I2 ) )
 +        return;
@@ -861,7 +1058,7 @@ index 8deefcbc4c..5295696d79 100644
  void    GenObject( void )
  /***********************/
  {
-@@ -127,6 +181,12 @@ void    GenObject( void )
+@@ -127,6 +183,12 @@ void    GenObject( void )
              StartBlockProfiling( blk );
              InitStackDepth( blk );
              for( ins = blk->ins.head.next; ins->head.opcode != OP_BLOCK; ins = ins->head.next ) {
@@ -874,7 +1071,7 @@ index 8deefcbc4c..5295696d79 100644
                  if( ins->head.opcode == OP_NOP
                    && ( (ins->flags.u.nop_flags & NOP_SOURCE_QUEUE)
                    || ins->flags.u.nop_flags == NOP_DBGINFO )) { // an end block
-@@ -145,6 +205,7 @@ void    GenObject( void )
+@@ -145,6 +207,7 @@ void    GenObject( void )
                          }
                      }
                  } else {
@@ -986,19 +1183,41 @@ index 310489af1a..0f98337910 100644
      if( !LDone( oc ) ) {
          if( OC_BASE_CLASS( oc->oc_header.class ) != OC_INFO
 diff --git a/bld/cg/c/regalloc.c b/bld/cg/c/regalloc.c
-index 90c1857729..129dd201e5 100644
+index 90c1857729..0c3f144195 100644
 --- a/bld/cg/c/regalloc.c
 +++ b/bld/cg/c/regalloc.c
-@@ -31,6 +31,8 @@
+@@ -31,6 +31,9 @@
  
  
  #include "_cgstd.h"
++extern const char *DaggerEnv( const char *name );
 +#include <stdlib.h>
 +#include <stdio.h>
  #include "coderep.h"
  #include "zoiks.h"
  #include "data.h"
-@@ -922,6 +924,8 @@ static  void    NeighboursUse( conflict_node *conf )
+@@ -354,6 +357,7 @@ static  bool  FixInstructions( conflict_node *conf, reg_tree *tree,
+ 
+ #define _InRegAssgn
+ #include "savcode.h"
++
+ #undef _InRegAssgn
+ 
+     if( _LBitEmpty( conf->id.within_block ) && _GBitEmpty( conf->id.out_of_block ) ) {
+@@ -472,7 +476,11 @@ static int_32   CountRegMoves( conflict_node *conf,
+                     case OP_AND:
+                     case OP_OR:
+                     case OP_XOR:
+-                        op2 = ins->operands[1];
++                        /* Daggerfall experiment: DAGGER_LEFTPREF=1 prefers only the left
++                         * operand of a commutative op for its result's register (worse) */
++                        if( _IsntModel( CGSW_GEN_NO_OPTIMIZATION )
++                          || DaggerEnv( "DAGGER_LEFTPREF" ) == NULL )
++                            op2 = ins->operands[1];
+                         break;
+                     }
+                 }
+@@ -922,6 +930,8 @@ static  void    NeighboursUse( conflict_node *conf )
  }
  
  
@@ -1007,7 +1226,7 @@ index 90c1857729..129dd201e5 100644
  static hw_reg_set   GiveBestReg( conflict_node *conf, reg_tree *tree,
                                       hw_reg_set except, bool needs_one )
  /*************************************************************************
-@@ -986,6 +990,11 @@ static hw_reg_set   GiveBestReg( conflict_node *conf, reg_tree *tree,
+@@ -986,6 +996,11 @@ static hw_reg_set   GiveBestReg( conflict_node *conf, reg_tree *tree,
          all_true = true;
          for( possible = tree->regs; !HW_CEqual( *possible, HW_EMPTY ); ++possible ) {
              reg = *possible;
@@ -1019,11 +1238,20 @@ index 90c1857729..129dd201e5 100644
              if( !HW_Ovlap( reg, conf->with.regs )
                && !HW_Ovlap( reg, except ) ) {
                  greed = TooGreedy( conf, reg, tree->temp );
-@@ -1207,6 +1216,20 @@ static  void    SortConflicts( void )
+@@ -1193,6 +1208,8 @@ conflict_node   *GiveRegister( conflict_node *conf, bool needs_one )
+ }
+ 
+ 
++extern bool DaggerFuncOpt( const char *opt );
++
+ static bool         ConfBefore( void *c1, void *c2 )
+ /*********************************************************
+     used by SortConflicts
+@@ -1207,6 +1224,20 @@ static  void    SortConflicts( void )
      Sort the conflicts in order of descending savings.
  */
  {
-+    if( getenv( "KKND_CONFREV" ) != NULL ) {
++    if( DaggerEnv( "KKND_CONFREV" ) != NULL || DaggerFuncOpt( "confrev" ) ) {
 +        /* KKND experiment: reverse the order of conflicts with equal savings */
 +        conflict_node   *conf;
 +        conflict_node   *next;
@@ -1040,7 +1268,7 @@ index 90c1857729..129dd201e5 100644
      ConfList = SortList( ConfList, offsetof( conflict_node, next_conflict ), ConfBefore );
  }
  
-@@ -1242,6 +1265,18 @@ static  enum allocation_state    AssignConflicts( void )
+@@ -1242,6 +1273,18 @@ static  enum allocation_state    AssignConflicts( void )
          }
      }
      ConstSavings();
@@ -1059,7 +1287,7 @@ index 90c1857729..129dd201e5 100644
  
      SortConflicts();
      state = ALLOC_BITS;
-@@ -1265,7 +1300,9 @@ static  enum allocation_state    AssignConflicts( void )
+@@ -1265,7 +1308,9 @@ static  enum allocation_state    AssignConflicts( void )
              */
              if( !only_const_temps && opnd->n.class == N_TEMP && (opnd->t.temp_flags & CONST_TEMP) )
                  return( ALLOC_CONST_TEMP );
@@ -1071,26 +1299,28 @@ index 90c1857729..129dd201e5 100644
              } else {
                  next = GiveRegister( conf, false );
 diff --git a/bld/cg/c/split.c b/bld/cg/c/split.c
-index af92de3399..8bfe938f9a 100644
+index af92de3399..9427a4a86e 100644
 --- a/bld/cg/c/split.c
 +++ b/bld/cg/c/split.c
-@@ -31,6 +31,7 @@
+@@ -31,6 +31,8 @@
  
  
  #include "_cgstd.h"
++extern const char *DaggerEnv( const char *name );
 +#include <stdlib.h>
  #include "coderep.h"
  #include "regset.h"
  #include "confldef.h"
-@@ -45,6 +46,7 @@
+@@ -45,6 +47,8 @@
  #include "revcond.h"
  #include "conflict.h"
  #include "_split.h"
 +#include "model.h"
++
  
  
  const type_class_def    HalfClass[] = {
-@@ -495,6 +497,7 @@ instruction      *rCLRHI_BW( instruction *ins )
+@@ -495,6 +499,7 @@ instruction      *rCLRHI_BW( instruction *ins )
  instruction      *rCLRHI_R( instruction *ins )
  /********************************************/
  {
@@ -1098,18 +1328,18 @@ index af92de3399..8bfe938f9a 100644
      instruction         *new_ins;
      instruction         *and_ins;
      type_class_def      type_class;
-@@ -527,6 +530,10 @@ instruction      *rCLRHI_R( instruction *ins )
+@@ -527,6 +532,10 @@ instruction      *rCLRHI_R( instruction *ins )
              new_ins = NULL;
          } else {
              new_ins = MoveConst( 0, HighPart( res, type_class ), type_class );
 +            /* Daggerfall: Watcom 10 clears the high half first, like OW (`xor dh,dh;
 +             * mov dl,[x]`); the batch prefers it. DAGGER_CLRAFTER=1 clears after the load. */
 +            dagger_after = _IsModel( CGSW_GEN_NO_OPTIMIZATION )
-+                        && getenv( "DAGGER_CLRAFTER" ) != NULL;
++                        && DaggerEnv( "DAGGER_CLRAFTER" ) != NULL;
          }
      } else if( op->n.class == N_REGISTER
        && HW_Ovlap( op->r.reg, res->r.reg ) ) {
-@@ -536,7 +543,10 @@ instruction      *rCLRHI_R( instruction *ins )
+@@ -536,7 +545,10 @@ instruction      *rCLRHI_R( instruction *ins )
          new_ins = MoveConst( 0, res, ins->type_class );
      }
      ins->result = LowPart( res, type_class );
@@ -1122,24 +1352,33 @@ index af92de3399..8bfe938f9a 100644
      } else {
          value = 0;
 diff --git a/bld/cg/c/tree.c b/bld/cg/c/tree.c
-index 23957dda5c..c28c5f61d2 100644
+index 23957dda5c..c22e7e5939 100644
 --- a/bld/cg/c/tree.c
 +++ b/bld/cg/c/tree.c
-@@ -31,6 +31,7 @@
+@@ -31,6 +31,8 @@
  
  
  #include "_cgstd.h"
++extern const char *DaggerEnv( const char *name );
 +#include <stdlib.h>
  #include "coderep.h"
  #include "tree.h"
  #include "zoiks.h"
-@@ -1691,7 +1692,21 @@ static  an  TNBitShift( an retv, tn node, bool already_masked )
+@@ -71,6 +73,7 @@
+ #endif
+ #ifdef DEVBUILD
+     #include "echoapi.h"
++
+ #endif
+ 
+ 
+@@ -1691,7 +1694,21 @@ static  an  TNBitShift( an retv, tn node, bool already_masked )
      }
      mask = TGMask64( node );
  #ifdef JUST_USE_SHIFTS
 -    if( !node->u1.b.is_signed && node->u1.b.start == 0 ) {
 +    if( node->u1.b.is_signed && _IsModel( CGSW_GEN_NO_OPTIMIZATION )
-+      && getenv( "DAGGER_SIGNEDBF" ) == NULL ) {
++      && DaggerEnv( "DAGGER_SIGNEDBF" ) == NULL ) {
 +        /* Daggerfall: Watcom 10 extracted a signed (plain short) bit-field like an unsigned
 +         * one, without sign extension, but kept its signed type (`and ah,3; cwde`).
 +         * DAGGER_SIGNEDBF=1 sign-extends like OW. */
@@ -1156,7 +1395,7 @@ index 23957dda5c..c28c5f61d2 100644
          if( !already_masked ) {
              retv = BGBinary( O_AND, retv, Int64( mask ), tipeu, true );
          }
-@@ -1881,13 +1896,22 @@ an  TNPostGets( tn node )
+@@ -1881,13 +1898,22 @@ an  TNPostGets( tn node )
      an      left;
      an      rite;
      an      leftp;
@@ -1170,7 +1409,7 @@ index 23957dda5c..c28c5f61d2 100644
 -        retv = MakeTempAddr( BGNewTemp( node->tipe ) );
 +        temp = BGNewTemp( node->tipe );
 +        /* only for stack variables: `x++` on a global is plain `inc [x]` */
-+        if( _IsModel( CGSW_GEN_NO_OPTIMIZATION ) && getenv( "DAGGER_DEADDEF" ) == NULL
++        if( _IsModel( CGSW_GEN_NO_OPTIMIZATION ) && DaggerEnv( "DAGGER_DEADDEF" ) == NULL
 +          && !( node->u.left->class == TN_LEAF
 +             && node->u.left->u.addr->format == NF_ADDR
 +             && node->u.left->u.addr->class == CL_ADDR_GLOBAL ) ) {
@@ -1181,19 +1420,28 @@ index 23957dda5c..c28c5f61d2 100644
          retv = BGAssign( retv, leftp, node->tipe );
          BGDone( BGOpGets( node->u1.t.op, left, rite, node->tipe, node->tipe ) );
 diff --git a/bld/cg/c/treefold.c b/bld/cg/c/treefold.c
-index dd3ef11ff7..b5696956e5 100644
+index dd3ef11ff7..f009f716c9 100644
 --- a/bld/cg/c/treefold.c
 +++ b/bld/cg/c/treefold.c
-@@ -31,6 +31,8 @@
+@@ -31,6 +31,9 @@
  
  
  #include "_cgstd.h"
++extern const char *DaggerEnv( const char *name );
 +#include <string.h>
 +#include <stdlib.h>
  #include "coderep.h"
  #include "tree.h"
  #include "zoiks.h"
-@@ -1346,6 +1348,46 @@ static bool IsObjectAddr( tn tree )
+@@ -46,6 +49,7 @@
+ #include "feprotos.h"
+ 
+ 
++
+ #define HasBigConst( t )       ( ( (t)->attr & TYPE_FLOAT ) || (t)->length == 8 )
+ 
+ static const cg_op RevOpcode[] = {
+@@ -1346,6 +1350,46 @@ static bool IsObjectAddr( tn tree )
      return( false );
  }
  
@@ -1215,7 +1463,7 @@ index dd3ef11ff7..b5696956e5 100644
 +    bool        eq;
 +    bool        zero;
 +
-+    policy = getenv( "DAGGER_STRIP" );
++    policy = DaggerEnv( "DAGGER_STRIP" );
 +    if( _IsntModel( CGSW_GEN_NO_OPTIMIZATION ) )
 +        return( true );
 +    if( policy == NULL )
@@ -1240,7 +1488,7 @@ index dd3ef11ff7..b5696956e5 100644
  tn  FoldCompare( cg_op opcode, tn left, tn rite, const type_def *tipe )
  /*********************************************************************/
  {
-@@ -1445,7 +1487,8 @@ tn  FoldCompare( cg_op opcode, tn left, tn rite, const type_def *tipe )
+@@ -1445,7 +1489,8 @@ tn  FoldCompare( cg_op opcode, tn left, tn rite, const type_def *tipe )
                      return( FoldCompare( opcode, IntToType( 1, TypeInteger ), IntToType( 0, TypeInteger ), TypeInteger ) );
                  }
              }
@@ -1333,25 +1581,34 @@ index 3ea68d697a..f534ca058f 100644
          HW_CAsgn( STParmReg[Max87Stk], HW_EMPTY );
      }
 diff --git a/bld/cg/intel/c/x86call.c b/bld/cg/intel/c/x86call.c
-index f8ad0db4b0..aeb2c8412b 100644
+index f8ad0db4b0..8cf64e867a 100644
 --- a/bld/cg/intel/c/x86call.c
 +++ b/bld/cg/intel/c/x86call.c
-@@ -32,6 +32,7 @@
+@@ -32,6 +32,8 @@
  
  
  #include "_cgstd.h"
++extern const char *DaggerEnv( const char *name );
 +#include <stdlib.h>
  #include "coderep.h"
  #include "cgmem.h"
  #include "cgaux.h"
-@@ -438,6 +439,19 @@ instruction *   PushOneParm( instruction *ins, name *curr,
+@@ -60,6 +62,7 @@
+ #include "feprotos.h"
+ 
+ 
++
+ static  void    AddCall( instruction *ins, cn call );
+ 
+ #if _TARGET & _TARG_80386
+@@ -438,6 +441,19 @@ instruction *   PushOneParm( instruction *ins, name *curr,
  
      /* unused parameters */ (void)state; (void)offset;
  
 +    /* Daggerfall: at -od, Watcom 10 pushed a stack variable through a register
 +     * (`mov eax,[ebp-x]; push eax`); globals were pushed directly. DAGGER_PUSHMEM=1 restores
 +     * Open Watcom. */
-+    if( _IsModel( CGSW_GEN_NO_OPTIMIZATION ) && getenv( "DAGGER_PUSHMEM" ) == NULL
++    if( _IsModel( CGSW_GEN_NO_OPTIMIZATION ) && DaggerEnv( "DAGGER_PUSHMEM" ) == NULL
 +      && curr->n.class == N_TEMP && TypeClassSize[type_class] == 4 ) {
 +        name    *temp;
 +
@@ -1365,40 +1622,58 @@ index f8ad0db4b0..aeb2c8412b 100644
      SuffixIns( ins, new_ins );
  #if 0
 diff --git a/bld/cg/intel/c/x86enc2.c b/bld/cg/intel/c/x86enc2.c
-index cfc287803e..6545a667a5 100644
+index cfc287803e..53e5898681 100644
 --- a/bld/cg/intel/c/x86enc2.c
 +++ b/bld/cg/intel/c/x86enc2.c
-@@ -32,6 +32,7 @@
+@@ -32,6 +32,8 @@
  
  
  #include "_cgstd.h"
++extern const char *DaggerEnv( const char *name );
 +#include <stdlib.h>
  #include "coderep.h"
  #include "optmain.h"
  #include "cgmem.h"
-@@ -137,6 +138,8 @@ unsigned DepthAlign( unsigned depth )
+@@ -63,6 +65,7 @@
+ #include "feprotos.h"
+ 
+ 
++
+ typedef enum {
+     UNSIGNED,               /* always an unsigned jump */
+     SIGNED_86,              /* signed if 8086 instruction, else unsigned */
+@@ -137,6 +140,8 @@ unsigned DepthAlign( unsigned depth )
      }
      if( OptForSize > 0 )
          return( 1 );
-+    if( getenv( "KKND_LOOPALIGN" ) == NULL )
++    if( DaggerEnv( "KKND_LOOPALIGN" ) == NULL )
 +        return( 1 );    /* KKND: Watcom 10.x never padded loop heads or the code after a jump table */
      if( _CPULevel( CPU_486 ) ) {
          if( depth == PROC_ALIGN || depth == DEEP_LOOP_ALIGN )
              return( 16 );
 diff --git a/bld/cg/intel/c/x86esc.c b/bld/cg/intel/c/x86esc.c
-index 48d95c8be9..c707fe6706 100644
+index 48d95c8be9..dd0cf8c14c 100644
 --- a/bld/cg/intel/c/x86esc.c
 +++ b/bld/cg/intel/c/x86esc.c
-@@ -32,6 +32,8 @@
+@@ -32,6 +32,9 @@
  
  
  #include "_cgstd.h"
++extern const char *DaggerEnv( const char *name );
 +#include <string.h>
 +#include <stdlib.h>
  #include "coderep.h"
  #include "addrname.h"
  #include "symdbg.h"
-@@ -238,6 +240,63 @@ static  void    DumpSavedDebug( void )
+@@ -58,6 +61,7 @@
+ #include "feprotos.h"
+ 
+ 
++
+ #define OC_INFO_NOT_DEBUG   OC_INFO_SELECT
+ 
+ static void     DoRelocRef( cg_sym_handle sym, cg_class class, segment_id segid, offset val, escape_class esc_attr );
+@@ -238,6 +242,63 @@ static  void    DumpSavedDebug( void )
      SaveDbgOc = OC_INFO_NOT_DEBUG;
  }
  
@@ -1447,7 +1722,7 @@ index 48d95c8be9..c707fe6706 100644
 +    char            *end;
 +
 +    sym = AskForLblSym( lbl );
-+    if( sym == NULL || getenv( "DAGGER_NOALIGNBIAS" ) != NULL )
++    if( sym == NULL || DaggerEnv( "DAGGER_NOALIGNBIAS" ) != NULL )
 +        return;
 +    name = FEName( sym );
 +    if( name == NULL || strncmp( name, "func_", 5 ) != 0 )
@@ -1462,7 +1737,7 @@ index 48d95c8be9..c707fe6706 100644
  void DoAlignment( int len )
  /*************************/
  {
-@@ -550,7 +609,15 @@ void    OutputOC( any_oc *oc, any_oc *next_lbl )
+@@ -550,7 +611,15 @@ void    OutputOC( any_oc *oc, any_oc *next_lbl )
      case OC_LABEL:
          /* figure out number of bytes to pad */
          lc = AskLocation();
@@ -1480,23 +1755,30 @@ index 48d95c8be9..c707fe6706 100644
              if( (lc == LastUnique) && (len == 0) ) {
                  /* Two unique labels have ended up next to each other.
 diff --git a/bld/cg/intel/c/x86mul.c b/bld/cg/intel/c/x86mul.c
-index 37aaf4e803..258b7341d8 100644
+index 37aaf4e803..24c000217c 100644
 --- a/bld/cg/intel/c/x86mul.c
 +++ b/bld/cg/intel/c/x86mul.c
-@@ -31,6 +31,7 @@
+@@ -31,11 +31,14 @@
  
  
  #include "_cgstd.h"
++extern const char *DaggerEnv( const char *name );
 +#include <stdlib.h>
  #include "coderep.h"
  #include "data.h"
  #include "multiply.h"
-@@ -48,7 +49,14 @@ int     MulCost( uint_32 num )
+ 
+ 
++
+ int     MulCost( uint_32 num )
+ /****************************/
+ {
+@@ -48,7 +51,14 @@ int     MulCost( uint_32 num )
       * is less than the number of cycles it takes to execute, to give slight
       * preference to multiply versus a shift/add sequence.
       */
 -    if( _CPULevel( CPU_686 ) ) {
-+    if( getenv( "KKND_OWMUL" ) == NULL && _CPULevel( CPU_386 ) ) {
++    if( DaggerEnv( "KKND_OWMUL" ) == NULL && _CPULevel( CPU_386 ) ) {
 +        /* KKND: Watcom 10.x used the 386/486 early-out cost for every 32-bit target */
 +        cost = 4;
 +        while( num ) {
@@ -1520,18 +1802,27 @@ index 7dae19018a..c154921215 100644
  
  #define WINDOWS_CHEAP  ( \
 diff --git a/bld/cg/intel/c/x86regsv.c b/bld/cg/intel/c/x86regsv.c
-index a5a4fdb3ed..9cb37ab74e 100644
+index a5a4fdb3ed..8f687114c8 100644
 --- a/bld/cg/intel/c/x86regsv.c
 +++ b/bld/cg/intel/c/x86regsv.c
-@@ -32,6 +32,7 @@
+@@ -32,6 +32,8 @@
  
  
  #include "_cgstd.h"
++extern const char *DaggerEnv( const char *name );
 +#include <stdlib.h>
  #include "coderep.h"
  #include "data.h"
  #include "savings.h"
-@@ -93,6 +94,8 @@ void    InitWeights( uint size )
+@@ -40,6 +42,7 @@
+ #include "regsave.h"
+ 
+ 
++
+ static  save_def        MaxConstSave;
+ 
+ #define COST( s, t ) ( ( (s)*size + (t)*time ) / TOTAL_WEIGHT )
+@@ -93,6 +96,8 @@ void    InitWeights( uint size )
  }
  
  
@@ -1540,11 +1831,11 @@ index a5a4fdb3ed..9cb37ab74e 100644
  bool    WorthProlog( conflict_node *conf, hw_reg_set reg )
  /*******************************************************************
      decide if the savings associated with giving conflict "conf"
-@@ -116,6 +119,8 @@ bool    WorthProlog( conflict_node *conf, hw_reg_set reg )
+@@ -116,6 +121,8 @@ bool    WorthProlog( conflict_node *conf, hw_reg_set reg )
      }
      op = conf->name;
      savings = conf->savings;
-+    if( _ConstTemp( op ) && getenv( "KKND_CONSTREG" ) != NULL && KKNDIsGlobalConstTemp( op ) )
++    if( _ConstTemp( op ) && DaggerEnv( "KKND_CONSTREG" ) != NULL && KKNDIsGlobalConstTemp( op ) )
 +        return( true );
      if( _ConstTemp( op ) ) {
          /* adjust for the initial load */
@@ -1567,18 +1858,27 @@ index d5bb49a4be..e28fa26206 100644
              return( HW_DS );
          return( HW_CS );
 diff --git a/bld/cg/intel/c/x86sel.c b/bld/cg/intel/c/x86sel.c
-index 1de30dab10..7cdf0c3b35 100644
+index 1de30dab10..4cdc4f45b3 100644
 --- a/bld/cg/intel/c/x86sel.c
 +++ b/bld/cg/intel/c/x86sel.c
-@@ -32,6 +32,7 @@
+@@ -32,6 +32,8 @@
  
  
  #include "_cgstd.h"
++extern const char *DaggerEnv( const char *name );
 +#include <stdlib.h>
  #include "coderep.h"
  #include "cgmem.h"
  #include "tree.h"
-@@ -113,8 +114,16 @@ static cost_val Balance( uint_32 size, uint_32 time )
+@@ -55,6 +57,7 @@
+ #include "i64.h"
+ 
+ 
++
+ #define MIN_JUMPS       4            /* to make it worth while for jum*/
+ #define MIN_LVALUES     5            /* to make it worth while for long sca*/
+ #define MIN_SVALUES     7            /* to make it worth while for short sca*/
+@@ -113,8 +116,16 @@ static cost_val Balance( uint_32 size, uint_32 time )
      byte        opt_size;
  
      opt_size = OptForSize;
@@ -1597,7 +1897,7 @@ index 1de30dab10..7cdf0c3b35 100644
      }
      balance = ( size * opt_size + 10 * time * ( 100 - opt_size ) ) / 100;
      if( (int_32)balance < 0 || balance > MAX_COST )
-@@ -315,6 +324,97 @@ static void GenValuesBackward( sel_handle s_node, const signed_64 *to_sub, cg_ty
+@@ -315,6 +326,97 @@ static void GenValuesBackward( sel_handle s_node, const signed_64 *to_sub, cg_ty
  }
  
  
@@ -1695,7 +1995,7 @@ index 1de30dab10..7cdf0c3b35 100644
  tbl_control *MakeScanTab( sel_handle s_node, cg_type value_type, cg_type real_type )
  /**********************************************************************************/
  {
-@@ -322,63 +422,102 @@ tbl_control *MakeScanTab( sel_handle s_node, cg_type value_type, cg_type real_ty
+@@ -322,63 +424,102 @@ tbl_control *MakeScanTab( sel_handle s_node, cg_type value_type, cg_type real_ty
      label_handle        *tab_ptr;
      uint_32             cases;
      signed_64           curr;
@@ -1739,7 +2039,7 @@ index 1de30dab10..7cdf0c3b35 100644
 -            other = table->cases[0];
 +    }
 +    mark = _IsModel( CGSW_GEN_NO_OPTIMIZATION ) ? DaggerTableState() : 0;
-+    if( mark != 0 && DaggerTableAlign != 0 && getenv( "DAGGER_NOTBLALIGN" ) == NULL )
++    if( mark != 0 && DaggerTableAlign != 0 && DaggerEnv( "DAGGER_NOTBLALIGN" ) == NULL )
 +        DaggerLabelAlign( table->value_lbl, DaggerTableAlign );
 +    DaggerTableAlign = 0;
 +    if( mark == 2 ) {
@@ -1841,7 +2141,7 @@ index 1de30dab10..7cdf0c3b35 100644
  tbl_control     *MakeJmpTab( sel_handle s_node )
  /**********************************************/
  {
-@@ -389,34 +528,51 @@ tbl_control     *MakeJmpTab( sel_handle s_node )
+@@ -389,34 +530,51 @@ tbl_control     *MakeJmpTab( sel_handle s_node )
      signed_64           curr;
      label_handle        other;
      unsigned_64         tmp;
@@ -1874,7 +2174,7 @@ index 1de30dab10..7cdf0c3b35 100644
 +        U64Inc( curr );
 +    }
 +    mark = _IsModel( CGSW_GEN_NO_OPTIMIZATION ) ? DaggerTableState() : 0;
-+    if( mark != 0 && DaggerTableAlign != 0 && getenv( "DAGGER_NOTBLALIGN" ) == NULL )
++    if( mark != 0 && DaggerTableAlign != 0 && DaggerEnv( "DAGGER_NOTBLALIGN" ) == NULL )
 +        DaggerLabelAlign( table->lbl, DaggerTableAlign );
 +    DaggerTableAlign = 0;
 +    if( mark == 2 ) {
@@ -1915,24 +2215,33 @@ index 1de30dab10..7cdf0c3b35 100644
      POP_OP();
      return( table );
 diff --git a/bld/cg/intel/c/x86ver.c b/bld/cg/intel/c/x86ver.c
-index 7de826e706..ad759a7833 100644
+index 7de826e706..07b256f0bc 100644
 --- a/bld/cg/intel/c/x86ver.c
 +++ b/bld/cg/intel/c/x86ver.c
-@@ -31,6 +31,7 @@
+@@ -31,6 +31,8 @@
  
  
  #include "_cgstd.h"
++extern const char *DaggerEnv( const char *name );
 +#include <stdlib.h>
  #include "coderep.h"
  #include "data.h"
  #include "rgtbl.h"
-@@ -312,6 +313,10 @@ bool    DoVerify( vertype kind, instruction *ins )
+@@ -39,6 +41,7 @@
+ #include "targetin.h"
+ 
+ 
++
+ //extern  hw_reg_set      Low16Reg( hw_reg_set );
+ //extern  type_class_def  RegClass(hw_reg_set);
+ 
+@@ -312,6 +315,10 @@ bool    DoVerify( vertype kind, instruction *ins )
          }
          return( true );
      case V_CDQ:
 +        /* Daggerfall: Watcom 10 sign-extended with `mov eax,edx; sar edx,31` (427 times in the
 +         * original, cdq twice). DAGGER_CDQ=1 restores Open Watcom's choice. */
-+        if( _IsModel( CGSW_GEN_NO_OPTIMIZATION ) && getenv( "DAGGER_CDQ" ) == NULL )
++        if( _IsModel( CGSW_GEN_NO_OPTIMIZATION ) && DaggerEnv( "DAGGER_CDQ" ) == NULL )
 +            break;
          /* On a Pentium, a MOV/SAR sequence is faster because it pairs while
           * CDQ does not. However, on Pentium Pro CDQ is no slower yet smaller.
