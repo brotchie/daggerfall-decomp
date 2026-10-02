@@ -2334,7 +2334,7 @@ index 1de30dab10..4cdc4f45b3 100644
      POP_OP();
      return( table );
 diff --git a/bld/cg/intel/c/x86ver.c b/bld/cg/intel/c/x86ver.c
-index 7de826e706..07b256f0bc 100644
+index 7de826e706..72174bb191 100644
 --- a/bld/cg/intel/c/x86ver.c
 +++ b/bld/cg/intel/c/x86ver.c
 @@ -31,6 +31,8 @@
@@ -2346,7 +2346,7 @@ index 7de826e706..07b256f0bc 100644
  #include "coderep.h"
  #include "data.h"
  #include "rgtbl.h"
-@@ -39,6 +41,7 @@
+@@ -39,10 +41,21 @@
  #include "targetin.h"
  
  
@@ -2354,7 +2354,57 @@ index 7de826e706..07b256f0bc 100644
  //extern  hw_reg_set      Low16Reg( hw_reg_set );
  //extern  type_class_def  RegClass(hw_reg_set);
  
-@@ -312,6 +315,10 @@ bool    DoVerify( vertype kind, instruction *ins )
+ 
++/* Daggerfall: Watcom 10 tested a stack variable whole (`test dword [ebp-x],0x8000`), never a
++ * byte or word of it; DAGGER_NARROWTEST=1 lets OW narrow it */
++static bool DaggerNoNarrowTest( instruction *ins, name *op1 )
++{
++    return( _IsModel( CGSW_GEN_NO_OPTIMIZATION ) && DaggerEnv( "DAGGER_NARROWTEST" ) == NULL
++      && ( ins->head.opcode == OP_BIT_TEST_TRUE || ins->head.opcode == OP_BIT_TEST_FALSE )
++      && op1->n.class == N_TEMP );
++}
++
++
+ bool    DoVerify( vertype kind, instruction *ins )
+ /************************************************/
+ {
+@@ -80,6 +93,8 @@ bool    DoVerify( vertype kind, instruction *ins )
+             return( true );
+         break;
+     case V_OP2HIGH_B_ZERO:
++        if( DaggerNoNarrowTest( ins, op1 ) )
++            return( false );
+         if( op2->c.const_type == CONS_ABSOLUTE
+           && (op2->c.lo.u.int_value & 0x0000ff00) == 0 )
+             return( true );
+@@ -90,6 +105,8 @@ bool    DoVerify( vertype kind, instruction *ins )
+             return( true );
+         break;
+     case V_OP2LOW_B_ZERO:
++        if( DaggerNoNarrowTest( ins, op1 ) )
++            return( false );
+         if( op2->c.const_type == CONS_ABSOLUTE
+           && (op2->c.lo.u.int_value & 0x000000ff) == 0 )
+             return( true );
+@@ -155,6 +172,8 @@ bool    DoVerify( vertype kind, instruction *ins )
+             return( true );
+         break;
+     case V_OP2HIGH_W_ZERO_REG:
++        if( DaggerNoNarrowTest( ins, op1 ) )
++            return( false );
+         if( op1->n.class == N_REGISTER
+           && HW_Ovlap( op1->r.reg, HW_xBP ) )
+             break;
+@@ -164,6 +183,8 @@ bool    DoVerify( vertype kind, instruction *ins )
+             return( true );
+         break;
+     case V_OP2LOW_W_ZERO:
++        if( DaggerNoNarrowTest( ins, op1 ) )
++            return( false );
+         if( op2->c.const_type == CONS_ABSOLUTE
+           && (op2->c.lo.u.int_value & 0x0000ffff) == 0 )
+             return( true );
+@@ -312,6 +333,10 @@ bool    DoVerify( vertype kind, instruction *ins )
          }
          return( true );
      case V_CDQ:

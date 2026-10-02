@@ -1027,3 +1027,8 @@ times over (`FoldMinus`, `foldins.c`, and the `V_OP2NEG` reduction back to `sub`
 breaks address folding (`[eax-1]`), so it is a per-function knob the search tries. +10.
 
 Batch **1,817**.
+- **Tests of stack variables stay whole**: every `test` of a stack slot with a constant in
+  FALL.EXE is a dword test (36 of 36), where OW narrows `test dword [ebp-x],0x8000` to
+  `test byte [ebp-x+1],0x80`; byte tests are on other memory (char fields). The code
+  generator no longer narrows tests of stack variables at `-od`
+  (`DAGGER_NARROWTEST=1` for OW's). +9. Batch **1,826**.

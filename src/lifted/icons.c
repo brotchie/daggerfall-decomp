@@ -32,10 +32,12 @@ extern int func_0004330A(int);
 extern int func_00069938(int, int, int);
 extern int func_0008CFE6(int);
 extern int func_000926AD(int, int, int);
+extern int func_0009A993(int);
 extern int func_000A0024();
 extern int func_000A1023();
 extern int func_0012B136();
 extern int func_00144F68();
+extern void func_00026904(void);
 extern void func_0004259C(int);
 extern void func_00042E24(int);
 extern void func_0005D2DE(int);
@@ -90,6 +92,15 @@ void func_0005D4F2(void)
 void func_0005D514(void)
 {
     func_00098651();
+}
+
+void func_0005D531(int a1)
+{
+    if ((a1 & 2) == 0) goto L5D557;
+    func_0009A993(1);
+    return;
+L5D557:;
+    func_00026904();
 }
 
 void func_0005D566(void)
