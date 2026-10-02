@@ -808,7 +808,7 @@ index 1bab6746f0..493bf37016 100644
              cf_value = OkToNegate( ins->operands[1]->c.u.cfval, tipe );
              if( cf_value != NULL ) {
 diff --git a/bld/cg/c/generate.c b/bld/cg/c/generate.c
-index a7f606be70..58bdf031cd 100644
+index a7f606be70..76e31c50a0 100644
 --- a/bld/cg/c/generate.c
 +++ b/bld/cg/c/generate.c
 @@ -31,6 +31,9 @@
@@ -847,14 +847,14 @@ index a7f606be70..58bdf031cd 100644
 +
 +/* Daggerfall: per-function code generator options from `#pragma dagger <opt> <func>` */
 +#define DAGGER_MAX_FUNC_OPTS    256
-+static char DaggerOptName[DAGGER_MAX_FUNC_OPTS][16];
++static char DaggerOptName[DAGGER_MAX_FUNC_OPTS][40];
 +static char DaggerOptFunc[DAGGER_MAX_FUNC_OPTS][40];
 +static int  DaggerOptCount;
 +
 +void    DaggerFuncOptAdd( const char *opt, const char *func )
 +{
 +    if( DaggerOptCount < DAGGER_MAX_FUNC_OPTS ) {
-+        strncpy( DaggerOptName[DaggerOptCount], opt, 15 );
++        strncpy( DaggerOptName[DaggerOptCount], opt, 39 );
 +        strncpy( DaggerOptFunc[DaggerOptCount], func, 39 );
 +        DaggerOptCount++;
 +    }
@@ -1303,18 +1303,20 @@ index 76c9e5daf1..1562a66f62 100644
      do {
          pow2 = 1;
 diff --git a/bld/cg/c/object.c b/bld/cg/c/object.c
-index 8deefcbc4c..f070492fa9 100644
+index 8deefcbc4c..ebd7de3b66 100644
 --- a/bld/cg/c/object.c
 +++ b/bld/cg/c/object.c
-@@ -31,6 +31,7 @@
+@@ -31,6 +31,9 @@
  
  
  #include "_cgstd.h"
++#include <stdio.h>
++#include <stdlib.h>
 +extern const char *DaggerEnv( const char *name );
  #include "coderep.h"
  #include "cgauxinf.h"
  #include "zoiks.h"
-@@ -46,6 +47,13 @@
+@@ -46,6 +49,13 @@
  #include "makeblk.h"
  #include "nullprop.h"
  #include "feprotos.h"
@@ -1328,7 +1330,7 @@ index 8deefcbc4c..f070492fa9 100644
  
  
  /*
-@@ -93,6 +101,93 @@ static  source_line_number      DumpLineNum( source_line_number n,
+@@ -93,6 +103,102 @@ static  source_line_number      DumpLineNum( source_line_number n,
  }
  
  
@@ -1391,7 +1393,9 @@ index 8deefcbc4c..f070492fa9 100644
 +
 +        if( prev->head.opcode == OP_BLOCK || prev->result == NULL
 +          || prev->result->n.class != N_REGISTER
-+          || !HW_Equal( prev->result->r.reg, op->r.reg )
++          || !( HW_Equal( prev->result->r.reg, op->r.reg )
++            || ( DaggerEnv( "DAGGER_NOWIDEOVL" ) == NULL
++              && HW_Equal( prev->result->r.reg, FullReg( op->r.reg ) ) ) )
 +          || ( prev->type_class != U2 && prev->type_class != I2
 +            && !( prev->head.opcode == OP_MUL && DaggerEnv( "DAGGER_NOMULWIDEN" ) == NULL )
 +            /* (an int sum narrowed to the short, `s = s + i / j`, too) */
@@ -1403,7 +1407,14 @@ index 8deefcbc4c..f070492fa9 100644
 +            return;
 +        op = AllocRegName( FullReg( op->r.reg ) );
 +    } else if( op->n.class == N_CONSTANT && op->c.const_type == CONS_ABSOLUTE ) {
-+        op = AllocS32Const( op->c.lo.u.int_value & 0xffff );
++        if( ins->type_class == I2 && ( op->c.lo.u.int_value & 0x8000 )
++          && DaggerEnv( "DAGGER_SEXTCONST" ) != NULL ) {
++            /* a negative short constant sign-extended (`return -5;`, where Watcom 10 kept
++             * the int constant; `return 65535;` zero-extends): a per-function knob */
++            op = AllocS32Const( (int_32)(signed short)op->c.lo.u.int_value );
++        } else {
++            op = AllocS32Const( op->c.lo.u.int_value & 0xffff );
++        }
 +    } else {
 +        return;
 +    }
@@ -1422,7 +1433,7 @@ index 8deefcbc4c..f070492fa9 100644
  void    GenObject( void )
  /***********************/
  {
-@@ -127,6 +222,12 @@ void    GenObject( void )
+@@ -127,6 +233,12 @@ void    GenObject( void )
              StartBlockProfiling( blk );
              InitStackDepth( blk );
              for( ins = blk->ins.head.next; ins->head.opcode != OP_BLOCK; ins = ins->head.next ) {
@@ -1435,7 +1446,7 @@ index 8deefcbc4c..f070492fa9 100644
                  if( ins->head.opcode == OP_NOP
                    && ( (ins->flags.u.nop_flags & NOP_SOURCE_QUEUE)
                    || ins->flags.u.nop_flags == NOP_DBGINFO )) { // an end block
-@@ -145,6 +246,7 @@ void    GenObject( void )
+@@ -145,6 +257,7 @@ void    GenObject( void )
                          }
                      }
                  } else {

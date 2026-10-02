@@ -154,7 +154,6 @@ extern int func_00137725();
 extern int func_00144F68();
 extern int func_0014D23C();
 extern void func_00013A52(void);
-extern void func_00027717(int, int);
 extern void func_00027E4F(void);
 extern void func_0003045F(int, int, int);
 extern void func_000304C8(int, int, int, int);
@@ -178,6 +177,7 @@ void func_00027035(void);
 void func_00027515(void);
 void func_000275F7(int);
 void func_000276B8(void);
+void func_00027717(int, int);
 void func_00027781(void);
 void func_00027A10(void);
 void func_0002814E(int);
@@ -194,6 +194,7 @@ void func_00028F56(void);
 void func_00028F8B(int);
 void func_000298F3(int);
 #pragma aux func_000A0ED9 parm routine [];
+#pragma dagger DAGGER_CONFLISTREV func_00027717
 #pragma dagger DAGGER_NOSAVES func_00028E24
 #pragma dagger DAGGER_RMW func_00026904
 #pragma dagger reg func_0002829B 7 esi
@@ -653,6 +654,20 @@ void func_000276B8(void)
 
     l_18 = func_000A0DF4(*(int *)D_00190DE8 + 2) + 3;
     func_000A0E0D(*(int *)D_00190DE8, *(int *)D_00190DE8 + l_18, ((int)(*(char **)D_00196DB4 + 2048) - *(int *)D_00190DE8) - l_18, (int)D_001707AE, 494, 4);
+}
+
+void func_00027717(int a1, int a2)
+{
+    int l_14;
+
+    l_14 = *(int *)D_00196DB4;
+L27732:;
+    if (*(signed char *)((char *)l_14 + 2) == 0) goto L2774E;
+    l_14 += func_000A0DF4(l_14 + 2) + 3;
+    goto L27732;
+L2774E:;
+    *(short *)((char *)l_14) = *(short *)((char *)a1 + 31);
+    func_000A0AD9(l_14 + 2, a2, 4, (int)D_001707AE, 506);
 }
 
 void func_00027781(void)

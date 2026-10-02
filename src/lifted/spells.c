@@ -116,6 +116,7 @@ void func_0003A036(void);
 #pragma dagger reg func_0003817F 2 edx 3 eax
 #pragma dagger reg func_000383CC 28 ebx 31 eax
 #pragma dagger reg func_0003946E 26 edx
+#pragma dagger reg func_0003978C 11 edx 27 eax 437 bx
 #pragma dagger slots func_0003853C a1 8 l_18 4 ret 12
 #pragma dagger slots func_00039224 a1 12 l_1C 8 l_18 4 ret 16
 #pragma dagger slots func_00039A8F l_24 16 l_20 12 l_1C 8 l_18 4
@@ -664,6 +665,21 @@ int func_0003946E(void)
     *(int *)&l_18 = ((int)(short)l_18) + (((int)(short)*(short *)D_00199620) * ((((int)(signed char)*(signed char *)(*(char **)D_00178A0A + 32 + (((int)(short)*(short *)D_00195F30) * 5))) + ((int)(signed char)*(signed char *)((char *)(int)((((int)(short)*(short *)D_00195F30) * 5) + *(char **)D_00178A0A) + 33))) / 2));
     *(int *)&l_18 = ((int)(short)l_18) + (((int)(short)*(short *)D_00199622) * (((((int)(signed char)*(signed char *)(*(char **)D_00178A0A + 34 + (((int)(short)*(short *)D_00195F30) * 5))) + ((int)(signed char)*(signed char *)(*(char **)D_00178A0A + 35 + (((int)(short)*(short *)D_00195F30) * 5)))) / 2) / ((int)(signed char)*(signed char *)(*(char **)D_00178A0A + 36 + (((int)(short)*(short *)D_00195F30) * 5)))));
     return (int)(short)l_18;
+}
+
+int func_0003978C(void)
+{
+    int l_24;
+    short l_1C;
+    short l_18;
+
+    l_18 = *(short *)D_00195F30;
+    l_24 = *(int *)D_00178A0A;
+    l_1C = ((((int)(signed char)*(signed char *)((char *)((((int)(short)l_18) * 5) + l_24) + 33)) + ((int)(signed char)*(signed char *)((char *)((((int)(short)l_18) * 5) + l_24) + 32))) >> 1) * ((int)(short)*(short *)D_00199620);
+    l_1C = ((int)(short)l_1C) + (((((int)(signed char)*(signed char *)((char *)((((int)(short)l_18) * 5) + l_24) + 34)) + ((int)(signed char)*(signed char *)((char *)((((int)(short)l_18) * 5) + l_24) + 35))) >> 1) * (((int)(short)*(short *)D_00199622) / ((int)(signed char)*(signed char *)((char *)((((int)(short)l_18) * 5) + l_24) + 36))));
+    l_1C += (short)*(signed char *)((char *)((((int)(short)l_18) * 3) + l_24) + 14) * *(short *)D_0019961C;
+    l_1C = ((int)(short)l_1C) + ((((int)(signed char)*(signed char *)((char *)((((int)(short)l_18) * 3) + l_24) + 15)) * ((int)(short)*(short *)D_0019961E)) / ((int)(signed char)*(signed char *)((char *)((((int)(short)l_18) * 3) + l_24) + 16)));
+    return (int)(short)l_1C;
 }
 
 int func_00039993(void)
