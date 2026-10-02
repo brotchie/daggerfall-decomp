@@ -309,7 +309,10 @@ class Func:
                             "add", "sub", "inc", "dec", "shl", "neg") and \
                             body[j].operands[0].type == cx.X86_OP_REG and \
                             body[j].reg_name(body[j].operands[0].reg) == r32 and \
-                            all(o.type == cx.X86_OP_IMM for o in body[j].operands[1:]):
+                            all(o.type == cx.X86_OP_IMM or (o.type == cx.X86_OP_REG and
+                                                           o.size == 4 and body[j].mnemonic in
+                                                           ("add", "sub"))
+                                for o in body[j].operands[1:]):
                         j -= 1
                     pv = body[j]
                     if pv.operands and pv.operands[0].type == cx.X86_OP_REG and \
@@ -739,7 +742,7 @@ class Func:
                 self.out.append("__dagger_%s%X:;" % table_end[ins.address])
             if ins.address in self.cskip:
                 continue        # a switch's compare tree: the compiler builds it again
-            if ins.address in self.cswitches:
+            if ins.address in self.cswitches and self.cswitches[ins.address].get("var") is None:
                 self.k = k
                 self.cswitch_start(ins, self.cswitches[ins.address])
                 continue
@@ -756,6 +759,10 @@ class Func:
                 self.regs = {}
                 self.after_return = False
                 dead = False
+            if ins.address in self.cswitches and not dead:
+                self.k = k
+                self.cswitch_start(ins, self.cswitches[ins.address])     # switch (v)
+                continue
             if dead:
                 continue        # alignment padding after a jump (before a switch table)
             self.k = k
@@ -1475,7 +1482,65 @@ class Func:
             sw["store"] = i.address
             found[i.address] = sw
             self.temps.add(t)           # the compiler's own temp: not declared
+        if not os.environ.get("LIFT_NOVARSWITCH"):
+            self.find_var_switches(found, by_addr, nxt)
         return found
+
+    def find_var_switches(self, found, by_addr, nxt):
+        """`switch (v)` on an int variable: Watcom compares the variable itself, no temp. A
+        compare tree on a variable is told from a chain of ifs by the binary search's
+        repeated compare (`cmp v,3; jb; cmp v,3; jbe`)."""
+        body = self.ins[self.body_start:self.body_end]
+        inside = set()          # nodes of trees seen (a subtree is no switch of its own)
+        for k, j in enumerate(body[:-3]):
+            if j.mnemonic != "cmp" or j.address in self.cskip or j.address in inside or \
+                    j.operands[1].type != cx.X86_OP_IMM or j.operands[0].size != 4:
+                continue
+            t = ebp_slot(j, j.operands[0])
+            if t is None:
+                op = j.operands[0]
+                if not (op.type == cx.X86_OP_MEM and op.mem.base and
+                        j.reg_name(op.mem.base) == "ebp" and not op.mem.index and
+                        op.mem.disp >= 8):
+                    continue
+                t = -op.mem.disp
+            pv = body[k - 1] if k else None
+            if pv is not None and pv.mnemonic == "cmp" and pv.operands[0].type == cx.X86_OP_MEM \
+                    and pv.op_str.split(",")[0] == j.op_str.split(",")[0]:
+                continue
+            # the repeated compare right at the root
+            j2 = by_addr.get(nxt.get(j.address))
+            j3 = by_addr.get(nxt.get(j2.address)) if j2 is not None else None
+            if j2 is None or j2.mnemonic not in JCC or j3 is None or j3.mnemonic != "cmp" or \
+                    j3.op_str != j.op_str:
+                continue
+            # the tree: compares of the variable and jumps, up to the first other code
+            end, x = j.address, j
+            while x is not None and ((x.mnemonic == "cmp" and x.op_str.split(",")[0] ==
+                                      j.op_str.split(",")[0] and
+                                      x.operands[1].type == cx.X86_OP_IMM) or
+                                     x.mnemonic in JCC or x.mnemonic == "jmp"):
+                end = nxt.get(x.address)
+                x = by_addr.get(end)
+            saved = set(self.cskip)
+            try:
+                sw = self.parse_ctree(j.address, t, 4, by_addr, nxt, limit=end)
+            except Unsupported:
+                self.cskip = saved
+                continue
+            if sum(len(v) for v in sw["cases"].values()) < 3 or sw["default"] is None:
+                self.cskip = saved
+                continue
+            inside |= sw["nodes"]
+            # or a chain of ifs after all (OW's tree differs): a choice point
+            self.choices.append(j.address + 0.9375)
+            if j.address + 0.9375 in self.flips:
+                self.cskip = saved
+                continue
+            sw["store"] = None
+            sw["var"] = j
+            self.cskip.discard(j.address)
+            found[j.address] = sw
 
     def scan_at(self, a, t, by_addr, nxt):
         """A scan switch's dispatch at `a`: `mov al, [t]; mov ecx, n+1; mov edi, offset
@@ -1511,7 +1576,7 @@ class Func:
         return {"width": width, "cases": cases, "other": labels[0], "jmp": jp.address,
                 "values": vals_va, "seq": [x.address for x in seq]}
 
-    def parse_ctree(self, start, t, w, by_addr, nxt, stubs=frozenset()):
+    def parse_ctree(self, start, t, w, by_addr, nxt, stubs=frozenset(), limit=None):
         """Walk the compare tree from `start`, tracking the selector's possible values.
         `stubs`: jumps a compare goes to that belong to the tree (an empty sub-range's
         `jmp default`, emitted right after the tree's own jumps)."""
@@ -1521,6 +1586,8 @@ class Func:
             i = by_addr.get(a)
             if i is None:
                 return None
+            if limit is not None and not start <= a < limit:
+                return None             # a variable's tree ends where other code starts
             if i.mnemonic == "cmp" and ebp_slot(i, i.operands[0]) == t and \
                     i.operands[1].type == cx.X86_OP_IMM:
                 js, b = [], nxt.get(a)
@@ -1652,7 +1719,7 @@ class Func:
                 (prev.get(a) in nodes or start < a < hi) and
                 by_addr[a].mnemonic == "jmp" and by_addr[a].operands[0].type == cx.X86_OP_IMM}
         if more and len(stubs) < 64:
-            return self.parse_ctree(start, t, w, by_addr, nxt, stubs | more)
+            return self.parse_ctree(start, t, w, by_addr, nxt, stubs | more, limit)
         self.cskip |= nodes
         return {"cases": cases, "default": dflt, "width": w, "signed": signed,
                 "has_table": any(n is not None and n[0] in ("table", "scan")
@@ -1710,8 +1777,12 @@ class Func:
 
     def cswitch_start(self, ins, sw):
         """The store into the selector temp: `switch (expr) {`."""
-        e = self.reg("eax", ins)
         w, signed = sw["width"], sw["signed"]
+        if sw.get("var") is not None:
+            v = self.mem(ins.operands[0], ins, 4)
+            e = E(v if signed else "(unsigned)" + v, 4, atom=signed)
+        else:
+            e = self.reg("eax", ins)
         tname = {1: "char", 2: "short", 4: "int"}[w]
         mm = re.fullmatch(r"\*\((?:signed |unsigned )?(?:char|short) \*\)(.*)", e.text)
         if w == 4:

@@ -37,7 +37,6 @@ extern int func_00030A23(int, int, int);
 extern int func_000310E1(int, int);
 extern int func_00031B8A(int);
 extern int func_00032A05(int);
-extern int func_000336EE(int, int);
 extern int func_00077960(int, int, int);
 extern int func_0007D6AE(int, int);
 extern int func_0008DA4D(int);
@@ -56,6 +55,7 @@ extern void func_00078DDD(int);
 extern void func_000876AD(int, int, int, int);
 int func_00032EC8(int);
 int func_0003323C(int);
+int func_000336EE(int, int);
 int func_00033EE7(int, int);
 
 int func_00032EC8(int a1)
@@ -348,6 +348,24 @@ L336A7:;
     goto L336A7;
 L336DA:;
     return 1;
+}
+
+int func_000336EE(int a1, int a2)
+{
+    switch ((unsigned)a1) {
+    goto L33751;
+case 3:
+    return *(int *)((char *)a2 + 12);
+case 0:
+    return *(int *)((char *)a2 + 11);
+case 4:
+    return *(int *)((char *)a2 + 16);
+case 7:
+    return *(int *)((char *)a2 + 10);
+default:
+L33751:;
+    return 0;
+}
 }
 
 void func_00033764(int a1, int a2)

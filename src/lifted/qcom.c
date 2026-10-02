@@ -572,24 +572,22 @@ L2CD31:;
     goto L2CD26;
 L2CD39:;
     if (*(int *)((char *)((l_20 * 15) + a2) + 13) == (-1)) goto L2CD31;
-    if (((unsigned)l_20) < 2) goto L2CD5A;
-    if (((unsigned)l_20) <= 2) goto L2CD84;
-    if (l_20 == 3) goto L2CDA8;
-    goto L2CDC7;
-L2CD5A:;
-    if (l_20 != 1) goto L2CDC7;
+    switch ((unsigned)l_20) {
+case 1:
     l_1C = func_00030A23(a1, 4, (int)(short)*(short *)((char *)((l_20 * 15) + a2) + 13));
     *(signed char *)((char *)l_1C + 2) |= 128;
     goto L2CDC7;
-L2CD84:;
+case 2:
     l_18 = func_00030A23(a1, 3, (int)(short)*(short *)((char *)((l_20 * 15) + a2) + 13));
     *(signed char *)((char *)l_18 + 3) |= 128;
     goto L2CDC7;
-L2CDA8:;
+case 3:
     l_14 = func_00030A23(a1, 0, (int)(short)*(short *)((char *)((l_20 * 15) + a2) + 13));
     *(signed char *)((char *)l_14 + 2) |= 128;
+default:
 L2CDC7:;
     goto L2CD31;
+}
 }
 
 void func_0002CDD5(int a1, int a2)
@@ -608,22 +606,20 @@ L2CDFA:;
     goto L2CDEF;
 L2CE02:;
     if (*(int *)((char *)((l_20 * 15) + a2) + 13) == (-1)) goto L2CDFA;
-    if (((unsigned)l_20) < 2) goto L2CE23;
-    if (((unsigned)l_20) <= 2) goto L2CE4D;
-    if (l_20 == 3) goto L2CE71;
-    goto L2CE90;
-L2CE23:;
-    if (l_20 != 1) goto L2CE90;
+    switch ((unsigned)l_20) {
+case 1:
     l_1C = func_00030A23(a1, 4, (int)(short)*(short *)((char *)((l_20 * 15) + a2) + 13));
     *(signed char *)((char *)l_1C + 2) &= 127;
     goto L2CE90;
-L2CE4D:;
+case 2:
     l_18 = func_00030A23(a1, 3, (int)(short)*(short *)((char *)((l_20 * 15) + a2) + 13));
     *(signed char *)((char *)l_18 + 3) &= 127;
     goto L2CE90;
-L2CE71:;
+case 3:
     l_14 = func_00030A23(a1, 0, (int)(short)*(short *)((char *)((l_20 * 15) + a2) + 13));
     *(signed char *)((char *)l_14 + 2) &= 127;
+default:
 L2CE90:;
     goto L2CDFA;
+}
 }

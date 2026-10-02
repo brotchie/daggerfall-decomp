@@ -321,27 +321,24 @@ L9B8A9:;
     func_0009B647();
     *(int *)D_00143550 = l_18;
 L9B911:;
-    if (((unsigned)a1) < 1) goto L9B925;
-    if (((unsigned)a1) <= 1) goto L9B93E;
-    if (a1 == 16) goto L9B951;
-    goto L9B964;
-L9B925:;
-    if (a1 != 0) goto L9B964;
+    switch ((unsigned)a1) {
+case 0:
     *(signed char *)D_001AA6A4 = 2;
     *(int *)D_001AA684 = (int)D_00188994;
     goto L9B96B;
-L9B93E:;
+case 1:
     *(signed char *)D_001AA6A4 = 4;
     *(int *)D_001AA684 = (int)D_0018899C;
     goto L9B96B;
-L9B951:;
+case 16:
     *(signed char *)D_001AA6A4 = 4;
     *(int *)D_001AA684 = (int)D_001889AC;
     goto L9B96B;
-L9B964:;
+default:
     *(signed char *)D_001AA6A4 = 0;
 L9B96B:;
     func_0009B97D(a1);
+}
 }
 
 void func_0009BAC1(void)

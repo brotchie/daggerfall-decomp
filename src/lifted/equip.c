@@ -134,24 +134,19 @@ void func_00061326(int);
 
 void func_0005E540(int a1, int a2, int a3)
 {
-    if (((unsigned)a1) < 5) goto L5E569;
-    if (((unsigned)a1) <= 5) goto L5E571;
-    if (a1 == 11) goto L5E58B;
-    goto L5E5A4;
-L5E569:;
-    if (a1 == 4) goto L5E57E;
-    goto L5E5A4;
-L5E571:;
+    switch ((unsigned)a1) {
+case 5:
     func_0006077F(a3, a2);
     return;
-L5E57E:;
+case 4:
     func_00060430(a3, a2);
     return;
-L5E58B:;
+case 11:
     func_0005DE74(287, 27, 8, a3);
     return;
-L5E5A4:;
+default:
     func_0005DE74((int)(unsigned short)*(short *)((char *)(int)(*(char **)(D_00185F88 + (a1 << 2)) + (a2 * 2))), (int)(short)*(short *)&a1, (int)(short)*(short *)&a2, a3);
+}
 }
 
 void func_0005E5D7(int a1, int a2)

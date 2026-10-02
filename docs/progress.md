@@ -1116,3 +1116,8 @@ Batch **1,927**; build **61.34%**.
   choice point. +9.
 - **Pointer plus constant**: `mov esi,[p]; add esi,14; add eax,esi` is `*(char **)p + 14 +
   i` (the pointer form puts the index in the other register). +8. Batch **1,972**.
+- **Switches on int variables**: Watcom compares an int (or unsigned) selector variable
+  itself, without the temp it copies a short or char selector into. The lifter recognises
+  such a compare tree by the binary search's repeated compare at its root (`cmp v,3; jb;
+  cmp v,3; jbe`), bounded to the run of compares and jumps (a case body may compare the
+  variable again); a choice point keeps the chain of ifs. +6. Batch **1,978**.

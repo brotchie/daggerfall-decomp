@@ -296,8 +296,6 @@ int func_0007461D(int a1)
     int l_24;
     int l_20;
     int l_1C;
-{
-    unsigned char l_2C;
 
     l_24 = func_0007DF35(*(int *)((char *)a1 + 4));
     if (((int)(unsigned char)*(signed char *)(*(char **)((char *)a1 + 4))) == 6) goto L74660;
@@ -317,25 +315,9 @@ L74682:;
     l_20 = 74;
 L746C8:;
     if (l_24 == 0) goto L748B6;
-    if (((unsigned)l_20) < 74) goto L74705;
-    if (((unsigned)l_20) <= 74) goto L7476A;
-    if (((unsigned)l_20) < 81) goto L74700;
-    if (((unsigned)l_20) <= 81) goto L747F9;
-    if (l_20 == 331) goto L74730;
-    goto L748B1;
-L74700:;
-    goto L748B1;
-L74705:;
-    if (((unsigned)l_20) < 56) goto L7472B;
-    if (((unsigned)l_20) <= 56) goto L74730;
-    if (((unsigned)l_20) < 71) goto L74726;
-    if (((unsigned)l_20) <= 72) goto L747F9;
-    goto L748B1;
-L74726:;
-    goto L748B1;
-L7472B:;
-    goto L748B1;
-L74730:;
+    switch ((unsigned)l_20) {
+case 56:
+case 331:
     if (((int)(unsigned short)(*(short *)(*(char **)D_00195BE0 + 64) & 1536)) == 0) goto L74756;
     func_0007CBA1((int)D_001761A0);
     goto L748B1;
@@ -343,13 +325,15 @@ L74756:;
     func_00086794(-1);
     func_00028C72();
     goto L748B1;
-L7476A:;
+case 74:
     if (((int)(unsigned short)(*(short *)(*(char **)D_00195BE0 + 64) & 1536)) == 0) goto L74790;
     func_0007CBA1((int)D_001761C4);
     goto L748B1;
 L74790:;
     if (((int)(unsigned char)*(signed char *)(*(char **)(*(char **)D_00195AA4 + 67))) != 1) goto L747E8;
     if (func_000CE45E((int)D_00187644, (int)(short)*(short *)((char *)l_24 + 18), 21) == 0) goto L747C4;
+{
+    unsigned char l_2C;
     l_2C = 1;
     goto L747C8;
 L747C4:;
@@ -364,7 +348,9 @@ L747E8:;
     *(signed char *)D_00196263 = 0;
 L747F4:;
     goto L748B1;
-L747F9:;
+case 71:
+case 72:
+case 81:
     if (l_20 != 72) goto L74805;
     if (l_1C == 3) goto L7480A;
 L74805:;
@@ -386,20 +372,15 @@ L7488B:;
     if (l_1C >= 4) goto L748B1;
     func_0007499C(*(int *)((char *)a1 + 4), l_24, *(int *)D_00195D54);
     return 1;
+default:
 L748B1:;
     goto L74988;
 L748B6:;
-    if (((unsigned)l_20) < 74) goto L748E1;
-    if (((unsigned)l_20) <= 74) goto L74922;
-    if (((unsigned)l_20) < 95) goto L748DC;
-    if (((unsigned)l_20) <= 95) goto L7492E;
-    if (l_20 == 331) goto L748EB;
-    goto L74988;
-L748DC:;
-    goto L74988;
-L748E1:;
-    if (l_20 != 56) goto L74988;
-L748EB:;
+}
+}
+    switch ((unsigned)l_20) {
+case 56:
+case 331:
     if (((int)(unsigned short)(*(short *)(*(char **)D_00195BE0 + 64) & 1536)) == 0) goto L74911;
     func_0007CBA1((int)D_001761E8);
     goto L74988;
@@ -407,10 +388,10 @@ L74911:;
     func_00086794(-1);
     func_00028C72();
     goto L74988;
-L74922:;
+case 74:
     func_0007CBA1((int)D_0017620C);
     goto L74988;
-L7492E:;
+case 95:
     if (*(int *)D_001959E8 == 0) goto L74943;
     func_0007DDC9(38);
     goto L7494A;
@@ -424,6 +405,7 @@ L7494A:;
 L74970:;
     func_00028BCD();
     func_00086D37((int)(unsigned short)*(short *)(*(char **)D_00195AC4 + 27));
+default:
 L74988:;
     return 0;
 }

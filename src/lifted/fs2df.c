@@ -37,26 +37,24 @@ void func_00036AA7(int a1)
     int l_1C;
     int l_18;
 
-    if (((unsigned)a1) < 2) goto L36ACC;
-    if (((unsigned)a1) <= 2) goto L36AF3;
-    if (a1 == 3) goto L36B15;
-    goto L36B39;
-L36ACC:;
-    if (a1 != 1) goto L36B39;
+    switch ((unsigned)a1) {
+case 1:
     func_00036C6F(*(int *)D_0019960C, *(int *)D_00199600, 0, 0);
     l_18 = *(int *)(*(char **)D_00199600 + 5);
     goto L36B39;
-L36AF3:;
+case 2:
     func_00036C6F(0, 0, 0, (int)(unsigned char)*(signed char *)(*(char **)D_001995F4 + 3));
     l_18 = *(int *)(*(char **)D_001995F4 + 4);
     goto L36B39;
-L36B15:;
+case 3:
     func_00036C6F(0, 0, *(int *)D_001995F0, (int)(unsigned char)*(signed char *)(*(char **)D_001995F0 + 10));
     l_18 = *(int *)(*(char **)D_001995F0 + 6);
+default:
 L36B39:;
     if (l_18 <= 0) return;
     *(short *)D_00199618 = func_00036A41(l_18);
     l_1C = (int)(*(char **)D_001995E8 + l_18);
+}
     switch ((unsigned char)(*(signed char *)((char *)l_1C + 20) & 63)) {
 case 1:
     if (*(int *)((char *)(*(int *)D_0019960C = (int)(*(char **)D_001995E8 + *(int *)((char *)l_1C + 21))) + 19) >= 0) goto L36BBB;
