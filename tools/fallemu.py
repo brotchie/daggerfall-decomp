@@ -83,6 +83,14 @@ def _old_exception_offset():
     return hits[0] if len(hits) == 1 else None
 
 
+def flush_caches(uc):
+    """After adding or removing hooks mid-run: Unicorn bakes code hooks into translated
+    blocks, and memory hooks are skipped by the TLB's fast path for pages already in it."""
+    from unicorn.unicorn_const import UC_CTL_TLB_FLUSH, UC_CTL_IO_WRITE
+    uc.ctl_flush_tb()
+    uc.ctl(UC_CTL_TLB_FLUSH, UC_CTL_IO_WRITE)
+
+
 OLD_EXCEPTION = _old_exception_offset()
 IN_HOOK_RESET = os.environ.get("FALLEMU_EXC_STOP") is None   # clear it inside the hook
 

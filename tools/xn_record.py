@@ -1,17 +1,19 @@
 #!/usr/bin/env python3
 """Record XnGine calls from the running game, and replay them in isolation.
 
-A record is everything one call depends on and everything it does:
-  - the registers and descriptors at entry,
-  - every byte it read before writing it (its input), anywhere in memory,
-  - the bytes of XnGine code that differ from FALL.EXE at entry (the self-modified state),
-  - the bytes it wrote (their final values), the registers at return, and its port I/O and
-    interrupts in order.
-Interrupts are held off while a call is recorded, so it runs as one piece.
+A record is one call's exact entry state and everything it does:
+  - its input: the 4 KB pages of memory that differ from the snapshot the recording started
+    from (that snapshot is the replay's base), plus registers, descriptors and the game's
+    exception handlers,
+  - its effect: every byte that differs after the call (memory before and after, compared),
+    the registers at return, and its port I/O and interrupts, with what each service returned.
+Interrupts are held off while a call is recorded, so it runs as one piece. Read hooks also
+note which bytes it read before writing them (a footprint of its inputs; Unicorn misses some
+reads inside self-modified blocks, so replay does not depend on it).
 
-Replay loads FALL.EXE fresh (tools/fallemu.py), puts back the input bytes, code state and
-registers, runs from the entry to the return, and compares writes, registers and I/O with the
-record. The asm must replay itself exactly; later the C versions must too.
+Replay restores the base snapshot and the record's pages, runs from the entry to the return
+with services and port reads answered as recorded, and compares. The asm must replay itself
+exactly; later the C versions must too.
 
 usage: xn_record.py record --load SNAPSHOT [--ticks N] [--script ...] [--per 2] [--out DIR]
        xn_record.py replay [DIR]
@@ -26,6 +28,7 @@ import pickle
 import struct
 import sys
 import time
+import zlib
 
 from unicorn import UC_HOOK_CODE, UC_HOOK_MEM_READ, UC_HOOK_MEM_WRITE
 
@@ -43,8 +46,10 @@ MAX_INSNS = 2_000_000       # longer calls are noted, not recorded
 
 
 def xngine_functions():
+    """Function entries to record: not the blocks seen only at run time (xngine_seeds.csv),
+    which are mostly places inside functions that the static walk missed."""
     with open(os.path.join(ROOT, "config", "xngine_functions.csv"), newline="") as f:
-        return [int(r["va"], 16) for r in csv.DictReader(f)]
+        return [int(r["va"], 16) for r in csv.DictReader(f) if r["found_by"] != "run time"]
 
 
 OBJ2 = (0xC0000, 0x161568)
@@ -69,6 +74,41 @@ def pristine_obj2():
     return bytes(buf)
 
 
+PAGE = 4096
+
+
+def memory(emu):
+    """(low memory, program memory) as bytes."""
+    return emu.read(0, fallemu.LOW), emu.read(LOAD, fallemu.MEM)
+
+
+def regions(mem):
+    return ((0, mem[0]), (LOAD, mem[1]))
+
+
+def changed_pages(mem, base):
+    """{linear address: page bytes} where mem differs from base."""
+    out = {}
+    for (origin, cur), (_o, ref) in zip(regions(mem), regions(base)):
+        a, b = memoryview(cur), memoryview(ref)
+        for k in range(0, len(cur), PAGE):
+            if a[k:k + PAGE] != b[k:k + PAGE]:
+                out[origin + k] = bytes(a[k:k + PAGE])
+    return out
+
+
+def changed_bytes(before, after):
+    """{linear address: new byte} for every byte that differs."""
+    out = {}
+    for page, data in changed_pages(after, before).items():
+        origin, buf = (0, before[0]) if page < LOAD else (LOAD, before[1])
+        old = buf[page - origin:page - origin + PAGE]
+        for j in range(len(data)):
+            if data[j] != old[j]:
+                out[page + j] = data[j]
+    return out
+
+
 def call_once(emu, entry_regs=None):
     """Run the call that starts at the current EIP to its return, with memory hooks that
     collect its input bytes and writes. Returns the record body."""
@@ -78,15 +118,16 @@ def call_once(emu, entry_regs=None):
     reads, written = {}, set()
     done = []
 
+    # one hook each: Unicorn calls hooks of a kind newest-first, so a pair of read hooks
+    # (mark, then fill in) loses bytes read only once. Read hooks run before the access, so
+    # memory still holds the value the instruction is about to read.
     def on_read(uc_, access, address, size, value, _):
         for a in range(address, address + size):
             if a not in written and a not in reads:
-                reads[a] = None          # filled in below, before the call changes it
+                reads[a] = bytes(uc_.mem_read(a, 1))[0]
 
     def on_write(uc_, access, address, size, value, _):
         for a in range(address, address + size):
-            if a not in written and a not in reads:
-                reads.setdefault(a, None)
             written.add(a)
 
     def on_ret(uc_, address, size, _):
@@ -94,23 +135,10 @@ def call_once(emu, entry_regs=None):
             done.append(True)
             uc_.emu_stop()
 
-    # the input bytes must be the values before the call; read hooks fire before the access,
-    # so take them from memory as the hook sees it
-    def on_read_value(uc_, access, address, size, value, _):
-        for a in range(address, address + size):
-            if a not in written and reads.get(a, 0) is None:
-                reads[a] = bytes(uc_.mem_read(a, 1))[0]
-
-    def on_write_value(uc_, access, address, size, value, _):
-        for a in range(address, address + size):
-            if reads.get(a, 0) is None:
-                reads[a] = bytes(uc_.mem_read(a, 1))[0]
-
-    hooks = [uc.hook_add(UC_HOOK_MEM_READ, on_read), uc.hook_add(UC_HOOK_MEM_READ, on_read_value),
-             uc.hook_add(UC_HOOK_MEM_WRITE, on_write_value),
-             uc.hook_add(UC_HOOK_MEM_WRITE, on_write),
+    before = memory(emu)
+    hooks = [uc.hook_add(UC_HOOK_MEM_READ, on_read), uc.hook_add(UC_HOOK_MEM_WRITE, on_write),
              uc.hook_add(UC_HOOK_CODE, on_ret, None, ret, ret)]
-    uc.ctl_flush_tb()       # code already translated would not call hooks added after it
+    fallemu.flush_caches(uc)    # translated code and the TLB would skip new hooks
     emu.io_log = []
     n = 0
     try:
@@ -122,12 +150,12 @@ def call_once(emu, entry_regs=None):
     finally:
         for h in hooks:
             uc.hook_del(h)
-        uc.ctl_flush_tb()
+        fallemu.flush_caches(uc)
         io, emu.io_log = emu.io_log, None
-    writes = {a: emu.read(a, 1)[0] for a in sorted(written)}
+    writes = changed_bytes(before, memory(emu))
     return {
         "returned": bool(done),
-        "reads": {a: v for a, v in reads.items() if v is not None},
+        "reads": reads,
         "writes": writes,
         "exit": {r: emu.r(r) for r in EXIT_REGS + ("eflags",)},
         "io": io,
@@ -135,8 +163,10 @@ def call_once(emu, entry_regs=None):
 
 
 class Recorder:
-    def __init__(self, emu, per=2, only=None):
+    def __init__(self, emu, per=2, only=None, base=None):
         self.emu, self.per = emu, per
+        self.base_path = base            # the snapshot emu was loaded from
+        self.base = memory(emu)
         self.funcs = only or xngine_functions()
         self.count = collections.Counter()
         self.records = []
@@ -171,9 +201,11 @@ class Recorder:
             emu.uc.hook_del(self.hooks.pop(f))
         live = emu.read(LOAD + OBJ2[0], OBJ2[1] - OBJ2[0])
         smc = {OBJ2[0] + k: live[k] for k in range(len(live)) if live[k] != self.pristine[k]}
+        pages = changed_pages(memory(emu), self.base)
         rec = {"func": f, "entry": {r: emu.r(r) for r in REGS}, "eip": emu.r("eip"),
                "sels": {s: tuple(v) for s, v in emu.sels.items()}, "smc": smc,
-               "exc": dict(emu.exc),
+               "exc": dict(emu.exc), "base": self.base_path,
+               "pages": zlib.compress(pickle.dumps(pages), 1),
                "tick": emu.ticks}
         t0 = time.time()
         self.recording = True
@@ -197,17 +229,30 @@ def load_records(d):
     return out
 
 
-def replay(rec, base=None, patch=None):
-    """Run one record again on a fresh machine. `patch(emu)` may replace the function's code
-    first (a C version). Returns a list of differences (empty: it matched)."""
-    emu = base or fallemu.Emu(overlay=os.path.join(ROOT, "build", "emu", "overlay_replay"))
+_bases = {}
+
+
+def base_machine(path):
+    """The snapshot a record was taken from, loaded once: (machine, its memory)."""
+    if path not in _bases:
+        emu = fallemu.Emu.load(path, overlay=os.path.join(ROOT, "build", "emu", "overlay_replay"))
+        _bases.clear()
+        _bases[path] = (emu, memory(emu))
+    return _bases[path]
+
+
+def replay(rec, patch=None):
+    """Run one record again from its exact entry state. `patch(emu)` may replace the
+    function's code first (a C version). Returns a list of differences (empty: it matched)."""
+    emu, (low, mem) = base_machine(rec["base"])
+    emu.write(0, low)
+    emu.write(LOAD, mem)
+    for a, page in pickle.loads(zlib.decompress(rec["pages"])).items():
+        emu.write(a, page)
+    emu.sels = {}
     for s, (b, lim, acc) in rec["sels"].items():
         emu.setsel(s, b, lim, acc)
-    emu.exc.update(rec.get("exc", {}))
-    for a, v in rec["smc"].items():
-        emu.write(LOAD + a, bytes([v]))
-    for a, v in rec["reads"].items():
-        emu.write(a, bytes([v]))
+    emu.exc = dict(rec.get("exc", {}))
     for r, v in rec["entry"].items():
         emu.w(r, v)
     emu.w("eip", rec["eip"])
@@ -253,7 +298,7 @@ def main():
     a = ap.parse_args()
     if a.cmd == "record":
         emu = fallemu.Emu.load(a.load, overlay=os.path.join(ROOT, "build", "emu", "overlay_record"))
-        rec = Recorder(emu, a.per)
+        rec = Recorder(emu, a.per, base=os.path.abspath(a.load))
         start = emu.ticks
         t0 = time.time()
         emu.run(start + a.ticks,
