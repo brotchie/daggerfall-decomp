@@ -639,6 +639,76 @@ index 23957dda5c..46b08cd7c4 100644
          leftp = BGUnary( O_POINTS, AddrCopy( left ), node->tipe );
          retv = BGAssign( retv, leftp, node->tipe );
          BGDone( BGOpGets( node->u1.t.op, left, rite, node->tipe, node->tipe ) );
+diff --git a/bld/cg/c/treefold.c b/bld/cg/c/treefold.c
+index dd3ef11ff7..b5696956e5 100644
+--- a/bld/cg/c/treefold.c
++++ b/bld/cg/c/treefold.c
+@@ -31,6 +31,8 @@
+ 
+ 
+ #include "_cgstd.h"
++#include <string.h>
++#include <stdlib.h>
+ #include "coderep.h"
+ #include "tree.h"
+ #include "zoiks.h"
+@@ -1346,6 +1348,46 @@ static bool IsObjectAddr( tn tree )
+     return( false );
+ }
+ 
++static bool DaggerStripConvert( cg_op opcode, tn base, tn rite )
++/****************************************************************
++ * Daggerfall: compare a widened byte/word against a constant at its own size? Open Watcom
++ * always does (`cmp byte ptr [x], K`); Watcom 10 at -od often compared the widened value
++ * (`xor eax,eax; mov al,[x]; cmp eax,K`) when the source converted explicitly (`(int)x`);
++ * a plain `x == K` is still narrowed by ResultType(). Rule from DAGGER_STRIP:
++ *   never (default at -od)  never strip an explicit conversion
++ *   ow            always strip (stock Open Watcom)
++ *   local         strip for locals only
++ *   eq            strip for == / != only
++ *   localeq0      strip for locals, or == / != against 0
++ */
++{
++    const char  *policy;
++    bool        local;
++    bool        eq;
++    bool        zero;
++
++    policy = getenv( "DAGGER_STRIP" );
++    if( _IsntModel( CGSW_GEN_NO_OPTIMIZATION ) )
++        return( true );
++    if( policy == NULL )
++        policy = "never";
++    if( strcmp( policy, "ow" ) == 0 )
++        return( true );
++    local = ( base->class == TN_LEAF && base->u.name->n.class == N_TEMP );
++    eq = ( opcode == O_EQ || opcode == O_NE );
++    zero = ( CFTest( rite->u.name->c.u.cfval ) == 0 );
++    if( strcmp( policy, "never" ) == 0 )
++        return( false );
++    if( strcmp( policy, "local" ) == 0 )
++        return( local );
++    if( strcmp( policy, "eq" ) == 0 )
++        return( eq );
++    if( strcmp( policy, "localeq0" ) == 0 )
++        return( local || ( eq && zero ) );
++    return( true );
++}
++
++
+ tn  FoldCompare( cg_op opcode, tn left, tn rite, const type_def *tipe )
+ /*********************************************************************/
+ {
+@@ -1445,7 +1487,8 @@ tn  FoldCompare( cg_op opcode, tn left, tn rite, const type_def *tipe )
+                     return( FoldCompare( opcode, IntToType( 1, TypeInteger ), IntToType( 0, TypeInteger ), TypeInteger ) );
+                 }
+             }
+-            if( ( base_l != left ) && (tipe->attr & TYPE_FLOAT) == 0 ) {
++            if( ( base_l != left ) && (tipe->attr & TYPE_FLOAT) == 0
++              && DaggerStripConvert( opcode, base_l, rite ) ) {
+                 // If we couldn't fold the comparison, get rid of some lame converts
+                 // the C++ compiler likes to emit. Careful with floats!
+                 BurnToBase( left, base_l );
 diff --git a/bld/cg/h/bldcall.h b/bld/cg/h/bldcall.h
 index bb42328d26..d33b42b56b 100644
 --- a/bld/cg/h/bldcall.h

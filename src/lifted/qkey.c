@@ -2,6 +2,7 @@
  * do not edit: move a function to src/qkey.c to work on it by hand) */
 
 extern char D_00195AF4[];
+extern char D_00195B50[];
 
 
 int func_0002E8AE(int a1, int a2)
@@ -11,10 +12,37 @@ int func_0002E8AE(int a1, int a2)
     l_18 = a2;
     *(short *)((char *)a1 + 124) += a2;
     if (*(short *)((char *)a1 + 124) <= *(short *)((char *)a1 + 126)) goto L2E902;
-    l_18 -= ((short)*(short *)((char *)a1 + 124)) - ((short)*(short *)((char *)a1 + 126));
+    l_18 -= ((int)(short)*(short *)((char *)a1 + 124)) - ((int)(short)*(short *)((char *)a1 + 126));
     *(short *)((char *)a1 + 124) = *(short *)((char *)a1 + 126);
 L2E902:;
     return l_18;
+}
+
+void func_0002EBDE(int a1)
+{
+    int l_18;
+
+    if (((int)(unsigned char)*(signed char *)((char *)a1)) != 2) return;
+    l_18 = a1 + 71;
+    if (((int)(short)*(short *)((char *)l_18 + 67)) != 26) goto L2EC23;
+    if (((int)(short)*(short *)((char *)l_18 + 69)) == 9) goto L2EC25;
+L2EC23:;
+    goto L2EC2E;
+L2EC25:;
+    if (*(int *)((char *)a1 + 63) == 0) goto L2EC30;
+L2EC2E:;
+    goto L2EC3A;
+L2EC30:;
+    *(int *)D_00195B50 = a1;
+    return;
+L2EC3A:;
+    if (((int)(unsigned short)*(short *)((char *)l_18 + 32)) != 27) goto L2EC5C;
+    if (((int)(unsigned short)*(short *)((char *)l_18 + 34)) == 1) goto L2EC5E;
+L2EC5C:;
+    return;
+L2EC5E:;
+    if (*(int *)((char *)a1 + 63) != 0) return;
+    *(int *)D_00195B50 = a1;
 }
 
 void func_0002EC79(int a1)

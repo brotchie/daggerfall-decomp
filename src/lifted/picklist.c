@@ -41,7 +41,7 @@ L8CFCD:;
 void func_0008D45A(int a1, short a2)
 {
 L8D46D:;
-    if (func_0005A4A9(a1) <= ((short)a2)) return;
+    if (func_0005A4A9(a1) <= ((int)(short)a2)) return;
     *(signed char *)((char *)(func_000A0DF4(a1) + a1) - 1) = 0;
     goto L8D46D;
 }

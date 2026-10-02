@@ -484,3 +484,40 @@ flagged `DAGGER_KEEP` in `TNPostGets()` (`cg/c/tree.c`):
 
 The flagged temp now gets a register. `DAGGER_DEADDEF=1` restores OW. Batch: **789 / 2,297**
 (738 without).
+
+## 2026-10-01: compiler fix for widened compares (+247 functions, 20% of game code)
+
+**Found with a debug build of the compiler.** `third_party/ow-debug` is a git worktree of the
+same OW tree built with `OWDEBUGBUILD=1` (no optimisation, symbols), so lldb shows locals.
+Breakpoints walked the compare from the front end to the instruction: `TGCompare()` builds an
+`int` compare with a proper `O_CONVERT` node, then `FoldCompare()` (`cg/c/treefold.c`) calls
+`BurnToBase()` to "get rid of some lame converts the C++ compiler likes to emit", which
+compares the byte at its own size.
+
+The fix, `DaggerStripConvert()`, makes that strip a policy, and the batch measured each
+candidate rule (`DAGGER_STRIP=ow|never|local|eq|localeq0`). The rule that matches Watcom 10
+is the simplest: **never strip an explicit conversion at `-od`**. A plain `x == K` is still
+narrowed by `ResultType()`, so both of the original's forms are reachable from C:
+
+| C | Code |
+|---|---|
+| `x == 1` | `cmp byte ptr [x], 1` |
+| `(int)x == 1` | `xor eax,eax; mov al,[x]; cmp eax,1` |
+
+The lifter now writes widened values with an explicit cast (`(int)(unsigned char)x`,
+`(int)(signed char)x`, `(int)(short)x`). The same widened shape turns up in arithmetic and call
+arguments too, which is why the gain is much larger than the compare cluster suggested.
+
+Batch: **1,040 / 2,297** (793 before). Build: **1,044 / 2,297 game functions, 118,554 /
+580,076 bytes (20.44%), `build/FALL.EXE: OK`** (also with `--blank`).
+
+Also from the batch, new clusters to look at next:
+
+- **Short stack variables are stored as full dwords**: `mov [x], eax` 1,780 times against
+  `mov word ptr [x], ax` 5 times. OW stores a word.
+- **Locals are pushed through `eax`**: `mov eax,[x]; push eax` 133 times against `push [x]` 9
+  times, while globals are pushed directly (70).
+- Pointer arithmetic: an `add` whose result is used as a base is emitted as `char *`
+  arithmetic, so OW loads the base pointer into a register as Watcom 10 did (+4). One remaining
+  shape (`add eax,edx` versus OW's `add edx,eax`) is register allocation and has no C-level
+  fix.

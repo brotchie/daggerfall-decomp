@@ -16,9 +16,23 @@ extern int func_00069938(int, int, int);
 extern int func_000A0024();
 extern int func_000A0040();
 extern int func_000A1079();
-extern void func_00062FBE(int);
 extern void func_00073DF9(int, int);
 extern void func_0008E3F7(int, int);
+void func_00062FBE(int);
+
+int func_0006299F(int a1)
+{
+    a1 = *(int *)((char *)a1 + 63);
+L629B9:;
+    if (a1 == 0) goto L629E4;
+    if (((int)(unsigned char)*(signed char *)((char *)a1)) != 22) goto L629D9;
+    return *(int *)((char *)a1 + 63);
+L629D9:;
+    a1 = *(int *)((char *)a1 + 55);
+    goto L629B9;
+L629E4:;
+    return 0;
+}
 
 void func_00062EBE(int a1, int a2)
 {
@@ -54,6 +68,15 @@ L62F7D:;
 L62FA1:;
     *(int *)((char *)a3) = -1;
     return a1 - a2;
+}
+
+void func_00062FBE(int a1)
+{
+    int l_18;
+
+    if (((int)(unsigned char)*(signed char *)((char *)a1)) != 18) return;
+    l_18 = a1 + 71;
+    *(signed char *)(D_00190FE4 + ((int)(unsigned char)*(signed char *)((char *)l_18 + 75))) = 1;
 }
 
 int func_00063003(void)

@@ -28,8 +28,8 @@ L517A3:;
 L517A5:;
     *(short *)D_00190D64 += *(int *)&a2;
 L517AF:;
-    *(int *)D_001959AC = (short)(*(short *)D_00190D64 & 7);
-    func_000CD126(*(int *)((char *)(((((short)(*(short *)D_00190D64 & 15)) >> 3) << 2) + a1)), 0, 119);
+    *(int *)D_001959AC = (int)(short)(*(short *)D_00190D64 & 7);
+    func_000CD126(*(int *)((char *)(((((int)(short)(*(short *)D_00190D64 & 15)) >> 3) << 2) + a1)), 0, 119);
 }
 
 void func_000517EC(short a1)
@@ -39,5 +39,5 @@ void func_000517EC(short a1)
     func_000A1944((int)l_44, 0, 44);
     *(short *)l_44 = 16;
     func_0006998C(18);
-    func_00051B3E(*(int *)(D_001852A3 + (((short)a1) << 2)), (int)l_44);
+    func_00051B3E(*(int *)(D_001852A3 + (((int)(short)a1) << 2)), (int)l_44);
 }

@@ -28,16 +28,16 @@ void func_00021597(void)
 {
     int l_18;
 
-    *(short *)(D_0018F08E + (((unsigned char)*(signed char *)D_00196268) * 80)) -= *(short *)(D_00179EA8 + (((unsigned char)*(signed char *)D_0019627E) << 2));
-    l_18 = func_000191DA((short)((unsigned char)*(signed char *)D_00196268), 15);
-    func_0001B470(l_18, -(*(int *)(D_00179EA8 + (((unsigned char)*(signed char *)D_0019627E) << 2)) >> 1));
+    *(short *)(D_0018F08E + (((int)(unsigned char)*(signed char *)D_00196268) * 80)) -= *(short *)(D_00179EA8 + (((int)(unsigned char)*(signed char *)D_0019627E) << 2));
+    l_18 = func_000191DA((int)(short)((int)(unsigned char)*(signed char *)D_00196268), 15);
+    func_0001B470(l_18, -(*(int *)(D_00179EA8 + (((int)(unsigned char)*(signed char *)D_0019627E) << 2)) >> 1));
 }
 
 void func_00021680(void)
 {
     int l_18;
 
-    l_18 = (unsigned short)*(short *)((char *)*(int *)D_00195BE0 + 155);
+    l_18 = (int)(unsigned short)*(short *)((char *)*(int *)D_00195BE0 + 155);
     func_0004AB2F(240);
     *(short *)((char *)*(int *)D_00195BE0 + 155) = l_18;
     *(signed char *)D_00187CA8 = 1;

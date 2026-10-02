@@ -42,6 +42,6 @@ void func_0008C566(int a1, int a2)
 void func_0008CA25(int a1)
 {
     if (*(signed char *)((char *)a1) == 0) return;
-    func_00144E84((short)*(short *)((char *)a1 + 5), (short)*(short *)((char *)a1 + 7), (short)*(short *)((char *)a1 + 9), (short)*(short *)((char *)a1 + 11), *(int *)((char *)a1 + 51), 0);
-    func_00144E84((short)*(short *)((char *)a1 + 29), (short)*(short *)((char *)a1 + 31), (short)*(short *)((char *)a1 + 33), (short)*(short *)((char *)a1 + 35), *(int *)((char *)a1 + 55), 0);
+    func_00144E84((int)(short)*(short *)((char *)a1 + 5), (int)(short)*(short *)((char *)a1 + 7), (int)(short)*(short *)((char *)a1 + 9), (int)(short)*(short *)((char *)a1 + 11), *(int *)((char *)a1 + 51), 0);
+    func_00144E84((int)(short)*(short *)((char *)a1 + 29), (int)(short)*(short *)((char *)a1 + 31), (int)(short)*(short *)((char *)a1 + 33), (int)(short)*(short *)((char *)a1 + 35), *(int *)((char *)a1 + 55), 0);
 }

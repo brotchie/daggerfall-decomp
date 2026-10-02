@@ -424,7 +424,7 @@ class Func:
                 v = self.src(s, ins)
                 cur = self.regs.get(full)
                 if sz < 4 and cur is not None and cur.text == "0":
-                    self.set_reg(full, E("(%s)%s" % (UTYPE[sz], v.p()), 4))
+                    self.set_reg(full, E("(int)(%s)%s" % (UTYPE[sz], v.p()), 4))
                 elif sz < 4:
                     self.set_reg(full, E(v.text, sz, v.atom))
                 else:
@@ -445,11 +445,11 @@ class Func:
             full, _ = subreg(ins.reg_name(d.reg))
             v = self.src(s, ins)
             t = (STYPE if m == "movsx" else UTYPE)[s.size]
-            self.set_reg(full, E("(%s)%s" % (t, v.p()), 4))
+            self.set_reg(full, E("(int)(%s)%s" % (t, v.p()), 4))
             return
         if m == "cwde":
             v = self.reg("eax", ins)
-            self.set_reg("eax", E("(short)" + v.p(), 4))
+            self.set_reg("eax", E("(int)(short)" + v.p(), 4))
             return
         if m == "cdq":
             v = self.reg("eax", ins)
@@ -505,7 +505,7 @@ class Func:
                 b = self.src(s, ins)
                 if m == "and" and s.type == cx.X86_OP_IMM and sz == 4 and s.imm in (0xFF, 0xFFFF):
                     t = "unsigned char" if s.imm == 0xFF else "unsigned short"
-                    self.set_reg(full, E("(%s)%s" % (t, a.p()), 4))
+                    self.set_reg(full, E("(int)(%s)%s" % (t, a.p()), 4))
                     return
                 # signed division by 2: X - (X >> 31), then >> 1
                 if m == "sar" and s.type == cx.X86_OP_IMM and s.imm == 31:
@@ -529,6 +529,16 @@ class Func:
                     return
                 if m == "shr":
                     a = E("(unsigned)" + a.p(), 4)
+                if m == "add" and s.type == cx.X86_OP_REG and self.used_as_base(full):
+                    # pointer arithmetic: the operand loaded from memory is the base pointer
+                    # (as char *, -od keeps it in a register: mov edx,[p]; add eax,edx)
+                    pa, pb = (b, a) if self.loaded_ptr(b) and not self.loaded_ptr(a) else (a, b)
+                    ptxt = ("*(char **)" + pa.text[len("*(int *)"):]) if self.loaded_ptr(pa) \
+                        else "(char *)" + pa.p()
+                    v = E("(int)(%s + %s)" % (ptxt, pb.p()), 4, atom=True)
+                    self.set_reg(full, v)
+                    self.flags = ("val", v, None)
+                    return
                 v = E("%s %s %s" % (a.p(), opch, b.p()), max(sz, 1))
                 self.set_reg(full, v)
                 self.flags = ("val", v, None)
@@ -668,6 +678,25 @@ class Func:
             self.flags = None
             return
         raise Unsupported("instruction %s" % m)
+
+    def used_as_base(self, reg):
+        """Is `reg` next read as the base of a memory operand (so it holds a pointer)?"""
+        for ins in self.body[self.k + 1:]:
+            for op in ins.operands:
+                if op.type == cx.X86_OP_MEM and op.mem.base and \
+                        SUB.get(ins.reg_name(op.mem.base), (None,))[0] == reg:
+                    return True
+                if op.type == cx.X86_OP_REG and \
+                        SUB.get(ins.reg_name(op.reg), (None,))[0] == reg:
+                    return False
+            if ins.mnemonic in ("call", "ret") or ins.mnemonic.startswith("j"):
+                return False
+        return False
+
+    @staticmethod
+    def loaded_ptr(e):
+        """A dword read straight from memory: the likely pointer operand of an add."""
+        return e.atom and e.text.startswith("*(int *)")
 
     def finish_call(self, call, nargs):
         """After a call: eax holds the result; callee-saved registers that were not

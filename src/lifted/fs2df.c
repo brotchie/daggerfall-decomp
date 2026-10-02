@@ -5,7 +5,7 @@
 
 void func_00036F18(int a1)
 {
-    *(short *)((char *)a1 + 7) = ((unsigned char)*(signed char *)((char *)a1 + 4)) << 3;
+    *(short *)((char *)a1 + 7) = ((int)(unsigned char)*(signed char *)((char *)a1 + 4)) << 3;
     *(signed char *)((char *)a1 + 4) = ((*(signed char *)((char *)a1 + 9) - 2) ^ 1) + 1;
     *(short *)((char *)a1 + 5) = 50;
     *(signed char *)((char *)a1 + 9) = 1;

@@ -17,7 +17,7 @@ void func_00013A52(void)
 {
     if (*(signed char *)D_00142333 == 0) return;
     func_000A0ED9(44, (int)D_00170194);
-    func_000A0F5C((int)D_0019645A, (int)D_0017019D, (short)*(short *)D_00196458);
+    func_000A0F5C((int)D_0019645A, (int)D_0017019D, (int)(short)*(short *)D_00196458);
     func_00013AB6((int)D_0019645A);
 L13A9C:;
     if (*(signed char *)D_00142333 == 0) return;

@@ -2,12 +2,20 @@
  * do not edit: move a function to src/sound.c to work on it by hand) */
 
 extern char D_00175ACC[];
+extern char D_001789FA[];
 extern char D_00186DEC[];
 extern char D_0018DC34[];
 extern char D_0018DD54[];
 extern char D_0018DD60[];
+extern char D_00195AA4[];
 extern char D_00195CB4[];
+extern char D_00195E2A[];
+extern char D_00196280[];
 extern char D_001A3BD8[];
+extern char D_001A3EFC[];
+extern char D_001A3F08[];
+extern char D_001A3F18[];
+extern char D_001A3F1C[];
 extern char D_001A3F20[];
 extern char D_001A3F24[];
 extern char D_001A3F28[];
@@ -25,6 +33,7 @@ extern char D_001A3F98[];
 extern char D_001A3F9C[];
 
 extern int func_00011870(int, ...);
+extern int func_0001FFF1(void);
 extern int func_00068F5E(int, int, int, int);
 extern int func_000694B8(int, int);
 extern int func_00085A51(int);
@@ -44,6 +53,7 @@ extern int func_000A27A0();
 extern int func_000A2857();
 extern void func_00069DAA(void);
 extern void func_00099490(int);
+int func_00069A62(int, int, int);
 void func_000696A3(int);
 void func_000697E3(void);
 
@@ -59,7 +69,7 @@ int func_000696F9(int a1)
     if (*(int *)(D_001A3BD8 + (a1 * 268)) != 305419896) goto L69726;
     return 1;
 L69726:;
-    return (short)func_000A2460(*(int *)D_0018DD60, *(int *)(D_001A3BD8 + (a1 * 268)));
+    return (int)(short)func_000A2460(*(int *)D_0018DD60, *(int *)(D_001A3BD8 + (a1 * 268)));
 }
 
 void func_0006974E(int a1)
@@ -170,6 +180,71 @@ void func_00069B53(int a1)
 {
     if (*(signed char *)D_001A3F5D == 0) return;
     func_0009E61A(a1);
+}
+
+void func_00069B7F(void)
+{
+    if (((int)(unsigned char)*(signed char *)D_001789FA) != 1) goto L69C7A;
+    if (*(int *)D_001A3F28 == 0) goto L69BBA;
+    func_000696A3(*(int *)D_001A3F28);
+    *(int *)D_001A3F28 = 0;
+L69BBA:;
+    if (((int)(unsigned char)(*(signed char *)(D_00195E2A + func_0001FFF1()) & 127)) != 4) goto L69BF6;
+    if (*(int *)D_001A3F20 != 0) goto L69BF4;
+    *(int *)D_001A3F20 = func_00069A62(385, *(int *)D_00195AA4, 100);
+L69BF4:;
+    goto L69C13;
+L69BF6:;
+    if (*(int *)D_001A3F20 == 0) goto L69C13;
+    func_000696A3(*(int *)D_001A3F20);
+    *(int *)D_001A3F20 = 0;
+L69C13:;
+    if (*(signed char *)D_00196280 != 0) goto L69C31;
+    if (((int)(unsigned char)*(signed char *)(D_00195E2A + func_0001FFF1())) < 2) goto L69C33;
+L69C31:;
+    goto L69C58;
+L69C33:;
+    if (*(int *)D_001A3F24 != 0) goto L69C56;
+    *(int *)D_001A3F24 = func_00069A62(375, *(int *)D_00195AA4, 100);
+L69C56:;
+    goto L69C75;
+L69C58:;
+    if (*(int *)D_001A3F24 == 0) goto L69C75;
+    func_000696A3(*(int *)D_001A3F24);
+    *(int *)D_001A3F24 = 0;
+L69C75:;
+    return;
+L69C7A:;
+    if (*(int *)D_001A3F20 == 0) goto L69C97;
+    func_000696A3(*(int *)D_001A3F20);
+    *(int *)D_001A3F20 = 0;
+L69C97:;
+    if (*(int *)D_001A3F24 == 0) goto L69CB4;
+    func_000696A3(*(int *)D_001A3F24);
+    *(int *)D_001A3F24 = 0;
+L69CB4:;
+    if (*(int *)D_001A3F18 >= 300) goto L69CC9;
+    if (*(int *)D_001A3F28 == 0) goto L69CCB;
+L69CC9:;
+    goto L69CD7;
+L69CCB:;
+    if (*(int *)D_001A3EFC == 305419896) goto L69CD9;
+L69CD7:;
+    goto L69CF5;
+L69CD9:;
+    *(int *)D_001A3F28 = func_00069A62(242, *(int *)D_001A3F1C, 100);
+    return;
+L69CF5:;
+    if (*(int *)D_001A3F28 == 0) goto L69D0A;
+    if (*(int *)D_001A3F18 >= 300) goto L69D0C;
+L69D0A:;
+    goto L69D22;
+L69D0C:;
+    func_000696A3(*(int *)D_001A3F28);
+    *(int *)D_001A3F28 = 0;
+    return;
+L69D22:;
+    *(int *)D_001A3F08 = *(int *)D_001A3F1C;
 }
 
 void func_00069D36(void)

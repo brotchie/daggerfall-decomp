@@ -17,7 +17,7 @@ L14461:;
     l_18++;
     goto L14452;
 L14469:;
-    l_1C = func_00014096(a1, (short)*(short *)&l_18);
+    l_1C = func_00014096(a1, (int)(short)*(short *)&l_18);
     if (l_1C != a2) goto L14488;
     return l_18;
 L14488:;

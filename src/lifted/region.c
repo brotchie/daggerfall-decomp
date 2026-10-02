@@ -30,5 +30,5 @@ L1FF17:;
 
 int func_0001FFF1(void)
 {
-    return (unsigned char)*(signed char *)(D_00179D74 + ((unsigned char)*(signed char *)D_0019627B));
+    return (int)(unsigned char)*(signed char *)(D_00179D74 + ((int)(unsigned char)*(signed char *)D_0019627B));
 }

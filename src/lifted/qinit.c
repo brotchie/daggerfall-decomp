@@ -2,8 +2,14 @@
  * do not edit: move a function to src/qinit.c to work on it by hand) */
 
 extern char D_00170A64[];
+extern char D_001940D5[];
+extern char D_00195A98[];
+extern char D_00195AA4[];
 extern char D_00195AC4[];
+extern char D_00196268[];
 extern char D_00196299[];
+extern char D_00196710[];
+extern char D_0019672C[];
 
 extern int func_00033EE7(int, int);
 extern int func_0007D6AE(int, int);
@@ -13,6 +19,7 @@ extern int func_0008DD46(int, int);
 extern int func_0008EB88(int);
 extern int func_000A1023();
 extern void func_00078DDD(int);
+extern void func_000876AD(unsigned char, unsigned char, int, int);
 
 void func_00033764(int a1, int a2)
 {
@@ -36,6 +43,35 @@ void func_000340A2(int a1, int a2)
     *(int *)((char *)l_14 + 51) = 0;
 L340DC:;
     func_00033EE7(l_14, *(int *)((char *)a2 + 37));
+}
+
+void func_000340F3(int a1, int a2)
+{
+    int l_20;
+    int l_1C;
+    int l_18;
+    int l_14;
+
+    if (*(int *)((char *)a2 + 28) != (-1)) goto L3419A;
+    l_1C = *(int *)((char *)a2 + 47);
+    func_000876AD((int)(unsigned char)*(signed char *)D_00196268, 3, (int)(unsigned short)*(short *)((char *)l_1C + 27), (int)(unsigned short)*(short *)((char *)l_1C + 29));
+    l_1C = *(int *)((char *)*(int *)((char *)a2 + 47) + 51);
+    if (l_1C == 0) goto L34198;
+    *(int *)((char *)*(int *)D_00195AA4 + 7) = *(int *)((char *)l_1C + 7);
+    *(int *)((char *)*(int *)D_00195AA4 + 11) = *(int *)((char *)l_1C + 11);
+    *(int *)((char *)*(int *)D_00195AA4 + 15) = *(int *)((char *)l_1C + 15);
+    *(short *)((char *)*(int *)D_00195AA4 + 3) = *(short *)((char *)*(int *)D_00195A98 + 3);
+    *(signed char *)D_001940D5 |= 2;
+L34198:;
+    return;
+L3419A:;
+    l_1C = *(int *)((char *)a2 + 32);
+    if (((int)(unsigned char)*(signed char *)((char *)l_1C)) == 65) return;
+    if (*(int *)((char *)l_1C + 51) == 0) goto L341C6;
+    func_0008DA91(*(int *)((char *)l_1C + 51));
+L341C6:;
+    *(int *)((char *)l_1C + 51) = 0;
+    func_00033EE7(l_1C, *(int *)((char *)a2 + 37));
 }
 
 void func_000341E7(int a1, int a2)
@@ -88,4 +124,45 @@ L344A1:;
     return 0;
 L344B0:;
     return *(int *)((char *)((func_0007D6AE(0, l_1C - 1) << 2) + a1));
+}
+
+int func_000344D3(void)
+{
+    int l_20;
+    int l_1C;
+
+    l_20 = 0;
+    l_1C = l_20;
+L344EE:;
+    if (l_20 < *(int *)D_00196710) goto L34503;
+    goto L3451E;
+L344FB:;
+    l_20++;
+    goto L344EE;
+L34503:;
+    if (*(short *)((char *)(int)(*(char **)D_0019672C + (l_20 * 92)) + 29) >= 0) goto L3451C;
+    l_1C++;
+L3451C:;
+    goto L344FB;
+L3451E:;
+    if (l_1C != 0) goto L34530;
+    return 0;
+L34530:;
+    l_1C = func_0007D6AE(0, l_1C - 1);
+    l_20 = 0;
+L34545:;
+    if (l_20 < *(int *)D_00196710) goto L3455A;
+    goto L34591;
+L34552:;
+    l_20++;
+    goto L34545;
+L3455A:;
+    if (*(short *)((char *)(int)(*(char **)D_0019672C + (l_20 * 92)) + 29) >= 0) goto L34552;
+    if (l_1C != 0) goto L34589;
+    return (int)(unsigned short)*(short *)((char *)(int)(*(char **)D_0019672C + (l_20 * 92)) + 33);
+L34589:;
+    l_1C--;
+    goto L34552;
+L34591:;
+    return 0;
 }

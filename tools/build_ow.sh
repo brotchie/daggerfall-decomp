@@ -12,6 +12,7 @@
 #   cg bldcall.c, intrface.c, generate.c: -od stack slots in Watcom 10 order (DAGGER_FIRSTUSE=1)
 #   cg makeaddr.c MakeGets(): `x = x + 1` keeps its temp, no in-place inc at -od (DAGGER_RMW=1)
 #   cg tree.c, optimize.c, regalloc.c: an unused `x++` still loads x into a register (DAGGER_DEADDEF=1)
+#   cg treefold.c FoldCompare(): an explicit (int)x compared to a constant stays wide (DAGGER_STRIP=ow)
 #
 # Output: third_party/open-watcom-v2/build/binbuild/{bwcc386,bwlink,bwasm,bwlib}
 set -eu

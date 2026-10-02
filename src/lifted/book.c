@@ -42,12 +42,12 @@ void func_0005A230(void);
 void func_00059B7B(short a1)
 {
     func_000A0ED9(37, (int)D_001757A8);
-    func_000A0F5C((int)D_001903A4, (int)D_001757AF, (short)a1);
+    func_000A0F5C((int)D_001903A4, (int)D_001757AF, (int)(short)a1);
     *(short *)D_00199D5A = func_0006CD6E((int)D_001903A4);
-    func_000A00CB((short)*(short *)D_00199D5A, (int)D_00199C70, 234);
-    func_000A00CB((short)*(short *)D_00199D5A, (int)D_00199D60, 2);
-    *(int *)D_00199C6C = func_000A00AF(((short)*(short *)D_00199D60) << 2, (int)D_001757A8, 43);
-    func_000A00CB((short)*(short *)D_00199D5A, *(int *)D_00199C6C, ((short)*(short *)D_00199D60) << 2);
+    func_000A00CB((int)(short)*(short *)D_00199D5A, (int)D_00199C70, 234);
+    func_000A00CB((int)(short)*(short *)D_00199D5A, (int)D_00199D60, 2);
+    *(int *)D_00199C6C = func_000A00AF(((int)(short)*(short *)D_00199D60) << 2, (int)D_001757A8, 43);
+    func_000A00CB((int)(short)*(short *)D_00199D5A, *(int *)D_00199C6C, ((int)(short)*(short *)D_00199D60) << 2);
     *(int *)D_00195BE8 = func_0006CB53((int)D_001757C1, 0);
     func_0005A230();
     *(short *)D_00199D5C = 0;
@@ -64,7 +64,7 @@ void func_0005A230(void)
 
     l_18 = 0;
 L5A245:;
-    if (((short)*(short *)D_00199D5E) > l_18) goto L5A25B;
+    if (((int)(short)*(short *)D_00199D5E) > l_18) goto L5A25B;
     goto L5A2AB;
 L5A253:;
     l_18++;
@@ -85,7 +85,7 @@ L5A2AB:;
 
 void func_0005A54A(int a1, short a2, short a3)
 {
-    func_0012DBCC((short)a2, (short)a3, a1);
+    func_0012DBCC((int)(short)a2, (int)(short)a3, a1);
 }
 
 void func_0005A661(int a1, int a2, int a3, int a4)

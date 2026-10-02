@@ -2,19 +2,90 @@
  * do not edit: move a function to src/pickbook.c to work on it by hand) */
 
 extern char D_0012B508[];
+extern char D_00143550[];
+extern char D_00170DE4[];
+extern char D_00170DF7[];
+extern char D_00170E04[];
 extern char D_00178A0A[];
+extern char D_00184876[];
+extern char D_00187CA8[];
+extern char D_001940D4[];
+extern char D_001940D8[];
+extern char D_00195AA4[];
+extern char D_00195B58[];
+extern char D_00195BE8[];
+extern char D_00195D60[];
+extern char D_00195D7C[];
+extern char D_0019626F[];
+extern char D_00196272[];
 extern char D_00196274[];
+extern char D_001996F8[];
 extern char D_001A9AB8[];
 
 extern int func_00041D27(void);
 extern int func_00042112(void);
 extern int func_00042F0F();
+extern int func_00069938(int, int, int);
+extern int func_0006CB53(int, int);
 extern int func_0008DA91(int);
+extern int func_000A00AF();
+extern int func_000A1023();
+extern int func_0012DB50();
 extern void func_0003C4DE(void);
 extern void func_0003F09F(short, int);
 extern void func_0004204E(short);
+extern void func_0007CB4F(int);
 extern void func_0008CF0E(int);
 extern void func_0008E152(int, int);
+
+int func_000417C8(short a1)
+{
+    int l_20;
+
+    if (((int)(unsigned char)*(signed char *)D_0019626F) != 5) goto L417F1;
+    if (((int)(unsigned char)*(signed char *)D_00196274) == 8) goto L417F3;
+L417F1:;
+    goto L417FF;
+L417F3:;
+    return 1;
+L417FF:;
+    if (*(int *)D_00195D7C <= 0) goto L41814;
+    return 0;
+L41814:;
+    if (a1 != 0) goto L41837;
+    if (*(signed char *)D_00196274 != 0) goto L41832;
+    if (func_00042F0F(28) != 0) goto L41837;
+L41832:;
+    goto L4190D;
+L41837:;
+    if (*(int *)D_00195D60 == 0) goto L41856;
+    func_0007CB4F(*(int *)D_00184876);
+    return 0;
+L41856:;
+    func_0012DB50(4);
+    *(signed char *)D_001940D8 &= 254;
+    if (func_00042112() != 0) goto L4187C;
+    return 0;
+L4187C:;
+    *(signed char *)D_001940D4 |= 128;
+    *(signed char *)D_00187CA8 = 0;
+    *(signed char *)D_001940D8 |= 2;
+    *(int *)D_001996F8 = func_000A00AF(64000, (int)D_00170DE4, 101);
+    func_000A1023(*(int *)D_001996F8, *(int *)D_00143550, 64000, (int)D_00170DE4, 102, 4);
+    *(signed char *)D_00196274 = 5;
+    *(int *)D_00195BE8 = func_0006CB53((int)D_00170DF7, 0);
+    *(int *)D_00195B58 = func_0006CB53((int)D_00170E04, 0);
+    *(signed char *)D_00196272 = 1;
+    func_00069938(237, *(int *)D_00195AA4, 100);
+L4190D:;
+    if (((int)(unsigned char)*(signed char *)D_00196274) != 5) goto L41922;
+    l_20 = 1;
+    goto L41929;
+L41922:;
+    l_20 = 0;
+L41929:;
+    return l_20;
+}
 
 void func_000420AF(void)
 {

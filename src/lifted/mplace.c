@@ -61,6 +61,6 @@ L26539:;
     l_18++;
     goto L2652F;
 L26541:;
-    func_000266C7((unsigned char)*(signed char *)(D_0017A028 + (func_0009DC25() & 3)));
+    func_000266C7((int)(unsigned char)*(signed char *)(D_0017A028 + (func_0009DC25() & 3)));
     goto L26539;
 }
