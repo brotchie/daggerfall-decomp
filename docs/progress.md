@@ -1224,3 +1224,7 @@ Batch **1,927**; build **61.34%**.
   turns a written `* 6` into imul). +2. The compiler no longer merges adjacent constant
   byte/word stores (`buf[0] = '0'; buf[1] = 'x'` stays two stores, as in FALL.EXE;
   `DAGGER_MERGESTORES` restores OW's merge). Batch **2,122**.
+- The last argument register is not an argument when its value was already used (an index
+  added into the first argument's register): a choice point, by default not. A pointer
+  post-increment whose old value is a call argument (`f(a, b, p++)`) is recognised. +1.
+  Batch **2,123**.

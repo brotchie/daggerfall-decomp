@@ -371,6 +371,36 @@ L3598A:;
 }
 }
 
+void func_000359B4(int a1)
+{
+    int l_18;
+
+    a1 = ((unsigned)a1) % 1440;
+    if (((unsigned)a1) >= 360) goto L359E6;
+    l_18 = 0;
+    goto L35A3E;
+L359E6:;
+    if (((unsigned)a1) <= 1080) goto L359F8;
+    l_18 = 0;
+    goto L35A3E;
+L359F8:;
+    if (((unsigned)a1) <= 488) goto L35A0A;
+    if (((unsigned)a1) < 952) goto L35A0C;
+L35A0A:;
+    goto L35A15;
+L35A0C:;
+    l_18 = 31;
+    goto L35A3E;
+L35A15:;
+    if (((unsigned)a1) >= 700) goto L35A2E;
+    l_18 = ((unsigned)(a1 - 360)) >> 2;
+    goto L35A3E;
+L35A2E:;
+    l_18 = ((unsigned)(-(a1 - 1080))) >> 2;
+L35A3E:;
+    func_000CD33A(((int)D_0017A294) + (l_18 * 3), 255, 1);
+}
+
 void func_00035A64(int a1)
 {
 }

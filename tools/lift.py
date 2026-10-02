@@ -1281,7 +1281,8 @@ class Func:
                     prev.op_str.split(", ", 1)[1] == ins.op_str.split(", ")[0]:
                 pre_r = subreg(prev.reg_name(prev.operands[0].reg))[0]
             if m in ("add", "sub") and s.type == cx.X86_OP_IMM and d.size == 4 and \
-                    pre_r is not None and self.reg_used_later(pre_r):
+                    pre_r is not None and self.reg_used_later(
+                        pre_r, calls=not os.environ.get("LIFT_NOPOSTARG")):
                 # *p++-style: the old value, loaded just before, is used afterwards
                 lv = lhs if re.fullmatch(r"\w+", lhs) else "(%s)" % lhs
                 self.post_expr("(int)(*(char (**)[%d])&%s)%s" % (s.imm, lv, "++" if m == "add" else "--"),
@@ -1475,6 +1476,15 @@ class Func:
                     self.choices.append(ins.address)
                     if ins.address in self.flips:
                         limit = live
+                last = max((PARM_REGS.index(r) for r in loaded if r in PARM_REGS[:limit]),
+                           default=-1)
+                if last > 0 and self.reg_consumed(self.k, PARM_REGS[last]) and \
+                        not os.environ.get("LIFT_NOCONSUMED"):
+                    # the last argument register's value was already used (an index added
+                    # into another register): not an argument (a choice point)
+                    self.choices.append(ins.address + 0.6875)
+                    if ins.address + 0.6875 not in self.flips:
+                        limit = last
                 if limit and "eax" in loaded and self.eax_consumed(self.k):
                     # eax's value was already used (copied into a byte register to pass on):
                     # perhaps no argument at all; a choice point
@@ -2096,8 +2106,10 @@ class Func:
         """Is eax read by a later instruction before being written (statement-local)?"""
         return self.reg_used_later("eax")
 
-    def reg_used_later(self, reg):
+    def reg_used_later(self, reg, calls=False):
         for ins in self.body[self.k + 1:]:
+            if calls and ins.mnemonic == "call" and reg in PARM_REGS:
+                return True         # (an argument of the call)
             if ins.address in self.targets or ins.mnemonic in ("call", "ret") or \
                     ins.mnemonic.startswith("j"):
                 return False
@@ -2132,6 +2144,23 @@ class Func:
         keep["eax"] = call
         self.regs = keep
         self.pending = call
+
+    def reg_consumed(self, k, reg):
+        """Whether the value in a 32-bit register at instruction k was read since it was
+        computed (as an operand, not an address)."""
+        fam = {reg, reg[1:], reg[1] + "l", reg[1] + "h"}
+        for j in range(k - 1, -1, -1):
+            i = self.body[j]
+            if i.mnemonic == "call" or i.mnemonic.startswith("j"):
+                return False
+            ops = i.operands
+            for n, o in enumerate(ops):
+                if n > 0 and o.type == cx.X86_OP_REG and i.reg_name(o.reg) in fam:
+                    return True
+            if ops and ops[0].type == cx.X86_OP_REG and i.reg_name(ops[0].reg) in fam and \
+                    i.mnemonic in ("mov", "movsx", "movzx", "lea", "xor"):
+                return False
+        return False
 
     def eax_consumed(self, k):
         """Whether the value in eax at instruction k was read since it was computed."""
