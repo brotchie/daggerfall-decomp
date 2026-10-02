@@ -42,3 +42,26 @@ and adds `FIXMAPS.EXE` and `FIXSAVE.EXE`. `DAGGER.EXE` is unchanged.
 
 The game folder also ships `HMIDRV.386`, `HMIDET.386` and `HMIMDRV.386`: HMI's Sound Operating
 System drivers, which tells us the licensed sound library to expect inside `FALL.EXE`.
+
+## 2026-10-01: FALL.EXE's format (plan section 2)
+
+**Plain, uncompressed LE.** The CauseWay MZ stub covers file offsets 0..0xB680, and `e_lfanew`
+(0x3C) points straight at an `LE` header at 0xB680. Data pages start at file offset 0x5B600
+(absolute), with no iterated or compressed pages. KKND's `le.py` loads it with one change
+(`tools/le.py`): a few fixups have negative target offsets (`&table[-1]`-style), so the target is
+wrapped mod 2^32.
+
+| Obj | Base | Size | Flags | Contents (first look) |
+|---|---|---|---|---|
+| 1 | 0x010000 | 0x0AB27F | 0x2045 (R X) | Watcom-compiled game code, Watcom runtime at the end; entry 0x9DEB4 is Watcom's `_cstart_` (`jmp` over the "WATCOM C/C++32 Run-Time system" banner) |
+| 2 | 0x0C0000 | 0x0A1568 | 0x2043 (R W) | Writable, but holds code too: rel32 calls go both ways between objects 1 and 2. Looks assembler-made (`8B D8 mov ebx,eax`, `33 C0`), reads the BIOS tick count at 0x46C, hooks interrupts with `cli`/`sti`. Probably HMI SOS and/or handwritten asm |
+| 3 | 0x170000 | 0x045520 | 0x2043 (R W) | DGROUP data; the stack ends at its top (esp = 0x45520) |
+
+Fixups: 37,520 internal, of kinds off32 (35,543), rel32 (1,018, only between objects 1 and 2)
+and six 16-bit selector fixups to object 3, all in object 2: the asm loading DGROUP's selector,
+as an interrupt handler does.
+
+Object 1's first function (0x10010) starts `push ebp; mov ebp,esp; push ebx/ecx/esi/edi;
+sub esp,imm32`, keeps its `eax`/`edx` arguments on the stack and re-reads them. So: the register
+calling convention, frame pointers, no stack-check calls, and quite possibly little or no
+optimisation for at least some modules. Functions are padded to 16 bytes with `nop`.
