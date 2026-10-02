@@ -140,13 +140,26 @@ def main():
     t0 = time.time()
     with mp.Pool(a.j, initializer=init_worker) as pool:
         results = sorted(pool.imap_unordered(work, vas, chunksize=8))
-    with open(os.path.join(OUT, "report.csv"), "w", newline="") as f:
+    # keep the previous full run's report to show what this change gained and lost
+    prev = {}
+    rp = os.path.join(OUT, "report.csv")
+    if not a.only and not a.limit and os.path.exists(rp):
+        with open(rp, newline="") as f:
+            prev = {r["func"]: r["status"] for r in csv.DictReader(f)}
+        os.replace(rp, os.path.join(OUT, "report.prev.csv"))
+    with open(rp, "w", newline="") as f:
         w = csv.writer(f)
         w.writerow(["func", "status", "detail"])
         w.writerows(results)
     st = Counter(r[1] for r in results)
     print("%d functions in %.0fs: %s" % (len(results), time.time() - t0,
                                           ", ".join("%s %d" % kv for kv in st.most_common())))
+    if prev:
+        gained = [r[0] for r in results if r[1] == "ok" and prev.get(r[0]) != "ok"]
+        lost = [r for r in results if r[1] != "ok" and prev.get(r[0]) == "ok"]
+        print("since the previous run: +%d -%d" % (len(gained), len(lost)))
+        for r in lost[:10]:
+            print("  LOST %s: %s %s" % (r[0], r[1], r[2][:100]))
     for status in ("unsupported", "error"):
         c = Counter(re.sub(r"0x[0-9a-f]+|\d+", "N", r[2])[:90] for r in results if r[1] == status)
         if c:
