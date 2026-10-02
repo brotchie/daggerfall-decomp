@@ -2,6 +2,8 @@
  * do not edit: move a function to src/kludge.c to work on it by hand) */
 
 struct bf16_0_10 { unsigned short f:10; };
+struct bf8_1_1 { unsigned char _:1; unsigned char f:1; };
+struct bf8_2_1 { unsigned char _:2; unsigned char f:1; };
 extern char D_0012B508[];
 extern char D_00132F6C[];
 extern char D_00142314[];
@@ -177,7 +179,7 @@ void func_00044E89(void)
     int l_18;
 
     if (*(signed char *)D_00199728 == 0) return;
-    if ((*(unsigned char *)D_001940D4 & 4) == 0) goto L44EB7;
+    if (((struct bf8_2_1 *)&D_001940D4)->f == 0) goto L44EB7;
     l_18 = func_000392AD();
     if (l_18 > (-1)) goto L44EB9;
 L44EB7:;
@@ -503,7 +505,7 @@ void func_00045B7F(void)
 void func_00045C6B(void)
 {
     *(signed char *)D_001940DA ^= 2;
-    if ((*(unsigned char *)D_001940DA & 2) == 0) return;
+    if (((struct bf8_1_1 *)&D_001940DA)->f == 0) return;
     func_0007CBA1((int)D_001710A7);
 }
 

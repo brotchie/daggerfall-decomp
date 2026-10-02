@@ -3,7 +3,9 @@
 
 struct bf32_30_1 { unsigned _:30; unsigned f:1; };
 struct bf32_31_1 { unsigned _:31; unsigned f:1; };
+struct bf8_0_1 { unsigned char f:1; };
 struct bf8_1_1 { unsigned char _:1; unsigned char f:1; };
+struct bf8_1_5 { unsigned char _:1; unsigned char f:5; };
 struct bf8_2_1 { unsigned char _:2; unsigned char f:1; };
 struct bf8_3_1 { unsigned char _:3; unsigned char f:1; };
 struct bf8_4_1 { unsigned char _:4; unsigned char f:1; };
@@ -513,7 +515,7 @@ L8703A:;
 L8703C:;
     return 1;
 L87048:;
-    if ((*(unsigned char *)(*(char **)D_00195BE0 + 137) & 64) == 0) goto L8706E;
+    if (((struct bf8_6_1 *)(*(char **)D_00195BE0 + 137))->f == 0) goto L8706E;
     *(signed char *)(*(char **)D_00195BE0 + 137) &= 191;
     return 1;
 L8706E:;
@@ -979,8 +981,8 @@ L88147:;
     (*(char (**)[17])&l_20)++;
     goto L8813A;
 L88156:;
-    if ((*(unsigned char *)((char *)l_20 + 7) & 64) != 0) goto L88168;
-    if ((*(unsigned char *)((char *)l_20 + 7) & 128) == 0) goto L8816A;
+    if (((struct bf8_6_1 *)((char *)l_20 + 7))->f != 0) goto L88168;
+    if (((struct bf8_7_1 *)((char *)l_20 + 7))->f == 0) goto L8816A;
 L88168:;
     goto L88170;
 L8816A:;
@@ -1004,8 +1006,8 @@ L881CB:;
     (*(char (**)[17])&l_20)++;
     goto L881BE;
 L881DA:;
-    if ((*(unsigned char *)((char *)l_20 + 7) & 64) != 0) goto L881EC;
-    if ((*(unsigned char *)((char *)l_20 + 7) & 128) == 0) goto L881EE;
+    if (((struct bf8_6_1 *)((char *)l_20 + 7))->f != 0) goto L881EC;
+    if (((struct bf8_7_1 *)((char *)l_20 + 7))->f == 0) goto L881EE;
 L881EC:;
     goto L881F4;
 L881EE:;
@@ -1040,7 +1042,7 @@ void func_00088281(int a1, int a2)
     int l_18;
     int l_14;
 
-    if ((*(unsigned char *)(*(char **)D_00196A80 + 7) & 62) != 0) goto L88307;
+    if (((struct bf8_1_5 *)(*(char **)D_00196A80 + 7))->f != 0) goto L88307;
     l_20 = 1;
     l_28 = (*(int *)(*(char **)D_00196A80 + 4) & 33554431) + 1536;
     l_28 = (l_28 & 32767) >> 8;
@@ -1430,10 +1432,10 @@ L88D56:;
 L88D58:;
     return 0;
 L88D64:;
-    if ((*(unsigned char *)((char *)l_18 + 137) & 1) == 0) goto L88D79;
+    if (((struct bf8_0_1 *)((char *)l_18 + 137))->f == 0) goto L88D79;
     return 0;
 L88D79:;
-    if ((*(unsigned char *)((char *)l_18 + 138) & 128) == 0) goto L88D8E;
+    if (((struct bf8_7_1 *)((char *)l_18 + 138))->f == 0) goto L88D8E;
     return 0;
 L88D8E:;
     if (func_0007D6AE(1, 100) <= ((int)(unsigned char)*(signed char *)((char *)(l_14 + a2) + 86))) goto L88DB5;
@@ -1469,7 +1471,7 @@ int func_00089035(int a1, int a2, int a3)
     switch (*(unsigned char *)((char *)((a2 * 2) + l_1C) + 1)) {
 case 0:
     if (l_18 != *(int *)D_00195BE0) goto L890A3;
-    if ((*(unsigned char *)D_00195AE8 & 64) != 0) goto L890A5;
+    if (((struct bf8_6_1 *)&D_00195AE8)->f != 0) goto L890A5;
 L890A3:;
     goto L890AA;
 L890A5:;

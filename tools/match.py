@@ -48,6 +48,17 @@ def default_flags():
 
 
 def compile_c(src, flags, obj):
+    if os.environ.get("DAGGER_CC") == "w10":
+        # the real Watcom C32 10.0a under DOSBox-X (tools/wcc10.py)
+        import wcc10
+        with tempfile.TemporaryDirectory() as td:
+            objs, _ = wcc10.compile_many([src], flags, workdir=td)
+            if objs[src] is None:
+                err = open(os.path.join(td, "N0000.ERR"), errors="replace").read()
+                sys.stderr.write(err)
+                raise SystemExit("compile failed")
+            shutil.move(objs[src], obj)
+        return
     with tempfile.TemporaryDirectory() as td:
         base = os.path.splitext(os.path.basename(src))[0]
         shutil.copyfile(src, os.path.join(td, base + ".c"))

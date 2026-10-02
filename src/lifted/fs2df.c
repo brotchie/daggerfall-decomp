@@ -3,6 +3,7 @@
 
 struct bf16_0_10 { unsigned short f:10; };
 struct bf16_11_3 { unsigned short _:11; unsigned short f:3; };
+struct bf8_2_1 { unsigned char _:2; unsigned char f:1; };
 extern char D_00170AB4[];
 extern char D_00170ABC[];
 extern char D_00170AC7[];
@@ -274,7 +275,7 @@ L36539:;
     *(int *)D_001995FC = -(((int)(unsigned char)*(signed char *)(*(char **)D_001995F0 + 5)) << 3);
 L3655F:;
     *(signed char *)D_001962A1 = *(signed char *)(*(char **)D_001995F0 + 4);
-    if ((*(unsigned char *)(*(char **)D_00199608 + 3) & 4) != 0) goto L36580;
+    if (((struct bf8_2_1 *)(*(char **)D_00199608 + 3))->f != 0) goto L36580;
     l_2C = 0;
     goto L36595;
 default:

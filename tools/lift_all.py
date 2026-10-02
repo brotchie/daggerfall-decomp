@@ -399,8 +399,15 @@ def lift_one(va):
         sites = info.get("sites", {})
         near = sorted((a for a in info["choices"] if a >= 0 and a not in flips),
                       key=lambda a: min(abs(x - at) for x in sites.get(a, [a])))[:NEAR]
+        if at - va < 16 and not os.environ.get("LIFT_NOFRAMEALL"):
+            # a difference in the frame size: any choice point can change it (a temp, a
+            # variable's type), not just those near the prologue
+            near = sorted(a for a in info["choices"] if a >= 0 and a not in flips)[:3 * NEAR]
         # function-level choices (compiler knobs) too
         func_level = [a for a in info["choices"] if a < 0 and a not in flips]
+        if os.environ.get("DAGGER_CC") == "w10":
+            # (the real Watcom 10.0a has no knobs and ignores slot pins)
+            func_level = [a for a in func_level if not (-100 < a < 0 or a == -1000)]
         found = None
         for a in near + func_level:
             if tries >= BUDGET:

@@ -1814,6 +1814,22 @@ class Func:
                 # a bit test doesn't care about sign; unsigned keeps it `test byte ptr [x], K`
                 a = E(a.text.replace("*(signed char *)", "*(unsigned char *)", 1)
                       .replace("*(short *)", "*(unsigned short *)", 1), a.size, a.atom)
+            if m == "test" and ops[0].type == cx.X86_OP_MEM and ops[0].size == 1 and \
+                    ops[1].type == cx.X86_OP_IMM and ebp_slot(ins, ops[0]) is None and \
+                    not (ops[0].mem.base and ins.reg_name(ops[0].mem.base) == "ebp") and \
+                    not os.environ.get("LIFT_NOBFTEST"):
+                k_ = ops[1].imm & 0xFF
+                lo_ = (k_ & -k_).bit_length() - 1 if k_ else 0
+                ln_ = (k_ >> lo_).bit_length() if k_ else 0
+                if k_ and (k_ >> lo_) == (1 << ln_) - 1:
+                    # test byte ptr [x],K on contiguous bits: a bit-field of x (Watcom
+                    # 10 tests a mask written as x & K through a register); a choice point
+                    self.choices.append(ins.address + 0.46875)
+                    if (ins.address + 0.46875 in self.flips) == bool(os.environ.get("LIFT_NOBFTESTDFLT")):
+                        bf = self.bitfield8(a, lo_, ln_)
+                        if bf is not None:
+                            self.flags = ("test", bf, bf)
+                            return
             if m == "test" and ops[0].type == cx.X86_OP_MEM and ops[1].type == cx.X86_OP_REG \
                     and not os.environ.get("LIFT_NOTESTSWAP"):
                 # test [y], reg: y (the bigger tree, its address computed first) is the right
@@ -3062,9 +3078,10 @@ class Func:
             ps.append("%s a%d" % (self.stack_type[k], self.stack_base + k))
         # The slot rule (docs/progress.md) gives slots top down: 2-byte locals, the return
         # variable, other locals last to first; so declare locals deepest first.
+        # (LIFT_DECLTOP=1: declare top down, the real Watcom 10.0a order without -d2)
         locals_ = sorted((o for o in set(self.slot_type) | set(self.arrays)
                           if o not in [p[1] for p in self.params] and o not in self.temps),
-                         reverse=True)
+                         reverse=not os.environ.get("LIFT_DECLTOP"))
         two = [o for o in locals_ if o in self.slot_type and self.size_of[self.slot_type[o]] == 2]
         rest = [o for o in locals_ if o not in two]
         if two and rest and max(two) > min(rest) and \
