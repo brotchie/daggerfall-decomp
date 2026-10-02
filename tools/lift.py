@@ -1514,7 +1514,9 @@ class Func:
                         return
                 if m in ("add", "imul", "and", "or", "xor") and s.type == cx.X86_OP_REG and \
                         not CONST_RE.fullmatch(a.text) and not CONST_RE.fullmatch(b.text) and \
-                        "func_" not in a.text + b.text:
+                        ("func_" not in a.text + b.text or
+                         ("func_" in a.text and "func_" in b.text and
+                          not os.environ.get("LIFT_NOCALLORDER"))):
                     a, b = self.operand_order(ins, a, b, k0)
                 v = E("%s %s %s" % (a.p(), opch, b.p()), max(sz, 1))
                 self.set_reg(full, v)
