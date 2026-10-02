@@ -176,6 +176,7 @@ class Func:
         self.regs = {}
         self.born_hint = None
         self.temps = set()       # slots that are the compiler's own temps (not declared)
+        self.side = []           # stores inside an expression, waiting for the next read
         self.used_results = set()   # callees whose return value is used
         self.structs = set()     # bit-field struct declarations used
         self.choices = []        # instruction addresses of operand-order choice points
@@ -569,6 +570,11 @@ class Func:
             t = self.mem(op, ins, op.size)
             if t == "@RET":
                 raise Unsupported("read of the return slot")
+            if self.side:
+                # the stores of an enclosing expression come first: (x = a, x <<= 2, x)
+                text = "(%s, %s)" % (", ".join(self.side), t)
+                self.side = []
+                return E(text, op.size, atom=True)
             ch = getattr(self, "chain", None)
             if ch is not None and ch[0] == t and ch[2] == len(self.out) - 1 and \
                     ch[3] + 1 == getattr(self, "k", -1) and self.pending is None and \
@@ -759,6 +765,18 @@ class Func:
                 self.void = False
                 self.emit("return %s;" % v.text)
                 self.after_return = True
+                return
+            src0 = subreg(ins.reg_name(s.reg))[0] if s.type == cx.X86_OP_REG else None
+            held = [r for r in self.regs if r != src0 and self.regs[r] is not self.pending
+                    and r not in self.stale and self.live_later(r)]
+            if (held or self.pushes) and ebp_slot(ins, d) is not None and \
+                    not os.environ.get("LIFT_NOCOMMA"):
+                # a store in the middle of an expression (arguments of a call are being
+                # held in registers or pushed): a comma expression, attached to the next
+                # value read
+                self.side.append("%s = %s" % (lhs, v.text))
+                if src0:
+                    self.regs[src0] = v
                 return
             self.emit("%s = %s;" % (lhs, v.text))
             # -od: nothing survives into the next statement, except the value just stored,
@@ -1622,6 +1640,21 @@ class Func:
             if any(SUB.get(ins.reg_name(x), (None,))[0] == reg for x in writes):
                 return False
             if ins.mnemonic in ("call", "ret", "jmp") or ins.mnemonic.startswith("j"):
+                return False
+        return False
+
+    def live_later(self, reg):
+        """Is `reg` read later before being written, across calls (callees keep it)?"""
+        for ins in self.body[self.k + 1:]:
+            if ins.address in self.targets or ins.mnemonic == "ret" or \
+                    ins.mnemonic.startswith("j"):
+                return False
+            reads, writes = ins.regs_access()
+            if any(SUB.get(ins.reg_name(x), (None,))[0] == reg for x in reads):
+                return True
+            if any(SUB.get(ins.reg_name(x), (None,))[0] == reg for x in writes):
+                return False
+            if ins.mnemonic == "call" and reg in ("eax",):
                 return False
         return False
 
