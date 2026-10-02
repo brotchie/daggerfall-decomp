@@ -632,3 +632,21 @@ The original sign-extends for division with `mov eax,edx; sar edx,31` 427 times 
 twice. OW's `V_CDQ` check (`cg/intel/c/x86ver.c`) picks `cdq` for a 486 target and only
 splits it (`rCDQ()`) for a 586 optimising for time. At `-od` it now always splits
 (`DAGGER_CDQ=1` restores OW). Batch **1,314** (+70, nothing lost).
+
+## 2026-10-01: idiom statistics (`tools/idiom_diff.py`)
+
+`lift_all.py` now keeps each compiled function's bytes (`build/lift/<func>.bin`), and
+`tools/idiom_diff.py` normalises our instructions and the original's (for the differing
+functions) to shapes such as `mov r8, byte[ebp-x]` or `cmp byte[ebp-x], imm`, and ranks the
+shapes by the difference in counts. That's how the `cdq` difference was spotted, and in its
+first run it gave:
+
+- `cmp byte[ebp-x], imm`: original 436, ours 150. A switch's compare tree on a byte temp uses
+  unsigned jumps, and the lifter's explicit `(unsigned)` cast widened the compare. Narrow
+  operands are now read unsigned instead (+16).
+- `ret imm`: original 26, ours 0. Our slot-order patch gave stack parameters frame slots
+  (OW copied them in). Only register parameters are recorded now (+4).
+- Still open: `add r32, dword[ebp-x]` (ours +264), `test byte[ebp-x], imm` against
+  `test dword[ebp-x], imm` (OW narrows an int bit test), `xor r32,r32` (+501).
+
+Batch **1,334**.

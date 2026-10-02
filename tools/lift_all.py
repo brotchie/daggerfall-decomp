@@ -103,6 +103,8 @@ def work(va):
     tva, tsize = W["funcs"][name]
     ok, diff = match.compare(W["tgt"], obj, name, tva, tsize, quiet=True)
     si, off, csz = fns[name]
+    with open(os.path.join(OUT, name + ".bin"), "wb") as f:   # for tools/idiom_diff.py
+        f.write(bytes(obj.data[si][off:off + csz]).rstrip(b"\x00"))
     if not ok:
         ours = bytes(obj.data[si][off:off + csz])
         mask = {fx.offset - off + j for fx in obj.fixups if fx.seg == si

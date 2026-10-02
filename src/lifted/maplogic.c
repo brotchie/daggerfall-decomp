@@ -239,6 +239,35 @@ L86777:;
     func_00086D37((int)(unsigned short)*(short *)((char *)*(int *)D_00195AC4 + 27));
 }
 
+void func_00086A71(int a1)
+{
+    int l_18;
+{
+    unsigned char l_20;
+
+    if (((int)(unsigned char)*(signed char *)((char *)a1)) != 32) return;
+    l_18 = func_0007DF35(a1);
+    l_20 = *(signed char *)((char *)l_18 + 24);
+    if (l_20 < 11) goto L86AC5;
+    if (l_20 <= 11) goto L86AC7;
+    if (l_20 < 14) goto L86AC3;
+    if (l_20 <= 15) goto L86AC7;
+    goto L86AD9;
+L86AC3:;
+    goto L86AD9;
+L86AC5:;
+    goto L86AD9;
+L86AC7:;
+    *(short *)((char *)a1 + 23) = 0;
+    *(signed char *)((char *)a1 + 21) |= 64;
+    return;
+L86AD9:;
+    if ((func_0009DC25() % 100) >= 90) return;
+    *(short *)((char *)a1 + 23) = 0;
+    *(signed char *)((char *)a1 + 21) |= 64;
+}
+}
+
 void func_00086D37(unsigned short a1)
 {
 {

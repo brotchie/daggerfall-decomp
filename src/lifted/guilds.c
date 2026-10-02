@@ -82,6 +82,7 @@ extern int func_00070308(unsigned char);
 extern int func_0007D6AE(int, int);
 extern int func_0007F2A8(int);
 extern int func_0008DA4D(int);
+extern int func_0008DA91(int);
 extern int func_0008DCE3(int, int, int);
 extern int func_0008DD46(int, int);
 extern int func_0008E6C5(int, int, int);
@@ -650,6 +651,40 @@ void func_0007141A(int a1)
     *(signed char *)((char *)l_18) = 2;
     func_0005E540(11, 0, l_18 + 71);
     func_0008DD46((int)D_001960D9, l_18);
+}
+
+void func_00071475(int a1)
+{
+    int l_18;
+{
+    unsigned char l_24;
+    unsigned char l_20;
+
+    l_20 = *(signed char *)((char *)a1);
+    if (l_20 < 9) goto L714A5;
+    if (l_20 <= 9) goto L714E1;
+    if (l_20 == 11) goto L714AA;
+    return;
+L714A5:;
+    return;
+L714AA:;
+    if (((int)(unsigned short)(*(short *)((char *)a1 + 21) & 32768)) == 0) goto L714D7;
+    l_18 = a1 + 71;
+    if (((int)(unsigned char)*(signed char *)((char *)l_18)) > 99) return;
+L714D7:;
+    func_0008DA91(a1);
+    return;
+L714E1:;
+    l_24 = *(signed char *)((char *)*(int *)((char *)a1 + 67));
+    if (l_24 < 3) goto L71500;
+    if (l_24 <= 3) goto L71506;
+    if (l_24 == 38) goto L71506;
+    return;
+L71500:;
+    if (l_24 != 1) return;
+L71506:;
+    func_0008DA91(a1);
+}
 }
 
 void func_000717EC(void)

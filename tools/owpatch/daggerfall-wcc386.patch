@@ -56,7 +56,7 @@ index e800aac5b8..5d93ba83bb 100644
                  ins = MakeBinary( OP_ADD, addr->u.n.name,
                                      AllocS32Const( addr->u.n.offset ),
 diff --git a/bld/cg/c/bldcall.c b/bld/cg/c/bldcall.c
-index 14a056a76b..07f9f1cb70 100644
+index 14a056a76b..63b9aa5f52 100644
 --- a/bld/cg/c/bldcall.c
 +++ b/bld/cg/c/bldcall.c
 @@ -31,6 +31,7 @@
@@ -174,11 +174,14 @@ index 14a056a76b..07f9f1cb70 100644
  }
  
  static  void    LinkParmIns( instruction *parm_def, instruction *ins )
-@@ -295,6 +382,7 @@ name    *DoParmDecl( cg_sym_handle sym, const type_def *tipe, hw_reg_set reg )
+@@ -295,6 +382,10 @@ name    *DoParmDecl( cg_sym_handle sym, const type_def *tipe, hw_reg_set reg )
      } else {
          temp = SAllocUserTemp( sym, TypeClass( tipe ), tipe->length );
          BGDone( MakeAddrName( CG_FE, sym, tipe ) );
-+        DaggerAllocAtDecl( temp, DAGGER_PARM );
++        /* a stack parameter keeps its incoming location: no frame slot */
++        if( !HW_CEqual( reg, HW_EMPTY ) ) {
++            DaggerAllocAtDecl( temp, DAGGER_PARM );
++        }
      }
      temp->v.usage |= USE_IN_ANOTHER_BLOCK;
  

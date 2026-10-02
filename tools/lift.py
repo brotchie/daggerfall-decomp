@@ -475,7 +475,17 @@ class Func:
         kind = self.flags[0]
         a, b = self.flags[1], self.flags[2]
         if kind == "cmp":
-            if uns:
+            if uns and a.size < 4 and a.atom:
+                # a narrow operand: read it unsigned and let the compare stay narrow
+                # (an explicit (unsigned) cast would widen it)
+                t = a.text.replace("*(signed char *)", "*(unsigned char *)", 1) \
+                          .replace("*(short *)", "*(unsigned short *)", 1)
+                if re.fullmatch(r"[al]_?\w+", t):
+                    var_t = self.var_type(t)
+                    if var_t in ("signed char", "short"):
+                        t = "(unsigned %s)%s" % ("char" if var_t == "signed char" else "short", t)
+                a = E(t, a.size, True)
+            elif uns:
                 a = E("(unsigned)" + a.p(), 4)
             return "%s %s %s" % (a.p(), opr, b.p())
         if kind == "test":
@@ -812,6 +822,15 @@ class Func:
     def loaded_ptr(e):
         """A dword read straight from memory: the likely pointer operand of an add."""
         return e.atom and e.text.startswith("*(int *)")
+
+    def var_type(self, name):
+        """Declared type of a parameter or local by name."""
+        if name.startswith("l_"):
+            return self.slot_type.get(int(name[2:], 16), "int")
+        k = int(name[1:]) - 1
+        if k < len(self.params):
+            return self.slot_type.get(self.params[k][1], "int")
+        return self.stack_type[k - 4] if k - 4 < len(self.stack_type) else "int"
 
     def eax_used_later(self):
         """Is eax read by a later instruction before being written (statement-local)?"""
