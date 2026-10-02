@@ -4,71 +4,137 @@
 .486p
 .387
 include xn_160E00.inc
-public D_00160E00
-public D_00160E44
-public D_00160E45
-public D_00160E57
-public D_00160E64
-public D_00160EAC
-public D_00160F00
-public D_00160F04
-public D_00160F08
-public D_00160F11
-public D_00160F13
 public D_00160F18
+public L_160F07
+public L_160F12
+public func_00160E00
+public func_00160E44
+public func_00160E45
+public func_00160E57
+public func_00160E64
+public func_00160EAC
+public func_00160F00
+public func_00160F04
+public func_00160F11
 extrn D_00160870:byte
 extrn D_00160D00:byte
 extrn D_00160D04:byte
 extrn D_00160D1C:byte
 extrn D_00160D20:byte
 extrn D_00160D24:byte
+extrn func_00160900:near
+extrn func_00160A54:near
+extrn func_00160A9C:near
 XN_160E00 segment byte public use32 'CODE'
     assume cs:XN_160E00, ds:XN_160E00, es:XN_160E00, ss:XN_160E00
-D_00160E00:
-    B_160E00_2
-    dd D_00160D00
-    B_160E06_32
-    dd D_00160D1C
-    B_160E2A_6
-    dd D_00160D20
-    B_160E34_6
-    dd D_00160D24
-    B_160E3E_6
-D_00160E44:
-    B_160E44_1
-D_00160E45:
-    B_160E45_18
-D_00160E57:
-    B_160E57_13
-D_00160E64:
-    B_160E64_19
-    dd D_00160870
-    B_160E7B_13
-    dd D_00160D04
-    B_160E8C_6
-    dd D_00160D00
-    B_160E96_22
-D_00160EAC:
-    B_160EAC_8
-    dd D_00160870
-    B_160EB8_13
-    dd D_00160D04
-    B_160EC9_6
-    dd D_00160D00
-    B_160ED3_24
-    dd D_00160D00
-    B_160EEF_7
+func_00160E00:
+    pushad
+    mov dword ptr [D_00160D00], eax
+    mov edx, 3
+    mov ebx, 6
+    call func_00160900
+    call func_00160E45
+    mov eax, 047h
+    call func_00160EE7
+    mov dword ptr [D_00160D1C], 0
+    mov dword ptr [D_00160D20], 0
+    mov dword ptr [D_00160D24], 0
+    popad
+    ret
+func_00160E44:
+    ret
+func_00160E45:
+    pushad
+    mov ecx, 020h
+    mov eax, 052h
+    call func_00160EE7
+    popad
+    ret
+func_00160E57:
+    pushad
+    mov eax, 048h
+    call func_00160EE7
+    popad
+    ret
+func_00160E64:
+    mov eax, 047h
+    call func_00160EE7
+    ret
+func_00160E6F:
+    pushad
+    mov ecx, 0FFFFFFh
+L_160E75:
+    cmp dword ptr [D_00160870], 012h
+    je short L_160E87
+    loop L_160E75
+    popad
+    mov eax, 0FFFFFFFFh
+    ret
+L_160E87:
+    mov edi, offset D_00160D04
+    mov ecx, 012h
+L_160E91:
+    mov eax, dword ptr [D_00160D00]
+    call func_00160A9C
+    jb short L_160EA6
+    cmp al, 0Ah
+    je short L_160EA6
+    cmp al, 0Dh
+    je short L_160EA6
+    stosb
+L_160EA6:
+    loop L_160E91
+    popad
+    xor eax, eax
+    ret
+func_00160EAC:
+    pushad
+    mov ecx, 0FFFFh
+L_160EB2:
+    cmp dword ptr [D_00160870], 6
+    je short L_160EC4
+    loop L_160EB2
+    popad
+    mov eax, 0FFFFFFFFh
+    ret
+L_160EC4:
+    mov edi, offset D_00160D04
+    mov ecx, 6
+L_160ECE:
+    mov eax, dword ptr [D_00160D00]
+    call func_00160A9C
+    jb short L_160EDB
+    stosb
+L_160EDB:
+    loop L_160ECE
+    popad
+    xor eax, eax
+    ret
+func_00160EE1:
+    mov eax, 0FFFFFFFFh
+    ret
+func_00160EE7:
+    push edx
+    mov edx, eax
+    mov eax, dword ptr [D_00160D00]
+    call func_00160A54
+    pop edx
+    ret
     db 10 dup (0)
-D_00160F00:
-    B_160F00_4
-D_00160F04:
-    B_160F04_4
-D_00160F08:
-    B_160F08_9
-D_00160F11:
-    B_160F11_2
-D_00160F13:
-    B_160F13_5
+func_00160F00:
+    and dword ptr [edx + 0Dh], edx
+    db 0FFh
+func_00160F04:
+    db 021h
+    B_160F05_2
+L_160F07:
+    jmp dword ptr [ecx]
+    B_160F09_8
+func_00160F11:
+    push ebx
+L_160F12:
+    jmp dword ptr [ecx]
+    B_160F14_4
 D_00160F18:
     B_160F18_1
     db 231 dup (0)

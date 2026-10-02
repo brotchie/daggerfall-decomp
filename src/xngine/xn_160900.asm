@@ -8,6 +8,12 @@ public D_00160AE0
 public D_00160B60
 public D_00160BE0
 public D_00160C60
+public func_00160900
+public func_001609C0
+public func_00160A18
+public func_00160A3C
+public func_00160A54
+public func_00160A9C
 extrn D_0015FFFF:byte
 extrn D_00160000:byte
 extrn D_00160004:byte
@@ -33,74 +39,190 @@ extrn D_00160878:byte
 extrn D_0016087C:byte
 extrn func_000A1272:near
 extrn func_000A12A6:near
+extrn func_00149F0C:near
 XN_160900 segment byte public use32 'CODE'
     assume cs:XN_160900, ds:XN_160900, es:XN_160900, ss:XN_160900
-    B_160900_4
-    dd D_00160000
-    B_160908_5
-    dd D_00160000
-    B_160911_10
-    dd D_00160014
-    B_16091F_1
+func_00160900:
+    push esi
+    dec eax
+    cmp byte ptr [eax + D_00160000], 1
+    je short L_160963
+    mov byte ptr [eax + D_00160000], 1
+    push eax
+    push ebx
+    push ecx
+    push edx
+    mov ebx, eax
+    mov eax, dword ptr [eax*4 + D_00160014]
+    push eax
     call func_000A1272
-    B_160925_4
-    dd D_00160038
-    B_16092D_3
-    dd D_00160028
-    B_160934_4
-    dd D_00160040
-    B_16093C_4
+    mov word ptr [ebx*2 + D_00160038], dx
+    mov dword ptr [ebx*4 + D_00160028], eax
+    pop eax
+    mov ebx, dword ptr [ebx*4 + D_00160040]
+    push ebx
+    mov cx, cs
     call func_000A12A6
-    B_160945_12
-    dd D_00160000
-    B_160955_32
-    dd D_00160004
-    B_160979_10
-    dd D_00160004
-    B_160987_11
-    dd D_00160004
-    B_160996_8
-    dd D_00160004
-    B_1609A2_17
-    dd D_00160024
-    B_1609B7_11
-    dd D_0015FFFF
-    B_1609C6_9
-    dd D_0015FFFF
-    B_1609D3_7
-    dd D_00160004
-    B_1609DE_8
-    dd D_00160024
-    B_1609EA_11
-    dd D_00160014
-    B_1609F9_4
-    dd D_00160038
-    B_160A01_3
-    dd D_00160028
+    pop eax
+    mov edx, 0400h
+    call func_00149F0C
+    mov eax, offset D_00160000
+    mov edx, 0880h
+    call func_00149F0C
+    pop edx
+    pop ecx
+    pop ebx
+    pop eax
+L_160963:
+    inc eax
+    call func_00160A18
+    cli
+    lea esi, [eax*4 - 4]
+    mov eax, edx
+    mov edx, dword ptr [esi + D_00160004]
+    add edx, 3
+    or al, 080h
+    out dx, al
+    push eax
+    push edx
+    mov edx, dword ptr [esi + D_00160004]
+    mov eax, ebx
+    out dx, ax
+    pop edx
+    pop eax
+    and al, 07Fh
+    out dx, al
+    mov edx, dword ptr [esi + D_00160004]
+    add edx, 4
+    mov al, 8
+    out dx, al
+    mov edx, dword ptr [esi + D_00160004]
+    add edx, 1
+    mov al, 1
+    out dx, al
+    sub edx, 1
+    in al, dx
+    shr esi, 2
+    in al, 021h
+    and al, byte ptr [esi + D_00160024]
+    out 021h, al
+    sti
+    mov al, 020h
+    out 020h, al
+    pop esi
+    ret
+func_001609C0:
+    cmp byte ptr [eax + D_0015FFFF], 0
+    je short L_160A15
+    cli
+    push ebx
+    push ecx
+    push edx
+    mov byte ptr [eax + D_0015FFFF], 0
+    lea ebx, [eax - 1]
+    mov edx, dword ptr [ebx*4 + D_00160004]
+    add edx, 3
+    mov al, 040h
+    out dx, al
+    mov dl, byte ptr [ebx + D_00160024]
+    not dl
+    in al, 021h
+    or al, dl
+    out 021h, al
+    mov eax, dword ptr [ebx*4 + D_00160014]
+func_001609F9:
+    mov cx, word ptr [ebx*2 + D_00160038]
+    mov ebx, dword ptr [ebx*4 + D_00160028]
     call func_000A12A6
-    B_160A0D_15
-    dd D_0016084C
-    B_160A20_7
-    dd D_0016085C
-    B_160A2B_7
-    dd D_0016086C
-    B_160A36_17
-    dd D_00160004
-    B_160A4B_69
-    dd D_00160004
-    B_160A94_18
-    dd D_00160850
-    B_160AAA_2
-    dd D_00160860
-    B_160AB0_4
-    dd D_00160850
-    B_160AB8_2
-    dd D_00160850
-    B_160ABE_6
-    dd D_00160870
-    B_160AC8_5
-    dd D_00160050
-    B_160AD1_15
+    pop edx
+    pop ecx
+    pop ebx
+    mov al, 020h
+    out 020h, al
+    sti
+L_160A15:
+    ret
+    B_160A16_2
+func_00160A18:
+    cli
+    mov dword ptr [eax*4 + D_0016084C], 0
+    mov dword ptr [eax*4 + D_0016085C], 0
+    mov dword ptr [eax*4 + D_0016086C], 0
+    sti
+    ret
+func_00160A3C:
+    push edx
+    push esi
+    lea esi, [eax*4 - 4]
+    mov edx, dword ptr [esi + D_00160004]
+    add edx, 5
+    in al, dx
+    pop esi
+    pop edx
+    ret
+    B_160A52_2
+func_00160A54:
+    push ebx
+    push ecx
+    push esi
+    lea esi, [eax*4 - 4]
+    mov ecx, 023h
+L_160A63:
+    push eax
+    push edx
+    mov dx, 03DAh
+L_160A69:
+    in al, dx
+    test al, 8
+    jne short L_160A69
+L_160A6E:
+    in al, dx
+    test al, 8
+    je short L_160A6E
+    pop edx
+    pop eax
+    push eax
+    call func_00160A3C
+    test al, 020h
+    pop eax
+    jne short L_160A8C
+    loop L_160A63
+    pop esi
+    pop ecx
+    pop ebx
+    mov eax, 1
+    stc
+    ret
+L_160A8C:
+    mov eax, edx
+    mov edx, dword ptr [esi + D_00160004]
+    out dx, al
+    pop esi
+    pop ecx
+    pop ebx
+    xor eax, eax
+    clc
+    ret
+func_00160A9C:
+    push esi
+    lea esi, [eax*4 - 4]
+    mov eax, dword ptr [esi + D_00160850]
+    cmp eax, dword ptr [esi + D_00160860]
+    je short L_160AD4
+    inc dword ptr [esi + D_00160850]
+    and dword ptr [esi + D_00160850], 01FFh
+    dec dword ptr [esi + D_00160870]
+    shl esi, 7
+    mov al, byte ptr [esi + D_00160050]
+    pop esi
+    clc
+    ret
+L_160AD4:
+    pop esi
+    xor eax, eax
+    stc
+    ret
+    B_160AD9_7
 D_00160AE0:
     B_160AE0_5
     db 00h, 00h   ; selector fixup, kept by the LE table

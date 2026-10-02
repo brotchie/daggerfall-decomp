@@ -84,11 +84,23 @@ class Analysis:
         self.insns = {}
         self.tables = set()          # bytes of jump tables
         self.code_labels = set()     # branch and call targets
-        self.gap_funcs = []          # functions found by gap filling
-        work = list(self.funcs)
-        while work:
-            self.descend(work)
-            work = self.gap_fill()
+        # Discovery. An address instructions access as memory is data (or a patch field),
+        # never a function entry; when a pointer found a "function" there, start over without.
+        seeds = list(self.funcs)
+        self.not_code = set()
+        while True:
+            self.funcs = list(seeds)
+            self.insns, self.tables, self.code_labels = {}, set(), set()
+            self.gap_funcs, self.ptr_funcs = [], []
+            work = list(self.funcs)
+            while work:
+                self.descend(work)
+                work = self.gap_fill() or self.pointer_seeds() or self.after_ret()
+            accessed = self.memory_targets()
+            wrong = {t for t in self.ptr_funcs if t in accessed} - self.not_code
+            if not wrong:
+                break
+            self.not_code |= wrong
         self.funcs = sorted(set(self.funcs))
         self.func_set = set(self.funcs)
         self.starts = sorted(self.insns)
@@ -96,6 +108,31 @@ class Analysis:
         for a in self.starts:
             for k in range(self.insns[a].size):
                 self.covered.setdefault(a + k, a)
+        self.find_patches()
+
+    def find_patches(self):
+        """The self-modifying code: every instruction that writes through an address fixup
+        into code. self.patches = [(writer va, field va, patched insn va)]; a field inside an
+        instruction (an operand) is named patch_<field> (self.patch_fields)."""
+        self.patches = []
+        self.patch_fields = set()
+        for a in self.starts:
+            i = self.insns[a]
+            for op in i.operands:
+                if op.type != cx.X86_OP_MEM or not op.access & capstone.CS_AC_WRITE or \
+                        not i.disp_offset:
+                    continue
+                fx = self.fields.get(a + i.disp_offset)
+                if fx is None or fx.kind != SRC_OFF32 or fx.target_va not in self.covered:
+                    continue
+                base = self.covered[fx.target_va]
+                self.patches.append((a, fx.target_va, base))
+                if fx.target_va != base and fx.target_va not in self.insns:
+                    self.patch_fields.add(fx.target_va)
+
+    def func_of(self, va):
+        k = bisect.bisect_right(self.funcs, va) - 1
+        return self.funcs[k] if k >= 0 else None
 
     def decode(self, va):
         o = va - self.lo
@@ -125,20 +162,134 @@ class Analysis:
                     self.img.raw[call - self.lo] not in (0xE8, 0xE9):
                 continue
             k = bisect.bisect_right(ends, call) - 1
-            s = ends[k] if k >= 0 else self.lo
-            while s < call and self.img.raw[s - self.lo] == 0:
-                s += 1
-            va = s
-            while va < call:
-                i = self.decode(va)
-                if i is None or not self.whole_fields(i):
+            gap = ends[k] if k >= 0 else self.lo
+            # the earliest start after a boundary (zero padding, a ret, the end of a fixup
+            # field) that decodes cleanly onto the call; the gap may begin with data
+            for s in range(gap, call):
+                prev = self.img.raw[s - 1 - self.lo] if s > self.lo else 0
+                if self.img.raw[s - self.lo] == 0 or s in self.insns or not (
+                        s == gap or prev in (0, 0xC3) or s - 4 in self.fields):
+                    continue
+                va = s
+                while va < call:
+                    i = self.decode(va)
+                    if i is None or not self.whole_fields(i) or i.bytes[:2] == b"\0\0" or \
+                            i.mnemonic.split()[-1] in self.UNLIKELY:
+                        break
+                    va += i.size
+                if va == call:
+                    found.append(s)
+                    self.gap_funcs.append(s)
+                    self.funcs.append(s)
                     break
-                va += i.size
-            if va == call and s not in self.insns:
-                found.append(s)
-                self.gap_funcs.append(s)
-                self.funcs.append(s)
         return found
+
+    # instructions hand-written engine code does not use but text and tables decode to
+    UNLIKELY = {"arpl", "bound", "into", "das", "daa", "aaa", "aas", "aam", "aad", "salc",
+                "insb", "insw", "insd", "outsb", "outsw", "outsd", "lds", "les", "lfs", "lgs",
+                "lss", "retf", "ljmp", "lcall", "hlt", "int3", "icebp", "wait", "fwait",
+                "sahf", "lahf", "xlatb", "cmc", "std", "enter", "leave", "pushfd", "popfd",
+                "iretd", "int1", "ud2", "ud1", "ud0", "in", "out"}
+
+    def looks_like_code(self, va, limit=3000):
+        """Decode from va along fall-through and local branches: every path must end in
+        ret or jmp, with no decode errors, cut fixup fields or unlikely instructions."""
+        seen, work = set(), [va]
+        while work:
+            p = work.pop()
+            while True:
+                if p in seen or p in self.insns:
+                    break
+                if not self.lo <= p < self.hi or len(seen) > limit:
+                    return False
+                i = self.decode(p)
+                if i is None or not self.whole_fields(i) or i.mnemonic in self.UNLIKELY or \
+                        i.mnemonic.split()[-1] in self.UNLIKELY or i.bytes[:2] == b"\0\0":
+                    return False
+                seen.add(p)
+                g = i.groups
+                if cx.X86_GRP_RET in g:
+                    break
+                t = branch_target(i)
+                if t is not None and cx.X86_GRP_CALL not in g:
+                    work.append(t)
+                if i.mnemonic == "jmp":
+                    break
+                p += i.size
+        return True
+
+    def skip_padding(self, s):
+        """Past alignment fill: zeros, nop (90) and the two-byte xchg ebx,ebx (87 DB)."""
+        raw, lo = self.img.raw, self.lo
+        while s < self.hi:
+            if raw[s - lo] in (0x00, 0x90):
+                s += 1
+            elif raw[s - lo] == 0x87 and s + 1 < self.hi and raw[s + 1 - lo] == 0xDB:
+                s += 2
+            else:
+                break
+        return s
+
+    def after_ret(self):
+        """Code nothing references directly, right after a ret or jmp (past zero padding):
+        accepted when it decodes as code (looks_like_code)."""
+        found = []
+        for a, i in list(self.insns.items()):
+            if not (cx.X86_GRP_RET in i.groups or i.mnemonic == "jmp"):
+                continue
+            s = self.skip_padding(a + i.size)
+            if s >= self.hi or s in self.insns or self.covered_by_code(s) or \
+                    s in self.not_code or s in found or not self.looks_like_code(s):
+                continue
+            found.append(s)
+        self.gap_funcs += found
+        self.funcs += found
+        return found
+
+    def memory_targets(self):
+        """Addresses decoded instructions read or write through an address fixup."""
+        out = set()
+        for a, i in self.insns.items():
+            if i.disp_offset and any(op.type == cx.X86_OP_MEM for op in i.operands):
+                fx = self.fields.get(a + i.disp_offset)
+                if fx is not None and fx.kind == SRC_OFF32:
+                    out.add(fx.target_va)
+        return out
+
+    def pointer_seeds(self):
+        """Code reached only through pointers: dispatch tables and callback variables. An
+        address fixup in data whose target decodes as code (looks_like_code) is a function."""
+        found = []
+        for fx in self.img.fixups:
+            t, src = fx.target_va, fx.src_va
+            if fx.kind != SRC_OFF32 or not self.lo <= t < self.hi or t in self.insns or \
+                    self.covered_by_code(t) or not self.lo <= src < self.hi:
+                continue
+            if self.covered_by_code(src):
+                # in code only `offset func` immediates; memory operands read or patch
+                a = self._starts[bisect.bisect_right(self._starts, src) - 1]
+                i = self.insns[a]
+                if not i.imm_offset or src != a + i.imm_offset:
+                    continue
+            if t in found or t in self.not_code or not self.looks_like_code(t):
+                continue
+            found.append(t)
+        self.ptr_funcs += found
+        self.funcs += found
+        return found
+
+    def covered_by_code(self, va):
+        k = bisect.bisect_right(self._starts_cache(), va) - 1
+        if k < 0:
+            return False
+        a = self._starts[k]
+        return a <= va < a + self.insns[a].size
+
+    def _starts_cache(self):
+        if getattr(self, "_starts_n", None) != len(self.insns):
+            self._starts = sorted(self.insns)
+            self._starts_n = len(self.insns)
+        return self._starts
 
     def descend(self, work):
         seen_funcs = set(self.funcs)
@@ -206,6 +357,7 @@ class Module:
         self.publics = set(publics)  # labels other modules use
         self.externs = {}         # name -> kind
         self.labels = {}          # va -> name, positions in this module that need a label
+        self.patch_equ = {}       # patch_X -> expression, for fields in other modules
 
     def local_name(self, va):
         an = self.an
@@ -217,6 +369,17 @@ class Module:
 
     def sym(self, t):
         """Symbol expression for linear address t."""
+        an = self.an
+        if t in an.patch_fields:
+            # an operand the self-modifying code rewrites: named, defined next to its
+            # instruction (or here from that instruction's public label)
+            expr = self.sym_plain(t)
+            if not self.start <= t < self.end:
+                self.patch_equ["patch_%06X" % t] = expr
+            return "patch_%06X" % t
+        return self.sym_plain(t)
+
+    def sym_plain(self, t):
         an = self.an
         if self.start <= t < self.end or t == self.end == an.hi:
             if t in an.insns or t not in an.covered and t not in an.field_bytes:
@@ -448,6 +611,10 @@ class Module:
                     for k, ln in enumerate(lines):
                         linemap[len(body) + 1] = a
                         body.append("    " + ln + (note if k == 0 else ""))
+                for f in range(a + 1, a + i.size):
+                    if f in an.patch_fields:
+                        body.append("patch_%06X equ %s+%d   ; rewritten at run time" % (
+                            f, self.labels[a], f - a))
                 if probe:
                     body.append("    org %s" % h(a + i.size - self.start))
                 a += i.size
@@ -471,6 +638,8 @@ class Module:
             head.append("public %s" % n)
         for n in sorted(self.externs):
             head.append("extrn %s:%s" % (n, self.externs[n]))
+        for n in sorted(self.patch_equ):
+            head.append("%s equ %s" % (n, self.patch_equ[n]))
         head += ["%s segment byte public use32 'CODE'" % seg,
                  "    assume cs:%s, ds:%s, es:%s, ss:%s" % ((seg,) * 4)]
         tail = ["%s ends" % seg, "end"]
@@ -503,6 +672,62 @@ def bad_insns(mod, data, problems, msgs, linemap):
     return bad
 
 
+def write_functions(an):
+    """config/xngine_functions.csv: every function in object 2, its code bytes (up to the next
+    function) and how it was found."""
+    with open(os.path.join(ROOT, "config", "functions.csv"), newline="") as f:
+        listed = {int(r["va"], 16) for r in csv.DictReader(f) if r["obj"] == str(xn_link.OBJ2)}
+    gap, ptr = set(an.gap_funcs), set(an.ptr_funcs)
+    funcs = an.funcs
+    with open(os.path.join(ROOT, "config", "xngine_functions.csv"), "w", newline="") as fh:
+        w = csv.writer(fh, lineterminator="\n")
+        w.writerow(["va", "code_bytes", "found_by"])
+        for k, f in enumerate(funcs):
+            nxt = funcs[k + 1] if k + 1 < len(funcs) else an.hi
+            j = bisect.bisect_left(an.starts, f)
+            size = 0
+            while j < len(an.starts) and an.starts[j] < nxt:
+                size += an.insns[an.starts[j]].size
+                j += 1
+            how = "functions.csv" if f in listed else "pointer" if f in ptr else \
+                "unreferenced" if f in gap else "call"
+            w.writerow(["0x%08X" % f, size, how])
+
+
+def write_patches(an):
+    """config/xngine_patches.csv: every write into code, with the instruction it changes."""
+    rows = []
+    for w, f, base in sorted(an.patches, key=lambda p: (p[1], p[0])):
+        i, wi = an.insns[base], an.insns[w]
+        k = f - base
+        size = next(op.size for op in wi.operands if op.type == cx.X86_OP_MEM)
+        orig = int.from_bytes(an.img.bytes_at(f, size), "little")
+        # placeholders are round numbers: 100, 1000, 10000, 100000
+        if k == 0:
+            kind = "opcode"         # a ret planted in an unrolled loop, or restored
+        elif k == i.disp_offset and k != i.imm_offset:
+            kind = "address"        # a memory operand pointed elsewhere
+        elif orig in (100, 1000, 10000, 100000):
+            kind = "placeholder"
+        else:
+            kind = "operand"
+        rows.append(["0x%08X" % f, "0x%08X" % base, "0x%08X" % an.func_of(base),
+                     "%s %s" % (i.mnemonic, i.op_str), "0x%0*X" % (2 * size, orig), kind,
+                     "0x%08X" % w, "0x%08X" % an.func_of(w), "%s %s" % (wi.mnemonic, wi.op_str)])
+    with open(os.path.join(ROOT, "config", "xngine_patches.csv"), "w", newline="") as fh:
+        wr = csv.writer(fh, lineterminator="\n")
+        wr.writerow(["field", "insn", "func", "insn_text", "original", "kind", "writer",
+                     "writer_func", "writer_text"])
+        wr.writerows(rows)
+    kinds = {}
+    for r in rows:
+        kinds[r[5]] = kinds.get(r[5], 0) + 1
+    print("self-modifying code: %d writes from %d functions into %d instructions of %d "
+          "functions (%s)" % (len(rows), len({r[7] for r in rows}), len({r[1] for r in rows}),
+                              len({r[2] for r in rows}),
+                              ", ".join("%s %d" % kv for kv in sorted(kinds.items()))))
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--split", action="store_true", help="rewrite config/xngine_modules.csv")
@@ -510,15 +735,18 @@ def main():
     a = ap.parse_args()
     img = xn_link.Image()
     an = Analysis(img)
-    print("object 2: %d functions (%d found by gap filling), %d instructions, %d code bytes, "
-          "%d jump-table bytes" % (len(an.funcs), len(an.gap_funcs), len(an.insns),
-                                   sum(i.size for i in an.insns.values()), len(an.tables)))
+    print("object 2: %d functions (%d found by gap filling, %d through pointers in data), "
+          "%d instructions, %d code bytes" % (
+              len(an.funcs), len(an.gap_funcs), len(an.ptr_funcs), len(an.insns),
+              sum(i.size for i in an.insns.values())))
     if a.split or not os.path.exists(xn_link.MODULES):
         with open(xn_link.MODULES, "w", newline="\n") as f:
             w = csv.writer(f, lineterminator="\n")
             w.writerow(["name", "start", "end"])
             for n, s, e in an.split():
                 w.writerow([n, "0x%08X" % s, "0x%08X" % e])
+    write_functions(an)
+    write_patches(an)
     mods = xn_link.modules()
     starts = [s for _n, s, _e in mods]
     # labels each module must make public: what the others reference

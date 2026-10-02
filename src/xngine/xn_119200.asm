@@ -29,21 +29,21 @@ public D_0012A01D
 public D_0012A029
 public D_0012A041
 extrn D_00116C80:byte
-extrn D_0012A700:byte
-extrn D_0012A740:byte
-extrn D_0012A7A0:byte
-extrn D_0012A860:byte
-extrn D_00155800:byte
-extrn D_00155820:byte
-extrn D_00155920:byte
-extrn D_00155D20:byte
-extrn D_00155F60:byte
-extrn D_00156460:byte
-extrn D_001566B4:byte
-extrn D_00156A80:byte
-extrn D_00156E60:byte
-extrn D_00157240:byte
-extrn D_0015BB8C:byte
+extrn func_0012A700:near
+extrn func_0012A740:near
+extrn func_0012A7A0:near
+extrn func_0012A860:near
+extrn func_00155800:near
+extrn func_00155820:near
+extrn func_00155920:near
+extrn func_00155D20:near
+extrn func_00155F60:near
+extrn func_00156460:near
+extrn func_001566B4:near
+extrn func_00156A80:near
+extrn func_00156E60:near
+extrn func_00157240:near
+extrn func_0015BB8C:near
 XN_119200 segment byte public use32 'CODE'
     assume cs:XN_119200, ds:XN_119200, es:XN_119200, ss:XN_119200
 D_00119200:
@@ -92,45 +92,45 @@ D_00129FC1:
     dd D_00129FE1+0
     dd D_00129FF5+0
 D_00129FCD:
-    dd D_0012A860
-    dd D_0012A860
-    dd D_0012A860
-    dd D_0012A860
-    dd D_0012A860
+    dd func_0012A860
+    dd func_0012A860
+    dd func_0012A860
+    dd func_0012A860
+    dd func_0012A860
 D_00129FE1:
-    dd D_0012A700
-    dd D_0012A700
-    dd D_0012A700
-    dd D_0012A700
-    dd D_0012A7A0
+    dd func_0012A700
+    dd func_0012A700
+    dd func_0012A700
+    dd func_0012A700
+    dd func_0012A7A0
 D_00129FF5:
-    dd D_0012A700
-    dd D_0015BB8C
-    dd D_0012A860
-    dd D_0012A860
-    dd D_0012A740
+    dd func_0012A700
+    dd func_0015BB8C
+    dd func_0012A860
+    dd func_0012A860
+    dd func_0012A740
 D_0012A009:
-    dd D_0012A700
-    dd D_0015BB8C
-    dd D_0012A860
-    dd D_0012A860
+    dd func_0012A700
+    dd func_0015BB8C
+    dd func_0012A860
+    dd func_0012A860
 D_0012A019:
-    dd D_0012A740
+    dd func_0012A740
 D_0012A01D:
-    dd D_00155800
-    dd D_00155820
-    dd D_00155920
+    dd func_00155800
+    dd func_00155820
+    dd func_00155920
 D_0012A029:
-    dd D_00155D20
-    dd D_00156460
-    dd D_00156A80
-    dd D_00155F60
-    dd D_001566B4
-    dd D_00156A80
+    dd func_00155D20
+    dd func_00156460
+    dd func_00156A80
+    dd func_00155F60
+    dd func_001566B4
+    dd func_00156A80
 D_0012A041:
-    dd D_00156E60
-    dd D_00157240
-    dd D_00157240
+    dd func_00156E60
+    dd func_00157240
+    dd func_00157240
     db 179 dup (0)
 XN_119200 ends
 end

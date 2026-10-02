@@ -27,10 +27,10 @@ public D_00143561
 public D_00143565
 public D_00143569
 public D_0014356D
-extrn D_00143924:byte
-extrn D_0014396C:byte
-extrn D_00143B80:byte
-extrn D_00144C0D:byte
+extrn func_00143924:near
+extrn func_0014396C:near
+extrn func_00143B80:near
+extrn func_00144C0D:near
 XN_142900 segment byte public use32 'CODE'
     assume cs:XN_142900, ds:XN_142900, es:XN_142900, ss:XN_142900
     B_142900_27
@@ -73,13 +73,13 @@ D_0014355C:
 D_0014355D:
     db 4 dup (0)
 D_00143561:
-    dd D_00143B80
+    dd func_00143B80
 D_00143565:
-    dd D_00144C0D
+    dd func_00144C0D
 D_00143569:
-    dd D_0014396C
+    dd func_0014396C
 D_0014356D:
-    dd D_00143924
+    dd func_00143924
     db 143 dup (0)
 XN_142900 ends
 end

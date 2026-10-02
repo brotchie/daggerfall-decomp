@@ -177,7 +177,7 @@ def check(name, start, end, img, src=SRC, objdir=OBJDIR):
 def splice(raw, img, blank=False):
     """Assemble every module, put the matching ones into raw[2] (the unrelocated object 2
     image). Returns ([(va, name, source)] of the functions they hold, [error lines])."""
-    matched, errors = [], []
+    matched, errors, done = [], [], []
     if not os.path.exists(MODULES):
         return matched, errors
     funcs = []
@@ -201,6 +201,16 @@ def splice(raw, img, blank=False):
             buf[start - base:end - base] = b"\xcc" * (end - start)
         buf[start - base:end - base] = data
         matched += [(va, fn, rel) for va, fn in funcs if start <= va < end]
+        done.append((start, end))
+    # object 2 has more functions than config/functions.csv lists (xngine_functions.csv)
+    p = os.path.join(ROOT, "config", "xngine_functions.csv")
+    if os.path.exists(p):
+        with open(p, newline="") as f:
+            rows = [(int(r["va"], 16), int(r["code_bytes"])) for r in csv.DictReader(f)]
+        ok = [(va, n) for va, n in rows if any(s <= va < e for s, e in done)]
+        print("xngine   %d / %d modules from asm: %d / %d functions, %d / %d code bytes" % (
+            len(done), len(modules()), len(ok), len(rows), sum(n for _v, n in ok),
+            sum(n for _v, n in rows)))
     return matched, errors
 
 

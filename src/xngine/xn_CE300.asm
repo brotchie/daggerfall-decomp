@@ -136,7 +136,24 @@ L_0CE42D:
     pop ecx
     pop ebx
     ret
-    B_0CE435_23
+func_000CE435:
+    push ecx
+    and ebx, ebx
+    je short L_0CE448
+L_0CE43A:
+    mov cl, byte ptr [eax]
+    test cl, cl
+    je short L_0CE448
+    cmp cl, dl
+    je short L_0CE44A
+    inc eax
+    dec ebx
+    jne short L_0CE43A
+L_0CE448:
+    xor eax, eax
+L_0CE44A:
+    pop ecx
+    ret
 func_000CE44C:
     and ebx, ebx
     je short L_0CE45A
@@ -188,7 +205,13 @@ func_000CE483:
     pop ecx
     pop edi
     ret
-    B_0CE495_9
+func_000CE495:
+    mov byte ptr [eax], dl
+    inc dl
+    inc eax
+    dec ebx
+    jne short func_000CE495
+    ret
 func_000CE49E:
     test byte ptr [eax], 0FFh
     je short L_0CE4A6
@@ -275,10 +298,10 @@ L_0CE554:
     neg esi
 L_0CE56C:
     push esi
-    mov dword ptr [D_000CDE3B], offset D_000CE61E
+    mov dword ptr [D_000CDE3B], offset func_000CE61E
     cmp ebx, ecx
     jle short L_0CE587
-    mov dword ptr [D_000CDE3B], offset D_000CE63F
+    mov dword ptr [D_000CDE3B], offset func_000CE63F
     xchg ecx, ebx
 L_0CE587:
     shl ebx, 1
@@ -331,22 +354,36 @@ L_0CE5F7:
     mov al, byte ptr [D_0012B508]
     rep stosb
     jmp short L_0CE65F
-D_000CE61E:
-    B_0CE61E_1
-    dd D_0012B508
-    B_0CE623_8
-    dd D_000CDE33
-    B_0CE62F_6
-    dd D_000CDE37
-    B_0CE639_6
-D_000CE63F:
-    B_0CE63F_1
-    dd D_0012B508
-    B_0CE644_10
-    dd D_000CDE33
-    B_0CE652_7
-    dd D_000CDE37
-    B_0CE65D_2
+func_000CE61E:
+    mov al, byte ptr [D_0012B508]
+    cld
+L_0CE624:
+    stosb
+    or esi, esi
+    jns short L_0CE633
+    add esi, dword ptr [D_000CDE33]
+    loop L_0CE624
+    jmp short L_0CE65F
+L_0CE633:
+    add esi, dword ptr [D_000CDE37]
+    add edi, ebx
+    loop L_0CE624
+    jmp short L_0CE65F
+func_000CE63F:
+    mov al, byte ptr [D_0012B508]
+    cld
+L_0CE645:
+    stosb
+    add edi, ebx
+    or esi, esi
+    jns short L_0CE657
+    add esi, dword ptr [D_000CDE33]
+    dec edi
+    loop L_0CE645
+    jmp short L_0CE65F
+L_0CE657:
+    add esi, dword ptr [D_000CDE37]
+    loop L_0CE645
 L_0CE65F:
     pop edi
     pop esi
@@ -378,7 +415,18 @@ func_000CE69A:
     int 033h
     popad
     ret
-    B_0CE6B7_29
+func_000CE6B7:
+    pushad
+    mov ax, 7
+    xor cx, cx
+    mov dx, 026Ch
+    int 033h
+    mov ax, 8
+    xor cx, cx
+    mov dx, 01CCh
+    int 033h
+    popad
+    ret
 func_000CE6D4:
     imul dword ptr [edx*4 + D_00150200]
     shld edx, eax, 4
@@ -492,9 +540,9 @@ func_000CE7A7:
     xor eax, eax
 L_0CE7B2:
     ret
-    B_0CE7B3_2
-    dd D_00195B00
-    B_0CE7B9_2
+func_000CE7B3:
+    add dword ptr [D_00195B00], 019h
+    ret
 func_000CE7BB:
     push edx
     inc dword ptr [D_000CDE06]
@@ -536,7 +584,47 @@ L_0CE81F:
     pop esi
     pop ecx
     ret
-    B_0CE828_83
+func_000CE828:
+    pushad
+    push edx
+    push ebx
+    mov ecx, dword ptr [eax + 4]
+    mov esi, dword ptr [eax + 030h]
+    add esi, eax
+    mov eax, 0FFFE7960h
+    mov ebx, 0186A0h
+    mov edx, 0FFFE7960h
+    mov edi, 0186A0h
+L_0CE847:
+    cmp eax, dword ptr [esi]
+    jl short L_0CE84D
+    mov eax, dword ptr [esi]
+L_0CE84D:
+    cmp ebx, dword ptr [esi]
+    jg short L_0CE853
+    mov ebx, dword ptr [esi]
+L_0CE853:
+    cmp edx, dword ptr [esi + 8]
+    jl short L_0CE85B
+    mov edx, dword ptr [esi + 8]
+L_0CE85B:
+    cmp edi, dword ptr [esi + 8]
+    jg short L_0CE863
+    mov edi, dword ptr [esi + 8]
+L_0CE863:
+    add esi, 0Ch
+    dec ecx
+    jne short L_0CE847
+    sub ebx, eax
+    sub edi, edx
+    shr ebx, 8
+    shr edi, 8
+    pop eax
+    mov dword ptr [eax], edi
+    pop eax
+    mov dword ptr [eax], ebx
+    popad
+    ret
 func_000CE87B:
     push edi
     push ecx
@@ -641,7 +729,13 @@ L_0CE948:
     popad
     popfd
     ret
-    B_0CE94B_12
+func_000CE94B:
+    pushad
+    mov bh, al
+    mov eax, 0C202h
+    int 015h
+    popad
+    ret
 func_000CE957:
     pushad
     mov edx, 0417h

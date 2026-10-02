@@ -4,18 +4,18 @@
 .486p
 .387
 include xn_13E600.inc
-public D_0013F4CC
-public D_0013F4F4
-public D_0013F51C
-public D_0013F550
-public D_0013F584
-public D_0013F5AC
-public D_0013F5D4
-public D_0013F608
 public L_13EA73
 public L_13EA7B
 public L_13EA8B
 public L_13EA93
+public func_0013F4CC
+public func_0013F4F4
+public func_0013F51C
+public func_0013F550
+public func_0013F584
+public func_0013F5AC
+public func_0013F5D4
+public func_0013F608
 extrn D_000C23C4:byte
 extrn D_000C23C8:byte
 extrn D_000C23CC:byte
@@ -334,21 +334,21 @@ func_0013E8C8:
     shl eax, 8
     shl ebx, 8
     call func_0013758A
-    mov dword ptr [L_13E984+6], eax
-    mov dword ptr [L_13E98E+6], edx
-    mov dword ptr [L_13E998+6], ebx
+    mov dword ptr [patch_13E98A], eax
+    mov dword ptr [patch_13E994], edx
+    mov dword ptr [patch_13E99E], ebx
     mov eax, dword ptr [D_00136E48]
     mov edx, dword ptr [D_00136E4C]
     mov ebx, dword ptr [D_00136E50]
-    mov dword ptr [L_13EAC2+6], eax
-    mov dword ptr [L_13EACC+6], edx
-    mov dword ptr [L_13EAD6+6], ebx
+    mov dword ptr [patch_13EAC8], eax
+    mov dword ptr [patch_13EAD2], edx
+    mov dword ptr [patch_13EADC], ebx
     mov eax, dword ptr [D_00136E60]
     mov edx, dword ptr [D_00136E64]
     mov ebx, dword ptr [D_00136E68]
-    mov dword ptr [L_13EAF1+6], eax
-    mov dword ptr [L_13EAFB+6], edx
-    mov dword ptr [L_13EB05+6], ebx
+    mov dword ptr [patch_13EAF7], eax
+    mov dword ptr [patch_13EB01], edx
+    mov dword ptr [patch_13EB0B], ebx
     mov eax, dword ptr [D_000C23CC]
     neg eax
     add eax, dword ptr [D_000C23D4]
@@ -359,26 +359,32 @@ func_0013E8C8:
     and ebx, 0FFh
     mov bh, ah
     xor edi, edi
-    mov dword ptr [L_13EB14+2], 03000h
+    mov dword ptr [patch_13EB16], 03000h
 L_13E984:
-    mov dword ptr [L_13E9B6+1], 0186A0h
+    mov dword ptr [patch_13E9B7], 0186A0h
+patch_13E98A equ L_13E984+6   ; rewritten at run time
 L_13E98E:
-    mov dword ptr [L_13E9BD+1], 0186A0h
+    mov dword ptr [patch_13E9BE], 0186A0h
+patch_13E994 equ L_13E98E+6   ; rewritten at run time
 L_13E998:
-    mov dword ptr [L_13E9C2+1], 0186A0h
+    mov dword ptr [patch_13E9C3], 0186A0h
+patch_13E99E equ L_13E998+6   ; rewritten at run time
     lea eax, [edi + 0180h]
-    mov dword ptr [L_13EAE5+2], eax
+    mov dword ptr [patch_13EAE7], eax
 L_13E9AD:
     push ebx
     add ebx, dword ptr [D_000C28BC]
     xor ecx, ecx
 L_13E9B6:
     mov eax, 0186A0h
+patch_13E9B7 equ L_13E9B6+1   ; rewritten at run time
     mov cl, byte ptr [ebx]
 L_13E9BD:
     mov ebp, 0186A0h
+patch_13E9BE equ L_13E9BD+1   ; rewritten at run time
 L_13E9C2:
     mov ebx, 0186A0h
+patch_13E9C3 equ L_13E9C2+1   ; rewritten at run time
     sub eax, dword ptr [ecx*4 + D_00137900]
     sub ebp, dword ptr [ecx*4 + D_00137D00]
     sub ebx, dword ptr [ecx*4 + D_00138100]
@@ -433,17 +439,21 @@ L_13EA58:
     mov eax, ebp
 L_13EA73:
     imul eax, eax, 0186A0h
+patch_13EA75 equ L_13EA73+2   ; rewritten at run time
     imul ebx
 L_13EA7B:
     add edx, 0186A0h
+patch_13EA7D equ L_13EA7B+2   ; rewritten at run time
     shr edx, 3
     pop eax
     mov dword ptr [edi + D_000D1AC0], edx
 L_13EA8B:
     imul eax, eax, 0186A0h
+patch_13EA8D equ L_13EA8B+2   ; rewritten at run time
     imul ebx
 L_13EA93:
     add edx, 0186A0h
+patch_13EA95 equ L_13EA93+2   ; rewritten at run time
     shr edx, 8
     mov dword ptr [edi + D_000D1AC4], edx
 L_13EAA2:
@@ -455,26 +465,34 @@ L_13EAA2:
     mov al, byte ptr [esi + ebx]
     mov byte ptr [edi + D_000D4AC0], al
 L_13EAC2:
-    add dword ptr [L_13E9B6+1], 0186A0h
+    add dword ptr [patch_13E9B7], 0186A0h
+patch_13EAC8 equ L_13EAC2+6   ; rewritten at run time
 L_13EACC:
-    add dword ptr [L_13E9BD+1], 0186A0h
+    add dword ptr [patch_13E9BE], 0186A0h
+patch_13EAD2 equ L_13EACC+6   ; rewritten at run time
 L_13EAD6:
-    add dword ptr [L_13E9C2+1], 0186A0h
+    add dword ptr [patch_13E9C3], 0186A0h
+patch_13EADC equ L_13EAD6+6   ; rewritten at run time
     add edi, 0Ch
     inc bl
 L_13EAE5:
     cmp edi, 0186A0h
+patch_13EAE7 equ L_13EAE5+2   ; rewritten at run time
     jne near ptr L_13E9AD
 L_13EAF1:
-    add dword ptr [L_13E984+6], 0186A0h
+    add dword ptr [patch_13E98A], 0186A0h
+patch_13EAF7 equ L_13EAF1+6   ; rewritten at run time
 L_13EAFB:
-    add dword ptr [L_13E98E+6], 0186A0h
+    add dword ptr [patch_13E994], 0186A0h
+patch_13EB01 equ L_13EAFB+6   ; rewritten at run time
 L_13EB05:
-    add dword ptr [L_13E998+6], 0186A0h
+    add dword ptr [patch_13E99E], 0186A0h
+patch_13EB0B equ L_13EB05+6   ; rewritten at run time
     inc bh
     sub bl, 020h
 L_13EB14:
     cmp edi, 0186A0h
+patch_13EB16 equ L_13EB14+2   ; rewritten at run time
     jne near ptr L_13E984
     ret
 func_0013EB21:
@@ -756,17 +774,17 @@ L_13EFD5:
 func_0013EFD7:
     call func_0013F3C1
     movzx eax, word ptr [D_000C287F]
-    mov dword ptr [L_13F0A1+1], eax
-    mov dword ptr [L_13F11A+1], eax
-    mov dword ptr [L_13F1B9+1], eax
+    mov dword ptr [patch_13F0A2], eax
+    mov dword ptr [patch_13F11B], eax
+    mov dword ptr [patch_13F1BA], eax
     xor edx, edx
     mov ebx, 0FFFFFFFFh
     call func_00135D00
     jb near ptr L_13F3C0
     mov eax, dword ptr [D_0012A019]
-    mov dword ptr [L_13F067+3], eax
-    mov dword ptr [L_13F0E0+3], eax
-    mov dword ptr [L_13F17F+3], eax
+    mov dword ptr [patch_13F06A], eax
+    mov dword ptr [patch_13F0E3], eax
+    mov dword ptr [patch_13F182], eax
     xor esi, esi
     mov edx, 01Fh
 L_13F01F:
@@ -794,6 +812,7 @@ L_13F02B:
     push ebx
 L_13F067:
     mov dword ptr [edi + 03Ch], 0186A0h
+patch_13F06A equ L_13F067+3   ; rewritten at run time
     mov dl, byte ptr [esi + D_000D4AC2]
     mov bl, byte ptr [esi + D_000D4AC0]
     mov al, dl
@@ -807,6 +826,7 @@ L_13F067:
     call dword ptr [eax + ebx*2 + D_00138558]
 L_13F0A1:
     mov eax, 0186A0h
+patch_13F0A2 equ L_13F0A1+1   ; rewritten at run time
     mov ebx, 0FFFFFFFFh
     call func_00135D00
     mov dword ptr [edi + 040h], eax
@@ -828,6 +848,7 @@ L_13F0C5:
     push ebx
 L_13F0E0:
     mov dword ptr [edi + 03Ch], 0186A0h
+patch_13F0E3 equ L_13F0E0+3   ; rewritten at run time
     mov dl, byte ptr [esi + D_000D4AC2]
     mov bl, byte ptr [esi + D_000D4AC0]
     mov al, dl
@@ -841,6 +862,7 @@ L_13F0E0:
     call dword ptr [eax + ebx*2 + D_00138558]
 L_13F11A:
     mov eax, 0186A0h
+patch_13F11B equ L_13F11A+1   ; rewritten at run time
     mov ebx, 0FFFFFFFFh
     call func_00135D00
     mov dword ptr [edi + 040h], eax
@@ -871,6 +893,7 @@ L_13F146:
     push ebx
 L_13F17F:
     mov dword ptr [edi + 03Ch], 0186A0h
+patch_13F182 equ L_13F17F+3   ; rewritten at run time
     mov dl, byte ptr [esi + D_000D4AC2]
     mov bl, byte ptr [esi + D_000D4AC0]
     mov al, dl
@@ -884,6 +907,7 @@ L_13F17F:
     call dword ptr [eax + ebx*2 + D_00138558]
 L_13F1B9:
     mov eax, 0186A0h
+patch_13F1BA equ L_13F1B9+1   ; rewritten at run time
     mov ebx, 0FFFFFFFFh
     call func_00135D00
     pop ebx
@@ -1072,86 +1096,112 @@ func_0013F3C1:
     sar dword ptr [D_00138534], 0Bh
     ret
     B_13F4CB_1
-D_0013F4CC:
-    B_13F4CC_2
-    dd D_00138520
-    B_13F4D2_5
-    dd D_00138524
-    B_13F4DB_5
-    dd D_00138528
-    B_13F4E4_5
-    dd D_000C28DC
-    B_13F4ED_7
-D_0013F4F4:
-    B_13F4F4_2
-    dd D_0013852C
-    B_13F4FA_5
-    dd D_00138530
-    B_13F503_5
-    dd D_00138534
-    B_13F50C_5
-    dd D_000C28E4
-    B_13F515_7
-D_0013F51C:
-    B_13F51C_2
-    dd D_00138520
-    B_13F522_7
-    dd D_00138524
-    B_13F52D_7
-    dd D_00138528
-    B_13F538_7
-    dd D_000C28DC
-    B_13F543_13
-D_0013F550:
-    B_13F550_2
-    dd D_0013852C
-    B_13F556_7
-    dd D_00138530
-    B_13F561_7
-    dd D_00138534
-    B_13F56C_7
-    dd D_000C28E4
-    B_13F577_13
-D_0013F584:
-    B_13F584_2
-    dd D_0013852C
-    B_13F58A_5
-    dd D_00138530
-    B_13F593_5
-    dd D_00138534
-    B_13F59C_5
-    dd D_000C28E4
-    B_13F5A5_7
-D_0013F5AC:
-    B_13F5AC_2
-    dd D_00138520
-    B_13F5B2_5
-    dd D_00138524
-    B_13F5BB_5
-    dd D_00138528
-    B_13F5C4_5
-    dd D_000C28DC
-    B_13F5CD_7
-D_0013F5D4:
-    B_13F5D4_2
-    dd D_0013852C
-    B_13F5DA_7
-    dd D_00138530
-    B_13F5E5_7
-    dd D_00138534
-    B_13F5F0_7
-    dd D_000C28E4
-    B_13F5FB_13
-D_0013F608:
-    B_13F608_2
-    dd D_00138520
-    B_13F60E_7
-    dd D_00138524
-    B_13F619_7
-    dd D_00138528
-    B_13F624_7
-    dd D_000C28DC
-    B_13F62F_13
+func_0013F4CC:
+    mov ecx, dword ptr [D_00138520]
+    mov dword ptr [edi + 024h], ecx
+    mov ecx, dword ptr [D_00138524]
+    mov dword ptr [edi + 028h], ecx
+    mov ecx, dword ptr [D_00138528]
+    mov dword ptr [edi + 02Ch], ecx
+    mov ecx, dword ptr [D_000C28DC]
+    mov dword ptr [edi + 018h], ecx
+    ret
+    B_13F4F1_3
+func_0013F4F4:
+    mov ecx, dword ptr [D_0013852C]
+    mov dword ptr [edi + 024h], ecx
+    mov ecx, dword ptr [D_00138530]
+    mov dword ptr [edi + 028h], ecx
+    mov ecx, dword ptr [D_00138534]
+    mov dword ptr [edi + 02Ch], ecx
+    mov ecx, dword ptr [D_000C28E4]
+    mov dword ptr [edi + 018h], ecx
+    ret
+    B_13F519_3
+func_0013F51C:
+    mov ecx, dword ptr [D_00138520]
+    neg ecx
+    mov dword ptr [edi + 024h], ecx
+    mov ecx, dword ptr [D_00138524]
+    neg ecx
+    mov dword ptr [edi + 028h], ecx
+    mov ecx, dword ptr [D_00138528]
+    neg ecx
+    mov dword ptr [edi + 02Ch], ecx
+    mov ecx, dword ptr [D_000C28DC]
+    neg ecx
+    add ecx, 04000h
+    mov dword ptr [edi + 018h], ecx
+    ret
+    B_13F54F_1
+func_0013F550:
+    mov ecx, dword ptr [D_0013852C]
+    neg ecx
+    mov dword ptr [edi + 024h], ecx
+    mov ecx, dword ptr [D_00138530]
+    neg ecx
+    mov dword ptr [edi + 028h], ecx
+    mov ecx, dword ptr [D_00138534]
+    neg ecx
+    mov dword ptr [edi + 02Ch], ecx
+    mov ecx, dword ptr [D_000C28E4]
+    neg ecx
+    add ecx, 04000h
+    mov dword ptr [edi + 018h], ecx
+    ret
+    B_13F583_1
+func_0013F584:
+    mov ecx, dword ptr [D_0013852C]
+    mov dword ptr [edi + 030h], ecx
+    mov ecx, dword ptr [D_00138530]
+    mov dword ptr [edi + 034h], ecx
+    mov ecx, dword ptr [D_00138534]
+    mov dword ptr [edi + 038h], ecx
+    mov ecx, dword ptr [D_000C28E4]
+    mov word ptr [edi + 01Ah], cx
+    ret
+    B_13F5AA_2
+func_0013F5AC:
+    mov ecx, dword ptr [D_00138520]
+    mov dword ptr [edi + 030h], ecx
+    mov ecx, dword ptr [D_00138524]
+    mov dword ptr [edi + 034h], ecx
+    mov ecx, dword ptr [D_00138528]
+    mov dword ptr [edi + 038h], ecx
+    mov ecx, dword ptr [D_000C28DC]
+    mov word ptr [edi + 01Ah], cx
+    ret
+    B_13F5D2_2
+func_0013F5D4:
+    mov ecx, dword ptr [D_0013852C]
+    neg ecx
+    mov dword ptr [edi + 030h], ecx
+    mov ecx, dword ptr [D_00138530]
+    neg ecx
+    mov dword ptr [edi + 034h], ecx
+    mov ecx, dword ptr [D_00138534]
+    neg ecx
+    mov dword ptr [edi + 038h], ecx
+    mov ecx, dword ptr [D_000C28E4]
+    neg ecx
+    add ecx, 04000h
+    mov word ptr [edi + 01Ah], cx
+    ret
+func_0013F608:
+    mov ecx, dword ptr [D_00138520]
+    neg ecx
+    mov dword ptr [edi + 030h], ecx
+    mov ecx, dword ptr [D_00138524]
+    neg ecx
+    mov dword ptr [edi + 034h], ecx
+    mov ecx, dword ptr [D_00138528]
+    neg ecx
+    mov dword ptr [edi + 038h], ecx
+    mov ecx, dword ptr [D_000C28DC]
+    neg ecx
+    add ecx, 04000h
+    mov word ptr [edi + 01Ah], cx
+    ret
     db 196 dup (0)
 XN_13E600 ends
 end

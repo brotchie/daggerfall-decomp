@@ -4,6 +4,8 @@
 .486p
 .387
 include xn_153100.inc
+public func_0015310C
+public func_00153188
 extrn D_0012B508:byte
 extrn D_00142928:byte
 extrn D_0014292C:byte
@@ -20,7 +22,7 @@ extrn D_00153004:byte
 XN_153100 segment byte public use32 'CODE'
     assume cs:XN_153100, ds:XN_153100, es:XN_153100, ss:XN_153100
     B_153100_12
-L_15310C:
+func_0015310C:
     cmp edx, dword ptr [D_00142944]
     jl short L_153178
     nop
@@ -60,8 +62,16 @@ L_153150:
     rep stosb
 L_153178:
     ret
-    B_153179_15
-L_153188:
+    B_153179_3
+func_0015317C:
+    push edi
+    push ebp
+    mov ecx, ebx
+    call func_00153188
+    pop ebp
+    pop edi
+    ret
+func_00153188:
     cmp eax, dword ptr [D_00142940]
     jl short L_1531EF
     cmp eax, dword ptr [D_00142948]
@@ -118,13 +128,13 @@ L_15320D:
 func_00153210:
     mov esi, ebx
     sub esi, eax
-    je near ptr L_153188
+    je near ptr func_00153188
     jns short L_15321E
     neg esi
 L_15321E:
     mov edi, ecx
     sub edi, edx
-    je near ptr L_15310C
+    je near ptr func_0015310C
     jns short L_15322C
     neg edi
 L_15322C:

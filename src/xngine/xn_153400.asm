@@ -19,24 +19,24 @@ public D_00153461
 public D_00153465
 public D_00153469
 public D_0015346D
-extrn D_00160E00:byte
-extrn D_00160E44:byte
-extrn D_00160E45:byte
-extrn D_00160E57:byte
-extrn D_00160E64:byte
-extrn D_00160EAC:byte
-extrn D_00161000:byte
-extrn D_00161084:byte
-extrn D_00161094:byte
-extrn D_001610B4:byte
-extrn D_001610C4:byte
-extrn D_0016116C:byte
-extrn D_00161400:byte
-extrn D_001614D0:byte
-extrn D_001614E4:byte
-extrn D_001614E8:byte
-extrn D_001614EC:byte
-extrn D_001614F0:byte
+extrn func_00160E00:near
+extrn func_00160E44:near
+extrn func_00160E45:near
+extrn func_00160E57:near
+extrn func_00160E64:near
+extrn func_00160EAC:near
+extrn func_00161000:near
+extrn func_00161084:near
+extrn func_00161094:near
+extrn func_001610B4:near
+extrn func_001610C4:near
+extrn func_0016116C:near
+extrn func_00161400:near
+extrn func_001614D0:near
+extrn func_001614E4:near
+extrn func_001614E8:near
+extrn func_001614EC:near
+extrn func_001614F0:near
 XN_153400 segment byte public use32 'CODE'
     assume cs:XN_153400, ds:XN_153400, es:XN_153400, ss:XN_153400
 D_00153400:
@@ -54,27 +54,27 @@ D_00153411:
 D_00153415:
     db 4 dup (0)
 D_00153419:
-    dd D_00160E00
-    dd D_00161000
-    dd D_00161400
+    dd func_00160E00
+    dd func_00161000
+    dd func_00161400
 D_00153425:
-    dd D_00160E44
-    dd D_00161084
-    dd D_001614D0
+    dd func_00160E44
+    dd func_00161084
+    dd func_001614D0
 D_00153431:
-    dd D_00160EAC
-    dd D_0016116C
-    dd D_001614F0
+    dd func_00160EAC
+    dd func_0016116C
+    dd func_001614F0
 D_0015343D:
-    dd D_00160E64
-    dd D_001610C4
-    dd D_001614E8
-    dd D_00160E45
-    dd D_00161094
-    dd D_001614E4
-    dd D_00160E57
-    dd D_001610B4
-    dd D_001614EC
+    dd func_00160E64
+    dd func_001610C4
+    dd func_001614E8
+    dd func_00160E45
+    dd func_00161094
+    dd func_001614E4
+    dd func_00160E57
+    dd func_001610B4
+    dd func_001614EC
 D_00153461:
     db 4 dup (0)
 D_00153465:

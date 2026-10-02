@@ -220,7 +220,7 @@ func_000C1654:
     rep stosb
     mov word ptr [D_000C1468], 0
     mov word ptr [D_000C1466], 0
-    mov eax, offset D_000C1CDC
+    mov eax, offset func_000C1CDC
     mov edx, 03Ch
     call func_00069B0E
     mov dword ptr [D_000C1462], eax
@@ -665,34 +665,45 @@ L_0C1CAF:
     mov dword ptr [D_000C1435], esi
     pop edi
     ret
-D_000C1CDC:
-    B_0C1CDC_3
-    dd D_000C1466
-    B_0C1CE3_3
-    dd D_000C146A
-    B_0C1CEA_6
-    dd D_000C1468
-    B_0C1CF4_5
-    dd D_000C146A
-    B_0C1CFD_3
-D_000C1D00:
-    B_0C1D00_11
-    dd D_000C1123
-    B_0C1D0F_5
-    dd D_000C1124
-    B_0C1D18_5
-    dd D_000C1100
-    B_0C1D21_4
-    dd D_000C111A
-    B_0C1D29_2
-    dd D_000C111E
-    B_0C1D2F_3
-    dd D_000C1112
-    B_0C1D36_2
-    dd D_000C1116
-    B_0C1D3C_7
-    dd D_000C1123
-    B_0C1D47_6
+func_000C1CDC:
+    dec word ptr [D_000C1466]
+    cmp word ptr [D_000C146A], 0
+    je short L_0C1CFF
+    dec word ptr [D_000C1468]
+    jne short L_0C1CFF
+    mov word ptr [D_000C146A], 0
+L_0C1CFF:
+    ret
+func_000C1D00:
+    push ebp
+    mov ebp, esp
+    push esi
+    push eax
+    push ecx
+    mov esi, dword ptr [ebp + 8]
+    cmp byte ptr [D_000C1123], 1
+    jne short L_0C1D1B
+    mov byte ptr [D_000C1124], 1
+    jmp short L_0C1D48
+L_0C1D1B:
+    cmp byte ptr [D_000C1100], 0
+    jne short L_0C1D31
+    mov eax, dword ptr [D_000C111A]
+    mov ecx, dword ptr [D_000C111E]
+    jmp short L_0C1D3C
+L_0C1D31:
+    mov eax, dword ptr [D_000C1112]
+    mov ecx, dword ptr [D_000C1116]
+L_0C1D3C:
+    mov dword ptr [esi], eax
+    mov dword ptr [esi + 0Ch], ecx
+    mov byte ptr [D_000C1123], 1
+L_0C1D48:
+    pop ecx
+    pop eax
+    pop esi
+    pop ebp
+    ret
 func_000C1D4D:
     cmp byte ptr [D_000C10FF], 0
     je short L_0C1D6D
@@ -722,7 +733,7 @@ L_0C1D8E:
     mov dword ptr [D_000C103B], 07F007F00h
     mov dword ptr [D_000C103F], 0
     mov dword ptr [D_000C101F], ecx
-    mov eax, offset D_000C1D00
+    mov eax, offset func_000C1D00
     mov dword ptr [D_000C106B], eax
     mov eax, dword ptr [D_0018DD60]
     mov edx, offset D_000C100F

@@ -4,44 +4,44 @@
 .486p
 .387
 include xn_136A00.inc
-public D_00136C30
-public D_00136C3B
-public D_00136C45
-public D_00136C4A
-public D_00136C51
-public D_00136C57
-public D_00136C6D
-public D_00136C84
-public D_00136C92
-public D_00136C99
-public D_00136CA0
-public D_00136CA7
-public D_00136CAE
-public D_00136CB5
-public D_00136CBB
-public D_00136CC0
-public D_00136CD8
-public D_00136CE3
-public D_00136CF9
-public D_00136D10
-public D_00136D1E
-public D_00136D25
-public D_00136D2C
-public D_00136D33
-public D_00136D3A
-public D_00136D41
-public D_00136D48
-public D_00136D4F
-public D_00136D56
-public D_00136D5C
-public D_00136D66
-public D_00136D70
-public D_00136D75
-public D_00136D8B
-public D_00136DA6
-public D_00136DC1
+public L_136C38
+public L_136C42
+public L_136C49
+public L_136C4E
+public L_136C55
+public L_136C6B
+public L_136C8F
+public L_136C96
+public L_136C9D
+public L_136CA4
+public L_136CAB
+public L_136CB2
+public L_136CB9
+public L_136CBF
+public L_136CD6
+public L_136CE1
+public L_136CF7
+public L_136D1B
+public L_136D22
+public L_136D29
+public L_136D30
+public L_136D37
+public L_136D3E
+public L_136D45
+public L_136D4C
+public L_136D53
+public L_136D5A
+public L_136D64
+public L_136D6E
+public L_136D74
+public L_136D89
+public L_136DA4
+public L_136DBF
 public func_00136A98
 public func_00136BD8
+public func_00136C30
+public func_00136C84
+public func_00136D10
 extrn D_000C23C4:byte
 extrn D_000C23C8:byte
 extrn D_000C23CC:byte
@@ -90,12 +90,12 @@ func_00136A00:
     add eax, 01Fh
     and eax, 0FFFFFFE0h
     mov dword ptr [D_00136901], eax
-    mov dword ptr [D_00136C67], eax
-    mov dword ptr [D_00136CD2], eax
-    mov dword ptr [D_00136CF3], eax
-    mov dword ptr [D_00136D85], eax
-    mov dword ptr [D_00136DA0], eax
-    mov dword ptr [D_00136DBB], eax
+    mov dword ptr [patch_136C67], eax
+    mov dword ptr [patch_136CD2], eax
+    mov dword ptr [patch_136CF3], eax
+    mov dword ptr [patch_136D85], eax
+    mov dword ptr [patch_136DA0], eax
+    mov dword ptr [patch_136DBB], eax
     mov edx, eax
     mov eax, offset D_0013652F
     call func_000C0E24
@@ -212,12 +212,12 @@ func_00136B88:
     mov eax, dword ptr [D_00136915]
     add eax, 03F00h
     mov dword ptr [D_0013691D], eax
-    mov dword ptr [D_00136C78], eax
-    mov dword ptr [D_00136C7F], eax
-    mov dword ptr [D_00136D04], eax
-    mov dword ptr [D_00136D0B], eax
-    mov dword ptr [D_00136DCC], eax
-    mov dword ptr [D_00136DD3], eax
+    mov dword ptr [patch_136C78], eax
+    mov dword ptr [patch_136C7F], eax
+    mov dword ptr [patch_136D04], eax
+    mov dword ptr [patch_136D0B], eax
+    mov dword ptr [patch_136DCC], eax
+    mov dword ptr [patch_136DD3], eax
     popad
     ret
     B_136BD7_1
@@ -253,108 +253,199 @@ L_136C2D:
     popad
     ret
     B_136C2F_1
-D_00136C30:
-    B_136C30_11
-D_00136C3B:
-    B_136C3B_10
-D_00136C45:
-    B_136C45_5
-D_00136C4A:
-    B_136C4A_7
-D_00136C51:
-    B_136C51_6
-D_00136C57:
-    dd D_00136909
-    B_136C5B_12
-D_00136C67:
-    B_136C67_6
-D_00136C6D:
-    B_136C6D_11
-D_00136C78:
-    B_136C78_7
-D_00136C7F:
-    B_136C7F_5
-D_00136C84:
-    B_136C84_14
-D_00136C92:
-    B_136C92_7
-D_00136C99:
-    B_136C99_7
-D_00136CA0:
-    B_136CA0_7
-D_00136CA7:
-    B_136CA7_7
-D_00136CAE:
-    B_136CAE_7
-D_00136CB5:
-    B_136CB5_6
-D_00136CBB:
-    dd D_00136909
-    B_136CBF_1
-D_00136CC0:
-    B_136CC0_18
-D_00136CD2:
-    B_136CD2_6
-D_00136CD8:
-    B_136CD8_11
-D_00136CE3:
-    dd D_00136909
-    B_136CE7_12
-D_00136CF3:
-    B_136CF3_6
-D_00136CF9:
-    B_136CF9_11
-D_00136D04:
-    B_136D04_7
-D_00136D0B:
-    B_136D0B_5
-D_00136D10:
-    B_136D10_14
-D_00136D1E:
-    B_136D1E_7
-D_00136D25:
-    B_136D25_7
-D_00136D2C:
-    B_136D2C_7
-D_00136D33:
-    B_136D33_7
-D_00136D3A:
-    B_136D3A_7
-D_00136D41:
-    B_136D41_7
-D_00136D48:
-    B_136D48_7
-D_00136D4F:
-    B_136D4F_7
-D_00136D56:
-    B_136D56_6
-D_00136D5C:
-    dd D_00136909
-    B_136D60_6
-D_00136D66:
-    dd D_00136909
-    B_136D6A_6
-D_00136D70:
-    dd D_00136909
-    B_136D74_1
-D_00136D75:
-    B_136D75_16
-D_00136D85:
-    B_136D85_6
-D_00136D8B:
-    B_136D8B_21
-D_00136DA0:
-    B_136DA0_6
-D_00136DA6:
-    B_136DA6_21
-D_00136DBB:
-    B_136DBB_6
-D_00136DC1:
-    B_136DC1_11
-D_00136DCC:
-    B_136DCC_7
-D_00136DD3:
-    B_136DD3_5
+func_00136C30:
+    imul ecx
+    mov ebx, edx
+    mov eax, ebp
+    imul ecx
+L_136C38:
+    mov eax, dword ptr [ebx*4 + 0186A0h]
+patch_136C3B equ L_136C38+3   ; rewritten at run time
+    shr ecx, 0Eh
+L_136C42:
+    add eax, dword ptr [edx*4 + 0186A0h]
+patch_136C45 equ L_136C42+3   ; rewritten at run time
+L_136C49:
+    mov ebp, 0186A0h
+patch_136C4A equ L_136C49+1   ; rewritten at run time
+L_136C4E:
+    add eax, dword ptr [ecx*4 + 0186A0h]
+patch_136C51 equ L_136C4E+3   ; rewritten at run time
+L_136C55:
+    mul dword ptr [D_00136909]
+patch_136C57 equ L_136C55+2   ; rewritten at run time
+    test edx, 0FFFF8000h
+    jne short L_136C83
+L_136C63:
+    mov dx, word ptr [edx*2 + 0186A0h]
+patch_136C67 equ L_136C63+4   ; rewritten at run time
+L_136C6B:
+    imul edx, edx, 0186A0h
+patch_136C6D equ L_136C6B+2   ; rewritten at run time
+    shr edx, 0Ch
+    add ebp, edx
+L_136C76:
+    cmp ebp, 0186A0h
+patch_136C78 equ L_136C76+2   ; rewritten at run time
+    jle short L_136C83
+L_136C7E:
+    mov ebp, 0186A0h
+patch_136C7F equ L_136C7E+1   ; rewritten at run time
+L_136C83:
+    ret
+func_00136C84:
+    imul ecx
+    mov eax, ebp
+    mov ebx, edx
+    imul ecx
+    shr ecx, 0Eh
+L_136C8F:
+    mov eax, dword ptr [ebx*4 + 0186A0h]
+patch_136C92 equ L_136C8F+3   ; rewritten at run time
+L_136C96:
+    add eax, dword ptr [edx*4 + 0186A0h]
+patch_136C99 equ L_136C96+3   ; rewritten at run time
+L_136C9D:
+    add eax, dword ptr [ecx*4 + 0186A0h]
+patch_136CA0 equ L_136C9D+3   ; rewritten at run time
+L_136CA4:
+    mov ecx, dword ptr [ecx*4 + 0186A0h]
+patch_136CA7 equ L_136CA4+3   ; rewritten at run time
+L_136CAB:
+    add ecx, dword ptr [ebx*4 + 0186A0h]
+patch_136CAE equ L_136CAB+3   ; rewritten at run time
+L_136CB2:
+    add ecx, dword ptr [edx*4 + 0186A0h]
+patch_136CB5 equ L_136CB2+3   ; rewritten at run time
+L_136CB9:
+    mul dword ptr [D_00136909]
+patch_136CBB equ L_136CB9+2   ; rewritten at run time
+L_136CBF:
+    mov ebp, 0186A0h
+patch_136CC0 equ L_136CBF+1   ; rewritten at run time
+    mov eax, ecx
+    test edx, 0FFFF8000h
+    jne short L_136CE1
+L_136CCE:
+    mov dx, word ptr [edx*2 + 0186A0h]
+patch_136CD2 equ L_136CCE+4   ; rewritten at run time
+L_136CD6:
+    imul edx, edx, 0186A0h
+patch_136CD8 equ L_136CD6+2   ; rewritten at run time
+    shr edx, 0Ch
+    add ebp, edx
+L_136CE1:
+    mul dword ptr [D_00136909]
+patch_136CE3 equ L_136CE1+2   ; rewritten at run time
+    test edx, 0FFFF8000h
+    jne short L_136D02
+L_136CEF:
+    mov dx, word ptr [edx*2 + 0186A0h]
+patch_136CF3 equ L_136CEF+4   ; rewritten at run time
+L_136CF7:
+    imul edx, edx, 0186A0h
+patch_136CF9 equ L_136CF7+2   ; rewritten at run time
+    shr edx, 0Ch
+    add ebp, edx
+L_136D02:
+    cmp ebp, 0186A0h
+patch_136D04 equ L_136D02+2   ; rewritten at run time
+    jle short L_136D0F
+L_136D0A:
+    mov ebp, 0186A0h
+patch_136D0B equ L_136D0A+1   ; rewritten at run time
+L_136D0F:
+    ret
+func_00136D10:
+    imul ecx
+    mov eax, ebp
+    mov ebx, edx
+    imul ecx
+    shr ecx, 0Eh
+L_136D1B:
+    mov eax, dword ptr [ebx*4 + 0186A0h]
+patch_136D1E equ L_136D1B+3   ; rewritten at run time
+L_136D22:
+    add eax, dword ptr [edx*4 + 0186A0h]
+patch_136D25 equ L_136D22+3   ; rewritten at run time
+L_136D29:
+    add eax, dword ptr [ecx*4 + 0186A0h]
+patch_136D2C equ L_136D29+3   ; rewritten at run time
+L_136D30:
+    mov ebp, dword ptr [ecx*4 + 0186A0h]
+patch_136D33 equ L_136D30+3   ; rewritten at run time
+L_136D37:
+    add ebp, dword ptr [ebx*4 + 0186A0h]
+patch_136D3A equ L_136D37+3   ; rewritten at run time
+L_136D3E:
+    add ebp, dword ptr [edx*4 + 0186A0h]
+patch_136D41 equ L_136D3E+3   ; rewritten at run time
+L_136D45:
+    mov ecx, dword ptr [ecx*4 + 0186A0h]
+patch_136D48 equ L_136D45+3   ; rewritten at run time
+L_136D4C:
+    add ecx, dword ptr [ebx*4 + 0186A0h]
+patch_136D4F equ L_136D4C+3   ; rewritten at run time
+L_136D53:
+    add ecx, dword ptr [edx*4 + 0186A0h]
+patch_136D56 equ L_136D53+3   ; rewritten at run time
+L_136D5A:
+    mul dword ptr [D_00136909]
+patch_136D5C equ L_136D5A+2   ; rewritten at run time
+    mov eax, ebp
+    mov ebx, edx
+L_136D64:
+    mul dword ptr [D_00136909]
+patch_136D66 equ L_136D64+2   ; rewritten at run time
+    mov eax, ecx
+    mov ecx, edx
+L_136D6E:
+    mul dword ptr [D_00136909]
+patch_136D70 equ L_136D6E+2   ; rewritten at run time
+L_136D74:
+    mov ebp, 0186A0h
+patch_136D75 equ L_136D74+1   ; rewritten at run time
+    test ebx, 0FFFF8000h
+    jne short L_136D94
+L_136D81:
+    mov bx, word ptr [ebx*2 + 0186A0h]
+patch_136D85 equ L_136D81+4   ; rewritten at run time
+L_136D89:
+    imul ebx, ebx, 0186A0h
+patch_136D8B equ L_136D89+2   ; rewritten at run time
+    shr ebx, 0Ch
+    add ebp, ebx
+L_136D94:
+    test ecx, 0FFFF8000h
+    jne short L_136DAF
+L_136D9C:
+    mov cx, word ptr [ecx*2 + 0186A0h]
+patch_136DA0 equ L_136D9C+4   ; rewritten at run time
+L_136DA4:
+    imul ecx, ecx, 0186A0h
+patch_136DA6 equ L_136DA4+2   ; rewritten at run time
+    shr ecx, 0Ch
+    add ebp, ecx
+L_136DAF:
+    test edx, 0FFFF8000h
+    jne short L_136DCA
+L_136DB7:
+    mov dx, word ptr [edx*2 + 0186A0h]
+patch_136DBB equ L_136DB7+4   ; rewritten at run time
+L_136DBF:
+    imul edx, edx, 0186A0h
+patch_136DC1 equ L_136DBF+2   ; rewritten at run time
+    shr edx, 0Ch
+    add ebp, edx
+L_136DCA:
+    cmp ebp, 0186A0h
+patch_136DCC equ L_136DCA+2   ; rewritten at run time
+    jle short L_136DD7
+L_136DD2:
+    mov ebp, 0186A0h
+patch_136DD3 equ L_136DD2+1   ; rewritten at run time
+L_136DD7:
+    ret
     db 40 dup (0)
 XN_136A00 ends
 end

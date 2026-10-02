@@ -4,18 +4,18 @@
 .486p
 .387
 include xn_C0100.inc
-public D_000C020A
-public D_000C0221
-public D_000C023B
-public D_000C0248
-public D_000C0253
-public D_000C026B
-public D_000C027B
-public D_000C027F
-public D_000C029C
-public D_000C02A7
-public D_000C02C5
-public D_000C02DF
+public func_000C020A
+public func_000C0221
+public func_000C023B
+public func_000C0248
+public func_000C0253
+public func_000C026B
+public func_000C027B
+public func_000C027F
+public func_000C029C
+public func_000C02A7
+public func_000C02C5
+public func_000C02DF
 extrn D_000C0000:byte
 extrn D_000C0030:byte
 extrn D_001343C0:byte
@@ -40,7 +40,10 @@ func_000C010F:
     mov dword ptr [ebx + 8], eax
     pop ebx
     ret
-    B_0C0131_10
+func_000C0131:
+    call func_000C010F
+    mov word ptr [eax + 0Ch], dx
+    ret
 func_000C013B:
     cmp byte ptr [eax + 014h], 0FFh
     je short L_0C0190
@@ -139,34 +142,139 @@ L_0C01FC:
     mov word ptr [esi + 2], ax
     mov word ptr [esi], ax
     ret
-D_000C020A:
-    B_0C020A_23
-D_000C0221:
-    B_0C0221_26
-D_000C023B:
-    B_0C023B_13
-D_000C0248:
-    B_0C0248_11
-D_000C0253:
-    B_0C0253_24
-D_000C026B:
-    B_0C026B_16
-D_000C027B:
-    B_0C027B_4
-D_000C027F:
-    B_0C027F_29
-D_000C029C:
-    B_0C029C_11
-D_000C02A7:
-    B_0C02A7_30
-D_000C02C5:
-    B_0C02C5_26
-D_000C02DF:
-    B_0C02DF_43
-    dd D_000C0030
-    B_0C030E_13
-    dd D_000C0030
-    B_0C031F_2
+func_000C020A:
+    mov al, byte ptr [edi + 1]
+    mov ah, byte ptr [edi + 2]
+    cmp al, ah
+    je short L_0C0219
+    call func_000C02E9
+L_0C0219:
+    mov byte ptr [edi + 3], al
+    add edi, 4
+    clc
+    ret
+func_000C0221:
+    mov eax, dword ptr [esi + 4]
+    movzx ebx, word ptr [edi + 1]
+    add eax, ebx
+    dec byte ptr [eax + 3]
+    je short L_0C0236
+    mov edi, eax
+    add edi, 4
+    clc
+    ret
+L_0C0236:
+    add edi, 3
+    clc
+    ret
+func_000C023B:
+    mov ax, word ptr [edi + 1]
+    or word ptr [esi + 010h], ax
+    add edi, 3
+    clc
+    ret
+func_000C0248:
+    mov al, byte ptr [edi + 1]
+    mov byte ptr [esi + 013h], al
+    add edi, 2
+    clc
+    ret
+func_000C0253:
+    mov al, byte ptr [edi + 1]
+    and word ptr [esi + 010h], 07FFFh
+    and al, al
+    je short L_0C0266
+    or word ptr [esi + 010h], 08000h
+L_0C0266:
+    add edi, 2
+    clc
+    ret
+func_000C026B:
+    mov edi, dword ptr [esi + 4]
+    movzx eax, word ptr [edi + 2]
+    add edi, eax
+    mov dword ptr [esi + 8], eax
+    mov edi, eax
+    clc
+    ret
+func_000C027B:
+    xor edi, edi
+    stc
+    ret
+func_000C027F:
+    movzx ax, byte ptr [edi + 1]
+    mov word ptr [esi + 2], ax
+    mov word ptr [esi], ax
+    mov al, byte ptr [edi + 2]
+    add edi, 3
+    and al, al
+    jne short L_0C0297
+    dec al
+L_0C0297:
+    mov byte ptr [esi + 012h], al
+    stc
+    ret
+func_000C029C:
+    movzx eax, word ptr [edi + 1]
+    mov edi, dword ptr [esi + 4]
+    add edi, eax
+    clc
+    ret
+func_000C02A7:
+    mov ax, 06400h
+    call func_000C02E9
+    cmp al, byte ptr [edi + 1]
+    ja short L_0C02C0
+    movzx eax, word ptr [edi + 2]
+    mov edi, dword ptr [esi + 4]
+    add edi, eax
+    clc
+    ret
+L_0C02C0:
+    add edi, 4
+    clc
+    ret
+func_000C02C5:
+    mov ax, word ptr [edi + 1]
+    test word ptr [esi + 010h], ax
+    je short L_0C02DA
+    movzx eax, word ptr [edi + 3]
+    mov edi, dword ptr [esi + 4]
+    add edi, eax
+    clc
+    ret
+L_0C02DA:
+    add edi, 5
+    clc
+    ret
+func_000C02DF:
+    mov al, byte ptr [edi + 1]
+    add edi, 2
+    mov byte ptr [esi + 016h], al
+    ret
+func_000C02E9:
+    push dx
+    push ax
+    call func_000C0307
+    pop dx
+    db 066h, 025h, 07Fh, 00h   ; and ax, 0x7f
+    sub dh, dl
+    inc dh
+    div dh
+    mov al, dl
+    add al, ah
+    xor ah, ah
+    pop dx
+    ret
+func_000C0307:
+    push edx
+    mov ax, word ptr [D_000C0030]
+    mov dx, 05E5h
+    mul dx
+    db 066h, 05h, 029h, 00h   ; add ax, 0x29
+    mov word ptr [D_000C0030], ax
+    pop edx
+    ret
     db 223 dup (0)
 XN_C0100 ends
 end

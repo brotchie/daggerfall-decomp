@@ -5,6 +5,7 @@
 .387
 include xn_153900.inc
 public func_00153900
+public func_0015392C
 public func_00153990
 extrn D_00153800:byte
 extrn D_00153804:byte
@@ -35,9 +36,64 @@ L_153928:
     pop edi
     pop ecx
     ret
-    B_15392B_92
-    dd D_00153800
-    B_15398B_5
+    B_15392B_1
+func_0015392C:
+    push ebx
+    push ecx
+    push edx
+    mov ebx, eax
+    xor eax, eax
+    mov edx, 1
+    cmp byte ptr [ebx], 02Dh
+    jne short L_153942
+    neg edx
+    inc ebx
+    jmp short L_153948
+L_153942:
+    cmp byte ptr [ebx], 02Bh
+    jne short L_153948
+    inc ebx
+L_153948:
+    movzx ecx, byte ptr [ebx]
+    sub ecx, 030h
+    jl short L_15395D
+    cmp ecx, 9
+    jg short L_15395D
+    imul eax, eax, 0Ah
+    add eax, ecx
+    inc ebx
+    jmp short L_153948
+L_15395D:
+    imul eax, edx
+    pop edx
+    pop ecx
+    pop ebx
+    ret
+func_00153964:
+    push ecx
+    mov ecx, 050h
+L_15396A:
+    lodsb
+    cmp al, 020h
+    jle short L_153972
+    stosb
+    loop L_15396A
+L_153972:
+    xor al, al
+    stosb
+    pop ecx
+    ret
+    B_153977_1
+func_00153978:
+    push eax
+    mov eax, 040006Ch
+    mov eax, dword ptr [eax]
+    and eax, 0FFFh
+    inc eax
+    mov dword ptr [D_00153800], eax
+    pop eax
+    ret
+    B_15398D_3
 func_00153990:
     push ebx
     push edx

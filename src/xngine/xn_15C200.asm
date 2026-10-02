@@ -73,7 +73,7 @@ func_0015C274:
     add edi, dword ptr [D_0015C150]
     mov ecx, 8
     mov eax, dword ptr [eax + 2]
-    mov ebx, offset D_0015C300
+    mov ebx, offset func_0015C300
     add eax, dword ptr [eax + 0Eh]
 L_15C2A9:
     mov dword ptr [ebx + 0Fh], eax
@@ -84,7 +84,7 @@ L_15C2A9:
     dec ecx
     jne short L_15C2A9
     mov eax, edi
-    mov esi, offset D_0015C300
+    mov esi, offset func_0015C300
     mov ecx, 01A2h
     rep movsb
     pop edi
@@ -115,8 +115,152 @@ func_0015C2F0:
     mov dword ptr [D_0015C158], 0
     ret
     B_15C2FB_5
-D_0015C300:
-    B_15C300_417
+func_0015C300:
+    bswap eax
+    mov ah, bh
+    mov edx, esi
+    and eax, 0186A0h
+    add ebx, ecx
+    mov dl, byte ptr [eax + 0186A0h]
+    add esi, ebp
+    mov dl, byte ptr [edx]
+    mov eax, ebx
+    mov byte ptr [edi + 1], dl
+    bswap eax
+    mov ah, bh
+    and eax, 0186A0h
+    add ebx, ecx
+    mov dl, byte ptr [eax + 0186A0h]
+    mov eax, ebx
+    mov dl, byte ptr [edx]
+    mov byte ptr [edi + 2], dl
+    bswap eax
+    mov ah, bh
+    mov edx, esi
+    and eax, 0186A0h
+    add ebx, ecx
+    mov dl, byte ptr [eax + 0186A0h]
+    add esi, ebp
+    mov dl, byte ptr [edx]
+    mov eax, ebx
+    mov byte ptr [edi + 3], dl
+    bswap eax
+    mov ah, bh
+    and eax, 0186A0h
+    add ebx, ecx
+    mov dl, byte ptr [eax + 0186A0h]
+    mov eax, ebx
+    mov dl, byte ptr [edx]
+    mov byte ptr [edi + 4], dl
+    bswap eax
+    mov ah, bh
+    mov edx, esi
+    and eax, 0186A0h
+    add ebx, ecx
+    mov dl, byte ptr [eax + 0186A0h]
+    add esi, ebp
+    mov dl, byte ptr [edx]
+    mov eax, ebx
+    mov byte ptr [edi + 5], dl
+    bswap eax
+    mov ah, bh
+    and eax, 0186A0h
+    add ebx, ecx
+    mov dl, byte ptr [eax + 0186A0h]
+    mov eax, ebx
+    mov dl, byte ptr [edx]
+    mov byte ptr [edi + 6], dl
+    bswap eax
+    mov ah, bh
+    mov edx, esi
+    and eax, 0186A0h
+    add ebx, ecx
+    mov dl, byte ptr [eax + 0186A0h]
+    add esi, ebp
+    mov dl, byte ptr [edx]
+    mov eax, ebx
+    mov byte ptr [edi + 7], dl
+    bswap eax
+    mov ah, bh
+    and eax, 0186A0h
+    add ebx, ecx
+    mov dl, byte ptr [eax + 0186A0h]
+    mov eax, ebx
+    mov dl, byte ptr [edx]
+    mov byte ptr [edi + 8], dl
+    bswap eax
+    mov ah, bh
+    mov edx, esi
+    and eax, 0186A0h
+    add ebx, ecx
+    mov dl, byte ptr [eax + 0186A0h]
+    add esi, ebp
+    mov dl, byte ptr [edx]
+    mov eax, ebx
+    mov byte ptr [edi + 9], dl
+    bswap eax
+    mov ah, bh
+    and eax, 0186A0h
+    add ebx, ecx
+    mov dl, byte ptr [eax + 0186A0h]
+    mov eax, ebx
+    mov dl, byte ptr [edx]
+    mov byte ptr [edi + 0Ah], dl
+    bswap eax
+    mov ah, bh
+    mov edx, esi
+    and eax, 0186A0h
+    add ebx, ecx
+    mov dl, byte ptr [eax + 0186A0h]
+    add esi, ebp
+    mov dl, byte ptr [edx]
+    mov eax, ebx
+    mov byte ptr [edi + 0Bh], dl
+    bswap eax
+    mov ah, bh
+    and eax, 0186A0h
+    add ebx, ecx
+    mov dl, byte ptr [eax + 0186A0h]
+    mov eax, ebx
+    mov dl, byte ptr [edx]
+    mov byte ptr [edi + 0Ch], dl
+    bswap eax
+    mov ah, bh
+    mov edx, esi
+    and eax, 0186A0h
+    add ebx, ecx
+    mov dl, byte ptr [eax + 0186A0h]
+    add esi, ebp
+    mov dl, byte ptr [edx]
+    mov eax, ebx
+    mov byte ptr [edi + 0Dh], dl
+    bswap eax
+    mov ah, bh
+    and eax, 0186A0h
+    add ebx, ecx
+    mov dl, byte ptr [eax + 0186A0h]
+    mov eax, ebx
+    mov dl, byte ptr [edx]
+    mov byte ptr [edi + 0Eh], dl
+    bswap eax
+    mov ah, bh
+    mov edx, esi
+    and eax, 0186A0h
+    add ebx, ecx
+    mov dl, byte ptr [eax + 0186A0h]
+    add esi, ebp
+    mov dl, byte ptr [edx]
+    mov eax, ebx
+    mov byte ptr [edi + 0Fh], dl
+    bswap eax
+    mov ah, bh
+    and eax, 0186A0h
+    add ebx, ecx
+    mov dl, byte ptr [eax + 0186A0h]
+    mov eax, ebx
+    mov dl, byte ptr [edx]
+    mov byte ptr [edi + 010h], dl
+    ret
     db 95 dup (0)
 XN_15C200 ends
 end

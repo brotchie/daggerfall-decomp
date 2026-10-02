@@ -21,14 +21,14 @@ public D_0013B578
 public D_0013B584
 public D_0013B6F8
 public D_0013B704
-extrn D_0013F4CC:byte
-extrn D_0013F4F4:byte
-extrn D_0013F51C:byte
-extrn D_0013F550:byte
-extrn D_0013F584:byte
-extrn D_0013F5AC:byte
-extrn D_0013F5D4:byte
-extrn D_0013F608:byte
+extrn func_0013F4CC:near
+extrn func_0013F4F4:near
+extrn func_0013F51C:near
+extrn func_0013F550:near
+extrn func_0013F584:near
+extrn func_0013F5AC:near
+extrn func_0013F5D4:near
+extrn func_0013F608:near
 XN_138500 segment byte public use32 'CODE'
     assume cs:XN_138500, ds:XN_138500, es:XN_138500, ss:XN_138500
 D_00138500:
@@ -47,23 +47,23 @@ D_00138530:
 D_00138534:
     db 4 dup (0)
 D_00138538:
-    dd D_0013F4CC
-    dd D_0013F51C
-    dd D_0013F550
-    dd D_0013F4F4
-    dd D_0013F51C
-    dd D_0013F51C
-    dd D_0013F4F4
-    dd D_0013F4F4
+    dd func_0013F4CC
+    dd func_0013F51C
+    dd func_0013F550
+    dd func_0013F4F4
+    dd func_0013F51C
+    dd func_0013F51C
+    dd func_0013F4F4
+    dd func_0013F4F4
 D_00138558:
-    dd D_0013F584
-    dd D_0013F5D4
-    dd D_0013F5AC
-    dd D_0013F608
-    dd D_0013F5D4
-    dd D_0013F584
-    dd D_0013F608
-    dd D_0013F5AC
+    dd func_0013F584
+    dd func_0013F5D4
+    dd func_0013F5AC
+    dd func_0013F608
+    dd func_0013F5D4
+    dd func_0013F584
+    dd func_0013F608
+    dd func_0013F5AC
 D_00138578:
     db 12 dup (0)
 D_00138584:

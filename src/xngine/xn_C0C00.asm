@@ -8,24 +8,26 @@ public func_000C0C8C
 public func_000C0CCC
 public func_000C0D28
 public func_000C0D54
+public func_000C0D8C
 public func_000C0DC4
 public func_000C0DE7
 public func_000C0E24
+extrn D_000C0B00:byte
+extrn D_000C0B16:byte
+extrn D_000C0B31:byte
+extrn D_000C0B53:byte
+extrn D_000C0BA8:byte
 extrn D_000CDE2F:byte
 extrn D_001917E4:byte
 extrn D_001A4A04:byte
-extrn L_0C0B15:near
-extrn L_0C0B30:near
-extrn L_0C0B52:near
-extrn L_0C0BA4:near
 extrn func_00050069:near
 extrn func_0009DB11:near
 extrn func_000A10A8:near
 extrn func_000A1235:near
-extrn func_000C0B00:near
 extrn func_00143700:near
 XN_C0C00 segment byte public use32 'CODE'
     assume cs:XN_C0C00, ds:XN_C0C00, es:XN_C0C00, ss:XN_C0C00
+func_000C0C00:
     push ebx
     push ecx
     push edx
@@ -75,7 +77,16 @@ L_0C0C64:
     pop ecx
     pop ebx
     ret
-    B_0C0C7C_16
+func_000C0C7C:
+    push ebx
+    push edx
+    mov edx, eax
+    call func_000C0C8C
+    mov eax, ebx
+    pop edx
+    pop ebx
+    ret
+    B_0C0C8A_2
 func_000C0C8C:
     cmp dword ptr [D_001A4A04], 0
     je short L_0C0CA1
@@ -95,16 +106,65 @@ L_0C0CA1:
 L_0C0CB0:
     pop eax
     mov esi, edx
-    mov edx, offset func_000C0B00
+    mov edx, offset D_000C0B00
     jmp near ptr L_0C0E8C
-    B_0C0CBD_15
+    B_0C0CBD_3
+func_000C0CC0:
+    push ebx
+    mov ebx, eax
+    call func_000C0CCC
+    pop ebx
+    ret
+    B_0C0CCA_2
 func_000C0CCC:
     push eax
     mov eax, 03E00h
     int 021h
     pop eax
     ret
-    B_0C0CD6_82
+    B_0C0CD6_2
+func_000C0CD8:
+    push ecx
+    push edx
+    mov ecx, edx
+    mov edx, eax
+    call func_000C0CF0
+    mov eax, 0
+    adc eax, 0
+    pop edx
+    pop ecx
+    ret
+    B_0C0CEE_2
+func_000C0CF0:
+    mov ah, 04Eh
+    xor ecx, ecx
+    int 021h
+    ret
+    B_0C0CF7_1
+func_000C0CF8:
+    push ecx
+    push edx
+    mov edx, eax
+    call func_000C0D0C
+    mov eax, 0
+    adc eax, 0
+    pop edx
+    pop ecx
+    ret
+func_000C0D0C:
+    mov ah, 04Fh
+    int 021h
+    ret
+    B_0C0D11_3
+func_000C0D14:
+    push edx
+    mov edx, eax
+    call func_000C0D28
+    mov eax, 0
+    adc eax, 0
+    pop edx
+    ret
+    B_0C0D26_2
 func_000C0D28:
     push eax
     mov eax, 03D00h
@@ -120,7 +180,17 @@ L_0C0D3E:
     pop eax
     stc
     ret
-    B_0C0D41_19
+    B_0C0D41_3
+func_000C0D44:
+    push ebx
+    push edx
+    mov edx, eax
+    call func_000C0D54
+    mov eax, ebx
+    pop edx
+    pop ebx
+    ret
+    B_0C0D52_2
 func_000C0D54:
     push eax
     push ecx
@@ -137,19 +207,69 @@ L_0C0D69:
     pop ecx
     pop eax
     mov esi, edx
-    mov edx, offset L_0C0B15+1
+    mov edx, offset D_000C0B16
     jmp near ptr L_0C0E8C
-    B_0C0D77_77
+    B_0C0D77_1
+func_000C0D78:
+    push ecx
+    mov ecx, edx
+    mov edx, eax
+    call func_000C0D8C
+    mov eax, 0
+    adc eax, 0
+    pop ecx
+    ret
+func_000C0D8C:
+    cmp ecx, 08000h
+    jle short L_0C0DB0
+    push ecx
+    mov ecx, 08000h
+    mov eax, 04000h
+    int 021h
+    pop ecx
+    sub ecx, 08000h
+    add edx, 08000h
+    jmp short func_000C0D8C
+L_0C0DB0:
+    mov eax, 04000h
+    int 021h
+    ret
+func_000C0DB8:
+    push ecx
+    mov ecx, edx
+    mov edx, eax
+    call func_000C0DC4
+    pop ecx
+    ret
 func_000C0DC4:
     mov eax, 03F00h
     int 021h
     ret
-    B_0C0DCC_27
+func_000C0DCC:
+    push ecx
+    mov ecx, edx
+    shr ecx, 010h
+    and edx, 0FFFFh
+    call func_000C0DE7
+    mov eax, 0
+    adc eax, 0
+    pop ecx
+    ret
 func_000C0DE7:
     mov ah, 042h
     int 021h
     ret
-    B_0C0DEC_16
+func_000C0DEC:
+    push ebx
+    push ecx
+    push edx
+    mov edx, eax
+    call func_000C0DFC
+    pop edx
+    pop ecx
+    pop ebx
+    ret
+    B_0C0DFA_2
 func_000C0DFC:
     push ebx
     push ecx
@@ -176,7 +296,7 @@ func_000C0E24:
     push ebp
     push esi
     push edi
-    mov dword ptr [L_0C0BA4+4], 0
+    mov dword ptr [D_000C0BA8], 0
     mov edi, edx
     mov edx, eax
     call func_000C0ED0
@@ -195,7 +315,7 @@ L_0C0E5B:
     mov ecx, 0FFFFh
     call func_000C0DC4
     movzx eax, ax
-    add dword ptr [L_0C0BA4+4], eax
+    add dword ptr [D_000C0BA8], eax
     add edx, eax
     cmp eax, 0FFFFh
     je short L_0C0E5B
@@ -208,7 +328,7 @@ L_0C0E5B:
     pop ebx
     ret
 L_0C0E84:
-    mov edx, offset L_0C0B30+1
+    mov edx, offset D_000C0B31
     jmp short L_0C0E8C
     B_0C0E8B_1
 L_0C0E8C:
@@ -222,7 +342,7 @@ L_0C0E8C:
     pop edx
     mov ah, 9
     int 021h
-    mov edi, offset L_0C0B52+1
+    mov edi, offset D_000C0B53
     mov ecx, 04Ch
 L_0C0EAF:
     cmp byte ptr [edi], 0
@@ -231,7 +351,7 @@ L_0C0EAF:
     loop L_0C0EAF
 L_0C0EB7:
     mov dword ptr [edi], 0240A0Dh
-    mov edx, offset L_0C0B52+1
+    mov edx, offset D_000C0B53
     int 021h
     call func_0009DB11
     mov ax, 04C01h
@@ -240,7 +360,7 @@ L_0C0EB7:
 func_000C0ED0:
     pushad
     mov esi, offset D_001917E4
-    mov edi, offset L_0C0B52+1
+    mov edi, offset D_000C0B53
     mov ecx, 050h
 L_0C0EE0:
     lodsb
@@ -265,7 +385,7 @@ L_0C0EFB:
     xor al, al
     stosb
     popad
-    mov edx, offset L_0C0B52+1
+    mov edx, offset D_000C0B53
     ret
     db 251 dup (0)
 XN_C0C00 ends

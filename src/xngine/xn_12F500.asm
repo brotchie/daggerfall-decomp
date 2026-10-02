@@ -4,7 +4,7 @@
 .486p
 .387
 include xn_12F500.inc
-public D_0012F9A0
+public func_0012F9A0
 extrn D_000C23BC:byte
 extrn D_000C23C8:byte
 extrn D_000CEA20:byte
@@ -321,7 +321,7 @@ L_12F860:
     sub eax, dword ptr [D_0012F482]
     cdq
     idiv ecx
-    mov dword ptr [L_12F974+2], eax
+    mov dword ptr [patch_12F976], eax
     pop eax
     mov edx, dword ptr [D_0012F482]
     mov dword ptr [D_0012DE10], eax
@@ -398,6 +398,7 @@ L_12F961:
     pop esi
 L_12F974:
     add edx, 0186A0h
+patch_12F976 equ L_12F974+2   ; rewritten at run time
     add edi, dword ptr [D_00142930]
     add esi, 010h
     dec ecx
@@ -406,20 +407,2595 @@ L_12F98A:
     popad
     ret
     B_12F98C_20
-D_0012F9A0:
-    B_12F9A0_13
-    dd D_0012EF78
-    B_12F9B1_1
-    dd D_0013695D
-    B_12F9B6_2
-    dd D_0012DE14
-    B_12F9BC_2
-    dd D_0012F9E0
-    B_12F9C2_11
-    dd D_0012F9E0
-    B_12F9D1_15
-D_0012F9E0:
-    B_12F9E0_13473
+func_0012F9A0:
+    sub ebp, ebx
+    jle short L_12F9D5
+    push ebx
+    push esi
+    push edi
+    add edi, ebx
+    mov bp, word ptr [ebp*2 + D_0012EF78]
+    mov eax, dword ptr [D_0013695D]
+    mov esi, dword ptr [D_0012DE14]
+    mov byte ptr [ebp + func_0012F9E0], 0C3h
+    lea esi, [esi + ebx*4]
+    call func_0012F9E0
+    mov byte ptr [ebp + func_0012F9E0], 08Bh
+    pop edi
+    pop esi
+    pop ebx
+L_12F9D5:
+    ret
+    B_12F9D6_10
+func_0012F9E0:
+    mov ebx, dword ptr [esi + 0400h]
+    mov al, byte ptr [edi + ebx + 0100h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0100h], al
+    mov ebx, dword ptr [esi + 0404h]
+    mov al, byte ptr [edi + ebx + 0101h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0101h], al
+    mov ebx, dword ptr [esi + 0408h]
+    mov al, byte ptr [edi + ebx + 0102h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0102h], al
+    mov ebx, dword ptr [esi + 040Ch]
+    mov al, byte ptr [edi + ebx + 0103h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0103h], al
+    mov ebx, dword ptr [esi + 0410h]
+    mov al, byte ptr [edi + ebx + 0104h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0104h], al
+    mov ebx, dword ptr [esi + 0414h]
+    mov al, byte ptr [edi + ebx + 0105h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0105h], al
+    mov ebx, dword ptr [esi + 0418h]
+    mov al, byte ptr [edi + ebx + 0106h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0106h], al
+    mov ebx, dword ptr [esi + 041Ch]
+    mov al, byte ptr [edi + ebx + 0107h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0107h], al
+    mov ebx, dword ptr [esi + 0420h]
+    mov al, byte ptr [edi + ebx + 0108h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0108h], al
+    mov ebx, dword ptr [esi + 0424h]
+    mov al, byte ptr [edi + ebx + 0109h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0109h], al
+    mov ebx, dword ptr [esi + 0428h]
+    mov al, byte ptr [edi + ebx + 010Ah]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 010Ah], al
+    mov ebx, dword ptr [esi + 042Ch]
+    mov al, byte ptr [edi + ebx + 010Bh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 010Bh], al
+    mov ebx, dword ptr [esi + 0430h]
+    mov al, byte ptr [edi + ebx + 010Ch]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 010Ch], al
+    mov ebx, dword ptr [esi + 0434h]
+    mov al, byte ptr [edi + ebx + 010Dh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 010Dh], al
+    mov ebx, dword ptr [esi + 0438h]
+    mov al, byte ptr [edi + ebx + 010Eh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 010Eh], al
+    mov ebx, dword ptr [esi + 043Ch]
+    mov al, byte ptr [edi + ebx + 010Fh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 010Fh], al
+    mov ebx, dword ptr [esi + 0440h]
+    mov al, byte ptr [edi + ebx + 0110h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0110h], al
+    mov ebx, dword ptr [esi + 0444h]
+    mov al, byte ptr [edi + ebx + 0111h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0111h], al
+    mov ebx, dword ptr [esi + 0448h]
+    mov al, byte ptr [edi + ebx + 0112h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0112h], al
+    mov ebx, dword ptr [esi + 044Ch]
+    mov al, byte ptr [edi + ebx + 0113h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0113h], al
+    mov ebx, dword ptr [esi + 0450h]
+    mov al, byte ptr [edi + ebx + 0114h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0114h], al
+    mov ebx, dword ptr [esi + 0454h]
+    mov al, byte ptr [edi + ebx + 0115h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0115h], al
+    mov ebx, dword ptr [esi + 0458h]
+    mov al, byte ptr [edi + ebx + 0116h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0116h], al
+    mov ebx, dword ptr [esi + 045Ch]
+    mov al, byte ptr [edi + ebx + 0117h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0117h], al
+    mov ebx, dword ptr [esi + 0460h]
+    mov al, byte ptr [edi + ebx + 0118h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0118h], al
+    mov ebx, dword ptr [esi + 0464h]
+    mov al, byte ptr [edi + ebx + 0119h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0119h], al
+    mov ebx, dword ptr [esi + 0468h]
+    mov al, byte ptr [edi + ebx + 011Ah]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 011Ah], al
+    mov ebx, dword ptr [esi + 046Ch]
+    mov al, byte ptr [edi + ebx + 011Bh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 011Bh], al
+    mov ebx, dword ptr [esi + 0470h]
+    mov al, byte ptr [edi + ebx + 011Ch]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 011Ch], al
+    mov ebx, dword ptr [esi + 0474h]
+    mov al, byte ptr [edi + ebx + 011Dh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 011Dh], al
+    mov ebx, dword ptr [esi + 0478h]
+    mov al, byte ptr [edi + ebx + 011Eh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 011Eh], al
+    mov ebx, dword ptr [esi + 047Ch]
+    mov al, byte ptr [edi + ebx + 011Fh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 011Fh], al
+    mov ebx, dword ptr [esi + 0480h]
+    mov al, byte ptr [edi + ebx + 0120h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0120h], al
+    mov ebx, dword ptr [esi + 0484h]
+    mov al, byte ptr [edi + ebx + 0121h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0121h], al
+    mov ebx, dword ptr [esi + 0488h]
+    mov al, byte ptr [edi + ebx + 0122h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0122h], al
+    mov ebx, dword ptr [esi + 048Ch]
+    mov al, byte ptr [edi + ebx + 0123h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0123h], al
+    mov ebx, dword ptr [esi + 0490h]
+    mov al, byte ptr [edi + ebx + 0124h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0124h], al
+    mov ebx, dword ptr [esi + 0494h]
+    mov al, byte ptr [edi + ebx + 0125h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0125h], al
+    mov ebx, dword ptr [esi + 0498h]
+    mov al, byte ptr [edi + ebx + 0126h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0126h], al
+    mov ebx, dword ptr [esi + 049Ch]
+    mov al, byte ptr [edi + ebx + 0127h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0127h], al
+    mov ebx, dword ptr [esi + 04A0h]
+    mov al, byte ptr [edi + ebx + 0128h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0128h], al
+    mov ebx, dword ptr [esi + 04A4h]
+    mov al, byte ptr [edi + ebx + 0129h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0129h], al
+    mov ebx, dword ptr [esi + 04A8h]
+    mov al, byte ptr [edi + ebx + 012Ah]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 012Ah], al
+    mov ebx, dword ptr [esi + 04ACh]
+    mov al, byte ptr [edi + ebx + 012Bh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 012Bh], al
+    mov ebx, dword ptr [esi + 04B0h]
+    mov al, byte ptr [edi + ebx + 012Ch]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 012Ch], al
+    mov ebx, dword ptr [esi + 04B4h]
+    mov al, byte ptr [edi + ebx + 012Dh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 012Dh], al
+    mov ebx, dword ptr [esi + 04B8h]
+    mov al, byte ptr [edi + ebx + 012Eh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 012Eh], al
+    mov ebx, dword ptr [esi + 04BCh]
+    mov al, byte ptr [edi + ebx + 012Fh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 012Fh], al
+    mov ebx, dword ptr [esi + 04C0h]
+    mov al, byte ptr [edi + ebx + 0130h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0130h], al
+    mov ebx, dword ptr [esi + 04C4h]
+    mov al, byte ptr [edi + ebx + 0131h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0131h], al
+    mov ebx, dword ptr [esi + 04C8h]
+    mov al, byte ptr [edi + ebx + 0132h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0132h], al
+    mov ebx, dword ptr [esi + 04CCh]
+    mov al, byte ptr [edi + ebx + 0133h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0133h], al
+    mov ebx, dword ptr [esi + 04D0h]
+    mov al, byte ptr [edi + ebx + 0134h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0134h], al
+    mov ebx, dword ptr [esi + 04D4h]
+    mov al, byte ptr [edi + ebx + 0135h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0135h], al
+    mov ebx, dword ptr [esi + 04D8h]
+    mov al, byte ptr [edi + ebx + 0136h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0136h], al
+    mov ebx, dword ptr [esi + 04DCh]
+    mov al, byte ptr [edi + ebx + 0137h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0137h], al
+    mov ebx, dword ptr [esi + 04E0h]
+    mov al, byte ptr [edi + ebx + 0138h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0138h], al
+    mov ebx, dword ptr [esi + 04E4h]
+    mov al, byte ptr [edi + ebx + 0139h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0139h], al
+    mov ebx, dword ptr [esi + 04E8h]
+    mov al, byte ptr [edi + ebx + 013Ah]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 013Ah], al
+    mov ebx, dword ptr [esi + 04ECh]
+    mov al, byte ptr [edi + ebx + 013Bh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 013Bh], al
+    mov ebx, dword ptr [esi + 04F0h]
+    mov al, byte ptr [edi + ebx + 013Ch]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 013Ch], al
+    mov ebx, dword ptr [esi + 04F4h]
+    mov al, byte ptr [edi + ebx + 013Dh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 013Dh], al
+    mov ebx, dword ptr [esi + 04F8h]
+    mov al, byte ptr [edi + ebx + 013Eh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 013Eh], al
+    mov ebx, dword ptr [esi + 04FCh]
+    mov al, byte ptr [edi + ebx + 013Fh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 013Fh], al
+    mov ebx, dword ptr [esi + 0500h]
+    mov al, byte ptr [edi + ebx + 0140h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0140h], al
+    mov ebx, dword ptr [esi + 0504h]
+    mov al, byte ptr [edi + ebx + 0141h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0141h], al
+    mov ebx, dword ptr [esi + 0508h]
+    mov al, byte ptr [edi + ebx + 0142h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0142h], al
+    mov ebx, dword ptr [esi + 050Ch]
+    mov al, byte ptr [edi + ebx + 0143h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0143h], al
+    mov ebx, dword ptr [esi + 0510h]
+    mov al, byte ptr [edi + ebx + 0144h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0144h], al
+    mov ebx, dword ptr [esi + 0514h]
+    mov al, byte ptr [edi + ebx + 0145h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0145h], al
+    mov ebx, dword ptr [esi + 0518h]
+    mov al, byte ptr [edi + ebx + 0146h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0146h], al
+    mov ebx, dword ptr [esi + 051Ch]
+    mov al, byte ptr [edi + ebx + 0147h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0147h], al
+    mov ebx, dword ptr [esi + 0520h]
+    mov al, byte ptr [edi + ebx + 0148h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0148h], al
+    mov ebx, dword ptr [esi + 0524h]
+    mov al, byte ptr [edi + ebx + 0149h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0149h], al
+    mov ebx, dword ptr [esi + 0528h]
+    mov al, byte ptr [edi + ebx + 014Ah]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 014Ah], al
+    mov ebx, dword ptr [esi + 052Ch]
+    mov al, byte ptr [edi + ebx + 014Bh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 014Bh], al
+    mov ebx, dword ptr [esi + 0530h]
+    mov al, byte ptr [edi + ebx + 014Ch]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 014Ch], al
+    mov ebx, dword ptr [esi + 0534h]
+    mov al, byte ptr [edi + ebx + 014Dh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 014Dh], al
+    mov ebx, dword ptr [esi + 0538h]
+    mov al, byte ptr [edi + ebx + 014Eh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 014Eh], al
+    mov ebx, dword ptr [esi + 053Ch]
+    mov al, byte ptr [edi + ebx + 014Fh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 014Fh], al
+    mov ebx, dword ptr [esi + 0540h]
+    mov al, byte ptr [edi + ebx + 0150h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0150h], al
+    mov ebx, dword ptr [esi + 0544h]
+    mov al, byte ptr [edi + ebx + 0151h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0151h], al
+    mov ebx, dword ptr [esi + 0548h]
+    mov al, byte ptr [edi + ebx + 0152h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0152h], al
+    mov ebx, dword ptr [esi + 054Ch]
+    mov al, byte ptr [edi + ebx + 0153h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0153h], al
+    mov ebx, dword ptr [esi + 0550h]
+    mov al, byte ptr [edi + ebx + 0154h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0154h], al
+    mov ebx, dword ptr [esi + 0554h]
+    mov al, byte ptr [edi + ebx + 0155h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0155h], al
+    mov ebx, dword ptr [esi + 0558h]
+    mov al, byte ptr [edi + ebx + 0156h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0156h], al
+    mov ebx, dword ptr [esi + 055Ch]
+    mov al, byte ptr [edi + ebx + 0157h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0157h], al
+    mov ebx, dword ptr [esi + 0560h]
+    mov al, byte ptr [edi + ebx + 0158h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0158h], al
+    mov ebx, dword ptr [esi + 0564h]
+    mov al, byte ptr [edi + ebx + 0159h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0159h], al
+    mov ebx, dword ptr [esi + 0568h]
+    mov al, byte ptr [edi + ebx + 015Ah]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 015Ah], al
+    mov ebx, dword ptr [esi + 056Ch]
+    mov al, byte ptr [edi + ebx + 015Bh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 015Bh], al
+    mov ebx, dword ptr [esi + 0570h]
+    mov al, byte ptr [edi + ebx + 015Ch]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 015Ch], al
+    mov ebx, dword ptr [esi + 0574h]
+    mov al, byte ptr [edi + ebx + 015Dh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 015Dh], al
+    mov ebx, dword ptr [esi + 0578h]
+    mov al, byte ptr [edi + ebx + 015Eh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 015Eh], al
+    mov ebx, dword ptr [esi + 057Ch]
+    mov al, byte ptr [edi + ebx + 015Fh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 015Fh], al
+    mov ebx, dword ptr [esi + 0580h]
+    mov al, byte ptr [edi + ebx + 0160h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0160h], al
+    mov ebx, dword ptr [esi + 0584h]
+    mov al, byte ptr [edi + ebx + 0161h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0161h], al
+    mov ebx, dword ptr [esi + 0588h]
+    mov al, byte ptr [edi + ebx + 0162h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0162h], al
+    mov ebx, dword ptr [esi + 058Ch]
+    mov al, byte ptr [edi + ebx + 0163h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0163h], al
+    mov ebx, dword ptr [esi + 0590h]
+    mov al, byte ptr [edi + ebx + 0164h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0164h], al
+    mov ebx, dword ptr [esi + 0594h]
+    mov al, byte ptr [edi + ebx + 0165h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0165h], al
+    mov ebx, dword ptr [esi + 0598h]
+    mov al, byte ptr [edi + ebx + 0166h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0166h], al
+    mov ebx, dword ptr [esi + 059Ch]
+    mov al, byte ptr [edi + ebx + 0167h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0167h], al
+    mov ebx, dword ptr [esi + 05A0h]
+    mov al, byte ptr [edi + ebx + 0168h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0168h], al
+    mov ebx, dword ptr [esi + 05A4h]
+    mov al, byte ptr [edi + ebx + 0169h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0169h], al
+    mov ebx, dword ptr [esi + 05A8h]
+    mov al, byte ptr [edi + ebx + 016Ah]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 016Ah], al
+    mov ebx, dword ptr [esi + 05ACh]
+    mov al, byte ptr [edi + ebx + 016Bh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 016Bh], al
+    mov ebx, dword ptr [esi + 05B0h]
+    mov al, byte ptr [edi + ebx + 016Ch]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 016Ch], al
+    mov ebx, dword ptr [esi + 05B4h]
+    mov al, byte ptr [edi + ebx + 016Dh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 016Dh], al
+    mov ebx, dword ptr [esi + 05B8h]
+    mov al, byte ptr [edi + ebx + 016Eh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 016Eh], al
+    mov ebx, dword ptr [esi + 05BCh]
+    mov al, byte ptr [edi + ebx + 016Fh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 016Fh], al
+    mov ebx, dword ptr [esi + 05C0h]
+    mov al, byte ptr [edi + ebx + 0170h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0170h], al
+    mov ebx, dword ptr [esi + 05C4h]
+    mov al, byte ptr [edi + ebx + 0171h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0171h], al
+    mov ebx, dword ptr [esi + 05C8h]
+    mov al, byte ptr [edi + ebx + 0172h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0172h], al
+    mov ebx, dword ptr [esi + 05CCh]
+    mov al, byte ptr [edi + ebx + 0173h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0173h], al
+    mov ebx, dword ptr [esi + 05D0h]
+    mov al, byte ptr [edi + ebx + 0174h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0174h], al
+    mov ebx, dword ptr [esi + 05D4h]
+    mov al, byte ptr [edi + ebx + 0175h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0175h], al
+    mov ebx, dword ptr [esi + 05D8h]
+    mov al, byte ptr [edi + ebx + 0176h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0176h], al
+    mov ebx, dword ptr [esi + 05DCh]
+    mov al, byte ptr [edi + ebx + 0177h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0177h], al
+    mov ebx, dword ptr [esi + 05E0h]
+    mov al, byte ptr [edi + ebx + 0178h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0178h], al
+    mov ebx, dword ptr [esi + 05E4h]
+    mov al, byte ptr [edi + ebx + 0179h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0179h], al
+    mov ebx, dword ptr [esi + 05E8h]
+    mov al, byte ptr [edi + ebx + 017Ah]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 017Ah], al
+    mov ebx, dword ptr [esi + 05ECh]
+    mov al, byte ptr [edi + ebx + 017Bh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 017Bh], al
+    mov ebx, dword ptr [esi + 05F0h]
+    mov al, byte ptr [edi + ebx + 017Ch]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 017Ch], al
+    mov ebx, dword ptr [esi + 05F4h]
+    mov al, byte ptr [edi + ebx + 017Dh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 017Dh], al
+    mov ebx, dword ptr [esi + 05F8h]
+    mov al, byte ptr [edi + ebx + 017Eh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 017Eh], al
+    mov ebx, dword ptr [esi + 05FCh]
+    mov al, byte ptr [edi + ebx + 017Fh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 017Fh], al
+    mov ebx, dword ptr [esi + 0600h]
+    mov al, byte ptr [edi + ebx + 0180h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0180h], al
+    mov ebx, dword ptr [esi + 0604h]
+    mov al, byte ptr [edi + ebx + 0181h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0181h], al
+    mov ebx, dword ptr [esi + 0608h]
+    mov al, byte ptr [edi + ebx + 0182h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0182h], al
+    mov ebx, dword ptr [esi + 060Ch]
+    mov al, byte ptr [edi + ebx + 0183h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0183h], al
+    mov ebx, dword ptr [esi + 0610h]
+    mov al, byte ptr [edi + ebx + 0184h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0184h], al
+    mov ebx, dword ptr [esi + 0614h]
+    mov al, byte ptr [edi + ebx + 0185h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0185h], al
+    mov ebx, dword ptr [esi + 0618h]
+    mov al, byte ptr [edi + ebx + 0186h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0186h], al
+    mov ebx, dword ptr [esi + 061Ch]
+    mov al, byte ptr [edi + ebx + 0187h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0187h], al
+    mov ebx, dword ptr [esi + 0620h]
+    mov al, byte ptr [edi + ebx + 0188h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0188h], al
+    mov ebx, dword ptr [esi + 0624h]
+    mov al, byte ptr [edi + ebx + 0189h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0189h], al
+    mov ebx, dword ptr [esi + 0628h]
+    mov al, byte ptr [edi + ebx + 018Ah]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 018Ah], al
+    mov ebx, dword ptr [esi + 062Ch]
+    mov al, byte ptr [edi + ebx + 018Bh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 018Bh], al
+    mov ebx, dword ptr [esi + 0630h]
+    mov al, byte ptr [edi + ebx + 018Ch]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 018Ch], al
+    mov ebx, dword ptr [esi + 0634h]
+    mov al, byte ptr [edi + ebx + 018Dh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 018Dh], al
+    mov ebx, dword ptr [esi + 0638h]
+    mov al, byte ptr [edi + ebx + 018Eh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 018Eh], al
+    mov ebx, dword ptr [esi + 063Ch]
+    mov al, byte ptr [edi + ebx + 018Fh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 018Fh], al
+    mov ebx, dword ptr [esi + 0640h]
+    mov al, byte ptr [edi + ebx + 0190h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0190h], al
+    mov ebx, dword ptr [esi + 0644h]
+    mov al, byte ptr [edi + ebx + 0191h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0191h], al
+    mov ebx, dword ptr [esi + 0648h]
+    mov al, byte ptr [edi + ebx + 0192h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0192h], al
+    mov ebx, dword ptr [esi + 064Ch]
+    mov al, byte ptr [edi + ebx + 0193h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0193h], al
+    mov ebx, dword ptr [esi + 0650h]
+    mov al, byte ptr [edi + ebx + 0194h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0194h], al
+    mov ebx, dword ptr [esi + 0654h]
+    mov al, byte ptr [edi + ebx + 0195h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0195h], al
+    mov ebx, dword ptr [esi + 0658h]
+    mov al, byte ptr [edi + ebx + 0196h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0196h], al
+    mov ebx, dword ptr [esi + 065Ch]
+    mov al, byte ptr [edi + ebx + 0197h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0197h], al
+    mov ebx, dword ptr [esi + 0660h]
+    mov al, byte ptr [edi + ebx + 0198h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0198h], al
+    mov ebx, dword ptr [esi + 0664h]
+    mov al, byte ptr [edi + ebx + 0199h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0199h], al
+    mov ebx, dword ptr [esi + 0668h]
+    mov al, byte ptr [edi + ebx + 019Ah]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 019Ah], al
+    mov ebx, dword ptr [esi + 066Ch]
+    mov al, byte ptr [edi + ebx + 019Bh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 019Bh], al
+    mov ebx, dword ptr [esi + 0670h]
+    mov al, byte ptr [edi + ebx + 019Ch]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 019Ch], al
+    mov ebx, dword ptr [esi + 0674h]
+    mov al, byte ptr [edi + ebx + 019Dh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 019Dh], al
+    mov ebx, dword ptr [esi + 0678h]
+    mov al, byte ptr [edi + ebx + 019Eh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 019Eh], al
+    mov ebx, dword ptr [esi + 067Ch]
+    mov al, byte ptr [edi + ebx + 019Fh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 019Fh], al
+    mov ebx, dword ptr [esi + 0680h]
+    mov al, byte ptr [edi + ebx + 01A0h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 01A0h], al
+    mov ebx, dword ptr [esi + 0684h]
+    mov al, byte ptr [edi + ebx + 01A1h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 01A1h], al
+    mov ebx, dword ptr [esi + 0688h]
+    mov al, byte ptr [edi + ebx + 01A2h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 01A2h], al
+    mov ebx, dword ptr [esi + 068Ch]
+    mov al, byte ptr [edi + ebx + 01A3h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 01A3h], al
+    mov ebx, dword ptr [esi + 0690h]
+    mov al, byte ptr [edi + ebx + 01A4h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 01A4h], al
+    mov ebx, dword ptr [esi + 0694h]
+    mov al, byte ptr [edi + ebx + 01A5h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 01A5h], al
+    mov ebx, dword ptr [esi + 0698h]
+    mov al, byte ptr [edi + ebx + 01A6h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 01A6h], al
+    mov ebx, dword ptr [esi + 069Ch]
+    mov al, byte ptr [edi + ebx + 01A7h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 01A7h], al
+    mov ebx, dword ptr [esi + 06A0h]
+    mov al, byte ptr [edi + ebx + 01A8h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 01A8h], al
+    mov ebx, dword ptr [esi + 06A4h]
+    mov al, byte ptr [edi + ebx + 01A9h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 01A9h], al
+    mov ebx, dword ptr [esi + 06A8h]
+    mov al, byte ptr [edi + ebx + 01AAh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 01AAh], al
+    mov ebx, dword ptr [esi + 06ACh]
+    mov al, byte ptr [edi + ebx + 01ABh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 01ABh], al
+    mov ebx, dword ptr [esi + 06B0h]
+    mov al, byte ptr [edi + ebx + 01ACh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 01ACh], al
+    mov ebx, dword ptr [esi + 06B4h]
+    mov al, byte ptr [edi + ebx + 01ADh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 01ADh], al
+    mov ebx, dword ptr [esi + 06B8h]
+    mov al, byte ptr [edi + ebx + 01AEh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 01AEh], al
+    mov ebx, dword ptr [esi + 06BCh]
+    mov al, byte ptr [edi + ebx + 01AFh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 01AFh], al
+    mov ebx, dword ptr [esi + 06C0h]
+    mov al, byte ptr [edi + ebx + 01B0h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 01B0h], al
+    mov ebx, dword ptr [esi + 06C4h]
+    mov al, byte ptr [edi + ebx + 01B1h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 01B1h], al
+    mov ebx, dword ptr [esi + 06C8h]
+    mov al, byte ptr [edi + ebx + 01B2h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 01B2h], al
+    mov ebx, dword ptr [esi + 06CCh]
+    mov al, byte ptr [edi + ebx + 01B3h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 01B3h], al
+    mov ebx, dword ptr [esi + 06D0h]
+    mov al, byte ptr [edi + ebx + 01B4h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 01B4h], al
+    mov ebx, dword ptr [esi + 06D4h]
+    mov al, byte ptr [edi + ebx + 01B5h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 01B5h], al
+    mov ebx, dword ptr [esi + 06D8h]
+    mov al, byte ptr [edi + ebx + 01B6h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 01B6h], al
+    mov ebx, dword ptr [esi + 06DCh]
+    mov al, byte ptr [edi + ebx + 01B7h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 01B7h], al
+    mov ebx, dword ptr [esi + 06E0h]
+    mov al, byte ptr [edi + ebx + 01B8h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 01B8h], al
+    mov ebx, dword ptr [esi + 06E4h]
+    mov al, byte ptr [edi + ebx + 01B9h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 01B9h], al
+    mov ebx, dword ptr [esi + 06E8h]
+    mov al, byte ptr [edi + ebx + 01BAh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 01BAh], al
+    mov ebx, dword ptr [esi + 06ECh]
+    mov al, byte ptr [edi + ebx + 01BBh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 01BBh], al
+    mov ebx, dword ptr [esi + 06F0h]
+    mov al, byte ptr [edi + ebx + 01BCh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 01BCh], al
+    mov ebx, dword ptr [esi + 06F4h]
+    mov al, byte ptr [edi + ebx + 01BDh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 01BDh], al
+    mov ebx, dword ptr [esi + 06F8h]
+    mov al, byte ptr [edi + ebx + 01BEh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 01BEh], al
+    mov ebx, dword ptr [esi + 06FCh]
+    mov al, byte ptr [edi + ebx + 01BFh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 01BFh], al
+    mov ebx, dword ptr [esi + 0700h]
+    mov al, byte ptr [edi + ebx + 01C0h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 01C0h], al
+    mov ebx, dword ptr [esi + 0704h]
+    mov al, byte ptr [edi + ebx + 01C1h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 01C1h], al
+    mov ebx, dword ptr [esi + 0708h]
+    mov al, byte ptr [edi + ebx + 01C2h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 01C2h], al
+    mov ebx, dword ptr [esi + 070Ch]
+    mov al, byte ptr [edi + ebx + 01C3h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 01C3h], al
+    mov ebx, dword ptr [esi + 0710h]
+    mov al, byte ptr [edi + ebx + 01C4h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 01C4h], al
+    mov ebx, dword ptr [esi + 0714h]
+    mov al, byte ptr [edi + ebx + 01C5h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 01C5h], al
+    mov ebx, dword ptr [esi + 0718h]
+    mov al, byte ptr [edi + ebx + 01C6h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 01C6h], al
+    mov ebx, dword ptr [esi + 071Ch]
+    mov al, byte ptr [edi + ebx + 01C7h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 01C7h], al
+    mov ebx, dword ptr [esi + 0720h]
+    mov al, byte ptr [edi + ebx + 01C8h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 01C8h], al
+    mov ebx, dword ptr [esi + 0724h]
+    mov al, byte ptr [edi + ebx + 01C9h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 01C9h], al
+    mov ebx, dword ptr [esi + 0728h]
+    mov al, byte ptr [edi + ebx + 01CAh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 01CAh], al
+    mov ebx, dword ptr [esi + 072Ch]
+    mov al, byte ptr [edi + ebx + 01CBh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 01CBh], al
+    mov ebx, dword ptr [esi + 0730h]
+    mov al, byte ptr [edi + ebx + 01CCh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 01CCh], al
+    mov ebx, dword ptr [esi + 0734h]
+    mov al, byte ptr [edi + ebx + 01CDh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 01CDh], al
+    mov ebx, dword ptr [esi + 0738h]
+    mov al, byte ptr [edi + ebx + 01CEh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 01CEh], al
+    mov ebx, dword ptr [esi + 073Ch]
+    mov al, byte ptr [edi + ebx + 01CFh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 01CFh], al
+    mov ebx, dword ptr [esi + 0740h]
+    mov al, byte ptr [edi + ebx + 01D0h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 01D0h], al
+    mov ebx, dword ptr [esi + 0744h]
+    mov al, byte ptr [edi + ebx + 01D1h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 01D1h], al
+    mov ebx, dword ptr [esi + 0748h]
+    mov al, byte ptr [edi + ebx + 01D2h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 01D2h], al
+    mov ebx, dword ptr [esi + 074Ch]
+    mov al, byte ptr [edi + ebx + 01D3h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 01D3h], al
+    mov ebx, dword ptr [esi + 0750h]
+    mov al, byte ptr [edi + ebx + 01D4h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 01D4h], al
+    mov ebx, dword ptr [esi + 0754h]
+    mov al, byte ptr [edi + ebx + 01D5h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 01D5h], al
+    mov ebx, dword ptr [esi + 0758h]
+    mov al, byte ptr [edi + ebx + 01D6h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 01D6h], al
+    mov ebx, dword ptr [esi + 075Ch]
+    mov al, byte ptr [edi + ebx + 01D7h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 01D7h], al
+    mov ebx, dword ptr [esi + 0760h]
+    mov al, byte ptr [edi + ebx + 01D8h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 01D8h], al
+    mov ebx, dword ptr [esi + 0764h]
+    mov al, byte ptr [edi + ebx + 01D9h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 01D9h], al
+    mov ebx, dword ptr [esi + 0768h]
+    mov al, byte ptr [edi + ebx + 01DAh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 01DAh], al
+    mov ebx, dword ptr [esi + 076Ch]
+    mov al, byte ptr [edi + ebx + 01DBh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 01DBh], al
+    mov ebx, dword ptr [esi + 0770h]
+    mov al, byte ptr [edi + ebx + 01DCh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 01DCh], al
+    mov ebx, dword ptr [esi + 0774h]
+    mov al, byte ptr [edi + ebx + 01DDh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 01DDh], al
+    mov ebx, dword ptr [esi + 0778h]
+    mov al, byte ptr [edi + ebx + 01DEh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 01DEh], al
+    mov ebx, dword ptr [esi + 077Ch]
+    mov al, byte ptr [edi + ebx + 01DFh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 01DFh], al
+    mov ebx, dword ptr [esi + 0780h]
+    mov al, byte ptr [edi + ebx + 01E0h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 01E0h], al
+    mov ebx, dword ptr [esi + 0784h]
+    mov al, byte ptr [edi + ebx + 01E1h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 01E1h], al
+    mov ebx, dword ptr [esi + 0788h]
+    mov al, byte ptr [edi + ebx + 01E2h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 01E2h], al
+    mov ebx, dword ptr [esi + 078Ch]
+    mov al, byte ptr [edi + ebx + 01E3h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 01E3h], al
+    mov ebx, dword ptr [esi + 0790h]
+    mov al, byte ptr [edi + ebx + 01E4h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 01E4h], al
+    mov ebx, dword ptr [esi + 0794h]
+    mov al, byte ptr [edi + ebx + 01E5h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 01E5h], al
+    mov ebx, dword ptr [esi + 0798h]
+    mov al, byte ptr [edi + ebx + 01E6h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 01E6h], al
+    mov ebx, dword ptr [esi + 079Ch]
+    mov al, byte ptr [edi + ebx + 01E7h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 01E7h], al
+    mov ebx, dword ptr [esi + 07A0h]
+    mov al, byte ptr [edi + ebx + 01E8h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 01E8h], al
+    mov ebx, dword ptr [esi + 07A4h]
+    mov al, byte ptr [edi + ebx + 01E9h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 01E9h], al
+    mov ebx, dword ptr [esi + 07A8h]
+    mov al, byte ptr [edi + ebx + 01EAh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 01EAh], al
+    mov ebx, dword ptr [esi + 07ACh]
+    mov al, byte ptr [edi + ebx + 01EBh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 01EBh], al
+    mov ebx, dword ptr [esi + 07B0h]
+    mov al, byte ptr [edi + ebx + 01ECh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 01ECh], al
+    mov ebx, dword ptr [esi + 07B4h]
+    mov al, byte ptr [edi + ebx + 01EDh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 01EDh], al
+    mov ebx, dword ptr [esi + 07B8h]
+    mov al, byte ptr [edi + ebx + 01EEh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 01EEh], al
+    mov ebx, dword ptr [esi + 07BCh]
+    mov al, byte ptr [edi + ebx + 01EFh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 01EFh], al
+    mov ebx, dword ptr [esi + 07C0h]
+    mov al, byte ptr [edi + ebx + 01F0h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 01F0h], al
+    mov ebx, dword ptr [esi + 07C4h]
+    mov al, byte ptr [edi + ebx + 01F1h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 01F1h], al
+    mov ebx, dword ptr [esi + 07C8h]
+    mov al, byte ptr [edi + ebx + 01F2h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 01F2h], al
+    mov ebx, dword ptr [esi + 07CCh]
+    mov al, byte ptr [edi + ebx + 01F3h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 01F3h], al
+    mov ebx, dword ptr [esi + 07D0h]
+    mov al, byte ptr [edi + ebx + 01F4h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 01F4h], al
+    mov ebx, dword ptr [esi + 07D4h]
+    mov al, byte ptr [edi + ebx + 01F5h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 01F5h], al
+    mov ebx, dword ptr [esi + 07D8h]
+    mov al, byte ptr [edi + ebx + 01F6h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 01F6h], al
+    mov ebx, dword ptr [esi + 07DCh]
+    mov al, byte ptr [edi + ebx + 01F7h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 01F7h], al
+    mov ebx, dword ptr [esi + 07E0h]
+    mov al, byte ptr [edi + ebx + 01F8h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 01F8h], al
+    mov ebx, dword ptr [esi + 07E4h]
+    mov al, byte ptr [edi + ebx + 01F9h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 01F9h], al
+    mov ebx, dword ptr [esi + 07E8h]
+    mov al, byte ptr [edi + ebx + 01FAh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 01FAh], al
+    mov ebx, dword ptr [esi + 07ECh]
+    mov al, byte ptr [edi + ebx + 01FBh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 01FBh], al
+    mov ebx, dword ptr [esi + 07F0h]
+    mov al, byte ptr [edi + ebx + 01FCh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 01FCh], al
+    mov ebx, dword ptr [esi + 07F4h]
+    mov al, byte ptr [edi + ebx + 01FDh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 01FDh], al
+    mov ebx, dword ptr [esi + 07F8h]
+    mov al, byte ptr [edi + ebx + 01FEh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 01FEh], al
+    mov ebx, dword ptr [esi + 07FCh]
+    mov al, byte ptr [edi + ebx + 01FFh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 01FFh], al
+    mov ebx, dword ptr [esi + 0800h]
+    mov al, byte ptr [edi + ebx + 0200h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0200h], al
+    mov ebx, dword ptr [esi + 0804h]
+    mov al, byte ptr [edi + ebx + 0201h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0201h], al
+    mov ebx, dword ptr [esi + 0808h]
+    mov al, byte ptr [edi + ebx + 0202h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0202h], al
+    mov ebx, dword ptr [esi + 080Ch]
+    mov al, byte ptr [edi + ebx + 0203h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0203h], al
+    mov ebx, dword ptr [esi + 0810h]
+    mov al, byte ptr [edi + ebx + 0204h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0204h], al
+    mov ebx, dword ptr [esi + 0814h]
+    mov al, byte ptr [edi + ebx + 0205h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0205h], al
+    mov ebx, dword ptr [esi + 0818h]
+    mov al, byte ptr [edi + ebx + 0206h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0206h], al
+    mov ebx, dword ptr [esi + 081Ch]
+    mov al, byte ptr [edi + ebx + 0207h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0207h], al
+    mov ebx, dword ptr [esi + 0820h]
+    mov al, byte ptr [edi + ebx + 0208h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0208h], al
+    mov ebx, dword ptr [esi + 0824h]
+    mov al, byte ptr [edi + ebx + 0209h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0209h], al
+    mov ebx, dword ptr [esi + 0828h]
+    mov al, byte ptr [edi + ebx + 020Ah]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 020Ah], al
+    mov ebx, dword ptr [esi + 082Ch]
+    mov al, byte ptr [edi + ebx + 020Bh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 020Bh], al
+    mov ebx, dword ptr [esi + 0830h]
+    mov al, byte ptr [edi + ebx + 020Ch]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 020Ch], al
+    mov ebx, dword ptr [esi + 0834h]
+    mov al, byte ptr [edi + ebx + 020Dh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 020Dh], al
+    mov ebx, dword ptr [esi + 0838h]
+    mov al, byte ptr [edi + ebx + 020Eh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 020Eh], al
+    mov ebx, dword ptr [esi + 083Ch]
+    mov al, byte ptr [edi + ebx + 020Fh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 020Fh], al
+    mov ebx, dword ptr [esi + 0840h]
+    mov al, byte ptr [edi + ebx + 0210h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0210h], al
+    mov ebx, dword ptr [esi + 0844h]
+    mov al, byte ptr [edi + ebx + 0211h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0211h], al
+    mov ebx, dword ptr [esi + 0848h]
+    mov al, byte ptr [edi + ebx + 0212h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0212h], al
+    mov ebx, dword ptr [esi + 084Ch]
+    mov al, byte ptr [edi + ebx + 0213h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0213h], al
+    mov ebx, dword ptr [esi + 0850h]
+    mov al, byte ptr [edi + ebx + 0214h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0214h], al
+    mov ebx, dword ptr [esi + 0854h]
+    mov al, byte ptr [edi + ebx + 0215h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0215h], al
+    mov ebx, dword ptr [esi + 0858h]
+    mov al, byte ptr [edi + ebx + 0216h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0216h], al
+    mov ebx, dword ptr [esi + 085Ch]
+    mov al, byte ptr [edi + ebx + 0217h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0217h], al
+    mov ebx, dword ptr [esi + 0860h]
+    mov al, byte ptr [edi + ebx + 0218h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0218h], al
+    mov ebx, dword ptr [esi + 0864h]
+    mov al, byte ptr [edi + ebx + 0219h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0219h], al
+    mov ebx, dword ptr [esi + 0868h]
+    mov al, byte ptr [edi + ebx + 021Ah]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 021Ah], al
+    mov ebx, dword ptr [esi + 086Ch]
+    mov al, byte ptr [edi + ebx + 021Bh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 021Bh], al
+    mov ebx, dword ptr [esi + 0870h]
+    mov al, byte ptr [edi + ebx + 021Ch]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 021Ch], al
+    mov ebx, dword ptr [esi + 0874h]
+    mov al, byte ptr [edi + ebx + 021Dh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 021Dh], al
+    mov ebx, dword ptr [esi + 0878h]
+    mov al, byte ptr [edi + ebx + 021Eh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 021Eh], al
+    mov ebx, dword ptr [esi + 087Ch]
+    mov al, byte ptr [edi + ebx + 021Fh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 021Fh], al
+    mov ebx, dword ptr [esi + 0880h]
+    mov al, byte ptr [edi + ebx + 0220h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0220h], al
+    mov ebx, dword ptr [esi + 0884h]
+    mov al, byte ptr [edi + ebx + 0221h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0221h], al
+    mov ebx, dword ptr [esi + 0888h]
+    mov al, byte ptr [edi + ebx + 0222h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0222h], al
+    mov ebx, dword ptr [esi + 088Ch]
+    mov al, byte ptr [edi + ebx + 0223h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0223h], al
+    mov ebx, dword ptr [esi + 0890h]
+    mov al, byte ptr [edi + ebx + 0224h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0224h], al
+    mov ebx, dword ptr [esi + 0894h]
+    mov al, byte ptr [edi + ebx + 0225h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0225h], al
+    mov ebx, dword ptr [esi + 0898h]
+    mov al, byte ptr [edi + ebx + 0226h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0226h], al
+    mov ebx, dword ptr [esi + 089Ch]
+    mov al, byte ptr [edi + ebx + 0227h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0227h], al
+    mov ebx, dword ptr [esi + 08A0h]
+    mov al, byte ptr [edi + ebx + 0228h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0228h], al
+    mov ebx, dword ptr [esi + 08A4h]
+    mov al, byte ptr [edi + ebx + 0229h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0229h], al
+    mov ebx, dword ptr [esi + 08A8h]
+    mov al, byte ptr [edi + ebx + 022Ah]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 022Ah], al
+    mov ebx, dword ptr [esi + 08ACh]
+    mov al, byte ptr [edi + ebx + 022Bh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 022Bh], al
+    mov ebx, dword ptr [esi + 08B0h]
+    mov al, byte ptr [edi + ebx + 022Ch]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 022Ch], al
+    mov ebx, dword ptr [esi + 08B4h]
+    mov al, byte ptr [edi + ebx + 022Dh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 022Dh], al
+    mov ebx, dword ptr [esi + 08B8h]
+    mov al, byte ptr [edi + ebx + 022Eh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 022Eh], al
+    mov ebx, dword ptr [esi + 08BCh]
+    mov al, byte ptr [edi + ebx + 022Fh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 022Fh], al
+    mov ebx, dword ptr [esi + 08C0h]
+    mov al, byte ptr [edi + ebx + 0230h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0230h], al
+    mov ebx, dword ptr [esi + 08C4h]
+    mov al, byte ptr [edi + ebx + 0231h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0231h], al
+    mov ebx, dword ptr [esi + 08C8h]
+    mov al, byte ptr [edi + ebx + 0232h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0232h], al
+    mov ebx, dword ptr [esi + 08CCh]
+    mov al, byte ptr [edi + ebx + 0233h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0233h], al
+    mov ebx, dword ptr [esi + 08D0h]
+    mov al, byte ptr [edi + ebx + 0234h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0234h], al
+    mov ebx, dword ptr [esi + 08D4h]
+    mov al, byte ptr [edi + ebx + 0235h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0235h], al
+    mov ebx, dword ptr [esi + 08D8h]
+    mov al, byte ptr [edi + ebx + 0236h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0236h], al
+    mov ebx, dword ptr [esi + 08DCh]
+    mov al, byte ptr [edi + ebx + 0237h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0237h], al
+    mov ebx, dword ptr [esi + 08E0h]
+    mov al, byte ptr [edi + ebx + 0238h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0238h], al
+    mov ebx, dword ptr [esi + 08E4h]
+    mov al, byte ptr [edi + ebx + 0239h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0239h], al
+    mov ebx, dword ptr [esi + 08E8h]
+    mov al, byte ptr [edi + ebx + 023Ah]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 023Ah], al
+    mov ebx, dword ptr [esi + 08ECh]
+    mov al, byte ptr [edi + ebx + 023Bh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 023Bh], al
+    mov ebx, dword ptr [esi + 08F0h]
+    mov al, byte ptr [edi + ebx + 023Ch]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 023Ch], al
+    mov ebx, dword ptr [esi + 08F4h]
+    mov al, byte ptr [edi + ebx + 023Dh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 023Dh], al
+    mov ebx, dword ptr [esi + 08F8h]
+    mov al, byte ptr [edi + ebx + 023Eh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 023Eh], al
+    mov ebx, dword ptr [esi + 08FCh]
+    mov al, byte ptr [edi + ebx + 023Fh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 023Fh], al
+    mov ebx, dword ptr [esi + 0900h]
+    mov al, byte ptr [edi + ebx + 0240h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0240h], al
+    mov ebx, dword ptr [esi + 0904h]
+    mov al, byte ptr [edi + ebx + 0241h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0241h], al
+    mov ebx, dword ptr [esi + 0908h]
+    mov al, byte ptr [edi + ebx + 0242h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0242h], al
+    mov ebx, dword ptr [esi + 090Ch]
+    mov al, byte ptr [edi + ebx + 0243h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0243h], al
+    mov ebx, dword ptr [esi + 0910h]
+    mov al, byte ptr [edi + ebx + 0244h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0244h], al
+    mov ebx, dword ptr [esi + 0914h]
+    mov al, byte ptr [edi + ebx + 0245h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0245h], al
+    mov ebx, dword ptr [esi + 0918h]
+    mov al, byte ptr [edi + ebx + 0246h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0246h], al
+    mov ebx, dword ptr [esi + 091Ch]
+    mov al, byte ptr [edi + ebx + 0247h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0247h], al
+    mov ebx, dword ptr [esi + 0920h]
+    mov al, byte ptr [edi + ebx + 0248h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0248h], al
+    mov ebx, dword ptr [esi + 0924h]
+    mov al, byte ptr [edi + ebx + 0249h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0249h], al
+    mov ebx, dword ptr [esi + 0928h]
+    mov al, byte ptr [edi + ebx + 024Ah]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 024Ah], al
+    mov ebx, dword ptr [esi + 092Ch]
+    mov al, byte ptr [edi + ebx + 024Bh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 024Bh], al
+    mov ebx, dword ptr [esi + 0930h]
+    mov al, byte ptr [edi + ebx + 024Ch]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 024Ch], al
+    mov ebx, dword ptr [esi + 0934h]
+    mov al, byte ptr [edi + ebx + 024Dh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 024Dh], al
+    mov ebx, dword ptr [esi + 0938h]
+    mov al, byte ptr [edi + ebx + 024Eh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 024Eh], al
+    mov ebx, dword ptr [esi + 093Ch]
+    mov al, byte ptr [edi + ebx + 024Fh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 024Fh], al
+    mov ebx, dword ptr [esi + 0940h]
+    mov al, byte ptr [edi + ebx + 0250h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0250h], al
+    mov ebx, dword ptr [esi + 0944h]
+    mov al, byte ptr [edi + ebx + 0251h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0251h], al
+    mov ebx, dword ptr [esi + 0948h]
+    mov al, byte ptr [edi + ebx + 0252h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0252h], al
+    mov ebx, dword ptr [esi + 094Ch]
+    mov al, byte ptr [edi + ebx + 0253h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0253h], al
+    mov ebx, dword ptr [esi + 0950h]
+    mov al, byte ptr [edi + ebx + 0254h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0254h], al
+    mov ebx, dword ptr [esi + 0954h]
+    mov al, byte ptr [edi + ebx + 0255h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0255h], al
+    mov ebx, dword ptr [esi + 0958h]
+    mov al, byte ptr [edi + ebx + 0256h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0256h], al
+    mov ebx, dword ptr [esi + 095Ch]
+    mov al, byte ptr [edi + ebx + 0257h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0257h], al
+    mov ebx, dword ptr [esi + 0960h]
+    mov al, byte ptr [edi + ebx + 0258h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0258h], al
+    mov ebx, dword ptr [esi + 0964h]
+    mov al, byte ptr [edi + ebx + 0259h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0259h], al
+    mov ebx, dword ptr [esi + 0968h]
+    mov al, byte ptr [edi + ebx + 025Ah]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 025Ah], al
+    mov ebx, dword ptr [esi + 096Ch]
+    mov al, byte ptr [edi + ebx + 025Bh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 025Bh], al
+    mov ebx, dword ptr [esi + 0970h]
+    mov al, byte ptr [edi + ebx + 025Ch]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 025Ch], al
+    mov ebx, dword ptr [esi + 0974h]
+    mov al, byte ptr [edi + ebx + 025Dh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 025Dh], al
+    mov ebx, dword ptr [esi + 0978h]
+    mov al, byte ptr [edi + ebx + 025Eh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 025Eh], al
+    mov ebx, dword ptr [esi + 097Ch]
+    mov al, byte ptr [edi + ebx + 025Fh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 025Fh], al
+    mov ebx, dword ptr [esi + 0980h]
+    mov al, byte ptr [edi + ebx + 0260h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0260h], al
+    mov ebx, dword ptr [esi + 0984h]
+    mov al, byte ptr [edi + ebx + 0261h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0261h], al
+    mov ebx, dword ptr [esi + 0988h]
+    mov al, byte ptr [edi + ebx + 0262h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0262h], al
+    mov ebx, dword ptr [esi + 098Ch]
+    mov al, byte ptr [edi + ebx + 0263h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0263h], al
+    mov ebx, dword ptr [esi + 0990h]
+    mov al, byte ptr [edi + ebx + 0264h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0264h], al
+    mov ebx, dword ptr [esi + 0994h]
+    mov al, byte ptr [edi + ebx + 0265h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0265h], al
+    mov ebx, dword ptr [esi + 0998h]
+    mov al, byte ptr [edi + ebx + 0266h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0266h], al
+    mov ebx, dword ptr [esi + 099Ch]
+    mov al, byte ptr [edi + ebx + 0267h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0267h], al
+    mov ebx, dword ptr [esi + 09A0h]
+    mov al, byte ptr [edi + ebx + 0268h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0268h], al
+    mov ebx, dword ptr [esi + 09A4h]
+    mov al, byte ptr [edi + ebx + 0269h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0269h], al
+    mov ebx, dword ptr [esi + 09A8h]
+    mov al, byte ptr [edi + ebx + 026Ah]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 026Ah], al
+    mov ebx, dword ptr [esi + 09ACh]
+    mov al, byte ptr [edi + ebx + 026Bh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 026Bh], al
+    mov ebx, dword ptr [esi + 09B0h]
+    mov al, byte ptr [edi + ebx + 026Ch]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 026Ch], al
+    mov ebx, dword ptr [esi + 09B4h]
+    mov al, byte ptr [edi + ebx + 026Dh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 026Dh], al
+    mov ebx, dword ptr [esi + 09B8h]
+    mov al, byte ptr [edi + ebx + 026Eh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 026Eh], al
+    mov ebx, dword ptr [esi + 09BCh]
+    mov al, byte ptr [edi + ebx + 026Fh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 026Fh], al
+    mov ebx, dword ptr [esi + 09C0h]
+    mov al, byte ptr [edi + ebx + 0270h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0270h], al
+    mov ebx, dword ptr [esi + 09C4h]
+    mov al, byte ptr [edi + ebx + 0271h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0271h], al
+    mov ebx, dword ptr [esi + 09C8h]
+    mov al, byte ptr [edi + ebx + 0272h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0272h], al
+    mov ebx, dword ptr [esi + 09CCh]
+    mov al, byte ptr [edi + ebx + 0273h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0273h], al
+    mov ebx, dword ptr [esi + 09D0h]
+    mov al, byte ptr [edi + ebx + 0274h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0274h], al
+    mov ebx, dword ptr [esi + 09D4h]
+    mov al, byte ptr [edi + ebx + 0275h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0275h], al
+    mov ebx, dword ptr [esi + 09D8h]
+    mov al, byte ptr [edi + ebx + 0276h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0276h], al
+    mov ebx, dword ptr [esi + 09DCh]
+    mov al, byte ptr [edi + ebx + 0277h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0277h], al
+    mov ebx, dword ptr [esi + 09E0h]
+    mov al, byte ptr [edi + ebx + 0278h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0278h], al
+    mov ebx, dword ptr [esi + 09E4h]
+    mov al, byte ptr [edi + ebx + 0279h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0279h], al
+    mov ebx, dword ptr [esi + 09E8h]
+    mov al, byte ptr [edi + ebx + 027Ah]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 027Ah], al
+    mov ebx, dword ptr [esi + 09ECh]
+    mov al, byte ptr [edi + ebx + 027Bh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 027Bh], al
+    mov ebx, dword ptr [esi + 09F0h]
+    mov al, byte ptr [edi + ebx + 027Ch]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 027Ch], al
+    mov ebx, dword ptr [esi + 09F4h]
+    mov al, byte ptr [edi + ebx + 027Dh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 027Dh], al
+    mov ebx, dword ptr [esi + 09F8h]
+    mov al, byte ptr [edi + ebx + 027Eh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 027Eh], al
+    mov ebx, dword ptr [esi + 09FCh]
+    mov al, byte ptr [edi + ebx + 027Fh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 027Fh], al
+    mov ebx, dword ptr [esi + 0A00h]
+    mov al, byte ptr [edi + ebx + 0280h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0280h], al
+    mov ebx, dword ptr [esi + 0A04h]
+    mov al, byte ptr [edi + ebx + 0281h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0281h], al
+    mov ebx, dword ptr [esi + 0A08h]
+    mov al, byte ptr [edi + ebx + 0282h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0282h], al
+    mov ebx, dword ptr [esi + 0A0Ch]
+    mov al, byte ptr [edi + ebx + 0283h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0283h], al
+    mov ebx, dword ptr [esi + 0A10h]
+    mov al, byte ptr [edi + ebx + 0284h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0284h], al
+    mov ebx, dword ptr [esi + 0A14h]
+    mov al, byte ptr [edi + ebx + 0285h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0285h], al
+    mov ebx, dword ptr [esi + 0A18h]
+    mov al, byte ptr [edi + ebx + 0286h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0286h], al
+    mov ebx, dword ptr [esi + 0A1Ch]
+    mov al, byte ptr [edi + ebx + 0287h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0287h], al
+    mov ebx, dword ptr [esi + 0A20h]
+    mov al, byte ptr [edi + ebx + 0288h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0288h], al
+    mov ebx, dword ptr [esi + 0A24h]
+    mov al, byte ptr [edi + ebx + 0289h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0289h], al
+    mov ebx, dword ptr [esi + 0A28h]
+    mov al, byte ptr [edi + ebx + 028Ah]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 028Ah], al
+    mov ebx, dword ptr [esi + 0A2Ch]
+    mov al, byte ptr [edi + ebx + 028Bh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 028Bh], al
+    mov ebx, dword ptr [esi + 0A30h]
+    mov al, byte ptr [edi + ebx + 028Ch]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 028Ch], al
+    mov ebx, dword ptr [esi + 0A34h]
+    mov al, byte ptr [edi + ebx + 028Dh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 028Dh], al
+    mov ebx, dword ptr [esi + 0A38h]
+    mov al, byte ptr [edi + ebx + 028Eh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 028Eh], al
+    mov ebx, dword ptr [esi + 0A3Ch]
+    mov al, byte ptr [edi + ebx + 028Fh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 028Fh], al
+    mov ebx, dword ptr [esi + 0A40h]
+    mov al, byte ptr [edi + ebx + 0290h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0290h], al
+    mov ebx, dword ptr [esi + 0A44h]
+    mov al, byte ptr [edi + ebx + 0291h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0291h], al
+    mov ebx, dword ptr [esi + 0A48h]
+    mov al, byte ptr [edi + ebx + 0292h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0292h], al
+    mov ebx, dword ptr [esi + 0A4Ch]
+    mov al, byte ptr [edi + ebx + 0293h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0293h], al
+    mov ebx, dword ptr [esi + 0A50h]
+    mov al, byte ptr [edi + ebx + 0294h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0294h], al
+    mov ebx, dword ptr [esi + 0A54h]
+    mov al, byte ptr [edi + ebx + 0295h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0295h], al
+    mov ebx, dword ptr [esi + 0A58h]
+    mov al, byte ptr [edi + ebx + 0296h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0296h], al
+    mov ebx, dword ptr [esi + 0A5Ch]
+    mov al, byte ptr [edi + ebx + 0297h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0297h], al
+    mov ebx, dword ptr [esi + 0A60h]
+    mov al, byte ptr [edi + ebx + 0298h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0298h], al
+    mov ebx, dword ptr [esi + 0A64h]
+    mov al, byte ptr [edi + ebx + 0299h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0299h], al
+    mov ebx, dword ptr [esi + 0A68h]
+    mov al, byte ptr [edi + ebx + 029Ah]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 029Ah], al
+    mov ebx, dword ptr [esi + 0A6Ch]
+    mov al, byte ptr [edi + ebx + 029Bh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 029Bh], al
+    mov ebx, dword ptr [esi + 0A70h]
+    mov al, byte ptr [edi + ebx + 029Ch]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 029Ch], al
+    mov ebx, dword ptr [esi + 0A74h]
+    mov al, byte ptr [edi + ebx + 029Dh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 029Dh], al
+    mov ebx, dword ptr [esi + 0A78h]
+    mov al, byte ptr [edi + ebx + 029Eh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 029Eh], al
+    mov ebx, dword ptr [esi + 0A7Ch]
+    mov al, byte ptr [edi + ebx + 029Fh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 029Fh], al
+    mov ebx, dword ptr [esi + 0A80h]
+    mov al, byte ptr [edi + ebx + 02A0h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 02A0h], al
+    mov ebx, dword ptr [esi + 0A84h]
+    mov al, byte ptr [edi + ebx + 02A1h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 02A1h], al
+    mov ebx, dword ptr [esi + 0A88h]
+    mov al, byte ptr [edi + ebx + 02A2h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 02A2h], al
+    mov ebx, dword ptr [esi + 0A8Ch]
+    mov al, byte ptr [edi + ebx + 02A3h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 02A3h], al
+    mov ebx, dword ptr [esi + 0A90h]
+    mov al, byte ptr [edi + ebx + 02A4h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 02A4h], al
+    mov ebx, dword ptr [esi + 0A94h]
+    mov al, byte ptr [edi + ebx + 02A5h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 02A5h], al
+    mov ebx, dword ptr [esi + 0A98h]
+    mov al, byte ptr [edi + ebx + 02A6h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 02A6h], al
+    mov ebx, dword ptr [esi + 0A9Ch]
+    mov al, byte ptr [edi + ebx + 02A7h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 02A7h], al
+    mov ebx, dword ptr [esi + 0AA0h]
+    mov al, byte ptr [edi + ebx + 02A8h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 02A8h], al
+    mov ebx, dword ptr [esi + 0AA4h]
+    mov al, byte ptr [edi + ebx + 02A9h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 02A9h], al
+    mov ebx, dword ptr [esi + 0AA8h]
+    mov al, byte ptr [edi + ebx + 02AAh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 02AAh], al
+    mov ebx, dword ptr [esi + 0AACh]
+    mov al, byte ptr [edi + ebx + 02ABh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 02ABh], al
+    mov ebx, dword ptr [esi + 0AB0h]
+    mov al, byte ptr [edi + ebx + 02ACh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 02ACh], al
+    mov ebx, dword ptr [esi + 0AB4h]
+    mov al, byte ptr [edi + ebx + 02ADh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 02ADh], al
+    mov ebx, dword ptr [esi + 0AB8h]
+    mov al, byte ptr [edi + ebx + 02AEh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 02AEh], al
+    mov ebx, dword ptr [esi + 0ABCh]
+    mov al, byte ptr [edi + ebx + 02AFh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 02AFh], al
+    mov ebx, dword ptr [esi + 0AC0h]
+    mov al, byte ptr [edi + ebx + 02B0h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 02B0h], al
+    mov ebx, dword ptr [esi + 0AC4h]
+    mov al, byte ptr [edi + ebx + 02B1h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 02B1h], al
+    mov ebx, dword ptr [esi + 0AC8h]
+    mov al, byte ptr [edi + ebx + 02B2h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 02B2h], al
+    mov ebx, dword ptr [esi + 0ACCh]
+    mov al, byte ptr [edi + ebx + 02B3h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 02B3h], al
+    mov ebx, dword ptr [esi + 0AD0h]
+    mov al, byte ptr [edi + ebx + 02B4h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 02B4h], al
+    mov ebx, dword ptr [esi + 0AD4h]
+    mov al, byte ptr [edi + ebx + 02B5h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 02B5h], al
+    mov ebx, dword ptr [esi + 0AD8h]
+    mov al, byte ptr [edi + ebx + 02B6h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 02B6h], al
+    mov ebx, dword ptr [esi + 0ADCh]
+    mov al, byte ptr [edi + ebx + 02B7h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 02B7h], al
+    mov ebx, dword ptr [esi + 0AE0h]
+    mov al, byte ptr [edi + ebx + 02B8h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 02B8h], al
+    mov ebx, dword ptr [esi + 0AE4h]
+    mov al, byte ptr [edi + ebx + 02B9h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 02B9h], al
+    mov ebx, dword ptr [esi + 0AE8h]
+    mov al, byte ptr [edi + ebx + 02BAh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 02BAh], al
+    mov ebx, dword ptr [esi + 0AECh]
+    mov al, byte ptr [edi + ebx + 02BBh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 02BBh], al
+    mov ebx, dword ptr [esi + 0AF0h]
+    mov al, byte ptr [edi + ebx + 02BCh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 02BCh], al
+    mov ebx, dword ptr [esi + 0AF4h]
+    mov al, byte ptr [edi + ebx + 02BDh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 02BDh], al
+    mov ebx, dword ptr [esi + 0AF8h]
+    mov al, byte ptr [edi + ebx + 02BEh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 02BEh], al
+    mov ebx, dword ptr [esi + 0AFCh]
+    mov al, byte ptr [edi + ebx + 02BFh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 02BFh], al
+    mov ebx, dword ptr [esi + 0B00h]
+    mov al, byte ptr [edi + ebx + 02C0h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 02C0h], al
+    mov ebx, dword ptr [esi + 0B04h]
+    mov al, byte ptr [edi + ebx + 02C1h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 02C1h], al
+    mov ebx, dword ptr [esi + 0B08h]
+    mov al, byte ptr [edi + ebx + 02C2h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 02C2h], al
+    mov ebx, dword ptr [esi + 0B0Ch]
+    mov al, byte ptr [edi + ebx + 02C3h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 02C3h], al
+    mov ebx, dword ptr [esi + 0B10h]
+    mov al, byte ptr [edi + ebx + 02C4h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 02C4h], al
+    mov ebx, dword ptr [esi + 0B14h]
+    mov al, byte ptr [edi + ebx + 02C5h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 02C5h], al
+    mov ebx, dword ptr [esi + 0B18h]
+    mov al, byte ptr [edi + ebx + 02C6h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 02C6h], al
+    mov ebx, dword ptr [esi + 0B1Ch]
+    mov al, byte ptr [edi + ebx + 02C7h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 02C7h], al
+    mov ebx, dword ptr [esi + 0B20h]
+    mov al, byte ptr [edi + ebx + 02C8h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 02C8h], al
+    mov ebx, dword ptr [esi + 0B24h]
+    mov al, byte ptr [edi + ebx + 02C9h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 02C9h], al
+    mov ebx, dword ptr [esi + 0B28h]
+    mov al, byte ptr [edi + ebx + 02CAh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 02CAh], al
+    mov ebx, dword ptr [esi + 0B2Ch]
+    mov al, byte ptr [edi + ebx + 02CBh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 02CBh], al
+    mov ebx, dword ptr [esi + 0B30h]
+    mov al, byte ptr [edi + ebx + 02CCh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 02CCh], al
+    mov ebx, dword ptr [esi + 0B34h]
+    mov al, byte ptr [edi + ebx + 02CDh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 02CDh], al
+    mov ebx, dword ptr [esi + 0B38h]
+    mov al, byte ptr [edi + ebx + 02CEh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 02CEh], al
+    mov ebx, dword ptr [esi + 0B3Ch]
+    mov al, byte ptr [edi + ebx + 02CFh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 02CFh], al
+    mov ebx, dword ptr [esi + 0B40h]
+    mov al, byte ptr [edi + ebx + 02D0h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 02D0h], al
+    mov ebx, dword ptr [esi + 0B44h]
+    mov al, byte ptr [edi + ebx + 02D1h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 02D1h], al
+    mov ebx, dword ptr [esi + 0B48h]
+    mov al, byte ptr [edi + ebx + 02D2h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 02D2h], al
+    mov ebx, dword ptr [esi + 0B4Ch]
+    mov al, byte ptr [edi + ebx + 02D3h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 02D3h], al
+    mov ebx, dword ptr [esi + 0B50h]
+    mov al, byte ptr [edi + ebx + 02D4h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 02D4h], al
+    mov ebx, dword ptr [esi + 0B54h]
+    mov al, byte ptr [edi + ebx + 02D5h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 02D5h], al
+    mov ebx, dword ptr [esi + 0B58h]
+    mov al, byte ptr [edi + ebx + 02D6h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 02D6h], al
+    mov ebx, dword ptr [esi + 0B5Ch]
+    mov al, byte ptr [edi + ebx + 02D7h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 02D7h], al
+    mov ebx, dword ptr [esi + 0B60h]
+    mov al, byte ptr [edi + ebx + 02D8h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 02D8h], al
+    mov ebx, dword ptr [esi + 0B64h]
+    mov al, byte ptr [edi + ebx + 02D9h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 02D9h], al
+    mov ebx, dword ptr [esi + 0B68h]
+    mov al, byte ptr [edi + ebx + 02DAh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 02DAh], al
+    mov ebx, dword ptr [esi + 0B6Ch]
+    mov al, byte ptr [edi + ebx + 02DBh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 02DBh], al
+    mov ebx, dword ptr [esi + 0B70h]
+    mov al, byte ptr [edi + ebx + 02DCh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 02DCh], al
+    mov ebx, dword ptr [esi + 0B74h]
+    mov al, byte ptr [edi + ebx + 02DDh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 02DDh], al
+    mov ebx, dword ptr [esi + 0B78h]
+    mov al, byte ptr [edi + ebx + 02DEh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 02DEh], al
+    mov ebx, dword ptr [esi + 0B7Ch]
+    mov al, byte ptr [edi + ebx + 02DFh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 02DFh], al
+    mov ebx, dword ptr [esi + 0B80h]
+    mov al, byte ptr [edi + ebx + 02E0h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 02E0h], al
+    mov ebx, dword ptr [esi + 0B84h]
+    mov al, byte ptr [edi + ebx + 02E1h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 02E1h], al
+    mov ebx, dword ptr [esi + 0B88h]
+    mov al, byte ptr [edi + ebx + 02E2h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 02E2h], al
+    mov ebx, dword ptr [esi + 0B8Ch]
+    mov al, byte ptr [edi + ebx + 02E3h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 02E3h], al
+    mov ebx, dword ptr [esi + 0B90h]
+    mov al, byte ptr [edi + ebx + 02E4h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 02E4h], al
+    mov ebx, dword ptr [esi + 0B94h]
+    mov al, byte ptr [edi + ebx + 02E5h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 02E5h], al
+    mov ebx, dword ptr [esi + 0B98h]
+    mov al, byte ptr [edi + ebx + 02E6h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 02E6h], al
+    mov ebx, dword ptr [esi + 0B9Ch]
+    mov al, byte ptr [edi + ebx + 02E7h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 02E7h], al
+    mov ebx, dword ptr [esi + 0BA0h]
+    mov al, byte ptr [edi + ebx + 02E8h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 02E8h], al
+    mov ebx, dword ptr [esi + 0BA4h]
+    mov al, byte ptr [edi + ebx + 02E9h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 02E9h], al
+    mov ebx, dword ptr [esi + 0BA8h]
+    mov al, byte ptr [edi + ebx + 02EAh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 02EAh], al
+    mov ebx, dword ptr [esi + 0BACh]
+    mov al, byte ptr [edi + ebx + 02EBh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 02EBh], al
+    mov ebx, dword ptr [esi + 0BB0h]
+    mov al, byte ptr [edi + ebx + 02ECh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 02ECh], al
+    mov ebx, dword ptr [esi + 0BB4h]
+    mov al, byte ptr [edi + ebx + 02EDh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 02EDh], al
+    mov ebx, dword ptr [esi + 0BB8h]
+    mov al, byte ptr [edi + ebx + 02EEh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 02EEh], al
+    mov ebx, dword ptr [esi + 0BBCh]
+    mov al, byte ptr [edi + ebx + 02EFh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 02EFh], al
+    mov ebx, dword ptr [esi + 0BC0h]
+    mov al, byte ptr [edi + ebx + 02F0h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 02F0h], al
+    mov ebx, dword ptr [esi + 0BC4h]
+    mov al, byte ptr [edi + ebx + 02F1h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 02F1h], al
+    mov ebx, dword ptr [esi + 0BC8h]
+    mov al, byte ptr [edi + ebx + 02F2h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 02F2h], al
+    mov ebx, dword ptr [esi + 0BCCh]
+    mov al, byte ptr [edi + ebx + 02F3h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 02F3h], al
+    mov ebx, dword ptr [esi + 0BD0h]
+    mov al, byte ptr [edi + ebx + 02F4h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 02F4h], al
+    mov ebx, dword ptr [esi + 0BD4h]
+    mov al, byte ptr [edi + ebx + 02F5h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 02F5h], al
+    mov ebx, dword ptr [esi + 0BD8h]
+    mov al, byte ptr [edi + ebx + 02F6h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 02F6h], al
+    mov ebx, dword ptr [esi + 0BDCh]
+    mov al, byte ptr [edi + ebx + 02F7h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 02F7h], al
+    mov ebx, dword ptr [esi + 0BE0h]
+    mov al, byte ptr [edi + ebx + 02F8h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 02F8h], al
+    mov ebx, dword ptr [esi + 0BE4h]
+    mov al, byte ptr [edi + ebx + 02F9h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 02F9h], al
+    mov ebx, dword ptr [esi + 0BE8h]
+    mov al, byte ptr [edi + ebx + 02FAh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 02FAh], al
+    mov ebx, dword ptr [esi + 0BECh]
+    mov al, byte ptr [edi + ebx + 02FBh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 02FBh], al
+    mov ebx, dword ptr [esi + 0BF0h]
+    mov al, byte ptr [edi + ebx + 02FCh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 02FCh], al
+    mov ebx, dword ptr [esi + 0BF4h]
+    mov al, byte ptr [edi + ebx + 02FDh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 02FDh], al
+    mov ebx, dword ptr [esi + 0BF8h]
+    mov al, byte ptr [edi + ebx + 02FEh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 02FEh], al
+    mov ebx, dword ptr [esi + 0BFCh]
+    mov al, byte ptr [edi + ebx + 02FFh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 02FFh], al
+    mov ebx, dword ptr [esi + 0C00h]
+    mov al, byte ptr [edi + ebx + 0300h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0300h], al
+    mov ebx, dword ptr [esi + 0C04h]
+    mov al, byte ptr [edi + ebx + 0301h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0301h], al
+    mov ebx, dword ptr [esi + 0C08h]
+    mov al, byte ptr [edi + ebx + 0302h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0302h], al
+    mov ebx, dword ptr [esi + 0C0Ch]
+    mov al, byte ptr [edi + ebx + 0303h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0303h], al
+    mov ebx, dword ptr [esi + 0C10h]
+    mov al, byte ptr [edi + ebx + 0304h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0304h], al
+    mov ebx, dword ptr [esi + 0C14h]
+    mov al, byte ptr [edi + ebx + 0305h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0305h], al
+    mov ebx, dword ptr [esi + 0C18h]
+    mov al, byte ptr [edi + ebx + 0306h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0306h], al
+    mov ebx, dword ptr [esi + 0C1Ch]
+    mov al, byte ptr [edi + ebx + 0307h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0307h], al
+    mov ebx, dword ptr [esi + 0C20h]
+    mov al, byte ptr [edi + ebx + 0308h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0308h], al
+    mov ebx, dword ptr [esi + 0C24h]
+    mov al, byte ptr [edi + ebx + 0309h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0309h], al
+    mov ebx, dword ptr [esi + 0C28h]
+    mov al, byte ptr [edi + ebx + 030Ah]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 030Ah], al
+    mov ebx, dword ptr [esi + 0C2Ch]
+    mov al, byte ptr [edi + ebx + 030Bh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 030Bh], al
+    mov ebx, dword ptr [esi + 0C30h]
+    mov al, byte ptr [edi + ebx + 030Ch]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 030Ch], al
+    mov ebx, dword ptr [esi + 0C34h]
+    mov al, byte ptr [edi + ebx + 030Dh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 030Dh], al
+    mov ebx, dword ptr [esi + 0C38h]
+    mov al, byte ptr [edi + ebx + 030Eh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 030Eh], al
+    mov ebx, dword ptr [esi + 0C3Ch]
+    mov al, byte ptr [edi + ebx + 030Fh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 030Fh], al
+    mov ebx, dword ptr [esi + 0C40h]
+    mov al, byte ptr [edi + ebx + 0310h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0310h], al
+    mov ebx, dword ptr [esi + 0C44h]
+    mov al, byte ptr [edi + ebx + 0311h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0311h], al
+    mov ebx, dword ptr [esi + 0C48h]
+    mov al, byte ptr [edi + ebx + 0312h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0312h], al
+    mov ebx, dword ptr [esi + 0C4Ch]
+    mov al, byte ptr [edi + ebx + 0313h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0313h], al
+    mov ebx, dword ptr [esi + 0C50h]
+    mov al, byte ptr [edi + ebx + 0314h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0314h], al
+    mov ebx, dword ptr [esi + 0C54h]
+    mov al, byte ptr [edi + ebx + 0315h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0315h], al
+    mov ebx, dword ptr [esi + 0C58h]
+    mov al, byte ptr [edi + ebx + 0316h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0316h], al
+    mov ebx, dword ptr [esi + 0C5Ch]
+    mov al, byte ptr [edi + ebx + 0317h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0317h], al
+    mov ebx, dword ptr [esi + 0C60h]
+    mov al, byte ptr [edi + ebx + 0318h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0318h], al
+    mov ebx, dword ptr [esi + 0C64h]
+    mov al, byte ptr [edi + ebx + 0319h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0319h], al
+    mov ebx, dword ptr [esi + 0C68h]
+    mov al, byte ptr [edi + ebx + 031Ah]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 031Ah], al
+    mov ebx, dword ptr [esi + 0C6Ch]
+    mov al, byte ptr [edi + ebx + 031Bh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 031Bh], al
+    mov ebx, dword ptr [esi + 0C70h]
+    mov al, byte ptr [edi + ebx + 031Ch]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 031Ch], al
+    mov ebx, dword ptr [esi + 0C74h]
+    mov al, byte ptr [edi + ebx + 031Dh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 031Dh], al
+    mov ebx, dword ptr [esi + 0C78h]
+    mov al, byte ptr [edi + ebx + 031Eh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 031Eh], al
+    mov ebx, dword ptr [esi + 0C7Ch]
+    mov al, byte ptr [edi + ebx + 031Fh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 031Fh], al
+    mov ebx, dword ptr [esi + 0C80h]
+    mov al, byte ptr [edi + ebx + 0320h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0320h], al
+    mov ebx, dword ptr [esi + 0C84h]
+    mov al, byte ptr [edi + ebx + 0321h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0321h], al
+    mov ebx, dword ptr [esi + 0C88h]
+    mov al, byte ptr [edi + ebx + 0322h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0322h], al
+    mov ebx, dword ptr [esi + 0C8Ch]
+    mov al, byte ptr [edi + ebx + 0323h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0323h], al
+    mov ebx, dword ptr [esi + 0C90h]
+    mov al, byte ptr [edi + ebx + 0324h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0324h], al
+    mov ebx, dword ptr [esi + 0C94h]
+    mov al, byte ptr [edi + ebx + 0325h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0325h], al
+    mov ebx, dword ptr [esi + 0C98h]
+    mov al, byte ptr [edi + ebx + 0326h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0326h], al
+    mov ebx, dword ptr [esi + 0C9Ch]
+    mov al, byte ptr [edi + ebx + 0327h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0327h], al
+    mov ebx, dword ptr [esi + 0CA0h]
+    mov al, byte ptr [edi + ebx + 0328h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0328h], al
+    mov ebx, dword ptr [esi + 0CA4h]
+    mov al, byte ptr [edi + ebx + 0329h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0329h], al
+    mov ebx, dword ptr [esi + 0CA8h]
+    mov al, byte ptr [edi + ebx + 032Ah]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 032Ah], al
+    mov ebx, dword ptr [esi + 0CACh]
+    mov al, byte ptr [edi + ebx + 032Bh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 032Bh], al
+    mov ebx, dword ptr [esi + 0CB0h]
+    mov al, byte ptr [edi + ebx + 032Ch]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 032Ch], al
+    mov ebx, dword ptr [esi + 0CB4h]
+    mov al, byte ptr [edi + ebx + 032Dh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 032Dh], al
+    mov ebx, dword ptr [esi + 0CB8h]
+    mov al, byte ptr [edi + ebx + 032Eh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 032Eh], al
+    mov ebx, dword ptr [esi + 0CBCh]
+    mov al, byte ptr [edi + ebx + 032Fh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 032Fh], al
+    mov ebx, dword ptr [esi + 0CC0h]
+    mov al, byte ptr [edi + ebx + 0330h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0330h], al
+    mov ebx, dword ptr [esi + 0CC4h]
+    mov al, byte ptr [edi + ebx + 0331h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0331h], al
+    mov ebx, dword ptr [esi + 0CC8h]
+    mov al, byte ptr [edi + ebx + 0332h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0332h], al
+    mov ebx, dword ptr [esi + 0CCCh]
+    mov al, byte ptr [edi + ebx + 0333h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0333h], al
+    mov ebx, dword ptr [esi + 0CD0h]
+    mov al, byte ptr [edi + ebx + 0334h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0334h], al
+    mov ebx, dword ptr [esi + 0CD4h]
+    mov al, byte ptr [edi + ebx + 0335h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0335h], al
+    mov ebx, dword ptr [esi + 0CD8h]
+    mov al, byte ptr [edi + ebx + 0336h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0336h], al
+    mov ebx, dword ptr [esi + 0CDCh]
+    mov al, byte ptr [edi + ebx + 0337h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0337h], al
+    mov ebx, dword ptr [esi + 0CE0h]
+    mov al, byte ptr [edi + ebx + 0338h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0338h], al
+    mov ebx, dword ptr [esi + 0CE4h]
+    mov al, byte ptr [edi + ebx + 0339h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0339h], al
+    mov ebx, dword ptr [esi + 0CE8h]
+    mov al, byte ptr [edi + ebx + 033Ah]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 033Ah], al
+    mov ebx, dword ptr [esi + 0CECh]
+    mov al, byte ptr [edi + ebx + 033Bh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 033Bh], al
+    mov ebx, dword ptr [esi + 0CF0h]
+    mov al, byte ptr [edi + ebx + 033Ch]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 033Ch], al
+    mov ebx, dword ptr [esi + 0CF4h]
+    mov al, byte ptr [edi + ebx + 033Dh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 033Dh], al
+    mov ebx, dword ptr [esi + 0CF8h]
+    mov al, byte ptr [edi + ebx + 033Eh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 033Eh], al
+    mov ebx, dword ptr [esi + 0CFCh]
+    mov al, byte ptr [edi + ebx + 033Fh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 033Fh], al
+    mov ebx, dword ptr [esi + 0D00h]
+    mov al, byte ptr [edi + ebx + 0340h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0340h], al
+    mov ebx, dword ptr [esi + 0D04h]
+    mov al, byte ptr [edi + ebx + 0341h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0341h], al
+    mov ebx, dword ptr [esi + 0D08h]
+    mov al, byte ptr [edi + ebx + 0342h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0342h], al
+    mov ebx, dword ptr [esi + 0D0Ch]
+    mov al, byte ptr [edi + ebx + 0343h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0343h], al
+    mov ebx, dword ptr [esi + 0D10h]
+    mov al, byte ptr [edi + ebx + 0344h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0344h], al
+    mov ebx, dword ptr [esi + 0D14h]
+    mov al, byte ptr [edi + ebx + 0345h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0345h], al
+    mov ebx, dword ptr [esi + 0D18h]
+    mov al, byte ptr [edi + ebx + 0346h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0346h], al
+    mov ebx, dword ptr [esi + 0D1Ch]
+    mov al, byte ptr [edi + ebx + 0347h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0347h], al
+    mov ebx, dword ptr [esi + 0D20h]
+    mov al, byte ptr [edi + ebx + 0348h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0348h], al
+    mov ebx, dword ptr [esi + 0D24h]
+    mov al, byte ptr [edi + ebx + 0349h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0349h], al
+    mov ebx, dword ptr [esi + 0D28h]
+    mov al, byte ptr [edi + ebx + 034Ah]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 034Ah], al
+    mov ebx, dword ptr [esi + 0D2Ch]
+    mov al, byte ptr [edi + ebx + 034Bh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 034Bh], al
+    mov ebx, dword ptr [esi + 0D30h]
+    mov al, byte ptr [edi + ebx + 034Ch]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 034Ch], al
+    mov ebx, dword ptr [esi + 0D34h]
+    mov al, byte ptr [edi + ebx + 034Dh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 034Dh], al
+    mov ebx, dword ptr [esi + 0D38h]
+    mov al, byte ptr [edi + ebx + 034Eh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 034Eh], al
+    mov ebx, dword ptr [esi + 0D3Ch]
+    mov al, byte ptr [edi + ebx + 034Fh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 034Fh], al
+    mov ebx, dword ptr [esi + 0D40h]
+    mov al, byte ptr [edi + ebx + 0350h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0350h], al
+    mov ebx, dword ptr [esi + 0D44h]
+    mov al, byte ptr [edi + ebx + 0351h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0351h], al
+    mov ebx, dword ptr [esi + 0D48h]
+    mov al, byte ptr [edi + ebx + 0352h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0352h], al
+    mov ebx, dword ptr [esi + 0D4Ch]
+    mov al, byte ptr [edi + ebx + 0353h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0353h], al
+    mov ebx, dword ptr [esi + 0D50h]
+    mov al, byte ptr [edi + ebx + 0354h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0354h], al
+    mov ebx, dword ptr [esi + 0D54h]
+    mov al, byte ptr [edi + ebx + 0355h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0355h], al
+    mov ebx, dword ptr [esi + 0D58h]
+    mov al, byte ptr [edi + ebx + 0356h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0356h], al
+    mov ebx, dword ptr [esi + 0D5Ch]
+    mov al, byte ptr [edi + ebx + 0357h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0357h], al
+    mov ebx, dword ptr [esi + 0D60h]
+    mov al, byte ptr [edi + ebx + 0358h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0358h], al
+    mov ebx, dword ptr [esi + 0D64h]
+    mov al, byte ptr [edi + ebx + 0359h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0359h], al
+    mov ebx, dword ptr [esi + 0D68h]
+    mov al, byte ptr [edi + ebx + 035Ah]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 035Ah], al
+    mov ebx, dword ptr [esi + 0D6Ch]
+    mov al, byte ptr [edi + ebx + 035Bh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 035Bh], al
+    mov ebx, dword ptr [esi + 0D70h]
+    mov al, byte ptr [edi + ebx + 035Ch]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 035Ch], al
+    mov ebx, dword ptr [esi + 0D74h]
+    mov al, byte ptr [edi + ebx + 035Dh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 035Dh], al
+    mov ebx, dword ptr [esi + 0D78h]
+    mov al, byte ptr [edi + ebx + 035Eh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 035Eh], al
+    mov ebx, dword ptr [esi + 0D7Ch]
+    mov al, byte ptr [edi + ebx + 035Fh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 035Fh], al
+    mov ebx, dword ptr [esi + 0D80h]
+    mov al, byte ptr [edi + ebx + 0360h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0360h], al
+    mov ebx, dword ptr [esi + 0D84h]
+    mov al, byte ptr [edi + ebx + 0361h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0361h], al
+    mov ebx, dword ptr [esi + 0D88h]
+    mov al, byte ptr [edi + ebx + 0362h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0362h], al
+    mov ebx, dword ptr [esi + 0D8Ch]
+    mov al, byte ptr [edi + ebx + 0363h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0363h], al
+    mov ebx, dword ptr [esi + 0D90h]
+    mov al, byte ptr [edi + ebx + 0364h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0364h], al
+    mov ebx, dword ptr [esi + 0D94h]
+    mov al, byte ptr [edi + ebx + 0365h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0365h], al
+    mov ebx, dword ptr [esi + 0D98h]
+    mov al, byte ptr [edi + ebx + 0366h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0366h], al
+    mov ebx, dword ptr [esi + 0D9Ch]
+    mov al, byte ptr [edi + ebx + 0367h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0367h], al
+    mov ebx, dword ptr [esi + 0DA0h]
+    mov al, byte ptr [edi + ebx + 0368h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0368h], al
+    mov ebx, dword ptr [esi + 0DA4h]
+    mov al, byte ptr [edi + ebx + 0369h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0369h], al
+    mov ebx, dword ptr [esi + 0DA8h]
+    mov al, byte ptr [edi + ebx + 036Ah]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 036Ah], al
+    mov ebx, dword ptr [esi + 0DACh]
+    mov al, byte ptr [edi + ebx + 036Bh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 036Bh], al
+    mov ebx, dword ptr [esi + 0DB0h]
+    mov al, byte ptr [edi + ebx + 036Ch]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 036Ch], al
+    mov ebx, dword ptr [esi + 0DB4h]
+    mov al, byte ptr [edi + ebx + 036Dh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 036Dh], al
+    mov ebx, dword ptr [esi + 0DB8h]
+    mov al, byte ptr [edi + ebx + 036Eh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 036Eh], al
+    mov ebx, dword ptr [esi + 0DBCh]
+    mov al, byte ptr [edi + ebx + 036Fh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 036Fh], al
+    mov ebx, dword ptr [esi + 0DC0h]
+    mov al, byte ptr [edi + ebx + 0370h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0370h], al
+    mov ebx, dword ptr [esi + 0DC4h]
+    mov al, byte ptr [edi + ebx + 0371h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0371h], al
+    mov ebx, dword ptr [esi + 0DC8h]
+    mov al, byte ptr [edi + ebx + 0372h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0372h], al
+    mov ebx, dword ptr [esi + 0DCCh]
+    mov al, byte ptr [edi + ebx + 0373h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0373h], al
+    mov ebx, dword ptr [esi + 0DD0h]
+    mov al, byte ptr [edi + ebx + 0374h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0374h], al
+    mov ebx, dword ptr [esi + 0DD4h]
+    mov al, byte ptr [edi + ebx + 0375h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0375h], al
+    mov ebx, dword ptr [esi + 0DD8h]
+    mov al, byte ptr [edi + ebx + 0376h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0376h], al
+    mov ebx, dword ptr [esi + 0DDCh]
+    mov al, byte ptr [edi + ebx + 0377h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0377h], al
+    mov ebx, dword ptr [esi + 0DE0h]
+    mov al, byte ptr [edi + ebx + 0378h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0378h], al
+    mov ebx, dword ptr [esi + 0DE4h]
+    mov al, byte ptr [edi + ebx + 0379h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0379h], al
+    mov ebx, dword ptr [esi + 0DE8h]
+    mov al, byte ptr [edi + ebx + 037Ah]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 037Ah], al
+    mov ebx, dword ptr [esi + 0DECh]
+    mov al, byte ptr [edi + ebx + 037Bh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 037Bh], al
+    mov ebx, dword ptr [esi + 0DF0h]
+    mov al, byte ptr [edi + ebx + 037Ch]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 037Ch], al
+    mov ebx, dword ptr [esi + 0DF4h]
+    mov al, byte ptr [edi + ebx + 037Dh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 037Dh], al
+    mov ebx, dword ptr [esi + 0DF8h]
+    mov al, byte ptr [edi + ebx + 037Eh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 037Eh], al
+    mov ebx, dword ptr [esi + 0DFCh]
+    mov al, byte ptr [edi + ebx + 037Fh]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 037Fh], al
+    mov ebx, dword ptr [esi + 0E00h]
+    mov al, byte ptr [edi + ebx + 0380h]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi + 0380h], al
+    ret
+    B_132E76_10
+func_00132E80:
+    ret
     db 127 dup (0)
 XN_12F500 ends
 end

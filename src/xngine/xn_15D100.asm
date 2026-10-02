@@ -6,6 +6,7 @@
 include xn_15D100.inc
 public D_0015DC00
 public func_0015D170
+public func_0015D288
 public func_0015D2EC
 public func_0015E400
 public func_0015F50C
@@ -18,23 +19,55 @@ extrn D_0014294C:byte
 extrn D_00142950:byte
 extrn D_00143550:byte
 extrn D_00149980:byte
+extrn func_0015310C:near
+extrn func_00153188:near
 XN_15D100 segment byte public use32 'CODE'
     assume cs:XN_15D100, ds:XN_15D100, es:XN_15D100, ss:XN_15D100
-    B_15D100_2
-    dd D_0015D165
-    B_15D106_2
-    dd D_0015D165
-    B_15D10C_2
-    dd D_0015D169
-    B_15D112_2
-    dd D_0015D169
-    B_15D118_25
-    dd D_0015D165
-    B_15D135_2
-    dd D_0015D169
-    B_15D13B_25
-    dd D_0015D169
-    B_15D158_13
+func_0015D100:
+    mov dword ptr [D_0015D165], ecx
+    shl dword ptr [D_0015D165], 2
+    mov dword ptr [D_0015D169], eax
+    shl dword ptr [D_0015D169], 2
+L_15D119:
+    push edi
+    push ebx
+    push eax
+L_15D11C:
+    call func_0015D141
+    add edi, 4
+    add ebx, 4
+    sub eax, 1
+    jne short L_15D11C
+    pop eax
+    pop ebx
+    pop edi
+    add esi, dword ptr [D_0015D165]
+    add ebx, dword ptr [D_0015D169]
+    sub edx, 1
+    jne short L_15D119
+    ret
+func_0015D141:
+    push eax
+    push ecx
+    push edx
+    push edi
+    push esi
+    xor edx, edx
+L_15D148:
+    mov eax, dword ptr [esi]
+    imul eax, dword ptr [edi]
+    add edx, eax
+    add esi, 4
+    add edi, dword ptr [D_0015D169]
+    sub ecx, 1
+    jne short L_15D148
+    mov dword ptr [ebx], edx
+    pop esi
+    pop edi
+    pop edx
+    pop ecx
+    pop eax
+    ret
 D_0015D165:
     db 4 dup (0)
 D_0015D169:
@@ -98,31 +131,121 @@ D_0015D1E9:
 D_0015D1ED:
     db 4 dup (0)
 D_0015D1F1:
-    B_15D1F1_9
-    dd D_0015D27C
-    B_15D1FE_2
-    dd D_0015D27C
-    B_15D204_2
-    dd D_0015D280
-    B_15D20A_2
-    dd D_0015D280
-    B_15D210_4
-    dd D_0015D284
-    B_15D218_24
-    dd D_0015D27C
-    B_15D234_2
-    dd D_0015D280
-    B_15D23A_30
-    dd D_0015D280
-    B_15D25C_8
-    dd D_0015D284
-    B_15D268_20
+    B_15D1F1_7
+func_0015D1F8:
+    mov dword ptr [D_0015D27C], ecx
+    shl dword ptr [D_0015D27C], 3
+    mov dword ptr [D_0015D280], eax
+    shl dword ptr [D_0015D280], 3
+    mov word ptr [D_0015D284], bp
+L_15D218:
+    push edi
+    push ebx
+    push eax
+L_15D21B:
+    call func_0015D240
+    add edi, 8
+    add ebx, 8
+    sub eax, 1
+    jne short L_15D21B
+    pop eax
+    pop ebx
+    pop edi
+    add esi, dword ptr [D_0015D27C]
+    add ebx, dword ptr [D_0015D280]
+    sub edx, 1
+    jne short L_15D218
+    ret
+func_0015D240:
+    push eax
+    push ecx
+    push edx
+    push edi
+    push esi
+    push ebp
+    push ebx
+    xor ebx, ebx
+    xor ebp, ebp
+L_15D24B:
+    mov eax, dword ptr [esi]
+    imul dword ptr [edi]
+    add ebp, eax
+    adc ebx, edx
+    add esi, 8
+    add edi, dword ptr [D_0015D280]
+    sub ecx, 1
+    jne short L_15D24B
+    mov cx, word ptr [D_0015D284]
+    shrd ebp, ebx, cl
+    sar ebx, cl
+    mov ecx, ebx
+    pop ebx
+    mov dword ptr [ebx + 4], ecx
+    mov dword ptr [ebx], ebp
+    pop ebp
+    pop esi
+    pop edi
+    pop edx
+    pop ecx
+    pop eax
+    ret
 D_0015D27C:
     db 4 dup (0)
 D_0015D280:
     db 4 dup (0)
 D_0015D284:
-    B_15D284_104
+    B_15D284_4
+func_0015D288:
+    push ecx
+    mov ecx, edx
+    mov edx, 1
+    shl edx, cl
+    mov ecx, ebx
+    imul ecx, ebx
+L_15D297:
+    mov dword ptr [eax], edx
+    add eax, 4
+    dec ecx
+    je short L_15D2B0
+    push ebx
+L_15D2A0:
+    mov dword ptr [eax], 0
+    add eax, 4
+    dec ecx
+    dec ebx
+    jne short L_15D2A0
+    pop ebx
+    jmp short L_15D297
+L_15D2B0:
+    pop ecx
+    ret
+    B_15D2B2_2
+func_0015D2B4:
+    push ecx
+    mov ecx, edx
+    mov edx, 1
+    shl edx, cl
+    mov ecx, ebx
+    imul ecx, ebx
+L_15D2C3:
+    mov dword ptr [eax], edx
+    mov dword ptr [eax + 4], 0
+    add eax, 8
+    dec ecx
+    je short L_15D2EA
+    push ebx
+L_15D2D3:
+    mov dword ptr [eax], 0
+    mov dword ptr [eax + 4], 0
+    add eax, 8
+    dec ecx
+    dec ebx
+    jne short L_15D2D3
+    pop ebx
+    jmp short L_15D2C3
+L_15D2EA:
+    pop ecx
+    ret
 func_0015D2EC:
     push ecx
     push esi
@@ -179,17 +302,93 @@ L_15E457:
 L_15E459:
     stc
     ret
-    B_15E45B_96
-    dd D_00142950
-    B_15E4BF_2
-    dd D_00143550
-    B_15E4C5_11
-    dd D_0012B508
-    B_15E4D4_2
-    dd D_00142930
-    B_15E4DA_3
-    dd D_00149980
-    B_15E4E1_31
+    B_15E45B_1
+func_0015E45C:
+    push ebp
+    push edi
+    cmp eax, ebx
+    jle short L_15E463
+    xchg ebx, eax
+L_15E463:
+    cmp edx, ecx
+    jle short L_15E469
+    xchg ecx, edx
+L_15E469:
+    call func_0015E400
+    jb short L_15E4A1
+    push eax
+    push ebx
+    push ecx
+    push edx
+    call func_0015310C
+    pop edx
+    pop ecx
+    pop ebx
+    pop eax
+    push eax
+    push ebx
+    push ecx
+    push edx
+    mov edx, ecx
+    call func_0015310C
+    pop edx
+    pop ecx
+    pop ebx
+    pop eax
+    push eax
+    push ebx
+    push ecx
+    push edx
+    call func_00153188
+    pop edx
+    pop ecx
+    pop ebx
+    pop eax
+    mov eax, ebx
+    dec eax
+    call func_00153188
+L_15E4A1:
+    pop edi
+    pop ebp
+    ret
+func_0015E4A4:
+    push ebp
+    push edi
+    cmp eax, ebx
+    jle short L_15E4AB
+    xchg ebx, eax
+L_15E4AB:
+    cmp edx, ecx
+    jle short L_15E4B1
+    xchg ecx, edx
+L_15E4B1:
+    call func_0015E400
+    jb short L_15E4F6
+    mov edi, dword ptr [edx*4 + D_00142950]
+    add edi, dword ptr [D_00143550]
+    add edi, eax
+    sub ebx, eax
+    sub ecx, edx
+    mov edx, ecx
+    movzx eax, byte ptr [D_0012B508]
+    mov ebp, dword ptr [D_00142930]
+    mov eax, dword ptr [eax*4 + D_00149980]
+    sub ebp, ebx
+L_15E4E3:
+    mov ecx, ebx
+    shr ecx, 2
+    rep stosd
+    mov ecx, ebx
+    and ecx, 3
+    rep stosb
+    add edi, ebp
+    dec edx
+    jne short L_15E4E3
+L_15E4F6:
+    pop edi
+    pop ebp
+    ret
+    db 7 dup (0)
 D_0015E500:
     B_15E500_4108
 func_0015F50C:

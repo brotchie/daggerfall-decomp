@@ -22,6 +22,7 @@ extrn D_00153461:byte
 extrn D_00153465:byte
 extrn D_00153469:byte
 extrn D_0015346D:byte
+extrn func_001609C0:near
 XN_153500 segment byte public use32 'CODE'
     assume cs:XN_153500, ds:XN_153500, es:XN_153500, ss:XN_153500
 func_00153500:
@@ -36,81 +37,112 @@ func_00153500:
 L_153526:
     mov byte ptr [D_00153408], 1
     ret
-    B_15352E_3
-    dd D_00153400
-    B_153535_6
-    dd D_00153404
-    B_15353F_6
-    dd D_00153425
-    B_153549_10
-    dd D_00153408
-    B_153557_4
-    dd D_00153404
-    B_15355F_6
-    dd D_0015343D
-    B_153569_6
-    dd D_00153408
-    B_153573_5
-    dd D_00153404
-    B_15357C_4
-    dd D_00153404
-    B_153584_2
-    dd D_00153431
-    B_15358A_8
-    dd D_0015340D
-    B_153596_2
-    dd D_00153411
-    B_15359C_2
-    dd D_00153415
-    B_1535A2_4
-    dd D_00153461
-    B_1535AA_2
-    dd D_00153465
-    B_1535B0_2
-    dd D_00153469
-    B_1535B6_2
-    dd D_0015346D
-    B_1535BC_2
-    dd D_00153409
-    B_1535C2_9
-    dd D_00153409
-    B_1535CF_5
-    dd D_00153409
-    B_1535D8_6
-    dd D_00120288
-    B_1535E2_6
-    dd D_0012028C
-    B_1535EC_6
-    dd D_00120290
-    B_1535F6_6
-    dd D_00153409
-    B_153600_6
-    dd D_00153465
-    B_15360A_2
-    dd D_00120288
-    B_153610_2
-    dd D_00153469
-    B_153616_36
-    dd D_0012028C
-    B_15363E_2
-    dd D_0015346D
-    B_153644_2
-    dd D_00120290
-    B_15364A_7
-    dd D_00153409
-    B_153655_4
-    dd D_00120288
-    B_15365D_5
-    dd D_0012028C
-    B_153666_5
-    dd D_00120290
-    B_15366F_15
-    dd D_00153461
-    B_153682_3
-    dd D_00153461
-    B_153689_4
-    dd D_00153461
-    B_153691_5
+    B_15352E_2
+func_00153530:
+    mov eax, dword ptr [D_00153400]
+    test eax, eax
+    je short L_15354E
+    mov edx, dword ptr [D_00153404]
+    test edx, edx
+    js short L_15354E
+    call dword ptr [edx + D_00153425]
+    call func_001609C0
+L_15354E:
+    ret
+    B_15354F_1
+func_00153550:
+    pushad
+    cmp byte ptr [D_00153408], 0
+    je short L_153569
+    mov eax, dword ptr [D_00153404]
+    test eax, eax
+    js short L_153569
+    call dword ptr [eax + D_0015343D]
+L_153569:
+    popad
+    ret
+    B_15356B_1
+func_0015356C:
+    pushad
+    cmp byte ptr [D_00153408], 0
+    je short L_1535A2
+    cmp dword ptr [D_00153404], -1
+    je short L_1535A2
+    mov eax, dword ptr [D_00153404]
+    call dword ptr [eax + D_00153431]
+    jb short L_1535A2
+    call func_001535A4
+    mov dword ptr [D_0015340D], eax
+    mov dword ptr [D_00153411], edx
+    mov dword ptr [D_00153415], ebx
+L_1535A2:
+    popad
+    ret
+func_001535A4:
+    mov ecx, dword ptr [D_00153461]
+    mov dword ptr [ecx + D_00153465], eax
+    mov dword ptr [ecx + D_00153469], edx
+    mov dword ptr [ecx + D_0015346D], ebx
+    cmp dword ptr [D_00153409], 0
+    je near ptr L_153695
+    cmp dword ptr [D_00153409], 7
+    jle short L_1535DC
+    mov dword ptr [D_00153409], 7
+L_1535DC:
+    mov dword ptr [D_00120288], 0
+    mov dword ptr [D_0012028C], 0
+    mov dword ptr [D_00120290], 0
+    mov ecx, dword ptr [D_00153409]
+    dec ecx
+    imul ecx, ecx, 0Ch
+L_153604:
+    mov eax, dword ptr [ecx + D_00153465]
+    add dword ptr [D_00120288], eax
+    mov eax, dword ptr [ecx + D_00153469]
+    mov ebp, eax
+    sub ebp, edx
+    or ebp, ebp
+    jns short L_153620
+    neg ebp
+L_153620:
+    sub ebp, 04000h
+    jle short L_153638
+    test edx, edx
+    jns short L_153633
+    sub eax, 08000h
+    jmp short L_153638
+L_153633:
+    add eax, 08000h
+L_153638:
+    add dword ptr [D_0012028C], eax
+    mov eax, dword ptr [ecx + D_0015346D]
+    add dword ptr [D_00120290], eax
+    sub ecx, 0Ch
+    jns short L_153604
+    mov ebp, dword ptr [D_00153409]
+    shl ebp, 4
+    mov eax, dword ptr [D_00120288]
+    cdq
+    idiv ebp
+    push eax
+    mov eax, dword ptr [D_0012028C]
+    cdq
+    idiv ebp
+    push eax
+    mov eax, dword ptr [D_00120290]
+    cdq
+    idiv ebp
+    mov ebx, eax
+    pop edx
+    pop eax
+    shr ebp, 4
+    imul ebp, ebp, 0Ch
+    add dword ptr [D_00153461], 0Ch
+    cmp dword ptr [D_00153461], ebp
+    jne short L_153695
+    mov dword ptr [D_00153461], 0
+L_153695:
+    ret
     db 106 dup (0)
 XN_153500 ends
 end

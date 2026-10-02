@@ -4,14 +4,14 @@
 .486p
 .387
 include xn_12A100.inc
-public D_0012A700
-public D_0012A740
-public D_0012A7A0
-public D_0012A860
 public D_0012AA04
 public D_0012AA08
 public D_0012AA0C
 public func_0012A230
+public func_0012A700
+public func_0012A740
+public func_0012A7A0
+public func_0012A860
 extrn D_000CEA28:byte
 extrn D_000CEA2C:byte
 extrn D_000CEA30:byte
@@ -88,48 +88,6 @@ extrn D_00153C44:byte
 extrn D_00154C44:byte
 extrn D_00154C48:byte
 extrn D_00154C4C:byte
-extrn D_00155636:byte
-extrn D_00155944:byte
-extrn D_00155996:byte
-extrn D_0015599B:byte
-extrn D_00155A4B:byte
-extrn D_00155D34:byte
-extrn D_00155DEC:byte
-extrn D_00155EDD:byte
-extrn D_00155F84:byte
-extrn D_0015603C:byte
-extrn D_001561AD:byte
-extrn D_0015647D:byte
-extrn D_00156535:byte
-extrn D_00156645:byte
-extrn D_001566E1:byte
-extrn D_00156799:byte
-extrn D_00156941:byte
-extrn D_00156AB7:byte
-extrn D_00156AC9:byte
-extrn D_00156B74:byte
-extrn D_00156B9F:byte
-extrn D_00156BAE:byte
-extrn D_00156C40:byte
-extrn D_00156C59:byte
-extrn D_00156E74:byte
-extrn D_00156F07:byte
-extrn D_00157090:byte
-extrn D_00157254:byte
-extrn D_001572F4:byte
-extrn D_001574B1:byte
-extrn D_00157622:byte
-extrn D_0015762E:byte
-extrn D_00157802:byte
-extrn D_0015780E:byte
-extrn D_00157B22:byte
-extrn D_00157B2E:byte
-extrn D_00157E22:byte
-extrn D_00157E2E:byte
-extrn D_0015BBB9:byte
-extrn D_0015BBDE:byte
-extrn D_0015BBE5:byte
-extrn D_0015BC61:byte
 extrn L_13EA73:near
 extrn L_13EA7B:near
 extrn L_13EA8B:near
@@ -145,6 +103,40 @@ extrn L_140729:near
 extrn L_14072E:near
 extrn L_1550E7:near
 extrn L_1550F1:near
+extrn L_155634:near
+extrn L_155943:near
+extrn L_155994:near
+extrn L_15599A:near
+extrn L_155A4A:near
+extrn L_155D31:near
+extrn L_155DE9:near
+extrn L_155EDA:near
+extrn L_155F81:near
+extrn L_156039:near
+extrn L_1561AA:near
+extrn L_15647A:near
+extrn L_156532:near
+extrn L_156642:near
+extrn L_1566DE:near
+extrn L_156796:near
+extrn L_15693E:near
+extrn L_156AB4:near
+extrn L_156AC8:near
+extrn L_156B6E:near
+extrn L_156B9C:near
+extrn L_156BAD:near
+extrn L_156C3D:near
+extrn L_156C58:near
+extrn L_156E71:near
+extrn L_156F04:near
+extrn L_15708D:near
+extrn L_157251:near
+extrn L_1572F1:near
+extrn L_1574AE:near
+extrn L_15762B:near
+extrn L_15780B:near
+extrn L_157B2B:near
+extrn L_157E2B:near
 extrn L_1583AD:near
 extrn L_1583B5:near
 extrn L_1583C3:near
@@ -157,6 +149,10 @@ extrn L_158606:near
 extrn L_15860E:near
 extrn L_15861C:near
 extrn L_158624:near
+extrn L_15BBB7:near
+extrn L_15BBDB:near
+extrn L_15BBE2:near
+extrn L_15BC5F:near
 extrn func_0006A319:near
 extrn func_000A10A8:near
 extrn func_000A117E:near
@@ -171,7 +167,82 @@ extrn func_0014BDF7:near
 extrn func_00154E20:near
 extrn func_00155415:near
 extrn func_00155508:near
+extrn func_00157620:near
+extrn func_00157800:near
+extrn func_00157B20:near
+extrn func_00157E20:near
 extrn func_0015810E:near
+extrn func_0015BC42:near
+extrn func_0015BC9C:near
+patch_13EA75 equ L_13EA73+2
+patch_13EA7D equ L_13EA7B+2
+patch_13EA8D equ L_13EA8B+2
+patch_13EA95 equ L_13EA93+2
+patch_14030A equ L_140309+1
+patch_1405B4 equ L_1405B2+2
+patch_1405BC equ L_1405BA+2
+patch_1405CC equ L_1405CA+2
+patch_1405D4 equ L_1405D2+2
+patch_1406DD equ L_1406DC+1
+patch_1406E2 equ L_1406E1+1
+patch_14072A equ L_140729+1
+patch_14072F equ L_14072E+1
+patch_1550ED equ L_1550E7+6
+patch_1550F7 equ L_1550F1+6
+patch_155636 equ L_155634+2
+patch_155944 equ L_155943+1
+patch_155996 equ L_155994+2
+patch_15599B equ L_15599A+1
+patch_155A4B equ L_155A4A+1
+patch_155D34 equ L_155D31+3
+patch_155DEC equ L_155DE9+3
+patch_155EDD equ L_155EDA+3
+patch_155F84 equ L_155F81+3
+patch_15603C equ L_156039+3
+patch_1561AD equ L_1561AA+3
+patch_15647D equ L_15647A+3
+patch_156535 equ L_156532+3
+patch_156645 equ L_156642+3
+patch_1566E1 equ L_1566DE+3
+patch_156799 equ L_156796+3
+patch_156941 equ L_15693E+3
+patch_156AB7 equ L_156AB4+3
+patch_156AC9 equ L_156AC8+1
+patch_156B74 equ L_156B6E+6
+patch_156B9F equ L_156B9C+3
+patch_156BAE equ L_156BAD+1
+patch_156C40 equ L_156C3D+3
+patch_156C59 equ L_156C58+1
+patch_156E74 equ L_156E71+3
+patch_156F07 equ L_156F04+3
+patch_157090 equ L_15708D+3
+patch_157254 equ L_157251+3
+patch_1572F4 equ L_1572F1+3
+patch_1574B1 equ L_1574AE+3
+patch_157622 equ func_00157620+2
+patch_15762E equ L_15762B+3
+patch_157802 equ func_00157800+2
+patch_15780E equ L_15780B+3
+patch_157B22 equ func_00157B20+2
+patch_157B2E equ L_157B2B+3
+patch_157E22 equ func_00157E20+2
+patch_157E2E equ L_157E2B+3
+patch_1583AF equ L_1583AD+2
+patch_1583B7 equ L_1583B5+2
+patch_1583C5 equ L_1583C3+2
+patch_1583CD equ L_1583CB+2
+patch_1584AD equ L_1584AB+2
+patch_1584B5 equ L_1584B3+2
+patch_1584C3 equ L_1584C1+2
+patch_1584CB equ L_1584C9+2
+patch_158608 equ L_158606+2
+patch_158610 equ L_15860E+2
+patch_15861E equ L_15861C+2
+patch_158626 equ L_158624+2
+patch_15BBB9 equ L_15BBB7+2
+patch_15BBDE equ L_15BBDB+3
+patch_15BBE5 equ L_15BBE2+3
+patch_15BC61 equ L_15BC5F+2
 XN_12A100 segment byte public use32 'CODE'
     assume cs:XN_12A100, ds:XN_12A100, es:XN_12A100, ss:XN_12A100
 func_0012A100:
@@ -215,31 +286,31 @@ L_12A162:
     mov eax, 040004h
     call func_000A10A8
     mov dword ptr [D_000CEAA5], eax
-    mov dword ptr [D_00156E74], eax
-    mov dword ptr [D_00156F07], eax
-    mov dword ptr [D_00157090], eax
-    mov dword ptr [D_00157254], eax
-    mov dword ptr [D_001572F4], eax
-    mov dword ptr [D_001574B1], eax
-    mov dword ptr [D_00155D34], eax
-    mov dword ptr [D_00155DEC], eax
-    mov dword ptr [D_00155EDD], eax
-    mov dword ptr [D_00155F84], eax
-    mov dword ptr [D_0015603C], eax
-    mov dword ptr [D_001561AD], eax
-    mov dword ptr [D_0015647D], eax
-    mov dword ptr [D_00156535], eax
-    mov dword ptr [D_00156645], eax
-    mov dword ptr [D_001566E1], eax
-    mov dword ptr [D_00156799], eax
-    mov dword ptr [D_00156941], eax
-    mov dword ptr [D_00156AB7], eax
-    mov dword ptr [D_00156B9F], eax
-    mov dword ptr [D_00156C40], eax
-    mov dword ptr [D_0015762E], eax
-    mov dword ptr [D_0015780E], eax
-    mov dword ptr [D_00157B2E], eax
-    mov dword ptr [D_00157E2E], eax
+    mov dword ptr [patch_156E74], eax
+    mov dword ptr [patch_156F07], eax
+    mov dword ptr [patch_157090], eax
+    mov dword ptr [patch_157254], eax
+    mov dword ptr [patch_1572F4], eax
+    mov dword ptr [patch_1574B1], eax
+    mov dword ptr [patch_155D34], eax
+    mov dword ptr [patch_155DEC], eax
+    mov dword ptr [patch_155EDD], eax
+    mov dword ptr [patch_155F84], eax
+    mov dword ptr [patch_15603C], eax
+    mov dword ptr [patch_1561AD], eax
+    mov dword ptr [patch_15647D], eax
+    mov dword ptr [patch_156535], eax
+    mov dword ptr [patch_156645], eax
+    mov dword ptr [patch_1566E1], eax
+    mov dword ptr [patch_156799], eax
+    mov dword ptr [patch_156941], eax
+    mov dword ptr [patch_156AB7], eax
+    mov dword ptr [patch_156B9F], eax
+    mov dword ptr [patch_156C40], eax
+    mov dword ptr [patch_15762E], eax
+    mov dword ptr [patch_15780E], eax
+    mov dword ptr [patch_157B2E], eax
+    mov dword ptr [patch_157E2E], eax
     push eax
     lea edi, [eax + 040000h]
     mov ebx, 020000000h
@@ -296,11 +367,11 @@ func_0012A274:
     xor eax, eax
     mov edx, 010h
     div dword ptr [D_000CEA38]
-    mov dword ptr [L_1406E1+1], eax
+    mov dword ptr [patch_1406E2], eax
     xor eax, eax
     mov edx, 2
     div dword ptr [D_000CEA40]
-    mov dword ptr [L_14072E+1], eax
+    mov dword ptr [patch_14072F], eax
     call func_0012A3AC
     popad
     ret
@@ -311,41 +382,41 @@ func_0012A2D0:
     mov dword ptr [D_000CEA2C], edx
     mov dword ptr [D_000CEA30], ebx
     mov dword ptr [D_000CEA34], ecx
-    mov dword ptr [L_1583AD+2], eax
-    mov dword ptr [L_1584AB+2], eax
-    mov dword ptr [L_158606+2], eax
-    mov dword ptr [L_1583C3+2], edx
-    mov dword ptr [L_1584C1+2], edx
-    mov dword ptr [L_15861C+2], edx
-    mov dword ptr [L_1405B2+2], eax
-    mov dword ptr [L_1405CA+2], edx
-    mov dword ptr [L_13EA73+2], eax
-    mov dword ptr [L_13EA8B+2], edx
-    mov dword ptr [D_0015BBDE], eax
-    mov dword ptr [D_0015BBE5], edx
-    mov dword ptr [L_1550E7+6], eax
-    mov dword ptr [L_1550F1+6], edx
-    mov dword ptr [L_12A92F+2], ebx
+    mov dword ptr [patch_1583AF], eax
+    mov dword ptr [patch_1584AD], eax
+    mov dword ptr [patch_158608], eax
+    mov dword ptr [patch_1583C5], edx
+    mov dword ptr [patch_1584C3], edx
+    mov dword ptr [patch_15861E], edx
+    mov dword ptr [patch_1405B4], eax
+    mov dword ptr [patch_1405CC], edx
+    mov dword ptr [patch_13EA75], eax
+    mov dword ptr [patch_13EA8D], edx
+    mov dword ptr [patch_15BBDE], eax
+    mov dword ptr [patch_15BBE5], edx
+    mov dword ptr [patch_1550ED], eax
+    mov dword ptr [patch_1550F7], edx
+    mov dword ptr [patch_12A931], ebx
     dec ebx
-    mov dword ptr [D_00157622], ebx
-    mov dword ptr [D_00157802], ebx
-    mov dword ptr [D_00157B22], ebx
-    mov dword ptr [D_00157E22], ebx
+    mov dword ptr [patch_157622], ebx
+    mov dword ptr [patch_157802], ebx
+    mov dword ptr [patch_157B22], ebx
+    mov dword ptr [patch_157E22], ebx
     inc ebx
     shl ebx, 8
     add ebx, 080h
     shl ecx, 8
     add ecx, 080h
-    mov dword ptr [L_1583B5+2], ebx
-    mov dword ptr [L_1583CB+2], ecx
-    mov dword ptr [L_1584B3+2], ebx
-    mov dword ptr [L_1584C9+2], ecx
-    mov dword ptr [L_1405BA+2], ebx
-    mov dword ptr [L_1405D2+2], ecx
-    mov dword ptr [L_13EA7B+2], ebx
-    mov dword ptr [L_13EA93+2], ecx
-    mov dword ptr [L_15860E+2], ebx
-    mov dword ptr [L_158624+2], ecx
+    mov dword ptr [patch_1583B7], ebx
+    mov dword ptr [patch_1583CD], ecx
+    mov dword ptr [patch_1584B5], ebx
+    mov dword ptr [patch_1584CB], ecx
+    mov dword ptr [patch_1405BC], ebx
+    mov dword ptr [patch_1405D4], ecx
+    mov dword ptr [patch_13EA7D], ebx
+    mov dword ptr [patch_13EA95], ecx
+    mov dword ptr [patch_158610], ebx
+    mov dword ptr [patch_158626], ecx
     call func_0012A3AC
     popad
     ret
@@ -362,7 +433,7 @@ func_0012A3AC:
     mov edx, 02000h
     div ebx
     mov dword ptr [D_000CEA7C], eax
-    mov dword ptr [L_1406DC+1], eax
+    mov dword ptr [patch_1406DD], eax
     mov ebx, dword ptr [D_000CEA2C]
     mov eax, dword ptr [D_000CEA40]
     shl eax, 0Eh
@@ -374,13 +445,13 @@ func_0012A3AC:
     mov edx, 02000h
     div ebx
     mov dword ptr [D_000CEA84], eax
-    mov dword ptr [L_140729+1], eax
+    mov dword ptr [patch_14072A], eax
     mov ebx, dword ptr [D_000CEA78]
     imul ebx, dword ptr [D_000CEA38]
     xor eax, eax
     mov edx, 010000h
     div ebx
-    mov dword ptr [L_140309+1], eax
+    mov dword ptr [patch_14030A], eax
     mov ebx, dword ptr [D_000CEA38]
     xor eax, eax
     imul ebx, ebx
@@ -434,8 +505,8 @@ L_12A4BD:
     mov eax, 0400000h
     xor edx, edx
     div dword ptr [D_000CEA38]
-    mov dword ptr [D_00156B74], eax
-    mov dword ptr [D_00155996], eax
+    mov dword ptr [patch_156B74], eax
+    mov dword ptr [patch_155996], eax
     ret
     B_12A4EF_1
 func_0012A4F0:
@@ -448,7 +519,7 @@ func_0012A4F0:
     mov edi, offset D_000F39E0
     mov ebx, dword ptr [D_000CEA64]
     add dword ptr [D_000CEA64], 064h
-    mov dword ptr [ebx + 03Ch], offset func_0012A949
+    mov dword ptr [ebx + 03Ch], offset D_0012A949
     mov dword ptr [edi], edi
     mov eax, dword ptr [D_00142948]
     mov word ptr [edi + 6], ax
@@ -484,14 +555,14 @@ L_12A5CE:
     mov eax, 03F00h
 L_12A5DA:
     add eax, dword ptr [D_00136915]
-    mov dword ptr [D_0015BC61], eax
-    mov dword ptr [D_00155636], eax
+    mov dword ptr [patch_15BC61], eax
+    mov dword ptr [patch_155636], eax
     mov eax, 012h
     cmp dword ptr [D_00142930], 0140h
     je short L_12A600
     mov eax, 019h
 L_12A600:
-    mov byte ptr [D_0015BBB9], al
+    mov byte ptr [patch_15BBB9], al
     popad
     ret
     B_12A607_1
@@ -566,22 +637,77 @@ L_12A6F8:
     pop ebx
     ret
     B_12A6FE_2
-D_0012A700:
-    B_12A700_13
-    dd D_0012A01D
-    B_12A711_14
-    dd D_00149980
-    B_12A723_29
-D_0012A740:
-    B_12A740_25
-    dd D_0012A041
-    B_12A75D_67
-D_0012A7A0:
-    B_12A7A0_13
-    dd D_0012A01D
-    B_12A7B1_14
-    dd D_00149980
-    B_12A7C3_13
+func_0012A700:
+    push ebx
+    push ebp
+    push esi
+    push edi
+    mov edi, eax
+    call func_0015BC42
+    mov ecx, dword ptr [eax + D_0012A01D]
+    mov esi, dword ptr [edi + 040h]
+    xor ebx, ebx
+    mov dword ptr [edi + 03Ch], ecx
+    mov bl, byte ptr [esi + 1]
+    mov eax, dword ptr [ebx*4 + D_00149980]
+    mov dword ptr [edi + 040h], eax
+    mov eax, edi
+    pop edi
+    pop esi
+    pop ebp
+    pop ebx
+    jmp ecx
+    B_12A72E_18
+func_0012A740:
+    push ebx
+    push ebp
+    push edi
+    mov edi, eax
+    push esi
+    mov ebx, dword ptr [edi + 040h]
+    mov ecx, dword ptr [ebx + 0Ch]
+    add ecx, dword ptr [ecx + 0Eh]
+    mov dword ptr [edi + 040h], ecx
+    call func_0015BC9C
+    mov ecx, dword ptr [eax + D_0012A041]
+    mov dword ptr [edi + 03Ch], ecx
+    mov eax, dword ptr [edi + 024h]
+    mov edx, dword ptr [edi + 030h]
+    mov ebx, dword ptr [edi + 05Ch]
+    shl eax, 4
+    shl edx, 4
+    shl ebx, 4
+    mov dword ptr [edi + 050h], eax
+    mov dword ptr [edi + 054h], edx
+    mov dword ptr [edi + 058h], ebx
+    pop esi
+    mov eax, edi
+    pop edi
+    pop ebp
+    pop ebx
+    jmp ecx
+    B_12A783_29
+func_0012A7A0:
+    push ebx
+    push ebp
+    push edi
+    mov edi, eax
+    push esi
+    call func_0015BC9C
+    mov ecx, dword ptr [eax + D_0012A01D]
+    mov esi, dword ptr [edi + 040h]
+    xor ebx, ebx
+    mov dword ptr [edi + 03Ch], ecx
+    mov bl, byte ptr [esi + 1]
+    mov eax, dword ptr [ebx*4 + D_00149980]
+    mov dword ptr [edi + 040h], eax
+    pop esi
+    mov eax, edi
+    pop edi
+    pop ebp
+    pop ebx
+    jmp ecx
+    B_12A7CE_2
 func_0012A7D0:
     test dword ptr [D_0013F76C], 0FFFFFFFFh
     je short L_12A811
@@ -638,10 +764,12 @@ L_12A846:
 L_12A85B:
     ret
     B_12A85C_4
-D_0012A860:
-    B_12A860_1
-    dd D_0012B508
-    B_12A865_11
+func_0012A860:
+    mov al, byte ptr [D_0012B508]
+    mov byte ptr [edi + 1], al
+    mov byte ptr [edi + ebp + 1], al
+    ret
+    B_12A86D_3
 func_0012A870:
     pushad
     mov dword ptr [D_000CEA5C], eax
@@ -667,26 +795,25 @@ func_0012A870:
     sub eax, dword ptr [D_000CEA34]
     mov dword ptr [D_000CEA6C], eax
     neg eax
-    mov dword ptr [L_12A95D+6], eax
+    mov dword ptr [D_0012A963], eax
     mov edi, dword ptr [ecx*4 + D_00142950]
     add edi, dword ptr [D_00143550]
     dec edi
     mov eax, dword ptr [D_00142930]
     shl ecx, 4
-    mov dword ptr [L_12A94E+2], eax
+    mov dword ptr [D_0012A950], eax
     lea esi, [ecx + D_000F39F0]
-L_12A8E9:
     mov eax, dword ptr [D_000CEA6C]
     push esi
     push edi
     mov eax, dword ptr [eax*4 + D_001218C0]
     mov esi, dword ptr [esi]
-    mov dword ptr [D_00155944], eax
-    mov dword ptr [D_0015599B], eax
-    mov dword ptr [D_00155A4B], eax
-    mov dword ptr [D_00156AC9], eax
-    mov dword ptr [D_00156BAE], eax
-    mov dword ptr [D_00156C59], eax
+    mov dword ptr [patch_155944], eax
+    mov dword ptr [patch_15599B], eax
+    mov dword ptr [patch_155A4B], eax
+    mov dword ptr [patch_156AC9], eax
+    mov dword ptr [patch_156BAE], eax
+    mov dword ptr [patch_156C59], eax
 L_12A917:
     xor ebx, ebx
     xor ebp, ebp
@@ -699,6 +826,7 @@ L_12A917:
     sub ebp, ebx
 L_12A92F:
     sub ebx, 0186A0h
+patch_12A931 equ L_12A92F+2   ; rewritten at run time
     push eax
     push ebp
     push edi
@@ -711,29 +839,17 @@ L_12A92F:
     call dword ptr [D_000CEA58]
     pop esi
     jmp short L_12A917
-func_0012A949:
-    add esp, 018h
-    pop edi
-    pop esi
-L_12A94E:
-    add edi, 0186A0h
-    add esi, 010h
-    inc dword ptr [D_000CEA6C]
-L_12A95D:
-    cmp dword ptr [D_000CEA6C], 0186A0h
-    jne short L_12A8E9
-    pushad
-    pushfd
-    mov eax, 0208h
+D_0012A949:
+    B_12A949_7
+D_0012A950:
+    B_12A950_9
+    dd D_000CEA6C
+    B_12A95D_2
+    dd D_000CEA6C
+D_0012A963:
+    B_12A963_13
     call func_0006A319
-    popfd
-    popad
-    call func_0012A814
-    jb short L_12A983
-    popad
-    xor eax, eax
-    clc
-    ret
+    B_12A975_14
 L_12A983:
     popad
     mov eax, 1

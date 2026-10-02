@@ -6,9 +6,27 @@
 include xn_153700.inc
 public func_00153718
 extrn D_0012DA48:byte
+extrn func_0012DD1C:near
 XN_153700 segment byte public use32 'CODE'
     assume cs:XN_153700, ds:XN_153700, es:XN_153700, ss:XN_153700
-    B_153700_24
+func_00153700:
+    cmp al, 041h
+    jb short L_15370A
+    cmp al, 05Ah
+    ja short L_15370A
+    add al, 020h
+L_15370A:
+    ret
+    B_15370B_1
+func_0015370C:
+    cmp al, 061h
+    jb short L_153716
+    cmp al, 07Ah
+    ja short L_153716
+    sub al, 020h
+L_153716:
+    ret
+    B_153717_1
 func_00153718:
     push esi
     push edi
@@ -22,11 +40,106 @@ L_15371E:
     pop edi
     pop esi
     ret
-    B_153727_75
-    dd D_0012DA48
-    B_153776_63
-    dd D_0012DA48
-    B_1537B9_8
+    B_153727_1
+func_00153728:
+    ret
+    B_153729_3
+func_0015372C:
+    push edi
+L_15372D:
+    xchg byte ptr [esi + edi], al
+    inc edi
+    test al, al
+    jne short L_15372D
+    mov byte ptr [esi + edi], al
+    pop edi
+    ret
+    B_15373A_2
+func_0015373C:
+    add edx, eax
+L_15373E:
+    mov al, byte ptr [edx + 1]
+    mov byte ptr [edx], al
+    inc edx
+    test al, al
+    jne short L_15373E
+    ret
+    B_153749_3
+func_0015374C:
+    push ebx
+    xor ebx, ebx
+L_15374F:
+    cmp byte ptr [eax], 0
+    je short L_153758
+    inc eax
+    inc ebx
+    jmp short L_15374F
+L_153758:
+    mov eax, ebx
+    pop ebx
+    ret
+func_0015375C:
+    push ebx
+    push ecx
+    xor ecx, ecx
+    mov ebx, eax
+L_153762:
+    movzx eax, byte ptr [ebx]
+    test eax, eax
+    je short L_153779
+    call func_0012DD1C
+    add ecx, eax
+    add ecx, dword ptr [D_0012DA48]
+    inc ebx
+    jmp short L_153762
+L_153779:
+    mov eax, ecx
+    pop ecx
+    pop ebx
+    ret
+func_0015377E:
+    push esi
+    push edi
+    xor edi, edi
+    mov esi, eax
+L_153784:
+    lodsb
+    cmp al, dl
+    je short L_153793
+    inc edi
+    test al, al
+    jne short L_153784
+    xor eax, eax
+    pop edi
+    pop esi
+    ret
+L_153793:
+    mov eax, edi
+    pop edi
+    pop esi
+    ret
+func_00153798:
+    push ebx
+    push esi
+    mov esi, eax
+    xor ebx, ebx
+    test edx, edx
+    je short L_1537BC
+L_1537A2:
+    lodsb
+    and eax, 0FFh
+    test eax, eax
+    je short L_1537BC
+    call func_0012DD1C
+    add ebx, eax
+    add ebx, dword ptr [D_0012DA48]
+    dec edx
+    jne short L_1537A2
+L_1537BC:
+    mov eax, ebx
+    pop esi
+    pop ebx
+    ret
     db 63 dup (0)
 XN_153700 ends
 end

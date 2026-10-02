@@ -23,31 +23,31 @@ public D_00158C58
 public D_00158C5C
 public D_00158C60
 public D_00158C64
-extrn D_0015BCE8:byte
-extrn D_0015BCF6:byte
-extrn D_0015BD78:byte
-extrn D_0015BE4D:byte
-extrn D_0015BF75:byte
-extrn D_0015C045:byte
-extrn D_0015C046:byte
-extrn D_0015C08A:byte
-extrn D_0015C08B:byte
-extrn D_0015C08C:byte
+extrn func_0015BCE8:near
+extrn func_0015BCF6:near
+extrn func_0015BD78:near
+extrn func_0015BE4D:near
+extrn func_0015BF75:near
+extrn func_0015C045:near
+extrn func_0015C046:near
+extrn func_0015C08A:near
+extrn func_0015C08B:near
+extrn func_0015C08C:near
 XN_158C00 segment byte public use32 'CODE'
     assume cs:XN_158C00, ds:XN_158C00, es:XN_158C00, ss:XN_158C00
 D_00158C00:
-    dd D_0015C08A
-    dd D_0015C08B
-    dd D_0015C08C
+    dd func_0015C08A
+    dd func_0015C08B
+    dd func_0015C08C
 D_00158C0C:
-    dd D_0015BF75
-    dd D_0015C045
-    dd D_0015C046
+    dd func_0015BF75
+    dd func_0015C045
+    dd func_0015C046
 D_00158C18:
-    dd D_0015BCE8
-    dd D_0015BCF6
-    dd D_0015BD78
-    dd D_0015BE4D
+    dd func_0015BCE8
+    dd func_0015BCF6
+    dd func_0015BD78
+    dd func_0015BE4D
 D_00158C28:
     db 4 dup (0)
 D_00158C2C:

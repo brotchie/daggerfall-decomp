@@ -36,11 +36,11 @@ Measured with `tools/xn_disasm.py` on 1.07.213:
 | Fact | Value |
 |---|---|
 | Range | 0xC0000-0x161568 (660,840 bytes, 79% zero) |
-| Functions | 363: the 348 in `config/functions.csv`, 10 more reached by calls, 5 found by gap filling |
-| Code | 20,857 instructions, 69,569 bytes |
+| Functions | 657 (`config/xngine_functions.csv`): 348 in `config/functions.csv`, 58 more reached by calls, 100 through pointers in data (dispatch tables, callbacks), 151 nothing references directly |
+| Code | 38,380 instructions, 133,169 bytes |
 | Calls from game C into XnGine | 952 sites, 174 entry points |
 | Calls from XnGine into game C | 66 sites, 14 targets |
-| Self-modifying writes | 87 sites in 14 writer functions, patching 75 instructions in 17 functions; 77 fill the placeholder `0x186A0` |
+| Self-modifying writes | 303 from 46 functions into 256 instructions of 56 functions (`config/xngine_patches.csv`) |
 
 Error strings name the subsystems: `DOS:` file loading (0xC0B00), `WORLD:` (0xC2300),
 `FONT:` (0x12DA00), `SET:` texture sets (0x132F00), `ENGINE:` shaders (0x136500), the 3D object
@@ -80,7 +80,47 @@ All of object 2 is now built from source, and `FALL.EXE` is still byte-identical
   | `cmp ax,imm` | 9 | `66 3D iw` (accumulator form) | `66 83 /7 ib` |
   | others | 3 | data decoded as code (an error string after a call that does not return) | |
 
-Next: phase 2 (name the 87 patch fields) and phase 3 (the replay harness).
+## 2026-10-02: phase 2, the self-modifying code
+
+Every write into code now targets a named field, and `config/xngine_patches.csv` lists all 303
+(field, patched instruction, original value, kind, writer). The census needed a better code
+map first: the first one stopped at 20,857 instructions because a lot of the engine is reached
+only through dispatch tables, callback variables or nothing at all.
+
+- **Code discovery**, in order: calls; an undecoded call into game C marks its gap as code;
+  pointers in data or `offset` immediates whose target decodes as code (a clean path to `ret`
+  or `jmp`, no string-like instructions, no fixup cut in two); and code after a `ret` past
+  alignment padding (`nop`, `xchg ebx,ebx`). An address instructions read or write as memory is
+  never a function entry; discovery restarts without any it took for one. This found 309
+  functions beyond the 348 listed, and code went from 69 KB to 133 KB.
+- **Patch fields**: an operand the code rewrites is `patch_<address>`, defined next to its
+  instruction (`patch_1584AD equ L_1584AB+2   ; rewritten at run time`); a module that writes
+  another module's field defines the name from that instruction's public label, since wasm
+  cannot export an equate. Writers read like a setup list:
+
+  ```asm
+  func_0012A2D0:
+      pushad
+      mov dword ptr [D_000CEA28], eax
+      ...
+      mov dword ptr [patch_1584AD], eax
+      mov dword ptr [patch_158608], eax
+  ```
+
+- **Kinds** (193 of the 303 writes patch a different function than the writer):
+
+  | Kind | Writes | What |
+  |---|---|---|
+  | placeholder | 202 | Immediates assembled as round numbers and overwritten: 100000 (193), 10000 (4), 100 (4), 1000 (1). In `add`, `mov`, `cmp`, `imul`, `sub`, `shl` |
+  | address | 63 | A memory operand's address rewritten (`mov`, `add`, `mul dword ptr [x]`, `lea`) |
+  | opcode | 36 | Opcode bytes of 15 unrolled loops: `0xC3` (`ret`) planted at a computed entry, the original opcode (`8B`, `88`, or a saved word) put back after the call |
+  | operand | 2 | A shift count (18) and a step (320, the screen width) |
+
+The busiest writers are setup routines: `0x12A2D0` (29 writes), `0x12A100` (25), `0x13E8C8`
+(20). What the static census cannot see (writes through registers, generated code) is phase
+3's job: replay flags every write into code.
+
+Next: phase 3 (the replay harness).
 
 Run: `.venv/bin/python tools/xn_disasm.py` regenerates `src/xngine/` (4 s);
 `.venv/bin/python tools/xn_link.py [module]` checks modules; `tools/build-and-verify.sh` builds.

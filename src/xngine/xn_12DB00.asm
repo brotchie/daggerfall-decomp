@@ -4,6 +4,7 @@
 .486p
 .387
 include xn_12DB00.inc
+public func_0012DD1C
 extrn D_0012B508:byte
 extrn D_0012DA00:byte
 extrn D_0012DA04:byte
@@ -176,7 +177,7 @@ L_12DC88:
     nop
     nop
 L_12DC9C:
-    mov byte ptr [L_12DD00+2], 010h
+    mov byte ptr [patch_12DD02], 010h
     cmp eax, dword ptr [D_00142940]
     jge short L_12DCC5
     sub eax, dword ptr [D_00142940]
@@ -184,7 +185,7 @@ L_12DC9C:
     sub ebx, eax
     jle short L_12DD17
     add bl, 010h
-    mov byte ptr [L_12DD00+2], bl
+    mov byte ptr [patch_12DD02], bl
     mov eax, dword ptr [D_00142940]
 L_12DCC5:
     mov ecx, eax
@@ -199,7 +200,7 @@ L_12DCD5:
     add edi, eax
     mov ecx, dword ptr [D_00142930]
     sub ecx, ebx
-    mov dword ptr [L_12DD0E+2], ecx
+    mov dword ptr [patch_12DD10], ecx
     mov ch, byte ptr [D_0012B508]
 L_12DCF8:
     mov ax, word ptr [esi]
@@ -207,6 +208,7 @@ L_12DCF8:
     add esi, 2
 L_12DD00:
     shl eax, 064h
+patch_12DD02 equ L_12DD00+2   ; rewritten at run time
 L_12DD03:
     add eax, eax
     jae short L_12DD09
@@ -217,6 +219,7 @@ L_12DD09:
     jne short L_12DD03
 L_12DD0E:
     add edi, 03E8h
+patch_12DD10 equ L_12DD0E+2   ; rewritten at run time
     dec ebp
     jne short L_12DCF8
 L_12DD17:
@@ -225,13 +228,17 @@ L_12DD17:
     pop ebx
     pop eax
     ret
-    B_12DD1C_10
-    dd D_0012DA74
-    B_12DD2A_6
-    dd D_0012DA40
-    B_12DD34_2
-    dd D_0012DA48
-    B_12DD3A_1
+func_0012DD1C:
+    sub eax, 021h
+    jle short L_12DD2F
+    shl eax, 2
+    add eax, dword ptr [D_0012DA74]
+    movzx eax, word ptr [eax + 6]
+    ret
+L_12DD2F:
+    mov eax, dword ptr [D_0012DA40]
+    sub eax, dword ptr [D_0012DA48]
+    ret
     db 197 dup (0)
 XN_12DB00 ends
 end

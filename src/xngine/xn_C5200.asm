@@ -91,7 +91,8 @@ func_000C5280:
     pop ecx
     pop ebx
     ret
-    B_0C5304_1
+func_000C5304:
+    ret
     db 251 dup (0)
 XN_C5200 ends
 end

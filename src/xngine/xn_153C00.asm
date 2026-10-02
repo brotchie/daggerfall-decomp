@@ -21,32 +21,32 @@ public D_00154C6D
 public D_00154C71
 public D_00154C7D
 public D_00154C85
-extrn D_00154EDC:byte
-extrn D_00154FD4:byte
-extrn D_00154FD8:byte
-extrn D_001550BC:byte
-extrn D_001550C0:byte
+extrn func_00154EDC:near
+extrn func_00154FD4:near
+extrn func_00154FD8:near
+extrn func_001550BC:near
+extrn func_001550C0:near
 XN_153C00 segment byte public use32 'CODE'
     assume cs:XN_153C00, ds:XN_153C00, es:XN_153C00, ss:XN_153C00
 D_00153C00:
-    dd D_00154EDC
-    dd D_00154EDC
-    dd D_00154FD4
-    dd D_00154FD4
-    dd D_00154FD8
-    dd D_00154FD8
-    dd D_00154FD8
-    dd D_00154FD8
-    dd D_001550BC
-    dd D_001550BC
-    dd D_001550BC
-    dd D_001550BC
-    dd D_001550BC
-    dd D_001550BC
-    dd D_001550BC
+    dd func_00154EDC
+    dd func_00154EDC
+    dd func_00154FD4
+    dd func_00154FD4
+    dd func_00154FD8
+    dd func_00154FD8
+    dd func_00154FD8
+    dd func_00154FD8
+    dd func_001550BC
+    dd func_001550BC
+    dd func_001550BC
+    dd func_001550BC
+    dd func_001550BC
+    dd func_001550BC
+    dd func_001550BC
 D_00153C3C:
-    dd D_001550BC
-    dd D_001550C0
+    dd func_001550BC
+    dd func_001550C0
 D_00153C44:
     db 4096 dup (0)
 D_00154C44:

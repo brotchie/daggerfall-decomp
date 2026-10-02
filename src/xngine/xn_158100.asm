@@ -7,7 +7,17 @@ include xn_158100.inc
 public func_0015810E
 XN_158100 segment byte public use32 'CODE'
     assume cs:XN_158100, ds:XN_158100, es:XN_158100, ss:XN_158100
-    B_158100_14
+func_00158100:
+    push ecx
+    push ebp
+    push esi
+    push edi
+    call func_0015810E
+    pop edi
+    pop esi
+    pop ebp
+    pop ecx
+    ret
 func_0015810E:
     cmp ebx, edx
     jle short L_15817E

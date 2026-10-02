@@ -4,6 +4,7 @@
 .486p
 .387
 include xn_C2000.inc
+public func_000C2088
 public func_000C2173
 extrn D_000C1F00:byte
 extrn D_000C1F04:byte
@@ -86,9 +87,23 @@ func_000C2088:
     shl eax, 0Ch
     shl edx, 0Ch
     shl ebx, 0Ch
-    jmp short L_0C20B8
-    B_0C2098_32
-L_0C20B8:
+    jmp short func_000C20B8
+func_000C2098:
+    push edx
+    push ebx
+    push eax
+    mov edx, dword ptr [eax + 4]
+    mov ebx, dword ptr [eax + 8]
+    mov eax, dword ptr [eax]
+    call func_000C20B8
+    pop ebx
+    mov dword ptr [ebx], eax
+    mov dword ptr [ebx + 4], edx
+    mov dword ptr [ebx + 8], 0
+    pop ebx
+    pop edx
+    ret
+func_000C20B8:
     push ecx
     push esi
     push edi

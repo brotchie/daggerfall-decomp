@@ -31,6 +31,8 @@ public D_0016087C
 public func_0015FC00
 public func_0015FC93
 public func_0015FCA7
+public func_0015FDF4
+public func_0015FEAE
 extrn D_0014291B:byte
 extrn D_0014291F:byte
 extrn D_00142930:byte
@@ -41,7 +43,6 @@ extrn D_0014294C:byte
 extrn D_00142950:byte
 extrn D_00143550:byte
 extrn D_00143561:byte
-extrn D_00144BFC:byte
 extrn D_0015FA00:byte
 extrn D_0015FA04:byte
 extrn D_0015FA06:byte
@@ -67,6 +68,7 @@ extrn D_00160AE0:byte
 extrn D_00160B60:byte
 extrn D_00160BE0:byte
 extrn D_00160C60:byte
+extrn func_00144BFC:near
 XN_15FC00 segment byte public use32 'CODE'
     assume cs:XN_15FC00, ds:XN_15FC00, es:XN_15FC00, ss:XN_15FC00
 func_0015FC00:
@@ -218,17 +220,53 @@ L_15FDF1:
     popad
     stc
     ret
-    B_15FDF4_19
-    dd D_0015FA69
-    B_15FE0B_6
-    dd D_0015FA69
-    B_15FE15_4
-    dd D_0015FA3C
-    B_15FE1D_52
-    dd D_0015FA1C
-    B_15FE55_5
-    dd D_0015FA3C
-    B_15FE5E_17
+func_0015FDF4:
+    pushad
+    mov ecx, eax
+    mov eax, 04F07h
+    xor ebx, ebx
+    call func_0015FE6F
+    popad
+    ret
+func_0015FE05:
+    cmp dword ptr [D_0015FA69], eax
+    je short L_15FE3E
+    push eax
+    push ebx
+    push edx
+    mov dword ptr [D_0015FA69], eax
+    mov dx, word ptr [eax*2 + D_0015FA3C]
+    mov eax, 04F05h
+    mov ebx, 0
+    call func_0015FE6F
+    mov eax, 04F05h
+    mov ebx, 1
+    call func_0015FE6F
+    pop edx
+    pop ebx
+    pop eax
+L_15FE3E:
+    ret
+func_0015FE3F:
+    push ebx
+    push ecx
+    mov eax, 04F05h
+    mov ebx, 0100h
+    call func_0015FE6F
+    mov eax, dword ptr [D_0015FA1C]
+    xor ecx, ecx
+L_15FE57:
+    cmp word ptr [ecx + D_0015FA3C], ax
+    je short L_15FE68
+    add ecx, 2
+    cmp ecx, 020h
+    jne short L_15FE57
+L_15FE68:
+    shr ecx, 1
+    mov eax, ecx
+    pop ecx
+    pop ebx
+    ret
 func_0015FE6F:
     push ebx
     push ecx
@@ -252,47 +290,113 @@ L_15FEAA:
     pop ecx
     pop ebx
     ret
-    B_15FEAE_3
-    dd D_00143561
-    B_15FEB5_5
-    dd D_00144BFC
-    B_15FEBE_2
-    dd D_0015FA5C
-    B_15FEC4_2
-    dd D_00142944
-    B_15FECA_3
-    dd D_00142950
-    B_15FED1_2
-    dd D_0014294C
-    B_15FED7_2
-    dd D_00142944
-    B_15FEDD_3
-    dd D_00142950
-    B_15FEE4_35
-    dd D_00143550
-    B_15FF0B_5
-    dd D_0015FA5C
-    B_15FF14_30
-    dd D_0015FA5C
-    B_15FF36_23
-    dd D_0015FA5C
-    B_15FF51_7
-    dd D_00142950
-    B_15FF5C_28
-    dd D_00142930
-    B_15FF7C_4
-    dd D_0015FFDB
-    B_15FF84_7
-    dd D_0015FFCC
-    B_15FF8F_7
-    dd D_0015FFD3
-    B_15FF9A_50
-D_0015FFCC:
-    B_15FFCC_7
-D_0015FFD3:
-    B_15FFD3_8
-D_0015FFDB:
-    B_15FFDB_36
+func_0015FEAE:
+    pushad
+    mov ebx, dword ptr [D_00143561]
+    test eax, eax
+    je short L_15FEBE
+    mov ebx, offset func_00144BFC
+L_15FEBE:
+    mov dword ptr [D_0015FA5C], ebx
+    mov esi, dword ptr [D_00142944]
+    mov esi, dword ptr [esi*4 + D_00142950]
+    mov edx, dword ptr [D_0014294C]
+    sub edx, dword ptr [D_00142944]
+    mov edx, dword ptr [edx*4 + D_00142950]
+    mov eax, esi
+    shr eax, 010h
+    call func_0015FE05
+    mov ebp, esi
+    and ebp, 0FFFFh
+    mov edi, ebp
+    xor ebp, 0FFFFh
+    inc ebp
+    add edi, 0A0000h
+    add esi, dword ptr [D_00143550]
+    mov ecx, ebp
+    push eax
+    call dword ptr [D_0015FA5C]
+    pop eax
+    sub edx, ebp
+L_15FF17:
+    inc eax
+    cmp edx, 010000h
+    jle short L_15FF3F
+    call func_0015FE05
+    mov edi, 0A0000h
+    mov ecx, 010000h
+    push eax
+    call dword ptr [D_0015FA5C]
+    pop eax
+    sub edx, 010000h
+    jmp short L_15FF17
+L_15FF3F:
+    call func_0015FE05
+    mov edi, 0A0000h
+    mov ecx, edx
+    call dword ptr [D_0015FA5C]
+    popad
+    ret
+func_0015FF53:
+    push ebp
+    push edi
+    mov edi, dword ptr [edx*4 + D_00142950]
+    add edi, eax
+    mov eax, edi
+    and edi, 0FFFFh
+    shr eax, 010h
+    add edi, 0A0000h
+    call func_0015FE05
+    mov edx, ecx
+    mov ecx, dword ptr [D_00142930]
+    sub ecx, ebx
+    mov dword ptr [patch_15FFDB], ecx
+    mov ecx, ebx
+    shr ecx, 2
+    mov dword ptr [patch_15FFCC], ecx
+    mov ecx, ebx
+    and ecx, 3
+    mov dword ptr [patch_15FFD3], ecx
+L_15FF9A:
+    lea ecx, [edi + ebx]
+    cmp ecx, 0B0000h
+    jb short L_15FFCB
+    mov ecx, edi
+    and ecx, 0FFFFh
+    xor ecx, 0FFFFh
+    inc ecx
+    mov ebp, ecx
+    rep movsb
+    inc eax
+    call func_0015FE05
+    mov edi, 0A0000h
+    mov ecx, ebx
+    sub ecx, ebp
+    rep movsb
+    jmp short L_15FFD9
+L_15FFCB:
+    mov ecx, 0186A0h
+patch_15FFCC equ L_15FFCB+1   ; rewritten at run time
+    rep movsd
+L_15FFD2:
+    mov ecx, 0186A0h
+patch_15FFD3 equ L_15FFD2+1   ; rewritten at run time
+    rep movsb
+L_15FFD9:
+    add edi, 0186A0h
+patch_15FFDB equ L_15FFD9+2   ; rewritten at run time
+    cmp edi, 0B0000h
+    jb short L_15FFF3
+    inc eax
+    call func_0015FE05
+    sub edi, 010000h
+L_15FFF3:
+    dec edx
+    jne short L_15FF9A
+    pop ebp
+    pop edi
+    ret
+    db 6 dup (0)
 D_0015FFFF:
     db 1 dup (0)
 D_00160000:

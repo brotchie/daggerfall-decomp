@@ -22,13 +22,13 @@ public D_0012F48E
 public D_0012F492
 public D_0012F496
 public D_0012F49A
-extrn D_0012F9A0:byte
+extrn func_0012F9A0:near
 XN_12DE00 segment byte public use32 'CODE'
     assume cs:XN_12DE00, ds:XN_12DE00, es:XN_12DE00, ss:XN_12DE00
 D_0012DE00:
     db 4 dup (0)
 D_0012DE04:
-    dd D_0012F9A0
+    dd func_0012F9A0
     db 8 dup (0)
 D_0012DE10:
     db 4 dup (0)

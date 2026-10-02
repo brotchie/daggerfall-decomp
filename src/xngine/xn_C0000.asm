@@ -6,33 +6,33 @@
 include xn_C0000.inc
 public D_000C0000
 public D_000C0030
-extrn D_000C020A:byte
-extrn D_000C0221:byte
-extrn D_000C023B:byte
-extrn D_000C0248:byte
-extrn D_000C0253:byte
-extrn D_000C026B:byte
-extrn D_000C027B:byte
-extrn D_000C027F:byte
-extrn D_000C029C:byte
-extrn D_000C02A7:byte
-extrn D_000C02C5:byte
-extrn D_000C02DF:byte
+extrn func_000C020A:near
+extrn func_000C0221:near
+extrn func_000C023B:near
+extrn func_000C0248:near
+extrn func_000C0253:near
+extrn func_000C026B:near
+extrn func_000C027B:near
+extrn func_000C027F:near
+extrn func_000C029C:near
+extrn func_000C02A7:near
+extrn func_000C02C5:near
+extrn func_000C02DF:near
 XN_C0000 segment byte public use32 'CODE'
     assume cs:XN_C0000, ds:XN_C0000, es:XN_C0000, ss:XN_C0000
 D_000C0000:
-    dd D_000C020A
-    dd D_000C0221
-    dd D_000C023B
-    dd D_000C027F
-    dd D_000C029C
-    dd D_000C026B
-    dd D_000C027B
-    dd D_000C02A7
-    dd D_000C02C5
-    dd D_000C0253
-    dd D_000C0248
-    dd D_000C02DF
+    dd func_000C020A
+    dd func_000C0221
+    dd func_000C023B
+    dd func_000C027F
+    dd func_000C029C
+    dd func_000C026B
+    dd func_000C027B
+    dd func_000C02A7
+    dd func_000C02C5
+    dd func_000C0253
+    dd func_000C0248
+    dd func_000C02DF
 D_000C0030:
     db 208 dup (0)
 XN_C0000 ends

@@ -4,12 +4,12 @@
 .486p
 .387
 include xn_161400.inc
-public D_00161400
-public D_001614D0
-public D_001614E4
-public D_001614E8
-public D_001614EC
-public D_001614F0
+public func_00161400
+public func_001614D0
+public func_001614E4
+public func_001614E8
+public func_001614EC
+public func_001614F0
 extrn D_00161300:byte
 extrn D_00161310:byte
 extrn D_00161314:byte
@@ -22,51 +22,128 @@ extrn D_00161336:byte
 extrn D_00161338:byte
 XN_161400 segment byte public use32 'CODE'
     assume cs:XN_161400, ds:XN_161400, es:XN_161400, ss:XN_161400
-D_00161400:
-    B_161400_65
-    dd D_00161324
-    B_161445_2
-    dd D_00161322
-    B_16144B_5
-    dd D_00161332
-    B_161454_12
-    dd D_00161336
-    B_161464_3
-    dd D_00161338
-    B_16146B_21
-    dd D_00161336
-    B_161484_76
-D_001614D0:
-    B_1614D0_3
-    dd D_00161332
-    B_1614D7_13
-D_001614E4:
-    B_1614E4_4
-D_001614E8:
-    B_1614E8_4
-D_001614EC:
-    B_1614EC_4
-D_001614F0:
-    B_1614F0_23
-    dd D_00161336
-    B_16150B_27
-    dd D_0016131C
-    B_16152A_2
-    dd D_00161310
-    B_161530_2
-    dd D_00161318
-    B_161536_2
-    dd D_00161314
-    B_16153C_1
-    dd D_00161300
-    B_161541_15
-    dd D_0016131C
-    B_161554_2
-    dd D_00161310
-    B_16155A_2
-    dd D_00161318
-    B_161560_2
-    dd D_00161314
-    B_161566_2
+func_00161400:
+    pushad
+    mov eax, 0607Fh
+    xor ebx, ebx
+    xor ecx, ecx
+    xor edx, edx
+    call func_00161524
+    cmp ax, 07F60h
+    jne near ptr L_1614C6
+    cmp ch, 1
+    jne near ptr L_1614C6
+    or dx, bx
+    jne near ptr L_1614C6
+    mov eax, 0100h
+    mov ebx, 080h
+    int 031h
+    jb near ptr L_1614C6
+    mov word ptr [D_00161324], ax
+    mov word ptr [D_00161322], ax
+    movzx edx, dx
+    mov dword ptr [D_00161332], edx
+    mov ebx, edx
+    mov eax, 6
+    int 031h
+    mov word ptr [D_00161336], dx
+    mov word ptr [D_00161338], cx
+    mov eax, 06003h
+    xor ecx, ecx
+    xor edx, edx
+    call func_00161524
+    test ax, ax
+    jne short L_1614C6
+    mov esi, dword ptr [D_00161336]
+    xor eax, eax
+L_161486:
+    mov al, byte ptr [esi]
+    cmp byte ptr [esi + 1], 6
+    je short L_161498
+    cmp byte ptr [esi + 1], 0
+    je short L_1614C6
+    add esi, eax
+    jmp short L_161486
+L_161498:
+    mov byte ptr [esi + 0Eh], 08Ah
+    mov byte ptr [esi + 016h], 088h
+    mov byte ptr [esi + 01Eh], 088h
+    add esi, eax
+    mov byte ptr [esi + 016h], 088h
+    mov byte ptr [esi + 01Eh], 088h
+    mov eax, 06004h
+    xor ecx, ecx
+    xor edx, edx
+    call func_00161524
+    test ax, ax
+    jne short L_1614C6
+    popad
+    xor eax, eax
+    clc
+    ret
+L_1614C6:
+    popad
+    mov eax, 1
+    stc
+    ret
+    B_1614CE_2
+func_001614D0:
+    pushad
+    mov edx, dword ptr [D_00161332]
+    test edx, edx
+    je short L_1614E2
+    mov eax, 0101h
+    int 031h
+L_1614E2:
+    popad
+    ret
+func_001614E4:
+    ret
+    B_1614E5_3
+func_001614E8:
+    ret
+    B_1614E9_3
+func_001614EC:
+    ret
+    B_1614ED_3
+func_001614F0:
+    mov eax, 06005h
+    xor ecx, ecx
+    xor edx, edx
+    call func_00161524
+    test ax, ax
+    jne short L_161522
+    jecxz L_161522
+    mov esi, dword ptr [D_00161336]
+    movsx edx, word ptr [esi]
+    movsx eax, word ptr [esi + 2]
+    movsx ebx, word ptr [esi + 4]
+    sar eax, 1
+    sar edx, 1
+    sar ebx, 1
+    neg eax
+    neg edx
+    clc
+    ret
+L_161522:
+    stc
+    ret
+func_00161524:
+    push edi
+    mov dword ptr [D_0016131C], eax
+    mov dword ptr [D_00161310], ebx
+    mov dword ptr [D_00161318], ecx
+    mov dword ptr [D_00161314], edx
+    mov edi, offset D_00161300
+    mov eax, 0300h
+    mov ebx, 033h
+    xor ecx, ecx
+    int 031h
+    mov eax, dword ptr [D_0016131C]
+    mov ebx, dword ptr [D_00161310]
+    mov ecx, dword ptr [D_00161318]
+    mov edx, dword ptr [D_00161314]
+    pop edi
+    ret
 XN_161400 ends
 end

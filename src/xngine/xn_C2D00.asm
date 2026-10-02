@@ -78,6 +78,7 @@ extrn func_000A117E:near
 extrn func_000C0C8C:near
 extrn func_000C0CCC:near
 extrn func_000C0D54:near
+extrn func_000C0D8C:near
 extrn func_000C0DC4:near
 extrn func_000C0DE7:near
 extrn func_0012A230:near
@@ -435,21 +436,27 @@ func_000C31AE:
     mov ebx, dword ptr [D_000C233A]
     call func_000C0DC4
     ret
-    B_0C31DB_2
-    dd D_000C27E9
-    B_0C31E1_6
-    dd D_000C27F9
-    B_0C31EB_2
-    dd D_000C233A
-    B_0C31F1_12
-    dd D_000C27E9
-    B_0C3201_12
-    dd D_000C27F5
-    B_0C3211_2
-    dd D_000C27E9
-    B_0C3217_6
-    dd D_000C23E9
-    B_0C3221_12
+func_000C31DB:
+    pushad
+    mov eax, dword ptr [D_000C27E9]
+    add eax, 090h
+    mov dword ptr [D_000C27F9], eax
+    mov ebx, dword ptr [D_000C233A]
+    xor ecx, ecx
+    xor edx, edx
+    xor eax, eax
+    call func_000C0DE7
+    mov edx, offset D_000C27E9
+    mov ecx, 090h
+    call func_000C0D8C
+    mov edx, dword ptr [D_000C27F5]
+    mov ecx, dword ptr [D_000C27E9]
+    call func_000C0D8C
+    mov edx, offset D_000C23E9
+    mov ecx, 0400h
+    call func_000C0D8C
+    popad
+    ret
 func_000C322D:
     pushad
     mov ebx, dword ptr [D_000C233A]
@@ -576,15 +583,32 @@ L_0C33D6:
     mov dword ptr [D_000C28A7], eax
     popad
     ret
-    B_0C33F4_5
-    dd D_000C233A
-    B_0C33FD_1
-    dd D_000C27F5
-    B_0C3402_30
-    dd D_000C27F5
-    B_0C3424_16
-    dd D_000C28F4
-    B_0C3438_6
+func_000C33F4:
+    pushad
+    push ecx
+    push edx
+    mov ebx, dword ptr [D_000C233A]
+    mov eax, dword ptr [D_000C27F5]
+    mov edx, dword ptr [eax + edi*4]
+    xor ecx, ecx
+    shld ecx, edx, 010h
+    and edx, 0FFFFh
+    xor eax, eax
+    call func_000C0DE7
+    pop edx
+    pop ecx
+    call func_000C0D8C
+    mov eax, dword ptr [D_000C27F5]
+    mov edx, dword ptr [eax + edi*4]
+    add edx, 02Fh
+    mov dword ptr [eax + edi*4 + 4], edx
+    popad
+    ret
+func_000C3430:
+    shl eax, 2
+    mov dword ptr [D_000C28F4], eax
+    call func_000C343E
+    ret
 func_000C343E:
     pushad
     mov al, byte ptr [D_000C2882]
@@ -652,17 +676,39 @@ L_0C34FB:
     jne short L_0C34DC
     popad
     ret
-    B_0C3515_26
-    dd D_000C28B4
-    B_0C3533_3
-    dd D_000C28B4
-    B_0C353A_2
-    dd D_000C28B8
-    B_0C3540_3
-    dd D_000C28B8
-    B_0C3547_11
-    dd D_000C28F4
-    B_0C3556_7
+func_000C3515:
+    push eax
+    push ecx
+    mov ecx, 019h
+L_0C351C:
+    call func_00153990
+    and eax, 07Fh
+L_0C3524:
+    cmp eax, 07Fh
+    jle short L_0C352D
+    shr eax, 1
+    jmp short L_0C3524
+L_0C352D:
+    cmp eax, dword ptr [D_000C28B4]
+    jge short L_0C353A
+    mov eax, dword ptr [D_000C28B4]
+L_0C353A:
+    cmp eax, dword ptr [D_000C28B8]
+    jle short L_0C3547
+    mov eax, dword ptr [D_000C28B8]
+L_0C3547:
+    stosb
+    loop L_0C351C
+    pop ecx
+    pop eax
+    ret
+func_000C354D:
+    pushad
+    shl eax, 2
+    mov dword ptr [D_000C28F4], eax
+    call func_000C355D
+    popad
+    ret
 func_000C355D:
     mov al, byte ptr [D_000C2882]
     and al, 01Fh
@@ -1055,19 +1101,56 @@ L_0C3B05:
     jne near ptr L_0C3A82
     popad
     ret
-    B_0C3B1D_17
-    dd D_000C23A3
-    B_0C3B32_2
-    dd D_000C23AB
-    B_0C3B38_30
-    dd D_000C23A3
-    B_0C3B5A_2
-    dd D_000C23AB
-    B_0C3B60_7
-    dd D_000C23B3
-    B_0C3B6B_8
-    dd D_000C23B4
-    B_0C3B77_16
+func_000C3B1D:
+    push edx
+    push ebp
+    push esi
+    mov dh, byte ptr [edi + ecx]
+    and dh, 07Fh
+    xor esi, esi
+    xor eax, eax
+    xor ebx, ebx
+L_0C3B2C:
+    mov al, byte ptr [esi + D_000C23A3]
+    mov ah, byte ptr [esi + D_000C23AB]
+    add ah, ch
+    add al, cl
+    mov dl, byte ptr [edi + eax]
+    and dl, 07Fh
+    sub dl, dh
+    cmp dl, bl
+    jns short L_0C3B4C
+    mov bl, dl
+    mov ebp, esi
+L_0C3B4C:
+    inc esi
+    cmp esi, 8
+    jne short L_0C3B2C
+    xor eax, eax
+    mov al, byte ptr [ebp + D_000C23A3]
+    mov ah, byte ptr [ebp + D_000C23AB]
+    cmp bl, 1
+    jge short L_0C3B7D
+    mov dl, byte ptr [D_000C23B3]
+    neg dl
+    cmp dl, al
+    jne short L_0C3B82
+    mov dl, byte ptr [D_000C23B4]
+    neg dl
+    cmp dl, ah
+    jne short L_0C3B82
+L_0C3B7D:
+    pop esi
+    pop ebp
+    pop edx
+    stc
+    ret
+L_0C3B82:
+    pop esi
+    pop ebp
+    pop edx
+    clc
+    ret
 func_000C3B87:
     pushad
     mov esi, dword ptr [D_000C28F4]
@@ -1269,68 +1352,108 @@ L_0C3D9E:
     ret
 func_000C3DA8:
     ret
-    B_0C3DA9_3
-    dd D_000C2883
-    B_0C3DB0_4
-    dd D_000C28F4
-    B_0C3DB8_2
-    dd D_000C2908
-    B_0C3DBE_5
-    dd D_000C28F8
-    B_0C3DC7_4
-    dd D_000C28C4
-    B_0C3DCF_2
-    dd D_000C28BC
-    B_0C3DD5_5
-    dd D_000C2883
-    B_0C3DDE_7
-    dd D_000C2883
-    B_0C3DE9_15
-    dd D_000C23B3
-    B_0C3DFC_3
-    dd D_000C23B4
-    B_0C3E03_3
-    dd D_000C23B5
-    B_0C3E0A_3
-    dd D_000C23B6
-    B_0C3E11_8
-    dd D_000C23B5
-    B_0C3E1D_4
-    dd D_000C23B6
-    B_0C3E25_3
-    dd D_000C23B5
-    B_0C3E2C_4
-    dd D_000C23B6
-    B_0C3E34_3
-    dd D_000C23B3
-    B_0C3E3B_2
-    dd D_000C23B4
-    B_0C3E41_40
+func_000C3DA9:
+    mov word ptr [D_000C2883], 0410h
+    mov esi, dword ptr [D_000C28F4]
+    mov edi, dword ptr [esi + D_000C2908]
+    shl edi, 8
+    add edi, dword ptr [esi + D_000C28F8]
+    mov esi, edi
+    add esi, dword ptr [D_000C28C4]
+    add edi, dword ptr [D_000C28BC]
+    xor ecx, ecx
+L_0C3DD7:
+    cmp word ptr [ecx + D_000C2883], 0
+    je short L_0C3E5C
+    push ecx
+    movzx eax, word ptr [ecx + D_000C2883]
+    mov ecx, eax
+    shl ecx, 4
+    and ch, 0FEh
+    mov cl, al
+    shl cl, 2
+    mov byte ptr [D_000C23B3], 0
+    mov byte ptr [D_000C23B4], 0
+    mov byte ptr [D_000C23B5], 0FFh
+    mov byte ptr [D_000C23B6], 0FFh
+L_0C3E12:
+    call func_000C3B1D
+    cmp al, byte ptr [D_000C23B5]
+    je short L_0C3E27
+    cmp ah, byte ptr [D_000C23B6]
+    jne short L_0C3E36
+L_0C3E27:
+    mov al, byte ptr [D_000C23B5]
+    neg al
+    mov ah, byte ptr [D_000C23B6]
+    neg ah
+L_0C3E36:
+    mov byte ptr [D_000C23B3], al
+    mov byte ptr [D_000C23B4], ah
+    add cl, al
+    cmp cl, 080h
+    jae short L_0C3E5B
+    add ch, ah
+    cmp ch, 080h
+    jae short L_0C3E5B
+    cmp byte ptr [esi + ecx], 0
+    je short L_0C3E12
+    mov byte ptr [esi + ecx], 02Eh
+    jmp short L_0C3E12
+L_0C3E5B:
+    pop ecx
+L_0C3E5C:
+    add ecx, 2
+    cmp ecx, 8
+    jne near ptr L_0C3DD7
+    ret
 func_000C3E69:
     ret
-    B_0C3E6A_2
-    dd D_000C28F4
-    B_0C3E70_2
-    dd D_000C2908
-    B_0C3E76_5
-    dd D_000C28F8
-    B_0C3E7F_4
-    dd D_000C28C4
-    B_0C3E87_2
-    dd D_000C28BC
-    B_0C3E8D_7
-    dd D_000C23B3
-    B_0C3E98_3
-    dd D_000C23B4
-    B_0C3E9F_12
-    dd D_000C23B3
-    B_0C3EAF_2
-    dd D_000C23B4
-    B_0C3EB5_24
-    dd D_000C23B3
-    B_0C3ED1_2
-    dd D_000C23B4
-    B_0C3ED7_39
+func_000C3E6A:
+    mov esi, dword ptr [D_000C28F4]
+    mov edi, dword ptr [esi + D_000C2908]
+    shl edi, 8
+    add edi, dword ptr [esi + D_000C28F8]
+    mov esi, edi
+    add esi, dword ptr [D_000C28C4]
+    add edi, dword ptr [D_000C28BC]
+    mov ecx, 07878h
+    mov byte ptr [D_000C23B3], 0
+    mov byte ptr [D_000C23B4], 0
+L_0C3EA0:
+    call func_000C3B1D
+    jae short L_0C3ECC
+    mov bl, byte ptr [edi + ecx]
+    mov byte ptr [D_000C23B3], al
+    mov byte ptr [D_000C23B4], ah
+    add cl, al
+    add ch, ah
+    cmp cl, 080h
+    jae short L_0C3EFD
+    cmp ch, 080h
+    jae short L_0C3EFD
+    mov byte ptr [edi + ecx], bl
+    mov byte ptr [esi + ecx], 0
+    jmp short L_0C3EA0
+L_0C3ECC:
+    mov byte ptr [D_000C23B3], al
+    mov byte ptr [D_000C23B4], ah
+    add cl, al
+    cmp cl, 080h
+    jae short L_0C3EFD
+    mov byte ptr [esi + ecx], 0
+    sub cl, al
+    add ch, ah
+    cmp ch, 080h
+    jae short L_0C3EFD
+    mov byte ptr [esi + ecx], 0
+    add cl, al
+    cmp byte ptr [esi + ecx], 0
+    je short L_0C3EFD
+    mov byte ptr [esi + ecx], 0
+    jmp short L_0C3EA0
+L_0C3EFD:
+    ret
 func_000C3EFE:
     pushad
     mov esi, dword ptr [D_000C28C4]

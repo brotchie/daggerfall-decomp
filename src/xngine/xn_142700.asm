@@ -97,11 +97,20 @@ L_1427F8:
 L_142803:
     xor eax, eax
     ret
-    B_142806_4
-    dd D_00142306
-    B_14280E_5
-    dd D_00142307
-    B_142817_41
+    B_142806_2
+func_00142808:
+    cmp byte ptr [D_00142306], 0
+    je short L_142820
+L_142811:
+    cmp byte ptr [D_00142307], 0
+    je short L_142811
+    call func_001427A8
+    ret
+L_142820:
+    xor eax, eax
+    int 016h
+    ret
+    B_142825_27
 D_00142840:
     B_142840_9
     db 00h, 00h   ; selector fixup, kept by the LE table

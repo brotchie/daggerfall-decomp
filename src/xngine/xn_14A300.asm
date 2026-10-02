@@ -59,6 +59,7 @@ extrn func_00135DE4:near
 extrn func_00137000:near
 extrn func_0013749E:near
 extrn func_00137514:near
+extrn func_0014BC34:near
 extrn func_0014BD94:near
 extrn func_0014BDF7:near
 extrn func_0014C021:near
@@ -367,159 +368,287 @@ D_0014A6A7:
 D_0014A6AB:
     db 4 dup (0)
 D_0014A6AF:
-    B_14A6AF_22
-    dd D_0014A190
-    B_14A6C9_2
-    dd D_0014A194
-    B_14A6CF_2
-    dd D_0014A1BC
-    B_14A6D5_43
-    dd D_0014A1BC
-    B_14A704_14
-    dd D_0014A190
-    B_14A716_10
-    dd D_0014A148
-    B_14A724_6
-    dd D_0014A148
-    B_14A72E_1
-    dd D_0014A16C
-    B_14A733_7
-    dd D_0014A190
-    B_14A73E_2
-    dd D_0014A194
-    B_14A744_28
-    dd D_0014A16C
-    B_14A764_6
-    dd D_0014A1A0
-    B_14A76E_2
-    dd D_0014A1A4
-    B_14A774_2
-    dd D_0014A1A8
-    B_14A77A_7
-    dd D_0014A1AC
-    B_14A785_2
-    dd D_0014A1B0
-    B_14A78B_2
-    dd D_0014A1B4
-    B_14A791_2
-    dd D_0014AA6E
-    B_14A797_5
-    dd D_00147954
-    B_14A7A0_1
-    dd D_0014AA66
-    B_14A7A5_1
-    dd D_0014AA6A
-    B_14A7AA_2
-    dd D_0014A194
-    B_14A7B0_7
-    dd D_0014A190
-    B_14A7BB_19
-    dd D_0014A1A0
-    B_14A7D2_39
-    dd D_0014AA6A
-    B_14A7FD_2
-    dd D_0014AA6A
-    B_14A803_5
-    dd D_0014AA6E
-    B_14A80C_4
-    dd D_0014AA6E
-    B_14A814_9
-    dd D_0014AA7A
-    B_14A821_5
-    dd D_00147954
-    B_14A82A_6
-    dd D_0014AA72
-    B_14A834_1
-    dd D_0014AA76
-    B_14A839_2
-    dd D_0014A190
-    B_14A83F_7
-    dd D_0014A194
-    B_14A84A_19
-    dd D_0014A1AC
-    B_14A861_39
-    dd D_0014AA76
-    B_14A88C_2
-    dd D_0014AA76
-    B_14A892_5
-    dd D_0014AA7A
-    B_14A89B_4
-    dd D_0014AA7A
-    B_14A8A3_9
-    dd D_0014A194
-    B_14A8B0_10
-    dd D_0014A100
-    B_14A8BE_6
-    dd D_0014A16C
-    B_14A8C8_1
-    dd D_0014A100
-    B_14A8CD_1
-    dd D_0014A1CC
-    B_14A8D2_21
-    dd D_0014AA7E
-    B_14A8EB_5
-    dd D_00147954
-    B_14A8F4_6
-    dd D_0014AA82
-    B_14A8FE_1
-    dd D_0014AA86
-    B_14A903_2
-    dd D_0014AA66
-    B_14A909_2
-    dd D_0014AA6E
-    B_14A90F_5
-    dd D_0014AA72
-    B_14A918_2
-    dd D_0014AA7A
-    B_14A91E_12
-    dd D_0014A1CC
-    B_14A92E_7
-    dd D_0014A1A0
-    B_14A939_2
-    dd D_0014A1A4
-    B_14A93F_2
-    dd D_0014A1A8
-    B_14A945_34
-    dd D_0014A1BC
-    B_14A96B_9
-    dd D_0014AA86
-    B_14A978_9
-    dd D_0014AA86
-    B_14A985_3
-    dd D_0014AA7E
-    B_14A98C_4
-    dd D_0014AA7E
-    B_14A994_8
-    dd D_0014A190
-    B_14A9A0_3
-    dd D_0014AA8A
-    B_14A9A7_7
-    dd D_0014AA8E
-    B_14A9B2_2
-    dd D_0014AA82
-    B_14A9B8_2
-    dd D_0014AA7E
-    B_14A9BE_6
-    dd D_0014A1CC
-    B_14A9C8_15
-    dd D_0014A1A0
-    B_14A9DB_2
-    dd D_0014A1A4
-    B_14A9E1_2
-    dd D_0014A1A8
-    B_14A9E7_1
-    dd D_0014A1C0
-    B_14A9EC_2
-    dd D_0014A1C4
-    B_14A9F2_2
-    dd D_0014A1C8
-    B_14A9F8_13
-    dd D_0014A1C0
-    B_14AA09_15
-    dd D_0014AA8E
-    B_14AA1C_2
-    dd D_0014AA8A
-    B_14AA22_68
+    B_14A6AF_17
+func_0014A6C0:
+    push ecx
+    push esi
+    push edi
+    push ebp
+    mov dword ptr [D_0014A190], eax
+    mov dword ptr [D_0014A194], edx
+    mov dword ptr [D_0014A1BC], ebx
+    mov ebx, dword ptr [edx]
+    mov edi, dword ptr [ebx + 0Ch]
+    shr edi, 8
+    lea esi, [edx + 020h]
+    mov ebx, dword ptr [eax]
+    mov ecx, dword ptr [ebx + 0Ch]
+    shr ecx, 8
+    mov ebx, dword ptr [eax + 028h]
+    mov edx, dword ptr [eax + 024h]
+    mov eax, dword ptr [eax + 020h]
+    call func_0014CA44
+    test eax, eax
+    js near ptr L_14AA5C
+    cmp dword ptr [D_0014A1BC], 2
+    je near ptr L_14AA58
+    jmp near ptr L_14AA58
+func_0014A710:
+    mov esi, dword ptr [D_0014A190]
+    mov eax, dword ptr [esi + 02Ch]
+    mov edx, dword ptr [esi + 030h]
+    mov ebx, dword ptr [esi + 034h]
+    mov ecx, offset D_0014A148
+    call func_00137000
+    mov eax, offset D_0014A148
+    mov edx, offset D_0014A16C
+    call func_0015D2EC
+    mov esi, dword ptr [D_0014A190]
+    mov edi, dword ptr [D_0014A194]
+    mov eax, dword ptr [edi + 020h]
+    sub eax, dword ptr [esi + 020h]
+    mov edx, dword ptr [edi + 024h]
+    sub edx, dword ptr [esi + 024h]
+    mov ebx, dword ptr [edi + 028h]
+    sub ebx, dword ptr [esi + 028h]
+    shl eax, 8
+    shl edx, 8
+    shl ebx, 8
+    mov ecx, offset D_0014A16C
+    call func_0013749E
+    mov dword ptr [D_0014A1A0], eax
+    mov dword ptr [D_0014A1A4], edx
+    mov dword ptr [D_0014A1A8], ebx
+    neg eax
+    neg edx
+    neg ebx
+    mov dword ptr [D_0014A1AC], eax
+    mov dword ptr [D_0014A1B0], edx
+    mov dword ptr [D_0014A1B4], ebx
+    mov dword ptr [D_0014AA6E], 0
+    mov eax, dword ptr [D_00147954]
+    mov dword ptr [D_0014AA66], eax
+    mov dword ptr [D_0014AA6A], eax
+    mov esi, dword ptr [D_0014A194]
+    mov esi, dword ptr [esi]
+    mov edi, dword ptr [esi + 0Ch]
+    mov esi, dword ptr [D_0014A190]
+    mov esi, dword ptr [esi]
+    mov ecx, dword ptr [esi + 01Ch]
+    add ecx, esi
+    mov ebp, dword ptr [esi + 020h]
+    test ebp, ebp
+    jle near ptr L_14AA58
+    mov esi, offset D_0014A1A0
+L_14A7D2:
+    push ecx
+    mov eax, dword ptr [ecx]
+    mov edx, dword ptr [ecx + 4]
+    mov ebx, dword ptr [ecx + 8]
+    mov ecx, dword ptr [ecx + 0Ch]
+    call func_0014CA44
+    pop ecx
+    test eax, eax
+    jns short L_14A7F8
+L_14A7E8:
+    movzx eax, word ptr [ecx + 010h]
+    lea eax, [eax + eax*2]
+    lea ecx, [ecx + eax*2 + 012h]
+    dec ebp
+    jne short L_14A7D2
+    jmp short L_14A80E
+L_14A7F8:
+    mov eax, dword ptr [D_0014AA6A]
+    add dword ptr [D_0014AA6A], 4
+    mov dword ptr [eax], ecx
+    inc dword ptr [D_0014AA6E]
+    jmp short L_14A7E8
+L_14A80E:
+    cmp dword ptr [D_0014AA6E], 0
+    je near ptr L_14AA5C
+    mov dword ptr [D_0014AA7A], 0
+    mov eax, dword ptr [D_00147954]
+    add eax, 01000h
+    mov dword ptr [D_0014AA72], eax
+    mov dword ptr [D_0014AA76], eax
+    mov esi, dword ptr [D_0014A190]
+    mov esi, dword ptr [esi]
+    mov edi, dword ptr [esi + 0Ch]
+    mov esi, dword ptr [D_0014A194]
+    mov esi, dword ptr [esi]
+    mov ecx, dword ptr [esi + 01Ch]
+    add ecx, esi
+    mov ebp, dword ptr [esi + 020h]
+    test ebp, ebp
+    jle near ptr L_14AA58
+    mov esi, offset D_0014A1AC
+L_14A861:
+    push ecx
+    mov eax, dword ptr [ecx]
+    mov edx, dword ptr [ecx + 4]
+    mov ebx, dword ptr [ecx + 8]
+    mov ecx, dword ptr [ecx + 0Ch]
+    call func_0014CA44
+    pop ecx
+    test eax, eax
+    jns short L_14A887
+L_14A877:
+    movzx eax, word ptr [ecx + 010h]
+    lea eax, [eax + eax*2]
+    lea ecx, [ecx + eax*2 + 012h]
+    dec ebp
+    jne short L_14A861
+    jmp short L_14A89D
+L_14A887:
+    mov eax, dword ptr [D_0014AA76]
+    add dword ptr [D_0014AA76], 4
+    mov dword ptr [eax], ecx
+    inc dword ptr [D_0014AA7A]
+    jmp short L_14A877
+L_14A89D:
+    cmp dword ptr [D_0014AA7A], 0
+    je near ptr L_14AA5C
+    mov esi, dword ptr [D_0014A194]
+    mov eax, dword ptr [esi + 02Ch]
+    mov edx, dword ptr [esi + 030h]
+    mov ebx, dword ptr [esi + 034h]
+    mov ecx, offset D_0014A100
+    call func_00137000
+    mov esi, offset D_0014A16C
+    mov edi, offset D_0014A100
+    mov ebx, offset D_0014A1CC
+    mov edx, 3
+    mov ecx, edx
+    mov eax, edx
+    mov ebp, 01Ch
+    call func_0015D170
+    mov dword ptr [D_0014AA7E], 0
+    mov eax, dword ptr [D_00147954]
+    add eax, 02000h
+    mov dword ptr [D_0014AA82], eax
+    mov dword ptr [D_0014AA86], eax
+    mov edx, dword ptr [D_0014AA66]
+    mov ebx, dword ptr [D_0014AA6E]
+L_14A90F:
+    push edx
+    push ebx
+    mov esi, dword ptr [edx]
+    mov eax, dword ptr [D_0014AA72]
+    mov ebp, dword ptr [D_0014AA7A]
+L_14A91E:
+    mov edi, dword ptr [eax]
+    push eax
+    mov eax, dword ptr [edi]
+    mov edx, dword ptr [edi + 4]
+    mov ebx, dword ptr [edi + 8]
+    mov ecx, offset D_0014A1CC
+    call func_0013749E
+    add eax, dword ptr [D_0014A1A0]
+    add edx, dword ptr [D_0014A1A4]
+    add ebx, dword ptr [D_0014A1A8]
+    mov ecx, dword ptr [edi + 0Ch]
+    mov edi, dword ptr [esi + 0Ch]
+    call func_0014CA44
+    test eax, eax
+    pop eax
+    jns short L_14A965
+L_14A955:
+    add eax, 4
+    dec ebp
+    jne short L_14A91E
+    pop ebx
+    pop edx
+    add edx, 4
+    dec ebx
+    jne short L_14A90F
+    jmp short L_14A98E
+L_14A965:
+    cmp dword ptr [D_0014A1BC], 1
+    je near ptr L_14AA56
+    mov edx, dword ptr [D_0014AA86]
+    mov ebx, dword ptr [eax]
+    mov dword ptr [edx + 4], ebx
+    mov dword ptr [edx], esi
+    add dword ptr [D_0014AA86], 8
+    inc dword ptr [D_0014AA7E]
+    jmp short L_14A955
+L_14A98E:
+    cmp dword ptr [D_0014AA7E], 0
+    je near ptr L_14AA5C
+    mov eax, dword ptr [D_0014A190]
+    mov eax, dword ptr [eax]
+    mov dword ptr [D_0014AA8A], eax
+    mov edx, dword ptr [eax + 034h]
+    add edx, eax
+    mov dword ptr [D_0014AA8E], edx
+    mov esi, dword ptr [D_0014AA82]
+    mov ebp, dword ptr [D_0014AA7E]
+L_14A9BE:
+    push esi
+    push ebp
+    mov edi, dword ptr [esi + 4]
+    mov ecx, offset D_0014A1CC
+    mov eax, dword ptr [edi]
+    mov edx, dword ptr [edi + 4]
+    mov ebx, dword ptr [edi + 8]
+    call func_0013749E
+    add eax, dword ptr [D_0014A1A0]
+    add edx, dword ptr [D_0014A1A4]
+    add ebx, dword ptr [D_0014A1A8]
+    mov dword ptr [D_0014A1C0], eax
+    mov dword ptr [D_0014A1C4], edx
+    mov dword ptr [D_0014A1C8], ebx
+    mov edi, dword ptr [edi + 0Ch]
+    mov ecx, dword ptr [esi]
+    movzx ebp, word ptr [ecx + 010h]
+    lea ecx, [ecx + 012h]
+    mov esi, offset D_0014A1C0
+L_14AA09:
+    push ecx
+    movzx eax, word ptr [ecx + 4]
+    mov ecx, dword ptr [ecx]
+    add ecx, 8
+    lea eax, [eax + eax*2]
+    add eax, dword ptr [D_0014AA8E]
+    add ecx, dword ptr [D_0014AA8A]
+    mov ebx, dword ptr [eax + 8]
+    mov edx, dword ptr [eax + 4]
+    mov eax, dword ptr [eax]
+    shl eax, 8
+    shl edx, 8
+    shl ebx, 8
+    call func_0014C711
+    test eax, eax
+    js short L_14AA41
+    pop eax
+    pop eax
+    pop eax
+    jmp short L_14AA58
+L_14AA41:
+    pop ecx
+    add ecx, 6
+    dec ebp
+    jne short L_14AA09
+    pop ebp
+    pop esi
+    add esi, 8
+    dec ebp
+    jne near ptr L_14A9BE
+    jmp short L_14AA5C
+L_14AA56:
+    pop eax
+    pop eax
+L_14AA58:
+    xor eax, eax
+    jmp short L_14AA61
+L_14AA5C:
+    mov eax, 0FFFFFFFFh
+L_14AA61:
+    pop ebp
+    pop edi
+    pop esi
+    pop ecx
+    ret
 D_0014AA66:
     db 4 dup (0)
 D_0014AA6A:
@@ -930,115 +1059,216 @@ D_0014AF24:
 D_0014AF28:
     db 4 dup (0)
 D_0014AF2C:
-    B_14AF2C_9
-    dd D_0014A190
-    B_14AF39_2
-    dd D_0014A19C
-    B_14AF3F_2
-    dd D_0014A198
-    B_14AF45_2
-    dd D_0014A190
-    B_14AF4B_1
-    dd D_0014A148
-    B_14AF50_15
-    dd D_0014A148
-    B_14AF63_1
-    dd D_0014A16C
-    B_14AF68_7
-    dd D_0014A198
-    B_14AF73_2
-    dd D_0014A190
-    B_14AF79_17
-    dd D_0014A16C
-    B_14AF8E_6
-    dd D_0014A1A0
-    B_14AF98_2
-    dd D_0014A1A4
-    B_14AF9E_2
-    dd D_0014A1A8
-    B_14AFA4_2
-    dd D_0014A19C
-    B_14AFAA_22
-    dd D_0014A1AC
-    B_14AFC4_2
-    dd D_0014A1B0
-    B_14AFCA_2
-    dd D_0014A1B4
-    B_14AFD0_2
-    dd D_0014A190
-    B_14AFD6_24
-    dd D_0014A1AC
-    B_14AFF2_1
-    dd D_0014A1A0
-    B_14AFF7_38
-    dd D_0014A190
-    B_14B021_2
-    dd D_0014A194
-    B_14B027_2
-    dd D_0014A190
-    B_14B02D_10
-    dd D_0014A148
-    B_14B03B_6
-    dd D_0014A148
-    B_14B045_1
-    dd D_0014A16C
-    B_14B04A_7
-    dd D_0014A190
-    B_14B055_2
-    dd D_0014A194
-    B_14B05B_26
-    dd D_0014A16C
-    B_14B079_6
-    dd D_0014A1A0
-    B_14B083_2
-    dd D_0014A1A4
-    B_14B089_2
-    dd D_0014A1A8
-    B_14B08F_2
-    dd D_0014A194
-    B_14B095_10
-    dd D_0014A100
-    B_14B0A3_6
-    dd D_0014A16C
-    B_14B0AD_1
-    dd D_0014A100
-    B_14B0B2_1
-    dd D_0014A1CC
-    B_14B0B7_21
-    dd D_00147954
-    B_14B0D0_2
-    dd D_0014B193
-    B_14B0D6_11
-    dd D_0014B197
-    B_14B0E5_2
-    dd D_0014A190
-    B_14B0EB_12
-    dd D_0014A194
-    B_14B0FB_21
-    dd D_0014A1CC
-    B_14B114_7
-    dd D_0014A1A0
-    B_14B11F_2
-    dd D_0014A1A4
-    B_14B125_2
-    dd D_0014A1A8
-    B_14B12B_13
-    dd D_0014B197
-    B_14B13C_2
-    dd D_0014B197
-    B_14B142_5
-    dd D_0014A194
-    B_14B14B_8
-    dd D_0014A190
-    B_14B157_17
-    dd D_0014B193
-    B_14B16C_19
-    dd D_0014B193
-    B_14B183_16
+    db 4 dup (0)
+func_0014AF30:
+    push ecx
+    push esi
+    push edi
+    push ebp
+    mov dword ptr [D_0014A190], eax
+    mov dword ptr [D_0014A19C], edx
+    mov dword ptr [D_0014A198], ebx
+    mov esi, dword ptr [D_0014A190]
+    mov ecx, offset D_0014A148
+    mov eax, dword ptr [esi + 0Ch]
+    mov edx, dword ptr [esi + 010h]
+    mov ebx, dword ptr [esi + 014h]
+    call func_00137000
+    mov eax, offset D_0014A148
+    mov edx, offset D_0014A16C
+    call func_0015D2EC
+    mov edi, dword ptr [D_0014A198]
+    mov esi, dword ptr [D_0014A190]
+    mov eax, dword ptr [edi]
+    sub eax, dword ptr [esi]
+    mov edx, dword ptr [edi + 4]
+    sub edx, dword ptr [esi + 4]
+    mov ebx, dword ptr [edi + 8]
+    sub ebx, dword ptr [esi + 8]
+    mov ecx, offset D_0014A16C
+    call func_0013749E
+    mov dword ptr [D_0014A1A0], eax
+    mov dword ptr [D_0014A1A4], edx
+    mov dword ptr [D_0014A1A8], ebx
+    mov edi, dword ptr [D_0014A19C]
+    mov eax, dword ptr [edi]
+    sub eax, dword ptr [esi]
+    mov edx, dword ptr [edi + 4]
+    sub edx, dword ptr [esi + 4]
+    mov ebx, dword ptr [edi + 8]
+    sub ebx, dword ptr [esi + 8]
+    call func_0013749E
+    mov dword ptr [D_0014A1AC], eax
+    mov dword ptr [D_0014A1B0], edx
+    mov dword ptr [D_0014A1B4], ebx
+    mov ecx, dword ptr [D_0014A190]
+    movzx ebp, word ptr [ecx + 018h]
+    test ebp, ebp
+    jle short L_14B00D
+    add ecx, 01Ah
+L_14AFE1:
+    push ecx
+    mov eax, dword ptr [ecx]
+    mov edx, dword ptr [ecx + 4]
+    mov ebx, dword ptr [ecx + 8]
+    mov ecx, dword ptr [ecx + 0Ch]
+    mov esi, offset D_0014A1AC
+    mov edi, offset D_0014A1A0
+    call func_0014C904
+    pop ecx
+    test eax, eax
+    jns short L_14B009
+    add ecx, 010h
+    dec ebp
+    jne short L_14AFE1
+    jmp short L_14B00D
+L_14B009:
+    xor eax, eax
+    jmp short L_14B012
+L_14B00D:
+    mov eax, 0FFFFFFFFh
+L_14B012:
+    pop ebp
+    pop edi
+    pop esi
+    pop ecx
+    ret
+func_0014B017:
+    push ebx
+    push ecx
+    push esi
+    push edi
+    push ebp
+    mov dword ptr [D_0014A190], eax
+    mov dword ptr [D_0014A194], edx
+    mov esi, dword ptr [D_0014A190]
+    mov eax, dword ptr [esi + 0Ch]
+    mov edx, dword ptr [esi + 010h]
+    mov ebx, dword ptr [esi + 014h]
+    mov ecx, offset D_0014A148
+    call func_00137000
+    mov eax, offset D_0014A148
+    mov edx, offset D_0014A16C
+    call func_0015D2EC
+    mov esi, dword ptr [D_0014A190]
+    mov edi, dword ptr [D_0014A194]
+    mov eax, dword ptr [edi]
+    sub eax, dword ptr [esi]
+    mov edx, dword ptr [edi + 4]
+    sub edx, dword ptr [esi + 4]
+    mov ebx, dword ptr [edi + 8]
+    sub ebx, dword ptr [esi + 8]
+    shl eax, 8
+    shl edx, 8
+    shl ebx, 8
+    mov ecx, offset D_0014A16C
+    call func_0013749E
+    mov dword ptr [D_0014A1A0], eax
+    mov dword ptr [D_0014A1A4], edx
+    mov dword ptr [D_0014A1A8], ebx
+    mov esi, dword ptr [D_0014A194]
+    mov eax, dword ptr [esi + 0Ch]
+    mov edx, dword ptr [esi + 010h]
+    mov ebx, dword ptr [esi + 014h]
+    mov ecx, offset D_0014A100
+    call func_00137000
+    mov esi, offset D_0014A16C
+    mov edi, offset D_0014A100
+    mov ebx, offset D_0014A1CC
+    mov edx, 3
+    mov ecx, edx
+    mov eax, edx
+    mov ebp, 01Ch
+    call func_0015D170
+    mov edx, dword ptr [D_00147954]
+    mov dword ptr [D_0014B193], edx
+    mov dword ptr [edx], 0
+    add edx, 4
+    mov dword ptr [D_0014B197], edx
+    mov esi, dword ptr [D_0014A190]
+    movzx ebp, word ptr [esi + 018h]
+    add esi, 01Ah
+L_14B0F2:
+    mov edi, dword ptr [esi + 0Ch]
+    mov ebx, dword ptr [D_0014A194]
+    movzx edx, word ptr [ebx + 018h]
+    add ebx, 01Ah
+L_14B102:
+    push edx
+    push ebx
+    push dword ptr [ebx + 0Ch]
+    mov eax, dword ptr [ebx]
+    mov edx, dword ptr [ebx + 4]
+    mov ebx, dword ptr [ebx + 8]
+    mov ecx, offset D_0014A1CC
+    call func_0013749E
+    add eax, dword ptr [D_0014A1A0]
+    add edx, dword ptr [D_0014A1A4]
+    add ebx, dword ptr [D_0014A1A8]
+    pop ecx
+    call func_0014CA44
+    pop ebx
+    pop edx
+    test eax, eax
+    js short L_14B16E
+    mov eax, dword ptr [D_0014B197]
+    add dword ptr [D_0014B197], 01Eh
+    push edx
+    push ebp
+    mov ecx, dword ptr [D_0014A194]
+    neg edx
+    add dx, word ptr [ecx + 018h]
+    mov ecx, dword ptr [D_0014A190]
+    neg ebp
+    add bp, word ptr [ecx + 018h]
+    mov word ptr [eax + 0Ch], bp
+    mov word ptr [eax + 0Eh], dx
+    pop ebp
+    pop edx
+    mov eax, dword ptr [D_0014B193]
+    inc dword ptr [eax]
+L_14B16E:
+    add ebx, 010h
+    dec edx
+    jne short L_14B102
+    add esi, 010h
+    dec ebp
+    jne near ptr L_14B0F2
+    mov eax, dword ptr [D_0014B193]
+    cmp dword ptr [eax], 0
+    jg short L_14B18D
+    mov eax, 0FFFFFFFFh
+L_14B18D:
+    pop ebp
+    pop edi
+    pop esi
+    pop ecx
+    pop ebx
+    ret
 D_0014B193:
     db 4 dup (0)
 D_0014B197:
-    B_14B197_48
+    db 4 dup (0)
+func_0014B19B:
+    push ebp
+    mov ebp, esp
+    push esi
+    push edi
+    mov esi, dword ptr [ebp + 0Ch]
+    mov edi, dword ptr [ebp + 8]
+    call func_0014B1B1
+    pop edi
+    pop esi
+    pop ebp
+    ret 8
+func_0014B1B1:
+    mov eax, 0FFFFFFFFh
+    ret
+func_0014B1B7:
+    call func_0014C711
+    call func_0015CB00
+    call func_0015CE7E
+    ret
 func_0014B1C7:
     push ebp
     mov ebp, esp
@@ -1310,281 +1540,343 @@ L_14B551:
     pop ecx
     pop ebx
     ret
-    B_14B58E_5
-    dd D_0014A190
-    B_14B597_4
-    dd D_0014A1F4
-    B_14B59F_2
-    dd D_0014A22C
-    B_14B5A5_7
-    dd D_0014BA7D
-    B_14B5B0_7
-    dd D_0014BA81
-    B_14B5BB_5
-    dd D_0014BA8D
-    B_14B5C4_7
-    dd D_0014BA85
-    B_14B5CF_2
-    dd D_0014BA89
-    B_14B5D5_6
-    dd D_0014A230
-    B_14B5DF_6
-    dd D_0014A234
-    B_14B5E9_6
-    dd D_0014A238
-    B_14B5F3_6
-    dd D_0014A23C
-    B_14B5FD_6
-    dd D_0014A240
-    B_14B607_6
-    dd D_0014A244
-    B_14B611_6
-    dd D_0014BA7D
-    B_14B61B_4
-    dd D_0014A230
-    B_14B623_3
-    dd D_0014A230
-    B_14B62A_2
-    dd D_0014A23C
-    B_14B630_3
-    dd D_0014A23C
-    B_14B637_5
-    dd D_0014A234
-    B_14B640_3
-    dd D_0014A234
-    B_14B647_2
-    dd D_0014A240
-    B_14B64D_3
-    dd D_0014A240
-    B_14B654_5
-    dd D_0014A238
-    B_14B65D_3
-    dd D_0014A238
-    B_14B664_2
-    dd D_0014A244
-    B_14B66A_3
-    dd D_0014A244
-    B_14B671_13
-    dd D_0014A1F4
-    B_14B682_13
-    dd D_0014A1F0
-    B_14B693_1
-    dd D_0014A1F4
-    B_14B698_20
-    dd D_0014A1F4
-    B_14B6B0_1
-    dd D_0014A23C
-    B_14B6B5_2
-    dd D_0014A230
-    B_14B6BB_3
-    dd D_0014A1F0
-    B_14B6C2_2
-    dd D_0014A1F8
-    B_14B6C8_1
-    dd D_0014A240
-    B_14B6CD_2
-    dd D_0014A234
-    B_14B6D3_3
-    dd D_0014A1F0
-    B_14B6DA_2
-    dd D_0014A1FC
-    B_14B6E0_1
-    dd D_0014A244
-    B_14B6E5_2
-    dd D_0014A238
-    B_14B6EB_3
-    dd D_0014A1F0
-    B_14B6F2_2
-    dd D_0014A200
-    B_14B6F8_3
-    dd D_0014A1F8
-    B_14B6FF_3
-    dd D_0014A1FC
-    B_14B706_19
-    dd D_00147954
-    B_14B71D_2
-    dd D_0014A21C
-    B_14B723_14
-    dd D_0014BA91
-    B_14B735_1
-    dd D_0014A23C
-    B_14B73A_2
-    dd D_0014A230
-    B_14B740_4
-    dd D_0014A1F8
-    B_14B748_4
-    dd D_0014A230
-    B_14B750_1
-    dd D_0014A204
-    B_14B755_1
-    dd D_0014A210
-    B_14B75A_1
-    dd D_0014A240
-    B_14B75F_2
-    dd D_0014A234
-    B_14B765_4
-    dd D_0014A1FC
-    B_14B76D_4
-    dd D_0014A234
-    B_14B775_1
-    dd D_0014A208
-    B_14B77A_1
-    dd D_0014A214
-    B_14B77F_1
-    dd D_0014A244
-    B_14B784_2
-    dd D_0014A238
-    B_14B78A_4
-    dd D_0014A200
-    B_14B792_4
-    dd D_0014A238
-    B_14B79A_1
-    dd D_0014A20C
-    B_14B79F_1
-    dd D_0014A218
-    B_14B7A4_2
-    dd D_0014BA85
-    B_14B7AA_2
-    dd D_0014BA7D
-    B_14B7B0_5
-    dd D_0014BA81
-    B_14B7B9_18
-    dd D_0014A210
-    B_14B7CF_2
-    dd D_0014A1F4
-    B_14B7D5_2
-    dd D_0014A200
-    B_14B7DB_2
-    dd D_0014A228
-    B_14B7E1_2
-    dd D_0014A1FC
-    B_14B7E7_2
-    dd D_0014A224
-    B_14B7ED_2
-    dd D_0014A1F8
-    B_14B7F3_2
-    dd D_0014A220
-    B_14B7F9_30
-    dd D_0014A1F4
-    B_14B81B_17
-    dd D_0014BA81
-    B_14B830_53
-    dd D_0014BA85
-    B_14B869_2
-    dd D_0014BA7D
-    B_14B86F_2
-    dd D_0014BA81
-    B_14B875_37
-    dd D_0014A21C
-    B_14B89E_4
-    dd D_0014BA91
-    B_14B8A6_6
-    dd D_0014BA85
-    B_14B8B0_2
-    dd D_0014A190
-    B_14B8B6_5
-    dd D_0014BA89
-    B_14B8BF_8
-    dd D_0014BA91
-    B_14B8CB_4
-    dd D_0014BA91
-    B_14B8D3_5
-    dd D_00147954
-    B_14B8DC_18
-    dd D_0014A1F0
-    B_14B8F2_2
-    dd D_0014A21C
-    B_14B8F8_3
-    dd D_0014A210
-    B_14B8FF_2
-    dd D_0014A220
-    B_14B905_8
-    dd D_0014A204
-    B_14B911_2
-    dd D_0014A210
-    B_14B917_2
-    dd D_0014A1F0
-    B_14B91D_2
-    dd D_0014A214
-    B_14B923_2
-    dd D_0014A224
-    B_14B929_8
-    dd D_0014A208
-    B_14B935_2
-    dd D_0014A214
-    B_14B93B_2
-    dd D_0014A1F0
-    B_14B941_2
-    dd D_0014A218
-    B_14B947_2
-    dd D_0014A228
-    B_14B94D_8
-    dd D_0014A20C
-    B_14B959_2
-    dd D_0014A218
-    B_14B95F_1
-    dd D_00147954
-    B_14B964_1
-    dd D_0014A21C
-    B_14B969_2
-    dd D_0014BA81
-    B_14B96F_2
-    dd D_0014BA85
-    B_14B975_11
-    dd D_0014BA85
-    B_14B984_2
-    dd D_0014BA89
-    B_14B98A_2
-    dd D_0014BA8D
-    B_14B990_8
-    dd D_0014A21C
-    B_14B99C_2
-    dd D_0014A22C
-    B_14B9A2_4
-    dd D_0014A200
-    B_14B9AA_2
-    dd D_0014A228
-    B_14B9B0_2
-    dd D_0014A1FC
-    B_14B9B6_2
-    dd D_0014A224
-    B_14B9BC_2
-    dd D_0014A1F8
-    B_14B9C2_2
-    dd D_0014A220
-    B_14B9C8_9
-    dd D_0014A210
-    B_14B9D5_4
-    dd D_0014A214
-    B_14B9DD_5
-    dd D_0014A218
-    B_14B9E6_5
-    dd D_0014A1F4
-    B_14B9EF_40
-    dd D_0014A1F0
-    B_14BA1B_5
-    dd D_0014A210
-    B_14BA24_2
-    dd D_0014A220
-    B_14BA2A_3
-    dd D_0014A204
-    B_14BA31_1
-    dd D_0014A210
-    B_14BA36_2
-    dd D_0014A214
-    B_14BA3C_2
-    dd D_0014A224
-    B_14BA42_7
-    dd D_0014A208
-    B_14BA4D_1
-    dd D_0014A214
-    B_14BA52_2
-    dd D_0014A218
-    B_14BA58_2
-    dd D_0014A228
-    B_14BA5E_8
-    dd D_0014A22C
-    B_14BA6A_19
+func_0014B58E:
+    push ecx
+    push esi
+    push edi
+    push ebp
+    mov dword ptr [D_0014A190], eax
+    mov edi, eax
+    mov dword ptr [D_0014A1F4], edx
+    mov dword ptr [D_0014A22C], ebx
+    mov edx, dword ptr [eax + 030h]
+    add edx, eax
+    mov dword ptr [D_0014BA7D], edx
+    mov edx, dword ptr [eax + 034h]
+    add edx, eax
+    mov dword ptr [D_0014BA81], edx
+    mov edx, dword ptr [eax + 8]
+    mov dword ptr [D_0014BA8D], edx
+    mov ecx, dword ptr [eax + 4]
+    add eax, dword ptr [eax + 03Ch]
+    mov dword ptr [D_0014BA85], eax
+    mov dword ptr [D_0014BA89], 0
+    mov dword ptr [D_0014A230], 0800000h
+    mov dword ptr [D_0014A234], 0800000h
+    mov dword ptr [D_0014A238], 0800000h
+    mov dword ptr [D_0014A23C], 0FF800000h
+    mov dword ptr [D_0014A240], 0FF800000h
+    mov dword ptr [D_0014A244], 0FF800000h
+    mov esi, dword ptr [D_0014BA7D]
+L_14B61B:
+    mov eax, dword ptr [esi]
+    cmp eax, dword ptr [D_0014A230]
+    jge short L_14B62A
+    mov dword ptr [D_0014A230], eax
+L_14B62A:
+    cmp eax, dword ptr [D_0014A23C]
+    jle short L_14B637
+    mov dword ptr [D_0014A23C], eax
+L_14B637:
+    mov eax, dword ptr [esi + 4]
+    cmp eax, dword ptr [D_0014A234]
+    jge short L_14B647
+    mov dword ptr [D_0014A234], eax
+L_14B647:
+    cmp eax, dword ptr [D_0014A240]
+    jle short L_14B654
+    mov dword ptr [D_0014A240], eax
+L_14B654:
+    mov eax, dword ptr [esi + 8]
+    cmp eax, dword ptr [D_0014A238]
+    jge short L_14B664
+    mov dword ptr [D_0014A238], eax
+L_14B664:
+    cmp eax, dword ptr [D_0014A244]
+    jle short L_14B671
+    mov dword ptr [D_0014A244], eax
+L_14B671:
+    add esi, 0Ch
+    dec ecx
+    jne short L_14B61B
+    mov eax, 016A0Ah
+    imul dword ptr [D_0014A1F4]
+    add eax, 08000h
+    adc edx, 0
+    shrd eax, edx, 010h
+    mov dword ptr [D_0014A1F0], eax
+    mov eax, dword ptr [D_0014A1F4]
+    mov edx, 0133h
+    imul edx
+    add eax, 080h
+    adc edx, 0
+    shrd eax, edx, 8
+    mov dword ptr [D_0014A1F4], eax
+    mov eax, dword ptr [D_0014A23C]
+    sub eax, dword ptr [D_0014A230]
+    cdq
+    idiv dword ptr [D_0014A1F0]
+    inc eax
+    mov dword ptr [D_0014A1F8], eax
+    mov eax, dword ptr [D_0014A240]
+    sub eax, dword ptr [D_0014A234]
+    cdq
+    idiv dword ptr [D_0014A1F0]
+    inc eax
+    mov dword ptr [D_0014A1FC], eax
+    mov eax, dword ptr [D_0014A244]
+    sub eax, dword ptr [D_0014A238]
+    cdq
+    idiv dword ptr [D_0014A1F0]
+    inc eax
+    mov dword ptr [D_0014A200], eax
+    imul eax, dword ptr [D_0014A1F8]
+    imul eax, dword ptr [D_0014A1FC]
+    mov esi, eax
+    shl esi, 2
+    cmp esi, 010000h
+    jge near ptr L_14BA76
+    mov esi, dword ptr [D_00147954]
+    mov dword ptr [D_0014A21C], esi
+L_14B723:
+    mov dword ptr [esi], 0
+    add esi, 4
+    dec eax
+    jne short L_14B723
+    mov dword ptr [D_0014BA91], esi
+    mov eax, dword ptr [D_0014A23C]
+    sub eax, dword ptr [D_0014A230]
+    xor edx, edx
+    idiv dword ptr [D_0014A1F8]
+    sar eax, 1
+    add eax, dword ptr [D_0014A230]
+    mov dword ptr [D_0014A204], eax
+    mov dword ptr [D_0014A210], eax
+    mov eax, dword ptr [D_0014A240]
+    sub eax, dword ptr [D_0014A234]
+    xor edx, edx
+    idiv dword ptr [D_0014A1FC]
+    sar eax, 1
+    add eax, dword ptr [D_0014A234]
+    mov dword ptr [D_0014A208], eax
+    mov dword ptr [D_0014A214], eax
+    mov eax, dword ptr [D_0014A244]
+    sub eax, dword ptr [D_0014A238]
+    xor edx, edx
+    idiv dword ptr [D_0014A200]
+    sar eax, 1
+    add eax, dword ptr [D_0014A238]
+    mov dword ptr [D_0014A20C], eax
+    mov dword ptr [D_0014A218], eax
+L_14B7A4:
+    mov edi, dword ptr [D_0014BA85]
+    mov ecx, dword ptr [D_0014BA7D]
+    add ecx, dword ptr [edi + 8]
+    mov edi, dword ptr [D_0014BA81]
+    mov eax, dword ptr [edi]
+    mov edx, dword ptr [edi + 4]
+    mov ebx, dword ptr [edi + 8]
+    shl eax, 8
+    shl edx, 8
+    shl ebx, 8
+    mov esi, offset D_0014A210
+    mov edi, dword ptr [D_0014A1F4]
+    mov ebp, dword ptr [D_0014A200]
+    mov dword ptr [D_0014A228], ebp
+L_14B7E1:
+    mov ebp, dword ptr [D_0014A1FC]
+    mov dword ptr [D_0014A224], ebp
+L_14B7ED:
+    mov ebp, dword ptr [D_0014A1F8]
+    mov dword ptr [D_0014A220], ebp
+L_14B7F9:
+    push eax
+    push edx
+    push ebx
+    call func_0014C711
+    test eax, eax
+    js near ptr L_14B8E9
+    push ecx
+    push esi
+    push edi
+    mov ecx, edx
+    mov eax, edx
+    imul eax
+    mov ebx, eax
+    mov ebp, edx
+    mov eax, dword ptr [D_0014A1F4]
+    imul eax
+    sub eax, ebx
+    db 01Bh, 0D5h   ; sbb edx, ebp
+    call func_0014BC34
+    mov ebp, eax
+    neg ecx
+    mov edi, dword ptr [D_0014BA81]
+    mov eax, dword ptr [edi]
+    imul eax, ecx
+    add eax, 080h
+    sar eax, 8
+    mov edx, dword ptr [edi + 4]
+    imul edx, ecx
+    add edx, 080h
+    sar edx, 8
+    mov ebx, dword ptr [edi + 8]
+    imul ebx, ecx
+    add ebx, 080h
+    sar ebx, 8
+    add eax, dword ptr [esi]
+    add edx, dword ptr [esi + 4]
+    add ebx, dword ptr [esi + 8]
+    mov ecx, dword ptr [D_0014BA85]
+    mov esi, dword ptr [D_0014BA7D]
+    mov edi, dword ptr [D_0014BA81]
+    push eax
+    push edx
+    push ebx
+    push esi
+    call func_0015CB00
+    test eax, eax
+    pop esi
+    pop ebx
+    pop edx
+    pop eax
+    jns short L_14B896
+    mov edi, ebp
+    call func_0015CE7E
+    test eax, eax
+    jns short L_14B896
+    pop edi
+    pop esi
+    pop ecx
+    jmp short L_14B8E9
+L_14B896:
+    pop edi
+    pop esi
+    pop ecx
+    mov eax, dword ptr [D_0014A21C]
+    mov ebx, dword ptr [eax]
+    mov edx, dword ptr [D_0014BA91]
+    mov dword ptr [eax], edx
+    mov dword ptr [edx], ebx
+    mov ebx, dword ptr [D_0014BA85]
+    sub ebx, dword ptr [D_0014A190]
+    mov dword ptr [edx + 4], ebx
+    mov ebx, dword ptr [D_0014BA89]
+    shl ebx, 2
+    mov dword ptr [edx + 8], ebx
+    add dword ptr [D_0014BA91], 0Ch
+    push edx
+    mov edx, dword ptr [D_0014BA91]
+    add edx, 0Ch
+    sub edx, dword ptr [D_00147954]
+    cmp edx, 010000h
+    pop edx
+    jge near ptr L_14BA73
+L_14B8E9:
+    pop ebx
+    pop edx
+    pop eax
+    mov ebp, dword ptr [D_0014A1F0]
+    add dword ptr [D_0014A21C], 4
+    add dword ptr [D_0014A210], ebp
+    dec dword ptr [D_0014A220]
+    jne near ptr L_14B7F9
+    mov ebp, dword ptr [D_0014A204]
+    mov dword ptr [D_0014A210], ebp
+    mov ebp, dword ptr [D_0014A1F0]
+    add dword ptr [D_0014A214], ebp
+    dec dword ptr [D_0014A224]
+    jne near ptr L_14B7ED
+    mov ebp, dword ptr [D_0014A208]
+    mov dword ptr [D_0014A214], ebp
+    mov ebp, dword ptr [D_0014A1F0]
+    add dword ptr [D_0014A218], ebp
+    dec dword ptr [D_0014A228]
+    jne near ptr L_14B7E1
+    mov ebp, dword ptr [D_0014A20C]
+    mov dword ptr [D_0014A218], ebp
+    mov eax, dword ptr [D_00147954]
+    mov dword ptr [D_0014A21C], eax
+    add dword ptr [D_0014BA81], 0Ch
+    mov eax, dword ptr [D_0014BA85]
+    movzx eax, byte ptr [eax]
+    shl eax, 3
+    add eax, 8
+    add dword ptr [D_0014BA85], eax
+    inc dword ptr [D_0014BA89]
+    dec dword ptr [D_0014BA8D]
+    jne near ptr L_14B7A4
+    mov edi, dword ptr [D_0014A21C]
+    mov esi, dword ptr [D_0014A22C]
+    xor ecx, ecx
+    mov ebp, dword ptr [D_0014A200]
+    mov dword ptr [D_0014A228], ebp
+L_14B9B0:
+    mov ebp, dword ptr [D_0014A1FC]
+    mov dword ptr [D_0014A224], ebp
+L_14B9BC:
+    mov ebp, dword ptr [D_0014A1F8]
+    mov dword ptr [D_0014A220], ebp
+L_14B9C8:
+    mov eax, dword ptr [edi]
+    test eax, eax
+    je short L_14BA15
+    inc ecx
+    mov edx, dword ptr [D_0014A210]
+    mov dword ptr [esi], edx
+    mov edx, dword ptr [D_0014A214]
+    mov dword ptr [esi + 4], edx
+    mov edx, dword ptr [D_0014A218]
+    mov dword ptr [esi + 8], edx
+    mov edx, dword ptr [D_0014A1F4]
+    mov dword ptr [esi + 0Ch], edx
+    push esi
+    add esi, 012h
+    xor dx, dx
+L_14B9F9:
+    mov ebp, dword ptr [eax + 4]
+    mov dword ptr [esi], ebp
+    mov ebp, dword ptr [eax + 8]
+    mov word ptr [esi + 4], bp
+    add esi, 6
+    inc dx
+    mov eax, dword ptr [eax]
+    test eax, eax
+    jne short L_14B9F9
+    pop eax
+    mov word ptr [eax + 010h], dx
+L_14BA15:
+    mov ebp, dword ptr [D_0014A1F0]
+    add edi, 4
+    add dword ptr [D_0014A210], ebp
+    dec dword ptr [D_0014A220]
+    jne short L_14B9C8
+    mov eax, dword ptr [D_0014A204]
+    mov dword ptr [D_0014A210], eax
+    add dword ptr [D_0014A214], ebp
+    dec dword ptr [D_0014A224]
+    jne near ptr L_14B9BC
+    mov eax, dword ptr [D_0014A208]
+    mov dword ptr [D_0014A214], eax
+    add dword ptr [D_0014A218], ebp
+    dec dword ptr [D_0014A228]
+    jne near ptr L_14B9B0
+    sub esi, dword ptr [D_0014A22C]
+    mov eax, esi
+    mov edx, ecx
+L_14BA6E:
+    pop ebp
+    pop edi
+    pop esi
+    pop ecx
+    ret
+L_14BA73:
+    pop eax
+    pop eax
+    pop eax
+L_14BA76:
+    mov eax, 0FFFFFFFFh
+    jmp short L_14BA6E
 D_0014BA7D:
     db 4 dup (0)
 D_0014BA81:

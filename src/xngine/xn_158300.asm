@@ -16,6 +16,7 @@ public L_158606
 public L_15860E
 public L_15861C
 public L_158624
+public func_0015830C
 public func_00158360
 public func_00158420
 public func_001585C0
@@ -46,11 +47,43 @@ extrn func_001552A0:near
 extrn func_0015B9A0:near
 XN_158300 segment byte public use32 'CODE'
     assume cs:XN_158300, ds:XN_158300, es:XN_158300, ss:XN_158300
-    B_158300_19
-    dd D_000CEA20
-    B_158317_7
-    dd D_000CEA24
-    B_158322_62
+func_00158300:
+    push ecx
+    call func_0015830C
+    mov eax, ecx
+    pop ecx
+    ret
+    B_15830A_2
+func_0015830C:
+    mov ecx, 03Fh
+    cmp ebx, dword ptr [D_000CEA20]
+    jl short L_15831C
+    xor ecx, 010h
+L_15831C:
+    cmp ebx, dword ptr [D_000CEA24]
+    jg short L_158327
+    xor ecx, 020h
+L_158327:
+    cmp eax, ebx
+    jg short L_15832E
+    xor ecx, 2
+L_15832E:
+    cmp edx, ebx
+    jg short L_158335
+    xor ecx, 4
+L_158335:
+    neg ebx
+    cmp eax, ebx
+    jl short L_15833E
+    xor ecx, 1
+L_15833E:
+    cmp edx, ebx
+    jl short L_158345
+    xor ecx, 8
+L_158345:
+    neg ebx
+    ret
+    B_158348_24
 func_00158360:
     mov dword ptr [D_00158200], esi
     lea eax, [esi + 040h]
@@ -75,17 +108,21 @@ L_15839A:
     mov eax, dword ptr [esi]
 L_1583AD:
     imul eax, eax, 0186A0h
+patch_1583AF equ L_1583AD+2   ; rewritten at run time
     imul ebx
 L_1583B5:
     add edx, 0186A0h
+patch_1583B7 equ L_1583B5+2   ; rewritten at run time
     shr edx, 3
     mov dword ptr [esi], edx
     mov eax, dword ptr [esi + 4]
 L_1583C3:
     imul eax, eax, 0186A0h
+patch_1583C5 equ L_1583C3+2   ; rewritten at run time
     imul ebx
 L_1583CB:
     add edx, 0186A0h
+patch_1583CD equ L_1583CB+2   ; rewritten at run time
     shr edx, 8
     mov dword ptr [esi + 4], edx
     sub edx, edi
@@ -149,17 +186,21 @@ L_15849A:
     mov eax, dword ptr [esi]
 L_1584AB:
     imul eax, eax, 0186A0h
+patch_1584AD equ L_1584AB+2   ; rewritten at run time
     imul ebx
 L_1584B3:
     add edx, 0186A0h
+patch_1584B5 equ L_1584B3+2   ; rewritten at run time
     shr edx, 3
     mov dword ptr [esi], edx
     mov eax, dword ptr [esi + 4]
 L_1584C1:
     imul eax, eax, 0186A0h
+patch_1584C3 equ L_1584C1+2   ; rewritten at run time
     imul ebx
 L_1584C9:
     add edx, 0186A0h
+patch_1584CB equ L_1584C9+2   ; rewritten at run time
     shr edx, 8
     mov dword ptr [esi + 4], edx
     add esi, 010h
@@ -228,7 +269,10 @@ L_15858D:
     sub eax, dword ptr [D_000CEA60]
 L_1585B2:
     ret
-    B_1585B3_13
+func_001585B3:
+    clc
+    ret
+    B_1585B5_11
 func_001585C0:
     mov eax, offset D_00158EA0
     mov dword ptr [D_00158200], eax
@@ -250,17 +294,21 @@ L_1585F5:
     mov eax, dword ptr [esi]
 L_158606:
     imul eax, eax, 0186A0h
+patch_158608 equ L_158606+2   ; rewritten at run time
     imul ebx
 L_15860E:
     add edx, 0186A0h
+patch_158610 equ L_15860E+2   ; rewritten at run time
     shr edx, 3
     mov dword ptr [esi], edx
     mov eax, dword ptr [esi + 4]
 L_15861C:
     imul eax, eax, 0186A0h
+patch_15861E equ L_15861C+2   ; rewritten at run time
     imul ebx
 L_158624:
     add edx, 0186A0h
+patch_158626 equ L_158624+2   ; rewritten at run time
     shr edx, 8
     mov dword ptr [esi + 4], edx
     add esi, 010h
@@ -299,7 +347,7 @@ L_1586AF:
     test byte ptr [D_00158211], 020h
     je short L_1586E6
     mov ebp, 020h
-    mov dword ptr [D_0015820C], offset D_00158B1C
+    mov dword ptr [D_0015820C], offset func_00158B1C
     call func_001587D4
     test byte ptr [D_00158211], 07Fh
     je near ptr L_1587CE
@@ -309,7 +357,7 @@ L_1586E6:
     test byte ptr [D_00158211], 1
     je short L_158724
     mov ebp, 1
-    mov dword ptr [D_0015820C], offset D_00158864
+    mov dword ptr [D_0015820C], offset func_00158864
     call func_001587D4
     and byte ptr [D_00158211], 0FEh
     test byte ptr [D_00158211], 07Fh
@@ -339,7 +387,7 @@ L_158762:
     test byte ptr [D_00158211], 2
     je short L_158798
     mov ebp, 2
-    mov dword ptr [D_0015820C], offset D_001588F0
+    mov dword ptr [D_0015820C], offset func_001588F0
     call func_001587D4
     and byte ptr [D_00158211], 0F8h
     test byte ptr [D_00158211], 07Fh
@@ -407,26 +455,124 @@ L_158852:
     lea ebx, [esi + 010h]
     call dword ptr [D_0015820C]
     jmp short L_158800
-D_00158864:
-    B_158864_66
-    dd D_000CEA20
-    B_1588AA_7
-    dd D_000CEA24
-    B_1588B5_42
-    dd D_00158211
-    B_1588E3_2
-    dd D_00158210
-    B_1588E9_7
-D_001588F0:
-    B_1588F0_63
-    dd D_000CEA20
-    B_158933_7
-    dd D_000CEA24
-    B_15893E_42
-    dd D_00158211
-    B_15896C_2
-    dd D_00158210
-    B_158972_6
+func_00158864:
+    mov ecx, dword ptr [ebx]
+    add ecx, dword ptr [ebx + 8]
+    xor eax, eax
+    mov edx, ecx
+    sub ecx, dword ptr [esi]
+    sub ecx, dword ptr [esi + 8]
+    add ecx, ecx
+    idiv ecx
+    mov ecx, eax
+    mov eax, dword ptr [esi]
+    sub eax, dword ptr [ebx]
+    add eax, eax
+    imul ecx
+    add edx, dword ptr [ebx]
+    mov dword ptr [edi], edx
+    neg edx
+    mov eax, dword ptr [esi + 4]
+    mov dword ptr [edi + 8], edx
+    mov ebx, dword ptr [ebx + 4]
+    sub eax, ebx
+    add eax, eax
+    imul ecx
+    add edx, ebx
+    mov dword ptr [edi + 4], edx
+    mov eax, dword ptr [edi]
+    mov ebx, dword ptr [edi + 8]
+    mov ecx, 03Fh
+    cmp ebx, dword ptr [D_000CEA20]
+    jl short L_1588AF
+    xor ecx, 010h
+L_1588AF:
+    cmp ebx, dword ptr [D_000CEA24]
+    jg short L_1588BA
+    xor ecx, 020h
+L_1588BA:
+    cmp eax, ebx
+    jg short L_1588C1
+    xor ecx, 2
+L_1588C1:
+    cmp edx, ebx
+    jg short L_1588C8
+    xor ecx, 4
+L_1588C8:
+    neg ebx
+    cmp eax, ebx
+    jl short L_1588D1
+    xor ecx, 1
+L_1588D1:
+    cmp edx, ebx
+    jl short L_1588D8
+    xor ecx, 8
+L_1588D8:
+    neg ebx
+    mov byte ptr [edi + 0Ch], cl
+    or byte ptr [D_00158211], cl
+    and byte ptr [D_00158210], cl
+    add edi, 010h
+    ret
+    B_1588ED_3
+func_001588F0:
+    mov ecx, dword ptr [esi + 8]
+    sub ecx, dword ptr [esi]
+    mov edx, dword ptr [ebx]
+    sub edx, dword ptr [ebx + 8]
+    xor eax, eax
+    add ecx, edx
+    add ecx, ecx
+    idiv ecx
+    mov ecx, eax
+    mov eax, dword ptr [esi]
+    sub eax, dword ptr [ebx]
+    add eax, eax
+    imul ecx
+    add edx, dword ptr [ebx]
+    mov eax, dword ptr [esi + 4]
+    mov dword ptr [edi], edx
+    mov dword ptr [edi + 8], edx
+    sub eax, dword ptr [ebx + 4]
+    add eax, eax
+    imul ecx
+    add edx, dword ptr [ebx + 4]
+    mov dword ptr [edi + 4], edx
+    mov eax, dword ptr [edi]
+    mov ebx, dword ptr [edi + 8]
+    mov ecx, 03Fh
+    cmp ebx, dword ptr [D_000CEA20]
+    jl short L_158938
+    xor ecx, 010h
+L_158938:
+    cmp ebx, dword ptr [D_000CEA24]
+    jg short L_158943
+    xor ecx, 020h
+L_158943:
+    cmp eax, ebx
+    jg short L_15894A
+    xor ecx, 2
+L_15894A:
+    cmp edx, ebx
+    jg short L_158951
+    xor ecx, 4
+L_158951:
+    neg ebx
+    cmp eax, ebx
+    jl short L_15895A
+    xor ecx, 1
+L_15895A:
+    cmp edx, ebx
+    jl short L_158961
+    xor ecx, 8
+L_158961:
+    neg ebx
+    mov byte ptr [edi + 0Ch], cl
+    or byte ptr [D_00158211], cl
+    and byte ptr [D_00158210], cl
+    add edi, 010h
+    ret
+    B_158976_2
 func_00158978:
     mov ecx, dword ptr [esi + 4]
     sub ecx, dword ptr [ebx + 4]
@@ -604,20 +750,62 @@ L_158B06:
     add edi, 010h
     ret
     B_158B1B_1
-D_00158B1C:
-    B_158B1C_9
-    dd D_000CEA24
-    B_158B29_36
-    dd D_000CEA24
-    B_158B51_15
-    dd D_000CEA20
-    B_158B64_7
-    dd D_000CEA24
-    B_158B6F_42
-    dd D_00158211
-    B_158B9D_2
-    dd D_00158210
-    B_158BA3_4
+func_00158B1C:
+    mov edx, dword ptr [ebx + 8]
+    xor eax, eax
+    mov ecx, edx
+    sub edx, dword ptr [D_000CEA24]
+    sub ecx, dword ptr [esi + 8]
+    add ecx, ecx
+    idiv ecx
+    mov ecx, eax
+    mov eax, dword ptr [esi]
+    sub eax, dword ptr [ebx]
+    add eax, eax
+    imul ecx
+    add edx, dword ptr [ebx]
+    mov eax, dword ptr [esi + 4]
+    mov dword ptr [edi], edx
+    sub eax, dword ptr [ebx + 4]
+    add eax, eax
+    imul ecx
+    add edx, dword ptr [ebx + 4]
+    mov ebx, dword ptr [D_000CEA24]
+    mov dword ptr [edi + 4], edx
+    mov dword ptr [edi + 8], ebx
+    mov eax, dword ptr [edi]
+    mov ecx, 03Fh
+    cmp ebx, dword ptr [D_000CEA20]
+    jl short L_158B69
+    xor ecx, 010h
+L_158B69:
+    cmp ebx, dword ptr [D_000CEA24]
+    jg short L_158B74
+    xor ecx, 020h
+L_158B74:
+    cmp eax, ebx
+    jg short L_158B7B
+    xor ecx, 2
+L_158B7B:
+    cmp edx, ebx
+    jg short L_158B82
+    xor ecx, 4
+L_158B82:
+    neg ebx
+    cmp eax, ebx
+    jl short L_158B8B
+    xor ecx, 1
+L_158B8B:
+    cmp edx, ebx
+    jl short L_158B92
+    xor ecx, 8
+L_158B92:
+    neg ebx
+    mov byte ptr [edi + 0Ch], cl
+    or byte ptr [D_00158211], cl
+    and byte ptr [D_00158210], cl
+    add edi, 010h
+    ret
     db 89 dup (0)
 XN_158300 ends
 end

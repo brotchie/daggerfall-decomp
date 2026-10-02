@@ -4,7 +4,7 @@
 .486p
 .387
 include xn_C0700.inc
-public D_000C094A
+public func_000C094A
 public func_000C0A36
 extrn D_000C0600:byte
 extrn D_000C0602:byte
@@ -75,7 +75,7 @@ L_0C076A:
     mov byte ptr [D_000C0613], ah
     movzx ax, al
     mov word ptr [D_000C0616], ax
-    mov dword ptr [L_0C08B7+2], 0100h
+    mov dword ptr [patch_0C08B9], 0100h
     call func_000C08CC
     jb near ptr L_0C08C6
     mov ax, word ptr [D_000C061A]
@@ -100,7 +100,7 @@ L_0C076A:
     mov edi, dword ptr [D_0014294C]
     mov eax, dword ptr [edi*4 + D_00142950]
     add eax, dword ptr [D_00143550]
-    mov dword ptr [L_0C08AB+2], eax
+    mov dword ptr [patch_0C08AD], eax
     movzx edi, word ptr [D_000C0604]
     mov edi, dword ptr [edi*4 + D_00142950]
     add edi, dword ptr [D_00143550]
@@ -108,7 +108,7 @@ L_0C076A:
     call dword ptr [D_000C061E]
     mov bp, word ptr [D_000C0608]
     mov bh, byte ptr [D_000C0613]
-    mov byte ptr [L_0C08BD+1], bh
+    mov byte ptr [patch_0C08BE], bh
     mov dx, word ptr [D_000C0616]
     mov bl, dl
     xor cx, cx
@@ -123,13 +123,16 @@ L_0C0897:
     add edi, 0140h
 L_0C08AB:
     cmp edi, 0186A0h
+patch_0C08AD equ L_0C08AB+2   ; rewritten at run time
     jae short L_0C08C6
     dec cx
     jne short L_0C0897
 L_0C08B7:
     add esi, 0186A0h
+patch_0C08B9 equ L_0C08B7+2   ; rewritten at run time
 L_0C08BD:
     mov bh, 064h
+patch_0C08BE equ L_0C08BD+1   ; rewritten at run time
     add bx, dx
     dec bp
     jne short L_0C0892
@@ -169,30 +172,88 @@ L_0C0946:
 L_0C0948:
     stc
     ret
-D_000C094A:
-    B_0C094A_4
-    dd D_00147954
-    B_0C0952_3
-    dd D_000C0606
-    B_0C0959_2
-    dd D_000C0612
-    B_0C095F_3
-    dd D_000C0614
-    B_0C0966_5
-    dd D_000C0602
-    B_0C096F_22
-    dd D_000C061C
-    B_0C0989_41
-    dd D_00142948
-    B_0C09B6_9
-    dd D_00142948
-    B_0C09C3_8
-    dd D_000C0600
-    B_0C09CF_76
-    dd D_000C061C
-    B_0C0A1F_2
-    dd D_000C0612
-    B_0C0A25_17
+func_000C094A:
+    push esi
+    push edi
+    mov edi, dword ptr [D_00147954]
+    mov bp, word ptr [D_000C0606]
+    mov bh, byte ptr [D_000C0612]
+    mov dx, word ptr [D_000C0614]
+    mov bl, dl
+    movzx esi, word ptr [D_000C0602]
+    xor cx, cx
+L_0C0972:
+    mov cl, bh
+    and cl, cl
+    jne short L_0C097D
+    jmp near ptr L_0C0A18
+L_0C097D:
+    mov word ptr [edi], 0868Ah
+    movzx eax, word ptr [D_000C061C]
+    mov dword ptr [edi + 2], eax
+    mov word ptr [edi + 6], 0C00Ah
+    mov byte ptr [edi + 8], 074h
+    add edi, 0Ah
+    push edi
+    mov byte ptr [edi], 03Ch
+    mov byte ptr [edi + 1], 0FFh
+    mov byte ptr [edi + 2], 074h
+    add edi, 4
+    push edi
+    mov ax, si
+    add ax, cx
+    cmp ax, word ptr [D_00142948]
+    jle short L_0C09C8
+    mov bp, 1
+    sub ax, word ptr [D_00142948]
+    sub cx, ax
+    jle short L_0C0A06
+L_0C09C8:
+    test word ptr [D_000C0600], 08000h
+    je short L_0C09D7
+    mov byte ptr [edi], 0D7h
+    inc edi
+L_0C09D7:
+    shr cl, 1
+    jae short L_0C09EA
+    mov word ptr [edi], 08788h
+    mov dword ptr [edi + 2], esi
+    inc esi
+    add edi, 6
+    jcxz L_0C0A06
+L_0C09EA:
+    mov word ptr [edi], 0E08Ah
+    add edi, 2
+L_0C09F2:
+    mov word ptr [edi], 08966h
+    mov byte ptr [edi + 2], 087h
+    mov dword ptr [edi + 3], esi
+    add esi, 2
+    add edi, 7
+    loop L_0C09F2
+L_0C0A06:
+    pop eax
+    push edi
+    xchg edi, eax
+    sub eax, edi
+    mov byte ptr [edi - 1], al
+    pop edi
+    pop eax
+    push edi
+    xchg edi, eax
+    sub eax, edi
+    mov byte ptr [edi - 1], al
+    pop edi
+L_0C0A18:
+    inc word ptr [D_000C061C]
+    mov bh, byte ptr [D_000C0612]
+    add bx, dx
+    dec bp
+    jne near ptr L_0C0972
+    mov byte ptr [edi], 0C3h
+    pop edi
+    pop esi
+    ret
 func_000C0A36:
     pushad
     movzx ecx, word ptr [D_000C0608]

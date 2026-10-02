@@ -68,7 +68,7 @@ public D_000D4ACD
 public D_000D4C41
 public D_000D4C4D
 public D_000D7AC0
-extrn D_0014D300:byte
+extrn func_0014D300:near
 XN_CEA00 segment byte public use32 'CODE'
     assume cs:XN_CEA00, ds:XN_CEA00, es:XN_CEA00, ss:XN_CEA00
     B_0CEA00_32
@@ -99,7 +99,7 @@ D_000CEA4C:
 D_000CEA54:
     db 4 dup (0)
 D_000CEA58:
-    dd D_0014D300
+    dd func_0014D300
 D_000CEA5C:
     db 4 dup (0)
 D_000CEA60:

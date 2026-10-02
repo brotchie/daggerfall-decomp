@@ -20,7 +20,7 @@ public D_000C0618
 public D_000C061A
 public D_000C061C
 public D_000C061E
-extrn D_000C094A:byte
+extrn func_000C094A:near
 XN_C0600 segment byte public use32 'CODE'
     assume cs:XN_C0600, ds:XN_C0600, es:XN_C0600, ss:XN_C0600
 D_000C0600:
@@ -54,7 +54,7 @@ D_000C061A:
 D_000C061C:
     db 2 dup (0)
 D_000C061E:
-    dd D_000C094A
+    dd func_000C094A
     db 222 dup (0)
 XN_C0600 ends
 end

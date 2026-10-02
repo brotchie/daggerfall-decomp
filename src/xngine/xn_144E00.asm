@@ -154,7 +154,46 @@ L_144F10:
 L_144F25:
     pop edi
     ret
-    B_144F27_65
+    B_144F27_1
+func_00144F28:
+    push ecx
+    push ebp
+    push esi
+    push edi
+    call func_00144F38
+    pop edi
+    pop esi
+    pop ebp
+    pop ecx
+    ret
+    B_144F36_2
+func_00144F38:
+    mov esi, ebx
+    movzx ecx, word ptr [ebx + 6]
+    movzx ebx, word ptr [ebx + 4]
+    add esi, 0Ch
+    jmp short func_00144F7C
+func_00144F47:
+    ret
+func_00144F48:
+    push ecx
+    push ebp
+    push esi
+    push edi
+    call func_00144F58
+    pop edi
+    pop esi
+    pop ebp
+    pop ecx
+    ret
+    B_144F56_2
+func_00144F58:
+    mov esi, ebx
+    movzx ebx, word ptr [esi + 4]
+    movzx ecx, word ptr [esi + 6]
+    add esi, 0Ch
+    jmp short func_00144FC8
+    B_144F67_1
 func_00144F68:
     push ebp
     mov ebp, esp
@@ -202,7 +241,8 @@ func_00144FB4:
     pop edi
     pop ebp
     ret 4
-    B_144FC7_1
+func_00144FC7:
+    ret
 func_00144FC8:
     xor ebp, ebp
     call func_00144E00
@@ -3429,9 +3469,52 @@ L_14780C:
     mov byte ptr [edi + 037Fh], al
 L_14781C:
     ret
-    B_14781D_21
-    dd D_0012B812
-    B_147836_58
+    B_14781D_3
+func_00147820:
+    pushad
+    mov esi, eax
+    movzx ecx, word ptr [esi + 4]
+    movzx eax, word ptr [esi + 6]
+    imul ecx, eax
+    add esi, 0Ch
+    mov edi, offset D_0012B812
+    xor eax, eax
+L_147838:
+    mov al, byte ptr [esi]
+    test al, al
+    je short L_147843
+    mov al, byte ptr [edi + eax]
+    mov byte ptr [esi], al
+L_147843:
+    inc esi
+    loop L_147838
+    popad
+    ret
+func_00147848:
+    push ebp
+    mov ebp, dword ptr [esp + 8]
+    call func_00147858
+    pop ebp
+    ret 4
+    B_147856_2
+func_00147858:
+    push edi
+    mov edi, eax
+    mov eax, ebp
+L_14785D:
+    mov ebp, ebx
+L_14785F:
+    mov al, byte ptr [edi]
+    mov al, byte ptr [eax]
+    mov byte ptr [edi], al
+    inc edi
+    dec ebp
+    jne short L_14785F
+    add edi, edx
+    dec ecx
+    jne short L_14785D
+    pop edi
+    ret
     db 144 dup (0)
 XN_144E00 ends
 end

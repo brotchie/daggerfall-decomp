@@ -4,37 +4,268 @@
 .486p
 .387
 include xn_157B00.inc
-public D_00157B20
-public D_00157B22
-public D_00157B2E
+public L_157B2B
+public func_00157B20
 XN_157B00 segment byte public use32 'CODE'
     assume cs:XN_157B00, ds:XN_157B00, es:XN_157B00, ss:XN_157B00
 D_00157B00:
-    B_157B00_32
-D_00157B20:
-    B_157B20_2
-D_00157B22:
-    B_157B22_12
-D_00157B2E:
-    B_157B2E_73
-    dd D_00157B99
-    B_157B7B_5
-    dd D_00157C58
-    B_157B84_21
-D_00157B99:
-    B_157B99_191
-D_00157C58:
-    B_157C58_24
-    dd D_00157B00
-    B_157C74_2
-    dd D_00157CA0
-    B_157C7A_4
-    dd D_00157B99
-    B_157C82_8
-    dd D_00157CA0
-    B_157C8E_18
-D_00157CA0:
-    B_157CA0_185
+    db 2 dup (0)
+func_00157B02:
+    pop ss
+    add byte ptr [esi], ch
+    add byte ptr [ebp], al
+    pop esp
+    db 00h, 073h, 00h   ; add byte ptr [ebx], dh
+    mov al, byte ptr [eax]
+    mov eax, dword ptr ds:[0CF00B800h]
+    db 00h, 0E6h   ; add dh, ah
+    db 00h, 0FDh   ; add ch, bh
+    add byte ptr [ecx + eax], dl
+    sub eax, dword ptr [ecx]
+    inc edx
+    add dword ptr [ecx + 1], ebx
+func_00157B20:
+    sub ebx, 02710h
+patch_157B22 equ func_00157B20+2   ; rewritten at run time
+    shr ecx, 0Dh
+    mov eax, ebx
+L_157B2B:
+    mov ecx, dword ptr [ecx*4 + 0186A0h]
+patch_157B2E equ L_157B2B+3   ; rewritten at run time
+    imul eax, dword ptr [esi + 024h]
+    add eax, dword ptr [esi + 02Ch]
+    sar eax, 1
+    imul eax, ecx
+    sub eax, dword ptr [esi + 018h]
+    imul ebx, dword ptr [esi + 030h]
+    sar eax, 0Fh
+    add ebx, dword ptr [esi + 038h]
+    imul ebx, ecx
+    sub ebx, dword ptr [esi + 01Ch]
+    mov bx, ax
+    mov eax, dword ptr [esi + 8]
+    imul eax, ecx
+    sar eax, 010h
+    imul ecx, dword ptr [esi + 0Ch]
+    mov cx, ax
+    sar eax, 3
+    mov edx, ecx
+    sar ecx, 3
+    mov cx, ax
+    and edx, 070007h
+    mov dword ptr [patch_157B99], ecx
+    mov eax, dword ptr [esi + 010h]
+    mov dword ptr [patch_157C58], edx
+    mov ecx, dword ptr [esi + 04Ch]
+    mov esi, dword ptr [esi + 040h]
+    cmp ebp, 8
+    jl near ptr L_157C6C
+    push ebp
+    shr ebp, 3
+L_157B97:
+    push ebp
+L_157B98:
+    mov ebp, 0186A0h
+patch_157B99 equ L_157B98+1   ; rewritten at run time
+    mov edx, ebx
+    shr edx, 010h
+    mov dl, bh
+    add ebx, ebp
+    mov al, byte ptr [esi + edx]
+    test al, al
+    je short L_157BB4
+    mov cl, byte ptr [eax]
+    mov cl, byte ptr [ecx]
+    mov byte ptr [edi + 1], cl
+L_157BB4:
+    mov edx, ebx
+    shr edx, 010h
+    mov dl, bh
+    add ebx, ebp
+    mov al, byte ptr [esi + edx]
+    test al, al
+    je short L_157BCB
+    mov cl, byte ptr [eax]
+    mov cl, byte ptr [ecx]
+    mov byte ptr [edi + 2], cl
+L_157BCB:
+    mov edx, ebx
+    shr edx, 010h
+    mov dl, bh
+    add ebx, ebp
+    mov al, byte ptr [esi + edx]
+    test al, al
+    je short L_157BE2
+    mov cl, byte ptr [eax]
+    mov cl, byte ptr [ecx]
+    mov byte ptr [edi + 3], cl
+L_157BE2:
+    mov edx, ebx
+    shr edx, 010h
+    mov dl, bh
+    add ebx, ebp
+    mov al, byte ptr [esi + edx]
+    test al, al
+    je short L_157BF9
+    mov cl, byte ptr [eax]
+    mov cl, byte ptr [ecx]
+    mov byte ptr [edi + 4], cl
+L_157BF9:
+    mov edx, ebx
+    shr edx, 010h
+    mov dl, bh
+    add ebx, ebp
+    mov al, byte ptr [esi + edx]
+    test al, al
+    je short L_157C10
+    mov cl, byte ptr [eax]
+    mov cl, byte ptr [ecx]
+    mov byte ptr [edi + 5], cl
+L_157C10:
+    mov edx, ebx
+    shr edx, 010h
+    mov dl, bh
+    add ebx, ebp
+    mov al, byte ptr [esi + edx]
+    test al, al
+    je short L_157C27
+    mov cl, byte ptr [eax]
+    mov cl, byte ptr [ecx]
+    mov byte ptr [edi + 6], cl
+L_157C27:
+    mov edx, ebx
+    shr edx, 010h
+    mov dl, bh
+    add ebx, ebp
+    mov al, byte ptr [esi + edx]
+    test al, al
+    je short L_157C3E
+    mov cl, byte ptr [eax]
+    mov cl, byte ptr [ecx]
+    mov byte ptr [edi + 7], cl
+L_157C3E:
+    mov edx, ebx
+    shr edx, 010h
+    mov dl, bh
+    add ebx, ebp
+    mov al, byte ptr [esi + edx]
+    test al, al
+    je short L_157C55
+    mov cl, byte ptr [eax]
+    mov cl, byte ptr [ecx]
+    mov byte ptr [edi + 8], cl
+L_157C55:
+    pop ebp
+L_157C56:
+    add ebx, 0186A0h
+patch_157C58 equ L_157C56+2   ; rewritten at run time
+    add edi, 8
+    dec ebp
+    jne near ptr L_157B97
+    pop ebp
+    and ebp, 7
+    je short L_157C8F
+L_157C6C:
+    mov bp, word ptr [ebp*2 + D_00157B00]
+    mov byte ptr [ebp + func_00157CA0], 0C3h
+    push ebp
+    mov ebp, dword ptr [patch_157B99]
+    call func_00157CA0
+    pop ebp
+    mov byte ptr [ebp + func_00157CA0], 08Bh
+L_157C8F:
+    ret
+    B_157C90_16
+func_00157CA0:
+    mov edx, ebx
+    shr edx, 010h
+    mov dl, bh
+    add ebx, ebp
+    mov al, byte ptr [esi + edx]
+    test al, al
+    je short L_157CB7
+    mov cl, byte ptr [eax]
+    mov cl, byte ptr [ecx]
+    mov byte ptr [edi + 1], cl
+L_157CB7:
+    mov edx, ebx
+    shr edx, 010h
+    mov dl, bh
+    add ebx, ebp
+    mov al, byte ptr [esi + edx]
+    test al, al
+    je short L_157CCE
+    mov cl, byte ptr [eax]
+    mov cl, byte ptr [ecx]
+    mov byte ptr [edi + 2], cl
+L_157CCE:
+    mov edx, ebx
+    shr edx, 010h
+    mov dl, bh
+    add ebx, ebp
+    mov al, byte ptr [esi + edx]
+    test al, al
+    je short L_157CE5
+    mov cl, byte ptr [eax]
+    mov cl, byte ptr [ecx]
+    mov byte ptr [edi + 3], cl
+L_157CE5:
+    mov edx, ebx
+    shr edx, 010h
+    mov dl, bh
+    add ebx, ebp
+    mov al, byte ptr [esi + edx]
+    test al, al
+    je short L_157CFC
+    mov cl, byte ptr [eax]
+    mov cl, byte ptr [ecx]
+    mov byte ptr [edi + 4], cl
+L_157CFC:
+    mov edx, ebx
+    shr edx, 010h
+    mov dl, bh
+    add ebx, ebp
+    mov al, byte ptr [esi + edx]
+    test al, al
+    je short L_157D13
+    mov cl, byte ptr [eax]
+    mov cl, byte ptr [ecx]
+    mov byte ptr [edi + 5], cl
+L_157D13:
+    mov edx, ebx
+    shr edx, 010h
+    mov dl, bh
+    add ebx, ebp
+    mov al, byte ptr [esi + edx]
+    test al, al
+    je short L_157D2A
+    mov cl, byte ptr [eax]
+    mov cl, byte ptr [ecx]
+    mov byte ptr [edi + 6], cl
+L_157D2A:
+    mov edx, ebx
+    shr edx, 010h
+    mov dl, bh
+    add ebx, ebp
+    mov al, byte ptr [esi + edx]
+    test al, al
+    je short L_157D41
+    mov cl, byte ptr [eax]
+    mov cl, byte ptr [ecx]
+    mov byte ptr [edi + 7], cl
+L_157D41:
+    mov edx, ebx
+    shr edx, 010h
+    mov dl, bh
+    add ebx, ebp
+    mov al, byte ptr [esi + edx]
+    test al, al
+    je short L_157D58
+    mov cl, byte ptr [eax]
+    mov cl, byte ptr [ecx]
+    mov byte ptr [edi + 8], cl
+L_157D58:
+    ret
     db 167 dup (0)
 XN_157B00 ends
 end

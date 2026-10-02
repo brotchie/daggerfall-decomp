@@ -30,231 +30,267 @@ extrn D_0012C778:byte
 extrn D_00147954:byte
 XN_12D400 segment byte public use32 'CODE'
     assume cs:XN_12D400, ds:XN_12D400, es:XN_12D400, ss:XN_12D400
-    B_12D400_19
-    dd D_0012B852
-    B_12D417_11
-    dd D_0012B500
-    B_12D426_52
-    dd D_0012B852
-    B_12D45E_4
-    dd D_0012B856
-    B_12D466_2
-    dd D_0012B852
-    B_12D46C_13
-    dd D_0012B856
-    B_12D47D_9
-    dd D_0012B852
-    B_12D48A_8
-    dd D_0012B500
-    B_12D496_3
-    dd D_0012B80C
-    B_12D49D_3
-    dd D_0012B80E
-    B_12D4A4_3
-    dd D_0012B810
-    B_12D4AB_15
-    dd D_0012B80C
-    B_12D4BE_13
-    dd D_0012B80E
-    B_12D4CF_13
-    dd D_0012B810
-    B_12D4E0_13
-    dd D_0012B852
-    B_12D4F1_4
-    dd D_0012B856
-    B_12D4F9_2
-    dd D_0012B852
-    B_12D4FF_13
-    dd D_0012B856
-    B_12D510_7
-    dd D_0012B80C
-    B_12D51B_3
-    dd D_0012B80E
-    B_12D522_3
-    dd D_0012B810
-    B_12D529_9
-    dd D_0012B85A
-    B_12D536_3
-    dd D_0012B85C
-    B_12D53D_3
-    dd D_0012B85E
-    B_12D544_21
-    dd D_0012B86E
-    B_12D55D_2
-    dd D_0012B810
-    B_12D563_21
-    dd D_0012B870
-    B_12D57C_3
-    dd D_0012B80E
-    B_12D583_5
-    dd D_0012B86E
-    B_12D58C_5
-    dd D_0012B86E
-    B_12D595_3
-    dd D_0012B870
-    B_12D59C_9
-    dd D_0012B86E
-    B_12D5A9_12
-    dd D_0012B80E
-    B_12D5B9_3
-    dd D_0012B80C
-    B_12D5C0_5
-    dd D_0012B80E
-    B_12D5C9_9
-    dd D_0012B86E
-    B_12D5D6_3
-    dd D_0012B870
-    B_12D5DD_2
-    dd D_0012B872
-    B_12D5E3_2
-    dd D_0012B85A
-    B_12D5E9_3
-    dd D_0012B86E
-    B_12D5F0_4
-    dd D_0012B85C
-    B_12D5F8_3
-    dd D_0012B85E
-    B_12D5FF_9
-    dd D_0012B872
-    B_12D60C_2
-    dd D_0012B80C
-    B_12D612_4
-    dd D_0012B85C
-    B_12D61A_3
-    dd D_0012B86E
-    B_12D621_4
-    dd D_0012B85E
-    B_12D629_3
-    dd D_0012B85A
-    B_12D630_9
-    dd D_0012B872
-    B_12D63D_6
-    dd D_0012B80C
-    B_12D647_4
-    dd D_0012B85A
-    B_12D64F_3
-    dd D_0012B85C
-    B_12D656_9
-    dd D_0012B872
-    B_12D663_6
-    dd D_0012B80C
-    B_12D66D_3
-    dd D_0012B80C
-    B_12D674_6
-    dd D_0012B80C
-    B_12D67E_5
-    dd D_0012B80C
-    B_12D687_3
-    dd D_0012B80E
-    B_12D68E_3
-    dd D_0012B810
-    B_12D695_3
-    dd D_0012B810
-    B_12D69C_3
-    dd D_0012B80E
-    B_12D6A3_3
-    dd D_0012B80C
-    B_12D6AA_4
-    dd D_0012B80C
-    B_12D6B2_3
-    dd D_0012B80E
-    B_12D6B9_3
-    dd D_0012B810
-    B_12D6C0_3
-    dd D_0012B80C
-    B_12D6C7_3
-    dd D_0012B80E
-    B_12D6CE_3
-    dd D_0012B810
-    B_12D6D5_3
-    dd D_0012B80E
-    B_12D6DC_6
-    dd D_0012B810
-    B_12D6E6_3
-    dd D_0012B810
-    B_12D6ED_3
-    dd D_0012B810
-    B_12D6F4_3
-    dd D_0012B80C
-    B_12D6FB_6
-    dd D_0012B866
-    B_12D705_3
-    dd D_0012B80C
-    B_12D70C_8
-    dd D_0012B80E
-    B_12D718_4
-    dd D_0012B810
-    B_12D720_6
-    dd D_0012B868
-    B_12D72A_3
-    dd D_0012B80E
-    B_12D731_4
-    dd D_0012B866
-    B_12D739_15
-    dd D_0012B810
-    B_12D74C_6
-    dd D_0012B86A
-    B_12D756_7
-    dd D_0012B866
-    B_12D761_4
-    dd D_0012B80E
-    B_12D769_15
-    dd D_0012B810
-    B_12D77C_6
-    dd D_0012B86C
-    B_12D786_3
-    dd D_0012B80C
-    B_12D78D_6
-    dd D_0012B810
-    B_12D797_3
-    dd D_0012B86C
-    B_12D79E_3
-    dd D_0012B868
-    B_12D7A5_4
-    dd D_0012B80C
-    B_12D7AD_6
-    dd D_0012B86A
-    B_12D7B7_3
-    dd D_0012B810
-    B_12D7BE_3
-    dd D_0012B868
-    B_12D7C5_4
-    dd D_0012B80C
-    B_12D7CD_6
-    dd D_0012B868
-    B_12D7D7_3
-    dd D_0012B810
-    B_12D7DE_3
-    dd D_0012B86C
-    B_12D7E5_4
-    dd D_0012B80C
-    B_12D7ED_6
-    dd D_0012B868
-    B_12D7F7_3
-    dd D_0012B86A
-    B_12D7FE_3
-    dd D_0012B810
-    B_12D805_4
-    dd D_0012B80C
-    B_12D80D_6
-    dd D_0012B86C
-    B_12D817_3
-    dd D_0012B868
-    B_12D81E_3
-    dd D_0012B810
-    B_12D825_4
-    dd D_0012B810
-    B_12D82D_3
-    dd D_0012B868
-    B_12D834_3
-    dd D_0012B86A
-    B_12D83B_3
-    dd D_0012B810
-    B_12D842_3
-    dd D_0012B80E
-    B_12D849_3
-    dd D_0012B80C
-    B_12D850_1
+    B_12D400_14
+func_0012D40E:
+    push ebp
+    push esi
+    push edi
+    mov dword ptr [D_0012B852], 07FFFFFFFh
+    mov edi, 1
+    mov esi, dword ptr [D_0012B500]
+    add esi, 3
+L_12D429:
+    mov al, bl
+    sub al, byte ptr [esi]
+    movsx eax, al
+    imul eax, eax
+    imul eax, eax, 03Dh
+    mov ebp, eax
+    mov al, cl
+    sub al, byte ptr [esi + 1]
+    movsx eax, al
+    imul eax, eax
+    imul eax, eax, 047h
+    add ebp, eax
+    mov al, dl
+    sub al, byte ptr [esi + 2]
+    movsx eax, al
+    imul eax, eax
+    imul eax, eax, 029h
+    add ebp, eax
+    cmp dword ptr [D_0012B852], ebp
+    jle short L_12D46C
+    mov dword ptr [D_0012B856], edi
+    mov dword ptr [D_0012B852], ebp
+L_12D46C:
+    add esi, 3
+    inc edi
+    cmp edi, 0100h
+    jne short L_12D429
+    mov eax, dword ptr [D_0012B856]
+    pop edi
+    pop esi
+    pop ebp
+    ret
+func_0012D481:
+    push ebp
+    push esi
+    push edi
+    mov dword ptr [D_0012B852], 07FFFFFFFh
+    xor edi, edi
+    mov esi, dword ptr [D_0012B500]
+    mov word ptr [D_0012B80C], bx
+    mov word ptr [D_0012B80E], cx
+    mov word ptr [D_0012B810], dx
+L_12D4AB:
+    mov bl, byte ptr [esi]
+    mov cl, byte ptr [esi + 1]
+    mov dl, byte ptr [esi + 2]
+    call func_0012D514
+    mov ax, word ptr [D_0012B80C]
+    sub ax, bx
+    movsx eax, al
+    imul eax, eax
+    mov ebp, eax
+    mov ax, word ptr [D_0012B80E]
+    sub ax, cx
+    movsx eax, al
+    imul eax, eax
+    add ebp, eax
+    mov ax, word ptr [D_0012B810]
+    sub ax, dx
+    movsx eax, al
+    imul eax, eax
+    add ebp, eax
+    cmp dword ptr [D_0012B852], ebp
+    jle short L_12D4FF
+    mov dword ptr [D_0012B856], edi
+    mov dword ptr [D_0012B852], ebp
+L_12D4FF:
+    add esi, 3
+    inc edi
+    cmp edi, 0100h
+    jne short L_12D4AB
+    mov eax, dword ptr [D_0012B856]
+    pop edi
+    pop esi
+    pop ebp
+    ret
+func_0012D514:
+    push word ptr [D_0012B80C]
+    push word ptr [D_0012B80E]
+    push word ptr [D_0012B810]
+    xor bh, bh
+    xor ch, ch
+    xor dh, dh
+    mov word ptr [D_0012B85A], bx
+    mov word ptr [D_0012B85C], cx
+    mov word ptr [D_0012B85E], dx
+    mov ax, bx
+    cmp ax, cx
+    jge short L_12D54F
+    mov ax, cx
+L_12D54F:
+    cmp ax, dx
+    jge short L_12D557
+    mov ax, dx
+L_12D557:
+    mov word ptr [D_0012B86E], ax
+    mov word ptr [D_0012B810], ax
+    mov ax, bx
+    cmp ax, cx
+    jle short L_12D56E
+    mov ax, cx
+L_12D56E:
+    cmp ax, dx
+    jle short L_12D576
+    mov ax, dx
+L_12D576:
+    mov word ptr [D_0012B870], ax
+    mov word ptr [D_0012B80E], 0
+    cmp word ptr [D_0012B86E], 0
+    je short L_12D5B9
+    mov ax, word ptr [D_0012B86E]
+    sub ax, word ptr [D_0012B870]
+    shl ax, 6
+    cwd
+    idiv word ptr [D_0012B86E]
+    db 066h, 03Dh, 03Fh, 00h   ; cmp ax, 0x3f
+    jle short L_12D5B3
+    mov ax, 03Fh
+L_12D5B3:
+    mov word ptr [D_0012B80E], ax
+L_12D5B9:
+    mov word ptr [D_0012B80C], 0
+    cmp word ptr [D_0012B80E], 0
+    je near ptr L_12D680
+    mov ax, word ptr [D_0012B86E]
+    sub ax, word ptr [D_0012B870]
+    mov word ptr [D_0012B872], ax
+    mov ax, word ptr [D_0012B85A]
+    cmp ax, word ptr [D_0012B86E]
+    jne short L_12D614
+    mov ax, word ptr [D_0012B85C]
+    sub ax, word ptr [D_0012B85E]
+    shl ax, 6
+    cwd
+    idiv word ptr [D_0012B872]
+    mov word ptr [D_0012B80C], ax
+    jmp short L_12D66D
+L_12D614:
+    mov ax, word ptr [D_0012B85C]
+    cmp ax, word ptr [D_0012B86E]
+    jne short L_12D649
+    mov ax, word ptr [D_0012B85E]
+    sub ax, word ptr [D_0012B85A]
+    shl ax, 6
+    cwd
+    idiv word ptr [D_0012B872]
+    add ax, 080h
+    mov word ptr [D_0012B80C], ax
+    jmp short L_12D66D
+L_12D649:
+    mov ax, word ptr [D_0012B85A]
+    sub ax, word ptr [D_0012B85C]
+    shl ax, 6
+    cwd
+    idiv word ptr [D_0012B872]
+    add ax, 0100h
+    mov word ptr [D_0012B80C], ax
+L_12D66D:
+    cmp word ptr [D_0012B80C], 0
+    jns short L_12D680
+    add word ptr [D_0012B80C], 0180h
+L_12D680:
+    mov bx, word ptr [D_0012B80C]
+    mov cx, word ptr [D_0012B80E]
+    mov dx, word ptr [D_0012B810]
+    pop word ptr [D_0012B810]
+    pop word ptr [D_0012B80E]
+    pop word ptr [D_0012B80C]
+    ret
+func_0012D6AB:
+    push word ptr [D_0012B80C]
+    push word ptr [D_0012B80E]
+    push word ptr [D_0012B810]
+    mov word ptr [D_0012B80C], bx
+    mov word ptr [D_0012B80E], cx
+    mov word ptr [D_0012B810], dx
+    cmp word ptr [D_0012B80E], 0
+    jne short L_12D6F5
+    mov bx, word ptr [D_0012B810]
+    mov cx, word ptr [D_0012B810]
+    mov dx, word ptr [D_0012B810]
+    ret
+L_12D6F5:
+    mov ax, word ptr [D_0012B80C]
+    db 066h, 025h, 03Fh, 00h   ; and ax, 0x3f
+    mov word ptr [D_0012B866], ax
+    shr word ptr [D_0012B80C], 6
+    mov ax, 03Fh
+    sub ax, word ptr [D_0012B80E]
+    imul ax, word ptr [D_0012B810]
+    shr ax, 6
+    mov word ptr [D_0012B868], ax
+    mov bx, word ptr [D_0012B80E]
+    imul bx, word ptr [D_0012B866]
+    shr bx, 6
+    mov ax, 03Fh
+    sub ax, bx
+    imul ax, word ptr [D_0012B810]
+    shr ax, 6
+    mov word ptr [D_0012B86A], ax
+    mov bx, 03Fh
+    sub bx, word ptr [D_0012B866]
+    imul bx, word ptr [D_0012B80E]
+    shr bx, 6
+    mov ax, 03Fh
+    sub ax, bx
+    imul ax, word ptr [D_0012B810]
+    shr ax, 6
+    mov word ptr [D_0012B86C], ax
+    cmp word ptr [D_0012B80C], 0
+    jne short L_12D7A6
+    mov bx, word ptr [D_0012B810]
+    mov cx, word ptr [D_0012B86C]
+    mov dx, word ptr [D_0012B868]
+    ret
+L_12D7A6:
+    cmp word ptr [D_0012B80C], 1
+    jne short L_12D7C6
+    mov bx, word ptr [D_0012B86A]
+    mov cx, word ptr [D_0012B810]
+    mov dx, word ptr [D_0012B868]
+    ret
+L_12D7C6:
+    cmp word ptr [D_0012B80C], 2
+    jne short L_12D7E6
+    mov bx, word ptr [D_0012B868]
+    mov cx, word ptr [D_0012B810]
+    mov dx, word ptr [D_0012B86C]
+    ret
+L_12D7E6:
+    cmp word ptr [D_0012B80C], 3
+    jne short L_12D806
+    mov bx, word ptr [D_0012B868]
+    mov cx, word ptr [D_0012B86A]
+    mov dx, word ptr [D_0012B810]
+    ret
+L_12D806:
+    cmp word ptr [D_0012B80C], 4
+    jne short L_12D826
+    mov bx, word ptr [D_0012B86C]
+    mov cx, word ptr [D_0012B868]
+    mov dx, word ptr [D_0012B810]
+    ret
+L_12D826:
+    mov bx, word ptr [D_0012B810]
+    mov cx, word ptr [D_0012B868]
+    mov dx, word ptr [D_0012B86A]
+    pop word ptr [D_0012B810]
+    pop word ptr [D_0012B80E]
+    pop word ptr [D_0012B80C]
+    ret
 func_0012D851:
     push ebx
     push ecx
@@ -309,9 +345,17 @@ L_12D88E:
     pop edx
     pop ebx
     ret
-    B_12D8AB_7
-    dd D_0012B878
-    B_12D8B6_7
+func_0012D8AB:
+    pushad
+    popad
+    ret
+func_0012D8AE:
+    push edx
+    mov edx, eax
+    mov eax, offset D_0012B878
+    call func_0012D8BD
+    pop edx
+    ret
 func_0012D8BD:
     test edx, edx
     je near ptr L_12D94D
@@ -395,19 +439,27 @@ func_0012D94E:
     pop edx
     pop eax
     ret
-    B_12D970_3
-    dd D_0012B500
-    B_12D977_1
-    dd D_00147954
-    B_12D97C_1
-    dd D_0012B500
-    B_12D981_6
-    dd D_0012B822
-    B_12D98B_1
-    dd D_0012B812
-    B_12D990_27
-    dd D_0012B500
-    B_12D9AF_2
+func_0012D970:
+    pushad
+    push dword ptr [D_0012B500]
+    mov eax, dword ptr [D_00147954]
+    mov dword ptr [D_0012B500], eax
+    call func_0012D887
+    mov esi, offset D_0012B822
+    mov edi, offset D_0012B812
+    mov ebp, 010h
+L_12D995:
+    mov bl, byte ptr [esi]
+    mov cl, byte ptr [esi + 1]
+    mov dl, byte ptr [esi + 2]
+    call func_0012D40E
+    stosb
+    add esi, 3
+    dec ebp
+    jne short L_12D995
+    pop dword ptr [D_0012B500]
+    popad
+    ret
     db 79 dup (0)
 XN_12D400 ends
 end

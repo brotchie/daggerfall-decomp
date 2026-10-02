@@ -35,6 +35,7 @@ extrn D_00136E8C:byte
 extrn D_00150200:byte
 extrn D_00150A00:byte
 extrn D_0015DC00:byte
+extrn func_0015D288:near
 XN_137000 segment byte public use32 'CODE'
     assume cs:XN_137000, ds:XN_137000, es:XN_137000, ss:XN_137000
 func_00137000:
@@ -148,9 +149,21 @@ D_0013719F:
 D_001371A3:
     db 4 dup (0)
 D_001371A7:
-    B_1371A7_41
-    dd D_0015DC00
-    B_1371D4_1
+    db 4 dup (0)
+func_001371AB:
+    add eax, 040000h
+    sar eax, 013h
+    cmp eax, 0FFFFFE00h
+    jge short L_1371C1
+    mov eax, 0FFFFFE00h
+    jmp short L_1371CD
+L_1371C1:
+    cmp eax, 01FFh
+    jle short L_1371CD
+    mov eax, 01FFh
+L_1371CD:
+    mov eax, dword ptr [eax*4 + D_0015DC00]
+    ret
 func_001371D5:
     push edx
     push ebx
@@ -245,9 +258,22 @@ L_1372B9:
     pop ebx
     pop edx
     ret
-    B_1372BF_37
-    dd D_0015DC00
-    B_1372E8_11
+func_001372BF:
+    add eax, 040000h
+    sar eax, 013h
+    cmp eax, 0FFFFFE00h
+    jge short L_1372D5
+    mov eax, 0FFFFFE00h
+    jmp short L_1372E1
+L_1372D5:
+    cmp eax, 01FFh
+    jle short L_1372E1
+    mov eax, 01FFh
+L_1372E1:
+    mov eax, dword ptr [eax*4 + D_0015DC00]
+    add eax, 0600h
+    and eax, 07FFh
+    ret
 func_001372F3:
     push edx
     push ebx
@@ -343,15 +369,72 @@ L_1373DC:
     pop ebx
     pop edx
     ret
-    B_1373E2_49
-    dd D_000CEA78
-    B_137417_7
-    dd D_000CEA80
-    B_137422_16
-    dd D_000CEA78
-    B_137436_36
-    dd D_000CEA80
-    B_13745E_40
+func_001373E2:
+    push eax
+    push edx
+    push ebx
+    mov edx, 01Ch
+    mov ebx, 3
+    call func_0015D288
+    pop ebx
+    pop edx
+    pop eax
+    ret
+func_001373F8:
+    call func_001373FE
+    ret
+func_001373FE:
+    push edx
+    push ebx
+    push eax
+    mov edx, 01Ch
+    mov ebx, 3
+    call func_0015D288
+    pop eax
+    mov edx, dword ptr [D_000CEA78]
+    shl edx, 0Eh
+    mov dword ptr [eax], edx
+    mov edx, dword ptr [D_000CEA80]
+    shl edx, 0Eh
+    mov dword ptr [eax + 010h], eax
+    pop ebx
+    pop edx
+    ret
+func_0013742B:
+    push edx
+    push ebx
+    push esi
+    mov esi, eax
+    mov ebx, dword ptr [D_000CEA78]
+    mov eax, dword ptr [esi]
+    imul ebx
+    shld edx, eax, 012h
+    mov dword ptr [esi], edx
+    mov eax, dword ptr [esi + 4]
+    imul ebx
+    shld edx, eax, 012h
+    mov dword ptr [esi + 4], edx
+    mov eax, dword ptr [esi + 8]
+    imul ebx
+    shld edx, eax, 012h
+    mov dword ptr [esi + 8], edx
+    mov ebx, dword ptr [D_000CEA80]
+    mov eax, dword ptr [esi + 0Ch]
+    imul ebx
+    shld edx, eax, 012h
+    mov dword ptr [esi + 0Ch], edx
+    mov eax, dword ptr [esi + 010h]
+    imul ebx
+    shld edx, eax, 012h
+    mov dword ptr [esi + 010h], edx
+    mov eax, dword ptr [esi + 020h]
+    imul ebx
+    shld edx, eax, 012h
+    mov dword ptr [esi + 020h], edx
+    pop esi
+    pop ebx
+    pop edx
+    ret
 func_00137486:
     push eax
     push edx
@@ -470,7 +553,21 @@ func_00137514:
     pop esi
     pop ebp
     ret
-    B_137572_24
+func_00137572:
+    push eax
+    push edx
+    push ebx
+    mov eax, dword ptr [eax]
+    mov edx, dword ptr [edx]
+    mov ebx, dword ptr [ebx]
+    call func_0013749E
+    pop ecx
+    mov dword ptr [ecx], ebx
+    pop ecx
+    mov dword ptr [ecx], edx
+    pop ecx
+    mov dword ptr [ecx], eax
+    ret
 func_0013758A:
     push ebp
     push esi
@@ -520,7 +617,50 @@ func_0013758A:
     pop esi
     pop ebp
     ret
-    B_1375F9_94
+func_001375F9:
+    push esi
+    push edi
+    push ebp
+    add eax, eax
+    add edx, edx
+    shl ebx, 4
+    lea esi, [eax*8]
+    lea edi, [edx*8]
+    mov eax, esi
+    imul dword ptr [ecx]
+    mov ebp, edx
+    mov eax, edi
+    imul dword ptr [ecx + 0Ch]
+    add ebp, edx
+    mov eax, ebx
+    imul dword ptr [ecx + 018h]
+    add ebp, edx
+    push ebp
+    mov eax, esi
+    imul dword ptr [ecx + 4]
+    mov ebp, edx
+    mov eax, edi
+    imul dword ptr [ecx + 010h]
+    add ebp, edx
+    mov eax, ebx
+    imul dword ptr [ecx + 01Ch]
+    add ebp, edx
+    push ebp
+    mov eax, ebx
+    imul dword ptr [ecx + 020h]
+    mov ebx, edx
+    mov eax, esi
+    imul dword ptr [ecx + 8]
+    add ebx, edx
+    mov eax, edi
+    imul dword ptr [ecx + 014h]
+    add ebx, edx
+    pop edx
+    pop eax
+    pop ebp
+    pop edi
+    pop esi
+    ret
 func_00137657:
     mov dword ptr [D_00136E84], eax
     mov dword ptr [D_00136E88], edx
@@ -573,11 +713,22 @@ func_001376E1:
     mov edx, ecx
     pop ecx
     ret
-    B_1376FB_7
-    dd D_000CEA2C
-    B_137706_13
-    dd D_000CEA28
-    B_137717_14
+func_001376FB:
+    push ecx
+    mov ecx, eax
+    mov eax, edx
+    imul dword ptr [D_000CEA2C]
+    add eax, 080h
+    adc edx, 0
+    idiv ebx
+    xchg ecx, eax
+    imul dword ptr [D_000CEA28]
+    add eax, 080h
+    adc edx, 0
+    idiv ebx
+    mov edx, ecx
+    pop ecx
+    ret
 func_00137725:
     pushad
     mov esi, eax
@@ -616,11 +767,54 @@ func_00137725:
     mov dword ptr [edi + 020h], eax
     popad
     ret
-    B_137790_7
-    dd D_000CEA78
-    B_13779B_48
-    dd D_000CEA80
-    B_1377CF_53
+func_00137790:
+    push edx
+    push ebx
+    push esi
+    mov esi, eax
+    mov ebx, dword ptr [D_000CEA78]
+    mov eax, dword ptr [esi]
+    cdq
+    shld edx, eax, 0Eh
+    shl eax, 0Eh
+    idiv ebx
+    mov dword ptr [esi], eax
+    mov eax, dword ptr [esi + 4]
+    cdq
+    shld edx, eax, 0Eh
+    shl eax, 0Eh
+    idiv ebx
+    mov dword ptr [esi + 4], eax
+    mov eax, dword ptr [esi + 8]
+    cdq
+    shld edx, eax, 0Eh
+    shl eax, 0Eh
+    idiv ebx
+    mov dword ptr [esi + 8], eax
+    mov ebx, dword ptr [D_000CEA80]
+    mov eax, dword ptr [esi + 0Ch]
+    cdq
+    shld edx, eax, 0Eh
+    shl eax, 0Eh
+    idiv ebx
+    mov dword ptr [esi + 0Ch], eax
+    mov eax, dword ptr [esi + 010h]
+    cdq
+    shld edx, eax, 0Eh
+    shl eax, 0Eh
+    idiv ebx
+    mov dword ptr [esi + 010h], eax
+    mov eax, dword ptr [esi + 014h]
+    cdq
+    shld edx, eax, 0Eh
+    shl eax, 0Eh
+    idiv ebx
+    mov dword ptr [esi + 014h], eax
+    pop esi
+    pop ebx
+    pop edx
+    ret
+    B_137803_1
 func_00137804:
     push ecx
     push ebp

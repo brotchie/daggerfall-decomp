@@ -4,87 +4,304 @@
 .486p
 .387
 include xn_161000.inc
-public D_00161000
-public D_00161084
-public D_00161094
-public D_001610B4
-public D_001610C4
-public D_0016116C
+public func_00161000
+public func_00161084
+public func_00161094
+public func_001610B4
+public func_001610C4
+public func_0016116C
 extrn D_00153400:byte
 extrn D_0016004C:byte
 extrn D_00160050:byte
 extrn D_00160860:byte
 extrn D_0016086C:byte
-extrn D_00160F00:byte
-extrn D_00160F04:byte
-extrn D_00160F08:byte
-extrn D_00160F11:byte
-extrn D_00160F13:byte
 extrn D_00160F18:byte
+extrn L_160F07:near
+extrn L_160F12:near
+extrn func_0015392C:near
+extrn func_00160900:near
+extrn func_001609C0:near
+extrn func_00160A18:near
+extrn func_00160A3C:near
+extrn func_00160A54:near
+extrn func_00160A9C:near
+extrn func_00160F00:near
+extrn func_00160F04:near
+extrn func_00160F11:near
 XN_161000 segment byte public use32 'CODE'
     assume cs:XN_161000, ds:XN_161000, es:XN_161000, ss:XN_161000
-D_00161000:
-    B_161000_2
-    dd D_00153400
-    B_161006_28
-    dd D_00160F08
-    B_161026_18
-    dd D_00160F18
-    B_16103C_25
-    dd D_00160F18
-    B_161059_6
-    dd D_00153400
-    B_161063_16
-    dd D_00153400
-    B_161077_13
-D_00161084:
-    B_161084_2
-    dd D_00160F00
-    B_16108A_10
-D_00161094:
-    B_161094_7
-    dd D_00160F00
-    B_16109F_21
-D_001610B4:
-    B_1610B4_2
-    dd D_00160F13
-    B_1610BA_10
-D_001610C4:
-    B_1610C4_2
-    dd D_00160F11
-    B_1610CA_12
-    dd D_00153400
-    B_1610DA_6
-    dd D_00160F04
-    B_1610E4_14
-    dd D_00153400
-    B_1610F6_3
-    dd D_0016086C
-    B_1610FD_28
-    dd D_00153400
-    B_16111D_6
-    dd D_0016004C+3
-    B_161127_69
-D_0016116C:
-    B_16116C_5
-    dd D_00153400
-    B_161175_4
-    dd D_00160860
-    B_16117D_5
-    dd D_00160050
-    B_161186_92
-    dd D_00160F18
-    B_1611E6_67
-    dd D_00153400
-    B_16122D_19
-    dd D_00153400
-    B_161244_20
-    dd D_00153400
-    B_16125C_26
-    dd D_00153400
-    B_16127A_3
-    dd D_0016086C
-    B_161281_18
+func_00161000:
+    pushad
+    mov dword ptr [D_00153400], eax
+    mov edx, 3
+    mov ebx, 6
+    call func_00160900
+    call func_00161094
+    jb short L_161072
+    mov ecx, 010h
+L_161021:
+    mov eax, offset L_160F07+1
+    call func_00161224
+    call func_00161250
+    jae short L_161036
+    loop L_161021
+    jmp short L_161072
+L_161036:
+    mov dword ptr [D_00160F18], 1
+    call func_001610D4
+    jb short L_161072
+    call func_00161114
+    cmp eax, 03EBh
+    jb short L_161059
+    neg dword ptr [D_00160F18]
+L_161059:
+    call func_001610B4
+    mov eax, dword ptr [D_00153400]
+    call func_00160A18
+    call func_001610C4
+    popad
+    xor eax, eax
+    clc
+    ret
+L_161072:
+    mov eax, dword ptr [D_00153400]
+    call func_001609C0
+    popad
+    mov eax, 1
+    stc
+    ret
+func_00161084:
+    pushad
+    mov eax, offset func_00160F00
+    call func_00161224
+    popad
+    ret
+    B_161091_3
+func_00161094:
+    pushad
+    mov ecx, 8
+L_16109A:
+    mov eax, offset func_00160F00
+    call func_00161224
+    call func_00161250
+    jae short L_1610B0
+    loop L_16109A
+    popad
+    stc
+    ret
+L_1610B0:
+    popad
+    clc
+    ret
+    B_1610B3_1
+func_001610B4:
+    pushad
+    mov eax, offset L_160F12+1
+    call func_00161224
+    popad
+    ret
+    B_1610C1_3
+func_001610C4:
+    pushad
+    mov eax, offset func_00160F11
+    call func_00161224
+    popad
+    ret
+    B_1610D1_3
+func_001610D4:
+    pushad
+    mov eax, dword ptr [D_00153400]
+    call func_00160A18
+    mov eax, offset func_00160F04
+    call func_00161224
+    mov ebx, 046Ch
+    mov eax, dword ptr [ebx]
+L_1610F0:
+    mov edx, dword ptr [D_00153400]
+    cmp dword ptr [edx*4 + D_0016086C], 03Ch
+    je short L_16110C
+    mov edx, dword ptr [ebx]
+    sub edx, eax
+    cmp edx, 012h
+    jbe short L_1610F0
+    popad
+    stc
+    ret
+L_16110C:
+    popad
+    clc
+    ret
+    B_16110F_1
+func_00161110:
+    ret
+    B_161111_3
+func_00161114:
+    push ebx
+    push ecx
+    push edx
+    mov ebx, dword ptr [D_00153400]
+    dec ebx
+    shl ebx, 9
+    add ebx, offset D_0016004C+3
+    lea ecx, [ebx + 0200h]
+L_16112D:
+    inc ebx
+    cmp ebx, ecx
+    je short L_161162
+    mov al, byte ptr [ebx]
+    cmp al, 04Dh
+    jne short L_16112D
+L_161138:
+    inc ebx
+    cmp ebx, ecx
+    je short L_161162
+    mov al, byte ptr [ebx]
+    cmp al, 046h
+    jne short L_161138
+    lea eax, [ebx + 1]
+    call func_0015392C
+    push eax
+    lea eax, [ebx + 5]
+    call func_0015392C
+    pop edx
+    imul edx, edx, 03E8h
+    add eax, edx
+    pop edx
+    pop ecx
+    pop ebx
+    clc
+    ret
+L_161162:
+    pop edx
+    pop ecx
+    pop ebx
+    xor eax, eax
+    stc
+    ret
+    B_161169_3
+func_0016116C:
+    push ecx
+    push ebp
+    push esi
+    mov ebp, dword ptr [D_00153400]
+    dec ebp
+    mov esi, dword ptr [ebp*4 + D_00160860]
+    shl ebp, 9
+    add ebp, offset D_00160050
+    sub esi, 8
+    and esi, 01FFh
+    mov ecx, 080h
+    mov al, 0FFh
+L_161196:
+    cmp byte ptr [esi + ebp], al
+    je short L_1611A6
+    dec esi
+    and esi, 01FFh
+    loop L_161196
+    jmp short L_16121D
+L_1611A6:
+    push esi
+    inc esi
+    and esi, 01FFh
+    mov edx, 6
+L_1611B3:
+    add al, byte ptr [ebp + esi]
+    inc esi
+    and esi, 01FFh
+    dec edx
+    jne short L_1611B3
+    cmp al, byte ptr [ebp + esi]
+    pop esi
+    jne short L_161196
+    inc esi
+    and esi, 01FFh
+    mov dh, byte ptr [esi + ebp]
+    inc esi
+    and esi, 01FFh
+    mov dl, byte ptr [esi + ebp]
+    movsx edx, dx
+    imul edx, dword ptr [D_00160F18]
+    inc esi
+    and esi, 01FFh
+    mov ah, byte ptr [esi + ebp]
+    inc esi
+    and esi, 01FFh
+    mov al, byte ptr [esi + ebp]
+    movsx eax, ax
+    neg eax
+    inc esi
+    and esi, 01FFh
+    mov bh, byte ptr [esi + ebp]
+    inc esi
+    and esi, 01FFh
+    mov bl, byte ptr [esi + ebp]
+    movsx ebx, bx
+    neg ebx
+    pop esi
+    pop ebp
+    pop ecx
+    clc
+    ret
+L_16121D:
+    pop esi
+    pop ebp
+    pop ecx
+    stc
+    ret
+    B_161222_2
+func_00161224:
+    push edx
+    push esi
+    mov esi, eax
+L_161228:
+    mov eax, dword ptr [D_00153400]
+    call func_00160A3C
+    test al, 040h
+    je short L_161228
+    movzx edx, byte ptr [esi]
+    cmp dl, 0FFh
+    je short L_16124B
+    inc esi
+    mov eax, dword ptr [D_00153400]
+    call func_00160A54
+    jmp short L_161228
+L_16124B:
+    pop esi
+    pop edx
+    ret
+    B_16124E_2
+func_00161250:
+    call func_0016126C
+    jb short L_161267
+    mov eax, dword ptr [D_00153400]
+    call func_00160A9C
+    cmp al, 04Fh
+    jne short L_161267
+    clc
+    ret
+L_161267:
+    stc
+    ret
+    B_161269_3
+func_0016126C:
+    pushad
+    mov ebx, 046Ch
+    mov eax, dword ptr [ebx]
+L_161274:
+    mov edx, dword ptr [D_00153400]
+    cmp dword ptr [edx*4 + D_0016086C], 0
+    jne short L_161290
+    mov edx, dword ptr [ebx]
+    sub edx, eax
+    cmp edx, 9
+    jbe short L_161274
+    popad
+    stc
+    ret
+L_161290:
+    popad
+    clc
+    ret
     db 109 dup (0)
 XN_161000 ends
 end

@@ -4,13 +4,13 @@
 .486p
 .387
 include xn_143600.inc
-public D_00143924
-public D_0014396C
-public D_00143B80
-public D_00144BFC
-public D_00144C0D
 public func_00143700
+public func_00143924
 public func_0014395C
+public func_0014396C
+public func_00143B80
+public func_00144BFC
+public func_00144C0D
 extrn D_0012B500:byte
 extrn D_0012B504:byte
 extrn D_0014291B:byte
@@ -47,6 +47,8 @@ extrn func_0012D887:near
 extrn func_0015FC00:near
 extrn func_0015FC93:near
 extrn func_0015FCA7:near
+extrn func_0015FDF4:near
+extrn func_0015FEAE:near
 XN_143600 segment byte public use32 'CODE'
     assume cs:XN_143600, ds:XN_143600, es:XN_143600, ss:XN_143600
 func_00143600:
@@ -281,20 +283,20 @@ func_00143914:
     popad
     ret
     B_143923_1
-D_00143924:
-    B_143924_8
-    dd D_00149980
-    B_143930_2
-    dd D_00142944
-    B_143936_3
-    dd D_00142950
-    B_14393D_4
-    dd D_00143550
-    B_143945_2
-    dd D_0014294C
-    B_14394B_3
-    dd D_00142950
-    B_143952_10
+func_00143924:
+    and eax, 0FFh
+    mov eax, dword ptr [eax*4 + D_00149980]
+    mov edx, dword ptr [D_00142944]
+    mov edx, dword ptr [edx*4 + D_00142950]
+    mov edi, edx
+    add edi, dword ptr [D_00143550]
+    mov ecx, dword ptr [D_0014294C]
+    mov ecx, dword ptr [ecx*4 + D_00142950]
+    sub ecx, edx
+    shr ecx, 2
+    rep stosd
+    ret
+    B_14395A_2
 func_0014395C:
     pushad
     mov ebx, dword ptr [D_00142923]
@@ -302,52 +304,74 @@ func_0014395C:
     popad
     ret
     B_14396B_1
-D_0014396C:
-    B_14396C_2
-    dd D_0014355C
-    B_143972_5
-    dd D_0014355C
-    B_14397B_5
-    dd D_0014291B
-    B_143984_8
-    dd D_00142944
-    B_143990_8
-    dd D_00142950
-    B_14399C_3
-    dd D_00142950
-    B_1439A3_2
-    dd D_00143550
-    B_1439A9_2
-    dd D_0014294C
-    B_1439AF_5
-    dd D_00142950
-    B_1439B8_12
+func_0014396C:
+    cmp byte ptr [D_0014355C], 0
+    jle short L_1439CE
+    cmp byte ptr [D_0014355C], 3
+    je short L_1439CF
+    cmp dword ptr [D_0014291B], 0100h
+    jae short L_1439C9
+    mov ecx, dword ptr [D_00142944]
+    mov edi, 0A0000h
+    mov esi, dword ptr [ecx*4 + D_00142950]
+    add edi, dword ptr [ecx*4 + D_00142950]
+    add esi, dword ptr [D_00143550]
+    sub ecx, dword ptr [D_0014294C]
+    neg ecx
+    mov ecx, dword ptr [ecx*4 + D_00142950]
+    test eax, eax
+    je short L_1439C2
+    call func_00144BFC
+    ret
+L_1439C2:
+    call dword ptr [D_00143561]
+    ret
+L_1439C9:
+    call func_0015FEAE
+L_1439CE:
+    ret
+L_1439CF:
+    push eax
+    xor eax, eax
+    mov edx, dword ptr [D_0015FA61]
+    imul edx, dword ptr [D_00142934]
+    call func_0015FDF4
+    inc dword ptr [D_0015FA61]
+    mov eax, dword ptr [D_0014293C]
+    cmp dword ptr [D_0015FA61], eax
+    jne short L_143A01
+    mov dword ptr [D_0015FA61], 0
+L_143A01:
+    mov eax, dword ptr [D_00142938]
+    imul eax, dword ptr [D_0015FA61]
+    add eax, dword ptr [D_0015FA65]
+    mov dword ptr [D_00143550], eax
+    pop eax
+    test eax, eax
+    jne short L_143A27
+    mov al, byte ptr [D_0012B504]
+    call func_00143914
+L_143A27:
+    ret
+func_00143A28:
+    mov ah, 3
+    xor ebx, ebx
+    int 010h
+    mov eax, edx
+    shr eax, 8
+    and eax, 0FFh
+    and edx, 0FFh
+    ret
+func_00143A3F:
+    shl eax, 8
+    add edx, eax
+    mov ah, 2
+    xor ebx, ebx
+    int 010h
+    ret
+    B_143A4B_21
     dd D_00143561
-    B_1439C8_12
-    dd D_0015FA61
-    B_1439D8_3
-    dd D_00142934
-    B_1439DF_7
-    dd D_0015FA61
-    B_1439EA_1
-    dd D_0014293C
-    B_1439EF_2
-    dd D_0015FA61
-    B_1439F5_4
-    dd D_0015FA61
-    B_1439FD_5
-    dd D_00142938
-    B_143A06_3
-    dd D_0015FA61
-    B_143A0D_2
-    dd D_0015FA65
-    B_143A13_1
-    dd D_00143550
-    B_143A18_6
-    dd D_0012B504
-    B_143A22_62
-    dd D_00143561
-    dd D_00143B80
+    dd func_00143B80
     B_143A68_2
     dd D_0014355C
     B_143A6E_9
@@ -370,7 +394,7 @@ D_0014396C:
     dd D_0015F600
     B_143B0F_12
     dd D_00143561
-    dd D_00143BB0
+    dd func_00143BB0
     B_143B23_9
     dd D_0015F600
     B_143B30_12
@@ -383,18 +407,434 @@ D_0014396C:
     dd D_00143561
     dd D_001443D0
     B_143B7B_5
-D_00143B80:
-    B_143B80_20
-    dd D_0012B504
-    B_143B98_3
-    dd D_00149980
-    B_143B9F_17
-D_00143BB0:
-    B_143BB0_7
-    dd D_0012B504
-    B_143BBB_3
-    dd D_00149980
-    B_143BC2_2062
+func_00143B80:
+    push ebp
+    push esi
+    mov ebp, ecx
+    shr ecx, 2
+    rep movsd
+    mov ecx, ebp
+    and ecx, 3
+    rep movsb
+    pop edi
+    movzx eax, byte ptr [D_0012B504]
+    mov eax, dword ptr [eax*4 + D_00149980]
+    mov ecx, ebp
+    shr ecx, 2
+    rep stosd
+    mov ecx, ebp
+    and ecx, 3
+    rep stosb
+    pop ebp
+    ret
+    B_143BAF_1
+func_00143BB0:
+    push ebx
+    push ebp
+    mov ebp, ecx
+    movzx edx, byte ptr [D_0012B504]
+    mov edx, dword ptr [edx*4 + D_00149980]
+    shr ecx, 9
+    je near ptr L_1443BB
+L_143BCB:
+    mov eax, dword ptr [esi]
+    mov dword ptr [esi], edx
+    mov dword ptr [edi], eax
+    mov eax, dword ptr [esi + 4]
+    mov dword ptr [esi + 4], edx
+    mov dword ptr [edi + 4], eax
+    mov eax, dword ptr [esi + 8]
+    mov dword ptr [esi + 8], edx
+    mov dword ptr [edi + 8], eax
+    mov eax, dword ptr [esi + 0Ch]
+    mov dword ptr [esi + 0Ch], edx
+    mov dword ptr [edi + 0Ch], eax
+    mov eax, dword ptr [esi + 010h]
+    mov dword ptr [esi + 010h], edx
+    mov dword ptr [edi + 010h], eax
+    mov eax, dword ptr [esi + 014h]
+    mov dword ptr [esi + 014h], edx
+    mov dword ptr [edi + 014h], eax
+    mov eax, dword ptr [esi + 018h]
+    mov dword ptr [esi + 018h], edx
+    mov dword ptr [edi + 018h], eax
+    mov eax, dword ptr [esi + 01Ch]
+    mov dword ptr [esi + 01Ch], edx
+    mov dword ptr [edi + 01Ch], eax
+    mov eax, dword ptr [esi + 020h]
+    mov dword ptr [esi + 020h], edx
+    mov dword ptr [edi + 020h], eax
+    mov eax, dword ptr [esi + 024h]
+    mov dword ptr [esi + 024h], edx
+    mov dword ptr [edi + 024h], eax
+    mov eax, dword ptr [esi + 028h]
+    mov dword ptr [esi + 028h], edx
+    mov dword ptr [edi + 028h], eax
+    mov eax, dword ptr [esi + 02Ch]
+    mov dword ptr [esi + 02Ch], edx
+    mov dword ptr [edi + 02Ch], eax
+    mov eax, dword ptr [esi + 030h]
+    mov dword ptr [esi + 030h], edx
+    mov dword ptr [edi + 030h], eax
+    mov eax, dword ptr [esi + 034h]
+    mov dword ptr [esi + 034h], edx
+    mov dword ptr [edi + 034h], eax
+    mov eax, dword ptr [esi + 038h]
+    mov dword ptr [esi + 038h], edx
+    mov dword ptr [edi + 038h], eax
+    mov eax, dword ptr [esi + 03Ch]
+    mov dword ptr [esi + 03Ch], edx
+    mov dword ptr [edi + 03Ch], eax
+    mov eax, dword ptr [esi + 040h]
+    mov dword ptr [esi + 040h], edx
+    mov dword ptr [edi + 040h], eax
+    mov eax, dword ptr [esi + 044h]
+    mov dword ptr [esi + 044h], edx
+    mov dword ptr [edi + 044h], eax
+    mov eax, dword ptr [esi + 048h]
+    mov dword ptr [esi + 048h], edx
+    mov dword ptr [edi + 048h], eax
+    mov eax, dword ptr [esi + 04Ch]
+    mov dword ptr [esi + 04Ch], edx
+    mov dword ptr [edi + 04Ch], eax
+    mov eax, dword ptr [esi + 050h]
+    mov dword ptr [esi + 050h], edx
+    mov dword ptr [edi + 050h], eax
+    mov eax, dword ptr [esi + 054h]
+    mov dword ptr [esi + 054h], edx
+    mov dword ptr [edi + 054h], eax
+    mov eax, dword ptr [esi + 058h]
+    mov dword ptr [esi + 058h], edx
+    mov dword ptr [edi + 058h], eax
+    mov eax, dword ptr [esi + 05Ch]
+    mov dword ptr [esi + 05Ch], edx
+    mov dword ptr [edi + 05Ch], eax
+    mov eax, dword ptr [esi + 060h]
+    mov dword ptr [esi + 060h], edx
+    mov dword ptr [edi + 060h], eax
+    mov eax, dword ptr [esi + 064h]
+    mov dword ptr [esi + 064h], edx
+    mov dword ptr [edi + 064h], eax
+    mov eax, dword ptr [esi + 068h]
+    mov dword ptr [esi + 068h], edx
+    mov dword ptr [edi + 068h], eax
+    mov eax, dword ptr [esi + 06Ch]
+    mov dword ptr [esi + 06Ch], edx
+    mov dword ptr [edi + 06Ch], eax
+    mov eax, dword ptr [esi + 070h]
+    mov dword ptr [esi + 070h], edx
+    mov dword ptr [edi + 070h], eax
+    mov eax, dword ptr [esi + 074h]
+    mov dword ptr [esi + 074h], edx
+    mov dword ptr [edi + 074h], eax
+    mov eax, dword ptr [esi + 078h]
+    mov dword ptr [esi + 078h], edx
+    mov dword ptr [edi + 078h], eax
+    mov eax, dword ptr [esi + 07Ch]
+    mov dword ptr [esi + 07Ch], edx
+    mov dword ptr [edi + 07Ch], eax
+    mov eax, dword ptr [esi + 080h]
+    mov dword ptr [esi + 080h], edx
+    mov dword ptr [edi + 080h], eax
+    mov eax, dword ptr [esi + 084h]
+    mov dword ptr [esi + 084h], edx
+    mov dword ptr [edi + 084h], eax
+    mov eax, dword ptr [esi + 088h]
+    mov dword ptr [esi + 088h], edx
+    mov dword ptr [edi + 088h], eax
+    mov eax, dword ptr [esi + 08Ch]
+    mov dword ptr [esi + 08Ch], edx
+    mov dword ptr [edi + 08Ch], eax
+    mov eax, dword ptr [esi + 090h]
+    mov dword ptr [esi + 090h], edx
+    mov dword ptr [edi + 090h], eax
+    mov eax, dword ptr [esi + 094h]
+    mov dword ptr [esi + 094h], edx
+    mov dword ptr [edi + 094h], eax
+    mov eax, dword ptr [esi + 098h]
+    mov dword ptr [esi + 098h], edx
+    mov dword ptr [edi + 098h], eax
+    mov eax, dword ptr [esi + 09Ch]
+    mov dword ptr [esi + 09Ch], edx
+    mov dword ptr [edi + 09Ch], eax
+    mov eax, dword ptr [esi + 0A0h]
+    mov dword ptr [esi + 0A0h], edx
+    mov dword ptr [edi + 0A0h], eax
+    mov eax, dword ptr [esi + 0A4h]
+    mov dword ptr [esi + 0A4h], edx
+    mov dword ptr [edi + 0A4h], eax
+    mov eax, dword ptr [esi + 0A8h]
+    mov dword ptr [esi + 0A8h], edx
+    mov dword ptr [edi + 0A8h], eax
+    mov eax, dword ptr [esi + 0ACh]
+    mov dword ptr [esi + 0ACh], edx
+    mov dword ptr [edi + 0ACh], eax
+    mov eax, dword ptr [esi + 0B0h]
+    mov dword ptr [esi + 0B0h], edx
+    mov dword ptr [edi + 0B0h], eax
+    mov eax, dword ptr [esi + 0B4h]
+    mov dword ptr [esi + 0B4h], edx
+    mov dword ptr [edi + 0B4h], eax
+    mov eax, dword ptr [esi + 0B8h]
+    mov dword ptr [esi + 0B8h], edx
+    mov dword ptr [edi + 0B8h], eax
+    mov eax, dword ptr [esi + 0BCh]
+    mov dword ptr [esi + 0BCh], edx
+    mov dword ptr [edi + 0BCh], eax
+    mov eax, dword ptr [esi + 0C0h]
+    mov dword ptr [esi + 0C0h], edx
+    mov dword ptr [edi + 0C0h], eax
+    mov eax, dword ptr [esi + 0C4h]
+    mov dword ptr [esi + 0C4h], edx
+    mov dword ptr [edi + 0C4h], eax
+    mov eax, dword ptr [esi + 0C8h]
+    mov dword ptr [esi + 0C8h], edx
+    mov dword ptr [edi + 0C8h], eax
+    mov eax, dword ptr [esi + 0CCh]
+    mov dword ptr [esi + 0CCh], edx
+    mov dword ptr [edi + 0CCh], eax
+    mov eax, dword ptr [esi + 0D0h]
+    mov dword ptr [esi + 0D0h], edx
+    mov dword ptr [edi + 0D0h], eax
+    mov eax, dword ptr [esi + 0D4h]
+    mov dword ptr [esi + 0D4h], edx
+    mov dword ptr [edi + 0D4h], eax
+    mov eax, dword ptr [esi + 0D8h]
+    mov dword ptr [esi + 0D8h], edx
+    mov dword ptr [edi + 0D8h], eax
+    mov eax, dword ptr [esi + 0DCh]
+    mov dword ptr [esi + 0DCh], edx
+    mov dword ptr [edi + 0DCh], eax
+    mov eax, dword ptr [esi + 0E0h]
+    mov dword ptr [esi + 0E0h], edx
+    mov dword ptr [edi + 0E0h], eax
+    mov eax, dword ptr [esi + 0E4h]
+    mov dword ptr [esi + 0E4h], edx
+    mov dword ptr [edi + 0E4h], eax
+    mov eax, dword ptr [esi + 0E8h]
+    mov dword ptr [esi + 0E8h], edx
+    mov dword ptr [edi + 0E8h], eax
+    mov eax, dword ptr [esi + 0ECh]
+    mov dword ptr [esi + 0ECh], edx
+    mov dword ptr [edi + 0ECh], eax
+    mov eax, dword ptr [esi + 0F0h]
+    mov dword ptr [esi + 0F0h], edx
+    mov dword ptr [edi + 0F0h], eax
+    mov eax, dword ptr [esi + 0F4h]
+    mov dword ptr [esi + 0F4h], edx
+    mov dword ptr [edi + 0F4h], eax
+    mov eax, dword ptr [esi + 0F8h]
+    mov dword ptr [esi + 0F8h], edx
+    mov dword ptr [edi + 0F8h], eax
+    mov eax, dword ptr [esi + 0FCh]
+    mov dword ptr [esi + 0FCh], edx
+    mov dword ptr [edi + 0FCh], eax
+    mov eax, dword ptr [esi + 0100h]
+    mov dword ptr [esi + 0100h], edx
+    mov dword ptr [edi + 0100h], eax
+    mov eax, dword ptr [esi + 0104h]
+    mov dword ptr [esi + 0104h], edx
+    mov dword ptr [edi + 0104h], eax
+    mov eax, dword ptr [esi + 0108h]
+    mov dword ptr [esi + 0108h], edx
+    mov dword ptr [edi + 0108h], eax
+    mov eax, dword ptr [esi + 010Ch]
+    mov dword ptr [esi + 010Ch], edx
+    mov dword ptr [edi + 010Ch], eax
+    mov eax, dword ptr [esi + 0110h]
+    mov dword ptr [esi + 0110h], edx
+    mov dword ptr [edi + 0110h], eax
+    mov eax, dword ptr [esi + 0114h]
+    mov dword ptr [esi + 0114h], edx
+    mov dword ptr [edi + 0114h], eax
+    mov eax, dword ptr [esi + 0118h]
+    mov dword ptr [esi + 0118h], edx
+    mov dword ptr [edi + 0118h], eax
+    mov eax, dword ptr [esi + 011Ch]
+    mov dword ptr [esi + 011Ch], edx
+    mov dword ptr [edi + 011Ch], eax
+    mov eax, dword ptr [esi + 0120h]
+    mov dword ptr [esi + 0120h], edx
+    mov dword ptr [edi + 0120h], eax
+    mov eax, dword ptr [esi + 0124h]
+    mov dword ptr [esi + 0124h], edx
+    mov dword ptr [edi + 0124h], eax
+    mov eax, dword ptr [esi + 0128h]
+    mov dword ptr [esi + 0128h], edx
+    mov dword ptr [edi + 0128h], eax
+    mov eax, dword ptr [esi + 012Ch]
+    mov dword ptr [esi + 012Ch], edx
+    mov dword ptr [edi + 012Ch], eax
+    mov eax, dword ptr [esi + 0130h]
+    mov dword ptr [esi + 0130h], edx
+    mov dword ptr [edi + 0130h], eax
+    mov eax, dword ptr [esi + 0134h]
+    mov dword ptr [esi + 0134h], edx
+    mov dword ptr [edi + 0134h], eax
+    mov eax, dword ptr [esi + 0138h]
+    mov dword ptr [esi + 0138h], edx
+    mov dword ptr [edi + 0138h], eax
+    mov eax, dword ptr [esi + 013Ch]
+    mov dword ptr [esi + 013Ch], edx
+    mov dword ptr [edi + 013Ch], eax
+    mov eax, dword ptr [esi + 0140h]
+    mov dword ptr [esi + 0140h], edx
+    mov dword ptr [edi + 0140h], eax
+    mov eax, dword ptr [esi + 0144h]
+    mov dword ptr [esi + 0144h], edx
+    mov dword ptr [edi + 0144h], eax
+    mov eax, dword ptr [esi + 0148h]
+    mov dword ptr [esi + 0148h], edx
+    mov dword ptr [edi + 0148h], eax
+    mov eax, dword ptr [esi + 014Ch]
+    mov dword ptr [esi + 014Ch], edx
+    mov dword ptr [edi + 014Ch], eax
+    mov eax, dword ptr [esi + 0150h]
+    mov dword ptr [esi + 0150h], edx
+    mov dword ptr [edi + 0150h], eax
+    mov eax, dword ptr [esi + 0154h]
+    mov dword ptr [esi + 0154h], edx
+    mov dword ptr [edi + 0154h], eax
+    mov eax, dword ptr [esi + 0158h]
+    mov dword ptr [esi + 0158h], edx
+    mov dword ptr [edi + 0158h], eax
+    mov eax, dword ptr [esi + 015Ch]
+    mov dword ptr [esi + 015Ch], edx
+    mov dword ptr [edi + 015Ch], eax
+    mov eax, dword ptr [esi + 0160h]
+    mov dword ptr [esi + 0160h], edx
+    mov dword ptr [edi + 0160h], eax
+    mov eax, dword ptr [esi + 0164h]
+    mov dword ptr [esi + 0164h], edx
+    mov dword ptr [edi + 0164h], eax
+    mov eax, dword ptr [esi + 0168h]
+    mov dword ptr [esi + 0168h], edx
+    mov dword ptr [edi + 0168h], eax
+    mov eax, dword ptr [esi + 016Ch]
+    mov dword ptr [esi + 016Ch], edx
+    mov dword ptr [edi + 016Ch], eax
+    mov eax, dword ptr [esi + 0170h]
+    mov dword ptr [esi + 0170h], edx
+    mov dword ptr [edi + 0170h], eax
+    mov eax, dword ptr [esi + 0174h]
+    mov dword ptr [esi + 0174h], edx
+    mov dword ptr [edi + 0174h], eax
+    mov eax, dword ptr [esi + 0178h]
+    mov dword ptr [esi + 0178h], edx
+    mov dword ptr [edi + 0178h], eax
+    mov eax, dword ptr [esi + 017Ch]
+    mov dword ptr [esi + 017Ch], edx
+    mov dword ptr [edi + 017Ch], eax
+    mov eax, dword ptr [esi + 0180h]
+    mov dword ptr [esi + 0180h], edx
+    mov dword ptr [edi + 0180h], eax
+    mov eax, dword ptr [esi + 0184h]
+    mov dword ptr [esi + 0184h], edx
+    mov dword ptr [edi + 0184h], eax
+    mov eax, dword ptr [esi + 0188h]
+    mov dword ptr [esi + 0188h], edx
+    mov dword ptr [edi + 0188h], eax
+    mov eax, dword ptr [esi + 018Ch]
+    mov dword ptr [esi + 018Ch], edx
+    mov dword ptr [edi + 018Ch], eax
+    mov eax, dword ptr [esi + 0190h]
+    mov dword ptr [esi + 0190h], edx
+    mov dword ptr [edi + 0190h], eax
+    mov eax, dword ptr [esi + 0194h]
+    mov dword ptr [esi + 0194h], edx
+    mov dword ptr [edi + 0194h], eax
+    mov eax, dword ptr [esi + 0198h]
+    mov dword ptr [esi + 0198h], edx
+    mov dword ptr [edi + 0198h], eax
+    mov eax, dword ptr [esi + 019Ch]
+    mov dword ptr [esi + 019Ch], edx
+    mov dword ptr [edi + 019Ch], eax
+    mov eax, dword ptr [esi + 01A0h]
+    mov dword ptr [esi + 01A0h], edx
+    mov dword ptr [edi + 01A0h], eax
+    mov eax, dword ptr [esi + 01A4h]
+    mov dword ptr [esi + 01A4h], edx
+    mov dword ptr [edi + 01A4h], eax
+    mov eax, dword ptr [esi + 01A8h]
+    mov dword ptr [esi + 01A8h], edx
+    mov dword ptr [edi + 01A8h], eax
+    mov eax, dword ptr [esi + 01ACh]
+    mov dword ptr [esi + 01ACh], edx
+    mov dword ptr [edi + 01ACh], eax
+    mov eax, dword ptr [esi + 01B0h]
+    mov dword ptr [esi + 01B0h], edx
+    mov dword ptr [edi + 01B0h], eax
+    mov eax, dword ptr [esi + 01B4h]
+    mov dword ptr [esi + 01B4h], edx
+    mov dword ptr [edi + 01B4h], eax
+    mov eax, dword ptr [esi + 01B8h]
+    mov dword ptr [esi + 01B8h], edx
+    mov dword ptr [edi + 01B8h], eax
+    mov eax, dword ptr [esi + 01BCh]
+    mov dword ptr [esi + 01BCh], edx
+    mov dword ptr [edi + 01BCh], eax
+    mov eax, dword ptr [esi + 01C0h]
+    mov dword ptr [esi + 01C0h], edx
+    mov dword ptr [edi + 01C0h], eax
+    mov eax, dword ptr [esi + 01C4h]
+    mov dword ptr [esi + 01C4h], edx
+    mov dword ptr [edi + 01C4h], eax
+    mov eax, dword ptr [esi + 01C8h]
+    mov dword ptr [esi + 01C8h], edx
+    mov dword ptr [edi + 01C8h], eax
+    mov eax, dword ptr [esi + 01CCh]
+    mov dword ptr [esi + 01CCh], edx
+    mov dword ptr [edi + 01CCh], eax
+    mov eax, dword ptr [esi + 01D0h]
+    mov dword ptr [esi + 01D0h], edx
+    mov dword ptr [edi + 01D0h], eax
+    mov eax, dword ptr [esi + 01D4h]
+    mov dword ptr [esi + 01D4h], edx
+    mov dword ptr [edi + 01D4h], eax
+    mov eax, dword ptr [esi + 01D8h]
+    mov dword ptr [esi + 01D8h], edx
+    mov dword ptr [edi + 01D8h], eax
+    mov eax, dword ptr [esi + 01DCh]
+    mov dword ptr [esi + 01DCh], edx
+    mov dword ptr [edi + 01DCh], eax
+    mov eax, dword ptr [esi + 01E0h]
+    mov dword ptr [esi + 01E0h], edx
+    mov dword ptr [edi + 01E0h], eax
+    mov eax, dword ptr [esi + 01E4h]
+    mov dword ptr [esi + 01E4h], edx
+    mov dword ptr [edi + 01E4h], eax
+    mov eax, dword ptr [esi + 01E8h]
+    mov dword ptr [esi + 01E8h], edx
+    mov dword ptr [edi + 01E8h], eax
+    mov eax, dword ptr [esi + 01ECh]
+    mov dword ptr [esi + 01ECh], edx
+    mov dword ptr [edi + 01ECh], eax
+    mov eax, dword ptr [esi + 01F0h]
+    mov dword ptr [esi + 01F0h], edx
+    mov dword ptr [edi + 01F0h], eax
+    mov eax, dword ptr [esi + 01F4h]
+    mov dword ptr [esi + 01F4h], edx
+    mov dword ptr [edi + 01F4h], eax
+    mov eax, dword ptr [esi + 01F8h]
+    mov dword ptr [esi + 01F8h], edx
+    mov dword ptr [edi + 01F8h], eax
+    mov eax, dword ptr [esi + 01FCh]
+    mov dword ptr [esi + 01FCh], edx
+    mov dword ptr [edi + 01FCh], eax
+    add esi, 0200h
+    add edi, 0200h
+    dec ecx
+    jne near ptr L_143BCB
+L_1443BB:
+    and ebp, 01FFh
+    je short L_1443CA
+    mov ecx, ebp
+    call func_00143B80
+L_1443CA:
+    pop ebp
+    pop ebx
+    ret
+    B_1443CD_3
 D_001443D0:
     B_1443D0_10
     dd D_0012B504
@@ -405,10 +845,18 @@ D_001443D0:
     B_1443EA_2
     dd D_0014355D
     B_1443F0_2060
-D_00144BFC:
-    B_144BFC_17
-D_00144C0D:
-    B_144C0D_1
+func_00144BFC:
+    push ebp
+    mov ebp, ecx
+    shr ecx, 2
+    rep movsd
+    mov ecx, ebp
+    and ecx, 3
+    rep movsb
+    pop ebp
+    ret
+func_00144C0D:
+    ret
     db 242 dup (0)
 XN_143600 ends
 end
