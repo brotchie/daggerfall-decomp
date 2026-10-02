@@ -617,6 +617,14 @@ class Func:
             b = self.src(s, ins)
             if lhs == "@RET":
                 raise Unsupported("read-modify-write of the return slot")
+            prev = self.body[self.k - 1] if self.k else None
+            if m in ("add", "sub") and s.type == cx.X86_OP_IMM and d.size == 4 and \
+                    prev is not None and prev.mnemonic == "mov" and \
+                    prev.op_str == "eax, " + ins.op_str.split(", ")[0] and 1 < s.imm < 0x10000:
+                # mov eax,[p]; add [p],K: post-increment of a pointer to a K-byte object
+                lv = lhs if re.fullmatch(r"\w+", lhs) else "(%s)" % lhs
+                self.emit("(*(char (**)[%d])&%s)%s;" % (s.imm, lv, "++" if m == "add" else "--"))
+                return
             self.emit("%s %s= %s;" % (lhs, opch, b.text))
             return
         if m in ("inc", "dec", "neg", "not"):

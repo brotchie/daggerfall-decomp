@@ -105,6 +105,7 @@ extern int func_00079A28(int);
 extern int func_00079A6E(int);
 extern int func_00079D0D(int, int, int);
 extern int func_00079E6E(int);
+extern int func_0008DA91(int);
 extern int func_0008E925(int, int);
 extern int func_0009DC59(int, ...);
 extern int func_0009DEA7();
@@ -123,13 +124,13 @@ extern void func_00050069(int);
 extern void func_0007A02A(int);
 extern void func_0007A191(int);
 extern void func_0007A3D0(int);
-extern void func_0007A42B(int);
 extern void func_0007C56F(int);
 extern void func_0007C78B(int);
 extern void func_0008E357(int, int);
 extern void func_0008E3A7(int, int);
 extern void func_0008E3F7(int, int);
 void func_00079C75(int);
+void func_0007A42B(int);
 #pragma aux func_000A0ED9 parm routine [];
 
 void func_00079BE4(int a1)
@@ -249,6 +250,34 @@ L7A38B:;
     return;
 L7A3BC:;
     *(int *)((char *)l_1C + 112) = 0;
+}
+
+void func_0007A42B(int a1)
+{
+    int l_1C;
+    int l_18;
+
+    if (((int)(unsigned char)*(signed char *)((char *)a1)) != 34) goto L7A45A;
+    if (((int)(unsigned char)*(signed char *)((char *)a1)) != 32) goto L7A45C;
+L7A45A:;
+    return;
+L7A45C:;
+    l_1C = *(int *)D_00195C44;
+    l_18 = 0;
+L7A46B:;
+    if (l_18 < *(int *)D_00195B84) goto L7A487;
+    return;
+L7A478:;
+    l_18++;
+    (*(char (**)[4])&l_1C)++;
+    goto L7A46B;
+L7A487:;
+    if (*(int *)((char *)a1 + 31) != *(int *)((char *)l_1C)) goto L7A4A7;
+    func_0008DA91(a1);
+    *(int *)((char *)l_1C) = 0;
+    return;
+L7A4A7:;
+    goto L7A478;
 }
 
 void func_0007A4B3(void)

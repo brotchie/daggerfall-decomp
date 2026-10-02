@@ -11,7 +11,7 @@
 #   cc cgen.c: no return-value slot for void functions (DAGGER_VOIDRET=1)
 #   cg bldcall.c, intrface.c, generate.c, cc cgen.c: -od stack slots in Watcom 10 order,
 #     nested-block locals after the parameters (DAGGER_FIRSTUSE=1)
-#   cg makeaddr.c MakeGets(): `x = x + 1` keeps its temp, no in-place inc at -od (DAGGER_RMW=1)
+#   cg makeaddr.c MakeGets(), addrfold.c GetValue(): `x = x + 1` keeps its temp at -od (DAGGER_RMW=1)
 #   cg tree.c, optimize.c, regalloc.c: an unused `x++` still loads x into a register (DAGGER_DEADDEF=1)
 #   cg treefold.c FoldCompare(): an explicit (int)x compared to a constant stays wide (DAGGER_STRIP=ow)
 #

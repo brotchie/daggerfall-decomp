@@ -32,6 +32,7 @@ extern char D_00195DB8[];
 extern char D_00195F5E[];
 extern char D_00195FB1[];
 extern char D_00196120[];
+extern char D_00196268[];
 extern char D_0019627B[];
 extern char D_00196289[];
 extern char D_00196A28[];
@@ -71,6 +72,7 @@ extern int func_000C2D81();
 extern int func_000C2FF5();
 extern int func_000C810C();
 extern void func_00014853(int, int);
+extern void func_0001DD39(int);
 extern void func_000279B9(void);
 extern void func_000287BD(int, int);
 extern void func_00028BCD(void);
@@ -83,6 +85,8 @@ extern void func_00076CF7(void);
 extern void func_0007E3CD(int, unsigned char, int);
 extern void func_0007FA4B(void);
 extern void func_00086B0B(int);
+extern void func_00088213(int, int);
+extern void func_0008824A(int, int);
 extern void func_00088732(void);
 extern void func_00088A68(void);
 extern void func_0008A4E4(int);
@@ -309,6 +313,57 @@ L87460:;
     if (*(int *)D_001A41E4 == 0) return;
     func_000287BD(*(int *)D_001A41E4, *(int *)D_001A41DC);
     *(int *)D_001A41E4 = 0;
+}
+
+int func_0008896D(int a1)
+{
+    int l_20;
+    int l_1C;
+
+    l_20 = *(int *)((char *)*(int *)D_00195BDC + 43);
+    l_1C = 0;
+L88990:;
+    if (((int)(unsigned short)*(short *)((char *)*(int *)D_00195BDC + 41)) > l_1C) goto L889B4;
+    goto L889C9;
+L889A5:;
+    l_1C++;
+    (*(char (**)[26])&l_20)++;
+    goto L88990;
+L889B4:;
+    if (*(int *)((char *)l_20 + 20) != a1) goto L889C7;
+    return l_20;
+L889C7:;
+    goto L889A5;
+L889C9:;
+    return 0;
+}
+
+void func_000889DD(int a1, int a2)
+{
+    int l_1C;
+    int l_18;
+    int l_14;
+
+    l_14 = (int)(unsigned char)*(signed char *)D_00196268;
+    func_0001DD39(a1);
+    l_1C = *(int *)D_00196A9C;
+    l_18 = 0;
+L88A11:;
+    if (l_18 < *(int *)D_00196A28) goto L88A2D;
+    goto L88A57;
+L88A1E:;
+    l_18++;
+    (*(char (**)[17])&l_1C)++;
+    goto L88A11;
+L88A2D:;
+    if ((*(int *)((char *)l_1C) & 1048575) != a2) goto L88A55;
+    func_00088213(l_18, 1);
+    func_0008824A(l_18, 0);
+    goto L88A57;
+L88A55:;
+    goto L88A1E;
+L88A57:;
+    func_0001DD39(l_14);
 }
 
 void func_00088DE6(int a1, int a2, int a3)

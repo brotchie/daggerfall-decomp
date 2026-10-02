@@ -38,6 +38,7 @@ extern char D_001997DC[];
 extern char D_001997DE[];
 extern char D_001997E0[];
 extern char D_001997E2[];
+extern char D_001997E4[];
 extern char D_001997E6[];
 extern char D_001997E8[];
 extern char D_001997EA[];
@@ -59,12 +60,14 @@ extern int func_000A0040();
 extern int func_000A006E();
 extern int func_000A00AF();
 extern int func_000A00CB();
+extern int func_000A0AD9();
 extern int func_000A0B42();
 extern int func_000A1023();
 extern int func_000A1235();
 extern int func_000A138E();
 extern int func_000A17DC();
 extern int func_0012DB50();
+extern void func_0003F09F(short, int);
 extern void func_0004E02D(int, int, int, int);
 extern void func_0004E612(void);
 extern void func_00050069(int);
@@ -289,6 +292,39 @@ L4DCE9:;
     *(signed char *)D_001997EC = 3;
     *(short *)D_001997B0 = *(short *)D_0012AC04;
     *(short *)D_001997B2 = *(short *)D_0012AC06;
+}
+
+void func_0004DF27(int a1)
+{
+    int l_18;
+
+    if (((unsigned)((int)(short)*(short *)D_001997E4)) >= 91) goto L4DF58;
+    func_0003F09F(1700, 1);
+    return;
+L4DF58:;
+    func_000A1023(*(int *)D_001997D8, *(int *)D_001997D4, 3640, (int)D_00174FAC, 361, 4);
+    *(signed char *)D_001940D5 |= 16;
+    l_18 = *(int *)D_001997D4;
+L4DF88:;
+    if (*(signed char *)((char *)l_18) == 0) goto L4DFAE;
+    if (((int)(unsigned char)*(signed char *)((char *)l_18)) != 1) goto L4DFA5;
+    l_18 += 91;
+    goto L4DFAC;
+L4DFA5:;
+    (*(char (**)[11])&l_18)++;
+L4DFAC:;
+    goto L4DF88;
+L4DFAE:;
+    *(signed char *)((char *)l_18) = 1;
+    *(short *)((char *)l_18 + 1) = *(short *)D_001997E6;
+    *(short *)((char *)l_18 + 3) = *(short *)D_001997E0;
+    *(signed char *)((char *)l_18 + 7) = *(signed char *)D_001851FF;
+    *(signed char *)((char *)l_18 + 5) = *(signed char *)D_001997DC;
+    *(signed char *)((char *)l_18 + 6) = *(signed char *)D_001997DE;
+    func_000A0AD9(l_18 + 11, a1, 4, (int)D_00174FAC, 381);
+    *(int *)D_001997C8 = l_18;
+    l_18 += 91;
+    *(signed char *)((char *)l_18) = 0;
 }
 
 void func_0004E108(void)

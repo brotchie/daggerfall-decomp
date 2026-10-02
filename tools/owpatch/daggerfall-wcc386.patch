@@ -38,6 +38,23 @@ index ee6e5533cb..ddddfdae1e 100644
              break;
          case OPR_ENDBLOCK:              // end of new block { vars; }
              DBEndBlock();
+diff --git a/bld/cg/c/addrfold.c b/bld/cg/c/addrfold.c
+index e800aac5b8..5d93ba83bb 100644
+--- a/bld/cg/c/addrfold.c
++++ b/bld/cg/c/addrfold.c
+@@ -612,6 +612,12 @@ name    *GetValue( an addr, name *suggest )
+             break;
+         case CL_TEMP_OFFSET:
+             if( addr->u.n.offset != 0 ) {
++                /* Daggerfall: like MakeGets(), `l = l + K` on a local keeps its temp at -od
++                 * (Watcom 10: mov eax,[l]; add eax,K; mov [l],eax). DAGGER_RMW=1 restores OW. */
++                if( suggest == addr->u.n.name && _IsModel( CGSW_GEN_NO_OPTIMIZATION )
++                  && getenv( "DAGGER_RMW" ) == NULL ) {
++                    suggest = NULL;
++                }
+                 op = MaybeTemp( suggest, addr->u.n.name->n.type_class );
+                 ins = MakeBinary( OP_ADD, addr->u.n.name,
+                                     AllocS32Const( addr->u.n.offset ),
 diff --git a/bld/cg/c/bldcall.c b/bld/cg/c/bldcall.c
 index 14a056a76b..07f9f1cb70 100644
 --- a/bld/cg/c/bldcall.c

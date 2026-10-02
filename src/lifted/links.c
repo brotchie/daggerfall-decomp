@@ -17,6 +17,7 @@ extern int func_0008E925(int, int);
 extern int func_000A00CB();
 extern int func_000A0B42();
 extern int func_000A1023();
+extern int func_000CE77F();
 
 void func_00064337(int a1)
 {
@@ -97,6 +98,46 @@ L64555:;
 L6455D:;
     *(int *)(D_001A3978 + (l_18 << 2)) = ((int)D_00199D78) + (*(int *)(D_001A3978 + (l_18 << 2)) * 39);
     goto L64555;
+}
+
+int func_000657B2(int a1)
+{
+    int l_28;
+    int l_24;
+    int l_20;
+    int l_1C;
+
+    l_28 = 0;
+L657CA:;
+    if (l_28 < *(int *)D_001A3A7C) goto L657E2;
+    goto L65850;
+L657DA:;
+    l_28++;
+    goto L657CA;
+L657E2:;
+    l_1C = *(int *)(D_001A3978 + (l_28 << 2));
+    l_24 = ((int)(unsigned char)*(signed char *)((char *)l_1C + 10)) + 1;
+    l_20 = 0;
+L65807:;
+    if (l_20 < l_24) goto L65820;
+    goto L6584E;
+L65811:;
+    l_20++;
+    (*(char (**)[39])&l_1C)++;
+    goto L65807;
+L65820:;
+    if (*(int *)((char *)l_1C + 35) != a1) goto L6583F;
+    if (func_000CE77F(l_1C + 29, 6) != 0) goto L65841;
+L6583F:;
+    goto L6584C;
+L65841:;
+    return l_1C + 29;
+L6584C:;
+    goto L65811;
+L6584E:;
+    goto L657DA;
+L65850:;
+    return 0;
 }
 
 int func_000658CA(int a1, int a2)

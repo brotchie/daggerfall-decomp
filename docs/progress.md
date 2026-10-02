@@ -573,3 +573,16 @@ The inferred types stay inside the function: callers keep the access-based proto
 changing a callee's prototype to `short` changed how 15 callers evaluate arguments.
 `promote_lifted.py` gives a function whose definition differs from its callers' prototype a
 file of its own. Batch **1,140**. Build **1,144 / 2,297, 23.39%**.
+
+## 2026-10-01: locals' `l = l + K`, pointer post-increments (+27)
+
+- **`l = l + K` on a local** still compiled in place. For a stack variable, `l + K` is folded
+  into a temp-plus-offset address (`CL_TEMP_OFFSET`), and `GetValue()` (`cg/c/addrfold.c`)
+  builds `ADD l, K` straight into the suggested destination `l`. Found by stepping through
+  `MakeGets()` in the debug compiler (it takes the `NF_ADDR` branch for locals). The patch
+  drops the suggestion when it's the operand (same switch, `DAGGER_RMW=1`).
+- **`mov eax,[p]; add [p],K`** is a post-increment of a pointer to a K-byte object (`p++` over
+  an array of structs). The lifter now writes `(*(char (**)[K])&p)++`, which compiles to that
+  shape.
+
+Batch **1,167**.
