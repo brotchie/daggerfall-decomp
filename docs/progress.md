@@ -1371,4 +1371,45 @@ Batch **1,927**; build **61.34%**.
   way). The build compiles them with the real compiler, `-d2` added, when it is installed
   and skips them otherwise (the original bytes stay, the checksum still matches). 4D402,
   7193D, 99922. Build **2,248** (93.77%).
+- The operand computed first can be padded with a no-op when it looks smaller
+  (`g & 128 & 255`; a lifter choice). DOSBox-X at `cycles=max` makes a 10.0a compile
+  0.7 s (0.08 s each in a batch), so searching against the real compiler is cheap.
+  `tools/w10_try.py` tries many variants of one function in one DOSBox run;
+  `tools/wcc10.py` also runs the build's relocation check.
+
+## 100%: the last 48 functions with the real compiler
+
+The last 48 functions were matched with Watcom 10.0a by six agents working in parallel,
+each from the lifter's attempt with the real compiler as the judge. Most were rewritten as
+ordinary C (structs, typed prototypes, `for` and `switch`); all are in `src/w10/`. Build
+**2,297 / 2,297** (100%), FALL.EXE byte-identical. What they found about 10.0a, most of it
+the reason patched OW could not get these:
+
+- **Register allocation and the stack frame both go through Watcom's unstable ShellSort**
+  (`cgsrtlst.c`). The conflicts of a block are sorted by savings, so swapping the operands
+  of a `+` or `*` gives the same instructions but can move esi/edi anywhere in the block,
+  earlier statements included; one more or one fewer temp (an `(int)` cast on a pointer,
+  `*(int *)D + 28` against `*(char **)D + 28`) does the same.
+- **Frame layout** (`tools/w10_frame.py`): register parameters in order, then the locals in
+  declaration order, then the return slot; shell-sorted by size, largest first; allocated
+  from the bottom up, the last element nearest ebp. Inner-block locals and compiler temps go
+  below. Unused locals still take slots: some matched files keep one or two.
+- **Short locals are stored as dwords** (`mov dword [s],0`, `inc dword [s]`) and read with
+  `movsx word`: such a slot is a plain `short`, not an int with casts.
+- **Evaluation order**: the operand with more tree nodes first. A struct member at a
+  nonzero offset, an array index other than 0, a cast or a mask (`lo & 0xffff`) add nodes;
+  `p->arr[i]` and `*(p + K + i)` are different trees. The result lands in the left operand's
+  register.
+- **Types steer allocation**: callees need real prototypes (`char *` strings, `short` and
+  `unsigned char` parameters: a constant for an `unsigned char` stack parameter is pushed
+  through a register); arrays of pointers typed as pointers; far pointers with `MK_FP`.
+- **Control flow is never threaded at -od**: a jump to the loop increment is `continue`,
+  `if (a) if (b)` and `if (a && b)` differ, `A || (B || C)` and `(A || B) || C` differ, a
+  switch selector in a user slot is `l = e; switch (l)`, explicit empty cases shape the tree.
+- **Missed arguments**: a remainder left in edx by `idiv` is not an argument, but an edx
+  load or a push just before a call usually is (three were missing in the lifts).
+- 684E9 multiplies by a literal double: 10.0a puts it in the module's own constants, which
+  the build cannot accept (every reference must resolve to FALL.EXE's), and with the
+  constant as an extern it emits `fld; fmulp`. `(float)(x * K)` stored to a double gives
+  the original `fmul [K]` bytes (the conversion emits no code there); the file says so.
 

@@ -25,9 +25,10 @@ check their SHA-1.
   rest are libraries (MemCheck, Watcom runtime). Object 2 is the XnGine engine in asm.
 - Compiler: Watcom C32 10.0a. Game code is unoptimised, with debug info: `-od -s -of+ -4r -d2`.
 - Toolchain: KKND-Decomp's patched Open Watcom `wcc386` plus our own `-od` patches (`tools/owpatch/`),
-  built natively on macOS. A few functions only the real 10.0a reproduces (`src/w10/`):
-  with your own copy of the compiler in `third_party/watcom10/` (see `tools/wcc10.py`) the
-  build compiles them under DOSBox-X, without it they keep the original bytes.
+  built natively on macOS, for most functions (`src/lifted/`, from `tools/lift.py`). The
+  last 52 are compiled with the real Watcom C32 10.0a (`src/w10/`): with your own copy of
+  the compiler in `third_party/watcom10/` (see `tools/wcc10.py`) the build compiles them
+  under DOSBox-X; without it they keep the original bytes and the checksum still matches.
 - Matched game functions and the share of game code: see the badges at the top (updated by
   every successful `tools/build-and-verify.sh`). Most functions are lifted automatically
   (`src/lifted/`, from `tools/lift.py`); the rebuilt executable is byte-identical.
