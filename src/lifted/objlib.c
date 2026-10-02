@@ -32,8 +32,11 @@ extern char D_001967F0[];
 extern char D_001967F4[];
 extern char D_001967F8[];
 extern char D_001967FC[];
+extern char D_00196800[];
+extern char D_00196808[];
 extern char D_00196888[];
 extern char D_001968BB[];
+extern char D_00196A2C[];
 extern char D_001A5C2C[];
 extern char D_001A5C30[];
 extern char D_001A5C34[];
@@ -93,9 +96,11 @@ extern void func_000847BC(int, int);
 extern void func_000848CA(int, int);
 extern void func_000849E4(int, int);
 extern void func_0008E3F7(int, int);
+int func_00084A7C(int);
 int func_000852A6(int, int);
 int func_00085407(int);
 int func_00086041(int, int);
+void func_00084E5E(int);
 void func_00085612(int);
 void func_00085666(int);
 void func_00085714(int, int, int);
@@ -251,6 +256,50 @@ L84F6F:;
 L84F77:;
     a1 = *(int *)((char *)a1 + 55);
     goto L84EF4;
+}
+
+int func_00084F8F(int a1, int a2)
+{
+    int l_20;
+    int l_1C;
+    int l_18;
+
+    *(int *)D_00196888 = *(int *)(*(char **)D_00196A2C + 1475 + (a2 << 2));
+    l_18 = func_00084A7C(a1);
+    *(short *)((char *)l_18 + 21) = 1;
+    *(short *)((char *)l_18 + 29) = a2;
+    l_20 = (int)(unsigned char)*(signed char *)(*(char **)D_00196A2C + 667 + (a2 * 26));
+    switch ((unsigned)l_20) {
+    goto L850BA;
+case 21:
+case 22:
+    *(signed char *)((char *)l_18 + 21) |= 8;
+    *(short *)((char *)l_18 + 27) = 65535;
+    return l_18;
+case 17:
+case 18:
+case 19:
+case 20:
+    l_1C = func_0009DC25();
+    func_0009DC49((int)(short)*(short *)((char *)l_18 + 31));
+    l_20 = func_0009DC25();
+    func_0009DC49(l_1C);
+    if (((int)(unsigned short)*(short *)(*(char **)D_00196A2C + 661 + (a2 * 26))) == 42) goto L85088;
+    if (((int)(unsigned short)*(short *)(*(char **)D_00196A2C + 661 + (a2 * 26))) != 108) goto L8508A;
+L85088:;
+    goto L850BA;
+L8508A:;
+    if ((l_20 % 100) > *(int *)D_00196800) goto L850BA;
+    *(signed char *)((char *)l_18 + 21) |= 8;
+    *(short *)((char *)l_18 + 27) = 65535;
+    return l_18;
+default:
+L850BA:;
+    *(short *)((char *)l_18 + 27) = (*(int *)D_00196808)++;
+    func_00084A7C(l_18);
+    func_00084E5E(l_18);
+    return l_18;
+}
 }
 
 void func_000850EF(int a1)

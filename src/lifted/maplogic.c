@@ -648,8 +648,6 @@ void func_000874C0(int a1)
     goto L87668;
 case 0:
 case 1:
-    goto L87507;
-L87507:;
     *(int *)(*(char **)D_00195AA4 + 7) = (((int)(unsigned char)*(signed char *)(*(char **)D_00195BDC + 32)) << 11) + *(int *)(*(char **)D_00195AC4 + 7);
     *(int *)(*(char **)D_00195AA4 + 15) = *(int *)(*(char **)D_00195AC4 + 15) - 256;
     *(short *)(*(char **)D_00195AA4 + 3) = (*(short *)(*(char **)D_00195A98 + 3) = 0);

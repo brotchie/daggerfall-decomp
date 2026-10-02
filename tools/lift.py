@@ -2201,7 +2201,7 @@ class Func:
         # (`jb L; ... L: jmp case`), not case bodies
         hi = max(nodes) if nodes else start
         more = {a for a, _ in leaves if a not in stubs and
-                (prev.get(a) in nodes or start < a < hi) and
+                (prev.get(a) in nodes or start < a < max(hi, limit or 0)) and
                 by_addr[a].mnemonic == "jmp" and by_addr[a].operands[0].type == cx.X86_OP_IMM}
         if more and len(stubs) < 64:
             return self.parse_ctree(start, t, w, by_addr, nxt, stubs | more, limit)

@@ -209,8 +209,6 @@ case 4:
 case 5:
 case 6:
 case 7:
-    goto L897BF;
-L897BF:;
     *(short *)((char *)((l_10 * 2) + l_18) + 32) += *(short *)((char *)((a2 * 2) + l_14) + 80);
     if (*(short *)((char *)((l_10 * 2) + l_18) + 32) <= *(short *)((char *)((l_10 * 2) + l_18) + 48)) goto L89809;
     *(short *)((char *)((l_10 * 2) + l_18) + 32) = *(short *)((char *)((l_10 * 2) + l_18) + 48);
