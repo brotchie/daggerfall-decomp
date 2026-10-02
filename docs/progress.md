@@ -1317,3 +1317,19 @@ Batch **1,927**; build **61.34%**.
 - **OW: a commutative op stored to memory** (`g = p + x`, x computed before the global p
   was read) takes x's register in Watcom 10; `rUSEREGISTER` now swaps the operands then
   (`DAGGER_NOUSEOLD` for the old). +4. Batch **2,198** (88.8%).
+- Short locals: `add dword [x],imm` is `x += k` on a short too; a 2-byte local below a
+  4-byte one always pins the slots; an int stored to a short whose address isn't taken
+  can be a plain assignment (a choice). `f(g(), x, y)` by default. Bit-field stores
+  (`and byte [p+7],0xbf` + `or dword [p+4],(v&1)<<30` is `p->f = v`). +3.
+- **OW: an address operand is loaded after the other operand** (`&g + ((i<<2) + 4)` adds
+  the 4 before `mov reg,offset g`; BGBinary generated the left operand first because a
+  clang-built compiler evaluates `MakeBinary( GenIns( left ), GenIns( rite ) )` left to
+  right). Compares nothing branches on are empty ifs (`if (x == 63) {}`). +4.
+- The search's backtracking may drop register pins found against an older compiler; a
+  search from scratch (`LIFT_SCRATCH=1`) found one more. +3.
+- **Two-dimensional global arrays**: a sum used as the base of `[reg + g]` is an int index
+  by default, and `g + (x*48 + y*4)` can be spelt `(g + x*48) + y*4` (the left-associated
+  `g[x][y]` evaluates the first index first). +4. Batch **2,212** (90.1%).
+- A caller widening an argument right before pushing it (`xor ah,ah; cwde; push eax`)
+  passes a short. Assignment chains through a reloaded pointer (`p->a = (p->b = v)`, the
+  word re-read then widened or stored on). +5. Batch **2,217** (90.6%).
