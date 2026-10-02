@@ -16,6 +16,7 @@ extern char D_00196268[];
 extern char D_0019676C[];
 extern char D_0019688C[];
 extern char D_00196A28[];
+extern char D_00196A2C[];
 extern char D_00196A7C[];
 extern char D_00196A88[];
 extern char D_00196A9C[];
@@ -280,4 +281,26 @@ int func_0001E576(void)
     *(short *)((char *)l_1C + 19) = 32768;
     *(int *)((char *)l_1C + 31) = *(int *)(*(char **)D_00195AC4 + 31) + ((int)(unsigned short)(*(short *)(*(char **)D_00195BDC + 37))++);
     return l_1C;
+}
+
+void func_0001E7A8(void)
+{
+    int l_1C;
+    int l_18;
+
+    l_1C = *(int *)D_00196A2C + 6776;
+    l_18 = 0;
+L1E7CA:;
+    if (((int)(unsigned char)*(signed char *)(*(char **)D_00196A2C)) > l_18) goto L1E7E5;
+    goto L1E813;
+L1E7DD:;
+    l_18++;
+    goto L1E7CA;
+L1E7E5:;
+    *(int *)(*(char **)D_00196A2C + 1475 + (l_18 << 2)) = l_1C;
+    l_1C += *(int *)(*(char **)D_00196A2C + 1603 + (l_18 << 2));
+    goto L1E7DD;
+L1E813:;
+    *(int *)(*(char **)D_00196A2C + 1731) = l_1C;
+    *(int *)(*(char **)D_00196A2C + 1735) = (int)(*(char **)(*(char **)D_00196A2C + 1731) + (((int)(unsigned char)*(signed char *)(*(char **)D_00196A2C + 1)) * 66));
 }

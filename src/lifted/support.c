@@ -674,7 +674,7 @@ L7DFC9:;
 L7DFDC:;
     return 0;
 L7DFE5:;
-    return (((int)(unsigned short)*(short *)((char *)a1 + 27)) * 26) + *(int *)(*(char **)D_00195BDC + 43);
+    return (int)(*(char **)(*(char **)D_00195BDC + 43) + (((int)(unsigned short)*(short *)((char *)a1 + 27)) * 26));
 }
 
 int func_0007E00E(int a1, int a2, int a3)
@@ -1397,7 +1397,7 @@ L7F93E:;
 L7F961:;
     goto L7F998;
 L7F963:;
-    func_000A1023(*(int *)(*(char **)D_00195BDC + 43) + (((int)(unsigned short)*(short *)((char *)l_1C + 27)) * 26), l_1C + 71, 26, (int)D_00176A10, 1350, 4);
+    func_000A1023((int)(*(char **)(*(char **)D_00195BDC + 43) + (((int)(unsigned short)*(short *)((char *)l_1C + 27)) * 26)), l_1C + 71, 26, (int)D_00176A10, 1350, 4);
 L7F998:;
     l_1C = l_18;
     goto L7F902;

@@ -877,6 +877,14 @@ class Func:
                     self.set_reg(full, v)
                     self.flags = ("val", v, None)
                     return
+                if m == "and" and s.type == cx.X86_OP_IMM and sz == 4 and s.imm in (0xFF, 0xFFFF) \
+                        and a.size == 4 and a.atom and a.text.startswith("*(int *)") and \
+                        not os.environ.get("LIFT_ANDCAST"):
+                    # a dword read masked to 16/8 bits: `x & 0xffff` (the cast narrows the load)
+                    v = E("%s & %d" % (a.p(), s.imm), 4)
+                    self.set_reg(full, v)
+                    self.flags = ("val", v, None)
+                    return
                 if m == "and" and s.type == cx.X86_OP_IMM and sz == 4 and s.imm in (0xFF, 0xFFFF):
                     t = "unsigned char" if s.imm == 0xFF else "unsigned short"
                     self.set_reg(full, E("(int)(%s)%s" % (t, a.p()), 4))
@@ -924,8 +932,16 @@ class Func:
                     return
                 if m == "shr":
                     a = E("(unsigned)" + a.p(), 4)
+                ptr_hint = m == "add" and s.type == cx.X86_OP_REG and \
+                    (self.loaded_ptr(a) or self.loaded_ptr(b))
+                if ptr_hint:
+                    # a dword read kept in a register for an add (not folded into it):
+                    # perhaps a pointer, a choice point
+                    self.choices.append(ins.address + 0.375)
                 if m == "add" and s.type == cx.X86_OP_REG and (
-                        self.used_as_base(full) or self.global_ptr(b) or self.global_ptr(a)):
+                        self.used_as_base(full) or self.global_ptr(b) or self.global_ptr(a) or
+                        (ptr_hint and (ins.address + 0.375 in self.flips) ==
+                         bool(os.environ.get("LIFT_NOPTRADD")))):
                     # pointer arithmetic: the operand loaded from memory is the base pointer
                     # (as char *, -od keeps it in a register: mov edx,[p]; add eax,edx)
                     pa, pb = (b, a) if self.loaded_ptr(b) and not self.loaded_ptr(a) else (a, b)

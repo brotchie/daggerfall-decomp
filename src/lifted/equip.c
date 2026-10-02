@@ -142,7 +142,7 @@ L5E58B:;
     func_0005DE74(287, 27, 8, a3);
     return;
 L5E5A4:;
-    func_0005DE74((int)(unsigned short)*(short *)((char *)((a2 * 2) + *(int *)(D_00185F88 + (a1 << 2)))), (int)(short)*(short *)&a1, (int)(short)*(short *)&a2, a3);
+    func_0005DE74((int)(unsigned short)*(short *)((char *)(int)(*(char **)(D_00185F88 + (a1 << 2)) + (a2 * 2))), (int)(short)*(short *)&a1, (int)(short)*(short *)&a2, a3);
 }
 
 void func_0005E5D7(int a1, int a2)

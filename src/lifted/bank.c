@@ -183,7 +183,7 @@ void func_0006B7EE(int a1)
     if (((int)(unsigned char)*(signed char *)((char *)a1)) != 43) return;
     if (*(int *)((char *)a1 + 63) == 0) return;
     if (((int)(unsigned char)*(signed char *)D_001A41F3) == 20) return;
-    l_20 = *(int *)(*(char **)D_00195BDC + 43) + (((int)(unsigned short)*(short *)((char *)a1 + 27)) * 26);
+    l_20 = (int)(*(char **)(*(char **)D_00195BDC + 43) + (((int)(unsigned short)*(short *)((char *)a1 + 27)) * 26));
     if (*(int *)((char *)a1 + 31) != *(int *)((char *)l_20 + 20)) goto L6B869;
     if (((int)(unsigned char)*(signed char *)((char *)l_20 + 24)) == 1) goto L6B86E;
 L6B869:;

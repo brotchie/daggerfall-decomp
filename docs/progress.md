@@ -965,3 +965,14 @@ Batch **1,715**.
   tags pointer additions and offers this as a choice point at the memory access. +27.
 
 Batch **1,751**.
+
+## 2026-10-02: masks and unfolded loads
+
+- `mov eax,[p+0x1f]; and eax,0xffff` is `x & 0xffff` on an int field: the
+  `(unsigned short)` cast makes the compiler load a word instead. The lifter uses the mask
+  for dword reads. +11.
+- A dword read kept in a register for an add (`mov eax,[p+0x88]; add eax,edx` rather than
+  `add edx,[p+0x88]`) is a pointer: Watcom 10 never folds a pointer load into an add. The
+  lifter now spells such adds as pointer arithmetic by default (a choice point). +8.
+
+Batch **1,770**.

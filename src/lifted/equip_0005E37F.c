@@ -30,6 +30,6 @@ case 11:
     func_0005DE74(287, 27, 8, a4);
     return;
 default:
-    func_0005DE74((int)(unsigned short)*(short *)((char *)((l_14 * 2) + *(int *)(D_00185F88 + (((int)(unsigned short)a1) << 2)))), (int)(short)a1, (int)(short)*(short *)&l_14, a4);
+    func_0005DE74((int)(unsigned short)*(short *)((char *)(int)(*(char **)(D_00185F88 + (((int)(unsigned short)a1) << 2)) + (l_14 * 2))), (int)(short)a1, (int)(short)*(short *)&l_14, a4);
 }
 }
