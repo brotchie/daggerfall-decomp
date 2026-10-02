@@ -30,7 +30,6 @@ extern void func_00060270(int, int);
 extern void func_000797E2(int, int);
 extern void func_0007DDC9(int);
 int func_0002E914(int, int, int);
-#pragma dagger DAGGER_KEEPSUB func_0002E032
 
 int func_0002E032(int a1, int a2, int a3, int a4, int a5, int a6)
 {

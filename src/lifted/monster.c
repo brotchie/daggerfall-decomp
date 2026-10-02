@@ -56,7 +56,6 @@ int func_00063ED8(int, int);
 void func_00062FBE(int);
 #pragma dagger DAGGER_DEADDEF func_000622EB
 #pragma dagger DAGGER_DEADDEF func_00063512
-#pragma dagger DAGGER_KEEPSUB func_00063ED8
 
 void func_000622EB(int a1, int a2, int a3, int a4)
 {

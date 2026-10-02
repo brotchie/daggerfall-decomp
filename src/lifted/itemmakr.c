@@ -122,7 +122,6 @@ void func_00058473(void);
 void func_000585D6(int, int);
 void func_00058AF7(void);
 #pragma aux func_000A0ED9 parm routine [];
-#pragma dagger DAGGER_KEEPSUB func_000586AF
 #pragma dagger KKND_CONFREV func_000571C7
 
 void func_00055F0F(void)

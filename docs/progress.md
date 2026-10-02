@@ -1032,3 +1032,20 @@ Batch **1,817**.
   `test byte [ebp-x+1],0x80`; byte tests are on other memory (char fields). The code
   generator no longer narrows tests of stack variables at `-od`
   (`DAGGER_NARROWTEST=1` for OW's). +9. Batch **1,826**.
+
+## 2026-10-02: shape census
+
+`tools/shape_census.py` compares instruction shapes (mnemonic and operand kinds) between our
+output and FALL.EXE over the functions that don't match yet. Findings acted on:
+
+- `sub [ebp-x],k` never occurs in FALL.EXE (`add [ebp-x],-k` does): in-place constant
+  subtraction on stack variables stays an add (`DAGGER_STACKSUB=1` for OW).
+- 8-bit shifts (`add al,al; shr al,6`) are byte bit-field reads; the lifter emits
+  `struct bf8_S_L { unsigned char _:S; unsigned char f:L; }` reads.
+- An address-taken slot with one of its bytes read separately is a 4-byte array.
+- Byte arithmetic between two variables (`add al,dl`, `add al,[x]`) is far rarer in
+  FALL.EXE than in our output: Watcom 10 demoted less. Global changes to demotion lose
+  hundreds of functions; `DAGGER_NODEMOTE` and `DAGGER_NOCVTDEMOTE` are per-function knobs
+  (+1).
+
+Batch **1,827**.

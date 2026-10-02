@@ -23,7 +23,6 @@ extern int func_000CE758();
 extern int func_00142790();
 void func_00013AB6(int);
 #pragma aux func_000A0ED9 parm routine [];
-#pragma dagger DAGGER_KEEPSUB func_00013AB6
 
 void func_00013A52(void)
 {

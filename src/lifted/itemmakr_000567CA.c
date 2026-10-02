@@ -6,7 +6,6 @@ extern char D_001AA560[];
 extern char D_001AA57C[];
 extern char D_001AA5F9[];
 
-#pragma dagger DAGGER_KEEPSUB func_000567CA
 
 void func_000567CA(int a1)
 {

@@ -211,7 +211,6 @@ void func_0001B554(int, int, int);
 void func_0001B5BE(int, int);
 #pragma aux func_000A0ED9 parm routine [];
 #pragma dagger DAGGER_DEADDEF func_00016DA8
-#pragma dagger DAGGER_KEEPSUB func_00019067
 #pragma dagger KKND_CONFREV func_00017CEF
 
 int func_00014AE8(int a1)
