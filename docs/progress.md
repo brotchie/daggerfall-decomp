@@ -326,3 +326,30 @@ game region only:
   Operating System.
 
 Game progress: **26 / 2,297 functions, 1,191 / 580,076 bytes (0.21%)**.
+
+## 2026-10-01: `src/` by original unit
+
+`src/` now has one file per original source unit (`src/talk.c`, `src/qmisc.c`, ...), with
+functions in address order and shared declarations in `include/dagger.h`, so every global has
+one type across units. That fixed a real conflict: `D_00195AC4` had been declared `int` in one
+probe and `char *` in another. `tools/units.py` maps an address to its unit. A function between
+two units' `__FILE__` runs is filed with the earlier unit and marked
+`/* between the X and Y runs: unit not certain */`.
+
+The build doesn't depend on the file layout (it splices by address), so these assignments can
+be corrected at any time.
+
+## Phase summary: build and verify (plan step 5) is done
+
+- `tools/build-and-verify.sh`: full splice-and-SHA-1 build with relocation checks, negative
+  tests and a `--blank` self-test.
+- `tools/split.py`: per-function asm listings (gitignored `asm/`).
+- Compiler: three `-od` patches (peephole flush, void return slot, stack-slot order), each
+  switchable back to stock OW with an environment variable.
+- Layout: 84 original units recovered from `__FILE__` strings, regions for game, library and
+  XnGine, `src/` organised by unit.
+- **26 / 2,297 game functions, 1,191 / 580,076 bytes, `build/FALL.EXE: OK`.**
+
+Next phase: match functions in bulk. Rank the game functions by difficulty (size, branches,
+calls, floating point), work through the easy ones unit by unit, and collect the compiler
+differences that come up along the way.

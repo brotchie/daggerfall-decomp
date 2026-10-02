@@ -35,9 +35,11 @@ python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
 # 3. Patched compiler (clones open-watcom-v2 into third_party/, about 3 minutes)
 tools/build_ow.sh
 
-# 4. Find functions, match a C file against the original, then build and verify
+# 4. Find functions and units, match a C file, then build and verify
 .venv/bin/python tools/find_functions.py
-.venv/bin/python tools/match.py src/leaf_probes.c
+.venv/bin/python tools/find_units.py
+.venv/bin/python tools/split.py                # asm listings in asm/nonmatchings/
+.venv/bin/python tools/match.py src/talk.c
 tools/build-and-verify.sh
 ```
 
@@ -53,6 +55,7 @@ tools/build-and-verify.sh
 | `tools/omf.py` | OMF object reader (from KKND-Decomp) |
 | `tools/match.py` | compile a C file and compare its functions with `FALL.EXE` |
 | `tools/cc_dis.py` | disassemble what the compiler makes of a C file |
+| `tools/find_units.py`, `tools/units.py` | recover the original source units; map an address to its unit |
 | `tools/build-and-verify.sh` | splice all of `src/` into `FALL.EXE` and check the SHA-1 (`build_fall.py`) |
 
 Several tools are adapted from [KKND-Decomp](https://github.com/Wyrelade/KKND-Decomp) (CC0).
