@@ -340,6 +340,14 @@ class Func:
                           nxt.op_str in ("eax, 0xff", "eax, 0xffff")) or \
                             (prv is not None and prv.mnemonic == "xor"):
                         sign.setdefault(off, set()).add("u")
+        if self.ret_slot is not None and self.ret_slot in wide16 and self.ret_type == "int" \
+                and not os.environ.get("LIFT_NOSHORTRET"):
+            # a 16-bit value stored whole into the return variable: a short function (its
+            # return variable is read back whole either way); a choice point
+            self.choices.append(first[self.ret_slot] + 0.0625)
+            uses = ret_uses().get(self.va, set())
+            if (first[self.ret_slot] + 0.0625 not in self.flips) == (uses != {"int"}):
+                self.ret_type = "short"
         self.slot_type = {}
         for reg, off, _sz in self.params:
             acc.setdefault(off, set())
@@ -2397,6 +2405,44 @@ def caller_types():
 
 
 GLOBAL_SIGN = None
+
+
+RET_USES = None
+
+
+def ret_uses():
+    """{callee va: set of 'short' / 'int'}: how callers use the returned eax. `cwde` (or
+    movsx from ax) right after the call: a short function; eax used whole: an int one."""
+    global RET_USES
+    if RET_USES is not None:
+        return RET_USES
+    path = os.path.join(ROOT, "build", "lift", "ret_uses.json")
+    if os.path.exists(path) and os.path.getmtime(path) >= os.path.getmtime(__file__):
+        with open(path) as f:
+            RET_USES = {int(k): set(v) for k, v in json.load(f).items()}
+        return RET_USES
+    out = {}
+    for va in IMG.funcs:
+        if not (0x10000 <= va < GAME_END) or IMG.le.obj_of_va(va).index != 1:
+            continue
+        try:
+            ins = IMG.insns(va)
+        except Exception:
+            continue
+        for k, c in enumerate(ins[:-1]):
+            if c.mnemonic != "call" or c.operands[0].type != cx.X86_OP_IMM:
+                continue
+            n = ins[k + 1]
+            if n.mnemonic == "cwde" or (n.mnemonic == "movsx" and n.op_str.endswith(", ax")):
+                out.setdefault(c.operands[0].imm, set()).add("short")
+            elif re.search(r"\beax\b", n.op_str) and not (
+                    n.mnemonic in ("mov", "movsx", "movzx", "lea") and n.op_str.startswith("eax,")):
+                out.setdefault(c.operands[0].imm, set()).add("int")
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path, "w") as f:
+        json.dump({str(k): sorted(v) for k, v in out.items()}, f)
+    RET_USES = out
+    return out
 
 
 def unsigned_globals():

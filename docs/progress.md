@@ -1140,3 +1140,7 @@ Batch **1,927**; build **61.34%**.
   loses ~300; per function +5). Batch **2,007**.
 - The search also tries a nearby choice point together with each compiler knob, at every
   new first difference it gets stuck on. +4. Batch **2,011**.
+- **Short functions**: a 16-bit value stored whole into the return variable (`mov ax,[x];
+  mov [ret],eax`) marks a short function (its return variable is read back whole either
+  way), unless callers use the result whole (a census of the instruction after each call:
+  `cwde` says short, eax used as an int says int). +3. Batch **2,014**.
