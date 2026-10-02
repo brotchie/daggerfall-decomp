@@ -427,8 +427,6 @@ int func_0001FBF5(int a1)
 {
     int l_20;
     int l_1C;
-{
-    int l_28;
 
     if (((int)(unsigned char)*(signed char *)(*(char **)((char *)a1 + 67))) == 43) goto L1FC24;
     return 0;
@@ -472,18 +470,7 @@ L1FD24:;
     return 1;
 L1FD2D:;
     *(int *)D_00190BE4 = *(int *)((char *)l_1C + 2);
-    if (((int)(unsigned char)(*(signed char *)((char *)l_1C + 15) & 2)) == 0) goto L1FD57;
-    if (((unsigned)*(int *)((char *)l_1C + 2)) > *(int *)D_00195BF4) goto L1FD59;
-L1FD57:;
-    goto L1FD62;
-L1FD59:;
-    l_28 = 1;
-    goto L1FD69;
-L1FD62:;
-    l_28 = 0;
-L1FD69:;
-    return l_28;
-}
+    return (((((int)(unsigned char)(*(signed char *)((char *)l_1C + 15) & 2)) != 0) && (((unsigned)*(int *)((char *)l_1C + 2)) > *(int *)D_00195BF4)) ? 1 : 0);
 }
 
 void func_0001FD7C(int a1)

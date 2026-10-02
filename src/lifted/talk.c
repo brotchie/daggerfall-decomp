@@ -2539,21 +2539,7 @@ L1ACB8:;
 
 int func_0001ACCA(int a1)
 {
-{
-    int l_20;
-
-    if (((int)(unsigned char)*(signed char *)((char *)a1)) != 7) goto L1ACFC;
-    if (((int)(unsigned char)*(signed char *)((char *)a1 + 1)) != 255) goto L1ACFE;
-L1ACFC:;
-    goto L1AD07;
-L1ACFE:;
-    l_20 = 1;
-    goto L1AD0E;
-L1AD07:;
-    l_20 = 0;
-L1AD0E:;
-    return l_20;
-}
+    return (((((int)(unsigned char)*(signed char *)((char *)a1)) == 7) && (((int)(unsigned char)*(signed char *)((char *)a1 + 1)) != 255)) ? 1 : 0);
 }
 
 int func_0001AD21(int a1, int a2)

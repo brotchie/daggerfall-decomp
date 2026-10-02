@@ -414,8 +414,6 @@ int func_0004B28C(int a1)
     int l_24;
     int l_20;
     int l_1C;
-{
-    int l_30;
 
     l_24 = func_0008E925(*(int *)D_00195AC4, *(int *)((char *)a1 + 20));
     if (((int)(unsigned short)*(short *)((char *)a1 + 18)) != 108) goto L4B2CC;
@@ -485,18 +483,7 @@ L4B40E:;
     return 0;
 L4B427:;
     l_28 = ((unsigned)(((unsigned)*(int *)D_00195BF4) % 1440)) / 60;
-    if (((int)(unsigned char)*(signed char *)(D_0017C5B8 + (((int)(unsigned char)*(signed char *)((char *)a1 + 24)) * 2))) > l_28) goto L4B47D;
-    if (((int)(unsigned char)*(signed char *)(D_0017C5B9 + (((int)(unsigned char)*(signed char *)((char *)a1 + 24)) * 2))) > l_28) goto L4B47F;
-L4B47D:;
-    goto L4B488;
-L4B47F:;
-    l_30 = 1;
-    goto L4B48F;
-L4B488:;
-    l_30 = 0;
-L4B48F:;
-    return l_30;
-}
+    return (((((int)(unsigned char)*(signed char *)(D_0017C5B8 + (((int)(unsigned char)*(signed char *)((char *)a1 + 24)) * 2))) <= l_28) && (((int)(unsigned char)*(signed char *)(D_0017C5B9 + (((int)(unsigned char)*(signed char *)((char *)a1 + 24)) * 2))) > l_28)) ? 1 : 0);
 }
 
 int func_0004B4A2(int a1)

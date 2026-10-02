@@ -367,7 +367,6 @@ L261C6:;
     goto L261D1;
 L261C8:;
 {
-    int l_50;
     int l_4C;
     int l_48;
     int l_44;
@@ -449,17 +448,7 @@ L262CF:;
 L262D6:;
     return l_4C;
 case 6:
-    if (l_18 > 256) goto L262F0;
-    if (l_1C <= 768) goto L262F2;
-L262F0:;
-    goto L262FB;
-L262F2:;
-    l_50 = 1;
-    goto L26302;
-L262FB:;
-    l_50 = 0;
-L26302:;
-    return l_50;
+    return (((l_18 <= 256) && (l_1C <= 768)) ? 1 : 0);
 default:
     return 0;
 }

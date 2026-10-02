@@ -2569,16 +2569,30 @@ class Func:
                     continue
                 lt, le = mt.group(1), me.group(1)
                 k = i
-                terms = []
+                # `Lx:; goto Le;` just above the then-arm: the chain's fall-through goes to
+                # the else-arm (`if (a) goto Lx; if (b) goto Lt; Lx: goto Le;`)
+                lx = None
+                if k > 2 and out[k - 1] == "    goto %s;" % le and \
+                        re.fullmatch(r"L[0-9A-F]+:;", out[k - 2]) and \
+                        not os.environ.get("LIFT_NOTRAMPTERN"):
+                    lx = out[k - 2][:-2]
+                    k -= 2
+                raw = []
                 while k > 0:
                     mc = re.fullmatch(r"    if \((.*)\) goto (L[0-9A-F]+);", out[k - 1])
-                    if not mc or mc.group(2) not in (lt, le):
+                    if not mc or mc.group(2) not in (lt, le, lx):
                         break
-                    terms.insert(0, (mc.group(1), mc.group(2)))
+                    raw.insert(0, (mc.group(1), mc.group(2)))
                     k -= 1
-                if len(terms) < 2 or not any(lab == le for _, lab in terms) or \
-                        gotos(lt) != sum(lab == lt for _, lab in terms) or \
-                        gotos(le) != sum(lab == le for _, lab in terms):
+                if len(raw) < 2 or gotos(lt) != sum(lab == lt for _, lab in raw) or \
+                        gotos(le) != sum(lab == le for _, lab in raw) + (lx is not None) or \
+                        (lx is not None and (raw[-1][1] != lt or
+                                             gotos(lx) != sum(lab == lx for _, lab in raw))):
+                    continue
+                terms = [(c, le if lab == lx else lab) for c, lab in raw]
+                if lx is not None:
+                    terms[-1] = ("@NEG:" + terms[-1][0], le)
+                if not any(lab == le for _, lab in terms):
                     continue
 
                 def then(j):
@@ -2588,7 +2602,7 @@ class Func:
                     rest = then(j + 1)
                     if lab == lt:
                         return None if rest is None else "(%s) || (%s)" % (c, rest)
-                    nc = negate(c)
+                    nc = c[5:] if c.startswith("@NEG:") else negate(c)
                     return nc if rest is None else "%s && (%s)" % (nc, rest)
                 cond = then(0)
                 if cond is None:

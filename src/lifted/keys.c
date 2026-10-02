@@ -472,18 +472,7 @@ int func_000430CD(int a1)
     goto L43270;
 case 200:
 case 201:
-    if (((int)(unsigned char)*(signed char *)(D_00195EB0 + a1)) != 200) goto L4315A;
-{
-    int l_34;
-    int l_30;
-    int l_2C;
-    int l_28;
-    l_28 = 0;
-    goto L43161;
-L4315A:;
-    l_28 = 1;
-L43161:;
-    l_1C = l_28;
+    l_1C = ((((int)(unsigned char)*(signed char *)(D_00195EB0 + a1)) == 200) ? 0 : 1);
     if (*(signed char *)(D_00152A30 + l_1C) == 0) goto L4317F;
     if (*(signed char *)(D_00199704 + l_1C) == 0) goto L43181;
 L4317F:;
@@ -497,41 +486,11 @@ L43197:;
 L431AD:;
     return 0;
 case 202:
-    if (((int)(unsigned char)(*(signed char *)D_0012AC00 & 1)) == 0) goto L431D9;
-    if (((int)(unsigned char)(*(signed char *)D_00196279 & 1)) == 0) goto L431DB;
-L431D9:;
-    goto L431E4;
-L431DB:;
-    l_2C = 1;
-    goto L431EB;
-L431E4:;
-    l_2C = 0;
-L431EB:;
-    return l_2C;
+    return (((((int)(unsigned char)(*(signed char *)D_0012AC00 & 1)) != 0) && (((int)(unsigned char)(*(signed char *)D_00196279 & 1)) == 0)) ? 1 : 0);
 case 203:
-    if (((int)(unsigned char)(*(signed char *)D_0012AC00 & 2)) == 0) goto L43216;
-    if (((int)(unsigned char)(*(signed char *)D_00196279 & 2)) == 0) goto L43218;
-L43216:;
-    goto L43221;
-L43218:;
-    l_30 = 1;
-    goto L43228;
-L43221:;
-    l_30 = 0;
-L43228:;
-    return l_30;
+    return (((((int)(unsigned char)(*(signed char *)D_0012AC00 & 2)) != 0) && (((int)(unsigned char)(*(signed char *)D_00196279 & 2)) == 0)) ? 1 : 0);
 case 212:
-    if (((int)(unsigned char)(*(signed char *)D_0012AC00 & 4)) == 0) goto L43253;
-    if (((int)(unsigned char)(*(signed char *)D_00196279 & 4)) == 0) goto L43255;
-L43253:;
-    goto L4325E;
-L43255:;
-    l_34 = 1;
-    goto L43265;
-L4325E:;
-    l_34 = 0;
-L43265:;
-    return l_34;
+    return (((((int)(unsigned char)(*(signed char *)D_0012AC00 & 4)) != 0) && (((int)(unsigned char)(*(signed char *)D_00196279 & 4)) == 0)) ? 1 : 0);
 default:
 L43270:;
     return 0;
@@ -548,6 +507,5 @@ L432CA:;
     *(signed char *)(D_00190484 + ((int)(unsigned char)*(signed char *)(D_00195EB0 + a1))) = 0;
 L432F6:;
     return 0;
-}
 }
 }
