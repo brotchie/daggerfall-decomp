@@ -86,25 +86,12 @@ int func_0001410F(int a1)
     int l_24;
     int l_20;
     int l_1C;
-{
-    unsigned char l_30;
 
     if ((*(unsigned char *)((char *)*(int *)D_00196484) & 1) == 0) goto L14136;
     return 0;
 L14136:;
-    l_30 = *(signed char *)((char *)a1);
-    if (l_30 < 32) goto L1416E;
-    if (l_30 <= 32) goto L142D9;
-    if (l_30 < 43) goto L14169;
-    if (l_30 <= 43) goto L1417D;
-    if (l_30 == 56) goto L14233;
-    goto L14320;
-L14169:;
-    goto L14320;
-L1416E:;
-    if (l_30 == 6) goto L142D9;
-    goto L14320;
-L1417D:;
+    switch (*(unsigned char *)((char *)a1)) {
+case 43:
     l_24 = a1 + 71;
     l_20 = *(int *)((char *)l_24 + 5);
     l_1C = 0;
@@ -128,7 +115,7 @@ L14225:;
     goto L141AA;
 L14227:;
     return 0;
-L14233:;
+case 56:
     l_20 = a1 + 71;
     l_1C = 0;
 L14243:;
@@ -150,13 +137,15 @@ L142CE:;
     goto L14259;
 L142D0:;
     return 0;
-L142D9:;
+case 6:
+case 32:
     l_28 = a1 + 71;
     if (*(int *)D_0019647C != l_28) goto L14320;
     *(signed char *)((char *)*(int *)D_00196484) |= 5;
     *(int *)((char *)*(int *)D_00196484 + 4) = a1;
     *(int *)((char *)*(int *)D_00196484 + 8) = func_00014438(l_28, *(int *)D_00195DC0);
     return 1;
+default:
 L14320:;
     return 0;
 }

@@ -73,60 +73,31 @@ void func_0002F02C(int a1, int a2)
     int l_1C;
     int l_18;
     int l_14;
-{
-    unsigned char l_28;
 
     l_1C = a1 + 71;
     l_18 = a2 + 71;
-    l_28 = *(signed char *)((char *)l_1C + 67);
-    if (l_28 < 10) goto L2F0C2;
-    if (l_28 <= 10) goto L2F189;
-    if (l_28 < 20) goto L2F09E;
-    if (l_28 <= 20) goto L2F21F;
-    if (l_28 < 28) goto L2F099;
-    if (l_28 <= 28) goto L2F244;
-    if (l_28 == 30) goto L2F244;
-    return;
-L2F099:;
-    return;
-L2F09E:;
-    if (l_28 < 14) goto L2F0BD;
-    if (l_28 <= 14) goto L2F1DA;
-    if (l_28 == 19) goto L2F1F8;
-    return;
-L2F0BD:;
-    return;
-L2F0C2:;
-    if (l_28 < 3) goto L2F0EE;
-    if (l_28 <= 3) goto L2F11F;
-    if (l_28 < 6) goto L2F0E9;
-    if (l_28 <= 6) goto L2F146;
-    if (l_28 == 9) goto L2F16E;
-    return;
-L2F0E9:;
-    return;
-L2F0EE:;
-    if (l_28 != 0) return;
+    switch (*(unsigned char *)((char *)l_1C + 67)) {
+case 0:
     if (func_0007D6AE(0, 100) > 5) goto L2F11A;
     func_00065937(a2, (int)D_0017A158, 0, 0);
 L2F11A:;
     return;
-L2F11F:;
+case 3:
     if (func_0007D6AE(0, 100) > 2) goto L2F141;
     func_00065937(a2, (int)D_0017A148, 0, 0);
 L2F141:;
     return;
-L2F146:;
+case 6:
     if (func_0005B772(a2, 66, 0) != 0) goto L2F169;
     func_0005AAE4(a1, a2, 66);
 L2F169:;
     return;
-L2F16E:;
+case 9:
     if (func_0009DC25() >= 400) goto L2F184;
     func_0002F288(a2, 0);
 L2F184:;
     return;
-L2F189:;
+case 10:
     l_14 = (int)(unsigned short)*(short *)((char *)l_18 + 155);
     l_14 -= func_0007D6AE(10, 30) << 6;
     if (l_14 >= 0) goto L2F1BA;
@@ -137,28 +108,30 @@ L2F1BA:;
     func_0002F369(a2);
 L2F1D5:;
     return;
-L2F1DA:;
+case 14:
     if (func_0009DC25() >= 400) goto L2F1F3;
     func_0002F288(a2, 1);
 L2F1F3:;
     return;
-L2F1F8:;
+case 19:
     if (func_0007D6AE(1, 100) > 5) goto L2F21D;
     func_00065937(a2, (int)D_0017A14C, 0, 0);
 L2F21D:;
     return;
-L2F21F:;
+case 20:
     if (func_0005B772(a2, 66, 0) != 0) goto L2F242;
     func_0005AAE4(a1, a2, 66);
 L2F242:;
     return;
-L2F244:;
+case 28:
+case 30:
     if (func_0009DC25() >= 400) goto L2F25A;
     func_0002F2FA(a2);
     return;
 L2F25A:;
     if (func_0007D6AE(1, 100) > 2) return;
     func_00065937(a2, (int)D_0017A158, 0, 0);
+default:;
 }
 }
 
@@ -375,8 +348,6 @@ void func_0002FC03(int a1, int a2, int a3)
     int l_18;
     int l_14;
     int l_10;
-{
-    unsigned char l_2C;
 
     l_1C = a2 + 71;
     l_18 = 0;
@@ -403,8 +374,7 @@ L2FC7F:;
     return;
 __dagger_tbl2FCDB:;
 L2FCEB:;
-    l_2C = *(signed char *)(D_00184FD7 + ((int)(unsigned char)*(signed char *)((char *)l_1C + 67)));
-    switch (l_2C) {
+    switch (*(unsigned char *)(D_00184FD7 + ((int)(unsigned char)*(signed char *)((char *)l_1C + 67)))) {
 case 3:
     return;
 case 2:
@@ -422,7 +392,6 @@ case 0:
 default:
 L2FD68:;
     goto L2FC33;
-}
 }
 }
 

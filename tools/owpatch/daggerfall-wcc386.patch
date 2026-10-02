@@ -229,18 +229,28 @@ index 14a056a76b..63b9aa5f52 100644
      temp->v.usage |= USE_IN_ANOTHER_BLOCK;
  
 diff --git a/bld/cg/c/bldsel.c b/bld/cg/c/bldsel.c
-index 6dc64e437d..825936f5ec 100644
+index 6dc64e437d..4e706e8f4a 100644
 --- a/bld/cg/c/bldsel.c
 +++ b/bld/cg/c/bldsel.c
-@@ -31,6 +31,7 @@
+@@ -31,6 +31,8 @@
  
  
  #include "_cgstd.h"
 +#include <stdlib.h>
++#include <stdio.h>
  #include "coderep.h"
  #include "cgmem.h"
  #include "seldef.h"
-@@ -445,7 +446,8 @@ static void DoBinarySearch( an node, const select_list *list, const type_def *ti
+@@ -48,6 +50,8 @@
+ #include "generate.h"
+ #include "i64.h"
+ 
++extern int  DaggerTableState( void );
++
+ 
+ static const type_def   *SortTipe;
+ 
+@@ -445,7 +449,8 @@ static void DoBinarySearch( an node, const select_list *list, const type_def *ti
              return;
          }
      }
@@ -250,7 +260,54 @@ index 6dc64e437d..825936f5ec 100644
          /*
           * a linear sequence for three different non-sequential cases where
           * c1<c2<c3, looks like:
-@@ -656,8 +658,15 @@ void    BGSelect( sel_handle s_node, an node, cg_switch_type allowed )
+@@ -576,6 +581,7 @@ void    BGSelect( sel_handle s_node, an node, cg_switch_type allowed )
+ {
+     cost_val    cost;
+     cost_val    best;
++    cg_switch_type allowed0;
+     sel_kind    kind;
+     unsigned_64 tmp;
+ 
+@@ -584,8 +590,19 @@ void    BGSelect( sel_handle s_node, an node, cg_switch_type allowed )
+         allowed = CG_SWITCH_ALL;
+     }
+     kind = 0;
++    allowed0 = allowed;
++    if( _IsModel( CGSW_GEN_NO_OPTIMIZATION ) && getenv( "DAGGER_NOSWFORCE" ) == NULL ) {
++        /* Daggerfall: the lifter marks where each of FALL.EXE's jump tables sat
++         * (DaggerTableHere): a switch with a pending mark had a table, one without had none */
++        if( DaggerTableState() != 0 ) {
++            allowed = CG_SWITCH_TABLE;
++        } else if( allowed & ~CG_SWITCH_TABLE ) {
++            allowed &= ~CG_SWITCH_TABLE;
++        }
++    }
+     node = Arithmetic( node, TypeInteger );
+     if( U64isntZero( s_node->num_cases ) ) {
++again:
+         best = MAX_COST;
+         /*
+          * sort signed
+@@ -637,6 +654,18 @@ void    BGSelect( sel_handle s_node, an node, cg_switch_type allowed )
+                 kind = U_IF;
+             }
+         }
++        if( ( kind == 0 || best >= MAX_COST ) && allowed != allowed0 ) {
++            allowed = allowed0;         /* a table isn't possible after all */
++            goto again;
++        }
++        if( getenv( "DAGGER_SWDEBUG" ) != NULL ) {
++            /* Daggerfall: the switch strategy costs, for fitting Watcom 10's choices */
++            SortNodeList( node, s_node, false );
++            fprintf( stderr, "switch: cases %u lo %d hi %d scan %u jump %u if %u -> kind %d\n",
++                (unsigned)U64Low( s_node->num_cases ), (int)U64Low( s_node->lower ),
++                (int)U64Low( s_node->upper ), (unsigned)ScanCost( s_node ),
++                (unsigned)JumpCost( s_node ), (unsigned)DistinctIfCost( s_node ), (int)kind );
++        }
+         switch( kind ) {
+         case S_SCAN:
+         case S_JUMP:
+@@ -656,8 +685,15 @@ void    BGSelect( sel_handle s_node, an node, cg_switch_type allowed )
           * once to index into the scan table. This would be bad if it
           * changed in between.
           */
@@ -1360,7 +1417,7 @@ index d5bb49a4be..e28fa26206 100644
              return( HW_DS );
          return( HW_CS );
 diff --git a/bld/cg/intel/c/x86sel.c b/bld/cg/intel/c/x86sel.c
-index 1de30dab10..030fd621ff 100644
+index 1de30dab10..bd33664af3 100644
 --- a/bld/cg/intel/c/x86sel.c
 +++ b/bld/cg/intel/c/x86sel.c
 @@ -32,6 +32,7 @@
@@ -1371,7 +1428,7 @@ index 1de30dab10..030fd621ff 100644
  #include "coderep.h"
  #include "cgmem.h"
  #include "tree.h"
-@@ -113,8 +114,13 @@ static cost_val Balance( uint_32 size, uint_32 time )
+@@ -113,8 +114,16 @@ static cost_val Balance( uint_32 size, uint_32 time )
      byte        opt_size;
  
      opt_size = OptForSize;
@@ -1380,14 +1437,17 @@ index 1de30dab10..030fd621ff 100644
 +    if( getenv( "KKND_SWOPT" ) != NULL ) {
 +        /* KKND experiment: override the size/time balance used to pick a switch strategy */
 +        opt_size = (byte)atoi( getenv( "KKND_SWOPT" ) );
-+    } else if( opt_size < 15 || _IsModel( CGSW_GEN_NO_OPTIMIZATION ) ) {
-+        /* Daggerfall: at -od (OptForSize 50) too: Watcom 10 used a table for a 4-case switch */
++    } else if( _IsModel( CGSW_GEN_NO_OPTIMIZATION ) ) {
++        /* Daggerfall: at -od, FALL.EXE's 158 switches (tables vs compare trees) fit a
++         * balance of 31..33 (OW's -od OptForSize is 50) */
++        opt_size = 32;
++    } else if( opt_size < 15 ) {
 +        /* KKND: retail Watcom 10.x switch choices fit a floor in [13,19] (OW uses 25) */
 +        opt_size = 15;
      }
      balance = ( size * opt_size + 10 * time * ( 100 - opt_size ) ) / 100;
      if( (int_32)balance < 0 || balance > MAX_COST )
-@@ -315,6 +321,14 @@ static void GenValuesBackward( sel_handle s_node, const signed_64 *to_sub, cg_ty
+@@ -315,6 +324,14 @@ static void GenValuesBackward( sel_handle s_node, const signed_64 *to_sub, cg_ty
  }
  
  
@@ -1402,7 +1462,7 @@ index 1de30dab10..030fd621ff 100644
  tbl_control *MakeScanTab( sel_handle s_node, cg_type value_type, cg_type real_type )
  /**********************************************************************************/
  {
-@@ -379,6 +393,43 @@ tbl_control *MakeScanTab( sel_handle s_node, cg_type value_type, cg_type real_ty
+@@ -379,6 +396,43 @@ tbl_control *MakeScanTab( sel_handle s_node, cg_type value_type, cg_type real_ty
      return( table );
  }
  
@@ -1446,7 +1506,7 @@ index 1de30dab10..030fd621ff 100644
  tbl_control     *MakeJmpTab( sel_handle s_node )
  /**********************************************/
  {
-@@ -389,34 +440,51 @@ tbl_control     *MakeJmpTab( sel_handle s_node )
+@@ -389,34 +443,51 @@ tbl_control     *MakeJmpTab( sel_handle s_node )
      signed_64           curr;
      label_handle        other;
      unsigned_64         tmp;

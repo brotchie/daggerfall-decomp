@@ -748,3 +748,39 @@ assignment nested in a call argument.
   batch still runs in 7 s. Further ambiguities can become choice points the same way.
 
 Batch **1,432** (from 1,405); build **1,435 functions, 36.85%** of game code.
+
+## 2026-10-02: compare-tree switches
+
+Most of FALL.EXE's switches aren't jump tables: a census over the game code finds 139
+compare trees against 19 plain tables. Watcom copies the selector into a temp (`mov ax,[p];
+mov [t],eax`, or `mov [t],al` for a char) and binary-searches the case values on it
+(`cmp word [t],12; jb L1; cmp word [t],12; jbe Lcase12; ...`), sometimes ending in a table.
+The lifter used to turn that into `l_t = ...; if (...) goto ...;` chains on a declared local,
+which compiles to different code and a different frame.
+
+- **Lifter** (`find_cswitches`/`parse_ctree`): a slot stored and then compared at a narrower
+  width, touched by nothing but the tree, is a selector temp. The tree is walked tracking
+  the set of selector values on each path (jcc signedness picks the sort); leaves give the
+  case values, the target with the most values is the default, jump tables inside give
+  their entries, and in-tree `jmp default` stubs are recognised as part of the tree. The
+  output is `switch (expr) { case ...: }` with the temp's slot left undeclared.
+- **Nested switches**: open switches are a stack; a switch inside a case body stays open
+  until a label of an outer switch, and an inner switch whose default is shared with the
+  outer one ends there.
+- **Nested-block locals after a switch**: Watcom gives the selector temp its slot when the
+  switch is reached; locals that sit below it were in a block that began later, so the
+  lifter now opens that block at the first statement using them (inside the switch, closed
+  with it).
+- **Strategy choice** (`cg/c/bldsel.c`): Watcom's size/time balance for `-od` code fits
+  31..33 over all 158 switches once the selector's own width caps `SelType` (char
+  selectors: +2 bytes for a table, no extra compare byte), so the `-od` balance is now 32.
+  Since the lifter marks every table's position anyway, a pending table mark now also forces
+  a table and its absence rules one out (`DAGGER_NOSWFORCE=1` turns that off). A debug
+  print of the costs is behind `DAGGER_SWDEBUG=1`.
+- `lift_all.py` reports first differences decoding around tables and walking both
+  instruction lists in step; `match.py` does the same; `--only` runs update the report
+  instead of replacing it.
+
+Batch **1,449**; build **1,452 functions, 37.86%**. 53 of the 122 functions with a switch
+match; the rest mostly fail elsewhere (frame size, register choice, unsupported idioms),
+and the `repne scasb`/`scasw` scan switches are still unsupported.

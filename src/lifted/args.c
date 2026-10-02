@@ -290,8 +290,6 @@ int func_00083EDF(int a1)
     int l_24;
     int l_20;
     short l_18;
-{
-    unsigned char l_48;
 
     if (*(signed char *)D_001A949D == 0) goto L83F05;
     return 1;
@@ -340,23 +338,8 @@ L84029:;
 L84059:;
     *(int *)((char *)a1 + 47) = 0;
     *(int *)D_000C5404 = 0;
-    l_48 = *(signed char *)((char *)a1);
-    if (l_48 < 34) goto L840A5;
-    if (l_48 <= 34) goto L840C9;
-    if (l_48 < 43) goto L840A0;
-    if (l_48 <= 43) goto L8412E;
-    if (l_48 == 56) goto L84335;
-    goto L843CC;
-L840A0:;
-    goto L843CC;
-L840A5:;
-    if (l_48 < 6) goto L840C4;
-    if (l_48 <= 6) goto L841D5;
-    if (l_48 == 32) goto L841D5;
-    goto L843CC;
-L840C4:;
-    goto L843CC;
-L840C9:;
+    switch (*(unsigned char *)((char *)a1)) {
+case 34:
     if (*(signed char *)D_001A5C25 == 0) goto L843CC;
     if (*(short *)((char *)a1 + 27) == 0) goto L840F3;
     if (((int)(unsigned short)*(short *)((char *)a1 + 27)) != 65535) goto L840F8;
@@ -365,7 +348,7 @@ L840F3:;
 L840F8:;
     *(int *)((char *)a1 + 47) = func_00154D00(*(int *)((char *)a1 + 7), *(int *)((char *)a1 + 11), *(int *)((char *)a1 + 15), (int)(unsigned short)*(short *)((char *)a1 + 27), -1, 4, 4129024);
     goto L843CC;
-L8412E:;
+case 43:
     l_3C = a1 + 71;
     l_34 = *(int *)((char *)l_3C + 5);
     l_38 = *(int *)((char *)l_3C + 9);
@@ -384,6 +367,8 @@ L84173:;
     func_001401D4(l_34 + 4, 0);
 L841D3:;
     goto L84164;
+case 6:
+case 32:
 L841D5:;
     if (*(short *)((char *)a1 + 29) == 0) goto L843CC;
     l_40 = a1 + 71;
@@ -416,7 +401,7 @@ L84326:;
     func_001401D4(l_40, 0);
 L84330:;
     goto L843CC;
-L84335:;
+case 56:
     l_34 = a1 + 71;
     l_28 = 0;
 L84345:;
@@ -433,6 +418,7 @@ L8436A:;
     func_001401D4(l_34 + 4, 0);
 L843CA:;
     goto L8435B;
+default:
 L843CC:;
     return 0;
 }

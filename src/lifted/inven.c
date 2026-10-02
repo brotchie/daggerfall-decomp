@@ -117,6 +117,7 @@ extern int func_0004A3EC(int);
 extern int func_0004A98C(int, int);
 extern int func_0004BB64(int);
 extern int func_0005879B(int);
+extern int func_0005B772(int, int, int);
 extern int func_0005FD36(int);
 extern int func_00069938(int, int, int);
 extern int func_0006CB53(int, int);
@@ -151,6 +152,7 @@ extern void func_00082487(void);
 extern void func_00086397(int);
 extern void func_000880F8(int);
 extern void func_00088213(int, int);
+extern void func_0008A4E4(int);
 extern void func_0008C4E4(int);
 extern void func_0008E3F7(int, int);
 extern void func_00091D8D(int);
@@ -879,6 +881,47 @@ L96A58:;
     *(int *)D_00195D30 = func_0009784E(*(int *)D_00195D2C, 0);
     *(int *)D_00195D30 = (*(int *)D_00195D30 * *(int *)D_001788DF) / 256;
     return *(int *)D_00195D2C;
+}
+
+void func_00096B77(int a1, int a2)
+{
+    int l_1C;
+    int l_18;
+    int l_14;
+
+    l_1C = 0;
+    l_18 = a1 + 71;
+L96B9A:;
+    if (l_1C >= 10) goto L96BB2;
+    if (((int)(short)*(short *)((char *)((l_1C << 2) + l_18) + 67)) != (-1)) goto L96BB7;
+L96BB2:;
+    return;
+L96BB7:;
+    switch (*(unsigned short *)((char *)((l_1C << 2) + l_18) + 67)) {
+case 1:
+    l_14 = func_0005B772(*(int *)D_00195AA0, (int)(short)*(short *)((char *)((l_1C << 2) + l_18) + 69), a2 + 200);
+    if (l_14 == 0) goto L96C38;
+    func_0008A4E4(l_14);
+L96C38:;
+    goto L96CBB;
+case 3:
+    if (*(signed char *)((char *)l_18 + 48) == 0) goto L96C8B;
+    *(short *)((char *)*(int *)D_00195BE0 + 141) -= (unsigned short)(unsigned char)*(signed char *)((char *)l_18 + 48);
+    *(short *)((char *)*(int *)D_00195BE0 + 143) -= (unsigned short)(unsigned char)*(signed char *)((char *)l_18 + 48);
+    if (*(short *)((char *)*(int *)D_00195BE0 + 141) >= 0) goto L96C8B;
+    *(short *)((char *)*(int *)D_00195BE0 + 141) = 0;
+L96C8B:;
+    goto L96CBB;
+case 9:
+    *(signed char *)((char *)*(int *)D_00195BE0 + 138) &= 253;
+    goto L96CBB;
+case 10:
+    *(short *)((char *)(int)(*(char **)D_00195BE0 + (((int)(short)*(short *)((char *)((l_1C << 2) + l_18) + 69)) * 6)) + 157) -= 15;
+default:
+L96CBB:;
+    l_1C++;
+    goto L96B9A;
+}
 }
 
 void func_00097101(int a1)

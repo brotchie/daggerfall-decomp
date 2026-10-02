@@ -53,20 +53,30 @@ def norm(ins):
     return re.sub(r"0x[0-9a-f]{5,}", "ADDR", t)
 
 
-def first_diff(ours, theirs, va, mask):
-    """Short description of the first instruction pair that differs outside relocations.
-    Relative branches count as equal when mnemonic and length agree: their displacement only
-    differs because of a size difference further on, which is the thing to report."""
+def decode(code, va):
+    """Instructions of a function, stepping over its switch tables (data in the code)."""
     md = W["md"]
-    a = list(md.disasm(ours, va))
-    b = list(md.disasm(theirs, va))
+    tables = sorted((t, n) for t, n in W["lift"].IMG.tables if va <= t < va + len(code))
+    out, pos = [], 0
+    for t, n in tables + [(va + len(code), 0)]:
+        out += list(md.disasm(code[pos:t - va], va + pos))
+        pos = t - va + n
+    return out
+
+
+def first_diff(ours, theirs, va, mask_ours, mask_theirs):
+    """Short description of the first instruction pair that differs outside relocations,
+    walking both instruction lists in step: a branch that only differs in its displacement
+    or size (from a difference further on) counts as equal."""
+    a = decode(ours, va)
+    b = decode(theirs, va)
     for x, y in zip(a, b):
-        k = y.address - va
-        if x.mnemonic.startswith("j") and y.mnemonic.startswith("j") and \
-                x.mnemonic == y.mnemonic and x.size == y.size and x.op_str.startswith("0x"):
+        if x.mnemonic.startswith("j") and x.mnemonic == y.mnemonic and \
+                x.op_str.startswith("0x") and y.op_str.startswith("0x"):
             continue
-        if x.size != y.size or any(k + j not in mask and ours[k + j] != theirs[k + j]
-                                   for j in range(y.size)):
+        ko, kt = x.address - va, y.address - va
+        if x.size != y.size or any(ko + j not in mask_ours and kt + j not in mask_theirs and
+                                   ours[ko + j] != theirs[kt + j] for j in range(y.size)):
             return "%s | %s" % (norm(x), norm(y)), y.address
     return "length %d | %d bytes" % (len(ours.rstrip(b"\x00")), len(theirs)), va + len(theirs)
 
@@ -103,8 +113,8 @@ def check(name, c):
         ours = bytes(obj.data[si][off:off + csz])
         mask = {fx.offset - off + j for fx in obj.fixups if fx.seg == si
                 and off <= fx.offset < off + csz for j in range(fx.size)}
-        mask |= {k for k in range(tsize) if tva + k in W["tgt"].fix}
-        desc, at = first_diff(ours, W["tgt"].bytes_at(tva, tsize), tva, mask)
+        tmask = {k for k in range(tsize) if tva + k in W["tgt"].fix}
+        desc, at = first_diff(ours, W["tgt"].bytes_at(tva, tsize), tva, mask, tmask)
         return "diff", "%d bytes (ours %d, target %d): %s" % (
             diff, len(ours.rstrip(b"\x00")), tsize, desc), at
     fields = {}
@@ -188,10 +198,17 @@ def main():
         with open(rp, newline="") as f:
             prev = {r["func"]: r["status"] for r in csv.DictReader(f)}
         os.replace(rp, os.path.join(OUT, "report.prev.csv"))
+    rows = results
+    if (a.only or a.limit) and os.path.exists(rp):
+        # a partial run updates its functions' rows and keeps the rest
+        with open(rp, newline="") as f:
+            old = {r["func"]: (r["func"], r["status"], r["detail"]) for r in csv.DictReader(f)}
+        old.update({r[0]: r for r in results})
+        rows = sorted(old.values())
     with open(rp, "w", newline="") as f:
         w = csv.writer(f)
         w.writerow(["func", "status", "detail"])
-        w.writerows(results)
+        w.writerows(rows)
     st = Counter(r[1] for r in results)
     print("%d functions in %.0fs: %s" % (len(results), time.time() - t0,
                                           ", ".join("%s %d" % kv for kv in st.most_common())))

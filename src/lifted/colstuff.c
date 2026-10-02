@@ -106,25 +106,12 @@ int func_00023A6A(int a1)
     int l_24;
     int l_20;
     short l_18;
-{
-    unsigned char l_38;
 
     if (((int)(unsigned short)(*(short *)((char *)a1 + 21) & 512)) == 0) goto L23A9C;
     return 0;
 L23A9C:;
-    l_38 = *(signed char *)((char *)a1);
-    if (l_38 < 32) goto L23AD4;
-    if (l_38 <= 32) goto L23BFB;
-    if (l_38 < 43) goto L23ACF;
-    if (l_38 <= 43) goto L23AE3;
-    if (l_38 == 56) goto L23B74;
-    goto L23C5E;
-L23ACF:;
-    goto L23C5E;
-L23AD4:;
-    if (l_38 == 6) goto L23C10;
-    goto L23C5E;
-L23AE3:;
+    switch (*(unsigned char *)((char *)a1)) {
+case 43:
     l_2C = a1 + 71;
     l_28 = *(int *)((char *)l_2C + 5);
     l_24 = 0;
@@ -150,7 +137,7 @@ L23B6D:;
     goto L23B0D;
 L23B6F:;
     goto L23C5E;
-L23B74:;
+case 56:
     l_28 = a1 + 71;
     l_24 = 0;
 L23B84:;
@@ -175,9 +162,9 @@ L23BF7:;
     goto L23B97;
 L23BF9:;
     goto L23C5E;
-L23BFB:;
+case 32:
     if (((int)(unsigned short)(*(short *)((char *)a1 + 21) & 256)) != 0) goto L23C5E;
-L23C10:;
+case 6:
     l_30 = a1 + 71;
     if (*(int *)((char *)l_30) == 0) goto L23C5E;
     *(int *)D_00196D48 = func_0014A300(l_30, (int)D_00196B10, (int)D_00196B1C, 0);
@@ -188,6 +175,7 @@ L23C4C:;
 L23C4E:;
     *(signed char *)D_00190CE4 = 1;
     return 1;
+default:
 L23C5E:;
     return 0;
 }

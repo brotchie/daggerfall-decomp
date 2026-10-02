@@ -503,13 +503,10 @@ L8A53E:;
 void func_0008A550(int a1, int a2, int a3)
 {
     int l_10;
-{
-    unsigned char l_20;
 
 __dagger_tbl8A56A:;
     l_10 = a3 + 71;
-    l_20 = *(signed char *)((char *)((a2 * 2) + a1));
-    switch (l_20) {
+    switch (*(unsigned char *)((char *)((a2 * 2) + a1))) {
 case 0:
     *(signed char *)((char *)l_10 + 137) &= 254;
     return;
@@ -604,7 +601,6 @@ case 46:
 default:;
 }
 }
-}
 
 int func_0008A858(int a1, int a2, int a3)
 {
@@ -641,26 +637,20 @@ L8A8FA:;
 void func_0008A90C(int a1, int a2, int a3)
 {
     int l_10;
-{
-    unsigned char l_20;
 
     l_10 = a1 + 71;
-    l_20 = *(signed char *)((char *)((a3 * 2) + l_10));
-    if (l_20 < 18) goto L8A94B;
-    if (l_20 <= 18) goto L8A961;
-    if (l_20 == 39) goto L8A97D;
-    return;
-L8A94B:;
-    if (l_20 != 1) return;
+    switch (*(unsigned char *)((char *)((a3 * 2) + l_10))) {
+case 1:
     func_00089035(a1, a3, a2);
     return;
-L8A961:;
+case 18:
     *(signed char *)((char *)((a3 * 2) + l_10) + 1) = 8;
     func_00089757(a1, a3, a2);
     return;
-L8A97D:;
+case 39:
     *(signed char *)D_001940D6 |= 16;
     *(signed char *)((char *)*(int *)D_00195BE0 + 545) = *(signed char *)((char *)((a3 * 2) + l_10) + 1);
+default:;
 }
 }
 

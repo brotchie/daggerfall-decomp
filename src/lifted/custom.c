@@ -378,13 +378,10 @@ void func_0005506F(void)
 void func_000551B1(int a1, int a2)
 {
     int l_14;
-{
-    unsigned char l_20;
 
 __dagger_tbl551C7:;
     l_14 = (int)(unsigned char)*(signed char *)(D_00199821 + (int)((char *)(((int)(short)*(short *)D_00190D82) * 14) + (a1 * 2)));
-    l_20 = *(signed char *)(D_00199820 + ((((int)(short)*(short *)D_00190D82) * 14) + (a1 * 2)));
-    switch (l_20) {
+    switch (*(unsigned char *)(D_00199820 + ((((int)(short)*(short *)D_00190D82) * 14) + (a1 * 2)))) {
 case 0:
     func_000CE4A9(*(int *)D_00195BEC, 1 << l_14, a2);
     return;
@@ -429,18 +426,14 @@ case 11:
 default:;
 }
 }
-}
 
 void func_000553B2(int a1, int a2)
 {
     int l_14;
-{
-    unsigned char l_20;
 
 __dagger_tbl553C7:;
     l_14 = (int)(unsigned char)*(signed char *)(D_00199821 + (int)((char *)(((int)(short)*(short *)D_00190D82) * 14) + (a1 * 2)));
-    l_20 = *(signed char *)(D_00199820 + ((((int)(short)*(short *)D_00190D82) * 14) + (a1 * 2)));
-    switch (l_20) {
+    switch (*(unsigned char *)(D_00199820 + ((((int)(short)*(short *)D_00190D82) * 14) + (a1 * 2)))) {
 case 0:
     func_000CE4B5(*(int *)D_00195BEC + 4, 8, a2);
     return;
@@ -474,7 +467,6 @@ case 9:
 case 10:
     func_000CE4B5(*(int *)D_00195BEC + 11, 1 << l_14, a2);
 default:;
-}
 }
 }
 

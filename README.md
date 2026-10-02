@@ -1,9 +1,9 @@
 # Daggerfall decompilation
 
 <!-- progress:start -->
-![decompiled](https://img.shields.io/badge/decompiled-36.85%25-orange) ![functions](https://img.shields.io/badge/functions-1435%20of%202297-yellowgreen) ![FALL.EXE](https://img.shields.io/badge/FALL.EXE-matching-brightgreen)
+![decompiled](https://img.shields.io/badge/decompiled-37.86%25-orange) ![functions](https://img.shields.io/badge/functions-1452%20of%202297-yellowgreen) ![FALL.EXE](https://img.shields.io/badge/FALL.EXE-matching-brightgreen)
 
-36.85% of the game's own code (213760 of 580076 bytes, 1435 of 2297 functions) is matched C; the rebuilt `FALL.EXE` is byte-identical to 1.07.213.
+37.86% of the game's own code (219634 of 580076 bytes, 1452 of 2297 functions) is matched C; the rebuilt `FALL.EXE` is byte-identical to 1.07.213.
 <!-- progress:end -->
 
 A matching decompilation of *The Elder Scrolls II: Daggerfall* (DOS, 1996), starting with the game

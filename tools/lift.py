@@ -174,6 +174,7 @@ class Func:
         self.scalls = {}         # func_ symbol -> arg count, stack arguments (callee pops)
         self.regs = {}
         self.born_hint = None
+        self.temps = set()       # slots that are the compiler's own temps (not declared)
         self.choices = []        # instruction addresses of operand-order choice points
         self.flips = frozenset()
         self.pending = None      # call expression in eax not yet emitted
@@ -515,11 +516,11 @@ class Func:
                     ins.operands[0].type == cx.X86_OP_IMM:
                 targets.add(ins.operands[0].imm)
         self.switches = self.find_switches()
-        for sw in self.switches.values():
+        self.cswitches = self.find_cswitches()
+        for sw in list(self.switches.values()) + list(self.cswitches.values()):
             targets |= set(sw["entries"])
         self.targets = targets
-        self.open_switches = 0
-        self.current_switch = None
+        self.sw_stack = []       # open switches, innermost last
         body = self.ins[self.body_start:self.body_end]
         self.body = body
         # where each switch table sat: the compiler is told to put the table there
@@ -533,13 +534,19 @@ class Func:
                 if self.out and self.out[-1] == "    goto L%X;" % ins.address:
                     self.out.pop()
                 self.out.append("__dagger_tbl%X:;" % table_end[ins.address])
+            if ins.address in self.cskip:
+                continue        # a switch's compare tree: the compiler builds it again
+            if ins.address in self.cswitches:
+                self.k = k
+                self.cswitch_start(ins, self.cswitches[ins.address])
+                continue
             if ins.address in targets:
                 self.flush_pending()
-                sw = self.current_switch
+                sw = self.switch_owning(ins.address)
                 if sw is not None:
-                    for i, t in enumerate(sw["entries"]):
-                        if t == ins.address and t != sw.get("default"):
-                            self.out.append("case %d:" % (i + sw["bias"]))
+                    if ins.address != sw.get("default"):
+                        for v in sw["cases"].get(ins.address, []):
+                            self.out.append("case %d:" % v)
                     if sw.get("default") == ins.address:
                         self.out.append("default:")
                 self.out.append("L%X:;" % ins.address)
@@ -952,15 +959,245 @@ class Func:
             t, n = min(tabs)
             entries = [IMG.fix_at[t + 4 * i].target_va for i in range(n // 4)
                        if t + 4 * i in IMG.fix_at]
-            found[ins.address] = {"table": t, "entries": entries, "bias": (t - disp) // 4}
-        # switch bodies run from their dispatch to the next dispatch (or the end): each
-        # switch's targets must lie in its own body
-        order = sorted(found)
-        for k, d in enumerate(order):
-            end = order[k + 1] if k + 1 < len(order) else 1 << 32
-            if any(not (d < t < end) for t in found[d]["entries"]):
-                raise Unsupported("switch targets outside the switch's own stretch")
+            bias = (t - disp) // 4
+            cases = {}
+            for k, e in enumerate(entries):
+                cases.setdefault(e, []).append(k + bias)
+            found[ins.address] = {"table": t, "entries": entries, "bias": bias, "cases": cases}
         return found
+
+    def find_cswitches(self):
+        """Switches compiled as a compare tree: Watcom copies the selector into a temp (the
+        whole register stored, then compared at the selector's width) and binary-searches the
+        case values, possibly ending in jump tables. Returns {store address: switch}."""
+        found = {}
+        self.cskip = set()
+        if os.environ.get("LIFT_NOCSWITCH"):
+            return found
+        by_addr = {i.address: i for i in self.ins}
+        nxt = {self.ins[k].address: self.ins[k + 1].address for k in range(len(self.ins) - 1)}
+        for k, i in enumerate(self.ins[:-1]):
+            if i.mnemonic != "mov" or len(i.operands) != 2 or \
+                    ebp_slot(i, i.operands[0]) is None or \
+                    i.op_str.split(", ")[-1] not in ("eax", "ax", "al"):
+                continue
+            t = ebp_slot(i, i.operands[0])
+            if t in [p[1] for p in self.params] or k < self.body_start:
+                continue                # a parameter's spill, not a temp
+            j = self.ins[k + 1]
+            if j.mnemonic != "cmp" or ebp_slot(j, j.operands[0]) != t or \
+                    j.operands[0].size >= 4 or j.operands[0].size > i.operands[0].size or \
+                    j.operands[1].type != cx.X86_OP_IMM:
+                continue
+            saved = set(self.cskip)
+            sw = self.parse_ctree(j.address, t, j.operands[0].size, by_addr, nxt)
+            # a temp: nothing but the store and the tree touches the slot
+            if any(x.address != i.address and x.address not in sw["nodes"]
+                   for x in self.ins for op in x.operands if ebp_slot(x, op) == t):
+                self.cskip = saved
+                continue
+            sw["store"] = i.address
+            found[i.address] = sw
+            self.temps.add(t)           # the compiler's own temp: not declared
+        return found
+
+    def parse_ctree(self, start, t, w, by_addr, nxt, stubs=frozenset()):
+        """Walk the compare tree from `start`, tracking the selector's possible values.
+        `stubs`: jumps a compare goes to that belong to the tree (an empty sub-range's
+        `jmp default`, emitted right after the tree's own jumps)."""
+        def node(a, fall=True):
+            """('cmp', v, [(jcc, target)], fallthrough) / ('jmp', target) / ('table', jmp)
+            / None for a leaf."""
+            i = by_addr.get(a)
+            if i is None:
+                return None
+            if i.mnemonic == "cmp" and ebp_slot(i, i.operands[0]) == t and \
+                    i.operands[1].type == cx.X86_OP_IMM:
+                js, b = [], nxt.get(a)
+                while b in by_addr and by_addr[b].mnemonic in JCC:
+                    js.append((by_addr[b].mnemonic, by_addr[b].operands[0].imm))
+                    b = nxt.get(b)
+                if not js:
+                    raise Unsupported("switch compare without a jump")
+                return ("cmp", i.operands[1].imm, js, b, [a] + [x for x in self.span(a, b, nxt)])
+            # the tree's own jumps follow its compares; a jump a compare goes to is a leaf
+            # (a case body's `break`)
+            if i.mnemonic == "jmp" and i.operands[0].type == cx.X86_OP_IMM and a != start and \
+                    (fall or a in stubs):
+                return ("jmp", i.operands[0].imm, [a])
+            if i.mnemonic == "xor" and i.op_str == "eax, eax":
+                b = nxt.get(a)
+                seq = [a]
+                while b in by_addr and len(seq) < 5:
+                    seq.append(b)
+                    if by_addr[b].mnemonic == "jmp":
+                        if b in self.switches:
+                            ld = by_addr[seq[1]]
+                            if ld.mnemonic != "mov" or ebp_slot(ld, ld.operands[1]) != t:
+                                raise Unsupported("switch table on another value")
+                            return ("table", b, seq)
+                        break
+                    b = nxt.get(b)
+            return None
+
+        bits = 8 * w
+        mask = (1 << bits) - 1
+        # signedness from the jumps used anywhere in the tree
+        signed, todo, seen = False, [(start, True)], set()
+        while todo:
+            a, fall = todo.pop()
+            if (a, fall) in seen or len(seen) > 4000:
+                continue
+            seen.add((a, fall))
+            n = node(a, fall)
+            if n is None:
+                continue
+            if n[0] == "cmp":
+                signed |= any(m in ("jl", "jle", "jg", "jge") for m, _ in n[2])
+                todo += [(x, False) for _, x in n[2]] + [(n[3], True)]
+            elif n[0] == "jmp":
+                todo.append((n[1], False))
+        lo, hi = (-(1 << (bits - 1)), (1 << (bits - 1)) - 1) if signed else (0, mask)
+
+        def val(imm):
+            v = imm & mask
+            return v - (1 << bits) if signed and v >> (bits - 1) else v
+
+        def cut(ivs, op, v):
+            yes, no = [], []
+            for a, b in ivs:
+                for (x, y), into in (((a, min(b, v - 1)), "lt"), ((max(a, v), min(b, v)), "eq"),
+                                     ((max(a, v + 1), b), "gt")):
+                    if x > y:
+                        continue
+                    ok = {"==": into == "eq", "!=": into != "eq", "<": into == "lt",
+                          "<=": into != "gt", ">": into == "gt", ">=": into != "lt"}[op]
+                    (yes if ok else no).append((x, y))
+            return yes, no
+
+        leaves, nodes = [], set()
+        todo = [(start, [(lo, hi)], True)]
+        while todo:
+            a, ivs, fall = todo.pop()
+            if not ivs:
+                continue
+            if len(nodes) > 4000:
+                raise Unsupported("switch compare tree too large")
+            n = node(a, fall)
+            if n is None:
+                leaves.append((a, ivs))
+                continue
+            nodes.update(n[-1])
+            if n[0] == "cmp":
+                v = val(n[1])
+                for m, x in n[2]:
+                    yes, ivs = cut(ivs, JCC[m][0], v)
+                    todo.append((x, yes, False))
+                todo.append((n[3], ivs, True))
+            elif n[0] == "jmp":
+                todo.append((n[1], ivs, False))
+            else:
+                tsw = self.switches[n[1]]
+                tsw["merged"] = True
+                for x, y in ivs:
+                    for v in range(x, y + 1):
+                        k = v - tsw["bias"]
+                        if not 0 <= k < len(tsw["entries"]):
+                            raise Unsupported("switch table index out of range")
+                        leaves.append((tsw["entries"][k], [(v, v)]))
+        # the default takes every value that isn't a case: the target with the most values
+        count = {}
+        for a, ivs in leaves:
+            count[a] = count.get(a, 0) + sum(y - x + 1 for x, y in ivs)
+        dflt = max(count, key=count.get)
+        cases = {}
+        for a, ivs in leaves:
+            if a == dflt:
+                continue
+            for x, y in ivs:
+                if y - x > 1024:
+                    raise Unsupported("switch case range too large")
+                cases.setdefault(a, []).extend(range(x, y + 1))
+        for a in cases:
+            cases[a].sort()
+        prev = {b: a for a, b in nxt.items()}
+        more = {a for a, _ in leaves if a not in stubs and prev.get(a) in nodes and
+                by_addr[a].mnemonic == "jmp" and by_addr[a].operands[0].type == cx.X86_OP_IMM}
+        if more and len(stubs) < 64:
+            return self.parse_ctree(start, t, w, by_addr, nxt, stubs | more)
+        self.cskip |= nodes
+        return {"cases": cases, "default": dflt, "width": w, "signed": signed,
+                "entries": sorted(cases), "nodes": nodes}
+
+    def span(self, a, b, nxt):
+        """Addresses after `a` up to (not including) `b`."""
+        out, x = [], nxt.get(a)
+        while x is not None and x != b:
+            out.append(x)
+            x = nxt.get(x)
+        return out
+
+    @staticmethod
+    def switch_targets(sw):
+        return [x for x in list(sw["cases"]) + [sw.get("default")] if isinstance(x, int)]
+
+    def close_switch(self, at):
+        """End the innermost switch's body before `at`."""
+        sw = self.sw_stack.pop()
+        if at is not None and (sw.get("default") == "END" or
+                               any(x > at for x in self.switch_targets(sw))):
+            raise Unsupported("switch targets interleave")
+        self.flush_pending()
+        self.out.append("}")
+
+    def open_switch(self, sw, text, at):
+        """Start a switch: inside the current one when that has case targets still ahead
+        (a switch in a case body), else after it."""
+        if any(x < at for x in sw["cases"]):
+            raise Unsupported("switch case before the dispatch")
+        while self.sw_stack and self.sw_stack[-1].get("default") != "END" and \
+                not any(x > at for x in self.switch_targets(self.sw_stack[-1])):
+            self.close_switch(at)
+        self.emit("switch (%s) {" % text)
+        self.sw_stack.append(sw)
+        self.regs = {}
+        self.born_hint = None
+
+    def switch_owning(self, a):
+        """The open switch with a case (or its default) at `a`, closing those inside it."""
+        own = [k for k, sw in enumerate(self.sw_stack) if a in sw["cases"] or sw.get("default") == a]
+        if not own:
+            return None
+        k = own[0]
+        # an inner switch whose default is here ends here: falling out of it is the same
+        if any(a in self.sw_stack[j]["cases"] for j in own[1:]):
+            raise Unsupported("case label shared by nested switches")
+        while len(self.sw_stack) > k + 1:
+            if self.sw_stack[-1].get("default") == a:
+                self.sw_stack[-1]["default"] = None
+            self.close_switch(a)
+        return self.sw_stack[k]
+
+    def cswitch_start(self, ins, sw):
+        """The store into the selector temp: `switch (expr) {`."""
+        e = self.reg("eax", ins)
+        w, signed = sw["width"], sw["signed"]
+        tname = {1: "char", 2: "short"}[w]
+        mm = re.fullmatch(r"\*\((?:signed |unsigned )?(?:char|short) \*\)(.*)", e.text)
+        if mm and e.size == w and e.atom:
+            text = "*(%s%s *)%s" % ("" if signed else "unsigned ",
+                                    "signed char" if signed and w == 1 else tname, mm.group(1))
+        else:
+            text = "(%s%s)%s" % ("" if signed else "unsigned ",
+                                 "signed char" if signed and w == 1 else tname, e.p())
+        d = sw["default"]
+        if d in (self.ret_ins, self.epi):
+            sw["default"] = "END"
+            self.default_targets.add("END")
+        elif not ins.address < d:
+            raise Unsupported("switch default before the dispatch")
+        self.flush_pending()
+        self.open_switch(sw, text, ins.address)
 
     def switch_dispatch(self, ins, op):
         sw = self.switches.get(ins.address)
@@ -997,21 +1234,34 @@ class Func:
             self.default_targets.add(dflt)
         elif not (ins.address < dflt):
             raise Unsupported("switch default before the dispatch")
-        if self.open_switches:
-            # the previous switch's body ends here
-            prev = self.current_switch
-            if prev.get("default") not in (None, "END") and prev["default"] > ins.address:
-                raise Unsupported("previous switch's default after this dispatch")
-            self.out.append("}")
-            self.open_switches -= 1
-        self.current_switch = sw
         text = re.sub(r"^\(int\)\((?:unsigned|signed) (?:char|short)\)", "", sel.text) \
             if sel.atom or sel.text.startswith("(int)(") else sel.text
-        self.emit("switch (%s) {" % text)
-        self.open_switches += 1
-        self.regs = {}
-        self.born_hint = None
+        text = self.switch_temp(text)
+        self.open_switch(sw, text, ins.address)
         return
+
+    def switch_temp(self, text):
+        """`l = expr; switch (l)` where l is used for nothing else: that slot is the compiler's
+        own selector temp (a switch on an expression), so switch on the expression."""
+        mm = re.fullmatch(r"(?:\*\([\w ]+ \*\)&)?l_([0-9A-F]+)", text)
+        if not mm or os.environ.get("LIFT_NOSWTEMP"):
+            return text
+        off = int(mm.group(1), 16)
+        last = self.out[-1] if self.out else ""
+        ma = re.fullmatch(r"    l_%X = (.*);" % off, last)
+        if not ma:
+            return text
+        uses = sum(1 for i in self.ins for op in i.operands
+                   if ebp_slot(i, op) == off or local_indexed(i, op) == off)
+        if uses != 3:                   # the store, the range check and the dispatch load
+            return text
+        # the temp is a whole register stored, compared at the selector's narrower width
+        sizes = [op.size for i in self.ins for op in i.operands if ebp_slot(i, op) == off]
+        if not (sizes and sizes[0] == 4 and min(sizes) < 4):
+            return text
+        self.out.pop()
+        self.temps.add(off)
+        return ma.group(1)
 
     def var_type(self, name):
         """Declared type of a parameter or local by name."""
@@ -1090,7 +1340,8 @@ class Func:
         # The slot rule (docs/progress.md) gives slots top down: 2-byte locals, the return
         # variable, other locals last to first; so declare locals deepest first.
         locals_ = sorted((o for o in set(self.slot_type) | set(self.arrays)
-                          if o not in [p[1] for p in self.params]), reverse=True)
+                          if o not in [p[1] for p in self.params] and o not in self.temps),
+                         reverse=True)
         two = [o for o in locals_ if o in self.slot_type and self.size_of[self.slot_type[o]] == 2]
         rest = [o for o in locals_ if o not in two]
         lines = ["%s %s(%s)" % ("void" if self.void else "int", name, ", ".join(ps) or "void"),
@@ -1099,33 +1350,77 @@ class Func:
         # block's locals their slots when the block starts, after the function's own.
         nested = [o for o in rest + two if o in self.nested]
         outer = [o for o in rest + two if o not in nested]
-        decl_lines = []
-        for o in outer:
-            decl_lines.append(self.decl_line(o, two))
-        if nested:
-            decl_lines.append("{")
-            for o in nested:
-                decl_lines.append(self.decl_line(o, two))
-        lines += decl_lines
-        if locals_:
-            lines.append("")
-        self.nested_open = bool(nested)
-        for o in []:
-            pass
         used = set(re.findall(r"goto L([0-9A-F]+);", "\n".join(self.out)))
+        body = []
         for line in self.out:
             mm = re.fullmatch(r"L([0-9A-F]+):;", line)
             if mm and mm.group(1) not in used:
                 continue
-            lines.append(line)
+            body.append(line)
         if not self.void and "%X" % self.ret_ins in used:
-            lines.append("L%X:;" % self.ret_ins)
-        if "END" in self.default_targets:
-            lines.append("default:;")
-        for _ in range(self.open_switches):
-            lines.append("}")
-        if self.nested_open:
-            lines.append("}")
+            body.append("L%X:;" % self.ret_ins)
+        nested_decls = [self.decl_line(o, two) for o in nested]
+        # Where the nested block starts: at the top, unless a switch's selector temp (which
+        # gets its slot when the switch is reached) sits above the block's locals: then the
+        # block began after that switch, at the first statement using its locals.
+        at, depth = None, 0
+        if nested and self.cswitches and not os.environ.get("LIFT_NOLATEBLOCK"):
+            names = re.compile(r"\b(?:%s)\b" % "|".join("l_%X" % o for o in nested))
+            d, seen_switch = 0, False
+            for k, line in enumerate(body):
+                if names.search(line):
+                    if seen_switch:
+                        at, depth = k, d
+                    break
+                if line.startswith("    switch (") and line.endswith("{"):
+                    d += 1
+                    seen_switch = True
+                elif line == "}":
+                    d -= 1
+        closers = []
+        for sw in reversed(self.sw_stack):
+            closers.append((["default:;"] if sw.get("default") == "END" else []) + ["}"])
+        decl_lines = [self.decl_line(o, two) for o in outer]
+        if nested and at is None:
+            decl_lines += ["{"] + nested_decls
+        lines += decl_lines
+        if locals_:
+            lines.append("")
+        if at is None:
+            lines += body
+            for c in closers:
+                lines += c
+            if nested:
+                lines.append("}")
+        else:
+            # open before the statement (after its labels), close with the enclosing switch
+            k = at
+            d, end = depth, None
+            for j in range(at, len(body)):
+                if body[j].startswith("    switch (") and body[j].endswith("{"):
+                    d += 1
+                elif body[j] == "}":
+                    d -= 1
+                    if d < depth:
+                        end = j
+                        break
+            stop = end if end is not None else len(body)
+            if any(names.search(x) for x in body[stop:]):
+                raise Unsupported("nested-block locals used after their block")
+            lines += body[:k] + ["{"] + nested_decls + body[k:stop]
+            if end is not None:
+                lines += ["}"] + body[stop:]
+                for c in closers:
+                    lines += c
+            else:
+                # the enclosing switch is still open at the end: close the block inside it
+                inner = len(closers) - depth       # closers run innermost first
+                for n, c in enumerate(closers):
+                    if n == inner:
+                        lines.append("}")
+                    lines += c
+                if inner >= len(closers):
+                    lines.append("}")
         lines.append("}")
         decl = ["/* lifted from 0x%08X */" % self.va]
         for g in sorted(self.globals):

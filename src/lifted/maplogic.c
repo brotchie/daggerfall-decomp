@@ -245,26 +245,17 @@ L86777:;
 void func_00086A71(int a1)
 {
     int l_18;
-{
-    unsigned char l_20;
 
     if (((int)(unsigned char)*(signed char *)((char *)a1)) != 32) return;
     l_18 = func_0007DF35(a1);
-    l_20 = *(signed char *)((char *)l_18 + 24);
-    if (l_20 < 11) goto L86AC5;
-    if (l_20 <= 11) goto L86AC7;
-    if (l_20 < 14) goto L86AC3;
-    if (l_20 <= 15) goto L86AC7;
-    goto L86AD9;
-L86AC3:;
-    goto L86AD9;
-L86AC5:;
-    goto L86AD9;
-L86AC7:;
+    switch (*(unsigned char *)((char *)l_18 + 24)) {
+case 11:
+case 14:
+case 15:
     *(short *)((char *)a1 + 23) = 0;
     *(signed char *)((char *)a1 + 21) |= 64;
     return;
-L86AD9:;
+default:
     if ((func_0009DC25() % 100) >= 90) return;
     *(short *)((char *)a1 + 23) = 0;
     *(signed char *)((char *)a1 + 21) |= 64;
@@ -605,18 +596,11 @@ int func_00089035(int a1, int a2, int a3)
     int l_1C;
     int l_18;
     int l_14;
-{
-    unsigned char l_2C;
 
     l_1C = a1 + 71;
     l_18 = a3 + 71;
-    l_2C = *(signed char *)((char *)((a2 * 2) + l_1C) + 1);
-    if (l_2C < 1) goto L89085;
-    if (l_2C <= 1) goto L890D9;
-    if (l_2C == 2) goto L8912A;
-    goto L8916B;
-L89085:;
-    if (l_2C != 0) goto L8916B;
+    switch (*(unsigned char *)((char *)((a2 * 2) + l_1C) + 1)) {
+case 0:
     if (l_18 != *(int *)D_00195BE0) goto L890A3;
     if ((*(unsigned char *)D_00195AE8 & 64) != 0) goto L890A5;
 L890A3:;
@@ -627,7 +611,7 @@ L890AA:;
     *(short *)D_00195F28 = *(short *)((char *)((a2 * 2) + l_1C) + 80);
     func_0002E914(a3, (int)(unsigned short)*(short *)((char *)((a2 * 2) + l_1C) + 80), 0);
     goto L8916B;
-L890D9:;
+case 1:
     *(short *)D_00195F28 = *(short *)((char *)((a2 * 2) + l_1C) + 80);
     l_14 = (int)(unsigned short)*(short *)((char *)l_18 + 155);
     l_14 -= (int)(unsigned short)*(short *)((char *)((a2 * 2) + l_1C) + 80);
@@ -636,11 +620,12 @@ L890D9:;
 L8911B:;
     *(short *)((char *)l_18 + 155) = l_14;
     goto L8916B;
-L8912A:;
+case 2:
     *(short *)D_00195F28 = *(short *)((char *)((a2 * 2) + l_1C) + 80);
     *(short *)((char *)l_18 + 141) -= *(short *)((char *)((a2 * 2) + l_1C) + 80);
     if (*(short *)((char *)l_18 + 141) >= 0) goto L8916B;
     *(short *)((char *)l_18 + 141) = 0;
+default:
 L8916B:;
     return 0;
 }

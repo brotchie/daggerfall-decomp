@@ -39,16 +39,9 @@ int func_00099D75(int a1)
     int l_24;
     int l_20;
     int l_1C;
-{
-    unsigned char l_34;
 
-    l_34 = *(signed char *)((char *)a1);
-    if (l_34 < 43) goto L99DAD;
-    if (l_34 <= 43) goto L99E39;
-    if (l_34 == 56) goto L99F20;
-    goto L9A00E;
-L99DAD:;
-    if (l_34 != 34) goto L9A00E;
+    switch (*(unsigned char *)((char *)a1)) {
+case 34:
     if ((((int)(unsigned short)*(short *)((char *)a1 + 27)) >> 7) != 199) goto L99DE9;
     if ((((int)(unsigned short)(*(short *)((char *)a1 + 27) & 31)) - 2) == *(int *)D_001AA648) goto L99DEB;
 L99DE9:;
@@ -65,7 +58,7 @@ L99E29:;
     *(int *)D_00195B84 += *(int *)D_001AA644;
 L99E34:;
     goto L9A00E;
-L99E39:;
+case 43:
     l_2C = a1 + 71;
     l_28 = *(int *)((char *)l_2C + 9);
     l_1C = 0;
@@ -97,7 +90,7 @@ L99F16:;
     goto L99E67;
 L99F1B:;
     goto L9A00E;
-L99F20:;
+case 56:
     l_24 = a1 + 71;
     l_28 = l_24 + (((int)(unsigned short)*(short *)((char *)a1 + 27)) * 66);
     l_1C = 0;
@@ -127,6 +120,7 @@ L99FFE:;
     *(int *)D_00195B84 += *(int *)D_001AA644;
 L9A009:;
     goto L99F5D;
+default:
 L9A00E:;
     return 0;
 }
@@ -189,16 +183,9 @@ void func_0009A1F7(int a1)
     int l_20;
     int l_1C;
     int l_18;
-{
-    unsigned char l_30;
 
-    l_30 = *(signed char *)((char *)a1);
-    if (l_30 < 43) goto L9A22F;
-    if (l_30 <= 43) goto L9A335;
-    if (l_30 == 56) goto L9A488;
-    return;
-L9A22F:;
-    if (l_30 != 34) return;
+    switch (*(unsigned char *)((char *)a1)) {
+case 34:
     if ((((int)(unsigned short)*(short *)((char *)a1 + 27)) >> 7) != 199) goto L9A26B;
     if ((((int)(unsigned short)(*(short *)((char *)a1 + 27) & 31)) - 2) != *(int *)D_001AA648) goto L9A26D;
 L9A26B:;
@@ -218,7 +205,7 @@ L9A2F7:;
     func_000A1023((int)D_00195F6A, a1, 55, (int)D_00177358, 363, 4);
 L9A330:;
     return;
-L9A335:;
+case 43:
     l_28 = a1 + 71;
     l_24 = *(int *)((char *)l_28 + 9);
     l_18 = 0;
@@ -253,7 +240,7 @@ L9A47E:;
     goto L9A363;
 L9A483:;
     return;
-L9A488:;
+case 56:
     l_20 = a1 + 71;
     l_24 = l_20 + (((int)(unsigned short)*(short *)((char *)a1 + 27)) * 66);
     l_18 = 0;
@@ -286,6 +273,7 @@ L9A58E:;
     *(int *)D_00195F89 = *(int *)((char *)a1 + 31);
 L9A5E0:;
     goto L9A4C5;
+default:;
 }
 }
 

@@ -95,6 +95,11 @@ class Target:
         return bytes(self.raw[o.index][va - o.base: va - o.base + n])
 
 
+def code_tables():
+    with open(os.path.join(ROOT, "config", "code_data.csv"), newline="") as f:
+        return [(int(r["va"], 16), int(r["size"])) for r in csv.DictReader(f)]
+
+
 def compare(tgt, obj, name, va, size, quiet=False):
     """Return (ok, n_diff_bytes). Relocations are masked on both sides."""
     funcs = {n.strip("_"): (si, off, sz) for n, si, off, sz in obj.functions()}
@@ -123,8 +128,18 @@ def compare(tgt, obj, name, va, size, quiet=False):
     ok = diff == 0 and len(ours) == size
     if not ok and not quiet:
         md = capstone.Cs(capstone.CS_ARCH_X86, capstone.CS_MODE_32)
-        Li = list(md.disasm(ours, va))
-        Ri = list(md.disasm(theirs, va))
+        # step over switch tables (data in the code) on both sides, and walk the two lists
+        # in step so a branch that changed size doesn't shift everything after it
+        tables = sorted((t, n) for t, n in code_tables() if va <= t < va + size)
+
+        def decode(code):
+            out, pos = [], 0
+            for t, n in tables + [(va + len(code), 0)]:
+                out += list(md.disasm(code[pos:max(pos, t - va)], va + pos))
+                pos = t - va + n
+            return out
+        Li = decode(ours)
+        Ri = decode(theirs)
         print("--- %s  ours %d bytes / target %d bytes, %d differing" % (name, len(ours), size, diff))
         for k in range(max(len(Li), len(Ri))):
             a = Li[k] if k < len(Li) else None
@@ -132,8 +147,9 @@ def compare(tgt, obj, name, va, size, quiet=False):
             left = "%-8x %-18s %s %s" % (a.address, a.bytes.hex(), a.mnemonic, a.op_str) if a else ""
             right = "%-8x %-18s %s %s" % (b.address, b.bytes.hex(), b.mnemonic, b.op_str) if b else ""
             # differs = unmasked bytes differ (relocated fields match by construction)
-            same = a is not None and b is not None and a.size == b.size and (all(
-                (a.address - va + j) in mask or a.bytes[j] == b.bytes[j] for j in range(a.size))
+            same = a is not None and b is not None and ((a.size == b.size and all(
+                (a.address - va + j) in mask or (b.address - va + j) in mask or
+                a.bytes[j] == b.bytes[j] for j in range(a.size)))
                 or (a.mnemonic == b.mnemonic and a.mnemonic.startswith("j")
                     and a.op_str.startswith("0x")))   # displacement only: a size difference later
             print("%s%-60s | %s" % ("  " if same else "! ", left, right))

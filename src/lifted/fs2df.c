@@ -36,8 +36,6 @@ void func_00036AA7(int a1)
 {
     int l_1C;
     int l_18;
-{
-    unsigned char l_24;
 
     if (((unsigned)a1) < 2) goto L36ACC;
     if (((unsigned)a1) <= 2) goto L36AF3;
@@ -59,13 +57,8 @@ L36B39:;
     if (l_18 <= 0) return;
     *(short *)D_00199618 = func_00036A41(l_18);
     l_1C = (int)(*(char **)D_001995E8 + l_18);
-    l_24 = *(signed char *)((char *)l_1C + 20) & 63;
-    if (l_24 < 2) goto L36B88;
-    if (l_24 <= 2) goto L36BF2;
-    if (l_24 == 3) goto L36C28;
-    goto L36C60;
-L36B88:;
-    if (l_24 != 1) goto L36C60;
+    switch ((unsigned char)(*(signed char *)((char *)l_1C + 20) & 63)) {
+case 1:
     *(int *)D_0019960C = (int)(*(char **)D_001995E8 + *(int *)((char *)l_1C + 21));
     if (*(int *)((char *)*(int *)D_0019960C + 19) >= 0) goto L36BBB;
     func_000361B7(*(int *)D_0019960C);
@@ -74,15 +67,16 @@ L36BBB:;
     func_00036DC9(*(int *)D_0019960C, *(int *)D_00199600, 0, 0);
     l_18 = *(int *)((char *)*(int *)D_00199600 + 5);
     goto L36C60;
-L36BF2:;
+case 2:
     *(int *)D_001995F4 = (int)(*(char **)D_001995E8 + *(int *)((char *)l_1C + 21));
     func_00036DC9(0, 0, 0, (int)(unsigned char)*(signed char *)((char *)*(int *)D_001995F4 + 3));
     l_18 = *(int *)((char *)*(int *)D_001995F4 + 4);
     goto L36C60;
-L36C28:;
+case 3:
     *(int *)D_001995F0 = (int)(*(char **)D_001995E8 + *(int *)((char *)l_1C + 21));
     func_00036DC9(0, 0, *(int *)D_001995F0, (int)(unsigned char)*(signed char *)((char *)*(int *)D_001995F0 + 10));
     l_18 = *(int *)((char *)*(int *)D_001995F0 + 6);
+default:
 L36C60:;
     goto L36B39;
 }

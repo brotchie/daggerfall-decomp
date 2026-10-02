@@ -257,8 +257,6 @@ L5AE4C:;
 int func_0005AFD5(int a1, int a2)
 {
     int l_18;
-{
-    unsigned char l_24;
 
     l_18 = a1 + 71;
     *(int *)((char *)a1 + 47) = *(int *)D_00195AA0;
@@ -267,8 +265,7 @@ int func_0005AFD5(int a1, int a2)
     return 1;
 __dagger_tbl5B023:;
 L5B037:;
-    l_24 = *(signed char *)((char *)l_18 + 7);
-    switch (l_24) {
+    switch (*(unsigned char *)((char *)l_18 + 7)) {
 case 0:
     func_0005ABE6(a1, *(int *)D_00195AA0, 0);
     return 1;
@@ -292,19 +289,15 @@ default:
     return 1;
 }
 }
-}
 
 int func_0005B107(int a1, int a2, int a3)
 {
     int l_14;
-{
-    unsigned char l_24;
 
 __dagger_tbl5B11F:;
     l_14 = a1 + 71;
     *(int *)((char *)a1 + 47) = a2;
-    l_24 = *(signed char *)((char *)l_14 + 7);
-    switch (l_24) {
+    switch (*(unsigned char *)((char *)l_14 + 7)) {
 case 0:
     func_0005ABE6(a1, a2, 0);
     if (a2 == *(int *)D_00195AA0) goto L5B191;
@@ -325,7 +318,6 @@ case 4:
     return 0;
 default:
     return 1;
-}
 }
 }
 
