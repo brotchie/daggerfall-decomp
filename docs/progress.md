@@ -1279,3 +1279,5 @@ Batch **1,927**; build **61.34%**.
 - The flip cache keeps each function's furthest progress (a later first difference, in
   build/lift/flips_at.json), so repeated runs deepen the search; a few more runs and a wide
   pin pass converge. +4. Batch **2,158**.
+- A register used as an address since it was loaded (`mov edx,[g]; sub eax,[edx+0xb]`)
+  has been consumed: not a further call argument. +5. Batch **2,163**.

@@ -2433,6 +2433,9 @@ class Func:
             for n, o in enumerate(ops):
                 if n > 0 and o.type == cx.X86_OP_REG and i.reg_name(o.reg) in fam:
                     return True
+                if o.type == cx.X86_OP_MEM and any(
+                        x and i.reg_name(x) == reg for x in (o.mem.base, o.mem.index)):
+                    return True     # (used as an address)
             if ops and ops[0].type == cx.X86_OP_REG and i.reg_name(ops[0].reg) in fam and \
                     i.mnemonic in ("mov", "movsx", "movzx", "lea", "xor"):
                 return False
