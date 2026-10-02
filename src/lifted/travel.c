@@ -167,19 +167,8 @@ void func_0009D515(void);
 
 void func_0009B2E2(int a1)
 {
-{
-    int l_1C;
-
     if (a1 == 100) goto L9B32F;
-    if (((int)(unsigned char)(*(signed char *)D_0012AC00 & 1)) == 0) goto L9B319;
-    if (((int)(unsigned char)(*(signed char *)D_00196279 & 1)) == 0) goto L9B322;
-L9B319:;
-    l_1C = 1;
-    goto L9B329;
-L9B322:;
-    l_1C = 0;
-L9B329:;
-    if (l_1C != 0) goto L9B331;
+    if ((((((int)(unsigned char)(*(signed char *)D_0012AC00 & 1)) == 0) || ((((int)(unsigned char)(*(signed char *)D_00196279 & 1)) != 0))) ? 1 : 0) != 0) goto L9B331;
 L9B32F:;
     goto L9B336;
 L9B331:;
@@ -296,7 +285,6 @@ L9B611:;
 L9B62F:;
     *(signed char *)D_00196274 = 0;
     *(signed char *)D_00196272 = 0;
-}
 }
 
 void func_0009B647(void)

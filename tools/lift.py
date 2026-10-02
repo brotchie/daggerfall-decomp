@@ -2268,6 +2268,52 @@ class Func:
         def gotos(lab):
             return len(re.findall(r"goto %s;" % lab, body))
 
+        # a compound condition (a chain of `if (c) goto` to the two arms) first becomes
+        # one line carrying the then-condition (put back if no ternary comes of it)
+        chains = {}
+        i = 0
+        while not os.environ.get("LIFT_NOCHAINTERN") and i < len(out) - 5:
+            i += 1
+            if True:
+                mt = re.fullmatch(r"(L[0-9A-F]+):;", out[i])
+                m1 = re.fullmatch(r"    (l_[0-9A-F]+) = (.*);", out[i + 1])
+                m2 = re.fullmatch(r"    goto (L[0-9A-F]+);", out[i + 2])
+                me = re.fullmatch(r"(L[0-9A-F]+):;", out[i + 3])
+                if not (mt and m1 and m2 and me) or \
+                        not re.fullmatch(r"    %s = (.*);" % m1.group(1), out[i + 4]) or \
+                        out[i + 5] != m2.group(1) + ":;":
+                    continue
+                lt, le = mt.group(1), me.group(1)
+                k = i
+                terms = []
+                while k > 0:
+                    mc = re.fullmatch(r"    if \((.*)\) goto (L[0-9A-F]+);", out[k - 1])
+                    if not mc or mc.group(2) not in (lt, le):
+                        break
+                    terms.insert(0, (mc.group(1), mc.group(2)))
+                    k -= 1
+                if len(terms) < 2 or not any(lab == le for _, lab in terms) or \
+                        gotos(lt) != sum(lab == lt for _, lab in terms) or \
+                        gotos(le) != sum(lab == le for _, lab in terms):
+                    continue
+
+                def then(j):
+                    if j == len(terms):
+                        return None
+                    c, lab = terms[j]
+                    rest = then(j + 1)
+                    if lab == lt:
+                        return None if rest is None else "(%s) || (%s)" % (c, rest)
+                    nc = negate(c)
+                    return nc if rest is None else "%s && (%s)" % (nc, rest)
+                cond = then(0)
+                if cond is None:
+                    continue
+                line = "    if (@THEN:%s) goto %s;" % (cond, le)
+                chains[line] = out[k:i + 1]
+                out[k:i + 1] = [line]
+                body = "\n".join(out)
+
         changed = True
         while changed:
             changed = False
@@ -2289,7 +2335,9 @@ class Func:
                 off = int(t[2:], 16)
                 if off in self.arrays or self.slot_type.get(off) != "int":
                     continue
-                tern = "%s ? %s : %s" % (negate(m0.group(1)), m1.group(2), m4.group(1))
+                cnd = m0.group(1)
+                cnd = "(%s)" % cnd[len("@THEN:"):] if cnd.startswith("@THEN:") else negate(cnd)
+                tern = "%s ? %s : %s" % (cnd, m1.group(2), m4.group(1))
                 use = re.sub(r"\b%s\b" % t, lambda _m: "(%s)" % tern, out[i + 6])
                 self.temps.add(off)
                 # the call's later arguments, stored into temps just before
@@ -2321,11 +2369,20 @@ class Func:
                 out[j:i + 7] = [use]
                 changed = True
                 break
+        self._restore_chains(chains)
+
+    def _restore_chains(self, chains):
+        """Put back the compound conditions no ternary came of (end of the last pass)."""
+        self._chains_pending = chains
 
     def c(self):
         self.lift()
         if not os.environ.get("LIFT_NOTERNARY"):
             self.ternaries()
+            chains = getattr(self, "_chains_pending", {})
+            for n in range(len(self.out) - 1, -1, -1):
+                if self.out[n] in chains:
+                    self.out[n:n + 1] = chains[self.out[n]]
         name = sym(self.va)
         ps = []
         for k, (reg, off, _sz) in enumerate(self.params):

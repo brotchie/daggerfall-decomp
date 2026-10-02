@@ -223,17 +223,7 @@ case 6:
 L29C78:;
     goto L29CA4;
 L29C7A:;
-    if (*(int *)D_00199768 == 0) goto L29C8E;
-    if (*(int *)(*(char **)D_00199768 + 63) != 0) goto L29C97;
-L29C8E:;
-{
-    int l_7C;
-    l_7C = 1;
-    goto L29C9E;
-L29C97:;
-    l_7C = 0;
-L29C9E:;
-    if (l_7C != 0) goto L29CA9;
+    if ((((*(int *)D_00199768 == 0) || ((*(int *)(*(char **)D_00199768 + 63) == 0))) ? 1 : 0) != 0) goto L29CA9;
 L29CA4:;
     goto L29D72;
 L29CA9:;
@@ -1071,7 +1061,6 @@ L2B24E:;
     return;
 L2B250:;
     func_000922F6(*(int *)D_00199768, 0, 6);
-}
 }
 }
 }

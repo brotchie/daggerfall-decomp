@@ -1241,3 +1241,6 @@ Batch **1,927**; build **61.34%**.
 - A branch diamond assigning a slot that lies in the compiler's temp region of the frame
   (below every declared variable) is a `?:` even outside call arguments. +2 (one 6.4 KB).
   Batch **2,129**.
+- Ternary recovery also takes compound conditions: a chain of `if (c) goto` to the two
+  arms becomes `(a || b)` / `!a && b` (put back if no ternary comes of it). No change in
+  matches yet. Batch **2,129**.
