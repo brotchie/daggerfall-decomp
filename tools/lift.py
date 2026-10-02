@@ -694,6 +694,11 @@ class Func:
             t = self.mem(op, ins, op.size)
             if t == "@RET":
                 raise Unsupported("read of the return slot")
+            pre = getattr(self, "pre_ops", {})
+            if t in pre:
+                # an in-place ++/-- done while the expression was being evaluated: --x
+                lv = t if re.fullmatch(r"\w+", t) else "(%s)" % t
+                return E("%s%s" % (pre.pop(t), lv), op.size, atom=False)
             if self.side:
                 # the stores of an enclosing expression come first: (x = a, x <<= 2, x)
                 text = "(%s, %s)" % (", ".join(self.side), t)
@@ -717,6 +722,10 @@ class Func:
             self.pending = None
 
     def emit(self, line):
+        for t, op in list(getattr(self, "pre_ops", {}).items()):
+            # never read back: a statement of its own
+            del self.pre_ops[t]
+            self.out.append("    %s%s;" % (op, t if re.fullmatch(r"\w+", t) else "(%s)" % t))
         self.flush_pending()
         self.out.append("    " + line)
 
@@ -1365,6 +1374,19 @@ class Func:
                             full_r != subreg(prev.reg_name(prev.operands[0].reg))[0]:
                         self.post_expr("%s%s" % (lv, "++" if m == "inc" else "--"), full_r, d.size)
                         return
+            if m in ("inc", "dec") and not os.environ.get("LIFT_NOEXPRPRE") and \
+                    any(r in self.regs and self.regs[r] is not self.pending and
+                        r not in self.stale and self.live_later(r) for r in PARM_REGS) and \
+                    self.k + 1 < len(self.body) and any(
+                        o.type == cx.X86_OP_MEM and
+                        self.body[self.k + 1].op_str.split(", ")[-1] == ins.op_str
+                        for o in self.body[self.k + 1].operands[1:]):
+                # in the middle of an expression (a value waits in a register) and read
+                # right after: ++x / --x inside it
+                if not hasattr(self, "pre_ops"):
+                    self.pre_ops = {}
+                self.pre_ops[lhs] = "++" if m == "inc" else "--"
+                return
             dead_load = prev is not None and prev.mnemonic == "mov" and prev.operands and \
                 prev.operands[0].type == cx.X86_OP_REG and \
                 re.sub(r"^\w+ ptr ", "", prev.op_str.split(", ", 1)[1]) == \

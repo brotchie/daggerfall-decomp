@@ -1235,3 +1235,6 @@ Batch **1,927**; build **61.34%**.
 - `DAGGER_NODEMOTE` (keep arithmetic wide when a result is narrowed) no longer applies to
   compound assignments: `p->flags |= 2` stays a byte `or` (`DAGGER_NODEMOTERMW` for the
   old behaviour). +2. Batch **2,126**.
+- An in-memory `dec`/`inc` while a computed value waits in a register, read right after, is
+  `--x` inside the expression (`x = --x % (a + b)`: the divisor is evaluated first). +1
+  (2 KB). Batch **2,127**.
