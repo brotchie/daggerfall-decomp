@@ -183,6 +183,7 @@ class Func:
         self.first_call = {}     # callee -> address of its first call
         self.noproto = set()     # callees called without a prototype in scope
         self.structs = set()     # bit-field struct declarations used
+        self.skip_set = set()    # instructions already lifted with an earlier one
         self.fpst = []           # the x87 stack of double expressions
         self.fpcalls = {}        # functions returning doubles: name -> double arguments
         self.farcalls = set()    # functions given a far pointer: declared without a prototype
@@ -1105,7 +1106,32 @@ class Func:
 
     def step(self, ins):
         m, ops = ins.mnemonic, ins.operands
-        if ins.address == getattr(self, "skip_addr", None):
+        if ins.address == getattr(self, "skip_addr", None) or \
+                ins.address in getattr(self, "skip_set", ()):
+            return
+        if m in ("movsd", "movsw", "movsb") and not os.environ.get("LIFT_NOMOVS"):
+            # lea edi,[dst]; mov esi,src; movsd...: a struct assignment
+            n, j = 0, self.k
+            sizes = {"movsd": 4, "movsw": 2, "movsb": 1}
+            while j < len(self.body) and self.body[j].mnemonic in sizes and \
+                    not self.body[j].op_str.startswith("rep"):
+                n += sizes[self.body[j].mnemonic]
+                if j > self.k:
+                    self.skip_set.add(self.body[j].address)
+                j += 1
+            dst, src_ = self.reg("edi", ins), self.reg("esi", ins)
+            tag = "s%d" % n
+            self.structs.add("struct %s { %s; };" % (
+                tag, "int a[%d]" % (n // 4) if n % 4 == 0 else "char a[%d]" % n))
+
+            def addr(e):
+                mm = re.fullmatch(r"\(int\)(&?)(.*)", e.text)
+                if mm:
+                    return mm.group(2) if mm.group(1) == "" else "&" + mm.group(2)
+                return "(char *)%s" % e.p()
+            self.emit("*(struct %s *)%s = *(struct %s *)%s;" % (tag, addr(dst), tag, addr(src_)))
+            self.regs.pop("edi", None)
+            self.regs.pop("esi", None)
             return
         if m == "nop":
             return
@@ -1171,7 +1197,10 @@ class Func:
             src0 = subreg(ins.reg_name(s.reg))[0] if s.type == cx.X86_OP_REG else None
             held = [r for r in self.regs if r != src0 and self.regs[r] is not self.pending
                     and r not in self.stale and self.live_later(r)]
-            if (held or self.pushes) and ebp_slot(ins, d) is not None and \
+            nx2 = self.body[self.k + 1] if self.k + 1 < len(self.body) else None
+            arm_end = nx2 is not None and (nx2.mnemonic == "jmp" or nx2.address in self.targets) \
+                and not os.environ.get("LIFT_NOARMEND")
+            if (held or self.pushes) and ebp_slot(ins, d) is not None and not arm_end and \
                     not os.environ.get("LIFT_NOCOMMA"):
                 # a store in the middle of an expression (arguments of a call are being
                 # held in registers or pushed): a comma expression, attached to the next
@@ -2531,6 +2560,37 @@ class Func:
                 line = "    if (@THEN:%s) goto %s;" % (cond, le)
                 chains[line] = out[k:i + 1]
                 out[k:i + 1] = [line]
+                body = "\n".join(out)
+
+        # comma stores folded into a diamond's condition (an argument spilled while the
+        # condition is evaluated) come out as statements before it
+        for i in range(len(out)):
+            if not out[i].startswith("    if (") or ", " not in out[i]:
+                continue
+            line, pre = out[i], []
+            while True:
+                mm = re.search(r"\((l_[0-9A-F]+) = ", line)
+                if not mm:
+                    break
+                k, depth = mm.end(), 0
+                while k < len(line) and not (depth == 0 and line[k] == ","):
+                    depth += line[k] == "("
+                    depth -= line[k] == ")"
+                    if depth < 0:
+                        break
+                    k += 1
+                if k >= len(line) or line[k] != ",":
+                    break
+                # the closing paren of the comma expression
+                e, depth = k + 1, 0
+                while e < len(line) and not (depth == 0 and line[e] == ")"):
+                    depth += line[e] == "("
+                    depth -= line[e] == ")"
+                    e += 1
+                pre.append("    %s = %s;" % (mm.group(1), line[mm.end():k]))
+                line = line[:mm.start()] + "(" + line[k + 2:e] + ")" + line[e + 1:]
+            if pre and all(uses(re.match(r"    (l_[0-9A-F]+)", p_).group(1)) == 2 for p_ in pre):
+                out[i:i + 1] = pre + [line]
                 body = "\n".join(out)
 
         changed = True

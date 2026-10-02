@@ -80,6 +80,7 @@ extern int func_000A1023();
 extern int func_000A1079();
 extern int func_000C1500();
 extern int func_000C808D();
+extern int func_000C9F08();
 extern int func_000CD53C();
 extern int func_000CE6E2();
 extern int func_000CE70D();
@@ -90,9 +91,9 @@ extern void func_00010F9A(int);
 extern void func_00029958(int);
 extern void func_0002EBDE(int);
 extern void func_0002EC79(int);
-extern void func_0002F369(int);
 extern void func_00031ACA(int, int);
 extern void func_00031B47(int, int);
+extern void func_0004AB2F(int);
 extern void func_0004BBD8(int, int, int);
 extern void func_0004FF2E(void);
 extern void func_0005ABE6(int, int, int);
@@ -103,6 +104,7 @@ extern void func_0007E31C(int);
 extern void func_0008E3F7(int, int);
 void func_0002F288(int, int);
 void func_0002F2FA(int);
+void func_0002F369(int);
 void func_0002FB8B(int);
 void func_000303F1(void);
 #pragma aux func_000A0ED9 parm routine [];
@@ -293,6 +295,18 @@ L2F334:;
     *(int *)(*(char **)D_00195BE0 + 499) = *(int *)D_00195BF4 + 4320;
     *(short *)(*(char **)D_00195BE0 + 108) = 0;
     *(signed char *)(*(char **)D_00195BE0 + 64) |= 16;
+}
+
+void func_0002F369(int a1)
+{
+    int l_1C;
+    int l_18;
+
+    l_1C = func_000C9F08();
+    func_000A0040(655360, 0, ((((int)(unsigned short)(*(short *)((char *)(*(int *)D_00195BF8)) & 1)) != 0) ? 64000 : ((int)(unsigned short)*(short *)(*(char **)D_00195B68 + 2)) * 320), (int)D_001709E4, 701, 4);
+    func_0004AB2F(20160);
+L2F3E3:;
+    if ((func_000C9F08() - l_1C) < 22) goto L2F3E3;
 }
 
 void func_0002F3FA(int a1)

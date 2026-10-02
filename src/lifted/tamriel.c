@@ -2,9 +2,13 @@
  * do not edit: move a function to src/tamriel.c to work on it by hand) */
 
 extern char D_0012B508[];
+extern char D_001711AC[];
 extern char D_001789FA[];
 extern char D_0017C5B8[];
 extern char D_0017C5B9[];
+extern char D_0017CB97[];
+extern char D_0017CBE3[];
+extern char D_001830E2[];
 extern char D_00187CA8[];
 extern char D_0018DBFC[];
 extern char D_0018F08D[];
@@ -76,6 +80,8 @@ extern int func_00086560(int, int);
 extern int func_0008AA11(int);
 extern int func_0008AC9B(int);
 extern int func_0008E925(int, int);
+extern int func_000A0ED9(int, int);
+extern int func_000A0F5C(int, ...);
 extern void func_00013E17(int, int);
 extern void func_00013F06(int, int);
 extern void func_00019676(int);
@@ -111,8 +117,19 @@ void func_0004B7E3(int);
 void func_0004B9A1(void);
 void func_0004BA0F(void);
 void func_0004BAE2(void);
+#pragma aux func_000A0ED9 parm routine [];
 #pragma dagger reg func_0004B66E 437 bx
 #pragma dagger slots func_0004BBD8 a1 4 a2 12 a3 16 l_20 20 l_14 8
+
+int func_0004AA7D(int a1, int a2)
+{
+    short l_14;
+
+    *(int *)&l_14 = ((unsigned)(((unsigned)(((unsigned)a1) % 518400)) / 1440)) % 30;
+    func_000A0ED9(79, (int)D_001711AC);
+    func_000A0F5C(a2, *(int *)D_001830E2, ((int)(short)l_14) + 1, *(int *)(D_0017CBE3 + (((((int)(short)l_14) > 3) ? 3 : (int)(short)l_14) << 2)), *(int *)(D_0017CB97 + ((((unsigned)(((unsigned)a1) % 518400)) / 43200) << 2)));
+    return a2;
+}
 
 void func_0004AB2F(int a1)
 {

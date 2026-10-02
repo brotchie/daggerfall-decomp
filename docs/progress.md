@@ -1265,3 +1265,8 @@ Batch **1,927**; build **61.34%**.
 - The two DPMI helpers at 0x99648/0x99662 were assembly in the original (no frame, `int
   31h`): written by hand in src/int.c as `__declspec(naked)` functions with `_asm` bodies.
   Build **2,139** functions.
+- Struct assignments: `lea edi,[dst]; mov esi,src; movsd ...` is `*(struct sN *)dst =
+  *(struct sN *)src` (a local initialised from data kept in the code segment). A store
+  ending a diamond arm is never a comma expression, and comma stores folded into a
+  diamond's condition come out before it, so ternary call arguments with pushed stack
+  arguments are found. +2. Batch **2,139**.
