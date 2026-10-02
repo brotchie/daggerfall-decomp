@@ -4,6 +4,9 @@
 extern char D_0012AC00[];
 extern char D_00142309[];
 extern char D_00176198[];
+extern char D_00183248[];
+extern char D_0018324C[];
+extern char D_00183250[];
 extern char D_001876AC[];
 extern char D_001876E8[];
 extern char D_00187734[];
@@ -16,6 +19,7 @@ extern char D_00187828[];
 extern char D_00187844[];
 extern char D_00187864[];
 extern char D_00187878[];
+extern char D_001903A4[];
 extern char D_00190BE4[];
 extern char D_001940D4[];
 extern char D_001940D5[];
@@ -47,9 +51,13 @@ extern char D_001A4FB4[];
 extern char D_001A4FC8[];
 
 extern int func_0004C274();
+extern int func_0007CBA1(int);
 extern int func_0008DADD(int);
 extern int func_0008DD46(int, int);
 extern int func_000A0024();
+extern int func_000A0ED9(int, int);
+extern int func_000A0F5C(int, ...);
+extern int func_000A17C1();
 extern int func_0012B136();
 extern void func_000202C5(int);
 extern void func_000756C6(int);
@@ -63,6 +71,20 @@ void func_00075A75(void);
 void func_00075B3F(void);
 void func_00075CFF(void);
 void func_00076952(void);
+#pragma aux func_000A0ED9 parm routine [];
+
+void func_00074589(int a1, int a2)
+{
+    if (func_000A17C1(*(int *)D_00183248, (unsigned char)*(signed char *)((char *)a2 + 28)) == 0) goto L745DF;
+    func_000A0ED9(215, (int)D_00176198);
+    func_000A0F5C((int)D_001903A4, *(int *)D_0018324C, a2 + 28);
+    goto L7460A;
+L745DF:;
+    func_000A0ED9(217, (int)D_00176198);
+    func_000A0F5C((int)D_001903A4, *(int *)D_00183250, a2 + 28);
+L7460A:;
+    func_0007CBA1((int)D_001903A4);
+}
 
 void func_00074C10(void)
 {

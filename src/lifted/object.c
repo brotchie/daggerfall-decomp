@@ -2,16 +2,20 @@
  * do not edit: move a function to src/object.c to work on it by hand) */
 
 extern char D_00176E44[];
+extern char D_00176E4D[];
 extern char D_00176E70[];
 extern char D_00190BE4[];
 extern char D_00190CE4[];
 extern char D_001959A8[];
 extern char D_00195AC4[];
 extern char D_00195AF4[];
+extern char D_00195BDC[];
 extern char D_00195E18[];
 extern char D_00199770[];
+extern char D_001A3F94[];
 extern char D_001A9B14[];
 extern char D_001A9B18[];
+extern char D_001A9B34[];
 extern char D_001A9B38[];
 extern char D_001A9B42[];
 extern char D_001AA3DC[];
@@ -23,8 +27,11 @@ extern int func_0008E55F(int, int);
 extern int func_0008E721(int);
 extern int func_0008EB88(int);
 extern int func_000A0040();
+extern int func_000A0ED9(int, int);
 extern int func_000A1023();
+extern int func_000A148C(int, ...);
 extern void func_00050069(int);
+extern void func_00069E9E(int, int);
 extern void func_00069F39(int);
 extern void func_0008E357(int, int);
 extern void func_0008E3A7(int, int);
@@ -43,6 +50,31 @@ void func_0008E09A(int, int);
 void func_0008E0F5(int, int);
 void func_0008EB25(int);
 void func_0008ECEE(int);
+#pragma aux func_000A0ED9 parm routine [];
+
+void func_0008D8CC(void)
+{
+    if (*(int *)D_001A9B34 != 0) goto L8D905;
+    if (*(int *)D_001A3F94 >= 13000) goto L8D8FB;
+    *(int *)D_001A9B34 = 1280000;
+    goto L8D905;
+L8D8FB:;
+    *(int *)D_001A9B34 = 2048000;
+L8D905:;
+    *(int *)D_001A9B38 = *(int *)D_001A9B34;
+    func_000A0ED9(55, (int)D_00176E44);
+    func_000A148C((int)D_00176E4D, *(int *)D_001A9B34);
+    func_00069E9E((int)D_00195E18, *(int *)D_001A9B34);
+    *(int *)D_00195AC4 = func_0008DB21(0, 0, 48);
+    *(signed char *)((char *)*(int *)D_00195AC4) = 1;
+    *(short *)((char *)*(int *)D_00195AC4 + 27) = 65535;
+    *(int *)((char *)*(int *)D_00195AC4 + 31) = -65535;
+    *(int *)D_00195BDC = *(int *)D_00195AC4 + 71;
+    *(int *)((char *)*(int *)D_00195BDC + 43) = 0;
+    *(int *)D_001959A8 = func_0008DB21(0, 0, 0);
+    *(signed char *)((char *)*(int *)D_001959A8) = 39;
+    *(int *)((char *)*(int *)D_001959A8 + 31) = 700;
+}
 
 void func_0008D9B9(void)
 {

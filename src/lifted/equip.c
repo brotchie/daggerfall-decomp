@@ -2,20 +2,49 @@
  * do not edit: move a function to src/equip.c to work on it by hand) */
 
 extern char D_001758B8[];
+extern char D_001758F8[];
 extern char D_00175927[];
 extern char D_00187966[];
+extern char D_0018E044[];
+extern char D_001903A4[];
+extern char D_00195C44[];
 extern char D_00195D40[];
 extern char D_00195D4C[];
 
+extern int func_0005F955(int);
 extern int func_00062EF7(int, int, int);
 extern int func_0006CD6E(int);
 extern int func_0007D6AE(int, int);
 extern int func_0008DCE3(int, int, int);
+extern int func_0009DC25();
+extern int func_0009DC49();
 extern int func_0009DEA7();
 extern int func_000A00AF();
 extern int func_000A00CB();
+extern int func_000A0ED9(int, int);
+extern int func_000A0F5C(int, ...);
 extern int func_000A1235();
 extern void func_00096F95(int);
+#pragma aux func_000A0ED9 parm routine [];
+
+void func_0005F75B(int a1, int a2)
+{
+    int l_1C;
+    int l_18;
+    int l_14;
+
+    *(short *)((char *)a1 + 63) = *(short *)(D_0018E044 + (func_0005F955(a2) << 2));
+    l_1C = *(int *)D_00195C44;
+    func_000A0ED9(674, (int)D_001758B8);
+    func_000A0F5C((int)D_001903A4, (int)D_001758F8, (unsigned short)*(short *)((char *)a1 + 63));
+    l_18 = func_0006CD6E((int)D_001903A4);
+    func_000A00CB(l_18, l_1C, 234);
+    func_0009DEA7(l_18);
+    l_14 = func_0009DC25();
+    func_0009DC49(*(int *)((char *)l_1C));
+    *(int *)((char *)a1 + 36) = func_0007D6AE(300, 800);
+    func_0009DC49(l_14);
+}
 
 void func_00060270(int a1, int a2)
 {

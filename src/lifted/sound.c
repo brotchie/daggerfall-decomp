@@ -13,6 +13,7 @@ extern char D_001A3F24[];
 extern char D_001A3F28[];
 extern char D_001A3F30[];
 extern char D_001A3F48[];
+extern char D_001A3F50[];
 extern char D_001A3F5D[];
 extern char D_001A3F60[];
 extern char D_001A3F74[];
@@ -23,22 +24,28 @@ extern char D_001A3F94[];
 extern char D_001A3F98[];
 extern char D_001A3F9C[];
 
+extern int func_00011870(int, ...);
 extern int func_00068F5E(int, int, int, int);
 extern int func_000694B8(int, int);
 extern int func_00085A51(int);
+extern int func_000994F0(int, int);
 extern int func_0009957D(int, int);
 extern int func_0009E2BB();
 extern int func_0009E61A();
 extern int func_000A0024();
 extern int func_000A0517();
+extern int func_000A0AD9();
+extern int func_000A0E3B();
 extern int func_000A1D3C();
 extern int func_000A2460();
 extern int func_000A2687();
 extern int func_000A277F();
+extern int func_000A27A0();
 extern int func_000A2857();
 extern void func_00069DAA(void);
 extern void func_00099490(int);
 void func_000696A3(int);
+void func_000697E3(void);
 
 void func_000696A3(int a1)
 {
@@ -53,6 +60,19 @@ int func_000696F9(int a1)
     return 1;
 L69726:;
     return (short)func_000A2460(*(int *)D_0018DD60, *(int *)(D_001A3BD8 + (a1 * 268)));
+}
+
+void func_0006974E(int a1)
+{
+    if (*(signed char *)D_001A3F5D == 0) return;
+    if (func_000A0E3B((int)D_001A3F50, a1) == 0) return;
+    func_000697E3();
+    func_000A0AD9((int)D_001A3F50, a1, 13, (int)D_00175ACC, 374);
+    *(int *)D_001A3F30 = func_00011870((int)D_001A3F50);
+    if (*(int *)D_0018DC34 == 0) goto L697CF;
+    func_000994F0(*(int *)D_0018DC34, func_000A277F(*(int *)D_0018DC34));
+L697CF:;
+    func_000A27A0(*(int *)D_001A3F30);
 }
 
 void func_000697E3(void)

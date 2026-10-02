@@ -127,7 +127,8 @@ class Func:
         self.out = []            # C lines
         self.globals = set()     # D_ symbols used
         self.calls = set()       # func_ symbols called with registers
-        self.vcalls = set()      # func_ symbols called with stack arguments
+        self.vcalls = set()      # func_ symbols called with stack arguments (caller pops)
+        self.scalls = {}         # func_ symbol -> arg count, stack arguments (callee pops)
         self.regs = {}
         self.pending = None      # call expression in eax not yet emitted
         self.pushes = []
@@ -373,6 +374,9 @@ class Func:
         m, ops = ins.mnemonic, ins.operands
         if m == "nop":
             return
+        if m == "add" and getattr(self, "skip_add", False):
+            self.skip_add = False   # caller's cleanup after a cdecl call
+            return
         if m == "mov":
             d, s = ops
             if d.type == cx.X86_OP_REG:
@@ -509,6 +513,9 @@ class Func:
             return
         if m == "push":
             self.pushes.append(self.src(ops[0], ins))
+            if ops[0].type == cx.X86_OP_REG:
+                # a pushed register has been consumed as a stack argument
+                self.regs.pop(subreg(ins.reg_name(ops[0].reg))[0], None)
             return
         if m == "call":
             op = ops[0]
@@ -517,7 +524,15 @@ class Func:
             name = sym(op.imm)
             nxt = self.body[self.k + 1] if self.k + 1 < len(self.body) else None
             cleanup = nxt is not None and nxt.mnemonic == "add" and nxt.op_str.startswith("esp, ")
-            if self.pushes and cleanup:
+            pops = callee_pops(op.imm)
+            loaded = [r for r in PARM_REGS if r in self.regs and self.regs[r] is not self.pending]
+            if pops and self.pushes and not loaded:
+                # stack convention, callee pops (`#pragma aux ... parm routine []`)
+                if pops // 4 != len(self.pushes):
+                    raise Unsupported("pushes do not match callee's ret %d" % pops)
+                args = [s.text for s in reversed(self.pushes)]
+                self.scalls[name] = pops // 4
+            elif self.pushes and cleanup:
                 # cdecl / varargs callee: every argument is on the stack, caller pops
                 n = int(nxt.op_str.split(", ")[1], 16) // 4
                 if n != len(self.pushes):
@@ -554,9 +569,6 @@ class Func:
             self.flush_pending()
             self.regs = {"eax": call}
             self.pending = call
-            return
-        if m == "add" and getattr(self, "skip_add", False):
-            self.skip_add = False
             return
         if m.startswith("j"):
             tgt = ops[0].imm if ops[0].type == cx.X86_OP_IMM else None
@@ -618,14 +630,35 @@ class Func:
         decl = ["/* lifted from 0x%08X */" % self.va]
         for g in sorted(self.globals):
             decl.append("extern char %s[];" % g)
-        for f in sorted(self.calls - self.vcalls - {name}):
+        for f in sorted(self.calls - self.vcalls - set(self.scalls) - {name}):
             decl.append(globals()["decl"](f))
+        for f, n in sorted(self.scalls.items()):
+            decl.append("#pragma aux %s parm routine [];" % f)
+            decl.append("extern int %s(%s);" % (f, ", ".join(["int"] * n)))
         for f in sorted(self.vcalls):
             decl.append("extern int %s(int, ...);" % f)
         return "\n".join(decl + [""] + lines) + "\n"
 
 
 SIGS = {}
+POPS = {}
+
+
+def callee_pops(va):
+    """Bytes a stack-convention callee pops (`ret N`, no register parameters), else 0."""
+    if va not in POPS:
+        n = 0
+        if va in IMG.funcs:
+            ins = IMG.insns(va)
+            rets = [i for i in ins if i.mnemonic == "ret" and i.op_str]
+            if rets and all(i.op_str == rets[0].op_str for i in rets):
+                n = int(rets[0].op_str, 16)
+                # register parameters would be spilled from eax/edx/ebx/ecx after the frame
+                head = " ".join("%s %s" % (i.mnemonic, i.op_str) for i in ins[:12])
+                if re.search(r"mov (dword|word|byte) ptr \[ebp - 0x[0-9a-f]+\], (eax|edx|ebx|ecx)", head):
+                    n = 0
+        POPS[va] = n
+    return POPS[va]
 
 
 def signature(va):
