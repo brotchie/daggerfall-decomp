@@ -2044,7 +2044,14 @@ class Func:
     def post_expr(self, text, reg="eax", size=4):
         """A post-increment whose old value `reg` carries into the next instructions."""
         e = E(text, size, atom=True)
-        self.flush_pending()
+        e.post = True
+        pv = self.pending
+        held = [r for r, v in self.regs.items() if v is pv and r != reg]
+        if not (pv is not None and getattr(pv, "post", False) and held and
+                self.reg_used_later(held[0]) and not os.environ.get("LIFT_NOPOSTPAIR")):
+            # (an earlier post-increment's old value still waiting in a register for a
+            # later use stays there: *q++ = *p++)
+            self.flush_pending()
         self.regs[reg] = e
         self.stale.discard(reg)
         self.pending = e

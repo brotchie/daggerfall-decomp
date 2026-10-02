@@ -20,6 +20,7 @@ extern char D_001703F0[];
 extern char D_001703F7[];
 extern char D_0017041B[];
 extern char D_0017042A[];
+extern char D_00178630[];
 extern char D_001789FA[];
 extern char D_001799E2[];
 extern char D_001799F2[];
@@ -204,6 +205,7 @@ int func_00014AE8(int);
 int func_00015D47(void);
 int func_000164AB(void);
 int func_000164CD(void);
+int func_000169D4(int);
 int func_00016DA8(int);
 int func_00017021(void);
 int func_00017C58(short, int);
@@ -1050,6 +1052,32 @@ L166A5:;
     func_0004A6B5(l_1C, 0, 0);
 L166B1:;
     return (int)D_00190FE4;
+}
+
+void func_00016907(int a1, int a2)
+{
+    int l_18;
+    int l_14;
+
+    l_18 = 0;
+    l_14 = 0;
+L16928:;
+    if (*(signed char *)((char *)a1) == 0) return;
+    if (((int)(unsigned char)(*(signed char *)(D_00178630 + ((int)(unsigned char)(*(signed char *)((char *)a1) + 1))) & 192)) == 0) goto L1696B;
+    *(signed char *)(D_001903A4 + l_18++) = *(signed char *)((char *)a1);
+    l_14 = 1;
+    goto L169C6;
+L1696B:;
+    if (l_14 == 0) goto L169B6;
+    *(signed char *)(D_001903A4 + l_18) = 0;
+    l_14 = 0;
+    l_18 = l_14;
+    func_000A0AD9(a2, func_000169D4((int)D_001903A4), 4, (int)D_001703F0, 1038);
+    a2 += func_000A0DF4(a2);
+L169B6:;
+    *(signed char *)((char *)a2++) = *(signed char *)((char *)a1++);
+L169C6:;
+    goto L16928;
 }
 
 int func_000169D4(int a1)

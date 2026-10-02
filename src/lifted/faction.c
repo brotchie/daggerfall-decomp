@@ -171,6 +171,25 @@ L1BD8D:;
     *(int *)((char *)a2) = l_C;
 }
 
+void func_0001BD9C(int a1, int a2, int a3, int a4)
+{
+    int l_10;
+    int l_C;
+
+    l_C = 0;
+    l_10 = *(int *)((char *)a2);
+L1BDC2:;
+    if (((int)(unsigned char)*(signed char *)((char *)l_10)) == 13) goto L1BDE0;
+    if (((int)(unsigned char)*(signed char *)((char *)l_10)) != 10) goto L1BDE2;
+L1BDE0:;
+    goto L1BDF8;
+L1BDE2:;
+    *(signed char *)((char *)(l_C++ + a1) + 3) = *(signed char *)((char *)l_10++);
+    goto L1BDC2;
+L1BDF8:;
+    *(int *)((char *)a2) = l_10;
+}
+
 void func_0001BE07(int a1, int a2, int a3, int a4)
 {
     int l_C;

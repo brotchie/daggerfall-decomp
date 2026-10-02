@@ -1158,3 +1158,6 @@ Batch **1,927**; build **61.34%**.
 - A value is 16 bits if any operand of the whole-register arithmetic producing it is (a
   small recursive walk back from the store): `mov ax,[x]; inc eax; mov edx,[l]; add edx,eax;
   mov [m],edx` stores a short. +3. Batch **2,028**.
+- Two post-increments in one expression (`*q++ = *p++`: `mov eax,[p]; inc [p]; mov edx,[q];
+  inc [q]; mov al,[eax]; mov [edx],al`): the first one's old value waits in its register
+  instead of being flushed as a statement. +6. Batch **2,034**.
