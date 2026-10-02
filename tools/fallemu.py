@@ -244,6 +244,8 @@ class Emu:
         self.trace = trace
         self.on_stop = None     # called after each slice; True = it handled an early stop
         self.io_log = None      # a list to collect port I/O and interrupts into
+        self.svc_writes = None  # memory a service writes, while recording
+        self.int_replay = None  # recorded service results to give instead of running them
         self.uc = uc = Uc(UC_ARCH_X86, UC_MODE_32)
         uc.mem_map(0, LOW)
         uc.mem_map(LOAD, MEM)
@@ -267,7 +269,8 @@ class Emu:
     def save(self, path):
         """Snapshot the whole machine: CPU, memory, open files, devices."""
         import pickle
-        st = {k: v for k, v in self.__dict__.items() if k not in ("uc", "files", "trace", "on_stop", "io_log")}
+        st = {k: v for k, v in self.__dict__.items() if k not in ("uc", "files", "trace", "on_stop", "io_log", "svc_writes",
+                                                             "int_replay")}
         st["ctx"] = self.uc.context_save()
         st["low"] = zlib.compress(self.read(0, LOW), 1)
         st["mem"] = zlib.compress(self.read(LOAD, MEM), 1)
@@ -412,6 +415,8 @@ class Emu:
 
     def write(self, lin, data):
         self.uc.mem_write(lin, bytes(data))
+        if self.svc_writes is not None:     # what a service wrote, for xn_record.py
+            self.svc_writes.append((lin, bytes(data)))
 
     def asciiz(self, lin, limit=260):
         b = self.read(lin, limit)
@@ -437,9 +442,26 @@ class Emu:
         self.carry(True)
 
     # -- interrupts --------------------------------------------------------------------
+    SVC_REGS = ("eax", "ebx", "ecx", "edx", "esi", "edi", "eflags", "es")
+
     def on_int(self, uc, intno, _):
-        if self.io_log is not None:
-            self.io_log.append(("int", intno, self.r("eax")))
+        if self.io_log is None:
+            return self.service(uc, intno)
+        self.io_log.append(("int", intno, self.r("eax")))
+        if self.int_replay is not None:     # replaying a record: the service's results
+            regs, writes = self.int_replay.pop(0)
+            for r, v in zip(self.SVC_REGS, regs):
+                self.w(r, v)
+            for lin, data in writes:
+                self.write(lin, data)
+        else:
+            self.svc_writes = []
+            self.service(uc, intno)
+            regs, writes = tuple(self.r(r) for r in self.SVC_REGS), self.svc_writes
+            self.svc_writes = None
+        self.io_log.append(("int-ret", regs, writes))
+
+    def service(self, uc, intno):
         try:
             if intno == 0xFE:
                 n = (self.r("eip") - 2 - STUBS) // 4
