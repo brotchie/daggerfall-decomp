@@ -326,6 +326,9 @@ class Func:
                 continue
             body_sizes = sizes - {4} if off in [p[1] for p in self.params] else sizes
             sz = min(body_sizes) if body_sizes and len(body_sizes) == 1 else 4
+            spill = next((p[2] for p in self.params if p[1] == off), None)
+            if spill == 1 and not sizes:
+                sz = 1          # an unused char parameter: the spill says so
             if off in wide16 and reads.get(off, set()) <= {2, 4} and 4 in reads.get(off, set()):
                 # a 2-byte variable read whole, or an int: a choice point
                 self.choices.append(first[off] + 0.0625)
@@ -1125,6 +1128,11 @@ class Func:
                 lv = lhs if re.fullmatch(r"\w+", lhs) else "(%s)" % lhs
                 self.emit("(*(char (**)[%d])&%s)%s;" % (s.imm, lv, "++" if m == "add" else "--"))
                 return
+            if m == "shr":
+                # a logical shift in place: the variable is unsigned
+                lhs = lhs.replace("*(short *)", "*(unsigned short *)", 1) \
+                    .replace("*(signed char *)", "*(unsigned char *)", 1) \
+                    .replace("*(int *)", "*(unsigned *)", 1)
             self.emit("%s %s= %s;" % (lhs, opch, b.text))
             return
         if m in ("inc", "dec", "neg", "not"):
