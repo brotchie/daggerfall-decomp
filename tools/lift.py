@@ -1136,7 +1136,9 @@ class Func:
                     self.flags = ("val", v, None)
                     return
                 if m == "and" and s.type == cx.X86_OP_IMM and sz == 4 and s.imm in (0xFF, 0xFFFF) \
-                        and a.size == 4 and a.atom and a.text.startswith("*(int *)") and \
+                        and a.size == 4 and a.atom and (a.text.startswith("*(int *)") or (
+                            re.fullmatch(r"[al]_?[0-9A-F]+|a\d+", a.text) and
+                            self.var_type(a.text) == "int")) and \
                         not os.environ.get("LIFT_ANDCAST"):
                     # a dword read masked to 16/8 bits: `x & 0xffff` (the cast narrows the load)
                     v = E("%s & %d" % (a.p(), s.imm), 4)
@@ -1383,6 +1385,10 @@ class Func:
             # `test ax,ax`): the source narrowed it
             for n_, op_ in enumerate(ops):
                 v_ = (a, b)[n_]
+                if m == "test" and n_ == 0 and op_.type == cx.X86_OP_REG and op_.size == 1 and \
+                        ops[1].type == cx.X86_OP_IMM and ops[1].imm == 0xFF and \
+                        not os.environ.get("LIFT_NOTESTFF"):
+                    continue    # test al,0xff on a wider value: (x & 255)
                 if op_.type == cx.X86_OP_REG and op_.size < 4 and v_.size > op_.size and \
                         not os.environ.get("LIFT_NONARROW"):
                     v_ = E("(%s)%s" % (STYPE[op_.size], v_.p()), op_.size, atom=True)

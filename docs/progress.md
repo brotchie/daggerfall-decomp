@@ -1228,3 +1228,7 @@ Batch **1,927**; build **61.34%**.
   added into the first argument's register): a choice point, by default not. A pointer
   post-increment whose old value is a call argument (`f(a, b, p++)`) is recognised. +1.
   Batch **2,123**.
+- `test al,0xff` on a call's int result is `(f() & 255)`; an int variable masked
+  (`mov eax,[l]; and eax,0xff`) is `l & 255`. The search also backtracks (an earlier flip
+  taken back, with a nearby new one) and its budget is settable (`LIFT_BUDGET`; a larger
+  one finds nothing more). +1. Batch **2,124**.

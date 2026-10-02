@@ -137,7 +137,7 @@ def check(name, c):
 
 # operand-order search: how many choice points before a mismatch to try, and compiles at most
 NEAR = 8
-BUDGET = 600
+BUDGET = int(os.environ.get("LIFT_BUDGET", "600"))
 
 
 REG_RE = re.compile(r"\b(e[abcd]x|e[sd]i|[abcd]x|[sd]i)\b")
@@ -347,6 +347,29 @@ def work(va):
                 s2, d2, at2, c2, info2 = r
                 if s2 == "ok" or (s2 == "diff" and at2 is not None and at2 > at):
                     found = (at2 or 0, 0, flips | {x, y}, r)
+                    break
+        if found is None and flips and not os.environ.get("LIFT_NOBACKTRACK") and \
+                ("bt", at) not in tried_pairs:
+            # backtrack: an earlier flip taken back, alone or with a nearby new one
+            tried_pairs.add(("bt", at))
+            for f in sorted(flips, key=lambda f: -abs(f)):
+                if f <= -3000:
+                    continue        # (register pins are positional; keep them)
+                for x in [None] + near[:4] + func_level[:0]:
+                    if tries >= BUDGET:
+                        break
+                    f2 = (flips - {f}) | ({x} if x is not None else set())
+                    if f2 == flips:
+                        continue
+                    tries += 1
+                    r = attempt(f2)
+                    if r is None:
+                        continue
+                    s2, d2, at2 = r[0], r[1], r[2]
+                    if s2 == "ok" or (s2 == "diff" and at2 is not None and at2 > at):
+                        found = (at2 or 0, 0, frozenset(f2), r)
+                        break
+                if found is not None:
                     break
         if found is None and not os.environ.get("LIFT_NOREGPIN"):
             found = pin_search(name, va, c, detail, at, flips, attempt)
