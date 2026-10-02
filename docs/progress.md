@@ -1270,3 +1270,9 @@ Batch **1,927**; build **61.34%**.
   ending a diamond arm is never a comma expression, and comma stores folded into a
   diamond's condition come out before it, so ternary call arguments with pushed stack
   arguments are found. +2. Batch **2,139**.
+- Watcom 10 pushed a compiler temp (a `?:` result) straight from memory (`push dword
+  [ebp-x]`) and only declared variables through a register; the compiler now does too
+  (`DAGGER_PUSHTEMPREG` for the old). Register pins are tried nearest the difference's
+  share of the function first. And the search now **starts from a previous run's flips**
+  when they get further (before, they were only a fallback), so finds accumulate across
+  runs. +15. Batch **2,154**.

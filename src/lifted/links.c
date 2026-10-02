@@ -71,7 +71,6 @@ int func_00065864(int);
 void func_0006530C(int);
 void func_0006546F(int, int);
 void func_000654EA(int);
-#pragma dagger DAGGER_PUSHMEM func_0006480F
 #pragma dagger reg func_00065864 437 bx
 
 void func_00064337(int a1)

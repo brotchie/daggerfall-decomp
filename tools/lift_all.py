@@ -183,13 +183,21 @@ def pin_search(name, va, c, detail, at, flips, attempt):
             return None
         mine = want = None
         near_k = []
-        order = [(k, r) for k in range(len(log)) if k not in used for r in regs if r != log[k]]
+        tva, tsize = W["funcs"][name]
+        k_est = len(log) * (at - tva) / max(tsize, 1)
+        order = sorted([(k, r) for k in range(len(log)) if k not in used for r in regs
+                        if r != log[k]], key=lambda kr: abs(kr[0] - k_est))
     else:
         mine, want = pairs[0]
-        # a choice that took our register gets theirs, or one that took theirs gets ours
-        near_k = [k for k, r in enumerate(log) if r == mine and k not in used]
+        # a choice that took our register gets theirs, or one that took theirs gets ours;
+        # nearest first to where the difference is, as a share of the function
+        tva, tsize = W["funcs"][name]
+        k_est = len(log) * (at - tva) / max(tsize, 1)
+        near_k = sorted([k for k, r in enumerate(log) if r == mine and k not in used],
+                        key=lambda k: abs(k - k_est))
         order = [(k, want) for k in near_k] + \
-            [(k, mine) for k, r in enumerate(log) if r == want and k not in used]
+            sorted([(k, mine) for k, r in enumerate(log) if r == want and k not in used],
+                   key=lambda kr: abs(kr[0] - k_est))
     tries = 0
     for k, reg in order[:64]:
         if reg not in lift.PIN_REGS:
@@ -308,6 +316,17 @@ def work(va):
         s2, d2, at2 = check(name, c2)
         return s2, d2, at2, c2, info2
 
+    # the flips a previous run found (the search is greedy: a new choice point can lead it
+    # astray): start from them when they get further
+    cached = frozenset(W.get("flips", {}).get(name, []))
+    if status != "ok" and cached and cached != flips and \
+            not os.environ.get("LIFT_NOFLIPCACHE"):
+        r = attempt(cached)
+        if r is not None and (r[0] == "ok" or (r[0] == "diff" and r[2] is not None and
+                                               (at is None or r[2] > at))):
+            flips = cached
+            status, detail, at, c, info = r
+            best = (status, detail, at, c)
     while status == "diff" and at is not None and tries < BUDGET and not os.environ.get("LIFT_NOSEARCH"):
         sites = info.get("sites", {})
         near = sorted((a for a in info["choices"] if a >= 0 and a not in flips),
@@ -382,16 +401,6 @@ def work(va):
         status, detail, at, c, info = found[3]
         best = (status, detail, at, c)
     status, detail, at, c = best
-    # the flips a previous run found (the search is greedy: a new choice point can lead it
-    # astray); kept when they get further
-    cached = frozenset(W.get("flips", {}).get(name, []))
-    if status != "ok" and cached and cached != flips and \
-            not os.environ.get("LIFT_NOFLIPCACHE"):
-        r = attempt(cached)
-        if r is not None and (r[0] == "ok" or (r[0] == "diff" and r[2] is not None and
-                                               at is not None and r[2] > at)):
-            flips = cached
-            status, detail, at, c, info = r
     if os.environ.get("LIFT_SHOWFLIPS"):
         print(name, sorted(flips), file=sys.stderr)
     if c is not None:

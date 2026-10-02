@@ -66,7 +66,7 @@ void func_000248FE(int);
 void func_0002576B(void);
 #pragma aux func_000A0ED9 parm routine [];
 #pragma dagger DAGGER_CONFPOS func_00025340
-#pragma dagger reg func_00025340 24 edx
+#pragma dagger reg func_00025340 21 edx
 
 int func_0002482A(int a1)
 {

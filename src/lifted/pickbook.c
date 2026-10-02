@@ -7,6 +7,7 @@ extern char D_0012AC06[];
 extern char D_00142309[];
 extern char D_00143550[];
 extern char D_00170DE4[];
+extern char D_00170DEF[];
 extern char D_00170E11[];
 extern char D_00170E17[];
 extern char D_00178A0A[];
@@ -66,18 +67,48 @@ extern int func_0012DB50();
 extern int func_00144FB4();
 extern void func_0003A2AD(int, int);
 extern void func_0003F09F(int, int);
-extern void func_00041672(int);
 extern void func_00041E7D(int);
 extern void func_0004204E(int);
 extern void func_0007CA1F(int, int, int, int, unsigned char);
 extern void func_0008CA9A(int, short, short, int, short, short, short, short, short, short, short, short, short, short, short, short, short, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char);
+extern void func_0008CCC8(int, int, int);
 extern void func_0008CF0E(int);
 extern void func_0008E152(int, int);
 extern void func_0008E3F7(int, int);
 int func_00041D27(void);
 int func_00042112(void);
+void func_00041672(int);
 #pragma aux func_000A0ED9 parm routine [];
-#pragma dagger DAGGER_PUSHMEM func_0004193C
+#pragma dagger reg func_00041672 47 edx
+
+void func_00041672(int a1)
+{
+    int l_1C;
+    int l_18;
+
+    if (((int)(unsigned char)*(signed char *)((char *)a1)) != 9) return;
+    l_1C = a1 + 71;
+    if (((int)(unsigned char)*(signed char *)((char *)l_1C + 47)) == 33) goto L416CE;
+    if (((int)(unsigned char)*(signed char *)((char *)(func_000A0DF4(l_1C + 47) + l_1C) + 48)) != 36) goto L4175A;
+L416CE:;
+    l_18 = func_0003A0C0(l_1C, *(int *)D_00195BE0);
+    if (((int)(unsigned char)*(signed char *)((char *)(func_000A0DF4(l_1C + 47) + l_1C) + 48)) != 36) goto L4172C;
+    l_18 >>= 2;
+    func_000A0ED9(62, (int)D_00170DE4);
+    func_000A0F5C((int)D_001903A4, (int)D_00170DEF, l_18, l_1C + 47);
+    goto L41758;
+L4172C:;
+    func_000A0ED9(65, (int)D_00170DE4);
+    func_000A0F5C((int)D_001903A4, (int)D_00170DEF, l_18, l_1C + 48);
+L41758:;
+    goto L41791;
+L4175A:;
+    func_000A0ED9(68, (int)D_00170DE4);
+    func_000A0F5C((int)D_001903A4, (int)D_00170DEF, func_0003A0C0(l_1C, *(int *)D_00195BE0), l_1C + 47);
+L41791:;
+    func_0008CCC8((int)D_001A9AB8, (int)D_001903A4, 0);
+    *(int *)(D_00190DE4 + (((int)(short)(*(short *)D_00190D64)++) << 2)) = a1;
+}
 
 void func_0004193C(void)
 {

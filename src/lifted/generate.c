@@ -103,7 +103,6 @@ extern void func_000972C7(int, int, int);
 int func_00090C3A(void);
 void func_0009117A(void);
 #pragma dagger DAGGER_NOSAVES func_0009190C
-#pragma dagger DAGGER_PUSHMEM func_00090C3A
 #pragma dagger reg func_0009190C 19 edx
 
 int func_00090C3A(void)

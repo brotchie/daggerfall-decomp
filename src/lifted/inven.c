@@ -353,11 +353,6 @@ void func_000992FA(void);
 void func_00099391(void);
 #pragma aux func_000A0ED9 parm routine [];
 #pragma dagger DAGGER_CONFPOS func_00093A6A
-#pragma dagger DAGGER_PUSHMEM func_00093372
-#pragma dagger DAGGER_PUSHMEM func_00093BD9
-#pragma dagger DAGGER_PUSHMEM func_00093DCB
-#pragma dagger DAGGER_PUSHMEM func_00098651
-#pragma dagger reg func_00092ED8 123 edi
 #pragma dagger reg func_000932C9 19 esi
 #pragma dagger slots func_00093BD9 a1 36 a2 32 a3 28 l_24 24 l_20 20 l_1C 16 l_18 12 l_14 8 l_10 4
 
@@ -797,7 +792,7 @@ void func_00092ED8(void)
 
     func_000A1023(*(int *)D_00143550, *(int *)D_001AA41C, 64000, (int)D_0017704C, 553, 4);
     if (*(int *)D_00195D38 == 0) goto L92F51;
-    func_00144F68((int)(unsigned short)*(short *)(*(char **)D_001AA434), (int)(unsigned short)*(short *)(*(char **)D_001AA434 + 2), (int)(unsigned short)*(short *)(*(char **)D_001AA434 + 4), (int)(unsigned short)*(short *)(*(char **)D_001AA434 + 6), *(int *)D_001AA434 + 12);
+    func_00144F68((int)(unsigned short)*(short *)(*(char **)D_001AA434), (int)(unsigned short)*(short *)(*(char **)D_001AA434 + 2), (int)(unsigned short)*(short *)(*(char **)D_001AA434 + 4), (int)(unsigned short)*(short *)(*(char **)D_001AA434 + 6), (int)(*(char **)D_001AA434 + 12));
 L92F51:;
     l_38 = (((int)D_00188281) + (*(int *)D_00195D38 * 84)) + (*(int *)D_00195D44 * 12);
     if (*(int *)D_00195D38 != 0) goto L92FEF;
@@ -830,7 +825,7 @@ L9309B:;
     func_00058E15(-147, 0);
     func_000CE31C(*(int *)D_00195B64 + 1008, *(int *)D_00143550 + 4209, 111, 184, 125);
     if (*(int *)D_00195D38 == 0) goto L931CF;
-    func_00144F68((int)(unsigned short)*(short *)(*(char **)D_001AA43C), (int)(unsigned short)*(short *)(*(char **)D_001AA43C + 2), (int)(unsigned short)*(short *)(*(char **)D_001AA43C + 4), (int)(unsigned short)*(short *)(*(char **)D_001AA43C + 6), *(int *)D_001AA43C + 12);
+    func_00144F68((int)(unsigned short)*(short *)(*(char **)D_001AA43C), (int)(unsigned short)*(short *)(*(char **)D_001AA43C + 2), (int)(unsigned short)*(short *)(*(char **)D_001AA43C + 4), (int)(unsigned short)*(short *)(*(char **)D_001AA43C + 6), (int)(*(char **)D_001AA43C + 12));
     l_20 = func_0004A98C(*(int *)D_00195BF4, (int)(unsigned char)*(signed char *)D_00196268);
     if (l_20 == 43) goto L9315A;
     if ((*(unsigned char *)D_001940DB & 128) == 0) goto L93163;

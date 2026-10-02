@@ -153,9 +153,8 @@ void func_0006C692(void);
 void func_0006CB02(void);
 #pragma aux func_000A0ED9 parm routine [];
 #pragma dagger DAGGER_NOGIVEN func_0006BE5C
-#pragma dagger DAGGER_PUSHMEM func_0006C692
 #pragma dagger KKND_CONFREV func_0006BF30
-#pragma dagger reg func_0006BA50 437 bx
+#pragma dagger reg func_0006BA50 381 esi 437 bx
 #pragma dagger reg func_0006BE5C 8 ebx
 
 int func_0006B376(int a1)
@@ -388,12 +387,12 @@ case 0:
 L6BBDF:;
     return;
 case 1:
-    func_00144F68((int)(unsigned short)*(short *)(*(char **)D_00195B5C), (int)(unsigned short)*(short *)(*(char **)D_00195B5C + 2), (int)(unsigned short)*(short *)(*(char **)D_00195B5C + 4), (int)(unsigned short)*(short *)(*(char **)D_00195B5C + 6), *(int *)D_00195B5C + 12);
+    func_00144F68((int)(unsigned short)*(short *)(*(char **)D_00195B5C), (int)(unsigned short)*(short *)(*(char **)D_00195B5C + 2), (int)(unsigned short)*(short *)(*(char **)D_00195B5C + 4), (int)(unsigned short)*(short *)(*(char **)D_00195B5C + 6), (int)(*(char **)D_00195B5C + 12));
     func_0006C55B();
     func_0006C29B((int)(unsigned char)*(signed char *)(*(char **)(D_001A3FAC + (((int)(unsigned char)*(signed char *)D_001A41F2) * 20))), *(int *)(*(char **)(D_001A3FAC + (((int)(unsigned char)*(signed char *)D_001A41F2) * 20)) + 5));
     return;
 case 2:
-    func_00144F68((int)(unsigned short)*(short *)(*(char **)D_00195B5C), (int)(unsigned short)*(short *)(*(char **)D_00195B5C + 2), (int)(unsigned short)*(short *)(*(char **)D_00195B5C + 4), (int)(unsigned short)*(short *)(*(char **)D_00195B5C + 6), *(int *)D_00195B5C + 12);
+    func_00144F68((int)(unsigned short)*(short *)(*(char **)D_00195B5C), (int)(unsigned short)*(short *)(*(char **)D_00195B5C + 2), (int)(unsigned short)*(short *)(*(char **)D_00195B5C + 4), (int)(unsigned short)*(short *)(*(char **)D_00195B5C + 6), (int)(*(char **)D_00195B5C + 12));
     func_0006C692();
     func_0006C29B(1, ((int)D_001A4148) + (((int)(unsigned char)*(signed char *)D_001A41F2) * 74));
 default:;

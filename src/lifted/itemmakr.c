@@ -142,7 +142,6 @@ void func_00057F42(void);
 void func_00058473(void);
 void func_000585D6(int, int);
 #pragma aux func_000A0ED9 parm routine [];
-#pragma dagger DAGGER_PUSHMEM func_000562A1
 #pragma dagger KKND_CONFREV func_000571C7
 #pragma dagger reg func_00057981 437 bx
 #pragma dagger reg func_000579FC 437 bx

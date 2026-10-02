@@ -59,7 +59,6 @@ extern void func_0008C4E4(int);
 void func_0006899B(void);
 #pragma aux func_000A0ED9 parm routine [];
 #pragma dagger DAGGER_NOGIVEN func_0006899B
-#pragma dagger DAGGER_PUSHMEM func_00068731
 #pragma dagger reg func_0006899B 0 edx 1 edx 2 edx 3 edx
 
 void func_00068731(void)

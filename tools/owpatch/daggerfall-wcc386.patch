@@ -2249,7 +2249,7 @@ index 3ea68d697a..f534ca058f 100644
          HW_CAsgn( STParmReg[Max87Stk], HW_EMPTY );
      }
 diff --git a/bld/cg/intel/c/x86call.c b/bld/cg/intel/c/x86call.c
-index f8ad0db4b0..8cf64e867a 100644
+index f8ad0db4b0..8127e69209 100644
 --- a/bld/cg/intel/c/x86call.c
 +++ b/bld/cg/intel/c/x86call.c
 @@ -32,6 +32,8 @@
@@ -2269,7 +2269,7 @@ index f8ad0db4b0..8cf64e867a 100644
  static  void    AddCall( instruction *ins, cn call );
  
  #if _TARGET & _TARG_80386
-@@ -438,6 +441,19 @@ instruction *   PushOneParm( instruction *ins, name *curr,
+@@ -438,6 +441,21 @@ instruction *   PushOneParm( instruction *ins, name *curr,
  
      /* unused parameters */ (void)state; (void)offset;
  
@@ -2277,7 +2277,9 @@ index f8ad0db4b0..8cf64e867a 100644
 +     * (`mov eax,[ebp-x]; push eax`); globals were pushed directly. DAGGER_PUSHMEM=1 restores
 +     * Open Watcom. */
 +    if( _IsModel( CGSW_GEN_NO_OPTIMIZATION ) && DaggerEnv( "DAGGER_PUSHMEM" ) == NULL
-+      && curr->n.class == N_TEMP && TypeClassSize[type_class] == 4 ) {
++      && curr->n.class == N_TEMP && TypeClassSize[type_class] == 4
++      /* (a compiler temp, a `?:` result, was pushed directly) */
++      && ( curr->v.symbol != NULL || DaggerEnv( "DAGGER_PUSHTEMPREG" ) != NULL ) ) {
 +        name    *temp;
 +
 +        temp = AllocTemp( type_class );

@@ -22,6 +22,7 @@ extern char D_0017AF6B[];
 extern char D_0017B202[];
 extern char D_0017B235[];
 extern char D_0017D1F6[];
+extern char D_00182686[];
 extern char D_00185C34[];
 extern char D_001940D4[];
 extern char D_001940D5[];
@@ -79,11 +80,13 @@ extern int func_0012B136();
 extern int func_0012B2D3();
 extern int func_0012DB50();
 extern int func_00144F68();
+extern void func_00038228(int);
 extern void func_00038872(int, short, int, int);
 extern void func_0003D01C(int, int);
 extern void func_0003EC2A(int, int);
 extern void func_0003F09F(int, int);
 extern void func_000425F2(void);
+extern void func_0007D24F(int);
 extern void func_0007D3CA(int);
 extern void func_0007D62B(short, unsigned char, unsigned char, int, unsigned char, unsigned char, unsigned char);
 extern void func_0007F1E3(int);
@@ -94,6 +97,7 @@ extern void func_0008E3F7(int, int);
 int func_00037AB7(void);
 int func_00037D5A(void);
 int func_00038067(void);
+int func_0003853C(short);
 int func_00039224(short);
 int func_00039B93(unsigned char);
 int func_00039C09(void);
@@ -110,6 +114,7 @@ void func_0003A036(void);
 #pragma dagger KKND_CONFREV func_0003817F
 #pragma dagger KKND_CONFREV func_00039E5F
 #pragma dagger reg func_0003817F 2 edx 3 eax
+#pragma dagger reg func_000383CC 28 ebx 31 eax
 #pragma dagger reg func_0003946E 26 edx
 #pragma dagger slots func_0003853C a1 8 l_18 4 ret 12
 #pragma dagger slots func_00039224 a1 12 l_1C 8 l_18 4 ret 16
@@ -425,6 +430,59 @@ void func_0003817F(int a1)
     *(signed char *)(*(char **)D_00178A0A + 1 + (((int)(short)*(short *)D_00195F30) * 2)) = *(signed char *)&a1;
     *(signed char *)D_0019962E = *(signed char *)(D_0017A94B + ((((int)(short)l_18) * 12) + ((int)(short)*(short *)&a1)));
     *(short *)D_00199628 = 0;
+}
+
+int func_000383CC(void)
+{
+    int l_2C;
+    int l_28;
+    short l_20;
+    short l_1C;
+    short l_18;
+
+    if (((int)(unsigned char)(*(signed char *)D_0012AC00 & 2)) == 0) goto L3840C;
+    *(signed char *)D_001940D5 |= 1;
+    func_0003F09F(1811, 1);
+    return 0;
+L3840C:;
+    if (func_0003853C(255) != (-1)) goto L38436;
+    func_0003F09F(1707, 1);
+    return 0;
+L38436:;
+    *(int *)&l_1C = func_00037D5A();
+    l_2C = *(int *)D_00195C44;
+    l_28 = *(int *)D_00195C44 + 32000;
+    *(int *)&l_18 = 0;
+    l_20 = *(int *)&l_18;
+    *(signed char *)((char *)l_2C) = *(signed char *)&l_20;
+L38469:;
+    if (((int)(short)l_20) < 51) goto L38480;
+    goto L3850E;
+L38477:;
+    l_20++;
+    goto L38469;
+L38480:;
+    if (*(int *)(D_00182686 + (((int)(short)l_20) << 2)) == 0) goto L38477;
+    if (((int)(unsigned char)*(signed char *)(D_0017A87F + ((int)(short)l_20))) == 2) goto L384AD;
+    if (((int)(short)l_1C) != 2) goto L384AF;
+L384AD:;
+    goto L384C1;
+L384AF:;
+    if ((short)((unsigned short)(unsigned char)*(signed char *)(D_0017A87F + ((int)(short)l_20))) != l_1C) goto L384C3;
+L384C1:;
+    goto L384C5;
+L384C3:;
+    goto L38477;
+L384C5:;
+    *(signed char *)((char *)(((int)(short)(*(int *)&l_18)++) + l_28)) = *(signed char *)&l_20;
+    func_000A0AD9(l_2C, *(int *)(D_00182686 + (((int)(short)l_20) << 2)), 4, (int)D_00170B13, 1108);
+    l_2C = (func_000A0DF4(l_2C) + l_2C) + 1;
+    goto L38477;
+L3850E:;
+    *(signed char *)((char *)l_2C) = 0;
+    *(int *)D_00195B7C = (int)func_00038228;
+    func_0007D24F(*(int *)D_00195C44);
+    return 0;
 }
 
 int func_0003853C(short a1)

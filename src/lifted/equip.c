@@ -143,7 +143,6 @@ void func_000615E0(int, int, int, int);
 #pragma dagger DAGGER_RMW func_0005E874
 #pragma dagger DAGGER_RMW func_0005EA8F
 #pragma dagger DAGGER_RMW func_00061CBC
-#pragma dagger KKND_CONFREV func_0005F81F
 #pragma dagger slots func_0005F81F l_4C 56 l_2E 26 l_2B 23
 
 void func_0005E540(int a1, int a2, int a3)

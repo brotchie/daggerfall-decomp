@@ -187,7 +187,7 @@ void func_00088A68(void);
 #pragma dagger DAGGER_KEEPSUB func_00088B98
 #pragma dagger DAGGER_RMW func_00088281
 #pragma dagger KKND_CONFREV func_0008661C
-#pragma dagger reg func_00086B0B 56 edx
+#pragma dagger reg func_00086B0B 53 edx
 #pragma dagger reg func_000876AD 437 bx
 #pragma dagger reg func_00088551 387 cx
 #pragma dagger reg func_00088732 39 edx 46 eax
