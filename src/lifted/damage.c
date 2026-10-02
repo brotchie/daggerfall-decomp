@@ -814,7 +814,7 @@ void func_000303F1(void)
 L30411:;
     return;
 L30413:;
-    l_18 = *(int *)((char *)(int)(*(char **)D_001997A0 + (((int)(unsigned char)*(signed char *)D_00196271) * 15)) + 7);
+    l_18 = *(int *)(*(char **)D_001997A0 + 7 + (((int)(unsigned char)*(signed char *)D_00196271) * 15));
     if (*(signed char *)((char *)l_18 + 2) == 0) goto L30447;
     *(signed char *)(D_001952EC + ((int)(unsigned char)*(signed char *)((char *)l_18 + 3))) = 1;
     goto L3044E;

@@ -605,7 +605,7 @@ class Func:
             return "%s[%s%s]" % (arr, idx, " + %d" % k if k > 0 else " - %d" % -k if k else "")
         elif base and not index and disp and self.reg(base, ins).tag and \
                 self.reg(base, ins).tag[0] == "padd" and \
-                (ins.address + 0.125 in self.flips) != bool(os.environ.get("LIFT_FIELDFIRST")):
+                (ins.address + 0.125 in self.flips) != (FIELD_LAST not in self.flips):
             # p->arr[i]: the field offset belongs with the pointer (`p + 367 + i*4`), which
             # makes the pointer side the bigger tree and so evaluated first
             _, ptxt, ptxtb = self.reg(base, ins).tag
@@ -2382,7 +2382,9 @@ class Func:
         if pins:
             decl.append("#pragma dagger reg %s %s" % (
                 name, " ".join("%d %s" % (k, r) for k, r in pins)))
-        # function-level choice points: code generator options (#pragma dagger)
+        # function-level choice points: code generator options (#pragma dagger), and the
+        # default spelling of p->arr[i] (field offset with the pointer, or after the sum)
+        self.choices.append(FIELD_LAST)
         self.choices.extend(-1 - k for k in range(len(FUNC_OPTS)))
         for k, opt in enumerate(FUNC_OPTS):
             if -1 - k in self.flips:
@@ -2416,6 +2418,7 @@ POPS = {}
 # Code generator switches the batch search may turn on for one function
 # (`#pragma dagger <SWITCH> <function>`, DaggerEnv() in the compiler)
 PIN_SLOTS = -1000         # the choice point for `#pragma dagger slots`
+FIELD_LAST = -9999        # p->arr[i] spelt (char *)(p + i*k) + off by default
 PIN_REGS = ["eax", "ebx", "ecx", "edx", "esi", "edi", "ax", "bx", "cx", "dx", "si", "di"]
 
 

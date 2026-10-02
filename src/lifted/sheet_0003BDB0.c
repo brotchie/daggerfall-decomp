@@ -37,12 +37,12 @@ void func_0003BDB0(short a1, short a2)
     *(short *)D_00178A08 = 250;
     *(signed char *)((char *)l_20) = 0;
     func_0003C010(l_20, (int)(short)((unsigned short)(unsigned char)*(signed char *)(*(char **)D_00195BEC + 16 + ((int)(short)a1))), func_0003C3A8((int)(unsigned char)*(signed char *)(*(char **)D_00195BEC + 16 + ((int)(short)a1))));
-    func_0003C010(l_20, (int)(short)((unsigned short)(unsigned char)*(signed char *)((char *)(int)(*(char **)D_00195BEC + ((int)(short)a1)) + 17)), func_0003C3A8((int)(unsigned char)*(signed char *)((char *)(int)(*(char **)D_00195BEC + ((int)(short)a1)) + 17)));
-    func_0003C010(l_20, (int)(short)((unsigned short)(unsigned char)*(signed char *)((char *)(int)(*(char **)D_00195BEC + ((int)(short)a1)) + 18)), func_0003C3A8((int)(unsigned char)*(signed char *)((char *)(int)(*(char **)D_00195BEC + ((int)(short)a1)) + 18)));
+    func_0003C010(l_20, (int)(short)((unsigned short)(unsigned char)*(signed char *)((char *)(int)(((int)(short)a1) + *(char **)D_00195BEC) + 17)), func_0003C3A8((int)(unsigned char)*(signed char *)((char *)(int)(((int)(short)a1) + *(char **)D_00195BEC) + 17)));
+    func_0003C010(l_20, (int)(short)((unsigned short)(unsigned char)*(signed char *)((char *)(int)(((int)(short)a1) + *(char **)D_00195BEC) + 18)), func_0003C3A8((int)(unsigned char)*(signed char *)((char *)(int)(((int)(short)a1) + *(char **)D_00195BEC) + 18)));
     if (a2 == 0) goto L3BF33;
-    func_0003C010(l_20, (int)(short)((unsigned short)(unsigned char)*(signed char *)((char *)(int)(*(char **)D_00195BEC + ((int)(short)a1)) + 19)), func_0003C3A8((int)(unsigned char)*(signed char *)((char *)(int)(*(char **)D_00195BEC + ((int)(short)a1)) + 19)));
-    func_0003C010(l_20, (int)(short)((int)(unsigned char)*(signed char *)((char *)(int)(*(char **)D_00195BEC + ((int)(short)a1)) + 20)), func_0003C3A8((int)(unsigned char)*(signed char *)((char *)(int)(*(char **)D_00195BEC + ((int)(short)a1)) + 20)));
-    func_0003C010(l_20, (int)(short)((unsigned short)(unsigned char)*(signed char *)((char *)(int)(*(char **)D_00195BEC + ((int)(short)a1)) + 21)), func_0003C3A8((int)(unsigned char)*(signed char *)((char *)(int)(*(char **)D_00195BEC + ((int)(short)a1)) + 21)));
+    func_0003C010(l_20, (int)(short)((unsigned short)(unsigned char)*(signed char *)((char *)(int)(((int)(short)a1) + *(char **)D_00195BEC) + 19)), func_0003C3A8((int)(unsigned char)*(signed char *)((char *)(int)(((int)(short)a1) + *(char **)D_00195BEC) + 19)));
+    func_0003C010(l_20, (int)(short)((int)(unsigned char)*(signed char *)((char *)(int)(((int)(short)a1) + *(char **)D_00195BEC) + 20)), func_0003C3A8((int)(unsigned char)*(signed char *)((char *)(int)(((int)(short)a1) + *(char **)D_00195BEC) + 20)));
+    func_0003C010(l_20, (int)(short)((unsigned short)(unsigned char)*(signed char *)((char *)(int)(((int)(short)a1) + *(char **)D_00195BEC) + 21)), func_0003C3A8((int)(unsigned char)*(signed char *)((char *)(int)(((int)(short)a1) + *(char **)D_00195BEC) + 21)));
 L3BF33:;
     if (*(signed char *)D_00199644 == 0) goto L3BFB6;
     func_000A0ED9(327, (int)D_00170C67);

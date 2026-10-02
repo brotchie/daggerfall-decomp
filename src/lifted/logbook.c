@@ -73,6 +73,8 @@ void func_0006ADDB(void);
 void func_0006B0ED(void);
 void func_0006B24F(void);
 void func_0006B2E2(void);
+#pragma dagger reg func_0006ABA8 437 bx
+#pragma dagger reg func_0006AED1 437 bx
 
 void func_0006A75C(void)
 {
@@ -433,7 +435,7 @@ L6B0C8:;
     goto L6B0A6;
 L6B0CA:;
     if (l_1C == (-1)) return;
-    *(short *)((char *)(int)((char *)((l_1C * 20) + l_24) + (a2 * 2)) + 64) = 0;
+    *(short *)((char *)((l_1C * 20) + l_24) + 64 + (a2 * 2)) = 0;
 }
 }
 

@@ -216,7 +216,7 @@ L7916D:;
     if (((int)(unsigned char)*(signed char *)((char *)(a2 + l_24))) == 255) return;
     l_20 = 0;
 L7918C:;
-    if (*(signed char *)((char *)(int)(*(char **)D_00195B04 + (l_20 * 89)) + 73) == *(signed char *)((char *)(a2 + l_24))) goto L791AD;
+    if (*(signed char *)((char *)(int)((l_20 * 89) + *(char **)D_00195B04) + 73) == *(signed char *)((char *)(a2 + l_24))) goto L791AD;
     l_20++;
     goto L7918C;
 L791AD:;

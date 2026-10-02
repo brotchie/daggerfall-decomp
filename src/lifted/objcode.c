@@ -82,6 +82,7 @@ int func_0009A139(int, int);
 int func_0009A5EF(int, int);
 int func_0009A915(int, int);
 void func_0009A1F7(int);
+#pragma dagger reg func_0009A7B8 437 bx
 
 int func_00099D75(int a1)
 {

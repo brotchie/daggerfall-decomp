@@ -1207,3 +1207,7 @@ Batch **1,927**; build **61.34%**.
   folds a written `(i * 2) * 2` into a shift). +4. The winning choice-point flips of the
   matched functions are committed as `config/lift_flips.json` (the search is greedy and
   some finds came from slow offline runs), and lift_all starts from them. Batch **2,110**.
+- `p->arr[i]` is now spelt with the field offset next to the pointer by default
+  (`*(short *)(*(char **)p + 48 + i * 2)`: the pointer side is evaluated first), the old
+  spelling a function-level choice point (cached flips migrated to keep it). +6.
+  Batch **2,116**.

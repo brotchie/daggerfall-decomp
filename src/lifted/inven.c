@@ -2369,7 +2369,7 @@ default:;
 void func_00096782(int a1, int a2, int a3)
 {
     if (*(int *)(*(char **)D_00195BE0 + 367 + (a2 << 2)) == 0) goto L967E6;
-    if (*(int *)((char *)(int)(*(char **)D_00195BE0 + ((a2 + a3) << 2)) + 367) == 0) goto L967D6;
+    if (*(int *)(*(char **)D_00195BE0 + 367 + ((a2 + a3) << 2)) == 0) goto L967D6;
     func_00096847(a1, a2);
     goto L967E4;
 L967D6:;
@@ -2511,7 +2511,7 @@ case 9:
     *(signed char *)(*(char **)D_00195BE0 + 138) &= 253;
     goto L96CBB;
 case 10:
-    *(short *)((char *)(int)(*(char **)D_00195BE0 + (((int)(short)*(short *)((char *)((l_1C << 2) + l_18) + 69)) * 6)) + 157) -= 15;
+    *(short *)(*(char **)D_00195BE0 + 157 + (((int)(short)*(short *)((char *)((l_1C << 2) + l_18) + 69)) * 6)) -= 15;
 default:
 L96CBB:;
     l_1C++;

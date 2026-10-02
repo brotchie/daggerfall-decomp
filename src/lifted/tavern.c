@@ -77,6 +77,8 @@ void func_0001FAB2(void);
 void func_0001FB3F(void);
 void func_0001FD7C(int);
 void func_0001FE4D(void);
+#pragma dagger reg func_0001F958 437 bx
+#pragma dagger reg func_0001FB3F 437 bx
 
 void func_0001F0C5(void)
 {
@@ -446,7 +448,7 @@ L1FC80:;
     l_20++;
     goto L1FC6B;
 L1FC88:;
-    if (*(int *)(*(char **)((char *)a1 + 67) + 31) != *(int *)((char *)(int)(*(char **)(*(char **)D_00195BDC + 43) + (l_20 * 26)) + 20)) goto L1FCB5;
+    if (*(int *)(*(char **)((char *)a1 + 67) + 31) != *(int *)((char *)(int)((l_20 * 26) + *(char **)(*(char **)D_00195BDC + 43)) + 20)) goto L1FCB5;
     l_1C = (int)(*(char **)(*(char **)D_00195BDC + 43) + (l_20 * 26));
 L1FCB5:;
     goto L1FC80;

@@ -20,6 +20,7 @@ extern void func_0005A54A(int, int, int);
 void func_0008CC33(int);
 void func_0008D45A(int, short);
 #pragma dagger DAGGER_NOGIVEN func_0008D497
+#pragma dagger reg func_0008D497 437 bx
 #pragma dagger slots func_0008CCC8 a1 20 a2 16 a3 8 l_18 12 l_10 4
 #pragma dagger slots func_0008D497 a1 40 a2 36 l_90 128 l_8C 124 l_88 120 l_30 32 l_2C 28 l_28 24 l_24 20 l_20 16 l_1C 12 l_18 8 l_14 4
 
@@ -59,20 +60,20 @@ L8CD5B:;
     func_000A0E0D((int)(*(char **)((char *)a1 + 47) + ((((int)(short)*(short *)&l_10) + 1) * 44)), (int)(*(char **)((char *)a1 + 47) + (((int)(short)*(short *)&l_10) * 44)), (((int)(unsigned short)*(short *)((char *)a1 + 37)) - ((int)(short)*(short *)&l_10)) * 44, (int)D_00176E38, 80, 4);
     func_000A0AD9((int)(*(char **)((char *)a1 + 47) + (((int)(short)*(short *)&l_10) * 44)) + 4, a2, 40, (int)D_00176E38, 81);
     *(short *)((char *)(int)(*(char **)((char *)a1 + 47) + (((int)(short)*(short *)&l_10) * 44))) = a3;
-    *(short *)((char *)(int)(*(char **)((char *)a1 + 47) + (((int)(short)*(short *)&l_10) * 44)) + 2) = *(short *)((char *)a1 + 37);
+    *(short *)((char *)(int)((((int)(short)*(short *)&l_10) * 44) + *(char **)((char *)a1 + 47)) + 2) = *(short *)((char *)a1 + 37);
     goto L8CEF7;
 L8CE16:;
     goto L8CD53;
 L8CE1B:;
     func_000A0AD9((int)(*(char **)((char *)a1 + 47) + (((int)(unsigned short)*(short *)((char *)a1 + 37)) * 44)) + 4, a2, 40, (int)D_00176E38, 87);
     *(short *)((char *)(int)(*(char **)((char *)a1 + 47) + (((int)(unsigned short)*(short *)((char *)a1 + 37)) * 44))) = a3;
-    *(short *)((char *)(int)(*(char **)((char *)a1 + 47) + (((int)(unsigned short)*(short *)((char *)a1 + 37)) * 44)) + 2) = *(short *)((char *)a1 + 37);
+    *(short *)(*(char **)((char *)a1 + 47) + 2 + (((int)(unsigned short)*(short *)((char *)a1 + 37)) * 44)) = *(short *)((char *)a1 + 37);
 L8CE88:;
     goto L8CEF7;
 L8CE8A:;
     func_000A0AD9((int)(*(char **)((char *)a1 + 47) + (((int)(unsigned short)*(short *)((char *)a1 + 37)) * 44)) + 4, a2, 40, (int)D_00176E38, 94);
     *(short *)((char *)(int)(*(char **)((char *)a1 + 47) + (((int)(unsigned short)*(short *)((char *)a1 + 37)) * 44))) = a3;
-    *(short *)((char *)(int)(*(char **)((char *)a1 + 47) + (((int)(unsigned short)*(short *)((char *)a1 + 37)) * 44)) + 2) = *(short *)((char *)a1 + 37);
+    *(short *)(*(char **)((char *)a1 + 47) + 2 + (((int)(unsigned short)*(short *)((char *)a1 + 37)) * 44)) = *(short *)((char *)a1 + 37);
 L8CEF7:;
     (*(short *)((char *)a1 + 37))++;
     func_0008CC33(a1);

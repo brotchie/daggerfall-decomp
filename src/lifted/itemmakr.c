@@ -144,6 +144,8 @@ void func_000585D6(int, int);
 #pragma aux func_000A0ED9 parm routine [];
 #pragma dagger DAGGER_PUSHMEM func_000562A1
 #pragma dagger KKND_CONFREV func_000571C7
+#pragma dagger reg func_00057981 437 bx
+#pragma dagger reg func_000579FC 437 bx
 #pragma dagger slots func_000576FF a1 28 a2 16 l_28 24 l_24 20 l_1C 12 l_18 8 l_14 4
 
 void func_00055F0F(void)
@@ -614,7 +616,7 @@ L57691:;
 L57693:;
     goto L576C2;
 L57695:;
-    *(signed char *)((char *)(int)(*(char **)D_00195C44 + ((int)(short)*(short *)&l_14)) + 64000) = *(signed char *)&l_18;
+    *(signed char *)((char *)(int)(((int)(short)*(short *)&l_14) + *(char **)D_00195C44) + 64000) = *(signed char *)&l_18;
     *(int *)(D_00190EE4 + (((int)(short)*(short *)&l_14) << 2)) = *(int *)((char *)a1);
     l_14++;
 L576C2:;
@@ -688,7 +690,7 @@ L57838:;
     goto L578C6;
 L57886:;
     *(short *)(D_001998E0 + (((int)(short)*(short *)D_00190D64) << 2)) = l_28;
-    *(signed char *)((char *)(int)(*(char **)D_00195C44 + ((int)(short)*(short *)&l_1C)) + 64000) = *(signed char *)&l_14;
+    *(signed char *)((char *)(int)(((int)(short)*(short *)&l_1C) + *(char **)D_00195C44) + 64000) = *(signed char *)&l_14;
     *(int *)(D_00190EE4 + (((int)(short)*(short *)&l_1C) << 2)) = *(int *)((char *)a1);
     l_1C++;
 L578C6:;

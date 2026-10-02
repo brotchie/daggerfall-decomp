@@ -46,6 +46,9 @@ extern char D_00196272[];
 extern char D_00196274[];
 extern char D_00196279[];
 extern char D_0019961C[];
+extern char D_0019961E[];
+extern char D_00199620[];
+extern char D_00199622[];
 extern char D_00199624[];
 extern char D_00199628[];
 extern char D_0019962C[];
@@ -107,6 +110,7 @@ void func_0003A036(void);
 #pragma dagger KKND_CONFREV func_0003817F
 #pragma dagger KKND_CONFREV func_00039E5F
 #pragma dagger reg func_0003817F 2 edx 3 eax
+#pragma dagger reg func_0003946E 26 edx
 #pragma dagger slots func_0003853C a1 8 l_18 4 ret 12
 #pragma dagger slots func_00039224 a1 12 l_1C 8 l_18 4 ret 16
 
@@ -418,7 +422,7 @@ void func_0003817F(int a1)
 
     *(int *)&l_18 = (int)(unsigned char)*(signed char *)((char *)(int)(*(char **)D_00178A0A + (((int)(short)*(short *)D_00195F30) * 2)));
     func_000A1023((int)D_0019961C, (((int)(unsigned char)*(signed char *)(D_0017AF6B + (((int)(short)*(short *)&a1) + (((int)(short)l_18) * 12)))) << 3) + ((int)D_0017AE13), 8, (int)D_00170B13, 1030, 8);
-    *(signed char *)((char *)(int)(*(char **)D_00178A0A + (((int)(short)*(short *)D_00195F30) * 2)) + 1) = *(signed char *)&a1;
+    *(signed char *)(*(char **)D_00178A0A + 1 + (((int)(short)*(short *)D_00195F30) * 2)) = *(signed char *)&a1;
     *(signed char *)D_0019962E = *(signed char *)(D_0017A94B + ((((int)(short)l_18) * 12) + ((int)(short)*(short *)&a1)));
     *(short *)D_00199628 = 0;
 }
@@ -558,7 +562,7 @@ int func_00039224(short a1)
     short l_18;
 
     l_18 = *(short *)(D_0017A8E5 + (((int)(unsigned char)*(signed char *)((char *)(int)(*(char **)D_00178A0A + (((int)(short)a1) * 2)))) * 2));
-    l_1C = (int)(unsigned char)*(signed char *)((char *)(int)(*(char **)D_00178A0A + (((int)(short)a1) * 2)) + 1);
+    l_1C = (int)(unsigned char)*(signed char *)(*(char **)D_00178A0A + 1 + (((int)(short)a1) * 2));
     if (((int)(short)*(short *)&l_1C) == 255) goto L39291;
     if (((int)(unsigned char)*(signed char *)((char *)(int)(*(char **)D_00178A0A + (((int)(short)a1) * 2)))) != 29) goto L39293;
 L39291:;
@@ -590,6 +594,17 @@ L3932A:;
 L3935B:;
     func_0008D497((int)D_00195FF8, 0);
     return -1;
+}
+
+int func_0003946E(void)
+{
+    short l_18;
+
+    l_18 = *(short *)D_0019961C * (short)*(signed char *)(*(char **)D_00178A0A + 14 + (((int)(short)*(short *)D_00195F30) * 3));
+    *(int *)&l_18 = ((int)(short)l_18) + (((int)(short)*(short *)D_0019961E) * (((int)(signed char)*(signed char *)(*(char **)D_00178A0A + 15 + (((int)(short)*(short *)D_00195F30) * 3))) / ((int)(signed char)*(signed char *)(*(char **)D_00178A0A + 16 + (((int)(short)*(short *)D_00195F30) * 3)))));
+    *(int *)&l_18 = ((int)(short)l_18) + (((int)(short)*(short *)D_00199620) * ((((int)(signed char)*(signed char *)(*(char **)D_00178A0A + 32 + (((int)(short)*(short *)D_00195F30) * 5))) + ((int)(signed char)*(signed char *)((char *)(int)((((int)(short)*(short *)D_00195F30) * 5) + *(char **)D_00178A0A) + 33))) / 2));
+    *(int *)&l_18 = ((int)(short)l_18) + (((int)(short)*(short *)D_00199622) * (((((int)(signed char)*(signed char *)(*(char **)D_00178A0A + 34 + (((int)(short)*(short *)D_00195F30) * 5))) + ((int)(signed char)*(signed char *)(*(char **)D_00178A0A + 35 + (((int)(short)*(short *)D_00195F30) * 5)))) / 2) / ((int)(signed char)*(signed char *)(*(char **)D_00178A0A + 36 + (((int)(short)*(short *)D_00195F30) * 5)))));
+    return (int)(short)l_18;
 }
 
 int func_00039993(void)

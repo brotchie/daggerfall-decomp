@@ -111,6 +111,7 @@ void func_0004B7E3(int);
 void func_0004B9A1(void);
 void func_0004BA0F(void);
 void func_0004BAE2(void);
+#pragma dagger reg func_0004B66E 437 bx
 #pragma dagger slots func_0004BBD8 a1 4 a2 12 a3 16 l_20 20 l_14 8
 
 void func_0004AB2F(int a1)

@@ -110,7 +110,7 @@ int func_0002E914(int, int, int);
 void func_0002E2CF(int, int, int, int);
 #pragma aux func_000A0ED9 parm routine [];
 #pragma dagger DAGGER_PUSHMEM func_0002CE9E
-#pragma dagger reg func_0002E2CF 67 edx 68 eax
+#pragma dagger reg func_0002E2CF 67 edx 68 eax 437 bx
 
 int func_0002CE9E(int a1, int a2, int a3)
 {

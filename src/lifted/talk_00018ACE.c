@@ -27,7 +27,7 @@ L18B15:;
     l_24 = func_00018BDC((int)(short)a1);
     *(short *)D_001966AC += *(short *)(*(char **)&l_1C + 29);
     if (((int)(unsigned char)*(signed char *)(*(char **)&l_1C + 54)) >= 5) goto L18B62;
-    *(short *)D_001966AC += *(short *)((char *)(int)(*(char **)D_00195BE0 + (((int)(unsigned char)*(signed char *)(*(char **)&l_1C + 54)) * 2)) + 145);
+    *(short *)D_001966AC += *(short *)(*(char **)D_00195BE0 + 145 + (((int)(unsigned char)*(signed char *)(*(char **)&l_1C + 54)) * 2));
 L18B62:;
     l_28 = func_0007D6AE(0, 15) - 10;
     if (((int)(short)*(short *)D_001966AC) < l_28) goto L18B8C;

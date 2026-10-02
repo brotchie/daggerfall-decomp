@@ -87,6 +87,7 @@ void func_00030854(int);
 void func_00030E34(unsigned char);
 void func_00031B47(int, int);
 #pragma aux func_000A0ED9 parm routine [];
+#pragma dagger reg func_00030FEF 437 bx
 #pragma dagger slots func_00031843 a1 8 a2 36 a3 32 l_34 40 l_28 28 l_24 24 l_20 20 l_1C 16 l_10 4 ret 12
 
 void func_0003053E(int a1, int a2)
@@ -257,7 +258,7 @@ L30954:;
     l_20 = func_000192EE((int)(short)l_14);
     l_24 = (int)(short)*(short *)((char *)l_20 + 29);
     if (((int)(unsigned char)*(signed char *)((char *)l_20 + 54)) >= 5) goto L30999;
-    l_24 += (int)(short)*(short *)((char *)(int)(*(char **)D_00195BE0 + (((int)(unsigned char)*(signed char *)((char *)l_20 + 54)) * 2)) + 145);
+    l_24 += (int)(short)*(short *)(*(char **)D_00195BE0 + 145 + (((int)(unsigned char)*(signed char *)((char *)l_20 + 54)) * 2));
 L30999:;
     if (l_24 < *(int *)((char *)a2 + 58)) goto L309AD;
     l_34 = 1;

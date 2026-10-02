@@ -110,7 +110,7 @@ L510E2:;
     (*(int *)&l_18)++;
     goto L510D5;
 L510EA:;
-    *(signed char *)((char *)(int)(*(char **)D_00195C44 + ((int)(short)l_18)) + 64000) <<= 2;
+    *(signed char *)((char *)(int)(((int)(short)l_18) + *(char **)D_00195C44) + 64000) <<= 2;
     goto L510E2;
 L510FF:;
     func_000CD367(*(int *)D_00195C44 + 64000);

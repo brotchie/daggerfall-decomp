@@ -2238,13 +2238,13 @@ case 1:
 case 2:
 case 3:
 case 6:
-    func_0006974E(*(int *)((char *)(int)(*(char **)D_001A4FA8 + ((func_0009DC25() % 5) << 2)) + 28));
+    func_0006974E(*(int *)(*(char **)D_001A4FA8 + 28 + ((func_0009DC25() % 5) << 2)));
     goto L77E07;
 case 4:
-    func_0006974E(*(int *)((char *)(int)(*(char **)D_001A4FA8 + ((func_0009DC25() % 3) << 2)) + 48));
+    func_0006974E(*(int *)(*(char **)D_001A4FA8 + 48 + ((func_0009DC25() % 3) << 2)));
     goto L77E07;
 case 5:
-    func_0006974E(*(int *)((char *)(int)(*(char **)D_001A4FA8 + ((func_0009DC25() % 3) << 2)) + 60));
+    func_0006974E(*(int *)(*(char **)D_001A4FA8 + 60 + ((func_0009DC25() % 3) << 2)));
 default:
 L77E07:;
     goto L77F7B;
@@ -2272,13 +2272,13 @@ case 1:
 case 2:
 case 3:
 case 6:
-    func_0006974E(*(int *)((char *)(int)(*(char **)D_001A4FA8 + ((func_0009DC25() % 5) << 2)) + 28));
+    func_0006974E(*(int *)(*(char **)D_001A4FA8 + 28 + ((func_0009DC25() % 5) << 2)));
     goto L77F7B;
 case 4:
-    func_0006974E(*(int *)((char *)(int)(*(char **)D_001A4FA8 + ((func_0009DC25() % 3) << 2)) + 48));
+    func_0006974E(*(int *)(*(char **)D_001A4FA8 + 48 + ((func_0009DC25() % 3) << 2)));
     goto L77F7B;
 case 5:
-    func_0006974E(*(int *)((char *)(int)(*(char **)D_001A4FA8 + ((func_0009DC25() % 3) << 2)) + 60));
+    func_0006974E(*(int *)(*(char **)D_001A4FA8 + 60 + ((func_0009DC25() % 3) << 2)));
 default:
 L77F7B:;
     goto L78223;

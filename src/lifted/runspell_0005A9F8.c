@@ -13,6 +13,7 @@ extern int func_0008DA91(int);
 extern int func_0008DCE3(int, int, int);
 extern int func_0008EB88(int);
 extern int func_000A1023();
+#pragma dagger reg func_0005A9F8 437 bx
 
 int func_0005A9F8(int a1, int a2)
 {

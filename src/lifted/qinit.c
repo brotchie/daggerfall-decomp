@@ -57,6 +57,7 @@ int func_00032EC8(int);
 int func_0003323C(int);
 int func_000336EE(int, int);
 int func_00033EE7(int, int);
+#pragma dagger reg func_000344D3 437 bx
 
 int func_00032EC8(int a1)
 {

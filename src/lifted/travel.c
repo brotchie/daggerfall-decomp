@@ -158,6 +158,10 @@ void func_0009D3D2(void);
 void func_0009D515(void);
 #pragma aux func_000A0ED9 parm routine [];
 #pragma dagger DAGGER_PUSHMEM func_0009BAC1
+#pragma dagger reg func_0009BAC1 437 bx
+#pragma dagger reg func_0009C29C 437 bx
+#pragma dagger reg func_0009C3E7 437 bx
+#pragma dagger reg func_0009CC3F 437 bx
 #pragma dagger slots func_0009BAC1 l_20 12 l_1C 8 l_18 4
 #pragma dagger slots func_0009C29C l_24 16 l_20 12 l_1C 8 l_18 4
 
@@ -462,7 +466,7 @@ void func_0009BAC1(void)
     l_18 = func_0009C860();
     if (l_18 == (-1)) goto L9BC68;
     if ((*(unsigned char *)D_00195AE8 & 8) == 0) goto L9BBA9;
-    if ((((int)(unsigned char)*(signed char *)D_001788E3) & (1 << ((int)(unsigned char)*(signed char *)(D_00188782 + (((unsigned)(*(int *)((char *)(int)(*(char **)D_00196A9C + (l_18 * 17)) + 4) << 2)) >> 27))))) == 0) goto L9BB85;
+    if ((((int)(unsigned char)*(signed char *)D_001788E3) & (1 << ((int)(unsigned char)*(signed char *)(D_00188782 + (((unsigned)(*(int *)((char *)(int)((l_18 * 17) + *(char **)D_00196A9C) + 4) << 2)) >> 27))))) == 0) goto L9BB85;
     func_000A0ED9(541, (int)D_0017743D);
     func_000A0F5C((int)D_001903A4, (int)D_00177455, *(int *)(D_001837E4 + (((int)(signed char)*(signed char *)D_00190CE4) << 2)), (int)(*(char **)D_00196A7C + (l_18 << 5)) + 4);
     goto L9BBA4;

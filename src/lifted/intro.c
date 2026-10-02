@@ -149,7 +149,7 @@ L3A45C:;
     l_28++;
     goto L3A44F;
 L3A464:;
-    *(signed char *)((char *)(int)(*(char **)D_00195C44 + ((int)(short)*(short *)&l_28)) + 64000) <<= 2;
+    *(signed char *)((char *)(int)(((int)(short)*(short *)&l_28) + *(char **)D_00195C44) + 64000) <<= 2;
     goto L3A45C;
 L3A479:;
     func_000CD33A(*(int *)D_00195C44 + 64000, 0, 256);

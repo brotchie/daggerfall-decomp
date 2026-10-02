@@ -444,16 +444,16 @@ void func_0009190C(int a1)
     *(int *)D_00190BE4 = *(int *)((char *)l_18);
     if (a1 != 30) goto L91997;
     if (*(short *)D_00190D64 == 0) goto L91995;
-    if (((int)(short)*(short *)((char *)(int)(*(char **)D_00195BE0 + (((int)(short)*(short *)D_00190D70) * 2)) + 32)) == 100) return;
+    if (((int)(short)*(short *)(*(char **)D_00195BE0 + 32 + (((int)(short)*(short *)D_00190D70) * 2))) == 100) return;
     (*(short *)D_00190D64)--;
-    (*(short *)((char *)(int)(*(char **)D_00195BE0 + (((int)(short)*(short *)D_00190D70) * 2)) + 32))++;
+    (*(short *)(*(char **)D_00195BE0 + 32 + (((int)(short)*(short *)D_00190D70) * 2)))++;
 L91995:;
     return;
 L91997:;
-    if ((short)(short)*(signed char *)(D_00190CE4 + ((int)(short)*(short *)D_00190D70)) >= *(short *)((char *)(int)(*(char **)D_00195BE0 + (((int)(short)*(short *)D_00190D70) * 2)) + 32)) return;
-    if (((int)(short)*(short *)((char *)(int)(*(char **)D_00195BE0 + (((int)(short)*(short *)D_00190D70) * 2)) + 32)) == 10) return;
+    if ((short)(short)*(signed char *)(D_00190CE4 + ((int)(short)*(short *)D_00190D70)) >= *(short *)(*(char **)D_00195BE0 + 32 + (((int)(short)*(short *)D_00190D70) * 2))) return;
+    if (((int)(short)*(short *)(*(char **)D_00195BE0 + 32 + (((int)(short)*(short *)D_00190D70) * 2))) == 10) return;
     (*(short *)D_00190D64)++;
-    (*(short *)((char *)(int)(*(char **)D_00195BE0 + (((int)(short)*(short *)D_00190D70) * 2)) + 32))--;
+    (*(short *)(*(char **)D_00195BE0 + 32 + (((int)(short)*(short *)D_00190D70) * 2)))--;
 }
 
 void func_000919FE(void)

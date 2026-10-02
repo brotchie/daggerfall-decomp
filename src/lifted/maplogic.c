@@ -188,6 +188,7 @@ void func_00088A68(void);
 #pragma dagger DAGGER_RMW func_00088281
 #pragma dagger KKND_CONFREV func_0008661C
 #pragma dagger reg func_00086B0B 56 edx
+#pragma dagger reg func_000876AD 437 bx
 #pragma dagger reg func_00088732 39 edx 46 eax
 
 void func_00086314(void)
@@ -1225,7 +1226,7 @@ void func_00088A68(void)
     if (((int)(unsigned char)*(signed char *)(D_001A94D6 + (*(int *)D_001A94C8 * 131))) <= 50) goto L88AA1;
     *(signed char *)(D_001A94D6 + (*(int *)D_001A94C8 * 131)) = 50;
 L88AA1:;
-    func_000A1023((int)D_000C2BB8, (int)&*(signed char *)((char *)(int)((char *)(*(int *)D_001A94C8 * 131) + ((int)D_001A94D4)) + 2), 129, (int)D_00176C94, 1455, 4);
+    func_000A1023((int)D_000C2BB8, (int)&*(signed char *)((char *)(int)(((int)D_001A94D4) + (char *)(*(int *)D_001A94C8 * 131)) + 2), 129, (int)D_00176C94, 1455, 4);
     *(int *)D_001A94CC = (((int)(unsigned char)*(signed char *)(D_0017CA0A + *(int *)D_001A94C8)) * 100) + 2;
     *(int *)D_001A94D0 = (int)(short)*(short *)(D_001A94D4 + (*(int *)D_001A94C8 * 131));
     l_1C = func_0001FFF1();
