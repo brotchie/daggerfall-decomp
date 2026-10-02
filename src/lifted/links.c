@@ -689,8 +689,6 @@ L65590:;
     goto L655FC;
 case 0:
 case 1:
-    goto L655CB;
-L655CB:;
     *(int *)((char *)a1 + 13) = *(int *)(*(char **)((char *)a1 + 35) + 7);
     goto L655FC;
 case 2:
@@ -732,8 +730,6 @@ L656C7:;
     goto L65724;
 case 0:
 case 1:
-    goto L656F0;
-L656F0:;
     *(int *)((char *)a1 + 13) = (int)(short)*(short *)(*(char **)((char *)a1 + 35) + 1);
     goto L65724;
 case 2:

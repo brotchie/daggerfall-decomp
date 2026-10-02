@@ -304,7 +304,7 @@ void func_0001B5BE(int, int);
 #pragma dagger KKND_CONFREV func_00017CEF
 #pragma dagger reg func_00016E61 4 ebx
 #pragma dagger reg func_00017179 33 esi
-#pragma dagger reg func_000174C3 130 esi 131 eax 188 esi 189 eax 437 bx
+#pragma dagger reg func_000174C3 130 esi 188 esi 437 bx
 #pragma dagger reg func_00017E5B 437 bx
 #pragma dagger reg func_0001839C 56 esi 116 esi 177 esi
 #pragma dagger reg func_00019676 236 edx
@@ -1582,8 +1582,12 @@ L174DF:;
     if (((int)(unsigned char)*(signed char *)((char *)l_40)) != 14) goto L17A4C;
     *(int *)D_00195D00 = l_40;
     *(int *)D_00199764 = (*(int *)D_00199780 = l_40 + 71);
-    switch ((unsigned)a1) {
-case 4:
+    if (((unsigned)a1) < 5) goto L17541;
+    if (((unsigned)a1) <= 5) goto L1776B;
+    if (a1 == 6) goto L1790A;
+    goto L17A4C;
+L17541:;
+    if (a1 != 4) goto L17A4C;
     l_34 = func_000309E8(*(int *)D_00199780, 4);
     l_24 = 0;
 L17564:;
@@ -1633,7 +1637,7 @@ L1768A:;
     goto L17577;
 L17766:;
     goto L17A4C;
-case 5:
+L1776B:;
     l_30 = func_000309E8(*(int *)D_00199780, 3);
     l_24 = 0;
 L17784:;
@@ -1674,7 +1678,7 @@ L17853:;
     goto L17797;
 L17905:;
     goto L17A4C;
-case 6:
+L1790A:;
     goto L17A4C;
 L1790F:;
     if (((int)(short)*(short *)(*(char **)D_00199780 + 16)) > l_24) goto L17931;
@@ -1705,11 +1709,9 @@ L179BB:;
     *(short *)((char *)(int)(*(char **)D_00196598 + (*(int *)D_001965B8 * 19)) + 15) = *(short *)((char *)l_2C + 15);
     *(short *)((char *)(int)(*(char **)D_00196598 + ((*(int *)D_001965B8)++ * 19)) + 17) = *(short *)((char *)l_2C + 17);
     goto L17922;
-default:
 L17A4C:;
     l_40 = l_3C;
     goto L174DF;
-}
 }
 
 void func_00017B98(void)

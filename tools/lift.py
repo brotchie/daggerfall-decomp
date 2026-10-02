@@ -895,6 +895,8 @@ class Func:
                         for v in sw["cases"].get(ins.address, []):
                             self.out.append("case %d:" % v)
                     if sw.get("default") == ins.address:
+                        for v in sw.get("explicit", []):
+                            self.out.append("case %d:" % v)
                         self.out.append("default:")
                 self.out.append("L%X:;" % ins.address)
                 self.regs = {}
@@ -1834,6 +1836,20 @@ class Func:
             elif sig is not None:
                 nreg, nstack = min(4, len(sig[1])), max(0, len(sig[1]) - 4)
                 self.calls.add(name)
+                if len(sig[1]) < 4 and not self.pushes and \
+                        not os.environ.get("LIFT_NOEXTRAARGS"):
+                    # more argument registers loaded than the callee takes, and not kept
+                    # for later: called without its prototype, with extra arguments
+                    extra = nreg
+                    while extra < 4 and PARM_REGS[extra] in loaded and \
+                            not self.live_later(PARM_REGS[extra]):
+                        extra += 1
+                    if extra > nreg and all(r in loaded for r in PARM_REGS[:nreg]):
+                        # (a choice point)
+                        self.choices.append(ins.address + 0.71875)
+                        if ins.address + 0.71875 in self.flips:
+                            self.noproto.add(name)
+                            nreg = extra
                 if any(t != "int" for t in sig[1]) and not os.environ.get("LIFT_NONOPROTO"):
                     # no prototype in scope at the call (arguments passed as ints): a
                     # choice point for the function's calls of it
@@ -2286,9 +2302,10 @@ class Func:
             return yes, no
 
         leaves, nodes = [], set()
-        todo = [(start, [(lo, hi)], True)]
+        direct = []         # leaves a compare's jump goes to straight (not through a jmp)
+        todo = [(start, [(lo, hi)], True, None)]
         while todo:
-            a, ivs, fall = todo.pop()
+            a, ivs, fall, via = todo.pop()
             if not ivs:
                 continue
             if len(nodes) > 4000:
@@ -2296,16 +2313,18 @@ class Func:
             n = node(a, fall)
             if n is None:
                 leaves.append((a, ivs))
+                if via == "jcc":
+                    direct.append((a, ivs))
                 continue
             nodes.update(n[-1])
             if n[0] == "cmp":
                 v = val(n[1])
                 for m, x in n[2]:
                     yes, ivs = cut(ivs, JCC[m][0], v)
-                    todo.append((x, yes, False))
-                todo.append((n[3], ivs, True))
+                    todo.append((x, yes, False, "jcc"))
+                todo.append((n[3], ivs, True, None))
             elif n[0] == "jmp":
-                todo.append((n[1], ivs, False))
+                todo.append((n[1], ivs, False, "jmp"))
             elif n[0] == "scan":
                 sc = n[1]
                 tsw = self.switches[sc["jmp"]]
@@ -2345,13 +2364,34 @@ class Func:
         # jumps a compare goes to inside the tree's own stretch of code are the tree's stubs
         # (`jb L; ... L: jmp case`), not case bodies
         hi = max(nodes) if nodes else start
+        run_end = limit
+        if run_end is None and not os.environ.get("LIFT_NORUNEND"):
+            # the tree's own stretch: its compares and jumps, up to the first other code
+            x = start
+            while x in by_addr and (by_addr[x].mnemonic in JCC or by_addr[x].mnemonic == "jmp"
+                                    or (by_addr[x].mnemonic == "cmp" and
+                                        frame_slot(by_addr[x], by_addr[x].operands[0]) == t)):
+                x = nxt.get(x)
+            run_end = x
         more = {a for a, _ in leaves if a not in stubs and
-                (prev.get(a) in nodes or start < a < max(hi, limit or 0)) and
+                (prev.get(a) in nodes or start < a < max(hi, run_end or 0)) and
                 by_addr[a].mnemonic == "jmp" and by_addr[a].operands[0].type == cx.X86_OP_IMM}
         if more and len(stubs) < 64:
             return self.parse_ctree(start, t, w, by_addr, nxt, stubs | more, limit)
         self.cskip |= nodes
+        # values a compare sends straight to the default's code: explicit cases there
+        # (`case 10: case 11: break;`), which shape the compiler's tree
+        explicit = sorted(v for a, ivs in direct if a == dflt for x, y in ivs
+                          if y - x <= 64 and y != hi
+                          for v in range(x, y + 1)) \
+            if not os.environ.get("LIFT_NOEXPLICIT") else []
+        if explicit:
+            # (a choice point: by default they are the default's)
+            self.choices.append(start + 0.84375)
+            if start + 0.84375 not in self.flips:
+                explicit = []
         return {"cases": cases, "default": dflt, "width": w, "signed": signed,
+                "explicit": explicit,
                 "has_table": any(n is not None and n[0] in ("table", "scan")
                                  for n in (node(a) for a in nodes)),
                 "entries": sorted(cases), "nodes": nodes}
@@ -3007,7 +3047,8 @@ class Func:
                     d -= 1
         closers = []
         for sw in reversed(self.sw_stack):
-            closers.append((["default:;"] if sw.get("default") == "END" else []) + ["}"])
+            closers.append((["case %d:" % v for v in sw.get("explicit", [])] + ["default:;"]
+                            if sw.get("default") == "END" else []) + ["}"])
         decl_lines = [self.decl_line(o, two) for o in outer]
         if early:
             decl_lines += ["{"] + [self.decl_line(o, two) for o in early]

@@ -3081,6 +3081,33 @@ void func_00097FE2(void)
     func_00097A85();
 }
 
+void func_00098008(void)
+{
+    int l_1C;
+    int l_18;
+
+    switch (*(int *)D_00195D38) {
+    return;
+case 1:
+    func_0008E3F7(*(int *)(*(char **)D_00195AA0 + 63), (int)func_00092013);
+    return;
+case 2:
+case 3:
+case 4:
+    l_1C = *(int *)(*(char **)D_00195B20 + 63);
+L98055:;
+    if (l_1C == 0) return;
+    l_18 = *(int *)((char *)l_1C + 55);
+    if (((int)(unsigned char)*(signed char *)((char *)l_1C)) != 54) goto L98079;
+    *(signed char *)((char *)l_1C) = 2;
+L98079:;
+    func_00097101(l_1C);
+    l_1C = l_18;
+    goto L98055;
+default:;
+}
+}
+
 void func_00098093(void)
 {
     if (*(int *)D_00195D2C == 0) return;
