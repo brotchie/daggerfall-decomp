@@ -1179,3 +1179,8 @@ Batch **1,927**; build **61.34%**.
   both operands are dword reads; OW evaluates a pointer sum's pointer side last, so which
   one was the `char *` decides the register order. A choice point when both are reads. +14.
   Batch **2,072**.
+- **Switch table marks mid-block**: a `__dagger_tbl` mark after a statement that falls into
+  a label was taken before that statement's code existed (OW builds a block before it
+  generates it), so the table landed in front of the statement. The front end now emits a
+  label before the mark, ending the block first. +4 (three of them 1.7–2.8 KB).
+  Batch **2,076**.

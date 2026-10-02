@@ -1,8 +1,13 @@
 diff --git a/bld/cc/c/cgen.c b/bld/cc/c/cgen.c
-index ee6e5533cb..1ccc31bde2 100644
+index ee6e5533cb..b42fafffb0 100644
 --- a/bld/cc/c/cgen.c
 +++ b/bld/cc/c/cgen.c
-@@ -35,6 +35,10 @@
+@@ -31,10 +31,15 @@
+ 
+ 
+ #include "cvars.h"
++#include <stdlib.h>
+ #include "langenv.h"
  #include "jmpbuf.h"
  #include "i64.h"
  #include "cg.h"
@@ -13,7 +18,7 @@ index ee6e5533cb..1ccc31bde2 100644
  #include "cgdefs.h"
  #include "cgswitch.h"
  #include "cgcli.h"
-@@ -1117,10 +1121,21 @@ static void CDoAutoDecl( SYM_HANDLE sym_handle )
+@@ -1117,10 +1122,21 @@ static void CDoAutoDecl( SYM_HANDLE sym_handle )
              }
              dtype = CGenType( typ );
              if( sym.flags & SYM_FUNC_RETURN_VAR ) {
@@ -36,7 +41,7 @@ index ee6e5533cb..1ccc31bde2 100644
              }
          }
  #if _CPU != 370
-@@ -1289,7 +1304,11 @@ static void EmitNodes( TREEPTR tree )
+@@ -1289,7 +1305,11 @@ static void EmitNodes( TREEPTR tree )
              break;
          case OPR_NEWBLOCK:              // start of new block { vars; }
              DBBegBlock();
@@ -48,14 +53,17 @@ index ee6e5533cb..1ccc31bde2 100644
              break;
          case OPR_ENDBLOCK:              // end of new block { vars; }
              DBEndBlock();
-@@ -1501,8 +1520,13 @@ static void EmitNodes( TREEPTR tree )
+@@ -1501,8 +1521,16 @@ static void EmitNodes( TREEPTR tree )
              op1 = PopCGName();          // - get address of array
              PushCGName( IndexOperator( op1, node, op2 ) );
              break;
 -        case OPR_ADDROF:                // & expr
          case OPR_NOP:                   // nop
 +            if( ( node->u2.long_value >> 8 ) == 0xDA66 ) {
-+                // Daggerfall: a switch table goes here
++                // Daggerfall: a switch table goes here; a label first ends the block being
++                // built, so the code before the mark is generated before it is taken
++                if( getenv( "DAGGER_NOTBLLABEL" ) == NULL )
++                    CGControl( O_LABEL, NULL, BENewLabel() );
 +                DaggerTableHere( (int)( node->u2.long_value & 0xFF ) );
 +            }
 +            break;
