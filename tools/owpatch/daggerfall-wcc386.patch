@@ -2593,7 +2593,7 @@ index 1de30dab10..4cdc4f45b3 100644
      POP_OP();
      return( table );
 diff --git a/bld/cg/intel/c/x86ver.c b/bld/cg/intel/c/x86ver.c
-index 7de826e706..b696f4b89a 100644
+index 7de826e706..95f867d3ab 100644
 --- a/bld/cg/intel/c/x86ver.c
 +++ b/bld/cg/intel/c/x86ver.c
 @@ -31,6 +31,8 @@
@@ -2605,7 +2605,7 @@ index 7de826e706..b696f4b89a 100644
  #include "coderep.h"
  #include "data.h"
  #include "rgtbl.h"
-@@ -39,10 +41,24 @@
+@@ -39,10 +41,26 @@
  #include "targetin.h"
  
  
@@ -2623,14 +2623,16 @@ index 7de826e706..b696f4b89a 100644
 +        || ( DaggerEnv( "DAGGER_NARROWRMW" ) == NULL
 +          && ( ins->head.opcode == OP_AND || ins->head.opcode == OP_OR
 +            || ins->head.opcode == OP_XOR ) ) )
-+      && op1->n.class == N_TEMP );
++      && ( op1->n.class == N_TEMP
++        || ( op1->n.class == N_INDEXED && op1->i.index != NULL && op1->i.base != NULL
++          && op1->i.base->n.class == N_TEMP && DaggerEnv( "DAGGER_NARROWARR" ) == NULL ) ) );
 +}
 +
 +
  bool    DoVerify( vertype kind, instruction *ins )
  /************************************************/
  {
-@@ -80,6 +96,8 @@ bool    DoVerify( vertype kind, instruction *ins )
+@@ -80,6 +98,8 @@ bool    DoVerify( vertype kind, instruction *ins )
              return( true );
          break;
      case V_OP2HIGH_B_ZERO:
@@ -2639,7 +2641,7 @@ index 7de826e706..b696f4b89a 100644
          if( op2->c.const_type == CONS_ABSOLUTE
            && (op2->c.lo.u.int_value & 0x0000ff00) == 0 )
              return( true );
-@@ -90,6 +108,8 @@ bool    DoVerify( vertype kind, instruction *ins )
+@@ -90,6 +110,8 @@ bool    DoVerify( vertype kind, instruction *ins )
              return( true );
          break;
      case V_OP2LOW_B_ZERO:
@@ -2648,7 +2650,23 @@ index 7de826e706..b696f4b89a 100644
          if( op2->c.const_type == CONS_ABSOLUTE
            && (op2->c.lo.u.int_value & 0x000000ff) == 0 )
              return( true );
-@@ -155,6 +175,8 @@ bool    DoVerify( vertype kind, instruction *ins )
+@@ -141,6 +163,8 @@ bool    DoVerify( vertype kind, instruction *ins )
+             return( false );
+         return( true );
+     case V_OP2HIGH_B_FF:
++        if( DaggerNoNarrowTest( ins, op1 ) )
++            return( false );
+         if( op2->c.const_type == CONS_ABSOLUTE
+           && (op2->c.lo.u.int_value & 0x0000ff00) == 0x0000ff00 )
+             return( true );
+@@ -150,11 +174,15 @@ bool    DoVerify( vertype kind, instruction *ins )
+           && HW_Ovlap( op1->r.reg, HW_xBP ) )
+             break;
+     case V_OP2HIGH_W_FFFF:
++        if( DaggerNoNarrowTest( ins, op1 ) )
++            return( false );
+         if( op2->c.const_type == CONS_ABSOLUTE
+           && (op2->c.lo.u.int_value & 0xffff0000) == 0xffff0000 )
              return( true );
          break;
      case V_OP2HIGH_W_ZERO_REG:
@@ -2657,7 +2675,7 @@ index 7de826e706..b696f4b89a 100644
          if( op1->n.class == N_REGISTER
            && HW_Ovlap( op1->r.reg, HW_xBP ) )
              break;
-@@ -164,6 +186,8 @@ bool    DoVerify( vertype kind, instruction *ins )
+@@ -164,6 +192,8 @@ bool    DoVerify( vertype kind, instruction *ins )
              return( true );
          break;
      case V_OP2LOW_W_ZERO:
@@ -2666,7 +2684,7 @@ index 7de826e706..b696f4b89a 100644
          if( op2->c.const_type == CONS_ABSOLUTE
            && (op2->c.lo.u.int_value & 0x0000ffff) == 0 )
              return( true );
-@@ -205,6 +229,9 @@ bool    DoVerify( vertype kind, instruction *ins )
+@@ -205,6 +235,9 @@ bool    DoVerify( vertype kind, instruction *ins )
                   * end up with a huge lea instruction which is unlikely to
                   * be any faster. See also GetNextAddConstant() in i86enc32.c.
                   */
@@ -2676,7 +2694,7 @@ index 7de826e706..b696f4b89a 100644
                  switch( ins->head.next->head.opcode ) {
                  case OP_ADD:
                  case OP_SUB:
-@@ -312,6 +339,10 @@ bool    DoVerify( vertype kind, instruction *ins )
+@@ -312,6 +345,10 @@ bool    DoVerify( vertype kind, instruction *ins )
          }
          return( true );
      case V_CDQ:

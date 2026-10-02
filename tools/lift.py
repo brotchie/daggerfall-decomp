@@ -789,6 +789,11 @@ class Func:
         kind = self.flags[0]
         a, b = self.flags[1], self.flags[2]
         if kind == "cmp":
+            if a.size == 2 and a.atom and re.fullmatch(r"\(?-\d+\)?", b.text) and \
+                    not os.environ.get("LIFT_NOSHORTNEG"):
+                # cmp word [x], -k: compared at 16 bits, so the constant was a short (OW
+                # widens a compare with a negative int)
+                b = E("(short)%s" % b.p(), 2, True)
             # two narrow values extended differently ((int)(unsigned short)x vs (int)(short)y):
             # written with explicit (int) casts OW compares them narrow; promoted implicitly,
             # as ints, like Watcom 10
@@ -1253,6 +1258,23 @@ class Func:
                 if self.reg_used_later(full_r):
                     self.post_expr("%s%s" % (lv, "++" if m == "inc" else "--"), full_r, d.size)
                     return
+            if m in ("inc", "dec") and self.k >= 2 and not os.environ.get("LIFT_NOPOSTFAR"):
+                # mov dx,[eax+6]; mov eax,[p]; dec word [eax+6]: the old value loaded two
+                # instructions back, the pointer reloaded in between
+                p2 = self.body[self.k - 2]
+                if p2.mnemonic == "mov" and p2.operands[0].type == cx.X86_OP_REG and \
+                        p2.operands[1].type == cx.X86_OP_MEM and \
+                        p2.operands[0].size == d.size and prev.mnemonic == "mov" and \
+                        prev.operands[0].type == cx.X86_OP_REG and \
+                        p2.op_str.split(", ", 1)[1] == ins.op_str:
+                    full_r = subreg(p2.reg_name(p2.operands[0].reg))[0]
+                    v_ = self.regs.get(full_r)
+                    if v_ is not None and re.sub(r"^\(int\)\((?:unsigned )?short\)|^\(int\)\((?:signed |unsigned )?char\)", "", v_.text) \
+                            .strip("()") in (lhs, lhs.strip("()")) and \
+                            self.reg_used_later(full_r) and \
+                            full_r != subreg(prev.reg_name(prev.operands[0].reg))[0]:
+                        self.post_expr("%s%s" % (lv, "++" if m == "inc" else "--"), full_r, d.size)
+                        return
             dead_load = prev is not None and prev.mnemonic == "mov" and prev.operands and \
                 prev.operands[0].type == cx.X86_OP_REG and \
                 re.sub(r"^\w+ ptr ", "", prev.op_str.split(", ", 1)[1]) == \

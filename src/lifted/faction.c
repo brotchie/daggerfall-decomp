@@ -2,6 +2,8 @@
  * do not edit: move a function to src/faction.c to work on it by hand) */
 
 extern char D_00170464[];
+extern char D_0017048A[];
+extern char D_001704A4[];
 extern char D_001704BB[];
 extern char D_00178630[];
 extern char D_0017A25C[];
@@ -52,6 +54,7 @@ extern void func_0001B69D(void);
 extern void func_0003EC2A(int, int);
 extern void func_0004A6B5(int, int, int);
 extern void func_0004A748(int, int, int, int);
+extern void func_00050069(int);
 extern void func_0008E3F7(int, int);
 int func_0001CBBD(int);
 int func_0001CC16(int);
@@ -266,6 +269,52 @@ L1C08A:;
     l_C++;
     goto L1C04D;
 L1C092:;
+    *(int *)((char *)a2) = l_C;
+}
+
+void func_0001C0A1(int a1, int a2, int a3, int a4)
+{
+    int l_C;
+
+    if (a3 != 4) goto L1C0C8;
+    func_00050069((int)D_0017048A);
+L1C0C8:;
+    l_C = *(int *)((char *)a2);
+    *(int *)((char *)(((*(int *)((char *)a3))++ << 2) + a1) + 56) = func_000A0D13(l_C);
+L1C0EF:;
+    if (((int)(unsigned char)(*(signed char *)(D_00178630 + ((int)(unsigned char)(*(signed char *)((char *)l_C) + 1))) & 32)) != 0) goto L1C11B;
+    if (((int)(unsigned char)*(signed char *)((char *)l_C)) != 45) goto L1C11D;
+L1C11B:;
+    goto L1C12C;
+L1C11D:;
+    if (((int)(unsigned char)*(signed char *)((char *)l_C)) != 43) goto L1C134;
+L1C12C:;
+    l_C++;
+    goto L1C0EF;
+L1C134:;
+    *(int *)((char *)a2) = l_C;
+}
+
+void func_0001C143(int a1, int a2, int a3, int a4)
+{
+    int l_C;
+
+    if (a4 != 4) goto L1C16A;
+    func_00050069((int)D_001704A4);
+L1C16A:;
+    l_C = *(int *)((char *)a2);
+    *(int *)((char *)(((*(int *)((char *)a4))++ << 2) + a1) + 68) = func_000A0D13(l_C);
+L1C191:;
+    if (((int)(unsigned char)(*(signed char *)(D_00178630 + ((int)(unsigned char)(*(signed char *)((char *)l_C) + 1))) & 32)) != 0) goto L1C1BD;
+    if (((int)(unsigned char)*(signed char *)((char *)l_C)) != 45) goto L1C1BF;
+L1C1BD:;
+    goto L1C1CE;
+L1C1BF:;
+    if (((int)(unsigned char)*(signed char *)((char *)l_C)) != 43) goto L1C1D6;
+L1C1CE:;
+    l_C++;
+    goto L1C191;
+L1C1D6:;
     *(int *)((char *)a2) = l_C;
 }
 

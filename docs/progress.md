@@ -1150,3 +1150,8 @@ Batch **1,927**; build **61.34%**.
 - A function the lifter gives up on at its first attempt gets the nearest choice points
   flipped one at a time (a register kept across a call, say), then the usual search. +3.
   Batch **2,019**.
+- `mov dx,[eax+6]; mov eax,[p]; dec word [eax+6]` is a post-decrement used as a value even
+  with the pointer reloaded in between. +3. `cmp word [x],-1` compares with a short
+  constant (`x == (short)-1`; OW widens a compare with a negative int). +3. The compiler
+  no longer narrows `and word [ebp-x],0xfffe` of a stack variable or local array to a byte
+  (FALL.EXE has none). Batch **2,025**.

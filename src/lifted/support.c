@@ -138,10 +138,14 @@ extern int func_000A2EAC();
 extern int func_000C7FD9();
 extern int func_000C7FF4();
 extern int func_000C808D();
+extern int func_000CD308();
+extern int func_000CD31A();
 extern int func_000CE8B2();
+extern int func_0012B136();
 extern int func_0012DB50();
 extern int func_00135DE4();
 extern int func_00135E39();
+extern int func_001427A8();
 extern int func_00144F68();
 extern void func_0003EC2A(int, int);
 extern void func_0003EDF4(int, short, int);
@@ -190,6 +194,7 @@ void func_0007FEB9(int);
 void func_0007FF73(int);
 void func_0007FFE7(int);
 #pragma aux func_000A0ED9 parm routine [];
+#pragma dagger slots func_0007CF09 a1 8 l_18 4 ret 12
 #pragma dagger slots func_0007D19B a1 24 a2 20 a3 16 a4 12 l_10 8 l_C 4
 #pragma dagger slots func_0007E3CD a1 16 a2 4 a3 8 l_20 20 l_18 12
 #pragma dagger slots func_0007EC8F a1 20 a2 16 a3 12 a4 8 l_C 4
@@ -282,6 +287,27 @@ void func_0007CD64(int a1)
     *(signed char *)D_00196275 = *(signed char *)D_00196272;
     *(signed char *)D_00196272 = 2;
     *(int *)D_001A59E8 = a1;
+}
+
+int func_0007CF09(short a1)
+{
+    int l_18;
+
+L7CF1A:;
+    --(*(int *)&a1);
+    if (a1 == (short)(-1)) goto L7CF59;
+    func_0012B136();
+    if (*(signed char *)D_0012AC00 == 0) goto L7CF3B;
+    return 1;
+L7CF3B:;
+    if ((signed char)func_001427A8() == 0) goto L7CF4D;
+    return 1;
+L7CF4D:;
+    func_000CD308();
+    func_000CD31A();
+    goto L7CF1A;
+L7CF59:;
+    return 0;
 }
 
 int func_0007D068(unsigned char a1)
