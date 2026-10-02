@@ -2904,6 +2904,32 @@ class Func:
             rmw.add(out[i])
             self.temps.add(int(mm.group(2)[2:], 16))
             body = "\n".join(out)
+        # ... or through a pointer variable set just before a diamond computing the value
+        i = 0
+        while i < len(out) and not os.environ.get("LIFT_NORMWTEMP2"):
+            mm = re.fullmatch(r"    \*\((short|signed char) \*\)\(\(char \*\)(l_[0-9A-F]+)\) = "
+                              r"\(\(int\)\((unsigned short|short|unsigned char)\)\*\(\1 \*\)"
+                              r"\(\(char \*\)\2\)\) ([|&^+-]) (.*);", out[i])
+            i += 1
+            if not mm or uses(mm.group(2)) != 3:
+                continue
+            j = i - 2
+            while j >= 0 and j > i - 10 and (re.fullmatch(r"L[0-9A-F]+:;", out[j]) or
+                                              out[j].startswith(("    if (", "    goto ")) or
+                                              re.fullmatch(r"    l_[0-9A-F]+ = -?\d+;", out[j])):
+                j -= 1
+            ma = re.fullmatch(r"    %s = (l_[0-9A-F]+|a\d+) \+ (\d+);" % mm.group(2), out[j]) \
+                if j >= 0 else None
+            if not ma:
+                continue
+            ty = mm.group(3)
+            out[i - 1] = "    *(%s *)((char *)%s + %s) %s= %s;" % (
+                ty, ma.group(1), ma.group(2), mm.group(4), mm.group(5))
+            rmw.add(out[i - 1])
+            self.temps.add(int(mm.group(2)[2:], 16))
+            del out[j]
+            i -= 1
+            body = "\n".join(out)
 
         changed = True
         while changed:

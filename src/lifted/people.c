@@ -45,6 +45,8 @@ extern void func_0005A54A(int, int, int);
 extern void func_00070370(int, unsigned char);
 int func_00041347(void);
 #pragma aux func_000A0ED9 parm routine [];
+#pragma dagger DAGGER_NOSAVES func_000410D7
+#pragma dagger reg func_000410D7 437 bx
 #pragma dagger reg func_000411BF 36 ecx 47 ecx
 
 void func_0004105A(void)
@@ -66,6 +68,23 @@ L410A4:;
 L410A6:;
     *(int *)D_001996F4 = 0;
     func_000A0040((int)D_00199670, 0, 120, (int)D_00170DC0, 554, 120);
+}
+
+void func_000410D7(int a1)
+{
+    int l_1C;
+    int l_18;
+
+    l_1C = func_0001FFF1();
+    l_18 = func_0009DC25() & 1;
+    if (((signed char)func_0009DC25() & 31) != 0) goto L41119;
+    *(short *)((char *)a1 + 27) = 51072;
+    *(signed char *)((char *)a1 + 22) &= 191;
+    return;
+L41119:;
+    *(short *)((char *)a1 + 27) = *(short *)(D_0017B66D + (((func_0009DC25() & 3) * 2) + ((((int)(unsigned char)*(signed char *)(D_0017B667 + l_1C)) << 4) + (l_18 << 3)))) << 7;
+    *(unsigned short *)((char *)a1 + 21) |= ((l_18 != 0) ? 16384 : 0);
+    *(unsigned char *)((char *)a1 + 73) |= ((l_18 != 0) ? 16 : 0);
 }
 
 void func_000411BF(int a1, int a2)
