@@ -69,7 +69,13 @@ def load_symbols():
     return syms
 
 
+# C runtime helpers the compiler calls by name, at their FALL.EXE addresses
+RUNTIME = {"__CHP": 0xA167C}
+
+
 def resolve(name, funcs, syms):
+    if name in RUNTIME:
+        return RUNTIME[name]
     n = c_name(name)
     if n in funcs:
         return funcs[n][0]

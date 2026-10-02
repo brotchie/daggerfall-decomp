@@ -79,7 +79,7 @@ extern int func_000392AD(void);
 extern int func_0003B1F3(int);
 extern int func_0003C6F1(void);
 extern int func_0003D113(void);
-extern int func_0003D2B6();
+extern int func_0003D2B6(short, short, int, int);
 extern int func_000417C8(int);
 extern int func_00055748(void);
 extern int func_00069938(int, int, int);

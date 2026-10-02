@@ -41,8 +41,10 @@ GAME_END = 0x9DA1C
 EXE = os.path.join(ROOT, "orig", "1.07.213", "FALL.EXE")
 PARM_REGS = ["eax", "edx", "ebx", "ecx"]
 SAVE_ORDER = ["ebx", "ecx", "edx", "esi", "edi"]
-STYPE = {1: "signed char", 2: "short", 4: "int"}
-UTYPE = {1: "unsigned char", 2: "unsigned short", 4: "unsigned"}
+STYPE = {1: "signed char", 2: "short", 4: "int", 8: "double"}
+UTYPE = {1: "unsigned char", 2: "unsigned short", 4: "unsigned", 8: "double"}
+CHP = 0xA167C               # __CHP: truncates ST0 toward zero (float to int conversions)
+FP_OPS = {"fadd": "+", "fsub": "-", "fmul": "*", "fdiv": "/"}
 JCC = {  # mnemonic -> (operator, unsigned compare)
     "je": ("==", False), "jne": ("!=", False),
     "jl": ("<", False), "jle": ("<=", False), "jg": (">", False), "jge": (">=", False),
@@ -181,6 +183,9 @@ class Func:
         self.first_call = {}     # callee -> address of its first call
         self.noproto = set()     # callees called without a prototype in scope
         self.structs = set()     # bit-field struct declarations used
+        self.fpst = []           # the x87 stack of double expressions
+        self.fpcalls = {}        # functions returning doubles: name -> double arguments
+        self.fild_val = {}       # temp slot -> the int an fild converts
         self.choices = []        # instruction addresses of operand-order choice points
         self.choice_sites = {}   # choice -> addresses where it shows (slot accesses)
         self.flips = frozenset()
@@ -418,12 +423,12 @@ class Func:
             if off in addr:
                 sz = 4
             hint = sign.get(off, set())
-            if sz not in (1, 2, 4):
-                raise Unsupported("%d-byte stack slot (floating point)" % sz)
+            if sz not in (1, 2, 4, 8):
+                raise Unsupported("%d-byte stack slot" % sz)
             t = (UTYPE if hint == {"u"} or (sz == 1 and hint != {"s"}) else STYPE)[sz]
             self.slot_type[off] = t
         self.size_of = {"signed char": 1, "unsigned char": 1, "short": 2,
-                        "unsigned short": 2, "int": 4, "unsigned": 4}
+                        "unsigned short": 2, "int": 4, "unsigned": 4, "double": 8}
         # stack parameters ([ebp+8], [ebp+12], ...): a narrow one makes callers push through a
         # register (`mov eax,0x9c; push eax`)
         self.stack_type = [self.slot_type.pop(-(8 + 4 * k), "int") for k in range(self.nstack)]
@@ -858,6 +863,8 @@ class Func:
         opr, uns = JCC[m]
         kind = self.flags[0]
         a, b = self.flags[1], self.flags[2]
+        if kind == "fcmp":
+            return "%s %s %s" % (a.p(), opr, b.p())
         if kind == "cmp":
             if a.size == 2 and a.atom and re.fullmatch(r"\(?-\d+\)?", b.text) and \
                     not os.environ.get("LIFT_NOSHORTNEG"):
@@ -945,9 +952,138 @@ class Func:
             return "(%s & %s) %s 0" % (a.p(), b.p(), opr)
         raise Unsupported("jcc on arithmetic flags")
 
+    def fpu_step(self, ins):
+        """x87 code: an expression stack of doubles. Returns True when handled."""
+        m, ops = ins.mnemonic, ins.operands
+        st = self.fpst
+        nxt = self.body[self.k + 1] if self.k + 1 < len(self.body) else None
+        if m == "sub" and ins.op_str == "esp, 8" and nxt is not None and \
+                nxt.mnemonic == "fstp" and nxt.op_str == "qword ptr [esp]":
+            return True                     # room for a double argument
+        if m == "fstp" and ins.op_str == "qword ptr [esp]":
+            self.pushes.append(E("", 0))    # (a double takes two stack slots)
+            self.pushes.append(st.pop())
+            return True
+        if m == "call" and ops[0].type == cx.X86_OP_IMM and ops[0].imm == CHP and st:
+            st[-1] = E(st[-1].text, 8, st[-1].atom, tag=("chp",))
+            return True
+        if m == "call" and ops[0].type == cx.X86_OP_IMM and nxt is not None and \
+                nxt.mnemonic.startswith("f") and nxt.mnemonic not in ("fld", "fild", "fld1",
+                                                                       "fldz"):
+            # a function returning a double (in ST0); its arguments are doubles on the stack
+            name = sym(ops[0].imm)
+            n = callee_pops(ops[0].imm) // 8
+            args = []
+            for _ in range(n):
+                v = self.pushes.pop()
+                self.pushes.pop()           # the double's other half
+                args.append(v.text)
+            self.fpcalls[name] = n
+            st.append(E("%s(%s)" % (name, ", ".join(args)), 8, atom=True))
+            return True
+        if not m.startswith("f") and m != "sahf":
+            return False
+        if m == "fnstsw":
+            self.stale.add("eax")
+            return True
+        if m == "sahf":
+            return True
+
+        def operand(op):
+            if op.size == 8:
+                return E(self.mem(op, ins, 8), 8, atom=True)
+            if op.size == 4 and m.startswith("fi"):
+                return E(self.mem(op, ins, 4), 4, atom=True)
+            if op.size == 2 and m.startswith("fi"):
+                return E(self.mem(op, ins, 2), 2, atom=True)
+            if op.size == 4:
+                t = self.mem(op, ins, 4)
+                return E(t.replace("*(int *)", "*(float *)", 1), 4, atom=True)
+            raise Unsupported("x87 operand")
+
+        if m == "fld1":
+            st.append(E("1.0", 8, atom=True))
+            return True
+        if m == "fldz":
+            st.append(E("0.0", 8, atom=True))
+            return True
+        if m in ("fld", "fild"):
+            if ops[0].type != cx.X86_OP_MEM:
+                raise Unsupported("x87 register load")
+            off = ebp_slot(ins, ops[0])
+            if m == "fild" and off is not None and off in self.fild_val:
+                st.append(self.fild_val.pop(off))   # an int converted through a temp
+            else:
+                st.append(operand(ops[0]))
+            return True
+        base = m[:-1] if m.endswith("p") else m
+        rev = False
+        if base.endswith("r") and base[:-1] in FP_OPS:
+            base, rev = base[:-1], True
+        if base in FP_OPS:
+            opr = FP_OPS[base]
+            if m.endswith("p"):
+                # fXXXp st(1): st1 = st1 op st0 (reversed: st0 op st1), pop
+                b, a = st.pop(), st.pop()
+                if rev:
+                    a, b = b, a
+            elif ops and ops[0].type == cx.X86_OP_MEM:
+                a, b = st.pop(), operand(ops[0])
+                other = a
+                if rev:
+                    a, b = b, a
+                # (the memory operand is the left one: maybe a compound assignment to it)
+                tag = ("fopm", a.text, opr, other) if rev or opr in ("+", "*") else None
+                st.append(E("%s %s %s" % (a.p(), opr, b.p()), 8, tag=tag))
+                return True
+            else:
+                raise Unsupported("x87 register operation")
+            st.append(E("%s %s %s" % (a.p(), opr, b.p()), 8))
+            return True
+        if m == "fcomp" and ops and ops[0].type == cx.X86_OP_MEM:
+            a = st.pop()
+            self.flags = ("fcmp", a, operand(ops[0]))
+            return True
+        if m in ("fstp", "fistp"):
+            v = st.pop()
+            if m == "fistp":
+                v = E("(int)%s" % v.p(), 4)
+            op = ops[0]
+            off = ebp_slot(ins, op)
+            if m == "fistp" and off is not None and nxt is not None and nxt.mnemonic == "mov" \
+                    and nxt.operands[0].type == cx.X86_OP_REG and \
+                    nxt.op_str.split(", ", 1)[1] == ins.op_str:
+                # converted through a temp slot, read straight back
+                self.temps.add(off)
+                self.skip_addr = nxt.address
+                self.set_reg(subreg(nxt.reg_name(nxt.operands[0].reg))[0], v)
+                return True
+            if m == "fistp" and off is not None and nxt is not None and nxt.mnemonic == "push" \
+                    and nxt.op_str == ins.op_str:
+                # converted through a temp slot and pushed as an argument
+                self.temps.add(off)
+                self.skip_addr = nxt.address
+                self.pushes.append(v)
+                return True
+            lhs = self.mem(op, ins, 8 if op.size == 8 else op.size)
+            if v.tag and v.tag[0] == "fopm" and v.tag[1] == lhs and m == "fstp":
+                # fld y; fsubr [x]; fstp [x]: x -= y
+                self.emit("%s %s= %s;" % (lhs, v.tag[2], v.tag[3].text))
+                return True
+            if op.size == 4 and m == "fstp":
+                lhs = lhs.replace("*(int *)", "*(float *)", 1)
+            self.emit("%s = %s;" % (lhs, v.text))
+            return True
+        raise Unsupported("instruction %s" % m)
+
     def step(self, ins):
         m, ops = ins.mnemonic, ins.operands
+        if ins.address == getattr(self, "skip_addr", None):
+            return
         if m == "nop":
+            return
+        if (m.startswith("f") or m in ("sahf", "call") or self.fpst or
+                (m == "sub" and ins.op_str == "esp, 8")) and self.fpu_step(ins):
             return
         if m == "add" and getattr(self, "skip_add", False):
             self.skip_add = False   # caller's cleanup after a cdecl call
@@ -970,6 +1106,16 @@ class Func:
                     self.set_reg(full, v)
                 return
             v = self.src(s, ins)
+            nx = self.body[self.k + 1] if self.k + 1 < len(self.body) else None
+            off_ = ebp_slot(ins, d)
+            if nx is not None and nx.mnemonic == "fild" and off_ is not None and \
+                    nx.op_str == ins.op_str.split(", ")[0] and d.size == 4 and \
+                    sum(1 for x in self.body for o in x.operands
+                        if ebp_slot(x, o) == off_) == 2:
+                # an int stored to a temp only to be converted to a double
+                self.fild_val[off_] = v
+                self.temps.add(off_)
+                return
             lhs = self.mem(d, ins, d.size)
             mm = re.fullmatch(r"\*\(int \*\)&(l_[0-9A-F]+|a\d+)", lhs)
             if mm and d.size == 4 and (v.size == 2 or ins.address in self.w16_stores) and \
@@ -2546,6 +2692,9 @@ class Func:
             elif f in self.noproto:
                 d = re.sub(r"\(.*\);$", "();", d)
             decl.append(d)
+        for f, n in sorted(self.fpcalls.items()):
+            decl.append("#pragma aux %s parm routine [] value [8087];" % f)
+            decl.append("extern double %s(%s);" % (f, ", ".join(["double"] * n) or "void"))
         for f, n in sorted(self.scalls.items()):
             decl.append("#pragma aux %s parm routine [];" % f)
             decl.append("extern int %s(%s);" % (f, ", ".join(["int"] * n)))

@@ -1244,3 +1244,10 @@ Batch **1,927**; build **61.34%**.
 - Ternary recovery also takes compound conditions: a chain of `if (c) goto` to the two
   arms becomes `(a || b)` / `!a && b` (put back if no ternary comes of it). No change in
   matches yet. Batch **2,129**.
+- **x87 floating point**: the lifter keeps a stack of double expressions (`fld`/`fild`,
+  `fadd`/`fsub`/`fmul`/`fdiv` and their reversed and popping forms, `fcomp` + `fnstsw` +
+  `sahf` compares, `fstp`/`fistp`), with ints converted through a temp (`mov [t],eax;
+  fild [t]`), `__CHP` truncation for `(int)` conversions (mapped to 0xA167C for the build),
+  library functions taking and returning doubles on the stack
+  (`#pragma aux f parm routine [] value [8087]`), and `fld y; fsubr [x]; fstp [x]` as
+  `x -= y`. +5. Batch **2,134**.
