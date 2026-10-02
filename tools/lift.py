@@ -215,6 +215,14 @@ class Func:
         # eax is never saved (it returns the result), so a free eax alone proves nothing; any
         # other free register carries a parameter
         free = [r for r in PARM_REGS if r not in saved]
+        self.conv = None
+        self.stack_base = 5      # stack parameters follow the four register ones
+        if saved == ["esi", "edi"] and not self.params:
+            # sosez.c/profile.c: arguments on the stack, caller cleanup, only esi/edi saved:
+            # #pragma aux sosconv parm caller [] modify [eax ebx ecx edx]
+            self.conv = "sosconv"
+            self.stack_base = 1
+            free = []
         if len(free) >= 2 and len(self.params) != len(free):
             raise Unsupported("prologue: %d free registers but %d spills" % (len(free), len(self.params)))
         self.body_start = i
@@ -223,7 +231,12 @@ class Func:
         # `ret N`: N/4 more parameters on the stack ([ebp+8], [ebp+12], ...), which Watcom
         # only uses once all four argument registers are taken
         self.nstack = int(ins[-1].op_str, 16) // 4 if ins[-1].op_str else 0
-        if self.nstack and len(self.params) != 4:
+        if self.conv == "sosconv":
+            disps = [op.mem.disp for x in ins for op in x.operands
+                     if op.type == cx.X86_OP_MEM and op.mem.base and
+                     x.reg_name(op.mem.base) == "ebp" and op.mem.disp >= 8]
+            self.nstack = (max(disps) - 8) // 4 + 1 if disps else 0
+        elif self.nstack and len(self.params) != 4:
             raise Unsupported("stack parameters with free argument registers")
         j = len(ins) - 2
         while ins[j].mnemonic == "pop":
@@ -407,7 +420,7 @@ class Func:
         if base == "ebp" and not index and disp >= 8 and (disp - 8) % 4 == 0 \
                 and (disp - 8) // 4 < self.nstack:
             k = (disp - 8) // 4
-            name = "a%d" % (5 + k)
+            name = "a%d" % (self.stack_base + k)
             return name if self.size_of[self.stack_type[k]] == size else \
                 "*(%s *)&%s" % (STYPE[size], name)
         if base == "ebp":
@@ -836,6 +849,17 @@ class Func:
         if m in ("cmp", "test"):
             a = self.src(ops[0], ins)
             b = self.src(ops[1], ins)
+            # a 16/8-bit register holding a wider value (a call's int result tested as
+            # `test ax,ax`): the source narrowed it
+            for n_, op_ in enumerate(ops):
+                v_ = (a, b)[n_]
+                if op_.type == cx.X86_OP_REG and op_.size < 4 and v_.size > op_.size and \
+                        not os.environ.get("LIFT_NONARROW"):
+                    v_ = E("(%s)%s" % (STYPE[op_.size], v_.p()), op_.size, atom=True)
+                    if n_ == 0:
+                        a = v_
+                    else:
+                        b = v_
             if m == "test" and ops[0].type == cx.X86_OP_MEM and ops[0].size < 4:
                 # a bit test doesn't care about sign; unsigned keeps it `test byte ptr [x], K`
                 a = E(a.text.replace("*(signed char *)", "*(unsigned char *)", 1)
@@ -1373,7 +1397,8 @@ class Func:
         k = int(name[1:]) - 1
         if k < len(self.params):
             return self.slot_type.get(self.params[k][1], "int")
-        return self.stack_type[k - 4] if k - 4 < len(self.stack_type) else "int"
+        k -= self.stack_base - 1
+        return self.stack_type[k] if 0 <= k < len(self.stack_type) else "int"
 
     def eax_used_later(self):
         """Is eax read by a later instruction before being written (statement-local)?"""
@@ -1439,7 +1464,7 @@ class Func:
         for k, (reg, off, _sz) in enumerate(self.params):
             ps.append("%s a%d" % (self.slot_type.get(off, "int"), k + 1))
         for k in range(self.nstack):
-            ps.append("%s a%d" % (self.stack_type[k], 5 + k))
+            ps.append("%s a%d" % (self.stack_type[k], self.stack_base + k))
         # The slot rule (docs/progress.md) gives slots top down: 2-byte locals, the return
         # variable, other locals last to first; so declare locals deepest first.
         locals_ = sorted((o for o in set(self.slot_type) | set(self.arrays)
@@ -1526,6 +1551,9 @@ class Func:
                     lines.append("}")
         lines.append("}")
         decl = ["/* lifted from 0x%08X */" % self.va]
+        if self.conv == "sosconv":
+            decl.append(SOSCONV)
+            decl.append("#pragma aux (sosconv) %s;" % name)
         for g in sorted(self.globals):
             decl.append("extern char %s[];" % g)
         for f in sorted(self.calls - self.vcalls - set(self.scalls) - {name}):
@@ -1542,6 +1570,7 @@ SIGS = {}
 POPS = {}
 
 
+SOSCONV = '#pragma aux sosconv "*" parm caller [] value [eax] modify [eax ebx ecx edx];'
 SAVES = {}
 
 

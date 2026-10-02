@@ -47,6 +47,7 @@ extern int func_000A0DF4();
 extern int func_000A0ED9(int, int);
 extern int func_000A0F5C(int, ...);
 extern int func_0012DBCC();
+extern int func_00144FB4();
 extern void func_0003EC2A(int, int);
 extern void func_0008C4E4(int);
 void func_0005A230(void);
@@ -127,6 +128,24 @@ L5A2A9:;
     goto L5A253;
 L5A2AB:;
     *(short *)D_00199D5E = 0;
+}
+
+void func_0005A2BE(void)
+{
+    int l_1C;
+    int l_18;
+
+    l_18 = 0;
+L5A2D3:;
+    if ((short)l_18 < *(short *)D_00199D5E) goto L5A2E9;
+    return;
+L5A2E1:;
+    l_18++;
+    goto L5A2D3;
+L5A2E9:;
+    l_1C = *(int *)(D_00199C2C + (((int)(short)*(short *)&l_18) << 2));
+    func_00144FB4((int)(unsigned short)*(short *)((char *)l_1C), (int)(unsigned short)*(short *)((char *)l_1C + 2), (int)(unsigned short)*(short *)((char *)l_1C + 4), (int)(unsigned short)*(short *)((char *)l_1C + 6), l_1C + 12);
+    goto L5A2E1;
 }
 
 void func_0005A337(void)

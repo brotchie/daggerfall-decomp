@@ -43,6 +43,9 @@ extern char D_00187828[];
 extern char D_00187844[];
 extern char D_00187864[];
 extern char D_00187878[];
+extern char D_00187894[];
+extern char D_001878AC[];
+extern char D_001878D4[];
 extern char D_00187B44[];
 extern char D_0018F061[];
 extern char D_001903A4[];
@@ -1405,6 +1408,35 @@ L77B58:;
     *(int *)D_001A4FA4 = (int)D_00187750;
     *(int *)D_001A4FB4 = (int)D_00187770;
     *(int *)D_001A4FA0 = (int)D_00187784;
+}
+
+int func_00078463(void)
+{
+    int l_24;
+    int l_20;
+    short l_18;
+
+    *(int *)&l_18 = ((unsigned)*(int *)((char *)*(int *)D_00195AC4 + 31)) >> 16;
+    l_20 = 0;
+L78486:;
+    if (l_20 < 10) goto L78496;
+    goto L784DA;
+L7848E:;
+    l_20++;
+    goto L78486;
+L78496:;
+    if ((short)*(int *)&l_18 != *(short *)(D_00187894 + (l_20 * 2))) goto L784D8;
+    if (*(signed char *)D_001A3F5E == 0) goto L784C1;
+    l_24 = *(int *)(D_001878AC + (l_20 << 2));
+    goto L784D0;
+L784C1:;
+    l_24 = *(int *)(D_001878D4 + (l_20 << 2));
+L784D0:;
+    return l_24;
+L784D8:;
+    goto L7848E;
+L784DA:;
+    return 0;
 }
 
 void func_000784EE(void)

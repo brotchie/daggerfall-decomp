@@ -38,6 +38,82 @@ L3379C:;
     func_00078DDD(l_14);
 }
 
+int func_000337AD(int a1, int a2, int a3)
+{
+{
+    int l_24;
+    int l_20;
+
+    if (((int)(short)*(short *)((char *)a2 + 6)) <= (-1)) goto L338A4;
+    if (((int)(short)*(short *)((char *)a2 + 6)) < 17) goto L337EA;
+    if (((int)(short)*(short *)((char *)a2 + 6)) <= 20) goto L337EC;
+L337EA:;
+    goto L337FC;
+L337EC:;
+    if (((int)(unsigned char)*(signed char *)((char *)a3 + 24)) >= 17) goto L337FE;
+L337FC:;
+    goto L3380E;
+L337FE:;
+    if (((int)(unsigned char)*(signed char *)((char *)a3 + 24)) <= 20) goto L33813;
+L3380E:;
+    goto L338A4;
+L33813:;
+    if (((int)(short)*(short *)((char *)a2 + 8)) != (-1)) goto L33838;
+    return (int)(unsigned short)(*(short *)((char *)a1 + 2) & 20480);
+L33838:;
+    if (((int)(short)*(short *)((char *)a2 + 8)) == 1) goto L3388B;
+    if (((int)(unsigned short)(*(short *)((char *)a1 + 2) & 16384)) == 0) goto L3386E;
+    if (((int)(unsigned short)(*(short *)((char *)a1 + 2) & 4096)) == 0) goto L33870;
+L3386E:;
+    goto L33879;
+L33870:;
+    l_20 = 1;
+    goto L33880;
+L33879:;
+    l_20 = 0;
+L33880:;
+    return l_20;
+L3388B:;
+    return (int)(unsigned short)(*(short *)((char *)a1 + 2) & 4096);
+L338A4:;
+    if (((int)(short)*(short *)((char *)a2 + 6)) <= (-1)) goto L33921;
+    if (((int)(unsigned char)*(signed char *)((char *)a3 + 24)) != 11) goto L338D5;
+    if ((short)((int)(unsigned char)*(signed char *)((char *)a3 + 24)) == *(short *)((char *)a2 + 6)) goto L338D7;
+L338D5:;
+    goto L338E8;
+L338D7:;
+    if (((int)(unsigned short)*(short *)((char *)a3 + 18)) == 40) goto L338EA;
+L338E8:;
+    goto L338EC;
+L338EA:;
+    goto L33921;
+L338EC:;
+    if (((int)(short)*(short *)((char *)a2 + 6)) != 11) goto L33904;
+    return 0;
+L33904:;
+    if ((short)((int)(unsigned char)*(signed char *)((char *)a3 + 24)) == *(short *)((char *)a2 + 6)) goto L33921;
+    return 0;
+L33921:;
+    if (((int)(short)*(short *)((char *)a2 + 8)) != (-1)) goto L33943;
+    return (int)(unsigned short)(*(short *)((char *)a1 + 2) & 20480);
+L33943:;
+    if (((int)(short)*(short *)((char *)a2 + 8)) == 1) goto L33993;
+    if (((int)(unsigned short)(*(short *)((char *)a1 + 2) & 16384)) == 0) goto L33979;
+    if (((int)(unsigned short)(*(short *)((char *)a1 + 2) & 4096)) == 0) goto L3397B;
+L33979:;
+    goto L33984;
+L3397B:;
+    l_24 = 1;
+    goto L3398B;
+L33984:;
+    l_24 = 0;
+L3398B:;
+    return l_24;
+L33993:;
+    return (int)(unsigned short)(*(short *)((char *)a1 + 2) & 4096);
+}
+}
+
 void func_000340A2(int a1, int a2)
 {
     int l_14;

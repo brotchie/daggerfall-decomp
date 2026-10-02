@@ -822,3 +822,15 @@ Batch **1,451**; build **1,454 functions, 37.97%**.
   additions are now choice points too. +25.
 
 Batch **1,479**.
+
+## 2026-10-02: sosez.c's convention, narrowed tests
+
+- **sosez.c/profile.c convention solved**: stack arguments, caller cleanup, only `esi`/`edi`
+  saved, parameters used in place: `#pragma aux sosconv "*" parm caller [] value [eax]
+  modify [eax ebx ecx edx]` reproduces the prologue exactly. The lifter detects it (only
+  esi/edi pushed, no register spills), names the stack parameters `a1..`, and emits the
+  pragma; `promote_lifted.py` puts a convention's definition before its uses. +8.
+- **Narrowed tests**: `test ax,ax` on a call's int result is `(short)f(...) != 0` at the
+  source level; the lifter casts a wider value used through a 16/8-bit register. +15.
+
+Batch **1,502**.

@@ -1380,7 +1380,7 @@ int func_0001B06F(int a1, int a2)
     *(int *)D_0019671C = a2;
     *(int *)D_0019670C = *(int *)((char *)a1 + 88);
     *(int *)D_00195B84 = 0;
-    if ((func_0001AFD5(*(int *)((char *)a2 + 84)) & 1) == 0) goto L1B0C0;
+    if (((signed char)func_0001AFD5(*(int *)((char *)a2 + 84)) & 1) == 0) goto L1B0C0;
     return 3;
 L1B0C0:;
     if (*(int *)((char *)a1 + 88) == 0) goto L1B0F7;

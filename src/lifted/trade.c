@@ -2,18 +2,62 @@
  * do not edit: move a function to src/trade.c to work on it by hand) */
 
 extern char D_000CDDA8[];
+extern char D_00175AB8[];
+extern char D_00175AC3[];
+extern char D_0018DC64[];
+extern char D_0018DD54[];
+extern char D_0018DD5C[];
 extern char D_001A3AE8[];
+extern char D_001A3BD8[];
 extern char D_001A3F3C[];
 extern char D_001A3F40[];
 extern char D_001A3F44[];
 extern char D_001A3F5D[];
 
-extern int func_000112A1();
+extern int func_00011016(int, ...);
+extern int func_000112A1(void);
+extern int func_0001149A(int, ...);
+extern int func_00012E04(int, int, int);
+extern int func_00069B0E(int, int);
+extern int func_000994F0(int, int);
 extern int func_0009957D(int, int);
+extern int func_000A1D3C();
 extern void func_00012F27(int);
 extern void func_000696A3(int);
 extern void func_000697E3(void);
 extern void func_00069B53(int);
+
+int func_00068A1D(void)
+{
+    int l_1C;
+
+    if ((short)func_0001149A((int)D_00175AB8) != 0) goto L68A4A;
+    return 0;
+L68A4A:;
+    if (func_00011016(*(int *)D_0018DD5C, *(int *)D_0018DD54) == 0) goto L68A6E;
+    return 0;
+L68A6E:;
+    *(int *)D_0018DC64 = 2048;
+    func_000A1D3C(127);
+    *(int *)D_001A3F44 = func_00012E04((int)D_00175AC3, 0, 0);
+    l_1C = 0;
+L68A9C:;
+    if (l_1C < 4) goto L68AAC;
+    goto L68ABF;
+L68AA4:;
+    l_1C++;
+    goto L68A9C;
+L68AAC:;
+    *(int *)(D_001A3BD8 + (l_1C * 268)) = 305419896;
+    goto L68AA4;
+L68ABF:;
+    *(signed char *)D_001A3F5D = 1;
+    func_000994F0((int)D_001A3AE8, 5168);
+    func_000994F0((int)D_000CDDA8, 4096);
+    func_000994F0((int)D_001A3F40, 4096);
+    *(int *)D_001A3F3C = func_00069B0E((int)D_000CDDA8, 140);
+    return 1;
+}
 
 void func_00068B1B(void)
 {

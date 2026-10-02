@@ -5,10 +5,12 @@ extern char D_00175970[];
 extern char D_0017597A[];
 extern char D_001759EB[];
 extern char D_001759F8[];
+extern char D_00190CE4[];
 extern char D_001940D8[];
 extern char D_00195AA0[];
 extern char D_00195B04[];
 extern char D_00195B0C[];
+extern char D_00195B84[];
 extern char D_00195BE0[];
 extern char D_00195BF4[];
 extern char D_001961F5[];
@@ -255,6 +257,57 @@ L6784B:;
     return;
 L6784D:;
     func_000A0AD9((int)D_001961F5, (int)D_001759F8, 13, (int)D_00175970, 971);
+}
+
+void func_00067875(int a1)
+{
+    int l_1C;
+    int l_18;
+
+    if (((int)(unsigned char)*(signed char *)((char *)a1)) != 2) return;
+    l_1C = a1 + 71;
+    if (((int)(short)*(short *)((char *)l_1C + 67)) == (-1)) return;
+    l_18 = 0;
+L678B9:;
+    if (l_18 < 10) goto L678CC;
+    return;
+L678C4:;
+    l_18++;
+    goto L678B9;
+L678CC:;
+    if (((int)(short)*(short *)((char *)((l_18 << 2) + l_1C) + 67)) == (-1)) return;
+    if (((int)(short)*(short *)((char *)((l_18 << 2) + l_1C) + 67)) != 14) goto L67906;
+    if (((int)(short)*(short *)((char *)((l_18 << 2) + l_1C) + 69)) == 5) goto L67908;
+L67906:;
+    goto L67914;
+L67908:;
+    *(int *)D_00195B84 += 10;
+    goto L679AC;
+L67914:;
+    if (((int)(short)*(short *)((char *)((l_18 << 2) + l_1C) + 67)) != 25) goto L67938;
+    if (((int)(short)*(short *)((char *)((l_18 << 2) + l_1C) + 69)) == 5) goto L6793A;
+L67938:;
+    goto L67946;
+L6793A:;
+    *(int *)D_00195B84 -= 10;
+    goto L679AC;
+L67946:;
+    if (((int)(short)*(short *)((char *)((l_18 << 2) + l_1C) + 67)) != 14) goto L6796F;
+    if ((short)((int)(signed char)*(signed char *)D_00190CE4) == *(short *)((char *)((l_18 << 2) + l_1C) + 69)) goto L67971;
+L6796F:;
+    goto L6797A;
+L67971:;
+    *(int *)D_00195B84 += 10;
+    goto L679AC;
+L6797A:;
+    if (((int)(short)*(short *)((char *)((l_18 << 2) + l_1C) + 67)) != 25) goto L679A3;
+    if ((short)((int)(signed char)*(signed char *)D_00190CE4) == *(short *)((char *)((l_18 << 2) + l_1C) + 69)) goto L679A5;
+L679A3:;
+    goto L679AC;
+L679A5:;
+    *(int *)D_00195B84 -= 10;
+L679AC:;
+    goto L678C4;
 }
 
 void func_00067A1D(int a1, int a2)
