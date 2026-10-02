@@ -1049,3 +1049,21 @@ output and FALL.EXE over the functions that don't match yet. Findings acted on:
   (+1).
 
 Batch **1,827**.
+
+## 2026-10-02: pinned frame slots, a last resort
+
+About 90 functions differed only in where their variables sit in the frame, and the slot
+rules derived so far contradict each other on them (a short parameter sits with the int
+ones in one function and above the 2-byte locals in another). Rather than keep guessing,
+the search now has a last resort: `#pragma dagger slots <function> <var> <depth> ...`
+gives every declared variable (and `ret`, the return variable) its depth below the saved
+registers in FALL.EXE. The code generator reserves that region and places the variables
+exactly (`DaggerAlloc()` in `bldcall.c`); compiler temps are allocated under it. The lifter
+offers it as a function-level choice point, so it is used only where nothing else
+reproduces the frame: 98 functions so far, +47 matches.
+
+This makes those functions' layout an annotation rather than a consequence of the source,
+which is worth revisiting once the layout rules are better understood: the pragmas mark
+exactly the cases they don't explain.
+
+Batch **1,876**.

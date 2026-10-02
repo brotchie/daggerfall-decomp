@@ -24,6 +24,7 @@ extern char D_001A3FA4[];
 extern char D_001A3FA8[];
 
 extern int func_0003B1F3(int);
+extern int func_0004BB64(int);
 extern int func_0005A442(unsigned char);
 extern int func_00069938(int, int, int);
 extern int func_0006AE87(int, int);
@@ -232,4 +233,28 @@ L6B291:;
     goto L6B26D;
 L6B2C2:;
     func_0006CD10(*(int *)D_00186E20, *(int *)D_00147954, *(int *)D_000C0BA8);
+}
+
+void func_0006B2E2(void)
+{
+    int l_20;
+    int l_1C;
+    int l_18;
+
+    l_20 = *(int *)D_001959B0 + 71;
+    l_1C = 0;
+L6B302:;
+    if (l_1C < 32) goto L6B312;
+    return;
+L6B30A:;
+    l_1C++;
+    goto L6B302;
+L6B312:;
+    if (*(short *)((char *)((l_1C * 2) + l_20)) == 0) goto L6B36A;
+    l_18 = func_0004BB64((int)(short)*(short *)((char *)((l_1C * 2) + l_20)));
+    if (l_18 != 0) goto L6B36A;
+    *(short *)((char *)((l_1C * 2) + l_20)) = 0;
+    func_000A0040((l_20 + 64) + (l_1C * 20), 0, 20, (int)D_00175C86, 422, 20);
+L6B36A:;
+    goto L6B30A;
 }

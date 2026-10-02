@@ -44,6 +44,7 @@ extern char D_001962A5[];
 extern char D_001962A9[];
 extern char D_00199764[];
 extern char D_0019976C[];
+extern char D_00199774[];
 extern char D_00199778[];
 extern char D_00199780[];
 extern char D_00199784[];
@@ -98,6 +99,7 @@ extern void func_0008B3EA(void);
 extern void func_0008E3F7(int, int);
 extern void func_0009D986(int);
 int func_0004B28C(int);
+int func_0004BB64(int);
 void func_0004AC01(int);
 void func_0004B0C3(void);
 void func_0004B54F(int);
@@ -106,6 +108,7 @@ void func_0004B7E3(int);
 void func_0004B9A1(void);
 void func_0004BA0F(void);
 void func_0004BAE2(void);
+#pragma dagger slots func_0004BBD8 a1 4 a2 12 a3 16 l_20 20 l_14 8
 
 void func_0004AB2F(int a1)
 {
@@ -682,6 +685,25 @@ L4BBB9:;
     goto L4BB80;
 L4BBC4:;
     return 0;
+}
+
+void func_0004BBD8(int a1, int a2, int a3)
+{
+    unsigned char l_20;
+    int l_14;
+
+    if (a2 == 0) goto L4BBFE;
+    l_20 = *(signed char *)((char *)a2 + 38);
+    goto L4BC07;
+L4BBFE:;
+    l_20 = *(signed char *)((char *)a3 + 38);
+L4BC07:;
+    l_14 = func_0004BB64((int)(unsigned char)l_20);
+    if (l_14 == 0) return;
+    *(short *)D_001997AC = a1;
+    *(int *)D_00199778 = a2;
+    *(int *)D_00199774 = a3;
+    func_0002B26B(l_14);
 }
 
 void func_0004BC43(int a1, int a2)

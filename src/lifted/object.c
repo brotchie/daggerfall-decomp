@@ -33,6 +33,7 @@ extern char D_001A9B30[];
 extern char D_001A9B34[];
 extern char D_001A9B38[];
 extern char D_001A9B3C[];
+extern char D_001A9B40[];
 extern char D_001A9B42[];
 extern char D_001A9B44[];
 extern char D_001AA3DC[];
@@ -52,6 +53,7 @@ extern void func_00050069(int);
 extern void func_00069E9E(int, int);
 extern void func_00069F39(int);
 extern void func_0008DD7E(int);
+extern void func_0008E649(int);
 extern void func_0008EBFD(int);
 extern void func_0008ED52(int);
 int func_0008DA4D(int);
@@ -77,6 +79,7 @@ void func_0008E7AE(int);
 void func_0008EB25(int);
 void func_0008ECEE(int);
 #pragma aux func_000A0ED9 parm routine [];
+#pragma dagger slots func_0008E6C5 a1 16 a2 4 a3 8 ret 12
 
 void func_0008D8CC(void)
 {
@@ -513,6 +516,17 @@ L8E62B:;
     a1 = *(int *)((char *)a1 + 55);
     goto L8E5D7;
 L8E636:;
+    return 0;
+}
+
+int func_0008E6C5(int a1, int a2, int a3)
+{
+    *(short *)D_001A9B42 = a3;
+    *(short *)D_001A9B40 = a2;
+    func_0008E3F7(a1, (int)func_0008E649);
+    if (((int)(short)*(short *)D_001A9B42) != (-1)) goto L8E70F;
+    return *(int *)D_00195AF4;
+L8E70F:;
     return 0;
 }
 

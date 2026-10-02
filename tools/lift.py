@@ -668,6 +668,12 @@ class Func:
         register on the left. The batch driver (tools/lift_all.py) flips choice points near
         a mismatch and keeps what helps."""
         first, second = (b, a) if getattr(b, "born", k0) < getattr(a, "born", k0) else (a, b)
+        if kids(first.text) <= kids(second.text) and not os.environ.get("LIFT_ONLYAMBIG"):
+            # the tree-size estimate can be off: the other order is a choice point too
+            self.choices.append(ins.address)
+            if ins.address in self.flips:
+                return second, first
+            return first, second
         if kids(first.text) > kids(second.text):
             self.choices.append(ins.address)
             left, right = (first, second) if os.environ.get("LIFT_AMBIG") == "born" else (a, b)
@@ -1920,6 +1926,20 @@ class Func:
             lines.append("}")
         lines.append("}")
         decl = ["/* lifted from 0x%08X */" % self.va] + sorted(self.structs)
+        # last resort, a function-level choice: pin every variable at its frame depth
+        self.choices.append(PIN_SLOTS)
+        if PIN_SLOTS in self.flips:
+            base = 4 * len(self.saved)
+            pins = []
+            for k, (_r, off, _sz) in enumerate(self.params):
+                pins.append(("a%d" % (k + 1), off - base))
+            for o in locals_:
+                pins.append(("l_%X" % o, o - base))
+            if self.ret_slot:
+                pins.append(("ret", self.ret_slot - base))
+            if pins:
+                decl.append("#pragma dagger slots %s %s" % (
+                    name, " ".join("%s %d" % (n, d) for n, d in pins)))
         # function-level choice points: code generator options (#pragma dagger)
         self.choices.extend(-1 - k for k in range(len(FUNC_OPTS)))
         for k, opt in enumerate(FUNC_OPTS):
@@ -1951,6 +1971,7 @@ POPS = {}
 
 # Code generator switches the batch search may turn on for one function
 # (`#pragma dagger <SWITCH> <function>`, DaggerEnv() in the compiler)
+PIN_SLOTS = -1000         # the choice point for `#pragma dagger slots`
 FUNC_OPTS = ["KKND_CONFREV", "DAGGER_LEFTPREF", "DAGGER_CHARAUTOSMALL", "DAGGER_CLRAFTER",
              "DAGGER_WORDSTORE", "DAGGER_RMW", "DAGGER_PUSHMEM", "DAGGER_DEADDEF", "DAGGER_CDQ",
              "DAGGER_FLUSH", "DAGGER_CHARPARMBIG", "DAGGER_SIGNEDBF", "KKND_CONSTREG",

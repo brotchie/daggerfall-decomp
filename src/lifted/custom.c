@@ -59,7 +59,6 @@ extern char D_0019982E[];
 extern char D_0019982F[];
 
 extern int func_00053494(short);
-extern int func_0005500F(short);
 extern int func_0006CB53(int, int);
 extern int func_0006CE0D(int);
 extern int func_0007D5D9(void);
@@ -88,6 +87,7 @@ extern void func_00055F0F(void);
 extern void func_000567CA(unsigned char);
 extern void func_0007D3CA(int);
 int func_000540F9(int, int);
+int func_0005500F(short);
 void func_0005425C(int);
 void func_0005559C(void);
 #pragma aux func_000A0ED9 parm routine [];
@@ -96,6 +96,7 @@ void func_0005559C(void);
 #pragma dagger DAGGER_DEADDEF func_00054D75
 #pragma dagger DAGGER_DEADDEF func_00054F81
 #pragma dagger DAGGER_DEADDEF func_00054FC8
+#pragma dagger slots func_0005500F a1 8 l_18 4 ret 12
 
 void func_000539D2(void)
 {
@@ -506,6 +507,26 @@ L54FF2:;
 L54FF4:;
     *(short *)D_00190D86 = 20;
     (*(signed char *)(*(char **)D_00195BEC + 52))--;
+}
+
+int func_0005500F(short a1)
+{
+    int l_18;
+
+    l_18 = 0;
+L55027:;
+    if (((int)(short)*(short *)&l_18) < 12) goto L5503A;
+    goto L5505B;
+L55032:;
+    l_18++;
+    goto L55027;
+L5503A:;
+    if ((short)((unsigned short)(unsigned char)*(signed char *)(*(char **)D_00195BEC + 16 + ((int)(short)*(short *)&l_18))) != a1) goto L55059;
+    return 1;
+L55059:;
+    goto L55032;
+L5505B:;
+    return 0;
 }
 
 void func_0005506F(void)

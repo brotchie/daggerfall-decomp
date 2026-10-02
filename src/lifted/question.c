@@ -29,7 +29,6 @@ extern char D_0019981A[];
 extern char D_0019981B[];
 
 extern int func_0003D412(int, int, int);
-extern int func_00051991(short, short, int, int);
 extern int func_00051B3E(int, int);
 extern int func_0006998C(int);
 extern int func_0006CB53(int, int);
@@ -49,6 +48,8 @@ extern int func_000CE49E();
 extern void func_00050069(int);
 extern void func_000516FD(int, int);
 extern void func_0005A54A(int, int, int);
+int func_00051991(short, short, int, int);
+#pragma dagger slots func_00051991 a1 4 a2 8 a3 20 a4 16 ret 12
 
 void func_00051490(int a1)
 {
@@ -195,6 +196,30 @@ L51974:;
     return 3;
 L5197D:;
     return 0;
+}
+
+int func_00051991(short a1, short a2, int a3, int a4)
+{
+    a1 = *(int *)&a1 * *(short *)D_0012DA44;
+    a2 = *(int *)&a2 * *(short *)D_0012DA44;
+    if (((int)(short)a1) >= (((int)(short)*(short *)D_00190D64) + 48)) goto L519E2;
+    if ((short)*(int *)&a2 > *(short *)D_00190D64) goto L519EB;
+L519E2:;
+    return 0;
+L519EB:;
+    if ((short)*(int *)&a1 >= *(short *)D_00190D64) goto L51A01;
+    *(short *)((char *)a3) = 135;
+    goto L51A17;
+L51A01:;
+    *(short *)((char *)a3) = (*(int *)&a1 - *(short *)D_00190D64) + 135;
+L51A17:;
+    if (((int)(short)a2) <= (((int)(short)*(short *)D_00190D64) + 48)) goto L51A33;
+    *(short *)((char *)a4) = 183;
+    goto L51A49;
+L51A33:;
+    *(short *)((char *)a4) = (*(int *)&a2 - *(short *)D_00190D64) + 135;
+L51A49:;
+    return 1;
 }
 
 int func_00051A5A(void)

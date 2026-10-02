@@ -64,14 +64,15 @@ index ee6e5533cb..1ccc31bde2 100644
          case OPR_FARPTR:                // segment :> offset
              op2 = PopCGName();          // - get offset
 diff --git a/bld/cc/c/cpragma.c b/bld/cc/c/cpragma.c
-index b8a6f1c7fd..f2457a26b1 100644
+index b8a6f1c7fd..20bcbe8112 100644
 --- a/bld/cc/c/cpragma.c
 +++ b/bld/cc/c/cpragma.c
-@@ -1487,6 +1487,28 @@ static void pragReadOnlyFile( void )
+@@ -1487,6 +1487,49 @@ static void pragReadOnlyFile( void )
  }
  
  
 +extern void DaggerFuncOptAdd( const char *opt, const char *func );
++extern void DaggerSlotAdd( const char *func, const char *var, int depth );
 +
 +static void pragDagger( void )
 +/*****************************
@@ -89,6 +90,26 @@ index b8a6f1c7fd..f2457a26b1 100644
 +    PPNextToken();
 +    if( !IS_ID_OR_KEYWORD( CurToken ) )
 +        return;
++    if( strcmp( opt, "slots" ) == 0 ) {
++        /* #pragma dagger slots <function> <variable> <depth> ...: each variable's frame
++         * depth below the saved registers, as in FALL.EXE */
++        char    func[40];
++        char    var[40];
++
++        strncpy( func, Buffer, sizeof( func ) - 1 );
++        func[sizeof( func ) - 1] = '\0';
++        PPNextToken();
++        while( IS_ID_OR_KEYWORD( CurToken ) ) {
++            strncpy( var, Buffer, sizeof( var ) - 1 );
++            var[sizeof( var ) - 1] = '\0';
++            PPNextToken();
++            if( CurToken != T_CONSTANT )
++                break;
++            DaggerSlotAdd( func, var, (int)U64Low( Constant64 ) );
++            PPNextToken();
++        }
++        return;
++    }
 +    DaggerFuncOptAdd( opt, Buffer );
 +    PPNextToken();
 +}
@@ -96,7 +117,7 @@ index b8a6f1c7fd..f2457a26b1 100644
  static void pragReadOnlyDir( void )
  /**********************************
   * forms:
-@@ -1821,6 +1843,8 @@ void CPragma( void )
+@@ -1821,6 +1864,8 @@ void CPragma( void )
              pragReadOnlyFile();
          } else if( pragmaNameRecog( "read_only_directory" ) ) {
              pragReadOnlyDir();
@@ -169,20 +190,21 @@ index e800aac5b8..6a099109f4 100644
                  ins = MakeBinary( OP_ADD, addr->u.n.name,
                                      AllocS32Const( addr->u.n.offset ),
 diff --git a/bld/cg/c/bldcall.c b/bld/cg/c/bldcall.c
-index 14a056a76b..bf29ab616b 100644
+index 14a056a76b..f8fb464b7a 100644
 --- a/bld/cg/c/bldcall.c
 +++ b/bld/cg/c/bldcall.c
-@@ -31,6 +31,9 @@
+@@ -31,6 +31,10 @@
  
  
  #include "_cgstd.h"
 +extern const char *DaggerEnv( const char *name );
 +#include <stdio.h>
 +#include <stdlib.h>
++#include <string.h>
  #include "coderep.h"
  #include "cgmem.h"
  #include "cgauxcc.h"
-@@ -65,6 +68,8 @@
+@@ -65,6 +69,8 @@
  #include "tree.h"
  #include "treeprot.h"
  #include "feprotos.h"
@@ -191,7 +213,7 @@ index 14a056a76b..bf29ab616b 100644
  
  
  type_class_def  AddCallBlock( cg_sym_handle sym, const type_def *tipe )
-@@ -161,6 +166,112 @@ void    BGAddParm( cn call, an parm )
+@@ -161,6 +167,193 @@ void    BGAddParm( cn call, an parm )
  }
  
  
@@ -248,10 +270,86 @@ index 14a056a76b..bf29ab616b 100644
 +    }
 +}
 +
++/*
++ * Daggerfall: `#pragma dagger slots` pins declared variables at their frame depth in FALL.EXE
++ * (a last resort the lifter's search uses when the layout rules don't reproduce a frame)
++ */
++#define DAGGER_MAX_SLOTS    1024
++static char     DaggerSlotFunc[DAGGER_MAX_SLOTS][40];
++static char     DaggerSlotVar[DAGGER_MAX_SLOTS][40];
++static int      DaggerSlotDepth[DAGGER_MAX_SLOTS];
++static int      DaggerSlotCount;
++
++void    DaggerSlotAdd( const char *func, const char *var, int depth )
++{
++    if( DaggerSlotCount < DAGGER_MAX_SLOTS ) {
++        strncpy( DaggerSlotFunc[DaggerSlotCount], func, 39 );
++        strncpy( DaggerSlotVar[DaggerSlotCount], var, 39 );
++        DaggerSlotDepth[DaggerSlotCount] = depth;
++        DaggerSlotCount++;
++    }
++}
++
++extern const char *DaggerCurrProcName( void );   /* generate.c */
++#define DaggerProcName  DaggerCurrProcName
++
++static name     *DaggerRetTemp;     /* the function's first CGTemp: its return variable */
++
++static int DaggerSlotDepthOf( name *temp )
++/* the pinned depth of a declared variable, or 0 */
++{
++    const char  *func;
++    const char  *var;
++    int         i;
++
++    if( DaggerSlotCount == 0 || temp->n.class != N_TEMP )
++        return( 0 );
++    func = DaggerProcName();
++    /* the return variable has no name: `ret` */
++    var = temp->v.symbol == NULL ? ( temp == DaggerRetTemp ? "ret" : NULL ) : FEName( temp->v.symbol );
++    if( func == NULL || var == NULL )
++        return( 0 );
++    for( i = 0; i < DaggerSlotCount; i++ ) {
++        if( strcmp( DaggerSlotFunc[i], func ) == 0 && strcmp( DaggerSlotVar[i], var ) == 0 )
++            return( DaggerSlotDepth[i] );
++    }
++    return( 0 );
++}
++
++static void DaggerSlotsReserve( void )
++/* the pinned region is below the saved registers; everything else goes under it */
++{
++    const char  *func;
++    int         i;
++    int         deepest;
++
++    func = DaggerProcName();
++    if( func == NULL )
++        return;
++    deepest = 0;
++    for( i = 0; i < DaggerSlotCount; i++ ) {
++        if( strcmp( DaggerSlotFunc[i], func ) == 0 && DaggerSlotDepth[i] > deepest )
++            deepest = DaggerSlotDepth[i];
++    }
++    if( deepest > (int)CurrProc->locals.size )
++        CurrProc->locals.size = deepest;
++}
++
 +static void DaggerAlloc( name *temp )
 +/***********************************/
 +{
++    int     depth;
++
 +    temp = DeAlias( temp );
++    depth = DaggerSlotDepthOf( temp );
++    if( depth != 0 ) {
++        if( (temp->v.usage & HAS_MEMORY) == 0 ) {
++            temp->v.usage |= NEEDS_MEMORY | USE_MEMORY | USE_IN_ANOTHER_BLOCK | HAS_MEMORY;
++            temp->t.location = - depth - CurrProc->locals.base;
++            PropLocal( temp );
++        }
++        return;
++    }
 +    temp->v.usage |= NEEDS_MEMORY | USE_MEMORY | USE_IN_ANOTHER_BLOCK;
 +    AllocALocal( temp );
 +}
@@ -263,6 +361,8 @@ index 14a056a76b..bf29ab616b 100644
 +
 +    if( DaggerProc != CurrProc || DaggerCount == 0 )
 +        return;
++    if( DaggerSlotCount != 0 )
++        DaggerSlotsReserve();
 +    /* 2-byte variables come first: parameters, then locals, last to first */
 +    for( i = DaggerCount; i-- > 0; ) {
 +        if( DaggerKinds[i] == DAGGER_PARM && ( DaggerDecls[i]->n.size == 2
@@ -276,8 +376,11 @@ index 14a056a76b..bf29ab616b 100644
 +            DaggerAlloc( DaggerDecls[i] );
 +        }
 +    }
++    DaggerRetTemp = NULL;
 +    for( i = 0; i < DaggerCount; i++ ) {
 +        if( DaggerKinds[i] == DAGGER_TEMP ) {
++            if( DaggerRetTemp == NULL )
++                DaggerRetTemp = DeAlias( DaggerDecls[i] );
 +            DaggerAlloc( DaggerDecls[i] );
 +        }
 +    }
@@ -304,7 +407,7 @@ index 14a056a76b..bf29ab616b 100644
  void    BGAutoDecl( cg_sym_handle sym, const type_def *tipe )
  /*************************************************************
   * declare an automatic variable with name "sym" and type "tipe". This
-@@ -168,6 +279,19 @@ void    BGAutoDecl( cg_sym_handle sym, const type_def *tipe )
+@@ -168,6 +361,19 @@ void    BGAutoDecl( cg_sym_handle sym, const type_def *tipe )
   */
  {
      BGDone( MakeAddrName( CG_FE, sym, tipe ) );
@@ -324,7 +427,7 @@ index 14a056a76b..bf29ab616b 100644
  }
  
  static  void    LinkParmIns( instruction *parm_def, instruction *ins )
-@@ -295,6 +419,10 @@ name    *DoParmDecl( cg_sym_handle sym, const type_def *tipe, hw_reg_set reg )
+@@ -295,6 +501,10 @@ name    *DoParmDecl( cg_sym_handle sym, const type_def *tipe, hw_reg_set reg )
      } else {
          temp = SAllocUserTemp( sym, TypeClass( tipe ), tipe->length );
          BGDone( MakeAddrName( CG_FE, sym, tipe ) );
@@ -335,7 +438,7 @@ index 14a056a76b..bf29ab616b 100644
      }
      temp->v.usage |= USE_IN_ANOTHER_BLOCK;
  
-@@ -887,3 +1015,12 @@ bool        AssgnParms( cn call, bool aux_inline )
+@@ -887,3 +1097,12 @@ bool        AssgnParms( cn call, bool aux_inline )
      call_ins->zap = &AllocRegName( CallZap( state ) )->r;
      return( push_no_pop );
  }
@@ -620,7 +723,7 @@ index 1bab6746f0..493bf37016 100644
              cf_value = OkToNegate( ins->operands[1]->c.u.cfval, tipe );
              if( cf_value != NULL ) {
 diff --git a/bld/cg/c/generate.c b/bld/cg/c/generate.c
-index a7f606be70..b4409f7604 100644
+index a7f606be70..cb330f17bb 100644
 --- a/bld/cg/c/generate.c
 +++ b/bld/cg/c/generate.c
 @@ -31,6 +31,9 @@
@@ -641,7 +744,7 @@ index a7f606be70..b4409f7604 100644
  
  
  static  bool            abortCG;
-@@ -144,6 +148,116 @@ static  void    AddANop( void )
+@@ -144,6 +148,126 @@ static  void    AddANop( void )
  }
  
  
@@ -663,6 +766,16 @@ index a7f606be70..b4409f7604 100644
 +}
 +
 +bool    DaggerFuncOpt( const char *opt );
++
++const char *DaggerCurrProcName( void )
++{
++    cg_sym_handle   sym;
++
++    if( CurrProc == NULL )
++        return( NULL );
++    sym = AskForLblSym( CurrProc->label );
++    return( sym == NULL ? NULL : FEName( sym ) );
++}
 +
 +bool    DaggerIsOd( void )
 +{
@@ -758,7 +871,7 @@ index a7f606be70..b4409f7604 100644
  static  void            PreOptimize( void )
  /*****************************************/
  {
-@@ -333,8 +447,8 @@ static  void    ForceTempsMemory( void )
+@@ -333,8 +457,8 @@ static  void    ForceTempsMemory( void )
      ParmPropagate();
      for( op = Names[N_TEMP]; op != LastTemp; op = next ) {
          next = op->n.next_name;
@@ -769,7 +882,7 @@ index a7f606be70..b4409f7604 100644
              op = DeAlias( op );
              op->v.usage |= NEEDS_MEMORY | USE_MEMORY;
              while( op->v.conflict != NULL ) {
-@@ -501,7 +615,12 @@ static  void    FlushBlocks( bool partly_done )
+@@ -501,7 +625,12 @@ static  void    FlushBlocks( bool partly_done )
          classes |= blk->class;
          CurrBlock = blk;
          BlockToCode( partly_done );
@@ -783,7 +896,7 @@ index a7f606be70..b4409f7604 100644
      }
      CurrBlock = curr;
      HeadBlock = NULL;
-@@ -665,6 +784,9 @@ void    Generate( bool routine_done )
+@@ -665,6 +794,9 @@ void    Generate( bool routine_done )
              InitStackMap();
              BlockByBlock = true;
          }
@@ -793,7 +906,7 @@ index a7f606be70..b4409f7604 100644
          LNBlip( SrcLine );
          FlushBlocks( false );
          FreeExtraSyms( LastTemp );
-@@ -722,6 +844,11 @@ void    Generate( bool routine_done )
+@@ -722,6 +854,11 @@ void    Generate( bool routine_done )
          Panic( false );
          return;
      }

@@ -38,6 +38,7 @@ extern int func_0008DA4D(int);
 extern int func_0008DCE3(int, int, int);
 extern int func_0008EA20(int, int);
 extern int func_0008EB88(int);
+extern int func_0009DC25();
 extern int func_000A0024();
 extern int func_000A0040();
 extern int func_000A1023();
@@ -46,6 +47,7 @@ extern int func_000C7FD9();
 extern int func_000C7FF4();
 extern int func_000C808D();
 extern void func_0006243B(int, int, int);
+extern void func_000633BC(int, int);
 extern void func_00073DF9(int, int);
 extern void func_00078566(int, int);
 extern void func_0008E3F7(int, int);
@@ -56,6 +58,7 @@ int func_00063ED8(int, int);
 void func_00062FBE(int);
 #pragma dagger DAGGER_DEADDEF func_000622EB
 #pragma dagger DAGGER_DEADDEF func_00063512
+#pragma dagger slots func_0006310D a1 8 a2 12 l_24 20 l_20 16 l_14 4
 
 void func_000622EB(int a1, int a2, int a3, int a4)
 {
@@ -444,6 +447,23 @@ L630E6:;
     goto L630E6;
 L630FA:;
     return l_1C;
+}
+
+void func_0006310D(int a1, int a2)
+{
+    int l_24;
+    int l_20;
+    int l_14;
+
+    if (func_0009DC25() > 195) return;
+    l_14 = func_000C7FD9(*(int *)((char *)a1 + 7), *(int *)((char *)a1 + 15), *(int *)(*(char **)D_00195AA4 + 7), *(int *)(*(char **)D_00195AA4 + 15));
+    if (l_14 >= 1024) return;
+    if (((int)(unsigned char)*(signed char *)((char *)a2 + 506)) != 146) goto L63186;
+    func_00069938(11461, a1, 100);
+    return;
+L63186:;
+    if (((int)(unsigned char)*(signed char *)((char *)a2 + 67)) >= 43) return;
+    func_000633BC(a1, l_14);
 }
 
 int func_000631AA(int a1)

@@ -7,7 +7,7 @@ extern int func_0007D6AE(int, int);
 extern void func_0005DE74(unsigned short, short, short, int);
 extern void func_00060430(int, int);
 extern void func_0006077F(int, int);
-#pragma dagger DAGGER_FIRSTUSE func_0005E37F
+#pragma dagger slots func_0005E37F a1 4 a2 16 a3 20 a4 8 l_14 12
 
 void func_0005E37F(short a1, int a2, int a3, int a4)
 {

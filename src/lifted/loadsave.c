@@ -266,6 +266,9 @@ void func_0007C8AF(void);
 #pragma dagger KKND_CONFREV func_0007A638
 #pragma dagger KKND_CONFREV func_0007B222
 #pragma dagger KKND_CONFREV func_0007B624
+#pragma dagger slots func_0007C908 a1 16 a2 12 a3 8 l_10 4
+#pragma dagger slots func_0007C965 a1 16 a2 12 a3 8 l_10 4
+#pragma dagger slots func_0007C9C2 a1 16 a2 12 a3 8 l_10 4
 
 int func_00079A6E(int a1)
 {
@@ -1404,35 +1407,35 @@ void func_0007C8AF(void)
     func_0008E3A7(*(int *)D_00195AC4, (int)func_0007C78B);
 }
 
-void func_0007C908(int a1, int a2, int a3)
+void func_0007C908(int a1, short a2, short a3)
 {
     int l_10;
 
     *(short *)&l_10 = (int)(unsigned char)*(signed char *)D_0012B508;
     *(signed char *)D_0012B508 = 0;
-    func_0005A5D2(a1, (int)&*(signed char *)((char *)((int)(short)*(short *)&a2) + 1), (int)&*(signed char *)((char *)((int)(short)*(short *)&a3) + 1));
+    func_0005A5D2(a1, (int)&*(signed char *)((char *)((int)(short)a2) + 1), (int)&*(signed char *)((char *)((int)(short)a3) + 1));
     *(signed char *)D_0012B508 = *(signed char *)&l_10;
-    func_0005A5D2(a1, (int)(short)*(short *)&a2, (int)(short)*(short *)&a3);
+    func_0005A5D2(a1, (int)(short)a2, (int)(short)a3);
 }
 
-void func_0007C965(int a1, int a2, int a3)
+void func_0007C965(int a1, short a2, short a3)
 {
     int l_10;
 
     *(short *)&l_10 = (int)(unsigned char)*(signed char *)D_0012B508;
     *(signed char *)D_0012B508 = 15;
-    func_0005A54A(a1, (int)&*(signed char *)((char *)((int)(short)*(short *)&a2) + 1), (int)&*(signed char *)((char *)((int)(short)*(short *)&a3) + 1));
+    func_0005A54A(a1, (int)&*(signed char *)((char *)((int)(short)a2) + 1), (int)&*(signed char *)((char *)((int)(short)a3) + 1));
     *(signed char *)D_0012B508 = *(signed char *)&l_10;
-    func_0005A54A(a1, (int)(short)*(short *)&a2, (int)(short)*(short *)&a3);
+    func_0005A54A(a1, (int)(short)a2, (int)(short)a3);
 }
 
-void func_0007C9C2(int a1, int a2, int a3)
+void func_0007C9C2(int a1, short a2, short a3)
 {
     int l_10;
 
     *(short *)&l_10 = (int)(unsigned char)*(signed char *)D_0012B508;
     *(signed char *)D_0012B508 = 0;
-    func_0005A54A(a1, (int)&*(signed char *)((char *)((int)(short)*(short *)&a2) + 1), (int)&*(signed char *)((char *)((int)(short)*(short *)&a3) + 1));
+    func_0005A54A(a1, (int)&*(signed char *)((char *)((int)(short)a2) + 1), (int)&*(signed char *)((char *)((int)(short)a3) + 1));
     *(signed char *)D_0012B508 = *(signed char *)&l_10;
-    func_0005A54A(a1, (int)(short)*(short *)&a2, (int)(short)*(short *)&a3);
+    func_0005A54A(a1, (int)(short)a2, (int)(short)a3);
 }

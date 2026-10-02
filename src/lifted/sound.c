@@ -60,6 +60,7 @@ void func_000696A3(int);
 void func_000697E3(void);
 void func_00069DAA(void);
 #pragma dagger KKND_CONFREV func_00068BA8
+#pragma dagger slots func_000699D8 a1 28 a2 24 a3 12 a4 20 l_6C 100 l_18 16 l_10 8 ret 4
 
 void func_00068BA8(int a1, int a2)
 {
@@ -195,6 +196,27 @@ int func_0006998C(int a1)
 L699AF:;
     l_1C = func_00085A51(a1);
     return func_000694B8(l_1C, *(int *)D_00195CB4);
+}
+
+int func_000699D8(int a1, int a2, int a3, int a4, int a5)
+{
+    char l_6C[72];
+    int l_18;
+    int l_10;
+
+    if (*(signed char *)D_001A3F5D != 0) goto L69A01;
+    return -1;
+L69A01:;
+    *(signed char *)l_6C = 0;
+    *(int *)((char *)l_6C + 7) = a2;
+    *(int *)((char *)l_6C + 11) = a3;
+    *(int *)((char *)l_6C + 15) = a4;
+    l_18 = func_00085A51(a1);
+    l_10 = func_00068F5E(l_18, *(int *)D_00195CB4, (int)l_6C, a5);
+    if (l_10 <= (-1)) goto L69A50;
+    *(int *)(D_001A3BE4 + (l_10 * 268)) = 0;
+L69A50:;
+    return l_10;
 }
 
 int func_00069A62(int a1, int a2, int a3)

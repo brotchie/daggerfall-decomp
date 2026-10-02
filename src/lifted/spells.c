@@ -15,6 +15,7 @@ extern char D_00178A0A[];
 extern char D_0017A84C[];
 extern char D_0017A87F[];
 extern char D_0017A8B2[];
+extern char D_0017A8E5[];
 extern char D_0017AE13[];
 extern char D_0017AF6B[];
 extern char D_0017B202[];
@@ -50,7 +51,6 @@ extern char D_0019962E[];
 extern char D_0019962F[];
 extern char D_00199630[];
 
-extern int func_00039224(short);
 extern int func_00069938(int, int, int);
 extern int func_0006CB53(int, int);
 extern int func_0006CD10(int, int, int);
@@ -90,6 +90,7 @@ extern void func_0008E3F7(int, int);
 int func_00037AB7(void);
 int func_00037D5A(void);
 int func_00038067(void);
+int func_00039224(short);
 int func_00039B93(unsigned char);
 int func_00039C09(void);
 int func_00039D24(int);
@@ -101,6 +102,8 @@ void func_00039FD6(void);
 void func_0003A036(void);
 #pragma aux func_000A0ED9 parm routine [];
 #pragma dagger KKND_CONFREV func_00039E5F
+#pragma dagger slots func_0003853C a1 8 l_18 4 ret 12
+#pragma dagger slots func_00039224 a1 12 l_1C 8 l_18 4 ret 16
 
 int func_00037732(void)
 {
@@ -404,6 +407,26 @@ L380C1:;
     return 0;
 }
 
+int func_0003853C(short a1)
+{
+    int l_18;
+
+    l_18 = 0;
+L38554:;
+    if (((int)(short)*(short *)&l_18) < 3) goto L38567;
+    goto L3858B;
+L3855F:;
+    l_18++;
+    goto L38554;
+L38567:;
+    if ((short)((unsigned short)(unsigned char)*(signed char *)((char *)(int)(*(char **)D_00178A0A + (((int)(short)*(short *)&l_18) * 2)))) != a1) goto L38589;
+    return (int)(short)*(short *)&l_18;
+L38589:;
+    goto L3855F;
+L3858B:;
+    return -1;
+}
+
 void func_000385DE(short a1)
 {
     func_00038872(((((int)(short)*(short *)D_00195F30) * 3) + (*(int *)D_00178A0A + 14)) + 1, (int)(short)a1, 60, 0);
@@ -496,6 +519,23 @@ L391E7:;
     func_0007D62B(1708, 11, 10, 0, 101, 100, 0);
 L39215:;
     goto L390F6;
+}
+
+int func_00039224(short a1)
+{
+    int l_1C;
+    short l_18;
+
+    l_18 = *(short *)(D_0017A8E5 + (((int)(unsigned char)*(signed char *)((char *)(int)(*(char **)D_00178A0A + (((int)(short)a1) * 2)))) * 2));
+    l_1C = (int)(unsigned char)*(signed char *)((char *)(int)(*(char **)D_00178A0A + (((int)(short)a1) * 2)) + 1);
+    if (((int)(short)*(short *)&l_1C) == 255) goto L39291;
+    if (((int)(unsigned char)*(signed char *)((char *)(int)(*(char **)D_00178A0A + (((int)(short)a1) * 2)))) != 29) goto L39293;
+L39291:;
+    goto L39299;
+L39293:;
+    *(int *)&l_18 += l_1C;
+L39299:;
+    return (int)(short)l_18;
 }
 
 int func_000392AD(void)

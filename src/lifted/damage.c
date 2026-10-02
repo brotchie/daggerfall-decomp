@@ -74,7 +74,8 @@ void func_0002F288(int, int);
 void func_0002F2FA(int);
 void func_0002FB8B(int);
 void func_000303F1(void);
-#pragma dagger DAGGER_FIRSTUSE func_0003009A
+#pragma dagger slots func_0003009A a1 12 a2 16 l_30 32 l_18 8 l_14 4
+#pragma dagger slots func_00030275 a1 16 a2 20 l_3C 44 l_38 40 l_34 36 l_1C 12 l_18 8 l_14 4
 
 void func_0002F02C(int a1, int a2)
 {
@@ -527,6 +528,65 @@ L30214:;
     return;
 L30254:;
     *(signed char *)(*(char **)((char *)l_30 + (((((int)(short)*(short *)&l_14) + 1) % l_18) << 2)) + 3) = 1;
+}
+
+void func_00030275(int a1, int a2)
+{
+    unsigned char l_3C;
+    unsigned char l_38;
+    char l_34[16];
+    int l_1C;
+    int l_18;
+    short l_14;
+
+    l_1C = 0;
+    l_18 = l_1C;
+L30295:;
+    if (((int)(short)*(short *)&l_1C) < 4) goto L302A8;
+    goto L302EC;
+L302A0:;
+    l_1C++;
+    goto L30295;
+L302A8:;
+    if (*(int *)((char *)(((((int)(short)*(short *)&l_1C) + 1) * 15) + a2) + 13) == (-1)) goto L302CA;
+    if (*(int *)((char *)(((((int)(short)*(short *)&l_1C) + 1) * 15) + a2) + 13) != (-2)) goto L302CC;
+L302CA:;
+    goto L302EA;
+L302CC:;
+    *(int *)((char *)l_34 + (((int)(short)l_18++) << 2)) = *(int *)((char *)(a2 + ((((int)(short)*(short *)&l_1C) + 1) * 15)) + 7);
+L302EA:;
+    goto L302A0;
+L302EC:;
+    if (*(short *)&l_18 == 0) return;
+    *(int *)&l_14 = func_0009DC25() % ((int)(short)*(short *)&l_18);
+    l_1C = 0;
+L30313:;
+    if ((short)l_1C < *(short *)&l_18) goto L30329;
+    return;
+L30321:;
+    l_1C++;
+    goto L30313;
+L30329:;
+    if ((short)l_1C != l_14) goto L30395;
+    if (*(signed char *)(*(char **)((char *)l_34 + (((int)(short)*(short *)&l_1C) << 2)) + 2) == 0) goto L30371;
+    if ((short)l_1C != l_14) goto L30352;
+    l_38 = 1;
+    goto L30356;
+L30352:;
+    l_38 = 0;
+L30356:;
+    *(signed char *)(D_001952EC + ((int)(unsigned char)*(signed char *)(*(char **)((char *)l_34 + (((int)(short)*(short *)&l_1C) << 2)) + 3))) = l_38;
+    goto L30395;
+L30371:;
+    if ((short)l_1C != l_14) goto L30380;
+    l_3C = 1;
+    goto L30384;
+L30380:;
+    l_3C = 0;
+L30384:;
+    *(signed char *)(*(char **)((char *)l_34 + (((int)(short)*(short *)&l_1C) << 2)) + 3) = l_3C;
+L30395:;
+    goto L30321;
 }
 
 void func_000303A0(int a1, int a2)

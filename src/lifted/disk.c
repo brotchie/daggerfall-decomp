@@ -50,7 +50,7 @@ int func_0006CD6E(int);
 int func_0006D13E(int);
 void func_0006D430(int);
 #pragma aux func_000A0ED9 parm routine [];
-#pragma dagger DAGGER_FIRSTUSE func_0006CE7E
+#pragma dagger slots func_0006CE7E a1 8 l_7C 104 l_18 4 ret 12
 
 int func_0006CB53(int a1, int a2)
 {
