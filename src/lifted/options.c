@@ -150,6 +150,11 @@ void func_00043818(void)
     func_000698AF((int)(short)*(short *)(*(char **)D_00195BF8 + 4));
 }
 
+void func_0004384D(void)
+{
+    *(short *)(*(char **)D_00195BF8) = (func_00043883() << 8) | (*(short *)(*(char **)D_00195BF8) & 255);
+}
+
 int func_00043883(void)
 {
     int l_1C;

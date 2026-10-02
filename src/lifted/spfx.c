@@ -51,6 +51,7 @@ extern int func_000392AD(void);
 extern int func_0007CBA1(int);
 extern int func_0007D6AE(int, int);
 extern int func_00089035(int, int, int);
+extern int func_0008950A(int, int, int);
 extern int func_0008B572(unsigned char, unsigned char);
 extern int func_0008DA4D(int);
 extern int func_0008DA91(int);
@@ -184,6 +185,16 @@ int func_0008962A(int a1, int a2, int a3)
     *(int *)((char *)l_14 + 137) |= *(int *)(D_00187FC6 + (((int)(unsigned char)*(signed char *)((char *)((a2 * 2) + l_18) + 1)) << 2));
     *(signed char *)((char *)(((int)(unsigned char)*(signed char *)((char *)((a2 * 2) + l_18) + 1)) + l_14) + 555) = *(signed char *)((char *)(l_18 + a2) + 86);
     return 1;
+}
+
+void func_000898DE(int a1, int a2, int a3)
+{
+    int l_10;
+
+    l_10 = a1 + 71;
+    *(unsigned short *)((char *)((a2 * 2) + l_10) + 80) >>= 1;
+    func_0008950A(a1, a2, a3);
+    func_00089757(a1, a2, *(int *)D_00195AA0);
 }
 
 int func_000899DF(int a1, int a2, int a3)

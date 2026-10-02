@@ -1091,3 +1091,11 @@ Batch **1,888**; build **59.28%**.
 - `f(g(), x, y)` with x and y loaded before the inner call: whether an earlier call's result
   still in eax is the next call's first argument is a per-call choice point (a runtime
   function with no arguments looks the same). +4. Batch **1,912**.
+- `xor ah,ah` / `xor ax,ax` on a wide value are masks (`x & 255`, `x & -65536`), and a
+  word read masked to a byte is `x & 255`. +6. Unsigned in-place `shr`, and unused char
+  parameters typed by their spill width. +3. Batch **1,921**.
+- **No lea with an index and a displacement**: FALL.EXE never folds a following
+  `add reg,k` into an lea (`lea eax,[eax+eax*4]; add eax,5`, `shl eax,3; add eax,8`); OW's
+  2004 GetNextAddConstant() does. Gated off at -od (`DAGGER_LEADISP` restores it). +6.
+
+Batch **1,927**; build **61.34%**.

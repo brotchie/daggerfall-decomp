@@ -7,6 +7,8 @@ extern char D_00179954[];
 extern char D_0017995C[];
 extern char D_00179966[];
 extern char D_0017CA0A[];
+extern char D_00190CE4[];
+extern char D_00190CE5[];
 extern char D_00195AA4[];
 extern char D_00195AC4[];
 extern char D_00195B68[];
@@ -21,9 +23,10 @@ extern char D_0019629F[];
 extern char D_00196478[];
 extern char D_0019647C[];
 extern char D_00196484[];
+extern char D_001A94C8[];
 
-extern int func_00014096(int, short);
 extern int func_00014334(int);
+extern int func_000145CD(int, unsigned short);
 extern int func_0001FFF1(void);
 extern int func_0007D6AE(int, int);
 extern int func_0008E55F(int, int);
@@ -36,6 +39,7 @@ extern void func_0006103A(int, int, int, int, int);
 extern void func_0007E815(int, int);
 extern void func_0007EB0B(int, int);
 extern void func_0008E4A8(int, int);
+int func_00014096(int, short);
 int func_0001410F(int);
 int func_00014438(int, int);
 int func_0001490D(int);
@@ -85,6 +89,27 @@ int func_00014048(int a1, short a2)
 L1407A:;
     *(int *)&l_18 += ((int)(short)a2) << 3;
     return *(int *)&l_18;
+}
+
+int func_00014096(int a1, short a2)
+{
+    int l_24;
+    int l_20;
+    short l_18;
+
+    l_20 = *(int *)((char *)a1);
+    *(int *)&l_18 = 0;
+    if (((int)(short)a2) < *(int *)((char *)l_20 + 8)) goto L140CD;
+    return 0;
+L140CD:;
+    l_24 = l_20 + *(int *)((char *)l_20 + 60);
+L140D9:;
+    if ((short)*(int *)&l_18 >= a2) goto L140FD;
+    l_24 += (((int)(unsigned char)*(signed char *)((char *)l_24)) << 3) + 8;
+    (*(int *)&l_18)++;
+    goto L140D9;
+L140FD:;
+    return l_24;
 }
 
 int func_0001410F(int a1)
@@ -178,6 +203,29 @@ L14488:;
     goto L14461;
 L1448A:;
     return -1;
+}
+
+void func_00014518(int a1)
+{
+    int l_20;
+    int l_1C;
+    int l_18;
+
+    *(signed char *)D_00190CE5 = func_0001FFF1();
+    *(signed char *)D_00190CE4 = *(signed char *)(D_0017CA0A + *(int *)D_001A94C8);
+    l_1C = a1 + *(int *)((char *)a1 + 60);
+    l_18 = 0;
+L14556:;
+    if (l_18 < *(int *)((char *)a1 + 8)) goto L1456B;
+    return;
+L14563:;
+    l_18++;
+    goto L14556;
+L1456B:;
+    l_20 = l_1C;
+    *(short *)((char *)l_20 + 2) = (*(short *)((char *)l_20 + 2) & 127) | (func_000145CD(((int)(unsigned short)*(short *)((char *)l_20 + 2)) >> 7, (int)(unsigned short)(*(short *)((char *)l_20 + 2) & 127)) << 7);
+    l_1C += (((int)(unsigned char)*(signed char *)((char *)l_1C)) << 3) + 8;
+    goto L14563;
 }
 
 void func_0001478F(void)

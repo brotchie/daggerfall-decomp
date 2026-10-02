@@ -1843,6 +1843,29 @@ index 796db7f256..89eff56559 100644
  } t_flags;
  
  #define PERM_TEMP_FLAGS (STACK_PARM+CONST_TEMP)
+diff --git a/bld/cg/intel/386/c/386enc.c b/bld/cg/intel/386/c/386enc.c
+index 88d5cb87d4..5c10d9ba26 100644
+--- a/bld/cg/intel/386/c/386enc.c
++++ b/bld/cg/intel/386/c/386enc.c
+@@ -31,6 +31,7 @@
+ 
+ 
+ #include "_cgstd.h"
++extern const char *DaggerEnv( const char *name );
+ #include "coderep.h"
+ #include "pccode.h"
+ #include "system.h"
+@@ -337,6 +338,10 @@ static int_32   GetNextAddConstant( instruction *ins )
+     next = ins->head.next;
+     neg = 1;
+     disp = 0;
++    /* Daggerfall: Watcom 10 kept the add (`lea eax,[eax+eax*4]; add eax,5`);
++     * DAGGER_LEADISP=1 folds it like OW */
++    if( _IsModel( CGSW_GEN_NO_OPTIMIZATION ) && DaggerEnv( "DAGGER_LEADISP" ) == NULL )
++        return( 0 );
+     switch( next->head.opcode ) {
+     case OP_SUB:
+         neg = -1;
 diff --git a/bld/cg/intel/386/c/386rgtbl.c b/bld/cg/intel/386/c/386rgtbl.c
 index 3ea68d697a..f534ca058f 100644
 --- a/bld/cg/intel/386/c/386rgtbl.c
@@ -2531,7 +2554,7 @@ index 1de30dab10..4cdc4f45b3 100644
      POP_OP();
      return( table );
 diff --git a/bld/cg/intel/c/x86ver.c b/bld/cg/intel/c/x86ver.c
-index 7de826e706..a4dd9cb553 100644
+index 7de826e706..b696f4b89a 100644
 --- a/bld/cg/intel/c/x86ver.c
 +++ b/bld/cg/intel/c/x86ver.c
 @@ -31,6 +31,8 @@
@@ -2604,7 +2627,17 @@ index 7de826e706..a4dd9cb553 100644
          if( op2->c.const_type == CONS_ABSOLUTE
            && (op2->c.lo.u.int_value & 0x0000ffff) == 0 )
              return( true );
-@@ -312,6 +336,10 @@ bool    DoVerify( vertype kind, instruction *ins )
+@@ -205,6 +229,9 @@ bool    DoVerify( vertype kind, instruction *ins )
+                  * end up with a huge lea instruction which is unlikely to
+                  * be any faster. See also GetNextAddConstant() in i86enc32.c.
+                  */
++                /* Daggerfall: not in Watcom 10 (`shl eax,3; add eax,8`) */
++                if( _IsModel( CGSW_GEN_NO_OPTIMIZATION ) && DaggerEnv( "DAGGER_LEADISP" ) == NULL )
++                    break;
+                 switch( ins->head.next->head.opcode ) {
+                 case OP_ADD:
+                 case OP_SUB:
+@@ -312,6 +339,10 @@ bool    DoVerify( vertype kind, instruction *ins )
          }
          return( true );
      case V_CDQ:

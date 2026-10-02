@@ -195,7 +195,7 @@ extern void func_00012F27(int);
 extern void func_0001B69D(void);
 extern void func_0001BB95(void);
 extern void func_0001FEBD(void);
-extern void func_0001FF3F(int, unsigned char);
+extern void func_0001FF3F(unsigned char, unsigned char);
 extern void func_00028C72(void);
 extern void func_0003503D(void);
 extern void func_0003D3F0(void);

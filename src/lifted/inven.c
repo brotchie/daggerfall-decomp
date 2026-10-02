@@ -185,7 +185,6 @@ extern int func_0008EB88(int);
 extern int func_00091D20(int);
 extern int func_000934F6(int, int, int);
 extern int func_000949AA(int);
-extern int func_0009784E(int, int);
 extern int func_0009830F();
 extern int func_000990F0(unsigned short);
 extern int func_0009A6D0(int, int);
@@ -250,6 +249,7 @@ extern void func_00095F82(int);
 extern void func_00096CCF(int, int);
 extern void func_0009D39E(void);
 int func_000977F2(int);
+int func_0009784E(int, int);
 int func_00097BD9(int);
 int func_0009848E(void);
 int func_00098B91(int);
@@ -1849,6 +1849,29 @@ int func_000977F2(int a1)
     if (a1 >= 0) goto L9783B;
     a1 = 1;
 L9783B:;
+    return a1;
+}
+
+int func_0009784E(int a1, int a2)
+{
+    int l_24;
+    int l_20;
+    int l_1C;
+    int l_18;
+
+    l_24 = ((((int)(unsigned char)*(signed char *)(*(char **)D_00195A9C + 25)) - 10) * 5) + 50;
+    l_20 = ((((int)(unsigned char)*(signed char *)(*(char **)D_00195A9C + 25)) - 10) * 5) + 50;
+    if (a2 != 0) goto L9798A;
+    l_1C = (((int)&*(signed char *)((char *)(((100 - ((int)(short)*(short *)(*(char **)D_00195BE0 + 241))) << 8) / 200) + 128)) * (((l_24 << 8) / 200) + 128)) / 256;
+    l_18 = (((int)&*(signed char *)((char *)(((100 - ((int)(short)*(short *)(*(char **)D_00195BE0 + 42))) << 8) / 200) + 128)) * (((l_20 << 8) / 200) + 128)) / 256;
+    a1 = (a1 * (((l_1C * 192) / 256) + ((l_18 << 6) / 256))) / 256;
+    goto L97A6B;
+L9798A:;
+    l_1C = (((int)&*(signed char *)((char *)((((int)(short)*(short *)(*(char **)D_00195BE0 + 241)) << 8) / 200) + 128)) * ((((100 - l_24) << 8) / 200) + 128)) / 256;
+    l_18 = (((int)&*(signed char *)((char *)((((int)(short)*(short *)(*(char **)D_00195BE0 + 42)) << 8) / 200) + 128)) * ((((100 - l_20) << 8) / 200) + 128)) / 256;
+    a1 = (a1 * (((l_1C * 179) / 256) + ((l_18 * 51) / 256))) / 256;
+L97A6B:;
+    *(int *)D_00195D30 = a1;
     return a1;
 }
 

@@ -3,18 +3,23 @@
 
 extern char D_001705F8[];
 extern char D_00179D74[];
+extern char D_0018F044[];
 extern char D_00195AA4[];
+extern char D_00195B30[];
 extern char D_00196268[];
+extern char D_00196269[];
 extern char D_0019627B[];
 extern char D_00196285[];
 extern char D_00196B00[];
 extern char D_00196B04[];
 
 extern int func_000A0024();
-extern void func_0001FF3F(int, unsigned char);
+extern void func_0001DF7F(int);
+extern void func_00086314(void);
 unsigned char func_00020089(int, int);
 unsigned char func_0002010F(int, int);
 unsigned char func_000201B8(int, int, int);
+void func_0001FF3F(unsigned char, unsigned char);
 #pragma dagger slots func_0001FF92 l_18 4 ret 8
 
 void func_0001FEBD(void)
@@ -34,6 +39,15 @@ L1FF15:;
 L1FF17:;
     func_000A0024(*(int *)D_00196B04, (int)D_001705F8, 34);
     *(int *)D_00196B04 = -1751672937;
+}
+
+void func_0001FF3F(unsigned char a1, unsigned char a2)
+{
+    *(signed char *)D_00196268 = a2;
+    *(int *)D_00195B30 = ((int)D_0018F044) + (((int)(unsigned char)*(signed char *)D_00196268) * 80);
+    *(signed char *)D_00196269 = *(signed char *)D_00196268;
+    func_00086314();
+    func_0001DF7F((int)(unsigned char)a2);
 }
 
 int func_0001FF92(void)

@@ -96,7 +96,7 @@ extern void func_000138E4(int);
 extern void func_00014853(int, int);
 extern void func_0001DD39(int);
 extern void func_0001E3D3(int, int);
-extern void func_0001FF3F(int, unsigned char);
+extern void func_0001FF3F(unsigned char, unsigned char);
 extern void func_000279B9(void);
 extern void func_000287BD(int, int);
 extern void func_00028BCD(void);
