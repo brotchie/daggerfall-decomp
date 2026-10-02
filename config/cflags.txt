@@ -1,0 +1,2 @@
+# wcc386 flags for FALL.EXE game code (see docs/progress.md)
+-od -s -of+

@@ -115,3 +115,35 @@ Plus 55 switch jump tables. What the code looks like:
   far easier to match than KKND's `-omilert` code.
 - The undecoded rest of object 1 is mostly runtime switch tables and the `int NNh; ret` stubs
   Watcom's `int386()` uses (0xAC551..0xAC7F6).
+
+## 2026-10-01: first matches (plan step 4)
+
+`tools/match.py` (adapted from KKND's) compiles a C file with the patched `bwcc386`, cuts each
+`func_XXXXXXXX` out of the OMF object and compares it with FALL.EXE, masking relocations on
+both sides.
+
+The game code is Watcom's **`-od`** output: every function saves `ebx ecx edx esi edi` after
+`push ebp; mov ebp,esp`, reserves locals with `sub esp, imm32`, spills its register arguments
+to the frame and returns through a stack temp. With **`-od -s -of+`** (`config/cflags.txt`) the
+first probes match byte for byte (`src/leaf_probes.c`):
+
+| Function | C |
+|---|---|
+| `func_00048CDB` | `return D_0018467C;` |
+| `func_000443F2` | `D_00195E7A = 1; return 0;` |
+| `func_000478CF` | `return D_00190DF4 + 3;` |
+| `func_00016507` | `int f(int a) { return 0; }` |
+
+Differences from Watcom 10 found so far, all from Open Watcom 2.0's `-od` code generator:
+
+1. **Branches.** Watcom 10 inverts the condition and uses short jumps
+   (`cmp; jle next; mov [ret],1; jmp end`). OW emits `jg +5; jmp near` with every jump near
+   (`func_000252FD`).
+2. **Call results** go through an extra temp in Watcom 10:
+   `call; mov [ebp-0x20],eax; mov eax,[ebp-0x20]; mov [ebp-0x1c],eax` (`func_000192EE`).
+3. **Void functions.** OW reserves a return-value slot even for `void`, so a lone argument
+   lands at `[ebp-0x1c]` instead of `[ebp-0x18]` (`func_00010AF6`).
+4. **Narrow arguments.** Watcom 10 spills a `short` argument as the whole `eax` and reads it
+   back with `movsx`. OW stores `ax` (`func_000192EE`). This may just be the declared type.
+
+These are candidates for `-od`-specific patches, in the same spirit as KKND's.
