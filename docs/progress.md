@@ -1203,3 +1203,7 @@ Batch **1,927**; build **61.34%**.
   not a switch (no switch case precedes its dispatch). Unsupported first attempts flip the
   choice points nearest where the lifter stopped. `DAGGER_RIGHTPREF` knob. +20.
   Batch **2,106**.
+- `add eax,eax` twice on an index is a short-array subscript (`((short *)p)[i * 2 + 1]`; OW
+  folds a written `(i * 2) * 2` into a shift). +4. The winning choice-point flips of the
+  matched functions are committed as `config/lift_flips.json` (the search is greedy and
+  some finds came from slow offline runs), and lift_all starts from them. Batch **2,110**.

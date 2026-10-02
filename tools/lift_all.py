@@ -40,11 +40,14 @@ def init_worker():
     import build_fall
     lift.init()
     W["lift"] = lift
-    try:
-        with open(os.path.join(OUT, "flips.json")) as f:
-            W["flips"] = json.load(f)
-    except (OSError, ValueError):
-        W["flips"] = {}
+    W["flips"] = {}
+    # the committed seed (config/lift_flips.json), then this checkout's newer finds
+    for p in (os.path.join(ROOT, "config", "lift_flips.json"), os.path.join(OUT, "flips.json")):
+        try:
+            with open(p) as f:
+                W["flips"].update(json.load(f))
+        except (OSError, ValueError):
+            pass
     W["match"] = match
     W["build"] = build_fall
     W["tgt"] = match.Target()

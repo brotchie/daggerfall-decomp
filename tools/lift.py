@@ -590,6 +590,19 @@ class Func:
             parts.append(g)
             if base:
                 parts.append(self.reg(base, ins).p())
+        elif base and not index and self.reg(base, ins).tag and \
+                self.reg(base, ins).tag[0] == "padd" and size in (2, 4) and disp % size == 0 \
+                and re.fullmatch(r"\(\((.*) \* 2\) \* 2\)", self.reg(base, ins).tag[2]) and \
+                self.reg(base, ins).tag[1].startswith("*(char **)") and \
+                not os.environ.get("LIFT_NOARRIDX"):
+            # (i * 2) * 2 doubled twice (add eax,eax twice: OW folds a written `* 4` into a
+            # shift): an index into an array of shorts, scaled by the compiler
+            _, ptxt, ptxtb = self.reg(base, ins).tag
+            mm = re.fullmatch(r"\(\((.*) \* 2\) \* 2\)", ptxtb)
+            arr = "(*(%s **)%s)" % (STYPE[size], ptxt[len("*(char **)"):])
+            idx = "%s * %d" % (mm.group(1), 4 // size) if size == 2 else mm.group(1)
+            k = disp // size
+            return "%s[%s%s]" % (arr, idx, " + %d" % k if k > 0 else " - %d" % -k if k else "")
         elif base and not index and disp and self.reg(base, ins).tag and \
                 self.reg(base, ins).tag[0] == "padd" and \
                 (ins.address + 0.125 in self.flips) != bool(os.environ.get("LIFT_FIELDFIRST")):
