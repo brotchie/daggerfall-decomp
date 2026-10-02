@@ -1315,6 +1315,12 @@ class Func:
                 # xor ax,ax clears only the low word
                 self.set_reg(full_r, E("%s & %d" % (cur_r.p(), -(1 << (8 * sz_r))), 4))
                 return
+            if sz_r == 1 and cur_r is not None and cur_r.size == 2 and \
+                    ins.reg_name(ops[0].reg).endswith("l") and \
+                    not os.environ.get("LIFT_NOXORLOW16"):
+                # xor bl,bl on a word: its high byte kept (w & 0xff00)
+                self.set_reg(full_r, E("%s & %d" % (cur_r.p(), -256), 2))
+                return
             self.set_reg(full_r, E("0", 4, atom=True))
             return
         if m == "imul" and len(ops) == 3:
@@ -1851,7 +1857,11 @@ class Func:
     def used_as_base(self, reg):
         """Is `reg` next read as the base of a memory operand (so it holds a pointer)?"""
         for ins in self.body[self.k + 1:]:
-            for op in ins.operands:
+            # (a memory operand is read before the destination register is written:
+            # mov ax,[eax+k])
+            ops = sorted(ins.operands, key=lambda o: o.type != cx.X86_OP_MEM) \
+                if not os.environ.get("LIFT_NOBASEFIRST") else ins.operands
+            for op in ops:
                 if op.type == cx.X86_OP_MEM and op.mem.base and \
                         SUB.get(ins.reg_name(op.mem.base), (None,))[0] == reg:
                     return True
@@ -2645,6 +2655,24 @@ class Func:
                 out[i:i + 1] = pre + [line]
                 body = "\n".join(out)
 
+        # a compound assignment through the address temp the code spilled
+        # (`*(T *)t = (*(T *)(t = p + k, t)) | x`) is `*(T *)(p + k) |= x`
+        rmw = set()
+        for i in range(len(out)):
+            mm = re.fullmatch(r"    \*\((short|signed char) \*\)\(\(char \*\)(l_[0-9A-F]+)\) = "
+                              r"\(\(int\)\((unsigned short|short|unsigned char)\)\*\(\1 \*\)"
+                              r"\(\(char \*\)\(\2 = (l_[0-9A-F]+|a\d+) \+ (\d+), \2\)\)\) "
+                              r"([|&^+-]) (.*);", out[i])
+            if not mm or uses(mm.group(2)) != 3 or os.environ.get("LIFT_NORMWTEMP"):
+                continue
+            ty = {"unsigned short": "unsigned short", "short": "short",
+                  "unsigned char": "unsigned char"}[mm.group(3)]
+            out[i] = "    *(%s *)((char *)%s + %s) %s= %s;" % (
+                ty, mm.group(4), mm.group(5), mm.group(6), mm.group(7))
+            rmw.add(out[i])
+            self.temps.add(int(mm.group(2)[2:], 16))
+            body = "\n".join(out)
+
         changed = True
         while changed:
             changed = False
@@ -2690,8 +2718,9 @@ class Func:
                     j -= 1
                 deepest = max([o for o in self.slot_type if o > 0 and o not in self.temps
                                and o != off] + [0])
-                if j == i and not (off in self.nested and off > deepest and
-                                   not os.environ.get("LIFT_NOTEMPTERN")):
+                if j == i and out[i + 6] not in rmw and \
+                        not (off in self.nested and off > deepest and
+                             not os.environ.get("LIFT_NOTEMPTERN")):
                     # no argument spilled: an if/else on a variable of its own, as likely
                     # (unless the slot is in the compiler's temp region, below every
                     # declared variable)

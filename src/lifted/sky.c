@@ -89,6 +89,7 @@ void func_000359B4(int);
 void func_00035A7F(void);
 void func_00035CE5(int);
 #pragma aux func_000A0ED9 parm routine [];
+#pragma dagger KKND_CONFREV func_0003522C
 
 void func_000346C4(void)
 {
@@ -230,7 +231,7 @@ L35293:;
     l_24 = 0;
 L352A9:;
     if (l_28 <= (-1)) goto L352D1;
-    l_28 -= (int)(unsigned char)*(signed char *)(D_0017A2F4 + (((l_2C * 42) + (l_30 * 7)) + l_24++));
+    l_28 -= (int)(unsigned char)*(signed char *)(D_0017A2F4 + (int)((char *)l_24++ + ((l_2C * 42) + (l_30 * 7))));
     goto L352A9;
 L352D1:;
     l_24--;
@@ -336,7 +337,7 @@ L3552E:;
 L35533:;
     l_20 = func_0009DC25();
     func_0009DC49(((unsigned)*(int *)D_00195BF4) / 1440);
-    l_24 += ((int)(unsigned char)*(signed char *)(D_0017A39C + (func_0007D6AE(0, 2) + ((((int)(unsigned char)*(signed char *)(D_0017A3D8 + ((int)(unsigned char)*(signed char *)(D_00195E2A + l_18)))) * 3) + (((int)(unsigned char)*(signed char *)(D_0017A3DF + l_18)) * 15))))) << 5;
+    l_24 += ((int)(unsigned char)*(signed char *)(D_0017A39C + (int)((char *)func_0007D6AE(0, 2) + ((((int)(unsigned char)*(signed char *)(D_0017A3D8 + ((int)(unsigned char)*(signed char *)(D_00195E2A + l_18)))) * 3) + (((int)(unsigned char)*(signed char *)(D_0017A3DF + l_18)) * 15))))) << 5;
     func_0009DC49(l_20);
     if (l_24 == *(int *)D_00195D48) return;
     *(int *)D_00195D48 = l_24;
