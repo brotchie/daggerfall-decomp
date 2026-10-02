@@ -1217,3 +1217,6 @@ Batch **1,927**; build **61.34%**.
   function-level choice for three kinds (a sweep inverting each kind's default globally
   found no better default, but four functions that need one inverted). +3.
   Batch **2,119**.
+- A parameter in a 2-byte parameter's frame position that is only ever read whole is an
+  int whose slot was given early (an address-taken one): typed int with its slots pinned.
+  +1. Batch **2,120**.

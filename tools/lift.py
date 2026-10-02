@@ -384,6 +384,8 @@ class Func:
             if (first[self.ret_slot] + 0.0625 not in self.flips) == (uses != {"int"}):
                 self.ret_type = "short"
         self.slot_type = {}
+        self.addr_taken = addr
+        self.slot_reads = reads
         for reg, off, _sz in self.params:
             acc.setdefault(off, set())
         for off, sizes in acc.items():
@@ -537,6 +539,13 @@ class Func:
         self.nested = nested
         for o, i in params.items():
             if i in small_p and self.size_of[self.slot_type.get(o, "int")] == 4:
+                if (o in getattr(self, "addr_taken", set()) or
+                        getattr(self, "slot_reads", {}).get(o) == {4}) and \
+                        not os.environ.get("LIFT_ADDRSMALL"):
+                    # a parameter sitting where a 2-byte one would but read only whole (an
+                    # address-taken one gets its slot early): an int, pinned to its slot
+                    self.force_pin = True
+                    continue
                 self.slot_type[o] = "short"
         for o in small_l:
             if o in self.slot_type and self.size_of[self.slot_type[o]] == 4:
@@ -2374,7 +2383,7 @@ class Func:
         decl = ["/* lifted from 0x%08X */" % self.va] + sorted(self.structs)
         # last resort, a function-level choice: pin every variable at its frame depth
         self.choices.append(PIN_SLOTS)
-        if PIN_SLOTS in self.flips:
+        if (PIN_SLOTS in self.flips) != getattr(self, "force_pin", False):
             base = 4 * len(self.saved)
             pins = []
             for k, (_r, off, _sz) in enumerate(self.params):

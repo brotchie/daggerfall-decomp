@@ -128,7 +128,7 @@ void func_0003D01C(int, int);
 #pragma aux func_000A0ED9 parm routine [];
 #pragma dagger KKND_CONFREV func_0003C010
 #pragma dagger KKND_CONFREV func_0003C0D3
-#pragma dagger reg func_0003BB8D 24 ebx 27 ebx 437 bx
+#pragma dagger reg func_0003BB8D 24 ebx 27 ebx
 
 int func_0003B436(void)
 {

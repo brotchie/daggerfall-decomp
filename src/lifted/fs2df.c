@@ -42,18 +42,21 @@ extern int func_000845F1(int, short, short, int);
 extern int func_0008DA4D(int);
 extern int func_0008E828(int, unsigned char, int, int, int);
 extern int func_000A0040();
+extern int func_000A0D13();
+extern int func_000A14E8();
 extern int func_000C7F07();
 extern int func_00135D00();
 extern int func_00135E39();
-extern void func_000369A0(int, int);
 extern void func_00050069(int);
 short func_00036A41(int);
 void func_000361B7(int);
+void func_000369A0(int, int);
 void func_00036AA7(int);
 void func_00036C6F(int, int, int, unsigned char);
 void func_00036DC9(int, int, int, unsigned char);
 void func_00036F18(int);
 #pragma dagger reg func_000361B7 387 cx
+#pragma dagger slots func_000369A0 a1 12 a2 4 l_28 24 l_18 8
 
 void func_000361B7(int a1)
 {
@@ -240,6 +243,23 @@ default:
 L36977:;
     a2 = (int)(*(char **)D_001995E8 + *(int *)((char *)a2));
     if ((a2 - *(int *)D_001995E8) > 0) goto L367FA;
+}
+}
+
+void func_000369A0(int a1, int a2)
+{
+    int l_18;
+{
+    char l_28[12];
+
+    func_000A14E8((int)l_28, a2, 3, (int)D_00170AB4, 347, 9);
+    *(signed char *)((char *)l_28 + 3) = 0;
+    *(short *)((char *)a1 + 29) = func_000A0D13((int)l_28);
+    func_000A14E8((int)l_28, a2 + 3, 2, (int)D_00170AB4, 350, 9);
+    *(signed char *)((char *)l_28 + 2) = 0;
+    *(short *)((char *)a1 + 27) = func_000A0D13((int)l_28);
+    func_000A14E8((int)l_28, a2, 8, (int)D_00170AB4, 354, 9);
+    *(signed char *)((char *)l_28 + 8) = 0;
 }
 }
 

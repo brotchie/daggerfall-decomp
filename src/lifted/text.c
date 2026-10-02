@@ -81,7 +81,6 @@ extern int func_0001FFF1(void);
 extern int func_00020C87(int);
 extern int func_00023DE0(int, int);
 extern int func_0003D412(int, int, int);
-extern int func_0003E8A8(short, int, int);
 extern int func_0003FDD2(int, int);
 extern int func_000404D9(int, int);
 extern int func_00040983(int, int);
@@ -128,6 +127,7 @@ extern void func_0007D12D(void);
 extern void func_00080637(void);
 extern void func_00081425(void);
 int func_0003E6B1(int, short, int, short);
+int func_0003E8A8(short, int, int);
 int func_0003EAB4(int, short, int, int);
 int func_0003F89F(short, short);
 int func_0004037E(void);
@@ -145,6 +145,7 @@ void func_00040E9D(int);
 #pragma aux func_000A0ED9 parm routine [];
 #pragma dagger DAGGER_PUSHMEM func_0003F71B
 #pragma dagger slots func_0003E6B1 a1 28 a2 16 a3 8 a4 4 l_1C 20 l_14 12 ret 24
+#pragma dagger slots func_0003E8A8 a1 8 a2 20 a3 4 l_24 24 l_18 12 ret 16
 #pragma dagger slots func_0003EAB4 a1 32 a2 8 a3 24 a4 4 l_24 28 l_18 16 l_14 12 ret 20
 #pragma dagger slots func_0003EDF4 a1 16 a2 4 a3 8 l_18 12
 
@@ -196,6 +197,33 @@ L3E747:;
 L3E7BD:;
     *(int *)D_00195D6C = (int)(short)l_14;
     return 0;
+}
+
+int func_0003E8A8(short a1, int a2, int a3)
+{
+    short l_18;
+{
+    int l_24;
+
+    l_24 = func_0003D412((int)(short)a1, (int)(short)(a3 | 32770), (int)(short)*(short *)D_00178A08);
+    func_0003DCF4(l_24, a2);
+    if (*(int *)D_00199650 == 0) goto L3E900;
+    func_0003E942(a2);
+    *(int *)&l_18 = 0;
+    goto L3E907;
+L3E900:;
+    *(int *)&l_18 = 1;
+L3E907:;
+    if (l_24 == 0) goto L3E916;
+    if (l_24 != (-1751672937)) goto L3E918;
+L3E916:;
+    goto L3E931;
+L3E918:;
+    func_000A0024(l_24, (int)D_00170D55, 599);
+    l_24 = -1751672937;
+L3E931:;
+    return *(int *)&l_18;
+}
 }
 
 void func_0003E942(int a1)

@@ -129,6 +129,7 @@ extern int func_0004C274(unsigned char, unsigned char, unsigned char, unsigned c
 extern int func_00055E35(int);
 extern int func_00069938(int, int, int);
 extern int func_0006CB53(int, int);
+extern int func_00070239(short);
 extern int func_0007CBA1(int);
 extern int func_0007D53F(int);
 extern int func_0007D6AE(int, int);
@@ -195,7 +196,6 @@ extern void func_00097A85(void);
 int func_0006F92F(void);
 int func_0006FDBE(void);
 int func_000700EE(int, int, int);
-int func_00070239(short);
 int func_000702A0(unsigned char);
 int func_00070308(unsigned char);
 int func_0007069D(int);
@@ -1477,18 +1477,6 @@ void func_000701F1(int a1)
     if (((int)(unsigned char)*(signed char *)((char *)a1)) != 10) return;
     if ((((int)(signed char)*(signed char *)D_00190D20) & ((int)(unsigned char)*(signed char *)((char *)a1 + 73))) == 0) return;
     *(int *)D_00195AF4 = a1;
-}
-
-int func_00070239(short a1)
-{
-    *(int *)D_00195AF4 = 0;
-    *(short *)D_00190DDC = *(int *)&a1;
-    *(signed char *)D_00190D20 = 255;
-    func_0008E3F7(*(int *)(*(char **)D_00195AA0 + 63), (int)func_00070191);
-    if (*(int *)D_00195AF4 != 0) goto L70288;
-    return 0;
-L70288:;
-    return *(int *)D_00195AF4 + 71;
 }
 
 int func_000702A0(unsigned char a1)

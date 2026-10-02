@@ -42,6 +42,7 @@ extern char D_001AA3E4[];
 extern int func_00045E45(int);
 extern int func_00069F8A(int, int);
 extern int func_0006A0D4(int);
+extern int func_0008E7E0(int, short);
 extern int func_0009DC25();
 extern int func_000A0040();
 extern int func_000A0ED9(int, int);
@@ -59,7 +60,6 @@ int func_0008DB21(int, int, int);
 int func_0008DCE3(int, int, int);
 int func_0008E55F(int, int);
 int func_0008E721(int);
-int func_0008E7E0(int, short);
 int func_0008E8E9(int);
 int func_0008E925(int, int);
 int func_0008E9C0(int);
@@ -76,7 +76,6 @@ void func_0008E357(int, int);
 void func_0008E3A7(int, int);
 void func_0008E3F7(int, int);
 void func_0008E649(int);
-void func_0008E7AE(int);
 void func_0008EAA7(int);
 void func_0008EB25(int);
 void func_0008EBFD(int);
@@ -574,14 +573,6 @@ void func_0008E7AE(int a1)
 {
     if ((short)((unsigned short)(unsigned char)*(signed char *)((char *)a1)) != *(short *)D_001A9B42) return;
     (*(short *)D_001A9B3C)++;
-}
-
-int func_0008E7E0(int a1, short a2)
-{
-    *(short *)D_001A9B42 = *(int *)&a2;
-    *(short *)D_001A9B3C = 0;
-    func_0008E3F7(a1, (int)func_0008E7AE);
-    return (int)(short)*(short *)D_001A9B3C;
 }
 
 int func_0008E8E9(int a1)

@@ -33,6 +33,7 @@ extern void func_00031B47(int, int);
 extern void func_00050069(int);
 void func_0002C0A8(int);
 void func_0002CAB0(int);
+#pragma dagger slots func_0002CB34 a1 16 a2 12 a3 4 l_14 8
 
 int func_0002B26B(int a1)
 {
@@ -507,12 +508,12 @@ L2CB1B:;
     goto L2CAE1;
 }
 
-void func_0002CB34(int a1, int a2, short a3)
+void func_0002CB34(int a1, int a2, int a3)
 {
     int l_14;
 
     l_14 = func_00030A23(a1, 6, (int)(short)*(short *)((char *)a2 + 28));
-    if (((int)(short)(*(int *)&a3 & 64)) == 0) goto L2CB97;
+    if (((int)(short)(a3 & 64)) == 0) goto L2CB97;
     if (((int)(short)(*(short *)((char *)l_14 + 2) & 64)) != 0) goto L2CB95;
     func_0002C5ED(a1, l_14, 1);
     *(signed char *)((char *)l_14 + 2) |= 64;

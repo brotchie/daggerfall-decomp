@@ -70,8 +70,9 @@ extern int func_0014AA92();
 extern int func_0014B1C7();
 extern int func_0014B45B();
 extern unsigned char func_0002021B(int, int);
-extern void func_000231F5(int, int);
 extern void func_00050069(int);
+extern void func_0007E815(int, int);
+extern void func_0007EB0B(int, int);
 extern void func_0008DEB4(int, int, int, int, int, int, int);
 extern void func_0008DFA1(int, int, int, int, int, int, int);
 extern void func_0008E3F7(int, int);
@@ -82,6 +83,8 @@ int func_00023EC2(int, int, int);
 void func_00021B04(int);
 void func_00021D97(int);
 void func_00022174(int);
+void func_000231F5(int, int);
+#pragma dagger slots func_000231F5 a1 12 a2 4 l_28 24 l_24 20 l_20 16 l_18 8
 
 int func_000219B8(int a1, int a2, int a3)
 {
@@ -759,6 +762,27 @@ L231AD:;
     *(int *)D_00196D5C = *(int *)((char *)a1 + 15);
 L231E0:;
     return (int)(short)*(short *)D_00196D64;
+}
+
+void func_000231F5(int a1, int a2)
+{
+    int l_18;
+{
+    int l_28;
+    int l_24;
+    int l_20;
+
+    if (((int)(unsigned char)*(signed char *)D_001789FA) == 3) goto L23246;
+    if (((int)(unsigned char)*(signed char *)(*(char **)((char *)a1 + 67))) == 1) goto L23239;
+    func_0008E4A8(*(int *)(*(char **)((char *)a1 + 67) + 63), a2);
+    goto L23244;
+L23239:;
+    func_0007EB0B(a1, a2);
+L23244:;
+    return;
+L23246:;
+    func_0007E815(a1, a2);
+}
 }
 
 void func_0002325A(int a1)
