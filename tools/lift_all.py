@@ -396,6 +396,12 @@ def work(va):
             tried_pairs.add(at)
             pairs = [(x, y) for i, x in enumerate(near[:4]) for y in near[i + 1:5]
                      if x >= 0 and y >= 0]
+            if not os.environ.get("LIFT_NOWIDEPAIRS"):
+                # then a little further out, choices close to each other first (two
+                # choices of one statement)
+                more = [(x, y) for i, x in enumerate(near[:7]) for y in near[i + 1:7]
+                        if (x, y) not in pairs and x >= 0 and y >= 0]
+                pairs += sorted(more, key=lambda p_: abs(p_[0] - p_[1]))
             if not os.environ.get("LIFT_NOKNOBPAIRS"):
                 # a nearby choice with a compiler knob
                 pairs += [(x, y) for x in near[:3] for y in func_level]

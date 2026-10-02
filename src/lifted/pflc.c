@@ -146,7 +146,7 @@ L52467:;
 
 void func_0005247B(int a1)
 {
-    unsigned l_1C;
+    int l_1C;
     unsigned short l_20;
     short l_18;
 {

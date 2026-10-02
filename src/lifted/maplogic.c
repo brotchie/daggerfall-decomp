@@ -1021,7 +1021,7 @@ void func_00088281(int a1, int a2)
     int l_20;
     int l_1C;
     int l_18;
-    unsigned l_14;
+    int l_14;
 
     if ((*(unsigned char *)(*(char **)D_00196A80 + 7) & 62) != 0) goto L88307;
     l_20 = 1;

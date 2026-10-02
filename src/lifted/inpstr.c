@@ -55,7 +55,7 @@ int func_0008C2D7(int a1, short a2, short a3, short a4, short a5, short a6)
 {
     int l_24;
     int l_20;
-    unsigned l_14;
+    int l_14;
     unsigned char l_C;
 
     func_0012B2EB();

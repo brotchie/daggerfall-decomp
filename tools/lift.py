@@ -374,19 +374,19 @@ class Func:
                 if not (n == 0 and ins.mnemonic == "mov"):
                     reads.setdefault(off, set()).add(op.size)
                 if ins.mnemonic == "movsx":
-                    sign.setdefault(off, set()).add("s")
+                    sign.setdefault(off, set()).add(("s", op.size))
                 elif ins.mnemonic == "movzx":
-                    sign.setdefault(off, set()).add("u")
+                    sign.setdefault(off, set()).add(("u", op.size))
                 elif ins.mnemonic == "mov" and n == 1 and op.size < 4:
                     nxt = body[k + 1] if k + 1 < len(body) else None
                     prv = body[k - 1] if k else None
                     if nxt is not None and (nxt.mnemonic == "cwde" or
                                             (nxt.mnemonic == "movsx" and op.size == 1)):
-                        sign.setdefault(off, set()).add("s")
+                        sign.setdefault(off, set()).add(("s", op.size))
                     elif (nxt is not None and nxt.mnemonic == "and" and
                           nxt.op_str in ("eax, 0xff", "eax, 0xffff")) or \
                             (prv is not None and prv.mnemonic == "xor"):
-                        sign.setdefault(off, set()).add("u")
+                        sign.setdefault(off, set()).add(("u", op.size))
         if self.ret_slot is not None and self.ret_slot in wide16 and self.ret_type == "int" \
                 and not os.environ.get("LIFT_NOSHORTRET"):
             # a 16-bit value stored whole into the return variable: a short function (its
@@ -417,7 +417,7 @@ class Func:
                 sz = 2
                 if any(ins.mnemonic == "and" and ins.op_str.endswith("0xffff")
                        for ins in body):
-                    sign.setdefault(off, set()).add("u")
+                    sign.setdefault(off, set()).add(("u", 2))
             # Watcom 10 stores a short with the whole register: read only as a word, it is one
             if reads.get(off) == {2} and sizes <= {2, 4} and \
                     not os.environ.get("LIFT_NOSHORTREAD"):
@@ -436,7 +436,9 @@ class Func:
                     self.choices.append(afirst[off] + 0.15625)
                     if afirst[off] + 0.15625 not in self.flips:
                         sz = 2
-            hint = sign.get(off, set())
+            # (a narrower read's extension says nothing about a wider variable's sign)
+            hint = {h for h, hs in sign.get(off, set())
+                    if hs == sz or os.environ.get("LIFT_ANYSIGN")}
             if sz not in (1, 2, 4, 8):
                 raise Unsupported("%d-byte stack slot" % sz)
             t = (UTYPE if hint == {"u"} or (sz == 1 and hint != {"s"}) else STYPE)[sz]
