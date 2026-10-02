@@ -1085,3 +1085,6 @@ Batch **1,888**; build **59.28%**.
   what OW does for the implicit promotions (`*(unsigned short *)x != *(short *)y`). The
   lifter now writes such compares without the `(int)` casts. +15. (Dropping the casts
   everywhere loses 612: they're right almost everywhere else.) Batch **1,905**.
+- **Pre-increments**: an in-place `inc`/`dec` of a stack variable without the dead load of
+  its old value is `++x`/`--x` (Watcom 10 loads the old value only for post-increments),
+  e.g. `if (--n == -1)` is `dec [n]; cmp [n],-1`. +3. Batch **1,908**.

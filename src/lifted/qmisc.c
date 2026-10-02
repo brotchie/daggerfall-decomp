@@ -154,6 +154,34 @@ L306F0:;
     goto L305ED;
 }
 
+void func_000306FE(int a1, int a2, int a3)
+{
+    int l_1C;
+    int l_18;
+    int l_14;
+    int l_10;
+
+    l_1C = *(int *)((char *)a2 + 32);
+    l_14 = (int)(unsigned short)*(short *)((char *)l_1C + 27);
+    l_18 = *(int *)D_00196A9C;
+    l_10 = 0;
+L30737:;
+    if (l_10 < *(int *)D_00196A28) goto L30753;
+    goto L30770;
+L30744:;
+    l_10++;
+    (*(char (**)[17])&l_18)++;
+    goto L30737;
+L30753:;
+    if (((int)(unsigned char)*(signed char *)((char *)l_18 + 12)) == 255) goto L3076E;
+    --l_14;
+    if (l_14 == (-1)) goto L30770;
+L3076E:;
+    goto L30744;
+L30770:;
+    *(signed char *)((char *)l_18 + 7) |= 64;
+}
+
 void func_00030854(int a1)
 {
     int l_20;

@@ -128,7 +128,6 @@ void func_00070191(int);
 void func_000701F1(int);
 void func_00070624(int, unsigned char);
 void func_00070AFA(int);
-#pragma dagger DAGGER_DEADDEF func_000700EE
 #pragma dagger DAGGER_NOSAVES func_00070B9C
 
 int func_0006F484(int a1)
@@ -370,7 +369,7 @@ L7014E:;
     l_1C = l_14;
     l_18 = (int)(unsigned char)*(signed char *)((char *)(a2 + l_20));
 L70161:;
-    l_20++;
+    ++l_20;
     if (((int)(unsigned char)*(signed char *)((char *)(a2 + l_20))) != 255) goto L70111;
     *(int *)((char *)a1) = l_18;
     return l_1C;

@@ -57,6 +57,7 @@ extern void func_00050069(int);
 void func_0001DAED(int);
 void func_0001DC12(int);
 void func_0001DD39(int);
+void func_0001E0C6(int, int);
 void func_0001E3D3(int, int);
 #pragma aux func_000A0ED9 parm routine [];
 
@@ -285,6 +286,36 @@ L1E2D0:;
     *(short *)(*(char **)((char *)a1 + 16) + 39) = 64000;
     func_000A00CB(*(int *)D_00196AAC, (int)D_00196AB0, 10);
     func_000A00CB(*(int *)D_00196AAC, (int)D_0019676C, 128);
+}
+
+void func_0001E34D(int a1, int a2, int a3)
+{
+    int l_18;
+    int l_14;
+    int l_10;
+
+    l_18 = *(int *)D_00196A9C;
+    l_10 = 0;
+    l_14 = l_10;
+L1E377:;
+    if (l_14 < *(int *)D_00196A28) goto L1E393;
+    goto L1E3C1;
+L1E384:;
+    l_14++;
+    (*(char (**)[17])&l_18)++;
+    goto L1E377;
+L1E393:;
+    if (((int)(unsigned char)*(signed char *)((char *)l_18 + 12)) != a2) goto L1E3BF;
+    --a3;
+    if (a3 != (-1)) goto L1E3B9;
+    func_0001E0C6(a1, l_10);
+    return;
+L1E3B9:;
+    l_10++;
+L1E3BF:;
+    goto L1E384;
+L1E3C1:;
+    func_0001E0C6(a1, 0);
 }
 
 void func_0001E3D3(int a1, int a2)

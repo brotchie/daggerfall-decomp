@@ -27,7 +27,6 @@ extern int func_0003B1F3(int);
 extern int func_0004BB64(int);
 extern int func_0005A442(unsigned char);
 extern int func_00069938(int, int, int);
-extern int func_0006AE87(int, int);
 extern int func_0006CB53(int, int);
 extern int func_0006CD10(int, int, int);
 extern int func_0006CDAB(int);
@@ -43,6 +42,7 @@ extern int func_000A1023();
 extern int func_0012DB50();
 extern void func_0006A907(int);
 extern void func_0006ABA8(void);
+int func_0006AE87(int, int);
 void func_0006B0ED(void);
 void func_0006B24F(void);
 
@@ -133,6 +133,20 @@ L6AE43:;
     *(short *)D_0014292C += 8;
 L6AE7B:;
     goto L6AE3B;
+}
+
+int func_0006AE87(int a1, int a2)
+{
+L6AE9A:;
+    --a2;
+    if (a2 == (-1)) goto L6AEBF;
+    a1 += func_000A0DF4(a1) + 1;
+    if (*(signed char *)((char *)a1) != 0) goto L6AEBD;
+    a1++;
+L6AEBD:;
+    goto L6AE9A;
+L6AEBF:;
+    return a1;
 }
 
 void func_0006B072(unsigned char a1, int a2)

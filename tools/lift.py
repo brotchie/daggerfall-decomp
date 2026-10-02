@@ -1146,6 +1146,16 @@ class Func:
                 if self.reg_used_later(full_r):
                     self.post_expr("%s%s" % (lv, "++" if m == "inc" else "--"), full_r, d.size)
                     return
+            dead_load = prev is not None and prev.mnemonic == "mov" and prev.operands and \
+                prev.operands[0].type == cx.X86_OP_REG and \
+                re.sub(r"^\w+ ptr ", "", prev.op_str.split(", ", 1)[1]) == \
+                re.sub(r"^\w+ ptr ", "", ins.op_str)
+            if m in ("inc", "dec") and not dead_load and ebp_slot(ins, d) is not None and \
+                    not os.environ.get("LIFT_NOPREINC"):
+                # no load of the old value first: Watcom 10 compiled a pre-increment (a
+                # post-increment statement reads the old value: mov eax,[x]; inc [x])
+                self.emit("%s%s;" % ("++" if m == "inc" else "--", lv))
+                return
             self.emit({"inc": "%s++;", "dec": "%s--;", "neg": "%s = -%s;", "not": "%s = ~%s;"}[m]
                       % ((lv,) if m in ("inc", "dec") else (lhs, lv)))
             return

@@ -389,7 +389,7 @@ L10E35:;
     if (*(int *)((char *)l_20 + 4) != 0) goto L10E58;
     if (*(signed char *)D_00132F58 == 0) goto L10E7C;
 L10E58:;
-    (*(int *)((char *)l_20 + 8))++;
+    ++(*(int *)((char *)l_20 + 8));
     if (*(int *)((char *)l_20 + 8) == 1) goto L10E6B;
     func_00050069((int)D_001700A0);
 L10E6B:;
