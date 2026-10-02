@@ -939,3 +939,14 @@ Batch **1,670**; build **1,671 functions, 47.90%**.
   give the same result). +7.
 
 Batch **1,679**; build **1,680 functions, 48.31%**.
+
+## 2026-10-02: post-increments everywhere, int parameters read as chars
+
+- `arr[G++] = x` (`mov edx,[G]; inc [G]; shl edx,2; ...`): post-increments used as values
+  now work through any register and with `inc`/`dec` and word operands, not just
+  `mov eax,[p]; add [p],K`. +18.
+- A parameter spilled as a dword is never a `char` (OW spills `char` parameters as bytes):
+  it is an `int` read through `(char)` casts; callers still see the narrow type they
+  convert to. +18.
+
+Batch **1,715**.

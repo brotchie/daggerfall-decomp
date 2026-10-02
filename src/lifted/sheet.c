@@ -53,6 +53,7 @@ extern char D_0019626F[];
 extern char D_00196271[];
 extern char D_00196272[];
 extern char D_00196274[];
+extern char D_00196279[];
 extern char D_0019963C[];
 extern char D_00199644[];
 extern char D_001A4A14[];
@@ -60,7 +61,6 @@ extern char D_001A4A14[];
 extern int func_000392AD(void);
 extern int func_0003B1F3(int);
 extern int func_0003B436(void);
-extern int func_0003C3A8(int);
 extern int func_0003C6F1(void);
 extern int func_000417C8(int);
 extern int func_00055748(void);
@@ -99,6 +99,8 @@ extern void func_0007DDC9(int);
 extern void func_0007F1E3(int);
 extern void func_0008C566(int, short);
 extern void func_0008E3F7(int, int);
+int func_0003C3A8(int);
+void func_0003C5A4(int);
 #pragma aux func_000A0ED9 parm routine [];
 #pragma dagger DAGGER_DEADDEF func_0003C8B2
 #pragma dagger KKND_CONFREV func_0003C010
@@ -268,6 +270,14 @@ L3C356:;
     func_0003EC2A(l_24, 1);
 }
 
+int func_0003C3A8(int a1)
+{
+    if (a1 >= 32) goto L3C3D8;
+    return (1 << a1) & *(int *)((char *)*(int *)D_00195BE0 + 80);
+L3C3D8:;
+    return (1 << (a1 - 32)) & *(int *)((char *)*(int *)D_00195BE0 + 84);
+}
+
 void func_0003C400(void)
 {
     int l_18;
@@ -319,6 +329,20 @@ void func_0003C4DE(void)
     return;
 L3C50B:;
     func_0003EC2A(l_18, 1);
+}
+
+void func_0003C53A(int a1)
+{
+    *(signed char *)D_0019626C = *(signed char *)&a1 - 13;
+    if ((*(unsigned char *)D_001940D9 & 4) == 0) goto L3C580;
+    if (((int)(unsigned char)(*(signed char *)D_0012AC00 & 2)) == 0) goto L3C57E;
+    if (((int)(unsigned char)(*(signed char *)D_00196279 & 2)) == 0) goto L3C580;
+L3C57E:;
+    goto L3C592;
+L3C580:;
+    func_0003F09F((int)(short)((int)(unsigned char)*(signed char *)D_0019626C), 1);
+L3C592:;
+    func_0003C5A4(a1);
 }
 
 void func_0003C5A4(int a1)

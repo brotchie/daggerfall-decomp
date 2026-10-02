@@ -103,6 +103,11 @@ L90F79:;
     *(int *)D_00195BE8 = -1751672937;
 }
 
+void func_0009114E(int a1)
+{
+    *(signed char *)((char *)*(int *)D_00195BE0 + 130) = *(signed char *)&a1 - 35;
+}
+
 void func_0009117A(void)
 {
     int l_1C;

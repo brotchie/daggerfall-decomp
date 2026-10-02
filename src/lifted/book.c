@@ -17,6 +17,7 @@ extern char D_0014294C[];
 extern char D_001757A8[];
 extern char D_001757AF[];
 extern char D_001757C1[];
+extern char D_001757CE[];
 extern char D_001757D7[];
 extern char D_0017D1E6[];
 extern char D_00187CA8[];
@@ -124,6 +125,13 @@ L5A1A5:;
     *(short *)D_00190D66 = 0;
     *(short *)D_00190D64 = 0;
     *(signed char *)D_001903A4 = 0;
+}
+
+void func_0005A1C8(int a1)
+{
+    func_000A0ED9(218, (int)D_001757A8);
+    func_000A0F5C((int)D_001903A4, (int)D_001757CE, a1);
+    *(int *)(D_00199C2C + (((int)(short)(*(short *)D_00199D5E)++) << 2)) = func_0006CB53((int)D_001903A4, 0);
 }
 
 void func_0005A230(void)

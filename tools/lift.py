@@ -377,6 +377,12 @@ class Func:
         # a parameter's declared type is what the callers convert their arguments to
         ct = caller_types().get(self.va) if not os.environ.get("LIFT_NOCALLERTYPES") else None
         self.sig_types = [self.slot_type.get(off, "int") for _r, off, _s in self.params]
+        # A parameter spilled as a dword is not a char (OW spills those as bytes): an int
+        # read through (char) casts
+        for _r, off, spill in self.params:
+            if spill == 4 and self.slot_type.get(off) in ("signed char", "unsigned char") and \
+                    not os.environ.get("LIFT_CHARPARM4"):
+                self.slot_type[off] = "int"
         # A parameter spilled as a dword and only read as a word is a short, or an int read
         # through (short) casts; they differ in where the frame puts it: a choice point at
         # the spill.

@@ -223,7 +223,6 @@ extern void func_0006CEFC(int, int, int);
 extern void func_0006D873(int, int);
 extern void func_00072AA0(void);
 extern void func_00078C79(void);
-extern void func_0007A3D0(int);
 extern void func_0007B75C(int, int, int);
 extern void func_00086D37(unsigned short);
 extern void func_000876AD(int, int, int, int);
@@ -249,6 +248,7 @@ void func_0007A191(int);
 void func_0007A1FE(void);
 void func_0007A23E(int);
 void func_0007A325(int);
+void func_0007A3D0(int);
 void func_0007A42B(int);
 void func_0007A4B3(void);
 void func_0007A4F9(void);
@@ -544,6 +544,17 @@ L7A38B:;
     return;
 L7A3BC:;
     *(int *)((char *)l_1C + 112) = 0;
+}
+
+void func_0007A3D0(int a1)
+{
+    switch (*(unsigned char *)((char *)a1)) {
+case 18:
+case 33:
+case 44:
+    *(int *)((char *)(int)(*(char **)D_00195C44 + ((*(int *)D_00195B84)++ << 2))) = *(int *)((char *)a1 + 31);
+default:;
+}
 }
 
 void func_0007A42B(int a1)

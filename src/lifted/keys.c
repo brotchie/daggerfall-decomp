@@ -7,8 +7,13 @@ extern char D_00152A20[];
 extern char D_00152A24[];
 extern char D_00152A30[];
 extern char D_00152A31[];
+extern char D_00170E38[];
+extern char D_0017D1CA[];
+extern char D_0017D1EE[];
+extern char D_001903A4[];
 extern char D_00190484[];
 extern char D_00195EB0[];
+extern char D_00196276[];
 extern char D_00196279[];
 extern char D_00199704[];
 extern char D_001A5B24[];
@@ -16,7 +21,19 @@ extern char D_001A5B26[];
 extern char D_001A5B2C[];
 extern char D_001A5B2E[];
 
+extern int func_000A0ED9(int, int);
+extern int func_000A0F5C(int, ...);
+extern void func_0007CB4F(int);
 void func_00042E8C(int);
+#pragma aux func_000A0ED9 parm routine [];
+
+void func_00042E24(int a1)
+{
+    *(signed char *)D_00196276 = (*(signed char *)D_00196276 + *(signed char *)&a1) & 3;
+    func_000A0ED9(231, (int)D_00170E38);
+    func_000A0F5C((int)D_001903A4, *(int *)D_0017D1EE, *(int *)(D_0017D1CA + (((int)(unsigned char)*(signed char *)D_00196276) << 2)));
+    func_0007CB4F((int)D_001903A4);
+}
 
 void func_00042E8C(int a1)
 {

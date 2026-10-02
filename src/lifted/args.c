@@ -51,7 +51,9 @@ extern char D_001917E4[];
 extern char D_00191833[];
 extern char D_00191834[];
 extern char D_00191884[];
+extern char D_00195AC4[];
 extern char D_00195AE8[];
+extern char D_00195BDC[];
 extern char D_00195C50[];
 extern char D_00195C5C[];
 extern char D_00195C94[];
@@ -89,6 +91,7 @@ extern int func_00073B3E(int);
 extern int func_000843E0(int, short, short, int);
 extern int func_000845F1(int, short, short, int);
 extern int func_0008523E(unsigned short, int, int);
+extern int func_0008DCE3(int, int, int);
 extern int func_0009DA1C(int, int);
 extern int func_0009DAEE(int, ...);
 extern int func_0009DB11();
@@ -424,6 +427,53 @@ default:
 L843CC:;
     return 0;
 }
+}
+
+int func_00084480(int a1, int a2, int a3)
+{
+    int l_14;
+
+    l_14 = func_0008DCE3(a1, 0, 0);
+    *(signed char *)((char *)l_14) = 7;
+    *(short *)((char *)l_14 + 27) = a2;
+    *(short *)((char *)l_14 + 23) = a3;
+    *(short *)((char *)l_14 + 19) = 8000;
+    *(int *)((char *)l_14 + 31) = *(int *)((char *)*(int *)D_00195AC4 + 31) + ((int)(unsigned short)(*(short *)((char *)*(int *)D_00195BDC + 37))++);
+    return l_14;
+}
+
+int func_000844FB(int a1, int a2)
+{
+    int l_20;
+    int l_1C;
+    int l_18;
+
+    l_1C = (a2 & 31) - 2;
+    if (l_1C == 13) goto L84526;
+    if (l_1C != 14) goto L84548;
+L84526:;
+    l_18 = 659;
+    l_20 = func_0008DCE3(a1, 0, l_18);
+    *(short *)((char *)l_20 + 19) = 0;
+    goto L84560;
+L84548:;
+    l_20 = func_0008DCE3(a1, 0, 0);
+    *(short *)((char *)l_20 + 19) = 0;
+L84560:;
+    *(signed char *)((char *)l_20) = 34;
+    *(short *)((char *)l_20 + 29) = 0;
+    *(short *)((char *)l_20 + 19) = 0;
+    *(short *)((char *)l_20 + 27) = a2;
+    if (l_1C == 9) goto L8458E;
+    if (l_1C != 16) goto L845B3;
+L8458E:;
+    *(int *)((char *)l_20 + 31) = *(int *)((char *)*(int *)D_00195AC4 + 31) + ((int)(unsigned short)(*(short *)((char *)*(int *)D_00195BDC + 39))++);
+    goto L845D6;
+L845B3:;
+    *(int *)((char *)l_20 + 31) = *(int *)((char *)*(int *)D_00195AC4 + 31) + ((int)(unsigned short)(*(short *)((char *)*(int *)D_00195BDC + 37))++);
+L845D6:;
+    *(short *)((char *)l_20 + 21) = 1;
+    return l_20;
 }
 
 void func_000847BC(int a1, int a2)
