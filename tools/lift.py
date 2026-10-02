@@ -704,6 +704,28 @@ class Func:
         kind = self.flags[0]
         a, b = self.flags[1], self.flags[2]
         if kind == "cmp":
+            if a.size == 1 and b.size == 1 and not os.environ.get("LIFT_NOBYTECMP"):
+                # a byte compare: both operands the same char type (mixing signed and
+                # unsigned char promotes both to int)
+                def ctype(e):
+                    if re.fullmatch(r"[al]_?\w+", e.text):
+                        t = self.var_type(e.text)
+                        if t in ("signed char", "unsigned char"):
+                            return t
+                    m_ = re.match(r"\*\((signed char|unsigned char) \*\)", e.text)
+                    return m_.group(1) if m_ else None
+                want = ("unsigned char" if uns else "signed char") if opr not in ("==", "!=") \
+                    else (ctype(b) or ctype(a) or "unsigned char")
+
+                def conv(e):
+                    t = ctype(e)
+                    if t == want or e.text.lstrip("-").isdigit():
+                        return e
+                    if e.atom and re.match(r"\*\((signed|unsigned) char \*\)", e.text):
+                        return E(re.sub(r"^\*\((signed|unsigned) char \*\)", "*(%s *)" % want,
+                                        e.text), 1, True)
+                    return E("(%s)%s" % (want, e.p()), 1, True)
+                return "%s %s %s" % (conv(a).p(), opr, conv(b).p())
             if a.size == 2 and b.size == 2 and not a.atom:
                 # a 16-bit register value against a 16-bit operand: cmp ax, word [x], with the
                 # jump's signedness
@@ -1284,7 +1306,11 @@ class Func:
             try:
                 sw = self.parse_ctree(j.address, t, w, by_addr, nxt)
             except Unsupported:
-                if w == 4:
+                # not a compare tree after all (a local compared, then used again)
+                if any(x.address != i.address and x.address != j.address and
+                       x.address not in self.cskip
+                       for x in self.ins for op in x.operands if ebp_slot(x, op) == t) \
+                        or w == 4:
                     self.cskip = saved
                     continue
                 raise
