@@ -394,6 +394,7 @@ class Func:
                 self.after_return = True
                 return
             self.emit("%s = %s;" % (lhs, v.text))
+            self.regs = {}          # -od: nothing survives into the next statement
             return
         if m in ("movsx", "movzx"):
             d, s = ops
@@ -526,13 +527,23 @@ class Func:
                 self.skip_add = True
             else:
                 args = []
-                for r in PARM_REGS:
-                    if r in self.regs:
+                sig = signature(op.imm) if op.imm in IMG.funcs and \
+                    IMG.le.obj_of_va(op.imm).index == 1 else None
+                if sig is not None:
+                    # the callee's own prologue says how many register arguments it takes
+                    for r in PARM_REGS[:len(sig[1])]:
+                        if r not in self.regs or self.regs[r] is self.pending:
+                            raise Unsupported("call argument %s not loaded" % r)
                         args.append(self.regs[r].text)
-                    else:
-                        break
-                if len(args) < len([r for r in PARM_REGS if r in self.regs]):
-                    raise Unsupported("call arguments not in eax, edx, ebx, ecx order")
+                else:
+                    for r in PARM_REGS:
+                        if r in self.regs and self.regs[r] is not self.pending:
+                            args.append(self.regs[r].text)
+                        else:
+                            break
+                    if len(args) < len([r for r in PARM_REGS if r in self.regs
+                                        and self.regs[r] is not self.pending]):
+                        raise Unsupported("call arguments not in eax, edx, ebx, ecx order")
                 if self.pushes:
                     if len(args) < 4:
                         raise Unsupported("stack arguments without cleanup (callee pops)")
@@ -608,10 +619,38 @@ class Func:
         for g in sorted(self.globals):
             decl.append("extern char %s[];" % g)
         for f in sorted(self.calls - self.vcalls - {name}):
-            decl.append("extern int %s();" % f)
+            decl.append(globals()["decl"](f))
         for f in sorted(self.vcalls):
             decl.append("extern int %s(int, ...);" % f)
         return "\n".join(decl + [""] + lines) + "\n"
+
+
+SIGS = {}
+
+
+def signature(va):
+    """(return type, [param types]) of a game function from its prologue and slot types, or
+    None if the lifter can't read its frame. Every caller declares a callee the same way, so
+    lifted functions can share a file."""
+    if va not in SIGS:
+        try:
+            f = Func(va)
+            f.prologue()
+            f.type_slots()
+            ret = "void" if f.void else "int"
+            # a return statement decides void-ness during lifting; the epilogue tells us now
+            SIGS[va] = (ret, [f.slot_type.get(off, "int") for _r, off, _s in f.params])
+        except Unsupported:
+            SIGS[va] = None
+    return SIGS[va]
+
+
+def decl(name):
+    va = int(name[5:], 16)
+    sig = signature(va) if va in IMG.funcs else None
+    if sig is None:
+        return "extern int %s();" % name
+    return "extern %s %s(%s);" % (sig[0], name, ", ".join(sig[1]) or "void")
 
 
 def init():

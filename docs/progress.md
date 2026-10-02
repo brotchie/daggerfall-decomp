@@ -409,3 +409,21 @@ The batch found compiler differences that hand matching would have taken weeks t
 Lesson for the workflow: fix compiler differences only once the batch shows a cluster, A/B
 each patch across the whole batch with its env switch, and timebox the debugging. The
 debugger is the fast way to find which pass drops an instruction.
+
+## 2026-10-01: lifted functions in the build
+
+- **One signature per function.** `lift.signature()` derives each game function's return type
+  and parameter types from its own prologue and slot types, and every caller declares it that
+  way. This turned up a lifter bug that unprototyped calls had hidden (an earlier call's result
+  passed as an extra argument): argument counts now come from the callee's signature, and
+  registers are cleared after every store, since nothing survives a statement at `-od`. With
+  real prototypes the batch matches **688** (674 without).
+- `tools/promote_lifted.py` writes every matched lifted function into `src/lifted/<unit>.c`,
+  grouped by original unit, leaving out anything hand-written in `src/*.c`. `src/lifted/` is
+  generated: to work on a function by hand, move it to `src/<unit>.c`.
+
+**The build: 692 / 2,297 game functions, 52,358 / 580,076 bytes (9.03%), `build/FALL.EXE:
+OK`** (also with `--blank`).
+
+Loop from here: `tools/lift_all.py` (2 s), fix the top cluster in the lifter or compiler,
+`tools/promote_lifted.py`, `tools/build-and-verify.sh`, commit.
