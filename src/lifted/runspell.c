@@ -29,7 +29,7 @@ extern int func_0005AE5F(int);
 extern int func_0005B905(int, int, int, int);
 extern int func_0007CBA1(int);
 extern int func_0007D6AE(int, int);
-extern int func_0008ADC3();
+extern int func_0008ADC3(int, int, int, int, int, int);
 extern int func_0008DA91(int);
 extern int func_0008DCE3(int, int, int);
 extern int func_0008E6C5(int, int, int);

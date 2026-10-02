@@ -20,6 +20,7 @@ extern char D_00196D6C[];
 extern char D_00196D70[];
 extern char D_00196D78[];
 
+extern int func_000249CE(int, int);
 extern int func_00024C88(int);
 extern int func_00069938(int, int, int);
 extern int func_0007D6AE(int, int);
@@ -30,7 +31,8 @@ extern int func_000CDD81();
 extern int func_000CE7A7();
 extern int func_0012B136();
 extern int func_0012B2D3();
-extern void func_000248FE(int);
+int func_0002482A(int);
+void func_000248FE(int);
 
 int func_0002482A(int a1)
 {
@@ -66,6 +68,33 @@ L248E6:;
     l_18 = 1;
 L248F2:;
     goto L24899;
+}
+
+void func_000248FE(int a1)
+{
+    a1 = func_0002482A(a1);
+    *(short *)D_00190D64 = 0;
+    a1 = func_000249CE(a1, 0);
+    *(int *)D_00190DE4 = a1;
+L24938:;
+    if (((int)(unsigned char)(*(signed char *)(D_00178630 + ((int)(unsigned char)(*(signed char *)((char *)a1) + 1))) & 32)) != 0) goto L2495D;
+    if (*(signed char *)((char *)a1) != 0) goto L2495F;
+L2495D:;
+    return;
+L2495F:;
+    (*(short *)D_00190D64)++;
+    a1 = func_000249CE(func_0002482A(a1), 1);
+L2497B:;
+    if (((int)(unsigned char)(*(signed char *)(D_00178630 + ((int)(unsigned char)(*(signed char *)((char *)a1) + 1))) & 224)) != 0) goto L249A0;
+    if (*(signed char *)((char *)a1) != 0) goto L249A2;
+L249A0:;
+    goto L249BF;
+L249A2:;
+    a1 = func_000A1079(a1, 10, 2000);
+    a1++;
+    goto L2497B;
+L249BF:;
+    goto L24938;
 }
 
 void func_00024AB1(void)

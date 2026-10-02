@@ -13,7 +13,7 @@ extern char D_00195BF4[];
 extern char D_001961F5[];
 extern char D_001A3AA4[];
 
-extern int func_0004C274();
+extern int func_0004C274(unsigned char, unsigned char, unsigned char, unsigned char, int);
 extern int func_00067A47(int);
 extern int func_00067C04(int);
 extern int func_0007D6AE(int, int);

@@ -159,6 +159,18 @@ def main():
         print("\ntop first differences (ours | original):")
         for k, n in c.most_common(25):
             print("  %5d  %s" % (n, k))
+    # the same, weighted by function size: big functions fail on their first mismatch
+    with open(os.path.join(ROOT, "config", "functions.csv"), newline="") as f:
+        size = {r["name"]: int(r["size"]) for r in csv.DictReader(f)}
+    cb = Counter()
+    for r in results:
+        if r[1] == "diff":
+            cb[re.sub(r"^\d+ bytes \(ours \d+, target \d+\): ", "", r[2])[:110]] += size[r[0]]
+        elif r[1] in ("unsupported", "error"):
+            cb["[%s] %s" % (r[1], re.sub(r"0x[0-9a-f]+|\d+", "N", r[2])[:90])] += size[r[0]]
+    print("\ntop causes by bytes of code blocked:")
+    for k, n in cb.most_common(25):
+        print("  %7d  %s" % (n, k))
 
 
 if __name__ == "__main__":

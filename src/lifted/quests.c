@@ -19,7 +19,7 @@ extern char D_001A5BE4[];
 
 extern int func_000192EE(short);
 extern int func_0004BDB7(int);
-extern int func_0004C274();
+extern int func_0004C274(unsigned char, unsigned char, unsigned char, unsigned char, int);
 extern int func_0004CFA7(int, int);
 extern int func_0007D6AE(int, int);
 extern int func_0009DC25();

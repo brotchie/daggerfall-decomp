@@ -35,6 +35,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from le import LE, SRC_OFF32  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+GAME_END = 0x9DA1C
 EXE = os.path.join(ROOT, "orig", "1.07.213", "FALL.EXE")
 PARM_REGS = ["eax", "edx", "ebx", "ecx"]
 SAVE_ORDER = ["ebx", "ecx", "edx", "esi", "edi"]
@@ -136,6 +137,7 @@ class Func:
         self.ret_slot = None
         self.void = True
         self.after_return = False
+        self.stale = set()       # registers readable but not implicit call arguments
 
     # ---- frame -------------------------------------------------------------------------
     def prologue(self):
@@ -170,8 +172,13 @@ class Func:
         if len(free) >= 2 and len(self.params) != len(free):
             raise Unsupported("prologue: %d free registers but %d spills" % (len(free), len(self.params)))
         self.body_start = i
-        if ins[-1].mnemonic != "ret" or ins[-1].op_str:
-            raise Unsupported("epilogue: not a plain ret")
+        if ins[-1].mnemonic != "ret":
+            raise Unsupported("epilogue: no ret")
+        # `ret N`: N/4 more parameters on the stack ([ebp+8], [ebp+12], ...), which Watcom
+        # only uses once all four argument registers are taken
+        self.nstack = int(ins[-1].op_str, 16) // 4 if ins[-1].op_str else 0
+        if self.nstack and len(self.params) != 4:
+            raise Unsupported("stack parameters with free argument registers")
         j = len(ins) - 2
         while ins[j].mnemonic == "pop":
             j -= 1
@@ -300,6 +307,10 @@ class Func:
             if self.size_of[t] == size:
                 return name
             return "*(%s *)&%s" % (STYPE[size], name)
+        if base == "ebp" and not index and disp >= 8 and (disp - 8) % 4 == 0 \
+                and (disp - 8) // 4 < self.nstack:
+            name = "a%d" % (5 + (disp - 8) // 4)
+            return name if size == 4 else "*(%s *)&%s" % (STYPE[size], name)
         if base == "ebp":
             raise Unsupported("stack parameter [ebp+%d]" % disp)
         fx = fixup_at(ins, ins.disp_offset) if ins.disp_size == 4 else None
@@ -368,6 +379,7 @@ class Func:
         self.out.append("    " + line)
 
     def set_reg(self, name, expr):
+        self.stale.discard(name)
         cur = self.regs.get(name)
         if self.pending is not None and cur is self.pending and expr is not cur:
             self.flush_pending()
@@ -438,7 +450,11 @@ class Func:
                 self.after_return = True
                 return
             self.emit("%s = %s;" % (lhs, v.text))
-            self.regs = {}          # -od: nothing survives into the next statement
+            # -od: nothing survives into the next statement, except the value just stored,
+            # which an enclosing assignment may reuse (a = b = x)
+            src = subreg(ins.reg_name(s.reg))[0] if s.type == cx.X86_OP_REG else None
+            self.regs = {src: v} if src else {}
+            self.stale = {src} if src else set()
             return
         if m in ("movsx", "movzx"):
             d, s = ops
@@ -607,48 +623,48 @@ class Func:
             name = sym(op.imm)
             nxt = self.body[self.k + 1] if self.k + 1 < len(self.body) else None
             cleanup = nxt is not None and nxt.mnemonic == "add" and nxt.op_str.startswith("esp, ")
+            loaded = [r for r in PARM_REGS if r in self.regs and self.regs[r] is not self.pending
+                      and r not in self.stale]
+            sig = signature(op.imm) if op.imm in IMG.funcs and \
+                IMG.le.obj_of_va(op.imm).index == 1 and op.imm < GAME_END else None
             pops = callee_pops(op.imm)
-            loaded = [r for r in PARM_REGS if r in self.regs and self.regs[r] is not self.pending]
-            if pops and self.pushes and not loaded:
-                # stack convention, callee pops (`#pragma aux ... parm routine []`)
-                if pops // 4 != len(self.pushes):
-                    raise Unsupported("pushes do not match callee's ret %d" % pops)
-                args = [s.text for s in reversed(self.pushes)]
-                self.scalls[name] = pops // 4
-            elif self.pushes and cleanup:
-                # cdecl / varargs callee: every argument is on the stack, caller pops
-                n = int(nxt.op_str.split(", ")[1], 16) // 4
-                if n != len(self.pushes):
-                    raise Unsupported("stack cleanup does not match pushes")
-                args = [s.text for s in reversed(self.pushes)]
+            # The callee's convention says how many register and stack arguments it takes; the
+            # most recent pushes are its stack arguments, and other pushes and registers belong
+            # to an enclosing call (f(g(x), 1, 2) evaluates f's later arguments first).
+            if self.pushes and cleanup:
+                nreg, nstack = 0, int(nxt.op_str.split(", ")[1], 16) // 4   # cdecl / varargs
                 self.vcalls.add(name)
                 self.skip_add = True
-            else:
-                args = []
-                sig = signature(op.imm) if op.imm in IMG.funcs and \
-                    IMG.le.obj_of_va(op.imm).index == 1 else None
-                if sig is not None:
-                    # the callee's own prologue says how many register arguments it takes
-                    for r in PARM_REGS[:len(sig[1])]:
-                        if r not in self.regs or self.regs[r] is self.pending:
-                            raise Unsupported("call argument %s not loaded" % r)
-                        args.append(self.regs[r].text)
-                else:
-                    for r in PARM_REGS:
-                        if r in self.regs and self.regs[r] is not self.pending:
-                            args.append(self.regs[r].text)
-                        else:
-                            break
-                    if len(args) < len([r for r in PARM_REGS if r in self.regs
-                                        and self.regs[r] is not self.pending]):
-                        raise Unsupported("call arguments not in eax, edx, ebx, ecx order")
-                if self.pushes:
-                    if len(args) < 4:
-                        raise Unsupported("stack arguments without cleanup (callee pops)")
-                    args += [s.text for s in reversed(self.pushes)]
+            elif sig is not None:
+                nreg, nstack = min(4, len(sig[1])), max(0, len(sig[1]) - 4)
                 self.calls.add(name)
-            self.pushes = []
-            self.finish_call(E("%s(%s)" % (name, ", ".join(args)), 4, atom=True), len(args))
+            elif pops and "eax" not in loaded:
+                nreg, nstack = 0, pops // 4          # stack only, callee pops: #pragma aux
+                self.scalls[name] = nstack
+            elif pops:
+                nreg, nstack = 4, pops // 4          # four registers, then the stack
+                self.calls.add(name)
+            else:
+                nreg, nstack = 0, 0
+                for r in PARM_REGS:
+                    if r in loaded:
+                        nreg += 1
+                    else:
+                        break
+                self.calls.add(name)
+            if nstack > len(self.pushes):
+                raise Unsupported("call needs %d stack arguments, %d pushed" % (nstack, len(self.pushes)))
+            args = []
+            for r in PARM_REGS[:nreg]:
+                if r not in self.regs:
+                    raise Unsupported("call argument %s not loaded" % r)
+                if self.regs[r] is self.pending:
+                    self.pending = None              # nested call: f(g(x))
+                args.append(self.regs[r].text)
+            if nstack:
+                args += [x.text for x in reversed(self.pushes[-nstack:])]
+                del self.pushes[-nstack:]
+            self.finish_call(E("%s(%s)" % (name, ", ".join(args)), 4, atom=True), nreg)
             return
         if m.startswith("j"):
             tgt = ops[0].imm if ops[0].type == cx.X86_OP_IMM else None
@@ -735,6 +751,8 @@ class Func:
         ps = []
         for k, (reg, off, _sz) in enumerate(self.params):
             ps.append("%s a%d" % (self.slot_type.get(off, "int"), k + 1))
+        for k in range(self.nstack):
+            ps.append("int a%d" % (5 + k))
         # The slot rule (docs/progress.md) gives slots top down: 2-byte locals, the return
         # variable, other locals last to first; so declare locals deepest first.
         locals_ = sorted((o for o in set(self.slot_type) | set(self.arrays)
@@ -778,18 +796,14 @@ POPS = {}
 
 
 def callee_pops(va):
-    """Bytes a stack-convention callee pops (`ret N`, no register parameters), else 0."""
+    """Bytes of stack arguments a callee pops (its `ret N`), else 0. Whether it also takes
+    register arguments is decided at the call site."""
     if va not in POPS:
         n = 0
         if va in IMG.funcs:
-            ins = IMG.insns(va)
-            rets = [i for i in ins if i.mnemonic == "ret" and i.op_str]
+            rets = [i for i in IMG.insns(va) if i.mnemonic == "ret" and i.op_str]
             if rets and all(i.op_str == rets[0].op_str for i in rets):
                 n = int(rets[0].op_str, 16)
-                # register parameters would be spilled from eax/edx/ebx/ecx after the frame
-                head = " ".join("%s %s" % (i.mnemonic, i.op_str) for i in ins[:12])
-                if re.search(r"mov (dword|word|byte) ptr \[ebp - 0x[0-9a-f]+\], (eax|edx|ebx|ecx)", head):
-                    n = 0
         POPS[va] = n
     return POPS[va]
 
@@ -805,7 +819,8 @@ def signature(va):
             f.type_slots()
             ret = "void" if f.void else "int"
             # a return statement decides void-ness during lifting; the epilogue tells us now
-            SIGS[va] = (ret, [f.slot_type.get(off, "int") for _r, off, _s in f.params])
+            SIGS[va] = (ret, [f.slot_type.get(off, "int") for _r, off, _s in f.params]
+                        + ["int"] * f.nstack)
         except Unsupported:
             SIGS[va] = None
     return SIGS[va]

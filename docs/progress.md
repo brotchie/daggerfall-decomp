@@ -528,3 +528,23 @@ The original's unused `g++` on a global is a plain `inc [g]`; only stack variabl
 `mov eax,[x]` first. In `TNPostGets()` the lvalue is a leaf whose address name (`u.addr`) has
 class `CL_ADDR_GLOBAL` for globals (found in the debug compiler after two wrong guesses about
 the tree shape). The keep flag now skips those. Batch **1,072**.
+
+## 2026-10-01: calls by callee convention; stack parameters
+
+- The batch report now also ranks causes **by bytes of code blocked**, since a big function
+  fails on its first mismatch.
+- **Call arguments come from the callee's convention**: register and stack argument counts
+  from its signature, its `ret N` (stack bytes it pops), or a cdecl cleanup. The most recent
+  pushes are its stack arguments. Other pushes and registers belong to an enclosing call,
+  because Watcom evaluates `f(g(x), 1, 2, 3, 4)` as `push 4; mov ecx,3; mov ebx,2; mov edx,1;
+  <g(x) into eax>; call f`, and a register that isn't an argument survives a call
+  (callee-saved). Nested calls use the inner result as `eax`.
+- **Chained assignments** (`a = b = x`): the stored value stays readable after the store, but
+  is never taken as an implicit call argument.
+- **More than four parameters**: `ret N` gives N/4 stack parameters `a5..` read from `[ebp+8]`
+  onwards, included in the signature.
+- Regression check: the previous lifter ran alongside the new one and the reports were
+  diffed. 71 functions had been lost by an over-eager register-parameter test for library
+  callees; fixed, nothing lost now.
+
+Batch **1,083**, unsupported down to 178.

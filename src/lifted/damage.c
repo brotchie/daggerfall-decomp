@@ -26,7 +26,7 @@ extern char D_001997AA[];
 extern int func_0006D13E(int);
 extern int func_0008DCE3(int, int, int);
 extern int func_0008EB88(int);
-extern int func_0009CEC4();
+extern int func_0009CEC4(int, int, int, int, int);
 extern int func_000A0040();
 extern int func_000C1500();
 extern int func_000C808D();
