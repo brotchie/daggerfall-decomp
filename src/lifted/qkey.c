@@ -608,8 +608,6 @@ L2E008:;
 int func_0002E032(int a1, int a2, int a3, int a4, int a5, int a6)
 {
     int l_10;
-{
-    int l_24;
 
     if (((int)(short)*(short *)((char *)a1 + 124)) >= (((int)(short)*(short *)((char *)a1 + 126)) >> 3)) goto L2E084;
     l_10 = a1 + 560;
@@ -670,14 +668,7 @@ L2E28F:;
     if (a4 <= 97) goto L2E29C;
     a4 = 97;
 L2E29C:;
-    if (func_0007D6AE(0, 100) > a4) goto L2E2B6;
-    l_24 = 1;
-    goto L2E2BD;
-L2E2B6:;
-    l_24 = 0;
-L2E2BD:;
-    return l_24;
-}
+    return ((func_0007D6AE(0, 100) <= a4) ? 1 : 0);
 }
 
 void func_0002E2CF(int a1, int a2, int a3, int a4)

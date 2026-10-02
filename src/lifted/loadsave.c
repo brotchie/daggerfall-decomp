@@ -312,16 +312,7 @@ L79B84:;
     *(int *)((char *)l_28 + 67) = (int)(unsigned char)*(signed char *)(*(char **)((char *)a1 + 67));
     *(int *)((char *)l_28 + 39) = *(int *)(*(char **)((char *)a1 + 67) + 31);
 L79BAC:;
-    if (func_000A0B42(*(int *)D_001A4A0C, l_28, *(int *)l_24) == *(int *)l_24) goto L79BCA;
-{
-    int l_34;
-    l_34 = 1;
-    goto L79BD1;
-L79BCA:;
-    l_34 = 0;
-L79BD1:;
-    return l_34;
-}
+    return ((func_000A0B42(*(int *)D_001A4A0C, l_28, *(int *)l_24) != *(int *)l_24) ? 1 : 0);
 }
 }
 

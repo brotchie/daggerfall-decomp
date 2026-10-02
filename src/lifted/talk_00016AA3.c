@@ -16,18 +16,10 @@ void func_00016AA3(int a1)
 {
     int l_1C;
     int l_18;
-{
-    int l_24;
 
     *(signed char *)D_00190D10 = 1;
     if (a1 < 1000) goto L16B11;
-    if (a1 != 1000) goto L16AD6;
-    l_24 = 0;
-    goto L16ADD;
-L16AD6:;
-    l_24 = 6;
-L16ADD:;
-    l_18 = l_24;
+    l_18 = ((a1 == 1000) ? 0 : 6);
     l_18 += func_0007D6AE(0, 5);
     l_1C = func_0006CD6E((int)D_00170404);
     func_000A006E(l_1C, l_18 << 12, 0);
@@ -39,5 +31,4 @@ L16B11:;
 L16B35:;
     func_000A00CB(l_1C, *(int *)D_001965EC, 4096);
     func_0009DEA7(l_1C);
-}
 }

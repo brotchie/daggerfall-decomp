@@ -160,9 +160,6 @@ void func_0006CB02(void);
 
 int func_0006B376(int a1)
 {
-{
-    int l_20;
-
     if (((int)(unsigned char)*(signed char *)D_00196274) != 8) goto L6B39F;
     if (((int)(unsigned char)*(signed char *)D_0019626F) == 15) goto L6B3A1;
 L6B39F:;
@@ -194,14 +191,7 @@ L6B3C7:;
     func_0008E3F7(*(int *)D_00195AC4, (int)func_0006B7EE);
     func_0006B987();
 L6B4E1:;
-    if (((int)(unsigned char)*(signed char *)D_00196274) != 15) goto L6B4F6;
-    l_20 = 1;
-    goto L6B4FD;
-L6B4F6:;
-    l_20 = 0;
-L6B4FD:;
-    return l_20;
-}
+    return ((((int)(unsigned char)*(signed char *)D_00196274) == 15) ? 1 : 0);
 }
 
 void func_0006B510(void)

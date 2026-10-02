@@ -1371,9 +1371,6 @@ int func_000290DD(int a1, int a2)
     int l_20;
     int l_1C;
     int l_18;
-{
-    int l_30;
-    int l_2C;
 
     l_1C = *(int *)((char *)a2 + 47);
     if (l_1C != 0) goto L2910B;
@@ -1434,21 +1431,8 @@ L2924C:;
     if (((int)(unsigned char)*(signed char *)((char *)l_1C)) != 47) goto L29264;
     l_1C = *(int *)((char *)l_1C + 67);
 L29264:;
-    if (*(int *)((char *)l_18 + 31) != *(int *)((char *)l_1C + 31)) goto L2927B;
-    l_2C = 1;
-    goto L29282;
-L2927B:;
-    l_2C = 0;
-L29282:;
-    func_000304C8(a1, a2, 1, l_2C);
-    if (*(int *)((char *)l_18 + 31) != *(int *)((char *)l_1C + 31)) goto L292AC;
-    l_30 = 1;
-    goto L292B3;
-L292AC:;
-    l_30 = 0;
-L292B3:;
-    return l_30;
-}
+    func_000304C8(a1, a2, 1, ((*(int *)((char *)l_18 + 31) == *(int *)((char *)l_1C + 31)) ? 1 : 0));
+    return ((*(int *)((char *)l_18 + 31) == *(int *)((char *)l_1C + 31)) ? 1 : 0);
 }
 
 void func_000292C5(int a1, int a2)

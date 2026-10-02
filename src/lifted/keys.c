@@ -429,7 +429,6 @@ void func_00042E8C(int a1)
 
 int func_00042F0F(int a1)
 {
-
     if (((int)(unsigned char)*(signed char *)(D_00195EB0 + a1)) >= 200) goto L42F6E;
     goto L430AA;
 __dagger_tbl42F3A:;
@@ -447,50 +446,20 @@ case 12:
     return (int)(unsigned char)(*(signed char *)D_0012AC00 & 4);
 case 4:
     func_00042E8C(*(int *)D_00152A20);
-    if (*(int *)D_00152A20 >= 0) goto L4300B;
-{
-    int l_30;
-    int l_2C;
-    int l_28;
-    int l_24;
-    l_24 = 1;
-    goto L43012;
-L4300B:;
-    l_24 = 0;
-L43012:;
-    return l_24;
+    return ((*(int *)D_00152A20 < 0) ? 1 : 0);
 case 5:
     func_00042E8C(*(int *)D_00152A20);
-    if (*(int *)D_00152A20 <= 0) goto L43039;
-    l_28 = 1;
-    goto L43040;
-L43039:;
-    l_28 = 0;
-L43040:;
-    return l_28;
+    return ((*(int *)D_00152A20 > 0) ? 1 : 0);
 case 6:
     func_00042E8C(*(int *)D_00152A24);
-    if (*(int *)D_00152A24 >= 0) goto L43067;
-    l_2C = 1;
-    goto L4306E;
-L43067:;
-    l_2C = 0;
-L4306E:;
-    return l_2C;
+    return ((*(int *)D_00152A24 < 0) ? 1 : 0);
 case 7:
     func_00042E8C(*(int *)D_00152A24);
-    if (*(int *)D_00152A24 <= 0) goto L43092;
-    l_30 = 1;
-    goto L43099;
-L43092:;
-    l_30 = 0;
-L43099:;
-    return l_30;
+    return ((*(int *)D_00152A24 > 0) ? 1 : 0);
 default:
     return 0;
 L430AA:;
     return (int)(unsigned char)*(signed char *)(D_00142308 + ((int)(unsigned char)*(signed char *)(D_00195EB0 + a1)));
-}
 }
 }
 

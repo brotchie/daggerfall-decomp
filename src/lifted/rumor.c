@@ -41,9 +41,6 @@ L13D14:;
 
 void func_00013D2D(int a1)
 {
-{
-    int l_1C;
-
     if (*(int *)D_00178E54 == 0) goto L13D53;
     if (*(int *)D_00178E54 != (-1751672937)) goto L13D55;
 L13D53:;
@@ -52,17 +49,10 @@ L13D55:;
     func_000A0024(*(int *)D_00178E54, (int)D_001702CC, 52);
     *(int *)D_00178E54 = -1751672937;
 L13D73:;
-    if ((*(unsigned char *)D_001940DA & 8) == 0) goto L13D84;
-    l_1C = a1;
-    goto L13D8B;
-L13D84:;
-    l_1C = 0;
-L13D8B:;
-    *(int *)D_00178E54 = l_1C;
+    *(int *)D_00178E54 = (((*(unsigned char *)D_001940DA & 8) != 0) ? a1 : 0);
     *(int *)D_00196474 = a1;
     *(int *)D_00196470 = 320;
     *(signed char *)D_001940DA &= 247;
-}
 }
 
 void func_00013DB6(void)

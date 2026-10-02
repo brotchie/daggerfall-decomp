@@ -298,17 +298,9 @@ L2F334:;
 void func_0002F3FA(int a1)
 {
     int l_18;
-{
-    int l_20;
 
     l_18 = (int)(short)*(short *)D_0014294C;
-    if (((int)(unsigned short)(*(short *)(*(char **)D_00195BF8) & 1)) == 0) goto L2F434;
-    l_20 = 199;
-    goto L2F448;
-L2F434:;
-    l_20 = ((int)(unsigned short)*(short *)(*(char **)D_00195B68 + 2)) - 2;
-L2F448:;
-    *(short *)D_0014294C = l_20;
+    *(short *)D_0014294C = ((((int)(unsigned short)(*(short *)(*(char **)D_00195BF8) & 1)) != 0) ? 199 : ((int)(unsigned short)*(short *)(*(char **)D_00195B68 + 2)) - 2);
     func_000CD53C();
     *(short *)D_0014294C = l_18;
     if (a1 >= 4) goto L2F46E;
@@ -319,7 +311,6 @@ L2F46E:;
     a1 = 32;
 L2F47B:;
     func_00010F9A(a1 << 3);
-}
 }
 
 void func_0002F490(int a1, int a2, int a3)

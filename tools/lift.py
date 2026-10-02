@@ -2309,8 +2309,13 @@ class Func:
                     use = re.sub(r"\b%s\b" % mm.group(1), lambda _m: mm.group(2), use)
                     self.temps.add(int(mm.group(1)[2:], 16))
                     j -= 1
-                if j == i:
+                deepest = max([o for o in self.slot_type if o > 0 and o not in self.temps
+                               and o != off] + [0])
+                if j == i and not (off in self.nested and off > deepest and
+                                   not os.environ.get("LIFT_NOTEMPTERN")):
                     # no argument spilled: an if/else on a variable of its own, as likely
+                    # (unless the slot is in the compiler's temp region, below every
+                    # declared variable)
                     self.temps.discard(off)
                     continue
                 out[j:i + 7] = [use]

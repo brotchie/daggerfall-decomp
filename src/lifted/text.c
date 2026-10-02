@@ -1220,17 +1220,7 @@ L40B6F:;
 
 int func_00040B83(int a1)
 {
-{
-    int l_20;
-
-    if ((((int)(unsigned short)*(short *)((char *)a1 + 27)) >> 7) != 399) goto L40BB3;
-    l_20 = 1;
-    goto L40BBA;
-L40BB3:;
-    l_20 = 0;
-L40BBA:;
-    return l_20;
-}
+    return (((((int)(unsigned short)*(short *)((char *)a1 + 27)) >> 7) == 399) ? 1 : 0);
 }
 
 int func_00040BCD(void)

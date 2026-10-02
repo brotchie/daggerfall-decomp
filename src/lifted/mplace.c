@@ -228,65 +228,22 @@ L25DA9:;
     switch ((unsigned)l_28) {
     goto L25EC1;
 case 0:
-    if (*(int *)D_00199808 == 0) goto L25E09;
-{
-    int l_50;
-    int l_4C;
-    int l_48;
-    int l_44;
-    int l_40;
-    int l_3C;
-    l_3C = 21;
-    goto L25E10;
-L25E09:;
-    l_3C = 22;
-L25E10:;
-    l_28 = l_3C;
+    l_28 = ((*(int *)D_00199808 != 0) ? 21 : 22);
     goto L25EC1;
 case 1:
-    if (*(int *)D_00199808 == 0) goto L25E2D;
-    l_40 = 24;
-    goto L25E34;
-L25E2D:;
-    l_40 = 25;
-L25E34:;
-    l_28 = l_40;
+    l_28 = ((*(int *)D_00199808 != 0) ? 24 : 25);
     goto L25EC1;
 case 2:
-    if (*(int *)D_00199808 == 0) goto L25E51;
-    l_44 = 27;
-    goto L25E58;
-L25E51:;
-    l_44 = 28;
-L25E58:;
-    l_28 = l_44;
+    l_28 = ((*(int *)D_00199808 != 0) ? 27 : 28);
     goto L25EC1;
 case 4:
-    if (*(int *)D_00199808 == 0) goto L25E72;
-    l_48 = 30;
-    goto L25E79;
-L25E72:;
-    l_48 = 31;
-L25E79:;
-    l_28 = l_48;
+    l_28 = ((*(int *)D_00199808 != 0) ? 30 : 31);
     goto L25EC1;
 case 5:
-    if (*(int *)D_00199808 == 0) goto L25E93;
-    l_4C = 33;
-    goto L25E9A;
-L25E93:;
-    l_4C = 34;
-L25E9A:;
-    l_28 = l_4C;
+    l_28 = ((*(int *)D_00199808 != 0) ? 33 : 34);
     goto L25EC1;
 case 232:
-    if (*(int *)D_00199808 == 0) goto L25EB4;
-    l_50 = 36;
-    goto L25EBB;
-L25EB4:;
-    l_50 = 37;
-L25EBB:;
-    l_28 = l_50;
+    l_28 = ((*(int *)D_00199808 != 0) ? 36 : 37);
 default:
 L25EC1:;
     goto L25ED1;
@@ -353,7 +310,6 @@ L26062:;
     goto L25BFC;
 L26067:;
     return (int)(unsigned char)*(signed char *)((char *)(l_2C + l_28));
-}
 }
 }
 

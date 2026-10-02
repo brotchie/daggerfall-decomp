@@ -268,16 +268,8 @@ void func_0005E874(int a1)
     int l_20;
     int l_1C;
     int l_18;
-{
-    int l_30;
 
-    if (((int)(short)*(short *)((char *)a1 + 67)) == (-1)) goto L5E89A;
-    l_30 = 1;
-    goto L5E8A1;
-L5E89A:;
-    l_30 = 0;
-L5E8A1:;
-    l_24 = l_30;
+    l_24 = ((((int)(short)*(short *)((char *)a1 + 67)) != (-1)) ? 1 : 0);
     *(signed char *)((char *)a1 + 54) = 0;
     if (((int)(unsigned short)*(short *)((char *)a1 + 32)) != 3) goto L5E8D0;
     if (((int)(unsigned short)*(short *)((char *)a1 + 34)) == 18) goto L5E8D2;
@@ -326,7 +318,6 @@ L5E9CC:;
     *(short *)((char *)a1 + 44) = *(short *)((char *)a1 + 46);
     *(short *)((char *)a1 + 61) = (((int)(unsigned short)*(short *)((char *)a1 + 61)) * ((int)(short)*(short *)(D_001869FE + (((int)(unsigned char)*(signed char *)((char *)a1 + 54)) * 2)))) >> 2;
     *(signed char *)((char *)a1 + 56) = *(signed char *)((char *)a1 + 54) + 16;
-}
 }
 
 void func_0005EA8F(int a1)

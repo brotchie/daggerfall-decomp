@@ -238,8 +238,6 @@ void func_000308DE(int a1, int a2)
     int l_1C;
     int l_18;
     short l_14;
-{
-    int l_34;
 
     if (*(int *)((char *)a2 + 28) == (-1)) return;
     l_28 = *(int *)((char *)a2 + 47);
@@ -260,19 +258,12 @@ L30954:;
     if (((int)(unsigned char)*(signed char *)((char *)l_20 + 54)) >= 5) goto L30999;
     l_24 += (int)(short)*(short *)(*(char **)D_00195BE0 + 145 + (((int)(unsigned char)*(signed char *)((char *)l_20 + 54)) * 2));
 L30999:;
-    if (l_24 < *(int *)((char *)a2 + 58)) goto L309AD;
-    l_34 = 1;
-    goto L309B4;
-L309AD:;
-    l_34 = 0;
-L309B4:;
-    l_18 = l_34;
+    l_18 = ((l_24 >= *(int *)((char *)a2 + 58)) ? 1 : 0);
     if (*(signed char *)((char *)l_1C + 2) == 0) goto L309D6;
     *(signed char *)(D_001952EC + ((int)(unsigned char)*(signed char *)((char *)l_1C + 3))) = *(signed char *)&l_18;
     return;
 L309D6:;
     *(signed char *)((char *)l_1C + 3) = *(signed char *)&l_18;
-}
 }
 
 void func_00030C10(void)

@@ -460,9 +460,6 @@ L33993:;
 int func_000339B2(int a1, int a2, int a3, int a4)
 {
     int l_10;
-{
-    int l_28;
-    int l_24;
 
     if (a4 == 0) goto L33C26;
     if (((int)(unsigned short)(*(short *)((char *)a1 + 2) & 20480)) == 16384) goto L339F7;
@@ -546,13 +543,7 @@ L33BD4:;
     return 0;
 L33BEC:;
     l_10 = func_000192EE((int)(short)*(short *)((char *)a3 + 18));
-    if ((short)((int)(unsigned char)*(signed char *)((char *)l_10)) != *(short *)((char *)a2 + 6)) goto L33C14;
-    l_24 = 1;
-    goto L33C1B;
-L33C14:;
-    l_24 = 0;
-L33C1B:;
-    return l_24;
+    return (((short)((int)(unsigned char)*(signed char *)((char *)l_10)) == *(short *)((char *)a2 + 6)) ? 1 : 0);
 L33C26:;
     if (((int)(unsigned short)(*(short *)((char *)a1 + 2) & 8192)) != 0) goto L33C47;
     return 0;
@@ -650,14 +641,7 @@ L33E8F:;
     return 0;
 L33EA4:;
     l_10 = func_000192EE(((struct bfs16_0_10 *)((char *)a1 + 2))->f);
-    if ((short)((int)(unsigned char)*(signed char *)((char *)l_10)) != *(short *)((char *)a2 + 6)) goto L33ED0;
-    l_28 = 1;
-    goto L33ED7;
-L33ED0:;
-    l_28 = 0;
-L33ED7:;
-    return l_28;
-}
+    return (((short)((int)(unsigned char)*(signed char *)((char *)l_10)) == *(short *)((char *)a2 + 6)) ? 1 : 0);
 }
 
 int func_00033EE7(int a1, int a2)

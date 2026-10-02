@@ -13,9 +13,6 @@ int func_0006328F(int a1, int a2, int a3, int a4)
 {
     int l_14;
     int l_10;
-{
-    int l_2C;
-    int l_28;
 
     if (a3 <= 1024) goto L632BB;
     return 0;
@@ -25,13 +22,7 @@ L632BB:;
     if ((((int)(short)*(short *)D_00195F4E) >> 1) >= *(int *)D_00187CA4) goto L632F5;
     return 1;
 L632F5:;
-    if ((((int)(short)*(short *)D_00195F4E) >> 1) < *(int *)D_00187CA4) goto L6330F;
-    l_28 = 1;
-    goto L63316;
-L6330F:;
-    l_28 = 0;
-L63316:;
-    if (l_28 == 0) goto L63325;
+    if ((((((int)(short)*(short *)D_00195F4E) >> 1) >= *(int *)D_00187CA4) ? 1 : 0) == 0) goto L63325;
     if ((*(unsigned char *)D_00195BF4 & 1) != 0) goto L63327;
 L63325:;
     goto L63332;
@@ -42,15 +33,8 @@ L63332:;
     *(int *)(*(char **)D_00195BE0 + 525) = *(int *)D_00195BF4;
     l_10 = (int)(short)*(short *)(*(char **)D_00195BE0 + 253);
     l_10 = ((l_10 * a3) / 1024) * 2;
-    if (func_0007D6AE(1, 100) <= l_10) goto L63397;
-    l_2C = 1;
-    goto L6339E;
-L63397:;
-    l_2C = 0;
-L6339E:;
-    l_14 = l_2C;
+    l_14 = ((func_0007D6AE(1, 100) > l_10) ? 1 : 0);
     return l_14;
 L633AC:;
     return a2;
-}
 }

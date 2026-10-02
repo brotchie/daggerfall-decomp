@@ -7,9 +7,6 @@ extern char D_001952EC[];
 int func_0002FFA6(int a1, short a2)
 {
     short l_18;
-{
-    int l_28;
-    int l_24;
 
     if (*(int *)((char *)((((int)(short)a2) * 15) + a1) + 13) != (-1)) goto L2FFD5;
     return 1;
@@ -20,25 +17,12 @@ L2FFD5:;
 L2FFF7:;
     if (((int)(unsigned char)(*(signed char *)((char *)((((int)(short)a2) * 15) + a1) + 6) & 1)) == 0) goto L30065;
     if (*(signed char *)(*(char **)&l_18 + 2) == 0) goto L30044;
-    if (*(signed char *)(D_001952EC + ((int)(unsigned char)*(signed char *)(*(char **)&l_18 + 3))) != 0) goto L30035;
-    l_24 = 1;
-    goto L3003C;
-L30035:;
-    l_24 = 0;
-L3003C:;
-    return l_24;
+    return ((*(signed char *)(D_001952EC + ((int)(unsigned char)*(signed char *)(*(char **)&l_18 + 3))) == 0) ? 1 : 0);
 L30044:;
-    if (*(signed char *)(*(char **)&l_18 + 3) != 0) goto L30056;
-    l_28 = 1;
-    goto L3005D;
-L30056:;
-    l_28 = 0;
-L3005D:;
-    return l_28;
+    return ((*(signed char *)(*(char **)&l_18 + 3) == 0) ? 1 : 0);
 L30065:;
     if (*(signed char *)(*(char **)&l_18 + 2) == 0) goto L30083;
     return (int)(unsigned char)*(signed char *)(D_001952EC + ((int)(unsigned char)*(signed char *)(*(char **)&l_18 + 3)));
 L30083:;
     return (int)(unsigned char)*(signed char *)(*(char **)&l_18 + 3);
-}
 }

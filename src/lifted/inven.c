@@ -461,9 +461,6 @@ L92685:;
 
 int func_000926AD(int a1, int a2, int a3)
 {
-{
-    int l_20;
-
     if (*(int *)D_00195D7C <= 0) goto L926D7;
     return 0;
 L926D7:;
@@ -526,14 +523,7 @@ L92853:;
     *(signed char *)D_001962A9 = 1;
     *(int *)D_001AA53C = *(int *)D_00195B20;
 L928D6:;
-    if (((int)(unsigned char)*(signed char *)D_00196274) != 4) goto L928EB;
-    l_20 = 1;
-    goto L928F2;
-L928EB:;
-    l_20 = 0;
-L928F2:;
-    return l_20;
-}
+    return ((((int)(unsigned char)*(signed char *)D_00196274) == 4) ? 1 : 0);
 }
 
 void func_00092903(void)
@@ -2403,21 +2393,12 @@ L968BE:;
 int func_000968F8(int a1)
 {
     int l_1C;
-{
-    int l_24;
 
     if (a1 != 0) goto L96918;
     return 0;
 L96918:;
     l_1C = a1 + 71;
-    if (((int)(unsigned short)(*(short *)((char *)l_1C + 42) & 4)) != 0) goto L9693F;
-    l_24 = 1;
-    goto L96946;
-L9693F:;
-    l_24 = 0;
-L96946:;
-    return l_24;
-}
+    return ((((int)(unsigned short)(*(short *)((char *)l_1C + 42) & 4)) == 0) ? 1 : 0);
 }
 
 void func_00096997(void)

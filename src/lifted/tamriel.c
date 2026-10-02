@@ -158,7 +158,6 @@ void func_0004AC01(int a1)
     int l_1C;
     int l_18;
 {
-    int l_3C;
     unsigned char l_38;
 
     l_1C = *(int *)D_00195BF4;
@@ -237,13 +236,7 @@ L4AD95:;
     *(int *)D_0018DBFC = 2010;
 L4AE0E:;
     if (((l_1C + l_2C) % 1440) != 0) goto L4AE42;
-    if (l_30 != 0) goto L4AE33;
-    l_3C = 2;
-    goto L4AE3A;
-L4AE33:;
-    l_3C = 0;
-L4AE3A:;
-    func_0004B7E3(l_3C);
+    func_0004B7E3(((l_30 == 0) ? 2 : 0));
 L4AE42:;
     l_30 = (l_1C + l_2C) % 161280;
     if (l_30 != 0) goto L4AE62;

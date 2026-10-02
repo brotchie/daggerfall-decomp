@@ -1807,8 +1807,6 @@ int func_00076E98(int a1)
     int l_24;
     int l_20;
     int l_1C;
-{
-    int l_2C;
 
     if (*(signed char *)D_0019629D == 0) goto L76EBE;
     return 0;
@@ -1818,14 +1816,7 @@ L76EBE:;
 L76ED8:;
     l_24 = func_000C808D(*(int *)(*(char **)D_00195AA4 + 7), *(int *)(*(char **)D_00195AA4 + 15), *(int *)((char *)a1 + 7), *(int *)((char *)a1 + 15));
     l_20 = func_00062EF7((int)(short)*(short *)((char *)a1 + 3), l_24, (int)&l_1C);
-    if (l_20 >= 400) goto L76F23;
-    l_2C = 1;
-    goto L76F2A;
-L76F23:;
-    l_2C = 0;
-L76F2A:;
-    return l_2C;
-}
+    return ((l_20 < 400) ? 1 : 0);
 }
 
 int func_00076F3D(int a1)
@@ -1833,7 +1824,6 @@ int func_00076F3D(int a1)
     int l_20;
     int l_1C;
 {
-    int l_48;
     char l_44[32];
 
     l_20 = (int)(unsigned char)*(signed char *)D_00196277;
@@ -1848,13 +1838,7 @@ int func_00076F3D(int a1)
     func_0002257C(a1, 0, (int)l_44, 0);
     *(signed char *)D_00196277 = *(signed char *)&l_20;
     *(int *)D_00195C74 = l_1C;
-    if (((int)(short)(*(short *)D_00196D64 & 10)) != 0) goto L76FD8;
-    l_48 = 1;
-    goto L76FDF;
-L76FD8:;
-    l_48 = 0;
-L76FDF:;
-    return l_48;
+    return ((((int)(short)(*(short *)D_00196D64 & 10)) == 0) ? 1 : 0);
 }
 }
 
@@ -1968,19 +1952,9 @@ void func_00077340(int a1)
 
 int func_000773BE(int a1)
 {
-{
-    int l_20;
-
     *(int *)D_00195B50 = a1;
     func_0008E3F7(*(int *)D_00195AC4, (int)func_00077340);
-    if (*(int *)D_00195B50 != 0) goto L773F8;
-    l_20 = 1;
-    goto L773FF;
-L773F8:;
-    l_20 = 0;
-L773FF:;
-    return l_20;
-}
+    return ((*(int *)D_00195B50 == 0) ? 1 : 0);
 }
 
 int func_00077639(int a1, int a2, int a3, int a4)

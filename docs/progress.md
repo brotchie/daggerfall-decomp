@@ -1238,3 +1238,6 @@ Batch **1,927**; build **61.34%**.
 - An in-memory `dec`/`inc` while a computed value waits in a register, read right after, is
   `--x` inside the expression (`x = --x % (a + b)`: the divisor is evaluated first). +1
   (2 KB). Batch **2,127**.
+- A branch diamond assigning a slot that lies in the compiler's temp region of the frame
+  (below every declared variable) is a `?:` even outside call arguments. +2 (one 6.4 KB).
+  Batch **2,129**.

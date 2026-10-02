@@ -164,9 +164,6 @@ L8F20B:;
 
 int func_0008F246(int a1)
 {
-{
-    int l_20;
-
     if (((int)(unsigned char)*(signed char *)D_0019626F) != 1) goto L8F26F;
     return 1;
 L8F26F:;
@@ -179,14 +176,7 @@ L8F26F:;
     func_000A0040((int)D_001A9BBC, 0, 32, (int)D_00176E94, 156, 32);
     func_000A0040((int)D_001A9BB4, 254, 8, (int)D_00176E94, 157, 8);
 L8F2F0:;
-    if (((int)(unsigned char)*(signed char *)D_00196274) != 1) goto L8F305;
-    l_20 = 1;
-    goto L8F30C;
-L8F305:;
-    l_20 = 0;
-L8F30C:;
-    return l_20;
-}
+    return ((((int)(unsigned char)*(signed char *)D_00196274) == 1) ? 1 : 0);
 }
 
 void func_0008F89A(int a1)

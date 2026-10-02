@@ -51,16 +51,8 @@ void func_0001497D(int);
 int func_00013F4B(int a1, int a2, int a3)
 {
     int l_14;
-{
-    int l_24;
 
-    if (((int)(unsigned short)(*(short *)(*(char **)D_00195BF8) & 1)) == 0) goto L13F7F;
-    l_24 = 199;
-    goto L13F8E;
-L13F7F:;
-    l_24 = (int)(unsigned short)*(short *)(*(char **)D_00195B68 + 2);
-L13F8E:;
-    l_14 = l_24;
+    l_14 = ((((int)(unsigned short)(*(short *)(*(char **)D_00195BF8) & 1)) != 0) ? 199 : (int)(unsigned short)*(short *)(*(char **)D_00195B68 + 2));
     if (a2 <= l_14) goto L13FA8;
     return 0;
 L13FA8:;
@@ -79,7 +71,6 @@ L1401C:;
     func_0001497D((int)func_00014334);
 L14030:;
     return *(int *)(*(char **)D_00196484) & 1;
-}
 }
 
 int func_00014048(int a1, short a2)

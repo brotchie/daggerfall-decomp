@@ -1024,8 +1024,6 @@ int func_0009CEC4(int a1, int a2, int a3, int a4, int a5)
     int l_18;
     int l_14;
     int l_10;
-{
-    int l_5C;
 
     l_1C = 0;
     if (*(int *)D_001AA698 == 0) goto L9CF25;
@@ -1041,13 +1039,7 @@ L9CF25:;
     l_44 = a4 - a2;
     l_3C = func_0009DEAC(l_48);
     l_38 = func_0009DEAC(l_44);
-    if (l_3C <= l_38) goto L9CFBF;
-    l_5C = l_3C;
-    goto L9CFC5;
-L9CFBF:;
-    l_5C = l_38;
-L9CFC5:;
-    l_40 = l_5C;
+    l_40 = ((l_3C > l_38) ? l_3C : l_38);
     if (l_48 >= 0) goto L9CFDA;
     l_30 = -1;
     goto L9CFE1;
@@ -1133,7 +1125,6 @@ L9D1E5:;
     return (l_24 * (((95 - ((int)(unsigned char)*(signed char *)((char *)l_10))) << 8) / 100)) / 256;
 L9D230:;
     return l_24;
-}
 }
 
 int func_0009D242(int a1, int a2)

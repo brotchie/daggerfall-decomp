@@ -768,8 +768,6 @@ int func_0008A858(int a1, int a2, int a3)
 {
     int l_18;
     int l_14;
-{
-    int l_28;
 
     a1 = *(int *)((char *)a1 + 63);
 L8A876:;
@@ -779,13 +777,7 @@ L8A876:;
     l_14 = func_000CE4C4(l_18, a2);
     if (l_14 == 0) goto L8A8EC;
     if (a3 == 0) goto L8A8E3;
-    if (((unsigned)func_0007D6AE(1, 100)) >= (l_18 + 86)) goto L8A8D4;
-    l_28 = 1;
-    goto L8A8DB;
-L8A8D4:;
-    l_28 = 0;
-L8A8DB:;
-    return l_28;
+    return ((((unsigned)func_0007D6AE(1, 100)) < (l_18 + 86)) ? 1 : 0);
 L8A8E3:;
     return 1;
 L8A8EC:;
@@ -793,7 +785,6 @@ L8A8EC:;
     goto L8A876;
 L8A8FA:;
     return 0;
-}
 }
 
 void func_0008A90C(int a1, int a2, int a3)
@@ -903,20 +894,11 @@ int func_0008AC0E(int a1, int a2, int a3)
     int l_1C;
     int l_18;
     int l_14;
-{
-    int l_2C;
 
     l_1C = a1 + 71;
     l_18 = a2 + 71;
     l_14 = ((int)(unsigned char)*(signed char *)((char *)(l_1C + a3) + 86)) + ((((int)(unsigned char)*(signed char *)(*(char **)((char *)a1 + 47) + 200)) - ((int)(unsigned char)*(signed char *)((char *)l_18 + 129))) * 5);
-    if (func_0007D6AE(0, 100) >= l_14) goto L8AC83;
-    l_2C = 1;
-    goto L8AC8A;
-L8AC83:;
-    l_2C = 0;
-L8AC8A:;
-    return l_2C;
-}
+    return ((func_0007D6AE(0, 100) < l_14) ? 1 : 0);
 }
 
 int func_0008AC9B(int a1)

@@ -295,31 +295,16 @@ void func_000356EF(int a1, int a2, int a3, int a4)
     int l_14;
     int l_10;
     int l_C;
-{
-    int l_40;
-    int l_3C;
 
     *(signed char *)D_0019629B = 0;
-    if (((int)(unsigned short)(*(short *)(*(char **)D_00195BF8) & 1)) == 0) goto L3572C;
-    l_3C = 199;
-    goto L3573B;
-L3572C:;
-    l_3C = (int)(unsigned short)*(short *)(*(char **)D_00195B68 + 2);
-L3573B:;
-    l_14 = l_3C;
+    l_14 = ((((int)(unsigned short)(*(short *)(*(char **)D_00195BF8) & 1)) != 0) ? 199 : (int)(unsigned short)*(short *)(*(char **)D_00195B68 + 2));
     if (((int)(unsigned char)(*(signed char *)(D_00195E2A + a4) & 127)) == 3) goto L3576A;
     if (((int)(unsigned char)(*(signed char *)(D_00195E2A + a4) & 128)) == 0) goto L35791;
 L3576A:;
     func_000A0040(*(int *)D_00143550, 119, l_14 * 320, (int)D_00170A86, 598, 4);
     return;
 L35791:;
-    if (((int)(unsigned short)(*(short *)(*(char **)D_00195BF8) & 1)) == 0) goto L357B0;
-    l_40 = 199;
-    goto L357BF;
-L357B0:;
-    l_40 = (int)(unsigned short)*(short *)(*(char **)D_00195B68 + 2);
-L357BF:;
-    l_14 = l_40;
+    l_14 = ((((int)(unsigned short)(*(short *)(*(char **)D_00195BF8) & 1)) != 0) ? 199 : (int)(unsigned short)*(short *)(*(char **)D_00195B68 + 2));
     l_28 = (139 - a1) << 9;
     if (l_28 >= 0) goto L357E0;
     l_28 = 0;
@@ -368,7 +353,6 @@ L35956:;
     goto L3594E;
 L3598A:;
     func_000A1023(*(int *)D_00143550, *(int *)D_00147954, l_14 * 320, (int)D_00170A86, 638, 4);
-}
 }
 
 void func_000359B4(int a1)
@@ -427,19 +411,11 @@ void func_00035B3A(int a1, int a2)
     int l_1C;
     int l_18;
     int l_14;
-{
-    int l_3C;
 
     if (*(signed char *)D_0019629B != 0) goto L35B5B;
     func_00035A7F();
 L35B5B:;
-    if (((int)(unsigned short)(*(short *)(*(char **)D_00195BF8) & 1)) == 0) goto L35B7A;
-    l_3C = 199;
-    goto L35B89;
-L35B7A:;
-    l_3C = (int)(unsigned short)*(short *)(*(char **)D_00195B68 + 2);
-L35B89:;
-    l_1C = l_3C;
+    l_1C = ((((int)(unsigned short)(*(short *)(*(char **)D_00195BF8) & 1)) != 0) ? 199 : (int)(unsigned short)*(short *)(*(char **)D_00195B68 + 2));
     l_30 = (139 - a1) << 9;
     if (l_30 >= 0) goto L35BAA;
     l_30 = 0;
@@ -472,7 +448,6 @@ L35C8D:;
     goto L35C85;
 L35CB9:;
     func_000A1023(*(int *)D_00143550, *(int *)D_00147954, l_1C * 320, (int)D_00170A86, 715, 4);
-}
 }
 
 void func_00035CE5(int a1)

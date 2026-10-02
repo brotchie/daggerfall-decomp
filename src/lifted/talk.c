@@ -273,8 +273,6 @@ int func_00014AE8(int a1)
 {
     int l_20;
     int l_1C;
-{
-    int l_28;
 
     if (((int)(unsigned char)*(signed char *)D_0019626F) != 12) goto L14B11;
     if (((int)(unsigned char)*(signed char *)D_00196274) == 8) goto L14B13;
@@ -396,14 +394,7 @@ L14E63:;
 L14E6F:;
     func_0001652C(7209);
 L14E79:;
-    if (((int)(unsigned char)*(signed char *)D_00196274) != 12) goto L14E8E;
-    l_28 = 1;
-    goto L14E95;
-L14E8E:;
-    l_28 = 0;
-L14E95:;
-    return l_28;
-}
+    return ((((int)(unsigned char)*(signed char *)D_00196274) == 12) ? 1 : 0);
 }
 
 void func_00014EA8(void)

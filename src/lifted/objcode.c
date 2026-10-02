@@ -431,8 +431,6 @@ int func_0009A915(int a1, int a2)
 int func_0009A993(int a1)
 {
     short l_18;
-{
-    int l_24;
 
     if (((int)(unsigned char)*(signed char *)D_0019626F) != 19) goto L9A9BC;
     if (((int)(unsigned char)*(signed char *)D_00196274) == 8) goto L9A9BE;
@@ -506,12 +504,5 @@ L9AB05:;
     *(signed char *)D_00187CA8 = 0;
     *(signed char *)D_00190CE7 = 0;
 L9AC14:;
-    if (((int)(unsigned char)*(signed char *)D_00196274) != 19) goto L9AC29;
-    l_24 = 1;
-    goto L9AC30;
-L9AC29:;
-    l_24 = 0;
-L9AC30:;
-    return l_24;
-}
+    return ((((int)(unsigned char)*(signed char *)D_00196274) == 19) ? 1 : 0);
 }

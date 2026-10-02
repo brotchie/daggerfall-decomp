@@ -403,9 +403,6 @@ void func_00036F18(int a1)
 
 int func_00036F69(int a1)
 {
-{
-    int l_20;
-
     if (((int)(unsigned char)*(signed char *)D_0019626F) != 2) goto L36F92;
     return 1;
 L36F92:;
@@ -418,12 +415,5 @@ L36F92:;
     *(signed char *)D_001940D8 |= 1;
     func_00038067();
 L36FE5:;
-    if (((int)(unsigned char)*(signed char *)D_00196274) != 2) goto L36FFA;
-    l_20 = 1;
-    goto L37001;
-L36FFA:;
-    l_20 = 0;
-L37001:;
-    return l_20;
-}
+    return ((((int)(unsigned char)*(signed char *)D_00196274) == 2) ? 1 : 0);
 }

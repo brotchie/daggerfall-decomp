@@ -275,9 +275,6 @@ L8654C:;
 
 int func_00086560(int a1, int a2)
 {
-{
-    int l_20;
-
     if (((unsigned)(*(int *)(*(char **)D_00196A80 + 4) & 33554431)) > a1) goto L865AC;
     if (((unsigned)((*(int *)(*(char **)D_00196A80 + 4) & 33554431) + ((((unsigned)(*(int *)(*(char **)D_00196A80 + 8) << 4)) >> 28) << 12))) > a1) goto L865AE;
 L865AC:;
@@ -288,16 +285,9 @@ L865AE:;
 L865E4:;
     goto L86609;
 L865E6:;
-    if ((*(unsigned char *)(*(char **)D_00196A80 + 7) & 128) != 0) goto L865FA;
-    l_20 = 1;
-    goto L86601;
-L865FA:;
-    l_20 = 0;
-L86601:;
-    return l_20;
+    return (((*(unsigned char *)(*(char **)D_00196A80 + 7) & 128) == 0) ? 1 : 0);
 L86609:;
     return 0;
-}
 }
 
 int func_0008661C(int a1, int a2)
@@ -706,7 +696,6 @@ L8794F:;
 
 int func_0008795D(int a1, int a2, int a3)
 {
-
 __dagger_tbl87978:;
     switch (a2) {
 case 0:
@@ -730,15 +719,7 @@ case 14:
     switch (a3) {
     goto L87CAC;
 case -1:
-    if (*(unsigned char *)((char *)a1) <= 0) goto L87BE2;
-{
-    int l_20;
-    l_20 = 1;
-    goto L87BE9;
-L87BE2:;
-    l_20 = 0;
-L87BE9:;
-    return l_20;
+    return ((*(unsigned char *)((char *)a1) > 0) ? 1 : 0);
 case 0:
 case 26:
     return (int)(unsigned char)(*(signed char *)((char *)a1) & 1);
@@ -766,7 +747,6 @@ case 22:
 default:
 L87CAC:;
     goto L87D5F;
-}
 }
 case 25:
 case 26:

@@ -76,7 +76,6 @@ void func_000411BF(int a1, int a2)
     int l_18;
     short l_14;
 {
-    int l_34;
     int l_30;
 
     *(int *)&l_14 = func_0009DC25();
@@ -93,13 +92,7 @@ L41244:;
     goto L412C6;
 L41258:;
     l_30 = (((int)(unsigned char)*(signed char *)(D_0017B667 + func_0001FFF1())) << 3) + (func_0009DC25() & 3);
-    if (((int)(unsigned short)(*(short *)(*(char **)D_00195A84 + 64) & 1)) == 0) goto L41295;
-    l_34 = 4;
-    goto L4129C;
-L41295:;
-    l_34 = 0;
-L4129C:;
-    l_1C = ((func_0009DC25() % 10) + ((int)(short)*(short *)(D_0017B69D + ((l_30 + l_34) * 2)))) << 12;
+    l_1C = ((func_0009DC25() % 10) + ((int)(short)*(short *)(D_0017B69D + ((l_30 + ((((int)(unsigned short)(*(short *)(*(char **)D_00195A84 + 64) & 1)) != 0) ? 4 : 0)) * 2)))) << 12;
 L412C6:;
     goto L41303;
 L412C8:;

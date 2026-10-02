@@ -292,17 +292,9 @@ void func_00079913(int a1)
     int l_20;
     int l_1C;
     int l_18;
-{
-    int l_28;
 
     l_20 = a1 + 71;
-    if ((*(unsigned char *)D_001940D6 & 64) == 0) goto L7993F;
-    l_28 = -25;
-    goto L79946;
-L7993F:;
-    l_28 = 10;
-L79946:;
-    l_1C = l_28;
+    l_1C = (((*(unsigned char *)D_001940D6 & 64) != 0) ? -25 : 10);
     if (((int)(unsigned char)*(signed char *)((char *)l_20 + 67)) < 43) goto L79994;
     l_1C += (((int)(short)*(short *)(*(char **)D_00195BE0 + 42)) / 5) + (((int)(short)*(short *)(*(char **)D_00195BE0 + 163)) / 10);
     goto L79A00;
@@ -317,7 +309,6 @@ L799D0:;
 L79A00:;
     if (func_0007D6AE(1, 200) > l_1C) return;
     *(signed char *)((char *)l_20 + 65) |= 128;
-}
 }
 
 int func_00079A28(int a1)

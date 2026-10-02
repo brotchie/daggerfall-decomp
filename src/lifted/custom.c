@@ -1070,9 +1070,6 @@ L55DF6:;
 
 int func_00055E35(int a1)
 {
-{
-    int l_20;
-
     if (((int)(unsigned char)*(signed char *)D_0019626F) != 10) goto L55E5E;
     if (((int)(unsigned char)*(signed char *)D_00196274) == 8) goto L55E60;
 L55E5E:;
@@ -1093,12 +1090,5 @@ L55E6C:;
     func_000567CA(15);
     func_00055F0F();
 L55EE0:;
-    if (((int)(unsigned char)*(signed char *)D_00196274) != 10) goto L55EF5;
-    l_20 = 1;
-    goto L55EFC;
-L55EF5:;
-    l_20 = 0;
-L55EFC:;
-    return l_20;
-}
+    return ((((int)(unsigned char)*(signed char *)D_00196274) == 10) ? 1 : 0);
 }

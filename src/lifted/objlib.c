@@ -215,8 +215,6 @@ void func_00084E5E(int a1)
     int l_20;
     int l_1C;
     int l_18;
-{
-    int l_28;
 
     l_1C = (int)(*(char **)(*(char **)D_00195BDC + 43) + (((int)(unsigned short)*(short *)((char *)a1 + 27)) * 26));
     if (((int)(unsigned char)*(signed char *)((char *)l_1C + 24)) == 16) goto L84EC1;
@@ -225,13 +223,7 @@ void func_00084E5E(int a1)
 L84EBC:;
     return;
 L84EC1:;
-    if (((int)(unsigned char)(*(signed char *)D_001968BB & 16)) == 0) goto L84EDA;
-    l_28 = 852;
-    goto L84EE1;
-L84EDA:;
-    l_28 = 242;
-L84EE1:;
-    *(short *)((char *)l_1C + 18) = l_28;
+    *(short *)((char *)l_1C + 18) = ((((int)(unsigned char)(*(signed char *)D_001968BB & 16)) != 0) ? 852 : 242);
     a1 = *(int *)((char *)a1 + 63);
 L84EF4:;
     if (a1 == 0) return;
@@ -249,7 +241,6 @@ L84F6F:;
 L84F77:;
     a1 = *(int *)((char *)a1 + 55);
     goto L84EF4;
-}
 }
 
 void func_000850EF(int a1)

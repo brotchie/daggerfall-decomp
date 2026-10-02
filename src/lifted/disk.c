@@ -90,24 +90,15 @@ int func_0006CC89(int a1, int a2, int a3)
 {
     int l_18;
     int l_14;
-{
-    int l_28;
 
     func_000A1004(a1);
     l_18 = func_0009DC59(a1, 546, 384);
     if (l_18 >= 1) goto L6CCCE;
     return 0;
 L6CCCE:;
-    if (func_000A0B42(l_18, a2, a3) != a3) goto L6CCEA;
-    l_28 = 1;
-    goto L6CCF1;
-L6CCEA:;
-    l_28 = 0;
-L6CCF1:;
-    l_14 = l_28;
+    l_14 = ((func_000A0B42(l_18, a2, a3) == a3) ? 1 : 0);
     func_0009DEA7(l_18);
     return l_14;
-}
 }
 
 int func_0006CD10(int a1, int a2, int a3)
