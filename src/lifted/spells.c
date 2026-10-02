@@ -118,6 +118,7 @@ void func_0003A036(void);
 #pragma dagger reg func_0003946E 26 edx
 #pragma dagger slots func_0003853C a1 8 l_18 4 ret 12
 #pragma dagger slots func_00039224 a1 12 l_1C 8 l_18 4 ret 16
+#pragma dagger slots func_00039A8F l_24 16 l_20 12 l_1C 8 l_18 4
 
 int func_00037732(void)
 {
@@ -695,15 +696,15 @@ void func_00039A8F(void)
 {
     int l_24;
     int l_20;
-    int l_1C;
     unsigned char l_18;
+    short l_1C;
 
-    l_1C = 0;
+    *(int *)&l_1C = 0;
     l_18 = 0;
     l_24 = *(int *)D_00195B04;
 L39AB0:;
-    if (*(short *)&l_1C != 0) goto L39B3A;
-    l_1C = 1;
+    if (l_1C != 0) goto L39B3A;
+    *(int *)&l_1C = 1;
     l_20 = 0;
 L39AC9:;
     if (((int)(short)*(short *)&l_20) < 128) goto L39ADE;
@@ -715,18 +716,18 @@ L39ADE:;
     if (*(signed char *)((char *)((((int)(short)*(short *)&l_20) * 89) + l_24) + 47) == 0) goto L39AD6;
     if (*(unsigned char *)((char *)((((int)(short)*(short *)&l_20) * 89) + l_24) + 73) != l_18) goto L39B0F;
     l_18++;
-    l_1C = 0;
+    *(int *)&l_1C = 0;
     goto L39B11;
 L39B0F:;
     goto L39AD6;
 L39B11:;
-    if (*(short *)&l_1C == 0) goto L39B26;
+    if (l_1C == 0) goto L39B26;
     if (func_00039B93((int)(unsigned char)l_18) != 0) goto L39B28;
 L39B26:;
     goto L39B35;
 L39B28:;
     l_18++;
-    l_1C = 0;
+    *(int *)&l_1C = 0;
 L39B35:;
     goto L39AB0;
 L39B3A:;

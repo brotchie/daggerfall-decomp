@@ -226,7 +226,7 @@ void func_0004A56A(int, int);
 #pragma aux func_000A0ED9 parm routine [];
 #pragma dagger DAGGER_CONFPOS func_0004633F
 #pragma dagger DAGGER_NOGIVEN func_000468DC
-#pragma dagger reg func_0004633F 67 edx
+#pragma dagger confwin func_0004633F 62 66
 #pragma dagger reg func_00047B8F 5 ebx 6 ebx 7 ebx 8 ebx 9 ebx
 #pragma dagger reg func_0004A56A 22 eax 23 edx 44 eax 48 edx
 #pragma dagger slots func_0004633F a1 48 a2 24 l_444 1076 l_440 1072 l_3C 44 l_38 40 l_34 36 l_30 32 l_2C 28 l_24 20 l_20 16 l_1C 12 l_18 8 l_14 4

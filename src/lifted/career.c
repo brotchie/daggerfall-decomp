@@ -94,6 +94,7 @@ void func_0002576B(void);
 #pragma dagger DAGGER_CONFPOS func_00025340
 #pragma dagger reg func_00024C88 177 edx 185 edx 437 bx
 #pragma dagger reg func_00025340 21 edx
+#pragma dagger slots func_000249CE a1 24 a2 20 l_20 16 l_1C 12 l_18 8 ret 4
 #pragma dagger slots func_00024C88 a1 36 l_34 32 l_30 28 l_2C 24 l_28 20 l_24 16 l_20 12 l_18 4 ret 8
 
 int func_0002482A(int a1)
@@ -162,10 +163,10 @@ L249BF:;
 int func_000249CE(int a1, int a2)
 {
     int l_20;
-    int l_1C;
     int l_18;
+    short l_1C;
 
-    l_1C = ((int)(short)*(short *)(D_00179F74 + (((int)(short)*(short *)D_00190D64) * 12))) + 21;
+    *(int *)&l_1C = ((int)(short)*(short *)(D_00179F74 + (((int)(short)*(short *)D_00190D64) * 12))) + 21;
     l_18 = (int)(short)*(short *)(D_00179F76 + (((int)(short)*(short *)D_00190D64) * 12));
     if (*(short *)D_00190D64 == 0) goto L24A1A;
     l_18 += 5;
@@ -173,7 +174,7 @@ L24A1A:;
     l_20 = func_000A1079(a1, 13, 2000);
     *(signed char *)((char *)l_20) = 0;
     if (*(signed char *)D_00196D86 == 0) goto L24A59;
-    func_0007CA1F(a1, (int)(short)*(short *)&l_1C, (int)(short)*(short *)&l_18, 145, 141);
+    func_0007CA1F(a1, (int)(short)l_1C, (int)(short)*(short *)&l_18, 145, 141);
 L24A59:;
     l_18 += 10;
     *(signed char *)((char *)l_20) = 13;

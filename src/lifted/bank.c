@@ -156,6 +156,7 @@ void func_0006CB02(void);
 #pragma dagger KKND_CONFREV func_0006BF30
 #pragma dagger reg func_0006BA50 381 esi
 #pragma dagger reg func_0006BE5C 8 ebx
+#pragma dagger slots func_0006C55B l_20 12 l_1C 8 l_18 4
 
 int func_0006B376(int a1)
 {
@@ -699,8 +700,8 @@ L6C535:;
 void func_0006C55B(void)
 {
     int l_20;
-    int l_1C;
     int l_18;
+    short l_1C;
 
     l_20 = *(int *)D_001A413C;
 L6C571:;
@@ -711,14 +712,14 @@ L6C583:;
     goto L6C571;
 L6C58B:;
     if (((int)(unsigned char)*(signed char *)D_001A41F2) != l_20) goto L6C5A0;
-    l_1C = 246;
+    *(int *)&l_1C = 246;
     goto L6C5A7;
 L6C5A0:;
-    l_1C = 146;
+    *(int *)&l_1C = 146;
 L6C5A7:;
     func_000A0ED9(573, (int)D_00175CC4);
     func_000A0F5C((int)D_001903A4, (int)D_00175CEF, *(int *)(D_001A3FB4 + (l_20 * 20)));
-    func_0007CA1F((int)D_001903A4, 52, (int)(short)(((l_20 - *(short *)D_001A413C) * 7) + 38), (int)(short)*(short *)&l_1C, 156);
+    func_0007CA1F((int)D_001903A4, 52, (int)(short)(((l_20 - *(short *)D_001A413C) * 7) + 38), (int)(short)l_1C, 156);
     goto L6C583;
 L6C608:;
     if (*(int *)D_001A413C == 0) goto L6C61B;

@@ -178,6 +178,7 @@ void func_00055A5B(void);
 void func_00055D93(int, int);
 #pragma aux func_000A0ED9 parm routine [];
 #pragma dagger KKND_CONFREV func_000549DB
+#pragma dagger slots func_00052DC3 l_2C 24 l_28 20 l_24 16 l_20 12 l_1C 8 l_18 4
 #pragma dagger slots func_00054B27 l_2C 24 l_28 20 l_24 16 l_20 12 l_1C 8 l_18 4
 #pragma dagger slots func_0005500F a1 8 l_18 4 ret 12
 
@@ -187,8 +188,8 @@ void func_00052DC3(void)
     int l_28;
     int l_24;
     int l_20;
-    int l_1C;
     int l_18;
+    short l_1C;
 
     func_000A0040(*(int *)D_00195BEC + 16, -1, 12, (int)D_00175420, 88, 12);
     *(signed char *)(*(char **)D_00195BEC + 52) = 8;
@@ -268,12 +269,12 @@ L530F9:;
 L5310A:;
     if (*(short *)D_00190D76 != 0) goto L53127;
     *(int *)D_0019983C = (int)D_001854F4;
-    l_1C = 28;
+    *(int *)&l_1C = 28;
     goto L53176;
 L53127:;
     if (((int)(short)*(short *)D_00190D76) != 1) goto L53146;
     *(int *)D_0019983C = (int)D_0018565C;
-    l_1C = 6;
+    *(int *)&l_1C = 6;
     goto L53176;
 L53146:;
     *(int *)D_0019983C = (int)D_001856A4;
@@ -283,7 +284,7 @@ L53146:;
 L53169:;
     l_2C = 3;
 L53170:;
-    l_1C = l_2C;
+    *(int *)&l_1C = l_2C;
 L53176:;
     if (((int)(unsigned char)*(signed char *)D_00196274) == 8) goto L5333E;
     if (*(short *)D_00190D76 != 0) goto L53199;
@@ -297,7 +298,7 @@ L531A8:;
 L531AD:;
     l_18 = 0;
 L531B4:;
-    if ((short)(short)l_18 < *(short *)&l_1C) goto L531CA;
+    if ((short)(short)l_18 < l_1C) goto L531CA;
     goto L53269;
 L531C2:;
     l_18++;
@@ -327,7 +328,7 @@ L5326E:;
     if (((int)(unsigned char)(*(signed char *)D_0012AC00 & 1)) == 0) goto L5333E;
     l_18 = 0;
 L53289:;
-    if ((short)(short)l_18 < *(short *)&l_1C) goto L5329F;
+    if ((short)(short)l_18 < l_1C) goto L5329F;
     goto L5333E;
 L53297:;
     l_18++;
@@ -762,8 +763,8 @@ void func_00054B27(void)
 {
     int l_2C;
     int l_28;
-    int l_24;
     int l_1C;
+    short l_24;
     short l_20;
     short l_18;
 
@@ -793,10 +794,10 @@ L54B8A:;
 L54BA0:;
     if (*(int *)((char *)l_28) == 0) goto L54C27;
     func_0007CA1F(*(int *)((char *)l_28), 10, (int)(short)l_20, 145, 141);
-    l_24 = *(int *)&l_20;
+    *(int *)&l_24 = *(int *)&l_20;
     l_20 += *(short *)D_0012DA44;
     if (l_18 == 0) goto L54BEC;
-    if (*(short *)D_0012AC06 > *(short *)&l_24) goto L54BEE;
+    if (*(short *)D_0012AC06 > l_24) goto L54BEE;
 L54BEC:;
     goto L54BFA;
 L54BEE:;

@@ -80,6 +80,7 @@ int func_00042112(void);
 void func_00041672(int);
 #pragma aux func_000A0ED9 parm routine [];
 #pragma dagger reg func_00041672 47 edx
+#pragma dagger slots func_0004193C l_30 28 l_2C 24 l_28 20 l_24 16 l_20 12 l_1C 8 l_18 4
 
 void func_00041672(int a1)
 {
@@ -117,8 +118,8 @@ void func_0004193C(void)
     int l_28;
     int l_24;
     int l_20;
-    int l_1C;
     int l_18;
+    short l_1C;
 
     if (func_000417C8(0) == 0) return;
     func_000A1023(*(int *)D_00143550, *(int *)D_001996F8, 64000, (int)D_00170DE4, 123, 4);
@@ -128,8 +129,8 @@ void func_0004193C(void)
     func_000A0F5C((int)D_001903A4, (int)D_00170E11, (int)(short)*(short *)(*(char **)D_00195BE0 + 141), (int)(short)*(short *)(*(char **)D_00195BE0 + 143));
     func_0007CA1F((int)D_001903A4, 238, 20, 145, 141);
     func_0012DB50(4);
-    l_1C = func_0007D53F((int)D_001A9AB8);
-    if (((int)(short)*(short *)&l_1C) <= (-1)) goto L41BDD;
+    *(int *)&l_1C = func_0007D53F((int)D_001A9AB8);
+    if (((int)(short)l_1C) <= (-1)) goto L41BDD;
     l_30 = *(int *)(D_00190DE4 + (((int)(unsigned short)*(short *)D_001A9AE1) << 2));
     func_00041D27();
     if ((*(unsigned char *)(*(char **)D_00195BE0 + 138) & 1) == 0) goto L41A68;
@@ -175,7 +176,7 @@ L41BDD:;
     func_000A0AD9((int)(*(char **)D_001A9AE7 + (((int)(unsigned short)*(short *)D_001A9AE1) * 44)) + 4, (int)&*(signed char *)(*(char **)D_00178A0A + 47), 40, (int)D_00170DE4, 193);
 L41C3E:;
     if (*(signed char *)D_00142309 != 0) goto L41C50;
-    if (((int)(short)*(short *)&l_1C) != (-2)) goto L41C55;
+    if (((int)(short)l_1C) != (-2)) goto L41C55;
 L41C50:;
     func_00041D27();
 L41C55:;

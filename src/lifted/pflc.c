@@ -47,6 +47,7 @@ void func_000529FA(int, int);
 #pragma dagger slots func_0005247B a1 16 l_2C 24 l_20 12 l_1C 8 l_18 4
 #pragma dagger slots func_000528FB a1 20 a2 16 l_1C 12 l_18 8 l_14 4
 #pragma dagger slots func_000529FA a1 36 a2 32 l_2C 28 l_28 24 l_24 20 l_20 16 l_1C 12 l_18 8 l_14 4
+#pragma dagger slots func_00052D3C a1 16 l_20 12 l_1C 8 ret 4
 
 void func_00051CF9(int a1)
 {
@@ -425,19 +426,19 @@ L52B42:;
 
 int func_00052D3C(int a1)
 {
-    int l_20;
     int l_1C;
+    short l_20;
 
     l_1C = 0;
-    l_20 = 150;
+    *(int *)&l_20 = 150;
 L52D5B:;
     if (*(signed char *)((char *)a1) == 0) goto L52D69;
     if (l_1C < 4) goto L52D6B;
 L52D69:;
     goto L52D9F;
 L52D6B:;
-    func_0007CA85(a1, 160, (int)(short)*(short *)&l_20, 145, 156);
-    l_20 += 10;
+    func_0007CA85(a1, 160, (int)(short)l_20, 145, 156);
+    *(int *)&l_20 += 10;
     l_1C++;
     a1 += func_000A0DF4(a1) + 1;
     goto L52D5B;

@@ -371,7 +371,11 @@ class Func:
                                 body[k - 1].operands[0].type == cx.X86_OP_REG and
                                 body[k - 1].operands[0].size == 2):
                             self.w16_stores.add(ins.address)
-                if not (n == 0 and ins.mnemonic == "mov"):
+                rmw_imm = n == 0 and ins.mnemonic in ("add", "sub") and op.size == 4 and \
+                    ins.operands[1].type == cx.X86_OP_IMM and \
+                    not os.environ.get("LIFT_NORMWIMM")
+                if not (n == 0 and ins.mnemonic == "mov") and not rmw_imm:
+                    # (`add dword [x],10` is Watcom 10's x += 10 on a short too)
                     reads.setdefault(off, set()).add(op.size)
                 if ins.mnemonic == "movsx":
                     sign.setdefault(off, set()).add(("s", op.size))
@@ -2852,6 +2856,11 @@ class Func:
                          reverse=True)
         two = [o for o in locals_ if o in self.slot_type and self.size_of[self.slot_type[o]] == 2]
         rest = [o for o in locals_ if o not in two]
+        if two and rest and max(two) > min(rest) and \
+                not os.environ.get("LIFT_NOSHORTPIN"):
+            # a 2-byte local below a 4-byte one: the slot rule puts 2-byte locals on top, so
+            # only pinned slots give this layout
+            self.must_pin = True
         lines = ["%s %s(%s)" % ("void" if self.void else self.ret_type, name, ", ".join(ps) or "void"),
                  "{"]
         # Locals below every parameter were declared in a nested block: Watcom gives a
@@ -2962,7 +2971,8 @@ class Func:
         decl = ["/* lifted from 0x%08X */" % self.va] + sorted(self.structs)
         # last resort, a function-level choice: pin every variable at its frame depth
         self.choices.append(PIN_SLOTS)
-        if (PIN_SLOTS in self.flips) != getattr(self, "force_pin", False):
+        if (PIN_SLOTS in self.flips) != getattr(self, "force_pin", False) or \
+                getattr(self, "must_pin", False):
             base = 4 * len(self.saved)
             pins = []
             for k, (_r, off, _sz) in enumerate(self.params):
