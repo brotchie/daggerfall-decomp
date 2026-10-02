@@ -77,6 +77,12 @@ def main():
     objs, td = compile_many(a.srcs, flags)
     tgt = match.Target()
     syms = match.symbol_map()
+    # the build's relocation check too: equal bytes can still reference the wrong symbol
+    import build_fall
+    from le import LE
+    le = LE(match.EXE)
+    fix_at = {f.src_va: f for f in le.fixups()}
+    gsyms = build_fall.load_symbols()
     nok = 0
     for src, obj in objs.items():
         name = a.func or os.path.basename(src)[:-2]
@@ -93,8 +99,19 @@ def main():
         except KeyError:
             print("MISSING", name)
             continue
+        bad = None
+        if ok:
+            o = OMF(obj)
+            for pub, si, off, size in o.functions():
+                if build_fall.c_name(pub) != name:
+                    continue
+                lo = max([q + z for _p, s2, q, z in o.functions() if s2 == si and q < off] + [0])
+                bad = build_fall.check_relocs(o, si, lo, off, size, va, tgt, fix_at, syms,
+                                              gsyms, le, {})
+            ok = bad is None
         nok += ok
-        print("%-4s %s %s" % ("OK" if ok else "FAIL", name, "" if ok else "%d bytes" % diff))
+        print("%-4s %s %s" % ("OK" if ok else "FAIL", name,
+                              "" if ok else bad or "%d bytes" % diff))
     print("%d / %d match" % (nok, len(objs)))
     if not a.srcs or len(a.srcs) == 1:
         print("work dir:", td)
