@@ -908,6 +908,10 @@ class Func:
                 self.set_reg(full, E("0", 4, atom=True, tag=("hiclr",)))
                 return
             v = self.reg(full, ins)
+            if v.size == 2 and v.atom and not os.environ.get("LIFT_NOAHMASK"):
+                # a word read with its high byte cleared: x & 0xff (mov ax,[x]; xor ah,ah)
+                self.set_reg(full, E("%s & 255" % v.p(), 2))
+                return
             # byte zero-extended to 16 bits: mov al,[x]; xor ah,ah
             self.set_reg(full, E("(unsigned short)(unsigned char)" + v.p(), 2))
             return
@@ -934,7 +938,14 @@ class Func:
             return
         if m in ("xor", "sub") and ops[0].type == cx.X86_OP_REG and \
                 ops[1].type == cx.X86_OP_REG and ops[0].reg == ops[1].reg:
-            self.set_reg(subreg(ins.reg_name(ops[0].reg))[0], E("0", 4, atom=True))
+            full_r, sz_r = subreg(ins.reg_name(ops[0].reg))
+            cur_r = self.regs.get(full_r)
+            if sz_r < 4 and cur_r is not None and cur_r.size == 4 and \
+                    not os.environ.get("LIFT_NOXORLOW"):
+                # xor ax,ax clears only the low word
+                self.set_reg(full_r, E("%s & %d" % (cur_r.p(), -(1 << (8 * sz_r))), 4))
+                return
+            self.set_reg(full_r, E("0", 4, atom=True))
             return
         if m == "imul" and len(ops) == 3:
             full, _ = subreg(ins.reg_name(ops[0].reg))
