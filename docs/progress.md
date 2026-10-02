@@ -1196,3 +1196,10 @@ Batch **1,927**; build **61.34%**.
   testing). Batch **2,087**.
 - Register pins are tried at any first difference with differing registers, not only pure
   renames. +7. Batch **2,094**.
+- More register pins: a pin with the next choice held at its old register, pins at
+  differences whose registers don't line up (`mov edx,[g]` against `mov edx,eax`), and an
+  offline wide search (`LIFT_PINWIDE=1`, ~8 min) over nearby pairs of choices whose
+  results the flip cache keeps. A compare chain jumping back to a loop's continue is ifs,
+  not a switch (no switch case precedes its dispatch). Unsupported first attempts flip the
+  choice points nearest where the lifter stopped. `DAGGER_RIGHTPREF` knob. +20.
+  Batch **2,106**.

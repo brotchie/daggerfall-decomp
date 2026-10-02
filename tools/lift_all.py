@@ -168,31 +168,65 @@ def pin_search(name, va, c, detail, at, flips, attempt):
     if REG_RE.sub("R", ours) != REG_RE.sub("R", theirs) and os.environ.get("LIFT_PINSAME"):
         return None
     pairs = [(a, b) for a, b in zip(REG_RE.findall(ours), REG_RE.findall(theirs)) if a != b]
-    if not pairs:
-        return None
-    mine, want = pairs[0]
     log = reg_log(c)
     if not log:
         return None
     used = {lift.pin_decode(f)[0] for f in flips if f <= -3000}
-    # a choice that took our register gets theirs, or one that took theirs gets ours
-    near_k = [k for k, r in enumerate(log) if r == mine and k not in used]
-    order = [(k, want) for k in near_k] + \
-        [(k, mine) for k, r in enumerate(log) if r == want and k not in used]
+    if not pairs:
+        # the registers don't line up (`mov edx,[g]` against `mov edx,eax`): any choice to
+        # any register either instruction names
+        regs = sorted(set(REG_RE.findall(ours + " " + theirs)))
+        if not regs:
+            return None
+        mine = want = None
+        near_k = []
+        order = [(k, r) for k in range(len(log)) if k not in used for r in regs if r != log[k]]
+    else:
+        mine, want = pairs[0]
+        # a choice that took our register gets theirs, or one that took theirs gets ours
+        near_k = [k for k, r in enumerate(log) if r == mine and k not in used]
+        order = [(k, want) for k in near_k] + \
+            [(k, mine) for k, r in enumerate(log) if r == want and k not in used]
     tries = 0
     for k, reg in order[:64]:
         if reg not in lift.PIN_REGS:
             continue
-        tries += 1
-        f2 = flips | {lift.pin_encode(k, reg)}
-        r = attempt(f2)
-        if r is None:
-            continue
-        s2, d2, at2 = r[0], r[1], r[2]
-        if s2 == "ok" or (s2 == "diff" and at2 is not None and at2 > at):
-            return ((1 << 40) if s2 == "ok" else at2, 0, f2, r, tries)
+        # the pin alone, then with the next choice held at what it took before (moving
+        # one choice frees or takes a register the next one wanted)
+        variants = [flips | {lift.pin_encode(k, reg)}]
+        if k + 1 < len(log) and log[k + 1] in lift.PIN_REGS and k + 1 not in used:
+            variants.append(variants[0] | {lift.pin_encode(k + 1, log[k + 1])})
+        for f2 in variants:
+            tries += 1
+            r = attempt(f2)
+            if r is None:
+                continue
+            s2, d2, at2 = r[0], r[1], r[2]
+            if s2 == "ok" or (s2 == "diff" and at2 is not None and at2 > at):
+                return ((1 << 40) if s2 == "ok" else at2, 0, f2, r, tries)
+    if mine is None:
+        return None
     # a swap: one choice to theirs and another to ours
     took_want = [k for k, r in enumerate(log) if r == want and k not in used]
+    if os.environ.get("LIFT_PINWIDE"):
+        # (offline, slow) every nearby pair of choices, each to ours, theirs or its own
+        for k1 in near_k + took_want:
+            for k2 in range(max(0, k1 - 3), min(len(log), k1 + 4)):
+                if k2 == k1 or k2 in used:
+                    continue
+                for r1 in (want, mine):
+                    for r2 in {mine, want, log[k2]}:
+                        if r1 not in lift.PIN_REGS or r2 not in lift.PIN_REGS or \
+                                (r1 == log[k1] and r2 == log[k2]):
+                            continue
+                        tries += 1
+                        f2 = flips | {lift.pin_encode(k1, r1), lift.pin_encode(k2, r2)}
+                        r = attempt(f2)
+                        if r is None:
+                            continue
+                        s2, d2, at2 = r[0], r[1], r[2]
+                        if s2 == "ok" or (s2 == "diff" and at2 is not None and at2 > at):
+                            return ((1 << 40) if s2 == "ok" else at2, 0, f2, r, tries)
     for k1 in near_k[:8]:
         for k2 in took_want[:8]:
             if want not in lift.PIN_REGS or mine not in lift.PIN_REGS:
@@ -220,7 +254,7 @@ def work(va):
         # call, say): the choice points seen before the failure, nearest first
         c = None
         m = re.search(r" at ([0-9a-f]+)$", str(e))
-        where = int(m.group(1), 16) if m else va
+        where = int(m.group(1), 16) if m else info.get("where", va)
         for a in sorted(info.get("choices", []), key=lambda a: abs(a - where))[:24]:
             info2 = {}
             try:

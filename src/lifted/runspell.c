@@ -99,7 +99,6 @@ extern void func_0007D7BA(void);
 extern void func_0008A4E4(int);
 extern void func_0008A550(int, int, int);
 extern void func_0008E3F7(int, int);
-int func_0005AFD5(int, int);
 int func_0005B107(int, int, int);
 int func_0005B408(int, int);
 int func_0005B905(int, int, int, int);
@@ -115,31 +114,6 @@ void func_0005CA28(int);
 void func_0005CA87(int);
 #pragma dagger slots func_0005BA28 a1 16 a2 4 a3 8 l_18 12
 #pragma dagger slots func_0005C448 a1 20 a2 24 l_44 52 l_40 48 l_34 36 l_20 16 l_1C 12 l_18 8 ret 4
-
-int func_0005A9F8(int a1, int a2)
-{
-    int l_1C;
-    int l_18;
-
-    l_1C = 0;
-    l_18 = func_0008DCE3(*(int *)(*(char **)D_00195AA4 + 67), 0, 89);
-L5AA29:;
-    if (*(signed char *)((char *)(int)(*(char **)D_00195B04 + (l_1C * 89)) + 47) == 0) goto L5AA53;
-    if (((int)(unsigned char)*(signed char *)((char *)(int)(*(char **)D_00195B04 + (l_1C * 89)) + 73)) == a1) goto L5AA5B;
-L5AA53:;
-    l_1C++;
-    goto L5AA29;
-L5AA5B:;
-    *(signed char *)((char *)l_18) = 9;
-    *(int *)((char *)l_18 + 31) = func_0008EB88(((unsigned)*(int *)(*(char **)D_00195AC4 + 31)) >> 16);
-    func_000A1023(l_18 + 71, (int)(*(char **)D_00195B04 + (l_1C * 89)), 89, (int)D_001757F4, 121, 4);
-    *(signed char *)((char *)l_18 + 143) = 250;
-    l_1C = func_0003A0C0(l_18 + 71, *(int *)D_00195BE0);
-    if (func_0005AFD5(l_18, a2) == 0) goto L5AAD2;
-    func_0008DA91(l_18);
-L5AAD2:;
-    return l_1C;
-}
 
 int func_0005AAE4(int a1, int a2, int a3)
 {

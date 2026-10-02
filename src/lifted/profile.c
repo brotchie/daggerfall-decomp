@@ -18,12 +18,14 @@ extern int func_000A0E3B();
 extern int func_000A0E74();
 int func_00012DA5(signed char);
 #pragma aux sosconv "*" parm caller [] value [eax] modify [eax ebx ecx edx];
+#pragma dagger reg func_000127EB 12 ebx 13 eax 19 eax
 #pragma dagger slots func_000122F1 l_44 60 l_42 58 l_24 28 l_20 24 l_1C 20 l_18 16 l_14 12 l_10 8 ret 4
 #pragma aux (sosconv) func_00012203;
 #pragma aux (sosconv) func_000122F1;
 #pragma aux (sosconv) func_00012640;
 #pragma aux (sosconv) func_0001270C;
 #pragma aux (sosconv) func_00012768;
+#pragma aux (sosconv) func_000127EB;
 #pragma aux (sosconv) func_000128A2;
 #pragma aux (sosconv) func_0001296A;
 
@@ -169,6 +171,28 @@ L127BA:;
     if ((short)func_000124BF(a1, (int)D_0017013B) != 0) goto L127DA;
     return 0;
 L127DA:;
+    return 1;
+}
+
+int func_000127EB(int a1, int a2)
+{
+    int l_14;
+    int l_10;
+
+    l_10 = 0;
+    if ((short)func_00011E36(a1, a2) != 0) goto L1281E;
+    return 0;
+L1281E:;
+    l_14 = *(int *)((char *)a1 + 156);
+L1282A:;
+    if (((int)(unsigned char)*(signed char *)((char *)(l_14 + l_10))) == 10) goto L12844;
+    l_10++;
+    goto L1282A;
+L12844:;
+    l_10++;
+    func_000A0E0D(l_14, l_14 + l_10, (*(int *)((char *)a1 + 132) + *(int *)((char *)a1 + 136)) - (l_14 + l_10), (int)D_00170129, 1119, 4);
+    *(int *)((char *)a1 + 136) -= l_10;
+    *(signed char *)((char *)a1 + 1) |= 128;
     return 1;
 }
 

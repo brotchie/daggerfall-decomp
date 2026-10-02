@@ -10,11 +10,13 @@ extern char D_001759F8[];
 extern char D_0018320A[];
 extern char D_00184FD7[];
 extern char D_00185083[];
+extern char D_00186A64[];
 extern char D_00186D83[];
 extern char D_00186D85[];
 extern char D_00186D87[];
 extern char D_00186D89[];
 extern char D_00186DE3[];
+extern char D_0018DDD4[];
 extern char D_0018DDE0[];
 extern char D_00190504[];
 extern char D_00190CE4[];
@@ -89,6 +91,46 @@ void func_0006630B(int);
 void func_00066352(void);
 void func_00066853(int, int);
 void func_00067027(int);
+#pragma dagger DAGGER_CONFPOS func_00065937
+#pragma dagger reg func_00065937 45 edx
+
+void func_00065937(int a1, int a2, int a3, int a4)
+{
+    int l_1C;
+    int l_18;
+    int l_14;
+    int l_10;
+    int l_C;
+
+    l_1C = a1 + 71;
+    l_18 = l_1C + 560;
+    if (l_1C != *(int *)D_00195BE0) goto L65980;
+    if (((int)(unsigned char)(*(signed char *)(*(char **)D_00195BEC + 1) & 64)) != 0) goto L65982;
+L65980:;
+    goto L65987;
+L65982:;
+    return;
+L65987:;
+    if (a4 != 0) goto L659B3;
+    if (func_0008ADC3(2, 64, l_1C, l_18, 4, *(int *)D_0018DDD4) == 100) return;
+L659B3:;
+    if (((int)(unsigned char)*(signed char *)((char *)l_1C + 129)) == 1) return;
+    l_10 = func_0008DCE3(a1, 0, 47);
+    *(signed char *)((char *)l_10) = 11;
+    *(short *)((char *)l_10 + 21) = 32771;
+    l_C = l_10 + 71;
+    if (a2 == 0) goto L65A31;
+    l_14 = 0;
+L65A01:;
+    if (((int)(unsigned char)*(signed char *)((char *)(l_14++ + a2))) != 255) goto L65A01;
+    a3 = (int)(unsigned char)*(signed char *)((char *)(int)((char *)a2 + func_0007D6AE(0, l_14 - 2)));
+L65A31:;
+    func_000A1023(l_C, (a3 * 47) + ((int)D_00186A64), 47, (int)D_00175970, 83, 4);
+    if (((int)(short)*(short *)((char *)l_C + 27)) == 255) goto L65A7C;
+    *(short *)((char *)l_C + 27) = func_0007D6AE((int)(short)*(short *)((char *)l_C + 27), (int)(short)*(short *)((char *)l_C + 29));
+L65A7C:;
+    *(short *)((char *)l_C + 29) = 0;
+}
 
 void func_00065A8C(int a1, int a2, int a3)
 {

@@ -6,6 +6,7 @@ extern char D_001789FA[];
 extern char D_00186DEC[];
 extern char D_0018DC34[];
 extern char D_0018DD54[];
+extern char D_0018DD5C[];
 extern char D_0018DD60[];
 extern char D_00195AA4[];
 extern char D_00195BEC[];
@@ -15,7 +16,15 @@ extern char D_00195E2A[];
 extern char D_00196280[];
 extern char D_001962B3[];
 extern char D_001A3AE8[];
+extern char D_001A3AF4[];
+extern char D_001A3B14[];
+extern char D_001A3B1C[];
+extern char D_001A3B20[];
+extern char D_001A3B24[];
+extern char D_001A3B28[];
+extern char D_001A3B2C[];
 extern char D_001A3BD8[];
+extern char D_001A3BDC[];
 extern char D_001A3BE0[];
 extern char D_001A3BE4[];
 extern char D_001A3EFC[];
@@ -38,13 +47,13 @@ extern int func_00011870(int, ...);
 extern int func_0001FFF1(void);
 extern int func_00062EF7(int, int, int);
 extern int func_00068F5E(int, int, int, int);
-extern int func_000694B8(int, int);
 extern int func_00085A51(int);
 extern int func_000994F0(int, int);
 extern int func_0009957D(int, int);
 extern int func_0009E2BB();
 extern int func_0009E61A();
 extern int func_000A0024();
+extern int func_000A0040();
 extern int func_000A0517();
 extern int func_000A0AD9();
 extern int func_000A0E3B();
@@ -53,6 +62,7 @@ extern int func_000A1D3C();
 extern int func_000A1ED5();
 extern int func_000A20BF();
 extern int func_000A2460();
+extern int func_000A2504();
 extern int func_000A2687();
 extern int func_000A277F();
 extern int func_000A27A0();
@@ -61,14 +71,17 @@ extern int func_000A2941();
 extern int func_000C7FD9();
 extern int func_000C7FF4();
 extern int func_000C808D();
+int func_000694B8(int, int);
 int func_00069A62(int, int, int);
 void func_00068DA6(int, int, int, int, int);
 void func_000696A3(int);
 void func_000697E3(void);
 void func_00069DAA(void);
 #pragma dagger DAGGER_CONFPOS func_00068C06
+#pragma dagger DAGGER_CONFPOS func_000694B8
 #pragma dagger KKND_CONFREV func_00068BA8
 #pragma dagger reg func_00068C06 37 edx 40 ebx
+#pragma dagger reg func_000694B8 30 edx
 #pragma dagger slots func_000699D8 a1 28 a2 24 a3 12 a4 20 l_6C 100 l_18 16 l_10 8 ret 4
 
 void func_00068BA8(int a1, int a2)
@@ -167,6 +180,65 @@ L68F24:;
     *(int *)((char *)a4) = 32768 - *(int *)((char *)l_18 + 8);
 L68F31:;
     *(int *)((char *)a3) = (*(int *)((char *)a3) * ((int)(short)*(short *)(*(char **)D_00195BF8 + 2))) / 128;
+}
+
+int func_000694B8(int a1, int a2)
+{
+    int l_28;
+    int l_24;
+    int l_20;
+    int l_1C;
+    int l_18;
+
+    l_18 = 0;
+    if (*(signed char *)D_001A3F5D != 0) goto L694E7;
+    return -1;
+L694E7:;
+    if (*(int *)D_0018DD5C != (-1)) goto L694FC;
+    return -1;
+L694FC:;
+    l_28 = 0;
+L69503:;
+    if (l_28 < 3) goto L69513;
+    goto L69542;
+L6950B:;
+    l_28++;
+    goto L69503;
+L69513:;
+    if (*(int *)(D_001A3BD8 + (l_28 * 268)) == 305419896) goto L69542;
+    if ((short)func_000A2460(*(int *)D_0018DD60, *(int *)(D_001A3BD8 + (l_28 * 268))) == 0) goto L6950B;
+L69542:;
+    if (l_28 != 3) goto L6958A;
+    l_28 = 0;
+L6954F:;
+    if (l_28 < 3) goto L6955F;
+    goto L6958A;
+L69557:;
+    l_28++;
+    goto L6954F;
+L6955F:;
+    if (*(int *)(D_001A3BDC + (l_28 * 268)) >= 90) goto L69588;
+    func_000A2687(*(int *)D_0018DD60, *(int *)(D_001A3BD8 + (l_28 * 268)));
+    goto L6958A;
+L69588:;
+    goto L69557;
+L6958A:;
+    if (l_28 != 3) goto L6959C;
+    return -1;
+L6959C:;
+    func_000A0040((l_28 * 268) + ((int)D_001A3AE8), 0, 240, (int)D_00175ACC, 336, 4);
+    *(int *)(D_001A3BDC + (l_28 * 268)) = 90;
+    *(int *)(D_001A3AE8 + (l_28 * 268)) = a1;
+    *(int *)(D_001A3AF4 + (l_28 * 268)) = a2;
+    *(int *)(D_001A3B14 + (l_28 * 268)) = 2147450879;
+    *(int *)(D_001A3B1C + (l_28 * 268)) = 11025;
+    *(int *)(D_001A3B28 + (l_28 * 268)) = 32768;
+    *(int *)(D_001A3B2C + (l_28 * 268)) = 32768;
+    *(int *)(D_001A3B20 + (l_28 * 268)) = 8;
+    *(int *)(D_001A3B24 + (l_28 * 268)) = 1;
+    *(int *)(D_001A3BE4 + (l_28 * 268)) = 0;
+    *(int *)(D_001A3BD8 + (l_28 * 268)) = func_000A2504(*(int *)D_0018DD60, (l_28 * 268) + ((int)D_001A3AE8));
+    return l_28;
 }
 
 void func_000696A3(int a1)

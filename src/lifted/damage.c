@@ -106,6 +106,9 @@ void func_0002F2FA(int);
 void func_0002FB8B(int);
 void func_000303F1(void);
 #pragma aux func_000A0ED9 parm routine [];
+#pragma dagger DAGGER_CONFPOS func_0002F62C
+#pragma dagger DAGGER_LEFTPREF func_0002F62C
+#pragma dagger reg func_0002F62C 18 edx 19 edx
 #pragma dagger slots func_0003009A a1 12 a2 16 l_30 32 l_18 8 l_14 4
 #pragma dagger slots func_00030275 a1 16 a2 20 l_3C 44 l_38 40 l_34 36 l_1C 12 l_18 8 l_14 4
 
@@ -357,6 +360,33 @@ L2F5E3:;
     l_1C = func_000C808D(*(int *)((char *)a1 + 7), *(int *)((char *)a1 + 15), *(int *)(*(char **)D_00195AA4 + 7), *(int *)(*(char **)D_00195AA4 + 15));
     func_000CE70D(0, l_1C, 10, l_18 + 7);
     func_0007E31C(l_18);
+}
+
+void func_0002F62C(int a1, int a2, int a3, int a4)
+{
+    int l_14;
+    int l_10;
+    int l_C;
+
+    l_14 = func_0004A3EC(a1);
+    if (l_14 == 0) return;
+    l_C = a1 + 71;
+    if (((int)(unsigned char)*(signed char *)((char *)l_C + 67)) >= 43) goto L2F688;
+    if (*(short *)(D_001842D9 + (((int)(unsigned char)*(signed char *)((char *)l_C + 67)) * 2)) == 0) goto L2F68A;
+L2F688:;
+    goto L2F68F;
+L2F68A:;
+    return;
+L2F68F:;
+    if (((int)(unsigned char)*(signed char *)((char *)l_C + 504)) == 16) return;
+    *(short *)((char *)l_C + 110) = (a4 * (((a2 - l_14) << 8) / (a2 + l_14))) / 256;
+    *(short *)((char *)l_C + 110) = (a2 / l_14) * (a4 - ((int)(short)*(short *)((char *)l_C + 110)));
+    if (((int)(short)*(short *)((char *)l_C + 110)) >= 15) goto L2F70D;
+    *(short *)((char *)l_C + 110) = 15;
+L2F70D:;
+    *(short *)((char *)l_C + 108) = a3;
+    *(signed char *)((char *)l_C + 64) |= 32;
+    *(signed char *)((char *)l_C + 504) = 16;
 }
 
 void func_0002F72F(int a1, int a2, int a3, int a4)

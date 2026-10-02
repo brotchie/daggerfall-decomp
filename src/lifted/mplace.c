@@ -13,11 +13,14 @@ extern char D_001940DB[];
 extern char D_001950EC[];
 extern char D_001951EC[];
 extern char D_001951ED[];
+extern char D_0019599C[];
 extern char D_001959AC[];
+extern char D_00195A04[];
 extern char D_00195AA4[];
 extern char D_00195AC4[];
 extern char D_00195BDC[];
 extern char D_00195BE0[];
+extern char D_00195BF4[];
 extern char D_00195BF8[];
 extern char D_00195C74[];
 extern char D_00196274[];
@@ -56,9 +59,11 @@ extern void func_0008E3F7(int, int);
 int func_00025BDD(int);
 int func_00026081(int, int);
 void func_0002631D(int);
+void func_00026508(void);
 void func_000266C7(int);
 void func_0002675D(int);
 #pragma dagger KKND_CONFREV func_00026565
+#pragma dagger reg func_00026476 5 edx
 
 int func_0002599F(int a1)
 {
@@ -561,6 +566,30 @@ L2643E:;
 L26455:;
     func_0008E3F7(*(int *)D_00195AC4, (int)func_0002631D);
     func_0009DC49(l_18);
+}
+
+void func_00026476(void)
+{
+    int l_1C;
+    int l_18;
+
+    if (((int)(unsigned char)*(signed char *)D_001789FA) == 3) return;
+    if (((unsigned)*(int *)D_0019599C) > *(int *)D_00195BF4) return;
+    *(int *)D_0019599C = (int)(*(char **)D_00195BF4 + func_0007D6AE(1400, 1700));
+    l_18 = *(int *)D_00195A04 + 71;
+    l_1C = 0;
+L264D0:;
+    if (l_1C < 62) goto L264E0;
+    return;
+L264D8:;
+    l_1C++;
+    goto L264D0;
+L264E0:;
+    if (*(int *)((char *)l_18 + 8) == 0) goto L264D8;
+    if (((unsigned)*(int *)((char *)l_18 + 8)) >= *(int *)D_00195BF4) goto L264FC;
+    func_00026508();
+L264FC:;
+    goto L264D8;
 }
 
 void func_00026508(void)

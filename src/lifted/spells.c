@@ -16,6 +16,7 @@ extern char D_0017A84C[];
 extern char D_0017A87F[];
 extern char D_0017A8B2[];
 extern char D_0017A8E5[];
+extern char D_0017A94B[];
 extern char D_0017AE13[];
 extern char D_0017AF6B[];
 extern char D_0017B202[];
@@ -46,6 +47,7 @@ extern char D_00196274[];
 extern char D_00196279[];
 extern char D_0019961C[];
 extern char D_00199624[];
+extern char D_00199628[];
 extern char D_0019962C[];
 extern char D_0019962E[];
 extern char D_0019962F[];
@@ -74,7 +76,6 @@ extern int func_0012B136();
 extern int func_0012B2D3();
 extern int func_0012DB50();
 extern int func_00144F68();
-extern void func_0003817F(int);
 extern void func_00038872(int, short, int, int);
 extern void func_0003D01C(int, int);
 extern void func_0003EC2A(int, int);
@@ -95,13 +96,17 @@ int func_00039B93(unsigned char);
 int func_00039C09(void);
 int func_00039D24(int);
 void func_00037DBB(unsigned char);
+void func_0003817F(int);
 void func_00039A8F(void);
 void func_00039B50(int);
 void func_00039F94(void);
 void func_00039FD6(void);
 void func_0003A036(void);
 #pragma aux func_000A0ED9 parm routine [];
+#pragma dagger DAGGER_CONFLIST func_0003817F
+#pragma dagger KKND_CONFREV func_0003817F
 #pragma dagger KKND_CONFREV func_00039E5F
+#pragma dagger reg func_0003817F 2 edx 3 eax
 #pragma dagger slots func_0003853C a1 8 l_18 4 ret 12
 #pragma dagger slots func_00039224 a1 12 l_1C 8 l_18 4 ret 16
 
@@ -405,6 +410,17 @@ L380C1:;
     *(short *)(*(char **)D_00178A0A + 8) = (*(short *)(*(char **)D_00178A0A + 10) = (*(short *)(*(char **)D_00178A0A + 12) = 0));
     *(short *)D_0019962C = 65535;
     return 0;
+}
+
+void func_0003817F(int a1)
+{
+    short l_18;
+
+    *(int *)&l_18 = (int)(unsigned char)*(signed char *)((char *)(int)(*(char **)D_00178A0A + (((int)(short)*(short *)D_00195F30) * 2)));
+    func_000A1023((int)D_0019961C, (((int)(unsigned char)*(signed char *)(D_0017AF6B + (((int)(short)*(short *)&a1) + (((int)(short)l_18) * 12)))) << 3) + ((int)D_0017AE13), 8, (int)D_00170B13, 1030, 8);
+    *(signed char *)((char *)(int)(*(char **)D_00178A0A + (((int)(short)*(short *)D_00195F30) * 2)) + 1) = *(signed char *)&a1;
+    *(signed char *)D_0019962E = *(signed char *)(D_0017A94B + ((((int)(short)l_18) * 12) + ((int)(short)*(short *)&a1)));
+    *(short *)D_00199628 = 0;
 }
 
 int func_0003853C(short a1)

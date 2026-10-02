@@ -1609,6 +1609,10 @@ class Func:
                    for x in self.ins for op in x.operands if ebp_slot(x, op) == t):
                 self.cskip = saved
                 continue
+            # a case before the dispatch (a jump back to a loop's continue): a chain of ifs
+            if any(a < i.address for a in sw["cases"]) and not os.environ.get("LIFT_BACKCASE"):
+                self.cskip = saved
+                continue
             sw["store"] = i.address
             found[i.address] = sw
             self.temps.add(t)           # the compiler's own temp: not declared
@@ -2416,7 +2420,7 @@ FUNC_OPTS = ["KKND_CONFREV", "DAGGER_LEFTPREF", "DAGGER_CHARAUTOSMALL", "DAGGER_
              "KKND_LINSEL", "KKND_NOROT", "KKND_STRETCH", "DAGGER_FIRSTUSE",
              "DAGGER_NOSAVES", "DAGGER_REGLAST", "DAGGER_NOGIVEN", "DAGGER_CONFLIST",
              "DAGGER_CONFLISTREV", "DAGGER_KEEPSUB", "DAGGER_NODEMOTE",
-             "DAGGER_NOCVTDEMOTE", "DAGGER_DEADDEFMEM", "DAGGER_CONFPOS", "DAGGER_CONFPOSREV"]
+             "DAGGER_NOCVTDEMOTE", "DAGGER_DEADDEFMEM", "DAGGER_CONFPOS", "DAGGER_CONFPOSREV", "DAGGER_RIGHTPREF"]
 IMPLICIT = bool(os.environ.get("LIFT_IMPLICIT"))
 
 
@@ -2754,6 +2758,10 @@ def lift(va, flips=frozenset(), info=None):
         if info is not None:
             info["choices"] = list(f.choices)
             info["sites"] = dict(f.choice_sites)
+            try:
+                info["where"] = f.body[f.k].address
+            except Exception:
+                pass
 
 
 def main():

@@ -1467,7 +1467,7 @@ index 310489af1a..0f98337910 100644
      if( !LDone( oc ) ) {
          if( OC_BASE_CLASS( oc->oc_header.class ) != OC_INFO
 diff --git a/bld/cg/c/regalloc.c b/bld/cg/c/regalloc.c
-index 90c1857729..0153860ba5 100644
+index 90c1857729..60b004f8f0 100644
 --- a/bld/cg/c/regalloc.c
 +++ b/bld/cg/c/regalloc.c
 @@ -31,6 +31,9 @@
@@ -1488,7 +1488,7 @@ index 90c1857729..0153860ba5 100644
  #undef _InRegAssgn
  
      if( _LBitEmpty( conf->id.within_block ) && _GBitEmpty( conf->id.out_of_block ) ) {
-@@ -472,7 +476,11 @@ static int_32   CountRegMoves( conflict_node *conf,
+@@ -472,7 +476,15 @@ static int_32   CountRegMoves( conflict_node *conf,
                      case OP_AND:
                      case OP_OR:
                      case OP_XOR:
@@ -1498,10 +1498,14 @@ index 90c1857729..0153860ba5 100644
 +                        if( _IsntModel( CGSW_GEN_NO_OPTIMIZATION )
 +                          || DaggerEnv( "DAGGER_LEFTPREF" ) == NULL )
 +                            op2 = ins->operands[1];
++                        /* DAGGER_RIGHTPREF: only the right operand */
++                        if( _IsModel( CGSW_GEN_NO_OPTIMIZATION )
++                          && DaggerEnv( "DAGGER_RIGHTPREF" ) != NULL )
++                            op1 = NULL;
                          break;
                      }
                  }
-@@ -922,6 +930,97 @@ static  void    NeighboursUse( conflict_node *conf )
+@@ -922,6 +934,97 @@ static  void    NeighboursUse( conflict_node *conf )
  }
  
  
@@ -1599,7 +1603,7 @@ index 90c1857729..0153860ba5 100644
  static hw_reg_set   GiveBestReg( conflict_node *conf, reg_tree *tree,
                                       hw_reg_set except, bool needs_one )
  /*************************************************************************
-@@ -986,13 +1085,24 @@ static hw_reg_set   GiveBestReg( conflict_node *conf, reg_tree *tree,
+@@ -986,13 +1089,24 @@ static hw_reg_set   GiveBestReg( conflict_node *conf, reg_tree *tree,
          all_true = true;
          for( possible = tree->regs; !HW_CEqual( *possible, HW_EMPTY ); ++possible ) {
              reg = *possible;
@@ -1626,7 +1630,7 @@ index 90c1857729..0153860ba5 100644
                         && HW_Subset( GivenRegisters, reg )
                         && !HW_Subset( GivenRegisters, best ) ) ) {
                          best = reg;
-@@ -1004,6 +1114,23 @@ static hw_reg_set   GiveBestReg( conflict_node *conf, reg_tree *tree,
+@@ -1004,6 +1118,23 @@ static hw_reg_set   GiveBestReg( conflict_node *conf, reg_tree *tree,
                  }
              }
          }
@@ -1650,7 +1654,7 @@ index 90c1857729..0153860ba5 100644
          if( all_true ) {
              HW_CAsgn( given, HW_EMPTY );
          } else if( HW_CEqual( best, HW_EMPTY ) ) {
-@@ -1193,12 +1320,24 @@ conflict_node   *GiveRegister( conflict_node *conf, bool needs_one )
+@@ -1193,12 +1324,24 @@ conflict_node   *GiveRegister( conflict_node *conf, bool needs_one )
  }
  
  
@@ -1676,7 +1680,7 @@ index 90c1857729..0153860ba5 100644
  }
  
  
-@@ -1207,6 +1346,40 @@ static  void    SortConflicts( void )
+@@ -1207,6 +1350,40 @@ static  void    SortConflicts( void )
      Sort the conflicts in order of descending savings.
  */
  {
@@ -1717,7 +1721,7 @@ index 90c1857729..0153860ba5 100644
      ConfList = SortList( ConfList, offsetof( conflict_node, next_conflict ), ConfBefore );
  }
  
-@@ -1242,6 +1415,18 @@ static  enum allocation_state    AssignConflicts( void )
+@@ -1242,6 +1419,18 @@ static  enum allocation_state    AssignConflicts( void )
          }
      }
      ConstSavings();
@@ -1736,7 +1740,7 @@ index 90c1857729..0153860ba5 100644
  
      SortConflicts();
      state = ALLOC_BITS;
-@@ -1265,7 +1450,9 @@ static  enum allocation_state    AssignConflicts( void )
+@@ -1265,7 +1454,9 @@ static  enum allocation_state    AssignConflicts( void )
              */
              if( !only_const_temps && opnd->n.class == N_TEMP && (opnd->t.temp_flags & CONST_TEMP) )
                  return( ALLOC_CONST_TEMP );
