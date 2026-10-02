@@ -18,6 +18,8 @@ extern char D_0018084E[];
 extern char D_0018092E[];
 extern char D_001853A0[];
 extern char D_001854C8[];
+extern char D_0018565E[];
+extern char D_00185662[];
 extern char D_001856C8[];
 extern char D_00187CA8[];
 extern char D_001903A4[];
@@ -38,6 +40,7 @@ extern char D_00190EE4[];
 extern char D_001940D4[];
 extern char D_001940D8[];
 extern char D_00195B58[];
+extern char D_00195BE0[];
 extern char D_00195BE8[];
 extern char D_00195BEC[];
 extern char D_00195C44[];
@@ -73,13 +76,13 @@ extern void func_0003F09F(int, int);
 extern void func_000425F2(void);
 extern void func_00053A89(int, short, int);
 extern void func_00053E83(int);
-extern void func_0005425C(int);
 extern void func_000557A7(void);
 extern void func_00055A5B(void);
 extern void func_00055F0F(void);
 extern void func_000567CA(unsigned char);
 extern void func_0007D3CA(int);
 int func_000540F9(int, int);
+void func_0005425C(int);
 void func_0005559C(void);
 #pragma aux func_000A0ED9 parm routine [];
 
@@ -282,6 +285,25 @@ L54210:;
     func_0012B2D3((int)(short)*(short *)D_0012AC04, (int)(short)*(short *)D_0012AC06);
     func_000A1023(655360, *(int *)D_00143550, 64000, (int)D_00175420, 568, 4);
     goto L541A3;
+}
+
+void func_0005425C(int a1)
+{
+    int l_1C;
+    int l_18;
+
+    l_18 = (((int)(short)*(short *)(D_0018565E + (((int)(short)*(short *)&a1) * 12))) + ((int)(short)*(short *)(D_00185662 + (((int)(short)*(short *)&a1) * 12)))) >> 1;
+    if (((int)(short)*(short *)D_0012AC06) >= 81) goto L542CA;
+    *(short *)((char *)(int)(*(char **)D_00195BE0 + (((int)(short)*(short *)&a1) * 2)) + 145) = (((int)(short)*(short *)D_0012AC06) - 81) / 5;
+    goto L5431C;
+L542CA:;
+    if (((int)(short)*(short *)D_0012AC06) <= 81) goto L54304;
+    *(short *)((char *)(int)(*(char **)D_00195BE0 + (((int)(short)*(short *)&a1) * 2)) + 145) = (((int)(short)*(short *)D_0012AC06) - 81) / 5;
+    goto L5431C;
+L54304:;
+    *(short *)((char *)(int)(*(char **)D_00195BE0 + (((int)(short)*(short *)&a1) * 2)) + 145) = 0;
+L5431C:;
+    *(short *)((char *)(int)(*(char **)D_00195BE0 + (((int)(short)*(short *)&a1) * 2)) + 145) = -*(short *)((char *)(int)(*(char **)D_00195BE0 + (((int)(short)*(short *)&a1) * 2)) + 145);
 }
 
 void func_00054352(void)

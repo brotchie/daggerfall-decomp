@@ -438,6 +438,14 @@ L2C5CF:;
     goto L2C5C0;
 }
 
+int func_0002C96B(int a1, int a2, short a3)
+{
+    if (a3 != 0) goto L2C9A0;
+    return *(int *)((char *)func_00030A23(a1, 4, (int)(short)*(short *)&a2) + 16);
+L2C9A0:;
+    return *(int *)((char *)func_00030A23(a1, 3, (int)(short)*(short *)&a2) + 12);
+}
+
 void func_0002C9C2(int a1, int a2)
 {
     int l_1C;

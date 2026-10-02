@@ -867,3 +867,20 @@ Batch **1,509**.
   so a broken `lift.py` fails at once instead of hanging.
 
 Batch **1,568**.
+
+## 2026-10-02: parameter type choices, char parameters, indirect calls
+
+- **Short or int parameter?** A parameter spilled as a dword and only read as a word is a
+  `short`, or an `int` read through `(short)` casts; the two differ only in where the frame
+  puts it (2-byte parameters first). It is now a choice point at the spill, settled by the
+  batch search. +20.
+- **Char parameters go first too**: 1-byte parameters sit at the top of the frame with the
+  2-byte ones (a census of the prologues: always at the top, mostly last to first), so the
+  compiler's small-parameter group includes them (`DAGGER_CHARPARMBIG=1` for the old
+  order). +8. (Char *locals* in that group: +2 -1, left off, `DAGGER_CHARAUTOSMALL=1`.)
+- **Indirect calls**: none of the 52 functions with a `call [p]` matched. The C front end
+  declares a hidden auto symbol (`.F`) for every indirect call, and at `-od`
+  `ForceTempsMemory()` gives every front-end temp a frame slot. Watcom 10 didn't: the
+  symbol is now declared without a slot (`DAGGER_INDSLOT=1` restores it). +16.
+
+Batch **1,612**.

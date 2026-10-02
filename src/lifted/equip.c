@@ -64,17 +64,41 @@ extern int func_000A0F5C(int, ...);
 extern int func_000A1235();
 extern int func_00144F68();
 extern void func_0003F09F(int, int);
+extern void func_0005DE74(unsigned short, short, short, int);
 extern void func_0005E450(unsigned short, int);
-extern void func_0005E540(int, int, int);
 extern void func_0005FA0E(int, int, int, unsigned short);
 extern void func_00060430(int, int);
+extern void func_0006077F(int, int);
 extern void func_000614FB(int);
 extern void func_00096F95(int);
 int func_0005F6E9(int);
 int func_0005F955(int);
+void func_0005E540(int, int, int);
 void func_0005F0E8(int, int);
 void func_00061326(int);
 #pragma aux func_000A0ED9 parm routine [];
+
+void func_0005E540(int a1, int a2, int a3)
+{
+    if (((unsigned)a1) < 5) goto L5E569;
+    if (((unsigned)a1) <= 5) goto L5E571;
+    if (a1 == 11) goto L5E58B;
+    goto L5E5A4;
+L5E569:;
+    if (a1 == 4) goto L5E57E;
+    goto L5E5A4;
+L5E571:;
+    func_0006077F(a3, a2);
+    return;
+L5E57E:;
+    func_00060430(a3, a2);
+    return;
+L5E58B:;
+    func_0005DE74(287, 27, 8, a3);
+    return;
+L5E5A4:;
+    func_0005DE74((int)(unsigned short)*(short *)((char *)((a2 * 2) + *(int *)(D_00185F88 + (a1 << 2)))), (int)(short)*(short *)&a1, (int)(short)*(short *)&a2, a3);
+}
 
 void func_0005E5D7(int a1, int a2)
 {
@@ -522,6 +546,18 @@ void func_0005FFE5(int a1, int a2, int a3)
     *(short *)((char *)l_10 + 32) = 28;
     *(short *)((char *)l_10 + 34) = 0;
     *(int *)((char *)l_10 + 36) = func_0007D6AE(a2, a3) * ((int)(unsigned char)*(signed char *)((char *)*(int *)D_00195BE0 + 129));
+}
+
+void func_00060184(int a1, int a2)
+{
+    int l_14;
+
+    l_14 = func_0008DCE3(a1, 0, 107);
+    *(signed char *)((char *)l_14) = 2;
+    *(int *)((char *)l_14 + 7) = *(int *)((char *)a1 + 7);
+    *(int *)((char *)l_14 + 11) = *(int *)((char *)a1 + 11);
+    *(int *)((char *)l_14 + 15) = *(int *)((char *)a1 + 15);
+    func_0005E450((int)(unsigned short)*(short *)&a2, l_14 + 71);
 }
 
 void func_000601ED(int a1, int a2)

@@ -6,6 +6,7 @@ extern char D_000C23C8[];
 extern char D_000C23CC[];
 extern char D_0012AC00[];
 extern char D_0012AC02[];
+extern char D_0012B508[];
 extern char D_0012DE00[];
 extern char D_00147954[];
 extern char D_00176884[];
@@ -176,6 +177,8 @@ extern void func_0004B5CF(void);
 extern void func_0004C759(void);
 extern void func_0004F3F6(void);
 extern void func_00050069(int);
+extern void func_0005A54A(int, int, int);
+extern void func_0005A5D2(int, int, int);
 extern void func_00064467(int);
 extern void func_000698AF(short);
 extern void func_00069D36(void);
@@ -1049,4 +1052,37 @@ void func_0007C8AF(void)
     *(int *)D_001A4FE0 = *(int *)D_00195AC4;
     func_0008E3F7(*(int *)D_001959A8, (int)func_0007C56F);
     func_0008E3A7(*(int *)D_00195AC4, (int)func_0007C78B);
+}
+
+void func_0007C908(int a1, int a2, int a3)
+{
+    int l_10;
+
+    *(short *)&l_10 = (int)(unsigned char)*(signed char *)D_0012B508;
+    *(signed char *)D_0012B508 = 0;
+    func_0005A5D2(a1, (int)&*(signed char *)((char *)((int)(short)*(short *)&a2) + 1), (int)&*(signed char *)((char *)((int)(short)*(short *)&a3) + 1));
+    *(signed char *)D_0012B508 = *(signed char *)&l_10;
+    func_0005A5D2(a1, (int)(short)*(short *)&a2, (int)(short)*(short *)&a3);
+}
+
+void func_0007C965(int a1, int a2, int a3)
+{
+    int l_10;
+
+    *(short *)&l_10 = (int)(unsigned char)*(signed char *)D_0012B508;
+    *(signed char *)D_0012B508 = 15;
+    func_0005A54A(a1, (int)&*(signed char *)((char *)((int)(short)*(short *)&a2) + 1), (int)&*(signed char *)((char *)((int)(short)*(short *)&a3) + 1));
+    *(signed char *)D_0012B508 = *(signed char *)&l_10;
+    func_0005A54A(a1, (int)(short)*(short *)&a2, (int)(short)*(short *)&a3);
+}
+
+void func_0007C9C2(int a1, int a2, int a3)
+{
+    int l_10;
+
+    *(short *)&l_10 = (int)(unsigned char)*(signed char *)D_0012B508;
+    *(signed char *)D_0012B508 = 0;
+    func_0005A54A(a1, (int)&*(signed char *)((char *)((int)(short)*(short *)&a2) + 1), (int)&*(signed char *)((char *)((int)(short)*(short *)&a3) + 1));
+    *(signed char *)D_0012B508 = *(signed char *)&l_10;
+    func_0005A54A(a1, (int)(short)*(short *)&a2, (int)(short)*(short *)&a3);
 }

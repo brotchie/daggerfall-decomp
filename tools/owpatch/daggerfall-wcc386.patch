@@ -1,18 +1,19 @@
 diff --git a/bld/cc/c/cgen.c b/bld/cc/c/cgen.c
-index ee6e5533cb..6532e34eb3 100644
+index ee6e5533cb..1ccc31bde2 100644
 --- a/bld/cc/c/cgen.c
 +++ b/bld/cc/c/cgen.c
-@@ -35,6 +35,9 @@
+@@ -35,6 +35,10 @@
  #include "jmpbuf.h"
  #include "i64.h"
  #include "cg.h"
 +
 +extern bool DaggerAutoNested;
++extern bool DaggerNoSlot;
 +extern void DaggerTableHere( int );   /* tells the code generator about nested-block locals */
  #include "cgdefs.h"
  #include "cgswitch.h"
  #include "cgcli.h"
-@@ -1117,7 +1120,13 @@ static void CDoAutoDecl( SYM_HANDLE sym_handle )
+@@ -1117,10 +1121,21 @@ static void CDoAutoDecl( SYM_HANDLE sym_handle )
              }
              dtype = CGenType( typ );
              if( sym.flags & SYM_FUNC_RETURN_VAR ) {
@@ -26,8 +27,16 @@ index ee6e5533cb..6532e34eb3 100644
 +                }
                  SymReplace( &sym, sym_handle );
              } else {
++                /* Daggerfall: the hidden symbol of an indirect call (".F") gets no frame
++                 * slot of its own (DAGGER_INDSLOT=1 gives it one) */
++                DaggerNoSlot = ( sym.flags & ( SYM_FUNCTION | SYM_TEMP ) )
++                    == ( SYM_FUNCTION | SYM_TEMP ) && getenv( "DAGGER_INDSLOT" ) == NULL;
                  CGAutoDecl( (CGSYM_HANDLE)sym_handle, dtype );
-@@ -1289,7 +1298,11 @@ static void EmitNodes( TREEPTR tree )
++                DaggerNoSlot = false;
+             }
+         }
+ #if _CPU != 370
+@@ -1289,7 +1304,11 @@ static void EmitNodes( TREEPTR tree )
              break;
          case OPR_NEWBLOCK:              // start of new block { vars; }
              DBBegBlock();
@@ -39,7 +48,7 @@ index ee6e5533cb..6532e34eb3 100644
              break;
          case OPR_ENDBLOCK:              // end of new block { vars; }
              DBEndBlock();
-@@ -1501,8 +1514,13 @@ static void EmitNodes( TREEPTR tree )
+@@ -1501,8 +1520,13 @@ static void EmitNodes( TREEPTR tree )
              op1 = PopCGName();          // - get address of array
              PushCGName( IndexOperator( op1, node, op2 ) );
              break;
@@ -102,18 +111,19 @@ index e800aac5b8..5d93ba83bb 100644
                  ins = MakeBinary( OP_ADD, addr->u.n.name,
                                      AllocS32Const( addr->u.n.offset ),
 diff --git a/bld/cg/c/bldcall.c b/bld/cg/c/bldcall.c
-index 14a056a76b..63b9aa5f52 100644
+index 14a056a76b..dd98919418 100644
 --- a/bld/cg/c/bldcall.c
 +++ b/bld/cg/c/bldcall.c
-@@ -31,6 +31,7 @@
+@@ -31,6 +31,8 @@
  
  
  #include "_cgstd.h"
++#include <stdio.h>
 +#include <stdlib.h>
  #include "coderep.h"
  #include "cgmem.h"
  #include "cgauxcc.h"
-@@ -65,6 +66,7 @@
+@@ -65,6 +67,7 @@
  #include "tree.h"
  #include "treeprot.h"
  #include "feprotos.h"
@@ -121,7 +131,7 @@ index 14a056a76b..63b9aa5f52 100644
  
  
  type_class_def  AddCallBlock( cg_sym_handle sym, const type_def *tipe )
-@@ -161,6 +163,89 @@ void    BGAddParm( cn call, an parm )
+@@ -161,6 +164,112 @@ void    BGAddParm( cn call, an parm )
  }
  
  
@@ -136,6 +146,27 @@ index 14a056a76b..63b9aa5f52 100644
 +#define DAGGER_MAX_DECLS    512
 +
 +bool                DaggerAutoNested;       /* set by the C front end */
++bool                DaggerNoSlot;           /* set by the C front end: a hidden symbol */
++static name         *DaggerNoSlots[DAGGER_MAX_DECLS];
++static int          DaggerNoSlotCount;
++static proc_def     *DaggerNoSlotProc;
++
++bool    DaggerIsNoSlot( name *op )
++/********************************/
++{
++    int     i;
++
++    if( DaggerNoSlotProc != CurrProc )
++        return( false );
++    for( i = 0; i < DaggerNoSlotCount; i++ ) {
++        if( DaggerNoSlots[i] == op ) {
++            return( true );
++        }
++    }
++    return( false );
++}
++
++
 +
 +static proc_def     *DaggerProc;
 +static name         *DaggerDecls[DAGGER_MAX_DECLS];
@@ -174,12 +205,14 @@ index 14a056a76b..63b9aa5f52 100644
 +        return;
 +    /* 2-byte variables come first: parameters, then locals, last to first */
 +    for( i = DaggerCount; i-- > 0; ) {
-+        if( DaggerKinds[i] == DAGGER_PARM && DaggerDecls[i]->n.size == 2 ) {
++        if( DaggerKinds[i] == DAGGER_PARM && ( DaggerDecls[i]->n.size == 2
++          || ( DaggerDecls[i]->n.size == 1 && getenv( "DAGGER_CHARPARMBIG" ) == NULL ) ) ) {
 +            DaggerAlloc( DaggerDecls[i] );
 +        }
 +    }
 +    for( i = DaggerCount; i-- > 0; ) {
-+        if( DaggerKinds[i] == DAGGER_AUTO && DaggerDecls[i]->n.size == 2 ) {
++        if( DaggerKinds[i] == DAGGER_AUTO && ( DaggerDecls[i]->n.size == 2
++          || ( DaggerDecls[i]->n.size == 1 && getenv( "DAGGER_CHARAUTOSMALL" ) != NULL ) ) ) {
 +            DaggerAlloc( DaggerDecls[i] );
 +        }
 +    }
@@ -211,16 +244,27 @@ index 14a056a76b..63b9aa5f52 100644
  void    BGAutoDecl( cg_sym_handle sym, const type_def *tipe )
  /*************************************************************
   * declare an automatic variable with name "sym" and type "tipe". This
-@@ -168,6 +253,8 @@ void    BGAutoDecl( cg_sym_handle sym, const type_def *tipe )
+@@ -168,6 +277,19 @@ void    BGAutoDecl( cg_sym_handle sym, const type_def *tipe )
   */
  {
      BGDone( MakeAddrName( CG_FE, sym, tipe ) );
-+    DaggerAllocAtDecl( SAllocUserTemp( sym, TypeClass( tipe ), tipe->length ),
-+                       DaggerAutoNested ? DAGGER_NESTED : DAGGER_AUTO );
++    if( DaggerNoSlot ) {
++        name    *t = SAllocUserTemp( sym, TypeClass( tipe ), tipe->length );
++
++        if( DaggerNoSlotProc != CurrProc ) {
++            DaggerNoSlotProc = CurrProc;
++            DaggerNoSlotCount = 0;
++        }
++        if( DaggerNoSlotCount < DAGGER_MAX_DECLS )
++            DaggerNoSlots[DaggerNoSlotCount++] = t;
++    } else {
++        DaggerAllocAtDecl( SAllocUserTemp( sym, TypeClass( tipe ), tipe->length ),
++                           DaggerAutoNested ? DAGGER_NESTED : DAGGER_AUTO );
++    }
  }
  
  static  void    LinkParmIns( instruction *parm_def, instruction *ins )
-@@ -295,6 +382,10 @@ name    *DoParmDecl( cg_sym_handle sym, const type_def *tipe, hw_reg_set reg )
+@@ -295,6 +417,10 @@ name    *DoParmDecl( cg_sym_handle sym, const type_def *tipe, hw_reg_set reg )
      } else {
          temp = SAllocUserTemp( sym, TypeClass( tipe ), tipe->length );
          BGDone( MakeAddrName( CG_FE, sym, tipe ) );
@@ -457,7 +501,7 @@ index 721fa0c6a9..bcb4e28a83 100644
              loops_killed = true;
              CleanPartition();
 diff --git a/bld/cg/c/generate.c b/bld/cg/c/generate.c
-index a7f606be70..6f779cfe7b 100644
+index a7f606be70..f326ee49b0 100644
 --- a/bld/cg/c/generate.c
 +++ b/bld/cg/c/generate.c
 @@ -31,6 +31,8 @@
@@ -477,11 +521,12 @@ index a7f606be70..6f779cfe7b 100644
  
  
  static  bool            abortCG;
-@@ -144,6 +147,59 @@ static  void    AddANop( void )
+@@ -144,6 +147,60 @@ static  void    AddANop( void )
  }
  
  
 +extern void DaggerMarkNow( void );
++extern bool DaggerIsNoSlot( name *op );
 +extern bool DaggerMarkIsSet( void );
 +
 +/* Daggerfall: the front end marks where a switch table goes (see optmain.c). Before the
@@ -537,7 +582,18 @@ index a7f606be70..6f779cfe7b 100644
  static  void            PreOptimize( void )
  /*****************************************/
  {
-@@ -501,7 +557,12 @@ static  void    FlushBlocks( bool partly_done )
+@@ -333,8 +390,8 @@ static  void    ForceTempsMemory( void )
+     ParmPropagate();
+     for( op = Names[N_TEMP]; op != LastTemp; op = next ) {
+         next = op->n.next_name;
+-        if( (op->v.usage & USE_IN_ANOTHER_BLOCK)
+-          || _FrontEndTmp( op ) ) {
++        if( ( (op->v.usage & USE_IN_ANOTHER_BLOCK)
++          || _FrontEndTmp( op ) ) && !DaggerIsNoSlot( op ) ) {
+             op = DeAlias( op );
+             op->v.usage |= NEEDS_MEMORY | USE_MEMORY;
+             while( op->v.conflict != NULL ) {
+@@ -501,7 +558,12 @@ static  void    FlushBlocks( bool partly_done )
          classes |= blk->class;
          CurrBlock = blk;
          BlockToCode( partly_done );
@@ -551,7 +607,7 @@ index a7f606be70..6f779cfe7b 100644
      }
      CurrBlock = curr;
      HeadBlock = NULL;
-@@ -665,6 +726,9 @@ void    Generate( bool routine_done )
+@@ -665,6 +727,9 @@ void    Generate( bool routine_done )
              InitStackMap();
              BlockByBlock = true;
          }
@@ -561,7 +617,7 @@ index a7f606be70..6f779cfe7b 100644
          LNBlip( SrcLine );
          FlushBlocks( false );
          FreeExtraSyms( LastTemp );
-@@ -722,6 +786,11 @@ void    Generate( bool routine_done )
+@@ -722,6 +787,11 @@ void    Generate( bool routine_done )
          Panic( false );
          return;
      }

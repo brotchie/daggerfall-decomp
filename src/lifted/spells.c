@@ -86,11 +86,13 @@ extern void func_0007F1E3(int);
 extern void func_0008C566(int, short);
 extern void func_0008CF0E(int);
 extern void func_0008D497(int, int);
+extern void func_0008E3F7(int, int);
 int func_00037D5A(void);
 int func_00038067(void);
 int func_00039C09(void);
 int func_00039D24(int);
 void func_00037DBB(unsigned char);
+void func_00039B50(int);
 void func_00039F94(void);
 void func_00039FD6(void);
 void func_0003A036(void);
@@ -481,6 +483,24 @@ void func_00039B50(int a1)
     if (((int)(unsigned char)*(signed char *)((char *)a1)) != 9) return;
     if (*(signed char *)((char *)a1 + 144) != *(signed char *)D_00199630) return;
     *(int *)D_00195B50 = a1;
+}
+
+int func_00039B93(unsigned char a1)
+{
+    int l_24;
+    int l_20;
+
+    *(int *)D_00195B50 = 0;
+    *(signed char *)D_00199630 = a1;
+    l_20 = func_0008E6C5(*(int *)((char *)*(int *)D_00195AA0 + 63), 27, 0);
+    func_0008E3F7(*(int *)((char *)l_20 + 63), (int)func_00039B50);
+    if (*(int *)D_00195B50 == 0) goto L39BEF;
+    l_24 = 1;
+    goto L39BF6;
+L39BEF:;
+    l_24 = 0;
+L39BF6:;
+    return l_24;
 }
 
 int func_00039C09(void)

@@ -354,6 +354,15 @@ class Func:
         # a parameter's declared type is what the callers convert their arguments to
         ct = caller_types().get(self.va) if not os.environ.get("LIFT_NOCALLERTYPES") else None
         self.sig_types = [self.slot_type.get(off, "int") for _r, off, _s in self.params]
+        # A parameter spilled as a dword and only read as a word is a short, or an int read
+        # through (short) casts; they differ in where the frame puts it: a choice point at
+        # the spill.
+        for n, (_r, off, spill) in enumerate(self.params):
+            if spill == 4 and self.slot_type.get(off) in ("short", "unsigned short"):
+                at = self.ins[self.body_start - len(self.params) + n].address
+                self.choices.append(at)
+                if at in self.flips:
+                    self.slot_type[off] = "int"
         if ct:
             for n, (_r, off, spill) in enumerate(self.params):
                 # a narrow load can also be a narrow value passed to an int: the spill width

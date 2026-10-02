@@ -51,6 +51,7 @@ extern int func_000A00CB();
 extern int func_000A0DF4();
 extern int func_000A0ED9(int, int);
 extern int func_000A0F5C(int, ...);
+extern int func_0012DBCC();
 extern int func_00144FB4();
 extern void func_0003EC2A(int, int);
 extern void func_0005A5D2(int, int, int);
@@ -194,6 +195,17 @@ void func_0005A3BC(void)
     func_0003EC2A(l_18, 2);
     func_0008C4E4(((int)(short)*(short *)D_00199D5C) + 1);
     *(short *)D_00190D68 = 4;
+}
+
+void func_0005A577(int a1, int a2, int a3)
+{
+    unsigned char l_10;
+
+    l_10 = *(signed char *)D_0012B508;
+    *(signed char *)D_0012B508 = *(signed char *)D_0012B504;
+    func_0012DBCC((int)(short)(a2 + 1), (int)(short)(a3 + 1), a1);
+    *(signed char *)D_0012B508 = l_10;
+    func_0012DBCC((int)(short)*(short *)&a2, (int)(short)*(short *)&a3, a1);
 }
 
 void func_0005A60C(int a1, int a2, int a3)

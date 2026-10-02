@@ -120,6 +120,7 @@ extern int func_00018ACE(int);
 extern int func_00018F7C(void);
 extern int func_00019067(void);
 extern int func_000192EE(short);
+extern int func_00019532(int, unsigned char);
 extern int func_0001D2F0(short);
 extern int func_0001D46A(int);
 extern int func_000342E3(int);
@@ -151,6 +152,7 @@ extern void func_000164EF(void);
 extern void func_00016AA3(unsigned short);
 extern void func_000174C3(int);
 extern void func_00017CEF(int);
+extern void func_000195C4(int, unsigned char);
 extern void func_0003F09F(int, int);
 extern void func_00040C87(int);
 extern void func_000411BF(int, int);
@@ -1275,6 +1277,14 @@ L19513:;
     goto L194D1;
 L1951E:;
     return 0;
+}
+
+int func_0001961A(unsigned char a1)
+{
+    *(int *)D_00195B84 = 0;
+    func_000195C4(*(int *)D_0019672C, (int)(unsigned char)a1);
+    *(int *)D_00195B84 = func_0007D6AE(0, *(int *)D_00195B84 - 1);
+    return func_00019532(*(int *)D_0019672C, (int)(unsigned char)a1);
 }
 
 int func_0001AC53(int a1, int a2)
