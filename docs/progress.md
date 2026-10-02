@@ -1106,3 +1106,7 @@ Batch **1,927**; build **61.34%**.
   variable with a register (`DAGGER_WORDRMW` keeps them), and the lifter types such slots
   short. Slot-type choice points are now tried when the first difference is near any access
   of the slot. +5. Batch **1,932**; build **61.44%**.
+- **Indirect calls without arguments**: in `call [eax+D]` the register is (part of) the
+  function's address, not an argument: the lifter stops the argument list there (a choice
+  point keeps it). +22. Slot-type and array-extent choice points are tried near any access
+  of their slots, and the search budget is 600 attempts. +3. Batch **1,956**.

@@ -2,6 +2,9 @@
  * do not edit: move a function to src/sheet.c to work on it by hand) */
 
 extern char D_0012AC00[];
+extern char D_0012AC04[];
+extern char D_0012AC06[];
+extern char D_0012B504[];
 extern char D_0012B508[];
 extern char D_0012DA44[];
 extern char D_00142309[];
@@ -16,7 +19,11 @@ extern char D_00170CFD[];
 extern char D_00170D4C[];
 extern char D_00178A08[];
 extern char D_0017B4C0[];
+extern char D_0017B506[];
 extern char D_0017B508[];
+extern char D_0017B50A[];
+extern char D_0017B50C[];
+extern char D_0017B50E[];
 extern char D_0017B604[];
 extern char D_0017B608[];
 extern char D_0017B610[];
@@ -40,6 +47,7 @@ extern char D_001940D4[];
 extern char D_001940D8[];
 extern char D_001940D9[];
 extern char D_00195AA0[];
+extern char D_00195AA4[];
 extern char D_00195B14[];
 extern char D_00195B5C[];
 extern char D_00195BE0[];
@@ -67,6 +75,7 @@ extern int func_0003B1F3(int);
 extern int func_0003C6F1(void);
 extern int func_000417C8(int);
 extern int func_00055748(void);
+extern int func_00069938(int, int, int);
 extern int func_0006A683(int);
 extern int func_0006CB53(int, int);
 extern int func_0006CD6E(int);
@@ -166,6 +175,62 @@ L3B565:;
 L3B583:;
     *(signed char *)D_00196272 = 0;
     return 1;
+}
+
+void func_0003B59E(void)
+{
+    int l_18;
+
+    if (func_0003B1F3(0) == 0) return;
+    func_000CB552(*(int *)D_00195BE8);
+    func_00058E15(0, 0);
+    func_0012DB50(4);
+    func_0003B6CF();
+    if (*(signed char *)D_00142309 == 0) goto L3B5EB;
+    func_0003B436();
+L3B5EB:;
+    if (*(signed char *)D_0012AC00 == 0) goto L3B608;
+    if (*(signed char *)D_0012AC00 == 0) goto L3B606;
+    if (*(signed char *)D_00196279 != 0) goto L3B608;
+L3B606:;
+    goto L3B60D;
+L3B608:;
+    return;
+L3B60D:;
+    *(signed char *)D_0012B508 = 146;
+    *(signed char *)D_0012B504 = 92;
+    l_18 = 0;
+L3B622:;
+    if (l_18 < 23) goto L3B635;
+    return;
+L3B62D:;
+    l_18++;
+    goto L3B622;
+L3B635:;
+    if (*(short *)D_0012AC04 <= *(short *)(D_0017B506 + (l_18 * 12))) goto L3B65D;
+    if (*(short *)D_0012AC04 < *(short *)(D_0017B50A + (l_18 * 12))) goto L3B65F;
+L3B65D:;
+    goto L3B673;
+L3B65F:;
+    if (*(short *)D_0012AC06 > *(short *)(D_0017B508 + (l_18 * 12))) goto L3B675;
+L3B673:;
+    goto L3B689;
+L3B675:;
+    if (*(short *)D_0012AC06 < *(short *)(D_0017B50C + (l_18 * 12))) goto L3B68B;
+L3B689:;
+    goto L3B6C0;
+L3B68B:;
+    if (l_18 >= 12) goto L3B69A;
+    if ((*(unsigned char *)D_001940D9 & 4) != 0) goto L3B69C;
+L3B69A:;
+    goto L3B69E;
+L3B69C:;
+    goto L3B62D;
+L3B69E:;
+    func_00069938(203, *(int *)D_00195AA4, 110);
+    ((int (*)())(*(int *)(D_0017B50E + (l_18 * 12))))(l_18);
+L3B6C0:;
+    goto L3B62D;
 }
 
 void func_0003BAD0(void)

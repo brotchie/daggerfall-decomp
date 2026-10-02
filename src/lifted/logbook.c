@@ -2,12 +2,21 @@
  * do not edit: move a function to src/logbook.c to work on it by hand) */
 
 extern char D_000C0BA8[];
+extern char D_0012AC00[];
+extern char D_0012AC04[];
+extern char D_0012AC06[];
 extern char D_00142309[];
 extern char D_00142928[];
 extern char D_0014292C[];
+extern char D_00143550[];
 extern char D_00147954[];
 extern char D_00175C6C[];
 extern char D_00175C86[];
+extern char D_00186DF0[];
+extern char D_00186DF2[];
+extern char D_00186DF4[];
+extern char D_00186DF6[];
+extern char D_00186DF8[];
 extern char D_00186E20[];
 extern char D_00187CA8[];
 extern char D_00190D66[];
@@ -19,6 +28,7 @@ extern char D_00195C44[];
 extern char D_00195D94[];
 extern char D_00196272[];
 extern char D_00196274[];
+extern char D_00196279[];
 extern char D_001A3FA0[];
 extern char D_001A3FA4[];
 extern char D_001A3FA8[];
@@ -27,6 +37,7 @@ extern int func_0003B1F3(int);
 extern int func_0004BB64(int);
 extern int func_0005A442(unsigned char);
 extern int func_00069938(int, int, int);
+extern int func_0006A683(int);
 extern int func_0006CB53(int, int);
 extern int func_0006CD10(int, int, int);
 extern int func_0006CDAB(int);
@@ -42,9 +53,55 @@ extern int func_000A1023();
 extern int func_0012DB50();
 extern void func_0006A907(int);
 extern void func_0006ABA8(void);
+int func_0006A852(void);
 int func_0006AE87(int, int);
+void func_0006ADDB(void);
 void func_0006B0ED(void);
 void func_0006B24F(void);
+
+void func_0006A75C(void)
+{
+    int l_18;
+
+    if (func_0006A683(0) == 0) return;
+    func_000A1023(*(int *)D_00143550, *(int *)D_00195BE8, 64000, (int)D_00175C86, 53, 4);
+    func_0006ADDB();
+    if (*(signed char *)D_00142309 == 0) goto L6A7AA;
+    func_0006A852();
+L6A7AA:;
+    if (*(signed char *)D_0012AC00 == 0) goto L6A7C7;
+    if (*(signed char *)D_0012AC00 == 0) goto L6A7C5;
+    if (*(signed char *)D_00196279 != 0) goto L6A7C7;
+L6A7C5:;
+    goto L6A7CC;
+L6A7C7:;
+    return;
+L6A7CC:;
+    l_18 = 0;
+L6A7D3:;
+    if (l_18 < 4) goto L6A7E6;
+    return;
+L6A7DE:;
+    l_18++;
+    goto L6A7D3;
+L6A7E6:;
+    if (*(short *)D_0012AC04 <= *(short *)(D_00186DF0 + (l_18 * 12))) goto L6A80E;
+    if (*(short *)D_0012AC04 < *(short *)(D_00186DF4 + (l_18 * 12))) goto L6A810;
+L6A80E:;
+    goto L6A824;
+L6A810:;
+    if (*(short *)D_0012AC06 > *(short *)(D_00186DF2 + (l_18 * 12))) goto L6A826;
+L6A824:;
+    goto L6A83A;
+L6A826:;
+    if (*(short *)D_0012AC06 < *(short *)(D_00186DF6 + (l_18 * 12))) goto L6A83C;
+L6A83A:;
+    goto L6A846;
+L6A83C:;
+    ((int (*)())(*(int *)(D_00186DF8 + (l_18 * 12))))();
+L6A846:;
+    goto L6A7DE;
+}
 
 int func_0006A852(void)
 {

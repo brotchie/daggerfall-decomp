@@ -127,7 +127,7 @@ def check(name, c):
 
 # operand-order search: how many choice points before a mismatch to try, and compiles at most
 NEAR = 8
-BUDGET = 200
+BUDGET = 600
 
 
 def work(va):
@@ -165,9 +165,10 @@ def work(va):
         sites = info.get("sites", {})
         near = sorted((a for a in info["choices"] if a >= 0 and a not in flips),
                       key=lambda a: min(abs(x - at) for x in sites.get(a, [a])))[:NEAR]
-        near += [a for a in info["choices"] if a < 0 and a not in flips]   # function-level
+        # function-level choices (compiler knobs) too
+        func_level = [a for a in info["choices"] if a < 0 and a not in flips]
         found = None
-        for a in near:
+        for a in near + func_level:
             if tries >= BUDGET:
                 break
             tries += 1
@@ -203,6 +204,8 @@ def work(va):
         status, detail, at, c, info = found[3]
         best = (status, detail, at, c)
     status, detail, at, c = best
+    if os.environ.get("LIFT_SHOWFLIPS"):
+        print(name, sorted(flips), file=sys.stderr)
     if c is not None:
         check(name, c)          # leave the best version's .c and .bin on disk
     return name, status, detail

@@ -407,6 +407,8 @@ class Func:
             own = [o for o in above if o in self.slot_type and o > nxt]
             if own and a in afirst:
                 self.choices.append(afirst[a] + 0.5)
+                self.choice_sites[afirst[a] + 0.5] = [afirst[a]] + \
+                    [x for o in own for x in sites.get(o, [])]
                 if afirst[a] + 0.5 in self.flips:
                     nxt = max(own)
             size = a - nxt
@@ -1879,7 +1881,17 @@ class Func:
         else:
             target = self.reg(subreg(ins.reg_name(op.reg))[0], ins).p()
         args = []
+        if op.type == cx.X86_OP_MEM:
+            used = {ins.reg_name(x) for x in (op.mem.base, op.mem.index) if x}
+        else:
+            used = {ins.reg_name(op.reg)}
         for r in PARM_REGS:
+            if r in used and not self.pushes:
+                # the register holds (part of) the function's address: no more arguments,
+                # or it is one too (a choice point)
+                self.choices.append(ins.address + 0.25)
+                if ins.address + 0.25 not in self.flips:
+                    break
             if r in self.regs and self.regs[r] is not self.pending:
                 args.append(self.regs[r].text)
             else:

@@ -2,10 +2,16 @@
  * do not edit: move a function to src/icons.c to work on it by hand) */
 
 extern char D_0012AC00[];
+extern char D_0012AC04[];
 extern char D_0012AC06[];
 extern char D_00142309[];
 extern char D_00143550[];
 extern char D_00175898[];
+extern char D_00185C58[];
+extern char D_00185C5A[];
+extern char D_00185C5C[];
+extern char D_00185C5E[];
+extern char D_00185C60[];
 extern char D_00187CA8[];
 extern char D_00188208[];
 extern char D_00190DE4[];
@@ -21,6 +27,7 @@ extern char D_00196272[];
 extern char D_00196279[];
 extern char D_00196290[];
 extern char D_00199D68[];
+extern char D_00199D70[];
 extern char D_00199D71[];
 extern char D_001A5B32[];
 extern char D_001A9AB8[];
@@ -40,14 +47,62 @@ extern int func_00144F68();
 extern void func_00026904(void);
 extern void func_0004259C(int);
 extern void func_00042E24(int);
-extern void func_0005D2DE(int);
 extern void func_000717EC(void);
 extern void func_0008059B(void);
 extern void func_0008CF0E(int);
 extern void func_0008D497(int, int);
 extern void func_00094FA8(void);
 extern void func_00098651(void);
+void func_0005D2DE(int);
 void func_0005D97C(void);
+
+void func_0005D2DE(int a1)
+{
+    int l_18;
+
+    if (((int)(unsigned char)*(signed char *)D_00195E7A) != 1) goto L5D304;
+    if (*(signed char *)D_00195E7F == 0) goto L5D306;
+L5D304:;
+    goto L5D30B;
+L5D306:;
+    return;
+L5D30B:;
+    l_18 = 0;
+L5D312:;
+    if (l_18 < 11) goto L5D325;
+    return;
+L5D31D:;
+    l_18++;
+    goto L5D312;
+L5D325:;
+    if (*(short *)D_0012AC04 <= *(short *)(D_00185C58 + (l_18 * 12))) goto L5D34D;
+    if (*(short *)D_0012AC04 < *(short *)(D_00185C5C + (l_18 * 12))) goto L5D34F;
+L5D34D:;
+    goto L5D363;
+L5D34F:;
+    if (*(short *)D_0012AC06 > *(short *)(D_00185C5A + (l_18 * 12))) goto L5D365;
+L5D363:;
+    goto L5D379;
+L5D365:;
+    if (*(short *)D_0012AC06 < *(short *)(D_00185C5E + (l_18 * 12))) goto L5D37B;
+L5D379:;
+    goto L5D3CC;
+L5D37B:;
+    if (a1 == 0) goto L5D38D;
+    if (((int)(unsigned char)*(signed char *)D_00199D70) == l_18) goto L5D38F;
+L5D38D:;
+    goto L5D3BE;
+L5D38F:;
+    func_00069938(203, *(int *)D_00195AA4, 100);
+    ((int (*)())(*(int *)(D_00185C60 + (l_18 * 12))))((int)(unsigned char)*(signed char *)D_00196279);
+    *(signed char *)D_00199D70 = 255;
+    return;
+L5D3BE:;
+    if (a1 != 0) goto L5D3CC;
+    *(signed char *)D_00199D70 = *(signed char *)&l_18;
+L5D3CC:;
+    goto L5D31D;
+}
 
 void func_0005D3DB(void)
 {
