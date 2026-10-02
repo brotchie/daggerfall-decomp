@@ -53,7 +53,7 @@ extern void func_000298F3(int);
 extern void func_00050069(int);
 extern void func_00069E9E(int, int);
 extern void func_00069F39(int);
-extern void func_0008DD7E(int);
+extern void func_0008302D(int, int, int);
 int func_0008DA4D(int);
 int func_0008DA91(int);
 int func_0008DB21(int, int, int);
@@ -68,6 +68,7 @@ int func_0008EDB8(int);
 void func_0008D9DB(int);
 void func_0008DA1C(int);
 void func_0008DC1D(int);
+void func_0008DD7E(int);
 void func_0008DEB4(int, int, int, int, int, int, int);
 void func_0008E005(int);
 void func_0008E09A(int, int);
@@ -82,6 +83,8 @@ void func_0008EBFD(int);
 void func_0008ECEE(int);
 void func_0008ED52(int);
 #pragma aux func_000A0ED9 parm routine [];
+#pragma dagger DAGGER_PTRSWAP func_0008DD7E
+#pragma dagger reg func_0008DD7E 17 edx 45 eax
 #pragma dagger slots func_0008E6C5 a1 16 a2 4 a3 8 ret 12
 
 void func_0008D8CC(void)
@@ -233,6 +236,37 @@ int func_0008DD46(int a1, int a2)
     func_0008E005(a2);
     func_0008E0F5(a1, a2);
     return a2;
+}
+
+void func_0008DD7E(int a1)
+{
+    int l_20;
+    int l_1C;
+    int l_18;
+
+    if (*(int *)((char *)a1 + 67) == 3) goto L8DDA1;
+    if (*(int *)((char *)a1 + 67) != 18) goto L8DDA6;
+L8DDA1:;
+    return;
+L8DDA6:;
+    if (((int)(unsigned char)*(signed char *)((char *)a1)) == 52) goto L8DDC7;
+    if (((int)(unsigned char)*(signed char *)(*(char **)((char *)a1 + 67))) != 52) goto L8DDC9;
+L8DDC7:;
+    goto L8DDDB;
+L8DDC9:;
+    if (((int)(unsigned char)*(signed char *)(*(char **)((char *)a1 + 67))) != 22) goto L8DDE0;
+L8DDDB:;
+    return;
+L8DDE0:;
+    *(short *)((char *)a1 + 1) = (short)(*(short *)D_001A9B00 + (*(short *)((char *)a1 + 1) - *(short *)D_001A9B1C)) & 2047;
+    *(short *)((char *)a1 + 3) = (short)(*(short *)D_001A9B04 + (*(short *)((char *)a1 + 3) - *(short *)D_001A9B20)) & 2047;
+    *(short *)((char *)a1 + 5) = (short)(*(short *)D_001A9B08 + (*(short *)((char *)a1 + 5) - *(short *)D_001A9B24)) & 2047;
+    l_1C = *(int *)((char *)a1 + 7) - *(int *)D_001A9B2C;
+    l_18 = *(int *)((char *)a1 + 15) - *(int *)D_001A9B28;
+    func_0008302D((int)&l_1C, (int)&l_18, (int)(short)*(short *)((char *)a1 + 3));
+    *(int *)((char *)a1 + 7) = *(int *)D_001A9AF4 + l_1C;
+    *(int *)((char *)a1 + 11) = (int)(*(char **)D_001A9AF8 + (*(int *)((char *)a1 + 11) - *(int *)D_001A9B30));
+    *(int *)((char *)a1 + 15) = *(int *)D_001A9AFC + l_18;
 }
 
 void func_0008DEB4(int a1, int a2, int a3, int a4, int a5, int a6, int a7)

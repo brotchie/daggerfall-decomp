@@ -47,6 +47,7 @@ int func_00014438(int, int);
 int func_0001490D(int);
 void func_0001497D(int);
 #pragma dagger DAGGER_NODEMOTE func_00014334
+#pragma dagger DAGGER_RMW func_00014518
 
 int func_00013F4B(int a1, int a2, int a3)
 {

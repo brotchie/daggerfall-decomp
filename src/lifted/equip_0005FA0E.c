@@ -16,6 +16,7 @@ extern void func_0005E450(unsigned short, int);
 extern void func_0005E540(int, int, int);
 extern void func_00060430(int, int);
 extern void func_000614FB(int);
+#pragma dagger DAGGER_RMW func_0005FA0E
 
 void func_0005FA0E(int a1, int a2, int a3, int a4)
 {

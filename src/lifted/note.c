@@ -104,6 +104,8 @@ void func_0004E612(void);
 void func_0004EA3C(int, int);
 void func_0004EC7A(void);
 #pragma aux func_000A0ED9 parm routine [];
+#pragma dagger DAGGER_NOSAVES func_0004EA3C
+#pragma dagger reg func_0004EA3C 3 edx 4 edx 26 edx 27 eax
 #pragma dagger slots func_0004EAF4 a1 12 a2 8 a3 16 l_34 40 l_30 36 l_2C 32 l_28 28 l_24 24 l_20 20 ret 4
 
 int func_0004D1E6(short a1)

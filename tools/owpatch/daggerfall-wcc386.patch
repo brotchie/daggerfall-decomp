@@ -1218,19 +1218,21 @@ index 9a81270076..c0d4185e99 100644
          if( new_head != NULL
            && new_head != Head ) {
 diff --git a/bld/cg/c/makeaddr.c b/bld/cg/c/makeaddr.c
-index 759b3b65c1..aba1cb75db 100644
+index 759b3b65c1..ffaca0dd8e 100644
 --- a/bld/cg/c/makeaddr.c
 +++ b/bld/cg/c/makeaddr.c
-@@ -32,6 +32,8 @@
+@@ -32,6 +32,10 @@
  
  
  #include "_cgstd.h"
++#include <stdio.h>
++#include <stdlib.h>
 +extern const char *DaggerEnv( const char *name );
 +#include <stdlib.h>
  #include "coderep.h"
  #include "zoiks.h"
  #include "freelist.h"
-@@ -50,6 +52,7 @@
+@@ -50,6 +54,7 @@
  #include "feprotos.h"
  
  
@@ -1238,7 +1240,7 @@ index 759b3b65c1..aba1cb75db 100644
  static    pointer       *AddrNameFrl;
  
  static  void    CopyAddr( an src, an dst )
-@@ -241,6 +244,34 @@ static  name    *Display( cg_sym_handle symbol, level_depth level )
+@@ -241,6 +246,53 @@ static  name    *Display( cg_sym_handle symbol, level_depth level )
  }
  
  
@@ -1252,15 +1254,34 @@ index 759b3b65c1..aba1cb75db 100644
 + */
 +{
 +    opcnt   i;
++    bool    conv_sum;
 +
-+    if( _IsntModel( CGSW_GEN_NO_OPTIMIZATION ) || DaggerEnv( "DAGGER_RMW" ) != NULL )
++    if( _IsntModel( CGSW_GEN_NO_OPTIMIZATION ) )
 +        return( false );
-+    if( ins->num_operands < 2 )
-+        return( false );    /* unary ops did fold: `*p = -*p` is `neg dword ptr [eax]` */
 +    /* (nor into a store through a pointer: Watcom 10 computes the value first, then loads
 +     * the pointer; DAGGER_IDXFOLD=1 folds) */
-+    if( dst_name->n.class == N_INDEXED && DaggerEnv( "DAGGER_IDXKEEP" ) != NULL )
++    conv_sum = ( ins->num_operands == 1 && ins->head.opcode == OP_MOV
++      && dst_name->n.class == N_INDEXED
++      && ins->head.prev->head.opcode != OP_BLOCK && ins->head.prev->num_operands == 2
++      && ins->head.prev->result == ins->operands[0]
++      && ins->head.prev->operands[0]->n.class != N_CONSTANT
++      && ins->head.prev->operands[1]->n.class != N_CONSTANT );
++    if( dst_name->n.class == N_INDEXED && ( ins->num_operands == 2 || conv_sum )
++      && DaggerEnv( "DAGGER_IDXKEEP" ) != NULL )
 +        return( true );
++    if( DaggerEnv( "DAGGER_RMW" ) != NULL )
++        return( false );
++    if( conv_sum && DaggerEnv( "DAGGER_IDXFOLD" ) == NULL ) {
++        return( true );     /* (a conversion of such a sum: the same, see below) */
++    }
++    /* (an op of two computed values isn't pointed at a store through a pointer either; one
++     * with a constant is: `p->f = (a + b) & 2047` ands into the store) */
++    if( dst_name->n.class == N_INDEXED && ins->num_operands == 2
++      && ins->operands[1]->n.class != N_CONSTANT
++      && ins->operands[0]->n.class != N_CONSTANT && DaggerEnv( "DAGGER_IDXFOLD" ) == NULL )
++        return( true );
++    if( ins->num_operands < 2 )
++        return( false );    /* unary ops did fold: `*p = -*p` is `neg dword ptr [eax]` */
 +    for( i = 0; i < ins->num_operands; i++ ) {
 +        if( ins->operands[i] == dst_name ) {
 +            return( true );
@@ -1273,7 +1294,7 @@ index 759b3b65c1..aba1cb75db 100644
  an      MakeGets( an dst, an src, const type_def *tipe )
  /******************************************************/
  {
-@@ -253,7 +284,8 @@ an      MakeGets( an dst, an src, const type_def *tipe )
+@@ -253,7 +305,8 @@ an      MakeGets( an dst, an src, const type_def *tipe )
      InsToAddr( dst );
      dst_name = Points( dst, tipe );
      ins = src->u.i.ins;

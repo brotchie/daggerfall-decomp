@@ -150,9 +150,10 @@ int func_000830C7(int);
 void func_0008302D(int, int, int);
 #pragma aux func_0009DA1C parm routine [];
 #pragma aux func_000A0ED9 parm routine [];
+#pragma dagger DAGGER_RMW func_0008302D
 #pragma dagger DAGGER_RMW func_000830C7
-#pragma dagger DAGGER_RMW func_00084480
-#pragma dagger DAGGER_RMW func_000844FB
+#pragma dagger reg func_00084480 5 edx
+#pragma dagger reg func_000844FB 18 edx 25 edx
 
 void func_000827C3(int a1)
 {
@@ -906,7 +907,7 @@ int func_00084480(int a1, int a2, int a3)
     *(short *)((char *)l_14 + 27) = a2;
     *(short *)((char *)l_14 + 23) = a3;
     *(short *)((char *)l_14 + 19) = 8000;
-    *(int *)((char *)l_14 + 31) = *(int *)(*(char **)D_00195AC4 + 31) + ((int)(unsigned short)(*(short *)(*(char **)D_00195BDC + 37))++);
+    *(int *)((char *)l_14 + 31) = (int)(*(char **)(*(char **)D_00195AC4 + 31) + ((int)(unsigned short)(*(short *)(*(char **)D_00195BDC + 37))++));
     return l_14;
 }
 
@@ -935,10 +936,10 @@ L84560:;
     if (l_1C == 9) goto L8458E;
     if (l_1C != 16) goto L845B3;
 L8458E:;
-    *(int *)((char *)l_20 + 31) = *(int *)(*(char **)D_00195AC4 + 31) + ((int)(unsigned short)(*(short *)(*(char **)D_00195BDC + 39))++);
+    *(int *)((char *)l_20 + 31) = (int)(*(char **)(*(char **)D_00195AC4 + 31) + ((int)(unsigned short)(*(short *)(*(char **)D_00195BDC + 39))++));
     goto L845D6;
 L845B3:;
-    *(int *)((char *)l_20 + 31) = *(int *)(*(char **)D_00195AC4 + 31) + ((int)(unsigned short)(*(short *)(*(char **)D_00195BDC + 37))++);
+    *(int *)((char *)l_20 + 31) = (int)(*(char **)(*(char **)D_00195AC4 + 31) + ((int)(unsigned short)(*(short *)(*(char **)D_00195BDC + 37))++));
 L845D6:;
     *(short *)((char *)l_20 + 21) = 1;
     return l_20;

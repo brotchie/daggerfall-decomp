@@ -122,8 +122,9 @@ void func_0001E928(int);
 #pragma dagger DAGGER_CONFPOS func_0001EC32
 #pragma dagger DAGGER_KEEPSUB func_0001EC32
 #pragma dagger DAGGER_NODEMOTE func_0001E614
-#pragma dagger DAGGER_RMW func_0001E576
+#pragma dagger DAGGER_RMW func_0001E928
 #pragma dagger KKND_CONFREV func_0001EC32
+#pragma dagger reg func_0001E576 7 edx
 #pragma dagger reg func_0001EC32 58 edx 59 edx 60 edx
 
 void func_0001DAED(int a1)
@@ -455,7 +456,7 @@ int func_0001E576(void)
     *(int *)((char *)l_1C + 11) = func_0014B45B(*(int *)D_00196AA4, *(int *)D_00196AA8) - 8;
     *(int *)((char *)l_1C + 15) = *(int *)D_00196AA8 - 4096;
     *(short *)((char *)l_1C + 19) = 32768;
-    *(int *)((char *)l_1C + 31) = *(int *)(*(char **)D_00195AC4 + 31) + ((int)(unsigned short)(*(short *)(*(char **)D_00195BDC + 37))++);
+    *(int *)((char *)l_1C + 31) = (int)(*(char **)(*(char **)D_00195AC4 + 31) + ((int)(unsigned short)(*(short *)(*(char **)D_00195BDC + 37))++));
     return l_1C;
 }
 

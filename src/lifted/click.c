@@ -309,6 +309,7 @@ void func_00076DB9(void);
 void func_00077340(int);
 #pragma aux func_000A0ED9 parm routine [];
 #pragma dagger DAGGER_CONFLIST func_00077639
+#pragma dagger DAGGER_RMW func_00076FF2
 #pragma dagger DAGGER_RMW func_0007716B
 #pragma dagger reg func_0007716B 6 edx 20 eax
 #pragma dagger reg func_00077A23 8 ebx

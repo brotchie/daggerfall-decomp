@@ -84,6 +84,7 @@ void func_000633BC(int, int);
 #pragma dagger DAGGER_KEEPSUB func_0006243B
 #pragma dagger DAGGER_NOGIVEN func_0006243B
 #pragma dagger DAGGER_NOSAVES func_00064228
+#pragma dagger DAGGER_RMW func_000622EB
 #pragma dagger reg func_00063FCF 437 bx
 #pragma dagger reg func_00064228 19 edx
 #pragma dagger slots func_0006310D a1 8 a2 12 l_24 20 l_20 16 l_14 4

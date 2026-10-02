@@ -110,6 +110,8 @@ void func_000303F1(void);
 #pragma aux func_000A0ED9 parm routine [];
 #pragma dagger DAGGER_CONFPOS func_0002F62C
 #pragma dagger DAGGER_LEFTPREF func_0002F62C
+#pragma dagger DAGGER_RMW func_0002ECBE
+#pragma dagger DAGGER_RMW func_0002F490
 #pragma dagger reg func_0002F62C 18 edx 19 edx
 #pragma dagger slots func_0003009A a1 12 a2 16 l_30 32 l_18 8 l_14 4
 #pragma dagger slots func_00030275 a1 16 a2 20 l_3C 44 l_38 40 l_34 36 l_1C 12 l_18 8 l_14 4

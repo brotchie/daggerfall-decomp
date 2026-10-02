@@ -231,11 +231,12 @@ void func_00070DFD(void);
 void func_00071475(int);
 void func_00071518(void);
 #pragma aux func_000A0ED9 parm routine [];
-#pragma dagger DAGGER_CONFPOSREV func_00070887
 #pragma dagger DAGGER_LEFTPREF func_0006FDBE
 #pragma dagger DAGGER_NOSAVES func_00070B9C
+#pragma dagger DAGGER_RMW func_00070887
 #pragma dagger confwin func_0006FAD4 90 95
 #pragma dagger reg func_0006FDBE 437 bx
+#pragma dagger reg func_00070887 37 ebx
 #pragma dagger reg func_00071606 60 edx
 
 void func_0006DC35(int a1)

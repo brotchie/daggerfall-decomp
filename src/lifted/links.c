@@ -73,6 +73,11 @@ void func_0006530C(int);
 void func_0006546F(int, int);
 void func_000654EA(int);
 #pragma dagger DAGGER_CONFPOS func_00064708
+#pragma dagger DAGGER_CONFPOS func_000654EA
+#pragma dagger DAGGER_RMW func_0006480F
+#pragma dagger DAGGER_RMW func_0006546F
+#pragma dagger confwin func_000654EA 37 40
+#pragma dagger reg func_000654EA 5 eax
 #pragma dagger reg func_00065864 437 bx
 
 void func_00064337(int a1)
