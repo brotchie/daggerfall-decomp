@@ -24,6 +24,7 @@ Success prints `build/FALL.EXE: OK`. Anything else is a failure.
 usage: build_fall.py [-v] [--blank]
 """
 import argparse
+import csv
 import glob
 import hashlib
 import os
@@ -200,9 +201,20 @@ def main():
 
     sha = hashlib.sha1(out).hexdigest()
     want = open(os.path.join(ROOT, "config", "fall.sha1")).read().split()[0]
-    total = len({v for v, _ in funcs.values()})
-    done = sum(funcs[n][1] for _va, n, _r in matched)
-    print("matched %d / %d functions (%d bytes)" % (len(matched), total, done))
+    # progress per region (config/regions.csv): the game's own C is what counts
+    with open(os.path.join(ROOT, "config", "regions.csv"), newline="") as f:
+        regions = list(csv.DictReader(f))
+    by_va = {v: sz for v, sz in funcs.values()}
+    done_va = {va for va, _n, _r in matched}
+    for g in regions:
+        lo, hi = int(g["start"], 16), int(g["end"], 16)
+        vas = [v for v in by_va if lo <= v < hi]
+        dv = [v for v in vas if v in done_va]
+        if g["region"] == "game" or dv:
+            print("%-8s %4d / %4d functions, %6d / %6d bytes (%.2f%%)" % (
+                g["region"], len(dv), len(vas), sum(by_va[v] for v in dv),
+                sum(by_va[v] for v in vas),
+                100.0 * sum(by_va[v] for v in dv) / max(1, sum(by_va[v] for v in vas))))
     rel_out = os.path.relpath(OUT, ROOT)
     if sha == want and not errors:
         print("%s: OK" % rel_out)

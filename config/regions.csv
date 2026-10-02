@@ -1,0 +1,4 @@
+region,start,end,kind,notes
+game,0x00010010,0x0009DA1C,c,"the game's own C, 84 units (config/units.csv), Watcom 10 -od"
+library,0x0009DA1C,0x000BB27F,lib,"StratosWare MemCheck, Watcom C runtime, other libraries"
+xngine,0x000C0000,0x00161568,asm,"object 2: XnGine 3D engine, handwritten asm in a writable object"

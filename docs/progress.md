@@ -300,3 +300,29 @@ the original object files **in link order**:
 Functions that sit between two runs belong to one of the neighbours. That's not settled yet,
 but it's a small search per boundary. This sets the layout for `src/`: one C file per original
 unit, named as the original.
+
+## 2026-10-01: regions (plan section 6)
+
+`config/regions.csv` splits the code three ways, and the build now reports progress against the
+game region only:
+
+| Region | Range | Functions | Bytes | What |
+|---|---|---|---|---|
+| game | 0x10010-0x9DA1C | 2,297 | 580,076 | the game's own C, 84 units, all `-od` |
+| library | 0x9DA1C-0xBB27F | 1,018 | 109,364 | StratosWare MemCheck, Watcom runtime, others |
+| xngine | object 2 | 348 | 67,023 | XnGine 3D engine, handwritten asm |
+
+- The boundary is exact: the last `travel.c` function (`func_0009D986`) ends at 0x9DA1C, and
+  the next function uses a different convention (stack arguments, `ret 8`).
+- **MemCheck** strings ("MemCheck Internal: Could not set DPMI vector") start at 0x9DBDD, the
+  same library KKND found. The `__FILE__`/`__LINE__` calls are its checked wrappers:
+  `func_000A1023(dst, src, n, "faction.c", 1873, 4)` is a checked `memcpy`. The literal line
+  numbers have to be written out in our C, since our files won't have the same line count.
+- **Object 2 is XnGine**, the engine shared with Redguard and Battlespire: "XnGine: Jump to
+  zero-page.", "ENGINE: Out of memory for shaders.", `$`-terminated DOS strings. It's
+  handwritten asm (MASM-style encodings) in a writable object, likely self-modifying, so it
+  stays asm, as the plan expected.
+- `HMI*.386` drivers ship with the game, and `sosez.c` (the second unit) wraps HMI's Sound
+  Operating System.
+
+Game progress: **26 / 2,297 functions, 1,191 / 580,076 bytes (0.21%)**.
