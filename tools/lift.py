@@ -33,6 +33,7 @@ from capstone import x86 as cx
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from le import LE, SRC_OFF32  # noqa: E402
+import slot_plan  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 GAME_END = 0x9DA1C
@@ -289,6 +290,35 @@ class Func:
             if any(o - 3 <= k <= o for k in known):
                 continue
             self.slot_type[o] = "int"         # declared but never used
+        # callers see the access-based parameter types; the layout plan only changes how the
+        # function itself declares them
+        self.sig_types = [self.slot_type.get(off, "int") for _r, off, _s in self.params]
+        self.plan_slots()
+
+    def plan_slots(self):
+        """Read 2-byte types and nested locals off the frame layout (tools/slot_plan.py)."""
+        params = {o: i + 1 for i, (_r, o, _s) in enumerate(self.params)}
+        toks = []
+        for o in sorted(set(self.slot_type) | set(params) | set(self.arrays)
+                        | ({self.ret_slot} if self.ret_slot else set())):
+            if o in params:
+                toks.append(("P", params[o]))
+            elif o == self.ret_slot:
+                toks.append(("R",))
+            else:
+                toks.append(("L", o))
+        res = slot_plan.plan(toks, len(params))
+        self.nested = set()
+        if res is None:
+            return
+        small_p, small_l, nested = res
+        self.nested = nested
+        for o, i in params.items():
+            if i in small_p and self.size_of[self.slot_type.get(o, "int")] != 2:
+                self.slot_type[o] = "short"
+        for o in small_l:
+            if o in self.slot_type and self.size_of[self.slot_type[o]] != 2:
+                self.slot_type[o] = "short"
 
     def var(self, off):
         for k, (reg, o, sz) in enumerate(self.params):
@@ -792,8 +822,7 @@ class Func:
                  "{"]
         # Locals below every parameter were declared in a nested block: Watcom gives a
         # block's locals their slots when the block starts, after the function's own.
-        pmax = max([p[1] for p in self.params] + [0])
-        nested = [o for o in rest + two if self.params and o > pmax]
+        nested = [o for o in rest + two if o in self.nested]
         outer = [o for o in rest + two if o not in nested]
         decl_lines = []
         for o in outer:
@@ -860,8 +889,7 @@ def signature(va):
             f.type_slots()
             ret = "void" if f.void else "int"
             # a return statement decides void-ness during lifting; the epilogue tells us now
-            SIGS[va] = (ret, [f.slot_type.get(off, "int") for _r, off, _s in f.params]
-                        + ["int"] * f.nstack)
+            SIGS[va] = (ret, f.sig_types + ["int"] * f.nstack)
         except Unsupported:
             SIGS[va] = None
     return SIGS[va]

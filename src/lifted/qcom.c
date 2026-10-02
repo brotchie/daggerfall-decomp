@@ -8,6 +8,7 @@ extern char D_0019976C[];
 extern int func_00030A23(int, short, short);
 extern void func_0002BD1E(int);
 extern void func_0002C0A8(int);
+extern void func_0002C5ED(int, int, short);
 
 void func_0002BBBC(void)
 {
@@ -67,6 +68,21 @@ L2BCE9:;
 L2BD09:;
     a1 = *(int *)((char *)a1 + 55);
     goto L2BCE9;
+}
+
+void func_0002CB34(int a1, int a2, short a3)
+{
+    int l_14;
+
+    l_14 = func_00030A23(a1, 6, (int)(short)*(short *)((char *)a2 + 28));
+    if (((int)(short)(*(int *)&a3 & 64)) == 0) goto L2CB97;
+    if (((int)(short)(*(short *)((char *)l_14 + 2) & 64)) != 0) goto L2CB95;
+    func_0002C5ED(a1, l_14, 1);
+    *(signed char *)((char *)l_14 + 2) |= 64;
+L2CB95:;
+    return;
+L2CB97:;
+    *(signed char *)((char *)l_14 + 2) &= 191;
 }
 
 void func_0002CD0C(int a1, int a2)

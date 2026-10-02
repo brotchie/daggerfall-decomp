@@ -83,7 +83,6 @@ void func_0004EC7A(void);
 
 int func_0004D1E6(short a1)
 {
-{
     int l_24;
     unsigned char l_20;
 
@@ -141,7 +140,6 @@ L4D3E8:;
     l_24 = 0;
 L4D3EF:;
     return l_24;
-}
 }
 
 int func_0004D904(void)

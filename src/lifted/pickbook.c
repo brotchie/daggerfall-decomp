@@ -40,7 +40,6 @@ extern void func_0008E152(int, int);
 
 int func_000417C8(short a1)
 {
-{
     int l_20;
 
     if (((int)(unsigned char)*(signed char *)D_0019626F) != 5) goto L417F1;
@@ -86,7 +85,6 @@ L41922:;
     l_20 = 0;
 L41929:;
     return l_20;
-}
 }
 
 void func_000420AF(void)

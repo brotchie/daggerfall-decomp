@@ -2,11 +2,15 @@
  * do not edit: move a function to src/spells.c to work on it by hand) */
 
 extern char D_0012AC00[];
+extern char D_0012AC04[];
+extern char D_0012AC06[];
 extern char D_00142309[];
+extern char D_00143550[];
 extern char D_00170B13[];
 extern char D_00170B69[];
 extern char D_00178A0A[];
 extern char D_0017A87F[];
+extern char D_001940D4[];
 extern char D_001940D5[];
 extern char D_00195AE8[];
 extern char D_00195B50[];
@@ -20,12 +24,19 @@ extern char D_0019962E[];
 extern char D_0019962F[];
 extern char D_00199630[];
 
-extern int func_00039C09(void);
+extern int func_00039D24(int);
 extern int func_0006CD10(int, int, int);
+extern int func_0007D5D9(void);
 extern int func_000A0024();
 extern int func_000A1023();
+extern int func_0012B136();
+extern int func_0012B2D3();
+extern int func_0012DB50();
 extern void func_0003F09F(short, int);
+extern void func_000425F2(void);
+extern void func_0007D3CA(int);
 int func_00037D5A(void);
+int func_00039C09(void);
 void func_00037DBB(unsigned char);
 void func_00039F94(void);
 
@@ -174,6 +185,53 @@ void func_00039B50(int a1)
     if (((int)(unsigned char)*(signed char *)((char *)a1)) != 9) return;
     if (*(signed char *)((char *)a1 + 144) != *(signed char *)D_00199630) return;
     *(int *)D_00195B50 = a1;
+}
+
+int func_00039C09(void)
+{
+    int l_2C;
+    int l_28;
+    short l_20;
+    short l_1C;
+    short l_18;
+
+    l_2C = func_00039D24(0);
+    if (l_2C != 0) goto L39C33;
+    return 0;
+L39C33:;
+    func_0012DB50(4);
+    func_0007D3CA(l_2C);
+    l_28 = *(int *)D_00195C44;
+    *(signed char *)D_001940D4 |= 1;
+L39C54:;
+    func_000425F2();
+    func_0012B136();
+    *(int *)&l_20 = func_0007D5D9();
+    if (((int)(short)l_20) <= (-1)) goto L39CCC;
+    *(int *)&l_18 = 0;
+L39C76:;
+    if (*(signed char *)((char *)((((int)(short)l_18) * 89) + l_28) + 47) != 0) goto L39C8E;
+    (*(int *)&l_18)++;
+    goto L39C76;
+L39C8E:;
+    if (l_20 == 0) goto L39CBB;
+    (*(int *)&l_18)++;
+L39C9B:;
+    if (*(signed char *)((char *)((((int)(short)l_18) * 89) + l_28) + 47) != 0) goto L39CB3;
+    (*(int *)&l_18)++;
+    goto L39C9B;
+L39CB3:;
+    (*(int *)&l_20)--;
+    goto L39C8E;
+L39CBB:;
+    return l_28 + (((int)(short)l_18) * 89);
+L39CCC:;
+    if (((int)(short)l_20) != (-2)) goto L39CDE;
+    return 0;
+L39CDE:;
+    func_0012B2D3((int)(short)*(short *)D_0012AC04, (int)(short)*(short *)D_0012AC06);
+    func_000A1023(655360, *(int *)D_00143550, 64000, (int)D_00170B13, 1560, 4);
+    goto L39C54;
 }
 
 void func_00039F94(void)

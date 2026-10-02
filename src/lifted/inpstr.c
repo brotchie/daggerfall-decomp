@@ -2,6 +2,10 @@
  * do not edit: move a function to src/inpstr.c to work on it by hand) */
 
 extern char D_0012DA50[];
+extern char D_0014234F[];
+extern char D_00142353[];
+extern char D_00142355[];
+extern char D_00142357[];
 extern char D_00176E2C[];
 extern char D_00190B44[];
 extern char D_00195B94[];
@@ -15,7 +19,31 @@ extern int func_000A0AD9();
 extern int func_000A0DD9();
 extern int func_000A0DF4();
 extern int func_00142790();
+extern int func_001427A8();
 extern int func_00144E84();
+
+int func_0008C462(void)
+{
+    short l_18;
+
+    *(signed char *)&l_18 = func_001427A8();
+    if (*(signed char *)&l_18 == 0) goto L8C488;
+    return (int)(unsigned char)*(signed char *)&l_18;
+L8C488:;
+    if (*(signed char *)D_00142353 == 0) goto L8C49A;
+    return 128;
+L8C49A:;
+    if (*(signed char *)D_00142355 == 0) goto L8C4AC;
+    return 129;
+L8C4AC:;
+    if (*(signed char *)D_0014234F == 0) goto L8C4BE;
+    return 131;
+L8C4BE:;
+    if (*(signed char *)D_00142357 == 0) goto L8C4D0;
+    return 130;
+L8C4D0:;
+    return 0;
+}
 
 void func_0008C4E4(int a1)
 {

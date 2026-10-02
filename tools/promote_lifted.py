@@ -44,7 +44,32 @@ def main():
     if os.path.isdir(OUT):
         shutil.rmtree(OUT)
     os.makedirs(OUT)
+    # A function whose definition declares parameters differently from the prototype its
+    # callers use (the lifter types a parameter `short` from the frame layout but keeps the
+    # callers' view) gets a file of its own, so neither side changes.
+    texts = {n: open(os.path.join(LIFT, n + ".c")).read() for n in ok}
+    proto = {}
+    for n, text in texts.items():
+        for line in text.splitlines():
+            m = re.match(r"extern \w+ (func_[0-9A-F]{8})\((.*)\);", line)
+            if m:
+                proto[m.group(1)] = m.group(2)
+    alone = set()
+    for n, text in texts.items():
+        m = re.search(r"^\w+ %s\((.*)\)$" % n, text, re.M)
+        if m and n in proto:
+            types = ", ".join(re.sub(r"\s*a\d+$", "", p.strip()) for p in m.group(1).split(","))
+            if types != proto[n] and not (types == "void" and proto[n] == "void"):
+                alone.add(n)
+    groups = []
     for unit, names in sorted(by_unit.items()):
+        shared = [n for n in names if n not in alone]
+        if shared:
+            groups.append((unit, unit, shared))
+        for n in names:
+            if n in alone:
+                groups.append((unit, unit[:-2] + "_" + n[5:] + ".c", [n]))
+    for unit, fname, names in groups:
         decls, bodies = [], []
         for name in sorted(names):
             text = open(os.path.join(LIFT, name + ".c")).read()
@@ -65,8 +90,9 @@ def main():
                " * do not edit: move a function to src/%s to work on it by hand) */" % unit, ""]
         out += data + [""] + code + [""]
         out += ["\n\n".join(bodies), ""]
-        open(os.path.join(OUT, unit), "w").write("\n".join(out))
-    print("promoted %d functions into %d units (src/lifted/)" % (len(ok), len(by_unit)))
+        open(os.path.join(OUT, fname), "w").write("\n".join(out))
+    print("promoted %d functions into %d units (src/lifted/, %d in files of their own)"
+          % (len(ok), len(by_unit), len(alone)))
 
 
 if __name__ == "__main__":

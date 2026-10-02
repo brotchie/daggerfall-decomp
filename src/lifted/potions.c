@@ -59,6 +59,36 @@ L8F20B:;
     func_00069938(205, *(int *)D_00195AA4, 100);
 }
 
+int func_0008F94D(int a1, int a2)
+{
+    short l_18;
+    short l_14;
+
+    *(int *)&l_14 = 0;
+L8F967:;
+    if (((int)(short)l_14) < 8) goto L8F97A;
+    goto L8F9CE;
+L8F972:;
+    (*(int *)&l_14)++;
+    goto L8F967;
+L8F97A:;
+    *(int *)&l_18 = *(int *)(D_001A9BBC + (((int)(short)l_14) << 2)) + 71;
+    if (*(int *)(D_001A9BBC + (((int)(short)l_14) << 2)) == 0) goto L8F9AE;
+    if (((int)(unsigned short)*(short *)((char *)*(int *)&l_18 + 34)) == a2) goto L8F9B0;
+L8F9AE:;
+    goto L8F9C1;
+L8F9B0:;
+    if (((int)(unsigned short)*(short *)((char *)*(int *)&l_18 + 32)) == a1) goto L8F9C3;
+L8F9C1:;
+    goto L8F9CC;
+L8F9C3:;
+    return 1;
+L8F9CC:;
+    goto L8F972;
+L8F9CE:;
+    return 0;
+}
+
 void func_0008FBE8(int a1)
 {
     int l_18;

@@ -17,6 +17,7 @@ extern char D_001A9B14[];
 extern char D_001A9B18[];
 extern char D_001A9B34[];
 extern char D_001A9B38[];
+extern char D_001A9B3C[];
 extern char D_001A9B42[];
 extern char D_001AA3DC[];
 extern char D_001AA3E4[];
@@ -36,6 +37,7 @@ extern void func_00069F39(int);
 extern void func_0008E357(int, int);
 extern void func_0008E3A7(int, int);
 extern void func_0008E3F7(int, int);
+extern void func_0008E7AE(int);
 extern void func_0008EBFD(int);
 extern void func_0008ED52(int);
 int func_0008DA4D(int);
@@ -316,6 +318,14 @@ int func_0008E767(int a1, int a2)
     *(short *)D_001A9B42 = a2;
     func_0008E55F(a1, (int)func_0008E721);
     return *(int *)D_00195AF4;
+}
+
+int func_0008E7E0(int a1, short a2)
+{
+    *(short *)D_001A9B42 = *(int *)&a2;
+    *(short *)D_001A9B3C = 0;
+    func_0008E3F7(a1, (int)func_0008E7AE);
+    return (int)(short)*(short *)D_001A9B3C;
 }
 
 int func_0008E8E9(int a1)

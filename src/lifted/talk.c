@@ -440,7 +440,6 @@ L182B2:;
 
 int func_000191DA(short a1, short a2)
 {
-{
     int l_24;
     int l_20;
 
@@ -453,7 +452,6 @@ L1921A:;
     l_24 = *(int *)D_0019671C;
 L19222:;
     return l_24;
-}
 }
 
 void func_000193DD(int a1)

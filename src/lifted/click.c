@@ -369,7 +369,6 @@ void func_0007606C(int a1, int a2)
 
 int func_0007667A(short a1)
 {
-{
     int l_20;
 
     l_20 = *(int *)((char *)*(int *)D_00195A00 + 63);
@@ -382,7 +381,6 @@ L766B2:;
     goto L76696;
 L766BD:;
     return 0;
-}
 }
 
 int func_000766D1(void)

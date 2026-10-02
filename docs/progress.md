@@ -559,3 +559,17 @@ parameters. Pending declarations now get slots at every `-od` statement, not jus
 so a block's locals get theirs when it starts. The lifter declares locals deeper than every
 parameter inside a nested block wrapping the body (jumping into a block with `goto` is legal
 C89). Batch **1,126** (+43, nothing lost).
+
+## 2026-10-01: types from the frame layout (+15)
+
+`tools/slot_plan.py` explains a frame with the slot rule by trying every subset of parameters
+as 2-byte. Locals' relative order is free (the lifter declares them in slot order), the
+parameters' isn't. **The rule plus inferred 2-byte variables explains 2,229 of the 2,297 game
+frames** (68 unexplained). About 115 functions need variables the access-based typing called
+`int` declared `short` (a short read as a dword compiles to the same `mov eax,[x]` through
+`*(int *)&x`), and the plan also names the nested-block locals.
+
+The inferred types stay inside the function: callers keep the access-based prototype, because
+changing a callee's prototype to `short` changed how 15 callers evaluate arguments.
+`promote_lifted.py` gives a function whose definition differs from its callers' prototype a
+file of its own. Batch **1,140**. Build **1,144 / 2,297, 23.39%**.
