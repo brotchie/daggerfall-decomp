@@ -502,6 +502,40 @@ index 14a056a76b..a88fef01ac 100644
 +    DaggerCount = 0;
 +    DaggerProc = CurrProc;
 +}
+diff --git a/bld/cg/c/bldins.c b/bld/cg/c/bldins.c
+index 7fa7f075c3..d274f4ac8c 100644
+--- a/bld/cg/c/bldins.c
++++ b/bld/cg/c/bldins.c
+@@ -31,6 +31,7 @@
+ 
+ 
+ #include "_cgstd.h"
++extern const char *DaggerEnv( const char *name );
+ #include "coderep.h"
+ #include "cgmem.h"
+ #include "memcheck.h"
+@@ -572,7 +573,20 @@ an      BGBinary( cg_op opcode, an left, an rite, const type_def *tipe, bool fol
+     }
+     if( result == NULL ) {
+         left = CheckType( left, tipe );
+-        ins = MakeBinary( (opcode_defs)opcode, GenIns( left ), GenIns( rite ), NULL, TypeClass( tipe ) );
++        /* Daggerfall: Watcom 10 loads an address operand (a global's or a local's) last, after the other
++         * operand's pending instructions (DAGGER_GENLEFT=1 for left first always) */
++        if( DaggerEnv( "DAGGER_GENLEFT" ) != NULL || left->format != NF_ADDR
++          || ( left->class != CL_ADDR_GLOBAL && left->class != CL_ADDR_TEMP ) ) {
++            name    *l_name = GenIns( left );
++            name    *r_name = GenIns( rite );
++
++            ins = MakeBinary( (opcode_defs)opcode, l_name, r_name, NULL, TypeClass( tipe ) );
++        } else {
++            name    *r_name = GenIns( rite );
++            name    *l_name = GenIns( left );
++
++            ins = MakeBinary( (opcode_defs)opcode, l_name, r_name, NULL, TypeClass( tipe ) );
++        }
+         result = InsName( ins, tipe );
+         AddIns( ins );
+         BGDone( left );
 diff --git a/bld/cg/c/bldsel.c b/bld/cg/c/bldsel.c
 index 6dc64e437d..690ce6e81f 100644
 --- a/bld/cg/c/bldsel.c

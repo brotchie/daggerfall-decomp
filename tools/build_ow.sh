@@ -23,6 +23,8 @@
 #
 #   cg split.c rUSEREGISTER(): a commutative op stored to memory takes the register of the
 #     operand computed before a global just read (DAGGER_NOUSEOLD=1)
+#   cg bldins.c BGBinary(): an address operand's load comes after the other operand's
+#     instructions (DAGGER_GENLEFT=1)
 #
 # Output: third_party/open-watcom-v2/build/binbuild/{bwcc386,bwlink,bwasm,bwlib}
 set -eu

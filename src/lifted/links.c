@@ -66,11 +66,13 @@ extern void func_00065A8C(int, int, int);
 extern void func_0007CC66(void);
 extern void func_0008C566(int, short);
 extern void func_0008DEB4(int, int, int, int, int, int, int);
+int func_0006480F(int);
 int func_00065398(int, int);
 int func_00065864(int);
 void func_0006530C(int);
 void func_0006546F(int, int);
 void func_000654EA(int);
+#pragma dagger DAGGER_CONFPOS func_00064708
 #pragma dagger reg func_00065864 437 bx
 
 void func_00064337(int a1)
@@ -221,6 +223,52 @@ L646EA:;
 L646F4:;
     l_24++;
     goto L645BA;
+}
+
+void func_00064708(void)
+{
+    int l_28;
+    int l_24;
+    int l_20;
+    int l_1C;
+    int l_18;
+
+    l_28 = 0;
+L6471D:;
+    if (l_28 < *(int *)D_001A3A7C) goto L64735;
+    return;
+L6472D:;
+    l_28++;
+    goto L6471D;
+L64735:;
+    l_18 = *(int *)(D_001A3978 + (l_28 << 2));
+    l_24 = ((int)(unsigned char)*(signed char *)((char *)l_18 + 10)) + 1;
+    l_20 = 0;
+    l_1C = l_20;
+L64760:;
+    if (l_20 < l_24) goto L64779;
+    goto L647A7;
+L6476A:;
+    l_20++;
+    (*(char (**)[39])&l_18)++;
+    goto L64760;
+L64779:;
+    l_1C += func_0006480F(l_18);
+    if (((int)(unsigned char)(*(signed char *)((char *)l_18 + 12) & 16)) == 0) goto L647A5;
+    l_1C = 0;
+    *(signed char *)((char *)l_18 + 12) &= 239;
+    goto L647A7;
+L647A5:;
+    goto L6476A;
+L647A7:;
+    if (l_1C != 0) goto L64800;
+    if ((*(int *)D_001A3A7C - 1) <= l_28) goto L647F4;
+    func_000A1023((l_28 << 2) + ((int)D_001A3978), ((int)D_001A3978) + ((l_28 << 2) + 4), (int)&*(signed char *)((char *)((*(int *)D_001A3A7C - l_28) << 2) - 4), (int)D_00175962, 187, 4);
+L647F4:;
+    (*(int *)D_001A3A7C)--;
+    l_28--;
+L64800:;
+    goto L6472D;
 }
 
 int func_0006480F(int a1)
