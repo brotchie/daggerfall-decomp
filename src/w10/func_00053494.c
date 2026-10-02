@@ -38,10 +38,10 @@ int func_00053494(short a1)
     func_0012B2EB();
     func_000A1023(*(int *)D_00143550, *(int *)D_00190DF4, 64000, (int)D_00175420, 235, 4);
     func_0005506F();
-    if (((int)(short)(*(short *)D_00190D66 & 2)) == 0) goto L53516;
-    func_00144ED8(44, (int)(short)*(short *)D_00190D6A, (int)(unsigned short)*(short *)(*(char **)D_00190DF0 + 4), (int)(unsigned short)*(short *)(*(char **)D_00190DF0 + 6), *(int *)D_00190DE8, 0);
-    *(signed char *)D_00190D66 &= 253;
-L53516:;
+    if (*(short *)D_00190D66 & 2) {
+        func_00144ED8(44, (int)(short)*(short *)D_00190D6A, (int)(unsigned short)*(short *)(*(char **)D_00190DF0 + 4), (int)(unsigned short)*(short *)(*(char **)D_00190DF0 + 6), *(int *)D_00190DE8, 0);
+        *(signed char *)D_00190D66 &= 253;
+    }
     func_00144E84(44, (int)(short)*(short *)D_00190D6A, (int)(unsigned short)*(short *)(*(char **)D_00190DF0 + 4), (int)(unsigned short)*(short *)(*(char **)D_00190DF0 + 6), *(int *)D_00190DE8, 0);
     *(signed char *)D_00190D66 |= 2;
     func_00144FB4(44, (int)(short)*(short *)D_00190D6A, (int)(unsigned short)*(short *)(*(char **)D_00190DF0 + 4), (int)(unsigned short)*(short *)(*(char **)D_00190DF0 + 6), (int)(*(char **)D_00190DF0 + 12));
