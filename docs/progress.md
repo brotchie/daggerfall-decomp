@@ -671,3 +671,27 @@ is `x * 2`, which the lifter spelled `x + x` (OW: `add edx,[x]`). Batch **1,393*
   `cmp ax, word [x]`.
 
 Batch **1,398**.
+
+## 2026-10-01: switch groundwork (translator), compiler work outlined
+
+The lifter now decodes around switch tables inside a function (skipping `config/code_data.csv`
+ranges), drops unreachable padding after a jump, and turns a table dispatch into
+`switch (sel) {` with `case k:`/`default:` labels at the real target addresses inside one
+switch body running to the end of the function (legal C; table entries then point at real
+code, not `goto` stubs). The range check before the dispatch becomes the switch's own. One
+table switch per function for now; sparse `repne scasb` switches aren't handled yet.
+
+These functions now compile but differ. With a lower table threshold (`KKND_SWOPT=4`) OW emits
+**the same dispatch sequence** as Watcom 10. Three compiler pieces remain:
+
+1. **Threshold**: Watcom 10 used a table for 4 dense byte cases at `-od`. KKND's `Balance()`
+   floor is 15.
+2. **Selector temp**: Watcom 10's switch temp *is* the slot the lifter declares as a local
+   (`l_1C = D; switch (l_1C)`); OW copies the selector into another temp. At `-od`, use a
+   plain local selector directly.
+3. **Table placement**: Watcom 10 emits a switch's table before the *outermost statement*
+   containing it (`func_00015A50`: at the start of the body, with `jmp` over it, ahead of an
+   enclosing one-case switch). OW emits it at the next dead spot inside the statement
+   (`jmp ...; lea eax,[eax]; table`). Both pad with `mov eax,eax`/`lea eax,[eax]`/`nop`.
+
+Worth about 36 functions (41 KB, 7% of game code).

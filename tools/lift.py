@@ -88,6 +88,8 @@ class Image:
         self.fix_at = {f.src_va: f for f in self.le.fixups()}
         with open(os.path.join(ROOT, "config", "functions.csv"), newline="") as f:
             self.funcs = {int(r["va"], 16): int(r["size"]) for r in csv.DictReader(f)}
+        with open(os.path.join(ROOT, "config", "code_data.csv"), newline="") as f:
+            self.tables = [(int(r["va"], 16), int(r["size"])) for r in csv.DictReader(f)]
         self.md = capstone.Cs(capstone.CS_ARCH_X86, capstone.CS_MODE_32)
         self.md.detail = True
 
@@ -96,7 +98,26 @@ class Image:
         return bytes(self.img[o.index][va - o.base: va - o.base + n])
 
     def insns(self, va):
-        return list(self.md.disasm(self.code(va, self.funcs[va]), va))
+        """Decode a function, stepping over switch tables inside it (config/code_data.csv)."""
+        size = self.funcs[va]
+        skip = sorted((t, n) for t, n in self.tables if va <= t < va + size)
+        if not skip:
+            return list(self.md.disasm(self.code(va, size), va))
+        out, pc, end = [], va, va + size
+        while pc < end:
+            hit = [(t, n) for t, n in skip if t <= pc < t + n]
+            if hit:
+                pc = hit[0][0] + hit[0][1]
+                continue
+            nxt = min([t for t, _n in skip if t > pc] + [end])
+            got = False
+            for ins in self.md.disasm(self.code(pc, nxt - pc), pc):
+                out.append(ins)
+                pc = ins.address + ins.size
+                got = True
+            if not got or pc < nxt:
+                pc = nxt if got else pc + 1
+        return out
 
 
 IMG = None
@@ -457,17 +478,36 @@ class Func:
             if cx.X86_GRP_JUMP in ins.groups and ins.operands and \
                     ins.operands[0].type == cx.X86_OP_IMM:
                 targets.add(ins.operands[0].imm)
+        self.switches = self.find_switches()
+        for sw in self.switches.values():
+            targets |= set(sw["entries"])
         self.targets = targets
+        self.case_at = {}
+        for sw in self.switches.values():
+            for i, t in enumerate(sw["entries"]):
+                self.case_at.setdefault(t, []).append(i + sw["bias"])
+        self.open_switches = 0
         body = self.ins[self.body_start:self.body_end]
         self.body = body
+        dead = False
         for k, ins in enumerate(body):
             if ins.address in targets:
                 self.flush_pending()
+                for v in self.case_at.get(ins.address, []):
+                    if ins.address != self.default_at.get(v, None):
+                        self.out.append("case %d:" % v)
+                if ins.address in self.default_targets:
+                    self.out.append("default:")
                 self.out.append("L%X:;" % ins.address)
                 self.regs = {}
                 self.after_return = False
+                dead = False
+            if dead:
+                continue        # alignment padding after a jump (before a switch table)
             self.k = k
             self.step(ins)
+            if ins.mnemonic == "jmp":
+                dead = True
         self.flush_pending()
 
     def cond_text(self, m):
@@ -630,6 +670,10 @@ class Func:
                     self.set_reg(full, v)
                     self.flags = ("val", v, None)
                     return
+                if m == "shl" and s.type == cx.X86_OP_IMM and s.imm == 2:
+                    v = E("%s << 2" % a.p(), 4, tag=("shl2", a))
+                    self.set_reg(full, v)
+                    return
                 if m == "shr":
                     a = E("(unsigned)" + a.p(), 4)
                 if m == "add" and s.type == cx.X86_OP_REG and (
@@ -784,7 +828,7 @@ class Func:
         if m.startswith("j"):
             tgt = ops[0].imm if ops[0].type == cx.X86_OP_IMM else None
             if tgt is None:
-                raise Unsupported("indirect jump (switch)")
+                return self.switch_dispatch(ins, ops[0])
             to_end = tgt in (self.ret_ins, self.epi)
             if m == "jmp":
                 if to_end:
@@ -834,6 +878,64 @@ class Func:
     def loaded_ptr(e):
         """A dword read straight from memory: the likely pointer operand of an add."""
         return e.atom and e.text.startswith("*(int *)")
+
+    def find_switches(self):
+        """jmp cs:[idx*4 + table] / jmp cs:[reg + table]: the table's entries (from the fixups
+        at consecutive dwords) and the bias (the displacement points 4k bytes before the
+        table when the lowest case is k)."""
+        found = {}
+        self.default_at = {}
+        self.default_targets = set()
+        for ins in self.ins:
+            if ins.mnemonic != "jmp" or not ins.operands or ins.operands[0].type != cx.X86_OP_MEM:
+                continue
+            disp = ins.operands[0].mem.disp & 0xFFFFFFFF
+            tabs = [(t, n) for t, n in IMG.tables if disp <= t < disp + 4 * 64]
+            if not tabs:
+                continue
+            t, n = min(tabs)
+            entries = [IMG.fix_at[t + 4 * i].target_va for i in range(n // 4)
+                       if t + 4 * i in IMG.fix_at]
+            found[ins.address] = {"table": t, "entries": entries, "bias": (t - disp) // 4}
+        if len(found) > 1:
+            raise Unsupported("several switches in one function")
+        return found
+
+    def switch_dispatch(self, ins, op):
+        sw = self.switches.get(ins.address)
+        if sw is None:
+            raise Unsupported("indirect jump without a table")
+        m = op.mem
+        if m.index and m.scale == 4:
+            sel = self.reg(subreg(ins.reg_name(m.index))[0], ins)
+        elif m.base and not m.index:
+            v = self.reg(subreg(ins.reg_name(m.base))[0], ins)
+            if not (v.tag and v.tag[0] == "shl2"):
+                raise Unsupported("switch index not scaled")
+            sel = v.tag[1]
+        else:
+            raise Unsupported("switch addressing")
+        # the range check just before is the switch's own: `if (sel > max) goto Ldefault;`
+        dflt = None
+        for i in range(len(self.out) - 1, -1, -1):
+            mm = re.fullmatch(r"    if \((.*)\) goto L([0-9A-F]+);", self.out[i])
+            if mm:
+                dflt = int(mm.group(2), 16)
+                del self.out[i]
+                break
+            if not self.out[i].startswith("    "):
+                break
+        if dflt is None:
+            raise Unsupported("switch without a range check")
+        for v in range(sw["bias"], sw["bias"] + len(sw["entries"])):
+            self.default_at[v] = dflt
+        self.default_targets.add(dflt)
+        text = re.sub(r"^\(int\)\((?:unsigned|signed) (?:char|short)\)", "", sel.text) \
+            if sel.atom or sel.text.startswith("(int)(") else sel.text
+        self.emit("switch (%s) {" % text)
+        self.open_switches += 1
+        self.regs = {}
+        return
 
     def var_type(self, name):
         """Declared type of a parameter or local by name."""
@@ -942,6 +1044,8 @@ class Func:
             lines.append(line)
         if not self.void and "%X" % self.ret_ins in used:
             lines.append("L%X:;" % self.ret_ins)
+        for _ in range(self.open_switches):
+            lines.append("}")
         if self.nested_open:
             lines.append("}")
         lines.append("}")
