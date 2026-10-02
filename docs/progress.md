@@ -1296,3 +1296,6 @@ Batch **1,927**; build **61.34%**.
 - A short variable whose address is taken or whose single bytes are read keeps 16-bit
   stores (`mov word [l],0`): the compiler doesn't widen those (`DAGGER_WIDENADDR`). +1.
   Batch **2,172**.
+- More switches on variables: case ranges (the root compares different constants, the
+  tree's dead `jmp default` stubs give it away), stack-parameter selectors, and two-case
+  trees with stubs. +4. Batch **2,176**.

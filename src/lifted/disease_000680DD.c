@@ -64,17 +64,13 @@ L68210:;
 L6821F:;
     goto L684C4;
 case 5:
-    if (((unsigned)a3) < 1) goto L68238;
-    if (((unsigned)a3) <= 1) goto L6823A;
-    if (a3 == 2) goto L68249;
-    goto L68256;
-L68238:;
-    goto L68256;
-L6823A:;
+    switch ((unsigned)a3) {
+case 1:
     if (func_0004B192() == 0) return;
     goto L68256;
-L68249:;
+case 2:
     if (func_0004B192() != 0) return;
+default:
 L68256:;
     *(short *)(*(char **)D_00195BE0 + 124) += *(short *)D_00195B08;
     if (*(short *)(*(char **)D_00195BE0 + 124) <= *(short *)(*(char **)D_00195BE0 + 126)) goto L68290;
@@ -85,6 +81,7 @@ L68290:;
     func_00060270(*(int *)D_00195AA8, 1);
 L682B6:;
     goto L684C4;
+}
 case 17:
     if (a3 != 0) goto L682CA;
     if (func_0004B192() != 0) goto L682DB;
@@ -98,17 +95,13 @@ L682DB:;
 L682ED:;
     goto L684C4;
 case 16:
-    if (((unsigned)a3) < 1) goto L68306;
-    if (((unsigned)a3) <= 1) goto L68308;
-    if (a3 == 2) goto L68317;
-    goto L68324;
-L68306:;
-    goto L68324;
-L68308:;
+    switch ((unsigned)a3) {
+case 1:
     if (func_0004B192() == 0) return;
     goto L68324;
-L68317:;
+case 2:
     if (func_0004B1FB() == 0) return;
+default:
 L68324:;
     if (((int)(unsigned short)*(short *)((char *)a1 + 44)) <= *(int *)D_00195B08) goto L68348;
     *(short *)((char *)a1 + 44) -= *(short *)D_00195B08;
@@ -117,14 +110,10 @@ L68348:;
     func_00096F95(*(int *)D_00195AA8);
 L68352:;
     goto L684C4;
+}
 case 21:
-    if (((unsigned)a3) < 1) goto L6836E;
-    if (((unsigned)a3) <= 1) goto L68373;
-    if (a3 == 2) goto L683AA;
-    goto L683DF;
-L6836E:;
-    goto L683DF;
-L68373:;
+    switch ((unsigned)a3) {
+case 1:
     if (*(int *)D_00195B08 == 0) goto L68394;
     if (((unsigned)(*(int *)D_00195BF4 - *(int *)(*(char **)D_00195BE0 + 509))) > 1440) goto L68396;
 L68394:;
@@ -133,15 +122,17 @@ L68396:;
     func_0002E914(*(int *)D_00195AA0, *(int *)D_00195B08, 0);
 L683A8:;
     goto L683DF;
-L683AA:;
+case 2:
     if (*(int *)D_00195B08 == 0) goto L683CB;
     if (((unsigned)(*(int *)D_00195BF4 - *(int *)(*(char **)D_00195BE0 + 509))) > 10080) goto L683CD;
 L683CB:;
     goto L683DF;
 L683CD:;
     func_0002E914(*(int *)D_00195AA0, *(int *)D_00195B08, 0);
+default:
 L683DF:;
     goto L684C4;
+}
 case 8:
     *(int *)D_00195B84 = *(int *)D_00195B08;
     func_0008E3F7(*(int *)(*(char **)D_00195AA0 + 63), (int)func_00096ECC);

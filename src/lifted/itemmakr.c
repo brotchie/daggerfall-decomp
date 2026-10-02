@@ -467,16 +467,13 @@ L572B3:;
 
 int func_00057342(int a1)
 {
-    if (((unsigned)a1) < 1) goto L5736A;
-    if (((unsigned)a1) <= 3) goto L5736F;
-    if (a1 == 4) goto L57391;
-    goto L5741B;
-L5736A:;
-    goto L5741B;
-L5736F:;
+    switch ((unsigned)a1) {
+case 1:
+case 2:
+case 3:
     func_000576FF(func_00039E5F(*(int *)(D_00185871 + (a1 << 2))), (int)(short)(a1 - 1));
     goto L5741B;
-L57391:;
+case 4:
     *(int *)D_00190EE4 = *(int *)D_00195C44 + 20000;
     *(int *)D_00190EDC = *(int *)D_00195C44 + 21000;
     *(int *)D_00195B84 = 0;
@@ -491,8 +488,10 @@ L573E2:;
 L573FA:;
     *(int *)(D_00190EE4 + (*(int *)D_00195B84 << 2)) = 0;
     func_000576FF((int)D_00190EE4, 1000);
+default:
 L5741B:;
     return 1;
+}
 }
 
 int func_0005742F(void)

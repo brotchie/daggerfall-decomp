@@ -173,6 +173,7 @@ extern char D_001AA458[];
 extern char D_001AA45C[];
 extern char D_001AA460[];
 extern char D_001AA4CC[];
+extern char D_001AA534[];
 extern char D_001AA53C[];
 extern char D_001AA540[];
 extern char D_001AA544[];
@@ -318,6 +319,8 @@ void func_00092BF7(void);
 void func_00092ED8(void);
 void func_000932C9(int, int);
 void func_00093372(int, int);
+void func_000945C0(int);
+void func_000946D4(int);
 void func_00094DB4(int);
 void func_00094FA8(void);
 void func_000954DD(int, int);
@@ -1130,6 +1133,51 @@ case 3:
     func_00094FA8();
 default:;
 }
+}
+}
+
+void func_00094264(int a1, int a2)
+{
+    a1 -= a2;
+    switch ((unsigned)a1) {
+    goto L942C1;
+case 0:
+    a1 = 4;
+    goto L942C1;
+case 1:
+case 2:
+case 3:
+case 4:
+    a1--;
+    goto L942C1;
+case 5:
+    a1 = 9;
+    goto L942C1;
+case 6:
+case 7:
+case 8:
+case 9:
+    a1--;
+default:
+L942C1:;
+    if (a1 >= 5) goto L942D6;
+    if (*(int *)(D_001AA568 + (a1 << 2)) != 0) goto L942D8;
+L942D6:;
+    goto L942EB;
+L942D8:;
+    func_000946D4(*(int *)(D_001AA568 + (a1 << 2)));
+    return;
+L942EB:;
+    if (a1 <= 4) goto L942F7;
+    if (a1 < 10) goto L942F9;
+L942F7:;
+    goto L94308;
+L942F9:;
+    if (*(int *)(D_001AA534 + (a1 << 2)) != 0) goto L9430A;
+L94308:;
+    return;
+L9430A:;
+    func_000945C0(*(int *)(D_001AA534 + (a1 << 2)));
 }
 }
 

@@ -60,6 +60,7 @@ extern int func_00013131(int, int);
 extern int func_00013260(int, int, int);
 extern int func_0002455D(int);
 extern int func_000504D8(int);
+extern int func_000699D8(int, int, int, int, int);
 extern int func_00069F8A(int, int);
 extern int func_0006A0D4(int);
 extern int func_0007D6AE(int, int);
@@ -77,6 +78,7 @@ extern int func_000A0ED9(int, int);
 extern int func_000A0F5C(int, ...);
 extern int func_000A1023();
 extern int func_000C5280();
+extern int func_000C7FD9();
 extern int func_000CE6E2();
 extern int func_000CE808();
 extern int func_00136AD8();
@@ -705,6 +707,36 @@ L85DCB:;
     goto L85D1F;
 L85DD0:;
     *(int *)D_001A9434 = 0;
+}
+
+void func_00085DE4(int a1, int a2, int a3, int a4, int a5)
+{
+    if (a4 != 201) return;
+    if (func_0009DC25() > 100) return;
+    if (func_000C7FD9(a1, a3, *(int *)(*(char **)D_00195AA4 + 7), *(int *)(*(char **)D_00195AA4 + 15)) > 768) return;
+    switch ((unsigned)a5) {
+    return;
+case 0:
+case 1:
+    func_000699D8(367, a1, a2, a3, 100);
+    return;
+case 3:
+case 4:
+    func_000699D8(371, a1, a2, a3, 100);
+    return;
+case 5:
+case 6:
+    func_000699D8(370, a1, a2, a3, 100);
+    return;
+case 7:
+case 8:
+    func_000699D8(369, a1, a2, a3, 100);
+    return;
+case 9:
+case 10:
+    func_000699D8(368, a1, a2, a3, 100);
+default:;
+}
 }
 
 void func_00085EF8(int a1)

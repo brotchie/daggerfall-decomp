@@ -1982,8 +1982,20 @@ class Func:
             j2 = by_addr.get(nxt.get(j.address))
             j3 = by_addr.get(nxt.get(j2.address)) if j2 is not None else None
             if j2 is None or j2.mnemonic not in JCC or j3 is None or j3.mnemonic != "cmp" or \
-                    j3.op_str != j.op_str:
+                    j3.op_str.split(",")[0] != j.op_str.split(",")[0]:
                 continue
+            if j3.op_str != j.op_str:
+                # (case ranges compare different constants: then the tree's dead `jmp
+                # default` stubs say switch)
+                run, x = [], j
+                while x is not None and ((x.mnemonic == "cmp" and x.op_str.split(",")[0] ==
+                                          j.op_str.split(",")[0]) or x.mnemonic in JCC or
+                                         x.mnemonic == "jmp"):
+                    run.append(x.mnemonic)
+                    x = by_addr.get(nxt.get(x.address))
+                if not any(a == b == "jmp" for a, b in zip(run, run[1:])) or \
+                        os.environ.get("LIFT_NORANGESWITCH"):
+                    continue
             # the tree: compares of the variable and jumps, up to the first other code
             end, x = j.address, j
             while x is not None and ((x.mnemonic == "cmp" and x.op_str.split(",")[0] ==
@@ -1998,7 +2010,10 @@ class Func:
             except Unsupported:
                 self.cskip = saved
                 continue
-            if sum(len(v) for v in sw["cases"].values()) < 3 or sw["default"] is None:
+            stubs = any(a == b == "jmp" for a, b in zip(
+                [x.mnemonic for x in body[k:k + 40]], [x.mnemonic for x in body[k + 1:k + 41]]))
+            if sum(len(v) for v in sw["cases"].values()) < (2 if stubs else 3) or \
+                    sw["default"] is None:
                 self.cskip = saved
                 continue
             inside |= sw["nodes"]
@@ -2058,7 +2073,7 @@ class Func:
                 return None
             if limit is not None and not start <= a < limit:
                 return None             # a variable's tree ends where other code starts
-            if i.mnemonic == "cmp" and ebp_slot(i, i.operands[0]) == t and \
+            if i.mnemonic == "cmp" and frame_slot(i, i.operands[0]) == t and \
                     i.operands[1].type == cx.X86_OP_IMM:
                 js, b = [], nxt.get(a)
                 while b in by_addr and by_addr[b].mnemonic in JCC:
@@ -2926,6 +2941,15 @@ def negate(c):
     k, op = ops[0]
     flip = {"==": "!=", "!=": "==", "<": ">=", ">=": "<", ">": "<=", "<=": ">"}[op]
     return "(%s%s%s)" % (c[:k], flip, c[k + len(op):])
+
+
+def frame_slot(ins, op):
+    """A local's slot (ebp_slot) or a stack parameter's (-disp)."""
+    off = ebp_slot(ins, op)
+    if off is None and op.type == cx.X86_OP_MEM and op.mem.base and \
+            ins.reg_name(op.mem.base) == "ebp" and not op.mem.index and op.mem.disp >= 8:
+        off = -op.mem.disp
+    return off
 
 
 def byteval(v):
