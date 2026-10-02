@@ -420,9 +420,9 @@ def work(va):
                 ("bt", at) not in tried_pairs:
             # backtrack: an earlier flip taken back, alone or with a nearby new one
             tried_pairs.add(("bt", at))
-            for f in sorted(flips, key=lambda f: -abs(f)):
-                if f <= -3000:
-                    continue        # (register pins are positional; keep them)
+            for f in sorted(flips, key=lambda f: (f <= -3000, -abs(f))):
+                if f <= -3000 and os.environ.get("LIFT_KEEPPINS"):
+                    continue        # (register pins are positional; tried last)
                 for x in [None] + near[:4] + func_level[:0]:
                     if tries >= BUDGET:
                         break
