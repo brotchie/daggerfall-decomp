@@ -7,7 +7,8 @@
 # its KKND_CONSTREG experiment in regalloc.c is guarded by _TARGET_INTEL and uses HW_Ovlap.
 #
 # Daggerfall changes (each has an environment variable that restores stock OW):
-#   generate.c FlushBlocks(): no peephole flush after every block at -od (DAGGER_FLUSH=1)
+#   cg generate.c FlushBlocks(): no peephole flush after every block at -od (DAGGER_FLUSH=1)
+#   cc cgen.c: no return-value slot for void functions (DAGGER_VOIDRET=1)
 #
 # Output: third_party/open-watcom-v2/build/binbuild/{bwcc386,bwlink,bwasm,bwlib}
 set -eu

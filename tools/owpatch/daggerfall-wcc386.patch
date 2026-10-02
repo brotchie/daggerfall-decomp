@@ -1,3 +1,22 @@
+diff --git a/bld/cc/c/cgen.c b/bld/cc/c/cgen.c
+index ee6e5533cb..6d98f59177 100644
+--- a/bld/cc/c/cgen.c
++++ b/bld/cc/c/cgen.c
+@@ -1117,7 +1117,13 @@ static void CDoAutoDecl( SYM_HANDLE sym_handle )
+             }
+             dtype = CGenType( typ );
+             if( sym.flags & SYM_FUNC_RETURN_VAR ) {
+-                sym.u1.return_var = CGTemp( dtype );
++                /* Daggerfall: Watcom 10 gave a void function no return slot, so at -od
++                 * `void f(void) {}` reserves `sub esp,0`. DAGGER_VOIDRET=1 restores OW's. */
++                if( typ->decl_type != TYP_VOID || getenv( "DAGGER_VOIDRET" ) != NULL ) {
++                    sym.u1.return_var = CGTemp( dtype );
++                } else {
++                    sym.u1.return_var = NULL;
++                }
+                 SymReplace( &sym, sym_handle );
+             } else {
+                 CGAutoDecl( (CGSYM_HANDLE)sym_handle, dtype );
 diff --git a/bld/cg/c/bldsel.c b/bld/cg/c/bldsel.c
 index 6dc64e437d..2e0ace6948 100644
 --- a/bld/cg/c/bldsel.c

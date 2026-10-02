@@ -23,3 +23,17 @@ int func_000252FD(int a)
     if (a > 2) return 2;
     return 3;
 }
+
+void func_00010AF6(int a) { }
+
+/* Empty functions (stubs left in the shipped game). */
+void func_000164EF(void) { }
+void func_0001F4E6(void) { }
+void func_0003C522(void) { }
+void func_00042E0C(void) { }
+void func_00043978(void) { }
+void func_0004E173(void) { }
+void func_0007F87E(void) { }
+void func_0007F896(void) { }
+void func_00091657(void) { }
+void func_00093ECD(void) { }

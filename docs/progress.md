@@ -170,3 +170,19 @@ be developed in place. Save it with
 `tools/cc_dis.py` prints the disassembly of every function in a C file, for probing.
 
 Matched so far: 5 functions (`src/leaf_probes.c`).
+
+## 2026-10-01: second `-od` patch, void functions
+
+**Void functions (difference 3) are fixed.** OW's C front end creates the hidden return
+variable `.R` with the function's return type even when that type is `void`, and at `-od` every
+temp gets a stack slot. So `void f(void) {}` reserved `sub esp,4`, where Watcom 10 has
+`sub esp,0` (288 such prologues in the original). `cc/c/cgen.c` now skips the slot for `void`
+(`DAGGER_VOIDRET=1` restores it). That matches `func_00010AF6` and the ten empty stubs.
+
+Register saves at `-od` follow the parameters: a function saves every one of
+`ebx ecx edx esi edi` that doesn't carry an argument. In the original: 1,650 functions save
+all five (no argument, or one in `eax`), 321 save `ebx ecx esi edi` (argument in `edx`), 181
+save `ecx esi edi`, 130 save `esi edi`. OW already does this.
+
+Matched so far: 16 functions (`src/leaf_probes.c`). Still open: call results going through an
+extra temp (`func_000192EE`, 387 sites in the original) and narrow arguments.
