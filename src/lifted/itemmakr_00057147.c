@@ -10,12 +10,12 @@ extern char D_0019986D[];
 
 #pragma dagger slots func_00057147 a1 8 a2 12 a3 4 a4 16
 
-void func_00057147(short a1, int a2, int a3, int a4, signed char a5, signed char a6, signed char a7)
+void func_00057147(short a1, int a2, int a3, int a4, short a5, short a6, short a7)
 {
     *(signed char *)(D_00199868 + (((int)(short)a1) * 10)) = *(signed char *)&a2;
     *(signed char *)(D_00199869 + (((int)(short)a1) * 10)) = *(signed char *)&a3;
     *(signed char *)(D_0019986A + (((int)(short)a1) * 10)) = *(signed char *)&a4;
-    *(signed char *)(D_0019986B + (((int)(short)a1) * 10)) = a5;
-    *(signed char *)(D_0019986C + (((int)(short)a1) * 10)) = a6;
-    *(signed char *)(D_0019986D + (((int)(short)a1) * 10)) = a7;
+    *(signed char *)(D_0019986B + (((int)(short)a1) * 10)) = *(signed char *)&a5;
+    *(signed char *)(D_0019986C + (((int)(short)a1) * 10)) = *(signed char *)&a6;
+    *(signed char *)(D_0019986D + (((int)(short)a1) * 10)) = *(signed char *)&a7;
 }

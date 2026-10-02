@@ -456,7 +456,9 @@ class Func:
         cts = caller_types().get(self.va) if not os.environ.get("LIFT_NOCALLERTYPES") else None
         if cts and self.conv is None:
             for k in range(self.nstack):
-                if 4 + k < len(cts) and cts[4 + k] == "int":
+                if 4 + k < len(cts) and cts[4 + k] == "short16":
+                    self.stack_type[k] = "short"    # callers widen it from 16 bits
+                elif 4 + k < len(cts) and cts[4 + k] == "int":
                     self.stack_type[k] = "int"      # callers push it as an immediate
                 elif 4 + k < len(cts) and cts[4 + k] == "narrow" and \
                         self.stack_type[k] == "int":
@@ -3303,6 +3305,11 @@ def caller_types():
                 if i.mnemonic in ("call", "ret") or i.mnemonic.startswith("j"):
                     break
                 if i.mnemonic == "push":
+                    if i.operands[0].type == cx.X86_OP_REG and j and \
+                            ins[j - 1].mnemonic == "cwde" and i.op_str == "eax" and \
+                            not os.environ.get("LIFT_NOSHORT16"):
+                        # widened from 16 bits just before the push: a short parameter
+                        ev.setdefault(tgt, {}).setdefault(n, set()).add("short16")
                     if i.operands[0].type == cx.X86_OP_IMM:
                         ev.setdefault(tgt, {}).setdefault(n, set()).add("int")
                     elif i.operands[0].type == cx.X86_OP_REG and j and \
@@ -3325,6 +3332,10 @@ def caller_types():
         types = []
         for n in range(max([4] + [m + 1 for m in params])):
             seen = params.get(n, set()) - {"const"}
+            if "short16" in seen and n >= 4 and not seen & {"int"}:
+                types.append("short16")
+                continue
+            seen -= {"short16"}
             if seen == {"signed"} or seen == {"signed", "narrow"}:
                 types.append("signed")
                 continue

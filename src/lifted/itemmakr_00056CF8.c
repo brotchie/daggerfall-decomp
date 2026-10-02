@@ -12,7 +12,7 @@ extern int func_00057342(int);
 extern int func_0005742F(void);
 extern void func_0003F09F(int, int);
 extern void func_00056BB0(short);
-extern void func_00057147(short, short, short, short, signed char, signed char, signed char);
+extern void func_00057147(short, short, short, short, short, short, short);
 extern void func_000576FF(int, short);
 
 void func_00056CF8(int a1)
