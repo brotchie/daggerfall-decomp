@@ -1258,3 +1258,7 @@ Batch **1,927**; build **61.34%**.
   the compiler now demotes a division whose operands are only widened shorts or small
   constants (`DAGGER_NODIVDEMOTE` keeps OW's), and the lifter reads `cwd`/`idiv r16`. An
   address-taken variable read as a word is a short (a choice point). +2. Batch **2,136**.
+- **Far pointers**: `mov ebx,ds` marks the selector half of a far pointer: a register pair
+  (offset, `ds`) passed to a call is `(void __far *)(void *)p` (the callee declared without
+  a prototype), and a stored selector is `_FP_SEG((void *)p)` (OW's i86.h inline). +1.
+  Batch **2,137**.

@@ -7,8 +7,24 @@ extern int func_000A0040();
 extern int func_000A2EAC();
 extern int func_000A330C();
 extern int func_000A3327();
+extern unsigned short _FP_SEG( const volatile void __far * );
+#pragma aux _FP_SEG = parm caller [eax dx] value [dx] modify exact [];
 #pragma dagger slots func_000994F0 a1 8 a2 12 l_38 40 ret 4
 #pragma dagger slots func_0009957D a1 8 a2 12 l_38 40 ret 4
+
+void func_00099490(int a1)
+{
+{
+    char l_40[28];
+    char l_24[12];
+
+    func_000A0040((int)l_24, 0, 12, (int)D_00177348, 39, 4);
+    *(int *)l_40 = 1280;
+    *(int *)((char *)l_40 + 20) = a1;
+    *(short *)l_24 = _FP_SEG((void *)a1);
+    func_000A2EAC(49, (int)l_40, (int)l_40, (int)l_24);
+}
+}
 
 int func_000994F0(int a1, int a2)
 {

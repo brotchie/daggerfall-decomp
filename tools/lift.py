@@ -185,6 +185,7 @@ class Func:
         self.structs = set()     # bit-field struct declarations used
         self.fpst = []           # the x87 stack of double expressions
         self.fpcalls = {}        # functions returning doubles: name -> double arguments
+        self.farcalls = set()    # functions given a far pointer: declared without a prototype
         self.fild_val = {}       # temp slot -> the int an fild converts
         self.slot_val = {}       # temp slot -> the value its one later read gets
         self.choices = []        # instruction addresses of operand-order choice points
@@ -1114,6 +1115,11 @@ class Func:
         if m == "add" and getattr(self, "skip_add", False):
             self.skip_add = False   # caller's cleanup after a cdecl call
             return
+        if m == "mov" and ops[1].type == cx.X86_OP_REG and ins.reg_name(ops[1].reg) == "ds" \
+                and ops[0].type == cx.X86_OP_REG and not os.environ.get("LIFT_NOFAR"):
+            # the data segment: the selector half of a far pointer being built
+            self.set_reg(subreg(ins.reg_name(ops[0].reg))[0], E("__DS__", 4, True, tag=("ds",)))
+            return
         if m == "mov":
             d, s = ops
             if d.type == cx.X86_OP_REG:
@@ -1132,6 +1138,11 @@ class Func:
                     self.set_reg(full, v)
                 return
             v = self.src(s, ins)
+            if v.tag and v.tag[0] == "ds" and "eax" in self.regs and \
+                    not os.environ.get("LIFT_NOFAR"):
+                # the selector of a far pointer to what eax points at: FP_SEG()
+                v = E("_FP_SEG((void *)%s)" % self.regs["eax"].p(), 2, atom=True)
+                self.uses_fpseg = True
             nx = self.body[self.k + 1] if self.k + 1 < len(self.body) else None
             off_ = ebp_slot(ins, d)
             if nx is not None and nx.mnemonic == "fild" and off_ is not None and \
@@ -1738,12 +1749,25 @@ class Func:
             if nstack > len(self.pushes):
                 raise Unsupported("call needs %d stack arguments, %d pushed" % (nstack, len(self.pushes)))
             args = []
-            for r in PARM_REGS[:nreg]:
+            far = [k for k in range(1, 4) if (self.regs.get(PARM_REGS[k]) is not None and
+                                             (self.regs[PARM_REGS[k]].tag or ("",))[0] == "ds")]
+            if far:
+                # a far pointer argument: offset and selector in a pair of registers
+                nreg = max(nreg, far[-1] + 1)
+            k = 0
+            while k < nreg:
+                r = PARM_REGS[k]
                 if r not in self.regs:
                     raise Unsupported("call argument %s not loaded" % r)
                 if self.regs[r] is self.pending:
                     self.pending = None              # nested call: f(g(x))
+                if k + 1 in far:
+                    args.append("(void __far *)(void *)%s" % self.regs[r].p())
+                    self.farcalls.add(name)
+                    k += 2
+                    continue
                 args.append(self.regs[r].text)
+                k += 1
             if nstack:
                 args += [x.text for x in reversed(self.pushes[-nstack:])]
                 del self.pushes[-nstack:]
@@ -2738,9 +2762,12 @@ class Func:
                 # a void function whose eax the caller uses: no prototype was in scope
                 # there (implicit int)
                 d = "extern int %s();" % f
-            elif f in self.noproto:
+            elif f in self.noproto or f in self.farcalls:
                 d = re.sub(r"\(.*\);$", "();", d)
             decl.append(d)
+        if getattr(self, "uses_fpseg", False):
+            decl.append("extern unsigned short _FP_SEG( const volatile void __far * );")
+            decl.append("#pragma aux _FP_SEG = parm caller [eax dx] value [dx] modify exact [];")
         for f, n in sorted(self.fpcalls.items()):
             decl.append("#pragma aux %s parm routine [] value [8087];" % f)
             decl.append("extern double %s(%s);" % (f, ", ".join(["double"] * n) or "void"))
