@@ -33,7 +33,10 @@ run 400: 10 click 283,183                     # reflexes: OK (average)
 shot summary
 save summary
 run 600: 10 click 283,183                     # summary: OK, the intro starts
-run 1500: 10 key esc; 300 key esc; 600 key esc; 900 key esc   # skip the intro video
+run 1500: 10 key esc                          # skip the book
+shot intro2
+run 1500: 10 key esc                          # skip the emperor
+shot intro3
 save intro_done
 run 4000
 shot world
