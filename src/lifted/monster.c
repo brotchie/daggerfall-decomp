@@ -56,8 +56,6 @@ int func_0006299F(int);
 int func_000631AA(int);
 int func_00063ED8(int, int);
 void func_00062FBE(int);
-#pragma dagger DAGGER_DEADDEF func_000622EB
-#pragma dagger DAGGER_DEADDEF func_00063512
 #pragma dagger slots func_0006310D a1 8 a2 12 l_24 20 l_20 16 l_14 4
 
 void func_000622EB(int a1, int a2, int a3, int a4)

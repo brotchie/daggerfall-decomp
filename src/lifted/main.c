@@ -145,7 +145,6 @@ extern void func_00099A37(void);
 extern void func_0009AC43(void);
 void func_00010B11(void);
 void func_00010EA6(int, int);
-#pragma dagger DAGGER_DEADDEF func_00010B11
 
 void func_0001025B(void)
 {

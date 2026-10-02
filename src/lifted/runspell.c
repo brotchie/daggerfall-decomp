@@ -109,7 +109,6 @@ void func_0005C856(int, int);
 void func_0005C897(int);
 void func_0005CA28(int);
 void func_0005CA87(int);
-#pragma dagger DAGGER_DEADDEF func_0005C448
 #pragma dagger slots func_0005BA28 a1 16 a2 4 a3 8 l_18 12
 #pragma dagger slots func_0005C448 a1 20 a2 24 l_44 52 l_40 48 l_34 36 l_20 16 l_1C 12 l_18 8 ret 4
 
@@ -491,21 +490,22 @@ void func_0005B828(int a1)
 {
     int l_24;
     int l_20;
-    char l_1C[8];
+    int l_1C;
+    int l_18;
 
     l_20 = a1 + 71;
     if ((*(unsigned short *)((char *)l_20 + 137) & 12292) == 0) return;
-    *(int *)((char *)l_1C + 4) = 0;
+    l_18 = 0;
 L5B85B:;
-    if (*(int *)((char *)l_1C + 4) < 3) goto L5B86E;
+    if (l_18 < 3) goto L5B86E;
     return;
 L5B866:;
-    (*(int *)((char *)l_1C + 4))++;
+    l_18++;
     goto L5B85B;
 L5B86E:;
-    l_24 = func_0005B905(a1, *(int *)(D_00185C3F + (*(int *)((char *)l_1C + 4) << 3)), (int)l_1C, (int)l_1C);
+    l_24 = func_0005B905(a1, *(int *)(D_00185C3F + (l_18 << 3)), (int)&l_1C, (int)&l_1C);
     if (l_24 != 0) goto L5B8AA;
-    *(int *)((char *)l_20 + 137) &= ~*(int *)(D_00185C43 + (*(int *)((char *)l_1C + 4) << 3));
+    *(int *)((char *)l_20 + 137) &= ~*(int *)(D_00185C43 + (l_18 << 3));
     goto L5B866;
 L5B8AA:;
     if (*(signed char *)((char *)((((int)(short)*(short *)D_00195F30) * 2) + l_24) + 1) != 0) goto L5B8F6;

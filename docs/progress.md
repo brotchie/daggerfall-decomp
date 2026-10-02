@@ -1067,3 +1067,16 @@ which is worth revisiting once the layout rules are better understood: the pragm
 exactly the cases they don't explain.
 
 Batch **1,876**.
+
+## 2026-10-02: stack variables vs other memory
+
+Two more places where Watcom 10 treated stack variables differently from other memory:
+
+- `and`/`or`/`xor` of a constant into a stack variable keep its full width
+  (`xor dword [ebp-x],1`), like tests; OW narrows to a byte. +4.
+- `x++` as a statement loads the old value first only for stack variables (`mov eax,[l];
+  inc [l]`); through a pointer it is a plain `inc [p]`. The dead load is now limited to
+  stack variables and their members (`DAGGER_DEADDEFMEM` restores it everywhere, also a
+  per-function knob). +8.
+
+Batch **1,888**; build **59.28%**.

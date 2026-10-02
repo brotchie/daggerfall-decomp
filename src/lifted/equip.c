@@ -125,9 +125,6 @@ void func_0005ED19(int);
 void func_0005F0E8(int, int);
 void func_00061326(int);
 #pragma aux func_000A0ED9 parm routine [];
-#pragma dagger DAGGER_DEADDEF func_0005E636
-#pragma dagger DAGGER_DEADDEF func_0005E874
-#pragma dagger DAGGER_DEADDEF func_000615E0
 #pragma dagger DAGGER_RMW func_0005E874
 #pragma dagger DAGGER_RMW func_00061CBC
 #pragma dagger KKND_CONFREV func_0005F81F
@@ -197,6 +194,60 @@ L5E6E7:;
 L5E711:;
     (*(short *)((char *)a1 + 50))++;
 }
+}
+
+void func_0005E722(int a1)
+{
+    int l_20;
+    int l_1C;
+    int l_18;
+
+    if (((int)(unsigned short)*(short *)((char *)a1 + 32)) != 12) goto L5E754;
+    l_18 = (int)D_00185FFC;
+    l_1C = 9;
+    goto L5E762;
+L5E754:;
+    l_18 = (int)D_0018606B;
+    l_1C = 13;
+L5E762:;
+    l_20 = (int)(unsigned short)(*(short *)((char *)a1 + 50) & 127);
+    if (*(signed char *)((char *)(l_18 + l_20)) == 0) return;
+    if (*(signed char *)((char *)(l_18 + l_20) + 1) != *(signed char *)((char *)(l_18 + l_20))) goto L5E7A1;
+    (*(short *)((char *)a1 + 50))++;
+    return;
+L5E7A1:;
+    l_20--;
+L5E7A7:;
+    if (*(signed char *)((char *)(l_18 + l_20) + 1) != *(signed char *)((char *)(l_18 + l_20))) goto L5E7C9;
+    l_20--;
+    (*(short *)((char *)a1 + 50))--;
+    goto L5E7A7;
+L5E7C9:;
+    if (((int)(unsigned short)*(short *)((char *)a1 + 34)) == l_1C) goto L5E7EB;
+    if (((int)(unsigned short)*(short *)((char *)a1 + 34)) != (l_1C + 1)) return;
+L5E7EB:;
+    (*(short *)((char *)a1 + 50))++;
+}
+
+void func_0005E7FC(int a1)
+{
+    int l_20;
+    int l_1C;
+    int l_18;
+
+    if (((int)(unsigned short)*(short *)((char *)a1 + 32)) != 12) goto L5E827;
+    l_18 = (int)D_00185FFC;
+    goto L5E82E;
+L5E827:;
+    l_18 = (int)D_0018606B;
+L5E82E:;
+    l_20 = (int)(unsigned short)(*(short *)((char *)a1 + 50) & 127);
+    l_20--;
+L5E848:;
+    if (*(signed char *)((char *)(l_18 + l_20) + 1) != *(signed char *)((char *)(l_18 + l_20))) return;
+    l_20--;
+    (*(short *)((char *)a1 + 50))--;
+    goto L5E848;
 }
 
 void func_0005E874(int a1)

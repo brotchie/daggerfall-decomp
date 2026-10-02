@@ -2,10 +2,59 @@
  * do not edit: move a function to src/picklist.c to work on it by hand) */
 
 extern char D_00176E38[];
+extern char D_001940D8[];
 
 extern int func_0005A4A9(int);
 extern int func_000A0024();
+extern int func_000A0AD9();
 extern int func_000A0DF4();
+extern int func_000A0E0D();
+extern int func_000A0E3B();
+extern void func_0008CC33(int);
+#pragma dagger slots func_0008CCC8 a1 20 a2 16 a3 8 l_18 12 l_10 4
+
+void func_0008CCC8(int a1, int a2, int a3)
+{
+    int l_18;
+    int l_10;
+
+    if ((*(unsigned char *)D_001940D8 & 1) == 0) goto L8CE8A;
+    if (*(short *)((char *)a1 + 37) != 0) goto L8CD33;
+    func_000A0AD9(*(int *)((char *)a1 + 47) + 4, a2, 40, (int)D_00176E38, 70);
+    *(short *)(*(char **)((char *)a1 + 47)) = a3;
+    *(short *)(*(char **)((char *)a1 + 47) + 2) = *(short *)((char *)a1 + 37);
+    goto L8CE88;
+L8CD33:;
+    l_10 = 0;
+L8CD3A:;
+    if (((int)(short)*(short *)&l_10) < ((int)(unsigned short)*(short *)((char *)a1 + 37))) goto L8CD5B;
+    goto L8CE1B;
+L8CD53:;
+    l_10++;
+    goto L8CD3A;
+L8CD5B:;
+    if (func_000A0E3B((int)(*(char **)((char *)a1 + 47) + (((int)(short)*(short *)&l_10) * 44)) + 4, a2) < 0) goto L8CE16;
+    func_000A0E0D((int)(*(char **)((char *)a1 + 47) + ((((int)(short)*(short *)&l_10) + 1) * 44)), (int)(*(char **)((char *)a1 + 47) + (((int)(short)*(short *)&l_10) * 44)), (((int)(unsigned short)*(short *)((char *)a1 + 37)) - ((int)(short)*(short *)&l_10)) * 44, (int)D_00176E38, 80, 4);
+    func_000A0AD9((int)(*(char **)((char *)a1 + 47) + (((int)(short)*(short *)&l_10) * 44)) + 4, a2, 40, (int)D_00176E38, 81);
+    *(short *)((char *)(int)(*(char **)((char *)a1 + 47) + (((int)(short)*(short *)&l_10) * 44))) = a3;
+    *(short *)((char *)(int)(*(char **)((char *)a1 + 47) + (((int)(short)*(short *)&l_10) * 44)) + 2) = *(short *)((char *)a1 + 37);
+    goto L8CEF7;
+L8CE16:;
+    goto L8CD53;
+L8CE1B:;
+    func_000A0AD9((int)(*(char **)((char *)a1 + 47) + (((int)(unsigned short)*(short *)((char *)a1 + 37)) * 44)) + 4, a2, 40, (int)D_00176E38, 87);
+    *(short *)((char *)(int)(*(char **)((char *)a1 + 47) + (((int)(unsigned short)*(short *)((char *)a1 + 37)) * 44))) = a3;
+    *(short *)((char *)(int)(*(char **)((char *)a1 + 47) + (((int)(unsigned short)*(short *)((char *)a1 + 37)) * 44)) + 2) = *(short *)((char *)a1 + 37);
+L8CE88:;
+    goto L8CEF7;
+L8CE8A:;
+    func_000A0AD9((int)(*(char **)((char *)a1 + 47) + (((int)(unsigned short)*(short *)((char *)a1 + 37)) * 44)) + 4, a2, 40, (int)D_00176E38, 94);
+    *(short *)((char *)(int)(*(char **)((char *)a1 + 47) + (((int)(unsigned short)*(short *)((char *)a1 + 37)) * 44))) = a3;
+    *(short *)((char *)(int)(*(char **)((char *)a1 + 47) + (((int)(unsigned short)*(short *)((char *)a1 + 37)) * 44)) + 2) = *(short *)((char *)a1 + 37);
+L8CEF7:;
+    (*(short *)((char *)a1 + 37))++;
+    func_0008CC33(a1);
+}
 
 void func_0008CF0E(int a1)
 {

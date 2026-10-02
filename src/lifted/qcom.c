@@ -33,7 +33,6 @@ extern void func_00031B47(int, int);
 extern void func_00050069(int);
 void func_0002C0A8(int);
 void func_0002CAB0(int);
-#pragma dagger DAGGER_DEADDEF func_0002CC40
 
 int func_0002B26B(int a1)
 {

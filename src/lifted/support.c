@@ -186,7 +186,6 @@ void func_0007FEB9(int);
 void func_0007FF73(int);
 void func_0007FFE7(int);
 #pragma aux func_000A0ED9 parm routine [];
-#pragma dagger DAGGER_DEADDEF func_0007E246
 #pragma dagger slots func_0007D19B a1 24 a2 20 a3 16 a4 12 l_10 8 l_C 4
 #pragma dagger slots func_0007E3CD a1 16 a2 4 a3 8 l_20 20 l_18 12
 #pragma dagger slots func_0007EC8F a1 20 a2 16 a3 12 a4 8 l_C 4

@@ -106,7 +106,6 @@ int func_0003C3A8(int);
 void func_0003C5A4(int);
 void func_0003D01C(int, int);
 #pragma aux func_000A0ED9 parm routine [];
-#pragma dagger DAGGER_DEADDEF func_0003C8B2
 #pragma dagger KKND_CONFREV func_0003C010
 #pragma dagger KKND_CONFREV func_0003C0D3
 

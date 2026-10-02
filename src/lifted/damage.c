@@ -617,3 +617,19 @@ L30447:;
 L3044E:;
     *(signed char *)D_001940DA &= 223;
 }
+
+void func_000304C8(int a1, int a2, int a3, int a4)
+{
+    int l_C;
+
+    if (*(int *)((char *)((a3 * 15) + a2) + 13) == (-1)) return;
+    l_C = *(int *)((char *)((a3 * 15) + a2) + 7);
+    if (((int)(unsigned char)(*(signed char *)((char *)((a3 * 15) + a2) + 6) & 1)) == 0) goto L30512;
+    a4 ^= 1;
+L30512:;
+    if (*(signed char *)((char *)l_C + 2) == 0) goto L3052E;
+    *(signed char *)(D_001952EC + ((int)(unsigned char)*(signed char *)((char *)l_C + 3))) = *(signed char *)&a4;
+    return;
+L3052E:;
+    *(signed char *)((char *)l_C + 3) = *(signed char *)&a4;
+}

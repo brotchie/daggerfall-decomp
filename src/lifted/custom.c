@@ -91,11 +91,6 @@ int func_0005500F(short);
 void func_0005425C(int);
 void func_0005559C(void);
 #pragma aux func_000A0ED9 parm routine [];
-#pragma dagger DAGGER_DEADDEF func_0005400B
-#pragma dagger DAGGER_DEADDEF func_00054082
-#pragma dagger DAGGER_DEADDEF func_00054D75
-#pragma dagger DAGGER_DEADDEF func_00054F81
-#pragma dagger DAGGER_DEADDEF func_00054FC8
 #pragma dagger slots func_0005500F a1 8 l_18 4 ret 12
 
 void func_000539D2(void)

@@ -27,6 +27,7 @@ extern char D_00190D66[];
 extern char D_00190D68[];
 extern char D_001940D8[];
 extern char D_00195AA4[];
+extern char D_00195BE0[];
 extern char D_00195BE8[];
 extern char D_00195C44[];
 extern char D_00195D38[];
@@ -44,6 +45,7 @@ extern char D_00199D60[];
 extern int func_00069938(int, int, int);
 extern int func_0006CB53(int, int);
 extern int func_0006CD6E(int);
+extern int func_0008DA91(int);
 extern int func_000926AD(int, int, int);
 extern int func_0009DEA7();
 extern int func_000A0024();
@@ -57,6 +59,8 @@ extern int func_00144FB4();
 extern void func_0003EC2A(int, int);
 extern void func_0007CA1F(int, int, int, int, unsigned char);
 extern void func_0007CA85(int, int, int, int, unsigned char);
+extern void func_0008A550(int, int, int);
+extern void func_0008A90C(int, int, int);
 extern void func_0008C4E4(int);
 void func_0005A230(void);
 #pragma aux func_000A0ED9 parm routine [];
@@ -238,4 +242,52 @@ void func_0005A6ED(int a1, int a2, int a3, int a4)
     *(short *)D_00142944 = a2;
     *(short *)D_00142948 = a3;
     *(short *)D_0014294C = a4;
+}
+
+void func_0005A7D5(int a1, int a2)
+{
+    int l_20;
+    int l_1C;
+    int l_18;
+    int l_14;
+
+    l_14 = a1 + 71;
+    l_20 = 0;
+    l_18 = l_20;
+    l_1C = l_18;
+L5A804:;
+    if (l_20 < 3) goto L5A817;
+    goto L5A901;
+L5A80F:;
+    l_20++;
+    goto L5A804;
+L5A817:;
+    if (((int)(unsigned char)*(signed char *)((char *)((l_20 * 2) + l_14))) == 255) goto L5A80F;
+    l_1C++;
+    if (((int)(signed char)*(signed char *)((char *)((l_20 * 3) + l_14) + 14)) != (-1)) goto L5A8AE;
+    if (*(int *)((char *)(int)(*(char **)D_00195BE0 + (((int)(unsigned char)*(signed char *)((char *)l_14 + 72)) << 2)) - 433) == 0) goto L5A88E;
+    if (((int)(short)*(short *)(*(char **)((char *)(int)(*(char **)D_00195BE0 + (((int)(unsigned char)*(signed char *)((char *)l_14 + 72)) << 2)) - 433) + 138)) != (-1)) goto L5A890;
+L5A88E:;
+    goto L5A895;
+L5A890:;
+    goto L5A80F;
+L5A895:;
+    l_18++;
+    func_0008A550(l_14, l_20, a2);
+    goto L5A80F;
+L5A8AE:;
+    if (*(short *)((char *)((l_20 * 2) + l_14) + 74) == 0) goto L5A8CB;
+    func_0008A90C(a1, a2, l_20);
+L5A8CB:;
+    if (*(short *)((char *)((l_20 * 2) + l_14) + 74) == 0) goto L5A8E8;
+    (*(short *)((char *)((l_20 * 2) + l_14) + 74))--;
+    goto L5A8FC;
+L5A8E8:;
+    l_18++;
+    func_0008A550(l_14, l_20, a2);
+L5A8FC:;
+    goto L5A80F;
+L5A901:;
+    if (l_1C != l_18) return;
+    func_0008DA91(a1);
 }

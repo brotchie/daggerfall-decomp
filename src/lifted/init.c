@@ -234,7 +234,6 @@ void func_00050B02(void);
 #pragma aux func_0009DA1C parm routine [];
 #pragma aux func_000A0ED9 parm routine [];
 #pragma aux func_000A18C3 parm routine [];
-#pragma dagger DAGGER_DEADDEF func_00050540
 
 void func_0004ECAE(void)
 {

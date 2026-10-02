@@ -141,8 +141,6 @@ void func_00028ED1(int);
 void func_00028F56(void);
 void func_000298F3(int);
 #pragma aux func_000A0ED9 parm routine [];
-#pragma dagger DAGGER_DEADDEF func_000294E5
-#pragma dagger DAGGER_DEADDEF func_00029670
 #pragma dagger DAGGER_NOSAVES func_00028E24
 
 void func_00026D8D(void)

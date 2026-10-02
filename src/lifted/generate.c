@@ -72,7 +72,6 @@ extern void func_00091B80(int);
 extern void func_00097101(int);
 extern void func_0009721F(void);
 extern void func_000972C7(int, int, int);
-#pragma dagger DAGGER_DEADDEF func_000919FE
 
 void func_00090E79(void)
 {

@@ -1555,7 +1555,7 @@ index e3c9f73344..f72e8cddb6 100644
       && temp->t.u.blk_id != BLK_ID_NONE ) {
          CalcRange( &st_temp, temp );
 diff --git a/bld/cg/c/tree.c b/bld/cg/c/tree.c
-index 23957dda5c..c22e7e5939 100644
+index 23957dda5c..04a5666a40 100644
 --- a/bld/cg/c/tree.c
 +++ b/bld/cg/c/tree.c
 @@ -31,6 +31,8 @@
@@ -1598,7 +1598,35 @@ index 23957dda5c..c22e7e5939 100644
          if( !already_masked ) {
              retv = BGBinary( O_AND, retv, Int64( mask ), tipeu, true );
          }
-@@ -1881,13 +1898,22 @@ an  TNPostGets( tn node )
+@@ -1872,6 +1889,27 @@ static  an  TNBitOpGets( tn node, const type_def *tipe, bool yield_before_op )
+ }
+ 
+ 
++static bool DaggerOnStack( tn node )
++/* Daggerfall: is this lvalue a stack variable, or a member of one (`l.f`, `arr[3]`)? */
++{
++    for( ;; ) {
++        if( node->class == TN_LEAF ) {
++            return( node->u.addr->format == NF_ADDR && node->u.addr->class == CL_ADDR_TEMP );
++        }
++        if( node->class == TN_UNARY && node->u1.t.op == O_POINTS ) {
++            node = node->u.left;
++        } else if( node->class == TN_BINARY && node->u1.t.op == O_PLUS
++          && node->u1.t.rite->class == TN_CONS ) {
++            node = node->u.left;
++        } else if( node->class == TN_UNARY && node->u1.t.op == O_CONVERT ) {
++            node = node->u.left;
++        } else {
++            return( false );
++        }
++    }
++}
++
++
+ an  TNPostGets( tn node )
+ /************************
+  * generate blocks for an x++ type node
+@@ -1881,13 +1919,25 @@ an  TNPostGets( tn node )
      an      left;
      an      rite;
      an      leftp;
@@ -1615,7 +1643,10 @@ index 23957dda5c..c22e7e5939 100644
 +        if( _IsModel( CGSW_GEN_NO_OPTIMIZATION ) && DaggerEnv( "DAGGER_DEADDEF" ) == NULL
 +          && !( node->u.left->class == TN_LEAF
 +             && node->u.left->u.addr->format == NF_ADDR
-+             && node->u.left->u.addr->class == CL_ADDR_GLOBAL ) ) {
++             && node->u.left->u.addr->class == CL_ADDR_GLOBAL )
++          && ( DaggerEnv( "DAGGER_DEADDEFMEM" ) != NULL || DaggerOnStack( node->u.left ) ) ) {
++            /* (and not through a pointer: `(*p)++` is a plain `inc [p]`;
++             * DAGGER_DEADDEFMEM=1 keeps the load there too) */
 +            temp->t.temp_flags |= DAGGER_KEEP;
 +        }
 +        retv = MakeTempAddr( temp );
@@ -2500,7 +2531,7 @@ index 1de30dab10..4cdc4f45b3 100644
      POP_OP();
      return( table );
 diff --git a/bld/cg/intel/c/x86ver.c b/bld/cg/intel/c/x86ver.c
-index 7de826e706..72174bb191 100644
+index 7de826e706..a4dd9cb553 100644
 --- a/bld/cg/intel/c/x86ver.c
 +++ b/bld/cg/intel/c/x86ver.c
 @@ -31,6 +31,8 @@
@@ -2512,7 +2543,7 @@ index 7de826e706..72174bb191 100644
  #include "coderep.h"
  #include "data.h"
  #include "rgtbl.h"
-@@ -39,10 +41,21 @@
+@@ -39,10 +41,24 @@
  #include "targetin.h"
  
  
@@ -2526,7 +2557,10 @@ index 7de826e706..72174bb191 100644
 +static bool DaggerNoNarrowTest( instruction *ins, name *op1 )
 +{
 +    return( _IsModel( CGSW_GEN_NO_OPTIMIZATION ) && DaggerEnv( "DAGGER_NARROWTEST" ) == NULL
-+      && ( ins->head.opcode == OP_BIT_TEST_TRUE || ins->head.opcode == OP_BIT_TEST_FALSE )
++      && ( ins->head.opcode == OP_BIT_TEST_TRUE || ins->head.opcode == OP_BIT_TEST_FALSE
++        || ( DaggerEnv( "DAGGER_NARROWRMW" ) == NULL
++          && ( ins->head.opcode == OP_AND || ins->head.opcode == OP_OR
++            || ins->head.opcode == OP_XOR ) ) )
 +      && op1->n.class == N_TEMP );
 +}
 +
@@ -2534,7 +2568,7 @@ index 7de826e706..72174bb191 100644
  bool    DoVerify( vertype kind, instruction *ins )
  /************************************************/
  {
-@@ -80,6 +93,8 @@ bool    DoVerify( vertype kind, instruction *ins )
+@@ -80,6 +96,8 @@ bool    DoVerify( vertype kind, instruction *ins )
              return( true );
          break;
      case V_OP2HIGH_B_ZERO:
@@ -2543,7 +2577,7 @@ index 7de826e706..72174bb191 100644
          if( op2->c.const_type == CONS_ABSOLUTE
            && (op2->c.lo.u.int_value & 0x0000ff00) == 0 )
              return( true );
-@@ -90,6 +105,8 @@ bool    DoVerify( vertype kind, instruction *ins )
+@@ -90,6 +108,8 @@ bool    DoVerify( vertype kind, instruction *ins )
              return( true );
          break;
      case V_OP2LOW_B_ZERO:
@@ -2552,7 +2586,7 @@ index 7de826e706..72174bb191 100644
          if( op2->c.const_type == CONS_ABSOLUTE
            && (op2->c.lo.u.int_value & 0x000000ff) == 0 )
              return( true );
-@@ -155,6 +172,8 @@ bool    DoVerify( vertype kind, instruction *ins )
+@@ -155,6 +175,8 @@ bool    DoVerify( vertype kind, instruction *ins )
              return( true );
          break;
      case V_OP2HIGH_W_ZERO_REG:
@@ -2561,7 +2595,7 @@ index 7de826e706..72174bb191 100644
          if( op1->n.class == N_REGISTER
            && HW_Ovlap( op1->r.reg, HW_xBP ) )
              break;
-@@ -164,6 +183,8 @@ bool    DoVerify( vertype kind, instruction *ins )
+@@ -164,6 +186,8 @@ bool    DoVerify( vertype kind, instruction *ins )
              return( true );
          break;
      case V_OP2LOW_W_ZERO:
@@ -2570,7 +2604,7 @@ index 7de826e706..72174bb191 100644
          if( op2->c.const_type == CONS_ABSOLUTE
            && (op2->c.lo.u.int_value & 0x0000ffff) == 0 )
              return( true );
-@@ -312,6 +333,10 @@ bool    DoVerify( vertype kind, instruction *ins )
+@@ -312,6 +336,10 @@ bool    DoVerify( vertype kind, instruction *ins )
          }
          return( true );
      case V_CDQ:

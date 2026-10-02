@@ -5,6 +5,7 @@ struct bf16_0_10 { unsigned short f:10; };
 extern char D_0012B508[];
 extern char D_00132F6C[];
 extern char D_00142314[];
+extern char D_00142315[];
 extern char D_00171044[];
 extern char D_0017104D[];
 extern char D_0017105A[];
@@ -17,6 +18,7 @@ extern char D_001710A7[];
 extern char D_001710BA[];
 extern char D_001710C3[];
 extern char D_001710D6[];
+extern char D_001710EB[];
 extern char D_0017BABC[];
 extern char D_0017BABD[];
 extern char D_0017BAE2[];
@@ -628,6 +630,27 @@ L45F7C:;
     goto L45F59;
 L45F7E:;
     *(signed char *)D_00142314 = 0;
+}
+
+void func_00045F8F(void)
+{
+    int l_18;
+
+    func_0007CBA1((int)D_001710EB);
+    l_18 = 0;
+L45FAE:;
+    if (l_18 < 35) goto L45FBE;
+    goto L45FEA;
+L45FB6:;
+    l_18++;
+    goto L45FAE;
+L45FBE:;
+    if (((int)(short)*(short *)(*(char **)D_00195BE0 + 157 + (l_18 * 6))) == 100) goto L45FE8;
+    (*(short *)(*(char **)D_00195BE0 + 157 + (l_18 * 6)))++;
+L45FE8:;
+    goto L45FB6;
+L45FEA:;
+    *(signed char *)D_00142315 = 0;
 }
 
 void func_00045FFB(int a1)
