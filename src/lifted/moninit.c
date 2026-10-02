@@ -204,8 +204,7 @@ void func_0007909F(int a1, int a2)
 
     l_24 = 0;
     l_14 = a1 + 71;
-    *(short *)((char *)l_14 + 143) = (((unsigned short)(unsigned char)*(signed char *)((char *)l_14 + 129)) * 10) + 100;
-    *(short *)((char *)l_14 + 141) = *(short *)((char *)l_14 + 143);
+    *(short *)((char *)l_14 + 141) = (*(short *)((char *)l_14 + 143) = (((unsigned short)(unsigned char)*(signed char *)((char *)l_14 + 129)) * 10) + 100);
     *(short *)((char *)l_14 + 289) = 80;
     *(short *)((char *)l_14 + 295) = 80;
     *(short *)((char *)l_14 + 301) = 80;

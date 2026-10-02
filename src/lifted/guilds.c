@@ -2143,8 +2143,7 @@ L71747:;
 L71791:;
     return;
 L71793:;
-    *(short *)((char *)l_20 + 141) = ((int)(short)*(short *)((char *)l_20 + 141)) + (((int)(short)*(short *)((char *)l_20 + 143)) >> 3);
-    if (*(short *)((char *)l_20 + 141) <= *(short *)((char *)l_20 + 143)) return;
+    if ((short)(*(short *)((char *)l_20 + 141) = ((int)(short)*(short *)((char *)l_20 + 141)) + (((int)(short)*(short *)((char *)l_20 + 143)) >> 3)) <= *(short *)((char *)l_20 + 143)) return;
     *(short *)((char *)l_20 + 141) = *(short *)((char *)l_20 + 143);
 }
 

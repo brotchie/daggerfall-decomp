@@ -747,8 +747,16 @@ class Func:
                 self.side = []
                 return E(text, op.size, atom=True)
             ch = getattr(self, "chain", None)
+            k_ = getattr(self, "k", -1)
+            # (or right after reloading the pointer: x = (p->f = v) with a short field,
+            # re-read as a word and widened with cwde)
+            reload = ch is not None and ch[3] + 2 == k_ and ins.mnemonic == "mov" and \
+                op.size == 2 and self.body[k_ - 1].mnemonic == "mov" and \
+                k_ + 1 < len(self.body) and self.body[k_ + 1].mnemonic in ("cwde", "mov") and \
+                ebp_slot(self.body[k_ - 1], self.body[k_ - 1].operands[1]) is not None and \
+                not os.environ.get("LIFT_NORELOADCHAIN")
             if ch is not None and ch[0] == t and ch[2] == len(self.out) - 1 and \
-                    ch[3] + 1 == getattr(self, "k", -1) and self.pending is None and \
+                    (ch[3] + 1 == k_ or reload) and self.pending is None and \
                     self.out[-1] == "    %s = %s;" % (ch[0], ch[1].text):
                 # re-reading what the previous statement stored: x = (lhs = v)
                 self.out.pop()
