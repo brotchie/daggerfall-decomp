@@ -942,7 +942,8 @@ void func_00067550(void)
     int l_1C;
     int l_18;
 
-    l_1C = (((unsigned)((l_20 = (((unsigned)*(int *)D_00195BF4) / 1440) & 31, *(int *)D_00195BF4) + 5760)) / 1440) & 31;
+    l_20 = (((unsigned)*(int *)D_00195BF4) / 1440) & 31;
+    l_1C = (((unsigned)(*(int *)D_00195BF4 + 5760)) / 1440) & 31;
     if (func_00067270() == 0) return;
     if (func_00067C04(3) != 0) return;
     if (((unsigned)(*(int *)D_00195BF4 - *(int *)(*(char **)D_00195BE0 + 96))) <= 20160) goto L67668;

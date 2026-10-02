@@ -17,6 +17,7 @@ extern char D_00142335[];
 extern char D_00143550[];
 extern char D_00147954[];
 extern char D_00170D55[];
+extern char D_00170D7F[];
 extern char D_00170DA2[];
 extern char D_00170DA7[];
 extern char D_00170DAE[];
@@ -48,6 +49,7 @@ extern char D_00195B14[];
 extern char D_00195BDC[];
 extern char D_00195BE0[];
 extern char D_00195C40[];
+extern char D_00195C44[];
 extern char D_00195D6C[];
 extern char D_00195E2A[];
 extern char D_00195F2E[];
@@ -95,6 +97,7 @@ extern int func_0001FFF1(void);
 extern int func_00020C87(int);
 extern int func_00023DE0(int, int);
 extern int func_0003D412(int, int, int);
+extern int func_0003D9B1(unsigned short, short, int, int, int);
 extern int func_000404D9(int, int);
 extern int func_0005A442(unsigned char);
 extern int func_0005A4A9(int);
@@ -115,7 +118,9 @@ extern int func_0009DEA7();
 extern int func_0009DEAC();
 extern int func_000A0024();
 extern int func_000A0040();
+extern int func_000A006E();
 extern int func_000A00AF();
+extern int func_000A00CB();
 extern int func_000A0ED9(int, int);
 extern int func_000A0F5C(int, ...);
 extern int func_000A1023();
@@ -169,13 +174,83 @@ void func_00040E9D(int);
 #pragma aux func_000A0ED9 parm routine [];
 #pragma dagger DAGGER_LEFTPREF func_0003DCF4
 #pragma dagger DAGGER_NOGIVEN func_0003DCF4
+#pragma dagger DAGGER_RMW func_0003D6FF
+#pragma dagger confwin func_0003D6FF 83 88
 #pragma dagger reg func_0003DCF4 120 eax 144 eax 278 edx 279 edx 437 bx
+#pragma dagger slots func_0003D6FF a1 24 a2 12 a3 16 a4 36 l_38 48 l_34 44 l_30 40 l_24 28 l_1C 20 l_10 8 l_C 4 ret 32
 #pragma dagger slots func_0003DCF4 a1 100 a2 96 l_6C 92 l_68 88 l_64 84 l_60 80 l_5C 76 l_58 72 l_54 68 l_50 64 l_4C 60 l_48 56 l_44 52 l_40 48 l_3C 44 l_38 40 l_34 36 l_30 32 l_2C 28 l_28 24 l_24 20 l_20 16 l_1C 12 l_18 8 l_14 4
 #pragma dagger slots func_0003E6B1 a1 28 a2 16 a3 8 a4 4 l_1C 20 l_14 12 ret 24
 #pragma dagger slots func_0003E8A8 a1 8 a2 20 a3 4 l_24 24 l_18 12 ret 16
 #pragma dagger slots func_0003EAB4 a1 32 a2 8 a3 24 a4 4 l_24 28 l_18 16 l_14 12 ret 20
 #pragma dagger slots func_0003EDF4 a1 16 a2 4 a3 8 l_18 12
 #pragma dagger slots func_00040983 a1 48 a2 44 l_38 40 l_34 36 l_30 32 l_2C 28 l_28 24 l_24 20 l_20 16 l_1C 12 l_14 4 ret 8
+
+int func_0003D6FF(short a1, unsigned short a2, short a3, int a4)
+{
+    int l_38;
+    int l_34;
+    int l_30;
+    int l_24;
+    int l_1C;
+    int l_C;
+    short l_10;
+
+    func_000A006E(*(int *)D_00195D6C, 0, 0);
+    func_000A00CB(*(int *)D_00195D6C, (int)&l_10, 2);
+    func_000A00CB(*(int *)D_00195D6C, *(int *)D_00195C44, (int)(short)l_10);
+    l_10 = *(short *)&l_10 / 6;
+    l_C = 0;
+L3D761:;
+    if ((short)(short)l_C < l_10) goto L3D774;
+    goto L3D78B;
+L3D76C:;
+    l_C++;
+    goto L3D761;
+L3D774:;
+    if (*(short *)((char *)(int)(*(char **)D_00195C44 + (((int)(short)*(short *)&l_C) * 6))) != a1) goto L3D76C;
+L3D78B:;
+    if ((short)(short)l_C < l_10) goto L3D7DA;
+    l_30 = func_000A00AF(1024, (int)D_00170D55, 121);
+    func_000A0ED9(122, (int)D_00170D55);
+    func_000A0F5C(l_30, (int)D_00170D7F, (int)(short)a1);
+    return l_30;
+L3D7DA:;
+    l_34 = *(int *)(*(char **)D_00195C44 + 2 + ((((int)(short)*(short *)&l_C) + 1) * 6)) - *(int *)(*(char **)D_00195C44 + 2 + (((int)(short)*(short *)&l_C) * 6));
+    func_000A006E(*(int *)D_00195D6C, *(int *)(*(char **)D_00195C44 + 2 + (((int)(short)*(short *)&l_C) * 6)), 0);
+    l_30 = func_000A00AF(l_34 + 16, (int)D_00170D55, 129);
+    l_24 = func_000A00AF(((l_34 < 4096) ? 8192 : l_34 * 2), (int)D_00170D55, 130);
+    l_38 = func_000A00AF(((l_34 < 4096) ? 8192 : l_34 * 2), (int)D_00170D55, 131);
+    func_000A00CB(*(int *)D_00195D6C, l_30, l_34 + 8);
+    l_1C = 0;
+    l_C = 1;
+L3D8CC:;
+    if (((int)(unsigned char)*(signed char *)((char *)(((int)(short)*(short *)&l_1C) + l_30))) == 254) goto L3D91C;
+    if (((int)(unsigned char)*(signed char *)((char *)(((int)(short)*(short *)&l_1C) + l_30))) != 255) goto L3D90C;
+    if (((int)(unsigned char)*(signed char *)((char *)(((int)(short)*(short *)&l_1C) + l_30) + 1)) != 254) goto L3D90E;
+L3D90C:;
+    goto L3D914;
+L3D90E:;
+    l_C++;
+L3D914:;
+    l_1C++;
+    goto L3D8CC;
+L3D91C:;
+    l_C = a4;
+    l_1C = 0;
+L3D929:;
+    if (*(short *)&l_C == 0) goto L3D950;
+L3D930:;
+    if (((int)(unsigned char)*(signed char *)((char *)(((int)(short)l_1C++) + l_30))) != 255) goto L3D930;
+    l_C--;
+    goto L3D929;
+L3D950:;
+    if (((int)(unsigned char)*(signed char *)((char *)(((int)(short)*(short *)&l_1C) + l_30))) >= 254) goto L3D981;
+    *(signed char *)((char *)(((int)(short)l_C++) + l_30)) = *(signed char *)((char *)(((int)(short)l_1C++) + l_30));
+    goto L3D950;
+L3D981:;
+    *(signed char *)((char *)(((int)(short)*(short *)&l_C) + l_30)) = 0;
+    return func_0003D9B1((int)(unsigned short)a2, (int)(short)a3, l_30, l_24, l_38);
+}
 
 void func_0003DCF4(int a1, int a2)
 {

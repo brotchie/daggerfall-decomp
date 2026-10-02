@@ -206,7 +206,8 @@ void func_0001F40E(int a1)
     int l_1C;
     int l_18;
 
-    l_18 = func_0004A98C(*(int *)D_00195BF4, (int)(unsigned char)(l_1C = (int)(unsigned char)*(signed char *)(D_001841D8 + a1), *(signed char *)D_00196268));
+    l_1C = (int)(unsigned char)*(signed char *)(D_001841D8 + a1);
+    l_18 = func_0004A98C(*(int *)D_00195BF4, (int)(unsigned char)*(signed char *)D_00196268);
     if (l_18 != 37) goto L1F457;
     l_1C >>= 1;
     if (l_1C != 0) goto L1F457;

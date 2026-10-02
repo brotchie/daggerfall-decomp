@@ -2592,6 +2592,12 @@ class Func:
                     ins.mnemonic.startswith("j"):
                 return False
             reads, writes = ins.regs_access()
+            if ins.mnemonic in ("xor", "sub") and len(ins.operands) == 2 and \
+                    ins.operands[0].type == cx.X86_OP_REG and \
+                    ins.operands[1].type == cx.X86_OP_REG and \
+                    ins.operands[0].reg == ins.operands[1].reg and \
+                    not os.environ.get("LIFT_XORREADS"):
+                reads = ()      # (xor r,r only writes r)
             if any(SUB.get(ins.reg_name(x), (None,))[0] == reg for x in reads):
                 return True
             if any(SUB.get(ins.reg_name(x), (None,))[0] == reg for x in writes):

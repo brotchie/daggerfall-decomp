@@ -765,7 +765,8 @@ void func_0006C722(void)
 {
     int l_18;
 
-    if (((int)(unsigned char)(l_18 = (int)(*(char **)D_001A413C + ((((int)(short)*(short *)D_0012AC06) - 38) / 7)), *(signed char *)D_001A41F3)) <= l_18) return;
+    l_18 = (int)(*(char **)D_001A413C + ((((int)(short)*(short *)D_0012AC06) - 38) / 7));
+    if (((int)(unsigned char)*(signed char *)D_001A41F3) <= l_18) return;
     *(signed char *)D_001A41F2 = *(signed char *)&l_18;
 }
 
@@ -786,7 +787,8 @@ void func_0006C7D2(void)
 {
     int l_18;
 
-    if (((int)(unsigned char)(l_18 = (((int)(short)*(short *)D_0012AC06) - 38) / 7, *(signed char *)D_001A41F0)) <= l_18) return;
+    l_18 = (((int)(short)*(short *)D_0012AC06) - 38) / 7;
+    if (((int)(unsigned char)*(signed char *)D_001A41F0) <= l_18) return;
     *(signed char *)D_001A41F2 = *(signed char *)&l_18;
 }
 

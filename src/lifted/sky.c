@@ -414,7 +414,8 @@ void func_0003522C(void)
     int l_18;
 
     l_1C = 0;
-    l_2C = (int)(unsigned char)*(signed char *)(D_0017A288 + (((unsigned)(((unsigned)(l_18 = (int)(unsigned char)*(signed char *)(D_00195E2A + func_0001FFF1()), *(int *)D_00195BF4)) % 518400)) / 43200));
+    l_18 = (int)(unsigned char)*(signed char *)(D_00195E2A + func_0001FFF1());
+    l_2C = (int)(unsigned char)*(signed char *)(D_0017A288 + (((unsigned)(((unsigned)*(int *)D_00195BF4) % 518400)) / 43200));
     l_30 = 0;
 L35280:;
     if (l_30 < 6) goto L35293;

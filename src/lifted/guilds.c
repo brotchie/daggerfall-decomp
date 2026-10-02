@@ -1776,7 +1776,8 @@ int func_00070B9C(int a1, int a2)
     if (((int)(unsigned char)*(signed char *)((char *)a1)) != 255) goto L70C20;
     *(short *)(D_0018F08E + (((int)(unsigned char)*(signed char *)D_00196268) * 80)) += a2;
     if (((int)(short)*(short *)(D_0018F08E + (((int)(unsigned char)*(signed char *)D_00196268) * 80))) <= 100) goto L70C1B;
-    *(short *)(D_0018F08E + (((int)(unsigned char)(l_18 = a2 - (((int)(short)*(short *)(D_0018F08E + (((int)(unsigned char)*(signed char *)D_00196268) * 80))) - 100), *(signed char *)D_00196268)) * 80)) = 100;
+    l_18 = a2 - (((int)(short)*(short *)(D_0018F08E + (((int)(unsigned char)*(signed char *)D_00196268) * 80))) - 100);
+    *(short *)(D_0018F08E + (((int)(unsigned char)*(signed char *)D_00196268) * 80)) = 100;
 L70C1B:;
     goto L70D36;
 L70C20:;

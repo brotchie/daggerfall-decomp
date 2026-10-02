@@ -404,7 +404,8 @@ int func_00042380(void)
     int l_1C;
 
     l_28 = 100;
-    l_1C = (((unsigned)((l_20 = (((unsigned)*(int *)D_00195BF4) / 1440) & 31, *(int *)D_00195BF4) + 5760)) / 1440) & 31;
+    l_20 = (((unsigned)*(int *)D_00195BF4) / 1440) & 31;
+    l_1C = (((unsigned)(*(int *)D_00195BF4 + 5760)) / 1440) & 31;
     l_30 = 0;
 L423C9:;
     if (l_30 < 27) goto L423DC;
