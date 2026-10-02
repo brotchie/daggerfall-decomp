@@ -659,3 +659,15 @@ lifter. The `add r32, dword[ebp-x]` difference has some other cause.
 
 The `add r32, dword[ebp-x]` excess was mostly 2-byte array indexing: `mov edx,[x]; add edx,edx`
 is `x * 2`, which the lifter spelled `x + x` (OW: `add edx,[x]`). Batch **1,393**.
+
+## 2026-10-01: 16-bit zero-extension and compares (+5)
+
+- Watcom 10 zero-extends a byte into a 16-bit register as `mov al,[x]; xor ah,ah` (load
+  first); OW's `rCLRHI_R()` (`cg/c/split.c`) clears the high half first. Patched to append the
+  clear at `-od` (`DAGGER_CLRFIRST=1` restores OW). Returning the clear as the next
+  instruction to expand crashed the compiler; it now returns the load.
+- The lifter writes that value as `(unsigned short)(unsigned char)x`, and a compare of two
+  16-bit operands casts the left side to the jump's signedness so it stays a 16-bit
+  `cmp ax, word [x]`.
+
+Batch **1,398**.

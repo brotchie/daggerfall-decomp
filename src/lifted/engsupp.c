@@ -68,6 +68,18 @@ L14030:;
 }
 }
 
+int func_00014048(int a1, short a2)
+{
+    short l_18;
+
+    *(int *)&l_18 = a1 + 8;
+    if ((short)((unsigned short)(unsigned char)*(signed char *)((char *)a1)) > a2) goto L1407A;
+    return 0;
+L1407A:;
+    *(int *)&l_18 += ((int)(short)a2) << 3;
+    return *(int *)&l_18;
+}
+
 int func_0001410F(int a1)
 {
     int l_28;

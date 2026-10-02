@@ -1136,7 +1136,7 @@ int func_00098B91(int a1)
 L98BB4:;
     goto L98BCB;
 L98BB6:;
-    *(int *)D_00199764 = func_0004BB64((int)(short)((unsigned char)*(signed char *)((char *)a1 + 38)));
+    *(int *)D_00199764 = func_0004BB64((int)(short)((unsigned short)(unsigned char)*(signed char *)((char *)a1 + 38)));
     goto L98BD4;
 L98BCB:;
     return 0;

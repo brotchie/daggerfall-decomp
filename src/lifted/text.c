@@ -359,8 +359,8 @@ void func_0003F5EF(void)
 void func_0003F630(short a1)
 {
     *(int *)D_00199658 = *(int *)(D_00199648 + (((int)(short)a1) << 2));
-    *(short *)D_00199666 = (unsigned char)*(signed char *)(D_0017B630 + (((int)(short)a1) * 2));
-    *(short *)D_00199662 = (unsigned char)*(signed char *)(D_0017B631 + (((int)(short)a1) * 2));
+    *(short *)D_00199666 = (unsigned short)(unsigned char)*(signed char *)(D_0017B630 + (((int)(short)a1) * 2));
+    *(short *)D_00199662 = (unsigned short)(unsigned char)*(signed char *)(D_0017B631 + (((int)(short)a1) * 2));
     *(short *)D_00199660 = *(short *)D_00199666 * *(short *)D_00199662;
 }
 

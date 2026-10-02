@@ -59,7 +59,6 @@ extern int func_000CE4C4();
 extern int func_000CE4E0();
 extern void func_0002F490(int, int, int);
 extern void func_0003A2AD(int, int);
-extern void func_0005B206(int);
 extern void func_0005BA28(int, unsigned short, int);
 extern void func_0007D774(int, int);
 extern void func_0008A4E4(int);
@@ -67,6 +66,7 @@ extern void func_0008E3F7(int, int);
 int func_0005B408(int, int);
 int func_0005B905(int, int, int, int);
 int func_0005B9DF(int, int, int);
+void func_0005B206(int);
 void func_0005C897(int);
 void func_0005CA28(int);
 void func_0005CA87(int);
@@ -208,7 +208,7 @@ L5AD1C:;
     *(int *)((char *)l_24 + 47) = *(int *)((char *)a1 + 47);
     *(int *)((char *)l_24 + 31) = func_0008EB88(801);
     l_10 = l_24 + 71;
-    func_0005BA28(l_10, (int)(unsigned short)((unsigned char)*(signed char *)((char *)*(int *)((char *)l_24 + 47) + 200)), l_14);
+    func_0005BA28(l_10, (int)(unsigned short)((unsigned short)(unsigned char)*(signed char *)((char *)*(int *)((char *)l_24 + 47) + 200)), l_14);
     l_20 = 0;
     l_1C = l_20;
 L5AD79:;
@@ -246,6 +246,13 @@ L5AE36:;
     return;
 L5AE4C:;
     func_0008DD46(a2, l_24);
+}
+
+void func_0005B206(int a1)
+{
+    if (((int)(unsigned char)*(signed char *)((char *)a1)) != 9) return;
+    if ((short)((unsigned short)(unsigned char)*(signed char *)((char *)a1 + 144)) != *(short *)D_00185C14) return;
+    *(int *)D_00195B50 = a1;
 }
 
 int func_0005B24C(void)

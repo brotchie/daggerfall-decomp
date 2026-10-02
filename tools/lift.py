@@ -475,6 +475,11 @@ class Func:
         kind = self.flags[0]
         a, b = self.flags[1], self.flags[2]
         if kind == "cmp":
+            if a.size == 2 and b.size == 2 and not a.atom:
+                # a 16-bit register value against a 16-bit operand: cmp ax, word [x], with the
+                # jump's signedness
+                a = E("(%s)%s" % ("unsigned short" if uns else "short", a.p()), 2, True)
+                return "%s %s %s" % (a.p(), opr, b.p())
             if uns and a.size < 4 and a.atom:
                 # a narrow operand: read it unsigned and let the compare stay narrow
                 # (an explicit (unsigned) cast would widen it)
@@ -548,7 +553,8 @@ class Func:
         if m == "xor" and ins.op_str in ("ah, ah", "dh, dh", "bh, bh", "ch, ch"):
             full = {"a": "eax", "d": "edx", "b": "ebx", "c": "ecx"}[ins.op_str[0]]
             v = self.reg(full, ins)
-            self.set_reg(full, E("(unsigned char)" + v.p(), 2))
+            # byte zero-extended to 16 bits: mov al,[x]; xor ah,ah
+            self.set_reg(full, E("(unsigned short)(unsigned char)" + v.p(), 2))
             return
         if m == "test" and ops[0].type == cx.X86_OP_REG and ins.reg_name(ops[0].reg) == "ah" \
                 and ops[1].type == cx.X86_OP_IMM:

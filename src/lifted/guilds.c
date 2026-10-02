@@ -526,14 +526,14 @@ L70AE5:;
 void func_00070AFA(int a1)
 {
     if (((int)(unsigned char)*(signed char *)((char *)a1)) != 255) goto L70B3B;
-    *(short *)(D_0018F08E + (((int)(unsigned char)*(signed char *)((char *)a1 + 6)) * 80)) -= (unsigned char)*(signed char *)((char *)a1 + 1);
+    *(short *)(D_0018F08E + (((int)(unsigned char)*(signed char *)((char *)a1 + 6)) * 80)) -= (unsigned short)(unsigned char)*(signed char *)((char *)a1 + 1);
     return;
 L70B3B:;
     if (((int)(unsigned char)(*(signed char *)((char *)a1) & 128)) == 0) goto L70B6F;
-    *(short *)((char *)(int)(*(char **)D_00195BE0 + (((int)(unsigned char)(*(signed char *)((char *)a1) & 127)) * 2)) + 32) -= (unsigned char)*(signed char *)((char *)a1 + 1);
+    *(short *)((char *)(int)(*(char **)D_00195BE0 + (((int)(unsigned char)(*(signed char *)((char *)a1) & 127)) * 2)) + 32) -= (unsigned short)(unsigned char)*(signed char *)((char *)a1 + 1);
     return;
 L70B6F:;
-    *(short *)((char *)(int)(*(char **)D_00195BE0 + (((int)(unsigned char)*(signed char *)((char *)a1)) * 6)) + 157) -= (unsigned char)*(signed char *)((char *)a1 + 1);
+    *(short *)((char *)(int)(*(char **)D_00195BE0 + (((int)(unsigned char)*(signed char *)((char *)a1)) * 6)) + 157) -= (unsigned short)(unsigned char)*(signed char *)((char *)a1 + 1);
 }
 
 void func_00070DFD(void)

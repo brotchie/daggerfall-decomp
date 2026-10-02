@@ -59,10 +59,10 @@ void func_00061326(int);
 void func_0005E5D7(int a1, int a2)
 {
     if (a2 <= 7) goto L5E616;
-    *(short *)((char *)a1 + 50) += ((unsigned char)*(signed char *)(D_00186589 + ((int)(unsigned char)*(signed char *)((char *)*(int *)D_00195BE0 + 498)))) << 7;
+    *(short *)((char *)a1 + 50) += ((unsigned short)(unsigned char)*(signed char *)(D_00186589 + ((int)(unsigned char)*(signed char *)((char *)*(int *)D_00195BE0 + 498)))) << 7;
     return;
 L5E616:;
-    *(short *)((char *)a1 + 50) += ((unsigned char)*(signed char *)(D_00186589 + a2)) << 7;
+    *(short *)((char *)a1 + 50) += ((unsigned short)(unsigned char)*(signed char *)(D_00186589 + a2)) << 7;
 }
 
 void func_0005ED19(int a1)

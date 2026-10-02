@@ -227,7 +227,7 @@ L2C3B4:;
     l_3C = a1 + *(int *)((char *)a1 + 56);
 L2C3C9:;
     if (*(signed char *)((char *)l_3C) == 0) return;
-    *(int *)((char *)l_3C + 23) = func_00030A23(a1, (int)(short)((unsigned char)*(signed char *)((char *)l_3C + 20)), (int)(short)*(short *)((char *)l_3C + 21));
+    *(int *)((char *)l_3C + 23) = func_00030A23(a1, (int)(short)((unsigned short)(unsigned char)*(signed char *)((char *)l_3C + 20)), (int)(short)*(short *)((char *)l_3C + 21));
     (*(char (**)[27])&l_3C)++;
     goto L2C3C9;
 }

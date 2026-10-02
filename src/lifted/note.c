@@ -259,7 +259,7 @@ L4DB5D:;
     *(short *)D_00195F38 = *(short *)D_001997E0;
 L4DB8F:;
     *(signed char *)D_001997EC = 1;
-    func_0012DB50((int)(short)((unsigned char)*(signed char *)(D_00185201 + ((int)(unsigned char)*(signed char *)((char *)l_18 + 5)))));
+    func_0012DB50((int)(short)((unsigned short)(unsigned char)*(signed char *)(D_00185201 + ((int)(unsigned char)*(signed char *)((char *)l_18 + 5)))));
     func_0008C566(l_18 + 11, 79);
     *(signed char *)D_001997DE |= 32;
     *(int *)D_001997C8 = l_18;
@@ -271,7 +271,7 @@ L4DBD0:;
     *(short *)D_00195F38 = *(short *)D_001997E0;
     *(signed char *)D_001997EC = 1;
     func_000A0040((int)D_00190FE4, 0, 81, (int)D_00174FAC, 270, 2048);
-    func_0012DB50((int)(short)((unsigned char)*(signed char *)(D_00185201 + ((int)(short)*(short *)D_001997DC))));
+    func_0012DB50((int)(short)((unsigned short)(unsigned char)*(signed char *)(D_00185201 + ((int)(short)*(short *)D_001997DC))));
     func_0008C566((int)D_00190FE4, 79);
 L4DC4B:;
     return;
@@ -433,7 +433,7 @@ void func_0004E466(void)
 
 void func_0004E48B(void)
 {
-    *(short *)D_001851FF = (unsigned char)func_000A138E((int)(short)(*(short *)D_0012AC04 - *(short *)D_000CEA30), (int)(short)((*(short *)D_0012AC06 - 1) - *(short *)D_000CEA34));
+    *(short *)D_001851FF = (unsigned short)(unsigned char)func_000A138E((int)(short)(*(short *)D_0012AC04 - *(short *)D_000CEA30), (int)(short)((*(short *)D_0012AC06 - 1) - *(short *)D_000CEA34));
     *(signed char *)D_001997EB = (((int)(short)*(short *)D_0012AC04) - 52) >> 3;
 }
 
@@ -574,7 +574,7 @@ void func_0004EA3C(int a1, int a2)
 {
     int l_14;
 
-    func_0012DB50((int)(short)((unsigned char)*(signed char *)(D_00185201 + ((int)(unsigned char)*(signed char *)((char *)a1 + 5)))));
+    func_0012DB50((int)(short)((unsigned short)(unsigned char)*(signed char *)(D_00185201 + ((int)(unsigned char)*(signed char *)((char *)a1 + 5)))));
     l_14 = func_0005A4A9(a1 + 11);
     *(short *)((char *)a2) = *(short *)((char *)a1 + 1);
     *(short *)((char *)a2 + 2) = *(short *)((char *)a1 + 3);

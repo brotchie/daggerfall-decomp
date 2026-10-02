@@ -1363,7 +1363,7 @@ int func_00049ABF(void)
 
 int func_00049AE7(void)
 {
-    return *(int *)((char *)func_000191DA((int)(short)((unsigned char)*(signed char *)((char *)*(int *)D_00195D28 + 7)), 13) + 84) + 3;
+    return *(int *)((char *)func_000191DA((int)(short)((unsigned short)(unsigned char)*(signed char *)((char *)*(int *)D_00195D28 + 7)), 13) + 84) + 3;
 }
 
 int func_00049B20(void)
@@ -1373,7 +1373,7 @@ int func_00049B20(void)
 
 int func_00049B43(void)
 {
-    return func_000192EE((int)(short)((unsigned char)*(signed char *)((char *)*(int *)D_00195BE0 + 541))) + 3;
+    return func_000192EE((int)(short)((unsigned short)(unsigned char)*(signed char *)((char *)*(int *)D_00195BE0 + 541))) + 3;
 }
 
 int func_00049B77(void)

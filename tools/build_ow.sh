@@ -16,6 +16,7 @@
 #   cg treefold.c FoldCompare(): an explicit (int)x compared to a constant stays wide (DAGGER_STRIP=ow)
 #   cg x86call.c PushOneParm(): a stack variable is pushed through a register (DAGGER_PUSHMEM=1)
 #   cg x86ver.c: sign extension for division as mov eax,edx; sar edx,31, not cdq (DAGGER_CDQ=1)
+#   cg split.c rCLRHI_R(): byte to word zero-extension as mov al,x; xor ah,ah (DAGGER_CLRFIRST=1)
 #
 # Output: third_party/open-watcom-v2/build/binbuild/{bwcc386,bwlink,bwasm,bwlib}
 set -eu

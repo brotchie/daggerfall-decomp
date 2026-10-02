@@ -658,6 +658,57 @@ index 90c1857729..129dd201e5 100644
                  next = InMemory( conf );
              } else {
                  next = GiveRegister( conf, false );
+diff --git a/bld/cg/c/split.c b/bld/cg/c/split.c
+index af92de3399..272c0437fd 100644
+--- a/bld/cg/c/split.c
++++ b/bld/cg/c/split.c
+@@ -31,6 +31,7 @@
+ 
+ 
+ #include "_cgstd.h"
++#include <stdlib.h>
+ #include "coderep.h"
+ #include "regset.h"
+ #include "confldef.h"
+@@ -45,6 +46,7 @@
+ #include "revcond.h"
+ #include "conflict.h"
+ #include "_split.h"
++#include "model.h"
+ 
+ 
+ const type_class_def    HalfClass[] = {
+@@ -495,6 +497,7 @@ instruction      *rCLRHI_BW( instruction *ins )
+ instruction      *rCLRHI_R( instruction *ins )
+ /********************************************/
+ {
++    bool                dagger_after = false;
+     instruction         *new_ins;
+     instruction         *and_ins;
+     type_class_def      type_class;
+@@ -527,6 +530,10 @@ instruction      *rCLRHI_R( instruction *ins )
+             new_ins = NULL;
+         } else {
+             new_ins = MoveConst( 0, HighPart( res, type_class ), type_class );
++            /* Daggerfall: Watcom 10 cleared the high half after the load
++             * (`mov al,[x]; xor ah,ah`). DAGGER_CLRFIRST=1 restores Open Watcom. */
++            dagger_after = _IsModel( CGSW_GEN_NO_OPTIMIZATION )
++                        && getenv( "DAGGER_CLRFIRST" ) == NULL;
+         }
+     } else if( op->n.class == N_REGISTER
+       && HW_Ovlap( op->r.reg, res->r.reg ) ) {
+@@ -536,7 +543,10 @@ instruction      *rCLRHI_R( instruction *ins )
+         new_ins = MoveConst( 0, res, ins->type_class );
+     }
+     ins->result = LowPart( res, type_class );
+-    if( new_ins != NULL ) {
++    if( new_ins != NULL && dagger_after ) {
++        SuffixIns( ins, new_ins );
++        new_ins = ins;      /* keep expanding from the load, then the clear */
++    } else if( new_ins != NULL ) {
+         PrefixIns( ins, new_ins );
+     } else {
+         value = 0;
 diff --git a/bld/cg/c/tree.c b/bld/cg/c/tree.c
 index 23957dda5c..85e04939f5 100644
 --- a/bld/cg/c/tree.c
