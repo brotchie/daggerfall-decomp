@@ -993,3 +993,27 @@ Batch **1,770**.
 - Address-taken stack parameters no longer leak into the local slot table.
 
 Batch **1,786**; build **1,786 functions, 54.55%**.
+
+## 2026-10-02: byte compares, 16-bit variables, nested-block split
+
+- **Nested-block locals split at a switch temp**: locals above the temp's slot were in a
+  block opened before the switch, those below it in one opened inside it. `func_00029958`
+  (6.4 KB) now differs only in one call's argument order. +1.
+- Stores in the middle of an argument list become comma expressions (`f(g((t = a, t << 2)),
+  ...)`) when arguments are held in registers or pushed: 14 functions lift that didn't
+  (none match yet: register allocation under pressure differs, see below).
+- `test x,x; jle` is `x <= 0`; a `neg`/`not` of the return variable right after it is set
+  folds into the `return`. +4.
+- A failed compare-tree parse on a slot used elsewhere is just a local, not a switch. +1.
+- **Byte compares**: `mov al,[p]; cmp al,[c]` needs both operands of the same char type
+  (mixing signed and unsigned char promotes both to int). +11.
+- A slot stored whole right after a 16-bit computation (`mov ax,[x]; mov [l],eax`) is a
+  2-byte variable even when read whole (`l & 1` loads the dword); a choice point when it is
+  also read as a dword. +4.
+
+Open: Watcom 10's register allocation under register pressure (outer call arguments held
+in esi/edi/ecx across an inner call, temps spilled to the stack) differs from OW's in
+which register each held value gets; 16-bit division (`cwd; idiv bx`) for short operands
+(OW always promotes); floating point (a handful of functions).
+
+Batch **1,807**.

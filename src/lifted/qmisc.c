@@ -66,7 +66,6 @@ extern void func_0001F0C5(void);
 extern void func_0002FE02(int);
 extern void func_0002FE4B(int);
 extern void func_0002FEBC(int);
-extern void func_00030E34(unsigned char);
 extern void func_00031ACA(int, int);
 extern void func_0004CDE3(int);
 extern void func_000705D9(void);
@@ -77,6 +76,7 @@ extern void func_0008DA1C(int);
 extern void func_0008E3F7(int, int);
 extern void func_00097101(int);
 void func_00030854(int);
+void func_00030E34(unsigned char);
 void func_00031B47(int, int);
 #pragma aux func_000A0ED9 parm routine [];
 
@@ -306,6 +306,27 @@ L30E0B:;
     return;
 L30E29:;
     goto L30E03;
+}
+
+void func_00030E34(unsigned char a1)
+{
+{
+    int l_1C;
+
+    l_1C = 0;
+L30E4C:;
+    if (l_1C < 10) goto L30E5C;
+    return;
+L30E54:;
+    l_1C++;
+    goto L30E4C;
+L30E5C:;
+    if (*(int *)(D_00195A16 + (l_1C * 10)) == 0) goto L30E54;
+    if (*(unsigned char *)(D_00195A15 + (l_1C * 10)) != a1) goto L30E86;
+    *(int *)(D_00195A16 + (l_1C * 10)) = 0;
+L30E86:;
+    goto L30E54;
+}
 }
 
 int func_00030E92(int a1, int a2)

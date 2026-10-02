@@ -271,6 +271,44 @@ L8FCCC:;
     return 1;
 }
 
+void func_00090261(int a1, int a2, int a3, int a4)
+{
+    int l_14;
+    int l_10;
+    int l_C;
+
+    l_10 = 1;
+    if (a4 <= 1) return;
+    l_C = 1;
+L90290:;
+    if (l_C == 0) return;
+    l_14 = 0;
+    l_C = l_14;
+L902A7:;
+    if ((a4 - l_10) > l_14) goto L902BF;
+    goto L9037B;
+L902B7:;
+    l_14++;
+    goto L902A7;
+L902BF:;
+    if (*(unsigned char *)((char *)(a1 + l_14)) >= *(unsigned char *)((char *)(a1 + l_14) + 1)) goto L90376;
+    *(signed char *)((char *)(a1 + l_14)) ^= *(signed char *)((char *)(a1 + l_14) + 1);
+    *(signed char *)((char *)(a1 + l_14) + 1) ^= *(signed char *)((char *)(a1 + l_14));
+    *(signed char *)((char *)(a1 + l_14)) ^= *(signed char *)((char *)(a1 + l_14) + 1);
+    *(signed char *)((char *)(a2 + l_14)) ^= *(signed char *)((char *)(a2 + l_14) + 1);
+    *(signed char *)((char *)(a2 + l_14) + 1) ^= *(signed char *)((char *)(a2 + l_14));
+    *(signed char *)((char *)(a2 + l_14)) ^= *(signed char *)((char *)(a2 + l_14) + 1);
+    *(signed char *)((char *)(a3 + l_14)) ^= *(signed char *)((char *)(a3 + l_14) + 1);
+    *(signed char *)((char *)(a3 + l_14) + 1) ^= *(signed char *)((char *)(a3 + l_14));
+    *(signed char *)((char *)(a3 + l_14)) ^= *(signed char *)((char *)(a3 + l_14) + 1);
+    l_C = 1;
+L90376:;
+    goto L902B7;
+L9037B:;
+    l_10++;
+    goto L90290;
+}
+
 void func_0009038D(int a1)
 {
     int l_1C;

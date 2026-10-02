@@ -169,7 +169,7 @@ index e800aac5b8..6a099109f4 100644
                  ins = MakeBinary( OP_ADD, addr->u.n.name,
                                      AllocS32Const( addr->u.n.offset ),
 diff --git a/bld/cg/c/bldcall.c b/bld/cg/c/bldcall.c
-index 14a056a76b..4d0d0b1c60 100644
+index 14a056a76b..bf29ab616b 100644
 --- a/bld/cg/c/bldcall.c
 +++ b/bld/cg/c/bldcall.c
 @@ -31,6 +31,9 @@
@@ -291,9 +291,9 @@ index 14a056a76b..4d0d0b1c60 100644
 +            DaggerAlloc( DaggerDecls[i] );
 +        }
 +    }
-+    /* then nested-block locals, last to first */
++    /* then nested-block locals, last to first (DAGGER_NESTEDLAZY: at first use instead) */
 +    for( i = DaggerCount; i-- > 0; ) {
-+        if( DaggerKinds[i] == DAGGER_NESTED ) {
++        if( DaggerKinds[i] == DAGGER_NESTED && DaggerEnv( "DAGGER_NESTEDLAZY" ) == NULL ) {
 +            DaggerAlloc( DaggerDecls[i] );
 +        }
 +    }

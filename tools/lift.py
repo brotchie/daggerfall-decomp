@@ -267,6 +267,7 @@ class Func:
         acc = {}       # slot -> set of sizes
         reads = {}     # slot -> set of sizes read
         first = {}     # slot -> address of its first access
+        wide16 = set() # slots stored whole from a 16-bit value
         afirst = {}    # address-taken slot -> address of its first access
         sign = {}      # slot -> 's' / 'u' hints
         addr = set()
@@ -291,6 +292,16 @@ class Func:
                     continue
                 acc.setdefault(off, set()).add(op.size)
                 first.setdefault(off, ins.address)
+                if n == 0 and ins.mnemonic == "mov" and op.size == 4 and k and \
+                        ins.operands[1].type == cx.X86_OP_REG:
+                    # stored whole right after being computed as 16 bits (mov ax,[x];
+                    # mov [l],eax): Watcom 10's store of a 2-byte variable
+                    pv = body[k - 1]
+                    r16 = {"eax": "ax", "edx": "dx", "ebx": "bx", "ecx": "cx"}.get(
+                        ins.reg_name(ins.operands[1].reg))
+                    if pv.operands and pv.operands[0].type == cx.X86_OP_REG and \
+                            pv.reg_name(pv.operands[0].reg) == r16:
+                        wide16.add(off)
                 if not (n == 0 and ins.mnemonic == "mov"):
                     reads.setdefault(off, set()).add(op.size)
                 if ins.mnemonic == "movsx":
@@ -315,6 +326,15 @@ class Func:
                 continue
             body_sizes = sizes - {4} if off in [p[1] for p in self.params] else sizes
             sz = min(body_sizes) if body_sizes and len(body_sizes) == 1 else 4
+            if off in wide16 and reads.get(off, set()) <= {2, 4} and 4 in reads.get(off, set()):
+                # a 2-byte variable read whole, or an int: a choice point
+                self.choices.append(first[off] + 0.0625)
+            if off in wide16 and reads.get(off, set()) <= {2, 4} and \
+                    (4 not in reads.get(off, set()) or first[off] + 0.0625 in self.flips):
+                sz = 2
+                if any(ins.mnemonic == "and" and ins.op_str.endswith("0xffff")
+                       for ins in body):
+                    sign.setdefault(off, set()).add("u")
             # Watcom 10 stores a short with the whole register: read only as a word, it is one
             if reads.get(off) == {2} and sizes <= {2, 4} and \
                     not os.environ.get("LIFT_NOSHORTREAD"):

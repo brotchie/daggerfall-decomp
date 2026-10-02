@@ -759,6 +759,26 @@ void func_0005C897(int a1)
     *(short *)D_001789F8 = a1 << 4;
 }
 
+int func_0005C9BF(unsigned char a1)
+{
+    int l_20;
+
+    l_20 = *(int *)(*(char **)D_00195AA0 + 63);
+L5C9DB:;
+    if (l_20 == 0) goto L5CA14;
+    if (((int)(unsigned char)*(signed char *)((char *)l_20)) != 9) goto L5C9FE;
+    if (*(unsigned char *)((char *)l_20 + 144) == a1) goto L5CA00;
+L5C9FE:;
+    goto L5CA09;
+L5CA00:;
+    return 1;
+L5CA09:;
+    l_20 = *(int *)((char *)l_20 + 55);
+    goto L5C9DB;
+L5CA14:;
+    return 0;
+}
+
 void func_0005CA28(int a1)
 {
     if (((int)(unsigned char)*(signed char *)((char *)a1)) != 9) return;

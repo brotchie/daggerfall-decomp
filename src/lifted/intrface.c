@@ -28,7 +28,10 @@ extern char D_00187C9A[];
 extern char D_00187C9E[];
 extern char D_00187CA4[];
 extern char D_001940D4[];
+extern char D_001940DA[];
 extern char D_001940DB[];
+extern char D_001959B8[];
+extern char D_001959BC[];
 extern char D_00195A8C[];
 extern char D_00195A98[];
 extern char D_00195AA4[];
@@ -39,10 +42,14 @@ extern char D_00195BE4[];
 extern char D_00195C44[];
 extern char D_00195C74[];
 extern char D_00195E7A[];
+extern char D_00195E7B[];
+extern char D_00195E7F[];
 extern char D_00195F4E[];
 extern char D_00195F64[];
 extern char D_00195F66[];
 extern char D_00196272[];
+extern char D_00196274[];
+extern char D_00196277[];
 extern char D_00196279[];
 extern char D_0019627D[];
 extern char D_0019628E[];
@@ -99,6 +106,7 @@ extern void func_00080A72(int);
 int func_00080B58(void);
 int func_00082657(int);
 void func_0008036E(void);
+void func_0008066F(int);
 
 void func_000802B2(void)
 {
@@ -180,6 +188,16 @@ void func_0008066F(int a1)
     *(int *)D_001A5B04 += a1;
     *(int *)D_001A5B0C += l_24;
     *(int *)D_001A5B10 += *(int *)l_20;
+}
+
+void func_000806DD(int a1, int a2)
+{
+    short l_14;
+
+    l_14 = *(short *)(*(char **)D_00195AA4 + 3);
+    *(short *)(*(char **)D_00195AA4 + 3) += a2;
+    func_0008066F(a1);
+    *(short *)(*(char **)D_00195AA4 + 3) = *(int *)&l_14;
 }
 
 void func_000807AD(void)
@@ -382,6 +400,91 @@ L80F7C:;
 void func_00080FAB(int a1)
 {
     *(signed char *)D_001940DB &= 191;
+}
+
+void func_00081096(void)
+{
+    int l_20;
+    short l_1C;
+    short l_18;
+
+    if (*(signed char *)D_00196274 != 0) goto L810B6;
+    if ((*(unsigned char *)D_001940D4 & 36) == 0) goto L810BB;
+L810B6:;
+    return;
+L810BB:;
+    if (((int)(unsigned char)*(signed char *)D_00195E7A) != 1) goto L81207;
+    if (*(signed char *)D_00195E7F != 0) goto L810E2;
+    if (func_00042F0F(33) == 0) goto L810E7;
+L810E2:;
+    goto L81202;
+L810E7:;
+    func_0007EED8();
+    if (*(signed char *)D_00196274 != 0) goto L81138;
+    if (*(signed char *)D_00196277 != 0) goto L81107;
+    if (*(signed char *)D_0019627D == 0) goto L81109;
+L81107:;
+    goto L81112;
+L81109:;
+    if ((*(unsigned char *)D_001940DB & 32) == 0) goto L81114;
+L81112:;
+    goto L81122;
+L81114:;
+    if ((*(unsigned char *)(*(char **)D_00195BE0 + 137) & 8) == 0) goto L8112B;
+L81122:;
+    l_20 = 1;
+    goto L81132;
+L8112B:;
+    l_20 = 0;
+L81132:;
+    if (l_20 != 0) goto L8113D;
+L81138:;
+    goto L81202;
+L8113D:;
+    l_1C = *(short *)D_00195F64;
+    l_18 = *(short *)D_00195F66;
+    if (((int)(unsigned char)(*(signed char *)D_00195E7B & 128)) == 0) goto L81162;
+    *(int *)&l_18 = -(*(int *)&l_18);
+L81162:;
+    *(short *)(*(char **)D_00195AA4 + 1) += *(int *)&l_18;
+    *(short *)(*(char **)D_00195AA4 + 3) += *(int *)&l_1C;
+    if (((int)(short)l_1C) <= 2) goto L81191;
+    *(int *)D_000C5400 = -8;
+    goto L811A4;
+L81191:;
+    if (((int)(short)l_1C) >= (-2)) goto L811A4;
+    *(int *)D_000C5400 = 8;
+L811A4:;
+    if (((int)(short)*(short *)(*(char **)D_00195AA4 + 1)) >= (-256)) goto L811C1;
+    *(short *)(*(char **)D_00195AA4 + 1) = 65280;
+    goto L811DC;
+L811C1:;
+    if (((int)(short)*(short *)(*(char **)D_00195AA4 + 1)) <= 256) goto L811DC;
+    *(short *)(*(char **)D_00195AA4 + 1) = 256;
+L811DC:;
+    *(short *)(*(char **)D_00195A98 + 1) = *(short *)(*(char **)D_00195AA4 + 1);
+    *(short *)(*(char **)D_00195A98 + 3) = *(short *)(*(char **)D_00195AA4 + 3);
+L81202:;
+    return;
+L81207:;
+    if ((*(unsigned char *)D_001940DA & 64) == 0) return;
+    l_1C = *(short *)D_00195F64;
+    l_18 = *(short *)D_00195F66;
+    *(int *)D_001959B8 += (int)(short)l_18;
+    *(int *)D_001959BC += (int)(short)l_1C;
+    if (*(int *)D_001959B8 >= (-256)) goto L81252;
+    *(int *)D_001959B8 = -256;
+    goto L81268;
+L81252:;
+    if (*(int *)D_001959B8 <= 256) goto L81268;
+    *(int *)D_001959B8 = 256;
+L81268:;
+    if (*(int *)D_001959BC >= (-512)) goto L81280;
+    *(int *)D_001959BC = -512;
+    return;
+L81280:;
+    if (*(int *)D_001959BC <= 512) return;
+    *(int *)D_001959BC = 512;
 }
 
 void func_000812A0(void)

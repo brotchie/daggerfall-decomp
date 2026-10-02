@@ -4,14 +4,18 @@
 extern char D_001705F8[];
 extern char D_00179D74[];
 extern char D_00195AA4[];
+extern char D_00196268[];
 extern char D_0019627B[];
 extern char D_00196285[];
 extern char D_00196B00[];
 extern char D_00196B04[];
 
 extern int func_000A0024();
+extern void func_0001FF3F(int, unsigned char);
+unsigned char func_00020089(int, int);
 unsigned char func_0002010F(int, int);
 unsigned char func_000201B8(int, int, int);
+#pragma dagger DAGGER_FIRSTUSE func_0001FF92
 
 void func_0001FEBD(void)
 {
@@ -30,6 +34,18 @@ L1FF15:;
 L1FF17:;
     func_000A0024(*(int *)D_00196B04, (int)D_001705F8, 34);
     *(int *)D_00196B04 = -1751672937;
+}
+
+int func_0001FF92(void)
+{
+    unsigned char l_18;
+
+    l_18 = func_00020089(*(int *)(*(char **)D_00195AA4 + 7), *(int *)(*(char **)D_00195AA4 + 15));
+    if ((signed char)l_18 == *(signed char *)D_00196268) goto L1FFDD;
+    func_0001FF3F((int)(unsigned char)*(signed char *)D_00196268, (int)(unsigned char)l_18);
+    return 1;
+L1FFDD:;
+    return 0;
 }
 
 int func_0001FFF1(void)

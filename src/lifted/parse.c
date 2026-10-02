@@ -1621,8 +1621,7 @@ int func_00049BAD(void)
     int l_20;
     int l_1C;
 
-    l_28 = (int)(unsigned short)*(short *)(*(char **)D_00195A80 + 34);
-    l_24 = ((int)(short)*(short *)(D_0017CF72 + (((int)(unsigned char)*(signed char *)(*(char **)D_00195A80 + 54)) * 2))) / 5;
+    l_24 = ((int)(short)*(short *)(D_0017CF72 + (((int)(unsigned char)*(signed char *)((char *)(l_28 = (int)(unsigned short)*(short *)(*(char **)D_00195A80 + 34), *(int *)D_00195A80) + 54)) * 2))) / 5;
     l_20 = l_24 + ((int)(short)*(short *)(D_0017CF86 + (l_28 << 2)));
     l_1C = l_24 + ((int)(short)*(short *)(D_0017CF88 + (l_28 << 2)));
     if (l_20 >= 0) goto L49C23;

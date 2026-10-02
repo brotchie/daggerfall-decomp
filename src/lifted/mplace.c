@@ -30,8 +30,10 @@ extern int func_0008DCE3(int, int, int);
 extern int func_0008EB88(int);
 extern int func_0009DC25();
 extern int func_0009DC49();
+extern int func_0009DEAC();
 extern int func_000A0040();
 extern int func_000A1023();
+extern int func_000C7FD9();
 extern int func_000CE6E2();
 extern int func_0014B45B();
 extern void func_00078566(int, int);
@@ -40,6 +42,160 @@ void func_0002631D(int);
 void func_000266C7(int);
 void func_0002675D(int);
 #pragma dagger KKND_CONFREV func_00026565
+
+int func_00026081(int a1, int a2)
+{
+    int l_20;
+    int l_1C;
+    int l_18;
+{
+    int l_30;
+    int l_2C;
+
+    l_20 = *(int *)((char *)a1 + 11) - *(int *)(*(char **)D_00195AA4 + 11);
+    l_18 = func_0009DEAC(l_20);
+    l_1C = func_000C7FD9(*(int *)((char *)a1 + 7), *(int *)((char *)a1 + 15), *(int *)(*(char **)D_00195AA4 + 7), *(int *)(*(char **)D_00195AA4 + 15));
+    if (((int)(unsigned char)*(signed char *)D_001789FA) != 1) goto L260EA;
+    if (l_1C < 4096) goto L260EC;
+L260EA:;
+    goto L260F8;
+L260EC:;
+    return 1;
+L260F8:;
+    if (a2 != 0) goto L2618F;
+    if (((int)(unsigned short)*(short *)((char *)a1 + 23)) < 4) goto L26142;
+    if (l_18 > 768) goto L26125;
+    if (l_1C <= 768) goto L26127;
+L26125:;
+    goto L26130;
+L26127:;
+    l_2C = 1;
+    goto L26137;
+L26130:;
+    l_2C = 0;
+L26137:;
+    return l_2C;
+L26142:;
+    if (l_18 > 384) goto L26154;
+    if (l_1C <= 1024) goto L26156;
+L26154:;
+    goto L2615F;
+L26156:;
+    l_30 = 1;
+    goto L26166;
+L2615F:;
+    l_30 = 0;
+L26166:;
+    return l_30;
+__dagger_tbl26173:;
+L2618F:;
+    switch (*(unsigned short *)((char *)a1 + 23)) {
+case 0:
+    if (l_18 > 128) goto L261C6;
+    if (l_1C <= 1024) goto L261C8;
+L261C6:;
+    goto L261D1;
+L261C8:;
+{
+    int l_50;
+    int l_4C;
+    int l_48;
+    int l_44;
+    int l_40;
+    int l_3C;
+    int l_38;
+    l_38 = 1;
+    goto L261D8;
+L261D1:;
+    l_38 = 0;
+L261D8:;
+    return l_38;
+case 1:
+    if (l_18 > 128) goto L261F5;
+    if (l_1C <= 384) goto L261F7;
+L261F5:;
+    goto L26200;
+L261F7:;
+    l_3C = 1;
+    goto L26207;
+L26200:;
+    l_3C = 0;
+L26207:;
+    return l_3C;
+case 2:
+    if (l_18 > 128) goto L26224;
+    if (l_1C <= 640) goto L26226;
+L26224:;
+    goto L2622F;
+L26226:;
+    l_40 = 1;
+    goto L26236;
+L2622F:;
+    l_40 = 0;
+L26236:;
+    return l_40;
+case 3:
+    if (l_18 > 384) goto L26253;
+    if (l_1C <= 768) goto L26255;
+L26253:;
+    goto L2625E;
+L26255:;
+    l_44 = 1;
+    goto L26265;
+L2625E:;
+    l_44 = 0;
+L26265:;
+    return l_44;
+case 4:
+    if (l_20 > 128) goto L26282;
+    if (l_20 >= (-768)) goto L26284;
+L26282:;
+    goto L2628D;
+L26284:;
+    if (l_1C <= 768) goto L2628F;
+L2628D:;
+    goto L26298;
+L2628F:;
+    l_48 = 1;
+    goto L2629F;
+L26298:;
+    l_48 = 0;
+L2629F:;
+    return l_48;
+case 5:
+    if (l_20 < (-128)) goto L262B9;
+    if (l_20 <= 768) goto L262BB;
+L262B9:;
+    goto L262C4;
+L262BB:;
+    if (l_1C <= 768) goto L262C6;
+L262C4:;
+    goto L262CF;
+L262C6:;
+    l_4C = 1;
+    goto L262D6;
+L262CF:;
+    l_4C = 0;
+L262D6:;
+    return l_4C;
+case 6:
+    if (l_18 > 256) goto L262F0;
+    if (l_1C <= 768) goto L262F2;
+L262F0:;
+    goto L262FB;
+L262F2:;
+    l_50 = 1;
+    goto L26302;
+L262FB:;
+    l_50 = 0;
+L26302:;
+    return l_50;
+default:
+    return 0;
+}
+}
+}
+}
 
 void func_0002631D(int a1)
 {
