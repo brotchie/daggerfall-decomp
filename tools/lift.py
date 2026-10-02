@@ -1403,8 +1403,17 @@ class Func:
                     return
                 if m == "and" and s.type == cx.X86_OP_IMM and sz == 4 and s.imm in (0xFF, 0xFFFF):
                     t = "unsigned char" if s.imm == 0xFF else "unsigned short"
-                    self.set_reg(full, E(ext_text(t, byteval(a) if s.imm == 0xFF else a), 4,
-                                         atom=IMPLICIT))
+                    av = byteval(a) if s.imm == 0xFF else a
+                    imp = IMPLICIT
+                    if not IMPLICIT and av.atom and re.fullmatch(
+                            r"\*\((?:unsigned |signed )?(?:char|short) \*\)(.+)", av.text) and \
+                            not os.environ.get("LIFT_NOIMPSITE"):
+                        # a zero-extended read: `(int)(unsigned short)*(short *)p` or
+                        # `*(unsigned short *)p` (fewer tree nodes: evaluated later); a
+                        # choice point
+                        self.choices.append(ins.address + 0.5625)
+                        imp = ins.address + 0.5625 in self.flips
+                    self.set_reg(full, E(ext_text(t, av, imp), 4, atom=imp))
                     return
                 # signed division by 2: X - (X >> 31), then >> 1
                 if m == "sar" and s.type == cx.X86_OP_IMM and s.imm == 31:
@@ -3006,10 +3015,10 @@ def byteval(v):
     return v
 
 
-def ext_text(t, v):
+def ext_text(t, v, implicit=None):
     """A narrow value widened to int: an explicit (int) cast, or (LIFT_IMPLICIT) left to the
     usual promotions."""
-    if IMPLICIT:
+    if IMPLICIT if implicit is None else implicit:
         mm = re.fullmatch(r"\*\((?:unsigned |signed )?(?:char|short) \*\)(.+)", v.text)
         if mm and v.atom:
             return "*(%s *)%s" % (t, mm.group(1))

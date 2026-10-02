@@ -2,6 +2,7 @@
  * do not edit: move a function to src/monster.c to work on it by hand) */
 
 extern char D_00175934[];
+extern char D_00175940[];
 extern char D_0017B62F[];
 extern char D_00186A14[];
 extern char D_00187B44[];
@@ -29,8 +30,11 @@ extern char D_00196D58[];
 extern char D_00196D5C[];
 extern char D_00196D64[];
 extern char D_00199D74[];
+extern char D_00199D78[];
 extern char D_00199D9B[];
 extern char D_001A3A78[];
+extern char D_001A3A80[];
+extern char D_001A3A81[];
 
 extern int func_0002257C(int, int, int, int);
 extern int func_0003A0C0(int, int);
@@ -45,6 +49,7 @@ extern int func_0007D6AE(int, int);
 extern int func_0008DA4D(int);
 extern int func_0008DA91(int);
 extern int func_0008DCE3(int, int, int);
+extern int func_0008E925(int, int);
 extern int func_0008EA20(int, int);
 extern int func_0008EB88(int);
 extern int func_0009DC25();
@@ -56,6 +61,7 @@ extern int func_000A1079();
 extern int func_000C7FD9();
 extern int func_000C7FF4();
 extern int func_000C808D();
+extern void func_00050069(int);
 extern void func_0006243B(int, int, int);
 extern void func_00073DF9(int, int);
 extern void func_00078566(int, int);
@@ -69,7 +75,9 @@ int func_00063FCF(int, int, int);
 void func_00062FBE(int);
 void func_000633BC(int, int);
 #pragma dagger DAGGER_CONFPOS func_00063FCF
+#pragma dagger DAGGER_NOSAVES func_00064228
 #pragma dagger reg func_00063FCF 437 bx
+#pragma dagger reg func_00064228 19 edx
 #pragma dagger slots func_0006310D a1 8 a2 12 l_24 20 l_20 16 l_14 4
 #pragma dagger slots func_00063FCF a1 56 a2 32 a3 48 l_98 140 l_94 136 l_5C 80 l_50 68 l_40 52 l_38 44 l_34 40 l_30 36 l_28 28 l_24 24 l_20 20 l_1C 16 l_14 8 l_10 4 ret 12
 
@@ -784,6 +792,38 @@ L64212:;
     goto L641F2;
 L64214:;
     return 0;
+}
+
+void func_00064228(void)
+{
+    int l_1C;
+    int l_18;
+
+    if (*(int *)D_001A3A78 < 1024) goto L6424C;
+    func_00050069((int)D_00175940);
+L6424C:;
+    l_1C = (int)D_00199D78;
+    l_18 = ((int)D_00199D78) + (*(int *)D_001A3A78 * 39);
+L64264:;
+    if (((unsigned)l_1C) < l_18) goto L6427A;
+    goto L642E6;
+L64271:;
+    (*(char (**)[39])&l_1C)++;
+    goto L64264;
+L6427A:;
+    if (((int)(unsigned char)*(signed char *)((char *)l_1C + 2)) != 6) goto L64291;
+    *(signed char *)((char *)l_1C + 2) = 2;
+L64291:;
+    if (((int)(unsigned char)*(signed char *)((char *)l_1C + 3)) != 108) goto L642A8;
+    *(signed char *)((char *)l_1C + 3) = 100;
+L642A8:;
+    *(int *)((char *)l_1C + 35) = func_0008E925(*(int *)D_00195AC4, (int)&*(signed char *)((char *)(*(unsigned short *)((char *)l_1C) + *(int *)((char *)*(int *)D_00195AC4 + 31)) - 1));
+    if (*(int *)((char *)l_1C + 35) == 0) goto L642E4;
+    *(signed char *)(*(char **)((char *)l_1C + 35) + 35) = 255;
+L642E4:;
+    goto L64271;
+L642E6:;
+    *(signed char *)D_001A3A80 = (*(signed char *)D_001A3A81 = 0);
 }
 
 void func_00064301(void)

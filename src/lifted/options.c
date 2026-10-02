@@ -104,7 +104,6 @@ extern int func_00144FB4();
 extern int func_00152C40();
 extern int func_00152D00();
 extern void func_0003EC2A(int, int);
-extern void func_0004359C(void);
 extern void func_0004FF57(int);
 extern void func_0005A5D2(int, int, int);
 extern void func_000698AF(short);
@@ -116,6 +115,7 @@ int func_00043883(void);
 int func_00043EDA(void);
 int func_00044B8A(void);
 int func_00044CA0(int);
+void func_0004359C(void);
 void func_00043B55(int, int);
 void func_000441B6(int);
 void func_0004478B(int, int);
@@ -195,6 +195,40 @@ L4356A:;
     *(int *)D_00199710 = -1751672937;
 L43588:;
     return 1;
+}
+
+void func_0004359C(void)
+{
+    int l_20;
+    int l_1C;
+    int l_18;
+
+    func_000A1023(*(int *)D_00143550, *(int *)D_00199710, 64000, (int)D_00170EE8, 176, 4);
+    l_20 = *(int *)D_0019970C;
+    func_00144F68((int)(unsigned short)*(short *)((char *)l_20), (int)(unsigned short)*(short *)((char *)l_20 + 2), (int)(unsigned short)*(short *)((char *)l_20 + 4), (int)(unsigned short)*(short *)((char *)l_20 + 6), l_20 + 12);
+    *(signed char *)D_0012B508 = 246;
+    l_18 = 0;
+L43613:;
+    if (l_18 < 2) goto L43623;
+    goto L4367C;
+L4361B:;
+    l_18++;
+    goto L43613;
+L43623:;
+    if ((*(unsigned short *)(*(char **)D_00195BF8) & (1 << l_18)) == 0) goto L4367A;
+    l_1C = ((int)D_0017B790) + ((l_18 + 6) * 12);
+    func_00144D00((int)(short)(*(short *)((char *)l_1C + 4) - 5), (int)(short)(*(short *)((char *)l_1C + 2) + 3), 3, 3);
+L4367A:;
+    goto L4361B;
+L4367C:;
+    if (*(short *)(*(char **)D_00195BF8 + 2) == 0) goto L436B9;
+    func_00144D00(91, 64, (int)(short)((((int)(short)*(short *)(*(char **)D_00195BF8 + 2)) * 108) / 128), 3);
+L436B9:;
+    if (*(short *)(*(char **)D_00195BF8 + 4) == 0) goto L436F6;
+    func_00144D00(91, 72, (int)(short)((((int)(short)*(short *)(*(char **)D_00195BF8 + 4)) * 108) / 128), 3);
+L436F6:;
+    if (((int)(unsigned short)(*(short *)(*(char **)D_00195BF8) & -256)) == 0) return;
+    func_00144D00(91, 80, (int)(short)(((((int)(unsigned short)*(short *)(*(char **)D_00195BF8)) >> 8) * 108) / 128), 3);
 }
 
 void func_0004374C(void)
