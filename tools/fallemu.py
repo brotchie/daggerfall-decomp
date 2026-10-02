@@ -36,13 +36,14 @@ GAME = os.path.join(ROOT, "build", "game")
 OVERLAY = os.path.join(ROOT, "build", "emu", "overlay")
 
 LOAD = 0x01000000          # the LE objects load at LOAD + their preferred address
-MEM = 64 << 20             # program memory from LOAD: objects, then the heap
+MEM = int(os.environ.get("FALLEMU_MB", "64")) << 20   # program memory from LOAD: objects, heap
 HEAP = 0x00200000          # where memory blocks start, relative to LOAD
 LOW = 0x110000             # real-mode memory, with the HMA
 GDT = 0x0800               # descriptor table (256 entries)
 PSP = 0x1000               # program segment prefix
 ENV = 0x1100               # environment block
 STUBS = 0x1800             # default interrupt handlers: int 0FEh; iretd (4 bytes each)
+EXC_STUB = 0x1F10          # where DPMI exception handlers return: int 0FDh
 DOSMEM = 0x2000            # DOS memory pool for DPMI 0100h, up to 0x9F000
 TICK = 400000              # instructions per timer interrupt
 
@@ -57,6 +58,32 @@ R = {n: globals()["UC_X86_REG_" + n.upper()] for n in (
 
 class Stop(Exception):
     pass
+
+
+def _old_exception_offset():
+    """Unicorn (QEMU) remembers the last CPU exception in env->old_exception and clears it
+    only when it delivers one through an IDT. Exceptions handled in a hook never are, so the
+    next divide error would be reported as a double fault. Find that field in the context
+    blob: run a #DE in a scratch CPU and see which -1 became 0."""
+    import ctypes
+    uc = Uc(UC_ARCH_X86, UC_MODE_32)
+    uc.mem_map(0x1000, 0x1000)
+    uc.mem_write(0x1000, b"\x31\xdb\xf7\xfb\xf4")        # xor ebx,ebx; idiv ebx; hlt
+    blob = lambda c: ctypes.string_at(c._context, c.size)
+    before = blob(uc.context_save())
+
+    def intr(uc_, n, _):
+        uc_.reg_write(UC_X86_REG_EIP, 0x1004)
+        uc_.emu_stop()
+    uc.hook_add(UC_HOOK_INTR, intr)
+    uc.emu_start(0x1000, 0x1005, count=10)
+    after = blob(uc.context_save())
+    hits = [k for k in range(0, len(before) - 3, 4)
+            if before[k:k + 4] == b"\xff" * 4 and after[k:k + 4] == b"\0" * 4]
+    return hits[0] if len(hits) == 1 else None
+
+
+OLD_EXCEPTION = _old_exception_offset()
 
 
 def descriptor(base, limit, access):
@@ -245,7 +272,9 @@ class Emu:
         self.on_stop = None     # called after each slice; True = it handled an early stop
         self.io_log = None      # a list to collect port I/O and interrupts into
         self.svc_writes = None  # memory a service writes, while recording
+        self.exc_reset = False  # a handled CPU exception to forget (clear_exception_state)
         self.int_replay = None  # recorded service results to give instead of running them
+        self.in_replay = None   # recorded port reads, likewise
         self.uc = uc = Uc(UC_ARCH_X86, UC_MODE_32)
         uc.mem_map(0, LOW)
         uc.mem_map(LOAD, MEM)
@@ -270,7 +299,7 @@ class Emu:
         """Snapshot the whole machine: CPU, memory, open files, devices."""
         import pickle
         st = {k: v for k, v in self.__dict__.items() if k not in ("uc", "files", "trace", "on_stop", "io_log", "svc_writes",
-                                                             "int_replay")}
+                                                             "int_replay", "exc_reset", "in_replay")}
         st["ctx"] = self.uc.context_save()
         st["low"] = zlib.compress(self.read(0, LOW), 1)
         st["mem"] = zlib.compress(self.read(LOAD, MEM), 1)
@@ -300,10 +329,11 @@ class Emu:
         uc.mem_write(0, zlib.decompress(st.pop("low")))
         uc.mem_write(LOAD, zlib.decompress(st.pop("mem")))
         uc.context_restore(st.pop("ctx"))
+        uc.mem_write(EXC_STUB, b"\xcd\xfd")
         root, overlay, cwd, log, handles, cow, changed = st.pop("files")
         emu.__dict__.update(st)
         # attributes newer than the snapshot
-        for k, v in (("mickeys_at", emu.mouse[:2]), ("pit_reload", 0), ("pit_reads", 0),
+        for k, v in (("mickeys_at", emu.mouse[:2]), ("exceptions", {}), ("pit_reload", 0), ("pit_reads", 0),
                      ("pit_access", 3), ("pit_latch", []), ("pit_hi_next", False),
                      ("pit_lo", None), ("pit_cur", 0)):
             emu.__dict__.setdefault(k, v)
@@ -348,6 +378,7 @@ class Emu:
         # default interrupt handlers: int 0FEh (we see which vector by EIP), iretd
         for n in range(256):
             uc.mem_write(STUBS + 4 * n, b"\xcd\xfe\xcf\x90")
+        uc.mem_write(EXC_STUB, b"\xcd\xfd")
         self.pm_vec = {n: (SEL_STUB, STUBS + 4 * n) for n in range(256)}
         self.rm_vec = {n: (0xF000, 0xFF53) for n in range(256)}
         self.exc = {}
@@ -395,6 +426,7 @@ class Emu:
         self.exit_code = None
         self.unknown = []
         self.notes = set()      # odd things the program did that DOS tolerates
+        self.exceptions = {}    # CPU exceptions handled by the game's own handlers
 
     # -- registers and memory --------------------------------------------------------
     def r(self, n):
@@ -466,6 +498,10 @@ class Emu:
             if intno == 0xFE:
                 n = (self.r("eip") - 2 - STUBS) // 4
                 self.default_handler(n)
+            elif intno == 0xFD:
+                self.exception_return()
+            elif intno in (0, 6, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E):   # CPU faults
+                self.cpu_fault(intno)
             elif intno == 0x21:
                 self.int21()
             elif intno == 0x31:
@@ -491,15 +527,6 @@ class Emu:
                 self.w("al", 0)
             elif intno in (8, 9) or intno >= 0x70 or 0x0A <= intno <= 0x0F:
                 self.default_handler(intno)
-            elif intno in (0, 6, 0x0D, 0x0E):  # CPU faults: the extender would end the run
-                self.fault = "CPU exception %d at %#x: eax=%08X ebx=%08X ecx=%08X edx=%08X " \
-                    "esi=%08X edi=%08X ebp=%08X esp=%08X tick %d" % (
-                        intno, self.r("eip") - LOAD, self.r("eax"), self.r("ebx"),
-                        self.r("ecx"), self.r("edx"), self.r("esi"), self.r("edi"),
-                        self.r("ebp"), self.r("esp"), self.ticks)
-                print(self.fault)
-                self.exit_code = -1
-                raise Stop()
             else:
                 self.unsupported("int %02Xh" % intno)
         except Stop:
@@ -522,6 +549,70 @@ class Emu:
                 self.call_handler(0x1C)
         elif n == 9:        # keyboard: read the scan code
             pass
+
+    def cpu_fault(self, n):
+        """A CPU exception: the game's DPMI handler if it set one, else the end of the run
+        (the extender would print a register dump)."""
+        if n in self.exc and self.exc[n][0] != SEL_STUB:
+            self.exceptions[n] = self.exceptions.get(n, 0) + 1
+            self.deliver_exception(n)
+            self.exc_reset = True       # see clear_exception_state
+            self.uc.emu_stop()
+            return
+        self.fault = "CPU exception %d at %#x: eax=%08X ebx=%08X ecx=%08X edx=%08X " \
+            "esi=%08X edi=%08X ebp=%08X esp=%08X tick %d" % (
+                n, self.r("eip") - LOAD, self.r("eax"), self.r("ebx"), self.r("ecx"),
+                self.r("edx"), self.r("esi"), self.r("edi"), self.r("ebp"), self.r("esp"),
+                self.ticks)
+        print(self.fault)
+        self.exit_code = -1
+        raise Stop()
+
+    def clear_exception_state(self):
+        """After a CPU stop for a handled exception: forget it (OLD_EXCEPTION), so the next
+        one is not taken for a double fault. True if there was one to clear."""
+        if not self.exc_reset:
+            return False
+        self.exc_reset = False
+        if OLD_EXCEPTION is not None:
+            import ctypes
+            ctx = self.uc.context_save()
+            addr = ctx._context.value if hasattr(ctx._context, "value") else ctx._context
+            ctypes.memmove(addr + OLD_EXCEPTION, b"\xff" * 4, 4)
+            self.uc.context_restore(ctx)
+        return True
+
+    def deliver_exception(self, n, err=0):
+        """Call the game's DPMI exception handler as a DPMI 0.9 host does: a far call with
+        [esp] = return EIP and CS (our stub), then the error code, the faulting EIP, CS,
+        EFLAGS, ESP and SS. The handler may change those and returns with retf; the stub
+        resumes the program from the frame. XnGine's divide-error handler (0x149FC8) skips the
+        faulting idiv and makes the quotient 0."""
+        sel, off = self.exc[n]
+        esp, ss = self.r("esp"), self.r("ss")
+        frame = esp - 0x200 - 32
+        self.write(self.lin(ss, frame), struct.pack(
+            "<8I", EXC_STUB, SEL_STUB, err, self.r("eip"), self.r("cs"), self.r("eflags"),
+            esp, ss))
+        self.w("esp", frame)
+        self.w("cs", sel)
+        self.w("eip", off)
+
+    def exception_return(self):
+        """The handler returned to our stub: resume from the frame (after the retf, ESP
+        points at the error code)."""
+        esp = self.r("esp")
+        _err, eip, cs, flags, cesp, css = struct.unpack(
+            "<6I", self.read(self.lin(self.r("ss"), esp), 24))
+        if self.trace:
+            print("exception return: esp %08X -> %04X:%08X flags %08X esp %08X ss %04X, "
+                  "eip now %08X cs %04X" % (esp, cs, eip, flags, cesp, css, self.r("eip"),
+                                            self.r("cs")))
+        self.w("ss", css)
+        self.w("esp", cesp)
+        self.w("eflags", flags)
+        self.w("cs", cs)
+        self.w("eip", eip)
 
     def call_handler(self, vector):
         """From inside a stub: run the game's handler for `vector` as `int` would, returning
@@ -962,7 +1053,10 @@ class Emu:
 
     # -- ports -------------------------------------------------------------------------
     def on_in(self, uc, port, size, _):
-        v = self.port_in(port)
+        if self.in_replay:                  # replaying a record: the values it read
+            v = self.in_replay.pop(0)
+        else:
+            v = self.port_in(port)
         if self.io_log is not None:
             self.io_log.append(("in", port, v))
         return v
@@ -1084,6 +1178,8 @@ class Emu:
         while self.ticks < ticks and self.exit_code is None:
             try:
                 self.uc.emu_start(self.r("eip"), 0xFFFFFFFF, count=TICK)
+                while self.clear_exception_state():      # resume after a handled fault
+                    self.uc.emu_start(self.r("eip"), 0xFFFFFFFF, count=TICK)
             except UcError as e:
                 print("CPU error: %s at %04X:%08X" % (e, self.r("cs"), self.r("eip")))
                 return False

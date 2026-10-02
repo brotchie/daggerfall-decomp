@@ -18,7 +18,7 @@ import os
 import sys
 import time
 
-from unicorn import UC_HOOK_CODE, UC_HOOK_MEM_WRITE
+from unicorn import UC_HOOK_BLOCK, UC_HOOK_CODE, UC_HOOK_MEM_WRITE
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import fallemu  # noqa: E402
@@ -55,14 +55,35 @@ class Tracer:
         self.field_writes = collections.Counter()
         self.opcode_writes = collections.Counter()
         self.unknown = collections.Counter()    # (writer, target) -> count
+        self.code_starts = set(an.insns)
+        self.blocks = set()         # executed basic blocks in object 2
         uc = emu.uc
         uc.hook_add(UC_HOOK_MEM_WRITE, self.on_write, None, LOAD + self.lo, LOAD + self.hi - 1)
+        uc.hook_add(UC_HOOK_BLOCK, self.on_block, None, LOAD + self.lo, LOAD + self.hi - 1)
         for f in self.funcs:
             uc.hook_add(UC_HOOK_CODE, self.on_call, None, LOAD + f, LOAD + f)
 
     def func_of(self, va):
         k = bisect.bisect_right(self.funcs, va) - 1
         return self.funcs[k] if k >= 0 else None
+
+    def on_block(self, uc, address, size, _):
+        self.blocks.add(address - LOAD)
+
+    def seeds(self):
+        """Code the static walk missed: executed blocks that start outside the code map, and
+        interrupt and exception handlers the game registered in object 2."""
+        out = {}
+        for a in self.blocks:
+            if a not in self.code_starts:
+                out[a] = "executed"
+        for kind, table in (("interrupt handler", self.emu.pm_vec),
+                            ("exception handler", self.emu.exc)):
+            for _n, (_sel, off) in table.items():
+                a = off - LOAD
+                if self.lo <= a < self.hi and a not in self.code_starts:
+                    out[a] = kind
+        return out
 
     def on_call(self, uc, address, size, _):
         self.calls[address - LOAD] += 1
@@ -115,6 +136,21 @@ def main():
     if a.save:
         emu.save(a.save)
     rep = tr.report()
+    # what the static walk missed, for tools/xn_disasm.py (merged with earlier runs)
+    seeds_path = os.path.join(ROOT, "config", "xngine_seeds.csv")
+    seeds = {}
+    if os.path.exists(seeds_path):
+        with open(seeds_path, newline="") as f:
+            seeds = {int(r["va"], 16): r["source"] for r in csv.DictReader(f)}
+    new = {a: k for a, k in tr.seeds().items() if a not in seeds}
+    seeds.update(new)
+    if new:
+        with open(seeds_path, "w", newline="") as f:
+            w = csv.writer(f, lineterminator="\n")
+            w.writerow(["va", "source"])
+            for a in sorted(seeds):
+                w.writerow(["0x%08X" % a, seeds[a]])
+    print("%d new code seeds for xn_disasm.py (%d in all)" % (len(new), len(seeds)))
     os.makedirs(os.path.dirname(a.out), exist_ok=True)
     with open(a.out, "w") as f:
         json.dump(rep, f, indent=1)

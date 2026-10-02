@@ -116,6 +116,8 @@ def call_once(emu, entry_regs=None):
     try:
         while not done and n < MAX_INSNS:
             uc.emu_start(emu.r("eip"), 0xFFFFFFFF, count=1_000_000)
+            if emu.clear_exception_state():     # a fault the game's handler took
+                continue
             n += 1_000_000
     finally:
         for h in hooks:
@@ -171,6 +173,7 @@ class Recorder:
         smc = {OBJ2[0] + k: live[k] for k in range(len(live)) if live[k] != self.pristine[k]}
         rec = {"func": f, "entry": {r: emu.r(r) for r in REGS}, "eip": emu.r("eip"),
                "sels": {s: tuple(v) for s, v in emu.sels.items()}, "smc": smc,
+               "exc": dict(emu.exc),
                "tick": emu.ticks}
         t0 = time.time()
         self.recording = True
@@ -200,6 +203,7 @@ def replay(rec, base=None, patch=None):
     emu = base or fallemu.Emu(overlay=os.path.join(ROOT, "build", "emu", "overlay_replay"))
     for s, (b, lim, acc) in rec["sels"].items():
         emu.setsel(s, b, lim, acc)
+    emu.exc.update(rec.get("exc", {}))
     for a, v in rec["smc"].items():
         emu.write(LOAD + a, bytes([v]))
     for a, v in rec["reads"].items():
@@ -211,8 +215,9 @@ def replay(rec, base=None, patch=None):
         patch(emu)
     # services (DOS, BIOS, the mouse) answer as they did in the recording
     emu.int_replay = [(e[1], e[2]) for e in rec["io"] if e[0] == "int-ret"]
+    emu.in_replay = [e[2] for e in rec["io"] if e[0] == "in"]   # and ports read as they were
     got = call_once(emu)
-    emu.int_replay = None
+    emu.int_replay = emu.in_replay = None
     diffs = []
     if not got["returned"]:
         diffs.append("did not return")

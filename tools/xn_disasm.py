@@ -84,6 +84,14 @@ class Analysis:
         self.insns = {}
         self.tables = set()          # bytes of jump tables
         self.code_labels = set()     # branch and call targets
+        # code seen at run time that no static rule reaches (tools/xn_trace.py)
+        p = os.path.join(ROOT, "config", "xngine_seeds.csv")
+        if os.path.exists(p):
+            with open(p, newline="") as f:
+                self.runtime_seeds = [int(r["va"], 16) for r in csv.DictReader(f)]
+            self.funcs = sorted(set(self.funcs) | set(self.runtime_seeds))
+        else:
+            self.runtime_seeds = []
         # Discovery. An address instructions access as memory is data (or a patch field),
         # never a function entry; when a pointer found a "function" there, start over without.
         seeds = list(self.funcs)
