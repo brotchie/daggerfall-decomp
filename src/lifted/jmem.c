@@ -15,6 +15,7 @@ extern char D_00175BA8[];
 extern char D_00175BC1[];
 extern char D_00175BDC[];
 extern char D_00175BFA[];
+extern char D_00175C18[];
 extern char D_00175C79[];
 extern char D_00187CA8[];
 extern char D_00187CAD[];
@@ -34,7 +35,7 @@ extern char D_001A3FA4[];
 extern char D_001A9B34[];
 
 extern int func_000309E8(int, short);
-extern int func_00042F0F();
+extern int func_00042F0F(int);
 extern int func_00069938(int, int, int);
 extern int func_0006CB53(int, int);
 extern int func_0008E925(int, int);
@@ -44,6 +45,8 @@ extern int func_000A00AF();
 extern int func_000A0ED9(int, int);
 extern int func_000A148C(int, ...);
 extern int func_000A29BA(int);
+extern int func_000A2A2B();
+extern int func_000A2A76();
 extern int func_000CE8D5();
 extern void func_00010AF6(int);
 extern void func_00050069(int);
@@ -234,6 +237,44 @@ L6A508:;
     func_00050069((int)D_00175BFA);
 L6A53C:;
     goto L6A3B0;
+}
+
+void func_0006A54B(int a1)
+{
+    int l_18;
+{
+    int l_30;
+    char l_2C[16];
+
+    l_18 = 0;
+    if (*(int *)D_00187CAD == 0) return;
+    func_000A0ED9(349, (int)D_00175AD4);
+    func_000A2A2B();
+    *(short *)((char *)l_2C + 4) = 0;
+    *(int *)l_2C = 0;
+L6A592:;
+    if (l_18 != 0) goto L6A5BC;
+    l_18 = func_000A2A76((int)l_2C);
+    goto L6A592;
+__dagger_tbl6A5A8:;
+L6A5BC:;
+    l_30 = l_18 - 1;
+    switch (l_30) {
+case 3:
+    return;
+case 0:
+    return;
+case 1:
+    func_00050069((int)D_00175C18);
+    return;
+case 4:
+    func_00050069((int)D_00175C18);
+    return;
+case 2:
+    func_00050069((int)D_00175C18);
+default:;
+}
+}
 }
 
 void func_0006A654(int a1)

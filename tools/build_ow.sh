@@ -17,6 +17,9 @@
 #   cg x86call.c PushOneParm(): a stack variable is pushed through a register (DAGGER_PUSHMEM=1)
 #   cg x86ver.c: sign extension for division as mov eax,edx; sar edx,31, not cdq (DAGGER_CDQ=1)
 #   cg split.c rCLRHI_R(): byte to word zero-extension as mov al,x; xor ah,ah (DAGGER_CLRFIRST=1)
+#   switch tables: bldsel.c selector local used directly (DAGGER_SELCOPY=1); x86sel.c, optmain.c,
+#     generate.c, object.c, cc cstmt.c+cgen.c: table emitted at a `__dagger_tbl` marker;
+#     x86esc.c: labels aligned as at the original address (DAGGER_NOALIGNBIAS=1)
 #
 # Output: third_party/open-watcom-v2/build/binbuild/{bwcc386,bwlink,bwasm,bwlib}
 set -eu

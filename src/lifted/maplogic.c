@@ -64,7 +64,7 @@ extern int func_0007CBA1(int);
 extern int func_0007D6AE(int, int);
 extern int func_0007DF35(int);
 extern int func_00086F50(int);
-extern int func_0008795D();
+extern int func_0008795D(int, int, int);
 extern int func_0008DD46(int, int);
 extern int func_0008E925(int, int);
 extern int func_0009A6D0(int, int);

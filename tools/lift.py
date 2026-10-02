@@ -489,8 +489,17 @@ class Func:
         self.open_switches = 0
         body = self.ins[self.body_start:self.body_end]
         self.body = body
+        # where each switch table sat: the compiler is told to put the table there
+        table_end = {t + n: t for t, n in IMG.tables
+                     if any(sw["table"] == t for sw in self.switches.values())}
         dead = False
         for k, ins in enumerate(body):
+            if ins.address in table_end:
+                self.flush_pending()
+                # the original's jmp over the table: the compiler inserts its own
+                if self.out and self.out[-1] == "    goto L%X;" % ins.address:
+                    self.out.pop()
+                self.out.append("__dagger_tbl%X:;" % table_end[ins.address])
             if ins.address in targets:
                 self.flush_pending()
                 for v in self.case_at.get(ins.address, []):
@@ -923,6 +932,10 @@ class Func:
                 dflt = int(mm.group(2), 16)
                 del self.out[i]
                 break
+            if re.fullmatch(r"    if \((.*)\) return;", self.out[i]):
+                dflt = "END"            # out of range: straight to the end of the function
+                del self.out[i]
+                break
             if not self.out[i].startswith("    "):
                 break
         if dflt is None:
@@ -1044,6 +1057,8 @@ class Func:
             lines.append(line)
         if not self.void and "%X" % self.ret_ins in used:
             lines.append("L%X:;" % self.ret_ins)
+        if "END" in self.default_targets:
+            lines.append("default:;")
         for _ in range(self.open_switches):
             lines.append("}")
         if self.nested_open:

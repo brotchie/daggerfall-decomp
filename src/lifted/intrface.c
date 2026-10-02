@@ -73,7 +73,7 @@ extern char D_001A5B32[];
 extern char D_001A5B34[];
 
 extern int func_000234EB(int, int, int, int);
-extern int func_00042F0F();
+extern int func_00042F0F(int);
 extern int func_000696F9(int);
 extern int func_00069938(int, int, int);
 extern int func_00069AB8(int, int, int);

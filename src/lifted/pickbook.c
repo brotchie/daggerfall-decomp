@@ -31,7 +31,7 @@ extern char D_001A9AB8[];
 extern int func_00039224(short);
 extern int func_0003B1F3(short);
 extern int func_00042112(void);
-extern int func_00042F0F();
+extern int func_00042F0F(int);
 extern int func_00069938(int, int, int);
 extern int func_0006CB53(int, int);
 extern int func_0008DA91(int);

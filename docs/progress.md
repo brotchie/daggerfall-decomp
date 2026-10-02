@@ -695,3 +695,31 @@ These functions now compile but differ. With a lower table threshold (`KKND_SWOP
    (`jmp ...; lea eax,[eax]; table`). Both pad with `mov eax,eax`/`lea eax,[eax]`/`nop`.
 
 Worth about 36 functions (41 KB, 7% of game code).
+
+## 2026-10-02: switch tables in the compiler
+
+The three compiler pieces outlined above, now done:
+
+1. **Selector**: at `-od`, `BGSelect()` (`cg/c/bldsel.c`) switches on a declared local
+   directly instead of copying it through its "bogus add 0" temp (`DAGGER_SELCOPY=1`
+   restores OW). With the lifter's `l = expr; switch (l)` the dispatch is now identical:
+   `cmp byte [l],3; ja; xor eax,eax; mov al,[l]; shl eax,2; jmp cs:[eax+table]`.
+2. **Threshold**: KKND's floor of 15 for the switch cost balance now also applies at `-od`
+   (where `OptForSize` is 50).
+3. **Table placement**: Watcom 10 put a table at the start of the top-level statement
+   containing the switch, with a `jmp` over it if control could fall in. The lifter's `goto`
+   style has no statements left, but it knows where each table sat, so it emits a marker
+   label `__dagger_tblXXXX:;` there (and drops the original's `jmp` over the table). The front
+   end (`cc/c/cstmt.c` `GrabLabels()`) turns that label into a marker node; `cgen.c` calls
+   `DaggerTableHere()`, which records the peephole-queue position (`optmain.c`).
+   `MakeJmpTab()` (`cg/intel/c/x86sel.c`) inserts the table there, preceded by a `jmp` when
+   the previous instruction falls through. A marker before the prologue defers the table until
+   the encoder reaches the first instruction after the parameter spills (`object.c`).
+4. **Alignment**: tables are aligned like labels, by padding to the current location, but the
+   object's offsets differ from FALL.EXE's addresses. Labels are now aligned as if the
+   function sat at its original address, read off its `func_XXXXXXXX` name
+   (`cg/intel/c/x86esc.c`, `DAGGER_NOALIGNBIAS=1` restores OW).
+
+`func_00015A50` and `func_0002814E` match. Batch **1,405**. Most switch functions are still
+held up by lifter gaps: several switches per function, sparse `repne scasb` switches, and an
+assignment nested in a call argument.

@@ -100,7 +100,6 @@ extern int func_001374FC();
 extern int func_00137725();
 extern int func_00144F68();
 extern int func_0014D23C();
-extern void func_0002814E(int);
 extern void func_00028210(int);
 extern void func_0002829B(int);
 extern void func_000286F6(void);
@@ -120,6 +119,7 @@ int func_000284DA(int);
 void func_00027035(void);
 void func_00027515(void);
 void func_000275F7(int);
+void func_0002814E(int);
 void func_0002830F(int);
 void func_00028DDB(int);
 void func_00028F56(void);
@@ -540,6 +540,25 @@ L280B1:;
     func_000A134C((int)(short)(l_28 + 1), (int)(short)*(short *)&l_24, 145);
     func_000A134C((int)(short)*(short *)&l_28, (int)(short)(l_24 + 1), 145);
     func_000A134C((int)(short)(l_28 + 1), (int)(short)(l_24 + 1), 145);
+}
+
+void func_0002814E(int a1)
+{
+__dagger_tbl28164:;
+    switch (a1) {
+case 0:
+    (*(int *)D_00196D90)--;
+    return;
+case 1:
+    (*(int *)D_00196D90)++;
+    return;
+case 2:
+    (*(int *)D_00196D98)--;
+    return;
+case 3:
+    (*(int *)D_00196D98)++;
+default:;
+}
 }
 
 int func_000281AF(void)

@@ -1,17 +1,18 @@
 diff --git a/bld/cc/c/cgen.c b/bld/cc/c/cgen.c
-index ee6e5533cb..ddddfdae1e 100644
+index ee6e5533cb..069bd2e5fe 100644
 --- a/bld/cc/c/cgen.c
 +++ b/bld/cc/c/cgen.c
-@@ -35,6 +35,8 @@
+@@ -35,6 +35,9 @@
  #include "jmpbuf.h"
  #include "i64.h"
  #include "cg.h"
 +
-+extern bool DaggerAutoNested;   /* tells the code generator about nested-block locals */
++extern bool DaggerAutoNested;
++extern void DaggerTableHere( void );   /* tells the code generator about nested-block locals */
  #include "cgdefs.h"
  #include "cgswitch.h"
  #include "cgcli.h"
-@@ -1117,7 +1119,13 @@ static void CDoAutoDecl( SYM_HANDLE sym_handle )
+@@ -1117,7 +1120,13 @@ static void CDoAutoDecl( SYM_HANDLE sym_handle )
              }
              dtype = CGenType( typ );
              if( sym.flags & SYM_FUNC_RETURN_VAR ) {
@@ -26,7 +27,7 @@ index ee6e5533cb..ddddfdae1e 100644
                  SymReplace( &sym, sym_handle );
              } else {
                  CGAutoDecl( (CGSYM_HANDLE)sym_handle, dtype );
-@@ -1289,7 +1297,11 @@ static void EmitNodes( TREEPTR tree )
+@@ -1289,7 +1298,11 @@ static void EmitNodes( TREEPTR tree )
              break;
          case OPR_NEWBLOCK:              // start of new block { vars; }
              DBBegBlock();
@@ -38,6 +39,42 @@ index ee6e5533cb..ddddfdae1e 100644
              break;
          case OPR_ENDBLOCK:              // end of new block { vars; }
              DBEndBlock();
+@@ -1501,8 +1514,12 @@ static void EmitNodes( TREEPTR tree )
+             op1 = PopCGName();          // - get address of array
+             PushCGName( IndexOperator( op1, node, op2 ) );
+             break;
+-        case OPR_ADDROF:                // & expr
+         case OPR_NOP:                   // nop
++            if( node->u2.long_value == 0xDA66 ) {
++                DaggerTableHere();      // Daggerfall: a switch table goes here
++            }
++            break;
++        case OPR_ADDROF:                // & expr
+             break;
+         case OPR_FARPTR:                // segment :> offset
+             op2 = PopCGName();          // - get offset
+diff --git a/bld/cc/c/cstmt.c b/bld/cc/c/cstmt.c
+index 695dca7a99..38bc3d93a3 100644
+--- a/bld/cc/c/cstmt.c
++++ b/bld/cc/c/cstmt.c
+@@ -353,6 +353,17 @@ static bool GrabLabels( void )
+         }
+         if( LAToken != T_COLON )
+             break; /* quit if look ahead not : */
++        if( strncmp( SavedId, "__dagger_tbl", 12 ) == 0 ) {
++            /* Daggerfall: not a label, but "a switch table goes here" for the code generator */
++            TREEPTR mark = LeafNode( OPR_NOP );
++            mark->op.u2.long_value = 0xDA66;
++            AddStmt( mark );
++            CMemFree( SavedId );
++            SavedId = NULL;
++            NextToken();                /* skip the id; the ':' follows */
++            label = NULL;
++            continue;
++        }
+         label = LkLabel( SavedId );
+         if( label->defined ) {
+             CErr2p( ERR_LABEL_ALREADY_DEFINED, label->name );
 diff --git a/bld/cg/c/addrfold.c b/bld/cg/c/addrfold.c
 index e800aac5b8..5d93ba83bb 100644
 --- a/bld/cg/c/addrfold.c
@@ -186,7 +223,7 @@ index 14a056a76b..63b9aa5f52 100644
      temp->v.usage |= USE_IN_ANOTHER_BLOCK;
  
 diff --git a/bld/cg/c/bldsel.c b/bld/cg/c/bldsel.c
-index 6dc64e437d..2e0ace6948 100644
+index 6dc64e437d..825936f5ec 100644
 --- a/bld/cg/c/bldsel.c
 +++ b/bld/cg/c/bldsel.c
 @@ -31,6 +31,7 @@
@@ -207,6 +244,24 @@ index 6dc64e437d..2e0ace6948 100644
          /*
           * a linear sequence for three different non-sequential cases where
           * c1<c2<c3, looks like:
+@@ -656,8 +658,15 @@ void    BGSelect( sel_handle s_node, an node, cg_switch_type allowed )
+          * once to index into the scan table. This would be bad if it
+          * changed in between.
+          */
+-        Set64ValZero( tmp );
+-        node = BGBinary( O_PLUS, node, BGIntegerSel( &tmp, SortTipe ), SortTipe, true );
++        /* Daggerfall: at -od, Watcom 10 switched on a local variable directly (its switch
++         * temp is the local the lifter declares: `l = expr; switch( l )`). DAGGER_SELCOPY=1
++         * restores Open Watcom's copy. */
++        if( !( _IsModel( CGSW_GEN_NO_OPTIMIZATION ) && getenv( "DAGGER_SELCOPY" ) == NULL
++          && node->format == NF_NAME && node->u.n.name->n.class == N_TEMP
++          && node->u.n.name->v.symbol != NULL ) ) {
++            Set64ValZero( tmp );
++            node = BGBinary( O_PLUS, node, BGIntegerSel( &tmp, SortTipe ), SortTipe, true );
++        }
+ 
+         MergeListEntries( s_node );
+ 
 diff --git a/bld/cg/c/blktrim.c b/bld/cg/c/blktrim.c
 index 5b346d0eb8..6b6571c049 100644
 --- a/bld/cg/c/blktrim.c
@@ -335,18 +390,19 @@ index 721fa0c6a9..bcb4e28a83 100644
              loops_killed = true;
              CleanPartition();
 diff --git a/bld/cg/c/generate.c b/bld/cg/c/generate.c
-index a7f606be70..adee9aed2f 100644
+index a7f606be70..857d40aeb0 100644
 --- a/bld/cg/c/generate.c
 +++ b/bld/cg/c/generate.c
-@@ -31,6 +31,7 @@
+@@ -31,6 +31,8 @@
  
  
  #include "_cgstd.h"
 +#include <stdlib.h>
++#include <stdio.h>
  #include "coderep.h"
  #include "memcheck.h"
  #include "data.h"
-@@ -84,6 +85,7 @@
+@@ -84,6 +86,7 @@
  #include "condcode.h"
  #include "trecurse.h"
  #include "feprotos.h"
@@ -354,7 +410,64 @@ index a7f606be70..adee9aed2f 100644
  
  
  static  bool            abortCG;
-@@ -501,7 +503,12 @@ static  void    FlushBlocks( bool partly_done )
+@@ -144,6 +147,56 @@ static  void    AddANop( void )
+ }
+ 
+ 
++extern void DaggerMarkNow( void );
++extern bool DaggerMarkIsSet( void );
++
++/* Daggerfall: the front end marks where a switch table goes (see optmain.c). Before the
++ * prologue exists, that spot is right after the prologue (DaggerPrologDone()). */
++static bool DaggerMarkPending;
++
++void    DaggerTableHere( void )
++/*****************************/
++{
++    if( CurrProc == NULL || (CurrProc->prolog_state & PST_PROLOG_GENERATED) == 0 ) {
++        DaggerMarkPending = true;
++    } else {
++        DaggerMarkNow();
++    }
++}
++
++void    (*DaggerDeferredEmit)( void );
++
++int     DaggerTableState( void )
++/******************************/
++/* 0: no mark, 1: marked in the queue, 2: marked before the prologue */
++{
++    if( DaggerMarkPending )
++        return( 2 );
++    return( DaggerMarkIsSet() ? 1 : 0 );
++}
++
++void    DaggerTableConsumed( void )
++/*********************************/
++{
++    DaggerMarkPending = false;
++}
++
++void    DaggerPrologDone( void )
++/******************************/
++{
++    if( DaggerMarkPending ) {
++        DaggerMarkPending = false;
++        DaggerMarkNow();
++    }
++    if( DaggerDeferredEmit != NULL ) {
++        void (*emit)( void ) = DaggerDeferredEmit;
++
++        DaggerDeferredEmit = NULL;
++        emit();
++    }
++}
++
++
+ static  void            PreOptimize( void )
+ /*****************************************/
+ {
+@@ -501,7 +554,12 @@ static  void    FlushBlocks( bool partly_done )
          classes |= blk->class;
          CurrBlock = blk;
          BlockToCode( partly_done );
@@ -368,7 +481,7 @@ index a7f606be70..adee9aed2f 100644
      }
      CurrBlock = curr;
      HeadBlock = NULL;
-@@ -665,6 +672,9 @@ void    Generate( bool routine_done )
+@@ -665,6 +723,9 @@ void    Generate( bool routine_done )
              InitStackMap();
              BlockByBlock = true;
          }
@@ -378,7 +491,7 @@ index a7f606be70..adee9aed2f 100644
          LNBlip( SrcLine );
          FlushBlocks( false );
          FreeExtraSyms( LastTemp );
-@@ -722,6 +732,11 @@ void    Generate( bool routine_done )
+@@ -722,6 +783,11 @@ void    Generate( bool routine_done )
          Panic( false );
          return;
      }
@@ -550,6 +663,32 @@ index 76c9e5daf1..abc589fae0 100644
      test = num >> 1;
      do {
          pow2 = 1;
+diff --git a/bld/cg/c/object.c b/bld/cg/c/object.c
+index 8deefcbc4c..c01463d42c 100644
+--- a/bld/cg/c/object.c
++++ b/bld/cg/c/object.c
+@@ -47,6 +47,8 @@
+ #include "nullprop.h"
+ #include "feprotos.h"
+ 
++extern void DaggerPrologDone( void );
++
+ 
+ /*
+  * block flag usage
+@@ -127,6 +129,12 @@ void    GenObject( void )
+             StartBlockProfiling( blk );
+             InitStackDepth( blk );
+             for( ins = blk->ins.head.next; ins->head.opcode != OP_BLOCK; ins = ins->head.next ) {
++                /* Daggerfall: a switch table marked at the start of the body goes after
++                 * the prologue and the parameter spills */
++                if( (ins->ins_flags & INS_PARAMETER) == 0 && ins->head.opcode != OP_NOP
++                  && ins->head.prev->head.opcode != OP_PARM_DEF ) {
++                    DaggerPrologDone();
++                }
+                 if( ins->head.opcode == OP_NOP
+                   && ( (ins->flags.u.nop_flags & NOP_SOURCE_QUEUE)
+                   || ins->flags.u.nop_flags == NOP_DBGINFO )) { // an end block
 diff --git a/bld/cg/c/optimize.c b/bld/cg/c/optimize.c
 index 74e94d9765..27ca4d9ca1 100644
 --- a/bld/cg/c/optimize.c
@@ -573,6 +712,86 @@ index 74e94d9765..27ca4d9ca1 100644
                      ins->result = NULL;
                      change = true;
                      if( _IsntIns( ins, SIDE_EFFECT ) ) {
+diff --git a/bld/cg/c/optmain.c b/bld/cg/c/optmain.c
+index 310489af1a..0f98337910 100644
+--- a/bld/cg/c/optmain.c
++++ b/bld/cg/c/optmain.c
+@@ -31,6 +31,8 @@
+ 
+ 
+ #include "_cgstd.h"
++#include <stdio.h>
++#include <stdlib.h>
+ #include "optwif.h"
+ #include "freelist.h"
+ #include "objout.h"
+@@ -137,12 +139,66 @@ static  bool    LDone( any_oc *oc )
+     optreturn( true );
+ }
+ 
++/*
++ * Daggerfall: Watcom 10 emitted a switch's jump table at the start of the top-level statement
++ * containing the switch, with a jmp over it if control could fall in. The lifter marks that
++ * spot (a `__dagger_tbl...:` label, turned into DaggerTableHere() by the front end); when
++ * the table is built, its code is inserted at the marked queue position.
++ */
++static bool         DaggerMarkSet;
++static ins_entry    *DaggerMark;
++static bool         DaggerRedirecting;
++static ins_entry    *DaggerRedirect;
++
++void    DaggerMarkNow( void )
++/***************************/
++{
++    DaggerMarkSet = true;
++    DaggerMark = LastIns;
++}
++
++bool    DaggerMarkIsSet( void )
++/*****************************/
++{
++    return( DaggerMarkSet );
++}
++
++bool    DaggerTableBegin( bool *falls_in )
++/****************************************/
++{
++    if( !DaggerMarkSet )
++        return( false );
++    *falls_in = ( DaggerMark == NULL ) || !_TransferClass( _Class( DaggerMark ) );
++    DaggerRedirecting = true;
++    DaggerRedirect = DaggerMark;
++    return( true );
++}
++
++void    DaggerTableEnd( void )
++/****************************/
++{
++    DaggerRedirecting = false;
++    DaggerMarkSet = false;
++}
++
+ void    InputOC( any_oc *oc )
+ /***************************/
+ {
+     oc_class        cl;
+ 
+   optbegin
++    if( DaggerRedirecting ) {
++        ins_entry   *instr;
++
++        instr = NewInstr( oc );
++        AddInstr( instr, DaggerRedirect );
++        if( _Class( instr ) == OC_LABEL || _Class( instr ) == OC_LREF
++          || _Class( instr ) == OC_JMP ) {
++            _ClrStatus( _Label( instr ), DYINGLABEL );
++        }
++        DaggerRedirect = instr;
++        optreturnvoid;
++    }
+     PSBlip();
+     if( !LDone( oc ) ) {
+         if( OC_BASE_CLASS( oc->oc_header.class ) != OC_INFO
 diff --git a/bld/cg/c/regalloc.c b/bld/cg/c/regalloc.c
 index 90c1857729..129dd201e5 100644
 --- a/bld/cg/c/regalloc.c
@@ -950,6 +1169,63 @@ index cfc287803e..6545a667a5 100644
      if( _CPULevel( CPU_486 ) ) {
          if( depth == PROC_ALIGN || depth == DEEP_LOOP_ALIGN )
              return( 16 );
+diff --git a/bld/cg/intel/c/x86esc.c b/bld/cg/intel/c/x86esc.c
+index 48d95c8be9..b007b9357e 100644
+--- a/bld/cg/intel/c/x86esc.c
++++ b/bld/cg/intel/c/x86esc.c
+@@ -32,6 +32,8 @@
+ 
+ 
+ #include "_cgstd.h"
++#include <string.h>
++#include <stdlib.h>
+ #include "coderep.h"
+ #include "addrname.h"
+ #include "symdbg.h"
+@@ -238,6 +240,33 @@ static  void    DumpSavedDebug( void )
+     SaveDbgOc = OC_INFO_NOT_DEBUG;
+ }
+ 
++/*
++ * Daggerfall: align as if the function sat at its original address. A lifted function is named
++ * func_XXXXXXXX; padding before a switch table (an aligned label) then comes out as in
++ * FALL.EXE. DAGGER_NOALIGNBIAS=1 aligns to the object's own offsets (stock).
++ */
++static offset   DaggerAlignBias;
++
++static void DaggerFunctionStart( label_handle lbl, offset lc )
++{
++    cg_sym_handle   sym;
++    const char      *name;
++    unsigned long   va;
++    char            *end;
++
++    sym = AskForLblSym( lbl );
++    if( sym == NULL || getenv( "DAGGER_NOALIGNBIAS" ) != NULL )
++        return;
++    name = FEName( sym );
++    if( name == NULL || strncmp( name, "func_", 5 ) != 0 )
++        return;
++    va = strtoul( name + 5, &end, 16 );
++    if( end != name + 13 )
++        return;
++    DaggerAlignBias = (offset)va - lc;
++}
++
++
+ void DoAlignment( int len )
+ /*************************/
+ {
+@@ -550,7 +579,8 @@ void    OutputOC( any_oc *oc, any_oc *next_lbl )
+     case OC_LABEL:
+         /* figure out number of bytes to pad */
+         lc = AskLocation();
+-        len = -lc & oc->oc_handle.hdr.objlen;
++        DaggerFunctionStart( oc->oc_handle.handle, lc );
++        len = -( lc + DaggerAlignBias ) & oc->oc_handle.hdr.objlen;
+         if( AskIfUniqueLabel( oc->oc_handle.handle ) ) {
+             if( (lc == LastUnique) && (len == 0) ) {
+                 /* Two unique labels have ended up next to each other.
 diff --git a/bld/cg/intel/c/x86mul.c b/bld/cg/intel/c/x86mul.c
 index 37aaf4e803..258b7341d8 100644
 --- a/bld/cg/intel/c/x86mul.c
@@ -978,6 +1254,18 @@ index 37aaf4e803..258b7341d8 100644
          /* On the Pentium Pro and up, multiply is pretty cheap. */
          cost = 3;
      } else if( _CPULevel( CPU_586 ) ) {
+diff --git a/bld/cg/intel/c/x86proc.c b/bld/cg/intel/c/x86proc.c
+index 7dae19018a..c154921215 100644
+--- a/bld/cg/intel/c/x86proc.c
++++ b/bld/cg/intel/c/x86proc.c
+@@ -63,6 +63,7 @@
+ #include "feprotos.h"
+ 
+ 
++
+ #define WORDS_COUNT(size)   (((size) + WORD_SIZE - 1) / WORD_SIZE)
+ 
+ #define WINDOWS_CHEAP  ( \
 diff --git a/bld/cg/intel/c/x86regsv.c b/bld/cg/intel/c/x86regsv.c
 index a5a4fdb3ed..9cb37ab74e 100644
 --- a/bld/cg/intel/c/x86regsv.c
@@ -1026,7 +1314,7 @@ index d5bb49a4be..e28fa26206 100644
              return( HW_DS );
          return( HW_CS );
 diff --git a/bld/cg/intel/c/x86sel.c b/bld/cg/intel/c/x86sel.c
-index 1de30dab10..6032de5060 100644
+index 1de30dab10..185a040d3e 100644
 --- a/bld/cg/intel/c/x86sel.c
 +++ b/bld/cg/intel/c/x86sel.c
 @@ -32,6 +32,7 @@
@@ -1037,7 +1325,7 @@ index 1de30dab10..6032de5060 100644
  #include "coderep.h"
  #include "cgmem.h"
  #include "tree.h"
-@@ -113,8 +114,12 @@ static cost_val Balance( uint_32 size, uint_32 time )
+@@ -113,8 +114,13 @@ static cost_val Balance( uint_32 size, uint_32 time )
      byte        opt_size;
  
      opt_size = OptForSize;
@@ -1046,12 +1334,140 @@ index 1de30dab10..6032de5060 100644
 +    if( getenv( "KKND_SWOPT" ) != NULL ) {
 +        /* KKND experiment: override the size/time balance used to pick a switch strategy */
 +        opt_size = (byte)atoi( getenv( "KKND_SWOPT" ) );
-+    } else if( opt_size < 15 ) {
++    } else if( opt_size < 15 || _IsModel( CGSW_GEN_NO_OPTIMIZATION ) ) {
++        /* Daggerfall: at -od (OptForSize 50) too: Watcom 10 used a table for a 4-case switch */
 +        /* KKND: retail Watcom 10.x switch choices fit a floor in [13,19] (OW uses 25) */
 +        opt_size = 15;
      }
      balance = ( size * opt_size + 10 * time * ( 100 - opt_size ) ) / 100;
      if( (int_32)balance < 0 || balance > MAX_COST )
+@@ -315,6 +321,12 @@ static void GenValuesBackward( sel_handle s_node, const signed_64 *to_sub, cg_ty
+ }
+ 
+ 
++extern bool DaggerTableBegin( bool *falls_in );
++extern void DaggerTableEnd( void );
++extern int  DaggerTableState( void );
++extern void DaggerTableConsumed( void );
++extern void (*DaggerDeferredEmit)( void );
++
+ tbl_control *MakeScanTab( sel_handle s_node, cg_type value_type, cg_type real_type )
+ /**********************************************************************************/
+ {
+@@ -379,6 +391,43 @@ tbl_control *MakeScanTab( sel_handle s_node, cg_type value_type, cg_type real_ty
+     return( table );
+ }
+ 
++/*
++ * Daggerfall: a jump table marked to sit right after the prologue, built before the prologue
++ * exists, is emitted when the prologue is done (DaggerPrologDone() calls DaggerEmitDeferred).
++ */
++static tbl_control  *DaggerDeferred;
++
++static void DaggerEmitTable( tbl_control *table, bool jump_over )
++/***************************************************************/
++{
++    label_handle    skip;
++    uint_32         i;
++
++    skip = NULL;
++    if( jump_over ) {
++        skip = AskForNewLabel();
++        GenJumpLabel( skip );           /* jmp over the table */
++    }
++    CodeLabel( table->lbl, TypeAddress( TY_NEAR_CODE_PTR )->length );
++    for( i = 0; i < table->size; i++ ) {
++        GenCodePtr( table->cases[i] );
++    }
++    if( skip != NULL ) {
++        CodeLabel( skip, 0 );
++    }
++}
++
++static void DaggerEmitDeferredTable( void )
++/*****************************************/
++{
++    if( DaggerDeferred != NULL ) {
++        PUSH_OP( AskCodeSeg() );
++            DaggerEmitTable( DaggerDeferred, true );
++        POP_OP();
++        DaggerDeferred = NULL;
++    }
++}
++
+ tbl_control     *MakeJmpTab( sel_handle s_node )
+ /**********************************************/
+ {
+@@ -389,34 +438,48 @@ tbl_control     *MakeJmpTab( sel_handle s_node )
+     signed_64           curr;
+     label_handle        other;
+     unsigned_64         tmp;
++    bool                falls_in = false;
++    int                 mark;
+ 
+     U64Sub( &tmp, &s_node->upper, &s_node->lower );
+     U64Inc( tmp );
+     cases = U64Low( tmp );
+     table = CGAlloc( sizeof( tbl_control ) + ( cases - 1 ) * sizeof( label_handle ) );
+     table->size = cases;
++    table->lbl = AskForNewLabel();
++    table->value_lbl = NULL;
++    tab_ptr = &table->cases[0];
++    other = s_node->other_wise;
++    list = s_node->list;
++    curr = s_node->lower;
++    for( ;; ) {
++        if( SelCompare( &curr, &list->low ) < 0 ) {
++            *tab_ptr = other;
++        } else {
++            *tab_ptr = list->label;
++        }
++        ++tab_ptr;
++        if( SelCompare( &curr, &s_node->upper ) >= 0 )
++            break;
++        if( SelCompare( &curr, &list->high ) >= 0 ) {
++            list = list->next;
++        }
++        U64Inc( curr );
++    }
++    mark = _IsModel( CGSW_GEN_NO_OPTIMIZATION ) ? DaggerTableState() : 0;
++    if( mark == 2 ) {
++        /* marked before the prologue: emit it right after the prologue */
++        DaggerDeferred = table;
++        DaggerDeferredEmit = DaggerEmitDeferredTable;
++        DaggerTableConsumed();
++        return( table );
++    }
+     PUSH_OP( AskCodeSeg() );
+-        table->lbl = AskForNewLabel();
+-        table->value_lbl = NULL;
+-        CodeLabel( table->lbl, TypeAddress( TY_NEAR_CODE_PTR )->length );
+-        tab_ptr = &table->cases[0];
+-        other = s_node->other_wise;
+-        list = s_node->list;
+-        curr = s_node->lower;
+-        for( ;; ) {
+-            if( SelCompare( &curr, &list->low ) < 0 ) {
+-                *tab_ptr = other;
+-            } else {
+-                *tab_ptr = list->label;
+-            }
+-            GenCodePtr( *tab_ptr );
+-            ++tab_ptr;
+-            if( SelCompare( &curr, &s_node->upper ) >= 0 )
+-                break;
+-            if( SelCompare( &curr, &list->high ) >= 0 ) {
+-                list = list->next;
+-            }
+-            U64Inc( curr );
++        if( mark == 1 && DaggerTableBegin( &falls_in ) ) {
++            DaggerEmitTable( table, falls_in );
++            DaggerTableEnd();
++        } else {
++            DaggerEmitTable( table, false );
+         }
+     POP_OP();
+     return( table );
 diff --git a/bld/cg/intel/c/x86ver.c b/bld/cg/intel/c/x86ver.c
 index 7de826e706..ad759a7833 100644
 --- a/bld/cg/intel/c/x86ver.c
