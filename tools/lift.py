@@ -334,6 +334,10 @@ class Func:
             for k in range(self.nstack):
                 if 4 + k < len(cts) and cts[4 + k] == "int":
                     self.stack_type[k] = "int"      # callers push it as an immediate
+                elif 4 + k < len(cts) and cts[4 + k] == "signed":
+                    self.stack_type[k] = {"unsigned char": "signed char",
+                                          "unsigned short": "short"}.get(self.stack_type[k],
+                                                                         self.stack_type[k])
         for o in [o for o in self.slot_type if o < 0]:
             del self.slot_type[o]
         # Every 4-byte slot between the saved registers and the frame bottom belongs to a
@@ -1431,7 +1435,11 @@ class Func:
         for a in cases:
             cases[a].sort()
         prev = {b: a for a, b in nxt.items()}
-        more = {a for a, _ in leaves if a not in stubs and prev.get(a) in nodes and
+        # jumps a compare goes to inside the tree's own stretch of code are the tree's stubs
+        # (`jb L; ... L: jmp case`), not case bodies
+        hi = max(nodes) if nodes else start
+        more = {a for a, _ in leaves if a not in stubs and
+                (prev.get(a) in nodes or start < a < hi) and
                 by_addr[a].mnemonic == "jmp" and by_addr[a].operands[0].type == cx.X86_OP_IMM}
         if more and len(stubs) < 64:
             return self.parse_ctree(start, t, w, by_addr, nxt, stubs | more)
@@ -1906,12 +1914,22 @@ def caller_types():
                 if i.mnemonic == "push":
                     if i.operands[0].type == cx.X86_OP_IMM:
                         ev.setdefault(tgt, {}).setdefault(n, set()).add("int")
+                    elif i.operands[0].type == cx.X86_OP_REG and j and \
+                            ins[j - 1].mnemonic == "mov" and \
+                            ins[j - 1].op_str.startswith(i.op_str + ", 0x") and \
+                            ins[j - 1].operands[1].imm & 0x80000000:
+                        # a negative constant pushed through a register: a signed narrow one
+                        ev.setdefault(tgt, {}).setdefault(n, set()).add("signed")
                     n += 1
     out = {}
     for tgt, params in ev.items():
         types = []
         for n in range(max([4] + [m + 1 for m in params])):
             seen = params.get(n, set()) - {"const"}
+            if seen == {"signed"}:
+                types.append("signed")
+                continue
+            seen -= {"signed"}
             if not seen:
                 types.append(None)
             elif "int" in seen or len(seen) > 1:
