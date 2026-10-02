@@ -24,9 +24,11 @@ extern char D_001880F6[];
 extern char D_001880FA[];
 extern char D_00188102[];
 extern char D_00188106[];
+extern char D_00190BE4[];
 extern char D_00190BE8[];
 extern char D_00190CA8[];
 extern char D_00190CE4[];
+extern char D_00190CEE[];
 extern char D_00190D64[];
 extern char D_00190DE4[];
 extern char D_00190DE6[];
@@ -99,6 +101,7 @@ extern void func_0009721F(void);
 extern void func_000972C7(int, int, int);
 int func_00090C3A(void);
 void func_0009117A(void);
+#pragma dagger DAGGER_PUSHMEM func_00090C3A
 
 int func_00090C3A(void)
 {
@@ -127,7 +130,7 @@ L90CE9:;
     l_1C = 0;
     l_20 = l_1C;
 L90CF6:;
-    func_00144F68(l_20 + 127, l_1C + ((((int)(unsigned char)*(signed char *)(*(char **)D_00195BE0 + 130)) * 9) + 148), 66, 9, (((int)(unsigned char)*(signed char *)(*(char **)D_00195BE0 + 130)) * 594) + (*(int *)D_001AA414 + 12));
+    func_00144F68(l_20 + 127, l_1C + ((((int)(unsigned char)*(signed char *)(*(char **)D_00195BE0 + 130)) * 9) + 148), 66, 9, (int)(*(char **)D_001AA414 + 12 + (((int)(unsigned char)*(signed char *)(*(char **)D_00195BE0 + 130)) * 594)));
 L90D46:;
     if (((int)(unsigned char)(*(signed char *)D_001AA41A & 16)) == 0) goto L90D64;
     if (((int)(unsigned char)*(signed char *)D_001AA41A) != 255) goto L90D66;
@@ -386,6 +389,45 @@ default:
 void func_000917F0(int a1)
 {
     func_00091B80((int)(short)(a1 - 20));
+}
+
+void func_00091817(int a1)
+{
+    int l_28;
+    int l_24;
+    int l_20;
+    int l_1C;
+    int l_18;
+
+    l_1C = 1132;
+    if (((unsigned)(*(int *)((char *)l_1C) - *(int *)D_00190BE4)) < 6) return;
+    l_18 = 1132;
+    *(int *)D_00190BE4 = *(int *)((char *)l_18);
+    a1 += -14;
+    l_28 = a1 >> 1;
+    if (*(short *)(D_00190DEA + (l_28 * 2)) != 0) goto L91878;
+    if ((a1 & 1) != 0) goto L9187A;
+L91878:;
+    goto L9187F;
+L9187A:;
+    return;
+L9187F:;
+    l_24 = (int)(short)*(short *)(D_00190DF0 + (l_28 * 2));
+    l_20 = (int)(*(char **)D_00195BE0 + 157 + (((int)(unsigned char)*(signed char *)((char *)(*(int *)D_00195BEC + l_24) + 16)) * 6));
+    if (*(unsigned char *)((char *)l_20) != *(signed char *)(D_00190CEE + l_24)) goto L918D1;
+    if ((a1 & 1) == 0) goto L918D3;
+L918D1:;
+    goto L918D5;
+L918D3:;
+    return;
+L918D5:;
+    if ((a1 & 1) == 0) goto L918F1;
+    (*(signed char *)((char *)l_20))++;
+    (*(short *)(D_00190DEA + (l_28 * 2)))--;
+    return;
+L918F1:;
+    (*(signed char *)((char *)l_20))--;
+    (*(short *)(D_00190DEA + (l_28 * 2)))++;
 }
 
 void func_000919FE(void)

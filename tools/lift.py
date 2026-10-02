@@ -851,7 +851,8 @@ class Func:
                     # xor dh,dh; mov dl,[x]: a byte zero-extended to 16 bits
                     self.set_reg(full, E("(unsigned short)(unsigned char)" + v.p(), 2))
                 elif sz < 4 and cur is not None and cur.text == "0":
-                    self.set_reg(full, E(ext_text(UTYPE[sz], v), 4, atom=IMPLICIT))
+                    self.set_reg(full, E(ext_text(UTYPE[sz], byteval(v) if sz == 1 else v), 4,
+                                         atom=IMPLICIT))
                 elif sz < 4:
                     self.set_reg(full, E(v.text, sz, v.atom))
                 else:
@@ -1017,7 +1018,8 @@ class Func:
                 if m == "and" and s.type == cx.X86_OP_IMM and sz == 1 and a.size > 1 and \
                         not os.environ.get("LIFT_NOAND8"):
                     # `and dl,0x80` on a wider value keeps its high bits: x & ~0x7f
-                    v = E("%s & %d" % (a.p(), (s.imm & 0xFF) - 256), a.size)
+                    v = E("%s & %d" % (a.p(), (s.imm & 0xFF) - 256), a.size,
+                          tag=("and8", a, s.imm & 0xFF))
                     self.set_reg(full, v)
                     self.flags = ("val", v, None)
                     return
@@ -1031,7 +1033,8 @@ class Func:
                     return
                 if m == "and" and s.type == cx.X86_OP_IMM and sz == 4 and s.imm in (0xFF, 0xFFFF):
                     t = "unsigned char" if s.imm == 0xFF else "unsigned short"
-                    self.set_reg(full, E(ext_text(t, a), 4, atom=IMPLICIT))
+                    self.set_reg(full, E(ext_text(t, byteval(a) if s.imm == 0xFF else a), 4,
+                                         atom=IMPLICIT))
                     return
                 # signed division by 2: X - (X >> 31), then >> 1
                 if m == "sar" and s.type == cx.X86_OP_IMM and s.imm == 31:
@@ -1094,7 +1097,8 @@ class Func:
                 if m == "shr":
                     a = E("(unsigned)" + a.p(), 4)
                 ptr_hint = m == "add" and s.type == cx.X86_OP_REG and \
-                    (self.loaded_ptr(a) or self.loaded_ptr(b))
+                    (self.loaded_ptr(a) or self.loaded_ptr(b) or bool(loaded_ptr_k(a)) or
+                     bool(loaded_ptr_k(b)))
                 if ptr_hint:
                     # a dword read kept in a register for an add (not folded into it):
                     # perhaps a pointer, a choice point
@@ -1106,7 +1110,10 @@ class Func:
                     # pointer arithmetic: the operand loaded from memory is the base pointer
                     # (as char *, -od keeps it in a register: mov edx,[p]; add eax,edx)
                     pa, pb = (b, a) if self.loaded_ptr(b) and not self.loaded_ptr(a) else (a, b)
+                    if not self.loaded_ptr(pa) and not loaded_ptr_k(pa) and loaded_ptr_k(pb):
+                        pa, pb = pb, pa
                     ptxt = ("*(char **)" + pa.text[len("*(int *)"):]) if self.loaded_ptr(pa) \
+                        else "*(char **)%s + %s" % loaded_ptr_k(pa) if loaded_ptr_k(pa) \
                         else "(char *)" + pa.p()
                     self.choices.append(ins.address)
                     if ins.address in self.flips:     # the offset written first
@@ -1295,6 +1302,12 @@ class Func:
                     self.choices.append(ins.address)
                     if ins.address in self.flips:
                         limit = live
+                if limit and "eax" in loaded and self.eax_consumed(self.k):
+                    # eax's value was already used (copied into a byte register to pass on):
+                    # perhaps no argument at all; a choice point
+                    self.choices.append(ins.address + 0.875)
+                    if ins.address + 0.875 in self.flips:
+                        limit = 0
                 if limit < 4:
                     # or more: a callee may save a register it takes as an argument
                     self.choices.append(ins.address + 0.25)
@@ -1872,6 +1885,28 @@ class Func:
         self.regs = keep
         self.pending = call
 
+    def eax_consumed(self, k):
+        """Whether the value in eax at instruction k was read since it was computed."""
+        fam = {"eax", "ax", "al", "ah"}
+        for j in range(k - 1, -1, -1):
+            i = self.body[j]
+            if i.mnemonic in ("call",) or i.mnemonic.startswith("j"):
+                return False
+            ops = i.operands
+            srcs = ops[1:] if i.mnemonic in ("mov", "movsx", "movzx", "lea") else ops
+            for n, o in enumerate(ops):
+                if o.type == cx.X86_OP_REG and i.reg_name(o.reg) in fam and \
+                        o in srcs and n > 0:
+                    return True
+                if o.type == cx.X86_OP_MEM and any(
+                        x and i.reg_name(x) == "eax" for x in (o.mem.base, o.mem.index)):
+                    return True
+            if ops and ops[0].type == cx.X86_OP_REG and i.reg_name(ops[0].reg) in fam and \
+                    i.mnemonic in ("mov", "movsx", "movzx", "lea", "xor") and \
+                    not (i.mnemonic == "xor" and i.reg_name(ops[0].reg) == "ah"):
+                return False
+        return False
+
     def indirect_call(self, ins, op):
         """call [mem] / call reg: through a function pointer, arguments in registers."""
         if op.type == cx.X86_OP_MEM:
@@ -2075,6 +2110,19 @@ FUNC_OPTS = ["KKND_CONFREV", "DAGGER_LEFTPREF", "DAGGER_CHARAUTOSMALL", "DAGGER_
              "DAGGER_CONFLISTREV", "DAGGER_KEEPSUB", "DAGGER_NODEMOTE",
              "DAGGER_NOCVTDEMOTE", "DAGGER_DEADDEFMEM"]
 IMPLICIT = bool(os.environ.get("LIFT_IMPLICIT"))
+
+
+def loaded_ptr_k(e):
+    """`*(int *)p + k`: a dword read plus a constant, perhaps a pointer and an offset."""
+    mm = re.fullmatch(r"\*\(int \*\)(\w+|\((?:[^()]|\([^()]*\))*\)) \+ (\d+)", e.text)
+    return (mm.group(1), mm.group(2)) if mm else None
+
+
+def byteval(v):
+    """A value about to be narrowed to a byte: `and al,k` on a wider one is just `x & k`."""
+    if v.tag and v.tag[0] == "and8":
+        return E("%s & %d" % (v.tag[1].p(), v.tag[2]), 4)
+    return v
 
 
 def ext_text(t, v):

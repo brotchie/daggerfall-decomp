@@ -37,7 +37,6 @@ extern int func_00030A23(int, int, int);
 extern int func_000310E1(int, int);
 extern int func_00031B8A(int);
 extern int func_00032A05(int);
-extern int func_0003323C(int);
 extern int func_000336EE(int, int);
 extern int func_00077960(int, int, int);
 extern int func_0007D6AE(int, int);
@@ -52,9 +51,11 @@ extern int func_000A0AD9();
 extern int func_000A1023();
 extern void func_0005E450(unsigned short, int);
 extern void func_0005E540(int, int, int);
+extern void func_00078566(int, int);
 extern void func_00078DDD(int);
 extern void func_000876AD(int, int, int, int);
 int func_00032EC8(int);
+int func_0003323C(int);
 int func_00033EE7(int, int);
 
 int func_00032EC8(int a1)
@@ -152,6 +153,27 @@ L331F9:;
     func_000A0AD9(l_2C + 10, (int)&*(signed char *)(*(char **)D_00199764 + 6), 4, (int)D_00170A64, 572);
 L33229:;
     return l_30;
+}
+
+int func_0003323C(int a1)
+{
+    int l_24;
+    int l_20;
+    int l_1C;
+
+    l_24 = func_0008DCE3(*(int *)D_001959A8, 0, 659);
+    l_20 = *(int *)D_00195AC4 + 71;
+    *(signed char *)((char *)l_24) = 18;
+    *(signed char *)((char *)l_24 + 21) |= 1;
+    *(int *)((char *)l_24 + 43) = func_0009DC25();
+    *(int *)((char *)l_24 + 31) = func_0008EB88(700);
+    *(int *)((char *)a1 + 10) = l_24;
+    *(short *)((char *)l_24 + 29) = (*(int *)D_00178A10)++;
+    *(signed char *)((char *)l_24 + 38) = *(signed char *)(*(char **)D_00199764);
+    func_00078566(l_24, (int)(unsigned char)*(signed char *)((char *)a1 + 3));
+    l_1C = l_24 + 71;
+    *(signed char *)((char *)l_1C + 553) = 1;
+    return l_24;
 }
 
 int func_000332F7(int a1)

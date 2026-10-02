@@ -313,6 +313,7 @@ void func_00099391(void);
 #pragma aux func_000A0ED9 parm routine [];
 #pragma dagger DAGGER_PUSHMEM func_00093372
 #pragma dagger DAGGER_PUSHMEM func_00093DCB
+#pragma dagger DAGGER_PUSHMEM func_00098651
 
 void func_00092349(void)
 {
@@ -2474,7 +2475,7 @@ L98791:;
     goto L98789;
 L98799:;
     if ((l_18 & (1 << l_1C)) != 0) goto L987FA;
-    func_00144F68((int)(short)*(short *)(D_00188641 + (l_1C * 12)), (int)(short)*(short *)(D_00188643 + (l_1C * 12)), (int)(unsigned short)*(short *)(*(char **)D_00195B60 + 4), 9, (l_1C * (((int)(unsigned short)*(short *)(*(char **)D_00195B60 + 4)) * 9)) + (*(int *)D_00195B60 + 12));
+    func_00144F68((int)(short)*(short *)(D_00188641 + (l_1C * 12)), (int)(short)*(short *)(D_00188643 + (l_1C * 12)), (int)(unsigned short)*(short *)(*(char **)D_00195B60 + 4), 9, (int)(*(char **)D_00195B60 + 12 + (l_1C * (((int)(unsigned short)*(short *)(*(char **)D_00195B60 + 4)) * 9))));
 L987FA:;
     goto L98791;
 L987FC:;

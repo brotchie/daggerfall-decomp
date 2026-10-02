@@ -291,6 +291,19 @@ void func_0005A3BC(void)
     *(short *)D_00190D68 = 4;
 }
 
+int func_0005A442(unsigned char a1)
+{
+    int l_24;
+    short l_1C;
+
+    if (((int)(unsigned char)a1) != 32) goto L5A469;
+    return (int)(short)*(short *)D_0012DA40;
+L5A469:;
+    *(int *)&l_1C = ((int)(unsigned char)a1) - 33;
+    l_24 = (int)(*(char **)D_0012DA74 + 6 + (((int)(short)l_1C) << 2));
+    return ((int)(short)*(short *)((char *)l_24)) + ((int)(short)*(short *)D_0012DA48);
+}
+
 int func_0005A4A9(int a1)
 {
     int l_2C;
@@ -310,7 +323,7 @@ L5A4CE:;
 L5A4F0:;
     (*(int *)&l_20)++;
     l_18 = ((unsigned short)(unsigned char)*(signed char *)((char *)l_28)) - 33;
-    l_2C = (*(int *)D_0012DA74 + 6) + (((int)(short)l_18) << 2);
+    l_2C = (int)(*(char **)D_0012DA74 + 6 + (((int)(short)l_18) << 2));
     l_1C += *(short *)((char *)l_2C);
 L5A521:;
     l_28++;

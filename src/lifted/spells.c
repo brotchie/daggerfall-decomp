@@ -427,44 +427,59 @@ L3858B:;
     return -1;
 }
 
+void func_0003859F(short a1)
+{
+    func_00038872((int)(*(char **)D_00178A0A + 14 + (((int)(short)*(short *)D_00195F30) * 3)), (int)(short)a1, 60, 0);
+}
+
 void func_000385DE(short a1)
 {
-    func_00038872(((((int)(short)*(short *)D_00195F30) * 3) + (*(int *)D_00178A0A + 14)) + 1, (int)(short)a1, 60, 0);
+    func_00038872((int)(*(char **)D_00178A0A + 14 + (((int)(short)*(short *)D_00195F30) * 3)) + 1, (int)(short)a1, 60, 0);
 }
 
 void func_0003861E(short a1)
 {
-    func_00038872(((((int)(short)*(short *)D_00195F30) * 3) + (*(int *)D_00178A0A + 14)) + 2, (int)(short)a1, 20, 0);
+    func_00038872((int)(*(char **)D_00178A0A + 14 + (((int)(short)*(short *)D_00195F30) * 3)) + 2, (int)(short)a1, 20, 0);
+}
+
+void func_00038660(short a1)
+{
+    func_00038872((int)(*(char **)D_00178A0A + 23 + (((int)(short)*(short *)D_00195F30) * 3)), (int)(short)a1, 100, 0);
 }
 
 void func_0003869F(short a1)
 {
-    func_00038872(((((int)(short)*(short *)D_00195F30) * 3) + (*(int *)D_00178A0A + 23)) + 1, (int)(short)a1, 100, 0);
+    func_00038872((int)(*(char **)D_00178A0A + 23 + (((int)(short)*(short *)D_00195F30) * 3)) + 1, (int)(short)a1, 100, 0);
 }
 
 void func_000386DF(short a1)
 {
-    func_00038872(((((int)(short)*(short *)D_00195F30) * 3) + (*(int *)D_00178A0A + 23)) + 2, (int)(short)a1, 20, 0);
+    func_00038872((int)(*(char **)D_00178A0A + 23 + (((int)(short)*(short *)D_00195F30) * 3)) + 2, (int)(short)a1, 20, 0);
+}
+
+void func_00038721(short a1)
+{
+    func_00038872((int)(*(char **)D_00178A0A + 32 + (((int)(short)*(short *)D_00195F30) * 5)), (int)(short)a1, 100, 1);
 }
 
 void func_00038763(short a1)
 {
-    func_00038872(((((int)(short)*(short *)D_00195F30) * 5) + (*(int *)D_00178A0A + 32)) + 1, (int)(short)a1, 100, -1);
+    func_00038872((int)(*(char **)D_00178A0A + 32 + (((int)(short)*(short *)D_00195F30) * 5)) + 1, (int)(short)a1, 100, -1);
 }
 
 void func_000387A6(short a1)
 {
-    func_00038872(((((int)(short)*(short *)D_00195F30) * 5) + (*(int *)D_00178A0A + 32)) + 2, (int)(short)a1, 100, 1);
+    func_00038872((int)(*(char **)D_00178A0A + 32 + (((int)(short)*(short *)D_00195F30) * 5)) + 2, (int)(short)a1, 100, 1);
 }
 
 void func_000387EB(short a1)
 {
-    func_00038872(((((int)(short)*(short *)D_00195F30) * 5) + (*(int *)D_00178A0A + 32)) + 3, (int)(short)a1, 100, -1);
+    func_00038872((int)(*(char **)D_00178A0A + 32 + (((int)(short)*(short *)D_00195F30) * 5)) + 3, (int)(short)a1, 100, -1);
 }
 
 void func_00038830(short a1)
 {
-    func_00038872(((((int)(short)*(short *)D_00195F30) * 5) + (*(int *)D_00178A0A + 32)) + 4, (int)(short)a1, 20, 0);
+    func_00038872((int)(*(char **)D_00178A0A + 32 + (((int)(short)*(short *)D_00195F30) * 5)) + 4, (int)(short)a1, 20, 0);
 }
 
 void func_000390AD(void)

@@ -1110,3 +1110,9 @@ Batch **1,927**; build **61.34%**.
   function's address, not an argument: the lifter stops the argument list there (a choice
   point keeps it). +22. Slot-type and array-extent choice points are tried near any access
   of their slots, and the search budget is 600 attempts. +3. Batch **1,956**.
+- **Call results narrowed to a byte**: `call rand; and al,1; xor edx,edx; mov dl,al` is
+  `rand() & 1` passed as an unsigned char (OW does the and at 8 bits); and when eax's value
+  was already used before a call of unknown arity, whether it is also an argument is a
+  choice point. +9.
+- **Pointer plus constant**: `mov esi,[p]; add esi,14; add eax,esi` is `*(char **)p + 14 +
+  i` (the pointer form puts the index in the other register). +8. Batch **1,972**.
