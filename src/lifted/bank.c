@@ -149,7 +149,6 @@ void func_0006C55B(void);
 void func_0006C692(void);
 void func_0006CB02(void);
 #pragma aux func_000A0ED9 parm routine [];
-#pragma dagger DAGGER_CONFPOS func_0006C818
 #pragma dagger DAGGER_PUSHMEM func_0006C692
 #pragma dagger KKND_CONFREV func_0006BF30
 
@@ -778,7 +777,7 @@ L6C854:;
     *(int *)D_001959A4 = *(int *)(D_001A3FB4 + (((int)(unsigned char)*(signed char *)D_001A41F2) * 20));
     *(int *)(*(char **)D_001A41EC) -= *(int *)D_001959A4;
     *(int *)(*(char **)D_00195BE0 + 116) = *(int *)(D_001A3FB8 + (((int)(unsigned char)*(signed char *)D_001A41F2) * 20));
-    *(int *)D_001A41E4 = *(int *)(D_001A3FAC + (((int)(unsigned char)*(signed char *)D_001A41F2) * 20)) - 71;
+    *(int *)D_001A41E4 = (int)(*(char **)(D_001A3FAC + (((int)(unsigned char)*(signed char *)D_001A41F2) * 20)) - 71);
     *(int *)D_001A41DC = *(int *)(D_001A3FB0 + (((int)(unsigned char)*(signed char *)D_001A41F2) * 20));
     func_0003F09F(282, 1);
     func_000A0AD9((int)D_0018DDB4, *(int *)(D_001837E8 + (((int)(unsigned char)*(signed char *)D_00196268) << 2)), 32, (int)D_00175CC4, 647);

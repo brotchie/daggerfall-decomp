@@ -522,6 +522,27 @@ L2CB97:;
     *(signed char *)((char *)l_14 + 2) &= 191;
 }
 
+int func_0002CBA6(int a1, int a2)
+{
+    int l_20;
+    int l_1C;
+    short l_14;
+
+    if (*(int *)((char *)a2 + 13) != (-1)) goto L2CBCB;
+    return 0;
+L2CBCB:;
+    l_20 = func_00030A23(a1, 6, (int)(short)*(short *)((char *)a2 + 28));
+    l_1C = func_00030A23(a1, 9, (int)(short)*(short *)((char *)a2 + 13));
+    l_14 = *(short *)((char *)l_20 + 2) & 128;
+    if (*(signed char *)((char *)l_1C + 2) == 0) goto L2CC24;
+    *(signed char *)(D_001952EC + ((int)(unsigned char)*(signed char *)((char *)l_1C + 3))) = *(signed char *)&l_14;
+    goto L2CC2D;
+L2CC24:;
+    *(signed char *)((char *)l_1C + 3) = *(signed char *)&l_14;
+L2CC2D:;
+    return (int)(short)l_14;
+}
+
 int func_0002CC40(int a1, int a2)
 {
     int l_1C;

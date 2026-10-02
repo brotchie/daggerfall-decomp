@@ -125,6 +125,7 @@ extern int func_000A00CB();
 extern int func_000A0AD9();
 extern int func_000A0B42();
 extern int func_000A0DF4();
+extern int func_000A0E0D();
 extern int func_000A0E3B();
 extern int func_000A0ED9(int, int);
 extern int func_000A0F5C(int, ...);
@@ -153,7 +154,6 @@ extern int func_00137725();
 extern int func_00144F68();
 extern int func_0014D23C();
 extern void func_00013A52(void);
-extern void func_000276B8(void);
 extern void func_00027717(int, int);
 extern void func_00027E4F(void);
 extern void func_0002829B(int);
@@ -178,6 +178,7 @@ void func_00026D8D(void);
 void func_00027035(void);
 void func_00027515(void);
 void func_000275F7(int);
+void func_000276B8(void);
 void func_00027781(void);
 void func_00027A10(void);
 void func_0002814E(int);
@@ -195,6 +196,7 @@ void func_000298F3(int);
 #pragma aux func_000A0ED9 parm routine [];
 #pragma dagger DAGGER_NOSAVES func_00028E24
 #pragma dagger DAGGER_PUSHMEM func_00027A10
+#pragma dagger DAGGER_PUSHMEM func_00028BCD
 #pragma dagger DAGGER_RMW func_00026904
 
 void func_00026904(void)
@@ -644,6 +646,14 @@ L27691:;
     goto L2765A;
 L276A4:;
     return 0;
+}
+
+void func_000276B8(void)
+{
+    int l_18;
+
+    l_18 = func_000A0DF4(*(int *)D_00190DE8 + 2) + 3;
+    func_000A0E0D(*(int *)D_00190DE8, *(int *)D_00190DE8 + l_18, ((int)(*(char **)D_00196DB4 + 2048) - *(int *)D_00190DE8) - l_18, (int)D_001707AE, 494, 4);
 }
 
 void func_00027781(void)
@@ -1180,6 +1190,20 @@ L28B70:;
     goto L28AEC;
 L28BBE:;
     goto L28AD2;
+}
+
+void func_00028BCD(void)
+{
+    if (((int)(unsigned char)*(signed char *)D_001789FA) != 3) goto L28BF0;
+    if (*(int *)D_00196DA0 != 0) goto L28BF2;
+L28BF0:;
+    return;
+L28BF2:;
+    *(int *)(*(char **)D_00195C44) = *(int *)D_00195BF4;
+    func_000A1023((int)(*(char **)D_00195C44 + 4), *(int *)D_00196DA0, 10240, (int)D_001707AE, 1055, 4);
+    func_000A0ED9(1056, (int)D_001707AE);
+    func_000A0F5C((int)D_001903A4, (int)D_001707E4, ((unsigned)*(int *)(*(char **)D_00195AC4 + 31)) >> 16);
+    func_0006CD10((int)D_001903A4, *(int *)D_00195C44, 10244);
 }
 
 void func_00028C72(void)

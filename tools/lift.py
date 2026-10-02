@@ -304,7 +304,8 @@ class Func:
                     return True
                 if dst != r32:
                     return False
-                if i.mnemonic in ("add", "sub", "inc", "dec", "shl", "neg", "imul"):
+                if i.mnemonic in ("add", "sub", "inc", "dec", "shl", "neg", "imul", "and", "or",
+                                  "xor"):
                     srcs = ops_[1:]
                     if not all(o.type in (cx.X86_OP_IMM, cx.X86_OP_REG) for o in srcs):
                         return False
@@ -1210,6 +1211,18 @@ class Func:
                     self.set_reg(full, v)
                     self.flags = ("val", v, None)
                     return
+                if m in ("add", "sub") and s.type == cx.X86_OP_IMM and sz == 4 and \
+                        self.loaded_ptr(a) and not os.environ.get("LIFT_NOPTRK"):
+                    # a pointer read plus an offset, converted back to an int (the
+                    # conversion costs a register move later): a choice point
+                    self.choices.append(ins.address + 0.4375)
+                    if ins.address + 0.4375 in self.flips:
+                        v = E("(int)(*(char **)%s %s %d)" % (a.text[len("*(int *)"):],
+                                                             "+" if m == "add" else "-",
+                                                             s.imm), 4, atom=True)
+                        self.set_reg(full, v)
+                        self.flags = ("val", v, None)
+                        return
                 if m in ("add", "imul", "and", "or", "xor") and s.type == cx.X86_OP_REG and \
                         not CONST_RE.fullmatch(a.text) and not CONST_RE.fullmatch(b.text) and \
                         "func_" not in a.text + b.text:

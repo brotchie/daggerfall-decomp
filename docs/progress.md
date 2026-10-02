@@ -1171,3 +1171,7 @@ Batch **1,927**; build **61.34%**.
   (Watcom stores, then negates in memory). +5. Batch **2,048**. (The compiler also gained
   a `DAGGER_DUMPINS=1` dump of the instruction stream before register allocation, for
   studying allocation differences.)
+- **Pointer plus an offset, back to int**: `(int)(*(char **)p + 2048) - q` costs a register
+  move for the conversion (`mov ebx,eax`) that the int sum doesn't: a choice point at
+  `add reg,imm` on a loaded dword. +9 (one of them 6 KB). `and`/`or`/`xor` join the
+  16-bit chains. +1. Batch **2,058**.
