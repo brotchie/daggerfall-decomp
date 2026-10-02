@@ -486,7 +486,17 @@ class Func:
             if base:
                 parts.append(self.reg(base, ins).p())
         elif base:
-            parts.append("(char *)" + self.reg(base, ins).p())
+            bv = self.reg(base, ins)
+            pick = bv.atom and bv.text.startswith("*(int *)")
+            if pick:
+                self.choices.append(ins.address + 0.75)     # or the int load and cast
+            if pick and ins.address + 0.75 not in self.flips and \
+                    not os.environ.get("LIFT_INTPTRBASE"):
+                # a pointer read from memory: *(char **)x, not (char *)*(int *)x (the int
+                # load and cast keep Watcom from folding the offset into an lea)
+                parts.append("*(char **)" + bv.text[len("*(int *)"):])
+            else:
+                parts.append("(char *)" + bv.p())
         elif not index:
             raise Unsupported("absolute address without fixup")
         if index:
