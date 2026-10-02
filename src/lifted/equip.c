@@ -89,6 +89,27 @@ L5EDEE:;
     *(signed char *)((char *)a1 + 56) = *(signed char *)(D_0018659B + (func_0009DC25() & 3));
 }
 
+int func_0005F0A0(int a1)
+{
+{
+    int l_20;
+
+    if (a1 == 12) goto L5F0BD;
+    if (a1 != 6) goto L5F0BF;
+L5F0BD:;
+    goto L5F0C5;
+L5F0BF:;
+    if (a1 != 2) goto L5F0CE;
+L5F0C5:;
+    l_20 = 1;
+    goto L5F0D5;
+L5F0CE:;
+    l_20 = 0;
+L5F0D5:;
+    return l_20;
+}
+}
+
 void func_0005F1BD(int a1, int a2, int a3, int a4)
 {
     int l_14;

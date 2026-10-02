@@ -768,6 +768,11 @@ class Func:
                                            "(%s)" % target, ", ".join(args)), 4, atom=True)
         self.finish_call(call, len(args))
 
+    def decl_line(self, o, two):
+        if o in self.arrays:
+            return "    char l_%X[%d];" % (o, self.arrays[o])
+        return "    %s l_%X;" % (self.slot_type[o], o)
+
     # ---- output ------------------------------------------------------------------------
     def c(self):
         self.lift()
@@ -785,14 +790,24 @@ class Func:
         rest = [o for o in locals_ if o not in two]
         lines = ["%s %s(%s)" % ("void" if self.void else "int", name, ", ".join(ps) or "void"),
                  "{"]
-        for o in rest + two:
-            reg = ""
-            if o in self.arrays:
-                lines.append("    char l_%X[%d];" % (o, self.arrays[o]))
-            else:
-                lines.append("    %s%s l_%X;" % (reg, self.slot_type[o], o))
+        # Locals below every parameter were declared in a nested block: Watcom gives a
+        # block's locals their slots when the block starts, after the function's own.
+        pmax = max([p[1] for p in self.params] + [0])
+        nested = [o for o in rest + two if self.params and o > pmax]
+        outer = [o for o in rest + two if o not in nested]
+        decl_lines = []
+        for o in outer:
+            decl_lines.append(self.decl_line(o, two))
+        if nested:
+            decl_lines.append("{")
+            for o in nested:
+                decl_lines.append(self.decl_line(o, two))
+        lines += decl_lines
         if locals_:
             lines.append("")
+        self.nested_open = bool(nested)
+        for o in []:
+            pass
         used = set(re.findall(r"goto L([0-9A-F]+);", "\n".join(self.out)))
         for line in self.out:
             mm = re.fullmatch(r"L([0-9A-F]+):;", line)
@@ -801,6 +816,8 @@ class Func:
             lines.append(line)
         if not self.void and "%X" % self.ret_ins in used:
             lines.append("L%X:;" % self.ret_ins)
+        if self.nested_open:
+            lines.append("}")
         lines.append("}")
         decl = ["/* lifted from 0x%08X */" % self.va]
         for g in sorted(self.globals):

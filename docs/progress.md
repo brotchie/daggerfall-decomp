@@ -548,3 +548,14 @@ the tree shape). The keep flag now skips those. Batch **1,072**.
   callees; fixed, nothing lost now.
 
 Batch **1,083**, unsupported down to 178.
+
+## 2026-10-01: nested-block locals (+43)
+
+Slot layouts like `R, P1, L` (a local *below* the parameters) are locals of a nested block
+`{ int x; ... }`. The front end declares the function body's own locals with the function
+(`CurFunc->u.func.locals`, with `.R`), and every `OPR_NEWBLOCK` is a nested block. The patch
+marks autos declared from a block node as `DAGGER_NESTED` and gives them slots after the
+parameters. Pending declarations now get slots at every `-od` statement, not just the first,
+so a block's locals get theirs when it starts. The lifter declares locals deeper than every
+parameter inside a nested block wrapping the body (jumping into a block with `goto` is legal
+C89). Batch **1,126** (+43, nothing lost).

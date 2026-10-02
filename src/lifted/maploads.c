@@ -94,6 +94,7 @@ void func_0001E3D3(int a1, int a2)
 
 int func_0001EE84(short a1)
 {
+{
     int l_20;
 
     if (((int)(unsigned char)*(signed char *)D_0019626F) != 20) goto L1EEAD;
@@ -122,4 +123,5 @@ L1EF14:;
     l_20 = 0;
 L1EF1B:;
     return l_20;
+}
 }

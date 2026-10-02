@@ -14,15 +14,27 @@ extern char D_00175BA8[];
 extern char D_00175BC1[];
 extern char D_00175BDC[];
 extern char D_00175BFA[];
+extern char D_00175C79[];
+extern char D_00187CA8[];
 extern char D_00187CAD[];
 extern char D_0018DBFC[];
 extern char D_0018DC24[];
 extern char D_001959A8[];
 extern char D_00195A00[];
+extern char D_00195AA4[];
 extern char D_00195AC4[];
+extern char D_00195BE8[];
 extern char D_00195E1C[];
+extern char D_0019626F[];
+extern char D_00196272[];
+extern char D_00196274[];
+extern char D_001A3FA0[];
+extern char D_001A3FA4[];
 extern char D_001A9B34[];
 
+extern int func_00042F0F();
+extern int func_00069938(int, int, int);
+extern int func_0006CB53(int, int);
 extern int func_0008E925(int, int);
 extern int func_000A0024();
 extern int func_000A0040();
@@ -34,6 +46,7 @@ extern int func_000CE8D5();
 extern void func_00010AF6(int);
 extern void func_00050069(int);
 extern void func_0006A28A(int);
+extern void func_0006ABA8(void);
 extern void func_0008E3F7(int, int);
 void func_0006A1FD(int);
 void func_0006A319(int);
@@ -198,4 +211,41 @@ void func_0006A654(int a1)
     (*(int *)D_00187CAD)++;
     func_0006A319(a1);
     (*(int *)D_00187CAD)--;
+}
+
+int func_0006A683(int a1)
+{
+{
+    int l_20;
+
+    if (((int)(unsigned char)*(signed char *)D_0019626F) != 14) goto L6A6AC;
+    if (((int)(unsigned char)*(signed char *)D_00196274) == 8) goto L6A6AE;
+L6A6AC:;
+    goto L6A6BA;
+L6A6AE:;
+    return 1;
+L6A6BA:;
+    if (a1 != 0) goto L6A6D9;
+    if (*(signed char *)D_00196274 != 0) goto L6A6D7;
+    if (func_00042F0F(24) != 0) goto L6A6D9;
+L6A6D7:;
+    goto L6A72D;
+L6A6D9:;
+    *(signed char *)D_00196274 = 14;
+    *(signed char *)D_00196272 = 1;
+    *(int *)D_00195BE8 = func_0006CB53((int)D_00175C79, 0);
+    *(int *)D_001A3FA0 = 0;
+    *(int *)D_001A3FA4 = *(int *)D_001A3FA0;
+    *(signed char *)D_00187CA8 = 0;
+    func_0006ABA8();
+    func_00069938(237, *(int *)D_00195AA4, 100);
+L6A72D:;
+    if (((int)(unsigned char)*(signed char *)D_00196274) != 14) goto L6A742;
+    l_20 = 1;
+    goto L6A749;
+L6A742:;
+    l_20 = 0;
+L6A749:;
+    return l_20;
+}
 }

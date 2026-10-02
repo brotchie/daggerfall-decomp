@@ -68,6 +68,7 @@ int func_000434F2(void);
 
 int func_0004330A(short a1)
 {
+{
     int l_20;
 
     if (a1 != 0) goto L4333B;
@@ -93,6 +94,7 @@ L433C0:;
     l_20 = 0;
 L433C7:;
     return l_20;
+}
 }
 
 int func_000434F2(void)

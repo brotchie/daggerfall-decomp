@@ -1,8 +1,17 @@
 diff --git a/bld/cc/c/cgen.c b/bld/cc/c/cgen.c
-index ee6e5533cb..6d98f59177 100644
+index ee6e5533cb..ddddfdae1e 100644
 --- a/bld/cc/c/cgen.c
 +++ b/bld/cc/c/cgen.c
-@@ -1117,7 +1117,13 @@ static void CDoAutoDecl( SYM_HANDLE sym_handle )
+@@ -35,6 +35,8 @@
+ #include "jmpbuf.h"
+ #include "i64.h"
+ #include "cg.h"
++
++extern bool DaggerAutoNested;   /* tells the code generator about nested-block locals */
+ #include "cgdefs.h"
+ #include "cgswitch.h"
+ #include "cgcli.h"
+@@ -1117,7 +1119,13 @@ static void CDoAutoDecl( SYM_HANDLE sym_handle )
              }
              dtype = CGenType( typ );
              if( sym.flags & SYM_FUNC_RETURN_VAR ) {
@@ -17,8 +26,20 @@ index ee6e5533cb..6d98f59177 100644
                  SymReplace( &sym, sym_handle );
              } else {
                  CGAutoDecl( (CGSYM_HANDLE)sym_handle, dtype );
+@@ -1289,7 +1297,11 @@ static void EmitNodes( TREEPTR tree )
+             break;
+         case OPR_NEWBLOCK:              // start of new block { vars; }
+             DBBegBlock();
++            /* Daggerfall: the function body's own locals are declared with the function, so
++             * every block here is a nested block */
++            DaggerAutoNested = true;
+             CDoAutoDecl( node->u2.sym_handle );
++            DaggerAutoNested = false;
+             break;
+         case OPR_ENDBLOCK:              // end of new block { vars; }
+             DBEndBlock();
 diff --git a/bld/cg/c/bldcall.c b/bld/cg/c/bldcall.c
-index 14a056a76b..801dea2c6b 100644
+index 14a056a76b..07f9f1cb70 100644
 --- a/bld/cg/c/bldcall.c
 +++ b/bld/cg/c/bldcall.c
 @@ -31,6 +31,7 @@
@@ -37,7 +58,7 @@ index 14a056a76b..801dea2c6b 100644
  
  
  type_class_def  AddCallBlock( cg_sym_handle sym, const type_def *tipe )
-@@ -161,6 +163,82 @@ void    BGAddParm( cn call, an parm )
+@@ -161,6 +163,89 @@ void    BGAddParm( cn call, an parm )
  }
  
  
@@ -50,6 +71,8 @@ index 14a056a76b..801dea2c6b 100644
 + * DAGGER_FIRSTUSE=1 restores Open Watcom's order.
 + */
 +#define DAGGER_MAX_DECLS    512
++
++bool                DaggerAutoNested;       /* set by the C front end */
 +
 +static proc_def     *DaggerProc;
 +static name         *DaggerDecls[DAGGER_MAX_DECLS];
@@ -84,7 +107,7 @@ index 14a056a76b..801dea2c6b 100644
 +{
 +    int     i;
 +
-+    if( DaggerProc != CurrProc )
++    if( DaggerProc != CurrProc || DaggerCount == 0 )
 +        return;
 +    /* 2-byte variables come first: parameters, then locals, last to first */
 +    for( i = DaggerCount; i-- > 0; ) {
@@ -112,7 +135,12 @@ index 14a056a76b..801dea2c6b 100644
 +            DaggerAlloc( DaggerDecls[i] );
 +        }
 +    }
-+    DaggerProc = NULL;
++    /* then nested-block locals, last to first */
++    for( i = DaggerCount; i-- > 0; ) {
++        if( DaggerKinds[i] == DAGGER_NESTED ) {
++            DaggerAlloc( DaggerDecls[i] );
++        }
++    }
 +    DaggerCount = 0;
 +}
 +
@@ -120,15 +148,16 @@ index 14a056a76b..801dea2c6b 100644
  void    BGAutoDecl( cg_sym_handle sym, const type_def *tipe )
  /*************************************************************
   * declare an automatic variable with name "sym" and type "tipe". This
-@@ -168,6 +246,7 @@ void    BGAutoDecl( cg_sym_handle sym, const type_def *tipe )
+@@ -168,6 +253,8 @@ void    BGAutoDecl( cg_sym_handle sym, const type_def *tipe )
   */
  {
      BGDone( MakeAddrName( CG_FE, sym, tipe ) );
-+    DaggerAllocAtDecl( SAllocUserTemp( sym, TypeClass( tipe ), tipe->length ), DAGGER_AUTO );
++    DaggerAllocAtDecl( SAllocUserTemp( sym, TypeClass( tipe ), tipe->length ),
++                       DaggerAutoNested ? DAGGER_NESTED : DAGGER_AUTO );
  }
  
  static  void    LinkParmIns( instruction *parm_def, instruction *ins )
-@@ -295,6 +374,7 @@ name    *DoParmDecl( cg_sym_handle sym, const type_def *tipe, hw_reg_set reg )
+@@ -295,6 +382,7 @@ name    *DoParmDecl( cg_sym_handle sym, const type_def *tipe, hw_reg_set reg )
      } else {
          temp = SAllocUserTemp( sym, TypeClass( tipe ), tipe->length );
          BGDone( MakeAddrName( CG_FE, sym, tipe ) );
@@ -286,7 +315,7 @@ index 721fa0c6a9..bcb4e28a83 100644
              loops_killed = true;
              CleanPartition();
 diff --git a/bld/cg/c/generate.c b/bld/cg/c/generate.c
-index a7f606be70..2d8d4a1fdd 100644
+index a7f606be70..adee9aed2f 100644
 --- a/bld/cg/c/generate.c
 +++ b/bld/cg/c/generate.c
 @@ -31,6 +31,7 @@
@@ -319,15 +348,17 @@ index a7f606be70..2d8d4a1fdd 100644
      }
      CurrBlock = curr;
      HeadBlock = NULL;
-@@ -664,6 +671,7 @@ void    Generate( bool routine_done )
-         if( !BlockByBlock ) {
+@@ -665,6 +672,9 @@ void    Generate( bool routine_done )
              InitStackMap();
              BlockByBlock = true;
-+            DaggerAllocDeclared();
          }
++        /* slots for the declarations made since the last statement (a nested block's
++         * locals get theirs when the block starts) */
++        DaggerAllocDeclared();
          LNBlip( SrcLine );
          FlushBlocks( false );
-@@ -722,6 +730,11 @@ void    Generate( bool routine_done )
+         FreeExtraSyms( LastTemp );
+@@ -722,6 +732,11 @@ void    Generate( bool routine_done )
          Panic( false );
          return;
      }
@@ -714,16 +745,17 @@ index dd3ef11ff7..b5696956e5 100644
                  // the C++ compiler likes to emit. Careful with floats!
                  BurnToBase( left, base_l );
 diff --git a/bld/cg/h/bldcall.h b/bld/cg/h/bldcall.h
-index bb42328d26..d33b42b56b 100644
+index bb42328d26..66e35921e9 100644
 --- a/bld/cg/h/bldcall.h
 +++ b/bld/cg/h/bldcall.h
-@@ -35,6 +35,11 @@ extern  void            BGFiniCall( cn call );
+@@ -35,6 +35,12 @@ extern  void            BGFiniCall( cn call );
  extern  cn              BGInitCall( an node, const type_def *tipe, aux_handle aux );
  extern  void            BGAddParm( cn call, an parm );
  extern  void            BGAutoDecl( cg_sym_handle sym, const type_def *tipe );
 +#define DAGGER_PARM     0
 +#define DAGGER_AUTO     1
 +#define DAGGER_TEMP     2
++#define DAGGER_NESTED   3
 +extern  void            DaggerAllocAtDecl( name *temp, int kind );
 +extern  void            DaggerAllocDeclared( void );
  extern  name            *DoParmDecl( cg_sym_handle sym, const type_def *tipe, hw_reg_set reg );

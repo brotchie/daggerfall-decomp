@@ -61,7 +61,6 @@ extern int func_0003D412(short, unsigned short, short);
 extern int func_0003E6B1(int, short, int, short);
 extern int func_0003F89F(short, short);
 extern int func_0004037E(void);
-extern int func_00040B83(int);
 extern int func_00062EF7(int, int, int);
 extern int func_00069938(int, int, int);
 extern int func_0006CB53(int, int);
@@ -92,6 +91,7 @@ extern void func_00078566(int, unsigned char);
 extern void func_0007D0DA(void);
 extern void func_0007D12D(void);
 extern void func_00081425(void);
+int func_00040B83(int);
 void func_0003F358(void);
 void func_0003F557(void);
 void func_000405EB(void);
@@ -188,6 +188,7 @@ L3F03A:;
 
 void func_0003F052(short a1)
 {
+{
     int l_1C;
 
     l_1C = func_0003D412((int)(short)a1, 0, 280);
@@ -198,6 +199,7 @@ L3F084:;
 L3F086:;
     *(signed char *)D_001940DA |= 8;
     func_00013D2D(l_1C);
+}
 }
 
 void func_0003F25E(void)
@@ -478,6 +480,21 @@ L40B6D:;
     goto L40B1F;
 L40B6F:;
     return 0;
+}
+
+int func_00040B83(int a1)
+{
+{
+    int l_20;
+
+    if ((((int)(unsigned short)*(short *)((char *)a1 + 27)) >> 7) != 399) goto L40BB3;
+    l_20 = 1;
+    goto L40BBA;
+L40BB3:;
+    l_20 = 0;
+L40BBA:;
+    return l_20;
+}
 }
 
 int func_00040BCD(void)

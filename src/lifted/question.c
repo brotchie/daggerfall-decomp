@@ -34,10 +34,12 @@ L517AF:;
 
 void func_000517EC(short a1)
 {
+{
     char l_44[44];
 
     func_000A1944((int)l_44, 0, 44);
     *(short *)l_44 = 16;
     func_0006998C(18);
     func_00051B3E(*(int *)(D_001852A3 + (((int)(short)a1) << 2)), (int)l_44);
+}
 }

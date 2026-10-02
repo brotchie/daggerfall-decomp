@@ -175,6 +175,7 @@ L86777:;
 
 void func_00086D37(unsigned short a1)
 {
+{
     int l_20;
     int l_1C;
 
@@ -221,6 +222,7 @@ L86F34:;
     *(int *)D_00187F28 = l_1C;
     func_0008EB52();
     func_00069D36();
+}
 }
 
 void func_000871FA(int a1)

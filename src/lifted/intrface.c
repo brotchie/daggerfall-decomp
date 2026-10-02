@@ -8,18 +8,33 @@ extern char D_00142940[];
 extern char D_00142944[];
 extern char D_00176A7C[];
 extern char D_00178A01[];
+extern char D_00187B6E[];
+extern char D_00187BB8[];
+extern char D_00187C12[];
+extern char D_00187C3C[];
+extern char D_00187C86[];
+extern char D_00187C8A[];
+extern char D_00187C8E[];
+extern char D_00187C92[];
+extern char D_00187C96[];
+extern char D_00187C9A[];
+extern char D_00187C9E[];
 extern char D_00187CA4[];
 extern char D_001940D4[];
 extern char D_001940DB[];
 extern char D_00195A98[];
 extern char D_00195AA4[];
+extern char D_00195BE0[];
 extern char D_00195BE4[];
+extern char D_00195F4E[];
 extern char D_00195F64[];
 extern char D_00195F66[];
 extern char D_00196279[];
+extern char D_00196D64[];
 extern char D_001A5A68[];
 extern char D_001A5ACC[];
 extern char D_001A5AD0[];
+extern char D_001A5ADC[];
 extern char D_001A5AE8[];
 extern char D_001A5AF4[];
 extern char D_001A5B04[];
@@ -39,8 +54,10 @@ extern char D_001A5B2E[];
 extern char D_001A5B32[];
 extern char D_001A5B34[];
 
+extern int func_000234EB(int, int, int, int);
 extern int func_00042F0F();
 extern int func_000696F9(int);
+extern int func_00069AB8(int, int, int);
 extern int func_00082657(int);
 extern int func_0008269B(int);
 extern int func_000A0024();
@@ -288,11 +305,104 @@ L81415:;
     return l_10;
 }
 
+int func_0008227A(int a1)
+{
+    int l_20;
+    int l_1C;
+{
+    int l_2C;
+    int l_28;
+
+    *(int *)D_00187C86 = *(int *)((char *)*(int *)D_00195AA4 + 7);
+    *(int *)D_00187C8A = *(int *)((char *)*(int *)D_00195AA4 + 11) + a1;
+    *(int *)D_00187C8E = *(int *)((char *)*(int *)D_00195AA4 + 15);
+    *(int *)D_00187C92 = (int)(short)*(short *)((char *)*(int *)D_00195AA4 + 1);
+    *(int *)D_00187C96 = (int)(short)*(short *)((char *)*(int *)D_00195AA4 + 3);
+    *(int *)D_00187C9A = (int)(short)*(short *)((char *)*(int *)D_00195AA4 + 5);
+    if ((*(signed char *)D_001940DB & 4) == 0) goto L822F1;
+    l_2C = (int)D_00187C12;
+    goto L822F8;
+L822F1:;
+    l_2C = (int)D_00187B6E;
+L822F8:;
+    *(int *)D_00187C9E = l_2C;
+    if (((int)(unsigned short)(*(short *)((char *)*(int *)D_00195BE0 + 64) & 1536)) == 0) goto L82320;
+    l_28 = (int)D_00187C3C;
+    goto L82328;
+L82320:;
+    l_28 = *(int *)D_00187C9E;
+L82328:;
+    *(int *)D_00187C9E = l_28;
+    if ((*(signed char *)D_001940DB & 32) == 0) goto L82343;
+    *(int *)D_00187C9E = (int)D_00187BB8;
+L82343:;
+    *(signed char *)D_00196D64 &= 251;
+    l_20 = func_000234EB(*(int *)D_00195AA4, 0, (int)D_00187C86, 1);
+    return l_20;
+}
+}
+
+void func_00082376(int a1)
+{
+    int l_18;
+{
+    int l_20;
+
+    if (((int)(unsigned short)(*(short *)((char *)*(int *)D_00195BE0 + 64) & 1536)) == 0) return;
+    if ((((int)(short)*(short *)D_00195F4E) - (((int)(short)*(short *)D_00195F4E) >> 2)) >= a1) goto L823C3;
+    l_20 = 366;
+    goto L823CA;
+L823C3:;
+    l_20 = 365;
+L823CA:;
+    l_18 = l_20;
+    if (((int)(unsigned short)(*(short *)((char *)*(int *)D_00195BE0 + 64) & 1024)) == 0) goto L823EE;
+    l_18 = 372;
+L823EE:;
+    if (a1 != 0) goto L82425;
+    if (*(int *)D_001A5AD0 == (-1)) return;
+    if (func_000696F9(*(int *)D_001A5AD0) != 0) return;
+    func_000696A3(*(int *)D_001A5AD0);
+    *(int *)D_001A5AD0 = -1;
+    return;
+L82425:;
+    if (*(int *)D_001A5AD0 != (-1)) goto L82448;
+    *(int *)D_001A5AD0 = func_00069AB8(l_18, *(int *)D_00195AA4, 100);
+    goto L82475;
+L82448:;
+    if (l_18 == *(int *)D_001A5ADC) goto L82475;
+    func_000696A3(*(int *)D_001A5AD0);
+    *(int *)D_001A5AD0 = func_00069AB8(l_18, *(int *)D_00195AA4, 100);
+L82475:;
+    *(int *)D_001A5ADC = l_18;
+}
+}
+
 void func_00082487(void)
 {
     *(int *)D_001A5AD0 = -1;
     if (func_000696F9(*(int *)D_001A5AD0) != 0) return;
     func_000696A3(*(int *)D_001A5AD0);
+}
+
+int func_00082609(int a1)
+{
+{
+    int l_20;
+
+    if (a1 == 0) goto L82634;
+    if (a1 <= 250) goto L82632;
+    if (a1 < 265) goto L82634;
+L82632:;
+    goto L8263D;
+L82634:;
+    l_20 = 1;
+    goto L82644;
+L8263D:;
+    l_20 = 0;
+L82644:;
+    return l_20;
+}
 }
 
 int func_00082750(int a1)

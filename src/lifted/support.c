@@ -281,6 +281,21 @@ void func_0007DE23(short a1)
     func_0003EDF4(*(int *)D_00199764, (int)(short)a1, 5);
 }
 
+int func_0007E00E(int a1, int a2, int a3)
+{
+{
+    int l_20;
+
+    if (func_000C7FD9(*(int *)((char *)a1 + 7), *(int *)((char *)a1 + 15), *(int *)((char *)a2 + 7), *(int *)((char *)a2 + 15)) >= a3) goto L7E04E;
+    l_20 = 1;
+    goto L7E055;
+L7E04E:;
+    l_20 = 0;
+L7E055:;
+    return l_20;
+}
+}
+
 void func_0007E066(void)
 {
     func_0007F671();
@@ -417,6 +432,21 @@ L7F23E:;
     *(int *)((char *)*(int *)D_00195BE0 + 133) -= *(int *)D_00195B84;
     if (*(int *)((char *)*(int *)D_00195BE0 + 133) >= 0) return;
     *(int *)((char *)*(int *)D_00195BE0 + 133) = 0;
+}
+
+int func_0007F2A8(int a1)
+{
+{
+    int l_20;
+
+    if (func_0007F349() < a1) goto L7F2CC;
+    l_20 = 1;
+    goto L7F2D3;
+L7F2CC:;
+    l_20 = 0;
+L7F2D3:;
+    return l_20;
+}
 }
 
 void func_0007F2E6(int a1)

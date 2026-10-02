@@ -2,6 +2,7 @@
  * do not edit: move a function to src/damage.c to work on it by hand) */
 
 extern char D_0012AC00[];
+extern char D_0014294C[];
 extern char D_00143550[];
 extern char D_001709E4[];
 extern char D_001709FB[];
@@ -12,8 +13,10 @@ extern char D_00195A0C[];
 extern char D_00195A78[];
 extern char D_00195AA4[];
 extern char D_00195AC4[];
+extern char D_00195B68[];
 extern char D_00195BE0[];
 extern char D_00195BF4[];
+extern char D_00195BF8[];
 extern char D_00195D48[];
 extern char D_00195DA0[];
 extern char D_0019629B[];
@@ -30,10 +33,12 @@ extern int func_0009CEC4(int, int, int, int, int);
 extern int func_000A0040();
 extern int func_000C1500();
 extern int func_000C808D();
+extern int func_000CD53C();
 extern int func_000CE70D();
 extern int func_0012B136();
 extern int func_0012D8BD();
 extern int func_00135DE4();
+extern void func_00010F9A(int);
 extern void func_00029958(int);
 extern void func_0004FF2E(void);
 extern void func_0007E31C(int);
@@ -62,6 +67,33 @@ L2F334:;
     *(int *)((char *)*(int *)D_00195BE0 + 499) = *(int *)D_00195BF4 + 4320;
     *(short *)((char *)*(int *)D_00195BE0 + 108) = 0;
     *(signed char *)((char *)*(int *)D_00195BE0 + 64) |= 16;
+}
+
+void func_0002F3FA(int a1)
+{
+    int l_18;
+{
+    int l_20;
+
+    l_18 = (int)(short)*(short *)D_0014294C;
+    if (((int)(unsigned short)(*(short *)((char *)*(int *)D_00195BF8) & 1)) == 0) goto L2F434;
+    l_20 = 199;
+    goto L2F448;
+L2F434:;
+    l_20 = ((int)(unsigned short)*(short *)((char *)*(int *)D_00195B68 + 2)) - 2;
+L2F448:;
+    *(short *)D_0014294C = l_20;
+    func_000CD53C();
+    *(short *)D_0014294C = l_18;
+    if (a1 >= 4) goto L2F46E;
+    a1 = 4;
+    goto L2F47B;
+L2F46E:;
+    if (a1 <= 32) goto L2F47B;
+    a1 = 32;
+L2F47B:;
+    func_00010F9A(a1 << 3);
+}
 }
 
 void func_0002F490(int a1, int a2, int a3)

@@ -23,6 +23,7 @@ extern char D_00195AF0[];
 extern char D_00195AF4[];
 extern char D_00195B84[];
 extern char D_00195B8C[];
+extern char D_00195BDC[];
 extern char D_00195BE0[];
 extern char D_00195BF4[];
 extern char D_00195C44[];
@@ -39,7 +40,6 @@ extern char D_00196B04[];
 extern char D_00199770[];
 extern char D_001A94D4[];
 
-extern int func_0001FBF5(int);
 extern int func_00042F0F();
 extern int func_0006CB53(int, int);
 extern int func_00071331(void);
@@ -64,6 +64,7 @@ extern void func_0008E3F7(int, int);
 extern void func_00097A85(void);
 int func_0001F5FD(void);
 int func_0001F653(void);
+int func_0001FBF5(int);
 void func_0001F0C5(void);
 void func_0001F592(int);
 void func_0001F6BB(int);
@@ -318,6 +319,69 @@ L1FA75:;
     return 1;
 L1FA9E:;
     return 0;
+}
+
+int func_0001FBF5(int a1)
+{
+    int l_20;
+    int l_1C;
+{
+    int l_28;
+
+    if (((int)(unsigned char)*(signed char *)((char *)*(int *)((char *)a1 + 67))) == 43) goto L1FC24;
+    return 0;
+L1FC24:;
+    if (*(signed char *)((char *)a1 + 38) == 0) goto L1FC39;
+    return 0;
+L1FC39:;
+    if ((((unsigned)*(int *)((char *)a1 + 31)) >> 16) != (((unsigned)*(int *)((char *)*(int *)D_00195AC4 + 31)) >> 16)) goto L1FC5D;
+    return 0;
+L1FC5D:;
+    l_1C = 0;
+    l_20 = 0;
+L1FC6B:;
+    if (((int)(unsigned short)*(short *)((char *)*(int *)D_00195BDC + 41)) > l_20) goto L1FC88;
+    goto L1FCB7;
+L1FC80:;
+    l_20++;
+    goto L1FC6B;
+L1FC88:;
+    if (*(int *)((char *)*(int *)((char *)a1 + 67) + 31) != *(int *)((char *)(int)(*(char **)((char *)*(int *)D_00195BDC + 43) + (l_20 * 26)) + 20)) goto L1FCB5;
+    l_1C = *(int *)((char *)*(int *)D_00195BDC + 43) + (l_20 * 26);
+L1FCB5:;
+    goto L1FC80;
+L1FCB7:;
+    if (l_1C != 0) goto L1FCC9;
+    return 0;
+L1FCC9:;
+    if (((int)(unsigned char)*(signed char *)((char *)l_1C + 24)) == 15) goto L1FCE9;
+    if (((int)(unsigned char)*(signed char *)((char *)l_1C + 24)) != 1) goto L1FCEB;
+L1FCE9:;
+    goto L1FCF7;
+L1FCEB:;
+    return 0;
+L1FCF7:;
+    *(int *)D_00190BE4 = 2147483647;
+    if (((int)(unsigned char)*(signed char *)((char *)l_1C + 24)) != 1) goto L1FD22;
+    if (*(int *)((char *)l_1C + 20) == *(int *)((char *)*(int *)D_00195BE0 + 116)) goto L1FD24;
+L1FD22:;
+    goto L1FD2D;
+L1FD24:;
+    return 1;
+L1FD2D:;
+    *(int *)D_00190BE4 = *(int *)((char *)l_1C + 2);
+    if (((int)(unsigned char)(*(signed char *)((char *)l_1C + 15) & 2)) == 0) goto L1FD57;
+    if (((unsigned)*(int *)((char *)l_1C + 2)) > *(int *)D_00195BF4) goto L1FD59;
+L1FD57:;
+    goto L1FD62;
+L1FD59:;
+    l_28 = 1;
+    goto L1FD69;
+L1FD62:;
+    l_28 = 0;
+L1FD69:;
+    return l_28;
+}
 }
 
 void func_0001FD7C(int a1)

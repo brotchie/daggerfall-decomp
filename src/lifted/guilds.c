@@ -58,8 +58,10 @@ extern int func_0004A98C(int, int);
 extern int func_0006CB53(int, int);
 extern int func_0006FDBE(void);
 extern int func_000700EE(int, int, int);
+extern int func_000702A0(unsigned char);
 extern int func_00070308(unsigned char);
 extern int func_0007069D(int);
+extern int func_0007D6AE(int, int);
 extern int func_0007F2A8(int);
 extern int func_0008DA4D(int);
 extern int func_0008DCE3(int, int, int);
@@ -82,7 +84,6 @@ extern void func_0005F401(int);
 extern void func_00061398(int);
 extern void func_0006F7B5(void);
 extern void func_0006FD03(short);
-extern void func_00070624(int, unsigned char);
 extern void func_00070AFA(int);
 extern void func_0007F1E3(int);
 extern void func_00081425(void);
@@ -91,6 +92,44 @@ extern void func_0008DA1C(int);
 extern void func_000922F6(int, int, int);
 int func_0006F92F(void);
 void func_0006F73A(void);
+void func_00070624(int, unsigned char);
+
+int func_0006F484(int a1)
+{
+    int l_1C;
+{
+    int l_28;
+    int l_24;
+
+    if (a1 != 4) goto L6F4F0;
+    l_1C = func_000702A0(0);
+    if (l_1C != 0) goto L6F4B7;
+    return 0;
+L6F4B7:;
+    if (func_0007D6AE(1, 100) > ((((int)(unsigned char)*(signed char *)((char *)l_1C)) + 1) * 5)) goto L6F4E1;
+    l_24 = 1;
+    goto L6F4E8;
+L6F4E1:;
+    l_24 = 0;
+L6F4E8:;
+    return l_24;
+L6F4F0:;
+    if (a1 >= 3) goto L6F54B;
+    l_1C = func_000702A0(3);
+    if (l_1C != 0) goto L6F512;
+    return 0;
+L6F512:;
+    if (func_0007D6AE(1, 100) > ((((int)(unsigned char)*(signed char *)((char *)l_1C)) + 1) * 5)) goto L6F53C;
+    l_28 = 1;
+    goto L6F543;
+L6F53C:;
+    l_28 = 0;
+L6F543:;
+    return l_28;
+L6F54B:;
+    return 0;
+}
+}
 
 void func_0006F55F(void)
 {
@@ -302,6 +341,22 @@ void func_000705D9(void)
 void func_000705FD(void)
 {
     func_00070624(42, 3);
+}
+
+void func_00070624(int a1, unsigned char a2)
+{
+{
+    int l_1C;
+
+    l_1C = func_0008DCE3(*(int *)D_00195AA0, 0, 13);
+    *(signed char *)((char *)l_1C) = 10;
+    *(short *)((char *)l_1C + 21) = 3;
+    *(int *)D_001A4A14 = l_1C + 71;
+    *(short *)((char *)*(int *)D_001A4A14 + 3) = a1;
+    *(signed char *)((char *)*(int *)D_001A4A14 + 2) = a2;
+    *(int *)((char *)*(int *)D_001A4A14 + 5) = *(int *)D_00195BF4;
+    *(signed char *)((char *)*(int *)D_001A4A14) = 0;
+}
 }
 
 void func_00070715(void)
