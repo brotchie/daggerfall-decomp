@@ -1220,3 +1220,7 @@ Batch **1,927**; build **61.34%**.
 - A parameter in a 2-byte parameter's frame position that is only ever read whole is an
   int whose slot was given early (an address-taken one): typed int with its slots pinned.
   +1. Batch **2,120**.
+- `lea eax,[eax+eax*2]; add eax,eax` on an index into shorts is a subscript of `x * 3` (OW
+  turns a written `* 6` into imul). +2. The compiler no longer merges adjacent constant
+  byte/word stores (`buf[0] = '0'; buf[1] = 'x'` stays two stores, as in FALL.EXE;
+  `DAGGER_MERGESTORES` restores OW's merge). Batch **2,122**.

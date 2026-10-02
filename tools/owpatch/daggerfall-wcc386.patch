@@ -2369,6 +2369,32 @@ index 48d95c8be9..dd0cf8c14c 100644
          if( AskIfUniqueLabel( oc->oc_handle.handle ) ) {
              if( (lc == LastUnique) && (len == 0) ) {
                  /* Two unique labels have ended up next to each other.
+diff --git a/bld/cg/intel/c/x86lesds.c b/bld/cg/intel/c/x86lesds.c
+index cd3d73b872..22a3620241 100644
+--- a/bld/cg/intel/c/x86lesds.c
++++ b/bld/cg/intel/c/x86lesds.c
+@@ -31,6 +31,7 @@
+ 
+ 
+ #include "_cgstd.h"
++extern const char *DaggerEnv( const char *name );
+ #include "coderep.h"
+ #include "data.h"
+ #include "makeins.h"
+@@ -335,8 +336,12 @@ void    OptSegs( void )
+                         CheckLDSES( ins, next, true );
+                     }
+                 }
++                /* Daggerfall: Watcom 10 kept adjacent constant stores apart
++                 * (DAGGER_MERGESTORES=1 combines them like OW) */
+                 if( MemMove( ins )  && !VolatileIns( ins )
+-                  && MemMove( next ) && !VolatileIns( next ) ) {
++                  && MemMove( next ) && !VolatileIns( next )
++                  && !( _IsModel( CGSW_GEN_NO_OPTIMIZATION )
++                    && DaggerEnv( "DAGGER_MERGESTORES" ) == NULL ) ) {
+                     /*
+                      * look for adjacent byte/word moves and combine them
+                      */
 diff --git a/bld/cg/intel/c/x86mul.c b/bld/cg/intel/c/x86mul.c
 index 37aaf4e803..24c000217c 100644
 --- a/bld/cg/intel/c/x86mul.c
