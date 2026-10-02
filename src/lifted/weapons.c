@@ -2,21 +2,33 @@
  * do not edit: move a function to src/weapons.c to work on it by hand) */
 
 extern char D_0017615C[];
+extern char D_00176166[];
+extern char D_00176175[];
 extern char D_00176184[];
+extern char D_0018754C[];
+extern char D_001875B7[];
+extern char D_001903A4[];
 extern char D_00190504[];
 extern char D_00195AA4[];
 extern char D_00195AC4[];
 extern char D_00195B14[];
 extern char D_00195B84[];
+extern char D_00195BE0[];
 extern char D_00195BF8[];
+extern char D_001A4A30[];
 extern char D_001A4A58[];
 extern char D_001A4A5C[];
+extern char D_001A4A60[];
+extern char D_001A4A68[];
 
+extern int func_0006CB53(int, int);
 extern int func_0007CBA1(int);
 extern int func_0008DCE3(int, int, int);
 extern int func_00097488(int);
 extern int func_000A0024();
 extern int func_000A0040();
+extern int func_000A0ED9(int, int);
+extern int func_000A0F5C(int, ...);
 extern int func_000C2000();
 extern int func_000C2043();
 extern int func_000C7FD9();
@@ -25,6 +37,64 @@ extern int func_000CE70D();
 extern void func_0005E540(short, short, int);
 extern void func_0006A54B(int);
 extern void func_000728D2(void);
+#pragma aux func_000A0ED9 parm routine [];
+
+void func_00072916(int a1, int a2)
+{
+    int l_18;
+    int l_14;
+{
+    int l_24;
+
+    if (a1 == 0) goto L72941;
+    if (((int)(unsigned char)*(signed char *)((char *)*(int *)D_00195BE0 + 67)) <= 8) goto L72982;
+L72941:;
+    *(int *)(D_001A4A68 + (a2 << 2)) = 0;
+    if (((int)(unsigned char)*(signed char *)((char *)*(int *)D_00195BE0 + 67)) >= 9) goto L7296C;
+    l_24 = 10;
+    goto L72973;
+L7296C:;
+    l_24 = 11;
+L72973:;
+    l_14 = l_24;
+    a1 = 0;
+    goto L729E8;
+L72982:;
+    l_18 = a1 + 71;
+    if (((int)(unsigned short)*(short *)((char *)l_18 + 32)) != 3) goto L72941;
+    l_14 = (int)(unsigned char)*(signed char *)(D_0018754C + ((int)(unsigned short)*(short *)((char *)l_18 + 34)));
+    if (l_14 != 9) goto L729C8;
+    *(int *)(D_001A4A68 + (a2 << 2)) = (int)D_001875B7;
+    goto L729D8;
+L729C8:;
+    *(int *)(D_001A4A68 + (a2 << 2)) = 0;
+L729D8:;
+    *(int *)(D_001A4A60 + (a2 << 2)) = 0;
+L729E8:;
+    *(int *)(D_001A4A30 + (a2 << 2)) = a1;
+    if (a1 == 0) goto L72A09;
+    if (((int)(short)*(short *)((char *)l_18 + 67)) != (-1)) goto L72A0B;
+L72A09:;
+    goto L72A1C;
+L72A0B:;
+    if (((int)(unsigned short)*(short *)((char *)l_18 + 34)) != 17) goto L72A1E;
+L72A1C:;
+    goto L72A2F;
+L72A1E:;
+    if (((int)(unsigned short)*(short *)((char *)l_18 + 34)) != 16) goto L72A31;
+L72A2F:;
+    goto L72A58;
+L72A31:;
+    func_000A0ED9(85, (int)D_0017615C);
+    func_000A0F5C((int)D_001903A4, (int)D_00176166, l_14);
+    goto L72A7D;
+L72A58:;
+    func_000A0ED9(87, (int)D_0017615C);
+    func_000A0F5C((int)D_001903A4, (int)D_00176175, l_14);
+L72A7D:;
+    *(int *)(D_001A4A58 + (a2 << 2)) = func_0006CB53((int)D_001903A4, 0);
+}
+}
 
 void func_00072AA0(void)
 {

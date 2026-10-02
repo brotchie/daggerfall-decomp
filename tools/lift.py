@@ -219,6 +219,10 @@ class Func:
                     addr.add(lo)          # indexed local array: [reg + ebp - x]
                     continue
                 off = ebp_slot(ins, op)
+                if off is None and op.type == cx.X86_OP_MEM and op.mem.base and \
+                        ins.reg_name(op.mem.base) == "ebp" and not op.mem.index and \
+                        op.mem.disp >= 8:
+                    off = -op.mem.disp    # stack parameter: typed like a slot, key < 0
                 if off is None:
                     continue
                 if ins.mnemonic == "lea":
@@ -256,6 +260,11 @@ class Func:
             self.slot_type[off] = t
         self.size_of = {"signed char": 1, "unsigned char": 1, "short": 2,
                         "unsigned short": 2, "int": 4, "unsigned": 4}
+        # stack parameters ([ebp+8], [ebp+12], ...): a narrow one makes callers push through a
+        # register (`mov eax,0x9c; push eax`)
+        self.stack_type = [self.slot_type.pop(-(8 + 4 * k), "int") for k in range(self.nstack)]
+        for o in [o for o in self.slot_type if o < 0]:
+            del self.slot_type[o]
         # Every 4-byte slot between the saved registers and the frame bottom belongs to a
         # declared variable (-od gives slots at declaration, used or not). An address-taken
         # slot is the base of an array reaching up to the next known variable.
@@ -362,8 +371,10 @@ class Func:
             return "*(%s *)&%s" % (STYPE[size], name)
         if base == "ebp" and not index and disp >= 8 and (disp - 8) % 4 == 0 \
                 and (disp - 8) // 4 < self.nstack:
-            name = "a%d" % (5 + (disp - 8) // 4)
-            return name if size == 4 else "*(%s *)&%s" % (STYPE[size], name)
+            k = (disp - 8) // 4
+            name = "a%d" % (5 + k)
+            return name if self.size_of[self.stack_type[k]] == size else \
+                "*(%s *)&%s" % (STYPE[size], name)
         if base == "ebp":
             raise Unsupported("stack parameter [ebp+%d]" % disp)
         fx = fixup_at(ins, ins.disp_offset) if ins.disp_size == 4 else None
@@ -819,7 +830,7 @@ class Func:
         for k, (reg, off, _sz) in enumerate(self.params):
             ps.append("%s a%d" % (self.slot_type.get(off, "int"), k + 1))
         for k in range(self.nstack):
-            ps.append("int a%d" % (5 + k))
+            ps.append("%s a%d" % (self.stack_type[k], 5 + k))
         # The slot rule (docs/progress.md) gives slots top down: 2-byte locals, the return
         # variable, other locals last to first; so declare locals deepest first.
         locals_ = sorted((o for o in set(self.slot_type) | set(self.arrays)
@@ -897,7 +908,7 @@ def signature(va):
             f.type_slots()
             ret = "void" if f.void else "int"
             # a return statement decides void-ness during lifting; the epilogue tells us now
-            SIGS[va] = (ret, f.sig_types + ["int"] * f.nstack)
+            SIGS[va] = (ret, f.sig_types + f.stack_type)
         except Unsupported:
             SIGS[va] = None
     return SIGS[va]

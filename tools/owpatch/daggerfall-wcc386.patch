@@ -843,6 +843,38 @@ index 3ea68d697a..f534ca058f 100644
      if( _FPULevel( FPU_87 ) ) {
          HW_CAsgn( STParmReg[Max87Stk], HW_EMPTY );
      }
+diff --git a/bld/cg/intel/c/x86call.c b/bld/cg/intel/c/x86call.c
+index f8ad0db4b0..aeb2c8412b 100644
+--- a/bld/cg/intel/c/x86call.c
++++ b/bld/cg/intel/c/x86call.c
+@@ -32,6 +32,7 @@
+ 
+ 
+ #include "_cgstd.h"
++#include <stdlib.h>
+ #include "coderep.h"
+ #include "cgmem.h"
+ #include "cgaux.h"
+@@ -438,6 +439,19 @@ instruction *   PushOneParm( instruction *ins, name *curr,
+ 
+     /* unused parameters */ (void)state; (void)offset;
+ 
++    /* Daggerfall: at -od, Watcom 10 pushed a stack variable through a register
++     * (`mov eax,[ebp-x]; push eax`); globals were pushed directly. DAGGER_PUSHMEM=1 restores
++     * Open Watcom. */
++    if( _IsModel( CGSW_GEN_NO_OPTIMIZATION ) && getenv( "DAGGER_PUSHMEM" ) == NULL
++      && curr->n.class == N_TEMP && TypeClassSize[type_class] == 4 ) {
++        name    *temp;
++
++        temp = AllocTemp( type_class );
++        new_ins = MakeMove( curr, temp, type_class );
++        SuffixIns( ins, new_ins );
++        ins = new_ins;
++        curr = temp;
++    }
+     new_ins = MakeUnary( OP_PUSH, curr, NULL, type_class );
+     SuffixIns( ins, new_ins );
+ #if 0
 diff --git a/bld/cg/intel/c/x86enc2.c b/bld/cg/intel/c/x86enc2.c
 index cfc287803e..6545a667a5 100644
 --- a/bld/cg/intel/c/x86enc2.c

@@ -32,6 +32,7 @@ extern int func_000CE4C4();
 extern void func_0005BC5B(int, int);
 extern void func_000728D2(void);
 extern void func_0007D3CA(int);
+extern void func_0007D62B(short, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char);
 extern void func_0007D723(void);
 extern void func_0007F87E(void);
 extern void func_00082487(void);
@@ -386,6 +387,13 @@ int func_0008A30A(int a1, int a2, int a3)
     l_14 = a3 + 71;
     *(signed char *)((char *)l_14 + 140) |= 1;
     return 1;
+}
+
+int func_0008A344(int a1, int a2, int a3)
+{
+    func_0007D62B(4000, 20, 21, 0, 97, 116, 0);
+    *(int *)D_00195B2C = 1;
+    return 0;
 }
 
 int func_0008A39A(int a1, int a2, int a3)

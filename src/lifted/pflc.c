@@ -6,10 +6,12 @@ extern char D_00175404[];
 
 extern int func_0009DEA7();
 extern int func_000A0024();
+extern int func_000A0DF4();
 extern int func_000A1023();
 extern int func_000CD33A();
 extern int func_00144FB4();
 extern void func_0005247B(int);
+extern void func_0007CA85(int, short, short, unsigned char, unsigned char);
 
 void func_00051CF9(int a1)
 {
@@ -79,5 +81,30 @@ L5244F:;
     *(signed char *)((char *)a1) &= 247;
     func_000CD33A(*(int *)((char *)a1 + 26), 0, 256);
 L52467:;
+    return 0;
+}
+
+int func_00052D3C(int a1)
+{
+    int l_20;
+    int l_1C;
+
+    l_1C = 0;
+    l_20 = 150;
+L52D5B:;
+    if (*(signed char *)((char *)a1) == 0) goto L52D69;
+    if (l_1C < 4) goto L52D6B;
+L52D69:;
+    goto L52D9F;
+L52D6B:;
+    func_0007CA85(a1, 160, (int)(short)*(short *)&l_20, 145, 156);
+    l_20 += 10;
+    l_1C++;
+    a1 += func_000A0DF4(a1) + 1;
+    goto L52D5B;
+L52D9F:;
+    if (*(signed char *)((char *)a1) == 0) goto L52DAF;
+    return a1;
+L52DAF:;
     return 0;
 }

@@ -4,6 +4,7 @@
 extern char D_0012AC00[];
 extern char D_00142309[];
 extern char D_00176198[];
+extern char D_0017627D[];
 extern char D_0017629C[];
 extern char D_001762B5[];
 extern char D_001762DD[];
@@ -74,17 +75,20 @@ extern char D_001A4FC8[];
 extern int func_0002257C(int, int, int, int);
 extern int func_00023C72(int, int);
 extern int func_0004A3EC(int);
-extern int func_0004C274(unsigned char, unsigned char, unsigned char, unsigned char, int);
+extern int func_0004C274(unsigned char, unsigned char, unsigned char, unsigned char, unsigned char);
 extern int func_00062EF7(int, int, int);
 extern int func_00069938(int, int, int);
 extern int func_0006CB53(int, int);
+extern int func_0006CD6E(int);
 extern int func_0007CBA1(int);
 extern int func_0007D6AE(int, int);
 extern int func_000801A4(void);
 extern int func_0008DADD(int);
 extern int func_0008DD46(int, int);
 extern int func_0009DC25();
+extern int func_0009DEA7();
 extern int func_000A0024();
+extern int func_000A00CB();
 extern int func_000A0ED9(int, int);
 extern int func_000A0F5C(int, ...);
 extern int func_000A17C1();
@@ -106,6 +110,19 @@ void func_00075B3F(void);
 void func_00075CFF(void);
 void func_00076952(void);
 #pragma aux func_000A0ED9 parm routine [];
+
+void func_000744FD(int a1)
+{
+    if (func_000A17C1(*(int *)D_00183248, (int)(unsigned char)*(signed char *)((char *)a1)) == 0) goto L7454D;
+    func_000A0ED9(204, (int)D_00176198);
+    func_000A0F5C((int)D_001903A4, *(int *)D_0018324C, a1);
+    goto L74575;
+L7454D:;
+    func_000A0ED9(206, (int)D_00176198);
+    func_000A0F5C((int)D_001903A4, *(int *)D_00183250, a1);
+L74575:;
+    func_0007CBA1((int)D_001903A4);
+}
 
 void func_00074589(int a1, int a2)
 {
@@ -183,6 +200,17 @@ L74C30:;
     *(short *)((char *)l_1C + 27) = *(short *)D_00195F58;
     l_1C = l_18;
     goto L74C30;
+}
+
+void func_00075172(int a1, int a2)
+{
+    int l_14;
+
+    func_000A0ED9(586, (int)D_00176198);
+    func_000A0F5C((int)D_001903A4, (int)D_0017627D, a2);
+    l_14 = func_0006CD6E((int)D_001903A4);
+    func_000A00CB(l_14, a1, 234);
+    func_0009DEA7(l_14);
 }
 
 void func_0007567B(int a1, int a2)

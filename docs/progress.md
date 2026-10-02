@@ -586,3 +586,15 @@ file of its own. Batch **1,140**. Build **1,144 / 2,297, 23.39%**.
   shape.
 
 Batch **1,167**.
+
+## 2026-10-01: stack-argument types and pushes (+38)
+
+- **Stack parameters get types** from how the callee reads `[ebp+8..]`, just like slots. A
+  `short`/`char` stack parameter makes callers push through a register
+  (`mov eax,0x9c; push eax`), which OW reproduces once the prototype says so (+9).
+- **Stack variables are pushed through a register**: Watcom 10 compiled a local argument as
+  `mov eax,[ebp-x]; push eax` (133 times in the original) but pushed globals directly (70).
+  `PushOneParm()` (`cg/intel/c/x86call.c`) now loads a 4-byte stack variable into a temp first
+  at `-od` (`DAGGER_PUSHMEM=1` restores OW). +29, -1.
+
+Batch **1,204**.

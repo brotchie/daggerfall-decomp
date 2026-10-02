@@ -5,12 +5,17 @@ extern char D_000CEA30[];
 extern char D_000CEA34[];
 extern char D_0012AC04[];
 extern char D_0012AC06[];
+extern char D_0012B508[];
 extern char D_0012DA44[];
 extern char D_00174FAC[];
 extern char D_00174FB3[];
 extern char D_00174FC0[];
 extern char D_00174FDF[];
 extern char D_00174FEC[];
+extern char D_00174FF5[];
+extern char D_00175010[];
+extern char D_0017D1E6[];
+extern char D_0017D1F2[];
 extern char D_001851FF[];
 extern char D_00185201[];
 extern char D_00190FE4[];
@@ -62,15 +67,20 @@ extern int func_000A00AF();
 extern int func_000A00CB();
 extern int func_000A0AD9();
 extern int func_000A0B42();
+extern int func_000A0DF4();
+extern int func_000A0ED9(int, int);
+extern int func_000A0F5C(int, ...);
 extern int func_000A1023();
 extern int func_000A1235();
 extern int func_000A138E();
 extern int func_000A17DC();
 extern int func_0012DB50();
+extern void func_0003EC2A(int, int);
 extern void func_0003F09F(short, int);
 extern void func_0004E02D(int, int, int, int);
 extern void func_0004E612(void);
 extern void func_00050069(int);
+extern void func_0008C4E4(int);
 extern void func_0008C566(int, int);
 int func_0004DA4A(int);
 int func_0004E8C8(int);
@@ -83,6 +93,7 @@ void func_0004E18B(void);
 void func_0004E1BC(void);
 void func_0004EA3C(int, int);
 void func_0004EC7A(void);
+#pragma aux func_000A0ED9 parm routine [];
 
 int func_0004D1E6(short a1)
 {
@@ -350,6 +361,20 @@ void func_0004E1BC(void)
     func_000A1023(*(int *)D_001997D8, *(int *)D_001997D4, 3640, (int)D_00174FAC, 450, 4);
 }
 
+void func_0004E227(void)
+{
+    int l_18;
+
+    *(signed char *)D_0012B508 = 146;
+    l_18 = *(int *)D_00195C44 + 55000;
+    func_000A0ED9(459, (int)D_00174FAC);
+    func_000A0F5C(l_18, (int)D_00174FF5, *(int *)D_0017D1E6);
+    *(signed char *)((char *)(func_000A0DF4(l_18) + l_18) + 1) = 0;
+    func_0003EC2A(l_18, 2);
+    func_0008C4E4(((int)(short)*(short *)D_001997E2) + 1);
+    *(signed char *)D_001997EC = 4;
+}
+
 void func_0004E2AB(short a1)
 {
 {
@@ -416,6 +441,23 @@ void func_0004E4E1(void)
 {
     (*(short *)D_001997DC)++;
     *(short *)D_001997DC &= 3;
+}
+
+void func_0004E508(void)
+{
+    int l_18;
+
+    func_0012DB50(4);
+    *(int *)D_001997C4 = *(int *)D_00195C44 + 56000;
+    l_18 = *(int *)D_00195C44 + 55000;
+    func_000A0ED9(540, (int)D_00174FAC);
+    func_000A0F5C(l_18, (int)D_00175010, *(int *)D_0017D1F2);
+    *(signed char *)((char *)(func_000A0DF4(l_18) + l_18) + 1) = 0;
+    func_0003EC2A(l_18, 2);
+    func_000A0040(*(int *)D_001997C4, 0, 24, (int)D_00174FAC, 543, 4);
+    func_0008C566(*(int *)D_001997C4, 23);
+    *(signed char *)D_001997DE |= 128;
+    *(int *)D_001997C8 = *(int *)D_001997D4;
 }
 
 int func_0004E5C7(int a1)

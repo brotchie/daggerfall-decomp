@@ -3,10 +3,18 @@
 
 extern char D_00142314[];
 extern char D_00171044[];
+extern char D_0017104D[];
+extern char D_0017105A[];
+extern char D_0017105D[];
+extern char D_00171062[];
 extern char D_001710A7[];
 extern char D_001710D6[];
 extern char D_0017BB01[];
 extern char D_0017BB39[];
+extern char D_001903A4[];
+extern char D_001903BA[];
+extern char D_001917E4[];
+extern char D_00191834[];
 extern char D_001940D4[];
 extern char D_001940D6[];
 extern char D_001940D9[];
@@ -28,13 +36,51 @@ extern int func_000392AD(void);
 extern int func_0003B1F3(short);
 extern int func_0007CBA1(int);
 extern int func_0008DA91(int);
+extern int func_0009DA1C(int, int);
+extern int func_0009DAEE(int, ...);
+extern int func_0009DC59(int, ...);
+extern int func_0009DEA7();
 extern int func_000A0040();
+extern int func_000A00CB();
+extern int func_000A0ED9(int, int);
+extern int func_000A0F5C(int, ...);
+extern int func_000A148C(int, ...);
+extern int func_000A16F8(int, ...);
 extern int func_000C7FD9();
 extern int func_000CAE1C();
 extern void func_0001D739(void);
 extern void func_0007D3CA(int);
 extern void func_0008E3F7(int, int);
 void func_00046114(int);
+#pragma aux func_0009DA1C parm routine [];
+#pragma aux func_000A0ED9 parm routine [];
+
+void func_00044D03(int a1)
+{
+    int l_1C;
+    int l_18;
+
+    func_000A0ED9(78, (int)D_00171044);
+    func_000A0F5C((int)D_001903A4, (int)D_0017104D, (int)D_001917E4);
+    l_1C = func_0009DC59((int)D_001903A4, 512);
+    if (l_1C >= 0) goto L44D9E;
+    func_000A0ED9(81, (int)D_00171044);
+    func_000A0F5C((int)D_001903A4, (int)D_0017104D, (int)D_00191834);
+    l_1C = func_0009DC59((int)D_001903A4, 512);
+    if (l_1C < 0) return;
+L44D9E:;
+    func_000A00CB(l_1C, (int)D_001903A4, 80);
+    func_000A16F8((int)D_001903BA, (int)D_0017105A, (int)&l_18);
+    if (a1 == 0) goto L44DEF;
+    func_0009DA1C(90, (int)D_00171044);
+    func_0009DAEE((int)D_0017105D, l_18);
+    goto L44E0E;
+L44DEF:;
+    func_000A0ED9(92, (int)D_00171044);
+    func_000A148C((int)D_00171062, l_18);
+L44E0E:;
+    func_0009DEA7(l_1C);
+}
 
 void func_00044E20(int a1)
 {
