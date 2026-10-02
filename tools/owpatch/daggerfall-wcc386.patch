@@ -413,6 +413,56 @@ index 9a81270076..df76f781b1 100644
          }
          if( new_head != NULL
            && new_head != Head ) {
+diff --git a/bld/cg/c/makeaddr.c b/bld/cg/c/makeaddr.c
+index 759b3b65c1..5392151dbe 100644
+--- a/bld/cg/c/makeaddr.c
++++ b/bld/cg/c/makeaddr.c
+@@ -32,6 +32,7 @@
+ 
+ 
+ #include "_cgstd.h"
++#include <stdlib.h>
+ #include "coderep.h"
+ #include "zoiks.h"
+ #include "freelist.h"
+@@ -241,6 +242,27 @@ static  name    *Display( cg_sym_handle symbol, level_depth level )
+ }
+ 
+ 
++static bool DaggerKeepTemp( instruction *ins, name *dst_name )
++/**************************************************************
++ * Daggerfall: at -od, Watcom 10 compiled `x = x + 1` as `mov eax,[x]; inc eax; mov [x],eax`;
++ * only `x++` and `x += 1` became `inc [x]`. Open Watcom points the add straight at x, which
++ * the encoder turns into `inc [x]`. Keep the temp when the destination is also an operand.
++ * DAGGER_RMW=1 restores Open Watcom.
++ */
++{
++    opcnt   i;
++
++    if( _IsntModel( CGSW_GEN_NO_OPTIMIZATION ) || getenv( "DAGGER_RMW" ) != NULL )
++        return( false );
++    for( i = 0; i < ins->num_operands; i++ ) {
++        if( ins->operands[i] == dst_name ) {
++            return( true );
++        }
++    }
++    return( false );
++}
++
++
+ an      MakeGets( an dst, an src, const type_def *tipe )
+ /******************************************************/
+ {
+@@ -253,7 +275,8 @@ an      MakeGets( an dst, an src, const type_def *tipe )
+     InsToAddr( dst );
+     dst_name = Points( dst, tipe );
+     ins = src->u.i.ins;
+-    if( src->format == NF_INS && CurrBlock->ins.head.prev == ins ) {
++    if( src->format == NF_INS && CurrBlock->ins.head.prev == ins
++      && !DaggerKeepTemp( ins, dst_name ) ) {
+         ins->result = dst_name;
+         src->format = NF_ADDR;  /* so instruction doesn't get freed! */
+     } else {
 diff --git a/bld/cg/c/multiply.c b/bld/cg/c/multiply.c
 index 76c9e5daf1..abc589fae0 100644
 --- a/bld/cg/c/multiply.c

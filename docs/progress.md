@@ -375,3 +375,37 @@ errors and first differences, which is the to-do list.
 First run: **537 / 2,297 match** (23%), against 26 by hand. 815 hit an instruction or shape
 the lifter doesn't handle yet (three-operand `imul` 297, stack-argument calls 120,
 `idiv`/`div` 149, ...), 529 produce C that doesn't compile, and 416 compile but differ.
+
+## 2026-10-01: lifter v2 and the first batch-found compiler differences
+
+Lifter v2 types every stack slot from its accesses in a pre-pass, and handles three-operand
+`imul`, `idiv`/`div` (with the `x - (x >> 31) >> 1` idiom for `/ 2`), cdecl calls (stack
+arguments with caller cleanup, declared `int f(int, ...)`) and `if (...) return;` for jumps
+to the epilogue. The report now ignores relocated bytes and branch displacements when it looks
+for the first difference, so it names the real cause.
+
+**674 / 2,297 game functions match** (29%), the whole batch in 2 seconds. Remaining: 1,110
+differ, 512 unsupported, 2 lifter errors.
+
+The batch found compiler differences that hand matching would have taken weeks to hit:
+
+1. **`x = x + 1`** (fixed, `DAGGER_RMW=1` restores OW). Watcom 10 compiled it as
+   `mov eax,[x]; inc eax; mov [x],eax`; only `x++`/`x += 1` became `inc [x]` (1,181 of those in
+   the original). OW's `MakeGets()` points the add straight at `x`, which the encoder turns
+   into `inc [x]`. The patch keeps the temp when the destination is also an operand.
+2. **An unused `x++`** (open, about 140 functions). Watcom 10 still loads the old value:
+   `mov eax,[x]; inc [x]`. `y = x++` gives that shape in OW, so only the discarded case
+   differs. A debugger trace shows `DeadTemps()` (`cg/c/optimize.c`, called from
+   `BlockToCode()` at `-od`) frees the load. With that blocked by a temp flag, `AxeDeadCode()`
+   does, and with that blocked too it still disappears, so there's a third pass. Reverted for
+   now. Next: trace again with both blocked.
+3. **Byte/word compares through pointers** (open, about 100 functions). Watcom 10 compares
+   named variables and `*p` narrow (`cmp byte ptr [x], 2`: 687 globals, 548 locals, 138
+   `*p == 0`), but widens fields read through pointer arithmetic (`mov al,[eax+0x22];
+   and eax,0xff; cmp eax,2`, about 1,600 cases). OW narrows them all. Turning off demotion in
+   `TGCompare()` changed nothing, so the narrowing happens earlier, probably in the C front
+   end's folding. Reverted for now.
+
+Lesson for the workflow: fix compiler differences only once the batch shows a cluster, A/B
+each patch across the whole batch with its env switch, and timebox the debugging. The
+debugger is the fast way to find which pass drops an instruction.

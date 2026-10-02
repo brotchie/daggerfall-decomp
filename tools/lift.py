@@ -6,58 +6,72 @@ Watcom's -od output is a near-literal translation of the source: every statement
 operands from memory, computes in registers and ends with a store, a call or a branch, and no
 register value survives into the next statement. So the lifter executes each instruction
 symbolically (register -> C expression) and emits a statement whenever something is stored,
-called with its result unused, or branched on. Control flow is emitted as `if (...) goto` and
-`goto`, which -od compiles back to the same cmp/jcc/jmp; the peephole optimiser makes the same
-choices Watcom 10 did. Structuring into if/while is a later, separately verified pass.
+a call's result goes unused, or a branch is taken. Control flow comes out as `if (...) goto`
+and `goto`, which -od compiles back to the same cmp/jcc/jmp; the peephole optimiser makes the
+same choices Watcom 10 did. Structuring into if/while is a later, separately verified pass.
 
 Conventions in the generated C:
   - globals are `char D_XXXXXXXX[]` and accessed through casts (`*(int *)D_X`), so no type
     inference is needed; a reference to D+4 is its own symbol D_(X+4)
-  - every function is declared `int func_X();` (no prototype: arguments are passed in
-    eax, edx, ebx, ecx exactly as the call site loads them)
-  - parameters are a1..a4, locals are named by frame offset (l_1C for [ebp-0x1C])
+  - callees are unprototyped `int func_X();` (arguments are passed in eax, edx, ebx, ecx as the
+    call site loads them), except callees taking stack arguments, which are `int f(int, ...);`
+  - parameters are a1..a4; locals are named by frame offset (l_1C for [ebp-0x1C]); each stack
+    slot's type comes from how the function accesses it (a pre-pass)
 
 Anything the lifter does not handle raises Unsupported(reason); the batch driver counts the
 reasons so the most common gap is fixed first.
 
-usage: lift.py func_XXXXXXXX     (prints the C)
+usage: lift.py func_XXXXXXXX ...     (prints the C)
 """
 import csv
 import os
 import re
-import struct
 import sys
 
 import capstone
 from capstone import x86 as cx
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from le import LE, SRC_OFF32, SRC_REL32  # noqa: E402
+from le import LE, SRC_OFF32  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 EXE = os.path.join(ROOT, "orig", "1.07.213", "FALL.EXE")
 PARM_REGS = ["eax", "edx", "ebx", "ecx"]
 SAVE_ORDER = ["ebx", "ecx", "edx", "esi", "edi"]
-SIZE_TYPE = {1: "char", 2: "short", 4: "int"}
+STYPE = {1: "signed char", 2: "short", 4: "int"}
 UTYPE = {1: "unsigned char", 2: "unsigned short", 4: "unsigned"}
 JCC = {  # mnemonic -> (operator, unsigned compare)
     "je": ("==", False), "jne": ("!=", False),
     "jl": ("<", False), "jle": ("<=", False), "jg": (">", False), "jge": (">=", False),
     "jb": ("<", True), "jbe": ("<=", True), "ja": (">", True), "jae": (">=", True),
 }
-REG8 = {"al": "eax", "dl": "edx", "bl": "ebx", "cl": "ecx"}
-REG16 = {"ax": "eax", "dx": "edx", "bx": "ebx", "cx": "ecx", "si": "esi", "di": "edi"}
+NEG = {"==": "!=", "!=": "==", "<": ">=", ">=": "<", ">": "<=", "<=": ">"}
+SUB = {}
+for full, b, w in (("eax", "al", "ax"), ("edx", "dl", "dx"), ("ebx", "bl", "bx"),
+                   ("ecx", "cl", "cx"), ("esi", None, "si"), ("edi", None, "di")):
+    SUB[full] = (full, 4)
+    SUB[w] = (full, 2)
+    if b:
+        SUB[b] = (full, 1)
 
 
 class Unsupported(Exception):
     pass
 
 
-class E:
-    """A C expression. `size` is how many low bytes of the register are meaningful (1, 2, 4)."""
+def subreg(name):
+    """(full register, size) for a register name; high byte registers are not handled."""
+    if name not in SUB:
+        raise Unsupported("register %s" % name)
+    return SUB[name]
 
-    def __init__(self, text, size=4, atom=False):
-        self.text, self.size, self.atom = text, size, atom
+
+class E:
+    """A C expression. `size` = how many low bytes are meaningful; `tag` marks idioms in
+    progress (('sign', X) for X >> 31, ('half', X) for X - (X >> 31))."""
+
+    def __init__(self, text, size=4, atom=False, tag=None):
+        self.text, self.size, self.atom, self.tag = text, size, atom, tag
 
     def p(self):
         return self.text if self.atom else "(%s)" % self.text
@@ -83,6 +97,9 @@ class Image:
         return list(self.md.disasm(self.code(va, self.funcs[va]), va))
 
 
+IMG = None
+
+
 def fixup_at(ins, offset):
     """The off32 fixup on the 4-byte field at `offset` in the instruction, if any."""
     if not offset:
@@ -95,26 +112,34 @@ def sym(va):
     return ("func_%08X" if va in IMG.funcs else "D_%08X") % va
 
 
+def ebp_slot(ins, op):
+    """Frame offset (positive) of an [ebp - x] operand, else None."""
+    if op.type != cx.X86_OP_MEM or not op.mem.base or ins.reg_name(op.mem.base) != "ebp" \
+            or op.mem.index or op.mem.disp >= 0:
+        return None
+    return -op.mem.disp
+
+
 class Func:
     def __init__(self, va):
         self.va = va
         self.ins = IMG.insns(va)
-        self.out = []            # C statement lines
+        self.out = []            # C lines
         self.globals = set()     # D_ symbols used
-        self.calls = set()       # func_ symbols used
-        self.labels = set()
+        self.calls = set()       # func_ symbols called with registers
+        self.vcalls = set()      # func_ symbols called with stack arguments
         self.regs = {}
-        self.pending = None      # (reg, call expression) not yet emitted
+        self.pending = None      # call expression in eax not yet emitted
         self.pushes = []
-        self.flags = None        # ("cmp", a, b) / ("test", a, b)
+        self.flags = None
         self.ret_slot = None
         self.void = True
-        self.slot_size = {}
+        self.after_return = False
 
     # ---- frame -------------------------------------------------------------------------
     def prologue(self):
         ins = self.ins
-        if len(ins) < 3 or ins[0].mnemonic != "push" or ins[0].op_str != "ebp" or \
+        if len(ins) < 4 or ins[0].mnemonic != "push" or ins[0].op_str != "ebp" or \
                 ins[1].mnemonic != "mov" or ins[1].op_str != "ebp, esp":
             raise Unsupported("prologue: no ebp frame")
         i, saved = 2, []
@@ -123,27 +148,27 @@ class Func:
             i += 1
         if ins[i].mnemonic != "sub" or not ins[i].op_str.startswith("esp, "):
             raise Unsupported("prologue: no sub esp")
-        self.frame = int(ins[i].op_str.split(", ")[1], 16)
         self.saved = saved
         i += 1
-        # register parameters are spilled first, in eax, edx, ebx, ecx order
-        self.params = []
-        nparm_max = len([r for r in PARM_REGS if r not in saved])
+        self.params = []         # (reg, slot)
         for reg in PARM_REGS:
-            if len(self.params) == nparm_max or i >= len(ins):
+            if reg in saved or i >= len(ins):
                 break
-            m = re.fullmatch(r"(?:dword|word|byte) ptr \[ebp - (0x[0-9a-f]+)\], (\w+)", ins[i].op_str)
-            if ins[i].mnemonic == "mov" and m and m.group(2) in (reg, reg[1:], reg[1] + "l"):
-                self.params.append((reg, int(m.group(1), 16), {"d": 4, "w": 2, "b": 1}[ins[i].op_str[0]]))
+            d = ins[i].operands[0] if ins[i].operands else None
+            s = ins[i].operands[1] if len(ins[i].operands) > 1 else None
+            if ins[i].mnemonic == "mov" and d is not None and ebp_slot(ins[i], d) and \
+                    s.type == cx.X86_OP_REG and SUB.get(ins[i].reg_name(s.reg), (None,))[0] == reg:
+                self.params.append((reg, ebp_slot(ins[i], d), d.size))
                 i += 1
             else:
                 break
-        if len(self.params) != nparm_max and nparm_max < 4 and saved != SAVE_ORDER[:len(saved)]:
-            pass
+        # eax is never saved (it returns the result), so a free eax alone proves nothing; any
+        # other free register carries a parameter
+        free = [r for r in PARM_REGS if r not in saved]
+        if len(free) >= 2 and len(self.params) != len(free):
+            raise Unsupported("prologue: %d free registers but %d spills" % (len(free), len(self.params)))
         self.body_start = i
-        self.top = 4 * (1 + len(saved))   # first slot below the saved registers is -(top+4)
-        # epilogue: lea esp, [ebp - top]; pops; pop ebp; ret
-        if self.ins[-1].mnemonic != "ret" or self.ins[-1].op_str:
+        if ins[-1].mnemonic != "ret" or ins[-1].op_str:
             raise Unsupported("epilogue: not a plain ret")
         j = len(ins) - 2
         while ins[j].mnemonic == "pop":
@@ -152,14 +177,61 @@ class Func:
             raise Unsupported("epilogue: no lea esp")
         self.epi = ins[j].address
         self.body_end = j
-        if j > 0 and ins[j - 1].mnemonic == "mov" and \
-                re.fullmatch(r"eax, dword ptr \[ebp - 0x[0-9a-f]+\]", ins[j - 1].op_str):
-            self.ret_slot = int(ins[j - 1].op_str.split("- ")[1].rstrip("]"), 16)
+        prev = ins[j - 1]
+        if prev.mnemonic == "mov" and prev.op_str.startswith("eax, dword ptr [ebp - "):
+            self.ret_slot = ebp_slot(prev, prev.operands[1])
             self.void = False
-            self.ret_ins = ins[j - 1].address
+            self.ret_ins = prev.address
             self.body_end = j - 1
         else:
             self.ret_ins = self.epi
+
+    def type_slots(self):
+        """Pre-pass: give every stack slot a C type from its accesses."""
+        acc = {}       # slot -> set of sizes
+        sign = {}      # slot -> 's' / 'u' hints
+        addr = set()
+        body = self.ins[self.body_start:self.body_end]
+        for k, ins in enumerate(body):
+            for n, op in enumerate(ins.operands):
+                off = ebp_slot(ins, op)
+                if off is None:
+                    continue
+                if ins.mnemonic == "lea":
+                    addr.add(off)
+                    continue
+                acc.setdefault(off, set()).add(op.size)
+                if ins.mnemonic == "movsx":
+                    sign.setdefault(off, set()).add("s")
+                elif ins.mnemonic == "movzx":
+                    sign.setdefault(off, set()).add("u")
+                elif ins.mnemonic == "mov" and n == 1 and op.size < 4:
+                    nxt = body[k + 1] if k + 1 < len(body) else None
+                    prv = body[k - 1] if k else None
+                    if nxt is not None and (nxt.mnemonic == "cwde" or
+                                            (nxt.mnemonic == "movsx" and op.size == 1)):
+                        sign.setdefault(off, set()).add("s")
+                    elif (nxt is not None and nxt.mnemonic == "and" and
+                          nxt.op_str in ("eax, 0xff", "eax, 0xffff")) or \
+                            (prv is not None and prv.mnemonic == "xor"):
+                        sign.setdefault(off, set()).add("u")
+        self.slot_type = {}
+        for reg, off, _sz in self.params:
+            acc.setdefault(off, set())
+        for off, sizes in acc.items():
+            if off == self.ret_slot:
+                continue
+            body_sizes = sizes - {4} if off in [p[1] for p in self.params] else sizes
+            sz = min(body_sizes) if body_sizes and len(body_sizes) == 1 else 4
+            if off in addr:
+                sz = 4
+            hint = sign.get(off, set())
+            t = (UTYPE if hint == {"u"} or (sz == 1 and hint != {"s"}) else STYPE)[sz]
+            self.slot_type[off] = t
+        for off in addr:
+            self.slot_type.setdefault(off, "int")
+        self.size_of = {"signed char": 1, "unsigned char": 1, "short": 2,
+                        "unsigned short": 2, "int": 4, "unsigned": 4}
 
     def var(self, off):
         for k, (reg, o, sz) in enumerate(self.params):
@@ -167,71 +239,66 @@ class Func:
                 return "a%d" % (k + 1)
         if off == self.ret_slot:
             return None
-        self.slot_size.setdefault(off, 4)
         return "l_%X" % off
 
     # ---- operands ----------------------------------------------------------------------
     def mem(self, op, ins, size):
-        """C lvalue text for a memory operand."""
+        """C lvalue text for a memory operand ('@RET' for the return slot)."""
         m = op.mem
         disp = m.disp
         base = ins.reg_name(m.base) if m.base else None
         index = ins.reg_name(m.index) if m.index else None
-        seg = ins.reg_name(m.segment) if m.segment else None
-        if seg not in (None, "ds"):
+        if m.segment and ins.reg_name(m.segment) not in ("ds", "cs"):
             raise Unsupported("segment override")
-        t = SIZE_TYPE[size]
-        # fixup inside the instruction = absolute address of a global
-        fx = fixup_at(ins, ins.disp_offset) if ins.disp_size == 4 else None
-        if base == "ebp" and index is None:
-            if disp < 0:
-                name = self.var(-disp)
-                if name is None:
-                    return "@RET"
-                self.slot_size[-disp] = max(size, self.slot_size.get(-disp, 0)) \
-                    if not name.startswith("a") else 4
-                if name.startswith("l_") and size != 4:
-                    return "*(%s *)&%s" % (t, name)
-                return name if size == 4 or name.startswith("l_") else "*(%s *)&%s" % (t, name)
+        off = ebp_slot(ins, op)
+        if off is not None:
+            name = self.var(off)
+            if name is None:
+                return "@RET"
+            t = self.slot_type.get(off, "int")
+            if self.size_of[t] == size:
+                return name
+            return "*(%s *)&%s" % (STYPE[size], name)
+        if base == "ebp":
             raise Unsupported("stack parameter [ebp+%d]" % disp)
+        fx = fixup_at(ins, ins.disp_offset) if ins.disp_size == 4 else None
         parts = []
         if fx is not None:
             g = sym(fx.target_va)
             self.globals.add(g)
             parts.append(g)
-        elif disp and not base and not index:
-            raise Unsupported("absolute address without fixup")
-        if base:
+            if base:
+                parts.append(self.reg(base, ins).p())
+        elif base:
             parts.append("(char *)" + self.reg(base, ins).p())
+        elif not index:
+            raise Unsupported("absolute address without fixup")
         if index:
-            sc = m.scale
             iexp = self.reg(index, ins).p()
-            parts.append(iexp if sc == 1 else "%s * %d" % (iexp, sc))
+            parts.append(iexp if m.scale == 1 else "%s * %d" % (iexp, m.scale))
+            if not fx and not base:
+                parts[-1] = "(char *)0 + " + parts[-1]
         if fx is None and disp:
-            parts.append(str(disp) if disp > 0 else None)
-            if disp < 0:
-                parts[-1] = None
-                parts.append("-%d" % -disp)
-        parts = [p for p in parts if p]
-        addr = parts[0] if fx is not None and len(parts) == 1 else " + ".join(parts).replace("+ -", "- ")
-        return "*(%s *)(%s)" % (t, addr)
+            parts.append(("+ %d" if disp > 0 else "- %d") % abs(disp))
+        addr = parts[0]
+        for p in parts[1:]:
+            addr += (" " + p) if p.startswith(("+ ", "- ")) else " + " + p
+        if len(parts) == 1 and fx is not None:
+            return "*(%s *)%s" % (STYPE[size], addr)
+        return "*(%s *)(%s)" % (STYPE[size], addr)
 
     def reg(self, name, ins):
         r = self.regs.get(name)
         if r is None:
-            raise Unsupported("read of undefined register %s at %x" % (name, ins.address))
-        if self.pending and self.pending[0] == name:
+            raise Unsupported("read of undefined register %s" % name)
+        if self.pending is not None and r is self.pending:
             self.pending = None
         return r
 
-    def src(self, op, ins, size):
+    def src(self, op, ins):
         if op.type == cx.X86_OP_REG:
-            n = ins.reg_name(op.reg)
-            if n in REG8:
-                return self.reg(REG8[n], ins)
-            if n in REG16:
-                return self.reg(REG16[n], ins)
-            return self.reg(n, ins)
+            full, _sz = subreg(ins.reg_name(op.reg))
+            return self.reg(full, ins)
         if op.type == cx.X86_OP_IMM:
             fx = fixup_at(ins, ins.imm_offset) if ins.imm_size == 4 else None
             if fx is not None:
@@ -251,8 +318,8 @@ class Func:
 
     # ---- statements --------------------------------------------------------------------
     def flush_pending(self):
-        if self.pending:
-            self.out.append("    %s;" % self.pending[1].text)
+        if self.pending is not None:
+            self.out.append("    %s;" % self.pending.text)
             self.pending = None
 
     def emit(self, line):
@@ -260,55 +327,66 @@ class Func:
         self.out.append("    " + line)
 
     def set_reg(self, name, expr):
-        if self.pending and self.pending[0] == name:
+        cur = self.regs.get(name)
+        if self.pending is not None and cur is self.pending and expr is not cur:
             self.flush_pending()
         self.regs[name] = expr
 
     def lift(self):
         self.prologue()
+        self.type_slots()
         targets = set()
         for ins in self.ins:
-            if cx.X86_GRP_JUMP in ins.groups and ins.operands[0].type == cx.X86_OP_IMM:
+            if cx.X86_GRP_JUMP in ins.groups and ins.operands and \
+                    ins.operands[0].type == cx.X86_OP_IMM:
                 targets.add(ins.operands[0].imm)
-        i = self.body_start
-        body = self.ins[i:self.body_end]
-        for ins in body:
+        self.targets = targets
+        body = self.ins[self.body_start:self.body_end]
+        self.body = body
+        for k, ins in enumerate(body):
             if ins.address in targets:
                 self.flush_pending()
-                self.labels.add(ins.address)
                 self.out.append("L%X:;" % ins.address)
                 self.regs = {}
+                self.after_return = False
+            self.k = k
             self.step(ins)
         self.flush_pending()
-        if self.ret_ins in targets or self.epi in targets:
-            pass
+
+    def cond_text(self, m):
+        opr, uns = JCC[m]
+        kind = self.flags[0]
+        a, b = self.flags[1], self.flags[2]
+        if kind == "cmp":
+            if uns:
+                a = E("(unsigned)" + a.p(), 4)
+            return "%s %s %s" % (a.p(), opr, b.p())
+        if kind == "test":
+            if opr not in ("==", "!="):
+                raise Unsupported("test with ordered jcc")
+            if a.text == b.text:
+                return "%s %s 0" % (a.p(), opr)
+            return "(%s & %s) %s 0" % (a.p(), b.p(), opr)
+        raise Unsupported("jcc on arithmetic flags")
 
     def step(self, ins):
         m, ops = ins.mnemonic, ins.operands
+        if m == "nop":
+            return
         if m == "mov":
             d, s = ops
             if d.type == cx.X86_OP_REG:
-                n = ins.reg_name(d.reg)
-                v = self.src(s, ins, d.size)
-                if n in REG8:
-                    full = REG8[n]
-                    cur = self.regs.get(full)
-                    if cur is not None and cur.text == "0":
-                        self.set_reg(full, E("(unsigned char)" + v.p(), 4))
-                    else:
-                        self.set_reg(full, E(v.text, 1, v.atom))
-                elif n in REG16:
-                    full = REG16[n]
-                    cur = self.regs.get(full)
-                    if cur is not None and cur.text == "0":
-                        self.set_reg(full, E("(unsigned short)" + v.p(), 4))
-                    else:
-                        self.set_reg(full, E(v.text, 2, v.atom))
+                full, sz = subreg(ins.reg_name(d.reg))
+                v = self.src(s, ins)
+                cur = self.regs.get(full)
+                if sz < 4 and cur is not None and cur.text == "0":
+                    self.set_reg(full, E("(%s)%s" % (UTYPE[sz], v.p()), 4))
+                elif sz < 4:
+                    self.set_reg(full, E(v.text, sz, v.atom))
                 else:
-                    self.set_reg(n, v)
+                    self.set_reg(full, v)
                 return
-            # store
-            v = self.src(s, ins, d.size)
+            v = self.src(s, ins)
             lhs = self.mem(d, ins, d.size)
             if lhs == "@RET":
                 self.void = False
@@ -319,148 +397,180 @@ class Func:
             return
         if m in ("movsx", "movzx"):
             d, s = ops
-            n = ins.reg_name(d.reg)
-            v = self.src(s, ins, s.size)
-            t = (SIZE_TYPE if m == "movsx" else UTYPE)[s.size]
-            if v.size == s.size or s.type == cx.X86_OP_MEM:
-                self.set_reg(n, E("(%s)%s" % (t, v.p()), 4))
-            else:
-                self.set_reg(n, E("(%s)%s" % (t, v.p()), 4))
+            full, _ = subreg(ins.reg_name(d.reg))
+            v = self.src(s, ins)
+            t = (STYPE if m == "movsx" else UTYPE)[s.size]
+            self.set_reg(full, E("(%s)%s" % (t, v.p()), 4))
             return
         if m == "cwde":
             v = self.reg("eax", ins)
             self.set_reg("eax", E("(short)" + v.p(), 4))
             return
-        if m == "xor" and ops[0].type == cx.X86_OP_REG and ops[1].type == cx.X86_OP_REG and \
-                ops[0].reg == ops[1].reg:
-            self.set_reg(ins.reg_name(ops[0].reg), E("0", 4, atom=True))
+        if m == "cdq":
+            v = self.reg("eax", ins)
+            self.set_reg("edx", E("%s >> 31" % v.p(), 4, tag=("sign", v)))
+            return
+        if m in ("xor", "sub") and ops[0].type == cx.X86_OP_REG and \
+                ops[1].type == cx.X86_OP_REG and ops[0].reg == ops[1].reg:
+            self.set_reg(subreg(ins.reg_name(ops[0].reg))[0], E("0", 4, atom=True))
+            return
+        if m == "imul" and len(ops) == 3:
+            full, _ = subreg(ins.reg_name(ops[0].reg))
+            a = self.src(ops[1], ins)
+            b = self.src(ops[2], ins)
+            self.set_reg(full, E("%s * %s" % (a.p(), b.p()), 4))
+            return
+        if m in ("idiv", "div"):
+            a = self.reg("eax", ins)
+            d = self.regs.get("edx")
+            b = self.src(ops[0], ins)
+            if m == "idiv" and not (d is not None and d.tag and d.tag[0] == "sign"):
+                raise Unsupported("idiv without sign extension")
+            if m == "div" and not (d is not None and d.text == "0"):
+                raise Unsupported("div without zeroed edx")
+            if m == "div":
+                a = E("(unsigned)" + a.p(), 4)
+            self.set_reg("eax", E("%s / %s" % (a.p(), b.p()), 4))
+            self.set_reg("edx", E("%s %% %s" % (a.p(), b.p()), 4))
             return
         if m in ("add", "sub", "and", "or", "xor", "imul", "shl", "sar", "shr"):
-            if m == "imul" and len(ops) != 2:
-                raise Unsupported("imul with 3 operands")
             d, s = ops
             opch = {"add": "+", "sub": "-", "and": "&", "or": "|", "xor": "^", "imul": "*",
                     "shl": "<<", "sar": ">>", "shr": ">>"}[m]
             if d.type == cx.X86_OP_REG:
-                n = ins.reg_name(d.reg)
-                if n not in self.regs and n in REG8.values():
-                    pass
-                full = REG8.get(n) or REG16.get(n) or n
+                full, sz = subreg(ins.reg_name(d.reg))
                 a = self.reg(full, ins)
-                b = self.src(s, ins, d.size)
-                if m == "and" and s.type == cx.X86_OP_IMM and s.imm in (0xFF, 0xFFFF) and d.size == 4:
+                b = self.src(s, ins)
+                if m == "and" and s.type == cx.X86_OP_IMM and sz == 4 and s.imm in (0xFF, 0xFFFF):
                     t = "unsigned char" if s.imm == 0xFF else "unsigned short"
                     self.set_reg(full, E("(%s)%s" % (t, a.p()), 4))
                     return
+                # signed division by 2: X - (X >> 31), then >> 1
+                if m == "sar" and s.type == cx.X86_OP_IMM and s.imm == 31:
+                    self.set_reg(full, E("%s >> 31" % a.p(), 4, tag=("sign", a)))
+                    return
+                if m == "sub" and b.tag and b.tag[0] == "sign" and b.tag[1].text == a.text:
+                    self.set_reg(full, E("%s - %s" % (a.p(), b.p()), 4, tag=("half", a)))
+                    return
+                if m == "sar" and a.tag and a.tag[0] == "half" and s.type == cx.X86_OP_IMM \
+                        and s.imm == 1:
+                    self.set_reg(full, E("%s / 2" % a.tag[1].p(), 4))
+                    return
                 if m == "shr":
                     a = E("(unsigned)" + a.p(), 4)
-                self.set_reg(full, E("%s %s %s" % (a.p(), opch, b.p()), d.size))
-                self.flags = ("val", self.regs[full])
+                v = E("%s %s %s" % (a.p(), opch, b.p()), max(sz, 1))
+                self.set_reg(full, v)
+                self.flags = ("val", v, None)
                 return
-            # read-modify-write memory
             lhs = self.mem(d, ins, d.size)
-            b = self.src(s, ins, d.size)
+            b = self.src(s, ins)
             if lhs == "@RET":
-                raise Unsupported("rmw on the return slot")
+                raise Unsupported("read-modify-write of the return slot")
             self.emit("%s %s= %s;" % (lhs, opch, b.text))
             return
         if m in ("inc", "dec", "neg", "not"):
             d = ops[0]
             if d.type == cx.X86_OP_REG:
-                n = ins.reg_name(d.reg)
-                a = self.reg(n, ins)
+                full, _ = subreg(ins.reg_name(d.reg))
+                a = self.reg(full, ins)
                 t = {"inc": "%s + 1", "dec": "%s - 1", "neg": "-%s", "not": "~%s"}[m] % a.p()
-                self.set_reg(n, E(t, 4))
+                self.set_reg(full, E(t, 4))
                 return
             lhs = self.mem(d, ins, d.size)
+            if lhs == "@RET":
+                raise Unsupported("read-modify-write of the return slot")
+            lv = lhs if re.fullmatch(r"\w+", lhs) else "(%s)" % lhs
             self.emit({"inc": "%s++;", "dec": "%s--;", "neg": "%s = -%s;", "not": "%s = ~%s;"}[m]
-                      % ((lhs,) if m in ("inc", "dec") else (lhs, lhs)))
+                      % ((lv,) if m in ("inc", "dec") else (lhs, lv)))
             return
         if m in ("cmp", "test"):
-            a = self.src(ops[0], ins, ops[0].size)
-            b = self.src(ops[1], ins, ops[1].size)
+            a = self.src(ops[0], ins)
+            b = self.src(ops[1], ins)
             self.flags = (m, a, b)
             return
         if m == "lea":
             d, s = ops
-            n = ins.reg_name(d.reg)
-            if s.mem.base and ins.reg_name(s.mem.base) == "ebp":
-                off = -s.mem.disp
+            full, _ = subreg(ins.reg_name(d.reg))
+            off = ebp_slot(ins, s)
+            if off is not None:
                 name = self.var(off)
                 if name is None:
-                    raise Unsupported("address of return slot")
-                self.set_reg(n, E("(int)&" + name, 4))
+                    raise Unsupported("address of the return slot")
+                self.set_reg(full, E("(int)&" + name, 4))
                 return
-            addr = self.mem(s, ins, 1)            # *(char *)(X)
-            self.set_reg(n, E("(int)&" + addr, 4))
+            mm = s.mem
+            if mm.base and mm.index and mm.base == mm.index and not mm.disp and mm.scale in (2, 4, 8):
+                a = self.reg(subreg(ins.reg_name(mm.base))[0], ins)
+                self.set_reg(full, E("%s * %d" % (a.p(), mm.scale + 1), 4))
+                return
+            addr = self.mem(s, ins, 1)
+            self.set_reg(full, E("(int)&" + addr, 4))
             return
         if m == "push":
-            self.pushes.append(self.src(ops[0], ins, 4))
+            self.pushes.append(self.src(ops[0], ins))
             return
         if m == "call":
             op = ops[0]
             if op.type != cx.X86_OP_IMM:
                 raise Unsupported("indirect call")
-            tgt = op.imm
-            name = sym(tgt)
-            self.calls.add(name)
-            args = []
-            for r in PARM_REGS:
-                if r in self.regs:
-                    args.append(self.regs[r].text)
-                else:
-                    break
-            if len(args) < len([r for r in PARM_REGS if r in self.regs]):
-                raise Unsupported("call arguments not in eax, edx, ebx, ecx order")
-            stack = list(reversed(self.pushes))
-            if stack and len(args) < 4:
-                raise Unsupported("stack arguments with free registers (cdecl/varargs callee)")
-            args += [s.text for s in stack]
+            name = sym(op.imm)
+            nxt = self.body[self.k + 1] if self.k + 1 < len(self.body) else None
+            cleanup = nxt is not None and nxt.mnemonic == "add" and nxt.op_str.startswith("esp, ")
+            if self.pushes and cleanup:
+                # cdecl / varargs callee: every argument is on the stack, caller pops
+                n = int(nxt.op_str.split(", ")[1], 16) // 4
+                if n != len(self.pushes):
+                    raise Unsupported("stack cleanup does not match pushes")
+                args = [s.text for s in reversed(self.pushes)]
+                self.vcalls.add(name)
+                self.skip_add = True
+            else:
+                args = []
+                for r in PARM_REGS:
+                    if r in self.regs:
+                        args.append(self.regs[r].text)
+                    else:
+                        break
+                if len(args) < len([r for r in PARM_REGS if r in self.regs]):
+                    raise Unsupported("call arguments not in eax, edx, ebx, ecx order")
+                if self.pushes:
+                    if len(args) < 4:
+                        raise Unsupported("stack arguments without cleanup (callee pops)")
+                    args += [s.text for s in reversed(self.pushes)]
+                self.calls.add(name)
             self.pushes = []
             call = E("%s(%s)" % (name, ", ".join(args)), 4, atom=True)
             self.flush_pending()
             self.regs = {"eax": call}
-            self.pending = ("eax", call)
+            self.pending = call
+            return
+        if m == "add" and getattr(self, "skip_add", False):
+            self.skip_add = False
             return
         if m.startswith("j"):
             tgt = ops[0].imm if ops[0].type == cx.X86_OP_IMM else None
             if tgt is None:
                 raise Unsupported("indirect jump (switch)")
+            to_end = tgt in (self.ret_ins, self.epi)
             if m == "jmp":
-                if tgt in (self.ret_ins, self.epi):
-                    if getattr(self, "after_return", False):
+                if to_end:
+                    if self.after_return:
                         self.after_return = False
-                        self.regs = {}
-                        return
-                    self.emit("return;" if self.void else "goto L%X;" % tgt)
-                    if not self.void:
-                        self.labels.add(tgt)
+                    elif self.void:
+                        self.emit("return;")
+                    else:
+                        self.emit("goto L%X;" % tgt)
                 else:
                     self.emit("goto L%X;" % tgt)
-                    self.labels.add(tgt)
                 self.regs = {}
                 return
             if m not in JCC or self.flags is None:
                 raise Unsupported("conditional jump %s" % m)
-            opr, uns = JCC[m]
-            kind = self.flags[0]
-            if kind == "cmp":
-                a, b = self.flags[1], self.flags[2]
-                if uns:
-                    a = E("(unsigned)" + a.p(), 4)
-                cond = "%s %s %s" % (a.p(), opr, b.p())
-            elif kind == "test":
-                a, b = self.flags[1], self.flags[2]
-                if opr not in ("==", "!="):
-                    raise Unsupported("test with ordered jcc")
-                if a.text == b.text:
-                    cond = "%s %s 0" % (a.p(), opr)
-                else:
-                    cond = "(%s & %s) %s 0" % (a.p(), b.p(), opr)
+            cond = self.cond_text(m)
+            if to_end and self.void:
+                self.emit("if (%s) return;" % cond)
             else:
-                raise Unsupported("jcc on arithmetic flags")
-            self.emit("if (%s) goto L%X;" % (cond, tgt))
-            self.labels.add(tgt)
+                self.emit("if (%s) goto L%X;" % (cond, tgt))
             self.regs = {}
             self.flags = None
             return
@@ -470,40 +580,38 @@ class Func:
     def c(self):
         self.lift()
         name = sym(self.va)
-        ps = ["int a%d" % (k + 1) for k in range(len(self.params))]
-        # locals: the slot rule gives slots top down: 2-byte ones, return, others last to
-        # first, so declare them bottom-up (deepest first)
-        locals_ = sorted((o for o in self.slot_size if not any(o == p[1] for p in self.params)),
+        ps = []
+        for k, (reg, off, _sz) in enumerate(self.params):
+            ps.append("%s a%d" % (self.slot_type.get(off, "int"), k + 1))
+        # The slot rule (docs/progress.md) gives slots top down: 2-byte locals, the return
+        # variable, other locals last to first; so declare locals deepest first.
+        locals_ = sorted((o for o in self.slot_type if o not in [p[1] for p in self.params]),
                          reverse=True)
+        two = [o for o in locals_ if self.size_of[self.slot_type[o]] == 2]
+        rest = [o for o in locals_ if o not in two]
         lines = ["%s %s(%s)" % ("void" if self.void else "int", name, ", ".join(ps) or "void"),
                  "{"]
-        for o in locals_:
-            lines.append("    %s l_%X;" % ("int", o))
+        for o in rest + two:
+            lines.append("    %s l_%X;" % (self.slot_type[o], o))
         if locals_:
             lines.append("")
-        body = []
-        used = set()
-        for l in self.out:
-            for t in re.findall(r"goto L([0-9A-F]+);", l):
-                used.add(t)
-        for l in self.out:
-            mm = re.fullmatch(r"L([0-9A-F]+):;", l)
+        used = set(re.findall(r"goto L([0-9A-F]+);", "\n".join(self.out)))
+        for line in self.out:
+            mm = re.fullmatch(r"L([0-9A-F]+):;", line)
             if mm and mm.group(1) not in used:
                 continue
-            body.append(l)
-        # a return label at the very end (int functions whose paths jump to the return)
+            lines.append(line)
         if not self.void and "%X" % self.ret_ins in used:
-            body.append("L%X:;" % self.ret_ins)
-        lines += body + ["}"]
+            lines.append("L%X:;" % self.ret_ins)
+        lines.append("}")
         decl = ["/* lifted from 0x%08X */" % self.va]
         for g in sorted(self.globals):
             decl.append("extern char %s[];" % g)
-        for f in sorted(self.calls - {name}):
+        for f in sorted(self.calls - self.vcalls - {name}):
             decl.append("extern int %s();" % f)
+        for f in sorted(self.vcalls):
+            decl.append("extern int %s(int, ...);" % f)
         return "\n".join(decl + [""] + lines) + "\n"
-
-
-IMG = None
 
 
 def init():

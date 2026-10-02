@@ -1,0 +1,8 @@
+build/lift/func_00012F27.c(12): Error! E1081: Expression must be scalar type
+build/lift/func_00012F27.c(13): Error! E1081: Expression must be scalar type
+build/lift/func_00012F27.c(14): Error! E1081: Expression must be scalar type
+build/lift/func_00012F27.c(18): Error! E1081: Expression must be scalar type
+build/lift/func_00012F27.c(19): Error! E1081: Expression must be scalar type
+build/lift/func_00012F27.c(21): Error! E1081: Expression must be scalar type
+build/lift/func_00012F27.c(22): Error! E1081: Expression must be scalar type
+build/lift/func_00012F27.c(24): Error! E1018: Label 'L12FC4' not defined in function

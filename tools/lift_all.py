@@ -54,17 +54,19 @@ def norm(ins):
 
 
 def first_diff(ours, theirs, va, mask):
-    """Short description of the first instruction pair that differs outside relocations."""
+    """Short description of the first instruction pair that differs outside relocations.
+    Relative branches count as equal when mnemonic and length agree: their displacement only
+    differs because of a size difference further on, which is the thing to report."""
     md = W["md"]
-    a = {i.address: i for i in md.disasm(ours, va)}
+    a = list(md.disasm(ours, va))
     b = list(md.disasm(theirs, va))
-    for y in b:
-        x = a.get(y.address)
+    for x, y in zip(a, b):
         k = y.address - va
-        if x is None:
-            return "(misaligned) | %s" % norm(y)
-        if any(k + j not in mask and (k + j >= len(ours) or ours[k + j] != theirs[k + j])
-               for j in range(max(x.size, y.size))):
+        if x.mnemonic.startswith("j") and y.mnemonic.startswith("j") and \
+                x.mnemonic == y.mnemonic and x.size == y.size and x.op_str.startswith("0x"):
+            continue
+        if x.size != y.size or any(k + j not in mask and ours[k + j] != theirs[k + j]
+                                   for j in range(y.size)):
             return "%s | %s" % (norm(x), norm(y))
     return "length %d | %d bytes" % (len(ours.rstrip(b"\x00")), len(theirs))
 
