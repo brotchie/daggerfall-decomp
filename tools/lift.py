@@ -1660,7 +1660,17 @@ class Func:
                         self.set_reg(full, v)
                         self.flags = ("val", v, None)
                         return
-                if m in ("add", "imul", "and", "or", "xor") and s.type == cx.X86_OP_REG and \
+                if m == "add" and s.type == cx.X86_OP_REG and \
+                        not os.environ.get("LIFT_NOADDRORDER") and \
+                        (re.fullmatch(r"\(int\)D_[0-9A-F]+", a.text) or
+                         re.fullmatch(r"\(int\)D_[0-9A-F]+", b.text)) and \
+                        not (CONST_RE.fullmatch(a.text) and CONST_RE.fullmatch(b.text)):
+                    # a global's address plus an index: either order (a choice point; the
+                    # address is loaded last either way)
+                    self.choices.append(ins.address + 0.09375)
+                    if ins.address + 0.09375 in self.flips:
+                        a, b = b, a
+                elif m in ("add", "imul", "and", "or", "xor") and s.type == cx.X86_OP_REG and \
                         not CONST_RE.fullmatch(a.text) and not CONST_RE.fullmatch(b.text) and \
                         ("func_" not in a.text + b.text or
                          ("func_" in a.text and "func_" in b.text and
