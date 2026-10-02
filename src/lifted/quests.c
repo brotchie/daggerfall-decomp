@@ -2,10 +2,15 @@
  * do not edit: move a function to src/quests.c to work on it by hand) */
 
 extern char D_00174F47[];
+extern char D_00174F50[];
+extern char D_00174F57[];
 extern char D_001789FA[];
 extern char D_0017CF72[];
 extern char D_00185128[];
+extern char D_001903A4[];
 extern char D_00190BE4[];
+extern char D_001917E4[];
+extern char D_00191834[];
 extern char D_001959A8[];
 extern char D_00195A00[];
 extern char D_00195AC4[];
@@ -33,6 +38,10 @@ extern int func_000A0AD9();
 extern int func_000A0DF4();
 extern int func_000A0E3B();
 extern int func_000A0E82();
+extern int func_000A0ED9(int, int);
+extern int func_000A0F5C(int, ...);
+extern int func_000A13DA();
+extern int func_000A13F7();
 extern void func_0001B470(int, int);
 extern void func_0004C588(int);
 extern void func_0008E3F7(int, int);
@@ -40,6 +49,26 @@ extern void func_0008E4A8(int, int);
 void func_0004C8EB(int);
 void func_0004CB5D(int);
 void func_0004CC14(int);
+#pragma aux func_000A0ED9 parm routine [];
+
+void func_0004BCFA(void)
+{
+    char l_44[30];
+    char l_26[18];
+
+    func_000A0ED9(142, (int)D_00174F47);
+    func_000A0F5C((int)D_001903A4, (int)D_00174F57, (int)D_001917E4, (int)D_00174F50);
+    *(int *)((char *)l_26 + 14) = func_000A13DA((int)D_001903A4, 0, (int)l_44);
+    if (*(int *)((char *)l_26 + 14) == 0) goto L4BD92;
+    func_000A0ED9(146, (int)D_00174F47);
+    func_000A0F5C((int)D_001903A4, (int)D_00174F57, (int)D_00191834, (int)D_00174F50);
+    *(int *)((char *)l_26 + 14) = func_000A13DA((int)D_001903A4, 0, (int)l_44);
+L4BD92:;
+    if (*(int *)((char *)l_26 + 14) != 0) return;
+    func_0004BDB7((int)l_26);
+    *(int *)((char *)l_26 + 14) = func_000A13F7((int)l_44);
+    goto L4BD92;
+}
 
 void func_0004C242(void)
 {

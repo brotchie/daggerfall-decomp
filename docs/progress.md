@@ -923,3 +923,19 @@ breaks 321 when applied everywhere. So the switches became per-function knobs:
   `CGProcDecl()`.
 
 Batch **1,670**; build **1,671 functions, 47.90%**.
+
+## 2026-10-02: more knobs, array extents, packed arrays
+
+- Five more register-allocation knobs (`DAGGER_NOSAVES`, `DAGGER_REGLAST`,
+  `DAGGER_NOGIVEN`, `DAGGER_CONFLIST`, `DAGGER_CONFLISTREV`): +2.
+- **Array extent** is a choice point: a slot accessed directly between a local array and the
+  next variable is an element or a variable of its own.
+- **Call arity** choice points both ways: fewer arguments when a register is read after the
+  call (kept across it), more than the callee's saved registers suggest (a callee may save
+  an argument register). Neutral so far; they combine with other choices.
+- **Odd-sized local arrays are packed**: `char a[14]; char b[30];` sit back to back in
+  FALL.EXE, where OW rounds every local to 4 bytes. At `-od` local arrays and structs are now
+  rounded to 2 bytes (`DAGGER_ROUND4=1` for OW, `DAGGER_ROUND1=1` for none; both 2 and 1
+  give the same result). +7.
+
+Batch **1,679**; build **1,680 functions, 48.31%**.

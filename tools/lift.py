@@ -261,6 +261,7 @@ class Func:
         acc = {}       # slot -> set of sizes
         reads = {}     # slot -> set of sizes read
         first = {}     # slot -> address of its first access
+        afirst = {}    # address-taken slot -> address of its first access
         sign = {}      # slot -> 's' / 'u' hints
         addr = set()
         body = self.ins[self.body_start:self.body_end]
@@ -269,6 +270,7 @@ class Func:
                 lo = local_indexed(ins, op)
                 if lo is not None:
                     addr.add(lo)          # indexed local array: [reg + ebp - x]
+                    afirst.setdefault(lo, ins.address)
                     continue
                 off = ebp_slot(ins, op)
                 if off is None and op.type == cx.X86_OP_MEM and op.mem.base and \
@@ -279,6 +281,7 @@ class Func:
                     continue
                 if ins.mnemonic == "lea":
                     addr.add(off)
+                    afirst.setdefault(off, ins.address)
                     continue
                 acc.setdefault(off, set()).add(op.size)
                 first.setdefault(off, ins.address)
@@ -342,6 +345,13 @@ class Func:
             nxt = max([o for o in above if o not in self.slot_type or o in addr
                        or o in [p[1] for p in self.params] or o == self.ret_slot]
                       + [top - 4])
+            # a slot accessed directly between the array and the next variable is one of its
+            # elements or a variable of its own: a choice point (at the array's first access)
+            own = [o for o in above if o in self.slot_type and o > nxt]
+            if own and a in afirst:
+                self.choices.append(afirst[a] + 0.5)
+                if afirst[a] + 0.5 in self.flips:
+                    nxt = max(own)
             size = a - nxt
             if size > 4:
                 self.arrays[a] = size
@@ -1030,7 +1040,22 @@ class Func:
                 self.calls.add(name)
             else:
                 nreg, nstack = 0, 0
-                for r in PARM_REGS[:max_reg_args(op.imm)]:
+                # at most as many register arguments as the callee leaves unsaved; without
+                # that information, registers read after the call were kept across it
+                limit = max_reg_args(op.imm)
+                live = self.args_before_live(self.k)
+                if live < limit:
+                    # or fewer: registers read after the call may have been kept across it;
+                    # a choice point at the call
+                    self.choices.append(ins.address)
+                    if ins.address in self.flips:
+                        limit = live
+                if limit < 4:
+                    # or more: a callee may save a register it takes as an argument
+                    self.choices.append(ins.address + 0.25)
+                    if ins.address + 0.25 in self.flips:
+                        limit = 4
+                for r in PARM_REGS[:limit]:
                     # a register still holding a copy of an earlier argument (mov edx,ebx)
                     # is left over, not another argument
                     if r in loaded and not any(self.regs[r] is self.regs[q]
@@ -1506,6 +1531,28 @@ class Func:
         k -= self.stack_base - 1
         return self.stack_type[k] if 0 <= k < len(self.stack_type) else "int"
 
+    def args_before_live(self, k):
+        """How many of edx/ebx/ecx (in argument order) can be arguments of the call at
+        body[k]: one read after the call before being written was kept across it (Watcom
+        callees preserve non-argument registers), so it and the later ones are not."""
+        for n, r in enumerate(PARM_REGS[1:]):
+            if self.read_after(k, r):
+                return n + 1
+        return 4
+
+    def read_after(self, k, reg):
+        for ins in self.body[k + 1:]:
+            if ins.address in self.targets:
+                return False
+            reads, writes = ins.regs_access()
+            if any(SUB.get(ins.reg_name(x), (None,))[0] == reg for x in reads):
+                return True
+            if any(SUB.get(ins.reg_name(x), (None,))[0] == reg for x in writes):
+                return False
+            if ins.mnemonic in ("call", "ret", "jmp") or ins.mnemonic.startswith("j"):
+                return False
+        return False
+
     def eax_used_later(self):
         """Is eax read by a later instruction before being written (statement-local)?"""
         for ins in self.body[self.k + 1:]:
@@ -1692,7 +1739,9 @@ POPS = {}
 FUNC_OPTS = ["KKND_CONFREV", "DAGGER_LEFTPREF", "DAGGER_CHARAUTOSMALL", "DAGGER_CLRAFTER",
              "DAGGER_WORDSTORE", "DAGGER_RMW", "DAGGER_PUSHMEM", "DAGGER_DEADDEF", "DAGGER_CDQ",
              "DAGGER_FLUSH", "DAGGER_CHARPARMBIG", "DAGGER_SIGNEDBF", "KKND_CONSTREG",
-             "KKND_LINSEL", "KKND_NOROT", "KKND_STRETCH", "DAGGER_FIRSTUSE"]
+             "KKND_LINSEL", "KKND_NOROT", "KKND_STRETCH", "DAGGER_FIRSTUSE",
+             "DAGGER_NOSAVES", "DAGGER_REGLAST", "DAGGER_NOGIVEN", "DAGGER_CONFLIST",
+             "DAGGER_CONFLISTREV"]
 SOSCONV = '#pragma aux sosconv "*" parm caller [] value [eax] modify [eax ebx ecx edx];'
 SAVES = {}
 

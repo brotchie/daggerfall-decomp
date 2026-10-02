@@ -129,6 +129,7 @@ void func_000701F1(int);
 void func_00070624(int, unsigned char);
 void func_00070AFA(int);
 #pragma dagger DAGGER_DEADDEF func_000700EE
+#pragma dagger DAGGER_NOSAVES func_00070B9C
 
 int func_0006F484(int a1)
 {
@@ -573,6 +574,34 @@ L70B3B:;
     return;
 L70B6F:;
     *(short *)((char *)(int)(*(char **)D_00195BE0 + (((int)(unsigned char)*(signed char *)((char *)a1)) * 6)) + 157) -= (unsigned short)(unsigned char)*(signed char *)((char *)a1 + 1);
+}
+
+int func_00070B9C(int a1, int a2)
+{
+    int l_18;
+
+    if (((int)(unsigned char)*(signed char *)((char *)a1)) != 255) goto L70C20;
+    *(short *)(D_0018F08E + (((int)(unsigned char)*(signed char *)D_00196268) * 80)) += a2;
+    if (((int)(short)*(short *)(D_0018F08E + (((int)(unsigned char)*(signed char *)D_00196268) * 80))) <= 100) goto L70C1B;
+    l_18 = a2 - (((int)(short)*(short *)(D_0018F08E + (((int)(unsigned char)*(signed char *)D_00196268) * 80))) - 100);
+    *(short *)(D_0018F08E + (((int)(unsigned char)*(signed char *)D_00196268) * 80)) = 100;
+L70C1B:;
+    goto L70D36;
+L70C20:;
+    if (((int)(unsigned char)(*(signed char *)((char *)a1) & 128)) == 0) goto L70CB2;
+    *(short *)((char *)(int)(*(char **)D_00195BE0 + (((int)(unsigned char)(*(signed char *)((char *)a1) & 127)) * 2)) + 32) += a2;
+    if (((int)(short)*(short *)((char *)(int)(*(char **)D_00195BE0 + (((int)(unsigned char)(*(signed char *)((char *)a1) & 127)) * 2)) + 32)) <= 100) goto L70CAD;
+    l_18 = a2 - (((int)(short)*(short *)((char *)(int)(*(char **)D_00195BE0 + (((int)(unsigned char)(*(signed char *)((char *)a1) & 127)) * 2)) + 32)) - 100);
+    *(short *)((char *)(int)(*(char **)D_00195BE0 + (((int)(unsigned char)(*(signed char *)((char *)a1) & 127)) * 2)) + 32) = 100;
+L70CAD:;
+    goto L70D36;
+L70CB2:;
+    *(short *)((char *)(int)(*(char **)D_00195BE0 + (((int)(unsigned char)*(signed char *)((char *)a1)) * 6)) + 157) += a2;
+    if (((int)(short)*(short *)((char *)(int)(*(char **)D_00195BE0 + (((int)(unsigned char)*(signed char *)((char *)a1)) * 6)) + 157)) <= 100) goto L70D36;
+    l_18 = a2 - (((int)(short)*(short *)((char *)(int)(*(char **)D_00195BE0 + (((int)(unsigned char)*(signed char *)((char *)a1)) * 6)) + 157)) - 100);
+    *(short *)((char *)(int)(*(char **)D_00195BE0 + (((int)(unsigned char)*(signed char *)((char *)a1)) * 6)) + 157) = 100;
+L70D36:;
+    return a2;
 }
 
 void func_00070DFD(void)

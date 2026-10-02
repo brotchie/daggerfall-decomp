@@ -55,13 +55,14 @@ extern void func_0005E540(int, int, int);
 extern void func_0007D3CA(int);
 extern void func_0008E3F7(int, int);
 extern void func_0008E4A8(int, int);
-extern void func_0008F11D(int);
 extern void func_00097101(int);
 int func_0009046D(int);
+void func_0008F11D(int);
 void func_0008F89A(int);
 void func_0008FBE8(int);
 void func_00090426(int);
 void func_00090572(int);
+#pragma dagger DAGGER_CONFLIST func_0008F11D
 #pragma dagger KKND_CONFREV func_0008EEBC
 
 void func_0008EEBC(void)
@@ -124,6 +125,21 @@ L8F0ED:;
     func_0008DA91(*(int *)(D_001A9BBC + (l_20 << 2)));
     *(int *)(D_001A9BBC + (l_20++ << 2)) = 0;
     goto L8F0D6;
+}
+
+void func_0008F11D(int a1)
+{
+    int l_18;
+
+    if (((int)(unsigned char)*(signed char *)((char *)a1)) != 2) return;
+    l_18 = a1 + 71;
+    if (((int)(unsigned short)*(short *)((char *)l_18 + 32)) != 27) goto L8F168;
+    if (((int)(unsigned short)*(short *)((char *)l_18 + 34)) == 4) goto L8F16A;
+L8F168:;
+    return;
+L8F16A:;
+    *(int *)(D_00190BE4 + (*(int *)D_00195B84 << 2)) = l_18;
+    *(int *)(D_00190DE4 + ((*(int *)D_00195B84)++ << 2)) = ((((int)(unsigned char)*(signed char *)((char *)l_18 + 49)) * 109) + ((int)D_00180B3A)) + 67;
 }
 
 void func_0008F1B2(void)

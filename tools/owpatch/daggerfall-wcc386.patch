@@ -1183,7 +1183,7 @@ index 310489af1a..0f98337910 100644
      if( !LDone( oc ) ) {
          if( OC_BASE_CLASS( oc->oc_header.class ) != OC_INFO
 diff --git a/bld/cg/c/regalloc.c b/bld/cg/c/regalloc.c
-index 90c1857729..0c3f144195 100644
+index 90c1857729..7154031c5f 100644
 --- a/bld/cg/c/regalloc.c
 +++ b/bld/cg/c/regalloc.c
 @@ -31,6 +31,9 @@
@@ -1226,7 +1226,7 @@ index 90c1857729..0c3f144195 100644
  static hw_reg_set   GiveBestReg( conflict_node *conf, reg_tree *tree,
                                       hw_reg_set except, bool needs_one )
  /*************************************************************************
-@@ -986,6 +996,11 @@ static hw_reg_set   GiveBestReg( conflict_node *conf, reg_tree *tree,
+@@ -986,13 +996,24 @@ static hw_reg_set   GiveBestReg( conflict_node *conf, reg_tree *tree,
          all_true = true;
          for( possible = tree->regs; !HW_CEqual( *possible, HW_EMPTY ); ++possible ) {
              reg = *possible;
@@ -1238,7 +1238,22 @@ index 90c1857729..0c3f144195 100644
              if( !HW_Ovlap( reg, conf->with.regs )
                && !HW_Ovlap( reg, except ) ) {
                  greed = TooGreedy( conf, reg, tree->temp );
-@@ -1193,6 +1208,8 @@ conflict_node   *GiveRegister( conflict_node *conf, bool needs_one )
+                 if( greed == MB_FALSE ) {
+-                    saves = CountRegMoves( conf, reg, conf->tree, 3 );
++                    /* Daggerfall knobs (per function via #pragma dagger): DAGGER_NOSAVES
++                     * ignores the moves a register would save, DAGGER_REGLAST breaks ties
++                     * towards the last register, DAGGER_NOGIVEN ignores registers given
++                     * before */
++                    saves = DaggerEnv( "DAGGER_NOSAVES" ) != NULL ? 0
++                          : CountRegMoves( conf, reg, conf->tree, 3 );
+                     if( ( saves > best_saves )
+-                     || ( saves == best_saves
++                     || ( saves == best_saves && DaggerEnv( "DAGGER_REGLAST" ) != NULL )
++                     || ( saves == best_saves && DaggerEnv( "DAGGER_NOGIVEN" ) == NULL
+                        && HW_Subset( GivenRegisters, reg )
+                        && !HW_Subset( GivenRegisters, best ) ) ) {
+                         best = reg;
+@@ -1193,6 +1214,8 @@ conflict_node   *GiveRegister( conflict_node *conf, bool needs_one )
  }
  
  
@@ -1247,7 +1262,7 @@ index 90c1857729..0c3f144195 100644
  static bool         ConfBefore( void *c1, void *c2 )
  /*********************************************************
      used by SortConflicts
-@@ -1207,6 +1224,20 @@ static  void    SortConflicts( void )
+@@ -1207,6 +1230,38 @@ static  void    SortConflicts( void )
      Sort the conflicts in order of descending savings.
  */
  {
@@ -1265,10 +1280,28 @@ index 90c1857729..0c3f144195 100644
 +        }
 +        ConfList = rev;
 +    }
++    /* Daggerfall knobs: DAGGER_CONFLIST allocates in list order, not by savings;
++     * DAGGER_CONFLISTREV in reversed list order */
++    if( DaggerEnv( "DAGGER_CONFLISTREV" ) != NULL ) {
++        conflict_node   *conf;
++        conflict_node   *next;
++        conflict_node   *rev;
++
++        rev = NULL;
++        for( conf = ConfList; conf != NULL; conf = next ) {
++            next = conf->next_conflict;
++            conf->next_conflict = rev;
++            rev = conf;
++        }
++        ConfList = rev;
++        return;
++    }
++    if( DaggerEnv( "DAGGER_CONFLIST" ) != NULL )
++        return;
      ConfList = SortList( ConfList, offsetof( conflict_node, next_conflict ), ConfBefore );
  }
  
-@@ -1242,6 +1273,18 @@ static  enum allocation_state    AssignConflicts( void )
+@@ -1242,6 +1297,18 @@ static  enum allocation_state    AssignConflicts( void )
          }
      }
      ConstSavings();
@@ -1287,7 +1320,7 @@ index 90c1857729..0c3f144195 100644
  
      SortConflicts();
      state = ALLOC_BITS;
-@@ -1265,7 +1308,9 @@ static  enum allocation_state    AssignConflicts( void )
+@@ -1265,7 +1332,9 @@ static  enum allocation_state    AssignConflicts( void )
              */
              if( !only_const_temps && opnd->n.class == N_TEMP && (opnd->t.temp_flags & CONST_TEMP) )
                  return( ALLOC_CONST_TEMP );
@@ -1351,6 +1384,32 @@ index af92de3399..9427a4a86e 100644
          PrefixIns( ins, new_ins );
      } else {
          value = 0;
+diff --git a/bld/cg/c/temps.c b/bld/cg/c/temps.c
+index e3c9f73344..f72e8cddb6 100644
+--- a/bld/cg/c/temps.c
++++ b/bld/cg/c/temps.c
+@@ -32,6 +32,7 @@
+ 
+ 
+ #include "_cgstd.h"
++extern const char *DaggerEnv( const char *name );
+ #include "coderep.h"
+ #include "cgmem.h"
+ #include "cgaux.h"
+@@ -388,6 +389,13 @@ static  void    AllocNewLocal( name *temp )
+     }
+ #endif
+     size = _RoundUp( temp->n.size, REG_SIZE ); /* align size*/
++    /* Daggerfall: Watcom 10 packed odd-sized local arrays (char l[14]; char m[30];) back to
++     * back. DAGGER_ROUND4=1 rounds them to 4 bytes like OW; DAGGER_ROUND1=1 doesn't round
++     * at all (default: to 2 bytes) */
++    if( _IsModel( CGSW_GEN_NO_OPTIMIZATION ) && temp->n.size > REG_SIZE
++      && DaggerEnv( "DAGGER_ROUND4" ) == NULL ) {
++        size = DaggerEnv( "DAGGER_ROUND1" ) != NULL ? temp->n.size : _RoundUp( temp->n.size, 2 );
++    }
+     if( (temp->v.usage & (USE_IN_ANOTHER_BLOCK | USE_ADDRESS)) == 0
+      && temp->t.u.blk_id != BLK_ID_NONE ) {
+         CalcRange( &st_temp, temp );
 diff --git a/bld/cg/c/tree.c b/bld/cg/c/tree.c
 index 23957dda5c..c22e7e5939 100644
 --- a/bld/cg/c/tree.c

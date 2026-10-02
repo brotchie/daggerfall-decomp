@@ -27,6 +27,8 @@ extern char D_00176934[];
 extern char D_0017693D[];
 extern char D_0017694A[];
 extern char D_00176964[];
+extern char D_0017696F[];
+extern char D_00176977[];
 extern char D_0017697F[];
 extern char D_0017698C[];
 extern char D_00176999[];
@@ -186,6 +188,8 @@ extern int func_000A0ED9(int, int);
 extern int func_000A0F5C(int, ...);
 extern int func_000A1004();
 extern int func_000A1023();
+extern int func_000A13DA();
+extern int func_000A13F7();
 extern int func_000C010F();
 extern int func_000C2FF5();
 extern int func_000CDD81();
@@ -220,8 +224,6 @@ extern void func_0006D873(int, int);
 extern void func_00072AA0(void);
 extern void func_00078C79(void);
 extern void func_0007A3D0(int);
-extern void func_0007AEF5(int);
-extern void func_0007B022(int);
 extern void func_0007B75C(int, int, int);
 extern void func_00086D37(unsigned short);
 extern void func_000876AD(int, int, int, int);
@@ -251,6 +253,9 @@ void func_0007A42B(int);
 void func_0007A4B3(void);
 void func_0007A4F9(void);
 void func_0007A8BE(void);
+void func_0007AEF5(int);
+void func_0007B022(int);
+void func_0007B0FC(void);
 void func_0007B9A1(int);
 void func_0007BEFC(int);
 void func_0007C432(void);
@@ -812,6 +817,93 @@ L7AE3E:;
 L7AEE1:;
     return 1;
 }
+}
+
+void func_0007AEF5(int a1)
+{
+    int l_18;
+{
+    char l_48[30];
+    char l_2A[14];
+
+    func_000A0ED9(787, (int)D_00176884);
+    func_000A0F5C((int)D_001903A4, (int)D_0017696F, (int)D_001917E4);
+    l_18 = func_000A13DA((int)D_001903A4, 0, (int)l_48);
+    func_000A0ED9(789, (int)D_00176884);
+    func_000A0F5C((int)D_001903A4, (int)D_00176909, a1);
+L7AF6A:;
+    if (l_18 != 0) goto L7AF8F;
+    func_0006CEFC((int)l_2A, (int)D_001917E4, (int)D_001903A4);
+    l_18 = func_000A13F7((int)l_48);
+    goto L7AF6A;
+L7AF8F:;
+    func_000A0ED9(796, (int)D_00176884);
+    func_000A0F5C((int)D_001903A4, (int)D_00176977, (int)D_001917E4);
+    l_18 = func_000A13DA((int)D_001903A4, 0, (int)l_48);
+    func_000A0ED9(798, (int)D_00176884);
+    func_000A0F5C((int)D_001903A4, (int)D_00176909, a1);
+L7AFF3:;
+    if (l_18 != 0) return;
+    func_0006CEFC((int)l_2A, (int)D_001917E4, (int)D_001903A4);
+    l_18 = func_000A13F7((int)l_48);
+    goto L7AFF3;
+}
+}
+
+void func_0007B022(int a1)
+{
+    int l_18;
+{
+    char l_48[30];
+    char l_2A[14];
+
+    func_0007B0FC();
+    func_000A0ED9(813, (int)D_00176884);
+    func_000A0F5C(*(int *)D_00147954, (int)D_0017696F, a1);
+    l_18 = func_000A13DA(*(int *)D_00147954, 0, (int)l_48);
+L7B072:;
+    if (l_18 != 0) goto L7B095;
+    func_0006CEFC((int)l_2A, a1, (int)D_001917E4);
+    l_18 = func_000A13F7((int)l_48);
+    goto L7B072;
+L7B095:;
+    func_000A0ED9(821, (int)D_00176884);
+    func_000A0F5C(*(int *)D_00147954, (int)D_00176977, a1);
+    l_18 = func_000A13DA(*(int *)D_00147954, 0, (int)l_48);
+L7B0CF:;
+    if (l_18 != 0) return;
+    func_0006CEFC((int)l_2A, a1, (int)D_001917E4);
+    l_18 = func_000A13F7((int)l_48);
+    goto L7B0CF;
+}
+}
+
+void func_0007B0FC(void)
+{
+    char l_44[30];
+    char l_26[18];
+
+    func_000A0ED9(835, (int)D_00176884);
+    func_000A0F5C(*(int *)D_00147954, (int)D_0017696F, (int)D_001917E4);
+    *(int *)((char *)l_26 + 14) = func_000A13DA(*(int *)D_00147954, 0, (int)l_44);
+L7B146:;
+    if (*(int *)((char *)l_26 + 14) != 0) goto L7B191;
+    func_000A0ED9(839, (int)D_00176884);
+    func_000A0F5C(*(int *)D_00147954, (int)D_001768DF, (int)D_001917E4, (int)l_26);
+    func_000A1004(*(int *)D_00147954);
+    *(int *)((char *)l_26 + 14) = func_000A13F7((int)l_44);
+    goto L7B146;
+L7B191:;
+    func_000A0ED9(844, (int)D_00176884);
+    func_000A0F5C(*(int *)D_00147954, (int)D_00176977, (int)D_001917E4);
+    *(int *)((char *)l_26 + 14) = func_000A13DA(*(int *)D_00147954, 0, (int)l_44);
+L7B1CD:;
+    if (*(int *)((char *)l_26 + 14) != 0) return;
+    func_000A0ED9(848, (int)D_00176884);
+    func_000A0F5C(*(int *)D_00147954, (int)D_001768DF, (int)D_001917E4, (int)l_26);
+    func_000A1004(*(int *)D_00147954);
+    *(int *)((char *)l_26 + 14) = func_000A13F7((int)l_44);
+    goto L7B1CD;
 }
 
 void func_0007B222(int a1)
