@@ -1276,3 +1276,6 @@ Batch **1,927**; build **61.34%**.
   share of the function first. And the search now **starts from a previous run's flips**
   when they get further (before, they were only a fallback), so finds accumulate across
   runs. +15. Batch **2,154**.
+- The flip cache keeps each function's furthest progress (a later first difference, in
+  build/lift/flips_at.json), so repeated runs deepen the search; a few more runs and a wide
+  pin pass converge. +4. Batch **2,158**.

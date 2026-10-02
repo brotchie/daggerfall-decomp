@@ -16,6 +16,8 @@ extern char D_00170500[];
 extern char D_0017050E[];
 extern char D_00170522[];
 extern char D_00170530[];
+extern char D_0017053F[];
+extern char D_0017054A[];
 extern char D_00179E10[];
 extern char D_00179E24[];
 extern char D_00179E26[];
@@ -38,6 +40,8 @@ extern char D_00196268[];
 extern char D_00196279[];
 extern char D_00196734[];
 extern char D_0019676C[];
+extern char D_00196800[];
+extern char D_00196808[];
 extern char D_0019688C[];
 extern char D_001968BA[];
 extern char D_001968BD[];
@@ -72,6 +76,7 @@ extern int func_0001EE84(int);
 extern int func_00069938(int, int, int);
 extern int func_0007D5D9(void);
 extern int func_000845F1(int, short, short, int);
+extern int func_00084F8F(int, int);
 extern int func_0008649F(int);
 extern int func_0008DCE3(int, int, int);
 extern int func_00097B2A(void);
@@ -94,20 +99,30 @@ extern int func_00144F68();
 extern int func_0014B45B();
 extern void func_00012F27(int);
 extern void func_0001335E(int, int, int);
+extern void func_0001E854(int, int);
 extern void func_0001F0C5(void);
 extern void func_0001F1C2(void);
 extern void func_0001F32D(void);
 extern void func_0001F40E(int);
 extern void func_00050069(int);
+extern void func_00088551(int, int);
+extern void func_000888C2(int, int);
+int func_0001E576(void);
 void func_0001DAED(int);
 void func_0001DC12(int);
 void func_0001DD39(int);
 void func_0001DFCD(int, int);
 void func_0001E0C6(int, int);
 void func_0001E3D3(int, int);
+void func_0001E614(int);
+void func_0001E7A8(void);
+void func_0001E928(int);
 #pragma aux func_000A0ED9 parm routine [];
 #pragma dagger DAGGER_CONFPOS func_0001E614
+#pragma dagger DAGGER_CONFPOS func_0001EC32
 #pragma dagger DAGGER_NODEMOTE func_0001E614
+#pragma dagger KKND_CONFREV func_0001EC32
+#pragma dagger reg func_0001EC32 58 edx 59 edx 60 edx
 
 void func_0001DAED(int a1)
 {
@@ -592,6 +607,92 @@ L1EBFC:;
 L1EC01:;
     func_000A1023(a1 + 71, (int)&*(signed char *)(*(char **)D_00196A2C + 6347), 429, (int)D_001704CC, 607, 4);
 }
+}
+}
+
+void func_0001EC32(void)
+{
+    int l_30;
+    int l_2C;
+    int l_28;
+    int l_24;
+    int l_20;
+    int l_1C;
+    int l_18;
+
+    l_30 = *(int *)(*(char **)D_00195BDC + 43);
+    *(int *)D_00196808 = 0;
+    *(int *)D_00196A2C = *(int *)D_00147954;
+    *(int *)D_00196AA0 = func_00012E04((int)D_0017053F, 0, 0);
+    switch (*(unsigned char *)(*(char **)D_00195BDC + 34)) {
+    goto L1ECD0;
+case 0:
+    if ((((int)(unsigned char)*(signed char *)(*(char **)D_00195BDC + 32)) * ((int)(unsigned char)*(signed char *)(*(char **)D_00195BDC + 33))) != 64) goto L1ECB8;
+    *(int *)D_00196800 = 66;
+    goto L1ECC2;
+L1ECB8:;
+    *(int *)D_00196800 = 50;
+L1ECC2:;
+    goto L1ECDA;
+case 1:
+    *(int *)D_00196800 = 33;
+    goto L1ECDA;
+default:
+L1ECD0:;
+    *(int *)D_00196800 = 0;
+L1ECDA:;
+    l_1C = 0;
+L1ECE1:;
+    if (((int)(unsigned char)*(signed char *)(*(char **)D_00195BDC + 33)) > l_1C) goto L1ED00;
+    goto L1EE6E;
+L1ECF8:;
+    l_1C++;
+    goto L1ECE1;
+L1ED00:;
+    l_20 = 0;
+L1ED07:;
+    if (((int)(unsigned char)*(signed char *)(*(char **)D_00195BDC + 32)) > l_20) goto L1ED26;
+    goto L1EE69;
+L1ED1E:;
+    l_20++;
+    goto L1ED07;
+L1ED26:;
+    *(int *)D_00196AA4 = (l_20 << 12) + *(int *)(*(char **)D_00195AC4 + 7);
+    *(int *)D_00196AA8 = (int)(*(char **)(*(char **)D_00195AC4 + 15) + ((l_1C + 1) << 12));
+    l_2C = func_0001E576();
+    func_0001E614((((int)(unsigned char)*(signed char *)(*(char **)D_00195BDC + 32)) * l_1C) + l_20);
+    func_0001E7A8();
+    func_000888C2(l_20, (int)&*(signed char *)((char *)(((int)(unsigned char)*(signed char *)(*(char **)D_00195BDC + 33)) - l_1C) - 1));
+    func_00088551(*(int *)D_00196AA4, *(int *)D_00196AA8);
+    l_24 = 0;
+L1EDAC:;
+    if (((int)(unsigned char)*(signed char *)(*(char **)D_00196A2C)) > l_24) goto L1EDCA;
+    goto L1EE5C;
+L1EDC2:;
+    l_24++;
+    goto L1EDAC;
+L1EDCA:;
+    func_0001E854(l_30, l_24);
+    l_28 = func_00084F8F(l_2C, l_24);
+    if (((int)(unsigned short)(*(short *)((char *)l_28 + 21) & 8)) != 0) goto L1EE3B;
+    if (*(int *)((char *)l_28 + 31) != *(int *)(*(char **)(*(char **)D_00195BDC + 43) + 20 + (((int)(unsigned short)*(short *)((char *)l_28 + 27)) * 26))) goto L1EE31;
+    *(short *)((char *)l_28 + 23) = (unsigned short)(unsigned char)*(signed char *)((char *)l_30 + 24);
+    (*(char (**)[26])&l_30)++;
+    goto L1EE3B;
+L1EE31:;
+    func_00050069((int)D_0017054A);
+L1EE3B:;
+    if (((int)(unsigned short)(*(short *)((char *)l_28 + 21) & 8)) == 0) goto L1EE57;
+    *(signed char *)((char *)l_28 + 21) &= 247;
+L1EE57:;
+    goto L1EDC2;
+L1EE5C:;
+    func_0001E928(l_2C);
+    goto L1ED1E;
+L1EE69:;
+    goto L1ECF8;
+L1EE6E:;
+    func_00012F27(*(int *)D_00196AA0);
 }
 }
 

@@ -405,7 +405,7 @@ def work(va):
         print(name, sorted(flips), file=sys.stderr)
     if c is not None:
         check(name, c)          # leave the best version's .c and .bin on disk
-    return name, status, detail, sorted(flips)
+    return name, status, detail, sorted(flips), at
 
 
 def main():
@@ -442,12 +442,23 @@ def main():
             allflips = json.load(f)
     except (OSError, ValueError):
         allflips = {}
+    ap_ = os.path.join(OUT, "flips_at.json")
+    try:
+        with open(ap_) as f:
+            allat = json.load(f)
+    except (OSError, ValueError):
+        allat = {}
     for r in results:
         if len(r) > 3:
-            if r[1] == "ok" or r[0] not in allflips:
+            # keep each function's furthest progress: matched, or a later first difference
+            at_ = r[4] if len(r) > 4 and r[4] is not None else 0
+            if r[1] == "ok" or r[0] not in allflips or at_ > allat.get(r[0], 0):
                 allflips[r[0]] = r[3]
+                allat[r[0]] = (1 << 40) if r[1] == "ok" else at_
     with open(fp, "w") as f:
         json.dump(allflips, f)
+    with open(ap_, "w") as f:
+        json.dump(allat, f)
     results = [r[:3] for r in results]
     # keep the previous full run's report to show what this change gained and lost
     prev = {}
