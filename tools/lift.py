@@ -920,13 +920,17 @@ class Func:
             if lhs == "@RET":
                 raise Unsupported("read-modify-write of the return slot")
             prev = self.body[self.k - 1] if self.k else None
+            pre_r = None
+            if prev is not None and prev.mnemonic == "mov" and prev.operands and \
+                    prev.operands[0].type == cx.X86_OP_REG and prev.operands[0].size == 4 and \
+                    prev.op_str.split(", ", 1)[1] == ins.op_str.split(", ")[0]:
+                pre_r = subreg(prev.reg_name(prev.operands[0].reg))[0]
             if m in ("add", "sub") and s.type == cx.X86_OP_IMM and d.size == 4 and \
-                    prev is not None and prev.mnemonic == "mov" and \
-                    prev.op_str == "eax, " + ins.op_str.split(", ")[0] and \
-                    self.eax_used_later():
-                # *p++-style: the old value in eax is used afterwards
+                    pre_r is not None and self.reg_used_later(pre_r):
+                # *p++-style: the old value, loaded just before, is used afterwards
                 lv = lhs if re.fullmatch(r"\w+", lhs) else "(%s)" % lhs
-                self.post_expr("(int)(*(char (**)[%d])&%s)%s" % (s.imm, lv, "++" if m == "add" else "--"))
+                self.post_expr("(int)(*(char (**)[%d])&%s)%s" % (s.imm, lv, "++" if m == "add" else "--"),
+                               pre_r)
                 return
             if m in ("add", "sub") and s.type == cx.X86_OP_IMM and d.size == 4 and \
                     prev is not None and prev.mnemonic == "mov" and \
@@ -950,12 +954,15 @@ class Func:
                 raise Unsupported("read-modify-write of the return slot")
             lv = lhs if re.fullmatch(r"\w+", lhs) else "(%s)" % lhs
             prev = self.body[self.k - 1] if self.k else None
-            if m in ("inc", "dec") and d.size == 4 and prev is not None and \
-                    prev.mnemonic == "mov" and prev.op_str == "eax, " + ins.op_str and \
-                    self.eax_used_later():
-                # *p++-style on a char pointer: the old value in eax is used afterwards
-                self.post_expr("%s%s" % (lv, "++" if m == "inc" else "--"))
-                return
+            if m in ("inc", "dec") and prev is not None and prev.mnemonic == "mov" and \
+                    prev.operands[0].type == cx.X86_OP_REG and \
+                    prev.op_str.split(", ", 1)[1] == ins.op_str and \
+                    prev.operands[0].size == d.size:
+                # x++ used as a value: the old value, loaded just before, is used afterwards
+                full_r = subreg(prev.reg_name(prev.operands[0].reg))[0]
+                if self.reg_used_later(full_r):
+                    self.post_expr("%s%s" % (lv, "++" if m == "inc" else "--"), full_r, d.size)
+                    return
             self.emit({"inc": "%s++;", "dec": "%s--;", "neg": "%s = -%s;", "not": "%s = ~%s;"}[m]
                       % ((lv,) if m in ("inc", "dec") else (lhs, lv)))
             return
@@ -1555,23 +1562,26 @@ class Func:
 
     def eax_used_later(self):
         """Is eax read by a later instruction before being written (statement-local)?"""
+        return self.reg_used_later("eax")
+
+    def reg_used_later(self, reg):
         for ins in self.body[self.k + 1:]:
             if ins.address in self.targets or ins.mnemonic in ("call", "ret") or \
                     ins.mnemonic.startswith("j"):
                 return False
             reads, writes = ins.regs_access()
-            if any(SUB.get(ins.reg_name(r), (None,))[0] == "eax" for r in reads):
+            if any(SUB.get(ins.reg_name(r), (None,))[0] == reg for r in reads):
                 return True
-            if any(SUB.get(ins.reg_name(r), (None,))[0] == "eax" for r in writes):
+            if any(SUB.get(ins.reg_name(r), (None,))[0] == reg for r in writes):
                 return False
         return False
 
-    def post_expr(self, text):
-        """A post-increment whose old value eax carries into the next instruction."""
-        e = E(text, 4, atom=True)
+    def post_expr(self, text, reg="eax", size=4):
+        """A post-increment whose old value `reg` carries into the next instructions."""
+        e = E(text, size, atom=True)
         self.flush_pending()
-        self.regs["eax"] = e
-        self.stale.discard("eax")
+        self.regs[reg] = e
+        self.stale.discard(reg)
         self.pending = e
 
     def finish_call(self, call, nargs):

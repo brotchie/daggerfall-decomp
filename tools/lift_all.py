@@ -144,6 +144,7 @@ def work(va):
     # Choice points (operand orders the code can't tell apart) just before the first
     # difference: flip one at a time and keep a flip when the first difference moves on.
     flips, tries = frozenset(), 0
+    tried_pairs = False
     best = (status, detail, at, c)
     while status == "diff" and at is not None and tries < BUDGET and not os.environ.get("LIFT_NOSEARCH"):
         near = sorted((a for a in info["choices"] if a >= 0 and a not in flips),
@@ -158,12 +159,37 @@ def work(va):
             except Exception:
                 continue
             s2, d2, at2 = check(name, c2)
+
+            def nbytes(d):
+                m = re.match(r"(\d+) bytes", d or "")
+                return int(m.group(1)) if m else 1 << 30
             if s2 == "ok" or (s2 == "diff" and at2 is not None and at2 > at):
                 flips, info = flips | {a}, info2
                 status, detail, at, c = s2, d2, at2, c2
                 best = (status, detail, at, c)
                 moved = True
                 break
+        if not moved and not tried_pairs:
+            # no single flip helps: try two of the nearest at once
+            tried_pairs = True
+            pairs = [(x, y) for i, x in enumerate(near[:4]) for y in near[i + 1:5]
+                     if x >= 0 and y >= 0]
+            for x, y in pairs:
+                if tries >= BUDGET:
+                    break
+                tries += 1
+                info2 = {}
+                try:
+                    c2 = lift.lift(va, flips | {x, y}, info=info2)
+                except Exception:
+                    continue
+                s2, d2, at2 = check(name, c2)
+                if s2 == "ok" or (s2 == "diff" and at2 is not None and at2 > at):
+                    flips, info = flips | {x, y}, info2
+                    status, detail, at, c = s2, d2, at2, c2
+                    best = (status, detail, at, c)
+                    moved = True
+                    break
         if not moved:
             break
     status, detail, at, c = best
