@@ -53,6 +53,7 @@ void func_00036AA7(int);
 void func_00036C6F(int, int, int, unsigned char);
 void func_00036DC9(int, int, int, unsigned char);
 void func_00036F18(int);
+#pragma dagger reg func_000361B7 387 cx
 
 void func_000361B7(int a1)
 {

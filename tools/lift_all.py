@@ -271,6 +271,23 @@ def work(va):
     except Exception as e:  # a lifter bug: report, keep going
         return name, "error", "lifter %s: %s" % (type(e).__name__, e)
     status, detail, at = check(name, c)
+    if status == "error" and detail.startswith("compile"):
+        # the C doesn't compile (a void result used): a choice point taken the other way
+        # may fix it
+        cands = [x for x in info.get("choices", []) if x >= 0]
+        # call arity choices first (a void result passed on, an argument too many)
+        cands.sort(key=lambda x: (round(x - int(x), 4) not in (0.5, 0.875, 0.25, 0.0), x))
+        for a in cands[:200]:
+            info2 = {}
+            try:
+                c2 = lift.lift(va, start | {a}, info=info2)
+            except Exception:
+                continue
+            r2 = check(name, c2)
+            if r2[0] != "error":
+                status, detail, at = r2
+                c, info, start = c2, info2, start | {a}
+                break
     # Choice points (operand orders the code can't tell apart, code generator knobs): try
     # flipping each one near the first difference and keep the flip that moves the first
     # difference furthest; when no single flip helps, try pairs of the nearest.

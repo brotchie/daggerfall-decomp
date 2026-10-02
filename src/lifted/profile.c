@@ -18,6 +18,7 @@ extern int func_000A0E3B();
 extern int func_000A0E74();
 int func_00012DA5(signed char);
 #pragma aux sosconv "*" parm caller [] value [eax] modify [eax ebx ecx edx];
+#pragma dagger reg func_000122F1 387 cx
 #pragma dagger reg func_000127EB 12 ebx 13 eax 19 eax
 #pragma dagger slots func_000122F1 l_44 60 l_42 58 l_24 28 l_20 24 l_1C 20 l_18 16 l_14 12 l_10 8 ret 4
 #pragma aux (sosconv) func_00012203;

@@ -234,6 +234,14 @@ class Func:
         if len(free) >= 2 and len(self.params) != len(free):
             raise Unsupported("prologue: %d free registers but %d spills" % (len(free), len(self.params)))
         self.body_start = i
+        if ins[-1].mnemonic == "jmp" and not os.environ.get("LIFT_NONORET"):
+            # a function that never returns (an endless loop): no epilogue at all
+            self.nstack = 0
+            self.epi = ins[-1].address + ins[-1].size
+            self.body_end = len(ins)
+            self.ret_ins = self.epi
+            self.void = True
+            return
         if ins[-1].mnemonic != "ret":
             raise Unsupported("epilogue: no ret")
         # `ret N`: N/4 more parameters on the stack ([ebp+8], [ebp+12], ...), which Watcom
@@ -1413,7 +1421,9 @@ class Func:
             nxt = self.body[self.k + 1] if self.k + 1 < len(self.body) else None
             cleanup = nxt is not None and nxt.mnemonic == "add" and nxt.op_str.startswith("esp, ")
             loaded = [r for r in PARM_REGS if r in self.regs and self.regs[r] is not self.pending
-                      and r not in self.stale]
+                      and r not in self.stale and not (
+                          self.regs[r].tag and self.regs[r].tag[0] == "call" and
+                          self.void_call(self.regs[r]))]
             sig = signature(op.imm) if op.imm in IMG.funcs and \
                 IMG.le.obj_of_va(op.imm).index == 1 and op.imm < GAME_END else None
             pops = callee_pops(op.imm)
@@ -2385,6 +2395,7 @@ class Func:
         # function-level choice points: code generator options (#pragma dagger), and the
         # default spelling of p->arr[i] (field offset with the pointer, or after the sum)
         self.choices.append(FIELD_LAST)
+        self.choices.extend(INVERT_KINDS)
         self.choices.extend(-1 - k for k in range(len(FUNC_OPTS)))
         for k, opt in enumerate(FUNC_OPTS):
             if -1 - k in self.flips:
@@ -2762,12 +2773,38 @@ def init():
     return IMG
 
 
+class InvertedFlips(frozenset):
+    """Flips with one kind of choice point (by its fractional part) taken the other way by
+    default: for trying a different default (LIFT_INVERT=0.375)."""
+    def __new__(cls, base, fracs):
+        o = super().__new__(cls, base)
+        o.fracs = fracs
+        return o
+
+    def __contains__(self, x):
+        hit = frozenset.__contains__(self, x)
+        if isinstance(x, float) and x >= 0 and \
+                any(abs((x - int(x)) - f) < 1e-9 for f in self.fracs):
+            return not hit
+        return hit
+
+    def __or__(self, other):
+        return InvertedFlips(frozenset(self) | frozenset(other), self.fracs)
+
+
+# function-level choices that take every choice point of one kind the other way by default
+INVERT_KINDS = {-9100: 0.4375, -9200: 0.8125, -9300: 0.75}
+
+
 def lift(va, flips=frozenset(), info=None):
     """C for the function at `va`. `flips`: choice points (instruction addresses) to take
     the other way; `info`, a dict, receives the list of choice points as info["choices"]."""
     init()
     f = Func(va)
-    f.flips = flips
+    inv = os.environ.get("LIFT_INVERT")
+    fracs = [float(inv)] if inv else []
+    fracs += [fr for k, fr in INVERT_KINDS.items() if k in flips]
+    f.flips = InvertedFlips(flips, fracs) if fracs else flips
     try:
         return f.c()
     finally:

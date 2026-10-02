@@ -1211,3 +1211,9 @@ Batch **1,927**; build **61.34%**.
   (`*(short *)(*(char **)p + 48 + i * 2)`: the pointer side is evaluated first), the old
   spelling a function-level choice point (cached flips migrated to keep it). +6.
   Batch **2,116**.
+- Functions that never return (an endless loop, no epilogue: OW omits it too) lift; a
+  void function's "result" is never an argument; C that fails to compile gets its call
+  arity choice points flipped. Taking every choice point of one kind the other way is a
+  function-level choice for three kinds (a sweep inverting each kind's default globally
+  found no better default, but four functions that need one inverted). +3.
+  Batch **2,119**.
