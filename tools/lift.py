@@ -639,6 +639,17 @@ class Func:
             raise Unsupported("stack parameter [ebp+%d]" % disp)
         fx = fixup_at(ins, ins.disp_offset) if ins.disp_size == 4 else None
         parts = []
+        dd = doubled_twice(self.reg(base, ins).text) if fx is not None and base and \
+            not index and size == 2 and not os.environ.get("LIFT_NOGARRIDX") else None
+        if dd is not None:
+            # g + (i * 2) * 2 read as a word: an element of a global array of 2-short
+            # structs, ((short *)g)[i * 2 + 1] (written relative to the field before, so the
+            # compiler keeps the doubling as two adds); a choice point
+            self.choices.append(ins.address + 0.78125)
+            if ins.address + 0.78125 not in self.flips:
+                g = sym(fx.target_va - 2)
+                self.globals.add(g)
+                return "((short *)%s)[%s * 2 + 1]" % (g, dd)
         if fx is not None:
             g = sym(fx.target_va)
             self.globals.add(g)
@@ -3223,6 +3234,30 @@ def loaded_ptr_k(e):
     """`*(int *)p + k`: a dword read plus a constant, perhaps a pointer and an offset."""
     mm = re.fullmatch(r"\*\(int \*\)(\w+|\((?:[^()]|\([^()]*\))*\)) \+ (\d+)", e.text)
     return (mm.group(1), mm.group(2)) if mm else None
+
+
+def unparen(t):
+    """t without one pair of enclosing parentheses, if they enclose all of it."""
+    if t.startswith("(") and t.endswith(")"):
+        depth = 0
+        for k, ch in enumerate(t):
+            depth += ch == "("
+            depth -= ch == ")"
+            if depth == 0 and k < len(t) - 1:
+                return t
+        return t[1:-1]
+    return t
+
+
+def doubled_twice(t):
+    """`(x * 2) * 2`: x (an atom-ish expression, parenthesized), else None."""
+    t = unparen(t)
+    if not t.endswith(" * 2"):
+        return None
+    t = unparen(t[:-4])
+    if not t.endswith(" * 2"):
+        return None
+    return t[:-4]
 
 
 def split_sum(text):
