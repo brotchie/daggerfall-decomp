@@ -87,15 +87,57 @@ def png(path, w, h, pixels, palette):
                 + chunk(b"IDAT", zlib.compress(raw, 6)) + chunk(b"IEND", b""))
 
 
+GENERATED = {"Z.CFG", os.path.join("ARENA2", "ARCH3D.BSA"), os.path.join("ARENA2", "DAGGER.SND")}
+
+
 class Files:
-    """DOS file handles over the game directory, with a writable overlay."""
+    """DOS file handles over the game directory, with a writable overlay. A file opened for
+    writing is copied into the overlay at its first write, so the overlay holds exactly what
+    the game changed (snapshots carry it)."""
 
     def __init__(self, root, overlay):
         self.root, self.overlay = root, overlay
         self.handles = {}
-        self.next = 5
+        self.cow = {}           # handle -> overlay path, for files not yet copied
         self.cwd = ""           # relative to the drive root, no leading backslash
         self.log = []
+
+    def changed(self):
+        """{relative path: bytes} of what the game wrote."""
+        out = {}
+        for d, _sub, names in os.walk(self.overlay):
+            for n in names:
+                p = os.path.join(d, n)
+                rel = os.path.relpath(p, self.overlay)
+                if rel not in GENERATED:
+                    out[rel] = open(p, "rb").read()
+        return out
+
+    def restore(self, changed):
+        """Make the overlay hold exactly `changed` (plus the generated files)."""
+        for rel in self.changed():
+            if rel not in changed:
+                os.remove(os.path.join(self.overlay, rel))
+        for rel, data in changed.items():
+            p = os.path.join(self.overlay, rel)
+            os.makedirs(os.path.dirname(p), exist_ok=True)
+            with open(p, "wb") as f:
+                f.write(data)
+
+    def write(self, h, data):
+        if h in self.cow:       # first write: copy the original into the overlay
+            path = self.cow.pop(h)
+            f = self.handles[h]
+            pos = f.tell()
+            f.seek(0)
+            os.makedirs(os.path.dirname(path), exist_ok=True)
+            with open(path, "wb") as out:
+                out.write(f.read())
+            f.close()
+            f = open(path, "r+b")
+            f.seek(pos)
+            self.handles[h] = f
+        self.handles[h].write(data)
 
     def host(self, dos, write=False):
         """Host path for a DOS path, case-insensitive; writes go to the overlay."""
@@ -127,19 +169,18 @@ class Files:
         return cur
 
     def open(self, dos, mode, create=False):
-        path = self.host(dos, write=create or (mode & 3) != 0)
-        if (mode & 3) != 0 and not create and not os.path.exists(path):
-            src = self.host(dos)
-            if os.path.exists(src):
-                os.makedirs(os.path.dirname(path), exist_ok=True)
-                with open(src, "rb") as a, open(path, "wb") as b:
-                    b.write(a.read())
+        writing = create or (mode & 3) != 0
+        path = self.host(dos, write=writing)
+        cow = None
         try:
             if create:
                 os.makedirs(os.path.dirname(path), exist_ok=True)
                 f = open(path, "w+b")
+            elif writing and not os.path.exists(path):
+                f = open(self.host(dos), "rb")       # the original, until a write
+                cow = path
             else:
-                f = open(path, "r+b" if (mode & 3) else "rb")
+                f = open(path, "r+b" if writing else "rb")
         except OSError:
             self.log.append(("open-fail", dos))
             return None
@@ -147,17 +188,136 @@ class Files:
         while h in self.handles:
             h += 1
         self.handles[h] = f
+        if cow:
+            self.cow[h] = cow
         self.log.append(("open", dos, h))
         return h
 
 
+Z_CFG = (b"type 4\r\npath C:\\ARENA2\\\r\npathcd C:\\ARENA2\\\r\nmaps mapsave.sav\r\n"
+         b"mapfile maps.bsa\r\ncontrols 1\r\n")
+
+
+def unpack_packed(path):
+    """ARENA2/PACKED.DAT, where the CD keeps ARCH3D.BSA and DAGGER.SND for the installer to
+    unpack: 256 KB blocks, each a 36-byte header (block size, compressed size twice, size,
+    ...) and a PKWARE DCL stream (tools/blast.py); a file's last block is short; a directory
+    of sizes and names closes the file. Returns [(name, bytes)] in order."""
+    import blast
+    d = open(path, "rb").read()
+    names = [n.decode() for n in (b"ARCH3D.BSA", b"DAGGER.SND") if n in d[-128:]]
+    files, cur, pos = [], bytearray(), 8
+    while len(files) < len(names) and pos + 36 <= len(d):
+        h = struct.unpack_from("<9I", d, pos)
+        out, _end = blast.explode(d, pos + 36)
+        cur += out
+        pos += 36 + h[3]
+        if h[5] < 0x40000:          # a file's last block
+            files.append((names[len(files)], bytes(cur)))
+            cur = bytearray()
+    return files
+
+
+def prepare_overlay(game, overlay):
+    """What the installer would have created: Z.CFG (the game's config, its one argument),
+    and ARCH3D.BSA and DAGGER.SND unpacked from PACKED.DAT when the install lacks them (as
+    Bethesda's free release of the CD does)."""
+    os.makedirs(os.path.join(overlay, "ARENA2"), exist_ok=True)
+    cfg = os.path.join(overlay, "Z.CFG")
+    if not os.path.exists(cfg):
+        with open(cfg, "wb") as f:
+            f.write(Z_CFG)
+    arena2 = os.listdir(os.path.join(game, "ARENA2"))
+    need = [n for n in ("ARCH3D.BSA", "DAGGER.SND")
+            if n not in (x.upper() for x in arena2) and
+            not os.path.exists(os.path.join(overlay, "ARENA2", n))]
+    if need:
+        for name, data in unpack_packed(os.path.join(game, "ARENA2", "PACKED.DAT")):
+            if name in need:
+                with open(os.path.join(overlay, "ARENA2", name), "wb") as f:
+                    f.write(data)
+
+
 class Emu:
-    def __init__(self, args=(), exe=EXE, game=GAME, overlay=OVERLAY, trace=False):
+    def machine(self, trace):
+        """The CPU, its memory map and the hooks."""
         self.trace = trace
+        self.on_stop = None     # called after each slice; True = it handled an early stop
+        self.io_log = None      # a list to collect port I/O and interrupts into
         self.uc = uc = Uc(UC_ARCH_X86, UC_MODE_32)
         uc.mem_map(0, LOW)
         uc.mem_map(LOAD, MEM)
-        self.le = le = LE(exe)
+        uc.hook_add(UC_HOOK_INTR, self.on_int)
+        uc.hook_add(UC_HOOK_INSN, self.on_in, None, 1, 0, UC_X86_INS_IN)
+        uc.hook_add(UC_HOOK_INSN, self.on_out, None, 1, 0, UC_X86_INS_OUT)
+        uc.hook_add(UC_HOOK_MEM_UNMAPPED, self.on_unmapped)
+        return uc
+
+    def watch(self, addrs):
+        """Log every call to these functions (preferred addresses) with the Watcom register
+        arguments and the return address."""
+        def hit(uc, address, size, _):
+            ret = struct.unpack("<I", self.read(self.r("esp"), 4))[0]
+            print("call %08X(eax=%08X edx=%08X ebx=%08X ecx=%08X) from %08X tick %d" % (
+                address - LOAD, self.r("eax"), self.r("edx"), self.r("ebx"), self.r("ecx"),
+                ret - LOAD, self.ticks))
+        for a in addrs:
+            self.uc.hook_add(UC_HOOK_CODE, hit, None, LOAD + a, LOAD + a)
+
+    def save(self, path):
+        """Snapshot the whole machine: CPU, memory, open files, devices."""
+        import pickle
+        st = {k: v for k, v in self.__dict__.items() if k not in ("uc", "files", "trace", "on_stop", "io_log")}
+        st["ctx"] = self.uc.context_save()
+        st["low"] = zlib.compress(self.read(0, LOW), 1)
+        st["mem"] = zlib.compress(self.read(LOAD, MEM), 1)
+        f = self.files
+        for fh in f.handles.values():
+            fh.flush()
+        st["files"] = (f.root, f.overlay, f.cwd, f.log,
+                       {h: (fh.name, fh.mode, fh.tell()) for h, fh in f.handles.items()},
+                       dict(f.cow), f.changed())
+        with open(path, "wb") as out:
+            pickle.dump(st, out)
+
+    @classmethod
+    def load(cls, path, trace=False, overlay=None):
+        """A machine from a snapshot. `overlay` gives this run its own overlay directory, so
+        runs can go side by side."""
+        import pickle
+        with open(path, "rb") as fh:
+            st = pickle.load(fh)
+        if overlay:
+            f = list(st["files"])
+            f[1] = overlay
+            st["files"] = tuple(f)
+            prepare_overlay(f[0], overlay)
+        emu = cls.__new__(cls)
+        uc = emu.machine(trace)
+        uc.mem_write(0, zlib.decompress(st.pop("low")))
+        uc.mem_write(LOAD, zlib.decompress(st.pop("mem")))
+        uc.context_restore(st.pop("ctx"))
+        root, overlay, cwd, log, handles, cow, changed = st.pop("files")
+        emu.__dict__.update(st)
+        # attributes newer than the snapshot
+        for k, v in (("mickeys_at", emu.mouse[:2]), ("pit_reload", 0), ("pit_reads", 0),
+                     ("pit_access", 3), ("pit_latch", []), ("pit_hi_next", False),
+                     ("pit_lo", None), ("pit_cur", 0)):
+            emu.__dict__.setdefault(k, v)
+        emu.files = Files(root, overlay)
+        emu.files.cwd, emu.files.log, emu.files.cow = cwd, log, cow
+        emu.files.restore(changed)
+        for h, (name, mode, pos) in handles.items():
+            f = open(name, mode)
+            f.seek(pos)
+            emu.files.handles[h] = f
+        return emu
+
+    def __init__(self, args=("z.cfg",), exe=EXE, game=GAME, overlay=OVERLAY, trace=False):
+        prepare_overlay(game, overlay)
+        Files(game, overlay).restore({})        # a fresh boot sees an unchanged install
+        uc = self.machine(trace)
+        le = LE(exe)
         img = le.load(relocate=True)
         for f in le.fixups():           # relocate to LOAD, as the extender's loader does
             o = le.obj_of_va(f.src_va)
@@ -220,7 +380,11 @@ class Emu:
         self.mode = 3
         self.kbd = []           # pending scancodes
         self.port60 = 0
-        self.mouse = [160, 100, 0]
+        self.pit_reload, self.pit_reads, self.pit_access = 0, 0, 3
+        self.pit_latch, self.pit_hi_next, self.pit_lo, self.pit_cur = [], False, None, 0
+        self.mouse = [160, 100, 0]      # x, y, buttons, in the game's own range
+        self.mouse_range = [(0, 639), (0, 199)]
+        self.mickeys_at = self.mouse[:2]   # where the last motion read left off
         self.ticks = 0
         self.insns = 0
         self.dta = 0
@@ -228,10 +392,6 @@ class Emu:
         self.exit_code = None
         self.unknown = []
         self.notes = set()      # odd things the program did that DOS tolerates
-        uc.hook_add(UC_HOOK_INTR, self.on_int)
-        uc.hook_add(UC_HOOK_INSN, self.on_in, None, 1, 0, UC_X86_INS_IN)
-        uc.hook_add(UC_HOOK_INSN, self.on_out, None, 1, 0, UC_X86_INS_OUT)
-        uc.hook_add(UC_HOOK_MEM_UNMAPPED, self.on_unmapped)
 
     # -- registers and memory --------------------------------------------------------
     def r(self, n):
@@ -278,6 +438,8 @@ class Emu:
 
     # -- interrupts --------------------------------------------------------------------
     def on_int(self, uc, intno, _):
+        if self.io_log is not None:
+            self.io_log.append(("int", intno, self.r("eax")))
         try:
             if intno == 0xFE:
                 n = (self.r("eip") - 2 - STUBS) // 4
@@ -307,6 +469,15 @@ class Emu:
                 self.w("al", 0)
             elif intno in (8, 9) or intno >= 0x70 or 0x0A <= intno <= 0x0F:
                 self.default_handler(intno)
+            elif intno in (0, 6, 0x0D, 0x0E):  # CPU faults: the extender would end the run
+                self.fault = "CPU exception %d at %#x: eax=%08X ebx=%08X ecx=%08X edx=%08X " \
+                    "esi=%08X edi=%08X ebp=%08X esp=%08X tick %d" % (
+                        intno, self.r("eip") - LOAD, self.r("eax"), self.r("ebx"),
+                        self.r("ecx"), self.r("edx"), self.r("esi"), self.r("edi"),
+                        self.r("ebp"), self.r("esp"), self.ticks)
+                print(self.fault)
+                self.exit_code = -1
+                raise Stop()
             else:
                 self.unsupported("int %02Xh" % intno)
         except Stop:
@@ -322,11 +493,25 @@ class Emu:
 
     def default_handler(self, n):
         """What the BIOS would do for an interrupt nobody else handles."""
-        if n == 8:          # timer: tick count, end of interrupt
+        if n == 8:          # timer: tick count, then the user tick (int 1Ch)
             t = struct.unpack("<I", self.read(0x46C, 4))[0] + 1
             self.write(0x46C, struct.pack("<I", t))
+            if self.pm_vec[0x1C][0] != SEL_STUB:
+                self.call_handler(0x1C)
         elif n == 9:        # keyboard: read the scan code
             pass
+
+    def call_handler(self, vector):
+        """From inside a stub: run the game's handler for `vector` as `int` would, returning
+        to the stub's iretd."""
+        sel, off = self.pm_vec[vector]
+        esp = self.r("esp") - 12
+        self.write(self.lin(self.r("ss"), esp),
+                   struct.pack("<III", self.r("eip"), self.r("cs"), self.r("eflags")))
+        self.w("esp", esp)
+        self.w("eflags", self.r("eflags") & ~0x200)
+        self.w("cs", sel)
+        self.w("eip", off)
 
     def int21(self):
         ah, al = self.r("ah"), self.r("al")
@@ -342,6 +527,8 @@ class Emu:
             self.w("al", 1)              # DOS/4G-compatible extender API present
         elif ah == 0x25:                 # set vector (protected mode)
             self.pm_vec[al] = (self.r("ds"), self.r("edx"))
+            if self.trace:
+                print("vector %02Xh -> %04X:%08X (int 21h)" % (al, self.r("ds"), self.r("edx")))
         elif ah == 0x35:                 # get vector
             sel, off = self.pm_vec[al]
             self.w("es", sel)
@@ -378,6 +565,7 @@ class Emu:
             h = f.open(self.asciiz(self.ds_edx()), al)
             self.w("eax", h) if h else self.fail(2)
         elif ah == 0x3E:
+            f.cow.pop(self.r("bx"), None)
             fh = f.handles.pop(self.r("bx"), None)
             if fh:
                 fh.close()
@@ -400,7 +588,7 @@ class Emu:
                     sys.stdout.write(data.decode("latin1"))
                 self.w("eax", n)
             elif h in f.handles:
-                f.handles[h].write(data)
+                f.write(h, data)
                 self.w("eax", n)
             else:
                 self.fail(6)
@@ -659,6 +847,9 @@ class Emu:
         regs = list(struct.unpack("<8IHHHHHHHHH", self.read(blk, 0x32)))
         n = self.r("bl")
         eax = regs[7]
+        if self.trace:
+            print("real-mode int %02Xh eax=%08X ebx=%08X ecx=%08X edx=%08X" % (
+                n, eax, regs[4], regs[6], regs[5]))
         if n == 0x10:
             ah = (eax >> 8) & 0xFF
             if ah == 0x00:
@@ -715,16 +906,28 @@ class Emu:
 
     def int33(self):
         ax = self.r("ax")
+        if self.trace:
+            print("int 33h ax=%04X bx=%04X cx=%04X dx=%04X" % (
+                ax, self.r("bx"), self.r("cx"), self.r("dx")))
         if ax == 0x0000:
             self.w("ax", 0xFFFF)
             self.w("bx", 2)
-        elif ax == 0x0003:
+        elif ax == 0x0003:              # position (clamped to the range) and buttons
+            (x0, x1), (y0, y1) = self.mouse_range
             self.w("bx", self.mouse[2])
-            self.w("cx", self.mouse[0] * 2)
-            self.w("dx", self.mouse[1])
-        elif ax == 0x000B:
-            self.w("cx", 0)
-            self.w("dx", 0)
+            self.w("cx", max(x0, min(x1, self.mouse[0])))
+            self.w("dx", max(y0, min(y1, self.mouse[1])))
+        elif ax == 0x0004:
+            self.mouse[0], self.mouse[1] = self.r("cx"), self.r("dx")
+            self.mickeys_at = self.mouse[:2]
+        elif ax in (0x0007, 0x0008):
+            k = ax - 7
+            self.mouse_range[k] = (self.r("cx"), self.r("dx"))
+        elif ax == 0x000B:              # motion since the last call, in mickeys (1 per pixel)
+            last = self.mickeys_at
+            self.w("cx", (self.mouse[0] - last[0]) & 0xFFFF)
+            self.w("dx", (self.mouse[1] - last[1]) & 0xFFFF)
+            self.mickeys_at = self.mouse[:2]
         elif ax == 0x001B:
             self.w("bx", 50)
             self.w("cx", 50)
@@ -737,6 +940,12 @@ class Emu:
 
     # -- ports -------------------------------------------------------------------------
     def on_in(self, uc, port, size, _):
+        v = self.port_in(port)
+        if self.io_log is not None:
+            self.io_log.append(("in", port, v))
+        return v
+
+    def port_in(self, port):
         if port == 0x3DA:                # VGA status: alternate retrace
             self.retrace ^= 0x09
             return self.retrace
@@ -756,12 +965,63 @@ class Emu:
             return 0
         if port == 0x61:
             return 0x20
-        if port in (0x40, 0x41, 0x42):
-            return (self.insns >> 4) & 0xFF
+        if port == 0x40:
+            return self.pit_read()
+        if port in (0x41, 0x42):
+            return 0
         return 0xFF
 
+    def pit_count(self):
+        """Channel 0's count. Time inside a timer tick is not visible to us, so each read
+        moves it on by 1/256 of the reload: it falls steadily from the reload value after
+        each timer interrupt, and two reads never see the same count."""
+        reload = self.pit_reload or 0x10000
+        self.pit_reads += 1
+        return max(1, reload - (self.pit_reads * reload) // 256 % reload)
+
+    def pit_read(self):
+        if self.pit_latch:
+            v = self.pit_latch.pop(0)
+            return v
+        if self.pit_access == 3:        # low byte, then high byte of one count
+            if not self.pit_hi_next:
+                self.pit_cur = self.pit_count()
+            v = (self.pit_cur >> (8 if self.pit_hi_next else 0)) & 0xFF
+            self.pit_hi_next = not self.pit_hi_next
+            return v
+        c = self.pit_count()
+        return (c >> 8) & 0xFF if self.pit_access == 2 else c & 0xFF
+
+    def pit_write(self, port, value):
+        value &= 0xFF
+        if port == 0x43:
+            if value >> 6:              # only channel 0 matters
+                return
+            if (value >> 4) & 3 == 0:   # latch the count
+                c = self.pit_count()
+                self.pit_latch = [c & 0xFF, (c >> 8) & 0xFF]
+            else:
+                self.pit_access = (value >> 4) & 3
+                self.pit_hi_next = False
+                self.pit_lo = None
+        elif port == 0x40:
+            if self.pit_access == 3:
+                if self.pit_lo is None:
+                    self.pit_lo = value
+                    return
+                self.pit_reload = self.pit_lo | (value << 8)
+                self.pit_lo = None
+            elif self.pit_access == 1:
+                self.pit_reload = (self.pit_reload & 0xFF00) | value
+            else:
+                self.pit_reload = (self.pit_reload & 0xFF) | (value << 8)
+
     def on_out(self, uc, port, size, value, _):
-        if port == 0x3C8:
+        if self.io_log is not None:
+            self.io_log.append(("out", port, value))
+        if port in (0x40, 0x43):
+            self.pit_write(port, value)
+        elif port == 0x3C8:
             self.pal_w, self.pal_sub, self.pal_rgb = value & 0xFF, 0, []
         elif port == 0x3C7:
             self.pal_r, self.pal_sub = value & 0xFF, 0
@@ -792,10 +1052,14 @@ class Emu:
         self.w("cs", sel)
         self.w("eip", off)
 
-    def run(self, insns, keys=None):
-        """Run for about `insns` instructions, firing the timer every TICK."""
-        keys = list(keys or [])
-        while self.insns < insns and self.exit_code is None:
+    def run(self, ticks, script=(), shots=None):
+        """Run until timer tick `ticks`. The timer fires every TICK instructions while
+        interrupts are enabled; script events [(tick, action, arg)] happen at their tick:
+        ("key", name) presses and releases a key, ("down"/"up", name) one half of that,
+        ("mouse", (x, y, buttons)) sets the mouse, ("shot", name) saves the screen."""
+        events = sorted(script, key=lambda e: e[0])
+        codes = []          # pending scan codes: (tick, code)
+        while self.ticks < ticks and self.exit_code is None:
             try:
                 self.uc.emu_start(self.r("eip"), 0xFFFFFFFF, count=TICK)
             except UcError as e:
@@ -804,12 +1068,28 @@ class Emu:
             except Stop:
                 break
             self.insns += TICK
-            if self.r("eflags") & 0x200:
-                self.ticks += 1
+            if self.on_stop is not None and self.on_stop():
+                continue        # a hook stopped the CPU early and handled it (xn_record.py)
+            if not self.r("eflags") & 0x200:
+                continue
+            self.ticks += 1
+            while events and events[0][0] <= self.ticks:
+                _t, act, arg = events.pop(0)
+                if act in ("key", "down"):
+                    codes.append((self.ticks, SCAN[arg]))
+                if act in ("key", "up"):
+                    codes.append((self.ticks + (3 if act == "key" else 0), SCAN[arg] | 0x80))
+                elif act == "mouse":
+                    self.mouse = list(arg)
+                elif act == "shot" and shots:
+                    self.screenshot(os.path.join(shots, arg + ".png"))
+            codes.sort()
+            if codes and codes[0][0] <= self.ticks:
+                self.port60 = codes.pop(0)[1]     # a key instead of this tick's timer
+                self.irq(9)
+            else:
+                self.pit_reads = 0         # the count restarts with each interrupt
                 self.irq(8)
-                if keys and self.ticks % 10 == 0:
-                    self.port60 = keys.pop(0)
-                    self.irq(9)
         return True
 
     def screenshot(self, path):
@@ -819,16 +1099,106 @@ class Emu:
         return False
 
 
+SCAN = {"esc": 0x01, "1": 0x02, "2": 0x03, "3": 0x04, "4": 0x05, "5": 0x06, "6": 0x07,
+        "7": 0x08, "8": 0x09, "9": 0x0A, "0": 0x0B, "-": 0x0C, "=": 0x0D, "bksp": 0x0E,
+        "tab": 0x0F, "enter": 0x1C, "ctrl": 0x1D, "lshift": 0x2A, "rshift": 0x36, "alt": 0x38,
+        "space": 0x39, "up": 0x48, "down": 0x50, "left": 0x4B, "right": 0x4D, "pgup": 0x49,
+        "pgdn": 0x51, "home": 0x47, "end": 0x4F, "ins": 0x52, "del": 0x53}
+for _k, _c in zip("qwertyuiop", range(0x10, 0x1A)):
+    SCAN[_k] = _c
+for _k, _c in zip("asdfghjkl", range(0x1E, 0x27)):
+    SCAN[_k] = _c
+for _k, _c in zip("zxcvbnm", range(0x2C, 0x33)):
+    SCAN[_k] = _c
+for _n in range(1, 11):
+    SCAN["f%d" % _n] = 0x3A + _n
+
+
+def parse_script(text):
+    """'TICK ACTION [ARG]; ...' -> [(tick, action, arg)]. ACTION is key, down, up (ARG a key
+    name), mouse (ARG x,y,buttons), shot (ARG a name), or click / dclick (ARG x,y): move
+    there, press 20 ticks later, release 30 after that (dclick presses twice, 6 ticks apart).
+    XnGine pairs presses less than about 8 BIOS ticks (60 timer ticks) apart into a
+    double-click, so separate single clicks by 80 or more."""
+    out = []
+    for item in text.replace("\n", ";").split(";"):
+        w = item.split()
+        if not w:
+            continue
+        t, act, arg = int(w[0]), w[1], w[2] if len(w) > 2 else None
+        if act in ("click", "dclick"):
+            x, y = (int(v) for v in arg.split(","))
+            out.append((t, "mouse", (x, y, 0)))
+            if act == "click":
+                out += [(t + 20, "mouse", (x, y, 1)), (t + 50, "mouse", (x, y, 0))]
+            else:
+                out += [(t + 20, "mouse", (x, y, 1)), (t + 26, "mouse", (x, y, 0)),
+                        (t + 32, "mouse", (x, y, 1)), (t + 38, "mouse", (x, y, 0))]
+            continue
+        if act == "mouse":
+            arg = tuple(int(v) for v in arg.split(","))
+        out.append((t, act, arg))
+    return out
+
+
+SNAPS = os.path.join(ROOT, "build", "emu", "snap")
+
+
+def run_scenario(emu, path, shots, upto=None):
+    """Lines: `run TICKS[: EVENTS]` (events as in --script, ticks from the line's start),
+    `shot NAME`, `save NAME` (build/emu/snap/NAME.snap), `# comments`. With `upto`, stop after
+    the line that saves that snapshot."""
+    for line in open(path):
+        line = line.split("#", 1)[0].strip()
+        if not line:
+            continue
+        word, _, rest = line.partition(" ")
+        if word == "run":
+            n, _, events = rest.partition(":")
+            start = emu.ticks
+            emu.run(start + int(n), [(start + t, a, g) for t, a, g in parse_script(events)],
+                    shots)
+        elif word == "shot":
+            emu.screenshot(os.path.join(shots, rest + ".png"))
+        elif word == "save":
+            os.makedirs(SNAPS, exist_ok=True)
+            emu.save(os.path.join(SNAPS, rest + ".snap"))
+            print("saved %s at tick %d" % (rest, emu.ticks))
+            if rest == upto:
+                return
+        if emu.exit_code is not None:
+            print("the game exited (%s) at: %s" % (emu.exit_code, line))
+            return
+
+
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--insns", type=float, default=2e8, help="instructions to run")
-    ap.add_argument("--shot", default=os.path.join(ROOT, "build", "emu", "screen.png"))
+    ap.add_argument("--ticks", type=int, default=2600, help="timer ticks to run")
+    ap.add_argument("--script", default="",
+                    help="'TICK ACTION [ARG]; ...' (ticks from the start of this run) or @file")
+    ap.add_argument("--shots", default=os.path.join(ROOT, "build", "emu"))
+    ap.add_argument("--load", help="start from a snapshot instead of booting")
+    ap.add_argument("--save", help="snapshot the machine at the end")
     ap.add_argument("--trace", action="store_true")
+    ap.add_argument("--watch", default="", help="log calls to these functions: ADDR,ADDR,...")
+    ap.add_argument("--scenario", help="a file of run/shot/save lines (run_scenario)")
     ap.add_argument("args", nargs="*")
     a = ap.parse_args()
-    emu = Emu(a.args, trace=a.trace)
+    script = open(a.script[1:]).read() if a.script.startswith("@") else a.script
+    emu = Emu.load(a.load, a.trace) if a.load else Emu(a.args or ["z.cfg"], trace=a.trace)
+    if a.watch:
+        emu.watch([int(x, 16) for x in a.watch.split(",")])
+    os.makedirs(a.shots, exist_ok=True)
     t0 = time.time()
-    emu.run(int(a.insns))
+    start = emu.ticks
+    if a.scenario:
+        run_scenario(emu, a.scenario, a.shots)
+    else:
+        emu.run(start + a.ticks, [(start + t, act, arg) for t, act, arg in parse_script(script)],
+                a.shots)
+    if a.save:
+        emu.save(a.save)
+    a.shot = os.path.join(a.shots, "screen.png")
     dt = time.time() - t0
     print("%.0fM instructions in %.1f s (%.1f MIPS), exit %s, mode %02Xh, eip %04X:%08X" % (
         emu.insns / 1e6, dt, emu.insns / 1e6 / max(dt, 1e-9), emu.exit_code, emu.mode,

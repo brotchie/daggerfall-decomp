@@ -1,0 +1,40 @@
+# A new game, from boot into the first dungeon (Privateer's Hold), for tools/fallemu.py:
+#   .venv/bin/python tools/fallemu.py --scenario tools/scenarios/newgame.txt
+# Times are timer ticks (400,000 instructions each) from the start of each `run` line.
+# Clicks are 80+ ticks apart: XnGine pairs closer presses into a double-click.
+
+run 2600
+shot menu
+save menu
+
+run 600: 50 key s; 250 click 90,52            # Start New Game; High Rock on the map
+run 300: 20 key y                             # be a Breton
+run 300: 20 key m                             # male
+run 400: 10 click 160,85                      # choose a class from a list
+run 400: 10 click 102,80; 120 dclick 102,80   # Battlemage
+run 300: 10 key y                             # be a Battlemage
+run 400: 10 click 160,85                      # fast start: generated background
+run 300: 10 key enter                         # reputation summary
+run 400: 10 key a; 20 key l; 30 key d; 40 key o; 100 key enter   # name
+run 400: 10 click 283,183                     # face: OK
+shot attributes
+# ten bonus points into STR: select it, then the top of the points diamond
+run 1100: 10 click 18,32; 100 click 51,24; 190 click 51,24; 280 click 51,24; 370 click 51,24; 460 click 51,24; 550 click 51,24; 640 click 51,24; 730 click 51,24; 820 click 51,24; 910 click 51,24
+shot attributes_done
+run 400: 10 click 283,183                     # attributes: OK
+shot skills
+# six bonus points in each skill group: select a skill, then the group's right arrow
+run 700: 10 click 100,35; 100 click 236,35; 190 click 236,35; 280 click 236,35; 370 click 236,35; 460 click 236,35; 550 click 236,35
+run 700: 10 click 100,84; 100 click 236,84; 190 click 236,84; 280 click 236,84; 370 click 236,84; 460 click 236,84; 550 click 236,84
+run 700: 10 click 100,132; 100 click 236,133; 190 click 236,133; 280 click 236,133; 370 click 236,133; 460 click 236,133; 550 click 236,133
+shot skills_done
+run 400: 10 click 283,183                     # skills: OK
+run 400: 10 click 283,183                     # reflexes: OK (average)
+shot summary
+save summary
+run 600: 10 click 283,183                     # summary: OK, the intro starts
+run 1500: 10 key esc; 300 key esc; 600 key esc; 900 key esc   # skip the intro video
+save intro_done
+run 4000
+shot world
+save world
