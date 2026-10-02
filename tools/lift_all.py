@@ -137,6 +137,77 @@ NEAR = 8
 BUDGET = 600
 
 
+REG_RE = re.compile(r"\b(e[abcd]x|e[sd]i|[abcd]x|[sd]i)\b")
+
+
+def reg_log(c):
+    """The function's register choices in order (DAGGER_REGLOG): [chosen register]."""
+    match = W["match"]
+    with tempfile.TemporaryDirectory() as td:
+        src = os.path.join(td, "r.c")
+        with open(src, "w") as f:
+            f.write(c)
+        cmd = [match.compiler(), "-q", "-zq"] + W["flags"] + [
+            "-i=" + os.path.join(ROOT, "include"), "-i=" + os.path.join(ROOT, "src"),
+            "-fo=r.obj", "r.c"]
+        import subprocess
+        r = subprocess.run(cmd, capture_output=True, text=True, cwd=td,
+                           env=dict(os.environ, DAGGER_REGLOG="1"))
+    return [ln.split()[2] for ln in r.stderr.splitlines() if ln.startswith("reg ")]
+
+
+def pin_search(name, va, c, detail, at, flips, attempt):
+    """Last resort at a register-only difference: pin one of the allocator's choices to the
+    register the original used there (#pragma dagger reg). Tries the choices that picked
+    our register first. Returns (at2, 0, flips, result, tries) or None."""
+    lift = W["lift"]
+    m = re.search(r": (.*) \| (.*)$", detail or "")
+    if not m or at is None:
+        return None
+    ours, theirs = m.group(1), m.group(2)
+    if REG_RE.sub("R", ours) != REG_RE.sub("R", theirs):
+        return None
+    pairs = [(a, b) for a, b in zip(REG_RE.findall(ours), REG_RE.findall(theirs)) if a != b]
+    if not pairs:
+        return None
+    mine, want = pairs[0]
+    log = reg_log(c)
+    if not log:
+        return None
+    used = {lift.pin_decode(f)[0] for f in flips if f <= -3000}
+    # a choice that took our register gets theirs, or one that took theirs gets ours
+    near_k = [k for k, r in enumerate(log) if r == mine and k not in used]
+    order = [(k, want) for k in near_k] + \
+        [(k, mine) for k, r in enumerate(log) if r == want and k not in used]
+    tries = 0
+    for k, reg in order[:64]:
+        if reg not in lift.PIN_REGS:
+            continue
+        tries += 1
+        f2 = flips | {lift.pin_encode(k, reg)}
+        r = attempt(f2)
+        if r is None:
+            continue
+        s2, d2, at2 = r[0], r[1], r[2]
+        if s2 == "ok" or (s2 == "diff" and at2 is not None and at2 > at):
+            return ((1 << 40) if s2 == "ok" else at2, 0, f2, r, tries)
+    # a swap: one choice to theirs and another to ours
+    took_want = [k for k, r in enumerate(log) if r == want and k not in used]
+    for k1 in near_k[:8]:
+        for k2 in took_want[:8]:
+            if want not in lift.PIN_REGS or mine not in lift.PIN_REGS:
+                return None
+            tries += 1
+            f2 = flips | {lift.pin_encode(k1, want), lift.pin_encode(k2, mine)}
+            r = attempt(f2)
+            if r is None:
+                continue
+            s2, d2, at2 = r[0], r[1], r[2]
+            if s2 == "ok" or (s2 == "diff" and at2 is not None and at2 > at):
+                return ((1 << 40) if s2 == "ok" else at2, 0, f2, r, tries)
+    return None
+
+
 def work(va):
     lift = W["lift"]
     name = "func_%08X" % va
@@ -223,6 +294,11 @@ def work(va):
                 if s2 == "ok" or (s2 == "diff" and at2 is not None and at2 > at):
                     found = (at2 or 0, 0, flips | {x, y}, r)
                     break
+        if found is None and not os.environ.get("LIFT_NOREGPIN"):
+            found = pin_search(name, va, c, detail, at, flips, attempt)
+            if found is not None:
+                tries += found[4]
+                found = found[:4]
         if found is None:
             break
         flips = found[2]

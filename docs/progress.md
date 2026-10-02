@@ -1187,3 +1187,10 @@ Batch **1,927**; build **61.34%**.
 - Locals deeper in the frame than a switch's selector temp were declared in a block opened
   inside the switch (a choice point when the frame has no parameters to tell). +2.
   Batch **2,078**.
+- **Register pins (last resort)**: `#pragma dagger reg <function> <k> <register> ...` makes
+  the k-th register choice of the function's allocator take that register (when it is free
+  to). At a difference that is only a register name, the search compiles once with
+  `DAGGER_REGLOG=1` to list the choices, then pins a choice that took our register to the
+  original's (or one that took the original's to ours, or swaps a pair). Like the slot
+  pins, this is a hint to the compiler, not a change to the C. +9 (and 2 more seen in
+  testing). Batch **2,087**.

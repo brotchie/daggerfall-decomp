@@ -2359,6 +2359,12 @@ class Func:
             if pins:
                 decl.append("#pragma dagger slots %s %s" % (
                     name, " ".join("%s %d" % (n, d) for n, d in pins)))
+        # register pins (#pragma dagger reg), set by the search at register-only
+        # differences: flips -(3000 + 16 k + r)
+        pins = sorted(pin_decode(f) for f in self.flips if f <= -3000)
+        if pins:
+            decl.append("#pragma dagger reg %s %s" % (
+                name, " ".join("%d %s" % (k, r) for k, r in pins)))
         # function-level choice points: code generator options (#pragma dagger)
         self.choices.extend(-1 - k for k in range(len(FUNC_OPTS)))
         for k, opt in enumerate(FUNC_OPTS):
@@ -2393,6 +2399,17 @@ POPS = {}
 # Code generator switches the batch search may turn on for one function
 # (`#pragma dagger <SWITCH> <function>`, DaggerEnv() in the compiler)
 PIN_SLOTS = -1000         # the choice point for `#pragma dagger slots`
+PIN_REGS = ["eax", "ebx", "ecx", "edx", "esi", "edi", "ax", "bx", "cx", "dx", "si", "di"]
+
+
+def pin_encode(k, reg):
+    """The flip for `#pragma dagger reg <f> k reg`."""
+    return -(3000 + 16 * k + PIN_REGS.index(reg))
+
+
+def pin_decode(f):
+    n = -f - 3000
+    return n // 16, PIN_REGS[n % 16]
 FUNC_OPTS = ["KKND_CONFREV", "DAGGER_LEFTPREF", "DAGGER_CHARAUTOSMALL", "DAGGER_CLRAFTER",
              "DAGGER_WORDSTORE", "DAGGER_RMW", "DAGGER_PUSHMEM", "DAGGER_DEADDEF", "DAGGER_CDQ",
              "DAGGER_FLUSH", "DAGGER_CHARPARMBIG", "DAGGER_SIGNEDBF", "KKND_CONSTREG",

@@ -43,6 +43,7 @@ extern char D_00190FE4[];
 extern char D_00191020[];
 extern char D_001959A0[];
 extern char D_001959A4[];
+extern char D_001959E0[];
 extern char D_00195A04[];
 extern char D_00195AA0[];
 extern char D_00195AA4[];
@@ -102,6 +103,7 @@ extern int func_0007F57B(int);
 extern int func_0008523E(unsigned short, int, int);
 extern int func_0008C5C9(void);
 extern int func_0008DA91(int);
+extern int func_0008DCE3(int, int, int);
 extern int func_000A0024();
 extern int func_000A0040();
 extern int func_000A00AF();
@@ -130,6 +132,7 @@ extern void func_0003EC2A(int, int);
 extern void func_0003F09F(int, int);
 extern void func_0003F358(void);
 extern void func_0004633F(int, int);
+extern void func_0005E540(int, int, int);
 extern void func_0007CA1F(int, int, int, int, unsigned char);
 extern void func_0007DDC9(int);
 extern void func_0007F1E3(int);
@@ -149,8 +152,10 @@ void func_0006C55B(void);
 void func_0006C692(void);
 void func_0006CB02(void);
 #pragma aux func_000A0ED9 parm routine [];
+#pragma dagger DAGGER_NOGIVEN func_0006BE5C
 #pragma dagger DAGGER_PUSHMEM func_0006C692
 #pragma dagger KKND_CONFREV func_0006BF30
+#pragma dagger reg func_0006BE5C 8 ebx
 
 int func_0006B376(int a1)
 {
@@ -456,6 +461,32 @@ void func_0006BE24(void)
 {
     if (func_0006C9E2(291) == 0) return;
     func_0008E3F7(*(int *)(*(char **)D_00195AA0 + 63), (int)func_0006BDB8);
+}
+
+void func_0006BE5C(void)
+{
+    int l_20;
+    int l_1C;
+    int l_18;
+
+    if (*(int *)(*(char **)D_001A41EC) <= 0) return;
+    l_1C = func_0006CA5C();
+    if (l_1C < 1) return;
+    if (l_1C >= 100) goto L6BEA4;
+    func_0003F09F(293, 1);
+    return;
+L6BEA4:;
+    l_20 = (l_1C / 100) + 1;
+    if ((l_20 + l_1C) <= *(int *)(*(char **)D_001A41EC)) goto L6BED8;
+    func_0003F09F(292, 1);
+    return;
+L6BED8:;
+    *(int *)(*(char **)D_001A41EC) -= l_20 + l_1C;
+    l_18 = func_0008DCE3(*(int *)D_001959E0, 0, 107);
+    *(signed char *)((char *)l_18) = 2;
+    *(short *)((char *)l_18 + 21) = 1;
+    func_0005E540(27, 2, l_18 + 71);
+    *(int *)((char *)l_18 + 107) = l_1C;
 }
 
 void func_0006BF30(void)

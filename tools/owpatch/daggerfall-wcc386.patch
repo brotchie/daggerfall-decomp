@@ -72,15 +72,16 @@ index ee6e5533cb..b42fafffb0 100644
          case OPR_FARPTR:                // segment :> offset
              op2 = PopCGName();          // - get offset
 diff --git a/bld/cc/c/cpragma.c b/bld/cc/c/cpragma.c
-index b8a6f1c7fd..20bcbe8112 100644
+index b8a6f1c7fd..de3576f0ae 100644
 --- a/bld/cc/c/cpragma.c
 +++ b/bld/cc/c/cpragma.c
-@@ -1487,6 +1487,49 @@ static void pragReadOnlyFile( void )
+@@ -1487,6 +1487,69 @@ static void pragReadOnlyFile( void )
  }
  
  
 +extern void DaggerFuncOptAdd( const char *opt, const char *func );
 +extern void DaggerSlotAdd( const char *func, const char *var, int depth );
++extern void DaggerRegPinAdd( const char *func, int k, const char *reg );
 +
 +static void pragDagger( void )
 +/*****************************
@@ -118,6 +119,25 @@ index b8a6f1c7fd..20bcbe8112 100644
 +        }
 +        return;
 +    }
++    if( strcmp( opt, "reg" ) == 0 ) {
++        /* #pragma dagger reg <function> <k> <register> ...: the k-th register choice of
++         * the function's allocator takes that register (a last resort) */
++        char    func[40];
++        int     k;
++
++        strncpy( func, Buffer, sizeof( func ) - 1 );
++        func[sizeof( func ) - 1] = '\0';
++        PPNextToken();
++        while( CurToken == T_CONSTANT ) {
++            k = (int)U64Low( Constant64 );
++            PPNextToken();
++            if( !IS_ID_OR_KEYWORD( CurToken ) )
++                break;
++            DaggerRegPinAdd( func, k, Buffer );
++            PPNextToken();
++        }
++        return;
++    }
 +    DaggerFuncOptAdd( opt, Buffer );
 +    PPNextToken();
 +}
@@ -125,7 +145,7 @@ index b8a6f1c7fd..20bcbe8112 100644
  static void pragReadOnlyDir( void )
  /**********************************
   * forms:
-@@ -1821,6 +1864,8 @@ void CPragma( void )
+@@ -1821,6 +1884,8 @@ void CPragma( void )
              pragReadOnlyFile();
          } else if( pragmaNameRecog( "read_only_directory" ) ) {
              pragReadOnlyDir();
@@ -198,7 +218,7 @@ index e800aac5b8..6a099109f4 100644
                  ins = MakeBinary( OP_ADD, addr->u.n.name,
                                      AllocS32Const( addr->u.n.offset ),
 diff --git a/bld/cg/c/bldcall.c b/bld/cg/c/bldcall.c
-index 14a056a76b..f8fb464b7a 100644
+index 14a056a76b..a88fef01ac 100644
 --- a/bld/cg/c/bldcall.c
 +++ b/bld/cg/c/bldcall.c
 @@ -31,6 +31,10 @@
@@ -446,14 +466,17 @@ index 14a056a76b..f8fb464b7a 100644
      }
      temp->v.usage |= USE_IN_ANOTHER_BLOCK;
  
-@@ -887,3 +1097,12 @@ bool        AssgnParms( cn call, bool aux_inline )
+@@ -887,3 +1097,15 @@ bool        AssgnParms( cn call, bool aux_inline )
      call_ins->zap = &AllocRegName( CallZap( state ) )->r;
      return( push_no_pop );
  }
 +
 +
++extern void DaggerRegReset( void );
++
 +void    DaggerNewProc( void )
 +{
++    DaggerRegReset();
 +    DaggerNoSlotCount = 0;
 +    DaggerNoSlotProc = CurrProc;
 +    DaggerCount = 0;
@@ -1444,7 +1467,7 @@ index 310489af1a..0f98337910 100644
      if( !LDone( oc ) ) {
          if( OC_BASE_CLASS( oc->oc_header.class ) != OC_INFO
 diff --git a/bld/cg/c/regalloc.c b/bld/cg/c/regalloc.c
-index 90c1857729..cd512df89e 100644
+index 90c1857729..0153860ba5 100644
 --- a/bld/cg/c/regalloc.c
 +++ b/bld/cg/c/regalloc.c
 @@ -31,6 +31,9 @@
@@ -1478,16 +1501,105 @@ index 90c1857729..cd512df89e 100644
                          break;
                      }
                  }
-@@ -922,6 +930,8 @@ static  void    NeighboursUse( conflict_node *conf )
+@@ -922,6 +930,97 @@ static  void    NeighboursUse( conflict_node *conf )
  }
  
  
 +extern bool KKNDIsGlobalConstTemp( name * );
++extern const char *DaggerCurrProcName( void );
++
++/*
++ * Daggerfall: `#pragma dagger reg <function> <k> <register>` makes the k-th register choice
++ * (GiveBestReg call) of the function take that register when it can: a last resort for
++ * allocation orders the heuristics don't reproduce. DAGGER_REGLOG=1 lists the choices.
++ */
++#define DAGGER_MAX_PINS 512
++static char         DaggerPinFunc[DAGGER_MAX_PINS][40];
++static int          DaggerPinK[DAGGER_MAX_PINS];
++static char         DaggerPinReg[DAGGER_MAX_PINS][8];
++static int          DaggerPinCount;
++static int          DaggerRegCount;
++
++void    DaggerRegPinAdd( const char *func, int k, const char *reg )
++{
++    if( DaggerPinCount < DAGGER_MAX_PINS ) {
++        strncpy( DaggerPinFunc[DaggerPinCount], func, 39 );
++        DaggerPinK[DaggerPinCount] = k;
++        strncpy( DaggerPinReg[DaggerPinCount], reg, 7 );
++        DaggerPinCount++;
++    }
++}
++
++void    DaggerRegReset( void )
++{
++    DaggerRegCount = 0;
++}
++
++static const char *DaggerRegNm[] = { "eax", "ebx", "ecx", "edx", "esi", "edi",
++                                     "ax", "bx", "cx", "dx", "si", "di", NULL };
++
++static hw_reg_set DaggerRegOf( int i )
++{
++#if !( _TARGET & _TARG_80386 )
++    (void)i;
++    return( HW_EMPTY );
++#else
++    switch( i ) {
++    case 0:  return( HW_EAX );
++    case 1:  return( HW_EBX );
++    case 2:  return( HW_ECX );
++    case 3:  return( HW_EDX );
++    case 4:  return( HW_ESI );
++    case 5:  return( HW_EDI );
++    case 6:  return( HW_AX );
++    case 7:  return( HW_BX );
++    case 8:  return( HW_CX );
++    case 9:  return( HW_DX );
++    case 10: return( HW_SI );
++    default: return( HW_DI );
++    }
++#endif
++}
++
++static const char *DaggerRegName( hw_reg_set reg )
++{
++    int i;
++
++    for( i = 0; DaggerRegNm[i] != NULL; i++ ) {
++        if( HW_Equal( reg, DaggerRegOf( i ) ) )
++            return( DaggerRegNm[i] );
++    }
++    return( "?" );
++}
++
++static bool DaggerRegPin( int k, hw_reg_set *reg )
++{
++    const char  *func;
++    int         i;
++    int         j;
++
++    if( DaggerPinCount == 0 )
++        return( false );
++    func = DaggerCurrProcName();
++    if( func == NULL )
++        return( false );
++    for( i = 0; i < DaggerPinCount; i++ ) {
++        if( DaggerPinK[i] == k && strcmp( DaggerPinFunc[i], func ) == 0 ) {
++            for( j = 0; DaggerRegNm[j] != NULL; j++ ) {
++                if( strcmp( DaggerRegNm[j], DaggerPinReg[i] ) == 0 ) {
++                    *reg = DaggerRegOf( j );
++                    return( true );
++                }
++            }
++        }
++    }
++    return( false );
++}
 +
  static hw_reg_set   GiveBestReg( conflict_node *conf, reg_tree *tree,
                                       hw_reg_set except, bool needs_one )
  /*************************************************************************
-@@ -986,13 +996,24 @@ static hw_reg_set   GiveBestReg( conflict_node *conf, reg_tree *tree,
+@@ -986,13 +1085,24 @@ static hw_reg_set   GiveBestReg( conflict_node *conf, reg_tree *tree,
          all_true = true;
          for( possible = tree->regs; !HW_CEqual( *possible, HW_EMPTY ); ++possible ) {
              reg = *possible;
@@ -1514,7 +1626,31 @@ index 90c1857729..cd512df89e 100644
                         && HW_Subset( GivenRegisters, reg )
                         && !HW_Subset( GivenRegisters, best ) ) ) {
                          best = reg;
-@@ -1193,12 +1214,24 @@ conflict_node   *GiveRegister( conflict_node *conf, bool needs_one )
+@@ -1004,6 +1114,23 @@ static hw_reg_set   GiveBestReg( conflict_node *conf, reg_tree *tree,
+                 }
+             }
+         }
++        {
++            int         pin_k = DaggerRegCount++;
++            hw_reg_set  pin;
++
++            if( DaggerRegPin( pin_k, &pin ) ) {
++                for( possible = tree->regs; !HW_CEqual( *possible, HW_EMPTY ); ++possible ) {
++                    if( HW_Equal( *possible, pin ) && !HW_Ovlap( pin, conf->with.regs )
++                      && !HW_Ovlap( pin, except ) ) {
++                        best = pin;
++                        all_true = false;
++                        break;
++                    }
++                }
++            }
++            if( getenv( "DAGGER_REGLOG" ) != NULL )
++                fprintf( stderr, "reg %d %s\n", pin_k, DaggerRegName( best ) );
++        }
+         if( all_true ) {
+             HW_CAsgn( given, HW_EMPTY );
+         } else if( HW_CEqual( best, HW_EMPTY ) ) {
+@@ -1193,12 +1320,24 @@ conflict_node   *GiveRegister( conflict_node *conf, bool needs_one )
  }
  
  
@@ -1540,7 +1676,7 @@ index 90c1857729..cd512df89e 100644
  }
  
  
-@@ -1207,6 +1240,40 @@ static  void    SortConflicts( void )
+@@ -1207,6 +1346,40 @@ static  void    SortConflicts( void )
      Sort the conflicts in order of descending savings.
  */
  {
@@ -1581,7 +1717,7 @@ index 90c1857729..cd512df89e 100644
      ConfList = SortList( ConfList, offsetof( conflict_node, next_conflict ), ConfBefore );
  }
  
-@@ -1242,6 +1309,18 @@ static  enum allocation_state    AssignConflicts( void )
+@@ -1242,6 +1415,18 @@ static  enum allocation_state    AssignConflicts( void )
          }
      }
      ConstSavings();
@@ -1600,7 +1736,7 @@ index 90c1857729..cd512df89e 100644
  
      SortConflicts();
      state = ALLOC_BITS;
-@@ -1265,7 +1344,9 @@ static  enum allocation_state    AssignConflicts( void )
+@@ -1265,7 +1450,9 @@ static  enum allocation_state    AssignConflicts( void )
              */
              if( !only_const_temps && opnd->n.class == N_TEMP && (opnd->t.temp_flags & CONST_TEMP) )
                  return( ALLOC_CONST_TEMP );
