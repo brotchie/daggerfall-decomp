@@ -1190,7 +1190,12 @@ class Func:
                 return
             lhs = self.mem(d, ins, d.size)
             mm = re.fullmatch(r"\*\(int \*\)&(l_[0-9A-F]+|a\d+)", lhs)
-            if mm and d.size == 4 and (v.size == 2 or ins.address in self.w16_stores) and \
+            pv = self.body[self.k - 1] if getattr(self, "k", 0) > 0 else None
+            conv = pv is not None and pv.mnemonic == "mov" and s.type == cx.X86_OP_REG and \
+                len(pv.operands) == 2 and pv.operands[0].type == cx.X86_OP_REG and \
+                pv.operands[1].type == cx.X86_OP_REG and pv.operands[0].reg == s.reg and \
+                pv.operands[0].size == 4 and not os.environ.get("LIFT_NOCONVSTORE")
+            if mm and d.size == 4 and (v.size == 2 or ins.address in self.w16_stores or conv) and \
                     self.var_type(mm.group(1)) in ("short", "unsigned short") and \
                     not os.environ.get("LIFT_NOSHORTSTORE"):
                 # Watcom 10 stores a short variable with the whole register
@@ -1711,7 +1716,11 @@ class Func:
             self.set_reg(full, E("(int)&" + addr, 4))
             return
         if m == "push":
-            self.pushes.append(self.src(ops[0], ins))
+            pe = self.src(ops[0], ins)
+            if ops[0].type == cx.X86_OP_IMM:
+                pe = E(pe.text, pe.size, pe.atom, pe.tag)
+                pe.imm_push = True
+            self.pushes.append(pe)
             if ops[0].type == cx.X86_OP_REG:
                 # a pushed register has been consumed as a stack argument
                 self.regs.pop(subreg(ins.reg_name(ops[0].reg))[0], None)
@@ -1831,6 +1840,14 @@ class Func:
                 args.append(self.regs[r].text)
                 k += 1
             if nstack:
+                if sig is not None and not os.environ.get("LIFT_NOIMMNOPROTO") and any(
+                        getattr(x, "imm_push", False) and 4 + k < len(sig[1]) and
+                        sig[1][4 + k] in ("short", "unsigned short", "signed char",
+                                          "unsigned char")
+                        for k, x in enumerate(reversed(self.pushes[-nstack:]))):
+                    # a narrow stack parameter pushed as an immediate: called without the
+                    # prototype in scope
+                    self.noproto.add(name)
                 args += [x.text for x in reversed(self.pushes[-nstack:])]
                 del self.pushes[-nstack:]
             self.finish_call(E("%s(%s)" % (name, ", ".join(args)), 4, atom=True,
@@ -3189,6 +3206,12 @@ def caller_types():
                 continue
             if seen == {"narrow"}:
                 types.append("narrow")
+                continue
+            if "narrow" in seen and seen - {"signed", "narrow"} == {"int"} and \
+                    not os.environ.get("LIFT_NOMIXNARROW"):
+                # some callers push it through a register, others as an immediate (called
+                # without a prototype): narrow
+                types.append("signed" if "signed" in seen else "narrow")
                 continue
             seen -= {"signed", "narrow"}
             if not seen:

@@ -19,10 +19,12 @@ extern int func_00144ED8();
 extern void func_0005A54A(int, int, int);
 void func_0008CC33(int);
 void func_0008D45A(int, short);
+void func_0008D88B(int, int);
 #pragma dagger DAGGER_NOGIVEN func_0008D497
 #pragma dagger reg func_0008D497 437 bx
 #pragma dagger slots func_0008CCC8 a1 20 a2 16 a3 8 l_18 12 l_10 4
 #pragma dagger slots func_0008D497 a1 40 a2 36 l_90 128 l_8C 124 l_88 120 l_30 32 l_2C 28 l_28 24 l_24 20 l_20 16 l_1C 12 l_18 8 l_14 4
+#pragma dagger slots func_0008D800 a1 12 a2 8 a3 16 a4 4 l_20 24 ret 20
 
 void func_0008CC33(int a1)
 {
@@ -199,6 +201,37 @@ L8D7B9:;
 L8D7EF:;
     *(signed char *)D_0012B508 = *(signed char *)&l_28;
 }
+}
+
+int func_0008D800(int a1, int a2, short a3, short a4, short a5, short a6)
+{
+    int l_20;
+
+    if ((short)(short)*(int *)&a5 >= a3) goto L8D82B;
+    func_0008D88B((int)&*(signed char *)&a5, (int)&a3);
+L8D82B:;
+    if ((short)(short)*(int *)&a6 >= a4) goto L8D83F;
+    func_0008D88B((int)&*(signed char *)&a6, (int)&a4);
+L8D83F:;
+    if ((short)(short)a1 < a3) goto L8D851;
+    if ((short)(short)a1 <= a5) goto L8D853;
+L8D851:;
+    goto L8D85C;
+L8D853:;
+    if ((short)(short)a2 >= a4) goto L8D85E;
+L8D85C:;
+    goto L8D867;
+L8D85E:;
+    if ((short)(short)a2 <= a6) goto L8D869;
+L8D867:;
+    goto L8D872;
+L8D869:;
+    l_20 = 1;
+    goto L8D879;
+L8D872:;
+    l_20 = 0;
+L8D879:;
+    return l_20;
 }
 
 void func_0008D88B(int a1, int a2)
