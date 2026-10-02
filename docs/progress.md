@@ -20,3 +20,25 @@ First look, from `strings`:
   Watcom, also "1988-1994") whose strings are mostly compressed. It says "This program will
   upgrade Daggerfall to version 1.07.213. You must run this patch from your Daggerfall
   subdirectory." It has to be run (or reimplemented) to get the 1.07.213 `FALL.EXE`.
+
+## 2026-10-01: the 1.07.213 executable
+
+`tools/patch_213.sh` runs the official `DAG213.EXE` patcher headless in DOSBox-X (Homebrew
+`dosbox-x`) on a copy of the CD files, answering its prompts with `AUTOTYPE`. It produces:
+
+| File | Size | SHA-1 |
+|---|---|---|
+| `orig/1.07.213/FALL.EXE` | 1,864,183 | `c49a2ceb677239af733d0e0127ac810ec859c0ac` |
+
+This is the target (`config/fall.sha1`). Checks that it's the build UESP documents:
+
+- 0x1B682A holds the item table: "Ruby", "Emerald", "Sapphire", 48-byte records.
+- 0x1AA57C holds the debug-menu strings: "Get rumor", "Advance level", "Jump 1 month".
+- Strings: "TES: Daggerfall v1.07.", **CauseWay v3.32** (the CD build had 3.17), the same Watcom
+  runtime string dated 1988-1994.
+
+The patch also updates 70-odd quest and text files in `ARENA2`, `SETUP.EXE` and `REPORT.EXE`,
+and adds `FIXMAPS.EXE` and `FIXSAVE.EXE`. `DAGGER.EXE` is unchanged.
+
+The game folder also ships `HMIDRV.386`, `HMIDET.386` and `HMIMDRV.386`: HMI's Sound Operating
+System drivers, which tells us the licensed sound library to expect inside `FALL.EXE`.
