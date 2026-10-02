@@ -398,6 +398,7 @@ class Func:
         self.slot_type = {}
         self.addr_taken = addr
         self.slot_reads = reads
+        self.first_acc = first
         for reg, off, _sz in self.params:
             acc.setdefault(off, set())
         for off, sizes in acc.items():
@@ -1195,7 +1196,17 @@ class Func:
                 len(pv.operands) == 2 and pv.operands[0].type == cx.X86_OP_REG and \
                 pv.operands[1].type == cx.X86_OP_REG and pv.operands[0].reg == s.reg and \
                 pv.operands[0].size == 4 and not os.environ.get("LIFT_NOCONVSTORE")
-            if mm and d.size == 4 and (v.size == 2 or ins.address in self.w16_stores or conv) and \
+            plain = False
+            if mm and off_ is not None and off_ not in self.addr_taken and d.size == 4 and \
+                    off_ in self.first_acc and not os.environ.get("LIFT_NOPLAINSHORT"):
+                # an int stored to a short variable whose address isn't taken: through
+                # its address (keeps the store whole), or plainly (the compiler widens
+                # the store); a choice point for the variable
+                key = self.first_acc[off_] + 0.59375
+                self.choices.append(key)
+                plain = key in self.flips
+            if mm and d.size == 4 and (v.size == 2 or ins.address in self.w16_stores or conv or
+                                       plain) and \
                     self.var_type(mm.group(1)) in ("short", "unsigned short") and \
                     not os.environ.get("LIFT_NOSHORTSTORE"):
                 # Watcom 10 stores a short variable with the whole register
@@ -1804,7 +1815,11 @@ class Func:
                         # an earlier call's result still in eax: an argument (f(g(), x)) or
                         # not (a call with no arguments after one returning a value)
                         self.choices.append(ins.address + 0.5)
-                    if (r in loaded or (pend and ins.address + 0.5 in self.flips)) and \
+                    # (by default an argument when later argument registers are loaded too:
+                    # f(g(), x, y) evaluates x and y first)
+                    pend_dflt = pend and any(q in loaded for q in PARM_REGS[1:limit]) and \
+                        not os.environ.get("LIFT_NOPENDDFLT")
+                    if (r in loaded or (pend and (ins.address + 0.5 in self.flips) != pend_dflt)) and \
                             not any(self.regs[r] is self.regs[q] for q in PARM_REGS[:nreg]):
                         nreg += 1
                     else:

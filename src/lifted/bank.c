@@ -154,7 +154,7 @@ void func_0006CB02(void);
 #pragma aux func_000A0ED9 parm routine [];
 #pragma dagger DAGGER_NOGIVEN func_0006BE5C
 #pragma dagger KKND_CONFREV func_0006BF30
-#pragma dagger reg func_0006BA50 381 esi 437 bx
+#pragma dagger reg func_0006BA50 381 esi
 #pragma dagger reg func_0006BE5C 8 ebx
 
 int func_0006B376(int a1)
