@@ -177,8 +177,8 @@ void func_000557A7(void);
 void func_00055A5B(void);
 void func_00055D93(int, int);
 #pragma aux func_000A0ED9 parm routine [];
+#pragma dagger DAGGER_WORDSTORE func_000540F9
 #pragma dagger KKND_CONFREV func_000549DB
-#pragma dagger slots func_00052DC3 l_2C 24 l_28 20 l_24 16 l_20 12 l_1C 8 l_18 4
 #pragma dagger slots func_00054B27 l_2C 24 l_28 20 l_24 16 l_20 12 l_1C 8 l_18 4
 #pragma dagger slots func_0005500F a1 8 l_18 4 ret 12
 
@@ -188,8 +188,8 @@ void func_00052DC3(void)
     int l_28;
     int l_24;
     int l_20;
-    int l_18;
     short l_1C;
+    short l_18;
 
     func_000A0040(*(int *)D_00195BEC + 16, -1, 12, (int)D_00175420, 88, 12);
     *(signed char *)(*(char **)D_00195BEC + 52) = 8;
@@ -296,29 +296,29 @@ L5319B:;
 L531A8:;
     goto L5326E;
 L531AD:;
-    l_18 = 0;
+    *(int *)&l_18 = 0;
 L531B4:;
-    if ((short)(short)l_18 < l_1C) goto L531CA;
+    if ((short)(short)*(int *)&l_18 < l_1C) goto L531CA;
     goto L53269;
 L531C2:;
-    l_18++;
+    (*(int *)&l_18)++;
     goto L531B4;
 L531CA:;
-    if (*(short *)D_0012AC04 <= *(short *)((char *)(int)(*(char **)D_0019983C + (((int)(short)*(short *)&l_18) * 12)))) goto L531FF;
-    if (*(short *)D_0012AC04 < *(short *)(*(char **)D_0019983C + 4 + (((int)(short)*(short *)&l_18) * 12))) goto L53201;
+    if (*(short *)D_0012AC04 <= *(short *)((char *)(int)(*(char **)D_0019983C + (((int)(short)l_18) * 12)))) goto L531FF;
+    if (*(short *)D_0012AC04 < *(short *)(*(char **)D_0019983C + 4 + (((int)(short)l_18) * 12))) goto L53201;
 L531FF:;
     goto L5321C;
 L53201:;
-    if (*(short *)D_0012AC06 > *(short *)(*(char **)D_0019983C + 2 + (((int)(short)*(short *)&l_18) * 12))) goto L5321E;
+    if (*(short *)D_0012AC06 > *(short *)(*(char **)D_0019983C + 2 + (((int)(short)l_18) * 12))) goto L5321E;
 L5321C:;
     goto L53239;
 L5321E:;
-    if (*(short *)D_0012AC06 < *(short *)(*(char **)D_0019983C + 6 + (((int)(short)*(short *)&l_18) * 12))) goto L5323B;
+    if (*(short *)D_0012AC06 < *(short *)(*(char **)D_0019983C + 6 + (((int)(short)l_18) * 12))) goto L5323B;
 L53239:;
     goto L53264;
 L5323B:;
     func_00069938(203, *(int *)D_00195AA4, 100);
-    ((int (*)())(*(int *)(*(char **)D_0019983C + 8 + (((int)(short)*(short *)&l_18) * 12))))();
+    ((int (*)())(*(int *)(*(char **)D_0019983C + 8 + (((int)(short)l_18) * 12))))();
     goto L53269;
 L53264:;
     goto L531C2;
@@ -326,29 +326,29 @@ L53269:;
     goto L5333E;
 L5326E:;
     if (((int)(unsigned char)(*(signed char *)D_0012AC00 & 1)) == 0) goto L5333E;
-    l_18 = 0;
+    *(int *)&l_18 = 0;
 L53289:;
-    if ((short)(short)l_18 < l_1C) goto L5329F;
+    if ((short)(short)*(int *)&l_18 < l_1C) goto L5329F;
     goto L5333E;
 L53297:;
-    l_18++;
+    (*(int *)&l_18)++;
     goto L53289;
 L5329F:;
-    if (*(short *)D_0012AC04 <= *(short *)((char *)(int)(*(char **)D_0019983C + (((int)(short)*(short *)&l_18) * 12)))) goto L532D4;
-    if (*(short *)D_0012AC04 < *(short *)(*(char **)D_0019983C + 4 + (((int)(short)*(short *)&l_18) * 12))) goto L532D6;
+    if (*(short *)D_0012AC04 <= *(short *)((char *)(int)(*(char **)D_0019983C + (((int)(short)l_18) * 12)))) goto L532D4;
+    if (*(short *)D_0012AC04 < *(short *)(*(char **)D_0019983C + 4 + (((int)(short)l_18) * 12))) goto L532D6;
 L532D4:;
     goto L532F1;
 L532D6:;
-    if (*(short *)D_0012AC06 > *(short *)(*(char **)D_0019983C + 2 + (((int)(short)*(short *)&l_18) * 12))) goto L532F3;
+    if (*(short *)D_0012AC06 > *(short *)(*(char **)D_0019983C + 2 + (((int)(short)l_18) * 12))) goto L532F3;
 L532F1:;
     goto L5330E;
 L532F3:;
-    if (*(short *)D_0012AC06 < *(short *)(*(char **)D_0019983C + 6 + (((int)(short)*(short *)&l_18) * 12))) goto L53310;
+    if (*(short *)D_0012AC06 < *(short *)(*(char **)D_0019983C + 6 + (((int)(short)l_18) * 12))) goto L53310;
 L5330E:;
     goto L53339;
 L53310:;
     func_00069938(203, *(int *)D_00195AA4, 100);
-    ((int (*)())(*(int *)(*(char **)D_0019983C + 8 + (((int)(short)*(short *)&l_18) * 12))))();
+    ((int (*)())(*(int *)(*(char **)D_0019983C + 8 + (((int)(short)l_18) * 12))))();
     goto L5333E;
 L53339:;
     goto L53297;
@@ -957,17 +957,17 @@ L54FF4:;
 
 int func_0005500F(short a1)
 {
-    int l_18;
+    short l_18;
 
-    l_18 = 0;
+    *(int *)&l_18 = 0;
 L55027:;
-    if (((int)(short)*(short *)&l_18) < 12) goto L5503A;
+    if (((int)(short)l_18) < 12) goto L5503A;
     goto L5505B;
 L55032:;
-    l_18++;
+    (*(int *)&l_18)++;
     goto L55027;
 L5503A:;
-    if ((short)((unsigned short)(unsigned char)*(signed char *)(*(char **)D_00195BEC + 16 + ((int)(short)*(short *)&l_18))) != a1) goto L55059;
+    if ((short)((unsigned short)(unsigned char)*(signed char *)(*(char **)D_00195BEC + 16 + ((int)(short)l_18))) != a1) goto L55059;
     return 1;
 L55059:;
     goto L55032;

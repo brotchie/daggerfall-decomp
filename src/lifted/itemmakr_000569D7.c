@@ -19,21 +19,21 @@ extern void func_000576FF(int, short);
 
 void func_000569D7(int a1)
 {
-    int l_18;
+    short l_18;
 
     *(short *)D_00190D66 = a1;
-    l_18 = func_0005742F();
-    *(short *)D_00190D64 = l_18;
-    if (((int)(short)*(short *)&l_18) != (-1)) goto L56A1F;
+    *(int *)&l_18 = func_0005742F();
+    *(short *)D_00190D64 = *(int *)&l_18;
+    if (((int)(short)l_18) != (-1)) goto L56A1F;
     func_0003F09F(1657, 1);
     return;
 L56A1F:;
-    *(signed char *)(D_00190CE4 + ((int)(short)*(short *)&l_18)) = 0;
+    *(signed char *)(D_00190CE4 + ((int)(short)l_18)) = 0;
     if (*(int *)(D_001857A1 + (((int)(short)*(short *)&a1) << 2)) == 0) goto L56AA8;
-    *(short *)(D_001998E0 + (((int)(short)*(short *)&l_18) << 2)) = a1;
+    *(short *)(D_001998E0 + (((int)(short)l_18) << 2)) = a1;
     if (((unsigned)*(int *)(D_001857A1 + (((int)(short)*(short *)&a1) << 2))) >= 5) goto L56A83;
     if (func_00057342(*(int *)(D_001857A1 + (((int)(short)*(short *)&a1) << 2))) != 0) goto L56A81;
-    *(signed char *)(D_00190CE4 + ((int)(short)*(short *)&l_18)) = 255;
+    *(signed char *)(D_00190CE4 + ((int)(short)l_18)) = 255;
     return;
 L56A81:;
     goto L56A99;
@@ -44,13 +44,13 @@ L56A99:;
     goto L56B2F;
 L56AA8:;
     if (((int)(short)*(short *)&a1) != 11) goto L56ADB;
-    func_00057147((int)(short)*(short *)&l_18, 23, -1, 11, -1, -1, -1);
+    func_00057147((int)(short)l_18, 23, -1, 11, -1, -1, -1);
 L56ADB:;
     if (((int)(short)*(short *)&a1) != 12) goto L56B0E;
-    func_00057147((int)(short)*(short *)&l_18, 24, -1, 12, -1, -1, -1);
+    func_00057147((int)(short)l_18, 24, -1, 12, -1, -1, -1);
 L56B0E:;
-    *(short *)(D_001998E0 + (((int)(short)*(short *)&l_18) << 2)) = a1;
-    *(short *)(D_001998E2 + (((int)(short)*(short *)&l_18) << 2)) = 65535;
+    *(short *)(D_001998E0 + (((int)(short)l_18) << 2)) = a1;
+    *(short *)(D_001998E2 + (((int)(short)l_18) << 2)) = 65535;
 L56B2F:;
     *(signed char *)D_00147964 &= 254;
 }

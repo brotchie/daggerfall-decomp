@@ -126,6 +126,7 @@ void func_0002CD0C(int, int);
 void func_0002CDD5(int, int);
 #pragma aux func_000A0ED9 parm routine [];
 #pragma dagger slots func_0002CB34 a1 16 a2 12 a3 4 l_14 8
+#pragma dagger slots func_0002CBA6 a1 24 a2 20 l_20 16 l_1C 12 l_14 4 ret 8
 
 void func_00029958(int a1)
 {
@@ -1555,16 +1556,16 @@ L2CB97:;
 
 int func_0002CBA6(int a1, int a2)
 {
-    int l_20;
     int l_1C;
+    short l_20;
     short l_14;
 
     if (*(int *)((char *)a2 + 13) != (-1)) goto L2CBCB;
     return 0;
 L2CBCB:;
-    l_20 = func_00030A23(a1, 6, (int)(short)*(short *)((char *)a2 + 28));
+    *(int *)&l_20 = func_00030A23(a1, 6, (int)(short)*(short *)((char *)a2 + 28));
     l_1C = func_00030A23(a1, 9, (int)(short)*(short *)((char *)a2 + 13));
-    l_14 = *(short *)((char *)l_20 + 2) & 128;
+    l_14 = *(short *)(*(char **)&l_20 + 2) & 128;
     if (*(signed char *)((char *)l_1C + 2) == 0) goto L2CC24;
     *(signed char *)(D_001952EC + ((int)(unsigned char)*(signed char *)((char *)l_1C + 3))) = *(signed char *)&l_14;
     goto L2CC2D;

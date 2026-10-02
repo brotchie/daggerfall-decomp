@@ -305,12 +305,12 @@ void func_0007CD98(void)
 {
     int l_2C;
     int l_28;
-    int l_24;
     int l_18;
+    short l_24;
     short l_20;
     short l_1C;
 
-    l_24 = 0;
+    *(int *)&l_24 = 0;
     l_28 = 0;
     l_18 = 0;
     if (*(int *)D_001A59E8 == 0) return;
@@ -321,16 +321,16 @@ L7CDD0:;
     if ((short)(short)l_28 <= *(short *)&l_18) goto L7CDFC;
     l_18 = l_28;
 L7CDFC:;
-    l_24++;
+    (*(int *)&l_24)++;
     if (*(signed char *)((char *)l_2C - 1) != 0) goto L7CDD0;
     l_18 = (((int)(short)*(short *)&l_18) + 10) / 2;
-    func_000CD0F1(160 - ((int)(short)*(short *)&l_18), (int)&*(signed char *)((char *)(100 - (((int)(short)*(short *)&l_24) * 5)) - 5), ((int)(short)*(short *)&l_18) * 2, (int)&*(signed char *)((char *)(((int)(short)*(short *)&l_24) * 10) + 10));
+    func_000CD0F1(160 - ((int)(short)*(short *)&l_18), (int)&*(signed char *)((char *)(100 - (((int)(short)l_24) * 5)) - 5), ((int)(short)*(short *)&l_18) * 2, (int)&*(signed char *)((char *)(((int)(short)l_24) * 10) + 10));
     l_2C = *(int *)D_001A59E8;
     l_20 = (160 - l_18) + 5;
-    l_1C = 100 - (l_24 * 5);
+    l_1C = 100 - (*(int *)&l_24 * 5);
     l_28 = 0;
 L7CE80:;
-    if ((short)(short)l_28 < *(short *)&l_24) goto L7CE97;
+    if ((short)(short)l_28 < l_24) goto L7CE97;
     goto L7CEBB;
 L7CE8B:;
     l_28++;
@@ -1477,12 +1477,12 @@ int func_0007F57B(int a1)
 
 void func_0007F5D9(int a1)
 {
-    int l_18;
+    short l_18;
 
     if (((int)(unsigned char)*(signed char *)((char *)a1)) != 2) return;
-    l_18 = a1 + 71;
-    if (((int)(unsigned short)*(short *)((char *)l_18 + 32)) != 27) goto L7F624;
-    if (((int)(unsigned short)*(short *)((char *)l_18 + 34)) == 2) goto L7F626;
+    *(int *)&l_18 = a1 + 71;
+    if (((int)(unsigned short)*(short *)(*(char **)&l_18 + 32)) != 27) goto L7F624;
+    if (((int)(unsigned short)*(short *)(*(char **)&l_18 + 34)) == 2) goto L7F626;
 L7F624:;
     return;
 L7F626:;

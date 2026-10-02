@@ -154,6 +154,7 @@ void func_0008302D(int, int, int);
 #pragma dagger DAGGER_RMW func_000830C7
 #pragma dagger reg func_00084480 5 edx
 #pragma dagger reg func_000844FB 18 edx 25 edx
+#pragma dagger slots func_000830C7 a1 60 l_4C 56 l_48 52 l_44 48 l_40 44 l_3C 40 l_38 36 l_34 32 l_30 28 l_2C 24 l_28 20 l_24 16 l_20 12 l_18 4 ret 8
 
 void func_000827C3(int a1)
 {
@@ -415,7 +416,6 @@ int func_000830C7(int a1)
     int l_48;
     int l_44;
     int l_40;
-    int l_3C;
     int l_38;
     int l_34;
     int l_30;
@@ -423,6 +423,7 @@ int func_000830C7(int a1)
     int l_28;
     int l_24;
     int l_20;
+    short l_3C;
     short l_18;
 
     if (*(signed char *)D_001A949D == 0) goto L830ED;
@@ -577,8 +578,8 @@ case 9:
     if (((int)(unsigned short)*(short *)((char *)a1 + 29)) != 32768) goto L83818;
     func_0005C6A2(a1);
 L83818:;
-    l_3C = func_00135DE4(((int)(unsigned short)*(short *)((char *)a1 + 23)) >> 7, (int)(unsigned short)(*(short *)((char *)a1 + 23) & 127));
-    if (((int)(unsigned short)((struct bf16_0_15 *)((char *)a1 + 29))->f) < *(unsigned short *)((char *)l_3C + 20)) goto L8386A;
+    *(int *)&l_3C = func_00135DE4(((int)(unsigned short)*(short *)((char *)a1 + 23)) >> 7, (int)(unsigned short)(*(short *)((char *)a1 + 23) & 127));
+    if (((int)(unsigned short)((struct bf16_0_15 *)((char *)a1 + 29))->f) < *(unsigned short *)(*(char **)&l_3C + 20)) goto L8386A;
     *(short *)((char *)a1 + 29) = 36863;
     goto L838B2;
 L8386A:;

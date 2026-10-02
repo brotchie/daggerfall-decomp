@@ -167,20 +167,20 @@ void func_00082376(int);
 
 void func_000802B2(void)
 {
-    int l_18;
+    short l_18;
 
     *(int *)D_001A5B18 = func_0006CB53((int)D_00176A68, 0);
     *(int *)D_00195BE4 = func_0006CB53((int)D_00176A72, 0);
     func_000A0040(*(int *)D_00195C44, 0, 256, (int)D_00176A7C, 44, 4);
-    l_18 = 0;
+    *(int *)&l_18 = 0;
 L80303:;
-    if (((int)(short)*(short *)&l_18) < 10) goto L80316;
+    if (((int)(short)l_18) < 10) goto L80316;
     goto L8034A;
 L8030E:;
-    l_18++;
+    (*(int *)&l_18)++;
     goto L80303;
 L80316:;
-    func_000A1023((int)(*(char **)D_00195C44 + (((int)(short)*(short *)&l_18) << 4)), (int)(*(char **)D_00195BE4 + (((int)(short)*(short *)&l_18) * 10)), 10, (int)D_00176A7C, 46, 4);
+    func_000A1023((int)(*(char **)D_00195C44 + (((int)(short)l_18) << 4)), (int)(*(char **)D_00195BE4 + (((int)(short)l_18) * 10)), 10, (int)D_00176A7C, 46, 4);
     goto L8030E;
 L8034A:;
     func_0012B45B(*(int *)D_00195C44, 0, 0);

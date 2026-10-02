@@ -92,6 +92,7 @@ void func_0001DA9C(int, int);
 #pragma aux func_000A0ED9 parm routine [];
 #pragma dagger DAGGER_DEADDEFMEM func_0001B69D
 #pragma dagger DAGGER_NOGIVEN func_0001CA8C
+#pragma dagger slots func_0001C8DE a1 24 a2 20 l_20 16 l_1C 12 l_18 8 ret 4
 #pragma dagger slots func_0001CF3E a1 16 a2 24 a3 20 a4 4 l_44 60 l_39 49 l_14 12 l_10 8
 #pragma dagger slots func_0001D54B a1 32 a2 4 a3 24 a4 20 l_24 28 l_18 16 l_14 12 ret 8
 #pragma dagger slots func_0001D766 a1 16 a2 24 a3 20 a4 4 l_48 64 l_44 60 l_39 49 l_14 12 l_10 8
@@ -755,17 +756,17 @@ L1C8CB:;
 int func_0001C8DE(int a1, int a2)
 {
     int l_20;
-    int l_1C;
     int l_18;
+    short l_1C;
 
     l_18 = 0;
     l_20 = *(int *)(*(char **)D_00195AA0 + 63);
 L1C903:;
     if (l_20 == 0) goto L1C94E;
     if (((int)(unsigned char)*(signed char *)((char *)l_20)) != (a2 + 45)) goto L1C943;
-    l_1C = l_20 + 71;
+    *(int *)&l_1C = l_20 + 71;
     if (a1 == (-1)) goto L1C93D;
-    if (((int)(unsigned short)*(short *)((char *)l_1C + 549)) != a1) goto L1C943;
+    if (((int)(unsigned short)*(short *)(*(char **)&l_1C + 549)) != a1) goto L1C943;
 L1C93D:;
     l_18++;
 L1C943:;

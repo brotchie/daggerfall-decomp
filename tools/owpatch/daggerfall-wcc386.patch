@@ -1347,7 +1347,7 @@ index 76c9e5daf1..1562a66f62 100644
      do {
          pow2 = 1;
 diff --git a/bld/cg/c/object.c b/bld/cg/c/object.c
-index 8deefcbc4c..ebd7de3b66 100644
+index 8deefcbc4c..9a46284046 100644
 --- a/bld/cg/c/object.c
 +++ b/bld/cg/c/object.c
 @@ -31,6 +31,9 @@
@@ -1374,7 +1374,7 @@ index 8deefcbc4c..ebd7de3b66 100644
  
  
  /*
-@@ -93,6 +103,102 @@ static  source_line_number      DumpLineNum( source_line_number n,
+@@ -93,6 +103,113 @@ static  source_line_number      DumpLineNum( source_line_number n,
  }
  
  
@@ -1394,14 +1394,25 @@ index 8deefcbc4c..ebd7de3b66 100644
 +    if( ( ins->head.opcode == OP_ADD || ins->head.opcode == OP_SUB || ins->head.opcode == OP_OR
 +      || ins->head.opcode == OP_XOR || ins->head.opcode == OP_AND )
 +      && ( ins->type_class == U2 || ins->type_class == I2 )
-+      && ins->result == ins->operands[0] && ins->operands[1]->n.class == N_REGISTER
++      && ins->result == ins->operands[0]
++      && ( ins->operands[1]->n.class == N_REGISTER
++        || ( ins->operands[1]->n.class == N_CONSTANT
++          && ins->operands[1]->c.const_type == CONS_ABSOLUTE
++          && ( ins->operands[1]->c.lo.u.int_value == 1 || ins->operands[1]->c.lo.u.int_value == -1 )
++          && ( ins->head.opcode == OP_ADD || ins->head.opcode == OP_SUB )
++          && DaggerEnv( "DAGGER_NOINCWIDEN" ) == NULL ) )
 +      && DaggerEnv( "DAGGER_WORDRMW" ) == NULL ) {
 +        /* `add [l],eax` on a 2-byte stack variable too: Watcom 10 never has `add word [ebp-x],ax` */
 +        res = ins->result;
 +        if( res->n.class != N_TEMP || res->n.size != 2 || DeAlias( res )->n.size != 2
 +          || ( DeAlias( res )->v.usage & HAS_MEMORY ) == 0 )
 +            return;
-+        ins->operands[1] = AllocRegName( FullReg( ins->operands[1]->r.reg ) );
++        if( ins->operands[1]->n.class == N_REGISTER ) {
++            ins->operands[1] = AllocRegName( FullReg( ins->operands[1]->r.reg ) );
++        } else {
++            /* `x++` on a 2-byte variable: `inc dword ptr [x]` too */
++            ins->operands[1] = AllocS32Const( ins->operands[1]->c.lo.u.int_value );
++        }
 +        ins->result = TempOffset( res, 0, U4 );
 +        ins->operands[0] = ins->result;
 +        ins->type_class = U4;
@@ -1477,7 +1488,7 @@ index 8deefcbc4c..ebd7de3b66 100644
  void    GenObject( void )
  /***********************/
  {
-@@ -127,6 +233,12 @@ void    GenObject( void )
+@@ -127,6 +244,12 @@ void    GenObject( void )
              StartBlockProfiling( blk );
              InitStackDepth( blk );
              for( ins = blk->ins.head.next; ins->head.opcode != OP_BLOCK; ins = ins->head.next ) {
@@ -1490,7 +1501,7 @@ index 8deefcbc4c..ebd7de3b66 100644
                  if( ins->head.opcode == OP_NOP
                    && ( (ins->flags.u.nop_flags & NOP_SOURCE_QUEUE)
                    || ins->flags.u.nop_flags == NOP_DBGINFO )) { // an end block
-@@ -145,6 +257,7 @@ void    GenObject( void )
+@@ -145,6 +268,7 @@ void    GenObject( void )
                          }
                      }
                  } else {

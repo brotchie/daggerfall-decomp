@@ -313,6 +313,7 @@ void func_0001B5BE(int, int);
 #pragma dagger reg func_0001839C 56 esi 116 esi 177 esi
 #pragma dagger reg func_00019676 236 edx
 #pragma dagger slots func_00016E61 a1 40 a2 36 a3 32 a4 28 l_20 24 l_1C 20 l_18 16 l_14 12 l_10 8 l_C 4
+#pragma dagger slots func_00017179 l_24 16 l_20 12 l_1C 8 l_18 4
 
 int func_00014AE8(int a1)
 {
@@ -1438,10 +1439,10 @@ void func_00017179(void)
 {
     int l_24;
     int l_20;
-    int l_1C;
     int l_18;
+    short l_1C;
 
-    l_1C = (int)(short)*(short *)D_00142948;
+    *(int *)&l_1C = (int)(short)*(short *)D_00142948;
     *(short *)D_00142948 = 100;
     *(int *)D_001965B8 = 0;
     if (*(signed char *)D_001966B1 != 0) goto L17307;
@@ -1493,7 +1494,7 @@ L1731F:;
     if (((int)(unsigned char)*(signed char *)D_001966B1) != 2) goto L17335;
     func_000174C3(6);
 L17335:;
-    *(short *)D_00142948 = l_1C;
+    *(short *)D_00142948 = *(int *)&l_1C;
 }
 
 void func_00017348(int a1)

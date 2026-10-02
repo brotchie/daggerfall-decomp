@@ -193,13 +193,13 @@ void func_0005D45D(void)
 
 void func_0005D486(void)
 {
-    int l_18;
+    short l_18;
 
     *(signed char *)D_001940D6 ^= 64;
     if ((*(unsigned char *)D_001940D6 & 64) == 0) return;
     if (*(int *)(*(char **)D_00195BE0 + 443) == 0) return;
-    l_18 = *(int *)(*(char **)D_00195BE0 + 443) + 71;
-    func_00069938((int)(short)*(short *)(D_00188208 + (((int)(unsigned short)*(short *)((char *)l_18 + 34)) * 2)), *(int *)D_00195AA4, 100);
+    *(int *)&l_18 = *(int *)(*(char **)D_00195BE0 + 443) + 71;
+    func_00069938((int)(short)*(short *)(D_00188208 + (((int)(unsigned short)*(short *)(*(char **)&l_18 + 34)) * 2)), *(int *)D_00195AA4, 100);
 }
 
 void func_0005D4F2(void)

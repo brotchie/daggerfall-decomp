@@ -373,11 +373,11 @@ void func_00021603(void)
 
 void func_00021680(void)
 {
-    int l_18;
+    short l_18;
 
-    l_18 = (int)(unsigned short)*(short *)(*(char **)D_00195BE0 + 155);
+    *(int *)&l_18 = (int)(unsigned short)*(short *)(*(char **)D_00195BE0 + 155);
     func_0004AB2F(240);
-    *(short *)(*(char **)D_00195BE0 + 155) = l_18;
+    *(short *)(*(char **)D_00195BE0 + 155) = *(int *)&l_18;
     *(signed char *)D_00187CA8 = 1;
     *(signed char *)D_00196274 = 0;
     *(signed char *)D_00196272 = 0;

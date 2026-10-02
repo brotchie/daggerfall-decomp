@@ -17,11 +17,11 @@ void func_00030A6E(int a1, int a2, int a3, int a4)
     int l_18;
     int l_14;
     int l_10;
-    int l_C;
+    short l_C;
 
     if (((int)(unsigned char)*(signed char *)((char *)a1)) != 18) goto L30ACA;
-    l_C = a1 + 71;
-    a3 = ((((int)(unsigned short)(*(short *)((char *)l_C + 64) & 1)) != 0) ? 1 : 0);
+    *(int *)&l_C = a1 + 71;
+    a3 = ((((int)(unsigned short)(*(short *)(*(char **)&l_C + 64) & 1)) != 0) ? 1 : 0);
     goto L30AD7;
 L30ACA:;
     if (a3 == 0) goto L30AD7;

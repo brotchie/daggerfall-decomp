@@ -351,6 +351,8 @@ void func_00050FFD(void);
 #pragma aux func_000A18C3 parm routine [];
 #pragma dagger DAGGER_PTRSWAP func_000503AD
 #pragma dagger reg func_0004ED36 185 ebx 186 ebx 189 edx
+#pragma dagger slots func_0004ED36 l_34 32 l_30 28 l_2C 24 l_28 20 l_24 16 l_20 12 l_1C 8 l_18 4
+#pragma dagger slots func_0004F5F3 l_1C 8 l_18 4
 
 void func_0004ECAE(void)
 {
@@ -373,8 +375,8 @@ void func_0004ED36(void)
     int l_30;
     int l_2C;
     int l_28;
-    int l_24;
     int l_20;
+    short l_24;
     short l_1C;
     short l_18;
 
@@ -469,12 +471,12 @@ L4F19C:;
     func_000C9BF7();
     func_0003522C();
     *(int *)D_00195998 = (*(int *)D_00195BF4 = 523530);
-    l_24 = 0;
+    *(int *)&l_24 = 0;
 L4F1D0:;
-    if (((int)(short)*(short *)&l_24) < 20) goto L4F1E3;
+    if (((int)(short)l_24) < 20) goto L4F1E3;
     goto L4F1EA;
 L4F1DB:;
-    l_24++;
+    (*(int *)&l_24)++;
     goto L4F1D0;
 L4F1E3:;
     func_0003522C();
@@ -482,15 +484,15 @@ L4F1E3:;
 L4F1EA:;
     func_000A1004((int)D_001751AF);
     func_0001B69D();
-    l_24 = 0;
+    *(int *)&l_24 = 0;
 L4F200:;
-    if (((int)(short)*(short *)&l_24) < 62) goto L4F213;
+    if (((int)(short)l_24) < 62) goto L4F213;
     goto L4F236;
 L4F20B:;
-    l_24++;
+    (*(int *)&l_24)++;
     goto L4F200;
 L4F213:;
-    *(short *)(D_0018F092 + (((int)(short)*(short *)&l_24) * 80)) = func_0007D6AE(0, 500) + 750;
+    *(short *)(D_0018F092 + (((int)(short)l_24) * 80)) = func_0007D6AE(0, 500) + 750;
     goto L4F20B;
 L4F236:;
     if (func_00068A1D() != 0) goto L4F246;
@@ -596,8 +598,8 @@ L4F5A8:;
 
 void func_0004F5F3(void)
 {
-    int l_1C;
     int l_18;
+    short l_1C;
 
     func_00152BA8();
     func_0012A230();
@@ -605,22 +607,22 @@ void func_0004F5F3(void)
     func_00012F27(*(int *)D_00196AAC);
     func_00012F27(*(int *)D_001A9448);
     func_00012F27(*(int *)D_00195AC8);
-    l_1C = 0;
+    *(int *)&l_1C = 0;
 L4F63A:;
-    if (((int)(short)*(short *)&l_1C) < 127) goto L4F650;
+    if (((int)(short)l_1C) < 127) goto L4F650;
     goto L4F6B4;
 L4F648:;
-    l_1C++;
+    (*(int *)&l_1C)++;
     goto L4F63A;
 L4F650:;
-    if (*(int *)(D_00190704 + (((int)(short)*(short *)&l_1C) << 2)) == 0) goto L4F6B2;
-    if (*(int *)(D_00190704 + (((int)(short)*(short *)&l_1C) << 2)) == 0) goto L4F683;
-    if (*(int *)(D_00190704 + (((int)(short)*(short *)&l_1C) << 2)) != (-1751672937)) goto L4F685;
+    if (*(int *)(D_00190704 + (((int)(short)l_1C) << 2)) == 0) goto L4F6B2;
+    if (*(int *)(D_00190704 + (((int)(short)l_1C) << 2)) == 0) goto L4F683;
+    if (*(int *)(D_00190704 + (((int)(short)l_1C) << 2)) != (-1751672937)) goto L4F685;
 L4F683:;
     goto L4F6B2;
 L4F685:;
-    func_000A0024(*(int *)(D_00190704 + (((int)(short)*(short *)&l_1C) << 2)), (int)D_00175040, 314);
-    *(int *)(D_00190704 + (((int)(short)*(short *)&l_1C) << 2)) = -1751672937;
+    func_000A0024(*(int *)(D_00190704 + (((int)(short)l_1C) << 2)), (int)D_00175040, 314);
+    *(int *)(D_00190704 + (((int)(short)l_1C) << 2)) = -1751672937;
 L4F6B2:;
     goto L4F648;
 L4F6B4:;
@@ -874,21 +876,21 @@ L4FD18:;
     func_00073EDB();
     func_00050B02();
     func_0003F699();
-    l_1C = 0;
+    *(int *)&l_1C = 0;
 L4FD2E:;
-    if (((int)(short)*(short *)&l_1C) < 5) goto L4FD41;
+    if (((int)(short)l_1C) < 5) goto L4FD41;
     goto L4FD95;
 L4FD39:;
-    l_1C++;
+    (*(int *)&l_1C)++;
     goto L4FD2E;
 L4FD41:;
-    if (*(int *)(D_00195D04 + (((int)(short)*(short *)&l_1C) << 2)) == 0) goto L4FD64;
-    if (*(int *)(D_00195D04 + (((int)(short)*(short *)&l_1C) << 2)) != (-1751672937)) goto L4FD66;
+    if (*(int *)(D_00195D04 + (((int)(short)l_1C) << 2)) == 0) goto L4FD64;
+    if (*(int *)(D_00195D04 + (((int)(short)l_1C) << 2)) != (-1751672937)) goto L4FD66;
 L4FD64:;
     goto L4FD93;
 L4FD66:;
-    func_000A0024(*(int *)(D_00195D04 + (((int)(short)*(short *)&l_1C) << 2)), (int)D_00175040, 360);
-    *(int *)(D_00195D04 + (((int)(short)*(short *)&l_1C) << 2)) = -1751672937;
+    func_000A0024(*(int *)(D_00195D04 + (((int)(short)l_1C) << 2)), (int)D_00175040, 360);
+    *(int *)(D_00195D04 + (((int)(short)l_1C) << 2)) = -1751672937;
 L4FD93:;
     goto L4FD39;
 L4FD95:;

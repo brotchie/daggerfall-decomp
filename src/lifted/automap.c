@@ -1078,15 +1078,15 @@ void func_000286F6(void)
     int l_24;
     int l_20;
     int l_1C;
-    int l_18;
+    short l_18;
 
     l_20 = 0;
     l_1C = *(int *)D_00195C44 + 4;
 L28716:;
     if (*(signed char *)((char *)l_1C) == 0) return;
-    l_18 = l_1C;
-    l_28 = ((((int)(unsigned short)*(short *)((char *)l_18)) - *(int *)D_00196D88) * 2) + 10;
-    l_24 = ((((int)(unsigned short)*(short *)((char *)l_18 + 2)) - *(int *)D_00196D8C) * 2) + 10;
+    *(int *)&l_18 = l_1C;
+    l_28 = ((((int)(unsigned short)*(short *)(*(char **)&l_18)) - *(int *)D_00196D88) * 2) + 10;
+    l_24 = ((((int)(unsigned short)*(short *)(*(char **)&l_18 + 2)) - *(int *)D_00196D8C) * 2) + 10;
     if ((l_20 + 1) != *(int *)D_00196D94) goto L28770;
     *(signed char *)D_0012B508 = 244;
     goto L28777;

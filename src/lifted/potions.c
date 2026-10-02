@@ -252,11 +252,11 @@ L8F9CE:;
 
 void func_0008FBE8(int a1)
 {
-    int l_18;
+    short l_18;
 
     if (((int)(unsigned char)*(signed char *)((char *)a1)) != 2) return;
-    l_18 = a1 + 71;
-    if (((int)(unsigned short)(*(short *)((char *)l_18 + 42) & 1)) == 0) return;
+    *(int *)&l_18 = a1 + 71;
+    if (((int)(unsigned short)(*(short *)(*(char **)&l_18 + 42) & 1)) == 0) return;
     *(int *)D_001AA3E4 = 1;
 }
 

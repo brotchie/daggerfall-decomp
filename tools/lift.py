@@ -296,6 +296,7 @@ class Func:
         afirst = {}    # address-taken slot -> address of its first access
         sign = {}      # slot -> 's' / 'u' hints
         fpu4 = set()   # slots the FPU reads or writes as floats
+        soft4 = set()  # slots read whole only where the low word would do
         addr = set()
         body = self.ins[self.body_start:self.body_end]
         R16 = {"eax": "ax", "edx": "dx", "ebx": "bx", "ecx": "cx"}
@@ -376,9 +377,32 @@ class Func:
                                 body[k - 1].operands[0].type == cx.X86_OP_REG and
                                 body[k - 1].operands[0].size == 2):
                             self.w16_stores.add(ins.address)
-                rmw_imm = n == 0 and ins.mnemonic in ("add", "sub") and op.size == 4 and \
-                    ins.operands[1].type == cx.X86_OP_IMM and \
-                    not os.environ.get("LIFT_NORMWIMM")
+                rmw_imm = n == 0 and op.size == 4 and not os.environ.get("LIFT_NORMWIMM") and (
+                    (ins.mnemonic in ("add", "sub") and ins.operands[1].type == cx.X86_OP_IMM)
+                    or (ins.mnemonic in ("inc", "dec") and not os.environ.get("LIFT_NOINCSHORT")))
+                # (nor the dead load of x++: mov eax,[x]; inc dword [x])
+                nx_ = body[k + 1] if k + 1 < len(body) else None
+                rmw_imm = rmw_imm or (n == 1 and ins.mnemonic == "mov" and op.size == 4 and
+                                      nx_ is not None and nx_.mnemonic in ("inc", "dec") and
+                                      nx_.operands[0].type == cx.X86_OP_MEM and
+                                      ebp_slot(nx_, nx_.operands[0]) == off and
+                                      not os.environ.get("LIFT_NOINCSHORT"))
+                # (nor a whole load whose low word alone is used next: mov eax,[x]; cmp ax,..)
+                if n == 1 and ins.mnemonic == "mov" and op.size == 4 and nx_ is not None and \
+                        ins.operands[0].type == cx.X86_OP_REG and \
+                        off not in [p_[1] for p_ in self.params] and \
+                        not os.environ.get("LIFT_NOLOWUSE"):
+                    r16 = {"eax": "ax", "ebx": "bx", "ecx": "cx", "edx": "dx", "esi": "si",
+                           "edi": "di"}.get(ins.reg_name(ins.operands[0].reg))
+                    if r16 is not None and any(o.type == cx.X86_OP_REG and
+                                               nx_.reg_name(o.reg) == r16 for o in nx_.operands):
+                        rmw_imm = True
+                        reads.setdefault(off, set()).add(2)
+                # (imul r,[x],k reads a short whole too: only its low word matters)
+                if n == 1 and op.size == 4 and ins.mnemonic == "imul" and \
+                        len(ins.operands) == 3 and not os.environ.get("LIFT_NOIMULSHORT"):
+                    soft4.add(off)      # (an int unless it is read as a word elsewhere)
+                    rmw_imm = True
                 if not (n == 0 and ins.mnemonic == "mov") and not rmw_imm:
                     # (`add dword [x],10` is Watcom 10's x += 10 on a short too)
                     reads.setdefault(off, set()).add(op.size)
@@ -396,6 +420,9 @@ class Func:
                           nxt.op_str in ("eax, 0xff", "eax, 0xffff")) or \
                             (prv is not None and prv.mnemonic == "xor"):
                         sign.setdefault(off, set()).add(("u", op.size))
+        for off in soft4:
+            if 2 not in reads.get(off, set()):
+                reads.setdefault(off, set()).add(4)
         if self.ret_slot is not None and self.ret_slot in wide16 and self.ret_type == "int" \
                 and not os.environ.get("LIFT_NOSHORTRET"):
             # a 16-bit value stored whole into the return variable: a short function (its

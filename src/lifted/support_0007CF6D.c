@@ -17,8 +17,8 @@ extern int func_001427A8();
 
 int func_0007CF6D(int a1, short a2)
 {
-    int l_18;
     unsigned char l_14;
+    short l_18;
 
 L7CF80:;
     if (*(signed char *)D_0012AC00 == 0) goto L7CF90;
@@ -39,16 +39,16 @@ L7CFDC:;
 L7CFE8:;
     if (a2 == 0) goto L7D02F;
     l_14 = func_000A0E74((int)(unsigned char)l_14);
-    l_18 = 0;
+    *(int *)&l_18 = 0;
 L7D003:;
-    if ((short)(short)l_18 < a2) goto L7D016;
+    if ((short)(short)*(int *)&l_18 < a2) goto L7D016;
     goto L7D02F;
 L7D00E:;
-    l_18++;
+    (*(int *)&l_18)++;
     goto L7D003;
 L7D016:;
-    if ((signed char)l_14 != *(signed char *)((char *)(((int)(short)*(short *)&l_18) + a1))) goto L7D02D;
-    return (int)(short)*(short *)&l_18;
+    if ((signed char)l_14 != *(signed char *)((char *)(((int)(short)l_18) + a1))) goto L7D02D;
+    return (int)(short)l_18;
 L7D02D:;
     goto L7D00E;
 L7D02F:;

@@ -365,7 +365,6 @@ void func_00099391(void);
 #pragma dagger reg func_00092ED8 37 esi 43 eax 71 esi
 #pragma dagger reg func_00093BD9 55 esi 62 eax
 #pragma dagger reg func_0009830F 39 edx
-#pragma dagger slots func_00093BD9 a1 36 a2 32 a3 28 l_24 24 l_20 20 l_1C 16 l_18 12 l_14 8 l_10 4
 
 void func_00092349(void)
 {
@@ -974,20 +973,20 @@ L93AE4:;
 void func_00093BD9(int a1, int a2, int a3)
 {
     int l_24;
-    int l_10;
     short l_20;
     short l_1C;
     short l_18;
     short l_14;
+    short l_10;
 
     *(int *)&l_20 = (((int)(short)*(short *)((char *)((a3 * 12) + a2))) + ((int)(short)*(short *)((char *)((a3 * 12) + a2) + 4))) >> 1;
     *(int *)&l_1C = (((int)(short)*(short *)((char *)((a3 * 12) + a2) + 2)) + ((int)(short)*(short *)((char *)((a3 * 12) + a2) + 6))) >> 1;
     l_24 = *(int *)D_001AA440;
-    l_10 = 0;
+    *(int *)&l_10 = 0;
 L93C36:;
-    if (((int)(short)*(short *)&l_10) >= 3) goto L93C5C;
+    if (((int)(short)l_10) >= 3) goto L93C5C;
     l_24 = (((int)(unsigned short)*(short *)((char *)l_24 + 10)) + l_24) + 12;
-    l_10++;
+    (*(int *)&l_10)++;
     goto L93C36;
 L93C5C:;
     l_18 = *(short *)((char *)l_24 + 4);
@@ -1633,7 +1632,7 @@ void func_00094FA8(void)
     int l_24;
     int l_20;
     int l_1C;
-    int l_18;
+    short l_18;
 
     l_1C = 0;
     l_28 = *(int *)D_001AA55C;
@@ -1728,12 +1727,12 @@ L95216:;
     goto L952D3;
 L9521B:;
     if (*(short *)((char *)((l_20 << 2) + l_30) + 67) != 0) goto L95274;
-    l_18 = (int)(short)*(short *)D_00185C14;
+    *(int *)&l_18 = (int)(short)*(short *)D_00185C14;
     *(signed char *)D_0019629A = 1;
     func_0005A91A((int)(short)*(short *)((char *)((l_20 << 2) + l_30) + 69));
     *(signed char *)D_0019629A = 1;
     l_1C = 1;
-    *(short *)D_00185C14 = l_18;
+    *(short *)D_00185C14 = *(int *)&l_18;
     func_00060270(*(int *)D_001AA55C, 10);
 L95274:;
     if (((int)(short)*(short *)((char *)((l_20 << 2) + l_30) + 67)) != 21) goto L95296;
@@ -2097,7 +2096,7 @@ L95B71:;
 
 void func_00095B81(int a1, int a2)
 {
-    int l_14;
+    short l_14;
 
     if (((int)(unsigned char)*(signed char *)((char *)a1)) == 2) goto L95BB2;
     if (((int)(unsigned char)*(signed char *)((char *)a1)) != 54) goto L95BC7;
@@ -2131,8 +2130,8 @@ L95CA6:;
 L95CCA:;
     goto L95CE6;
 L95CCC:;
-    l_14 = a1 + 71;
-    if (((int)(unsigned short)*(short *)((char *)l_14 + 32)) != 1) return;
+    *(int *)&l_14 = a1 + 71;
+    if (((int)(unsigned short)*(short *)(*(char **)&l_14 + 32)) != 1) return;
 L95CE6:;
     *(int *)(D_001AA548 + ((((int)(short)*(short *)D_001AA588) - *(int *)D_001AA564) << 2)) = a1;
     func_000934F6(a1, (int)(short)(*(short *)D_001AA588 - *(short *)D_001AA564), a2);

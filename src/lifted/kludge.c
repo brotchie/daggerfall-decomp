@@ -215,23 +215,23 @@ void func_00044F85(int a1)
     int l_24;
     int l_20;
     int l_1C;
-    int l_18;
+    short l_18;
 
     func_0004504D(a1);
-    l_18 = 0;
+    *(int *)&l_18 = 0;
 L44FA5:;
-    if (((int)(short)*(short *)&l_18) < *(int *)D_00195D98) goto L44FBE;
+    if (((int)(short)l_18) < *(int *)D_00195D98) goto L44FBE;
     return;
 L44FB6:;
-    l_18++;
+    (*(int *)&l_18)++;
     goto L44FA5;
 L44FBE:;
-    if (*(signed char *)(*(char **)D_00195B04 + 47 + (((int)(short)*(short *)&l_18) * 89)) == 0) goto L44FB6;
+    if (*(signed char *)(*(char **)D_00195B04 + 47 + (((int)(short)l_18) * 89)) == 0) goto L44FB6;
     l_20 = func_0008E6C5(*(int *)(*(char **)D_00195AA0 + 63), 27, 0);
     l_20 = func_0008DCE3(l_20, 0, 89);
     *(signed char *)((char *)l_20) = 9;
     *(int *)((char *)l_20 + 31) = func_0008EB88(100);
-    func_000A1023(l_20 + 71, (int)(*(char **)D_00195B04 + (((int)(short)*(short *)&l_18) * 89)), 89, (int)D_00171044, 165, 4);
+    func_000A1023(l_20 + 71, (int)(*(char **)D_00195B04 + (((int)(short)l_18) * 89)), 89, (int)D_00171044, 165, 4);
     goto L44FB6;
 }
 
