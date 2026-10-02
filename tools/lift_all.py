@@ -127,7 +127,8 @@ def check(name, c):
     bad = build.check_relocs(obj, si, off, off, csz, tva, W["tgt"], W["fix_at"], W["funcs"],
                              {}, W["tgt"].le, fields)
     if bad:
-        return "diff", "relocation: " + bad, None
+        at = fields.get("bad_at")      # lets the choice point search run
+        return "diff", "relocation: " + bad, at
     return "ok", "", None
 
 

@@ -28,12 +28,15 @@ extern char D_00175CC4[];
 extern char D_00175CCB[];
 extern char D_00175CD0[];
 extern char D_00175CEF[];
+extern char D_001837E8[];
 extern char D_00186E24[];
 extern char D_00186E26[];
 extern char D_00186E28[];
 extern char D_00186E2A[];
 extern char D_00186E2C[];
 extern char D_00187CA8[];
+extern char D_0018DD94[];
+extern char D_0018DDB4[];
 extern char D_001903A4[];
 extern char D_00190B44[];
 extern char D_00190FE4[];
@@ -81,6 +84,7 @@ extern char D_001A4194[];
 extern char D_001A4196[];
 extern char D_001A41D4[];
 extern char D_001A41D8[];
+extern char D_001A41DC[];
 extern char D_001A41E0[];
 extern char D_001A41E4[];
 extern char D_001A41E8[];
@@ -101,6 +105,7 @@ extern int func_0008DA91(int);
 extern int func_000A0024();
 extern int func_000A0040();
 extern int func_000A00AF();
+extern int func_000A0AD9();
 extern int func_000A0D13();
 extern int func_000A0DD9();
 extern int func_000A0ED9(int, int);
@@ -144,6 +149,7 @@ void func_0006C55B(void);
 void func_0006C692(void);
 void func_0006CB02(void);
 #pragma aux func_000A0ED9 parm routine [];
+#pragma dagger DAGGER_CONFPOS func_0006C818
 #pragma dagger DAGGER_PUSHMEM func_0006C692
 #pragma dagger KKND_CONFREV func_0006BF30
 
@@ -762,6 +768,23 @@ void func_0006C7D2(void)
 
     if (((int)(unsigned char)(l_18 = (((int)(short)*(short *)D_0012AC06) - 38) / 7, *(signed char *)D_001A41F0)) <= l_18) return;
     *(signed char *)D_001A41F2 = *(signed char *)&l_18;
+}
+
+void func_0006C818(void)
+{
+    if (*(int *)(*(char **)D_001A41EC) >= *(int *)(D_001A3FB4 + (((int)(unsigned char)*(signed char *)D_001A41F2) * 20))) goto L6C854;
+    func_0003F09F(454, 1);
+    return;
+L6C854:;
+    *(int *)D_001959A4 = *(int *)(D_001A3FB4 + (((int)(unsigned char)*(signed char *)D_001A41F2) * 20));
+    *(int *)(*(char **)D_001A41EC) -= *(int *)D_001959A4;
+    *(int *)(*(char **)D_00195BE0 + 116) = *(int *)(D_001A3FB8 + (((int)(unsigned char)*(signed char *)D_001A41F2) * 20));
+    *(int *)D_001A41E4 = *(int *)(D_001A3FAC + (((int)(unsigned char)*(signed char *)D_001A41F2) * 20)) - 71;
+    *(int *)D_001A41DC = *(int *)(D_001A3FB0 + (((int)(unsigned char)*(signed char *)D_001A41F2) * 20));
+    func_0003F09F(282, 1);
+    func_000A0AD9((int)D_0018DDB4, *(int *)(D_001837E8 + (((int)(unsigned char)*(signed char *)D_00196268) << 2)), 32, (int)D_00175CC4, 647);
+    func_000A0AD9((int)D_0018DD94, *(int *)D_00195BDC, 32, (int)D_00175CC4, 648);
+    *(signed char *)D_001A41F1 = 0;
 }
 
 void func_0006C924(void)

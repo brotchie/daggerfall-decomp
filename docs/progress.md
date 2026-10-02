@@ -1134,3 +1134,7 @@ Batch **1,927**; build **61.34%**.
 - Ordered word compares (`cmp dx,[x]; jb`) give both operands the jump's signedness. +3.
   A sum used as an address is pointer arithmetic or an int sum (a choice point:
   `D + ((t[i] * 2) + i * 14)`). +5. Batch **2,002**.
+- Relocation mismatches now report where they are, so the choice point search runs on
+  them too. Two more per-function register allocation knobs: `DAGGER_CONFPOS` /
+  `DAGGER_CONFPOSREV` break ties in savings by where each live range starts (globally each
+  loses ~300; per function +5). Batch **2,007**.

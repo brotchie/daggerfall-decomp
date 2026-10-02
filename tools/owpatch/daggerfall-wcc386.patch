@@ -1346,7 +1346,7 @@ index 310489af1a..0f98337910 100644
      if( !LDone( oc ) ) {
          if( OC_BASE_CLASS( oc->oc_header.class ) != OC_INFO
 diff --git a/bld/cg/c/regalloc.c b/bld/cg/c/regalloc.c
-index 90c1857729..7154031c5f 100644
+index 90c1857729..cd512df89e 100644
 --- a/bld/cg/c/regalloc.c
 +++ b/bld/cg/c/regalloc.c
 @@ -31,6 +31,9 @@
@@ -1416,16 +1416,33 @@ index 90c1857729..7154031c5f 100644
                         && HW_Subset( GivenRegisters, reg )
                         && !HW_Subset( GivenRegisters, best ) ) ) {
                          best = reg;
-@@ -1193,6 +1214,8 @@ conflict_node   *GiveRegister( conflict_node *conf, bool needs_one )
+@@ -1193,12 +1214,24 @@ conflict_node   *GiveRegister( conflict_node *conf, bool needs_one )
  }
  
  
 +extern bool DaggerFuncOpt( const char *opt );
 +
++static int          DaggerConfPos;  /* Daggerfall: break savings ties by live range start */
++
  static bool         ConfBefore( void *c1, void *c2 )
  /*********************************************************
      used by SortConflicts
-@@ -1207,6 +1230,38 @@ static  void    SortConflicts( void )
+ */
+ {
+-    return( ((conflict_node *)c1)->savings > ((conflict_node *)c2)->savings );
++    conflict_node   *a = c1;
++    conflict_node   *b = c2;
++
++    if( DaggerConfPos != 0 && a->savings == b->savings
++      && a->ins_range.first != NULL && b->ins_range.first != NULL
++      && a->ins_range.first->id != b->ins_range.first->id ) {
++        return( ( a->ins_range.first->id < b->ins_range.first->id ) == ( DaggerConfPos > 0 ) );
++    }
++    return( a->savings > b->savings );
+ }
+ 
+ 
+@@ -1207,6 +1240,40 @@ static  void    SortConflicts( void )
      Sort the conflicts in order of descending savings.
  */
  {
@@ -1461,10 +1478,12 @@ index 90c1857729..7154031c5f 100644
 +    }
 +    if( DaggerEnv( "DAGGER_CONFLIST" ) != NULL )
 +        return;
++    DaggerConfPos = DaggerEnv( "DAGGER_CONFPOS" ) != NULL ? 1
++                  : DaggerEnv( "DAGGER_CONFPOSREV" ) != NULL ? -1 : 0;
      ConfList = SortList( ConfList, offsetof( conflict_node, next_conflict ), ConfBefore );
  }
  
-@@ -1242,6 +1297,18 @@ static  enum allocation_state    AssignConflicts( void )
+@@ -1242,6 +1309,18 @@ static  enum allocation_state    AssignConflicts( void )
          }
      }
      ConstSavings();
@@ -1483,7 +1502,7 @@ index 90c1857729..7154031c5f 100644
  
      SortConflicts();
      state = ALLOC_BITS;
-@@ -1265,7 +1332,9 @@ static  enum allocation_state    AssignConflicts( void )
+@@ -1265,7 +1344,9 @@ static  enum allocation_state    AssignConflicts( void )
              */
              if( !only_const_temps && opnd->n.class == N_TEMP && (opnd->t.temp_flags & CONST_TEMP) )
                  return( ALLOC_CONST_TEMP );

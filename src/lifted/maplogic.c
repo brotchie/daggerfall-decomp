@@ -11,6 +11,7 @@ struct bf8_7_1 { unsigned char _:7; unsigned char f:1; };
 extern char D_000C23C4[];
 extern char D_000C23C8[];
 extern char D_000C23CC[];
+extern char D_000C2BB8[];
 extern char D_0012DE00[];
 extern char D_00176C94[];
 extern char D_00176CDD[];
@@ -19,6 +20,8 @@ extern char D_00176D20[];
 extern char D_00176D3E[];
 extern char D_001789FA[];
 extern char D_00178A0A[];
+extern char D_0017A288[];
+extern char D_0017CA0A[];
 extern char D_0018461C[];
 extern char D_00185097[];
 extern char D_00186503[];
@@ -45,6 +48,7 @@ extern char D_00195C88[];
 extern char D_00195CB8[];
 extern char D_00195D84[];
 extern char D_00195DB8[];
+extern char D_00195E2A[];
 extern char D_00195F28[];
 extern char D_00195F5E[];
 extern char D_00195FB1[];
@@ -73,10 +77,15 @@ extern char D_001A94A0[];
 extern char D_001A94B0[];
 extern char D_001A94C4[];
 extern char D_001A94C8[];
+extern char D_001A94CC[];
+extern char D_001A94D0[];
+extern char D_001A94D4[];
+extern char D_001A94D6[];
 extern char D_001A99F4[];
 
 extern int func_000135E6(int, int, int);
 extern int func_0001FF92(void);
+extern int func_0001FFF1(void);
 extern int func_0002001F(void);
 extern int func_0002E914(int, int, int);
 extern int func_000342E3(int);
@@ -124,7 +133,6 @@ extern void func_00086B0B(int);
 extern void func_00088213(int, int);
 extern void func_0008824A(int, int);
 extern void func_00088732(void);
-extern void func_00088A68(void);
 extern void func_0008A4E4(int);
 extern void func_0008A90C(int, int, int);
 extern void func_0008DA1C(int);
@@ -144,6 +152,8 @@ void func_000866B4(void);
 void func_00086D37(unsigned short);
 void func_000871FA(int);
 void func_00087281(int);
+void func_00088A68(void);
+#pragma dagger DAGGER_CONFPOS func_00088A68
 #pragma dagger DAGGER_KEEPSUB func_00088B98
 #pragma dagger KKND_CONFREV func_0008661C
 
@@ -908,6 +918,40 @@ L88A55:;
     goto L88A1E;
 L88A57:;
     func_0001DD39(l_14);
+}
+
+void func_00088A68(void)
+{
+    int l_1C;
+    int l_18;
+
+    if (((int)(unsigned char)*(signed char *)(D_001A94D6 + (*(int *)D_001A94C8 * 131))) <= 50) goto L88AA1;
+    *(signed char *)(D_001A94D6 + (*(int *)D_001A94C8 * 131)) = 50;
+L88AA1:;
+    func_000A1023((int)D_000C2BB8, (int)&*(signed char *)((char *)(int)((char *)(*(int *)D_001A94C8 * 131) + ((int)D_001A94D4)) + 2), 129, (int)D_00176C94, 1455, 4);
+    *(int *)D_001A94CC = (((int)(unsigned char)*(signed char *)(D_0017CA0A + *(int *)D_001A94C8)) * 100) + 2;
+    *(int *)D_001A94D0 = (int)(short)*(short *)(D_001A94D4 + (*(int *)D_001A94C8 * 131));
+    l_1C = func_0001FFF1();
+    l_18 = (int)(unsigned char)*(signed char *)(D_0017A288 + (((unsigned)(((unsigned)*(int *)D_00195BF4) % 518400)) / 43200));
+    if (((int)(unsigned char)(*(signed char *)(D_00195E2A + l_1C) & 127)) == 5) goto L88B62;
+    if (l_18 != 0) goto L88B60;
+    if (l_1C == 1) goto L88B56;
+    if (l_1C != 3) goto L88B58;
+L88B56:;
+    goto L88B5E;
+L88B58:;
+    if (l_1C != 5) goto L88B60;
+L88B5E:;
+    goto L88B62;
+L88B60:;
+    goto L88B70;
+L88B62:;
+    (*(int *)D_001A94CC)++;
+    (*(int *)D_001A94D0)++;
+    return;
+L88B70:;
+    if (((int)(unsigned char)(*(signed char *)(D_00195E2A + func_0001FFF1()) & 127)) != 4) return;
+    *(int *)D_001A94CC += 2;
 }
 
 int func_00088B98(int a1)

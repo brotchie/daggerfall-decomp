@@ -107,12 +107,14 @@ def check_relocs(obj, si, lo, off, size, va, tgt, fix_at, funcs, syms, le, field
                 rel32 = struct.unpack_from("<i", tgt.bytes_at(field, 4))[0]
                 have = field + 4 + rel32
             if have != want + addend:
+                fields["bad_at"] = field
                 return "call/jmp target %s (%#x) != original %#x" % (fx.target, want, have)
             # between objects the LE loader fills the field in and the file holds 0
             value = 0 if of is not None else want + addend - (field + 4)
             fields[field] = (fx.size, value)
         else:
             if of is None or of.kind != SRC_OFF32 or of.target_va != want + addend:
+                fields["bad_at"] = field
                 return "reference %s+%d (%#x) != original %s" % (
                     fx.target, addend, want + addend,
                     "%#x" % of.target_va if of else "no fixup")
