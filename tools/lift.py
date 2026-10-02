@@ -390,6 +390,9 @@ class Func:
             size = a - nxt
             if size > 4:
                 self.arrays[a] = size
+            elif any(a - 3 <= o < a for o in known) and not os.environ.get("LIFT_NOSMALLARR"):
+                # an address-taken slot with bytes of it read separately: a 4-byte array
+                self.arrays[a] = 4
         inside = {}
         for a, size in self.arrays.items():
             for o in range(a - size + 1, a):
@@ -1953,7 +1956,7 @@ FUNC_OPTS = ["KKND_CONFREV", "DAGGER_LEFTPREF", "DAGGER_CHARAUTOSMALL", "DAGGER_
              "DAGGER_FLUSH", "DAGGER_CHARPARMBIG", "DAGGER_SIGNEDBF", "KKND_CONSTREG",
              "KKND_LINSEL", "KKND_NOROT", "KKND_STRETCH", "DAGGER_FIRSTUSE",
              "DAGGER_NOSAVES", "DAGGER_REGLAST", "DAGGER_NOGIVEN", "DAGGER_CONFLIST",
-             "DAGGER_CONFLISTREV", "DAGGER_KEEPSUB"]
+             "DAGGER_CONFLISTREV", "DAGGER_KEEPSUB", "DAGGER_NODEMOTE"]
 SOSCONV = '#pragma aux sosconv "*" parm caller [] value [eax] modify [eax ebx ecx edx];'
 SAVES = {}
 
