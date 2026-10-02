@@ -99,6 +99,7 @@ extern int func_0012B45B();
 extern int func_0012B47E();
 extern int func_00144E84();
 extern int func_00144FB4();
+extern int func_0014BC00();
 extern int func_00152D00();
 extern void func_000696A3(int);
 extern void func_0007EED8(void);
@@ -400,6 +401,26 @@ L80F7C:;
 void func_00080FAB(int a1)
 {
     *(signed char *)D_001940DB &= 191;
+}
+
+int func_00080FCD(int a1)
+{
+    int l_20;
+    int l_1C;
+
+    l_20 = (*(int *)((char *)a1) << 8) / func_0014BC00((*(int *)((char *)a1) * *(int *)((char *)a1)) + (*(int *)((char *)a1 + 8) * *(int *)((char *)a1 + 8)));
+    if (*(int *)((char *)a1) <= 0) goto L81047;
+    l_1C = (l_20 * 511) / 256;
+    if (*(int *)((char *)a1 + 8) >= 0) goto L81045;
+    l_1C = (512 - l_1C) + 512;
+L81045:;
+    goto L8107E;
+L81047:;
+    l_1C = ((l_20 * 511) / 256) + 2047;
+    if (*(int *)((char *)a1 + 8) >= 0) goto L8107E;
+    l_1C = 1536 - (l_1C - 1536);
+L8107E:;
+    return l_1C & 2047;
 }
 
 void func_00081096(void)

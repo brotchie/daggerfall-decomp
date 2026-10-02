@@ -1147,3 +1147,6 @@ Batch **1,927**; build **61.34%**.
 - Short multiplications: `movsx ax,byte [x]` is a short operand, `imul edx,eax` joins the
   16-bit chain of a short variable's store, and the compiler widens a short store right
   after a MUL (OW multiplies shorts as U4). +2. Batch **2,016**.
+- A function the lifter gives up on at its first attempt gets the nearest choice points
+  flipped one at a time (a register kept across a call, say), then the usual search. +3.
+  Batch **2,019**.

@@ -141,17 +141,32 @@ def work(va):
     lift = W["lift"]
     name = "func_%08X" % va
     info = {}
+    start = frozenset()
     try:
         c = lift.lift(va, info=info)
     except lift.Unsupported as e:
-        return name, "unsupported", re.sub(r" at [0-9a-f]+$", "", str(e))
+        # a choice point taken the other way may get past it (a register kept across a
+        # call, say): the choice points seen before the failure, nearest first
+        c = None
+        m = re.search(r" at ([0-9a-f]+)$", str(e))
+        where = int(m.group(1), 16) if m else va
+        for a in sorted(info.get("choices", []), key=lambda a: abs(a - where))[:24]:
+            info2 = {}
+            try:
+                c = lift.lift(va, frozenset({a}), info=info2)
+            except Exception:
+                continue
+            start, info = frozenset({a}), info2
+            break
+        if c is None:
+            return name, "unsupported", re.sub(r" at [0-9a-f]+$", "", str(e))
     except Exception as e:  # a lifter bug: report, keep going
         return name, "error", "lifter %s: %s" % (type(e).__name__, e)
     status, detail, at = check(name, c)
     # Choice points (operand orders the code can't tell apart, code generator knobs): try
     # flipping each one near the first difference and keep the flip that moves the first
     # difference furthest; when no single flip helps, try pairs of the nearest.
-    flips, tries = frozenset(), 0
+    flips, tries = start, 0
     tried_pairs = set()      # first differences pairs were tried at
     best = (status, detail, at, c)
 

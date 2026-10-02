@@ -9,9 +9,10 @@ extern char D_00178848[];
 extern int func_00011E36(int, ...);
 extern int func_000120EB(int, ...);
 extern int func_000124BF(int, ...);
-extern int func_00012DA5(signed char);
 extern int func_000A0DF4();
 extern int func_000A0E3B();
+extern int func_000A0E74();
+int func_00012DA5(signed char);
 #pragma aux sosconv "*" parm caller [] value [eax] modify [eax ebx ecx edx];
 #pragma aux (sosconv) func_00012640;
 #pragma aux (sosconv) func_0001270C;
@@ -76,4 +77,24 @@ L12D65:;
     l_24--;
     if (((unsigned)l_24) > 0) goto L12D65;
     return l_28;
+}
+
+int func_00012DA5(signed char a1)
+{
+    int l_20;
+
+    l_20 = 0;
+L12DBD:;
+    if (((unsigned)l_20) < 16) goto L12DCD;
+    goto L12DF0;
+L12DC5:;
+    l_20++;
+    goto L12DBD;
+L12DCD:;
+    if (((int)(unsigned char)*(signed char *)((char *)(*(int *)D_00178848 + l_20))) != func_000A0E74((int)(signed char)a1)) goto L12DEE;
+    return l_20;
+L12DEE:;
+    goto L12DC5;
+L12DF0:;
+    return -1;
 }
