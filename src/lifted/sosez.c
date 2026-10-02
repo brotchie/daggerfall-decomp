@@ -33,6 +33,7 @@ extern int func_000A00AF();
 extern int func_000A00CB();
 extern int func_000A01DE();
 #pragma aux sosconv "*" parm caller [] value [eax] modify [eax ebx ecx edx];
+#pragma dagger DAGGER_RMW func_0001167F
 #pragma aux (sosconv) func_000112A1;
 #pragma aux (sosconv) func_0001167F;
 #pragma aux (sosconv) func_0001198A;

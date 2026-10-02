@@ -117,6 +117,8 @@ void func_0005C897(int);
 void func_0005CA28(int);
 void func_0005CA87(int);
 #pragma dagger DAGGER_NODEMOTE func_0005C1CA
+#pragma dagger DAGGER_RMW func_0005BCDE
+#pragma dagger DAGGER_RMW func_0005C1CA
 #pragma dagger reg func_0005AAE4 437 bx
 #pragma dagger reg func_0005C1CA 72 edx 74 edx 85 dx 437 bx
 #pragma dagger reg func_0005CA87 437 bx

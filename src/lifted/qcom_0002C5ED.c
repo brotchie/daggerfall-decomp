@@ -10,6 +10,7 @@ extern int func_0002FF2C(int, int, int);
 extern int func_0007D6AE(int, int);
 extern int func_000A1079();
 extern void func_0002C9C2(int, int);
+#pragma dagger DAGGER_RMW func_0002C5ED
 #pragma dagger slots func_0002C5ED a1 20 a2 16 a3 8 l_18 12 l_10 4
 
 void func_0002C5ED(int a1, int a2, short a3)

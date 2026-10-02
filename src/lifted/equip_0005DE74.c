@@ -28,6 +28,7 @@ extern void func_0005F75B(int, short);
 extern void func_00060430(int, int);
 #pragma aux func_000A0ED9 parm routine [];
 #pragma aux func_000A18C3 parm routine [];
+#pragma dagger DAGGER_RMW func_0005DE74
 #pragma dagger slots func_0005DE74 a1 12 a2 8 a3 16 a4 24 l_1C 20 l_C 4
 
 void func_0005DE74(int a1, short a2, int a3, int a4)

@@ -233,9 +233,9 @@ void func_00071518(void);
 #pragma aux func_000A0ED9 parm routine [];
 #pragma dagger DAGGER_LEFTPREF func_0006FDBE
 #pragma dagger DAGGER_NOSAVES func_00070B9C
-#pragma dagger KKND_CONFREV func_00070887
-#pragma dagger confwin func_00070887 37 42
+#pragma dagger DAGGER_RMW func_00070887
 #pragma dagger reg func_0006FDBE 437 bx
+#pragma dagger reg func_00070887 37 ebx
 #pragma dagger reg func_00071606 60 edx
 
 void func_0006DC35(int a1)

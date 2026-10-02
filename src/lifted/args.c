@@ -151,6 +151,8 @@ void func_0008302D(int, int, int);
 #pragma aux func_0009DA1C parm routine [];
 #pragma aux func_000A0ED9 parm routine [];
 #pragma dagger DAGGER_RMW func_000830C7
+#pragma dagger DAGGER_RMW func_00084480
+#pragma dagger DAGGER_RMW func_000844FB
 
 void func_000827C3(int a1)
 {

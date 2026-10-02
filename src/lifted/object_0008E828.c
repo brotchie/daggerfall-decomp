@@ -10,6 +10,7 @@ extern char D_001A9B44[];
 extern int func_0008DB21(int, int, int);
 extern int func_0008DCE3(int, int, int);
 extern int func_000A1023();
+#pragma dagger DAGGER_RMW func_0008E828
 
 int func_0008E828(int a1, int a2, int a3, int a4, int a5)
 {

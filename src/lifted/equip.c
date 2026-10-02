@@ -148,6 +148,7 @@ void func_000615E0(int, int, int, int);
 #pragma dagger DAGGER_NOGIVEN func_00060430
 #pragma dagger DAGGER_RMW func_0005E874
 #pragma dagger DAGGER_RMW func_0005EA8F
+#pragma dagger DAGGER_RMW func_00060430
 #pragma dagger DAGGER_RMW func_00061CBC
 #pragma dagger reg func_0005F5E7 381 esi
 #pragma dagger reg func_00060430 102 eax 105 edx 437 bx

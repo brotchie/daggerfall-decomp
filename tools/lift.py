@@ -1153,6 +1153,8 @@ class Func:
                     and not os.environ.get("LIFT_NOFISTPTEMP"):
                 # converted through a temp read once later: the read gets the conversion
                 self.temps.add(off)
+                if op.size == 8:
+                    self.temps.add(off - 4)     # (a 64-bit temp: both halves)
                 self.slot_val[off] = v
                 return True
             if m == "fistp" and off is not None and nxt is not None and nxt.mnemonic == "push" \
@@ -3149,7 +3151,8 @@ FUNC_OPTS = ["KKND_CONFREV", "DAGGER_LEFTPREF", "DAGGER_CHARAUTOSMALL", "DAGGER_
              "KKND_LINSEL", "KKND_NOROT", "KKND_STRETCH", "DAGGER_FIRSTUSE",
              "DAGGER_NOSAVES", "DAGGER_REGLAST", "DAGGER_NOGIVEN", "DAGGER_CONFLIST",
              "DAGGER_CONFLISTREV", "DAGGER_KEEPSUB", "DAGGER_NODEMOTE",
-             "DAGGER_NOCVTDEMOTE", "DAGGER_DEADDEFMEM", "DAGGER_CONFPOS", "DAGGER_CONFPOSREV", "DAGGER_RIGHTPREF"]
+             "DAGGER_NOCVTDEMOTE", "DAGGER_DEADDEFMEM", "DAGGER_CONFPOS", "DAGGER_CONFPOSREV", "DAGGER_RIGHTPREF",
+             "DAGGER_IDXKEEP"]
 IMPLICIT = bool(os.environ.get("LIFT_IMPLICIT"))
 
 

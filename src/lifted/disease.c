@@ -104,9 +104,9 @@ void func_00066D3C(int);
 void func_00067027(int);
 void func_000686DA(int);
 #pragma dagger DAGGER_CONFPOS func_00065937
+#pragma dagger DAGGER_RMW func_00066D3C
 #pragma dagger reg func_00065937 45 edx
 #pragma dagger reg func_00066853 437 bx
-#pragma dagger reg func_00066D3C 98 eax 437 bx
 
 void func_00065937(int a1, int a2, int a3, int a4)
 {
@@ -735,8 +735,8 @@ L66ED4:;
     l_28 = l_30 + 71;
     l_1C = 0;
 L66F24:;
-    if (*(signed char *)((char *)(int)(*(char **)D_00195B04 + (l_1C * 89)) + 47) == 0) goto L66F4E;
-    if (((int)(unsigned char)*(signed char *)((char *)(int)(*(char **)D_00195B04 + (l_1C * 89)) + 73)) == 92) goto L66F56;
+    if (*(signed char *)((char *)(int)((l_1C * 89) + *(char **)D_00195B04) + 47) == 0) goto L66F4E;
+    if (((int)(unsigned char)*(signed char *)((char *)(int)((l_1C * 89) + *(char **)D_00195B04) + 73)) == 92) goto L66F56;
 L66F4E:;
     l_1C++;
     goto L66F24;

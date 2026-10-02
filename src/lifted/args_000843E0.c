@@ -5,6 +5,7 @@ extern char D_00195AC4[];
 extern char D_00195BDC[];
 
 extern int func_0008DCE3(int, int, int);
+#pragma dagger DAGGER_RMW func_000843E0
 #pragma dagger slots func_000843E0 a1 24 a2 8 a3 4 a4 12 l_24 28 l_1C 20 ret 16
 
 int func_000843E0(int a1, int a2, int a3, int a4)

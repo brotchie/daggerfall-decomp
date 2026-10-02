@@ -122,6 +122,7 @@ void func_0001E928(int);
 #pragma dagger DAGGER_CONFPOS func_0001EC32
 #pragma dagger DAGGER_KEEPSUB func_0001EC32
 #pragma dagger DAGGER_NODEMOTE func_0001E614
+#pragma dagger DAGGER_RMW func_0001E576
 #pragma dagger KKND_CONFREV func_0001EC32
 #pragma dagger reg func_0001EC32 58 edx 59 edx 60 edx
 

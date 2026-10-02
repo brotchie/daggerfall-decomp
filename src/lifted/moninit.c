@@ -51,6 +51,7 @@ extern void func_0008E3F7(int, int);
 void func_0007909F(int, int);
 void func_000792C1(int, int, int);
 void func_0007977F(int);
+#pragma dagger DAGGER_RMW func_0007909F
 #pragma dagger reg func_000792C1 30 edx 67 edx 68 edx 99 edx 110 edx 111 edx 142 edx
 
 void func_00078C79(void)

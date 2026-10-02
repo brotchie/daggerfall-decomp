@@ -87,6 +87,7 @@ int func_00051B3E(int, int);
 void func_00051490(int);
 void func_000517EC(short);
 #pragma aux func_000A0ED9 parm routine [];
+#pragma dagger DAGGER_RMW func_00051991
 #pragma dagger slots func_00051026 l_34 32 l_28 20 l_24 16 l_20 12 l_1C 8 l_18 4 ret 24
 #pragma dagger slots func_00051991 a1 4 a2 8 a3 20 a4 16 ret 12
 

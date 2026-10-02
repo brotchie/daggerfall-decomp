@@ -79,6 +79,7 @@ int func_00033EE7(int, int);
 int func_0003445C(int);
 int func_000344D3(void);
 int func_000345A5(int);
+#pragma dagger DAGGER_RMW func_00031B8A
 #pragma dagger reg func_00031B8A 158 edx 539 eax
 #pragma dagger reg func_000344D3 437 bx
 

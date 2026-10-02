@@ -5,8 +5,9 @@ extern char D_00176E38[];
 
 extern int func_000A00AF();
 extern void func_0008CA25(int);
+#pragma dagger DAGGER_RMW func_0008CA9A
 #pragma dagger KKND_CONFREV func_0008CA9A
-#pragma dagger reg func_0008CA9A 57 edx 437 bx
+#pragma dagger reg func_0008CA9A 57 edx
 #pragma dagger slots func_0008CA9A a1 16 a2 12 a3 4 a4 8
 
 void func_0008CA9A(int a1, int a2, int a3, int a4, short a5, short a6, short a7, short a8, short a9, short a10, short a11, short a12, short a13, short a14, short a15, short a16, short a17, unsigned char a18, unsigned char a19, unsigned char a20, unsigned char a21, unsigned char a22)

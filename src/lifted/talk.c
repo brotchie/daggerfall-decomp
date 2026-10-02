@@ -300,6 +300,7 @@ void func_0001B418(int, int);
 void func_0001B554(int, int, int);
 void func_0001B5BE(int, int);
 #pragma aux func_000A0ED9 parm routine [];
+#pragma dagger DAGGER_RMW func_00019676
 #pragma dagger KKND_CONFREV func_00017CEF
 #pragma dagger reg func_00016E61 4 ebx
 #pragma dagger reg func_00017179 33 esi
