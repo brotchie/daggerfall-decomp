@@ -1333,3 +1333,16 @@ Batch **1,927**; build **61.34%**.
 - A caller widening an argument right before pushing it (`xor ah,ah; cwde; push eax`)
   passes a short. Assignment chains through a reloaded pointer (`p->a = (p->b = v)`, the
   word re-read then widened or stored on). +5. Batch **2,217** (90.6%).
+- x87: floats (slots the FPU stores and loads as 4 bytes; `fstp m32; fld m32` of a temp
+  rounds to float; `(int)(float)((float)x + y)` stored back to x is `x += y`), two filds
+  combined are `(double)a / b`, `fistp qword` read as a dword is the unsigned conversion.
+- **OW: per-function knobs with names over 15 characters never worked** (DaggerFuncOpt kept
+  15 characters of the name): DAGGER_WORDSTORE, DAGGER_CHARPARMBIG, DAGGER_CONFPOSREV and
+  five more now switch on per function. The widened short store also follows int sums
+  and int variables (`s = s + i / j`, `s = i`). +6.
+- Selector-temp switch trees treat jumps in their own run as stubs; explicit empty cases
+  (values a compare sends straight to the default's code shape Watcom's tree) and extra
+  register arguments to a callee taking fewer are choice points. OW: widened byte/word
+  compares against out-of-range constants are no longer folded (`(uchar)x == -1`), and
+  DAGGER_CALLFIRST (a knob) generates an operand making a call first. +6. Batch **2,227**
+  (91.5%).
