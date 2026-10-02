@@ -121,6 +121,7 @@ extern char D_00195D54[];
 extern char D_00195D68[];
 extern char D_00195D7C[];
 extern char D_00195DA8[];
+extern char D_00195DBC[];
 extern char D_00195F2E[];
 extern char D_00195FB1[];
 extern char D_001960D9[];
@@ -1927,6 +1928,35 @@ L96CBB:;
 }
 }
 
+void func_00096ECC(int a1)
+{
+    int l_18;
+
+    if (((int)(unsigned char)*(signed char *)((char *)a1)) != 2) return;
+    if (*(int *)D_00195B84 == 0) return;
+    l_18 = a1 + 71;
+    if (((int)(unsigned short)*(short *)((char *)l_18 + 32)) != 3) goto L96F28;
+    if (((int)(unsigned short)*(short *)((char *)l_18 + 34)) == 18) goto L96F2A;
+L96F28:;
+    goto L96F2C;
+L96F2A:;
+    return;
+L96F2C:;
+    if (((int)(short)*(short *)((char *)l_18 + 67)) == (-1)) goto L96F41;
+    if (*(int *)D_00195DBC == 0) goto L96F43;
+L96F41:;
+    goto L96F45;
+L96F43:;
+    return;
+L96F45:;
+    if (*(short *)((char *)l_18 + 44) == *(short *)((char *)l_18 + 46)) return;
+    *(short *)((char *)l_18 + 44) += *(short *)D_00195B84;
+    if (*(unsigned short *)((char *)l_18 + 44) <= *(unsigned short *)((char *)l_18 + 46)) goto L96F81;
+    *(short *)((char *)l_18 + 44) = *(short *)((char *)l_18 + 46);
+L96F81:;
+    *(int *)D_00195B84 = 0;
+}
+
 void func_00096F95(int a1)
 {
     int l_20;
@@ -2091,6 +2121,25 @@ L974D6:;
 L97504:;
     (*(signed char *)((char *)l_1C + 49))--;
     return 1;
+}
+
+void func_00097616(int a1, int a2)
+{
+__dagger_tbl9762C:;
+    switch (a2) {
+case 0:
+    func_00144FB4(163, 48, (int)(unsigned short)*(short *)((char *)a1 + 4), 20, a1 + 12);
+    return;
+case 1:
+    func_00144FB4(261, 48, (int)(unsigned short)*(short *)((char *)a1 + 4), 20, a1 + 12);
+    return;
+case 2:
+    func_00144FB4(163, (int)&*(signed char *)((char *)(((int)(unsigned short)*(short *)((char *)a1 + 2)) + ((int)(unsigned short)*(short *)((char *)a1 + 6))) - 20), (int)(unsigned short)*(short *)((char *)a1 + 4), 20, ((a1 + 12) + ((int)(unsigned short)*(short *)((char *)a1 + 10))) - (((int)(unsigned short)*(short *)((char *)a1 + 4)) * 20));
+    return;
+case 3:
+    func_00144FB4(261, (int)&*(signed char *)((char *)(((int)(unsigned short)*(short *)((char *)a1 + 2)) + ((int)(unsigned short)*(short *)((char *)a1 + 6))) - 20), (int)(unsigned short)*(short *)((char *)a1 + 4), 20, ((a1 + 12) + ((int)(unsigned short)*(short *)((char *)a1 + 10))) - (((int)(unsigned short)*(short *)((char *)a1 + 4)) * 20));
+default:;
+}
 }
 
 int func_00097764(void)

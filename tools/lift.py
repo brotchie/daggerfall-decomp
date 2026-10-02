@@ -817,6 +817,22 @@ class Func:
                                         e.text), 1, True)
                     return E("(%s)%s" % (want, e.p()), 1, True)
                 return "%s %s %s" % (conv(a).p(), opr, conv(b).p())
+            if a.size == 2 and b.size == 2 and a.atom and b.atom and opr not in ("==", "!=") \
+                    and not os.environ.get("LIFT_NOWORDCMP"):
+                # an ordered word compare: both operands of the jump's signedness (mixing
+                # short and unsigned short promotes both to int)
+                want = "unsigned short" if uns else "short"
+
+                def convw(e):
+                    if e.text.lstrip("-").isdigit():
+                        return e
+                    if re.match(r"\*\((?:unsigned )?short \*\)", e.text):
+                        return E(re.sub(r"^\*\((?:unsigned )?short \*\)", "*(%s *)" % want,
+                                        e.text), 2, True)
+                    if re.fullmatch(r"[al]_?\w+", e.text) and self.var_type(e.text) == want:
+                        return e
+                    return E("(%s)%s" % (want, e.p()), 2, True)
+                return "%s %s %s" % (convw(a).p(), opr, convw(b).p())
             if a.size == 2 and b.size == 2 and not a.atom:
                 # a 16-bit register value against a 16-bit operand: cmp ax, word [x], with the
                 # jump's signedness
@@ -1119,8 +1135,17 @@ class Func:
                     # a dword read kept in a register for an add (not folded into it):
                     # perhaps a pointer, a choice point
                     self.choices.append(ins.address + 0.375)
+                base_only = m == "add" and s.type == cx.X86_OP_REG and not ptr_hint and \
+                    self.used_as_base(full) and not self.global_ptr(b) and \
+                    not self.global_ptr(a)
+                if base_only:
+                    # the sum is used as an address: pointer arithmetic, or an int sum (a
+                    # choice point)
+                    self.choices.append(ins.address + 0.375)
                 if m == "add" and s.type == cx.X86_OP_REG and (
-                        self.used_as_base(full) or self.global_ptr(b) or self.global_ptr(a) or
+                        (self.used_as_base(full) and not (
+                            base_only and ins.address + 0.375 in self.flips)) or
+                        self.global_ptr(b) or self.global_ptr(a) or
                         (ptr_hint and (ins.address + 0.375 in self.flips) ==
                          bool(os.environ.get("LIFT_NOPTRADD")))):
                     # pointer arithmetic: the operand loaded from memory is the base pointer

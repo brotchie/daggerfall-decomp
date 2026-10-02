@@ -1131,3 +1131,6 @@ Batch **1,927**; build **61.34%**.
   point declares the callee `extern int f();` in that function. +3. lift_all keeps each
   function's winning flips (build/lift/flips.json) and retries them when a fresh greedy
   search ends worse. Batch **1,994**.
+- Ordered word compares (`cmp dx,[x]; jb`) give both operands the jump's signedness. +3.
+  A sum used as an address is pointer arithmetic or an int sum (a choice point:
+  `D + ((t[i] * 2) + i * 14)`). +5. Batch **2,002**.

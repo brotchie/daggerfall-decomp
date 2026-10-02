@@ -775,7 +775,7 @@ int func_00039E5F(int a1)
     *(int *)&l_18 = 0;
     *(int *)&l_1C = *(int *)&l_18;
 L39EC7:;
-    if ((short)*(int *)&l_18 < l_20) goto L39EDD;
+    if ((short)(short)*(int *)&l_18 < l_20) goto L39EDD;
     goto L39F61;
 L39ED5:;
     (*(int *)&l_18)++;

@@ -252,7 +252,7 @@ void func_0005A2BE(void)
 
     l_18 = 0;
 L5A2D3:;
-    if ((short)l_18 < *(short *)D_00199D5E) goto L5A2E9;
+    if ((short)(short)l_18 < *(short *)D_00199D5E) goto L5A2E9;
     return;
 L5A2E1:;
     l_18++;

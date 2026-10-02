@@ -2099,7 +2099,7 @@ L4A91D:;
 L4A92A:;
     if (((int)(unsigned char)*(signed char *)(D_0017CA8E + ((int)(short)l_18))) == 255) goto L4A979;
     if (((int)(unsigned char)*(signed char *)(D_0017CA8E + ((int)(short)l_18))) != a2) goto L4A966;
-    if ((short)*(int *)&l_14 >= *(short *)(D_0017CA24 + (((int)(short)l_18) * 2))) goto L4A968;
+    if ((short)(short)*(int *)&l_14 >= *(short *)(D_0017CA24 + (((int)(short)l_18) * 2))) goto L4A968;
 L4A966:;
     goto L4A971;
 L4A968:;

@@ -333,7 +333,7 @@ L7D1CC:;
 L7D1D1:;
     *(int *)&l_10 = (((int)(short)a3) << 8) / ((int)(short)*(short *)((char *)a1));
     l_C = (((int)(short)a4) << 8) / ((int)(short)*(short *)((char *)a2));
-    if ((short)l_C >= l_10) goto L7D229;
+    if ((short)(short)l_C >= l_10) goto L7D229;
     *(short *)((char *)a1) = (((int)(short)*(short *)((char *)a1)) * ((int)(short)*(short *)&l_C)) >> 8;
     *(short *)((char *)a2) = *(int *)&a4;
     return;
@@ -765,6 +765,27 @@ void func_0007E14E(int a1)
     *(int *)(*(char **)D_00195AA4 + 11) = *(int *)(D_0018DE18 + (a1 * 12));
     *(int *)(*(char **)D_00195AA4 + 15) = *(int *)(D_0018DE1C + (a1 * 12));
     *(signed char *)D_001940D5 |= 2;
+}
+
+int func_0007E1A7(int a1)
+{
+    int l_1C;
+{
+    int l_24;
+
+    l_1C = func_00135DE4(((int)(unsigned short)*(short *)((char *)a1 + 27)) >> 7, (int)(unsigned short)(*(short *)((char *)a1 + 27) & 127));
+    if (l_1C != 0) goto L7E213;
+    func_00135E39();
+    l_1C = func_00135DE4(((int)(unsigned short)*(short *)((char *)a1 + 27)) >> 7, (int)(unsigned short)(*(short *)((char *)a1 + 27) & 127));
+L7E213:;
+    if (*(unsigned short *)((char *)a1 + 23) < *(unsigned short *)((char *)l_1C + 20)) goto L7E22C;
+    l_24 = 1;
+    goto L7E233;
+L7E22C:;
+    l_24 = 0;
+L7E233:;
+    return l_24;
+}
 }
 
 void func_0007E246(int a1)

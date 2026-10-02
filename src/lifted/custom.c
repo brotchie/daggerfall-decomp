@@ -135,6 +135,7 @@ int func_0005500F(short);
 void func_0005425C(int);
 void func_0005559C(void);
 #pragma aux func_000A0ED9 parm routine [];
+#pragma dagger KKND_CONFREV func_000549DB
 #pragma dagger slots func_0005500F a1 8 l_18 4 ret 12
 
 void func_00052DC3(void)
@@ -253,7 +254,7 @@ L531A8:;
 L531AD:;
     l_18 = 0;
 L531B4:;
-    if ((short)l_18 < *(short *)&l_1C) goto L531CA;
+    if ((short)(short)l_18 < *(short *)&l_1C) goto L531CA;
     goto L53269;
 L531C2:;
     l_18++;
@@ -283,7 +284,7 @@ L5326E:;
     if (((int)(unsigned char)(*(signed char *)D_0012AC00 & 1)) == 0) goto L5333E;
     l_18 = 0;
 L53289:;
-    if ((short)l_18 < *(short *)&l_1C) goto L5329F;
+    if ((short)(short)l_18 < *(short *)&l_1C) goto L5329F;
     goto L5333E;
 L53297:;
     l_18++;
@@ -668,6 +669,35 @@ L544E0:;
     goto L54492;
 }
 
+int func_000549DB(int a1)
+{
+    int l_24;
+    int l_20;
+    int l_1C;
+
+    l_20 = (int)(unsigned char)*(signed char *)(D_00199820 + (int)((char *)(((int)(unsigned char)*(signed char *)(D_00190D7E + a1)) * 2) + (a1 * 14)));
+    l_1C = (int)(unsigned char)*(signed char *)(D_00199821 + ((((int)(unsigned char)*(signed char *)(D_00190D7E + a1)) * 2) + (a1 * 14)));
+    l_24 = 0;
+L54A32:;
+    if (((int)(unsigned char)*(signed char *)(D_00190D7E + a1)) > l_24) goto L54A4F;
+    goto L54A9B;
+L54A47:;
+    l_24++;
+    goto L54A32;
+L54A4F:;
+    if (((int)(unsigned char)*(signed char *)(D_00199820 + ((a1 * 14) + (l_24 * 2)))) != l_20) goto L54A85;
+    if (((int)(unsigned char)*(signed char *)(D_00199821 + ((a1 * 14) + (l_24 * 2)))) == l_1C) goto L54A87;
+L54A85:;
+    goto L54A99;
+L54A87:;
+    (*(signed char *)(D_00190D7E + a1))--;
+    return 1;
+L54A99:;
+    goto L54A47;
+L54A9B:;
+    return 0;
+}
+
 void func_00054AAF(void)
 {
     *(short *)D_00190D76 = 0;
@@ -712,7 +742,7 @@ int func_00054DC5(void)
     l_24 = 0;
     *(int *)&l_18 = 0;
 L54DE8:;
-    if ((short)((int)(unsigned char)*(signed char *)D_00190D7E) > l_18) goto L54DFF;
+    if ((short)(short)((int)(unsigned char)*(signed char *)D_00190D7E) > l_18) goto L54DFF;
     goto L54E37;
 L54DF7:;
     (*(int *)&l_18)++;
@@ -724,7 +754,7 @@ L54E37:;
     l_2C = 0;
     *(int *)&l_18 = 0;
 L54E45:;
-    if ((short)((int)(unsigned char)*(signed char *)D_00190D7F) > l_18) goto L54E5C;
+    if ((short)(short)((int)(unsigned char)*(signed char *)D_00190D7F) > l_18) goto L54E5C;
     goto L54E94;
 L54E54:;
     (*(int *)&l_18)++;

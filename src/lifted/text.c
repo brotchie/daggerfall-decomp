@@ -244,7 +244,7 @@ case 248:
 default:
     *(signed char *)((char *)(((int)(short)l_1C++) + l_30)) = *(signed char *)((char *)(((int)(short)*(short *)&l_24) + a5) - 1);
     l_10 += func_0005A442((int)(unsigned char)*(signed char *)((char *)(((int)(short)*(short *)&l_24) + a5) - 1));
-    if ((short)l_10 <= a2) goto L3DCB3;
+    if ((short)(short)l_10 <= a2) goto L3DCB3;
     *(signed char *)((char *)(((int)(short)l_1C++) + l_30)) = 0;
     *(signed char *)((char *)l_30) = 252;
     l_30 += (int)(short)*(short *)&l_1C;

@@ -1506,7 +1506,7 @@ int func_000294E5(int a1, int a2)
 
     l_18 = *(int *)((char *)a2 + 22);
     if (*(short *)(*(char **)((char *)a2 + 32) + 29) != *(short *)(*(char **)D_00199778 + 29)) goto L29558;
-    if ((short)((int)(unsigned char)*(signed char *)((char *)l_18 + 5)) >= *(short *)((char *)a2 + 43)) goto L29558;
+    if ((short)(short)((int)(unsigned char)*(signed char *)((char *)l_18 + 5)) >= *(short *)((char *)a2 + 43)) goto L29558;
     (*(signed char *)((char *)l_18 + 5))++;
     if ((short)((int)(unsigned char)*(signed char *)((char *)l_18 + 5)) != *(short *)((char *)a2 + 43)) goto L29558;
     func_0003045F(a1, a2, 1);

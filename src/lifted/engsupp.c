@@ -104,7 +104,7 @@ int func_00014096(int a1, short a2)
 L140CD:;
     l_24 = l_20 + *(int *)((char *)l_20 + 60);
 L140D9:;
-    if ((short)*(int *)&l_18 >= a2) goto L140FD;
+    if ((short)(short)*(int *)&l_18 >= a2) goto L140FD;
     l_24 += (((int)(unsigned char)*(signed char *)((char *)l_24)) << 3) + 8;
     (*(int *)&l_18)++;
     goto L140D9;

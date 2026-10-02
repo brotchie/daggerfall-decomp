@@ -41,7 +41,7 @@ L7CFE8:;
     l_14 = func_000A0E74((int)(unsigned char)l_14);
     l_18 = 0;
 L7D003:;
-    if ((short)l_18 < a2) goto L7D016;
+    if ((short)(short)l_18 < a2) goto L7D016;
     goto L7D02F;
 L7D00E:;
     l_18++;

@@ -574,7 +574,7 @@ L302EC:;
     *(int *)&l_14 = func_0009DC25() % ((int)(short)*(short *)&l_18);
     l_1C = 0;
 L30313:;
-    if ((short)l_1C < *(short *)&l_18) goto L30329;
+    if ((short)(short)l_1C < *(short *)&l_18) goto L30329;
     return;
 L30321:;
     l_1C++;

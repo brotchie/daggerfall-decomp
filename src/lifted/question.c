@@ -203,11 +203,11 @@ int func_00051991(short a1, short a2, int a3, int a4)
     a1 = *(int *)&a1 * *(short *)D_0012DA44;
     a2 = *(int *)&a2 * *(short *)D_0012DA44;
     if (((int)(short)a1) >= (((int)(short)*(short *)D_00190D64) + 48)) goto L519E2;
-    if ((short)*(int *)&a2 > *(short *)D_00190D64) goto L519EB;
+    if ((short)(short)*(int *)&a2 > *(short *)D_00190D64) goto L519EB;
 L519E2:;
     return 0;
 L519EB:;
-    if ((short)*(int *)&a1 >= *(short *)D_00190D64) goto L51A01;
+    if ((short)(short)*(int *)&a1 >= *(short *)D_00190D64) goto L51A01;
     *(short *)((char *)a3) = 135;
     goto L51A17;
 L51A01:;
