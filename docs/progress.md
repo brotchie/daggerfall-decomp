@@ -1175,3 +1175,7 @@ Batch **1,927**; build **61.34%**.
   move for the conversion (`mov ebx,eax`) that the int sum doesn't: a choice point at
   `add reg,imm` on a loaded dword. +9 (one of them 6 KB). `and`/`or`/`xor` join the
   16-bit chains. +1. Batch **2,058**.
+- **Which operand is the pointer**: in `mov edx,[g]; mov eax,[p]; mov eax,[eax]; add eax,edx`
+  both operands are dword reads; OW evaluates a pointer sum's pointer side last, so which
+  one was the `char *` decides the register order. A choice point when both are reads. +14.
+  Batch **2,072**.

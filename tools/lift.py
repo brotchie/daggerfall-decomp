@@ -1199,6 +1199,11 @@ class Func:
                     pa, pb = (b, a) if self.loaded_ptr(b) and not self.loaded_ptr(a) else (a, b)
                     if not self.loaded_ptr(pa) and not loaded_ptr_k(pa) and loaded_ptr_k(pb):
                         pa, pb = pb, pa
+                    if self.loaded_ptr(a) and self.loaded_ptr(b):
+                        # both read from memory: which one is the pointer (a choice point)
+                        self.choices.append(ins.address + 0.8125)
+                        if ins.address + 0.8125 in self.flips:
+                            pa, pb = pb, pa
                     ptxt = ("*(char **)" + pa.text[len("*(int *)"):]) if self.loaded_ptr(pa) \
                         else "*(char **)%s + %s" % loaded_ptr_k(pa) if loaded_ptr_k(pa) \
                         else "(char *)" + pa.p()
