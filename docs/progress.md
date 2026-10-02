@@ -1088,3 +1088,6 @@ Batch **1,888**; build **59.28%**.
 - **Pre-increments**: an in-place `inc`/`dec` of a stack variable without the dead load of
   its old value is `++x`/`--x` (Watcom 10 loads the old value only for post-increments),
   e.g. `if (--n == -1)` is `dec [n]; cmp [n],-1`. +3. Batch **1,908**.
+- `f(g(), x, y)` with x and y loaded before the inner call: whether an earlier call's result
+  still in eax is the next call's first argument is a per-call choice point (a runtime
+  function with no arguments looks the same). +4. Batch **1,912**.

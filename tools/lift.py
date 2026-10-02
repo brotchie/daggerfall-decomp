@@ -1257,9 +1257,16 @@ class Func:
                         limit = 4
                 for r in PARM_REGS[:limit]:
                     # a register still holding a copy of an earlier argument (mov edx,ebx)
-                    # is left over, not another argument
-                    if r in loaded and not any(self.regs[r] is self.regs[q]
-                                               for q in PARM_REGS[:nreg]):
+                    # is left over, not another argument; a call's result still in eax is
+                    # one (f(g(), x, y))
+                    pend = r == "eax" and self.pending is not None and \
+                        self.regs.get("eax") is self.pending and not self.void_call(self.pending)
+                    if pend:
+                        # an earlier call's result still in eax: an argument (f(g(), x)) or
+                        # not (a call with no arguments after one returning a value)
+                        self.choices.append(ins.address + 0.5)
+                    if (r in loaded or (pend and ins.address + 0.5 in self.flips)) and \
+                            not any(self.regs[r] is self.regs[q] for q in PARM_REGS[:nreg]):
                         nreg += 1
                     else:
                         break
@@ -1761,6 +1768,15 @@ class Func:
             if ins.mnemonic in ("call", "ret", "jmp") or ins.mnemonic.startswith("j"):
                 return False
         return False
+
+    @staticmethod
+    def void_call(e):
+        """Is `e` a call of a void game function?"""
+        if not (e.tag and e.tag[0] == "call"):
+            return False
+        va = int(e.tag[1][5:], 16) if e.tag[1].startswith("func_") else None
+        sig = signature(va) if va is not None and va in IMG.funcs and va < GAME_END else None
+        return sig is not None and sig[0] == "void"
 
     def live_later(self, reg):
         """Is `reg` read later before being written, across calls (callees keep it)?"""

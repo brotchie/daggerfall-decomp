@@ -173,6 +173,7 @@ extern int func_00058B76(int);
 extern int func_00070308(unsigned char);
 extern int func_0007D6AE(int, int);
 extern int func_0007DF35(int);
+extern int func_000801A4(void);
 extern int func_0008B43B(unsigned char, unsigned char, int);
 extern int func_0008B48B(int);
 extern int func_0008B572(unsigned char, unsigned char);
@@ -522,6 +523,11 @@ int func_00047373(void)
 int func_000473BE(void)
 {
     return func_000A0DD9(*(int *)D_00195D2C, (int)D_00190FE4, 10);
+}
+
+int func_000473F0(void)
+{
+    return func_000A0DD9(func_000801A4(), (int)D_00190FE4, 10);
 }
 
 int func_00047422(void)

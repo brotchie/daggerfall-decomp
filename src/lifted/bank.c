@@ -18,11 +18,14 @@ extern char D_00136E24[];
 extern char D_00142309[];
 extern char D_00142314[];
 extern char D_00142315[];
+extern char D_00143550[];
 extern char D_00175CC4[];
+extern char D_00175CCB[];
 extern char D_00175CD0[];
 extern char D_00175CEF[];
 extern char D_00187CA8[];
 extern char D_001903A4[];
+extern char D_00190B44[];
 extern char D_00190FE4[];
 extern char D_00191020[];
 extern char D_001959A0[];
@@ -72,6 +75,7 @@ extern char D_001A41F1[];
 extern char D_001A41F2[];
 extern char D_001A41F3[];
 
+extern int func_0007F349(void);
 extern int func_0007F558(void);
 extern int func_0007F57B(int);
 extern int func_0008523E(unsigned short, int, int);
@@ -83,6 +87,7 @@ extern int func_000A0D13();
 extern int func_000A0DD9();
 extern int func_000A0ED9(int, int);
 extern int func_000A0F5C(int, ...);
+extern int func_000A1023();
 extern int func_000CDD81();
 extern int func_0012A2D0();
 extern int func_0012A4F0();
@@ -95,12 +100,13 @@ extern int func_00137000();
 extern int func_00137725();
 extern int func_001401D4();
 extern int func_00142790();
+extern int func_00144F68();
 extern int func_00144FB4();
 extern int func_0014D23C();
 extern void func_0003EC2A(int, int);
 extern void func_0003F09F(int, int);
 extern void func_0003F358(void);
-extern void func_0006BA50(void);
+extern void func_0004633F(int, int);
 extern void func_0007CA1F(int, int, int, int, unsigned char);
 extern void func_0007DDC9(int);
 extern void func_0007F1E3(int);
@@ -109,7 +115,11 @@ extern void func_0008C566(int, short);
 extern void func_0008E3F7(int, int);
 int func_0006C9E2(int);
 int func_0006CA5C(void);
+void func_0006BA50(void);
 void func_0006BDB8(int);
+void func_0006C29B(int, int);
+void func_0006C55B(void);
+void func_0006C692(void);
 void func_0006CB02(void);
 #pragma aux func_000A0ED9 parm routine [];
 #pragma dagger DAGGER_PUSHMEM func_0006C692
@@ -227,6 +237,40 @@ void func_0006B987(void)
     *(int *)D_001A41D4 = 65077249;
     *(int *)D_001A41D8 = 200000;
     *(signed char *)D_001A41F0 = 2;
+}
+
+void func_0006BA50(void)
+{
+    int l_1C;
+    int l_18;
+
+    l_18 = *(int *)D_00195BE8;
+    func_000A1023(*(int *)D_00143550, *(int *)D_001A4144, 64000, (int)D_00175CC4, 216, 4);
+    func_00144F68((int)(unsigned short)*(short *)((char *)l_18), (int)(unsigned short)*(short *)((char *)l_18 + 2), (int)(unsigned short)*(short *)((char *)l_18 + 4), (int)(unsigned short)*(short *)((char *)l_18 + 6), l_18 + 12);
+    switch (*(unsigned char *)D_001A41F1) {
+case 0:
+    func_0007CA1F(func_000A0DD9(*(int *)(*(char **)D_001A41EC), (int)D_00190FE4, 10), 197, 19, 145, 156);
+    func_0007CA1F(func_000A0DD9(func_0007F349(), (int)D_00190FE4, 10), 203, 29, 145, 156);
+    if (*(int *)(*(char **)D_001A41EC + 8) == 0) goto L6BBDF;
+    func_0007CA1F(func_000A0DD9(*(int *)(*(char **)D_001A41EC + 4), (int)D_00190FE4, 10), 143, 39, 145, 156);
+    l_1C = *(int *)D_00195BF4;
+    *(int *)D_00195BF4 = *(int *)(*(char **)D_001A41EC + 8);
+    func_0004633F((int)D_00175CCB, (int)D_00190B44);
+    func_0007CA1F((int)D_00190B44, 119, 49, 145, 156);
+    *(int *)D_00195BF4 = l_1C;
+L6BBDF:;
+    return;
+case 1:
+    func_00144F68((int)(unsigned short)*(short *)(*(char **)D_00195B5C), (int)(unsigned short)*(short *)(*(char **)D_00195B5C + 2), (int)(unsigned short)*(short *)(*(char **)D_00195B5C + 4), (int)(unsigned short)*(short *)(*(char **)D_00195B5C + 6), *(int *)D_00195B5C + 12);
+    func_0006C55B();
+    func_0006C29B((int)(unsigned char)*(signed char *)(*(char **)(D_001A3FAC + (((int)(unsigned char)*(signed char *)D_001A41F2) * 20))), *(int *)(*(char **)(D_001A3FAC + (((int)(unsigned char)*(signed char *)D_001A41F2) * 20)) + 5));
+    return;
+case 2:
+    func_00144F68((int)(unsigned short)*(short *)(*(char **)D_00195B5C), (int)(unsigned short)*(short *)(*(char **)D_00195B5C + 2), (int)(unsigned short)*(short *)(*(char **)D_00195B5C + 4), (int)(unsigned short)*(short *)(*(char **)D_00195B5C + 6), *(int *)D_00195B5C + 12);
+    func_0006C692();
+    func_0006C29B(1, ((int)D_001A4148) + (((int)(unsigned char)*(signed char *)D_001A41F2) * 74));
+default:;
+}
 }
 
 void func_0006BCCC(void)
