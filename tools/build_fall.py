@@ -190,6 +190,12 @@ def main():
             buf[base - o.base:base - o.base + len(ours)] = ours
             matched.append((va, name, rel))
 
+    # object 2, the XnGine engine: asm modules from src/xngine/ (tools/xn_link.py)
+    import xn_link
+    xn_matched, xn_errors = xn_link.splice(raw, xn_link.Image(le), blank=a.blank)
+    matched += xn_matched
+    errors += xn_errors
+
     for e in errors:
         print("ERROR " + e)
 
