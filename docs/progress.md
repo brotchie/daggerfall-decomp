@@ -1299,3 +1299,21 @@ Batch **1,927**; build **61.34%**.
 - More switches on variables: case ranges (the root compares different constants, the
   tree's dead `jmp default` stubs give it away), stack-parameter selectors, and two-case
   trees with stubs. +4. Batch **2,176**.
+- A range case landing on a dead `jmp default` inside the compare run is the default, not
+  a case of its own. `?:` arguments whose `&&` chain falls through a `goto` trampoline to
+  the else arm. Sums of two calls are ordered like other commutative operands. +3.
+- Compound assignments through the spilled address temp (`*(T *)t = *(T *)(t = p + k, t)
+  | x`) are `p->f |= x`, so `x` can be a ternary; `xor bl,bl` on a word keeps its high
+  byte; `used_as_base` reads an instruction's memory operand before its destination. +2.
+- Sign hints count only for reads of the variable's own size (a zero-extended word read
+  no longer makes an int unsigned); the search also tries pairs among the seven nearest
+  choices, closest first. +1.
+- **Zero-extended reads spelled `*(unsigned short *)p`** (a choice point at each `and
+  eax,0xffff`): the `(int)(unsigned short)*(short *)p` cast adds a tree node, and TNBinary
+  evaluates the bigger operand first, so the spelling decides operand order in compares
+  and sums. +10. Batch **2,194** (88.7%).
+- A stack parameter some callers push through a register and others as an immediate is
+  narrow (the immediate pushers have no prototype in scope).
+- **OW: a commutative op stored to memory** (`g = p + x`, x computed before the global p
+  was read) takes x's register in Watcom 10; `rUSEREGISTER` now swaps the operands then
+  (`DAGGER_NOUSEOLD` for the old). +4. Batch **2,198** (88.8%).
