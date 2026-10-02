@@ -28,10 +28,34 @@ extern int func_000A0040();
 extern int func_000A1023();
 extern int func_000CE6E2();
 extern int func_0014B45B();
-extern void func_0002631D(int);
 extern void func_00078566(int, int);
 extern void func_0008E3F7(int, int);
+void func_0002631D(int);
 void func_000266C7(int);
+
+void func_0002631D(int a1)
+{
+    int l_1C;
+    short l_18;
+
+    if (((int)(unsigned char)*(signed char *)((char *)a1)) != 34) goto L26356;
+    if ((((int)(unsigned short)(*(short *)((char *)a1 + 27) & 31)) - 2) == 13) goto L26358;
+L26356:;
+    return;
+L26358:;
+    l_1C = a1;
+L2635E:;
+    if (((int)(unsigned char)*(signed char *)((char *)l_1C)) == 47) goto L26378;
+    l_1C = *(int *)((char *)l_1C + 67);
+    goto L2635E;
+L26378:;
+    l_18 = *(short *)((char *)l_1C + 25);
+    if (((int)(short)l_18) >= *(int *)((char *)a1 + 11)) goto L263AB;
+    *(short *)((char *)a1 + 19) = (unsigned short)(unsigned char)*(signed char *)(D_001950EC + ((int)(unsigned short)*(short *)((char *)a1 + 19)));
+    return;
+L263AB:;
+    *(short *)((char *)a1 + 19) = (unsigned short)(unsigned char)*(signed char *)(D_001951EC + ((int)(unsigned short)*(short *)((char *)a1 + 19)));
+}
 
 void func_000263D0(void)
 {

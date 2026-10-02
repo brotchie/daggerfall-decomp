@@ -466,11 +466,11 @@ void func_0004E30F(void)
 
 void func_0004E360(void)
 {
-    int l_18;
+    short l_18;
 
-    l_18 = ((unsigned)func_000A006E((int)(short)*(short *)D_001997E8, 0, 2)) / 3640;
+    *(int *)&l_18 = ((unsigned)func_000A006E((int)(short)*(short *)D_001997E8, 0, 2)) / 3640;
     func_0004E108();
-    if (((int)(short)*(short *)D_001997E2) >= (((int)(short)*(short *)&l_18) - 1)) goto L4E3D1;
+    if (((int)(short)*(short *)D_001997E2) >= (((int)(short)l_18) - 1)) goto L4E3D1;
     (*(short *)D_001997E2)++;
     func_0004E18B();
     if (*(signed char *)D_001997ED != 0) goto L4E3CC;

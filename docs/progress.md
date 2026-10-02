@@ -884,3 +884,21 @@ Batch **1,568**.
   symbol is now declared without a slot (`DAGGER_INDSLOT=1` restores it). +16.
 
 Batch **1,612**.
+
+## 2026-10-02: short variables are stored as dwords
+
+- **Indirect calls with stack arguments** (four registers, then the stack) lift.
+- **Left-over register copies aren't arguments**: after `mov ebx,eax` (a call's result
+  saved) and `mov edx,ebx`, ebx still holds the same value but is not a third argument. +6.
+- **Watcom 10 stores a 2-byte stack variable with the whole register.** In FALL.EXE every
+  store into a slot that is only read as a word is a dword store (281 from registers, 41
+  immediates, zero-extended from 16 bits), except where an `int` is narrowed to a `short`
+  (`call f; mov [l],ax`). The code generator now widens such stores at `-od`
+  (`DaggerWidenStore()` in `object.c`, when the previous instruction computed the value
+  as 16 bits; `DAGGER_WORDSTORE=1` keeps OW's). The lifter types a slot read only as a
+  word as `short` and assigns 16-bit values to it directly; whether such a slot is a
+  `short` or an `int` read through `(short)` casts is a choice point. +12.
+- (Unsigned globals from a census of their compares: net +1, off by default,
+  `LIFT_UGLOBALS=1`.)
+
+Batch **1,624**.

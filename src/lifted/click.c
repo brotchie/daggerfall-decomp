@@ -158,6 +158,7 @@ extern int func_000A0ED9(int, int);
 extern int func_000A0F5C(int, ...);
 extern int func_000A17C1();
 extern int func_000C7FD9();
+extern int func_000C7FF4();
 extern int func_000C808D();
 extern int func_000CE45E();
 extern int func_0012B136();
@@ -178,7 +179,6 @@ extern void func_0007499C(int, int, int);
 extern void func_00074ECA(int, int, int);
 extern void func_000751DB(int);
 extern void func_000756C6(int);
-extern void func_00077340(int);
 extern void func_0007CB4F(int);
 extern void func_0007DDC9(int);
 extern void func_00086794(int);
@@ -207,6 +207,7 @@ void func_0007653C(int, int);
 void func_00076952(void);
 void func_00076A8F(int);
 void func_00076DB9(void);
+void func_00077340(int);
 #pragma aux func_000A0ED9 parm routine [];
 
 void func_000744FD(int a1)
@@ -1297,6 +1298,17 @@ L76FD8:;
 L76FDF:;
     return l_48;
 }
+}
+
+void func_00077340(int a1)
+{
+    int l_18;
+
+    if (*(int *)D_00195B50 == 0) return;
+    if (((int)(unsigned char)*(signed char *)((char *)a1)) != 18) return;
+    l_18 = func_000C7FF4(*(int *)((char *)*(int *)D_00195B50 + 11) - *(int *)((char *)a1 + 11), func_000C7FD9(*(int *)((char *)*(int *)D_00195B50 + 7), *(int *)((char *)*(int *)D_00195B50 + 15), *(int *)((char *)a1 + 7), *(int *)((char *)a1 + 15)));
+    if (l_18 >= 64) return;
+    *(int *)D_00195B50 = 0;
 }
 
 int func_000773BE(int a1)

@@ -193,6 +193,7 @@ def main():
     import lift
     lift.init()
     lift.caller_types()
+    lift.unsigned_globals()
     t0 = time.time()
     with mp.Pool(a.j, initializer=init_worker) as pool:
         results = sorted(pool.imap_unordered(work, vas, chunksize=8))

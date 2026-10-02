@@ -173,7 +173,7 @@ void func_000308DE(int a1, int a2)
     int l_20;
     int l_1C;
     int l_18;
-    int l_14;
+    short l_14;
 {
     int l_34;
 
@@ -182,16 +182,16 @@ void func_000308DE(int a1, int a2)
     l_1C = *(int *)((char *)a2 + 22);
     if (l_28 == 0) return;
     if (((int)(unsigned char)*(signed char *)((char *)l_28)) != 65) goto L30937;
-    l_14 = (int)(unsigned short)*(short *)((char *)l_28 + 25);
+    *(int *)&l_14 = (int)(unsigned short)*(short *)((char *)l_28 + 25);
     goto L30954;
 L30937:;
     if (*(short *)((char *)l_28 + 89) == 0) goto L3094F;
-    l_14 = (int)(unsigned short)*(short *)((char *)l_28 + 89);
+    *(int *)&l_14 = (int)(unsigned short)*(short *)((char *)l_28 + 89);
     goto L30954;
 L3094F:;
     return;
 L30954:;
-    l_20 = func_000192EE((int)(short)*(short *)&l_14);
+    l_20 = func_000192EE((int)(short)l_14);
     l_24 = (int)(short)*(short *)((char *)l_20 + 29);
     if (((int)(unsigned char)*(signed char *)((char *)l_20 + 54)) >= 5) goto L30999;
     l_24 += (int)(short)*(short *)((char *)(int)(*(char **)D_00195BE0 + (((int)(unsigned char)*(signed char *)((char *)l_20 + 54)) * 2)) + 145);

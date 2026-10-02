@@ -14,15 +14,15 @@ extern void func_0008C566(int, short);
 
 void func_00053A89(int a1, int a2, int a3)
 {
-    int l_10;
+    short l_10;
 
     func_0012B2EB();
     *(short *)D_00195F36 = 100;
     *(short *)D_00195F38 = 5;
     func_0008C566(a1, (int)(short)*(short *)&a2);
-    l_10 = 0;
+    *(int *)&l_10 = 0;
 L53AC8:;
-    if (*(short *)&l_10 != 0) goto L53B15;
+    if (l_10 != 0) goto L53B15;
     if (a3 == 0) goto L53ADE;
     if (((int (*)())(a3))(0) != 0) goto L53AE0;
 L53ADE:;
@@ -31,7 +31,7 @@ L53AE0:;
     return;
 L53AE2:;
     if (func_0008C5C9() == 0) goto L53AF2;
-    l_10 = 1;
+    *(int *)&l_10 = 1;
 L53AF2:;
     func_000A1023(655360, *(int *)D_00143550, 64000, (int)D_00175420, 364, 4);
     goto L53AC8;

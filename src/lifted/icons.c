@@ -104,7 +104,7 @@ void func_0005D583(void)
 
 void func_0005D876(void)
 {
-    int l_18;
+    short l_18;
 
     if ((*(unsigned char *)D_001940D4 & 32) == 0) return;
     func_000A1023(*(int *)D_00143550, *(int *)D_00199D68, 64000, (int)D_00175898, 368, 4);
@@ -121,10 +121,10 @@ L5D92A:;
     func_0005D97C();
     return;
 L5D931:;
-    l_18 = func_0008CFE6((int)D_001A9AB8) - 1;
-    if (((int)(short)*(short *)&l_18) <= (-1)) goto L5D966;
+    *(int *)&l_18 = func_0008CFE6((int)D_001A9AB8) - 1;
+    if (((int)(short)l_18) <= (-1)) goto L5D966;
     func_0005D97C();
-    *(int *)D_001AA55C = *(int *)(D_00190DE4 + (((int)(short)*(short *)&l_18) << 2));
+    *(int *)D_001AA55C = *(int *)(D_00190DE4 + (((int)(short)l_18) << 2));
     func_00094FA8();
     return;
 L5D966:;

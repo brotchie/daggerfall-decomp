@@ -259,6 +259,8 @@ class Func:
     def type_slots(self):
         """Pre-pass: give every stack slot a C type from its accesses."""
         acc = {}       # slot -> set of sizes
+        reads = {}     # slot -> set of sizes read
+        first = {}     # slot -> address of its first access
         sign = {}      # slot -> 's' / 'u' hints
         addr = set()
         body = self.ins[self.body_start:self.body_end]
@@ -279,6 +281,9 @@ class Func:
                     addr.add(off)
                     continue
                 acc.setdefault(off, set()).add(op.size)
+                first.setdefault(off, ins.address)
+                if not (n == 0 and ins.mnemonic == "mov"):
+                    reads.setdefault(off, set()).add(op.size)
                 if ins.mnemonic == "movsx":
                     sign.setdefault(off, set()).add("s")
                 elif ins.mnemonic == "movzx":
@@ -301,6 +306,14 @@ class Func:
                 continue
             body_sizes = sizes - {4} if off in [p[1] for p in self.params] else sizes
             sz = min(body_sizes) if body_sizes and len(body_sizes) == 1 else 4
+            # Watcom 10 stores a short with the whole register: read only as a word, it is one
+            if reads.get(off) == {2} and sizes <= {2, 4} and \
+                    not os.environ.get("LIFT_NOSHORTREAD"):
+                # ... or an int read through (short) casts: a choice point
+                if 4 in sizes and off not in [p[1] for p in self.params]:
+                    self.choices.append(first[off])
+                if first.get(off) not in self.flips or off in [p[1] for p in self.params]:
+                    sz = 2
             if off in addr:
                 sz = 4
             hint = sign.get(off, set())
@@ -471,6 +484,9 @@ class Func:
         for p in parts[1:]:
             addr += (" " + p) if p.startswith(("+ ", "- ")) else " + " + p
         if len(parts) == 1 and fx is not None:
+            if size == 4 and fx.target_va in unsigned_globals() and \
+                    os.environ.get("LIFT_UGLOBALS"):
+                return "*(unsigned *)%s" % addr
             return "*(%s *)%s" % (STYPE[size], addr)
         return "*(%s *)(%s)" % (STYPE[size], addr)
 
@@ -680,6 +696,12 @@ class Func:
                 return
             v = self.src(s, ins)
             lhs = self.mem(d, ins, d.size)
+            mm = re.fullmatch(r"\*\(int \*\)&(l_[0-9A-F]+|a\d+)", lhs)
+            if mm and d.size == 4 and v.size == 2 and \
+                    self.var_type(mm.group(1)) in ("short", "unsigned short") and \
+                    not os.environ.get("LIFT_NOSHORTSTORE"):
+                # Watcom 10 stores a short variable with the whole register
+                lhs = mm.group(1)
             if lhs == "@RET":
                 self.void = False
                 self.emit("return %s;" % v.text)
@@ -1009,7 +1031,10 @@ class Func:
             else:
                 nreg, nstack = 0, 0
                 for r in PARM_REGS[:max_reg_args(op.imm)]:
-                    if r in loaded:
+                    # a register still holding a copy of an earlier argument (mov edx,ebx)
+                    # is left over, not another argument
+                    if r in loaded and not any(self.regs[r] is self.regs[q]
+                                               for q in PARM_REGS[:nreg]):
                         nreg += 1
                     else:
                         break
@@ -1520,16 +1545,22 @@ class Func:
                 raise Unsupported("call through the return slot")
         else:
             target = self.reg(subreg(ins.reg_name(op.reg))[0], ins).p()
-        if self.pushes:
-            raise Unsupported("indirect call with stack arguments")
         args = []
         for r in PARM_REGS:
             if r in self.regs and self.regs[r] is not self.pending:
                 args.append(self.regs[r].text)
             else:
                 break
-        call = E("((int (*)())%s)(%s)" % (target if target.startswith("(") else
-                                           "(%s)" % target, ", ".join(args)), 4, atom=True)
+        proto = ""
+        if self.pushes:
+            # four register arguments, then the stack (the callee pops it)
+            if len(args) != 4:
+                raise Unsupported("indirect call with stack arguments")
+            args += [x.text for x in reversed(self.pushes)]
+            self.pushes = []
+            proto = ", ".join(["int"] * len(args))
+        call = E("((int (*)(%s))%s)(%s)" % (proto, target if target.startswith("(") else
+                                             "(%s)" % target, ", ".join(args)), 4, atom=True)
         self.finish_call(call, len(args))
 
     def decl_line(self, o, two):
@@ -1763,6 +1794,59 @@ def caller_types():
         json.dump({str(k): v for k, v in out.items()}, f)
     CALLER_TYPES = out
     return out
+
+
+GLOBAL_SIGN = None
+
+
+def unsigned_globals():
+    """Dword globals compared unsigned (ja/jb...) and never signed anywhere in the game: they
+    were declared unsigned, which changes code beyond the compares."""
+    global GLOBAL_SIGN
+    if GLOBAL_SIGN is not None:
+        return GLOBAL_SIGN
+    path = os.path.join(ROOT, "build", "lift", "global_sign.json")
+    if os.path.exists(path) and os.path.getmtime(path) >= os.path.getmtime(__file__):
+        with open(path) as f:
+            GLOBAL_SIGN = set(json.load(f))
+        return GLOBAL_SIGN
+    ev = {}
+    for va in IMG.funcs:
+        if not (0x10000 <= va < GAME_END) or IMG.le.obj_of_va(va).index != 1:
+            continue
+        try:
+            ins = IMG.insns(va)
+        except Exception:
+            continue
+        for k in range(1, len(ins) - 1):
+            c, j = ins[k], ins[k + 1]
+            if c.mnemonic != "cmp" or j.mnemonic not in JCC or j.mnemonic in ("je", "jne"):
+                continue
+            kind = "u" if JCC[j.mnemonic][1] else "s"
+            gs = []
+            for n, op in enumerate(c.operands):
+                if op.type == cx.X86_OP_MEM and op.size == 4 and not op.mem.base and \
+                        not op.mem.index:
+                    fx = fixup_at(c, c.disp_offset)
+                    if fx is not None:
+                        gs.append(fx.target_va)
+                elif op.type == cx.X86_OP_REG and op.size == 4:
+                    p_ = ins[k - 1]
+                    if p_.mnemonic == "mov" and p_.operands[0].type == cx.X86_OP_REG and \
+                            p_.operands[0].reg == op.reg and \
+                            p_.operands[1].type == cx.X86_OP_MEM and \
+                            not p_.operands[1].mem.base and not p_.operands[1].mem.index:
+                        fx = fixup_at(p_, p_.disp_offset)
+                        if fx is not None:
+                            gs.append(fx.target_va)
+            for g in gs:
+                ev.setdefault(g, set()).add(kind)
+    out = sorted(g for g, kinds in ev.items() if kinds == {"u"})
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path, "w") as f:
+        json.dump(out, f)
+    GLOBAL_SIGN = set(out)
+    return GLOBAL_SIGN
 
 
 def arg_type(ins, k, reg):

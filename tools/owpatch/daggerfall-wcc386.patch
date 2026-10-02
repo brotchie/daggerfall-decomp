@@ -790,19 +790,78 @@ index 76c9e5daf1..abc589fae0 100644
      do {
          pow2 = 1;
 diff --git a/bld/cg/c/object.c b/bld/cg/c/object.c
-index 8deefcbc4c..c01463d42c 100644
+index 8deefcbc4c..5295696d79 100644
 --- a/bld/cg/c/object.c
 +++ b/bld/cg/c/object.c
-@@ -47,6 +47,8 @@
+@@ -46,6 +46,12 @@
+ #include "makeblk.h"
  #include "nullprop.h"
  #include "feprotos.h"
- 
-+extern void DaggerPrologDone( void );
++#include <stdlib.h>
++#include "namelist.h"
++#include "expand.h"
++#include "rgtbl.h"
 +
++extern void DaggerPrologDone( void );
+ 
  
  /*
-  * block flag usage
-@@ -127,6 +129,12 @@ void    GenObject( void )
+@@ -93,6 +99,54 @@ static  source_line_number      DumpLineNum( source_line_number n,
+ }
+ 
+ 
++/*
++ * Daggerfall: Watcom 10 stored a 2-byte stack variable with a whole-register move
++ * (`mov [ebp-x],eax`, an immediate zero-extended to 32 bits); its slot is 4 bytes anyway.
++ * DAGGER_WORDSTORE=1 keeps the 16-bit stores.
++ */
++static void DaggerWidenStore( instruction *ins )
++{
++#if _TARGET_INTEL
++    name    *res;
++    name    *op;
++
++    if( _IsntModel( CGSW_GEN_NO_OPTIMIZATION ) || getenv( "DAGGER_WORDSTORE" ) != NULL )
++        return;
++    if( ins->head.opcode != OP_MOV || ( ins->type_class != U2 && ins->type_class != I2 ) )
++        return;
++    res = ins->result;
++    if( res->n.class != N_TEMP || res->n.size != 2 || DeAlias( res )->n.size != 2
++      || ( DeAlias( res )->v.usage & HAS_MEMORY ) == 0 )
++        return;
++    op = ins->operands[0];
++    if( op->n.class == N_REGISTER ) {
++        /* only a value computed as 16 bits (`mov ax,[x]`), not an int narrowed to a short
++         * (`call f; mov [l],ax`) */
++        instruction *prev = ins->head.prev;
++
++        if( prev->head.opcode == OP_BLOCK || prev->result == NULL
++          || prev->result->n.class != N_REGISTER
++          || !HW_Equal( prev->result->r.reg, op->r.reg )
++          || ( prev->type_class != U2 && prev->type_class != I2 ) )
++            return;
++        op = AllocRegName( FullReg( op->r.reg ) );
++    } else if( op->n.class == N_CONSTANT && op->c.const_type == CONS_ABSOLUTE ) {
++        op = AllocS32Const( op->c.lo.u.int_value & 0xffff );
++    } else {
++        return;
++    }
++    ins->operands[0] = op;
++    ins->result = TempOffset( res, 0, U4 );
++    ins->type_class = U4;
++    ins->table = NULL;              /* the U4 move's table, not the U2 one */
++    FixGenEntry( ins );
++    ins->head.state = INS_READY;
++#else
++    (void)ins;
++#endif
++}
++
++
+ void    GenObject( void )
+ /***********************/
+ {
+@@ -127,6 +181,12 @@ void    GenObject( void )
              StartBlockProfiling( blk );
              InitStackDepth( blk );
              for( ins = blk->ins.head.next; ins->head.opcode != OP_BLOCK; ins = ins->head.next ) {
@@ -815,6 +874,14 @@ index 8deefcbc4c..c01463d42c 100644
                  if( ins->head.opcode == OP_NOP
                    && ( (ins->flags.u.nop_flags & NOP_SOURCE_QUEUE)
                    || ins->flags.u.nop_flags == NOP_DBGINFO )) { // an end block
+@@ -145,6 +205,7 @@ void    GenObject( void )
+                         }
+                     }
+                 } else {
++                    DaggerWidenStore( ins );
+                     GenObjCode( ins );
+                 }
+             }
 diff --git a/bld/cg/c/optimize.c b/bld/cg/c/optimize.c
 index 74e94d9765..27ca4d9ca1 100644
 --- a/bld/cg/c/optimize.c

@@ -117,6 +117,8 @@ extern char D_00195D28[];
 extern char D_00195D2C[];
 extern char D_00195D30[];
 extern char D_00195D50[];
+extern char D_00195D6C[];
+extern char D_00195D78[];
 extern char D_00195D94[];
 extern char D_00195DB0[];
 extern char D_00195DC6[];
@@ -153,6 +155,7 @@ extern int func_0001664A(int);
 extern int func_00017AF9(void);
 extern int func_000191DA(int, short);
 extern int func_000192EE(short);
+extern int func_0003D412(int, int, int);
 extern int func_000476C1(void);
 extern int func_0004A07F(int, signed char);
 extern int func_0004A0C0(short);
@@ -166,6 +169,7 @@ extern int func_0008B572(unsigned char, unsigned char);
 extern int func_0008BD50(int);
 extern int func_0009DC25();
 extern int func_0009DC49();
+extern int func_000A0024();
 extern int func_000A0AD9();
 extern int func_000A0D13();
 extern int func_000A0D8F();
@@ -178,7 +182,6 @@ extern int func_000CE3E3();
 extern int func_000CE44C();
 extern void func_0004633F(int, int);
 extern void func_0004A56A(int, int);
-extern void func_0004A6B5(int, int, int);
 extern void func_0008E3F7(int, int);
 int func_00047164(void);
 int func_00048964(void);
@@ -188,6 +191,7 @@ int func_0004A231(int, int, int);
 int func_0004A8DB(int, int);
 int func_0004AA47(int, int);
 void func_0004A282(int);
+void func_0004A6B5(int, int, int);
 #pragma aux func_000A0ED9 parm routine [];
 
 int func_000466C6(void)
@@ -1811,6 +1815,46 @@ L4A534:;
     return (int)(*(char **)D_00195B54 + ((int)(short)*(short *)(D_001842D9 + (((int)(unsigned char)*(signed char *)((char *)l_1C + 67)) * 2))));
 L4A555:;
     return *(int *)D_00195B54;
+}
+
+void func_0004A6B5(int a1, int a2, int a3)
+{
+    int l_14;
+    short l_10;
+
+    l_10 = *(short *)D_00195D6C;
+    *(int *)D_00195D6C = *(int *)D_00195D78;
+    l_14 = func_0003D412((int)(short)*(short *)&a1, (int)(short)*(short *)&a2, (int)(short)*(short *)&a3);
+    func_000A0AD9((int)D_00190FE4, l_14, 2048, (int)D_0017110C, 2003);
+    if (l_14 == 0) goto L4A71C;
+    if (l_14 != (-1751672937)) goto L4A71E;
+L4A71C:;
+    goto L4A737;
+L4A71E:;
+    func_000A0024(l_14, (int)D_0017110C, 2004);
+    l_14 = -1751672937;
+L4A737:;
+    *(int *)D_00195D6C = (int)(short)l_10;
+}
+
+void func_0004A82A(int a1, int a2)
+{
+    int l_18;
+    short l_14;
+
+    l_14 = *(short *)D_00195D6C;
+    *(int *)D_00195D6C = *(int *)D_00195D78;
+    l_18 = func_0003D412((int)(short)*(short *)&a1, 0, 0);
+    func_000A0AD9(a2, l_18, 4, (int)D_0017110C, 2034);
+    if (l_18 == 0) goto L4A889;
+    if (l_18 != (-1751672937)) goto L4A88B;
+L4A889:;
+    goto L4A8A4;
+L4A88B:;
+    func_000A0024(l_18, (int)D_0017110C, 2035);
+    l_18 = -1751672937;
+L4A8A4:;
+    *(int *)D_00195D6C = (int)(short)l_14;
 }
 
 int func_0004A8B6(int a1)
