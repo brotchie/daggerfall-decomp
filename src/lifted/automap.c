@@ -194,6 +194,7 @@ void func_00028F56(void);
 void func_00028F8B(int);
 void func_000298F3(int);
 #pragma aux func_000A0ED9 parm routine [];
+#pragma dagger DAGGER_CALLFIRST func_000295BE
 #pragma dagger DAGGER_CONFLISTREV func_00027717
 #pragma dagger DAGGER_NOSAVES func_00028E24
 #pragma dagger DAGGER_RMW func_00026904
@@ -1554,6 +1555,31 @@ void func_0002956B(int a1)
     *(int *)((char *)a1 + 31) = func_0008EB88(((unsigned)*(int *)(*(char **)D_00195AC4 + 31)) >> 16);
     *(int *)(*(char **)((char *)a1 + 51) + 51) = 0;
     *(int *)((char *)a1 + 51) = 0;
+}
+
+void func_000295BE(int a1, int a2)
+{
+    int l_18;
+    int l_14;
+
+    if (*(int *)((char *)a2 + 73) == 0) return;
+    if (((unsigned)(*(int *)D_00195BF4 - *(int *)((char *)a2 + 83))) < *(int *)((char *)a2 + 43)) return;
+    *(int *)((char *)a2 + 83) = *(int *)D_00195BF4;
+    if ((func_0009DC25() % 100) > ((int)(short)*(short *)((char *)a2 + 56))) return;
+    if (*(int *)((char *)a2 + 73) == (-1)) goto L29631;
+    (*(int *)((char *)a2 + 73))--;
+L29631:;
+    l_18 = *(int *)((char *)a2 + 22);
+    l_14 = 0;
+L29641:;
+    if (((int)(unsigned char)*(signed char *)((char *)l_18 + 4)) > l_14) goto L2965B;
+    return;
+L29653:;
+    l_14++;
+    goto L29641;
+L2965B:;
+    func_00033764(a2, 0);
+    goto L29653;
 }
 
 void func_00029670(int a1, int a2)

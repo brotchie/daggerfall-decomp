@@ -2419,6 +2419,38 @@ L191C6:;
     return 1;
 }
 
+int func_00019234(int a1, short a2, short a3)
+{
+    int l_1C;
+
+L19249:;
+    if (a1 == 0) goto L192DC;
+    if ((short)((unsigned short)(unsigned char)*(signed char *)((char *)a1)) != a3) goto L19270;
+    if (((int)(unsigned char)*(signed char *)((char *)a1 + 1)) == (-1)) goto L19272;
+L19270:;
+    goto L1927C;
+L19272:;
+    *(int *)D_0019671C = a1;
+    goto L192A1;
+L1927C:;
+    if ((short)((unsigned short)(unsigned char)*(signed char *)((char *)a1)) != a3) goto L19297;
+    if ((short)((unsigned short)(unsigned char)*(signed char *)((char *)a1 + 1)) == a2) goto L19299;
+L19297:;
+    goto L192A1;
+L19299:;
+    return a1;
+L192A1:;
+    if (*(int *)((char *)a1 + 84) == 0) goto L192CE;
+    l_1C = func_00019234(*(int *)((char *)a1 + 84), (int)(short)a2, (int)(short)a3);
+    if (l_1C == 0) goto L192CE;
+    return l_1C;
+L192CE:;
+    a1 = *(int *)((char *)a1 + 80);
+    goto L19249;
+L192DC:;
+    return 0;
+}
+
 int func_00019323(int a1, short a2)
 {
     short l_18;
