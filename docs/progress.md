@@ -598,3 +598,12 @@ Batch **1,167**.
   at `-od` (`DAGGER_PUSHMEM=1` restores OW). +29, -1.
 
 Batch **1,204**.
+
+### Parked: sosez.c's calling convention
+
+About 25 functions in `sosez.c` (the HMI sound wrapper) save only `esi`/`edi` and take their
+arguments on the stack with caller cleanup. OW's `__cdecl` and `-3s/-4s/-5s` all also save
+`ebx` and copy the stack parameter into a local at `-od`, so this needs its own compiler
+study. Also parked: register assignment within a statement (Watcom 10 puts the first-evaluated
+subexpression in `edx` and the second in `eax`; OW the reverse; about 20 KB). The default
+register order is clearly best (a sweep of `KKND_REGORDER` only lost matches).
