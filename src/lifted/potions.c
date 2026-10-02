@@ -307,7 +307,7 @@ L8FD1D:;
     goto L8FD15;
 L8FD25:;
     if (((int)(signed char)*(signed char *)((char *)(a1 + l_10))) == (-2)) goto L8FD76;
-    func_0005E540((int)(unsigned short)((int)(signed char)*(signed char *)((char *)(a1 + l_10) + 10)), (int)(signed char)*(signed char *)((char *)(a1 + l_10)), (int)l_A4);
+    func_0005E540((int)(unsigned short)(short)*(signed char *)((char *)(a1 + l_10) + 10), (int)(signed char)*(signed char *)((char *)(a1 + l_10)), (int)l_A4);
     *(signed char *)((char *)l_38 + l_10) = *(signed char *)((char *)l_A4 + 65);
     *(int *)((char *)a4) += (int)(unsigned char)*(signed char *)D_0019626D;
     l_24++;

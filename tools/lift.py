@@ -308,12 +308,12 @@ class Func:
                     # ... possibly through whole-register arithmetic on it (mov ax,[x];
                     # sub eax,4; mov [l],eax: short arithmetic done in 32 bits)
                     while j > 0 and k - j < 4 and body[j].mnemonic in (
-                            "add", "sub", "inc", "dec", "shl", "neg") and \
+                            "add", "sub", "inc", "dec", "shl", "neg", "imul") and \
                             body[j].operands[0].type == cx.X86_OP_REG and \
                             body[j].reg_name(body[j].operands[0].reg) == r32 and \
                             all(o.type == cx.X86_OP_IMM or (o.type == cx.X86_OP_REG and
                                                            o.size == 4 and body[j].mnemonic in
-                                                           ("add", "sub"))
+                                                           ("add", "sub", "imul"))
                                 for o in body[j].operands[1:]):
                         j -= 1
                     pv = body[j]
@@ -947,6 +947,12 @@ class Func:
                 self.set_reg(full, E(self.bitfield(load, start, length, True).text, 4, atom=True))
                 return
             t = (STYPE if m == "movsx" else UTYPE)[s.size]
+            if d.size == 2 and s.size == 1 and not os.environ.get("LIFT_NOMOVSX16"):
+                # extended to 16 bits only: a short (char) operand of short arithmetic
+                tt = "short" if m == "movsx" else "unsigned short"
+                vv = v if v.text.startswith("*(%s *)" % t) else E("(%s)%s" % (t, v.p()), 1, True)
+                self.set_reg(full, E("(%s)%s" % (tt, vv.p()), 2, atom=True))
+                return
             self.set_reg(full, E(ext_text(t, v), 4, atom=IMPLICIT))
             return
         if m == "cwde" and self.regs.get("eax") is not None and \

@@ -1122,7 +1122,7 @@ index 76c9e5daf1..1562a66f62 100644
      do {
          pow2 = 1;
 diff --git a/bld/cg/c/object.c b/bld/cg/c/object.c
-index 8deefcbc4c..8e35250d65 100644
+index 8deefcbc4c..67821e36c9 100644
 --- a/bld/cg/c/object.c
 +++ b/bld/cg/c/object.c
 @@ -31,6 +31,7 @@
@@ -1147,7 +1147,7 @@ index 8deefcbc4c..8e35250d65 100644
  
  
  /*
-@@ -93,6 +101,73 @@ static  source_line_number      DumpLineNum( source_line_number n,
+@@ -93,6 +101,74 @@ static  source_line_number      DumpLineNum( source_line_number n,
  }
  
  
@@ -1198,7 +1198,8 @@ index 8deefcbc4c..8e35250d65 100644
 +        if( prev->head.opcode == OP_BLOCK || prev->result == NULL
 +          || prev->result->n.class != N_REGISTER
 +          || !HW_Equal( prev->result->r.reg, op->r.reg )
-+          || ( prev->type_class != U2 && prev->type_class != I2 ) )
++          || ( prev->type_class != U2 && prev->type_class != I2
++            && !( prev->head.opcode == OP_MUL && DaggerEnv( "DAGGER_NOMULWIDEN" ) == NULL ) ) )
 +            return;
 +        op = AllocRegName( FullReg( op->r.reg ) );
 +    } else if( op->n.class == N_CONSTANT && op->c.const_type == CONS_ABSOLUTE ) {
@@ -1221,7 +1222,7 @@ index 8deefcbc4c..8e35250d65 100644
  void    GenObject( void )
  /***********************/
  {
-@@ -127,6 +202,12 @@ void    GenObject( void )
+@@ -127,6 +203,12 @@ void    GenObject( void )
              StartBlockProfiling( blk );
              InitStackDepth( blk );
              for( ins = blk->ins.head.next; ins->head.opcode != OP_BLOCK; ins = ins->head.next ) {
@@ -1234,7 +1235,7 @@ index 8deefcbc4c..8e35250d65 100644
                  if( ins->head.opcode == OP_NOP
                    && ( (ins->flags.u.nop_flags & NOP_SOURCE_QUEUE)
                    || ins->flags.u.nop_flags == NOP_DBGINFO )) { // an end block
-@@ -145,6 +226,7 @@ void    GenObject( void )
+@@ -145,6 +227,7 @@ void    GenObject( void )
                          }
                      }
                  } else {

@@ -513,7 +513,7 @@ L91CC8:;
     goto L91CC0;
 L91CD0:;
     *(short *)(D_001AA400 + (l_18 * 2)) = *(short *)(*(char **)D_00195BE0 + 32 + (l_18 * 2));
-    *(short *)(D_001AA3F0 + (l_18 * 2)) = (int)(signed char)*(signed char *)(D_00190CE4 + l_18);
+    *(short *)(D_001AA3F0 + (l_18 * 2)) = (short)*(signed char *)(D_00190CE4 + l_18);
     goto L91CC8;
 L91D05:;
     *(signed char *)D_00196279 = *(signed char *)D_0012AC00;

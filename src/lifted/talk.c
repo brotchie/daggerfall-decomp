@@ -1043,7 +1043,7 @@ int func_0001664A(int a1)
 
     l_1C = func_000166C5(a1);
     if ((l_1C & 32768) == 0) goto L166A5;
-    *(int *)D_00199764 = (*(int *)D_00199780 = func_0004BB64((int)(short)((int)(signed char)*(signed char *)D_00190D11)));
+    *(int *)D_00199764 = (*(int *)D_00199780 = func_0004BB64((int)(short)(short)*(signed char *)D_00190D11));
     func_0004A748(*(int *)D_00199764, l_1C & 32767, 0, 0);
     goto L166B1;
 L166A5:;

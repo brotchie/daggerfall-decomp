@@ -1144,3 +1144,6 @@ Batch **1,927**; build **61.34%**.
   mov [ret],eax`) marks a short function (its return variable is read back whole either
   way), unless callers use the result whole (a census of the instruction after each call:
   `cwde` says short, eax used as an int says int). +3. Batch **2,014**.
+- Short multiplications: `movsx ax,byte [x]` is a short operand, `imul edx,eax` joins the
+  16-bit chain of a short variable's store, and the compiler widens a short store right
+  after a MUL (OW multiplies shorts as U4). +2. Batch **2,016**.
