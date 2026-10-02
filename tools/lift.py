@@ -628,6 +628,18 @@ class Func:
         self.born_hint = None
         self.regs[name] = expr
 
+    def bitfield8(self, load, start, length):
+        """A read of an unsigned char bit-field: `load` is the 8-bit memory read."""
+        mm = re.fullmatch(r"\*\((?:signed |unsigned )?char \*\)(.*)", load.text)
+        if not mm or os.environ.get("LIFT_NOBITFIELD"):
+            return None
+        tag = "bf8_%d_%d" % (start, length)
+        pad = "unsigned char _:%d; " % start if start else ""
+        self.structs.add("struct %s { %sunsigned char f:%d; };" % (tag, pad, length))
+        addr = mm.group(1)
+        return E("((struct %s *)%s)->f" % (tag, addr if addr.startswith("(") else "&" + addr),
+                 1, atom=True)
+
     def bitfield(self, load, start, length, signed=False):
         """A read of a 16-bit bit-field: `load` is the 16-bit memory read. Watcom's bit-fields
         are unsigned either way; a `short` one widens with cwde, `unsigned short` with a
@@ -983,11 +995,28 @@ class Func:
                         and s.imm == a.tag[2]:
                     self.set_reg(full, E("%s / %d" % (a.tag[1].p(), 1 << s.imm), 4))
                     return
+                if m == "add" and s.type == cx.X86_OP_REG and d.reg == s.reg and sz == 1 and \
+                        a.size == 1 and a.atom:
+                    # add al,al on a byte read: the shift left of a bit-field read
+                    self.set_reg(full, E("%s << 1" % a.p(), 1, tag=("bfshl8", a, 1)))
+                    return
                 if m == "add" and s.type == cx.X86_OP_REG and d.reg == s.reg:
                     # add r,r: doubling (2-byte array indexing), not x + x
                     v = E("%s * 2" % a.p(), 4)
                     self.set_reg(full, v)
                     self.flags = ("val", v, None)
+                    return
+                if m == "shr" and sz == 1 and s.type == cx.X86_OP_IMM:
+                    # shr al,r on a byte read (shifted left first: shl al,s / add al,al)
+                    base_, sft = (a.tag[1], a.tag[2]) if a.tag and a.tag[0] == "bfshl8" else \
+                        (a, 0)
+                    if base_.size == 1 and base_.atom:
+                        bf = self.bitfield8(base_, s.imm - sft, 8 - s.imm)
+                        if bf is not None:
+                            self.set_reg(full, bf)
+                            return
+                if m == "shl" and sz == 1 and s.type == cx.X86_OP_IMM and a.size == 1 and a.atom:
+                    self.set_reg(full, E("%s << %d" % (a.p(), s.imm), 1, tag=("bfshl8", a, s.imm)))
                     return
                 if m == "shr" and sz == 2 and s.type == cx.X86_OP_IMM and a.tag and \
                         a.tag[0] in ("shl2", "bfshl"):
