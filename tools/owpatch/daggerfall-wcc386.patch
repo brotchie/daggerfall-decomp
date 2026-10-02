@@ -2361,7 +2361,7 @@ index c0838301a3..143bfcd919 100644
          DemoteTree( name, tipe, false );
      }
 diff --git a/bld/cg/c/treefold.c b/bld/cg/c/treefold.c
-index dd3ef11ff7..a178267619 100644
+index dd3ef11ff7..0a190b23bb 100644
 --- a/bld/cg/c/treefold.c
 +++ b/bld/cg/c/treefold.c
 @@ -31,6 +31,9 @@
@@ -2462,6 +2462,19 @@ index dd3ef11ff7..a178267619 100644
 +              && DaggerStripConvert( opcode, base_l, rite ) ) {
                  // If we couldn't fold the comparison, get rid of some lame converts
                  // the C++ compiler likes to emit. Careful with floats!
+                 BurnToBase( left, base_l );
+@@ -1491,7 +1544,11 @@ tn  FoldCompare( cg_op opcode, tn left, tn rite, const type_def *tipe )
+     } else {
+         base_r = FindBase( rite, op_eq );
+         base_l = FindBase( left, op_eq );
+-        if( base_r != rite || base_l != left ) {
++        /* Daggerfall: Watcom 10 at -od kept both explicit conversions of an == / != of two
++         * converted values, comparing them wide (DAGGER_STRIPBOTH=1 narrows as OW does) */
++        if( ( base_r != rite || base_l != left )
++          && ( _IsntModel( CGSW_GEN_NO_OPTIMIZATION ) || DaggerEnv( "DAGGER_STRIPBOTH" ) != NULL
++            || ( base_r != rite ) != ( base_l != left ) ) ) {
+             if( ( base_r->tipe == base_l->tipe ) && ( ( opcode == O_EQ ) || ( opcode == O_NE ) ) ) {
+                 BurnToBase( rite, base_r );
                  BurnToBase( left, base_l );
 diff --git a/bld/cg/c/verify.c b/bld/cg/c/verify.c
 index 509455be21..22061de2b1 100644
