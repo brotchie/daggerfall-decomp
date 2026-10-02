@@ -148,7 +148,7 @@ index 721fa0c6a9..bcb4e28a83 100644
              loops_killed = true;
              CleanPartition();
 diff --git a/bld/cg/c/generate.c b/bld/cg/c/generate.c
-index a7f606be70..27aed084a6 100644
+index a7f606be70..a623c9f27d 100644
 --- a/bld/cg/c/generate.c
 +++ b/bld/cg/c/generate.c
 @@ -31,6 +31,7 @@
@@ -159,7 +159,21 @@ index a7f606be70..27aed084a6 100644
  #include "coderep.h"
  #include "memcheck.h"
  #include "data.h"
-@@ -722,6 +723,11 @@ void    Generate( bool routine_done )
+@@ -501,7 +502,12 @@ static  void    FlushBlocks( bool partly_done )
+         classes |= blk->class;
+         CurrBlock = blk;
+         BlockToCode( partly_done );
+-        FlushOpt();
++        /* Daggerfall: at -od, OW flushes the peephole queue after every block, so a forward
++         * jump is fixed as near (and a jcc over a jmp is never inverted) before its label
++         * arrives. Watcom 10 kept the queue: `cmp; jle else` with short jumps.
++         * DAGGER_FLUSH=1 restores OW's flush. */
++        if( getenv( "DAGGER_FLUSH" ) != NULL )
++            FlushOpt();
+     }
+     CurrBlock = curr;
+     HeadBlock = NULL;
+@@ -722,6 +728,11 @@ void    Generate( bool routine_done )
          Panic( false );
          return;
      }

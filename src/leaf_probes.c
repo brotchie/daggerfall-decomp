@@ -16,3 +16,10 @@ int func_000443F2(void)
 int func_000478CF(void) { return D_00190DF4 + 3; }
 
 int func_00016507(int a) { return 0; }
+
+int func_000252FD(int a)
+{
+    if (a > 5) return 1;
+    if (a > 2) return 2;
+    return 3;
+}

@@ -6,6 +6,9 @@
 # third_party/KKND-Decomp/doc/compiler_patch.md) plus a fix so it compiles off Windows:
 # its KKND_CONSTREG experiment in regalloc.c is guarded by _TARGET_INTEL and uses HW_Ovlap.
 #
+# Daggerfall changes (each has an environment variable that restores stock OW):
+#   generate.c FlushBlocks(): no peephole flush after every block at -od (DAGGER_FLUSH=1)
+#
 # Output: third_party/open-watcom-v2/build/binbuild/{bwcc386,bwlink,bwasm,bwlib}
 set -eu
 cd "$(dirname "$0")/.."
@@ -15,8 +18,15 @@ BASE=91922eabf98fdfbc38de8ddd4ff3e7f5e769c64c
 (
     cd "$OW"
     set +u  # OW's own scripts read unset variables
-    git checkout -q -- . && git checkout -q "$BASE"
-    git apply ../../tools/owpatch/daggerfall-wcc386.patch
+    # A clean tree gets the saved patch. A modified tree is assumed to be work in progress on
+    # the patch: build it as is (save it with `git diff > tools/owpatch/daggerfall-wcc386.patch`).
+    if git diff --quiet; then
+        git checkout -q "$BASE"
+        git apply ../../tools/owpatch/daggerfall-wcc386.patch
+    else
+        git diff | cmp -s - ../../tools/owpatch/daggerfall-wcc386.patch ||
+            echo "note: building an OW tree that differs from tools/owpatch/daggerfall-wcc386.patch"
+    fi
     export OWROOT=$PWD OWDOCBUILD=0 OWDISTRBUILD=0 OWGUINOBUILD=1
     case $(uname) in Darwin) export OWTOOLS=CLANG ;; *) export OWTOOLS=GCC ;; esac
     . ./cmnvars.sh

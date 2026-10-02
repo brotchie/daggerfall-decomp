@@ -147,3 +147,26 @@ Differences from Watcom 10 found so far, all from Open Watcom 2.0's `-od` code g
    back with `movsx`. OW stores `ax` (`func_000192EE`). This may just be the declared type.
 
 These are candidates for `-od`-specific patches, in the same spirit as KKND's.
+
+## 2026-10-01: first `-od` compiler patch
+
+**Branches (difference 1 above) are fixed.** At `-od`, OW generates code one statement at a
+time and calls `FlushOpt()` after every block (`generate.c` `FlushBlocks()`), which pulls the
+peephole queue down to 10 instructions. A forward jump leaves the queue before its label
+arrives, so it's fixed as near, and a `jcc` over a `jmp` can't be inverted. Watcom 10 kept the
+queue. The patch skips that flush (`DAGGER_FLUSH=1` restores it), and `func_000252FD` now
+matches: `cmp; jle else; mov [ret],1; jmp short end`.
+
+Evidence from the original's game code (0x10000..0x9D000): no `jcc near +5; jmp near` at all,
+1,955 `jcc short +2; jmp short` pairs (so Watcom 10 still left many jcc-over-jmp pairs
+uninverted, all short) and 157 `jcc +5; jmp near` pairs.
+
+Two other experiments made no difference and were dropped: letting the object-level optimiser
+(`optins.c`, `optrel.c`, `optcom.c`) run at `-od`, and running `BlockTrim()` at `-od`.
+
+`tools/build_ow.sh` now builds a modified OW tree as is, without resetting it, so the patch can
+be developed in place. Save it with
+`git -C third_party/open-watcom-v2 diff > tools/owpatch/daggerfall-wcc386.patch`.
+`tools/cc_dis.py` prints the disassembly of every function in a C file, for probing.
+
+Matched so far: 5 functions (`src/leaf_probes.c`).
