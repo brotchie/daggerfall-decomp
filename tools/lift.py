@@ -1704,6 +1704,13 @@ class Func:
                 a = E(a.text.replace("*(signed char *)", "*(unsigned char *)", 1)
                       .replace("*(short *)", "*(unsigned short *)", 1), a.size, a.atom)
             self.flags = (m, a, b)
+            nx = self.body[self.k + 1] if self.k + 1 < len(self.body) else None
+            if nx is not None and not nx.mnemonic.startswith(("j", "set", "adc", "sbb", "cmov")) \
+                    and not os.environ.get("LIFT_NODEADCMP"):
+                # a compare nothing branches on: an empty if (the jump to the next
+                # instruction was dropped)
+                self.emit("if (%s) {}" % self.cond_text("je"))
+                self.flags = None
             return
         if m == "lea":
             d, s = ops
