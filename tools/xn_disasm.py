@@ -137,6 +137,20 @@ class Analysis:
                 self.patches.append((a, fx.target_va, base))
                 if fx.target_va != base and fx.target_va not in self.insns:
                     self.patch_fields.add(fx.target_va)
+        # writes through a register, seen at run time (tools/xn_trace.py): XnGine's texture
+        # template at 0x15C300, patched and copied into the heap by 0x15C274
+        self.register_patches = set()
+        p = os.path.join(ROOT, "config", "xngine_runtime_patches.csv")
+        if os.path.exists(p):
+            with open(p, newline="") as f:
+                for r in csv.DictReader(f):
+                    w, t = int(r["writer"], 16), int(r["field"], 16)
+                    if w in self.insns and t in self.covered:
+                        base = self.covered[t]
+                        self.patches.append((w, t, base))
+                        self.register_patches.add((w, t))
+                        if t != base and t not in self.insns:
+                            self.patch_fields.add(t)
 
     def func_of(self, va):
         k = bisect.bisect_right(self.funcs, va) - 1
@@ -585,6 +599,10 @@ class Module:
         for fx in an.img.fixups:
             if self.start <= fx.target_va < self.end or fx.target_va == self.end == an.hi:
                 self.sym(fx.target_va)
+        for f in an.patch_fields:      # instructions holding a patch field get a label too
+            if self.start <= f < self.end:
+                base = an.covered[f]
+                self.labels.setdefault(base, self.local_name(base))
         sorted_labels = sorted(self.labels)
         body, linemap = [], {}
         a = self.start
@@ -711,7 +729,9 @@ def write_patches(an):
         size = next(op.size for op in wi.operands if op.type == cx.X86_OP_MEM)
         orig = int.from_bytes(an.img.bytes_at(f, size), "little")
         # placeholders are round numbers: 100, 1000, 10000, 100000
-        if k == 0:
+        if (w, f) in an.register_patches:
+            kind = "register"       # written through a register (the texture template)
+        elif k == 0:
             kind = "opcode"         # a ret planted in an unrolled loop, or restored
         elif k == i.disp_offset and k != i.imm_offset:
             kind = "address"        # a memory operand pointed elsewhere

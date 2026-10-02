@@ -55,6 +55,7 @@ class Tracer:
         self.field_writes = collections.Counter()
         self.opcode_writes = collections.Counter()
         self.unknown = collections.Counter()    # (writer, target) -> count
+        self.unknown_size = {}
         self.code_starts = set(an.insns)
         self.blocks = set()         # executed basic blocks in object 2
         uc = emu.uc
@@ -101,6 +102,7 @@ class Tracer:
             return
         writer = self.emu.r("eip") - LOAD
         self.unknown[(writer, va)] += 1
+        self.unknown_size[(writer, va)] = size
 
     def report(self):
         ran = [f for f in self.funcs if self.calls[f]]
@@ -151,6 +153,22 @@ def main():
             for va in sorted(seeds):
                 w.writerow(["0x%08X" % va, seeds[va]])
     print("%d new code seeds for xn_disasm.py (%d in all)" % (len(new), len(seeds)))
+    # writes into code the static census did not predict (through a register): fields for
+    # xn_disasm.py's patch table, merged with earlier runs
+    rp_path = os.path.join(ROOT, "config", "xngine_runtime_patches.csv")
+    rp = {}
+    if os.path.exists(rp_path):
+        with open(rp_path, newline="") as f:
+            rp = {(int(r["writer"], 16), int(r["field"], 16)): int(r["size"])
+                  for r in csv.DictReader(f)}
+    for (w, t) in tr.unknown:
+        rp.setdefault((w, t), tr.unknown_size.get((w, t), 1))
+    if rp:
+        with open(rp_path, "w", newline="") as f:
+            wr = csv.writer(f, lineterminator="\n")
+            wr.writerow(["writer", "field", "size"])
+            for (w, t), z in sorted(rp.items()):
+                wr.writerow(["0x%08X" % w, "0x%08X" % t, z])
     os.makedirs(os.path.dirname(a.out), exist_ok=True)
     with open(a.out, "w") as f:
         json.dump(rep, f, indent=1)

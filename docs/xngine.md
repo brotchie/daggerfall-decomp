@@ -199,5 +199,28 @@ outside the map, and handlers the game registers, to `config/xngine_seeds.csv`, 
 Records now also replay port reads, and carry the exception handlers: all 110 records from the
 menu, the province map, character creation and the intro video replay exactly.
 
+## 2026-10-02: phase 3 in the 3D world
+
+- **Exact records.** Inside blocks that rewrite their own code, Unicorn drops some memory-hook
+  events (a read of `0xC28BC` in `0x13E8C8` reached no hook, though the same bytes alone report
+  correctly). Records no longer depend on hooks: a call's input is the 4 KB pages that differ
+  from the snapshot the recording started from, and its effect is every byte that differs
+  after it. **All 387 calls of 194 functions recorded in 150 ticks of the world replay
+  exactly.**
+- **Coverage.** 231 of the 719 functions ran in 300 ticks of walking and turning outside.
+- **Code generated at run time, found by the tracer.** `func_0015C274` patches a 418-byte
+  texture-mapping template (`func_0015C300`: 8 unrolled steps, each with a mask and two table
+  addresses) through a register, then copies it into a heap buffer that holds up to 768
+  compiled instances; `func_0015C2DC` re-patches an instance in place, and the renderer calls
+  the copies. The static census could not see these 32 writes (the address is in EBX);
+  `tools/xn_trace.py` reports them in `config/xngine_runtime_patches.csv` and the patch table
+  lists them as kind `register`, named like the others (`patch_15C307 equ L_15C306+1`). The
+  census is now 337 writes. For the C version this is one texture mapper with parameters; the
+  records already hold the generated code, since they keep whole pages.
+- **Phase 3 gate.** The asm replays itself exactly in every scene recorded so far (menu,
+  province map, character creation, intro video, the world), and every write into XnGine code
+  seen at run time is now a named field. What remains is breadth: dungeons, towns, combat,
+  the automap and the other screens, to run the other 488 functions.
+
 Run: `.venv/bin/python tools/xn_disasm.py` regenerates `src/xngine/` (4 s);
 `.venv/bin/python tools/xn_link.py [module]` checks modules; `tools/build-and-verify.sh` builds.
