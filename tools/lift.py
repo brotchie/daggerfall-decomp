@@ -787,6 +787,15 @@ class Func:
                 # an in-place ++/-- done while the expression was being evaluated: --x
                 lv = t if re.fullmatch(r"\w+", t) else "(%s)" % t
                 return E("%s%s" % (pre.pop(t), lv), op.size, atom=False)
+            if self.side and len(self.side) == 1 and off_ is not None and \
+                    self.side[0].startswith(t + " = ") and self.store_read_pairs(off_) \
+                    and os.environ.get("DAGGER_CC") == "w10" and not os.environ.get("LIFT_KEEPSPILL"):
+                # (x = a, x) on a slot used nowhere else: the compiler's own spill of a
+                # (Watcom 10.0a spills an argument it evaluated before a call): just a
+                v = self.side[0][len(t) + 3:]
+                self.side = []
+                self.temps.add(off_)
+                return E("(%s)" % v, op.size, atom=True)
             if self.side:
                 # the stores of an enclosing expression come first: (x = a, x <<= 2, x)
                 text = "(%s, %s)" % (", ".join(self.side), t)
@@ -1045,6 +1054,16 @@ class Func:
             return "(%s & %s) %s 0" % (a.p(), b.p(), opr)
         raise Unsupported("jcc on arithmetic flags")
 
+    def store_read_pairs(self, off):
+        """Is every access of slot `off` a store whose next access reads it once?"""
+        acc = []
+        for x in self.body:
+            for n, o in enumerate(x.operands):
+                if ebp_slot(x, o) == off:
+                    acc.append("w" if n == 0 and x.mnemonic == "mov" else "r")
+        return bool(acc) and len(acc) % 2 == 0 and \
+            all(acc[k] == "w" and acc[k + 1] == "r" for k in range(0, len(acc), 2))
+
     def params_offs(self):
         return {p[1] for p in self.params}
 
@@ -1282,6 +1301,17 @@ class Func:
                 self.uses_fpseg = True
             nx = self.body[self.k + 1] if self.k + 1 < len(self.body) else None
             off_ = ebp_slot(ins, d)
+            if off_ is not None and s.type == cx.X86_OP_IMM and d.size == 4 and \
+                    nx is not None and nx.mnemonic == "mov" and len(nx.operands) == 2 and \
+                    nx.operands[0].type == cx.X86_OP_REG and \
+                    ebp_slot(nx, nx.operands[1]) == off_ and \
+                    fixup_at(ins, ins.imm_offset) is None and self.store_read_pairs(off_) \
+                    and (os.environ.get("DAGGER_CC") == "w10" or os.environ.get("LIFT_ABSTEMP")):
+                # mov [t],0x46c; mov eax,[t]; mov eax,[eax]: *(int *)0x46c, the address in a
+                # temp of the compiler's own (Watcom 10.0a -d2 makes one)
+                self.temps.add(off_)
+                self.slot_val[off_] = E(str(s.imm), 4, atom=True)
+                return
             if nx is not None and nx.mnemonic == "fild" and off_ is not None and \
                     re.sub(r"^\w+ ptr ", "", nx.op_str) == \
                     re.sub(r"^\w+ ptr ", "", ins.op_str.split(", ")[0]) and d.size == 4 and \

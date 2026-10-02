@@ -9,7 +9,6 @@ extern char D_0012AC06[];
 extern char D_0012B508[];
 extern char D_001343C0[];
 extern char D_001343C2[];
-extern char D_00142308[];
 extern char D_00142309[];
 extern char D_00143550[];
 extern char D_00147954[];
@@ -23,7 +22,6 @@ extern char D_0018DE14[];
 extern char D_0018DE18[];
 extern char D_0018DE1C[];
 extern char D_001903A4[];
-extern char D_00190484[];
 extern char D_00190504[];
 extern char D_00190C74[];
 extern char D_00190C7C[];
@@ -374,22 +372,6 @@ L7CF4D:;
     func_000CD31A();
     goto L7CF1A;
 L7CF59:;
-    return 0;
-}
-
-int func_0007D068(unsigned char a1)
-{
-    if (*(signed char *)(D_00142308 + ((int)(unsigned char)a1)) == 0) goto L7D095;
-    if (*(signed char *)(D_00190484 + ((int)(unsigned char)a1)) == 0) goto L7D097;
-L7D095:;
-    goto L7D0AC;
-L7D097:;
-    *(signed char *)(D_00190484 + ((int)(unsigned char)a1)) = 1;
-    return 1;
-L7D0AC:;
-    if (*(signed char *)(D_00142308 + ((int)(unsigned char)a1)) != 0) goto L7D0C6;
-    *(signed char *)(D_00190484 + ((int)(unsigned char)a1)) = 0;
-L7D0C6:;
     return 0;
 }
 

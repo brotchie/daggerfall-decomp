@@ -1346,3 +1346,29 @@ Batch **1,927**; build **61.34%**.
   compares against out-of-range constants are no longer folded (`(uchar)x == -1`), and
   DAGGER_CALLFIRST (a knob) generates an operand making a call first. +6. Batch **2,227**
   (91.5%).
+- Bit-field tests (`test byte [g],K`, a contiguous mask: only a bit-field test makes it),
+  `p + i` / `i + p` address order and global arrays of short pairs as choices. Batch
+  **2,242**.
+
+## The real compiler: Watcom C32 10.0a
+
+- The remaining functions are not hand-written assembly. Compiling their lifts with the
+  real Watcom C32 10.0a (`tools/wcc10.py`: the 1995 compiler under DOSBox-X) shows plain C
+  code generation throughout, so the gap is in our emulation of 10.0a, not in the source
+  language.
+- **FALL.EXE was compiled with `-d2`.** Debug info explains the dead `mov eax,[i]` before
+  `inc dword [i]` (the value of `i++` kept for the debugger), the address of `*(int
+  *)0x46c` going through a stack temp, and the frame order: with `-d2` the return value's
+  slot is on top, then locals last to first, then spilled parameters last to first.
+  Without `-d2` the order is first to first (`LIFT_DECLTOP=1`).
+- The probes also settled: a far pointer second argument goes in ebx:ecx with the next int
+  in edx (a lifter choice); `==` of two converted values stays wide (OW patch); an
+  argument evaluated before a call is spilled to a temp of the compiler's own.
+- `DAGGER_CC=w10 DAGGER_W10EXTRA=-d2` makes `tools/match.py` and `tools/lift_all.py` use
+  the real compiler; in that mode the lifter drops the compiler's own temps (`(t = a, t)`
+  is `a`; `*(int *)1132` needs no variable).
+- **`src/w10/`**: functions only 10.0a reproduces (OW does not place its temps the same
+  way). The build compiles them with the real compiler, `-d2` added, when it is installed
+  and skips them otherwise (the original bytes stay, the checksum still matches). 4D402,
+  7193D, 99922. Build **2,248** (93.77%).
+

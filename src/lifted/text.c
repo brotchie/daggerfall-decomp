@@ -762,34 +762,6 @@ L3F086:;
 }
 }
 
-void func_0003F09F(int a1, int a2)
-{
-{
-    int l_1C;
-
-    if (*(signed char *)D_00196270 != 0) return;
-    func_00080637();
-    *(int *)D_0019965C = func_000A00AF(64000, (int)D_00170D55, 824);
-    func_000A1023(*(int *)D_0019965C, *(int *)D_00143550, 64000, (int)D_00170D55, 825, 4);
-    func_0012DB50(4);
-    if (((int)(short)*(short *)&a2) != 5) goto L3F130;
-    *(signed char *)D_00196271 = 0;
-    l_1C = func_0003E8A8((int)(short)*(short *)&a1, (int)D_00199654, 4);
-    goto L3F143;
-L3F130:;
-    l_1C = func_0003E8A8((int)(short)*(short *)&a1, (int)D_00199654, 0);
-L3F143:;
-    if (l_1C == 0) return;
-    *(signed char *)D_00196270 = *(signed char *)&a2;
-    func_0007D0DA();
-    *(signed char *)D_00196274 = 8;
-    *(signed char *)D_00196272 = 1;
-    *(signed char *)D_00196279 = *(signed char *)D_0012AC00;
-    func_0012B136();
-    func_0003F25E();
-}
-}
-
 void func_0003F181(int a1, int a2)
 {
 {

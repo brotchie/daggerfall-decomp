@@ -39,7 +39,8 @@ def proto_line(text, name):
 
 def main():
     hand = set()
-    for path in glob.glob(os.path.join(ROOT, "src", "*.c")):
+    for path in glob.glob(os.path.join(ROOT, "src", "*.c")) + \
+            glob.glob(os.path.join(ROOT, "src", "w10", "*.c")):
         hand |= set(DEF.findall(open(path).read()))
     with open(os.path.join(LIFT, "report.csv"), newline="") as f:
         ok = [r["func"] for r in csv.DictReader(f) if r["status"] == "ok"]

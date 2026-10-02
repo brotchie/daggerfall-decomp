@@ -24,6 +24,15 @@ from omf import OMF  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 W10 = os.path.join(ROOT, "third_party", "watcom10", "w10a")
+# FALL.EXE was built with debug info (-d2): it keeps the dead `mov eax,[i]` of `i++` and
+# orders the stack frame its own way, so src/w10/ adds it to config/cflags.txt.
+FLAGS = ["-d2"]
+
+
+def available():
+    """True when the compiler has been extracted and DOSBox-X is on PATH."""
+    return os.path.exists(os.path.join(W10, "WATCOM", "BINB", "WCC386.EXE")) and \
+        shutil.which("dosbox-x") is not None
 
 
 def compile_many(srcs, flags, workdir=None):
