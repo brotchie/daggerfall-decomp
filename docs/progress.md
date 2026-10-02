@@ -65,3 +65,24 @@ Object 1's first function (0x10010) starts `push ebp; mov ebp,esp; push ebx/ecx/
 sub esp,imm32`, keeps its `eax`/`edx` arguments on the stack and re-reads them. So: the register
 calling convention, frame pointers, no stack-check calls, and quite possibly little or no
 optimisation for at least some modules. Functions are padded to 16 bytes with `nop`.
+
+## 2026-10-01: compiler (plan sections 3 and 4)
+
+**Version: Watcom 10.0 or 10.0a.** FALL.EXE's runtime string says "1988-1994", the same string
+KKND-Decomp uses to pin Watcom 10.0/10.0a (10.5 would say 1995, 10.6 1996). So Daggerfall was
+built with the compiler generation KKND's patch targets, even though it shipped in 1996 and was
+patched in 1997.
+
+**Toolchain: KKND's patched Open Watcom v2, built natively on macOS.** `tools/build_ow.sh` clones
+open-watcom-v2, checks out `91922ea`, applies `tools/owpatch/daggerfall-wcc386.patch` and runs
+OW's `build.sh boot` with clang (about 3 minutes). The patch is KKND's `kknd-wcc386.patch`
+plus one fix: its off-by-default `KKND_CONSTREG` experiment in `regalloc.c` used `HW_COvlap`
+on `HW_EAX`, which only compiles in KKND's Windows build. It's now `HW_Ovlap` under
+`#if _TARGET_INTEL`.
+
+Outputs in `third_party/open-watcom-v2/build/binbuild/`: `bwcc386`, `bwlink`, `bwasm`, `bwlib`.
+The boot `bwdis` segfaults on arm64 macOS, but it isn't needed: `tools/omf.py` (from KKND) reads
+the OMF objects and capstone disassembles them.
+
+Smoke test: `bwcc386 -s -of+ -5r -omilert -zm -zp1` gives register-convention code (`f_`) with
+Watcom's `89 xx` encodings, the same style as FALL.EXE's object 1.
