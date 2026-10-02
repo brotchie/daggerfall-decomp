@@ -1080,3 +1080,8 @@ Two more places where Watcom 10 treated stack variables differently from other m
   per-function knob). +8.
 
 Batch **1,888**; build **59.28%**.
+- **Mixed-signedness compares**: `(int)(unsigned short)x != (int)(short)y` written with
+  explicit casts makes OW compare 16 bits; Watcom 10 compared the extended ints, which is
+  what OW does for the implicit promotions (`*(unsigned short *)x != *(short *)y`). The
+  lifter now writes such compares without the `(int)` casts. +15. (Dropping the casts
+  everywhere loses 612: they're right almost everywhere else.) Batch **1,905**.

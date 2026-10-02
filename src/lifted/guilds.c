@@ -108,7 +108,6 @@ extern void func_0005F401(int);
 extern void func_00061398(int);
 extern void func_0006F7B5(void);
 extern void func_0006FD03(int);
-extern void func_00070191(int);
 extern void func_000756C6(int);
 extern void func_0007CA85(int, int, int, int, unsigned char);
 extern void func_0007F1E3(int);
@@ -125,6 +124,7 @@ int func_000702A0(unsigned char);
 int func_00070308(unsigned char);
 int func_0007069D(int);
 void func_0006F73A(void);
+void func_00070191(int);
 void func_000701F1(int);
 void func_00070624(int, unsigned char);
 void func_00070AFA(int);
@@ -374,6 +374,16 @@ L70161:;
     if (((int)(unsigned char)*(signed char *)((char *)(a2 + l_20))) != 255) goto L70111;
     *(int *)((char *)a1) = l_18;
     return l_1C;
+}
+
+void func_00070191(int a1)
+{
+    if (((int)(unsigned char)*(signed char *)((char *)a1)) != 10) return;
+    if (*(signed char *)D_00190D20 != *(unsigned char *)((char *)a1 + 73)) goto L701CF;
+    *(int *)D_00195AF4 = a1;
+L701CF:;
+    if (*(short *)D_00190DDC != *(short *)((char *)a1 + 74)) return;
+    *(int *)D_00195AF4 = a1;
 }
 
 void func_000701F1(int a1)

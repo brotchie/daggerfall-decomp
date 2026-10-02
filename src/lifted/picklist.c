@@ -27,7 +27,7 @@ void func_0008CCC8(int a1, int a2, int a3)
 L8CD33:;
     l_10 = 0;
 L8CD3A:;
-    if (((int)(short)*(short *)&l_10) < ((int)(unsigned short)*(short *)((char *)a1 + 37))) goto L8CD5B;
+    if (*(short *)&l_10 < *(unsigned short *)((char *)a1 + 37)) goto L8CD5B;
     goto L8CE1B;
 L8CD53:;
     l_10++;

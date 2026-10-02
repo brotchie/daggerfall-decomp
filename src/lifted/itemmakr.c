@@ -342,7 +342,7 @@ void func_00057266(int a1)
 L5728F:;
     return;
 L57294:;
-    if (((int)(signed char)*(signed char *)D_00190D63) != ((int)(unsigned short)*(short *)((char *)a1 + 27))) goto L572B3;
+    if (*(signed char *)D_00190D63 != *(unsigned short *)((char *)a1 + 27)) goto L572B3;
     *(int *)D_00195B50 = a1;
 L572B3:;
     *(signed char *)(D_00190FE4 + *(int *)D_00195B84) = *(signed char *)((char *)a1 + 27);

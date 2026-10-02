@@ -589,7 +589,7 @@ L33DF7:;
     return 0;
 L33E0F:;
     if (((int)(short)*(short *)((char *)a2 + 4)) != (-1)) goto L33E35;
-    if (((int)(unsigned short)((struct bf16_0_10 *)((char *)a1 + 2))->f) == ((int)(short)*(short *)((char *)a2 + 6))) goto L33E37;
+    if ((unsigned short)((struct bf16_0_10 *)((char *)a1 + 2))->f == *(short *)((char *)a2 + 6)) goto L33E37;
 L33E35:;
     goto L33E43;
 L33E37:;

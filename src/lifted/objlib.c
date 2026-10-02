@@ -7,6 +7,8 @@ extern char D_00176C4F[];
 extern char D_00176C6B[];
 extern char D_00176C80[];
 extern char D_001789FA[];
+extern char D_00187CB4[];
+extern char D_00187D30[];
 extern char D_00187DE8[];
 extern char D_00187EC8[];
 extern char D_001903A4[];
@@ -19,12 +21,14 @@ extern char D_00195BDC[];
 extern char D_00195BF8[];
 extern char D_00195C44[];
 extern char D_00195CB4[];
+extern char D_00196268[];
 extern char D_0019627B[];
 extern char D_001967F0[];
 extern char D_001967F4[];
 extern char D_001967F8[];
 extern char D_001967FC[];
 extern char D_00196888[];
+extern char D_001968BB[];
 extern char D_001A5C2C[];
 extern char D_001A5C30[];
 extern char D_001A5C34[];
@@ -202,6 +206,48 @@ L84DF5:;
     func_000847BC(a1, l_30);
     *(int *)D_00196888 = l_30 + (((int)(unsigned char)*(signed char *)(*(char **)D_00196888 + 4)) * 19);
     return l_48;
+}
+
+void func_00084E5E(int a1)
+{
+    int l_20;
+    int l_1C;
+    int l_18;
+{
+    int l_28;
+
+    l_1C = (int)(*(char **)(*(char **)D_00195BDC + 43) + (((int)(unsigned short)*(short *)((char *)a1 + 27)) * 26));
+    if (((int)(unsigned char)*(signed char *)((char *)l_1C + 24)) == 16) goto L84EC1;
+    if (*(short *)((char *)l_1C + 18) != 0) goto L84EBC;
+    *(short *)((char *)l_1C + 18) = *(short *)(D_00187D30 + (((int)(unsigned char)*(signed char *)D_00196268) * 2));
+L84EBC:;
+    return;
+L84EC1:;
+    if (((int)(unsigned char)(*(signed char *)D_001968BB & 16)) == 0) goto L84EDA;
+    l_28 = 852;
+    goto L84EE1;
+L84EDA:;
+    l_28 = 242;
+L84EE1:;
+    *(short *)((char *)l_1C + 18) = l_28;
+    a1 = *(int *)((char *)a1 + 63);
+L84EF4:;
+    if (a1 == 0) return;
+    if (((int)(unsigned char)*(signed char *)((char *)a1)) != 8) goto L84F77;
+    l_20 = a1 + 71;
+    if (*(unsigned short *)((char *)l_20) != *(short *)(D_00187D30 + (((int)(unsigned char)*(signed char *)D_00196268) * 2))) goto L84F4B;
+    *(short *)((char *)l_20) = *(short *)(D_00187CB4 + (((int)(unsigned char)*(signed char *)D_00196268) * 2));
+L84F4B:;
+    if (((int)(unsigned short)*(short *)((char *)l_20)) != 852) goto L84F6D;
+    if (((int)(unsigned char)(*(signed char *)D_001968BB & 16)) == 0) goto L84F6F;
+L84F6D:;
+    goto L84F77;
+L84F6F:;
+    *(short *)((char *)l_20) = 242;
+L84F77:;
+    a1 = *(int *)((char *)a1 + 55);
+    goto L84EF4;
+}
 }
 
 void func_000850EF(int a1)

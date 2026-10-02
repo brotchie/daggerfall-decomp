@@ -22,6 +22,7 @@ extern char D_00195A08[];
 extern char D_00195A0C[];
 extern char D_00195A78[];
 extern char D_00195AA4[];
+extern char D_00195AA8[];
 extern char D_00195AC4[];
 extern char D_00195B68[];
 extern char D_00195BE0[];
@@ -31,6 +32,7 @@ extern char D_00195D48[];
 extern char D_00195DA0[];
 extern char D_00196271[];
 extern char D_00196274[];
+extern char D_00196291[];
 extern char D_0019629B[];
 extern char D_00196DC4[];
 extern char D_001970C4[];
@@ -66,6 +68,7 @@ extern void func_0002F369(int);
 extern void func_00031ACA(int, int);
 extern void func_00031B47(int, int);
 extern void func_0004FF2E(void);
+extern void func_0005ABE6(int, int, int);
 extern void func_00060270(int, int);
 extern void func_00065937(int, int, int, int);
 extern void func_0007E31C(int);
@@ -448,6 +451,16 @@ void func_0002FE4B(int a1)
     return;
 L2FEA8:;
     *(signed char *)((char *)a1 + 136) &= 127;
+}
+
+void func_0002FEBC(int a1)
+{
+    if (((int)(unsigned char)*(signed char *)((char *)a1)) != 18) return;
+    if ((short)((int)(unsigned char)*(signed char *)((char *)a1 + 38)) != *(short *)(*(char **)D_00199764)) return;
+    if (*(unsigned short *)((char *)a1 + 29) != *(short *)D_00190D64) return;
+    *(signed char *)D_00196291 = 1;
+    func_0005ABE6(*(int *)D_00195AA8, a1, 1);
+    *(signed char *)D_00196291 = 0;
 }
 
 int func_0002FF2C(int a1, int a2, int a3)

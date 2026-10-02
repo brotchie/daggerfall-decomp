@@ -745,6 +745,20 @@ class Func:
         kind = self.flags[0]
         a, b = self.flags[1], self.flags[2]
         if kind == "cmp":
+            # two narrow values extended differently ((int)(unsigned short)x vs (int)(short)y):
+            # written with explicit (int) casts OW compares them narrow; promoted implicitly,
+            # as ints, like Watcom 10
+            ext = re.compile(r"\(int\)\(((?:unsigned |signed )?(?:char|short))\)(.+)")
+            ma_, mb_ = ext.fullmatch(a.text), ext.fullmatch(b.text)
+            if ma_ and mb_ and ("unsigned" in ma_.group(1)) != ("unsigned" in mb_.group(1)) and \
+                    not os.environ.get("LIFT_NOMIXEDCMP"):
+                def narrow(m_):
+                    t_, inner = m_.group(1), m_.group(2)
+                    mm_ = re.fullmatch(r"\*\((?:unsigned |signed )?(?:char|short) \*\)(.+)", inner)
+                    if mm_:
+                        return "*(%s *)%s" % (t_, mm_.group(1))
+                    return "(%s)%s" % (t_, inner)
+                return "%s %s %s" % (narrow(ma_), opr, narrow(mb_))
             if a.size == 1 and b.size == 1 and not os.environ.get("LIFT_NOBYTECMP"):
                 # a byte compare: both operands the same char type (mixing signed and
                 # unsigned char promotes both to int)
@@ -813,7 +827,7 @@ class Func:
                     # xor dh,dh; mov dl,[x]: a byte zero-extended to 16 bits
                     self.set_reg(full, E("(unsigned short)(unsigned char)" + v.p(), 2))
                 elif sz < 4 and cur is not None and cur.text == "0":
-                    self.set_reg(full, E("(int)(%s)%s" % (UTYPE[sz], v.p()), 4))
+                    self.set_reg(full, E(ext_text(UTYPE[sz], v), 4, atom=IMPLICIT))
                 elif sz < 4:
                     self.set_reg(full, E(v.text, sz, v.atom))
                 else:
@@ -872,7 +886,7 @@ class Func:
                 self.set_reg(full, E(self.bitfield(load, start, length, True).text, 4, atom=True))
                 return
             t = (STYPE if m == "movsx" else UTYPE)[s.size]
-            self.set_reg(full, E("(int)(%s)%s" % (t, v.p()), 4))
+            self.set_reg(full, E(ext_text(t, v), 4, atom=IMPLICIT))
             return
         if m == "cwde" and self.regs.get("eax") is not None and \
                 (self.regs["eax"].tag or ("",))[0] == "bf":
@@ -982,7 +996,7 @@ class Func:
                     return
                 if m == "and" and s.type == cx.X86_OP_IMM and sz == 4 and s.imm in (0xFF, 0xFFFF):
                     t = "unsigned char" if s.imm == 0xFF else "unsigned short"
-                    self.set_reg(full, E("(int)(%s)%s" % (t, a.p()), 4))
+                    self.set_reg(full, E(ext_text(t, a), 4, atom=IMPLICIT))
                     return
                 # signed division by 2: X - (X >> 31), then >> 1
                 if m == "sar" and s.type == cx.X86_OP_IMM and s.imm == 31:
@@ -1979,6 +1993,20 @@ FUNC_OPTS = ["KKND_CONFREV", "DAGGER_LEFTPREF", "DAGGER_CHARAUTOSMALL", "DAGGER_
              "DAGGER_NOSAVES", "DAGGER_REGLAST", "DAGGER_NOGIVEN", "DAGGER_CONFLIST",
              "DAGGER_CONFLISTREV", "DAGGER_KEEPSUB", "DAGGER_NODEMOTE",
              "DAGGER_NOCVTDEMOTE", "DAGGER_DEADDEFMEM"]
+IMPLICIT = bool(os.environ.get("LIFT_IMPLICIT"))
+
+
+def ext_text(t, v):
+    """A narrow value widened to int: an explicit (int) cast, or (LIFT_IMPLICIT) left to the
+    usual promotions."""
+    if IMPLICIT:
+        mm = re.fullmatch(r"\*\((?:unsigned |signed )?(?:char|short) \*\)(.+)", v.text)
+        if mm and v.atom:
+            return "*(%s *)%s" % (t, mm.group(1))
+        return "(%s)%s" % (t, v.p())
+    return "(int)(%s)%s" % (t, v.p())
+
+
 SOSCONV = '#pragma aux sosconv "*" parm caller [] value [eax] modify [eax ebx ecx edx];'
 SAVES = {}
 

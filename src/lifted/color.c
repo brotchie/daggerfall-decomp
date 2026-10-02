@@ -73,7 +73,7 @@ L99C46:;
 L99C48:;
     *(int *)&l_18 = 0;
 L99C4F:;
-    if (((int)(short)l_18) < ((int)(unsigned short)*(short *)(*(char **)D_00195BDC + 41))) goto L99C6F;
+    if ((short)l_18 < *(unsigned short *)(*(char **)D_00195BDC + 41)) goto L99C6F;
     goto L99CA3;
 L99C67:;
     (*(int *)&l_18)++;

@@ -1803,7 +1803,7 @@ int func_0004A0C0(short a1)
     l_18 = 0;
     l_1C = l_18;
 L4A0E9:;
-    if (((int)(short)*(short *)&l_18) < ((int)(unsigned short)*(short *)(*(char **)D_00195BDC + 41))) goto L4A110;
+    if (*(short *)&l_18 < *(unsigned short *)(*(char **)D_00195BDC + 41)) goto L4A110;
     goto L4A126;
 L4A101:;
     l_18++;
