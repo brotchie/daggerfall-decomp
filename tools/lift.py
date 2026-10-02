@@ -2778,8 +2778,61 @@ class Func:
         """Put back the compound conditions no ternary came of (end of the last pass)."""
         self._chains_pending = chains
 
+    def bitfield_stores(self):
+        """`p->f = v` on a bit-field: Watcom clears the field (narrowed to the byte holding
+        it: `and byte [p+7],0xbf`), then ors in `(v & m) << s` on the whole unit. The two
+        compound assignments the lift gives become the one bit-field store."""
+        if os.environ.get("LIFT_NOBFSTORE"):
+            return
+        size = {"signed char": 1, "unsigned char": 1, "short": 2, "unsigned short": 2,
+                "int": 4}
+
+        def addr(t):
+            mm = re.fullmatch(r"\(\(char \*\)(.+) \+ (\d+)\)", t)
+            if mm:
+                return mm.group(1), int(mm.group(2))
+            mm = re.fullmatch(r"\(\(char \*\)(.+)\)", t)
+            return (mm.group(1), 0) if mm else (None, None)
+        out = self.out
+        i = 0
+        while i < len(out) - 1:
+            ma = re.fullmatch(r"    \*\((signed char|unsigned char|short|unsigned short|int) "
+                              r"\*\)(.+) &= (\d+);", out[i])
+            mb = re.fullmatch(r"    \*\((signed char|unsigned char|short|unsigned short|int) "
+                              r"\*\)(.+) \|= (.+);", out[i + 1])
+            i += 1
+            if not (ma and mb):
+                continue
+            ba, oa = addr(ma.group(2))
+            bb, ob = addr(mb.group(2))
+            if ba is None or ba != bb:
+                continue
+            wa, wb = size[ma.group(1)], size[mb.group(1)]
+            if not (ob <= oa and oa + wa <= ob + wb):
+                continue
+            cleared = (~int(ma.group(3)) & ((1 << 8 * wa) - 1)) << 8 * (oa - ob)
+            mv = re.fullmatch(r"\((.+) & (\d+)\) << (\d+)", mb.group(3))
+            if mv:
+                v, m, sh = mv.group(1), int(mv.group(2)), int(mv.group(3))
+            else:
+                mv = re.fullmatch(r"(.+) & (\d+)", mb.group(3))
+                if not mv:
+                    continue
+                v, m, sh = mv.group(1), int(mv.group(2)), 0
+            if m & (m + 1) or cleared != m << sh:
+                continue
+            length = m.bit_length()
+            t = {1: "unsigned char", 2: "unsigned short", 4: "unsigned"}[wb]
+            tag = "bf%d_%d_%d" % (8 * wb, sh, length)
+            pad = "%s _:%d; " % (t, sh) if sh else ""
+            self.structs.add("struct %s { %s%s f:%d; };" % (tag, pad, t, length))
+            if v.startswith("(") and v.endswith(")") and v.count("(") == 1:
+                v = v[1:-1]
+            out[i - 1:i + 1] = ["    ((struct %s *)%s)->f = %s;" % (tag, mb.group(2), v)]
+
     def c(self):
         self.lift()
+        self.bitfield_stores()
         if not os.environ.get("LIFT_NOTERNARY"):
             self.ternaries()
             chains = getattr(self, "_chains_pending", {})
