@@ -165,7 +165,7 @@ def pin_search(name, va, c, detail, at, flips, attempt):
     if not m or at is None:
         return None
     ours, theirs = m.group(1), m.group(2)
-    if REG_RE.sub("R", ours) != REG_RE.sub("R", theirs):
+    if REG_RE.sub("R", ours) != REG_RE.sub("R", theirs) and os.environ.get("LIFT_PINSAME"):
         return None
     pairs = [(a, b) for a, b in zip(REG_RE.findall(ours), REG_RE.findall(theirs)) if a != b]
     if not pairs:

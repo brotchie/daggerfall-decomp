@@ -1194,3 +1194,5 @@ Batch **1,927**; build **61.34%**.
   original's (or one that took the original's to ours, or swaps a pair). Like the slot
   pins, this is a hint to the compiler, not a change to the C. +9 (and 2 more seen in
   testing). Batch **2,087**.
+- Register pins are tried at any first difference with differing registers, not only pure
+  renames. +7. Batch **2,094**.
