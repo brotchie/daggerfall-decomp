@@ -121,6 +121,16 @@ def ebp_slot(ins, op):
     return -op.mem.disp
 
 
+def local_indexed(ins, op):
+    """Frame offset of a [reg + ebp - x] operand (a local array indexed by reg), else None."""
+    if op.type != cx.X86_OP_MEM or not op.mem.base or not op.mem.index:
+        return None
+    names = (ins.reg_name(op.mem.base), ins.reg_name(op.mem.index))
+    if "ebp" not in names or op.mem.disp >= 0:
+        return None
+    return -op.mem.disp
+
+
 class Func:
     def __init__(self, va):
         self.va = va
@@ -203,6 +213,10 @@ class Func:
         body = self.ins[self.body_start:self.body_end]
         for k, ins in enumerate(body):
             for n, op in enumerate(ins.operands):
+                lo = local_indexed(ins, op)
+                if lo is not None:
+                    addr.add(lo)          # indexed local array: [reg + ebp - x]
+                    continue
                 off = ebp_slot(ins, op)
                 if off is None:
                     continue
@@ -293,6 +307,15 @@ class Func:
         index = ins.reg_name(m.index) if m.index else None
         if m.segment and ins.reg_name(m.segment) not in ("ds", "cs"):
             raise Unsupported("segment override")
+        lo = local_indexed(ins, op)
+        if lo is not None:
+            other = [r for r in (base, index) if r != "ebp"][0]
+            sc = m.scale if index != "ebp" else 1
+            iexp = self.reg(subreg(other)[0], ins).p()
+            if sc != 1:
+                iexp = "%s * %d" % (iexp, sc)
+            arr = "l_%X" % lo
+            return "*(%s *)((char *)%s + %s)" % (STYPE[size], arr, iexp)
         off = ebp_slot(ins, op)
         if off is not None and off in getattr(self, "inside", {}):
             base = self.inside[off]
@@ -471,9 +494,10 @@ class Func:
             v = self.reg("eax", ins)
             self.set_reg("edx", E("%s >> 31" % v.p(), 4, tag=("sign", v)))
             return
-        if m == "xor" and ins.op_str == "ah, ah":
-            v = self.reg("eax", ins)
-            self.set_reg("eax", E("(unsigned char)" + v.p(), 2))
+        if m == "xor" and ins.op_str in ("ah, ah", "dh, dh", "bh, bh", "ch, ch"):
+            full = {"a": "eax", "d": "edx", "b": "ebx", "c": "ecx"}[ins.op_str[0]]
+            v = self.reg(full, ins)
+            self.set_reg(full, E("(unsigned char)" + v.p(), 2))
             return
         if m == "test" and ops[0].type == cx.X86_OP_REG and ins.reg_name(ops[0].reg) == "ah" \
                 and ops[1].type == cx.X86_OP_IMM:
