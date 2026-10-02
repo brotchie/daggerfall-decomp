@@ -699,6 +699,12 @@ L444EF:;
     return 0;
 }
 
+int func_0004451D(void)
+{
+    *(signed char *)D_00195E7B = ((int)(unsigned char)(*(signed char *)D_00195E7B & 128 & 255)) | ((((int)(short)*(short *)D_0012AC04) - 139) / 7);
+    return 0;
+}
+
 int func_0004456A(void)
 {
     *(signed char *)D_00195E7B ^= 128;

@@ -883,6 +883,21 @@ class Func:
         register on the left. The batch driver (tools/lift_all.py) flips choice points near
         a mismatch and keeps what helps."""
         first, second = (b, a) if getattr(b, "born", k0) < getattr(a, "born", k0) else (a, b)
+        if kids(first.text) <= kids(second.text) and not os.environ.get("LIFT_NOPADFIRST"):
+            # the smaller operand computed first: it had more nodes in the source than its
+            # code shows, a no-op the code generator folds only after choosing the order
+            # (`(g & 128 & 255) | (x - 139) / 7`, `(int)(unsigned)(a & 128) | b / 7`)
+            m = re.fullmatch(r"\(int\)\(unsigned char\)\((.*)\)", first.text)
+            if m and kids(m.group(1)) == kids(first.text) - 2:
+                pad = E("(int)(unsigned char)(%s & 255)" % m.group(1), first.size)
+            elif first.size == 4:
+                pad = E("(int)(unsigned)%s" % first.p(), 4)
+            else:
+                pad = None
+            if pad is not None:
+                self.choices.append(ins.address + 0.28125)
+                if ins.address + 0.28125 in self.flips:
+                    return pad, second
         if kids(first.text) <= kids(second.text) and not os.environ.get("LIFT_ONLYAMBIG"):
             # the tree-size estimate can be off: the other order is a choice point too
             self.choices.append(ins.address)
