@@ -353,3 +353,25 @@ be corrected at any time.
 Next phase: match functions in bulk. Rank the game functions by difficulty (size, branches,
 calls, floating point), work through the easy ones unit by unit, and collect the compiler
 differences that come up along the way.
+
+## 2026-10-01: the batch lifter
+
+Working rule from here: trade model turns for CPU time. Tools run over every function in a
+batch, and turns go to the residue and to improving the tools.
+
+`tools/lift.py` turns a game function's `-od` code back into C. Watcom `-od` keeps no register
+value between statements, so it executes each statement symbolically (register → C
+expression) and emits a statement at each store, unused call result or branch. Control flow
+comes out as `if (...) goto` / `goto`, which `-od` compiles back to the same `cmp`/`jcc`/`jmp`.
+Globals are `char D_X[]` accessed through casts, so no type inference is needed yet. Callees are
+unprototyped `int func_X();`, and arguments come from whichever of `eax edx ebx ecx` the
+statement loaded.
+
+`tools/lift_all.py` lifts, compiles and checks (bytes plus relocation targets, as in the
+build) all 2,297 game functions on every core, **in about 2 seconds**. It writes
+`build/lift/report.csv` and a summary of the most common unsupported instructions, compile
+errors and first differences, which is the to-do list.
+
+First run: **537 / 2,297 match** (23%), against 26 by hand. 815 hit an instruction or shape
+the lifter doesn't handle yet (three-operand `imul` 297, stack-argument calls 120,
+`idiv`/`div` 149, ...), 529 produce C that doesn't compile, and 416 compile but differ.
