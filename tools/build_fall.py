@@ -215,6 +215,17 @@ def main():
                 g["region"], len(dv), len(vas), sum(by_va[v] for v in dv),
                 sum(by_va[v] for v in vas),
                 100.0 * sum(by_va[v] for v in dv) / max(1, sum(by_va[v] for v in vas))))
+    # numbers for the README badges (tools/update_readme_progress.py)
+    import json
+    game = next(g for g in regions if g["region"] == "game")
+    lo, hi = int(game["start"], 16), int(game["end"], 16)
+    gvas = [v for v in by_va if lo <= v < hi]
+    gdone = [v for v in gvas if v in done_va]
+    with open(os.path.join(ROOT, "build", "progress.json"), "w") as f:
+        json.dump({"functions_done": len(gdone), "functions_total": len(gvas),
+                   "bytes_done": sum(by_va[v] for v in gdone),
+                   "bytes_total": sum(by_va[v] for v in gvas),
+                   "matching": sha == want and not errors}, f)
     rel_out = os.path.relpath(OUT, ROOT)
     if sha == want and not errors:
         print("%s: OK" % rel_out)

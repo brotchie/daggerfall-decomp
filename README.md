@@ -1,10 +1,17 @@
 # Daggerfall decompilation
 
+<!-- progress:start -->
+![decompiled](https://img.shields.io/badge/decompiled-34.90%25-orange) ![functions](https://img.shields.io/badge/functions-1402%20of%202297-yellowgreen) ![FALL.EXE](https://img.shields.io/badge/FALL.EXE-matching-brightgreen)
+
+34.90% of the game's own code (202439 of 580076 bytes, 1402 of 2297 functions) is matched C; the rebuilt `FALL.EXE` is byte-identical to 1.07.213.
+<!-- progress:end -->
+
 A matching decompilation of *The Elder Scrolls II: Daggerfall* (DOS, 1996), starting with the game
 executable `FALL.EXE` (version 1.07.213), built with Watcom C 10.0 and run under the CauseWay DOS
 extender.
 
-This repo contains no game code or data. You supply the executables; the tools check their SHA-1.
+This repo contains no game files (executables or data). You supply the executables; the tools
+check their SHA-1.
 
 - [docs/head_start.md](docs/head_start.md): the research plan this project started from
 - [docs/progress.md](docs/progress.md): a log of what has been found and done, newest last
@@ -17,11 +24,11 @@ This repo contains no game code or data. You supply the executables; the tools c
   game's own C in 84 original source units (names recovered from `__FILE__` strings), the
   rest are libraries (MemCheck, Watcom runtime). Object 2 is the XnGine engine in asm.
 - Compiler: Watcom 10.0/10.0a. Game code is unoptimised: `-od -s -of+ -4r`.
-- Toolchain: KKND-Decomp's patched Open Watcom `wcc386` plus six `-od` patches of our own,
+- Toolchain: KKND-Decomp's patched Open Watcom `wcc386` plus our own `-od` patches (`tools/owpatch/`),
   built natively on macOS.
-- **1,044 / 2,297 game functions (20.44% of game code) match byte for byte**, most lifted
-  automatically (`src/lifted/`, from `tools/lift.py`), and the rebuilt executable is
-  identical: `tools/build-and-verify.sh` prints `build/FALL.EXE: OK`.
+- Matched game functions and the share of game code: see the badges at the top (updated by
+  every successful `tools/build-and-verify.sh`). Most functions are lifted automatically
+  (`src/lifted/`, from `tools/lift.py`); the rebuilt executable is byte-identical.
 
 ## Quick start
 
@@ -60,6 +67,7 @@ tools/build-and-verify.sh
 | `tools/find_units.py`, `tools/units.py` | recover the original source units; map an address to its unit |
 | `tools/lift.py`, `tools/lift_all.py` | lift `-od` code to C; batch lift, compile and check every game function (2 s) |
 | `tools/promote_lifted.py` | write matched lifted functions into `src/lifted/<unit>.c` |
+| `tools/update_readme_progress.py` | refresh the README badges from `build/progress.json` |
 | `tools/build-and-verify.sh` | splice all of `src/` into `FALL.EXE` and check the SHA-1 (`build_fall.py`) |
 
 Several tools are adapted from [KKND-Decomp](https://github.com/Wyrelade/KKND-Decomp) (CC0).
