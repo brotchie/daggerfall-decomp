@@ -4,6 +4,7 @@
 extern char D_0012AC00[];
 extern char D_0012AC04[];
 extern char D_0012AC06[];
+extern char D_0012B508[];
 extern char D_00143550[];
 extern char D_00147964[];
 extern char D_00175420[];
@@ -365,6 +366,35 @@ void func_000543B5(void)
 void func_000543D7(void)
 {
     func_0005425C(4);
+}
+
+void func_000543F9(void)
+{
+    int l_1C;
+    short l_18;
+
+    l_1C = 0;
+    *(int *)&l_18 = l_1C;
+L54414:;
+    if (((int)(short)*(short *)&l_1C) < 5) goto L54427;
+    goto L54442;
+L5441F:;
+    l_1C++;
+    goto L54414;
+L54427:;
+    l_18 += *(short *)((char *)(int)(*(char **)D_00195BE0 + (((int)(short)*(short *)&l_1C) * 2)) + 145);
+    goto L5441F;
+L54442:;
+    if (l_18 == 0) goto L54461;
+    *(signed char *)D_0012B508 = 145;
+    func_0003F09F(303, 1);
+    return;
+L54461:;
+    *(short *)D_00190D76 = 0;
+L5446A:;
+    if (*(signed char *)D_0012AC00 == 0) return;
+    func_0012B136();
+    goto L5446A;
 }
 
 int func_00054484(void)

@@ -180,6 +180,7 @@ class Func:
         self.used_results = set()   # callees whose return value is used
         self.structs = set()     # bit-field struct declarations used
         self.choices = []        # instruction addresses of operand-order choice points
+        self.choice_sites = {}   # choice -> addresses where it shows (slot accesses)
         self.flips = frozenset()
         self.pending = None      # call expression in eax not yet emitted
         self.pushes = []
@@ -268,6 +269,8 @@ class Func:
         reads = {}     # slot -> set of sizes read
         first = {}     # slot -> address of its first access
         wide16 = set() # slots stored whole from a 16-bit value
+        sites = {}     # slot -> addresses of its accesses
+        self.w16_stores = set()
         afirst = {}    # address-taken slot -> address of its first access
         sign = {}      # slot -> 's' / 'u' hints
         addr = set()
@@ -292,16 +295,30 @@ class Func:
                     continue
                 acc.setdefault(off, set()).add(op.size)
                 first.setdefault(off, ins.address)
-                if n == 0 and ins.mnemonic == "mov" and op.size == 4 and k and \
-                        ins.operands[1].type == cx.X86_OP_REG:
+                sites.setdefault(off, []).append(ins.address)
+                if n == 0 and ins.mnemonic in ("mov", "add", "sub", "and", "or", "xor") and \
+                        op.size == 4 and k and ins.operands[1].type == cx.X86_OP_REG:
                     # stored whole right after being computed as 16 bits (mov ax,[x];
                     # mov [l],eax): Watcom 10's store of a 2-byte variable
-                    pv = body[k - 1]
-                    r16 = {"eax": "ax", "edx": "dx", "ebx": "bx", "ecx": "cx"}.get(
-                        ins.reg_name(ins.operands[1].reg))
+                    r32 = ins.reg_name(ins.operands[1].reg)
+                    r16 = {"eax": "ax", "edx": "dx", "ebx": "bx", "ecx": "cx"}.get(r32)
+                    j = k - 1
+                    # ... possibly through whole-register arithmetic on it (mov ax,[x];
+                    # sub eax,4; mov [l],eax: short arithmetic done in 32 bits)
+                    while j > 0 and k - j < 4 and body[j].mnemonic in (
+                            "add", "sub", "inc", "dec", "shl", "neg") and \
+                            body[j].operands[0].type == cx.X86_OP_REG and \
+                            body[j].reg_name(body[j].operands[0].reg) == r32 and \
+                            all(o.type == cx.X86_OP_IMM for o in body[j].operands[1:]):
+                        j -= 1
+                    pv = body[j]
                     if pv.operands and pv.operands[0].type == cx.X86_OP_REG and \
-                            pv.reg_name(pv.operands[0].reg) == r16:
+                            (pv.reg_name(pv.operands[0].reg) == r16 or
+                             (pv.mnemonic == "xor" and r16 and
+                              pv.op_str == "%sh, %sh" % (r16[0], r16[0]))):
                         wide16.add(off)
+                        if j < k - 1:
+                            self.w16_stores.add(ins.address)
                 if not (n == 0 and ins.mnemonic == "mov"):
                     reads.setdefault(off, set()).add(op.size)
                 if ins.mnemonic == "movsx":
@@ -332,6 +349,7 @@ class Func:
             if off in wide16 and reads.get(off, set()) <= {2, 4} and 4 in reads.get(off, set()):
                 # a 2-byte variable read whole, or an int: a choice point
                 self.choices.append(first[off] + 0.0625)
+                self.choice_sites[first[off] + 0.0625] = sites[off]
             if off in wide16 and reads.get(off, set()) <= {2, 4} and \
                     (4 not in reads.get(off, set()) or first[off] + 0.0625 in self.flips):
                 sz = 2
@@ -344,6 +362,7 @@ class Func:
                 # ... or an int read through (short) casts: a choice point
                 if 4 in sizes and off not in [p[1] for p in self.params]:
                     self.choices.append(first[off])
+                    self.choice_sites[first[off]] = sites[off]
                 if first.get(off) not in self.flips or off in [p[1] for p in self.params]:
                     sz = 2
             if off in addr:
@@ -839,7 +858,7 @@ class Func:
             v = self.src(s, ins)
             lhs = self.mem(d, ins, d.size)
             mm = re.fullmatch(r"\*\(int \*\)&(l_[0-9A-F]+|a\d+)", lhs)
-            if mm and d.size == 4 and v.size == 2 and \
+            if mm and d.size == 4 and (v.size == 2 or ins.address in self.w16_stores) and \
                     self.var_type(mm.group(1)) in ("short", "unsigned short") and \
                     not os.environ.get("LIFT_NOSHORTSTORE"):
                 # Watcom 10 stores a short variable with the whole register
@@ -1128,6 +1147,11 @@ class Func:
                 lv = lhs if re.fullmatch(r"\w+", lhs) else "(%s)" % lhs
                 self.emit("(*(char (**)[%d])&%s)%s;" % (s.imm, lv, "++" if m == "add" else "--"))
                 return
+            mm = re.fullmatch(r"\*\(int \*\)&(l_[0-9A-F]+|a\d+)", lhs)
+            if mm and m in ("add", "sub", "and", "or", "xor") and s.type == cx.X86_OP_REG and \
+                    b.size == 2 and self.var_type(mm.group(1)) in ("short", "unsigned short"):
+                # Watcom 10 updates a short variable with the whole register too
+                lhs = mm.group(1)
             if m == "shr":
                 # a logical shift in place: the variable is unsigned
                 lhs = lhs.replace("*(short *)", "*(unsigned short *)", 1) \
@@ -2293,6 +2317,7 @@ def lift(va, flips=frozenset(), info=None):
     finally:
         if info is not None:
             info["choices"] = list(f.choices)
+            info["sites"] = dict(f.choice_sites)
 
 
 def main():

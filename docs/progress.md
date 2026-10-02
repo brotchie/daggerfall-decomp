@@ -1099,3 +1099,10 @@ Batch **1,888**; build **59.28%**.
   2004 GetNextAddConstant() does. Gated off at -od (`DAGGER_LEADISP` restores it). +6.
 
 Batch **1,927**; build **61.34%**.
+- **Short arithmetic in 32-bit registers**: `mov ax,[x]; sub eax,4; mov [l],eax` (and
+  `xor ah,ah; sub eax,0x21; ...`) is a short variable assigned short arithmetic; Watcom 10
+  also updates a short stack variable with the whole register (`add [l],eax`, never
+  `add word [l],ax`): the compiler widens 16-bit add/sub/and/or/xor of a 2-byte stack
+  variable with a register (`DAGGER_WORDRMW` keeps them), and the lifter types such slots
+  short. Slot-type choice points are now tried when the first difference is near any access
+  of the slot. +5. Batch **1,932**; build **61.44%**.

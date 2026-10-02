@@ -569,10 +569,36 @@ void func_00093EE5(void)
     (*(int *)D_001AA560)--;
 }
 
+void func_00093F0C(void)
+{
+    short l_18;
+
+    l_18 = *(short *)D_001AA58A - 4;
+    if (l_18 <= 0) goto L93F39;
+    if (((int)(short)l_18) > *(int *)D_001AA560) goto L93F3B;
+L93F39:;
+    return;
+L93F3B:;
+    (*(int *)D_001AA560)++;
+}
+
 void func_00093F4B(void)
 {
     if (*(int *)D_001AA564 == 0) return;
     (*(int *)D_001AA564)--;
+}
+
+void func_00093F72(void)
+{
+    short l_18;
+
+    l_18 = *(short *)D_001AA584 - 4;
+    if (l_18 <= 0) goto L93F9F;
+    if (((int)(short)l_18) > *(int *)D_001AA564) goto L93FA1;
+L93F9F:;
+    return;
+L93FA1:;
+    (*(int *)D_001AA564)++;
 }
 
 void func_0009401E(int a1)

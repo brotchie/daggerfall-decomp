@@ -162,8 +162,9 @@ def work(va):
         return s2, d2, at2, c2, info2
 
     while status == "diff" and at is not None and tries < BUDGET and not os.environ.get("LIFT_NOSEARCH"):
+        sites = info.get("sites", {})
         near = sorted((a for a in info["choices"] if a >= 0 and a not in flips),
-                      key=lambda a: abs(a - at))[:NEAR]
+                      key=lambda a: min(abs(x - at) for x in sites.get(a, [a])))[:NEAR]
         near += [a for a in info["choices"] if a < 0 and a not in flips]   # function-level
         found = None
         for a in near:
