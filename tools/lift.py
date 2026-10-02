@@ -723,6 +723,9 @@ class Func:
                 a = E("(unsigned)" + a.p(), 4)
             return "%s %s %s" % (a.p(), opr, b.p())
         if kind == "test":
+            if opr not in ("==", "!=") and a.text == b.text and not uns:
+                # test x,x; jle: a signed compare with zero
+                return "%s %s 0" % (a.p(), opr)
             if opr not in ("==", "!="):
                 raise Unsupported("test with ordered jcc")
             if a.text == b.text:
@@ -1029,6 +1032,14 @@ class Func:
                 return
             lhs = self.mem(d, ins, d.size)
             if lhs == "@RET":
+                last = self.out[-1] if self.out else ""
+                mm = re.fullmatch(r"    return (.*);", last)
+                if mm and m in ("neg", "not", "inc", "dec"):
+                    # the return variable changed in place right after being set
+                    self.out[-1] = "    return %s;" % ({"neg": "-(%s)", "not": "~(%s)",
+                                                         "inc": "(%s) + 1", "dec": "(%s) - 1"}[m]
+                                                        % mm.group(1))
+                    return
                 raise Unsupported("read-modify-write of the return slot")
             lv = lhs if re.fullmatch(r"\w+", lhs) else "(%s)" % lhs
             prev = self.body[self.k - 1] if self.k else None
