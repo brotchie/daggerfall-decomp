@@ -17,7 +17,8 @@ This repo contains no game code or data. You supply the executables; the tools c
 - Compiler: Watcom 10.0/10.0a. Game code is unoptimised: `-od -s -of+ -4r`.
 - Toolchain: KKND-Decomp's patched Open Watcom `wcc386` plus two `-od` patches of our own,
   built natively on macOS.
-- **17 functions match byte for byte** (`src/leaf_probes.c`).
+- **17 functions match byte for byte** (`src/leaf_probes.c`), and the rebuilt executable is
+  identical: `tools/build-and-verify.sh` prints `build/FALL.EXE: OK`.
 
 ## Quick start
 
@@ -32,9 +33,10 @@ python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
 # 3. Patched compiler (clones open-watcom-v2 into third_party/, about 3 minutes)
 tools/build_ow.sh
 
-# 4. Find functions, then match a C file against the original
+# 4. Find functions, match a C file against the original, then build and verify
 .venv/bin/python tools/find_functions.py
 .venv/bin/python tools/match.py src/leaf_probes.c
+tools/build-and-verify.sh
 ```
 
 ## Tools
@@ -48,5 +50,6 @@ tools/build_ow.sh
 | `tools/omf.py` | OMF object reader (from KKND-Decomp) |
 | `tools/match.py` | compile a C file and compare its functions with `FALL.EXE` |
 | `tools/cc_dis.py` | disassemble what the compiler makes of a C file |
+| `tools/build-and-verify.sh` | splice all of `src/` into `FALL.EXE` and check the SHA-1 (`build_fall.py`) |
 
 Several tools are adapted from [KKND-Decomp](https://github.com/Wyrelade/KKND-Decomp) (CC0).

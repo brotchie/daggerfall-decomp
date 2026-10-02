@@ -213,3 +213,29 @@ rule (for example "the return variable gets its slot when the first statement is
 and patch `AssgnMoreTemps()` to match.
 
 Matched so far: 17 functions (`src/leaf_probes.c`).
+
+## 2026-10-01: build and verify (plan step 5)
+
+`tools/build-and-verify.sh` (`tools/build_fall.py`, adapted from KKND's `build_kknd.py`)
+compiles every `src/**/*.c`, checks each function against the original, splices it into the
+object images, rewrites the LE pages to `build/FALL.EXE` and compares the SHA-1 with
+`config/fall.sha1`. A function counts as matched only if:
+
+- every byte outside relocations is identical and the length is the same, and
+- every relocation resolves to the original's target. A call or jump inside an object must have
+  the same displacement. A call between objects 1 and 2 must hit the same LE rel32 fixup
+  target, and a data reference the same LE off32 fixup target plus addend.
+
+The splice writes relocated fields as a linker would (displacements, 0 for LE rel32 fields,
+object-relative offsets for off32 fields) rather than keeping the original's bytes. With
+`--blank`, every matched function is first filled with `int3`, and the output is still
+byte-identical, so the matched code in `build/FALL.EXE` comes from our C. The LE fixup tables
+are kept as they are, because the checks show every relocation in the new code is one the
+original already has.
+
+Negative tests fail as they should, with the reason: a data reference 4 bytes off
+(`reference _D_00184680+0 (0x184680) != original 0x18467c`), a call to the wrong function, and
+a changed constant.
+
+`build/matched.txt` lists the matched functions. Current state: **17 / 3,663 functions, 542
+bytes, `build/FALL.EXE: OK`.**
