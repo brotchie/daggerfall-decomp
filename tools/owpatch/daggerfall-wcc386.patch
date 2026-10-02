@@ -1262,7 +1262,7 @@ index 76c9e5daf1..1562a66f62 100644
      do {
          pow2 = 1;
 diff --git a/bld/cg/c/object.c b/bld/cg/c/object.c
-index 8deefcbc4c..67821e36c9 100644
+index 8deefcbc4c..946c667548 100644
 --- a/bld/cg/c/object.c
 +++ b/bld/cg/c/object.c
 @@ -31,6 +31,7 @@
@@ -1287,7 +1287,7 @@ index 8deefcbc4c..67821e36c9 100644
  
  
  /*
-@@ -93,6 +101,74 @@ static  source_line_number      DumpLineNum( source_line_number n,
+@@ -93,6 +101,87 @@ static  source_line_number      DumpLineNum( source_line_number n,
  }
  
  
@@ -1329,6 +1329,19 @@ index 8deefcbc4c..67821e36c9 100644
 +    if( res->n.class != N_TEMP || res->n.size != 2 || DeAlias( res )->n.size != 2
 +      || ( DeAlias( res )->v.usage & HAS_MEMORY ) == 0 )
 +        return;
++    /* (not a variable whose address is taken: its bytes are read separately) */
++    if( DaggerEnv( "DAGGER_WIDENADDR" ) == NULL ) {
++        name    *a;
++        name    *master = DeAlias( res );
++
++        if( master->v.usage & USE_ADDRESS )
++            return;
++        /* (nor one whose single bytes are read: `*(char *)&s`) */
++        for( a = master->t.alias; a != master && a != NULL; a = a->t.alias ) {
++            if( a->n.size == 1 )
++                return;
++        }
++    }
 +    op = ins->operands[0];
 +    if( op->n.class == N_REGISTER ) {
 +        /* only a value computed as 16 bits (`mov ax,[x]`), not an int narrowed to a short
@@ -1362,7 +1375,7 @@ index 8deefcbc4c..67821e36c9 100644
  void    GenObject( void )
  /***********************/
  {
-@@ -127,6 +203,12 @@ void    GenObject( void )
+@@ -127,6 +216,12 @@ void    GenObject( void )
              StartBlockProfiling( blk );
              InitStackDepth( blk );
              for( ins = blk->ins.head.next; ins->head.opcode != OP_BLOCK; ins = ins->head.next ) {
@@ -1375,7 +1388,7 @@ index 8deefcbc4c..67821e36c9 100644
                  if( ins->head.opcode == OP_NOP
                    && ( (ins->flags.u.nop_flags & NOP_SOURCE_QUEUE)
                    || ins->flags.u.nop_flags == NOP_DBGINFO )) { // an end block
-@@ -145,6 +227,7 @@ void    GenObject( void )
+@@ -145,6 +240,7 @@ void    GenObject( void )
                          }
                      }
                  } else {

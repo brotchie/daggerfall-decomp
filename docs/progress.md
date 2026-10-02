@@ -1293,3 +1293,6 @@ Batch **1,927**; build **61.34%**.
   with fewer loaded registers than the callee's parameters is unprototyped. An offline
   deep search (`LIFT_DEEP=1`: every allocation window and every single register pin,
   ~16 min over the failing functions) found nothing more. +4. Batch **2,171**.
+- A short variable whose address is taken or whose single bytes are read keeps 16-bit
+  stores (`mov word [l],0`): the compiler doesn't widen those (`DAGGER_WIDENADDR`). +1.
+  Batch **2,172**.
