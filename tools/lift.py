@@ -2002,9 +2002,18 @@ class Func:
             if far:
                 # a far pointer argument: offset and selector in a pair of registers
                 nreg = max(nreg, far[-1] + 1)
+            order = list(range(nreg))
+            if far == [3] and nreg == 4 and "edx" in self.regs and \
+                    not os.environ.get("LIFT_NOFARSECOND"):
+                # a far pointer in ebx:ecx with an int in edx: the far pointer is the second
+                # argument (Watcom gives it the ebx:ecx pair, the third goes in edx); a
+                # choice point
+                self.choices.append(ins.address + 0.21875)
+                if ins.address + 0.21875 not in self.flips:
+                    order = [0, 2, 3, 1]
             k = 0
             while k < nreg:
-                r = PARM_REGS[k]
+                r = PARM_REGS[order[k]]
                 if r not in self.regs:
                     if k >= 1 and sig is not None and not self.pushes and \
                             not os.environ.get("LIFT_NOSHORTCALL"):
@@ -2016,7 +2025,7 @@ class Func:
                     raise Unsupported("call argument %s not loaded" % r)
                 if self.regs[r] is self.pending:
                     self.pending = None              # nested call: f(g(x))
-                if k + 1 in far:
+                if order[k] + 1 in far:
                     args.append("(void __far *)(void *)%s" % self.regs[r].p())
                     self.farcalls.add(name)
                     k += 2
