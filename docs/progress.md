@@ -283,3 +283,20 @@ macro, so **the original source file names and line numbers are in the executabl
 strong evidence for naming units and ordering functions.
 
 Matched: **26 / 3,663 functions, 1,191 bytes, `build/FALL.EXE: OK`** (also with `--blank`).
+
+## 2026-10-01: the original source files
+
+`tools/find_units.py` writes `config/units.csv`. 529 functions pass a source file name
+(`"faction.c"`, `"talk.c"`, ...) to helpers, most likely `__FILE__` in checked-memory or
+assert macros. Each of the **84 names** is referenced from exactly one contiguous run of
+functions, no function references two names, and the runs don't interleave. So the runs give
+the original object files **in link order**:
+
+`main.c` (0x10010), `sosez.c`, `profile.c`, `archive.c`, `steal.c`, `camera.c`, `rumor.c`,
+`engsupp.c`, `talk.c`, `faction.c`, ... `inven.c`, `int.c`, `color.c`, `travel.c` (ends
+0x9D986). Then comes the Watcom runtime, with two more names inside it (`xxdef.c` at
+0xA2B64 and `xerftrc.c` at 0xB7622), which probably belong to a library.
+
+Functions that sit between two runs belong to one of the neighbours. That's not settled yet,
+but it's a small search per boundary. This sets the layout for `src/`: one C file per original
+unit, named as the original.
