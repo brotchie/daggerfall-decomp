@@ -81,11 +81,11 @@ L_152B4D:
     mov word ptr [D_00152A62], dx
     mov dword ptr [D_00152A64], eax
     mov eax, 01Ch
-    mov ebx, offset D_00152EA0
+    mov ebx, offset func_00152EA0
     mov cx, cs
     call func_000A12A6
-    mov eax, offset D_00152EA0
-    mov edx, offset D_00152F41
+    mov eax, offset func_00152EA0
+    mov edx, offset L_152F41
     sub edx, eax
     call func_00149F0C
     mov eax, offset D_00152A00
@@ -273,34 +273,68 @@ L_152E81:
     popad
     ret
     B_152E83_29
-D_00152EA0:
-    B_152EA0_9
-    db 00h, 00h   ; selector fixup, kept by the LE table
-    B_152EAB_5
-    dd D_00152A30
-    B_152EB4_5
-    dd D_00152A60
-    B_152EBD_4
-    dd D_00152A02
-    B_152EC5_55
-    dd D_00152A28
-    B_152F00_2
-    dd D_00152A2C
-    B_152F06_2
-    dd D_00152A58
-    B_152F0C_2
-    dd D_00152A5C
-    B_152F12_9
-    dd D_00152A61
-    B_152F1F_5
-    dd D_00152A60
-    B_152F28_5
-    dd D_00152A31
-    B_152F31_5
-    dd D_00152A30
-    B_152F3A_7
-D_00152F41:
-    B_152F41_1
+func_00152EA0:
+    pushad
+    push ds
+    push es
+    push fs
+    push gs
+    db 066h, 0B8h, 00h, 00h   ; mov ax, 0
+    mov ds, eax
+func_00152EAD:
+    mov word ptr [D_00152A30], 0
+    mov word ptr [D_00152A60], 0
+    cmp byte ptr [D_00152A02], 2
+    je short func_00152F3A
+    mov al, 0Fh
+    mov dx, 0201h
+    out dx, al
+    xor eax, eax
+    xor ebx, ebx
+    xor ecx, ecx
+    xor esi, esi
+    xor edi, edi
+    mov ebp, 0800h
+L_152EDE:
+    in al, dx
+    test al, al
+    je short L_152EFA
+    shr eax, 1
+    adc esi, 0
+    shr eax, 1
+    adc edi, 0
+    shr eax, 1
+    adc ebx, 0
+    shr eax, 1
+    adc ecx, 0
+    dec ebp
+    jne short L_152EDE
+L_152EFA:
+    mov dword ptr [D_00152A28], esi
+    mov dword ptr [D_00152A2C], edi
+    mov dword ptr [D_00152A58], ebx
+    mov dword ptr [D_00152A5C], ecx
+    mov al, 0F0h
+    out dx, al
+    in al, dx
+    test al, 080h
+    sete byte ptr [D_00152A61]
+    test al, 040h
+    sete byte ptr [D_00152A60]
+    test al, 020h
+    sete byte ptr [D_00152A31]
+    test al, 010h
+    sete byte ptr [D_00152A30]
+func_00152F3A:
+    pop gs
+    pop fs
+    pop es
+func_00152F3F:
+    pop ds
+func_00152F40:
+    popad
+L_152F41:
+    iretd
     db 190 dup (0)
 XN_152B00 ends
 end

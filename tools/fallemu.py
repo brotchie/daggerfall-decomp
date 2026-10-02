@@ -480,6 +480,11 @@ class Emu:
     def on_int(self, uc, intno, _):
         if self.io_log is None:
             return self.service(uc, intno)
+        if intno < 0x20 or intno in (0xFD, 0xFE):
+            # CPU exceptions and our own stubs depend on nothing outside the machine: they
+            # run for real when a record is replayed, and are logged only to compare
+            self.io_log.append(("exc", intno))
+            return self.service(uc, intno)
         self.io_log.append(("int", intno, self.r("eax")))
         if self.int_replay is not None:     # replaying a record: the service's results
             regs, writes = self.int_replay.pop(0)

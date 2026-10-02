@@ -519,7 +519,7 @@ func_0012A4F0:
     mov edi, offset D_000F39E0
     mov ebx, dword ptr [D_000CEA64]
     add dword ptr [D_000CEA64], 064h
-    mov dword ptr [ebx + 03Ch], offset D_0012A949
+    mov dword ptr [ebx + 03Ch], offset func_0012A949
     mov dword ptr [edi], edi
     mov eax, dword ptr [D_00142948]
     mov word ptr [edi + 6], ax
@@ -795,14 +795,15 @@ func_0012A870:
     sub eax, dword ptr [D_000CEA34]
     mov dword ptr [D_000CEA6C], eax
     neg eax
-    mov dword ptr [D_0012A963], eax
+    mov dword ptr [patch_12A963], eax
     mov edi, dword ptr [ecx*4 + D_00142950]
     add edi, dword ptr [D_00143550]
     dec edi
     mov eax, dword ptr [D_00142930]
     shl ecx, 4
-    mov dword ptr [D_0012A950], eax
+    mov dword ptr [patch_12A950], eax
     lea esi, [ecx + D_000F39F0]
+L_12A8E9:
     mov eax, dword ptr [D_000CEA6C]
     push esi
     push edi
@@ -839,17 +840,36 @@ patch_12A931 equ L_12A92F+2   ; rewritten at run time
     call dword ptr [D_000CEA58]
     pop esi
     jmp short L_12A917
-D_0012A949:
-    B_12A949_7
-D_0012A950:
-    B_12A950_9
-    dd D_000CEA6C
-    B_12A95D_2
-    dd D_000CEA6C
-D_0012A963:
-    B_12A963_13
+func_0012A949:
+    add esp, 018h
+    pop edi
+    pop esi
+func_0012A94E:
+    add edi, 0186A0h
+patch_12A950 equ func_0012A94E+2   ; rewritten at run time
+    add esi, 010h
+    inc dword ptr [D_000CEA6C]
+L_12A95D:
+    cmp dword ptr [D_000CEA6C], 0186A0h
+patch_12A963 equ L_12A95D+6   ; rewritten at run time
+    jne short L_12A8E9
+func_0012A969:
+    pushad
+    pushfd
+    mov eax, 0208h
     call func_0006A319
-    B_12A975_14
+func_0012A975:
+    popfd
+func_0012A976:
+    popad
+    call func_0012A814
+func_0012A97C:
+    jb short L_12A983
+func_0012A97E:
+    popad
+    xor eax, eax
+    clc
+    ret
 L_12A983:
     popad
     mov eax, 1

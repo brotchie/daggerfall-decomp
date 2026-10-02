@@ -685,7 +685,7 @@ def write_functions(an):
     function) and how it was found."""
     with open(os.path.join(ROOT, "config", "functions.csv"), newline="") as f:
         listed = {int(r["va"], 16) for r in csv.DictReader(f) if r["obj"] == str(xn_link.OBJ2)}
-    gap, ptr = set(an.gap_funcs), set(an.ptr_funcs)
+    gap, ptr, runtime = set(an.gap_funcs), set(an.ptr_funcs), set(an.runtime_seeds)
     funcs = an.funcs
     with open(os.path.join(ROOT, "config", "xngine_functions.csv"), "w", newline="") as fh:
         w = csv.writer(fh, lineterminator="\n")
@@ -698,7 +698,7 @@ def write_functions(an):
                 size += an.insns[an.starts[j]].size
                 j += 1
             how = "functions.csv" if f in listed else "pointer" if f in ptr else \
-                "unreferenced" if f in gap else "call"
+                "unreferenced" if f in gap else "run time" if f in runtime else "call"
             w.writerow(["0x%08X" % f, size, how])
 
 

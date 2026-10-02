@@ -19,6 +19,7 @@ va,code_bytes,found_by
 0x000C02DF,10,pointer
 0x000C02E9,30,call
 0x000C0307,26,call
+0x000C0500,6,run time
 0x000C0520,78,functions.csv
 0x000C0580,54,functions.csv
 0x000C0700,460,functions.csv
@@ -238,9 +239,16 @@ va,code_bytes,found_by
 0x0012A740,67,pointer
 0x0012A7A0,46,pointer
 0x0012A7D0,66,functions.csv
-0x0012A814,72,unreferenced
+0x0012A814,72,call
 0x0012A860,13,pointer
-0x0012A870,225,functions.csv
+0x0012A870,217,functions.csv
+0x0012A949,5,run time
+0x0012A94E,27,run time
+0x0012A969,12,run time
+0x0012A975,1,run time
+0x0012A976,6,run time
+0x0012A97C,2,run time
+0x0012A97E,13,run time
 0x0012A98B,115,functions.csv
 0x0012B100,54,functions.csv
 0x0012B136,96,functions.csv
@@ -299,7 +307,7 @@ va,code_bytes,found_by
 0x00136AD8,22,functions.csv
 0x00136AF0,149,functions.csv
 0x00136B88,79,functions.csv
-0x00136BD8,87,unreferenced
+0x00136BD8,87,call
 0x00136C30,84,pointer
 0x00136C84,140,pointer
 0x00136D10,200,pointer
@@ -373,6 +381,21 @@ va,code_bytes,found_by
 0x00142790,24,functions.csv
 0x001427A8,94,functions.csv
 0x00142808,29,unreferenced
+0x00142840,13,run time
+0x0014284D,21,run time
+0x00142862,12,run time
+0x0014286E,12,run time
+0x0014287A,12,run time
+0x00142886,12,run time
+0x00142892,15,run time
+0x001428A1,15,run time
+0x001428B0,12,run time
+0x001428BC,12,run time
+0x001428C8,12,run time
+0x001428D4,14,run time
+0x001428E2,9,run time
+0x001428EB,1,run time
+0x001428EC,2,run time
 0x00143600,254,functions.csv
 0x00143700,63,functions.csv
 0x0014373F,302,unreferenced
@@ -414,6 +437,39 @@ va,code_bytes,found_by
 0x00149F0C,64,functions.csv
 0x00149F4C,75,functions.csv
 0x00149F98,46,functions.csv
+0x00149FC8,14,run time
+0x00149FD6,10,run time
+0x00149FE0,10,run time
+0x00149FEA,10,run time
+0x00149FF4,10,run time
+0x00149FFE,10,run time
+0x0014A008,10,run time
+0x0014A012,10,run time
+0x0014A01C,10,run time
+0x0014A026,10,run time
+0x0014A030,10,run time
+0x0014A03A,10,run time
+0x0014A044,10,run time
+0x0014A04E,10,run time
+0x0014A058,6,run time
+0x0014A05E,10,run time
+0x0014A068,10,run time
+0x0014A072,10,run time
+0x0014A07C,10,run time
+0x0014A086,6,run time
+0x0014A08C,6,run time
+0x0014A092,6,run time
+0x0014A098,6,run time
+0x0014A09E,6,run time
+0x0014A0A4,6,run time
+0x0014A0AA,6,run time
+0x0014A0B0,6,run time
+0x0014A0B6,6,run time
+0x0014A0BC,6,run time
+0x0014A0C2,4,run time
+0x0014A0C6,2,run time
+0x0014A0C8,7,run time
+0x0014A0CF,23,run time
 0x0014A300,911,functions.csv
 0x0014A6C0,80,unreferenced
 0x0014A710,854,unreferenced
@@ -472,6 +528,11 @@ va,code_bytes,found_by
 0x00152BDC,99,functions.csv
 0x00152C40,192,functions.csv
 0x00152D00,387,functions.csv
+0x00152EA0,13,run time
+0x00152EAD,141,run time
+0x00152F3A,5,run time
+0x00152F3F,1,run time
+0x00152F40,2,run time
 0x0015310C,109,call
 0x0015317C,12,unreferenced
 0x00153188,104,call
@@ -503,19 +564,19 @@ va,code_bytes,found_by
 0x00154D00,27,functions.csv
 0x00154D20,133,functions.csv
 0x00154DA5,93,functions.csv
-0x00154E20,187,unreferenced
+0x00154E20,187,call
 0x00154EDC,247,pointer
 0x00154FD4,1,pointer
 0x00154FD8,228,pointer
 0x001550BC,1,pointer
 0x001550C0,1,pointer
-0x001550E0,266,unreferenced
+0x001550E0,266,call
 0x00155200,108,call
 0x0015526C,41,call
 0x001552A0,146,call
 0x00155332,164,unreferenced
 0x001553D8,61,call
-0x00155415,243,unreferenced
+0x00155415,243,call
 0x00155508,264,functions.csv
 0x00155610,278,pointer
 0x00155800,19,pointer
@@ -551,7 +612,7 @@ va,code_bytes,found_by
 0x0015811C,99,functions.csv
 0x00158300,10,unreferenced
 0x0015830C,60,call
-0x00158360,189,unreferenced
+0x00158360,189,call
 0x00158420,402,functions.csv
 0x001585B3,2,unreferenced
 0x001585C0,182,functions.csv
@@ -625,6 +686,7 @@ va,code_bytes,found_by
 0x00160A3C,22,call
 0x00160A54,72,call
 0x00160A9C,61,call
+0x00160AE0,99,run time
 0x00160E00,68,pointer
 0x00160E44,1,pointer
 0x00160E45,18,pointer

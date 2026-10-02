@@ -13,14 +13,16 @@ extrn func_000A1272:near
 extrn func_000A12A6:near
 XN_C0500 segment byte public use32 'CODE'
     assume cs:XN_C0500, ds:XN_C0500, es:XN_C0500, ss:XN_C0500
-D_000C0500:
-    B_0C0500_32
+func_000C0500:
+    mov eax, 1
+    iretd
+    B_0C0506_26
 func_000C0520:
     pushad
     pushfd
     cmp byte ptr [D_000C0406], 1
     je short L_0C056B
-    mov eax, offset D_000C0500
+    mov eax, offset func_000C0500
     mov edx, 01006h
     call func_000994F0
     cli
@@ -29,7 +31,7 @@ func_000C0520:
     mov word ptr [D_000C0400], dx
     mov dword ptr [D_000C0402], eax
     mov eax, 024h
-    mov ebx, offset D_000C0500
+    mov ebx, offset func_000C0500
     mov cx, cs
     call func_000A12A6
     mov byte ptr [D_000C0406], 1
@@ -50,7 +52,7 @@ func_000C0580:
     mov cx, word ptr [D_000C0400]
     call func_000A12A6
     sti
-    mov eax, offset D_000C0500
+    mov eax, offset func_000C0500
     mov edx, 01006h
     call func_0009957D
 L_0C05B3:

@@ -29,7 +29,7 @@ func_00142700:
     mov dword ptr [D_00142300], eax
     mov word ptr [D_00142304], dx
     mov eax, 9
-    mov ebx, offset D_00142840
+    mov ebx, offset func_00142840
     mov cx, cs
     call func_000A12A6
     mov eax, offset func_00142700
@@ -111,34 +111,76 @@ L_142820:
     int 016h
     ret
     B_142825_27
-D_00142840:
-    B_142840_9
-    db 00h, 00h   ; selector fixup, kept by the LE table
-    B_14284B_30
-    dd D_00142388
-    B_14286D_8
-    dd D_00142388
-    B_142879_8
-    dd D_00142388
-    B_142885_8
-    dd D_00142388
-    B_142891_3
-    dd D_00142307
-    B_142898_2
-    dd D_00142308
-    B_14289E_13
-    dd D_00142388
-    B_1428AF_8
-    dd D_00142388
-    B_1428BB_8
-    dd D_00142388
-    B_1428C7_8
-    dd D_00142388
-    B_1428D3_3
-    dd D_00142307
-    B_1428DA_3
-    dd D_00142308
-    B_1428E1_13
+func_00142840:
+    pushad
+    push ds
+    push es
+    push gs
+    push fs
+    db 066h, 0B8h, 00h, 00h   ; mov ax, 0
+    mov ds, eax
+func_0014284D:
+    xor ebx, ebx
+    in al, 060h
+    mov bl, al
+    in al, 061h
+    or al, 080h
+    out 061h, al
+    and al, 07Fh
+    out 061h, al
+    test bl, 080h
+    jne short func_001428A1
+func_00142862:
+    cmp bl, 01Dh
+    jne short func_0014286E
+    or dword ptr [D_00142388], 8
+func_0014286E:
+    cmp bl, 02Ah
+    jne short func_0014287A
+    or dword ptr [D_00142388], 1
+func_0014287A:
+    cmp bl, 036h
+    jne short func_00142886
+    or dword ptr [D_00142388], 2
+func_00142886:
+    cmp bl, 038h
+    jne short func_00142892
+    or dword ptr [D_00142388], 4
+func_00142892:
+    mov byte ptr [D_00142307], bl
+    mov byte ptr [ebx + D_00142308], 1
+    jmp short func_001428E2
+func_001428A1:
+    and bl, 07Fh
+    cmp bl, 01Dh
+    jne short func_001428B0
+    and dword ptr [D_00142388], 0FFFFFFF7h
+func_001428B0:
+    cmp bl, 02Ah
+    jne short func_001428BC
+    and dword ptr [D_00142388], 0FFFFFFFEh
+func_001428BC:
+    cmp bl, 036h
+    jne short func_001428C8
+    and dword ptr [D_00142388], 0FFFFFFFDh
+func_001428C8:
+    cmp bl, 038h
+    jne short func_001428D4
+    and dword ptr [D_00142388], 0FFFFFFFBh
+func_001428D4:
+    mov byte ptr [D_00142307], 0
+    mov byte ptr [ebx + D_00142308], 0
+func_001428E2:
+    mov al, 020h
+    out 020h, al
+    pop fs
+    pop gs
+    pop es
+func_001428EB:
+    pop ds
+func_001428EC:
+    popad
+    iretd
     db 18 dup (0)
 XN_142700 ends
 end

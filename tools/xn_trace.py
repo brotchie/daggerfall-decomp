@@ -142,14 +142,14 @@ def main():
     if os.path.exists(seeds_path):
         with open(seeds_path, newline="") as f:
             seeds = {int(r["va"], 16): r["source"] for r in csv.DictReader(f)}
-    new = {a: k for a, k in tr.seeds().items() if a not in seeds}
+    new = {va: k for va, k in tr.seeds().items() if va not in seeds}
     seeds.update(new)
     if new:
         with open(seeds_path, "w", newline="") as f:
             w = csv.writer(f, lineterminator="\n")
             w.writerow(["va", "source"])
-            for a in sorted(seeds):
-                w.writerow(["0x%08X" % a, seeds[a]])
+            for va in sorted(seeds):
+                w.writerow(["0x%08X" % va, seeds[va]])
     print("%d new code seeds for xn_disasm.py (%d in all)" % (len(new), len(seeds)))
     os.makedirs(os.path.dirname(a.out), exist_ok=True)
     with open(a.out, "w") as f:

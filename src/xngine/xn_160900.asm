@@ -4,7 +4,6 @@
 .486p
 .387
 include xn_160900.inc
-public D_00160AE0
 public D_00160B60
 public D_00160BE0
 public D_00160C60
@@ -14,6 +13,7 @@ public func_00160A18
 public func_00160A3C
 public func_00160A54
 public func_00160A9C
+public func_00160AE0
 extrn D_0015FFFF:byte
 extrn D_00160000:byte
 extrn D_00160004:byte
@@ -223,20 +223,46 @@ L_160AD4:
     stc
     ret
     B_160AD9_7
-D_00160AE0:
-    B_160AE0_5
-    db 00h, 00h   ; selector fixup, kept by the LE table
-    B_160AE7_37
-    dd D_00160050
-    B_160B10_2
-    dd D_00160860
-    B_160B16_2
-    dd D_00160860
-    B_160B1C_4
-    dd D_00160860
-    B_160B24_6
-    dd D_00160870
-    B_160B2E_50
+func_00160AE0:
+    push eax
+    push edx
+    push ds
+    db 066h, 0B8h, 00h, 00h   ; mov ax, 0
+    mov ds, eax
+    mov edx, 03F8h
+    add edx, 2
+    in al, dx
+    test al, 1
+    jne short L_160B3A
+    test al, 6
+    je short L_160B30
+    test al, 4
+    je short L_160B3A
+    mov edx, 03F8h
+    add edx, 5
+    in al, dx
+    sub edx, 5
+    in al, dx
+    mov edx, offset D_00160050
+    add edx, dword ptr [D_00160860]
+    inc dword ptr [D_00160860]
+    mov byte ptr [edx], al
+    and dword ptr [D_00160860], 01FFh
+    inc dword ptr [D_00160870]
+    jmp short L_160B3A
+L_160B30:
+    mov edx, 03F8h
+    in al, dx
+    add edx, 5
+    in al, dx
+L_160B3A:
+    mov al, 020h
+    out 020h, al
+    pop ds
+    pop edx
+    pop eax
+    iret
+    B_160B43_29
 D_00160B60:
     B_160B60_5
     db 00h, 00h   ; selector fixup, kept by the LE table

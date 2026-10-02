@@ -153,10 +153,10 @@ func_00149F4C:
     mov eax, 0203h
     xor ebx, ebx
     mov cx, cs
-    mov edx, offset D_00149FC8
+    mov edx, offset func_00149FC8
     int 031h
-    mov eax, offset D_00149FC8
-    mov edx, offset D_0014A0E5
+    mov eax, offset func_00149FC8
+    mov edx, offset L_14A0E5
     sub edx, eax
     call func_00149F0C
     popad
@@ -179,10 +179,131 @@ L_149FC4:
     popad
     ret
     B_149FC6_2
-D_00149FC8:
-    B_149FC8_285
-D_0014A0E5:
-    B_14A0E5_1
+func_00149FC8:
+    mov eax, dword ptr [esp + 0Ch]
+    cmp byte ptr [eax + 1], 03Dh
+    je near ptr L_14A0D2
+func_00149FD6:
+    cmp byte ptr [eax + 1], 035h
+    je near ptr L_14A0D2
+func_00149FE0:
+    cmp byte ptr [eax + 1], 070h
+    je near ptr L_14A0DC
+func_00149FEA:
+    cmp byte ptr [eax + 1], 071h
+    je near ptr L_14A0DC
+func_00149FF4:
+    cmp byte ptr [eax + 1], 072h
+    je near ptr L_14A0DC
+func_00149FFE:
+    cmp byte ptr [eax + 1], 073h
+    je near ptr L_14A0DC
+func_0014A008:
+    cmp byte ptr [eax + 1], 075h
+    je near ptr L_14A0DC
+func_0014A012:
+    cmp byte ptr [eax + 1], 076h
+    je near ptr L_14A0DC
+func_0014A01C:
+    cmp byte ptr [eax + 1], 077h
+    je near ptr L_14A0DC
+func_0014A026:
+    cmp byte ptr [eax + 1], 078h
+    je near ptr L_14A0DC
+func_0014A030:
+    cmp byte ptr [eax + 1], 079h
+    je near ptr L_14A0DC
+func_0014A03A:
+    cmp byte ptr [eax + 1], 07Ah
+    je near ptr L_14A0DC
+func_0014A044:
+    cmp byte ptr [eax + 1], 07Bh
+    je near ptr L_14A0DC
+func_0014A04E:
+    cmp byte ptr [eax + 1], 07Dh
+    je near ptr L_14A0DC
+func_0014A058:
+    cmp byte ptr [eax + 1], 07Eh
+    je short L_14A0DC
+func_0014A05E:
+    nop
+    nop
+    nop
+    nop
+    cmp byte ptr [eax + 1], 07Fh
+    je short L_14A0DC
+func_0014A068:
+    nop
+    nop
+    nop
+    nop
+    cmp byte ptr [eax + 1], 0B0h
+    je short L_14A0D2
+func_0014A072:
+    nop
+    nop
+    nop
+    nop
+    cmp byte ptr [eax + 1], 0B1h
+    je short L_14A0D2
+func_0014A07C:
+    nop
+    nop
+    nop
+    nop
+    cmp byte ptr [eax + 1], 0B2h
+    je short L_14A0D2
+func_0014A086:
+    cmp byte ptr [eax + 1], 0B3h
+    je short L_14A0D2
+func_0014A08C:
+    cmp byte ptr [eax + 1], 0B5h
+    je short L_14A0D2
+func_0014A092:
+    cmp byte ptr [eax + 1], 0B6h
+    je short L_14A0D2
+func_0014A098:
+    cmp byte ptr [eax + 1], 0B7h
+    je short L_14A0D2
+func_0014A09E:
+    cmp byte ptr [eax + 1], 0B8h
+    je short L_14A0D2
+func_0014A0A4:
+    cmp byte ptr [eax + 1], 0B9h
+    je short L_14A0D2
+func_0014A0AA:
+    cmp byte ptr [eax + 1], 0BAh
+    je short L_14A0D2
+func_0014A0B0:
+    cmp byte ptr [eax + 1], 0BBh
+    je short L_14A0D2
+func_0014A0B6:
+    cmp byte ptr [eax + 1], 0BDh
+    je short L_14A0D2
+func_0014A0BC:
+    cmp byte ptr [eax + 1], 0BEh
+    je short L_14A0D2
+func_0014A0C2:
+    cmp byte ptr [eax + 1], 0BFh
+func_0014A0C6:
+    je short L_14A0D2
+func_0014A0C8:
+    add dword ptr [esp + 0Ch], 2
+    xor eax, eax
+func_0014A0CF:
+    xor edx, edx
+    retf
+L_14A0D2:
+    add dword ptr [esp + 0Ch], 6
+    xor eax, eax
+    xor edx, edx
+    retf
+L_14A0DC:
+    add dword ptr [esp + 0Ch], 3
+    xor eax, eax
+    xor edx, edx
+L_14A0E5:
+    retf
     db 26 dup (0)
 XN_149E00 ends
 end

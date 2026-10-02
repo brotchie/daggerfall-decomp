@@ -64,11 +64,11 @@ extrn D_0015FA7F:byte
 extrn D_0015FA81:byte
 extrn D_0015FA8A:byte
 extrn D_0015FA95:byte
-extrn D_00160AE0:byte
 extrn D_00160B60:byte
 extrn D_00160BE0:byte
 extrn D_00160C60:byte
 extrn func_00144BFC:near
+extrn func_00160AE0:near
 XN_15FC00 segment byte public use32 'CODE'
     assume cs:XN_15FC00, ds:XN_15FC00, es:XN_15FC00, ss:XN_15FC00
 func_0015FC00:
@@ -412,7 +412,7 @@ D_00160028:
 D_00160038:
     db 8 dup (0)
 D_00160040:
-    dd D_00160AE0
+    dd func_00160AE0
     dd D_00160B60
     dd D_00160BE0
 D_0016004C:
