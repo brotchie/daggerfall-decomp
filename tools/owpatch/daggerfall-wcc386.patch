@@ -948,7 +948,7 @@ index 90c1857729..129dd201e5 100644
              } else {
                  next = GiveRegister( conf, false );
 diff --git a/bld/cg/c/split.c b/bld/cg/c/split.c
-index af92de3399..272c0437fd 100644
+index af92de3399..8bfe938f9a 100644
 --- a/bld/cg/c/split.c
 +++ b/bld/cg/c/split.c
 @@ -31,6 +31,7 @@
@@ -979,10 +979,10 @@ index af92de3399..272c0437fd 100644
              new_ins = NULL;
          } else {
              new_ins = MoveConst( 0, HighPart( res, type_class ), type_class );
-+            /* Daggerfall: Watcom 10 cleared the high half after the load
-+             * (`mov al,[x]; xor ah,ah`). DAGGER_CLRFIRST=1 restores Open Watcom. */
++            /* Daggerfall: Watcom 10 clears the high half first, like OW (`xor dh,dh;
++             * mov dl,[x]`); the batch prefers it. DAGGER_CLRAFTER=1 clears after the load. */
 +            dagger_after = _IsModel( CGSW_GEN_NO_OPTIMIZATION )
-+                        && getenv( "DAGGER_CLRFIRST" ) == NULL;
++                        && getenv( "DAGGER_CLRAFTER" ) != NULL;
          }
      } else if( op->n.class == N_REGISTER
        && HW_Ovlap( op->r.reg, res->r.reg ) ) {

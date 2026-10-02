@@ -320,8 +320,7 @@ void func_00027515(void)
 {
     int l_18;
 
-    *(int *)D_00196DA0 = 0;
-    *(int *)D_00195AF4 = *(int *)D_00196DA0;
+    *(int *)D_00195AF4 = (*(int *)D_00196DA0 = 0);
     if (*(int *)D_00195AA0 == 0) return;
     func_0008E3F7(*(int *)((char *)*(int *)D_00195AA0 + 63), (int)func_000275F7);
     if (*(int *)D_00195AF4 != 0) goto L275D6;

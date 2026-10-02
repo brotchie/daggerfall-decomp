@@ -37,6 +37,7 @@ extern char D_00195F3E[];
 extern char D_00195F40[];
 extern char D_00195F42[];
 extern char D_00195FF8[];
+extern char D_00196036[];
 extern char D_00196272[];
 extern char D_00196274[];
 extern char D_00196279[];
@@ -48,7 +49,6 @@ extern char D_0019962E[];
 extern char D_0019962F[];
 extern char D_00199630[];
 
-extern int func_00038067(void);
 extern int func_00039224(short);
 extern int func_00069938(int, int, int);
 extern int func_0006CB53(int, int);
@@ -61,6 +61,7 @@ extern int func_0008E6C5(int, int, int);
 extern int func_0008E7E0(int, int);
 extern int func_0008EB88(int);
 extern int func_000A0024();
+extern int func_000A0040();
 extern int func_000A0AD9();
 extern int func_000A0DF4();
 extern int func_000A0ED9(int, int);
@@ -85,10 +86,12 @@ extern void func_0008C566(int, int);
 extern void func_0008CF0E(int);
 extern void func_0008D497(int, int);
 int func_00037D5A(void);
+int func_00038067(void);
 int func_00039C09(void);
 int func_00039D24(int);
 void func_00037DBB(unsigned char);
 void func_00039F94(void);
+void func_00039FD6(void);
 void func_0003A036(void);
 #pragma aux func_000A0ED9 parm routine [];
 
@@ -295,6 +298,28 @@ L37FD1:;
     func_00069938(206, *(int *)D_00195AA4, 110);
     func_00038067();
     func_0003F09F(1705, 1);
+    return 0;
+}
+
+int func_00038067(void)
+{
+    if (((int)(unsigned char)(*(signed char *)D_0012AC00 & 2)) == 0) goto L380C1;
+    if ((*(unsigned char *)D_00195AE8 & 1) == 0) goto L3809F;
+    func_00039FD6();
+    return 0;
+L3809F:;
+    *(signed char *)D_001940D5 |= 1;
+    func_0003F09F(1813, 1);
+    return 0;
+L380C1:;
+    *(int *)D_00178A0A = (int)D_00196036;
+    func_000A0040(*(int *)D_00178A0A, 1, 89, (int)D_00170B13, 1009, 4);
+    func_000A0040(*(int *)D_00178A0A + 47, 0, 24, (int)D_00170B13, 1010, 25);
+    *(signed char *)((char *)*(int *)D_00178A0A + 7) = 0;
+    *(signed char *)((char *)*(int *)D_00178A0A + 6) = 4;
+    func_000A0040(*(int *)D_00178A0A, 255, 6, (int)D_00170B13, 1015, 6);
+    *(short *)((char *)*(int *)D_00178A0A + 8) = (*(short *)((char *)*(int *)D_00178A0A + 10) = (*(short *)((char *)*(int *)D_00178A0A + 12) = 0));
+    *(short *)D_0019962C = 65535;
     return 0;
 }
 

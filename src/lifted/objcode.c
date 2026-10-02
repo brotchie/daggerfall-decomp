@@ -168,8 +168,7 @@ int func_0009A139(int a1, int a2)
     if (*(int *)D_00195B84 != 0) goto L9A1A4;
     return 0;
 L9A1A4:;
-    *(int *)D_00195B84 = func_0009DC25() % *(int *)D_00195B84;
-    l_18 = *(int *)D_00195B84;
+    l_18 = (*(int *)D_00195B84 = func_0009DC25() % *(int *)D_00195B84);
     *(int *)D_001AA644 = -1;
     func_0008E4A8(a1, (int)func_00099D75);
     *(short *)D_00195F81 = l_18;

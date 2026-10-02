@@ -63,8 +63,7 @@ int func_0006CB53(int a1, int a2)
     func_000A0F5C((int)D_001A41F4, (int)D_00175D07, a1);
     func_00050069((int)D_001A41F4);
 L6CBAC:;
-    *(int *)D_000C0BA8 = func_000A1235(l_20);
-    l_1C = *(int *)D_000C0BA8;
+    l_1C = (*(int *)D_000C0BA8 = func_000A1235(l_20));
     if (l_24 != 0) goto L6CBDC;
     l_24 = func_000A00AF(l_1C, (int)D_00175D00, 52);
 L6CBDC:;
@@ -317,10 +316,8 @@ void func_0006D4DD(void)
 
     l_18 = func_000A00AF(102400, (int)D_00175D00, 303);
     *(int *)D_001A4A08 = 0;
-    *(int *)D_001A49FC = l_18;
-    *(int *)D_001A49F8 = *(int *)D_001A49FC;
-    *(int *)D_001A49F4 = l_18 + 1024;
-    *(int *)D_001A4A00 = *(int *)D_001A49F4;
+    *(int *)D_001A49F8 = (*(int *)D_001A49FC = l_18);
+    *(int *)D_001A4A00 = (*(int *)D_001A49F4 = l_18 + 1024);
     func_0006D6A4((int)D_001917E4);
     func_0006D430((int)D_00175D82);
     l_1C = func_000A00AF((*(int *)D_001A49FC - *(int *)D_001A49F8) + 1, (int)D_00175D00, 311);

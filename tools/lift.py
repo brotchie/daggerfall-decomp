@@ -464,6 +464,14 @@ class Func:
             t = self.mem(op, ins, op.size)
             if t == "@RET":
                 raise Unsupported("read of the return slot")
+            ch = getattr(self, "chain", None)
+            if ch is not None and ch[0] == t and ch[2] == len(self.out) - 1 and \
+                    ch[3] + 1 == getattr(self, "k", -1) and self.pending is None and \
+                    self.out[-1] == "    %s = %s;" % (ch[0], ch[1].text):
+                # re-reading what the previous statement stored: x = (lhs = v)
+                self.out.pop()
+                self.chain = None
+                return E("(%s = %s)" % (t, ch[1].text), op.size, atom=True)
             return E(t, op.size, atom=True)
         raise Unsupported("operand type")
 
@@ -609,7 +617,10 @@ class Func:
                 full, sz = subreg(ins.reg_name(d.reg))
                 v = self.src(s, ins)
                 cur = self.regs.get(full)
-                if sz < 4 and cur is not None and cur.text == "0":
+                if sz == 1 and cur is not None and cur.tag == ("hiclr",):
+                    # xor dh,dh; mov dl,[x]: a byte zero-extended to 16 bits
+                    self.set_reg(full, E("(unsigned short)(unsigned char)" + v.p(), 2))
+                elif sz < 4 and cur is not None and cur.text == "0":
                     self.set_reg(full, E("(int)(%s)%s" % (UTYPE[sz], v.p()), 4))
                 elif sz < 4:
                     self.set_reg(full, E(v.text, sz, v.atom))
@@ -625,10 +636,22 @@ class Func:
                 return
             self.emit("%s = %s;" % (lhs, v.text))
             # -od: nothing survives into the next statement, except the value just stored,
-            # which an enclosing assignment may reuse (a = b = x)
+            # which an enclosing assignment may reuse (a = b = x), and the registers of the
+            # address, through which an enclosing assignment re-reads it (x = (p->f = 0))
             src = subreg(ins.reg_name(s.reg))[0] if s.type == cx.X86_OP_REG else None
-            self.regs = {src: v} if src else {}
-            self.stale = {src} if src else set()
+            keep = {}
+            for r in (d.mem.base, d.mem.index):
+                if r and ins.reg_name(r) != "ebp":
+                    full_r = subreg(ins.reg_name(r))[0]
+                    if full_r in self.regs:
+                        keep[full_r] = self.regs[full_r]
+            if src:
+                keep[src] = v
+            self.regs = keep
+            self.stale = set(keep)
+            # (a local's reload is the dead load of a statement like x++, not a chain)
+            self.chain = None if ebp_slot(ins, d) is not None else \
+                (lhs, v, len(self.out) - 1, getattr(self, "k", -1))
             return
         if m in ("movsx", "movzx"):
             d, s = ops
@@ -647,6 +670,10 @@ class Func:
             return
         if m == "xor" and ins.op_str in ("ah, ah", "dh, dh", "bh, bh", "ch, ch"):
             full = {"a": "eax", "d": "edx", "b": "ebx", "c": "ecx"}[ins.op_str[0]]
+            if full not in self.regs:
+                # the high byte cleared before the low byte is loaded
+                self.set_reg(full, E("0", 4, atom=True, tag=("hiclr",)))
+                return
             v = self.reg(full, ins)
             # byte zero-extended to 16 bits: mov al,[x]; xor ah,ah
             self.set_reg(full, E("(unsigned short)(unsigned char)" + v.p(), 2))
@@ -746,7 +773,11 @@ class Func:
                     pa, pb = (b, a) if self.loaded_ptr(b) and not self.loaded_ptr(a) else (a, b)
                     ptxt = ("*(char **)" + pa.text[len("*(int *)"):]) if self.loaded_ptr(pa) \
                         else "(char *)" + pa.p()
-                    v = E("(int)(%s + %s)" % (ptxt, pb.p()), 4, atom=True)
+                    self.choices.append(ins.address)
+                    if ins.address in self.flips:     # the offset written first
+                        v = E("(int)(%s + %s)" % (pb.p(), ptxt), 4, atom=True)
+                    else:
+                        v = E("(int)(%s + %s)" % (ptxt, pb.p()), 4, atom=True)
                     self.set_reg(full, v)
                     self.flags = ("val", v, None)
                     return
@@ -872,7 +903,7 @@ class Func:
                 self.calls.add(name)
             else:
                 nreg, nstack = 0, 0
-                for r in PARM_REGS:
+                for r in PARM_REGS[:max_reg_args(op.imm)]:
                     if r in loaded:
                         nreg += 1
                     else:
@@ -1509,6 +1540,31 @@ class Func:
 
 SIGS = {}
 POPS = {}
+
+
+SAVES = {}
+
+
+def max_reg_args(va):
+    """At most how many register arguments a callee takes: Watcom callees save every
+    register they use that isn't a parameter, so a pushed edx means at most one."""
+    if va not in SAVES:
+        n = 4
+        if va in IMG.funcs and IMG.le.obj_of_va(va).index == 1:   # Watcom code, not asm
+            pushed = set()
+            for i in IMG.insns(va)[:8]:
+                if i.mnemonic == "push" and i.operands[0].type == cx.X86_OP_REG:
+                    pushed.add(i.reg_name(i.operands[0].reg))
+                elif i.mnemonic == "mov" and i.op_str == "ebp, esp":
+                    continue
+                else:
+                    break
+            for k, r in enumerate(PARM_REGS[1:]):
+                if r in pushed:
+                    n = k + 1
+                    break
+        SAVES[va] = n
+    return SAVES[va]
 
 
 def callee_pops(va):

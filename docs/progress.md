@@ -805,3 +805,20 @@ and the `repne scasb`/`scasw` scan switches are still unsupported.
   least three cases: a local assigned once and compared once looks the same.
 
 Batch **1,451**; build **1,454 functions, 37.97%**.
+
+## 2026-10-02: register lifetimes across statements and calls
+
+- **Clear-high order**: Watcom 10 zero-extends a byte into a 16-bit register by clearing
+  the high byte first (`xor dh,dh; mov dl,[x]`), as OW does; the earlier "clear after"
+  patch is now opt-in (`DAGGER_CLRAFTER=1`). The lifter accepts the `xor dh,dh` before the
+  load. +3.
+- **Callee arity from saved registers**: a Watcom-compiled callee pushes every register it
+  uses that isn't a parameter, so a runtime function that saves `edx` takes at most one
+  register argument. Values kept in `edx`/`ebx` across such a call are no longer taken for
+  arguments. +19.
+- **Chained assignments**: `x = (p->f = 0)` stores and immediately re-reads the field
+  through the same base register. The lifter keeps the address registers alive after a
+  store and folds an immediate re-read of a non-stack lvalue into `(lhs = v)`. Pointer
+  additions are now choice points too. +25.
+
+Batch **1,479**.

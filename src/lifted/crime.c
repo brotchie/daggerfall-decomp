@@ -66,8 +66,7 @@ void func_00021603(void)
     *(short *)(D_0018F08E + (((int)(unsigned char)*(signed char *)D_00196268) * 80)) += *(short *)D_00196B08 - 1;
     l_18 = func_000191DA((int)(short)((int)(unsigned char)*(signed char *)D_00196268), 15);
     func_0001B470(l_18, (-(*(int *)D_00196B08 - 1)) / 2);
-    *(int *)D_001A4A74 = 0;
-    *(int *)D_001A4A70 = *(int *)D_001A4A74;
+    *(int *)D_001A4A70 = (*(int *)D_001A4A74 = 0);
     *(signed char *)D_001962B2 = 1;
 }
 

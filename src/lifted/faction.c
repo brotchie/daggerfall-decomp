@@ -638,8 +638,7 @@ L1CF1B:;
 void func_0001D113(void)
 {
     *(int *)D_00196708 = 0;
-    *(int *)D_00196704 = func_0006CDAB((int)D_001704BB);
-    if (*(int *)D_00196704 >= 0) goto L1D152;
+    if ((*(int *)D_00196704 = func_0006CDAB((int)D_001704BB)) >= 0) goto L1D152;
     *(int *)D_00196704 = func_0006CE0D((int)D_001704BB);
 L1D152:;
     if (*(int *)D_00196704 < 0) return;

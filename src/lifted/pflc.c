@@ -4,8 +4,13 @@
 extern char D_00143550[];
 extern char D_00175404[];
 
+extern int func_0006CD6E(int);
 extern int func_0009DEA7();
 extern int func_000A0024();
+extern int func_000A0040();
+extern int func_000A006E();
+extern int func_000A00AF();
+extern int func_000A00CB();
 extern int func_000A0DF4();
 extern int func_000A1023();
 extern int func_000CD33A();
@@ -28,6 +33,50 @@ L51D6D:;
 L51D97:;
     if (((int)(unsigned char)*(signed char *)((char *)a1 + 43)) <= 1) return;
     func_000A1023(655360, *(int *)D_00143550, 64000, (int)D_00175404, 118, 4);
+}
+
+int func_0005209D(int a1, int a2)
+{
+{
+    char l_A8[128];
+    char l_28[12];
+
+    *(short *)((char *)a2 + 2) = func_0006CD6E(a1);
+    if (((int)(unsigned short)*(short *)((char *)a2 + 2)) >= 1) goto L520DE;
+    return 0;
+L520DE:;
+    func_000A00CB((int)(unsigned short)*(short *)((char *)a2 + 2), (int)l_A8, 128);
+    *(short *)((char *)a2 + 4) = *(int *)((char *)l_A8 + 6);
+    *(short *)((char *)a2 + 8) = (int)&*(signed char *)((char *)(((unsigned)*(int *)((char *)l_A8 + 16)) / 55) + 1);
+    *(short *)((char *)a2 + 18) = *(int *)((char *)l_A8 + 8);
+    *(short *)((char *)a2 + 20) = *(int *)((char *)l_A8 + 10);
+    *(short *)((char *)a2 + 14) = 0;
+    *(short *)((char *)a2 + 16) = *(short *)((char *)a2 + 14);
+    *(int *)((char *)a2 + 10) = *(int *)((char *)l_A8 + 84);
+    if (*(int *)((char *)a2 + 22) != 0) goto L52191;
+    *(signed char *)((char *)a2) |= 1;
+    *(int *)((char *)a2 + 22) = func_000A00AF(((int)(short)*(short *)((char *)a2 + 18)) * ((int)(short)*(short *)((char *)a2 + 20)), (int)D_00175404, 225);
+L52191:;
+    if (*(int *)((char *)a2 + 26) != 0) goto L521BC;
+    *(signed char *)((char *)a2) |= 2;
+    *(int *)((char *)a2 + 26) = func_000A00AF(2050, (int)D_00175404, 231);
+L521BC:;
+    func_000A0040(*(int *)((char *)a2 + 26), 0, 2050, (int)D_00175404, 233, 4);
+    func_000A00CB((int)(unsigned short)*(short *)((char *)a2 + 2), (int)l_28, 10);
+    if (((int)(unsigned short)*(short *)((char *)l_28 + 4)) != 61696) goto L5224E;
+    func_000A00CB((int)(unsigned short)*(short *)((char *)a2 + 2), (int)l_28, 8);
+    if (((int)(short)*(short *)l_28) != 3) goto L5224E;
+    *(short *)((char *)a2 + 14) = ((int)(short)*(short *)((char *)l_28 + 4)) - (((int)(short)*(short *)((char *)a2 + 18)) >> 1);
+    *(short *)((char *)a2 + 16) = ((int)(short)*(short *)((char *)l_28 + 6)) - (((int)(short)*(short *)((char *)a2 + 20)) >> 1);
+L5224E:;
+    func_000A006E((int)(unsigned short)*(short *)((char *)a2 + 2), *(int *)((char *)l_A8 + 80), 0);
+    *(short *)((char *)a2 + 6) = 1;
+    if (*(int *)((char *)a2 + 30) != 0) goto L522A4;
+    *(signed char *)((char *)a2) |= 64;
+    *(int *)((char *)a2 + 30) = func_000A00AF(((int)(short)*(short *)((char *)a2 + 18)) * ((int)(short)*(short *)((char *)a2 + 20)), (int)D_00175404, 255);
+L522A4:;
+    return 1;
+}
 }
 
 void func_000522B7(int a1)

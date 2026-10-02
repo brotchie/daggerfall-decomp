@@ -436,8 +436,7 @@ void func_00070624(int a1, unsigned char a2)
     l_1C = func_0008DCE3(*(int *)D_00195AA0, 0, 13);
     *(signed char *)((char *)l_1C) = 10;
     *(short *)((char *)l_1C + 21) = 3;
-    *(int *)D_001A4A14 = l_1C + 71;
-    *(short *)((char *)*(int *)D_001A4A14 + 3) = a1;
+    *(short *)((char *)(*(int *)D_001A4A14 = l_1C + 71) + 3) = a1;
     *(signed char *)((char *)*(int *)D_001A4A14 + 2) = a2;
     *(int *)((char *)*(int *)D_001A4A14 + 5) = *(int *)D_00195BF4;
     *(signed char *)((char *)*(int *)D_001A4A14) = 0;
@@ -448,10 +447,8 @@ int func_0007069D(int a1)
 {
     int l_1C;
 
-    *(int *)D_00195D2C = a1;
-    *(int *)D_00195D2C = func_00097BD9(*(int *)D_00195D2C);
-    *(int *)D_00195D30 = func_0009784E(*(int *)D_00195D2C, 0);
-    *(int *)D_00195D30 = (*(int *)D_00195D30 * *(int *)D_001788DF) / 256;
+    *(int *)D_00195D2C = func_00097BD9((*(int *)D_00195D2C = a1));
+    *(int *)D_00195D30 = ((*(int *)D_00195D30 = func_0009784E(*(int *)D_00195D2C, 0)) * *(int *)D_001788DF) / 256;
     func_00097A85();
     l_1C = func_00097B2A();
     return l_1C;

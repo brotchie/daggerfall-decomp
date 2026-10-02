@@ -59,8 +59,7 @@ L36B39:;
     l_1C = (int)(*(char **)D_001995E8 + l_18);
     switch ((unsigned char)(*(signed char *)((char *)l_1C + 20) & 63)) {
 case 1:
-    *(int *)D_0019960C = (int)(*(char **)D_001995E8 + *(int *)((char *)l_1C + 21));
-    if (*(int *)((char *)*(int *)D_0019960C + 19) >= 0) goto L36BBB;
+    if (*(int *)((char *)(*(int *)D_0019960C = (int)(*(char **)D_001995E8 + *(int *)((char *)l_1C + 21))) + 19) >= 0) goto L36BBB;
     func_000361B7(*(int *)D_0019960C);
 L36BBB:;
     *(int *)D_00199600 = (int)(*(char **)D_001995E8 + *(int *)((char *)*(int *)D_0019960C + 19));
@@ -68,13 +67,11 @@ L36BBB:;
     l_18 = *(int *)((char *)*(int *)D_00199600 + 5);
     goto L36C60;
 case 2:
-    *(int *)D_001995F4 = (int)(*(char **)D_001995E8 + *(int *)((char *)l_1C + 21));
-    func_00036DC9(0, 0, 0, (int)(unsigned char)*(signed char *)((char *)*(int *)D_001995F4 + 3));
+    func_00036DC9(0, 0, 0, (int)(unsigned char)*(signed char *)((char *)(*(int *)D_001995F4 = (int)(*(char **)D_001995E8 + *(int *)((char *)l_1C + 21))) + 3));
     l_18 = *(int *)((char *)*(int *)D_001995F4 + 4);
     goto L36C60;
 case 3:
-    *(int *)D_001995F0 = (int)(*(char **)D_001995E8 + *(int *)((char *)l_1C + 21));
-    func_00036DC9(0, 0, *(int *)D_001995F0, (int)(unsigned char)*(signed char *)((char *)*(int *)D_001995F0 + 10));
+    func_00036DC9(0, 0, *(int *)D_001995F0, (int)(unsigned char)*(signed char *)((char *)(*(int *)D_001995F0 = (int)(*(char **)D_001995E8 + *(int *)((char *)l_1C + 21))) + 10));
     l_18 = *(int *)((char *)*(int *)D_001995F0 + 6);
 default:
 L36C60:;
@@ -84,8 +81,7 @@ L36C60:;
 
 void func_00036C6F(int a1, int a2, int a3, unsigned char a4)
 {
-    *(int *)D_001995E4 = ((int)D_00199D78) + ((*(int *)D_001A3A78)++ * 39);
-    *(int *)D_001995EC = *(int *)D_001995E4;
+    *(int *)D_001995EC = (*(int *)D_001995E4 = ((int)D_00199D78) + ((*(int *)D_001A3A78)++ * 39));
     func_000A0040(*(int *)D_001995EC, 0, 39, (int)D_00170AB4, 447, 4);
     *(short *)((char *)*(int *)D_001995EC) = *(short *)D_00199618;
     if (a2 == 0) goto L36D3C;

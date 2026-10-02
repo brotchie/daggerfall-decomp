@@ -208,8 +208,7 @@ void func_00053E62(void)
 void func_00053E83(short a1)
 {
     *(short *)D_00190D70 = *(int *)&a1;
-    *(short *)D_00190D6A = *(short *)(D_001854F6 + ((((int)(short)a1) + 18) * 12)) + 1;
-    *(short *)D_00185646 = *(short *)D_00190D6A;
+    *(short *)D_00185646 = (*(short *)D_00190D6A = *(short *)(D_001854F6 + ((((int)(short)a1) + 18) * 12)) + 1);
     *(short *)D_0018564A = *(short *)D_00190D6A + 6;
     *(short *)D_00185652 = *(short *)D_00190D6A + 13;
     *(short *)D_00185656 = *(short *)D_00190D6A + 19;
@@ -555,8 +554,7 @@ L55736:;
 
 int func_00055748(void)
 {
-    *(int *)D_0019981C = *(int *)D_00195C44 + 55000;
-    *(signed char *)((char *)*(int *)D_0019981C) = 0;
+    *(signed char *)((char *)(*(int *)D_0019981C = *(int *)D_00195C44 + 55000)) = 0;
     func_000557A7();
     func_00055A5B();
     *(signed char *)((char *)(int)(*(char **)D_0019981C + func_000A0DF4(*(int *)D_0019981C)) + 1) = 0;

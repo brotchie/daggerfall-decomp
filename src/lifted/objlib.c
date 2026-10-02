@@ -2,6 +2,7 @@
  * do not edit: move a function to src/objlib.c to work on it by hand) */
 
 extern char D_00176C20[];
+extern char D_00176C6B[];
 extern char D_00176C80[];
 extern char D_00187DE8[];
 extern char D_00187EC8[];
@@ -12,6 +13,8 @@ extern char D_00195AC4[];
 extern char D_00195CB4[];
 extern char D_00196280[];
 extern char D_001A5C2C[];
+extern char D_001A5C30[];
+extern char D_001A5C34[];
 extern char D_001A5C38[];
 extern char D_001A5C3C[];
 extern char D_001A5C40[];
@@ -32,18 +35,25 @@ extern int func_00013131(int, int);
 extern int func_00013260(int, int, int);
 extern int func_0006A0D4(int);
 extern int func_0007D6AE(int, int);
-extern int func_00085407(int);
+extern int func_000852A6(int, int);
 extern int func_00086093(int);
 extern int func_000994F0(int, int);
 extern int func_0009957D(int, int);
+extern int func_0009DC25();
+extern int func_0009DC49();
 extern int func_000A0024();
 extern int func_000A0040();
 extern int func_000A00AF();
+extern int func_0013FE15();
+extern void func_00014518(int);
 extern void func_00050069(int);
 extern void func_00069E9E(int, int);
 extern void func_00069F39(int);
 extern void func_0008E3F7(int, int);
 int func_00085163(int);
+int func_00085407(int);
+void func_00085612(int);
+void func_00085666(int);
 void func_00085714(int, int, int);
 void func_0008579F(int, int);
 void func_00085BB2(void);
@@ -54,8 +64,7 @@ void func_000850EF(int a1)
 {
     func_00069E9E((int)D_001A944C, a1);
     *(int *)D_001A942C = a1;
-    *(int *)D_001A9430 = (int)D_001A5C2C;
-    *(int *)((char *)*(int *)D_001A9430 + 12) = 50000;
+    *(int *)((char *)(*(int *)D_001A9430 = (int)D_001A5C2C) + 12) = 50000;
     *(int *)((char *)*(int *)D_001A9430 + 8) = 0;
 }
 
@@ -120,6 +129,103 @@ L8527B:;
     a2 = 47;
 L85282:;
     return func_00085163((a2 + (a1 * 100)) + (a3 << 17));
+}
+
+int func_00085407(int a1)
+{
+    int l_20;
+    int l_1C;
+{
+    int l_30;
+    int l_2C;
+    int l_28;
+
+    l_20 = 0;
+L8541F:;
+    if (*(int *)(D_001A5C38 + (l_20 * 20)) != 0) goto L85439;
+    if (*(int *)(D_001A5C2C + (l_20 * 20)) == 0) goto L8543B;
+L85439:;
+    goto L85448;
+L8543B:;
+    if (*(int *)(D_001A5C30 + (l_20 * 20)) == 0) goto L85451;
+L85448:;
+    l_28 = 1;
+    goto L85458;
+L85451:;
+    l_28 = 0;
+L85458:;
+    if (l_28 == 0) goto L85467;
+    if (l_20 < 512) goto L85469;
+L85467:;
+    goto L85471;
+L85469:;
+    l_20++;
+    goto L8541F;
+L85471:;
+    if (l_20 != 512) goto L85564;
+    func_00085612(*(int *)D_001A9430);
+    l_20 = 0;
+L8548F:;
+    if (*(int *)(D_001A5C38 + (l_20 * 20)) != 0) goto L854A9;
+    if (*(int *)(D_001A5C2C + (l_20 * 20)) == 0) goto L854AB;
+L854A9:;
+    goto L854B8;
+L854AB:;
+    if (*(int *)(D_001A5C30 + (l_20 * 20)) == 0) goto L854C1;
+L854B8:;
+    l_2C = 1;
+    goto L854C8;
+L854C1:;
+    l_2C = 0;
+L854C8:;
+    if (l_2C == 0) goto L854D7;
+    if (l_20 < 512) goto L854D9;
+L854D7:;
+    goto L854E1;
+L854D9:;
+    l_20++;
+    goto L8548F;
+L854E1:;
+    if (l_20 != 512) goto L85564;
+    func_00085666(*(int *)D_001A9430);
+    l_20 = 0;
+L854FF:;
+    if (*(int *)(D_001A5C38 + (l_20 * 20)) != 0) goto L85519;
+    if (*(int *)(D_001A5C2C + (l_20 * 20)) == 0) goto L8551B;
+L85519:;
+    goto L85528;
+L8551B:;
+    if (*(int *)(D_001A5C30 + (l_20 * 20)) == 0) goto L85531;
+L85528:;
+    l_30 = 1;
+    goto L85538;
+L85531:;
+    l_30 = 0;
+L85538:;
+    if (l_30 == 0) goto L85547;
+    if (l_20 < 512) goto L85549;
+L85547:;
+    goto L85551;
+L85549:;
+    l_20++;
+    goto L854FF;
+L85551:;
+    if (l_20 != 512) goto L85564;
+    func_00050069((int)D_00176C6B);
+L85564:;
+    *(int *)(D_001A5C38 + (l_20 * 20)) = a1;
+    *(int *)(D_001A5C34 + (l_20 * 20)) = *(int *)D_001959AC;
+    *(int *)(D_001A5C2C + (l_20 * 20)) = (*(int *)(D_001A5C30 + (l_20 * 20)) = 0);
+    if (func_000852A6(l_20, a1) != 0) goto L855B7;
+    return 0;
+L855B7:;
+    func_0013FE15(*(int *)(D_001A5C3C + (l_20 * 20)));
+    l_1C = func_0009DC25();
+    func_0009DC49(*(int *)((char *)*(int *)(D_001A5C3C + (l_20 * 20)) + 12));
+    func_00014518(*(int *)(D_001A5C3C + (l_20 * 20)));
+    func_0009DC49(l_1C);
+    return ((int)D_001A5C2C) + (l_20 * 20);
+}
 }
 
 void func_00085612(int a1)

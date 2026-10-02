@@ -15,6 +15,7 @@ extern char D_00171192[];
 extern char D_0017119C[];
 extern char D_00178630[];
 extern char D_001789FA[];
+extern char D_00178A0A[];
 extern char D_0017C54E[];
 extern char D_0017C552[];
 extern char D_0017C912[];
@@ -102,6 +103,7 @@ extern char D_00195AC0[];
 extern char D_00195AC4[];
 extern char D_00195ACC[];
 extern char D_00195AD4[];
+extern char D_00195AF0[];
 extern char D_00195B30[];
 extern char D_00195B54[];
 extern char D_00195BDC[];
@@ -114,6 +116,7 @@ extern char D_00195D30[];
 extern char D_00195D50[];
 extern char D_00195D94[];
 extern char D_00195DB0[];
+extern char D_00195F30[];
 extern char D_00196266[];
 extern char D_00196267[];
 extern char D_00196268[];
@@ -207,6 +210,26 @@ L467AD:;
     return (int)D_00190FE4;
 }
 
+int func_000467D0(void)
+{
+    return func_000A0DD9((int)(signed char)*(signed char *)((char *)(int)(*(char **)D_00178A0A + (((int)(short)*(short *)D_00195F30) * 3)) + 24), (int)D_00190FE4, 10);
+}
+
+int func_00046813(void)
+{
+    return func_000A0DD9((int)(signed char)*(signed char *)((char *)(int)(*(char **)D_00178A0A + (((int)(short)*(short *)D_00195F30) * 3)) + 15), (int)D_00190FE4, 10);
+}
+
+int func_00046856(void)
+{
+    return func_000A0DD9((int)(signed char)*(signed char *)((char *)(int)(*(char **)D_00178A0A + (((int)(short)*(short *)D_00195F30) * 5)) + 34), (int)D_00190FE4, 10);
+}
+
+int func_00046899(void)
+{
+    return func_000A0DD9((int)(signed char)*(signed char *)((char *)(int)(*(char **)D_00178A0A + (((int)(short)*(short *)D_00195F30) * 5)) + 35), (int)D_00190FE4, 10);
+}
+
 int func_000469B4(void)
 {
     return *(int *)D_00196728 + 3;
@@ -225,6 +248,26 @@ int func_00046A00(void)
     return func_0004A231(((int)(unsigned short)*(short *)((char *)*(int *)D_00195A80 + 34)) - 6, (int)D_00190FE4, 10);
 L46A46:;
     return func_0004A231(func_0004CF37(*(int *)D_00195A80) / 10, (int)D_00190FE4, 10);
+}
+
+int func_00046B0D(void)
+{
+    return func_000A0DD9((int)(signed char)*(signed char *)((char *)(int)(*(char **)D_00178A0A + (((int)(short)*(short *)D_00195F30) * 3)) + 23), (int)D_00190FE4, 10);
+}
+
+int func_00046B50(void)
+{
+    return func_000A0DD9((int)(signed char)*(signed char *)((char *)(int)(*(char **)D_00178A0A + (((int)(short)*(short *)D_00195F30) * 3)) + 14), (int)D_00190FE4, 10);
+}
+
+int func_00046B93(void)
+{
+    return func_000A0DD9((int)(signed char)*(signed char *)((char *)(int)(*(char **)D_00178A0A + (((int)(short)*(short *)D_00195F30) * 5)) + 32), (int)D_00190FE4, 10);
+}
+
+int func_00046BD6(void)
+{
+    return func_000A0DD9((int)(signed char)*(signed char *)((char *)(int)(*(char **)D_00178A0A + (((int)(short)*(short *)D_00195F30) * 5)) + 33), (int)D_00190FE4, 10);
 }
 
 int func_00046C19(void)
@@ -256,6 +299,26 @@ int func_00046D22(void)
 int func_00046D45(void)
 {
     return *(int *)(D_00184644 + (((int)(unsigned char)*(signed char *)((char *)*(int *)D_00195BDC + 34)) << 2));
+}
+
+int func_00046D79(void)
+{
+    return func_000A0DD9((int)(signed char)*(signed char *)((char *)(int)(*(char **)D_00178A0A + (((int)(short)*(short *)D_00195F30) * 3)) + 25), (int)D_00190FE4, 10);
+}
+
+int func_00046DBC(void)
+{
+    return func_000A0DD9((int)(signed char)*(signed char *)((char *)(int)(*(char **)D_00178A0A + (((int)(short)*(short *)D_00195F30) * 3)) + 16), (int)D_00190FE4, 10);
+}
+
+int func_00046DFF(void)
+{
+    return func_000A0DD9((int)(signed char)*(signed char *)((char *)(int)(*(char **)D_00178A0A + (((int)(short)*(short *)D_00195F30) * 5)) + 36), (int)D_00190FE4, 10);
+}
+
+int func_00046E42(void)
+{
+    return func_000A0DD9(((unsigned)*(int *)((char *)*(int *)D_00195A80 + 36)) / 10, (int)D_00190FE4, 10);
 }
 
 int func_00046E82(void)
@@ -291,6 +354,11 @@ int func_00046F52(void)
 int func_00047006(void)
 {
     return func_0004A231((((int)(short)*(short *)((char *)*(int *)D_00195BE0 + 32)) / 10) - 5, (int)D_00190FE4, 10);
+}
+
+int func_0004704E(void)
+{
+    return func_000A0DD9(((unsigned)(*(int *)((char *)*(int *)D_00195AF0 + 2) - *(int *)D_00195BF4)) / 60, (int)D_00190FE4, 10);
 }
 
 int func_00047094(void)
@@ -370,6 +438,11 @@ int func_000472F6(void)
     func_000A0ED9(454, (int)D_0017110C);
     func_000A0F5C((int)D_00190FE4, (int)D_0017114E, *(int *)(D_0018426D + ((((int)(unsigned char)*(signed char *)((char *)*(int *)D_00195BE0 + 547)) >> 4) << 2)), *(int *)(D_001842A1 + (((int)(unsigned char)(*(signed char *)((char *)*(int *)D_00195BE0 + 547) & 15)) << 2)));
     return (int)D_00190FE4;
+}
+
+int func_00047373(void)
+{
+    return func_000A0DD9(((unsigned)((*(int *)((char *)*(int *)D_00195AA8 + 43) - *(int *)D_00195BF4) + 1439)) / 1440, (int)D_00190FE4, 10);
 }
 
 int func_000473BE(void)
@@ -771,6 +844,11 @@ L48336:;
     goto L48314;
 L4833E:;
     return *(int *)(D_0018509F + (l_1C << 2));
+}
+
+int func_0004835A(void)
+{
+    return func_000A0DD9(((int)(short)*(short *)((char *)*(int *)D_00195BE0 + 36)) / 10, (int)D_00190FE4, 10);
 }
 
 int func_0004839F(void)

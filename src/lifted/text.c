@@ -142,8 +142,7 @@ L3E99B:;
     func_0012B136();
     goto L3E99B;
 L3E9AB:;
-    *(signed char *)D_00196279 = 0;
-    *(signed char *)D_0012AC00 = *(signed char *)D_00196279;
+    *(signed char *)D_0012AC00 = (*(signed char *)D_00196279 = 0);
 L3E9BC:;
     if (((int)(unsigned char)*(signed char *)D_00196274) != 8) goto L3EA01;
     func_000A1023(*(int *)D_00143550, *(int *)D_00147954, 64000, (int)D_00170D55, 618, 4);
@@ -169,8 +168,7 @@ L3EA3A:;
     func_0007D0DA();
     *(signed char *)D_00196274 = 8;
     *(signed char *)D_00196272 = 1;
-    *(signed char *)D_00196279 = 0;
-    *(signed char *)D_0012AC00 = *(signed char *)D_00196279;
+    *(signed char *)D_0012AC00 = (*(signed char *)D_00196279 = 0);
 L3EA65:;
     if (((int)(unsigned char)*(signed char *)D_00196274) != 8) return;
     func_000A1023(*(int *)D_00143550, *(int *)D_00147954, 64000, (int)D_00170D55, 641, 4);
@@ -216,8 +214,7 @@ void func_0003F25E(void)
 {
     int l_18;
 
-    *(signed char *)D_00196279 = 1;
-    *(signed char *)D_0012AC00 = *(signed char *)D_00196279;
+    *(signed char *)D_0012AC00 = (*(signed char *)D_00196279 = 1);
 L3F27D:;
     if (((int)(unsigned char)*(signed char *)D_00196274) != 8) goto L3F2F8;
     func_000A1023(*(int *)D_00143550, *(int *)D_0019965C, 64000, (int)D_00170D55, 882, 4);
@@ -299,8 +296,7 @@ L3F49B:;
     return;
 L3F4A0:;
     if (((int)(unsigned char)*(signed char *)D_00196270) != 2) goto L3F4C9;
-    *(signed char *)D_0019966C = func_0008C5C9();
-    if (*(signed char *)D_0019966C == 0) goto L3F4C4;
+    if ((*(signed char *)D_0019966C = func_0008C5C9()) == 0) goto L3F4C4;
     func_0003F557();
 L3F4C4:;
     return;
@@ -349,8 +345,7 @@ L3F5C4:;
     func_0012B136();
     goto L3F5C4;
 L3F5D4:;
-    *(signed char *)D_00196279 = 0;
-    *(signed char *)D_0012AC00 = *(signed char *)D_00196279;
+    *(signed char *)D_0012AC00 = (*(signed char *)D_00196279 = 0);
 }
 
 void func_0003F5EF(void)

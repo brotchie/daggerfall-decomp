@@ -13,6 +13,7 @@ extern char D_00195AF4[];
 extern char D_00195B84[];
 extern char D_00195B85[];
 extern char D_00195BE0[];
+extern char D_00195BF4[];
 extern char D_00195C44[];
 extern char D_00195D50[];
 extern char D_001961F5[];
@@ -36,6 +37,7 @@ extern void func_0001B470(int, int);
 extern void func_0004C588(int);
 extern void func_0008E3F7(int, int);
 extern void func_0008E4A8(int, int);
+void func_0004C8EB(int);
 void func_0004CB5D(int);
 void func_0004CC14(int);
 
@@ -189,6 +191,28 @@ L4CA74:;
     if ((func_0009DC25() % 100) > 25) return;
 L4CA8C:;
     *(signed char *)((char *)l_1C + 2) |= 128;
+}
+
+void func_0004CA9D(void)
+{
+    int l_18;
+
+    l_18 = func_0009DC25();
+    if (((int)(unsigned char)*(signed char *)D_001789FA) != 3) goto L4CAFB;
+    if ((((unsigned)*(int *)((char *)*(int *)D_00195AC4 + 31)) >> 16) == 50027) goto L4CAE3;
+    if ((((unsigned)*(int *)((char *)*(int *)D_00195AC4 + 31)) >> 16) != 50029) goto L4CAE5;
+L4CAE3:;
+    goto L4CAF7;
+L4CAE5:;
+    if ((((unsigned)*(int *)((char *)*(int *)D_00195AC4 + 31)) >> 16) != 50033) goto L4CAF9;
+L4CAF7:;
+    goto L4CAFB;
+L4CAF9:;
+    return;
+L4CAFB:;
+    func_0009DC49(((unsigned)*(int *)D_00195BF4) / 1440);
+    func_0008E3F7(*(int *)D_00195AC4, (int)func_0004C8EB);
+    func_0009DC49(l_18);
 }
 
 int func_0004CB2F(int a1)

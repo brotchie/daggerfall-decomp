@@ -325,9 +325,7 @@ case 5:
     *(int *)D_00195A98 = a1;
     return;
 case 3:
-    *(int *)D_00195AA0 = a1;
-    *(int *)D_00195BE0 = *(int *)D_00195AA0 + 71;
-    *(int *)D_00195BEC = *(int *)D_00195BE0 + 560;
+    *(int *)D_00195BEC = (*(int *)D_00195BE0 = (*(int *)D_00195AA0 = a1) + 71) + 560;
     return;
 case 52:
     if (*(int *)(D_001959D8 + (((int)(unsigned short)*(short *)((char *)a1 + 27)) << 2)) == 0) goto L7A133;
@@ -340,8 +338,7 @@ case 16:
     *(int *)D_00195A00 = a1;
     return;
 case 23:
-    *(int *)D_001959B4 = a1;
-    *(int *)D_00195BF8 = *(int *)D_001959B4 + 71;
+    *(int *)D_00195BF8 = (*(int *)D_001959B4 = a1) + 71;
     return;
 case 24:
     *(int *)D_001959B0 = a1;
@@ -477,8 +474,7 @@ void func_0007A4F9(void)
     func_000A0ED9(494, (int)D_00176884);
     func_000A0F5C((int)D_001913E4, (int)D_001768DF, (int)D_001903A4, (int)D_001768D5);
     func_000A1004((int)D_001913E4);
-    *(int *)D_001A4A0C = func_0009DC59((int)D_001913E4, 546, 384);
-    if (*(int *)D_001A4A0C >= 0) goto L7A571;
+    if ((*(int *)D_001A4A0C = func_0009DC59((int)D_001913E4, 546, 384)) >= 0) goto L7A571;
     func_00050069((int)D_001768E4);
 L7A571:;
     func_000A0B42(*(int *)D_001A4A0C, *(int *)D_00147954 + 24000, 4000);

@@ -472,22 +472,19 @@ L44AD2:;
 
 int func_00044AE5(void)
 {
-    *(short *)D_00195E80 = 10;
-    *(int *)D_00152A0C = (int)(short)*(short *)D_00195E80;
+    *(int *)D_00152A0C = (int)(short)(*(short *)D_00195E80 = 10);
     return 0;
 }
 
 int func_00044B1C(void)
 {
-    *(short *)D_00195E80 = 20;
-    *(int *)D_00152A0C = (int)(short)*(short *)D_00195E80;
+    *(int *)D_00152A0C = (int)(short)(*(short *)D_00195E80 = 20);
     return 0;
 }
 
 int func_00044B53(void)
 {
-    *(short *)D_00195E80 = 40;
-    *(int *)D_00152A0C = (int)(short)*(short *)D_00195E80;
+    *(int *)D_00152A0C = (int)(short)(*(short *)D_00195E80 = 40);
     return 0;
 }
 

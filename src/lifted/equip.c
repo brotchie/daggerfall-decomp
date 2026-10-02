@@ -481,7 +481,7 @@ void func_00060FC3(void)
 
     l_18 = func_0006CD6E((int)D_00175927);
     func_000A00CB(l_18, (int)D_00195D40, 4);
-    *(int *)D_00195D4C = func_000A00AF(func_000A1235(l_18, (int)D_001758B8, 1201) - 4);
+    *(int *)D_00195D4C = func_000A00AF(func_000A1235(l_18) - 4, (int)D_001758B8, 1201);
     func_000A00CB(l_18, *(int *)D_00195D4C, (int)&*(signed char *)((char *)func_000A1235(l_18) - 4));
     func_0009DEA7(l_18);
 }
