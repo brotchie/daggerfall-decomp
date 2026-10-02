@@ -176,12 +176,28 @@ file position is already right. The emulator logs it as a note each run.
   loops make 4,400 opcode writes per 100 ticks, and nothing writes into code outside the known
   patch fields.
 
-**Open: a divide fault entering the world.** After the intro is skipped with Esc, the first 3D
-frame faults in `func_0015BC42` (`idiv` computing 2^32 / `[edi+5Ch]`, a field that is 0), via
-`main` → `func_0001025B` → `func_00010B11` → XnGine `0x12A870` → `0x15BB8C`. The field comes
-from a perspective divide in `0x13EBxx`. Unicorn handles all three self-modification patterns
-correctly (tested), so the next check is whether the fault also happens when the intro ends on
-its own; if it does not, skipping the emperor video is a candidate original bug.
+**The divide fault entering the world was by design.** The first 3D frame divides by zero in
+`func_0015BC42` (`idiv` computing 2^32 / `[edi+5Ch]`, a texture gradient that is 0 for
+axis-aligned walls seen straight on), whether or not the intro is skipped. XnGine expects it:
+it installs a DPMI divide-error handler (`0x149FC8`) that reads the faulting `idiv`'s ModRM
+byte, steps EIP over the instruction (2, 3 or 6 bytes) and returns with EAX = EDX = 0. A frame
+takes about 10 of them. Two emulator changes made it work:
+
+- CPU exceptions go to the game's DPMI 0203h handlers with a DPMI 0.9 frame (return CS:EIP,
+  error code, faulting CS:EIP, EFLAGS, SS:ESP), and resume from the frame after its `retf`.
+- Unicorn keeps the last exception in `env->old_exception` and clears it only when delivering
+  through an IDT, so a second handled #DE came back as a double fault and the CPU stalled. The
+  emulator finds that field in Unicorn's context blob at start-up (a scratch #DE) and resets it
+  inside the hook after each handled exception.
+
+With that, the headless game reaches the 3D world (a snowy exterior after the fast-start
+character), at about 4.5 timer ticks a second. The handler was not in the code map (it is
+reached only through DPMI and ends in `retf`); `tools/xn_trace.py` now writes code it sees run
+outside the map, and handlers the game registers, to `config/xngine_seeds.csv`, which
+`tools/xn_disasm.py` starts from.
+
+Records now also replay port reads, and carry the exception handlers: all 110 records from the
+menu, the province map, character creation and the intro video replay exactly.
 
 Run: `.venv/bin/python tools/xn_disasm.py` regenerates `src/xngine/` (4 s);
 `.venv/bin/python tools/xn_link.py [module]` checks modules; `tools/build-and-verify.sh` builds.

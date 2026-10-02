@@ -84,6 +84,7 @@ def _old_exception_offset():
 
 
 OLD_EXCEPTION = _old_exception_offset()
+IN_HOOK_RESET = os.environ.get("FALLEMU_EXC_STOP") is None   # clear it inside the hook
 
 
 def descriptor(base, limit, access):
@@ -556,8 +557,12 @@ class Emu:
         if n in self.exc and self.exc[n][0] != SEL_STUB:
             self.exceptions[n] = self.exceptions.get(n, 0) + 1
             self.deliver_exception(n)
-            self.exc_reset = True       # see clear_exception_state
-            self.uc.emu_stop()
+            if IN_HOOK_RESET:
+                self.exc_reset = True   # forget it now, without stopping the CPU
+                self.clear_exception_state()
+            else:
+                self.exc_reset = True   # see clear_exception_state
+                self.uc.emu_stop()
             return
         self.fault = "CPU exception %d at %#x: eax=%08X ebx=%08X ecx=%08X edx=%08X " \
             "esi=%08X edi=%08X ebp=%08X esp=%08X tick %d" % (
