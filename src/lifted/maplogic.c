@@ -27,6 +27,7 @@ extern char D_001789FA[];
 extern char D_00178A0A[];
 extern char D_0017A288[];
 extern char D_0017CA0A[];
+extern char D_001832C4[];
 extern char D_0018461C[];
 extern char D_00185097[];
 extern char D_00186503[];
@@ -41,6 +42,7 @@ extern char D_00190504[];
 extern char D_00190EE4[];
 extern char D_00190FE4[];
 extern char D_001940D5[];
+extern char D_001940D8[];
 extern char D_0019599C[];
 extern char D_00195A98[];
 extern char D_00195A9C[];
@@ -166,6 +168,7 @@ extern void func_00088213(int, int);
 extern void func_0008824A(int, int);
 extern void func_0008A4E4(int);
 extern void func_0008A90C(int, int, int);
+extern void func_0008B054(int, int);
 extern void func_0008DA1C(int);
 extern void func_0008E3F7(int, int);
 extern void func_0008EAF1(int, int);
@@ -189,18 +192,21 @@ void func_00087E68(int);
 void func_00088281(int, int);
 void func_00088732(void);
 void func_00088A68(void);
+void func_00088C0E(int);
 #pragma aux func_000A0ED9 parm routine [];
 #pragma dagger DAGGER_CONFPOS func_00088A68
 #pragma dagger DAGGER_KEEPSUB func_00088B98
 #pragma dagger DAGGER_RMW func_00088281
 #pragma dagger KKND_CONFREV func_0008661C
 #pragma dagger KKND_CONFREV func_000874C0
+#pragma dagger KKND_CONFREV func_00088E11
 #pragma dagger reg func_00086B0B 53 edx
 #pragma dagger reg func_000874C0 40 eax 56 eax 63 edx 68 eax
 #pragma dagger reg func_000876AD 437 bx
 #pragma dagger reg func_00087F76 437 bx
 #pragma dagger reg func_00088551 387 cx
 #pragma dagger reg func_00088732 39 edx 46 eax
+#pragma dagger reg func_00088E11 437 bx
 #pragma dagger slots func_00087F76 a1 36 a2 24 a3 32 a4 28 l_3C 52 l_38 48 l_34 44 l_30 40 l_1C 20 l_18 16 l_14 12 l_10 8 l_C 4
 
 void func_00086314(void)
@@ -1432,6 +1438,13 @@ L88DD4:;
 void func_00088DE6(int a1, int a2, int a3)
 {
     func_0008A90C(a1, a3, a2);
+}
+
+void func_00088E11(int a1, int a2, int a3)
+{
+    *(signed char *)D_001940D8 &= 254;
+    *(int *)D_001A99F4 = (int)(*(char **)D_00195BF4 + ((int)(unsigned short)*(short *)((char *)((a2 * 2) + a1) + 145)));
+    func_0008B054((int)D_001832C4, (int)func_00088C0E);
 }
 
 int func_00089035(int a1, int a2, int a3)

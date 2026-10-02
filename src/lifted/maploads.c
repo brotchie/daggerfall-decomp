@@ -120,6 +120,7 @@ void func_0001E928(int);
 #pragma aux func_000A0ED9 parm routine [];
 #pragma dagger DAGGER_CONFPOS func_0001E614
 #pragma dagger DAGGER_CONFPOS func_0001EC32
+#pragma dagger DAGGER_KEEPSUB func_0001EC32
 #pragma dagger DAGGER_NODEMOTE func_0001E614
 #pragma dagger KKND_CONFREV func_0001EC32
 #pragma dagger reg func_0001EC32 58 edx 59 edx 60 edx
@@ -658,7 +659,7 @@ L1ED1E:;
     goto L1ED07;
 L1ED26:;
     *(int *)D_00196AA4 = (l_20 << 12) + *(int *)(*(char **)D_00195AC4 + 7);
-    *(int *)D_00196AA8 = (int)(*(char **)(*(char **)D_00195AC4 + 15) + ((l_1C + 1) << 12));
+    *(int *)D_00196AA8 = *(int *)(*(char **)D_00195AC4 + 15) + ((l_1C + 1) << 12);
     l_2C = func_0001E576();
     func_0001E614((((int)(unsigned char)*(signed char *)(*(char **)D_00195BDC + 32)) * l_1C) + l_20);
     func_0001E7A8();

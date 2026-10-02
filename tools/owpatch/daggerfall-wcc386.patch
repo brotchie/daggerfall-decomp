@@ -774,7 +774,7 @@ index 1bab6746f0..493bf37016 100644
              cf_value = OkToNegate( ins->operands[1]->c.u.cfval, tipe );
              if( cf_value != NULL ) {
 diff --git a/bld/cg/c/generate.c b/bld/cg/c/generate.c
-index a7f606be70..2277ede253 100644
+index a7f606be70..58bdf031cd 100644
 --- a/bld/cg/c/generate.c
 +++ b/bld/cg/c/generate.c
 @@ -31,6 +31,9 @@
@@ -787,16 +787,17 @@ index a7f606be70..2277ede253 100644
  #include "coderep.h"
  #include "memcheck.h"
  #include "data.h"
-@@ -67,6 +70,8 @@
+@@ -67,6 +70,9 @@
  #include "optimize.h"
  #include "index.h"
  #include "fixindex.h"
 +
 +static void DaggerDumpIns( const char *when );
++extern const char *DaggerRegName( hw_reg_set reg );
  #include "conflict.h"
  #include "scmain.h"
  #include "generate.h"
-@@ -84,6 +89,7 @@
+@@ -84,6 +90,7 @@
  #include "condcode.h"
  #include "trecurse.h"
  #include "feprotos.h"
@@ -804,7 +805,7 @@ index a7f606be70..2277ede253 100644
  
  
  static  bool            abortCG;
-@@ -144,6 +150,126 @@ static  void    AddANop( void )
+@@ -144,6 +151,126 @@ static  void    AddANop( void )
  }
  
  
@@ -931,7 +932,7 @@ index a7f606be70..2277ede253 100644
  static  void            PreOptimize( void )
  /*****************************************/
  {
-@@ -333,8 +459,8 @@ static  void    ForceTempsMemory( void )
+@@ -333,8 +460,8 @@ static  void    ForceTempsMemory( void )
      ParmPropagate();
      for( op = Names[N_TEMP]; op != LastTemp; op = next ) {
          next = op->n.next_name;
@@ -942,15 +943,17 @@ index a7f606be70..2277ede253 100644
              op = DeAlias( op );
              op->v.usage |= NEEDS_MEMORY | USE_MEMORY;
              while( op->v.conflict != NULL ) {
-@@ -413,6 +539,7 @@ static  void    BlockToCode( bool partly_done )
+@@ -413,7 +540,9 @@ static  void    BlockToCode( bool partly_done )
          FixIndex();
          FixSegments();
          FPRegAlloc();
 +        DaggerDumpIns( "block before regalloc" );
          RegAlloc( true );
++        DaggerDumpIns( "block after regalloc" );
          FreeConflicts();
          HaveLiveInfo = false;
-@@ -501,7 +628,12 @@ static  void    FlushBlocks( bool partly_done )
+     } else {
+@@ -501,7 +630,12 @@ static  void    FlushBlocks( bool partly_done )
          classes |= blk->class;
          CurrBlock = blk;
          BlockToCode( partly_done );
@@ -964,7 +967,7 @@ index a7f606be70..2277ede253 100644
      }
      CurrBlock = curr;
      HeadBlock = NULL;
-@@ -542,6 +674,63 @@ static  void    FreeExtraSyms( name *last )
+@@ -542,6 +676,63 @@ static  void    FreeExtraSyms( name *last )
  }
  
  
@@ -989,7 +992,7 @@ index a7f606be70..2277ede253 100644
 +        fprintf( stderr, " M%p/%d", (void *)op->v.symbol, (int)op->n.size );
 +        break;
 +    case N_REGISTER:
-+        fprintf( stderr, " R" );
++        fprintf( stderr, " %s", DaggerRegName( op->r.reg ) );
 +        break;
 +    case N_INDEXED:
 +        fprintf( stderr, " [" );
@@ -1028,7 +1031,7 @@ index a7f606be70..2277ede253 100644
  static  void    FinishIndex( void )
  /*********************************/
  {
-@@ -665,6 +854,9 @@ void    Generate( bool routine_done )
+@@ -665,6 +856,9 @@ void    Generate( bool routine_done )
              InitStackMap();
              BlockByBlock = true;
          }
@@ -1038,7 +1041,7 @@ index a7f606be70..2277ede253 100644
          LNBlip( SrcLine );
          FlushBlocks( false );
          FreeExtraSyms( LastTemp );
-@@ -722,6 +914,11 @@ void    Generate( bool routine_done )
+@@ -722,6 +916,11 @@ void    Generate( bool routine_done )
          Panic( false );
          return;
      }
@@ -1050,7 +1053,7 @@ index a7f606be70..2277ede253 100644
      MakeConflicts();
      if( _IsModel( CGSW_GEN_LOOP_OPTIMIZATION ) ) {
          SplitVars();
-@@ -744,6 +941,7 @@ void    Generate( bool routine_done )
+@@ -744,6 +943,7 @@ void    Generate( bool routine_done )
      FixIndex();
      FixSegments();
      FPRegAlloc();
@@ -1500,7 +1503,7 @@ index 310489af1a..0f98337910 100644
      if( !LDone( oc ) ) {
          if( OC_BASE_CLASS( oc->oc_header.class ) != OC_INFO
 diff --git a/bld/cg/c/regalloc.c b/bld/cg/c/regalloc.c
-index 90c1857729..be8aa70773 100644
+index 90c1857729..992f5e5e0d 100644
 --- a/bld/cg/c/regalloc.c
 +++ b/bld/cg/c/regalloc.c
 @@ -31,6 +31,9 @@
@@ -1615,7 +1618,7 @@ index 90c1857729..be8aa70773 100644
 +#endif
 +}
 +
-+static const char *DaggerRegName( hw_reg_set reg )
++const char *DaggerRegName( hw_reg_set reg )
 +{
 +    int i;
 +
@@ -1680,7 +1683,7 @@ index 90c1857729..be8aa70773 100644
                         && HW_Subset( GivenRegisters, reg )
                         && !HW_Subset( GivenRegisters, best ) ) ) {
                          best = reg;
-@@ -1004,6 +1135,23 @@ static hw_reg_set   GiveBestReg( conflict_node *conf, reg_tree *tree,
+@@ -1004,6 +1135,28 @@ static hw_reg_set   GiveBestReg( conflict_node *conf, reg_tree *tree,
                  }
              }
          }
@@ -1698,13 +1701,18 @@ index 90c1857729..be8aa70773 100644
 +                    }
 +                }
 +            }
-+            if( getenv( "DAGGER_REGLOG" ) != NULL )
-+                fprintf( stderr, "reg %d %s\n", pin_k, DaggerRegName( best ) );
++            if( getenv( "DAGGER_REGLOG" ) != NULL ) {
++                fprintf( stderr, "reg %d %s", pin_k, DaggerRegName( best ) );
++                if( getenv( "DAGGER_REGLOGT" ) != NULL && conf->name != NULL
++                  && conf->name->n.class == N_TEMP )
++                    fprintf( stderr, " t%d", (int)conf->name->t.v.id );
++                fprintf( stderr, "\n" );
++            }
 +        }
          if( all_true ) {
              HW_CAsgn( given, HW_EMPTY );
          } else if( HW_CEqual( best, HW_EMPTY ) ) {
-@@ -1193,12 +1341,24 @@ conflict_node   *GiveRegister( conflict_node *conf, bool needs_one )
+@@ -1193,12 +1346,24 @@ conflict_node   *GiveRegister( conflict_node *conf, bool needs_one )
  }
  
  
@@ -1730,7 +1738,7 @@ index 90c1857729..be8aa70773 100644
  }
  
  
-@@ -1207,7 +1367,95 @@ static  void    SortConflicts( void )
+@@ -1207,7 +1372,95 @@ static  void    SortConflicts( void )
      Sort the conflicts in order of descending savings.
  */
  {
@@ -1826,7 +1834,7 @@ index 90c1857729..be8aa70773 100644
  }
  
  
-@@ -1242,6 +1490,18 @@ static  enum allocation_state    AssignConflicts( void )
+@@ -1242,6 +1495,18 @@ static  enum allocation_state    AssignConflicts( void )
          }
      }
      ConstSavings();
@@ -1845,7 +1853,7 @@ index 90c1857729..be8aa70773 100644
  
      SortConflicts();
      state = ALLOC_BITS;
-@@ -1265,7 +1525,9 @@ static  enum allocation_state    AssignConflicts( void )
+@@ -1265,7 +1530,9 @@ static  enum allocation_state    AssignConflicts( void )
              */
              if( !only_const_temps && opnd->n.class == N_TEMP && (opnd->t.temp_flags & CONST_TEMP) )
                  return( ALLOC_CONST_TEMP );
@@ -1857,7 +1865,7 @@ index 90c1857729..be8aa70773 100644
              } else {
                  next = GiveRegister( conf, false );
 diff --git a/bld/cg/c/split.c b/bld/cg/c/split.c
-index af92de3399..9427a4a86e 100644
+index af92de3399..f2f4919ef0 100644
 --- a/bld/cg/c/split.c
 +++ b/bld/cg/c/split.c
 @@ -31,6 +31,8 @@
@@ -1878,7 +1886,58 @@ index af92de3399..9427a4a86e 100644
  
  
  const type_class_def    HalfClass[] = {
-@@ -495,6 +499,7 @@ instruction      *rCLRHI_BW( instruction *ins )
+@@ -401,6 +405,50 @@ instruction      *rUSEREGISTER( instruction *ins )
+     name                *name1;
+ 
+     name1 = ins->operands[0];
++    if( _IsModel( CGSW_GEN_NO_OPTIMIZATION ) && ins->num_operands == 2
++      && ( ins->head.opcode == OP_ADD || ins->head.opcode == OP_MUL
++        || ins->head.opcode == OP_AND || ins->head.opcode == OP_OR
++        || ins->head.opcode == OP_XOR )
++      && ins->operands[1]->n.class == N_REGISTER && name1->n.class == N_REGISTER
++      && ins->result->n.class != N_TEMP
++      && CanUseOp1( ins, ins->operands[1] ) && DaggerEnv( "DAGGER_NOUSEOLD" ) == NULL ) {
++        /* Daggerfall: Watcom 10 gives a commutative op's result (stored to memory) the
++         * register of the operand computed first when the other is a global just read
++         * (both die here; DAGGER_NOUSEOLD=1 for stock OW) */
++        instruction *p;
++        instruction *q;
++        instruction *nx;
++
++        for( p = ins->head.prev; p->head.opcode != OP_BLOCK; p = p->head.prev ) {
++            if( p->result != NULL && p->result->n.class == N_REGISTER ) {
++                if( HW_Ovlap( p->result->r.reg, ins->operands[1]->r.reg ) ) {
++                    break;      /* the second operand is the newer one */
++                }
++                if( HW_Ovlap( p->result->r.reg, name1->r.reg ) ) {
++                    /* (only a value read from a global just now: a pointer) */
++                    if( p->head.opcode != OP_MOV || p->operands[0]->n.class != N_MEMORY )
++                        break;
++                    /* (the older value not a copy of a register: a call's result) */
++                    for( q = p->head.prev; q->head.opcode != OP_BLOCK; q = q->head.prev ) {
++                        if( q->result != NULL && q->result->n.class == N_REGISTER
++                          && HW_Ovlap( q->result->r.reg, ins->operands[1]->r.reg ) )
++                            break;
++                    }
++                    if( q->head.opcode == OP_MOV && q->operands[0]->n.class == N_REGISTER )
++                        break;
++                    /* (nor an assignment whose value is used again) */
++                    nx = ins->head.next;
++                    if( nx->head.opcode != OP_BLOCK && nx->num_operands > 0
++                      && nx->operands[0] == ins->result )
++                        break;
++                    ins->operands[0] = ins->operands[1];
++                    ins->operands[1] = name1;
++                    name1 = ins->operands[0];
++                    break;
++                }
++            }
++        }
++    }
+     if( CanUseOp1( ins, name1 ) ) {
+         new_ins = MakeMove( name1, ins->result, ins->type_class );
+         ins->result = name1;
+@@ -495,6 +543,7 @@ instruction      *rCLRHI_BW( instruction *ins )
  instruction      *rCLRHI_R( instruction *ins )
  /********************************************/
  {
@@ -1886,7 +1945,7 @@ index af92de3399..9427a4a86e 100644
      instruction         *new_ins;
      instruction         *and_ins;
      type_class_def      type_class;
-@@ -527,6 +532,10 @@ instruction      *rCLRHI_R( instruction *ins )
+@@ -527,6 +576,10 @@ instruction      *rCLRHI_R( instruction *ins )
              new_ins = NULL;
          } else {
              new_ins = MoveConst( 0, HighPart( res, type_class ), type_class );
@@ -1897,7 +1956,7 @@ index af92de3399..9427a4a86e 100644
          }
      } else if( op->n.class == N_REGISTER
        && HW_Ovlap( op->r.reg, res->r.reg ) ) {
-@@ -536,7 +545,10 @@ instruction      *rCLRHI_R( instruction *ins )
+@@ -536,7 +589,10 @@ instruction      *rCLRHI_R( instruction *ins )
          new_ins = MoveConst( 0, res, ins->type_class );
      }
      ins->result = LowPart( res, type_class );

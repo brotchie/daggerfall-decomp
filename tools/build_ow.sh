@@ -21,6 +21,9 @@
 #     generate.c, object.c, cc cstmt.c+cgen.c: table emitted at a `__dagger_tbl` marker;
 #     x86esc.c: labels aligned as at the original address (DAGGER_NOALIGNBIAS=1)
 #
+#   cg split.c rUSEREGISTER(): a commutative op stored to memory takes the register of the
+#     operand computed before a global just read (DAGGER_NOUSEOLD=1)
+#
 # Output: third_party/open-watcom-v2/build/binbuild/{bwcc386,bwlink,bwasm,bwlib}
 set -eu
 cd "$(dirname "$0")/.."

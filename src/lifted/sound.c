@@ -43,6 +43,14 @@ extern char D_001A3F38[];
 extern char D_001A3F48[];
 extern char D_001A3F50[];
 extern char D_001A3F5D[];
+extern char D_001A3F60[];
+extern char D_001A3F74[];
+extern char D_001A3F78[];
+extern char D_001A3F7C[];
+extern char D_001A3F90[];
+extern char D_001A3F94[];
+extern char D_001A3F98[];
+extern char D_001A3F9C[];
 extern char D_001A5AD0[];
 
 extern int func_00011870(int, ...);
@@ -73,6 +81,7 @@ extern int func_000A2941();
 extern int func_000C7FD9();
 extern int func_000C7FF4();
 extern int func_000C808D();
+extern void func_00099490(int);
 int func_000694B8(int, int);
 int func_00069A62(int, int, int);
 void func_00068DA6(int, int, int, int, int);
@@ -83,10 +92,12 @@ void func_00069DAA(void);
 #pragma dagger DAGGER_CONFPOS func_00069281
 #pragma dagger DAGGER_CONFPOS func_000694B8
 #pragma dagger KKND_CONFREV func_00068BA8
+#pragma dagger KKND_CONFREV func_00069E3C
 #pragma dagger confwin func_00069281 34 39
 #pragma dagger reg func_00068C06 37 edx 40 ebx
 #pragma dagger reg func_00069281 40 eax 437 bx
 #pragma dagger reg func_000694B8 30 edx
+#pragma dagger reg func_00069E3C 437 bx
 #pragma dagger slots func_000699D8 a1 28 a2 24 a3 12 a4 20 l_6C 100 l_18 16 l_10 8 ret 4
 
 void func_00068BA8(int a1, int a2)
@@ -558,4 +569,13 @@ L69E15:;
     goto L69DC7;
 L69E28:;
     *(int *)D_001A5AD0 = -1;
+}
+
+void func_00069E3C(void)
+{
+    func_00099490((int)D_001A3F60);
+    *(int *)D_001A3F98 = (*(int *)D_001A3F78 - *(int *)D_001A3F74) << 2;
+    *(int *)D_001A3F90 = (int)(*(char **)D_001A3F98 + (*(int *)D_001A3F7C << 2));
+    *(int *)D_001A3F94 = *(int *)D_001A3F78 << 2;
+    *(int *)D_001A3F9C = *(int *)D_001A3F98;
 }

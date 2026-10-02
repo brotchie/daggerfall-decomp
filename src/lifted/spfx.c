@@ -93,6 +93,8 @@ void func_00089757(int, int, int);
 void func_0008A550(int, int, int);
 void func_0008B054(int, int);
 void func_0008B341(int);
+#pragma dagger KKND_CONFREV func_0008A113
+#pragma dagger reg func_0008A113 437 bx
 #pragma dagger slots func_0008B29A a1 28 a2 4 a3 8 l_24 24 l_20 20 l_1C 16 ret 12
 #pragma dagger slots func_0008B43B a1 4 a2 8 a3 16 l_24 24 l_20 20 ret 12
 
@@ -591,6 +593,19 @@ L8A0C9:;
     return 0;
 L8A0FA:;
     *(signed char *)((char *)l_18 + 65) |= 128;
+    return 1;
+}
+
+int func_0008A113(int a1, int a2, int a3)
+{
+    int l_18;
+    int l_14;
+
+    l_14 = a1 + 71;
+    l_18 = a3 + 71;
+    *(signed char *)((char *)l_18 + 139) |= 64;
+    *(int *)((char *)l_18 + 537) = (int)(unsigned short)*(short *)((char *)((a2 * 2) + l_14) + 80);
+    *(int *)((char *)l_18 + 100) = (int)(*(char **)D_00195BF4 + ((int)(unsigned short)*(short *)((char *)((a2 * 2) + l_14) + 74)));
     return 1;
 }
 
