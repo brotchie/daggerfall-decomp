@@ -30,7 +30,7 @@ extern int func_00062229(int, int);
 extern int func_0006328F(int, unsigned short, int, unsigned short);
 extern int func_0006379A(int, int);
 extern int func_00063846(int, int, short);
-extern int func_00063ED8(int, int);
+extern int func_00063FCF(int, int, int);
 extern int func_00069938(int, int, int);
 extern int func_00077960(int, int, int);
 extern int func_0007D6AE(int, int);
@@ -52,9 +52,11 @@ extern void func_0008E3F7(int, int);
 int func_00062855(int, int, int);
 int func_0006299F(int);
 int func_000631AA(int);
+int func_00063ED8(int, int);
 void func_00062FBE(int);
 #pragma dagger DAGGER_DEADDEF func_000622EB
 #pragma dagger DAGGER_DEADDEF func_00063512
+#pragma dagger DAGGER_KEEPSUB func_00063ED8
 
 void func_000622EB(int a1, int a2, int a3, int a4)
 {
@@ -600,6 +602,53 @@ L63EB3:;
     *(int *)((char *)l_1C + 509) = 200;
 L63EC9:;
     goto L63E04;
+}
+
+int func_00063ED8(int a1, int a2)
+{
+    int l_24;
+    int l_20;
+    int l_1C;
+    int l_18;
+
+    l_18 = a1 + 71;
+    if (a2 == 0) goto L63F00;
+    if (a2 != 2) goto L63F14;
+L63F00:;
+    l_24 = a1 + 7;
+    l_20 = a1 + 15;
+    goto L63F26;
+L63F14:;
+    l_24 = a1 + 15;
+    l_20 = a1 + 7;
+L63F26:;
+    l_1C = *(int *)((char *)l_24) & 63;
+    if (l_1C != 0) goto L63F43;
+    return 0;
+L63F43:;
+    if (l_1C >= 8) goto L63F5C;
+    l_1C = 0;
+    *(signed char *)((char *)l_18 + 541) &= 254;
+    goto L63F85;
+L63F5C:;
+    if (l_1C >= 32) goto L63F68;
+    l_1C += -8;
+    goto L63F85;
+L63F68:;
+    if (l_1C <= 56) goto L63F81;
+    l_1C = 64;
+    *(signed char *)((char *)l_18 + 541) &= 254;
+    goto L63F85;
+L63F81:;
+    l_1C += 8;
+L63F85:;
+    l_1C += *(int *)((char *)l_24) & -64;
+    if (a2 == 0) goto L63F9B;
+    if (a2 != 2) goto L63FB0;
+L63F9B:;
+    return func_00063FCF(a1, l_1C, *(int *)((char *)l_20));
+L63FB0:;
+    return func_00063FCF(a1, *(int *)((char *)l_20), l_1C);
 }
 
 int func_000641CD(int a1)

@@ -1017,3 +1017,13 @@ which register each held value gets; 16-bit division (`cwd; idiv bx`) for short 
 (OW always promotes); floating point (a handful of functions).
 
 Batch **1,807**.
+
+## 2026-10-02: subtraction of constants as a knob
+
+FALL.EXE has both `sub [x],5` (68) and `add [x],-5` (31) on memory, so the source said
+`x -= 5` in some places and `x += -5` in others. OW rewrites one into the other three
+times over (`FoldMinus`, `foldins.c`, and the `V_OP2NEG` reduction back to `sub`). The new
+`DAGGER_KEEPSUB` switch keeps in-place memory updates as written; applied everywhere it
+breaks address folding (`[eax-1]`), so it is a per-function knob the search tries. +10.
+
+Batch **1,817**.

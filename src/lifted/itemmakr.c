@@ -45,6 +45,7 @@ extern char D_00195B50[];
 extern char D_00195B58[];
 extern char D_00195B7C[];
 extern char D_00195B84[];
+extern char D_00195BE0[];
 extern char D_00195BE8[];
 extern char D_00195C44[];
 extern char D_00195C5C[];
@@ -121,6 +122,7 @@ void func_00058473(void);
 void func_000585D6(int, int);
 void func_00058AF7(void);
 #pragma aux func_000A0ED9 parm routine [];
+#pragma dagger DAGGER_KEEPSUB func_000586AF
 #pragma dagger KKND_CONFREV func_000571C7
 
 void func_00055F0F(void)
@@ -794,6 +796,40 @@ void func_00058679(void)
 {
     if (((int)(unsigned char)*(signed char *)(*(char **)D_001AA57C)) == 52) return;
     *(int *)D_001AA57C = *(int *)(*(char **)D_001AA57C + 67);
+}
+
+void func_000586AF(int a1)
+{
+    int l_1C;
+    int l_18;
+
+    a1 += -9;
+    l_1C = *(int *)(D_001AA568 + (a1 << 2));
+    if (l_1C == 0) return;
+    l_18 = l_1C + 71;
+    if (((int)(short)*(short *)((char *)l_18 + 67)) == (-1)) goto L58706;
+    func_0003F09F(1660, 1);
+    return;
+L58706:;
+    if (*(short *)((char *)l_18 + 61) != 0) goto L58724;
+    func_0003F09F(1659, 1);
+    return;
+L58724:;
+    a1 = 0;
+L5872B:;
+    if (a1 < 27) goto L5873B;
+    goto L5876E;
+L58733:;
+    a1++;
+    goto L5872B;
+L5873B:;
+    if (*(int *)(*(char **)D_00195BE0 + 367 + (a1 << 2)) != l_1C) goto L5876C;
+    *(int *)(*(char **)D_00195BE0 + 367 + (a1 << 2)) = 0;
+L5876C:;
+    goto L58733;
+L5876E:;
+    *(int *)D_0019990C = l_1C;
+    *(int *)D_00190BE4 = (int)(unsigned short)*(short *)((char *)(*(int *)D_00199908 = l_18) + 61);
 }
 
 int func_0005879B(int a1)

@@ -85,6 +85,7 @@ extern char D_00195B14[];
 extern char D_00195B20[];
 extern char D_00195B34[];
 extern char D_00195B50[];
+extern char D_00195B74[];
 extern char D_00195B84[];
 extern char D_00195B8C[];
 extern char D_00195BE0[];
@@ -279,6 +280,7 @@ void func_00099155(int);
 void func_000992FA(void);
 #pragma aux func_000A0ED9 parm routine [];
 #pragma dagger DAGGER_DEADDEF func_00097488
+#pragma dagger DAGGER_KEEPSUB func_00096959
 #pragma dagger DAGGER_PUSHMEM func_00093372
 #pragma dagger DAGGER_PUSHMEM func_00093DCB
 
@@ -1547,6 +1549,13 @@ L9693F:;
 L96946:;
     return l_24;
 }
+}
+
+int func_00096959(int a1, int a2, int a3)
+{
+    a1 += -41;
+    a2 += -5;
+    return (int)(unsigned char)*(signed char *)((char *)(int)(*(char **)D_00195B74 + ((a2 * 125) + a1)));
 }
 
 void func_00096997(void)

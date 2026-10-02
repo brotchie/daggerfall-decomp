@@ -137,6 +137,7 @@ void func_000866B4(void);
 void func_00086D37(unsigned short);
 void func_000871FA(int);
 void func_00087281(int);
+#pragma dagger DAGGER_KEEPSUB func_00088B98
 #pragma dagger KKND_CONFREV func_0008661C
 
 void func_00086314(void)
@@ -804,6 +805,31 @@ L88A55:;
     goto L88A1E;
 L88A57:;
     func_0001DD39(l_14);
+}
+
+int func_00088B98(int a1)
+{
+    int l_20;
+    int l_1C;
+
+    l_20 = *(int *)D_00196A9C;
+    l_1C = 0;
+L88BB8:;
+    if (l_1C < *(int *)D_00196A28) goto L88BD4;
+    goto L88BFA;
+L88BC5:;
+    l_1C++;
+    (*(char (**)[17])&l_20)++;
+    goto L88BB8;
+L88BD4:;
+    if (((int)(unsigned char)*(signed char *)((char *)l_20 + 12)) == 255) goto L88BF8;
+    a1 += -1;
+    if (a1 >= 0) goto L88BF8;
+    return l_1C;
+L88BF8:;
+    goto L88BC5;
+L88BFA:;
+    return -1;
 }
 
 void func_00088C0E(int a1)

@@ -2,29 +2,110 @@
  * do not edit: move a function to src/qkey.c to work on it by hand) */
 
 extern char D_00184FD7[];
+extern char D_0018DDDC[];
 extern char D_001940D7[];
 extern char D_00195AA0[];
 extern char D_00195AE8[];
 extern char D_00195AF4[];
 extern char D_00195B50[];
+extern char D_00195BE0[];
 extern char D_00196271[];
 extern char D_00196274[];
 extern char D_0019628D[];
 extern char D_001962B2[];
+extern char D_001A4B7A[];
 
 extern int func_00040AFD(void);
+extern int func_0007D6AE(int, int);
 extern int func_0008ADC3(int, int, int, int, int, int);
 extern void func_00021597(void);
 extern void func_0002ECBE(int);
 extern void func_0002F3FA(int);
 extern void func_0002F490(int, int, int);
 extern void func_0002FBCC(void);
+extern void func_0003D01C(int, int);
 extern void func_00040FC1(int);
 extern void func_0004BBD8(int, int, int);
 extern void func_00060270(int, int);
 extern void func_000797E2(int, int);
 extern void func_0007DDC9(int);
 int func_0002E914(int, int, int);
+#pragma dagger DAGGER_KEEPSUB func_0002E032
+
+int func_0002E032(int a1, int a2, int a3, int a4, int a5, int a6)
+{
+    int l_10;
+{
+    int l_24;
+
+    if (((int)(short)*(short *)((char *)a1 + 124)) >= (((int)(short)*(short *)((char *)a1 + 126)) >> 3)) goto L2E084;
+    l_10 = a1 + 560;
+    if (((int)(unsigned short)(*(short *)((char *)l_10 + 4) & 4)) == 0) goto L2E084;
+    a4 += 5;
+L2E084:;
+    if (((int)(short)*(short *)((char *)a2 + 124)) >= (((int)(short)*(short *)((char *)a2 + 126)) >> 3)) goto L2E0BF;
+    l_10 = a2 + 560;
+    if (((int)(unsigned short)(*(short *)((char *)l_10 + 4) & 4)) == 0) goto L2E0BF;
+    a4 += -5;
+L2E0BF:;
+    if (a1 != *(int *)D_00195BE0) goto L2E0D4;
+    a4 += (int)(short)*(short *)D_001A4B7A;
+L2E0D4:;
+    if (a2 != *(int *)D_00195BE0) goto L2E0E7;
+    a4 -= *(int *)D_0018DDDC;
+L2E0E7:;
+    a4 += a6;
+    a4 += (((int)(short)*(short *)((char *)a1 + 38)) - ((int)(short)*(short *)((char *)a2 + 38))) / 10;
+    a4 += (((int)(short)*(short *)((char *)a1 + 46)) - ((int)(short)*(short *)((char *)a2 + 46))) / 10;
+    a4 += (int)(signed char)*(signed char *)((char *)(a2 + a3) + 68);
+    if (((int)(unsigned char)*(signed char *)((char *)a2 + 67)) >= 43) goto L2E150;
+    a4 += 40;
+L2E150:;
+    a4 += (int)(short)*(short *)((char *)a1 + 507);
+    if (((int)(unsigned char)*(signed char *)((char *)a1 + 67)) != 1) goto L2E173;
+    if (a5 < 16) goto L2E175;
+L2E173:;
+    goto L2E193;
+L2E175:;
+    a4 += ((int)(unsigned char)*(signed char *)((char *)a1 + 129)) / 3;
+L2E193:;
+    if (((int)(unsigned char)*(signed char *)((char *)a1 + 67)) != 5) goto L2E1A9;
+    if (a5 >= 16) goto L2E1AB;
+L2E1A9:;
+    goto L2E1C9;
+L2E1AB:;
+    a4 += ((int)(unsigned char)*(signed char *)((char *)a1 + 129)) / 3;
+L2E1C9:;
+    if (((int)(unsigned char)*(signed char *)((char *)a1 + 67)) != 3) goto L2E1F8;
+    a4 += ((int)(unsigned char)*(signed char *)((char *)a1 + 129)) / 4;
+L2E1F8:;
+    a4 -= ((int)(short)*(short *)((char *)a1 + 277)) / 4;
+    if (func_0007D6AE(1, 100) >= ((int)(short)*(short *)((char *)a1 + 361))) goto L2E248;
+    a4 += ((int)(short)*(short *)((char *)a1 + 361)) / 10;
+L2E248:;
+    if (a1 != *(int *)D_00195BE0) goto L2E262;
+    func_0003D01C(34, 1);
+L2E262:;
+    if (a2 != *(int *)D_00195BE0) goto L2E27C;
+    func_0003D01C(20, 1);
+L2E27C:;
+    a4 += -50;
+    if (a4 >= 3) goto L2E28F;
+    a4 = 3;
+    goto L2E29C;
+L2E28F:;
+    if (a4 <= 97) goto L2E29C;
+    a4 = 97;
+L2E29C:;
+    if (func_0007D6AE(0, 100) > a4) goto L2E2B6;
+    l_24 = 1;
+    goto L2E2BD;
+L2E2B6:;
+    l_24 = 0;
+L2E2BD:;
+    return l_24;
+}
+}
 
 int func_0002E55C(int a1, int a2, int a3)
 {

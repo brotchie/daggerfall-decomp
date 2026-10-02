@@ -593,6 +593,32 @@ index 721fa0c6a9..902ba8fd22 100644
              change = true;
              loops_killed = true;
              CleanPartition();
+diff --git a/bld/cg/c/foldins.c b/bld/cg/c/foldins.c
+index 1bab6746f0..493bf37016 100644
+--- a/bld/cg/c/foldins.c
++++ b/bld/cg/c/foldins.c
+@@ -31,6 +31,7 @@
+ 
+ 
+ #include "_cgstd.h"
++extern const char *DaggerEnv( const char *name );
+ #include "coderep.h"
+ #include "zoiks.h"
+ #include "tree.h"
+@@ -339,8 +340,11 @@ static  instruction    *FoldAbsolute( instruction *ins ) {
+     }
+     switch( ins->head.opcode ) {
+     case OP_SUB:
+-        /* change sub t1, k -> add t1, -k */
+-        if( ins->operands[1]->n.class == N_CONSTANT
++        /* change sub t1, k -> add t1, -k (Daggerfall knob DAGGER_KEEPSUB: not in place) */
++        if( !( _IsModel( CGSW_GEN_NO_OPTIMIZATION ) && DaggerEnv( "DAGGER_KEEPSUB" ) != NULL
++               && ins->result == ins->operands[0]
++               && ( ins->result->n.class == N_MEMORY || ins->result->n.class == N_TEMP ) )
++          && ins->operands[1]->n.class == N_CONSTANT
+           && ins->operands[1]->c.const_type == CONS_ABSOLUTE ) {
+             cf_value = OkToNegate( ins->operands[1]->c.u.cfval, tipe );
+             if( cf_value != NULL ) {
 diff --git a/bld/cg/c/generate.c b/bld/cg/c/generate.c
 index a7f606be70..9a6ba2e651 100644
 --- a/bld/cg/c/generate.c
@@ -1479,7 +1505,7 @@ index 23957dda5c..c22e7e5939 100644
          retv = BGAssign( retv, leftp, node->tipe );
          BGDone( BGOpGets( node->u1.t.op, left, rite, node->tipe, node->tipe ) );
 diff --git a/bld/cg/c/treefold.c b/bld/cg/c/treefold.c
-index dd3ef11ff7..f009f716c9 100644
+index dd3ef11ff7..074a323af2 100644
 --- a/bld/cg/c/treefold.c
 +++ b/bld/cg/c/treefold.c
 @@ -31,6 +31,9 @@
@@ -1500,7 +1526,18 @@ index dd3ef11ff7..f009f716c9 100644
  #define HasBigConst( t )       ( ( (t)->attr & TYPE_FLOAT ) || (t)->length == 8 )
  
  static const cg_op RevOpcode[] = {
-@@ -1346,6 +1350,46 @@ static bool IsObjectAddr( tn tree )
+@@ -464,7 +468,9 @@ tn      FoldMinus( tn left, tn rite, const type_def *tipe )
+             fold = TGUnary( O_UMINUS, rite, tipe );
+             BurnTree( left );
+         }
+-    } else if( rite->class == TN_CONS ) {
++    } else if( rite->class == TN_CONS
++      && !( _IsModel( CGSW_GEN_NO_OPTIMIZATION ) && DaggerEnv( "DAGGER_KEEPSUB" ) != NULL ) ) {
++        /* Daggerfall: at -od Watcom 10 kept `x - 5` a subtraction (and `x += -5` an add) */
+         rv = OkToNegate( rite->u.name->c.u.cfval, tipe );
+         if( rv != NULL ) {
+             fold = TGBinary( O_PLUS, left, TGConst( rv, rite->tipe ),
+@@ -1346,6 +1352,46 @@ static bool IsObjectAddr( tn tree )
      return( false );
  }
  
@@ -1547,7 +1584,7 @@ index dd3ef11ff7..f009f716c9 100644
  tn  FoldCompare( cg_op opcode, tn left, tn rite, const type_def *tipe )
  /*********************************************************************/
  {
-@@ -1445,7 +1489,8 @@ tn  FoldCompare( cg_op opcode, tn left, tn rite, const type_def *tipe )
+@@ -1445,7 +1491,8 @@ tn  FoldCompare( cg_op opcode, tn left, tn rite, const type_def *tipe )
                      return( FoldCompare( opcode, IntToType( 1, TypeInteger ), IntToType( 0, TypeInteger ), TypeInteger ) );
                  }
              }
@@ -1557,6 +1594,29 @@ index dd3ef11ff7..f009f716c9 100644
                  // If we couldn't fold the comparison, get rid of some lame converts
                  // the C++ compiler likes to emit. Careful with floats!
                  BurnToBase( left, base_l );
+diff --git a/bld/cg/c/verify.c b/bld/cg/c/verify.c
+index 509455be21..b3ae81354f 100644
+--- a/bld/cg/c/verify.c
++++ b/bld/cg/c/verify.c
+@@ -31,6 +31,7 @@
+ 
+ 
+ #include "_cgstd.h"
++extern const char *DaggerEnv( const char *name );
+ #include "coderep.h"
+ #include "zoiks.h"
+ #include "data.h"
+@@ -266,6 +267,10 @@ bool    OtherVerify( vertype kind, instruction *ins,
+             return( true );
+         break;
+     case V_OP2NEG:
++        /* Daggerfall: Watcom 10 kept `x += -5` as `add x,-5` (only with DAGGER_KEEPSUB=1, a per-function knob) */
++        if( _IsModel( CGSW_GEN_NO_OPTIMIZATION ) && DaggerEnv( "DAGGER_KEEPSUB" ) != NULL
++          && ins->result != NULL && ins->result->n.class != N_REGISTER )
++            break;      /* only in place, on memory */
+         if( ( op2->c.const_type == CONS_ABSOLUTE )
+           && ( op2->c.lo.u.int_value < 0 )
+           && ( (op2->c.lo.u.int_value & 0xffff) != 0x8000 )
 diff --git a/bld/cg/h/bldcall.h b/bld/cg/h/bldcall.h
 index bb42328d26..66e35921e9 100644
 --- a/bld/cg/h/bldcall.h
