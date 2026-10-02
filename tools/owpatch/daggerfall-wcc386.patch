@@ -1303,7 +1303,7 @@ index 76c9e5daf1..1562a66f62 100644
      do {
          pow2 = 1;
 diff --git a/bld/cg/c/object.c b/bld/cg/c/object.c
-index 8deefcbc4c..946c667548 100644
+index 8deefcbc4c..f070492fa9 100644
 --- a/bld/cg/c/object.c
 +++ b/bld/cg/c/object.c
 @@ -31,6 +31,7 @@
@@ -1328,7 +1328,7 @@ index 8deefcbc4c..946c667548 100644
  
  
  /*
-@@ -93,6 +101,87 @@ static  source_line_number      DumpLineNum( source_line_number n,
+@@ -93,6 +101,93 @@ static  source_line_number      DumpLineNum( source_line_number n,
  }
  
  
@@ -1393,7 +1393,13 @@ index 8deefcbc4c..946c667548 100644
 +          || prev->result->n.class != N_REGISTER
 +          || !HW_Equal( prev->result->r.reg, op->r.reg )
 +          || ( prev->type_class != U2 && prev->type_class != I2
-+            && !( prev->head.opcode == OP_MUL && DaggerEnv( "DAGGER_NOMULWIDEN" ) == NULL ) ) )
++            && !( prev->head.opcode == OP_MUL && DaggerEnv( "DAGGER_NOMULWIDEN" ) == NULL )
++            /* (an int sum narrowed to the short, `s = s + i / j`, too) */
++            && !( ( prev->head.opcode == OP_ADD || prev->head.opcode == OP_SUB )
++              && DaggerEnv( "DAGGER_NOADDWIDEN" ) == NULL )
++            /* (an int variable just loaded, `s = i`, too) */
++            && !( prev->head.opcode == OP_MOV && prev->operands[0]->n.class == N_TEMP
++              && DaggerEnv( "DAGGER_NOVARWIDEN" ) == NULL ) ) )
 +            return;
 +        op = AllocRegName( FullReg( op->r.reg ) );
 +    } else if( op->n.class == N_CONSTANT && op->c.const_type == CONS_ABSOLUTE ) {
@@ -1416,7 +1422,7 @@ index 8deefcbc4c..946c667548 100644
  void    GenObject( void )
  /***********************/
  {
-@@ -127,6 +216,12 @@ void    GenObject( void )
+@@ -127,6 +222,12 @@ void    GenObject( void )
              StartBlockProfiling( blk );
              InitStackDepth( blk );
              for( ins = blk->ins.head.next; ins->head.opcode != OP_BLOCK; ins = ins->head.next ) {
@@ -1429,7 +1435,7 @@ index 8deefcbc4c..946c667548 100644
                  if( ins->head.opcode == OP_NOP
                    && ( (ins->flags.u.nop_flags & NOP_SOURCE_QUEUE)
                    || ins->flags.u.nop_flags == NOP_DBGINFO )) { // an end block
-@@ -145,6 +240,7 @@ void    GenObject( void )
+@@ -145,6 +246,7 @@ void    GenObject( void )
                          }
                      }
                  } else {
