@@ -1754,6 +1754,15 @@ class Func:
             body.append(line)
         if not self.void and "%X" % self.ret_ins in used:
             body.append("L%X:;" % self.ret_ins)
+        # A switch temp among the nested locals splits them: those above it were in a block
+        # opened before the switch, those below it in one opened inside it.
+        early = []
+        if nested and self.temps and not os.environ.get("LIFT_NOSPLIT"):
+            inside = [t for t in self.temps if min(nested) < t < max(nested)]
+            if inside:
+                cut = min(inside)
+                early = [o for o in nested if o < cut]
+                nested = [o for o in nested if o > cut]
         nested_decls = [self.decl_line(o, two) for o in nested]
         # Where the nested block starts: at the top, unless a switch's selector temp (which
         # gets its slot when the switch is reached) sits above the block's locals: then the
@@ -1776,6 +1785,8 @@ class Func:
         for sw in reversed(self.sw_stack):
             closers.append((["default:;"] if sw.get("default") == "END" else []) + ["}"])
         decl_lines = [self.decl_line(o, two) for o in outer]
+        if early:
+            decl_lines += ["{"] + [self.decl_line(o, two) for o in early]
         if nested and at is None:
             decl_lines += ["{"] + nested_decls
         lines += decl_lines
@@ -1816,6 +1827,8 @@ class Func:
                     lines += c
                 if inner >= len(closers):
                     lines.append("}")
+        if early:
+            lines.append("}")
         lines.append("}")
         decl = ["/* lifted from 0x%08X */" % self.va] + sorted(self.structs)
         # function-level choice points: code generator options (#pragma dagger)
