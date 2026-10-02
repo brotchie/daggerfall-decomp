@@ -121,7 +121,7 @@ L62769:;
     return 0;
 L62775:;
     l_24 = a1 + 705;
-    l_1C = func_000C808D(*(int *)((char *)a1 + 7), *(int *)((char *)a1 + 15), *(int *)((char *)*(int *)D_00195AA4 + 7), *(int *)((char *)*(int *)D_00195AA4 + 15));
+    l_1C = func_000C808D(*(int *)((char *)a1 + 7), *(int *)((char *)a1 + 15), *(int *)(*(char **)D_00195AA4 + 7), *(int *)(*(char **)D_00195AA4 + 15));
     l_18 = (((int)(short)*(short *)((char *)a1 + 3)) + 128) & 2047;
     l_20 = (l_18 - l_1C) & 2047;
     l_20 >>= 8;
@@ -159,7 +159,7 @@ int func_00062855(int a1, int a2, int a3)
 L62891:;
     l_20 = a1 + 71;
     *(signed char *)((char *)l_20 + 504) = *(signed char *)&a3;
-    l_18 = func_000C808D(*(int *)((char *)a1 + 7), *(int *)((char *)a1 + 15), *(int *)((char *)*(int *)D_00195AA4 + 7), *(int *)((char *)*(int *)D_00195AA4 + 15));
+    l_18 = func_000C808D(*(int *)((char *)a1 + 7), *(int *)((char *)a1 + 15), *(int *)(*(char **)D_00195AA4 + 7), *(int *)(*(char **)D_00195AA4 + 15));
     l_14 = (((int)(short)*(short *)((char *)a1 + 3)) + 128) & 2047;
     l_1C = (l_14 - l_18) & 2047;
     if (((int)(unsigned short)(*(short *)((char *)l_20 + 64) & 16384)) == 0) goto L6292A;
@@ -338,7 +338,7 @@ L62D8B:;
     if ((*(int *)D_00195AD8 = func_0008EA20(a1, 9)) != 0) goto L62DB2;
     return 0;
 L62DB2:;
-    if (func_0005C9BF((int)(unsigned char)*(signed char *)((char *)*(int *)D_00195AD8 + 144)) == 0) goto L62DD7;
+    if (func_0005C9BF((int)(unsigned char)*(signed char *)(*(char **)D_00195AD8 + 144)) == 0) goto L62DD7;
     return 0;
 L62DD7:;
     l_1C = func_0008DCE3(*(int *)((char *)a1 + 67), 0, 89);
@@ -411,8 +411,8 @@ int func_00063003(void)
     int l_1C;
 
     func_000A0040((int)D_00190FE4, 0, 128, (int)D_00175934, 829, 2048);
-    func_0008E3F7(*(int *)((char *)*(int *)D_00195AC4 + 63), (int)func_00062FBE);
-    func_0008E3F7(*(int *)((char *)*(int *)D_001959A8 + 63), (int)func_00062FBE);
+    func_0008E3F7(*(int *)(*(char **)D_00195AC4 + 63), (int)func_00062FBE);
+    func_0008E3F7(*(int *)(*(char **)D_001959A8 + 63), (int)func_00062FBE);
     l_1C = 0;
 L6305C:;
     if (l_1C < 128) goto L63072;
@@ -456,13 +456,13 @@ int func_000631DD(int a1)
 {
     int l_24;
 
-    if ((*(unsigned short *)((char *)*(int *)D_00195BE0 + 137) & 12292) != 0) goto L6320A;
+    if ((*(unsigned short *)(*(char **)D_00195BE0 + 137) & 12292) != 0) goto L6320A;
     return 1;
 L6320A:;
-    if ((*(unsigned char *)((char *)*(int *)D_00195BE0 + 137) & 4) == 0) goto L63225;
+    if ((*(unsigned char *)(*(char **)D_00195BE0 + 137) & 4) == 0) goto L63225;
     return func_000631AA(a1);
 L63225:;
-    if ((*(unsigned char *)((char *)*(int *)D_00195BE0 + 138) & 32) == 0) goto L6323C;
+    if ((*(unsigned char *)(*(char **)D_00195BE0 + 138) & 32) == 0) goto L6323C;
     l_1C = 8;
     goto L63243;
 L6323C:;
@@ -485,7 +485,7 @@ int func_00063495(int a1)
 {
     int l_1C;
 
-    l_1C = func_0008DCE3(*(int *)((char *)*(int *)D_00195AA4 + 67), 0, 659);
+    l_1C = func_0008DCE3(*(int *)(*(char **)D_00195AA4 + 67), 0, 659);
     if (func_00077960(l_1C, 96, 300) == 0) goto L634F6;
     *(signed char *)((char *)l_1C) = 18;
     func_00078566(l_1C, a1);
@@ -591,7 +591,7 @@ L63E04:;
     goto L63DF4;
 L63E0C:;
     l_18 = *(int *)(D_00190504 + (l_24 << 2));
-    l_20 = func_000C7FF4(*(int *)((char *)l_18 + 11) - *(int *)((char *)*(int *)D_00195AA4 + 11), func_000C7FD9(*(int *)((char *)l_18 + 7), *(int *)((char *)l_18 + 15), *(int *)((char *)*(int *)D_00195AA4 + 7), *(int *)((char *)*(int *)D_00195AA4 + 15)));
+    l_20 = func_000C7FF4(*(int *)((char *)l_18 + 11) - *(int *)(*(char **)D_00195AA4 + 11), func_000C7FD9(*(int *)((char *)l_18 + 7), *(int *)((char *)l_18 + 15), *(int *)(*(char **)D_00195AA4 + 7), *(int *)(*(char **)D_00195AA4 + 15)));
     l_1C = *(int *)(D_00190504 + (l_24 << 2)) + 71;
     if (a1 == *(int *)(D_00190504 + (l_24 << 2))) goto L63EB3;
     if (func_0006328F((int)(unsigned char)*(signed char *)((char *)l_1C + 67), (int)(unsigned short)(*(short *)((char *)l_1C + 64) & 256), l_20, (int)(unsigned short)(*(short *)((char *)l_1C + 64) & 8)) == 0) goto L63EC9;

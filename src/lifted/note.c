@@ -478,7 +478,7 @@ void func_0004E360(void)
 L4E3CC:;
     return;
 L4E3D1:;
-    if (*(signed char *)((char *)*(int *)D_001997D4) == 0) return;
+    if (*(signed char *)(*(char **)D_001997D4) == 0) return;
     func_000A006E((int)(short)*(short *)D_001997E8, 0, 2);
     func_000A0040(*(int *)D_001997D4, 0, 3640, (int)D_00174FAC, 507, 4);
     func_000A0B42((int)(short)*(short *)D_001997E8, *(int *)D_001997D4, 3640);
@@ -535,7 +535,7 @@ L4E5FE:;
 void func_0004E729(void)
 {
     if (*(int *)D_001997C4 == 0) return;
-    if (((int)(unsigned char)*(signed char *)((char *)*(int *)D_001997D0)) != 1) goto L4E760;
+    if (((int)(unsigned char)*(signed char *)(*(char **)D_001997D0)) != 1) goto L4E760;
     *(int *)D_001997D0 = *(int *)D_001997D0 + 91;
     goto L4E767;
 L4E760:;
@@ -560,22 +560,22 @@ void func_0004E80C(void)
 {
     func_000A1023(*(int *)D_001997D8, *(int *)D_001997D4, 3640, (int)D_00174FAC, 622, 4);
     if (*(int *)D_001997C8 == 0) goto L4E855;
-    if (((int)(unsigned char)*(signed char *)((char *)*(int *)D_001997C8)) == 1) goto L4E857;
+    if (((int)(unsigned char)*(signed char *)(*(char **)D_001997C8)) == 1) goto L4E857;
 L4E855:;
     return;
 L4E857:;
-    *(signed char *)((char *)*(int *)D_001997C8 + 6) ^= 2;
+    *(signed char *)(*(char **)D_001997C8 + 6) ^= 2;
 }
 
 void func_0004E86A(void)
 {
     func_000A1023(*(int *)D_001997D8, *(int *)D_001997D4, 3640, (int)D_00174FAC, 629, 4);
     if (*(int *)D_001997C8 == 0) goto L4E8B3;
-    if (((int)(unsigned char)*(signed char *)((char *)*(int *)D_001997C8)) == 1) goto L4E8B5;
+    if (((int)(unsigned char)*(signed char *)(*(char **)D_001997C8)) == 1) goto L4E8B5;
 L4E8B3:;
     return;
 L4E8B5:;
-    *(signed char *)((char *)*(int *)D_001997C8 + 6) ^= 1;
+    *(signed char *)(*(char **)D_001997C8 + 6) ^= 1;
 }
 
 int func_0004E8C8(int a1)
@@ -678,5 +678,5 @@ L4EC41:;
 void func_0004EC7A(void)
 {
     func_0004EAF4(*(int *)D_001997D4, (int)func_0004EBAC, (int)func_0004EC16);
-    *(signed char *)((char *)*(int *)D_001997CC) = 0;
+    *(signed char *)(*(char **)D_001997CC) = 0;
 }

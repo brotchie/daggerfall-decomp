@@ -286,7 +286,7 @@ L2EC5E:;
 
 void func_0002EC79(int a1)
 {
-    *(int *)((char *)a1 + 7) = *(int *)((char *)*(int *)D_00195AF4 + 7);
-    *(int *)((char *)a1 + 11) = *(int *)((char *)*(int *)D_00195AF4 + 11);
-    *(int *)((char *)a1 + 15) = *(int *)((char *)*(int *)D_00195AF4 + 15);
+    *(int *)((char *)a1 + 7) = *(int *)(*(char **)D_00195AF4 + 7);
+    *(int *)((char *)a1 + 11) = *(int *)(*(char **)D_00195AF4 + 11);
+    *(int *)((char *)a1 + 15) = *(int *)(*(char **)D_00195AF4 + 15);
 }

@@ -20,7 +20,7 @@ int func_0005A91A(int a1)
     int l_1C;
 
     l_20 = 0;
-    l_1C = func_0008DCE3(*(int *)((char *)*(int *)D_00195AA4 + 67), 0, 89);
+    l_1C = func_0008DCE3(*(int *)(*(char **)D_00195AA4 + 67), 0, 89);
 L5A949:;
     if (*(signed char *)((char *)(int)(*(char **)D_00195B04 + (l_20 * 89)) + 47) == 0) goto L5A973;
     if (((int)(unsigned char)*(signed char *)((char *)(int)(*(char **)D_00195B04 + (l_20 * 89)) + 73)) == a1) goto L5A97B;
@@ -29,7 +29,7 @@ L5A973:;
     goto L5A949;
 L5A97B:;
     *(signed char *)((char *)l_1C) = 9;
-    *(int *)((char *)l_1C + 31) = func_0008EB88(((unsigned)*(int *)((char *)*(int *)D_00195AC4 + 31)) >> 16);
+    *(int *)((char *)l_1C + 31) = func_0008EB88(((unsigned)*(int *)(*(char **)D_00195AC4 + 31)) >> 16);
     func_000A1023(l_1C + 71, (int)(*(char **)D_00195B04 + (l_20 * 89)), 89, (int)D_001757F4, 103, 4);
     l_20 = func_0003A0C0(l_1C + 71, *(int *)D_00195BE0);
     if (func_0005AE5F(l_1C) == 0) goto L5A9E5;

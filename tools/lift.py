@@ -329,6 +329,11 @@ class Func:
         # stack parameters ([ebp+8], [ebp+12], ...): a narrow one makes callers push through a
         # register (`mov eax,0x9c; push eax`)
         self.stack_type = [self.slot_type.pop(-(8 + 4 * k), "int") for k in range(self.nstack)]
+        cts = caller_types().get(self.va) if not os.environ.get("LIFT_NOCALLERTYPES") else None
+        if cts and self.conv is None:
+            for k in range(self.nstack):
+                if 4 + k < len(cts) and cts[4 + k] == "int":
+                    self.stack_type[k] = "int"      # callers push it as an immediate
         for o in [o for o in self.slot_type if o < 0]:
             del self.slot_type[o]
         # Every 4-byte slot between the saved registers and the frame bottom belongs to a
@@ -485,8 +490,19 @@ class Func:
             parts.append(g)
             if base:
                 parts.append(self.reg(base, ins).p())
+        elif base and not index and disp and self.reg(base, ins).tag and \
+                self.reg(base, ins).tag[0] == "padd" and \
+                (ins.address + 0.125 in self.flips) != bool(os.environ.get("LIFT_FIELDFIRST")):
+            # p->arr[i]: the field offset belongs with the pointer (`p + 367 + i*4`), which
+            # makes the pointer side the bigger tree and so evaluated first
+            _, ptxt, ptxtb = self.reg(base, ins).tag
+            self.choices.append(ins.address + 0.125)
+            return "*(%s *)(%s %s %d + %s)" % (STYPE[size], ptxt, "+" if disp > 0 else "-",
+                                               abs(disp), ptxtb)
         elif base:
             bv = self.reg(base, ins)
+            if bv.tag and bv.tag[0] == "padd" and disp and not index:
+                self.choices.append(ins.address + 0.125)
             pick = bv.atom and bv.text.startswith("*(int *)")
             if pick:
                 self.choices.append(ins.address + 0.75)     # or the int load and cast
@@ -919,7 +935,8 @@ class Func:
                     if ins.address in self.flips:     # the offset written first
                         v = E("(int)(%s + %s)" % (pb.p(), ptxt), 4, atom=True)
                     else:
-                        v = E("(int)(%s + %s)" % (ptxt, pb.p()), 4, atom=True)
+                        v = E("(int)(%s + %s)" % (ptxt, pb.p()), 4, atom=True,
+                              tag=("padd", ptxt, pb.p()))
                     self.set_reg(full, v)
                     self.flags = ("val", v, None)
                     return
@@ -1863,10 +1880,21 @@ def caller_types():
                 t = arg_type(ins, k, r)
                 if t is not None:
                     ev.setdefault(tgt, {}).setdefault(n, set()).add(t)
+            # stack arguments, nearest push first: `push imm` is an int (a narrow one is
+            # pushed through a register)
+            n = 4
+            for j in range(k - 1, max(-1, k - 24), -1):
+                i = ins[j]
+                if i.mnemonic in ("call", "ret") or i.mnemonic.startswith("j"):
+                    break
+                if i.mnemonic == "push":
+                    if i.operands[0].type == cx.X86_OP_IMM:
+                        ev.setdefault(tgt, {}).setdefault(n, set()).add("int")
+                    n += 1
     out = {}
     for tgt, params in ev.items():
         types = []
-        for n in range(4):
+        for n in range(max([4] + [m + 1 for m in params])):
             seen = params.get(n, set()) - {"const"}
             if not seen:
                 types.append(None)

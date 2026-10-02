@@ -36,7 +36,7 @@ void func_0001374D(int a1)
     int l_1C;
     int l_18;
 
-    l_1C = (int)(short)*(short *)((char *)*(int *)D_00195BE0 + 247);
+    l_1C = (int)(short)*(short *)(*(char **)D_00195BE0 + 247);
     func_0003D01C(15, 1);
     if (((int)(unsigned char)*(signed char *)((char *)a1)) != 18) goto L137B7;
     l_18 = a1 + 71;
@@ -68,7 +68,7 @@ L1385E:;
     *(short *)D_00178A08 = 250;
     *(signed char *)D_0012B508 = 145;
     l_20 = (func_0009DC25() % 5) + 1;
-    *(int *)((char *)*(int *)D_00195BE0 + 133) += l_20;
+    *(int *)(*(char **)D_00195BE0 + 133) += l_20;
     func_000A0ED9(155, (int)D_0017018C);
     func_000A0F5C((int)D_001903A4, *(int *)D_00183340, l_20);
     func_0003EC2A((int)D_001903A4, 1);
@@ -83,7 +83,7 @@ void func_000138E4(int a1)
     func_0007CB4F(*(int *)D_0018328C);
     return;
 L1390A:;
-    l_18 = ((int)(short)*(short *)((char *)*(int *)D_00195BE0 + 235)) - (a1 * 5);
+    l_18 = ((int)(short)*(short *)(*(char **)D_00195BE0 + 235)) - (a1 * 5);
     if (l_18 >= 30) goto L13933;
     func_0007CB4F(*(int *)D_00183258);
     return;

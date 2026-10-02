@@ -300,7 +300,7 @@ void func_0006D430(int a1)
 {
     func_000A0AD9(*(int *)D_001A49FC, a1, 4, (int)D_00175D00, 287);
     *(int *)D_001A49FC += func_000A0DF4(a1) + 1;
-    *(int *)((char *)*(int *)D_001A49FC) = *(int *)D_001A49F4 - *(int *)D_001A4A00;
+    *(int *)(*(char **)D_001A49FC) = *(int *)D_001A49F4 - *(int *)D_001A4A00;
     *(int *)D_001A49FC += 4;
 }
 

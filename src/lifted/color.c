@@ -38,9 +38,9 @@ int func_00099B86(int a1)
 {
     int l_28;
 
-    *(int *)D_00187B6E = *(int *)((char *)*(int *)D_00195AA4 + 7);
-    *(int *)D_00187B72 = *(int *)((char *)*(int *)D_00195AA4 + 11);
-    *(int *)D_00187B76 = *(int *)((char *)*(int *)D_00195AA4 + 15);
+    *(int *)D_00187B6E = *(int *)(*(char **)D_00195AA4 + 7);
+    *(int *)D_00187B72 = *(int *)(*(char **)D_00195AA4 + 11);
+    *(int *)D_00187B76 = *(int *)(*(char **)D_00195AA4 + 15);
     l_20 = a1 + 71;
     if (*(int *)((char *)l_20) == 0) goto L99C07;
     l_1C = func_0014AA92(l_20, (int)D_00187B6E, 0);
@@ -73,13 +73,13 @@ L99C46:;
 L99C48:;
     *(int *)&l_18 = 0;
 L99C4F:;
-    if (((int)(short)l_18) < ((int)(unsigned short)*(short *)((char *)*(int *)D_00195BDC + 41))) goto L99C6F;
+    if (((int)(short)l_18) < ((int)(unsigned short)*(short *)(*(char **)D_00195BDC + 41))) goto L99C6F;
     goto L99CA3;
 L99C67:;
     (*(int *)&l_18)++;
     goto L99C4F;
 L99C6F:;
-    if (*(int *)((char *)(int)(*(char **)((char *)*(int *)D_00195BDC + 43) + (((int)(short)l_18) * 26)) + 20) != *(int *)((char *)a1 + 31)) goto L99CA1;
+    if (*(int *)((char *)(int)(*(char **)(*(char **)D_00195BDC + 43) + (((int)(short)l_18) * 26)) + 20) != *(int *)((char *)a1 + 31)) goto L99CA1;
     return (((int)(short)l_18) * 26) + *(int *)((char *)*(int *)D_00195BDC + 43);
 L99CA1:;
     goto L99C67;

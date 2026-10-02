@@ -950,3 +950,18 @@ Batch **1,679**; build **1,680 functions, 48.31%**.
   convert to. +18.
 
 Batch **1,715**.
+
+## 2026-10-02: pointer spellings that steer evaluation order
+
+- A pointer read from memory is spelled `*(char **)x`, not `(char *)*(int *)x`: the int
+  load and cast keep Watcom from folding `p + 71` into `lea edx,[eax+0x47]`, and they change
+  the tree size that decides evaluation order. A choice point per use (default the former).
+  +7.
+- Stack arguments pushed as immediates (`push 0x9c`) are `int` parameters (a narrow one
+  goes through a register): the call-site census now covers stack arguments. +2.
+- **`p->arr[i]`**: with the field offset written next to the pointer (`p + 367 + (i << 2)`)
+  the pointer side is the bigger tree and is evaluated first, as in FALL.EXE
+  (`mov edx,[G]; mov eax,[i]; shl eax,2; add eax,edx; mov eax,[eax+0x16f]`). The lifter
+  tags pointer additions and offers this as a choice point at the memory access. +27.
+
+Batch **1,751**.

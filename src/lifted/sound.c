@@ -78,7 +78,7 @@ void func_00068DA6(int a1, int a2, int a3, int a4, int a5)
     *(int *)l_18 = func_000C7FF4(*(int *)((char *)a1 + 4) - *(int *)((char *)a2 + 4), func_000C7FD9(*(int *)((char *)a1), *(int *)((char *)a1 + 8), *(int *)((char *)a2), *(int *)((char *)a2 + 8)));
     *(int *)((char *)l_18 + 12) = *(int *)l_18;
     if (*(int *)l_18 >= 25) goto L68E53;
-    *(int *)((char *)a3) = (((int)(short)*(short *)((char *)*(int *)D_00195BF8 + 2)) * 32767) / 128;
+    *(int *)((char *)a3) = (((int)(short)*(short *)(*(char **)D_00195BF8 + 2)) * 32767) / 128;
     *(int *)((char *)a4) = 32768;
     return;
 L68E53:;
@@ -93,7 +93,7 @@ L68E89:;
     *(int *)((char *)a3) = 32767;
 L68E9D:;
     *(int *)((char *)l_18 + 4) = func_000C808D(*(int *)((char *)a1), *(int *)((char *)a1 + 8), *(int *)((char *)a2), *(int *)((char *)a2 + 8));
-    *(int *)((char *)l_18 + 8) = func_00062EF7((int)(short)*(short *)((char *)*(int *)D_00195AA4 + 3), *(int *)((char *)l_18 + 4), (int)l_18);
+    *(int *)((char *)l_18 + 8) = func_00062EF7((int)(short)*(short *)(*(char **)D_00195AA4 + 3), *(int *)((char *)l_18 + 4), (int)l_18);
     if (*(int *)((char *)l_18 + 8) <= 512) goto L68EED;
     *(int *)((char *)l_18 + 8) = 512 - (*(int *)((char *)l_18 + 8) - 512);
 L68EED:;
@@ -107,7 +107,7 @@ L68F0F:;
 L68F24:;
     *(int *)((char *)a4) = 32768 - *(int *)((char *)l_18 + 8);
 L68F31:;
-    *(int *)((char *)a3) = (*(int *)((char *)a3) * ((int)(short)*(short *)((char *)*(int *)D_00195BF8 + 2))) / 128;
+    *(int *)((char *)a3) = (*(int *)((char *)a3) * ((int)(short)*(short *)(*(char **)D_00195BF8 + 2))) / 128;
 }
 
 void func_000696A3(int a1)

@@ -14,10 +14,10 @@ void func_0007F0F3(int a1)
     int l_18;
 
     if (a1 == 0) return;
-    l_1C = *(int *)((char *)*(int *)D_00195BDC + 43);
+    l_1C = *(int *)(*(char **)D_00195BDC + 43);
     l_20 = 0;
 L7F120:;
-    if (((int)(unsigned short)*(short *)((char *)*(int *)D_00195BDC + 41)) > l_20) goto L7F144;
+    if (((int)(unsigned short)*(short *)(*(char **)D_00195BDC + 41)) > l_20) goto L7F144;
     return;
 L7F135:;
     l_20++;

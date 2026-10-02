@@ -78,7 +78,7 @@ void func_00020BBB(int a1)
     *(signed char *)D_00190D1F = func_0009DC25() & -255;
     if (a1 == 0) goto L20BF9;
     *(int *)D_00190CD4 = 0;
-    *(signed char *)D_00190D20 = *(signed char *)((char *)*(int *)D_00195BE0 + 64) & 1;
+    *(signed char *)D_00190D20 = *(signed char *)(*(char **)D_00195BE0 + 64) & 1;
     goto L20C0F;
 L20BF9:;
     *(int *)D_00190CD4 = func_0009DC25();

@@ -30,12 +30,12 @@ L13CA0:;
     *(signed char *)(D_001903A4 + l_18) = 0;
     func_0005A54A((int)D_001903A4, *(int *)D_00196470, 140);
     *(int *)D_00196470 -= 2;
-    l_1C = func_0005A442((int)(unsigned char)*(signed char *)((char *)*(int *)D_00196474));
+    l_1C = func_0005A442((int)(unsigned char)*(signed char *)(*(char **)D_00196474));
     if ((-*(int *)D_00196470) <= l_1C) goto L13D14;
     (*(int *)D_00196474)++;
     *(int *)D_00196470 += l_1C;
 L13D14:;
-    if (*(signed char *)((char *)*(int *)D_00196474) != 0) return;
+    if (*(signed char *)(*(char **)D_00196474) != 0) return;
     func_00013DB6();
 }
 

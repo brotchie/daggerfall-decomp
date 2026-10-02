@@ -329,7 +329,7 @@ L83FD2:;
 L83FDE:;
     *(int *)&l_18 = 1132;
     if (*(int *)D_00196DB0 != a1) goto L83FF7;
-    if ((*(unsigned char *)((char *)*(int *)&l_18) & 8) == 0) goto L83FF9;
+    if ((*(unsigned char *)(*(char **)&l_18) & 8) == 0) goto L83FF9;
 L83FF7:;
     goto L84005;
 L83FF9:;
@@ -438,7 +438,7 @@ int func_00084480(int a1, int a2, int a3)
     *(short *)((char *)l_14 + 27) = a2;
     *(short *)((char *)l_14 + 23) = a3;
     *(short *)((char *)l_14 + 19) = 8000;
-    *(int *)((char *)l_14 + 31) = *(int *)((char *)*(int *)D_00195AC4 + 31) + ((int)(unsigned short)(*(short *)((char *)*(int *)D_00195BDC + 37))++);
+    *(int *)((char *)l_14 + 31) = *(int *)(*(char **)D_00195AC4 + 31) + ((int)(unsigned short)(*(short *)(*(char **)D_00195BDC + 37))++);
     return l_14;
 }
 
@@ -467,10 +467,10 @@ L84560:;
     if (l_1C == 9) goto L8458E;
     if (l_1C != 16) goto L845B3;
 L8458E:;
-    *(int *)((char *)l_20 + 31) = *(int *)((char *)*(int *)D_00195AC4 + 31) + ((int)(unsigned short)(*(short *)((char *)*(int *)D_00195BDC + 39))++);
+    *(int *)((char *)l_20 + 31) = *(int *)(*(char **)D_00195AC4 + 31) + ((int)(unsigned short)(*(short *)(*(char **)D_00195BDC + 39))++);
     goto L845D6;
 L845B3:;
-    *(int *)((char *)l_20 + 31) = *(int *)((char *)*(int *)D_00195AC4 + 31) + ((int)(unsigned short)(*(short *)((char *)*(int *)D_00195BDC + 37))++);
+    *(int *)((char *)l_20 + 31) = *(int *)(*(char **)D_00195AC4 + 31) + ((int)(unsigned short)(*(short *)(*(char **)D_00195BDC + 37))++);
 L845D6:;
     *(short *)((char *)l_20 + 21) = 1;
     return l_20;
@@ -481,10 +481,10 @@ void func_000847BC(int a1, int a2)
     int l_18;
     int l_14;
 
-    if (*(signed char *)((char *)*(int *)D_00196888 + 4) == 0) return;
+    if (*(signed char *)(*(char **)D_00196888 + 4) == 0) return;
     l_14 = 0;
 L847E5:;
-    if (((int)(unsigned char)*(signed char *)((char *)*(int *)D_00196888 + 4)) > l_14) goto L8480B;
+    if (((int)(unsigned char)*(signed char *)(*(char **)D_00196888 + 4)) > l_14) goto L8480B;
     return;
 L847FC:;
     l_14++;
@@ -509,10 +509,10 @@ void func_000848CA(int a1, int a2)
     int l_18;
     int l_14;
 
-    if (*(signed char *)((char *)*(int *)D_00196888 + 3) == 0) return;
+    if (*(signed char *)(*(char **)D_00196888 + 3) == 0) return;
     l_14 = 0;
 L848F3:;
-    if (((int)(unsigned char)*(signed char *)((char *)*(int *)D_00196888 + 3)) > l_14) goto L84919;
+    if (((int)(unsigned char)*(signed char *)(*(char **)D_00196888 + 3)) > l_14) goto L84919;
     return;
 L8490A:;
     l_14++;

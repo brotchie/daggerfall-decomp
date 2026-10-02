@@ -252,7 +252,7 @@ L25563:;
 L2556B:;
     *(int *)D_00196D78 -= 2;
 L25572:;
-    if (*(signed char *)((char *)*(int *)D_00196D78) == 0) goto L25584;
+    if (*(signed char *)(*(char **)D_00196D78) == 0) goto L25584;
     (*(int *)D_00196D78)--;
     goto L25572;
 L25584:;

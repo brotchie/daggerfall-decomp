@@ -9,25 +9,25 @@ extern int func_00067270(void);
 void func_00070370(int a1, int a2)
 {
     if (a1 != 5) goto L703F6;
-    if (*(int *)((char *)*(int *)D_00195BE0 + 529) != 0) return;
-    if (((int)(unsigned char)*(signed char *)((char *)*(int *)D_00195BE0 + 546)) == 100) return;
-    *(signed char *)((char *)*(int *)D_00195BE0 + 546) += *(signed char *)&a2;
-    if (((int)(unsigned char)*(signed char *)((char *)*(int *)D_00195BE0 + 546)) < 6) goto L703F1;
-    *(int *)((char *)*(int *)D_00195BE0 + 529) = *(int *)D_00195BF4 + 4320;
+    if (*(int *)(*(char **)D_00195BE0 + 529) != 0) return;
+    if (((int)(unsigned char)*(signed char *)(*(char **)D_00195BE0 + 546)) == 100) return;
+    *(signed char *)(*(char **)D_00195BE0 + 546) += *(signed char *)&a2;
+    if (((int)(unsigned char)*(signed char *)(*(char **)D_00195BE0 + 546)) < 6) goto L703F1;
+    *(int *)(*(char **)D_00195BE0 + 529) = *(int *)D_00195BF4 + 4320;
 L703F1:;
     return;
 L703F6:;
-    if (*(int *)((char *)*(int *)D_00195BE0 + 92) == 0) goto L7040A;
+    if (*(int *)(*(char **)D_00195BE0 + 92) == 0) goto L7040A;
     if (func_00067270() != 0) goto L7040C;
 L7040A:;
     goto L7042D;
 L7040C:;
-    *(int *)((char *)*(int *)D_00195BE0 + 96) = *(int *)D_00195BF4;
-    *(short *)((char *)*(int *)D_00195BE0 + 126) = *(short *)((char *)*(int *)D_00195BE0 + 92);
+    *(int *)(*(char **)D_00195BE0 + 96) = *(int *)D_00195BF4;
+    *(short *)(*(char **)D_00195BE0 + 126) = *(short *)(*(char **)D_00195BE0 + 92);
 L7042D:;
-    if (*(int *)((char *)*(int *)D_00195BE0 + 533) != 0) return;
-    if (((int)(unsigned char)*(signed char *)((char *)*(int *)D_00195BE0 + 543)) == 100) return;
-    *(signed char *)((char *)*(int *)D_00195BE0 + 543) += *(signed char *)&a2;
-    if (((int)(unsigned char)*(signed char *)((char *)*(int *)D_00195BE0 + 543)) < 15) return;
-    *(int *)((char *)*(int *)D_00195BE0 + 533) = *(int *)D_00195BF4 + 4320;
+    if (*(int *)(*(char **)D_00195BE0 + 533) != 0) return;
+    if (((int)(unsigned char)*(signed char *)(*(char **)D_00195BE0 + 543)) == 100) return;
+    *(signed char *)(*(char **)D_00195BE0 + 543) += *(signed char *)&a2;
+    if (((int)(unsigned char)*(signed char *)(*(char **)D_00195BE0 + 543)) < 15) return;
+    *(int *)(*(char **)D_00195BE0 + 533) = *(int *)D_00195BF4 + 4320;
 }

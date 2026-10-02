@@ -16,8 +16,8 @@ void func_000231F5(int a1, short a2)
     int l_20;
 
     if (((int)(unsigned char)*(signed char *)D_001789FA) == 3) goto L23246;
-    if (((int)(unsigned char)*(signed char *)((char *)*(int *)((char *)a1 + 67))) == 1) goto L23239;
-    func_0008E4A8(*(int *)((char *)*(int *)((char *)a1 + 67) + 63), *(int *)&a2);
+    if (((int)(unsigned char)*(signed char *)(*(char **)((char *)a1 + 67))) == 1) goto L23239;
+    func_0008E4A8(*(int *)(*(char **)((char *)a1 + 67) + 63), *(int *)&a2);
     goto L23244;
 L23239:;
     func_0007EB0B(a1, *(int *)&a2);

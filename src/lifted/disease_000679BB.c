@@ -16,8 +16,8 @@ int func_000679BB(int a1)
 
     *(signed char *)D_00190CE4 = *(signed char *)&a1;
     *(int *)D_00195B84 = 0;
-    func_0008E3F7(*(int *)((char *)*(int *)D_00195AA0 + 63), (int)func_00067875);
-    l_18 = *(signed char *)((char *)*(int *)D_00195BE0 + 548);
+    func_0008E3F7(*(int *)(*(char **)D_00195AA0 + 63), (int)func_00067875);
+    l_18 = *(signed char *)(*(char **)D_00195BE0 + 548);
     *(int *)D_00195B84 += (int)(signed char)l_18;
     return *(int *)D_00195B84;
 }

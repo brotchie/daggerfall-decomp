@@ -77,8 +77,8 @@ void func_0005D486(void)
 
     *(signed char *)D_001940D6 ^= 64;
     if ((*(unsigned char *)D_001940D6 & 64) == 0) return;
-    if (*(int *)((char *)*(int *)D_00195BE0 + 443) == 0) return;
-    l_18 = *(int *)((char *)*(int *)D_00195BE0 + 443) + 71;
+    if (*(int *)(*(char **)D_00195BE0 + 443) == 0) return;
+    l_18 = *(int *)(*(char **)D_00195BE0 + 443) + 71;
     func_00069938((int)(short)*(short *)(D_00188208 + (((int)(unsigned short)*(short *)((char *)l_18 + 34)) * 2)), *(int *)D_00195AA4, 100);
 }
 
@@ -108,7 +108,7 @@ void func_0005D876(void)
 
     if ((*(unsigned char *)D_001940D4 & 32) == 0) return;
     func_000A1023(*(int *)D_00143550, *(int *)D_00199D68, 64000, (int)D_00175898, 368, 4);
-    func_00144F68((int)(unsigned short)*(short *)((char *)*(int *)D_00195D64), (int)(unsigned short)*(short *)((char *)*(int *)D_00195D64 + 2), (int)(unsigned short)*(short *)((char *)*(int *)D_00195D64 + 4), (int)(unsigned short)*(short *)((char *)*(int *)D_00195D64 + 6), *(int *)D_00195D64 + 12);
+    func_00144F68((int)(unsigned short)*(short *)(*(char **)D_00195D64), (int)(unsigned short)*(short *)(*(char **)D_00195D64 + 2), (int)(unsigned short)*(short *)(*(char **)D_00195D64 + 4), (int)(unsigned short)*(short *)(*(char **)D_00195D64 + 6), *(int *)D_00195D64 + 12);
     if (*(signed char *)D_00142309 != 0) goto L5D911;
     if (((int)(unsigned char)(*(signed char *)D_0012AC00 & 2)) == 0) goto L5D931;
 L5D911:;
@@ -161,7 +161,7 @@ int func_0005DA1D(void)
 L5DA42:;
     goto L5DA5A;
 L5DA44:;
-    if (((int)(unsigned short)(*(short *)((char *)*(int *)D_00195BF8) & 1)) == 0) goto L5DA5F;
+    if (((int)(unsigned short)(*(short *)(*(char **)D_00195BF8) & 1)) == 0) goto L5DA5F;
 L5DA5A:;
     goto L5DAEE;
 L5DA5F:;
@@ -194,7 +194,7 @@ L5DAEE:;
 
 int func_0005DB02(void)
 {
-    if (((int)(short)*(short *)((char *)*(int *)D_00195BE0 + 124)) >= (((int)(short)*(short *)((char *)*(int *)D_00195BE0 + 126)) / 10)) goto L5DB3D;
+    if (((int)(short)*(short *)(*(char **)D_00195BE0 + 124)) >= (((int)(short)*(short *)(*(char **)D_00195BE0 + 126)) / 10)) goto L5DB3D;
     return 2;
 L5DB3D:;
     if (*(signed char *)D_00199D71 == 0) goto L5DB4F;

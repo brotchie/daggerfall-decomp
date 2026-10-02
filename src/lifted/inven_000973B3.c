@@ -30,9 +30,9 @@ void func_000973B3(int a1, int a2)
 L9744C:;
     return;
 L9744E:;
-    l_14 = a2 + ((int)(unsigned char)*(signed char *)((char *)*(int *)D_00195AF4 + 120));
+    l_14 = a2 + ((int)(unsigned char)*(signed char *)(*(char **)D_00195AF4 + 120));
     if (l_14 < 200) goto L97473;
     l_14 = 199;
 L97473:;
-    *(signed char *)((char *)*(int *)D_00195AF4 + 120) = *(signed char *)&l_14;
+    *(signed char *)(*(char **)D_00195AF4 + 120) = *(signed char *)&l_14;
 }

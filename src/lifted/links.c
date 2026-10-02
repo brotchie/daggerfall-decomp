@@ -52,7 +52,7 @@ L64396:;
     goto L64389;
 L6439E:;
     if (*(int *)((char *)((l_20 * 39) + l_1C) + 35) == 0) goto L643C2;
-    *(int *)((char *)((l_20 * 39) + l_1C) + 35) = *(int *)((char *)*(int *)((char *)((l_20 * 39) + l_1C) + 35) + 31);
+    *(int *)((char *)((l_20 * 39) + l_1C) + 35) = *(int *)(*(char **)((char *)((l_20 * 39) + l_1C) + 35) + 31);
 L643C2:;
     goto L64396;
 L643C4:;
@@ -184,7 +184,7 @@ void func_0006546F(int a1, int a2)
 
     l_18 = func_0008DCE3(*(int *)D_00195AC4, 0, 89);
     l_14 = l_18 + 71;
-    *(short *)((char *)l_14 + 80) = a2 * ((unsigned short)(unsigned char)*(signed char *)((char *)*(int *)D_00195BE0 + 129));
+    *(short *)((char *)l_14 + 80) = a2 * ((unsigned short)(unsigned char)*(signed char *)(*(char **)D_00195BE0 + 129));
     *(signed char *)((char *)l_14 + 1) = 0;
     *(signed char *)((char *)l_14 + 6) = *(signed char *)&a1;
     func_00089035(l_18, 0, *(int *)D_00195AA0);
@@ -217,15 +217,15 @@ case 0:
 case 1:
     goto L655CB;
 L655CB:;
-    *(int *)((char *)a1 + 13) = *(int *)((char *)*(int *)((char *)a1 + 35) + 7);
+    *(int *)((char *)a1 + 13) = *(int *)(*(char **)((char *)a1 + 35) + 7);
     goto L655FC;
 case 2:
 case 3:
-    *(int *)((char *)a1 + 13) = *(int *)((char *)*(int *)((char *)a1 + 35) + 11);
+    *(int *)((char *)a1 + 13) = *(int *)(*(char **)((char *)a1 + 35) + 11);
     goto L655FC;
 case 4:
 case 5:
-    *(int *)((char *)a1 + 13) = *(int *)((char *)*(int *)((char *)a1 + 35) + 15);
+    *(int *)((char *)a1 + 13) = *(int *)(*(char **)((char *)a1 + 35) + 15);
 default:
 L655FC:;
     return;
@@ -243,7 +243,7 @@ L65652:;
     l_18 = 1132;
     *(int *)((char *)a1 + 25) = *(int *)((char *)l_18);
     if (((int)(unsigned char)(*(signed char *)((char *)a1 + 12) & 32)) != 0) goto L6569E;
-    l_20 = func_000658CA((int)(unsigned short)*(short *)((char *)*(int *)((char *)a1 + 35) + 29), (int)(unsigned short)*(short *)((char *)*(int *)((char *)a1 + 35) + 27));
+    l_20 = func_000658CA((int)(unsigned short)*(short *)(*(char **)((char *)a1 + 35) + 29), (int)(unsigned short)*(short *)(*(char **)((char *)a1 + 35) + 27));
     if (l_20 != 0) goto L656A0;
 L6569E:;
     goto L656C7;
@@ -260,15 +260,15 @@ case 0:
 case 1:
     goto L656F0;
 L656F0:;
-    *(int *)((char *)a1 + 13) = (int)(short)*(short *)((char *)*(int *)((char *)a1 + 35) + 1);
+    *(int *)((char *)a1 + 13) = (int)(short)*(short *)(*(char **)((char *)a1 + 35) + 1);
     goto L65724;
 case 2:
 case 3:
-    *(int *)((char *)a1 + 13) = (int)(short)*(short *)((char *)*(int *)((char *)a1 + 35) + 3);
+    *(int *)((char *)a1 + 13) = (int)(short)*(short *)(*(char **)((char *)a1 + 35) + 3);
     goto L65724;
 case 4:
 case 5:
-    *(int *)((char *)a1 + 13) = (int)(short)*(short *)((char *)*(int *)((char *)a1 + 35) + 5);
+    *(int *)((char *)a1 + 13) = (int)(short)*(short *)(*(char **)((char *)a1 + 35) + 5);
 default:
 L65724:;
     return;

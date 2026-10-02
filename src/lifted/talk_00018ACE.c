@@ -19,19 +19,19 @@ int func_00018ACE(short a1)
     short l_1C;
 
     *(int *)&l_1C = func_000192EE((int)(short)a1);
-    if (((int)(unsigned char)*(signed char *)((char *)*(int *)&l_1C)) == 15) goto L18B09;
-    if (((int)(unsigned char)*(signed char *)((char *)*(int *)&l_1C)) != 14) goto L18B15;
+    if (((int)(unsigned char)*(signed char *)(*(char **)&l_1C)) == 15) goto L18B09;
+    if (((int)(unsigned char)*(signed char *)(*(char **)&l_1C)) != 14) goto L18B15;
 L18B09:;
     return 0;
 L18B15:;
     l_24 = func_00018BDC((int)(short)a1);
-    *(short *)D_001966AC += *(short *)((char *)*(int *)&l_1C + 29);
-    if (((int)(unsigned char)*(signed char *)((char *)*(int *)&l_1C + 54)) >= 5) goto L18B62;
-    *(short *)D_001966AC += *(short *)((char *)(int)(*(char **)D_00195BE0 + (((int)(unsigned char)*(signed char *)((char *)*(int *)&l_1C + 54)) * 2)) + 145);
+    *(short *)D_001966AC += *(short *)(*(char **)&l_1C + 29);
+    if (((int)(unsigned char)*(signed char *)(*(char **)&l_1C + 54)) >= 5) goto L18B62;
+    *(short *)D_001966AC += *(short *)((char *)(int)(*(char **)D_00195BE0 + (((int)(unsigned char)*(signed char *)(*(char **)&l_1C + 54)) * 2)) + 145);
 L18B62:;
     l_28 = func_0007D6AE(0, 15) - 10;
     if (((int)(short)*(short *)D_001966AC) < l_28) goto L18B8C;
-    if (((int)(short)*(short *)((char *)*(int *)&l_1C + 29)) >= 30) goto L18B8E;
+    if (((int)(short)*(short *)(*(char **)&l_1C + 29)) >= 30) goto L18B8E;
 L18B8C:;
     goto L18B9E;
 L18B8E:;
