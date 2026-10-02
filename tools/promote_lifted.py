@@ -60,15 +60,17 @@ def main():
     proto = {}
     for n, text in texts.items():
         for line in text.splitlines():
-            m = re.match(r"extern \w+ (func_[0-9A-F]{8})\((.*)\);", line)
+            m = re.match(r"extern (\w+(?: \w+)?) (func_[0-9A-F]{8})\((.*)\);", line)
             if m:
-                proto[m.group(1)] = m.group(2)
+                proto.setdefault(m.group(2), set()).add((m.group(1), m.group(3)))
     alone = set()
     for n, text in texts.items():
-        m = re.search(r"^\w+ %s\((.*)\)$" % n, text, re.M)
+        m = re.search(r"^(\w+(?: \w+)?) %s\((.*)\)$" % n, text, re.M)
         if m and n in proto:
-            types = ", ".join(re.sub(r"\s*a\d+$", "", p.strip()) for p in m.group(1).split(","))
-            if types != proto[n] and not (types == "void" and proto[n] == "void"):
+            types = ", ".join(re.sub(r"\s*a\d+$", "", p.strip()) for p in m.group(2).split(","))
+            # (the return type too: a short function its callers declare int)
+            if any((types != pt and pt != "") or (rt != m.group(1) and pt != "")
+                   for rt, pt in proto[n]):
                 alone.add(n)
     # A function that declares a callee differently from the rest of its unit (an implicit
     # `int f()` for a void function whose result it uses) also gets a file of its own.

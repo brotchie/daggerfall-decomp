@@ -88,6 +88,7 @@ extern int func_000696F9(int);
 extern int func_00069938(int, int, int);
 extern int func_00069AB8(int, int, int);
 extern int func_0006CB53(int, int);
+extern int func_0008269B(int);
 extern int func_000A0024();
 extern int func_000A0040();
 extern int func_000A1023();
@@ -104,7 +105,6 @@ extern void func_0007EED8(void);
 extern void func_00080A72(int);
 int func_00080B58(void);
 int func_00082657(int);
-int func_0008269B(int);
 void func_0008036E(void);
 void func_0008066F(int);
 
@@ -822,32 +822,6 @@ L82675:;
     goto L82675;
 L82688:;
     return l_1C;
-}
-
-short func_0008269B(int a1)
-{
-    if (((int)(unsigned char)*(signed char *)((char *)a1)) < 48) goto L826CA;
-    if (((int)(unsigned char)*(signed char *)((char *)a1)) <= 57) goto L826CC;
-L826CA:;
-    goto L826DE;
-L826CC:;
-    return ((unsigned short)(unsigned char)*(signed char *)((char *)a1)) - 48;
-L826DE:;
-    if (((int)(unsigned char)*(signed char *)((char *)a1)) < 65) goto L826FC;
-    if (((int)(unsigned char)*(signed char *)((char *)a1)) <= 90) goto L826FE;
-L826FC:;
-    goto L8270D;
-L826FE:;
-    return ((unsigned short)(unsigned char)*(signed char *)((char *)a1)) - 55;
-L8270D:;
-    if (((int)(unsigned char)*(signed char *)((char *)a1)) < 97) goto L8272B;
-    if (((int)(unsigned char)*(signed char *)((char *)a1)) <= 97) goto L8272D;
-L8272B:;
-    goto L8273C;
-L8272D:;
-    return ((unsigned short)(unsigned char)*(signed char *)((char *)a1)) - 87;
-L8273C:;
-    return 0;
 }
 
 int func_00082750(int a1)
