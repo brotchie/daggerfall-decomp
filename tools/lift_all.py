@@ -97,7 +97,7 @@ def work(va):
             msg = [re.sub(r"^.*?Error! E\d+: ", "", l) for l in msg]
             return name, "error", "compile: " + (msg[0][:150] if msg else "failed")
         obj = OMF(objp)
-    fns = {n.rstrip("_"): (si, off, sz) for n, si, off, sz in obj.functions()}
+    fns = {n.strip("_"): (si, off, sz) for n, si, off, sz in obj.functions()}
     if name not in fns:
         return name, "error", "function not in object"
     tva, tsize = W["funcs"][name]

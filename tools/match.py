@@ -97,7 +97,7 @@ class Target:
 
 def compare(tgt, obj, name, va, size, quiet=False):
     """Return (ok, n_diff_bytes). Relocations are masked on both sides."""
-    funcs = {n.rstrip("_"): (si, off, sz) for n, si, off, sz in obj.functions()}
+    funcs = {n.strip("_"): (si, off, sz) for n, si, off, sz in obj.functions()}
     si, off, csz = funcs[name]
     ours = bytes(obj.data[si][off:off + csz])
     # trailing padding in our segment belongs to alignment, not the function
@@ -123,16 +123,20 @@ def compare(tgt, obj, name, va, size, quiet=False):
     ok = diff == 0 and len(ours) == size
     if not ok and not quiet:
         md = capstone.Cs(capstone.CS_ARCH_X86, capstone.CS_MODE_32)
-        L = ["%-8x %-18s %s %s" % (i.address, i.bytes.hex(), i.mnemonic, i.op_str)
-             for i in md.disasm(ours, va)]
-        R = ["%-8x %-18s %s %s" % (i.address, i.bytes.hex(), i.mnemonic, i.op_str)
-             for i in md.disasm(theirs, va)]
+        Li = list(md.disasm(ours, va))
+        Ri = list(md.disasm(theirs, va))
         print("--- %s  ours %d bytes / target %d bytes, %d differing" % (name, len(ours), size, diff))
-        for k in range(max(len(L), len(R))):
-            left = L[k] if k < len(L) else ""
-            right = R[k] if k < len(R) else ""
-            mark = "  " if left.split()[1:2] == right.split()[1:2] else "! "
-            print("%s%-60s | %s" % (mark, left, right))
+        for k in range(max(len(Li), len(Ri))):
+            a = Li[k] if k < len(Li) else None
+            b = Ri[k] if k < len(Ri) else None
+            left = "%-8x %-18s %s %s" % (a.address, a.bytes.hex(), a.mnemonic, a.op_str) if a else ""
+            right = "%-8x %-18s %s %s" % (b.address, b.bytes.hex(), b.mnemonic, b.op_str) if b else ""
+            # differs = unmasked bytes differ (relocated fields match by construction)
+            same = a is not None and b is not None and a.size == b.size and (all(
+                (a.address - va + j) in mask or a.bytes[j] == b.bytes[j] for j in range(a.size))
+                or (a.mnemonic == b.mnemonic and a.mnemonic.startswith("j")
+                    and a.op_str.startswith("0x")))   # displacement only: a size difference later
+            print("%s%-60s | %s" % ("  " if same else "! ", left, right))
     return ok, diff
 
 
@@ -152,7 +156,7 @@ def main():
         obj = OMF(objp)
     allok = True
     for n, _si, _off, _sz in obj.functions():
-        name = n.rstrip("_")
+        name = n.strip("_")
         if a.func and name != a.func:
             continue
         if name not in syms:
