@@ -120,7 +120,37 @@ The busiest writers are setup routines: `0x12A2D0` (29 writes), `0x12A100` (25),
 (20). What the static census cannot see (writes through registers, generated code) is phase
 3's job: replay flags every write into code.
 
-Next: phase 3 (the replay harness).
+## 2026-10-02: phase 3, a headless FALL.EXE
+
+Phase 3 needs XnGine's real inputs, so instead of dumping memory from DOSBox-X, the game now
+runs headless in `tools/fallemu.py`: Unicorn for the CPU, with the extender, DOS, BIOS and PC
+hardware the game touches written in Python. It boots `FALL.EXE z.cfg` to the main menu in
+about a billion instructions (50 s, 20 MIPS) and saves the screen as a PNG.
+
+- **Memory as CauseWay sets it up.** The game is zero-based and flat: it reads the BIOS tick
+  count at 0x46C and video memory at 0xA0000 directly, so its objects load above 1 MB and are
+  relocated through the LE fixups. They load at 0x01000000 + their preferred address, so
+  `func_00012345` runs at 0x01012345. The six selector fixups in object 2 get the flat data
+  selector.
+- **Services:** DOS files over `build/game` (a clone of the patched install) with writes going
+  to `build/emu/overlay`; DOS memory, dates and directory search; about 25 DPMI functions;
+  CauseWay's `FF25h`/`FF26h`/`FF30h`; BIOS video, keyboard and mouse; VGA palette and retrace
+  ports. The Watcom startup takes the DOS/4G path (`int 21h ax=FF00h`).
+- **Deterministic:** the timer interrupt fires every 400,000 instructions while interrupts
+  are enabled, and the date is fixed.
+- **`Z.CFG`:** the game needs exactly one argument, its config file (`main` checks
+  `argc == 2`, the "Please run DAGGER.EXE" message). The overlay holds one with `path`,
+  `pathcd`, `maps` and `mapfile maps.bsa` (12 characters at most).
+- Two things DOS does that mattered: handles are the lowest free number (Watcom's runtime
+  only tracks 20), and a seek with an invalid mode fails without moving.
+
+**A latent bug, found on the way:** XnGine's `func_000C31AE` seeks with `mov ah,42h / int 21h`
+and never sets AL, so the mode is the low byte of whatever EAX held (a pointer, 0x1C, in this
+run). DOS rejects it and does not move, and the 0x400-byte read that follows only works if the
+file position is already right. The emulator logs it as a note each run.
+
+Next: drive the menus into the 3D world, then hook XnGine's entry points to capture calls and
+watch for writes into code.
 
 Run: `.venv/bin/python tools/xn_disasm.py` regenerates `src/xngine/` (4 s);
 `.venv/bin/python tools/xn_link.py [module]` checks modules; `tools/build-and-verify.sh` builds.
