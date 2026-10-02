@@ -81,6 +81,9 @@ extern void func_0007D3CA(int);
 void func_0003AF3F(void);
 void func_0003B1D6(void);
 #pragma aux func_000A0ED9 parm routine [];
+#pragma dagger DAGGER_CONFPOS func_0003A3CE
+#pragma dagger KKND_CONFREV func_0003A3CE
+#pragma dagger confwin func_0003A3CE 124 125
 
 void func_0003A325(void)
 {
@@ -247,7 +250,7 @@ L3A7CE:;
     if (((int)(signed char)l_18) == (-1)) goto L3A3EC;
     goto L3A7CE;
 L3A7F2:;
-    l_18 = *(signed char *)((char *)(int)(*(char **)D_00195C44 + ((((int)(short)*(short *)D_0012AC06) * 320) + ((int)(short)*(short *)D_0012AC04))));
+    l_18 = *(signed char *)((char *)(int)(*(char **)D_00195C44 + (((int)(short)*(short *)D_0012AC04) + (((int)(short)*(short *)D_0012AC06) * 320))));
     if (l_18 != 0) goto L3A81F;
     l_18 = 255;
 L3A81F:;

@@ -21,7 +21,7 @@ void func_0008CC33(int);
 void func_0008D45A(int, short);
 void func_0008D88B(int, int);
 #pragma dagger DAGGER_NOGIVEN func_0008D497
-#pragma dagger reg func_0008D497 437 bx
+#pragma dagger reg func_0008D497 119 edx 437 bx
 #pragma dagger slots func_0008CCC8 a1 20 a2 16 a3 8 l_18 12 l_10 4
 #pragma dagger slots func_0008D497 a1 40 a2 36 l_90 128 l_8C 124 l_88 120 l_30 32 l_2C 28 l_28 24 l_24 20 l_20 16 l_1C 12 l_18 8 l_14 4
 #pragma dagger slots func_0008D800 a1 12 a2 8 a3 16 a4 4 l_20 24 ret 20
@@ -157,10 +157,10 @@ L8D556:;
     func_00144D00((int)(short)l_2C, (int)(short)l_18, (int)(short)l_20, (int)(short)l_1C);
 L8D5B7:;
     *(signed char *)D_0012B508 = 123;
-    func_000CE4FA((int)(short)l_2C, (int)(short)l_18, (int)(short)l_2C, (int)&*(signed char *)((char *)(int)((char *)((int)(short)l_18) + ((int)(short)l_1C)) - 1));
-    func_000CE4FA((int)(short)l_2C, (int)&*(signed char *)((char *)(int)((char *)((int)(short)l_18) + ((int)(short)l_1C)) - 1), (int)&*(signed char *)((char *)(int)((char *)((int)(short)l_2C) + ((int)(short)l_20)) - 1), (int)&*(signed char *)((char *)(((int)(short)l_18) + ((int)(short)l_1C)) - 1));
+    func_000CE4FA((int)(short)l_2C, (int)(short)l_18, (int)(short)l_2C, (int)&*(signed char *)((char *)(((int)(short)l_18) + ((int)(short)l_1C)) - 1));
+    func_000CE4FA((int)(short)l_2C, (int)&*(signed char *)((char *)(((int)(short)l_18) + ((int)(short)l_1C)) - 1), (int)&*(signed char *)((char *)(((int)(short)l_2C) + ((int)(short)l_20)) - 1), (int)&*(signed char *)((char *)(((int)(short)l_18) + ((int)(short)l_1C)) - 1));
     *(signed char *)D_0012B508 = 112;
-    func_000CE4FA((((int)(short)l_2C) + ((int)(short)l_20)) - 1, (int)(short)l_18, (int)&*(signed char *)((char *)(((int)(short)l_2C) + ((int)(short)l_20)) - 1), (int)&*(signed char *)((char *)(int)((char *)((int)(short)l_18) + ((int)(short)l_1C)) - 2));
+    func_000CE4FA((((int)(short)l_2C) + ((int)(short)l_20)) - 1, (int)(short)l_18, (int)&*(signed char *)((char *)(((int)(short)l_2C) + ((int)(short)l_20)) - 1), (int)&*(signed char *)((char *)(((int)(short)l_18) + ((int)(short)l_1C)) - 2));
     func_000CE4FA(((int)(short)l_2C) + 1, (int)(short)l_18, (int)&*(signed char *)((char *)(((int)(short)l_2C) + ((int)(short)l_20)) - 1), (int)(short)l_18);
     l_24 = *(short *)((char *)a1 + 39);
     *(int *)&l_18 = 1;

@@ -206,11 +206,8 @@ void func_00088C0E(int);
 #pragma dagger reg func_000874C0 40 eax 56 eax 63 edx 68 eax
 #pragma dagger reg func_000876AD 437 bx
 #pragma dagger reg func_00087F76 437 bx
-#pragma dagger reg func_00088213 437 bx
-#pragma dagger reg func_0008824A 437 bx
 #pragma dagger reg func_00088551 387 cx
 #pragma dagger reg func_00088732 39 edx 46 eax
-#pragma dagger reg func_00088E11 437 bx
 #pragma dagger slots func_00087F76 a1 36 a2 24 a3 32 a4 28 l_3C 52 l_38 48 l_34 44 l_30 40 l_1C 20 l_18 16 l_14 12 l_10 8 l_C 4
 
 void func_00086314(void)
@@ -1023,12 +1020,12 @@ L88207:;
 
 void func_00088213(int a1, int a2)
 {
-    ((struct bf32_30_1 *)((char *)(int)(*(char **)D_00196A9C + (a1 * 17)) + 4))->f = a2;
+    ((struct bf32_30_1 *)((char *)(int)((a1 * 17) + *(char **)D_00196A9C) + 4))->f = a2;
 }
 
 void func_0008824A(int a1, int a2)
 {
-    ((struct bf32_31_1 *)((char *)(int)(*(char **)D_00196A9C + (a1 * 17)) + 4))->f = a2;
+    ((struct bf32_31_1 *)((char *)(int)((a1 * 17) + *(char **)D_00196A9C) + 4))->f = a2;
 }
 
 void func_00088281(int a1, int a2)

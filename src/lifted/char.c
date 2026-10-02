@@ -57,10 +57,11 @@ extern void func_0005E7FC(int);
 void func_0005978F(int, int);
 void func_00059909(int, int);
 #pragma aux func_000A0ED9 parm routine [];
+#pragma dagger DAGGER_CONFPOS func_00059909
 #pragma dagger DAGGER_PUSHMEM func_00058E15
+#pragma dagger confwin func_00059909 11 13
 #pragma dagger reg func_00058E15 240 esi 242 ebx 381 esi
 #pragma dagger reg func_0005978F 51 eax
-#pragma dagger reg func_00059909 12 esi
 #pragma dagger slots func_00058E15 a1 32 a2 44 l_B4 164 l_B0 160 l_AC 156 l_A8 152 l_38 40 l_34 36 l_2C 28 l_28 24 l_24 20 l_20 16 l_1C 12 l_18 8 l_14 4
 
 void func_00058E15(int a1, int a2)

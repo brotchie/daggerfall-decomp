@@ -17,6 +17,9 @@ extern int func_000A00CB();
 extern int func_0012DB50();
 extern void func_0005A13D(void);
 extern void func_0005A1C8(int);
+#pragma dagger DAGGER_CONFPOSREV func_00059F24
+#pragma dagger KKND_CONFREV func_00059F24
+#pragma dagger confwin func_00059F24 27 32
 
 void func_00059F24(int a1)
 {

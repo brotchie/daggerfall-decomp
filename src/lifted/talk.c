@@ -302,6 +302,7 @@ void func_0001B5BE(int, int);
 #pragma aux func_000A0ED9 parm routine [];
 #pragma dagger DAGGER_RMW func_00019676
 #pragma dagger KKND_CONFREV func_00017CEF
+#pragma dagger reg func_00015176 148 edx 381 esi
 #pragma dagger reg func_00016E61 4 ebx
 #pragma dagger reg func_00017179 33 esi
 #pragma dagger reg func_000174C3 130 esi 188 esi 437 bx
@@ -587,7 +588,7 @@ void func_00015176(void)
     l_1C = func_0009DC25();
     func_0009DC49(*(int *)D_001965C8);
     if (((int)(unsigned char)*(signed char *)(*(char **)D_00196590)) != 4) goto L151CB;
-    func_0007CA85(*(int *)D_00196590 + 3, 213, 53, 145, 156);
+    func_0007CA85((int)(*(char **)D_00196590 + 3), 213, 53, 145, 156);
     goto L151EF;
 L151CB:;
     func_0007CA85(func_0008B48B(*(int *)D_001965E0), 213, 53, 145, 156);
@@ -630,8 +631,8 @@ L15406:;
     func_000A0AD9((int)D_00196620, (int)D_00190FE4, 4, (int)D_001703F0, 430);
     func_0004A6B5(((int)(unsigned char)*(signed char *)D_001966B2) + 7212, 0, 0);
     *(signed char *)D_00190D0F = 1;
-    func_000A0AD9(*(int *)D_00147954 + 90000, (int)D_00190FE4, 4, (int)D_001703F0, 433);
-    func_00016B91(*(int *)D_00147954 + 90000, 134, 10, 245, 45);
+    func_000A0AD9((int)(*(char **)D_00147954 + 90000), (int)D_00190FE4, 4, (int)D_001703F0, 433);
+    func_00016B91((int)(*(char **)D_00147954 + 90000), 134, 10, 245, 45);
     *(signed char *)D_00190D0F = 0;
     goto L15621;
 L154B4:;
@@ -650,8 +651,8 @@ L154F1:;
     if (*(int *)D_001965B8 == 0) goto L15621;
     func_0004A6B5(((int)(unsigned char)*(signed char *)D_001966B2) + 7225, 0, 0);
     *(signed char *)D_00190D0F = 1;
-    func_000A0AD9(*(int *)D_00147954 + 90000, (int)D_00190FE4, 4, (int)D_001703F0, 448);
-    func_00016B91(*(int *)D_00147954 + 90000, 134, 10, 245, 45);
+    func_000A0AD9((int)(*(char **)D_00147954 + 90000), (int)D_00190FE4, 4, (int)D_001703F0, 448);
+    func_00016B91((int)(*(char **)D_00147954 + 90000), 134, 10, 245, 45);
     *(signed char *)D_00190D0F = 0;
 L15569:;
     goto L15621;
@@ -668,8 +669,8 @@ L155BB:;
     func_0004A6B5(((int)(unsigned char)*(signed char *)D_001966B2) + 7212, 0, 0);
 L155D0:;
     *(signed char *)D_00190D0F = 1;
-    func_000A0AD9(*(int *)D_00147954 + 90000, (int)D_00190FE4, 4, (int)D_001703F0, 461);
-    func_00016B91(*(int *)D_00147954 + 90000, 134, 10, 245, 45);
+    func_000A0AD9((int)(*(char **)D_00147954 + 90000), (int)D_00190FE4, 4, (int)D_001703F0, 461);
+    func_00016B91((int)(*(char **)D_00147954 + 90000), 134, 10, 245, 45);
     *(signed char *)D_00190D0F = 0;
 default:
 L15621:;

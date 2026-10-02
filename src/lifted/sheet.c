@@ -132,6 +132,7 @@ void func_0003BB8D(int);
 void func_0003C5A4(int);
 void func_0003D01C(int, int);
 #pragma aux func_000A0ED9 parm routine [];
+#pragma dagger DAGGER_CONFPOSREV func_0003C6F1
 #pragma dagger confwin func_0003D113 44 49
 #pragma dagger reg func_0003BB8D 21 edx
 #pragma dagger reg func_0003D113 56 edx

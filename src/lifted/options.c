@@ -119,6 +119,7 @@ void func_0004359C(void);
 void func_00043B55(int, int);
 void func_000441B6(int);
 void func_0004478B(int, int);
+#pragma dagger DAGGER_CONFPOS func_0004478B
 #pragma dagger reg func_00043F9C 1 ebx 10 edx 13 ebx
 #pragma dagger reg func_000441B6 381 esi
 

@@ -92,8 +92,9 @@ extern void func_00098651(void);
 void func_0005D2DE(int);
 void func_0005D5A5(int);
 void func_0005D97C(void);
+#pragma dagger DAGGER_PTRSWAP func_0005DB95
 #pragma dagger reg func_0005D5A5 52 edx
-#pragma dagger reg func_0005DB95 26 esi 27 eax 100 esi 101 eax
+#pragma dagger reg func_0005DB95 27 eax 101 eax
 
 void func_0005D151(void)
 {

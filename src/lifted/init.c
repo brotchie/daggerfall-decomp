@@ -349,10 +349,8 @@ void func_00050FFD(void);
 #pragma aux func_0009DA1C parm routine [];
 #pragma aux func_000A0ED9 parm routine [];
 #pragma aux func_000A18C3 parm routine [];
-#pragma dagger DAGGER_NODEMOTE func_000503AD
-#pragma dagger KKND_CONFREV func_000503AD
+#pragma dagger DAGGER_PTRSWAP func_000503AD
 #pragma dagger reg func_0004ED36 185 ebx 186 ebx 189 edx
-#pragma dagger reg func_000503AD 31 edx 36 edx 39 edx
 
 void func_0004ECAE(void)
 {

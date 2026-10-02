@@ -43,6 +43,7 @@ void func_000528FB(int, int);
 void func_000529FA(int, int);
 #pragma aux func_000A0ED9 parm routine [];
 #pragma dagger DAGGER_NODEMOTE func_000529FA
+#pragma dagger DAGGER_PTRSWAP func_000529FA
 #pragma dagger reg func_0005247B 381 esi
 #pragma dagger slots func_0005247B a1 16 l_2C 24 l_20 12 l_1C 8 l_18 4
 #pragma dagger slots func_000528FB a1 20 a2 16 l_1C 12 l_18 8 l_14 4
@@ -414,7 +415,7 @@ L52A92:;
     goto L52B3D;
 L52AF2:;
     if (l_14 <= 0) goto L52B3D;
-    func_000A1023((int)(*(char **)((char *)a2 + 30) + (((int)(short)*(short *)((char *)a2 + 18)) * ((int)(short)*(short *)&l_2C))) + ((int)(unsigned short)l_1C), a1, (int)(signed char)l_14, (int)D_00175404, 498, 4);
+    func_000A1023((int)(*(char **)((char *)a2 + 30) + (((int)(short)*(short *)&l_2C) * ((int)(short)*(short *)((char *)a2 + 18)))) + ((int)(unsigned short)l_1C), a1, (int)(signed char)l_14, (int)D_00175404, 498, 4);
     l_1C += (short)(signed char)l_14;
     a1 += (int)(signed char)l_14;
 L52B3D:;

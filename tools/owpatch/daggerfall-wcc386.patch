@@ -503,7 +503,7 @@ index 14a056a76b..a88fef01ac 100644
 +    DaggerProc = CurrProc;
 +}
 diff --git a/bld/cg/c/bldins.c b/bld/cg/c/bldins.c
-index 7fa7f075c3..d274f4ac8c 100644
+index 7fa7f075c3..edd10fe1d8 100644
 --- a/bld/cg/c/bldins.c
 +++ b/bld/cg/c/bldins.c
 @@ -31,6 +31,7 @@
@@ -514,7 +514,22 @@ index 7fa7f075c3..d274f4ac8c 100644
  #include "coderep.h"
  #include "cgmem.h"
  #include "memcheck.h"
-@@ -572,7 +573,20 @@ an      BGBinary( cg_op opcode, an left, an rite, const type_def *tipe, bool fol
+@@ -541,8 +542,14 @@ an      BGBinary( cg_op opcode, an left, an rite, const type_def *tipe, bool fol
+ {
+     an          result;
+     instruction *ins;
++    bool        ptrint;
+ 
+     result = NULL;
++    /* Daggerfall: DAGGER_PTRSWAP (a per-function knob) puts the int first in a pointer plus
++     * an int, so the sum takes the int's register as Watcom 10's often did */
++    ptrint = ( opcode == O_PLUS && ( left->tipe->attr & TYPE_POINTER )
++      && ( rite->tipe->attr & ( TYPE_POINTER | TYPE_FLOAT ) ) == 0
++      && _IsModel( CGSW_GEN_NO_OPTIMIZATION ) && DaggerEnv( "DAGGER_PTRSWAP" ) != NULL );
+     if( opcode == O_PLUS || opcode == O_MINUS
+        && ( tipe->attr & TYPE_POINTER )
+        && ( left->tipe->attr & TYPE_POINTER )
+@@ -572,7 +579,28 @@ an      BGBinary( cg_op opcode, an left, an rite, const type_def *tipe, bool fol
      }
      if( result == NULL ) {
          left = CheckType( left, tipe );
@@ -526,12 +541,20 @@ index 7fa7f075c3..d274f4ac8c 100644
 +            name    *l_name = GenIns( left );
 +            name    *r_name = GenIns( rite );
 +
-+            ins = MakeBinary( (opcode_defs)opcode, l_name, r_name, NULL, TypeClass( tipe ) );
++            if( ptrint ) {
++                ins = MakeBinary( (opcode_defs)opcode, r_name, l_name, NULL, TypeClass( tipe ) );
++            } else {
++                ins = MakeBinary( (opcode_defs)opcode, l_name, r_name, NULL, TypeClass( tipe ) );
++            }
 +        } else {
 +            name    *r_name = GenIns( rite );
 +            name    *l_name = GenIns( left );
 +
-+            ins = MakeBinary( (opcode_defs)opcode, l_name, r_name, NULL, TypeClass( tipe ) );
++            if( ptrint ) {
++                ins = MakeBinary( (opcode_defs)opcode, r_name, l_name, NULL, TypeClass( tipe ) );
++            } else {
++                ins = MakeBinary( (opcode_defs)opcode, l_name, r_name, NULL, TypeClass( tipe ) );
++            }
 +        }
          result = InsName( ins, tipe );
          AddIns( ins );

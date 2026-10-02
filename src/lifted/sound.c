@@ -97,7 +97,6 @@ void func_00069DAA(void);
 #pragma dagger reg func_00068C06 37 edx 40 ebx
 #pragma dagger reg func_00069281 40 eax 437 bx
 #pragma dagger reg func_000694B8 30 edx
-#pragma dagger reg func_00069E3C 437 bx
 #pragma dagger slots func_000699D8 a1 28 a2 24 a3 12 a4 20 l_6C 100 l_18 16 l_10 8 ret 4
 
 void func_00068BA8(int a1, int a2)

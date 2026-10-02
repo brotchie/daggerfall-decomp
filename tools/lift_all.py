@@ -475,6 +475,14 @@ def lift_one(va):
         status, detail, at, c, info = found[3]
         best = (status, detail, at, c)
     status, detail, at, c = best
+    if status == "diff" and cached and not os.environ.get("LIFT_NOCACHEKNOBS"):
+        # a previous run's flips with one more compiler knob (a knob added since, say)
+        for k in [a for a in info.get("choices", []) if -100 < a < 0 and a not in cached]:
+            r = attempt(cached | {k})
+            if r is not None and r[0] == "ok":
+                flips = cached | {k}
+                status, detail, at, c = r[0], r[1], r[2], r[3]
+                break
     if os.environ.get("LIFT_SHOWFLIPS"):
         print(name, sorted(flips), file=sys.stderr)
     if c is not None:

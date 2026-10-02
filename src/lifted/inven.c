@@ -294,7 +294,6 @@ extern void func_000921CC(int);
 extern void func_00092280(int);
 extern void func_00093FB1(unsigned char);
 extern void func_00096CCF(int, int);
-extern void func_0009830F(void);
 extern void func_00098BE8(void);
 extern void func_0009D39E(void);
 int func_000926AD(int, int, int);
@@ -344,6 +343,7 @@ void func_00097A85(void);
 void func_00097CC9(void);
 void func_00097F6F(void);
 void func_00098224(void);
+void func_0009830F(void);
 void func_000984E0(void);
 void func_00098538(void);
 void func_00098A15(void);
@@ -357,7 +357,14 @@ void func_000992FA(void);
 void func_00099391(void);
 #pragma aux func_000A0ED9 parm routine [];
 #pragma dagger DAGGER_CONFPOS func_00093A6A
-#pragma dagger reg func_000932C9 19 esi
+#pragma dagger DAGGER_IDXKEEP func_0009830F
+#pragma dagger DAGGER_PTRSWAP func_00092ED8
+#pragma dagger DAGGER_PTRSWAP func_000932C9
+#pragma dagger DAGGER_PTRSWAP func_00093BD9
+#pragma dagger DAGGER_PTRSWAP func_0009830F
+#pragma dagger reg func_00092ED8 37 esi 43 eax 71 esi
+#pragma dagger reg func_00093BD9 55 esi 62 eax
+#pragma dagger reg func_0009830F 39 edx
 #pragma dagger slots func_00093BD9 a1 36 a2 32 a3 28 l_24 24 l_20 20 l_1C 16 l_18 12 l_14 8 l_10 4
 
 void func_00092349(void)
@@ -3192,6 +3199,56 @@ L9829F:;
 L982E9:;
     func_00069938(235, *(int *)D_00195AA4, 100);
     *(signed char *)((char *)l_18 + 42) |= 64;
+}
+
+void func_0009830F(void)
+{
+    double l_3C;
+    int l_34;
+    int l_30;
+    int l_2C;
+    int l_28;
+    int l_24;
+    int l_20;
+    int l_1C;
+    int l_18;
+
+    l_28 = 0;
+    l_1C = *(int *)(*(char **)D_00195B20 + 63);
+L9832F:;
+    if (l_1C == 0) goto L98394;
+    l_18 = l_1C + 71;
+    l_20 = (((((int)(unsigned short)*(short *)((char *)l_18 + 46)) - ((int)(unsigned short)*(short *)((char *)l_18 + 44))) * 1440) / 1000) + 1440;
+    if (l_20 <= l_34) goto L98383;
+    l_34 = l_20;
+    l_2C = l_28;
+L98383:;
+    l_28++;
+    l_1C = *(int *)((char *)l_1C + 55);
+    goto L9832F;
+L98394:;
+    l_24 = l_34;
+    l_28 = 0;
+    l_1C = *(int *)(*(char **)D_00195B20 + 63);
+L983AC:;
+    if (l_1C == 0) goto L98405;
+    if (l_28 == l_2C) goto L983F4;
+    l_18 = l_1C + 71;
+    l_34 += (((((int)(unsigned short)*(short *)((char *)l_18 + 46)) - ((int)(unsigned short)*(short *)((char *)l_18 + 44))) * 1440) / 1000) + 720;
+L983F4:;
+    l_28++;
+    l_1C = *(int *)((char *)l_1C + 55);
+    goto L983AC;
+L98405:;
+    l_3C = (double)l_34 / l_24;
+    l_1C = *(int *)(*(char **)D_00195B20 + 63);
+L9841B:;
+    if (l_1C == 0) return;
+    l_18 = l_1C + 71;
+    l_20 = (((((int)(unsigned short)*(short *)((char *)l_18 + 46)) - ((int)(unsigned short)*(short *)((char *)l_18 + 44))) * 1440) / 1000) + 1440;
+    *(int *)((char *)l_1C + 43) = (int)(*(char **)D_00195BF4 + ((unsigned)(l_20 * l_3C)));
+    l_1C = *(int *)((char *)l_1C + 55);
+    goto L9841B;
 }
 
 int func_0009848E(void)

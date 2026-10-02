@@ -265,9 +265,8 @@ void func_0007C56F(int);
 void func_0007C78B(int);
 void func_0007C8AF(void);
 #pragma aux func_000A0ED9 parm routine [];
-#pragma dagger DAGGER_NOGIVEN func_0007B222
+#pragma dagger DAGGER_CONFPOSREV func_0007B222
 #pragma dagger KKND_CONFREV func_0007A638
-#pragma dagger KKND_CONFREV func_0007B222
 #pragma dagger slots func_0007C908 a1 16 a2 12 a3 8 l_10 4
 #pragma dagger slots func_0007C965 a1 16 a2 12 a3 8 l_10 4
 #pragma dagger slots func_0007C9C2 a1 16 a2 12 a3 8 l_10 4

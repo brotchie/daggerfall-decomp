@@ -94,7 +94,6 @@ void func_0008A550(int, int, int);
 void func_0008B054(int, int);
 void func_0008B341(int);
 #pragma dagger KKND_CONFREV func_0008A113
-#pragma dagger reg func_0008A113 437 bx
 #pragma dagger slots func_0008B29A a1 28 a2 4 a3 8 l_24 24 l_20 20 l_1C 16 ret 12
 #pragma dagger slots func_0008B43B a1 4 a2 8 a3 16 l_24 24 l_20 20 ret 12
 
