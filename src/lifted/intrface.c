@@ -4,14 +4,20 @@
 extern char D_0012AC04[];
 extern char D_0012AC06[];
 extern char D_00176A7C[];
+extern char D_00187CA4[];
+extern char D_001940D4[];
 extern char D_001940DB[];
 extern char D_00195A98[];
+extern char D_00195AA4[];
 extern char D_00195BE4[];
 extern char D_00195F64[];
 extern char D_00195F66[];
 extern char D_001A5A68[];
 extern char D_001A5ACC[];
 extern char D_001A5AD0[];
+extern char D_001A5B04[];
+extern char D_001A5B0C[];
+extern char D_001A5B10[];
 extern char D_001A5B14[];
 extern char D_001A5B18[];
 extern char D_001A5B24[];
@@ -23,6 +29,7 @@ extern char D_001A5B34[];
 extern int func_00042F0F();
 extern int func_000696F9(int);
 extern int func_000A0024();
+extern int func_000CE6E2();
 extern int func_0012B47E();
 extern int func_00144E84();
 extern int func_00144FB4();
@@ -61,6 +68,21 @@ void func_0008059B(void)
 void func_00080637(void)
 {
     func_00144FB4(*(int *)D_001A5B14, *(int *)D_001A5ACC, 10, 10, (int)D_001A5A68);
+}
+
+void func_0008066F(int a1)
+{
+    int l_24;
+    char l_20[12];
+
+    *(signed char *)D_001940D4 |= 16;
+    *(signed char *)((char *)*(int *)D_00195AA4 + 4) &= 7;
+    *(int *)((char *)l_20 + 4) = (short)*(short *)((char *)*(int *)D_00195AA4 + 3);
+    func_000CE6E2(*(int *)((char *)l_20 + 4), a1 << 7, (int)&l_24, (int)l_20);
+    *(int *)D_00187CA4 = a1;
+    *(int *)D_001A5B04 += a1;
+    *(int *)D_001A5B0C += l_24;
+    *(int *)D_001A5B10 += *(int *)l_20;
 }
 
 int func_00080B58(void)

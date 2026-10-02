@@ -1030,9 +1030,19 @@ int func_00049ABF(void)
     return func_0004A0C0(14);
 }
 
+int func_00049AE7(void)
+{
+    return *(int *)((char *)func_000191DA((short)((unsigned char)*(signed char *)((char *)*(int *)D_00195D28 + 7)), 13) + 84) + 3;
+}
+
 int func_00049B20(void)
 {
     return *(int *)D_00195DB0;
+}
+
+int func_00049B43(void)
+{
+    return func_000192EE((short)((unsigned char)*(signed char *)((char *)*(int *)D_00195BE0 + 541))) + 3;
 }
 
 int func_00049B77(void)

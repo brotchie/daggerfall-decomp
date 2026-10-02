@@ -6,11 +6,16 @@ extern char D_000C23BC[];
 extern char D_000C23C0[];
 extern char D_00136E00[];
 extern char D_00136E24[];
+extern char D_00170A86[];
 extern char D_001959B8[];
 extern char D_001959BC[];
 extern char D_00195A98[];
 extern char D_00195AA4[];
 extern char D_00195BF4[];
+extern char D_001970E0[];
+extern char D_001970E4[];
+extern char D_00198500[];
+extern char D_00198504[];
 extern char D_0019857C[];
 extern char D_00198580[];
 extern char D_00198588[];
@@ -20,6 +25,7 @@ extern char D_001985C8[];
 extern char D_001985CC[];
 extern char D_001985D0[];
 
+extern int func_000A0024();
 extern int func_00136AD8();
 extern int func_00137000();
 extern int func_00137725();
@@ -51,6 +57,43 @@ void func_00034F3F(void)
     *(int *)D_00198580 = (((unsigned)*(int *)D_00195BF4) / 1440) & 31;
     func_000351B6((int)D_001985A8, -1000, ((unsigned)*(int *)D_00195BF4) % 3500, 3500);
     *(int *)D_00198588 = (((unsigned)(*(int *)D_00195BF4 + 5760)) / 1440) & 31;
+}
+
+void func_0003503D(void)
+{
+    int l_18;
+
+    if (*(int *)D_00198500 == 0) goto L35060;
+    if (*(int *)D_00198500 != (-1751672937)) goto L35062;
+L35060:;
+    goto L35080;
+L35062:;
+    func_000A0024(*(int *)D_00198500, (int)D_00170A86, 368);
+    *(int *)D_00198500 = -1751672937;
+L35080:;
+    if (*(int *)D_00198504 == 0) goto L35095;
+    if (*(int *)D_00198504 != (-1751672937)) goto L35097;
+L35095:;
+    goto L350B5;
+L35097:;
+    func_000A0024(*(int *)D_00198504, (int)D_00170A86, 369);
+    *(int *)D_00198504 = -1751672937;
+L350B5:;
+    if (*(int *)D_001970E0 == 0) goto L350CA;
+    if (*(int *)D_001970E0 != (-1751672937)) goto L350CC;
+L350CA:;
+    goto L350EA;
+L350CC:;
+    func_000A0024(*(int *)D_001970E0, (int)D_00170A86, 370);
+    *(int *)D_001970E0 = -1751672937;
+L350EA:;
+    if (*(int *)D_001970E4 == 0) goto L350FF;
+    if (*(int *)D_001970E4 != (-1751672937)) goto L35101;
+L350FF:;
+    return;
+L35101:;
+    func_000A0024(*(int *)D_001970E4, (int)D_00170A86, 371);
+    *(int *)D_001970E4 = -1751672937;
 }
 
 void func_00035A64(int a1)

@@ -149,6 +149,7 @@ class Func:
             i += 1
         if ins[i].mnemonic != "sub" or not ins[i].op_str.startswith("esp, "):
             raise Unsupported("prologue: no sub esp")
+        self.frame = int(ins[i].op_str.split(", ")[1], 16)
         self.saved = saved
         i += 1
         self.params = []         # (reg, slot)
@@ -227,12 +228,46 @@ class Func:
             if off in addr:
                 sz = 4
             hint = sign.get(off, set())
+            if sz not in (1, 2, 4):
+                raise Unsupported("%d-byte stack slot (floating point)" % sz)
             t = (UTYPE if hint == {"u"} or (sz == 1 and hint != {"s"}) else STYPE)[sz]
             self.slot_type[off] = t
-        for off in addr:
-            self.slot_type.setdefault(off, "int")
         self.size_of = {"signed char": 1, "unsigned char": 1, "short": 2,
                         "unsigned short": 2, "int": 4, "unsigned": 4}
+        # Every 4-byte slot between the saved registers and the frame bottom belongs to a
+        # declared variable (-od gives slots at declaration, used or not). An address-taken
+        # slot is the base of an array reaching up to the next known variable.
+        top = 4 * len(self.saved) + 4
+        bottom = 4 * len(self.saved) + self.frame
+        known = set(self.slot_type) | {o for _r, o, _s in self.params} | addr
+        if self.ret_slot:
+            known.add(self.ret_slot)
+        self.arrays = {}         # base offset -> size in bytes
+        for a in sorted(addr):
+            above = [o for o in known if o < a and o not in range(a - 3, a)]
+            nxt = max([o for o in above if o not in self.slot_type or o in addr
+                       or o in [p[1] for p in self.params] or o == self.ret_slot]
+                      + [top - 4])
+            size = a - nxt
+            if size > 4:
+                self.arrays[a] = size
+        inside = {}
+        for a, size in self.arrays.items():
+            for o in range(a - size + 1, a):
+                inside[o] = a
+        for o in list(self.slot_type):
+            if o in inside:
+                del self.slot_type[o]
+        self.inside = inside
+        for a in addr:
+            if a not in self.arrays:
+                self.slot_type.setdefault(a, "int")
+        for o in range(top, bottom + 1, 4):
+            if o in known or o in inside or o in self.arrays:
+                continue
+            if any(o - 3 <= k <= o for k in known):
+                continue
+            self.slot_type[o] = "int"         # declared but never used
 
     def var(self, off):
         for k, (reg, o, sz) in enumerate(self.params):
@@ -252,6 +287,11 @@ class Func:
         if m.segment and ins.reg_name(m.segment) not in ("ds", "cs"):
             raise Unsupported("segment override")
         off = ebp_slot(ins, op)
+        if off is not None and off in getattr(self, "inside", {}):
+            base = self.inside[off]
+            return "*(%s *)((char *)l_%X + %d)" % (STYPE[size], base, base - off)
+        if off is not None and off in getattr(self, "arrays", {}):
+            return "*(%s *)l_%X" % (STYPE[size], off)
         if off is not None:
             name = self.var(off)
             if name is None:
@@ -415,6 +455,15 @@ class Func:
             v = self.reg("eax", ins)
             self.set_reg("edx", E("%s >> 31" % v.p(), 4, tag=("sign", v)))
             return
+        if m == "xor" and ins.op_str == "ah, ah":
+            v = self.reg("eax", ins)
+            self.set_reg("eax", E("(unsigned char)" + v.p(), 2))
+            return
+        if m == "test" and ops[0].type == cx.X86_OP_REG and ins.reg_name(ops[0].reg) == "ah" \
+                and ops[1].type == cx.X86_OP_IMM:
+            v = self.reg("eax", ins)
+            self.flags = ("test", v, E(str(ops[1].imm << 8), 4, atom=True))
+            return
         if m in ("xor", "sub") and ops[0].type == cx.X86_OP_REG and \
                 ops[1].type == cx.X86_OP_REG and ops[0].reg == ops[1].reg:
             self.set_reg(subreg(ins.reg_name(ops[0].reg))[0], E("0", 4, atom=True))
@@ -438,6 +487,14 @@ class Func:
             self.set_reg("eax", E("%s / %s" % (a.p(), b.p()), 4))
             self.set_reg("edx", E("%s %% %s" % (a.p(), b.p()), 4))
             return
+        if m == "sbb" and ops[0].type == cx.X86_OP_REG and ops[1].type == cx.X86_OP_REG:
+            a = self.reg(subreg(ins.reg_name(ops[0].reg))[0], ins)
+            b = self.reg(subreg(ins.reg_name(ops[1].reg))[0], ins)
+            if b.tag and b.tag[0] == "signshl" and b.tag[1].text == a.text:
+                self.set_reg(subreg(ins.reg_name(ops[0].reg))[0],
+                             E("%s - %s" % (a.p(), b.p()), 4, tag=("sbbprep", a, b.tag[2])))
+                return
+            raise Unsupported("sbb outside the division idiom")
         if m in ("add", "sub", "and", "or", "xor", "imul", "shl", "sar", "shr"):
             d, s = ops
             opch = {"add": "+", "sub": "-", "and": "&", "or": "|", "xor": "^", "imul": "*",
@@ -460,6 +517,15 @@ class Func:
                 if m == "sar" and a.tag and a.tag[0] == "half" and s.type == cx.X86_OP_IMM \
                         and s.imm == 1:
                     self.set_reg(full, E("%s / 2" % a.tag[1].p(), 4))
+                    return
+                # signed division by 2^k: sar edx,31; shl edx,k; sbb eax,edx; sar eax,k
+                if m == "shl" and a.tag and a.tag[0] == "sign" and s.type == cx.X86_OP_IMM:
+                    self.set_reg(full, E("%s << %d" % (a.p(), s.imm), 4,
+                                         tag=("signshl", a.tag[1], s.imm)))
+                    return
+                if m == "sar" and a.tag and a.tag[0] == "sbbprep" and s.type == cx.X86_OP_IMM \
+                        and s.imm == a.tag[2]:
+                    self.set_reg(full, E("%s / %d" % (a.tag[1].p(), 1 << s.imm), 4))
                     return
                 if m == "shr":
                     a = E("(unsigned)" + a.p(), 4)
@@ -497,6 +563,13 @@ class Func:
             d, s = ops
             full, _ = subreg(ins.reg_name(d.reg))
             off = ebp_slot(ins, s)
+            if off is not None and off in self.arrays:
+                self.set_reg(full, E("(int)l_%X" % off, 4))
+                return
+            if off is not None and off in self.inside:
+                base = self.inside[off]
+                self.set_reg(full, E("(int)((char *)l_%X + %d)" % (base, base - off), 4))
+                return
             if off is not None:
                 name = self.var(off)
                 if name is None:
@@ -520,7 +593,7 @@ class Func:
         if m == "call":
             op = ops[0]
             if op.type != cx.X86_OP_IMM:
-                raise Unsupported("indirect call")
+                return self.indirect_call(ins, op)
             name = sym(op.imm)
             nxt = self.body[self.k + 1] if self.k + 1 < len(self.body) else None
             cleanup = nxt is not None and nxt.mnemonic == "add" and nxt.op_str.startswith("esp, ")
@@ -565,10 +638,7 @@ class Func:
                     args += [s.text for s in reversed(self.pushes)]
                 self.calls.add(name)
             self.pushes = []
-            call = E("%s(%s)" % (name, ", ".join(args)), 4, atom=True)
-            self.flush_pending()
-            self.regs = {"eax": call}
-            self.pending = call
+            self.finish_call(E("%s(%s)" % (name, ", ".join(args)), 4, atom=True), len(args))
             return
         if m.startswith("j"):
             tgt = ops[0].imm if ops[0].type == cx.X86_OP_IMM else None
@@ -599,6 +669,36 @@ class Func:
             return
         raise Unsupported("instruction %s" % m)
 
+    def finish_call(self, call, nargs):
+        """After a call: eax holds the result; callee-saved registers that were not
+        arguments keep their values (Watcom callees preserve everything but eax)."""
+        self.flush_pending()
+        keep = {r: v for r, v in self.regs.items()
+                if r != "eax" and r not in PARM_REGS[:nargs] and v is not self.pending}
+        keep["eax"] = call
+        self.regs = keep
+        self.pending = call
+
+    def indirect_call(self, ins, op):
+        """call [mem] / call reg: through a function pointer, arguments in registers."""
+        if op.type == cx.X86_OP_MEM:
+            target = self.mem(op, ins, 4)
+            if target == "@RET":
+                raise Unsupported("call through the return slot")
+        else:
+            target = self.reg(subreg(ins.reg_name(op.reg))[0], ins).p()
+        if self.pushes:
+            raise Unsupported("indirect call with stack arguments")
+        args = []
+        for r in PARM_REGS:
+            if r in self.regs and self.regs[r] is not self.pending:
+                args.append(self.regs[r].text)
+            else:
+                break
+        call = E("((int (*)())%s)(%s)" % (target if target.startswith("(") else
+                                           "(%s)" % target, ", ".join(args)), 4, atom=True)
+        self.finish_call(call, len(args))
+
     # ---- output ------------------------------------------------------------------------
     def c(self):
         self.lift()
@@ -608,14 +708,18 @@ class Func:
             ps.append("%s a%d" % (self.slot_type.get(off, "int"), k + 1))
         # The slot rule (docs/progress.md) gives slots top down: 2-byte locals, the return
         # variable, other locals last to first; so declare locals deepest first.
-        locals_ = sorted((o for o in self.slot_type if o not in [p[1] for p in self.params]),
-                         reverse=True)
-        two = [o for o in locals_ if self.size_of[self.slot_type[o]] == 2]
+        locals_ = sorted((o for o in set(self.slot_type) | set(self.arrays)
+                          if o not in [p[1] for p in self.params]), reverse=True)
+        two = [o for o in locals_ if o in self.slot_type and self.size_of[self.slot_type[o]] == 2]
         rest = [o for o in locals_ if o not in two]
         lines = ["%s %s(%s)" % ("void" if self.void else "int", name, ", ".join(ps) or "void"),
                  "{"]
         for o in rest + two:
-            lines.append("    %s l_%X;" % (self.slot_type[o], o))
+            reg = ""
+            if o in self.arrays:
+                lines.append("    char l_%X[%d];" % (o, self.arrays[o]))
+            else:
+                lines.append("    %s%s l_%X;" % (reg, self.slot_type[o], o))
         if locals_:
             lines.append("")
         used = set(re.findall(r"goto L([0-9A-F]+);", "\n".join(self.out)))

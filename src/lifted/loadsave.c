@@ -83,6 +83,7 @@ extern char D_001AA580[];
 extern int func_00079A28(int);
 extern int func_00079A6E(int);
 extern int func_00079D0D(int, int, int);
+extern int func_00079E6E(int);
 extern int func_0009DC59(int, ...);
 extern int func_0009DEA7();
 extern int func_000A0B42();
@@ -100,6 +101,7 @@ extern void func_0007C78B(int);
 extern void func_0008E357(int, int);
 extern void func_0008E3A7(int, int);
 extern void func_0008E3F7(int, int);
+void func_00079C75(int);
 #pragma aux func_000A0ED9 parm routine [];
 
 void func_00079BE4(int a1)
@@ -132,6 +134,25 @@ void func_00079C75(int a1)
     *(int *)((char *)a1 + 55) = 0;
     func_0008E357(a1, (int)func_00079A6E);
     *(int *)((char *)a1 + 55) = l_18;
+}
+
+void func_00079CB9(int a1)
+{
+    int l_20;
+    int l_1C;
+    int l_18;
+
+    l_18 = 0;
+L79CD1:;
+    if (a1 == 0) return;
+    if (func_00079E6E(a1) == 0) goto L79CED;
+    func_00079C75(a1);
+    goto L79CF8;
+L79CED:;
+    func_00079CB9(*(int *)((char *)a1 + 63));
+L79CF8:;
+    a1 = *(int *)((char *)a1 + 55);
+    goto L79CD1;
 }
 
 void func_0007A1FE(void)

@@ -2,7 +2,14 @@
  * do not edit: move a function to src/tamriel.c to work on it by hand) */
 
 extern char D_0012B508[];
+extern char D_00195B24[];
+extern char D_00195B28[];
+extern char D_00195B38[];
+extern char D_00195B3C[];
+extern char D_00195B4C[];
 extern char D_00195BF4[];
+extern char D_00195F24[];
+extern char D_00195F25[];
 extern char D_00196268[];
 extern char D_00199764[];
 extern char D_0019976C[];
@@ -27,6 +34,20 @@ extern void func_0004AC01(int);
 void func_0004AB2F(int a1)
 {
     func_0004AC01(a1);
+}
+
+void func_0004B0C3(void)
+{
+    int l_1C;
+    int l_18;
+
+    *(int *)D_00195B24 = (((unsigned)*(int *)D_00195BF4) / 518400) + 400;
+    *(int *)D_00195B38 = ((unsigned)(((unsigned)*(int *)D_00195BF4) % 518400)) / 43200;
+    *(int *)D_00195B28 = ((unsigned)(((unsigned)*(int *)D_00195BF4) / 1440)) % 7;
+    *(int *)D_00195B4C = ((unsigned)(((unsigned)*(int *)D_00195BF4) / 60)) % 24;
+    *(int *)D_00195B3C = ((unsigned)*(int *)D_00195BF4) % 60;
+    *(signed char *)D_00195F24 = ((unsigned)(((unsigned)*(int *)D_00195BF4) / 1440)) % 22;
+    *(signed char *)D_00195F25 = (((unsigned)*(int *)D_00195BF4) / 1440) & 15;
 }
 
 void func_0004B796(void)

@@ -4,9 +4,11 @@
 extern char D_001758B8[];
 extern char D_001758F8[];
 extern char D_00175927[];
+extern char D_00186589[];
 extern char D_00187966[];
 extern char D_0018E044[];
 extern char D_001903A4[];
+extern char D_00195BE0[];
 extern char D_00195C44[];
 extern char D_00195D40[];
 extern char D_00195D4C[];
@@ -27,6 +29,15 @@ extern int func_000A1235();
 extern void func_00096F95(int);
 #pragma aux func_000A0ED9 parm routine [];
 
+void func_0005E5D7(int a1, int a2)
+{
+    if (a2 <= 7) goto L5E616;
+    *(short *)((char *)a1 + 50) += ((unsigned char)*(signed char *)(D_00186589 + ((unsigned char)*(signed char *)((char *)*(int *)D_00195BE0 + 498)))) << 7;
+    return;
+L5E616:;
+    *(short *)((char *)a1 + 50) += ((unsigned char)*(signed char *)(D_00186589 + a2)) << 7;
+}
+
 void func_0005F75B(int a1, int a2)
 {
     int l_1C;
@@ -44,6 +55,22 @@ void func_0005F75B(int a1, int a2)
     func_0009DC49(*(int *)((char *)l_1C));
     *(int *)((char *)a1 + 36) = func_0007D6AE(300, 800);
     func_0009DC49(l_14);
+}
+
+void func_0005FFE5(int a1, int a2, int a3)
+{
+    int l_14;
+    int l_10;
+
+    l_14 = func_0008DCE3(a1, 0, 107);
+    l_10 = l_14 + 71;
+    *(signed char *)((char *)l_14) = 2;
+    *(int *)((char *)l_14 + 7) = *(int *)((char *)a1 + 7);
+    *(int *)((char *)l_14 + 11) = *(int *)((char *)a1 + 11);
+    *(int *)((char *)l_14 + 15) = *(int *)((char *)a1 + 15);
+    *(short *)((char *)l_10 + 32) = 28;
+    *(short *)((char *)l_10 + 34) = 0;
+    *(int *)((char *)l_10 + 36) = func_0007D6AE(a2, a3) * ((unsigned char)*(signed char *)((char *)*(int *)D_00195BE0 + 129));
 }
 
 void func_00060270(int a1, int a2)

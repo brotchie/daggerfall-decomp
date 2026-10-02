@@ -443,3 +443,29 @@ and `ResultType()` demotes it (seen in lldb). A switchable policy in `TGCompare(
 widened cases: OW still emits `cmp byte` with demotion off there, so **a later,
 instruction-level pass also narrows**. Next: find that pass with lldb (break where the compare
 instruction gets a byte type class), then measure the policies again with the batch.
+
+## 2026-10-01: more lifter coverage; the build passes 10%
+
+Lifter additions, each driven by a cluster in the batch report:
+
+- **Stack-convention callees.** MemCheck's location hook `func_000A0ED9(line, file)` is called
+  with `push "file.c"; push line` before every checked operation and pops its own arguments
+  (`ret 8`). Callees that pop with no register arguments get
+  `#pragma aux f parm routine [];`. Five-argument calls (four registers plus the stack, callee
+  pops) are Watcom's normal convention. A pushed register counts as consumed.
+- **Unused and array locals.** Every 4-byte slot between the saved registers and the frame
+  bottom belongs to a declared variable, so gaps become unused `int` locals in the right
+  declaration order, and an address-taken slot becomes a `char l_X[n]` reaching up to the next
+  variable.
+- **Idioms:** signed division by 2^k (`sar edx,31; shl edx,k; sbb eax,edx; sar eax,k`),
+  `xor ah,ah` (zero-extend to 16 bits), `test ah,K`, calls through function pointers, and
+  registers that survive a call (Watcom callees preserve everything but `eax`, so
+  `if (f(1) > x + 10)` keeps `x + 10` in `ebx` across the call).
+
+Batch: **738 / 2,297** lift and match. Build: **742 / 2,297 game functions, 61,837 / 580,076
+bytes (10.66%), `build/FALL.EXE: OK`.**
+
+Investigated and parked: the return variable's slot. It's above all locals in 444 functions
+but in the middle or at the bottom in 86. Neither address-taking, nor `register`, nor
+first-use order explains it (tested with a switchable compiler patch and a whole-game tally).
+Locals themselves follow source declaration order, which the lifter reproduces.

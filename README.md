@@ -19,7 +19,7 @@ This repo contains no game code or data. You supply the executables; the tools c
 - Compiler: Watcom 10.0/10.0a. Game code is unoptimised: `-od -s -of+ -4r`.
 - Toolchain: KKND-Decomp's patched Open Watcom `wcc386` plus three `-od` patches of our own,
   built natively on macOS.
-- **692 / 2,297 game functions (9.03% of game code) match byte for byte**, most lifted
+- **742 / 2,297 game functions (10.66% of game code) match byte for byte**, most lifted
   automatically (`src/lifted/`, from `tools/lift.py`), and the rebuilt executable is
   identical: `tools/build-and-verify.sh` prints `build/FALL.EXE: OK`.
 

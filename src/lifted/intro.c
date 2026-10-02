@@ -3,6 +3,7 @@
 
 extern char D_0012AC00[];
 extern char D_00143550[];
+extern char D_00170B7B[];
 extern char D_00170B88[];
 extern char D_00170C1B[];
 extern char D_00170C28[];
@@ -14,6 +15,40 @@ extern int func_000C1500();
 extern int func_0012B136();
 extern void func_0004579D(void);
 extern void func_0004FF2E(void);
+
+void func_0003A325(void)
+{
+    int l_48;
+    int l_44;
+    int l_40;
+    int l_3C;
+    int l_38;
+    int l_34;
+    int l_30;
+    int l_2C;
+    int l_28;
+    int l_24;
+    int l_20;
+    int l_1C;
+    int l_18;
+
+L3A333:;
+    if (*(signed char *)D_0012AC00 == 0) goto L3A343;
+    func_0012B136();
+    goto L3A333;
+L3A343:;
+    l_18 = func_0006D13E((int)D_00170B7B);
+    func_000C1500(l_18, 0, 0, 1);
+    func_000A0040(655360, 0, 64000, (int)D_00170B88, 34, 4);
+    func_000A0040(*(int *)D_00143550, 0, 64000, (int)D_00170B88, 35, 4);
+L3A395:;
+    if (*(signed char *)D_0012AC00 == 0) goto L3A3A5;
+    func_0012B136();
+    goto L3A395;
+L3A3A5:;
+    func_000A0040(655360, 0, 64000, (int)D_00170B88, 39, 4);
+    func_0004FF2E();
+}
 
 void func_0003AF3F(void)
 {
