@@ -37,3 +37,13 @@ void func_0007F87E(void) { }
 void func_0007F896(void) { }
 void func_00091657(void) { }
 void func_00093ECD(void) { }
+
+extern int D_00195AC4;
+extern int D_001959A8;
+extern void func_0008ECBD(int, int);
+
+void func_0003081B(unsigned char a)
+{
+    func_0008ECBD(D_00195AC4, a);
+    func_0008ECBD(D_001959A8, a);
+}

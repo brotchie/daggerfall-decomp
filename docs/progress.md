@@ -186,3 +186,30 @@ save `ecx esi edi`, 130 save `esi edi`. OW already does this.
 
 Matched so far: 16 functions (`src/leaf_probes.c`). Still open: call results going through an
 extra temp (`func_000192EE`, 387 sites in the original) and narrow arguments.
+
+## 2026-10-01: CPU flag `-4r`, stack-slot order
+
+**`-4r`, not `-5r`.** The original sign-extends a `short` with `movsx edx, word [ebp-x]` and
+zero-extends a byte with `xor edx,edx; mov dl,[ebp-x]`. With `-3r`, OW uses `movzx` for the
+byte. With `-5r`/`-6r` (OW's default), it uses `mov edx,[ebp-x-2]; sar edx,16` for the short.
+Only `-4r` gives both, so `config/cflags.txt` is now `-od -s -of+ -4r`. That also fixes
+difference 4 (a `short` argument is spilled as the whole `eax`) and matches `func_0003081B`.
+
+**Still open: the order of stack slots.** `func_000192EE` is
+`int f(short a) { int r; r = g(D_0019672C, a); return r; }`. The instructions now match, but
+Watcom 10 puts the return variable above the local (`a` -0x18, return -0x1c, `r` -0x20), and
+OW puts it below (`r` -0x1c, return -0x20). At `-od`, OW gives slots in the order temps first
+appear in the instruction stream (`cg/c/temps.c` `AssgnMoreTemps()`, operands before
+results), one statement at a time. Declaring `.R` before the locals in the front end made no
+difference and was dropped. What's known:
+
+| Function | Watcom 10 slots, top down |
+|---|---|
+| `int f(int a) { return 0; }` (`func_00016507`) | return -0x18, `a` -0x1c (OW agrees) |
+| `int f(short a) { int r; r = g(a); return r; }` (`func_000192EE`) | `a` -0x18, return -0x1c, `r` -0x20 (OW swaps the last two) |
+
+Next step: collect more functions with locals and a return value from the original, pin the
+rule (for example "the return variable gets its slot when the first statement is generated")
+and patch `AssgnMoreTemps()` to match.
+
+Matched so far: 17 functions (`src/leaf_probes.c`).
