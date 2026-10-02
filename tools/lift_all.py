@@ -297,6 +297,31 @@ def pin_search(name, va, c, detail, at, flips, attempt):
 
 
 def work(va):
+    """lift_one from the cached flips, and (LIFT_SCRATCH=1, after compiler changes) when
+    that doesn't match, also from scratch (the greedy search can be led astray by a stale
+    cache): the result that gets further."""
+    r = lift_one(va)
+    name = "func_%08X" % va
+    if r[1] != "ok" and len(r) > 4 and W.get("flips", {}).get(name) and \
+            not os.environ.get("LIFT_NOFLIPCACHE") and os.environ.get("LIFT_SCRATCH"):
+        os.environ["LIFT_NOFLIPCACHE"] = "1"
+        try:
+            r2 = lift_one(va)
+        finally:
+            del os.environ["LIFT_NOFLIPCACHE"]
+        if len(r2) > 4 and (r2[1] == "ok" or (r2[4] or 0) > (r[4] or 0)):
+            name_ = r2[0]
+            check(name_, W["lift"].lift(va, frozenset(r2[3])))   # its files on disk
+            return r2
+        # (leave the cached run's best version on disk)
+        try:
+            check(name, W["lift"].lift(va, frozenset(r[3])))
+        except Exception:
+            pass
+    return r
+
+
+def lift_one(va):
     lift = W["lift"]
     name = "func_%08X" % va
     info = {}
