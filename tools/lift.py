@@ -1327,6 +1327,17 @@ class Func:
                 self.temps.add(off_)
                 self.slot_val[off_] = E(str(s.imm), 4, atom=True)
                 return
+            if off_ is not None and d.size == 4 and os.environ.get("DAGGER_CC") == "w10" and \
+                    re.fullmatch(r"-?\d+|(?:\(int\))?D_[0-9A-F]{8}", v.text) and \
+                    self.store_read_pairs(off_):
+                # a constant or a global's address stored once and read once: an argument
+                # Watcom 10.0a parked in a temp of its own while it evaluated another (the
+                # register it goes in was needed): f(g(a / 5, D_190FE4, 10)) (a choice)
+                self.choices.append(ins.address + 0.34375)
+                if ins.address + 0.34375 not in self.flips:
+                    self.temps.add(off_)
+                    self.slot_val[off_] = v
+                    return
             if nx is not None and nx.mnemonic == "fild" and off_ is not None and \
                     re.sub(r"^\w+ ptr ", "", nx.op_str) == \
                     re.sub(r"^\w+ ptr ", "", ins.op_str.split(", ")[0]) and d.size == 4 and \

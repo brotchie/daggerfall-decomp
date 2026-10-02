@@ -12,6 +12,10 @@ Output:
   a summary: match count, and the most common unsupported reasons and first differences,
   which is the to-do list for the lifter and the compiler patch
 
+With DAGGER_CC=w10 DAGGER_W10EXTRA=-d2 it compiles with the real Watcom C32 10.0a instead
+(tools/wcc10.py) and writes build/lift10/; tools/promote_w10.py copies what matched there
+into src/w10/.
+
 usage: lift_all.py [-j N] [--only func_X,func_Y] [--limit N]
 """
 import argparse
@@ -28,7 +32,10 @@ from collections import Counter
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-OUT = os.path.join(ROOT, "build", "lift")
+# the real Watcom 10.0a (DAGGER_CC=w10) keeps its own lifts, report and flips
+OUT = os.environ.get("LIFT_OUT") or os.path.join(
+    ROOT, "build", "lift10" if os.environ.get("DAGGER_CC") == "w10" else "lift")
+os.makedirs(OUT, exist_ok=True)
 
 W = {}  # per-worker state
 

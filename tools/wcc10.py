@@ -51,8 +51,11 @@ def compile_many(srcs, flags, workdir=None):
     with open(os.path.join(td, "GO.BAT"), "w", newline="\r\n") as f:
         f.write("\n".join(lines) + "\n")
     env = dict(os.environ, SDL_VIDEODRIVER="dummy", SDL_AUDIODRIVER="dummy")
-    subprocess.run(["dosbox-x", "-silent", "-nogui", "-nomenu",
-                    "-c", "mount c %s" % td, "-c", "mount d %s" % W10,
+    opts = []
+    for kv in os.environ.get("DAGGER_DOSBOX", "cpu:cycles=max").split():
+        opts += ["-set", kv.replace(":", " ", 1)]
+    subprocess.run(["dosbox-x", "-silent", "-nogui", "-nomenu"] + opts +
+                   ["-c", "mount c %s" % td, "-c", "mount d %s" % W10,
                     "-c", "c:\\go.bat", "-exit"],
                    stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, env=env,
                    timeout=60 + 10 * len(srcs))
