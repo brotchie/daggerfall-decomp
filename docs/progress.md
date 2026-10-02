@@ -834,3 +834,19 @@ Batch **1,479**.
   source level; the lifter casts a wider value used through a 16/8-bit register. +15.
 
 Batch **1,502**.
+
+## 2026-10-02: high-byte operations and bit-fields
+
+- **High-byte immediates**: `and ah,3` / `or ah,0x80` / `add ah,0x19` are 16-bit operations
+  whose constant leaves the low byte alone (`x & 0x3ff`, `x | 0x8000`, `x + 0x1900`); the
+  lifter reads them so. +6.
+- **The game uses bit-fields.** `mov ax,[p+2]; and ah,3` and `mov ax,[p+2]; shl eax,2;
+  shr ax,13` are exactly Watcom's bit-field reads. The lifter emits per-use structs
+  (`struct bf16_11_3 { unsigned short _:11; unsigned short f:3; }`) and reads
+  `((struct bf16_11_3 *)p)->f`; a value widened with `cwde`/`movsx` was a plain `short`
+  field (`struct bfs16_...`). Watcom 10 extracted such a signed field like an unsigned one
+  but kept its signed type (`and ah,3; cwde`), where OW sign-extends with shifts: the code
+  generator now does the former at `-od` (`TNBitShift`, `DAGGER_SIGNEDBF=1` for OW's).
+  `promote_lifted.py` carries the struct declarations.
+
+Batch **1,509**.

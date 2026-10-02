@@ -175,6 +175,7 @@ class Func:
         self.regs = {}
         self.born_hint = None
         self.temps = set()       # slots that are the compiler's own temps (not declared)
+        self.structs = set()     # bit-field struct declarations used
         self.choices = []        # instruction addresses of operand-order choice points
         self.flips = frozenset()
         self.pending = None      # call expression in eax not yet emitted
@@ -510,6 +511,21 @@ class Func:
         self.born_hint = None
         self.regs[name] = expr
 
+    def bitfield(self, load, start, length, signed=False):
+        """A read of a 16-bit bit-field: `load` is the 16-bit memory read. Watcom's bit-fields
+        are unsigned either way; a `short` one widens with cwde, `unsigned short` with a
+        zero extension."""
+        mm = re.fullmatch(r"\*\((?:unsigned )?short \*\)(.*)", load.text)
+        if not mm or os.environ.get("LIFT_NOBITFIELD"):
+            return None
+        t = "short" if signed else "unsigned short"
+        tag = "bf%s16_%d_%d" % ("s" if signed else "", start, length)
+        pad = "%s _:%d; " % (t, start) if start else ""
+        self.structs.add("struct %s { %s%s f:%d; };" % (tag, pad, t, length))
+        addr = mm.group(1)
+        return E("((struct %s *)%s)->f" % (tag, addr if addr.startswith("(") else "&" + addr),
+                 2, atom=True, tag=("bf", load, start, length))
+
     def operand_order(self, ins, a, b, k0):
         """Source order of a commutative op's operands; `a` is the destination register's.
 
@@ -670,8 +686,17 @@ class Func:
             d, s = ops
             full, _ = subreg(ins.reg_name(d.reg))
             v = self.src(s, ins)
+            if m == "movsx" and v.tag and v.tag[0] == "bf":
+                _, load, start, length = v.tag
+                self.set_reg(full, E(self.bitfield(load, start, length, True).text, 4, atom=True))
+                return
             t = (STYPE if m == "movsx" else UTYPE)[s.size]
             self.set_reg(full, E("(int)(%s)%s" % (t, v.p()), 4))
+            return
+        if m == "cwde" and self.regs.get("eax") is not None and \
+                (self.regs["eax"].tag or ("",))[0] == "bf":
+            _, load, start, length = self.regs["eax"].tag
+            self.set_reg("eax", E(self.bitfield(load, start, length, True).text, 4, atom=True))
             return
         if m == "cwde":
             v = self.reg("eax", ins)
@@ -690,6 +715,22 @@ class Func:
             v = self.reg(full, ins)
             # byte zero-extended to 16 bits: mov al,[x]; xor ah,ah
             self.set_reg(full, E("(unsigned short)(unsigned char)" + v.p(), 2))
+            return
+        if m in ("and", "or", "xor", "add", "sub") and ops[0].type == cx.X86_OP_REG and \
+                ins.reg_name(ops[0].reg) in ("ah", "bh", "ch", "dh") and \
+                ops[1].type == cx.X86_OP_IMM:
+            # a 16-bit op whose constant leaves the low byte alone: x & 0x3ff is `and ah,3`
+            full = {"a": "eax", "d": "edx", "b": "ebx", "c": "ecx"}[ins.reg_name(ops[0].reg)[0]]
+            v = self.reg(full, ins)
+            k = (ops[1].imm & 0xFF) << 8 | (0xFF if m == "and" else 0)
+            opch = {"and": "&", "or": "|", "xor": "^", "add": "+", "sub": "-"}[m]
+            if m == "and" and v.size == 2 and ((ops[1].imm & 0xFF) + 1) & (ops[1].imm & 0xFF) == 0:
+                bf = self.bitfield(v, 0, 8 + (ops[1].imm & 0xFF).bit_length())
+                if bf is not None:
+                    self.set_reg(full, bf)
+                    return
+            t = v.p() if v.size == 2 else "(short)%s" % v.p()
+            self.set_reg(full, E("%s %s %d" % (t, opch, k), 2))
             return
         if m == "test" and ops[0].type == cx.X86_OP_REG and ins.reg_name(ops[0].reg) == "ah" \
                 and ops[1].type == cx.X86_OP_IMM:
@@ -773,8 +814,19 @@ class Func:
                     self.set_reg(full, v)
                     self.flags = ("val", v, None)
                     return
+                if m == "shr" and sz == 2 and s.type == cx.X86_OP_IMM and a.tag and \
+                        a.tag[0] in ("shl2", "bfshl"):
+                    # shl eax,s; shr ax,r on a 16-bit read: a bit-field
+                    bf = self.bitfield(a.tag[1], s.imm - a.tag[2], 16 - s.imm)
+                    if bf is not None:
+                        self.set_reg(full, bf)
+                        return
                 if m == "shl" and s.type == cx.X86_OP_IMM and s.imm == 2:
-                    v = E("%s << 2" % a.p(), 4, tag=("shl2", a))
+                    v = E("%s << 2" % a.p(), 4, tag=("shl2", a, 2))
+                    self.set_reg(full, v)
+                    return
+                if m == "shl" and s.type == cx.X86_OP_IMM and a.size == 2:
+                    v = E("%s << %d" % (a.p(), s.imm), 4, tag=("bfshl", a, s.imm))
                     self.set_reg(full, v)
                     return
                 if m == "shr":
@@ -1550,7 +1602,7 @@ class Func:
                 if inner >= len(closers):
                     lines.append("}")
         lines.append("}")
-        decl = ["/* lifted from 0x%08X */" % self.va]
+        decl = ["/* lifted from 0x%08X */" % self.va] + sorted(self.structs)
         if self.conv == "sosconv":
             decl.append(SOSCONV)
             decl.append("#pragma aux (sosconv) %s;" % name)

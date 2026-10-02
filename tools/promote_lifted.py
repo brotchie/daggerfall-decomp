@@ -75,14 +75,16 @@ def main():
             text = open(os.path.join(LIFT, name + ".c")).read()
             head, body = text.split("\n\n", 1)
             for line in head.splitlines():
-                if line.startswith(("extern", "#pragma")) and line not in decls:
+                if line.startswith(("extern", "#pragma", "struct")) and line not in decls:
                     decls.append(line)
             bodies.append(body.strip())
         defined = set(names)
         # a function defined here needs no extern, but keep its prototype for earlier callers
         decls = [d.replace("extern ", "", 1) if any(n in d for n in defined) else d
                  for d in decls]
-        data = sorted(d for d in decls if " D_" in d)
+        structs = sorted(d for d in decls if d.startswith("struct"))
+        decls = [d for d in decls if not d.startswith("struct")]
+        data = structs + sorted(d for d in decls if " D_" in d)
         code = [d for d in decls if " D_" not in d and not d.startswith("#pragma")]
         pragmas = [d for d in decls if d.startswith("#pragma")]
         # a calling convention's definition before the functions that use it

@@ -47,8 +47,10 @@ extern int func_000A0024();
 extern int func_000A0040();
 extern int func_000A0ED9(int, int);
 extern int func_000A0F5C(int, ...);
+extern int func_000A1023();
 extern int func_000C2000();
 extern int func_000C2043();
+extern int func_000C2068();
 extern int func_000C7FD9();
 extern int func_000C7FF4();
 extern int func_000CE70D();
@@ -165,6 +167,18 @@ L73AA6:;
     *(int *)((char *)*(int *)((char *)l_24 + 12) + 15) = *(int *)((char *)*(int *)D_00195AA4 + 15);
     *(short *)((char *)*(int *)((char *)l_24 + 12) + 25) = 1;
     func_000C2043(*(int *)((char *)l_24 + 12) + 142, 160, *(int *)((char *)l_24 + 12) + 7);
+}
+
+void func_00073ADF(int a1)
+{
+{
+    char l_24[12];
+
+    func_000A1023((int)l_24, a1 + 142, 12, (int)D_0017615C, 426, 12);
+    func_000C2068((int)l_24);
+    *(short *)((char *)a1 + 23) = (short)*(int *)l_24 & 2047;
+    *(short *)((char *)a1 + 5) = (short)*(int *)((char *)l_24 + 4) & 2047;
+}
 }
 
 void func_00073DF9(int a1, int a2)

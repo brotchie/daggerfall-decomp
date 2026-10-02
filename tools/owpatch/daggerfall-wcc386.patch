@@ -999,7 +999,7 @@ index af92de3399..8bfe938f9a 100644
      } else {
          value = 0;
 diff --git a/bld/cg/c/tree.c b/bld/cg/c/tree.c
-index 23957dda5c..85e04939f5 100644
+index 23957dda5c..c28c5f61d2 100644
 --- a/bld/cg/c/tree.c
 +++ b/bld/cg/c/tree.c
 @@ -31,6 +31,7 @@
@@ -1010,7 +1010,30 @@ index 23957dda5c..85e04939f5 100644
  #include "coderep.h"
  #include "tree.h"
  #include "zoiks.h"
-@@ -1881,13 +1882,22 @@ an  TNPostGets( tn node )
+@@ -1691,7 +1692,21 @@ static  an  TNBitShift( an retv, tn node, bool already_masked )
+     }
+     mask = TGMask64( node );
+ #ifdef JUST_USE_SHIFTS
+-    if( !node->u1.b.is_signed && node->u1.b.start == 0 ) {
++    if( node->u1.b.is_signed && _IsModel( CGSW_GEN_NO_OPTIMIZATION )
++      && getenv( "DAGGER_SIGNEDBF" ) == NULL ) {
++        /* Daggerfall: Watcom 10 extracted a signed (plain short) bit-field like an unsigned
++         * one, without sign extension, but kept its signed type (`and ah,3; cwde`).
++         * DAGGER_SIGNEDBF=1 sign-extends like OW. */
++        if( node->u1.b.start == 0 ) {
++            if( !already_masked ) {
++                retv = BGBinary( O_AND, retv, Int64( mask ), tipes, true );
++            }
++        } else {
++            retv = BGBinary( O_LSHIFT, retv, Int( 8*tipeu->length - node->u1.b.len - node->u1.b.start ), tipeu, true );
++            retv = BGBinary( O_RSHIFT, retv, Int( 8*tipeu->length - node->u1.b.len ), tipeu, true );
++            retv = BGConvert( retv, tipes );
++        }
++    } else if( !node->u1.b.is_signed && node->u1.b.start == 0 ) {
+         if( !already_masked ) {
+             retv = BGBinary( O_AND, retv, Int64( mask ), tipeu, true );
+         }
+@@ -1881,13 +1896,22 @@ an  TNPostGets( tn node )
      an      left;
      an      rite;
      an      leftp;
