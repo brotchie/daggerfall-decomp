@@ -24,6 +24,7 @@ extern char D_00195AA0[];
 extern char D_00195B14[];
 extern char D_00195BE0[];
 extern char D_00195BE8[];
+extern char D_00195BEC[];
 extern char D_00195BF4[];
 extern char D_00195C44[];
 extern char D_00195D30[];
@@ -210,7 +211,7 @@ L3CA43:;
 
 void func_0003CFB9(void)
 {
-    if ((*(signed char *)D_001940D9 & 4) == 0) goto L3CFD9;
+    if ((*(unsigned char *)D_001940D9 & 4) == 0) goto L3CFD9;
     if (*(int *)D_00195B14 == 0) goto L3CFDB;
 L3CFD9:;
     goto L3CFE4;
@@ -228,6 +229,26 @@ L3D006:;
     return;
 L3D008:;
     func_0003B1F3(1);
+}
+
+int func_0003D0A8(void)
+{
+    int l_1C;
+
+    l_1C = 0;
+L3D0BD:;
+    if (l_1C < 6) goto L3D0CD;
+    goto L3D0FF;
+L3D0C5:;
+    l_1C++;
+    goto L3D0BD;
+L3D0CD:;
+    if (((int)(short)*(short *)((char *)(int)(*(char **)D_00195BE0 + (((int)(unsigned char)*(signed char *)((char *)(*(int *)D_00195BEC + l_1C) + 16)) * 6)) + 157)) != 100) goto L3D0FD;
+    return 1;
+L3D0FD:;
+    goto L3D0C5;
+L3D0FF:;
+    return 0;
 }
 
 int func_0003D39D(void)

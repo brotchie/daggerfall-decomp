@@ -6,6 +6,7 @@ extern char D_0012AF36[];
 extern char D_0012AF38[];
 extern char D_0012AF3A[];
 extern char D_0012B508[];
+extern char D_00142309[];
 extern char D_00142940[];
 extern char D_00142944[];
 extern char D_00142948[];
@@ -18,11 +19,14 @@ extern char D_0017D1E6[];
 extern char D_00187CA8[];
 extern char D_001903A4[];
 extern char D_00190D68[];
+extern char D_001940D8[];
 extern char D_00195AA4[];
 extern char D_00195BE8[];
 extern char D_00195C44[];
+extern char D_00195D38[];
 extern char D_00196272[];
 extern char D_00196274[];
+extern char D_00196288[];
 extern char D_00199C2C[];
 extern char D_00199C6C[];
 extern char D_00199C70[];
@@ -34,6 +38,8 @@ extern char D_00199D60[];
 extern int func_00069938(int, int, int);
 extern int func_0006CB53(int, int);
 extern int func_0006CD6E(int);
+extern int func_000926AD(int, int, unsigned char);
+extern int func_0009DEA7();
 extern int func_000A0024();
 extern int func_000A00AF();
 extern int func_000A00CB();
@@ -63,6 +69,39 @@ void func_00059B7B(short a1)
     *(signed char *)D_00196272 = 1;
     *(signed char *)D_00187CA8 = 0;
     func_00069938(237, *(int *)D_00195AA4, 100);
+}
+
+void func_00059E2B(void)
+{
+L59E39:;
+    if (*(signed char *)D_00142309 != 0) goto L59E39;
+    if (((int)(short)*(short *)D_00199D5A) < 1) return;
+    *(signed char *)D_001940D8 &= 239;
+    func_0009DEA7((int)(short)*(short *)D_00199D5A);
+    if (*(int *)D_00195BE8 == 0) goto L59E7A;
+    if (*(int *)D_00195BE8 != (-1751672937)) goto L59E7C;
+L59E7A:;
+    goto L59E9A;
+L59E7C:;
+    func_000A0024(*(int *)D_00195BE8, (int)D_001757A8, 101);
+    *(int *)D_00195BE8 = -1751672937;
+L59E9A:;
+    if (*(int *)D_00199C6C == 0) goto L59EAF;
+    if (*(int *)D_00199C6C != (-1751672937)) goto L59EB1;
+L59EAF:;
+    goto L59ECF;
+L59EB1:;
+    func_000A0024(*(int *)D_00199C6C, (int)D_001757A8, 102);
+    *(int *)D_00199C6C = -1751672937;
+L59ECF:;
+    func_0005A230();
+    *(short *)D_00199D5A = 0;
+    *(signed char *)D_00196274 = 0;
+    *(signed char *)D_00196272 = 0;
+    *(signed char *)D_00187CA8 = 1;
+    if ((*(unsigned char *)D_001940D8 & 128) == 0) return;
+    *(signed char *)D_001940D8 &= 127;
+    func_000926AD(2, *(int *)D_00195D38, (int)(unsigned char)*(signed char *)D_00196288);
 }
 
 void func_0005A230(void)

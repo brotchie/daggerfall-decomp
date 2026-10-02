@@ -607,3 +607,21 @@ arguments on the stack with caller cleanup. OW's `__cdecl` and `-3s/-4s/-5s` all
 study. Also parked: register assignment within a statement (Watcom 10 puts the first-evaluated
 subexpression in `edx` and the second in `eax`; OW the reverse; about 20 KB). The default
 register order is clearly best (a sweep of `KKND_REGORDER` only lost matches).
+
+## 2026-10-01: lifter round (+40): bit tests, char parameters, `*p++`, pointer adds
+
+- `tools/cluster_peek.py` prints one example of each top diff cluster with context (using
+  `match.py`, which now flags only instructions whose unmasked bytes differ).
+- **Bit tests on bytes/words read unsigned**: `(*(unsigned char *)x & 0x80)` compiles to
+  `test byte ptr [x], 0x80`; the signed spelling sign-extends first.
+- **The layout plan leaves 1-byte variables alone** (it had retyped a `char` parameter as
+  `short`).
+- **Post-increments used as values**: `mov eax,[p]; inc [p]; cmp byte [eax],0` is `*p++`,
+  now a deferred `p++` expression feeding the next instruction (int `x++`, or
+  `(int)(*(char (**)[K])&p)++` for a stride-K pointer).
+- **An add of a dword global is pointer arithmetic** (`(int)(*(char **)G + i)`): Watcom 10
+  never folds a pointer load into the add (`mov edx,[G]; add eax,edx`). Against the committed
+  lifter this gains 42 and loses 2 (`func_00069E3C`, `func_0008C462`), where `int` arithmetic
+  happened to give the same register assignment.
+
+Batch **1,244**.

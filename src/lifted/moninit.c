@@ -8,6 +8,7 @@ extern char D_00187A23[];
 extern char D_00190704[];
 extern char D_001959A8[];
 extern char D_00195AC4[];
+extern char D_00195B04[];
 extern char D_001A4A0C[];
 
 extern int func_0007D6AE(int, int);
@@ -15,6 +16,7 @@ extern int func_0008DCE3(int, int, int);
 extern int func_0008EB88(int);
 extern int func_000A0024();
 extern int func_000A00CB();
+extern int func_000A1023();
 extern void func_0005E540(short, short, int);
 extern void func_00060270(int, int);
 extern void func_00078566(int, unsigned char);
@@ -86,6 +88,45 @@ L78DB7:;
     goto L78DAF;
 L78DC9:;
     return l_14 + a2;
+}
+
+void func_0007909F(int a1, int a2)
+{
+    int l_24;
+    int l_20;
+    int l_1C;
+    int l_18;
+    int l_14;
+
+    l_24 = 0;
+    l_14 = a1 + 71;
+    *(short *)((char *)l_14 + 143) = (((unsigned char)*(signed char *)((char *)l_14 + 129)) * 10) + 100;
+    *(short *)((char *)l_14 + 141) = *(short *)((char *)l_14 + 143);
+    *(short *)((char *)l_14 + 289) = 80;
+    *(short *)((char *)l_14 + 295) = 80;
+    *(short *)((char *)l_14 + 301) = 80;
+    *(short *)((char *)l_14 + 307) = 80;
+    *(short *)((char *)l_14 + 313) = 80;
+    *(short *)((char *)l_14 + 319) = 80;
+    l_1C = func_0008DCE3(a1, 0, 0);
+    *(signed char *)((char *)l_1C) = 22;
+    *(short *)((char *)l_1C + 21) = 3;
+    *(int *)((char *)l_1C + 31) = func_0008EB88(((unsigned)*(int *)((char *)a1 + 31)) >> 16);
+L7916D:;
+    if (((int)(unsigned char)*(signed char *)((char *)(a2 + l_24))) == 255) return;
+    l_20 = 0;
+L7918C:;
+    if (*(signed char *)((char *)(int)(*(char **)D_00195B04 + (l_20 * 89)) + 73) == *(signed char *)((char *)(a2 + l_24))) goto L791AD;
+    l_20++;
+    goto L7918C;
+L791AD:;
+    l_18 = func_0008DCE3(l_1C, 0, 89);
+    *(signed char *)((char *)l_18) = 9;
+    *(short *)((char *)l_18 + 21) = 1;
+    *(int *)((char *)l_18 + 31) = func_0008EB88(((unsigned)*(int *)((char *)a1 + 31)) >> 16);
+    func_000A1023(l_18 + 71, (int)(*(char **)D_00195B04 + (l_20 * 89)), 89, (int)D_00176844, 370, 4);
+    l_24++;
+    goto L7916D;
 }
 
 void func_000797E2(int a1, int a2)

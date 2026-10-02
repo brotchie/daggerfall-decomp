@@ -245,7 +245,7 @@ int func_00089DED(int a1, int a2, int a3)
 
     l_18 = a3 + 71;
     *(signed char *)((char *)l_18 + 138) |= 128;
-    if ((*(signed char *)((char *)l_18 + 137) & 1) != 0) goto L89E2A;
+    if ((*(unsigned char *)((char *)l_18 + 137) & 1) != 0) goto L89E2A;
     return 0;
 L89E2A:;
     l_14 = a1 + 71;

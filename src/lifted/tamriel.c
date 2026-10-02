@@ -69,7 +69,7 @@ void func_0004AB52(void)
     int l_1C;
     int l_18;
 
-    if ((*(signed char *)D_001940D8 & 64) != 0) goto L4AB72;
+    if ((*(unsigned char *)D_001940D8 & 64) != 0) goto L4AB72;
     if (*(signed char *)D_00187CA8 != 0) goto L4AB88;
 L4AB72:;
     l_1C = 1132;
@@ -80,7 +80,7 @@ L4AB88:;
     l_18 = 1132;
     l_24 = ((unsigned)(*(int *)((char *)l_18) - *(int *)D_00195C40)) / 90;
     *(int *)D_00195C40 += l_24 * 90;
-    if ((*(signed char *)D_001940D9 & 16) == 0) goto L4ABD8;
+    if ((*(unsigned char *)D_001940D9 & 16) == 0) goto L4ABD8;
     if (((int)(unsigned short)(*(short *)((char *)*(int *)D_00195BE0 + 64) & 1536)) == 0) goto L4ABDA;
 L4ABD8:;
     goto L4ABE9;

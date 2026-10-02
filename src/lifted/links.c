@@ -6,6 +6,7 @@ extern char D_00175962[];
 extern char D_00186A34[];
 extern char D_00186A4C[];
 extern char D_00195AC4[];
+extern char D_00195B04[];
 extern char D_00199D78[];
 extern char D_00199D7B[];
 extern char D_00199D9B[];
@@ -138,6 +139,21 @@ L6584E:;
     goto L657DA;
 L65850:;
     return 0;
+}
+
+int func_00065864(int a1)
+{
+    int l_1C;
+
+    l_1C = 0;
+L6587C:;
+    if (*(signed char *)((char *)(int)(*(char **)D_00195B04 + (l_1C * 89)) + 47) == 0) goto L658A6;
+    if (((int)(unsigned char)*(signed char *)((char *)(int)(*(char **)D_00195B04 + (l_1C * 89)) + 73)) == a1) goto L658AE;
+L658A6:;
+    l_1C++;
+    goto L6587C;
+L658AE:;
+    return (int)(*(char **)D_00195B04 + (l_1C * 89));
 }
 
 int func_000658CA(int a1, int a2)

@@ -6,6 +6,7 @@ extern char D_001758E2[];
 extern char D_001758F8[];
 extern char D_00175927[];
 extern char D_001789FA[];
+extern char D_00180B42[];
 extern char D_00186589[];
 extern char D_0018659B[];
 extern char D_0018659F[];
@@ -386,6 +387,21 @@ L61366:;
     *(short *)((char *)l_1C + 21) = 3;
     *(signed char *)((char *)l_1C) = 20;
     *(short *)((char *)l_1C + 27) = l_18;
+}
+
+int func_000614A9(void)
+{
+    int l_20;
+    int l_1C;
+
+    l_20 = 0;
+    l_1C = 0;
+L614C5:;
+    if (*(short *)(D_00180B42 + (l_20++ * 109)) == 0) goto L614E0;
+    l_1C++;
+    goto L614C5;
+L614E0:;
+    return func_0007D6AE(0, l_1C - 1);
 }
 
 int func_00062229(int a1, int a2)

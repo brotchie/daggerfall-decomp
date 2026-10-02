@@ -48,7 +48,7 @@ int func_00062C15(int a1)
     int l_24;
 
     l_1C = *(int *)(D_00190504 + (a1 << 2)) + 71;
-    if ((*(signed char *)((char *)l_1C + 138) & 1) == 0) goto L62C4D;
+    if ((*(unsigned char *)((char *)l_1C + 138) & 1) == 0) goto L62C4D;
     return 0;
 L62C4D:;
     *(int *)D_00195AD8 = func_0008EA20(*(int *)(D_00190504 + (a1 << 2)), 9);
@@ -72,7 +72,7 @@ int func_00062CB6(int a1)
     int l_24;
 
     l_1C = *(int *)(D_00190504 + (a1 << 2)) + 71;
-    if ((*(signed char *)((char *)l_1C + 138) & 1) == 0) goto L62CEE;
+    if ((*(unsigned char *)((char *)l_1C + 138) & 1) == 0) goto L62CEE;
     return 0;
 L62CEE:;
     *(int *)D_00195AD8 = func_0008EA20(*(int *)(D_00190504 + (a1 << 2)), 9);
@@ -184,13 +184,13 @@ int func_000631DD(int a1)
 {
     int l_24;
 
-    if ((*(short *)((char *)*(int *)D_00195BE0 + 137) & 12292) != 0) goto L6320A;
+    if ((*(unsigned short *)((char *)*(int *)D_00195BE0 + 137) & 12292) != 0) goto L6320A;
     return 1;
 L6320A:;
-    if ((*(signed char *)((char *)*(int *)D_00195BE0 + 137) & 4) == 0) goto L63225;
+    if ((*(unsigned char *)((char *)*(int *)D_00195BE0 + 137) & 4) == 0) goto L63225;
     return func_000631AA(a1);
 L63225:;
-    if ((*(signed char *)((char *)*(int *)D_00195BE0 + 138) & 32) == 0) goto L6323C;
+    if ((*(unsigned char *)((char *)*(int *)D_00195BE0 + 138) & 32) == 0) goto L6323C;
     l_1C = 8;
     goto L63243;
 L6323C:;

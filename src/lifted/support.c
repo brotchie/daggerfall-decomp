@@ -5,6 +5,8 @@ extern char D_0012AC00[];
 extern char D_0012B508[];
 extern char D_001343C0[];
 extern char D_00142309[];
+extern char D_00143550[];
+extern char D_00147954[];
 extern char D_00176A10[];
 extern char D_00176A27[];
 extern char D_00176A42[];
@@ -214,7 +216,7 @@ L7CC97:;
     goto L7CC8C;
 L7CCA3:;
     if (*(int *)(D_00195B98 + (l_24 << 2)) == 0) goto L7CD0A;
-    if ((*(signed char *)D_001940DA & 1) != 0) goto L7CCE5;
+    if ((*(unsigned char *)D_001940DA & 1) != 0) goto L7CCE5;
     l_1C = 1132;
     if (((unsigned)*(int *)((char *)l_1C)) <= *(int *)(D_00195B98 + (l_24 << 2))) goto L7CCE5;
     *(int *)(D_00195B98 + (l_24 << 2)) = 0;
@@ -224,7 +226,7 @@ L7CD0A:;
     goto L7CC97;
 L7CD0C:;
     if (*(int *)D_00195BD8 == 0) return;
-    if ((*(signed char *)D_001940DA & 1) != 0) goto L7CD3C;
+    if ((*(unsigned char *)D_001940DA & 1) != 0) goto L7CD3C;
     l_18 = 1132;
     if (((unsigned)*(int *)((char *)l_18)) <= *(int *)D_00195BD8) goto L7CD3C;
     *(int *)D_00195BD8 = 0;
@@ -243,7 +245,7 @@ int func_0007D53F(int a1)
 {
     short l_18;
 
-    if ((*(signed char *)D_001940D4 & 1) == 0) goto L7D574;
+    if ((*(unsigned char *)D_001940D4 & 1) == 0) goto L7D574;
     if (*(signed char *)D_00142309 != 0) goto L7D572;
     if (((int)(unsigned char)(*(signed char *)D_0012AC00 & 2)) == 0) goto L7D574;
 L7D572:;
@@ -496,6 +498,35 @@ L7E3B9:;
 int func_0007ED48(int a1)
 {
     return a1;
+}
+
+void func_0007EE38(void)
+{
+    int l_20;
+    int l_1C;
+    int l_18;
+
+    l_18 = 24000;
+    l_1C = 0;
+L7EE54:;
+    if (l_1C < 200) goto L7EE65;
+    return;
+L7EE5F:;
+    l_1C += 4;
+    goto L7EE54;
+L7EE65:;
+    l_20 = 0;
+L7EE6C:;
+    if (l_20 < 320) goto L7EE7D;
+    goto L7EEA3;
+L7EE77:;
+    l_20 += 4;
+    goto L7EE6C;
+L7EE7D:;
+    *(signed char *)((char *)(int)(*(char **)D_00147954 + l_18++)) = *(signed char *)((char *)(int)(*(char **)D_00143550 + ((l_1C * 320) + l_20)));
+    goto L7EE77;
+L7EEA3:;
+    goto L7EE5F;
 }
 
 int func_0007EEAF(void)
@@ -758,7 +789,7 @@ L7F6FE:;
     l_20 = ((65535 - *(int *)D_001A59CC) + *(int *)D_001A59E0) + (((*(int *)D_001A59DC - *(int *)D_001A59E4) - 1) * 65535);
 L7F726:;
     if (((unsigned)l_20) >= 10000) goto L7F745;
-    l_20 = *(int *)D_001A59E0 + (65535 - *(int *)D_001A59CC);
+    l_20 = (int)(*(char **)D_001A59E0 + (65535 - *(int *)D_001A59CC));
 L7F745:;
     *(int *)(D_001A5408 + (*(int *)D_001A59D8 << 2)) = ((unsigned)(((unsigned)(l_20 * 1000)) / 1193180)) >> 1;
     if (((unsigned)*(int *)(D_001A5408 + (*(int *)D_001A59D8 << 2))) <= 100) goto L7F78A;

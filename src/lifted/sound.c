@@ -23,14 +23,6 @@ extern char D_001A3F30[];
 extern char D_001A3F48[];
 extern char D_001A3F50[];
 extern char D_001A3F5D[];
-extern char D_001A3F60[];
-extern char D_001A3F74[];
-extern char D_001A3F78[];
-extern char D_001A3F7C[];
-extern char D_001A3F90[];
-extern char D_001A3F94[];
-extern char D_001A3F98[];
-extern char D_001A3F9C[];
 
 extern int func_00011870(int, ...);
 extern int func_0001FFF1(void);
@@ -52,7 +44,6 @@ extern int func_000A277F();
 extern int func_000A27A0();
 extern int func_000A2857();
 extern void func_00069DAA(void);
-extern void func_00099490(int);
 int func_00069A62(int, int, int);
 void func_000696A3(int);
 void func_000697E3(void);
@@ -262,13 +253,4 @@ L69D7E:;
     *(int *)D_001A3F20 = 0;
 L69D9B:;
     func_00069DAA();
-}
-
-void func_00069E3C(void)
-{
-    func_00099490((int)D_001A3F60);
-    *(int *)D_001A3F98 = (*(int *)D_001A3F78 - *(int *)D_001A3F74) << 2;
-    *(int *)D_001A3F90 = (*(int *)D_001A3F7C << 2) + *(int *)D_001A3F98;
-    *(int *)D_001A3F94 = *(int *)D_001A3F78 << 2;
-    *(int *)D_001A3F9C = *(int *)D_001A3F98;
 }

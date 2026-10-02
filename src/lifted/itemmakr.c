@@ -8,6 +8,7 @@ extern char D_001756EC[];
 extern char D_0017D1EA[];
 extern char D_00180A7A[];
 extern char D_00180B0A[];
+extern char D_001830E6[];
 extern char D_00185871[];
 extern char D_00187CA8[];
 extern char D_00190BE4[];
@@ -19,6 +20,7 @@ extern char D_00190D63[];
 extern char D_00190D68[];
 extern char D_00190EDC[];
 extern char D_00190EE4[];
+extern char D_00190FE4[];
 extern char D_001940D8[];
 extern char D_00195AA0[];
 extern char D_00195B50[];
@@ -52,6 +54,7 @@ extern int func_000934F6(int, short, int);
 extern int func_0009DEA7();
 extern int func_000A0024();
 extern int func_000A0040();
+extern int func_000A0AD9();
 extern int func_000A0B42();
 extern int func_000A0DF4();
 extern int func_000A0ED9(int, int);
@@ -62,12 +65,12 @@ extern void func_0004F3F6(void);
 extern void func_000569D7(short);
 extern void func_00056CF8(short);
 extern void func_000571C7(short);
-extern void func_00057266(int);
 extern void func_000574DA(int, short);
 extern void func_000576FF(int, short);
 extern void func_0008C566(int, int);
 extern void func_0008E3F7(int, int);
 extern void func_00097101(int);
+void func_00057266(int);
 void func_000585D6(int, int);
 void func_00058AF7(void);
 #pragma aux func_000A0ED9 parm routine [];
@@ -186,6 +189,26 @@ void func_00057111(void)
     func_00097101(*(int *)D_0019990C);
     *(int *)D_00199908 = 0;
     *(int *)D_0019990C = 0;
+}
+
+void func_00057266(int a1)
+{
+    int l_18;
+
+    if (((int)(unsigned char)*(signed char *)((char *)a1)) != 20) goto L5728F;
+    if (*(int *)D_00195B84 <= 62) goto L57294;
+L5728F:;
+    return;
+L57294:;
+    if (((int)(signed char)*(signed char *)D_00190D63) != ((int)(unsigned short)*(short *)((char *)a1 + 27))) goto L572B3;
+    *(int *)D_00195B50 = a1;
+L572B3:;
+    *(signed char *)(D_00190FE4 + *(int *)D_00195B84) = *(signed char *)((char *)a1 + 27);
+    *(int *)(D_00190EE4 + ((*(int *)D_00195B84)++ << 2)) = *(int *)D_00190EDC;
+    func_000A0AD9(*(int *)D_00190EDC, *(int *)(D_001830E6 + (((int)(unsigned short)*(short *)((char *)a1 + 27)) << 2)), 4, (int)D_001756A3, 526);
+    l_18 = *(int *)D_00190EDC;
+    l_18 += func_000A0DF4(*(int *)(D_001830E6 + (((int)(unsigned short)*(short *)((char *)a1 + 27)) << 2))) + 1;
+    *(int *)D_00190EDC = l_18;
 }
 
 int func_00057342(int a1)

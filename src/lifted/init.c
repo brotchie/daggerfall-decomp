@@ -239,7 +239,7 @@ void func_0004ECAE(void)
     int l_18;
 
     l_18 = 1132;
-    if ((*(signed char *)((char *)l_18) & 31) != 0) goto L4ECEA;
+    if ((*(unsigned char *)((char *)l_18) & 31) != 0) goto L4ECEA;
     func_00099490((int)D_001A3F60);
     *(int *)D_001A3F9C = *(int *)D_001A3F90 - (*(int *)D_001A3F7C << 2);
 L4ECEA:;

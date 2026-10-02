@@ -27,7 +27,19 @@ extern int func_0006998C(int);
 extern int func_0006CB53(int, int);
 extern int func_000A1944();
 extern int func_000CD126();
+extern int func_0012B2EB();
+extern int func_0012B3ED();
+extern int func_00144FB4();
 extern void func_00050069(int);
+void func_0005175B(int, short);
+
+void func_000516FD(int a1, short a2)
+{
+    func_0012B2EB();
+    func_0005175B(a1, (int)(short)a2);
+    func_00144FB4(0, 135, 320, 48, (int)(*(char **)D_00195C44 + (((int)(short)*(short *)D_00190D64) * 320)));
+    func_0012B3ED();
+}
 
 void func_0005175B(int a1, short a2)
 {

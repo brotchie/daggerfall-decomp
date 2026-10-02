@@ -78,7 +78,7 @@ void func_0005D876(void)
 {
     int l_18;
 
-    if ((*(signed char *)D_001940D4 & 32) == 0) return;
+    if ((*(unsigned char *)D_001940D4 & 32) == 0) return;
     func_000A1023(*(int *)D_00143550, *(int *)D_00199D68, 64000, (int)D_00175898, 368, 4);
     func_00144F68((int)(unsigned short)*(short *)((char *)*(int *)D_00195D64), (int)(unsigned short)*(short *)((char *)*(int *)D_00195D64 + 2), (int)(unsigned short)*(short *)((char *)*(int *)D_00195D64 + 4), (int)(unsigned short)*(short *)((char *)*(int *)D_00195D64 + 6), *(int *)D_00195D64 + 12);
     if (*(signed char *)D_00142309 != 0) goto L5D911;

@@ -22,7 +22,7 @@ L13D55:;
     func_000A0024(*(int *)D_00178E54, (int)D_001702CC, 52);
     *(int *)D_00178E54 = -1751672937;
 L13D73:;
-    if ((*(signed char *)D_001940DA & 8) == 0) goto L13D84;
+    if ((*(unsigned char *)D_001940DA & 8) == 0) goto L13D84;
     l_1C = a1;
     goto L13D8B;
 L13D84:;

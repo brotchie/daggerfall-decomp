@@ -22,6 +22,7 @@ extern char D_00196279[];
 extern char D_00196D68[];
 extern char D_00196D6C[];
 extern char D_00196D70[];
+extern char D_00196D74[];
 extern char D_00196D78[];
 extern char D_00196D86[];
 
@@ -214,6 +215,24 @@ void func_000252C7(int a1)
 
 void func_000252E2(int a1)
 {
+}
+
+void func_000254E2(void)
+{
+    int l_18;
+
+    if ((*(int *)D_00196D68 + 21) >= *(int *)D_00196D74) return;
+    l_18 = 0;
+L25507:;
+    if (l_18 < 21) goto L25517;
+    return;
+L2550F:;
+    l_18++;
+    goto L25507;
+L25517:;
+    if (*(signed char *)((char *)(*(int *)D_00196D78)++) != 0) goto L25517;
+    (*(int *)D_00196D68)++;
+    goto L2550F;
 }
 
 void func_00025539(void)

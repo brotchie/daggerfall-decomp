@@ -20,7 +20,9 @@ extern char D_00195A16[];
 extern char D_00195A1A[];
 extern char D_00195AA0[];
 extern char D_00195AA4[];
+extern char D_00195AA8[];
 extern char D_00195AC4[];
+extern char D_00195B04[];
 extern char D_00195B14[];
 extern char D_00195B20[];
 extern char D_00195BDC[];
@@ -46,14 +48,17 @@ extern int func_0008661C(int, int);
 extern int func_0008DA91(int);
 extern int func_0008DCE3(int, int, int);
 extern int func_0008DD46(int, int);
+extern int func_0008EB88(int);
 extern int func_0008EE02(int, unsigned char);
 extern int func_000A0E82();
 extern int func_000A0ED9(int, int);
 extern int func_000A0F5C(int, ...);
+extern int func_000A1023();
 extern int func_00144FB4();
 extern void func_0001F0C5(void);
 extern void func_0002FE02(int);
 extern void func_0002FE4B(int);
+extern void func_0002FEBC(int);
 extern void func_00030E34(unsigned char);
 extern void func_00031ACA(int, short);
 extern void func_0004CDE3(int);
@@ -298,6 +303,33 @@ L30FCD:;
     *(signed char *)((char *)l_18 + 136) &= 127;
 L30FD7:;
     func_0008E3F7(*(int *)D_00195AC4, (int)func_0002FE4B);
+}
+
+void func_00030FEF(int a1, int a2)
+{
+    int l_20;
+    int l_1C;
+    int l_18;
+    int l_14;
+
+    l_1C = *(int *)((char *)a2 + 32);
+    *(short *)D_00190D64 = *(short *)((char *)l_1C + 29);
+    l_18 = 0;
+L3101F:;
+    if (*(signed char *)((char *)(int)(*(char **)D_00195B04 + (l_18 * 89)) + 47) == 0) goto L31049;
+    if (((int)(unsigned char)*(signed char *)((char *)(int)(*(char **)D_00195B04 + (l_18 * 89)) + 73)) == *(int *)((char *)a2 + 43)) goto L31051;
+L31049:;
+    l_18++;
+    goto L3101F;
+L31051:;
+    l_14 = func_0008DCE3(*(int *)((char *)*(int *)D_00195AA4 + 67), 0, 89);
+    *(int *)D_00195AA8 = l_14;
+    *(signed char *)((char *)l_14) = 9;
+    *(int *)((char *)l_14 + 47) = *(int *)D_00195AA0;
+    *(int *)((char *)l_14 + 31) = func_0008EB88(((unsigned)*(int *)((char *)*(int *)D_00195AC4 + 31)) >> 16);
+    func_000A1023(l_14 + 71, (int)(*(char **)D_00195B04 + (l_18 * 89)), 89, (int)D_00170A1A, 679, 4);
+    func_0008E3F7(*(int *)D_00195AC4, (int)func_0002FEBC);
+    func_0008DA91(l_14);
 }
 
 void func_00031658(int a1, int a2, int a3)

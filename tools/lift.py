@@ -323,10 +323,10 @@ class Func:
         small_p, small_l, nested = res
         self.nested = nested
         for o, i in params.items():
-            if i in small_p and self.size_of[self.slot_type.get(o, "int")] != 2:
+            if i in small_p and self.size_of[self.slot_type.get(o, "int")] == 4:
                 self.slot_type[o] = "short"
         for o in small_l:
-            if o in self.slot_type and self.size_of[self.slot_type[o]] != 2:
+            if o in self.slot_type and self.size_of[self.slot_type[o]] == 4:
                 self.slot_type[o] = "short"
 
     def var(self, off):
@@ -610,7 +610,8 @@ class Func:
                     return
                 if m == "shr":
                     a = E("(unsigned)" + a.p(), 4)
-                if m == "add" and s.type == cx.X86_OP_REG and self.used_as_base(full):
+                if m == "add" and s.type == cx.X86_OP_REG and (
+                        self.used_as_base(full) or self.global_ptr(b) or self.global_ptr(a)):
                     # pointer arithmetic: the operand loaded from memory is the base pointer
                     # (as char *, -od keeps it in a register: mov edx,[p]; add eax,edx)
                     pa, pb = (b, a) if self.loaded_ptr(b) and not self.loaded_ptr(a) else (a, b)
@@ -629,6 +630,14 @@ class Func:
             if lhs == "@RET":
                 raise Unsupported("read-modify-write of the return slot")
             prev = self.body[self.k - 1] if self.k else None
+            if m in ("add", "sub") and s.type == cx.X86_OP_IMM and d.size == 4 and \
+                    prev is not None and prev.mnemonic == "mov" and \
+                    prev.op_str == "eax, " + ins.op_str.split(", ")[0] and \
+                    self.eax_used_later():
+                # *p++-style: the old value in eax is used afterwards
+                lv = lhs if re.fullmatch(r"\w+", lhs) else "(%s)" % lhs
+                self.post_expr("(int)(*(char (**)[%d])&%s)%s" % (s.imm, lv, "++" if m == "add" else "--"))
+                return
             if m in ("add", "sub") and s.type == cx.X86_OP_IMM and d.size == 4 and \
                     prev is not None and prev.mnemonic == "mov" and \
                     prev.op_str == "eax, " + ins.op_str.split(", ")[0] and 1 < s.imm < 0x10000:
@@ -650,12 +659,23 @@ class Func:
             if lhs == "@RET":
                 raise Unsupported("read-modify-write of the return slot")
             lv = lhs if re.fullmatch(r"\w+", lhs) else "(%s)" % lhs
+            prev = self.body[self.k - 1] if self.k else None
+            if m in ("inc", "dec") and d.size == 4 and prev is not None and \
+                    prev.mnemonic == "mov" and prev.op_str == "eax, " + ins.op_str and \
+                    self.eax_used_later():
+                # *p++-style on a char pointer: the old value in eax is used afterwards
+                self.post_expr("%s%s" % (lv, "++" if m == "inc" else "--"))
+                return
             self.emit({"inc": "%s++;", "dec": "%s--;", "neg": "%s = -%s;", "not": "%s = ~%s;"}[m]
                       % ((lv,) if m in ("inc", "dec") else (lhs, lv)))
             return
         if m in ("cmp", "test"):
             a = self.src(ops[0], ins)
             b = self.src(ops[1], ins)
+            if m == "test" and ops[0].type == cx.X86_OP_MEM and ops[0].size < 4:
+                # a bit test doesn't care about sign; unsigned keeps it `test byte ptr [x], K`
+                a = E(a.text.replace("*(signed char *)", "*(unsigned char *)", 1)
+                      .replace("*(short *)", "*(unsigned short *)", 1), a.size, a.atom)
             self.flags = (m, a, b)
             return
         if m == "lea":
@@ -783,9 +803,36 @@ class Func:
         return False
 
     @staticmethod
+    def global_ptr(e):
+        """A dword global read straight from memory: Watcom 10 never folds it into an add
+        (`mov edx,[p]; add eax,edx`), which marks it as a pointer."""
+        return e.atom and re.fullmatch(r"\*\(int \*\)D_[0-9A-F]{8}", e.text) is not None
+
+    @staticmethod
     def loaded_ptr(e):
         """A dword read straight from memory: the likely pointer operand of an add."""
         return e.atom and e.text.startswith("*(int *)")
+
+    def eax_used_later(self):
+        """Is eax read by a later instruction before being written (statement-local)?"""
+        for ins in self.body[self.k + 1:]:
+            if ins.address in self.targets or ins.mnemonic in ("call", "ret") or \
+                    ins.mnemonic.startswith("j"):
+                return False
+            reads, writes = ins.regs_access()
+            if any(SUB.get(ins.reg_name(r), (None,))[0] == "eax" for r in reads):
+                return True
+            if any(SUB.get(ins.reg_name(r), (None,))[0] == "eax" for r in writes):
+                return False
+        return False
+
+    def post_expr(self, text):
+        """A post-increment whose old value eax carries into the next instruction."""
+        e = E(text, 4, atom=True)
+        self.flush_pending()
+        self.regs["eax"] = e
+        self.stale.discard("eax")
+        self.pending = e
 
     def finish_call(self, call, nargs):
         """After a call: eax holds the result; callee-saved registers that were not

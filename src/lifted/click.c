@@ -155,7 +155,7 @@ L74B54:;
     goto L74BF4;
 L74B59:;
     l_14 = a1 + 71;
-    if ((*(signed char *)D_001940D7 & 2) == 0) goto L74B77;
+    if ((*(unsigned char *)D_001940D7 & 2) == 0) goto L74B77;
     if (((int)(short)*(short *)((char *)l_14 + 67)) != (-1)) goto L74B79;
 L74B77:;
     goto L74B84;

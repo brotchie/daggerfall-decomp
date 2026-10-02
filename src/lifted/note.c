@@ -198,7 +198,7 @@ L4DA02:;
     *(signed char *)D_001997ED = 0;
     *(signed char *)D_001940D5 &= 247;
     func_0009DEA7((int)(short)*(short *)D_001997E8);
-    if ((*(signed char *)D_001940D8 & 32) == 0) goto L4DA36;
+    if ((*(unsigned char *)D_001940D8 & 32) == 0) goto L4DA36;
     *(signed char *)D_001940D8 &= 223;
     func_0003B1F3(1);
 L4DA36:;
@@ -340,7 +340,7 @@ L4DFAE:;
 
 void func_0004E108(void)
 {
-    if ((*(signed char *)D_001940D5 & 16) == 0) return;
+    if ((*(unsigned char *)D_001940D5 & 16) == 0) return;
     *(signed char *)D_001940D5 &= 239;
     func_000A006E((int)(short)*(short *)D_001997E8, ((int)(short)*(short *)D_001997E2) * 3640, 0);
     func_000A0B42((int)(short)*(short *)D_001997E8, *(int *)D_001997D4, 3640);
