@@ -183,6 +183,7 @@ class Func:
         self.pushes = []
         self.flags = None
         self.ret_slot = None
+        self.ret_type = "int"
         self.void = True
         self.after_return = False
         self.stale = set()       # registers readable but not implicit call arguments
@@ -248,8 +249,11 @@ class Func:
         self.epi = ins[j].address
         self.body_end = j
         prev = ins[j - 1]
-        if prev.mnemonic == "mov" and prev.op_str.startswith("eax, dword ptr [ebp - "):
+        if prev.mnemonic == "mov" and prev.op_str.startswith(
+                ("eax, dword ptr [ebp - ", "al, byte ptr [ebp - ", "ax, word ptr [ebp - ")):
+            # the return variable, loaded into al/ax for a char/short function
             self.ret_slot = ebp_slot(prev, prev.operands[1])
+            self.ret_type = {1: "unsigned char", 2: "short", 4: "int"}[prev.operands[1].size]
             self.void = False
             self.ret_ins = prev.address
             self.body_end = j - 1
@@ -1698,7 +1702,7 @@ class Func:
                          reverse=True)
         two = [o for o in locals_ if o in self.slot_type and self.size_of[self.slot_type[o]] == 2]
         rest = [o for o in locals_ if o not in two]
-        lines = ["%s %s(%s)" % ("void" if self.void else "int", name, ", ".join(ps) or "void"),
+        lines = ["%s %s(%s)" % ("void" if self.void else self.ret_type, name, ", ".join(ps) or "void"),
                  "{"]
         # Locals below every parameter were declared in a nested block: Watcom gives a
         # block's locals their slots when the block starts, after the function's own.
@@ -1857,7 +1861,7 @@ def signature(va):
             f = Func(va)
             f.prologue()
             f.type_slots()
-            ret = "void" if f.void else "int"
+            ret = "void" if f.void else f.ret_type
             # a return statement decides void-ness during lifting; the epilogue tells us now
             SIGS[va] = (ret, f.sig_types + f.stack_type)
         except Unsupported:

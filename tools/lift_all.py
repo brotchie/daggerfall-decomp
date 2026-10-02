@@ -127,7 +127,7 @@ def check(name, c):
 
 # operand-order search: how many choice points before a mismatch to try, and compiles at most
 NEAR = 8
-BUDGET = 80
+BUDGET = 200
 
 
 def work(va):
@@ -141,36 +141,47 @@ def work(va):
     except Exception as e:  # a lifter bug: report, keep going
         return name, "error", "lifter %s: %s" % (type(e).__name__, e)
     status, detail, at = check(name, c)
-    # Choice points (operand orders the code can't tell apart) just before the first
-    # difference: flip one at a time and keep a flip when the first difference moves on.
+    # Choice points (operand orders the code can't tell apart, code generator knobs): try
+    # flipping each one near the first difference and keep the flip that moves the first
+    # difference furthest; when no single flip helps, try pairs of the nearest.
     flips, tries = frozenset(), 0
     tried_pairs = False
     best = (status, detail, at, c)
+
+    def nbytes(d):
+        m = re.match(r"(\d+) bytes", d or "")
+        return int(m.group(1)) if m else 1 << 30
+
+    def attempt(fl):
+        info2 = {}
+        try:
+            c2 = lift.lift(va, fl, info=info2)
+        except Exception:
+            return None
+        s2, d2, at2 = check(name, c2)
+        return s2, d2, at2, c2, info2
+
     while status == "diff" and at is not None and tries < BUDGET and not os.environ.get("LIFT_NOSEARCH"):
         near = sorted((a for a in info["choices"] if a >= 0 and a not in flips),
                       key=lambda a: abs(a - at))[:NEAR]
         near += [a for a in info["choices"] if a < 0 and a not in flips]   # function-level
-        moved = False
+        found = None
         for a in near:
-            tries += 1
-            info2 = {}
-            try:
-                c2 = lift.lift(va, flips | {a}, info=info2)
-            except Exception:
-                continue
-            s2, d2, at2 = check(name, c2)
-
-            def nbytes(d):
-                m = re.match(r"(\d+) bytes", d or "")
-                return int(m.group(1)) if m else 1 << 30
-            if s2 == "ok" or (s2 == "diff" and at2 is not None and at2 > at):
-                flips, info = flips | {a}, info2
-                status, detail, at, c = s2, d2, at2, c2
-                best = (status, detail, at, c)
-                moved = True
+            if tries >= BUDGET:
                 break
-        if not moved and not tried_pairs:
-            # no single flip helps: try two of the nearest at once
+            tries += 1
+            r = attempt(flips | {a})
+            if r is None:
+                continue
+            s2, d2, at2, c2, info2 = r
+            if s2 == "ok":
+                found = (1 << 40, 0, flips | {a}, r)
+                break
+            if s2 == "diff" and at2 is not None and at2 > at:
+                key = (at2, -nbytes(d2))
+                if found is None or key > found[:2]:
+                    found = (at2, -nbytes(d2), flips | {a}, r)
+        if found is None and not tried_pairs:
             tried_pairs = True
             pairs = [(x, y) for i, x in enumerate(near[:4]) for y in near[i + 1:5]
                      if x >= 0 and y >= 0]
@@ -178,20 +189,18 @@ def work(va):
                 if tries >= BUDGET:
                     break
                 tries += 1
-                info2 = {}
-                try:
-                    c2 = lift.lift(va, flips | {x, y}, info=info2)
-                except Exception:
+                r = attempt(flips | {x, y})
+                if r is None:
                     continue
-                s2, d2, at2 = check(name, c2)
+                s2, d2, at2, c2, info2 = r
                 if s2 == "ok" or (s2 == "diff" and at2 is not None and at2 > at):
-                    flips, info = flips | {x, y}, info2
-                    status, detail, at, c = s2, d2, at2, c2
-                    best = (status, detail, at, c)
-                    moved = True
+                    found = (at2 or 0, 0, flips | {x, y}, r)
                     break
-        if not moved:
+        if found is None:
             break
+        flips = found[2]
+        status, detail, at, c, info = found[3]
+        best = (status, detail, at, c)
     status, detail, at, c = best
     if c is not None:
         check(name, c)          # leave the best version's .c and .bin on disk
