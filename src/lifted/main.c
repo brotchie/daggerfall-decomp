@@ -28,6 +28,7 @@ extern char D_00196274[];
 extern char D_00196277[];
 
 extern int func_0008DD46(int, int);
+extern int func_0009DC25();
 extern int func_000C9C70();
 extern int func_000CE6D4();
 extern int func_0012DB50();
@@ -264,6 +265,17 @@ L10F6F:;
 L10F7D:;
     *(int *)D_0018DC2C = *(int *)((char *)a1);
     *(int *)D_0018DBF8 = *(int *)((char *)a2);
+}
+
+void func_00010F9A(int a1)
+{
+    *(int *)D_0018DC00 = a1 / 2;
+    if ((*(unsigned char *)D_0018DC00 & 1) == 0) goto L10FCC;
+    (*(int *)D_0018DC00)++;
+L10FCC:;
+    *(int *)D_0018DC28 = func_0009DC25();
+    *(int *)D_0018DC14 = 0;
+    *(int *)D_0018DC18 = 60;
 }
 
 void func_00010FF4(void)

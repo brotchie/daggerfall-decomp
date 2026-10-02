@@ -5,6 +5,7 @@ extern char D_0012B508[];
 extern char D_001789FA[];
 extern char D_00187CA8[];
 extern char D_0018F08E[];
+extern char D_0018F092[];
 extern char D_00190CE4[];
 extern char D_001940D8[];
 extern char D_001940D9[];
@@ -41,11 +42,16 @@ extern char D_00199798[];
 extern char D_0019979A[];
 extern char D_001997AC[];
 
+extern int func_000191DA(short, short);
+extern int func_000192EE(short);
 extern int func_0002B26B(int);
 extern int func_0004A98C(int, int);
 extern int func_0004B28C(int);
+extern int func_0007D6AE(int, int);
 extern int func_0007DF35(int);
 extern int func_00086560(int, int);
+extern void func_00013E17(int, int);
+extern void func_00013F06(int, int);
 extern void func_00029958(int);
 extern void func_0003081B(unsigned char);
 extern void func_00030E34(unsigned char);
@@ -196,6 +202,51 @@ void func_0004B796(void)
     if (l_18 == 0) return;
     *(signed char *)D_0012B508 = 146;
     func_0003F09F((int)(short)(l_18 + 8349), 1);
+}
+
+void func_0004B7E3(int a1)
+{
+    int l_20;
+    int l_1C;
+    int l_18;
+
+    l_20 = 0;
+L4B7FB:;
+    if (l_20 < 62) goto L4B80E;
+    return;
+L4B806:;
+    l_20++;
+    goto L4B7FB;
+L4B80E:;
+    l_18 = func_000191DA((int)(short)*(short *)&l_20, 7);
+    if (l_18 == 0) goto L4B806;
+    l_1C = (((int)(short)*(short *)((char *)func_000192EE(510) + 31)) - ((int)(short)*(short *)((char *)l_18 + 31))) / 5;
+    l_1C = (l_1C + 50) - ((((int)(unsigned short)*(short *)(D_0018F092 + (l_20 * 80))) - 1000) / 25);
+    if (func_0007D6AE(0, 100) >= l_1C) goto L4B8B5;
+    *(short *)(D_0018F092 + (l_20 * 80)) = (((int)(unsigned short)*(short *)(D_0018F092 + (l_20 * 80))) * 51) / 50;
+    goto L4B8E2;
+L4B8B5:;
+    *(short *)(D_0018F092 + (l_20 * 80)) = (((int)(unsigned short)*(short *)(D_0018F092 + (l_20 * 80))) * 49) / 50;
+L4B8E2:;
+    if (((int)(unsigned short)*(short *)(D_0018F092 + (l_20 * 80))) <= 4000) goto L4B908;
+    *(short *)(D_0018F092 + (l_20 * 80)) = 4000;
+    goto L4B92C;
+L4B908:;
+    if (((int)(unsigned short)*(short *)(D_0018F092 + (l_20 * 80))) >= 250) goto L4B92C;
+    *(short *)(D_0018F092 + (l_20 * 80)) = 250;
+L4B92C:;
+    if (((int)(unsigned short)*(short *)(D_0018F092 + (l_20 * 80))) <= 2000) goto L4B952;
+    func_00013E17(l_20, 19);
+    goto L4B992;
+L4B952:;
+    if (((int)(unsigned short)*(short *)(D_0018F092 + (l_20 * 80))) >= 500) goto L4B978;
+    func_00013E17(l_20, 20);
+    goto L4B992;
+L4B978:;
+    func_00013F06(l_20, 19);
+    func_00013F06(l_20, 20);
+L4B992:;
+    goto L4B806;
 }
 
 void func_0004B9A1(void)

@@ -46,6 +46,7 @@ extern int func_0008E6C5(int, int, int);
 extern int func_0008EB88(int);
 extern int func_0009DA1C(int, int);
 extern int func_0009DAEE(int, ...);
+extern int func_0009DC25();
 extern int func_0009DC59(int, ...);
 extern int func_0009DEA7();
 extern int func_000A0040();
@@ -127,6 +128,11 @@ L44EB9:;
 void func_00044EE0(void)
 {
     func_0001D739();
+}
+
+void func_00044EFD(void)
+{
+    *(short *)((char *)*(int *)D_00195BE0 + 147) = (func_0009DC25() % 50) + 10;
 }
 
 void func_00044F3A(void)

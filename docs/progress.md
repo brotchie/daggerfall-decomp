@@ -625,3 +625,10 @@ register order is clearly best (a sweep of `KKND_REGORDER` only lost matches).
   happened to give the same register assignment.
 
 Batch **1,244**.
+
+## 2026-10-01: `mov eax,edx; sar edx,31` instead of `cdq` (+70)
+
+The original sign-extends for division with `mov eax,edx; sar edx,31` 427 times and uses `cdq`
+twice. OW's `V_CDQ` check (`cg/intel/c/x86ver.c`) picks `cdq` for a 486 target and only
+splits it (`rCDQ()`) for a 586 optimising for time. At `-od` it now always splits
+(`DAGGER_CDQ=1` restores OW). Batch **1,314** (+70, nothing lost).

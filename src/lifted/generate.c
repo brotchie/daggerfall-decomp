@@ -23,6 +23,7 @@ extern char D_00195BE8[];
 extern char D_00195BF4[];
 extern char D_00195D2C[];
 extern char D_00196268[];
+extern char D_00196279[];
 extern char D_001AA410[];
 extern char D_001AA414[];
 extern char D_001AA41A[];
@@ -115,6 +116,12 @@ void func_0009166F(void)
 void func_000917F0(int a1)
 {
     func_00091B80((int)(short)(a1 - 20));
+}
+
+void func_00091A4B(void)
+{
+    if (*(signed char *)D_00196279 != 0) return;
+    *(signed char *)((char *)*(int *)D_00195BE0 + 128) = (((int)(unsigned char)*(signed char *)((char *)*(int *)D_00195BE0 + 128)) + 1) % 10;
 }
 
 void func_00091B80(short a1)

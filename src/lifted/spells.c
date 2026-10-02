@@ -204,6 +204,18 @@ void func_000390AD(void)
     *(signed char *)D_0019962E = 0;
 }
 
+int func_000399FD(void)
+{
+    *(signed char *)((char *)*(int *)D_00178A0A + 72) = (((int)(unsigned char)*(signed char *)((char *)*(int *)D_00178A0A + 72)) + 1) % 69;
+    return 0;
+}
+
+int func_00039A46(void)
+{
+    *(signed char *)((char *)*(int *)D_00178A0A + 72) = (((int)(unsigned char)*(signed char *)((char *)*(int *)D_00178A0A + 72)) - 1) % 69;
+    return 0;
+}
+
 void func_00039B50(int a1)
 {
     if (((int)(unsigned char)*(signed char *)((char *)a1)) != 9) return;

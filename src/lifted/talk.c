@@ -2,6 +2,8 @@
  * do not edit: move a function to src/talk.c to work on it by hand) */
 
 extern char D_0012AC00[];
+extern char D_0012AC02[];
+extern char D_0012AC06[];
 extern char D_00142309[];
 extern char D_00147954[];
 extern char D_001703F0[];
@@ -54,12 +56,14 @@ extern char D_001965EC[];
 extern char D_001965F0[];
 extern char D_001965F4[];
 extern char D_001965F8[];
+extern char D_00196612[];
 extern char D_001966A6[];
 extern char D_001966A8[];
 extern char D_001966AE[];
 extern char D_001966B0[];
 extern char D_001966B1[];
 extern char D_001966B3[];
+extern char D_001966B5[];
 extern char D_001966BA[];
 extern char D_001966BB[];
 extern char D_0019670C[];
@@ -76,6 +80,7 @@ extern int func_000342E3(int);
 extern int func_0004A044(int);
 extern int func_0006CD6E(int);
 extern int func_00070308(unsigned char);
+extern int func_0007D068(unsigned char);
 extern int func_0007D6AE(int, int);
 extern int func_0009DEA7();
 extern int func_000A0024();
@@ -458,6 +463,75 @@ L1713E:;
     func_000A0040(*(int *)D_001965AC, 0, 20480, (int)D_001703F0, 1259, 4);
     *(int *)D_00196570 = *(int *)D_001965AC;
     *(int *)D_001965D8 = 0;
+}
+
+void func_00017348(int a1)
+{
+    int l_18;
+
+    if (a1 != 100) goto L17368;
+    if (*(signed char *)D_001966B1 == 0) goto L1736A;
+L17368:;
+    goto L17376;
+L1736A:;
+    if (((int)(unsigned char)*(signed char *)D_001966AE) == 1) goto L17378;
+L17376:;
+    goto L17381;
+L17378:;
+    if (*(signed char *)D_001966B0 != 0) goto L17383;
+L17381:;
+    goto L173AA;
+L17383:;
+    *(signed char *)D_001966B5 = *(signed char *)D_001965E8;
+    *(signed char *)D_001966B0 = 0;
+    *(int *)D_001965E8 = 1;
+    *(signed char *)D_001966B3 = 1;
+    return;
+L173AA:;
+    l_18 = (int)(*(char **)D_001965F4 + ((((int)(short)*(short *)D_0012AC06) - 71) / 7));
+    if (l_18 >= *(int *)D_001965B8) return;
+    if (*(signed char *)D_001966B1 != 0) goto L173EF;
+    if (((int)(unsigned char)*(signed char *)D_001966AE) == 1) goto L173F4;
+L173EF:;
+    goto L174AA;
+L173F4:;
+    if (*(signed char *)D_001966B0 == 0) goto L1744D;
+    if (*(signed char *)D_0012AC02 != 0) goto L17414;
+    if (func_0007D068(28) == 0) goto L17435;
+L17414:;
+    *(signed char *)D_001966B5 = *(signed char *)(D_00196612 + l_18);
+    *(signed char *)D_001966B0 = 0;
+    *(int *)D_001965E8 = 1;
+    goto L17448;
+L17435:;
+    *(int *)D_001965E8 = (int)(unsigned char)*(signed char *)(D_00196612 + l_18);
+L17448:;
+    goto L174A8;
+L1744D:;
+    if (func_0007D068(1) != 0) goto L1747C;
+    if (l_18 != 0) goto L1747A;
+    if (*(signed char *)D_0012AC02 != 0) goto L17478;
+    if (func_0007D068(28) == 0) goto L1747A;
+L17478:;
+    goto L1747C;
+L1747A:;
+    goto L1748E;
+L1747C:;
+    if (*(signed char *)D_00142309 != 0) goto L1747C;
+    *(signed char *)D_001966B0 = 1;
+    goto L174A8;
+L1748E:;
+    if (l_18 == 0) goto L1749E;
+    *(int *)D_001965E8 = l_18;
+    goto L174A8;
+L1749E:;
+    *(int *)D_001965E8 = 1;
+L174A8:;
+    goto L174B2;
+L174AA:;
+    *(int *)D_001965E8 = l_18;
+L174B2:;
+    *(signed char *)D_001966B3 = 1;
 }
 
 void func_00017E5B(void)

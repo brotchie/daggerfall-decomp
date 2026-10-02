@@ -998,3 +998,26 @@ index 1de30dab10..6032de5060 100644
      }
      balance = ( size * opt_size + 10 * time * ( 100 - opt_size ) ) / 100;
      if( (int_32)balance < 0 || balance > MAX_COST )
+diff --git a/bld/cg/intel/c/x86ver.c b/bld/cg/intel/c/x86ver.c
+index 7de826e706..ad759a7833 100644
+--- a/bld/cg/intel/c/x86ver.c
++++ b/bld/cg/intel/c/x86ver.c
+@@ -31,6 +31,7 @@
+ 
+ 
+ #include "_cgstd.h"
++#include <stdlib.h>
+ #include "coderep.h"
+ #include "data.h"
+ #include "rgtbl.h"
+@@ -312,6 +313,10 @@ bool    DoVerify( vertype kind, instruction *ins )
+         }
+         return( true );
+     case V_CDQ:
++        /* Daggerfall: Watcom 10 sign-extended with `mov eax,edx; sar edx,31` (427 times in the
++         * original, cdq twice). DAGGER_CDQ=1 restores Open Watcom's choice. */
++        if( _IsModel( CGSW_GEN_NO_OPTIMIZATION ) && getenv( "DAGGER_CDQ" ) == NULL )
++            break;
+         /* On a Pentium, a MOV/SAR sequence is faster because it pairs while
+          * CDQ does not. However, on Pentium Pro CDQ is no slower yet smaller.
+          * Therefore, generate CDQ except when optimizing for time and the

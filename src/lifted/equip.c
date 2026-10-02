@@ -15,6 +15,7 @@ extern char D_00186605[];
 extern char D_00186610[];
 extern char D_00187966[];
 extern char D_0018E044[];
+extern char D_0018E046[];
 extern char D_001903A4[];
 extern char D_00195A9C[];
 extern char D_00195AA4[];
@@ -26,10 +27,10 @@ extern char D_00195D40[];
 extern char D_00195D4C[];
 extern char D_00195D54[];
 extern char D_00195DC4[];
+extern char D_00195F22[];
 extern char D_0019615F[];
 
 extern int func_00045A1D(int, unsigned short, int, int);
-extern int func_0005F955(int);
 extern int func_00062EF7(int, int, int);
 extern int func_0006CB53(int, int);
 extern int func_0006CD6E(int);
@@ -51,6 +52,7 @@ extern void func_0005FA0E(int, int, int, int);
 extern void func_00060430(int, int);
 extern void func_000614FB(int);
 extern void func_00096F95(int);
+int func_0005F955(int);
 void func_00061326(int);
 #pragma aux func_000A0ED9 parm routine [];
 
@@ -268,6 +270,42 @@ void func_0005F75B(int a1, int a2)
     func_0009DC49(l_14);
 }
 
+int func_0005F955(int a1)
+{
+    int l_24;
+    int l_20;
+    int l_1C;
+
+    l_24 = 0;
+    l_20 = l_24;
+L5F973:;
+    if (((int)(unsigned short)*(short *)D_00195F22) > l_24) goto L5F98A;
+    goto L5F9A9;
+L5F982:;
+    l_24++;
+    goto L5F973;
+L5F98A:;
+    if (((int)(unsigned short)*(short *)(D_0018E046 + (l_24 << 2))) > a1) goto L5F9A7;
+    l_20++;
+L5F9A7:;
+    goto L5F982;
+L5F9A9:;
+    if (l_20 != 0) goto L5F9B6;
+    l_20 = 1;
+L5F9B6:;
+    l_1C = func_0009DC25() % l_20;
+    l_24 = 0;
+L5F9CF:;
+    if (l_1C < 0) goto L5F9FA;
+    if (((int)(unsigned short)*(short *)(D_0018E046 + (l_24 << 2))) > a1) goto L5F9F2;
+    l_1C--;
+L5F9F2:;
+    l_24++;
+    goto L5F9CF;
+L5F9FA:;
+    return l_24 - 1;
+}
+
 void func_0005FE55(int a1)
 {
     int l_20;
@@ -325,6 +363,26 @@ void func_0005FFE5(int a1, int a2, int a3)
     *(short *)((char *)l_10 + 32) = 28;
     *(short *)((char *)l_10 + 34) = 0;
     *(int *)((char *)l_10 + 36) = func_0007D6AE(a2, a3) * ((int)(unsigned char)*(signed char *)((char *)*(int *)D_00195BE0 + 129));
+}
+
+void func_000601ED(int a1, int a2)
+{
+    int l_14;
+
+    l_14 = a1 + 71;
+    a2 = ((a2 * 10) + 50) / 100;
+    if (a2 != 0) goto L60239;
+    if (func_0007D6AE(1, 100) < 20) goto L6023B;
+L60239:;
+    goto L60242;
+L6023B:;
+    a2 = 1;
+L60242:;
+    if (((int)(unsigned short)*(short *)((char *)l_14 + 44)) <= a2) goto L6025F;
+    *(short *)((char *)l_14 + 44) -= a2;
+    return;
+L6025F:;
+    func_00096F95(a1);
 }
 
 void func_00060270(int a1, int a2)

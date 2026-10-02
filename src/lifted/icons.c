@@ -9,13 +9,16 @@ extern char D_00175898[];
 extern char D_00187CA8[];
 extern char D_00190DE4[];
 extern char D_001940D4[];
+extern char D_00195BE0[];
 extern char D_00195BF8[];
 extern char D_00195D64[];
 extern char D_00195E7A[];
 extern char D_00195E7F[];
 extern char D_00196272[];
 extern char D_00196279[];
+extern char D_00196290[];
 extern char D_00199D68[];
+extern char D_00199D71[];
 extern char D_001A5B32[];
 extern char D_001A9AB8[];
 extern char D_001AA55C[];
@@ -162,4 +165,21 @@ L5DAD4:;
     return 1;
 L5DAEE:;
     return 0;
+}
+
+int func_0005DB02(void)
+{
+    if (((int)(short)*(short *)((char *)*(int *)D_00195BE0 + 124)) >= (((int)(short)*(short *)((char *)*(int *)D_00195BE0 + 126)) / 10)) goto L5DB3D;
+    return 2;
+L5DB3D:;
+    if (*(signed char *)D_00199D71 == 0) goto L5DB4F;
+    return 0;
+L5DB4F:;
+    if (((int)(unsigned char)(*(signed char *)D_00196290 & 1)) == 0) goto L5DB68;
+    return 3;
+L5DB68:;
+    if (((int)(unsigned char)(*(signed char *)D_00196290 & 2)) == 0) goto L5DB81;
+    return 1;
+L5DB81:;
+    return -1;
 }
