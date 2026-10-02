@@ -1,0 +1,11 @@
+# Game files are never committed: you supply them, the build checks SHA-1s.
+/orig/
+*.EXE
+*.exe
+
+# Build outputs and third-party checkouts
+/build/
+/third_party/
+__pycache__/
+*.pyc
+.DS_Store
