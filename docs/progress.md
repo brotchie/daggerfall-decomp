@@ -239,3 +239,47 @@ a changed constant.
 
 `build/matched.txt` lists the matched functions. Current state: **17 / 3,663 functions, 542
 bytes, `build/FALL.EXE: OK`.**
+
+## 2026-10-01: third `-od` patch, stack-slot order
+
+**Solved.** Watcom 10 gives stack slots to declared variables in a fixed order, from the top of
+the frame down:
+
+1. 2-byte (`short`) parameters, last to first, then 2-byte locals, last to first;
+2. the return variable;
+3. the locals, last to first;
+4. the parameters, last to first.
+
+Evidence, top down (P = parameter, L = local, R = return variable, s = short):
+
+| Function | Slots |
+|---|---|
+| `func_00013A00` | R, P3, P2, P1 |
+| `func_0001811D` | R, L, P1 |
+| `func_000192EE` | P1s, R, L |
+| `func_000309E8` | P2s, Ls, R, P1 |
+| `func_00030A23` | P3s, P2s, R, L, P1 |
+| `func_00045AED` | R, L2, L1, P2, P1 |
+| `func_00046C62` | R, L2, L1 |
+
+Open Watcom gives slots at first use, statement by statement (`cg/c/temps.c`). The patch records
+each declaration as it is made: parameters in `DoParmDecl()`, locals in `BGAutoDecl()`, the
+return variable in `CGTemp()`. `DaggerAllocDeclared()` gives the slots in the order above when
+`Generate()` handles the function's first statement. `DAGGER_FIRSTUSE=1` restores Open Watcom.
+The front end declares the return variable before the body's locals (they come from a separate
+block node), which is why the patch orders by kind and not just by declaration order.
+
+The rule was worked out from `func_000192EE` and then checked against eight more functions
+from a survey of small branch-free functions with locals. Seven matched on the first try, and
+the eighth (`func_00030A23`) after swapping the operands of a multiply. All are in
+`src/slot_probes.c`.
+
+Open questions: whether 1-byte variables are ordered like 2-byte ones, and how nested-block
+locals are placed.
+
+Also noticed: `func_0001DA2D` calls `func_000A1023(dst, src, n, "faction.c", 0x751, 4)`. The
+string and line number look like `__FILE__`/`__LINE__` from a checked-copy or allocation
+macro, so **the original source file names and line numbers are in the executable**. That's
+strong evidence for naming units and ordering functions.
+
+Matched: **26 / 3,663 functions, 1,191 bytes, `build/FALL.EXE: OK`** (also with `--blank`).

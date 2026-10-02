@@ -17,6 +17,125 @@ index ee6e5533cb..6d98f59177 100644
                  SymReplace( &sym, sym_handle );
              } else {
                  CGAutoDecl( (CGSYM_HANDLE)sym_handle, dtype );
+diff --git a/bld/cg/c/bldcall.c b/bld/cg/c/bldcall.c
+index 14a056a76b..801dea2c6b 100644
+--- a/bld/cg/c/bldcall.c
++++ b/bld/cg/c/bldcall.c
+@@ -31,6 +31,7 @@
+ 
+ 
+ #include "_cgstd.h"
++#include <stdlib.h>
+ #include "coderep.h"
+ #include "cgmem.h"
+ #include "cgauxcc.h"
+@@ -65,6 +66,7 @@
+ #include "tree.h"
+ #include "treeprot.h"
+ #include "feprotos.h"
++#include "temps.h"
+ 
+ 
+ type_class_def  AddCallBlock( cg_sym_handle sym, const type_def *tipe )
+@@ -161,6 +163,82 @@ void    BGAddParm( cn call, an parm )
+ }
+ 
+ 
++/*
++ * Daggerfall: at -od, Watcom 10 gave stack slots to the declared variables from the top of
++ * the frame down in this order: 2-byte parameters and then 2-byte locals (last to first), the
++ * return variable, the locals last to first, the parameters last to first. Open Watcom gives slots at first use. DaggerAllocAtDecl()
++ * records each declaration (kind DAGGER_PARM, DAGGER_AUTO or DAGGER_TEMP);
++ * DaggerAllocDeclared() gives the slots when the first statement is generated.
++ * DAGGER_FIRSTUSE=1 restores Open Watcom's order.
++ */
++#define DAGGER_MAX_DECLS    512
++
++static proc_def     *DaggerProc;
++static name         *DaggerDecls[DAGGER_MAX_DECLS];
++static int          DaggerKinds[DAGGER_MAX_DECLS];
++static int          DaggerCount;
++
++void    DaggerAllocAtDecl( name *temp, int kind )
++/***********************************************/
++{
++    if( _IsntModel( CGSW_GEN_NO_OPTIMIZATION ) || getenv( "DAGGER_FIRSTUSE" ) != NULL )
++        return;
++    if( DaggerProc != CurrProc ) {
++        DaggerProc = CurrProc;
++        DaggerCount = 0;
++    }
++    if( DaggerCount < DAGGER_MAX_DECLS ) {
++        DaggerKinds[DaggerCount] = kind;
++        DaggerDecls[DaggerCount++] = temp;
++    }
++}
++
++static void DaggerAlloc( name *temp )
++/***********************************/
++{
++    temp = DeAlias( temp );
++    temp->v.usage |= NEEDS_MEMORY | USE_MEMORY | USE_IN_ANOTHER_BLOCK;
++    AllocALocal( temp );
++}
++
++void    DaggerAllocDeclared( void )
++/*********************************/
++{
++    int     i;
++
++    if( DaggerProc != CurrProc )
++        return;
++    /* 2-byte variables come first: parameters, then locals, last to first */
++    for( i = DaggerCount; i-- > 0; ) {
++        if( DaggerKinds[i] == DAGGER_PARM && DaggerDecls[i]->n.size == 2 ) {
++            DaggerAlloc( DaggerDecls[i] );
++        }
++    }
++    for( i = DaggerCount; i-- > 0; ) {
++        if( DaggerKinds[i] == DAGGER_AUTO && DaggerDecls[i]->n.size == 2 ) {
++            DaggerAlloc( DaggerDecls[i] );
++        }
++    }
++    for( i = 0; i < DaggerCount; i++ ) {
++        if( DaggerKinds[i] == DAGGER_TEMP ) {
++            DaggerAlloc( DaggerDecls[i] );
++        }
++    }
++    for( i = DaggerCount; i-- > 0; ) {
++        if( DaggerKinds[i] == DAGGER_AUTO ) {
++            DaggerAlloc( DaggerDecls[i] );
++        }
++    }
++    for( i = DaggerCount; i-- > 0; ) {
++        if( DaggerKinds[i] == DAGGER_PARM ) {
++            DaggerAlloc( DaggerDecls[i] );
++        }
++    }
++    DaggerProc = NULL;
++    DaggerCount = 0;
++}
++
++
+ void    BGAutoDecl( cg_sym_handle sym, const type_def *tipe )
+ /*************************************************************
+  * declare an automatic variable with name "sym" and type "tipe". This
+@@ -168,6 +246,7 @@ void    BGAutoDecl( cg_sym_handle sym, const type_def *tipe )
+  */
+ {
+     BGDone( MakeAddrName( CG_FE, sym, tipe ) );
++    DaggerAllocAtDecl( SAllocUserTemp( sym, TypeClass( tipe ), tipe->length ), DAGGER_AUTO );
+ }
+ 
+ static  void    LinkParmIns( instruction *parm_def, instruction *ins )
+@@ -295,6 +374,7 @@ name    *DoParmDecl( cg_sym_handle sym, const type_def *tipe, hw_reg_set reg )
+     } else {
+         temp = SAllocUserTemp( sym, TypeClass( tipe ), tipe->length );
+         BGDone( MakeAddrName( CG_FE, sym, tipe ) );
++        DaggerAllocAtDecl( temp, DAGGER_PARM );
+     }
+     temp->v.usage |= USE_IN_ANOTHER_BLOCK;
+ 
 diff --git a/bld/cg/c/bldsel.c b/bld/cg/c/bldsel.c
 index 6dc64e437d..2e0ace6948 100644
 --- a/bld/cg/c/bldsel.c
@@ -167,7 +286,7 @@ index 721fa0c6a9..bcb4e28a83 100644
              loops_killed = true;
              CleanPartition();
 diff --git a/bld/cg/c/generate.c b/bld/cg/c/generate.c
-index a7f606be70..a623c9f27d 100644
+index a7f606be70..2d8d4a1fdd 100644
 --- a/bld/cg/c/generate.c
 +++ b/bld/cg/c/generate.c
 @@ -31,6 +31,7 @@
@@ -178,7 +297,15 @@ index a7f606be70..a623c9f27d 100644
  #include "coderep.h"
  #include "memcheck.h"
  #include "data.h"
-@@ -501,7 +502,12 @@ static  void    FlushBlocks( bool partly_done )
+@@ -84,6 +85,7 @@
+ #include "condcode.h"
+ #include "trecurse.h"
+ #include "feprotos.h"
++#include "bldcall.h"
+ 
+ 
+ static  bool            abortCG;
+@@ -501,7 +503,12 @@ static  void    FlushBlocks( bool partly_done )
          classes |= blk->class;
          CurrBlock = blk;
          BlockToCode( partly_done );
@@ -192,7 +319,15 @@ index a7f606be70..a623c9f27d 100644
      }
      CurrBlock = curr;
      HeadBlock = NULL;
-@@ -722,6 +728,11 @@ void    Generate( bool routine_done )
+@@ -664,6 +671,7 @@ void    Generate( bool routine_done )
+         if( !BlockByBlock ) {
+             InitStackMap();
+             BlockByBlock = true;
++            DaggerAllocDeclared();
+         }
+         LNBlip( SrcLine );
+         FlushBlocks( false );
+@@ -722,6 +730,11 @@ void    Generate( bool routine_done )
          Panic( false );
          return;
      }
@@ -204,6 +339,28 @@ index a7f606be70..a623c9f27d 100644
      MakeConflicts();
      if( _IsModel( CGSW_GEN_LOOP_OPTIMIZATION ) ) {
          SplitVars();
+diff --git a/bld/cg/c/intrface.c b/bld/cg/c/intrface.c
+index b473a42354..4c909e7dc7 100644
+--- a/bld/cg/c/intrface.c
++++ b/bld/cg/c/intrface.c
+@@ -857,9 +857,16 @@ temp_handle _CGAPI      CGTemp( cg_type tipe )
+ 
+     EchoAPI( "CGTemp( %t )", tipe );
+     retn = (temp_handle)BGGlobalTemp( TypeAddress( tipe ) );
++    DaggerAllocAtDecl( (name *)retn, DAGGER_TEMP );
+     return EchoAPITempHandleReturn( retn );
+ #else
+-    return( (temp_handle)BGGlobalTemp( TypeAddress( tipe ) ) );
++    {
++        name    *temp;
++
++        temp = BGGlobalTemp( TypeAddress( tipe ) );
++        DaggerAllocAtDecl( temp, DAGGER_TEMP );
++        return( (temp_handle)temp );
++    }
+ #endif
+ }
+ 
 diff --git a/bld/cg/c/loopopts.c b/bld/cg/c/loopopts.c
 index 9a81270076..df76f781b1 100644
 --- a/bld/cg/c/loopopts.c
@@ -363,6 +520,22 @@ index 90c1857729..697078951e 100644
  
      SortConflicts();
      state = ALLOC_BITS;
+diff --git a/bld/cg/h/bldcall.h b/bld/cg/h/bldcall.h
+index bb42328d26..d33b42b56b 100644
+--- a/bld/cg/h/bldcall.h
++++ b/bld/cg/h/bldcall.h
+@@ -35,6 +35,11 @@ extern  void            BGFiniCall( cn call );
+ extern  cn              BGInitCall( an node, const type_def *tipe, aux_handle aux );
+ extern  void            BGAddParm( cn call, an parm );
+ extern  void            BGAutoDecl( cg_sym_handle sym, const type_def *tipe );
++#define DAGGER_PARM     0
++#define DAGGER_AUTO     1
++#define DAGGER_TEMP     2
++extern  void            DaggerAllocAtDecl( name *temp, int kind );
++extern  void            DaggerAllocDeclared( void );
+ extern  name            *DoParmDecl( cg_sym_handle sym, const type_def *tipe, hw_reg_set reg );
+ extern  void            BGParmDecl( cg_sym_handle sym, const type_def *tipe );
+ extern  void            AddCallIns( instruction *ins, cn call );
 diff --git a/bld/cg/intel/386/c/386rgtbl.c b/bld/cg/intel/386/c/386rgtbl.c
 index 3ea68d697a..f534ca058f 100644
 --- a/bld/cg/intel/386/c/386rgtbl.c

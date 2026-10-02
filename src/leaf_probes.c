@@ -47,3 +47,13 @@ void func_0003081B(unsigned char a)
     func_0008ECBD(D_00195AC4, a);
     func_0008ECBD(D_001959A8, a);
 }
+
+extern int D_0019672C;
+extern int func_00019323(int, int);
+
+int func_000192EE(short a)
+{
+    int r;
+    r = func_00019323(D_0019672C, a);
+    return r;
+}

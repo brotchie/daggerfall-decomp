@@ -9,6 +9,7 @@
 # Daggerfall changes (each has an environment variable that restores stock OW):
 #   cg generate.c FlushBlocks(): no peephole flush after every block at -od (DAGGER_FLUSH=1)
 #   cc cgen.c: no return-value slot for void functions (DAGGER_VOIDRET=1)
+#   cg bldcall.c, intrface.c, generate.c: -od stack slots in Watcom 10 order (DAGGER_FIRSTUSE=1)
 #
 # Output: third_party/open-watcom-v2/build/binbuild/{bwcc386,bwlink,bwasm,bwlib}
 set -eu

@@ -15,9 +15,9 @@ This repo contains no game code or data. You supply the executables; the tools c
 - Format: uncompressed LE behind the CauseWay stub. 3 objects, 37,520 fixups.
 - 3,315 functions found in object 1 (98.4% of its bytes decoded).
 - Compiler: Watcom 10.0/10.0a. Game code is unoptimised: `-od -s -of+ -4r`.
-- Toolchain: KKND-Decomp's patched Open Watcom `wcc386` plus two `-od` patches of our own,
+- Toolchain: KKND-Decomp's patched Open Watcom `wcc386` plus three `-od` patches of our own,
   built natively on macOS.
-- **17 functions match byte for byte** (`src/leaf_probes.c`), and the rebuilt executable is
+- **26 functions match byte for byte** (`src/`), and the rebuilt executable is
   identical: `tools/build-and-verify.sh` prints `build/FALL.EXE: OK`.
 
 ## Quick start
