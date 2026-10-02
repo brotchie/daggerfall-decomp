@@ -1262,3 +1262,6 @@ Batch **1,927**; build **61.34%**.
   (offset, `ds`) passed to a call is `(void __far *)(void *)p` (the callee declared without
   a prototype), and a stored selector is `_FP_SEG((void *)p)` (OW's i86.h inline). +1.
   Batch **2,137**.
+- The two DPMI helpers at 0x99648/0x99662 were assembly in the original (no frame, `int
+  31h`): written by hand in src/int.c as `__declspec(naked)` functions with `_asm` bodies.
+  Build **2,139** functions.
