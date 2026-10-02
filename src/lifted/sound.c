@@ -476,6 +476,17 @@ void func_000698EC(void)
     func_000A27A0(*(int *)D_001A3F30);
 }
 
+int func_00069938(int a1, int a2, int a3)
+{
+    int l_14;
+
+    if (*(signed char *)D_001A3F5D != 0) goto L6995F;
+    return -1;
+L6995F:;
+    l_14 = func_00085A51(a1);
+    return func_00068F5E(l_14, *(int *)D_00195CB4, a2, a3);
+}
+
 int func_0006998C(int a1)
 {
     int l_1C;
