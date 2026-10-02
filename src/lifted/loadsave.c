@@ -84,6 +84,7 @@ extern int func_00079A28(int);
 extern int func_00079A6E(int);
 extern int func_00079D0D(int, int, int);
 extern int func_00079E6E(int);
+extern int func_0008E925(int, int);
 extern int func_0009DC59(int, ...);
 extern int func_0009DEA7();
 extern int func_000A0B42();
@@ -160,6 +161,33 @@ void func_0007A1FE(void)
     func_0008E3F7(*(int *)D_00195AC4, (int)func_0007A191);
     func_0008E3F7(*(int *)D_001959A8, (int)func_0007A191);
     *(int *)D_001AA57C = *(int *)D_001959D8;
+}
+
+void func_0007A325(int a1)
+{
+    int l_1C;
+    int l_18;
+
+    l_1C = a1 + 71;
+    l_18 = 0;
+L7A346:;
+    if (l_18 < 27) goto L7A356;
+    goto L7A38B;
+L7A34E:;
+    l_18++;
+    goto L7A346;
+L7A356:;
+    if (*(int *)((char *)((l_18 << 2) + l_1C) + 367) == 0) goto L7A389;
+    *(int *)((char *)((l_18 << 2) + l_1C) + 367) = *(int *)((char *)*(int *)((char *)((l_18 << 2) + l_1C) + 367) + 31);
+L7A389:;
+    goto L7A34E;
+L7A38B:;
+    if (*(int *)((char *)l_1C + 112) == 0) return;
+    if (func_0008E925(*(int *)D_00195AC4, *(int *)((char *)*(int *)((char *)l_1C + 112) + 31)) == 0) goto L7A3BC;
+    *(int *)((char *)l_1C + 112) = *(int *)((char *)*(int *)((char *)l_1C + 112) + 31);
+    return;
+L7A3BC:;
+    *(int *)((char *)l_1C + 112) = 0;
 }
 
 void func_0007A4B3(void)

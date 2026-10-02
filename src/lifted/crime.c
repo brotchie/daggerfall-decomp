@@ -5,7 +5,10 @@ extern char D_001706E1[];
 extern char D_00179EA8[];
 extern char D_00187CA8[];
 extern char D_0018F08E[];
+extern char D_00190504[];
 extern char D_001940D5[];
+extern char D_00195AA0[];
+extern char D_00195B14[];
 extern char D_00195BE0[];
 extern char D_00195BE8[];
 extern char D_00195D7C[];
@@ -15,10 +18,11 @@ extern char D_00196274[];
 extern char D_0019627E[];
 
 extern int func_000191DA(short, short);
+extern int func_0008DA91(int);
 extern int func_000A0024();
 extern void func_0001B470(int, int);
-extern void func_0002171A(void);
 extern void func_0004AB2F(int);
+void func_0002171A(void);
 
 void func_00021597(void)
 {
@@ -49,6 +53,23 @@ L216E6:;
 L21704:;
     func_0002171A();
     *(signed char *)D_001940D5 &= 191;
+}
+
+void func_0002171A(void)
+{
+    int l_18;
+
+    l_18 = 0;
+L2172F:;
+    if (l_18 < *(int *)D_00195B14) goto L21744;
+    return;
+L2173C:;
+    l_18++;
+    goto L2172F;
+L21744:;
+    if (*(int *)(D_00190504 + (l_18 << 2)) == *(int *)D_00195AA0) goto L2173C;
+    func_0008DA91(*(int *)(D_00190504 + (l_18 << 2)));
+    goto L2173C;
 }
 
 void func_00021775(void)

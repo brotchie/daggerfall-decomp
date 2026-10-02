@@ -2,8 +2,12 @@
  * do not edit: move a function to src/colstuff.c to work on it by hand) */
 
 extern char D_00170710[];
+extern char D_00190504[];
 extern char D_00190CE4[];
+extern char D_00195AA4[];
 extern char D_00195AC4[];
+extern char D_00195B14[];
+extern char D_00195C48[];
 extern char D_00195CB8[];
 extern char D_00195CD0[];
 extern char D_00196B10[];
@@ -15,6 +19,7 @@ extern char D_00196D60[];
 extern int func_00023A6A(int);
 extern int func_0008E5C4(int, int);
 extern int func_000A1023();
+extern int func_000C7FD9();
 extern void func_00021D97(int);
 extern void func_000231F5(int, int);
 extern void func_0008E3F7(int, int);
@@ -38,6 +43,66 @@ int func_00023C72(int a1, int a2)
     func_000231F5(a1, (int)func_00023A6A);
     *(int *)D_00195CD0 = (int)func_0008E4A8;
     return (signed char)(*(signed char *)D_00190CE4 ^ 1);
+}
+
+int func_00023DE0(int a1, int a2)
+{
+    int l_1C;
+    int l_18;
+
+    *(int *)(D_00190504 + (*(int *)D_00195B14 << 2)) = *(int *)D_00195AA4;
+    l_1C = 0;
+L23E0E:;
+    if (l_1C <= *(int *)D_00195B14) goto L23E26;
+    goto L23EAF;
+L23E1E:;
+    l_1C++;
+    goto L23E0E;
+L23E26:;
+    if (*(int *)(D_00190504 + (l_1C << 2)) == a1) goto L23E1E;
+    l_18 = *(int *)((char *)*(int *)(D_00190504 + (l_1C << 2)) + 11) - *(int *)((char *)a2 + 4);
+    if (l_18 < 0) goto L23E5B;
+    if (l_18 <= 100) goto L23E5D;
+L23E5B:;
+    goto L23E1E;
+L23E5D:;
+    if (func_000C7FD9(*(int *)((char *)*(int *)(D_00190504 + (l_1C << 2)) + 7), *(int *)((char *)*(int *)(D_00190504 + (l_1C << 2)) + 15), *(int *)((char *)a2), *(int *)((char *)a2 + 8)) >= 50) goto L23EAA;
+    *(int *)D_00195C48 = *(int *)(D_00190504 + (l_1C << 2));
+    return 1;
+L23EAA:;
+    goto L23E1E;
+L23EAF:;
+    return 0;
+}
+
+int func_00023EC2(int a1, int a2, int a3)
+{
+    int l_18;
+    int l_14;
+
+    *(int *)(D_00190504 + (*(int *)D_00195B14 << 2)) = *(int *)D_00195AA4;
+    l_18 = 0;
+L23EF2:;
+    if (l_18 <= *(int *)D_00195B14) goto L23F0A;
+    goto L23F93;
+L23F02:;
+    l_18++;
+    goto L23EF2;
+L23F0A:;
+    if (*(int *)(D_00190504 + (l_18 << 2)) == a1) goto L23F02;
+    l_14 = *(int *)((char *)*(int *)(D_00190504 + (l_18 << 2)) + 11) - *(int *)((char *)a2 + 4);
+    if (l_14 < 0) goto L23F3F;
+    if (l_14 <= 100) goto L23F41;
+L23F3F:;
+    goto L23F02;
+L23F41:;
+    if (func_000C7FD9(*(int *)((char *)*(int *)(D_00190504 + (l_18 << 2)) + 7), *(int *)((char *)*(int *)(D_00190504 + (l_18 << 2)) + 15), *(int *)((char *)a2), *(int *)((char *)a2 + 8)) >= a3) goto L23F8E;
+    *(int *)D_00195C48 = *(int *)(D_00190504 + (l_18 << 2));
+    return 1;
+L23F8E:;
+    goto L23F02;
+L23F93:;
+    return 0;
 }
 
 int func_0002455D(int a1)

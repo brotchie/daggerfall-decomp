@@ -4,6 +4,7 @@
 extern char D_00171044[];
 extern char D_001710A7[];
 extern char D_0017BB01[];
+extern char D_0017BB39[];
 extern char D_001940D4[];
 extern char D_001940D6[];
 extern char D_001940D9[];
@@ -97,6 +98,37 @@ L45CD8:;
     if (l_18 == 0) return;
     l_18 = func_0008DA91(l_18);
     goto L45CD8;
+}
+
+int func_00045EB1(int a1)
+{
+    int l_20;
+    int l_1C;
+
+    l_20 = 0;
+L45EC9:;
+    if (l_20 < 12) goto L45ED9;
+    goto L45F11;
+L45ED1:;
+    l_20++;
+    goto L45EC9;
+L45ED9:;
+    l_1C = 0;
+L45EE0:;
+    if (l_1C < 6) goto L45EF0;
+    goto L45F0F;
+L45EE8:;
+    l_1C++;
+    goto L45EE0;
+L45EF0:;
+    if (*(signed char *)((char *)(a1 + l_20) + 16) != *(signed char *)(D_0017BB39 + l_1C)) goto L45F0D;
+    return 1;
+L45F0D:;
+    goto L45EE8;
+L45F0F:;
+    goto L45ED1;
+L45F11:;
+    return 0;
 }
 
 int func_000461A3(void)

@@ -3,8 +3,11 @@
 
 extern char D_00190D64[];
 extern char D_00190D66[];
+extern char D_00196D6C[];
+extern char D_00196D70[];
 
 extern int func_0007D6AE(int, int);
+extern int func_000A0DF4();
 
 void func_00024BD9(void)
 {
@@ -17,4 +20,20 @@ void func_000252C7(int a1)
 
 void func_000252E2(int a1)
 {
+}
+
+int func_0002581C(void)
+{
+    int l_20;
+    int l_1C;
+
+    l_20 = *(int *)D_00196D6C;
+    l_1C = 0;
+L25839:;
+    if (((unsigned)l_20) >= *(int *)D_00196D70) goto L25858;
+    l_1C++;
+    l_20 += func_000A0DF4(l_20) + 1;
+    goto L25839;
+L25858:;
+    return l_1C;
 }

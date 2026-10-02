@@ -2,6 +2,8 @@
  * do not edit: move a function to src/tamriel.c to work on it by hand) */
 
 extern char D_0012B508[];
+extern char D_0018F08E[];
+extern char D_00195A04[];
 extern char D_00195B24[];
 extern char D_00195B28[];
 extern char D_00195B38[];
@@ -58,6 +60,27 @@ void func_0004B796(void)
     if (l_18 == 0) return;
     *(signed char *)D_0012B508 = 146;
     func_0003F09F((short)(l_18 + 8349), 1);
+}
+
+void func_0004BA0F(void)
+{
+    int l_1C;
+    int l_18;
+
+    l_18 = *(int *)D_00195A04 + 71;
+    l_1C = 0;
+L4BA2F:;
+    if (l_1C < 62) goto L4BA3F;
+    return;
+L4BA37:;
+    l_1C++;
+    goto L4BA2F;
+L4BA3F:;
+    if (*(int *)((char *)l_18 + 8) == 0) goto L4BA37;
+    if (*(int *)((char *)l_18 + 8) != *(int *)D_00195BF4) goto L4BA62;
+    *(short *)(D_0018F08E + (l_1C * 80)) -= 5;
+L4BA62:;
+    goto L4BA37;
 }
 
 void func_0004BA70(void)

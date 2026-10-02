@@ -9,6 +9,8 @@ extern char D_00171178[];
 extern char D_00171185[];
 extern char D_0017118B[];
 extern char D_00171192[];
+extern char D_0017C54E[];
+extern char D_0017C552[];
 extern char D_0017CAC3[];
 extern char D_0017CB8E[];
 extern char D_0017CC1F[];
@@ -31,8 +33,10 @@ extern char D_001842A1[];
 extern char D_0018432D[];
 extern char D_00184644[];
 extern char D_0018467C[];
+extern char D_0018509F[];
 extern char D_0018DD94[];
 extern char D_0018DDB4[];
+extern char D_0018F08E[];
 extern char D_0018F090[];
 extern char D_00190BE4[];
 extern char D_00190BEC[];
@@ -544,6 +548,29 @@ int func_0004827C(void)
 int func_000482A4(void)
 {
     return func_0008BD50(*(int *)((char *)*(int *)D_00195D28 + 18));
+}
+
+int func_000482CF(void)
+{
+    int l_20;
+    int l_1C;
+
+    l_20 = (short)*(short *)(D_0018F08E + (((unsigned char)*(signed char *)D_00196268) * 80));
+    l_1C = 0;
+    if (l_20 >= (-100)) goto L48307;
+    l_20 = -100;
+    goto L48314;
+L48307:;
+    if (l_20 <= 100) goto L48314;
+    l_20 = 100;
+L48314:;
+    if (l_20 < *(int *)(D_0017C54E + (l_1C << 3))) goto L48336;
+    if (l_20 <= *(int *)(D_0017C552 + (l_1C << 3))) goto L4833E;
+L48336:;
+    l_1C++;
+    goto L48314;
+L4833E:;
+    return *(int *)(D_0018509F + (l_1C << 2));
 }
 
 int func_0004845B(void)

@@ -31,7 +31,6 @@ extern void func_00050069(int);
 extern void func_0006A1FD(int);
 extern void func_0006A28A(int);
 extern void func_0008E3F7(int, int);
-void func_0006A319(int);
 #pragma aux func_000A0ED9 parm routine [];
 #pragma aux func_000A29BA parm routine [];
 
@@ -132,11 +131,4 @@ L6A508:;
     func_00050069((int)D_00175BFA);
 L6A53C:;
     goto L6A3B0;
-}
-
-void func_0006A654(int a1)
-{
-    (*(int *)D_00187CAD)++;
-    func_0006A319(a1);
-    (*(int *)D_00187CAD)--;
 }

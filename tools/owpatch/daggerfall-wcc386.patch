@@ -499,8 +499,31 @@ index 76c9e5daf1..abc589fae0 100644
      test = num >> 1;
      do {
          pow2 = 1;
+diff --git a/bld/cg/c/optimize.c b/bld/cg/c/optimize.c
+index 74e94d9765..27ca4d9ca1 100644
+--- a/bld/cg/c/optimize.c
++++ b/bld/cg/c/optimize.c
+@@ -228,6 +228,7 @@ void    DeadTemps( void )
+             if( !SideEffect( ins ) && _IsntIns( ins, SIDE_EFFECT )
+              && ins->result != NULL
+              && ins->result->n.class == N_TEMP
++             && ( ins->result->t.temp_flags & DAGGER_KEEP ) == 0
+              && ( ins->result->v.usage & (USE_ADDRESS | HAS_MEMORY | USE_WITHIN_BLOCK | USE_IN_ANOTHER_BLOCK) ) == 0 ) {
+                 FreeIns( ins );
+             }
+@@ -299,7 +300,9 @@ void    AxeDeadCode( void )
+         for( blk = HeadBlock; blk != NULL; blk = blk->next_block ) {
+             for( ins = blk->ins.head.next; ins->head.opcode != OP_BLOCK; ins = next ) {
+                 next = ins->head.next;
+-                if( IsDeadIns( blk, ins, next ) ) {
++                if( IsDeadIns( blk, ins, next )
++                  && !( ins->result->n.class == N_TEMP
++                     && ( ins->result->t.temp_flags & DAGGER_KEEP ) ) ) {
+                     ins->result = NULL;
+                     change = true;
+                     if( _IsntIns( ins, SIDE_EFFECT ) ) {
 diff --git a/bld/cg/c/regalloc.c b/bld/cg/c/regalloc.c
-index 90c1857729..697078951e 100644
+index 90c1857729..129dd201e5 100644
 --- a/bld/cg/c/regalloc.c
 +++ b/bld/cg/c/regalloc.c
 @@ -31,6 +31,8 @@
@@ -573,6 +596,49 @@ index 90c1857729..697078951e 100644
  
      SortConflicts();
      state = ALLOC_BITS;
+@@ -1265,7 +1300,9 @@ static  enum allocation_state    AssignConflicts( void )
+             */
+             if( !only_const_temps && opnd->n.class == N_TEMP && (opnd->t.temp_flags & CONST_TEMP) )
+                 return( ALLOC_CONST_TEMP );
+-            if( conf->savings == 0 || IsUncacheableMemory( conf->name ) ) {
++            if( ( conf->savings == 0
++                && !( opnd->n.class == N_TEMP && ( opnd->t.temp_flags & DAGGER_KEEP ) ) )
++              || IsUncacheableMemory( conf->name ) ) {
+                 next = InMemory( conf );
+             } else {
+                 next = GiveRegister( conf, false );
+diff --git a/bld/cg/c/tree.c b/bld/cg/c/tree.c
+index 23957dda5c..46b08cd7c4 100644
+--- a/bld/cg/c/tree.c
++++ b/bld/cg/c/tree.c
+@@ -31,6 +31,7 @@
+ 
+ 
+ #include "_cgstd.h"
++#include <stdlib.h>
+ #include "coderep.h"
+ #include "tree.h"
+ #include "zoiks.h"
+@@ -1881,13 +1882,18 @@ an  TNPostGets( tn node )
+     an      left;
+     an      rite;
+     an      leftp;
++    name    *temp;
+ 
+     if( node->u.left->class == TN_BIT_LVALUE ) {
+         retv = TNBitOpGets( node, node->tipe, true );
+     } else {
+         left = AddrGen( node->u.left );
+         rite = NotAddrGen( node->u1.t.rite );
+-        retv = MakeTempAddr( BGNewTemp( node->tipe ) );
++        temp = BGNewTemp( node->tipe );
++        if( _IsModel( CGSW_GEN_NO_OPTIMIZATION ) && getenv( "DAGGER_DEADDEF" ) == NULL ) {
++            temp->t.temp_flags |= DAGGER_KEEP;
++        }
++        retv = MakeTempAddr( temp );
+         leftp = BGUnary( O_POINTS, AddrCopy( left ), node->tipe );
+         retv = BGAssign( retv, leftp, node->tipe );
+         BGDone( BGOpGets( node->u1.t.op, left, rite, node->tipe, node->tipe ) );
 diff --git a/bld/cg/h/bldcall.h b/bld/cg/h/bldcall.h
 index bb42328d26..d33b42b56b 100644
 --- a/bld/cg/h/bldcall.h
@@ -589,6 +655,18 @@ index bb42328d26..d33b42b56b 100644
  extern  name            *DoParmDecl( cg_sym_handle sym, const type_def *tipe, hw_reg_set reg );
  extern  void            BGParmDecl( cg_sym_handle sym, const type_def *tipe );
  extern  void            AddCallIns( instruction *ins, cn call );
+diff --git a/bld/cg/h/name.h b/bld/cg/h/name.h
+index 796db7f256..89eff56559 100644
+--- a/bld/cg/h/name.h
++++ b/bld/cg/h/name.h
+@@ -99,6 +99,7 @@ typedef enum {
+     CG_INTRODUCED           = 0x2000,         /* created under special circumstances by CG
+                                                  so don't use normal size/range checks - this
+                                                  is to allow weird t1-3 aliases made by rCYP_SEX */
++    DAGGER_KEEP             = 0x4000,         /* Daggerfall: keep a dead load at -od */
+ } t_flags;
+ 
+ #define PERM_TEMP_FLAGS (STACK_PARM+CONST_TEMP)
 diff --git a/bld/cg/intel/386/c/386rgtbl.c b/bld/cg/intel/386/c/386rgtbl.c
 index 3ea68d697a..f534ca058f 100644
 --- a/bld/cg/intel/386/c/386rgtbl.c

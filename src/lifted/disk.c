@@ -28,13 +28,6 @@ void func_0006D430(int a1)
     *(int *)D_001A49FC += 4;
 }
 
-void func_0006D491(int a1)
-{
-    func_000A0AD9(*(int *)D_001A49F4, a1, 4, (int)D_00175D00, 295);
-    *(int *)D_001A49F4 += func_000A0DF4(a1) + 1;
-    (*(int *)D_001A4A08)++;
-}
-
 void func_0006D4DD(void)
 {
     int l_1C;

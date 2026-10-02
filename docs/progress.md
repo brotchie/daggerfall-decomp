@@ -469,3 +469,18 @@ Investigated and parked: the return variable's slot. It's above all locals in 44
 but in the middle or at the bottom in 86. Neither address-taking, nor `register`, nor
 first-use order explains it (tested with a switchable compiler patch and a whole-game tally).
 Locals themselves follow source declaration order, which the lifter reproduces.
+
+## 2026-10-01: compiler fix for an unused `x++` (+51 functions)
+
+Watcom 10 compiled an `x++` whose value is unused as `mov eax,[x]; inc [x]` (the old value is
+loaded into a register and dropped). OW drops the load. Tracing with lldb (breakpoints on
+`FreeIns`/`DoNothing`, rerun after each fix) found four places, all now handled for a temp
+flagged `DAGGER_KEEP` in `TNPostGets()` (`cg/c/tree.c`):
+
+1. `DeadTemps()` (`optimize.c`), called from `BlockToCode()` at `-od`, freed the load;
+2. `AxeDeadCode()` (`optimize.c`) then dropped it as a dead instruction;
+3. `AssignConflicts()` (`regalloc.c`) put the never-read temp in memory (`savings == 0`), so
+4. `ScanForLastUse()` (`temps.c`) deleted the dead store.
+
+The flagged temp now gets a register. `DAGGER_DEADDEF=1` restores OW. Batch: **789 / 2,297**
+(738 without).

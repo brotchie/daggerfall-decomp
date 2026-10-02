@@ -21,6 +21,7 @@ extern int func_0006CB53(int, int);
 extern int func_000A0024();
 extern int func_000A0ED9(int, int);
 extern int func_000A0F5C(int, ...);
+extern int func_000CDD49();
 extern void func_0008E3F7(int, int);
 extern void func_0009B647(void);
 extern void func_0009C229(void);
@@ -92,6 +93,23 @@ L9D56E:;
 L9D588:;
     if ((((short)*(short *)D_00190D66) + 40) <= 148) return;
     *(short *)D_00190D66 = 108;
+}
+
+void func_0009D5AC(int a1, int a2, int a3)
+{
+    int l_10;
+
+    a2 = (a2 + (((short)*(short *)D_00190D66) * 320)) + ((short)*(short *)D_00190D64);
+    l_10 = 0;
+L9D5E6:;
+    if (l_10 < 40) goto L9D5F6;
+    return;
+L9D5EE:;
+    l_10++;
+    goto L9D5E6;
+L9D5F6:;
+    func_000CDD49((l_10 * 320) + a2, (l_10 * 1280) + a1, 80);
+    goto L9D5EE;
 }
 
 int func_0009D960(int a1, int a2)

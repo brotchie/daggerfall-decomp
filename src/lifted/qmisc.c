@@ -3,14 +3,79 @@
 
 extern char D_00190CE4[];
 extern char D_00190D64[];
+extern char D_00195A16[];
+extern char D_00195A1A[];
 extern char D_00195AA0[];
 extern char D_00195AC4[];
+extern char D_00196274[];
 
 extern int func_0002FFA6(int, short);
 extern int func_00030A23(int, short, short);
+extern int func_00144FB4();
 extern void func_0002FE02(int);
 extern void func_0002FE4B(int);
 extern void func_0008E3F7(int, int);
+
+void func_00030D02(void)
+{
+    int l_20;
+    int l_1C;
+    int l_18;
+
+    if (*(signed char *)D_00196274 != 0) return;
+    l_20 = 0;
+    l_1C = l_20;
+L30D26:;
+    if (l_20 < 10) goto L30D36;
+    return;
+L30D2E:;
+    l_20++;
+    goto L30D26;
+L30D36:;
+    if (*(int *)(D_00195A16 + (l_20 * 10)) == 0) goto L30D2E;
+    l_18 = *(int *)(D_00195A1A + (l_20 * 10));
+    func_00144FB4((l_1C << 5) + 8, 36, (unsigned short)*(short *)((char *)l_18 + 4), (unsigned short)*(short *)((char *)l_18 + 6), l_18 + 12);
+    l_1C++;
+    goto L30D2E;
+}
+
+void func_00030D8E(int a1)
+{
+    int l_18;
+
+    l_18 = 0;
+L30DA6:;
+    if (l_18 < 10) goto L30DB6;
+    return;
+L30DAE:;
+    l_18++;
+    goto L30DA6;
+L30DB6:;
+    if (*(int *)(D_00195A16 + (l_18 * 10)) != a1) goto L30DD5;
+    *(int *)(D_00195A16 + (l_18 * 10)) = 0;
+    return;
+L30DD5:;
+    goto L30DAE;
+}
+
+void func_00030DE1(int a1, int a2)
+{
+    int l_14;
+
+    l_14 = 0;
+L30DFB:;
+    if (l_14 < 10) goto L30E0B;
+    return;
+L30E03:;
+    l_14++;
+    goto L30DFB;
+L30E0B:;
+    if (*(int *)(D_00195A16 + (l_14 * 10)) != a1) goto L30E29;
+    *(int *)(D_00195A16 + (l_14 * 10)) = a2;
+    return;
+L30E29:;
+    goto L30E03;
+}
 
 void func_00030F39(void)
 {

@@ -2,7 +2,10 @@
  * do not edit: move a function to src/weapons.c to work on it by hand) */
 
 extern char D_0017615C[];
+extern char D_00190504[];
 extern char D_00195AC4[];
+extern char D_00195B14[];
+extern char D_00195B84[];
 extern char D_001A4A58[];
 extern char D_001A4A5C[];
 
@@ -10,6 +13,8 @@ extern int func_0008DCE3(int, int, int);
 extern int func_000A0024();
 extern int func_000C2000();
 extern int func_000C2043();
+extern int func_000C7FD9();
+extern int func_000C7FF4();
 extern void func_0005E540(short, short, int);
 extern void func_0006A54B(int);
 extern void func_000728D2(void);
@@ -58,4 +63,34 @@ L73F33:;
 L73F35:;
     func_000A0024(*(int *)D_001A4A5C, (int)D_0017615C, 543);
     *(int *)D_001A4A5C = -1751672937;
+}
+
+int func_00073F5D(int a1, int a2, int a3)
+{
+    int l_20;
+    int l_1C;
+    int l_18;
+    int l_14;
+
+    l_1C = 100000;
+    l_20 = 0;
+L73F80:;
+    if (l_20 < *(int *)D_00195B14) goto L73F95;
+    goto L73FF0;
+L73F8D:;
+    l_20++;
+    goto L73F80;
+L73F95:;
+    l_14 = func_000C7FF4(*(int *)((char *)*(int *)(D_00190504 + (l_20 << 2)) + 11) - a2, func_000C7FD9(*(int *)((char *)*(int *)(D_00190504 + (l_20 << 2)) + 7), *(int *)((char *)*(int *)(D_00190504 + (l_20 << 2)) + 15), a1, a3));
+    if (l_14 >= l_1C) goto L73FEE;
+    l_1C = l_14;
+    l_18 = l_20;
+L73FEE:;
+    goto L73F8D;
+L73FF0:;
+    *(int *)D_00195B84 = l_1C;
+    if (l_1C != 100000) goto L7400A;
+    return 0;
+L7400A:;
+    return *(int *)(D_00190504 + (l_18 << 2));
 }
