@@ -549,6 +549,67 @@ L70E71:;
     func_0004C274((int)(unsigned char)*(signed char *)((char *)(int)(*(char **)D_00187545 + ((int)(unsigned char)*(signed char *)((char *)*(int *)D_001A4A14 + 2))) - 142), 67, 48, 67, (int)(unsigned char)*(signed char *)((char *)*(int *)D_00195BE0 + 129));
 }
 
+int func_00070EC0(int a1)
+{
+__dagger_scn70ED6:;
+    switch (*(unsigned short *)((char *)a1 + 33)) {
+case 108:
+    return 0;
+case 42:
+    return 3;
+case 40:
+    return 1;
+case 41:
+    return 2;
+case 21:
+case 82:
+    return 142;
+case 22:
+case 84:
+    return 143;
+case 24:
+case 28:
+    return 144;
+case 26:
+case 92:
+    return 145;
+case 27:
+case 94:
+    return 146;
+case 29:
+case 98:
+    return 147;
+case 33:
+case 106:
+    return 148;
+case 35:
+case 36:
+    return 149;
+case 368:
+    return 68;
+case 408:
+    return 69;
+case 409:
+    return 70;
+case 410:
+    return 71;
+case 411:
+    return 72;
+case 413:
+    return 73;
+case 414:
+    return 74;
+case 415:
+    return 75;
+case 416:
+    return 76;
+case 417:
+    return 77;
+default:
+    return -1;
+}
+}
+
 int func_000710AE(short a1)
 {
     int l_20;

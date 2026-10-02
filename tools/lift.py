@@ -524,8 +524,12 @@ class Func:
         body = self.ins[self.body_start:self.body_end]
         self.body = body
         # where each switch table sat: the compiler is told to put the table there
-        table_end = {t + n: t for t, n in IMG.tables
-                     if any(sw["table"] == t for sw in self.switches.values())}
+        table_end = {}
+        for t, n in IMG.tables:
+            for sw in self.switches.values():
+                if sw["table"] == t:
+                    table_end[t + n] = ("scn", sw["scan_values"]) if "scan_values" in sw \
+                        else ("tbl", t)
         dead = False
         for k, ins in enumerate(body):
             if ins.address in table_end:
@@ -533,7 +537,7 @@ class Func:
                 # the original's jmp over the table: the compiler inserts its own
                 if self.out and self.out[-1] == "    goto L%X;" % ins.address:
                     self.out.pop()
-                self.out.append("__dagger_tbl%X:;" % table_end[ins.address])
+                self.out.append("__dagger_%s%X:;" % table_end[ins.address])
             if ins.address in self.cskip:
                 continue        # a switch's compare tree: the compiler builds it again
             if ins.address in self.cswitches:
@@ -985,12 +989,28 @@ class Func:
             if t in [p[1] for p in self.params] or k < self.body_start:
                 continue                # a parameter's spill, not a temp
             j = self.ins[k + 1]
-            if j.mnemonic != "cmp" or ebp_slot(j, j.operands[0]) != t or \
-                    j.operands[0].size >= 4 or j.operands[0].size > i.operands[0].size or \
-                    j.operands[1].type != cx.X86_OP_IMM:
+            if j.mnemonic == "cmp" and ebp_slot(j, j.operands[0]) == t and \
+                    j.operands[0].size <= i.operands[0].size and \
+                    j.operands[1].type == cx.X86_OP_IMM:
+                w = j.operands[0].size
+            elif self.scan_at(j.address, t, by_addr, nxt) is not None:
+                w = self.scan_at(j.address, t, by_addr, nxt)["width"]
+            else:
                 continue
             saved = set(self.cskip)
-            sw = self.parse_ctree(j.address, t, j.operands[0].size, by_addr, nxt)
+            try:
+                sw = self.parse_ctree(j.address, t, w, by_addr, nxt)
+            except Unsupported:
+                if w == 4:
+                    self.cskip = saved
+                    continue
+                raise
+            # an int selector looks like `l = f(); if (l < 0) ...` on a local used once: take
+            # it for a switch only when it has a table or several cases
+            if w == 4 and not sw["has_table"] and \
+                    sum(len(v) for v in sw["cases"].values()) < 3:
+                self.cskip = saved
+                continue
             # a temp: nothing but the store and the tree touches the slot
             if any(x.address != i.address and x.address not in sw["nodes"]
                    for x in self.ins for op in x.operands if ebp_slot(x, op) == t):
@@ -1000,6 +1020,40 @@ class Func:
             found[i.address] = sw
             self.temps.add(t)           # the compiler's own temp: not declared
         return found
+
+    def scan_at(self, a, t, by_addr, nxt):
+        """A scan switch's dispatch at `a`: `mov al, [t]; mov ecx, n+1; mov edi, offset
+        values; repne scasb; jmp cs:[ecx*4 + labels]` (scasw/scasd for wider values). The
+        values are stored largest first; a value found at index i leaves ecx = n - i, which
+        picks its label; not found leaves 0, the default."""
+        seq, b = [], a
+        for _ in range(5):
+            if b not in by_addr:
+                return None
+            seq.append(by_addr[b])
+            b = nxt.get(b)
+        ld, mc, me, sc, jp = seq
+        if ld.mnemonic != "mov" or ebp_slot(ld, ld.operands[1]) != t or \
+                ld.op_str.split(",")[0] not in ("al", "ax", "eax") or \
+                mc.mnemonic != "mov" or not mc.op_str.startswith("ecx, ") or \
+                me.mnemonic != "mov" or not me.op_str.startswith("edi, ") or \
+                not sc.mnemonic.startswith("repne scas") or jp.mnemonic != "jmp" or \
+                jp.address not in self.switches:
+            return None
+        width = {"b": 1, "w": 2, "d": 4}[sc.mnemonic[-1]]
+        n = mc.operands[1].imm - 1
+        vals_va = me.operands[1].imm
+        labels = self.switches[jp.address]["entries"]
+        if len(labels) != n + 1:
+            raise Unsupported("scan switch label table size")
+        o = IMG.le.obj_of_va(vals_va)
+        raw = bytes(IMG.img[o.index][vals_va - o.base: vals_va - o.base + n * width])
+        cases = {}
+        for i in range(n):
+            v = int.from_bytes(raw[i * width:(i + 1) * width], "little")
+            cases[v] = labels[n - i]
+        return {"width": width, "cases": cases, "other": labels[0], "jmp": jp.address,
+                "values": vals_va, "seq": [x.address for x in seq]}
 
     def parse_ctree(self, start, t, w, by_addr, nxt, stubs=frozenset()):
         """Walk the compare tree from `start`, tracking the selector's possible values.
@@ -1025,6 +1079,9 @@ class Func:
             if i.mnemonic == "jmp" and i.operands[0].type == cx.X86_OP_IMM and a != start and \
                     (fall or a in stubs):
                 return ("jmp", i.operands[0].imm, [a])
+            sc = self.scan_at(a, t, by_addr, nxt)
+            if sc is not None:
+                return ("scan", sc, sc["seq"])
             if i.mnemonic == "xor" and i.op_str == "eax, eax":
                 b = nxt.get(a)
                 seq = [a]
@@ -1096,6 +1153,17 @@ class Func:
                 todo.append((n[3], ivs, True))
             elif n[0] == "jmp":
                 todo.append((n[1], ivs, False))
+            elif n[0] == "scan":
+                sc = n[1]
+                tsw = self.switches[sc["jmp"]]
+                tsw["merged"] = True
+                tsw["scan_values"] = sc["values"]
+                for v in sorted(sc["cases"]):
+                    if any(x <= v <= y for x, y in ivs):
+                        leaves.append((sc["cases"][v], [(v, v)]))
+                        _yes, ivs = cut(ivs, "==", v)
+                if ivs:
+                    leaves.append((sc["other"], ivs))
             else:
                 tsw = self.switches[n[1]]
                 tsw["merged"] = True
@@ -1127,6 +1195,8 @@ class Func:
             return self.parse_ctree(start, t, w, by_addr, nxt, stubs | more)
         self.cskip |= nodes
         return {"cases": cases, "default": dflt, "width": w, "signed": signed,
+                "has_table": any(n is not None and n[0] in ("table", "scan")
+                                 for n in (node(a) for a in nodes)),
                 "entries": sorted(cases), "nodes": nodes}
 
     def span(self, a, b, nxt):
@@ -1182,9 +1252,11 @@ class Func:
         """The store into the selector temp: `switch (expr) {`."""
         e = self.reg("eax", ins)
         w, signed = sw["width"], sw["signed"]
-        tname = {1: "char", 2: "short"}[w]
+        tname = {1: "char", 2: "short", 4: "int"}[w]
         mm = re.fullmatch(r"\*\((?:signed |unsigned )?(?:char|short) \*\)(.*)", e.text)
-        if mm and e.size == w and e.atom:
+        if w == 4:
+            text = e.text if e.size == 4 else "(int)%s" % e.p()
+        elif mm and e.size == w and e.atom:
             text = "*(%s%s *)%s" % ("" if signed else "unsigned ",
                                     "signed char" if signed and w == 1 else tname, mm.group(1))
         else:

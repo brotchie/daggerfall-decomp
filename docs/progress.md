@@ -784,3 +784,24 @@ which compiles to different code and a different frame.
 Batch **1,449**; build **1,452 functions, 37.86%**. 53 of the 122 functions with a switch
 match; the rest mostly fail elsewhere (frame size, register choice, unsupported idioms),
 and the `repne scasb`/`scasw` scan switches are still unsupported.
+
+## 2026-10-02: scan switches, selector copy
+
+- **Selector copy**: with the lifter now switching on expressions, the earlier patch that
+  let `switch (local)` use the local directly is wrong in general: Watcom 10 copies even a
+  parameter into the selector temp (`mov eax,[a1]; mov [t],eax; cmp word [t],5`). OW's copy
+  is the default again (`DAGGER_SELDIRECT=1` for the old behaviour); the batch is unchanged.
+- **Scan switches** (`repne scasb`/`scasw`): `find_functions.py` now records the value
+  tables (`kind=scanvalues` in `config/code_data.csv`, three of them), so the lifter no
+  longer decodes them as code. The lifter reads a scan dispatch (`mov al,[t]; mov ecx,n+1;
+  mov edi,offset values; repne scasb; jmp cs:[ecx*4+labels]`; values stored largest first,
+  label 0 the default) as a node of the compare tree and marks the tables with
+  `__dagger_scnXXXX:` (XXXX = the value table). In the compiler, `MakeScanTab()` is placed
+  and aligned at the mark like a jump table, including the deferred case after the prologue
+  (from a copy of the select node), and a scan mark forces the scan strategy.
+  `func_00070EC0` matches; the other two fail elsewhere.
+- Fixed: the forced strategy fell back whenever `kind` was 0, which is `U_SCAN`.
+- Int-width selector temps (`cmp dword [t]`) are taken for switches only with a table or at
+  least three cases: a local assigned once and compared once looks the same.
+
+Batch **1,451**; build **1,454 functions, 37.97%**.

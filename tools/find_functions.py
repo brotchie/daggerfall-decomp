@@ -80,17 +80,19 @@ def main():
     covered = {}         # insn va -> length
     owner = {}           # insn va -> function va
     table_bytes = set()  # jump-table dwords inside code
+    scan_values = {}     # scan switch value tables inside code: start -> end
     done = set()
 
     def walk(fva):
         lo, hi = obj_range(le.obj_of_va(fva).index)
         work, seen = [fva], set()
+        edi_val = None
         while work:
             va = work.pop()
             while lo <= va < hi and va not in seen:
                 if va in covered and owner.get(va) != fva:
                     break  # ran into another function's code
-                if va in table_bytes:
+                if va in table_bytes or any(a <= va < b for a, b in scan_values.items()):
                     break
                 seen.add(va)
                 ins = next(md.disasm(rd(va, 16), va), None)
@@ -99,6 +101,9 @@ def main():
                 covered[va] = ins.size
                 owner.setdefault(va, fva)
                 g, m = ins.groups, ins.mnemonic
+                if m == "mov" and ins.op_str.startswith("edi, ") and ins.size == 5:
+                    ff = fix_at.get(va + 1)
+                    edi_val = ff.target_va if ff and ff.target_obj == 1 else None
                 if m in ("push", "mov") and ins.size >= 5:
                     ff = fix_at.get(va + ins.size - 4)
                     # `mov edi, offset values` also points into code (the byte table of a
@@ -130,6 +135,11 @@ def main():
                         if op.mem.scale == 4:
                             while p not in fix_at and p < t + 4 * 64:
                                 p += 4
+                        # a scan switch (`mov edi, offset values; repne scasb; jmp
+                        # cs:[ecx*4 + labels]`): its values sit just before the labels
+                        if edi_val is not None and edi_val < p <= edi_val + 4 * 256:
+                            scan_values[edi_val] = p
+                            edi_val = None
                         if lo <= p < hi and p in fix_at and op.mem.index + op.mem.base != 0:
                             while p in fix_at and fix_at[p].kind == SRC_OFF32 and \
                                     lo <= fix_at[p].target_va < hi:
@@ -214,8 +224,10 @@ def main():
     with open(os.path.join(ROOT, "config", "code_data.csv"), "w", newline="") as fh:
         w = csv.writer(fh)
         w.writerow(["va", "size", "kind"])
-        for a, b in blocks:
-            w.writerow(["0x%08X" % a, b - a, "jumptable"])
+        data = [(a, b - a, "jumptable") for a, b in blocks] + \
+               [(a, b - a, "scanvalues") for a, b in scan_values.items()]
+        for a, n, kind in sorted(data):
+            w.writerow(["0x%08X" % a, n, kind])
     for oi in CODE_OBJS:
         lo, hi = obj_range(oi)
         n = sum(1 for r in rows if r[1] == oi)

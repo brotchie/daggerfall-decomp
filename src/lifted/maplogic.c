@@ -445,6 +445,67 @@ L87E5E:;
     goto L87E28;
 }
 
+void func_00087E68(int a1)
+{
+    int l_24;
+    int l_20;
+    int l_1C;
+    int l_18;
+
+    l_24 = *(int *)D_00196A9C;
+    l_18 = 0;
+    func_000A0040(a1, 0, 20, (int)D_00176C94, 991, 4);
+    l_20 = 0;
+L87EAA:;
+    if (l_20 < *(int *)D_00196A28) goto L87EC6;
+    goto L87EE7;
+L87EB7:;
+    l_20++;
+    (*(char (**)[17])&l_24)++;
+    goto L87EAA;
+L87EC6:;
+    switch (((unsigned)(*(int *)((char *)l_24 + 4) << 2)) >> 27) {
+    goto L87EE5;
+case 0:
+case 1:
+case 2:
+    l_18++;
+default:
+L87EE5:;
+    goto L87EB7;
+L87EE7:;
+    if (l_18 != 0) goto L87EFA;
+    func_00086397(a1);
+    return;
+L87EFA:;
+    l_1C = (func_0009DC25() % l_18) + 1;
+    l_24 = *(int *)D_00196A9C;
+    l_20 = 0;
+L87F1C:;
+    if (l_20 < *(int *)D_00196A28) goto L87F38;
+    return;
+L87F29:;
+    l_20++;
+    (*(char (**)[17])&l_24)++;
+    goto L87F1C;
+L87F38:;
+}
+    switch (((unsigned)(*(int *)((char *)l_24 + 4) << 2)) >> 27) {
+    goto L87F57;
+case 0:
+case 1:
+case 2:
+    l_1C--;
+default:
+L87F57:;
+    if (l_1C != 0) goto L87F6A;
+    func_0001E3D3(a1, l_20);
+    return;
+L87F6A:;
+    goto L87F29;
+}
+}
+
 void func_000880F8(int a1)
 {
     int l_20;

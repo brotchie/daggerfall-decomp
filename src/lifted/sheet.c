@@ -224,19 +224,13 @@ L3CA43:;
 
 void func_0003CA57(void)
 {
-    int l_24;
     int l_20;
     int l_1C;
     int l_18;
 
     if (((int)(unsigned char)*(signed char *)D_00196274) != 23) return;
-    l_24 = *(int *)D_00190C34;
-    if (((unsigned)l_24) < 1235) goto L3CAA5;
-    if (((unsigned)l_24) <= 1235) goto L3CB8C;
-    if (l_24 == 1236) goto L3CB9F;
-    return;
-L3CAA5:;
-    if (l_24 != 1234) return;
+    switch (*(int *)D_00190C34) {
+case 1234:
     if (((int)(unsigned char)*(signed char *)D_00196271) != 2) goto L3CACD;
     *(int *)D_00190C34 = 1235;
     return;
@@ -261,11 +255,11 @@ L3CB6D:;
     func_0007D24F(*(int *)D_00195C44);
     *(int *)D_00190C34 = 1236;
     return;
-L3CB8C:;
+case 1235:
     *(signed char *)D_00196272 = 0;
     *(signed char *)D_00196274 = 0;
     return;
-L3CB9F:;
+case 1236:
     if ((*(unsigned char *)D_001940D4 & 4) == 0) goto L3CBB6;
     l_18 = func_000392AD();
     if (l_18 > (-1)) goto L3CBBB;
@@ -288,6 +282,8 @@ L3CC05:;
 L3CC86:;
     if ((*(unsigned char *)D_001940D4 & 4) != 0) return;
     *(int *)D_00190C34 = 1235;
+default:;
+}
 }
 
 void func_0003CFB9(void)

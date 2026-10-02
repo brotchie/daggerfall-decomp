@@ -19,6 +19,7 @@ extern int func_000A00CB();
 extern int func_000A0B42();
 extern int func_000A1023();
 extern int func_000CE77F();
+int func_000658CA(int, int);
 
 void func_00064337(int a1)
 {
@@ -99,6 +100,99 @@ L64555:;
 L6455D:;
     *(int *)(D_001A3978 + (l_18 << 2)) = ((int)D_00199D78) + (*(int *)(D_001A3978 + (l_18 << 2)) * 39);
     goto L64555;
+}
+
+void func_000654EA(int a1)
+{
+    int l_20;
+    int l_1C;
+    int l_18;
+
+    *(signed char *)((char *)a1 + 12) &= 250;
+    switch (*(unsigned char *)((char *)a1 + 9)) {
+case 1:
+    if (*(short *)((char *)a1 + 5) == 0) goto L65569;
+    *(int *)((char *)a1 + 17) = (((int)(short)*(short *)((char *)a1 + 7)) << 16) / ((int)(short)*(short *)((char *)a1 + 5));
+    goto L65579;
+L65569:;
+    *(int *)((char *)a1 + 17) = ((int)(short)*(short *)((char *)a1 + 7)) << 16;
+L65579:;
+    if (((int)(unsigned char)(*(signed char *)((char *)a1 + 12) & 2)) == 0) goto L65590;
+    *(int *)((char *)a1 + 17) = -(*(int *)((char *)a1 + 17));
+L65590:;
+    l_1C = 1132;
+    *(int *)((char *)a1 + 25) = *(int *)((char *)l_1C);
+    switch (((int)(unsigned char)*(signed char *)((char *)a1 + 4)) - 1) {
+    goto L655FC;
+case 0:
+case 1:
+    goto L655CB;
+L655CB:;
+    *(int *)((char *)a1 + 13) = *(int *)((char *)*(int *)((char *)a1 + 35) + 7);
+    goto L655FC;
+case 2:
+case 3:
+    *(int *)((char *)a1 + 13) = *(int *)((char *)*(int *)((char *)a1 + 35) + 11);
+    goto L655FC;
+case 4:
+case 5:
+    *(int *)((char *)a1 + 13) = *(int *)((char *)*(int *)((char *)a1 + 35) + 15);
+default:
+L655FC:;
+    return;
+}
+case 8:
+    if (*(short *)((char *)a1 + 5) == 0) goto L6562B;
+    *(int *)((char *)a1 + 17) = (((int)(short)*(short *)((char *)a1 + 7)) << 16) / ((int)(short)*(short *)((char *)a1 + 5));
+    goto L6563B;
+L6562B:;
+    *(int *)((char *)a1 + 17) = ((int)(short)*(short *)((char *)a1 + 7)) << 16;
+L6563B:;
+    if (((int)(unsigned char)(*(signed char *)((char *)a1 + 12) & 2)) == 0) goto L65652;
+    *(int *)((char *)a1 + 17) = -(*(int *)((char *)a1 + 17));
+L65652:;
+    l_18 = 1132;
+    *(int *)((char *)a1 + 25) = *(int *)((char *)l_18);
+    if (((int)(unsigned char)(*(signed char *)((char *)a1 + 12) & 32)) != 0) goto L6569E;
+    l_20 = func_000658CA((int)(unsigned short)*(short *)((char *)*(int *)((char *)a1 + 35) + 29), (int)(unsigned short)*(short *)((char *)*(int *)((char *)a1 + 35) + 27));
+    if (l_20 != 0) goto L656A0;
+L6569E:;
+    goto L656C7;
+L656A0:;
+    *(signed char *)((char *)a1 + 12) |= 32;
+    if (((int)(unsigned char)(*(signed char *)((char *)a1 + 4) & 1)) == 0) goto L656BE;
+    l_20++;
+L656BE:;
+    *(signed char *)((char *)a1 + 4) = *(signed char *)&l_20;
+L656C7:;
+    switch (((int)(unsigned char)*(signed char *)((char *)a1 + 4)) - 1) {
+    goto L65724;
+case 0:
+case 1:
+    goto L656F0;
+L656F0:;
+    *(int *)((char *)a1 + 13) = (int)(short)*(short *)((char *)*(int *)((char *)a1 + 35) + 1);
+    goto L65724;
+case 2:
+case 3:
+    *(int *)((char *)a1 + 13) = (int)(short)*(short *)((char *)*(int *)((char *)a1 + 35) + 3);
+    goto L65724;
+case 4:
+case 5:
+    *(int *)((char *)a1 + 13) = (int)(short)*(short *)((char *)*(int *)((char *)a1 + 35) + 5);
+default:
+L65724:;
+    return;
+}
+case 16:
+case 17:
+case 18:
+case 19:
+case 20:
+    if (((int)(unsigned char)(*(signed char *)((char *)a1 + 12) & 2)) == 0) return;
+    *(signed char *)((char *)a1 + 12) |= 1;
+default:;
+}
 }
 
 int func_000657B2(int a1)

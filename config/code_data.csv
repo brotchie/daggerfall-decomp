@@ -14,7 +14,9 @@ va,size,kind
 0x0005B023,20,jumptable
 0x0005B11F,20,jumptable
 0x000602D8,28,jumptable
+0x000609D0,23,scanvalues
 0x000609E7,96,jumptable
+0x0006498D,28,scanvalues
 0x000649A9,116,jumptable
 0x00064A7D,24,jumptable
 0x00064CA1,24,jumptable
@@ -25,6 +27,7 @@ va,size,kind
 0x0006E476,16,jumptable
 0x0006E86A,16,jumptable
 0x00070932,28,jumptable
+0x00070ED6,60,scanvalues
 0x00070F12,124,jumptable
 0x00077D04,28,jumptable
 0x00077E78,28,jumptable
