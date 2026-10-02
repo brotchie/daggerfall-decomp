@@ -37,7 +37,6 @@ extern char D_001AA3E4[];
 extern int func_00069F8A(int, int);
 extern int func_0006A0D4(int);
 extern int func_0008E55F(int, int);
-extern int func_0008E7E0(int, int);
 extern int func_0008E9C0(int);
 extern int func_0008EB88(int);
 extern int func_0009DC25();
@@ -58,6 +57,7 @@ int func_0008DA4D(int);
 int func_0008DB21(int, int, int);
 int func_0008DCE3(int, int, int);
 int func_0008E721(int);
+int func_0008E7E0(int, short);
 int func_0008E8E9(int);
 void func_0008D9DB(int);
 void func_0008DA1C(int);
@@ -66,6 +66,7 @@ void func_0008DEB4(int, int, int, int, int, int, int);
 void func_0008E005(int);
 void func_0008E09A(int, int);
 void func_0008E0F5(int, int);
+void func_0008E7AE(int);
 void func_0008EB25(int);
 void func_0008ECEE(int);
 #pragma aux func_000A0ED9 parm routine [];
@@ -377,6 +378,14 @@ void func_0008E7AE(int a1)
 {
     if ((short)((unsigned short)(unsigned char)*(signed char *)((char *)a1)) != *(short *)D_001A9B42) return;
     (*(short *)D_001A9B3C)++;
+}
+
+int func_0008E7E0(int a1, short a2)
+{
+    *(short *)D_001A9B42 = *(int *)&a2;
+    *(short *)D_001A9B3C = 0;
+    func_0008E3F7(a1, (int)func_0008E7AE);
+    return (int)(short)*(short *)D_001A9B3C;
 }
 
 int func_0008E8E9(int a1)

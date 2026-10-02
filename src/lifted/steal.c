@@ -24,7 +24,7 @@ extern int func_000A0F5C(int, ...);
 extern void func_0002FBCC(void);
 extern void func_0003D01C(int, int);
 extern void func_0003EC2A(int, int);
-extern void func_0003F09F(short, int);
+extern void func_0003F09F(int, int);
 extern void func_00040C87(int);
 extern void func_00070370(int, unsigned char);
 extern void func_0007CB4F(int);

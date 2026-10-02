@@ -38,7 +38,7 @@ extern int func_000CDD81();
 extern int func_000CE7A7();
 extern int func_0012B136();
 extern int func_0012B2D3();
-extern void func_0007CA1F(int, short, short, unsigned char, unsigned char);
+extern void func_0007CA1F(int, int, int, int, unsigned char);
 extern void func_0007D6EA(int);
 extern void func_0008059B(void);
 int func_0002482A(int);

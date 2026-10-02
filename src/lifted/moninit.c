@@ -17,9 +17,10 @@ extern int func_0008EB88(int);
 extern int func_000A0024();
 extern int func_000A00CB();
 extern int func_000A1023();
-extern void func_0005E540(short, short, int);
+extern void func_0005E540(int, int, int);
 extern void func_00060270(int, int);
-extern void func_00078566(int, unsigned char);
+extern void func_00065BBA(int, int);
+extern void func_00078566(int, int);
 extern void func_00078B8A(int);
 extern void func_0008E3F7(int, int);
 
@@ -127,6 +128,13 @@ L791AD:;
     func_000A1023(l_18 + 71, (int)(*(char **)D_00195B04 + (l_20 * 89)), 89, (int)D_00176844, 370, 4);
     l_24++;
     goto L7916D;
+}
+
+void func_0007977F(int a1)
+{
+    a1 = func_0008DCE3(a1, 0, 47);
+    *(int *)((char *)a1 + 31) = func_0008EB88(((unsigned)*(int *)((char *)*(int *)((char *)a1 + 67) + 31)) >> 16);
+    func_00065BBA(a1 + 71, (int)&*(signed char *)((char *)func_0007D6AE(0, 7) + 128));
 }
 
 void func_000797E2(int a1, int a2)

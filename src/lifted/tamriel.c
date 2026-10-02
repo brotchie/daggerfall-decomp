@@ -44,7 +44,7 @@ extern char D_00199798[];
 extern char D_0019979A[];
 extern char D_001997AC[];
 
-extern int func_000191DA(short, short);
+extern int func_000191DA(int, short);
 extern int func_000192EE(short);
 extern int func_0002B26B(int);
 extern int func_0004A98C(int, int);
@@ -58,7 +58,7 @@ extern void func_00029958(int);
 extern void func_0003081B(unsigned char);
 extern void func_00030E34(unsigned char);
 extern void func_0003D01C(int, int);
-extern void func_0003F09F(short, int);
+extern void func_0003F09F(int, int);
 extern void func_00040C87(int);
 extern void func_0004AC01(int);
 extern void func_0008E3F7(int, int);

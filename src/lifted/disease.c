@@ -26,8 +26,10 @@ extern int func_000A0AD9();
 extern int func_000A0DF4();
 extern int func_000A1023();
 extern void func_0003EC2A(int, int);
-extern void func_0003F09F(short, int);
+extern void func_0003F09F(int, int);
 extern void func_00058E15(int, int);
+extern void func_00066352(void);
+extern void func_00066D3C(int);
 extern void func_000728D2(void);
 extern void func_0007D12D(void);
 extern void func_00094E25(void);
@@ -211,6 +213,18 @@ L672EF:;
     l_24 = 0;
 L672F6:;
     return l_24;
+}
+
+void func_000676A4(void)
+{
+    if (*(int *)((char *)*(int *)D_00195BE0 + 499) == 0) return;
+    if (((unsigned)*(int *)D_00195BF4) <= *(int *)((char *)*(int *)D_00195BE0 + 499)) return;
+    *(int *)((char *)*(int *)D_00195BE0 + 499) = 0;
+    if (*(short *)((char *)*(int *)D_00195BE0 + 108) == 0) goto L676FF;
+    func_00066D3C(((int)(short)*(short *)((char *)*(int *)D_00195BE0 + 108)) - 1);
+    return;
+L676FF:;
+    func_00066352();
 }
 
 void func_0006770E(int a1)

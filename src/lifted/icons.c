@@ -26,17 +26,18 @@ extern char D_001A5B32[];
 extern char D_001A9AB8[];
 extern char D_001AA55C[];
 
-extern int func_0003B1F3(short);
-extern int func_000417C8(short);
-extern int func_0004330A(short);
+extern int func_0003B1F3(int);
+extern int func_000417C8(int);
+extern int func_0004330A(int);
 extern int func_00069938(int, int, int);
 extern int func_0008CFE6(int);
-extern int func_000926AD(int, int, unsigned char);
+extern int func_000926AD(int, int, int);
 extern int func_000A0024();
 extern int func_000A1023();
 extern int func_0012B136();
 extern int func_00144F68();
-extern void func_0004259C(short);
+extern void func_0004259C(int);
+extern void func_00042E24(int);
 extern void func_0005D2DE(int);
 extern void func_000717EC(void);
 extern void func_0008059B(void);
@@ -54,6 +55,15 @@ void func_0005D3DB(void)
 void func_0005D3FD(void)
 {
     func_000417C8(1);
+}
+
+void func_0005D41F(void)
+{
+    if (((int)(unsigned char)(*(signed char *)D_00196279 & 1)) == 0) goto L5D449;
+    func_00042E24(1);
+    return;
+L5D449:;
+    func_00042E24(-1);
 }
 
 void func_0005D45D(void)

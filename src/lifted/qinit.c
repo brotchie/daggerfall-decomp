@@ -19,7 +19,7 @@ extern char D_001970DD[];
 extern char D_00199780[];
 
 extern int func_000192EE(short);
-extern int func_000309E8(int, short);
+extern int func_000309E8(int, int);
 extern int func_00033EE7(int, int);
 extern int func_0007D6AE(int, int);
 extern int func_0008DA91(int);
@@ -28,7 +28,7 @@ extern int func_0008DD46(int, int);
 extern int func_0008EB88(int);
 extern int func_000A1023();
 extern void func_00078DDD(int);
-extern void func_000876AD(unsigned char, unsigned char, int, int);
+extern void func_000876AD(int, int, int, int);
 
 void func_00033764(int a1, int a2)
 {

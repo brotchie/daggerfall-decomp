@@ -106,14 +106,6 @@ void func_0006987B(void)
     func_000A1D3C(*(int *)D_00186DEC);
 }
 
-void func_000698AF(int a1)
-{
-    if (*(signed char *)D_001A3F5D == 0) return;
-    if (*(int *)D_0018DD54 == (-1)) return;
-    func_000A1D3C(a1);
-    *(int *)D_00186DEC = a1;
-}
-
 void func_000698EC(void)
 {
     if (*(signed char *)D_001A3F5D == 0) return;

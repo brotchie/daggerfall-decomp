@@ -15,13 +15,7 @@ extern char D_001880F6[];
 extern char D_001880FA[];
 extern char D_00188102[];
 extern char D_00188106[];
-extern char D_00188186[];
-extern char D_0018818A[];
-extern char D_00188192[];
-extern char D_00188196[];
 extern char D_00190CA8[];
-extern char D_00190D6A[];
-extern char D_00190D70[];
 extern char D_00190DE4[];
 extern char D_00190DE6[];
 extern char D_00190DE8[];
@@ -33,6 +27,8 @@ extern char D_001959D8[];
 extern char D_001959E8[];
 extern char D_00195A9C[];
 extern char D_00195AF4[];
+extern char D_00195B20[];
+extern char D_00195B34[];
 extern char D_00195B5C[];
 extern char D_00195B60[];
 extern char D_00195B84[];
@@ -40,6 +36,7 @@ extern char D_00195BE0[];
 extern char D_00195BE8[];
 extern char D_00195BF4[];
 extern char D_00195D2C[];
+extern char D_00195DA8[];
 extern char D_00196268[];
 extern char D_00196279[];
 extern char D_001AA410[];
@@ -52,12 +49,14 @@ extern int func_0004A3EC(int);
 extern int func_0004A98C(int, int);
 extern int func_0008EB88(int);
 extern int func_00090C3A(void);
+extern int func_000926AD(int, int, int);
 extern int func_000A0024();
 extern int func_00144FB4();
 extern void func_00053A89(int, short, int);
+extern void func_0008DA1C(int);
+extern void func_00091B80(int);
 extern void func_00097101(int);
 extern void func_0009721F(void);
-void func_00091B80(short);
 
 void func_00090E79(void)
 {
@@ -170,15 +169,6 @@ void func_00091A4B(void)
 {
     if (*(signed char *)D_00196279 != 0) return;
     *(signed char *)((char *)*(int *)D_00195BE0 + 128) = (((int)(unsigned char)*(signed char *)((char *)*(int *)D_00195BE0 + 128)) + 1) % 10;
-}
-
-void func_00091B80(short a1)
-{
-    *(short *)D_00190D70 = *(int *)&a1;
-    *(short *)D_00188186 = (*(short *)D_00190D6A = *(short *)(D_0018801E + ((((int)(short)a1) + 20) * 12)) + 1);
-    *(short *)D_0018818A = *(short *)D_00190D6A + 6;
-    *(short *)D_00188192 = *(short *)D_00190D6A + 13;
-    *(short *)D_00188196 = *(short *)D_00190D6A + 19;
 }
 
 int func_00091D20(int a1)
@@ -332,4 +322,12 @@ void func_000922CA(void)
 {
     *(int *)D_001AA560 = 0;
     *(int *)D_001AA57C = *(int *)D_001959D8;
+}
+
+void func_000922F6(int a1, int a2, int a3)
+{
+    *(int *)D_00195DA8 = a1;
+    *(int *)D_00195B20 = (*(int *)D_00195B34 = a1);
+    if (func_000926AD(2, a2, a3) != 0) return;
+    func_0008DA1C(a1);
 }

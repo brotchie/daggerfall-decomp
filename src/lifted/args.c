@@ -86,9 +86,9 @@ extern char D_001A949D[];
 extern char D_001A9B34[];
 
 extern int func_00073B3E(int);
-extern int func_000843E0(int, int, int, int);
+extern int func_000843E0(int, short, short, int);
 extern int func_000845F1(int, short, short, int);
-extern int func_0008523E(int, int, int);
+extern int func_0008523E(unsigned short, int, int);
 extern int func_0009DA1C(int, int);
 extern int func_0009DAEE(int, ...);
 extern int func_0009DB11();

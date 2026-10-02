@@ -8,21 +8,30 @@ extern char D_001940D7[];
 extern char D_001940DB[];
 extern char D_001950EC[];
 extern char D_001951EC[];
+extern char D_00195AA4[];
 extern char D_00195AC4[];
 extern char D_00195C74[];
 extern char D_00196277[];
+extern char D_00196299[];
 extern char D_00196D64[];
 
 extern int func_0002257C(int, int, int, int);
 extern int func_00025BDD(int);
+extern int func_00077960(int, int, int);
 extern int func_0007D6AE(int, int);
+extern int func_0008DA91(int);
+extern int func_0008DCE3(int, int, int);
+extern int func_0008EB88(int);
 extern int func_0009DC25();
 extern int func_0009DC49();
 extern int func_000A0040();
 extern int func_000A1023();
+extern int func_000CE6E2();
+extern int func_0014B45B();
 extern void func_0002631D(int);
-extern void func_000266C7(int);
+extern void func_00078566(int, int);
 extern void func_0008E3F7(int, int);
+void func_000266C7(int);
 
 void func_000263D0(void)
 {
@@ -73,6 +82,42 @@ L26539:;
 L26541:;
     func_000266C7((int)(unsigned char)*(signed char *)(D_0017A028 + (func_0009DC25() & 3)));
     goto L26539;
+}
+
+void func_000266C7(int a1)
+{
+    int l_18;
+
+    if (a1 == (-1)) return;
+    l_18 = func_0008DCE3(*(int *)D_00195AC4, 0, 659);
+    *(signed char *)((char *)l_18) = 18;
+    *(signed char *)((char *)l_18 + 21) |= 1;
+    *(int *)((char *)l_18 + 31) = func_0008EB88(((unsigned)*(int *)((char *)*(int *)D_00195AC4 + 31)) >> 16);
+    func_00078566(l_18, a1);
+    *(signed char *)((char *)l_18 + 624) = 1;
+    if (func_00077960(l_18, 384, 768) != 0) goto L2674C;
+    func_0008DA91(l_18);
+    return;
+L2674C:;
+    *(signed char *)D_00196299 = 1;
+}
+
+void func_0002675D(int a1)
+{
+    int l_18;
+
+    if (a1 == (-1)) return;
+    l_18 = func_0008DCE3(*(int *)D_00195AC4, 0, 659);
+    *(signed char *)((char *)l_18) = 18;
+    *(signed char *)((char *)l_18 + 21) |= 1;
+    *(int *)((char *)l_18 + 31) = func_0008EB88(((unsigned)*(int *)((char *)*(int *)D_00195AC4 + 31)) >> 16);
+    func_00078566(l_18, a1);
+    *(signed char *)((char *)l_18 + 624) = 1;
+    func_000CE6E2((int)(short)*(short *)((char *)*(int *)D_00195AA4 + 3), 1024, l_18 + 7, l_18 + 15);
+    *(int *)((char *)l_18 + 7) += *(int *)((char *)*(int *)D_00195AA4 + 7);
+    *(int *)((char *)l_18 + 15) += *(int *)((char *)*(int *)D_00195AA4 + 15);
+    *(int *)((char *)l_18 + 11) = func_0014B45B(*(int *)((char *)l_18 + 7), *(int *)((char *)l_18 + 15));
+    *(signed char *)D_00196299 = 1;
 }
 
 void func_0002682B(int a1)

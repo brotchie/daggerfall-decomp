@@ -16,7 +16,7 @@ extern int func_000A1023();
 extern int func_000CD33A();
 extern int func_00144FB4();
 extern void func_0005247B(int);
-extern void func_0007CA85(int, short, short, unsigned char, unsigned char);
+extern void func_0007CA85(int, int, int, int, unsigned char);
 
 void func_00051CF9(int a1)
 {

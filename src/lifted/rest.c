@@ -53,7 +53,7 @@ extern void func_0002ECBE(int);
 extern void func_0003CCA3(void);
 extern void func_0003D01C(int, int);
 extern void func_0003EC2A(int, int);
-extern void func_0003F09F(short, int);
+extern void func_0003F09F(int, int);
 extern void func_00040C87(int);
 extern void func_0004AC01(int);
 extern void func_0004FF2E(void);

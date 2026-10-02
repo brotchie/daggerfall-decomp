@@ -31,7 +31,7 @@ extern char D_00196B08[];
 extern char D_001A4A70[];
 extern char D_001A4A74[];
 
-extern int func_000191DA(short, short);
+extern int func_000191DA(int, short);
 extern int func_0006CB53(int, int);
 extern int func_0008DA91(int);
 extern int func_000A0024();
@@ -45,7 +45,7 @@ extern void func_00010FF4(void);
 extern void func_0001B470(int, int);
 extern void func_0004AB2F(int);
 extern void func_0004FF2E(void);
-extern void func_0007CA85(int, short, short, unsigned char, unsigned char);
+extern void func_0007CA85(int, int, int, int, unsigned char);
 void func_0002171A(void);
 void func_00021775(void);
 #pragma aux func_000A0ED9 parm routine [];

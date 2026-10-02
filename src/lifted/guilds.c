@@ -34,7 +34,6 @@ extern char D_00190D20[];
 extern char D_00190DD0[];
 extern char D_00190DDC[];
 extern char D_001940D4[];
-extern char D_001940D5[];
 extern char D_001940D8[];
 extern char D_001940D9[];
 extern char D_00195A9C[];
@@ -74,7 +73,6 @@ extern char D_001A4A2C[];
 extern char D_001A9AB8[];
 
 extern int func_000192EE(short);
-extern int func_00039224(short);
 extern int func_0003A0C0(int, int);
 extern int func_0004A98C(int, int);
 extern int func_0004C274(unsigned char, unsigned char, unsigned char, unsigned char, unsigned char);
@@ -95,7 +93,7 @@ extern int func_0008EB88(int);
 extern int func_0009784E(int, int);
 extern int func_00097B2A(void);
 extern int func_00097BD9(int);
-extern int func_0009A993(unsigned char);
+extern int func_0009A993(int);
 extern int func_0009DC25();
 extern int func_0009DC49();
 extern int func_000A0024();
@@ -105,16 +103,17 @@ extern int func_000A1023();
 extern int func_000CDD81();
 extern int func_0012B136();
 extern int func_00144F68();
-extern void func_0003F09F(short, int);
+extern void func_0003F09F(int, int);
 extern void func_000425F2(void);
-extern void func_0005E540(short, short, int);
+extern void func_0005E540(int, int, int);
 extern void func_0005F1BD(int, int, int, int);
 extern void func_0005F401(int);
 extern void func_00061398(int);
 extern void func_0006F7B5(void);
+extern void func_0006FD03(int);
 extern void func_00070191(int);
 extern void func_000756C6(int);
-extern void func_0007CA85(int, short, short, unsigned char, unsigned char);
+extern void func_0007CA85(int, int, int, int, unsigned char);
 extern void func_0007F1E3(int);
 extern void func_00081425(void);
 extern void func_0008AF3E(int, int);
@@ -126,7 +125,6 @@ extern void func_00097A85(void);
 int func_0006F92F(void);
 int func_0007069D(int);
 void func_0006F73A(void);
-void func_0006FD03(short);
 void func_00070624(int, unsigned char);
 void func_00070AFA(int);
 
@@ -284,13 +282,6 @@ L6FA5F:;
     *(signed char *)((char *)l_18) = 9;
     *(int *)((char *)l_18 + 31) = func_0008EB88(100);
     func_000A1023(l_18 + 71, *(int *)D_00178A0A, 89, (int)D_00175EAA, 992, 4);
-}
-
-void func_0006FD03(short a1)
-{
-    if (((int)(unsigned char)*(signed char *)((char *)(int)(*(char **)D_00178A0A + (((int)(short)a1) * 2)))) == 255) return;
-    *(signed char *)D_001940D5 |= 1;
-    func_0003F09F((int)(short)(func_00039224((int)(short)a1) + 1200), 1);
 }
 
 void func_0006FD5B(void)

@@ -28,7 +28,7 @@ extern int func_000A0ED9(int, int);
 extern int func_000A0F5C(int, ...);
 extern int func_000A1054();
 extern int func_000CE790();
-extern void func_0004A6B5(short, short, short);
+extern void func_0004A6B5(int, int, int);
 extern void func_0007D6EA(int);
 #pragma aux func_000A0ED9 parm routine [];
 
@@ -75,14 +75,14 @@ void func_00020BBB(int a1)
 {
     int l_1C;
 
-    *(signed char *)D_00190D1F = func_0009DC25() & 1;
+    *(signed char *)D_00190D1F = func_0009DC25() & -255;
     if (a1 == 0) goto L20BF9;
     *(int *)D_00190CD4 = 0;
     *(signed char *)D_00190D20 = *(signed char *)((char *)*(int *)D_00195BE0 + 64) & 1;
     goto L20C0F;
 L20BF9:;
     *(int *)D_00190CD4 = func_0009DC25();
-    *(signed char *)D_00190D20 = func_0009DC25() & 1;
+    *(signed char *)D_00190D20 = func_0009DC25() & -255;
 L20C0F:;
     *(int *)D_00190CD8 = func_0009DC25();
     if (*(signed char *)D_00190D20 == 0) goto L20C2B;

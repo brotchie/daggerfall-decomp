@@ -11,6 +11,7 @@ extern char D_00177460[];
 extern char D_0017748E[];
 extern char D_00177493[];
 extern char D_001774A3[];
+extern char D_001788E3[];
 extern char D_00178A0E[];
 extern char D_001837E8[];
 extern char D_001846F4[];
@@ -104,18 +105,18 @@ extern void func_0001DD39(int);
 extern void func_0001DFA2(void);
 extern void func_0003CCA3(void);
 extern void func_0003EC2A(int, int);
-extern void func_0003F09F(short, int);
+extern void func_0003F09F(int, int);
 extern void func_0004AB2F(int);
 extern void func_0004FF2E(void);
-extern void func_0007CA1F(int, short, short, unsigned char, unsigned char);
-extern void func_0007DDC9(short);
+extern void func_0007CA1F(int, int, int, int, unsigned char);
+extern void func_0007DDC9(int);
 extern void func_0007F1E3(int);
 extern void func_000874C0(int);
-extern void func_000876AD(unsigned char, unsigned char, int, int);
-extern void func_0008C566(int, int);
+extern void func_000876AD(int, int, int, int);
+extern void func_0008C566(int, short);
 extern void func_0008E3F7(int, int);
 extern void func_0009B647(void);
-extern void func_0009B81A(unsigned char);
+extern void func_0009B81A(int);
 extern void func_0009B97D(int);
 int func_0009CEC4(int, int, int, int, int);
 int func_0009D242(int, int);
@@ -895,6 +896,35 @@ L9D73F:;
     *(int *)D_001AA688 = 0;
     l_18 = 1132;
     *(int *)D_00190CAC = *(int *)((char *)l_18);
+}
+
+void func_0009D8BD(void)
+{
+    int l_18;
+
+    l_18 = 0;
+    if (((int)(unsigned char)(*(signed char *)D_0012AC00 & 1)) == 0) goto L9D8F2;
+    if (((int)(unsigned char)(*(signed char *)D_00196279 & 1)) == 0) goto L9D8F4;
+L9D8F2:;
+    return;
+L9D8F4:;
+    if (*(signed char *)D_00190CE4 == 0) return;
+    if (((int)(short)*(short *)D_0012AC06) >= 186) goto L9D92B;
+    if (((int)(short)*(short *)D_0012AC04) >= 149) goto L9D922;
+    *(signed char *)D_001788E3 ^= 1;
+    goto L9D929;
+L9D922:;
+    *(signed char *)D_001788E3 ^= 2;
+L9D929:;
+    goto L9D949;
+L9D92B:;
+    if (((int)(short)*(short *)D_0012AC04) >= 149) goto L9D942;
+    *(signed char *)D_001788E3 ^= 4;
+    goto L9D949;
+L9D942:;
+    *(signed char *)D_001788E3 ^= 8;
+L9D949:;
+    func_0009B81A(((int)(signed char)*(signed char *)D_00190CE4) - 1);
 }
 
 int func_0009D960(int a1, int a2)

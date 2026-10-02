@@ -2,16 +2,19 @@
  * do not edit: move a function to src/objlib.c to work on it by hand) */
 
 extern char D_00176C20[];
+extern char D_00176C29[];
+extern char D_00176C4F[];
 extern char D_00176C6B[];
 extern char D_00176C80[];
 extern char D_00187DE8[];
 extern char D_00187EC8[];
+extern char D_001903A4[];
 extern char D_00190DE4[];
 extern char D_001910AC[];
 extern char D_001959AC[];
 extern char D_00195AC4[];
+extern char D_00195C44[];
 extern char D_00195CB4[];
-extern char D_00196280[];
 extern char D_001A5C2C[];
 extern char D_001A5C30[];
 extern char D_001A5C34[];
@@ -26,6 +29,7 @@ extern char D_001A942C[];
 extern char D_001A9430[];
 extern char D_001A9434[];
 extern char D_001A9440[];
+extern char D_001A9444[];
 extern char D_001A9448[];
 extern char D_001A944C[];
 extern char D_001A949D[];
@@ -33,9 +37,9 @@ extern char D_001A949D[];
 extern int func_00012FCE(int, int, int);
 extern int func_00013131(int, int);
 extern int func_00013260(int, int, int);
+extern int func_00069F8A(int, int);
 extern int func_0006A0D4(int);
 extern int func_0007D6AE(int, int);
-extern int func_000852A6(int, int);
 extern int func_00086093(int);
 extern int func_000994F0(int, int);
 extern int func_0009957D(int, int);
@@ -44,13 +48,15 @@ extern int func_0009DC49();
 extern int func_000A0024();
 extern int func_000A0040();
 extern int func_000A00AF();
+extern int func_000A0ED9(int, int);
+extern int func_000A0F5C(int, ...);
 extern int func_0013FE15();
 extern void func_00014518(int);
 extern void func_00050069(int);
 extern void func_00069E9E(int, int);
 extern void func_00069F39(int);
 extern void func_0008E3F7(int, int);
-int func_00085163(int);
+int func_000852A6(int, int);
 int func_00085407(int);
 void func_00085612(int);
 void func_00085666(int);
@@ -59,6 +65,7 @@ void func_0008579F(int, int);
 void func_00085BB2(void);
 void func_00085EF8(int);
 void func_0008600F(int);
+#pragma aux func_000A0ED9 parm routine [];
 
 void func_000850EF(int a1)
 {
@@ -112,23 +119,35 @@ L8521C:;
     return *(int *)((char *)l_1C + 16);
 }
 
-int func_0008523E(int a1, int a2, int a3)
+int func_000852A6(int a1, int a2)
 {
-    if (a1 != 4) goto L85267;
-    if (a2 == 46) goto L85265;
-    if (a2 != 47) goto L85267;
-L85265:;
-    goto L85269;
-L85267:;
-    goto L85282;
-L85269:;
-    if (*(signed char *)D_00196280 == 0) goto L8527B;
-    a2 = 46;
-    goto L85282;
-L8527B:;
-    a2 = 47;
-L85282:;
-    return func_00085163((a2 + (a1 * 100)) + (a3 << 17));
+    int l_20;
+    int l_1C;
+    int l_18;
+
+    l_18 = a2 & 131071;
+    l_20 = func_00012FCE(*(int *)D_001A9444, (int)D_001903A4, l_18);
+    l_1C = func_00013131(*(int *)D_001A9444, l_20);
+    if ((*(int *)(D_001A5C3C + (a1 * 20)) = func_00069F8A((int)D_001A944C, l_1C)) != 0) goto L85395;
+    if (*(signed char *)D_001A949D != 0) goto L8535E;
+    func_00085612(*(int *)D_001A9430);
+    if ((*(int *)(D_001A5C3C + (a1 * 20)) = func_00069F8A((int)D_001A944C, l_1C)) != 0) goto L8535C;
+    func_00085666(*(int *)D_001A9430);
+    return 0;
+L8535C:;
+    goto L85395;
+L8535E:;
+    func_00085612(*(int *)D_001A9430);
+    if ((*(int *)(D_001A5C3C + (a1 * 20)) = func_00069F8A((int)D_001A944C, l_1C)) != 0) goto L85395;
+    func_00050069((int)D_00176C29);
+L85395:;
+    if (func_00013260(*(int *)D_001A9444, l_20, *(int *)(D_001A5C3C + (a1 * 20))) != 0) goto L853E2;
+    func_000A0ED9(1104, (int)D_00176C20);
+    func_000A0F5C(*(int *)D_00195C44, (int)D_00176C4F, l_20);
+    func_00050069(*(int *)D_00195C44);
+L853E2:;
+    *(int *)D_001A942C -= (l_1C + 1) & -2;
+    return *(int *)(D_001A5C3C + (a1 * 20));
 }
 
 int func_00085407(int a1)

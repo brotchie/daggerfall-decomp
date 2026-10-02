@@ -29,16 +29,6 @@ void func_0008C4E4(int a1)
     *(signed char *)D_001A9AB1 = *(signed char *)D_0012DA50;
 }
 
-void func_0008C566(int a1, int a2)
-{
-    func_00142790();
-    *(signed char *)D_001A9AB0 = 0;
-    *(int *)D_00195B94 = a1;
-    func_000A0AD9((int)D_00190B44, *(int *)D_00195B94, 160, (int)D_00176E2C, 121);
-    *(short *)D_001A9AAE = func_000A0DF4(a1);
-    *(short *)D_001A9AAC = a2;
-}
-
 void func_0008CA25(int a1)
 {
     if (*(signed char *)((char *)a1) == 0) return;

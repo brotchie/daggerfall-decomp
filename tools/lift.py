@@ -24,6 +24,7 @@ reasons so the most common gap is fixed first.
 usage: lift.py func_XXXXXXXX ...     (prints the C)
 """
 import csv
+import json
 import os
 import re
 import sys
@@ -350,7 +351,19 @@ class Func:
             self.slot_type[o] = "int"         # declared but never used
         # callers see the access-based parameter types; the layout plan only changes how the
         # function itself declares them
+        # a parameter's declared type is what the callers convert their arguments to
+        ct = caller_types().get(self.va) if not os.environ.get("LIFT_NOCALLERTYPES") else None
         self.sig_types = [self.slot_type.get(off, "int") for _r, off, _s in self.params]
+        if ct:
+            for n, (_r, off, spill) in enumerate(self.params):
+                # a narrow load can also be a narrow value passed to an int: the spill width
+                # decides (a char parameter is spilled as a byte, a short one as a dword).
+                # Callers get this type; the definition keeps the one its frame shows.
+                if ct[n] is not None and \
+                        (spill == 1) == (ct[n] in ("signed char", "unsigned char")):
+                    if os.environ.get("LIFT_CTDEF"):
+                        self.slot_type[off] = ct[n]
+                    self.sig_types[n] = ct[n]
         self.plan_slots()
 
     def plan_slots(self):
@@ -784,6 +797,13 @@ class Func:
                     if mb:
                         b = E(mb.group(1), 4, atom=True)
                     self.regs.pop("ecx", None)      # the count is used up, not an argument
+                if m == "and" and s.type == cx.X86_OP_IMM and sz == 1 and a.size > 1 and \
+                        not os.environ.get("LIFT_NOAND8"):
+                    # `and dl,0x80` on a wider value keeps its high bits: x & ~0x7f
+                    v = E("%s & %d" % (a.p(), (s.imm & 0xFF) - 256), a.size)
+                    self.set_reg(full, v)
+                    self.flags = ("val", v, None)
+                    return
                 if m == "and" and s.type == cx.X86_OP_IMM and sz == 4 and s.imm in (0xFF, 0xFFFF):
                     t = "unsigned char" if s.imm == 0xFF else "unsigned short"
                     self.set_reg(full, E("(int)(%s)%s" % (t, a.p()), 4))
@@ -1684,6 +1704,91 @@ def decl(name):
     if sig is None:
         return "extern int %s();" % name
     return "extern %s %s(%s);" % (sig[0], name, ", ".join(sig[1]) or "void")
+
+
+CALLER_TYPES = None
+
+
+def caller_types():
+    """{callee va: [type or None per register parameter]} from how every call site loads its
+    arguments: a caller converts each argument to the parameter's declared type, so
+    `movsx edx, word ptr [x]` before the call means a short second parameter."""
+    global CALLER_TYPES
+    if CALLER_TYPES is not None:
+        return CALLER_TYPES
+    path = os.path.join(ROOT, "build", "lift", "caller_types.json")
+    if os.path.exists(path) and os.path.getmtime(path) >= os.path.getmtime(__file__):
+        with open(path) as f:
+            CALLER_TYPES = {int(k): v for k, v in json.load(f).items()}
+        return CALLER_TYPES
+    ev = {}
+    for va in IMG.funcs:
+        if not (0x10000 <= va < GAME_END) or IMG.le.obj_of_va(va).index != 1:
+            continue
+        try:
+            ins = IMG.insns(va)
+        except Exception:
+            continue
+        for k, c in enumerate(ins):
+            if c.mnemonic != "call" or c.operands[0].type != cx.X86_OP_IMM:
+                continue
+            tgt = c.operands[0].imm
+            for n, r in enumerate(PARM_REGS):
+                t = arg_type(ins, k, r)
+                if t is not None:
+                    ev.setdefault(tgt, {}).setdefault(n, set()).add(t)
+    out = {}
+    for tgt, params in ev.items():
+        types = []
+        for n in range(4):
+            seen = params.get(n, set()) - {"const"}
+            if not seen:
+                types.append(None)
+            elif "int" in seen or len(seen) > 1:
+                types.append("int")
+            else:
+                types.append(seen.pop())
+        out[tgt] = types
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path, "w") as f:
+        json.dump({str(k): v for k, v in out.items()}, f)
+    CALLER_TYPES = out
+    return out
+
+
+def arg_type(ins, k, reg):
+    """How the instructions before the call at ins[k] last set `reg` (None: not seen)."""
+    for j in range(k - 1, max(-1, k - 14), -1):
+        i = ins[j]
+        if i.mnemonic in ("call", "ret") or i.mnemonic.startswith("j"):
+            return None
+        if not i.operands or i.operands[0].type != cx.X86_OP_REG:
+            continue
+        name = i.reg_name(i.operands[0].reg)
+        full, sz = SUB.get(name, (None, 0))
+        if full != reg or i.mnemonic in ("cmp", "test", "push"):
+            continue
+        m = i.mnemonic
+        if m == "movsx":
+            return {1: "signed char", 2: "short"}[i.operands[1].size]
+        if m == "movzx":
+            return {1: "unsigned char", 2: "unsigned short"}[i.operands[1].size]
+        if m == "cwde":
+            return "short"
+        if m == "and" and i.operands[1].type == cx.X86_OP_IMM and sz == 4:
+            return {0xFF: "unsigned char", 0xFFFF: "unsigned short"}.get(i.operands[1].imm, "int")
+        if m == "mov" and sz < 4:
+            prev = ins[j - 1] if j else None
+            if prev is not None and prev.mnemonic == "xor" and \
+                    prev.op_str == "%s, %s" % (reg, reg):
+                return {1: "unsigned char", 2: "unsigned short"}[sz]
+            return None
+        if m == "mov" and i.operands[1].type == cx.X86_OP_IMM:
+            return "const"
+        if sz == 4:
+            return "int"
+        return None
+    return None
 
 
 def init():

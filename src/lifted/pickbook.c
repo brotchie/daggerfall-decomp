@@ -2,101 +2,31 @@
  * do not edit: move a function to src/pickbook.c to work on it by hand) */
 
 extern char D_0012AC00[];
-extern char D_0012B508[];
 extern char D_00142309[];
-extern char D_00143550[];
 extern char D_00170DE4[];
-extern char D_00170DF7[];
-extern char D_00170E04[];
 extern char D_00178A0A[];
-extern char D_00184876[];
 extern char D_00187CA8[];
 extern char D_001940D4[];
-extern char D_001940D5[];
 extern char D_001940D8[];
-extern char D_00195AA4[];
 extern char D_00195B58[];
 extern char D_00195BE8[];
 extern char D_00195D38[];
-extern char D_00195D60[];
-extern char D_00195D7C[];
-extern char D_00195F30[];
-extern char D_0019626F[];
 extern char D_00196272[];
 extern char D_00196274[];
 extern char D_00196288[];
 extern char D_001996F8[];
 extern char D_001A9AB8[];
 
-extern int func_00039224(short);
-extern int func_0003B1F3(short);
+extern int func_0003B1F3(int);
 extern int func_00042112(void);
-extern int func_00042F0F(int);
-extern int func_00069938(int, int, int);
-extern int func_0006CB53(int, int);
 extern int func_0008DA91(int);
-extern int func_000926AD(int, int, unsigned char);
+extern int func_000926AD(int, int, int);
 extern int func_000A0024();
-extern int func_000A00AF();
-extern int func_000A1023();
 extern int func_0012B136();
-extern int func_0012DB50();
-extern void func_0003C4DE(void);
-extern void func_0003F09F(short, int);
-extern void func_0007CB4F(int);
+extern void func_0004204E(int);
 extern void func_0008CF0E(int);
 extern void func_0008E152(int, int);
 int func_00041D27(void);
-void func_0004204E(short);
-
-int func_000417C8(short a1)
-{
-    int l_20;
-
-    if (((int)(unsigned char)*(signed char *)D_0019626F) != 5) goto L417F1;
-    if (((int)(unsigned char)*(signed char *)D_00196274) == 8) goto L417F3;
-L417F1:;
-    goto L417FF;
-L417F3:;
-    return 1;
-L417FF:;
-    if (*(int *)D_00195D7C <= 0) goto L41814;
-    return 0;
-L41814:;
-    if (a1 != 0) goto L41837;
-    if (*(signed char *)D_00196274 != 0) goto L41832;
-    if (func_00042F0F(28) != 0) goto L41837;
-L41832:;
-    goto L4190D;
-L41837:;
-    if (*(int *)D_00195D60 == 0) goto L41856;
-    func_0007CB4F(*(int *)D_00184876);
-    return 0;
-L41856:;
-    func_0012DB50(4);
-    *(signed char *)D_001940D8 &= 254;
-    if (func_00042112() != 0) goto L4187C;
-    return 0;
-L4187C:;
-    *(signed char *)D_001940D4 |= 128;
-    *(signed char *)D_00187CA8 = 0;
-    *(signed char *)D_001940D8 |= 2;
-    *(int *)D_001996F8 = func_000A00AF(64000, (int)D_00170DE4, 101);
-    func_000A1023(*(int *)D_001996F8, *(int *)D_00143550, 64000, (int)D_00170DE4, 102, 4);
-    *(signed char *)D_00196274 = 5;
-    *(int *)D_00195BE8 = func_0006CB53((int)D_00170DF7, 0);
-    *(int *)D_00195B58 = func_0006CB53((int)D_00170E04, 0);
-    *(signed char *)D_00196272 = 1;
-    func_00069938(237, *(int *)D_00195AA4, 100);
-L4190D:;
-    if (((int)(unsigned char)*(signed char *)D_00196274) != 5) goto L41922;
-    l_20 = 1;
-    goto L41929;
-L41922:;
-    l_20 = 0;
-L41929:;
-    return l_20;
-}
 
 int func_00041D27(void)
 {
@@ -152,18 +82,6 @@ L41E69:;
     return 1;
 }
 
-void func_0004204E(short a1)
-{
-{
-    int l_1C;
-
-    if (((int)(unsigned char)*(signed char *)((char *)(int)(*(char **)D_00178A0A + (((int)(short)a1) * 2)))) == 255) return;
-    *(short *)D_00195F30 = *(int *)&a1;
-    *(signed char *)D_001940D5 |= 1;
-    func_0003F09F((int)(short)(func_00039224((int)(short)a1) + 1200), 1);
-}
-}
-
 void func_000420AF(void)
 {
     func_0004204E(0);
@@ -207,17 +125,4 @@ void func_00042337(void)
     func_0008E152(l_18, *(int *)((char *)l_18 + 55));
     func_0008CF0E((int)D_001A9AB8);
     func_00042112();
-}
-
-void func_0004259C(short a1)
-{
-    if (a1 != 0) goto L425CD;
-    if (*(signed char *)D_00196274 != 0) goto L425CB;
-    if (func_00042F0F(35) != 0) goto L425CD;
-L425CB:;
-    return;
-L425CD:;
-    *(signed char *)D_0012B508 = 146;
-    func_0003F09F(22, 1);
-    func_0003C4DE();
 }

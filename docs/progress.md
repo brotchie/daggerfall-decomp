@@ -850,3 +850,20 @@ Batch **1,502**.
   `promote_lifted.py` carries the struct declarations.
 
 Batch **1,509**.
+
+## 2026-10-02: byte masks, parameter types from call sites
+
+- `and dl,0x80` on a 16/32-bit value keeps the high bits: the source was `x & ~0x7f`
+  (`(a + 1) & ~1` is `and al,0xfe`). The lifter had read it as `x & 128`. +3.
+- **Parameter types from the callers.** A caller converts each argument to the parameter's
+  declared type, so `movsx edx, word ptr [x]` before a call means a `short` second
+  parameter, even when the callee only ever reads the low byte. `lift.caller_types()`
+  surveys every call site once (cached in `build/lift/caller_types.json`); a narrow load can
+  also be a narrow value passed to an `int`, so the callee's spill width decides (char
+  parameters are spilled as bytes, short ones as dwords). Callers' prototypes take this
+  type; the definition keeps the type its frame shows, and `promote_lifted.py` gives such
+  functions a file of their own. +56.
+- `lift_all.py` imports the lifter and builds the shared caches before starting the pool,
+  so a broken `lift.py` fails at once instead of hanging.
+
+Batch **1,568**.

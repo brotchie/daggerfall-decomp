@@ -188,6 +188,11 @@ def main():
     if a.limit:
         vas = vas[:a.limit]
     os.makedirs(OUT, exist_ok=True)
+    # fail here, not in every pool worker (a broken lift.py would respawn them forever),
+    # and build the shared caches once before the workers start
+    import lift
+    lift.init()
+    lift.caller_types()
     t0 = time.time()
     with mp.Pool(a.j, initializer=init_worker) as pool:
         results = sorted(pool.imap_unordered(work, vas, chunksize=8))

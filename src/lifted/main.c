@@ -53,7 +53,7 @@ extern void func_0003FC4B(void);
 extern void func_0003FCBD(void);
 extern void func_00040F7F(void);
 extern void func_0004193C(void);
-extern void func_0004259C(short);
+extern void func_0004259C(int);
 extern void func_000433DA(void);
 extern void func_00044E89(void);
 extern void func_0004AB52(void);

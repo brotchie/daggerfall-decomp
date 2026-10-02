@@ -22,7 +22,7 @@ extern char D_001A3FA0[];
 extern char D_001A3FA4[];
 extern char D_001A3FA8[];
 
-extern int func_0003B1F3(short);
+extern int func_0003B1F3(int);
 extern int func_0005A442(unsigned char);
 extern int func_00069938(int, int, int);
 extern int func_0006AE87(int, int);

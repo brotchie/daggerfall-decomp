@@ -23,7 +23,7 @@ extern void func_00040FC1(int);
 extern void func_0004BBD8(int, int, int);
 extern void func_00060270(int, int);
 extern void func_000797E2(int, int);
-extern void func_0007DDC9(short);
+extern void func_0007DDC9(int);
 int func_0002E914(int, int, int);
 
 int func_0002E55C(int a1, int a2, int a3)
