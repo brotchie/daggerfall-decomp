@@ -58,6 +58,10 @@ for full, b, w in (("eax", "al", "ax"), ("edx", "dl", "dx"), ("ebx", "bl", "bx")
     SUB[w] = (full, 2)
     if b:
         SUB[b] = (full, 1)
+if not os.environ.get("LIFT_NOHIGHBYTE"):
+    # a high byte register as a byte value of its own (`mov ah,[x]; shl ah,7; add al,ah`)
+    for full, h in (("eax", "ah"), ("edx", "dh"), ("ebx", "bh"), ("ecx", "ch")):
+        SUB[h] = ("h" + full, 1)
 
 
 class Unsupported(Exception):
@@ -1790,6 +1794,13 @@ class Func:
             while k < nreg:
                 r = PARM_REGS[k]
                 if r not in self.regs:
+                    if k >= 1 and sig is not None and not self.pushes and \
+                            not os.environ.get("LIFT_NOSHORTCALL"):
+                        # fewer arguments than the callee's parameters: called without a
+                        # prototype in scope
+                        self.noproto.add(name)
+                        nreg = k
+                        break
                     raise Unsupported("call argument %s not loaded" % r)
                 if self.regs[r] is self.pending:
                     self.pending = None              # nested call: f(g(x))
@@ -2433,6 +2444,10 @@ class Func:
             if i.mnemonic == "call" or i.mnemonic.startswith("j"):
                 return False
             ops = i.operands
+            if i.mnemonic in ("xor", "sub") and len(ops) == 2 and \
+                    ops[0].type == cx.X86_OP_REG and ops[1].type == cx.X86_OP_REG and \
+                    ops[0].reg == ops[1].reg and i.reg_name(ops[0].reg) in fam:
+                return False        # zeroed: a fresh value
             for n, o in enumerate(ops):
                 if n > 0 and o.type == cx.X86_OP_REG and i.reg_name(o.reg) in fam:
                     return True
@@ -2953,6 +2968,39 @@ def max_reg_args(va):
                 if r in pushed:
                     n = k + 1
                     break
+        try:
+            ins_ = IMG.insns(va)
+        except Exception:
+            ins_ = []
+        if True:
+            library = va >= GAME_END or not (va in IMG.funcs and
+                                             IMG.le.obj_of_va(va).index == 1)
+            if ins_ and (ins_[0].mnemonic != "push" or library) and len(ins_) < 40 and \
+                    not any(i.mnemonic == "call" for i in ins_) and \
+                    not os.environ.get("LIFT_NOASMARGS"):
+                # a hand-written leaf: its arguments are the registers it reads before
+                # writing them
+                read, written = set(), set()
+                for i in ins_:
+                    if i.mnemonic == "ret":
+                        break
+                    if i.mnemonic in ("push", "pop"):
+                        continue        # (saving a register is not reading it)
+                    rd, wr = i.regs_access()
+                    if i.mnemonic in ("xor", "sub") and len(i.operands) == 2 and \
+                            i.operands[0].type == cx.X86_OP_REG and \
+                            i.operands[1].type == cx.X86_OP_REG and \
+                            i.operands[0].reg == i.operands[1].reg:
+                        rd = []             # (zeroing)
+                    for r_ in rd:
+                        full = SUB.get(i.reg_name(r_), (None,))[0]
+                        if full in PARM_REGS and full not in written:
+                            read.add(full)
+                    for r_ in wr:
+                        full = SUB.get(i.reg_name(r_), (None,))[0]
+                        if full:
+                            written.add(full)
+                n = max([PARM_REGS.index(r_) + 1 for r_ in read] + [0])
         SAVES[va] = n
     return SAVES[va]
 

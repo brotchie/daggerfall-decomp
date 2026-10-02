@@ -1287,3 +1287,9 @@ Batch **1,927**; build **61.34%**.
   10's order for e.g. `(f(42)->x + f(108)->x) / 2`: the sum in the second operand's
   register). The search tries windows around the difference's share of the function
   before register pins (`confsort` lines in `DAGGER_REGLOG`). +3. Batch **2,167**.
+- Unsupported down to the two asm helpers (written by hand): high byte registers are byte
+  values of their own (`mov ah,[x]; shl ah,7; add al,ah`); a small hand-written callee's
+  arity is the argument registers it reads before writing (`imul edx` leaf: two); a call
+  with fewer loaded registers than the callee's parameters is unprototyped. An offline
+  deep search (`LIFT_DEEP=1`: every allocation window and every single register pin,
+  ~16 min over the failing functions) found nothing more. +4. Batch **2,171**.

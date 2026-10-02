@@ -2,6 +2,8 @@
  * do not edit: move a function to src/args.c to work on it by hand) */
 
 extern char D_000C5404[];
+extern char D_00150200[];
+extern char D_00150A00[];
 extern char D_00153404[];
 extern char D_00176A88[];
 extern char D_00176A8F[];
@@ -119,6 +121,7 @@ extern int func_000C7F07();
 extern int func_000C7F14();
 extern int func_000C7F98();
 extern int func_000C7FD9();
+extern int func_000CE74F();
 extern int func_00136AD8();
 extern int func_001401D4();
 extern int func_00154D00();
@@ -128,9 +131,9 @@ extern void func_0007D723(void);
 extern void func_0007D7BA(void);
 extern void func_0007E815(int, int);
 extern void func_0007EB0B(int, int);
-extern void func_0008302D(int, int, int);
 extern void func_00086149(void);
 extern void func_0008E4A8(int, int);
+void func_0008302D(int, int, int);
 #pragma aux func_0009DA1C parm routine [];
 #pragma aux func_000A0ED9 parm routine [];
 
@@ -374,6 +377,18 @@ L83011:;
 L83019:;
     func_0007D7BA();
     func_0007D723();
+}
+
+void func_0008302D(int a1, int a2, int a3)
+{
+    int l_14;
+    int l_10;
+
+    l_14 = *(int *)((char *)a1);
+    l_10 = *(int *)((char *)a2);
+    a3 &= 2047;
+    *(int *)((char *)a1) = func_000CE74F(l_14, *(int *)(D_00150A00 + (a3 << 2))) - func_000CE74F(l_10, *(int *)(D_00150200 + (a3 << 2)));
+    *(int *)((char *)a2) = func_000CE74F(l_10, *(int *)(D_00150A00 + (a3 << 2))) + func_000CE74F(l_14, *(int *)(D_00150200 + (a3 << 2)));
 }
 
 int func_00083EDF(int a1)

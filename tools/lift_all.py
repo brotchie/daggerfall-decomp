@@ -177,6 +177,29 @@ def pin_search(name, va, c, detail, at, flips, attempt):
     if not log:
         return None
     used = {lift.pin_decode(f)[0] for f in flips if -200000 < f <= -3000}
+    if os.environ.get("LIFT_DEEP"):
+        # offline: every window, then every single pin to every register, nearest first
+        nconf = W.get("confs", 0)
+        tva, tsize = W["funcs"][name]
+        share = (at - tva) / max(tsize, 1)
+        cands = []
+        if not any(f <= -200000 for f in flips):
+            cands += sorted((lift.win_encode(k1, k1 + L) for L in range(1, 9)
+                             for k1 in range(0, nconf) if k1 + L < nconf),
+                            key=lambda f: abs(sum(lift.win_decode(f)) / 2 - nconf * share))
+        cands += sorted((lift.pin_encode(k, r) for k in range(len(log)) if k not in used
+                         for r in ("eax", "ebx", "ecx", "edx", "esi", "edi") if r != log[k]),
+                        key=lambda f: abs(lift.pin_decode(f)[0] - len(log) * share))
+        tries_d = 0
+        for f in cands:
+            tries_d += 1
+            r = attempt(flips | {f})
+            if r is None:
+                continue
+            s2, d2, at2 = r[0], r[1], r[2]
+            if s2 == "ok" or (s2 == "diff" and at2 is not None and at2 > at):
+                return ((1 << 40) if s2 == "ok" else at2, 0, flips | {f}, r, tries_d)
+        return None
     # first: a window of the allocation order taken latest-starting first
     nconf = W.get("confs", 0)
     if nconf and not os.environ.get("LIFT_NOCONFWIN") and \

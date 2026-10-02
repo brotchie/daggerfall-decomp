@@ -143,6 +143,7 @@ void func_000615E0(int, int, int, int);
 #pragma dagger DAGGER_RMW func_0005E874
 #pragma dagger DAGGER_RMW func_0005EA8F
 #pragma dagger DAGGER_RMW func_00061CBC
+#pragma dagger reg func_0005F5E7 381 esi
 #pragma dagger slots func_0005F81F l_4C 56 l_2E 26 l_2B 23
 
 void func_0005E540(int a1, int a2, int a3)
@@ -686,16 +687,15 @@ void func_0005F5E7(int a1)
     int l_18;
 
     l_18 = func_0009DC25();
-    func_0009DC49((int)(unsigned short)*(short *)((char *)a1 + 63));
-    *(short *)D_00195DC4 = func_0009DC25() % 180;
+    *(short *)D_00195DC4 = func_0009DC25(func_0009DC49((int)(unsigned short)*(short *)((char *)a1 + 63))) % 180;
     l_1C = func_0006CD6E((int)D_001758EE);
     func_000A006E(l_1C, ((int)(unsigned short)*(short *)D_00195DC4) * 40, 0);
     func_000A00CB(l_1C, *(int *)D_00195C44, 40);
     func_0009DEA7(l_1C);
     *(short *)D_00195DC6 = func_0005F6E9(*(int *)D_00195C44) + 6100;
     *(short *)D_00195DC8 = func_0005F6E9(*(int *)D_00195C44 + 10) + 6200;
-    *(short *)D_00195DCA = func_0005F6E9(*(int *)D_00195C44 + 20) + 6300;
-    *(short *)D_00195DCC = (short)func_0005F6E9(*(int *)D_00195C44 + 30) + 6400;
+    *(short *)D_00195DCA = func_0005F6E9((int)(*(char **)D_00195C44 + 20)) + 6300;
+    *(short *)D_00195DCC = (short)func_0005F6E9((int)(*(char **)D_00195C44 + 30)) + 6400;
     *(signed char *)D_001940D6 |= 32;
     func_0003F09F(250, 1);
     func_0009DC49(l_18);
