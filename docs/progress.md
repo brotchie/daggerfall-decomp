@@ -650,3 +650,7 @@ first run it gave:
   `test dword[ebp-x], imm` (OW narrows an int bit test), `xor r32,r32` (+501).
 
 Batch **1,334**.
+
+Tried and reverted: declaring locals whose value is used as a memory base as `char *` (so
+`add` doesn't fold them, like the global-pointer case): 0 gained, 9 lost against the committed
+lifter. The `add r32, dword[ebp-x]` difference has some other cause.
