@@ -178,6 +178,8 @@ class Func:
         self.temps = set()       # slots that are the compiler's own temps (not declared)
         self.side = []           # stores inside an expression, waiting for the next read
         self.used_results = set()   # callees whose return value is used
+        self.first_call = {}     # callee -> address of its first call
+        self.noproto = set()     # callees called without a prototype in scope
         self.structs = set()     # bit-field struct declarations used
         self.choices = []        # instruction addresses of operand-order choice points
         self.choice_sites = {}   # choice -> addresses where it shows (slot accesses)
@@ -938,7 +940,11 @@ class Func:
             return
         if m == "xor" and ins.op_str in ("ah, ah", "dh, dh", "bh, bh", "ch, ch"):
             full = {"a": "eax", "d": "edx", "b": "ebx", "c": "ecx"}[ins.op_str[0]]
-            if full not in self.regs:
+            nx = self.body[self.k + 1] if self.k + 1 < len(self.body) else None
+            if full not in self.regs or (
+                    nx is not None and nx.mnemonic == "mov" and
+                    nx.op_str.startswith(ins.op_str[0] + "l, ") and
+                    not os.environ.get("LIFT_NOHICLRNEXT")):
                 # the high byte cleared before the low byte is loaded
                 self.set_reg(full, E("0", 4, atom=True, tag=("hiclr",)))
                 return
@@ -1294,6 +1300,13 @@ class Func:
             elif sig is not None:
                 nreg, nstack = min(4, len(sig[1])), max(0, len(sig[1]) - 4)
                 self.calls.add(name)
+                if any(t != "int" for t in sig[1]) and not os.environ.get("LIFT_NONOPROTO"):
+                    # no prototype in scope at the call (arguments passed as ints): a
+                    # choice point for the function's calls of it
+                    key = self.first_call.setdefault(name, ins.address) + 0.03125
+                    self.choices.append(key)
+                    if key in self.flips:
+                        self.noproto.add(name)
             elif pops and "eax" not in loaded:
                 nreg, nstack = 0, pops // 4          # stack only, callee pops: #pragma aux
                 self.scalls[name] = nstack
@@ -2160,6 +2173,8 @@ class Func:
                 # a void function whose eax the caller uses: no prototype was in scope
                 # there (implicit int)
                 d = "extern int %s();" % f
+            elif f in self.noproto:
+                d = re.sub(r"\(.*\);$", "();", d)
             decl.append(d)
         for f, n in sorted(self.scalls.items()):
             decl.append("#pragma aux %s parm routine [];" % f)

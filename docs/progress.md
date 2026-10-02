@@ -1125,3 +1125,9 @@ Batch **1,927**; build **61.34%**.
   parameter, so the callee's parameter is a short even when it only ever reads it whole
   (the census also looks further back for calls with many stack arguments). +7.
   Batch **1,985**.
+- `xor ah,ah` right before `mov al,[x]` clears the high byte for that load even when eax
+  holds an unrelated value (an idiv quotient). +6. Calls with no prototype in scope
+  (`mov ebx,eax` passing an int result to an unsigned char parameter): a per-callee choice
+  point declares the callee `extern int f();` in that function. +3. lift_all keeps each
+  function's winning flips (build/lift/flips.json) and retries them when a fresh greedy
+  search ends worse. Batch **1,994**.

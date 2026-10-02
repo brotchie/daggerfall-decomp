@@ -16,6 +16,7 @@ usage: lift_all.py [-j N] [--only func_X,func_Y] [--limit N]
 """
 import argparse
 import csv
+import json
 import multiprocessing as mp
 import os
 import re
@@ -39,6 +40,11 @@ def init_worker():
     import build_fall
     lift.init()
     W["lift"] = lift
+    try:
+        with open(os.path.join(OUT, "flips.json")) as f:
+            W["flips"] = json.load(f)
+    except (OSError, ValueError):
+        W["flips"] = {}
     W["match"] = match
     W["build"] = build_fall
     W["tgt"] = match.Target()
@@ -204,11 +210,21 @@ def work(va):
         status, detail, at, c, info = found[3]
         best = (status, detail, at, c)
     status, detail, at, c = best
+    # the flips a previous run found (the search is greedy: a new choice point can lead it
+    # astray); kept when they get further
+    cached = frozenset(W.get("flips", {}).get(name, []))
+    if status != "ok" and cached and cached != flips and \
+            not os.environ.get("LIFT_NOFLIPCACHE"):
+        r = attempt(cached)
+        if r is not None and (r[0] == "ok" or (r[0] == "diff" and r[2] is not None and
+                                               at is not None and r[2] > at)):
+            flips = cached
+            status, detail, at, c, info = r
     if os.environ.get("LIFT_SHOWFLIPS"):
         print(name, sorted(flips), file=sys.stderr)
     if c is not None:
         check(name, c)          # leave the best version's .c and .bin on disk
-    return name, status, detail
+    return name, status, detail, sorted(flips)
 
 
 def main():
@@ -238,6 +254,19 @@ def main():
     t0 = time.time()
     with mp.Pool(a.j, initializer=init_worker) as pool:
         results = sorted(pool.imap_unordered(work, vas, chunksize=8))
+    fp = os.path.join(OUT, "flips.json")
+    try:
+        with open(fp) as f:
+            allflips = json.load(f)
+    except (OSError, ValueError):
+        allflips = {}
+    for r in results:
+        if len(r) > 3:
+            if r[1] == "ok" or r[0] not in allflips:
+                allflips[r[0]] = r[3]
+    with open(fp, "w") as f:
+        json.dump(allflips, f)
+    results = [r[:3] for r in results]
     # keep the previous full run's report to show what this change gained and lost
     prev = {}
     rp = os.path.join(OUT, "report.csv")

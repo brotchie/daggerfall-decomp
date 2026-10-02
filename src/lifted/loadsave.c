@@ -182,6 +182,7 @@ extern int func_000A0040();
 extern int func_000A00CB();
 extern int func_000A0AD9();
 extern int func_000A0B42();
+extern int func_000A0DD9();
 extern int func_000A0DF4();
 extern int func_000A0E3B();
 extern int func_000A0ED9(int, int);
@@ -224,6 +225,7 @@ extern void func_0006D873(int, int);
 extern void func_00072AA0(void);
 extern void func_00078C79(void);
 extern void func_0007B75C(int, int, int);
+extern void func_0007CA85();
 extern void func_00086D37(unsigned short);
 extern void func_000876AD(int, int, int, int);
 extern void func_0008C566(int, short);
@@ -263,12 +265,14 @@ void func_0007C56F(int);
 void func_0007C78B(int);
 void func_0007C8AF(void);
 #pragma aux func_000A0ED9 parm routine [];
+#pragma dagger DAGGER_PUSHMEM func_0007CAEB
 #pragma dagger KKND_CONFREV func_0007A638
 #pragma dagger KKND_CONFREV func_0007B222
 #pragma dagger KKND_CONFREV func_0007B624
 #pragma dagger slots func_0007C908 a1 16 a2 12 a3 8 l_10 4
 #pragma dagger slots func_0007C965 a1 16 a2 12 a3 8 l_10 4
 #pragma dagger slots func_0007C9C2 a1 16 a2 12 a3 8 l_10 4
+#pragma dagger slots func_0007CAEB a1 4 a2 12 a3 8 a4 16 l_24 28
 
 int func_00079A6E(int a1)
 {
@@ -1438,4 +1442,11 @@ void func_0007C9C2(int a1, short a2, short a3)
     func_0005A54A(a1, (int)&*(signed char *)((char *)((int)(short)a2) + 1), (int)&*(signed char *)((char *)((int)(short)a3) + 1));
     *(signed char *)D_0012B508 = *(signed char *)&l_10;
     func_0005A54A(a1, (int)(short)a2, (int)(short)a3);
+}
+
+void func_0007CAEB(short a1, short a2, short a3, short a4, short a5, short a6, short a7)
+{
+    char l_24[12];
+
+    func_0007CA85(func_000A0DD9((int)(short)a5, (int)l_24, 10), (int)(short)((((int)(short)a1) + ((int)(short)a3)) >> 1), (int)(short)(((((int)(short)a2) + ((int)(short)a4)) >> 1) - 2), (int)(short)a6, (int)(short)a7);
 }
