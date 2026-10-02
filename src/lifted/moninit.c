@@ -2,6 +2,21 @@
  * do not edit: move a function to src/moninit.c to work on it by hand) */
 
 extern char D_00176844[];
+extern char D_0018487E[];
+extern char D_00187914[];
+extern char D_00187919[];
+extern char D_0018791B[];
+extern char D_00187921[];
+extern char D_00187924[];
+extern char D_00187927[];
+extern char D_0018792A[];
+extern char D_0018792E[];
+extern char D_00187930[];
+extern char D_00187933[];
+extern char D_00187936[];
+extern char D_0018793C[];
+extern char D_00187942[];
+extern char D_0018794A[];
 extern char D_001879CE[];
 extern char D_00187A12[];
 extern char D_00187A23[];
@@ -19,6 +34,7 @@ extern int func_0007D6AE(int, int);
 extern int func_0008B29A(int, unsigned char, unsigned char);
 extern int func_0008DCE3(int, int, int);
 extern int func_0008EB88(int);
+extern int func_0009DC25();
 extern int func_000A0024();
 extern int func_000A00CB();
 extern int func_000A1023();
@@ -29,7 +45,9 @@ extern void func_00060270(int, int);
 extern void func_00065BBA(int, int);
 extern void func_00078566(int, int);
 extern void func_00078B8A(int);
+extern void func_000792C1(int, int, int);
 extern void func_0008E3F7(int, int);
+void func_0007909F(int, int);
 
 void func_00078C79(void)
 {
@@ -96,6 +114,80 @@ L78DB7:;
     goto L78DAF;
 L78DC9:;
     return l_14 + a2;
+}
+
+void func_00078DDD(int a1)
+{
+    int l_1C;
+    int l_18;
+
+    l_1C = a1 + 71;
+    if (((int)(unsigned char)*(signed char *)((char *)l_1C + 67)) < 43) goto L78E87;
+    func_000792C1(a1, l_1C, func_0009DC25() & 1);
+    if (((int)(unsigned short)(*(short *)(D_0018487E + (((int)(unsigned char)*(signed char *)((char *)l_1C + 67)) * 29)) & 2)) == 0) goto L78E82;
+    l_18 = ((int)(unsigned char)*(signed char *)((char *)l_1C + 129)) / 3;
+    if (l_18 <= 6) goto L78E6E;
+    l_18 = 6;
+L78E6E:;
+    func_0007909F(a1, *(int *)(D_0018794A + (l_18 << 2)));
+L78E82:;
+    return;
+L78E87:;
+    switch (*(unsigned char *)((char *)l_1C + 67)) {
+    return;
+case 1:
+    func_0007909F(a1, (int)D_00187914);
+    return;
+case 7:
+    func_000792C1(a1, l_1C, 0);
+    return;
+case 8:
+    func_000792C1(a1, l_1C, 1);
+    return;
+case 12:
+    func_000792C1(a1, l_1C, 1);
+    return;
+case 18:
+    func_0007909F(a1, (int)D_00187919);
+    return;
+case 21:
+    func_000792C1(a1, l_1C, 0);
+    func_0007909F(a1, (int)D_0018791B);
+    return;
+case 23:
+    func_0007909F(a1, (int)D_00187921);
+    return;
+case 24:
+    func_000792C1(a1, l_1C, 2);
+    return;
+case 25:
+    func_0007909F(a1, (int)D_00187924);
+    return;
+case 26:
+    func_0007909F(a1, (int)D_00187927);
+    return;
+case 27:
+    func_0007909F(a1, (int)D_0018792A);
+    return;
+case 28:
+    func_0007909F(a1, (int)D_0018792E);
+    return;
+case 29:
+    func_0007909F(a1, (int)D_00187930);
+    return;
+case 30:
+    func_0007909F(a1, (int)D_00187933);
+    return;
+case 31:
+    func_0007909F(a1, (int)D_00187936);
+    return;
+case 32:
+    func_0007909F(a1, (int)D_0018793C);
+    return;
+case 33:
+    func_0007909F(a1, (int)D_00187942);
+default:;
+}
 }
 
 void func_0007909F(int a1, int a2)

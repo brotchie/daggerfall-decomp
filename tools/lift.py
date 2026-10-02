@@ -176,6 +176,7 @@ class Func:
         self.regs = {}
         self.born_hint = None
         self.temps = set()       # slots that are the compiler's own temps (not declared)
+        self.used_results = set()   # callees whose return value is used
         self.structs = set()     # bit-field struct declarations used
         self.choices = []        # instruction addresses of operand-order choice points
         self.flips = frozenset()
@@ -353,7 +354,7 @@ class Func:
         if self.ret_slot:
             known.add(self.ret_slot)
         self.arrays = {}         # base offset -> size in bytes
-        for a in sorted(addr):
+        for a in sorted(x for x in addr if x > 0):
             above = [o for o in known if o < a and o not in range(a - 3, a)]
             nxt = max([o for o in above if o not in self.slot_type or o in addr
                        or o in [p[1] for p in self.params] or o == self.ret_slot]
@@ -377,7 +378,7 @@ class Func:
                 del self.slot_type[o]
         self.inside = inside
         for a in addr:
-            if a not in self.arrays:
+            if a not in self.arrays and a > 0:      # (< 0: an address-taken stack parameter)
                 self.slot_type.setdefault(a, "int")
         for o in range(top, bottom + 1, 4):
             if o in known or o in inside or o in self.arrays:
@@ -544,6 +545,8 @@ class Func:
         r = self.regs.get(name)
         if r is None:
             raise Unsupported("read of undefined register %s" % name)
+        if r.tag and r.tag[0] == "call":
+            self.used_results.add(r.tag[1])
         if self.pending is not None and r is self.pending:
             self.pending = None
         return r
@@ -1140,7 +1143,8 @@ class Func:
             if nstack:
                 args += [x.text for x in reversed(self.pushes[-nstack:])]
                 del self.pushes[-nstack:]
-            self.finish_call(E("%s(%s)" % (name, ", ".join(args)), 4, atom=True), nreg)
+            self.finish_call(E("%s(%s)" % (name, ", ".join(args)), 4, atom=True,
+                               tag=("call", name)), nreg)
             return
         if m.startswith("j"):
             tgt = ops[0].imm if ops[0].type == cx.X86_OP_IMM else None
@@ -1792,7 +1796,12 @@ class Func:
         for g in sorted(self.globals):
             decl.append("extern char %s[];" % g)
         for f in sorted(self.calls - self.vcalls - set(self.scalls) - {name}):
-            decl.append(globals()["decl"](f))
+            d = globals()["decl"](f)
+            if f in self.used_results and d.startswith("extern void "):
+                # a void function whose eax the caller uses: no prototype was in scope
+                # there (implicit int)
+                d = "extern int %s();" % f
+            decl.append(d)
         for f, n in sorted(self.scalls.items()):
             decl.append("#pragma aux %s parm routine [];" % f)
             decl.append("extern int %s(%s);" % (f, ", ".join(["int"] * n)))

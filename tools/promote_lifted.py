@@ -28,6 +28,15 @@ OUT = os.path.join(ROOT, "src", "lifted")
 DEF = re.compile(r"^[A-Za-z][^;\n(]*\b(func_[0-9A-F]{8})\s*\(", re.M)
 
 
+def proto_line(text, name):
+    """The prototype a function's own definition implies, as an extern line minus 'extern '."""
+    m = re.search(r"^(\w+(?: \w+)?) %s\((.*)\)$" % name, text, re.M)
+    if not m:
+        return ""
+    types = ", ".join(re.sub(r"\s*a\d+$", "", p.strip()) for p in m.group(2).split(","))
+    return "%s %s(%s);" % (m.group(1), name, types)
+
+
 def main():
     hand = set()
     for path in glob.glob(os.path.join(ROOT, "src", "*.c")):
@@ -61,6 +70,31 @@ def main():
             types = ", ".join(re.sub(r"\s*a\d+$", "", p.strip()) for p in m.group(1).split(","))
             if types != proto[n] and not (types == "void" and proto[n] == "void"):
                 alone.add(n)
+    # A function that declares a callee differently from the rest of its unit (an implicit
+    # `int f()` for a void function whose result it uses) also gets a file of its own.
+    decls_of = {}
+    for n, text in texts.items():
+        for line in text.splitlines():
+            m = re.match(r"extern \w+ (func_[0-9A-F]{8})\(", line)
+            if m:
+                decls_of.setdefault(n, {})[m.group(1)] = line
+    for unit, names in by_unit.items():
+        members = [n for n in names if n not in alone]
+        votes = {}
+        for n in members:
+            for callee, line in decls_of.get(n, {}).items():
+                votes.setdefault(callee, {}).setdefault(line, []).append(n)
+        for callee, lines in votes.items():
+            if len(lines) > 1:
+                defined_here = callee in members
+                keep = None
+                if defined_here:
+                    keep = next((l for l in lines if l == "extern " + proto_line(texts[callee], callee)), None)
+                if keep is None:
+                    keep = max(lines, key=lambda l: len(lines[l]))
+                for line, users in lines.items():
+                    if line != keep:
+                        alone.update(users)
     groups = []
     for unit, names in sorted(by_unit.items()):
         shared = [n for n in names if n not in alone]

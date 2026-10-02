@@ -3,11 +3,15 @@
 
 extern char D_001705F8[];
 extern char D_00179D74[];
+extern char D_00195AA4[];
 extern char D_0019627B[];
+extern char D_00196285[];
 extern char D_00196B00[];
 extern char D_00196B04[];
 
 extern int func_000A0024();
+unsigned char func_0002010F(int, int);
+unsigned char func_000201B8(int, int, int);
 
 void func_0001FEBD(void)
 {
@@ -31,4 +35,72 @@ L1FF17:;
 int func_0001FFF1(void)
 {
     return (int)(unsigned char)*(signed char *)(D_00179D74 + ((int)(unsigned char)*(signed char *)D_0019627B));
+}
+
+int func_0002001F(void)
+{
+    return (int)(unsigned char)func_0002010F(*(int *)(*(char **)D_00195AA4 + 7), *(int *)(*(char **)D_00195AA4 + 15));
+}
+
+unsigned char func_00020089(int a1, int a2)
+{
+    int l_20;
+    int l_1C;
+    unsigned char l_18;
+
+    l_20 = (a1 >> 15) + 2;
+    l_1C = 499 - (a2 >> 15);
+    if (l_1C >= 1) goto L200C7;
+    l_1C = 1;
+    goto L200D7;
+L200C7:;
+    if (l_1C <= 499) goto L200D7;
+    l_1C = 499;
+L200D7:;
+    l_18 = func_000201B8(l_20, l_1C, *(int *)D_00196B00);
+    if (((int)(unsigned char)l_18) != 64) goto L200FB;
+    return 31;
+L200FB:;
+    return l_18 & 127;
+}
+
+unsigned char func_0002010F(int a1, int a2)
+{
+    int l_1C;
+    int l_18;
+
+    l_1C = (a1 >> 15) + 2;
+    l_18 = 499 - (a2 >> 15);
+    if (l_18 >= 1) goto L2014D;
+    l_18 = 1;
+    goto L2015D;
+L2014D:;
+    if (l_18 <= 499) goto L2015D;
+    l_18 = 499;
+L2015D:;
+    *(signed char *)D_0019627B = func_000201B8(l_1C, l_18, *(int *)D_00196B04);
+    if (((int)(unsigned char)*(signed char *)D_0019627B) != 223) goto L20195;
+    *(signed char *)D_0019627B = 228;
+    *(signed char *)D_00196285 = 1;
+    return 3;
+L20195:;
+    *(signed char *)D_00196285 = 0;
+    return *(signed char *)(D_00179D74 + ((int)(unsigned char)*(signed char *)D_0019627B));
+}
+
+unsigned char func_000201B8(int a1, int a2, int a3)
+{
+    int l_18;
+    int l_14;
+
+    l_18 = a3;
+    l_14 = (int)(*(char **)((char *)((a2 << 2) + l_18)) + a3);
+    a1 -= (int)(short)*(short *)((char *)l_14);
+L201EF:;
+    if (a1 <= 0) goto L20207;
+    (*(char (**)[3])&l_14)++;
+    a1 -= (int)(short)*(short *)((char *)l_14);
+    goto L201EF;
+L20207:;
+    return *(signed char *)((char *)l_14 + 2);
 }

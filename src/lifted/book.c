@@ -61,6 +61,7 @@ extern void func_0007CA85(int, int, int, int, unsigned char);
 extern void func_0008C4E4(int);
 void func_0005A230(void);
 #pragma aux func_000A0ED9 parm routine [];
+#pragma dagger DAGGER_FIRSTUSE func_0005A577
 
 void func_00059B7B(short a1)
 {
@@ -205,15 +206,15 @@ void func_0005A3BC(void)
     *(short *)D_00190D68 = 4;
 }
 
-void func_0005A577(int a1, int a2, int a3)
+void func_0005A577(int a1, short a2, short a3)
 {
     unsigned char l_10;
 
     l_10 = *(signed char *)D_0012B508;
     *(signed char *)D_0012B508 = *(signed char *)D_0012B504;
-    func_0012DBCC((int)(short)(a2 + 1), (int)(short)(a3 + 1), a1);
+    func_0012DBCC((int)(short)(*(int *)&a2 + 1), (int)(short)(*(int *)&a3 + 1), a1);
     *(signed char *)D_0012B508 = l_10;
-    func_0012DBCC((int)(short)*(short *)&a2, (int)(short)*(short *)&a3, a1);
+    func_0012DBCC((int)(short)a2, (int)(short)a3, a1);
 }
 
 void func_0005A60C(int a1, int a2, int a3)

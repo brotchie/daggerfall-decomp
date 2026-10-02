@@ -15,6 +15,7 @@ extern char D_0017703F[];
 extern char D_0017704C[];
 extern char D_00177054[];
 extern char D_00177099[];
+extern char D_001770A7[];
 extern char D_0017710F[];
 extern char D_00177129[];
 extern char D_00177147[];
@@ -46,6 +47,10 @@ extern char D_00185C14[];
 extern char D_00185F88[];
 extern char D_00187CA8[];
 extern char D_0018822C[];
+extern char D_00188425[];
+extern char D_00188427[];
+extern char D_00188429[];
+extern char D_0018842B[];
 extern char D_0018867D[];
 extern char D_0018F092[];
 extern char D_001903A4[];
@@ -85,6 +90,7 @@ extern char D_00195B8C[];
 extern char D_00195BE0[];
 extern char D_00195BEC[];
 extern char D_00195BF4[];
+extern char D_00195BF8[];
 extern char D_00195C44[];
 extern char D_00195D2C[];
 extern char D_00195D30[];
@@ -156,6 +162,7 @@ extern char D_001AA5F7[];
 extern int func_0002E914(int, int, int);
 extern int func_0003B1F3(int);
 extern int func_000417C8(int);
+extern int func_00047F95(void);
 extern int func_0004A3EC(int);
 extern int func_0004A98C(int, int);
 extern int func_0004BB64(int);
@@ -196,6 +203,7 @@ extern int func_000CE44C();
 extern int func_0012B136();
 extern int func_00135D00();
 extern int func_00135E39();
+extern int func_00144FB4();
 extern void func_00030F39(void);
 extern void func_0003D01C(int, int);
 extern void func_0003EC2A(int, int);
@@ -214,6 +222,7 @@ extern void func_00060270(int, int);
 extern void func_00065A8C(int, int, int);
 extern void func_000728D2(void);
 extern void func_00075172(int, unsigned short);
+extern void func_0007CA1F(int, int, int, int, unsigned char);
 extern void func_0007D723(void);
 extern void func_0007DDC9(int);
 extern void func_0007F185(int);
@@ -235,7 +244,6 @@ extern void func_00092013(int);
 extern void func_0009219A(int);
 extern void func_000921CC(int);
 extern void func_00092280(int);
-extern void func_00093372(int, int);
 extern void func_00093FB1(unsigned char);
 extern void func_00095F82(int);
 extern void func_00096CCF(int, int);
@@ -248,6 +256,7 @@ int func_00099211(int);
 int func_000993CB(int);
 void func_00092476(void);
 void func_00092BF7(void);
+void func_00093372(int, int);
 void func_00094DB4(int);
 void func_00094FA8(void);
 void func_000954DD(int, int);
@@ -270,6 +279,7 @@ void func_00099155(int);
 void func_000992FA(void);
 #pragma aux func_000A0ED9 parm routine [];
 #pragma dagger DAGGER_DEADDEF func_00097488
+#pragma dagger DAGGER_PUSHMEM func_00093372
 #pragma dagger DAGGER_PUSHMEM func_00093DCB
 
 void func_00092349(void)
@@ -495,6 +505,43 @@ L92EAD:;
     func_0003B1F3(1);
 L92EC7:;
     *(signed char *)D_001962A9 = 0;
+}
+
+void func_00093372(int a1, int a2)
+{
+    int l_20;
+    int l_1C;
+    int l_18;
+    int l_14;
+
+    l_20 = *(int *)D_001AA440;
+    l_1C = 0;
+    if (a2 != 1) goto L933B0;
+    if (((int)(unsigned short)(*(short *)(*(char **)D_00195BF8) & 4)) != 0) goto L933B2;
+L933B0:;
+    goto L933B9;
+L933B2:;
+    a2 = 10;
+L933B9:;
+    if (l_1C >= a2) goto L933DE;
+    l_20 = (((int)(unsigned short)*(short *)((char *)l_20 + 10)) + l_20) + 12;
+    l_1C++;
+    goto L933B9;
+L933DE:;
+    l_18 = ((int)(short)*(short *)(D_00188425 + (a1 * 12))) + ((((int)&*(signed char *)((char *)(((int)(short)*(short *)(D_00188429 + (a1 * 12))) - ((int)(short)*(short *)(D_00188425 + (a1 * 12)))) + 1)) - ((int)(unsigned short)*(short *)((char *)l_20 + 4))) >> 1);
+    l_14 = ((int)(short)*(short *)(D_00188427 + (a1 * 12))) + ((((((int)(short)*(short *)(D_0018842B + (a1 * 12))) - ((int)(short)*(short *)(D_00188427 + (a1 * 12)))) + 1) - ((int)(unsigned short)*(short *)((char *)l_20 + 6))) >> 1);
+    func_00144FB4(l_18, l_14, (int)(unsigned short)*(short *)((char *)l_20 + 4), (int)(unsigned short)*(short *)((char *)l_20 + 6), l_20 + 12);
+    if (*(int *)D_001959E8 == 0) goto L93486;
+    if (a2 == 3) goto L93488;
+L93486:;
+    return;
+L93488:;
+    *(signed char *)D_001962AE = 1;
+    *(int *)D_00195AA8 = *(int *)D_001959E8;
+    func_000A0ED9(657, (int)D_0017704C);
+    func_000A0F5C((int)D_001903A4, (int)D_001770A7, func_00047F95());
+    func_0007CA1F((int)D_001903A4, (int)(short)(l_18 + 1), (int)(short)(l_14 + 1), 145, 156);
+    *(signed char *)D_001962AE = 0;
 }
 
 void func_00093DCB(int a1, int a2, int a3, int a4)

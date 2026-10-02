@@ -976,3 +976,20 @@ Batch **1,751**.
   lifter now spells such adds as pointer arithmetic by default (a choice point). +8.
 
 Batch **1,770**.
+
+## 2026-10-02: tree stubs, char returns, implicit int
+
+- Compare trees also contain `jmp case` stubs (with dead `jmp` filler between them), not
+  only `jmp default`: any jump a compare reaches inside the tree's own stretch of code is
+  part of the tree. +3.
+- Negative constants pushed through a register mark a signed narrow stack parameter. +2.
+- The search now takes the flip that moves the first difference furthest at each step (not
+  the first that helps), with a budget of 200 compiles. +2.
+- **Char and short return values**: `mov al, byte ptr [ebp-x]` before the epilogue is a
+  `char` function's return variable. +8.
+- A `void` function whose eax a caller uses was called without a prototype in scope
+  (implicit `int`): such callers declare it `extern int f();`, and `promote_lifted.py` gives
+  a function whose declarations conflict with its unit's a file of its own.
+- Address-taken stack parameters no longer leak into the local slot table.
+
+Batch **1,786**; build **1,786 functions, 54.55%**.

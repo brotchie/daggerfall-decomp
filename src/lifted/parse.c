@@ -42,6 +42,7 @@ extern char D_0017D036[];
 extern char D_0017D042[];
 extern char D_0017D04A[];
 extern char D_0017D06A[];
+extern char D_0017D08A[];
 extern char D_0017D206[];
 extern char D_00182F92[];
 extern char D_001830E6[];
@@ -132,6 +133,7 @@ extern char D_00196266[];
 extern char D_00196267[];
 extern char D_00196268[];
 extern char D_00196269[];
+extern char D_0019626C[];
 extern char D_0019628F[];
 extern char D_001962AE[];
 extern char D_00196620[];
@@ -198,6 +200,7 @@ int func_0004AA47(int, int);
 void func_0004A282(int);
 void func_0004A6B5(int, int, int);
 #pragma aux func_000A0ED9 parm routine [];
+#pragma dagger DAGGER_NOGIVEN func_000468DC
 
 int func_000466C6(void)
 {
@@ -246,6 +249,17 @@ int func_00046856(void)
 int func_00046899(void)
 {
     return func_000A0DD9((int)(signed char)*(signed char *)((char *)(int)(*(char **)D_00178A0A + (((int)(short)*(short *)D_00195F30) * 5)) + 35), (int)D_00190FE4, 10);
+}
+
+int func_000468DC(void)
+{
+    short l_18;
+
+    *(int *)&l_18 = ((int)(short)*(short *)((char *)(int)(*(char **)D_00195BE0 + (((int)(unsigned char)*(signed char *)D_0019626C) * 2)) + 32)) / 10;
+    if (((int)(short)l_18) < 10) goto L4691E;
+    *(int *)&l_18 = 9;
+L4691E:;
+    return *(int *)(D_0017D08A + (((((int)(unsigned char)*(signed char *)D_0019626C) * 10) + ((int)(short)l_18)) << 2));
 }
 
 int func_00046947(void)
