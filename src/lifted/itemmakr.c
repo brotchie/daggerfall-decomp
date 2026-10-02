@@ -9,7 +9,9 @@ extern char D_0017D1EA[];
 extern char D_00180A7A[];
 extern char D_00180B0A[];
 extern char D_001830E6[];
+extern char D_001857E5[];
 extern char D_00185871[];
+extern char D_001858DB[];
 extern char D_00187CA8[];
 extern char D_00190BE4[];
 extern char D_00190BE8[];
@@ -47,6 +49,8 @@ extern char D_001AA58A[];
 
 extern int func_00039E5F(int);
 extern int func_00057903(short);
+extern int func_00057BAE(int, unsigned char, unsigned char, int);
+extern int func_00057C5F(int, unsigned char, unsigned char, int);
 extern int func_0006CE0D(int);
 extern int func_0008DA4D(int);
 extern int func_0008DA91(int);
@@ -283,6 +287,72 @@ L574C7:;
     return l_1C;
 }
 
+int func_00057AB4(void)
+{
+    int l_28;
+    int l_24;
+    int l_20;
+    int l_1C;
+
+    l_28 = 0;
+    l_24 = l_28;
+L57ACF:;
+    if (l_28 < 10) goto L57AE2;
+    goto L57B9B;
+L57ADA:;
+    l_28++;
+    goto L57ACF;
+L57AE2:;
+    if (((int)(signed char)*(signed char *)(D_00190CE4 + l_28)) == (-1)) goto L57ADA;
+    if (*(signed char *)(D_00199910 + l_28) != 0) goto L57ADA;
+    if (*(signed char *)(D_00190CE4 + l_28) != 0) goto L57B12;
+    l_1C = (int)D_001857E5;
+    goto L57B19;
+L57B12:;
+    l_1C = (int)D_001858DB;
+L57B19:;
+    l_20 = *(int *)((char *)((((int)(short)*(short *)(D_001998E0 + (l_28 << 2))) << 2) + l_1C));
+    if (l_20 == 0) goto L57ADA;
+    if (((unsigned)l_20) >= 100) goto L57B6A;
+    l_24 += func_00057BAE(l_20, (int)(unsigned char)*(signed char *)(D_001998E2 + (l_28 << 2)), 1, (int)(short)*(short *)(D_001998E0 + (l_28 << 2)));
+    goto L57B96;
+L57B6A:;
+    l_24 += (int)(short)*(short *)((char *)(*(int *)((char *)((((int)(short)*(short *)(D_001998E0 + (l_28 << 2))) << 2) + l_1C)) + (((int)(short)*(short *)(D_001998E2 + (l_28 << 2))) * 2)));
+L57B96:;
+    goto L57ADA;
+L57B9B:;
+    return l_24;
+}
+
+int func_00057CFB(void)
+{
+    int l_24;
+    int l_20;
+    int l_1C;
+
+    l_24 = 0;
+    l_20 = l_24;
+L57D16:;
+    if (l_24 < 10) goto L57D29;
+    goto L57DB6;
+L57D21:;
+    l_24++;
+    goto L57D16;
+L57D29:;
+    if (*(signed char *)(D_00190CE4 + l_24) != 0) goto L57D21;
+    l_1C = *(int *)(D_001857E5 + (((int)(short)*(short *)(D_001998E0 + (l_24 << 2))) << 2));
+    if (l_1C == 0) goto L57D21;
+    if (((unsigned)l_1C) >= 100) goto L57D84;
+    l_20 += func_00057BAE(l_1C, (int)(unsigned char)*(signed char *)(D_001998E2 + (l_24 << 2)), 0, (int)(short)*(short *)(D_001998E0 + (l_24 << 2)));
+    goto L57DB1;
+L57D84:;
+    l_20 += (int)(short)*(short *)((char *)(*(int *)(D_001857E5 + (((int)(short)*(short *)(D_001998E0 + (l_24 << 2))) << 2)) + (((int)(short)*(short *)(D_001998E2 + (l_24 << 2))) * 2)));
+L57DB1:;
+    goto L57D21;
+L57DB6:;
+    return l_20 * 10;
+}
+
 void func_00057DCA(void)
 {
     int l_1C;
@@ -419,6 +489,40 @@ void func_00058679(void)
 {
     if (((int)(unsigned char)*(signed char *)((char *)*(int *)D_001AA57C)) == 52) return;
     *(int *)D_001AA57C = *(int *)((char *)*(int *)D_001AA57C + 67);
+}
+
+int func_0005879B(int a1)
+{
+    int l_24;
+    int l_20;
+    int l_1C;
+
+    l_24 = 0;
+    l_20 = l_24;
+L587B9:;
+    if (l_24 < 10) goto L587CC;
+    goto L5887D;
+L587C4:;
+    l_24++;
+    goto L587B9;
+L587CC:;
+    if (((int)(short)*(short *)((char *)((l_24 << 2) + a1) + 67)) >= 16) goto L587C4;
+    if (((int)(short)*(short *)((char *)((l_24 << 2) + a1) + 67)) == (-1)) goto L587C4;
+    l_1C = *(int *)(D_001857E5 + (((int)(short)*(short *)((char *)((l_24 << 2) + a1) + 67)) << 2));
+    if (l_1C == 0) goto L587C4;
+    if (l_1C >= 100) goto L5881B;
+    if (l_1C > 0) goto L5881D;
+L5881B:;
+    goto L5884B;
+L5881D:;
+    l_20 += func_00057C5F(l_1C, (int)(unsigned char)*(signed char *)((char *)((l_24 << 2) + a1) + 69), 0, (int)(short)*(short *)((char *)((l_24 << 2) + a1) + 67));
+    goto L58878;
+L5884B:;
+    l_20 += (int)(short)*(short *)((char *)(*(int *)(D_001857E5 + (((int)(short)*(short *)((char *)((l_24 << 2) + a1) + 67)) << 2)) + (((int)(short)*(short *)((char *)((l_24 << 2) + a1) + 69)) * 2)));
+L58878:;
+    goto L587C4;
+L5887D:;
+    return l_20;
 }
 
 int func_00058890(int a1, int a2)

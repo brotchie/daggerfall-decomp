@@ -32,6 +32,7 @@ extern char D_0017533E[];
 extern char D_0017534B[];
 extern char D_00175358[];
 extern char D_00175365[];
+extern char D_001788D3[];
 extern char D_001789FA[];
 extern char D_00187CAD[];
 extern char D_0018DBFC[];
@@ -733,6 +734,12 @@ L500E4:;
     func_000A1004((int)l_418);
     func_0009DB11(10);
 }
+}
+
+void func_00050344(int a1, int a2)
+{
+    *(short *)((char *)a1 + 143) = (((int)(short)*(short *)((char *)a1 + 34)) * ((int)(short)*(short *)(D_001788D3 + (((((int)(unsigned short)*(short *)((char *)a2 + 4)) >> 10) & 7) * 2)))) / 256;
+    *(short *)((char *)a1 + 141) = *(short *)((char *)a1 + 143);
 }
 
 int func_000504D8(int a1)

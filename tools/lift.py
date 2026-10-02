@@ -618,6 +618,12 @@ class Func:
                         and s.imm == a.tag[2]:
                     self.set_reg(full, E("%s / %d" % (a.tag[1].p(), 1 << s.imm), 4))
                     return
+                if m == "add" and s.type == cx.X86_OP_REG and d.reg == s.reg:
+                    # add r,r: doubling (2-byte array indexing), not x + x
+                    v = E("%s * 2" % a.p(), 4)
+                    self.set_reg(full, v)
+                    self.flags = ("val", v, None)
+                    return
                 if m == "shr":
                     a = E("(unsigned)" + a.p(), 4)
                 if m == "add" and s.type == cx.X86_OP_REG and (

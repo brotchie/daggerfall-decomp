@@ -22,6 +22,7 @@ extern char D_00195A9C[];
 extern char D_00195AA0[];
 extern char D_00195AA4[];
 extern char D_00195AC4[];
+extern char D_00195AE8[];
 extern char D_00195B14[];
 extern char D_00195BDC[];
 extern char D_00195BE0[];
@@ -31,6 +32,7 @@ extern char D_00195C88[];
 extern char D_00195CB8[];
 extern char D_00195D84[];
 extern char D_00195DB8[];
+extern char D_00195F28[];
 extern char D_00195F5E[];
 extern char D_00195FB1[];
 extern char D_00196120[];
@@ -56,6 +58,7 @@ extern char D_001A99F4[];
 
 extern int func_0001FF92(void);
 extern int func_0002001F(void);
+extern int func_0002E914(int, int, int);
 extern int func_0004B4A2(int);
 extern int func_0007CBA1(int);
 extern int func_0007D6AE(int, int);
@@ -595,6 +598,52 @@ L88DD4:;
 void func_00088DE6(int a1, int a2, int a3)
 {
     func_0008A90C(a1, a3, a2);
+}
+
+int func_00089035(int a1, int a2, int a3)
+{
+    int l_1C;
+    int l_18;
+    int l_14;
+{
+    unsigned char l_2C;
+
+    l_1C = a1 + 71;
+    l_18 = a3 + 71;
+    l_2C = *(signed char *)((char *)((a2 * 2) + l_1C) + 1);
+    if (l_2C < 1) goto L89085;
+    if (l_2C <= 1) goto L890D9;
+    if (l_2C == 2) goto L8912A;
+    goto L8916B;
+L89085:;
+    if (l_2C != 0) goto L8916B;
+    if (l_18 != *(int *)D_00195BE0) goto L890A3;
+    if ((*(unsigned char *)D_00195AE8 & 64) != 0) goto L890A5;
+L890A3:;
+    goto L890AA;
+L890A5:;
+    goto L8916B;
+L890AA:;
+    *(short *)D_00195F28 = *(short *)((char *)((a2 * 2) + l_1C) + 80);
+    func_0002E914(a3, (int)(unsigned short)*(short *)((char *)((a2 * 2) + l_1C) + 80), 0);
+    goto L8916B;
+L890D9:;
+    *(short *)D_00195F28 = *(short *)((char *)((a2 * 2) + l_1C) + 80);
+    l_14 = (int)(unsigned short)*(short *)((char *)l_18 + 155);
+    l_14 -= (int)(unsigned short)*(short *)((char *)((a2 * 2) + l_1C) + 80);
+    if (l_14 >= 0) goto L8911B;
+    l_14 = 0;
+L8911B:;
+    *(short *)((char *)l_18 + 155) = l_14;
+    goto L8916B;
+L8912A:;
+    *(short *)D_00195F28 = *(short *)((char *)((a2 * 2) + l_1C) + 80);
+    *(short *)((char *)l_18 + 141) -= *(short *)((char *)((a2 * 2) + l_1C) + 80);
+    if (*(short *)((char *)l_18 + 141) >= 0) goto L8916B;
+    *(short *)((char *)l_18 + 141) = 0;
+L8916B:;
+    return 0;
+}
 }
 
 int func_0008917D(int a1, int a2, int a3)

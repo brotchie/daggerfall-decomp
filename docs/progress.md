@@ -654,3 +654,8 @@ Batch **1,334**.
 Tried and reverted: declaring locals whose value is used as a memory base as `char *` (so
 `add` doesn't fold them, like the global-pointer case): 0 gained, 9 lost against the committed
 lifter. The `add r32, dword[ebp-x]` difference has some other cause.
+
+## 2026-10-01: `add r,r` is `x * 2` (+59)
+
+The `add r32, dword[ebp-x]` excess was mostly 2-byte array indexing: `mov edx,[x]; add edx,edx`
+is `x * 2`, which the lifter spelled `x + x` (OW: `add edx,[x]`). Batch **1,393**.

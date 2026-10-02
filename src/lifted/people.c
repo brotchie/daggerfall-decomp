@@ -2,16 +2,21 @@
  * do not edit: move a function to src/people.c to work on it by hand) */
 
 extern char D_00170DC0[];
+extern char D_001789FA[];
+extern char D_00195AA4[];
 extern char D_0019627E[];
+extern char D_0019627F[];
 extern char D_00199670[];
 extern char D_001996F4[];
 
-extern int func_00041347(void);
+extern int func_00023C72(int, int);
+extern int func_00040B83(int);
 extern int func_0008DA91(int);
 extern int func_000A0040();
 extern void func_000401F1(int);
 extern void func_00040C87(int);
 extern void func_00070370(int, unsigned char);
+int func_00041347(void);
 
 void func_0004105A(void)
 {
@@ -32,6 +37,36 @@ L410A4:;
 L410A6:;
     *(int *)D_001996F4 = 0;
     func_000A0040((int)D_00199670, 0, 120, (int)D_00170DC0, 554, 120);
+}
+
+int func_00041347(void)
+{
+    int l_20;
+    int l_1C;
+
+    l_1C = 0;
+    if (((int)(unsigned char)*(signed char *)D_001789FA) != 3) goto L41374;
+    return 0;
+L41374:;
+    l_20 = 0;
+L4137B:;
+    if (l_20 < *(int *)D_001996F4) goto L41390;
+    goto L413EE;
+L41388:;
+    l_20++;
+    goto L4137B;
+L41390:;
+    if (*(int *)(D_00199670 + (l_20 << 2)) == 0) goto L41388;
+    if (func_00040B83(*(int *)(D_00199670 + (l_20 << 2))) == 0) goto L413D2;
+    l_1C |= func_00023C72(*(int *)(D_00199670 + (l_20 << 2)), *(int *)D_00195AA4) * 2;
+    goto L413EC;
+L413D2:;
+    l_1C |= func_00023C72(*(int *)(D_00199670 + (l_20 << 2)), *(int *)D_00195AA4);
+L413EC:;
+    goto L41388;
+L413EE:;
+    *(signed char *)D_0019627F = *(signed char *)&l_1C;
+    return l_1C;
 }
 
 void func_00041409(int a1)

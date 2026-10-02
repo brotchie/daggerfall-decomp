@@ -3,6 +3,8 @@
 
 extern char D_00174F47[];
 extern char D_001789FA[];
+extern char D_0017CF72[];
+extern char D_00185128[];
 extern char D_00190BE4[];
 extern char D_001959A8[];
 extern char D_00195A00[];
@@ -300,6 +302,17 @@ L4CF18:;
     goto L4CEDA;
 L4CF23:;
     return 0;
+}
+
+int func_0004CF37(int a1)
+{
+    int l_1C;
+
+    l_1C = 0;
+    if (((int)(unsigned char)*(signed char *)((char *)a1 + 55)) != 2) goto L4CF7E;
+    return (((int)(short)*(short *)(D_0017CF72 + (((int)(unsigned char)*(signed char *)((char *)a1 + 54)) * 2))) + l_1C) + 45;
+L4CF7E:;
+    return l_1C + ((int)(short)*(short *)(D_00185128 + (((int)(unsigned char)*(signed char *)((char *)a1 + 55)) * 2)));
 }
 
 void func_0004D195(int a1)

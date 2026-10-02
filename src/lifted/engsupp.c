@@ -2,6 +2,11 @@
  * do not edit: move a function to src/engsupp.c to work on it by hand) */
 
 extern char D_001702D4[];
+extern char D_00179954[];
+extern char D_0017995C[];
+extern char D_00179966[];
+extern char D_0017CA0A[];
+extern char D_00195AC4[];
 extern char D_00195B68[];
 extern char D_00195BF8[];
 extern char D_00195C88[];
@@ -15,7 +20,12 @@ extern char D_00196484[];
 
 extern int func_00014096(int, short);
 extern int func_00014334(int);
+extern int func_0001FFF1(void);
+extern int func_0007D6AE(int, int);
+extern int func_0009DC25();
+extern int func_0009DC49();
 extern int func_000A0040();
+extern int func_000A1023();
 extern int func_0012A608();
 extern void func_0001497D(int);
 extern void func_0006103A(int, int, int, int, int);
@@ -160,6 +170,37 @@ L14488:;
     goto L14461;
 L1448A:;
     return -1;
+}
+
+void func_0001478F(void)
+{
+    int l_24;
+    int l_20;
+    int l_1C;
+    int l_18;
+
+    l_18 = func_0009DC25();
+    func_0009DC49(((unsigned)*(int *)((char *)*(int *)D_00195AC4 + 31)) >> 16);
+    l_1C = (int)(unsigned char)*(signed char *)(D_0017CA0A + func_0001FFF1());
+    if (l_1C == 1) return;
+    func_000A1023((int)D_00179966, (int)D_0017995C, 10, (int)D_001702D4, 279, 10);
+    l_24 = 0;
+L147F8:;
+    if (l_24 < 5) goto L14808;
+    goto L14841;
+L14800:;
+    l_24++;
+    goto L147F8;
+L14808:;
+    l_20 = func_0007D6AE(0, 4);
+    if (l_20 != 2) goto L14821;
+    l_20 += 2;
+L14821:;
+    l_20 += (int)(short)*(short *)(D_00179954 + (l_1C * 2));
+    *(short *)(D_00179966 + (l_24 * 2)) = l_20;
+    goto L14800;
+L14841:;
+    func_0009DC49(l_18);
 }
 
 void func_00014853(int a1, int a2)

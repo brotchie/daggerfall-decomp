@@ -3,6 +3,8 @@
 
 extern char D_0012B508[];
 extern char D_001789FA[];
+extern char D_0017C5B8[];
+extern char D_0017C5B9[];
 extern char D_00187CA8[];
 extern char D_0018F08E[];
 extern char D_0018F092[];
@@ -153,6 +155,21 @@ void func_0004B25B(int a1)
 {
     if (((int)(unsigned char)*(signed char *)((char *)a1)) != 8) return;
     *(signed char *)D_00190CE4 = 1;
+}
+
+int func_0004B4A2(int a1)
+{
+    int l_1C;
+
+    l_1C = ((unsigned)(((unsigned)*(int *)D_00195BF4) % 1440)) / 60;
+    if (((int)(unsigned char)*(signed char *)(D_0017C5B8 + (((int)(unsigned char)*(signed char *)((char *)a1 + 24)) * 2))) > l_1C) goto L4B509;
+    if (((int)(unsigned char)*(signed char *)(D_0017C5B9 + (((int)(unsigned char)*(signed char *)((char *)a1 + 24)) * 2))) > l_1C) goto L4B50B;
+L4B509:;
+    goto L4B53B;
+L4B50B:;
+    return (((int)(unsigned char)*(signed char *)(D_0017C5B9 + (((int)(unsigned char)*(signed char *)((char *)a1 + 24)) * 2))) * 60) - (((unsigned)*(int *)D_00195BF4) % 1440);
+L4B53B:;
+    return 0;
 }
 
 void func_0004B54F(int a1)

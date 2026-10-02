@@ -12,6 +12,7 @@ extern char D_00178A0A[];
 extern char D_00184876[];
 extern char D_00187CA8[];
 extern char D_001940D4[];
+extern char D_001940D5[];
 extern char D_001940D8[];
 extern char D_00195AA4[];
 extern char D_00195B58[];
@@ -19,6 +20,7 @@ extern char D_00195BE8[];
 extern char D_00195D38[];
 extern char D_00195D60[];
 extern char D_00195D7C[];
+extern char D_00195F30[];
 extern char D_0019626F[];
 extern char D_00196272[];
 extern char D_00196274[];
@@ -26,6 +28,7 @@ extern char D_00196288[];
 extern char D_001996F8[];
 extern char D_001A9AB8[];
 
+extern int func_00039224(short);
 extern int func_0003B1F3(short);
 extern int func_00042112(void);
 extern int func_00042F0F();
@@ -40,11 +43,11 @@ extern int func_0012B136();
 extern int func_0012DB50();
 extern void func_0003C4DE(void);
 extern void func_0003F09F(short, int);
-extern void func_0004204E(short);
 extern void func_0007CB4F(int);
 extern void func_0008CF0E(int);
 extern void func_0008E152(int, int);
 int func_00041D27(void);
+void func_0004204E(short);
 
 int func_000417C8(short a1)
 {
@@ -147,6 +150,18 @@ L41E62:;
     *(signed char *)D_00187CA8 = 1;
 L41E69:;
     return 1;
+}
+
+void func_0004204E(short a1)
+{
+{
+    int l_1C;
+
+    if (((int)(unsigned char)*(signed char *)((char *)(int)(*(char **)D_00178A0A + (((int)(short)a1) * 2)))) == 255) return;
+    *(short *)D_00195F30 = *(int *)&a1;
+    *(signed char *)D_001940D5 |= 1;
+    func_0003F09F((int)(short)(func_00039224((int)(short)a1) + 1200), 1);
+}
 }
 
 void func_000420AF(void)
