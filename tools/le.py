@@ -105,8 +105,9 @@ class LE:
     def load(self, relocate=False):
         """Return {obj_index: bytearray(vsize)} with page data copied in (bss stays zero).
 
-        With relocate=True every 32-bit offset fixup is applied (field := target linear address),
-        which is what the loader does and what a disassembler wants. Without it the fields keep
+        With relocate=True every 32-bit offset fixup is applied (field := target linear address)
+        and every rel32 fixup gets its displacement, which is what the loader does and what a
+        disassembler wants. Without it the fields keep
         the raw file contents (object-relative offsets)."""
         out = {}
         for o in self.objs:
@@ -122,10 +123,13 @@ class LE:
             out[o.index] = buf
         if relocate:
             for f in self.fixups():
-                if f.kind != SRC_OFF32:
-                    continue
                 so = self.obj_of_va(f.src_va)
-                struct.pack_into("<I", out[so.index], f.src_va - so.base, f.target_va)
+                if f.kind == SRC_OFF32:
+                    struct.pack_into("<I", out[so.index], f.src_va - so.base, f.target_va)
+                elif f.kind == SRC_REL32:
+                    # cross-object call/jmp: the file holds 0, the loader writes the displacement
+                    struct.pack_into("<i", out[so.index], f.src_va - so.base,
+                                     (f.target_va - (f.src_va + 4) + 2**31) % 2**32 - 2**31)
         return out
 
     def page_va(self, page_no):

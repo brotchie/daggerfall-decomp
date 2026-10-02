@@ -86,3 +86,32 @@ the OMF objects and capstone disassembles them.
 
 Smoke test: `bwcc386 -s -of+ -5r -omilert -zm -zp1` gives register-convention code (`f_`) with
 Watcom's `89 xx` encodings, the same style as FALL.EXE's object 1.
+
+## 2026-10-01: function discovery
+
+`tools/find_functions.py` (adapted from KKND's) writes `config/functions.csv` and
+`config/code_data.csv`:
+
+| Object | Functions | Bytes decoded |
+|---|---|---|
+| 1 (game + Watcom runtime) | 3,315 | 689,585 / 701,055 (98.4%) |
+| 2 (writable, asm + data) | 348 | 67,102 / 660,840 (10.2%, the rest is mostly data) |
+
+Plus 55 switch jump tables. What the code looks like:
+
+- **No padding between functions** in object 1: 2,350 of 2,689 `push ebp; mov ebp,esp`
+  prologues follow a `ret` directly. KKND's executable has 16-byte zero fill from `-zm`, so the
+  segment and alignment setup differs here.
+- **Switches:** `shl eax,2; jmp cs:[eax + table]`, or for sparse cases `repne scasb` over a
+  byte table of case values, then `jmp cs:[ecx*4 + table - 4]`. The tables sit in the middle of
+  the function, before the dispatch, and the code after them is reached by jumps.
+- **Tables are 16-byte aligned with `lea eax,[eax]`** (`8D 40 00`, at 0x609CD for example).
+  KKND found no `lea` NOPs at all and patches the padding out by default, so Daggerfall may
+  need `KKND_LOOPALIGN=1`, or a finer-grained switch.
+- Prologue styles among the 3,315: about 2,466 `push ebp; mov ebp,esp; push regs`, 221
+  `push regs; push ebp; mov ebp,esp`, 836 without a frame. At least 1,450 functions store
+  `eax` into `[ebp-x]` in their first few instructions, so much of the game looks compiled
+  **without optimisation** (arguments spilled to the frame and reloaded), which should make it
+  far easier to match than KKND's `-omilert` code.
+- The undecoded rest of object 1 is mostly runtime switch tables and the `int NNh; ret` stubs
+  Watcom's `int386()` uses (0xAC551..0xAC7F6).
