@@ -1776,6 +1776,13 @@ class Func:
                 # a bit test doesn't care about sign; unsigned keeps it `test byte ptr [x], K`
                 a = E(a.text.replace("*(signed char *)", "*(unsigned char *)", 1)
                       .replace("*(short *)", "*(unsigned short *)", 1), a.size, a.atom)
+            if m == "test" and ops[0].type == cx.X86_OP_MEM and ops[1].type == cx.X86_OP_REG \
+                    and not os.environ.get("LIFT_NOTESTSWAP"):
+                # test [y], reg: y (the bigger tree, its address computed first) is the right
+                # operand of x & y; a choice point
+                self.choices.append(ins.address + 0.40625)
+                if ins.address + 0.40625 not in self.flips:
+                    a, b = b, a
             self.flags = (m, a, b)
             nx = self.body[self.k + 1] if self.k + 1 < len(self.body) else None
             if nx is not None and not nx.mnemonic.startswith(("j", "set", "adc", "sbb", "cmov")) \

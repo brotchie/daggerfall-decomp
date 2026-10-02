@@ -21,6 +21,7 @@ extern char D_00185083[];
 extern char D_00185097[];
 extern char D_00187FB8[];
 extern char D_00187FC6[];
+extern char D_0018DDD8[];
 extern char D_0018DE14[];
 extern char D_0018DE20[];
 extern char D_00190504[];
@@ -1015,6 +1016,66 @@ L8ADAB:;
     goto L8ACDE;
 L8ADB0:;
     return l_1C;
+}
+
+int func_0008ADC3(int a1, int a2, int a3, int a4, int a5, int a6)
+{
+    int l_14;
+    int l_10;
+
+    if ((*(int *)((char *)a3 + 137) & *(int *)(D_00187FC6 + (a1 << 2))) == 0) goto L8AE12;
+    if (func_0007D6AE(1, 100) <= ((int)(unsigned char)*(signed char *)((char *)(a3 + a1) + 555))) goto L8AE14;
+L8AE12:;
+    goto L8AE20;
+L8AE14:;
+    return 0;
+L8AE20:;
+    l_14 = 50;
+    if (a4 == 0) goto L8AE8F;
+    if ((((int)(unsigned char)*(signed char *)((char *)a4 + 1)) & a2) == 0) goto L8AE49;
+    return 0;
+L8AE49:;
+    if ((((int)(unsigned char)*(signed char *)((char *)a4 + 3)) & a2) == 0) goto L8AE65;
+    return 100;
+L8AE65:;
+    if ((((int)(unsigned char)*(signed char *)((char *)a4 + 2)) & a2) == 0) goto L8AE78;
+    l_14 >>= 1;
+L8AE78:;
+    if ((((int)(unsigned char)*(signed char *)((char *)a4)) & a2) == 0) goto L8AE8F;
+    l_14 += l_14 >> 1;
+L8AE8F:;
+    l_14 += a6;
+    l_14 += *(int *)D_0018DDD8;
+    if (a1 != 1) goto L8AEB3;
+    if (((int)(unsigned char)*(signed char *)((char *)a3 + 67)) == 2) goto L8AEB5;
+L8AEB3:;
+    goto L8AEB9;
+L8AEB5:;
+    l_14 += 30;
+L8AEB9:;
+    if (a1 != 4) goto L8AEC8;
+    if (*(signed char *)((char *)a3 + 67) == 0) goto L8AECA;
+L8AEC8:;
+    goto L8AECE;
+L8AECA:;
+    l_14 += 30;
+L8AECE:;
+    if (l_14 >= 5) goto L8AEDD;
+    l_14 = 5;
+    goto L8AEEA;
+L8AEDD:;
+    if (l_14 <= 95) goto L8AEEA;
+    l_14 = 95;
+L8AEEA:;
+    l_10 = func_0007D6AE(1, 100);
+    if (l_10 <= l_14) goto L8AF0D;
+    return 100;
+L8AF0D:;
+    if ((l_14 - 20) <= l_10) goto L8AF21;
+    return 0;
+L8AF21:;
+    l_10 -= l_14;
+    return (-l_10) * 5;
 }
 
 void func_0008AF3E(int a1, int a2)

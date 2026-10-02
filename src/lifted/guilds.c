@@ -554,7 +554,7 @@ case 77:
     if (*(int *)D_001A4A14 == 0) goto L6E7B0;
     switch (*(unsigned short *)((char *)a1 + 71)) {
 case 845:
-    if ((*(int *)(*(char **)D_001A4A14 + 9) & (1 << ((int)(unsigned char)*(signed char *)(*(char **)D_001A4A14)))) == 0) goto L6E5EC;
+    if (((1 << ((int)(unsigned char)*(signed char *)(*(char **)D_001A4A14))) & *(int *)(*(char **)D_001A4A14 + 9)) == 0) goto L6E5EC;
     func_0003F09F(461, 1);
     goto L6E7AE;
 L6E5EC:;
