@@ -385,6 +385,9 @@ class Func:
             for k in range(self.nstack):
                 if 4 + k < len(cts) and cts[4 + k] == "int":
                     self.stack_type[k] = "int"      # callers push it as an immediate
+                elif 4 + k < len(cts) and cts[4 + k] == "narrow" and \
+                        self.stack_type[k] == "int":
+                    self.stack_type[k] = "short"    # callers push it through a register
                 elif 4 + k < len(cts) and cts[4 + k] == "signed":
                     self.stack_type[k] = {"unsigned char": "signed char",
                                           "unsigned short": "short"}.get(self.stack_type[k],
@@ -2305,7 +2308,7 @@ def caller_types():
             # stack arguments, nearest push first: `push imm` is an int (a narrow one is
             # pushed through a register)
             n = 4
-            for j in range(k - 1, max(-1, k - 24), -1):
+            for j in range(k - 1, max(-1, k - 96), -1):
                 i = ins[j]
                 if i.mnemonic in ("call", "ret") or i.mnemonic.startswith("j"):
                     break
@@ -2318,16 +2321,27 @@ def caller_types():
                             ins[j - 1].operands[1].imm & 0x80000000:
                         # a negative constant pushed through a register: a signed narrow one
                         ev.setdefault(tgt, {}).setdefault(n, set()).add("signed")
+                    elif i.operands[0].type == cx.X86_OP_REG and j and \
+                            ins[j - 1].mnemonic == "mov" and \
+                            ins[j - 1].op_str.startswith(i.op_str + ", ") and \
+                            ins[j - 1].operands[1].type == cx.X86_OP_IMM and \
+                            ins[j - 1].operands[1].imm < 0x8000 and \
+                            not os.environ.get("LIFT_NONARROWPUSH"):
+                        # a constant pushed through a register: a narrow one
+                        ev.setdefault(tgt, {}).setdefault(n, set()).add("narrow")
                     n += 1
     out = {}
     for tgt, params in ev.items():
         types = []
         for n in range(max([4] + [m + 1 for m in params])):
             seen = params.get(n, set()) - {"const"}
-            if seen == {"signed"}:
+            if seen == {"signed"} or seen == {"signed", "narrow"}:
                 types.append("signed")
                 continue
-            seen -= {"signed"}
+            if seen == {"narrow"}:
+                types.append("narrow")
+                continue
+            seen -= {"signed", "narrow"}
             if not seen:
                 types.append(None)
             elif "int" in seen or len(seen) > 1:

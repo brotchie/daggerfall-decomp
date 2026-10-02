@@ -44,7 +44,7 @@ int func_0008C9D2(int, short);
 #pragma dagger slots func_0008C5C9 l_2C 24 l_28 20 l_20 12 l_1C 8 l_18 4 ret 16
 #pragma dagger slots func_0008C9D2 a1 20 a2 12 l_18 8 l_14 4 ret 16
 
-int func_0008C2D7(int a1, short a2, short a3, short a4, short a5, int a6)
+int func_0008C2D7(int a1, short a2, short a3, short a4, short a5, short a6)
 {
     int l_24;
     int l_20;
@@ -56,7 +56,7 @@ int func_0008C2D7(int a1, short a2, short a3, short a4, short a5, int a6)
     *(int *)D_00195B94 = a1;
     func_000A0AD9((int)D_00190B44, *(int *)D_00195B94, 160, (int)D_00176E2C, 56);
     *(short *)D_001A9AAE = func_000A0DF4(*(int *)D_00195B94);
-    *(short *)D_001A9AAC = a6;
+    *(short *)D_001A9AAC = *(int *)&a6;
 L8C335:;
     l_14 = func_0008C462();
     if (*(short *)&l_14 != 0) goto L8C406;

@@ -1121,3 +1121,7 @@ Batch **1,927**; build **61.34%**.
   such a compare tree by the binary search's repeated compare at its root (`cmp v,3; jb;
   cmp v,3; jbe`), bounded to the run of compares and jumps (a case body may compare the
   variable again); a choice point keeps the chain of ifs. +6. Batch **1,978**.
+- **Constants pushed through a register**: `mov eax,0x32; push eax` passes a narrow stack
+  parameter, so the callee's parameter is a short even when it only ever reads it whole
+  (the census also looks further back for calls with many stack arguments). +7.
+  Batch **1,985**.

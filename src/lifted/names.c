@@ -43,7 +43,7 @@ extern int func_0007D6AE(int, int);
 extern int func_0008B43B(unsigned char, unsigned char, int);
 extern int func_0008B65C(unsigned char, unsigned char);
 extern int func_0008B79D(unsigned char, unsigned char);
-extern int func_0008C2D7(int, short, short, short, short, int);
+extern int func_0008C2D7(int, short, short, short, short, short);
 extern int func_0009DC25();
 extern int func_0009DC49();
 extern int func_0009DEA7();
