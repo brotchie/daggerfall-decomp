@@ -129,6 +129,7 @@ void func_00045FFB(int);
 void func_00046114(int);
 #pragma aux func_0009DA1C parm routine [];
 #pragma aux func_000A0ED9 parm routine [];
+#pragma dagger DAGGER_NOGIVEN func_00044D03
 
 void func_00044D03(int a1)
 {

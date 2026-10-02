@@ -310,6 +310,7 @@ void func_00077340(int);
 #pragma aux func_000A0ED9 parm routine [];
 #pragma dagger DAGGER_CONFLIST func_00077639
 #pragma dagger DAGGER_RMW func_0007716B
+#pragma dagger reg func_0007716B 6 edx 20 eax
 #pragma dagger reg func_00077A23 8 ebx
 #pragma dagger slots func_00077639 a1 28 a2 48 a3 44 a4 40 l_80 120 l_2C 36 l_28 32 l_20 24 l_1C 20 l_18 16 l_14 12 l_10 8 ret 4
 

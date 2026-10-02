@@ -196,6 +196,7 @@ void func_000298F3(int);
 #pragma aux func_000A0ED9 parm routine [];
 #pragma dagger DAGGER_CALLFIRST func_000295BE
 #pragma dagger DAGGER_CONFLISTREV func_00027717
+#pragma dagger DAGGER_NOGIVEN func_00027A10
 #pragma dagger DAGGER_NOSAVES func_00028E24
 #pragma dagger DAGGER_RMW func_00026904
 #pragma dagger reg func_0002829B 7 esi

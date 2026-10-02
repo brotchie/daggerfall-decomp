@@ -104,7 +104,9 @@ void func_00066D3C(int);
 void func_00067027(int);
 void func_000686DA(int);
 #pragma dagger DAGGER_CONFPOS func_00065937
+#pragma dagger DAGGER_NOGIVEN func_00066853
 #pragma dagger DAGGER_RMW func_00066D3C
+#pragma dagger confwin func_00066853 21 26
 #pragma dagger reg func_00065937 45 edx
 #pragma dagger reg func_00066853 437 bx
 

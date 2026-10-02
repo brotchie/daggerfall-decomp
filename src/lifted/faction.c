@@ -91,6 +91,7 @@ void func_0001CF3E(int, int, int, unsigned char, int);
 void func_0001DA9C(int, int);
 #pragma aux func_000A0ED9 parm routine [];
 #pragma dagger DAGGER_DEADDEFMEM func_0001B69D
+#pragma dagger DAGGER_NOGIVEN func_0001CA8C
 #pragma dagger slots func_0001CF3E a1 16 a2 24 a3 20 a4 4 l_44 60 l_39 49 l_14 12 l_10 8
 #pragma dagger slots func_0001D54B a1 32 a2 4 a3 24 a4 20 l_24 28 l_18 16 l_14 12 ret 8
 #pragma dagger slots func_0001D766 a1 16 a2 24 a3 20 a4 4 l_48 64 l_44 60 l_39 49 l_14 12 l_10 8

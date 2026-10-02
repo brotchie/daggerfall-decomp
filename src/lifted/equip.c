@@ -143,6 +143,7 @@ void func_00061326(int);
 void func_000614FB(int);
 void func_000615E0(int, int, int, int);
 #pragma aux func_000A0ED9 parm routine [];
+#pragma dagger DAGGER_CONFPOS func_0005F81F
 #pragma dagger DAGGER_CONFPOS func_00061398
 #pragma dagger DAGGER_CONFPOS func_000614FB
 #pragma dagger DAGGER_NOGIVEN func_00060430

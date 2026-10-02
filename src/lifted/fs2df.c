@@ -72,9 +72,9 @@ void func_00036C6F(int, int, int, unsigned char);
 void func_00036DC9(int, int, int, unsigned char);
 void func_00036F18(int);
 #pragma aux func_000A0ED9 parm routine [];
-#pragma dagger DAGGER_RMW func_00036233
 #pragma dagger reg func_00035D6D 39 edx 40 ebx 41 edx 51 edx 53 ebx 60 edx 66 edx 387 cx
 #pragma dagger reg func_000361B7 387 cx
+#pragma dagger reg func_00036233 120 eax
 #pragma dagger slots func_000369A0 a1 12 a2 4 l_28 24 l_18 8
 
 void func_00035D6D(int a1)

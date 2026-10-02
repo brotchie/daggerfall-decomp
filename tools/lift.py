@@ -1367,6 +1367,14 @@ class Func:
                 self.set_reg(full, E("%s & 255" % v.p(), 2))
                 return
             # byte zero-extended to 16 bits: mov al,[x]; xor ah,ah
+            mb = re.fullmatch(r"\*\((?:signed |unsigned )?char \*\)(.+)", v.text)
+            if mb and v.atom and not os.environ.get("LIFT_NOIMPBYTE"):
+                # or the read as unsigned char, promoted (a smaller tree): a choice point
+                self.choices.append(ins.address + 0.5625)
+                if ins.address + 0.5625 in self.flips:
+                    self.set_reg(full, E("(short)*(unsigned char *)" + mb.group(1), 2,
+                                         atom=True))
+                    return
             self.set_reg(full, E("(unsigned short)(unsigned char)" + v.p(), 2))
             return
         if m in ("and", "or", "xor", "add", "sub") and ops[0].type == cx.X86_OP_REG and \

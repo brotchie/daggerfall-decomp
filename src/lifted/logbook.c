@@ -73,6 +73,7 @@ void func_0006ADDB(void);
 void func_0006B0ED(void);
 void func_0006B24F(void);
 void func_0006B2E2(void);
+#pragma dagger DAGGER_NOGIVEN func_0006ABA8
 #pragma dagger reg func_0006ABA8 437 bx
 #pragma dagger reg func_0006AED1 437 bx
 
