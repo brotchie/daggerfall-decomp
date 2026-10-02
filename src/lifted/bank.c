@@ -27,6 +27,7 @@ extern char D_0019627B[];
 extern char D_001968BB[];
 extern char D_001A3FAC[];
 extern char D_001A3FBC[];
+extern char D_001A413C[];
 extern char D_001A4140[];
 extern char D_001A4144[];
 extern char D_001A4148[];
@@ -218,6 +219,19 @@ L6C1F3:;
 L6C20D:;
     *(signed char *)D_001A41F1 = 2;
     *(signed char *)D_001A41F2 = 0;
+}
+
+void func_0006C76F(void)
+{
+    if (*(int *)D_001A413C == 0) return;
+    (*(int *)D_001A413C)--;
+}
+
+void func_0006C796(void)
+{
+    if (((int)(unsigned char)*(signed char *)D_001A41F3) <= 11) return;
+    if ((((int)(unsigned char)*(signed char *)D_001A41F3) - 11) <= *(int *)D_001A413C) return;
+    (*(int *)D_001A413C)++;
 }
 
 void func_0006C924(void)

@@ -15,8 +15,10 @@ extern char D_00190D66[];
 extern char D_00190DE4[];
 extern char D_00195AA4[];
 extern char D_00195C44[];
+extern char D_00196D68[];
 extern char D_00196D6C[];
 extern char D_00196D70[];
+extern char D_00196D78[];
 
 extern int func_00024C88(int);
 extern int func_00069938(int, int, int);
@@ -144,6 +146,33 @@ void func_000252C7(int a1)
 
 void func_000252E2(int a1)
 {
+}
+
+void func_00025539(void)
+{
+    int l_18;
+
+    if (*(int *)D_00196D78 == *(int *)D_00196D6C) return;
+    l_18 = 0;
+L2555B:;
+    if (l_18 < 21) goto L2556B;
+    goto L2558C;
+L25563:;
+    l_18++;
+    goto L2555B;
+L2556B:;
+    *(int *)D_00196D78 -= 2;
+L25572:;
+    if (*(signed char *)((char *)*(int *)D_00196D78) == 0) goto L25584;
+    (*(int *)D_00196D78)--;
+    goto L25572;
+L25584:;
+    (*(int *)D_00196D68)--;
+    goto L25563;
+L2558C:;
+    if (((unsigned)*(int *)D_00196D78) >= *(int *)D_00196D6C) return;
+    *(int *)D_00196D78 = *(int *)D_00196D6C;
+    *(int *)D_00196D68 = 0;
 }
 
 int func_0002581C(void)

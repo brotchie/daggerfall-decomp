@@ -608,7 +608,7 @@ index 90c1857729..129dd201e5 100644
              } else {
                  next = GiveRegister( conf, false );
 diff --git a/bld/cg/c/tree.c b/bld/cg/c/tree.c
-index 23957dda5c..46b08cd7c4 100644
+index 23957dda5c..85e04939f5 100644
 --- a/bld/cg/c/tree.c
 +++ b/bld/cg/c/tree.c
 @@ -31,6 +31,7 @@
@@ -619,7 +619,7 @@ index 23957dda5c..46b08cd7c4 100644
  #include "coderep.h"
  #include "tree.h"
  #include "zoiks.h"
-@@ -1881,13 +1882,18 @@ an  TNPostGets( tn node )
+@@ -1881,13 +1882,22 @@ an  TNPostGets( tn node )
      an      left;
      an      rite;
      an      leftp;
@@ -632,7 +632,11 @@ index 23957dda5c..46b08cd7c4 100644
          rite = NotAddrGen( node->u1.t.rite );
 -        retv = MakeTempAddr( BGNewTemp( node->tipe ) );
 +        temp = BGNewTemp( node->tipe );
-+        if( _IsModel( CGSW_GEN_NO_OPTIMIZATION ) && getenv( "DAGGER_DEADDEF" ) == NULL ) {
++        /* only for stack variables: `x++` on a global is plain `inc [x]` */
++        if( _IsModel( CGSW_GEN_NO_OPTIMIZATION ) && getenv( "DAGGER_DEADDEF" ) == NULL
++          && !( node->u.left->class == TN_LEAF
++             && node->u.left->u.addr->format == NF_ADDR
++             && node->u.left->u.addr->class == CL_ADDR_GLOBAL ) ) {
 +            temp->t.temp_flags |= DAGGER_KEEP;
 +        }
 +        retv = MakeTempAddr( temp );

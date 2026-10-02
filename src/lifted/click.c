@@ -29,6 +29,7 @@ extern char D_0018F061[];
 extern char D_001903A4[];
 extern char D_00190BE4[];
 extern char D_001940D4[];
+extern char D_001940D5[];
 extern char D_001940D7[];
 extern char D_00195A00[];
 extern char D_00195AA0[];
@@ -52,12 +53,16 @@ extern char D_001A4C88[];
 extern char D_001A4C8C[];
 extern char D_001A4C90[];
 extern char D_001A4C9D[];
+extern char D_001A4E20[];
+extern char D_001A4E24[];
+extern char D_001A4E28[];
 extern char D_001A4FA0[];
 extern char D_001A4FA4[];
 extern char D_001A4FA8[];
 extern char D_001A4FAC[];
 extern char D_001A4FB0[];
 extern char D_001A4FB4[];
+extern char D_001A4FC8[];
 
 extern int func_0004A3EC(int);
 extern int func_0004C274();
@@ -77,13 +82,13 @@ extern int func_0012B136();
 extern void func_000202C5(int);
 extern void func_0004BBD8(int, int, int);
 extern void func_000756C6(int);
-extern void func_000757C9(int);
 extern void func_0007653C(int, int);
 extern void func_0008DA1C(int);
 extern void func_0008E3F7(int, int);
 extern void func_000922F6(int, int, int);
 extern void func_00097101(int);
 void func_0007567B(int, int);
+void func_000757C9(int);
 void func_00075A75(void);
 void func_00075B3F(void);
 void func_00075CFF(void);
@@ -178,6 +183,12 @@ void func_0007567B(int a1, int a2)
     *(signed char *)((char *)l_14 + 21) |= 1;
 L756AB:;
     func_000922F6(a2, 3, 7);
+}
+
+void func_000757C9(int a1)
+{
+    if (((int)(unsigned char)*(signed char *)((char *)a1)) != 2) return;
+    (*(int *)D_00190BE4)++;
 }
 
 int func_000757F9(int a1)
@@ -516,4 +527,16 @@ L77B58:;
     *(int *)D_001A4FA4 = (int)D_00187750;
     *(int *)D_001A4FB4 = (int)D_00187770;
     *(int *)D_001A4FA0 = (int)D_00187784;
+}
+
+void func_000784EE(void)
+{
+    (*(int *)D_001A4FC8)--;
+    if (*(int *)D_001A4FC8 != (-1)) goto L78515;
+    *(int *)D_001A4FC8 = 31;
+L78515:;
+    *(int *)((char *)*(int *)D_00195AA4 + 7) = *(int *)(D_001A4E20 + (*(int *)D_001A4FC8 * 12));
+    *(int *)((char *)*(int *)D_00195AA4 + 11) = *(int *)(D_001A4E24 + (*(int *)D_001A4FC8 * 12));
+    *(int *)((char *)*(int *)D_00195AA4 + 15) = *(int *)(D_001A4E28 + (*(int *)D_001A4FC8 * 12));
+    *(signed char *)D_001940D5 |= 2;
 }

@@ -51,9 +51,9 @@ extern void func_00056CF8(short);
 extern void func_000571C7(short);
 extern void func_00057266(int);
 extern void func_000574DA(int, short);
-extern void func_000585D6(int, int);
 extern void func_0008E3F7(int, int);
 extern void func_00097101(int);
+void func_000585D6(int, int);
 void func_00058AF7(void);
 
 void func_00055F0F(void)
@@ -308,6 +308,26 @@ L585A1:;
     goto L585A1;
 L585C0:;
     *(short *)D_001AA58A = *(short *)D_001AA586;
+}
+
+void func_000585D6(int a1, int a2)
+{
+    int l_14;
+
+    if (((int)(unsigned char)*(signed char *)((char *)a1)) != 2) goto L5860D;
+    if (((int)(unsigned short)(*(short *)((char *)a1 + 21) & 2)) == 0) goto L5860F;
+L5860D:;
+    return;
+L5860F:;
+    if (((int)(short)*(short *)D_001AA586) < *(int *)D_001AA560) goto L58631;
+    if (((int)(short)*(short *)D_001AA586) < (*(int *)D_001AA560 + 4)) goto L58633;
+L58631:;
+    goto L58669;
+L58633:;
+    *(int *)(D_001AA568 + ((((int)(short)*(short *)D_001AA586) - *(int *)D_001AA560) << 2)) = a1;
+    func_000934F6(a1, (int)(short)(*(short *)D_001AA586 - *(short *)D_001AA560), a2);
+L58669:;
+    (*(short *)D_001AA586)++;
 }
 
 void func_00058679(void)

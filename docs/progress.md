@@ -521,3 +521,10 @@ Also from the batch, new clusters to look at next:
   arithmetic, so OW loads the base pointer into a register as Watcom 10 did (+4). One remaining
   shape (`add eax,edx` versus OW's `add edx,eax`) is register allocation and has no C-level
   fix.
+
+## 2026-10-01: unused `x++` keeps its load only for locals (+32)
+
+The original's unused `g++` on a global is a plain `inc [g]`; only stack variables get the
+`mov eax,[x]` first. In `TNPostGets()` the lvalue is a leaf whose address name (`u.addr`) has
+class `CL_ADDR_GLOBAL` for globals (found in the debug compiler after two wrong guesses about
+the tree shape). The keep flag now skips those. Batch **1,072**.

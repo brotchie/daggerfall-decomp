@@ -71,6 +71,20 @@ L6A8F3:;
     return 1;
 }
 
+void func_0006AB2B(void)
+{
+    if (*(int *)D_001A3FA0 == 0) return;
+    func_00069938(205, *(int *)D_00195AA4, 100);
+    (*(int *)D_001A3FA0)--;
+}
+
+void func_0006AB67(void)
+{
+    if ((*(int *)D_001A3FA8 - 1) <= *(int *)D_001A3FA0) return;
+    func_00069938(205, *(int *)D_00195AA4, 100);
+    (*(int *)D_001A3FA0)++;
+}
+
 void func_0006ADDB(void)
 {
     int l_1C;

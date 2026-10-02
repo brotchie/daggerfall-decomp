@@ -83,6 +83,20 @@ L5A2AB:;
     *(short *)D_00199D5E = 0;
 }
 
+void func_0005A337(void)
+{
+    if (*(short *)D_00199D5C == 0) return;
+    func_00069938(205, *(int *)D_00195AA4, 100);
+    (*(short *)D_00199D5C)--;
+}
+
+void func_0005A375(void)
+{
+    if (((int)(short)*(short *)D_00199D5C) == (((int)(short)*(short *)D_00199D60) - 1)) return;
+    func_00069938(205, *(int *)D_00195AA4, 100);
+    (*(short *)D_00199D5C)++;
+}
+
 void func_0005A54A(int a1, short a2, short a3)
 {
     func_0012DBCC((int)(short)a2, (int)(short)a3, a1);

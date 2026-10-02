@@ -75,6 +75,7 @@ extern void func_0008C566(int, int);
 int func_0004EBAC(int);
 int func_0004EC16(int);
 void func_0004E108(void);
+void func_0004E18B(void);
 void func_0004E1BC(void);
 void func_0004EC7A(void);
 
@@ -296,10 +297,56 @@ void func_0004E2AB(short a1)
     func_00069938(205, *(int *)D_00195AA4, 100);
 }
 
+void func_0004E30F(void)
+{
+    if (*(short *)D_001997E2 == 0) return;
+    func_0004E108();
+    (*(short *)D_001997E2)--;
+    func_0004E18B();
+    if (*(signed char *)D_001997ED != 0) return;
+    func_00069938(205, *(int *)D_00195AA4, 100);
+}
+
+void func_0004E360(void)
+{
+    int l_18;
+
+    l_18 = ((unsigned)func_000A006E((int)(short)*(short *)D_001997E8, 0, 2)) / 3640;
+    func_0004E108();
+    if (((int)(short)*(short *)D_001997E2) >= (((int)(short)*(short *)&l_18) - 1)) goto L4E3D1;
+    (*(short *)D_001997E2)++;
+    func_0004E18B();
+    if (*(signed char *)D_001997ED != 0) goto L4E3CC;
+    func_00069938(205, *(int *)D_00195AA4, 100);
+L4E3CC:;
+    return;
+L4E3D1:;
+    if (*(signed char *)((char *)*(int *)D_001997D4) == 0) return;
+    func_000A006E((int)(short)*(short *)D_001997E8, 0, 2);
+    func_000A0040(*(int *)D_001997D4, 0, 3640, (int)D_00174FAC, 507, 4);
+    func_000A0B42((int)(short)*(short *)D_001997E8, *(int *)D_001997D4, 3640);
+    *(int *)D_001997BC = func_000A1235((int)(short)*(short *)D_001997E8);
+    (*(short *)D_001997E2)++;
+    if (*(signed char *)D_001997ED != 0) return;
+    func_00069938(205, *(int *)D_00195AA4, 100);
+}
+
+void func_0004E466(void)
+{
+    (*(signed char *)D_001997EA)++;
+    *(signed char *)D_001997EA &= 3;
+}
+
 void func_0004E48B(void)
 {
     *(short *)D_001851FF = (unsigned char)func_000A138E((int)(short)(*(short *)D_0012AC04 - *(short *)D_000CEA30), (int)(short)((*(short *)D_0012AC06 - 1) - *(short *)D_000CEA34));
     *(signed char *)D_001997EB = (((int)(short)*(short *)D_0012AC04) - 52) >> 3;
+}
+
+void func_0004E4E1(void)
+{
+    (*(short *)D_001997DC)++;
+    *(short *)D_001997DC &= 3;
 }
 
 int func_0004E5C7(int a1)
