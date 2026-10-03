@@ -1458,4 +1458,19 @@ the reason patched OW could not get these:
     A13DA/A13F7 _dos_findfirst/_dos_findnext, A1004 unlink, 6CDAB open, 6CE0D creat,
     A00CB read, A0B42 write, A006E lseek, 9DEA7 close, 9DEAC abs; D_00178630 is `_IsTable`.
   Build **2,295** (99.56%).
+- The last two:
+  - **8D497**: `l_30 = a1->top * a1->h2 / a1->count;` with `short l_30`. The I4→I2 convert
+    before the (dword) store adds one conflict to the block, which reorders 10.0a's unstable
+    sort of the block's conflicts: `top` then gets edx and coalesces with the product. A
+    destination's type is a register-allocation lever even when the code is the same.
+  - **77B9E**: case 16 is `if (func_0009DC25() % 1) func_0006974E(c ? A : B); else
+    func_0006974E(c ? A : B);`, a random pick from one choice. The front end keeps the `if`
+    (the call has side effects), the code generator folds `% 1` to 0 and drops the dead
+    branch, but the dead branch's `?:` temp keeps its slot: a frame slot no instruction
+    touches. (The dead branch's own strings left no trace; it is written as a copy.)
+  - Temps get their slots when code is flushed at front-end control flow (if/else, labels,
+    goto/break, case labels), newest first before the first `switch`, in instruction order
+    after it; an unused inner-block local gets a slot only before the first switch body.
+- **Build 2,297 / 2,297 (100%), every function compiled by Watcom C32 10.0a**; merged into
+  main.
 
