@@ -8,7 +8,6 @@ extern char D_00195BE0[];
 
 extern void func_00067875(int);
 extern void func_0008E3F7(int, int);
-#pragma dagger slots func_000679BB a1 12 l_18 4 ret 8
 
 int func_000679BB(int a1)
 {

@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Compile one C file with wcc386 and diff each of its functions against FALL.EXE.
+"""Compile one C file with Watcom C32 10.0a and diff each of its functions against FALL.EXE.
 
 Adapted from KKND-Decomp's match.py (CC0):
-  1. `bwcc386 <flags> file.c` -> OMF object (tools/omf.py reads it)
+  1. `wcc386 <flags> file.c` under DOSBox-X (tools/wcc10.py) -> OMF object (tools/omf.py)
   2. every public in a CODE segment named `func_XXXXXXXX` (or listed in config/symbols.txt)
      is cut out and compared to the original bytes at its VA
   3. bytes under a relocation on *either* side are masked; everything else must be identical,
@@ -17,7 +17,6 @@ import csv
 import os
 import re
 import shutil
-import subprocess
 import sys
 import tempfile
 
@@ -31,15 +30,6 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 EXE = os.path.join(ROOT, "orig", "1.07.213", "FALL.EXE")
 
 
-def compiler():
-    """$WCC386, else the patched boot compiler from tools/build_ow.sh."""
-    cc = os.environ.get("WCC386") or os.path.join(
-        ROOT, "third_party", "open-watcom-v2", "build", "binbuild", "bwcc386")
-    if not os.path.exists(cc):
-        raise SystemExit("no compiler at %s: run tools/build_ow.sh" % cc)
-    return cc
-
-
 def default_flags():
     p = os.path.join(ROOT, "config", "cflags.txt")
     if os.path.exists(p):
@@ -48,31 +38,14 @@ def default_flags():
 
 
 def compile_c(src, flags, obj):
-    if os.environ.get("DAGGER_CC") == "w10":
-        # the real Watcom C32 10.0a under DOSBox-X (tools/wcc10.py)
-        import wcc10
-        with tempfile.TemporaryDirectory() as td:
-            objs, _ = wcc10.compile_many([src], flags, workdir=td)
-            if objs[src] is None:
-                err = open(os.path.join(td, "N0000.ERR"), errors="replace").read()
-                sys.stderr.write(err)
-                raise SystemExit("compile failed")
-            shutil.move(objs[src], obj)
-        return
+    """Compile `src` with Watcom C32 10.0a (tools/wcc10.py) into the OMF object `obj`."""
+    import wcc10
     with tempfile.TemporaryDirectory() as td:
-        base = os.path.splitext(os.path.basename(src))[0]
-        shutil.copyfile(src, os.path.join(td, base + ".c"))
-        cmd = [compiler(), "-q", "-zq"] + flags + [
-            "-i=" + os.path.join(ROOT, "include"), "-i=" + os.path.join(ROOT, "src"),
-            "-fo=" + base + ".obj", base + ".c"]
-        r = subprocess.run(cmd, capture_output=True, text=True, cwd=td)
-        out = os.path.join(td, base + ".obj")
-        if r.returncode != 0 or not os.path.exists(out):
-            sys.stderr.write(r.stdout + r.stderr)
+        objs, _ = wcc10.compile_many([src], flags, workdir=td)
+        if objs[src] is None:
+            sys.stderr.write(open(os.path.join(td, "N0000.ERR"), errors="replace").read())
             raise SystemExit("compile failed")
-        if r.stdout.strip():
-            sys.stderr.write(r.stdout)
-        shutil.move(out, obj)
+        shutil.move(objs[src], obj)
 
 
 def symbol_map():

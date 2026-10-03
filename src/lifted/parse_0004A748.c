@@ -13,12 +13,11 @@ extern int func_000A0ED9(int, int);
 extern int func_000A0F5C(int, ...);
 extern int func_000A1023();
 #pragma aux func_000A0ED9 parm routine [];
-#pragma dagger slots func_0004A748 a1 16 a2 20 a3 4 a4 12 l_2C 36 l_10 8
 
-void func_0004A748(int a1, short a2, short a3, short a4)
+void func_0004A748(int a1, int a2, short a3, int a4)
 {
-    char l_2C[16];
     int l_10;
+    char l_2C[16];
 
     *(int *)D_00199764 = a1;
     if (*(short *)((char *)a1 + 4) == 0) goto L4A79D;
@@ -29,7 +28,7 @@ L4A79D:;
     func_000A1023((int)l_2C, a1 + 6, 8, (int)D_0017110C, 2018, 13);
 L4A7BC:;
     *(signed char *)((char *)l_2C + 8) = 0;
-    l_10 = func_0003E7D7((int)l_2C, (int)(short)a2, (int)(short)a3, (int)(short)a4);
+    l_10 = func_0003E7D7((int)l_2C, (int)(short)*(short *)&a2, (int)(short)a3, (int)(short)*(short *)&a4);
     if (l_10 == 0) return;
     func_000A0AD9((int)D_00190FE4, l_10, 2048, (int)D_0017110C, 2022);
     if (l_10 == 0) goto L4A808;

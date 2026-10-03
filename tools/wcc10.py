@@ -7,7 +7,7 @@ and WATCOM/H into third_party/watcom10/w10a/WATCOM (they are never committed). B
 is a Win32-format binary that runs on DOS through BIN/W32RUN.EXE and DOS4GW.EXE.
 
 usage: wcc10.py file.c [file.c ...] [--flags "..."] [--func name] [-q]
-       (each file's functions are compared when its name is func_XXXXXXXX.c, or --func)
+       (every function a file defines is checked, or just --func)
 
 All files go through one DOSBox-X session (8.3 names N0000.C, N0001.C, ...).
 """
@@ -24,10 +24,6 @@ from omf import OMF  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 W10 = os.path.join(ROOT, "third_party", "watcom10", "w10a")
-# FALL.EXE was built with debug info (-d2): it keeps the dead `mov eax,[i]` of `i++` and
-# orders the stack frame its own way, so src/w10/ adds it to config/cflags.txt.
-FLAGS = ["-d2"]
-
 
 def available():
     """True when the compiler has been extracted and DOSBox-X is on PATH."""
@@ -38,13 +34,22 @@ def available():
 def compile_many(srcs, flags, workdir=None):
     """Compile `srcs` with Watcom 10.0a; returns {src: obj path or None} (and the log)."""
     td = workdir or tempfile.mkdtemp(prefix="wcc10_")
-    flags = list(flags) + os.environ.get("DAGGER_W10EXTRA", "").split()
+    flags = list(flags)
     lines = ["@echo off", "set WATCOM=D:\\WATCOM", "set INCLUDE=D:\\WATCOM\\H",
              "set PATH=D:\\WATCOM\\BINB;D:\\WATCOM\\BIN;Z:\\", "C:"]
     names = {}
+    # the project's own headers (include/) sit next to the sources
+    inc = os.path.join(ROOT, "include")
+    for h in os.listdir(inc) if os.path.isdir(inc) else []:
+        shutil.copyfile(os.path.join(inc, h), os.path.join(td, h))
     for k, src in enumerate(srcs):
         n = "N%04d" % k
         names[src] = n
+        if src.lower().endswith(".asm"):
+            # hand-written assembly: the 10.0a assembler
+            shutil.copyfile(src, os.path.join(td, n + ".ASM"))
+            lines.append("wasm -q %s.ASM > %s.ERR" % (n, n))
+            continue
         shutil.copyfile(src, os.path.join(td, n + ".C"))
         lines.append("wcc386 %s %s.C > %s.ERR" % (" ".join(flags), n, n))
     lines.append("echo done > DONE.TXT")
@@ -83,36 +88,46 @@ def main():
     le = LE(match.EXE)
     fix_at = {f.src_va: f for f in le.fixups()}
     gsyms = build_fall.load_symbols()
-    nok = 0
-    for src, obj in objs.items():
-        name = a.func or os.path.basename(src)[:-2]
+    nok = ntot = 0
+    for k, (src, obj) in enumerate(objs.items()):
         if obj is None:
-            err = open(os.path.join(td, "N%04d.ERR" % list(objs).index(src)), errors="replace").read()
-            print("ERROR", name, err.strip().splitlines()[-1:] if err.strip() else "")
+            err = open(os.path.join(td, "N%04d.ERR" % k), errors="replace").read()
+            print("ERROR", src, err.strip().splitlines()[-1:] if err.strip() else "")
+            ntot += 1
             continue
-        if name not in syms:
-            print("?", name, obj)
-            continue
-        va, size = syms[name]
-        try:
-            ok, diff = match.compare(tgt, OMF(obj), name, va, size, quiet=a.q)
-        except KeyError:
-            print("MISSING", name)
-            continue
-        bad = None
-        if ok:
-            o = OMF(obj)
-            for pub, si, off, size in o.functions():
-                if build_fall.c_name(pub) != name:
-                    continue
-                lo = max([q + z for _p, s2, q, z in o.functions() if s2 == si and q < off] + [0])
-                bad = build_fall.check_relocs(o, si, lo, off, size, va, tgt, fix_at, syms,
-                                              gsyms, le, {})
-            ok = bad is None
-        nok += ok
-        print("%-4s %s %s" % ("OK" if ok else "FAIL", name,
-                              "" if ok else bad or "%d bytes" % diff))
-    print("%d / %d match" % (nok, len(objs)))
+        o = OMF(obj)
+        fns = o.functions()
+        # every function the file defines (or just --func)
+        names = [a.func] if a.func else [build_fall.c_name(p) for p, _s, _o, _z in fns
+                                         if build_fall.c_name(p) in syms]
+        for name in names:
+            ntot += 1
+            if name not in syms:
+                print("?", name, obj)
+                continue
+            va, size = syms[name]
+            try:
+                ok, diff = match.compare(tgt, o, name, va, size, quiet=a.q)
+            except KeyError:
+                print("MISSING", name)
+                continue
+            bad = None
+            if ok:
+                for pub, si, off, fsize in fns:
+                    if build_fall.c_name(pub) != name:
+                        continue
+                    lo = max([q + z for _p, s2, q, z in fns if s2 == si and q < off] + [0])
+                    bad = build_fall.check_relocs(o, si, lo, off, fsize, va, tgt, fix_at, syms,
+                                                  gsyms, le, {})
+                    # (a switch table ahead of the code: the bytes since the previous function)
+                    if bad is None and lo < off and \
+                            tgt.bytes_at(va - (off - lo), off - lo) != bytes(o.data[si][lo:off]):
+                        bad = "leading table bytes differ"
+                ok = bad is None
+            nok += ok
+            print("%-4s %s %s" % ("OK" if ok else "FAIL", name,
+                                  "" if ok else bad or "%d bytes" % diff))
+    print("%d / %d match" % (nok, ntot))
     if not a.srcs or len(a.srcs) == 1:
         print("work dir:", td)
 

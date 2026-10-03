@@ -27,11 +27,11 @@ extern void func_0007D0DA(void);
 
 void func_0003EC2A(int a1, short a2)
 {
-    int l_28;
     int l_24;
     int l_20;
-    int l_1C;
+    int l_28;
     int l_18;
+    int l_1C;
 
     if (*(signed char *)D_00196270 != 0) return;
     *(int *)D_0019965C = func_000A00AF(64000, (int)D_00170D55, 697);

@@ -36,14 +36,13 @@ extern void func_00064589(int, int);
 extern void func_00070370(int, unsigned char);
 int func_0001345E(int);
 #pragma aux func_000A0ED9 parm routine [];
-#pragma dagger KKND_CONFREV func_00012FCE
 
 int func_00012E04(int a1, int a2, int a3)
 {
+    short l_10;
     short l_1C;
     short l_18;
     short l_14;
-    short l_10;
 
     if (a3 == 0) goto L12E32;
 L12E1F:;
@@ -134,11 +133,11 @@ L1309C:;
 L1309E:;
     if (((int)(short)*(short *)(D_00196304 + (a1 * 2))) != 256) goto L130E4;
     func_000A0ED9(105, (int)D_00170150);
-    func_000A0F5C(*(int *)D_00195C44, (int)D_0017015A, a2, (a1 * 13) + ((int)D_00196354));
+    func_000A0F5C(*(int *)D_00195C44, (int)D_0017015A, a2, ((int)D_00196354) + (a1 * 13));
     goto L13115;
 L130E4:;
     func_000A0ED9(107, (int)D_00170150);
-    func_000A0F5C(*(int *)D_00195C44, (int)D_00170172, a3, (a1 * 13) + ((int)D_00196354));
+    func_000A0F5C(*(int *)D_00195C44, (int)D_00170172, a3, ((int)D_00196354) + (a1 * 13));
 L13115:;
     func_00050069(*(int *)D_00195C44);
     return 0;

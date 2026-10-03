@@ -77,12 +77,6 @@ void func_0001FAB2(void);
 void func_0001FB3F(void);
 void func_0001FD7C(int);
 void func_0001FE4D(void);
-#pragma dagger DAGGER_CONFPOS func_0001F958
-#pragma dagger DAGGER_CONFPOSREV func_0001FBF5
-#pragma dagger DAGGER_PTRSWAP func_0001FB3F
-#pragma dagger KKND_CONFREV func_0001FB3F
-#pragma dagger reg func_0001F958 437 bx
-#pragma dagger reg func_0001FB3F 437 bx
 
 void func_0001F0C5(void)
 {

@@ -533,6 +533,13 @@ class Func:
             elif any(a - 3 <= o < a for o in known) and not os.environ.get("LIFT_NOSMALLARR"):
                 # an address-taken slot with bytes of it read separately: a 4-byte array
                 self.arrays[a] = 4
+        # an address-taken slot inside a bigger array is one of its elements (buf and buf + 2),
+        # not an array of its own
+        if not os.environ.get("LIFT_NOARRAYNEST"):
+            for a in sorted(self.arrays):
+                if any(b > a and b - self.arrays[b] <= a - self.arrays[a]
+                       for b in self.arrays if b != a):
+                    del self.arrays[a]
         inside = {}
         for a, size in self.arrays.items():
             for o in range(a - size + 1, a):
@@ -641,6 +648,8 @@ class Func:
             if sc != 1:
                 iexp = "%s * %d" % (iexp, sc)
             arr = "l_%X" % lo
+            if lo not in self.arrays and lo in getattr(self, "inside", {}):
+                arr = "(l_%X + %d)" % (self.inside[lo], self.inside[lo] - lo)
             return "*(%s *)((char *)%s + %s)" % (STYPE[size], arr, iexp)
         off = ebp_slot(ins, op)
         if off is not None and off in getattr(self, "inside", {}):
@@ -789,7 +798,7 @@ class Func:
                 return E("%s%s" % (pre.pop(t), lv), op.size, atom=False)
             if self.side and len(self.side) == 1 and off_ is not None and \
                     self.side[0].startswith(t + " = ") and self.store_read_pairs(off_) \
-                    and os.environ.get("DAGGER_CC") == "w10" and not os.environ.get("LIFT_KEEPSPILL"):
+                    and not os.environ.get("LIFT_KEEPSPILL"):
                 # (x = a, x) on a slot used nowhere else: the compiler's own spill of a
                 # (Watcom 10.0a spills an argument it evaluated before a call): just a
                 v = self.side[0][len(t) + 3:]
@@ -1320,14 +1329,13 @@ class Func:
                     nx is not None and nx.mnemonic == "mov" and len(nx.operands) == 2 and \
                     nx.operands[0].type == cx.X86_OP_REG and \
                     ebp_slot(nx, nx.operands[1]) == off_ and \
-                    fixup_at(ins, ins.imm_offset) is None and self.store_read_pairs(off_) \
-                    and (os.environ.get("DAGGER_CC") == "w10" or os.environ.get("LIFT_ABSTEMP")):
+                    fixup_at(ins, ins.imm_offset) is None and self.store_read_pairs(off_):
                 # mov [t],0x46c; mov eax,[t]; mov eax,[eax]: *(int *)0x46c, the address in a
                 # temp of the compiler's own (Watcom 10.0a -d2 makes one)
                 self.temps.add(off_)
                 self.slot_val[off_] = E(str(s.imm), 4, atom=True)
                 return
-            if off_ is not None and d.size == 4 and os.environ.get("DAGGER_CC") == "w10" and \
+            if off_ is not None and d.size == 4 and \
                     re.fullmatch(r"-?\d+|(?:\(int\))?D_[0-9A-F]{8}", v.text) and \
                     self.store_read_pairs(off_):
                 # a constant or a global's address stored once and read once: an argument
@@ -2867,6 +2875,101 @@ class Func:
                                              "(%s)" % target, ", ".join(args)), 4, atom=True)
         self.finish_call(call, len(args))
 
+    def frame_order(self, outer):
+        """Declaration order of `outer` (frame offsets) that makes Watcom 10.0a -d2 put every
+        variable where the original has it, plus unused locals for gaps; None if there is
+        none. The compiler's rule (tools/w10_frame.py): the register parameters in order,
+        the locals in declaration order and the return slot are shell-sorted by size,
+        largest first (gaps n/2, then alternately g/2+1 and g/2; not stable), and allocated
+        from the bottom up, the last one nearest ebp, each slot at least 4 bytes. The sort's
+        permutation depends only on the sizes, so search the arrangements of the locals'
+        sizes for one whose permutation lands every variable on its slot."""
+        def size(o):
+            if o in self.arrays:
+                return self.arrays[o]
+            return self.size_of.get(self.slot_type.get(o, "int"), 4)
+
+        def slot(n):
+            return max(4, (n + 3) & ~3)
+        params = [("p", off, size(off)) for _r, off, _sz in self.params]
+        ret = [] if self.void or self.ret_slot is None else \
+            [("r", self.ret_slot, self.size_of.get(self.ret_type, 4))]
+        items = params + [("l", o, size(o)) for o in outer] + ret
+        # top down, from the saved registers: fill the gaps with unused int locals
+        cur = 4 * len(self.saved)
+        dummies = []
+        for kind, off, n in sorted(items, key=lambda x: x[1] - slot(x[2])):
+            top = off - slot(n)
+            if top < cur:
+                return None
+            while top - cur >= 4:
+                dummies.append(cur + 4)
+                cur += 4
+            if top != cur:
+                return None
+            cur = off
+        locs = [("l", o, size(o)) for o in outer] + [("d", o, 4) for o in dummies]
+        target = [x[1] for x in sorted(params + locs + ret, key=lambda x: x[1])]
+        k, m = len(params), len(locs)
+
+        def gaps(n):
+            s = [n // 2] if n // 2 >= 1 else []
+            alt = True
+            while s and s[-1] > 1:
+                s.append(s[-1] // 2 + 1 if alt else s[-1] // 2)
+                alt = not alt
+            return s
+
+        def perm(keys):
+            a = list(range(len(keys)))
+            for g in gaps(len(a)):
+                for i in range(g, len(a)):
+                    t, j = a[i], i
+                    while j >= g and keys[a[j - g]] < keys[t]:
+                        a[j] = a[j - g]
+                        j -= g
+                    a[j] = t
+            return a[::-1]          # top down: input positions
+
+        by_size = {}
+        for x in locs:
+            by_size.setdefault(x[2], []).append(x)
+
+        def arrangements(counts, n):
+            # distinct sequences of sizes, the commonest size first everywhere it can be
+            if n == 0:
+                yield []
+                return
+            for s in sorted(counts, key=lambda s: -counts[s]):
+                if counts[s]:
+                    counts[s] -= 1
+                    for rest in arrangements(counts, n - 1):
+                        yield [s] + rest
+                    counts[s] += 1
+        counts = {s: len(v) for s, v in by_size.items()}
+        pkeys = [x[2] for x in params]
+        rkeys = [x[2] for x in ret]
+        for tries, arr in enumerate(arrangements(counts, m)):
+            if tries > 20000:
+                return None
+            td = perm(pkeys + arr + rkeys)
+            order = [None] * m
+            ok = True
+            for pos, off in zip(td, target):
+                if pos < k:
+                    ok = params[pos][1] == off
+                elif pos >= k + m:
+                    ok = ret[0][1] == off
+                else:
+                    x = next((x for x in locs if x[1] == off), None)
+                    ok = x is not None and x[2] == arr[pos - k]
+                    order[pos - k] = x
+                if not ok:
+                    break
+            if ok:
+                return [(x[1], x[0] == "d") for x in order]
+        return None
+
     def decl_line(self, o, two):
         if o in self.arrays:
             return "    char l_%X[%d];" % (o, self.arrays[o])
@@ -3227,6 +3330,15 @@ class Func:
             closers.append((["case %d:" % v for v in sw.get("explicit", [])] + ["default:;"]
                             if sw.get("default") == "END" else []) + ["}"])
         decl_lines = [self.decl_line(o, two) for o in outer]
+        if not os.environ.get("LIFT_NOFRAMEORDER"):
+            # the declaration order Watcom 10.0a's frame sort turns into the original's
+            # slots (a function-level choice: -2100 keeps the old order)
+            fo = self.frame_order(outer)
+            if fo is not None:
+                self.choices.append(-2100)
+                if -2100 not in self.flips:
+                    decl_lines = ["    int l_%X;          /* unused: holds its slot */" % o
+                                  if dummy else self.decl_line(o, two) for o, dummy in fo]
         if early:
             decl_lines += ["{"] + [self.decl_line(o, two) for o in early]
         if nested and at is None:
@@ -3273,39 +3385,10 @@ class Func:
             lines.append("}")
         lines.append("}")
         decl = ["/* lifted from 0x%08X */" % self.va] + sorted(self.structs)
-        # last resort, a function-level choice: pin every variable at its frame depth
-        self.choices.append(PIN_SLOTS)
-        if (PIN_SLOTS in self.flips) != getattr(self, "force_pin", False) or \
-                getattr(self, "must_pin", False):
-            base = 4 * len(self.saved)
-            pins = []
-            for k, (_r, off, _sz) in enumerate(self.params):
-                pins.append(("a%d" % (k + 1), off - base))
-            for o in locals_:
-                pins.append(("l_%X" % o, o - base))
-            if self.ret_slot:
-                pins.append(("ret", self.ret_slot - base))
-            if pins:
-                decl.append("#pragma dagger slots %s %s" % (
-                    name, " ".join("%s %d" % (n, d) for n, d in pins)))
-        # register pins (#pragma dagger reg), set by the search at register-only
-        # differences: flips -(3000 + 16 k + r)
-        wins = sorted(win_decode(f) for f in self.flips if f <= -200000)
-        if wins:
-            decl.append("#pragma dagger confwin %s %s" % (
-                name, " ".join("%d %d" % (a, b) for a, b in wins)))
-        pins = sorted(pin_decode(f) for f in self.flips if -200000 < f <= -3000)
-        if pins:
-            decl.append("#pragma dagger reg %s %s" % (
-                name, " ".join("%d %s" % (k, r) for k, r in pins)))
-        # function-level choice points: code generator options (#pragma dagger), and the
-        # default spelling of p->arr[i] (field offset with the pointer, or after the sum)
+        # function-level choice points: the default spelling of p->arr[i] (field offset with
+        # the pointer, or after the sum)
         self.choices.append(FIELD_LAST)
         self.choices.extend(INVERT_KINDS)
-        self.choices.extend(-1 - k for k in range(len(FUNC_OPTS)))
-        for k, opt in enumerate(FUNC_OPTS):
-            if -1 - k in self.flips:
-                decl.append("#pragma dagger %s %s" % (opt, name))
         if self.conv == "sosconv":
             decl.append(SOSCONV)
             decl.append("#pragma aux (sosconv) %s;" % name)
@@ -3338,40 +3421,7 @@ SIGS = {}
 POPS = {}
 
 
-# Code generator switches the batch search may turn on for one function
-# (`#pragma dagger <SWITCH> <function>`, DaggerEnv() in the compiler)
-PIN_SLOTS = -1000         # the choice point for `#pragma dagger slots`
 FIELD_LAST = -9999        # p->arr[i] spelt (char *)(p + i*k) + off by default
-PIN_REGS = ["eax", "ebx", "ecx", "edx", "esi", "edi", "ax", "bx", "cx", "dx", "si", "di"]
-
-
-def pin_encode(k, reg):
-    """The flip for `#pragma dagger reg <f> k reg`."""
-    return -(3000 + 16 * k + PIN_REGS.index(reg))
-
-
-def win_encode(k1, k2):
-    """The flip for `#pragma dagger confwin <f> k1 k2`."""
-    return -(200000 + 64 * k1 + (k2 - k1))
-
-
-def win_decode(f):
-    n = -f - 200000
-    return n // 64, n // 64 + n % 64
-
-
-def pin_decode(f):
-    n = -f - 3000
-    return n // 16, PIN_REGS[n % 16]
-FUNC_OPTS = ["KKND_CONFREV", "DAGGER_LEFTPREF", "DAGGER_CHARAUTOSMALL", "DAGGER_CLRAFTER",
-             "DAGGER_WORDSTORE", "DAGGER_RMW", "DAGGER_PUSHMEM", "DAGGER_DEADDEF", "DAGGER_CDQ",
-             "DAGGER_FLUSH", "DAGGER_CHARPARMBIG", "DAGGER_SIGNEDBF", "KKND_CONSTREG",
-             "KKND_LINSEL", "KKND_NOROT", "KKND_STRETCH", "DAGGER_FIRSTUSE",
-             "DAGGER_NOSAVES", "DAGGER_REGLAST", "DAGGER_NOGIVEN", "DAGGER_CONFLIST",
-             "DAGGER_CONFLISTREV", "DAGGER_KEEPSUB", "DAGGER_NODEMOTE",
-             "DAGGER_NOCVTDEMOTE", "DAGGER_DEADDEFMEM", "DAGGER_CONFPOS", "DAGGER_CONFPOSREV", "DAGGER_RIGHTPREF",
-             "DAGGER_IDXKEEP", "DAGGER_SEXTCONST", "DAGGER_CALLFIRST",
-             "DAGGER_PTRSWAP"]
 IMPLICIT = bool(os.environ.get("LIFT_IMPLICIT"))
 
 

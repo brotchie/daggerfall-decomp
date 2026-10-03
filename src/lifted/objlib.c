@@ -109,8 +109,6 @@ void func_00085BB2(void);
 void func_00085EF8(int);
 void func_0008600F(int);
 #pragma aux func_000A0ED9 parm routine [];
-#pragma dagger DAGGER_RMW func_00084A7C
-#pragma dagger DAGGER_RMW func_00086149
 
 int func_00084A7C(int a1)
 {
@@ -858,19 +856,22 @@ void func_00086149(void)
     int l_30;
     int l_2C;
     int l_28;
-    char l_24[16];
+    int l_24;
+    int l_20;
+    int l_1C;
+    int l_18;
 
     l_2C = func_000C5280(*(int *)(*(char **)D_00195AA4 + 7) ^ *(int *)(*(char **)D_00195AA4 + 15), (*(int *)D_001343C0 / 40) << 6);
     l_2C >>= 3;
     l_2C = 256 - l_2C;
     l_30 = (l_2C * 192) >> 8;
-    *(int *)((char *)l_24 + 4) = func_000C5280(*(int *)(*(char **)D_00195AA4 + 7) ^ *(int *)(*(char **)D_00195AA4 + 15), (*(int *)D_001343C0 / 40) << 6);
-    *(int *)((char *)l_24 + 4) >>= 3;
-    *(int *)((char *)l_24 + 8) = func_000C5280(*(int *)(*(char **)D_00195AA4 + 7) + *(int *)(*(char **)D_00195AA4 + 15), (*(int *)D_001343C0 / 40) << 6);
-    *(int *)((char *)l_24 + 8) >>= 3;
-    *(int *)((char *)l_24 + 12) = func_000C5280(*(int *)(*(char **)D_00195AA4 + 7) - *(int *)(*(char **)D_00195AA4 + 15), (*(int *)D_001343C0 / 40) << 6);
-    *(int *)((char *)l_24 + 12) >>= 3;
-    func_000CE6E2((((int)(short)*(short *)(*(char **)D_00195AA4 + 3)) + *(int *)D_001959BC) & 2047, 192, (int)&l_28, (int)l_24);
-    func_00136AD8((*(int *)(*(char **)D_00195AA4 + 7) + l_28) + (int)(*(char **)((char *)l_24 + 4) - 16), (*(int *)(*(char **)D_00195AA4 + 11) - 50) + (*(int *)((char *)l_24 + 8) - 16), (*(int *)(*(char **)D_00195AA4 + 15) + *(int *)l_24) + (*(int *)((char *)l_24 + 12) - 16), 50, l_30, 0);
-    func_00154D00((*(int *)(*(char **)D_00195AA4 + 7) + l_28) + (int)(*(char **)((char *)l_24 + 4) - 16), (*(int *)(*(char **)D_00195AA4 + 11) - 50) + (int)(*(char **)((char *)l_24 + 8) - 16), (*(int *)(*(char **)D_00195AA4 + 15) + *(int *)l_24) + (*(int *)((char *)l_24 + 12) - 16), 26883, -1, 1, 400);
+    l_20 = func_000C5280(*(int *)(*(char **)D_00195AA4 + 7) ^ *(int *)(*(char **)D_00195AA4 + 15), (*(int *)D_001343C0 / 40) << 6);
+    l_20 >>= 3;
+    l_1C = func_000C5280(*(int *)(*(char **)D_00195AA4 + 7) + *(int *)(*(char **)D_00195AA4 + 15), (*(int *)D_001343C0 / 40) << 6);
+    l_1C >>= 3;
+    l_18 = func_000C5280(*(int *)(*(char **)D_00195AA4 + 7) - *(int *)(*(char **)D_00195AA4 + 15), (*(int *)D_001343C0 / 40) << 6);
+    l_18 >>= 3;
+    func_000CE6E2((((int)(short)*(short *)(*(char **)D_00195AA4 + 3)) + *(int *)D_001959BC) & 2047, 192, (int)&l_28, (int)&l_24);
+    func_00136AD8((*(int *)(*(char **)D_00195AA4 + 7) + l_28) + (l_20 - 16), (*(int *)(*(char **)D_00195AA4 + 11) - 50) + (l_1C - 16), (*(int *)(*(char **)D_00195AA4 + 15) + l_24) + (l_18 - 16), 50, l_30, 0);
+    func_00154D00((*(int *)(*(char **)D_00195AA4 + 7) + l_28) + (l_20 - 16), (*(int *)(*(char **)D_00195AA4 + 11) - 50) + (l_1C - 16), (*(int *)(*(char **)D_00195AA4 + 15) + l_24) + (l_18 - 16), 26883, -1, 1, 400);
 }

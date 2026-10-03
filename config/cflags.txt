@@ -1,2 +1,2 @@
-# wcc386 flags for FALL.EXE game code (see docs/progress.md)
--od -s -of+ -4r
+# wcc386 flags for FALL.EXE game code: Watcom C32 10.0a, unoptimised, with debug info
+-od -s -of+ -4r -d2

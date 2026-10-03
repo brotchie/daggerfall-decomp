@@ -1,0 +1,7 @@
+# lifted functions that match only in a file of their own (tools/settle_lifted.py)
+func_0002FC03
+func_0005AE5F
+func_0005B107
+func_00094324
+func_000945C0
+func_000946D4

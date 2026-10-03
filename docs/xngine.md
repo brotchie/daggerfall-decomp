@@ -2,7 +2,7 @@
 
 Object 2 of `FALL.EXE` is the XnGine engine: hand-written asm, shared with Battlespire and
 Redguard. This file is the plan and running log for it, kept apart from `docs/progress.md` (the
-game C) while the work lives on the `xngine` branch.
+game C).
 
 ## Plan
 
@@ -249,8 +249,8 @@ reproduces each fingerprint:
 
 The build uses TASM: `tools/xn_link.py` runs `TASMX.EXE` (TASM 4.0 as a DPMI program;
 real-mode `TASM.EXE` runs out of memory on the larger modules and writes the same objects) in
-up to 8 DOSBox-X sessions side by side. Without TASM the build keeps object 2's original bytes,
-as it does for `src/w10` without the Watcom compiler. The generator writes the source the way
+up to 8 DOSBox-X sessions side by side. Without TASM the build keeps object 2's original
+bytes. The generator writes the source the way
 the authors evidently did: `jcc short L` for short forward jumps, a plain `jcc L` for the rest
 (TASM sizes them, and writes the 4 NOPs where they belong), `loop X` for the stretched
 sequence, and externs declared inside the 32-bit segment (outside it TASM addresses them with

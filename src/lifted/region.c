@@ -24,7 +24,6 @@ unsigned char func_00020089(int, int);
 unsigned char func_0002010F(int, int);
 unsigned char func_000201B8(int, int, int);
 void func_0001FF3F(unsigned char, unsigned char);
-#pragma dagger slots func_0001FF92 l_18 4 ret 8
 
 void func_0001FEBD(void)
 {

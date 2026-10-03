@@ -5,7 +5,6 @@ extern char D_00196570[];
 extern char D_001965D8[];
 
 extern void func_0007CA1F(int, int, int, int, unsigned char);
-#pragma dagger reg func_00016F74 4 ebx
 
 void func_00016F74(int a1, int a2, int a3, int a4)
 {

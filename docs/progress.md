@@ -1413,3 +1413,64 @@ the reason patched OW could not get these:
   constant as an extern it emits `fld; fmulp`. `(float)(x * K)` stored to a double gives
   the original `fmul [K]` bytes (the conversion emits no code there); the file says so.
 
+## The real compiler only (branch w10-only)
+
+- The patched Open Watcom is gone (tools/owpatch, tools/build_ow.sh, the lifter's compiler
+  knobs and register pins): everything is compiled by Watcom C32 10.0a under DOSBox-X, `-d2`
+  now in config/cflags.txt. A full build is one DOSBox-X run, about 40 s. The two assembly
+  helpers are src/int.asm, assembled by 10.0a's WASM (which encodes reg-to-reg moves as
+  `89 /r`; the original's assembler wrote `8b /r`, so those five are spelt as bytes).
+- Of the 2,246 functions matched under OW, 1,994 matched 10.0a as they were; re-lifting the
+  rest for 10.0a matched 75 more. src/w10/ is now src/hand/.
+- Watcom 10.0a's code for a function depends on its unit's declarations (a callee with or
+  without a prototype), so tools/settle_lifted.py promotes, builds, and moves a function
+  that fails inside its unit file to a file of its own (config/lift_alone.txt); six matched
+  only in one unit context and went back on the list. Build **2,063** (77.46%).
+- The lifter now picks the declaration order that Watcom 10.0a's frame sort turns into the
+  original's slots (tools/lift.py `frame_order`, unused locals for gaps): +27; an
+  address-taken slot inside a bigger array is one of its elements, and a slot difference
+  searches the whole frame's choices: +1. Build **2,091**.
+- The other 206 went to eight agents (src/hand/). Rules they established, beyond the first
+  round's:
+  - **Switch tables are aligned to 4 from the start of the object's code segment** (padding
+    `nop` / `mov eax,eax` / `lea eax,[eax]`), so a function with a jump table or a `repne
+    scas` value table matches only at its original offset mod 4. Such functions are
+    compiled together with their real predecessors: `src/hand/run_<last>.c` holds the
+    unit's functions in address order from the nearest one at the unit start's alignment
+    (20 runs, 82 functions). Two hand-written units (keys.c, generate.c) lost their only
+    function to a run.
+  - **Stack parameters take part in the frame sort** (two entries each, right after the
+    register parameters, neither given a slot); the **return slot is created at the first
+    `return`** and `*(int *)0x46c` address temps where they are first used, both in the
+    sorted list; ?: and switch temps and inner-block locals go below, in creation order;
+    unused inner-block locals take no slot (unused function-level ones do).
+  - Short locals ever read as bytes (`isalnum(s)`) are stored with word moves; taking a
+    short's address does the same.
+  - `while (n--)` is `dec [n]; cmp [n],-1`; `--n` and `n -= 1` are `add [n],-1`; `s += e`
+    on a short differs from `s = s + e`; `x /= 6` from `x = x / 6`.
+  - A `!` around a whole condition is free, one nested inside `&&`/`||` makes a 0/1 temp;
+    `if (A && B)` always has the jump-over-jump stub, nested ifs jump straight to the end.
+  - Mask tests on ints are narrowed to the byte or word they touch (`test byte [m+1],0x20`),
+    on unsigned char/short fields they are not; a narrowing cast as a condition gives
+    `test byte` too.
+  - Library callees identified: A0F5C sprintf, A1023 memcpy, A0E0D memmove, A0040 memset,
+    A0AD9 strncpy, A0DD9 itoa, A0DF4 strlen, A1079 memchr, A00AF malloc, A0024 free,
+    A13DA/A13F7 _dos_findfirst/_dos_findnext, A1004 unlink, 6CDAB open, 6CE0D creat,
+    A00CB read, A0B42 write, A006E lseek, 9DEA7 close, 9DEAC abs; D_00178630 is `_IsTable`.
+  Build **2,295** (99.56%).
+- The last two:
+  - **8D497**: `l_30 = a1->top * a1->h2 / a1->count;` with `short l_30`. The I4→I2 convert
+    before the (dword) store adds one conflict to the block, which reorders 10.0a's unstable
+    sort of the block's conflicts: `top` then gets edx and coalesces with the product. A
+    destination's type is a register-allocation lever even when the code is the same.
+  - **77B9E**: case 16 is `if (func_0009DC25() % 1) func_0006974E(c ? A : B); else
+    func_0006974E(c ? A : B);`, a random pick from one choice. The front end keeps the `if`
+    (the call has side effects), the code generator folds `% 1` to 0 and drops the dead
+    branch, but the dead branch's `?:` temp keeps its slot: a frame slot no instruction
+    touches. (The dead branch's own strings left no trace; it is written as a copy.)
+  - Temps get their slots when code is flushed at front-end control flow (if/else, labels,
+    goto/break, case labels), newest first before the first `switch`, in instruction order
+    after it; an unused inner-block local gets a slot only before the first switch body.
+- **Build 2,297 / 2,297 (100%), every function compiled by Watcom C32 10.0a**; merged into
+  main.
+

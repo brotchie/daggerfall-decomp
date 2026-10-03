@@ -5,8 +5,6 @@ extern char D_0018598A[];
 extern char D_00187966[];
 
 extern int func_000579FC(unsigned char);
-#pragma dagger DAGGER_RMW func_00057C5F
-#pragma dagger slots func_00057C5F a1 24 a2 8 a3 4 a4 12 l_1C 20 ret 16
 
 int func_00057C5F(int a1, unsigned char a2, unsigned char a3, int a4)
 {

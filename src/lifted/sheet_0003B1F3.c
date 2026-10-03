@@ -36,8 +36,8 @@ extern void func_0003C5A4(int);
 
 int func_0003B1F3(short a1)
 {
-    int l_24;
     int l_20;
+    int l_24;
 
     if (*(int *)D_00195D7C <= 0) goto L3B219;
     return 0;

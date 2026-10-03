@@ -70,7 +70,6 @@ extern int func_0007F2A8(int);
 extern int func_0008E5C4(int, int);
 extern int func_0009D61E(void);
 extern int func_0009DC25();
-extern int func_0009DEAC();
 extern int func_000A0040();
 extern int func_000A1023();
 extern int func_000CD367();
@@ -377,45 +376,6 @@ int func_0009A744(int a1, int a2)
     return 1;
 L9A7A5:;
     return 0;
-}
-
-void func_0009A7B8(void)
-{
-    char l_AC[72];
-    char l_64[80];
-
-    *(int *)((char *)l_64 + 76) = *(int *)(*(char **)D_00195AA4 + 67);
-L9A7D1:;
-    if (*(int *)((char *)l_64 + 76) == 0) goto L9A7EC;
-    if (((int)(unsigned short)(*(short *)(*(char **)((char *)l_64 + 76) + 21) & 1)) == 0) goto L9A7EE;
-L9A7EC:;
-    goto L9A7F9;
-L9A7EE:;
-    *(int *)((char *)l_64 + 76) = *(int *)(*(char **)((char *)l_64 + 76) + 67);
-    goto L9A7D1;
-L9A7F9:;
-    if (*(int *)((char *)l_64 + 76) == 0) goto L9A80E;
-    if (((int)(unsigned char)*(signed char *)(*(char **)((char *)l_64 + 76))) == 43) goto L9A813;
-L9A80E:;
-    return;
-L9A813:;
-    *(int *)((char *)l_64 + 72) = func_0009A5EF(*(int *)(*(char **)((char *)l_64 + 76) + 63), 19);
-    if (*(int *)((char *)l_64 + 72) == 0) return;
-    func_000A1023((int)l_AC, *(int *)((char *)l_64 + 72), 71, (int)D_00177358, 521, 4);
-    *(int *)((char *)l_64 + 72) = func_0009A5EF(*(int *)(*(char **)((char *)l_64 + 76) + 63), 20);
-    if (*(int *)((char *)l_64 + 72) == 0) return;
-    func_000A1023((int)l_64, *(int *)((char *)l_64 + 72), 71, (int)D_00177358, 525, 4);
-    if (func_0009DEAC(*(int *)(*(char **)D_00195AA4 + 11) - *(int *)((char *)l_AC + 11)) <= func_0009DEAC(*(int *)(*(char **)D_00195AA4 + 11) - *(int *)((char *)l_64 + 11))) goto L9A8E0;
-    *(int *)(*(char **)D_00195AA4 + 7) = *(int *)((char *)l_AC + 7);
-    *(int *)(*(char **)D_00195AA4 + 11) = *(int *)((char *)l_AC + 11);
-    *(int *)(*(char **)D_00195AA4 + 15) = *(int *)((char *)l_AC + 15);
-    goto L9A904;
-L9A8E0:;
-    *(int *)(*(char **)D_00195AA4 + 7) = *(int *)((char *)l_64 + 7);
-    *(int *)(*(char **)D_00195AA4 + 11) = *(int *)((char *)l_64 + 11);
-    *(int *)(*(char **)D_00195AA4 + 15) = *(int *)((char *)l_64 + 15);
-L9A904:;
-    *(signed char *)D_001940D5 |= 2;
 }
 
 int func_0009A915(int a1, int a2)

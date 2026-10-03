@@ -11,7 +11,6 @@ extern char D_00190D66[];
 extern char D_001998E2[];
 
 extern void func_00057147(short, short, short, short, short, short, short);
-#pragma dagger reg func_000568D6 437 bx
 
 void func_000568D6(int a1)
 {

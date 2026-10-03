@@ -20,11 +20,8 @@ extern char D_0018794A[];
 extern char D_001879CE[];
 extern char D_00187A12[];
 extern char D_00187A23[];
-extern char D_00187A62[];
 extern char D_00190704[];
-extern char D_001940D6[];
 extern char D_001959A8[];
-extern char D_00195AA0[];
 extern char D_00195AC4[];
 extern char D_00195B04[];
 extern char D_00195BE0[];
@@ -32,7 +29,6 @@ extern char D_001A4A0C[];
 
 extern int func_0007921F(int, unsigned short, int, int, int, int);
 extern int func_0007D6AE(int, int);
-extern int func_0008B29A(int, unsigned char, unsigned char);
 extern int func_0008DCE3(int, int, int);
 extern int func_0008EB88(int);
 extern int func_0009DC25();
@@ -40,7 +36,6 @@ extern int func_000A0024();
 extern int func_000A0040();
 extern int func_000A00CB();
 extern int func_000A1023();
-extern void func_0003D01C(int, int);
 extern void func_0004D195(int);
 extern void func_0005E540(int, int, int);
 extern void func_00060270(int, int);
@@ -51,8 +46,6 @@ extern void func_0008E3F7(int, int);
 void func_0007909F(int, int);
 void func_000792C1(int, int, int);
 void func_0007977F(int);
-#pragma dagger DAGGER_RMW func_0007909F
-#pragma dagger reg func_000792C1 30 edx 67 edx 68 edx 99 edx 110 edx 111 edx 142 edx
 
 void func_00078C79(void)
 {
@@ -354,30 +347,6 @@ L798C1:;
     *(int *)((char *)l_18 + 31) = func_0008EB88(((unsigned)*(int *)((char *)a1 + 31)) >> 16);
     l_14 = l_18 + 71;
     func_0005E540(27, 8, l_14);
-}
-
-void func_00079913(int a1)
-{
-    int l_20;
-    int l_1C;
-    int l_18;
-
-    l_20 = a1 + 71;
-    l_1C = (((*(unsigned char *)D_001940D6 & 64) != 0) ? -25 : 10);
-    if (((int)(unsigned char)*(signed char *)((char *)l_20 + 67)) < 43) goto L79994;
-    l_1C += (((int)(short)*(short *)(*(char **)D_00195BE0 + 42)) / 5) + (((int)(short)*(short *)(*(char **)D_00195BE0 + 163)) / 10);
-    goto L79A00;
-L79994:;
-    l_18 = (int)(unsigned char)*(signed char *)(D_00187A62 + ((int)(unsigned char)*(signed char *)((char *)l_20 + 67)));
-    if (l_18 == 0) goto L799D0;
-    l_1C += (int)(short)*(short *)(*(char **)D_00195BE0 + 157 + (l_18 * 6));
-    func_0003D01C(l_18, 1);
-L799D0:;
-    l_1C += func_0008B29A(*(int *)D_00195AA0, 44, 255);
-    l_1C += ((int)(short)*(short *)(*(char **)D_00195BE0 + 42)) / 5;
-L79A00:;
-    if (func_0007D6AE(1, 200) > l_1C) return;
-    *(signed char *)((char *)l_20 + 65) |= 128;
 }
 
 int func_00079A28(int a1)
