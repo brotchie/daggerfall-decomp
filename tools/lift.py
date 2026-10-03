@@ -2866,6 +2866,101 @@ class Func:
                                              "(%s)" % target, ", ".join(args)), 4, atom=True)
         self.finish_call(call, len(args))
 
+    def frame_order(self, outer):
+        """Declaration order of `outer` (frame offsets) that makes Watcom 10.0a -d2 put every
+        variable where the original has it, plus unused locals for gaps; None if there is
+        none. The compiler's rule (tools/w10_frame.py): the register parameters in order,
+        the locals in declaration order and the return slot are shell-sorted by size,
+        largest first (gaps n/2, then alternately g/2+1 and g/2; not stable), and allocated
+        from the bottom up, the last one nearest ebp, each slot at least 4 bytes. The sort's
+        permutation depends only on the sizes, so search the arrangements of the locals'
+        sizes for one whose permutation lands every variable on its slot."""
+        def size(o):
+            if o in self.arrays:
+                return self.arrays[o]
+            return self.size_of.get(self.slot_type.get(o, "int"), 4)
+
+        def slot(n):
+            return max(4, (n + 3) & ~3)
+        params = [("p", off, size(off)) for _r, off, _sz in self.params]
+        ret = [] if self.void or self.ret_slot is None else \
+            [("r", self.ret_slot, self.size_of.get(self.ret_type, 4))]
+        items = params + [("l", o, size(o)) for o in outer] + ret
+        # top down, from the saved registers: fill the gaps with unused int locals
+        cur = 4 * len(self.saved)
+        dummies = []
+        for kind, off, n in sorted(items, key=lambda x: x[1] - slot(x[2])):
+            top = off - slot(n)
+            if top < cur:
+                return None
+            while top - cur >= 4:
+                dummies.append(cur + 4)
+                cur += 4
+            if top != cur:
+                return None
+            cur = off
+        locs = [("l", o, size(o)) for o in outer] + [("d", o, 4) for o in dummies]
+        target = [x[1] for x in sorted(params + locs + ret, key=lambda x: x[1])]
+        k, m = len(params), len(locs)
+
+        def gaps(n):
+            s = [n // 2] if n // 2 >= 1 else []
+            alt = True
+            while s and s[-1] > 1:
+                s.append(s[-1] // 2 + 1 if alt else s[-1] // 2)
+                alt = not alt
+            return s
+
+        def perm(keys):
+            a = list(range(len(keys)))
+            for g in gaps(len(a)):
+                for i in range(g, len(a)):
+                    t, j = a[i], i
+                    while j >= g and keys[a[j - g]] < keys[t]:
+                        a[j] = a[j - g]
+                        j -= g
+                    a[j] = t
+            return a[::-1]          # top down: input positions
+
+        by_size = {}
+        for x in locs:
+            by_size.setdefault(x[2], []).append(x)
+
+        def arrangements(counts, n):
+            # distinct sequences of sizes, the commonest size first everywhere it can be
+            if n == 0:
+                yield []
+                return
+            for s in sorted(counts, key=lambda s: -counts[s]):
+                if counts[s]:
+                    counts[s] -= 1
+                    for rest in arrangements(counts, n - 1):
+                        yield [s] + rest
+                    counts[s] += 1
+        counts = {s: len(v) for s, v in by_size.items()}
+        pkeys = [x[2] for x in params]
+        rkeys = [x[2] for x in ret]
+        for tries, arr in enumerate(arrangements(counts, m)):
+            if tries > 20000:
+                return None
+            td = perm(pkeys + arr + rkeys)
+            order = [None] * m
+            ok = True
+            for pos, off in zip(td, target):
+                if pos < k:
+                    ok = params[pos][1] == off
+                elif pos >= k + m:
+                    ok = ret[0][1] == off
+                else:
+                    x = next((x for x in locs if x[1] == off), None)
+                    ok = x is not None and x[2] == arr[pos - k]
+                    order[pos - k] = x
+                if not ok:
+                    break
+            if ok:
+                return [(x[1], x[0] == "d") for x in order]
+        return None
+
     def decl_line(self, o, two):
         if o in self.arrays:
             return "    char l_%X[%d];" % (o, self.arrays[o])
@@ -3226,6 +3321,15 @@ class Func:
             closers.append((["case %d:" % v for v in sw.get("explicit", [])] + ["default:;"]
                             if sw.get("default") == "END" else []) + ["}"])
         decl_lines = [self.decl_line(o, two) for o in outer]
+        if not os.environ.get("LIFT_NOFRAMEORDER"):
+            # the declaration order Watcom 10.0a's frame sort turns into the original's
+            # slots (a function-level choice: -2100 keeps the old order)
+            fo = self.frame_order(outer)
+            if fo is not None:
+                self.choices.append(-2100)
+                if -2100 not in self.flips:
+                    decl_lines = ["    int l_%X;          /* unused: holds its slot */" % o
+                                  if dummy else self.decl_line(o, two) for o, dummy in fo]
         if early:
             decl_lines += ["{"] + [self.decl_line(o, two) for o in early]
         if nested and at is None:

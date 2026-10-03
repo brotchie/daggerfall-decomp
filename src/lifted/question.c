@@ -9,6 +9,8 @@ extern char D_00142336[];
 extern char D_00142338[];
 extern char D_00143550[];
 extern char D_0017539B[];
+extern char D_001753DB[];
+extern char D_001753E7[];
 extern char D_001852A3[];
 extern char D_001903A4[];
 extern char D_00190D64[];
@@ -22,10 +24,14 @@ extern char D_0019980C[];
 extern char D_00199816[];
 extern char D_00199817[];
 extern char D_00199818[];
+extern char D_00199819[];
+extern char D_0019981A[];
+extern char D_0019981B[];
 
 extern int func_0003D412(int, int, int);
 extern int func_00051B3E(int, int);
 extern int func_0006998C(int);
+extern int func_0006CB53(int, int);
 extern int func_0009DC25();
 extern int func_000A0024();
 extern int func_000A0040();
@@ -39,6 +45,7 @@ extern int func_000A1944();
 extern int func_000CD126();
 extern int func_000CE46D();
 extern int func_000CE49E();
+extern void func_00050069(int);
 extern void func_000516FD(int, int);
 extern void func_0005A54A(int, int, int);
 int func_00051991(short, short, int, int);
@@ -212,4 +219,45 @@ L51A33:;
     *(short *)((char *)a4) = (*(int *)&a2 - *(short *)D_00190D64) + 135;
 L51A49:;
     return 1;
+}
+
+int func_00051A5A(void)
+{
+    short l_1C;
+    int l_24;
+    short l_18;
+
+    func_0006CB53((int)D_001753DB, *(int *)D_00195C44);
+    *(int *)&l_1C = *(int *)D_00195C44 + 18;
+    l_24 = ((((int)(unsigned char)*(signed char *)D_0019981B) << 16) | (((int)(unsigned char)*(signed char *)D_0019981A) << 8)) | ((int)(unsigned char)*(signed char *)D_00199819);
+    *(int *)&l_18 = 0;
+L51AAE:;
+    if (((int)(short)l_18) < 48) goto L51AC1;
+    goto L51AE2;
+L51AB9:;
+    (*(int *)&l_18)++;
+    goto L51AAE;
+L51AC1:;
+    if ((*(int *)(*(char **)&l_1C) & 16777215) != l_24) goto L51ADC;
+    return ((int)(short)l_18) >> 2;
+L51ADC:;
+    *(int *)&l_1C += 3;
+    goto L51AB9;
+L51AE2:;
+    *(int *)&l_18 = 0;
+L51AE9:;
+    if (((int)(short)l_18) < 18) goto L51AFC;
+    goto L51B20;
+L51AF4:;
+    (*(int *)&l_18)++;
+    goto L51AE9;
+L51AFC:;
+    if ((*(int *)(*(char **)&l_1C) & 16777215) != l_24) goto L51B1A;
+    return (((int)(short)l_18) >> 2) + 12;
+L51B1A:;
+    *(int *)&l_1C += 3;
+    goto L51AF4;
+L51B20:;
+    func_00050069((int)D_001753E7);
+    return 0;
 }

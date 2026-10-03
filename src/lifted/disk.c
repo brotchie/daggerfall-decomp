@@ -126,6 +126,21 @@ int func_0006CE0D(int a1)
     return func_0009DC59((int)D_001A41F4, 546, 384);
 }
 
+int func_0006CE7E(int a1)
+{
+    short l_18;
+    char l_7C[92];
+
+    func_000A0ED9(159, (int)D_00175D00);
+    func_000A0F5C((int)l_7C, (int)D_00175D60, (int)D_001917E4, a1);
+    *(int *)&l_18 = func_0009DC59((int)l_7C, 512);
+    if (l_18 >= 0) goto L6CEDF;
+    return 0;
+L6CEDF:;
+    func_0009DEA7((int)(short)l_18);
+    return 1;
+}
+
 void func_0006CEFC(int a1, int a2, int a3)
 {
     int l_1C;

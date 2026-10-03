@@ -92,6 +92,23 @@ L99886:;
     goto L9987E;
 }
 
+int func_000998C8(int a1)
+{
+    short l_18;
+    short l_1C;
+
+    *(int *)&l_1C = 0;
+    *(int *)&l_18 = 0;
+L998E7:;
+    if (*(signed char *)((char *)(((int)(short)l_18) + a1)) == 0) goto L9990F;
+    *(int *)&l_1C <<= 1;
+    *(int *)&l_1C += (int)(unsigned char)*(signed char *)((char *)(((int)(short)l_18) + a1));
+    (*(int *)&l_18)++;
+    goto L998E7;
+L9990F:;
+    return *(int *)&l_1C;
+}
+
 void func_00099A37(void)
 {
     int l_28;

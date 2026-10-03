@@ -16,6 +16,8 @@ extern char D_0019632C[];
 extern char D_00196354[];
 
 extern int func_00069938(int, int, int);
+extern int func_0006CD6E(int);
+extern int func_0006CDAB(int);
 extern int func_0007CBA1(int);
 extern int func_0007D6AE(int, int);
 extern int func_0009DEA7();
@@ -23,6 +25,7 @@ extern int func_000A0024();
 extern int func_000A006E();
 extern int func_000A00AF();
 extern int func_000A00CB();
+extern int func_000A0AD9();
 extern int func_000A0B42();
 extern int func_000A0E82();
 extern int func_000A0ED9(int, int);
@@ -33,6 +36,44 @@ extern void func_00064589(int, int);
 extern void func_00070370(int, unsigned char);
 int func_0001345E(int);
 #pragma aux func_000A0ED9 parm routine [];
+
+int func_00012E04(int a1, int a2, int a3)
+{
+    short l_10;
+    short l_1C;
+    short l_18;
+    short l_14;
+
+    if (a3 == 0) goto L12E32;
+L12E1F:;
+    *(int *)&l_1C = func_0006CDAB(a1);
+    if (*(int *)&l_1C < 1) goto L12E1F;
+    goto L12E3D;
+L12E32:;
+    *(int *)&l_1C = func_0006CD6E(a1);
+L12E3D:;
+    if (*(int *)&l_1C >= 1) goto L12E4E;
+    return *(int *)&l_1C;
+L12E4E:;
+    func_000A0AD9(((int)D_00196354) + (*(int *)&l_1C * 13), a1, 13, (int)D_00170150, 32);
+    func_000A00CB(*(int *)&l_1C, (int)&l_10, 2);
+    func_000A00CB(*(int *)&l_1C, (int)&l_14, 2);
+    if (((int)(short)l_14) != 256) goto L12EA4;
+    *(int *)&l_18 = ((int)(short)l_10) * 18;
+    goto L12EAE;
+L12EA4:;
+    *(int *)&l_18 = ((int)(short)l_10) << 3;
+L12EAE:;
+    if (a2 != 0) goto L12EC9;
+    a2 = func_000A00AF(*(int *)&l_18, (int)D_00170150, 42);
+L12EC9:;
+    *(short *)(D_0019632C + (*(int *)&l_1C * 2)) = *(int *)&l_10;
+    *(int *)(D_001962B4 + (*(int *)&l_1C << 2)) = a2;
+    *(short *)(D_00196304 + (*(int *)&l_1C * 2)) = *(int *)&l_14;
+    func_000A006E(*(int *)&l_1C, -*(int *)&l_18, 2);
+    func_000A00CB(*(int *)&l_1C, a2, *(int *)&l_18);
+    return *(int *)&l_1C;
+}
 
 void func_00012F27(int a1)
 {

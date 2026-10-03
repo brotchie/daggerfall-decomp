@@ -26,6 +26,7 @@ extern char D_0017C552[];
 extern char D_0017C650[];
 extern char D_0017C912[];
 extern char D_0017CA24[];
+extern char D_0017CA8E[];
 extern char D_0017CAC3[];
 extern char D_0017CB8E[];
 extern char D_0017CB97[];
@@ -169,7 +170,6 @@ extern int func_000192EE(short);
 extern int func_0003D412(int, int, int);
 extern int func_0004A07F(int, signed char);
 extern int func_0004A0C0(short);
-extern int func_0004A8DB(int, int);
 extern int func_0004AA7D(int, int);
 extern int func_0004CF37(int);
 extern int func_000504D8(int);
@@ -206,6 +206,7 @@ int func_0004A044(int);
 int func_0004A231(int, int, int);
 int func_0004A3EC(int);
 int func_0004A8B6(int);
+int func_0004A8DB(int, int);
 int func_0004AA47(int, int);
 void func_0004A282(int);
 void func_0004A56A(int, int);
@@ -2101,6 +2102,59 @@ L4A8A4:;
 
 int func_0004A8B6(int a1)
 {
+    return 0;
+}
+
+int func_0004A8DB(int a1, int a2)
+{
+    short l_14;
+    short l_18;
+
+    *(int *)&l_14 = (((unsigned)(((unsigned)a1) % 518400)) / 1440) + 1;
+    if (((int)(short)l_14) <= 355) goto L4A91D;
+    return 0;
+L4A91D:;
+    *(int *)&l_18 = 0;
+    a2++;
+L4A92A:;
+    if (((int)(unsigned char)*(signed char *)(D_0017CA8E + ((int)(short)l_18))) == 255) goto L4A979;
+    if (((int)(unsigned char)*(signed char *)(D_0017CA8E + ((int)(short)l_18))) != a2) goto L4A966;
+    if ((short)(short)*(int *)&l_14 >= *(short *)(D_0017CA24 + (((int)(short)l_18) * 2))) goto L4A968;
+L4A966:;
+    goto L4A971;
+L4A968:;
+    return (int)(short)l_18;
+L4A971:;
+    (*(int *)&l_18)++;
+    goto L4A92A;
+L4A979:;
+    return 0;
+}
+
+int func_0004A98C(int a1, int a2)
+{
+    short l_14;
+    short l_18;
+
+    *(int *)&l_18 = 0;
+    a2++;
+    *(int *)&l_14 = (((unsigned)(((unsigned)a1) % 518400)) / 1440) + 1;
+    if (((int)(short)l_14) <= 355) goto L4A9DB;
+    return 0;
+L4A9DB:;
+    if (((int)(short)l_18) >= 53) goto L4AA34;
+    if (((int)(unsigned char)*(signed char *)(D_0017CA8E + ((int)(short)l_18))) == 255) goto L4AA0E;
+    if (((int)(unsigned char)*(signed char *)(D_0017CA8E + ((int)(short)l_18))) != a2) goto L4AA20;
+L4AA0E:;
+    if ((short)*(int *)&l_14 == *(short *)(D_0017CA24 + (((int)(short)l_18) * 2))) goto L4AA22;
+L4AA20:;
+    goto L4AA2C;
+L4AA22:;
+    return ((int)(short)l_18) + 1;
+L4AA2C:;
+    (*(int *)&l_18)++;
+    goto L4A9DB;
+L4AA34:;
     return 0;
 }
 

@@ -26,7 +26,6 @@ extern char D_0019647C[];
 extern char D_00196484[];
 extern char D_001A94C8[];
 
-extern int func_00014096(int, short);
 extern int func_00014334(int);
 extern int func_000145CD(int, unsigned short);
 extern int func_0001FFF1(void);
@@ -41,6 +40,7 @@ extern void func_0006103A(int, int, int, int, int);
 extern void func_0007E815(int, int);
 extern void func_0007EB0B(int, int);
 extern void func_0008E4A8(int, int);
+int func_00014096(int, short);
 int func_0001410F(int);
 int func_00014438(int, int);
 int func_0001490D(int);
@@ -81,6 +81,27 @@ int func_00014048(int a1, short a2)
 L1407A:;
     *(int *)&l_18 += ((int)(short)a2) << 3;
     return *(int *)&l_18;
+}
+
+int func_00014096(int a1, short a2)
+{
+    int l_20;
+    int l_24;
+    short l_18;
+
+    l_20 = *(int *)((char *)a1);
+    *(int *)&l_18 = 0;
+    if (((int)(short)a2) < *(int *)((char *)l_20 + 8)) goto L140CD;
+    return 0;
+L140CD:;
+    l_24 = l_20 + *(int *)((char *)l_20 + 60);
+L140D9:;
+    if ((short)(short)*(int *)&l_18 >= a2) goto L140FD;
+    l_24 += (((int)(unsigned char)*(signed char *)((char *)l_24)) << 3) + 8;
+    (*(int *)&l_18)++;
+    goto L140D9;
+L140FD:;
+    return l_24;
 }
 
 int func_0001410F(int a1)
