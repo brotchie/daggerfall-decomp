@@ -217,6 +217,21 @@ menu, the province map, character creation and the intro video replay exactly.
   lists them as kind `register`, named like the others (`patch_15C307 equ L_15C306+1`). The
   census is now 337 writes. For the C version this is one texture mapper with parameters; the
   records already hold the generated code, since they keep whole pages.
+- **What the generated code is (read from the asm, not yet run).** XnGine draws
+  perspective-correct textures the way Quake later did: subdivide each span every 16 pixels,
+  do the perspective divide at the ends, and fill the 16 pixels in between with an affine
+  inner loop. That inner loop is the template: per pixel, `bswap` and `mov ah,bh` turn packed
+  fixed-point u/v (EBX, stepped by ECX) into a texel offset, `and` with the texture's size mask,
+  fetch the texel from the texture's base, map it through a shade table (EDX, stepped by
+  ESI/EBP every second pixel), store to `[edi+k]`. The generator bakes one texture's mask and
+  base into a copy (the per-texture specialisation that code generation buys); the texture
+  cache (`0x135D00`) builds the mask from the texture's size via the table at `0x129EC0`,
+  keeps the copy's address in the texture record at +0Ah, and re-patches the copy when the
+  texture's data moves. The span routine `0x156A80` calls the copy 16 pixels at a time
+  (`call [D_00156A40]`); for the last, shorter run it plants a `ret` inside the heap copy, calls
+  it, and puts the `0x0F` back: the planted-`ret` trick again, on generated code, which no
+  static census of object 2 can see. In 220 ticks outdoors no generated copy ran (74 were
+  built); an interior or a wall close up should exercise them.
 - **Phase 3 gate.** The asm replays itself exactly in every scene recorded so far (menu,
   province map, character creation, intro video, the world), and every write into XnGine code
   seen at run time is now a named field. What remains is breadth: dungeons, towns, combat,
