@@ -59,9 +59,9 @@ extern int func_00069938(int, int, int);
 extern void func_0007F185(int);
 extern int func_0008DA4D(char *);
 extern void func_00093372(int, unsigned char);
-extern int func_000934F6(struct node *, short, int);
-extern void func_000958D0(struct node *, int);
-extern void func_00095B81(struct node *, int);
+extern int func_000934F6(struct node *, short, char *);
+extern void func_000958D0(struct node *, char *);
+extern void func_00095B81(struct node *, char *);
 extern void func_00096782(char *, int, int);
 extern void func_000967F9(int);
 extern void func_00096847(char *, int);
@@ -76,7 +76,7 @@ extern int func_000A0ED9(int, char *);
 extern int func_000A0F5C(char *, char *, ...);
 void func_00095F82(char *obj);
 
-void func_00095D2C(int a1)
+void func_00095D2C(char *a1)
 {
     struct node *n;
 
@@ -98,7 +98,7 @@ void func_00095D2C(int a1)
     D_001AA58A = D_001AA586;
 }
 
-void func_00095E32(int a1)
+void func_00095E32(char *a1)
 {
     struct node *n;
 

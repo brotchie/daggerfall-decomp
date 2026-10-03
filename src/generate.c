@@ -2,5 +2,4 @@
 
 #include "dagger.h"
 
-/* between the generate.c and inven.c runs: unit not certain */
-void func_00091657(void) { }
+/* func_00091657 moved to src/hand/run_0009169B.c, the run of functions it belongs to */
