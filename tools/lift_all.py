@@ -247,10 +247,15 @@ def lift_one(va):
         sites = info.get("sites", {})
         near = sorted((a for a in info["choices"] if a >= 0 and a not in flips),
                       key=lambda a: min(abs(x - at) for x in sites.get(a, [a])))[:NEAR]
-        if at - va < 16 and not os.environ.get("LIFT_NOFRAMEALL"):
-            # a difference in the frame size: any choice point can change it (a temp, a
-            # variable's type), not just those near the prologue
-            near = sorted(a for a in info["choices"] if a >= 0 and a not in flips)[:3 * NEAR]
+        m_ = re.search(r": (.*) \| (.*)$", detail or "")
+        slot_diff = m_ is not None and "ebp - 0x" in m_.group(1) and "ebp - 0x" in m_.group(2) \
+            and re.sub(r"0x[0-9a-f]+", "K", m_.group(1)) == re.sub(r"0x[0-9a-f]+", "K", m_.group(2))
+        if (at - va < 16 or slot_diff) and not os.environ.get("LIFT_NOFRAMEALL"):
+            # a difference in the frame size or a variable's slot: any choice point can
+            # change it (a temp, a variable's type, an array's extent), not just those near
+            # (the frame's own choices first: an array's extent, a variable's width)
+            near = sorted((a for a in info["choices"] if a >= 0 and a not in flips),
+                          key=lambda a: (a % 1 not in (0.5, 0.0625, 0.15625), a))[:3 * NEAR]
         # function-level choices too
         func_level = [a for a in info["choices"] if a < 0 and a not in flips]
         found = None

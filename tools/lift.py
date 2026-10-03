@@ -533,6 +533,13 @@ class Func:
             elif any(a - 3 <= o < a for o in known) and not os.environ.get("LIFT_NOSMALLARR"):
                 # an address-taken slot with bytes of it read separately: a 4-byte array
                 self.arrays[a] = 4
+        # an address-taken slot inside a bigger array is one of its elements (buf and buf + 2),
+        # not an array of its own
+        if not os.environ.get("LIFT_NOARRAYNEST"):
+            for a in sorted(self.arrays):
+                if any(b > a and b - self.arrays[b] <= a - self.arrays[a]
+                       for b in self.arrays if b != a):
+                    del self.arrays[a]
         inside = {}
         for a, size in self.arrays.items():
             for o in range(a - size + 1, a):
@@ -641,6 +648,8 @@ class Func:
             if sc != 1:
                 iexp = "%s * %d" % (iexp, sc)
             arr = "l_%X" % lo
+            if lo not in self.arrays and lo in getattr(self, "inside", {}):
+                arr = "(l_%X + %d)" % (self.inside[lo], self.inside[lo] - lo)
             return "*(%s *)((char *)%s + %s)" % (STYPE[size], arr, iexp)
         off = ebp_slot(ins, op)
         if off is not None and off in getattr(self, "inside", {}):
