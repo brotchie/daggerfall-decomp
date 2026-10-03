@@ -1,4 +1,4 @@
-/* matched by the real Watcom C32 10.0a (-d2), lifted from 0x000425F2 */
+/* matched by the real Watcom C32 10.0a (-d2): a run of keys from 0x425F2 to 0x42F0F, kept together for its switch table's alignment */
 struct bits8 {
     unsigned char b0:1, b1:1, b2:1, b3:1, b4:1, b5:1, b6:1, b7:1;
 };
@@ -104,6 +104,20 @@ extern void func_00135E90(void);
 #pragma aux func_000A0ED9 parm routine [];
 extern void func_000A0ED9(int, char *);
 extern int func_000A0F5C(char *, char *, ...);
+extern short D_001A5B24;
+extern short D_001A5B26;
+extern short D_001A5B2C;
+extern short D_001A5B2E;
+extern char *D_0017D1CA[];
+extern char *D_0017D1EE;
+extern unsigned char D_00142308[];
+extern int D_00152A20;
+extern int D_00152A24;
+extern unsigned char D_00152A30;
+extern unsigned char D_00152A31;
+extern unsigned char D_00195EB0[];
+extern void func_0007CB4F(char *);
+extern void func_00042E8C(int);
 
 void func_000425F2(void)
 {
@@ -259,4 +273,57 @@ void func_000425F2(void)
         func_00135E90();
         D_001940D5.b1 = 1;
     }
+}
+
+void func_00042E0C(void)
+{
+}
+
+void func_00042E24(int a1)
+{
+    D_00196276 = (D_00196276 + a1) & 3;
+    func_000A0ED9(231, D_00170E38);
+    func_000A0F5C(D_001903A4, D_0017D1EE, D_0017D1CA[D_00196276]);
+    func_0007CB4F(D_001903A4);
+}
+
+void func_00042E8C(int a1)
+{
+    D_001A5B26 = (a1 << 8) / 4096;
+    D_001A5B24 = (a1 << 8) / 4096;
+    D_001A5B2C = (-a1 << 8) / 4096;
+    D_001A5B2E = (-a1 << 8) / 4096;
+}
+
+int func_00042F0F(int a1)
+{
+    if (D_00195EB0[a1] >= 200) {
+        switch ((unsigned char)(D_00195EB0[a1] - 200)) {
+        case 0:
+            return D_00152A30;
+        case 1:
+            return D_00152A31;
+        case 2:
+            return D_0012AC00 & 1;
+        case 3:
+            return D_0012AC00 & 2;
+        case 12:
+            return D_0012AC00 & 4;
+        case 4:
+            func_00042E8C(D_00152A20);
+            return D_00152A20 < 0 ? 1 : 0;
+        case 5:
+            func_00042E8C(D_00152A20);
+            return D_00152A20 > 0 ? 1 : 0;
+        case 6:
+            func_00042E8C(D_00152A24);
+            return D_00152A24 < 0 ? 1 : 0;
+        case 7:
+            func_00042E8C(D_00152A24);
+            return D_00152A24 > 0 ? 1 : 0;
+        default:
+            return 0;
+        }
+    }
+    return D_00142308[D_00195EB0[a1]];
 }

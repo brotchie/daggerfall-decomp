@@ -69,6 +69,7 @@ extern void func_0003EC2A(int, int);
 extern void func_0003F09F(int, int);
 extern void func_00058E15(int, int);
 extern void func_00060270(int, int);
+extern void func_0006630B(int);
 extern void func_00066352(void);
 extern void func_000680DD(int, short, int);
 extern void func_00068731(void);
@@ -82,7 +83,6 @@ extern void func_00094F31(void);
 int func_00067270(void);
 int func_00067A47(int);
 int func_00067C04(int);
-void func_0006630B(int);
 void func_00066D3C(int);
 void func_00067027(int);
 void func_000686DA(int);
@@ -336,16 +336,6 @@ L662EE:;
 L662F7:;
     return 1;
 }
-}
-
-void func_0006630B(int a1)
-{
-    if (((int)(unsigned char)*(signed char *)((char *)a1)) != 10) goto L66333;
-    *(signed char *)((char *)a1) = 29;
-    return;
-L66333:;
-    if (((int)(unsigned char)*(signed char *)((char *)a1)) != 29) return;
-    *(signed char *)((char *)a1) = 10;
 }
 
 void func_00066853(int a1, int a2)
