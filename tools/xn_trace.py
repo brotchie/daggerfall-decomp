@@ -18,10 +18,10 @@ import os
 import sys
 import time
 
-from unicorn import UC_HOOK_BLOCK, UC_HOOK_CODE, UC_HOOK_MEM_WRITE
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-import fallemu  # noqa: E402
+import fallemu  # noqa: E402  (first: it picks the Unicorn build)
+from unicorn import UC_HOOK_BLOCK, UC_HOOK_CODE, UC_HOOK_MEM_WRITE  # noqa: E402
 import xn_disasm  # noqa: E402
 import xn_link  # noqa: E402
 

@@ -52,6 +52,9 @@ python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
 #    The assembler for object 2: from your TASM 4.0 disks, unpack CMD16.PAK and CMDLINE.PAK
 #    (LHA archives; tar -xf reads them) into third_party/tasm/BIN/ (never committed).
 #    Without it the build keeps object 2's original bytes.
+#    For the headless game (tools/fallemu.py): a patched Unicorn, about a minute to build,
+#    which runs the 3D world ~70x faster than the pip one (needs cmake and ninja)
+tools/build_unicorn.sh
 
 # 4. Find functions and units, match a C file, then build and verify
 .venv/bin/python tools/find_functions.py
@@ -84,6 +87,7 @@ tools/build-and-verify.sh
 | `tools/xn_disasm.py` | disassemble object 2 (XnGine) into TASM modules in `src/xngine/` that reassemble to the original |
 | `tools/xn_link.py` | assemble the XnGine modules with TASM 4.0 under DOSBox-X and check bytes and fixups |
 | `tools/fallemu.py` | run `FALL.EXE` headless (Unicorn): DOS, DPMI, timer, keyboard and mouse, scripted scenarios |
+| `tools/build_unicorn.sh` | build the patched Unicorn `fallemu.py` uses (`tools/unicorn/dagger-unicorn.patch`): ~70x faster in the 3D world |
 | `tools/xn_trace.py`, `tools/xn_record.py` | XnGine code coverage and run-time code writes; record and replay single calls |
 
 Several tools are adapted from [KKND-Decomp](https://github.com/Wyrelade/KKND-Decomp) (CC0).

@@ -1,0 +1,299 @@
+diff --git a/include/uc_priv.h b/include/uc_priv.h
+index c3132dc..fdaa7a8 100644
+--- a/include/uc_priv.h
++++ b/include/uc_priv.h
+@@ -368,6 +368,8 @@ struct uc_struct {
+ 
+     size_t emu_counter; // current counter of uc_emu_start()
+     size_t emu_count;   // save counter of uc_emu_start()
++    bool fast_count;    // dagger: count a translation block at a time
++    uint8_t *smc_pages; // dagger: pages whose translated code a guest write invalidated
+ 
+     int size_recur_mem; // size for mem access when in a recursive call
+ 
+diff --git a/qemu/accel/tcg/cpu-exec.c b/qemu/accel/tcg/cpu-exec.c
+index 77168f3..7b38e80 100644
+--- a/qemu/accel/tcg/cpu-exec.c
++++ b/qemu/accel/tcg/cpu-exec.c
+@@ -423,6 +423,10 @@ static inline bool cpu_handle_exception(CPUState *cpu, int *ret)
+             return true;
+         }
+ 
++#if defined(TARGET_X86_64)
++        // dagger: a hook delivered it, so the next fault is not a double fault
++        ((CPUArchState *)cpu->env_ptr)->old_exception = -1;
++#endif
+         cpu->exception_index = -1;
+     }
+ 
+diff --git a/qemu/accel/tcg/cputlb.c b/qemu/accel/tcg/cputlb.c
+index 3d0bebd..c0910f0 100644
+--- a/qemu/accel/tcg/cputlb.c
++++ b/qemu/accel/tcg/cputlb.c
+@@ -2360,7 +2360,11 @@ store_helper(CPUArchState *env, target_ulong addr, uint64_t val,
+ 
+         /* Handle clean RAM pages.  */
+         if (tlb_addr & TLB_NOTDIRTY) {
+-            notdirty_write(env_cpu(env), addr, size, iotlbentry, retaddr, entry);
++            // dagger: unless the store changes nothing (little-endian host and guest)
++            void *h = (void *)((uintptr_t)addr + entry->addend);
++            if (need_swap || memcmp(h, &val, size) != 0) {
++                notdirty_write(env_cpu(env), addr, size, iotlbentry, retaddr, entry);
++            }
+         }
+ 
+         haddr = (void *)((uintptr_t)addr + entry->addend);
+diff --git a/qemu/accel/tcg/tcg-runtime.c b/qemu/accel/tcg/tcg-runtime.c
+index 777287a..354beb3 100644
+--- a/qemu/accel/tcg/tcg-runtime.c
++++ b/qemu/accel/tcg/tcg-runtime.c
+@@ -165,9 +165,29 @@ void HELPER(exit_atomic)(CPUArchState *env)
+     cpu_loop_exit_atomic(env_cpu(env), GETPC());
+ }
+ 
+-void HELPER(check_exit_request)(void *p, uint32_t in_delay_slot) {
++void HELPER(check_exit_request)(void *p, uint32_t in_delay_slot, uint32_t ninsns) {
+     uc_engine *uc = p;
+ 
++    // dagger: count instructions a translation block at a time (uc_emu_start's count
++    // without the per-instruction hook). At the start of a block: stop before it if it
++    // would take the count past the limit, except for the slice's first block.
++    if (ninsns && uc->fast_count) {
++        if (uc->emu_counter > 0 && uc->emu_counter + ninsns > uc->emu_count &&
++            !in_delay_slot) {
++            // stop here, before the block: always restore the guest PC (the block's
++            // start), whatever a hook's earlier PC write left in skip_sync_pc_on_exit
++            uc->stop_request = true;
++            cpu_exit(uc->cpu);
++            if (uc->nested_level == 1) {
++                tb_exec_unlock(uc);
++            }
++            uc->cpu->tcg_exit_req = 0;
++            uc->skip_sync_pc_on_exit = false;
++            cpu_loop_exit_restore(uc->cpu, GETPC());
++        }
++        uc->emu_counter += ninsns;
++    }
++
+     if (cpu_loop_exit_requested(uc->cpu) && !in_delay_slot) {
+         // There are stil something we have to before exiting to be compatible with previous behaviors
+ 
+diff --git a/qemu/accel/tcg/tcg-runtime.h b/qemu/accel/tcg/tcg-runtime.h
+index 8ba10e1..9d30109 100644
+--- a/qemu/accel/tcg/tcg-runtime.h
++++ b/qemu/accel/tcg/tcg-runtime.h
+@@ -260,4 +260,4 @@ DEF_HELPER_FLAGS_4(gvec_leu64, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
+ 
+ DEF_HELPER_FLAGS_5(gvec_bitsel, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
+ 
+-DEF_HELPER_2(check_exit_request, void, ptr, i32)
+\ No newline at end of file
++DEF_HELPER_3(check_exit_request, void, ptr, i32, i32)
+\ No newline at end of file
+diff --git a/qemu/accel/tcg/translate-all.c b/qemu/accel/tcg/translate-all.c
+index 71b6b2b..5cb8275 100644
+--- a/qemu/accel/tcg/translate-all.c
++++ b/qemu/accel/tcg/translate-all.c
+@@ -73,7 +73,7 @@ static void tb_exec_change(struct uc_struct*, bool locked);
+  */
+ #define assert_memory_lock()
+ 
+-#define SMC_BITMAP_USE_THRESHOLD 10
++#define SMC_BITMAP_USE_THRESHOLD 1   /* dagger: was 10; the bitmap now persists */
+ 
+ typedef struct PageDesc {
+     /* list of TBs intersecting this ram page */
+@@ -1514,11 +1514,9 @@ static void do_tb_phys_invalidate(TCGContext *tcg_ctx, TranslationBlock *tb, boo
+     if (rm_from_page_list) {
+         p = page_find(tcg_ctx->uc, tb->page_addr[0] >> TARGET_PAGE_BITS);
+         tb_page_remove(p, tb);
+-        invalidate_page_bitmap(p);
+         if (tb->page_addr[1] != -1) {
+             p = page_find(tcg_ctx->uc, tb->page_addr[1] >> TARGET_PAGE_BITS);
+             tb_page_remove(p, tb);
+-            invalidate_page_bitmap(p);
+         }
+     }
+ 
+@@ -1603,7 +1601,24 @@ static inline void tb_page_add(struct uc_struct *uc, PageDesc *p, TranslationBlo
+     tb->page_next[n] = p->first_tb;
+     page_already_protected = p->first_tb != (uintptr_t)NULL;
+     p->first_tb = (uintptr_t)tb | n;
+-    invalidate_page_bitmap(p);
++    // dagger: keep the code bitmap, adding this TB's bytes (it was discarded here, so on a
++    // page whose code is patched and retranslated all the time every write scanned all of
++    // the page's TBs). Bits are only cleared when the page has no code left, so the bitmap
++    // covers every TB, perhaps more: a write it misses touches no code.
++    if (p->code_bitmap) {
++        int tb_start, tb_end;
++        if (n == 0) {
++            tb_start = tb->pc & ~TARGET_PAGE_MASK;
++            tb_end = tb_start + tb->size;
++            if (tb_end > TARGET_PAGE_SIZE) {
++                tb_end = TARGET_PAGE_SIZE;
++            }
++        } else {
++            tb_start = 0;
++            tb_end = ((tb->pc + tb->size) & ~TARGET_PAGE_MASK);
++        }
++        qemu_bitmap_set(p->code_bitmap, tb_start, tb_end - tb_start);
++    }
+ 
+     /* if some code is already present, then the pages are already
+        protected. So we handle the case where only the first TB is
+@@ -1726,6 +1741,37 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
+     if (max_insns > TCG_MAX_INSNS) {
+         max_insns = TCG_MAX_INSNS;
+     }
++    {
++        // dagger: a cap on block length (UC_MAX_TB_INSNS): self-modifying code retranslates
++        // the whole block around each patch, so shorter blocks make each patch cheaper
++        static int cap = -1;
++        if (cap < 0) {
++            const char *s = getenv("UC_MAX_TB_INSNS");
++            cap = s ? atoi(s) : 0;
++        }
++        if (cap > 0 && max_insns > cap) {
++            max_insns = cap;
++        }
++        // dagger: short blocks on pages the guest patches (UC_SMC_TB_INSNS, default 8; 0 off)
++        static int smc_cap = -1;
++        if (smc_cap < 0) {
++            const char *s = getenv("UC_SMC_TB_INSNS");
++            smc_cap = s ? atoi(s) : 8;
++        }
++        bool smc = cpu->uc->smc_pages &&
++                   cpu->uc->smc_pages[(phys_pc >> TARGET_PAGE_BITS) & 0xFFFFF];
++        if (smc_cap > 0 && max_insns > smc_cap && smc) {
++            max_insns = smc_cap;
++        }
++        // dagger: code that will be patched again soon is not worth optimising
++        // (UC_SMC_NOOPT=0 keeps the optimiser)
++        static int smc_noopt = -1;
++        if (smc_noopt < 0) {
++            const char *s = getenv("UC_SMC_NOOPT");
++            smc_noopt = s ? atoi(s) : 1;
++        }
++        cpu->uc->tcg_ctx->dagger_skip_opt = smc && smc_noopt;
++    }
+     if (cpu->singlestep_enabled) {
+         max_insns = 1;
+     }
+@@ -1933,6 +1979,14 @@ tb_invalidate_phys_page_range__locked(struct uc_struct *uc, struct page_collecti
+             }
+ #endif /* TARGET_HAS_PRECISE_SMC */
+             tb_phys_invalidate__locked(uc->tcg_ctx, tb);
++            // dagger: the guest rewrote code here: translate this page in short blocks
++            // from now on (tb_gen_code), so each later patch retranslates little
++            if (retaddr) {
++                if (!uc->smc_pages) {
++                    uc->smc_pages = g_malloc0(1 << 20);
++                }
++                uc->smc_pages[(start >> TARGET_PAGE_BITS) & 0xFFFFF] = 1;
++            }
+         }
+     }
+ 
+diff --git a/qemu/include/exec/gen-icount.h b/qemu/include/exec/gen-icount.h
+index 8b484cb..732264e 100644
+--- a/qemu/include/exec/gen-icount.h
++++ b/qemu/include/exec/gen-icount.h
+@@ -34,13 +34,18 @@ static inline void gen_tb_start(TCGContext *tcg_ctx, TranslationBlock *tb)
+ {
+     TCGv_ptr puc = tcg_const_ptr(tcg_ctx, tcg_ctx->uc);
+     TCGv_i32 tmp = tcg_const_i32(tcg_ctx, 0);
++    // dagger: the block's instruction count, filled in by gen_tb_end
++    TCGv_i32 ninsns = tcg_temp_new_i32(tcg_ctx);
++    tcg_gen_movi_i32(tcg_ctx, ninsns, 0xdeadbeef);
++    tcg_ctx->icount_start_insn = tcg_last_op(tcg_ctx);
+     // Unicorn:
+     //    We CANT'T use brcondi_i32 here or we will fail liveness analysis
+     //    because it marks the end of BB
+     if (tcg_ctx->delay_slot_flag != NULL) {
+         tcg_gen_mov_i32(tcg_ctx, tmp, tcg_ctx->delay_slot_flag);
+     }
+-    gen_helper_check_exit_request(tcg_ctx, puc, tmp);
++    gen_helper_check_exit_request(tcg_ctx, puc, tmp, ninsns);
++    tcg_temp_free_i32(tcg_ctx, ninsns);
+     tcg_temp_free_i32(tcg_ctx, tmp);
+     tcg_temp_free_ptr(tcg_ctx, puc);
+ }
+@@ -51,11 +56,9 @@ static inline void gen_tb_end(TCGContext *tcg_ctx, TranslationBlock *tb, int num
+         tcg_temp_free_i32(tcg_ctx, tcg_ctx->delay_slot_flag);
+     }
+     tcg_ctx->delay_slot_flag = NULL;
+-    if (tb_cflags(tb) & CF_USE_ICOUNT) {
+-        /* Update the num_insn immediate parameter now that we know
+-         * the actual insn count.  */
+-        tcg_set_insn_param(tcg_ctx->icount_start_insn, 1, num_insns);
+-    }
++    /* Update the num_insn immediate parameter now that we know
++     * the actual insn count (dagger: always, for check_exit_request).  */
++    tcg_set_insn_param(tcg_ctx->icount_start_insn, 1, num_insns);
+ 
+     tcg_gen_exit_tb(tcg_ctx, tb, TB_EXIT_REQUESTED);
+ }
+diff --git a/qemu/include/tcg/tcg.h b/qemu/include/tcg/tcg.h
+index bbeb4b9..adbabc3 100644
+--- a/qemu/include/tcg/tcg.h
++++ b/qemu/include/tcg/tcg.h
+@@ -818,6 +818,7 @@ struct TCGContext {
+ 
+     // loongarch 
+     bool use_lsx_instructions;
++    bool dagger_skip_opt;   // dagger: skip tcg_optimize for this TB (code the guest patches)
+ };
+ 
+ static inline size_t temp_idx(TCGContext *tcg_ctx, TCGTemp *ts)
+diff --git a/qemu/tcg/tcg-op.c b/qemu/tcg/tcg-op.c
+index d0223ea..f6947f2 100644
+--- a/qemu/tcg/tcg-op.c
++++ b/qemu/tcg/tcg-op.c
+@@ -2867,7 +2867,9 @@ void check_exit_request(TCGContext *tcg_ctx)
+     if (tcg_ctx->delay_slot_flag != NULL) {
+         tcg_gen_mov_i32(tcg_ctx, tmp, tcg_ctx->delay_slot_flag);
+     }
+-    gen_helper_check_exit_request(tcg_ctx, puc, tmp);
++    TCGv_i32 zero = tcg_const_i32(tcg_ctx, 0);
++    gen_helper_check_exit_request(tcg_ctx, puc, tmp, zero);
++    tcg_temp_free_i32(tcg_ctx, zero);
+     tcg_temp_free_i32(tcg_ctx, tmp);
+     tcg_temp_free_ptr(tcg_ctx, puc);
+ }
+diff --git a/qemu/tcg/tcg.c b/qemu/tcg/tcg.c
+index bc62051..de09e78 100644
+--- a/qemu/tcg/tcg.c
++++ b/qemu/tcg/tcg.c
+@@ -3733,6 +3733,7 @@ int tcg_gen_code(TCGContext *s, TranslationBlock *tb)
+ #endif
+ 
+ #ifdef USE_TCG_OPTIMIZATIONS
++    if (!s->dagger_skip_opt)
+     tcg_optimize(s);
+ #endif
+     //tcg_dump_ops(s, false, "after opt1:");
+diff --git a/uc.c b/uc.c
+index 75b89a0..9d221b2 100644
+--- a/uc.c
++++ b/uc.c
+@@ -1190,8 +1190,10 @@ uc_err uc_emu_start(uc_engine *uc, uint64_t begin, uint64_t until,
+     uc->stop_request = false;
+ 
+     uc->emu_count = count;
++    // dagger: count whole translation blocks in check_exit_request, unless asked for exact
++    uc->fast_count = count > 0 && getenv("UC_EXACT_COUNT") == NULL;
+     // remove count hook if counting isn't necessary
+-    if (count <= 0 && uc->count_hook != 0) {
++    if ((count <= 0 || uc->fast_count) && uc->count_hook != 0) {
+         uc_hook_del(uc, uc->count_hook);
+         uc->count_hook = 0;
+ 
+@@ -1199,7 +1201,7 @@ uc_err uc_emu_start(uc_engine *uc, uint64_t begin, uint64_t until,
+         uc->tb_flush(uc);
+     }
+     // set up count hook to count instructions.
+-    if (count > 0 && uc->count_hook == 0) {
++    if (count > 0 && !uc->fast_count && uc->count_hook == 0) {
+         uc_err err;
+         // callback to count instructions must be run before everything else,
+         // so instead of appending, we must insert the hook at the begin

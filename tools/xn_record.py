@@ -30,10 +30,10 @@ import sys
 import time
 import zlib
 
-from unicorn import UC_HOOK_CODE, UC_HOOK_MEM_READ, UC_HOOK_MEM_WRITE
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-import fallemu  # noqa: E402
+import fallemu  # noqa: E402  (first: it picks the Unicorn build)
+from unicorn import UC_HOOK_CODE, UC_HOOK_MEM_READ, UC_HOOK_MEM_WRITE  # noqa: E402
 
 ROOT = fallemu.ROOT
 LOAD = fallemu.LOAD

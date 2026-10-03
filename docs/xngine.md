@@ -269,3 +269,48 @@ The three `mov ax, sel` loads are bytes as before: their selector fixups stay in
 Run: `.venv/bin/python tools/xn_disasm.py` regenerates `src/xngine/` (12 s, most of it in
 DOSBox-X); `.venv/bin/python tools/xn_link.py [module]` checks modules (5 s for all);
 `tools/build-and-verify.sh` builds.
+
+## 2026-10-03: the 3D world at full emulator speed
+
+In the 3D world `fallemu.py` ran at 0.5 MIPS, against ~30 MIPS in the menus: 500 timer ticks of
+gameplay took four minutes. Profiling put nearly all of it inside Unicorn, translating code
+again and again (`tcg_gen_code`, `tcg_optimize`, liveness), for three reasons:
+
+- **XnGine's divide errors.** The renderer divides by zero about 240 times a tick and lets its
+  own handler zero the quotient. Stock Unicorn never clears `env->old_exception` for an
+  exception a hook handles, so `fallemu` reset it with a context save and restore per fault.
+- **Instruction counting.** `uc_emu_start(count=N)` is a hook on every instruction: each
+  translated block grows several times over, and every instruction calls it.
+- **Self-modifying code.** XnGine rewrites operands and plants `ret`s all the time (4,000 code
+  writes a tick in a town); each write throws away the translation of the block around it,
+  and the next run translates the whole block again. On a page whose code keeps being
+  retranslated, QEMU also discards the page's code bitmap whenever a block is added, so every
+  write scanned all of the page's blocks.
+
+A self-modifying loop in bare Unicorn: 1,000 MIPS unpatched, 2.4 MIPS patching itself, 0.4 MIPS
+patching itself while counting. `tools/build_unicorn.sh` builds Unicorn 2.1.4 with
+`tools/unicorn/dagger-unicorn.patch` (11 files, ~100 lines), and `fallemu.py` uses it whenever
+it is built:
+
+- the count is kept a block at a time, in the exit check every block already makes (the
+  block's instruction count is a parameter filled in when its translation is done); a slice
+  ends on a block boundary, so runs stay deterministic (`UC_EXACT_COUNT=1` for the old way);
+- an interrupt a hook handled clears `old_exception`, as delivering it would;
+- code on a page the guest has patched is translated in blocks of at most 8 instructions and
+  without the optimiser, so each patch retranslates little (`UC_SMC_TB_INSNS`, `UC_SMC_NOOPT`);
+- a page's code bitmap is built at the first write and kept up to date as blocks are added
+  (bits cleared only when the page has no code left), so a write next to code costs a bit test;
+- a store that leaves memory unchanged does not invalidate anything.
+
+| | stock Unicorn | patched |
+|---|---|---|
+| 3D world (four saves: town, dungeon, ship, castle) | 0.5 MIPS | 30-40 MIPS |
+| boot to the main menu (2,600 ticks) | 30.5 s (34 MIPS) | 15.2 s (68 MIPS) |
+| 300 ticks in the world | ~3.5 min | 3-4 s |
+
+Two runs of each save end with identical memory, and every recorded XnGine call still replays
+exactly (387 of 387 in the world, 110 of 110 in the menu set). Snapshots carry over between the
+two builds; ticks now land on block boundaries, so a run continues differently from one made
+with stock Unicorn, deterministically. What remains is mostly retranslation of patched code,
+Apple Silicon's W^X switching for the JIT, and the per-block exit check.
+

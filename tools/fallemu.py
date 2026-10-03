@@ -9,7 +9,9 @@ the sources call func_00012345 runs at 0x01012345. Real-mode memory (PSP, enviro
 blocks, the BIOS data area, VGA) is linear 0-1 MB.
 
 Time is counted in instructions, so a run is deterministic: the timer interrupt fires every
-TICK instructions while the game has interrupts enabled.
+TICK instructions while the game has interrupts enabled (with the patched Unicorn from
+tools/build_unicorn.sh, at the first translation-block boundary after that: still
+deterministic, and ~70x faster in the 3D world; see docs/xngine.md).
 
 Files: drive C: is the game directory (build/game), read-only; writes go to an overlay
 directory (build/emu/overlay) that reads also check first.
@@ -22,6 +24,14 @@ import struct
 import sys
 import time
 import zlib
+
+# The patched Unicorn from tools/build_unicorn.sh when it has been built: stock Unicorn runs
+# the 3D world ~70x slower (per-instruction counting, and XnGine's self-modifying code).
+_UC_BUILD = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                         "third_party", "unicorn", "build")
+if any(os.path.exists(os.path.join(_UC_BUILD, n))
+       for n in ("libunicorn.2.dylib", "libunicorn.so.2", "unicorn.dll")):
+    os.environ.setdefault("LIBUNICORN_PATH", _UC_BUILD)
 
 from unicorn import Uc, UcError, UC_ARCH_X86, UC_MODE_32, UC_HOOK_INTR, UC_HOOK_INSN, \
     UC_HOOK_MEM_UNMAPPED, UC_HOOK_CODE, UC_HOOK_MEM_WRITE, UC_PROT_ALL
