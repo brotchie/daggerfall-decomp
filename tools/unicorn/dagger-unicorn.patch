@@ -1,13 +1,15 @@
 diff --git a/include/uc_priv.h b/include/uc_priv.h
-index c3132dc..fdaa7a8 100644
+index c3132dc..684fbce 100644
 --- a/include/uc_priv.h
 +++ b/include/uc_priv.h
-@@ -368,6 +368,8 @@ struct uc_struct {
+@@ -368,6 +368,10 @@ struct uc_struct {
  
      size_t emu_counter; // current counter of uc_emu_start()
      size_t emu_count;   // save counter of uc_emu_start()
 +    bool fast_count;    // dagger: count a translation block at a time
 +    uint8_t *smc_pages; // dagger: pages whose translated code a guest write invalidated
++    uint8_t *cov_map;   // dagger: a byte per guest code byte in [cov_lo, cov_hi) translated
++    uint64_t cov_lo, cov_hi;
  
      int size_recur_mem; // size for mem access when in a recursive call
  
@@ -91,7 +93,7 @@ index 8ba10e1..9d30109 100644
 +DEF_HELPER_3(check_exit_request, void, ptr, i32, i32)
 \ No newline at end of file
 diff --git a/qemu/accel/tcg/translate-all.c b/qemu/accel/tcg/translate-all.c
-index 71b6b2b..5cb8275 100644
+index 71b6b2b..284b10a 100644
 --- a/qemu/accel/tcg/translate-all.c
 +++ b/qemu/accel/tcg/translate-all.c
 @@ -73,7 +73,7 @@ static void tb_exec_change(struct uc_struct*, bool locked);
@@ -179,7 +181,23 @@ index 71b6b2b..5cb8275 100644
      if (cpu->singlestep_enabled) {
          max_insns = 1;
      }
-@@ -1933,6 +1979,14 @@ tb_invalidate_phys_page_range__locked(struct uc_struct *uc, struct page_collecti
+@@ -1758,6 +1804,15 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
+     UC_TRACE_START(UC_TRACE_TB_TRANS);
+     gen_intermediate_code(cpu, tb, max_insns);
+     UC_TRACE_END(UC_TRACE_TB_TRANS, "[uc] translate tb 0x%" PRIx64 ": ", tb->pc);
++    // dagger: coverage (uc_dagger_coverage): code is translated before it first runs
++    if (cpu->uc->cov_map) {
++        uint64_t a = tb->pc, e = tb->pc + tb->size;
++        for (; a < e; a++) {
++            if (a >= cpu->uc->cov_lo && a < cpu->uc->cov_hi) {
++                cpu->uc->cov_map[a - cpu->uc->cov_lo] = 1;
++            }
++        }
++    }
+     tcg_ctx->cpu = NULL;
+ 
+     /* generate machine code */
+@@ -1933,6 +1988,14 @@ tb_invalidate_phys_page_range__locked(struct uc_struct *uc, struct page_collecti
              }
  #endif /* TARGET_HAS_PRECISE_SMC */
              tb_phys_invalidate__locked(uc->tcg_ctx, tb);
@@ -273,7 +291,7 @@ index bc62051..de09e78 100644
  #endif
      //tcg_dump_ops(s, false, "after opt1:");
 diff --git a/uc.c b/uc.c
-index 75b89a0..9d221b2 100644
+index 75b89a0..1cc1353 100644
 --- a/uc.c
 +++ b/uc.c
 @@ -1190,8 +1190,10 @@ uc_err uc_emu_start(uc_engine *uc, uint64_t begin, uint64_t until,
@@ -297,3 +315,35 @@ index 75b89a0..9d221b2 100644
          uc_err err;
          // callback to count instructions must be run before everything else,
          // so instead of appending, we must insert the hook at the begin
+@@ -3068,3 +3070,31 @@ void trace_end(uc_tracer *tracer, trace_loc loc, const char *fmt, ...)
+             (double)(end - tracer->starts[loc]) / (double)(1000));
+ }
+ #endif
++
++// dagger: code coverage. out == NULL starts recording [lo, hi) afresh (a byte per guest code
++// byte, set once a translation block covering it is made, i.e. once it is about to run);
++// otherwise copies the map (hi - lo bytes) into out.
++UNICORN_EXPORT
++uc_err uc_dagger_coverage(uc_engine *uc, uint64_t lo, uint64_t hi, uint8_t *out)
++{
++    if (hi <= lo) {
++        return UC_ERR_ARG;
++    }
++    if (!out) {
++        g_free(uc->cov_map);
++        uc->cov_map = g_malloc0(hi - lo);
++        uc->cov_lo = lo;
++        uc->cov_hi = hi;
++        // code translated before recording started would never be seen: start over
++        if (uc->init_done) {
++            uc->tb_flush(uc);
++        }
++        return UC_ERR_OK;
++    }
++    if (!uc->cov_map || lo != uc->cov_lo || hi != uc->cov_hi) {
++        return UC_ERR_ARG;
++    }
++    memcpy(out, uc->cov_map, hi - lo);
++    return UC_ERR_OK;
++}
++

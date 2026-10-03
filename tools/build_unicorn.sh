@@ -12,7 +12,8 @@
 #     bitmap instead of discarding it whenever a block is added, and lets a store that does
 #     not change memory leave translated code alone.
 # It also forgets a CPU exception once an interrupt hook has handled it, so the next divide
-# error is not taken for a double fault (stock Unicorn needs a context save/restore per fault).
+# error is not taken for a double fault (stock Unicorn needs a context save/restore per fault),
+# and records code coverage for free (uc_dagger_coverage, used by tools/fallcov.py).
 # Knobs (environment): UC_EXACT_COUNT=1 (per-instruction counting), UC_SMC_TB_INSNS (block
 # length on patched pages, 0 = off), UC_SMC_NOOPT=0 (optimise them), UC_MAX_TB_INSNS (cap all).
 #
