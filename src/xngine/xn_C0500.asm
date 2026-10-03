@@ -3,6 +3,7 @@
 ; B_<address>_<length> lines are data bytes the build takes from your FALL.EXE.
 .486p
 .387
+include xngine.inc
 include xn_C0500.inc
 extrn D_000C0400:byte
 extrn D_000C0402:byte

@@ -3,6 +3,7 @@
 ; B_<address>_<length> lines are data bytes the build takes from your FALL.EXE.
 .486p
 .387
+include xngine.inc
 include xn_14BC00.inc
 public func_0014BC00
 public func_0014BC34
@@ -53,19 +54,19 @@ func_0014BC00:
 L_14BC12:
     mov esi, 1
     shl esi, cl
-    xor edi, edi
-    mov ecx, eax
+    xor@ edi, edi
+    mov@ ecx, eax
 L_14BC1D:
-    mov eax, edi
-    add eax, esi
+    mov@ eax, edi
+    add@ eax, esi
     imul eax
-    cmp eax, ecx
+    cmp@ eax, ecx
     jg short L_14BC29
-    add edi, esi
+    add@ edi, esi
 L_14BC29:
     shr esi, 1
     jne short L_14BC1D
-    mov eax, edi
+    mov@ eax, edi
     pop edi
     pop esi
     pop ecx
@@ -85,25 +86,25 @@ func_0014BC34:
     mov ebp, 1
     shl ebp, cl
 L_14BC4D:
-    xor ebx, ebx
-    mov esi, edx
-    mov edi, eax
+    xor@ ebx, ebx
+    mov@ esi, edx
+    mov@ edi, eax
 L_14BC53:
-    mov eax, ebx
-    add eax, ebp
+    mov@ eax, ebx
+    add@ eax, ebp
     mul eax
-    sub eax, edi
-    db 01Bh, 0D6h   ; sbb edx, esi
+    sub@ eax, edi
+    sbb@ edx, esi
     jg short L_14BC68
     jne short L_14BC66
     cmp eax, 0
     jne short L_14BC68
 L_14BC66:
-    add ebx, ebp
+    add@ ebx, ebp
 L_14BC68:
     shr ebp, 1
     jne short L_14BC53
-    mov eax, ebx
+    mov@ eax, ebx
     pop ebp
     pop edi
     pop esi
@@ -114,48 +115,48 @@ func_0014BC74:
     push esi
     push edi
     push ebp
-    mov ebp, edx
+    mov@ ebp, edx
     shl eax, 0Ah
     mov dword ptr [D_0014BB60], eax
-    mov eax, ebx
+    mov@ eax, ebx
     shl eax, 0Ah
     mov dword ptr [D_0014BB64], eax
     mov eax, dword ptr [ebp]
     imul dword ptr [D_0014BB60]
-    mov esi, eax
-    mov edi, edx
+    mov@ esi, eax
+    mov@ edi, edx
     mov eax, dword ptr [ecx]
     imul dword ptr [D_0014BB64]
-    add esi, eax
-    adc edi, edx
+    add@ esi, eax
+    adc@ edi, edx
     add esi, 080000h
     adc edi, 0
     shrd esi, edi, 014h
     push esi
     mov eax, dword ptr [ebp + 4]
     imul dword ptr [D_0014BB60]
-    mov esi, eax
-    mov edi, edx
+    mov@ esi, eax
+    mov@ edi, edx
     mov eax, dword ptr [ecx + 4]
     imul dword ptr [D_0014BB64]
-    add esi, eax
-    adc edi, edx
+    add@ esi, eax
+    adc@ edi, edx
     add esi, 080000h
     adc edi, 0
     shrd esi, edi, 014h
     push esi
     mov eax, dword ptr [ebp + 8]
     imul dword ptr [D_0014BB60]
-    mov esi, eax
-    mov edi, edx
+    mov@ esi, eax
+    mov@ edi, edx
     mov eax, dword ptr [ecx + 8]
     imul dword ptr [D_0014BB64]
-    add esi, eax
-    adc edi, edx
+    add@ esi, eax
+    adc@ edi, edx
     add esi, 080000h
     adc edi, 0
     shrd esi, edi, 014h
-    mov ebx, esi
+    mov@ ebx, esi
     pop edx
     pop eax
     pop ebp
@@ -166,40 +167,40 @@ func_0014BD09:
     push ecx
     push esi
     push edi
-    mov esi, eax
-    mov edi, edx
+    mov@ esi, eax
+    mov@ edi, edx
     mov eax, dword ptr [esi]
     imul dword ptr [edi + 8]
-    mov ebx, eax
-    mov ecx, edx
+    mov@ ebx, eax
+    mov@ ecx, edx
     mov eax, dword ptr [esi + 8]
     imul dword ptr [edi]
-    sub eax, ebx
-    db 01Bh, 0D1h   ; sbb edx, ecx
+    sub@ eax, ebx
+    sbb@ edx, ecx
     add eax, 080h
     adc edx, 0
     shrd eax, edx, 8
     push eax
     mov eax, dword ptr [esi]
     imul dword ptr [edi + 4]
-    mov ebx, eax
-    mov ecx, edx
+    mov@ ebx, eax
+    mov@ ecx, edx
     mov eax, dword ptr [esi + 4]
     imul dword ptr [edi]
-    sub ebx, eax
-    db 01Bh, 0CAh   ; sbb ecx, edx
+    sub@ ebx, eax
+    sbb@ ecx, edx
     add ebx, 080h
     adc ecx, 0
     shrd ebx, ecx, 8
     push ebx
     mov eax, dword ptr [esi + 8]
     imul dword ptr [edi + 4]
-    mov ebx, eax
-    mov ecx, edx
+    mov@ ebx, eax
+    mov@ ecx, edx
     mov eax, dword ptr [esi + 4]
     imul dword ptr [edi + 8]
-    sub eax, ebx
-    db 01Bh, 0D1h   ; sbb edx, ecx
+    sub@ eax, ebx
+    sbb@ edx, ecx
     add eax, 080h
     adc edx, 0
     shrd eax, edx, 8
@@ -212,39 +213,39 @@ func_0014BD09:
 func_0014BD75:
     push ecx
     push ebp
-    mov ecx, edx
+    mov@ ecx, edx
     imul eax
     xchg ebx, eax
-    mov ebp, edx
+    mov@ ebp, edx
     imul eax
-    add ebx, eax
-    adc ebp, edx
-    mov eax, ecx
+    add@ ebx, eax
+    adc@ ebp, edx
+    mov@ eax, ecx
     imul eax
-    add eax, ebx
-    adc edx, ebp
+    add@ eax, ebx
+    adc@ edx, ebp
     call func_0014BC34
     pop ebp
     pop ecx
     ret
 func_0014BD94:
-    or eax, eax
+    or@ eax, eax
     jns short L_14BD9A
     neg eax
 L_14BD9A:
-    or edx, edx
+    or@ edx, edx
     jns short L_14BDA0
     neg edx
 L_14BDA0:
-    or ebx, ebx
+    or@ ebx, ebx
     jns short L_14BDA6
     neg ebx
 L_14BDA6:
-    cmp eax, edx
+    cmp@ eax, edx
     jge short L_14BDC2
-    cmp ebx, edx
+    cmp@ ebx, edx
     jge short L_14BDBA
-    cmp ebx, eax
+    cmp@ ebx, eax
     jge short L_14BDB2
 L_14BDB2:
     shr eax, 2
@@ -255,9 +256,9 @@ L_14BDBA:
     shr edx, 2
     jmp short L_14BDD8
 L_14BDC2:
-    cmp ebx, eax
+    cmp@ ebx, eax
     jge short L_14BDD2
-    cmp ebx, edx
+    cmp@ ebx, edx
     jge short L_14BDCA
 L_14BDCA:
     shr edx, 2
@@ -267,8 +268,8 @@ L_14BDD2:
     shr eax, 2
     shr edx, 2
 L_14BDD8:
-    add eax, edx
-    add eax, ebx
+    add@ eax, edx
+    add@ eax, ebx
     ret
 func_0014BDDD:
     pushad
@@ -291,16 +292,16 @@ func_0014BDF7:
     push ebx
     push edx
     imul eax
-    mov ecx, eax
-    mov ebp, edx
+    mov@ ecx, eax
+    mov@ ebp, edx
     pop eax
     imul eax
-    add ecx, eax
-    adc ebp, edx
-    mov eax, ebx
+    add@ ecx, eax
+    adc@ ebp, edx
+    mov@ eax, ebx
     imul eax
-    add eax, ecx
-    adc edx, ebp
+    add@ eax, ecx
+    adc@ edx, ebp
     call func_0014BC34
     test eax, eax
     jne short L_14BE20
@@ -309,25 +310,25 @@ func_0014BDF7:
     pop eax
     jmp short L_14BE49
 L_14BE20:
-    mov ecx, eax
+    mov@ ecx, eax
     pop eax
     cdq
     shld edx, eax, 010h
     shl eax, 010h
     idiv ecx
-    mov ebx, eax
+    mov@ ebx, eax
     pop eax
     cdq
     shld edx, eax, 010h
     shl eax, 010h
     idiv ecx
-    mov ebp, eax
+    mov@ ebp, eax
     pop eax
     cdq
     shld edx, eax, 010h
     shl eax, 010h
     idiv ecx
-    mov edx, ebp
+    mov@ edx, ebp
 L_14BE49:
     pop ebp
     pop ecx
@@ -340,16 +341,16 @@ func_0014BE4C:
     push ebx
     push edx
     imul eax
-    mov ecx, eax
-    mov ebp, edx
+    mov@ ecx, eax
+    mov@ ebp, edx
     pop eax
     imul eax
-    add ecx, eax
-    adc ebp, edx
-    mov eax, ebx
+    add@ ecx, eax
+    adc@ ebp, edx
+    mov@ eax, ebx
     imul eax
-    add eax, ecx
-    adc edx, ebp
+    add@ eax, ecx
+    adc@ edx, ebp
     call func_0014BC34
     test eax, eax
     jne short L_14BE75
@@ -358,25 +359,25 @@ func_0014BE4C:
     pop eax
     jmp short L_14BE9E
 L_14BE75:
-    mov ecx, eax
+    mov@ ecx, eax
     pop eax
     cdq
     shld edx, eax, 01Ch
     shl eax, 01Ch
     idiv ecx
-    mov ebx, eax
+    mov@ ebx, eax
     pop eax
     cdq
     shld edx, eax, 01Ch
     shl eax, 01Ch
     idiv ecx
-    mov ebp, eax
+    mov@ ebp, eax
     pop eax
     cdq
     shld edx, eax, 01Ch
     shl eax, 01Ch
     idiv ecx
-    mov edx, ebp
+    mov@ edx, ebp
 L_14BE9E:
     pop ebp
     pop ecx
@@ -389,32 +390,32 @@ func_0014BEA1:
     push ebx
     push edx
     imul eax
-    mov ebp, eax
-    mov esi, edx
+    mov@ ebp, eax
+    mov@ esi, edx
     pop eax
     imul eax
-    add ebp, eax
-    adc esi, edx
-    mov eax, ebx
+    add@ ebp, eax
+    adc@ esi, edx
+    mov@ eax, ebx
     imul eax
-    add eax, ebp
-    adc edx, esi
+    add@ eax, ebp
+    adc@ edx, esi
     call func_0014BC34
-    mov ebp, eax
-    xor eax, eax
+    mov@ ebp, eax
+    xor@ eax, eax
     mov edx, 1
     shl edx, cl
     div ebp
-    mov ebp, eax
+    mov@ ebp, eax
     pop eax
     imul ebp
-    mov ebx, edx
+    mov@ ebx, edx
     pop eax
     imul ebp
     pop eax
     push edx
     imul ebp
-    mov eax, edx
+    mov@ eax, edx
     pop edx
     pop ebp
     pop esi
@@ -423,7 +424,7 @@ func_0014BEE2:
     push ebx
     push ecx
     push esi
-    xor esi, esi
+    xor@ esi, esi
     test eax, eax
     jns short L_14BF02
     neg eax
@@ -444,23 +445,23 @@ L_14BF02:
     mov esi, 0200h
 L_14BF0E:
     push eax
-    mov ecx, edx
+    mov@ ecx, edx
     imul eax
-    mov ebx, eax
+    mov@ ebx, eax
     xchg edx, ecx
-    mov eax, edx
+    mov@ eax, edx
     imul eax
-    add eax, ebx
-    adc edx, ecx
+    add@ eax, ebx
+    adc@ edx, ecx
     call func_0014BC34
     pop edx
-    mov ecx, eax
-    mov eax, edx
+    mov@ ecx, eax
+    mov@ eax, edx
     shl eax, 01Ch
     sar edx, 4
     idiv ecx
     call func_001372F3
-    add eax, esi
+    add@ eax, esi
     and eax, 07FFh
     pop esi
     pop ecx
@@ -471,10 +472,10 @@ func_0014BF41:
     push esi
     push edi
     push ebp
-    mov esi, eax
-    mov edi, esi
+    mov@ esi, eax
+    mov@ edi, esi
     add edi, 0Ch
-    mov ebp, edi
+    mov@ ebp, edi
     add ebp, 0Ch
     mov ecx, offset D_0014BB00
     mov eax, dword ptr [edi]
@@ -497,36 +498,36 @@ func_0014BF41:
     sub eax, dword ptr [edi + 8]
     mov dword ptr [ecx + 8], eax
     mov esi, offset D_0014BB00
-    mov edi, esi
+    mov@ edi, esi
     add edi, 0Ch
     mov eax, dword ptr [esi + 4]
     imul dword ptr [edi]
-    mov ebx, eax
-    mov ecx, edx
+    mov@ ebx, eax
+    mov@ ecx, edx
     mov eax, dword ptr [esi]
     imul dword ptr [edi + 4]
-    sub eax, ebx
-    db 01Bh, 0D1h   ; sbb edx, ecx
+    sub@ eax, ebx
+    sbb@ edx, ecx
     shrd eax, edx, 8
     push eax
     mov eax, dword ptr [esi]
     imul dword ptr [edi + 8]
-    mov ebx, eax
-    mov ecx, edx
+    mov@ ebx, eax
+    mov@ ecx, edx
     mov eax, dword ptr [esi + 8]
     imul dword ptr [edi]
-    sub eax, ebx
-    db 01Bh, 0D1h   ; sbb edx, ecx
+    sub@ eax, ebx
+    sbb@ edx, ecx
     shrd eax, edx, 8
     push eax
     mov eax, dword ptr [esi + 8]
     imul dword ptr [edi + 4]
-    mov ebx, eax
-    mov ecx, edx
+    mov@ ebx, eax
+    mov@ ecx, edx
     mov eax, dword ptr [esi + 4]
     imul dword ptr [edi + 8]
-    sub eax, ebx
-    db 01Bh, 0D1h   ; sbb edx, ecx
+    sub@ eax, ebx
+    sbb@ edx, ecx
     shrd eax, edx, 8
     pop edx
     pop ebx
@@ -542,16 +543,16 @@ func_0014BFE1:
     mov dword ptr [D_0014BB3C], eax
     mov dword ptr [D_0014BB40], edx
     mov dword ptr [D_0014BB44], ebx
-    mov eax, esi
+    mov@ eax, esi
     sub eax, dword ptr [ecx]
     imul dword ptr [D_0014BB3C]
-    mov ebx, eax
-    mov ebp, edx
-    mov eax, edi
+    mov@ ebx, eax
+    mov@ ebp, edx
+    mov@ eax, edi
     sub eax, dword ptr [ecx + 8]
     imul dword ptr [D_0014BB44]
-    add eax, ebx
-    adc edx, ebp
+    add@ eax, ebx
+    adc@ edx, ebp
     idiv dword ptr [D_0014BB40]
     neg eax
     add eax, dword ptr [ecx + 4]
@@ -565,10 +566,10 @@ func_0014C021:
     push ebp
     push ebx
     push edx
-    mov esi, eax
-    mov edi, esi
+    mov@ esi, eax
+    mov@ edi, esi
     add edi, 0Ch
-    mov ebp, edi
+    mov@ ebp, edi
     add ebp, 0Ch
     mov ecx, offset D_0014BB00
     mov edx, dword ptr [edi]
@@ -600,52 +601,52 @@ func_0014C021:
     mov edx, dword ptr [esi + 4]
     mov dword ptr [ecx + 4], edx
     mov esi, offset D_0014BB00
-    mov edi, esi
+    mov@ edi, esi
     add edi, 0Ch
-    mov ebp, edi
+    mov@ ebp, edi
     add ebp, 0Ch
     mov eax, dword ptr [esi]
     imul dword ptr [edi + 8]
-    mov ebx, eax
-    mov ecx, edx
+    mov@ ebx, eax
+    mov@ ecx, edx
     mov eax, dword ptr [esi + 8]
     imul dword ptr [edi]
-    sub eax, ebx
-    db 01Bh, 0D1h   ; sbb edx, ecx
+    sub@ eax, ebx
+    sbb@ edx, ecx
     shrd eax, edx, 8
     neg eax
     je short L_14C10C
     mov dword ptr [D_0014BB30], eax
     mov eax, dword ptr [esi]
     imul dword ptr [ebp + 8]
-    mov ebx, eax
-    mov ecx, edx
+    mov@ ebx, eax
+    mov@ ecx, edx
     mov eax, dword ptr [esi + 8]
     imul dword ptr [ebp]
-    sub eax, ebx
-    db 01Bh, 0D1h   ; sbb edx, ecx
+    sub@ eax, ebx
+    sbb@ edx, ecx
     shrd eax, edx, 8
     neg eax
     mov dword ptr [D_0014BB34], eax
     mov eax, dword ptr [ebp]
     imul dword ptr [edi + 8]
-    mov ebx, eax
-    mov ecx, edx
+    mov@ ebx, eax
+    mov@ ecx, edx
     mov eax, dword ptr [ebp + 8]
     imul dword ptr [edi]
-    sub eax, ebx
-    db 01Bh, 0D1h   ; sbb edx, ecx
+    sub@ eax, ebx
+    sbb@ edx, ecx
     shrd eax, edx, 8
     neg eax
     mov dword ptr [D_0014BB38], eax
     mov eax, dword ptr [D_0014BB38]
     imul dword ptr [esi + 4]
-    mov ebx, eax
-    mov ecx, edx
+    mov@ ebx, eax
+    mov@ ecx, edx
     mov eax, dword ptr [D_0014BB34]
     imul dword ptr [edi + 4]
-    add eax, ebx
-    adc edx, ecx
+    add@ eax, ebx
+    adc@ edx, ecx
     idiv dword ptr [D_0014BB30]
     add eax, dword ptr [ebp + 4]
 L_14C10C:
@@ -663,40 +664,40 @@ func_0014C111:
     mov eax, dword ptr [edi]
     sub eax, dword ptr [esi]
     imul dword ptr [D_0014BB3C]
-    mov ebx, eax
-    mov ebp, edx
+    mov@ ebx, eax
+    mov@ ebp, edx
     mov eax, dword ptr [edi + 4]
     sub eax, dword ptr [esi + 4]
     imul dword ptr [D_0014BB40]
-    add ebx, eax
-    adc ebp, edx
+    add@ ebx, eax
+    adc@ ebp, edx
     mov eax, dword ptr [edi + 8]
     sub eax, dword ptr [esi + 8]
     imul dword ptr [D_0014BB44]
-    add eax, ebx
-    adc edx, ebp
+    add@ eax, ebx
+    adc@ edx, ebp
     add eax, 08000h
     adc edx, 0
     shrd eax, edx, 010h
     push edi
-    mov edi, eax
+    mov@ edi, eax
     mov eax, dword ptr [ecx]
     sub eax, dword ptr [esi]
     imul dword ptr [D_0014BB3C]
-    mov ebx, eax
-    mov ebp, edx
+    mov@ ebx, eax
+    mov@ ebp, edx
     mov eax, dword ptr [ecx + 4]
     sub eax, dword ptr [esi + 4]
     imul dword ptr [D_0014BB40]
-    add ebx, eax
-    adc ebp, edx
+    add@ ebx, eax
+    adc@ ebp, edx
     mov eax, dword ptr [ecx + 8]
     sub eax, dword ptr [esi + 8]
     imul dword ptr [D_0014BB44]
-    add eax, ebx
-    adc edx, ebp
+    add@ eax, ebx
+    adc@ edx, ebp
     idiv edi
-    mov ecx, eax
+    mov@ ecx, eax
     pop edi
     mov eax, dword ptr [edi + 4]
     sub eax, dword ptr [esi + 4]
@@ -713,7 +714,7 @@ func_0014C111:
     adc edx, 0
     shrd eax, edx, 010h
     add eax, dword ptr [esi + 8]
-    mov ebx, eax
+    mov@ ebx, eax
     mov eax, dword ptr [edi]
     sub eax, dword ptr [esi]
     imul ecx
@@ -738,24 +739,24 @@ func_0014C1DD:
     adc edx, 0
     shrd eax, edx, 010h
     push edi
-    mov edi, eax
+    mov@ edi, eax
     mov eax, dword ptr [ecx]
     sub eax, dword ptr [esi]
     imul dword ptr [D_0014BB3C]
-    mov ebx, eax
-    mov ebp, edx
+    mov@ ebx, eax
+    mov@ ebp, edx
     mov eax, dword ptr [ecx + 4]
     sub eax, dword ptr [esi + 4]
     imul dword ptr [D_0014BB40]
-    add ebx, eax
-    adc ebp, edx
+    add@ ebx, eax
+    adc@ ebp, edx
     mov eax, dword ptr [ecx + 8]
     sub eax, dword ptr [esi + 8]
     imul dword ptr [D_0014BB44]
-    add eax, ebx
-    adc edx, ebp
+    add@ eax, ebx
+    adc@ edx, ebp
     idiv edi
-    mov ecx, eax
+    mov@ ecx, eax
     pop edi
     mov eax, dword ptr [edi + 4]
     sub eax, dword ptr [esi + 4]
@@ -764,7 +765,7 @@ func_0014C1DD:
     adc edx, 0
     shrd eax, edx, 010h
     add eax, dword ptr [esi + 4]
-    mov edx, eax
+    mov@ edx, eax
     mov eax, dword ptr [esi]
     mov ebx, dword ptr [esi + 8]
     pop ebp
@@ -778,18 +779,18 @@ func_0014C25F:
     mov eax, dword ptr [esi]
     sub eax, dword ptr [ecx]
     imul dword ptr [D_0014BB3C]
-    mov ebx, eax
-    mov edi, edx
+    mov@ ebx, eax
+    mov@ edi, edx
     mov eax, dword ptr [esi + 4]
     sub eax, dword ptr [ecx + 4]
     imul dword ptr [D_0014BB40]
-    add ebx, eax
-    adc edi, edx
+    add@ ebx, eax
+    adc@ edi, edx
     mov eax, dword ptr [esi + 8]
     sub eax, dword ptr [ecx + 4]
     imul dword ptr [D_0014BB44]
-    add eax, ebx
-    adc edx, edi
+    add@ eax, ebx
+    adc@ edx, edi
     add eax, 08000h
     adc edx, 0
     shrd eax, edx, 010h
@@ -812,37 +813,37 @@ L_14C2D2:
     sub edx, dword ptr [esi]
     imul edx
     xchg ebx, eax
-    mov ebp, edx
+    mov@ ebp, edx
     mov edx, dword ptr [ecx + 8]
     sub edx, dword ptr [esi + 8]
     imul edx
-    add ebx, eax
-    adc ebp, edx
+    add@ ebx, eax
+    adc@ ebp, edx
     mov eax, dword ptr [ecx + 4]
     sub eax, dword ptr [esi + 4]
     imul dword ptr [D_0014BB40]
-    add eax, ebx
-    adc edx, ebp
+    add@ eax, ebx
+    adc@ edx, ebp
     push eax
     push edx
     mov eax, dword ptr [ecx]
     sub eax, dword ptr [edi]
     imul dword ptr [D_0014BB3C]
-    mov ebx, eax
-    mov ebp, edx
+    mov@ ebx, eax
+    mov@ ebp, edx
     mov eax, dword ptr [ecx + 4]
     sub eax, dword ptr [edi + 4]
     imul dword ptr [D_0014BB40]
-    add ebx, eax
-    adc ebp, edx
+    add@ ebx, eax
+    adc@ ebp, edx
     mov eax, dword ptr [ecx + 8]
     sub eax, dword ptr [edi + 8]
     imul dword ptr [D_0014BB44]
-    add ebx, eax
-    adc ebp, edx
+    add@ ebx, eax
+    adc@ ebp, edx
     pop edx
     pop eax
-    xor ebp, edx
+    xor@ ebp, edx
     js short L_14C337
     mov ecx, 0FFFFFFFFh
     jmp near ptr L_14C3D6
@@ -852,26 +853,26 @@ L_14C337:
     mov eax, dword ptr [edi]
     sub eax, dword ptr [esi]
     imul dword ptr [D_0014BB3C]
-    mov ebx, eax
-    mov ebp, edx
+    mov@ ebx, eax
+    mov@ ebp, edx
     mov eax, dword ptr [edi + 4]
     sub eax, dword ptr [esi + 4]
     imul dword ptr [D_0014BB40]
-    add ebx, eax
-    adc ebp, edx
+    add@ ebx, eax
+    adc@ ebp, edx
     mov eax, dword ptr [edi + 8]
     sub eax, dword ptr [esi + 8]
     imul dword ptr [D_0014BB44]
-    add eax, ebx
-    adc edx, ebp
+    add@ eax, ebx
+    adc@ edx, ebp
     add eax, 08000h
     adc edx, 0
     shrd eax, edx, 010h
-    mov ebp, eax
+    mov@ ebp, eax
     sub eax, 8
-    mov edx, eax
+    mov@ edx, eax
     add edx, 010h
-    xor edx, eax
+    xor@ edx, eax
     jns short L_14C38A
     pop eax
     pop eax
@@ -881,7 +882,7 @@ L_14C38A:
     pop edx
     pop eax
     idiv ebp
-    mov ecx, eax
+    mov@ ecx, eax
     mov eax, dword ptr [edi + 4]
     sub eax, dword ptr [esi + 4]
     imul ecx
@@ -897,7 +898,7 @@ L_14C38A:
     adc edx, 0
     shrd eax, edx, 010h
     add eax, dword ptr [esi + 8]
-    mov ebx, eax
+    mov@ ebx, eax
     mov eax, dword ptr [edi]
     sub eax, dword ptr [esi]
     imul ecx
@@ -921,37 +922,37 @@ L_14C3EC:
     sub edx, dword ptr [esi]
     imul edx
     xchg ebx, eax
-    mov ebp, edx
+    mov@ ebp, edx
     mov edx, dword ptr [ecx + 8]
     sub edx, dword ptr [esi + 8]
     imul edx
-    add ebx, eax
-    adc ebp, edx
+    add@ ebx, eax
+    adc@ ebp, edx
     mov eax, dword ptr [ecx + 4]
     sub eax, dword ptr [esi + 4]
     imul dword ptr [D_0014BB40]
-    add eax, ebx
-    adc edx, ebp
+    add@ eax, ebx
+    adc@ edx, ebp
     push eax
     push edx
     mov eax, dword ptr [ecx]
     sub eax, dword ptr [edi]
     imul dword ptr [D_0014BB3C]
-    mov ebx, eax
-    mov ebp, edx
+    mov@ ebx, eax
+    mov@ ebp, edx
     mov eax, dword ptr [ecx + 4]
     sub eax, dword ptr [edi + 4]
     imul dword ptr [D_0014BB40]
-    add ebx, eax
-    adc ebp, edx
+    add@ ebx, eax
+    adc@ ebp, edx
     mov eax, dword ptr [ecx + 8]
     sub eax, dword ptr [edi + 8]
     imul dword ptr [D_0014BB44]
-    add ebx, eax
-    adc ebp, edx
+    add@ ebx, eax
+    adc@ ebp, edx
     pop edx
     pop eax
-    xor ebp, edx
+    xor@ ebp, edx
     js short L_14C44E
     mov ecx, 0FFFFFFFFh
     jmp short L_14C4A3
@@ -964,11 +965,11 @@ L_14C44E:
     add eax, 08000h
     adc edx, 0
     shrd eax, edx, 010h
-    mov ebp, eax
+    mov@ ebp, eax
     sub eax, 8
-    mov edx, eax
+    mov@ edx, eax
     add edx, 010h
-    xor edx, eax
+    xor@ edx, eax
     jns short L_14C47F
     pop eax
     pop eax
@@ -978,7 +979,7 @@ L_14C47F:
     pop edx
     pop eax
     idiv ebp
-    mov ecx, eax
+    mov@ ecx, eax
     mov eax, dword ptr [edi + 4]
     sub eax, dword ptr [esi + 4]
     imul ecx
@@ -986,7 +987,7 @@ L_14C47F:
     adc edx, 0
     shrd eax, edx, 010h
     add eax, dword ptr [esi + 4]
-    mov edx, eax
+    mov@ edx, eax
     mov eax, dword ptr [esi]
     mov ebx, dword ptr [esi + 8]
 L_14C4A3:
@@ -998,76 +999,76 @@ func_0014C4A6:
     mov dword ptr [D_0014C705], edx
     mov dword ptr [D_0014C709], ebx
     mov dword ptr [D_0014C70D], ecx
-    mov esi, eax
-    mov edi, ebx
+    mov@ esi, eax
+    mov@ edi, ebx
     mov eax, dword ptr [esi + 4]
     imul dword ptr [edi + 8]
-    mov ebx, eax
-    mov ecx, edx
+    mov@ ebx, eax
+    mov@ ecx, edx
     mov eax, dword ptr [esi + 8]
     imul dword ptr [edi + 4]
-    sub ebx, eax
-    db 01Bh, 0CAh   ; sbb ecx, edx
+    sub@ ebx, eax
+    sbb@ ecx, edx
     add ebx, 08000h
     adc ecx, 0
     shrd ebx, ecx, 010h
     mov dword ptr [D_0014BB3C], ebx
     mov eax, dword ptr [esi + 8]
     imul dword ptr [edi]
-    mov ebx, eax
-    mov ecx, edx
+    mov@ ebx, eax
+    mov@ ecx, edx
     mov eax, dword ptr [esi]
     imul dword ptr [edi + 8]
-    sub ebx, eax
-    db 01Bh, 0CAh   ; sbb ecx, edx
+    sub@ ebx, eax
+    sbb@ ecx, edx
     add ebx, 08000h
     adc ecx, 0
     shrd ebx, ecx, 010h
     mov dword ptr [D_0014BB40], ebx
     mov eax, dword ptr [esi]
     imul dword ptr [edi + 4]
-    mov ebx, eax
-    mov ecx, edx
+    mov@ ebx, eax
+    mov@ ecx, edx
     mov eax, dword ptr [esi + 4]
     imul dword ptr [edi]
-    sub ebx, eax
-    db 01Bh, 0CAh   ; sbb ecx, edx
+    sub@ ebx, eax
+    sbb@ ecx, edx
     add ebx, 08000h
     adc ecx, 0
     shrd ebx, ecx, 010h
     mov dword ptr [D_0014BB44], ebx
-    mov eax, ebx
+    mov@ eax, ebx
     sub eax, 01600h
-    mov edx, eax
+    mov@ edx, eax
     add edx, 02C00h
-    xor eax, edx
+    xor@ eax, edx
     jns short L_14C575
     mov eax, dword ptr [D_0014BB3C]
     sub eax, 01600h
-    mov edx, eax
+    mov@ edx, eax
     add edx, 02C00h
-    xor eax, edx
+    xor@ eax, edx
     jns short L_14C575
     mov eax, dword ptr [D_0014BB40]
     sub eax, 01600h
-    mov edx, eax
+    mov@ edx, eax
     add edx, 02C00h
-    xor eax, edx
+    xor@ eax, edx
     js near ptr L_14C6FC
 L_14C575:
     mov edi, dword ptr [D_0014C705]
     mov eax, dword ptr [esi]
     imul dword ptr [edi]
-    mov ebx, eax
-    mov ebp, edx
+    mov@ ebx, eax
+    mov@ ebp, edx
     mov eax, dword ptr [esi + 4]
     imul dword ptr [edi + 4]
-    add ebx, eax
-    adc ebp, edx
+    add@ ebx, eax
+    adc@ ebp, edx
     mov eax, dword ptr [esi + 8]
     imul dword ptr [edi + 8]
-    add eax, ebx
-    adc edx, ebp
+    add@ eax, ebx
+    adc@ edx, ebp
     add eax, 080h
     adc edx, 0
     shrd eax, edx, 8
@@ -1076,40 +1077,40 @@ L_14C575:
     mov edi, dword ptr [D_0014C70D]
     mov eax, dword ptr [esi]
     imul dword ptr [edi]
-    mov ebx, eax
-    mov ebp, edx
+    mov@ ebx, eax
+    mov@ ebp, edx
     mov eax, dword ptr [esi + 4]
     imul dword ptr [edi + 4]
-    add ebx, eax
-    adc ebp, edx
+    add@ ebx, eax
+    adc@ ebp, edx
     mov eax, dword ptr [esi + 8]
     imul dword ptr [edi + 8]
-    add eax, ebx
-    adc edx, ebp
+    add@ eax, ebx
+    adc@ edx, ebp
     add eax, 080h
     adc edx, 0
     shrd eax, edx, 8
     mov dword ptr [D_0014BB28], eax
-    mov edi, esi
+    mov@ edi, esi
     mov esi, dword ptr [D_0014C701]
     mov eax, dword ptr [D_0014BB3C]
-    or eax, eax
+    or@ eax, eax
     jns short L_14C5F4
     neg eax
 L_14C5F4:
     mov edx, dword ptr [D_0014BB40]
-    or edx, edx
+    or@ edx, edx
     jns short L_14C600
     neg edx
 L_14C600:
     mov ebx, dword ptr [D_0014BB44]
-    or ebx, ebx
+    or@ ebx, ebx
     jns short L_14C60C
     neg ebx
 L_14C60C:
-    cmp eax, edx
+    cmp@ eax, edx
     jl short L_14C62C
-    cmp eax, ebx
+    cmp@ eax, ebx
     jl short L_14C646
     mov dword ptr [D_0014C6FD], 1
     mov eax, dword ptr [esi + 4]
@@ -1118,7 +1119,7 @@ L_14C60C:
     mov ecx, dword ptr [edi + 8]
     jmp short L_14C65A
 L_14C62C:
-    cmp edx, ebx
+    cmp@ edx, ebx
     jl short L_14C646
     mov dword ptr [D_0014C6FD], 2
     mov eax, dword ptr [esi]
@@ -1139,12 +1140,12 @@ L_14C65A:
     mov dword ptr [D_0014BB5C], ecx
     mov eax, dword ptr [D_0014BB4C]
     imul dword ptr [D_0014BB5C]
-    mov ecx, eax
-    mov ebp, edx
+    mov@ ecx, eax
+    mov@ ebp, edx
     mov eax, dword ptr [D_0014BB50]
     imul dword ptr [D_0014BB58]
-    sub ecx, eax
-    db 01Bh, 0EAh   ; sbb ebp, edx
+    sub@ ecx, eax
+    sbb@ ebp, edx
     add ecx, 08000h
     adc ebp, 0
     shrd ecx, ebp, 010h
@@ -1152,26 +1153,26 @@ L_14C65A:
     mov eax, dword ptr [D_0014BB58]
     neg eax
     imul dword ptr [D_0014BB24]
-    mov esi, eax
-    mov ebp, edx
+    mov@ esi, eax
+    mov@ ebp, edx
     mov eax, dword ptr [D_0014BB4C]
     imul dword ptr [D_0014BB28]
-    add eax, esi
-    adc edx, ebp
+    add@ eax, esi
+    adc@ edx, ebp
     idiv ecx
-    mov ebx, eax
+    mov@ ebx, eax
     mov eax, dword ptr [D_0014BB28]
     neg eax
     imul dword ptr [D_0014BB50]
-    mov esi, eax
-    mov ebp, edx
+    mov@ esi, eax
+    mov@ ebp, edx
     mov eax, dword ptr [D_0014BB24]
     imul dword ptr [D_0014BB5C]
-    add eax, esi
-    adc edx, ebp
+    add@ eax, esi
+    adc@ edx, ebp
     idiv ecx
-    mov edx, eax
-    xor eax, eax
+    mov@ edx, eax
+    xor@ eax, eax
     cmp dword ptr [D_0014C6FD], 1
     je short L_14C6FC
     cmp dword ptr [D_0014C6FD], 2
@@ -1198,28 +1199,28 @@ func_0014C711:
     mov edx, dword ptr [esi]
     sub edx, dword ptr [ecx]
     imul edx
-    mov ebx, eax
-    mov ebp, edx
+    mov@ ebx, eax
+    mov@ ebp, edx
     mov eax, dword ptr [esi + 4]
     sub eax, dword ptr [ecx + 4]
     imul dword ptr [D_0014BB40]
-    add ebx, eax
-    adc ebp, edx
+    add@ ebx, eax
+    adc@ ebp, edx
     mov eax, dword ptr [esi + 8]
     sub eax, dword ptr [ecx + 8]
     imul dword ptr [D_0014BB44]
-    add eax, ebx
-    adc edx, ebp
+    add@ eax, ebx
+    adc@ edx, ebp
     add eax, 08000h
     adc edx, 0
     shrd eax, edx, 010h
-    mov edx, eax
-    or eax, eax
+    mov@ edx, eax
+    or@ eax, eax
     jns short L_14C75C
     neg eax
 L_14C75C:
     neg eax
-    add eax, edi
+    add@ eax, edi
     pop ebp
     ret
 func_0014C762:
@@ -1228,23 +1229,23 @@ func_0014C762:
     mov edx, dword ptr [esi]
     sub edx, dword ptr [ecx]
     imul edx
-    mov ebx, eax
-    mov ebp, edx
+    mov@ ebx, eax
+    mov@ ebp, edx
     mov eax, dword ptr [esi + 8]
     sub eax, dword ptr [ecx + 8]
     imul dword ptr [D_0014BB44]
-    add eax, ebx
-    adc edx, ebp
+    add@ eax, ebx
+    adc@ edx, ebp
     add eax, 08000h
     adc edx, 0
     shrd eax, edx, 010h
-    mov edx, eax
-    or eax, eax
+    mov@ edx, eax
+    or@ eax, eax
     jns short L_14C797
     neg eax
 L_14C797:
     neg eax
-    add eax, edi
+    add@ eax, edi
     pop ebp
     ret
 func_0014C79D:
@@ -1253,29 +1254,29 @@ func_0014C79D:
     mov eax, dword ptr [esi + 4]
     sub eax, dword ptr [ecx + 4]
     imul edx
-    mov ebx, eax
-    mov ebp, edx
+    mov@ ebx, eax
+    mov@ ebp, edx
     mov eax, dword ptr [esi + 8]
     sub eax, dword ptr [ecx + 8]
     imul dword ptr [D_0014BB44]
-    add eax, ebx
-    adc edx, ebp
+    add@ eax, ebx
+    adc@ edx, ebp
     add eax, 08000h
     adc edx, 0
     shrd eax, edx, 010h
-    mov edx, eax
-    or eax, eax
+    mov@ edx, eax
+    or@ eax, eax
     jns short L_14C7D4
     neg eax
 L_14C7D4:
     neg eax
-    add eax, edi
+    add@ eax, edi
     pop ebp
     ret
 func_0014C7DA:
     mov eax, dword ptr [ecx + 8]
     sub eax, dword ptr [esi + 8]
-    sub eax, edi
+    sub@ eax, edi
     neg eax
     ret
 func_0014C7E5:
@@ -1304,20 +1305,20 @@ func_0014C7E5:
     sub eax, dword ptr [esi]
     mov dword ptr [D_0014BB48], eax
     imul eax
-    mov ebx, eax
-    mov ebp, edx
+    mov@ ebx, eax
+    mov@ ebp, edx
     mov eax, dword ptr [D_0014BB40]
     sub eax, dword ptr [esi + 4]
     mov dword ptr [D_0014BB4C], eax
     imul eax
-    add ebx, eax
-    adc ebp, edx
+    add@ ebx, eax
+    adc@ ebp, edx
     mov eax, dword ptr [D_0014BB44]
     sub eax, dword ptr [esi + 8]
     mov dword ptr [D_0014BB50], eax
     imul eax
-    add eax, ebx
-    adc edx, ebp
+    add@ eax, ebx
+    adc@ edx, ebp
     add eax, 08000h
     adc edx, 0
     shrd eax, edx, 010h
@@ -1326,53 +1327,53 @@ func_0014C7E5:
     sub eax, dword ptr [esi]
     mov dword ptr [D_0014BB54], eax
     imul eax
-    mov ebx, eax
-    mov ebp, edx
+    mov@ ebx, eax
+    mov@ ebp, edx
     mov eax, dword ptr [edi + 4]
     sub eax, dword ptr [esi + 4]
     mov dword ptr [D_0014BB58], eax
     imul eax
-    add ebx, eax
-    adc ebp, edx
+    add@ ebx, eax
+    adc@ ebp, edx
     mov eax, dword ptr [edi + 8]
     sub eax, dword ptr [esi + 8]
     mov dword ptr [D_0014BB5C], eax
     imul eax
-    add eax, ebx
-    adc edx, ebp
+    add@ eax, ebx
+    adc@ edx, ebp
     add eax, 08000h
     adc edx, 0
     shrd eax, edx, 010h
     je short L_14C8FC
-    mov esi, eax
+    mov@ esi, eax
     mov eax, dword ptr [D_0014BB48]
     imul dword ptr [D_0014BB54]
-    mov ebx, eax
-    mov ebp, edx
+    mov@ ebx, eax
+    mov@ ebp, edx
     mov eax, dword ptr [D_0014BB4C]
     imul dword ptr [D_0014BB58]
-    add ebx, eax
-    adc ebp, edx
+    add@ ebx, eax
+    adc@ ebp, edx
     mov eax, dword ptr [D_0014BB50]
     imul dword ptr [D_0014BB5C]
-    add eax, ebx
-    adc edx, ebp
+    add@ eax, ebx
+    adc@ edx, ebp
     add eax, 08000h
     adc edx, 0
     shrd eax, edx, 010h
     js short L_14C8FC
-    cmp eax, esi
+    cmp@ eax, esi
     jg short L_14C8FC
     imul eax
     idiv esi
     pop ebx
-    sub ebx, eax
-    mov eax, ecx
+    sub@ ebx, eax
+    mov@ eax, ecx
     imul eax
     add eax, 08000h
     adc edx, 0
     shrd eax, edx, 010h
-    sub eax, ebx
+    sub@ eax, ebx
 L_14C8F3:
     pop ebp
     ret
@@ -1410,11 +1411,11 @@ func_0014C904:
     sub edx, dword ptr [esi + 4]
     mov dword ptr [D_0014BB4C], edx
     imul edx, edx
-    add eax, edx
+    add@ eax, edx
     sub ebx, dword ptr [esi + 8]
     mov dword ptr [D_0014BB50], ebx
     imul ebx, ebx
-    add ebx, eax
+    add@ ebx, eax
     mov eax, dword ptr [edi]
     sub eax, dword ptr [esi]
     mov dword ptr [D_0014BB54], eax
@@ -1423,31 +1424,31 @@ func_0014C904:
     sub edx, dword ptr [esi + 4]
     mov dword ptr [D_0014BB58], edx
     imul edx, edx
-    add eax, edx
+    add@ eax, edx
     mov edx, dword ptr [edi + 8]
     sub edx, dword ptr [esi + 8]
     mov dword ptr [D_0014BB5C], edx
     imul edx, edx
-    add eax, edx
+    add@ eax, edx
     je short L_14C9CB
-    mov esi, eax
+    mov@ esi, eax
     mov eax, dword ptr [D_0014BB48]
     imul eax, dword ptr [D_0014BB54]
     mov edx, dword ptr [D_0014BB4C]
     imul edx, dword ptr [D_0014BB58]
-    add eax, edx
+    add@ eax, edx
     mov edx, dword ptr [D_0014BB50]
     imul edx, dword ptr [D_0014BB5C]
-    add eax, edx
+    add@ eax, edx
     js short L_14C9CB
-    cmp eax, esi
+    cmp@ eax, esi
     jg short L_14C9CB
     imul eax
     idiv esi
-    sub ebx, eax
-    mov eax, ecx
+    sub@ ebx, eax
+    mov@ eax, ecx
     imul eax, eax
-    sub eax, ebx
+    sub@ eax, ebx
 L_14C9C2:
     pop ebp
     ret
@@ -1468,7 +1469,7 @@ func_0014C9D2:
     mov edx, dword ptr [D_0014BB40]
     mov ebx, dword ptr [D_0014BB44]
     push esi
-    mov esi, edi
+    mov@ esi, edi
     call func_0014CAD8
     pop ebx
     test eax, eax
@@ -1498,24 +1499,24 @@ func_0014CA44:
     mov dword ptr [D_0014BB44], ebx
     sub eax, dword ptr [esi]
     imul eax
-    mov ebx, eax
-    mov ebp, edx
+    mov@ ebx, eax
+    mov@ ebp, edx
     mov eax, dword ptr [D_0014BB40]
     sub eax, dword ptr [esi + 4]
     imul eax
-    add ebx, eax
-    adc ebp, edx
+    add@ ebx, eax
+    adc@ ebp, edx
     mov eax, dword ptr [D_0014BB44]
     sub eax, dword ptr [esi + 8]
     imul eax
-    add ebx, eax
-    adc ebp, edx
-    mov eax, ecx
-    add eax, edi
+    add@ ebx, eax
+    adc@ ebp, edx
+    mov@ eax, ecx
+    add@ eax, edi
     imul eax
-    sub eax, ebx
-    db 01Bh, 0D5h   ; sbb edx, ebp
-    mov eax, edx
+    sub@ eax, ebx
+    sbb@ edx, ebp
+    mov@ eax, edx
     pop ebp
     ret
 func_0014CA83:
@@ -1523,8 +1524,8 @@ func_0014CA83:
     sub edx, dword ptr [esi + 4]
     sub ebx, dword ptr [esi + 8]
     call func_0014BD94
-    sub eax, ecx
-    sub eax, edi
+    sub@ eax, ecx
+    sub@ eax, edi
     neg eax
     ret
 func_0014CA97:
@@ -1534,23 +1535,23 @@ func_0014CA97:
     neg eax
     add eax, dword ptr [esi]
     imul eax
-    mov ebx, eax
-    mov edi, edx
+    mov@ ebx, eax
+    mov@ edi, edx
     mov eax, dword ptr [esi + 4]
     sub eax, dword ptr [D_0014BB40]
     imul eax
-    add ebx, eax
-    adc edi, edx
+    add@ ebx, eax
+    adc@ edi, edx
     mov eax, dword ptr [esi + 8]
     sub eax, dword ptr [D_0014BB44]
     imul eax
-    add ebx, eax
-    adc edi, edx
-    mov eax, ecx
+    add@ ebx, eax
+    adc@ edi, edx
+    mov@ eax, ecx
     imul eax
-    sub eax, ebx
-    db 01Bh, 0D7h   ; sbb edx, edi
-    mov eax, edx
+    sub@ eax, ebx
+    sbb@ edx, edi
+    mov@ eax, edx
     pop edi
     ret
 func_0014CAD8:
@@ -1558,34 +1559,34 @@ func_0014CAD8:
     sub edx, dword ptr [esi + 4]
     sub ebx, dword ptr [esi + 8]
     call func_0014BD94
-    sub eax, ecx
+    sub@ eax, ecx
     neg eax
     ret
 func_0014CAEA:
     push ebp
     sub edx, dword ptr [ecx + 4]
     sar edi, 1
-    sub edx, edi
-    mov ebp, edx
-    add ebp, edi
-    add ebp, edi
-    xor ebp, edx
+    sub@ edx, edi
+    mov@ ebp, edx
+    add@ ebp, edi
+    add@ ebp, edi
+    xor@ ebp, edx
     jns short L_14CB1D
     sub eax, dword ptr [ecx]
     imul eax
-    mov edi, eax
-    mov ebp, edx
-    mov eax, ebx
+    mov@ edi, eax
+    mov@ ebp, edx
+    mov@ eax, ebx
     sub eax, dword ptr [ecx + 8]
     imul eax
-    add edi, eax
-    adc ebp, edx
-    mov eax, esi
+    add@ edi, eax
+    adc@ ebp, edx
+    mov@ eax, esi
     sar eax, 1
     imul eax
-    sub eax, edi
-    db 01Bh, 0D5h   ; sbb edx, ebp
-    mov eax, edx
+    sub@ eax, edi
+    sbb@ edx, ebp
+    mov@ eax, edx
 L_14CB1B:
     pop ebp
     ret
@@ -1595,44 +1596,44 @@ L_14CB1D:
 func_0014CB24:
     push edi
     sub eax, dword ptr [esi]
-    mov edi, eax
+    mov@ edi, eax
     add edi, dword ptr [ecx]
-    xor eax, edi
+    xor@ eax, edi
     sub edx, dword ptr [esi + 4]
-    mov edi, edx
+    mov@ edi, edx
     add edi, dword ptr [ecx + 4]
-    xor edx, edi
+    xor@ edx, edi
     sub ebx, dword ptr [esi + 8]
-    mov edi, ebx
+    mov@ edi, ebx
     add edi, dword ptr [ecx + 8]
-    xor ebx, edi
-    xor eax, edx
-    xor edx, ebx
-    or eax, edx
+    xor@ ebx, edi
+    xor@ eax, edx
+    xor@ edx, ebx
+    or@ eax, edx
     neg eax
-    and eax, ebx
+    and@ eax, ebx
     neg eax
     pop edi
     ret
 func_0014CB4F:
     push edi
     sub eax, dword ptr [esi]
-    mov edi, eax
-    add edi, ecx
-    xor eax, edi
+    mov@ edi, eax
+    add@ edi, ecx
+    xor@ eax, edi
     sub edx, dword ptr [esi + 4]
-    mov edi, edx
-    add edi, ecx
-    xor edx, edi
+    mov@ edi, edx
+    add@ edi, ecx
+    xor@ edx, edi
     sub ebx, dword ptr [esi + 8]
-    mov edi, ebx
-    add edi, ecx
-    xor ebx, edi
-    xor eax, edx
-    xor edx, ebx
-    or eax, edx
+    mov@ edi, ebx
+    add@ edi, ecx
+    xor@ ebx, edi
+    xor@ eax, edx
+    xor@ edx, ebx
+    or@ eax, edx
     neg eax
-    and eax, ebx
+    and@ eax, ebx
     neg eax
     pop edi
     ret
@@ -1642,20 +1643,20 @@ func_0014CB78:
     shl eax, 4
     shl edx, 4
     and ebx, 07FFh
-    mov ebp, edx
+    mov@ ebp, edx
     push eax
     imul dword ptr [ebx*4 + D_00150A00]
-    mov ecx, edx
-    mov eax, ebp
+    mov@ ecx, edx
+    mov@ eax, ebp
     imul dword ptr [ebx*4 + D_00150200]
-    add edx, ecx
+    add@ edx, ecx
     pop eax
     push edx
     imul dword ptr [ebx*4 + D_00150200]
-    mov ecx, edx
-    mov eax, ebp
+    mov@ ecx, edx
+    mov@ eax, ebp
     imul dword ptr [ebx*4 + D_00150A00]
-    sub edx, ecx
+    sub@ edx, ecx
     pop eax
     pop ebp
     pop ecx

@@ -3,6 +3,7 @@
 ; B_<address>_<length> lines are data bytes the build takes from your FALL.EXE.
 .486p
 .387
+include xngine.inc
 include xn_136A00.inc
 public L_136C38
 public L_136C42
@@ -96,7 +97,7 @@ func_00136A00:
     mov dword ptr [patch_136D85], eax
     mov dword ptr [patch_136DA0], eax
     mov dword ptr [patch_136DBB], eax
-    mov edx, eax
+    mov@ edx, eax
     mov eax, offset D_0013652F
     call func_000C0E24
     popad
@@ -134,12 +135,14 @@ L_136ABF:
     add edi, 01Dh
     dec ecx
     jne short L_136ABF
-    mov dword ptr [D_001368FD], offset D_00136540
+    db 0C7h, 05h   ; mov dword ptr [0x1368fd], 0x136540
+    dd D_001368FD
+    dd D_00136540
     popad
     ret
 func_00136AD8:
     push ebp
-    mov ebp, esp
+    mov@ ebp, esp
     push esi
     mov esi, dword ptr [ebp + 0Ch]
     mov ebp, dword ptr [ebp + 8]
@@ -155,7 +158,8 @@ func_00136AF0:
     jle near ptr L_136B84
     inc dword ptr [D_0013690D]
     cmp dword ptr [D_0013690D], 020h
-    jae short L_136B84
+    db 073h   ; jae 0x136b84
+    db L_136B84 - ($ + 1)
     nop
     nop
     nop
@@ -255,8 +259,8 @@ L_136C2D:
     B_136C2F_1
 func_00136C30:
     imul ecx
-    mov ebx, edx
-    mov eax, ebp
+    mov@ ebx, edx
+    mov@ eax, ebp
     imul ecx
 L_136C38:
     mov eax, dword ptr [ebx*4 + 0186A0h]
@@ -283,7 +287,7 @@ L_136C6B:
     imul edx, edx, 0186A0h
 patch_136C6D equ L_136C6B+2   ; rewritten at run time
     shr edx, 0Ch
-    add ebp, edx
+    add@ ebp, edx
 L_136C76:
     cmp ebp, 0186A0h
 patch_136C78 equ L_136C76+2   ; rewritten at run time
@@ -295,8 +299,8 @@ L_136C83:
     ret
 func_00136C84:
     imul ecx
-    mov eax, ebp
-    mov ebx, edx
+    mov@ eax, ebp
+    mov@ ebx, edx
     imul ecx
     shr ecx, 0Eh
 L_136C8F:
@@ -323,7 +327,7 @@ patch_136CBB equ L_136CB9+2   ; rewritten at run time
 L_136CBF:
     mov ebp, 0186A0h
 patch_136CC0 equ L_136CBF+1   ; rewritten at run time
-    mov eax, ecx
+    mov@ eax, ecx
     test edx, 0FFFF8000h
     jne short L_136CE1
 L_136CCE:
@@ -333,7 +337,7 @@ L_136CD6:
     imul edx, edx, 0186A0h
 patch_136CD8 equ L_136CD6+2   ; rewritten at run time
     shr edx, 0Ch
-    add ebp, edx
+    add@ ebp, edx
 L_136CE1:
     mul dword ptr [D_00136909]
 patch_136CE3 equ L_136CE1+2   ; rewritten at run time
@@ -346,7 +350,7 @@ L_136CF7:
     imul edx, edx, 0186A0h
 patch_136CF9 equ L_136CF7+2   ; rewritten at run time
     shr edx, 0Ch
-    add ebp, edx
+    add@ ebp, edx
 L_136D02:
     cmp ebp, 0186A0h
 patch_136D04 equ L_136D02+2   ; rewritten at run time
@@ -358,8 +362,8 @@ L_136D0F:
     ret
 func_00136D10:
     imul ecx
-    mov eax, ebp
-    mov ebx, edx
+    mov@ eax, ebp
+    mov@ ebx, edx
     imul ecx
     shr ecx, 0Eh
 L_136D1B:
@@ -392,13 +396,13 @@ patch_136D56 equ L_136D53+3   ; rewritten at run time
 L_136D5A:
     mul dword ptr [D_00136909]
 patch_136D5C equ L_136D5A+2   ; rewritten at run time
-    mov eax, ebp
-    mov ebx, edx
+    mov@ eax, ebp
+    mov@ ebx, edx
 L_136D64:
     mul dword ptr [D_00136909]
 patch_136D66 equ L_136D64+2   ; rewritten at run time
-    mov eax, ecx
-    mov ecx, edx
+    mov@ eax, ecx
+    mov@ ecx, edx
 L_136D6E:
     mul dword ptr [D_00136909]
 patch_136D70 equ L_136D6E+2   ; rewritten at run time
@@ -414,7 +418,7 @@ L_136D89:
     imul ebx, ebx, 0186A0h
 patch_136D8B equ L_136D89+2   ; rewritten at run time
     shr ebx, 0Ch
-    add ebp, ebx
+    add@ ebp, ebx
 L_136D94:
     test ecx, 0FFFF8000h
     jne short L_136DAF
@@ -425,7 +429,7 @@ L_136DA4:
     imul ecx, ecx, 0186A0h
 patch_136DA6 equ L_136DA4+2   ; rewritten at run time
     shr ecx, 0Ch
-    add ebp, ecx
+    add@ ebp, ecx
 L_136DAF:
     test edx, 0FFFF8000h
     jne short L_136DCA
@@ -436,7 +440,7 @@ L_136DBF:
     imul edx, edx, 0186A0h
 patch_136DC1 equ L_136DBF+2   ; rewritten at run time
     shr edx, 0Ch
-    add ebp, edx
+    add@ ebp, edx
 L_136DCA:
     cmp ebp, 0186A0h
 patch_136DCC equ L_136DCA+2   ; rewritten at run time

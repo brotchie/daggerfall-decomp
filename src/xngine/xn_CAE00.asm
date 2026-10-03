@@ -3,6 +3,7 @@
 ; B_<address>_<length> lines are data bytes the build takes from your FALL.EXE.
 .486p
 .387
+include xngine.inc
 include xn_CAE00.inc
 extrn D_000CAF00:byte
 extrn D_000CAF24:byte
@@ -16,9 +17,9 @@ func_000CAE07:
     jmp dword ptr [eax*4 + D_000CAF24]
 func_000CAE0E:
     push dword ptr [eax*4 + D_000CAF40]
-    mov eax, edx
-    mov edx, ebx
-    mov ebx, ecx
+    mov@ eax, edx
+    mov@ edx, ebx
+    mov@ ebx, ecx
     ret
 func_000CAE1C:
     push dword ptr [eax*4 + D_000CB00C]

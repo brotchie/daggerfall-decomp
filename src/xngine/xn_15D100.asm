@@ -3,6 +3,7 @@
 ; B_<address>_<length> lines are data bytes the build takes from your FALL.EXE.
 .486p
 .387
+include xngine.inc
 include xn_15D100.inc
 public D_0015DC00
 public func_0015D170
@@ -52,11 +53,11 @@ func_0015D141:
     push edx
     push edi
     push esi
-    xor edx, edx
+    xor@ edx, edx
 L_15D148:
     mov eax, dword ptr [esi]
     imul eax, dword ptr [edi]
-    add edx, eax
+    add@ edx, eax
     add esi, 4
     add edi, dword ptr [D_0015D169]
     sub ecx, 1
@@ -104,13 +105,13 @@ func_0015D1B7:
     push esi
     push ebp
     push ebx
-    xor ebx, ebx
-    xor ebp, ebp
+    xor@ ebx, ebx
+    xor@ ebp, ebp
 L_15D1C2:
     mov eax, dword ptr [esi]
     imul dword ptr [edi]
-    add ebp, eax
-    adc ebx, edx
+    add@ ebp, eax
+    adc@ ebx, edx
     add esi, 4
     add edi, dword ptr [D_0015D1ED]
     dec ecx
@@ -164,13 +165,13 @@ func_0015D240:
     push esi
     push ebp
     push ebx
-    xor ebx, ebx
-    xor ebp, ebp
+    xor@ ebx, ebx
+    xor@ ebp, ebp
 L_15D24B:
     mov eax, dword ptr [esi]
     imul dword ptr [edi]
-    add ebp, eax
-    adc ebx, edx
+    add@ ebp, eax
+    adc@ ebx, edx
     add esi, 8
     add edi, dword ptr [D_0015D280]
     sub ecx, 1
@@ -178,7 +179,7 @@ L_15D24B:
     mov cx, word ptr [D_0015D284]
     shrd ebp, ebx, cl
     sar ebx, cl
-    mov ecx, ebx
+    mov@ ecx, ebx
     pop ebx
     mov dword ptr [ebx + 4], ecx
     mov dword ptr [ebx], ebp
@@ -197,10 +198,10 @@ D_0015D284:
     B_15D284_4
 func_0015D288:
     push ecx
-    mov ecx, edx
+    mov@ ecx, edx
     mov edx, 1
     shl edx, cl
-    mov ecx, ebx
+    mov@ ecx, ebx
     imul ecx, ebx
 L_15D297:
     mov dword ptr [eax], edx
@@ -222,10 +223,10 @@ L_15D2B0:
     B_15D2B2_2
 func_0015D2B4:
     push ecx
-    mov ecx, edx
+    mov@ ecx, edx
     mov edx, 1
     shl edx, cl
-    mov ecx, ebx
+    mov@ ecx, ebx
     imul ecx, ebx
 L_15D2C3:
     mov dword ptr [eax], edx
@@ -250,8 +251,8 @@ func_0015D2EC:
     push ecx
     push esi
     push edi
-    mov esi, eax
-    mov edi, edx
+    mov@ esi, eax
+    mov@ edi, edx
     mov ecx, 9
     rep movsd
     mov eax, dword ptr [edx + 4]
@@ -306,11 +307,11 @@ L_15E459:
 func_0015E45C:
     push ebp
     push edi
-    cmp eax, ebx
+    cmp@ eax, ebx
     jle short L_15E463
     xchg ebx, eax
 L_15E463:
-    cmp edx, ecx
+    cmp@ edx, ecx
     jle short L_15E469
     xchg ecx, edx
 L_15E469:
@@ -329,7 +330,7 @@ L_15E469:
     push ebx
     push ecx
     push edx
-    mov edx, ecx
+    mov@ edx, ecx
     call func_0015310C
     pop edx
     pop ecx
@@ -344,7 +345,7 @@ L_15E469:
     pop ecx
     pop ebx
     pop eax
-    mov eax, ebx
+    mov@ eax, ebx
     dec eax
     call func_00153188
 L_15E4A1:
@@ -354,11 +355,11 @@ L_15E4A1:
 func_0015E4A4:
     push ebp
     push edi
-    cmp eax, ebx
+    cmp@ eax, ebx
     jle short L_15E4AB
     xchg ebx, eax
 L_15E4AB:
-    cmp edx, ecx
+    cmp@ edx, ecx
     jle short L_15E4B1
     xchg ecx, edx
 L_15E4B1:
@@ -366,22 +367,22 @@ L_15E4B1:
     jb short L_15E4F6
     mov edi, dword ptr [edx*4 + D_00142950]
     add edi, dword ptr [D_00143550]
-    add edi, eax
-    sub ebx, eax
-    sub ecx, edx
-    mov edx, ecx
+    add@ edi, eax
+    sub@ ebx, eax
+    sub@ ecx, edx
+    mov@ edx, ecx
     movzx eax, byte ptr [D_0012B508]
     mov ebp, dword ptr [D_00142930]
     mov eax, dword ptr [eax*4 + D_00149980]
-    sub ebp, ebx
+    sub@ ebp, ebx
 L_15E4E3:
-    mov ecx, ebx
+    mov@ ecx, ebx
     shr ecx, 2
     rep stosd
-    mov ecx, ebx
+    mov@ ecx, ebx
     and ecx, 3
     rep stosb
-    add edi, ebp
+    add@ edi, ebp
     dec edx
     jne short L_15E4E3
 L_15E4F6:
@@ -395,29 +396,29 @@ func_0015F50C:
     push ebx
     push ecx
     push edx
-    or eax, eax
+    or@ eax, eax
     je short L_15F54F
-    mov ebx, eax
-    xor dl, dl
+    mov@ ebx, eax
+    xor@ dl, dl
     bsr ecx, ebx
     cmp ecx, 0Ch
     jb short L_15F52F
     sub ecx, 0Bh
-    mov dl, cl
+    mov@ dl, cl
     shr dl, 1
     adc cl, 0
-    mov dl, cl
+    mov@ dl, cl
     shr dl, 1
     shr ebx, cl
 L_15F52F:
     bsf ecx, ebx
     test ecx, 1
     setne al
-    sub cl, al
+    sub@ cl, al
     shr ebx, cl
     shr cl, 1
     movzx eax, byte ptr [ebx + D_0015E500]
-    add cl, dl
+    add@ cl, dl
     shl eax, cl
     shr eax, 2
 L_15F54F:

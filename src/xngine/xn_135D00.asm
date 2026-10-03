@@ -3,6 +3,7 @@
 ; B_<address>_<length> lines are data bytes the build takes from your FALL.EXE.
 .486p
 .387
+include xngine.inc
 include xn_135D00.inc
 public func_00135D00
 public func_00135DE4
@@ -103,17 +104,17 @@ L_135D50:
     mov eax, dword ptr [D_001343C0]
     movzx ebx, word ptr [edx + 016h]
     push edx
-    xor edx, edx
+    xor@ edx, edx
     div ebx
-    mov ebx, eax
+    mov@ ebx, eax
     pop edx
     cmp word ptr [edx + 014h], ax
     ja short L_135D9D
     push edx
     movzx ebx, word ptr [edx + 014h]
-    xor edx, edx
+    xor@ edx, edx
     div ebx
-    mov ebx, edx
+    mov@ ebx, edx
     pop edx
 L_135D9D:
     push esi
@@ -130,24 +131,24 @@ L_135D9D:
     je short L_135DD1
     push eax
     push edx
-    mov edx, eax
-    mov eax, esi
+    mov@ edx, eax
+    mov@ eax, esi
     call func_0015C2DC
     pop edx
     pop eax
 L_135DD1:
-    sub eax, edx
+    sub@ eax, edx
     mov dword ptr [edx + 0Eh], eax
     pop esi
 L_135DD7:
     mov dword ptr [ecx + 0Ch], edx
-    mov eax, ecx
+    mov@ eax, ecx
     pop ecx
     clc
     ret
 L_135DDF:
     pop ecx
-    xor eax, eax
+    xor@ eax, eax
     stc
     ret
 func_00135DE4:
@@ -184,7 +185,7 @@ L_135E24:
     ret
 L_135E34:
     pop ecx
-    xor eax, eax
+    xor@ eax, eax
     stc
     ret
 func_00135E39:
@@ -197,11 +198,12 @@ func_00135E39:
     mov dword ptr [D_001343E0], ebx
     mov dword ptr [eax + 8], ebx
     mov dword ptr [eax], 0
-    mov dword ptr [eax + 4], offset D_001343E4
+    db 0C7h, 040h, 04h   ; mov dword ptr [eax + 4], 0x1343e4
+    dd D_001343E4
     mov word ptr [eax + 0Ch], 0
     mov edi, offset D_00132F6C
     mov ecx, 0200h
-    xor eax, eax
+    xor@ eax, eax
     rep stosd
     mov byte ptr [D_00132F58], 0
     call func_0015C2F0
@@ -210,7 +212,7 @@ func_00135E39:
     B_135E8D_3
 func_00135E90:
     pushad
-    xor eax, eax
+    xor@ eax, eax
     mov edi, offset D_00133F6C
     mov ecx, 0100h
     rep stosd
@@ -221,11 +223,11 @@ func_00135E90:
 func_00135EAB:
     push eax
     mov bx, 0Ah
-    xor dx, dx
+    xor@ dx, dx
     div bx
     add dl, 030h
     mov byte ptr [D_00134376], dl
-    xor dx, dx
+    xor@ dx, dx
     div bx
     add dl, 030h
     mov byte ptr [D_00134375], dl
@@ -257,7 +259,7 @@ L_135EF8:
 L_135F02:
     mov edx, offset D_00134378
     call func_000C0C8C
-    mov eax, ebx
+    mov@ eax, ebx
     call func_000A1235
     mov dword ptr [D_001343B9], eax
     push ebx
@@ -269,12 +271,12 @@ L_135F02:
     mov dword ptr [edx], eax
     mov dword ptr [eax - 8], edx
     push eax
-    mov edx, eax
+    mov@ edx, eax
     mov ecx, dword ptr [D_001343B9]
     call func_000C0DC4
     call func_000C0CCC
     pop eax
-    mov edx, eax
+    mov@ edx, eax
     movzx ecx, word ptr [eax]
     add eax, 01Ah
 L_135F4E:
@@ -323,7 +325,7 @@ L_135FC1:
 func_00135FCF:
     pushad
     movzx edx, word ptr [ebx + 6]
-    mov edi, ebx
+    mov@ edi, ebx
     mov ebp, 0100h
     add edi, dword ptr [ebx + 0Eh]
     sub bp, word ptr [ebx + 4]
@@ -344,13 +346,13 @@ func_00135FCF:
     mov edi, dword ptr [D_00147954]
 L_136005:
     and word ptr [ebx + 8], 0FEFFh
-    xor eax, eax
+    xor@ eax, eax
 L_13600D:
     movzx ecx, word ptr [ebx + 4]
     repne scasb
     test ecx, ecx
     jne short L_13601E
-    add edi, ebp
+    add@ edi, ebp
     dec edx
     jne short L_13600D
     popad
@@ -373,7 +375,8 @@ func_00136026:
     mov ebx, dword ptr [D_001343E0]
     mov dword ptr [eax + 8], ebx
     mov dword ptr [eax], 0
-    mov dword ptr [eax + 4], offset D_001343E4
+    db 0C7h, 040h, 04h   ; mov dword ptr [eax + 4], 0x1343e4
+    dd D_001343E4
     mov word ptr [eax + 0Ch], 0
     mov eax, 0C0000h
     call func_000A10A8
@@ -383,7 +386,7 @@ func_00136026:
     mov dword ptr [eax + 4], 0
     mov edi, offset D_00132F6C
     mov ecx, 0200h
-    xor eax, eax
+    xor@ eax, eax
     rep stosd
     call func_0015C200
     call func_00135E90
@@ -403,10 +406,10 @@ L_1360A3:
     int 021h
 func_001360CC:
     pushad
-    xor eax, eax
+    xor@ eax, eax
     xchg dword ptr [D_001343DC], eax
     call func_000A117E
-    xor eax, eax
+    xor@ eax, eax
     xchg dword ptr [D_001343D0], eax
     call func_000A117E
     call func_0015C260
@@ -449,10 +452,10 @@ func_00136145:
     call func_00136173
     test eax, eax
     je short L_13616F
-    mov edx, eax
+    mov@ edx, eax
     mov ecx, dword ptr [edx + 0Eh]
     mov dword ptr [ecx], 0
-    mov eax, edx
+    mov@ eax, edx
     add eax, 016h
     call func_0013622F
     pop eax
@@ -467,7 +470,7 @@ func_00136173:
     push ecx
     push ebx
     mov eax, 046Ch
-    xor ecx, ecx
+    xor@ ecx, ecx
     mov eax, dword ptr [eax]
     mov edx, dword ptr [D_001343E4]
 L_136184:
@@ -481,12 +484,12 @@ L_136184:
     test word ptr [ebx + D_00133F6C], 0FFFFh
     jne short L_1361AD
     mov eax, dword ptr [edx + 012h]
-    mov ecx, edx
+    mov@ ecx, edx
 L_1361AD:
     mov edx, dword ptr [edx]
     test edx, edx
     jne short L_136184
-    mov eax, ecx
+    mov@ eax, ecx
     pop ebx
     pop ecx
     ret
@@ -509,8 +512,8 @@ L_1361DD:
     jmp short L_1361C1
 L_1361E1:
     add eax, 016h
-    mov ebx, edx
-    add ebx, eax
+    mov@ ebx, edx
+    add@ ebx, eax
     lea ebx, [eax + edx]
     sub dword ptr [D_001343E0], eax
     mov ecx, dword ptr [edx]
@@ -522,7 +525,7 @@ L_1361E1:
     mov dword ptr [ecx + 4], ebx
 L_136201:
     mov ecx, dword ptr [edx + 8]
-    sub ecx, eax
+    sub@ ecx, eax
     mov dword ptr [ebx + 8], ecx
     or word ptr [edx + 0Ch], 1
     sub eax, 016h
@@ -536,7 +539,7 @@ L_13621D:
     lea eax, [edx + 016h]
     ret
 L_13622C:
-    xor eax, eax
+    xor@ eax, eax
     ret
 func_0013622F:
     sub eax, 016h
@@ -558,7 +561,7 @@ L_13625F:
     mov ebx, dword ptr [eax + 4]
     test word ptr [ebx + 0Ch], 1
     jne short L_136281
-    mov ebx, eax
+    mov@ ebx, eax
     mov eax, dword ptr [ebx + 4]
     mov ecx, dword ptr [ebx + 8]
     add ecx, 016h
@@ -581,25 +584,25 @@ func_00136282:
     call func_001362CF
     push edi
     jb short L_1362C8
-    mov ebp, eax
-    xor eax, eax
-    xor ecx, ecx
+    mov@ ebp, eax
+    xor@ eax, eax
+    xor@ ecx, ecx
 L_13629F:
     push edi
     push ebp
 L_1362A1:
     mov cl, byte ptr [esi]
     inc esi
-    sub ebp, ecx
-    mov ebx, ecx
+    sub@ ebp, ecx
+    mov@ ebx, ecx
     shr ecx, 2
     rep stosd
-    mov ecx, ebx
+    mov@ ecx, ebx
     and ecx, 3
     rep stosb
     mov cl, byte ptr [esi]
     inc esi
-    sub ebp, ecx
+    sub@ ebp, ecx
     rep movsb
     jne short L_1362A1
     pop ebp
@@ -639,7 +642,7 @@ L_13630D:
     sub cx, word ptr [edi]
     add ecx, dword ptr [edi + 2]
     sub word ptr [edi], ax
-    mov edi, ecx
+    mov@ edi, ecx
     jmp short L_13637A
 L_13632A:
     add edi, 8
@@ -653,14 +656,14 @@ L_13632A:
     mov dword ptr [edi + 2], ecx
     mov word ptr [edi], 0100h
     sub word ptr [edi], ax
-    mov edi, ecx
+    mov@ edi, ecx
     jmp short L_13637A
 L_136353:
     mov ecx, dword ptr [D_001343D0]
     mov word ptr [edi + 6], dx
     mov dword ptr [edi + 2], ecx
     mov ecx, 0100h
-    sub ecx, eax
+    sub@ ecx, eax
     mov word ptr [edi], cx
     mov edi, dword ptr [D_001343D0]
     mov dword ptr [D_00134BFA], 1
@@ -673,7 +676,7 @@ L_13637A:
     mov dword ptr [ecx + D_00134C06], edi
     mov ecx, dword ptr [D_001343D0]
     add ecx, 0C0000h
-    cmp edi, ecx
+    cmp@ edi, ecx
     jae short L_1363B1
     clc
 L_1363B0:
@@ -690,7 +693,7 @@ L_1363B1:
     mov ax, 04C00h
     int 021h
 func_001363D9:
-    xor ecx, ecx
+    xor@ ecx, ecx
 L_1363DB:
     cmp dword ptr [ecx + D_00134C02], ebp
     jne short L_1363EB
@@ -707,7 +710,7 @@ func_001363F8:
     push eax
     push edx
     mov eax, dword ptr [D_001343E4]
-    xor edx, edx
+    xor@ edx, edx
 L_136401:
     test eax, eax
     je short L_136414
@@ -728,24 +731,24 @@ func_0013641D:
     movzx edx, word ptr [esi + 2]
     add esi, 4
     mov edi, dword ptr [D_00147954]
-    xor eax, eax
-    xor ecx, ecx
+    xor@ eax, eax
+    xor@ ecx, ecx
 L_136432:
     push edi
     push ebp
 L_136434:
     mov cl, byte ptr [esi]
     inc esi
-    sub ebp, ecx
-    mov ebx, ecx
+    sub@ ebp, ecx
+    mov@ ebx, ecx
     shr ecx, 2
     rep stosd
-    mov ecx, ebx
+    mov@ ecx, ebx
     and ecx, 3
     rep stosb
     mov cl, byte ptr [esi]
     inc esi
-    sub ebp, ecx
+    sub@ ebp, ecx
     rep movsb
     jne short L_136434
     pop ebp

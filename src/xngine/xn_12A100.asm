@@ -3,6 +3,7 @@
 ; B_<address>_<length> lines are data bytes the build takes from your FALL.EXE.
 .486p
 .387
+include xngine.inc
 include xn_12A100.inc
 public D_0012AA04
 public D_0012AA08
@@ -259,7 +260,7 @@ func_0012A100:
     mov edi, offset D_00121EC0
     mov ecx, 0FFFFF000h
 L_12A13B:
-    mov eax, ecx
+    mov@ eax, ecx
     imul eax, eax
     shl eax, 8
     stosd
@@ -267,13 +268,13 @@ L_12A13B:
     cmp ecx, 01000h
     jne short L_12A13B
     mov ecx, 0100h
-    xor ebx, ebx
-    xor edi, edi
+    xor@ ebx, ebx
+    xor@ edi, edi
 L_12A156:
-    mov bl, bh
-    mov dl, bl
+    mov@ bl, bh
+    mov@ dl, bl
     dec dl
-    and bl, dl
+    and@ bl, dl
     je short L_12A162
     mov dl, 0FFh
 L_12A162:
@@ -316,7 +317,7 @@ L_12A162:
     mov ebx, 020000000h
     mov ecx, 010000h
 L_12A214:
-    xor eax, eax
+    xor@ eax, eax
     mov edx, 020h
     div ebx
     mov dword ptr [edi], eax
@@ -356,19 +357,19 @@ func_0012A274:
     pushad
     mov dword ptr [D_000CEA38], eax
     mov dword ptr [D_000CEA40], edx
-    xor eax, eax
+    xor@ eax, eax
     mov edx, 040h
     div dword ptr [D_000CEA38]
     mov dword ptr [D_000CEA3C], eax
-    xor eax, eax
+    xor@ eax, eax
     mov edx, 040h
     div dword ptr [D_000CEA40]
     mov dword ptr [D_000CEA44], eax
-    xor eax, eax
+    xor@ eax, eax
     mov edx, 010h
     div dword ptr [D_000CEA38]
     mov dword ptr [patch_1406E2], eax
-    xor eax, eax
+    xor@ eax, eax
     mov edx, 2
     div dword ptr [D_000CEA40]
     mov dword ptr [patch_14072F], eax
@@ -425,11 +426,11 @@ func_0012A3AC:
     mov ebx, dword ptr [D_000CEA28]
     mov eax, dword ptr [D_000CEA38]
     shl eax, 0Eh
-    xor edx, edx
+    xor@ edx, edx
     div ebx
     mov dword ptr [D_000CEA78], eax
-    mov ebx, eax
-    xor eax, eax
+    mov@ ebx, eax
+    xor@ eax, eax
     mov edx, 02000h
     div ebx
     mov dword ptr [D_000CEA7C], eax
@@ -437,51 +438,51 @@ func_0012A3AC:
     mov ebx, dword ptr [D_000CEA2C]
     mov eax, dword ptr [D_000CEA40]
     shl eax, 0Eh
-    xor edx, edx
+    xor@ edx, edx
     div ebx
     mov dword ptr [D_000CEA80], eax
-    mov ebx, eax
-    xor eax, eax
+    mov@ ebx, eax
+    xor@ eax, eax
     mov edx, 02000h
     div ebx
     mov dword ptr [D_000CEA84], eax
     mov dword ptr [patch_14072A], eax
     mov ebx, dword ptr [D_000CEA78]
     imul ebx, dword ptr [D_000CEA38]
-    xor eax, eax
+    xor@ eax, eax
     mov edx, 010000h
     div ebx
     mov dword ptr [patch_14030A], eax
     mov ebx, dword ptr [D_000CEA38]
-    xor eax, eax
+    xor@ eax, eax
     imul ebx, ebx
     mov edx, dword ptr [D_000CEA28]
     div ebx
     db 0C1h, 0E8h, 01h   ; shr eax, 1
     mov dword ptr [D_000CEA99], eax
     mov ebx, dword ptr [D_000CEA40]
-    xor eax, eax
+    xor@ eax, eax
     imul ebx, ebx
     mov edx, dword ptr [D_000CEA2C]
     div ebx
     db 0C1h, 0E8h, 01h   ; shr eax, 1
     mov dword ptr [D_000CEA9D], eax
     mov ebx, dword ptr [D_000CEA28]
-    xor edx, edx
+    xor@ edx, edx
     mov eax, dword ptr [D_000CEA38]
     call func_0014BDF7
     mov dword ptr [D_000CEA88], eax
     mov dword ptr [D_000CEA8C], ebx
     mov edx, dword ptr [D_000CEA2C]
     mov eax, dword ptr [D_000CEA40]
-    xor ebx, ebx
+    xor@ ebx, ebx
     call func_0014BDF7
     mov dword ptr [D_000CEA90], eax
     mov dword ptr [D_000CEA94], edx
     mov ebx, 0FFFFFE00h
     mov edi, offset D_001202C0
 L_12A499:
-    mov eax, ebx
+    mov@ eax, ebx
     cdq
     shld edx, eax, 012h
     shl eax, 012h
@@ -493,7 +494,7 @@ L_12A499:
     mov ebx, 0FFFFFE80h
     mov edi, offset D_001212C0
 L_12A4BD:
-    mov eax, ebx
+    mov@ eax, ebx
     cdq
     shld edx, eax, 012h
     shl eax, 012h
@@ -503,7 +504,7 @@ L_12A4BD:
     cmp ebx, 0180h
     jne short L_12A4BD
     mov eax, 0400000h
-    xor edx, edx
+    xor@ edx, edx
     div dword ptr [D_000CEA38]
     mov dword ptr [patch_156B74], eax
     mov dword ptr [patch_155996], eax
@@ -511,11 +512,21 @@ L_12A4BD:
     B_12A4EF_1
 func_0012A4F0:
     pushad
-    mov dword ptr [D_000CEA70], offset D_000D7AC0
-    mov dword ptr [D_000CEA64], offset D_000DB320
-    mov dword ptr [D_000CEA68], offset D_00116C80
-    mov dword ptr [D_0013F780], offset D_0013F784
-    mov dword ptr [D_00154C44], offset D_00153C44
+    db 0C7h, 05h   ; mov dword ptr [0xcea70], 0xd7ac0
+    dd D_000CEA70
+    dd D_000D7AC0
+    db 0C7h, 05h   ; mov dword ptr [0xcea64], 0xdb320
+    dd D_000CEA64
+    dd D_000DB320
+    db 0C7h, 05h   ; mov dword ptr [0xcea68], 0x116c80
+    dd D_000CEA68
+    dd D_00116C80
+    db 0C7h, 05h   ; mov dword ptr [0x13f780], 0x13f784
+    dd D_0013F780
+    dd D_0013F784
+    db 0C7h, 05h   ; mov dword ptr [0x154c44], 0x153c44
+    dd D_00154C44
+    dd D_00153C44
     mov edi, offset D_000F39E0
     mov ebx, dword ptr [D_000CEA64]
     add dword ptr [D_000CEA64], 064h
@@ -582,10 +593,10 @@ func_0012A608:
     push eax
     mov edx, dword ptr [D_00120298]
     mov dword ptr [D_00120290], 08000h
-    add edx, edx
+    add@ edx, edx
     mov eax, dword ptr [D_00120294]
     lea esi, [edx*8 + D_000F39F0]
-    xor ebx, ebx
+    xor@ ebx, ebx
 L_12A661:
     mov esi, dword ptr [esi]
     cmp esi, dword ptr [esi]
@@ -598,12 +609,12 @@ L_12A661:
     sub ax, word ptr [esi + 6]
     imul eax, dword ptr [ebx + 05Ch]
     add eax, dword ptr [esi + 8]
-    mov ecx, eax
-    xor eax, eax
+    mov@ ecx, eax
+    xor@ eax, eax
     mov edx, 1
     div ecx
     mov dword ptr [D_00120290], eax
-    mov ecx, eax
+    mov@ ecx, eax
     mov eax, dword ptr [D_00120294]
     sub eax, dword ptr [D_000CEA30]
     imul ecx
@@ -631,7 +642,7 @@ L_12A6C3:
     pop ebx
     ret
 L_12A6F8:
-    mov eax, ebx
+    mov@ eax, ebx
     pop esi
     pop ecx
     pop ebx
@@ -642,16 +653,16 @@ func_0012A700:
     push ebp
     push esi
     push edi
-    mov edi, eax
+    mov@ edi, eax
     call func_0015BC42
     mov ecx, dword ptr [eax + D_0012A01D]
     mov esi, dword ptr [edi + 040h]
-    xor ebx, ebx
+    xor@ ebx, ebx
     mov dword ptr [edi + 03Ch], ecx
     mov bl, byte ptr [esi + 1]
     mov eax, dword ptr [ebx*4 + D_00149980]
     mov dword ptr [edi + 040h], eax
-    mov eax, edi
+    mov@ eax, edi
     pop edi
     pop esi
     pop ebp
@@ -662,7 +673,7 @@ func_0012A740:
     push ebx
     push ebp
     push edi
-    mov edi, eax
+    mov@ edi, eax
     push esi
     mov ebx, dword ptr [edi + 040h]
     mov ecx, dword ptr [ebx + 0Ch]
@@ -681,7 +692,7 @@ func_0012A740:
     mov dword ptr [edi + 054h], edx
     mov dword ptr [edi + 058h], ebx
     pop esi
-    mov eax, edi
+    mov@ eax, edi
     pop edi
     pop ebp
     pop ebx
@@ -691,18 +702,18 @@ func_0012A7A0:
     push ebx
     push ebp
     push edi
-    mov edi, eax
+    mov@ edi, eax
     push esi
     call func_0015BC9C
     mov ecx, dword ptr [eax + D_0012A01D]
     mov esi, dword ptr [edi + 040h]
-    xor ebx, ebx
+    xor@ ebx, ebx
     mov dword ptr [edi + 03Ch], ecx
     mov bl, byte ptr [esi + 1]
     mov eax, dword ptr [ebx*4 + D_00149980]
     mov dword ptr [edi + 040h], eax
     pop esi
-    mov eax, edi
+    mov@ eax, edi
     pop edi
     pop ebp
     pop ebx
@@ -713,9 +724,9 @@ func_0012A7D0:
     je short L_12A811
     mov eax, offset D_0013F784
     mov ebx, dword ptr [D_0013F780]
-    sub ebx, eax
+    sub@ ebx, eax
     sub ebx, 8
-    xor edx, edx
+    xor@ edx, edx
     push ebx
     call func_0015810E
     pop ecx
@@ -742,8 +753,8 @@ func_0012A814:
     call func_00136BD8
     mov eax, offset D_00153C44
     mov ebx, dword ptr [D_00154C44]
-    sub ebx, eax
-    xor edx, edx
+    sub@ ebx, eax
+    xor@ edx, edx
     sub ebx, 8
     push ebx
     call func_0015810E
@@ -791,7 +802,7 @@ func_0012A870:
     popfd
     popad
     mov eax, dword ptr [D_00142944]
-    mov ecx, eax
+    mov@ ecx, eax
     sub eax, dword ptr [D_000CEA34]
     mov dword ptr [D_000CEA6C], eax
     neg eax
@@ -816,15 +827,15 @@ L_12A8E9:
     mov dword ptr [patch_156BAE], eax
     mov dword ptr [patch_156C59], eax
 L_12A917:
-    xor ebx, ebx
-    xor ebp, ebp
+    xor@ ebx, ebx
+    xor@ ebp, ebp
     mov edi, dword ptr [esp]
     push dword ptr [esi]
     mov bx, word ptr [esi + 6]
     mov bp, word ptr [esi + 4]
     mov eax, dword ptr [esi + 0Ch]
-    add edi, ebx
-    sub ebp, ebx
+    add@ edi, ebx
+    sub@ ebp, ebx
 L_12A92F:
     sub ebx, 0186A0h
 patch_12A931 equ L_12A92F+2   ; rewritten at run time
@@ -867,7 +878,7 @@ func_0012A97C:
     jb short L_12A983
 func_0012A97E:
     popad
-    xor eax, eax
+    xor@ eax, eax
     clc
     ret
 L_12A983:
@@ -881,23 +892,23 @@ func_0012A98B:
     mov edi, dword ptr [D_00142944]
     mov ebp, dword ptr [D_0014294C]
     lea esi, [edi*8]
-    sub ebp, edi
+    sub@ ebp, edi
     lea esi, [esi*2 + D_000F39F0]
     mov edi, dword ptr [edi*4 + D_00142950]
-    xor ecx, ecx
+    xor@ ecx, ecx
     mov al, byte ptr [D_0012B504]
     add edi, dword ptr [D_00143550]
-    mov ah, al
+    mov@ ah, al
 L_12A9C9:
     push esi
     push edi
     mov esi, dword ptr [esi]
-    xor ebx, ebx
+    xor@ ebx, ebx
 L_12A9CF:
     mov cx, word ptr [esi + 6]
     mov edi, dword ptr [esp]
-    sub ecx, ebx
-    add edi, ebx
+    sub@ ecx, ebx
+    add@ edi, ebx
     shr ecx, 1
     rep stosw
     rcl ecx, 1

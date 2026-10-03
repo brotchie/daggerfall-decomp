@@ -3,6 +3,7 @@
 ; B_<address>_<length> lines are data bytes the build takes from your FALL.EXE.
 .486p
 .387
+include xngine.inc
 include xn_152B00.inc
 public func_00152BA8
 extrn D_00152A00:byte
@@ -60,9 +61,9 @@ L_152B2A:
 L_152B36:
     in al, dx
     not al
-    and ah, al
+    and@ ah, al
     loop L_152B36
-    mov al, ah
+    mov@ al, ah
     and al, 0Fh
     test al, 3
     jne short L_152B47
@@ -72,7 +73,7 @@ L_152B47:
     jne short L_152B4D
     and al, 3
 L_152B4D:
-    or ah, al
+    or@ ah, al
     mov byte ptr [D_00152A00], ah
     mov byte ptr [D_00152A02], 2
     sti
@@ -86,7 +87,7 @@ L_152B4D:
     call func_000A12A6
     mov eax, offset func_00152EA0
     mov edx, offset L_152F41
-    sub edx, eax
+    sub@ edx, eax
     call func_00149F0C
     mov eax, offset D_00152A00
     mov edx, 06Eh
@@ -209,15 +210,15 @@ L_152DBD:
     mov dword ptr [D_00152A4C], ecx
 L_152DCB:
     mov ebp, dword ptr [D_00152A10]
-    mov eax, esi
+    mov@ eax, esi
     sub eax, dword ptr [D_00152A04]
     js short L_152DE3
     neg eax
     mov ebp, dword ptr [D_00152A14]
 L_152DE3:
     sub ebp, dword ptr [D_00152A04]
-    mov edx, eax
-    or edx, edx
+    mov@ edx, eax
+    or@ edx, edx
     jns short L_152DF1
     neg edx
 L_152DF1:
@@ -240,15 +241,15 @@ L_152E1B:
     mov dword ptr [D_00152A20], eax
 L_152E26:
     mov ebp, dword ptr [D_00152A18]
-    mov eax, edi
+    mov@ eax, edi
     sub eax, dword ptr [D_00152A08]
     js short L_152E3E
     neg eax
     mov ebp, dword ptr [D_00152A1C]
 L_152E3E:
     sub ebp, dword ptr [D_00152A08]
-    mov edx, eax
-    or edx, edx
+    mov@ edx, eax
+    or@ edx, edx
     jns short L_152E4C
     neg edx
 L_152E4C:
@@ -280,7 +281,7 @@ func_00152EA0:
     push fs
     push gs
     db 066h, 0B8h, 00h, 00h   ; mov ax, 0
-    mov ds, eax
+    db 08Eh, 0D8h   ; mov ds, eax
 func_00152EAD:
     mov word ptr [D_00152A30], 0
     mov word ptr [D_00152A60], 0
@@ -289,11 +290,11 @@ func_00152EAD:
     mov al, 0Fh
     mov dx, 0201h
     out dx, al
-    xor eax, eax
-    xor ebx, ebx
-    xor ecx, ecx
-    xor esi, esi
-    xor edi, edi
+    xor@ eax, eax
+    xor@ ebx, ebx
+    xor@ ecx, ecx
+    xor@ esi, esi
+    xor@ edi, edi
     mov ebp, 0800h
 L_152EDE:
     in al, dx

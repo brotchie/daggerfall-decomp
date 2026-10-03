@@ -3,6 +3,7 @@
 ; B_<address>_<length> lines are data bytes the build takes from your FALL.EXE.
 .486p
 .387
+include xngine.inc
 include xn_161000.inc
 public func_00161000
 public func_00161084
@@ -60,7 +61,7 @@ L_161059:
     call func_00160A18
     call func_001610C4
     popad
-    xor eax, eax
+    xor@ eax, eax
     clc
     ret
 L_161072:
@@ -121,7 +122,7 @@ L_1610F0:
     cmp dword ptr [edx*4 + D_0016086C], 03Ch
     je short L_16110C
     mov edx, dword ptr [ebx]
-    sub edx, eax
+    sub@ edx, eax
     cmp edx, 012h
     jbe short L_1610F0
     popad
@@ -142,18 +143,19 @@ func_00161114:
     mov ebx, dword ptr [D_00153400]
     dec ebx
     shl ebx, 9
-    add ebx, offset D_0016004C+3
-    lea ecx, [ebx + 0200h]
+    db 081h, 0C3h   ; add ebx, 0x16004f
+    dd D_0016004C+3
+    db 08Dh, 08Bh, 00h, 02h, 00h, 00h   ; lea ecx, [ebx + 0x200]
 L_16112D:
     inc ebx
-    cmp ebx, ecx
+    cmp@ ebx, ecx
     je short L_161162
     mov al, byte ptr [ebx]
     cmp al, 04Dh
     jne short L_16112D
 L_161138:
     inc ebx
-    cmp ebx, ecx
+    cmp@ ebx, ecx
     je short L_161162
     mov al, byte ptr [ebx]
     cmp al, 046h
@@ -165,7 +167,7 @@ L_161138:
     call func_0015392C
     pop edx
     imul edx, edx, 03E8h
-    add eax, edx
+    add@ eax, edx
     pop edx
     pop ecx
     pop ebx
@@ -175,7 +177,7 @@ L_161162:
     pop edx
     pop ecx
     pop ebx
-    xor eax, eax
+    xor@ eax, eax
     stc
     ret
     B_161169_3
@@ -252,7 +254,7 @@ L_16121D:
 func_00161224:
     push edx
     push esi
-    mov esi, eax
+    mov@ esi, eax
 L_161228:
     mov eax, dword ptr [D_00153400]
     call func_00160A3C
@@ -292,7 +294,7 @@ L_161274:
     cmp dword ptr [edx*4 + D_0016086C], 0
     jne short L_161290
     mov edx, dword ptr [ebx]
-    sub edx, eax
+    sub@ edx, eax
     cmp edx, 9
     jbe short L_161274
     popad

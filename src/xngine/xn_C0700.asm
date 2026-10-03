@@ -3,6 +3,7 @@
 ; B_<address>_<length> lines are data bytes the build takes from your FALL.EXE.
 .486p
 .387
+include xngine.inc
 include xn_C0700.inc
 public func_000C094A
 public func_000C0A36
@@ -38,7 +39,7 @@ func_000C0700:
     cmp bx, 2
     jle near ptr L_0C08C9
     push ebp
-    mov ebp, esp
+    mov@ ebp, esp
     push esi
     push edi
     mov word ptr [D_000C0602], ax
@@ -59,7 +60,7 @@ func_000C0700:
     mov eax, dword ptr [D_00195C44]
     mov dword ptr [D_000C060E], eax
 L_0C076A:
-    mov ax, bx
+    mov@ ax, bx
     movzx dx, ah
     shl ax, 8
     idiv word ptr [D_000C0606]
@@ -110,10 +111,10 @@ L_0C076A:
     mov bh, byte ptr [D_000C0613]
     mov byte ptr [patch_0C08BE], bh
     mov dx, word ptr [D_000C0616]
-    mov bl, dl
-    xor cx, cx
+    mov@ bl, dl
+    xor@ cx, cx
 L_0C0892:
-    mov cl, bh
+    mov@ cl, bh
     jcxz L_0C08B7
 L_0C0897:
     push ebx
@@ -133,7 +134,7 @@ patch_0C08B9 equ L_0C08B7+2   ; rewritten at run time
 L_0C08BD:
     mov bh, 064h
 patch_0C08BE equ L_0C08BD+1   ; rewritten at run time
-    add bx, dx
+    add@ bx, dx
     dec bp
     jne short L_0C0892
 L_0C08C6:
@@ -179,12 +180,12 @@ func_000C094A:
     mov bp, word ptr [D_000C0606]
     mov bh, byte ptr [D_000C0612]
     mov dx, word ptr [D_000C0614]
-    mov bl, dl
+    mov@ bl, dl
     movzx esi, word ptr [D_000C0602]
-    xor cx, cx
+    xor@ cx, cx
 L_0C0972:
-    mov cl, bh
-    and cl, cl
+    mov@ cl, bh
+    and@ cl, cl
     jne short L_0C097D
     jmp near ptr L_0C0A18
 L_0C097D:
@@ -200,13 +201,13 @@ L_0C097D:
     mov byte ptr [edi + 2], 074h
     add edi, 4
     push edi
-    mov ax, si
-    add ax, cx
+    mov@ ax, si
+    add@ ax, cx
     cmp ax, word ptr [D_00142948]
     jle short L_0C09C8
     mov bp, 1
     sub ax, word ptr [D_00142948]
-    sub cx, ax
+    sub@ cx, ax
     jle short L_0C0A06
 L_0C09C8:
     test word ptr [D_000C0600], 08000h
@@ -235,19 +236,19 @@ L_0C0A06:
     pop eax
     push edi
     xchg edi, eax
-    sub eax, edi
+    sub@ eax, edi
     mov byte ptr [edi - 1], al
     pop edi
     pop eax
     push edi
     xchg edi, eax
-    sub eax, edi
+    sub@ eax, edi
     mov byte ptr [edi - 1], al
     pop edi
 L_0C0A18:
     inc word ptr [D_000C061C]
     mov bh, byte ptr [D_000C0612]
-    add bx, dx
+    add@ bx, dx
     dec bp
     jne near ptr L_0C0972
     mov byte ptr [edi], 0C3h
@@ -262,9 +263,9 @@ func_000C0A36:
 L_0C0A4A:
     push ecx
     lodsd
-    and eax, eax
+    and@ eax, eax
     jns short L_0C0A71
-    mov edx, edi
+    mov@ edx, edi
     and eax, 07FFFFFFFh
     add eax, dword ptr [D_000C060E]
     sub eax, 01Ch
@@ -278,13 +279,13 @@ L_0C0A71:
     movzx ecx, word ptr [D_000C0606]
     push esi
     push edi
-    mov esi, eax
+    mov@ esi, eax
     add esi, dword ptr [D_000C060E]
     sub esi, 01Ch
-    mov ebp, ecx
+    mov@ ebp, ecx
     shr ecx, 2
     rep movsd
-    mov ecx, ebp
+    mov@ ecx, ebp
     and ecx, 3
     rep movsb
     pop edi

@@ -3,6 +3,7 @@
 ; B_<address>_<length> lines are data bytes the build takes from your FALL.EXE.
 .486p
 .387
+include xngine.inc
 include xn_C0C00.inc
 public func_000C0C8C
 public func_000C0CCC
@@ -32,35 +33,35 @@ func_000C0C00:
     push ecx
     push edx
     push edi
-    mov edi, edx
-    mov edx, eax
+    mov@ edi, edx
+    mov@ edx, eax
     call func_000C0ED0
     call func_000C0DFC
-    mov ecx, eax
-    or edi, edi
+    mov@ ecx, eax
+    or@ edi, edi
     jne short L_0C0C24
     mov eax, 0300h
     call func_000A10A8
-    mov edi, eax
+    mov@ edi, eax
 L_0C0C24:
     cmp ecx, 0300h
     je short L_0C0C64
     call func_000C0C8C
-    xor ecx, ecx
+    xor@ ecx, ecx
     mov edx, 8
-    xor al, al
+    xor@ al, al
     call func_000C0DE7
     mov ecx, 0300h
-    mov edx, edi
+    mov@ edx, edi
     call func_000C0DC4
     call func_000C0CCC
-    mov esi, edi
+    mov@ esi, edi
     mov ecx, 0300h
 L_0C0C57:
     shr byte ptr [esi], 2
     inc esi
     loop L_0C0C57
-    mov eax, edi
+    mov@ eax, edi
     pop edi
     pop edx
     pop ecx
@@ -68,10 +69,10 @@ L_0C0C57:
     ret
 L_0C0C64:
     call func_000C0C8C
-    mov edx, edi
+    mov@ edx, edi
     call func_000C0DC4
     call func_000C0CCC
-    mov eax, edi
+    mov@ eax, edi
     pop edi
     pop edx
     pop ecx
@@ -80,9 +81,9 @@ L_0C0C64:
 func_000C0C7C:
     push ebx
     push edx
-    mov edx, eax
+    mov@ edx, eax
     call func_000C0C8C
-    mov eax, ebx
+    mov@ eax, ebx
     pop edx
     pop ebx
     ret
@@ -91,9 +92,9 @@ func_000C0C8C:
     cmp dword ptr [D_001A4A04], 0
     je short L_0C0CA1
     push eax
-    mov eax, edx
+    mov@ eax, edx
     call dword ptr [D_001A4A04]
-    mov edx, eax
+    mov@ edx, eax
     pop eax
 L_0C0CA1:
     push eax
@@ -105,13 +106,13 @@ L_0C0CA1:
     ret
 L_0C0CB0:
     pop eax
-    mov esi, edx
+    mov@ esi, edx
     mov edx, offset D_000C0B00
     jmp near ptr L_0C0E8C
     B_0C0CBD_3
 func_000C0CC0:
     push ebx
-    mov ebx, eax
+    mov@ ebx, eax
     call func_000C0CCC
     pop ebx
     ret
@@ -126,8 +127,8 @@ func_000C0CCC:
 func_000C0CD8:
     push ecx
     push edx
-    mov ecx, edx
-    mov edx, eax
+    mov@ ecx, edx
+    mov@ edx, eax
     call func_000C0CF0
     mov eax, 0
     adc eax, 0
@@ -137,14 +138,14 @@ func_000C0CD8:
     B_0C0CEE_2
 func_000C0CF0:
     mov ah, 04Eh
-    xor ecx, ecx
+    xor@ ecx, ecx
     int 021h
     ret
     B_0C0CF7_1
 func_000C0CF8:
     push ecx
     push edx
-    mov edx, eax
+    mov@ edx, eax
     call func_000C0D0C
     mov eax, 0
     adc eax, 0
@@ -158,7 +159,7 @@ func_000C0D0C:
     B_0C0D11_3
 func_000C0D14:
     push edx
-    mov edx, eax
+    mov@ edx, eax
     call func_000C0D28
     mov eax, 0
     adc eax, 0
@@ -170,7 +171,7 @@ func_000C0D28:
     mov eax, 03D00h
     int 021h
     jb short L_0C0D3E
-    mov ebx, eax
+    mov@ ebx, eax
     mov eax, 03E00h
     int 021h
     pop eax
@@ -184,9 +185,9 @@ L_0C0D3E:
 func_000C0D44:
     push ebx
     push edx
-    mov edx, eax
+    mov@ edx, eax
     call func_000C0D54
-    mov eax, ebx
+    mov@ eax, ebx
     pop edx
     pop ebx
     ret
@@ -195,25 +196,25 @@ func_000C0D54:
     push eax
     push ecx
     mov ax, 03C00h
-    xor cx, cx
+    xor@ cx, cx
     int 021h
     jb short L_0C0D69
-    xor ebx, ebx
-    mov bx, ax
+    xor@ ebx, ebx
+    mov@ bx, ax
     pop ecx
     pop eax
     ret
 L_0C0D69:
     pop ecx
     pop eax
-    mov esi, edx
+    mov@ esi, edx
     mov edx, offset D_000C0B16
     jmp near ptr L_0C0E8C
     B_0C0D77_1
 func_000C0D78:
     push ecx
-    mov ecx, edx
-    mov edx, eax
+    mov@ ecx, edx
+    mov@ edx, eax
     call func_000C0D8C
     mov eax, 0
     adc eax, 0
@@ -236,8 +237,8 @@ L_0C0DB0:
     ret
 func_000C0DB8:
     push ecx
-    mov ecx, edx
-    mov edx, eax
+    mov@ ecx, edx
+    mov@ edx, eax
     call func_000C0DC4
     pop ecx
     ret
@@ -247,7 +248,7 @@ func_000C0DC4:
     ret
 func_000C0DCC:
     push ecx
-    mov ecx, edx
+    mov@ ecx, edx
     shr ecx, 010h
     and edx, 0FFFFh
     call func_000C0DE7
@@ -263,7 +264,7 @@ func_000C0DEC:
     push ebx
     push ecx
     push edx
-    mov edx, eax
+    mov@ edx, eax
     call func_000C0DFC
     pop edx
     pop ecx
@@ -275,12 +276,12 @@ func_000C0DFC:
     push ecx
     push edx
     call func_000C0C8C
-    xor ecx, ecx
-    xor edx, edx
+    xor@ ecx, ecx
+    xor@ edx, edx
     mov al, 2
     call func_000C0DE7
     shl eax, 010h
-    mov ax, dx
+    mov@ ax, dx
     ror eax, 010h
     push eax
     call func_000C0CCC
@@ -297,30 +298,30 @@ func_000C0E24:
     push esi
     push edi
     mov dword ptr [D_000C0BA8], 0
-    mov edi, edx
-    mov edx, eax
+    mov@ edi, edx
+    mov@ edx, eax
     call func_000C0ED0
     call func_000C0C8C
-    mov edx, edi
+    mov@ edx, edi
     test edi, edi
     jne short L_0C0E5B
-    mov eax, ebx
+    mov@ eax, ebx
     call func_000A1235
     call func_000A10A8
     test eax, eax
     je short L_0C0E84
-    mov edx, eax
-    mov edi, eax
+    mov@ edx, eax
+    mov@ edi, eax
 L_0C0E5B:
     mov ecx, 0FFFFh
     call func_000C0DC4
     movzx eax, ax
     add dword ptr [D_000C0BA8], eax
-    add edx, eax
+    add@ edx, eax
     cmp eax, 0FFFFh
     je short L_0C0E5B
     call func_000C0CCC
-    mov eax, edi
+    mov@ eax, edi
     pop edi
     pop esi
     pop ebp
@@ -333,7 +334,7 @@ L_0C0E84:
     B_0C0E8B_1
 L_0C0E8C:
     mov dword ptr [D_000CDE2F], eax
-    mov eax, edx
+    mov@ eax, edx
     call func_00050069
     push edx
     push esi
@@ -374,15 +375,15 @@ L_0C0EE8:
     mov al, 05Ch
     stosb
 L_0C0EF1:
-    mov esi, edx
+    mov@ esi, edx
 L_0C0EF3:
     lodsb
-    or al, al
+    or@ al, al
     je short L_0C0EFB
     stosb
     loop L_0C0EF3
 L_0C0EFB:
-    xor al, al
+    xor@ al, al
     stosb
     popad
     mov edx, offset D_000C0B53

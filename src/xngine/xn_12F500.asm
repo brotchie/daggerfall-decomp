@@ -3,6 +3,7 @@
 ; B_<address>_<length> lines are data bytes the build takes from your FALL.EXE.
 .486p
 .387
+include xngine.inc
 include xn_12F500.inc
 public func_0012F9A0
 extrn D_000C23BC:byte
@@ -74,7 +75,7 @@ L_12F535:
     stosd
     loop L_12F50B
     mov ecx, 0C8h
-    xor edi, edi
+    xor@ edi, edi
 L_12F53F:
     call func_00153990
     and eax, 7
@@ -143,20 +144,20 @@ L_12F60A:
     jg short L_12F615
     xor ecx, 020h
 L_12F615:
-    cmp eax, ebx
+    cmp@ eax, ebx
     jg short L_12F61C
     xor ecx, 2
 L_12F61C:
-    cmp edx, ebx
+    cmp@ edx, ebx
     jg short L_12F623
     xor ecx, 4
 L_12F623:
     neg ebx
-    cmp eax, ebx
+    cmp@ eax, ebx
     jl short L_12F62C
     xor ecx, 1
 L_12F62C:
-    cmp edx, ebx
+    cmp@ edx, ebx
     jl short L_12F633
     xor ecx, 8
 L_12F633:
@@ -179,20 +180,20 @@ L_12F66D:
     jg short L_12F678
     xor ecx, 020h
 L_12F678:
-    cmp eax, ebx
+    cmp@ eax, ebx
     jg short L_12F67F
     xor ecx, 2
 L_12F67F:
-    cmp edx, ebx
+    cmp@ edx, ebx
     jg short L_12F686
     xor ecx, 4
 L_12F686:
     neg ebx
-    cmp eax, ebx
+    cmp@ eax, ebx
     jl short L_12F68F
     xor ecx, 1
 L_12F68F:
-    cmp edx, ebx
+    cmp@ edx, ebx
     jl short L_12F696
     xor ecx, 8
 L_12F696:
@@ -272,11 +273,11 @@ func_0012F79C:
     pushad
     call func_0012F59C
     jb near ptr L_12F98A
-    xor eax, eax
+    xor@ eax, eax
     mov edx, 0100h
     div dword ptr [D_0012F482]
     mov dword ptr [D_0012F482], eax
-    xor eax, eax
+    xor@ eax, eax
     mov edx, 0100h
     div dword ptr [D_0012F492]
     mov dword ptr [D_0012F492], eax
@@ -286,14 +287,14 @@ func_0012F79C:
     add edx, 080h
     sar edx, 8
     add edx, dword ptr [D_000CEA34]
-    mov ecx, edx
+    mov@ ecx, edx
     mov eax, dword ptr [D_0012F47E]
     imul eax, dword ptr [D_000CEA2C]
     imul dword ptr [D_0012F482]
     add edx, 080h
     sar edx, 8
     add edx, dword ptr [D_000CEA34]
-    cmp ecx, edx
+    cmp@ ecx, edx
     je near ptr L_12F98A
     jg short L_12F82C
     xchg edx, ecx
@@ -313,7 +314,7 @@ L_12F852:
     jle short L_12F860
     mov ecx, dword ptr [D_0014294C]
 L_12F860:
-    sub ecx, edx
+    sub@ ecx, edx
     cmp ecx, 2
     jle near ptr L_12F98A
     push edx
@@ -325,7 +326,7 @@ L_12F860:
     pop eax
     mov edx, dword ptr [D_0012F482]
     mov dword ptr [D_0012DE10], eax
-    add eax, eax
+    add@ eax, eax
     mov edi, dword ptr [eax*2 + D_00142950]
     lea esi, [eax*8 + D_000F39F0]
     add edi, dword ptr [D_00143550]
@@ -364,9 +365,9 @@ L_12F900:
     sub edx, dword ptr [esi + 8]
     imul edx
     movzx ebp, word ptr [esi + 6]
-    add ebp, edx
+    add@ ebp, edx
     movzx edx, word ptr [esi + 4]
-    cmp edx, ebp
+    cmp@ edx, ebp
     pop edx
     jle short L_12F900
     call dword ptr [D_0012DE04]
@@ -383,9 +384,9 @@ L_12F936:
     sub edx, dword ptr [esi + 8]
     imul edx
     mov bx, word ptr [esi + 6]
-    add ebx, edx
+    add@ ebx, edx
     movzx edx, word ptr [esi + 4]
-    cmp ebx, edx
+    cmp@ ebx, edx
     pop edx
     jle short L_12F900
 L_12F95B:
@@ -408,12 +409,12 @@ L_12F98A:
     ret
     B_12F98C_20
 func_0012F9A0:
-    sub ebp, ebx
+    sub@ ebp, ebx
     jle short L_12F9D5
     push ebx
     push esi
     push edi
-    add edi, ebx
+    add@ edi, ebx
     mov bp, word ptr [ebp*2 + D_0012EF78]
     mov eax, dword ptr [D_0013695D]
     mov esi, dword ptr [D_0012DE14]

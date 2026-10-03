@@ -10,16 +10,21 @@ that reassemble to the original bytes and fixups (checked by tools/xn_link.py).
      instruction (a patch field of the self-modifying code) is written `label + k`. Targets in
      other objects, or in another module, are externs func_X / D_X, which the build resolves by
      address.
-  3. Modules: object 2 is cut at 0x100-aligned addresses that follow zero padding
-     (config/xngine_modules.csv; --split rewrites it).
-  4. Text: each instruction is capstone's, turned into MASM syntax. Plain data bytes become
+  3. Modules: object 2 is cut at 0x100-aligned addresses that follow zero padding, and a
+     module longer than 64K wherever it splits no instruction, field or short jump (WASM 10.0a
+     wraps segment offsets at 64K) (config/xngine_modules.csv; --split rewrites it).
+  4. Text: each instruction is capstone's, turned into MASM syntax; a register-to-register
+     ALU op or mov in the `reg, r/m` form is the matching src/xngine/xngine.inc macro
+     (`mov@ edi, esi`), since WASM writes the other form. Plain data bytes become
      B_<address>_<length> blobs that the build fills from the original (no game bytes in the
      repo); zero runs are `db n dup (0)`; pointers are `dd symbol`.
-  5. Encodings: a probe pass assembles every module with an `org` back to the original offset
-     after each instruction, so a mis-encoded instruction cannot shift the rest. Each one whose
-     bytes differ, or that wasm rejects, is written as `db` bytes with its symbol fields as
-     `dd` expressions from then on, and the pass repeats until nothing changes. The final files
-     have no `org`s and are checked whole.
+  5. Encodings: Watcom 10.0a's WASM assembles every module (tools/xn_link.py, under DOSBox-X,
+     all modules of a round at once). A probe pass assembles each with an `org` back to the
+     original offset after each instruction, so a mis-encoded instruction cannot shift the rest.
+     Each one whose bytes differ, or that WASM rejects, is written as `db` bytes with its symbol
+     fields as `dd` expressions from then on, and the pass repeats until nothing changes. The
+     final files have no `org`s and are checked whole; where WASM then sizes a forward jump
+     differently, that jump is written as bytes too.
 
 usage: xn_disasm.py [--split] [module ...]
 """
@@ -29,6 +34,7 @@ import csv
 import os
 import re
 import sys
+import time
 
 import capstone
 from capstone import x86 as cx
@@ -45,6 +51,10 @@ STRING_OPS = {"movsb", "movsw", "movsd", "stosb", "stosw", "stosd", "lodsb", "lo
               "insd", "outsb", "outsw", "outsd"}
 SEG_PREFIXES = {0x26, 0x2E, 0x36, 0x3E, 0x64, 0x65}
 MNEMONIC = {"pushal": "pushad", "popal": "popad"}
+# reg, reg in the `reg, r/m` form (direction bit set), which WASM 10.0a does not write: the
+# mov@/add@/... macros of src/xngine/xngine.inc
+RR_FORMS = {0x02, 0x03, 0x0A, 0x0B, 0x12, 0x13, 0x1A, 0x1B, 0x22, 0x23, 0x2A, 0x2B, 0x32, 0x33,
+            0x3A, 0x3B, 0x8A, 0x8B}
 
 
 def h(v):
@@ -370,7 +380,31 @@ class Analysis:
             if a in self.insns or a in targets or self.img.raw[a - self.lo]:
                 cuts.append(a)
         cuts.append(self.hi)
-        return [("xn_%05X" % s, s, e) for s, e in zip(cuts, cuts[1:])]
+        # WASM 10.0a writes 16-bit LEDATA offsets, so a segment past 64K wraps: cut longer modules
+        # at the last 0x100-aligned point under 64K that splits no instruction, fixup field or
+        # short jump
+        short = []
+        for a, i in self.insns.items():
+            b = bytes(i.bytes)
+            if i.size == 2 and (b[0] == 0xEB or 0x70 <= b[0] <= 0x7F or 0xE0 <= b[0] <= 0xE3):
+                t = a + 2 + (b[1] - 256 if b[1] & 0x80 else b[1])
+                short.append((min(a, t), max(a, t)))
+
+        def can_cut(a):
+            if a in self.covered and self.covered[a] != a:
+                return False
+            if a in self.field_bytes and self.field_bytes[a] != a:
+                return False
+            return not any(lo < a <= hi for lo, hi in short)
+        out = [cuts[0]]
+        for e in cuts[1:]:
+            while e - out[-1] > 0x10000:
+                a = out[-1] + 0x10000 & ~0xFF
+                while not can_cut(a):
+                    a -= 0x100
+                out.append(a)
+            out.append(e)
+        return [("xn_%05X" % s, s, e) for s, e in zip(out, out[1:])]
 
 
 class Module:
@@ -440,6 +474,10 @@ class Module:
                 prefix_bytes.append(b)
             else:
                 break
+        n = len(prefix_bytes)
+        if prefix_bytes in ([], [0x66]) and i.size == n + 2 and i.bytes[n] in RR_FORMS and \
+                i.bytes[n + 1] >= 0xC0:
+            return "%s@ %s" % (m, ops)
         words = m.split()
         if words[-1] in STRING_OPS:
             if any(b in SEG_PREFIXES for b in prefix_bytes) or fields:
@@ -658,6 +696,7 @@ class Module:
             "; B_<address>_<length> lines are data bytes the build takes from your FALL.EXE.",
             ".486p",
             ".387",
+            "include xngine.inc",
             "include %s.inc" % self.name,
         ]
         for n in sorted(self.publics):
@@ -696,6 +735,24 @@ def bad_insns(mod, data, problems, msgs, linemap):
                 if s is not None:
                     bad.add(s)
     return bad
+
+
+def first_resized(mod, data):
+    """The first instruction that assembled to a different length, or None. Without the probe's
+    `org`s WASM 10.0a sizes a forward `short` jump from its first-pass guess and silently makes it
+    near when that guess is past 127 bytes; up to the first such instruction everything is in
+    place, so it is the first whose own decoding differs in length."""
+    an = mod.an
+    md = capstone.Cs(capstone.CS_ARCH_X86, capstone.CS_MODE_32)
+    j = bisect.bisect_left(an.starts, mod.start)
+    while j < len(an.starts) and an.starts[j] < mod.end:
+        va = an.starts[j]
+        j += 1
+        k = va - mod.start
+        got = next(md.disasm(bytes(data[k:k + 16]), va), None)
+        if got is None or got.size != an.insns[va].size:
+            return va
+    return None
 
 
 def write_functions(an):
@@ -788,31 +845,69 @@ def main():
                 owner = mods[bisect.bisect_right(starts, va) - 1][0]
                 exports.setdefault(owner, set()).add(n)
     os.makedirs(xn_link.SRC, exist_ok=True)
-    total_db = 0
-    failed = []
-    for name, start, end in mods:
-        if a.only and name not in a.only:
-            continue
-        fallback = set()
-        for _round in range(20):
+    os.makedirs(PROBE_DIR, exist_ok=True)
+    t0 = time.time()
+    todo = [(n, s, e) for n, s, e in mods if not a.only or n in a.only]
+    fallback = {n: set() for n, _s, _e in todo}
+    # probe rounds: every module still changing is assembled in one batch (one DOSBox-X run
+    # with Watcom 10.0a's WASM); each instruction whose bytes differ, or that WASM rejects,
+    # is written as bytes from then on
+    pending = list(todo)
+    for _round in range(20):
+        if not pending:
+            break
+        print("probe round %d: %d modules (%.0f s)" % (_round + 1, len(pending), time.time() - t0), file=sys.stderr)
+        probes = {}
+        for name, start, end in pending:
             mod = Module(an, name, start, end, exports.get(name, ()))
-            text, linemap = mod.emit(fallback, probe=True)
+            text, linemap = mod.emit(fallback[name], probe=True)
             path = os.path.join(PROBE_DIR, name + ".asm")
-            os.makedirs(PROBE_DIR, exist_ok=True)
             open(path, "w", newline="\n").write(text)
-            obj, msgs = xn_link.assemble(path, img, PROBE_DIR)
+            probes[name] = (mod, linemap, path)
+        results = xn_link.assemble_many([p for _m, _l, p in probes.values()], img, PROBE_DIR)
+        still = []
+        for name, start, end in pending:
+            mod, linemap, path = probes[name]
+            obj, msgs = results[path]
             data, problems = xn_link.link(obj, start, end, img) if obj else (None, [])
             if obj is None and not ERR.search(msgs):
-                break
-            bad = bad_insns(mod, data, problems, msgs, linemap) - fallback
-            if not bad:
-                break
-            fallback |= bad
-        mod = Module(an, name, start, end, exports.get(name, ()))
-        text, _ = mod.emit(fallback)
-        open(os.path.join(xn_link.SRC, name + ".asm"), "w", newline="\n").write(text)
-        data, problems, msgs = xn_link.check(name, start, end, img)
-        total_db += len(fallback)
+                continue                # a failure with no line to blame: reported below
+            bad = bad_insns(mod, data, problems, msgs, linemap) - fallback[name]
+            if bad:
+                fallback[name] |= bad
+                still.append((name, start, end))
+        pending = still
+    # the real sources, without the `org`s: a module whose jumps WASM sizes differently now is
+    # written again with the first resized instruction as bytes, until nothing changes
+    final = {}
+    pending = list(todo)
+    for _round in range(20):
+        if not pending:
+            break
+        print("final round %d: %d modules (%.0f s)" % (_round + 1, len(pending), time.time() - t0), file=sys.stderr)
+        paths = {}
+        for name, start, end in pending:
+            mod = Module(an, name, start, end, exports.get(name, ()))
+            text, _ = mod.emit(fallback[name])
+            paths[name] = os.path.join(xn_link.SRC, name + ".asm")
+            open(paths[name], "w", newline="\n").write(text)
+        results = xn_link.assemble_many(list(paths.values()), img)
+        still = []
+        for name, start, end in pending:
+            obj, msgs = results[paths[name]]
+            data, problems = xn_link.link(obj, start, end, img) if obj else \
+                (None, [(start, "does not assemble")])
+            final[name] = data, problems, msgs
+            va = first_resized(Module(an, name, start, end), data) if problems and data else None
+            if va is not None and va not in fallback[name]:
+                fallback[name].add(va)
+                still.append((name, start, end))
+        pending = still
+    total_db = 0
+    failed = []
+    for name, start, end in todo:
+        data, problems, msgs = final[name]
+        total_db += len(fallback[name])
         status = "OK" if not problems else "%d problems: %s" % (
             len(problems), "; ".join("%#x %s" % p for p in problems[:3]))
         if problems:
@@ -820,9 +915,9 @@ def main():
             if data is None:
                 status += "\n" + msgs.strip()[:2000]
         print("%-10s %#x-%#x  %5d bytes as db  %s" % (
-            name, start, end, len(fallback), status))
+            name, start, end, len(fallback[name]), status))
     print("%d modules, %d instructions written as bytes, %d not matching" % (
-        len(mods), total_db, len(failed)))
+        len(todo), total_db, len(failed)))
     return 1 if failed else 0
 
 

@@ -3,6 +3,7 @@
 ; B_<address>_<length> lines are data bytes the build takes from your FALL.EXE.
 .486p
 .387
+include xngine.inc
 include xn_160E00.inc
 public D_00160F18
 public L_160F07
@@ -85,7 +86,7 @@ L_160E91:
 L_160EA6:
     loop L_160E91
     popad
-    xor eax, eax
+    xor@ eax, eax
     ret
 func_00160EAC:
     pushad
@@ -108,14 +109,14 @@ L_160ECE:
 L_160EDB:
     loop L_160ECE
     popad
-    xor eax, eax
+    xor@ eax, eax
     ret
 func_00160EE1:
     mov eax, 0FFFFFFFFh
     ret
 func_00160EE7:
     push edx
-    mov edx, eax
+    mov@ edx, eax
     mov eax, dword ptr [D_00160D00]
     call func_00160A54
     pop edx

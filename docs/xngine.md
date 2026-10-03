@@ -8,7 +8,7 @@ game C) while the work lives on the `xngine` branch.
 
 Two layers in one source tree:
 
-1. **Matching asm** (`src/xngine/*.asm`): modules that reassemble with Open Watcom's wasm to
+1. **Matching asm** (`src/xngine/*.asm`): modules that reassemble with Watcom 10.0a's WASM to
    the original bytes and fixups, with every address a symbol. This is the reference for the
    byte-identical build.
 2. **Equivalent C**: each function rewritten in documented C and proved equal to its asm, by
@@ -237,5 +237,46 @@ menu, the province map, character creation and the intro video replay exactly.
   seen at run time is now a named field. What remains is breadth: dungeons, towns, combat,
   the automap and the other screens, to run the other 488 functions.
 
-Run: `.venv/bin/python tools/xn_disasm.py` regenerates `src/xngine/` (4 s);
-`.venv/bin/python tools/xn_link.py [module]` checks modules; `tools/build-and-verify.sh` builds.
+## 2026-10-02: the assembler is Watcom 10.0a's WASM
+
+The modules now build with `WASM.EXE` from Watcom 10.0a, the toolchain that compiled the game,
+under DOSBox-X, as the `w10-only` work does for the C: Open Watcom is no longer needed for
+object 2. `tools/xn_link.py` assembles a batch of modules in up to 8 DOSBox-X sessions side by
+side (8.3 names, `Mnnn.ASM` and its blob include); `$WASM` still names a native assembler for
+anyone without the Watcom media. Every module assembles from its source, and 117 / 117 match.
+
+- **XnGine was not assembled with WASM 10.0a.** For a register-to-register ALU op or `mov`, XnGine's
+  assembler wrote the `reg, r/m` form (`mov edi, esi` = `8B FE`), as MASM and TASM do; WASM
+  10.0a writes the `r/m, reg` form (`89 F7`). That is 5,336 instructions. Rather than leave
+  them as bytes, `src/xngine/xngine.inc` defines `mov@`, `add@`, `or@`, `xor@`, `sub@`, `and@`,
+  `cmp@`, `adc@` and `sbb@`, which emit the original form (`mov@ edi, esi`). The macros look up
+  register numbers in a table of `?r_<reg>` equates, because comparing names with `ifidni`
+  made WASM about 17 times slower.
+- **WASM 10.0a's own limits**, found on the way:
+  - LEDATA records carry 16-bit offsets, so a segment past 64K wraps onto its own start.
+    `--split` now cuts long modules below 64K where no instruction, fixup field or short jump
+    crosses: `xn_DB300` (the 254 KB of zeroed buffers) is now four modules and `xn_119200` two.
+  - A forward `short` jump near the 127-byte limit can silently come out near (seen at 125 and
+    127 bytes). The probe's `org`s hide this, so the generator assembles the final files again
+    and writes the first resized jump in a module as bytes, until none is left (2 jumps).
+  - `mov dword ptr [ext], offset ext2` assembles as `mov word ptr`, with a 16-bit fixup.
+  - `imul reg, [base+disp], imm` adds the displacement to the immediate.
+  - `mov ds, eax` is rejected ("Operands must be the same size").
+- **What is left as bytes**: 72 instructions, against 67 under Open Watcom's wasm (whose 24
+  `sbb reg,reg` are now `sbb@`):
+
+  | Instruction | Count | Original | WASM 10.0a |
+  |---|---|---|---|
+  | `shr reg,1` | 23 | `C1 /5 01` (imm8 form) | `D1 /5` |
+  | `mov dword ptr [...], offset sym` | 14 | `C7 /0` with imm32 | a 16-bit `mov word ptr` |
+  | `cmp`/`and`/`add ax,imm` | 13 | `66 3D/25/05 iw` (accumulator form) | `66 83 /r ib` |
+  | `imul reg, [base+disp], imm32` | 6 | `69 /r id` | immediate off by the displacement |
+  | `jcc` | 6 | 4 near jumps to a target in short range, 2 short jumps | sized differently |
+  | `mov ds,eax` | 3 | `8E D8` | rejected |
+  | others | 7 | `cmp [sym], offset sym` (2), `add ebx, offset sym`, `lea` with a long displacement, `xchg al,ah`, `loop` with a 67h prefix, data decoded as code | |
+
+  The three `mov ax, sel` loads are bytes as before: their selector fixups stay in the LE table.
+
+Run: `.venv/bin/python tools/xn_disasm.py` regenerates `src/xngine/` (20 s, most of it in
+DOSBox-X); `.venv/bin/python tools/xn_link.py [module]` checks modules (5 s for all);
+`tools/build-and-verify.sh` builds.

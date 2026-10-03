@@ -3,6 +3,7 @@
 ; B_<address>_<length> lines are data bytes the build takes from your FALL.EXE.
 .486p
 .387
+include xngine.inc
 include xn_156A00.inc
 public D_00156D20
 public L_156AB4
@@ -57,7 +58,7 @@ func_00156A80:
 func_00156A94:
     mov ecx, dword ptr [esi + 8]
     mov edx, dword ptr [eax + 044h]
-    mov esi, eax
+    mov@ esi, eax
     mov eax, dword ptr [esi + 014h]
     mov dword ptr [D_00156A40], edx
     mov dword ptr [D_00156A44], eax
@@ -81,12 +82,12 @@ patch_156AC9 equ L_156AC8+1   ; rewritten at run time
     pop ebp
     pop ebx
     pop ecx
-    mov eax, ebx
+    mov@ eax, ebx
     mov edx, dword ptr [D_000CEA6C]
     imul eax, dword ptr [esi + 024h]
     imul edx, dword ptr [esi + 028h]
     add edx, dword ptr [esi + 02Ch]
-    add eax, edx
+    add@ eax, edx
     mov dword ptr [D_00156A54], eax
     imul ecx
     mov dword ptr [D_00156A5C], edx
@@ -94,7 +95,7 @@ patch_156AC9 equ L_156AC8+1   ; rewritten at run time
     imul ebx, dword ptr [esi + 030h]
     imul eax, dword ptr [esi + 034h]
     add eax, dword ptr [esi + 038h]
-    add eax, ebx
+    add@ eax, ebx
     mov dword ptr [D_00156A50], eax
     imul ecx
     mov dword ptr [D_00156A58], edx
@@ -112,7 +113,7 @@ patch_156AC9 equ L_156AC8+1   ; rewritten at run time
     mov eax, dword ptr [esi + 018h]
     and ebp, 0FFFFFFF0h
     mov dword ptr [patch_156BF4], eax
-    add ebp, edi
+    add@ ebp, edi
     mov esi, dword ptr [D_00156A48]
     mov dword ptr [patch_156C10], ebp
     mov dword ptr [patch_156C10], ebp
@@ -144,28 +145,28 @@ L_156BAD:
 patch_156BAE equ L_156BAD+1   ; rewritten at run time
     call dword ptr [D_00156A44]
     pop ecx
-    mov eax, ecx
+    mov@ eax, ecx
     imul dword ptr [D_00156A54]
     mov ebx, dword ptr [D_00156A5C]
     mov dword ptr [D_00156A5C], edx
-    sub edx, ebx
-    mov eax, ecx
-    mov ecx, edx
+    sub@ edx, ebx
+    mov@ eax, ecx
+    mov@ ecx, edx
     imul dword ptr [D_00156A50]
     mov eax, dword ptr [D_00156A58]
     mov dword ptr [D_00156A58], edx
-    sub edx, eax
+    sub@ edx, eax
     shl ebx, 010h
-    mov bx, ax
+    mov@ bx, ax
     shl ecx, 0Ch
     sar edx, 4
 L_156BF2:
     add ebx, 0186A0h
 patch_156BF4 equ L_156BF2+2   ; rewritten at run time
-    mov cx, dx
+    mov@ cx, dx
     push ebp
-    sub ebp, esi
-    mov eax, ebx
+    sub@ ebp, esi
+    mov@ eax, ebx
     sar ebp, 3
     call dword ptr [D_00156A40]
     add edi, 010h
@@ -183,7 +184,7 @@ patch_156C10 equ L_156C0E+2   ; rewritten at run time
 L_156C2B:
     lea eax, [ebp - 1]
     imul eax, dword ptr [esi + 05Ch]
-    add ecx, eax
+    add@ ecx, eax
     shr ecx, 0Dh
     and ecx, 0FFFFh
 L_156C3D:
@@ -194,7 +195,7 @@ patch_156C40 equ L_156C3D+3   ; rewritten at run time
     push ecx
     mov eax, dword ptr [ebp*4 + D_00120AC0]
     mov ebp, dword ptr [D_00156A60]
-    add ebp, eax
+    add@ ebp, eax
 L_156C58:
     mov eax, 0186A0h
 patch_156C59 equ L_156C58+1   ; rewritten at run time
@@ -213,24 +214,24 @@ patch_156C59 equ L_156C58+1   ; rewritten at run time
     imul edx
     mov ebx, dword ptr [D_00156A5C]
     mov eax, dword ptr [D_00156A58]
-    sub ecx, ebx
-    sub edx, eax
+    sub@ ecx, ebx
+    sub@ edx, eax
     imul ecx, dword ptr [ebp*4 + D_00147980]
     imul edx, dword ptr [ebp*4 + D_00147980]
     sar edx, 010h
-    mov cx, dx
+    mov@ cx, dx
     shl ebx, 010h
-    mov bx, ax
+    mov@ bx, ax
     mov eax, dword ptr [ebp*4 + D_00156A00]
     add ebx, dword ptr [esi + 018h]
     mov esi, dword ptr [D_00156A48]
     mov ebp, dword ptr [D_00156A4C]
     add eax, dword ptr [D_00156A40]
-    sub ebp, esi
+    sub@ ebp, esi
     push eax
     mov byte ptr [eax], 0C3h
     sar ebp, 3
-    mov eax, ebx
+    mov@ eax, ebx
     call dword ptr [D_00156A40]
     pop eax
     mov byte ptr [eax], 0Fh
@@ -241,126 +242,126 @@ L_156CE5:
 D_00156D20:
     B_156D20_32
 func_00156D40:
-    mov edx, ebx
+    mov@ edx, ebx
     shr edx, 010h
-    mov dl, bh
-    and edx, eax
-    add ebx, ecx
+    mov@ dl, bh
+    and@ edx, eax
+    add@ ebx, ecx
     mov dl, byte ptr [esi + edx]
     mov byte ptr [edi + 1], dl
-    mov edx, ebx
+    mov@ edx, ebx
     shr edx, 010h
-    mov dl, bh
-    and edx, eax
-    add ebx, ecx
+    mov@ dl, bh
+    and@ edx, eax
+    add@ ebx, ecx
     mov dl, byte ptr [esi + edx]
     mov byte ptr [edi + 2], dl
-    mov edx, ebx
+    mov@ edx, ebx
     shr edx, 010h
-    mov dl, bh
-    and edx, eax
-    add ebx, ecx
+    mov@ dl, bh
+    and@ edx, eax
+    add@ ebx, ecx
     mov dl, byte ptr [esi + edx]
     mov byte ptr [edi + 3], dl
-    mov edx, ebx
+    mov@ edx, ebx
     shr edx, 010h
-    mov dl, bh
-    and edx, eax
-    add ebx, ecx
+    mov@ dl, bh
+    and@ edx, eax
+    add@ ebx, ecx
     mov dl, byte ptr [esi + edx]
     mov byte ptr [edi + 4], dl
-    mov edx, ebx
+    mov@ edx, ebx
     shr edx, 010h
-    mov dl, bh
-    and edx, eax
-    add ebx, ecx
+    mov@ dl, bh
+    and@ edx, eax
+    add@ ebx, ecx
     mov dl, byte ptr [esi + edx]
     mov byte ptr [edi + 5], dl
-    mov edx, ebx
+    mov@ edx, ebx
     shr edx, 010h
-    mov dl, bh
-    and edx, eax
-    add ebx, ecx
+    mov@ dl, bh
+    and@ edx, eax
+    add@ ebx, ecx
     mov dl, byte ptr [esi + edx]
     mov byte ptr [edi + 6], dl
-    mov edx, ebx
+    mov@ edx, ebx
     shr edx, 010h
-    mov dl, bh
-    and edx, eax
-    add ebx, ecx
+    mov@ dl, bh
+    and@ edx, eax
+    add@ ebx, ecx
     mov dl, byte ptr [esi + edx]
     mov byte ptr [edi + 7], dl
-    mov edx, ebx
+    mov@ edx, ebx
     shr edx, 010h
-    mov dl, bh
-    and edx, eax
-    add ebx, ecx
+    mov@ dl, bh
+    and@ edx, eax
+    add@ ebx, ecx
     mov dl, byte ptr [esi + edx]
     mov byte ptr [edi + 8], dl
-    mov edx, ebx
+    mov@ edx, ebx
     shr edx, 010h
-    mov dl, bh
-    and edx, eax
-    add ebx, ecx
+    mov@ dl, bh
+    and@ edx, eax
+    add@ ebx, ecx
     mov dl, byte ptr [esi + edx]
     mov byte ptr [edi + 9], dl
-    mov edx, ebx
+    mov@ edx, ebx
     shr edx, 010h
-    mov dl, bh
-    and edx, eax
-    add ebx, ecx
+    mov@ dl, bh
+    and@ edx, eax
+    add@ ebx, ecx
     mov dl, byte ptr [esi + edx]
     mov byte ptr [edi + 0Ah], dl
-    mov edx, ebx
+    mov@ edx, ebx
     shr edx, 010h
-    mov dl, bh
-    and edx, eax
-    add ebx, ecx
+    mov@ dl, bh
+    and@ edx, eax
+    add@ ebx, ecx
     mov dl, byte ptr [esi + edx]
     mov byte ptr [edi + 0Bh], dl
-    mov edx, ebx
+    mov@ edx, ebx
     shr edx, 010h
-    mov dl, bh
-    and edx, eax
-    add ebx, ecx
+    mov@ dl, bh
+    and@ edx, eax
+    add@ ebx, ecx
     mov dl, byte ptr [esi + edx]
     mov byte ptr [edi + 0Ch], dl
-    mov edx, ebx
+    mov@ edx, ebx
     shr edx, 010h
-    mov dl, bh
-    and edx, eax
-    add ebx, ecx
+    mov@ dl, bh
+    and@ edx, eax
+    add@ ebx, ecx
     mov dl, byte ptr [esi + edx]
     mov byte ptr [edi + 0Dh], dl
-    mov edx, ebx
+    mov@ edx, ebx
     shr edx, 010h
-    mov dl, bh
-    and edx, eax
-    add ebx, ecx
+    mov@ dl, bh
+    and@ edx, eax
+    add@ ebx, ecx
     mov dl, byte ptr [esi + edx]
     mov byte ptr [edi + 0Eh], dl
-    mov edx, ebx
+    mov@ edx, ebx
     shr edx, 010h
-    mov dl, bh
-    and edx, eax
-    add ebx, ecx
+    mov@ dl, bh
+    and@ edx, eax
+    add@ ebx, ecx
     mov dl, byte ptr [esi + edx]
     mov byte ptr [edi + 0Fh], dl
-    mov edx, ebx
+    mov@ edx, ebx
     shr edx, 010h
-    mov dl, bh
-    and edx, eax
-    add ebx, ecx
+    mov@ dl, bh
+    and@ edx, eax
+    add@ ebx, ecx
     mov dl, byte ptr [esi + edx]
     mov byte ptr [edi + 010h], dl
     ret
     B_156E51_15
 func_00156E60:
     mov ecx, dword ptr [esi + 8]
-    mov esi, eax
+    mov@ esi, eax
     push ecx
     shr ecx, 0Dh
-    mov eax, ebx
+    mov@ eax, ebx
     and ecx, 0FFFFh
 L_156E71:
     mov ecx, dword ptr [ecx*4 + 0186A0h]
@@ -369,20 +370,20 @@ patch_156E74 equ L_156E71+3   ; rewritten at run time
     imul eax, dword ptr [esi + 030h]
     imul edx, dword ptr [esi + 034h]
     add eax, dword ptr [esi + 038h]
-    add edx, eax
+    add@ edx, eax
     mov eax, dword ptr [D_000CEA6C]
     push edx
     imul edx, ecx
     imul ebx, dword ptr [esi + 024h]
     imul eax, dword ptr [esi + 028h]
     add eax, dword ptr [esi + 02Ch]
-    add eax, ebx
+    add@ eax, ebx
     imul ecx, eax
     shr ecx, 010h
     mov ebx, dword ptr [esi + 018h]
-    mov dx, cx
+    mov@ dx, cx
     mov dword ptr [patch_156F19], ebx
-    add ebx, edx
+    add@ ebx, edx
     pop edx
     pop ecx
     cmp ebp, 010h
@@ -418,117 +419,117 @@ patch_156F07 equ L_156F04+3   ; rewritten at run time
     imul eax, ecx
     imul ecx, edx
     sar eax, 010h
-    mov cx, ax
+    mov@ cx, ax
 L_156F17:
     add ecx, 0186A0h
 patch_156F19 equ L_156F17+2   ; rewritten at run time
-    sub ecx, ebx
+    sub@ ecx, ebx
     sar ecx, 4
     shl cx, 4
     sar cx, 4
-    mov eax, ebx
+    mov@ eax, ebx
     shr eax, 010h
-    mov al, bh
-    add ebx, ecx
+    mov@ al, bh
+    add@ ebx, ecx
     and eax, 03F3Fh
-    mov edx, ebx
+    mov@ edx, ebx
     shr edx, 010h
-    mov dl, bh
+    mov@ dl, bh
     and edx, 03F3Fh
     mov al, byte ptr [esi + eax]
     mov ah, byte ptr [esi + edx]
-    add ebx, ecx
+    add@ ebx, ecx
     mov word ptr [edi + 1], ax
-    mov eax, ebx
+    mov@ eax, ebx
     shr eax, 010h
-    mov al, bh
-    add ebx, ecx
+    mov@ al, bh
+    add@ ebx, ecx
     and eax, 03F3Fh
-    mov edx, ebx
+    mov@ edx, ebx
     shr edx, 010h
-    mov dl, bh
+    mov@ dl, bh
     and edx, 03F3Fh
     mov al, byte ptr [esi + eax]
     mov ah, byte ptr [esi + edx]
-    add ebx, ecx
+    add@ ebx, ecx
     mov word ptr [edi + 3], ax
-    mov eax, ebx
+    mov@ eax, ebx
     shr eax, 010h
-    mov al, bh
-    add ebx, ecx
+    mov@ al, bh
+    add@ ebx, ecx
     and eax, 03F3Fh
-    mov edx, ebx
+    mov@ edx, ebx
     shr edx, 010h
-    mov dl, bh
+    mov@ dl, bh
     and edx, 03F3Fh
     mov al, byte ptr [esi + eax]
     mov ah, byte ptr [esi + edx]
-    add ebx, ecx
+    add@ ebx, ecx
     mov word ptr [edi + 5], ax
-    mov eax, ebx
+    mov@ eax, ebx
     shr eax, 010h
-    mov al, bh
-    add ebx, ecx
+    mov@ al, bh
+    add@ ebx, ecx
     and eax, 03F3Fh
-    mov edx, ebx
+    mov@ edx, ebx
     shr edx, 010h
-    mov dl, bh
+    mov@ dl, bh
     and edx, 03F3Fh
     mov al, byte ptr [esi + eax]
     mov ah, byte ptr [esi + edx]
-    add ebx, ecx
+    add@ ebx, ecx
     mov word ptr [edi + 7], ax
-    mov eax, ebx
+    mov@ eax, ebx
     shr eax, 010h
-    mov al, bh
-    add ebx, ecx
+    mov@ al, bh
+    add@ ebx, ecx
     and eax, 03F3Fh
-    mov edx, ebx
+    mov@ edx, ebx
     shr edx, 010h
-    mov dl, bh
+    mov@ dl, bh
     and edx, 03F3Fh
     mov al, byte ptr [esi + eax]
     mov ah, byte ptr [esi + edx]
-    add ebx, ecx
+    add@ ebx, ecx
     mov word ptr [edi + 9], ax
-    mov eax, ebx
+    mov@ eax, ebx
     shr eax, 010h
-    mov al, bh
-    add ebx, ecx
+    mov@ al, bh
+    add@ ebx, ecx
     and eax, 03F3Fh
-    mov edx, ebx
+    mov@ edx, ebx
     shr edx, 010h
-    mov dl, bh
+    mov@ dl, bh
     and edx, 03F3Fh
     mov al, byte ptr [esi + eax]
     mov ah, byte ptr [esi + edx]
-    add ebx, ecx
+    add@ ebx, ecx
     mov word ptr [edi + 0Bh], ax
-    mov eax, ebx
+    mov@ eax, ebx
     shr eax, 010h
-    mov al, bh
-    add ebx, ecx
+    mov@ al, bh
+    add@ ebx, ecx
     and eax, 03F3Fh
-    mov edx, ebx
+    mov@ edx, ebx
     shr edx, 010h
-    mov dl, bh
+    mov@ dl, bh
     and edx, 03F3Fh
     mov al, byte ptr [esi + eax]
     mov ah, byte ptr [esi + edx]
-    add ebx, ecx
+    add@ ebx, ecx
     mov word ptr [edi + 0Dh], ax
-    mov eax, ebx
+    mov@ eax, ebx
     shr eax, 010h
-    mov al, bh
-    add ebx, ecx
+    mov@ al, bh
+    add@ ebx, ecx
     and eax, 03F3Fh
-    mov edx, ebx
+    mov@ edx, ebx
     shr edx, 010h
-    mov dl, bh
+    mov@ dl, bh
     and edx, 03F3Fh
     mov al, byte ptr [esi + eax]
     mov ah, byte ptr [esi + edx]
-    add ebx, ecx
+    add@ ebx, ecx
     mov word ptr [edi + 0Fh], ax
     add edi, 010h
     pop edx
@@ -539,13 +540,14 @@ patch_156F19 equ L_156F17+2   ; rewritten at run time
     pop esi
     pop ebp
     and ebp, 0Fh
-    je near ptr L_1570F6
+    db 0Fh, 084h   ; je 0x1570f6
+    dd L_1570F6 - ($ + 4)
 L_15707A:
     push eax
     push edx
-    mov eax, ebp
+    mov@ eax, ebp
     imul eax, dword ptr [esi + 05Ch]
-    add ecx, eax
+    add@ ecx, eax
     shr ecx, 0Dh
     and ecx, 0FFFFh
 L_15708D:
@@ -560,16 +562,16 @@ patch_157090 equ L_15708D+3   ; rewritten at run time
     add edx, dword ptr [esp + 4]
     imul edx, eax
     shr edx, 010h
-    mov cx, dx
+    mov@ cx, dx
     add ecx, dword ptr [esi + 018h]
     add esp, 8
-    sub ecx, ebx
+    sub@ ecx, ebx
     movsx eax, cx
     sar ecx, 010h
     imul dword ptr [ebp*4 + D_00148980]
     imul ecx, dword ptr [ebp*4 + D_00147980]
     mov bp, word ptr [ebp*2 + D_00156D20]
-    mov cx, dx
+    mov@ cx, dx
     mov byte ptr [ebp + func_00156D40], 0C3h
     mov esi, dword ptr [esi + 040h]
     mov eax, 03F3Fh
@@ -579,131 +581,131 @@ L_1570F6:
     ret
     B_1570F7_9
 func_00157100:
-    mov edx, ebx
+    mov@ edx, ebx
     shr edx, 010h
-    mov dl, bh
-    and edx, ebp
-    add ebx, ecx
+    mov@ dl, bh
+    and@ edx, ebp
+    add@ ebx, ecx
     mov al, byte ptr [esi + edx]
     mov al, byte ptr [eax]
     mov byte ptr [edi + 1], al
-    mov edx, ebx
+    mov@ edx, ebx
     shr edx, 010h
-    mov dl, bh
-    and edx, ebp
-    add ebx, ecx
+    mov@ dl, bh
+    and@ edx, ebp
+    add@ ebx, ecx
     mov al, byte ptr [esi + edx]
     mov al, byte ptr [eax]
     mov byte ptr [edi + 2], al
-    mov edx, ebx
+    mov@ edx, ebx
     shr edx, 010h
-    mov dl, bh
-    and edx, ebp
-    add ebx, ecx
+    mov@ dl, bh
+    and@ edx, ebp
+    add@ ebx, ecx
     mov al, byte ptr [esi + edx]
     mov al, byte ptr [eax]
     mov byte ptr [edi + 3], al
-    mov edx, ebx
+    mov@ edx, ebx
     shr edx, 010h
-    mov dl, bh
-    and edx, ebp
-    add ebx, ecx
+    mov@ dl, bh
+    and@ edx, ebp
+    add@ ebx, ecx
     mov al, byte ptr [esi + edx]
     mov al, byte ptr [eax]
     mov byte ptr [edi + 4], al
-    mov edx, ebx
+    mov@ edx, ebx
     shr edx, 010h
-    mov dl, bh
-    and edx, ebp
-    add ebx, ecx
+    mov@ dl, bh
+    and@ edx, ebp
+    add@ ebx, ecx
     mov al, byte ptr [esi + edx]
     mov al, byte ptr [eax]
     mov byte ptr [edi + 5], al
-    mov edx, ebx
+    mov@ edx, ebx
     shr edx, 010h
-    mov dl, bh
-    and edx, ebp
-    add ebx, ecx
+    mov@ dl, bh
+    and@ edx, ebp
+    add@ ebx, ecx
     mov al, byte ptr [esi + edx]
     mov al, byte ptr [eax]
     mov byte ptr [edi + 6], al
-    mov edx, ebx
+    mov@ edx, ebx
     shr edx, 010h
-    mov dl, bh
-    and edx, ebp
-    add ebx, ecx
+    mov@ dl, bh
+    and@ edx, ebp
+    add@ ebx, ecx
     mov al, byte ptr [esi + edx]
     mov al, byte ptr [eax]
     mov byte ptr [edi + 7], al
-    mov edx, ebx
+    mov@ edx, ebx
     shr edx, 010h
-    mov dl, bh
-    and edx, ebp
-    add ebx, ecx
+    mov@ dl, bh
+    and@ edx, ebp
+    add@ ebx, ecx
     mov al, byte ptr [esi + edx]
     mov al, byte ptr [eax]
     mov byte ptr [edi + 8], al
-    mov edx, ebx
+    mov@ edx, ebx
     shr edx, 010h
-    mov dl, bh
-    and edx, ebp
-    add ebx, ecx
+    mov@ dl, bh
+    and@ edx, ebp
+    add@ ebx, ecx
     mov al, byte ptr [esi + edx]
     mov al, byte ptr [eax]
     mov byte ptr [edi + 9], al
-    mov edx, ebx
+    mov@ edx, ebx
     shr edx, 010h
-    mov dl, bh
-    and edx, ebp
-    add ebx, ecx
+    mov@ dl, bh
+    and@ edx, ebp
+    add@ ebx, ecx
     mov al, byte ptr [esi + edx]
     mov al, byte ptr [eax]
     mov byte ptr [edi + 0Ah], al
-    mov edx, ebx
+    mov@ edx, ebx
     shr edx, 010h
-    mov dl, bh
-    and edx, ebp
-    add ebx, ecx
+    mov@ dl, bh
+    and@ edx, ebp
+    add@ ebx, ecx
     mov al, byte ptr [esi + edx]
     mov al, byte ptr [eax]
     mov byte ptr [edi + 0Bh], al
-    mov edx, ebx
+    mov@ edx, ebx
     shr edx, 010h
-    mov dl, bh
-    and edx, ebp
-    add ebx, ecx
+    mov@ dl, bh
+    and@ edx, ebp
+    add@ ebx, ecx
     mov al, byte ptr [esi + edx]
     mov al, byte ptr [eax]
     mov byte ptr [edi + 0Ch], al
-    mov edx, ebx
+    mov@ edx, ebx
     shr edx, 010h
-    mov dl, bh
-    and edx, ebp
-    add ebx, ecx
+    mov@ dl, bh
+    and@ edx, ebp
+    add@ ebx, ecx
     mov al, byte ptr [esi + edx]
     mov al, byte ptr [eax]
     mov byte ptr [edi + 0Dh], al
-    mov edx, ebx
+    mov@ edx, ebx
     shr edx, 010h
-    mov dl, bh
-    and edx, ebp
-    add ebx, ecx
+    mov@ dl, bh
+    and@ edx, ebp
+    add@ ebx, ecx
     mov al, byte ptr [esi + edx]
     mov al, byte ptr [eax]
     mov byte ptr [edi + 0Eh], al
-    mov edx, ebx
+    mov@ edx, ebx
     shr edx, 010h
-    mov dl, bh
-    and edx, ebp
-    add ebx, ecx
+    mov@ dl, bh
+    and@ edx, ebp
+    add@ ebx, ecx
     mov al, byte ptr [esi + edx]
     mov al, byte ptr [eax]
     mov byte ptr [edi + 0Fh], al
-    mov edx, ebx
+    mov@ edx, ebx
     shr edx, 010h
-    mov dl, bh
-    and edx, ebp
-    add ebx, ecx
+    mov@ dl, bh
+    and@ edx, ebp
+    add@ ebx, ecx
     mov al, byte ptr [esi + edx]
     mov al, byte ptr [eax]
     mov byte ptr [edi + 010h], al
@@ -711,10 +713,10 @@ func_00157100:
     B_157231_15
 func_00157240:
     mov ecx, dword ptr [esi + 8]
-    mov esi, eax
+    mov@ esi, eax
     push ecx
     shr ecx, 0Dh
-    mov eax, ebx
+    mov@ eax, ebx
     and ecx, 0FFFFh
 L_157251:
     mov ecx, dword ptr [ecx*4 + 0186A0h]
@@ -723,20 +725,20 @@ patch_157254 equ L_157251+3   ; rewritten at run time
     imul eax, dword ptr [esi + 030h]
     imul edx, dword ptr [esi + 034h]
     add eax, dword ptr [esi + 038h]
-    add edx, eax
+    add@ edx, eax
     mov eax, dword ptr [D_000CEA6C]
     push edx
     imul edx, ecx
     imul ebx, dword ptr [esi + 024h]
     imul eax, dword ptr [esi + 028h]
     add eax, dword ptr [esi + 02Ch]
-    add eax, ebx
+    add@ eax, ebx
     imul ecx, eax
     shr ecx, 010h
     mov ebx, dword ptr [esi + 018h]
-    mov dx, cx
+    mov@ dx, cx
     mov dword ptr [patch_157306], ebx
-    add ebx, edx
+    add@ ebx, edx
     pop edx
     pop ecx
     cmp ebp, 010h
@@ -744,7 +746,7 @@ patch_157254 equ L_157251+3   ; rewritten at run time
     push ebp
     and ebp, 0FFFFFFF0h
     push esi
-    add ebp, edi
+    add@ ebp, edi
     mov dword ptr [patch_157486], ebp
     mov ebp, dword ptr [esi + 050h]
     mov dword ptr [patch_1572DB], ebp
@@ -775,136 +777,136 @@ patch_1572F4 equ L_1572F1+3   ; rewritten at run time
     imul eax, ebp
     imul ebp, edx
     sar eax, 010h
-    mov bp, ax
+    mov@ bp, ax
 L_157304:
     add ebp, 0186A0h
 patch_157306 equ L_157304+2   ; rewritten at run time
 L_15730A:
     mov eax, 0186A0h
 patch_15730B equ L_15730A+1   ; rewritten at run time
-    sub ebp, ebx
+    sub@ ebp, ebx
     sar ebp, 4
-    mov edx, ebx
+    mov@ edx, ebx
     shl bp, 4
     sar bp, 4
     shr edx, 010h
-    mov dl, bh
+    mov@ dl, bh
     and edx, 03F3Fh
-    add ebx, ebp
+    add@ ebx, ebp
     mov al, byte ptr [esi + edx]
-    mov edx, ebx
+    mov@ edx, ebx
     shr edx, 010h
     mov cl, byte ptr [eax]
-    mov dl, bh
+    mov@ dl, bh
     and edx, 03F3Fh
-    add ebx, ebp
+    add@ ebx, ebp
     mov al, byte ptr [esi + edx]
-    mov edx, ebx
+    mov@ edx, ebx
     mov ch, byte ptr [eax]
     mov word ptr [edi + 1], cx
     shr edx, 010h
-    mov dl, bh
+    mov@ dl, bh
     and edx, 03F3Fh
-    add ebx, ebp
+    add@ ebx, ebp
     mov al, byte ptr [esi + edx]
-    mov edx, ebx
+    mov@ edx, ebx
     shr edx, 010h
     mov cl, byte ptr [eax]
-    mov dl, bh
+    mov@ dl, bh
     and edx, 03F3Fh
-    add ebx, ebp
+    add@ ebx, ebp
     mov al, byte ptr [esi + edx]
-    mov edx, ebx
+    mov@ edx, ebx
     mov ch, byte ptr [eax]
     mov word ptr [edi + 3], cx
     shr edx, 010h
-    mov dl, bh
+    mov@ dl, bh
     and edx, 03F3Fh
-    add ebx, ebp
+    add@ ebx, ebp
     mov al, byte ptr [esi + edx]
-    mov edx, ebx
+    mov@ edx, ebx
     shr edx, 010h
     mov cl, byte ptr [eax]
-    mov dl, bh
+    mov@ dl, bh
     and edx, 03F3Fh
-    add ebx, ebp
+    add@ ebx, ebp
     mov al, byte ptr [esi + edx]
-    mov edx, ebx
+    mov@ edx, ebx
     mov ch, byte ptr [eax]
     mov word ptr [edi + 5], cx
     shr edx, 010h
-    mov dl, bh
+    mov@ dl, bh
     and edx, 03F3Fh
-    add ebx, ebp
+    add@ ebx, ebp
     mov al, byte ptr [esi + edx]
-    mov edx, ebx
+    mov@ edx, ebx
     shr edx, 010h
     mov cl, byte ptr [eax]
-    mov dl, bh
+    mov@ dl, bh
     and edx, 03F3Fh
-    add ebx, ebp
+    add@ ebx, ebp
     mov al, byte ptr [esi + edx]
-    mov edx, ebx
+    mov@ edx, ebx
     mov ch, byte ptr [eax]
     mov word ptr [edi + 7], cx
     shr edx, 010h
-    mov dl, bh
+    mov@ dl, bh
     and edx, 03F3Fh
-    add ebx, ebp
+    add@ ebx, ebp
     mov al, byte ptr [esi + edx]
-    mov edx, ebx
+    mov@ edx, ebx
     shr edx, 010h
     mov cl, byte ptr [eax]
-    mov dl, bh
+    mov@ dl, bh
     and edx, 03F3Fh
-    add ebx, ebp
+    add@ ebx, ebp
     mov al, byte ptr [esi + edx]
-    mov edx, ebx
+    mov@ edx, ebx
     mov ch, byte ptr [eax]
     mov word ptr [edi + 9], cx
     shr edx, 010h
-    mov dl, bh
+    mov@ dl, bh
     and edx, 03F3Fh
-    add ebx, ebp
+    add@ ebx, ebp
     mov al, byte ptr [esi + edx]
-    mov edx, ebx
+    mov@ edx, ebx
     shr edx, 010h
     mov cl, byte ptr [eax]
-    mov dl, bh
+    mov@ dl, bh
     and edx, 03F3Fh
-    add ebx, ebp
+    add@ ebx, ebp
     mov al, byte ptr [esi + edx]
-    mov edx, ebx
+    mov@ edx, ebx
     mov ch, byte ptr [eax]
     mov word ptr [edi + 0Bh], cx
     shr edx, 010h
-    mov dl, bh
+    mov@ dl, bh
     and edx, 03F3Fh
-    add ebx, ebp
+    add@ ebx, ebp
     mov al, byte ptr [esi + edx]
-    mov edx, ebx
+    mov@ edx, ebx
     shr edx, 010h
     mov cl, byte ptr [eax]
-    mov dl, bh
+    mov@ dl, bh
     and edx, 03F3Fh
-    add ebx, ebp
+    add@ ebx, ebp
     mov al, byte ptr [esi + edx]
-    mov edx, ebx
+    mov@ edx, ebx
     mov ch, byte ptr [eax]
     mov word ptr [edi + 0Dh], cx
     shr edx, 010h
-    mov dl, bh
+    mov@ dl, bh
     and edx, 03F3Fh
-    add ebx, ebp
+    add@ ebx, ebp
     mov al, byte ptr [esi + edx]
-    mov edx, ebx
+    mov@ edx, ebx
     shr edx, 010h
     mov cl, byte ptr [eax]
-    mov dl, bh
+    mov@ dl, bh
     and edx, 03F3Fh
-    add ebx, ebp
+    add@ ebx, ebp
     mov al, byte ptr [esi + edx]
-    mov edx, ebx
+    mov@ edx, ebx
     mov ch, byte ptr [eax]
     mov word ptr [edi + 0Fh], cx
     add edi, 010h
@@ -922,9 +924,9 @@ patch_157486 equ L_157484+2   ; rewritten at run time
 L_15749B:
     push eax
     push edx
-    mov eax, ebp
+    mov@ eax, ebp
     imul eax, dword ptr [esi + 05Ch]
-    add ecx, eax
+    add@ ecx, eax
     shr ecx, 0Dh
     and ecx, 0FFFFh
 L_1574AE:
@@ -939,16 +941,16 @@ patch_1574B1 equ L_1574AE+3   ; rewritten at run time
     add edx, dword ptr [esp + 4]
     imul edx, eax
     shr edx, 010h
-    mov cx, dx
+    mov@ cx, dx
     add ecx, dword ptr [esi + 018h]
     add esp, 8
-    sub ecx, ebx
+    sub@ ecx, ebx
     movsx eax, cx
     sar ecx, 010h
     imul dword ptr [ebp*4 + D_00148980]
     imul ecx, dword ptr [ebp*4 + D_00147980]
     mov bp, word ptr [ebp*2 + D_00157600]
-    mov cx, dx
+    mov@ cx, dx
     mov byte ptr [ebp + func_00157100], 0C3h
     mov eax, dword ptr [esi + 014h]
     mov esi, dword ptr [esi + 040h]

@@ -3,6 +3,7 @@
 ; B_<address>_<length> lines are data bytes the build takes from your FALL.EXE.
 .486p
 .387
+include xngine.inc
 include xn_153900.inc
 public func_00153900
 public func_0015392C
@@ -17,16 +18,16 @@ func_00153900:
     lea ecx, [ebx - 1]
     test ecx, ecx
     je short L_153928
-    mov edi, edx
-    mov edx, eax
-    or edx, edx
+    mov@ edi, edx
+    mov@ edx, eax
+    or@ edx, edx
     jns short L_153917
     mov byte ptr [edi], 02Dh
     neg edx
     inc edi
 L_153917:
-    mov eax, edx
-    xor edx, edx
+    mov@ eax, edx
+    xor@ edx, edx
     div dword ptr [ecx*4 + D_00153804]
     add al, 030h
     stosb
@@ -41,8 +42,8 @@ func_0015392C:
     push ebx
     push ecx
     push edx
-    mov ebx, eax
-    xor eax, eax
+    mov@ ebx, eax
+    xor@ eax, eax
     mov edx, 1
     cmp byte ptr [ebx], 02Dh
     jne short L_153942
@@ -60,7 +61,7 @@ L_153948:
     cmp ecx, 9
     jg short L_15395D
     imul eax, eax, 0Ah
-    add eax, ecx
+    add@ eax, ecx
     inc ebx
     jmp short L_153948
 L_15395D:
@@ -79,7 +80,7 @@ L_15396A:
     stosb
     loop L_15396A
 L_153972:
-    xor al, al
+    xor@ al, al
     stosb
     pop ecx
     ret
@@ -103,7 +104,7 @@ func_00153990:
     mov bx, 01003h
     div bx
     mov dword ptr [D_00153800], edx
-    mov eax, edx
+    mov@ eax, edx
     pop edx
     pop ebx
     ret

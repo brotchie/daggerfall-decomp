@@ -3,6 +3,7 @@
 ; B_<address>_<length> lines are data bytes the build takes from your FALL.EXE.
 .486p
 .387
+include xngine.inc
 include xn_C5200.inc
 extrn D_000C4100:byte
 extrn D_000C4104:byte
@@ -17,7 +18,7 @@ func_000C5200:
     call func_000C524A
     mov dword ptr [D_00153800], 1
     mov ecx, 0100h
-    xor edi, edi
+    xor@ edi, edi
 L_0C5217:
     call func_00153990
     and eax, 0FFh
@@ -41,8 +42,8 @@ func_000C524A:
 L_0C5250:
     mov eax, 0300h
     lea edx, [ebx*2]
-    sub eax, edx
-    mov edx, ebx
+    sub@ eax, edx
+    mov@ edx, ebx
     imul edx, edx
     imul eax, edx
     add eax, 08000h
@@ -57,8 +58,8 @@ func_000C5280:
     push ebx
     push ecx
     push ebp
-    mov ebx, eax
-    mov ecx, edx
+    mov@ ebx, eax
+    mov@ ecx, edx
     and ebx, 0FFh
     and ecx, 0FFh
     shr eax, 8
@@ -70,20 +71,20 @@ func_000C5280:
     mov ebx, dword ptr [ebx*4 + D_000C4D04]
     mov ebp, dword ptr [eax*4 + D_000C4104]
     mov eax, dword ptr [eax*4 + D_000C4100]
-    sub ebp, eax
+    sub@ ebp, eax
     imul ebp, ebx
     sar ebp, 8
-    add ebp, eax
+    add@ ebp, eax
     pop eax
     add eax, dword ptr [edx*4 + D_000C4104]
     and eax, 0FFh
     mov edx, dword ptr [eax*4 + D_000C4104]
     mov eax, dword ptr [eax*4 + D_000C4100]
-    sub edx, eax
+    sub@ edx, eax
     imul edx, ebx
     sar edx, 8
-    add edx, eax
-    sub edx, ebp
+    add@ edx, eax
+    sub@ edx, ebp
     imul edx, dword ptr [ecx*4 + D_000C4D04]
     sar edx, 8
     lea eax, [edx + ebp]

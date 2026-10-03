@@ -3,6 +3,7 @@
 ; B_<address>_<length> lines are data bytes the build takes from your FALL.EXE.
 .486p
 .387
+include xngine.inc
 include xn_153500.inc
 extrn D_00120288:byte
 extrn D_0012028C:byte
@@ -99,9 +100,9 @@ L_153604:
     mov eax, dword ptr [ecx + D_00153465]
     add dword ptr [D_00120288], eax
     mov eax, dword ptr [ecx + D_00153469]
-    mov ebp, eax
-    sub ebp, edx
-    or ebp, ebp
+    mov@ ebp, eax
+    sub@ ebp, edx
+    or@ ebp, ebp
     jns short L_153620
     neg ebp
 L_153620:
@@ -132,7 +133,7 @@ L_153638:
     mov eax, dword ptr [D_00120290]
     cdq
     idiv ebp
-    mov ebx, eax
+    mov@ ebx, eax
     pop edx
     pop eax
     shr ebp, 4

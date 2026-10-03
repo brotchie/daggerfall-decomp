@@ -3,6 +3,7 @@
 ; B_<address>_<length> lines are data bytes the build takes from your FALL.EXE.
 .486p
 .387
+include xngine.inc
 include xn_15CB00.inc
 public func_0015CB00
 public func_0015CE7E
@@ -47,7 +48,7 @@ func_0015CB00:
     mov dword ptr [D_0015CC2E], edi
     mov dword ptr [D_0015CC32], esi
     movzx ebx, byte ptr [ecx]
-    xor edx, edx
+    xor@ edx, edx
     mov ebx, dword ptr [ebx*4 + D_0015C524]
 L_15CB2A:
     push ebx
@@ -66,8 +67,8 @@ L_15CB2A:
     sub edx, dword ptr [D_0015C520]
     mov dword ptr [D_0015C514], edx
     imul edx
-    mov ebx, eax
-    mov ebp, edx
+    mov@ ebx, eax
+    mov@ ebp, edx
     mov eax, dword ptr [esi + 8]
     sub eax, dword ptr [D_0015C520]
     mov dword ptr [D_0015C508], eax
@@ -75,52 +76,52 @@ L_15CB2A:
     sub edx, dword ptr [D_0015C51C]
     mov dword ptr [D_0015C510], edx
     imul edx
-    sub ebx, eax
-    db 01Bh, 0EAh   ; sbb ebp, edx
+    sub@ ebx, eax
+    sbb@ ebp, edx
     shrd ebx, ebp, 010h
-    mov ecx, ebx
+    mov@ ecx, ebx
     mov eax, dword ptr [edi]
     sub eax, dword ptr [D_0015C518]
     mov dword ptr [D_0015C50C], eax
     imul dword ptr [D_0015C508]
-    mov ebx, eax
-    mov ebp, edx
+    mov@ ebx, eax
+    mov@ ebp, edx
     mov eax, dword ptr [esi]
     sub eax, dword ptr [D_0015C518]
     mov dword ptr [D_0015C500], eax
     imul dword ptr [D_0015C514]
-    sub ebx, eax
-    db 01Bh, 0EAh   ; sbb ebp, edx
+    sub@ ebx, eax
+    sbb@ ebp, edx
     shrd ebx, ebp, 010h
-    mov esi, ebx
+    mov@ esi, ebx
     mov eax, dword ptr [D_0015C500]
     imul dword ptr [D_0015C510]
-    mov ebx, eax
-    mov ebp, edx
+    mov@ ebx, eax
+    mov@ ebp, edx
     mov eax, dword ptr [D_0015C504]
     imul dword ptr [D_0015C50C]
-    sub ebx, eax
-    db 01Bh, 0EAh   ; sbb ebp, edx
+    sub@ ebx, eax
+    sbb@ ebp, edx
     shrd ebx, ebp, 010h
-    mov edi, ebx
-    or ebx, esi
-    or ebx, ecx
+    mov@ edi, ebx
+    or@ ebx, esi
+    or@ ebx, ecx
     je short L_15CC1B
     mov ebx, dword ptr [D_0015CC2E]
-    mov eax, ecx
+    mov@ eax, ecx
     imul dword ptr [ebx]
-    mov ecx, eax
-    mov ebp, edx
-    mov eax, esi
+    mov@ ecx, eax
+    mov@ ebp, edx
+    mov@ eax, esi
     imul dword ptr [ebx + 4]
-    add ecx, eax
-    adc ebp, edx
-    mov eax, edi
+    add@ ecx, eax
+    adc@ ebp, edx
+    mov@ eax, edi
     imul dword ptr [ebx + 8]
-    add eax, ecx
-    adc edx, ebp
+    add@ eax, ecx
+    adc@ edx, ebp
     jns short L_15CC1B
-    mov eax, edx
+    mov@ eax, edx
     pop edx
     pop ecx
     pop ebx
@@ -146,7 +147,7 @@ func_0015CC36:
     mov dword ptr [D_001202A4], edx
     mov dword ptr [D_001202A8], ebx
     movzx edx, byte ptr [ecx]
-    mov ebp, esi
+    mov@ ebp, esi
     mov ebx, dword ptr [edx*4 + D_0015C524]
 L_15CC54:
     push ebx
@@ -156,8 +157,8 @@ L_15CC54:
     mov edi, dword ptr [ebx + 4]
     mov esi, dword ptr [esi + ecx + 8]
     mov edi, dword ptr [edi + ecx + 8]
-    add esi, ebp
-    add edi, ebp
+    add@ esi, ebp
+    add@ edi, ebp
     mov eax, dword ptr [esi + 4]
     mov edx, dword ptr [edi + 8]
     sub eax, dword ptr [D_001202A4]
@@ -167,7 +168,7 @@ L_15CC54:
     mov dword ptr [D_0015C504], eax
     mov dword ptr [D_0015C514], edx
     imul edx
-    mov ebx, edx
+    mov@ ebx, edx
     mov eax, dword ptr [esi + 8]
     mov edx, dword ptr [edi + 4]
     sub eax, dword ptr [D_001202A8]
@@ -177,35 +178,35 @@ L_15CC54:
     mov dword ptr [D_0015C508], eax
     mov dword ptr [D_0015C510], edx
     imul edx
-    sub ebx, edx
+    sub@ ebx, edx
     mov eax, dword ptr [edi]
     sub eax, dword ptr [D_001202A0]
     shl eax, 8
     mov dword ptr [D_0015C50C], eax
     imul dword ptr [D_0015C508]
-    mov edi, edx
+    mov@ edi, edx
     mov eax, dword ptr [esi]
     sub eax, dword ptr [D_001202A0]
     shl eax, 8
     mov dword ptr [D_0015C500], eax
     imul dword ptr [D_0015C514]
-    sub edi, edx
+    sub@ edi, edx
     mov eax, dword ptr [D_0015C500]
     imul dword ptr [D_0015C510]
-    mov esi, edx
+    mov@ esi, edx
     mov eax, dword ptr [D_0015C504]
     imul dword ptr [D_0015C50C]
-    sub esi, edx
-    mov edx, ebx
-    or edx, edi
-    or edx, esi
+    sub@ esi, edx
+    mov@ edx, ebx
+    or@ edx, edi
+    or@ edx, esi
     pop eax
     je short L_15CD22
     imul ebx, dword ptr [eax]
     imul edi, dword ptr [eax + 4]
     imul esi, dword ptr [eax + 8]
-    add ebx, esi
-    add ebx, edi
+    add@ ebx, esi
+    add@ ebx, edi
     sar ebx, 8
     jg short L_15CD22
     pop edx
@@ -214,7 +215,7 @@ L_15CC54:
     stc
     ret
 L_15CD22:
-    mov edi, eax
+    mov@ edi, eax
     pop edx
     pop ebx
     add ebx, 4
@@ -230,7 +231,7 @@ func_0015CD33:
     push edi
     push ebp
     mov dword ptr [D_0015CE76], edx
-    mov ecx, eax
+    mov@ ecx, eax
     mov esi, dword ptr [ecx + 8]
     add esi, dword ptr [D_0015CE76]
     mov eax, dword ptr [esi]
@@ -244,7 +245,7 @@ func_0015CD33:
     sub dword ptr [D_0015CE7A], 2
     mov ebp, 1
     mov ebx, dword ptr [ebx*4 + D_0015C524]
-    xor edx, edx
+    xor@ edx, edx
 L_15CD7E:
     push edx
     push ebx
@@ -263,8 +264,8 @@ L_15CD7E:
     sub edx, dword ptr [esi + 8]
     mov dword ptr [D_0015C514], edx
     imul edx
-    mov ebx, eax
-    mov ebp, edx
+    mov@ ebx, eax
+    mov@ ebp, edx
     mov eax, dword ptr [esi + 8]
     sub eax, dword ptr [D_0015C520]
     mov dword ptr [D_0015C508], eax
@@ -272,51 +273,51 @@ L_15CD7E:
     sub edx, dword ptr [esi + 4]
     mov dword ptr [D_0015C510], edx
     imul edx
-    sub ebx, eax
-    db 01Bh, 0EAh   ; sbb ebp, edx
+    sub@ ebx, eax
+    sbb@ ebp, edx
     add ebx, 08000h
     adc ebp, 0
     shrd ebx, ebp, 010h
-    mov ecx, ebx
+    mov@ ecx, ebx
     mov eax, dword ptr [edi]
     sub eax, dword ptr [esi]
     mov dword ptr [D_0015C50C], eax
     imul dword ptr [D_0015C508]
-    mov ebx, eax
-    mov ebp, edx
+    mov@ ebx, eax
+    mov@ ebp, edx
     mov eax, dword ptr [esi]
     sub eax, dword ptr [D_0015C518]
     mov dword ptr [D_0015C500], eax
     imul dword ptr [D_0015C514]
-    sub ebx, eax
-    db 01Bh, 0EAh   ; sbb ebp, edx
+    sub@ ebx, eax
+    sbb@ ebp, edx
     add ebx, 08000h
     adc ebp, 0
     shrd ebx, ebp, 010h
-    mov esi, ebx
+    mov@ esi, ebx
     mov eax, dword ptr [D_0015C500]
     imul dword ptr [D_0015C510]
-    mov ebx, eax
-    mov ebp, edx
+    mov@ ebx, eax
+    mov@ ebp, edx
     mov eax, dword ptr [D_0015C504]
     imul dword ptr [D_0015C50C]
-    sub ebx, eax
-    db 01Bh, 0EAh   ; sbb ebp, edx
+    sub@ ebx, eax
+    sbb@ ebp, edx
     add ebx, 08000h
     adc ebp, 0
     shrd ebx, ebp, 010h
-    mov eax, ecx
-    mov edx, esi
+    mov@ eax, ecx
+    mov@ edx, esi
     call func_0014BD75
     pop ebp
     pop ecx
     pop ebx
     pop edx
-    add edx, eax
+    add@ edx, eax
     inc ebp
     cmp ebp, dword ptr [D_0015CE7A]
     jle near ptr L_15CD7E
-    mov eax, edx
+    mov@ eax, edx
     sar eax, 1
     pop ebp
     pop edi
@@ -399,7 +400,7 @@ D_0015CF11:
     B_15CF11_7
 func_0015CF18:
     push edi
-    mov edi, ecx
+    mov@ edi, ecx
     mov ecx, offset D_00136E24
     call func_0013749E
     mov ecx, 03Fh
@@ -411,27 +412,27 @@ L_15CF35:
     jg short L_15CF40
     xor ecx, 020h
 L_15CF40:
-    cmp eax, ebx
+    cmp@ eax, ebx
     jg short L_15CF47
     xor ecx, 2
 L_15CF47:
-    cmp edx, ebx
+    cmp@ edx, ebx
     jg short L_15CF4E
     xor ecx, 4
 L_15CF4E:
     neg ebx
-    cmp eax, ebx
+    cmp@ eax, ebx
     jl short L_15CF57
     xor ecx, 1
 L_15CF57:
-    cmp edx, ebx
+    cmp@ edx, ebx
     jl short L_15CF5E
     xor ecx, 8
 L_15CF5E:
     neg ebx
-    add edx, edx
+    add@ edx, edx
     push edx
-    add eax, eax
+    add@ eax, eax
     imul dword ptr [D_000CEA7C]
     mov dword ptr [D_00120288], edx
     pop eax
@@ -444,14 +445,14 @@ L_15CF5E:
     test byte ptr [D_00158211], 010h
     je short L_15CFAA
     mov eax, dword ptr [D_000CEA20]
-    sub eax, ebx
-    sub eax, edi
+    sub@ eax, ebx
+    sub@ eax, edi
     jns near ptr L_15D036
 L_15CFAA:
     test byte ptr [D_00158211], 020h
     je short L_15CFC3
-    mov eax, ebx
-    sub eax, edi
+    mov@ eax, ebx
+    sub@ eax, edi
     sub eax, dword ptr [D_000CEA24]
     jge short L_15D036
     nop
@@ -503,11 +504,11 @@ func_0015D03C:
     xchg ebx, eax
     imul dword ptr [D_00120290]
     shld edx, eax, 010h
-    add edx, ebx
+    add@ edx, ebx
     js short L_15D057
     neg edx
 L_15D057:
-    add edx, edi
+    add@ edx, edi
     ret
     B_15D05A_2
 func_0015D05C:
@@ -516,11 +517,11 @@ func_0015D05C:
     xchg ebx, eax
     imul dword ptr [D_00120290]
     shld edx, eax, 010h
-    add edx, ebx
+    add@ edx, ebx
     js short L_15D077
     neg edx
 L_15D077:
-    add edx, edi
+    add@ edx, edi
     ret
     db 134 dup (0)
 XN_15CB00 ends

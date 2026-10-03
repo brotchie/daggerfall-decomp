@@ -3,6 +3,7 @@
 ; B_<address>_<length> lines are data bytes the build takes from your FALL.EXE.
 .486p
 .387
+include xngine.inc
 include xn_158100.inc
 public func_0015810E
 XN_158100 segment byte public use32 'CODE'
@@ -19,7 +20,7 @@ func_00158100:
     pop ecx
     ret
 func_0015810E:
-    cmp ebx, edx
+    cmp@ ebx, edx
     jle short L_15817E
     nop
     nop
@@ -28,10 +29,10 @@ func_0015810E:
     call func_0015811C
     ret
 func_0015811C:
-    mov esi, edx
-    mov edi, ebx
-    mov ebp, esi
-    add ebp, edi
+    mov@ esi, edx
+    mov@ edi, ebx
+    mov@ ebp, esi
+    add@ ebp, edi
     shr ebp, 4
     shl ebp, 3
     mov ebp, dword ptr [eax + ebp]
@@ -46,7 +47,7 @@ L_158137:
     sub edi, 8
     jmp short L_158137
 L_158141:
-    cmp esi, edi
+    cmp@ esi, edi
     jg short L_158162
     mov ecx, dword ptr [esi + eax]
     xchg dword ptr [edi + eax], ecx
@@ -56,20 +57,20 @@ L_158141:
     mov dword ptr [esi + eax + 4], ecx
     add esi, 8
     sub edi, 8
-    cmp esi, edi
+    cmp@ esi, edi
 L_158162:
     jle short L_15812D
-    cmp edx, edi
+    cmp@ edx, edi
     jge short L_158171
     push ebx
-    mov ebx, edi
+    mov@ ebx, edi
     call func_0015811C
     pop ebx
 L_158171:
-    cmp esi, ebx
+    cmp@ esi, ebx
     jge short L_15817E
     push edx
-    mov edx, esi
+    mov@ edx, esi
     call func_0015811C
     pop edx
 L_15817E:

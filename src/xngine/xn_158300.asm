@@ -3,6 +3,7 @@
 ; B_<address>_<length> lines are data bytes the build takes from your FALL.EXE.
 .486p
 .387
+include xngine.inc
 include xn_158300.inc
 public L_1583AD
 public L_1583B5
@@ -50,7 +51,7 @@ XN_158300 segment byte public use32 'CODE'
 func_00158300:
     push ecx
     call func_0015830C
-    mov eax, ecx
+    mov@ eax, ecx
     pop ecx
     ret
     B_15830A_2
@@ -64,20 +65,20 @@ L_15831C:
     jg short L_158327
     xor ecx, 020h
 L_158327:
-    cmp eax, ebx
+    cmp@ eax, ebx
     jg short L_15832E
     xor ecx, 2
 L_15832E:
-    cmp edx, ebx
+    cmp@ edx, ebx
     jg short L_158335
     xor ecx, 4
 L_158335:
     neg ebx
-    cmp eax, ebx
+    cmp@ eax, ebx
     jl short L_15833E
     xor ecx, 1
 L_15833E:
-    cmp edx, ebx
+    cmp@ edx, ebx
     jl short L_158345
     xor ecx, 8
 L_158345:
@@ -97,14 +98,14 @@ func_00158360:
     mov esi, dword ptr [D_00158200]
 L_158393:
     mov edi, 07FFFh
-    xor ecx, ecx
+    xor@ ecx, ecx
 L_15839A:
     mov ebx, dword ptr [esi + 8]
-    xor eax, eax
+    xor@ eax, eax
     mov edx, 0100h
     div ebx
     mov dword ptr [esi + 8], eax
-    mov ebx, eax
+    mov@ ebx, eax
     mov eax, dword ptr [esi]
 L_1583AD:
     imul eax, eax, 0186A0h
@@ -125,10 +126,10 @@ L_1583CB:
 patch_1583CD equ L_1583CB+2   ; rewritten at run time
     shr edx, 8
     mov dword ptr [esi + 4], edx
-    sub edx, edi
+    sub@ edx, edi
     jge short L_1583DF
-    add edi, edx
-    mov ebp, ecx
+    add@ edi, edx
+    mov@ ebp, ecx
 L_1583DF:
     add esi, 010h
     inc ecx
@@ -137,12 +138,14 @@ L_1583DF:
     shl ebp, 2
     mov byte ptr [D_0015B984], cl
     add ebp, dword ptr [ecx*4 + D_00159294]
-    cmp dword ptr [D_00158200], offset D_00158EA0
+    db 081h, 03Dh   ; cmp dword ptr [0x158200], 0x158ea0
+    dd D_00158200
+    dd D_00158EA0
     je short L_158415
     sub ebp, dword ptr [ecx*4 + D_00159294]
     add ebp, dword ptr [ecx*4 + D_001592FC]
 L_158415:
-    mov eax, edi
+    mov@ eax, edi
     call func_001552A0
 L_15841C:
     ret
@@ -176,12 +179,12 @@ L_15844D:
     jae near ptr L_1585B2
     mov esi, dword ptr [D_00158200]
     mov edi, 07FFFFFFFh
-    xor ecx, ecx
+    xor@ ecx, ecx
 L_15849A:
-    xor eax, eax
+    xor@ eax, eax
     mov edx, 0100h
     div dword ptr [esi + 8]
-    mov ebx, eax
+    mov@ ebx, eax
     mov dword ptr [esi + 8], eax
     mov eax, dword ptr [esi]
 L_1584AB:
@@ -204,10 +207,10 @@ patch_1584CB equ L_1584C9+2   ; rewritten at run time
     shr edx, 8
     mov dword ptr [esi + 4], edx
     add esi, 010h
-    sub edx, edi
+    sub@ edx, edi
     jg short L_1584E0
-    add edi, edx
-    mov ebp, ecx
+    add@ edi, edx
+    mov@ ebp, ecx
 L_1584E0:
     inc ecx
     cmp esi, dword ptr [D_00158208]
@@ -215,7 +218,7 @@ L_1584E0:
     cmp cl, 01Ch
     jae near ptr L_1585B2
     mov byte ptr [D_0015B984], cl
-    mov eax, edi
+    mov@ eax, edi
     shl ebp, 2
     mov ebx, dword ptr [D_00158200]
     add ebp, dword ptr [ecx*4 + D_00159294]
@@ -241,7 +244,7 @@ L_158534:
     mov eax, dword ptr [edi + D_000D1AC4]
     mov dword ptr [ebx + 4], eax
     add ecx, 03FFh
-    xor edx, edx
+    xor@ edx, edx
 L_158563:
     add esi, 8
     add ebx, 010h
@@ -252,17 +255,17 @@ L_158563:
     mov dword ptr [ebx + 8], ebp
     mov ebp, dword ptr [edi + D_000D1AC4]
     mov dword ptr [ebx + 4], ebp
-    sub ebp, eax
+    sub@ ebp, eax
     jg short L_15858D
-    add eax, ebp
-    mov dl, ch
+    add@ eax, ebp
+    mov@ dl, ch
 L_15858D:
     add ch, 4
     dec cl
     jne short L_158563
     shr ecx, 0Ah
     add edx, dword ptr [ecx*4 + D_00159294]
-    mov ebp, edx
+    mov@ ebp, edx
     push dword ptr [D_000CEA60]
     call func_0015B9A0
     pop eax
@@ -277,19 +280,19 @@ func_001585C0:
     mov eax, offset D_00158EA0
     mov dword ptr [D_00158200], eax
     lea edx, [eax + 0200h]
-    add eax, ecx
+    add@ eax, ecx
     mov dword ptr [D_00158204], edx
     mov dword ptr [D_00158208], eax
     call func_00158678
     jae near ptr L_158675
     mov esi, dword ptr [D_00158200]
     mov edi, 07FFFFFFFh
-    xor ecx, ecx
+    xor@ ecx, ecx
 L_1585F5:
-    xor eax, eax
+    xor@ eax, eax
     mov edx, 0100h
     div dword ptr [esi + 8]
-    mov ebx, eax
+    mov@ ebx, eax
     mov dword ptr [esi + 8], eax
     mov eax, dword ptr [esi]
 L_158606:
@@ -312,19 +315,21 @@ patch_158626 equ L_158624+2   ; rewritten at run time
     shr edx, 8
     mov dword ptr [esi + 4], edx
     add esi, 010h
-    sub edx, edi
+    sub@ edx, edi
     jg short L_15863B
-    add edi, edx
-    mov ebp, ecx
+    add@ edi, edx
+    mov@ ebp, ecx
 L_15863B:
     inc ecx
     cmp esi, dword ptr [D_00158208]
     jne short L_1585F5
     mov byte ptr [D_0015B984], cl
     shl ebp, 2
-    mov eax, edi
+    mov@ eax, edi
     add ebp, dword ptr [ecx*4 + D_00159294]
-    cmp dword ptr [D_00158200], offset D_00158EA0
+    db 081h, 03Dh   ; cmp dword ptr [0x158200], 0x158ea0
+    dd D_00158200
+    dd D_00158EA0
     je short L_158670
     sub ebp, dword ptr [ecx*4 + D_00159294]
     add ebp, dword ptr [ecx*4 + D_001592FC]
@@ -424,17 +429,17 @@ func_001587D4:
 L_158800:
     add esi, 010h
     mov ebx, dword ptr [D_00158208]
-    cmp esi, ebx
+    cmp@ esi, ebx
     je short L_15882B
 L_15880D:
     mov al, byte ptr [esi + 0Ch]
-    db 085h, 0C5h   ; test ebp, eax
+    test ebp, eax
     jne short L_158842
     mov ecx, 4
     rep movsd
     or byte ptr [D_00158211], al
     and byte ptr [D_00158210], al
-    cmp esi, ebx
+    cmp@ esi, ebx
     jne short L_15880D
 L_15882B:
     mov dword ptr [D_00158208], edi
@@ -443,13 +448,13 @@ L_15882B:
     mov dword ptr [D_00158200], eax
     ret
 L_158842:
-    mov eax, ebp
+    mov@ eax, ebp
     test byte ptr [esi - 4], al
     jne short L_158852
     lea ebx, [esi - 010h]
     call dword ptr [D_0015820C]
 L_158852:
-    mov eax, ebp
+    mov@ eax, ebp
     test byte ptr [esi + 01Ch], al
     jne short L_158800
     lea ebx, [esi + 010h]
@@ -458,16 +463,16 @@ L_158852:
 func_00158864:
     mov ecx, dword ptr [ebx]
     add ecx, dword ptr [ebx + 8]
-    xor eax, eax
-    mov edx, ecx
+    xor@ eax, eax
+    mov@ edx, ecx
     sub ecx, dword ptr [esi]
     sub ecx, dword ptr [esi + 8]
-    add ecx, ecx
+    add@ ecx, ecx
     idiv ecx
-    mov ecx, eax
+    mov@ ecx, eax
     mov eax, dword ptr [esi]
     sub eax, dword ptr [ebx]
-    add eax, eax
+    add@ eax, eax
     imul ecx
     add edx, dword ptr [ebx]
     mov dword ptr [edi], edx
@@ -475,10 +480,10 @@ func_00158864:
     mov eax, dword ptr [esi + 4]
     mov dword ptr [edi + 8], edx
     mov ebx, dword ptr [ebx + 4]
-    sub eax, ebx
-    add eax, eax
+    sub@ eax, ebx
+    add@ eax, eax
     imul ecx
-    add edx, ebx
+    add@ edx, ebx
     mov dword ptr [edi + 4], edx
     mov eax, dword ptr [edi]
     mov ebx, dword ptr [edi + 8]
@@ -491,20 +496,20 @@ L_1588AF:
     jg short L_1588BA
     xor ecx, 020h
 L_1588BA:
-    cmp eax, ebx
+    cmp@ eax, ebx
     jg short L_1588C1
     xor ecx, 2
 L_1588C1:
-    cmp edx, ebx
+    cmp@ edx, ebx
     jg short L_1588C8
     xor ecx, 4
 L_1588C8:
     neg ebx
-    cmp eax, ebx
+    cmp@ eax, ebx
     jl short L_1588D1
     xor ecx, 1
 L_1588D1:
-    cmp edx, ebx
+    cmp@ edx, ebx
     jl short L_1588D8
     xor ecx, 8
 L_1588D8:
@@ -520,21 +525,21 @@ func_001588F0:
     sub ecx, dword ptr [esi]
     mov edx, dword ptr [ebx]
     sub edx, dword ptr [ebx + 8]
-    xor eax, eax
-    add ecx, edx
-    add ecx, ecx
+    xor@ eax, eax
+    add@ ecx, edx
+    add@ ecx, ecx
     idiv ecx
-    mov ecx, eax
+    mov@ ecx, eax
     mov eax, dword ptr [esi]
     sub eax, dword ptr [ebx]
-    add eax, eax
+    add@ eax, eax
     imul ecx
     add edx, dword ptr [ebx]
     mov eax, dword ptr [esi + 4]
     mov dword ptr [edi], edx
     mov dword ptr [edi + 8], edx
     sub eax, dword ptr [ebx + 4]
-    add eax, eax
+    add@ eax, eax
     imul ecx
     add edx, dword ptr [ebx + 4]
     mov dword ptr [edi + 4], edx
@@ -549,20 +554,20 @@ L_158938:
     jg short L_158943
     xor ecx, 020h
 L_158943:
-    cmp eax, ebx
+    cmp@ eax, ebx
     jg short L_15894A
     xor ecx, 2
 L_15894A:
-    cmp edx, ebx
+    cmp@ edx, ebx
     jg short L_158951
     xor ecx, 4
 L_158951:
     neg ebx
-    cmp eax, ebx
+    cmp@ eax, ebx
     jl short L_15895A
     xor ecx, 1
 L_15895A:
-    cmp edx, ebx
+    cmp@ edx, ebx
     jl short L_158961
     xor ecx, 8
 L_158961:
@@ -578,28 +583,28 @@ func_00158978:
     sub ecx, dword ptr [ebx + 4]
     sub ecx, dword ptr [esi + 8]
     mov edx, dword ptr [ebx + 8]
-    xor eax, eax
-    add ecx, edx
+    xor@ eax, eax
+    add@ ecx, edx
     sub edx, dword ptr [ebx + 4]
-    add ecx, ecx
+    add@ ecx, ecx
     idiv ecx
-    mov ecx, eax
+    mov@ ecx, eax
     mov eax, dword ptr [esi]
     sub eax, dword ptr [ebx]
-    add eax, eax
+    add@ eax, eax
     imul ecx
     add edx, dword ptr [ebx]
     mov eax, dword ptr [esi + 4]
     mov dword ptr [edi], edx
     mov ebx, dword ptr [ebx + 4]
-    sub eax, ebx
-    add eax, eax
+    sub@ eax, ebx
+    add@ eax, eax
     imul ecx
-    add edx, ebx
+    add@ edx, ebx
     mov eax, dword ptr [edi]
     mov dword ptr [edi + 4], edx
     mov dword ptr [edi + 8], edx
-    mov ebx, edx
+    mov@ ebx, edx
     mov ecx, 03Fh
     cmp ebx, dword ptr [D_000CEA20]
     jl short L_1589C5
@@ -609,20 +614,20 @@ L_1589C5:
     jg short L_1589D0
     xor ecx, 020h
 L_1589D0:
-    cmp eax, ebx
+    cmp@ eax, ebx
     jg short L_1589D7
     xor ecx, 2
 L_1589D7:
-    cmp edx, ebx
+    cmp@ edx, ebx
     jg short L_1589DE
     xor ecx, 4
 L_1589DE:
     neg ebx
-    cmp eax, ebx
+    cmp@ eax, ebx
     jl short L_1589E7
     xor ecx, 1
 L_1589E7:
-    cmp edx, ebx
+    cmp@ edx, ebx
     jl short L_1589EE
     xor ecx, 8
 L_1589EE:
@@ -636,30 +641,30 @@ L_1589EE:
 func_00158A04:
     mov ecx, dword ptr [ebx + 4]
     add ecx, dword ptr [ebx + 8]
-    xor eax, eax
-    mov edx, ecx
+    xor@ eax, eax
+    mov@ edx, ecx
     sub ecx, dword ptr [esi + 4]
     sub ecx, dword ptr [esi + 8]
-    add ecx, ecx
+    add@ ecx, ecx
     idiv ecx
-    mov ecx, eax
+    mov@ ecx, eax
     mov eax, dword ptr [esi]
     sub eax, dword ptr [ebx]
-    add eax, eax
+    add@ eax, eax
     imul ecx
     add edx, dword ptr [ebx]
     mov eax, dword ptr [esi + 4]
     mov dword ptr [edi], edx
     mov ebx, dword ptr [ebx + 4]
-    sub eax, ebx
-    add eax, eax
+    sub@ eax, ebx
+    add@ eax, eax
     imul ecx
-    add edx, ebx
+    add@ edx, ebx
     mov eax, dword ptr [edi]
     mov dword ptr [edi + 4], edx
     neg edx
     mov dword ptr [edi + 8], edx
-    mov ebx, edx
+    mov@ ebx, edx
     neg edx
     mov ecx, 03Fh
     cmp ebx, dword ptr [D_000CEA20]
@@ -670,20 +675,20 @@ L_158A52:
     jg short L_158A5D
     xor ecx, 020h
 L_158A5D:
-    cmp eax, ebx
+    cmp@ eax, ebx
     jg short L_158A64
     xor ecx, 2
 L_158A64:
-    cmp edx, ebx
+    cmp@ edx, ebx
     jg short L_158A6B
     xor ecx, 4
 L_158A6B:
     neg ebx
-    cmp eax, ebx
+    cmp@ eax, ebx
     jl short L_158A74
     xor ecx, 1
 L_158A74:
-    cmp edx, ebx
+    cmp@ edx, ebx
     jl short L_158A7B
     xor ecx, 8
 L_158A7B:
@@ -695,22 +700,22 @@ L_158A7B:
     ret
 func_00158A90:
     mov edx, dword ptr [ebx + 8]
-    xor eax, eax
-    mov ecx, edx
+    xor@ eax, eax
+    mov@ ecx, edx
     sub edx, dword ptr [D_000CEA20]
     sub ecx, dword ptr [esi + 8]
-    add ecx, ecx
+    add@ ecx, ecx
     idiv ecx
-    mov ecx, eax
+    mov@ ecx, eax
     mov eax, dword ptr [esi]
     sub eax, dword ptr [ebx]
-    add eax, eax
+    add@ eax, eax
     imul ecx
     add edx, dword ptr [ebx]
     mov dword ptr [edi], edx
     mov eax, dword ptr [esi + 4]
     sub eax, dword ptr [ebx + 4]
-    add eax, eax
+    add@ eax, eax
     imul ecx
     add edx, dword ptr [ebx + 4]
     mov dword ptr [edi + 4], edx
@@ -726,20 +731,20 @@ L_158ADD:
     jg short L_158AE8
     xor ecx, 020h
 L_158AE8:
-    cmp eax, ebx
+    cmp@ eax, ebx
     jg short L_158AEF
     xor ecx, 2
 L_158AEF:
-    cmp edx, ebx
+    cmp@ edx, ebx
     jg short L_158AF6
     xor ecx, 4
 L_158AF6:
     neg ebx
-    cmp eax, ebx
+    cmp@ eax, ebx
     jl short L_158AFF
     xor ecx, 1
 L_158AFF:
-    cmp edx, ebx
+    cmp@ edx, ebx
     jl short L_158B06
     xor ecx, 8
 L_158B06:
@@ -752,22 +757,22 @@ L_158B06:
     B_158B1B_1
 func_00158B1C:
     mov edx, dword ptr [ebx + 8]
-    xor eax, eax
-    mov ecx, edx
+    xor@ eax, eax
+    mov@ ecx, edx
     sub edx, dword ptr [D_000CEA24]
     sub ecx, dword ptr [esi + 8]
-    add ecx, ecx
+    add@ ecx, ecx
     idiv ecx
-    mov ecx, eax
+    mov@ ecx, eax
     mov eax, dword ptr [esi]
     sub eax, dword ptr [ebx]
-    add eax, eax
+    add@ eax, eax
     imul ecx
     add edx, dword ptr [ebx]
     mov eax, dword ptr [esi + 4]
     mov dword ptr [edi], edx
     sub eax, dword ptr [ebx + 4]
-    add eax, eax
+    add@ eax, eax
     imul ecx
     add edx, dword ptr [ebx + 4]
     mov ebx, dword ptr [D_000CEA24]
@@ -783,20 +788,20 @@ L_158B69:
     jg short L_158B74
     xor ecx, 020h
 L_158B74:
-    cmp eax, ebx
+    cmp@ eax, ebx
     jg short L_158B7B
     xor ecx, 2
 L_158B7B:
-    cmp edx, ebx
+    cmp@ edx, ebx
     jg short L_158B82
     xor ecx, 4
 L_158B82:
     neg ebx
-    cmp eax, ebx
+    cmp@ eax, ebx
     jl short L_158B8B
     xor ecx, 1
 L_158B8B:
-    cmp edx, ebx
+    cmp@ edx, ebx
     jl short L_158B92
     xor ecx, 8
 L_158B92:

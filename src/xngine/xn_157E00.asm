@@ -3,6 +3,7 @@
 ; B_<address>_<length> lines are data bytes the build takes from your FALL.EXE.
 .486p
 .387
+include xngine.inc
 include xn_157E00.inc
 public L_157E2B
 public func_00157E20
@@ -16,8 +17,8 @@ func_00157E02:
     dec ebx
     add byte ptr [eax + eax + 07Dh], ah
     add byte ptr [esi - 037FF5100h], dl
-    db 00h, 0E1h   ; add cl, ah
-    db 00h, 0FAh   ; add dl, bh
+    add cl, ah
+    add dl, bh
     add byte ptr [ebx], dl
     add dword ptr [ecx + eax], ebp
     inc ebp
@@ -32,7 +33,7 @@ L_157E21:
     db 00h
     db 00h
     shr ecx, 0Dh
-    mov eax, ebx
+    mov@ eax, ebx
 L_157E2B:
     mov ecx, dword ptr [ecx*4 + 0186A0h]
 patch_157E2E equ L_157E2B+3   ; rewritten at run time
@@ -50,22 +51,22 @@ L_157E33:
     add ebx, dword ptr [esi + 038h]
     imul ebx, ecx
     sub ebx, dword ptr [esi + 01Ch]
-    mov bx, ax
+    mov@ bx, ax
     mov eax, dword ptr [esi + 8]
     imul eax, ecx
     sar eax, 010h
     imul ecx, dword ptr [esi + 0Ch]
-    mov cx, ax
+    mov@ cx, ax
     sar eax, 3
-    mov edx, ecx
+    mov@ edx, ecx
     sar ecx, 3
-    mov cx, ax
+    mov@ cx, ax
     and edx, 070007h
     mov dword ptr [patch_157E98], ecx
     mov ecx, dword ptr [esi + 04Ch]
     mov dword ptr [patch_157F67], edx
     mov esi, dword ptr [esi + 040h]
-    xor eax, eax
+    xor@ eax, eax
     cmp ebp, 8
     jl near ptr L_157F7B
     push ebp
@@ -75,10 +76,10 @@ L_157E96:
 L_157E97:
     mov ebp, 0186A0h
 patch_157E98 equ L_157E97+1   ; rewritten at run time
-    mov edx, ebx
+    mov@ edx, ebx
     shr edx, 010h
-    mov dl, bh
-    add ebx, ebp
+    mov@ dl, bh
+    add@ ebx, ebp
     mov ah, byte ptr [esi + edx]
     test ah, ah
     je short L_157EB5
@@ -86,10 +87,10 @@ patch_157E98 equ L_157E97+1   ; rewritten at run time
     mov al, byte ptr [ecx + eax]
     mov byte ptr [edi + 1], al
 L_157EB5:
-    mov edx, ebx
+    mov@ edx, ebx
     shr edx, 010h
-    mov dl, bh
-    add ebx, ebp
+    mov@ dl, bh
+    add@ ebx, ebp
     mov ah, byte ptr [esi + edx]
     test ah, ah
     je short L_157ECE
@@ -97,10 +98,10 @@ L_157EB5:
     mov al, byte ptr [ecx + eax]
     mov byte ptr [edi + 2], al
 L_157ECE:
-    mov edx, ebx
+    mov@ edx, ebx
     shr edx, 010h
-    mov dl, bh
-    add ebx, ebp
+    mov@ dl, bh
+    add@ ebx, ebp
     mov ah, byte ptr [esi + edx]
     test ah, ah
     je short L_157EE7
@@ -108,10 +109,10 @@ L_157ECE:
     mov al, byte ptr [ecx + eax]
     mov byte ptr [edi + 3], al
 L_157EE7:
-    mov edx, ebx
+    mov@ edx, ebx
     shr edx, 010h
-    mov dl, bh
-    add ebx, ebp
+    mov@ dl, bh
+    add@ ebx, ebp
     mov ah, byte ptr [esi + edx]
     test ah, ah
     je short L_157F00
@@ -119,10 +120,10 @@ L_157EE7:
     mov al, byte ptr [ecx + eax]
     mov byte ptr [edi + 4], al
 L_157F00:
-    mov edx, ebx
+    mov@ edx, ebx
     shr edx, 010h
-    mov dl, bh
-    add ebx, ebp
+    mov@ dl, bh
+    add@ ebx, ebp
     mov ah, byte ptr [esi + edx]
     test ah, ah
     je short L_157F19
@@ -130,10 +131,10 @@ L_157F00:
     mov al, byte ptr [ecx + eax]
     mov byte ptr [edi + 5], al
 L_157F19:
-    mov edx, ebx
+    mov@ edx, ebx
     shr edx, 010h
-    mov dl, bh
-    add ebx, ebp
+    mov@ dl, bh
+    add@ ebx, ebp
     mov ah, byte ptr [esi + edx]
     test ah, ah
     je short L_157F32
@@ -141,10 +142,10 @@ L_157F19:
     mov al, byte ptr [ecx + eax]
     mov byte ptr [edi + 6], al
 L_157F32:
-    mov edx, ebx
+    mov@ edx, ebx
     shr edx, 010h
-    mov dl, bh
-    add ebx, ebp
+    mov@ dl, bh
+    add@ ebx, ebp
     mov ah, byte ptr [esi + edx]
     test ah, ah
     je short L_157F4B
@@ -152,10 +153,10 @@ L_157F32:
     mov al, byte ptr [ecx + eax]
     mov byte ptr [edi + 7], al
 L_157F4B:
-    mov edx, ebx
+    mov@ edx, ebx
     shr edx, 010h
-    mov dl, bh
-    add ebx, ebp
+    mov@ dl, bh
+    add@ ebx, ebp
     mov ah, byte ptr [esi + edx]
     test ah, ah
     je short L_157F64
@@ -185,10 +186,10 @@ L_157F9E:
     ret
     B_157F9F_1
 func_00157FA0:
-    mov edx, ebx
+    mov@ edx, ebx
     shr edx, 010h
-    mov dl, bh
-    add ebx, ebp
+    mov@ dl, bh
+    add@ ebx, ebp
     mov ah, byte ptr [esi + edx]
     test ah, ah
     je short L_157FB9
@@ -196,10 +197,10 @@ func_00157FA0:
     mov al, byte ptr [ecx + eax]
     mov byte ptr [edi + 1], al
 L_157FB9:
-    mov edx, ebx
+    mov@ edx, ebx
     shr edx, 010h
-    mov dl, bh
-    add ebx, ebp
+    mov@ dl, bh
+    add@ ebx, ebp
     mov ah, byte ptr [esi + edx]
     test ah, ah
     je short L_157FD2
@@ -207,10 +208,10 @@ L_157FB9:
     mov al, byte ptr [ecx + eax]
     mov byte ptr [edi + 2], al
 L_157FD2:
-    mov edx, ebx
+    mov@ edx, ebx
     shr edx, 010h
-    mov dl, bh
-    add ebx, ebp
+    mov@ dl, bh
+    add@ ebx, ebp
     mov ah, byte ptr [esi + edx]
     test ah, ah
     je short L_157FEB
@@ -218,10 +219,10 @@ L_157FD2:
     mov al, byte ptr [ecx + eax]
     mov byte ptr [edi + 3], al
 L_157FEB:
-    mov edx, ebx
+    mov@ edx, ebx
     shr edx, 010h
-    mov dl, bh
-    add ebx, ebp
+    mov@ dl, bh
+    add@ ebx, ebp
     mov ah, byte ptr [esi + edx]
     test ah, ah
     je short L_158004
@@ -229,10 +230,10 @@ L_157FEB:
     mov al, byte ptr [ecx + eax]
     mov byte ptr [edi + 4], al
 L_158004:
-    mov edx, ebx
+    mov@ edx, ebx
     shr edx, 010h
-    mov dl, bh
-    add ebx, ebp
+    mov@ dl, bh
+    add@ ebx, ebp
     mov ah, byte ptr [esi + edx]
     test ah, ah
     je short L_15801D
@@ -240,10 +241,10 @@ L_158004:
     mov al, byte ptr [ecx + eax]
     mov byte ptr [edi + 5], al
 L_15801D:
-    mov edx, ebx
+    mov@ edx, ebx
     shr edx, 010h
-    mov dl, bh
-    add ebx, ebp
+    mov@ dl, bh
+    add@ ebx, ebp
     mov ah, byte ptr [esi + edx]
     test ah, ah
     je short L_158036
@@ -251,10 +252,10 @@ L_15801D:
     mov al, byte ptr [ecx + eax]
     mov byte ptr [edi + 6], al
 L_158036:
-    mov edx, ebx
+    mov@ edx, ebx
     shr edx, 010h
-    mov dl, bh
-    add ebx, ebp
+    mov@ dl, bh
+    add@ ebx, ebp
     mov ah, byte ptr [esi + edx]
     test ah, ah
     je short L_15804F
@@ -262,10 +263,10 @@ L_158036:
     mov al, byte ptr [ecx + eax]
     mov byte ptr [edi + 7], al
 L_15804F:
-    mov edx, ebx
+    mov@ edx, ebx
     shr edx, 010h
-    mov dl, bh
-    add ebx, ebp
+    mov@ dl, bh
+    add@ ebx, ebp
     mov ah, byte ptr [esi + edx]
     test ah, ah
     je short L_158068

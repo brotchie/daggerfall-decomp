@@ -3,6 +3,7 @@
 ; B_<address>_<length> lines are data bytes the build takes from your FALL.EXE.
 .486p
 .387
+include xngine.inc
 include xn_143600.inc
 public func_00143700
 public func_00143924
@@ -67,7 +68,7 @@ func_00143600:
     mov eax, dword ptr [D_0015FA65]
     test eax, eax
     je short L_14367E
-    mov edi, eax
+    mov@ edi, eax
     mov dword ptr [D_00143550], eax
     mov dword ptr [D_00143554], eax
     mov dword ptr [D_00143558], 0
@@ -76,14 +77,15 @@ func_00143600:
     mov dword ptr [D_0014293C], eax
     imul ecx, eax
     shr ecx, 2
-    xor eax, eax
+    xor@ eax, eax
     rep stosd
     mov byte ptr [D_0014355C], 3
     mov dword ptr [D_0015FA61], 0
     jmp short L_1436CD
 L_143670:
     cmp eax, 013h
-    jne near ptr L_1436F6
+    db 0Fh, 085h   ; jne 0x1436f6
+    dd L_1436F6 - ($ + 4)
     call func_00143870
 L_14367E:
     mov eax, dword ptr [D_00142930]
@@ -101,19 +103,19 @@ L_14367E:
     mov edi, dword ptr [D_00143550]
     mov ecx, dword ptr [D_00142938]
     shr ecx, 2
-    xor eax, eax
+    xor@ eax, eax
     rep stosd
     mov dword ptr [D_0014293C], 1
 L_1436CD:
-    xor eax, eax
-    xor edx, edx
+    xor@ eax, eax
+    xor@ edx, edx
     mov ebx, dword ptr [D_00142930]
     mov ecx, dword ptr [D_00142934]
     call func_001438FC
     call func_001438DC
     mov dword ptr [D_00142923], 0
     popad
-    xor eax, eax
+    xor@ eax, eax
     clc
     ret
 L_1436F6:
@@ -172,7 +174,7 @@ L_14376E:
     mov eax, dword ptr [D_0015FA65]
     test eax, eax
     je short L_1437E3
-    mov edi, eax
+    mov@ edi, eax
     mov dword ptr [D_00143550], eax
     mov dword ptr [D_00143554], eax
     mov dword ptr [D_00143558], 0
@@ -181,7 +183,7 @@ L_14376E:
     mov dword ptr [D_0014293C], eax
     imul ecx, eax
     shr ecx, 2
-    xor eax, eax
+    xor@ eax, eax
     rep stosd
     mov byte ptr [D_0014355C], 3
     mov dword ptr [D_0015FA61], 0
@@ -204,13 +206,13 @@ L_1437E3:
     mov edi, dword ptr [D_00143550]
     mov ecx, dword ptr [D_00142938]
     shr ecx, 2
-    xor eax, eax
+    xor@ eax, eax
     rep stosd
     mov dword ptr [D_0014293C], 1
     mov byte ptr [D_0014355C], 1
 L_143839:
-    xor eax, eax
-    xor edx, edx
+    xor@ eax, eax
+    xor@ edx, edx
     mov ebx, dword ptr [D_00142930]
     mov ecx, dword ptr [D_00142934]
     call func_001438FC
@@ -221,7 +223,7 @@ L_143839:
     call func_0012D851
 L_143861:
     popad
-    xor eax, eax
+    xor@ eax, eax
     ret
 L_143865:
     popad
@@ -244,8 +246,8 @@ L_14388E:
     mov dword ptr [D_00142930], 0140h
     mov dword ptr [D_00142934], 0C8h
     mov dword ptr [D_00142938], 0FA00h
-    xor eax, eax
-    xor edx, edx
+    xor@ eax, eax
+    xor@ edx, edx
     mov ebx, dword ptr [D_00142930]
     mov ecx, dword ptr [D_00142934]
     call func_001438FC
@@ -258,7 +260,7 @@ func_001438DC:
     push ecx
     push edi
     mov edi, offset D_00142950
-    xor eax, eax
+    xor@ eax, eax
     mov ecx, 0300h
 L_1438EB:
     stosd
@@ -288,11 +290,11 @@ func_00143924:
     mov eax, dword ptr [eax*4 + D_00149980]
     mov edx, dword ptr [D_00142944]
     mov edx, dword ptr [edx*4 + D_00142950]
-    mov edi, edx
+    mov@ edi, edx
     add edi, dword ptr [D_00143550]
     mov ecx, dword ptr [D_0014294C]
     mov ecx, dword ptr [ecx*4 + D_00142950]
-    sub ecx, edx
+    sub@ ecx, edx
     shr ecx, 2
     rep stosd
     ret
@@ -332,7 +334,7 @@ L_1439CE:
     ret
 L_1439CF:
     push eax
-    xor eax, eax
+    xor@ eax, eax
     mov edx, dword ptr [D_0015FA61]
     imul edx, dword ptr [D_00142934]
     call func_0015FDF4
@@ -355,18 +357,18 @@ L_143A27:
     ret
 func_00143A28:
     mov ah, 3
-    xor ebx, ebx
+    xor@ ebx, ebx
     int 010h
-    mov eax, edx
+    mov@ eax, edx
     shr eax, 8
     and eax, 0FFh
     and edx, 0FFh
     ret
 func_00143A3F:
     shl eax, 8
-    add edx, eax
+    add@ edx, eax
     mov ah, 2
-    xor ebx, ebx
+    xor@ ebx, ebx
     int 010h
     ret
     B_143A4B_21
@@ -410,19 +412,19 @@ func_00143A3F:
 func_00143B80:
     push ebp
     push esi
-    mov ebp, ecx
+    mov@ ebp, ecx
     shr ecx, 2
     rep movsd
-    mov ecx, ebp
+    mov@ ecx, ebp
     and ecx, 3
     rep movsb
     pop edi
     movzx eax, byte ptr [D_0012B504]
     mov eax, dword ptr [eax*4 + D_00149980]
-    mov ecx, ebp
+    mov@ ecx, ebp
     shr ecx, 2
     rep stosd
-    mov ecx, ebp
+    mov@ ecx, ebp
     and ecx, 3
     rep stosb
     pop ebp
@@ -431,7 +433,7 @@ func_00143B80:
 func_00143BB0:
     push ebx
     push ebp
-    mov ebp, ecx
+    mov@ ebp, ecx
     movzx edx, byte ptr [D_0012B504]
     mov edx, dword ptr [edx*4 + D_00149980]
     shr ecx, 9
@@ -828,7 +830,7 @@ L_143BCB:
 L_1443BB:
     and ebp, 01FFh
     je short L_1443CA
-    mov ecx, ebp
+    mov@ ecx, ebp
     call func_00143B80
 L_1443CA:
     pop ebp
@@ -847,10 +849,10 @@ D_001443D0:
     B_1443F0_2060
 func_00144BFC:
     push ebp
-    mov ebp, ecx
+    mov@ ebp, ecx
     shr ecx, 2
     rep movsd
-    mov ecx, ebp
+    mov@ ecx, ebp
     and ecx, 3
     rep movsb
     pop ebp

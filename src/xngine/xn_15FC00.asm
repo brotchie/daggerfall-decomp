@@ -3,6 +3,7 @@
 ; B_<address>_<length> lines are data bytes the build takes from your FALL.EXE.
 .486p
 .387
+include xngine.inc
 include xn_15FC00.inc
 public D_0015FFFF
 public D_00160000
@@ -86,7 +87,7 @@ func_0015FC00:
     mov word ptr [D_0015FA2A], ax
     movzx edx, dx
     mov dword ptr [D_0015FA00], edx
-    mov ebx, edx
+    mov@ ebx, edx
     mov eax, 6
     int 031h
     mov word ptr [D_0015FA04], dx
@@ -101,7 +102,7 @@ func_0015FC00:
     jb short L_15FC74
     mov byte ptr [D_0015FA60], 1
     popad
-    xor eax, eax
+    xor@ eax, eax
     clc
     ret
 L_15FC74:
@@ -161,27 +162,27 @@ L_15FD06:
     je short L_15FD93
     mov eax, 0800h
     mov ecx, dword ptr [D_0015FA95]
-    mov ebx, ecx
+    mov@ ebx, ecx
     and ecx, 0FFFFh
     shr ebx, 010h
     mov edi, dword ptr [D_00142938]
     inc byte ptr [D_0015FA8A]
     movzx esi, byte ptr [D_0015FA8A]
     imul edi, esi
-    mov esi, edi
+    mov@ esi, edi
     and edi, 0FFFFh
     shr esi, 010h
     int 031h
     jb short L_15FD89
     shl ebx, 010h
-    mov cx, bx
+    mov@ cx, bx
     mov dword ptr [D_0015FA65], ebx
     jmp short L_15FD93
 L_15FD89:
     mov dword ptr [D_0015FA65], 0
 L_15FD93:
     popad
-    xor eax, eax
+    xor@ eax, eax
     clc
     ret
 L_15FD98:
@@ -192,7 +193,7 @@ L_15FD98:
     ret
 func_0015FDAA:
     pushad
-    mov ecx, eax
+    mov@ ecx, eax
     mov eax, 04F01h
     call func_0015FE6F
     jb short L_15FDF1
@@ -200,17 +201,17 @@ func_0015FDAA:
     movzx ecx, word ptr [edi + 4]
     jecxz L_15FDF1
     mov eax, 040h
-    xor edx, edx
+    xor@ edx, edx
     div ecx
     test eax, eax
     je short L_15FDF1
     mov word ptr [D_0015FA3A], ax
     mov ecx, 010h
     mov ebx, offset D_0015FA3C
-    xor edx, edx
+    xor@ edx, edx
 L_15FDE4:
     mov word ptr [ebx], dx
-    add edx, eax
+    add@ edx, eax
     add ebx, 2
     loop L_15FDE4
     popad
@@ -222,9 +223,9 @@ L_15FDF1:
     ret
 func_0015FDF4:
     pushad
-    mov ecx, eax
+    mov@ ecx, eax
     mov eax, 04F07h
-    xor ebx, ebx
+    xor@ ebx, ebx
     call func_0015FE6F
     popad
     ret
@@ -254,7 +255,7 @@ func_0015FE3F:
     mov ebx, 0100h
     call func_0015FE6F
     mov eax, dword ptr [D_0015FA1C]
-    xor ecx, ecx
+    xor@ ecx, ecx
 L_15FE57:
     cmp word ptr [ecx + D_0015FA3C], ax
     je short L_15FE68
@@ -263,7 +264,7 @@ L_15FE57:
     jne short L_15FE57
 L_15FE68:
     shr ecx, 1
-    mov eax, ecx
+    mov@ eax, ecx
     pop ecx
     pop ebx
     ret
@@ -278,7 +279,7 @@ func_0015FE6F:
     mov edi, offset D_0015FA08
     mov eax, 0300h
     mov ebx, 010h
-    xor ecx, ecx
+    xor@ ecx, ecx
     int 031h
     jb short L_15FEAA
     mov eax, dword ptr [D_0015FA24]
@@ -303,21 +304,21 @@ L_15FEBE:
     mov edx, dword ptr [D_0014294C]
     sub edx, dword ptr [D_00142944]
     mov edx, dword ptr [edx*4 + D_00142950]
-    mov eax, esi
+    mov@ eax, esi
     shr eax, 010h
     call func_0015FE05
-    mov ebp, esi
+    mov@ ebp, esi
     and ebp, 0FFFFh
-    mov edi, ebp
+    mov@ edi, ebp
     xor ebp, 0FFFFh
     inc ebp
     add edi, 0A0000h
     add esi, dword ptr [D_00143550]
-    mov ecx, ebp
+    mov@ ecx, ebp
     push eax
     call dword ptr [D_0015FA5C]
     pop eax
-    sub edx, ebp
+    sub@ edx, ebp
 L_15FF17:
     inc eax
     cmp edx, 010000h
@@ -333,7 +334,7 @@ L_15FF17:
 L_15FF3F:
     call func_0015FE05
     mov edi, 0A0000h
-    mov ecx, edx
+    mov@ ecx, edx
     call dword ptr [D_0015FA5C]
     popad
     ret
@@ -341,37 +342,37 @@ func_0015FF53:
     push ebp
     push edi
     mov edi, dword ptr [edx*4 + D_00142950]
-    add edi, eax
-    mov eax, edi
+    add@ edi, eax
+    mov@ eax, edi
     and edi, 0FFFFh
     shr eax, 010h
     add edi, 0A0000h
     call func_0015FE05
-    mov edx, ecx
+    mov@ edx, ecx
     mov ecx, dword ptr [D_00142930]
-    sub ecx, ebx
+    sub@ ecx, ebx
     mov dword ptr [patch_15FFDB], ecx
-    mov ecx, ebx
+    mov@ ecx, ebx
     shr ecx, 2
     mov dword ptr [patch_15FFCC], ecx
-    mov ecx, ebx
+    mov@ ecx, ebx
     and ecx, 3
     mov dword ptr [patch_15FFD3], ecx
 L_15FF9A:
     lea ecx, [edi + ebx]
     cmp ecx, 0B0000h
     jb short L_15FFCB
-    mov ecx, edi
+    mov@ ecx, edi
     and ecx, 0FFFFh
     xor ecx, 0FFFFh
     inc ecx
-    mov ebp, ecx
+    mov@ ebp, ecx
     rep movsb
     inc eax
     call func_0015FE05
     mov edi, 0A0000h
-    mov ecx, ebx
-    sub ecx, ebp
+    mov@ ecx, ebx
+    sub@ ecx, ebp
     rep movsb
     jmp short L_15FFD9
 L_15FFCB:

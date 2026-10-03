@@ -3,6 +3,7 @@
 ; B_<address>_<length> lines are data bytes the build takes from your FALL.EXE.
 .486p
 .387
+include xngine.inc
 include xn_144E00.inc
 public func_00144E9C
 public func_00144EF0
@@ -41,35 +42,35 @@ func_00144E00:
     cmp edx, dword ptr [D_00142944]
     jge short L_144E44
     sub edx, dword ptr [D_00142944]
-    add ecx, edx
+    add@ ecx, edx
     jle short L_144E81
     lea edi, [ebx + ebp]
     imul edx, edi
-    sub esi, edx
+    sub@ esi, edx
     mov edx, dword ptr [D_00142944]
 L_144E44:
     cmp eax, dword ptr [D_00142940]
     jge short L_144E5F
     sub eax, dword ptr [D_00142940]
-    add ebx, eax
+    add@ ebx, eax
     jle short L_144E81
-    sub ebp, eax
-    sub esi, eax
+    sub@ ebp, eax
+    sub@ esi, eax
     mov eax, dword ptr [D_00142940]
 L_144E5F:
-    mov edi, edx
-    add edi, ecx
+    mov@ edi, edx
+    add@ edi, ecx
     sub edi, dword ptr [D_0014294C]
     jle short L_144E6F
-    sub ecx, edi
+    sub@ ecx, edi
     jle short L_144E81
 L_144E6F:
-    mov edi, eax
-    add edi, ebx
+    mov@ edi, eax
+    add@ edi, ebx
     sub edi, dword ptr [D_00142948]
     jle short L_144E7F
-    sub ebx, edi
-    add ebp, edi
+    sub@ ebx, edi
+    add@ ebp, edi
 L_144E7F:
     clc
     ret
@@ -79,7 +80,7 @@ L_144E81:
     B_144E83_1
 func_00144E84:
     push ebp
-    mov ebp, esp
+    mov@ ebp, esp
     push edi
     push esi
     mov edi, dword ptr [ebp + 8]
@@ -92,25 +93,25 @@ func_00144E84:
     B_144E9A_2
 func_00144E9C:
     push esi
-    mov esi, edi
+    mov@ esi, edi
     call func_00144E00
     jb short L_144ED5
-    mov edi, esi
+    mov@ edi, esi
     mov esi, dword ptr [edx*4 + D_00142950]
     add esi, dword ptr [D_00143550]
-    add esi, eax
-    mov edx, ecx
+    add@ esi, eax
+    mov@ edx, ecx
     mov eax, dword ptr [D_00142930]
-    sub eax, ebx
+    sub@ eax, ebx
 L_144EC0:
-    mov ecx, ebx
+    mov@ ecx, ebx
     and ecx, 3
     rep movsb
-    mov ecx, ebx
+    mov@ ecx, ebx
     shr ecx, 2
     rep movsd
-    add esi, eax
-    add edi, ebp
+    add@ esi, eax
+    add@ edi, ebp
     dec edx
     jne short L_144EC0
 L_144ED5:
@@ -119,7 +120,7 @@ L_144ED5:
     B_144ED7_1
 func_00144ED8:
     push ebp
-    mov ebp, esp
+    mov@ ebp, esp
     push esi
     push edi
     mov esi, dword ptr [ebp + 8]
@@ -136,19 +137,19 @@ func_00144EF0:
     jb short L_144F25
     mov edi, dword ptr [edx*4 + D_00142950]
     add edi, dword ptr [D_00143550]
-    add edi, eax
-    mov edx, ecx
+    add@ edi, eax
+    mov@ edx, ecx
     mov eax, dword ptr [D_00142930]
-    sub eax, ebx
+    sub@ eax, ebx
 L_144F10:
-    mov ecx, ebx
+    mov@ ecx, ebx
     and ecx, 3
     rep movsb
-    mov ecx, ebx
+    mov@ ecx, ebx
     shr ecx, 2
     rep movsd
-    add edi, eax
-    add esi, ebp
+    add@ edi, eax
+    add@ esi, ebp
     dec edx
     jne short L_144F10
 L_144F25:
@@ -168,7 +169,7 @@ func_00144F28:
     ret
     B_144F36_2
 func_00144F38:
-    mov esi, ebx
+    mov@ esi, ebx
     movzx ecx, word ptr [ebx + 6]
     movzx ebx, word ptr [ebx + 4]
     add esi, 0Ch
@@ -188,7 +189,7 @@ func_00144F48:
     ret
     B_144F56_2
 func_00144F58:
-    mov esi, ebx
+    mov@ esi, ebx
     movzx ebx, word ptr [esi + 4]
     movzx ecx, word ptr [esi + 6]
     add esi, 0Ch
@@ -196,7 +197,7 @@ func_00144F58:
     B_144F67_1
 func_00144F68:
     push ebp
-    mov ebp, esp
+    mov@ ebp, esp
     push edi
     push esi
     mov esi, dword ptr [ebp + 8]
@@ -207,24 +208,24 @@ func_00144F68:
     ret 4
     B_144F7B_1
 func_00144F7C:
-    xor ebp, ebp
+    xor@ ebp, ebp
     call func_00144E00
     jb short L_144FB2
     mov edi, dword ptr [edx*4 + D_00142950]
-    add edi, eax
+    add@ edi, eax
     add edi, dword ptr [D_00143550]
-    mov edx, ecx
+    mov@ edx, ecx
     mov eax, dword ptr [D_00142930]
-    sub eax, ebx
+    sub@ eax, ebx
 L_144F9D:
-    mov ecx, ebx
+    mov@ ecx, ebx
     and ecx, 3
     rep movsb
-    mov ecx, ebx
+    mov@ ecx, ebx
     shr ecx, 2
     rep movsd
-    add esi, ebp
-    add edi, eax
+    add@ esi, ebp
+    add@ edi, eax
     dec edx
     jne short L_144F9D
 L_144FB2:
@@ -232,7 +233,7 @@ L_144FB2:
     B_144FB3_1
 func_00144FB4:
     push ebp
-    mov ebp, esp
+    mov@ ebp, esp
     push edi
     push esi
     mov esi, dword ptr [ebp + 8]
@@ -244,23 +245,23 @@ func_00144FB4:
 func_00144FC7:
     ret
 func_00144FC8:
-    xor ebp, ebp
+    xor@ ebp, ebp
     call func_00144E00
     jb short L_145018
     mov edi, dword ptr [edx*4 + D_00142950]
-    add edi, eax
+    add@ edi, eax
     add edi, dword ptr [D_00143550]
     sub edi, 0100h
     sub esi, 0100h
-    add ebp, ebx
+    add@ ebp, ebx
     mov edx, dword ptr [D_00142930]
     shl ebx, 4
     push word ptr [ebx + func_0014501C]
     mov byte ptr [ebx + func_0014501C], 0C3h
 L_145005:
     call func_0014501C
-    add esi, ebp
-    add edi, edx
+    add@ esi, ebp
+    add@ edi, edx
     dec ecx
     jne short L_145005
     pop word ptr [ebx + func_0014501C]
@@ -3472,13 +3473,13 @@ L_14781C:
     B_14781D_3
 func_00147820:
     pushad
-    mov esi, eax
+    mov@ esi, eax
     movzx ecx, word ptr [esi + 4]
     movzx eax, word ptr [esi + 6]
     imul ecx, eax
     add esi, 0Ch
     mov edi, offset D_0012B812
-    xor eax, eax
+    xor@ eax, eax
 L_147838:
     mov al, byte ptr [esi]
     test al, al
@@ -3499,10 +3500,10 @@ func_00147848:
     B_147856_2
 func_00147858:
     push edi
-    mov edi, eax
-    mov eax, ebp
+    mov@ edi, eax
+    mov@ eax, ebp
 L_14785D:
-    mov ebp, ebx
+    mov@ ebp, ebx
 L_14785F:
     mov al, byte ptr [edi]
     mov al, byte ptr [eax]
@@ -3510,7 +3511,7 @@ L_14785F:
     inc edi
     dec ebp
     jne short L_14785F
-    add edi, edx
+    add@ edi, edx
     dec ecx
     jne short L_14785D
     pop edi

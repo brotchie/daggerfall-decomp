@@ -3,6 +3,7 @@
 ; B_<address>_<length> lines are data bytes the build takes from your FALL.EXE.
 .486p
 .387
+include xngine.inc
 include xn_160900.inc
 public D_00160B60
 public D_00160BE0
@@ -52,7 +53,7 @@ func_00160900:
     push ebx
     push ecx
     push edx
-    mov ebx, eax
+    mov@ ebx, eax
     mov eax, dword ptr [eax*4 + D_00160014]
     push eax
     call func_000A1272
@@ -78,7 +79,7 @@ L_160963:
     call func_00160A18
     cli
     lea esi, [eax*4 - 4]
-    mov eax, edx
+    mov@ eax, edx
     mov edx, dword ptr [esi + D_00160004]
     add edx, 3
     or al, 080h
@@ -86,7 +87,7 @@ L_160963:
     push eax
     push edx
     mov edx, dword ptr [esi + D_00160004]
-    mov eax, ebx
+    mov@ eax, ebx
     out dx, ax
     pop edx
     pop eax
@@ -127,7 +128,7 @@ func_001609C0:
     mov dl, byte ptr [ebx + D_00160024]
     not dl
     in al, 021h
-    or al, dl
+    or@ al, dl
     out 021h, al
     mov eax, dword ptr [ebx*4 + D_00160014]
 func_001609F9:
@@ -194,13 +195,13 @@ L_160A6E:
     stc
     ret
 L_160A8C:
-    mov eax, edx
+    mov@ eax, edx
     mov edx, dword ptr [esi + D_00160004]
     out dx, al
     pop esi
     pop ecx
     pop ebx
-    xor eax, eax
+    xor@ eax, eax
     clc
     ret
 func_00160A9C:
@@ -219,7 +220,7 @@ func_00160A9C:
     ret
 L_160AD4:
     pop esi
-    xor eax, eax
+    xor@ eax, eax
     stc
     ret
     B_160AD9_7
@@ -228,7 +229,7 @@ func_00160AE0:
     push edx
     push ds
     db 066h, 0B8h, 00h, 00h   ; mov ax, 0
-    mov ds, eax
+    db 08Eh, 0D8h   ; mov ds, eax
     mov edx, 03F8h
     add edx, 2
     in al, dx

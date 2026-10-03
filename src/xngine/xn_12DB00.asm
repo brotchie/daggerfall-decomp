@@ -3,6 +3,7 @@
 ; B_<address>_<length> lines are data bytes the build takes from your FALL.EXE.
 .486p
 .387
+include xngine.inc
 include xn_12DB00.inc
 public func_0012DD1C
 extrn D_0012B508:byte
@@ -35,7 +36,7 @@ XN_12DB00 segment byte public use32 'CODE'
 func_0012DB00:
     pushad
     mov edi, offset D_0012DA54
-    xor eax, eax
+    xor@ eax, eax
     mov ecx, 8
     rep stosd
     mov dword ptr [D_0012DA48], 1
@@ -49,7 +50,7 @@ func_0012DB28:
     mov ebx, 4
     call func_00153900
     mov eax, offset D_0012DA00
-    xor edx, edx
+    xor@ edx, edx
     call func_000C0E24
     pop edx
     mov dword ptr [edx*4 + D_0012DA54], eax
@@ -117,7 +118,7 @@ L_12DBDB:
     add esi, dword ptr [D_0012DA74]
     movzx ebx, word ptr [ecx + 6]
     call func_0012DC44
-    add eax, ebx
+    add@ eax, ebx
     add eax, dword ptr [D_0012DA48]
     pop ebx
     jmp short L_12DBDB
@@ -160,18 +161,19 @@ func_0012DC44:
     jge short L_12DC88
     sub edx, dword ptr [D_00142944]
     neg edx
-    sub ebp, edx
+    sub@ ebp, edx
     jle near ptr L_12DD17
-    add edx, edx
-    add esi, edx
+    add@ edx, edx
+    add@ esi, edx
     mov edx, dword ptr [D_00142944]
 L_12DC88:
-    mov ecx, edx
-    add ecx, ebp
+    mov@ ecx, edx
+    add@ ecx, ebp
     sub ecx, dword ptr [D_0014294C]
     jle short L_12DC9C
-    sub ebp, ecx
-    jle short L_12DD17
+    sub@ ebp, ecx
+    db 07Eh   ; jle 0x12dd17
+    db L_12DD17 - ($ + 1)
     nop
     nop
     nop
@@ -182,35 +184,35 @@ L_12DC9C:
     jge short L_12DCC5
     sub eax, dword ptr [D_00142940]
     neg eax
-    sub ebx, eax
+    sub@ ebx, eax
     jle short L_12DD17
     add bl, 010h
     mov byte ptr [patch_12DD02], bl
     mov eax, dword ptr [D_00142940]
 L_12DCC5:
-    mov ecx, eax
-    add ecx, ebx
+    mov@ ecx, eax
+    add@ ecx, ebx
     sub ecx, dword ptr [D_00142948]
     jle short L_12DCD5
-    sub ebx, ecx
+    sub@ ebx, ecx
     jle short L_12DD17
 L_12DCD5:
     mov edi, dword ptr [edx*4 + D_00142950]
     add edi, dword ptr [D_00143550]
-    add edi, eax
+    add@ edi, eax
     mov ecx, dword ptr [D_00142930]
-    sub ecx, ebx
+    sub@ ecx, ebx
     mov dword ptr [patch_12DD10], ecx
     mov ch, byte ptr [D_0012B508]
 L_12DCF8:
     mov ax, word ptr [esi]
-    mov cl, bl
+    mov@ cl, bl
     add esi, 2
 L_12DD00:
     shl eax, 064h
 patch_12DD02 equ L_12DD00+2   ; rewritten at run time
 L_12DD03:
-    add eax, eax
+    add@ eax, eax
     jae short L_12DD09
     mov byte ptr [edi], ch
 L_12DD09:

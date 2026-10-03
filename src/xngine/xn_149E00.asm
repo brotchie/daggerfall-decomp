@@ -3,6 +3,7 @@
 ; B_<address>_<length> lines are data bytes the build takes from your FALL.EXE.
 .486p
 .387
+include xngine.inc
 include xn_149E00.inc
 public func_00149EF8
 public func_00149F0C
@@ -65,7 +66,7 @@ L_149E10:
     mov ecx, 1
 L_149E79:
     mov eax, 0FFFFh
-    xor edx, edx
+    xor@ edx, edx
     div ecx
     stosd
     inc ecx
@@ -77,7 +78,7 @@ L_149E79:
     mov ecx, 1
 L_149E9C:
     mov eax, 0FFFFFFFFh
-    xor edx, edx
+    xor@ edx, edx
     div ecx
     stosd
     inc ecx
@@ -85,7 +86,7 @@ L_149E9C:
     jne short L_149E9C
     mov edi, offset D_00149980
     mov ecx, 0100h
-    xor eax, eax
+    xor@ eax, eax
 L_149EBB:
     stosd
     add eax, 01010101h
@@ -118,10 +119,10 @@ L_149F07:
     B_149F09_3
 func_00149F0C:
     pushad
-    mov ebx, eax
+    mov@ ebx, eax
     movzx ecx, ax
     shr ebx, 010h
-    mov esi, edx
+    mov@ esi, edx
     movzx edi, dx
     shr esi, 010h
     mov eax, 0600h
@@ -146,18 +147,18 @@ func_00149F4C:
     mov byte ptr [D_00149D86], 1
     pushad
     mov eax, 0202h
-    xor ebx, ebx
+    xor@ ebx, ebx
     int 031h
     mov word ptr [D_00149D84], cx
     mov dword ptr [D_00149D80], edx
     mov eax, 0203h
-    xor ebx, ebx
+    xor@ ebx, ebx
     mov cx, cs
     mov edx, offset func_00149FC8
     int 031h
     mov eax, offset func_00149FC8
     mov edx, offset L_14A0E5
-    sub edx, eax
+    sub@ edx, eax
     call func_00149F0C
     popad
 L_149F96:
@@ -169,7 +170,7 @@ func_00149F98:
     je short L_149FC4
     mov byte ptr [D_00149D86], 0
     mov eax, 0203h
-    xor ebx, ebx
+    xor@ ebx, ebx
     mov cx, word ptr [D_00149D84]
     test cx, cx
     je short L_149FC4
@@ -289,19 +290,19 @@ func_0014A0C6:
     je short L_14A0D2
 func_0014A0C8:
     add dword ptr [esp + 0Ch], 2
-    xor eax, eax
+    xor@ eax, eax
 func_0014A0CF:
-    xor edx, edx
+    xor@ edx, edx
     retf
 L_14A0D2:
     add dword ptr [esp + 0Ch], 6
-    xor eax, eax
-    xor edx, edx
+    xor@ eax, eax
+    xor@ edx, edx
     retf
 L_14A0DC:
     add dword ptr [esp + 0Ch], 3
-    xor eax, eax
-    xor edx, edx
+    xor@ eax, eax
+    xor@ edx, edx
 L_14A0E5:
     retf
     db 26 dup (0)

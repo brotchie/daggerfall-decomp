@@ -3,6 +3,7 @@
 ; B_<address>_<length> lines are data bytes the build takes from your FALL.EXE.
 .486p
 .387
+include xngine.inc
 include xn_142700.inc
 public func_00142764
 public func_001427A8
@@ -38,7 +39,9 @@ func_00142700:
     mov eax, offset D_00142300
     mov edx, 0397h
     call func_00149F0C
-    mov dword ptr [D_00142393], offset D_00142397
+    db 0C7h, 05h   ; mov dword ptr [0x142393], 0x142397
+    dd D_00142393
+    dd D_00142397
 L_142761:
     popad
     ret
@@ -60,7 +63,7 @@ func_00142790:
     pushad
     mov edi, offset D_00142308
     mov ecx, 020h
-    xor eax, eax
+    xor@ eax, eax
     rep stosd
     mov byte ptr [D_00142307], 0
     popad
@@ -78,7 +81,7 @@ func_001427A8:
     setne bl
     test dword ptr [D_00142388], 2
     setne bh
-    or bl, bh
+    or@ bl, bh
     and ebx, 1
     shl ebx, 7
     mov al, byte ptr [eax + ebx]
@@ -91,11 +94,11 @@ L_1427F8:
     mov ah, 1
     int 016h
     je short L_142803
-    xor eax, eax
+    xor@ eax, eax
     int 016h
     ret
 L_142803:
-    xor eax, eax
+    xor@ eax, eax
     ret
     B_142806_2
 func_00142808:
@@ -107,7 +110,7 @@ L_142811:
     call func_001427A8
     ret
 L_142820:
-    xor eax, eax
+    xor@ eax, eax
     int 016h
     ret
     B_142825_27
@@ -118,11 +121,11 @@ func_00142840:
     push gs
     push fs
     db 066h, 0B8h, 00h, 00h   ; mov ax, 0
-    mov ds, eax
+    db 08Eh, 0D8h   ; mov ds, eax
 func_0014284D:
-    xor ebx, ebx
+    xor@ ebx, ebx
     in al, 060h
-    mov bl, al
+    mov@ bl, al
     in al, 061h
     or al, 080h
     out 061h, al

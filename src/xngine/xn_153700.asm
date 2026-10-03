@@ -3,6 +3,7 @@
 ; B_<address>_<length> lines are data bytes the build takes from your FALL.EXE.
 .486p
 .387
+include xngine.inc
 include xn_153700.inc
 public func_00153718
 extrn D_0012DA48:byte
@@ -30,8 +31,8 @@ L_153716:
 func_00153718:
     push esi
     push edi
-    mov esi, eax
-    mov edi, edx
+    mov@ esi, eax
+    mov@ edi, edx
 L_15371E:
     lodsb
     stosb
@@ -56,7 +57,7 @@ L_15372D:
     ret
     B_15373A_2
 func_0015373C:
-    add edx, eax
+    add@ edx, eax
 L_15373E:
     mov al, byte ptr [edx + 1]
     mov byte ptr [edx], al
@@ -67,7 +68,7 @@ L_15373E:
     B_153749_3
 func_0015374C:
     push ebx
-    xor ebx, ebx
+    xor@ ebx, ebx
 L_15374F:
     cmp byte ptr [eax], 0
     je short L_153758
@@ -75,54 +76,54 @@ L_15374F:
     inc ebx
     jmp short L_15374F
 L_153758:
-    mov eax, ebx
+    mov@ eax, ebx
     pop ebx
     ret
 func_0015375C:
     push ebx
     push ecx
-    xor ecx, ecx
-    mov ebx, eax
+    xor@ ecx, ecx
+    mov@ ebx, eax
 L_153762:
     movzx eax, byte ptr [ebx]
     test eax, eax
     je short L_153779
     call func_0012DD1C
-    add ecx, eax
+    add@ ecx, eax
     add ecx, dword ptr [D_0012DA48]
     inc ebx
     jmp short L_153762
 L_153779:
-    mov eax, ecx
+    mov@ eax, ecx
     pop ecx
     pop ebx
     ret
 func_0015377E:
     push esi
     push edi
-    xor edi, edi
-    mov esi, eax
+    xor@ edi, edi
+    mov@ esi, eax
 L_153784:
     lodsb
-    cmp al, dl
+    cmp@ al, dl
     je short L_153793
     inc edi
     test al, al
     jne short L_153784
-    xor eax, eax
+    xor@ eax, eax
     pop edi
     pop esi
     ret
 L_153793:
-    mov eax, edi
+    mov@ eax, edi
     pop edi
     pop esi
     ret
 func_00153798:
     push ebx
     push esi
-    mov esi, eax
-    xor ebx, ebx
+    mov@ esi, eax
+    xor@ ebx, ebx
     test edx, edx
     je short L_1537BC
 L_1537A2:
@@ -131,12 +132,12 @@ L_1537A2:
     test eax, eax
     je short L_1537BC
     call func_0012DD1C
-    add ebx, eax
+    add@ ebx, eax
     add ebx, dword ptr [D_0012DA48]
     dec edx
     jne short L_1537A2
 L_1537BC:
-    mov eax, ebx
+    mov@ eax, ebx
     pop esi
     pop ebx
     ret

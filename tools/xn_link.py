@@ -2,16 +2,17 @@
 """Assemble the XnGine modules (src/xngine/*.asm) and check them against FALL.EXE's object 2.
 
 Object 2 is the XnGine engine, hand-written asm. Each module is one MASM source file holding
-one segment that covers [start, end) of object 2 (config/xngine_modules.csv). Open Watcom's
-wasm (bwasm, built by tools/build_ow.sh) assembles it to OMF. A module matches when, with its
-fixups written as the linker and the LE loader would:
+one segment that covers [start, end) of object 2 (config/xngine_modules.csv). Watcom 10.0a's
+WASM, the assembler of the compiler that built the game, assembles it to OMF under DOSBox-X,
+all modules in one session ($WASM names a native MASM-compatible assembler to use instead).
+A module matches when, with its fixups written as the linker and the LE loader would:
   - every byte equals the original file's byte, and
   - every LE fixup in the range comes from a fixup in our object with the same target, so every
     address in the module is a symbol, not a number. 16-bit selector fixups are the exception:
     the LE table keeps them and the source holds the file's value.
 
 Plain data bytes are not in the repo (game files never are). The source names each run of
-them `B_<address>_<length>`, and assemble() writes a per-module include that defines those
+them `B_<address>_<length>`, and assemble_many() writes a per-module include that defines those
 macros from the original FALL.EXE.
 
 build_fall.py calls splice() to put matching modules into object 2. As a tool:
@@ -21,6 +22,7 @@ usage: xn_link.py [module ...]     assemble and check, print one line per module
 import csv
 import os
 import re
+import shutil
 import struct
 import subprocess
 import sys
@@ -40,13 +42,20 @@ NAME = re.compile(r"(?:func|D|L)_0*([0-9A-Fa-f]{5,8})$")
 BLOB = re.compile(r"\bB_([0-9A-F]{6})_([0-9]+)\b")
 
 
-def assembler():
-    """$WASM, else the boot assembler from tools/build_ow.sh."""
-    p = os.environ.get("WASM") or os.path.join(
-        ROOT, "third_party", "open-watcom-v2", "build", "binbuild", "bwasm")
-    if not os.path.exists(p):
-        raise SystemExit("no assembler at %s: run tools/build_ow.sh" % p)
-    return p
+W10 = os.path.join(ROOT, "third_party", "watcom10", "w10a")
+DOSDIR = os.path.join(ROOT, "build", "xngine", "dos")
+
+
+def w10_available():
+    """Watcom 10.0a's WASM (from your Watcom media, see tools/wcc10.py) and DOSBox-X."""
+    return os.path.exists(os.path.join(W10, "WATCOM", "BINB", "WASM.EXE")) and \
+        shutil.which("dosbox-x") is not None
+
+
+def native_assembler():
+    """$WASM: a native MASM-compatible assembler (Open Watcom's wasm), or None."""
+    p = os.environ.get("WASM")
+    return p if p and os.path.exists(p) else None
 
 
 def modules():
@@ -87,16 +96,89 @@ def write_blobs(asm_text, inc_path, img):
 
 def assemble(asm_path, img, objdir=OBJDIR):
     """Assemble one module. Returns (obj path or None, assembler messages)."""
+    return assemble_many([asm_path], img, objdir)[asm_path]
+
+
+def assemble_many(asm_paths, img, objdir=OBJDIR):
+    """Assemble modules with Watcom 10.0a's WASM in a few DOSBox-X sessions run side by side
+    (8.3 names M000.ASM, M001.ASM, ... with their blob includes), or with $WASM natively. Returns
+    {path: (obj path or None, messages)}; messages name the original path, so error lines
+    (`path(N): Error! ...`) point into it."""
     os.makedirs(objdir, exist_ok=True)
-    base = os.path.splitext(os.path.basename(asm_path))[0]
-    write_blobs(open(asm_path).read(), os.path.join(objdir, base + ".inc"), img)
-    obj = os.path.join(objdir, base + ".obj")
-    if os.path.exists(obj):
-        os.remove(obj)
-    r = subprocess.run([assembler(), "-q", "-i=" + objdir, "-fo=" + obj, asm_path],
-                       capture_output=True, text=True)
-    ok = r.returncode == 0 and os.path.exists(obj)
-    return (obj if ok else None), r.stdout + r.stderr
+    nat = native_assembler()
+    out = {}
+    if nat:
+        for path in asm_paths:
+            base = os.path.splitext(os.path.basename(path))[0]
+            write_blobs(open(path).read(), os.path.join(objdir, base + ".inc"), img)
+            obj = os.path.join(objdir, base + ".obj")
+            if os.path.exists(obj):
+                os.remove(obj)
+            r = subprocess.run([nat, "-q", "-i=" + objdir, "-i=" + SRC, "-fo=" + obj, path],
+                               capture_output=True, text=True)
+            ok = r.returncode == 0 and os.path.exists(obj)
+            out[path] = (obj if ok else None), r.stdout + r.stderr
+        return out
+    if not w10_available():
+        raise SystemExit("no assembler: XnGine needs Watcom 10.0a's WASM under DOSBox-X "
+                         "(third_party/watcom10/w10a, see tools/wcc10.py) or $WASM")
+    shutil.rmtree(DOSDIR, ignore_errors=True)
+    # up to 8 DOSBox-X sessions side by side, the files dealt out largest first
+    jobs = max(1, min(8, os.cpu_count() or 1, len(asm_paths) // 4 or 1))
+    load = [0] * jobs
+    share = [[] for _ in range(jobs)]
+    for path in sorted(asm_paths, key=os.path.getsize, reverse=True):
+        j = load.index(min(load))
+        load[j] += os.path.getsize(path)
+        share[j].append(path)
+    names, runs = {}, []
+    env = dict(os.environ, SDL_VIDEODRIVER="dummy", SDL_AUDIODRIVER="dummy")
+    opts = []
+    for kv in os.environ.get("DAGGER_DOSBOX", "cpu:cycles=max").split():
+        opts += ["-set", kv.replace(":", " ", 1)]
+    for j, paths in enumerate(share):
+        if not paths:
+            continue
+        d = os.path.join(DOSDIR, "J%02d" % j)
+        os.makedirs(d)
+        shutil.copyfile(os.path.join(SRC, "xngine.inc"), os.path.join(d, "XNGINE.INC"))
+        lines = ["@echo off", "set WATCOM=D:\\WATCOM",
+                 "set PATH=D:\\WATCOM\\BINB;D:\\WATCOM\\BIN;Z:\\", "C:"]
+        for k, path in enumerate(paths):
+            n = "M%03d" % k
+            names[path] = d, n
+            base = os.path.splitext(os.path.basename(path))[0]
+            text = open(path).read().replace("include %s.inc" % base, "include %s.INC" % n)
+            with open(os.path.join(d, n + ".ASM"), "w", newline="\r\n") as f:
+                f.write(text)
+            write_blobs(text, os.path.join(d, n + ".INC"), img)
+            lines.append("wasm -q %s.ASM > %s.OUT" % (n, n))
+        with open(os.path.join(d, "GO.BAT"), "w", newline="\r\n") as f:
+            f.write("\n".join(lines) + "\n")
+        runs.append(subprocess.Popen(
+            ["dosbox-x", "-silent", "-nogui", "-nomenu"] + opts +
+            ["-c", "mount c %s" % d, "-c", "mount d %s" % W10, "-c", "c:\\go.bat", "-exit"],
+            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, env=env))
+    for r in runs:
+        try:
+            r.wait(timeout=600)
+        except subprocess.TimeoutExpired:
+            r.kill()
+            r.wait()
+    for path, (d, n) in names.items():
+        base = os.path.splitext(os.path.basename(path))[0]
+        src_obj, err = os.path.join(d, n + ".OBJ"), os.path.join(d, n + ".OUT")
+        msgs = open(err, errors="replace").read() if os.path.exists(err) else "no output"
+        msgs = msgs.replace(n + ".ASM", path).replace(n.lower() + ".asm", path)
+        obj = os.path.join(objdir, base + ".obj")
+        if os.path.exists(obj):
+            os.remove(obj)
+        if os.path.exists(src_obj) and "Error!" not in msgs:
+            shutil.copyfile(src_obj, obj)
+            out[path] = obj, msgs
+        else:
+            out[path] = None, msgs
+    return out
 
 
 def link(obj_path, start, end, img):
@@ -167,11 +249,23 @@ def link(obj_path, start, end, img):
 
 def check(name, start, end, img, src=SRC, objdir=OBJDIR):
     """Assemble and link one module: (bytes or None, problems, assembler messages)."""
-    obj, msgs = assemble(os.path.join(src, name + ".asm"), img, objdir)
-    if obj is None:
-        return None, [(start, "does not assemble")], msgs
-    data, problems = link(obj, start, end, img)
-    return data, problems, msgs
+    return check_many([(name, start, end)], img, src, objdir)[name]
+
+
+def check_many(mods, img, src=SRC, objdir=OBJDIR):
+    """Assemble [(name, start, end)] in one batch and link each:
+    {name: (bytes or None, problems, assembler messages)}."""
+    paths = {name: os.path.join(src, name + ".asm") for name, _s, _e in mods}
+    res = assemble_many(list(paths.values()), img, objdir)
+    out = {}
+    for name, start, end in mods:
+        obj, msgs = res[paths[name]]
+        if obj is None:
+            out[name] = None, [(start, "does not assemble")], msgs
+        else:
+            data, problems = link(obj, start, end, img)
+            out[name] = data, problems, msgs
+    return out
 
 
 def splice(raw, img, blank=False):
@@ -185,13 +279,17 @@ def splice(raw, img, blank=False):
         for r in csv.DictReader(f):
             if r["obj"] == str(OBJ2):
                 funcs.append((int(r["va"], 16), r["name"]))
+    if not native_assembler() and not w10_available():
+        print("xngine   no assembler (Watcom 10.0a's WASM under DOSBox-X, or $WASM): "
+              "object 2 keeps the original bytes")
+        return matched, errors
     buf = raw[OBJ2]
     base = img.obj.base
-    for name, start, end in modules():
+    have = [m for m in modules() if os.path.exists(os.path.join(SRC, m[0] + ".asm"))]
+    results = check_many(have, img)
+    for name, start, end in have:
         rel = os.path.relpath(os.path.join(SRC, name + ".asm"), ROOT)
-        if not os.path.exists(os.path.join(SRC, name + ".asm")):
-            continue
-        data, problems, msgs = check(name, start, end, img)
+        data, problems, msgs = results[name]
         if problems:
             va, why = problems[0]
             errors.append("%s: %s at %#x (%d problems)%s" % (
@@ -218,10 +316,10 @@ def main():
     img = Image()
     want = set(sys.argv[1:])
     bad = 0
-    for name, start, end in modules():
-        if want and name not in want:
-            continue
-        data, problems, msgs = check(name, start, end, img)
+    mods = [m for m in modules() if not want or m[0] in want]
+    results = check_many(mods, img)
+    for name, start, end in mods:
+        data, problems, msgs = results[name]
         if problems:
             bad += 1
             print("%-14s %#x-%#x  %d problems: %s" % (

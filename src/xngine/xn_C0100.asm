@@ -3,6 +3,7 @@
 ; B_<address>_<length> lines are data bytes the build takes from your FALL.EXE.
 .486p
 .387
+include xngine.inc
 include xn_C0100.inc
 public func_000C020A
 public func_000C0221
@@ -28,8 +29,8 @@ func_000C0100:
     ret
 func_000C010F:
     push ebx
-    mov ebx, eax
-    xor eax, eax
+    mov@ ebx, eax
+    xor@ eax, eax
     mov byte ptr [ebx + 013h], 0FFh
     mov word ptr [ebx + 2], ax
     mov word ptr [ebx], ax
@@ -92,13 +93,13 @@ func_000C019C:
     je short L_0C01E5
     push esi
     push edi
-    mov esi, eax
+    mov@ esi, eax
     mov eax, dword ptr [D_001343C0]
     movzx ebx, word ptr [esi + 0Ch]
     push edx
-    xor edx, edx
+    xor@ edx, edx
     div ebx
-    mov ebx, eax
+    mov@ ebx, eax
     pop edx
     cmp ax, word ptr [esi + 0Eh]
     je short L_0C01E7
@@ -106,7 +107,7 @@ func_000C019C:
     mov al, byte ptr [esi + 012h]
     cmp al, 0FFh
     je short L_0C01E1
-    and al, al
+    and@ al, al
     je short L_0C01D6
     dec al
     mov byte ptr [esi + 012h], al
@@ -130,7 +131,7 @@ L_0C01E7:
     ret
 func_000C01EB:
     movsx eax, byte ptr [edi]
-    and eax, eax
+    and@ eax, eax
     js short L_0C01FC
     call dword ptr [eax*4 + D_000C0000]
     jae short func_000C01EB
@@ -145,7 +146,7 @@ L_0C01FC:
 func_000C020A:
     mov al, byte ptr [edi + 1]
     mov ah, byte ptr [edi + 2]
-    cmp al, ah
+    cmp@ al, ah
     je short L_0C0219
     call func_000C02E9
 L_0C0219:
@@ -156,10 +157,10 @@ L_0C0219:
 func_000C0221:
     mov eax, dword ptr [esi + 4]
     movzx ebx, word ptr [edi + 1]
-    add eax, ebx
+    add@ eax, ebx
     dec byte ptr [eax + 3]
     je short L_0C0236
-    mov edi, eax
+    mov@ edi, eax
     add edi, 4
     clc
     ret
@@ -182,7 +183,7 @@ func_000C0248:
 func_000C0253:
     mov al, byte ptr [edi + 1]
     and word ptr [esi + 010h], 07FFFh
-    and al, al
+    and@ al, al
     je short L_0C0266
     or word ptr [esi + 010h], 08000h
 L_0C0266:
@@ -192,13 +193,13 @@ L_0C0266:
 func_000C026B:
     mov edi, dword ptr [esi + 4]
     movzx eax, word ptr [edi + 2]
-    add edi, eax
+    add@ edi, eax
     mov dword ptr [esi + 8], eax
-    mov edi, eax
+    mov@ edi, eax
     clc
     ret
 func_000C027B:
-    xor edi, edi
+    xor@ edi, edi
     stc
     ret
 func_000C027F:
@@ -207,7 +208,7 @@ func_000C027F:
     mov word ptr [esi], ax
     mov al, byte ptr [edi + 2]
     add edi, 3
-    and al, al
+    and@ al, al
     jne short L_0C0297
     dec al
 L_0C0297:
@@ -217,7 +218,7 @@ L_0C0297:
 func_000C029C:
     movzx eax, word ptr [edi + 1]
     mov edi, dword ptr [esi + 4]
-    add edi, eax
+    add@ edi, eax
     clc
     ret
 func_000C02A7:
@@ -227,7 +228,7 @@ func_000C02A7:
     ja short L_0C02C0
     movzx eax, word ptr [edi + 2]
     mov edi, dword ptr [esi + 4]
-    add edi, eax
+    add@ edi, eax
     clc
     ret
 L_0C02C0:
@@ -240,7 +241,7 @@ func_000C02C5:
     je short L_0C02DA
     movzx eax, word ptr [edi + 3]
     mov edi, dword ptr [esi + 4]
-    add edi, eax
+    add@ edi, eax
     clc
     ret
 L_0C02DA:
@@ -258,12 +259,12 @@ func_000C02E9:
     call func_000C0307
     pop dx
     db 066h, 025h, 07Fh, 00h   ; and ax, 0x7f
-    sub dh, dl
+    sub@ dh, dl
     inc dh
     div dh
-    mov al, dl
-    add al, ah
-    xor ah, ah
+    mov@ al, dl
+    add@ al, ah
+    xor@ ah, ah
     pop dx
     ret
 func_000C0307:

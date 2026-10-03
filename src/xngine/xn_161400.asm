@@ -3,6 +3,7 @@
 ; B_<address>_<length> lines are data bytes the build takes from your FALL.EXE.
 .486p
 .387
+include xngine.inc
 include xn_161400.inc
 public func_00161400
 public func_001614D0
@@ -25,15 +26,15 @@ XN_161400 segment byte public use32 'CODE'
 func_00161400:
     pushad
     mov eax, 0607Fh
-    xor ebx, ebx
-    xor ecx, ecx
-    xor edx, edx
+    xor@ ebx, ebx
+    xor@ ecx, ecx
+    xor@ edx, edx
     call func_00161524
     cmp ax, 07F60h
     jne near ptr L_1614C6
     cmp ch, 1
     jne near ptr L_1614C6
-    or dx, bx
+    or@ dx, bx
     jne near ptr L_1614C6
     mov eax, 0100h
     mov ebx, 080h
@@ -43,42 +44,42 @@ func_00161400:
     mov word ptr [D_00161322], ax
     movzx edx, dx
     mov dword ptr [D_00161332], edx
-    mov ebx, edx
+    mov@ ebx, edx
     mov eax, 6
     int 031h
     mov word ptr [D_00161336], dx
     mov word ptr [D_00161338], cx
     mov eax, 06003h
-    xor ecx, ecx
-    xor edx, edx
+    xor@ ecx, ecx
+    xor@ edx, edx
     call func_00161524
     test ax, ax
     jne short L_1614C6
     mov esi, dword ptr [D_00161336]
-    xor eax, eax
+    xor@ eax, eax
 L_161486:
     mov al, byte ptr [esi]
     cmp byte ptr [esi + 1], 6
     je short L_161498
     cmp byte ptr [esi + 1], 0
     je short L_1614C6
-    add esi, eax
+    add@ esi, eax
     jmp short L_161486
 L_161498:
     mov byte ptr [esi + 0Eh], 08Ah
     mov byte ptr [esi + 016h], 088h
     mov byte ptr [esi + 01Eh], 088h
-    add esi, eax
+    add@ esi, eax
     mov byte ptr [esi + 016h], 088h
     mov byte ptr [esi + 01Eh], 088h
     mov eax, 06004h
-    xor ecx, ecx
-    xor edx, edx
+    xor@ ecx, ecx
+    xor@ edx, edx
     call func_00161524
     test ax, ax
     jne short L_1614C6
     popad
-    xor eax, eax
+    xor@ eax, eax
     clc
     ret
 L_1614C6:
@@ -108,8 +109,8 @@ func_001614EC:
     B_1614ED_3
 func_001614F0:
     mov eax, 06005h
-    xor ecx, ecx
-    xor edx, edx
+    xor@ ecx, ecx
+    xor@ edx, edx
     call func_00161524
     test ax, ax
     jne short L_161522
@@ -137,7 +138,7 @@ func_00161524:
     mov edi, offset D_00161300
     mov eax, 0300h
     mov ebx, 033h
-    xor ecx, ecx
+    xor@ ecx, ecx
     int 031h
     mov eax, dword ptr [D_0016131C]
     mov ebx, dword ptr [D_00161310]

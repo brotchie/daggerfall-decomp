@@ -3,6 +3,7 @@
 ; B_<address>_<length> lines are data bytes the build takes from your FALL.EXE.
 .486p
 .387
+include xngine.inc
 include xn_CB300.inc
 extrn D_000C0606:byte
 extrn D_000C0608:byte
@@ -42,18 +43,18 @@ L_0CB30B:
 func_000CB31E:
     push esi
     push edi
-    mov esi, eax
-    mov edi, edx
-    mov edx, ecx
-    mov ecx, ebx
+    mov@ esi, eax
+    mov@ edi, edx
+    mov@ edx, ecx
+    mov@ ecx, ebx
 L_0CB328:
     push ecx
     push esi
     push edi
-    mov eax, ecx
+    mov@ eax, ecx
     shr ecx, 2
     rep movsd
-    mov ecx, eax
+    mov@ ecx, eax
     and ecx, 3
     rep movsb
     pop edi
@@ -68,21 +69,21 @@ L_0CB328:
     ret
 func_000CB34E:
     push ebp
-    mov ebp, esp
+    mov@ ebp, esp
     push esi
     push edi
-    mov esi, eax
-    mov edi, edx
-    mov edx, ecx
-    mov ecx, ebx
+    mov@ esi, eax
+    mov@ edi, edx
+    mov@ edx, ecx
+    mov@ ecx, ebx
 L_0CB35B:
     push ecx
     push esi
     push edi
-    mov eax, ecx
+    mov@ eax, ecx
     shr ecx, 2
     rep movsd
-    mov ecx, eax
+    mov@ ecx, eax
     and ecx, 3
     rep movsb
     pop edi
@@ -99,13 +100,13 @@ L_0CB35B:
 func_000CB381:
     push ebx
     movzx ebx, word ptr [eax + 0Ah]
-    add eax, ebx
+    add@ eax, ebx
     add eax, 0Ch
-    and edx, edx
+    and@ edx, edx
     je short L_0CB398
 L_0CB38F:
     movzx ebx, word ptr [eax + 04Ah]
-    add eax, ebx
+    add@ eax, ebx
     dec edx
     jne short L_0CB38F
 L_0CB398:
@@ -116,7 +117,7 @@ func_000CB39A:
     push edi
     push ecx
     movzx edi, word ptr [eax + 8]
-    add edi, ebx
+    add@ edi, ebx
     jns short L_0CB3B2
     neg edi
     mov edi, dword ptr [edi*4 + D_00142950]
@@ -126,32 +127,32 @@ L_0CB3B2:
     mov edi, dword ptr [edi*4 + D_00142950]
 L_0CB3B9:
     movzx ecx, word ptr [eax + 6]
-    add edi, ecx
+    add@ edi, ecx
     add edi, dword ptr [D_00143550]
-    mov esi, eax
+    mov@ esi, eax
     movzx esi, word ptr [esi + edx*2 + 0Ch]
-    add esi, eax
+    add@ esi, eax
     push ebp
     movzx ecx, word ptr [eax + 2]
-    mov ebx, eax
+    mov@ ebx, eax
 L_0CB3D5:
     push ecx
     push edi
     movzx edx, word ptr [ebx]
 L_0CB3DA:
     lodsb
-    and al, al
+    and@ al, al
     js short L_0CB40E
     inc al
     movzx ecx, al
-    sub edx, ecx
-    mov eax, edi
-    add edi, ecx
-    add esi, ecx
+    sub@ edx, ecx
+    mov@ eax, edi
+    add@ edi, ecx
+    add@ esi, ecx
     cmp eax, dword ptr [D_00143550]
     jb short L_0CB408
-    sub edi, ecx
-    sub esi, ecx
+    sub@ edi, ecx
+    sub@ esi, ecx
     mov eax, dword ptr [D_00195B80]
 L_0CB3FD:
     mov al, byte ptr [esi]
@@ -162,43 +163,43 @@ L_0CB3FD:
     dec ecx
     jne short L_0CB3FD
 L_0CB408:
-    and edx, edx
+    and@ edx, edx
     jne short L_0CB3DA
     jmp short L_0CB45F
 L_0CB40E:
     and al, 07Fh
     inc al
     movzx ecx, al
-    sub edx, ecx
+    sub@ edx, ecx
     mov al, byte ptr [esi]
     inc esi
     cmp edi, dword ptr [D_00143550]
     jbe short L_0CB455
-    and al, al
+    and@ al, al
     je short L_0CB455
     mov eax, dword ptr [D_00195B80]
     mov al, byte ptr [esi - 1]
     mov al, byte ptr [eax]
-    mov ah, al
-    mov bp, ax
+    mov@ ah, al
+    mov@ bp, ax
     shl eax, 010h
-    mov ax, bp
+    mov@ ax, bp
     test edi, 1
     je short L_0CB447
     stosb
     dec ecx
     je short L_0CB457
 L_0CB447:
-    mov ebp, ecx
+    mov@ ebp, ecx
     shr ecx, 2
     rep stosd
-    mov ecx, ebp
+    mov@ ecx, ebp
     and ecx, 3
     rep stosb
 L_0CB455:
-    add edi, ecx
+    add@ edi, ecx
 L_0CB457:
-    and edx, edx
+    and@ edx, edx
     jne near ptr L_0CB3DA
 L_0CB45F:
     pop edi
@@ -216,23 +217,23 @@ func_000CB473:
     movzx ecx, word ptr [eax + 6]
     lea esi, [eax + 0Ch]
     movzx ebx, word ptr [eax + 2]
-    add ebx, edx
+    add@ ebx, edx
     cmp ebx, dword ptr [D_00142944]
     jge short L_0CB49E
     sub ebx, dword ptr [D_00142944]
-    add ecx, ebx
+    add@ ecx, ebx
     push eax
     push edx
     movzx eax, word ptr [eax + 4]
     imul eax, ebx
-    sub esi, eax
+    sub@ esi, eax
     pop edx
     pop eax
 L_0CB49E:
     mov edi, dword ptr [ebx*4 + D_00142950]
     add edi, dword ptr [D_00143550]
     movzx ebx, word ptr [eax]
-    add edi, ebx
+    add@ edi, ebx
     movzx ebx, word ptr [eax + 4]
     mov eax, dword ptr [D_00195B80]
 L_0CB4B9:
@@ -260,66 +261,66 @@ func_000CB4D7:
     push esi
     push edi
     push ecx
-    mov edi, ebx
-    mov esi, eax
+    mov@ edi, ebx
+    mov@ esi, eax
     movzx esi, word ptr [esi + edx*2 + 0Ch]
-    add esi, eax
+    add@ esi, eax
     push ebp
     movzx ecx, word ptr [eax + 2]
-    mov ebx, eax
+    mov@ ebx, eax
 L_0CB4EC:
     push ecx
     push edi
     movzx edx, word ptr [ebx]
 L_0CB4F1:
     lodsb
-    and al, al
+    and@ al, al
     js short L_0CB505
     inc al
     movzx ecx, al
-    sub edx, ecx
+    sub@ edx, ecx
     rep movsb
-    and edx, edx
+    and@ edx, edx
     jne short L_0CB4F1
     jmp short L_0CB53A
 L_0CB505:
     and al, 07Fh
     inc al
     movzx ecx, al
-    sub edx, ecx
+    sub@ edx, ecx
     lodsb
-    mov ah, al
-    mov bp, ax
+    mov@ ah, al
+    mov@ bp, ax
     shl eax, 010h
-    mov ax, bp
+    mov@ ax, bp
     test edi, 1
     je short L_0CB526
     stosb
     dec ecx
     je short L_0CB536
 L_0CB526:
-    mov ebp, ecx
+    mov@ ebp, ecx
     shr ecx, 2
     rep stosd
-    mov ecx, ebp
+    mov@ ecx, ebp
     and ecx, 3
     rep stosb
-    add edi, ecx
+    add@ edi, ecx
 L_0CB536:
-    and edx, edx
+    and@ edx, edx
     jne short L_0CB4F1
 L_0CB53A:
     pop edi
     pop ecx
     movzx edx, word ptr [ebx]
-    add edi, edx
+    add@ edi, edx
     dec ecx
     jne short L_0CB4EC
     pop ebp
     mov eax, 1
     jmp short L_0CB54E
 func_000CB54C:
-    xor eax, eax
+    xor@ eax, eax
 L_0CB54E:
     pop ecx
     pop edi
@@ -328,9 +329,9 @@ L_0CB54E:
 func_000CB552:
     pushad
     mov esi, dword ptr [D_00136915]
-    mov edx, eax
+    mov@ edx, eax
     mov edi, dword ptr [D_00143550]
-    xor ebx, ebx
+    xor@ ebx, ebx
     mov cx, 0C8h
 L_0CB567:
     mov bh, byte ptr [edx]
@@ -338,7 +339,7 @@ L_0CB567:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CB575
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CB57A
 L_0CB575:
     mov bh, 014h
@@ -351,7 +352,7 @@ L_0CB57A:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CB58B
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CB590
 L_0CB58B:
     mov bh, 014h
@@ -364,7 +365,7 @@ L_0CB590:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CB5A1
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CB5A6
 L_0CB5A1:
     mov bh, 014h
@@ -377,7 +378,7 @@ L_0CB5A6:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CB5B7
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CB5BC
 L_0CB5B7:
     mov bh, 014h
@@ -390,7 +391,7 @@ L_0CB5BC:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CB5CD
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CB5D2
 L_0CB5CD:
     mov bh, 014h
@@ -403,7 +404,7 @@ L_0CB5D2:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CB5E3
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CB5E8
 L_0CB5E3:
     mov bh, 014h
@@ -416,7 +417,7 @@ L_0CB5E8:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CB5F9
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CB5FE
 L_0CB5F9:
     mov bh, 014h
@@ -429,7 +430,7 @@ L_0CB5FE:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CB60F
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CB614
 L_0CB60F:
     mov bh, 014h
@@ -442,7 +443,7 @@ L_0CB614:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CB625
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CB62A
 L_0CB625:
     mov bh, 014h
@@ -455,7 +456,7 @@ L_0CB62A:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CB63B
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CB640
 L_0CB63B:
     mov bh, 014h
@@ -468,7 +469,7 @@ L_0CB640:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CB651
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CB656
 L_0CB651:
     mov bh, 014h
@@ -481,7 +482,7 @@ L_0CB656:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CB667
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CB66C
 L_0CB667:
     mov bh, 014h
@@ -494,7 +495,7 @@ L_0CB66C:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CB67D
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CB682
 L_0CB67D:
     mov bh, 014h
@@ -507,7 +508,7 @@ L_0CB682:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CB693
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CB698
 L_0CB693:
     mov bh, 014h
@@ -520,7 +521,7 @@ L_0CB698:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CB6A9
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CB6AE
 L_0CB6A9:
     mov bh, 014h
@@ -533,7 +534,7 @@ L_0CB6AE:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CB6BF
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CB6C4
 L_0CB6BF:
     mov bh, 014h
@@ -546,7 +547,7 @@ L_0CB6C4:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CB6D5
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CB6DA
 L_0CB6D5:
     mov bh, 014h
@@ -559,7 +560,7 @@ L_0CB6DA:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CB6EB
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CB6F0
 L_0CB6EB:
     mov bh, 014h
@@ -572,7 +573,7 @@ L_0CB6F0:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CB701
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CB706
 L_0CB701:
     mov bh, 014h
@@ -585,7 +586,7 @@ L_0CB706:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CB717
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CB71C
 L_0CB717:
     mov bh, 014h
@@ -598,7 +599,7 @@ L_0CB71C:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CB72D
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CB732
 L_0CB72D:
     mov bh, 014h
@@ -611,7 +612,7 @@ L_0CB732:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CB743
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CB748
 L_0CB743:
     mov bh, 014h
@@ -624,7 +625,7 @@ L_0CB748:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CB759
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CB75E
 L_0CB759:
     mov bh, 014h
@@ -637,7 +638,7 @@ L_0CB75E:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CB76F
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CB774
 L_0CB76F:
     mov bh, 014h
@@ -650,7 +651,7 @@ L_0CB774:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CB785
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CB78A
 L_0CB785:
     mov bh, 014h
@@ -663,7 +664,7 @@ L_0CB78A:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CB79B
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CB7A0
 L_0CB79B:
     mov bh, 014h
@@ -676,7 +677,7 @@ L_0CB7A0:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CB7B1
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CB7B6
 L_0CB7B1:
     mov bh, 014h
@@ -689,7 +690,7 @@ L_0CB7B6:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CB7C7
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CB7CC
 L_0CB7C7:
     mov bh, 014h
@@ -702,7 +703,7 @@ L_0CB7CC:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CB7DD
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CB7E2
 L_0CB7DD:
     mov bh, 014h
@@ -715,7 +716,7 @@ L_0CB7E2:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CB7F3
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CB7F8
 L_0CB7F3:
     mov bh, 014h
@@ -728,7 +729,7 @@ L_0CB7F8:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CB809
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CB80E
 L_0CB809:
     mov bh, 014h
@@ -741,7 +742,7 @@ L_0CB80E:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CB81F
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CB824
 L_0CB81F:
     mov bh, 014h
@@ -754,7 +755,7 @@ L_0CB824:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CB835
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CB83A
 L_0CB835:
     mov bh, 014h
@@ -767,7 +768,7 @@ L_0CB83A:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CB84B
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CB850
 L_0CB84B:
     mov bh, 014h
@@ -780,7 +781,7 @@ L_0CB850:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CB861
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CB866
 L_0CB861:
     mov bh, 014h
@@ -793,7 +794,7 @@ L_0CB866:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CB877
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CB87C
 L_0CB877:
     mov bh, 014h
@@ -806,7 +807,7 @@ L_0CB87C:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CB88D
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CB892
 L_0CB88D:
     mov bh, 014h
@@ -819,7 +820,7 @@ L_0CB892:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CB8A3
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CB8A8
 L_0CB8A3:
     mov bh, 014h
@@ -832,7 +833,7 @@ L_0CB8A8:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CB8B9
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CB8BE
 L_0CB8B9:
     mov bh, 014h
@@ -845,7 +846,7 @@ L_0CB8BE:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CB8CF
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CB8D4
 L_0CB8CF:
     mov bh, 014h
@@ -858,7 +859,7 @@ L_0CB8D4:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CB8E5
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CB8EA
 L_0CB8E5:
     mov bh, 014h
@@ -871,7 +872,7 @@ L_0CB8EA:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CB8FB
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CB900
 L_0CB8FB:
     mov bh, 014h
@@ -884,7 +885,7 @@ L_0CB900:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CB911
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CB916
 L_0CB911:
     mov bh, 014h
@@ -897,7 +898,7 @@ L_0CB916:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CB927
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CB92C
 L_0CB927:
     mov bh, 014h
@@ -910,7 +911,7 @@ L_0CB92C:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CB93D
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CB942
 L_0CB93D:
     mov bh, 014h
@@ -923,7 +924,7 @@ L_0CB942:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CB953
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CB958
 L_0CB953:
     mov bh, 014h
@@ -936,7 +937,7 @@ L_0CB958:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CB969
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CB96E
 L_0CB969:
     mov bh, 014h
@@ -949,7 +950,7 @@ L_0CB96E:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CB97F
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CB984
 L_0CB97F:
     mov bh, 014h
@@ -962,7 +963,7 @@ L_0CB984:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CB995
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CB99A
 L_0CB995:
     mov bh, 014h
@@ -975,7 +976,7 @@ L_0CB99A:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CB9AB
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CB9B0
 L_0CB9AB:
     mov bh, 014h
@@ -988,7 +989,7 @@ L_0CB9B0:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CB9C1
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CB9C6
 L_0CB9C1:
     mov bh, 014h
@@ -1001,7 +1002,7 @@ L_0CB9C6:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CB9D7
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CB9DC
 L_0CB9D7:
     mov bh, 014h
@@ -1014,7 +1015,7 @@ L_0CB9DC:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CB9ED
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CB9F2
 L_0CB9ED:
     mov bh, 014h
@@ -1027,7 +1028,7 @@ L_0CB9F2:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CBA03
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CBA08
 L_0CBA03:
     mov bh, 014h
@@ -1040,7 +1041,7 @@ L_0CBA08:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CBA19
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CBA1E
 L_0CBA19:
     mov bh, 014h
@@ -1053,7 +1054,7 @@ L_0CBA1E:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CBA2F
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CBA34
 L_0CBA2F:
     mov bh, 014h
@@ -1066,7 +1067,7 @@ L_0CBA34:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CBA45
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CBA4A
 L_0CBA45:
     mov bh, 014h
@@ -1079,7 +1080,7 @@ L_0CBA4A:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CBA5B
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CBA60
 L_0CBA5B:
     mov bh, 014h
@@ -1092,7 +1093,7 @@ L_0CBA60:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CBA71
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CBA76
 L_0CBA71:
     mov bh, 014h
@@ -1105,7 +1106,7 @@ L_0CBA76:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CBA87
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CBA8C
 L_0CBA87:
     mov bh, 014h
@@ -1118,7 +1119,7 @@ L_0CBA8C:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CBA9D
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CBAA2
 L_0CBA9D:
     mov bh, 014h
@@ -1131,7 +1132,7 @@ L_0CBAA2:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CBAB3
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CBAB8
 L_0CBAB3:
     mov bh, 014h
@@ -1144,7 +1145,7 @@ L_0CBAB8:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CBAC9
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CBACE
 L_0CBAC9:
     mov bh, 014h
@@ -1157,7 +1158,7 @@ L_0CBACE:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CBADF
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CBAE4
 L_0CBADF:
     mov bh, 014h
@@ -1170,7 +1171,7 @@ L_0CBAE4:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CBAF5
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CBAFA
 L_0CBAF5:
     mov bh, 014h
@@ -1183,7 +1184,7 @@ L_0CBAFA:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CBB0B
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CBB10
 L_0CBB0B:
     mov bh, 014h
@@ -1196,7 +1197,7 @@ L_0CBB10:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CBB21
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CBB26
 L_0CBB21:
     mov bh, 014h
@@ -1209,7 +1210,7 @@ L_0CBB26:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CBB37
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CBB3C
 L_0CBB37:
     mov bh, 014h
@@ -1222,7 +1223,7 @@ L_0CBB3C:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CBB4D
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CBB52
 L_0CBB4D:
     mov bh, 014h
@@ -1235,7 +1236,7 @@ L_0CBB52:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CBB63
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CBB68
 L_0CBB63:
     mov bh, 014h
@@ -1248,7 +1249,7 @@ L_0CBB68:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CBB79
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CBB7E
 L_0CBB79:
     mov bh, 014h
@@ -1261,7 +1262,7 @@ L_0CBB7E:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CBB8F
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CBB94
 L_0CBB8F:
     mov bh, 014h
@@ -1274,7 +1275,7 @@ L_0CBB94:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CBBA5
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CBBAA
 L_0CBBA5:
     mov bh, 014h
@@ -1287,7 +1288,7 @@ L_0CBBAA:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CBBBB
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CBBC0
 L_0CBBBB:
     mov bh, 014h
@@ -1300,7 +1301,7 @@ L_0CBBC0:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CBBD1
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CBBD6
 L_0CBBD1:
     mov bh, 014h
@@ -1313,7 +1314,7 @@ L_0CBBD6:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CBBE7
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CBBEC
 L_0CBBE7:
     mov bh, 014h
@@ -1326,7 +1327,7 @@ L_0CBBEC:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CBBFD
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CBC02
 L_0CBBFD:
     mov bh, 014h
@@ -1339,7 +1340,7 @@ L_0CBC02:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CBC13
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CBC18
 L_0CBC13:
     mov bh, 014h
@@ -1352,7 +1353,7 @@ L_0CBC18:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CBC29
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CBC2E
 L_0CBC29:
     mov bh, 014h
@@ -1365,7 +1366,7 @@ L_0CBC2E:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CBC3F
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CBC44
 L_0CBC3F:
     mov bh, 014h
@@ -1378,7 +1379,7 @@ L_0CBC44:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CBC55
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CBC5A
 L_0CBC55:
     mov bh, 014h
@@ -1391,7 +1392,7 @@ L_0CBC5A:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CBC6B
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CBC70
 L_0CBC6B:
     mov bh, 014h
@@ -1404,7 +1405,7 @@ L_0CBC70:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CBC81
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CBC86
 L_0CBC81:
     mov bh, 014h
@@ -1417,7 +1418,7 @@ L_0CBC86:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CBC97
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CBC9C
 L_0CBC97:
     mov bh, 014h
@@ -1430,7 +1431,7 @@ L_0CBC9C:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CBCAD
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CBCB2
 L_0CBCAD:
     mov bh, 014h
@@ -1443,7 +1444,7 @@ L_0CBCB2:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CBCC3
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CBCC8
 L_0CBCC3:
     mov bh, 014h
@@ -1456,7 +1457,7 @@ L_0CBCC8:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CBCD9
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CBCDE
 L_0CBCD9:
     mov bh, 014h
@@ -1469,7 +1470,7 @@ L_0CBCDE:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CBCEF
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CBCF4
 L_0CBCEF:
     mov bh, 014h
@@ -1482,7 +1483,7 @@ L_0CBCF4:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CBD05
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CBD0A
 L_0CBD05:
     mov bh, 014h
@@ -1495,7 +1496,7 @@ L_0CBD0A:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CBD1B
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CBD20
 L_0CBD1B:
     mov bh, 014h
@@ -1508,7 +1509,7 @@ L_0CBD20:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CBD31
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CBD36
 L_0CBD31:
     mov bh, 014h
@@ -1521,7 +1522,7 @@ L_0CBD36:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CBD47
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CBD4C
 L_0CBD47:
     mov bh, 014h
@@ -1534,7 +1535,7 @@ L_0CBD4C:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CBD5D
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CBD62
 L_0CBD5D:
     mov bh, 014h
@@ -1547,7 +1548,7 @@ L_0CBD62:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CBD73
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CBD78
 L_0CBD73:
     mov bh, 014h
@@ -1560,7 +1561,7 @@ L_0CBD78:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CBD89
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CBD8E
 L_0CBD89:
     mov bh, 014h
@@ -1573,7 +1574,7 @@ L_0CBD8E:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CBD9F
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CBDA4
 L_0CBD9F:
     mov bh, 014h
@@ -1586,7 +1587,7 @@ L_0CBDA4:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CBDB5
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CBDBA
 L_0CBDB5:
     mov bh, 014h
@@ -1599,7 +1600,7 @@ L_0CBDBA:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CBDCB
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CBDD0
 L_0CBDCB:
     mov bh, 014h
@@ -1612,7 +1613,7 @@ L_0CBDD0:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CBDE1
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CBDE6
 L_0CBDE1:
     mov bh, 014h
@@ -1625,7 +1626,7 @@ L_0CBDE6:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CBDF7
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CBDFC
 L_0CBDF7:
     mov bh, 014h
@@ -1638,7 +1639,7 @@ L_0CBDFC:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CBE0D
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CBE12
 L_0CBE0D:
     mov bh, 014h
@@ -1651,7 +1652,7 @@ L_0CBE12:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CBE23
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CBE28
 L_0CBE23:
     mov bh, 014h
@@ -1664,7 +1665,7 @@ L_0CBE28:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CBE39
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CBE3E
 L_0CBE39:
     mov bh, 014h
@@ -1677,7 +1678,7 @@ L_0CBE3E:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CBE4F
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CBE54
 L_0CBE4F:
     mov bh, 014h
@@ -1690,7 +1691,7 @@ L_0CBE54:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CBE65
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CBE6A
 L_0CBE65:
     mov bh, 014h
@@ -1703,7 +1704,7 @@ L_0CBE6A:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CBE7B
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CBE80
 L_0CBE7B:
     mov bh, 014h
@@ -1716,7 +1717,7 @@ L_0CBE80:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CBE91
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CBE96
 L_0CBE91:
     mov bh, 014h
@@ -1729,7 +1730,7 @@ L_0CBE96:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CBEA7
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CBEAC
 L_0CBEA7:
     mov bh, 014h
@@ -1742,7 +1743,7 @@ L_0CBEAC:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CBEBD
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CBEC2
 L_0CBEBD:
     mov bh, 014h
@@ -1755,7 +1756,7 @@ L_0CBEC2:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CBED3
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CBED8
 L_0CBED3:
     mov bh, 014h
@@ -1768,7 +1769,7 @@ L_0CBED8:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CBEE9
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CBEEE
 L_0CBEE9:
     mov bh, 014h
@@ -1781,7 +1782,7 @@ L_0CBEEE:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CBEFF
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CBF04
 L_0CBEFF:
     mov bh, 014h
@@ -1794,7 +1795,7 @@ L_0CBF04:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CBF15
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CBF1A
 L_0CBF15:
     mov bh, 014h
@@ -1807,7 +1808,7 @@ L_0CBF1A:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CBF2B
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CBF30
 L_0CBF2B:
     mov bh, 014h
@@ -1820,7 +1821,7 @@ L_0CBF30:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CBF41
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CBF46
 L_0CBF41:
     mov bh, 014h
@@ -1833,7 +1834,7 @@ L_0CBF46:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CBF57
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CBF5C
 L_0CBF57:
     mov bh, 014h
@@ -1846,7 +1847,7 @@ L_0CBF5C:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CBF6D
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CBF72
 L_0CBF6D:
     mov bh, 014h
@@ -1859,7 +1860,7 @@ L_0CBF72:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CBF83
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CBF88
 L_0CBF83:
     mov bh, 014h
@@ -1872,7 +1873,7 @@ L_0CBF88:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CBF99
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CBF9E
 L_0CBF99:
     mov bh, 014h
@@ -1885,7 +1886,7 @@ L_0CBF9E:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CBFAF
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CBFB4
 L_0CBFAF:
     mov bh, 014h
@@ -1898,7 +1899,7 @@ L_0CBFB4:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CBFC5
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CBFCA
 L_0CBFC5:
     mov bh, 014h
@@ -1911,7 +1912,7 @@ L_0CBFCA:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CBFDB
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CBFE0
 L_0CBFDB:
     mov bh, 014h
@@ -1924,7 +1925,7 @@ L_0CBFE0:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CBFF1
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CBFF6
 L_0CBFF1:
     mov bh, 014h
@@ -1937,7 +1938,7 @@ L_0CBFF6:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC007
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC00C
 L_0CC007:
     mov bh, 014h
@@ -1950,7 +1951,7 @@ L_0CC00C:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC01D
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC022
 L_0CC01D:
     mov bh, 014h
@@ -1963,7 +1964,7 @@ L_0CC022:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC033
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC038
 L_0CC033:
     mov bh, 014h
@@ -1976,7 +1977,7 @@ L_0CC038:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC049
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC04E
 L_0CC049:
     mov bh, 014h
@@ -1989,7 +1990,7 @@ L_0CC04E:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC05F
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC064
 L_0CC05F:
     mov bh, 014h
@@ -2002,7 +2003,7 @@ L_0CC064:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC075
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC07A
 L_0CC075:
     mov bh, 014h
@@ -2015,7 +2016,7 @@ L_0CC07A:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC08B
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC090
 L_0CC08B:
     mov bh, 014h
@@ -2028,7 +2029,7 @@ L_0CC090:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC0A1
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC0A6
 L_0CC0A1:
     mov bh, 014h
@@ -2041,7 +2042,7 @@ L_0CC0A6:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC0B7
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC0BC
 L_0CC0B7:
     mov bh, 014h
@@ -2054,7 +2055,7 @@ L_0CC0BC:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC0CD
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC0D2
 L_0CC0CD:
     mov bh, 014h
@@ -2067,7 +2068,7 @@ L_0CC0D2:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC0E3
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC0E8
 L_0CC0E3:
     mov bh, 014h
@@ -2080,7 +2081,7 @@ L_0CC0E8:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC0F9
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC0FE
 L_0CC0F9:
     mov bh, 014h
@@ -2093,7 +2094,7 @@ L_0CC0FE:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC10F
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC114
 L_0CC10F:
     mov bh, 014h
@@ -2106,7 +2107,7 @@ L_0CC114:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC125
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC12A
 L_0CC125:
     mov bh, 014h
@@ -2119,7 +2120,7 @@ L_0CC12A:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC13B
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC140
 L_0CC13B:
     mov bh, 014h
@@ -2132,7 +2133,7 @@ L_0CC140:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC151
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC156
 L_0CC151:
     mov bh, 014h
@@ -2145,7 +2146,7 @@ L_0CC156:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC167
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC16C
 L_0CC167:
     mov bh, 014h
@@ -2158,7 +2159,7 @@ L_0CC16C:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC17D
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC182
 L_0CC17D:
     mov bh, 014h
@@ -2171,7 +2172,7 @@ L_0CC182:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC193
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC198
 L_0CC193:
     mov bh, 014h
@@ -2184,7 +2185,7 @@ L_0CC198:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC1A9
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC1AE
 L_0CC1A9:
     mov bh, 014h
@@ -2197,7 +2198,7 @@ L_0CC1AE:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC1BF
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC1C4
 L_0CC1BF:
     mov bh, 014h
@@ -2210,7 +2211,7 @@ L_0CC1C4:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC1D5
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC1DA
 L_0CC1D5:
     mov bh, 014h
@@ -2223,7 +2224,7 @@ L_0CC1DA:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC1EB
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC1F0
 L_0CC1EB:
     mov bh, 014h
@@ -2236,7 +2237,7 @@ L_0CC1F0:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC201
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC206
 L_0CC201:
     mov bh, 014h
@@ -2249,7 +2250,7 @@ L_0CC206:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC217
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC21C
 L_0CC217:
     mov bh, 014h
@@ -2262,7 +2263,7 @@ L_0CC21C:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC22D
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC232
 L_0CC22D:
     mov bh, 014h
@@ -2275,7 +2276,7 @@ L_0CC232:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC243
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC248
 L_0CC243:
     mov bh, 014h
@@ -2288,7 +2289,7 @@ L_0CC248:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC259
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC25E
 L_0CC259:
     mov bh, 014h
@@ -2301,7 +2302,7 @@ L_0CC25E:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC26F
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC274
 L_0CC26F:
     mov bh, 014h
@@ -2314,7 +2315,7 @@ L_0CC274:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC285
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC28A
 L_0CC285:
     mov bh, 014h
@@ -2327,7 +2328,7 @@ L_0CC28A:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC29B
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC2A0
 L_0CC29B:
     mov bh, 014h
@@ -2340,7 +2341,7 @@ L_0CC2A0:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC2B1
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC2B6
 L_0CC2B1:
     mov bh, 014h
@@ -2353,7 +2354,7 @@ L_0CC2B6:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC2C7
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC2CC
 L_0CC2C7:
     mov bh, 014h
@@ -2366,7 +2367,7 @@ L_0CC2CC:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC2DD
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC2E2
 L_0CC2DD:
     mov bh, 014h
@@ -2379,7 +2380,7 @@ L_0CC2E2:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC2F3
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC2F8
 L_0CC2F3:
     mov bh, 014h
@@ -2392,7 +2393,7 @@ L_0CC2F8:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC309
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC30E
 L_0CC309:
     mov bh, 014h
@@ -2405,7 +2406,7 @@ L_0CC30E:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC31F
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC324
 L_0CC31F:
     mov bh, 014h
@@ -2418,7 +2419,7 @@ L_0CC324:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC335
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC33A
 L_0CC335:
     mov bh, 014h
@@ -2431,7 +2432,7 @@ L_0CC33A:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC34B
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC350
 L_0CC34B:
     mov bh, 014h
@@ -2444,7 +2445,7 @@ L_0CC350:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC361
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC366
 L_0CC361:
     mov bh, 014h
@@ -2457,7 +2458,7 @@ L_0CC366:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC377
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC37C
 L_0CC377:
     mov bh, 014h
@@ -2470,7 +2471,7 @@ L_0CC37C:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC38D
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC392
 L_0CC38D:
     mov bh, 014h
@@ -2483,7 +2484,7 @@ L_0CC392:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC3A3
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC3A8
 L_0CC3A3:
     mov bh, 014h
@@ -2496,7 +2497,7 @@ L_0CC3A8:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC3B9
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC3BE
 L_0CC3B9:
     mov bh, 014h
@@ -2509,7 +2510,7 @@ L_0CC3BE:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC3CF
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC3D4
 L_0CC3CF:
     mov bh, 014h
@@ -2522,7 +2523,7 @@ L_0CC3D4:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC3E5
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC3EA
 L_0CC3E5:
     mov bh, 014h
@@ -2535,7 +2536,7 @@ L_0CC3EA:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC3FB
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC400
 L_0CC3FB:
     mov bh, 014h
@@ -2548,7 +2549,7 @@ L_0CC400:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC411
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC416
 L_0CC411:
     mov bh, 014h
@@ -2561,7 +2562,7 @@ L_0CC416:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC427
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC42C
 L_0CC427:
     mov bh, 014h
@@ -2574,7 +2575,7 @@ L_0CC42C:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC43D
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC442
 L_0CC43D:
     mov bh, 014h
@@ -2587,7 +2588,7 @@ L_0CC442:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC453
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC458
 L_0CC453:
     mov bh, 014h
@@ -2600,7 +2601,7 @@ L_0CC458:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC469
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC46E
 L_0CC469:
     mov bh, 014h
@@ -2613,7 +2614,7 @@ L_0CC46E:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC47F
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC484
 L_0CC47F:
     mov bh, 014h
@@ -2626,7 +2627,7 @@ L_0CC484:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC495
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC49A
 L_0CC495:
     mov bh, 014h
@@ -2639,7 +2640,7 @@ L_0CC49A:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC4AB
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC4B0
 L_0CC4AB:
     mov bh, 014h
@@ -2652,7 +2653,7 @@ L_0CC4B0:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC4C1
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC4C6
 L_0CC4C1:
     mov bh, 014h
@@ -2665,7 +2666,7 @@ L_0CC4C6:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC4D7
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC4DC
 L_0CC4D7:
     mov bh, 014h
@@ -2678,7 +2679,7 @@ L_0CC4DC:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC4ED
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC4F2
 L_0CC4ED:
     mov bh, 014h
@@ -2691,7 +2692,7 @@ L_0CC4F2:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC503
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC508
 L_0CC503:
     mov bh, 014h
@@ -2704,7 +2705,7 @@ L_0CC508:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC519
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC51E
 L_0CC519:
     mov bh, 014h
@@ -2717,7 +2718,7 @@ L_0CC51E:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC52F
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC534
 L_0CC52F:
     mov bh, 014h
@@ -2730,7 +2731,7 @@ L_0CC534:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC545
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC54A
 L_0CC545:
     mov bh, 014h
@@ -2743,7 +2744,7 @@ L_0CC54A:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC55B
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC560
 L_0CC55B:
     mov bh, 014h
@@ -2756,7 +2757,7 @@ L_0CC560:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC571
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC576
 L_0CC571:
     mov bh, 014h
@@ -2769,7 +2770,7 @@ L_0CC576:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC587
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC58C
 L_0CC587:
     mov bh, 014h
@@ -2782,7 +2783,7 @@ L_0CC58C:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC59D
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC5A2
 L_0CC59D:
     mov bh, 014h
@@ -2795,7 +2796,7 @@ L_0CC5A2:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC5B3
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC5B8
 L_0CC5B3:
     mov bh, 014h
@@ -2808,7 +2809,7 @@ L_0CC5B8:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC5C9
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC5CE
 L_0CC5C9:
     mov bh, 014h
@@ -2821,7 +2822,7 @@ L_0CC5CE:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC5DF
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC5E4
 L_0CC5DF:
     mov bh, 014h
@@ -2834,7 +2835,7 @@ L_0CC5E4:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC5F5
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC5FA
 L_0CC5F5:
     mov bh, 014h
@@ -2847,7 +2848,7 @@ L_0CC5FA:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC60B
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC610
 L_0CC60B:
     mov bh, 014h
@@ -2860,7 +2861,7 @@ L_0CC610:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC621
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC626
 L_0CC621:
     mov bh, 014h
@@ -2873,7 +2874,7 @@ L_0CC626:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC637
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC63C
 L_0CC637:
     mov bh, 014h
@@ -2886,7 +2887,7 @@ L_0CC63C:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC64D
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC652
 L_0CC64D:
     mov bh, 014h
@@ -2899,7 +2900,7 @@ L_0CC652:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC663
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC668
 L_0CC663:
     mov bh, 014h
@@ -2912,7 +2913,7 @@ L_0CC668:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC679
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC67E
 L_0CC679:
     mov bh, 014h
@@ -2925,7 +2926,7 @@ L_0CC67E:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC68F
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC694
 L_0CC68F:
     mov bh, 014h
@@ -2938,7 +2939,7 @@ L_0CC694:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC6A5
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC6AA
 L_0CC6A5:
     mov bh, 014h
@@ -2951,7 +2952,7 @@ L_0CC6AA:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC6BB
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC6C0
 L_0CC6BB:
     mov bh, 014h
@@ -2964,7 +2965,7 @@ L_0CC6C0:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC6D1
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC6D6
 L_0CC6D1:
     mov bh, 014h
@@ -2977,7 +2978,7 @@ L_0CC6D6:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC6E7
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC6EC
 L_0CC6E7:
     mov bh, 014h
@@ -2990,7 +2991,7 @@ L_0CC6EC:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC6FD
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC702
 L_0CC6FD:
     mov bh, 014h
@@ -3003,7 +3004,7 @@ L_0CC702:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC713
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC718
 L_0CC713:
     mov bh, 014h
@@ -3016,7 +3017,7 @@ L_0CC718:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC729
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC72E
 L_0CC729:
     mov bh, 014h
@@ -3029,7 +3030,7 @@ L_0CC72E:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC73F
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC744
 L_0CC73F:
     mov bh, 014h
@@ -3042,7 +3043,7 @@ L_0CC744:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC755
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC75A
 L_0CC755:
     mov bh, 014h
@@ -3055,7 +3056,7 @@ L_0CC75A:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC76B
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC770
 L_0CC76B:
     mov bh, 014h
@@ -3068,7 +3069,7 @@ L_0CC770:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC781
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC786
 L_0CC781:
     mov bh, 014h
@@ -3081,7 +3082,7 @@ L_0CC786:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC797
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC79C
 L_0CC797:
     mov bh, 014h
@@ -3094,7 +3095,7 @@ L_0CC79C:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC7AD
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC7B2
 L_0CC7AD:
     mov bh, 014h
@@ -3107,7 +3108,7 @@ L_0CC7B2:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC7C3
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC7C8
 L_0CC7C3:
     mov bh, 014h
@@ -3120,7 +3121,7 @@ L_0CC7C8:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC7D9
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC7DE
 L_0CC7D9:
     mov bh, 014h
@@ -3133,7 +3134,7 @@ L_0CC7DE:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC7EF
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC7F4
 L_0CC7EF:
     mov bh, 014h
@@ -3146,7 +3147,7 @@ L_0CC7F4:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC805
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC80A
 L_0CC805:
     mov bh, 014h
@@ -3159,7 +3160,7 @@ L_0CC80A:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC81B
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC820
 L_0CC81B:
     mov bh, 014h
@@ -3172,7 +3173,7 @@ L_0CC820:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC831
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC836
 L_0CC831:
     mov bh, 014h
@@ -3185,7 +3186,7 @@ L_0CC836:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC847
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC84C
 L_0CC847:
     mov bh, 014h
@@ -3198,7 +3199,7 @@ L_0CC84C:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC85D
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC862
 L_0CC85D:
     mov bh, 014h
@@ -3211,7 +3212,7 @@ L_0CC862:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC873
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC878
 L_0CC873:
     mov bh, 014h
@@ -3224,7 +3225,7 @@ L_0CC878:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC889
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC88E
 L_0CC889:
     mov bh, 014h
@@ -3237,7 +3238,7 @@ L_0CC88E:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC89F
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC8A4
 L_0CC89F:
     mov bh, 014h
@@ -3250,7 +3251,7 @@ L_0CC8A4:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC8B5
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC8BA
 L_0CC8B5:
     mov bh, 014h
@@ -3263,7 +3264,7 @@ L_0CC8BA:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC8CB
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC8D0
 L_0CC8CB:
     mov bh, 014h
@@ -3276,7 +3277,7 @@ L_0CC8D0:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC8E1
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC8E6
 L_0CC8E1:
     mov bh, 014h
@@ -3289,7 +3290,7 @@ L_0CC8E6:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC8F7
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC8FC
 L_0CC8F7:
     mov bh, 014h
@@ -3302,7 +3303,7 @@ L_0CC8FC:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC90D
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC912
 L_0CC90D:
     mov bh, 014h
@@ -3315,7 +3316,7 @@ L_0CC912:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC923
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC928
 L_0CC923:
     mov bh, 014h
@@ -3328,7 +3329,7 @@ L_0CC928:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC939
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC93E
 L_0CC939:
     mov bh, 014h
@@ -3341,7 +3342,7 @@ L_0CC93E:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC94F
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC954
 L_0CC94F:
     mov bh, 014h
@@ -3354,7 +3355,7 @@ L_0CC954:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC965
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC96A
 L_0CC965:
     mov bh, 014h
@@ -3367,7 +3368,7 @@ L_0CC96A:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC97B
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC980
 L_0CC97B:
     mov bh, 014h
@@ -3380,7 +3381,7 @@ L_0CC980:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC991
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC996
 L_0CC991:
     mov bh, 014h
@@ -3393,7 +3394,7 @@ L_0CC996:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC9A7
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC9AC
 L_0CC9A7:
     mov bh, 014h
@@ -3406,7 +3407,7 @@ L_0CC9AC:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC9BD
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC9C2
 L_0CC9BD:
     mov bh, 014h
@@ -3419,7 +3420,7 @@ L_0CC9C2:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC9D3
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC9D8
 L_0CC9D3:
     mov bh, 014h
@@ -3432,7 +3433,7 @@ L_0CC9D8:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC9E9
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CC9EE
 L_0CC9E9:
     mov bh, 014h
@@ -3445,7 +3446,7 @@ L_0CC9EE:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CC9FF
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CCA04
 L_0CC9FF:
     mov bh, 014h
@@ -3458,7 +3459,7 @@ L_0CCA04:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CCA15
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CCA1A
 L_0CCA15:
     mov bh, 014h
@@ -3471,7 +3472,7 @@ L_0CCA1A:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CCA2B
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CCA30
 L_0CCA2B:
     mov bh, 014h
@@ -3484,7 +3485,7 @@ L_0CCA30:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CCA41
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CCA46
 L_0CCA41:
     mov bh, 014h
@@ -3497,7 +3498,7 @@ L_0CCA46:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CCA57
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CCA5C
 L_0CCA57:
     mov bh, 014h
@@ -3510,7 +3511,7 @@ L_0CCA5C:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CCA6D
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CCA72
 L_0CCA6D:
     mov bh, 014h
@@ -3523,7 +3524,7 @@ L_0CCA72:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CCA83
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CCA88
 L_0CCA83:
     mov bh, 014h
@@ -3536,7 +3537,7 @@ L_0CCA88:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CCA99
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CCA9E
 L_0CCA99:
     mov bh, 014h
@@ -3549,7 +3550,7 @@ L_0CCA9E:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CCAAF
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CCAB4
 L_0CCAAF:
     mov bh, 014h
@@ -3562,7 +3563,7 @@ L_0CCAB4:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CCAC5
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CCACA
 L_0CCAC5:
     mov bh, 014h
@@ -3575,7 +3576,7 @@ L_0CCACA:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CCADB
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CCAE0
 L_0CCADB:
     mov bh, 014h
@@ -3588,7 +3589,7 @@ L_0CCAE0:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CCAF1
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CCAF6
 L_0CCAF1:
     mov bh, 014h
@@ -3601,7 +3602,7 @@ L_0CCAF6:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CCB07
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CCB0C
 L_0CCB07:
     mov bh, 014h
@@ -3614,7 +3615,7 @@ L_0CCB0C:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CCB1D
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CCB22
 L_0CCB1D:
     mov bh, 014h
@@ -3627,7 +3628,7 @@ L_0CCB22:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CCB33
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CCB38
 L_0CCB33:
     mov bh, 014h
@@ -3640,7 +3641,7 @@ L_0CCB38:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CCB49
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CCB4E
 L_0CCB49:
     mov bh, 014h
@@ -3653,7 +3654,7 @@ L_0CCB4E:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CCB5F
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CCB64
 L_0CCB5F:
     mov bh, 014h
@@ -3666,7 +3667,7 @@ L_0CCB64:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CCB75
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CCB7A
 L_0CCB75:
     mov bh, 014h
@@ -3679,7 +3680,7 @@ L_0CCB7A:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CCB8B
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CCB90
 L_0CCB8B:
     mov bh, 014h
@@ -3692,7 +3693,7 @@ L_0CCB90:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CCBA1
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CCBA6
 L_0CCBA1:
     mov bh, 014h
@@ -3705,7 +3706,7 @@ L_0CCBA6:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CCBB7
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CCBBC
 L_0CCBB7:
     mov bh, 014h
@@ -3718,7 +3719,7 @@ L_0CCBBC:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CCBCD
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CCBD2
 L_0CCBCD:
     mov bh, 014h
@@ -3731,7 +3732,7 @@ L_0CCBD2:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CCBE3
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CCBE8
 L_0CCBE3:
     mov bh, 014h
@@ -3744,7 +3745,7 @@ L_0CCBE8:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CCBF9
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CCBFE
 L_0CCBF9:
     mov bh, 014h
@@ -3757,7 +3758,7 @@ L_0CCBFE:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CCC0F
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CCC14
 L_0CCC0F:
     mov bh, 014h
@@ -3770,7 +3771,7 @@ L_0CCC14:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CCC25
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CCC2A
 L_0CCC25:
     mov bh, 014h
@@ -3783,7 +3784,7 @@ L_0CCC2A:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CCC3B
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CCC40
 L_0CCC3B:
     mov bh, 014h
@@ -3796,7 +3797,7 @@ L_0CCC40:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CCC51
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CCC56
 L_0CCC51:
     mov bh, 014h
@@ -3809,7 +3810,7 @@ L_0CCC56:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CCC67
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CCC6C
 L_0CCC67:
     mov bh, 014h
@@ -3822,7 +3823,7 @@ L_0CCC6C:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CCC7D
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CCC82
 L_0CCC7D:
     mov bh, 014h
@@ -3835,7 +3836,7 @@ L_0CCC82:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CCC93
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CCC98
 L_0CCC93:
     mov bh, 014h
@@ -3848,7 +3849,7 @@ L_0CCC98:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CCCA9
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CCCAE
 L_0CCCA9:
     mov bh, 014h
@@ -3861,7 +3862,7 @@ L_0CCCAE:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CCCBF
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CCCC4
 L_0CCCBF:
     mov bh, 014h
@@ -3874,7 +3875,7 @@ L_0CCCC4:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CCCD5
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CCCDA
 L_0CCCD5:
     mov bh, 014h
@@ -3887,7 +3888,7 @@ L_0CCCDA:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CCCEB
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CCCF0
 L_0CCCEB:
     mov bh, 014h
@@ -3900,7 +3901,7 @@ L_0CCCF0:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CCD01
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CCD06
 L_0CCD01:
     mov bh, 014h
@@ -3913,7 +3914,7 @@ L_0CCD06:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CCD17
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CCD1C
 L_0CCD17:
     mov bh, 014h
@@ -3926,7 +3927,7 @@ L_0CCD1C:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CCD2D
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CCD32
 L_0CCD2D:
     mov bh, 014h
@@ -3939,7 +3940,7 @@ L_0CCD32:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CCD43
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CCD48
 L_0CCD43:
     mov bh, 014h
@@ -3952,7 +3953,7 @@ L_0CCD48:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CCD59
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CCD5E
 L_0CCD59:
     mov bh, 014h
@@ -3965,7 +3966,7 @@ L_0CCD5E:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CCD6F
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CCD74
 L_0CCD6F:
     mov bh, 014h
@@ -3978,7 +3979,7 @@ L_0CCD74:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CCD85
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CCD8A
 L_0CCD85:
     mov bh, 014h
@@ -3991,7 +3992,7 @@ L_0CCD8A:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CCD9B
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CCDA0
 L_0CCD9B:
     mov bh, 014h
@@ -4004,7 +4005,7 @@ L_0CCDA0:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CCDB1
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CCDB6
 L_0CCDB1:
     mov bh, 014h
@@ -4017,7 +4018,7 @@ L_0CCDB6:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CCDC7
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CCDCC
 L_0CCDC7:
     mov bh, 014h
@@ -4030,7 +4031,7 @@ L_0CCDCC:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CCDDD
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CCDE2
 L_0CCDDD:
     mov bh, 014h
@@ -4043,7 +4044,7 @@ L_0CCDE2:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CCDF3
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CCDF8
 L_0CCDF3:
     mov bh, 014h
@@ -4056,7 +4057,7 @@ L_0CCDF8:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CCE09
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CCE0E
 L_0CCE09:
     mov bh, 014h
@@ -4069,7 +4070,7 @@ L_0CCE0E:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CCE1F
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CCE24
 L_0CCE1F:
     mov bh, 014h
@@ -4082,7 +4083,7 @@ L_0CCE24:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CCE35
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CCE3A
 L_0CCE35:
     mov bh, 014h
@@ -4095,7 +4096,7 @@ L_0CCE3A:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CCE4B
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CCE50
 L_0CCE4B:
     mov bh, 014h
@@ -4108,7 +4109,7 @@ L_0CCE50:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CCE61
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CCE66
 L_0CCE61:
     mov bh, 014h
@@ -4121,7 +4122,7 @@ L_0CCE66:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CCE77
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CCE7C
 L_0CCE77:
     mov bh, 014h
@@ -4134,7 +4135,7 @@ L_0CCE7C:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CCE8D
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CCE92
 L_0CCE8D:
     mov bh, 014h
@@ -4147,7 +4148,7 @@ L_0CCE92:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CCEA3
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CCEA8
 L_0CCEA3:
     mov bh, 014h
@@ -4160,7 +4161,7 @@ L_0CCEA8:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CCEB9
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CCEBE
 L_0CCEB9:
     mov bh, 014h
@@ -4173,7 +4174,7 @@ L_0CCEBE:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CCECF
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CCED4
 L_0CCECF:
     mov bh, 014h
@@ -4186,7 +4187,7 @@ L_0CCED4:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CCEE5
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CCEEA
 L_0CCEE5:
     mov bh, 014h
@@ -4199,7 +4200,7 @@ L_0CCEEA:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CCEFB
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CCF00
 L_0CCEFB:
     mov bh, 014h
@@ -4212,7 +4213,7 @@ L_0CCF00:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CCF11
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CCF16
 L_0CCF11:
     mov bh, 014h
@@ -4225,7 +4226,7 @@ L_0CCF16:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CCF27
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CCF2C
 L_0CCF27:
     mov bh, 014h
@@ -4238,7 +4239,7 @@ L_0CCF2C:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CCF3D
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CCF42
 L_0CCF3D:
     mov bh, 014h
@@ -4251,7 +4252,7 @@ L_0CCF42:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CCF53
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CCF58
 L_0CCF53:
     mov bh, 014h
@@ -4264,7 +4265,7 @@ L_0CCF58:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CCF69
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CCF6E
 L_0CCF69:
     mov bh, 014h
@@ -4277,7 +4278,7 @@ L_0CCF6E:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CCF7F
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CCF84
 L_0CCF7F:
     mov bh, 014h
@@ -4290,7 +4291,7 @@ L_0CCF84:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CCF95
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CCF9A
 L_0CCF95:
     mov bh, 014h
@@ -4303,7 +4304,7 @@ L_0CCF9A:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CCFAB
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CCFB0
 L_0CCFAB:
     mov bh, 014h
@@ -4316,7 +4317,7 @@ L_0CCFB0:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CCFC1
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CCFC6
 L_0CCFC1:
     mov bh, 014h
@@ -4329,7 +4330,7 @@ L_0CCFC6:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CCFD7
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CCFDC
 L_0CCFD7:
     mov bh, 014h
@@ -4342,7 +4343,7 @@ L_0CCFDC:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CCFED
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CCFF2
 L_0CCFED:
     mov bh, 014h
@@ -4355,7 +4356,7 @@ L_0CCFF2:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CD003
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CD008
 L_0CD003:
     mov bh, 014h
@@ -4368,7 +4369,7 @@ L_0CD008:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CD019
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CD01E
 L_0CD019:
     mov bh, 014h
@@ -4381,7 +4382,7 @@ L_0CD01E:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CD02F
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CD034
 L_0CD02F:
     mov bh, 014h
@@ -4394,7 +4395,7 @@ L_0CD034:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CD045
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CD04A
 L_0CD045:
     mov bh, 014h
@@ -4407,7 +4408,7 @@ L_0CD04A:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CD05B
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CD060
 L_0CD05B:
     mov bh, 014h
@@ -4420,7 +4421,7 @@ L_0CD060:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CD071
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CD076
 L_0CD071:
     mov bh, 014h
@@ -4433,7 +4434,7 @@ L_0CD076:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CD087
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CD08C
 L_0CD087:
     mov bh, 014h
@@ -4446,7 +4447,7 @@ L_0CD08C:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CD09D
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CD0A2
 L_0CD09D:
     mov bh, 014h
@@ -4459,7 +4460,7 @@ L_0CD0A2:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CD0B3
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CD0B8
 L_0CD0B3:
     mov bh, 014h
@@ -4472,7 +4473,7 @@ L_0CD0B8:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CD0C9
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CD0CE
 L_0CD0C9:
     mov bh, 014h
@@ -4485,7 +4486,7 @@ L_0CD0CE:
     mov bl, byte ptr [edi]
     cmp bh, 0Fh
     jbe short L_0CD0DF
-    mov al, bh
+    mov@ al, bh
     jmp short L_0CD0E4
 L_0CD0DF:
     mov bh, 014h
@@ -4501,13 +4502,13 @@ func_000CD0F1:
     push esi
     add eax, dword ptr [edx*4 + D_00142950]
     add eax, dword ptr [D_00143550]
-    mov esi, eax
+    mov@ esi, eax
     mov eax, dword ptr [D_00136915]
     add eax, 01400h
 L_0CD10B:
     push ecx
     push esi
-    mov ecx, ebx
+    mov@ ecx, ebx
 L_0CD10F:
     mov al, byte ptr [esi]
     mov al, byte ptr [eax]
@@ -4528,9 +4529,9 @@ func_000CD126:
     push ecx
     add edx, dword ptr [ebx*4 + D_00142950]
     add edx, dword ptr [D_00143550]
-    mov edi, edx
-    mov ebx, eax
-    mov esi, eax
+    mov@ edi, edx
+    mov@ ebx, eax
+    mov@ esi, eax
     mov cx, word ptr [esi + 4]
     mov dx, word ptr [esi + 2]
     mov ax, word ptr [esi]
@@ -4538,17 +4539,17 @@ func_000CD126:
     db 066h, 03Dh, 01h, 00h   ; cmp ax, 1
     je short L_0CD177
     push bx
-    mov bx, ax
-    xor dx, dx
+    mov@ bx, ax
+    xor@ dx, dx
     mov ax, word ptr [D_001959AC]
     div bx
-    mov ax, dx
+    mov@ ax, dx
     pop bx
     imul ax, cx
     shl ax, 2
     movzx eax, ax
     mov dx, word ptr [esi - 0Ch]
-    add esi, eax
+    add@ esi, eax
 L_0CD177:
     push cx
     push dx
@@ -4556,21 +4557,21 @@ L_0CD177:
     push ebx
     push edi
     mov eax, dword ptr [esi]
-    and eax, eax
+    and@ eax, eax
     jns short L_0CD19E
     and eax, 07FFFFFFFh
-    add eax, ebx
+    add@ eax, ebx
     push edx
     mov edx, offset D_000CB104
     call func_000C8017
     pop edx
     mov ebx, offset D_000CB104
-    xor eax, eax
+    xor@ eax, eax
 L_0CD19E:
-    add ebx, eax
+    add@ ebx, eax
 L_0CD1A0:
     mov al, byte ptr [ebx]
-    and al, al
+    and@ al, al
     je short L_0CD1A8
     mov byte ptr [edi], al
 L_0CD1A8:
@@ -4592,13 +4593,13 @@ L_0CD1A8:
     ret
 func_000CD1C5:
     push ebp
-    mov ebp, esp
+    mov@ ebp, esp
     push edi
     push esi
     mov esi, dword ptr [ebp + 8]
     add eax, dword ptr [edx*4 + D_00142950]
     add eax, dword ptr [D_00143550]
-    mov edi, eax
+    mov@ edi, eax
 L_0CD1DC:
     push ebx
     push ecx
@@ -4607,7 +4608,7 @@ L_0CD1DC:
     mov cl, 09Ch
 L_0CD1E2:
     mov al, byte ptr [esi]
-    and al, al
+    and@ al, al
     je short L_0CD1F0
     mov byte ptr [edi], al
     mov byte ptr [edi + 0282h], cl
@@ -4632,11 +4633,11 @@ func_000CD20E:
     push ecx
     push esi
     push edi
-    mov edi, eax
+    mov@ edi, eax
     add edi, dword ptr [edx*4 + D_00142950]
     add edi, dword ptr [D_00143550]
-    mov ax, bx
-    xor dx, dx
+    mov@ ax, bx
+    xor@ dx, dx
     mov bx, 014h
     div bx
     shl dx, 4
@@ -4644,7 +4645,7 @@ func_000CD20E:
     mov bx, 01400h
     mul bx
     movzx eax, ax
-    add esi, eax
+    add@ esi, eax
     add esi, dword ptr [D_00195B88]
     mov cx, 010h
 L_0CD24A:
@@ -4662,20 +4663,20 @@ L_0CD24A:
     ret
 func_000CD262:
     push ebp
-    mov ebp, esp
+    mov@ ebp, esp
     push esi
     push edi
-    mov edi, eax
+    mov@ edi, eax
     mov al, byte ptr [ebp + 8]
-    mov esi, ecx
+    mov@ esi, ecx
 L_0CD26E:
-    mov ecx, edx
+    mov@ ecx, edx
     push edi
     push esi
 L_0CD272:
     mov ah, byte ptr [esi]
     inc esi
-    and ah, ah
+    and@ ah, ah
     je short L_0CD27B
     mov byte ptr [edi], al
 L_0CD27B:
@@ -4694,12 +4695,12 @@ L_0CD27B:
     ret
 func_000CD291:
     push ebp
-    mov ebp, esp
+    mov@ ebp, esp
     pushad
     mov word ptr [D_000C0606], bx
     mov word ptr [D_000C0608], cx
     mov edi, dword ptr [edx*4 + D_00142950]
-    add edi, eax
+    add@ edi, eax
     add edi, dword ptr [D_00143550]
     mov esi, dword ptr [ebp + 8]
     mov dword ptr [D_000C060E], esi
@@ -4710,10 +4711,10 @@ L_0CD2CB:
     push ecx
     push edi
     push esi
-    mov ecx, ebx
+    mov@ ecx, ebx
 L_0CD2D0:
     lodsb
-    and al, al
+    and@ al, al
     je short L_0CD2EF
     cmp al, 0FFh
     jne short L_0CD2EB
@@ -4770,13 +4771,13 @@ func_000CD32C:
 func_000CD33A:
     push ecx
     push esi
-    mov esi, eax
-    mov ax, dx
-    mov ah, al
+    mov@ esi, eax
+    mov@ ax, dx
+    mov@ ah, al
     movzx ecx, bx
 L_0CD346:
     mov dx, 03C8h
-    mov al, ah
+    mov@ al, ah
     inc ah
     out dx, al
     mov dx, 03C9h
@@ -4805,12 +4806,12 @@ L_0CD36E:
     pop ecx
     jmp near ptr func_0012D851
 func_000CD37B:
-    and edx, edx
+    and@ edx, edx
     je short L_0CD38D
     push ebx
 L_0CD380:
     movzx ebx, word ptr [eax + 0Ah]
-    add eax, ebx
+    add@ eax, ebx
     add eax, 0Ch
     dec edx
     jne short L_0CD380
@@ -4831,8 +4832,8 @@ func_000CD39B:
     push esi
     push edi
     push ecx
-    mov esi, eax
-    mov edi, edx
+    mov@ esi, eax
+    mov@ edi, edx
 L_0CD3A2:
     push ebx
     mov eax, dword ptr [esi]
@@ -5266,26 +5267,26 @@ L_0CD86B:
     ret
 func_000CDB7A:
     pushad
-    and edx, edx
+    and@ edx, edx
     je short L_0CDB8B
 L_0CDB7F:
     movzx ecx, word ptr [eax + 0Ah]
-    add eax, ecx
+    add@ eax, ecx
     add eax, 0Ch
     dec edx
     jne short L_0CDB7F
 L_0CDB8B:
-    mov esi, eax
+    mov@ esi, eax
     add esi, 0Ch
-    mov edi, ebx
+    mov@ edi, ebx
     movzx ebx, word ptr [eax + 2]
     movzx ecx, word ptr [eax + 4]
     movzx edx, word ptr [eax + 6]
     movzx eax, word ptr [eax]
     mov ebp, 013Fh
-    sub ebp, eax
-    sub ebp, eax
-    add edi, ebx
+    sub@ ebp, eax
+    sub@ ebp, eax
+    add@ edi, ebx
     jns short L_0CDBBB
     neg edi
     mov edi, dword ptr [edi*4 + D_00142950]
@@ -5294,33 +5295,33 @@ L_0CDB8B:
 L_0CDBBB:
     mov edi, dword ptr [edi*4 + D_00142950]
 L_0CDBC2:
-    add edi, eax
+    add@ edi, eax
     add edi, dword ptr [D_00143550]
     xchg edx, ecx
-    xor ah, ah
-    mov ebx, edx
+    xor@ ah, ah
+    mov@ ebx, edx
 L_0CDBD0:
     push ecx
     push edi
     push ebx
-    xor ch, ch
+    xor@ ch, ch
     lea edx, [edi + ebp]
 L_0CDBD8:
     lodsb
-    and al, al
+    and@ al, al
     js short L_0CDC10
     inc al
-    sub ebx, eax
-    mov cl, al
-    add esi, ecx
-    add edi, ecx
+    sub@ ebx, eax
+    mov@ cl, al
+    add@ esi, ecx
+    add@ edi, ecx
     cmp edi, dword ptr [D_00143550]
     jbe short L_0CDC01
-    sub esi, ecx
-    sub edi, ecx
+    sub@ esi, ecx
+    sub@ edi, ecx
 L_0CDBF3:
     lodsb
-    and al, al
+    and@ al, al
     je short L_0CDBFC
     mov byte ptr [edi], al
     mov byte ptr [edx], al
@@ -5330,7 +5331,7 @@ L_0CDBFC:
     dec ecx
     jne short L_0CDBF3
 L_0CDC01:
-    and ebx, ebx
+    and@ ebx, ebx
     jne short L_0CDBD8
     pop ebx
     pop edi
@@ -5340,10 +5341,10 @@ L_0CDC01:
 L_0CDC10:
     and al, 07Fh
     inc al
-    sub ebx, eax
-    mov cl, al
+    sub@ ebx, eax
+    mov@ cl, al
     lodsb
-    and al, al
+    and@ al, al
     je short L_0CDC35
     cmp edi, dword ptr [D_00143550]
     jbe short L_0CDC35
@@ -5359,10 +5360,10 @@ L_0CDC10:
     cld
     jmp short L_0CDC39
 L_0CDC35:
-    add edi, ecx
-    sub edx, ecx
+    add@ edi, ecx
+    sub@ edx, ecx
 L_0CDC39:
-    and ebx, ebx
+    and@ ebx, ebx
     jne short L_0CDBD8
     pop ebx
     pop edi
@@ -5375,9 +5376,9 @@ L_0CDC46:
     ret
 func_000CDC4B:
     pushad
-    mov edi, eax
+    mov@ edi, eax
     mov ecx, 0100h
-    xor dl, dl
+    xor@ dl, dl
 L_0CDC55:
     mov byte ptr [edi], dl
     inc dl
@@ -5422,11 +5423,11 @@ func_000CDCB8:
     test edx, edx
     je short L_0CDCE4
     pushad
-    mov esi, ebx
+    mov@ esi, ebx
     mov edi, dword ptr [D_00143550]
-    mov ebx, eax
+    mov@ ebx, eax
 L_0CDCCB:
-    mov ecx, edx
+    mov@ ecx, edx
     push edi
 L_0CDCCE:
     lodsb
@@ -5446,23 +5447,23 @@ L_0CDCE4:
     ret
 func_000CDCE5:
     push ebp
-    mov ebp, esp
+    mov@ ebp, esp
     push esi
     push edi
     cmp eax, dword ptr [D_00142940]
     jl short L_0CDD45
-    add eax, ebx
+    add@ eax, ebx
     cmp eax, dword ptr [D_00142948]
     jge short L_0CDD45
     cmp edx, dword ptr [D_00142944]
     jl short L_0CDD45
-    add edx, ecx
+    add@ edx, ecx
     cmp edx, dword ptr [D_0014294C]
     jge short L_0CDD45
-    sub eax, ebx
-    sub edx, ecx
+    sub@ eax, ebx
+    sub@ edx, ecx
     mov edi, dword ptr [edx*4 + D_00142950]
-    add edi, eax
+    add@ edi, eax
     add edi, dword ptr [D_00143550]
     mov esi, dword ptr [ebp + 8]
     mov edx, dword ptr [ebp + 0Ch]
@@ -5493,8 +5494,8 @@ L_0CDD45:
     ret
 func_000CDD49:
     pushad
-    mov esi, eax
-    mov edi, edx
+    mov@ esi, eax
+    mov@ edi, edx
     mov ecx, 4
 L_0CDD53:
     push edi
@@ -5518,11 +5519,11 @@ L_0CDD56:
     ret
 func_000CDD6C:
     pushad
-    mov esi, eax
-    mov edi, edx
+    mov@ esi, eax
+    mov@ edi, edx
 L_0CDD71:
     mov al, byte ptr [esi]
-    cmp al, bl
+    cmp@ al, bl
     jne short L_0CDD7A
     mov byte ptr [edi], 0F4h
 L_0CDD7A:

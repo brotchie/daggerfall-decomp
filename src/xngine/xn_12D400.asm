@@ -3,6 +3,7 @@
 ; B_<address>_<length> lines are data bytes the build takes from your FALL.EXE.
 .486p
 .387
+include xngine.inc
 include xn_12D400.inc
 public func_0012D851
 public func_0012D887
@@ -40,24 +41,24 @@ func_0012D40E:
     mov esi, dword ptr [D_0012B500]
     add esi, 3
 L_12D429:
-    mov al, bl
+    mov@ al, bl
     sub al, byte ptr [esi]
     movsx eax, al
     imul eax, eax
     imul eax, eax, 03Dh
-    mov ebp, eax
-    mov al, cl
+    mov@ ebp, eax
+    mov@ al, cl
     sub al, byte ptr [esi + 1]
     movsx eax, al
     imul eax, eax
     imul eax, eax, 047h
-    add ebp, eax
-    mov al, dl
+    add@ ebp, eax
+    mov@ al, dl
     sub al, byte ptr [esi + 2]
     movsx eax, al
     imul eax, eax
     imul eax, eax, 029h
-    add ebp, eax
+    add@ ebp, eax
     cmp dword ptr [D_0012B852], ebp
     jle short L_12D46C
     mov dword ptr [D_0012B856], edi
@@ -77,7 +78,7 @@ func_0012D481:
     push esi
     push edi
     mov dword ptr [D_0012B852], 07FFFFFFFh
-    xor edi, edi
+    xor@ edi, edi
     mov esi, dword ptr [D_0012B500]
     mov word ptr [D_0012B80C], bx
     mov word ptr [D_0012B80E], cx
@@ -88,20 +89,20 @@ L_12D4AB:
     mov dl, byte ptr [esi + 2]
     call func_0012D514
     mov ax, word ptr [D_0012B80C]
-    sub ax, bx
+    sub@ ax, bx
     movsx eax, al
     imul eax, eax
-    mov ebp, eax
+    mov@ ebp, eax
     mov ax, word ptr [D_0012B80E]
-    sub ax, cx
+    sub@ ax, cx
     movsx eax, al
     imul eax, eax
-    add ebp, eax
+    add@ ebp, eax
     mov ax, word ptr [D_0012B810]
-    sub ax, dx
+    sub@ ax, dx
     movsx eax, al
     imul eax, eax
-    add ebp, eax
+    add@ ebp, eax
     cmp dword ptr [D_0012B852], ebp
     jle short L_12D4FF
     mov dword ptr [D_0012B856], edi
@@ -120,31 +121,31 @@ func_0012D514:
     push word ptr [D_0012B80C]
     push word ptr [D_0012B80E]
     push word ptr [D_0012B810]
-    xor bh, bh
-    xor ch, ch
-    xor dh, dh
+    xor@ bh, bh
+    xor@ ch, ch
+    xor@ dh, dh
     mov word ptr [D_0012B85A], bx
     mov word ptr [D_0012B85C], cx
     mov word ptr [D_0012B85E], dx
-    mov ax, bx
-    cmp ax, cx
+    mov@ ax, bx
+    cmp@ ax, cx
     jge short L_12D54F
-    mov ax, cx
+    mov@ ax, cx
 L_12D54F:
-    cmp ax, dx
+    cmp@ ax, dx
     jge short L_12D557
-    mov ax, dx
+    mov@ ax, dx
 L_12D557:
     mov word ptr [D_0012B86E], ax
     mov word ptr [D_0012B810], ax
-    mov ax, bx
-    cmp ax, cx
+    mov@ ax, bx
+    cmp@ ax, cx
     jle short L_12D56E
-    mov ax, cx
+    mov@ ax, cx
 L_12D56E:
-    cmp ax, dx
+    cmp@ ax, dx
     jle short L_12D576
-    mov ax, dx
+    mov@ ax, dx
 L_12D576:
     mov word ptr [D_0012B870], ax
     mov word ptr [D_0012B80E], 0
@@ -236,7 +237,7 @@ L_12D6F5:
     imul bx, word ptr [D_0012B866]
     shr bx, 6
     mov ax, 03Fh
-    sub ax, bx
+    sub@ ax, bx
     imul ax, word ptr [D_0012B810]
     shr ax, 6
     mov word ptr [D_0012B86A], ax
@@ -245,7 +246,7 @@ L_12D6F5:
     imul bx, word ptr [D_0012B80E]
     shr bx, 6
     mov ax, 03Fh
-    sub ax, bx
+    sub@ ax, bx
     imul ax, word ptr [D_0012B810]
     shr ax, 6
     mov word ptr [D_0012B86C], ax
@@ -297,7 +298,7 @@ func_0012D851:
     push edx
     push esi
     mov dword ptr [D_0012B500], eax
-    mov esi, eax
+    mov@ esi, eax
     mov dx, 03DAh
 L_12D860:
     in al, dx
@@ -307,10 +308,10 @@ L_12D865:
     in al, dx
     test al, 8
     je short L_12D865
-    xor bx, bx
+    xor@ bx, bx
 L_12D86D:
     mov dx, 03C8h
-    mov al, bl
+    mov@ al, bl
     out dx, al
     inc dx
     outsb
@@ -328,11 +329,11 @@ func_0012D887:
     push ebx
     push edx
     push edi
-    mov edi, eax
-    xor ebx, ebx
+    mov@ edi, eax
+    xor@ ebx, ebx
 L_12D88E:
     mov edx, 03C7h
-    mov al, bl
+    mov@ al, bl
     out dx, al
     mov edx, 03C9h
     insb
@@ -351,7 +352,7 @@ func_0012D8AB:
     ret
 func_0012D8AE:
     push edx
-    mov edx, eax
+    mov@ edx, eax
     mov eax, offset D_0012B878
     call func_0012D8BD
     pop edx
@@ -361,8 +362,8 @@ func_0012D8BD:
     je near ptr L_12D94D
     pushad
     push eax
-    mov ecx, eax
-    mov ebx, edx
+    mov@ ecx, eax
+    mov@ ebx, edx
     mov esi, dword ptr [D_0012B500]
     mov edi, offset D_0012BB78
     mov ebp, offset D_0012C778
@@ -375,7 +376,7 @@ L_12D8E0:
     movzx edx, byte ptr [esi]
     shl edx, 010h
     mov dword ptr [edi], edx
-    sub eax, edx
+    sub@ eax, edx
     cdq
     idiv ebx
     mov dword ptr [ebp], eax
@@ -399,7 +400,7 @@ L_12D90E:
     je short L_12D90E
     mov esi, offset D_0012BB78
     mov edi, offset D_0012C778
-    xor ecx, ecx
+    xor@ ecx, ecx
 L_12D91F:
     call func_0012D94E
     mov eax, dword ptr [edi]
@@ -424,7 +425,7 @@ func_0012D94E:
     push eax
     push edx
     mov dx, 03C8h
-    mov al, cl
+    mov@ al, cl
     out dx, al
     inc dx
     mov eax, dword ptr [esi]

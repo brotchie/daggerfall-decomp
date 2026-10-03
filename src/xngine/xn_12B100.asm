@@ -3,6 +3,7 @@
 ; B_<address>_<length> lines are data bytes the build takes from your FALL.EXE.
 .486p
 .387
+include xngine.inc
 include xn_12B100.inc
 public func_0012B136
 extrn D_0012AC00:byte
@@ -104,9 +105,9 @@ func_0012B196:
     nop
     nop
     nop
-    mov eax, edx
+    mov@ eax, edx
     sub eax, dword ptr [D_0012AF24]
-    or eax, eax
+    or@ eax, eax
     jns short L_12B1F5
     neg eax
 L_12B1F5:
@@ -143,9 +144,9 @@ L_12B250:
     nop
     nop
     nop
-    mov eax, edx
+    mov@ eax, edx
     sub eax, dword ptr [D_0012AF2C]
-    or eax, eax
+    or@ eax, eax
     jns short L_12B277
     neg eax
 L_12B277:
@@ -190,29 +191,29 @@ func_0012B2EB:
     movzx ebx, word ptr [D_0012AF14]
     movzx ecx, word ptr [D_0012AF16]
     mov esi, offset D_0012AC10
-    xor ebp, ebp
+    xor@ ebp, ebp
     call func_00144EF0
     popad
 L_12B325:
     ret
 func_0012B326:
     pushad
-    xor ebx, ebx
+    xor@ ebx, ebx
     mov word ptr [D_0012AF14], 010h
     mov word ptr [D_0012AF16], 010h
     movsx eax, word ptr [D_0012AC04]
     movsx edx, word ptr [D_0012AF18]
-    sub eax, edx
+    sub@ eax, edx
     jns short L_12B35A
     neg eax
-    mov ebx, eax
+    mov@ ebx, eax
     sub word ptr [D_0012AF14], ax
-    xor eax, eax
+    xor@ eax, eax
 L_12B35A:
     mov dword ptr [D_0012AC08], eax
     mov ebp, dword ptr [D_00142930]
     sub ebp, 010h
-    cmp eax, ebp
+    cmp@ eax, ebp
     jb short L_12B37A
     neg eax
     add eax, dword ptr [D_00142930]
@@ -220,18 +221,18 @@ L_12B35A:
 L_12B37A:
     movsx eax, word ptr [D_0012AC06]
     movsx edx, word ptr [D_0012AF18]
-    sub eax, edx
+    sub@ eax, edx
     jns short L_12B39C
     neg eax
     sub word ptr [D_0012AF16], ax
     shl eax, 4
-    add ebx, eax
-    xor eax, eax
+    add@ ebx, eax
+    xor@ eax, eax
 L_12B39C:
     mov dword ptr [D_0012AC0C], eax
     mov ebp, dword ptr [D_00142934]
     sub ebp, 010h
-    cmp eax, ebp
+    cmp@ eax, ebp
     jb short L_12B3BC
     neg eax
     add eax, dword ptr [D_00142934]
@@ -245,10 +246,10 @@ L_12B3BC:
     jle short L_12B3EB
     mov edi, offset D_0012AD10
     mov esi, offset D_0012AE10
-    add esi, ebx
+    add@ esi, ebx
 L_12B3DE:
     push ecx
-    mov ecx, eax
+    mov@ ecx, eax
     push esi
     rep movsb
     pop esi
@@ -269,7 +270,7 @@ func_0012B3ED:
     movzx ebx, word ptr [D_0012AF14]
     movzx ecx, word ptr [D_0012AF16]
     mov edi, offset D_0012AC10
-    xor ebp, ebp
+    xor@ ebp, ebp
     mov dword ptr [D_0012AF1C], eax
     mov dword ptr [D_0012AF20], edx
     call func_00144E9C
@@ -286,7 +287,7 @@ func_0012B45B:
     push esi
     push edi
     push ecx
-    mov esi, eax
+    mov@ esi, eax
     mov edi, offset D_0012AE10
     mov ecx, 040h
     rep movsd
@@ -320,7 +321,7 @@ L_12B49B:
     ret
 func_0012B49E:
     pushad
-    mov ecx, eax
+    mov@ ecx, eax
     mov eax, 4
     push ds
     pop fs
