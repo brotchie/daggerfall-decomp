@@ -63,22 +63,15 @@ All of object 2 is now built from source, and `FALL.EXE` is still byte-identical
 - **No game bytes in the repo.** Plain data is written `B_<address>_<length>`; at build time
   `tools/xn_link.py` defines those macros from your `FALL.EXE` (`build/xngine/*.inc`). Zero runs
   are `db n dup (0)`.
-- **`tools/xn_link.py`** assembles each module with `bwasm`, writes its fixups as the linker and
-  LE loader would, and requires identical bytes and the same target for every LE fixup in the
+- **`tools/xn_link.py`** assembles each module (with TASM 4.0, see below), writes its fixups as
+  the linker and LE loader would, and requires identical bytes and the same target for every LE fixup in the
   range (16-bit selector fixups excepted: the LE table keeps them). `build_fall.py` calls it and
   splices the modules in; the `--blank` self-test and two negative tests (a changed constant, a
   pointer to the wrong table) behave.
 - **Encodings.** A probe pass assembles each module with an `org` back to the original offset
   after every instruction, so one mis-encoded instruction cannot shift the rest; those are
-  written as `db` (symbol fields stay `dd` expressions). 45 instructions need it, and they say
-  something about the original assembler:
-
-  | Instruction | Count | Original | wasm |
-  |---|---|---|---|
-  | `shr reg,1` | 20 | `C1 /5 01` (imm8 form) | `D1 /5`. Typical of a shift count that was a forward-referenced constant |
-  | `sbb reg,reg` | 13 | `1B /r` | `19 /r` |
-  | `cmp ax,imm` | 9 | `66 3D iw` (accumulator form) | `66 83 /7 ib` |
-  | others | 3 | data decoded as code (an error string after a call that does not return) | |
+  written as `db` (symbol fields stay `dd` expressions). What is left as bytes, and what the
+  encodings say about the original assembler, is in the TASM section below.
 
 ## 2026-10-02: phase 2, the self-modifying code
 
@@ -95,8 +88,7 @@ only through dispatch tables, callback variables or nothing at all.
   functions beyond the 348 listed, and code went from 69 KB to 133 KB.
 - **Patch fields**: an operand the code rewrites is `patch_<address>`, defined next to its
   instruction (`patch_1584AD equ L_1584AB+2   ; rewritten at run time`); a module that writes
-  another module's field defines the name from that instruction's public label, since wasm
-  cannot export an equate. Writers read like a setup list:
+  another module's field defines the name from that instruction's public label. Writers read like a setup list:
 
   ```asm
   func_0012A2D0:
@@ -240,20 +232,14 @@ menu, the province map, character creation and the intro video replay exactly.
 ## 2026-10-02: XnGine was assembled with TASM 4.0
 
 The game's C was compiled by Watcom C32 10.0a, but XnGine's asm was not assembled with Watcom's
-WASM. The modules first moved from Open Watcom's wasm to WASM 10.0a (to drop Open Watcom, as
-the `w10-only` work does for the C), and that showed the mismatch: 5,336 register-to-register
-ALU ops and `mov`s are in the `reg, r/m` form (`mov edi, esi` = `8B FE`) and WASM writes the
-other one (`89 F7`). WASM 10.0a also wraps segments past 64K (16-bit LEDATA offsets), can
-silently make a `short` forward jump near, assembles `mov dword ptr [ext], offset sym` as a
-16-bit move and adds the displacement into `imul reg, [base+disp], imm`.
-
-The original bytes point to Borland's Turbo Assembler in its default single-pass mode with
-`JUMPS`, and TASM 4.0 (14 Dec 1993, from your own copy, unpacked into `third_party/tasm/BIN`)
+WASM: its 5,336 register-to-register ALU ops and `mov`s are in the `reg, r/m` form
+(`mov edi, esi` = `8B FE`), and WASM writes the other one (`89 F7`). The bytes point to
+Borland's Turbo Assembler in its default single-pass mode with `JUMPS`, and TASM 4.0 (14 Dec 1993, from your own copy, unpacked into `third_party/tasm/BIN`)
 reproduces each fingerprint:
 
 | In the original | TASM 4.0 |
 |---|---|
-| reg,reg ALU and `mov` in the `8B /r` form, `sbb` too (`1B`; Open Watcom's wasm writes `19`) | same |
+| reg,reg ALU and `mov` in the `8B /r` form, `sbb` included (`1B`) | same |
 | 24 forward short `jcc` followed by exactly 4 NOPs, at 86-127 bytes, never after a backward jump | an unmarked forward `jcc` is reserved as a 6-byte near jump; when it comes out short, TASM pads with 4 NOPs (`/m` multi-pass would remove them) |
 | `loop $+4` / `jmp short $+7` / `jmp near X` (2 places) | an out-of-range `loop X` under `JUMPS` |
 | `cmp`/`and`/`add ax,imm` always in the accumulator form (`66 3D iw`), never `66 83 /r ib` | same, even for small values |
@@ -261,7 +247,7 @@ reproduces each fingerprint:
 | `xchg`/`test reg,reg` with the first operand in the reg field | same |
 | `shr reg,1` 63 times as `D1` and 23 times as `C1 /r 01` | `D1` for any count it knows is 1; `C1 /r ib` for an `extrn K:abs`, a count the linker fills in |
 
-The build now uses TASM: `tools/xn_link.py` runs `TASMX.EXE` (TASM 4.0 as a DPMI program;
+The build uses TASM: `tools/xn_link.py` runs `TASMX.EXE` (TASM 4.0 as a DPMI program;
 real-mode `TASM.EXE` runs out of memory on the larger modules and writes the same objects) in
 up to 8 DOSBox-X sessions side by side. Without TASM the build keeps object 2's original bytes,
 as it does for `src/w10` without the Watcom compiler. The generator writes the source the way
@@ -270,7 +256,7 @@ the authors evidently did: `jcc short L` for short forward jumps, a plain `jcc L
 sequence, and externs declared inside the 32-bit segment (outside it TASM addresses them with
 16-bit offsets). TASM handles segments past 64K, so the modules are the original 113.
 
-What is left as bytes: 28 instructions (72 under WASM 10.0a, 67 under Open Watcom's wasm).
+What is left as bytes: 28 instructions.
 
 | Instruction | Count | Why |
 |---|---|---|
