@@ -1437,7 +1437,7 @@ the reason patched OW could not get these:
     scas` value table matches only at its original offset mod 4. Such functions are
     compiled together with their real predecessors: `src/hand/run_<last>.c` holds the
     unit's functions in address order from the nearest one at the unit start's alignment
-    (24 runs, 90 functions). Two hand-written units (keys.c, generate.c) lost their only
+    (20 runs, 82 functions). Two hand-written units (keys.c, generate.c) lost their only
     function to a run.
   - **Stack parameters take part in the frame sort** (two entries each, right after the
     register parameters, neither given a slot); the **return slot is created at the first
