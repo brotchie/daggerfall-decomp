@@ -66,6 +66,8 @@ void func_0006A319(int);
 #pragma aux func_000A0ED9 parm routine [];
 #pragma aux func_000A29BA parm routine [];
 #pragma aux sosconv "*" parm caller [] value [eax] modify [eax ebx ecx edx];
+#pragma dagger DAGGER_NOSAVES func_00069F8A
+#pragma dagger reg func_00069F8A 20 edx
 #pragma aux (sosconv) func_0006A606;
 
 void func_00069E9E(int a1, int a2)

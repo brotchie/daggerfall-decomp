@@ -10,7 +10,7 @@ extern char D_001A9B44[];
 extern int func_0008DB21(int, int, int);
 extern int func_0008DCE3(int, int, int);
 extern int func_000A1023();
-#pragma dagger DAGGER_RMW func_0008E828
+#pragma dagger reg func_0008E828 12 edx
 
 int func_0008E828(int a1, int a2, int a3, int a4, int a5)
 {
@@ -25,7 +25,7 @@ L8E866:;
     *(signed char *)((char *)l_10) = *(signed char *)&a2;
     *(short *)((char *)l_10 + 27) = a4;
     *(short *)((char *)l_10 + 19) = a5;
-    *(int *)((char *)l_10 + 31) = *(int *)(*(char **)D_00195AC4 + 31) + ((int)(unsigned short)(*(short *)(*(char **)D_00195BDC + 37))++);
+    *(int *)((char *)l_10 + 31) = (int)(*(char **)(*(char **)D_00195AC4 + 31) + ((int)(unsigned short)(*(short *)(*(char **)D_00195BDC + 37))++));
     if (*(int *)((char *)l_10 + 31) != (-1016397758)) goto L8E8D7;
     func_000A1023((int)D_001A9B44, l_10, 71, (int)D_00176E44, 634, 4);
     *(int *)D_001A9B0C = l_10;

@@ -1,9 +1,9 @@
 # Daggerfall decompilation
 
 <!-- progress:start -->
-![decompiled](https://img.shields.io/badge/decompiled-90.70%25-green) ![functions](https://img.shields.io/badge/functions-2219%20of%202297-green) ![FALL.EXE](https://img.shields.io/badge/FALL.EXE-matching-brightgreen)
+![decompiled](https://img.shields.io/badge/decompiled-100.00%25-brightgreen) ![functions](https://img.shields.io/badge/functions-2297%20of%202297-brightgreen) ![FALL.EXE](https://img.shields.io/badge/FALL.EXE-matching-brightgreen)
 
-90.70% of the game's own code (526108 of 580076 bytes, 2219 of 2297 functions) is matched C; the rebuilt `FALL.EXE` is byte-identical to 1.07.213.
+100.00% of the game's own code (580076 of 580076 bytes, 2297 of 2297 functions) is matched C; the rebuilt `FALL.EXE` is byte-identical to 1.07.213.
 <!-- progress:end -->
 
 A matching decompilation of *The Elder Scrolls II: Daggerfall* (DOS, 1996), starting with the game
@@ -23,9 +23,12 @@ check their SHA-1.
 - 3,315 functions found in object 1 (98.4% of its bytes decoded): 2,297 of them are the
   game's own C in 84 original source units (names recovered from `__FILE__` strings), the
   rest are libraries (MemCheck, Watcom runtime). Object 2 is the XnGine engine in asm.
-- Compiler: Watcom 10.0/10.0a. Game code is unoptimised: `-od -s -of+ -4r`.
+- Compiler: Watcom C32 10.0a. Game code is unoptimised, with debug info: `-od -s -of+ -4r -d2`.
 - Toolchain: KKND-Decomp's patched Open Watcom `wcc386` plus our own `-od` patches (`tools/owpatch/`),
-  built natively on macOS.
+  built natively on macOS, for most functions (`src/lifted/`, from `tools/lift.py`). The
+  last 51 are compiled with the real Watcom C32 10.0a (`src/w10/`): with your own copy of
+  the compiler in `third_party/watcom10/` (see `tools/wcc10.py`) the build compiles them
+  under DOSBox-X; without it they keep the original bytes and the checksum still matches.
 - Matched game functions and the share of game code: see the badges at the top (updated by
   every successful `tools/build-and-verify.sh`). Most functions are lifted automatically
   (`src/lifted/`, from `tools/lift.py`); the rebuilt executable is byte-identical.

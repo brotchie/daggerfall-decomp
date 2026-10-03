@@ -15,11 +15,12 @@ extern char D_001998E2[];
 extern void func_00057147(short, short, short, short, short, short, short);
 extern void func_00057F8B(short);
 #pragma dagger reg func_00056BB0 437 bx
+#pragma dagger slots func_00056BB0 a1 12 l_1C 8 l_18 4
 
 void func_00056BB0(int a1)
 {
-    int l_1C;
     int l_18;
+    short l_1C;
 
     l_18 = a1;
     if (*(short *)(D_001998E0 + (((int)(short)*(short *)D_00190D64) << 2)) != 0) goto L56BFA;
@@ -28,11 +29,11 @@ void func_00056BB0(int a1)
     func_00057F8B((int)(short)*(short *)&a1);
 L56BFA:;
     *(short *)(D_001998E2 + (((int)(short)*(short *)D_00190D64) << 2)) = a1;
-    l_1C = (int)(unsigned char)*(signed char *)(D_0018597F + ((int)(short)*(short *)D_00190D66));
-    if (*(short *)&l_1C != 0) goto L56C61;
+    *(int *)&l_1C = (int)(unsigned char)*(signed char *)(D_0018597F + ((int)(short)*(short *)D_00190D66));
+    if (l_1C != 0) goto L56C61;
     func_00057147((int)(short)*(short *)D_00190D64, (int)(short)(*(short *)D_00190D66 + 15), (int)(short)*(short *)&l_18, -1, -1, -1, -1);
     return;
 L56C61:;
-    l_1C--;
-    func_00057147((int)(short)*(short *)D_00190D64, (int)(short)(*(short *)D_00190D66 + 15), (int)(short)*(short *)&l_18, (int)(short)((unsigned short)(unsigned char)*(signed char *)(D_00185907 + ((((int)(short)*(short *)&l_1C) * 20) + (((int)(short)*(short *)&l_18) << 2)))), (int)(short)((unsigned short)(unsigned char)*(signed char *)(D_00185908 + ((((int)(short)*(short *)&l_1C) * 20) + (((int)(short)*(short *)&l_18) << 2)))), (int)(short)((unsigned short)(unsigned char)*(signed char *)(D_00185909 + ((((int)(short)*(short *)&l_1C) * 20) + (((int)(short)*(short *)&l_18) << 2)))), (int)(short)((unsigned short)(unsigned char)*(signed char *)(D_0018590A + ((((int)(short)*(short *)&l_1C) * 20) + (((int)(short)*(short *)&l_18) << 2)))));
+    (*(int *)&l_1C)--;
+    func_00057147((int)(short)*(short *)D_00190D64, (int)(short)(*(short *)D_00190D66 + 15), (int)(short)*(short *)&l_18, (int)(short)((unsigned short)(unsigned char)*(signed char *)(D_00185907 + ((((int)(short)l_1C) * 20) + (((int)(short)*(short *)&l_18) << 2)))), (int)(short)((unsigned short)(unsigned char)*(signed char *)(D_00185908 + ((((int)(short)l_1C) * 20) + (((int)(short)*(short *)&l_18) << 2)))), (int)(short)((unsigned short)(unsigned char)*(signed char *)(D_00185909 + ((((int)(short)l_1C) * 20) + (((int)(short)*(short *)&l_18) << 2)))), (int)(short)((unsigned short)(unsigned char)*(signed char *)(D_0018590A + ((((int)(short)l_1C) * 20) + (((int)(short)*(short *)&l_18) << 2)))));
 }

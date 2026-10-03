@@ -25,7 +25,7 @@ from units import load_units, unit_of  # noqa: E402
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 LIFT = os.path.join(ROOT, "build", "lift")
 OUT = os.path.join(ROOT, "src", "lifted")
-DEF = re.compile(r"^[A-Za-z][^;\n(]*\b(func_[0-9A-F]{8})\s*\(", re.M)
+DEF = re.compile(r"^(?!extern\b)[A-Za-z][^;\n(]*\b(func_[0-9A-F]{8})\s*\(", re.M)
 
 
 def proto_line(text, name):
@@ -39,7 +39,8 @@ def proto_line(text, name):
 
 def main():
     hand = set()
-    for path in glob.glob(os.path.join(ROOT, "src", "*.c")):
+    for path in glob.glob(os.path.join(ROOT, "src", "*.c")) + \
+            glob.glob(os.path.join(ROOT, "src", "w10", "*.c")):
         hand |= set(DEF.findall(open(path).read()))
     with open(os.path.join(LIFT, "report.csv"), newline="") as f:
         ok = [r["func"] for r in csv.DictReader(f) if r["status"] == "ok"]

@@ -503,7 +503,7 @@ index 14a056a76b..a88fef01ac 100644
 +    DaggerProc = CurrProc;
 +}
 diff --git a/bld/cg/c/bldins.c b/bld/cg/c/bldins.c
-index 7fa7f075c3..d274f4ac8c 100644
+index 7fa7f075c3..edd10fe1d8 100644
 --- a/bld/cg/c/bldins.c
 +++ b/bld/cg/c/bldins.c
 @@ -31,6 +31,7 @@
@@ -514,7 +514,22 @@ index 7fa7f075c3..d274f4ac8c 100644
  #include "coderep.h"
  #include "cgmem.h"
  #include "memcheck.h"
-@@ -572,7 +573,20 @@ an      BGBinary( cg_op opcode, an left, an rite, const type_def *tipe, bool fol
+@@ -541,8 +542,14 @@ an      BGBinary( cg_op opcode, an left, an rite, const type_def *tipe, bool fol
+ {
+     an          result;
+     instruction *ins;
++    bool        ptrint;
+ 
+     result = NULL;
++    /* Daggerfall: DAGGER_PTRSWAP (a per-function knob) puts the int first in a pointer plus
++     * an int, so the sum takes the int's register as Watcom 10's often did */
++    ptrint = ( opcode == O_PLUS && ( left->tipe->attr & TYPE_POINTER )
++      && ( rite->tipe->attr & ( TYPE_POINTER | TYPE_FLOAT ) ) == 0
++      && _IsModel( CGSW_GEN_NO_OPTIMIZATION ) && DaggerEnv( "DAGGER_PTRSWAP" ) != NULL );
+     if( opcode == O_PLUS || opcode == O_MINUS
+        && ( tipe->attr & TYPE_POINTER )
+        && ( left->tipe->attr & TYPE_POINTER )
+@@ -572,7 +579,28 @@ an      BGBinary( cg_op opcode, an left, an rite, const type_def *tipe, bool fol
      }
      if( result == NULL ) {
          left = CheckType( left, tipe );
@@ -526,12 +541,20 @@ index 7fa7f075c3..d274f4ac8c 100644
 +            name    *l_name = GenIns( left );
 +            name    *r_name = GenIns( rite );
 +
-+            ins = MakeBinary( (opcode_defs)opcode, l_name, r_name, NULL, TypeClass( tipe ) );
++            if( ptrint ) {
++                ins = MakeBinary( (opcode_defs)opcode, r_name, l_name, NULL, TypeClass( tipe ) );
++            } else {
++                ins = MakeBinary( (opcode_defs)opcode, l_name, r_name, NULL, TypeClass( tipe ) );
++            }
 +        } else {
 +            name    *r_name = GenIns( rite );
 +            name    *l_name = GenIns( left );
 +
-+            ins = MakeBinary( (opcode_defs)opcode, l_name, r_name, NULL, TypeClass( tipe ) );
++            if( ptrint ) {
++                ins = MakeBinary( (opcode_defs)opcode, r_name, l_name, NULL, TypeClass( tipe ) );
++            } else {
++                ins = MakeBinary( (opcode_defs)opcode, l_name, r_name, NULL, TypeClass( tipe ) );
++            }
 +        }
          result = InsName( ins, tipe );
          AddIns( ins );
@@ -808,7 +831,7 @@ index 1bab6746f0..493bf37016 100644
              cf_value = OkToNegate( ins->operands[1]->c.u.cfval, tipe );
              if( cf_value != NULL ) {
 diff --git a/bld/cg/c/generate.c b/bld/cg/c/generate.c
-index a7f606be70..58bdf031cd 100644
+index a7f606be70..76e31c50a0 100644
 --- a/bld/cg/c/generate.c
 +++ b/bld/cg/c/generate.c
 @@ -31,6 +31,9 @@
@@ -847,14 +870,14 @@ index a7f606be70..58bdf031cd 100644
 +
 +/* Daggerfall: per-function code generator options from `#pragma dagger <opt> <func>` */
 +#define DAGGER_MAX_FUNC_OPTS    256
-+static char DaggerOptName[DAGGER_MAX_FUNC_OPTS][16];
++static char DaggerOptName[DAGGER_MAX_FUNC_OPTS][40];
 +static char DaggerOptFunc[DAGGER_MAX_FUNC_OPTS][40];
 +static int  DaggerOptCount;
 +
 +void    DaggerFuncOptAdd( const char *opt, const char *func )
 +{
 +    if( DaggerOptCount < DAGGER_MAX_FUNC_OPTS ) {
-+        strncpy( DaggerOptName[DaggerOptCount], opt, 15 );
++        strncpy( DaggerOptName[DaggerOptCount], opt, 39 );
 +        strncpy( DaggerOptFunc[DaggerOptCount], func, 39 );
 +        DaggerOptCount++;
 +    }
@@ -1195,19 +1218,21 @@ index 9a81270076..c0d4185e99 100644
          if( new_head != NULL
            && new_head != Head ) {
 diff --git a/bld/cg/c/makeaddr.c b/bld/cg/c/makeaddr.c
-index 759b3b65c1..aba1cb75db 100644
+index 759b3b65c1..ffaca0dd8e 100644
 --- a/bld/cg/c/makeaddr.c
 +++ b/bld/cg/c/makeaddr.c
-@@ -32,6 +32,8 @@
+@@ -32,6 +32,10 @@
  
  
  #include "_cgstd.h"
++#include <stdio.h>
++#include <stdlib.h>
 +extern const char *DaggerEnv( const char *name );
 +#include <stdlib.h>
  #include "coderep.h"
  #include "zoiks.h"
  #include "freelist.h"
-@@ -50,6 +52,7 @@
+@@ -50,6 +54,7 @@
  #include "feprotos.h"
  
  
@@ -1215,7 +1240,7 @@ index 759b3b65c1..aba1cb75db 100644
  static    pointer       *AddrNameFrl;
  
  static  void    CopyAddr( an src, an dst )
-@@ -241,6 +244,34 @@ static  name    *Display( cg_sym_handle symbol, level_depth level )
+@@ -241,6 +246,53 @@ static  name    *Display( cg_sym_handle symbol, level_depth level )
  }
  
  
@@ -1229,15 +1254,34 @@ index 759b3b65c1..aba1cb75db 100644
 + */
 +{
 +    opcnt   i;
++    bool    conv_sum;
 +
-+    if( _IsntModel( CGSW_GEN_NO_OPTIMIZATION ) || DaggerEnv( "DAGGER_RMW" ) != NULL )
++    if( _IsntModel( CGSW_GEN_NO_OPTIMIZATION ) )
 +        return( false );
-+    if( ins->num_operands < 2 )
-+        return( false );    /* unary ops did fold: `*p = -*p` is `neg dword ptr [eax]` */
 +    /* (nor into a store through a pointer: Watcom 10 computes the value first, then loads
 +     * the pointer; DAGGER_IDXFOLD=1 folds) */
-+    if( dst_name->n.class == N_INDEXED && DaggerEnv( "DAGGER_IDXKEEP" ) != NULL )
++    conv_sum = ( ins->num_operands == 1 && ins->head.opcode == OP_MOV
++      && dst_name->n.class == N_INDEXED
++      && ins->head.prev->head.opcode != OP_BLOCK && ins->head.prev->num_operands == 2
++      && ins->head.prev->result == ins->operands[0]
++      && ins->head.prev->operands[0]->n.class != N_CONSTANT
++      && ins->head.prev->operands[1]->n.class != N_CONSTANT );
++    if( dst_name->n.class == N_INDEXED && ( ins->num_operands == 2 || conv_sum )
++      && DaggerEnv( "DAGGER_IDXKEEP" ) != NULL )
 +        return( true );
++    if( DaggerEnv( "DAGGER_RMW" ) != NULL )
++        return( false );
++    if( conv_sum && DaggerEnv( "DAGGER_IDXFOLD" ) == NULL ) {
++        return( true );     /* (a conversion of such a sum: the same, see below) */
++    }
++    /* (an op of two computed values isn't pointed at a store through a pointer either; one
++     * with a constant is: `p->f = (a + b) & 2047` ands into the store) */
++    if( dst_name->n.class == N_INDEXED && ins->num_operands == 2
++      && ins->operands[1]->n.class != N_CONSTANT
++      && ins->operands[0]->n.class != N_CONSTANT && DaggerEnv( "DAGGER_IDXFOLD" ) == NULL )
++        return( true );
++    if( ins->num_operands < 2 )
++        return( false );    /* unary ops did fold: `*p = -*p` is `neg dword ptr [eax]` */
 +    for( i = 0; i < ins->num_operands; i++ ) {
 +        if( ins->operands[i] == dst_name ) {
 +            return( true );
@@ -1250,7 +1294,7 @@ index 759b3b65c1..aba1cb75db 100644
  an      MakeGets( an dst, an src, const type_def *tipe )
  /******************************************************/
  {
-@@ -253,7 +284,8 @@ an      MakeGets( an dst, an src, const type_def *tipe )
+@@ -253,7 +305,8 @@ an      MakeGets( an dst, an src, const type_def *tipe )
      InsToAddr( dst );
      dst_name = Points( dst, tipe );
      ins = src->u.i.ins;
@@ -1303,18 +1347,20 @@ index 76c9e5daf1..1562a66f62 100644
      do {
          pow2 = 1;
 diff --git a/bld/cg/c/object.c b/bld/cg/c/object.c
-index 8deefcbc4c..946c667548 100644
+index 8deefcbc4c..9a46284046 100644
 --- a/bld/cg/c/object.c
 +++ b/bld/cg/c/object.c
-@@ -31,6 +31,7 @@
+@@ -31,6 +31,9 @@
  
  
  #include "_cgstd.h"
++#include <stdio.h>
++#include <stdlib.h>
 +extern const char *DaggerEnv( const char *name );
  #include "coderep.h"
  #include "cgauxinf.h"
  #include "zoiks.h"
-@@ -46,6 +47,13 @@
+@@ -46,6 +49,13 @@
  #include "makeblk.h"
  #include "nullprop.h"
  #include "feprotos.h"
@@ -1328,7 +1374,7 @@ index 8deefcbc4c..946c667548 100644
  
  
  /*
-@@ -93,6 +101,87 @@ static  source_line_number      DumpLineNum( source_line_number n,
+@@ -93,6 +103,113 @@ static  source_line_number      DumpLineNum( source_line_number n,
  }
  
  
@@ -1348,14 +1394,25 @@ index 8deefcbc4c..946c667548 100644
 +    if( ( ins->head.opcode == OP_ADD || ins->head.opcode == OP_SUB || ins->head.opcode == OP_OR
 +      || ins->head.opcode == OP_XOR || ins->head.opcode == OP_AND )
 +      && ( ins->type_class == U2 || ins->type_class == I2 )
-+      && ins->result == ins->operands[0] && ins->operands[1]->n.class == N_REGISTER
++      && ins->result == ins->operands[0]
++      && ( ins->operands[1]->n.class == N_REGISTER
++        || ( ins->operands[1]->n.class == N_CONSTANT
++          && ins->operands[1]->c.const_type == CONS_ABSOLUTE
++          && ( ins->operands[1]->c.lo.u.int_value == 1 || ins->operands[1]->c.lo.u.int_value == -1 )
++          && ( ins->head.opcode == OP_ADD || ins->head.opcode == OP_SUB )
++          && DaggerEnv( "DAGGER_NOINCWIDEN" ) == NULL ) )
 +      && DaggerEnv( "DAGGER_WORDRMW" ) == NULL ) {
 +        /* `add [l],eax` on a 2-byte stack variable too: Watcom 10 never has `add word [ebp-x],ax` */
 +        res = ins->result;
 +        if( res->n.class != N_TEMP || res->n.size != 2 || DeAlias( res )->n.size != 2
 +          || ( DeAlias( res )->v.usage & HAS_MEMORY ) == 0 )
 +            return;
-+        ins->operands[1] = AllocRegName( FullReg( ins->operands[1]->r.reg ) );
++        if( ins->operands[1]->n.class == N_REGISTER ) {
++            ins->operands[1] = AllocRegName( FullReg( ins->operands[1]->r.reg ) );
++        } else {
++            /* `x++` on a 2-byte variable: `inc dword ptr [x]` too */
++            ins->operands[1] = AllocS32Const( ins->operands[1]->c.lo.u.int_value );
++        }
 +        ins->result = TempOffset( res, 0, U4 );
 +        ins->operands[0] = ins->result;
 +        ins->type_class = U4;
@@ -1391,13 +1448,28 @@ index 8deefcbc4c..946c667548 100644
 +
 +        if( prev->head.opcode == OP_BLOCK || prev->result == NULL
 +          || prev->result->n.class != N_REGISTER
-+          || !HW_Equal( prev->result->r.reg, op->r.reg )
++          || !( HW_Equal( prev->result->r.reg, op->r.reg )
++            || ( DaggerEnv( "DAGGER_NOWIDEOVL" ) == NULL
++              && HW_Equal( prev->result->r.reg, FullReg( op->r.reg ) ) ) )
 +          || ( prev->type_class != U2 && prev->type_class != I2
-+            && !( prev->head.opcode == OP_MUL && DaggerEnv( "DAGGER_NOMULWIDEN" ) == NULL ) ) )
++            && !( prev->head.opcode == OP_MUL && DaggerEnv( "DAGGER_NOMULWIDEN" ) == NULL )
++            /* (an int sum narrowed to the short, `s = s + i / j`, too) */
++            && !( ( prev->head.opcode == OP_ADD || prev->head.opcode == OP_SUB )
++              && DaggerEnv( "DAGGER_NOADDWIDEN" ) == NULL )
++            /* (an int variable just loaded, `s = i`, too) */
++            && !( prev->head.opcode == OP_MOV && prev->operands[0]->n.class == N_TEMP
++              && DaggerEnv( "DAGGER_NOVARWIDEN" ) == NULL ) ) )
 +            return;
 +        op = AllocRegName( FullReg( op->r.reg ) );
 +    } else if( op->n.class == N_CONSTANT && op->c.const_type == CONS_ABSOLUTE ) {
-+        op = AllocS32Const( op->c.lo.u.int_value & 0xffff );
++        if( ins->type_class == I2 && ( op->c.lo.u.int_value & 0x8000 )
++          && DaggerEnv( "DAGGER_SEXTCONST" ) != NULL ) {
++            /* a negative short constant sign-extended (`return -5;`, where Watcom 10 kept
++             * the int constant; `return 65535;` zero-extends): a per-function knob */
++            op = AllocS32Const( (int_32)(signed short)op->c.lo.u.int_value );
++        } else {
++            op = AllocS32Const( op->c.lo.u.int_value & 0xffff );
++        }
 +    } else {
 +        return;
 +    }
@@ -1416,7 +1488,7 @@ index 8deefcbc4c..946c667548 100644
  void    GenObject( void )
  /***********************/
  {
-@@ -127,6 +216,12 @@ void    GenObject( void )
+@@ -127,6 +244,12 @@ void    GenObject( void )
              StartBlockProfiling( blk );
              InitStackDepth( blk );
              for( ins = blk->ins.head.next; ins->head.opcode != OP_BLOCK; ins = ins->head.next ) {
@@ -1429,7 +1501,7 @@ index 8deefcbc4c..946c667548 100644
                  if( ins->head.opcode == OP_NOP
                    && ( (ins->flags.u.nop_flags & NOP_SOURCE_QUEUE)
                    || ins->flags.u.nop_flags == NOP_DBGINFO )) { // an end block
-@@ -145,6 +240,7 @@ void    GenObject( void )
+@@ -145,6 +268,7 @@ void    GenObject( void )
                          }
                      }
                  } else {
@@ -2033,7 +2105,7 @@ index e3c9f73344..f72e8cddb6 100644
       && temp->t.u.blk_id != BLK_ID_NONE ) {
          CalcRange( &st_temp, temp );
 diff --git a/bld/cg/c/tree.c b/bld/cg/c/tree.c
-index 23957dda5c..5b59d813c2 100644
+index 23957dda5c..008c889c05 100644
 --- a/bld/cg/c/tree.c
 +++ b/bld/cg/c/tree.c
 @@ -31,6 +31,9 @@
@@ -2046,15 +2118,16 @@ index 23957dda5c..5b59d813c2 100644
  #include "coderep.h"
  #include "tree.h"
  #include "zoiks.h"
-@@ -71,6 +74,7 @@
- #endif
- #ifdef DEVBUILD
+@@ -73,6 +76,8 @@
      #include "echoapi.h"
-+
  #endif
  
++static bool DaggerLeftFirst( tn left, tn rite );
++
  
-@@ -1123,7 +1127,10 @@ tn  DoTGPreGets( cg_op opcode, tn left, tn rite, const type_def *tipe,
+ static  void    FreeTreeNode( tn node );
+ static  void    Control( cg_op opcode, tn node, label_handle lbl, bool gen );
+@@ -1123,7 +1128,10 @@ tn  DoTGPreGets( cg_op opcode, tn left, tn rite, const type_def *tipe,
      case O_RSHIFT:
          break;
      default:
@@ -2065,7 +2138,7 @@ index 23957dda5c..5b59d813c2 100644
          break;
      }
      if( TGCanDuplicate( left ) ) {
-@@ -1691,7 +1698,21 @@ static  an  TNBitShift( an retv, tn node, bool already_masked )
+@@ -1691,7 +1699,21 @@ static  an  TNBitShift( an retv, tn node, bool already_masked )
      }
      mask = TGMask64( node );
  #ifdef JUST_USE_SHIFTS
@@ -2088,7 +2161,7 @@ index 23957dda5c..5b59d813c2 100644
          if( !already_masked ) {
              retv = BGBinary( O_AND, retv, Int64( mask ), tipeu, true );
          }
-@@ -1872,6 +1893,27 @@ static  an  TNBitOpGets( tn node, const type_def *tipe, bool yield_before_op )
+@@ -1872,6 +1894,27 @@ static  an  TNBitOpGets( tn node, const type_def *tipe, bool yield_before_op )
  }
  
  
@@ -2116,7 +2189,7 @@ index 23957dda5c..5b59d813c2 100644
  an  TNPostGets( tn node )
  /************************
   * generate blocks for an x++ type node
-@@ -1881,13 +1923,25 @@ an  TNPostGets( tn node )
+@@ -1881,13 +1924,25 @@ an  TNPostGets( tn node )
      an      left;
      an      rite;
      an      leftp;
@@ -2143,6 +2216,68 @@ index 23957dda5c..5b59d813c2 100644
          leftp = BGUnary( O_POINTS, AddrCopy( left ), node->tipe );
          retv = BGAssign( retv, leftp, node->tipe );
          BGDone( BGOpGets( node->u1.t.op, left, rite, node->tipe, node->tipe ) );
+@@ -2006,7 +2061,7 @@ an  TNCompare( tn node )
+     entry = BGGetEntry();
+     retv = FoldConsCompare( node->u1.t.op, node->u.left, node->u1.t.rite, node->u.left->tipe );
+     if( retv == NULL ) {
+-        if( node->u.left->kids >= node->u1.t.rite->kids ) {
++        if( DaggerLeftFirst( node->u.left, node->u1.t.rite ) ) {
+             left = NotAddrGen( node->u.left );
+             rite = NotAddrGen( node->u1.t.rite );
+         } else {
+@@ -2095,6 +2150,43 @@ static an   MakeBased( an left, an rite, const type_def *tipe )
+ #endif
+ 
+ 
++/* Daggerfall: does the tree make a call? With DAGGER_CALLFIRST (a per-function knob) an
++ * operand making a call is generated before one that doesn't, whatever their sizes */
++static bool DaggerHasCall( tn node )
++{
++    if( node == NULL )
++        return( false );
++    switch( node->class ) {
++    case TN_CALL:
++    case TN_CALLBACK:
++        return( true );
++    case TN_LEAF:
++    case TN_CONS:
++    case TN_HANDLE:
++    case TN_PATCH:
++    case TN_WARP:
++        return( false );
++    case TN_BIT_LVALUE:
++    case TN_BIT_RVALUE:
++        return( DaggerHasCall( node->u.left ) );
++    default:
++        return( ( (node->flags & TF_HAS_LEFT) && DaggerHasCall( node->u.left ) )
++             || DaggerHasCall( node->u1.t.rite ) );
++    }
++}
++
++static bool DaggerLeftFirst( tn left, tn rite )
++{
++    if( _IsModel( CGSW_GEN_NO_OPTIMIZATION ) && DaggerEnv( "DAGGER_CALLFIRST" ) != NULL ) {
++        bool lc = DaggerHasCall( left );
++        bool rc = DaggerHasCall( rite );
++
++        if( lc != rc )
++            return( lc );
++    }
++    return( left->kids >= rite->kids );
++}
++
+ an  TNBinary( tn node )
+ /**********************
+  * generate a binary node
+@@ -2108,7 +2200,7 @@ an  TNBinary( tn node )
+     tn      folded;
+     bool    was_address;
+ 
+-    if( node->u.left->kids >= node->u1.t.rite->kids ) {
++    if( DaggerLeftFirst( node->u.left, node->u1.t.rite ) ) {
+         left = TreeGen( node->u.left );
+         rite = TreeGen( node->u1.t.rite );
+     } else {
 diff --git a/bld/cg/c/treeconv.c b/bld/cg/c/treeconv.c
 index c0838301a3..143bfcd919 100644
 --- a/bld/cg/c/treeconv.c
@@ -2226,7 +2361,7 @@ index c0838301a3..143bfcd919 100644
          DemoteTree( name, tipe, false );
      }
 diff --git a/bld/cg/c/treefold.c b/bld/cg/c/treefold.c
-index dd3ef11ff7..074a323af2 100644
+index dd3ef11ff7..0a190b23bb 100644
 --- a/bld/cg/c/treefold.c
 +++ b/bld/cg/c/treefold.c
 @@ -31,6 +31,9 @@
@@ -2305,7 +2440,20 @@ index dd3ef11ff7..074a323af2 100644
  tn  FoldCompare( cg_op opcode, tn left, tn rite, const type_def *tipe )
  /*********************************************************************/
  {
-@@ -1445,7 +1491,8 @@ tn  FoldCompare( cg_op opcode, tn left, tn rite, const type_def *tipe )
+@@ -1425,6 +1471,12 @@ tn  FoldCompare( cg_op opcode, tn left, tn rite, const type_def *tipe )
+                 cmp_result  cmp;
+ 
+                 cmp = CheckCmpRange( opcode, CmpType( tipe ), rite->u.name->c.u.cfval );
++                /* Daggerfall: Watcom 10 at -od kept a compare of a widened byte/word with a
++                 * constant out of its range (`(int)(unsigned char)x == -1`; DAGGER_RANGEFOLD=1
++                 * folds it) */
++                if( cmp != CMP_VOID && base_l != left && _IsModel( CGSW_GEN_NO_OPTIMIZATION )
++                  && DaggerEnv( "DAGGER_RANGEFOLD" ) == NULL )
++                    cmp = CMP_VOID;
+                 if( cmp != CMP_VOID ) {
+                     if( cmp == CMP_TRUE ) {
+                         result = true_value;
+@@ -1445,7 +1497,8 @@ tn  FoldCompare( cg_op opcode, tn left, tn rite, const type_def *tipe )
                      return( FoldCompare( opcode, IntToType( 1, TypeInteger ), IntToType( 0, TypeInteger ), TypeInteger ) );
                  }
              }
@@ -2314,6 +2462,19 @@ index dd3ef11ff7..074a323af2 100644
 +              && DaggerStripConvert( opcode, base_l, rite ) ) {
                  // If we couldn't fold the comparison, get rid of some lame converts
                  // the C++ compiler likes to emit. Careful with floats!
+                 BurnToBase( left, base_l );
+@@ -1491,7 +1544,11 @@ tn  FoldCompare( cg_op opcode, tn left, tn rite, const type_def *tipe )
+     } else {
+         base_r = FindBase( rite, op_eq );
+         base_l = FindBase( left, op_eq );
+-        if( base_r != rite || base_l != left ) {
++        /* Daggerfall: Watcom 10 at -od kept both explicit conversions of an == / != of two
++         * converted values, comparing them wide (DAGGER_STRIPBOTH=1 narrows as OW does) */
++        if( ( base_r != rite || base_l != left )
++          && ( _IsntModel( CGSW_GEN_NO_OPTIMIZATION ) || DaggerEnv( "DAGGER_STRIPBOTH" ) != NULL
++            || ( base_r != rite ) != ( base_l != left ) ) ) {
+             if( ( base_r->tipe == base_l->tipe ) && ( ( opcode == O_EQ ) || ( opcode == O_NE ) ) ) {
+                 BurnToBase( rite, base_r );
                  BurnToBase( left, base_l );
 diff --git a/bld/cg/c/verify.c b/bld/cg/c/verify.c
 index 509455be21..22061de2b1 100644

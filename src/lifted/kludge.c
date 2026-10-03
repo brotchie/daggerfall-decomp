@@ -2,6 +2,8 @@
  * do not edit: move a function to src/kludge.c to work on it by hand) */
 
 struct bf16_0_10 { unsigned short f:10; };
+struct bf8_1_1 { unsigned char _:1; unsigned char f:1; };
+struct bf8_2_1 { unsigned char _:2; unsigned char f:1; };
 extern char D_0012B508[];
 extern char D_00132F6C[];
 extern char D_00142314[];
@@ -129,6 +131,7 @@ void func_00045FFB(int);
 void func_00046114(int);
 #pragma aux func_0009DA1C parm routine [];
 #pragma aux func_000A0ED9 parm routine [];
+#pragma dagger DAGGER_NOGIVEN func_00044D03
 
 void func_00044D03(int a1)
 {
@@ -176,7 +179,7 @@ void func_00044E89(void)
     int l_18;
 
     if (*(signed char *)D_00199728 == 0) return;
-    if ((*(unsigned char *)D_001940D4 & 4) == 0) goto L44EB7;
+    if (((struct bf8_2_1 *)&D_001940D4)->f == 0) goto L44EB7;
     l_18 = func_000392AD();
     if (l_18 > (-1)) goto L44EB9;
 L44EB7:;
@@ -214,23 +217,23 @@ void func_00044F85(int a1)
     int l_24;
     int l_20;
     int l_1C;
-    int l_18;
+    short l_18;
 
     func_0004504D(a1);
-    l_18 = 0;
+    *(int *)&l_18 = 0;
 L44FA5:;
-    if (((int)(short)*(short *)&l_18) < *(int *)D_00195D98) goto L44FBE;
+    if (((int)(short)l_18) < *(int *)D_00195D98) goto L44FBE;
     return;
 L44FB6:;
-    l_18++;
+    (*(int *)&l_18)++;
     goto L44FA5;
 L44FBE:;
-    if (*(signed char *)(*(char **)D_00195B04 + 47 + (((int)(short)*(short *)&l_18) * 89)) == 0) goto L44FB6;
+    if (*(signed char *)(*(char **)D_00195B04 + 47 + (((int)(short)l_18) * 89)) == 0) goto L44FB6;
     l_20 = func_0008E6C5(*(int *)(*(char **)D_00195AA0 + 63), 27, 0);
     l_20 = func_0008DCE3(l_20, 0, 89);
     *(signed char *)((char *)l_20) = 9;
     *(int *)((char *)l_20 + 31) = func_0008EB88(100);
-    func_000A1023(l_20 + 71, (int)(*(char **)D_00195B04 + (((int)(short)*(short *)&l_18) * 89)), 89, (int)D_00171044, 165, 4);
+    func_000A1023(l_20 + 71, (int)(*(char **)D_00195B04 + (((int)(short)l_18) * 89)), 89, (int)D_00171044, 165, 4);
     goto L44FB6;
 }
 
@@ -502,7 +505,7 @@ void func_00045B7F(void)
 void func_00045C6B(void)
 {
     *(signed char *)D_001940DA ^= 2;
-    if ((*(unsigned char *)D_001940DA & 2) == 0) return;
+    if (((struct bf8_1_1 *)&D_001940DA)->f == 0) return;
     func_0007CBA1((int)D_001710A7);
 }
 

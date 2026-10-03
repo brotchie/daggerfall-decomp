@@ -77,6 +77,10 @@ void func_0001FAB2(void);
 void func_0001FB3F(void);
 void func_0001FD7C(int);
 void func_0001FE4D(void);
+#pragma dagger DAGGER_CONFPOS func_0001F958
+#pragma dagger DAGGER_CONFPOSREV func_0001FBF5
+#pragma dagger DAGGER_PTRSWAP func_0001FB3F
+#pragma dagger KKND_CONFREV func_0001FB3F
 #pragma dagger reg func_0001F958 437 bx
 #pragma dagger reg func_0001FB3F 437 bx
 
@@ -202,7 +206,8 @@ void func_0001F40E(int a1)
     int l_1C;
     int l_18;
 
-    l_18 = func_0004A98C(*(int *)D_00195BF4, (int)(unsigned char)(l_1C = (int)(unsigned char)*(signed char *)(D_001841D8 + a1), *(signed char *)D_00196268));
+    l_1C = (int)(unsigned char)*(signed char *)(D_001841D8 + a1);
+    l_18 = func_0004A98C(*(int *)D_00195BF4, (int)(unsigned char)*(signed char *)D_00196268);
     if (l_18 != 37) goto L1F457;
     l_1C >>= 1;
     if (l_1C != 0) goto L1F457;

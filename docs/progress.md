@@ -1333,3 +1333,83 @@ Batch **1,927**; build **61.34%**.
 - A caller widening an argument right before pushing it (`xor ah,ah; cwde; push eax`)
   passes a short. Assignment chains through a reloaded pointer (`p->a = (p->b = v)`, the
   word re-read then widened or stored on). +5. Batch **2,217** (90.6%).
+- x87: floats (slots the FPU stores and loads as 4 bytes; `fstp m32; fld m32` of a temp
+  rounds to float; `(int)(float)((float)x + y)` stored back to x is `x += y`), two filds
+  combined are `(double)a / b`, `fistp qword` read as a dword is the unsigned conversion.
+- **OW: per-function knobs with names over 15 characters never worked** (DaggerFuncOpt kept
+  15 characters of the name): DAGGER_WORDSTORE, DAGGER_CHARPARMBIG, DAGGER_CONFPOSREV and
+  five more now switch on per function. The widened short store also follows int sums
+  and int variables (`s = s + i / j`, `s = i`). +6.
+- Selector-temp switch trees treat jumps in their own run as stubs; explicit empty cases
+  (values a compare sends straight to the default's code shape Watcom's tree) and extra
+  register arguments to a callee taking fewer are choice points. OW: widened byte/word
+  compares against out-of-range constants are no longer folded (`(uchar)x == -1`), and
+  DAGGER_CALLFIRST (a knob) generates an operand making a call first. +6. Batch **2,227**
+  (91.5%).
+- Bit-field tests (`test byte [g],K`, a contiguous mask: only a bit-field test makes it),
+  `p + i` / `i + p` address order and global arrays of short pairs as choices. Batch
+  **2,242**.
+
+## The real compiler: Watcom C32 10.0a
+
+- The remaining functions are not hand-written assembly. Compiling their lifts with the
+  real Watcom C32 10.0a (`tools/wcc10.py`: the 1995 compiler under DOSBox-X) shows plain C
+  code generation throughout, so the gap is in our emulation of 10.0a, not in the source
+  language.
+- **FALL.EXE was compiled with `-d2`.** Debug info explains the dead `mov eax,[i]` before
+  `inc dword [i]` (the value of `i++` kept for the debugger), the address of `*(int
+  *)0x46c` going through a stack temp, and the frame order: with `-d2` the return value's
+  slot is on top, then locals last to first, then spilled parameters last to first.
+  Without `-d2` the order is first to first (`LIFT_DECLTOP=1`).
+- The probes also settled: a far pointer second argument goes in ebx:ecx with the next int
+  in edx (a lifter choice); `==` of two converted values stays wide (OW patch); an
+  argument evaluated before a call is spilled to a temp of the compiler's own.
+- `DAGGER_CC=w10 DAGGER_W10EXTRA=-d2` makes `tools/match.py` and `tools/lift_all.py` use
+  the real compiler; in that mode the lifter drops the compiler's own temps (`(t = a, t)`
+  is `a`; `*(int *)1132` needs no variable).
+- **`src/w10/`**: functions only 10.0a reproduces (OW does not place its temps the same
+  way). The build compiles them with the real compiler, `-d2` added, when it is installed
+  and skips them otherwise (the original bytes stay, the checksum still matches). 4D402,
+  7193D, 99922. Build **2,248** (93.77%).
+- The operand computed first can be padded with a no-op when it looks smaller
+  (`g & 128 & 255`; a lifter choice). DOSBox-X at `cycles=max` makes a 10.0a compile
+  0.7 s (0.08 s each in a batch), so searching against the real compiler is cheap.
+  `tools/w10_try.py` tries many variants of one function in one DOSBox run;
+  `tools/wcc10.py` also runs the build's relocation check.
+
+## 100%: the last 48 functions with the real compiler
+
+The last 48 functions were matched with Watcom 10.0a by six agents working in parallel,
+each from the lifter's attempt with the real compiler as the judge. Most were rewritten as
+ordinary C (structs, typed prototypes, `for` and `switch`); all are in `src/w10/`. Build
+**2,297 / 2,297** (100%), FALL.EXE byte-identical. What they found about 10.0a, most of it
+the reason patched OW could not get these:
+
+- **Register allocation and the stack frame both go through Watcom's unstable ShellSort**
+  (`cgsrtlst.c`). The conflicts of a block are sorted by savings, so swapping the operands
+  of a `+` or `*` gives the same instructions but can move esi/edi anywhere in the block,
+  earlier statements included; one more or one fewer temp (an `(int)` cast on a pointer,
+  `*(int *)D + 28` against `*(char **)D + 28`) does the same.
+- **Frame layout** (`tools/w10_frame.py`): register parameters in order, then the locals in
+  declaration order, then the return slot; shell-sorted by size, largest first; allocated
+  from the bottom up, the last element nearest ebp. Inner-block locals and compiler temps go
+  below. Unused locals still take slots: some matched files keep one or two.
+- **Short locals are stored as dwords** (`mov dword [s],0`, `inc dword [s]`) and read with
+  `movsx word`: such a slot is a plain `short`, not an int with casts.
+- **Evaluation order**: the operand with more tree nodes first. A struct member at a
+  nonzero offset, an array index other than 0, a cast or a mask (`lo & 0xffff`) add nodes;
+  `p->arr[i]` and `*(p + K + i)` are different trees. The result lands in the left operand's
+  register.
+- **Types steer allocation**: callees need real prototypes (`char *` strings, `short` and
+  `unsigned char` parameters: a constant for an `unsigned char` stack parameter is pushed
+  through a register); arrays of pointers typed as pointers; far pointers with `MK_FP`.
+- **Control flow is never threaded at -od**: a jump to the loop increment is `continue`,
+  `if (a) if (b)` and `if (a && b)` differ, `A || (B || C)` and `(A || B) || C` differ, a
+  switch selector in a user slot is `l = e; switch (l)`, explicit empty cases shape the tree.
+- **Missed arguments**: a remainder left in edx by `idiv` is not an argument, but an edx
+  load or a push just before a call usually is (three were missing in the lifts).
+- 684E9 multiplies by a literal double: 10.0a puts it in the module's own constants, which
+  the build cannot accept (every reference must resolve to FALL.EXE's), and with the
+  constant as an extern it emits `fld; fmulp`. `(float)(x * K)` stored to a double gives
+  the original `fmul [K]` bytes (the conversion emits no code there); the file says so.
+

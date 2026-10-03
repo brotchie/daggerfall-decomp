@@ -3,6 +3,7 @@
 
 struct bf16_0_10 { unsigned short f:10; };
 struct bf16_11_3 { unsigned short _:11; unsigned short f:3; };
+struct bf8_2_1 { unsigned char _:2; unsigned char f:1; };
 extern char D_00170AB4[];
 extern char D_00170ABC[];
 extern char D_00170AC7[];
@@ -73,8 +74,10 @@ void func_00036DC9(int, int, int, unsigned char);
 void func_00036F18(int);
 #pragma aux func_000A0ED9 parm routine [];
 #pragma dagger DAGGER_RMW func_00036233
+#pragma dagger KKND_CONFREV func_000367E5
 #pragma dagger reg func_00035D6D 39 edx 40 ebx 41 edx 51 edx 53 ebx 60 edx 66 edx 387 cx
 #pragma dagger reg func_000361B7 387 cx
+#pragma dagger reg func_000367E5 18 edx
 #pragma dagger slots func_000369A0 a1 12 a2 4 l_28 24 l_18 8
 
 void func_00035D6D(int a1)
@@ -272,7 +275,7 @@ L36539:;
     *(int *)D_001995FC = -(((int)(unsigned char)*(signed char *)(*(char **)D_001995F0 + 5)) << 3);
 L3655F:;
     *(signed char *)D_001962A1 = *(signed char *)(*(char **)D_001995F0 + 4);
-    if ((*(unsigned char *)(*(char **)D_00199608 + 3) & 4) != 0) goto L36580;
+    if (((struct bf8_2_1 *)(*(char **)D_00199608 + 3))->f != 0) goto L36580;
     l_2C = 0;
     goto L36595;
 default:

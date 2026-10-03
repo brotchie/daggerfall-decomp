@@ -13,18 +13,18 @@ extern void func_0007CA1F();
 void func_00017A61(int a1, int a2, short a3, short a4, int a5)
 {
     int l_14;
-    int l_10;
-    int l_C;
+    short l_10;
+    short l_C;
 
-    l_10 = (int)(short)*(short *)D_00142940;
+    *(int *)&l_10 = (int)(short)*(short *)D_00142940;
     *(short *)D_00142940 = 6;
-    l_C = (int)(short)*(short *)D_00142948;
+    *(int *)&l_C = (int)(short)*(short *)D_00142948;
     *(short *)D_00142948 = 100;
     func_0007CA1F(a1, (int)(short)(a2 + *(short *)D_00196580), (int)(short)a3, (int)(short)a4, (int)(short)*(short *)&a5);
     l_14 = func_0005A4A9(a1);
     if (l_14 <= *(int *)D_00196578) goto L17ADE;
     *(int *)D_00196578 = l_14;
 L17ADE:;
-    *(short *)D_00142940 = l_10;
-    *(short *)D_00142948 = l_C;
+    *(short *)D_00142940 = *(int *)&l_10;
+    *(short *)D_00142948 = *(int *)&l_C;
 }

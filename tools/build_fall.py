@@ -4,7 +4,9 @@
 Adapted from KKND-Decomp's build_kknd.py (CC0). Pipeline:
   1. Load orig/1.07.213/FALL.EXE (tools/le.py) as raw, unrelocated object images.
   2. Compile every src/**/*.c with wcc386 (flags: config/cflags.txt, or a first-line
-     `/* cflags: ... */` override in the file) into OMF objects.
+     `/* cflags: ... */` override in the file) into OMF objects. src/w10/ holds functions
+     only the real Watcom C32 10.0a reproduces: they are compiled with it (tools/wcc10.py,
+     plus -d2) when it is installed, and otherwise left out (the original bytes stay).
   3. Check every function defined in C against the original at its address
      (config/functions.csv + config/symbols.txt):
        - every non-relocated byte must be identical, and the length must equal the original;
@@ -29,6 +31,7 @@ import glob
 import hashlib
 import os
 import re
+import shutil
 import struct
 import sys
 
@@ -36,6 +39,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from le import LE, SRC_OFF32, SRC_REL32  # noqa: E402
 from omf import OMF  # noqa: E402
 import match  # noqa: E402
+import wcc10  # noqa: E402
 
 ROOT = match.ROOT
 OUT = os.path.join(ROOT, "build", "FALL.EXE")
@@ -129,6 +133,25 @@ def check_relocs(obj, si, lo, off, size, va, tgt, fix_at, funcs, syms, le, field
     return None
 
 
+def compile_w10(srcs, default, objdir):
+    """Compile src/w10/ with Watcom 10.0a, grouped by flags: {src: obj path or None}."""
+    groups = {}
+    for s in srcs:
+        groups.setdefault(tuple(file_flags(s, default) + wcc10.FLAGS), []).append(s)
+    out = {}
+    for flags, group in groups.items():
+        objs, td = wcc10.compile_many(group, list(flags))
+        for s, o in objs.items():
+            rel = os.path.relpath(s, ROOT)
+            dst = os.path.join(objdir, rel.replace(os.sep, "_")[:-2] + ".obj")
+            out[s] = None
+            if o is not None:
+                shutil.move(o, dst)
+                out[s] = dst
+        shutil.rmtree(td, ignore_errors=True)
+    return out
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("-v", action="store_true", help="print diffs for non-matching functions")
@@ -148,10 +171,28 @@ def main():
     matched, errors = [], []
     objdir = os.path.join(ROOT, "build", "obj")
     os.makedirs(objdir, exist_ok=True)
+    # src/w10/ needs the real Watcom C32 10.0a (tools/wcc10.py): one DOSBox-X run for all
+    # of it. Without that compiler those functions keep the original bytes.
+    w10dir = os.path.join(ROOT, "src", "w10") + os.sep
+    w10 = [s for s in srcs if s.startswith(w10dir)]
+    srcs = [s for s in srcs if not s.startswith(w10dir)]
+    w10objs = {}
+    if w10 and wcc10.available():
+        w10objs = compile_w10(w10, default, objdir)
+        srcs += w10
+    elif w10:
+        print("note: skipping %d file(s) in src/w10/: they need Watcom C32 10.0a "
+              "(see tools/wcc10.py)" % len(w10))
     for src in srcs:
         rel = os.path.relpath(src, ROOT)
         obj_path = os.path.join(objdir, rel.replace(os.sep, "_")[:-2] + ".obj")
-        match.compile_c(src, file_flags(src, default), obj_path)
+        if src in w10objs:
+            if w10objs[src] is None:
+                errors.append("%s: Watcom 10.0a could not compile it" % rel)
+                continue
+            obj_path = w10objs[src]
+        else:
+            match.compile_c(src, file_flags(src, default), obj_path)
         obj = OMF(obj_path)
         fns = obj.functions()
         for pub, si, off, size in fns:

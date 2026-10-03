@@ -12,6 +12,10 @@ Output:
   a summary: match count, and the most common unsupported reasons and first differences,
   which is the to-do list for the lifter and the compiler patch
 
+With DAGGER_CC=w10 DAGGER_W10EXTRA=-d2 it compiles with the real Watcom C32 10.0a instead
+(tools/wcc10.py) and writes build/lift10/; tools/promote_w10.py copies what matched there
+into src/w10/.
+
 usage: lift_all.py [-j N] [--only func_X,func_Y] [--limit N]
 """
 import argparse
@@ -28,7 +32,10 @@ from collections import Counter
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-OUT = os.path.join(ROOT, "build", "lift")
+# the real Watcom 10.0a (DAGGER_CC=w10) keeps its own lifts, report and flips
+OUT = os.environ.get("LIFT_OUT") or os.path.join(
+    ROOT, "build", "lift10" if os.environ.get("DAGGER_CC") == "w10" else "lift")
+os.makedirs(OUT, exist_ok=True)
 
 W = {}  # per-worker state
 
@@ -399,8 +406,15 @@ def lift_one(va):
         sites = info.get("sites", {})
         near = sorted((a for a in info["choices"] if a >= 0 and a not in flips),
                       key=lambda a: min(abs(x - at) for x in sites.get(a, [a])))[:NEAR]
+        if at - va < 16 and not os.environ.get("LIFT_NOFRAMEALL"):
+            # a difference in the frame size: any choice point can change it (a temp, a
+            # variable's type), not just those near the prologue
+            near = sorted(a for a in info["choices"] if a >= 0 and a not in flips)[:3 * NEAR]
         # function-level choices (compiler knobs) too
         func_level = [a for a in info["choices"] if a < 0 and a not in flips]
+        if os.environ.get("DAGGER_CC") == "w10":
+            # (the real Watcom 10.0a has no knobs and ignores slot pins)
+            func_level = [a for a in func_level if not (-100 < a < 0 or a == -1000)]
         found = None
         for a in near + func_level:
             if tries >= BUDGET:
@@ -475,6 +489,48 @@ def lift_one(va):
         status, detail, at, c, info = found[3]
         best = (status, detail, at, c)
     status, detail, at, c = best
+    if status == "diff" and cached and not os.environ.get("LIFT_NOCACHEKNOBS"):
+        # a previous run's flips with one more compiler knob (a knob added since, say)
+        for k in [a for a in info.get("choices", []) if -100 < a < 0 and a not in cached]:
+            r = attempt(cached | {k})
+            if r is not None and r[0] == "ok":
+                flips = cached | {k}
+                status, detail, at, c = r[0], r[1], r[2], r[3]
+                break
+    if status == "diff" and not os.environ.get("LIFT_NOKNOBSTART"):
+        # a compiler knob alone that leaves far fewer differing bytes (though the first one
+        # comes earlier): a short greedy search from it
+        nb = nbytes(detail)
+        for k in [a for a in info.get("choices", []) if -100 < a < 0]:
+            r = attempt(frozenset({k}))
+            if r is None or r[0] == "error" or (r[0] == "diff" and nbytes(r[1]) * 3 > nb):
+                continue
+            fl, (s2, d2, at2, c2, info2) = frozenset({k}), r
+            for _ in range(8):
+                if s2 == "ok" or at2 is None:
+                    break
+                sites2 = info2.get("sites", {})
+                near2 = sorted((a for a in info2["choices"] if a >= 0 and a not in fl),
+                               key=lambda a: min(abs(x - at2) for x in sites2.get(a, [a])))[:12]
+                step = None
+                for a in near2:
+                    r2 = attempt(fl | {a})
+                    if r2 is not None and (r2[0] == "ok" or (r2[0] == "diff" and r2[2] is not None
+                                                            and r2[2] > at2)):
+                        if step is None or r2[0] == "ok" or (step[1][0] != "ok" and r2[2] > step[1][2]):
+                            step = (fl | {a}, r2)
+                        if r2[0] == "ok":
+                            break
+                if step is None and not os.environ.get("LIFT_NOREGPIN"):
+                    pf = pin_search(name, va, c2, d2, at2, fl, attempt)
+                    if pf is not None:
+                        step = (pf[2], pf[3])
+                if step is None:
+                    break
+                fl, (s2, d2, at2, c2, info2) = step[0], step[1]
+            if s2 == "ok":
+                flips, status, detail, at, c = fl, s2, d2, at2, c2
+                break
     if os.environ.get("LIFT_SHOWFLIPS"):
         print(name, sorted(flips), file=sys.stderr)
     if c is not None:

@@ -2,6 +2,10 @@
  * do not edit: move a function to src/icons.c to work on it by hand) */
 
 struct bf16_0_11 { unsigned short f:11; };
+struct bf8_3_1 { unsigned char _:3; unsigned char f:1; };
+struct bf8_4_1 { unsigned char _:4; unsigned char f:1; };
+struct bf8_5_1 { unsigned char _:5; unsigned char f:1; };
+struct bf8_6_1 { unsigned char _:6; unsigned char f:1; };
 struct bfs16_0_11 { short f:11; };
 extern char D_000C23BC[];
 extern char D_0012AC00[];
@@ -92,8 +96,9 @@ extern void func_00098651(void);
 void func_0005D2DE(int);
 void func_0005D5A5(int);
 void func_0005D97C(void);
+#pragma dagger DAGGER_PTRSWAP func_0005DB95
 #pragma dagger reg func_0005D5A5 52 edx
-#pragma dagger reg func_0005DB95 26 esi 27 eax 100 esi 101 eax
+#pragma dagger reg func_0005DB95 27 eax 101 eax
 
 void func_0005D151(void)
 {
@@ -104,12 +109,12 @@ void func_0005D151(void)
     l_18 = func_0007ED48(((struct bfs16_0_11 *)(*(char **)D_00195A98 + 3))->f >> 6);
     l_20 = (int)(*(char **)D_00190904 + 10 + ((((int)(short)*(short *)(*(char **)D_00190904 + 4)) * ((int)(short)*(short *)(*(char **)D_00190904 + 6))) * l_18));
     func_00144FB4((int)(short)*(short *)(*(char **)D_00190904), (int)(short)*(short *)(*(char **)D_00190904 + 2), (int)(short)*(short *)(*(char **)D_00190904 + 4), (int)(short)*(short *)(*(char **)D_00190904 + 6), l_20);
-    if ((*(unsigned char *)D_001940D6 & 8) == 0) goto L5D233;
+    if (((struct bf8_3_1 *)&D_001940D6)->f == 0) goto L5D233;
     l_18 = func_0007EDD3();
     l_20 = (int)(*(char **)D_00190908 + 10 + (l_18 * (((int)(short)*(short *)(*(char **)D_00190908 + 4)) * ((int)(short)*(short *)(*(char **)D_00190908 + 6)))));
     func_00144FB4((int)(short)*(short *)(*(char **)D_00190908), (int)(short)*(short *)(*(char **)D_00190908 + 2), (int)(short)*(short *)(*(char **)D_00190908 + 4), (int)(short)*(short *)(*(char **)D_00190908 + 6), l_20);
 L5D233:;
-    if ((*(unsigned char *)D_001940D6 & 16) == 0) goto L5D29A;
+    if (((struct bf8_4_1 *)&D_001940D6)->f == 0) goto L5D29A;
     l_18 = func_0007ED6C();
     l_20 = (int)(*(char **)D_0019090C + 10 + (l_18 * (((int)(short)*(short *)(*(char **)D_0019090C + 4)) * ((int)(short)*(short *)(*(char **)D_0019090C + 6)))));
     func_00144FB4((int)(short)*(short *)(*(char **)D_0019090C), (int)(short)*(short *)(*(char **)D_0019090C + 2), (int)(short)*(short *)(*(char **)D_0019090C + 4), (int)(short)*(short *)(*(char **)D_0019090C + 6), l_20);
@@ -192,13 +197,13 @@ void func_0005D45D(void)
 
 void func_0005D486(void)
 {
-    int l_18;
+    short l_18;
 
     *(signed char *)D_001940D6 ^= 64;
-    if ((*(unsigned char *)D_001940D6 & 64) == 0) return;
+    if (((struct bf8_6_1 *)&D_001940D6)->f == 0) return;
     if (*(int *)(*(char **)D_00195BE0 + 443) == 0) return;
-    l_18 = *(int *)(*(char **)D_00195BE0 + 443) + 71;
-    func_00069938((int)(short)*(short *)(D_00188208 + (((int)(unsigned short)*(short *)((char *)l_18 + 34)) * 2)), *(int *)D_00195AA4, 100);
+    *(int *)&l_18 = *(int *)(*(char **)D_00195BE0 + 443) + 71;
+    func_00069938((int)(short)*(short *)(D_00188208 + (((int)(unsigned short)*(short *)(*(char **)&l_18 + 34)) * 2)), *(int *)D_00195AA4, 100);
 }
 
 void func_0005D4F2(void)
@@ -323,7 +328,7 @@ void func_0005D876(void)
 {
     short l_18;
 
-    if ((*(unsigned char *)D_001940D4 & 32) == 0) return;
+    if (((struct bf8_5_1 *)&D_001940D4)->f == 0) return;
     func_000A1023(*(int *)D_00143550, *(int *)D_00199D68, 64000, (int)D_00175898, 368, 4);
     func_00144F68((int)(unsigned short)*(short *)(*(char **)D_00195D64), (int)(unsigned short)*(short *)(*(char **)D_00195D64 + 2), (int)(unsigned short)*(short *)(*(char **)D_00195D64 + 4), (int)(unsigned short)*(short *)(*(char **)D_00195D64 + 6), (int)(*(char **)D_00195D64 + 12));
     if (*(signed char *)D_00142309 != 0) goto L5D911;

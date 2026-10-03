@@ -73,6 +73,11 @@ void func_0006530C(int);
 void func_0006546F(int, int);
 void func_000654EA(int);
 #pragma dagger DAGGER_CONFPOS func_00064708
+#pragma dagger DAGGER_CONFPOS func_000654EA
+#pragma dagger DAGGER_RMW func_0006480F
+#pragma dagger DAGGER_RMW func_0006546F
+#pragma dagger confwin func_000654EA 37 40
+#pragma dagger reg func_000654EA 5 eax
 #pragma dagger reg func_00065864 437 bx
 
 void func_00064337(int a1)
@@ -689,8 +694,6 @@ L65590:;
     goto L655FC;
 case 0:
 case 1:
-    goto L655CB;
-L655CB:;
     *(int *)((char *)a1 + 13) = *(int *)(*(char **)((char *)a1 + 35) + 7);
     goto L655FC;
 case 2:
@@ -732,8 +735,6 @@ L656C7:;
     goto L65724;
 case 0:
 case 1:
-    goto L656F0;
-L656F0:;
     *(int *)((char *)a1 + 13) = (int)(short)*(short *)(*(char **)((char *)a1 + 35) + 1);
     goto L65724;
 case 2:

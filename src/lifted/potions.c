@@ -70,6 +70,7 @@ void func_00090426(int);
 void func_00090572(int);
 #pragma dagger DAGGER_CONFLIST func_0008F11D
 #pragma dagger KKND_CONFREV func_0008EEBC
+#pragma dagger reg func_0008EEBC 40 eax
 #pragma dagger reg func_0008FE48 437 bx
 #pragma dagger slots func_0008F89A a1 8 l_8C 120 l_4B 55 l_48 52 l_44 48 l_40 44 l_3C 40 l_38 36 l_34 32 l_30 28 l_2C 24 l_28 20 l_24 16 l_20 12 l_18 4
 #pragma dagger slots func_0008FCE7 a1 32 a2 40 a3 16 a4 36 l_A4 156 l_38 48 l_24 28 l_20 24 l_1C 20 l_14 12 l_10 8 ret 4
@@ -251,11 +252,11 @@ L8F9CE:;
 
 void func_0008FBE8(int a1)
 {
-    int l_18;
+    short l_18;
 
     if (((int)(unsigned char)*(signed char *)((char *)a1)) != 2) return;
-    l_18 = a1 + 71;
-    if (((int)(unsigned short)(*(short *)((char *)l_18 + 42) & 1)) == 0) return;
+    *(int *)&l_18 = a1 + 71;
+    if (((int)(unsigned short)(*(short *)(*(char **)&l_18 + 42) & 1)) == 0) return;
     *(int *)D_001AA3E4 = 1;
 }
 

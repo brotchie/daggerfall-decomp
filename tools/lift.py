@@ -296,6 +296,7 @@ class Func:
         afirst = {}    # address-taken slot -> address of its first access
         sign = {}      # slot -> 's' / 'u' hints
         fpu4 = set()   # slots the FPU reads or writes as floats
+        soft4 = set()  # slots read whole only where the low word would do
         addr = set()
         body = self.ins[self.body_start:self.body_end]
         R16 = {"eax": "ax", "edx": "dx", "ebx": "bx", "ecx": "cx"}
@@ -376,9 +377,32 @@ class Func:
                                 body[k - 1].operands[0].type == cx.X86_OP_REG and
                                 body[k - 1].operands[0].size == 2):
                             self.w16_stores.add(ins.address)
-                rmw_imm = n == 0 and ins.mnemonic in ("add", "sub") and op.size == 4 and \
-                    ins.operands[1].type == cx.X86_OP_IMM and \
-                    not os.environ.get("LIFT_NORMWIMM")
+                rmw_imm = n == 0 and op.size == 4 and not os.environ.get("LIFT_NORMWIMM") and (
+                    (ins.mnemonic in ("add", "sub") and ins.operands[1].type == cx.X86_OP_IMM)
+                    or (ins.mnemonic in ("inc", "dec") and not os.environ.get("LIFT_NOINCSHORT")))
+                # (nor the dead load of x++: mov eax,[x]; inc dword [x])
+                nx_ = body[k + 1] if k + 1 < len(body) else None
+                rmw_imm = rmw_imm or (n == 1 and ins.mnemonic == "mov" and op.size == 4 and
+                                      nx_ is not None and nx_.mnemonic in ("inc", "dec") and
+                                      nx_.operands[0].type == cx.X86_OP_MEM and
+                                      ebp_slot(nx_, nx_.operands[0]) == off and
+                                      not os.environ.get("LIFT_NOINCSHORT"))
+                # (nor a whole load whose low word alone is used next: mov eax,[x]; cmp ax,..)
+                if n == 1 and ins.mnemonic == "mov" and op.size == 4 and nx_ is not None and \
+                        ins.operands[0].type == cx.X86_OP_REG and \
+                        off not in [p_[1] for p_ in self.params] and \
+                        not os.environ.get("LIFT_NOLOWUSE"):
+                    r16 = {"eax": "ax", "ebx": "bx", "ecx": "cx", "edx": "dx", "esi": "si",
+                           "edi": "di"}.get(ins.reg_name(ins.operands[0].reg))
+                    if r16 is not None and any(o.type == cx.X86_OP_REG and
+                                               nx_.reg_name(o.reg) == r16 for o in nx_.operands):
+                        rmw_imm = True
+                        reads.setdefault(off, set()).add(2)
+                # (imul r,[x],k reads a short whole too: only its low word matters)
+                if n == 1 and op.size == 4 and ins.mnemonic == "imul" and \
+                        len(ins.operands) == 3 and not os.environ.get("LIFT_NOIMULSHORT"):
+                    soft4.add(off)      # (an int unless it is read as a word elsewhere)
+                    rmw_imm = True
                 if not (n == 0 and ins.mnemonic == "mov") and not rmw_imm:
                     # (`add dword [x],10` is Watcom 10's x += 10 on a short too)
                     reads.setdefault(off, set()).add(op.size)
@@ -396,6 +420,9 @@ class Func:
                           nxt.op_str in ("eax, 0xff", "eax, 0xffff")) or \
                             (prv is not None and prv.mnemonic == "xor"):
                         sign.setdefault(off, set()).add(("u", op.size))
+        for off in soft4:
+            if 2 not in reads.get(off, set()):
+                reads.setdefault(off, set()).add(4)
         if self.ret_slot is not None and self.ret_slot in wide16 and self.ret_type == "int" \
                 and not os.environ.get("LIFT_NOSHORTRET"):
             # a 16-bit value stored whole into the return variable: a short function (its
@@ -639,6 +666,17 @@ class Func:
             raise Unsupported("stack parameter [ebp+%d]" % disp)
         fx = fixup_at(ins, ins.disp_offset) if ins.disp_size == 4 else None
         parts = []
+        dd = doubled_twice(self.reg(base, ins).text) if fx is not None and base and \
+            not index and size == 2 and not os.environ.get("LIFT_NOGARRIDX") else None
+        if dd is not None:
+            # g + (i * 2) * 2 read as a word: an element of a global array of 2-short
+            # structs, ((short *)g)[i * 2 + 1] (written relative to the field before, so the
+            # compiler keeps the doubling as two adds); a choice point
+            self.choices.append(ins.address + 0.78125)
+            if ins.address + 0.78125 not in self.flips:
+                g = sym(fx.target_va - 2)
+                self.globals.add(g)
+                return "((short *)%s)[%s * 2 + 1]" % (g, dd)
         if fx is not None:
             g = sym(fx.target_va)
             self.globals.add(g)
@@ -749,6 +787,15 @@ class Func:
                 # an in-place ++/-- done while the expression was being evaluated: --x
                 lv = t if re.fullmatch(r"\w+", t) else "(%s)" % t
                 return E("%s%s" % (pre.pop(t), lv), op.size, atom=False)
+            if self.side and len(self.side) == 1 and off_ is not None and \
+                    self.side[0].startswith(t + " = ") and self.store_read_pairs(off_) \
+                    and os.environ.get("DAGGER_CC") == "w10" and not os.environ.get("LIFT_KEEPSPILL"):
+                # (x = a, x) on a slot used nowhere else: the compiler's own spill of a
+                # (Watcom 10.0a spills an argument it evaluated before a call): just a
+                v = self.side[0][len(t) + 3:]
+                self.side = []
+                self.temps.add(off_)
+                return E("(%s)" % v, op.size, atom=True)
             if self.side:
                 # the stores of an enclosing expression come first: (x = a, x <<= 2, x)
                 text = "(%s, %s)" % (", ".join(self.side), t)
@@ -836,6 +883,21 @@ class Func:
         register on the left. The batch driver (tools/lift_all.py) flips choice points near
         a mismatch and keeps what helps."""
         first, second = (b, a) if getattr(b, "born", k0) < getattr(a, "born", k0) else (a, b)
+        if kids(first.text) <= kids(second.text) and not os.environ.get("LIFT_NOPADFIRST"):
+            # the smaller operand computed first: it had more nodes in the source than its
+            # code shows, a no-op the code generator folds only after choosing the order
+            # (`(g & 128 & 255) | (x - 139) / 7`, `(int)(unsigned)(a & 128) | b / 7`)
+            m = re.fullmatch(r"\(int\)\(unsigned char\)\((.*)\)", first.text)
+            if m and kids(m.group(1)) == kids(first.text) - 2:
+                pad = E("(int)(unsigned char)(%s & 255)" % m.group(1), first.size)
+            elif first.size == 4:
+                pad = E("(int)(unsigned)%s" % first.p(), 4)
+            else:
+                pad = None
+            if pad is not None:
+                self.choices.append(ins.address + 0.28125)
+                if ins.address + 0.28125 in self.flips:
+                    return pad, second
         if kids(first.text) <= kids(second.text) and not os.environ.get("LIFT_ONLYAMBIG"):
             # the tree-size estimate can be off: the other order is a choice point too
             self.choices.append(ins.address)
@@ -895,6 +957,8 @@ class Func:
                         for v in sw["cases"].get(ins.address, []):
                             self.out.append("case %d:" % v)
                     if sw.get("default") == ins.address:
+                        for v in sw.get("explicit", []):
+                            self.out.append("case %d:" % v)
                         self.out.append("default:")
                 self.out.append("L%X:;" % ins.address)
                 self.regs = {}
@@ -1004,6 +1068,16 @@ class Func:
                 return "%s %s 0" % (a.p(), opr)
             return "(%s & %s) %s 0" % (a.p(), b.p(), opr)
         raise Unsupported("jcc on arithmetic flags")
+
+    def store_read_pairs(self, off):
+        """Is every access of slot `off` a store whose next access reads it once?"""
+        acc = []
+        for x in self.body:
+            for n, o in enumerate(x.operands):
+                if ebp_slot(x, o) == off:
+                    acc.append("w" if n == 0 and x.mnemonic == "mov" else "r")
+        return bool(acc) and len(acc) % 2 == 0 and \
+            all(acc[k] == "w" and acc[k + 1] == "r" for k in range(0, len(acc), 2))
 
     def params_offs(self):
         return {p[1] for p in self.params}
@@ -1242,6 +1316,28 @@ class Func:
                 self.uses_fpseg = True
             nx = self.body[self.k + 1] if self.k + 1 < len(self.body) else None
             off_ = ebp_slot(ins, d)
+            if off_ is not None and s.type == cx.X86_OP_IMM and d.size == 4 and \
+                    nx is not None and nx.mnemonic == "mov" and len(nx.operands) == 2 and \
+                    nx.operands[0].type == cx.X86_OP_REG and \
+                    ebp_slot(nx, nx.operands[1]) == off_ and \
+                    fixup_at(ins, ins.imm_offset) is None and self.store_read_pairs(off_) \
+                    and (os.environ.get("DAGGER_CC") == "w10" or os.environ.get("LIFT_ABSTEMP")):
+                # mov [t],0x46c; mov eax,[t]; mov eax,[eax]: *(int *)0x46c, the address in a
+                # temp of the compiler's own (Watcom 10.0a -d2 makes one)
+                self.temps.add(off_)
+                self.slot_val[off_] = E(str(s.imm), 4, atom=True)
+                return
+            if off_ is not None and d.size == 4 and os.environ.get("DAGGER_CC") == "w10" and \
+                    re.fullmatch(r"-?\d+|(?:\(int\))?D_[0-9A-F]{8}", v.text) and \
+                    self.store_read_pairs(off_):
+                # a constant or a global's address stored once and read once: an argument
+                # Watcom 10.0a parked in a temp of its own while it evaluated another (the
+                # register it goes in was needed): f(g(a / 5, D_190FE4, 10)) (a choice)
+                self.choices.append(ins.address + 0.34375)
+                if ins.address + 0.34375 not in self.flips:
+                    self.temps.add(off_)
+                    self.slot_val[off_] = v
+                    return
             if nx is not None and nx.mnemonic == "fild" and off_ is not None and \
                     re.sub(r"^\w+ ptr ", "", nx.op_str) == \
                     re.sub(r"^\w+ ptr ", "", ins.op_str.split(", ")[0]) and d.size == 4 and \
@@ -1365,6 +1461,14 @@ class Func:
                 self.set_reg(full, E("%s & 255" % v.p(), 2))
                 return
             # byte zero-extended to 16 bits: mov al,[x]; xor ah,ah
+            mb = re.fullmatch(r"\*\((?:signed |unsigned )?char \*\)(.+)", v.text)
+            if mb and v.atom and not os.environ.get("LIFT_NOIMPBYTE"):
+                # or the read as unsigned char, promoted (a smaller tree): a choice point
+                self.choices.append(ins.address + 0.5625)
+                if ins.address + 0.5625 in self.flips:
+                    self.set_reg(full, E("(short)*(unsigned char *)" + mb.group(1), 2,
+                                         atom=True))
+                    return
             self.set_reg(full, E("(unsigned short)(unsigned char)" + v.p(), 2))
             return
         if m in ("and", "or", "xor", "add", "sub") and ops[0].type == cx.X86_OP_REG and \
@@ -1612,7 +1716,17 @@ class Func:
                         self.set_reg(full, v)
                         self.flags = ("val", v, None)
                         return
-                if m in ("add", "imul", "and", "or", "xor") and s.type == cx.X86_OP_REG and \
+                if m == "add" and s.type == cx.X86_OP_REG and \
+                        not os.environ.get("LIFT_NOADDRORDER") and \
+                        (re.fullmatch(r"\(int\)D_[0-9A-F]+", a.text) or
+                         re.fullmatch(r"\(int\)D_[0-9A-F]+", b.text)) and \
+                        not (CONST_RE.fullmatch(a.text) and CONST_RE.fullmatch(b.text)):
+                    # a global's address plus an index: either order (a choice point; the
+                    # address is loaded last either way)
+                    self.choices.append(ins.address + 0.09375)
+                    if ins.address + 0.09375 in self.flips:
+                        a, b = b, a
+                elif m in ("add", "imul", "and", "or", "xor") and s.type == cx.X86_OP_REG and \
                         not CONST_RE.fullmatch(a.text) and not CONST_RE.fullmatch(b.text) and \
                         ("func_" not in a.text + b.text or
                          ("func_" in a.text and "func_" in b.text and
@@ -1766,6 +1880,29 @@ class Func:
                 # a bit test doesn't care about sign; unsigned keeps it `test byte ptr [x], K`
                 a = E(a.text.replace("*(signed char *)", "*(unsigned char *)", 1)
                       .replace("*(short *)", "*(unsigned short *)", 1), a.size, a.atom)
+            if m == "test" and ops[0].type == cx.X86_OP_MEM and ops[0].size == 1 and \
+                    ops[1].type == cx.X86_OP_IMM and ebp_slot(ins, ops[0]) is None and \
+                    not (ops[0].mem.base and ins.reg_name(ops[0].mem.base) == "ebp") and \
+                    not os.environ.get("LIFT_NOBFTEST"):
+                k_ = ops[1].imm & 0xFF
+                lo_ = (k_ & -k_).bit_length() - 1 if k_ else 0
+                ln_ = (k_ >> lo_).bit_length() if k_ else 0
+                if k_ and (k_ >> lo_) == (1 << ln_) - 1:
+                    # test byte ptr [x],K on contiguous bits: a bit-field of x (Watcom
+                    # 10 tests a mask written as x & K through a register); a choice point
+                    self.choices.append(ins.address + 0.46875)
+                    if (ins.address + 0.46875 in self.flips) == bool(os.environ.get("LIFT_NOBFTESTDFLT")):
+                        bf = self.bitfield8(a, lo_, ln_)
+                        if bf is not None:
+                            self.flags = ("test", bf, bf)
+                            return
+            if m == "test" and ops[0].type == cx.X86_OP_MEM and ops[1].type == cx.X86_OP_REG \
+                    and not os.environ.get("LIFT_NOTESTSWAP"):
+                # test [y], reg: y (the bigger tree, its address computed first) is the right
+                # operand of x & y; a choice point
+                self.choices.append(ins.address + 0.40625)
+                if ins.address + 0.40625 not in self.flips:
+                    a, b = b, a
             self.flags = (m, a, b)
             nx = self.body[self.k + 1] if self.k + 1 < len(self.body) else None
             if nx is not None and not nx.mnemonic.startswith(("j", "set", "adc", "sbb", "cmov")) \
@@ -1834,6 +1971,20 @@ class Func:
             elif sig is not None:
                 nreg, nstack = min(4, len(sig[1])), max(0, len(sig[1]) - 4)
                 self.calls.add(name)
+                if len(sig[1]) < 4 and not self.pushes and \
+                        not os.environ.get("LIFT_NOEXTRAARGS"):
+                    # more argument registers loaded than the callee takes, and not kept
+                    # for later: called without its prototype, with extra arguments
+                    extra = nreg
+                    while extra < 4 and PARM_REGS[extra] in loaded and \
+                            not self.live_later(PARM_REGS[extra]):
+                        extra += 1
+                    if extra > nreg and all(r in loaded for r in PARM_REGS[:nreg]):
+                        # (a choice point)
+                        self.choices.append(ins.address + 0.71875)
+                        if ins.address + 0.71875 in self.flips:
+                            self.noproto.add(name)
+                            nreg = extra
                 if any(t != "int" for t in sig[1]) and not os.environ.get("LIFT_NONOPROTO"):
                     # no prototype in scope at the call (arguments passed as ints): a
                     # choice point for the function's calls of it
@@ -1907,9 +2058,18 @@ class Func:
             if far:
                 # a far pointer argument: offset and selector in a pair of registers
                 nreg = max(nreg, far[-1] + 1)
+            order = list(range(nreg))
+            if far == [3] and nreg == 4 and "edx" in self.regs and \
+                    not os.environ.get("LIFT_NOFARSECOND"):
+                # a far pointer in ebx:ecx with an int in edx: the far pointer is the second
+                # argument (Watcom gives it the ebx:ecx pair, the third goes in edx); a
+                # choice point
+                self.choices.append(ins.address + 0.21875)
+                if ins.address + 0.21875 not in self.flips:
+                    order = [0, 2, 3, 1]
             k = 0
             while k < nreg:
-                r = PARM_REGS[k]
+                r = PARM_REGS[order[k]]
                 if r not in self.regs:
                     if k >= 1 and sig is not None and not self.pushes and \
                             not os.environ.get("LIFT_NOSHORTCALL"):
@@ -1921,7 +2081,7 @@ class Func:
                     raise Unsupported("call argument %s not loaded" % r)
                 if self.regs[r] is self.pending:
                     self.pending = None              # nested call: f(g(x))
-                if k + 1 in far:
+                if order[k] + 1 in far:
                     args.append("(void __far *)(void *)%s" % self.regs[r].p())
                     self.farcalls.add(name)
                     k += 2
@@ -2286,9 +2446,10 @@ class Func:
             return yes, no
 
         leaves, nodes = [], set()
-        todo = [(start, [(lo, hi)], True)]
+        direct = []         # leaves a compare's jump goes to straight (not through a jmp)
+        todo = [(start, [(lo, hi)], True, None)]
         while todo:
-            a, ivs, fall = todo.pop()
+            a, ivs, fall, via = todo.pop()
             if not ivs:
                 continue
             if len(nodes) > 4000:
@@ -2296,16 +2457,18 @@ class Func:
             n = node(a, fall)
             if n is None:
                 leaves.append((a, ivs))
+                if via == "jcc":
+                    direct.append((a, ivs))
                 continue
             nodes.update(n[-1])
             if n[0] == "cmp":
                 v = val(n[1])
                 for m, x in n[2]:
                     yes, ivs = cut(ivs, JCC[m][0], v)
-                    todo.append((x, yes, False))
-                todo.append((n[3], ivs, True))
+                    todo.append((x, yes, False, "jcc"))
+                todo.append((n[3], ivs, True, None))
             elif n[0] == "jmp":
-                todo.append((n[1], ivs, False))
+                todo.append((n[1], ivs, False, "jmp"))
             elif n[0] == "scan":
                 sc = n[1]
                 tsw = self.switches[sc["jmp"]]
@@ -2345,13 +2508,34 @@ class Func:
         # jumps a compare goes to inside the tree's own stretch of code are the tree's stubs
         # (`jb L; ... L: jmp case`), not case bodies
         hi = max(nodes) if nodes else start
+        run_end = limit
+        if run_end is None and not os.environ.get("LIFT_NORUNEND"):
+            # the tree's own stretch: its compares and jumps, up to the first other code
+            x = start
+            while x in by_addr and (by_addr[x].mnemonic in JCC or by_addr[x].mnemonic == "jmp"
+                                    or (by_addr[x].mnemonic == "cmp" and
+                                        frame_slot(by_addr[x], by_addr[x].operands[0]) == t)):
+                x = nxt.get(x)
+            run_end = x
         more = {a for a, _ in leaves if a not in stubs and
-                (prev.get(a) in nodes or start < a < max(hi, limit or 0)) and
+                (prev.get(a) in nodes or start < a < max(hi, run_end or 0)) and
                 by_addr[a].mnemonic == "jmp" and by_addr[a].operands[0].type == cx.X86_OP_IMM}
         if more and len(stubs) < 64:
             return self.parse_ctree(start, t, w, by_addr, nxt, stubs | more, limit)
         self.cskip |= nodes
+        # values a compare sends straight to the default's code: explicit cases there
+        # (`case 10: case 11: break;`), which shape the compiler's tree
+        explicit = sorted(v for a, ivs in direct if a == dflt for x, y in ivs
+                          if y - x <= 64 and y != hi
+                          for v in range(x, y + 1)) \
+            if not os.environ.get("LIFT_NOEXPLICIT") else []
+        if explicit:
+            # (a choice point: by default they are the default's)
+            self.choices.append(start + 0.84375)
+            if start + 0.84375 not in self.flips:
+                explicit = []
         return {"cases": cases, "default": dflt, "width": w, "signed": signed,
+                "explicit": explicit,
                 "has_table": any(n is not None and n[0] in ("table", "scan")
                                  for n in (node(a) for a in nodes)),
                 "entries": sorted(cases), "nodes": nodes}
@@ -2544,6 +2728,12 @@ class Func:
                     ins.mnemonic.startswith("j"):
                 return False
             reads, writes = ins.regs_access()
+            if ins.mnemonic in ("xor", "sub") and len(ins.operands) == 2 and \
+                    ins.operands[0].type == cx.X86_OP_REG and \
+                    ins.operands[1].type == cx.X86_OP_REG and \
+                    ins.operands[0].reg == ins.operands[1].reg and \
+                    not os.environ.get("LIFT_XORREADS"):
+                reads = ()      # (xor r,r only writes r)
             if any(SUB.get(ins.reg_name(x), (None,))[0] == reg for x in reads):
                 return True
             if any(SUB.get(ins.reg_name(x), (None,))[0] == reg for x in writes):
@@ -2805,6 +2995,32 @@ class Func:
             rmw.add(out[i])
             self.temps.add(int(mm.group(2)[2:], 16))
             body = "\n".join(out)
+        # ... or through a pointer variable set just before a diamond computing the value
+        i = 0
+        while i < len(out) and not os.environ.get("LIFT_NORMWTEMP2"):
+            mm = re.fullmatch(r"    \*\((short|signed char) \*\)\(\(char \*\)(l_[0-9A-F]+)\) = "
+                              r"\(\(int\)\((unsigned short|short|unsigned char)\)\*\(\1 \*\)"
+                              r"\(\(char \*\)\2\)\) ([|&^+-]) (.*);", out[i])
+            i += 1
+            if not mm or uses(mm.group(2)) != 3:
+                continue
+            j = i - 2
+            while j >= 0 and j > i - 10 and (re.fullmatch(r"L[0-9A-F]+:;", out[j]) or
+                                              out[j].startswith(("    if (", "    goto ")) or
+                                              re.fullmatch(r"    l_[0-9A-F]+ = -?\d+;", out[j])):
+                j -= 1
+            ma = re.fullmatch(r"    %s = (l_[0-9A-F]+|a\d+) \+ (\d+);" % mm.group(2), out[j]) \
+                if j >= 0 else None
+            if not ma:
+                continue
+            ty = mm.group(3)
+            out[i - 1] = "    *(%s *)((char *)%s + %s) %s= %s;" % (
+                ty, ma.group(1), ma.group(2), mm.group(4), mm.group(5))
+            rmw.add(out[i - 1])
+            self.temps.add(int(mm.group(2)[2:], 16))
+            del out[j]
+            i -= 1
+            body = "\n".join(out)
 
         changed = True
         while changed:
@@ -2937,9 +3153,10 @@ class Func:
             ps.append("%s a%d" % (self.stack_type[k], self.stack_base + k))
         # The slot rule (docs/progress.md) gives slots top down: 2-byte locals, the return
         # variable, other locals last to first; so declare locals deepest first.
+        # (LIFT_DECLTOP=1: declare top down, the real Watcom 10.0a order without -d2)
         locals_ = sorted((o for o in set(self.slot_type) | set(self.arrays)
                           if o not in [p[1] for p in self.params] and o not in self.temps),
-                         reverse=True)
+                         reverse=not os.environ.get("LIFT_DECLTOP"))
         two = [o for o in locals_ if o in self.slot_type and self.size_of[self.slot_type[o]] == 2]
         rest = [o for o in locals_ if o not in two]
         if two and rest and max(two) > min(rest) and \
@@ -3007,7 +3224,8 @@ class Func:
                     d -= 1
         closers = []
         for sw in reversed(self.sw_stack):
-            closers.append((["default:;"] if sw.get("default") == "END" else []) + ["}"])
+            closers.append((["case %d:" % v for v in sw.get("explicit", [])] + ["default:;"]
+                            if sw.get("default") == "END" else []) + ["}"])
         decl_lines = [self.decl_line(o, two) for o in outer]
         if early:
             decl_lines += ["{"] + [self.decl_line(o, two) for o in early]
@@ -3152,7 +3370,8 @@ FUNC_OPTS = ["KKND_CONFREV", "DAGGER_LEFTPREF", "DAGGER_CHARAUTOSMALL", "DAGGER_
              "DAGGER_NOSAVES", "DAGGER_REGLAST", "DAGGER_NOGIVEN", "DAGGER_CONFLIST",
              "DAGGER_CONFLISTREV", "DAGGER_KEEPSUB", "DAGGER_NODEMOTE",
              "DAGGER_NOCVTDEMOTE", "DAGGER_DEADDEFMEM", "DAGGER_CONFPOS", "DAGGER_CONFPOSREV", "DAGGER_RIGHTPREF",
-             "DAGGER_IDXKEEP"]
+             "DAGGER_IDXKEEP", "DAGGER_SEXTCONST", "DAGGER_CALLFIRST",
+             "DAGGER_PTRSWAP"]
 IMPLICIT = bool(os.environ.get("LIFT_IMPLICIT"))
 
 
@@ -3160,6 +3379,30 @@ def loaded_ptr_k(e):
     """`*(int *)p + k`: a dword read plus a constant, perhaps a pointer and an offset."""
     mm = re.fullmatch(r"\*\(int \*\)(\w+|\((?:[^()]|\([^()]*\))*\)) \+ (\d+)", e.text)
     return (mm.group(1), mm.group(2)) if mm else None
+
+
+def unparen(t):
+    """t without one pair of enclosing parentheses, if they enclose all of it."""
+    if t.startswith("(") and t.endswith(")"):
+        depth = 0
+        for k, ch in enumerate(t):
+            depth += ch == "("
+            depth -= ch == ")"
+            if depth == 0 and k < len(t) - 1:
+                return t
+        return t[1:-1]
+    return t
+
+
+def doubled_twice(t):
+    """`(x * 2) * 2`: x (an atom-ish expression, parenthesized), else None."""
+    t = unparen(t)
+    if not t.endswith(" * 2"):
+        return None
+    t = unparen(t[:-4])
+    if not t.endswith(" * 2"):
+        return None
+    return t[:-4]
 
 
 def split_sum(text):

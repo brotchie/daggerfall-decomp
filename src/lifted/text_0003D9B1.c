@@ -14,10 +14,10 @@ extern void func_0004633F(int, int);
 int func_0003D9B1(int a1, short a2, int a3, int a4, int a5)
 {
     int l_30;
-    int l_24;
-    int l_1C;
     int l_10;
     int l_C;
+    short l_24;
+    short l_1C;
     short l_18;
     unsigned short l_14;
 
@@ -50,62 +50,62 @@ L3DA7D:;
 L3DA88:;
     l_10 = 0;
     l_C = l_10;
-    l_24 = 0;
-    l_1C = 0;
+    *(int *)&l_24 = 0;
+    *(int *)&l_1C = 0;
     *(int *)&l_18 = 0;
     l_30 = a4;
-    l_1C += 2;
+    *(int *)&l_1C += 2;
 L3DAB4:;
     if (l_18 != 0) goto L3DCB8;
-    switch (*(unsigned char *)((char *)(((int)(short)l_24++) + a5))) {
+    switch (*(unsigned char *)((char *)(((int)(short)(*(int *)&l_24)++) + a5))) {
 case 0:
     *(signed char *)((char *)l_30) = 252;
-    *(signed char *)((char *)(((int)(short)l_1C++) + l_30)) = 0;
-    *(signed char *)((char *)(((int)(short)*(short *)&l_1C) + l_30)) = 0;
+    *(signed char *)((char *)(((int)(short)(*(int *)&l_1C)++) + l_30)) = 0;
+    *(signed char *)((char *)(((int)(short)l_1C) + l_30)) = 0;
     *(int *)&l_18 = 1;
     l_10 = 0;
     goto L3DCB3;
 case 253:
     *(signed char *)((char *)l_30) = 253;
-    *(signed char *)((char *)(((int)(short)l_1C++) + l_30)) = 0;
-    l_30 += (int)(short)*(short *)&l_1C;
-    l_1C = 2;
+    *(signed char *)((char *)(((int)(short)(*(int *)&l_1C)++) + l_30)) = 0;
+    l_30 += (int)(short)l_1C;
+    *(int *)&l_1C = 2;
     l_10 = 0;
-    if (*(signed char *)((char *)(((int)(short)*(short *)&l_24) + a5)) != 0) goto L3DB93;
-    *(signed char *)((char *)(((int)(short)*(short *)&l_1C) + l_30) - 2) = 0;
+    if (*(signed char *)((char *)(((int)(short)l_24) + a5)) != 0) goto L3DB93;
+    *(signed char *)((char *)(((int)(short)l_1C) + l_30) - 2) = 0;
     *(int *)&l_18 = 1;
 L3DB93:;
     goto L3DCB3;
 case 252:
     *(signed char *)((char *)l_30) = 252;
-    *(signed char *)((char *)(((int)(short)l_1C++) + l_30)) = 0;
-    l_30 += (int)(short)*(short *)&l_1C;
-    l_1C = 2;
+    *(signed char *)((char *)(((int)(short)(*(int *)&l_1C)++) + l_30)) = 0;
+    l_30 += (int)(short)l_1C;
+    *(int *)&l_1C = 2;
     l_10 = 0;
     goto L3DCB3;
 case 251:
-    *(signed char *)((char *)(((int)(short)l_1C++) + l_30)) = 251;
-    *(signed char *)((char *)(((int)(short)l_1C++) + l_30)) = *(signed char *)((char *)(((int)(short)l_24++) + a5));
+    *(signed char *)((char *)(((int)(short)(*(int *)&l_1C)++) + l_30)) = 251;
+    *(signed char *)((char *)(((int)(short)(*(int *)&l_1C)++) + l_30)) = *(signed char *)((char *)(((int)(short)(*(int *)&l_24)++) + a5));
     goto L3DCB3;
 case 250:
-    *(signed char *)((char *)(((int)(short)l_1C++) + l_30)) = 250;
-    *(signed char *)((char *)(((int)(short)l_1C++) + l_30)) = *(signed char *)((char *)(((int)(short)l_24++) + a5));
+    *(signed char *)((char *)(((int)(short)(*(int *)&l_1C)++) + l_30)) = 250;
+    *(signed char *)((char *)(((int)(short)(*(int *)&l_1C)++) + l_30)) = *(signed char *)((char *)(((int)(short)(*(int *)&l_24)++) + a5));
     goto L3DCB3;
 case 249:
-    *(signed char *)((char *)(((int)(short)l_1C++) + l_30)) = 249;
-    *(signed char *)((char *)(((int)(short)l_1C++) + l_30)) = *(signed char *)((char *)(((int)(short)l_24++) + a5));
+    *(signed char *)((char *)(((int)(short)(*(int *)&l_1C)++) + l_30)) = 249;
+    *(signed char *)((char *)(((int)(short)(*(int *)&l_1C)++) + l_30)) = *(signed char *)((char *)(((int)(short)(*(int *)&l_24)++) + a5));
     goto L3DCB3;
 case 248:
-    *(signed char *)((char *)(((int)(short)l_1C++) + l_30)) = 248;
+    *(signed char *)((char *)(((int)(short)(*(int *)&l_1C)++) + l_30)) = 248;
     goto L3DCB3;
 default:
-    *(signed char *)((char *)(((int)(short)l_1C++) + l_30)) = *(signed char *)((char *)(((int)(short)*(short *)&l_24) + a5) - 1);
-    l_10 += func_0005A442((int)(unsigned char)*(signed char *)((char *)(((int)(short)*(short *)&l_24) + a5) - 1));
+    *(signed char *)((char *)(((int)(short)(*(int *)&l_1C)++) + l_30)) = *(signed char *)((char *)(((int)(short)l_24) + a5) - 1);
+    l_10 += func_0005A442((int)(unsigned char)*(signed char *)((char *)(((int)(short)l_24) + a5) - 1));
     if ((short)(short)l_10 <= a2) goto L3DCB3;
-    *(signed char *)((char *)(((int)(short)l_1C++) + l_30)) = 0;
+    *(signed char *)((char *)(((int)(short)(*(int *)&l_1C)++) + l_30)) = 0;
     *(signed char *)((char *)l_30) = 252;
-    l_30 += (int)(short)*(short *)&l_1C;
-    l_1C = 2;
+    l_30 += (int)(short)l_1C;
+    *(int *)&l_1C = 2;
     l_10 = 0;
 L3DCB3:;
     goto L3DAB4;
