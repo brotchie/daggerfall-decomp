@@ -75,6 +75,7 @@ extern void func_000292C5(int, int);
 extern void func_000295BE(int, int);
 extern void func_00029670(int, int);
 extern void func_0002BD1E(int);
+extern void func_0002C4FA(int);
 extern void func_0002C5ED(int, int, int);
 extern void func_0002CB34(int, int, int);
 extern void func_0003009A(int, int);
@@ -120,8 +121,6 @@ extern void func_000922F6(int, int, int);
 extern void func_0009B2E2(int);
 int func_0002CC40(int, int);
 void func_0002C0A8(int);
-void func_0002C4FA(int);
-void func_0002CAB0(int);
 void func_0002CD0C(int, int);
 void func_0002CDD5(int, int);
 #pragma aux func_000A0ED9 parm routine [];
@@ -1422,50 +1421,6 @@ L2C4DC:;
     goto L2C429;
 L2C4E7:;
     return *(int *)&l_1C;
-}
-
-void func_0002C4FA(int a1)
-{
-    int l_1C;
-    int l_18;
-
-    l_18 = func_000309E8(a1, 6);
-    l_1C = 0;
-L2C522:;
-    if (((int)(short)*(short *)((char *)a1 + 28)) > l_1C) goto L2C53F;
-    return;
-L2C530:;
-    l_1C++;
-    (*(char (**)[33])&l_18)++;
-    goto L2C522;
-L2C53F:;
-    if (((int)(short)(*(short *)((char *)l_18 + 2) & 2)) == 0) goto L2C55F;
-    *(signed char *)((char *)l_18 + 2) &= 127;
-    func_0002CAB0(l_18);
-L2C55F:;
-    if (((int)(short)(*(short *)((char *)l_18 + 2) & 64)) == 0) goto L2C57D;
-    func_0002C5ED(a1, l_18, 0);
-L2C57D:;
-    goto L2C530;
-}
-
-void func_0002C589(void)
-{
-    int l_1C;
-    int l_18;
-
-    l_1C = func_000309E8(*(int *)D_00199764, 6);
-    l_18 = 0;
-L2C5B0:;
-    if (((int)(short)*(short *)(*(char **)D_00199764 + 28)) > l_18) goto L2C5CF;
-    return;
-L2C5C0:;
-    l_18++;
-    (*(char (**)[33])&l_1C)++;
-    goto L2C5B0;
-L2C5CF:;
-    func_0002C5ED(*(int *)D_00199764, l_1C, 1);
-    goto L2C5C0;
 }
 
 int func_0002C96B(int a1, int a2, short a3)

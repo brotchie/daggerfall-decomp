@@ -85,7 +85,6 @@ extern void func_0007F87E(void);
 extern void func_00082487(void);
 extern void func_000876AD(int, int, int, int);
 extern void func_000891E6(int);
-extern void func_0008A550(int, int, int);
 extern void func_0008E3F7(int, int);
 extern void func_00094E25(void);
 extern void func_00094F31(void);
@@ -690,37 +689,6 @@ int func_0008A448(int a1, int a2, int a3)
 int func_0008A46F(int a1, int a2, int a3)
 {
     return 0;
-}
-
-int func_0008A496(int a1, int a2, int a3)
-{
-    return 0;
-}
-
-int func_0008A4BD(int a1, int a2, int a3)
-{
-    return 0;
-}
-
-void func_0008A4E4(int a1)
-{
-    int l_1C;
-    int l_18;
-
-    l_1C = a1 + 71;
-    l_18 = 0;
-L8A505:;
-    if (l_18 < 3) goto L8A515;
-    goto L8A53E;
-L8A50D:;
-    l_18++;
-    goto L8A505;
-L8A515:;
-    if (((int)(unsigned char)*(signed char *)((char *)((l_18 * 2) + l_1C))) == 255) goto L8A50D;
-    func_0008A550(l_1C, l_18, *(int *)((char *)a1 + 67));
-    goto L8A50D;
-L8A53E:;
-    func_0008DA91(a1);
 }
 
 int func_0008A858(int a1, int a2, int a3)
