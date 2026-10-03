@@ -272,7 +272,8 @@ def prepare_overlay(game, overlay):
     cfg = os.path.join(overlay, "Z.CFG")
     if not os.path.exists(cfg):
         with open(cfg, "wb") as f:
-            f.write(Z_CFG)
+            # FALLEMU_CHEAT=1: the game's own cheat mode (read once, at boot)
+            f.write(Z_CFG + (b"cheatmode 1\r\n" if os.environ.get("FALLEMU_CHEAT") else b""))
     arena2 = os.listdir(os.path.join(game, "ARENA2"))
     need = [n for n in ("ARCH3D.BSA", "DAGGER.SND")
             if n not in (x.upper() for x in arena2) and
@@ -1258,6 +1259,9 @@ for _k, _c in zip("zxcvbnm", range(0x2C, 0x33)):
     SCAN[_k] = _c
 for _n in range(1, 11):
     SCAN["f%d" % _n] = 0x3A + _n
+SCAN.update({"f11": 0x57, "f12": 0x58, "[": 0x1A, "]": 0x1B, ";": 0x27, "'": 0x28, "`": 0x29,
+             "\\": 0x2B, ",": 0x33, ".": 0x34, "/": 0x35, "kp+": 0x4E, "kp-": 0x4A,
+             "kp*": 0x37, "capslock": 0x3A, "numlock": 0x45, "scrolllock": 0x46})
 
 
 def parse_script(text):
