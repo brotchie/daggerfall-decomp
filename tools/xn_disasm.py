@@ -10,21 +10,22 @@ that reassemble to the original bytes and fixups (checked by tools/xn_link.py).
      instruction (a patch field of the self-modifying code) is written `label + k`. Targets in
      other objects, or in another module, are externs func_X / D_X, which the build resolves by
      address.
-  3. Modules: object 2 is cut at 0x100-aligned addresses that follow zero padding, and a
-     module longer than 64K wherever it splits no instruction, field or short jump (WASM 10.0a
-     wraps segment offsets at 64K) (config/xngine_modules.csv; --split rewrites it).
-  4. Text: each instruction is capstone's, turned into MASM syntax; a register-to-register
-     ALU op or mov in the `reg, r/m` form is the matching src/xngine/xngine.inc macro
-     (`mov@ edi, esi`), since WASM writes the other form. Plain data bytes become
-     B_<address>_<length> blobs that the build fills from the original (no game bytes in the
-     repo); zero runs are `db n dup (0)`; pointers are `dd symbol`.
-  5. Encodings: Watcom 10.0a's WASM assembles every module (tools/xn_link.py, under DOSBox-X,
-     all modules of a round at once). A probe pass assembles each with an `org` back to the
+  3. Modules: object 2 is cut at 0x100-aligned addresses that follow zero padding
+     (config/xngine_modules.csv; --split rewrites it).
+  4. Text: each instruction is capstone's, turned into TASM's MASM-mode syntax, written the
+     way XnGine's authors evidently wrote it for TASM 4.0 with JUMPS: short forward jumps say
+     `short`, other jumps say nothing and TASM sizes them, a short jump followed by the NOPs
+     TASM pads with is a plain jump (TASM writes the NOPs), and loop $+4 / jmp short $+7 /
+     jmp near X is `loop X`. Plain data bytes become B_<address>_<length> blobs that the build
+     fills from the original (no game bytes in the repo); zero runs are `db n dup (0)`;
+     pointers are `dd symbol`.
+  5. Encodings: TASM 4.0 assembles every module (tools/xn_link.py, under DOSBox-X, all
+     modules of a round at once). A probe pass assembles each with an `org` back to the
      original offset after each instruction, so a mis-encoded instruction cannot shift the rest.
-     Each one whose bytes differ, or that WASM rejects, is written as `db` bytes with its symbol
+     Each one whose bytes differ, or that TASM rejects, is written as `db` bytes with its symbol
      fields as `dd` expressions from then on, and the pass repeats until nothing changes. The
-     final files have no `org`s and are checked whole; where WASM then sizes a forward jump
-     differently, that jump is written as bytes too.
+     final files have no `org`s and are checked whole; an instruction that then comes out a
+     different length is written as bytes too.
 
 usage: xn_disasm.py [--split] [module ...]
 """
@@ -51,10 +52,7 @@ STRING_OPS = {"movsb", "movsw", "movsd", "stosb", "stosw", "stosd", "lodsb", "lo
               "insd", "outsb", "outsw", "outsd"}
 SEG_PREFIXES = {0x26, 0x2E, 0x36, 0x3E, 0x64, 0x65}
 MNEMONIC = {"pushal": "pushad", "popal": "popad"}
-# reg, reg in the `reg, r/m` form (direction bit set), which WASM 10.0a does not write: the
-# mov@/add@/... macros of src/xngine/xngine.inc
-RR_FORMS = {0x02, 0x03, 0x0A, 0x0B, 0x12, 0x13, 0x1A, 0x1B, 0x22, 0x23, 0x2A, 0x2B, 0x32, 0x33,
-            0x3A, 0x3B, 0x8A, 0x8B}
+LOOPS = ("loop", "loope", "loopne", "jecxz", "jcxz")
 
 
 def h(v):
@@ -380,31 +378,7 @@ class Analysis:
             if a in self.insns or a in targets or self.img.raw[a - self.lo]:
                 cuts.append(a)
         cuts.append(self.hi)
-        # WASM 10.0a writes 16-bit LEDATA offsets, so a segment past 64K wraps: cut longer modules
-        # at the last 0x100-aligned point under 64K that splits no instruction, fixup field or
-        # short jump
-        short = []
-        for a, i in self.insns.items():
-            b = bytes(i.bytes)
-            if i.size == 2 and (b[0] == 0xEB or 0x70 <= b[0] <= 0x7F or 0xE0 <= b[0] <= 0xE3):
-                t = a + 2 + (b[1] - 256 if b[1] & 0x80 else b[1])
-                short.append((min(a, t), max(a, t)))
-
-        def can_cut(a):
-            if a in self.covered and self.covered[a] != a:
-                return False
-            if a in self.field_bytes and self.field_bytes[a] != a:
-                return False
-            return not any(lo < a <= hi for lo, hi in short)
-        out = [cuts[0]]
-        for e in cuts[1:]:
-            while e - out[-1] > 0x10000:
-                a = out[-1] + 0x10000 & ~0xFF
-                while not can_cut(a):
-                    a -= 0x100
-                out.append(a)
-            out.append(e)
-        return [("xn_%05X" % s, s, e) for s, e in zip(out, out[1:])]
+        return [("xn_%05X" % s, s, e) for s, e in zip(cuts, cuts[1:])]
 
 
 class Module:
@@ -414,6 +388,8 @@ class Module:
         self.externs = {}         # name -> kind
         self.labels = {}          # va -> name, positions in this module that need a label
         self.patch_equ = {}       # patch_X -> expression, for fields in other modules
+        self.padded = {}          # short jump va -> NOPs after it that TASM writes itself
+        self.stretched = {}       # loop va -> `loop target` that TASM stretches to 9 bytes
 
     def local_name(self, va):
         an = self.an
@@ -475,9 +451,13 @@ class Module:
             else:
                 break
         n = len(prefix_bytes)
-        if prefix_bytes in ([], [0x66]) and i.size == n + 2 and i.bytes[n] in RR_FORMS and \
-                i.bytes[n + 1] >= 0xC0:
-            return "%s@ %s" % (m, ops)
+        if m in ("xchg", "test") and i.size == n + 2 and i.bytes[n] in (0x84, 0x85, 0x86, 0x87) \
+                and i.bytes[n + 1] >= 0xC0:
+            # TASM puts the first operand in the reg field; capstone prints r/m first
+            rm, reg = ops.split(", ")
+            return "%s %s, %s" % (m, reg, rm)
+        if m == "iret" and prefix_bytes == [0x66]:
+            return "iretw"
         words = m.split()
         if words[-1] in STRING_OPS:
             if any(b in SEG_PREFIXES for b in prefix_bytes) or fields:
@@ -494,9 +474,13 @@ class Module:
             s = self.sym(t)
             if cx.X86_GRP_CALL in g:
                 return "call " + s
-            if m in ("loop", "loope", "loopne", "jecxz", "jcxz"):
-                return "%s %s" % (m, s)
-            return "%s %s %s" % (m, "short" if i.size == 2 else "near ptr", s)
+            if m in LOOPS:
+                if m.startswith("loop") and 0x67 in prefix_bytes:
+                    m += "w"            # counts in CX
+                return "%s short %s" % (m, s)
+            if i.size == 2 and i.address not in self.padded:
+                return "%s short %s" % (m, s)
+            return "%s %s" % (m, s)
         if any(an.fields[f].kind != SRC_OFF32 for f in fields):
             return None
         operands = ops.split(", ") if ops else []
@@ -642,6 +626,42 @@ class Module:
                 base = an.covered[f]
                 self.labels.setdefault(base, self.local_name(base))
         sorted_labels = sorted(self.labels)
+        # a short jump followed by the NOPs TASM leaves when a jump it reserved as near (6 bytes
+        # for jcc, 5 for jmp) turns out short: written without `short`, TASM pads it again
+        self.padded = {}
+        for a in range(self.start, self.end):
+            i = an.insns.get(a)
+            if i is None or i.size != 2 or branch_target(i) is None or i.bytes[0] not in \
+                    set(range(0x70, 0x80)) | {0xEB}:
+                continue
+            n = 3 if i.bytes[0] == 0xEB else 4
+            pad = range(a + 2, a + 2 + n)
+            if all(p in an.insns and bytes(an.insns[p].bytes) == b"\x90" and
+                   p not in self.labels and p not in an.patch_fields for p in pad) and \
+                    a + 2 + n <= self.end and not (a + 2 + n in an.insns and
+                                                   bytes(an.insns[a + 2 + n].bytes) == b"\x90"):
+                self.padded[a] = n
+        # `loop X` out of range: TASM's JUMPS writes loop $+4 / jmp short $+7 / jmp near X
+        refs = {fx.target_va for fx in an.img.fixups}
+        for a in range(self.start, self.end):
+            i = an.insns.get(a)
+            t = branch_target(i) if i is not None else None
+            if t is not None and not (i.size == 2 and i.bytes[1] == 2 and i.mnemonic in LOOPS):
+                refs.add(t)
+        self.stretched = {}
+        for a in range(self.start, self.end - 8):
+            i = an.insns.get(a)
+            if i is None or i.size != 2 or i.mnemonic not in LOOPS or i.bytes[1] != 2:
+                continue
+            j, k = an.insns.get(a + 2), an.insns.get(a + 4)
+            if j is None or k is None or bytes(j.bytes) != b"\xeb\x05" or k.size != 5 or \
+                    k.bytes[0] != 0xE9 or a + 2 in refs or a + 4 in refs or \
+                    any(self.start <= f < self.end and a < f < a + 9 for f in an.patch_fields) or \
+                    any(n in self.publics for n in (self.local_name(a + 2), self.local_name(a + 4))):
+                continue
+            jmp = self.text(k)
+            if jmp is not None and jmp.startswith("jmp "):
+                self.stretched[a] = "%s %s" % (i.mnemonic, jmp[4:])
         body, linemap = [], {}
         a = self.start
         while a < self.end:
@@ -652,6 +672,9 @@ class Module:
                 j = bisect.bisect_right(sorted_labels, a)
                 inner = j < len(sorted_labels) and sorted_labels[j] < a + i.size
                 s = None if a in fallback or inner else self.text(i)
+                skip = self.padded.get(a, 0) if s is not None else 0
+                if s is not None and a in self.stretched:
+                    s, skip = self.stretched[a], 7
                 if inner:
                     # a label inside the instruction (code that jumps into it): bytes with
                     # the labels between them
@@ -679,9 +702,10 @@ class Module:
                     if f in an.patch_fields:
                         body.append("patch_%06X equ %s+%d   ; rewritten at run time" % (
                             f, self.labels[a], f - a))
+                size = i.size + skip
                 if probe:
-                    body.append("    org %s" % h(a + i.size - self.start))
-                a += i.size
+                    body.append("    org %s" % h(a + size - self.start))
+                a += size
                 continue
             b = a + 1
             while b < self.end and b not in an.insns:
@@ -695,18 +719,19 @@ class Module:
             "; Generated by tools/xn_disasm.py; reassembles to the original (tools/xn_link.py).",
             "; B_<address>_<length> lines are data bytes the build takes from your FALL.EXE.",
             ".486p",
-            ".387",
-            "include xngine.inc",
+            ".487",
+            "JUMPS",
             "include %s.inc" % self.name,
         ]
         for n in sorted(self.publics):
             head.append("public %s" % n)
+        head += ["%s segment byte public use32 'CODE'" % seg,
+                 "    assume cs:%s, ds:%s, es:%s, ss:%s" % ((seg,) * 4)]
+        # inside the segment, so TASM takes them as 32-bit (outside, they get 16-bit addressing)
         for n in sorted(self.externs):
             head.append("extrn %s:%s" % (n, self.externs[n]))
         for n in sorted(self.patch_equ):
             head.append("%s equ %s" % (n, self.patch_equ[n]))
-        head += ["%s segment byte public use32 'CODE'" % seg,
-                 "    assume cs:%s, ds:%s, es:%s, ss:%s" % ((seg,) * 4)]
         tail = ["%s ends" % seg, "end"]
         off = len(head)
         return "\n".join(head + body + tail) + "\n", {k + off: v for k, v in linemap.items()}
@@ -738,10 +763,10 @@ def bad_insns(mod, data, problems, msgs, linemap):
 
 
 def first_resized(mod, data):
-    """The first instruction that assembled to a different length, or None. Without the probe's
-    `org`s WASM 10.0a sizes a forward `short` jump from its first-pass guess and silently makes it
-    near when that guess is past 127 bytes; up to the first such instruction everything is in
-    place, so it is the first whose own decoding differs in length."""
+    """The first instruction that assembled to a different length, or None. The probe's `org`s
+    can hide a length that depends on what follows (a forward jump); up to the first such
+    instruction everything is in place, so it is the first whose own decoding differs in
+    length."""
     an = mod.an
     md = capstone.Cs(capstone.CS_ARCH_X86, capstone.CS_MODE_32)
     j = bisect.bisect_left(an.starts, mod.start)
@@ -849,9 +874,9 @@ def main():
     t0 = time.time()
     todo = [(n, s, e) for n, s, e in mods if not a.only or n in a.only]
     fallback = {n: set() for n, _s, _e in todo}
-    # probe rounds: every module still changing is assembled in one batch (one DOSBox-X run
-    # with Watcom 10.0a's WASM); each instruction whose bytes differ, or that WASM rejects,
-    # is written as bytes from then on
+    # probe rounds: every module still changing is assembled in one batch (TASM under
+    # DOSBox-X); each instruction whose bytes differ, or that TASM rejects, is written as bytes
+    # from then on
     pending = list(todo)
     for _round in range(20):
         if not pending:
@@ -877,8 +902,8 @@ def main():
                 fallback[name] |= bad
                 still.append((name, start, end))
         pending = still
-    # the real sources, without the `org`s: a module whose jumps WASM sizes differently now is
-    # written again with the first resized instruction as bytes, until nothing changes
+    # the real sources, without the `org`s: a module where an instruction now comes out a
+    # different length is written again with it as bytes, until nothing changes
     final = {}
     pending = list(todo)
     for _round in range(20):

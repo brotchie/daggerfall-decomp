@@ -2,9 +2,8 @@
 """Assemble the XnGine modules (src/xngine/*.asm) and check them against FALL.EXE's object 2.
 
 Object 2 is the XnGine engine, hand-written asm. Each module is one MASM source file holding
-one segment that covers [start, end) of object 2 (config/xngine_modules.csv). Watcom 10.0a's
-WASM, the assembler of the compiler that built the game, assembles it to OMF under DOSBox-X,
-all modules in one session ($WASM names a native MASM-compatible assembler to use instead).
+one segment that covers [start, end) of object 2 (config/xngine_modules.csv). Borland Turbo
+Assembler 4.0, the assembler XnGine was built with, assembles it to OMF under DOSBox-X.
 A module matches when, with its fixups written as the linker and the LE loader would:
   - every byte equals the original file's byte, and
   - every LE fixup in the range comes from a fixup in our object with the same target, so every
@@ -42,20 +41,19 @@ NAME = re.compile(r"(?:func|D|L)_0*([0-9A-Fa-f]{5,8})$")
 BLOB = re.compile(r"\bB_([0-9A-F]{6})_([0-9]+)\b")
 
 
-W10 = os.path.join(ROOT, "third_party", "watcom10", "w10a")
+TASM = os.path.join(ROOT, "third_party", "tasm", "BIN")
 DOSDIR = os.path.join(ROOT, "build", "xngine", "dos")
+TASM_MSG = re.compile(r"^\*+(Error|Fatal|Warning)\*+ (\S+?)\((\d+)\) (.*)$", re.M)
+TASM_FATAL = re.compile(r"^\*\*Fatal\*\* (?!\S+\(\d+\))(.*)$", re.M)
 
 
-def w10_available():
-    """Watcom 10.0a's WASM (from your Watcom media, see tools/wcc10.py) and DOSBox-X."""
-    return os.path.exists(os.path.join(W10, "WATCOM", "BINB", "WASM.EXE")) and \
+def tasm_available():
+    """Borland Turbo Assembler 4.0 (from your own copy, unpacked into third_party/tasm/BIN) and
+    DOSBox-X to run it. TASMX.EXE is TASM as a DPMI program: real-mode TASM.EXE runs out of
+    memory on the larger modules, and the two write the same objects."""
+    return all(os.path.exists(os.path.join(TASM, f))
+               for f in ("TASMX.EXE", "DPMI16BI.OVL", "RTM.EXE")) and \
         shutil.which("dosbox-x") is not None
-
-
-def native_assembler():
-    """$WASM: a native MASM-compatible assembler (Open Watcom's wasm), or None."""
-    p = os.environ.get("WASM")
-    return p if p and os.path.exists(p) else None
 
 
 def modules():
@@ -80,7 +78,8 @@ class Image:
 
 
 def write_blobs(asm_text, inc_path, img):
-    """Define every B_<address>_<length> macro the source uses, from the original bytes."""
+    """Define every B_<address>_<length> macro the source uses, from the original bytes
+    (DOS line ends)."""
     lines = []
     for a, n in sorted(set((int(a, 16), int(n)) for a, n in BLOB.findall(asm_text))):
         data = img.bytes_at(a, n)
@@ -89,9 +88,8 @@ def write_blobs(asm_text, inc_path, img):
             lines.append("    db " + ", ".join("0%02Xh" % b for b in data[k:k + 16]))
         lines.append("endm")
     text = "\n".join(lines) + "\n"
-    if not os.path.exists(inc_path) or open(inc_path).read() != text:
-        with open(inc_path, "w", newline="\n") as f:
-            f.write(text)
+    with open(inc_path, "w", newline="\r\n") as f:
+        f.write(text)
 
 
 def assemble(asm_path, img, objdir=OBJDIR):
@@ -100,28 +98,15 @@ def assemble(asm_path, img, objdir=OBJDIR):
 
 
 def assemble_many(asm_paths, img, objdir=OBJDIR):
-    """Assemble modules with Watcom 10.0a's WASM in a few DOSBox-X sessions run side by side
-    (8.3 names M000.ASM, M001.ASM, ... with their blob includes), or with $WASM natively. Returns
-    {path: (obj path or None, messages)}; messages name the original path, so error lines
-    (`path(N): Error! ...`) point into it."""
+    """Assemble modules with TASM 4.0 in a few DOSBox-X sessions run side by side (8.3 names
+    M000.ASM, M001.ASM, ... with their blob includes). Returns {path: (obj path or None,
+    messages)}; TASM's messages are rewritten as `path(N): Error! ...`, naming the original
+    path, so error lines point into it."""
     os.makedirs(objdir, exist_ok=True)
-    nat = native_assembler()
     out = {}
-    if nat:
-        for path in asm_paths:
-            base = os.path.splitext(os.path.basename(path))[0]
-            write_blobs(open(path).read(), os.path.join(objdir, base + ".inc"), img)
-            obj = os.path.join(objdir, base + ".obj")
-            if os.path.exists(obj):
-                os.remove(obj)
-            r = subprocess.run([nat, "-q", "-i=" + objdir, "-i=" + SRC, "-fo=" + obj, path],
-                               capture_output=True, text=True)
-            ok = r.returncode == 0 and os.path.exists(obj)
-            out[path] = (obj if ok else None), r.stdout + r.stderr
-        return out
-    if not w10_available():
-        raise SystemExit("no assembler: XnGine needs Watcom 10.0a's WASM under DOSBox-X "
-                         "(third_party/watcom10/w10a, see tools/wcc10.py) or $WASM")
+    if not tasm_available():
+        raise SystemExit("no assembler: XnGine needs Borland Turbo Assembler 4.0 "
+                         "(third_party/tasm/BIN/TASMX.EXE) and DOSBox-X")
     shutil.rmtree(DOSDIR, ignore_errors=True)
     # up to 8 DOSBox-X sessions side by side, the files dealt out largest first
     jobs = max(1, min(8, os.cpu_count() or 1, len(asm_paths) // 4 or 1))
@@ -141,9 +126,7 @@ def assemble_many(asm_paths, img, objdir=OBJDIR):
             continue
         d = os.path.join(DOSDIR, "J%02d" % j)
         os.makedirs(d)
-        shutil.copyfile(os.path.join(SRC, "xngine.inc"), os.path.join(d, "XNGINE.INC"))
-        lines = ["@echo off", "set WATCOM=D:\\WATCOM",
-                 "set PATH=D:\\WATCOM\\BINB;D:\\WATCOM\\BIN;Z:\\", "C:"]
+        lines = ["@echo off", "set PATH=D:\\;Z:\\", "C:"]
         for k, path in enumerate(paths):
             n = "M%03d" % k
             names[path] = d, n
@@ -152,12 +135,12 @@ def assemble_many(asm_paths, img, objdir=OBJDIR):
             with open(os.path.join(d, n + ".ASM"), "w", newline="\r\n") as f:
                 f.write(text)
             write_blobs(text, os.path.join(d, n + ".INC"), img)
-            lines.append("wasm -q %s.ASM > %s.OUT" % (n, n))
+            lines.append("TASMX /ml %s.ASM > %s.OUT" % (n, n))
         with open(os.path.join(d, "GO.BAT"), "w", newline="\r\n") as f:
             f.write("\n".join(lines) + "\n")
         runs.append(subprocess.Popen(
             ["dosbox-x", "-silent", "-nogui", "-nomenu"] + opts +
-            ["-c", "mount c %s" % d, "-c", "mount d %s" % W10, "-c", "c:\\go.bat", "-exit"],
+            ["-c", "mount c %s" % d, "-c", "mount d %s" % TASM, "-c", "c:\\go.bat", "-exit"],
             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, env=env))
     for r in runs:
         try:
@@ -169,7 +152,10 @@ def assemble_many(asm_paths, img, objdir=OBJDIR):
         base = os.path.splitext(os.path.basename(path))[0]
         src_obj, err = os.path.join(d, n + ".OBJ"), os.path.join(d, n + ".OUT")
         msgs = open(err, errors="replace").read() if os.path.exists(err) else "no output"
-        msgs = msgs.replace(n + ".ASM", path).replace(n.lower() + ".asm", path)
+        msgs = TASM_MSG.sub(lambda m: "%s(%s): %s! %s" % (
+            path if m.group(2).upper() == n + ".ASM" else m.group(2), m.group(3),
+            "Warning" if m.group(1) == "Warning" else "Error", m.group(4)), msgs)
+        msgs = TASM_FATAL.sub(lambda m: "%s: Error! %s" % (path, m.group(1)), msgs)
         obj = os.path.join(objdir, base + ".obj")
         if os.path.exists(obj):
             os.remove(obj)
@@ -202,6 +188,9 @@ def link(obj_path, start, end, img):
         field = start + fx.offset
         if fx.size != 4:
             problems.append((field, "%d-byte fixup" % fx.size))
+            continue
+        if fx.offset + 4 > len(data):
+            problems.append((field, "fixup past the end"))
             continue
         addend = struct.unpack_from("<i", data, fx.offset)[0]
         if fx.target_kind == "seg" and fx.target_index == si:
@@ -279,9 +268,8 @@ def splice(raw, img, blank=False):
         for r in csv.DictReader(f):
             if r["obj"] == str(OBJ2):
                 funcs.append((int(r["va"], 16), r["name"]))
-    if not native_assembler() and not w10_available():
-        print("xngine   no assembler (Watcom 10.0a's WASM under DOSBox-X, or $WASM): "
-              "object 2 keeps the original bytes")
+    if not tasm_available():
+        print("xngine   no assembler (TASM 4.0 under DOSBox-X): object 2 keeps the original bytes")
         return matched, errors
     buf = raw[OBJ2]
     base = img.obj.base
