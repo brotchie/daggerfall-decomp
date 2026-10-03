@@ -1413,3 +1413,17 @@ the reason patched OW could not get these:
   constant as an extern it emits `fld; fmulp`. `(float)(x * K)` stored to a double gives
   the original `fmul [K]` bytes (the conversion emits no code there); the file says so.
 
+## The real compiler only (branch w10-only)
+
+- The patched Open Watcom is gone (tools/owpatch, tools/build_ow.sh, the lifter's compiler
+  knobs and register pins): everything is compiled by Watcom C32 10.0a under DOSBox-X, `-d2`
+  now in config/cflags.txt. A full build is one DOSBox-X run, about 40 s. The two assembly
+  helpers are src/int.asm, assembled by 10.0a's WASM (which encodes reg-to-reg moves as
+  `89 /r`; the original's assembler wrote `8b /r`, so those five are spelt as bytes).
+- Of the 2,246 functions matched under OW, 1,994 matched 10.0a as they were; re-lifting the
+  rest for 10.0a matched 75 more. src/w10/ is now src/hand/.
+- Watcom 10.0a's code for a function depends on its unit's declarations (a callee with or
+  without a prototype), so tools/settle_lifted.py promotes, builds, and moves a function
+  that fails inside its unit file to a file of its own (config/lift_alone.txt); six matched
+  only in one unit context and went back on the list. Build **2,063** (77.46%).
+

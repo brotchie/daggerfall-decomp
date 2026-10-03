@@ -2,7 +2,6 @@
  * do not edit: move a function to src/engsupp.c to work on it by hand) */
 
 struct bf8_0_1 { unsigned char f:1; };
-extern char D_00142340[];
 extern char D_001702D4[];
 extern char D_001789FA[];
 extern char D_00179954[];
@@ -11,7 +10,6 @@ extern char D_00179966[];
 extern char D_0017CA0A[];
 extern char D_00190CE4[];
 extern char D_00190CE5[];
-extern char D_001959AC[];
 extern char D_00195AA4[];
 extern char D_00195AC4[];
 extern char D_00195B68[];
@@ -28,6 +26,8 @@ extern char D_0019647C[];
 extern char D_00196484[];
 extern char D_001A94C8[];
 
+extern int func_00014096(int, short);
+extern int func_00014334(int);
 extern int func_000145CD(int, unsigned short);
 extern int func_0001FFF1(void);
 extern int func_0007D6AE(int, int);
@@ -41,14 +41,10 @@ extern void func_0006103A(int, int, int, int, int);
 extern void func_0007E815(int, int);
 extern void func_0007EB0B(int, int);
 extern void func_0008E4A8(int, int);
-int func_00014096(int, short);
 int func_0001410F(int);
-int func_00014334(int);
 int func_00014438(int, int);
 int func_0001490D(int);
 void func_0001497D(int);
-#pragma dagger DAGGER_NODEMOTE func_00014334
-#pragma dagger DAGGER_RMW func_00014518
 
 int func_00013F4B(int a1, int a2, int a3)
 {
@@ -85,27 +81,6 @@ int func_00014048(int a1, short a2)
 L1407A:;
     *(int *)&l_18 += ((int)(short)a2) << 3;
     return *(int *)&l_18;
-}
-
-int func_00014096(int a1, short a2)
-{
-    int l_24;
-    int l_20;
-    short l_18;
-
-    l_20 = *(int *)((char *)a1);
-    *(int *)&l_18 = 0;
-    if (((int)(short)a2) < *(int *)((char *)l_20 + 8)) goto L140CD;
-    return 0;
-L140CD:;
-    l_24 = l_20 + *(int *)((char *)l_20 + 60);
-L140D9:;
-    if ((short)(short)*(int *)&l_18 >= a2) goto L140FD;
-    l_24 += (((int)(unsigned char)*(signed char *)((char *)l_24)) << 3) + 8;
-    (*(int *)&l_18)++;
-    goto L140D9;
-L140FD:;
-    return l_24;
 }
 
 int func_0001410F(int a1)
@@ -175,44 +150,6 @@ case 32:
     return 1;
 default:
 L14320:;
-    return 0;
-}
-}
-
-int func_00014334(int a1)
-{
-    int l_24;
-    int l_20;
-    int l_1C;
-
-    if (((struct bf8_0_1 *)(*(char **)D_00196484))->f == 0) goto L1435B;
-    return 0;
-L1435B:;
-    switch (*(unsigned char *)((char *)a1)) {
-case 2:
-case 8:
-case 18:
-case 33:
-case 34:
-case 44:
-case 53:
-    if (*(int *)((char *)a1 + 47) != *(int *)D_00196478) goto L143E2;
-    if ((*(int *)D_001959AC & 65535) == ((int)(unsigned short)((int)(short)*(short *)((char *)a1 + 1)))) goto L143E4;
-L143E2:;
-    goto L14424;
-L143E4:;
-    if (*(signed char *)D_00142340 == 0) goto L143FC;
-    if (((int)(unsigned char)*(signed char *)((char *)a1)) != 34) goto L143FE;
-L143FC:;
-    goto L14407;
-L143FE:;
-    return 0;
-L14407:;
-    *(signed char *)(*(char **)D_00196484) |= 3;
-    *(int *)(*(char **)D_00196484 + 4) = a1;
-    return 1;
-default:
-L14424:;
     return 0;
 }
 }

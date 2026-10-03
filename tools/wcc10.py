@@ -24,10 +24,6 @@ from omf import OMF  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 W10 = os.path.join(ROOT, "third_party", "watcom10", "w10a")
-# FALL.EXE was built with debug info (-d2): it keeps the dead `mov eax,[i]` of `i++` and
-# orders the stack frame its own way, so src/w10/ adds it to config/cflags.txt.
-FLAGS = ["-d2"]
-
 
 def available():
     """True when the compiler has been extracted and DOSBox-X is on PATH."""
@@ -38,13 +34,22 @@ def available():
 def compile_many(srcs, flags, workdir=None):
     """Compile `srcs` with Watcom 10.0a; returns {src: obj path or None} (and the log)."""
     td = workdir or tempfile.mkdtemp(prefix="wcc10_")
-    flags = list(flags) + os.environ.get("DAGGER_W10EXTRA", "").split()
+    flags = list(flags)
     lines = ["@echo off", "set WATCOM=D:\\WATCOM", "set INCLUDE=D:\\WATCOM\\H",
              "set PATH=D:\\WATCOM\\BINB;D:\\WATCOM\\BIN;Z:\\", "C:"]
     names = {}
+    # the project's own headers (include/) sit next to the sources
+    inc = os.path.join(ROOT, "include")
+    for h in os.listdir(inc) if os.path.isdir(inc) else []:
+        shutil.copyfile(os.path.join(inc, h), os.path.join(td, h))
     for k, src in enumerate(srcs):
         n = "N%04d" % k
         names[src] = n
+        if src.lower().endswith(".asm"):
+            # hand-written assembly: the 10.0a assembler
+            shutil.copyfile(src, os.path.join(td, n + ".ASM"))
+            lines.append("wasm -q %s.ASM > %s.ERR" % (n, n))
+            continue
         shutil.copyfile(src, os.path.join(td, n + ".C"))
         lines.append("wcc386 %s %s.C > %s.ERR" % (" ".join(flags), n, n))
     lines.append("echo done > DONE.TXT")

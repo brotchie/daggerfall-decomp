@@ -78,6 +78,7 @@ extern int func_0012DBCC();
 extern int func_00144FB4();
 extern void func_0003EC2A(int, int);
 extern void func_00059F24(short);
+extern void func_0005A5D2(int, int, int);
 extern void func_0007CA1F(int, int, int, int, unsigned char);
 extern void func_0007CA85(int, int, int, int, unsigned char);
 extern void func_0008A550(int, int, int);
@@ -89,8 +90,6 @@ void func_0005A337(void);
 void func_0005A375(void);
 void func_0005A7D5(int, int);
 #pragma aux func_000A0ED9 parm routine [];
-#pragma dagger slots func_0005A4A9 a1 28 l_2C 24 l_28 20 l_20 12 l_1C 8 l_18 4 ret 16
-#pragma dagger slots func_0005A577 a1 16 a2 12 a3 8 l_10 4
 
 void func_00059B7B(short a1)
 {
@@ -310,34 +309,6 @@ L5A469:;
     return ((int)(short)*(short *)((char *)l_24)) + ((int)(short)*(short *)D_0012DA48);
 }
 
-int func_0005A4A9(int a1)
-{
-    int l_28;
-    short l_2C;
-    short l_20;
-    short l_1C;
-    short l_18;
-
-    *(int *)&l_1C = 0;
-    *(int *)&l_20 = 0;
-    l_28 = a1;
-L5A4CE:;
-    if (*(signed char *)((char *)l_28) == 0) goto L5A529;
-    if (((int)(unsigned char)*(signed char *)((char *)l_28)) != 32) goto L5A4F0;
-    l_1C += *(short *)D_0012DA40;
-    goto L5A521;
-L5A4F0:;
-    (*(int *)&l_20)++;
-    l_18 = ((unsigned short)(unsigned char)*(signed char *)((char *)l_28)) - 33;
-    *(int *)&l_2C = (int)(*(char **)D_0012DA74 + 6 + (((int)(short)l_18) << 2));
-    l_1C += *(short *)(*(char **)&l_2C);
-L5A521:;
-    l_28++;
-    goto L5A4CE;
-L5A529:;
-    return ((int)(short)l_1C) + (((int)(short)*(short *)D_0012DA48) * *(int *)&l_20);
-}
-
 void func_0005A577(int a1, short a2, short a3)
 {
     unsigned char l_10;
@@ -347,6 +318,17 @@ void func_0005A577(int a1, short a2, short a3)
     func_0012DBCC((int)(short)(*(int *)&a2 + 1), (int)(short)(*(int *)&a3 + 1), a1);
     *(signed char *)D_0012B508 = l_10;
     func_0012DBCC((int)(short)a2, (int)(short)a3, a1);
+}
+
+void func_0005A60C(int a1, int a2, int a3)
+{
+    unsigned char l_10;
+
+    l_10 = *(signed char *)D_0012B508;
+    *(signed char *)D_0012B508 = *(signed char *)D_0012B504;
+    func_0005A5D2(a1, a2 + 1, a3 + 1);
+    *(signed char *)D_0012B508 = l_10;
+    func_0005A5D2(a1, a2, a3);
 }
 
 void func_0005A661(int a1, int a2, int a3, int a4)

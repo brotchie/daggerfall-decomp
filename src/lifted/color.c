@@ -28,7 +28,6 @@ extern int func_0014AA92();
 extern void func_0008E3A7(int, int);
 int func_00099B86(int);
 void func_00099CB9(int);
-#pragma dagger reg func_00099689 78 eax 86 edx
 
 void func_00099689(void)
 {
@@ -89,25 +88,8 @@ L9987E:;
     l_1C++;
     goto L99876;
 L99886:;
-    func_000A1023((int)(*(char **)D_001AA600 + ((l_1C << 8) + 4096)) + 112, (l_1C << 4) + ((int)D_001886D2), 16, (int)D_00177350, 87, 4);
+    func_000A1023((int)(*(char **)D_001AA600 + ((l_1C << 8) + 4096)) + 112, ((int)D_001886D2) + (l_1C << 4), 16, (int)D_00177350, 87, 4);
     goto L9987E;
-}
-
-int func_000998C8(int a1)
-{
-    short l_1C;
-    short l_18;
-
-    *(int *)&l_1C = 0;
-    *(int *)&l_18 = 0;
-L998E7:;
-    if (*(signed char *)((char *)(((int)(short)l_18) + a1)) == 0) goto L9990F;
-    *(int *)&l_1C <<= 1;
-    *(int *)&l_1C += (int)(unsigned char)*(signed char *)((char *)(((int)(short)l_18) + a1));
-    (*(int *)&l_18)++;
-    goto L998E7;
-L9990F:;
-    return *(int *)&l_1C;
 }
 
 void func_00099A37(void)

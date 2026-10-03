@@ -6,7 +6,6 @@ extern char D_00170129[];
 extern int func_000A0DF4();
 extern int func_000A0E0D();
 #pragma aux sosconv "*" parm caller [] value [eax] modify [eax ebx ecx edx];
-#pragma dagger reg func_000124BF 387 cx
 #pragma aux (sosconv) func_000124BF;
 
 int func_000124BF(int a1, int a2)

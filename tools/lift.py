@@ -789,7 +789,7 @@ class Func:
                 return E("%s%s" % (pre.pop(t), lv), op.size, atom=False)
             if self.side and len(self.side) == 1 and off_ is not None and \
                     self.side[0].startswith(t + " = ") and self.store_read_pairs(off_) \
-                    and os.environ.get("DAGGER_CC") == "w10" and not os.environ.get("LIFT_KEEPSPILL"):
+                    and not os.environ.get("LIFT_KEEPSPILL"):
                 # (x = a, x) on a slot used nowhere else: the compiler's own spill of a
                 # (Watcom 10.0a spills an argument it evaluated before a call): just a
                 v = self.side[0][len(t) + 3:]
@@ -1320,14 +1320,13 @@ class Func:
                     nx is not None and nx.mnemonic == "mov" and len(nx.operands) == 2 and \
                     nx.operands[0].type == cx.X86_OP_REG and \
                     ebp_slot(nx, nx.operands[1]) == off_ and \
-                    fixup_at(ins, ins.imm_offset) is None and self.store_read_pairs(off_) \
-                    and (os.environ.get("DAGGER_CC") == "w10" or os.environ.get("LIFT_ABSTEMP")):
+                    fixup_at(ins, ins.imm_offset) is None and self.store_read_pairs(off_):
                 # mov [t],0x46c; mov eax,[t]; mov eax,[eax]: *(int *)0x46c, the address in a
                 # temp of the compiler's own (Watcom 10.0a -d2 makes one)
                 self.temps.add(off_)
                 self.slot_val[off_] = E(str(s.imm), 4, atom=True)
                 return
-            if off_ is not None and d.size == 4 and os.environ.get("DAGGER_CC") == "w10" and \
+            if off_ is not None and d.size == 4 and \
                     re.fullmatch(r"-?\d+|(?:\(int\))?D_[0-9A-F]{8}", v.text) and \
                     self.store_read_pairs(off_):
                 # a constant or a global's address stored once and read once: an argument
@@ -3273,39 +3272,10 @@ class Func:
             lines.append("}")
         lines.append("}")
         decl = ["/* lifted from 0x%08X */" % self.va] + sorted(self.structs)
-        # last resort, a function-level choice: pin every variable at its frame depth
-        self.choices.append(PIN_SLOTS)
-        if (PIN_SLOTS in self.flips) != getattr(self, "force_pin", False) or \
-                getattr(self, "must_pin", False):
-            base = 4 * len(self.saved)
-            pins = []
-            for k, (_r, off, _sz) in enumerate(self.params):
-                pins.append(("a%d" % (k + 1), off - base))
-            for o in locals_:
-                pins.append(("l_%X" % o, o - base))
-            if self.ret_slot:
-                pins.append(("ret", self.ret_slot - base))
-            if pins:
-                decl.append("#pragma dagger slots %s %s" % (
-                    name, " ".join("%s %d" % (n, d) for n, d in pins)))
-        # register pins (#pragma dagger reg), set by the search at register-only
-        # differences: flips -(3000 + 16 k + r)
-        wins = sorted(win_decode(f) for f in self.flips if f <= -200000)
-        if wins:
-            decl.append("#pragma dagger confwin %s %s" % (
-                name, " ".join("%d %d" % (a, b) for a, b in wins)))
-        pins = sorted(pin_decode(f) for f in self.flips if -200000 < f <= -3000)
-        if pins:
-            decl.append("#pragma dagger reg %s %s" % (
-                name, " ".join("%d %s" % (k, r) for k, r in pins)))
-        # function-level choice points: code generator options (#pragma dagger), and the
-        # default spelling of p->arr[i] (field offset with the pointer, or after the sum)
+        # function-level choice points: the default spelling of p->arr[i] (field offset with
+        # the pointer, or after the sum)
         self.choices.append(FIELD_LAST)
         self.choices.extend(INVERT_KINDS)
-        self.choices.extend(-1 - k for k in range(len(FUNC_OPTS)))
-        for k, opt in enumerate(FUNC_OPTS):
-            if -1 - k in self.flips:
-                decl.append("#pragma dagger %s %s" % (opt, name))
         if self.conv == "sosconv":
             decl.append(SOSCONV)
             decl.append("#pragma aux (sosconv) %s;" % name)
@@ -3338,40 +3308,7 @@ SIGS = {}
 POPS = {}
 
 
-# Code generator switches the batch search may turn on for one function
-# (`#pragma dagger <SWITCH> <function>`, DaggerEnv() in the compiler)
-PIN_SLOTS = -1000         # the choice point for `#pragma dagger slots`
 FIELD_LAST = -9999        # p->arr[i] spelt (char *)(p + i*k) + off by default
-PIN_REGS = ["eax", "ebx", "ecx", "edx", "esi", "edi", "ax", "bx", "cx", "dx", "si", "di"]
-
-
-def pin_encode(k, reg):
-    """The flip for `#pragma dagger reg <f> k reg`."""
-    return -(3000 + 16 * k + PIN_REGS.index(reg))
-
-
-def win_encode(k1, k2):
-    """The flip for `#pragma dagger confwin <f> k1 k2`."""
-    return -(200000 + 64 * k1 + (k2 - k1))
-
-
-def win_decode(f):
-    n = -f - 200000
-    return n // 64, n // 64 + n % 64
-
-
-def pin_decode(f):
-    n = -f - 3000
-    return n // 16, PIN_REGS[n % 16]
-FUNC_OPTS = ["KKND_CONFREV", "DAGGER_LEFTPREF", "DAGGER_CHARAUTOSMALL", "DAGGER_CLRAFTER",
-             "DAGGER_WORDSTORE", "DAGGER_RMW", "DAGGER_PUSHMEM", "DAGGER_DEADDEF", "DAGGER_CDQ",
-             "DAGGER_FLUSH", "DAGGER_CHARPARMBIG", "DAGGER_SIGNEDBF", "KKND_CONSTREG",
-             "KKND_LINSEL", "KKND_NOROT", "KKND_STRETCH", "DAGGER_FIRSTUSE",
-             "DAGGER_NOSAVES", "DAGGER_REGLAST", "DAGGER_NOGIVEN", "DAGGER_CONFLIST",
-             "DAGGER_CONFLISTREV", "DAGGER_KEEPSUB", "DAGGER_NODEMOTE",
-             "DAGGER_NOCVTDEMOTE", "DAGGER_DEADDEFMEM", "DAGGER_CONFPOS", "DAGGER_CONFPOSREV", "DAGGER_RIGHTPREF",
-             "DAGGER_IDXKEEP", "DAGGER_SEXTCONST", "DAGGER_CALLFIRST",
-             "DAGGER_PTRSWAP"]
 IMPLICIT = bool(os.environ.get("LIFT_IMPLICIT"))
 
 

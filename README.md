@@ -1,17 +1,17 @@
 # Daggerfall decompilation
 
 <!-- progress:start -->
-![decompiled](https://img.shields.io/badge/decompiled-100.00%25-brightgreen) ![functions](https://img.shields.io/badge/functions-2297%20of%202297-brightgreen) ![FALL.EXE](https://img.shields.io/badge/FALL.EXE-matching-brightgreen)
+![decompiled](https://img.shields.io/badge/decompiled-77.46%25-yellowgreen) ![functions](https://img.shields.io/badge/functions-2063%20of%202297-green) ![FALL.EXE](https://img.shields.io/badge/FALL.EXE-matching-brightgreen)
 
-100.00% of the game's own code (580076 of 580076 bytes, 2297 of 2297 functions) is matched C; the rebuilt `FALL.EXE` is byte-identical to 1.07.213.
+77.46% of the game's own code (449304 of 580076 bytes, 2063 of 2297 functions) is matched C; the rebuilt `FALL.EXE` is byte-identical to 1.07.213.
 <!-- progress:end -->
 
 A matching decompilation of *The Elder Scrolls II: Daggerfall* (DOS, 1996), starting with the game
-executable `FALL.EXE` (version 1.07.213), built with Watcom C 10.0 and run under the CauseWay DOS
-extender.
+executable `FALL.EXE` (version 1.07.213), built with Watcom C32 10.0a and run under the CauseWay
+DOS extender. The rebuild uses that same compiler, run under DOSBox-X.
 
-This repo contains no game files (executables or data). You supply the executables; the tools
-check their SHA-1.
+This repo contains no game files (executables or data) and no compiler. You supply the
+executables and your own copy of Watcom C/C++ 10.0a; the tools check the executables' SHA-1.
 
 - [docs/head_start.md](docs/head_start.md): the research plan this project started from
 - [docs/progress.md](docs/progress.md): a log of what has been found and done, newest last
@@ -24,14 +24,13 @@ check their SHA-1.
   game's own C in 84 original source units (names recovered from `__FILE__` strings), the
   rest are libraries (MemCheck, Watcom runtime). Object 2 is the XnGine engine in asm.
 - Compiler: Watcom C32 10.0a. Game code is unoptimised, with debug info: `-od -s -of+ -4r -d2`.
-- Toolchain: KKND-Decomp's patched Open Watcom `wcc386` plus our own `-od` patches (`tools/owpatch/`),
-  built natively on macOS, for most functions (`src/lifted/`, from `tools/lift.py`). The
-  last 51 are compiled with the real Watcom C32 10.0a (`src/w10/`): with your own copy of
-  the compiler in `third_party/watcom10/` (see `tools/wcc10.py`) the build compiles them
-  under DOSBox-X; without it they keep the original bytes and the checksum still matches.
+- Toolchain: the real Watcom C32 10.0a `wcc386` (and `wasm` for the two assembly helpers)
+  under DOSBox-X (`tools/wcc10.py`): one DOSBox-X run compiles all of `src/` in under a minute.
+- Sources: `src/lifted/` is generated (functions `tools/lift.py` lifts and the compiler
+  matches); `src/hand/` holds functions matched by hand, one per file; `src/<unit>.c` are
+  hand-written units; `src/int.asm` is the original's assembly.
 - Matched game functions and the share of game code: see the badges at the top (updated by
-  every successful `tools/build-and-verify.sh`). Most functions are lifted automatically
-  (`src/lifted/`, from `tools/lift.py`); the rebuilt executable is byte-identical.
+  every successful `tools/build-and-verify.sh`); the rebuilt executable is byte-identical.
 
 ## Quick start
 
@@ -43,15 +42,15 @@ tools/patch_213.sh orig/DFInstall.zip
 # 2. Python tools
 python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
 
-# 3. Patched compiler (clones open-watcom-v2 into third_party/, about 3 minutes)
-tools/build_ow.sh
+# 3. The compiler: from your Watcom C/C++ 10.0a media, copy WATCOM/BIN, WATCOM/BINB and
+#    WATCOM/H to third_party/watcom10/w10a/WATCOM/ (never committed)
 
 # 4. Find functions and units, match a C file, then build and verify
 .venv/bin/python tools/find_functions.py
 .venv/bin/python tools/find_units.py
 .venv/bin/python tools/split.py                # asm listings in asm/nonmatchings/
 .venv/bin/python tools/lift_all.py               # batch: lift, compile, check
-.venv/bin/python tools/promote_lifted.py         # matched → src/lifted/
+.venv/bin/python tools/settle_lifted.py          # matched → src/lifted/
 tools/build-and-verify.sh
 ```
 
@@ -60,7 +59,9 @@ tools/build-and-verify.sh
 | Tool | Purpose |
 |---|---|
 | `tools/patch_213.sh` | build the 1.07.213 `FALL.EXE` from `DFInstall.zip` |
-| `tools/build_ow.sh` | build the patched Open Watcom toolchain (`tools/owpatch/`) |
+| `tools/wcc10.py` | run Watcom C32 10.0a (and WASM) under DOSBox-X; check files against `FALL.EXE` |
+| `tools/w10_try.py` | try many C variants of one function in one compiler run |
+| `tools/w10_frame.py` | predict 10.0a's stack-frame layout from a function's declarations |
 | `tools/le.py` | LE loader: objects, pages, fixups (from KKND-Decomp) |
 | `tools/find_functions.py` | function discovery → `config/functions.csv` |
 | `tools/split.py` | one symbolic asm listing per function → `asm/nonmatchings/` (gitignored) |
@@ -69,7 +70,7 @@ tools/build-and-verify.sh
 | `tools/cc_dis.py` | disassemble what the compiler makes of a C file |
 | `tools/find_units.py`, `tools/units.py` | recover the original source units; map an address to its unit |
 | `tools/lift.py`, `tools/lift_all.py` | lift `-od` code to C; batch lift, compile and check every game function (2 s) |
-| `tools/promote_lifted.py` | write matched lifted functions into `src/lifted/<unit>.c` |
+| `tools/promote_lifted.py`, `tools/settle_lifted.py` | write matched lifted functions into `src/lifted/<unit>.c`, splitting out any that match only on their own |
 | `tools/update_readme_progress.py` | refresh the README badges from `build/progress.json` |
 | `tools/build-and-verify.sh` | splice all of `src/` into `FALL.EXE` and check the SHA-1 (`build_fall.py`) |
 

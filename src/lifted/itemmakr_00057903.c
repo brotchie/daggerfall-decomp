@@ -7,7 +7,6 @@ extern char D_00190CEE[];
 extern char D_00190D02[];
 
 extern int func_0012DB50();
-#pragma dagger slots func_00057903 a1 8 l_18 4 ret 12
 
 int func_00057903(short a1)
 {

@@ -13,34 +13,16 @@ extern char D_0018801E[];
 extern char D_00188020[];
 extern char D_00188022[];
 extern char D_00188024[];
-extern char D_001880C6[];
-extern char D_001880CA[];
-extern char D_001880D2[];
-extern char D_001880D6[];
-extern char D_001880DE[];
-extern char D_001880E2[];
-extern char D_001880EA[];
-extern char D_001880EE[];
-extern char D_001880F6[];
-extern char D_001880FA[];
-extern char D_00188102[];
-extern char D_00188106[];
 extern char D_00190BE4[];
 extern char D_00190BE8[];
 extern char D_00190CA8[];
 extern char D_00190CE4[];
 extern char D_00190CEE[];
 extern char D_00190D64[];
-extern char D_00190D70[];
-extern char D_00190DE4[];
-extern char D_00190DE6[];
-extern char D_00190DE8[];
 extern char D_00190DEA[];
 extern char D_00190DEC[];
 extern char D_00190DEE[];
 extern char D_00190DF0[];
-extern char D_00190DF2[];
-extern char D_00190DF4[];
 extern char D_001940D5[];
 extern char D_001940D6[];
 extern char D_001940D8[];
@@ -103,8 +85,6 @@ extern void func_0009721F(void);
 extern void func_000972C7(int, int, int);
 int func_00090C3A(void);
 void func_0009117A(void);
-#pragma dagger DAGGER_NOSAVES func_0009190C
-#pragma dagger reg func_0009190C 19 edx
 
 int func_00090C3A(void)
 {
@@ -359,36 +339,6 @@ void func_0009166F(void)
     func_00053A89(*(int *)D_00195BE0, 31, (int)func_00090C3A);
 }
 
-void func_0009169B(int a1)
-{
-{
-    int l_1C;
-
-__dagger_tbl916B1:;
-    l_1C = a1 - 2;
-    switch (l_1C) {
-case 0:
-case 1:
-case 2:
-    *(short *)D_001880D2 = (*(short *)D_001880C6 = (*(short *)D_00190DE4 = *(short *)(D_0018801E + (a1 * 12))));
-    *(short *)D_001880D6 = (*(short *)D_001880CA = *(short *)D_00190DE4 + 8);
-    *(short *)D_00190DF0 = a1 - 2;
-    return;
-case 3:
-case 4:
-case 5:
-    *(short *)D_001880EA = (*(short *)D_001880DE = (*(short *)D_00190DE6 = *(short *)(D_0018801E + (a1 * 12))));
-    *(short *)D_001880EE = (*(short *)D_001880E2 = *(short *)D_00190DE6 + 8);
-    *(short *)D_00190DF2 = a1 - 2;
-    return;
-default:
-    *(short *)D_00188102 = (*(short *)D_001880F6 = (*(short *)D_00190DE8 = *(short *)(D_0018801E + (a1 * 12))));
-    *(short *)D_00188106 = (*(short *)D_001880FA = *(short *)D_00190DE8 + 8);
-    *(short *)D_00190DF4 = a1 - 2;
-}
-}
-}
-
 void func_000917F0(int a1)
 {
     func_00091B80((int)(short)(a1 - 20));
@@ -431,29 +381,6 @@ L918D5:;
 L918F1:;
     (*(signed char *)((char *)l_20))--;
     (*(short *)(D_00190DEA + (l_28 * 2)))++;
-}
-
-void func_0009190C(int a1)
-{
-    int l_1C;
-    int l_18;
-
-    l_1C = 1132;
-    if (((unsigned)(*(int *)((char *)l_1C) - *(int *)D_00190BE4)) < 6) return;
-    l_18 = 1132;
-    *(int *)D_00190BE4 = *(int *)((char *)l_18);
-    if (a1 != 30) goto L91997;
-    if (*(short *)D_00190D64 == 0) goto L91995;
-    if (((int)(short)*(short *)(*(char **)D_00195BE0 + 32 + (((int)(short)*(short *)D_00190D70) * 2))) == 100) return;
-    (*(short *)D_00190D64)--;
-    (*(short *)(*(char **)D_00195BE0 + 32 + (((int)(short)*(short *)D_00190D70) * 2)))++;
-L91995:;
-    return;
-L91997:;
-    if ((short)(short)*(signed char *)(D_00190CE4 + ((int)(short)*(short *)D_00190D70)) >= *(short *)(*(char **)D_00195BE0 + 32 + (((int)(short)*(short *)D_00190D70) * 2))) return;
-    if (((int)(short)*(short *)(*(char **)D_00195BE0 + 32 + (((int)(short)*(short *)D_00190D70) * 2))) == 10) return;
-    (*(short *)D_00190D64)++;
-    (*(short *)(*(char **)D_00195BE0 + 32 + (((int)(short)*(short *)D_00190D70) * 2)))--;
 }
 
 void func_000919FE(void)

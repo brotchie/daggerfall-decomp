@@ -16,7 +16,6 @@ extern char D_00175BA8[];
 extern char D_00175BC1[];
 extern char D_00175BDC[];
 extern char D_00175BFA[];
-extern char D_00175C18[];
 extern char D_00175C2D[];
 extern char D_00175C79[];
 extern char D_00187CA8[];
@@ -49,8 +48,6 @@ extern int func_000A00AF();
 extern int func_000A0ED9(int, int);
 extern int func_000A148C(int, ...);
 extern int func_000A29BA(int);
-extern int func_000A2A2B();
-extern int func_000A2A76();
 extern int func_000A2D9E();
 extern int func_000CE8D5();
 extern int func_00143700();
@@ -66,8 +63,6 @@ void func_0006A319(int);
 #pragma aux func_000A0ED9 parm routine [];
 #pragma aux func_000A29BA parm routine [];
 #pragma aux sosconv "*" parm caller [] value [eax] modify [eax ebx ecx edx];
-#pragma dagger DAGGER_NOSAVES func_00069F8A
-#pragma dagger reg func_00069F8A 20 edx
 #pragma aux (sosconv) func_0006A606;
 
 void func_00069E9E(int a1, int a2)
@@ -296,44 +291,6 @@ L6A508:;
     func_00050069((int)D_00175BFA);
 L6A53C:;
     goto L6A3B0;
-}
-
-void func_0006A54B(int a1)
-{
-    int l_18;
-{
-    int l_30;
-    char l_2C[16];
-
-    l_18 = 0;
-    if (*(int *)D_00187CAD == 0) return;
-    func_000A0ED9(349, (int)D_00175AD4);
-    func_000A2A2B();
-    *(short *)((char *)l_2C + 4) = 0;
-    *(int *)l_2C = 0;
-L6A592:;
-    if (l_18 != 0) goto L6A5BC;
-    l_18 = func_000A2A76((int)l_2C);
-    goto L6A592;
-__dagger_tbl6A5A8:;
-L6A5BC:;
-    l_30 = l_18 - 1;
-    switch (l_30) {
-case 3:
-    return;
-case 0:
-    return;
-case 1:
-    func_00050069((int)D_00175C18);
-    return;
-case 4:
-    func_00050069((int)D_00175C18);
-    return;
-case 2:
-    func_00050069((int)D_00175C18);
-default:;
-}
-}
 }
 
 void func_0006A606(void)

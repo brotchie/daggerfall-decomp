@@ -12,9 +12,8 @@ Output:
   a summary: match count, and the most common unsupported reasons and first differences,
   which is the to-do list for the lifter and the compiler patch
 
-With DAGGER_CC=w10 DAGGER_W10EXTRA=-d2 it compiles with the real Watcom C32 10.0a instead
-(tools/wcc10.py) and writes build/lift10/; tools/promote_w10.py copies what matched there
-into src/w10/.
+The compiler is the game's own, Watcom C32 10.0a, under DOSBox-X (tools/wcc10.py). After a
+run, tools/settle_lifted.py writes the matching functions into src/lifted/.
 
 usage: lift_all.py [-j N] [--only func_X,func_Y] [--limit N]
 """
@@ -32,9 +31,7 @@ from collections import Counter
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-# the real Watcom 10.0a (DAGGER_CC=w10) keeps its own lifts, report and flips
-OUT = os.environ.get("LIFT_OUT") or os.path.join(
-    ROOT, "build", "lift10" if os.environ.get("DAGGER_CC") == "w10" else "lift")
+OUT = os.environ.get("LIFT_OUT") or os.path.join(ROOT, "build", "lift")
 os.makedirs(OUT, exist_ok=True)
 
 W = {}  # per-worker state
@@ -147,162 +144,6 @@ NEAR = 8
 BUDGET = int(os.environ.get("LIFT_BUDGET", "600"))
 
 
-REG_RE = re.compile(r"\b(e[abcd]x|e[sd]i|[abcd]x|[sd]i)\b")
-
-
-def reg_log(c):
-    """The function's register choices in order (DAGGER_REGLOG): [chosen register]."""
-    match = W["match"]
-    with tempfile.TemporaryDirectory() as td:
-        src = os.path.join(td, "r.c")
-        with open(src, "w") as f:
-            f.write(c)
-        cmd = [match.compiler(), "-q", "-zq"] + W["flags"] + [
-            "-i=" + os.path.join(ROOT, "include"), "-i=" + os.path.join(ROOT, "src"),
-            "-fo=r.obj", "r.c"]
-        import subprocess
-        r = subprocess.run(cmd, capture_output=True, text=True, cwd=td,
-                           env=dict(os.environ, DAGGER_REGLOG="1"))
-    W["confs"] = sum(int(ln.split()[2]) for ln in r.stderr.splitlines()
-                     if ln.startswith("confsort "))
-    return [ln.split()[2] for ln in r.stderr.splitlines() if ln.startswith("reg ")]
-
-
-def pin_search(name, va, c, detail, at, flips, attempt):
-    """Last resort at a register-only difference: pin one of the allocator's choices to the
-    register the original used there (#pragma dagger reg). Tries the choices that picked
-    our register first. Returns (at2, 0, flips, result, tries) or None."""
-    lift = W["lift"]
-    m = re.search(r": (.*) \| (.*)$", detail or "")
-    if not m or at is None:
-        return None
-    ours, theirs = m.group(1), m.group(2)
-    if REG_RE.sub("R", ours) != REG_RE.sub("R", theirs) and os.environ.get("LIFT_PINSAME"):
-        return None
-    pairs = [(a, b) for a, b in zip(REG_RE.findall(ours), REG_RE.findall(theirs)) if a != b]
-    log = reg_log(c)
-    if not log:
-        return None
-    used = {lift.pin_decode(f)[0] for f in flips if -200000 < f <= -3000}
-    if os.environ.get("LIFT_DEEP"):
-        # offline: every window, then every single pin to every register, nearest first
-        nconf = W.get("confs", 0)
-        tva, tsize = W["funcs"][name]
-        share = (at - tva) / max(tsize, 1)
-        cands = []
-        if not any(f <= -200000 for f in flips):
-            cands += sorted((lift.win_encode(k1, k1 + L) for L in range(1, 9)
-                             for k1 in range(0, nconf) if k1 + L < nconf),
-                            key=lambda f: abs(sum(lift.win_decode(f)) / 2 - nconf * share))
-        cands += sorted((lift.pin_encode(k, r) for k in range(len(log)) if k not in used
-                         for r in ("eax", "ebx", "ecx", "edx", "esi", "edi") if r != log[k]),
-                        key=lambda f: abs(lift.pin_decode(f)[0] - len(log) * share))
-        tries_d = 0
-        for f in cands:
-            tries_d += 1
-            r = attempt(flips | {f})
-            if r is None:
-                continue
-            s2, d2, at2 = r[0], r[1], r[2]
-            if s2 == "ok" or (s2 == "diff" and at2 is not None and at2 > at):
-                return ((1 << 40) if s2 == "ok" else at2, 0, flips | {f}, r, tries_d)
-        return None
-    # first: a window of the allocation order taken latest-starting first
-    nconf = W.get("confs", 0)
-    if nconf and not os.environ.get("LIFT_NOCONFWIN") and \
-            not any(f <= -200000 for f in flips):
-        tva, tsize = W["funcs"][name]
-        c_est = nconf * (at - tva) / max(tsize, 1)
-        wins = sorted(((k1, k1 + L) for L in range(1, 6) for k1 in range(0, nconf)
-                       if k1 + L < nconf), key=lambda w: (abs((w[0] + w[1]) / 2 - c_est), w[1] - w[0]))
-        tries_w = 0
-        for k1, k2 in wins[:60]:
-            tries_w += 1
-            f2 = flips | {lift.win_encode(k1, k2)}
-            r = attempt(f2)
-            if r is None:
-                continue
-            s2, d2, at2 = r[0], r[1], r[2]
-            if s2 == "ok" or (s2 == "diff" and at2 is not None and at2 > at):
-                return ((1 << 40) if s2 == "ok" else at2, 0, f2, r, tries_w)
-    if not pairs:
-        # the registers don't line up (`mov edx,[g]` against `mov edx,eax`): any choice to
-        # any register either instruction names
-        regs = sorted(set(REG_RE.findall(ours + " " + theirs)))
-        if not regs:
-            return None
-        mine = want = None
-        near_k = []
-        tva, tsize = W["funcs"][name]
-        k_est = len(log) * (at - tva) / max(tsize, 1)
-        order = sorted([(k, r) for k in range(len(log)) if k not in used for r in regs
-                        if r != log[k]], key=lambda kr: abs(kr[0] - k_est))
-    else:
-        mine, want = pairs[0]
-        # a choice that took our register gets theirs, or one that took theirs gets ours;
-        # nearest first to where the difference is, as a share of the function
-        tva, tsize = W["funcs"][name]
-        k_est = len(log) * (at - tva) / max(tsize, 1)
-        near_k = sorted([k for k, r in enumerate(log) if r == mine and k not in used],
-                        key=lambda k: abs(k - k_est))
-        order = [(k, want) for k in near_k] + \
-            sorted([(k, mine) for k, r in enumerate(log) if r == want and k not in used],
-                   key=lambda kr: abs(kr[0] - k_est))
-    tries = 0
-    for k, reg in order[:64]:
-        if reg not in lift.PIN_REGS:
-            continue
-        # the pin alone, then with the next choice held at what it took before (moving
-        # one choice frees or takes a register the next one wanted)
-        variants = [flips | {lift.pin_encode(k, reg)}]
-        if k + 1 < len(log) and log[k + 1] in lift.PIN_REGS and k + 1 not in used:
-            variants.append(variants[0] | {lift.pin_encode(k + 1, log[k + 1])})
-        for f2 in variants:
-            tries += 1
-            r = attempt(f2)
-            if r is None:
-                continue
-            s2, d2, at2 = r[0], r[1], r[2]
-            if s2 == "ok" or (s2 == "diff" and at2 is not None and at2 > at):
-                return ((1 << 40) if s2 == "ok" else at2, 0, f2, r, tries)
-    if mine is None:
-        return None
-    # a swap: one choice to theirs and another to ours
-    took_want = [k for k, r in enumerate(log) if r == want and k not in used]
-    if os.environ.get("LIFT_PINWIDE"):
-        # (offline, slow) every nearby pair of choices, each to ours, theirs or its own
-        for k1 in near_k + took_want:
-            for k2 in range(max(0, k1 - 3), min(len(log), k1 + 4)):
-                if k2 == k1 or k2 in used:
-                    continue
-                for r1 in (want, mine):
-                    for r2 in {mine, want, log[k2]}:
-                        if r1 not in lift.PIN_REGS or r2 not in lift.PIN_REGS or \
-                                (r1 == log[k1] and r2 == log[k2]):
-                            continue
-                        tries += 1
-                        f2 = flips | {lift.pin_encode(k1, r1), lift.pin_encode(k2, r2)}
-                        r = attempt(f2)
-                        if r is None:
-                            continue
-                        s2, d2, at2 = r[0], r[1], r[2]
-                        if s2 == "ok" or (s2 == "diff" and at2 is not None and at2 > at):
-                            return ((1 << 40) if s2 == "ok" else at2, 0, f2, r, tries)
-    for k1 in near_k[:8]:
-        for k2 in took_want[:8]:
-            if want not in lift.PIN_REGS or mine not in lift.PIN_REGS:
-                return None
-            tries += 1
-            f2 = flips | {lift.pin_encode(k1, want), lift.pin_encode(k2, mine)}
-            r = attempt(f2)
-            if r is None:
-                continue
-            s2, d2, at2 = r[0], r[1], r[2]
-            if s2 == "ok" or (s2 == "diff" and at2 is not None and at2 > at):
-                return ((1 << 40) if s2 == "ok" else at2, 0, f2, r, tries)
-    return None
-
-
 def work(va):
     """lift_one from the cached flips, and (LIFT_SCRATCH=1, after compiler changes) when
     that doesn't match, also from scratch (the greedy search can be led astray by a stale
@@ -371,7 +212,7 @@ def lift_one(va):
                 status, detail, at = r2
                 c, info, start = c2, info2, start | {a}
                 break
-    # Choice points (operand orders the code can't tell apart, code generator knobs): try
+    # Choice points (operand orders and spellings the code cannot tell apart): try
     # flipping each one near the first difference and keep the flip that moves the first
     # difference furthest; when no single flip helps, try pairs of the nearest.
     flips, tries = start, 0
@@ -410,11 +251,8 @@ def lift_one(va):
             # a difference in the frame size: any choice point can change it (a temp, a
             # variable's type), not just those near the prologue
             near = sorted(a for a in info["choices"] if a >= 0 and a not in flips)[:3 * NEAR]
-        # function-level choices (compiler knobs) too
+        # function-level choices too
         func_level = [a for a in info["choices"] if a < 0 and a not in flips]
-        if os.environ.get("DAGGER_CC") == "w10":
-            # (the real Watcom 10.0a has no knobs and ignores slot pins)
-            func_level = [a for a in func_level if not (-100 < a < 0 or a == -1000)]
         found = None
         for a in near + func_level:
             if tries >= BUDGET:
@@ -441,9 +279,8 @@ def lift_one(va):
                 more = [(x, y) for i, x in enumerate(near[:7]) for y in near[i + 1:7]
                         if (x, y) not in pairs and x >= 0 and y >= 0]
                 pairs += sorted(more, key=lambda p_: abs(p_[0] - p_[1]))
-            if not os.environ.get("LIFT_NOKNOBPAIRS"):
-                # a nearby choice with a compiler knob
-                pairs += [(x, y) for x in near[:3] for y in func_level]
+            # a nearby choice with a function-level one
+            pairs += [(x, y) for x in near[:3] for y in func_level]
             for x, y in pairs:
                 if tries >= BUDGET:
                     break
@@ -459,9 +296,7 @@ def lift_one(va):
                 ("bt", at) not in tried_pairs:
             # backtrack: an earlier flip taken back, alone or with a nearby new one
             tried_pairs.add(("bt", at))
-            for f in sorted(flips, key=lambda f: (f <= -3000, -abs(f))):
-                if f <= -3000 and os.environ.get("LIFT_KEEPPINS"):
-                    continue        # (register pins are positional; tried last)
+            for f in sorted(flips, key=lambda f: -abs(f)):
                 for x in [None] + near[:4] + func_level[:0]:
                     if tries >= BUDGET:
                         break
@@ -478,59 +313,12 @@ def lift_one(va):
                         break
                 if found is not None:
                     break
-        if found is None and not os.environ.get("LIFT_NOREGPIN"):
-            found = pin_search(name, va, c, detail, at, flips, attempt)
-            if found is not None:
-                tries += found[4]
-                found = found[:4]
         if found is None:
             break
         flips = found[2]
         status, detail, at, c, info = found[3]
         best = (status, detail, at, c)
     status, detail, at, c = best
-    if status == "diff" and cached and not os.environ.get("LIFT_NOCACHEKNOBS"):
-        # a previous run's flips with one more compiler knob (a knob added since, say)
-        for k in [a for a in info.get("choices", []) if -100 < a < 0 and a not in cached]:
-            r = attempt(cached | {k})
-            if r is not None and r[0] == "ok":
-                flips = cached | {k}
-                status, detail, at, c = r[0], r[1], r[2], r[3]
-                break
-    if status == "diff" and not os.environ.get("LIFT_NOKNOBSTART"):
-        # a compiler knob alone that leaves far fewer differing bytes (though the first one
-        # comes earlier): a short greedy search from it
-        nb = nbytes(detail)
-        for k in [a for a in info.get("choices", []) if -100 < a < 0]:
-            r = attempt(frozenset({k}))
-            if r is None or r[0] == "error" or (r[0] == "diff" and nbytes(r[1]) * 3 > nb):
-                continue
-            fl, (s2, d2, at2, c2, info2) = frozenset({k}), r
-            for _ in range(8):
-                if s2 == "ok" or at2 is None:
-                    break
-                sites2 = info2.get("sites", {})
-                near2 = sorted((a for a in info2["choices"] if a >= 0 and a not in fl),
-                               key=lambda a: min(abs(x - at2) for x in sites2.get(a, [a])))[:12]
-                step = None
-                for a in near2:
-                    r2 = attempt(fl | {a})
-                    if r2 is not None and (r2[0] == "ok" or (r2[0] == "diff" and r2[2] is not None
-                                                            and r2[2] > at2)):
-                        if step is None or r2[0] == "ok" or (step[1][0] != "ok" and r2[2] > step[1][2]):
-                            step = (fl | {a}, r2)
-                        if r2[0] == "ok":
-                            break
-                if step is None and not os.environ.get("LIFT_NOREGPIN"):
-                    pf = pin_search(name, va, c2, d2, at2, fl, attempt)
-                    if pf is not None:
-                        step = (pf[2], pf[3])
-                if step is None:
-                    break
-                fl, (s2, d2, at2, c2, info2) = step[0], step[1]
-            if s2 == "ok":
-                flips, status, detail, at, c = fl, s2, d2, at2, c2
-                break
     if os.environ.get("LIFT_SHOWFLIPS"):
         print(name, sorted(flips), file=sys.stderr)
     if c is not None:

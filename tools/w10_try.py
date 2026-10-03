@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Try C variants of one function with the real Watcom C32 10.0a (-d2), all in one DOSBox-X run.
+"""Try C variants of one function with Watcom C32 10.0a, all in one DOSBox-X run.
 
 usage: w10_try.py file.c func_XXXXXXXX "old text" "new text" ["new text" ...]
   each variant is file.c with `old text` replaced by one `new text`; a new text of the form
@@ -7,7 +7,6 @@ usage: w10_try.py file.c func_XXXXXXXX "old text" "new text" ["new text" ...]
   difference and the first differing instruction (ours | target).
 """
 import sys, os, tempfile
-os.environ.setdefault("DAGGER_W10EXTRA", "-d2")
 sys.path.insert(0, 'tools')
 import wcc10, match, lift_all, capstone
 from omf import OMF

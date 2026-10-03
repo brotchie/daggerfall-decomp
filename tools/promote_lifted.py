@@ -40,7 +40,7 @@ def proto_line(text, name):
 def main():
     hand = set()
     for path in glob.glob(os.path.join(ROOT, "src", "*.c")) + \
-            glob.glob(os.path.join(ROOT, "src", "w10", "*.c")):
+            glob.glob(os.path.join(ROOT, "src", "hand", "*.c")):
         hand |= set(DEF.findall(open(path).read()))
     with open(os.path.join(LIFT, "report.csv"), newline="") as f:
         ok = [r["func"] for r in csv.DictReader(f) if r["status"] == "ok"]
@@ -81,6 +81,11 @@ def main():
             m = re.match(r"extern \w+ (func_[0-9A-F]{8})\(", line)
             if m:
                 decls_of.setdefault(n, {})[m.group(1)] = line
+    # functions that match only on their own (the unit's other declarations change their
+    # code): config/lift_alone.txt
+    p = os.path.join(ROOT, "config", "lift_alone.txt")
+    if os.path.exists(p):
+        alone |= {w for line in open(p) if not line.startswith("#") for w in line.split()} & set(ok)
     for unit, names in by_unit.items():
         members = [n for n in names if n not in alone]
         votes = {}
@@ -112,6 +117,8 @@ def main():
             text = open(os.path.join(LIFT, name + ".c")).read()
             head, body = text.split("\n\n", 1)
             for line in head.splitlines():
+                if line.startswith("#pragma dagger"):
+                    continue        # (an old lift's knob for a compiler we no longer use)
                 if line.startswith(("extern", "#pragma", "struct")) and line not in decls:
                     decls.append(line)
             bodies.append(body.strip())
