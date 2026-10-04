@@ -133,6 +133,30 @@ exactly the costs the spellbook shows.
 **Crafting:** direct calls to 0x36F69, 0x55E35 and 0x8F246 open the spellmaker, the item
 enchanter and the potion maker. A potion recipe is 109 bytes.
 
+## Text macros and quests
+
+These come from the text and quests naming agent; details are in build/names/text_quests.md.
+
+**Text macros:** 255 entries of `{name[5]; handler}` (9 bytes each), indexed by first letter
+(0x17C47E pointers, 0x17C4F2 counts); `parse_expand` (0x4633F) expands them.
+- Every handler was called directly in save_dorian, and the results match the game: %ra
+  "Dark Elf", %dat "Middas the 23th of Evening Star", %rn "Queen Akorithi".
+- 18 handlers return "BLANK".
+- Two bugs in the table: "%3hn" is spelt "1hn", and "%prg" appears twice.
+- Some macros that TEXT.RSC uses have no handler (%hol, %2com, %nam).
+
+**Quests:** an active quest is a type-14 object under `quest_root`. Its data at +0x47 is the
+QBN file as loaded, with its pointers relocated.
+- Section record sizes are in `qbn_record_sizes` (0x199788): 19, 94, 34, 20, 24, 16, 33,
+  14, 87, 8.
+- An opcode record is 87 bytes: five 15-byte arguments, then the message at +0x51.
+- `qbn_opcode_arg_counts` (0x195DA4) is a digit string with each opcode's argument count. It
+  matches UESP for every documented opcode.
+- The actions dispatch from 0x29958. Events dispatch from 0x2B26B: 1 item given, 2 kill,
+  3 item found, 5 dropped, 21 foe hurt, 28 NPC clicked, 71 pay gold, 73 spell cast,
+  78 faction.
+- `quest_pick_file` (0x4C274) picks a guild or NPC quest by its file-name letters.
+
 ## Source units that are mislabelled
 
 config/units.csv takes each unit's range from its first and last MemCheck file reference.
@@ -152,6 +176,11 @@ The naming agents found these functions filed under the wrong unit:
 - potions.c starts at 0x8EE48 (filed under object.c).
 - 0x5A72F and 0x5A7D5, filed under book.c, are probably runspell.c.
 - 0x2E914 belongs to damage.c (filed under qkey.c).
+- 0x2FD75–0x304C8 (filed under damage.c) are the quest-state core, which belongs to
+  qmisc.c.
+- 0x4BA70–0x4BCA6 (filed under tamriel.c) belong to quests.c. 0x4CF37, 0x4CFA7 and 0x4D195
+  (filed under quests.c) are armour code.
+- 0x4A8DB–0x4AA47 (after parse.c's last file reference) are probably tamriel.c's calendar.
 
 ## Calling functions directly
 

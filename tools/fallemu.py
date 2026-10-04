@@ -186,8 +186,9 @@ class Files:
             self.handles[h] = f
         self.handles[h].write(data)
 
-    def host(self, dos, write=False):
-        """Host path for a DOS path, case-insensitive; writes go to the overlay."""
+    def host(self, dos, write=False, game=False):
+        """Host path for a DOS path, case-insensitive; writes go to the overlay. game: the
+        path in the game directory, even when the overlay has one too."""
         p = dos.replace("/", "\\")
         if len(p) > 1 and p[1] == ":":
             p = p[2:]
@@ -203,7 +204,7 @@ class Files:
                 out.append(x)
         rel = os.path.join(*out) if out else ""
         ov = os.path.join(self.overlay, rel.upper())
-        if write or os.path.exists(ov):
+        if write or (os.path.exists(ov) and not game):
             return ov
         cur = self.root
         for x in out:
@@ -850,23 +851,25 @@ class Emu:
             self.unsupported("int 21h ah=%02Xh" % ah)
 
     def find_first(self, pattern):
+        """The matches in the game directory and the overlay (which wins for a file in both:
+        it holds what the game wrote)."""
         import fnmatch
         p = pattern.replace("/", "\\")
         d, _, mask = p.rpartition("\\")
-        hd = self.files.host(d) if d else self.files.host("")
-        names = []
-        for base in (hd, self.files.host(d, write=True) if d else self.files.overlay):
+        found = {}
+        for base in (self.files.host(d, game=True), self.files.host(d, write=True)):
             if os.path.isdir(base):
-                names += [n for n in os.listdir(base) if fnmatch.fnmatch(n.upper(), mask.upper())]
-        self.find = [(n, hd) for n in sorted(set(names))]
+                for n in os.listdir(base):
+                    if fnmatch.fnmatch(n.upper(), mask.upper()):
+                        found[n.upper()] = os.path.join(base, n)
+        self.find = sorted(found.items())
         self.find_next()
 
     def find_next(self):
         if not self.find:
             self.fail(18)
             return
-        name, d = self.find.pop(0)
-        p = os.path.join(d, name)
+        name, p = self.find.pop(0)
         size = os.path.getsize(p) if os.path.exists(p) else 0
         rec = bytearray(43)
         rec[21] = 0x10 if os.path.isdir(p) else 0x20

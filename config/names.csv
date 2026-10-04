@@ -53,13 +53,36 @@ global,0x0017B23F,spellmaker_buttons,strong,"18 x {x0,y0,x1,y1,handler}: 5 eleme
 global,0x0017B317,spellmaker_setting_buttons,strong,"34 x {rect, handler}: 11 setting spinners (duration/chance/magnitude rows at y 94/114/134), their up and down halves (11-32), and the panel exit (33)"
 global,0x0017B4C0,skill_advance_multipliers,strong,"35 shorts 12,1,1,5,15..,2,1,2,2,1,2,1,4,50,1,2,1,1,2,1,2,2,2,2,2,1,8 = DFU's per-skill advancement multipliers; used by skill_ready_to_advance and guild training"
 global,0x0017B506,sheet_buttons,confirmed,"23 x {x0,y0,x1,y1,handler} hit boxes for the sheet (dumped from the image): NAME row, INVENTORY, SPELLBOOK, AFFILIATIONS, PRIMARY/MAJOR/MINOR/MISC, HISTORY, LOG, HEALTH row, FATIGUE row, EXIT, 8 attribute boxes, 2 level-up spinner arrows; boxes match the labels in docs/play.md"
+global,0x0017BB6C,macro_table,strong,"start of the 255 text macro entries {char name[5]; char *(*handler)(void)} (9 bytes), grouped by first letter (tools/asset_ids.py, build/assets/macros.csv)"
+global,0x0017C47E,macro_letter_tables,strong,"per-letter pointers into macro_table, indexed by c-'a' (digits: c-23); parse_expand looks a %name up only in its letter's table"
+global,0x0017C4F2,macro_letter_counts,strong,"short count of entries per letter table (a 11, b 6, c 14, d 14 ... q 40, 1 9, 2 6, 3 6)"
+global,0x0017C52C,weight_fractions,strong,""".00"","".25"","".50"","".75"" (%kg)"
+global,0x0017C54E,legal_reputation_ranges,candidate,"pairs of int (low, high) bounds matching legal_reputation_names (%ltn)"
 global,0x0017C5DC,talk_regional_names,strong,"28 names: Temple of Akatosh ... Knights of the Hawk, Mages Guild, Fighters Guild, Tavern ... Clothing store"
+global,0x0017C650,ruler_fates,strong,"5 pointers: ""died of heart failure"" .. ""was overthrown"" (%olf)"
 global,0x0017C668,region_neighbours,candidate,11 bytes per region: bordering regions (faction_regions_border)
+global,0x0017CA24,holiday_days,strong,"short day of year of each holiday (holiday_index, holiday_today)"
+global,0x0017CA8E,holiday_regions,strong,"byte region+1 of each holiday, 255 for all (holiday_index, holiday_today)"
+global,0x0017CAC3,holiday_names,strong,"holiday names: New Life, Scour Day, Ovank'a, South Wind's Prayer, Day of Lights... (holiday_name)"
+global,0x0017CB97,month_names,strong,12 pointers: Morning Star..Evening Star (%dat)
+global,0x0017CBC7,day_names,strong,7 pointers: Morndas..Sundas (%dat)
+global,0x0017CBE3,ordinal_suffixes,strong,"""st"",""nd"",""rd"",""th"" (%dat; days above 3 all get ""th"", hence ""23th"")"
 global,0x0017CBF3,race_names,confirmed,"11 string pointers Breton .. Argonian, Vampire, Werewolf, Wereboar; sheet_draw prints [character+0x43]"
 global,0x0017CC27,skill_names,confirmed,35 string pointers Medical .. Critical Strike (DFU skill order); the sheet's skill popups print them
 global,0x0017CCB7,skill_governing_attributes,confirmed,"35 bytes, attribute index per skill (Hand-to-Hand 3 = AGI, as the sheet popup shows 'Hand-to-Hand 97% AGI')"
 global,0x0017CCDA,attribute_abbrevs,confirmed,8 string pointers STR INT WIL AGI END PER SPD LUC
 global,0x0017CEF2,faction_rank_names,candidate,table of rank-name tables by faction type; sheet_affiliation_line prints rank names from it
+global,0x0017CF4A,material_names,strong,"Iron, Steel, Silver, Elven, Dwarven, Mithril, Adamantium, Ebony, Orcish, Daedric (%mat)"
+global,0x0017CFD2,armor_type_names,strong,"Leather, Chain, Plate... by item+0x37 (%mat)"
+global,0x0017CFF6,condition_thresholds,strong,8 bytes of percentage limits for condition_names (%qua)
+global,0x0017CFFE,condition_names,strong,"8 pointers: Broken, Useless, Battered, Worn, Used, Slightly Used, Almost New, New (%qua)"
+global,0x0017D01E,pronoun_he,strong,"""he"",""she"",""it"" (%g %1g1 %2g1 %3g1)"
+global,0x0017D02A,pronoun_him,strong,"""him"",""her"",""it"" (%g2 ..)"
+global,0x0017D036,pronoun_his,strong,"""his"",""her"",""its"" (%g3 ..)"
+global,0x0017D04A,province_names,strong,"8 pointers: High Rock, Hammerfell, Skyrim, Elsweyr, Black Marsh, Valenwood, Sumurset, Morrowind (%hpn %dpr)"
+global,0x0017D06A,province_terrain_names,strong,"8 pointers: rolling hills, desertland, mountains... (%hpw)"
+global,0x0017D08A,attribute_rating_names,strong,"8x10 pointers by attribute and value/10: pathetic, frail, weak, below average.. superhuman (%ark)"
+global,0x0017D206,direction_names,strong,8 pointers: north..northwest (%di)
 global,0x0017D22A,item_templates,strong,"288 item templates of 48 bytes ('Ruby' first): name, weight, condition, value, pictures; item_init_from_template refuses idx >= 288"
 global,0x00180A7A,enchant_power_names,strong,"15 strings: Cast when used/held/strikes, Extra spell pts, Potent vs, Regens health, Vampiric effect, Increased Weight Allowance, Repairs objects, Absorbs spells, Enhances skill, Feather Weight, Strengthens armor, Improves talents, Good rep with (item+0x43 types 0-14)"
 global,0x00180B0A,enchant_side_effect_names,strong,"11 strings: Soul bound, Item deteriorates, User takes damage, Vision problems, Walking problems, Low damage vs, Health leech, Bad reactions from, Extra weight, Weakens armor, Bad rep with (types 15-25)"
@@ -67,7 +90,17 @@ global,0x00180B3A,potion_recipes,strong,"20 potion recipes x 109 bytes: +0 8 ing
 global,0x00182686,spell_effect_names,confirmed,"51 string pointers by effect type: Paralyze, Continuous Damage, Create Item, Cure, Damage, ... Teleport (43), Comprehend Languages (44); null for 29, 32, 36-38, 41, 42, 45-50 (not offered); exp1b (build/names/scratch/magic/exp1b.py, save_morthag1): effect types 0, 7, 9, 13-17, 19, 26-28, 30, 31, 35, 39, 42, 44 did what these names say"
 global,0x00182752,spell_effect_subtype_names,strong,"51 x 12 string pointers: subtypes (Health/Fatigue/Spell Points, the 8 attributes, Disease/Poison/Paralyzation, Fire/Frost/Poison/Shock/Magicka, Normal/True, Magic/Enemy/Treasure...)"
 global,0x001830E6,monster_names,strong,"string per monster id: Rat, Imp, Spriggan, Giant bat, Grizzly bear, Sabretooth tiger, Spider, Orc, Centaur, Werewolf (DFU MobileTypes order); soul lists"
+global,0x001837B4,ruler_titles,strong,"pointers indexed by faction+0x02: -, King, Queen, Duke, Duchess, Marquis, ... Lord, Lady (parse_faction_ruler_title)"
 global,0x001837E8,region_names,confirmed,"62 string pointers Alik'r Desert, Dragontail Mountains .. Cybiades (DFU region order); D_001837E4 is the same table indexed by region+1 and D_001835E8 by world-map pixel (128+region)"
+global,0x00184229,crime_names,strong,14 pointers: Attempted Breaking and Entering .. Treason (%cri)
+global,0x00184261,penalty_texts,strong,"3 pointers: Banishment, Execution, ""%gtp gold pieces in fines and %dip days in prison"" (%pen)"
+global,0x0018426D,codeword_first_words,strong,"False, Grand, Step, Second, Bastard... (%dbp high nibble)"
+global,0x001842A1,codeword_second_words,strong,"Sire, Dam, Scion, Cousin... (%dbp low nibble)"
+global,0x0018432D,imperial_names,strong,"""Pelagius"",""Cephorus"",""Uriel"",""Cassynder"" (%imp)"
+global,0x00184644,location_type_names,strong,"10 pointers: Town, Village, Community, Farm, Dungeon Entrance, Temple, Tavern, Castle, Manor, Shrine (%ct)"
+global,0x0018467C,text_blank,confirmed,"pointer to ""BLANK"": what the unimplemented macros return (%cn2 %du %hc %pd ...); experiment: their direct calls returned ""BLANK"""
+global,0x0018508B,honorifics,strong,"""Sir"", ""Ma'am"" by gender (%hnr)"
+global,0x0018509F,legal_reputation_names,strong,"8 pointers: hated, pond scum, a villain, a criminal, a scoundrel, undependable, a common citizen, dependable.. (%ltn)"
 global,0x001857A1,enchant_power_params,strong,"15 entries: 1-3 the spell lists, 4 souls, else a pointer to the parameter labels (seasons/moons, monster kinds, skills, talents, social groups)"
 global,0x001857E5,enchant_power_costs,candidate,per power: cost code (< 100) or a pointer to costs by parameter
 global,0x00185875,enchant_spell_lists,strong,3 pointers to 255-terminated SPELLS.STD id lists for cast when used / held / strikes
@@ -140,25 +173,36 @@ global,0x00190DF0,text_macro_fa,strong,faction record for %fa (shared ally)
 global,0x00190DF4,text_macro_fae,strong,faction record for %fae (the player's ally that the NPC's faction fights)
 global,0x00190DF8,text_macro_fea,strong,faction record for %fea (the player's enemy allied to the NPC's faction)
 global,0x00190DFC,text_macro_fpa,strong,faction record for %fpa (common parent)
+global,0x00190EAC,text_macro_map_location,candidate,location record whose name (+0x10) %map returns (map items)
 global,0x00190FE4,text_rsc_buffer,strong,output of the TEXT.RSC expander (parse.c func_0004A6B5); talk copies its answers from here
 global,0x001913E4,enchant_text,candidate,text buffer built by enchant_powers_text
+global,0x001917E4,arena2_path,candidate,"""C:\ARENA2\"" in save_dorian; quest_start and quests_start_initial look for quest files here first"
+global,0x00191834,arena2_path_alt,candidate,"second directory searched for quest files (""C:\ARENA2\"" in save_dorian; probably the CD)"
+global,0x001952EC,quest_global_states,strong,"byte array of global (main quest) states: a state record with is_global (+2) keeps its value at quest_global_states[+3]; snapshots: 0/1 values shared by s0000999, s0000016, s0000008"
 global,0x0019572C,text_macro_fcn,strong,%fcn text (parse.c 47815): name of the nearest town with the asked-for group (talk_find_regional)
 global,0x0019574C,enchant_reference_character,candidate,a character record whose 35 skills enchant_spell_cost sets to 50 before costing a spell
 global,0x0019597C,right_hand_ready_delay,candidate,accumulates the ready time of a changed right-hand weapon (inv_track_hand_weapons); >0 at close gives 'Equipping %it'
 global,0x00195980,left_hand_ready_delay,candidate,same for the left hand (equipped[21])
+global,0x00195984,quest_passed_items,candidate,"four item records (args 1-4) set by opcode 75 while it runs, cleared after the opcode loop; qinit copies them into a starting quest's items of category 100"
 global,0x00195998,last_skill_check_minutes,candidate,game_minutes of the last raise_skills from a trip: travel_begin_trip runs it again after 360 minutes
 global,0x001959AC,frame_counter,confirmed,main()'s loop does D_001959AC++ once per iteration (src/hand/func_00010010.c); rises ~119 per 400 timer ticks
 global,0x001959D8,inventory_containers,confirmed,"5 container objects (record type 52) under player_entity: tabs 0 weapons/armor, 1 magic items, 2 clothing/misc, 3 ingredients, 4 wagon; exp: tab click lists inventory_containers[tab]"
 global,0x001959E8,wagon_container,confirmed,inventory_containers[4]: exp: WAGON lists it on the right; capacity 3000 (750 kg) and '%s / 750'
 global,0x001959FC,spell_points_bonus,candidate,spell points spent before magicka by cast_recast_last (extra spell points)
 global,0x00195A00,quest_root,candidate,object whose child list (+0x3F) holds the active quests (type 14) that talk lists
+global,0x00195A14,quest_faces,strong,"10 slots of 10 bytes, the escort faces drawn at the top left: +0 face bits (gender<<7, race<<6, index), +1 quest id, +2 object id, +6 image (quest_face_add, quest_faces_draw)"
+global,0x00195A15,quest_faces_quest,candidate,quest_faces[i] +1: quest id
+global,0x00195A16,quest_faces_object,candidate,quest_faces[i] +2: object id (0 = free)
+global,0x00195A1A,quest_faces_image,candidate,quest_faces[i] +6: face image
 global,0x00195A80,text_macro_item,candidate,"item record the %it text macro reads ('Equipping %it', item info)"
+global,0x00195A84,text_macro_npc,candidate,"the talk NPC's record (char.c 59973, set by the NPC click 756C6): %n name, %oth oath by its race (+0x43)"
 global,0x00195A9C,current_building,strong,"the building entered: +0x12 faction (40 at the Mages Guild hall, experiment), +0x19 quality (spell list size)"
 global,0x00195AA0,player_entity,confirmed,"pointer to the player's creature entity: the character record is at +0x47 (2 saves), its parent (+0x43, the generic record header) is the world object; disease code checks entity+71 == player_character"
 global,0x00195AA4,player_object,confirmed,pointer to the player's world object: x/y/z ints at +7/+11/+15 move the player (fallplay tp); it is player_entity's parent (+0x43)
 global,0x00195AC4,location_object,candidate,root object of the loaded location/dungeon: its +0x1F high word is the id in the at%05d.amf/.atf file names; its children are walked for seen marks
 global,0x00195AC8,monster_bsa_handle,candidate,MONSTER.BSA's open archive handle (exp2 traces)
 global,0x00195ACC,text_macro_potion,candidate,potion recipe the %po macro reads ('Recipe for %po.')
+global,0x00195AD4,text_macro_book,strong,"book header that %bt (title, +0) and %ba (author, +64) read"
 global,0x00195AE8,cheat_flags,strong,"bits: 3 reveal maps (Ctrl+F1), 6 no spell damage to the player (Ctrl+F4, spfx_damage), 0 SPELLS.STD editing in the spellmaker, 2 free enchanting (itemmaker_enchant), 7 creatures cast nothing (cast_spell_on); keys.c toggles 3 and 6 in cheat mode"
 global,0x00195AF4,found_record,candidate,result of the membership searches (object pointer)
 global,0x00195B04,spell_records,confirmed,"pointer to SPELLS.STD in memory: 89-byte spell records, 128 max (name +0x2F, id +0x49); in save_morthag1 89 records (Fenrik's Door Jam, Buoyancy, Frostbite...); exp1b: cast_item_used_spell(82) found Orc Strength by id here"
@@ -169,6 +213,7 @@ global,0x00195B34,inv_right_container_base,candidate,the container the right lis
 global,0x00195B40,spell_ready_missile,strong,"spell object readied to fire (distance/area targets, ""Press button to fire spell.""); intrface.c and weapons.c fire it (cast_fire_missile, spell_area_effect); cast_recast_last refuses while set"
 global,0x00195B48,spell_ready_touch,strong,spell object readied for a touch
 global,0x00195B50,guild_npc_object,strong,the clicked guild NPC object (guild_service_dispatch)
+global,0x00195B54,weight_total,strong,accumulator object_weight_add adds to; object_weight returns it
 global,0x00195B58,spellshop_icons,strong,"mask04i0.img, spell icons drawn by spellshop_draw_spell"
 global,0x00195B7C,list_popup_callback,strong,"function called with the entry picked in a list popup (spells_list_poll): spellmaker_pick_effect_cb/pick_subtype_cb, itemmaker_add_power_cb, ..."
 global,0x00195B84,faction_scratch,candidate,counter/flags used by the recursive faction walks
@@ -178,6 +223,9 @@ global,0x00195BE8,window_image,strong,"background image of the open window: talk
 global,0x00195BEC,player_class,strong,"the class (career) record inside the character (player_character+0x230): item_forbidden_for_class reads +0x0B forbidden materials and +0x0E forbidden armor/shield/weapon bits (message 1068); disease/poison code reads immunity bits at +0x01, which fit class advantages"
 global,0x00195BF4,game_minutes,strong,"game time in minutes: %1440 with 1080/360 for 18:00/06:00 when trips end, 'Days left' = /1440, training once per 720, automap notes kept 43200 (30 days), files 129600 (90 days); save_blades = day 671 22:10"
 global,0x00195C44,scratch_buffer,candidate,"pointer to a large work buffer: +55000 popup text, +60000 status list, 50000 bytes of town-map notes"
+global,0x00195D00,quest_tick_object,candidate,object of the quest being run or started
+global,0x00195D04,quest_face_images,candidate,"four face image sets by gender and race (quest_face_add, quest_faces_after_load)"
+global,0x00195D14,quest_face_images_special,candidate,face image set for persons of faction 514
 global,0x00195D28,talk_where_target,candidate,"points at a struct (0x1965FC) the %hnt macro reads: +0x12 target building, +0x07 region, +0x10 kind"
 global,0x00195D2C,trade_total,candidate,"trade total shown at (77,15) on trade screens; set by trade_total_*"
 global,0x00195D30,trade_price,candidate,price after trade_adjust_price; paid or received when the offer is accepted
@@ -186,17 +234,28 @@ global,0x00195D38,trade_mode,strong,"0 inventory, 1 buy, 2 sell, 3 repair, 4 ide
 global,0x00195D40,magic_def_count,strong,number of magic.def entries (first dword of magic.def)
 global,0x00195D44,inventory_action,confirmed,"1 info, 2 equip/select, 3 remove, 4 use, 5 hide; exp: INFO/EQUIP/REMOVE/USE set 1/2/3/4; 2 when the inventory opens"
 global,0x00195D4C,magic_def,strong,"magic.def entries (name, kind, enchantment pairs, condition, value, material) read by magic_def_load"
+global,0x00195D50,quest_potential_questor,strong,person picked by quest_find_potential_questor / quest_npc_offers_quest; %pqn and %pqp read it
 global,0x00195D58,talk_prostitute_price,strong,"1d(50-75) - disposition, taken from the gold"
 global,0x00195D6C,text_rsc_file,candidate,"file handle from text_rsc_open('text.rsc'), closed by text_rsc_close; text.c reads messages through it"
+global,0x00195D78,text_rsc_main_file,candidate,handle of the main TEXT.RSC; parse_rsc_text and parse_rsc_text_copy switch text_rsc_file to it while reading (6 in save_dorian)
+global,0x00195D94,text_macro_city,candidate,"when set, the %cn macro returns it instead of the current location name"
 global,0x00195D98,spell_record_count,strong,"89 in save_morthag1, the number of named SPELLS.STD records at spell_records"
+global,0x00195DA4,qbn_opcode_arg_counts,strong,"pointer to a digit string, argument count per opcode (""3332531535442255...""); read in save_dorian, it matches UESP's sub-record count of every documented opcode; quest_unlink_for_save and quest_relink_after_load refresh qbn_op+0x04 from it"
+global,0x00195DB0,text_macro_travel_city,candidate,"destination name for %tcn (""Do you wish to travel to %tcn?"")"
+global,0x00195DC6,painting_subject_text,strong,TEXT.RSC id of the painting subject (%sub)
+global,0x00195DC8,painting_adjective_text,strong,TEXT.RSC id of the painting adjective (%adj)
+global,0x00195DCA,painting_prefix1_text,strong,TEXT.RSC id of painting prefix 1 (%pp1)
+global,0x00195DCC,painting_prefix2_text,strong,TEXT.RSC id of painting prefix 2 (%pp2)
 global,0x00195EB0,key_map,strong,"action -> scan code table (action 27 travel map = W, 12 rest = R, 24 logbook, 26 automap); matches Options > CONTROLS (travel play agent)"
 global,0x00195F22,book_count,candidate,u16 number of books found by books_scan
 global,0x00195F30,spell_effect_slot,strong,"short: effect slot (0-2) being edited/costed: the cost formulas, settings spinners and spell_cost index the spell with it"
 global,0x00195F5C,text_macro_n_text,strong,text id the %n macro uses when nonzero (parse.c 4878B); %1com sets it to 7221-7223 (friend/stranger/buddy)
 global,0x00195F62,spell_ready_cost,candidate,"short magicka cost of the spell being cast; cast_recast_last spends it, spfx_identify refunds it"
+global,0x00195F68,quest_giver_faction,candidate,"faction given to a new ""Y"" quest (quest+0x02); 240 means the current building's faction"
 global,0x00196036,spellmaker_spell,strong,89-byte spell being made: spellmaker_new points spellshop_spell at it and clears it; potion_mix_unknown also builds its spell here
 global,0x001960D9,trade_container,candidate,item list the guild services stock (shop_stock_*) and hand to the trade window (generate.c func_000922F6)
 global,0x001961F5,pending_quest_file,candidate,"13-char quest file name queued by guild_check_invitations (o0a0al00.qbn, l0a01l00.qbn)"
+global,0x00196266,text_macro_imperial,candidate,"index into D_0018432D (""Pelagius"",""Cephorus"",""Uriel"",""Cassynder"") for %imp"
 global,0x00196268,current_region,strong,"byte region index of the player: the world view paints pixels 128+this red (the highlighted region in cheat_morthag1, value 21 Anticlere), I'M AT and travel_mark_player use it, closing the map reloads it"
 global,0x00196269,previous_region,candidate,copied from current_region at the end of faction_politics_update
 global,0x0019626C,sheet_selected_attribute,candidate,attribute index 0..7 set by sheet_select_attribute (button-13); the level-up spinner changes this attribute
@@ -208,8 +267,10 @@ global,0x00196276,interaction_mode,strong,"0 grab F2, 1 info F3, 2 steal F1, 3 t
 global,0x00196279,mouse_buttons_prev,strong,mouse_buttons from the last frame: handlers act on (mouse_buttons & 1) && !(this & 1); the automap copies mouse_buttons into it each frame
 global,0x00196280,is_daytime,candidate,nonzero with a vampire (race 8) or career flag 16: 'You cannot initiate fast travel during the day.'; trips then end after 18:00
 global,0x00196288,inv_right_icon,strong,"byte: picture of inve16i0.cif shown for the right container: 2 ground at open, 3 wagon after WAGON (exp)"
+global,0x0019628F,text_macro_gender,candidate,"gender index (0 he, 1 she, 2 it) for %g %g2 %g3"
 global,0x00196291,cast_strike_spell,candidate,byte: 1 while func_0002E2CF casts a weapon's cast-when-strikes spell; cast_spell_on then plays the creature cast animation instead of the player's
 global,0x0019629A,cast_ignore_silence,candidate,byte: potion_drink sets it so cast_player_spell skips the silence check
+global,0x001962A9,quests_suspended,candidate,when set quests_run_all and quest_event_individual_npc do nothing
 global,0x001962AB,forced_material,candidate,"byte: when set, the next rolled material is n-1 (then cleared)"
 global,0x00196488,talk_regional_rows,candidate,row -> regional group index
 global,0x001964B0,talk_place_rows,candidate,row -> talk_place_topics index for the place list
@@ -270,6 +331,7 @@ global,0x0019672C,factions,strong,"faction records (92 bytes) as one array and t
 global,0x00196A28,region_location_count,candidate,number of map_location records at region_locations
 global,0x00196A7C,region_location_names,candidate,"pointer to 32-byte records, name at +4, parallel to region_locations"
 global,0x00196A9C,region_locations,candidate,"pointer to the region's 17-byte map_location records (D_00196A28 of them), from maploads.c"
+global,0x00196D7C,reputation_baseline,strong,"5 shorts: the social-group reputations %r1..%r5 compare with character+0x91.. (""Lower""/""Higher""/""Unchanged""); experiment: 0 against 25 gave ""Higher"""
 global,0x00196D88,town_map_view_x,candidate,left column of the town map shown; notes are drawn at (x-this)*2+10
 global,0x00196D8C,town_map_view_y,candidate,top row of the town map shown
 global,0x00196D90,town_map_scroll_y,candidate,scroll offset changed by town_map_scroll directions 0/1
@@ -282,11 +344,31 @@ global,0x00196DAC,automap_selected_note,candidate,"text of the selected object's
 global,0x00196DB0,automap_selected_object,candidate,object picked by a left click on the automap; the note line edits its note
 global,0x00196DB4,automap_notes,candidate,pointer to the notes in automap_record (object+0x47): entries u16 object id + string
 global,0x00196DB8,automap_top_down,confirmed,"1 top-down plan, 0 perspective: automap_button_view_mode flipped it 1 -> 0 and the picture changed"
+global,0x00196DBC,quest_debug_object,strong,quest object shown by quest_debug_overlay (quest_debug_next)
+global,0x00196DC0,quest_debug_kind_index,candidate,"index 0-5 into D_0017A134 (3, 4, 7, ..) cycled by key 39"
+global,0x00196DC1,quest_debug_kind,candidate,"text-variable section the overlay lists (3 persons, 4 places, 7 foes, 0 items, 9 states, 6 timers)"
 global,0x0019961C,spell_effect_cost_current,strong,"the 8-byte cost record (4 shorts) of the effect being costed, copied from spell_effect_costs; read by spell_cost_formulas"
 global,0x00199624,spellmaker_settings_image,strong,"mask05i0.img (spellmaker_open): the effect settings panel drawn by spellmaker_settings_update, freed by spellmaker_exit"
 global,0x0019962C,spellmaker_alter_row,candidate,"short: effect row waiting for the ""alter the spell?"" answer (-1 none): yes edits it, no deletes the effect"
 global,0x0019962E,spellmaker_settings_kind,strong,"byte: spell_effect_settings of the effect being edited (bits duration/chance/magnitude), 0 = settings panel closed"
+global,0x00199640,text_macro_skill,candidate,"skill index for %ski (""You are now a Master of %ski"")"
 global,0x00199644,sheet_hth_damage_line,candidate,set when a skill list includes skill 30 (Hand-to-Hand) so the popup adds 'Hand-to-Hand dmg: %d-%d' (seen in the keophex PRIMARY popup)
+global,0x0019972C,parse_name_seed,strong,"random seed saved by parse_expand at its start; the name macros reseed from it (+0 %fn, +123 %fn2, +3457 %mn and %bn, +9543 %mn2) so one text gets the same names"
+global,0x00199730,parse_output,candidate,the destination buffer of the current parse_expand call
+global,0x00199734,parse_number,candidate,number read after a %z.. macro by parse_read_number
+global,0x00199738,parse_stop,candidate,"when set, parse_expand stops after the current character (cleared on stop)"
+global,0x00199764,current_quest,strong,"data (+0x47) of the quest being run or started: set by quest_run_opcodes, quest_start, quest_load_text, quest_event_individual_npc"
+global,0x0019976C,quest_debug_data,strong,data of quest_debug_object; also set by quest_start and quests_run_all when 0; cleared by quest_end
+global,0x00199774,quest_event_object2,strong,"second object of the event (the person given an item: quest_raise_event(1, 0, npc))"
+global,0x00199778,quest_event_object,strong,"object of the event being dispatched (clicked person, item, creature, spell)"
+global,0x00199780,quest_tick_data,candidate,data of the quest quests_run_all is running / quest_find_by_id found
+global,0x00199784,quest_ended_id,confirmed,id of the last quest ended (quest_end); experiment: 4 after ending quest 4
+global,0x00199788,qbn_record_sizes,confirmed,"short[10] = 19, 94, 34, 20, 24, 16, 33, 14, 87, 8 (quest_init_record_sizes), the QBN section record sizes; quest_record multiplies by it; read back in save_dorian"
+global,0x001997A0,quest_prompt_op,strong,opcode of the yes/no question in progress (qaction_op29_prompt)
+global,0x001997A4,quest_prompt_quest,strong,quest of the yes/no question in progress
+global,0x001997AA,quest_find_id,candidate,quest id quest_find_by_id_cb looks for
+global,0x001997AC,quest_event_code,strong,"short: event being dispatched (1 item to npc, 2 kill, 3 item found, 5 item dropped, 21 foe hurt, 28 npc clicked, 71 pay, 73 spell, 78 faction); quest_dispatch_event runs the opcodes equal to it"
+global,0x001997AE,quest_test_started,candidate,set once quest_start_test_quest has started quest_test_file
 global,0x00199868,itemmaker_slot_exclusions,candidate,"10 x 10 bytes: per slot 5 (type, param) pairs ruled out"
 global,0x001998E0,itemmaker_slots,strong,"10 x {s16 type, s16 param}: the enchantments being made, copied to item+0x43 by itemmaker_enchant"
 global,0x00199908,itemmaker_item,strong,item data being enchanted (itemmaker_pick_item); enchant points item+0x3D
@@ -298,6 +380,8 @@ global,0x001A4A18,spellshop_saved_seed,candidate,RNG seed saved while the spell 
 global,0x001A4A1A,guild_npc_seed,candidate,high word of the NPC's record id; seeds the spell shop list
 global,0x001A4A1C,guild_gift_pending,candidate,set by guild_give_gift; guild_service_dispatch then opens the trade container
 global,0x001A4A1D,guild_join_asked,candidate,counter: the join question is asked only when it becomes 1
+global,0x001A5BE4,quest_test_file,candidate,quest file quest_start_test_quest starts (empty in the saves)
+global,0x001A5C27,quest_debug_on,strong,when non-zero quest_debug_overlay draws; experiment: setting it drew the overlay
 global,0x001A99F8,recall_anchor_location,candidate,location id (location_object +0x1B) saved when Recall sets the anchor
 global,0x001A99FC,recall_anchor_region,candidate,current_region saved with the Recall anchor
 global,0x001A9A00,recall_anchor_building,candidate,"the building (player object parent +0x1B) when anchored indoors, else 0"
@@ -472,10 +556,53 @@ field,object+0x37,next,confirmed,pointer to the next sibling: walked the charact
 field,object+0x3F,children,confirmed,pointer to the first child (containers -> items); walked in save_tlalac_s
 field,object+0x43,parent,confirmed,pointer to the parent: items -> their tab container -> player_entity -> player_object (player_entity+0x43 = player_object in save_tlalac_s; +0x40 is misaligned there)
 field,object+0x47,record_data,strong,record data (item or character) follows the 71-byte header: player_character = player_entity + 0x47
+field,person+0x02,flags,candidate,"byte of a type-8 person's data (object+0x49): bit 7 marks a potential quest giver (quest_mark_giver_cb, npc_is_quest_giver)"
 field,potion_recipe+0x00,ingredient_indices,strong,"8 signed bytes: ingredient template index, -2 ends (Stamina 4 16 13)"
 field,potion_recipe+0x08,value,strong,"u16 value of the potion made (25 Stamina, 50 Orc Strength)"
 field,potion_recipe+0x0A,ingredient_groups,strong,"8 bytes: item group of each ingredient (20, 16, 16)"
 field,potion_recipe+0x14,spell,strong,89-byte spell record of the potion (name at +0x43 Stamina; Stamina heals fatigue 10/9); potion_drink casts it
+field,qbn_arg+0x00,negate,strong,"bit 0 inverts the state (quest_arg_state, quest_set_state); UESP Not"
+field,qbn_arg+0x01,record,strong,pointer to the resource record (offset from the quest in the file; quest_relink_after_load adds the quest base); UESP LocalPtr
+field,qbn_arg+0x05,section,candidate,short section of the record; UESP SectionId
+field,qbn_arg+0x07,value,strong,"record index or constant; -1 none, -2 filler; UESP Value"
+field,qbn_arg+0x0B,object,strong,world object of the resource (an id in the save); UESP ObjectPtr
+field,qbn_foe+0x03,type,confirmed,monster type; experiment: 139 for S0000101's foe (UESP MobType)
+field,qbn_foe+0x04,count,confirmed,short count; experiment: 3 (UESP MobCount)
+field,qbn_foe+0x0A,object,strong,world object of the foe (relinked on load; opcode 87 deletes its type-34 twin)
+field,qbn_item+0x02,flags,strong,bit 7 topic hidden (opcodes 10/11); UESP Reward byte in the file
+field,qbn_item+0x0B,object,strong,world object of the item (relinked on load; cleared by opcodes 36/54)
+field,qbn_op+0x00,opcode,confirmed,"short opcode the quest_run_opcodes / quest_dispatch_event switches use; read in the saves (12, 76, 30, 28, 29, 51...)"
+field,qbn_op+0x02,flags,strong,"bit 0 done (quest_op_done; set in the saves on finished opcodes), bits 1/2 started/delivered (opcode 76)"
+field,qbn_op+0x04,arg_count,strong,"number of valid arguments, refreshed from qbn_opcode_arg_counts"
+field,qbn_op+0x06,args,strong,five 15-byte qbn_arg records; arg 0 is the state
+field,qbn_op+0x51,message,strong,"QRC message shown when done (quest_op_done), -1 none; UESP Message ID"
+field,qbn_op+0x53,last_minutes,strong,"game_minutes of the last run (opcodes 9/87 spawn interval, 76, 84); UESP LastUpdate"
+field,qbn_person+0x03,flags,strong,"bit 7 topic hidden (opcodes 10/11), bit 6 set by opcode 81, bit 5 follows opcode 82's state; with bit 5 set an event on this person (28, 1, 71) still lets the click go on to talk (quest_dispatch_event returns 0); UESP FacePictureIndex in the file"
+field,qbn_person+0x04,kind,candidate,short; 21 gets the questor rumors 1008/1009 (quest_add_questor_rumor); UESP Unknown1
+field,qbn_person+0x06,faction_id,strong,copied to type-65 person objects on load (+0x19); UESP FactionIndex
+field,qbn_person+0x0C,object,strong,world object of the person (cleared by opcode 44)
+field,qbn_place+0x02,flags,strong,"bit 7 topic hidden (opcodes 10/11), bit 6 opcode 81"
+field,qbn_place+0x10,object,strong,"world object of the place (relinked on load, an error when it is missing)"
+field,qbn_state+0x00,index,strong,short state index; UESP FlagIndex
+field,qbn_state+0x02,is_global,confirmed,non-zero: the value lives in quest_global_states[+3]; experiment: quest_arg_state matched 51/51
+field,qbn_state+0x03,value,confirmed,"the state (0, 1, or 128 from a timer) of a local state, or the global index"
+field,qbn_state+0x04,name_hash,strong,"hash of the state's name; the debug overlay prints it (""flag %d""); timers find their state by it"
+field,qbn_timer+0x02,flags,strong,"64 running, 128 expired, 0x400 links resolved, 16 doubled, 256/512 link is a person, 1/2/4/8 expiry behaviour (quest_timer_expire)"
+field,qbn_timer+0x04,type,strong,"0 random, 1 fixed, 2-5 travel time to one/two places or persons (quest_timer_update); UESP timer types"
+field,qbn_timer+0x05,minimum,confirmed,"minutes; experiment: delay = minimum (75, 640000) for type 1"
+field,qbn_timer+0x09,maximum,strong,"minutes, for type 0"
+field,qbn_timer+0x0D,start,confirmed,game_minutes when started; experiment: = game_minutes after quest_start
+field,qbn_timer+0x11,delay,confirmed,minutes until expiry; experiment: 75 and 640000
+field,qbn_timer+0x15,link1,strong,"place or person index, then its object (quest_link_object)"
+field,qbn_timer+0x19,link2,strong,second place or person
+field,qbn_timer+0x1D,state_hash,strong,name hash of the state the timer sets (quest_timer_expire)
+field,quest+0x00,id,confirmed,"short quest id, also object+0x26 (quest_start, quest_free_id); experiment: 4 for the started quest"
+field,quest+0x02,faction_id,strong,"questor faction: +5 reputation on success (quest_reward_faction), -2 on failure (opcode 6); UESP header FactionId"
+field,quest+0x04,text_file,candidate,"when non-zero the QRC name is sprintf(""%08d"") of it (quest_load_text); set by opcodes 66 and 67; UESP ResourceId"
+field,quest+0x06,name,confirmed,"8-character file name (""s0000999"", ""B0B71Y03""); debug overlay ""Quest : S0000999""; quest_is_active"
+field,quest+0x0F,flags,strong,bit 1 set by opcode 4 (rewarded): opcode 6 then posts 1007 not 1006 and skips the -2; UESP HasDebugInfo byte
+field,quest+0x10,section_counts,confirmed,"short[10] records per QBN section (+0x20 opcodes, +0x22 states, +0x1C timers, +0x1E foes, +0x16 persons, +0x18 places); read in 7 saves"
+field,quest+0x24,section_offsets,confirmed,short[11] offsets of the sections from the quest start (quest_section); offset 10 = text variables
 field,spell+0x00,effects,confirmed,"3 x {u8 type, u8 subtype}, 255 none; exp1b (build/names/scratch/magic/exp1b.py, save_morthag1): the dispatcher spell_apply_effect ran the handler of spell_effect_names[type]"
 field,spell+0x06,element,strong,"0 fire, 1 frost, 2 poison, 3 shock, 4 magic (spellmaker element buttons, TEXT 1801-1805); indexes spell_cast_sounds and spell_resist_flags"
 field,spell+0x07,target,strong,"0 caster, 1 touch, 2 distance, 3 area around caster, 4 area at distance (TEXT 1806-1810); cast_player_spell/cast_creature_spell_at switch on it"
@@ -642,21 +769,79 @@ func,0x00028EAA,automap_reattach_record,candidate,automap_find_record and keep t
 func,0x00028ED1,automap_restore_seen_one,candidate,callback: a type 6 or 34 object whose seen bit is set gets object_flags bit 0x80
 func,0x00028F56,automap_restore_seen,strong,"15 episodes with M: finds the record if needed, applies the seen bits to all location objects; after automap_load and on loading a game"
 func,0x00028F8B,automap_unmark_seen_one,candidate,callback: clears object_flags bit 0x80 (run over all objects as the automap closes)
-func,0x00028FAD,qcond_op05_event_at_place,candidate,quest event opcode 5 (qcom 2B26B): the event object is the resource and the player is in the same place (type 43) as it
-func,0x000290DD,qcond_op43_pc_at_place,candidate,"quest opcode 43 (qcom 29958, every frame with a quest, 442 episodes): true when the player's place (type 43 or 1 up the parents) has the resource place's id"
+func,0x00028FAD,qcond_op05_event_at_place,strong,"event 5, raised by the inventory drop code (inven 94324/946D4, 9401E): the dropped object's twin is the item resource and it lies in the same place (type 43 parent) as the player -> state; UESP type 5 (Item, Location); DFU DroppedItemAtPlace"
+func,0x000290DD,qcond_op43_pc_at_place,strong,"opcode 43 in the 29958 switch (every frame with a quest): arg2 state = player's place (type 43/47/1 parent) has the place resource's id (+0x1F); UESP 0x2B ""PC at Location""; DFU PcAt"
 func,0x000292C5,quest_op17_set_timer,candidate,quest opcode 17: on the resource's placed object calls support.c 7E3CD with a byte and game_minutes + a duration
-func,0x00029324,qcond_op01_item_given_to_npc,candidate,"quest event 1: the resource item is among player_entity's possessions and the clicked person is the target; removes the item (unequip_object, delete)"
-func,0x00029441,qcond_op03_event_object,candidate,quest event 3: the event object (D_00199778) is the resource
-func,0x00029490,qcond_op21_event_same_kind,candidate,quest event 21: the event object's +0x1D matches the resource's
-func,0x000294E5,qcond_op02_event_count,candidate,quest event 2: like op 21 but counts up to a target before firing
+func,0x00029324,qcond_op01_item_given_to_npc,strong,"event 1, raised by the NPC click (click.c 756C6: quest_raise_event(1, 0, npc)): the item resource is carried by player_entity and the clicked person is the person resource -> state, item removed (unequip_object, object delete); UESP type 1 ""set State when Item is given to NPC""; DFU TotingItemAndClickedNpc"
+func,0x00029441,qcond_op03_event_object,strong,"event 3, raised when an item is picked up (inven.c, click 75839): the event object's twin is the item resource -> state; UESP type 3 ""PC finds Item""; DFU ClickedItem"
+func,0x00029490,qcond_op21_event_same_kind,strong,"event 21, raised by the damage code (qkey.c 2E914 after a hit): the hurt creature's +0x1D matches the foe resource -> state; UESP 0x15 ""Mob hurt by PC""; DFU InjuredFoe"
+func,0x000294E5,qcond_op02_event_count,strong,"event 2, raised by the death code (2ECBE: quest_raise_event(2, creature, 0)): counts kills of the foe kind in the state record +5 up to arg2, then state; UESP type 2 ""Check Kill Count""; DFU KilledFoe"
 func,0x0002956B,quest_resource_unplace,candidate,clears a resource's placement links and resets its id to the current location
-func,0x000295BE,quest_op09_spawn_repeat,candidate,"quest opcode 9 (267 episodes): every interval minutes, with chance %, while charges last, spawns the resource count times (qinit 33764): 'create foe every N minutes M times with P%'"
-func,0x00029670,quest_op87_respawn,candidate,quest opcode 87: like op 9 but first deletes the previous creature (type 34)
-func,0x00029738,qcond_op28_event_person,candidate,quest event 28: the event object is the resource person (type 65 id or placement)
-func,0x000297BA,qcond_op70_player_has_items,candidate,quest opcode 70: true when up to 3 resources are all among player_entity's possessions
+func,0x000295BE,quest_op09_spawn_repeat,strong,"opcode 9 (267 episodes): every arg2 minutes, with arg3 % chance, while arg4 lasts (-1 forever), creates the foe (qinit 33764); UESP type 9 ""Repeating Spawn"" (Mob, delay, chance, count); DFU CreateFoe"
+func,0x00029670,quest_op87_respawn,strong,"opcode 87: like op 9 but first deletes the previous creature (type 34); UESP 0x57 (Mob, delay, chance, total count)"
+func,0x00029738,qcond_op28_event_person,strong,"event 28, raised by the NPC click (click.c 756C6: quest_raise_event(28, npc, 0)): the clicked person is the person resource (type-65 faction id or twin) -> state; UESP 0x1C ""PC meets NPC""; DFU ClickedNpc"
+func,0x000297BA,qcond_op70_player_has_items,strong,"opcode 70: arg1 state = all item resources args 2-4 are carried by player_entity; UESP 0x46 ""PC has Items""; DFU HaveItem"
 func,0x000298F3,unequip_object,candidate,clears the character+0x16F equipped slots holding this object; called when an object is deleted (object.c 8EBFD) or given away
+func,0x00029958,quest_run_opcodes,strong,"runs one quest: for each 87-byte opcode record (quest_section(q,8), count quest+0x20) switches on the opcode: 0 place item, 4 reward, 6 end, 7 clear states, 8 start s%07d.qbn, 9 spawn, 10/11 topics, 12/13 timer, 19/20 reveal, 22/33 place foe, 23/24 log, 29 prompt, 30 place npc, 31 daily clock, 34/35 states, 43 pc at, 49 cure disease, 50 anim%04d.vid, 52/53 and/or, 55/56 faces, 58/59 cure vampirism/lycanthropy, 60/84 sound, 61/65 reputation, 62 weather, 72 disease, 76 give item, 77/79 level/repute, 83 teleport, 85/86 questor..; most cases: state arg0 true and not done -> handler, then quest_op_done; called every frame by quests_run_all (495 episodes)"
+func,0x0002B26B,quest_dispatch_event,strong,"for each opcode equal to quest_event_code: 71 pay gold, 28 clicked npc, 3 found item, 5 dropped item, 1 item to npc, 2 kill, 21 hurt foe, 73 spell cast, 78 faction; returns whether one fired; callers quest_raise_event, quests_raise_event_all, quest_event_individual_npc"
+func,0x0002B5EF,quest_debug_overlay,confirmed,"called from main every frame; when quest_debug_on: keys 39/40/67 cycle the text-variable type, the quest and on/off; draws ""flag %d ( TRUE/FALSE )"" per state, ""Player : x, y, z"", ""Quest : %s"" (qcom.c strings); experiment: with D_001A5C27=1 after quest_debug_next it drew the states of S0000999 over the 3D view"
+func,0x0002BBBC,quest_debug_next,confirmed,selects the next active quest (type 14) for the overlay: quest_debug_object and quest_debug_data; experiment: selected s0000999 (the first quest)
+func,0x0002BC80,quests_unlink_all,strong,quest_unlink_for_save on every type-14 child of an object; called by the save code (loadsave 7A638)
+func,0x0002BCCF,quests_relink_all,strong,"quest_relink_after_load on every type-14 child; called by save and load (loadsave 7A638, 7A983)"
+func,0x0002BD1E,quest_unlink_for_save,strong,"turns a quest's pointers into save form: opcode arg record pointers -= quest base, arg/person/place/item/mob/timer object pointers -> object ids (+0x1F), arg counts refreshed from qbn_opcode_arg_counts; errors if an object belongs to another quest (+0x26)"
+func,0x0002C0A8,quest_relink_after_load,strong,"inverse of quest_unlink_for_save: arg pointers += quest base, object ids -> objects (object.c 8E925 under D_001959A8 or location_object), type-65 person objects get the person's faction (+6), text variables get their record pointers (quest_record)"
+func,0x0002C406,quest_event_clicked_faction,strong,"for every quest and every opcode 78 whose arg1 is the faction id: sets its state; called by the NPC click (click.c 756C6) with the clicked person's faction (+0x47); UESP 0x4E (State, Faction ID) ""sets State1 if some condition is true"""
+func,0x0002C4FA,quest_timers_update,strong,"per frame (end of quest_run_opcodes): timers with flag 2 clear their state; running timers (flag 64) are checked by quest_timer_update(q, t, 0)"
+func,0x0002C589,quest_timers_start_all,confirmed,"quest_timer_update(current_quest, t, 1) for every timer; called by quest_start; experiment: after quest_start(S0000101.QBN) both timers had start = game_minutes, delay = minimum (type 1) and flag 0x400"
+func,0x0002C5ED,quest_timer_update,strong,"start (a3): resolves links once (flag 0x400), start = game_minutes, delay by type: 0 random(min,max), 1 min, 2-5 travel time to the linked place/person (+1 week for some place kinds, flag 16 doubles); check (!a3): game_minutes - start > delay -> quest_timer_expire; UESP timer types 0-5"
+func,0x0002C96B,quest_link_object,candidate,"object of a place (quest_record(q,4,i)+0x10) or person (quest_record(q,3,i)+0x0C) resource; resolves timer links"
+func,0x0002C9C2,quest_timer_expire,strong,"sets timer flag 128 (flags 1/2 set it, 4 toggles it), restarts it when flag 8, and copies flag 128 into the state whose name hash is the timer's +0x1D; UESP timer +29 ""the name of the state this timer controls"""
+func,0x0002CAB0,quest_timer_clear_state,candidate,clears the state whose name hash is the timer's (+0x1D) in current_quest
+func,0x0002CB34,qaction_op12_start_stop_timer,strong,"opcode 12 (a3=64): starts timer arg1 (quest_timer_update start) unless running; opcode 13 (a3=0): clears the running flag; UESP 0x0C ""Start timer"" / 0x0D ""Stop timer""; DFU StartStopTimer"
+func,0x0002CBA6,quest_state_from_timer,candidate,sets state arg0 to the expired flag (128) of timer arg1; no caller in the C
+func,0x0002CC40,qaction_op25_countdown,candidate,"opcode 25: while state arg1 is clear, counts arg2 down once per run; at 0 sets state arg1 (or just finishes when arg1 is -1); not in UESP's list"
+func,0x0002CD0C,qaction_op11_remove_topics,strong,"opcode 11: sets bit 7 (topic hidden) of the place (+2), person (+3) and item (+2) resources args 1-3; UESP 0x0B ""Remove Topics"" (Location, NPC, Item)"
+func,0x0002CDD5,qaction_op10_add_topics,strong,"opcode 10: clears bit 7 of the place, person and item resources args 1-3; UESP 0x0A ""Add Topics"": enable ""Where is""/""Tell me about""; DFU AddDialog"
 func,0x0002F369,damage_collapse_exhausted,strong,"damage.c; direct call (all-zero args) shows 'You drop to the ground, completely exhausted...'; called by func_0002F02C"
 func,0x0002FA97,play_death_video,strong,damage.c; opens anim0012.vid; a direct call shows the funeral cutscene (fallcall)
+func,0x0002FD75,quest_run_object_cb,candidate,tree-walk callback: quest_run_opcodes on a type-14 object's data (+0x47); referenced by pointer only
+func,0x0002FDB0,quest_find_by_id_cb,candidate,tree-walk callback: a type-14 object whose quest id (+0x47) is D_001997AA becomes quest_tick_data/quest_event_object
+func,0x0002FE02,quest_item_release_cb,candidate,per inventory item (quest_items_release_on_close): an item with a quest id (+0x26) and flag 0x8000 at +0x15 loses its quest id and bit 7 of +0x16
+func,0x0002FE4B,quest_restrain_foe_cb,candidate,per object of the location: creatures (type 18) of the current quest (+0x26) whose kind (+0x1D) is D_00190D64 get bit 7 of +0x88 set (D_00190CE4) or cleared; the damage code (qkey 2E914) clears it when hit
+func,0x0002FEBC,quest_cast_spell_on_foe_cb,strong,per object of the location: creatures of the current quest of kind D_00190D64 get the spell object D_00195AA8 cast on them (runspell.c 5ABE6)
+func,0x0002FF2C,quest_travel_minutes,strong,travel_route time between two objects (or the player and one) + 2880 (two days); used by quest_timer_update for timer types 2-5
+func,0x0002FFA6,quest_arg_state,confirmed,value of the state of opcode argument i (-1 = always true; NOT bit +6 inverts; global states read quest_global_states[+3]); experiment: equal to the state record for all 51 state arguments of s0000999 in save_dorian
+func,0x0003009A,qaction_op35_cycle_state,strong,"opcode 35: clears the first set state among args 1-4 and sets the next one (wrapping), or the first; UESP 0x23 ""Cycle state"""
+func,0x00030275,qaction_op34_pick_one_state,strong,"opcode 34: sets one random state of args 1-4 (skipping -1/-2); UESP 0x22 ""Random State""; DFU PickOneOf"
+func,0x000303A0,qaction_op29_prompt,strong,"opcode 29: shows message arg3 as a yes/no popup (quest_show_message), remembers op/quest in quest_prompt_op/quest_prompt_quest and sets D_001940DA bit 5; UESP 0x1D ""Yes/No Question""; DFU Prompt"
+func,0x000303F1,quest_prompt_answer,strong,"per frame once the popup closes (game_mode 0, D_001940DA bit 5): sets state arg[popup_answer] (1 yes, 2 no) of quest_prompt_op and clears the bit"
+func,0x0003045F,quest_set_state,confirmed,sets state arg0 of an opcode to a value (NOT bit inverts; global states via quest_global_states); experiment: flipped and restored the state of s0000999 opcode 1
+func,0x000304C8,quest_set_arg_state,strong,"sets the state of opcode argument i to a value (NOT bit inverts); used by the conditions (pc at, has items, pay gold, level, faction)"
+func,0x0003053E,qaction_op04_give_reward,strong,"opcode 4 (after quest+0x0F |= 2 and QRC message 1004 ""guild quest complete""): l0a01l00 -> guild_join_dark_brotherhood, o0a0al00 -> guild_join_thieves_guild; else the reward items args 1-4 are moved into the trade/loot container for the player to take (""ERROR: Could not retrieve quest item: %s, %d""); faction +5 (quest_reward_faction); UESP type 4 (Items, 5 sub-records)"
+func,0x000306FE,qaction_op19_reveal_location,strong,"opcodes 19 and 20 (third argument unused): sets bit 6 of the region_locations entry of the place resource's location (index +0x1B among the non-255 entries); UESP 0x13 ""Add Location to Map""; DFU RevealLocation"
+func,0x0003077F,quest_object_delete,candidate,"deletes a quest resource object (object.c 8DA91) and its twin (+0x33) when a2, else unlinks the twin (+0x33=0, quest id +0x26=0); used by opcodes 36, 44, 54"
+func,0x0003081B,quest_remove_objects,strong,deletes every object with the quest id under location_object and D_001959A8 (object.c 8ECBD); called by quest_end; experiment: the quest started by quest_start was gone after quest_end
+func,0x00030854,quest_give_item_to_player,strong,makes the item resource's twin (quest_object_instantiate) and stores it with inv_store_item; opcodes 26 and 76
+func,0x000308DE,qaction_op37_repute_exceeds,strong,"opcode 37: state arg1 = reputation with the person resource's faction (+0x1D, plus the social-group reputation character+0x91 for groups < 5) >= arg3; UESP 0x25 ""set State2 if NPC reputation >= Value""; DFU ReputeExceedsDo"
+func,0x000309E8,quest_section,confirmed,"quest + section_offsets[s] (quest+0x24): base of QBN section s (0 items, 3 persons, 4 places, 6 timers, 7 foes, 8 opcodes, 9 states); experiment: equal to quest + offset for s=0..9"
+func,0x00030A23,quest_record,confirmed,"quest_section(q,s) + i * qbn_record_sizes[s]; experiment: record 2 of sections 8 and 9 = base + 2*87 / 2*8"
+func,0x00030A6E,quest_face_add,strong,"adds a person or foe to the 10 quest_faces slots (face image from D_00195D04 by gender and the region's name bank, or D_00195D14 for faction 514), with its quest id and object id; opcodes 55 and 63; UESP 0x37 ""Escort NPC: add face for NPC to screen""; DFU AddFace"
+func,0x00030C10,quest_faces_after_load,candidate,rebuilds the face image pointers of quest_faces and drops the slots whose quest no longer exists (object.c 8EE02); called by the load code (7A983)
+func,0x00030D02,quest_faces_draw,strong,"every frame in game_mode 0 (game_frame): draws each used quest_faces image at (32n+8, 36)"
+func,0x00030D8E,quest_face_remove,strong,"frees the quest_faces slot of an object id; opcodes 56 and 64; UESP 0x38 ""End Escort NPC: remove face""; DFU DropFace"
+func,0x00030DE1,quest_face_rename,candidate,replaces an object id in quest_faces (called when quest_object_instantiate gives the twin a new id)
+func,0x00030E34,quest_faces_remove_quest,strong,frees the quest_faces slots of a quest id; called by quest_end and quest_faces_after_load
+func,0x00030E92,qcond_op57_item_used,strong,"opcode 57: true once the item resource's twin has flag 0x200 (+0x2A of the item, set when used); sets state arg1; UESP 0x39 ""Use Item""; DFU ItemUsedDo"
+func,0x00030F39,quest_items_release_on_close,candidate,quest_item_release_cb for every item of player_entity; called by inventory_close
+func,0x00030F63,qaction_op68_restrain_foe,candidate,"opcode 68: sets or clears (by state arg2) bit 7 of +0x88 on the quest's creatures of the foe's kind (quest_restrain_foe_cb); the bit is cleared when the creature is hurt; UESP 0x44 (Mob, State) ""done with Mob""; DFU RestrainFoe fits"
+func,0x00030FEF,qaction_op69_cast_spell_on_foe,strong,"opcode 69: finds spell arg2 in spell_records (+0x49 id), makes a type-9 spell object and casts it on the quest's creatures of the foe's kind (quest_cast_spell_on_foe_cb); UESP 0x45 (Mob, value 6-64); DFU CastSpellOnFoe"
+func,0x000310E1,quest_object_instantiate,candidate,"makes the world twin of a quest resource object: items/creatures (type 2/18) are copied with their children, persons (type 41) become type-8 people (faction from +0x59 or 510, ""Invalid person""), type 40 links an existing object; twins link both ways (+0x33)"
+func,0x00031658,qaction_op76_give_pc_item_later,candidate,"opcode 76: sets flag 2, then gives the item (quest_give_item_to_player) with a 10% chance per minute once the player is outside in a town, not fighting, not a vampire by day; at once on the travel map; flag 4 = delivered; UESP 0x4C ""Give Item to PC"" (letters)"
+func,0x000317AE,quest_deliveries_done,candidate,0 while an opcode 76 has started (flag 2) but not delivered (flag 4); opcode 6 waits for it
+func,0x00031843,quest_event_individual_npc,candidate,"event for a clicked individual NPC (type 8, faction type 4): dispatches to every quest with a type-65 person of that faction; called by the NPC click 756C6 with events 28 and 1"
+func,0x000319B6,qaction_op83_teleport_pc,strong,"opcode 83: finds location arg3 in region arg2, loads it (maploads 1DD39, maplogic 876AD/86794) and moves the player to the place object; UESP 0x53 (Location, Region ID, Location ID); DFU TeleportPc"
+func,0x00031ACA,quest_show_message,strong,"shows quest message id: -1 none, bit 15 -> TEXT.RSC record (text.c 3F09F), during a prompt (D_001940DA bit 5) support.c 7DE23, else the QRC record (text.c 3EDF4)"
+func,0x00031B47,quest_op_done,strong,marks an opcode done (flags bit 0) once and shows its message (+0x51); snapshots: done opcodes have flag 1 (op 76: 7)
 func,0x00036F69,spellmaker_open,confirmed,"unit spells.c (filed under fs2df.c). (open) game_mode=2, loads info01i0.img, mask01i0.img, mask05i0.img, spellmaker_new; called by spellmaker_update every frame (open=0) and guild_service_dispatch (Make Spells, cases 64/497); exp: fallcall 0x36F69 1 drew the spellmaker (MAX SP, MONEY, SPELL COST, CASTING COST, SPELL NAME, BUY/NEW/EXIT): scratch/magic/open_0x36F69.png"
 func,0x00037014,spellmaker_update,strong,"every frame (game_frame, 501 episodes) but returns unless spellmaker_open says mode 2; draws MAX SP/MONEY/SPELL COST (sum of effect costs*target factor*2)/CASTING COST (spell_cost)/name, element and target icons, effect names; hit-tests the 18 spellmaker_buttons (ButtonClick 203); handles the alter-effect popup"
 func,0x00037732,spellmaker_exit,strong,"spellmaker_buttons[12] (244,179)-(268,195) EXIT: right-click shows TEXT 1814 ""Exit from SpellMaker""; left frees the images, game_mode=0; with cheat_flags bit 0 a right-click deletes a SPELLS.STD entry (spells_std_delete)"
@@ -761,6 +946,297 @@ func,0x00040FC1,court_trial,strong,"text.c; direct call with the player entity f
 func,0x000445B5,options_joystick_calibrate,strong,"options.c; cnfg04i0.img, cnfg05i0.cif, cnfg06i0.img; direct call (all-zero args) shows the joystick calibration window"
 func,0x00044EE0,show_rumor,candidate,kludge.c; opens rumor.dat; direct call (all-zero args) shows a rumour; calls faction_rumor_text
 func,0x00045B7F,pick_gold,candidate,kludge.c; string 'Picking from %s.'; direct call (all-zero args) shows 'You picked N gold pieces'
+func,0x0004633F,parse_expand,confirmed,"the text macro expander (src, dst): ""%xxx"" via the per-letter tables D_0017C47E/D_0017C4F2 (9-byte {name[5], handler}), ""_sym_""/""=sym_"" quest symbols via qkey.c 2CE9E with a hash (998C8) and level (_ +16 each, = +1 each); ""Invalid parse command (%lx,%s)"" when a handler returns <1000; experiment: expanding ""%ra|%pcn|%cn|%dat|%tim|%god|%rn..."" in save_dorian gave ""Dark Elf|Dorian Kaine|Sentinel|Middas the 23th of Evening Star|18:55|Arkay|Queen Akorithi..."""
+func,0x000466C6,macro_fal_faction_name,candidate,macro table %fal -> func_000466C6: name of the faction in D_00196724; never used by TEXT.RSC or QRC
+func,0x000466EC,macro_a_price,strong,"macro table %a -> func_000466EC: trade_price as decimal; rsc8 ""Training will cost you %a""; direct call in save_dorian returned '0'"
+func,0x0004671E,macro_agi_agility,confirmed,"macro table %agi -> func_0004671E: character+0x26 (AGI) as decimal; rsc3 ""With your agility of %agi""; experiment: direct call in save_dorian returned '100'"
+func,0x00046754,macro_ap_other_province,candidate,"macro table %ap -> func_00046754: the {High Rock, Hammerfell} entry not selected by D_00196267 (D_0017D042[x^1]); no text uses %ap; direct call in save_dorian returned 'Hammerfell'"
+func,0x00046787,macro_arm_item_name,strong,"macro table %arm -> func_00046787: text_macro_item name with %-template substitution (parse_item_name); rsc1000 ""%mat %arm %mod to armor rating""; DFU ItemName; direct call in save_dorian returned 'Indulcet'"
+func,0x000467D0,macro_ach_chance_per_level,strong,"macro table %ach -> func_000467D0: spellshop_spell effect byte +0x18+3n; rsc1202 ""Chance: %bch + %ach per %clc level(s)""; DFU ChancePlus; direct call in save_dorian returned '0'"
+func,0x00046813,macro_adr_duration_per_level,strong,"macro table %adr -> func_00046813: spellshop_spell effect byte +0x0F+3n; rsc1202 ""Duration: %bdr + %adr per %cld level(s)""; DFU DurationPlus; direct call in save_dorian returned '0'"
+func,0x00046856,macro_1am_magnitude_per_level_min,strong,"macro table %1am -> func_00046856: spellshop_spell effect byte +0x22+5n; rsc1202 ""Magnitude: %1bm - %2bm + %1am - %2am""; DFU MagnitudePlusMin; direct call in save_dorian returned '0'"
+func,0x00046899,macro_2am_magnitude_per_level_max,strong,macro table %2am -> func_00046899: spellshop_spell effect byte +0x23+5n; rsc1202; DFU MagnitudePlusMax; direct call in save_dorian returned '0'
+func,0x000468DC,macro_ark_attribute_rating,confirmed,"macro table %ark -> func_000468DC: D_0017D08A[sheet_selected_attribute*10 + value/10] (""pathetic""..""superhuman""); rsc0-7 ""you are considered %ark""; experiment: direct call in save_dorian returned 'superhuman'"
+func,0x00046947,macro_adj_painting_adjective,strong,"macro table %adj -> func_00046947: TEXT.RSC record D_00195DC8 (parse_rsc_text); rsc250 ""%adj by %an""; DFU PaintingAdjective; direct call in save_dorian returned 'STRENGTHý Strength governs encumbrance, '"
+func,0x0004697A,macro_an_artist_name,confirmed,"macro table %an -> func_0004697A: random name (names.c 8B572, random bank and gender); rsc250 ""%sub by %an""; DFU ArtistName; experiment: direct call in save_dorian returned 'Churpan'"
+func,0x000469B4,macro_alc_faction_name,candidate,macro table %alc -> func_000469B4: name of the faction in D_00196728 (+3); never used by TEXT.RSC or QRC
+func,0x000469DA,macro_alf_faction_name,candidate,macro table %alf -> func_000469DA: name of the faction in D_00196728 (+3); never used by TEXT.RSC or QRC
+func,0x00046A00,macro_mod_armor_modifier,strong,"macro table %mod -> func_00046A00: armour bonus of text_macro_item with sign (index-6, or item_armor_value/10); rsc1000 ""%mod to armor rating""; DFU ArmourMod; direct call in save_dorian returned '+1'"
+func,0x00046A7F,macro_brd_regional_name,candidate,macro table %brd -> func_00046A7F: regional name (bank D_001841E3[region]) seeded from parse_stub_zero(511)+31; no text uses %brd; direct call in save_dorian returned 'Bojan'
+func,0x00046B0D,macro_bch_base_chance,strong,"macro table %bch -> func_00046B0D: spellshop_spell effect byte +0x17+3n; rsc1202 ""Chance: %bch""; DFU ChanceBase; direct call in save_dorian returned '0'"
+func,0x00046B50,macro_bdr_base_duration,strong,"macro table %bdr -> func_00046B50: spellshop_spell effect byte +0x0E+3n; rsc1202 ""Duration: %bdr""; DFU DurationBase; direct call in save_dorian returned '0'"
+func,0x00046B93,macro_1bm_base_magnitude_min,strong,"macro table %1bm -> func_00046B93: spellshop_spell effect byte +0x20+5n; rsc1202 ""Magnitude: %1bm - %2bm""; DFU MagnitudeBaseMin; direct call in save_dorian returned '0'"
+func,0x00046BD6,macro_2bm_base_magnitude_max,strong,macro table %2bm -> func_00046BD6: spellshop_spell effect byte +0x21+5n; DFU MagnitudeBaseMax; direct call in save_dorian returned '0'
+func,0x00046C19,macro_bt_book_title,strong,"macro table %bt -> func_00046C19: string at *D_00195AD4 (book header); rsc1009 ""%bt by %ba""; DFU book title"
+func,0x00046C3C,macro_ba_book_author,strong,"macro table %ba -> func_00046C3C: *D_00195AD4 + 64; rsc1009 ""%bt by %ba""; DFU BookAuthor"
+func,0x00046C62,macro_bn_biography_name,strong,"macro table %bn -> func_00046C62: name generator seeded by parse_name_seed+0xD81 with the player race (character+0x43); rsc4121 ""a %q8 named %bn""; direct call in save_dorian returned 'Turien Enakul'"
+func,0x00046CC2,macro_cn_city_name,confirmed,"macro table %cn -> func_00046CC2: D_00195D94 if set, else current_location name, else the region name; rsc22 ""You are in %cn""; experiment: direct call in save_dorian returned 'Sentinel'"
+func,0x00046D22,macro_cn2_blank,confirmed,"macro table %cn2 -> func_00046D22: returns text_blank (""BLANK""); DFU CityName2; experiment: direct call in save_dorian returned 'BLANK'"
+func,0x00046D45,macro_ct_location_type,confirmed,"macro table %ct -> func_00046D45: D_00184644[current_location+0x22] (""Town"",""Village"",..); DFU CityType; experiment: direct call in save_dorian returned 'Town'"
+func,0x00046D79,macro_clc_chance_levels,strong,"macro table %clc -> func_00046D79: spellshop_spell effect byte +0x19+3n; rsc1202 ""per %clc level(s)""; DFU ChancePerLevel; direct call in save_dorian returned '0'"
+func,0x00046DBC,macro_cld_duration_levels,strong,"macro table %cld -> func_00046DBC: spellshop_spell effect byte +0x10+3n; rsc1202 ""per %cld level(s)""; DFU DurationPerLevel; direct call in save_dorian returned '0'"
+func,0x00046DFF,macro_clm_magnitude_levels,strong,"macro table %clm -> func_00046DFF: spellshop_spell effect byte +0x24+5n; rsc1202 ""per %clm level(s)""; DFU MagnitudePerLevel; direct call in save_dorian returned '0'"
+func,0x00046E42,macro_cti_item_value_tenth,candidate,macro table %cti -> func_00046E42: text_macro_item +0x24 (value) / 10; no text uses %cti; direct call in save_dorian returned '0'
+func,0x00046E82,macro_cne_faction_name,candidate,macro table %cne -> func_00046E82: name of the faction in D_00196728; never used by TEXT.RSC or QRC
+func,0x00046EA8,macro_cnr_faction_name,candidate,macro table %cnr -> func_00046EA8: name of the faction in D_00196720; never used by TEXT.RSC or QRC
+func,0x00046ECE,macro_cri_crime,strong,"macro table %cri -> func_00046ECE: D_00184229[D_00190D17] (""Trespassing"",""Murder"",..); rsc8050 ""accused of the crime of %cri""; DFU Crime"
+func,0x00046EFC,macro_cpn_shop_name,strong,"macro table %cpn -> func_00046EFC: name of current_building (names.c 8BD50); rsc261 ""%cpn prides itself""; DFU ShopName; direct call in save_dorian returned 'Residence'"
+func,0x00046F24,macro_crn_current_region,confirmed,"macro table %crn -> func_00046F24: region_names[current_region]; rsc22 ""In the eyes of the law of %crn""; DFU CurrentRegion; experiment: direct call in save_dorian returned 'Sentinel'"
+func,0x00046F52,macro_dae_daedra_name,strong,"macro table %dae -> func_00046F52: faction_match name (+3); rsc481 ""the day of summoning for %dae""; DFU Daedra"
+func,0x00046F78,macro_dnc_regional_name,candidate,macro table %dnc -> func_00046F78: like %brd but parse_stub_zero(515); no text uses %dnc; direct call in save_dorian returned 'Bojan'
+func,0x00047006,macro_dam_damage_modifier,confirmed,"macro table %dam -> func_00047006: STR/10-5 with sign (parse_signed_itoa); rsc0 ""%dam (modifier is factored into your hand-to-hand / weapon damage""; experiment: direct call in save_dorian returned '+5'"
+func,0x0004704E,macro_dwr_room_hours_left,strong,"macro table %dwr -> func_0004704E: (D_00195AF0+2 - game_minutes)/60; rsc5100 ""Your room is still rented for %dwr hours""; DFU RoomHoursLeft; direct call in save_dorian returned '71565681'"
+func,0x00047094,macro_dpr_other_random_province,candidate,macro table %dpr -> func_00047094: random province_names[] entry different from character+0x42>>5; no text uses %dpr; direct call in save_dorian returned 'Valenwood'
+func,0x000470EB,macro_di_direction,strong,"macro table %di -> func_000470EB: direction_names[] of the angle from the player to (D_00195A90, D_00195A94); rsc7333 ""%loc is %di of here""; DFU Direction; direct call in save_dorian returned 'west'"
+func,0x00047141,macro_du_blank,confirmed,"macro table %du -> func_00047141: returns text_blank (""BLANK""); experiment: direct call in save_dorian returned 'BLANK'"
+func,0x00047164,macro_dat_date,confirmed,"macro table %dat -> func_00047164: ""%s the %d%s of %s"" from game_minutes: day_names, ordinal_suffixes, month_names; rsc22 ""on %dat""; experiment: direct call in save_dorian returned 'Middas the 23th of Evening Star'"
+func,0x0004723D,macro_dip_days_in_prison,strong,"macro table %dip -> func_0004723D: D_00190DC8 as decimal; rsc8053 ""wait the %dip days""; DFU DaysInPrison; direct call in save_dorian returned '0'"
+func,0x00047271,macro_dbl_brotherhood_building,candidate,"macro table %dbl -> func_00047271: name of the current town building whose faction (+0x12) is 108 (Dark Brotherhood), else ""nowhere""; no text uses %dbl; direct call in save_dorian returned 'nowhere'"
+func,0x000472F6,macro_dbp_codeword,strong,"macro table %dbp -> func_000472F6: two words ""%s %s"" from the nibbles of character+0x223 (D_0018426D ""False"".., D_001842A1 ""Sire""..); rsc5292 ""your codeword will be %dbp""; direct call in save_dorian returned 'False Sire'"
+func,0x00047373,macro_dtr_days_left,candidate,macro table %dtr -> func_00047373: (D_00195AA8+0x2B - game_minutes + 1439)/1440 as decimal; no text uses %dtr; direct call in save_dorian returned '2981904'
+func,0x000473BE,macro_da_trade_total,candidate,macro table %da -> func_000473BE: trade_total as decimal; no text uses %da; direct call in save_dorian returned '0'
+func,0x000473F0,macro_enc_max_encumbrance,confirmed,"macro table %enc -> func_000473F0: support.c 801A4 (max encumbrance); rsc0 ""%enc (kilograms is your maximum encumbrance""; experiment: direct call in save_dorian returned '150'"
+func,0x00047422,macro_end_endurance,confirmed,"macro table %end -> func_00047422: character+0x28 (END); rsc4 ""With your endurance of %end""; experiment: direct call in save_dorian returned '100'"
+func,0x00047458,macro_enf_faction_name,candidate,macro table %enf -> func_00047458: name of the faction in D_00196728; never used by TEXT.RSC or QRC
+func,0x0004747E,macro_ef_shop_owner_name,strong,"macro table %ef -> func_0004747E: first word of a generated name (bank D_00196267); FALL.EXE shop-name template ""%ef's""; direct call in save_dorian returned 'Uthastyr'"
+func,0x000474CC,macro_foc_blank,confirmed,"macro table %foc -> func_000474CC: returns text_blank (""BLANK""); experiment: direct call in save_dorian returned 'BLANK'"
+func,0x000474EF,macro_fon_building_faction,strong,"macro table %fon -> func_000474EF: name of current_building's faction (+0x12); rsc740 ""%fon will embrace you as a member""; DFU FactionOrderName"
+func,0x0004751E,macro_fn_female_name,confirmed,macro table %fn -> func_0004751E: random female name seeded by parse_name_seed; DFU FemaleName; experiment: direct call in save_dorian returned 'Athicla Perdorus'
+func,0x00047572,macro_fn2_female_name2,confirmed,"macro table %fn2 -> func_00047572: random female name seeded by parse_name_seed+123; rsc6402 ""of Lady %fn2""; DFU FemaleName (2nd seed); experiment: direct call in save_dorian returned 'Hecicla Xerdorus'"
+func,0x000475C9,macro_fln_faction_child_name,candidate,"macro table %fln -> func_000475C9: name of D_00196720's child faction (+0x54), else BLANK; no text uses %fln; direct call in save_dorian returned 'BLANK'"
+func,0x00047607,macro_foe_faction_name,candidate,macro table %foe -> func_00047607: name of the faction in D_00196728; never used by TEXT.RSC or QRC
+func,0x0004762D,macro_fxn_faction_name,candidate,macro table %fxn -> func_0004762D: name of the faction in D_00196720; never used by TEXT.RSC or QRC
+func,0x00047653,macro_fac1_key_text,candidate,macro table %fac1 -> func_00047653: returns talk_key_text (same as %key); no text uses %fac1
+func,0x00047675,macro_fx1_news_faction1,strong,"macro table %fx1 -> func_00047675: faction_match name; rsc1400 ""%fx1 has just allied with %fx2""; DFU AFactionInNews"
+func,0x0004769B,macro_fx2_news_faction2,strong,macro table %fx2 -> func_0004769B: D_0019670C faction name; rsc1400; DFU AnotherFactionInNews
+func,0x000476C1,macro_fl1_faction1_leader,strong,"macro table %fl1 -> func_000476C1: faction_match's individual child (type 4) name, else a name seeded by the faction; rsc1402 ""%fl1 insulted %fl2""; DFU LordOfFaction1; direct call in save_dorian returned 'Mithlian Silinal'"
+func,0x00047767,macro_fl2_faction2_leader,strong,macro table %fl2 -> func_00047767: same for D_0019670C; rsc1402; DFU LordOfFaction2; direct call in save_dorian returned 'Mithlian Silinal'
+func,0x00047815,macro_fcn_building_town,strong,"macro table %fcn -> func_00047815: returns text_macro_fcn; rsc10 ""I think they have one in %fcn""; DFU LocationOfRegionalBuilding"
+func,0x00047837,macro_fpc_player_faction,strong,"macro table %fpc -> func_00047837: text_macro_fpc faction name; rsc8558 ""%fnpc and %fpc are allied""; DFU FactionPC"
+func,0x0004785D,macro_fnpc_npc_faction,strong,macro table %fnpc -> func_0004785D: text_macro_fnpc faction name; rsc8558; DFU FactionNPC
+func,0x00047883,macro_fe_shared_enemy,strong,"macro table %fe -> func_00047883: text_macro_fe faction name; rsc8562 ""both enemys of %fe""; DFU FactionEnemy"
+func,0x000478A9,macro_fa_shared_ally,strong,"macro table %fa -> func_000478A9: text_macro_fa faction name; rsc8564 ""Any friend of %fa""; DFU FactionAlly"
+func,0x000478CF,macro_fae_player_ally_npc_enemy,strong,macro table %fae -> func_000478CF: text_macro_fae faction name; rsc8566; DFU FactionAllyEnemy
+func,0x000478F5,macro_fea_player_enemy_npc_ally,strong,macro table %fea -> func_000478F5: text_macro_fea faction name; rsc8568; DFU FactionEnemyAlly
+func,0x0004791B,macro_fpa_shared_faction,strong,"macro table %fpa -> func_0004791B: text_macro_fpa faction name; rsc8554 ""we are both part of %fpa""; DFU FactionName"
+func,0x00047941,macro_g_pronoun_he,confirmed,"macro table %g -> func_00047941: D_0017D01E[D_0019628F] (""he"",""she"",""it""); DFU Pronoun; experiment: direct call in save_dorian returned 'he'"
+func,0x0004796F,macro_g2_pronoun_him,confirmed,"macro table %g2 -> func_0004796F: D_0017D02A[D_0019628F] (""him"",""her"",""it""); DFU Pronoun2; experiment: direct call in save_dorian returned 'him'"
+func,0x0004799D,macro_g3_pronoun_his,confirmed,"macro table %g3 -> func_0004799D: D_0017D036[D_0019628F] (""his"",""her"",""its""); DFU Pronoun3; experiment: direct call in save_dorian returned 'his'"
+func,0x000479CB,macro_gii_gold_carried,confirmed,"macro table %gii -> func_000479CB: character+0x85 (gold) as decimal; rsc25 ""You have %gii gold pieces""; DFU GoldCarried; experiment: direct call in save_dorian returned '21191'"
+func,0x00047A03,macro_gtp_fine,strong,"macro table %gtp -> func_00047A03: D_00190CAC as decimal; rsc8057 ""pay a fine of %gtp gold pieces""; DFU GoldToPay; direct call in save_dorian returned '0'"
+func,0x00047A35,macro_gdd_temple_god,strong,"macro table %gdd -> func_00047A35: D_0017CB8E[guild_membership kind] or BLANK; rsc703 ""Certainly %gdd accepts all donations""; DFU GodDesc; direct call in save_dorian returned 'BLANK'"
+func,0x00047A7C,macro_god_local_god,confirmed,"macro table %god -> func_00047A7C: in a temple: its faction's parent (the god), else the parent of the region's temple faction (D_0017C912); rsc703 ""Perhaps %god will look more kindly""; DFU God; experiment: direct call in save_dorian returned 'Arkay'"
+func,0x00047B2F,parse_unused_biography_name,candidate,"like the %bn handler (seed parse_name_seed+3457, bank character+0x43, gender D_00190C78 bit 1) but in no macro table entry and never called"
+func,0x00047B8F,macro_tim_time,confirmed,"macro table %tim -> func_00047B8F: ""%d:%02d"" of game_minutes; returned ""18:55""; rsc22 ""It is %tim on %dat""; DFU Time; experiment: direct call in save_dorian returned '18:55'"
+func,0x00047C14,macro_hea_endurance_modifier,confirmed,"macro table %hea/%hmd -> func_00047C14: END/10-5 with sign; shared by %hea and %hmd; rsc4 ""%hea (modifier is factored into the number of hit points""; experiment: direct call in save_dorian returned '+5'"
+func,0x00047C5C,macro_hs_held_soul,strong,"macro table %hs -> func_00047C5C: soul in D_00195AA8's first child: monster_names[+0x1B] or ""Nothing""/""Humanoid""; rsc1004 ""Holding: %hs""; DFU HeldSoul; direct call in save_dorian returned 'Nothing'"
+func,0x00047CC7,macro_hod_holiday_description,confirmed,"macro table %hod -> func_00047CC7: TEXT.RSC 8350 + holiday_index(game_minutes, current_region) (parse_rsc_text); experiment: direct call in save_dorian returned 'Today the people of Sentinel are havingý the New Life Festiv'"
+func,0x00047D0F,macro_hc_blank,confirmed,"macro table %hc/%hcn/%hcn2/%hcn3 -> func_00047D0F: returns text_blank (""BLANK""); shared by %hc %hcn %hcn2 %hcn3; experiment: direct call in save_dorian returned 'BLANK'"
+func,0x00047D32,macro_hct_blank,confirmed,"macro table %hct/%hct2/%hct3 -> func_00047D32: returns text_blank (""BLANK""); shared by %hct %hct2 %hct3; experiment: direct call in save_dorian returned 'BLANK'"
+func,0x00047D55,macro_ht_blank,confirmed,"macro table %ht -> func_00047D55: returns text_blank (""BLANK""); experiment: direct call in save_dorian returned 'BLANK'"
+func,0x00047D78,macro_hnt_hint,strong,"macro table %hnt -> func_00047D78: talk_macro_hint(0); rsc28 ""%hnt""; DFU DialogHint; direct call in save_dorian returned 'STRENGTHý Strength governs encumbrance, '"
+func,0x00047DA3,macro_hnt2_hint2,strong,"macro table %hnt2 -> func_00047DA3: talk_macro_hint(1); rsc7275 ""%hnt2""; DFU DialogHint2; direct call in save_dorian returned 'STRENGTHý Strength governs encumbrance, '"
+func,0x00047DD1,macro_hip_hours_in_prison,candidate,macro table %hip -> func_00047DD1: D_00190DC8*24 as decimal; no text uses %hip; direct call in save_dorian returned '0'
+func,0x00047E08,macro_hpn_home_province,confirmed,"macro table %hpn/%hpr -> func_00047E08: province_names[D_0017CC1F[character+0x43]]; shared by %hpn %hpr; rsc4126 ""the backwater %hpw of %hpn""; DFU HomeProvinceName; experiment: direct call in save_dorian returned 'Morrowind'"
+func,0x00047E47,macro_hpw_home_terrain,confirmed,"macro table %hpw -> func_00047E47: D_0017D06A[D_0017CC1F[race]] (""mountains""..); rsc4126; DFU GeographicalFeature; experiment: direct call in save_dorian returned 'mountains'"
+func,0x00047E86,macro_hrg_house_region,strong,"macro table %hrg -> func_00047E86: returns the string D_0018DDB4; rsc1073 ""Deed for your house in the region of %hrg""; direct call in save_dorian returned 'Daggerfall'"
+func,0x00047EA8,macro_htwn_house_town,strong,"macro table %htwn -> func_00047EA8: returns the string D_0018DD94; rsc1073 ""in the town of %htwn""; direct call in save_dorian returned 'Daggerfall'"
+func,0x00047ECA,macro_hnr_honorific,confirmed,"macro table %hnr -> func_00047ECA: D_0018508B[character gender] (""Sir"",""Ma'am""); rsc8553 ""Yes, %hnr""; DFU Honorific; experiment: direct call in save_dorian returned 'Sir'"
+func,0x00047F0E,macro_int_intelligence,confirmed,"macro table %int -> func_00047F0E: character+0x22 (INT); rsc1 ""With your intelligence of %int""; experiment: direct call in save_dorian returned '100'"
+func,0x00047F44,macro_imp_imperial_name,confirmed,"macro table %imp -> func_00047F44: D_0018432D[D_00196266] (""Pelagius"",..); rsc4126 ""Prince %imp""; DFU ImperialName; experiment: direct call in save_dorian returned 'Pelagius'"
+func,0x00047F72,macro_itr_item_name_raw,candidate,"macro table %itr -> func_00047F72: returns the text_macro_item record itself (its name, no substitution); no text uses %itr"
+func,0x00047F95,macro_kg_weight,strong,"macro table %kg -> func_00047F95: object_weight(D_00195AA8) in quarter kilograms, ""%ld%s"" with "".25""/"".50""/"".75""; rsc1000 ""Weight: %kg kilograms""; DFU Weight; direct call in save_dorian returned '0.25'"
+func,0x00048034,macro_pow_blank,confirmed,"macro table %pow -> func_00048034: returns text_blank (""BLANK""); experiment: direct call in save_dorian returned 'BLANK'"
+func,0x00048057,macro_wth_worth,strong,"macro table %wth -> func_00048057: text_macro_item +0x24 (value) as decimal; rsc1002 ""Worth: %wth gold""; DFU Worth; direct call in save_dorian returned '0'"
+func,0x0004808C,macro_jok_joke,confirmed,"macro table %jok -> func_0004808C: TEXT.RSC 200 (a random joke variant); K0C00Y08.QRC ""I heard a great joke. %jok""; DFU Joke; experiment: direct call in save_dorian returned ' How do you make a Dark Elf laugh on Morndas? Tell him a jok'"
+func,0x000480BC,macro_kno_knightly_order,confirmed,"macro table %kno -> func_000480BC: faction of the player's knightly membership (bits 64), else faction_match; B0B20Y07.QRC ""The %kno saved %reg""; DFU FactionOrderName; experiment: direct call in save_dorian returned 'The Order of the Candle'"
+func,0x0004811C,macro_key_topic,strong,"macro table %key -> func_0004811C: returns talk_key_text; rsc7212 ""I would hear about %key""; DFU DialogKeySubject"
+func,0x0004813E,macro_key2_topic2,strong,"macro table %key2 -> func_0004813E: returns talk_key_text+65; rsc7224 ""and %key2"""
+func,0x00048160,macro_lp_local_province,candidate,"macro table %lp -> func_00048160: D_0017D042[D_00196267] (""High Rock"",""Hammerfell""); rsc8375 ""the %lp dungeons""; DFU LocalProvince; gave ""High Rock"" in Sentinel; direct call in save_dorian returned 'High Rock'"
+func,0x0004818E,macro_luc_luck,confirmed,"macro table %luc -> func_0004818E: character+0x2E (LUC); rsc7 ""With your luck of %luc""; experiment: direct call in save_dorian returned '100'"
+func,0x000481C4,macro_la_number,candidate,macro table %la -> func_000481C4: D_00190BEC as decimal (shared scratch); no text uses %la; direct call in save_dorian returned '0'
+func,0x000481F6,macro_lev_guild_rank,strong,"macro table %lev/%pct -> func_000481F6: faction_rank_names[kind&63][rank] of guild_membership, else the player name; shared by %lev and %pct; rsc666 ""promoted to the rank of %lev""; DFU GuildTitle; direct call in save_dorian returned 'Dorian Kaine'"
+func,0x00048254,macro_lt1_faction1_ruler_title,strong,"macro table %lt1 -> func_00048254: parse_faction_ruler_title(faction_match); rsc1406 ""%fx1 has a new %lt1""; DFU TitleOfLordOfFaction1; direct call in save_dorian returned 'Lord'"
+func,0x0004827C,macro_lt2_faction2_ruler_title,candidate,macro table %lt2 -> func_0004827C: parse_faction_ruler_title(D_0019670C); no text uses %lt2; direct call in save_dorian returned 'Lord'
+func,0x000482A4,macro_loc_where_building,strong,"macro table %loc -> func_000482A4: name of talk_where_target's building (+0x12); rsc7332 ""Let me just mark %loc here on your map""; DFU MarkLocationOnMap; direct call in save_dorian returned 'Residence'"
+func,0x000482CF,macro_ltn_legal_standing,confirmed,"macro table %ltn -> func_000482CF: legal_reputation_names[] for region_legal_reputation of current_region clamped to +-100; rsc22 ""you are %ltn""; DFU LegalReputation; experiment: direct call in save_dorian returned 'a common citizen'"
+func,0x0004835A,macro_mad_magic_resist,confirmed,"macro table %mad -> func_0004835A: WIL/10 as decimal; rsc2 ""+%mad (modifier is factored into your magic resistance""; DFU MagicResist; experiment: direct call in save_dorian returned '10'"
+func,0x0004839F,macro_mat_material,strong,"macro table %mat -> func_0004839F: material_names[item+0x36] or armor_type_names[item+0x37] of text_macro_item; rsc1000 ""%mat %arm""; DFU Material; direct call in save_dorian returned 'Iron'"
+func,0x0004845B,macro_mit_item_name_raw,candidate,"macro table %mit -> func_0004845B: returns the text_macro_item record itself; rsc1002 ""%mit Condition: %qua"""
+func,0x0004847E,macro_it_item_name,strong,"macro table %it -> func_0004847E: text_macro_item name with template substitution; rsc29 ""%it is broken.""; DFU ItemName; direct call in save_dorian returned 'Indulcet'"
+func,0x000484C7,macro_mt_blank,confirmed,"macro table %mt -> func_000484C7: returns text_blank (""BLANK""); experiment: direct call in save_dorian returned 'BLANK'"
+func,0x000484EA,macro_mn_male_name,confirmed,"macro table %mn -> func_000484EA: random male name seeded by parse_name_seed+3457; rsc4126 ""your master, %mn""; DFU MaleName; experiment: direct call in save_dorian returned 'Legotan Mossrun'"
+func,0x00048540,macro_mn2_male_name2,confirmed,"macro table %mn2 -> func_00048540: random male name seeded by parse_name_seed+9543; rsc6401 ""of Lord %mn2""; DFU MaleName (2nd seed); experiment: direct call in save_dorian returned 'Ingmorn Soreldsen'"
+func,0x00048596,macro_mwz_name,candidate,macro table %mwz -> func_00048596: name seeded by D_00195B30+0x4E in bank D_00196267; no text uses %mwz; direct call in save_dorian returned 'Belladanna Buckingcroft'
+func,0x000485F4,macro_ml_max_loan,confirmed,"macro table %ml -> func_000485F4: character level*50000 (2050000 at level 41); rsc295 ""our limit is %ml gold pieces""; DFU MaxLoan; experiment: direct call in save_dorian returned '2050000'"
+func,0x00048637,macro_map_map_location,strong,"macro table %map -> func_00048637: name at D_00190EAC+0x10; rsc499 ""The scrap of parchment shows the location of %map""; DFU LocationRevealedByMapItem"
+func,0x00048663,macro_mpw_magic_powers,strong,"macro table %mpw -> func_00048663: TEXT.RSC 8700+item+0x69 for artifacts (flag 0x800), else itemmakr.c 58B76; rsc1016 ""Item powers: %mpw""; DFU MagicPowers; direct call in save_dorian returned 'Powers unknown.ý'"
+func,0x000486C2,macro_nh_holiday_name,confirmed,"macro table %nh -> func_000486C2: holiday_name(game_minutes, current_region) (""New Life""); experiment: direct call in save_dorian returned 'New Life'"
+func,0x000486F2,macro_nhd_holiday_date,confirmed,macro table %nhd -> func_000486F2: date of the current holiday (tamriel.c 4AA7D on holiday_days[]*1440); experiment: direct call in save_dorian returned '2nd of Morning Star'
+func,0x0004873D,macro_nt_nearby_tavern,confirmed,"macro table %nt -> func_0004873D: parse_town_building_name(15): a random tavern of the town; rsc200 ""Over at the %nt""; DFU NearbyTavern; experiment: direct call in save_dorian returned 'The Rat and Jug'"
+func,0x00048765,macro_ncl_name,candidate,macro table %ncl -> func_00048765: string at *D_00195AC0+0x1C; no text uses %ncl
+func,0x0004878B,macro_n_npc_name,strong,"macro table %n -> func_0004878B: TEXT.RSC text_macro_n_text, else the talk NPC name (D_00195A84), else a regional name; rsc1410 ""They killed %n in broad daylight""; DFU Name; direct call in save_dorian returned 'Shirder'"
+func,0x0004881C,macro_nrn_regional_noble,strong,"macro table %nrn -> func_0004881C: calls the %fl1 handler (faction_match leader); rsc1475 ""%nrn has declared""; DFU LordOfCurrentRegion; direct call in save_dorian returned 'Mithlian Silinal'"
+func,0x0004883F,macro_fop_faction_name,candidate,macro table %fop -> func_0004883F: name of the faction in D_00196714; never used by TEXT.RSC or QRC
+func,0x00048865,macro_olf_old_leader_fate,confirmed,"macro table %olf -> func_00048865: D_0017C650[random(0,5)] seeded by faction_match (""died of heart failure""..); rsc1406 ""%ol1 %olf""; DFU OldLeaderFate; experiment: direct call in save_dorian returned 'died of heart failure'"
+func,0x000488C0,macro_ol1_old_leader,strong,macro table %ol1 -> func_000488C0: like %fl1 with the high seed word of faction_match+0x27; rsc1406; DFU OldLordOfFaction1; direct call in save_dorian returned 'Mithlian Silinal'
+func,0x00048964,macro_pcn_player_name,confirmed,"macro table %pcn -> func_00048964: player_character name; rsc260 ""honors my humble shop %pcn""; DFU PlayerName; experiment: direct call in save_dorian returned 'Dorian Kaine'"
+func,0x00048987,macro_pcf_player_first_name,confirmed,macro table %pcf -> func_00048987: player name up to the first space; DFU PlayerFirstname; experiment: direct call in save_dorian returned 'Dorian'
+func,0x000489F8,macro_per_personality,confirmed,"macro table %per -> func_000489F8: character+0x2A (PER); rsc5 ""With your personality of %per""; experiment: direct call in save_dorian returned '100'"
+func,0x00048A2E,macro_po_potion_name,strong,"macro table %po -> func_00048A2E: ""Potion of %s"" with text_macro_potion+0x43; rsc1008 ""%po Worth""; DFU Potion; direct call in save_dorian returned 'Potion of '"
+func,0x00048A7D,macro_pp1_painting_prefix1,strong,"macro table %pp1 -> func_00048A7D: TEXT.RSC record D_00195DCA; rsc250 ""%pp1 %sub by %an""; DFU PaintingPrefix1; direct call in save_dorian returned 'STRENGTHý Strength governs encumbrance, '"
+func,0x00048AB0,macro_pp2_painting_prefix2,strong,"macro table %pp2 -> func_00048AB0: TEXT.RSC record D_00195DCC; rsc250 ""%sub %pp2 by %an""; DFU PaintingPrefix2; direct call in save_dorian returned 'STRENGTHý Strength governs encumbrance, '"
+func,0x00048AE3,macro_prg_faction_name,candidate,macro table %prg -> func_00048AE3: faction named by D_00195B30+0x4C; first of the two %prg entries; no text uses %prg
+func,0x00048B18,macro_pen_penalty,confirmed,"macro table %pen -> func_00048B18: D_00184261[D_00190D16] (""Banishment"",""Execution"", or expanded ""%gtp gold pieces in fines and %dip days in prison""); rsc8050 ""you will face %pen""; DFU Penalty; experiment: direct call in save_dorian returned 'Banishment'"
+func,0x00048B82,macro_pdg_more_prison_days,strong,"macro table %pdg -> func_00048B82: D_00190DCA as decimal; rsc8052 ""an additional %pdg days in prison""; direct call in save_dorian returned '0'"
+func,0x00048BB6,macro_prn_prison_name,confirmed,"macro table %prn -> func_00048BB6: TEXT.RSC 8100 with D_001940D7 bit 2 set (""The Cage of Slarpen"", ""The Hall of Yegon""); rsc8060 ""sealed into the %prn""; experiment: direct call in save_dorian returned 'The Hall of Yegon'"
+func,0x00048BF4,macro_pqn_questor_name,strong,"macro table %pqn -> func_00048BF4: name of quest_potential_questor (spfx 8B48B); rsc8076 ""%pqn might have work""; DFU PotentialQuestorName"
+func,0x00048C1C,macro_pqp_questor_place,strong,"macro table %pqp -> func_00048C1C: building of quest_potential_questor (support 7DF35, names 8BD50); rsc8076 ""find %g2 in %pqp""; DFU PotentialQuestorLocation; direct call in save_dorian returned 'Residence'"
+func,0x00048C4F,macro_pd_blank,confirmed,"macro table %pd -> func_00048C4F: returns text_blank (""BLANK""); experiment: direct call in save_dorian returned 'BLANK'"
+func,0x00048C72,macro_ph_blank,confirmed,"macro table %ph -> func_00048C72: returns text_blank (""BLANK""); experiment: direct call in save_dorian returned 'BLANK'"
+func,0x00048C95,macro_plm_blank,confirmed,"macro table %plm -> func_00048C95: returns text_blank (""BLANK""); experiment: direct call in save_dorian returned 'BLANK'"
+func,0x00048CB8,macro_plq_blank,confirmed,"macro table %plq -> func_00048CB8: returns text_blank (""BLANK""); rsc2500 ""%pnq in %plq told me"" never filled; experiment: direct call in save_dorian returned 'BLANK'"
+func,0x00048CDB,macro_pnq_blank,confirmed,"macro table %pnq -> func_00048CDB: returns text_blank (""BLANK""); rsc2500 ""%pnq in %plq told me""; experiment: direct call in save_dorian returned 'BLANK'"
+func,0x00048CFE,macro_pn_blank,confirmed,"macro table %pn -> func_00048CFE: returns text_blank (""BLANK""); experiment: direct call in save_dorian returned 'BLANK'"
+func,0x00048D21,macro_prg_region_enemy_faction,candidate,"macro table %prg -> func_00048D21: same code as %ptm; the second %prg entry of the p table, shadowed by the first, so it never runs"
+func,0x00048D5E,macro_ptm_region_enemy_faction,strong,"macro table %ptm -> func_00048D5E: faction named by the region record (+0x10, D_0018F090) of faction_match's region; rsc1476 ""%nrn has declared that %ptm is guilty of treason""; DFU ""an enemy of the current region"""
+func,0x00048D9B,macro_qua_condition,strong,"macro table %qua -> func_00048D9B: condition_names[] by text_macro_item +0x2C*100/+0x2E against D_0017CFF6 (""Broken""..""New""); rsc1000 ""Condition: %qua""; DFU Condition; direct call in save_dorian returned 'Broken'"
+func,0x00048E1D,macro_q1_bio_answer,strong,"macro table %q1 -> func_00048E1D: parse_bio_answer_text(0): TEXT.RSC record from the biography answer table D_00190BE4[0]; rsc4126 ""trained ... to be %q1""; DFU Q1..Q12b (effects of questions answered in bio); direct call in save_dorian returned 'STRENGTHý Strength governs encumbrance, '"
+func,0x00048E42,macro_q2_bio_answer,strong,"macro table %q2 -> func_00048E42: parse_bio_answer_text(1): TEXT.RSC record from the biography answer table D_00190BE4[1]; rsc4126 ""trained ... to be %q1""; DFU Q1..Q12b (effects of questions answered in bio); direct call in save_dorian returned 'STRENGTHý Strength governs encumbrance, '"
+func,0x00048E6A,macro_q3_bio_answer,strong,"macro table %q3 -> func_00048E6A: parse_bio_answer_text(2): TEXT.RSC record from the biography answer table D_00190BE4[2]; rsc4126 ""trained ... to be %q1""; DFU Q1..Q12b (effects of questions answered in bio); direct call in save_dorian returned 'STRENGTHý Strength governs encumbrance, '"
+func,0x00048E92,macro_q4_bio_answer,strong,"macro table %q4 -> func_00048E92: parse_bio_answer_text(3): TEXT.RSC record from the biography answer table D_00190BE4[3]; rsc4126 ""trained ... to be %q1""; DFU Q1..Q12b (effects of questions answered in bio); direct call in save_dorian returned 'You brush aside huge cobwebs.'"
+func,0x00048EBA,macro_q5_bio_answer,strong,"macro table %q5 -> func_00048EBA: parse_bio_answer_text(4): TEXT.RSC record from the biography answer table D_00190BE4[4]; rsc4126 ""trained ... to be %q1""; DFU Q1..Q12b (effects of questions answered in bio); direct call in save_dorian returned 'STRENGTHý Strength governs encumbrance, '"
+func,0x00048EE2,macro_q6_bio_answer,strong,"macro table %q6 -> func_00048EE2: parse_bio_answer_text(5): TEXT.RSC record from the biography answer table D_00190BE4[5]; rsc4126 ""trained ... to be %q1""; DFU Q1..Q12b (effects of questions answered in bio); direct call in save_dorian returned 'STRENGTHý Strength governs encumbrance, '"
+func,0x00048F0A,macro_q7_bio_answer,strong,"macro table %q7 -> func_00048F0A: parse_bio_answer_text(6): TEXT.RSC record from the biography answer table D_00190BE4[6]; rsc4126 ""trained ... to be %q1""; DFU Q1..Q12b (effects of questions answered in bio); direct call in save_dorian returned 'STRENGTHý Strength governs encumbrance, '"
+func,0x00048F32,macro_q8_bio_answer,strong,"macro table %q8 -> func_00048F32: parse_bio_answer_text(7): TEXT.RSC record from the biography answer table D_00190BE4[7]; rsc4126 ""trained ... to be %q1""; DFU Q1..Q12b (effects of questions answered in bio); direct call in save_dorian returned 'Bad DAGTEXT number requested : -1024.'"
+func,0x00048F5A,macro_q9_bio_answer,strong,"macro table %q9 -> func_00048F5A: parse_bio_answer_text(8): TEXT.RSC record from the biography answer table D_00190BE4[8]; rsc4126 ""trained ... to be %q1""; DFU Q1..Q12b (effects of questions answered in bio); direct call in save_dorian returned 'STRENGTHý Strength governs encumbrance, '"
+func,0x00048F82,macro_q10_bio_answer,strong,"macro table %q10 -> func_00048F82: parse_bio_answer_text(9): TEXT.RSC record from the biography answer table D_00190BE4[9]; rsc4126 ""trained ... to be %q1""; DFU Q1..Q12b (effects of questions answered in bio); direct call in save_dorian returned 'STRENGTHý Strength governs encumbrance, '"
+func,0x00048FAA,macro_q11_bio_answer,strong,"macro table %q11 -> func_00048FAA: parse_bio_answer_text(10): TEXT.RSC record from the biography answer table D_00190BE4[10]; rsc4126 ""trained ... to be %q1""; DFU Q1..Q12b (effects of questions answered in bio); direct call in save_dorian returned 'STRENGTHý Strength governs encumbrance, '"
+func,0x00048FD2,macro_q12_bio_answer,strong,"macro table %q12 -> func_00048FD2: parse_bio_answer_text(11): TEXT.RSC record from the biography answer table D_00190BE4[11]; rsc4126 ""trained ... to be %q1""; DFU Q1..Q12b (effects of questions answered in bio); direct call in save_dorian returned 'STRENGTHý Strength governs encumbrance, '"
+func,0x00048FFA,macro_q1a_bio_answer,strong,"macro table %q1a -> func_00048FFA: parse_bio_answer_text(12): TEXT.RSC record from the biography answer table D_00190BE4[12]; rsc4126 ""trained ... to be %q1""; DFU Q1..Q12b (effects of questions answered in bio); direct call in save_dorian returned 'STRENGTHý Strength governs encumbrance, '"
+func,0x00049022,macro_q2a_bio_answer,strong,"macro table %q2a -> func_00049022: parse_bio_answer_text(13): TEXT.RSC record from the biography answer table D_00190BE4[13]; rsc4126 ""trained ... to be %q1""; DFU Q1..Q12b (effects of questions answered in bio); direct call in save_dorian returned 'STRENGTHý Strength governs encumbrance, '"
+func,0x0004904A,macro_q3a_bio_answer,strong,"macro table %q3a -> func_0004904A: parse_bio_answer_text(14): TEXT.RSC record from the biography answer table D_00190BE4[14]; rsc4126 ""trained ... to be %q1""; DFU Q1..Q12b (effects of questions answered in bio); direct call in save_dorian returned 'STRENGTHý Strength governs encumbrance, '"
+func,0x00049072,macro_q4a_bio_answer,strong,"macro table %q4a -> func_00049072: parse_bio_answer_text(15): TEXT.RSC record from the biography answer table D_00190BE4[15]; rsc4126 ""trained ... to be %q1""; DFU Q1..Q12b (effects of questions answered in bio); direct call in save_dorian returned 'STRENGTHý Strength governs encumbrance, '"
+func,0x0004909A,macro_q5a_bio_answer,strong,"macro table %q5a -> func_0004909A: parse_bio_answer_text(16): TEXT.RSC record from the biography answer table D_00190BE4[16]; rsc4126 ""trained ... to be %q1""; DFU Q1..Q12b (effects of questions answered in bio); direct call in save_dorian returned 'STRENGTHý Strength governs encumbrance, '"
+func,0x000490C2,macro_q6a_bio_answer,strong,"macro table %q6a -> func_000490C2: parse_bio_answer_text(17): TEXT.RSC record from the biography answer table D_00190BE4[17]; rsc4126 ""trained ... to be %q1""; DFU Q1..Q12b (effects of questions answered in bio); direct call in save_dorian returned 'STRENGTHý Strength governs encumbrance, '"
+func,0x000490EA,macro_q7a_bio_answer,strong,"macro table %q7a -> func_000490EA: parse_bio_answer_text(18): TEXT.RSC record from the biography answer table D_00190BE4[18]; rsc4126 ""trained ... to be %q1""; DFU Q1..Q12b (effects of questions answered in bio); direct call in save_dorian returned 'STRENGTHý Strength governs encumbrance, '"
+func,0x00049112,macro_q8a_bio_answer,strong,"macro table %q8a -> func_00049112: parse_bio_answer_text(19): TEXT.RSC record from the biography answer table D_00190BE4[19]; rsc4126 ""trained ... to be %q1""; DFU Q1..Q12b (effects of questions answered in bio); direct call in save_dorian returned 'STRENGTHý Strength governs encumbrance, '"
+func,0x0004913A,macro_q9a_bio_answer,strong,"macro table %q9a -> func_0004913A: parse_bio_answer_text(20): TEXT.RSC record from the biography answer table D_00190BE4[20]; rsc4126 ""trained ... to be %q1""; DFU Q1..Q12b (effects of questions answered in bio); direct call in save_dorian returned 'STRENGTHý Strength governs encumbrance, '"
+func,0x00049162,macro_q10a_bio_answer,strong,"macro table %q10a -> func_00049162: parse_bio_answer_text(21): TEXT.RSC record from the biography answer table D_00190BE4[21]; rsc4126 ""trained ... to be %q1""; DFU Q1..Q12b (effects of questions answered in bio); direct call in save_dorian returned 'STRENGTHý Strength governs encumbrance, '"
+func,0x0004918A,macro_q11a_bio_answer,strong,"macro table %q11a -> func_0004918A: parse_bio_answer_text(22): TEXT.RSC record from the biography answer table D_00190BE4[22]; rsc4126 ""trained ... to be %q1""; DFU Q1..Q12b (effects of questions answered in bio); direct call in save_dorian returned 'STRENGTHý Strength governs encumbrance, '"
+func,0x000491B2,macro_q12a_bio_answer,strong,"macro table %q12a -> func_000491B2: parse_bio_answer_text(23): TEXT.RSC record from the biography answer table D_00190BE4[23]; rsc4126 ""trained ... to be %q1""; DFU Q1..Q12b (effects of questions answered in bio); direct call in save_dorian returned 'STRENGTHý Strength governs encumbrance, '"
+func,0x000491DA,macro_q1b_bio_answer,strong,"macro table %q1b -> func_000491DA: parse_bio_answer_text(24): TEXT.RSC record from the biography answer table D_00190BE4[24]; rsc4126 ""trained ... to be %q1""; DFU Q1..Q12b (effects of questions answered in bio); direct call in save_dorian returned 'STRENGTHý Strength governs encumbrance, '"
+func,0x00049202,macro_q2b_bio_answer,strong,"macro table %q2b -> func_00049202: parse_bio_answer_text(25): TEXT.RSC record from the biography answer table D_00190BE4[25]; rsc4126 ""trained ... to be %q1""; DFU Q1..Q12b (effects of questions answered in bio); direct call in save_dorian returned 'STRENGTHý Strength governs encumbrance, '"
+func,0x0004922A,macro_q3b_bio_answer,strong,"macro table %q3b -> func_0004922A: parse_bio_answer_text(26): TEXT.RSC record from the biography answer table D_00190BE4[26]; rsc4126 ""trained ... to be %q1""; DFU Q1..Q12b (effects of questions answered in bio); direct call in save_dorian returned 'STRENGTHý Strength governs encumbrance, '"
+func,0x00049252,macro_q4b_bio_answer,strong,"macro table %q4b -> func_00049252: parse_bio_answer_text(27): TEXT.RSC record from the biography answer table D_00190BE4[27]; rsc4126 ""trained ... to be %q1""; DFU Q1..Q12b (effects of questions answered in bio); direct call in save_dorian returned 'STRENGTHý Strength governs encumbrance, '"
+func,0x0004927A,macro_q5b_bio_answer,strong,"macro table %q5b -> func_0004927A: parse_bio_answer_text(28): TEXT.RSC record from the biography answer table D_00190BE4[28]; rsc4126 ""trained ... to be %q1""; DFU Q1..Q12b (effects of questions answered in bio); direct call in save_dorian returned 'STRENGTHý Strength governs encumbrance, '"
+func,0x000492A2,macro_q6b_bio_answer,strong,"macro table %q6b -> func_000492A2: parse_bio_answer_text(29): TEXT.RSC record from the biography answer table D_00190BE4[29]; rsc4126 ""trained ... to be %q1""; DFU Q1..Q12b (effects of questions answered in bio); direct call in save_dorian returned 'STRENGTHý Strength governs encumbrance, '"
+func,0x000492CA,macro_q7b_bio_answer,strong,"macro table %q7b -> func_000492CA: parse_bio_answer_text(30): TEXT.RSC record from the biography answer table D_00190BE4[30]; rsc4126 ""trained ... to be %q1""; DFU Q1..Q12b (effects of questions answered in bio); direct call in save_dorian returned 'STRENGTHý Strength governs encumbrance, '"
+func,0x000492F2,macro_q8b_bio_answer,strong,"macro table %q8b -> func_000492F2: parse_bio_answer_text(31): TEXT.RSC record from the biography answer table D_00190BE4[31]; rsc4126 ""trained ... to be %q1""; DFU Q1..Q12b (effects of questions answered in bio); direct call in save_dorian returned 'STRENGTHý Strength governs encumbrance, '"
+func,0x0004931A,macro_q9b_bio_answer,strong,"macro table %q9b -> func_0004931A: parse_bio_answer_text(32): TEXT.RSC record from the biography answer table D_00190BE4[32]; rsc4126 ""trained ... to be %q1""; DFU Q1..Q12b (effects of questions answered in bio); direct call in save_dorian returned 'STRENGTHý Strength governs encumbrance, '"
+func,0x00049342,macro_q10b_bio_answer,strong,"macro table %q10b -> func_00049342: parse_bio_answer_text(33): TEXT.RSC record from the biography answer table D_00190BE4[33]; rsc4126 ""trained ... to be %q1""; DFU Q1..Q12b (effects of questions answered in bio); direct call in save_dorian returned 'STRENGTHý Strength governs encumbrance, '"
+func,0x0004936A,macro_q11b_bio_answer,strong,"macro table %q11b -> func_0004936A: parse_bio_answer_text(34): TEXT.RSC record from the biography answer table D_00190BE4[34]; rsc4126 ""trained ... to be %q1""; DFU Q1..Q12b (effects of questions answered in bio); direct call in save_dorian returned 'STRENGTHý Strength governs encumbrance, '"
+func,0x00049392,macro_q12b_bio_answer,strong,"macro table %q12b -> func_00049392: parse_bio_answer_text(35): TEXT.RSC record from the biography answer table D_00190BE4[35]; rsc4126 ""trained ... to be %q1""; DFU Q1..Q12b (effects of questions answered in bio); direct call in save_dorian returned 'STRENGTHý Strength governs encumbrance, '"
+func,0x000493BA,macro_qot_blank,confirmed,"macro table %qot -> func_000493BA: returns text_blank (""BLANK""); rsc2500 ""told me %qot""; experiment: direct call in save_dorian returned 'BLANK'"
+func,0x000493DD,macro_qdt_quest_date,confirmed,"macro table %qdt/%qdat -> func_000493DD: %dat of the time in D_00190BE4 (swapped into game_minutes); shared by %qdt %qdat; rsc2500 ""%qdt - ...""; DFU QuestDate; experiment: direct call in save_dorian returned 'Morndas the 1st of Morning Star'"
+func,0x00049420,macro_ra_player_race,confirmed,"macro table %ra -> func_00049420: race_names[character+0x43] (or +0x1F2, the original race, for vampires/werewolves); returned ""Dark Elf""; DFU PlayerRace; experiment: direct call in save_dorian returned 'Dark Elf'"
+func,0x00049484,macro_rf_empty,confirmed,macro table %rf -> func_00049484: returns an empty string; no text uses %rf; experiment: direct call in save_dorian returned ''
+func,0x000494A6,macro_rt_ruler_title,confirmed,"macro table %rt -> func_000494A6: parse_faction_ruler_title of the region's type-14 (court) faction; returned ""Queen"" in Sentinel; DFU RegentTitle; experiment: direct call in save_dorian returned 'Queen'"
+func,0x000494E1,parse_faction_ruler_title,strong,"ruler title of a faction: D_001837B4[+0x02] (King, Queen, Duke...), else its parent's, else ""Lord""; used by %rt %t %lt1 %lt2; experiment: %rt -> ""Queen"" (Sentinel), %lt1 -> ""Lord"""
+func,0x00049577,macro_reg_previous_region,strong,"macro table %reg -> func_00049577: region_names[previous_region]; returned ""Sentinel""; DFU RegionInContext; direct call in save_dorian returned 'Sentinel'"
+func,0x000495A5,macro_rn_ruler_name,confirmed,"macro table %rn -> func_000495A5: the region's noble (type 7) faction's individual child, else a name seeded by the court faction; returned ""Queen Akorithi"" in Sentinel; DFU RegentName; experiment: direct call in save_dorian returned 'Queen Akorithi'"
+func,0x00049647,macro_r1_commoners_change,confirmed,"macro table %r1 -> func_00049647: character+0x91 against reputation_baseline[0]: ""Lower""/""Higher""/""Unchanged""; rsc35 ""Commoners: %r1""; experiment: direct call in save_dorian returned 'Higher'"
+func,0x000496A5,macro_r2_merchants_change,confirmed,"macro table %r2 -> func_000496A5: character+0x93 against reputation_baseline[1]; rsc35 ""Merchants: %r2""; experiment: direct call in save_dorian returned 'Higher'"
+func,0x00049703,macro_r3_scholars_change,confirmed,"macro table %r3 -> func_00049703: character+0x95 against reputation_baseline[2]; rsc35 ""Scholars: %r3""; experiment: direct call in save_dorian returned 'Higher'"
+func,0x00049761,macro_r4_nobility_change,confirmed,"macro table %r4 -> func_00049761: character+0x97 against reputation_baseline[3]; rsc35 ""Nobility: %r4""; experiment: direct call in save_dorian returned 'Higher'"
+func,0x000497BF,macro_r5_underworld_change,confirmed,"macro table %r5 -> func_000497BF: character+0x99 against reputation_baseline[4]; rsc35 ""Underworld: %r5""; experiment: direct call in save_dorian returned 'Higher'"
+func,0x0004981D,macro_spc_magicka,confirmed,"macro table %spc -> func_0004981D: character+0x8D as decimal; rsc1 ""%spc out of %spt""; DFU Magicka; experiment: direct call in save_dorian returned '750'"
+func,0x00049856,macro_spt_max_magicka,confirmed,"macro table %spt -> func_00049856: character+0x8F as decimal (750); rsc1 ""%spc out of %spt spell points""; DFU MagickaMax; experiment: direct call in save_dorian returned '750'"
+func,0x0004988F,macro_spd_speed,confirmed,"macro table %spd -> func_0004988F: character+0x2C (SPD); rsc6 ""With your speed of %spd""; experiment: direct call in save_dorian returned '100'"
+func,0x000498C5,macro_str_strength,confirmed,"macro table %str -> func_000498C5: character+0x20 (STR); rsc0 ""With your strength of %str""; experiment: direct call in save_dorian returned '100'"
+func,0x000498FB,macro_sub_painting_subject,strong,"macro table %sub -> func_000498FB: TEXT.RSC record D_00195DC6; rsc250 ""%sub by %an""; DFU PaintingSubject; direct call in save_dorian returned 'STRENGTHý Strength governs encumbrance, '"
+func,0x0004992E,macro_fac2_key2_text,candidate,macro table %fac2 -> func_0004992E: returns talk_key_text+65 (same as %key2); no text uses %fac2
+func,0x00049950,parse_unused_price_text,candidate,trade_price as decimal (same as the %a handler); in no macro table entry and never called
+func,0x00049982,macro_ski_skill_name,confirmed,"macro table %ski -> func_00049982: skill_names[D_00199640] (""Medical"" for 0); rsc4020 ""You are now a Master of %ski""; DFU Skill; experiment: direct call in save_dorian returned 'Medical'"
+func,0x000499AE,macro_oth_oath,confirmed,"macro table %oth -> func_000499AE: TEXT.RSC 201 + the talk NPC race (D_00195A84+0x43); rsc7206 ""%oth, it's you""; DFU Oath; experiment: direct call in save_dorian returned 'By the Hoarfather'"
+func,0x000499EB,macro_sng_blank,confirmed,"macro table %sng -> func_000499EB: returns text_blank (""BLANK""); experiment: direct call in save_dorian returned 'BLANK'"
+func,0x00049A0E,macro_reg_where_target_region,strong,"macro table %creg/%freg/%hreg/%ireg/%preg/%rreg/%treg/%wreg -> func_00049A0E: region name of talk_where_target (+7); shared by %creg %freg %hreg %ireg %preg %rreg %treg %wreg; direct call in save_dorian returned ""Alik'r Desert"""
+func,0x00049A42,macro_t_ruler_title,confirmed,"macro table %t -> func_00049A42: parse_faction_ruler_title of the region's noble (type 7) faction (""Queen""); rsc7253 ""a personal friend of %t %rn""; DFU RegentTitle; experiment: direct call in save_dorian returned 'Queen'"
+func,0x00049A77,macro_thd_to_hit_modifier,confirmed,"macro table %thd -> func_00049A77: AGI/10-5 with sign; rsc3 ""%thd (modifier is factored into your combat odds""; DFU ToHitMod; experiment: direct call in save_dorian returned '+5'"
+func,0x00049ABF,macro_tem_town_temple,strong,macro table %tem -> func_00049ABF: parse_town_building_name(14): a random temple (building type 14) of the town; direct call in save_dorian returned 'City Wall'
+func,0x00049AE7,macro_tgm_thieves_faction,candidate,macro table %tgm -> func_00049AE7: child (+0x54) of the type-13 (thieves) faction of talk_where_target's region; no text uses %tgm
+func,0x00049B20,macro_tcn_travel_city,strong,"macro table %tcn -> func_00049B20: returns *D_00195DB0; rsc31 ""Do you wish to travel to %tcn?"""
+func,0x00049B43,macro_vam_vampire_clan,strong,"macro table %vam -> func_00049B43: faction named by character+0x21D; P0B10L07.QRC ""%vam feel that you deserve""; DFU VampireClan"
+func,0x00049B77,macro_wil_willpower,confirmed,"macro table %wil -> func_00049B77: character+0x24 (WIL); rsc2 ""With your willpower of %wil""; experiment: direct call in save_dorian returned '100'"
+func,0x00049BAD,macro_wdm_weapon_damage,strong,"macro table %wdm -> func_00049BAD: ""%d - %d"" from weapon damage table D_0017CF86/88 by item index plus material bonus; rsc1001 ""%wdm points of damage""; DFU WeaponDamage; direct call in save_dorian returned '0 - 4'"
+func,0x00049C70,macro_wep_weapon_name,strong,"macro table %wep -> func_00049C70: text_macro_item name with template substitution; rsc1001 ""%mat %wep""; DFU ItemName; direct call in save_dorian returned 'Indulcet'"
+func,0x00049CB9,macro_wpn_poison,strong,"macro table %wpn -> func_00049CB9: D_00182F92[poison of D_00195AA8's first child] or ""Nothing""; rsc1005 ""Poisoned with %wpn""; direct call in save_dorian returned 'Nothing'"
+func,0x00049D0C,macro_12m_number,candidate,macro table %12m -> func_00049D0C: D_00190BF4 as decimal (shared scratch slot); no text uses %12m; direct call in save_dorian returned '0'
+func,0x00049D3E,macro_12f_number,candidate,macro table %12f -> func_00049D3E: D_00190BF8 as decimal; no text uses %12f; direct call in save_dorian returned '0'
+func,0x00049D70,macro_36m_number,candidate,macro table %36m -> func_00049D70: D_00190BFC as decimal; no text uses %36m; direct call in save_dorian returned '0'
+func,0x00049DA2,macro_36f_number,candidate,macro table %36f -> func_00049DA2: D_00190C00 as decimal; no text uses %36f; direct call in save_dorian returned '-1024'
+func,0x00049DD4,macro_1hn_hero1_name,candidate,"macro table %1hn -> func_00049DD4: name from seed D_00190CD4 (regional bank, gender D_00190D20), else the player name; rsc853 book titles ""%1hn""; direct call in save_dorian returned 'Dorian'"
+func,0x00049E25,macro_1g1_hero1_he,candidate,macro table %1g1 -> func_00049E25: pronoun table D_0017D01E[D_00190D20] for hero 1; direct call in save_dorian returned 'dexterous'
+func,0x00049E53,macro_1g2_hero1_him,candidate,macro table %1g2 -> func_00049E53: D_0017D02A[D_00190D20]; direct call in save_dorian returned 'sickly'
+func,0x00049E81,macro_1g3_hero1_his,candidate,macro table %1g3 -> func_00049E81: D_0017D036[D_00190D20]; direct call in save_dorian returned 'erratic'
+func,0x00049EAF,macro_2hn_hero2_name,candidate,"macro table %2hn -> func_00049EAF: name from seed D_00190CD8, gender D_00190D21; rsc852 book titles ""%2hn and""; direct call in save_dorian returned 'Bojan'"
+func,0x00049EDE,macro_2g1_hero2_he,candidate,macro table %2g1 -> func_00049EDE: D_0017D01E[D_00190D21]; direct call in save_dorian returned 'he'
+func,0x00049F0C,macro_2g2_hero2_him,candidate,macro table %2g2 -> func_00049F0C: D_0017D02A[D_00190D21]; direct call in save_dorian returned 'him'
+func,0x00049F3A,macro_2g3_hero2_his,candidate,macro table %2g3 -> func_00049F3A: D_0017D036[D_00190D21]; direct call in save_dorian returned 'his'
+func,0x00049F68,macro_3hn_hero3_name,candidate,"macro table %1hn -> func_00049F68: name from seed D_00190CDC, gender D_00190D22; its table entry in the ""3"" table is misspelt ""1hn"", so %3hn (rsc852) never expands; direct call in save_dorian returned 'Bojan'"
+func,0x00049F97,macro_3g1_hero3_he,candidate,macro table %3g1 -> func_00049F97: D_0017D01E[D_00190D22]; direct call in save_dorian returned 'he'
+func,0x00049FC5,macro_3g2_hero3_him,candidate,macro table %3g2 -> func_00049FC5: D_0017D02A[D_00190D22]; direct call in save_dorian returned 'him'
+func,0x00049FF3,macro_3g3_hero3_his,candidate,macro table %3g3 -> func_00049FF3: D_0017D036[D_00190D22]; direct call in save_dorian returned 'his'
+func,0x0004A021,macro_1com_greeting,confirmed,"macro table %1com -> func_0004A021: calls talk_macro_1com; returned ""Ah, I see""; rsc7212 ""%1com. If possible, I would hear about %key""; experiment: direct call in save_dorian returned 'Ah, I see'"
+func,0x0004A044,parse_bio_answer_text,strong,loads TEXT.RSC record (short) D_00190BE4[i*4] into text_rsc_buffer and returns it; called by the 36 %q1..%q12b handlers
+func,0x0004A07F,parse_regional_name,candidate,name generator (spfx 8B43B) with the bank of region D_00190D1F and a seed; used by %1hn %2hn %3hn
+func,0x0004A0C0,parse_town_building_name,confirmed,"name of a random building of the given type in current_location (+0x29 count, +0x2B 26-byte records, type at +0x18), else BLANK; experiment: (15) -> ""The Rat and Jug"" in Sentinel; used by %nt (15) and %tem (14)"
+func,0x0004A1A2,parse_read_number,candidate,"reads the alphanumerics after a ""%z.."" macro and atoi()s them into D_00199734; returns the length; called by parse_expand"
+func,0x0004A231,parse_signed_itoa,confirmed,"itoa with a leading ""+"" for positive values; experiment: %dam/%hea/%thd returned ""+5"""
+func,0x0004A282,object_weight_add,strong,"per-object callback of object_weight: adds an item's weight (+0x39 of its record, gold/100, ingredient and stack rules) to D_00195B54; skips the wagon unless D_001962AE"
+func,0x0004A3EC,object_weight,strong,"total weight in quarter kilograms under an object (player: + gold/100, i.e. 400 coins per kg); used by %kg (""%ld%s"" with .25 steps) and the inventory/encumbrance code (inv_take_item, inv_click_left_item)"
+func,0x0004A56A,parse_item_name,strong,"copies an item name to a buffer, replacing ""%"" in the name with the item template name (item_templates by group/index); used by %arm %it %wep; experiment: %it -> ""Indulcet"""
+func,0x0004A6B5,parse_rsc_text,confirmed,"loads TEXT.RSC record id into text_rsc_buffer (text.c 3D412 with the main RSC file D_00195D78); experiment: (200) -> a joke, (7204) -> ""You cannot talk to that."""
+func,0x0004A748,quest_load_text,confirmed,"loads quest message id from the quest's QRC (name ""%08d"" of quest+0x04, else quest+0x06) via text.c 3E7D7 into text_rsc_buffer; sets current_quest; experiment: (s0000999, 1033) -> its text, (.., 1000) -> ""Error: Questtext 1000 called on MAIN.Q"""
+func,0x0004A82A,parse_rsc_text_copy,confirmed,"copies TEXT.RSC record id into a caller buffer; experiment: (7204, buf) -> ""You cannot talk to that."""
+func,0x0004A8B6,parse_stub_zero,strong,"returns 0 whatever its argument (511, 515); the %brd/%dnc handlers then read +0x1F/+0x1B of address 0"
+func,0x0004A8DB,holiday_index,candidate,"index of the regional holiday (D_0017CA8E region == region+1, day of year >= D_0017CA24[i]) for a time, 0 if none; used by %hod %nhd and holiday_name"
+func,0x0004A98C,holiday_today,strong,"1 + index of the holiday falling on that day of the year in that region (255 = all regions), 0 if none; experiment: days 1/15/46 -> 1/4/10; called by the shops (spellshop_buy, guild_buy_magic_items, inventory_draw)"
+func,0x0004AA47,holiday_name,confirmed,"D_0017CAC3[holiday_index] (""New Life"", ""Scour Day""..); experiment returned ""New Life""; used by %nh"
+func,0x0004BA70,quest_init_record_sizes,confirmed,"called by main: qbn_record_sizes = 19, 94, 34, 20, 24, 16, 33, 14, 87, 8; experiment: read back from save_dorian, the record sizes of UESP's QBN sections"
+func,0x0004BAE2,quests_run_all,strong,"every frame (game_frame, and time passing 4AC01) unless quests_suspended: quest_run_opcodes on each type-14 child of quest_root"
+func,0x0004BB64,quest_find_by_id,strong,"data of the active quest with that id (quest+0x00), also in quest_tick_data"
+func,0x0004BBD8,quest_raise_event,strong,"sets quest_event_code/object/object2 and runs quest_dispatch_event on the quest owning the object (its +0x26 quest id); raised with 1, 2, 3, 5, 21, 28, 71 by click.c, inven.c, damage.c"
+func,0x0004BC43,quests_raise_event_all,strong,quest_dispatch_event on every active quest; raised with 73 by the spell caster (runspell 5AFD5)
+func,0x0004BCA6,quest_end,confirmed,"ends current_quest: quest_ended_id = its id, quest_faces_remove_quest, quest_remove_objects, quest_debug_data = 0; experiment: the quest started by quest_start disappeared and quest_ended_id was 4"
+func,0x0004BCFA,quests_start_initial,strong,"at the title menu: quest_start on every ""_*.qbn"" in the arena2 directory (then the alternative one); UESP ""_ Starting quests (Tutor and Initial)"""
+func,0x0004BDB7,quest_start,confirmed,"starts a quest file: refuses empty, N0C00Y01.QBN and active ones; reads it, makes a type-14 record under quest_root (+0x15 = 3), id from quest_free_id (also +0x26), name, questor faction for ""Y"" quests; qinit 332F7 places it (else quest_end and TEXT.RSC 600 ""Well, I had work, but I hired the Fighters Guild to do it""); quest_timers_start_all; non-""s"" quests must pass quest_offer_prompt; rumor 1005; experiment: S0000101.QBN -> new quest id 4 with 2 started timers and 1 foe"
+func,0x0004C075,quest_offer_prompt,strong,"offer of a new quest: Daedra quests (name in ""TUVWXYZ1-9"") play azura.flc.. (pflc) with QRC 1000 and 1001/1002; ""Y"" (in person) quests show 1000 as a yes/no popup, then 1002 accepted / 1001 refused; returns accepted; UESP 1000 ""Get Quest"", 1001 refuse, 1002 accept"
+func,0x0004C242,quest_start_pending,strong,"every frame: quest_start(pending_quest_file) when set, then clears it"
+func,0x0004C274,quest_pick_file,confirmed,"experiment (find_first patched to list the game ARENA2, see notes): (M,M,0,B,9) -> M0B00Y07.QBN, M0B50Y09.QBN..; (A,K,0,C,9) -> A0C00Y07.QBN, A0C01Y13.QBN..; (R,0,0,C,9) -> R0C20Y22.QBN..; collects ""%s*.qbn"" names (two directories) whose letters match: [0] in {a1,a2}, [1]==a3, [2]==a4 (A join/B member/C non-member), [3]-'0' <= a5 (reputation), no X/Y under D_00195BF8 bit 2 (ChildGuard); picks one at random into pending_quest_file; UESP quest file name format; callers guild_service_dispatch, guild_temple_quest, quest_pick_for_npc"
+func,0x0004C4A0,quest_file_list_add,candidate,adds a file name to the list in scratch_buffer unless present; returns the new count
+func,0x0004C526,quest_match_person_cb,candidate,tree callback: a type-8 person whose faction (+0x47) is D_00190BE4 becomes found_record
+func,0x0004C588,quest_link_object_cb,candidate,"per world object of the quest tree: links a resource object to its world twin (type-41 persons with id 800<<16 to a matching person, ""Invalid person (%d) selected.""; others by id in the current location, or quest_object_instantiate)"
+func,0x0004C759,quests_link_world,candidate,"quest_link_object_cb on every object under D_001959A8; after quest_start and on location loads (7A983, 86794, 86B0B)"
+func,0x0004C787,quest_free_id,confirmed,"lowest quest id 1-255 not used by an active quest (""Unable to assign questID...""); experiment: returned 4 with quests 1-3 active"
+func,0x0004C835,qaction_op46_hide_npc,strong,"opcode 46: sets bits 0x0A00 of the person resource object's flags (+0x15) and its twin's; UESP 0x2E ""Hide NPC""; DFU HideNpc"
+func,0x0004C874,qaction_op45_nop,candidate,opcode 45: empty function
+func,0x0004C890,qaction_op48_restore_npc,strong,"opcode 48: clears those bits again; UESP 0x30 ""Show NPC""; DFU RestoreNpc"
+func,0x0004C8CF,qaction_op47_nop,candidate,opcode 47: empty function
+func,0x0004C8EB,quest_mark_giver_cb,candidate,"per type-8 person: in a dungeon, or inside a building of type < 16 other than 1 (not guild halls 11 or temples 14), and not of the Dark Brotherhood/Thieves/Mages/Fighters trees (108, 42, 40, 41): marks group/generic factions with 25% and individuals with 50% chance (data+2 bit 7)"
+func,0x0004CA9D,quest_mark_givers,candidate,"quest_mark_giver_cb on the location's objects, seeded by the day; on location loads (maplogic 86794, 86B0B), not in three special dungeons"
+func,0x0004CB2F,npc_is_quest_giver,candidate,returns bit 7 of a person's data+2 (the quest-giver mark)
+func,0x0004CB5D,quest_pick_for_npc,strong,"quest for a clicked marked NPC: individuals (faction type 4, not 407) get Royalty quests quest_pick_file('R',0,'0','C',level), others outside dungeons Commoner/Merchant quests ('A','K','0','C',level); UESP Appendix B: A commoners, K merchants, R royalty"
+func,0x0004CC14,quest_count_givers_cb,candidate,"counts (or counts down to) the marked persons of the location, leaving the chosen one in found_record"
+func,0x0004CC82,quest_find_potential_questor,strong,picks a random marked person of the location as quest_potential_questor (for %pqn/%pqp); called by talk_button_okay for the WORK answer
+func,0x0004CD10,quest_npc_offers_quest,candidate,seeded by the person's id: would quest_pick_for_npc pick a quest; if so sets quest_potential_questor and returns 1 (pending_quest_file cleared)
+func,0x0004CD80,quest_start_test_quest,candidate,clicking a person of faction 510 starts the quest file D_001A5BE4 once (quest_test_started); probably a test hook
+func,0x0004CDE3,quest_reward_faction,strong,"faction_change_reputation(quest faction (+0x02), +5); called by qaction_op04_give_reward"
+func,0x0004CE24,quest_add_questor_rumor,candidate,for the quest's person with kind 21 (+0x04): rumor (faction.c 1D766) with QRC 1008 on success or 1009 on failure; called by opcode 6
+func,0x0004CEBE,quest_is_active,confirmed,"1 if an active quest has that 8-character name; experiment: s0000999 -> 1, s0000123 -> 0"
+func,0x0004CF37,item_armor_value,candidate,"armour value of an item: material bonus D_0017CF72 + 45 for plate (+0x37 == 2), else D_00185128 by armour type; not quest code (also used by %mod)"
+func,0x0004CFA7,armor_value_for_part,candidate,"100 minus the armour on one body part (equipped slots character+0x16F by D_0018513E), shield bonus, +-25 for enchantments 12/24, clamped to +-100; not quest code"
+func,0x0004D195,character_update_armor_values,strong,"fills character+0x44 armor_values[7] from armor_value_for_part; callers 58E15, 792C1; not quest code"
 func,0x0004D1E6,note_open_notebook,candidate,"note.c; strings notebook.tde, note.rci, mask02i0.img, 'Unable to create new notebook!'"
 func,0x00051DCF,pflc_read_savetree,candidate,"pflc.c; strings 'save2\\savetree.dat', 'Unable to open %s.'"
 func,0x00055E35,itemmaker_open,confirmed,"unit itemmakr.c (filed under custom.c). (kind) game_mode=10, loads item00i0.img, item01i0.img, spells.std, selects tab 0, itemmaker_reset; called every frame by itemmaker_update (0) and by guild_service_dispatch; exp: fallcall 0x55E35 1 drew ITEM NAME, CURRENT GOLD, TOTAL COST, ENCHANTMENT POINTS, POWERS, SIDE EFFECTS, ENCHANT, ADD POWERS, ADD SIDE EFFECTS (scratch/magic/open_0x55E35.png)"
