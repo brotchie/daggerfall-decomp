@@ -236,6 +236,35 @@ saves.
 questions, or the class maker) → background (random, or 12 questions) → name, face,
 attributes, skills, reflexes → the intro movie.
 
+## Input, movement and the interface
+
+These come from the UI and input naming agent; details are in build/names/ui_input.md.
+
+**Key map:** `key_map` holds the 38 actions in the order of the CONTROLS screen (0 FORWARD
+… 37 INVENTORY).
+- `key_action_held` (0x42F0F) tests whether a key is down; `key_action_pressed` (0x430CD)
+  fires only on the first frame.
+- Bindings of 200 and up are joystick and mouse buttons and joystick axes.
+
+**Steering:** the view is a 3 × 3 grid of steering regions, with handlers in a table at
+0xCAF00 (forward-left, forward, forward-right, turn left, stop/activate, turn right, slide
+left, back, slide right). The movement keys use the same handlers.
+
+**Movement:** `player_movement_update` (0x81425) does the walking, climbing, jumping and
+fall damage every frame. The on-ground flag, vertical velocity, crouch and look pitch were
+confirmed by experiment.
+
+**Settings:** `game_settings` (0x195BF8) points at the settings record. Its view flags hold
+full screen (bit 0) and head bobbing (bit 1), then detail and the volumes.
+
+**HUD:**
+- 11 buttons.
+- The portrait overlays low health, poison, disease and being under someone's spell.
+- Two compasses: the HUD one, and a small strip in full screen.
+
+**More game modes** (`game_mode` values): 26 the repair menu, 27 the witches' coven menu,
+28 the service menu (banking or selling), chosen by building type.
+
 ## Message boxes and support code
 
 These come from the text and support naming agent; details are in build/names/text_support.md.
@@ -334,6 +363,14 @@ The naming agents found these functions filed under the wrong unit:
 - 0x7C908–0x7CAEB (filed under loadsave.c) are probably support.c's text-drawing helpers.
 - 0x82DF6–0x83EDF (filed under args.c) draw world and automap objects, and 0x843E0–0x849E4
   are probably objlib.c's RMB record object makers.
+- 0x76AF4–0x784EE (filed under click.c, past its last file reference) has no known unit. It
+  holds ambient sounds, footsteps, the position history Alt+F11 uses, the creature
+  spawn-point search, head bobbing, and the music choice.
+- 0x998C8–0x99D0D (filed under color.c) is a string hash, door swinging and building
+  lookups.
+- 0x51B3E (question.c) is pflc.c's FLIC play loop; 0x8CA25 (inpstr.c) is picklist.c.
+- 0x4259C (pickbook.c) is the STATUS key handler; 0x82657–0x82750 (intrface.c) are dead
+  hex-string helpers.
 - 0x2586B (filed under career.c) turns killed creatures into corpses: mplace.c or the
   monster code.
 

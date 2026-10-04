@@ -39,7 +39,7 @@ global,0x001788E4,controls_file,candidate,pointer to the controls file name (con
 global,0x001789F8,cast_anim_state,strong,"short: casting animation, element << 4 | frame, -1 idle (cast_anim_start, cast_anim_update)"
 global,0x001789FA,player_environment,confirmed,"1 outside, 2 inside a building, 3 dungeon or palace: constant across 16 states in 3 groups (docs/state.md)"
 global,0x00178A08,msgbox_wrap_width,candidate,short: line width passed to text_rsc_load for message boxes
-global,0x00178A0A,spellshop_spell,strong,"the selected 89-byte spell record (spellshop_update), bought by spellshop_buy"
+global,0x00178A0A,selected_spell,strong,"the current spell for the spell shop, the spellmaker and the spellbook (UI and magic agents); was spellshop_spell; the selected 89-byte spell record (spellshop_update), bought by spellshop_buy"
 global,0x00178A0E,travel_options,strong,"trip options: bits 0/1 cautious/reckless, 2/3 foot-horse/ship, 4/5 inns/camp out (pairs toggled by the popup boxes, ticks at D_0018886C); reckless halves the time, camp x300/256, inns and ship cost gold; 0x19 or 0x16 in saves"
 global,0x00178A10,quest_object_serial,candidate,SAVEVARS.DAT 0x39F: counter stored in +0x1D of quest items and foes (qinit 32EC8 / 3323C increment it)
 global,0x00178A14,guards_timer,candidate,"int: frames until guards_summon(1); guards_summon sets random(5,10) x D_0012AA04 after an unwitnessed crime"
@@ -783,7 +783,7 @@ global,0x001A9A60,namegen_part_name,strong,30-byte buffer for the first name / s
 global,0x001A9A7E,namegen_syllable,strong,10 bytes read by namegen_read_part
 global,0x001A9A9C,namegen_file,strong,short: NAMEGEN.DAT handle while a name is made
 global,0x001A9AB0,input_digits_only,strong,byte: inpstr.c's editor accepts only 0-9 (set by 8C4E4 number input and input_edit_number_box)
-global,0x001A9AB8,spellshop_list,candidate,picklist control of the spell shop
+global,0x001A9AB8,shared_picklist,candidate,"the pick list the spell shop, the spellbook, the magic-item list and support.c's popups all use (UI agent); was spellshop_list; picklist control of the spell shop"
 global,0x001A9AF4,object_move_new,candidate,"object_set_position's new x, y, z, angle x, yaw, angle z (6 ints) that object_follow_move_cb applies to children"
 global,0x001A9B0C,object_debug_watch,candidate,that object's pointer
 global,0x001A9B10,object_delete_block_id,candidate,high word of the block whose objects object_delete_block deletes
@@ -1653,7 +1653,7 @@ func,0x000411BF,person_load_face,strong,"(person, buf): seeded by the person's i
 func,0x00041347,people_check_witnesses,candidate,"outside: ORs line-of-sight (23C72) from each pedestrian to the player into people_witness_flags (bit 1 for guards); callers talk_open, person_killed, 7425E, 86F50"
 func,0x00041409,person_killed,strong,"(person): if anyone saw it, crime_current 5 (murder) and guards_summon(1); re-places the person; guild_count_crime(6, 5) (Dark Brotherhood count); caller weapon_melee_strike"
 func,0x00041455,people_debug_map,candidate,"debug: draws the town map with pedestrians (145), creatures (161), the player (244) and 'LOC: %d, %d'; no callers"
-func,0x000445B5,options_joystick_calibrate,strong,"options.c; cnfg04i0.img, cnfg05i0.cif, cnfg06i0.img; direct call (all-zero args) shows the joystick calibration window"
+func,0x000445B5,options_joystick_screen,strong,"the whole joystick screen (DISABLED, CALIBRATE, a LOW/MED/HIGH threshold); its CALIBRATE button is 0x449D8 (UI agent); was options_joystick_calibrate; options.c; cnfg04i0.img, cnfg05i0.cif, cnfg06i0.img; direct call (all-zero args) shows the joystick calibration window"
 func,0x00044EE0,show_rumor,candidate,kludge.c; opens rumor.dat; direct call (all-zero args) shows a rumour; calls faction_rumor_text
 func,0x00045B7F,pick_gold,candidate,kludge.c; string 'Picking from %s.'; direct call (all-zero args) shows 'You picked N gold pieces'
 func,0x0004633F,parse_expand,confirmed,"the text macro expander (src, dst): ""%xxx"" via the per-letter tables D_0017C47E/D_0017C4F2 (9-byte {name[5], handler}), ""_sym_""/""=sym_"" quest symbols via qkey.c 2CE9E with a hash (998C8) and level (_ +16 each, = +1 each); ""Invalid parse command (%lx,%s)"" when a handler returns <1000; experiment: expanding ""%ra|%pcn|%cn|%dat|%tim|%god|%rn..."" in save_dorian gave ""Dark Elf|Dorian Kaine|Sentinel|Middas the 23th of Evening Star|18:55|Arkay|Queen Akorithi..."""
