@@ -20,6 +20,7 @@ usage: fallemu.py [--frames N] [--keys "..."] [--shots DIR] [--trace] [args for 
 """
 import argparse
 import os
+import shutil
 import struct
 import sys
 import time
@@ -279,10 +280,21 @@ def prepare_overlay(game, overlay):
             if n not in (x.upper() for x in arena2) and
             not os.path.exists(os.path.join(overlay, "ARENA2", n))]
     if need:
-        for name, data in unpack_packed(os.path.join(game, "ARENA2", "PACKED.DAT")):
-            if name in need:
-                with open(os.path.join(overlay, "ARENA2", name), "wb") as f:
-                    f.write(data)
+        # unpacked once into a cache and hard-linked into each overlay (they are only read)
+        cache = os.path.join(ROOT, "build", "emu", "packed")
+        if not all(os.path.exists(os.path.join(cache, n)) for n in need):
+            os.makedirs(cache, exist_ok=True)
+            for name, data in unpack_packed(os.path.join(game, "ARENA2", "PACKED.DAT")):
+                if name in need:
+                    with open(os.path.join(cache, name + ".tmp"), "wb") as f:
+                        f.write(data)
+                    os.replace(os.path.join(cache, name + ".tmp"), os.path.join(cache, name))
+        for name in need:
+            dst = os.path.join(overlay, "ARENA2", name)
+            try:
+                os.link(os.path.join(cache, name), dst)
+            except OSError:
+                shutil.copyfile(os.path.join(cache, name), dst)
 
 
 class Emu:

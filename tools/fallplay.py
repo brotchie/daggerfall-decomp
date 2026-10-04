@@ -197,6 +197,7 @@ def arch3d():
     """ARCH3D.BSA (the 3D models; fallemu unpacks it from PACKED.DAT): {id: (offset, size)}."""
     if not _ARCH:
         for p in (os.path.join(ROOT, "build", "game", "ARENA2", "ARCH3D.BSA"),
+                  os.path.join(ROOT, "build", "emu", "packed", "ARCH3D.BSA"),
                   os.path.join(ROOT, "build", "emu", "overlay", "ARENA2", "ARCH3D.BSA")):
             if os.path.exists(p):
                 d = open(p, "rb").read()
@@ -512,7 +513,10 @@ def run_step(session, label, action):
     for va, _nm, g, k in fns:
         if LO <= va < HI and cov[va - LO]:
             tot[k] = tot.get(k, 0) + 1
-    steps.append({"n": n + 1, "events": label, "tick": emu.ticks, "new_functions": len(newf)})
+    # argv: the command, which replays the step exactly from the previous snapshot (the
+    # emulator and every command are deterministic)
+    steps.append({"n": n + 1, "events": label, "tick": emu.ticks, "new_functions": len(newf),
+                  "argv": sys.argv[1:2] + sys.argv[3:]})
     save_steps(session, steps)
     by = {}
     for g, _k in newf:

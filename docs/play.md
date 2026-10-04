@@ -94,6 +94,9 @@ creation into the first dungeon.
 
 The point of playing is to run code that the saves alone never reach: magic, guilds,
 shops, banks, quests, crime and guards, travel, dungeons, combat, resting and levelling,
-character creation. When a sequence works, save it as a fallemu scenario in
-`tools/scenarios/` (see newgame.txt), so it can be replayed for traces without a model.
-`tools/fallcov.py report` totals the coverage of every run in `build/cov`.
+character creation. Each step records the command that made it (`argv` in
+`build/play/S/steps.json`). The emulator and every command are deterministic, so a
+session replays exactly from its first snapshot, and a session that reaches somewhere
+new is a scenario. `tools/fallcov.py report` totals the coverage of every run in
+`build/cov`: play sessions, batch runs, and `tools/fallfuzz.py`, the random play that runs
+alongside on spare cores.
