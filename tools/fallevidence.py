@@ -59,7 +59,7 @@ def todo():
             par = e["parent"]
             ps = os.path.join(SNAPS, par[5:] + ".snap") if par.startswith("seed_") else snaps.get(par)
             if ps and os.path.exists(ps):
-                out.append(("fuzz", e["id"], ps, e["events"], e["ticks"], e["tick"]))
+                out.append(("fuzz", e["id"], ps, e["events"], e["ticks"], e["tick"], e.get("macro")))
     return out
 
 
@@ -136,10 +136,13 @@ def work(k, n):
                 rec = {"id": "%s/%d" % (s, num), "kind": "play", "label": st.get("events", ""),
                        "exact": exact}
             else:
-                _kind, eid, snap, events, ticks, tick = item
+                _kind, eid, snap, events, ticks, tick, macro = item
                 emu = fallemu.Emu.load(snap, overlay=ov)
                 lib.uc_dagger_coverage(emu.uc._uch, L + LO, L + HI, None)
                 env0 = fallplay.env(emu)
+                if macro:
+                    import fallfuzz
+                    fallfuzz.run_macro(emu, macro)
                 s0 = emu.ticks
                 emu.run(s0 + ticks, [(s0 + t, a, tuple(g) if isinstance(g, list) else g)
                                      for t, a, g in events], None)
@@ -147,6 +150,8 @@ def work(k, n):
                 lib.uc_dagger_coverage(emu.uc._uch, L + LO, L + HI, buf)
                 cov = buf.raw
                 toks = tokens_of_events([(t, a, g) for t, a, g in events]) | {"cmd:fuzz"}
+                if macro:
+                    toks.add("cmd:" + macro[0])
                 rec = {"id": eid, "kind": "fuzz", "label": "random input from " + os.path.basename(snap),
                        "exact": emu.ticks == tick}
             env1 = fallplay.env(emu)

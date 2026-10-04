@@ -40,6 +40,7 @@ LO, HI = fallcov.LO, fallcov.HI
 SIZE = HI - LO
 MIN_NEW = 8                     # new code bytes that make a state worth keeping
 MAX_MB = 2000                   # a worker restarts if it ever holds more than this
+MACRO_P = 0.35                  # episodes that start with a fallplay command
 
 # Keys pressed one at a time, weighted: the screens bound in the world, answers to prompts,
 # the interaction modes, movement extras (jump, crouch, run), digits for counts and slots.
@@ -94,6 +95,53 @@ def episode_events(rng, length):
     return [(min(t, length - 10), a, g) for t, a, g in ev] + [(length - 10, "mouse", (160, 100, 0))]
 
 
+def pick_macro(rng, emu):
+    """A fallplay command to start an episode with, or None: the doors and walks random keys
+    rarely manage. Outside: enter (or walk up to) a building, shops and halls more often than
+    houses; indoors: walk, turn, or use what is ahead (a door, a person)."""
+    import fallplay
+    if rng.random() > MACRO_P:
+        return None
+    if fallplay.env(emu) == 1:
+        bs = [(i, b) for i, b in enumerate(fallplay.buildings(emu)) if b["doors"] and b["dist"] < 400]
+        if not bs:
+            return None
+        i, b = rng.choices(bs, [3 if b["type"] < 17 else 1 for _i, b in bs])[0]
+        return ["enter" if rng.random() < 0.8 else "goto", str(i)]
+    r = rng.random()
+    if r < 0.4:
+        return ["walk", str(rng.choice([2, 4, 8, 12]))]
+    if r < 0.7:
+        return ["turn", str(rng.choice([-135, -90, -45, 45, 90, 135, 180]))]
+    return ["step", rng.choice(["1 press f2; 40 click 165,112", "1 press f4; 40 click 165,112"])]
+
+
+def run_macro(emu, argv):
+    """Run a fallplay command (deterministic, so the episode replays)."""
+    import fallplay
+    a = fallplay.build_parser().parse_args([argv[0], "fuzz"] + list(argv[1:]))
+    sa = fallplay.step_action(a, None)
+    try:
+        sa[1](emu)
+    except SystemExit:                              # e.g. no such building any more
+        pass
+
+
+def signature(emu):
+    """The game state the sensors see: where (1 outside, 2 building, 3 dungeon), the mode
+    (which screen has the input) and the interaction mode."""
+    import fallplay
+    return "%d/%d/%d" % (fallplay.env(emu), fallplay.rd(emu, 0x196274, "<B"),
+                         fallplay.rd(emu, 0x196276, "<B"))
+
+
+def read_states():
+    out = set()
+    for p in glob.glob(os.path.join(FUZZ, "states_*.txt")):
+        out |= set(open(p).read().split())
+    return out
+
+
 def read_cov(path):
     try:
         data = zlib.decompress(open(path, "rb").read())
@@ -134,6 +182,8 @@ def worker(wid, seeds, hours, max_corpus, seed):
     for p in glob.glob(os.path.join(FUZZ, "cov_*.bin")):
         union |= read_cov(p)
     log = open(os.path.join(FUZZ, "corpus_%d.jsonl" % wid), "a")
+    states = read_states()
+    states_log = open(os.path.join(FUZZ, "states_%d.txt" % wid), "a")
     corpus, picks = load_corpus(seeds), {}
     t_end = time.time() + hours * 3600
     n, emu = 0, None
@@ -144,6 +194,7 @@ def worker(wid, seeds, hours, max_corpus, seed):
         n += 1
         if n % 10 == 0:                             # share with the other workers
             corpus = load_corpus(seeds)
+            states |= read_states()
             for p in glob.glob(os.path.join(FUZZ, "cov_*.bin")):
                 union |= read_cov(p)
         weights = [(1 + math.log2(1 + e.get("new", 0))) / (1 + picks.get(e["id"], 0)) ** 0.7
@@ -161,6 +212,9 @@ def worker(wid, seeds, hours, max_corpus, seed):
             emu = fallemu.Emu.load(parent["snap"], overlay=os.path.join(FUZZ, "ov_%d" % wid))
             uch = emu.uc._uch
             lib.uc_dagger_coverage(uch, fallemu.LOAD + LO, fallemu.LOAD + HI, None)
+            macro = pick_macro(rng, emu)
+            if macro:
+                run_macro(emu, macro)
             s = emu.ticks
             ok = emu.run(s + length, [(s + t, a, g) for t, a, g in events], None)
             buf = ctypes.create_string_buffer(SIZE)
@@ -173,21 +227,30 @@ def worker(wid, seeds, hours, max_corpus, seed):
         acc |= cov
         union |= cov
         nb = new.bit_count()
-        if nb < MIN_NEW or not ok or emu.exit_code is not None:
+        sig = signature(emu) if ok and emu.exit_code is None else None
+        new_state = sig is not None and sig not in states
+        if new_state:
+            states.add(sig)
+            states_log.write(sig + "\n")
+            states_log.flush()
+        if (nb < MIN_NEW and not new_state) or not ok or emu.exit_code is not None:
             continue
         newf = [g for va, g in fns if new >> (va - LO) & 1]
-        entry = {"id": "w%d_%05d" % (wid, n), "parent": parent["id"], "new": nb,
+        entry = {"id": "w%d_%05d" % (wid, n), "parent": parent["id"], "new": max(nb, 64 * new_state),
                  "new_functions": len(newf), "units": sorted(set(newf)), "ticks": length,
-                 "events": events, "tick": emu.ticks, "time": time.time()}
-        if len(glob.glob(os.path.join(CORPUS, "*.snap"))) < max_corpus or newf:
+                 "macro": macro, "events": events, "tick": emu.ticks, "state": sig,
+                 "new_state": new_state, "time": time.time()}
+        if len(glob.glob(os.path.join(CORPUS, "*.snap"))) < max_corpus or newf or new_state:
             entry["snap"] = os.path.join(CORPUS, entry["id"] + ".snap")
             emu.save(entry["snap"])
         log.write(json.dumps(entry) + "\n")
         log.flush()
         write_cov(mine, {"fuzz": wid}, acc)
         write_cov(os.path.join(fallcov.COV, "fuzz_%d.cov" % wid), {"fuzz": wid}, acc)
-        print("worker %d ep %d: +%d bytes, +%d functions (%s) from %s" % (
-            wid, n, nb, len(newf), ",".join(sorted(set(newf)))[:80], parent["id"]), flush=True)
+        print("worker %d ep %d: +%d bytes, +%d functions (%s)%s%s from %s" % (
+            wid, n, nb, len(newf), ",".join(sorted(set(newf)))[:80],
+            " new state " + sig if new_state else "", " after " + " ".join(macro) if macro else "",
+            parent["id"]), flush=True)
     write_cov(mine, {"fuzz": wid}, acc)
 
 
