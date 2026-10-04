@@ -133,6 +133,43 @@ exactly the costs the spellbook shows.
 **Crafting:** direct calls to 0x36F69, 0x55E35 and 0x8F246 open the spellmaker, the item
 enchanter and the potion maker. A potion recipe is 109 bytes.
 
+## Creatures and combat
+
+These come from the combat naming agent; details are in build/names/combat.md.
+
+**Monster table** `D_0018487A`: 29 bytes per creature type. It holds the HP bonus, armour,
+loot table, the weapon material needed to hit, flags (+4), three damage ranges and the level.
+Every value checked equals Daggerfall Unity's EnemyBasics: Rat 1d8+8 HP and 1–4 damage, Frost
+Daedra 50–100. Other tables match Daggerfall Unity too:
+- weights, monster categories, corpse textures and language skills;
+- the 13 monster spell lists and the class spell lists;
+- the Wabbajack list and the disease lists.
+Daggerfall Unity's "FALL.EXE offset" comments convert to our addresses as VA = file offset −
+0x39600.
+
+**Creature object:** a 0x47-byte header, then a character record. A few character offsets
+mean something else for creatures (+0x58, +0x6C, +0x74, +0x1FD, +0x21D), so those are named
+`monster+`.
+- +0x23E: ASCR animation record number; +0x23F: the action.
+- +0x241: the mobile id (Daggerfall Unity's MobileTypes).
+- +0x2C1: the animation struct. It holds the frame index, a request byte at +0x2D5 (255 =
+  none), the state at +0x2D8, and event bits (bit 0 strike, bit 1 missile).
+
+**AI states:** 0 move, 8 melee, 16 hurt, 24 bow, 32 spell, 48 idle, 56/57/59 Daedra Seducer.
+- Detection and the 200-frame give-up timer match Daggerfall Unity.
+- A creature attacks when rand % SPD < SPD / 8 + 6.
+
+**Damage** (`damage_resolve_attack`, `damage_roll_to_hit`) matches Daggerfall Unity's
+CalculateAttackDamage and CalculateSuccessfulHit.
+- Up to 5 monster attacks; weapon, material, race and swing modifiers; STR; backstab × 3.
+- The to-hit chance is clamped to 3–97.
+- Classic also deals damage when a knocked-back creature hits a wall.
+
+Direct calls confirmed:
+- `damage_apply` (500 damage) killed the Frost Daedra;
+- `monster_summon_near_player` (id 25) summons a Frost Daedra;
+- lycanthropy infection and shapechanging back from wolf form.
+
 ## Text macros and quests
 
 These come from the text and quests naming agent; details are in build/names/text_quests.md.
@@ -181,6 +218,12 @@ The naming agents found these functions filed under the wrong unit:
 - 0x4BA70–0x4BCA6 (filed under tamriel.c) belong to quests.c. 0x4CF37, 0x4CFA7 and 0x4D195
   (filed under quests.c) are armour code.
 - 0x4A8DB–0x4AA47 (after parse.c's last file reference) are probably tamriel.c's calendar.
+- 0x2D62F–0x2EC79 (filed under qkey.c) belong to damage.c.
+- 0x641CD–0x64301 (filed under monster.c) belong to links.c.
+- 0x74024 and 0x7425E (filed under weapons.c) belong to click.c; 0x79A28 (moninit.c)
+  belongs to loadsave.c.
+- 0x7242F and 0x728D2 (filed under rest.c) are probably weapons.c; 0x685EC (disease.c) is
+  probably trade.c.
 
 ## Calling functions directly
 

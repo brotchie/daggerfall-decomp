@@ -394,10 +394,13 @@ def main():
     scratch = Scratch(emu)
     args = [arg_value(emu, s, scratch) for s in a.args]
     names = namesmod.by_address()
-    po = struct.unpack("<I", bytes(emu.uc.mem_read(L + 0x195AA4, 4)))[0] - L
+    # the player's records, each read through its own pointer: their distance differs by save
+    records = [("object", 0x195AA4, 0x47), ("character", 0x195BE0, 0x300)]
+    recs = {kind: (struct.unpack("<I", bytes(emu.uc.mem_read(L + ptr, 4)))[0], size)
+            for kind, ptr, size in records}
+    before = {kind: bytes(emu.uc.mem_read(a, size)) for kind, (a, size) in recs.items()}
     o3 = bytes(emu.uc.mem_read(L + O3, O3_END - O3))
     stack_lo = emu.r("esp") - L - 0x8000            # object 3 ends in the stack
-    rec = bytes(emu.uc.mem_read(L + po, 0x600))
     nfiles = len(emu.files.log)
     from unicorn.unicorn_py3 import unicorn as ucmod
     lib = ucmod.uclib
@@ -423,13 +426,17 @@ def main():
     print("globals changed: %d" % len(ch))
     for addr, old, new in ch[:30]:
         print("  %-28s %08X -> %08X" % (names.get("D_%08X" % addr, "D_%08X" % addr), old, new))
-    recb = bytes(emu.uc.mem_read(L + po, 0x600))
-    fields = {int(r["address"].split("+")[1], 16) + (0x1CF if r["address"].startswith("character") else 0): r["name"]
-              for r in namesmod.load() if r["kind"] == "field"}
-    diffs = [o for o in range(0x600) if rec[o] != recb[o]]
-    if diffs:
-        print("player object bytes changed: %s" % " ".join(
-            "+%X%s" % (o, "(" + fields[o] + ")" if o in fields else "") for o in diffs[:40]))
+    fields = {}
+    for r in namesmod.load():
+        if r["kind"] == "field":
+            kind, off = r["address"].split("+")
+            fields[(kind, int(off, 16))] = r["name"]
+    for kind, (addr, size) in recs.items():
+        after = bytes(emu.uc.mem_read(addr, size))
+        diffs = [o for o in range(size) if before[kind][o] != after[o]]
+        if diffs:
+            print("player %s bytes changed: %s" % (kind, " ".join(
+                "+%X%s" % (o, "(" + fields[(kind, o)] + ")" if (kind, o) in fields else "") for o in diffs[:40])))
     if a.shot:
         emu.run(emu.ticks + a.after, [], None)
         import fallplay

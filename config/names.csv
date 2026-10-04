@@ -17,6 +17,7 @@ global,0x00142358,key_down_down,strong,key_down[0x50]: automap_move_back (key:do
 global,0x00142359,key_down_pgdn,strong,key_down[0x51] PgDn: talk list down x10
 global,0x00143550,screen_buffer,strong,pointer to the 320-wide 8-bit frame buffer every inventory blit writes (y*320+x)
 global,0x00147954,big_buffer,candidate,"pointer to a large shared buffer; talk uses +16384 (topics), +90000 (answer text), +95000 (logbook copy)"
+global,0x0017886C,weapon_skills,strong,"skill per weapon index (item+0x22): 28 short blade, 29 long blade, 31 axe, 32 blunt, 33 archery (indexes 16/17 bows); damage_resolve_attack uses it"
 global,0x001788DF,trade_price_scale,strong,price factor /256: guild_confirm_price applies it; guilds set (10-rank)/10 discounts and 128 (half) on holidays
 global,0x001788E3,travel_filter,strong,"4 bits toggled by the bar's DUNGEONS(1) HOMES(2) TEMPLES(4) TOWNS(8) quadrants (screenshot labels), lit by travel_draw_buttons; a location is drawn when its type's category bit (location_type_category) is set; 0xF in 4 saves"
 global,0x001789F8,cast_anim_state,strong,"short: casting animation, element << 4 | frame, -1 idle (cast_anim_start, cast_anim_update)"
@@ -40,6 +41,13 @@ global,0x00179D55,talk_organisations,strong,"34 faction ids of the tell-me-about
 global,0x0017A02C,automap_buttons,confirmed,"12 x {x0,y0,x1,y1,handler}: grid/view, forward, back, left, right, rotate left, rotate right, upstairs, downstairs, EXIT, map area, note line; matches the automap bar in the save_mord screenshot"
 global,0x0017A0BC,town_map_buttons,confirmed,"6 x {x0,y0,x1,y1,handler}: the 4 arrows, EXIT, map area"
 global,0x0017A11D,automap_view_initialised,candidate,automap_init_view sets the camera only the first time (flag)
+global,0x0017A148,monster_diseases_bat,strong,"disease list {1, 3, 5} Plague, Stomach Rot, Brain Fever: Giant Bat 2% (DFU diseaseListB)"
+global,0x0017A14C,monster_diseases_mummy,strong,disease list of 11 (1 2 3 4 5 6 8 9 11 13 14): Mummy 5% (DFU diseaseListC)
+global,0x0017A158,monster_diseases_plague,strong,"disease list {1} (Plague): Rat 5%, Vampire 2% (damage_monster_hit_effects; DFU diseaseListA)"
+global,0x0017A15A,struck_body_part_table,strong,"20 bytes 0,0,1,1,1,2,2,2,3,3,3,3,4,4,4,4,5,5,5,6: damage_resolve_attack picks [random(0,19)] (DFU CalculateStruckBodyPart)"
+global,0x0017A16E,monster_corpse_textures,strong,"{u16 archive, u16 record} per monster: Rat 401/1 ... = DFU CorpseTexture; damage_creature_death gives the corpse this picture"
+global,0x0017A21A,weapon_swing_sounds,strong,"s16 sound per weapon index: 374 SwingHighPitch, 91 SwingMediumPitch, 373 SwingLowPitch (in play)"
+global,0x0017A240,monster_parry_ids,strong,28 ids 7 8 12 15 21 24 25 26 27 31 36 38 129 130 133-146 = exactly DFU's ParrySounds = true; damage_miss_sound
 global,0x0017A84C,spell_effect_school,strong,"byte per effect type: 0 Alteration, 1 Restoration, 2 Destruction, 3 Mysticism, 4 Thaumaturgy, 5 Illusion (index into magic_school_skills); spell_cost uses it: exp1b reproduced the spellbook costs"
 global,0x0017A87F,spell_effect_target_class,strong,"byte per effect type: 0 caster only (Create Item, Lock, Open, Teleport...), 1 others only (Damage, Paralyze...), 2 any; spellmaker_add_effect filters by it"
 global,0x0017A8B2,spell_effect_elemental,candidate,"byte per effect type: nonzero (Paralyze, Damage, Drain...) lets the spellmaker choose the element; spellmaker_effects_allow_element"
@@ -53,6 +61,7 @@ global,0x0017B23F,spellmaker_buttons,strong,"18 x {x0,y0,x1,y1,handler}: 5 eleme
 global,0x0017B317,spellmaker_setting_buttons,strong,"34 x {rect, handler}: 11 setting spinners (duration/chance/magnitude rows at y 94/114/134), their up and down halves (11-32), and the panel exit (33)"
 global,0x0017B4C0,skill_advance_multipliers,strong,"35 shorts 12,1,1,5,15..,2,1,2,2,1,2,1,4,50,1,2,1,1,2,1,2,2,2,2,2,1,8 = DFU's per-skill advancement multipliers; used by skill_ready_to_advance and guild training"
 global,0x0017B506,sheet_buttons,confirmed,"23 x {x0,y0,x1,y1,handler} hit boxes for the sheet (dumped from the image): NAME row, INVENTORY, SPELLBOOK, AFFILIATIONS, PRIMARY/MAJOR/MINOR/MISC, HISTORY, LOG, HEALTH row, FATIGUE row, EXIT, 8 attribute boxes, 2 level-up spinner arrows; boxes match the labels in docs/play.md"
+global,0x0017B62F,anim_mirror_facing,candidate,"facing 5,6,7 -> 3,2,1 for the mirrored sprite views (monster_set_action sets monster+0x2D2 bit 7); DFU uses the same 8 views with flips"
 global,0x0017BB6C,macro_table,strong,"start of the 255 text macro entries {char name[5]; char *(*handler)(void)} (9 bytes), grouped by first letter (tools/asset_ids.py, build/assets/macros.csv)"
 global,0x0017C47E,macro_letter_tables,strong,"per-letter pointers into macro_table, indexed by c-'a' (digits: c-23); parse_expand looks a %name up only in its letter's table"
 global,0x0017C4F2,macro_letter_counts,strong,"short count of entries per letter table (a 11, b 6, c 14, d 14 ... q 40, 1 9, 2 6, 3 6)"
@@ -73,6 +82,9 @@ global,0x0017CCB7,skill_governing_attributes,confirmed,"35 bytes, attribute inde
 global,0x0017CCDA,attribute_abbrevs,confirmed,8 string pointers STR INT WIL AGI END PER SPD LUC
 global,0x0017CEF2,faction_rank_names,candidate,table of rank-name tables by faction type; sheet_affiliation_line prints rank names from it
 global,0x0017CF4A,material_names,strong,"Iron, Steel, Silver, Elven, Dwarven, Mithril, Adamantium, Ebony, Orcish, Daedric (%mat)"
+global,0x0017CF72,material_to_hit,strong,"s16 per material: -10 iron, 0 steel, 0 silver, 10 elven ... 60 daedric: to-hit, and /10 damage (DFU weapon material modifier x10)"
+global,0x0017CF86,weapon_damage_min,strong,"{s16 min, s16 max} per weapon index: dagger 1-6, tanto 1-8, staff 1-8 ... (DFU weapon base damage); damage_resolve_attack rolls it"
+global,0x0017CF88,weapon_damage_max,strong,the max half of weapon_damage_min's pairs
 global,0x0017CFD2,armor_type_names,strong,"Leather, Chain, Plate... by item+0x37 (%mat)"
 global,0x0017CFF6,condition_thresholds,strong,8 bytes of percentage limits for condition_names (%qua)
 global,0x0017CFFE,condition_names,strong,"8 pointers: Broken, Useless, Battered, Worn, Used, Slightly Used, Almost New, New (%qua)"
@@ -96,11 +108,16 @@ global,0x00184229,crime_names,strong,14 pointers: Attempted Breaking and Enterin
 global,0x00184261,penalty_texts,strong,"3 pointers: Banishment, Execution, ""%gtp gold pieces in fines and %dip days in prison"" (%pen)"
 global,0x0018426D,codeword_first_words,strong,"False, Grand, Step, Second, Bastard... (%dbp high nibble)"
 global,0x001842A1,codeword_second_words,strong,"Sire, Dam, Scion, Cousin... (%dbp low nibble)"
+global,0x001842D9,monster_weights,strong,"u16 weight per creature type: Rat 2, Imp 40, Spriggan 240, Giant Bat 80, Grizzly 1000 ...; DFU: 'Weights in classic (From offset 0x1BD8D9 in FALL.EXE)' (= VA 0x1842D9); the knockback code divides by it"
 global,0x0018432D,imperial_names,strong,"""Pelagius"",""Cephorus"",""Uriel"",""Cassynder"" (%imp)"
 global,0x00184644,location_type_names,strong,"10 pointers: Town, Village, Community, Farm, Dungeon Entrance, Temple, Tavern, Castle, Manor, Shrine (%ct)"
 global,0x0018467C,text_blank,confirmed,"pointer to ""BLANK"": what the unimplemented macros return (%cn2 %du %hc %pd ...); experiment: their direct calls returned ""BLANK"""
+global,0x0018487A,monster_table,strong,"29-byte records by creature type (character+0x43): +0 HP bonus, +1 armor (x5 into armor_values), +2 loot table (1-based A..), +3 weapon material needed to hit, +4 flags, +6 attack damage min/max x3, +26/27 a range, +28 level; monster_init reads it; values = DFU EnemyBasics (Rat 1d8+8 HP = 9-16, damage 1-4, level 1; Frost Daedra 50-100, level 17, armor -5)"
+global,0x0018487E,monster_table_flags,strong,"monster_table+4 as the code reads it (u16 per type): bit 0 flying (Imp, Bat, Harpy, Ghost, Wraith), 1 spellcaster (Imp, Ghost, Wraith, daedra, vampires, liches, caster classes: monster_init_gear gives class types spells by it), 2 can open doors (DFU CanOpenDoors), 4 spectral (Ghost, Wraith), 5 shoots arrows (class types; ai_creature_think's archer branch), 6 aquatic (Slaughterfish, Dreugh, Lamia)"
+global,0x00184FD7,monster_category,strong,"byte per creature type: 0 undead, 1 daedra, 2 humanoid, 3 animal (Zombie is 3 in classic); damage_bonus_vs_target tests it against class+0x0A and PotentVs/LowDamageVs enchantments, damage_namira_reflect switches on it"
 global,0x0018508B,honorifics,strong,"""Sir"", ""Ma'am"" by gender (%hnr)"
 global,0x0018509F,legal_reputation_names,strong,"8 pointers: hated, pond scum, a villain, a criminal, a scoundrel, undependable, a common citizen, dependable.. (%ltn)"
+global,0x0018513E,body_part_armor_slots,strong,"equipped slot per body part: 12 head, 13 right pauldron, 15 left pauldron, 18 cuirass, 20 gauntlets, 23 greaves, 26 boots; the hit wears the target's armor there"
 global,0x001857A1,enchant_power_params,strong,"15 entries: 1-3 the spell lists, 4 souls, else a pointer to the parameter labels (seasons/moons, monster kinds, skills, talents, social groups)"
 global,0x001857E5,enchant_power_costs,candidate,per power: cost code (< 100) or a pointer to costs by parameter
 global,0x00185875,enchant_spell_lists,strong,3 pointers to 255-terminated SPELLS.STD id lists for cast when used / held / strikes
@@ -117,7 +134,11 @@ global,0x00185C3A,spell_element_class_bits,strong,"5 bytes by element: the class
 global,0x00185C3F,spell_concealment_effects,candidate,"3 x {byte effect, u32 conditions mask}: Invisibility 0x4, Chameleon 0x1000, Shadow 0x2000 (spell_break_concealment)"
 global,0x00185CEC,spell_hud_icon_x,candidate,"12 shorts: x of the HUD spell icons (16, 40, ... 280)"
 global,0x00185F88,item_group_templates,candidate,"per item group, a -1-ended list of template indices (index within group -> template)"
+global,0x00186A14,ai_octant_angles,candidate,"8 angles (512, 0, 1024, 512, 1536, 1024, 0, 1536) by ai_octant_toward result; ai_move_toward_target's detour headings"
 global,0x00186A64,disease_table,candidate,disease_infect copies a 47-byte record from here + id*47
+global,0x00186D83,poison_table,candidate,"4 s16 per poison id-128: incubation min/max (+0x17), duration min/max (+0x1B); poison_apply, poison_init_record"
+global,0x00186DE3,vampire_spells,candidate,spell ids (255 ends) every new vampire gets (disease_become_vampire)
+global,0x00186DE7,lycanthrope_attributes,strong,4 attribute indexes 0 4 3 6 (STR END AGI SPD) that disease_become_lycanthrope raises by 40 (DFU)
 global,0x00186F08,guild_rank_primary_skill,strong,"10 bytes 22,30..94: best guild skill needed per rank"
 global,0x00186F12,guild_rank_secondary_skill,strong,"10 bytes 4,8..40: second guild skill needed per rank"
 global,0x00187023,guild_skill_lists,strong,"per guild kind a 255-terminated skill list: MG 22-27 (magic schools), FG 32 31 33 28 29 6 4, TG 13 15 2 16 18 19 28, DB 28 33 19 2 16 18 22 9 34"
@@ -128,7 +149,31 @@ global,0x00187369,guild_service_labels,strong,"92 label pointers: Training, Buy 
 global,0x001874CD,spellshop_buttons,confirmed,"5 x {rect, handler}: 3 effect slots, BUY (23,167)-(65,181), EXIT (242,170)-(278,178); experiment: BUY (45,174) -> spellshop_buy"
 global,0x00187509,guild_menu_buttons,confirmed,"4 x {x0,y0,x1,y1,..}: JOIN (99,51)-(220,59), TALK (99,60)-(220,68), service (99,69)-(220,77), EXIT (139,80)-(181,94); experiment: clicks matched"
 global,0x00187545,temple_quest_types,candidate,quest type per temple kind (index kind-142) for guild_temple_quest
+global,0x0018754C,weapon_cif_by_index,strong,WEAPON%02d.CIF number per weapon index (2 dagger ... 9 bows); weapon_load_hand_sprite (asset trace WEAPON04.CIF ...)
+global,0x0018755E,weapon_swing_types,strong,"16 swing types by mouse direction sector (0 down, 4/3 diagonals, 5 up ...); weapon_start_swing"
+global,0x0018756E,swing_to_hit_mods,strong,"s16 per sector: -10, 5, 5, 0, 0, 10 x6, 0, 0, -5, -5, -10 = DFU swing to-hit"
+global,0x0018758E,swing_damage_mods,strong,"s16 per sector: 4, -2, -2, 0, 0, -4 x6, 0, 0, 2, 2, 4 = DFU swing damage"
+global,0x001875B7,bow_anim_script,candidate,"frame script of bows (codes 3 wait for button, 5 fire, 7 reload) used by weapon_load_hand_sprite / weapon_bow_update"
+global,0x001878FC,class_creature_types,strong,"creature type (character+0x43) per enemy class (id-128): Mage 53, Spellsword 43, Battlemage 57, ... city watch 59 (+1 for the other sex); texture = 432+type (Mage 485/486 = DFU)"
+global,0x00187914,monster_spells_imp,strong,spell id list (255 ends) 07 0A 1D 2C; DFU EnemyEntity 'From FALL.EXE offset 0x1C0F14' (= VA 0x187914) ImpSpells; the other lists follow
+global,0x00187919,monster_spells_ghost,strong,22 (DFU GhostSpells); monster_init_gear case 18
+global,0x0018791B,monster_spells_orc_shaman,strong,06 07 16 19 1F (DFU OrcShamanSpells); case 21
+global,0x00187921,monster_spells_wraith,strong,1C 1F (DFU WraithSpells); case 23
+global,0x00187924,monster_spells_frost_daedra,strong,10 14 (DFU FrostDaedraSpells); case 25
+global,0x00187927,monster_spells_fire_daedra,strong,0E 19 (DFU FireDaedraSpells); case 26
+global,0x0018792A,monster_spells_daedroth,strong,16 17 1F (DFU DaedrothSpells); case 27
+global,0x0018792E,monster_spells_vampire,strong,33 (DFU VampireSpells); case 28
+global,0x00187930,monster_spells_seducer,strong,34 43 (DFU SeducerSpells); case 29
+global,0x00187933,monster_spells_vampire_ancient,strong,08 32 (DFU VampireAncientSpells); case 30
+global,0x00187936,monster_spells_daedra_lord,strong,08 0A 0E 3C 43 (DFU DaedraLordSpells); case 31
+global,0x0018793C,monster_spells_lich,strong,08 0A 0E 22 3C (DFU LichSpells); case 32
+global,0x00187942,monster_spells_ancient_lich,strong,08 0A 0E 1D 1F 22 3C (DFU AncientLichSpells); case 33
+global,0x0018794A,monster_class_spell_lists,strong,"7 pointers = DFU EnemyClassSpells (Frost Daedra, Daedroth, Orc Shaman, Vampire Ancient, Daedra Lord, Lich, Ancient Lich lists); spell-casting classes get [min(level/3, 6)]"
 global,0x00187966,monster_soul_values,candidate,"u32 per monster id: soul value (Imp 1000, Orc 1000, Centaur 3000); soul_trap_add_soul, enchant_slot_cost"
+global,0x001879CE,monster_class_map_chance,candidate,"the same for class enemies, indexed by id (128-146) from this base (data at 0x187A4E: Mage 3, Spellsword 1 ...)"
+global,0x00187A12,wabbajack_creatures,strong,"17 creature types monster_wabbajack picks from: Rat, Imp, Spriggan, Giant Bat, Grizzly, Spider, Nymph, Harpy, Skeleton, Giant, Zombie, Scorpion, Iron/Flesh/Ice/Fire Atronach, Lich"
+global,0x00187A23,monster_map_chance,strong,"percent chance per monster type to carry a map: Imp 1, Centaur 1, Orc Shaman 3, Lich 4 ... = DFU MapChance; monster_maybe_give_map"
+global,0x00187A62,monster_language_skill,strong,"language skill per monster type: Imp 12 Impish, Spriggan 10, Orc 4 Orcish, Centaur 11, Nymph 8, Harpy 5, Giant 6, daedra 9, Dragonling 7; monster_pacify_check"
 global,0x00187CA8,world_running,candidate,byte cleared when the inventory opens and set at close; ai_update_creatures returns while it is 0
 global,0x00187FB8,dispel_monster_ids,strong,"2 x 7 monster ids: undead 15 18 19 23 28 30 32, daedra 1 25 26 27 29 31 100 (spfx_dispel_creatures)"
 global,0x00187FC6,spell_resist_flags,confirmed,"5 u32 masks by element in character+0x89: fire 0x2, frost 0x10000000, poison 0x20000000, shock 0x40000000, magic 0x80000000; exp1b (build/names/scratch/magic/exp1b.py, save_morthag1): Resist frost set 0x10000000"
@@ -138,6 +183,7 @@ global,0x0018822C,item_group_tab,strong,"29 bytes: item group -> inventory tab (
 global,0x00188281,inv_mode_buttons,strong,"5 trade modes x 7 buttons {x0,y0,x1,y1,handler}: WAGON INFO EQUIP REMOVE USE GOLD EXIT in mode 0; dumped from memory, each handler confirmed by a click"
 global,0x00188425,inv_buttons,strong,"45 buttons {x0,y0,x1,y1,handler}: 0-11 slots, 12 paper doll, 27-36 list rows, 37-40 scroll, 41-44 tabs"
 global,0x00188641,transport_buttons,strong,"5 buttons of the transport menu: FOOT, HORSE, CART, SHIP (transport_choose), EXIT"
+global,0x0018867D,weapon_proficiency_bits,strong,"u16 per weapon index: 1 short blades, 2 long blades, 8 axes, 16 blunt, 32 missile (DFU ProficiencyFlags); tested against class+0x0D for the expert bonus"
 global,0x00188774,location_type_dot_colour,candidate,"14 palette indexes, one per location type, for the region-map dots"
 global,0x00188782,location_type_category,strong,"14 bytes 3,3,3,1,0,2,3,0,1,2,0,1,0,0: DFU location types (city..coven) -> 0 dungeon, 1 home, 2 temple, 3 town, the travel_filter bit"
 global,0x001887A0,travel_bar_buttons,confirmed,"7 x {x0,y0,x1,y1,handler}: FIND, EXIT, map area, two part arrows, I'M AT, filter quadrants; matches the travel-map screenshot"
@@ -179,6 +225,8 @@ global,0x001913E4,enchant_text,candidate,text buffer built by enchant_powers_tex
 global,0x001917E4,arena2_path,candidate,"""C:\ARENA2\"" in save_dorian; quest_start and quests_start_initial look for quest files here first"
 global,0x00191834,arena2_path_alt,candidate,"second directory searched for quest files (""C:\ARENA2\"" in save_dorian; probably the CD)"
 global,0x001952EC,quest_global_states,strong,"byte array of global (main quest) states: a state record with is_global (+2) keeps its value at quest_global_states[+3]; snapshots: 0/1 values shared by s0000999, s0000016, s0000008"
+global,0x0019532C,ai_characters,strong,"entity+0x47 (character record) per AI index, made with ai_entities"
+global,0x0019552C,ai_entities,strong,"copy of creature_list (entity pointers) per AI index, made by ai_update_creatures each frame; ai_pick_target and weapon code index it"
 global,0x0019572C,text_macro_fcn,strong,%fcn text (parse.c 47815): name of the nearest town with the asked-for group (talk_find_regional)
 global,0x0019574C,enchant_reference_character,candidate,a character record whose 35 skills enchant_spell_cost sets to 50 before costing a spell
 global,0x0019597C,right_hand_ready_delay,candidate,accumulates the ready time of a changed right-hand weapon (inv_track_hand_weapons); >0 at close gives 'Equipping %it'
@@ -190,22 +238,29 @@ global,0x001959D8,inventory_containers,confirmed,"5 container objects (record ty
 global,0x001959E8,wagon_container,confirmed,inventory_containers[4]: exp: WAGON lists it on the right; capacity 3000 (750 kg) and '%s / 750'
 global,0x001959FC,spell_points_bonus,candidate,spell points spent before magicka by cast_recast_last (extra spell points)
 global,0x00195A00,quest_root,candidate,object whose child list (+0x3F) holds the active quests (type 14) that talk lists
+global,0x00195A08,strength_bonus,candidate,temporary STR: the Mace of Molag Bal (damage_weapon_strike_effects) adds the STR it drains; damage_resolve_attack's damage bonus is (STR+this-50)/5; cleared at strength_bonus_end
+global,0x00195A0C,spell_points_bonus_end,candidate,"game_minutes + 12 when spell_points_bonus (magicka drained by the Mace of Molag Bal, damage_weapon_strike_effects) is cleared by damage_expire_drain_bonuses"
 global,0x00195A14,quest_faces,strong,"10 slots of 10 bytes, the escort faces drawn at the top left: +0 face bits (gender<<7, race<<6, index), +1 quest id, +2 object id, +6 image (quest_face_add, quest_faces_draw)"
 global,0x00195A15,quest_faces_quest,candidate,quest_faces[i] +1: quest id
 global,0x00195A16,quest_faces_object,candidate,quest_faces[i] +2: object id (0 = free)
 global,0x00195A1A,quest_faces_image,candidate,quest_faces[i] +6: face image
+global,0x00195A78,strength_bonus_end,candidate,game_minutes + 12 when strength_bonus ends (damage_expire_drain_bonuses)
 global,0x00195A80,text_macro_item,candidate,"item record the %it text macro reads ('Equipping %it', item info)"
 global,0x00195A84,text_macro_npc,candidate,"the talk NPC's record (char.c 59973, set by the NPC click 756C6): %n name, %oth oath by its race (+0x43)"
 global,0x00195A9C,current_building,strong,"the building entered: +0x12 faction (40 at the Mages Guild hall, experiment), +0x19 quality (spell list size)"
 global,0x00195AA0,player_entity,confirmed,"pointer to the player's creature entity: the character record is at +0x47 (2 saves), its parent (+0x43, the generic record header) is the world object; disease code checks entity+71 == player_character"
 global,0x00195AA4,player_object,confirmed,pointer to the player's world object: x/y/z ints at +7/+11/+15 move the player (fallplay tp); it is player_entity's parent (+0x43)
+global,0x00195AB0,frame_ticks,candidate,"time of the last frame: attack and death timers are counted down by it, movement is speed*frame_ticks/1000 (ai_creature_think, monster_move_step, weapon_player_update, 10585)"
+global,0x00195ABC,attack_angle,candidate,angle from attacker to target set by weapon_melee_strike; damage_resolve_attack passes it to damage_knockback
 global,0x00195AC4,location_object,candidate,root object of the loaded location/dungeon: its +0x1F high word is the id in the at%05d.amf/.atf file names; its children are walked for seen marks
 global,0x00195AC8,monster_bsa_handle,candidate,MONSTER.BSA's open archive handle (exp2 traces)
 global,0x00195ACC,text_macro_potion,candidate,potion recipe the %po macro reads ('Recipe for %po.')
 global,0x00195AD4,text_macro_book,strong,"book header that %bt (title, +0) and %ba (author, +64) read"
+global,0x00195AD8,ai_chosen_spell,candidate,"spell object picked by ai_pick_ranged_spell / ai_pick_touch_spell / ai_has_spell, cast by monster_cast_spell"
 global,0x00195AE8,cheat_flags,strong,"bits: 3 reveal maps (Ctrl+F1), 6 no spell damage to the player (Ctrl+F4, spfx_damage), 0 SPELLS.STD editing in the spellmaker, 2 free enchanting (itemmaker_enchant), 7 creatures cast nothing (cast_spell_on); keys.c toggles 3 and 6 in cheat mode"
 global,0x00195AF4,found_record,candidate,result of the membership searches (object pointer)
 global,0x00195B04,spell_records,confirmed,"pointer to SPELLS.STD in memory: 89-byte spell records, 128 max (name +0x2F, id +0x49); in save_morthag1 89 records (Fenrik's Door Jam, Buoyancy, Frostbite...); exp1b: cast_item_used_spell(82) found Orc Strength by id here"
+global,0x00195B08,effect_tick_minutes,candidate,minutes (/4) since the last effects_tick; the regeneration and enchantment amounts
 global,0x00195B14,creature_count,strong,active creatures: ai_update_creatures loops over them; inv_use_item says 'There are no monsters nearby.' when 0
 global,0x00195B20,inv_right_container,confirmed,"container listed on the right (ground pile, wagon, shop or trade pile); exp: WAGON set it to the wagon and back at close"
 global,0x00195B2C,spfx_popup_handler,strong,"pending spell popup: 1 = Recall (spell_recall_prompt sets it), else the choice-list callback; spfx_popup_update runs and clears it"
@@ -223,6 +278,7 @@ global,0x00195BE8,window_image,strong,"background image of the open window: talk
 global,0x00195BEC,player_class,strong,"the class (career) record inside the character (player_character+0x230): item_forbidden_for_class reads +0x0B forbidden materials and +0x0E forbidden armor/shield/weapon bits (message 1068); disease/poison code reads immunity bits at +0x01, which fit class advantages"
 global,0x00195BF4,game_minutes,strong,"game time in minutes: %1440 with 1080/360 for 18:00/06:00 when trips end, 'Days left' = /1440, training once per 720, automap notes kept 43200 (30 days), files 129600 (90 days); save_blades = day 671 22:10"
 global,0x00195C44,scratch_buffer,candidate,"pointer to a large work buffer: +55000 popup text, +60000 status list, 50000 bytes of town-map notes"
+global,0x00195CB0,ai_los_index,strong,"round-robin AI index: only that creature re-tests line of sight (23C72) this frame, setting/clearing character+0x40 bit 7; ai_update_creatures advances it mod creature_count"
 global,0x00195D00,quest_tick_object,candidate,object of the quest being run or started
 global,0x00195D04,quest_face_images,candidate,"four face image sets by gender and race (quest_face_add, quest_faces_after_load)"
 global,0x00195D14,quest_face_images_special,candidate,face image set for persons of faction 514
@@ -238,9 +294,11 @@ global,0x00195D50,quest_potential_questor,strong,person picked by quest_find_pot
 global,0x00195D58,talk_prostitute_price,strong,"1d(50-75) - disposition, taken from the gold"
 global,0x00195D6C,text_rsc_file,candidate,"file handle from text_rsc_open('text.rsc'), closed by text_rsc_close; text.c reads messages through it"
 global,0x00195D78,text_rsc_main_file,candidate,handle of the main TEXT.RSC; parse_rsc_text and parse_rsc_text_copy switch text_rsc_file to it while reading (6 in save_dorian)
+global,0x00195D7C,player_death_timer,strong,damage_creature_death sets 1000 when the player dies (exp_c1); the frame loop (10585) counts it down by frame_ticks and main reacts when it goes negative
 global,0x00195D94,text_macro_city,candidate,"when set, the %cn macro returns it instead of the current location name"
 global,0x00195D98,spell_record_count,strong,"89 in save_morthag1, the number of named SPELLS.STD records at spell_records"
 global,0x00195DA4,qbn_opcode_arg_counts,strong,"pointer to a digit string, argument count per opcode (""3332531535442255...""); read in save_dorian, it matches UESP's sub-record count of every documented opcode; quest_unlink_for_save and quest_relink_after_load refresh qbn_op+0x04 from it"
+global,0x00195DAC,ai_monster_flags,strong,monster_table_flags of the creature being thought about (ai_creature_think); monster_move_step reads bit 0 (flying) and bit 6 (aquatic)
 global,0x00195DB0,text_macro_travel_city,candidate,"destination name for %tcn (""Do you wish to travel to %tcn?"")"
 global,0x00195DC6,painting_subject_text,strong,TEXT.RSC id of the painting subject (%sub)
 global,0x00195DC8,painting_adjective_text,strong,TEXT.RSC id of the painting adjective (%adj)
@@ -258,6 +316,7 @@ global,0x001961F5,pending_quest_file,candidate,"13-char quest file name queued b
 global,0x00196266,text_macro_imperial,candidate,"index into D_0018432D (""Pelagius"",""Cephorus"",""Uriel"",""Cassynder"") for %imp"
 global,0x00196268,current_region,strong,"byte region index of the player: the world view paints pixels 128+this red (the highlighted region in cheat_morthag1, value 21 Anticlere), I'M AT and travel_mark_player use it, closing the map reloads it"
 global,0x00196269,previous_region,candidate,copied from current_region at the end of faction_politics_update
+global,0x0019626A,weapon_active_hand,strong,"0 right, 1 left: indexes right_hand + hand*8 (character+0x1BB/+0x1C3), weapon_hand_* arrays and the strike slot 19+2*hand"
 global,0x0019626C,sheet_selected_attribute,candidate,attribute index 0..7 set by sheet_select_attribute (button-13); the level-up spinner changes this attribute
 global,0x0019626F,game_mode_under_popup,candidate,mode a popup (game_mode 8) returns to: inventory_open treats 4 under 8 as open
 global,0x00196271,popup_answer,candidate,yes/no answer: training cancels on 2; travel_map_update starts the trip on 1 after 'Do you wish to travel to %tcn?'
@@ -347,6 +406,7 @@ global,0x00196DB8,automap_top_down,confirmed,"1 top-down plan, 0 perspective: au
 global,0x00196DBC,quest_debug_object,strong,quest object shown by quest_debug_overlay (quest_debug_next)
 global,0x00196DC0,quest_debug_kind_index,candidate,"index 0-5 into D_0017A134 (3, 4, 7, ..) cycled by key 39"
 global,0x00196DC1,quest_debug_kind,candidate,"text-variable section the overlay lists (3 persons, 4 places, 7 foes, 0 items, 9 states, 6 timers)"
+global,0x001970C4,monsters_woken,candidate,set once by monster_wake_all
 global,0x0019961C,spell_effect_cost_current,strong,"the 8-byte cost record (4 shorts) of the effect being costed, copied from spell_effect_costs; read by spell_cost_formulas"
 global,0x00199624,spellmaker_settings_image,strong,"mask05i0.img (spellmaker_open): the effect settings panel drawn by spellmaker_settings_update, freed by spellmaker_exit"
 global,0x0019962C,spellmaker_alter_row,candidate,"short: effect row waiting for the ""alter the spell?"" answer (-1 none): yes edits it, no deletes the effect"
@@ -374,12 +434,22 @@ global,0x001998E0,itemmaker_slots,strong,"10 x {s16 type, s16 param}: the enchan
 global,0x00199908,itemmaker_item,strong,item data being enchanted (itemmaker_pick_item); enchant points item+0x3D
 global,0x0019990C,itemmaker_item_object,strong,its object
 global,0x00199910,itemmaker_slot_from_soul,candidate,10 bytes: slot was filled by a bound soul
+global,0x00199D74,anim_changed_this_frame,candidate,"ai_creature_think clears it, monster_set_action sets it: one animation change per creature per frame"
+global,0x001A3AA4,extra_spell_points,candidate,enchant_extra_spell_points accumulates 75 per active ExtraSpellPts enchantment
+global,0x001A3AA8,magicka_max_modifier,candidate,"effects_tick: -max/2 or -max magicka for darkness/light-powered magery, plus extra spell points"
 global,0x001A4A10,guild_saved_screen,strong,64000-byte copy of the screen under the guild menu / spell shop
 global,0x001A4A14,guild_membership,strong,the player's membership record for the current guild (or 0); experiment at the Mages Guild: rank 9 kind 1 faction 40
 global,0x001A4A18,spellshop_saved_seed,candidate,RNG seed saved while the spell shop is open
 global,0x001A4A1A,guild_npc_seed,candidate,high word of the NPC's record id; seeds the spell shop list
 global,0x001A4A1C,guild_gift_pending,candidate,set by guild_give_gift; guild_service_dispatch then opens the trade container
 global,0x001A4A1D,guild_join_asked,candidate,counter: the join question is asked only when it becomes 1
+global,0x001A4A30,weapon_hand_item,candidate,the item drawn in each hand (0 = fists)
+global,0x001A4A58,weapon_hand_cif,strong,"2 loaded weapon CIF images (right, left hand); weapon_load_hand_sprite / weapon_free_sprites"
+global,0x001A4A60,weapon_hand_frame,candidate,position in weapon_hand_anim (or a reload countdown)
+global,0x001A4A68,weapon_hand_anim,candidate,frame script per hand (bow_anim_script for bows)
+global,0x001A4A70,weapon_swing_state,candidate,"per hand: 5 when a swing starts, counts down per frame step; 0 idle"
+global,0x001A4B7A,swing_to_hit,strong,to-hit modifier of the current swing (swing_to_hit_mods[direction]); damage_roll_to_hit adds it for the player
+global,0x001A4B7C,swing_damage,strong,damage modifier of the current swing (swing_damage_mods[direction]); damage_resolve_attack adds it for the player
 global,0x001A5BE4,quest_test_file,candidate,quest file quest_start_test_quest starts (empty in the saves)
 global,0x001A5C27,quest_debug_on,strong,when non-zero quest_debug_overlay draws; experiment: setting it drew the overlay
 global,0x001A99F8,recall_anchor_location,candidate,location id (location_object +0x1B) saved when Recall sets the anchor
@@ -432,33 +502,45 @@ field,character+0x00,name,confirmed,32-byte name: Dafydd gen orbo (save_blades)
 field,character+0x16F,equipped,confirmed,"27 item pointers by slot (0-1 amulets, 2-3 bracelets, 4-5 rings, 6-7 bracers, 8-9 marks, 10-11 crystals, 12 head, 13 right pauldron, 14/16 cloaks, 15 left pauldron, 17 chest clothes, 18 cuirass, 19 right hand, 20 gauntlets, 21 left hand, 23 greaves, 24 legs clothes, 26 boots); save read + exp REMOVE/EQUIP"
 field,character+0x1BB,right_hand,strong,equipped[19]: weapons; inv_track_hand_weapons watches it
 field,character+0x1C3,left_hand,strong,equipped[21]: shields and off-hand weapons
-field,character+0x1F2,original_race,candidate,byte: race before vampirism/lycanthropy (1 in save_kralvamp and save_kralwolf whose race is 8/9); clothing images use it when race > 7
-field,character+0x1FD,last_kill_time,candidate,game_minutes: a vampire (race 8) can't heal or rest if 960 minutes have passed
+field,character+0x1F2,original_race,strong,player: disease_become_vampire / disease_become_lycanthrope save the race here; the cures and disease_lycanthrope_shapechange restore character+0x43 from it (fallcall save_kralwolf 0x67027 1 changed the race back)
+field,character+0x1F3,special_infection_time,confirmed,player: fallcall disease_infect_lycanthropy set game_minutes+4320; disease_special_infection_tick acts after it; guild_cure_diseases clears it
+field,character+0x1F9,target_score,strong,"exp_c1: ai_pick_target writes 0/20/50 (+5 untargeted, +20 in sight, +30-dist/128)"
+field,character+0x1FB,to_hit_bonus,candidate,s16 added to the attacker's to-hit by damage_roll_to_hit
+field,character+0x1FD,last_kill_time,strong,player: damage_creature_death writes game_minutes here at every kill; item_enchantment_tick's health leech (21) hurts the player once 1440/10080 minutes pass without a kill (DFU HealthLeech daily/weekly); creatures use the same offset as monster+0x244 give_up_timer
 field,character+0x20,attributes,confirmed,8 x u16 STR INT WIL AGI END PER SPD LUC as on the sheet
+field,character+0x201,last_shapechange_time,confirmed,player: fallcall save_kralwolf 0x67027 1 wrote it; the lycanthrope shapechange works once per 1200 minutes from it
 field,character+0x209,last_training_minutes,strong,i32 game minutes of the last guild training: training_offer refuses with TEXT.RSC 4023 ('cannot train ... more than one skill in a single day') within 720 minutes; training_update sets it
+field,character+0x20D,last_stealth_check_minutes,strong,player: game_minutes of the last stealth roll; ai_stealth_check returns the old result within the same minute (DFU TimeOfLastStealthCheck)
 field,character+0x211,thieves_invite_time,strong,game_minutes when the Thieves Guild invitation comes (guild_check_invitations)
 field,character+0x215,brotherhood_invite_time,strong,game_minutes when the Dark Brotherhood invitation comes
 field,character+0x219,shield_points,confirmed,"u32 damage the Shield effect still absorbs; exp1b (build/names/scratch/magic/exp1b.py, save_morthag1): Shield set 10, Transfer and Continuous Damage hits took 10 -> 5 -> 0; the HUD ends the Shield spell at 0"
+field,character+0x21D,vampire_clan,candidate,"player: faction id of the vampire clan (150-158, default 153) set by disease_become_vampire; the vampire spells depend on it"
 field,character+0x21E,lock_open_chance,strong,"byte: chance of the last Lock, Open or Identify spell, used on the next door/chest or identify; exp1b (build/names/scratch/magic/exp1b.py, save_morthag1): Lock set it to 100"
 field,character+0x21F,brotherhood_invite_count,strong,"kills counted toward the Dark Brotherhood invitation (15), 100 once invited; 100 in save_kralvamp"
 field,character+0x220,hidden_load_percent,candidate,byte: hidden items' weight as % of equip_hiding_capacity (inv_update_hidden_load)
 field,character+0x221,detect_kind,candidate,"byte: Detect subtype (0 magic, 1 enemy, 2 treasure) set each round by spfx_effect_tick"
 field,character+0x222,thieves_invite_count,strong,"thefts counted toward the Thieves Guild invitation (6), 100 once invited; 100 in 4 saves"
 field,character+0x227,faction_id,strong,NPC records: faction id passed to faction_find by talk_start (0 in the player's record)
+field,character+0x229,team,candidate,byte: creatures of the same value never target (ai_pick_target) or strike (weapon_melee_strike) each other; summons get 0 (DFU MobileTeams)
 field,character+0x22B,resist_chances,confirmed,"5 bytes by element: elemental resistance chance; exp1b (build/names/scratch/magic/exp1b.py, save_morthag1): Resist frost chance 100 -> [0,100,0,0,0]; spfx_resist_roll saves outright on a roll <= this when the element's spell_resist_flags bit is set"
 field,character+0x230,class,strong,the class (career) record is embedded here: player_class = player_character + 0x230 in save_blades
 field,character+0x2CC,effects_list,candidate,disease_infect links its new 47+71-byte record (type 11) at the head of this list
 field,character+0x30,base_attributes,strong,"permanent attributes: sheet_draw colours an attribute red when +0x20 is below this, another colour when above (STR 50 < 85 went red); level-up points raise both sets; clamped to 100 by raise_skills"
-field,character+0x40,gender_flags,candidate,"bit 0 female: men's clothing (group 6) refused when set, women's (12) when clear; item generation picks 6 or 12 by it"
+field,character+0x40,flags,strong,"flag word, for creatures too: lycanthropy infection sets bit 0x10 (fallcall on save_blades); the female bit is unverified (combat and inventory agents)"
 field,character+0x41,transport_flags,strong,"bit 1 riding a horse, bit 2 a cart: transport_choose sets/clears them (FOOT clears both); exp ran the handler"
+field,character+0x42,min_metal_to_hit,confirmed,"byte: weapons of a lower material do nothing ('The material of the weapon you are using is ineffective.'); monsters from monster_table (Imp steel, werewolf silver, daedra mithril = DFU MinMetalToHit); fallcall save_kralwolf 0x67027 1 (lycanthrope back to human) changed it 2 -> 0"
 field,character+0x43,race,confirmed,"byte: 8 vampire (save_kralvamp), 9 werewolf (save_kralwolf); >8 blocks the inventory: exp F6 in save_kralwolf gave 'You cannot access the inventory while shapechanged...'"
 field,character+0x44,armor_values,confirmed,"7 signed bytes, one per body part, drawn as (100-v)/5; exp: removing the helm changed [0] from -10 to 75"
+field,character+0x4C,fall_velocity,strong,exp_c1: monster_move_step / monster_apply_gravity write it every frame; landing deals ((v/256)/40-5)^2/3 (creatures) or (v/256)/80-3 damage
 field,character+0x50,skills_raised_lo,candidate,"u32 bit per skill 0-31: raise_skills sets the bit when the skill goes up, skill_raised_recently tests it to colour the skill line, sheet_close clears it"
 field,character+0x54,skills_raised_hi,candidate,"u32 bits for skills 32-34, as skills_raised_lo"
 field,character+0x58,level_skill_sum_start,strong,"i32: raise_skills sets level = (level_skill_sum - this + 28) / 15, DFU's level formula; 170 in save_blades, 169 in save_keophex"
 field,character+0x5C,max_health_base,strong,i32 (not u16): the level-up HP gain is added to it and to +0x7E; equals max health in 3 saves
+field,character+0x60,lycanthrope_kill_time,strong,player: game_minutes of the last innocent kill (guild_count_crime) or of becoming a lycanthrope (disease_become_lycanthrope); disease_lycanthrope_tick shrinks max health 14 days after it
 field,character+0x64,shield_end_time,candidate,u32 duration + game_minutes written by spfx_shield
 field,character+0x68,shapechange_form,candidate,"int: subtype of effect 29 (Bat, Raven, Fish, Wolf) set by spfx_lycanthropy"
+field,character+0x6C,special_infection,confirmed,"player: fallcall disease_infect_lycanthropy set it to 1 (werewolf); 0 vampirism, 2 wereboar; disease_special_infection_tick turns it into the disease"
+field,character+0x70,target,strong,exp_c1: ai_update_creatures writes each creature's target entity here and the creature into its target's +0x70 (also the player's record)
 field,character+0x74,house,candidate,building given by the knightly order's 'Receive House' (848); 0 = none ('You have not earned a house' 460)
 field,character+0x78,ship_owned,strong,i32 set by bank.c from its ship-sale table; nonzero waives the ship fare in travel_trip_cost and the ship-option gold check (DFU hasShip)
 field,character+0x7C,health,confirmed,u16 current health: writing 123 in save_keophex made the sheet show HEALTH 123/489; guild/inn healing sets it to +0x7E; travel refills it
@@ -475,11 +557,14 @@ field,character+0x9B,fatigue,confirmed,u16 current fatigue x64: sheet shows +0x9
 field,character+0x9D,skills,strong,"35 x 6 bytes, u16 value first: Mercantile (14) at +0xF1 in prices, Pickpocket (15) at +0xF7 in shop theft, enchantment 10 adds 15 to skill[param]"
 field,character+0x9F,skill_uses,candidate,"u16 per skill (stride 6): skill_add_uses adds and clamps 0..20000, raise_skills compares it with the advance threshold and zeroes it, training adds random(10,20)*multiplier"
 field,class+0x00,resistance_flags,strong,"byte: spfx_resist_roll raises the save chance x1.5 for these bits (spell_element_class_bits: fire 8, frost 16, poison 4, shock 32, magic 2, disease 64); DFU DFCareer order resistances, immunities, low tolerances, critical weaknesses"
-field,class+0x01,immunity_flags,candidate,"byte: disease_infect gives up when bit 6 is set, the poison code tests bit 2 (DFU CFG ImmunityFlags: 4 poison, 64 disease)"
+field,class+0x01,immunity_flags,strong,"CFG byte 1 = DFU ImmunityFlags (EffectFlags: 4 poison, 64 disease): disease_infect and poison_apply give up on them; disease_become_vampire sets 0x41 (paralysis, disease), disease_become_lycanthrope 0x40"
 field,class+0x02,low_tolerance_flags,strong,byte: spfx_resist_roll halves the save chance for these bits
 field,class+0x03,critical_weakness_flags,strong,byte: spfx_resist_roll returns 100 (no save) for these bits
 field,class+0x04,flags,candidate,"u16: bit 3 stops travel refilling magicka, bit 4 forbids fast travel by day like a vampire ('You cannot initiate fast travel during the day.'); 0x8 for the blades Wizard"
+field,class+0x07,regeneration_flags,strong,"CFG byte 7 (DFU Regeneration flags): effects_tick heals the player by these bits (bit 3 always, bits 0/1 by light or darkness (4B192), bit 2 with D_0019627D/D_001962A0)"
 field,class+0x09,spell_absorption_flags,candidate,"byte bits 0-2: class spell absorption (1 in light?, 2 in darkness via func_0004B192, 4 always); spell_resist_check"
+field,class+0x0A,attack_modifier_flags,strong,"CFG byte 10 (DFU AttackModifierFlags): bits 0-3 bonus, 4-7 phobia vs undead/daedra/humanoid/animals (damage_bonus_vs_target)"
+field,class+0x0D,expert_weapons,strong,CFG byte 13: weapon proficiency bits the class is expert in (Archer 0x20 missile in CLASS13.CFG); damage_resolve_attack adds level to-hit and level/3+1 damage (DFU CalculateProficiencyModifiers)
 field,class+0x10,skills,strong,"12 skill indexes: 3 primary, 3 major, 6 minor; PRIMARY/MAJOR/MINOR popups list them (keophex PRIMARY = Archery, Hand-to-Hand, Restoration); misc = the rest"
 field,class+0x1C,name,strong,"16-byte class name drawn on the sheet's CLASS line (46,24): 'Wizard' in save_blades, matching its sheet"
 field,class+0x34,hp_per_level,strong,"level-up HP = random(hp/2..hp) + END/10 - 5, min 1 (DFU's formula); 16 for the blades Wizard"
@@ -488,6 +573,7 @@ field,disease+0x00,id,candidate,type-11 record data: disease id (< 100; poisons 
 field,disease+0x01,stat_flags,candidate,"11 x s16: which stats the disease hits (8 attributes, 8 health, 9 fatigue, 10 magicka); spfx_disease_daily"
 field,disease+0x17,damage_min,candidate,s16 daily damage range low (+0x19 high); spfx_disease_daily rolls it
 field,disease+0x1B,days_left,candidate,"s16 days left, 255 forever, 254 finished; spfx_disease_daily counts it down"
+field,disease+0x1D,stage,candidate,s16: poison_tick sets 1 when it starts and 2 after a one-time effect; with +0x1B at 0 a stage-2 record ends (254)
 field,disease+0x1F,drained,candidate,8 x s16 attribute points taken so far; given back by spfx_cure_disease and spfx_disease_recover
 field,entity+0x47,character,confirmed,player_character = player_entity + 0x47 in 2 saves; disease code: entity+71 == player_character
 field,faction+0x00,type,strong,"byte: 2 group, 4 individual, 7 noble, 9 temple, 14 courts, 15 people (faction.txt types); talk walks up to 2/7/9"
@@ -533,10 +619,32 @@ field,membership+0x05,rank_time,strong,game_minutes of the last rank change; re-
 field,membership+0x09,armor_received,candidate,bit per rank: knightly 'Receive Armor' already given (461)
 field,monster+0x00,type,strong,"monster object: type byte 18 (exp5, the C of func_00078B8A; docs/asset_tracing.md)"
 field,monster+0x1B,texture,strong,monster object: sprite texture archive<<7 | record (exp7)
-field,monster+0x23E,monster_type,strong,u16 monster id = Daggerfall Unity's MobileTypes (25 Frost Daedra); changing it changes the ASCR animation and bark sound loaded (exp7)
-field,monster+0x241,sound_type,strong,byte copy of the monster id; its sound is 10000 + 10 * id (func_000633BC)
-field,monster+0x2C1,anim_state,candidate,ASCR animation state (exp4/exp6)
+field,monster+0x222,table_flags,strong,u16 (character+0x1DB) copied from monster_table_flags by monster_init
+field,monster+0x224,attack_damage,strong,"5 x {u16 min, max} (character+0x1DD) copied from monster_table by monster_init; damage_resolve_attack rolls each; exp_c1: the Frost Daedra hit for 56, 92, 71, 86 (table 50-100)"
+field,monster+0x23E,ascr_record,strong,byte: the monster's ASCR animation record number (combat agent: code); changing it changes the ASCR record and bark loaded (asset tracing exp7)
+field,monster+0x23F,action,confirmed,"fallcall save_mord 0x2D62F @entity <Frost Daedra> 19 (the player's weapon hit, read back from a --save snapshot): became 16 (hurt); byte (character+0x1F8): exp_c1: monster_set_action writes the action (48 idle, 8 attack, 32 spell, 0 move), the knockback code writes 16 (hurt)"
+field,monster+0x24,wait_state,candidate,short: nonzero (and D_00195C78 clear) keeps the creature idle; 99 = asleep until hurt (damage_apply calls monster_wake_all)
+field,monster+0x241,mobile_id,strong,"the full mobile id (Daggerfall Unity MobileTypes; 25 Frost Daedra); its sound is 10000 + 10 * id (func_000633BC) (combat agent, asset tracing)"
+field,monster+0x244,give_up_timer,confirmed,"fallcall save_mord 0x2D62F @entity <Frost Daedra> 19 (the player's weapon hit, read back from a --save snapshot): 184 -> 60 (damage_apply); int (character+0x1FD; the player's +0x1FD is last_kill_time): exp_c1 counts 183, 182, ...; set to 200 on detection (DFU GiveUpTimer 'value is from classic'), 60 when hit"
+field,monster+0x264,nav_blocked,strong,byte (character+0x21D): ai_move_toward_target's blocked/detour bits (exp_c1 writes 0/1)
+field,monster+0x265,nav_direction,candidate,byte (character+0x21E): detour direction bit 2/4/8 (heading octant +0/+1024/+1536); monster_init sets 2
+field,monster+0x266,nav_turn_count,strong,"byte (character+0x21F): exp_c1 writes 12; monster_init sets 12, ai_move_toward_target counts it down"
+field,monster+0x267,nav_stuck_count,strong,"byte (character+0x220): exp_c1 writes 5, 7, 0; > 6 failed steps set the blocked bit"
+field,monster+0x2C1,anim_frame,candidate,the animation frame index (combat agent); the animation struct's request byte is +0x2D5 and its state +0x2D8
+field,monster+0x2C5,anim_script,strong,pointer: the ASCR record (monster_init / monster_reload_anim_cb store it; also in monster_anim_records[anim_slot])
+field,monster+0x2C9,anim_script_pos,strong,pointer into the ASCR script; exp_c1: XnGine xn_C0100 (C013B/C019C) advances it; monster_reload_anim_cb rebases it after a load
+field,monster+0x2D1,anim_events,confirmed,"exp_c1: XnGine C023B sets bit 0 at the strike frame, ai_update_creatures clears it and calls weapon_melee_strike; bit 1 = missile release (monster_shoot_arrow)"
+field,monster+0x2D2,anim_flags,strong,exp_c1: monster_set_action writes bit 7 (mirrored view: 128/0)
+field,monster+0x2D5,anim_request,confirmed,"exp_c1: monster_set_action writes the action, XnGine C013B takes it and writes 255; a new action is accepted only at 255"
+field,monster+0x2D6,anim_facing,strong,"exp_c1: 0-4 written by monster_set_action (view of the sprite from the player, mirrored for 5-7)"
+field,monster+0x2D7,anim_record,strong,"exp_c1: XnGine C02DF writes the texture record group of the state: 0 move, 5 attack, 15 idle, 20 spell (DFU records 0-4, 5-9, 15-19, 20-24)"
+field,monster+0x2D8,anim_current,confirmed,"exp_c1: XnGine C013B writes the state it started (48, 8, 32) after monster_set_action requested it"
 field,monster+0x47,character,strong,"monster object: a character record laid out like the player's (name, health at +195/+197 of the object) (exp5)"
+field,monster+0x92,anim_slot,strong,"byte (character+0x4B): index into monster_anim_records, from monster_alloc_anim_slot (fallcall summon)"
+field,monster+0x9F,floor_y,candidate,int (character+0x58; the player's +0x58 is something else): monster_move_step stores D_00195C74 (-120 in exp_c1)
+field,monster+0xB3,knockback_angle,strong,short (character+0x6C): direction of the hit (attack_angle) set by damage_knockback; damage_knockback_move moves along it
+field,monster+0xB5,knockback_speed,confirmed,"fallcall save_mord 0x2D62F @entity <Frost Daedra> 19 (the player's weapon hit, read back from a --save snapshot): health 81 -> 48 and knockback speed 0 -> 15 (the minimum); short (character+0x6E): DFU knockback formula ((10d-w)*256/(w+10d)*2d, speed (10d/w)*(2d-amount/256), at least 15) in damage_knockback; capped 40, moves at most 25, -5 per frame (damage_knockback_move = DFU KnockbackMovement)"
+field,monster+0xBB,attack_timer,strong,"int (character+0x74; the player's +0x74 is house): exp_c1: counts down by frame_ticks in ai_creature_think (clamped at 0); a melee attack needs 0 and resets it to random(1500,3000)-(player level-10)*50+(reflexes-2)*450 = DFU MeleeTimer"
 field,object+0x00,record_type,strong,"byte: 2 item, 3 character, 9 spell, 20 soul, 31 potion recipe, 33 loot pile, 52 item container, 54 item in repair/sold pile (read in save_tlalac_s; code tests)"
 field,object+0x01,angle_x,strong,"player object: short; yaw is +0x03 (2048 to a turn, clockwise from north)"
 field,object+0x03,yaw,confirmed,"player object: short, 2048 to a turn, clockwise from north; the camera follows the game's own turning only"
@@ -802,8 +910,30 @@ func,0x0002CBA6,quest_state_from_timer,candidate,sets state arg0 to the expired 
 func,0x0002CC40,qaction_op25_countdown,candidate,"opcode 25: while state arg1 is clear, counts arg2 down once per run; at 0 sets state arg1 (or just finishes when arg1 is -1); not in UESP's list"
 func,0x0002CD0C,qaction_op11_remove_topics,strong,"opcode 11: sets bit 7 (topic hidden) of the place (+2), person (+3) and item (+2) resources args 1-3; UESP 0x0B ""Remove Topics"" (Location, NPC, Item)"
 func,0x0002CDD5,qaction_op10_add_topics,strong,"opcode 10: clears bit 7 of the place, person and item resources args 1-3; UESP 0x0A ""Add Topics"": enable ""Where is""/""Tell me about""; DFU AddDialog"
+func,0x0002D62F,damage_resolve_attack,confirmed,"damage.c (filed under qkey.c). (attacker, target, hand slot 19/21): exp_c1: weapon_melee_strike calls it for every strike; monsters roll up to 5 attacks (50-(player reflexes-2)*10% each, to-hit, random(attack_damage)): the Frost Daedra did 56/92/71/86 (table 50-100); weapons roll weapon_damage_min/max + swing, STR, material, race, proficiency, Skeleton silver x2; 'The material of the weapon you are using is ineffective.'; backstab x3 'Successful backstab!' = DFU CalculateAttackDamage"
+func,0x0002E032,damage_roll_to_hit,strong,"ran before every hit in exp_c1 and the fallcall player hit; (attacker, target, body part, chance, weapon, material mod): DFU CalculateSuccessfulHit: adrenaline rush +-5 (class+0x04 bit 2, health < max/8), swing to-hit, AGI and LUC differences /10, target armor_values[part], +40 vs monsters, race bonuses, -Dodging/4, Critical Strike, -50, clamp 3..97; tallies skills 34 and 20; exp_c1: called before each hit with chance 100"
+func,0x0002E2CF,damage_weapon_strike_effects,strong,"after a weapon hit: enchantment 2 cast-when-strikes (spell on the target, weapon wear 10), 6/1 vampiric (heals the wielder damage/2 via damage_heal), 26/2 Mace of Molag Bal (drains magicka or STR into spell_points_bonus / strength_bonus for 12 minutes) = DFU EnchantmentTypes / ArtifactsSubTypes; exp_c1: 10-25 calls after weapon hits"
+func,0x0002E55C,damage_bonus_vs_target,strong,"+-level by class attack modifier flags (class+0x0A bits 0-3 bonus, 4-7 phobia vs monster_category undead/daedra/humanoid/animal = DFU GetAttackModifier) and the weapon's PotentVs (4) / LowDamageVs (20) enchantments; HealthLeech (21) damages the wielder level/4+1"
+func,0x0002E8AE,damage_heal,candidate,adds to health (character+0x7C) up to max (+0x7E); returns the amount healed (vampiric weapons)
+func,0x0002E914,damage_apply,confirmed,"(entity, damage, weapon): fallcall save_mord 0x2E914 0x19022B8 500 0: 'Frost Daedra just died.' (kill_m25.png); exp_c1: every hit on the player (77, 73, 19, 56, 92 ...) lowers character+0x7C; town guards' 'Do you wish to surrender' (15) / court_trial; cheat_flags bit 6 blocks it; give-up timer 60, hostile again, blood splash, Wabbajack (26/6) and Mehrunes Razor (26/1) artifacts, death at <= 0"
+func,0x0002EBDE,damage_find_empty_soul_trap_cb,candidate,player-item walk callback: an empty Azura's Star (artifact 26/9) or soul trap (27/1 without a child) becomes D_00195B50 for damage_creature_death's soul trapping
+func,0x0002EC79,damage_drop_at_death_cb,candidate,tree-walk callback: moves an object to found_record's position (damage_creature_death walks the dead creature's children with it)
+func,0x0002ECBE,damage_creature_death,confirmed,"fallcall (damage_apply 500 on the Frost Daedra) showed '%s just died.' (Frost Daedra just died.); exp_c1: the player's death runs its player branch (pain sound 243/258, player_death_timer = 1000); soul trapping ('The monster would have been dead but the soul has nowhere to go...'), BodyFall 17, player last_kill_time, quest event 2, object type 44 with monster_corpse_textures; killing the city watch counts a crime"
+func,0x0002F02C,damage_monster_hit_effects,strong,"DFU FormulaHelper.OnMonsterHit by attacker type: Rat 5% / Giant Bat 2% / Mummy 5% diseases from monster_disease_lists (Plague; Plague/Stomach Rot/Brain Fever; 11 diseases), Spider/Scorpion paralysis spell 66, Werewolf/Wereboar 400/65536 lycanthropy, Nymph fatigue drain, Vampires vampirism or 2% plague; exp_c1: after each Frost Daedra hit"
+func,0x0002F288,disease_infect_lycanthropy,confirmed,"damage.c. fallcall save_blades 0x2F288 @entity 0: player record +0x40 |= 0x10, +0x6C = 1, +0x1F3..0x1F5 = game_minutes+4320; kind 0 werewolf / 1 wereboar (+0x6C = kind+1); never at level 1 or when already a vampire/were (race > 7)"
+func,0x0002F2FA,disease_infect_vampirism,strong,"damage.c. the vampirism twin of disease_infect_lycanthropy (+0x6C = 0, deadline +3 days); called by damage_monster_hit_effects for Vampire/Vampire Ancient hits (DFU specialInfectionChance 0.6%)"
 func,0x0002F369,damage_collapse_exhausted,strong,"damage.c; direct call (all-zero args) shows 'You drop to the ground, completely exhausted...'; called by func_0002F02C"
+func,0x0002F3FA,damage_player_hurt,strong,"exp_c1: damage_apply calls it with every damage the player takes (13, 6, 77, 73 ...); flashes the view (CD53C) and 10F9A(clamp(n,4,32)*8)"
+func,0x0002F490,damage_spawn_splash,strong,"(entity, texture record, alt record): a type-42 effect object at the creature (blood or spell sparkle, archive D_00195DA0); exp_c1: casts (5ACEA/5B191) call it with 3,3, damage_apply with 0,2 (blood)"
+func,0x0002F62C,damage_knockback_2,candidate,same knockback as damage_knockback (slightly different arithmetic); no caller in the C
+func,0x0002F72F,damage_knockback,confirmed,"fallcall save_mord 0x2D62F @entity <Frost Daedra> 19 (the player's weapon hit, read back from a --save snapshot): ran after damage_apply; the Frost Daedra got flag 0x20 (character+0x40), knockback speed 15, action 16; (target, 10*damage, angle, 2*damage): DFU knockback (monster_weights; 'knockBackAmount = ((10d - w) * 256) / (w + 10d) * 2d ...', at least 15) into monster+0xB5/+0xB3, flag 0x20, action 16 (hurt); creatures with weight 0 (or table types >= 43 with none) are skipped"
+func,0x0002F824,damage_knockback_move,strong,"ai_update_creatures for knocked-back creatures (flag 0x20): speed capped 40, moves min(speed,25) along monster+0xB3, -5 per frame, ends at <= 5; hitting a wall deals speed/2 damage = DFU KnockbackMovement (whose TODO notes classic's collision damage)"
+func,0x0002F992,damage_expire_drain_bonuses,candidate,every frame: clears spell_points_bonus / strength_bonus once game_minutes passes spell_points_bonus_end / strength_bonus_end
+func,0x0002F9EE,damage_miss_sound,strong,"(weapon, target id): sound for a miss: parry 291-299 half the time against monster_parry_ids (= DFU ParrySounds list exactly), else weapon_swing_sounds[weapon index] (in play 91/373/374 Swing*Pitch), 374 bare-handed; exp_c1: on misses"
 func,0x0002FA97,play_death_video,strong,damage.c; opens anim0012.vid; a direct call shows the funeral cutscene (fallcall)
+func,0x0002FB8B,monster_wake_cb,candidate,tree-walk callback: a type-18 object with monster+0x24 == 99 gets 0
+func,0x0002FBCC,monster_wake_all,candidate,"once (monsters_woken): monster_wake_cb over the location; damage_apply calls it when a sleeping (99) creature is hurt, weapon_melee_strike when certain doors are bashed"
+func,0x0002FC03,damage_namira_reflect,strong,"(attacker, target, damage): if the target wears artifact 26/7 (Ring of Namira, DFU ArtifactsSubTypes 7) the attacker takes the damage back (none for animals, item wear x0.5 daedra, x2 undead); exp_c1 caller damage_resolve_attack for type-18 attackers"
 func,0x0002FD75,quest_run_object_cb,candidate,tree-walk callback: quest_run_opcodes on a type-14 object's data (+0x47); referenced by pointer only
 func,0x0002FDB0,quest_find_by_id_cb,candidate,tree-walk callback: a type-14 object whose quest id (+0x47) is D_001997AA becomes quest_tick_data/quest_event_object
 func,0x0002FE02,quest_item_release_cb,candidate,per inventory item (quest_items_release_on_close): an item with a quest id (+0x26) and flag 0x8000 at +0x15 loses its quest id and bit 7 of +0x16
@@ -1358,14 +1488,68 @@ func,0x00061326,soul_trap_add_soul,candidate,adds a soul record (type 20) with a
 func,0x00061398,shop_stock_potions,candidate,"quality+1 potions: glass bottle (1/1) with a random recipe (type-31 child copied from D_00180B3A, 109 bytes), not owned; caller guilds.c 6F55F"
 func,0x000614A9,potion_random_recipe,candidate,random index into the potion recipe table D_00180B3A (until a zero value)
 func,0x000614FB,loot_add_potion,candidate,one potion with a random recipe at the player (loot_generate 3%)
-func,0x000615E0,ai_creature_think,strong,"per creature: chooses the action against its target (62700 actions 0/8/24/32/48/57/59), faces it (ai_turn_toward), attack timers (+0x74), flee/keep distance; called by ai_update_creatures; 37 dungeon/combat episodes (x5.9). Belongs to monster.c (past equip.c's last ref 0x614FB)"
-func,0x00061CBC,ai_pick_target,candidate,"scores the other creatures (different faction +0x229, +5 untargeted, +20 in sight, closeness) and returns the best index, -1 if none worth it; 24 combat episodes. monster.c"
-func,0x00061E9B,ai_update_creatures,strong,"per frame while world_running and creature_count>0: appends the player to the creature list, matches targets (ai_pick_target), runs ai_creature_think for each type-18 creature; 426 episodes; caller main loop 1025B. monster.c"
-func,0x00062229,ai_turn_toward,candidate,"turns object yaw (+0x03) toward an angle in steps of 64, returns 1 while turning"
+func,0x000615E0,ai_creature_think,confirmed,"monster.c (filed under equip.c). exp_c1 (save_mord fight): runs per creature per frame and picks the action passed to monster_set_action: 48 idle (from 61C4D), 8 melee attack (61BAA), 32 spell (61B5F), 0 move (61C67/61AC9); attack timer character+0x74 = random(1500,3000) - (player level-10)*50 + (reflexes-2)*450 (DFU ResetMeleeTimer); attack when rand()%SPD < SPD/8+6 (DFU notes classic's comparison); seducer (type 29) transforms (57) when hurt"
+func,0x00061CBC,ai_pick_target,strong,"exp_c1: writes the target score character+0x1F9 (0, 20, 50) of each candidate; code: +5 if untargeted (+0x70 = 0), +20 in sight (23C72), +30-dist/128; skips the same team (+0x229)"
+func,0x00061E9B,ai_update_creatures,confirmed,"exp_c1: every frame sets each creature's target (character+0x70, also the player's), runs ai_creature_think for type-18 creatures, and when the animation raises the strike event (monster+0x2D1 bit 0) clears it and calls weapon_melee_strike (621FE -> 733AD -> damage_resolve_attack on the player)"
+func,0x00062229,ai_turn_toward,confirmed,exp_c1: the monsters' yaw (object+0x03) moved 898 -> 834 -> 770 ... in steps of 64 toward the player; returns 1 while turning
 func,0x0006228A,ai_turn_away,candidate,turns object yaw toward angle+1024 in steps of 32
+func,0x000622EB,monster_wander,candidate,keeps a creature walking: every 4-12 frames (record +0x205 counter) swings its heading (+0x201) by +-512 and moves it with monster_move_in_direction; no direct caller (pointer?); monster.c string
+func,0x0006243B,monster_move_in_direction,candidate,moves an object along an angle at (SPD+100)*frame_ticks/1000 through the collision mover 2257C; flyers home on the target height; landing with fall velocity (character+0x4C) v deals damage_apply((v/256)/80-3); deletes it 3000 below the player
+func,0x00062700,monster_set_action,confirmed,"(entity, angle, action): exp_c1 calls with actions 0/8/32/48 write monster+0x2D5 (animation request, XnGine xn_C0100 C013B then sets it to 255 and the current state monster+0x2D8 to the action, record group monster+0x2D7 = 5 for 8, 20 for 32, 15 for 48) and monster+0x23F; facing 0-4 to +0x2D6 and mirror bit 7 of +0x2D2 via D_0017B62F; one change per frame (D_00199D74); seducers (type 29) go to monster_set_action_seducer; types >= 60 accept only 0, 8, 60"
+func,0x00062855,monster_set_action_seducer,strong,"Daedra Seducer (character+0x43 == 29, DFU MobileTypes 29) variant of monster_set_action: once transformed (character+0x40 bit 14) attack/spell become 56 and move 59 (DFU SeducerTransform states); refuses while transforming (57)"
+func,0x0006299F,monster_spell_list,candidate,"first child of the creature's type-22 record (the spellbook container monster_give_spells makes), or 0"
+func,0x000629F8,ai_pick_ranged_spell,candidate,"(creature index): unless paralyzed, picks a random spell of the creature's spellbook whose target type (spell data +7) is 2 or 4 (at range) into ai_chosen_spell; 1 if castable (5C9BF); used by ai_creature_think beyond 256 units"
+func,0x00062B0A,ai_pick_touch_spell,strong,"exp_c1: called by ai_creature_think in melee range (85 calls); code: picks a spell with target type 0 or 1 (caster, touch) into ai_chosen_spell"
+func,0x00062C15,ai_has_spell,candidate,(creature index): ai_chosen_spell = first spell (type 9) of the creature; 1 if it can be cast; no caller in the C
+func,0x00062CB6,ai_has_spell_2,candidate,identical to ai_has_spell (a second copy); no caller in the C
+func,0x00062D57,monster_cast_spell,confirmed,exp_c1: ai_creature_think calls it (61B49) before action 32; each call copies an 89-byte spell into a type-9 object and casts it with cast_creature_spell_at -> cast_spell_on; the casters' magicka (character+0x8D) went 258 -> 176 -> 126 -> 44 -> 0 and the player took 77/73/19 spell damage
+func,0x00062EBE,monster_shoot_arrow,strong,plays sound 6 ArrowShoot at the creature and launches an arrow (weapon_monster_arrow); ai_creature_think calls it when the animation raises the missile event (monster+0x2D1 bit 1)
+func,0x00062EF7,ai_angle_diff,strong,"(angle, target angle, &dir): difference 0..1024 between two 2048-to-a-turn angles and the turn direction; exp_c1: 1223 calls from the turn and target code"
+func,0x00062FBE,monster_mark_anim_slot_cb,strong,tree-walk callback: marks the ASCR slot (character+0x4B) of each type-18 object as used in the slot bitmap at D_00190FE4
+func,0x00063003,monster_alloc_anim_slot,strong,frees ASCR records (monster_anim_records) no creature uses and returns the first free slot of 128; fallcall monster_summon_near_player: the slot bytes at D_00190FE4 became 01 and the slot went to character+0x4B; monster.c string
+func,0x0006310D,monster_ambient_sound,strong,"about 0.6% of frames within 1024 of the player: city watch (id 146) shouts 11461 Halt2, monsters (< 43) play monster_play_sound, classes stay silent; Halt2 and barks in play (asset features)"
+func,0x000631AA,monster_sees_invisible,strong,"type is in the 14 ids at D_00187FB8 (undead 15 18 19 23 28 30 32, daedra 1 25 26 27 29 31, 100) = DFU SeesThroughInvisibility (Ancient Lich missing in classic, as DFU notes)"
+func,0x000631DD,ai_sees_through_illusion,strong,"(type): 1 unless the player (character+0x89) is invisible (bit 2: only monster_sees_invisible types see), chameleon (bit 13: 8%) or shade (bit 12: 4%); DFU BlockedByIllusionEffect has the same 8/4 chances; exp_c1: called with types 25/54/57"
+func,0x0006328F,ai_stealth_check,strong,"(type, detected, distance, encountered): DFU EnemySenses.StealthCheck: within 1024, once per game minute (player character+0x20D), tallies Stealth (skill 16), detected unless rand(1,100) <= 2*(dist*Stealth>>10)"
+func,0x000633BC,monster_play_sound,strong,"sound 10000+10*id (character+0x1FA): +0 move, +1 bark, +2 attack when aware (character+0x40 & 0x180) and close; in play: 10250/10251 Frost Daedra move/bark, 10320/10321 Lich (DFU SoundClips)"
+func,0x00063495,monster_summon_near_player,confirmed,"fallcall save_mord 0x63495 25: a Frost Daedra appeared in front of the player (summon25.png); allocates a 659-byte type-18 object at the player, monster_init(id), team +0x229 = 0; callers inv_use_item, item_break (released soul)"
+func,0x00063512,ai_move_toward_target,strong,"exp_c1: writes the navigation bytes monster+0x264..0x267 (blocked bits, direction 2/4/8, turn count 12, stuck count); code: turns toward the target, steps (monster_move_step), on a block tries the octant directions of D_00186A14 and wall-follows, centres in corridors (ai_center_in_corridor)"
+func,0x0006379A,ai_octant_toward,candidate,octant 0-7 of the second object seen from the first (sign and dominant axis of dx/dz)
+func,0x00063846,monster_move_step,strong,"exp_c1: writes character+0x4C (fall velocity) and +0x58 (floor height -120); code: steps an object along an angle at frame_ticks*(SPD-50+D_00187CA9)/1000 through the collision mover, flyers (monster flags bit 0) climb toward the target, swimmers stay below the water line; 1 if it moved more than 2 units"
+func,0x00063B47,monster_apply_gravity,strong,per frame (ai_update_creatures): falls each creature with its velocity character+0x4C; on landing deals damage_apply(((v/256)/40-5)^2/3); exp_c1: writes +0x4C every frame
+func,0x00063DDC,ai_alert_creatures,candidate,"(source): every creature whose stealth check passes, or the source itself, gets flags 0x108 (detected, encountered: character+0x40) and give-up timer 200; callers weapon_melee_strike (the player's swing, door bashing) and 99922"
+func,0x00063ED8,ai_center_in_corridor,candidate,"nudges a creature toward the centre of its 64-unit cell across its heading (quadrant a2), clearing the blocked bit when centred; caller ai_move_toward_target"
+func,0x00063FCF,monster_move_to,candidate,"moves an object to (x, z) through the collision mover 2257C; 1 if it moved more than 2 units; caller ai_center_in_corridor"
+func,0x000641CD,links_has_id,candidate,links.c (filed under monster.c): 1 if one of the D_001A3A78 39-byte link records has id a1; caller loadsave.c 79E6E
+func,0x00064228,links_resolve,strong,"links.c (filed under monster.c): 'Exceeded maximum number of links.' at 1024; points each link record at the location object with its id and fixes old states 6 -> 2, 108 -> 100"
+func,0x00064301,links_reset,candidate,links.c (filed under monster.c): link count D_001A3A78 = 0 and D_00195C70 = D_00195CB8 = 0; caller maplogic 86D37
 func,0x00065937,disease_infect,strong,"(entity, list, disease id, skip resistance): never level 1, resistance roll, allocates a type-11 effect record from disease_table; a direct call on the player links it to character+0x2CC (fallcall)"
 func,0x00065A8C,poison_apply,candidate,"mirror of disease_infect for poison ids >= 128 (immunity bit 2, a type-11 record from the table at D_00186D83)"
+func,0x00065BBA,poison_init_record,strong,"(effect data, poison id): id, incubation +0x17 and duration +0x1B from poison_table (same as poison_apply); caller monster_poison_weapon"
+func,0x00065C38,poison_tick,strong,"type-11 records with id >= 128 (poisons): after the incubation +0x17 runs down, per id 128-139: health damage, attribute drains kept in +0x1F.., fatigue/magicka loss (DFU Poisons Nux Vomica .. Aegrotat); 'You feel somewhat bad.'; caller 4AC01 (effects tick); 22 combat episodes"
+func,0x0006630B,disease_toggle_memberships_cb,strong,"tree-walk callback: guild memberships (type 10) <-> type 29: becoming a vampire suspends them (disease_become_vampire), the cure restores them (disease_cure_vampirism)"
+func,0x00066352,disease_become_vampire,strong,"TEXT 401 'Death is not always eternal...', passes 30240 minutes, moves the player to a random location, the region's vampire clan (faction type 7, 150-158) into character+0x21D, race 8 (original in +0x1F2), +20 attributes except INT, +30 skills, immunities class+0x01 |= 0x41, sun/holy damage class+0x04 |= 0x30, silver to hit, vampire spells by clan; a direct call drew it"
+func,0x00066853,disease_add_racial_spell,candidate,"(spellbook, spell id): copies the spell_records entry into a new type-9 child and appends '$' to its name (the cures delete '$' spells)"
+func,0x0006691F,disease_cure_vampirism,strong,"(quest action, 29958) for race 8: undoes the vampire bonuses (attributes from the type-11 record id 100, -30 skills), restores the class record saved as type 28, memberships, original race (+0x1F2), deletes the '$' spells, max health = +0x5C"
+func,0x00066B7A,disease_remove_skill_bonuses,strong,"unequips everything (inv_unequip_all_saved) and takes the vampire/lycanthrope +30 skill bonuses away; callers guild_heal, raise_skills (so training and level-ups see base skills)"
+func,0x00066C5B,disease_restore_skill_bonuses,strong,"puts them back (inv_reequip_saved, +30); the pair of disease_remove_skill_bonuses"
+func,0x00066D3C,disease_become_lycanthrope,strong,"(0 werewolf, 1 wereboar): effect record id 101/102, class saved as type 28, +40 to STR/END/AGI/SPD (lycanthrope_attributes), disease immunity, spell 92 (shapechange), +30 Jumping, Swimming, Stealth, Running, Climbing, Hand-to-Hand, Critical Strike (DFU LycanthropyEffect), lycanthrope_kill_time = now"
+func,0x00067027,disease_lycanthrope_shapechange,confirmed,"fallcall save_kralwolf 0x67027 1: race back from 9 to the original (+0x1F2), reputation +100 x5, min_metal_to_hit 2 -> 0, +0x201 = now, fists reloaded (weapon10.cif); into beast form race 9/10, -100 reputation, silver to hit, hands emptied; 'Can only be cast once per day...' unless a1 or Hircine's Ring"
+func,0x00067270,disease_is_lycanthrope,strong,"1 if the player has a type-11 record with id 101 or 102; used by the shapechange, bonuses, guild_count_crime"
+func,0x00067309,disease_cure_lycanthropy,strong,"(quest action, 29958): undoes disease_become_lycanthrope (attributes from the record, class from type 28, race +0x1F2, spell 92 deleted, max health = +0x5C)"
+func,0x00067550,disease_lycanthrope_tick,strong,"'You feel the need to hunt the innocent...': 14 days (20160 minutes) after lycanthrope_kill_time max health shrinks toward 4; 'You dream, once again, of the moon...' and a forced shapechange at the full moon (day&31 == 0 or 4 days ahead); not with Hircine's Ring"
+func,0x000676A4,disease_special_infection_tick,strong,"when game_minutes passes character+0x1F3: +0x6C = 0 -> disease_become_vampire, else disease_become_lycanthrope(+0x6C-1)"
+func,0x0006770E,disease_start_cure_quest,strong,"'$curevam.qbn' / '$curewer.qbn' into pending_quest_file (30%), or a quest (4C274) for vampires; caller 4AC01"
+func,0x00067875,item_reputation_mod_cb,candidate,player-item walk callback: enchantments 14 good rep / 25 bad rep with param 5 (all) or the asked social group add +-10 to D_00195B84 (DFU GoodRepWith/BadRepWith)
+func,0x000679BB,item_reputation_mod,candidate,(social group): sum of item_reputation_mod_cb plus character+0x224; caller talk_start (disposition)
+func,0x00067A1D,enchant_extra_spell_points,strong,adds enchant_spell_points_condition(param) to extra_spell_points; caller item_enchantment_tick for enchantment 3
+func,0x00067A47,enchant_spell_points_condition,strong,"75 when the ExtraSpellPts param holds: 0-3 the season (month table D_0018320A), 4 full moon, 5 half, 6 new (moon phases D_00195F24/25), 7-10 a creature of monster_category undead/daedra/humanoid/animal within 1024 (DFU ExtraSpellPts params)"
+func,0x00067C04,item_artifact_equipped,strong,"1 if an equipped item has artifact effect (26, n): 9 Azura's Star in damage_creature_death, 3 Hircine's Ring in the lycanthrope code (DFU ArtifactsSubTypes)"
+func,0x00067CA4,item_damage_artifact,candidate,"item_damage on the equipped item with artifact effect (26, n); no caller in the C"
+func,0x00067D4F,effects_tick,strong,"every frame (game_frame): elapsed minutes (effect_tick_minutes); class regeneration flags (class+0x07) heal, sun/holy damage (class+0x04 bits 4/5), every equipped item's enchantments (item_enchantment_tick), darkness/light-powered magery (class+0x04 bits 6-9 -> magicka_max_modifier) = DFU career specials"
+func,0x000680DD,item_enchantment_tick,strong,"(item, type, param): 3 extra spell points, 5 regenerates health (param by light/darkness), 17 user takes damage, 16 deteriorates, 21 health leech (unless a kill within a day/week: last_kill_time), 8 repairs objects (item_repair_cb), 1 cast-when-held wear, 6 vampiric at range = DFU EnchantmentTypes"
 func,0x000684E9,shrine_donation,candidate,disease.c; direct call (all-zero args) shows 'The current amount in the shrine is 0 gold' with buttons
+func,0x000685EC,shrine_donation_update,candidate,"trade.c? (filed under disease.c, before trade.c's first ref 0x68731): per frame in game mode 13: popup answers 1/2/3 -> shrine_donate / trade_counter_offer"
 func,0x000686DA,shrine_donate,candidate,disease.c; direct call with the player entity first shows 'You do not have enough gold.' (next to shrine_donation)
 func,0x000687C5,trade_counter_offer,strong,trade.c; direct call (all-zero args) shows 'Enter counter offer'; called by func_000685EC
 func,0x0006BE24,bank_deposit_letters_of_credit,candidate,bank.c; direct call (all-zero args) shows 'Am I to understand that you would like to deposit all of your letters of credit?'; no direct caller
@@ -1424,6 +1608,34 @@ func,0x00071475,guild_heal_cleanup,candidate,"guild_heal walk callback: deletes 
 func,0x00071518,guild_heal,strong,guilds.c; direct call (all-zero args) shows 'You are healed'; called by func_0006DC35
 func,0x00071606,rest_recover,strong,"(unit rest.c?) heals a creature: health by Medical skill (character+0x9D, tallies Medical use) and END, magicka by 1/8; no healing for a starving vampire (race 8); callers rest loop 7193D, 7242F"
 func,0x000717EC,rest_open,strong,"(unit rest.c?) R key (35 episodes, key:r x12): vampire 'too long since you sated' (36), 'There are enemies nearby.' (354), 'You cannot sleep now.' (355), else loads rest00i0.img, game_mode=16"
+func,0x00072916,weapon_load_hand_sprite,strong,"(item, hand): loads WEAPON%02d.CIF (weapon_cif_by_index; 10 fists, 11 beast form) or WEAPO1%02d.CIF for bows into weapon_hand_cif[hand] (asset trace: WEAPON04/09/10/11, WEAPO104); weapons.c"
+func,0x00072AA0,weapon_reload_sprites,strong,after a save load (loadsave 7A983): reloads both hands' sprites (728D2) (asset trace: weapo104.cif weapon10.cif)
+func,0x00072AC7,weapon_start_swing,strong,"with the attack key (action 33) and a mouse move of >= 45: direction (16 sectors) -> swing type (weapon_swing_types), swing_to_hit/swing_damage from swing_to_hit_mods/swing_damage_mods (= DFU CalculateSwingModifiers: up +10/-4, down -10/+4, diagonals +-5/-+2); exp_c1: 2 swings"
+func,0x00072C23,weapon_bow_update,strong,"bow frames (bow_anim_script): waits for the right button, plays 6 ArrowShoot, fires (weapon_fire_arrow, fatigue -11), reload delay (100-SPD)*10+1000"
+func,0x00072E85,weapon_player_update,strong,"every frame (game_frame): unless paralyzed (character+0x89 bit 0) or busy, draws the readied weapon, runs bows ('You have no arrows.') or the swing: frame delay (115-SPD)*3, at the strike frame weapon_melee_strike(player) and fatigue -11 (exp_c1: 7242F(-11))"
+func,0x000733AD,weapon_melee_strike,confirmed,"(attacker entity): exp_c1: ai_update_creatures calls it at each monster strike frame and it runs damage_resolve_attack(attacker, player, 19) on targets within 90 units and 200 of facing with line of sight, skipping the attacker's team; the player's swing also alerts creatures, hits town NPCs, misses with damage_miss_sound, bashes doors (sound 9 PlayerDoorBash, unlock chance 20-lock)"
+func,0x00073980,weapon_fire_arrow,strong,"takes an arrow (inv_take_arrow, 'You have no arrows.'), makes an arrows item (item_make 3/18) as a missile object 998 flying from the player's view"
+func,0x00073ADF,weapon_missile_orient,candidate,"sets a missile's yaw/pitch (+0x17, +0x05) from its velocity (+0x8E); callers 830C7/83EDF"
+func,0x00073B3E,weapon_arrow_update,strong,"per arrow: moves it, deletes it beyond 2048; monster arrows (+0x19 = 0) within 125 of the player hit him (sound 7 ArrowHit, damage_resolve_attack, inv_merge_arrows); player arrows hit the creature struck or the nearest within 140"
+func,0x00073DF9,weapon_monster_arrow,strong,"(creature, target): an arrows item (item_make 3/18) as a missile from the creature toward the target; caller monster_shoot_arrow"
+func,0x00073EDB,weapon_free_sprites,strong,frees the two hands' weapon CIFs (weapon_hand_cif) and poisons them with 0x97979797
+func,0x00073F5D,monster_nearest_to_point,candidate,"nearest creature to (x,y,z) (its distance in faction_scratch / D_00195B84); arrows and spell missiles (5C448) use it"
+func,0x00074024,click_world_object,candidate,"click.c (filed under weapons.c, before click.c's first ref 0x744FD): the object clicked in the world by type (2 item, 6, 8, 18 creature, 32 door, 33, 34, 43, 44 corpse, 53, 56) -> 75E08...76503; caller 80A72"
+func,0x0007425E,door_try_open,candidate,"click.c (filed under weapons.c): opens or unlocks a door (+0x15 flags 0x100/0x40, lock +0x17): key (13A00), an Open spell (character+0x89 bits 5/6 with chance character+0x21E), Stealth-based guard alert (40C87); callers weapon_melee_strike (bash), 75FFF"
+func,0x00078566,monster_init,confirmed,"(entity, id): fallcall 0x63495 25 spawned a Frost Daedra (summon25.png) through it; reads ASCR%04d.ANC, ENEMY%03d.CFG or CLASS%02d.CFG into character+0x230, TEXTURE (255+type for monsters, 432+type for classes, 340 city watch); level, HP (monster_roll_d8_health / monster_roll_class_health), armor x5, loot, metal, flags, damage from monster_table; skills = min(100, 5*level+30); starts idle (48)"
+func,0x00078B8A,monster_reload_anim_cb,strong,"tree-walk callback for type-18 objects: re-reads the ASCR record (MONSTER.BSA, character+0x1F7) into its slot and rebases anim_script_pos; asset trace: MONSTER.BSA reads at every save load"
+func,0x00078C79,monster_reload_anims,strong,"save load (loadsave 7A983): frees every monster_anim_records slot, then monster_reload_anim_cb over the location and the player's tree; asset trace: ASCR0018..ASCR0139 read here"
+func,0x00078D28,monster_roll_d8_health,strong,"n d8 + bonus: monster HP = (ENEMY cfg +0x34)d8 + monster_table HP bonus; DFU 'For monsters, the number of 1d8 hit point die rolls'; Rat 1d8+8 = DFU 9-16"
+func,0x00078D83,monster_roll_class_health,strong,"level x d(hp per level, class+0x34) + bonus for class enemies (level = the player's, city watch +3..6)"
+func,0x00078DDD,monster_init_gear,strong,"class types (>= 43): equipment (monster_give_equipment, random tier) and, if they cast (monster_table_flags bit 1), monster_class_spell_lists[min(level/3,6)]; monsters by type: Imp/Ghost/Wraith/daedra/vampire/lich spell lists (= DFU EnemyEntity), Orc 7 tier 0, Centaur 8 and Orc Sergeant 12 tier 1, Orc Shaman 21 tier 0 + spells, Orc Warlord 24 tier 2"
+func,0x0007909F,monster_give_spells,strong,"magicka (character+0x8D/+0x8F) = level*10+100, magic skills 22-27 = 80, a type-22 spellbook with type-9 copies of spell_records matching the id list; fallcall summon ran it"
+func,0x0007921F,monster_make_item,strong,"(entity, group, index lo, hi, excluded index, chance%): a random item (item_make_in_range) as a type-2 child, or 0; asset features with the class spawns"
+func,0x000792C1,monster_give_equipment,strong,"(entity, character, tier 0-2): weapon in right_hand, shield/second weapon, helm, armor pieces with tier chances 50/75/90%; armor_values > 50 become 60 (DFU: 'Classic sets the value to 60 if it is > 50'); from player level 2 a poisoned weapon: 60% for Assassins (139), 5% others and Orcs/Centaurs"
+func,0x0007977F,monster_poison_weapon,strong,adds a 47-byte effect child to a weapon with a random poison 128-135 (poison_init_record); caller monster_give_equipment
+func,0x000797E2,monster_wabbajack,strong,"(item, entity): damage_apply calls it for artifact effect 26/6 (Wabbajack, DFU ArtifactsSubTypes 6): re-inits the target as a random creature of wabbajack_creatures, marks it (character+0x40 bit 12) and damages the item by the HP lost"
+func,0x00079867,monster_maybe_give_map,strong,map item (item_make 27/8) with chance monster_map_chance[id] (classes monster_class_map_chance) = DFU MapChance
+func,0x00079913,monster_pacify_check,strong,"DFU CalculateEnemyPacification: chance = (weapon drawn ? -25 : 10) + PER/5 + language skill (monster_language_skill, tallied; Etiquette/10 for classes) + 8B29A; rand(1,200) <= chance sets character+0x40 bit 15 (not hostile)"
+func,0x00079A28,savetree_read_chunk,candidate,loadsave.c (filed under moninit.c): reads a u32 length then that many bytes from SAVETREE.DAT (asset trace) into a1; caller loadsave 79BE4
 func,0x00088C0E,spfx_create_item_cb,strong,"unit spfx.c (filed under maplogic.c). Create Item list callback: item_make of the chosen armor piece (D_00187F44 group/index; names D_001832C4 Leather Cuirass...), expiry time at object+0x2B, flag 0x1000, inv_store_item"
 func,0x00088CF5,spfx_paralyze,confirmed,"spell_effect_handlers[0] (filed under maplogic.c). Immune: race 4 (High Elf), class immunity bit 0, already paralyzed, Free Action (+0x8A bit 7); chance roll; sets character+0x89 bit 0, ""You are paralyzed.""; exp1b (build/names/scratch/magic/exp1b.py, save_morthag1): type 0 set conditions bit 0"
 func,0x00088DE6,spfx_continuous_damage,confirmed,"spell_effect_handlers[1] (filed under maplogic.c): one spfx_effect_tick now (then each round); exp1b (build/names/scratch/magic/exp1b.py, save_morthag1): type 1/0 took 10 (5 from the shield, 5 health)"
