@@ -274,7 +274,12 @@ def analyze():
     import fallcov
     import names as namesmod
     known = namesmod.by_address()
-    eps = [json.loads(line) for line in open(os.path.join(OUT, "episodes.jsonl"))]
+    alleps = [json.loads(line) for line in open(os.path.join(OUT, "episodes.jsonl"))]
+    # direct calls (fallcall sweep) say what a function does when called, not what play
+    # reaches: they are kept apart from the played episodes
+    calls = {e["id"][5:]: e for e in alleps if e["kind"] == "call"}
+    called_in = collections.Counter(f for e in calls.values() for f in e["functions"])
+    eps = [e for e in alleps if e["kind"] != "call"]
     N = len(eps)
     fns = fallcov.functions()
     info = {va: (name, group, kind) for va, name, group, kind in fns}
@@ -324,6 +329,14 @@ def analyze():
         rows.append({
             "va": "0x%08X" % va, "name": known.get(name, name), "unit": group, "kind": kind,
             "episodes": len(s), "share": "%.3f" % (len(s) / N),
+            "calls": called_in.get("%X" % va, 0),
+            "called": ("%s; ran %d functions%s%s" % (
+                "returned" if "no-return" not in calls["%X" % va]["tokens"] else "did not return",
+                len(calls["%X" % va]["functions"]),
+                "; files " + " ".join(x[5:] for x in calls["%X" % va]["tokens"] if x.startswith("file:"))
+                if any(x.startswith("file:") for x in calls["%X" % va]["tokens"]) else "",
+                "; drew " + calls["%X" % va]["label"].split(", drew ")[1] if ", drew " in calls["%X" % va]["label"] else ""))
+            if "%X" % va in calls else "",
             "cluster": cid.get(va, ""),
             "features": "; ".join("%s (%d, x%.1f)" % (t, n, l) for t, n, l in assoc(s)) if s and len(s) < N * 0.8 else ("always" if s else ""),
             "examples": " | ".join(examples(s)) if s and len(s) < N * 0.8 else "",
@@ -357,10 +370,11 @@ def analyze():
     for u, rs in byunit.items():
         with open(os.path.join(OUT, "units", "%s.md" % u.replace("/", "_")), "w") as f:
             hit = sum(1 for r in rs if r["episodes"])
-            f.write("# %s: %d functions, %d ran in some episode\n\n" % (u, len(rs), hit))
+            f.write("# %s: %d functions, %d ran in play (episodes); `called` is what a direct call "
+                    "with all-zero arguments did (tools/fallcall.py sweep)\n\n" % (u, len(rs), hit))
             for r in rs:
                 f.write("## %s (%s episodes, cluster %s)\n\n" % (r["name"], r["episodes"], r["cluster"]))
-                for k in ("features", "examples", "strings", "callers", "callees"):
+                for k in ("features", "examples", "called", "strings", "callers", "callees"):
                     if r[k]:
                         f.write("- %s: %s\n" % (k, r[k]))
                 f.write("\n")

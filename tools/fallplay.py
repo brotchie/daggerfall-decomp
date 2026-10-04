@@ -155,7 +155,10 @@ def state(emu):
             "name": bytes(emu.uc.mem_read(L + c, 32)).split(b"\0")[0].decode("latin-1"),
             "level": rd(emu, c + 0x81, "<B"), "gold": rd(emu, c + 0x85, "<i"),
             "magicka": (rd(emu, c + 0x8D, "<H"), rd(emu, c + 0x8F, "<H")),
-            "max health": rd(emu, c + 0x7C, "<H"),
+            "health": (rd(emu, c + 0x7C, "<H"), rd(emu, c + 0x7E, "<H")),
+            "fatigue": (rd(emu, c + 0x9B, "<H") >> 6,          # stored x64; max = STR + END
+                        rd(emu, c + 0x20, "<H") + rd(emu, c + 0x28, "<H")),
+            "minutes": rd(emu, 0x195BF4, "<I"),               # game time
             "attributes": struct.unpack("<8H", bytes(emu.uc.mem_read(L + c + 0x20, 16)))}
 
 
@@ -404,9 +407,12 @@ def describe(emu, top=6):
         ENVS.get(env(emu), "?"), p["x"] / UNITS, p["z"] / UNITS, p["x"], p["z"], round(deg) % 360,
         compass(deg))]
     st = state(emu)
-    lines.append("state: screen %s, %s mode; %s, level %d, %d gold coins, magicka %d/%d, max "
-                 "health %d" % (st["screen"], st["use"], st["name"], st["level"], st["gold"],
-                                st["magicka"][0], st["magicka"][1], st["max health"]))
+    m = st["minutes"]
+    lines.append("state: screen %s, %s mode; day %d %02d:%02d; %s, level %d, health %d/%d, "
+                 "fatigue %d/%d, magicka %d/%d, %d gold coins" % (
+                     st["screen"], st["use"], m // 1440, m % 1440 // 60, m % 60, st["name"],
+                     st["level"], st["health"][0], st["health"][1], st["fatigue"][0],
+                     st["fatigue"][1], st["magicka"][0], st["magicka"][1], st["gold"]))
     bs = [b for b in buildings(emu) if b["type"] not in range(17, 23)] if env(emu) == 1 else []
     if env(emu) != 1:
         pass

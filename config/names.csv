@@ -2,11 +2,31 @@ kind,address,name,confidence,evidence
 global,0x0012AC00,mouse_buttons,strong,byte: mouse button state; inventory_frame and transport_menu act when it is set and was not last frame
 global,0x0012AC04,mouse_x,strong,"short: mouse x in game pixels, hit-tested against the inventory button rects (clicks confirmed)"
 global,0x0012AC06,mouse_y,strong,short: mouse y in game pixels
+global,0x0012B508,text_colour,candidate,set to 145/146/199/244 just before text is drawn in all three units
+global,0x00142308,key_down,strong,"key state by scan code: keys.c returns key_down[key_map[action]]; the automap reads +0x01 Esc, +0x48 up, +0x50 down, +0x4B left, +0x4D right, matching key:up/down/left/right lifts on its move functions"
+global,0x00142309,key_down_esc,strong,"key_down[0x01] (Esc): ends the automap, town map and sheet loops"
+global,0x00142350,key_down_up,strong,key_down[0x48]: automap_move_forward (key:up x2.3)
+global,0x00142353,key_down_left,strong,key_down[0x4B]: automap_move_left (key:left x4.5)
+global,0x00142355,key_down_right,strong,key_down[0x4D]: automap_move_right (key:right x2.9)
+global,0x00142358,key_down_down,strong,key_down[0x50]: automap_move_back (key:down x6.7)
 global,0x00143550,screen_buffer,strong,pointer to the 320-wide 8-bit frame buffer every inventory blit writes (y*320+x)
 global,0x001788DF,trade_price_scale,candidate,"price factor /256 set by guild services (rank discount), reset to 256 at close"
+global,0x001788E3,travel_filter,strong,"4 bits toggled by the bar's DUNGEONS(1) HOMES(2) TEMPLES(4) TOWNS(8) quadrants (screenshot labels), lit by travel_draw_buttons; a location is drawn when its type's category bit (location_type_category) is set; 0xF in 4 saves"
 global,0x001789FA,player_environment,confirmed,"1 outside, 2 inside a building, 3 dungeon or palace: constant across 16 states in 3 groups (docs/state.md)"
+global,0x00178A0E,travel_options,strong,"trip options: bits 0/1 cautious/reckless, 2/3 foot-horse/ship, 4/5 inns/camp out (pairs toggled by the popup boxes, ticks at D_0018886C); reckless halves the time, camp x300/256, inns and ship cost gold; 0x19 or 0x16 in saves"
+global,0x0017A02C,automap_buttons,confirmed,"12 x {x0,y0,x1,y1,handler}: grid/view, forward, back, left, right, rotate left, rotate right, upstairs, downstairs, EXIT, map area, note line; matches the automap bar in the save_mord screenshot"
+global,0x0017A0BC,town_map_buttons,confirmed,"6 x {x0,y0,x1,y1,handler}: the 4 arrows, EXIT, map area"
+global,0x0017A11D,automap_view_initialised,candidate,automap_init_view sets the camera only the first time (flag)
+global,0x0017B4C0,skill_advance_multipliers,strong,"35 shorts 12,1,1,5,15..,2,1,2,2,1,2,1,4,50,1,2,1,1,2,1,2,2,2,2,2,1,8 = DFU's per-skill advancement multipliers; used by skill_ready_to_advance and guild training"
+global,0x0017B506,sheet_buttons,confirmed,"23 x {x0,y0,x1,y1,handler} hit boxes for the sheet (dumped from the image): NAME row, INVENTORY, SPELLBOOK, AFFILIATIONS, PRIMARY/MAJOR/MINOR/MISC, HISTORY, LOG, HEALTH row, FATIGUE row, EXIT, 8 attribute boxes, 2 level-up spinner arrows; boxes match the labels in docs/play.md"
+global,0x0017CBF3,race_names,confirmed,"11 string pointers Breton .. Argonian, Vampire, Werewolf, Wereboar; sheet_draw prints [character+0x43]"
+global,0x0017CC27,skill_names,confirmed,35 string pointers Medical .. Critical Strike (DFU skill order); the sheet's skill popups print them
+global,0x0017CCB7,skill_governing_attributes,confirmed,"35 bytes, attribute index per skill (Hand-to-Hand 3 = AGI, as the sheet popup shows 'Hand-to-Hand 97% AGI')"
+global,0x0017CCDA,attribute_abbrevs,confirmed,8 string pointers STR INT WIL AGI END PER SPD LUC
+global,0x0017CEF2,faction_rank_names,candidate,table of rank-name tables by faction type; sheet_affiliation_line prints rank names from it
 global,0x0017D22A,item_templates,strong,"288 item templates of 48 bytes ('Ruby' first): name, weight, condition, value, pictures; item_init_from_template refuses idx >= 288"
 global,0x00180B3A,potion_recipes,candidate,"potion recipe table, 109-byte entries; a potion's type-31 child is a copy; value at +8"
+global,0x001837E8,region_names,confirmed,"62 string pointers Alik'r Desert, Dragontail Mountains .. Cybiades (DFU region order); D_001837E4 is the same table indexed by region+1 and D_001835E8 by world-map pixel (128+region)"
 global,0x00185F88,item_group_templates,candidate,"per item group, a -1-ended list of template indices (index within group -> template)"
 global,0x00186A64,disease_table,candidate,disease_infect copies a 47-byte record from here + id*47
 global,0x00187CA8,world_running,candidate,byte cleared when the inventory opens and set at close; ai_update_creatures returns while it is 0
@@ -15,40 +35,79 @@ global,0x0018822C,item_group_tab,strong,"29 bytes: item group -> inventory tab (
 global,0x00188281,inv_mode_buttons,strong,"5 trade modes x 7 buttons {x0,y0,x1,y1,handler}: WAGON INFO EQUIP REMOVE USE GOLD EXIT in mode 0; dumped from memory, each handler confirmed by a click"
 global,0x00188425,inv_buttons,strong,"45 buttons {x0,y0,x1,y1,handler}: 0-11 slots, 12 paper doll, 27-36 list rows, 37-40 scroll, 41-44 tabs"
 global,0x00188641,transport_buttons,strong,"5 buttons of the transport menu: FOOT, HORSE, CART, SHIP (transport_choose), EXIT"
+global,0x00188774,location_type_dot_colour,candidate,"14 palette indexes, one per location type, for the region-map dots"
+global,0x00188782,location_type_category,strong,"14 bytes 3,3,3,1,0,2,3,0,1,2,0,1,0,0: DFU location types (city..coven) -> 0 dungeon, 1 home, 2 temple, 3 town, the travel_filter bit"
+global,0x001887A0,travel_bar_buttons,confirmed,"7 x {x0,y0,x1,y1,handler}: FIND, EXIT, map area, two part arrows, I'M AT, filter quadrants; matches the travel-map screenshot"
+global,0x001887F4,travel_popup_buttons,confirmed,"10 x {x0,y0,x1,y1,handler}: six option boxes, BEGIN, EXIT, teleport YES/NO"
+global,0x00188898,region_map_origins,candidate,per view (region+1) x/y of the region map's corner in world units/32768; maps world positions to map pixels
+global,0x001889BC,travel_selected_region,candidate,"byte: region clicked on the world map, passed to the trip's teleport"
+global,0x001889BD,travel_selected_location,strong,"index of the location under the cursor / found by name (travel_location_at_cursor, travel_find_location), -1 none; the popup prints its name"
+global,0x001889C5,terrain_travel_modifiers,strong,"240,220,200,200,230,250 = DFU terrainMovementModifiers; travel_pixel_time indexes it with the terrain at each pixel"
 global,0x0018DBFC,frame_checkpoint,strong,main()'s loop sets 0-3 around its calls and game_frame sets 98-107 between its steps: a where-are-we marker (for crash reports?)
 global,0x0018E044,book_list,candidate,"{u16 id, u16 level} per book found by books_scan"
+global,0x001903A4,text_buffer,strong,"sprintf target for every text line drawn by the sheet, travel map and automap (and 76 other files); D_001903A5, its second byte, is overwritten with a colour code"
 global,0x00190504,creature_list,candidate,creature objects processed by ai_update_creatures (the player appended at the end each frame)
+global,0x00190BF0,automap_pitch,confirmed,"512 looking straight down, 128 in the perspective view: the grid button switched it 512 -> 128 in save_mord"
+global,0x00190BF4,automap_yaw,confirmed,the rotate buttons add/subtract 16 a frame (0 -> 512 after a click in save_mord)
+global,0x00190C34,training_state,candidate,"training_update state: 1234 ask to pay, 1235 done, 1236 skill chosen"
+global,0x00190CE8,travel_zoomed,candidate,"4x zoom on the region map, toggled by travel_toggle_zoom (right click)"
+global,0x00190D8C,levelup_attribute_floor,candidate,copy of character+0x30 taken when the sheet opens; sheet_levelup_adjust won't lower an attribute below it
 global,0x0019597C,right_hand_ready_delay,candidate,accumulates the ready time of a changed right-hand weapon (inv_track_hand_weapons); >0 at close gives 'Equipping %it'
 global,0x00195980,left_hand_ready_delay,candidate,same for the left hand (equipped[21])
+global,0x00195998,last_skill_check_minutes,candidate,game_minutes of the last raise_skills from a trip: travel_begin_trip runs it again after 360 minutes
 global,0x001959AC,frame_counter,confirmed,main()'s loop does D_001959AC++ once per iteration (src/hand/func_00010010.c); rises ~119 per 400 timer ticks
 global,0x001959D8,inventory_containers,confirmed,"5 container objects (record type 52) under player_entity: tabs 0 weapons/armor, 1 magic items, 2 clothing/misc, 3 ingredients, 4 wagon; exp: tab click lists inventory_containers[tab]"
 global,0x001959E8,wagon_container,confirmed,inventory_containers[4]: exp: WAGON lists it on the right; capacity 3000 (750 kg) and '%s / 750'
 global,0x00195A80,text_macro_item,candidate,"item record the %it text macro reads ('Equipping %it', item info)"
 global,0x00195A9C,current_building,candidate,"record of the building/shop: +0x18 type (11 guild hall), +0x19 quality used in prices, repair and shop messages"
-global,0x00195AA0,player_entity,confirmed,"pointer to the player's creature entity: the character record is at +0x47 (2 saves), +0x40 points to the world object; disease code checks entity+71 == player_character"
-global,0x00195AA4,player_object,confirmed,pointer to the player's world object: x/y/z ints at +7/+11/+15 move the player (fallplay tp); player_entity+0x40 points to it
+global,0x00195AA0,player_entity,confirmed,"pointer to the player's creature entity: the character record is at +0x47 (2 saves), its parent (+0x43, the generic record header) is the world object; disease code checks entity+71 == player_character"
+global,0x00195AA4,player_object,confirmed,pointer to the player's world object: x/y/z ints at +7/+11/+15 move the player (fallplay tp); it is player_entity's parent (+0x43)
+global,0x00195AC4,location_object,candidate,root object of the loaded location/dungeon: its +0x1F high word is the id in the at%05d.amf/.atf file names; its children are walked for seen marks
 global,0x00195ACC,text_macro_potion,candidate,potion recipe the %po macro reads ('Recipe for %po.')
 global,0x00195B14,creature_count,strong,active creatures: ai_update_creatures loops over them; inv_use_item says 'There are no monsters nearby.' when 0
 global,0x00195B20,inv_right_container,confirmed,"container listed on the right (ground pile, wagon, shop or trade pile); exp: WAGON set it to the wagon and back at close"
 global,0x00195B34,inv_right_container_base,candidate,the container the right list was opened with (ground pile or shop container); trade totals sum it
+global,0x00195BDC,current_location,candidate,"pointer to the loaded location record: +0x20/+0x21 width/height in blocks (town map size), +0x22 type (no town map for 4, 7, >=9: 'Automap not available here.'), +0x29 building count, +0x2B 26-byte buildings"
 global,0x00195BE0,player_character,confirmed,"pointer to the player character record (= *player_entity + 0x47): name, attributes, level, gold, magicka in every save (docs/state.md)"
 global,0x00195BEC,player_class,strong,"the class (career) record inside the character (player_character+0x230): item_forbidden_for_class reads +0x0B forbidden materials and +0x0E forbidden armor/shield/weapon bits (message 1068); disease/poison code reads immunity bits at +0x01, which fit class advantages"
-global,0x00195BF4,game_minutes,candidate,repair due times are now + days*1440 and shown as '%d days'; 1714189 in save_tlalac_s
+global,0x00195BF4,game_minutes,strong,"game time in minutes: %1440 with 1080/360 for 18:00/06:00 when trips end, 'Days left' = /1440, training once per 720, automap notes kept 43200 (30 days), files 129600 (90 days); save_blades = day 671 22:10"
+global,0x00195C44,scratch_buffer,candidate,"pointer to a large work buffer: +55000 popup text, +60000 status list, 50000 bytes of town-map notes"
 global,0x00195D2C,trade_total,candidate,"trade total shown at (77,15) on trade screens; set by trade_total_*"
 global,0x00195D30,trade_price,candidate,price after trade_adjust_price; paid or received when the offer is accepted
 global,0x00195D38,trade_mode,strong,"0 inventory, 1 buy, 2 sell, 3 repair, 4 identify: selects the button set D_00188281[mode], the trade total and payment; callers pass 4 for the identify spell and guild identify"
 global,0x00195D40,magic_def_count,strong,number of magic.def entries (first dword of magic.def)
 global,0x00195D44,inventory_action,confirmed,"1 info, 2 equip/select, 3 remove, 4 use, 5 hide; exp: INFO/EQUIP/REMOVE/USE set 1/2/3/4; 2 when the inventory opens"
 global,0x00195D4C,magic_def,strong,"magic.def entries (name, kind, enchantment pairs, condition, value, material) read by magic_def_load"
+global,0x00195D6C,text_rsc_file,candidate,"file handle from text_rsc_open('text.rsc'), closed by text_rsc_close; text.c reads messages through it"
 global,0x00195EB0,key_map,strong,"action -> scan code table (action 27 travel map = W, 12 rest = R, 24 logbook, 26 automap); matches Options > CONTROLS (travel play agent)"
 global,0x00195F22,book_count,candidate,u16 number of books found by books_scan
-global,0x00196268,current_region,candidate,byte: index into the per-region price table D_0018F092 (80-byte entries); 16 in save_tlalac_s
+global,0x00196268,current_region,strong,"byte region index of the player: the world view paints pixels 128+this red (the highlighted region in cheat_morthag1, value 21 Anticlere), I'M AT and travel_mark_player use it, closing the map reloads it"
+global,0x0019626C,sheet_selected_attribute,candidate,attribute index 0..7 set by sheet_select_attribute (button-13); the level-up spinner changes this attribute
 global,0x0019626F,game_mode_under_popup,candidate,mode a popup (game_mode 8) returns to: inventory_open treats 4 under 8 as open
+global,0x00196271,popup_answer,candidate,yes/no answer: training cancels on 2; travel_map_update starts the trip on 1 after 'Do you wish to travel to %tcn?'
+global,0x00196272,screen_active,candidate,"set to 1 when the sheet, travel map or automap opens and back to 0 (or its old value) when it closes"
 global,0x00196274,game_mode,strong,"which screen has the input: 0 world, 3 sheet, 4 inventory, 5 spellbook, 7 options, 14 logbook, 16 rest, 19 travel map; same from 3 saves (fallstate screens); hand code already calls it MODE"
 global,0x00196276,interaction_mode,strong,"0 grab F2, 1 info F3, 2 steal F1, 3 talk F4; same from 3 saves (fallstate modes)"
-global,0x00196279,mouse_buttons_prev,candidate,byte: mouse state of the previous frame (transport_menu copies mouse_buttons into it); click handlers need it clear
+global,0x00196279,mouse_buttons_prev,strong,mouse_buttons from the last frame: handlers act on (mouse_buttons & 1) && !(this & 1); the automap copies mouse_buttons into it each frame
+global,0x00196280,is_daytime,candidate,nonzero with a vampire (race 8) or career flag 16: 'You cannot initiate fast travel during the day.'; trips then end after 18:00
 global,0x00196288,inv_right_icon,strong,"byte: picture of inve16i0.cif shown for the right container: 2 ground at open, 3 wagon after WAGON (exp)"
 global,0x001962AB,forced_material,candidate,"byte: when set, the next rolled material is n-1 (then cleared)"
+global,0x00196A28,region_location_count,candidate,number of map_location records at region_locations
+global,0x00196A7C,region_location_names,candidate,"pointer to 32-byte records, name at +4, parallel to region_locations"
+global,0x00196A9C,region_locations,candidate,"pointer to the region's 17-byte map_location records (D_00196A28 of them), from maploads.c"
+global,0x00196D88,town_map_view_x,candidate,left column of the town map shown; notes are drawn at (x-this)*2+10
+global,0x00196D8C,town_map_view_y,candidate,top row of the town map shown
+global,0x00196D90,town_map_scroll_y,candidate,scroll offset changed by town_map_scroll directions 0/1
+global,0x00196D94,town_note_selected,candidate,1-based town note picked by a right click to be moved (drawn in colour 244)
+global,0x00196D98,town_map_scroll_x,candidate,scroll offset changed by town_map_scroll directions 2/3
+global,0x00196DA0,automap_record,candidate,"the player's type-51 automap object for the current dungeon (automap_find_record), holding notes and seen bits"
+global,0x00196DA4,town_map_pixels,candidate,"the town map picture, (width*64) x (height*64) bytes allocated by automap_alloc_town_map; town_map_draw shows it 2x"
+global,0x00196DA8,town_map_size,candidate,byte size of town_map_pixels
+global,0x00196DAC,automap_selected_note,candidate,"text of the selected object's note, printed at (2,191)"
+global,0x00196DB0,automap_selected_object,candidate,object picked by a left click on the automap; the note line edits its note
+global,0x00196DB4,automap_notes,candidate,pointer to the notes in automap_record (object+0x47): entries u16 object id + string
+global,0x00196DB8,automap_top_down,confirmed,"1 top-down plan, 0 perspective: automap_button_view_mode flipped it 1 -> 0 and the picture changed"
+global,0x00199644,sheet_hth_damage_line,candidate,set when a skill list includes skill 30 (Hand-to-Hand) so the popup adds 'Hand-to-Hand dmg: %d-%d' (seen in the keophex PRIMARY popup)
 global,0x001AA41C,inventory_images,strong,"inventory_load_images stores 8 image handles here, one per inve*.img/cif it opens (fallcall)"
 global,0x001AA45C,inv_temp_pile,strong,"loot pile object (type 33, treasure texture 216, at the player) made by inventory_open; freed at close when empty"
 global,0x001AA53C,inv_ground_pile,candidate,right container saved at open; inv_wagon_button switches back to it
@@ -62,28 +121,57 @@ global,0x001AA584,inv_right_count,strong,short: items in the right list
 global,0x001AA58A,inv_left_count,strong,"short: items in the left list; exp: 0 for the weapons tab (all worn), 2 for magic items"
 global,0x001AA5F7,trade_offer_pending,candidate,"byte set by trade_make_offer, cleared by trade_settle_offer"
 global,0x001AA5F9,inv_tab,confirmed,byte: selected tab 0-3; exp: 1 after clicking MAGIC ITEMS
+global,0x001AA668,travel_region_image,candidate,"the loaded region map fmap0iNN.img / fmap%ci%02d.img, freed by travel_close_region"
+global,0x001AA66C,travel_region_index_image,candidate,"world-map image whose pixels are 128+region; hover and clicks read it, the player's region is painted from it"
+global,0x001AA674,travel_ocean_pixels,candidate,"ocean pixels on the route (DFU pixelsTraveledOnOcean), counted by travel_pixel_time, used in the ship fare"
+global,0x001AA678,travel_dest_x,candidate,destination x (location record +4 & 0x1FFFFFF) set by travel_open_trip
+global,0x001AA67C,travel_dest_z,candidate,destination z (location record +8 & 0xFFFFFF) set by travel_open_trip
+global,0x001AA680,travel_trip_minutes,candidate,"trip time from travel_route; the popup shows /1440+1 days, travel_trip_cost hours=(t+59)/60"
+global,0x001AA688,travel_marker_x,candidate,"x of the blinking marker on the map (player or found place), -1 none; I'M AT set it to 0 in the experiment"
+global,0x001AA68C,travel_marker_y,candidate,y of the travel map marker
+global,0x001AA69C,travel_transport_factor,strong,"256 on foot, 192 with a cart, 128 with a horse (travel_find_transport; DFU's values); scales travel_pixel_time"
+global,0x001AA6A4,travel_map_parts,candidate,"number of parts of the region map: 2 for region 0, 4 for 1 and 16, else 0"
+global,0x001AA6A5,travel_map_part,candidate,bit 0 / bit 1: which horizontal / vertical part of a multi-part region map is shown (travel_button_arrows)
+global,0x001AA6A6,travel_map_mode,candidate,"how the map was opened (objcode func_0009A993): 1 the W key, 100 teleport (tele00i0.img, guilds.c): mode 100 skips the clock and shows YES/NO"
+field,automap+0x000,notes,candidate,"2048 bytes of notes: u16 object id, string; automap = payload of the type-51 object, saved as at%05d.amf"
+field,automap+0x800,seen_bits,candidate,"bit per object id (record_id low word, object+0x1F) set by automap_mark_seen, applied by automap_restore_seen"
 field,character+0x00,name,confirmed,32-byte name: Dafydd gen orbo (save_blades)
 field,character+0x16F,equipped,confirmed,"27 item pointers by slot (0-1 amulets, 2-3 bracelets, 4-5 rings, 6-7 bracers, 8-9 marks, 10-11 crystals, 12 head, 13 right pauldron, 14/16 cloaks, 15 left pauldron, 17 chest clothes, 18 cuirass, 19 right hand, 20 gauntlets, 21 left hand, 23 greaves, 24 legs clothes, 26 boots); save read + exp REMOVE/EQUIP"
 field,character+0x1BB,right_hand,strong,equipped[19]: weapons; inv_track_hand_weapons watches it
 field,character+0x1C3,left_hand,strong,equipped[21]: shields and off-hand weapons
 field,character+0x1F2,original_race,candidate,byte: race before vampirism/lycanthropy (1 in save_kralvamp and save_kralwolf whose race is 8/9); clothing images use it when race > 7
 field,character+0x20,attributes,confirmed,8 x u16 STR INT WIL AGI END PER SPD LUC as on the sheet
+field,character+0x209,last_training_minutes,strong,i32 game minutes of the last guild training: training_offer refuses with TEXT.RSC 4023 ('cannot train ... more than one skill in a single day') within 720 minutes; training_update sets it
 field,character+0x220,hidden_load_percent,candidate,byte: hidden items' weight as % of equip_hiding_capacity (inv_update_hidden_load)
+field,character+0x230,class,strong,the class (career) record is embedded here: player_class = player_character + 0x230 in save_blades
 field,character+0x2CC,effects_list,candidate,disease_infect links its new 47+71-byte record (type 11) at the head of this list
-field,character+0x30,base_attributes,candidate,"8 x u16, a second attribute set (85 100 75 70 80 65 80 70 in save_blades)"
+field,character+0x30,base_attributes,strong,"permanent attributes: sheet_draw colours an attribute red when +0x20 is below this, another colour when above (STR 50 < 85 went red); level-up points raise both sets; clamped to 100 by raise_skills"
 field,character+0x40,gender_flags,candidate,"bit 0 female: men's clothing (group 6) refused when set, women's (12) when clear; item generation picks 6 or 12 by it"
 field,character+0x41,transport_flags,strong,"bit 1 riding a horse, bit 2 a cart: transport_choose sets/clears them (FOOT clears both); exp ran the handler"
 field,character+0x43,race,confirmed,"byte: 8 vampire (save_kralvamp), 9 werewolf (save_kralwolf); >8 blocks the inventory: exp F6 in save_kralwolf gave 'You cannot access the inventory while shapechanged...'"
 field,character+0x44,armor_values,confirmed,"7 signed bytes, one per body part, drawn as (100-v)/5; exp: removing the helm changed [0] from -10 to 75"
-field,character+0x5C,max_health_base,candidate,"u16 = max health in 3 saves (also +0x7C, +0x7E)"
-field,character+0x78,ship_owned,candidate,"u32: high word 992/993 (save_tlalac_s, save_blades, save_kralwolf), 0 in two saves; enables SHIP in the transport menu"
-field,character+0x7C,max_health,strong,u16 = the sheet's max health in 3 saves; current health is elsewhere
+field,character+0x50,skills_raised_lo,candidate,"u32 bit per skill 0-31: raise_skills sets the bit when the skill goes up, skill_raised_recently tests it to colour the skill line, sheet_close clears it"
+field,character+0x54,skills_raised_hi,candidate,"u32 bits for skills 32-34, as skills_raised_lo"
+field,character+0x58,level_skill_sum_start,strong,"i32: raise_skills sets level = (level_skill_sum - this + 28) / 15, DFU's level formula; 170 in save_blades, 169 in save_keophex"
+field,character+0x5C,max_health_base,strong,i32 (not u16): the level-up HP gain is added to it and to +0x7E; equals max health in 3 saves
+field,character+0x78,ship_owned,strong,i32 set by bank.c from its ship-sale table; nonzero waives the ship fare in travel_trip_cost and the ship-option gold check (DFU hasShip)
+field,character+0x7C,health,confirmed,u16 current health: writing 123 in save_keophex made the sheet show HEALTH 123/489; guild/inn healing sets it to +0x7E; travel refills it
+field,character+0x7E,max_health,strong,"u16 drawn after the / of HEALTH (489 in keophex, 356 in blades); level-up adds the HP gain; healing copies it to +0x7C"
 field,character+0x81,level,confirmed,"byte: 21, 13, 20 = the sheet's level in 3 saves"
+field,character+0x82,reflexes,strong,"byte: skill_ready_to_advance scales uses by (0x10000-((r-2)<<13))/0x10000, DFU's reflexes modifier; 0 in two saves"
 field,character+0x85,gold,confirmed,i32 gold coins: +5000 per gold cheat in 2 saves; writing it changes gold shown and encumbrance by the coins' weight
 field,character+0x8A,equip_effect_flags,confirmed,"bit 1 spells absorbed (enchantment 9): exp: 6 -> 4 when the amulet came off, back to 6 when re-equipped"
 field,character+0x8D,magicka,strong,u16 = 28 in morthag1 (sheet 28/160)
 field,character+0x8F,max_magicka,strong,u16 = 160 in morthag1
+field,character+0x9B,fatigue,confirmed,u16 current fatigue x64: sheet shows +0x9B>>6 / (STR+END); writing 77*64 made FATIGUE 77/187 in keophex; 12206 in blades = 190 as on its sheet. Max fatigue is not stored
 field,character+0x9D,skills,strong,"35 x 6 bytes, u16 value first: Mercantile (14) at +0xF1 in prices, Pickpocket (15) at +0xF7 in shop theft, enchantment 10 adds 15 to skill[param]"
+field,character+0x9F,skill_uses,candidate,"u16 per skill (stride 6): skill_add_uses adds and clamps 0..20000, raise_skills compares it with the advance threshold and zeroes it, training adds random(10,20)*multiplier"
+field,class+0x01,immunity_flags,candidate,"byte: disease_infect gives up when bit 6 is set, the poison code tests bit 2 (DFU CFG ImmunityFlags: 4 poison, 64 disease)"
+field,class+0x04,flags,candidate,"u16: bit 3 stops travel refilling magicka, bit 4 forbids fast travel by day like a vampire ('You cannot initiate fast travel during the day.'); 0x8 for the blades Wizard"
+field,class+0x10,skills,strong,"12 skill indexes: 3 primary, 3 major, 6 minor; PRIMARY/MAJOR/MINOR popups list them (keophex PRIMARY = Archery, Hand-to-Hand, Restoration); misc = the rest"
+field,class+0x1C,name,strong,"16-byte class name drawn on the sheet's CLASS line (46,24): 'Wizard' in save_blades, matching its sheet"
+field,class+0x34,hp_per_level,strong,"level-up HP = random(hp/2..hp) + END/10 - 5, min 1 (DFU's formula); 16 for the blades Wizard"
+field,class+0x36,advancement_multiplier,strong,16.16 fixed multiplier in the skill-advance threshold (DFU careerAdvancementMultiplier); 0xCCCE (0.8) in save_blades
 field,entity+0x47,character,confirmed,player_character = player_entity + 0x47 in 2 saves; disease code: entity+71 == player_character
 field,item+0x00,name,confirmed,"32 bytes: 'Amulet of Spring's Dawn', 'Helm' (save_tlalac_s); %it text"
 field,item+0x20,group,confirmed,"u16 item group: 2 armor, 3 weapons, 6/12 clothing, 7 books, 14 gems, 25 jewellery, 27 misc, 28 gold; equipped items' groups fit their slots in save_tlalac_s"
@@ -101,6 +189,8 @@ field,item+0x38,color,candidate,byte: dye / palette remap row used when drawing 
 field,item+0x39,weight,candidate,"u32 from the template, scaled by material"
 field,item+0x3F,message,candidate,"book id (books\\bok%05d.txt), letter/spell id"
 field,item+0x43,enchantments,strong,"10 x {u16 type, u16 param}, type -1 ends: 0 cast when used, 1 cast when held, 3 extra spell points, 8 repairs, 9 absorbs spells, 10 +skill, 15 soul bound, 26 artifact special; the amulet's (3,0,9,8) changed character+0x8A on unequip"
+field,map_location+0x04,x_type_flags,candidate,"u32: bits 0-24 x (world/32768 -> map pixel), 25-29 location type (category via location_type_category), bit 30 discovered, bit 31 hidden; only discovered, not hidden ones are drawn unless D_00195AE8 bit 3 (reveal cheat?)"
+field,map_location+0x08,y,candidate,"u32: bits 0-23 the north coordinate, mapped to map pixels with 499-origin"
 field,object+0x00,record_type,strong,"byte: 2 item, 3 character, 9 spell, 20 soul, 31 potion recipe, 33 loot pile, 52 item container, 54 item in repair/sold pile (read in save_tlalac_s; code tests)"
 field,object+0x01,angle_x,strong,"player object: short; yaw is +0x03 (2048 to a turn, clockwise from north)"
 field,object+0x03,yaw,confirmed,"player object: short, 2048 to a turn, clockwise from north; the camera follows the game's own turning only"
@@ -125,6 +215,68 @@ func,0x0001D739,faction_rumor_text,candidate,faction.c; opens rumor.dat; direct 
 func,0x0001F15D,tavern_rent_room,strong,tavern.c; direct call (all-zero args) shows 'for how many days will you require the room?'
 func,0x000245EF,career_background_summary,strong,"career.c; biog%02dt0.txt, bio.dat, class*.cfg, namegen.dat; direct call (all-zero args) shows 'Your reputation has changed as follows'"
 func,0x000255B7,career_show_biography,strong,"career.c; bio.dat, lgbk00i0.img; direct call (all-zero args) shows the character's biography page"
+func,0x00026904,automap_open,strong,"runs with M (key:m x14.6, 38 episodes): indoors loads amap00i0.img/amap01i0.img and loops over automap_buttons until a handler returns 1 or Esc; outdoors in a town runs town_map_open"
+func,0x00026D8D,automap_draw,strong,"one frame of the automap loop (22 episodes with M): background, 3D view (automap_render), note line at (2,191), block overview"
+func,0x00026E87,automap_button_note_line,candidate,"handler of the note line (0,190)-(319,199): 50-char input for the selected object's note, replacing the old note"
+func,0x00026F82,automap_button_rotate_left,confirmed,"handler of (193..213,171..189), the left-turn arrow: yaw +16 a frame (0 -> 512 after a click in save_mord)"
+func,0x00026FB6,automap_button_rotate_right,strong,"handler of (214..234,171..189), the right-turn arrow: yaw -16 a frame"
+func,0x00026FEA,automap_button_exit,strong,"handler of EXIT (281..319,171..189): returns 1, ending the loop; click 297,180 lift x14.2 (13 episodes)"
+func,0x00027035,automap_render,strong,"renders the dungeon in 3D from the automap camera (pitch/yaw, offsets D_00190BFC..C04) through XnGine; 22 episodes with M"
+func,0x000271D8,automap_move_forward,confirmed,handler of the up arrow (105..125) and the Up key: the click moved the camera 528 along the view in save_mord; outdoors town_map_scroll(0)
+func,0x00027267,automap_move_back,strong,handler of the down arrow (126..146) and the Down key (key:down x6.7); outdoors town_map_scroll(1)
+func,0x000272F6,automap_move_left,strong,handler of the left arrow (149..169) and the Left key (key:left x4.5)
+func,0x00027385,automap_move_right,strong,handler of the right arrow (170..190) and the Right key (key:right x2.9)
+func,0x00027414,automap_button_upstairs,confirmed,"handler of (237..257), the up-ladder icon: camera height D_00190BE8 -16 a frame (-512 -> -1040 in save_mord), limit -3072"
+func,0x00027449,automap_button_downstairs,strong,"handler of (258..278), the down-ladder icon: camera height +16 a frame, limit 3072"
+func,0x0002747E,automap_button_map_click,strong,"handler of the map area (0,0)-(319,170) (rbutton lifts x9.4): picks the object under the cursor; right sets object_flags bit 0x400 (byte +0x16 bit 2), left selects its note; outdoors town_map_click"
+func,0x00027515,automap_find_record,strong,"15 episodes with M: finds the player's type-51 object for this location id or creates one (10240 bytes, time stamped), sets automap_record/automap_notes"
+func,0x000275F7,automap_match_record,strong,callback for automap_find_record: type 51 with the current location id
+func,0x00027641,automap_find_note,candidate,"returns the note text for an object id from automap_notes, 0 if none"
+func,0x000276B8,automap_delete_note,candidate,removes the current note entry from automap_notes (memmove)
+func,0x00027717,automap_add_note,candidate,"appends (object id, text) to automap_notes"
+func,0x00027781,automap_init_view,strong,"first automap only: offset 0/-1536/0 in a dungeon (else -1024), pitch 512, yaw 0, top-down; save_mord opened that way"
+func,0x000277FC,automap_button_view_mode,confirmed,handler of the grid box (78..104): toggles top-down (pitch 512) and perspective (pitch 128); the click changed both and the picture
+func,0x000278E4,automap_expire_records,candidate,deletes the player's type-51 automap objects older than 43200 minutes (30 days); called from tamriel.c as time passes
+func,0x00027947,automap_alloc_town_map,candidate,allocates town_map_pixels = (width*height)<<12 bytes for the location; called when a location loads (maplogic 86B0B)
+func,0x000279B9,automap_free_town_map,candidate,frees town_map_pixels (maplogic 86D37)
+func,0x00027A10,town_map_open,strong,"the outdoor automap (24 episodes with M): 'Automap not available here.' outside towns; loads town00i0.img and the at%05d.atf notes, loops over town_map_buttons, saves the notes if changed"
+func,0x00027E4F,town_map_draw,strong,"38 episodes: town_map_pixels 2x around the player, the notes, the blinking player dot"
+func,0x0002814E,town_map_scroll,strong,the arrows outdoors (hold up/down episodes): directions 0-3 change town_map_scroll_y/x
+func,0x000281AF,town_notes_size,candidate,"byte size of the town notes (entries u16 x, u16 y, string) plus 4"
+func,0x00028210,town_note_input,candidate,"50-char input on the bottom line (2,191) for a town note"
+func,0x0002829B,town_note_add,candidate,"appends a town note at D_00190D68/D_00190D6A, marks the notes changed"
+func,0x0002830F,town_note_delete,candidate,removes town note n
+func,0x0002839E,town_note_get,candidate,address of town note n
+func,0x000283FD,town_note_at,candidate,"1-based index of the town note whose text covers screen x,y, else 0"
+func,0x000284DA,town_note_exists,candidate,1 if a town note has this text
+func,0x00028547,town_map_click,candidate,"map click outdoors: right on a note picks it to move, right elsewhere moves the picked one; left on a note edits it, elsewhere adds one"
+func,0x000286F6,town_map_draw_notes,candidate,"prints each town note at its place, the picked one in colour 244"
+func,0x000287BD,town_map_note_building,strong,"notes a building's name at its place in the location's at%05d.atf unless already there; callers talk.c, click.c, maplogic.c...; 17 episodes, entering a building lift x26"
+func,0x00028940,automap_purge_old_files,strong,strings %sat*.atf / %sat*.amf: deletes automap files older than 129600 minutes (90 days); called from tamriel.c
+func,0x00028A6E,automap_draw_block_overview,confirmed,"2x2 px per dungeon block of the 32x32 grid at the top left: the player's block red (240), the type-8 object's block 132, others 145; seen in the save_mord automap"
+func,0x00028BCD,automap_save,strong,"in a dungeon: time stamp + the 10240-byte automap record to at%05d.amf; callers click.c, loadsave.c, maplogic.c"
+func,0x00028C72,automap_load,strong,"in a dungeon: reads at%05d.amf into the scratch buffer and applies the seen bits; callers init.c, click.c, maplogic.c"
+func,0x00028D1A,town_map_note_guild_halls,candidate,"for each building of the location whose type is the hall of a guild the player belongs to (func_000702A0(0) -> 108, (3) -> 42), town_map_note_building"
+func,0x00028DDB,automap_clear_mark,candidate,callback: clears object_flags bit 0x400 (byte +0x16 bit 2)
+func,0x00028DFD,automap_clear_marks,candidate,clears object_flags bit 0x400 on all location objects when the automap closes
+func,0x00028E24,automap_mark_seen,strong,"152 episodes, dungeon/building lift; called from colstuff 234EB and maplogic: in a dungeon sets object_flags bit 0x80 and its automap seen bit"
+func,0x00028EAA,automap_reattach_record,candidate,automap_find_record and keep the match in automap_record (maplogic 86794)
+func,0x00028ED1,automap_restore_seen_one,candidate,callback: a type 6 or 34 object whose seen bit is set gets object_flags bit 0x80
+func,0x00028F56,automap_restore_seen,strong,"15 episodes with M: finds the record if needed, applies the seen bits to all location objects; after automap_load and on loading a game"
+func,0x00028F8B,automap_unmark_seen_one,candidate,callback: clears object_flags bit 0x80 (run over all objects as the automap closes)
+func,0x00028FAD,qcond_op05_event_at_place,candidate,quest event opcode 5 (qcom 2B26B): the event object is the resource and the player is in the same place (type 43) as it
+func,0x000290DD,qcond_op43_pc_at_place,candidate,"quest opcode 43 (qcom 29958, every frame with a quest, 442 episodes): true when the player's place (type 43 or 1 up the parents) has the resource place's id"
+func,0x000292C5,quest_op17_set_timer,candidate,quest opcode 17: on the resource's placed object calls support.c 7E3CD with a byte and game_minutes + a duration
+func,0x00029324,qcond_op01_item_given_to_npc,candidate,"quest event 1: the resource item is among player_entity's possessions and the clicked person is the target; removes the item (unequip_object, delete)"
+func,0x00029441,qcond_op03_event_object,candidate,quest event 3: the event object (D_00199778) is the resource
+func,0x00029490,qcond_op21_event_same_kind,candidate,quest event 21: the event object's +0x1D matches the resource's
+func,0x000294E5,qcond_op02_event_count,candidate,quest event 2: like op 21 but counts up to a target before firing
+func,0x0002956B,quest_resource_unplace,candidate,clears a resource's placement links and resets its id to the current location
+func,0x000295BE,quest_op09_spawn_repeat,candidate,"quest opcode 9 (267 episodes): every interval minutes, with chance %, while charges last, spawns the resource count times (qinit 33764): 'create foe every N minutes M times with P%'"
+func,0x00029670,quest_op87_respawn,candidate,quest opcode 87: like op 9 but first deletes the previous creature (type 34)
+func,0x00029738,qcond_op28_event_person,candidate,quest event 28: the event object is the resource person (type 65 id or placement)
+func,0x000297BA,qcond_op70_player_has_items,candidate,quest opcode 70: true when up to 3 resources are all among player_entity's possessions
+func,0x000298F3,unequip_object,candidate,clears the character+0x16F equipped slots holding this object; called when an object is deleted (object.c 8EBFD) or given away
 func,0x0002F369,damage_collapse_exhausted,strong,"damage.c; direct call (all-zero args) shows 'You drop to the ground, completely exhausted...'; called by func_0002F02C"
 func,0x0002FA97,play_death_video,strong,damage.c; opens anim0012.vid; a direct call shows the funeral cutscene (fallcall)
 func,0x00037856,spellmaker_enter_name,strong,spells.c; direct call (all-zero args) shows 'Enter spell name'
@@ -132,7 +284,42 @@ func,0x00039C09,spells_pick_list,candidate,"spells.c; opens spells.std; direct c
 func,0x0003A325,intro_play_logo,strong,intro.c; opens anim0001.vid; direct call (all-zero args) shows 'Bethesda Softworks presents'; called by main
 func,0x0003A3CE,title_menu,strong,intro.c; pick03i0.img; direct call (all-zero args) shows Load Saved Game / Start New Game / Exit; called by main
 func,0x0003AF3F,intro_play_movie,strong,"intro.c; opens anim0000.vid (also anim0011.vid, dag2.vid); direct call (all-zero args) shows the opening cinematic; called by title_menu"
+func,0x0003B1F3,sheet_open,strong,"polled every frame (sheet_update, levelup_check): opens on key action 36 in the world, or for a level-up (adds HP gain to character+0x7E/+0x5C); sets game_mode 3, loads info00i0.img popu00i0.img cust09i0.img; returns 1 while the sheet is up"
+func,0x0003B436,sheet_close,strong,"handler of the EXIT box (50,179)-(88,197) (docs EXIT 70,187; 25 episodes); in level-up refuses with 'You must distribute all bonus points.'; game_mode 0, frees the 3 images"
+func,0x0003B59E,sheet_update,strong,"every frame from main 1025B: if sheet_open says the sheet is up, draws it, Esc closes, a click runs the sheet_buttons handler under the mouse (first 12 disabled during level-up)"
+func,0x0003B6CF,sheet_draw,confirmed,"draws name, race, class, level, gold, FATIGUE +0x9B>>6/(STR+END), HEALTH +0x7C/+0x7E, encumbrance, 8 attributes; writing those fields changed the picture (keophex, blades)"
+func,0x0003BAD0,sheet_rename,strong,"handler of the NAME row (9,3)-(135,12): prompt 'Enter new name', 23-char text input into character+0x00"
+func,0x0003BB48,sheet_button_inventory,strong,"handler of (1,150)-(67,159) = INVENTORY (35,156): closes the sheet, calls func_000926AD(1,0,2) in inven.c"
+func,0x0003BB8D,sheet_affiliation_line,strong,callback over the player's objects: a type-10 object adds '<rank> <faction>' to the affiliations popup; ran only with AFFILIATIONS clicks
+func,0x0003BC48,sheet_show_affiliations,strong,"handler of (2,83)-(133,92) = AFFILIATIONS; ran in quest1/28 'click 60,87'; empty list shows TEXT.RSC 19 'You have no affiliations.'"
+func,0x0003BD06,sheet_button_spellbook,strong,"handler of (68,150)-(134,159) = SPELLBOOK (105,156): closes the sheet, calls func_000417C8(1)"
+func,0x0003BD44,sheet_show_primary_skills,confirmed,"handler of (10,105)-(126,114) = PRIMARY; clicking (80,109) in keophex popped up its 3 primary skills"
+func,0x0003BD65,sheet_show_major_skills,strong,"handler of (10,115)-(126,124) = MAJOR (80,119): career skills 3-5"
+func,0x0003BD89,sheet_show_minor_skills,strong,"handler of (10,125)-(126,134) = MINOR (80,129): career skills 6-11"
+func,0x0003BDB0,sheet_show_career_skills,confirmed,"(first, six): popup of 3 or 6 career skills via sheet_format_skill plus the Hand-to-Hand damage line; produced the keophex PRIMARY popup"
+func,0x0003C010,sheet_format_skill,confirmed,"appends '<skill> <value>% <ATTR>' for one skill (character+0x9D+6n), coloured if raised recently; lines seen in the keophex popup"
+func,0x0003C0D3,sheet_show_misc_skills,strong,"handler of (10,135)-(126,144) = MISC (80,139): the skills not among the career's 12, in two columns"
+func,0x0003C3A8,skill_raised_recently,candidate,tests skill n's bit in character+0x50/+0x54 (set by raise_skills)
+func,0x0003C400,sheet_button_history,strong,"handler of (69,164)-(134,177) = HISTORY (105,170): shows the text from func_00055748 (custom.c), then reloads info00i0.img"
+func,0x0003C4A0,sheet_button_log,strong,"handler of (1,164)-(67,177) = LOG (35,170): closes the sheet, calls func_0006A683(1)"
+func,0x0003C4DE,show_health_status,strong,"handler of the HEALTH row (9,62)-(135,70), also run from 4259C with the I key (x34.6): shows the disease/poison texts or TEXT.RSC 18 'You are healthy.'"
+func,0x0003C522,sheet_button_fatigue,strong,"handler of the FATIGUE row (9,52)-(135,60): an empty function"
+func,0x0003C53A,sheet_select_attribute,strong,"handler of the 8 attribute boxes x 140-169: selects attribute (button-13), shows its TEXT.RSC description (0 STRENGTH .. 7 LUCK), moves the level-up spinner there"
+func,0x0003C5A4,sheet_place_spinner,strong,moves the level-up +/- boxes (sheet_buttons 21/22) beside attribute button n; called with 13 when the sheet opens (35 episodes with F5)
+func,0x0003C610,health_status_add,candidate,callback: a type-11 object (disease/poison) adds message 100+n ('You have contracted ...') or 117 ('You have been poisoned')
+func,0x0003C6F1,health_status_text,strong,builds the status text from the player's diseases and poisons (8 episodes with I / health row); travel_begin_trip also asks it before warning TEXT.RSC 1010 'You are not well...'
+func,0x0003C81C,sheet_draw_levelup_points,candidate,level-up only: draws the spinner image (cust09i0.img) and the bonus points left
+func,0x0003C8B2,sheet_levelup_adjust,strong,"handler of sheet_buttons 21/22 (spinner): 21 moves a bonus point into the selected attribute (+0x20 and +0x30, max 100), 22 takes one back, not below levelup_attribute_floor"
 func,0x0003C9C1,training_offer,strong,sheet.c; direct call (all-zero args) shows 'Training will cost you ... gold. Do you wish to receive training?'; called by func_0006DC35
+func,0x0003CA57,training_update,strong,"every frame in mode 23: pay (454 'not enough gold'), pick a skill, refuse above 50 (4022), add random(10,20)*multiplier uses, 5221 'practice for 3 hours', pass 180 minutes"
+func,0x0003CCA3,raise_skills,strong,"'Your %s skill has improved.' for each skill whose uses reach the threshold; TEXT.RSC 4020 'Master of %ski'; clamps to 100; level = (level_skill_sum - character+0x58 + 28)/15, flags a level-up; called from rest.c and travel_begin_trip (5 episodes)"
+func,0x0003CFB9,levelup_check,strong,"every frame: level-up flag (D_001940D9 bit 2), no enemies (D_00195B14), world mode, game_mode_under_popup 16 (rest), race < 9 -> sheet_open(1)"
+func,0x0003D01C,skill_add_uses,strong,"adds to skill n's use count (character+0x9F+6n), clamped 0..20000; 18 callers; runs with J (x5.5), P run (x6.6), dungeon play"
+func,0x0003D0A8,career_skill_mastered,candidate,1 if any of the career's 6 primary/major skills is 100 (raise_skills then skips them below 95)
+func,0x0003D113,level_skill_sum,strong,"sum of the 6 primary+major skills minus the lowest major plus the highest minor: DFU's level-up skill sum, used with character+0x58 in raise_skills"
+func,0x0003D2B6,skill_ready_to_advance,strong,uses*(reflex modifier) >= multiplier*value*class+0x36*1.04^level*k + 1: DFU's skill advancement formula
+func,0x0003D39D,text_rsc_open,candidate,opens 'text.rsc' into text_rsc_file; called from init.c
+func,0x0003D3F0,text_rsc_close,candidate,closes text_rsc_file; called from init.c
 func,0x000445B5,options_joystick_calibrate,strong,"options.c; cnfg04i0.img, cnfg05i0.cif, cnfg06i0.img; direct call (all-zero args) shows the joystick calibration window"
 func,0x00044EE0,show_rumor,candidate,kludge.c; opens rumor.dat; direct call (all-zero args) shows a rumour; calls faction_rumor_text
 func,0x00045B7F,pick_gold,candidate,kludge.c; string 'Picking from %s.'; direct call (all-zero args) shows 'You picked N gold pieces'
@@ -199,7 +386,7 @@ func,0x00071518,guild_heal,strong,guilds.c; direct call (all-zero args) shows 'Y
 func,0x0008A344,spell_recall_prompt,strong,spfx.c (spell effects); direct call (all-zero args) shows 'Do you wish to Teleport or Set an Anchor?' (the Recall effect)
 func,0x00090426,potion_make,strong,potions.c; string 'You do not have the ingredients required.'; direct call (all-zero args) shows that message
 func,0x0009063D,chargen_name_character,strong,"generate.c; tamriel.img, char00i0.img, face%d%di0.cif; direct call (all-zero args) shows 'Name thyself'"
-func,0x00092349,inventory_load_images,strong,"runs with F6 (x17.7); its strings are the inventory screen images inve00i0.img .. inve07i0.img, shop00i0.img"
+func,0x00092349,inventory_load_images,confirmed,"loads inve00/01/02/05/06/07i0.img, shop00i0.img, inve16i0.cif and inve%02di0.img (trade mode*2+6/+7); exp: called once when F6 opens the inventory (save_tlalac_s)"
 func,0x00092476,inventory_free_images,confirmed,frees the same image handles (inven.c lines 322-334) and poisons them with 0x97979797; exp: called once by EXIT
 func,0x000926AD,inventory_open,confirmed,"(how 0 key/1 fresh/2 given container, trade_mode, right icon): with how=0 opens on key action 37; refuses if race>8 ('You cannot access the inventory while shapechanged...', seen in save_kralwolf); creates the ground pile, sets game_mode=4; exp: F6 -> game_mode 0->4; callers sheet/HUD icon (1,0,2), identify spell (1,4,8)"
 func,0x00092903,inventory_frame,strong,"called every frame from the main loop: opens via inventory_open(0,0,2), redraws, settles a pending trade payment by trade_mode, then hit-tests the per-mode button table D_00188281 and the 45-button table D_00188425 against mouse_x/y and calls the handler; every handler clicked in exp ran through it"
@@ -300,3 +487,35 @@ func,0x00099211,trade_can_repair_item,strong,"'You have already selected an item
 func,0x000992FA,trade_set_repair_time,candidate,"trade_mode 3: guild hall due time from missing condition and guild level, else trade_set_repair_times"
 func,0x00099391,trade_mark_in_repair,candidate,after paying for repair: every item in the right container becomes record type 54 (in repair)
 func,0x000993CB,potion_recipe_text,candidate,"builds the ingredient list of a potion recipe (bytes group/index pairs, -2 end) from item template names ('Ruby' is template 0), shown after 'Recipe for %po.'"
+func,0x0009AC43,travel_map_update,strong,"every frame from main (501 episodes); acts only while the map is up (func_0009A993(0)): draws map, dots or the trip popup, hover name, blinking marker/region, F (scan 33) = FIND, the pending name search ('There is no place by that name' TEXT.RSC 13), then dispatches clicks to travel_bar_buttons or travel_popup_buttons"
+func,0x0009B2E2,travel_button_exit,strong,"handler of the bar's EXIT (278,175)-(316,196): from a region view back to the world view, else frees the map images, reloads the player's region, game_mode 0; also called with 100 after a trip"
+func,0x0009B647,travel_draw_locations,strong,"8 episodes after clicking a region (travel1/2 click 270,40): a dot per discovered location that passes travel_filter, colour by type"
+func,0x0009B81A,travel_open_region,strong,"loads fmap0iNN.img for region n (the part maps for 0, 1, 16), draws its dots, places the player marker; ran when the world map was clicked"
+func,0x0009B97D,travel_mark_player,strong,"if the shown region is current_region: player x/z -> map pixel into travel_marker_x/y, else -1"
+func,0x0009BAC1,travel_draw_hover_name,strong,"17 episodes with W: '%s : %s' region and the location under the cursor, or the region name from the world-map pixel, at (160,2)"
+func,0x0009BD31,travel_button_map,strong,"handler of the map area (0,12)-(319,172): right click in a region toggles zoom, left click selects a location (travel_open_trip), on the world map opens the clicked region"
+func,0x0009BE38,travel_close_region,candidate,"frees the region image, marker -1, back to the world view"
+func,0x0009BEA6,travel_toggle_option,strong,handler of the 6 popup option boxes: toggles a travel_options bit pair; ship/inns refused with TEXT.RSC 454 'You do not have enough gold.'; recomputes the trip time
+func,0x0009C00A,travel_draw_trip_popup,strong,"8 episodes: option ticks, gold (character+0x85), fare (travel_trip_cost), days (minutes/1440+1), destination name; teleport mode shows only the name"
+func,0x0009C229,travel_popup_exit,strong,"handler of the popup EXIT box (220,110)-(271,124): closes the trip popup"
+func,0x0009C27F,travel_teleport_no,candidate,"handler of popup box (190,96)-(241,110), teleport mode's NO: calls travel_popup_exit"
+func,0x0009C29C,travel_teleport_yes,candidate,"handler of popup box (79,96)-(130,110) in teleport mode: closes the map and moves the player to the location (maplogic 876AD) with no time passing"
+func,0x0009C3E7,travel_begin_trip,strong,"handler of the popup BEGIN box (220,95)-(271,109): TEXT.RSC 1010 if diseased, pays the fare, travel_route(go=1), moves the player, cautious trips end at 06:00 (vampires 18:00), raise_skills every 6 hours"
+func,0x0009C73D,travel_button_find,strong,"handler of FIND (3,175)-(41,185) in a region view (and F): 'Enter name of place', 32-char input, drops 'the '; ran in travel1/3 (click 25,180) and travel1/4 (typed a name)"
+func,0x0009C860,travel_location_at_cursor,strong,"nearest shown location within 2 px of the mouse (zoom aware), sets travel_selected_location; 14 episodes with W"
+func,0x0009CACB,travel_find_location,strong,"finds a location of the region by name, exact then prefix, ignoring 'the '; ran in travel1/4 after typing a name"
+func,0x0009CC3F,travel_open_trip,strong,"with a selected location: opens the trip popup, sets travel_dest_x/z, trip minutes via travel_route, drops inns if unaffordable; 8 episodes"
+func,0x0009CD32,travel_nearest_location_of_type,candidate,the region's location of type n nearest the player (else the selected one); no direct callers
+func,0x0009CEC4,travel_route,strong,"walks the pixel line player -> destination summing travel_pixel_time (camp x300/256, reckless /2); go=1 passes the time and refills fatigue to (STR+END)<<6, health to max, magicka to max (not with career flag 8); DFU's travel-time calculator"
+func,0x0009D242,travel_pixel_time,strong,"time for one map pixel: (512 - terrain_travel_modifiers[terrain]) * (transport factor*102/256) / 256; an ocean pixel is counted in travel_ocean_pixels and costs 51 by ship (option bit 3 or character+0x78), else 255"
+func,0x0009D304,travel_check_transport_item,strong,"callback over the player's objects: transportation item (group 23) index 1 horse -> 128, index 0 cart -> 192"
+func,0x0009D39E,travel_find_transport,strong,"transport factor 256, then scans the player's objects with travel_check_transport_item; 11 episodes, also called from inven.c"
+func,0x0009D3D2,travel_load_region_part,strong,"loads fmap%ci%02d.img, the part (a, b, ...) of a multi-part region map, and draws its dots"
+func,0x0009D487,travel_button_arrows,strong,"handler of the two bar arrows (231..252 / 254..275, y 176..195): flips the horizontal or vertical part of a multi-part map"
+func,0x0009D515,travel_toggle_zoom,strong,"right click on a region map: toggles 4x zoom with its origin 40,32 above-left of the cursor, clamped"
+func,0x0009D5AC,travel_draw_zoom,candidate,"copies the 80x40 window at the zoom origin, enlarged, row by row"
+func,0x0009D61E,travel_trip_cost,strong,"inns 5*((hours-ocean)/24)+5 unless free rooms (guild benefit 64), ship 25*(ocean/24+1) unless character+0x78: DFU CalculateTripCost"
+func,0x0009D6F8,travel_button_im_at,strong,"handler of (3,186)-(47,196) labelled I'M AT: world view flashes the player's region (marker 0 seen after the click), region view marks the player"
+func,0x0009D764,travel_draw_buttons,strong,draws FIND/I'M AT (region vs world) and the 4 filter buttons lit or not by travel_filter; 21 episodes
+func,0x0009D8BD,travel_button_filter,strong,"handler of (50,175)-(228,196) = DUNGEONS/HOMES/TEMPLES/TOWNS (screenshot): toggles travel_filter bit 0/1/2/3 by quadrant, redraws the region"
+func,0x0009D986,travel_show_days_left,strong,"'Days left: %ld' (minutes/1440) at (240,2) over the saved map picture; called from tamriel.c 4AC01 while a trip's time passes"

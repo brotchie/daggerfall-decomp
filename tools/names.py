@@ -86,6 +86,9 @@ def merge(rows, new):
             rows.append(n)
             idx[k] = n
             added += 1
+        elif idx[k]["name"] == n["name"]:
+            if RANK.get(n["confidence"], 0) > RANK.get(idx[k]["confidence"], 0):
+                idx[k].update(n)                    # the same name, now more certain
         elif idx[k]["name"] != n["name"]:
             old = idx[k]
             keep = n if RANK.get(n["confidence"], 0) > RANK.get(old["confidence"], 0) else old
