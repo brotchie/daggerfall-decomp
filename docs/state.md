@@ -203,6 +203,37 @@ saves.
 questions, or the class maker) → background (random, or 12 questions) → name, face,
 attributes, skills, reflexes → the intro movie.
 
+## Message boxes and support code
+
+These come from the text and support naming agent; details are in build/names/text_support.md.
+
+**Message boxes:**
+- `text_rsc_load` reads a TEXT.RSC record and picks one of its variants at random.
+- `text_expand_wrap` expands the macros and wraps the lines; `msgbox_render` draws the box.
+- `msgbox_show_rsc` (0x3F09F) and its string, quest-text and QRC siblings show a box and
+  wait in `msgbox_wait`.
+- `msgbox_kind` (`D_00196270`) says how the box closes: 1 a click, 2 text input, 4 a flag,
+  5 buttons.
+
+**support.c is a grab-bag:**
+- screen messages;
+- the mode stack (`mode_push` / `mode_pop`) and `rand_range`;
+- the per-frame walk over world objects: creatures, pedestrians and the Detect target;
+- building access for trespassing;
+- gold: `gold_total` is the sheet's GOLD (coins plus letters of credit), and carrying
+  capacity is STR × 1.5;
+- keeping rented rooms, house and ship contents, and items in repair across location
+  changes;
+- Recall's position slots;
+- a stubbed-out driver for a Logitech SWIFT 3D input device.
+
+**File formats:**
+- Books are `bok%05u.txt`: a 234-byte header, then the page count and page offsets.
+- The logbook holds 32 quest ids, each with 10 message ids, times and places.
+- The notebook is `notebook.tde`, in 3640-byte pages. It's all dead code: `note_update` has
+  no callers and nothing points at it.
+- NAMEGEN.DAT's banks are Daggerfall Unity's.
+
 ## Text macros and quests
 
 These come from the text and quests naming agent; details are in build/names/text_quests.md.
@@ -261,6 +292,9 @@ The naming agents found these functions filed under the wrong unit:
   belongs to region.c.
 - 0x20C55 (filed under song.c) belongs to crime.c; 0x68A1D and 0x68B1B (trade.c) belong to
   sound.c.
+- 0x3FC4B–0x40F7F (filed under text.c) is people.c: pedestrians and guards.
+- 0x5A442–0x5A6ED (after book.c's last file reference) are text-drawing, mouse-bounds and
+  clip helpers, possibly their own file. 0x8C286 (names.c) belongs to inpstr.c.
 - 0x2586B (filed under career.c) turns killed creatures into corpses: mplace.c or the
   monster code.
 
