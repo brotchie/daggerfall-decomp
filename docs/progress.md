@@ -1474,3 +1474,51 @@ the reason patched OW could not get these:
 - **Build 2,297 / 2,297 (100%), every function compiled by Watcom C32 10.0a**; merged into
   main.
 
+
+## 2026-10-03/04: reverse engineering — every game function named
+
+The decomp is byte-identical. This phase is about what the code does. The headless game
+(tools/fallemu.py on a patched Unicorn, about 70x stock) drives a loop: reverse
+engineering finds game state, the state makes playing and calling the code more useful, and
+that gives more evidence.
+
+**Running the code:**
+- fallplay.py plays a session step by step.
+- fallfuzz.py plays at random and stopped helping after its first run.
+- fallcall.py calls any function in a live game from a safe point between frames. Its sweep
+  ran all 1282 functions that play never reached; 89 of them drew their screen, among them
+  the death video, the court and the bank deals.
+- fallassets.py ties every file read to the code that made it.
+
+**Evidence:** fallevidence.py builds a page for each function covering:
+- what makes it run, and what a direct call does;
+- its button, its messages and sounds, the assets it reads;
+- its strings, callers and callees.
+
+**Naming:**
+- Eleven agents took the code one system at a time, over three rounds. They proposed
+  names in config/names.csv, each with a confidence and its evidence, and confirmed the
+  doubtful ones by experiment: write tests, direct calls, replays.
+- All 2297 game functions are named: 440 confirmed, 1274 strong, 583 candidate. With
+  globals and record fields, 3707 names.
+
+**Findings** are in docs/state.md:
+- the 71-byte record header (Daggerfall Unity's RecordRoot) and the records built on it:
+  character, creature, item, spell, quest, faction, bank, region, location;
+- the main loop, game modes, key map, message boxes and text macros;
+- the spell effect and quest opcode tables, AI states and formulas;
+- save files. Most tables match Daggerfall Unity value for value. A few original bugs
+  turned up, and two places where Daggerfall Unity differs.
+
+**Infrastructure found along the way:**
+- A memory leak in parallel emulator runs took the machine down; tools/memwatch.py and
+  per-worker guards now prevent it.
+- An emulator file-search bug had hidden the quest files from the game.
+- About 40 functions are filed under the wrong source unit (docs/state.md lists them).
+
+**Next:**
+- Name the library functions by matching them against the Watcom 10.0a runtime.
+- Audit the candidate names.
+- Put the names and record structs into the source, with the matching build checking each
+  step.
+- XnGine.
