@@ -73,6 +73,50 @@ Every game record (item, character, spell, loot pile, container, effect) starts 
 The player is a tree: the world object (`D_00195AA4`) → the entity (`D_00195AA0`, type 3,
 whose data at +0x47 is the character record) → 5 item containers → items.
 
+## Factions and guilds
+
+These come from the dialogue and guilds naming agent; details are in build/names/talk_guilds.md.
+
+**Faction record** (92 bytes): the tree is at 0x19672C and the count at 0x196710.
+
+| offset | field |
+|---|---|
+| +0x00 | type |
+| +0x01 | region |
+| +0x03 | name |
+| +0x1D | reputation |
+| +0x1F | power |
+| +0x21 | faction id |
+| +0x33 | face |
+| +0x36 | social group |
+| +0x38 | 3 allies |
+| +0x44 | 3 enemies |
+| +0x50 / +0x54 / +0x58 | next / child / parent |
+
+**Guild membership** is a type-10 record holding rank, guild kind, faction and the time of
+the last rank change.
+- Guild kinds: 0 Dark Brotherhood, 1 Mages, 2 Fighters, 3 Thieves, 64 + k knightly orders,
+  128 + k temples.
+- Rank r needs skills of 22 + 8r and 4 + 4r in the guild's skills, and a rank changes at
+  most every 28 days.
+
+**Character fields used here:**
+- +0x91: reputation with the 5 social groups;
+- +0x211 to +0x222: Thieves Guild and Dark Brotherhood invitation times and counts.
+
+## Source units that are mislabelled
+
+config/units.csv takes each unit's range from its first and last MemCheck file reference.
+The naming agents found these functions filed under the wrong unit:
+- equip.c is item creation (items from templates, artifacts, books, paintings, loot, shop
+  stock), not equipping.
+- 0x615E0–0x6228A, filed under equip.c, is creature AI that belongs to monster.c.
+- 0x91D20–0x922F6, filed under generate.c, are inventory callbacks.
+- 0x28FAD–0x298F3, filed under automap.c, are quest condition and event handlers called
+  from qcom.c.
+- 0x191DA–0x1B5BE, filed under talk.c, are probably faction.c's faction tree and politics.
+- 0x6D91A, filed under disk.c, belongs to guilds.c; 0x71606 and 0x717EC look like rest.c.
+
 ## Calling functions directly
 
 `tools/fallcall.py` calls any function in a live game, from the safe point at the entry of
