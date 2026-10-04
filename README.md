@@ -91,6 +91,8 @@ tools/build-and-verify.sh
 | `tools/fallplay.py` | play the headless game a step at a time (snapshots, rewind, 2x screenshots, new code per step), for a model at the controls (walk, turn, go to and enter buildings); `FALLEMU_CHEAT=1` boots with the game's cheat mode |
 | `tools/fallcov.py` | code coverage of the headless game: which functions ran, per source unit and XnGine module |
 | `tools/fallfuzz.py` | coverage-guided random play: workers play random input from the save snapshots and keep every state that ran new code |
+| `tools/fallevidence.py` | evidence for naming: replays every play step and fuzz state with coverage, then gives each function the inputs that go with it running, its cluster, callers, callees and strings |
+| `tools/memwatch.py` | memory watchdog: kills this repo's emulator processes, largest first, before the machine runs out of memory (the multi-worker tools start it themselves) |
 | `tools/build_unicorn.sh` | build the patched Unicorn `fallemu.py` uses (`tools/unicorn/dagger-unicorn.patch`): ~70x faster in the 3D world |
 | `tools/xn_trace.py`, `tools/xn_record.py` | XnGine code coverage and run-time code writes; record and replay single calls |
 

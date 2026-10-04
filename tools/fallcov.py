@@ -163,6 +163,8 @@ def main():
     if a.cmd == "one":
         one(a.name, a.script, a.ticks, a.shots)
     elif a.cmd == "run":
+        import memwatch
+        memwatch.start()                            # kills runs before memory runs out
         script = EXPLORE if a.script is None else (
             open(a.script).read() if os.path.exists(a.script) else a.script)
         ticks = a.ticks or (EXPLORE_TICKS if a.script is None else 2000)

@@ -291,10 +291,21 @@ index bc62051..de09e78 100644
  #endif
      //tcg_dump_ops(s, false, "after opt1:");
 diff --git a/uc.c b/uc.c
-index 75b89a0..1cc1353 100644
+index 75b89a0..55960e3 100644
 --- a/uc.c
 +++ b/uc.c
-@@ -1190,8 +1190,10 @@ uc_err uc_emu_start(uc_engine *uc, uint64_t begin, uint64_t until,
+@@ -567,6 +567,10 @@ uc_err uc_close(uc_engine *uc)
+ 
+     g_tree_destroy(uc->ctl_exits);
+ 
++    // dagger: the patched-page map and the coverage map
++    g_free(uc->smc_pages);
++    g_free(uc->cov_map);
++
+     // finally, free uc itself.
+     memset(uc, 0, sizeof(*uc));
+     free(uc);
+@@ -1190,8 +1194,10 @@ uc_err uc_emu_start(uc_engine *uc, uint64_t begin, uint64_t until,
      uc->stop_request = false;
  
      uc->emu_count = count;
@@ -306,7 +317,7 @@ index 75b89a0..1cc1353 100644
          uc_hook_del(uc, uc->count_hook);
          uc->count_hook = 0;
  
-@@ -1199,7 +1201,7 @@ uc_err uc_emu_start(uc_engine *uc, uint64_t begin, uint64_t until,
+@@ -1199,7 +1205,7 @@ uc_err uc_emu_start(uc_engine *uc, uint64_t begin, uint64_t until,
          uc->tb_flush(uc);
      }
      // set up count hook to count instructions.
@@ -315,7 +326,7 @@ index 75b89a0..1cc1353 100644
          uc_err err;
          // callback to count instructions must be run before everything else,
          // so instead of appending, we must insert the hook at the begin
-@@ -3068,3 +3070,31 @@ void trace_end(uc_tracer *tracer, trace_loc loc, const char *fmt, ...)
+@@ -3068,3 +3074,31 @@ void trace_end(uc_tracer *tracer, trace_loc loc, const char *fmt, ...)
              (double)(end - tracer->starts[loc]) / (double)(1000));
  }
  #endif

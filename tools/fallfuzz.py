@@ -39,6 +39,7 @@ CORPUS = os.path.join(FUZZ, "corpus")
 LO, HI = fallcov.LO, fallcov.HI
 SIZE = HI - LO
 MIN_NEW = 8                     # new code bytes that make a state worth keeping
+MAX_MB = 2000                   # a worker restarts if it ever holds more than this
 
 # Keys pressed one at a time, weighted: the screens bound in the world, answers to prompts,
 # the interaction modes, movement extras (jump, crouch, run), digits for counts and slots.
@@ -135,7 +136,10 @@ def worker(wid, seeds, hours, max_corpus, seed):
     log = open(os.path.join(FUZZ, "corpus_%d.jsonl" % wid), "a")
     corpus, picks = load_corpus(seeds), {}
     t_end = time.time() + hours * 3600
-    n = 0
+    n, emu = 0, None
+    for e in corpus:                                # a restarted worker numbers on
+        if e["id"].startswith("w%d_" % wid):
+            n = max(n, int(e["id"].split("_")[1]))
     while time.time() < t_end:
         n += 1
         if n % 10 == 0:                             # share with the other workers
@@ -148,6 +152,11 @@ def worker(wid, seeds, hours, max_corpus, seed):
         picks[parent["id"]] = picks.get(parent["id"], 0) + 1
         length = rng.randint(300, 1500)
         events = episode_events(rng, length)
+        if emu is not None:
+            emu.close()                             # ~500 MB each: never two at once
+        if fallemu.rss_mb() > MAX_MB:               # a slow leak: start afresh (run restarts it)
+            write_cov(mine, {"fuzz": wid}, acc)
+            sys.exit(3)
         try:
             emu = fallemu.Emu.load(parent["snap"], overlay=os.path.join(FUZZ, "ov_%d" % wid))
             uch = emu.uc._uch
@@ -213,7 +222,7 @@ def main():
     ap = argparse.ArgumentParser()
     sub = ap.add_subparsers(dest="cmd", required=True)
     r = sub.add_parser("run")
-    r.add_argument("-j", type=int, default=4)
+    r.add_argument("-j", type=int, default=4, help="workers (capped by memory)")
     r.add_argument("--hours", type=float, default=2.0)
     r.add_argument("--max-corpus", type=int, default=400)
     r.add_argument("--seeds", default=None)
@@ -226,16 +235,30 @@ def main():
     a = ap.parse_args()
     snaps = os.path.join(ROOT, "build", "emu", "snap")
     if a.cmd == "run":
+        import memwatch
+        memwatch.start()                            # kills workers before memory runs out
         os.makedirs(CORPUS, exist_ok=True)
         os.makedirs(fallcov.COV, exist_ok=True)
         seeds = ([os.path.join(snaps, n + ".snap") for n in a.seeds.split(",")] if a.seeds else
                  sorted(glob.glob(os.path.join(snaps, "save_*.snap")) +
                         glob.glob(os.path.join(snaps, "cheat_*.snap"))))
         seeds = [s for s in seeds if not s.endswith("cheat_load.snap")]
-        procs = [subprocess.Popen([sys.executable, __file__, "worker", str(i), str(a.hours),
-                                   str(a.max_corpus), ",".join(seeds)]) for i in range(a.j)]
-        for p in procs:
-            p.wait()
+        t_end = time.time() + a.hours * 3600
+
+        def start(i):
+            return subprocess.Popen([sys.executable, __file__, "worker", str(i),
+                                     str(max(0.0, t_end - time.time()) / 3600), str(a.max_corpus),
+                                     ",".join(seeds)])
+        procs = {i: start(i) for i in range(fallemu.workers(a.j))}
+        while procs:
+            time.sleep(5)
+            for i, p in list(procs.items()):
+                if p.poll() is None:
+                    continue
+                if p.returncode == 3 and time.time() < t_end - 60:
+                    procs[i] = start(i)             # it stopped at its memory limit
+                else:
+                    del procs[i]
     elif a.cmd == "worker":
         worker(a.wid, a.seeds.split(","), a.hours, a.max_corpus, a.wid * 7919 + int(time.time()))
     else:

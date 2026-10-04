@@ -515,8 +515,11 @@ def run_step(session, label, action):
             tot[k] = tot.get(k, 0) + 1
     # argv: the command, which replays the step exactly from the previous snapshot (the
     # emulator and every command are deterministic)
+    argv = sys.argv[1:]
+    if session in argv[1:]:
+        argv.pop(argv.index(session, 1))
     steps.append({"n": n + 1, "events": label, "tick": emu.ticks, "new_functions": len(newf),
-                  "argv": sys.argv[1:2] + sys.argv[3:]})
+                  "argv": argv})
     save_steps(session, steps)
     by = {}
     for g, _k in newf:
@@ -551,11 +554,13 @@ def act_events(events, ticks, frames, session):
         s = emu.ticks
         pending = [(s + t, a, g) for t, a, g in script]
         extra = []
-        n = latest(session)[1] + 1
+        n = latest(session)[1] + 1 if session else 0
         for k in range(frames):
             m = s + length * (k + 1) // (frames + 1)
             emu.run(m, [e for e in pending if e[0] <= m], None)
             pending = [e for e in pending if e[0] > m]
+            if session is None:                     # a replay: same runs, no pictures
+                continue
             p = os.path.join(sdir(session), "%03d_%d.png" % (n, k + 1))
             if shot(emu, p):
                 extra.append("frame: %s" % p)
@@ -690,6 +695,7 @@ def look4(session, n, dist=None):
         turn_to(emu, yaw)
         emu.run(emu.ticks + 10, [], None)
         frames.append(frame_rgb(emu))
+        emu.close()
     W, H = 640, 400
     out = bytearray(W * H * 3)
     for k, f in enumerate(frames):
@@ -713,7 +719,7 @@ def rewind(session, n):
     print("session %s back at step %d (coverage keeps what the dropped steps ran)" % (session, n))
 
 
-def main():
+def build_parser():
     ap = argparse.ArgumentParser()
     sub = ap.add_subparsers(dest="cmd", required=True)
     for c, args in (("new", ["frm"]), ("rewind", ["n"]), ("log", []), ("cov", []), ("where", []),
@@ -745,22 +751,24 @@ def main():
     a.add_argument("session")
     a.add_argument("n", type=int)
     a.add_argument("dist", nargs="?", type=float)
-    a = ap.parse_args()
-    s = a.session
-    if a.cmd == "new":
-        new(s, a.frm)
-    elif a.cmd == "step":
-        run_step(s, a.events, act_events(a.events, a.ticks, a.frames, s))
-    elif a.cmd in ("walk", "back"):
-        run_step(s, "%s %s m" % (a.cmd, a.metres), act_walk(float(a.metres),
-                                                            "up" if a.cmd == "walk" else "down"))
-    elif a.cmd == "face":
-        run_step(s, "face %s" % a.degrees, act_set(yaw=round(float(a.degrees) * 2048 / 360)))
-    elif a.cmd == "turn":
-        run_step(s, "turn %s" % a.degrees, act_set(dyaw=round(float(a.degrees) * 2048 / 360)))
-    elif a.cmd == "tp":
-        run_step(s, "tp %s %s" % (a.east, a.north), act_set(dx=float(a.east), dz=float(a.north)))
-    elif a.cmd == "goto":
+    return ap
+
+
+def step_action(a, session):
+    """(label, action) for a command that makes a step, else None. session: where step
+    pictures go (None when replaying)."""
+    if a.cmd == "step":
+        return a.events, act_events(a.events, a.ticks, a.frames, session)
+    if a.cmd in ("walk", "back"):
+        return "%s %s m" % (a.cmd, a.metres), act_walk(float(a.metres),
+                                                      "up" if a.cmd == "walk" else "down")
+    if a.cmd == "face":
+        return "face %s" % a.degrees, act_set(yaw=round(float(a.degrees) * 2048 / 360))
+    if a.cmd == "turn":
+        return "turn %s" % a.degrees, act_set(dyaw=round(float(a.degrees) * 2048 / 360))
+    if a.cmd == "tp":
+        return "tp %s %s" % (a.east, a.north), act_set(dx=float(a.east), dz=float(a.north))
+    if a.cmd == "goto":
         def action(emu):
             b = find_building(emu, a.n)
             x, z, yaw, side = place(b, a.side, player(emu), a.dist)
@@ -769,8 +777,8 @@ def main():
             turn_to(emu, yaw)
             emu.run(emu.ticks + 10, [], None)
             return ["at building #%d (%s), %s side, facing it" % (a.n, bname(b), side)]
-        run_step(s, "goto %d %s" % (a.n, a.side or ""), action)
-    elif a.cmd in ("door", "enter"):
+        return "goto %d %s" % (a.n, a.side or ""), action
+    if a.cmd in ("door", "enter"):
         def action(emu):
             b = find_building(emu, a.n)
             spot = door_spot(b, a.k)
@@ -794,7 +802,76 @@ def main():
                 return ["tried to enter building #%d (%s) but did not get in (locked? closed at "
                         "night? see the screen)" % (a.n, bname(b))]
             return ["inside building #%d (%s)" % (a.n, bname(b))]
-        run_step(s, "%s %d" % (a.cmd, a.n), action)
+        return "%s %d" % (a.cmd, a.n), action
+    return None
+
+
+def argv_of(st, session=None):
+    """A step's command, or the commands it may have been: recorded, or (sessions from before
+    it was) read back from its label. A list of candidates; the right one ends on the
+    recorded tick."""
+    a = st.get("argv")
+    if a and session in a[1:]:          # recorded early with an option's name dropped
+        i = a.index(session, 1)
+        return [a[:1] + [opt] + a[1:i] + a[i + 1:] for opt in ("--ticks", "--frames")]
+    if a:
+        return [a]
+    return [x] if (x := _argv_of_label(st)) else []
+
+
+def _argv_of_label(st):
+    lab = st.get("events", "")
+    if re.match(r"\d", lab):
+        return ["step", lab]
+    m = re.match(r"(walk|back) ([-\d.]+) m$", lab)
+    if m:
+        return [m.group(1), m.group(2)]
+    w = lab.split()
+    if w and w[0] in ("face", "turn", "tp", "goto", "door", "enter"):
+        return w
+    return None
+
+
+def replay_step(session, n, overlay):
+    """Run step n of a session again from step n-1's snapshot, with coverage on. Returns
+    (coverage map of LO..HI, the machine after, whether it ended on the recorded tick, the
+    environment byte before), or None if the step can't be rebuilt."""
+    st = next((x for x in load_steps(session) if x["n"] == n), None)
+    out = None
+    for argv in (argv_of(st, session) if st else []):
+        if out is not None:
+            out[1].close()                          # a candidate that ended off the tick
+        try:
+            a = build_parser().parse_args([argv[0], session] + list(argv[1:]))
+        except SystemExit:
+            continue
+        sa = step_action(a, None)
+        if sa is None:
+            continue
+        emu = fallemu.Emu.load(os.path.join(sdir(session), "%03d.snap" % (n - 1)), overlay=overlay)
+        lib = cov_lib()
+        lib.uc_dagger_coverage(emu.uc._uch, L + LO, L + HI, None)
+        env0 = env(emu)
+        try:
+            sa[1](emu)
+        except SystemExit:
+            pass
+        buf = ctypes.create_string_buffer(HI - LO)
+        lib.uc_dagger_coverage(emu.uc._uch, L + LO, L + HI, buf)
+        out = buf.raw, emu, emu.ticks == st.get("tick"), env0
+        if out[2]:
+            break
+    return out
+
+
+def main():
+    a = build_parser().parse_args()
+    s = a.session
+    sa = step_action(a, s)
+    if sa is not None:
+        run_step(s, *sa)
+    elif a.cmd == "new":
+        new(s, a.frm)
     elif a.cmd == "buildings":
         cmd_buildings(s, a.kind)
     elif a.cmd == "look4":

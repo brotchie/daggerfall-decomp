@@ -327,6 +327,15 @@ class Emu:
         for a in addrs:
             self.uc.hook_add(UC_HOOK_CODE, hit, None, LOAD + a, LOAD + a)
 
+    def close(self):
+        """Free the CPU and its memory now. A machine holds about 500 MB, and Python frees it
+        only when its cycle collector next runs (the hooks make a cycle): a loop that loads
+        snapshot after snapshot runs the computer out of memory first. Close each machine
+        before loading the next."""
+        if getattr(self, "uc", None) is not None:
+            self.uc._Uc__finalizer()        # uc_close, once (Unicorn's own finalizer)
+            self.uc = None
+
     def save(self, path):
         """Snapshot the whole machine: CPU, memory, open files, devices."""
         import pickle
@@ -1304,6 +1313,26 @@ def parse_script(text):
 
 
 SNAPS = os.path.join(ROOT, "build", "emu", "snap")
+
+
+def rss_mb():
+    """This process's resident memory in MB (for the guards in the many-machine loops)."""
+    import subprocess
+    try:
+        return int(subprocess.check_output(["ps", "-o", "rss=", "-p", str(os.getpid())])) / 1024
+    except (OSError, ValueError, subprocess.CalledProcessError):
+        return 0.0
+
+
+def workers(want=None, per_mb=2500):
+    """How many emulator processes to run at once: what was asked, else the cores less two,
+    and never more than the memory allows at per_mb each."""
+    try:
+        mem = os.sysconf("SC_PAGE_SIZE") * os.sysconf("SC_PHYS_PAGES") / (1 << 20)
+    except (ValueError, OSError):
+        mem = 16384
+    n = want or max(1, (os.cpu_count() or 2) - 2)
+    return max(1, min(n, int(mem * 0.6 // per_mb)))
 
 
 def run_scenario(emu, path, shots, upto=None):
