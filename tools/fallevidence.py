@@ -173,6 +173,8 @@ def collect(j, resume=False):
             os.remove(p)
     print("%d episodes to replay" % len(todo()), flush=True)
     procs = {k: subprocess.Popen([sys.executable, __file__, "work", str(k), str(j)]) for k in range(j)}
+    if j == 0:                                      # gather: nothing to replay
+        procs = {}
     while procs:
         for k, p in list(procs.items()):
             r = p.wait()
@@ -189,7 +191,7 @@ def collect(j, resume=False):
     fns = fallcov.functions()
     for p in sorted(glob.glob(os.path.join(fallcov.COV, "*.cov"))):  # the batch runs
         base = os.path.basename(p)[:-4]
-        if base.startswith(("play_", "fuzz_")):
+        if base.startswith(("play_", "fuzz_", "call_")):
             continue
         _meta, m = fallcov.load_cov(p)
         eps.append({"id": "cov/" + base, "kind": "explore", "exact": True,
@@ -197,12 +199,29 @@ def collect(j, resume=False):
                     "tokens": ["cmd:explore", "from:save_" + base],
                     "functions": ["%X" % va for va, _n, _g, _k in fns
                                   if fallcov.LO <= va < fallcov.HI and m[va - fallcov.LO]]})
+    for p in sorted(glob.glob(os.path.join(ROOT, "build", "call", "sweep_*.jsonl"))):  # direct calls
+        for line in open(p):
+            r = json.loads(line)
+            if not r.get("ran"):
+                continue
+            toks = {"cmd:call", "called:" + r["va"]} | {
+                "file:" + os.path.basename(x.replace("\\", "/")).lower() for x in r.get("files", [])}
+            if r.get("shot"):
+                toks.add("drew")
+            if r.get("returned") is False:
+                toks.add("no-return")
+            eps.append({"id": "call/" + r["va"], "kind": "call", "exact": True,
+                        "label": "direct call of func_%s(%s)%s" % (
+                            r["va"].zfill(8), ", ".join("%X" % x for x in r.get("args", [])),
+                            ", drew " + r["shot"] if r.get("shot") else ""),
+                        "tokens": sorted(toks), "functions": r["ran"]})
     with open(os.path.join(OUT, "episodes.jsonl"), "w") as f:
         for e in eps:
             f.write(json.dumps(e) + "\n")
-    print("%d episodes (%d play, %d fuzz, %d explore), %d not exact replays" % (
+    print("%d episodes (%d play, %d fuzz, %d explore, %d direct calls), %d not exact replays" % (
         len(eps), sum(e["kind"] == "play" for e in eps), sum(e["kind"] == "fuzz" for e in eps),
-        sum(e["kind"] == "explore" for e in eps), sum(not e["exact"] for e in eps)))
+        sum(e["kind"] == "explore" for e in eps), sum(e["kind"] == "call" for e in eps),
+        sum(not e["exact"] for e in eps)))
 
 
 # ---- static evidence -------------------------------------------------------------------------
@@ -253,6 +272,8 @@ def strings_at(addrs):
 # ---- analysis --------------------------------------------------------------------------------
 def analyze():
     import fallcov
+    import names as namesmod
+    known = namesmod.by_address()
     eps = [json.loads(line) for line in open(os.path.join(OUT, "episodes.jsonl"))]
     N = len(eps)
     fns = fallcov.functions()
@@ -301,13 +322,13 @@ def analyze():
         s = ran.get(va, set())
         d = st.get(va, {"calls": set(), "globals": set()})
         rows.append({
-            "va": "0x%08X" % va, "name": name, "unit": group, "kind": kind,
+            "va": "0x%08X" % va, "name": known.get(name, name), "unit": group, "kind": kind,
             "episodes": len(s), "share": "%.3f" % (len(s) / N),
             "cluster": cid.get(va, ""),
             "features": "; ".join("%s (%d, x%.1f)" % (t, n, l) for t, n, l in assoc(s)) if s and len(s) < N * 0.8 else ("always" if s else ""),
             "examples": " | ".join(examples(s)) if s and len(s) < N * 0.8 else "",
-            "callers": " ".join(sorted("%X" % c for c in callers.get(va, ())))[:200],
-            "callees": " ".join(sorted("%X" % c for c in d["calls"]))[:200],
+            "callers": " ".join(sorted(known.get("func_%08X" % c, "%X" % c) for c in callers.get(va, ())))[:300],
+            "callees": " ".join(sorted(known.get("func_%08X" % c, "%X" % c) for c in d["calls"]))[:300],
             "strings": " | ".join(repr(strs[g])[1:-1][:60] for g in sorted(d["globals"]) if g in strs)[:400],
         })
     with open(os.path.join(OUT, "functions.csv"), "w", newline="") as f:
@@ -357,10 +378,13 @@ def main():
     w.add_argument("k", type=int)
     w.add_argument("n", type=int)
     sub.add_parser("analyze")
+    sub.add_parser("gather", help="rebuild episodes.jsonl from the replays already made, plus calls")
     a = ap.parse_args()
     if a.cmd == "collect":
         import fallemu
         collect(fallemu.workers(a.j), a.resume)
+    elif a.cmd == "gather":
+        collect(0, resume=True)
     elif a.cmd == "work":
         work(a.k, a.n)
     else:

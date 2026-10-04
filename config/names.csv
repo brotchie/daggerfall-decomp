@@ -1,25 +1,302 @@
 kind,address,name,confidence,evidence
-global,0x00195AA4,player_object,confirmed,"pointer to the player's world object: x/y/z ints at +7/+11/+15 move the player (fallplay tp); the character record is at +0x1CF"
-global,0x00195BE0,player_character,confirmed,"pointer to the player character record (= player_object + 0x1CF): name, attributes, level, gold, magicka in every save (docs/state.md)"
+global,0x0012AC00,mouse_buttons,strong,byte: mouse button state; inventory_frame and transport_menu act when it is set and was not last frame
+global,0x0012AC04,mouse_x,strong,"short: mouse x in game pixels, hit-tested against the inventory button rects (clicks confirmed)"
+global,0x0012AC06,mouse_y,strong,short: mouse y in game pixels
+global,0x00143550,screen_buffer,strong,pointer to the 320-wide 8-bit frame buffer every inventory blit writes (y*320+x)
+global,0x001788DF,trade_price_scale,candidate,"price factor /256 set by guild services (rank discount), reset to 256 at close"
 global,0x001789FA,player_environment,confirmed,"1 outside, 2 inside a building, 3 dungeon or palace: constant across 16 states in 3 groups (docs/state.md)"
+global,0x0017D22A,item_templates,strong,"288 item templates of 48 bytes ('Ruby' first): name, weight, condition, value, pictures; item_init_from_template refuses idx >= 288"
+global,0x00180B3A,potion_recipes,candidate,"potion recipe table, 109-byte entries; a potion's type-31 child is a copy; value at +8"
+global,0x00185F88,item_group_templates,candidate,"per item group, a -1-ended list of template indices (index within group -> template)"
+global,0x00186A64,disease_table,candidate,disease_infect copies a 47-byte record from here + id*47
+global,0x00187CA8,world_running,candidate,byte cleared when the inventory opens and set at close; ai_update_creatures returns while it is 0
+global,0x00187FDC,next_record_id,candidate,goes up by one when disease_infect allocates an effect record (fallcall)
+global,0x0018822C,item_group_tab,strong,"29 bytes: item group -> inventory tab (2,2,0,0,1,1,2.. 14-22 -> 3); matches where items sit in save_tlalac_s"
+global,0x00188281,inv_mode_buttons,strong,"5 trade modes x 7 buttons {x0,y0,x1,y1,handler}: WAGON INFO EQUIP REMOVE USE GOLD EXIT in mode 0; dumped from memory, each handler confirmed by a click"
+global,0x00188425,inv_buttons,strong,"45 buttons {x0,y0,x1,y1,handler}: 0-11 slots, 12 paper doll, 27-36 list rows, 37-40 scroll, 41-44 tabs"
+global,0x00188641,transport_buttons,strong,"5 buttons of the transport menu: FOOT, HORSE, CART, SHIP (transport_choose), EXIT"
+global,0x0018DBFC,frame_checkpoint,strong,main()'s loop sets 0-3 around its calls and game_frame sets 98-107 between its steps: a where-are-we marker (for crash reports?)
+global,0x0018E044,book_list,candidate,"{u16 id, u16 level} per book found by books_scan"
+global,0x00190504,creature_list,candidate,creature objects processed by ai_update_creatures (the player appended at the end each frame)
+global,0x0019597C,right_hand_ready_delay,candidate,accumulates the ready time of a changed right-hand weapon (inv_track_hand_weapons); >0 at close gives 'Equipping %it'
+global,0x00195980,left_hand_ready_delay,candidate,same for the left hand (equipped[21])
+global,0x001959AC,frame_counter,confirmed,main()'s loop does D_001959AC++ once per iteration (src/hand/func_00010010.c); rises ~119 per 400 timer ticks
+global,0x001959D8,inventory_containers,confirmed,"5 container objects (record type 52) under player_entity: tabs 0 weapons/armor, 1 magic items, 2 clothing/misc, 3 ingredients, 4 wagon; exp: tab click lists inventory_containers[tab]"
+global,0x001959E8,wagon_container,confirmed,inventory_containers[4]: exp: WAGON lists it on the right; capacity 3000 (750 kg) and '%s / 750'
+global,0x00195A80,text_macro_item,candidate,"item record the %it text macro reads ('Equipping %it', item info)"
+global,0x00195A9C,current_building,candidate,"record of the building/shop: +0x18 type (11 guild hall), +0x19 quality used in prices, repair and shop messages"
+global,0x00195AA0,player_entity,confirmed,"pointer to the player's creature entity: the character record is at +0x47 (2 saves), +0x40 points to the world object; disease code checks entity+71 == player_character"
+global,0x00195AA4,player_object,confirmed,pointer to the player's world object: x/y/z ints at +7/+11/+15 move the player (fallplay tp); player_entity+0x40 points to it
+global,0x00195ACC,text_macro_potion,candidate,potion recipe the %po macro reads ('Recipe for %po.')
+global,0x00195B14,creature_count,strong,active creatures: ai_update_creatures loops over them; inv_use_item says 'There are no monsters nearby.' when 0
+global,0x00195B20,inv_right_container,confirmed,"container listed on the right (ground pile, wagon, shop or trade pile); exp: WAGON set it to the wagon and back at close"
+global,0x00195B34,inv_right_container_base,candidate,the container the right list was opened with (ground pile or shop container); trade totals sum it
+global,0x00195BE0,player_character,confirmed,"pointer to the player character record (= *player_entity + 0x47): name, attributes, level, gold, magicka in every save (docs/state.md)"
+global,0x00195BEC,player_class,strong,"the class (career) record inside the character (player_character+0x230): item_forbidden_for_class reads +0x0B forbidden materials and +0x0E forbidden armor/shield/weapon bits (message 1068); disease/poison code reads immunity bits at +0x01, which fit class advantages"
+global,0x00195BF4,game_minutes,candidate,repair due times are now + days*1440 and shown as '%d days'; 1714189 in save_tlalac_s
+global,0x00195D2C,trade_total,candidate,"trade total shown at (77,15) on trade screens; set by trade_total_*"
+global,0x00195D30,trade_price,candidate,price after trade_adjust_price; paid or received when the offer is accepted
+global,0x00195D38,trade_mode,strong,"0 inventory, 1 buy, 2 sell, 3 repair, 4 identify: selects the button set D_00188281[mode], the trade total and payment; callers pass 4 for the identify spell and guild identify"
+global,0x00195D40,magic_def_count,strong,number of magic.def entries (first dword of magic.def)
+global,0x00195D44,inventory_action,confirmed,"1 info, 2 equip/select, 3 remove, 4 use, 5 hide; exp: INFO/EQUIP/REMOVE/USE set 1/2/3/4; 2 when the inventory opens"
+global,0x00195D4C,magic_def,strong,"magic.def entries (name, kind, enchantment pairs, condition, value, material) read by magic_def_load"
+global,0x00195EB0,key_map,strong,"action -> scan code table (action 27 travel map = W, 12 rest = R, 24 logbook, 26 automap); matches Options > CONTROLS (travel play agent)"
+global,0x00195F22,book_count,candidate,u16 number of books found by books_scan
+global,0x00196268,current_region,candidate,byte: index into the per-region price table D_0018F092 (80-byte entries); 16 in save_tlalac_s
+global,0x0019626F,game_mode_under_popup,candidate,mode a popup (game_mode 8) returns to: inventory_open treats 4 under 8 as open
 global,0x00196274,game_mode,strong,"which screen has the input: 0 world, 3 sheet, 4 inventory, 5 spellbook, 7 options, 14 logbook, 16 rest, 19 travel map; same from 3 saves (fallstate screens); hand code already calls it MODE"
 global,0x00196276,interaction_mode,strong,"0 grab F2, 1 info F3, 2 steal F1, 3 talk F4; same from 3 saves (fallstate modes)"
-global,0x00195EB0,key_map,strong,"action -> scan code table (action 27 travel map = W, 12 rest = R, 24 logbook, 26 automap); matches Options > CONTROLS (travel play agent)"
-global,0x001959AC,game_clock,candidate,"dword rising ~119 per 400 timer ticks in the world, larger in older saves; +2757 over an interrupted 1-hour rest; a 12-hour jump did not change the sky in 300 ticks"
+global,0x00196279,mouse_buttons_prev,candidate,byte: mouse state of the previous frame (transport_menu copies mouse_buttons into it); click handlers need it clear
+global,0x00196288,inv_right_icon,strong,"byte: picture of inve16i0.cif shown for the right container: 2 ground at open, 3 wagon after WAGON (exp)"
+global,0x001962AB,forced_material,candidate,"byte: when set, the next rolled material is n-1 (then cleared)"
+global,0x001AA41C,inventory_images,strong,"inventory_load_images stores 8 image handles here, one per inve*.img/cif it opens (fallcall)"
+global,0x001AA45C,inv_temp_pile,strong,"loot pile object (type 33, treasure texture 216, at the player) made by inventory_open; freed at close when empty"
+global,0x001AA53C,inv_ground_pile,candidate,right container saved at open; inv_wagon_button switches back to it
+global,0x001AA548,inv_right_rows,strong,4 item pointers shown in the right rows (D_001AA534 is the 10-entry base used by inv_click_list_row; [9] = right header)
+global,0x001AA55C,inv_selected_item,confirmed,item object last clicked (list row or slot); exp: set by the clicks
+global,0x001AA560,inv_left_scroll,strong,first visible row of the left list (scroll buttons 37/38)
+global,0x001AA564,inv_right_scroll,strong,first visible row of the right list (scroll buttons 39/40)
+global,0x001AA568,inv_left_rows,strong,5 item pointers: visible left rows 0-3 and [4] the header cell; exp: read back the spellbook and the item listed
+global,0x001AA57C,inv_left_container,confirmed,container listed on the left (a tab or the wagon); exp: tab click sets it to inventory_containers[tab]
+global,0x001AA584,inv_right_count,strong,short: items in the right list
+global,0x001AA58A,inv_left_count,strong,"short: items in the left list; exp: 0 for the weapons tab (all worn), 2 for magic items"
+global,0x001AA5F7,trade_offer_pending,candidate,"byte set by trade_make_offer, cleared by trade_settle_offer"
+global,0x001AA5F9,inv_tab,confirmed,byte: selected tab 0-3; exp: 1 after clicking MAGIC ITEMS
+field,character+0x00,name,confirmed,32-byte name: Dafydd gen orbo (save_blades)
+field,character+0x16F,equipped,confirmed,"27 item pointers by slot (0-1 amulets, 2-3 bracelets, 4-5 rings, 6-7 bracers, 8-9 marks, 10-11 crystals, 12 head, 13 right pauldron, 14/16 cloaks, 15 left pauldron, 17 chest clothes, 18 cuirass, 19 right hand, 20 gauntlets, 21 left hand, 23 greaves, 24 legs clothes, 26 boots); save read + exp REMOVE/EQUIP"
+field,character+0x1BB,right_hand,strong,equipped[19]: weapons; inv_track_hand_weapons watches it
+field,character+0x1C3,left_hand,strong,equipped[21]: shields and off-hand weapons
+field,character+0x1F2,original_race,candidate,byte: race before vampirism/lycanthropy (1 in save_kralvamp and save_kralwolf whose race is 8/9); clothing images use it when race > 7
+field,character+0x20,attributes,confirmed,8 x u16 STR INT WIL AGI END PER SPD LUC as on the sheet
+field,character+0x220,hidden_load_percent,candidate,byte: hidden items' weight as % of equip_hiding_capacity (inv_update_hidden_load)
+field,character+0x2CC,effects_list,candidate,disease_infect links its new 47+71-byte record (type 11) at the head of this list
+field,character+0x30,base_attributes,candidate,"8 x u16, a second attribute set (85 100 75 70 80 65 80 70 in save_blades)"
+field,character+0x40,gender_flags,candidate,"bit 0 female: men's clothing (group 6) refused when set, women's (12) when clear; item generation picks 6 or 12 by it"
+field,character+0x41,transport_flags,strong,"bit 1 riding a horse, bit 2 a cart: transport_choose sets/clears them (FOOT clears both); exp ran the handler"
+field,character+0x43,race,confirmed,"byte: 8 vampire (save_kralvamp), 9 werewolf (save_kralwolf); >8 blocks the inventory: exp F6 in save_kralwolf gave 'You cannot access the inventory while shapechanged...'"
+field,character+0x44,armor_values,confirmed,"7 signed bytes, one per body part, drawn as (100-v)/5; exp: removing the helm changed [0] from -10 to 75"
+field,character+0x5C,max_health_base,candidate,"u16 = max health in 3 saves (also +0x7C, +0x7E)"
+field,character+0x78,ship_owned,candidate,"u32: high word 992/993 (save_tlalac_s, save_blades, save_kralwolf), 0 in two saves; enables SHIP in the transport menu"
+field,character+0x7C,max_health,strong,u16 = the sheet's max health in 3 saves; current health is elsewhere
+field,character+0x81,level,confirmed,"byte: 21, 13, 20 = the sheet's level in 3 saves"
+field,character+0x85,gold,confirmed,i32 gold coins: +5000 per gold cheat in 2 saves; writing it changes gold shown and encumbrance by the coins' weight
+field,character+0x8A,equip_effect_flags,confirmed,"bit 1 spells absorbed (enchantment 9): exp: 6 -> 4 when the amulet came off, back to 6 when re-equipped"
+field,character+0x8D,magicka,strong,u16 = 28 in morthag1 (sheet 28/160)
+field,character+0x8F,max_magicka,strong,u16 = 160 in morthag1
+field,character+0x9D,skills,strong,"35 x 6 bytes, u16 value first: Mercantile (14) at +0xF1 in prices, Pickpocket (15) at +0xF7 in shop theft, enchantment 10 adds 15 to skill[param]"
+field,entity+0x47,character,confirmed,player_character = player_entity + 0x47 in 2 saves; disease code: entity+71 == player_character
+field,item+0x00,name,confirmed,"32 bytes: 'Amulet of Spring's Dawn', 'Helm' (save_tlalac_s); %it text"
+field,item+0x20,group,confirmed,"u16 item group: 2 armor, 3 weapons, 6/12 clothing, 7 books, 14 gems, 25 jewellery, 27 misc, 28 gold; equipped items' groups fit their slots in save_tlalac_s"
+field,item+0x22,index,confirmed,"u16 index within the group: helm 5, greaves 2, boots 6, pauldrons 3/4 in save_tlalac_s, as inv_equip_item maps them"
+field,item+0x24,value,strong,u32 base value; gold pieces' amount; trade totals and identify cost (value*25/256)
+field,item+0x2A,item_flags,strong,"u16: 0x20 identified, 0x40 hidden, 0x800 artifact (artifacts in save_tlalac_s and item_make_artifact set 0x820), 0x4 one-handed?"
+field,item+0x2C,condition,confirmed,"u16 current condition: 795 of 800 etc. in save_tlalac_s; item_damage lowers it, item_break at 0"
+field,item+0x2E,max_condition,confirmed,u16 maximum condition (save_tlalac_s); repair stops there
+field,item+0x31,stack_count,strong,"byte: arrows in a stack (max 199, drawn as '%d'); potion recipe index for recipes"
+field,item+0x32,inventory_image,strong,u16 archive<<7|record of the picture inv_draw_item_image draws
+field,item+0x34,dropped_image,candidate,u16 picture given to the world object when the item is dropped
+field,item+0x36,material,candidate,byte: weapon/armor material rolled by item_roll_material; class forbidden-materials mask bit
+field,item+0x37,armor_type,candidate,byte: 0 leather 1 chain 2 plate (item_roll_armor_type); equip sound 231+n; class armor mask bit 6+n
+field,item+0x38,color,candidate,byte: dye / palette remap row used when drawing (material+16 for metal)
+field,item+0x39,weight,candidate,"u32 from the template, scaled by material"
+field,item+0x3F,message,candidate,"book id (books\\bok%05d.txt), letter/spell id"
+field,item+0x43,enchantments,strong,"10 x {u16 type, u16 param}, type -1 ends: 0 cast when used, 1 cast when held, 3 extra spell points, 8 repairs, 9 absorbs spells, 10 +skill, 15 soul bound, 26 artifact special; the amulet's (3,0,9,8) changed character+0x8A on unequip"
+field,object+0x00,record_type,strong,"byte: 2 item, 3 character, 9 spell, 20 soul, 31 potion recipe, 33 loot pile, 52 item container, 54 item in repair/sold pile (read in save_tlalac_s; code tests)"
 field,object+0x01,angle_x,strong,"player object: short; yaw is +0x03 (2048 to a turn, clockwise from north)"
 field,object+0x03,yaw,confirmed,"player object: short, 2048 to a turn, clockwise from north; the camera follows the game's own turning only"
-field,object+0x05,angle_z,candidate,"player object: short next to the yaw"
+field,object+0x05,angle_z,candidate,player object: short next to the yaw
 field,object+0x07,x,confirmed,"player object: int, 1/40 m, east"
 field,object+0x0B,y,confirmed,"player object: int, 1/40 m, height"
 field,object+0x0F,z,confirmed,"player object: int, 1/40 m, north"
-field,object+0x1CF,character,confirmed,"player object: the character record starts here (player_character points at it)"
-field,character+0x00,name,confirmed,"32-byte name: Dafydd gen orbo (save_blades)"
-field,character+0x20,attributes,confirmed,"8 x u16 STR INT WIL AGI END PER SPD LUC as on the sheet"
-field,character+0x30,base_attributes,candidate,"8 x u16, a second attribute set (85 100 75 70 80 65 80 70 in save_blades)"
-field,character+0x5C,max_health_base,candidate,"u16 = max health in 3 saves (also +0x7C, +0x7E)"
-field,character+0x7C,max_health,strong,"u16 = the sheet's max health in 3 saves; current health is elsewhere"
-field,character+0x81,level,confirmed,"byte: 21, 13, 20 = the sheet's level in 3 saves"
-field,character+0x85,gold,confirmed,"i32 gold coins: +5000 per gold cheat in 2 saves; writing it changes gold shown and encumbrance by the coins' weight"
-field,character+0x8D,magicka,strong,"u16 = 28 in morthag1 (sheet 28/160)"
-field,character+0x8F,max_magicka,strong,"u16 = 160 in morthag1"
+field,object+0x15,object_flags,strong,"u16: 0x20 not owned (unpaid shop goods: 'You do not own this item.'), 0x02 not listed; loot piles get 0x05"
+field,object+0x17,owner,candidate,u16: shop owner id; the right list in a shop shows items whose owner is D_00195D54
+field,object+0x1B,world_image,candidate,u16 archive<<7|record for the object in the world; a dropped item gets item+0x34; loot pile 216<<7|n
+field,object+0x1F,record_id,candidate,"u32 save-tree id; 8EB88 makes new ones, high word = block (100 for carried items)"
+field,object+0x26,quest_id,candidate,byte: quest the item belongs to; quest items get a highlighted cell and quest letter text
+field,object+0x2B,repair_due,strong,u32 game minutes when an item in repair (type 54) is ready: 'DONE' or '%d days' (minutes/1440)
+field,object+0x33,twin,candidate,pointer to a linked object that shares the record id (item_sync_twin_id)
+field,object+0x37,next,confirmed,pointer to the next sibling: walked the character's containers and items in save_tlalac_s
+field,object+0x3F,children,confirmed,pointer to the first child (containers -> items); walked in save_tlalac_s
+field,object+0x43,parent,confirmed,pointer to the parent: items -> their tab container -> player_entity -> player_object (player_entity+0x43 = player_object in save_tlalac_s; +0x40 is misaligned there)
+field,object+0x47,record_data,strong,record data (item or character) follows the 71-byte header: player_character = player_entity + 0x47
+func,0x00010010,main,strong,"entry from the C runtime with (argc, argv); setup, then the endless frame loop that calls game_frame and bumps frame_counter"
+func,0x0001025B,game_frame,strong,main()'s loop calls it once per iteration with no arguments; updates the world (frame_checkpoint 98-107 inside)
+func,0x0001D739,faction_rumor_text,candidate,faction.c; opens rumor.dat; direct call (all-zero args) shows a rumour about a faction; called by func_00044EE0
+func,0x0001F15D,tavern_rent_room,strong,tavern.c; direct call (all-zero args) shows 'for how many days will you require the room?'
+func,0x000245EF,career_background_summary,strong,"career.c; biog%02dt0.txt, bio.dat, class*.cfg, namegen.dat; direct call (all-zero args) shows 'Your reputation has changed as follows'"
+func,0x000255B7,career_show_biography,strong,"career.c; bio.dat, lgbk00i0.img; direct call (all-zero args) shows the character's biography page"
+func,0x0002F369,damage_collapse_exhausted,strong,"damage.c; direct call (all-zero args) shows 'You drop to the ground, completely exhausted...'; called by func_0002F02C"
+func,0x0002FA97,play_death_video,strong,damage.c; opens anim0012.vid; a direct call shows the funeral cutscene (fallcall)
+func,0x00037856,spellmaker_enter_name,strong,spells.c; direct call (all-zero args) shows 'Enter spell name'
+func,0x00039C09,spells_pick_list,candidate,"spells.c; opens spells.std; direct call (all-zero args) shows a spell list window; called by func_00039F94, func_00039FD6"
+func,0x0003A325,intro_play_logo,strong,intro.c; opens anim0001.vid; direct call (all-zero args) shows 'Bethesda Softworks presents'; called by main
+func,0x0003A3CE,title_menu,strong,intro.c; pick03i0.img; direct call (all-zero args) shows Load Saved Game / Start New Game / Exit; called by main
+func,0x0003AF3F,intro_play_movie,strong,"intro.c; opens anim0000.vid (also anim0011.vid, dag2.vid); direct call (all-zero args) shows the opening cinematic; called by title_menu"
+func,0x0003C9C1,training_offer,strong,sheet.c; direct call (all-zero args) shows 'Training will cost you ... gold. Do you wish to receive training?'; called by func_0006DC35
+func,0x000445B5,options_joystick_calibrate,strong,"options.c; cnfg04i0.img, cnfg05i0.cif, cnfg06i0.img; direct call (all-zero args) shows the joystick calibration window"
+func,0x00044EE0,show_rumor,candidate,kludge.c; opens rumor.dat; direct call (all-zero args) shows a rumour; calls faction_rumor_text
+func,0x00045B7F,pick_gold,candidate,kludge.c; string 'Picking from %s.'; direct call (all-zero args) shows 'You picked N gold pieces'
+func,0x0005DE74,item_init_from_template,strong,"fills an item record from item template idx (D_0017D22A, 48 bytes each, 288 of them, 'Invalid index requested %d -> %d'): name, group/index, value, flags, condition, images, weight; then per-group rolls (clothing style, material, armor type, arrows 1-20, books, paintings); ran entering shops (cmd:enter x15.8) and in dungeons"
+func,0x0005E37F,item_make_in_range,candidate,"item_make with the index random in [lo,hi] (magic items, artifacts and maps special-cased); callers kludge.c, guilds.c, moninit.c"
+func,0x0005E450,item_make_random,strong,"random index of a group from its template list (D_00185F88[group], -1 end) then item_init_from_template; 5 artifact, 4 magic item, 11 map special; called by all loot/stock makers; ran on shop entry and dungeon loot"
+func,0x0005E540,item_make,strong,"item of a given group and index: D_00185F88[group][index] -> item_init_from_template; group 4 -> item_make_magic, 5 -> item_make_artifact, 11 -> map (template 287 as group 27 index 8); 29 callers (arrows 3/18, gold 28/0, spellbook 27/0, soul trap 27/1)"
+func,0x0005E5D7,item_set_race_image,candidate,"adds D_00186589[race]<<7 to item+0x32 (race-specific clothing pictures), using original_race when race > 7; called from item_init_from_template with character+0x43"
+func,0x0005E636,item_roll_style,candidate,armor/clothing: random picture variant (item+0x32 += rand) and random dye (item_roll_dye); clothing index pairs get +1
+func,0x0005E722,item_next_clothing_style,candidate,"steps a clothing item's picture to its next variant (tables D_00185FFC women's, D_0018606B men's); inv_use_item calls it for groups 6/12 (USE changes how it is worn)"
+func,0x0005E7FC,item_first_clothing_style,candidate,rewinds a clothing picture to the first variant of its article; the paper doll (char.c 58E15) draws cloaks this way; ran with F5/F6 screens
+func,0x0005E874,item_roll_material,candidate,"weapon/armor material from a level- and shop-quality-weighted roll (D_00186591), scales value, weight, condition and enchantment points by material tables, color = material+16"
+func,0x0005EA8F,item_roll_armor_type,candidate,"armor: 70% leather (weight halved), 20% chain, 10% plate (+material roll); value scaled; picture via armor_image_for_type"
+func,0x0005ED19,item_roll_dye,candidate,"75%: item+0x38 color = rand 1-10, special dye tables for some clothing"
+func,0x0005EE0C,loot_fill_from_list,candidate,"makes items from a group/chance list D_00186483[n] into a container (owned flag when n >= 0), books via loot_add_books; caller click.c 74ECA"
+func,0x0005F0A0,item_group_has_styles,candidate,"1 for groups 2, 6, 12 (armor and clothing)"
+func,0x0005F0E8,loot_add_books,candidate,"(level+3)/5 books (group 7), not owned, at the player"
+func,0x0005F1BD,shop_stock_magic,candidate,"quality/2+1 magic items (item_make_magic), a spellbook, optional soul traps (25% filled: soul_trap_add_soul, value 5000+soul); caller guilds.c 6F673"
+func,0x0005F401,shop_stock_soul_traps,candidate,"quality/2+1 soul traps (27/1), 25% with a soul; caller guilds.c 70715"
+func,0x0005F50B,painting_draw,candidate,loads %cpaint.cif (letter from D_00195DC4>>3) and draws frame D_00195DC4&7 centred at y 50; caller text.c
+func,0x0005F5E7,item_info_painting,strong,"seeds from item+0x3F, reads a 40-byte paint.dat entry, picks subject/description ids 6100-6400 and shows message 250; inv_item_info calls it for group 13 (paintings); and equip.c; opens paint.dat; direct call (all-zero args) shows a painting with its title"
+func,0x0005F6E9,pick_random_byte,candidate,random entry of a byte list ended by 0xFF (at most 10)
+func,0x0005F75B,item_init_book,strong,"picks a book id (book_pick_random) into item+0x3F, reads books\\bok%05d.txt header and sets value 300-800 from its seed; called by item_init_from_template for group 7"
+func,0x0005F81F,books_scan,strong,"finds books\\bok*.txt and records each id and level in D_0018E044, count D_00195F22; caller init.c"
+func,0x0005F955,book_pick_random,candidate,random index among the books whose level (D_0018E046) is <= a1
+func,0x0005FA0E,loot_generate,candidate,"loot table D_0018642F[n]: gold (group 28) = level*rand(min,max), then groups 2-14 with chances (halving per extra item), 3% potion, 2% (45A1D) extra; callers 5FE55, click.c 7461D, moninit.c 78566; 7 dungeon episodes"
+func,0x0005FD36,equip_hiding_capacity,candidate,"sums capacity over equipped items: +10 for some group-1 items (D_00186583), armor (D_00186578 when a1) and clothing (D_0018654F) by index; inv_toggle_hidden compares hidden weight with it"
+func,0x0005FE55,loot_fill_container,candidate,"fills an empty container with loot_generate by dungeon type (D_00195BDC+0x22) or building type, plus maps, potions, extras; caller click.c 76460"
+func,0x0005FFE5,loot_add_gold,candidate,"adds gold pieces (group 28 index 0) worth rand(a2,a3)*level at a container's position"
+func,0x0006007C,loot_add_ingredient,candidate,adds a random item of a group from D_0018661E = groups 15-22 (ingredients)
+func,0x00060100,loot_add_misc_item,candidate,"adds a random item of a group from D_00186626 = groups 6, 9, 1, 12"
+func,0x00060184,loot_add_item_of_group,candidate,adds a random item of group a2 at a container's position
+func,0x000601ED,item_wear_from_hit,candidate,lowers condition by (n*10+50)/100 (20% chance of 1 when 0) and breaks it at 0; caller qkey.c 2D62F
+func,0x00060270,item_damage,strong,"lowers item condition by n, item_break when it runs out; callers combat damage (damage_0002FC03), enchantment ticks (disease_000680DD), inv_use_item (10 per cast), item_apply_equip_effects; 55 episodes, dungeon/combat"
+func,0x000602C0,armor_image_for_type,candidate,"picture record for armor type (0 leather 1 chain 2 plate) and armor index, -1 if none"
+func,0x00060430,item_make_magic,strong,"random (or given) non-artifact magic.def entry: base item of its kind, name, enchantments copied, condition, material; value from 5879B (itemmakr.c); group 4 of item_make"
+func,0x0006077F,item_make_artifact,strong,"magic.def artifact entry: base item, name, enchantments, value, sets item flags |= 0x820 (artifacts in save_tlalac_s carry 0x820), artifact-specific pictures; group 5 of item_make"
+func,0x00060FC3,magic_def_load,strong,"reads magic.def: count into D_00195D40, entries into D_00195D4C; caller init.c"
+func,0x0006103A,shop_generate_stock,strong,"fills a shop container with items from per-shop-kind lists (D_00186639..D_001868D9), owner +0x17 = a5, chance halving per extra item; ran on entering shops (cmd:enter x44.2, env1:building); caller engsupp.c"
+func,0x000612A1,shop_count_stock,candidate,counts items in D_0019615F owned by D_00195D54 and moves them all to the player's position
+func,0x00061326,soul_trap_add_soul,candidate,adds a soul record (type 20) with a random monster that has a soul value (D_00187966) to a soul trap
+func,0x00061398,shop_stock_potions,candidate,"quality+1 potions: glass bottle (1/1) with a random recipe (type-31 child copied from D_00180B3A, 109 bytes), not owned; caller guilds.c 6F55F"
+func,0x000614A9,potion_random_recipe,candidate,random index into the potion recipe table D_00180B3A (until a zero value)
+func,0x000614FB,loot_add_potion,candidate,one potion with a random recipe at the player (loot_generate 3%)
+func,0x000615E0,ai_creature_think,strong,"per creature: chooses the action against its target (62700 actions 0/8/24/32/48/57/59), faces it (ai_turn_toward), attack timers (+0x74), flee/keep distance; called by ai_update_creatures; 37 dungeon/combat episodes (x5.9). Belongs to monster.c (past equip.c's last ref 0x614FB)"
+func,0x00061CBC,ai_pick_target,candidate,"scores the other creatures (different faction +0x229, +5 untargeted, +20 in sight, closeness) and returns the best index, -1 if none worth it; 24 combat episodes. monster.c"
+func,0x00061E9B,ai_update_creatures,strong,"per frame while world_running and creature_count>0: appends the player to the creature list, matches targets (ai_pick_target), runs ai_creature_think for each type-18 creature; 426 episodes; caller main loop 1025B. monster.c"
+func,0x00062229,ai_turn_toward,candidate,"turns object yaw (+0x03) toward an angle in steps of 64, returns 1 while turning"
+func,0x0006228A,ai_turn_away,candidate,turns object yaw toward angle+1024 in steps of 32
+func,0x00065937,disease_infect,strong,"(entity, list, disease id, skip resistance): never level 1, resistance roll, allocates a type-11 effect record from disease_table; a direct call on the player links it to character+0x2CC (fallcall)"
+func,0x00065A8C,poison_apply,candidate,"mirror of disease_infect for poison ids >= 128 (immunity bit 2, a type-11 record from the table at D_00186D83)"
+func,0x000684E9,shrine_donation,candidate,disease.c; direct call (all-zero args) shows 'The current amount in the shrine is 0 gold' with buttons
+func,0x000687C5,trade_counter_offer,strong,trade.c; direct call (all-zero args) shows 'Enter counter offer'; called by func_000685EC
+func,0x0006BE24,bank_deposit_letters_of_credit,candidate,bank.c; direct call (all-zero args) shows 'Am I to understand that you would like to deposit all of your letters of credit?'; no direct caller
+func,0x0006C0F7,bank_buy_house,candidate,"bank.c; direct call (all-zero args) shows 'it is a seller's market for houses, there are none available'; no direct caller"
+func,0x0006C153,bank_sell_house,candidate,bank.c; direct call (all-zero args) shows 'We would gladly purchase your house for the generous sum of ... gold'; no direct caller
+func,0x0006C1C9,bank_buy_ship,candidate,"bank.c; direct call (all-zero args) shows 'You already own a ship, you must sell it before you can buy another'; no direct caller"
+func,0x0006C225,bank_sell_ship,candidate,bank.c; direct call (all-zero args) shows 'Your ship is worth ... gold'; no direct caller
+func,0x0006C818,bank_house_bought,strong,"bank.c (strings Crossing, region names); direct call (all-zero args) shows 'Congratulations! You have purchased a lovely home here in Crossing'; no direct caller (a handler)"
+func,0x0006C924,bank_ship_bought,candidate,bank.c; direct call (all-zero args) shows 'Congratulations! You have purchased a ...' ship; no direct caller
+func,0x0006DC35,guild_service_dispatch,candidate,"calls guild_donate, guild_heal, training_offer"
+func,0x00070D48,guild_donate,strong,guilds.c; direct call (all-zero args) shows 'Donate how much money'; called by func_0006DC35
+func,0x00071518,guild_heal,strong,guilds.c; direct call (all-zero args) shows 'You are healed'; called by func_0006DC35
+func,0x0008A344,spell_recall_prompt,strong,spfx.c (spell effects); direct call (all-zero args) shows 'Do you wish to Teleport or Set an Anchor?' (the Recall effect)
+func,0x00090426,potion_make,strong,potions.c; string 'You do not have the ingredients required.'; direct call (all-zero args) shows that message
+func,0x0009063D,chargen_name_character,strong,"generate.c; tamriel.img, char00i0.img, face%d%di0.cif; direct call (all-zero args) shows 'Name thyself'"
 func,0x00092349,inventory_load_images,strong,"runs with F6 (x17.7); its strings are the inventory screen images inve00i0.img .. inve07i0.img, shop00i0.img"
+func,0x00092476,inventory_free_images,confirmed,frees the same image handles (inven.c lines 322-334) and poisons them with 0x97979797; exp: called once by EXIT
+func,0x000926AD,inventory_open,confirmed,"(how 0 key/1 fresh/2 given container, trade_mode, right icon): with how=0 opens on key action 37; refuses if race>8 ('You cannot access the inventory while shapechanged...', seen in save_kralwolf); creates the ground pile, sets game_mode=4; exp: F6 -> game_mode 0->4; callers sheet/HUD icon (1,0,2), identify spell (1,4,8)"
+func,0x00092903,inventory_frame,strong,"called every frame from the main loop: opens via inventory_open(0,0,2), redraws, settles a pending trade payment by trade_mode, then hit-tests the per-mode button table D_00188281 and the 45-button table D_00188425 against mouse_x/y and calls the handler; every handler clicked in exp ran through it"
+func,0x00092BF7,inventory_close,confirmed,"EXIT handler (mode buttons, (226,182)-(256,195)); exp: EXIT click -> called once, game_mode 4->0, inventory_free_images; also called by inv_use_item before reading a book/opening the spellbook (exp: USE spellbook -> game_mode 5); string 'Equipping %it'"
+func,0x00092ED8,inventory_draw,confirmed,"exp: runs once per frame while game_mode=4 and never after EXIT; blits inve00i0 background, tab highlight, paper doll (58E15), armor values, both item lists, the 12 accessory slots, scroll arrows, container icon, and the trade total by trade_mode"
+func,0x000932C9,inv_blit_rect_from_image,strong,copies button rect N of D_00188425 from a 320-wide image to the screen; inventory_draw uses it to highlight the selected tab (rect tab+41 from inve01i0); runs every inventory frame
+func,0x00093372,inv_draw_container_icon,strong,"draws picture N of inve16i0.cif centred in button rect a1 (32 = right list header, 27 = left header when the wagon is listed); N = D_00196288; with N=3 and a wagon prints its load '%s / 750'; exp: icon 2 (ground) at open, 3 after WAGON"
+func,0x000934F6,inv_draw_item_cell,strong,"draws one list/slot cell: selection highlight, repair/quest backgrounds, marks for enchanted/hidden/not-owned (inv_draw_cell_mark), the item picture with its dye, arrow count '%d', and 'DONE'/'%d days' for items in repair; exp: 10 calls per frame (12 slots + rows shown)"
+func,0x00093A6A,inv_draw_item_image,strong,"looks up item+0x32 (archive<<7|record) in the texture cache (135D00, retry after 135E39) and draws it scaled to fit the cell; called once per drawn cell (exp 1:1 with inv_draw_item_cell)"
+func,0x00093BD9,inv_draw_cart_cell,candidate,"draws inve16i0.cif picture 3 (wagon) scaled into the cell instead of the item picture for group 23 index 0 (cart), with text '%s / 1000'"
+func,0x00093DCB,inv_draw_cell_mark,candidate,"draws texture (archive a1, record a2) centred in a cell; inv_draw_item_cell passes archive 380 records 5 (enchanted), 6 (not owned), 7 (hidden)"
+func,0x00093ECD,inv_button_nop,strong,"empty function; the handler of buttons 13-26 of D_00188425 (paper doll area, behind button 12)"
+func,0x00093EE5,inv_scroll_left_up,strong,"button 37 (163,48)-(171,63) of D_00188425: decrements the left list scroll D_001AA560"
+func,0x00093F0C,inv_scroll_left_down,confirmed,"button 38 (163,184)-(171,199): increments the left list scroll while rows remain; exp: click (167,190) ran it"
+func,0x00093F4B,inv_scroll_right_up,strong,"button 39 (261,48)-(269,63): decrements the right list scroll D_001AA564"
+func,0x00093F72,inv_scroll_right_down,strong,"button 40 (261,184)-(269,199): increments the right list scroll while rows remain"
+func,0x00093FB1,inv_select_tab,confirmed,"buttons 41-44 (tabs across y 0-9): tab = button-41, left list = inventory_containers[tab], scroll 0; exp: click (120,4) -> tab 1, left list = magic items container"
+func,0x0009401E,inv_click_equip_slot,confirmed,"buttons 0-11 (the accessory slots at x 0-45): acts on character equipped[slot] by inventory_action (info/equip/remove/use); exp: REMOVE + click (11,20) emptied equipped[0]; INFO + click (34,20) showed item info"
+func,0x00094264,inv_click_list_row,confirmed,"buttons 27-36 (left list x 163-221, right list x 261-319): maps the row to inv_left_rows/inv_right_rows and calls inv_click_left_item/inv_click_right_item; exp: row clicks ran it then those"
+func,0x00094324,inv_click_paperdoll,confirmed,"button 12 (49,13)-(159,196): inv_paperdoll_slot_at gives 64+slot, then acts on equipped[slot] like inv_click_equip_slot; exp: INFO + click (100,60) -> item info"
+func,0x000945C0,inv_click_right_item,confirmed,"click on an item in the right (ground/wagon/shop) list: info, take+equip, take, use by inventory_action; refuses items still in repair; exp: EQUIP + click right row -> inv_take_item, inv_store_item, inv_equip_item"
+func,0x000946D4,inv_click_left_item,confirmed,"click on an item in the player's list: info, equip, remove (to the right container; repair/identify/wagon-capacity rules), use, hide; exp: EQUIP -> inv_equip_item; REMOVE -> item moved to the ground pile"
+func,0x000949AA,inv_take_item,confirmed,"moves an item into the player's inventory or wagon: weight checks ('You cannot carry anymore stuff.', 'Your cart cannot hold anymore stuff.' at 3000), carts, maps, arrows, gold pieces -> gold; exp: taking the spellbook from the ground filed it back under the magic tab"
+func,0x00094D5A,inv_update_hidden_load,candidate,character+0x220 = weight of hidden items (91D8D) *100 / equip_hiding_capacity(1)
+func,0x00094DB4,inv_unequip_item,strong,"finds the item in equipped[27], removes its effects (item_remove_equip_effects) and clears the slot; called by inv_unequip_all_saved"
+func,0x00094E25,inv_unequip_all_saved,strong,"saves every equipped item and its condition (D_001AA4CC/D_001AA460), sets condition to max and unequips it; callers disease.c and spfx.c lycanthropy/shapechange code, paired with inv_reequip_saved"
+func,0x00094F31,inv_reequip_saved,strong,re-equips the items saved by inv_unequip_all_saved (inv_equip_item) and restores their condition; same disease.c/spfx.c callers
+func,0x00094FA8,inv_use_item,confirmed,"USE on the selected item: artifact specials, cast-when-used spells (wear 10), drugs, potions (bottle with type-31 child), books, spellbook, parchment letters, clothing style; strings 'You do not own this item.', 'There are no monsters nearby.'; exp: USE on the spellbook closed the inventory and opened the spellbook (game_mode 5)"
+func,0x000954DD,inv_item_info,confirmed,"INFO on an item: message by group (recipes 'Recipe for %po.', paintings, books, armor/weapon/artifact texts 1000-1016); exp: INFO + click slot -> message box (game_mode 8)"
+func,0x000958D0,inv_list_left_item,strong,"per-item callback of inv_draw_left_list: filters (type 2/50, not hidden, not equipped, trade-mode rules) and draws the item in the visible rows (inv_left_rows); exp: 4 calls per frame"
+func,0x00095B81,inv_list_right_item,strong,"per-item callback of inv_draw_right_list: type 2/54 items, shop-owner filter, within 160 units of the player unless in the wagon; fills inv_right_rows; exp: runs once the ground pile has items"
+func,0x00095D2C,inv_draw_left_list,strong,"draws the left (player's) list from inv_left_container: header cell, then inv_list_left_item per child; sets inv_left_count; once per inventory frame (exp)"
+func,0x00095E32,inv_draw_right_list,strong,draws the right list from inv_right_container via inv_list_right_item; sets inv_right_count; once per inventory frame (exp)
+func,0x00095EDB,inv_store_and_equip_selected,candidate,"if the selected item is not equipped: inv_store_item, inv_equip_item, then reports gold picked up (D_001AA454)"
+func,0x00095F82,inv_equip_item,confirmed,"picks the slot by item group/index (armor 12/13/15/18/20/21/23/26, weapons 19/21 with two-hand rules, clothing by table, gems 10/11, jewellery pairs 0-9), class check item_forbidden_for_class, equip sounds; gold pieces add to D_001AA454; exp: equipping the amulet from the ground refilled equipped[0]"
+func,0x00096782,inv_equip_in_slot_pair,strong,"equips into slot or slot+step (rings, bracelets, gems, weapons): the first empty one, else replaces slot; exp: ran when re-equipping the amulet (slots 0/1)"
+func,0x000967F9,inv_unequip_slot,strong,removes the effects of equipped[slot] and clears it; inv_equip_item uses it on the left hand for two-handed weapons
+func,0x00096847,inv_equip_in_slot,confirmed,"replaces equipped[slot] (removing the old item's effects), records it, item_apply_equip_effects; exp: equipped[0] set again"
+func,0x000968F8,item_is_two_handed,candidate,"1 when item flags (item+0x2A) lack 0x4, 0 for no item; inv_equip_item clears the left hand for such weapons and moves them off for shields"
+func,0x00096959,inv_paperdoll_slot_at,strong,"reads the paper doll hit mask (D_00195B74, 125 wide, origin 41,5) at the mouse: 64+slot; exp: ran on a paper doll click"
+func,0x00096997,trade_total_buy,candidate,"trade_mode 1: sums the unpaid items carried (91DE1), trade price via trade_base_price/trade_adjust_price scaled by D_001788DF/256"
+func,0x00096A14,trade_total_repair,candidate,"trade_mode 3: sums repair costs of the items in the right container (91F7C), min 1, then trade_base_price/trade_adjust_price"
+func,0x00096AB4,inv_close_return_unpaid,strong,at close (exp: once per EXIT): runs 92013/9219A over the carried items and empties equipped slots holding not-owned items
+func,0x00096B77,item_remove_equip_effects,confirmed,"undoes an item's enchantments on unequip: cast-when-held spell removed, extra spell points, absorbs-spells bit (character+0x8A bit 1), +15 skill; exp: unequipping the amulet (enchantments 3,0,9,8) cleared character+0x8A bit 1"
+func,0x00096CCF,item_apply_equip_effects,confirmed,"applies enchantments on equip: cast-when-held creates a spell record (type 9) for slot+200, regen time, absorbs-spells bit, +15 skill, then wears the item by the spell cost; exp: re-equipping the amulet set character+0x8A bit 1 again"
+func,0x00096ECC,item_repair_cb,strong,"per-item callback: raises item condition by D_00195B84 (not arrows, max_condition cap) then stops; run over the carried items by the held-item enchantment ticker (disease_000680DD) for enchantment 8 (repairs objects); 64 episodes in the world"
+func,0x00096F95,item_break,strong,"condition 0, '%s is broken.', unequips; a soul-bound enchantment (15) releases its monster ('The soul from your broken item is released.'); frees enchanted items; called by item_damage"
+func,0x00097101,inv_store_item,confirmed,"new record id, files the item into inventory_containers[D_0018822C[group]] (magic items and the spellbook into tab 1); exp: a taken item reappeared in the magic tab; 22 callers"
+func,0x000971C1,inv_count_cart_cb,candidate,per-item callback: counts group 23 index 0 (cart) items into D_00190CE4 and remembers the last
+func,0x0009721F,inv_create_wagon,strong,"creates the wagon container (record type 52, +0x1B = 4) under the character object if missing; called when a cart is bought (921CC) and by kludge.c"
+func,0x00097271,inv_drop_wagon_if_no_cart,candidate,counts carts carried (inv_count_cart_cb) and frees the wagon container when there is none; called after a sale
+func,0x000972C7,inv_merge_arrows,strong,"adds an arrows item's count (item+0x31, max 199) to the owner's arrow stack, creating one (group 3 index 18) if needed; callers weapons.c (arrow pickup), maplogic, inv_take_item"
+func,0x000973B3,inv_add_arrows,strong,adds N arrows to the owner's arrow stack (create group 3 index 18 if missing); kludge.c gives 250 and 24
+func,0x00097488,inv_take_arrow,strong,finds the player's arrows; with a1 takes one (frees the stack at 1); callers weapons.c 72E85/73980 with 'You have no arrows.'
+func,0x0009751E,inv_draw_scroll_arrows,strong,draws the 4 list scroll arrows lit (inve06i0) or dim (inve07i0) by scroll position and row counts; once per inventory frame
+func,0x00097616,inv_draw_scroll_arrow,strong,"blits one scroll arrow image at (163|261, 48) or at the list bottom"
+func,0x00097764,trade_total_sell,candidate,"trade_mode 2: sums item+0x24 value of the owned items in the right container, trade_base_price, trade_adjust_price(selling)"
+func,0x000977F2,trade_region_price,candidate,price * D_0018F092[current_region*80] / 1000 (min 1)
+func,0x0009784E,trade_adjust_price,strong,"haggling: scales a price by shop quality vs Mercantile (character+0xF1) and Personality (character+0x2A), buying or selling (a2); callers tavern.c rooms, guilds.c spells, the trade totals"
+func,0x00097A85,trade_make_offer,candidate,merchant reaction text 260-262 (+3 when selling) by offered price vs value (func 7DDC9); marks an offer pending (D_001AA5F7); free on holiday 43 in identify mode
+func,0x00097B2A,trade_settle_offer,candidate,"when an offer is pending: yes/no prompt (3D01C(14)) and returns the price, 1 when free, -1 when declined or a popup is up; polled each frame by inventory_frame"
+func,0x00097BD9,trade_base_price,candidate,"trade_region_price, then +/- by shop quality (current_shop+0x19 - 10)%, doubled"
+func,0x00097C2E,shop_quality_message,strong,"message 266-270 by the building's quality byte (+0x19: <=3, <=7, <=13, <=17, more); caller maplogic.c on entering; ran only in cmd:enter episodes (x73.7)"
+func,0x00097CC9,inv_wagon_button,confirmed,"WAGON button (226,14)-(256,27): toggles the right list between the ground pile and the wagon (normal mode) or lists the wagon on the left (trade modes); refused in dungeons; exp: right container -> wagon, icon 3"
+func,0x00097D5A,inv_info_button,confirmed,"INFO button (226,36)-(256,49): inventory_action=1; exp"
+func,0x00097D7C,inv_equip_button,confirmed,"EQUIP/SELECT button (226,58)-(256,71): inventory_action=2; exp"
+func,0x00097D9E,inv_remove_button,confirmed,"REMOVE button (226,80)-(256,93): inventory_action=3; exp"
+func,0x00097DC0,inv_use_button,confirmed,"USE button (226,103)-(256,116): inventory_action=4; exp"
+func,0x00097DE2,inv_gold_button,confirmed,"GOLD button (226,125)-(256,138): asks an amount (8C4E4, message 25) and takes it from character gold; exp: typed 100, gold 14300 -> 14200"
+func,0x00097E4B,trade_steal_button,strong,"trade_mode 1 button (226,112)-(256,125): chance Pickpocket (character+0xF7) - value/32 - D_00190CA8/4; fail: crime, closes, 'You are not successful.'; success: 'You are successful.', goods become owned"
+func,0x00097F6F,inv_claim_items,candidate,clears the not-owned flag on everything carried and equipped (921CC); after paying in buy mode and at close of the normal inventory
+func,0x00097FE2,trade_buy_button,strong,"trade_mode 1 button (226,134)-(256,147) (BUY at 240,140 in docs/play.md): makes an offer if the total is non-zero"
+func,0x00098008,trade_clear_button,strong,"trade button (226,156)-(256,169) in modes 1-4: buy returns unpaid items (92013); sell/repair/identify move the trade pile back into the inventory"
+func,0x00098093,trade_sell_button,strong,"trade_mode 2 button (226,134)-(256,147): makes an offer if the total is non-zero"
+func,0x000980B9,trade_repair_button,strong,"trade_mode 3 button (226,134)-(256,147): makes an offer if the total is non-zero"
+func,0x000980DF,trade_identify_button,strong,"trade_mode 4 button (226,134)-(256,147): at a Mages Guild (building type 11, faction 40) pays money; else spends spell points per item ('You do not have enough spell points left.') with a chance from character+0x21E, sets the identified flag"
+func,0x00098224,inv_toggle_hidden,strong,"toggles item flag 0x40 (hidden); 'You cannot hide something you're wearing.', 'You cannot hide anymore stuff.' against equip_hiding_capacity; inventory_action 5"
+func,0x0009830F,trade_set_repair_times,candidate,"shop repair: due time (object+0x2B) = now + per-item days from missing condition, the longest job first and the rest scaled"
+func,0x0009848E,trade_pay_spell_points,candidate,if magicka (character+0x8D) >= D_001AA458 subtract it and return 1
+func,0x000984E0,trade_total_identify,candidate,trade_mode 4: total = sum of item value*25/256 over the right container
+func,0x00098538,trade_mark_identified,candidate,sets the identified flag (item flags 0x20) on every item in the right container; after paying in identify mode
+func,0x00098573,trade_can_identify_selected,candidate,selected item must be magic and not identified (messages D_001832B4/BC) and affordable at value*25/256 ('You do not have enough money.')
+func,0x00098651,transport_menu,confirmed,T: 'You cannot change transportation indoors.' unless outside; draws move00i0/move01i0.img with FOOT/HORSE/CART/SHIP enabled by what is owned; exp: T -> called
+func,0x00098941,transport_choose,confirmed,"transport button handler (D_00188641): 0 foot clears character+0x41 bits 1-2, 1 horse sets bit 1, 2 cart sets bit 2, 3 ship (transport_toggle_ship); exp: FOOT click -> called"
+func,0x00098A15,transport_toggle_ship,candidate,"boards or leaves the ship: saves/restores the player object and location (D_001AA540/544/580), ship size from character+0x78 (992 small)"
+func,0x00098B20,player_on_ship,candidate,1 when the current location record id (D_00195AC4+0x1F >> 16) is 992 or 993
+func,0x00098B91,item_quest_letter,candidate,if the item has a twin (object+0x33) and a quest id (object+0x26): sets the quest text context (D_00199764) and returns 1; used for parchment USE
+func,0x00098BE8,inv_draw_armor_values,strong,draws 7 numbers (100 - character+0x44[i])/5 at fixed doll positions; once per inventory frame; character+0x44[0] changed when the helm was removed (exp)
+func,0x00098C7E,inv_read_map_scrap,strong,inven.c; direct call (all-zero args) shows 'The scrap of parchment shows the location of ... in The Blackbriar Cabin'
+func,0x00098CE4,item_forbidden_for_class,strong,"message 1068 and 1 when the class record (player_class +0x0B materials, +0x0E armor/shield/weapon masks) forbids the armor/shield/weapon; called by inv_equip_item (ran in its episodes)"
+func,0x00098F1D,item_sync_twin_id,candidate,copies object+0x1F record id to the linked twin object (+0x33)
+func,0x00098F50,inv_close_assign_ids,candidate,at close (exp: once per EXIT): 92280 over the carried items gives each a record id in block 100
+func,0x00098F7A,inv_track_hand_weapons,strong,"open: remembers the right/left hand items (equipped[19]/[21]); close: adds per-weapon ready time (D_0017887F) to D_0019597C/D_00195980 when they changed; exp: once at open, once at close; inventory_close then says 'Equipping %it'"
+func,0x000990F0,trade_shop_takes_group,candidate,"1 if the item group is in the shop's list D_00195D84 (pairs, 0xFF end); sell mode lists only those items"
+func,0x00099155,item_refresh_magic_value_cb,candidate,"per-item callback: for enchanted items in an inventory container (type 52, +0x1B <= 4) recomputes value with 5879B (itemmakr.c)"
+func,0x000991E7,inv_refresh_magic_values,candidate,runs item_refresh_magic_value_cb over the carried items; exp: once when the inventory opens
+func,0x00099211,trade_can_repair_item,strong,"'You have already selected an item.' (guild hall, one at a time), 'Item to be repaired must be empty.', arrows and undamaged items refused (message 24); and inven.c; strings 'Item to be repaired must be empty', 'You have already selected an item'; direct call (all-zero args) shows 'This does not need to be repaired'"
+func,0x000992FA,trade_set_repair_time,candidate,"trade_mode 3: guild hall due time from missing condition and guild level, else trade_set_repair_times"
+func,0x00099391,trade_mark_in_repair,candidate,after paying for repair: every item in the right container becomes record type 54 (in repair)
+func,0x000993CB,potion_recipe_text,candidate,"builds the ingredient list of a potion recipe (bytes group/index pairs, -2 end) from item template names ('Ruby' is template 0), shown after 'Recipe for %po.'"
