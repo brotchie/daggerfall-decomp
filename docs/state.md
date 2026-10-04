@@ -60,6 +60,39 @@ The record is packed: fields sit at odd offsets.
 An earlier draft named +0x7C max health. That was wrong: the saves checked were all at full
 health, and a write test settled it.
 
+## Objects, saves and the heap
+
+These come from the objects and data naming agent; details are in build/names/objects_data.md.
+
+**The 71-byte header** is Daggerfall Unity's RecordRoot.
+- +0x1D: image2. For a 3D object the model id is image2 × 100 + image.
+- +0x27: the parent id, used only in the file.
+- +0x3B: the previous sibling. Daggerfall Unity calls it ChildObject, which is wrong.
+- Record types use the classic names: 1 World, 4 Move (the player object), 5 Eye (the
+  camera), 23 Options, 24 Logbook, 39 NonWorld.
+
+**Two trees.** The location's objects, and `nonworld_root` (0x1959A8, type 39, id 700),
+which holds quest objects and tavern rooms. `object_find_by_id` searches the location first.
+
+**Heaps:**
+- Objects live in a pool of first-fit blocks with 18-byte headers (magic 'iiii'), checked by
+  `mem_check_heap`.
+- ARCH3D models have their own pool, cached in a 512-node binary tree.
+- Bug: `object_heap_free` drifts by one byte on each odd-size allocation.
+
+**Save files:**
+- SAVETREE.DAT, version 294: position, location id, environment, building records,
+  location records, nonworld records, links.
+- SAVEVARS.DAT is mapped field by field to Daggerfall Unity's SaveVars. Daggerfall Unity
+  reads the ship price one byte early: it is a u32 at 0x1751.
+- `save_game(5, ...)` wrote all of SAVE5 when called directly.
+
+**Other:**
+- links.c runs a dungeon's action links: RDB action records of 39 bytes, with the same
+  action and trigger types as Daggerfall Unity.
+- profile.c is HMI's INI library, and sosez.c is the HMI SOS sound wrapper.
+- args.c reads the Z.CFG keys into 22 `cfg_*` globals.
+
 ## Records in general
 
 Every game record (item, character, spell, loot pile, container, effect) starts with a
@@ -295,6 +328,12 @@ The naming agents found these functions filed under the wrong unit:
 - 0x3FC4B–0x40F7F (filed under text.c) is people.c: pedestrians and guards.
 - 0x5A442–0x5A6ED (after book.c's last file reference) are text-drawing, mouse-bounds and
   clip helpers, possibly their own file. 0x8C286 (names.c) belongs to inpstr.c.
+- 0x13438–0x135E6 (filed under archive.c) are steal.c's lockpicking.
+- 0x6A683 (jmem.c) is logbook.c's logbook_open; 0x9A993 (objcode.c) is travel.c's
+  travel_map_open; 0x11016 (main.c) is probably sosez.c's sos_init.
+- 0x7C908–0x7CAEB (filed under loadsave.c) are probably support.c's text-drawing helpers.
+- 0x82DF6–0x83EDF (filed under args.c) draw world and automap objects, and 0x843E0–0x849E4
+  are probably objlib.c's RMB record object makers.
 - 0x2586B (filed under career.c) turns killed creatures into corpses: mplace.c or the
   monster code.
 
