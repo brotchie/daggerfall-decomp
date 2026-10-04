@@ -92,8 +92,11 @@ tools/build-and-verify.sh
 | `tools/fallplay.py` | play the headless game a step at a time (snapshots, rewind, 2x screenshots, new code per step), for a model at the controls (walk, turn, go to and enter buildings); `FALLEMU_CHEAT=1` boots with the game's cheat mode |
 | `tools/fallcov.py` | code coverage of the headless game: which functions ran, per source unit and XnGine module |
 | `tools/fallfuzz.py` | coverage-guided random play: workers play random input from the save snapshots and keep every state that ran new code |
-| `tools/fallevidence.py` | evidence for naming: replays every play step and fuzz state with coverage, then gives each function the inputs that go with it running, its cluster, callers, callees and strings |
+| `tools/fallevidence.py` | evidence for naming: replays every play step and fuzz state with coverage, then gives each function the inputs that go with it running, its cluster, callers, callees and strings, and the asset evidence: files read, texts and sounds asked for, button boxes handled |
 | `tools/fallcall.py` | call any function in a live game from a safe point between frames: return value, functions run, files opened, globals changed, the screen it draws; `sweep` does it for many functions, each from a fresh game |
+| `tools/fallassets.py` | asset tracing: replays every evidence episode and loads every classic save with each file read (and each sound asked for) attributed to its validated guest call chain and named by record; `report` lists per asset class the loaders and consumers, per function the assets it reads |
+| `tools/asset_ids.py` | static asset evidence, no emulator: the TEXT.RSC records and sounds each function asks for by constant id (with the text or sound name), the screen button tables `{x0,y0,x1,y1,handler}` and the text-macro tables |
+| `tools/assets.py` | readers for the game's data files: BSA and DAGGER.SND records, TEXT.RSC text, TEXTURE archives, sound names (`config/sound_clips.csv`, from Daggerfall Unity) |
 | `tools/names.py` | config/names.csv: names for functions, globals and record fields, each with a confidence and its evidence (check, merge, show, annotate) |
 | `tools/fallstate.py` | experiments that find game state in memory: screens, interaction modes, values read off the screen, counters that move in step |
 | `tools/memwatch.py` | memory watchdog: kills this repo's emulator processes, largest first, before the machine runs out of memory (the multi-worker tools start it themselves) |

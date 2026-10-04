@@ -297,6 +297,17 @@ def prepare_overlay(game, overlay):
                 shutil.copyfile(os.path.join(cache, name), dst)
 
 
+LOAD_HOOKS = []             # functions called with every machine Emu.load makes (fallassets.py)
+
+
+def snapshot_memory(path):
+    """A snapshot's program memory (LOAD up, so m[va] is the byte at preferred address va),
+    read without starting a machine: cheap and memory-safe for surveys of many saves."""
+    import pickle
+    with open(path, "rb") as fh:
+        return zlib.decompress(pickle.load(fh)["mem"])
+
+
 class Emu:
     def machine(self, trace):
         """The CPU, its memory map and the hooks."""
@@ -316,16 +327,25 @@ class Emu:
         uc.hook_add(UC_HOOK_MEM_UNMAPPED, self.on_unmapped)
         return uc
 
-    def watch(self, addrs):
+    def watch(self, addrs, count=False):
         """Log every call to these functions (preferred addresses) with the Watcom register
-        arguments and the return address."""
+        arguments and the return address. count=True prints nothing: it returns a
+        collections.Counter of calls by function that the run keeps up to date (for a
+        function called every frame)."""
+        import collections
+        calls = collections.Counter()
+
         def hit(uc, address, size, _):
+            if count:
+                calls[address - LOAD] += 1
+                return
             ret = struct.unpack("<I", self.read(self.r("esp"), 4))[0]
             print("call %08X(eax=%08X edx=%08X ebx=%08X ecx=%08X) from %08X tick %d" % (
                 address - LOAD, self.r("eax"), self.r("edx"), self.r("ebx"), self.r("ecx"),
                 ret - LOAD, self.ticks))
         for a in addrs:
             self.uc.hook_add(UC_HOOK_CODE, hit, None, LOAD + a, LOAD + a)
+        return calls if count else None
 
     def close(self):
         """Free the CPU and its memory now. A machine holds about 500 MB, and Python frees it
@@ -385,6 +405,8 @@ class Emu:
             f = open(name, mode)
             f.seek(pos)
             emu.files.handles[h] = f
+        for hook in LOAD_HOOKS:
+            hook(emu)
         return emu
 
     def __init__(self, args=("z.cfg",), exe=EXE, game=GAME, overlay=OVERLAY, trace=False):

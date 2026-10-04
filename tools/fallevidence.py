@@ -11,11 +11,17 @@ is the original), and keeps the functions that ran. `analyze` then gives every f
     P(feature);
   - its cluster: the functions that ran in exactly the same episodes (one feature's code);
   - static evidence from the C: callers, callees, the globals it uses and the strings
-    among them.
+    among them;
+  - asset evidence (tools/fallassets.py, tools/asset_ids.py): the files it reads, the
+    TEXT.RSC records and sounds it asks for, the button boxes and text macros it handles.
+    The assets an episode read are features too (asset:MONSTER.BSA/ASCR0025, rsc:354,
+    snd:GoldPieces).
 
 usage:
   fallevidence.py collect [-j N] [--resume]   build/evidence/episodes.jsonl (replays, N at
       a time; tools/memwatch.py kills workers if memory runs short)
+  fallevidence.py gather           episodes.jsonl again from the replays made, the direct
+      calls, and the asset tokens of build/assets/reads.jsonl
   fallevidence.py analyze          build/evidence/functions.csv, clusters.md, units/UNIT.md
 """
 import argparse
@@ -36,6 +42,8 @@ OUT = os.path.join(ROOT, "build", "evidence")
 SNAPS = os.path.join(ROOT, "build", "emu", "snap")
 FUZZ = os.path.join(ROOT, "build", "fuzz")
 ENVS = {1: "outside", 2: "building", 3: "dungeon"}
+ASSET_LINES = ("buttons", "texts", "sounds", "macros", "assets")   # fallassets.evidence()
+ASSET_TOKENS = ("asset:", "rsc:", "snd:")                           # fallassets.episode_tokens()
 
 
 # ---- episodes ------------------------------------------------------------------------------
@@ -96,19 +104,72 @@ def region(x, y):
     return "x%dy%d" % (min(7, max(0, x // 40)) * 40, min(4, max(0, y // 40)) * 40)
 
 
-def work(k, n):
-    """Replay the episodes i with i % n == k; append them to build/evidence/part_K.jsonl."""
+def episode_id(item):
+    """The id an episode of todo() has in episodes.jsonl."""
+    return item[1] if item[0] == "fuzz" else "%s/%d" % item[1:]
+
+
+def replay(item, ov):
+    """Run an episode of todo() again from its snapshot, with coverage on: (the machine
+    after, the coverage map of fallcov.LO..HI, its record: id, kind, label, exact, tokens),
+    or None if it can't be rebuilt. The caller closes the machine."""
     import ctypes
     import fallemu
     import fallplay
+    import fallcov
+    lib = fallplay.cov_lib()
+    L, LO, HI = fallemu.LOAD, fallcov.LO, fallcov.HI
+    if item[0] == "play":
+        _kind, s, num = item
+        r = fallplay.replay_step(s, num, ov)
+        if r is None:
+            return None
+        cov, emu, exact, env0 = r
+        st = next(x for x in fallplay.load_steps(s) if x["n"] == num)
+        argv = (fallplay.argv_of(st, s) or [[]])[0]
+        first = fallplay.load_steps(s)[0].get("from", "")
+        toks = {"cmd:" + (argv[0] if argv else "?"), "from:" + first}
+        if argv and argv[0] == "step":
+            toks |= tokens_of_events(argv[-1])
+        rec = {"id": episode_id(item), "kind": "play", "label": st.get("events", ""), "exact": exact}
+    else:
+        _kind, eid, snap, events, ticks, tick, macro = item
+        emu = fallemu.Emu.load(snap, overlay=ov)
+        lib.uc_dagger_coverage(emu.uc._uch, L + LO, L + HI, None)
+        env0 = fallplay.env(emu)
+        try:
+            if macro:
+                import fallfuzz
+                fallfuzz.run_macro(emu, macro)
+            s0 = emu.ticks
+            emu.run(s0 + ticks, [(s0 + t, a, tuple(g) if isinstance(g, list) else g)
+                                 for t, a, g in events], None)
+        except BaseException:
+            emu.close()                             # no machine left behind
+            raise
+        buf = ctypes.create_string_buffer(HI - LO)
+        lib.uc_dagger_coverage(emu.uc._uch, L + LO, L + HI, buf)
+        cov = buf.raw
+        toks = tokens_of_events([(t, a, g) for t, a, g in events]) | {"cmd:fuzz"}
+        if macro:
+            toks.add("cmd:" + macro[0])
+        rec = {"id": eid, "kind": "fuzz", "label": "random input from " + os.path.basename(snap),
+               "exact": emu.ticks == tick}
+    env1 = fallplay.env(emu)
+    toks |= {"env0:" + ENVS.get(env0, str(env0)), "env1:" + ENVS.get(env1, str(env1))}
+    rec["tokens"] = sorted(toks)
+    return emu, cov, rec
+
+
+def work(k, n):
+    """Replay the episodes i with i % n == k; append them to build/evidence/part_K.jsonl."""
+    import fallemu
     import fallcov
     fns = [va for va, _nm, _g, _k in fallcov.functions() if fallcov.LO <= va < fallcov.HI]
     ov = os.path.join(OUT, "ov_%d" % k)
     part = os.path.join(OUT, "part_%d.jsonl" % k)
     done = {json.loads(line)["id"] for line in open(part)} if os.path.exists(part) else set()
     out = open(part, "a")                           # a restarted worker carries on
-    lib = fallplay.cov_lib()
-    L, LO, HI = fallemu.LOAD, fallcov.LO, fallcov.HI
     emu = None
     for i, item in enumerate(todo()):
         if i % n != k:
@@ -118,46 +179,14 @@ def work(k, n):
             emu = None
         if fallemu.rss_mb() > 2000:                 # a slow leak: start afresh (collect restarts it)
             sys.exit(3)
-        if (item[1] if item[0] == "fuzz" else "%s/%d" % item[1:]) in done:
+        if episode_id(item) in done:
             continue
         try:
-            if item[0] == "play":
-                _kind, s, num = item
-                r = fallplay.replay_step(s, num, ov)
-                if r is None:
-                    continue
-                cov, emu, exact, env0 = r
-                st = next(x for x in fallplay.load_steps(s) if x["n"] == num)
-                argv = (fallplay.argv_of(st, s) or [[]])[0]
-                first = fallplay.load_steps(s)[0].get("from", "")
-                toks = {"cmd:" + (argv[0] if argv else "?"), "from:" + first}
-                if argv and argv[0] == "step":
-                    toks |= tokens_of_events(argv[-1])
-                rec = {"id": "%s/%d" % (s, num), "kind": "play", "label": st.get("events", ""),
-                       "exact": exact}
-            else:
-                _kind, eid, snap, events, ticks, tick, macro = item
-                emu = fallemu.Emu.load(snap, overlay=ov)
-                lib.uc_dagger_coverage(emu.uc._uch, L + LO, L + HI, None)
-                env0 = fallplay.env(emu)
-                if macro:
-                    import fallfuzz
-                    fallfuzz.run_macro(emu, macro)
-                s0 = emu.ticks
-                emu.run(s0 + ticks, [(s0 + t, a, tuple(g) if isinstance(g, list) else g)
-                                     for t, a, g in events], None)
-                buf = ctypes.create_string_buffer(HI - LO)
-                lib.uc_dagger_coverage(emu.uc._uch, L + LO, L + HI, buf)
-                cov = buf.raw
-                toks = tokens_of_events([(t, a, g) for t, a, g in events]) | {"cmd:fuzz"}
-                if macro:
-                    toks.add("cmd:" + macro[0])
-                rec = {"id": eid, "kind": "fuzz", "label": "random input from " + os.path.basename(snap),
-                       "exact": emu.ticks == tick}
-            env1 = fallplay.env(emu)
-            toks |= {"env0:" + ENVS.get(env0, str(env0)), "env1:" + ENVS.get(env1, str(env1))}
-            rec["tokens"] = sorted(toks)
-            rec["functions"] = ["%X" % va for va in fns if cov[va - LO]]
+            r = replay(item, ov)
+            if r is None:
+                continue
+            emu, cov, rec = r
+            rec["functions"] = ["%X" % va for va in fns if cov[va - fallcov.LO]]
             out.write(json.dumps(rec) + "\n")
             out.flush()
         except Exception as e:                      # noqa: BLE001  (report, carry on)
@@ -218,13 +247,19 @@ def collect(j, resume=False):
                             r["va"].zfill(8), ", ".join("%X" % x for x in r.get("args", [])),
                             ", drew " + r["shot"] if r.get("shot") else ""),
                         "tokens": sorted(toks), "functions": r["ran"]})
+    import fallassets
+    at = fallassets.episode_tokens()                # what the episode read (fallassets collect)
+    for e in eps:
+        if at.get(e["id"]):
+            e["tokens"] = sorted(set(e["tokens"]) | at[e["id"]])
     with open(os.path.join(OUT, "episodes.jsonl"), "w") as f:
         for e in eps:
             f.write(json.dumps(e) + "\n")
-    print("%d episodes (%d play, %d fuzz, %d explore, %d direct calls), %d not exact replays" % (
-        len(eps), sum(e["kind"] == "play" for e in eps), sum(e["kind"] == "fuzz" for e in eps),
-        sum(e["kind"] == "explore" for e in eps), sum(e["kind"] == "call" for e in eps),
-        sum(not e["exact"] for e in eps)))
+    print("%d episodes (%d play, %d fuzz, %d explore, %d direct calls), %d not exact replays, "
+          "%d with asset tokens" % (
+              len(eps), sum(e["kind"] == "play" for e in eps), sum(e["kind"] == "fuzz" for e in eps),
+              sum(e["kind"] == "explore" for e in eps), sum(e["kind"] == "call" for e in eps),
+              sum(not e["exact"] for e in eps), sum(1 for e in eps if at.get(e["id"]))))
 
 
 # ---- static evidence -------------------------------------------------------------------------
@@ -308,6 +343,8 @@ def analyze():
         for c in d["calls"]:
             callers[c].add(va)
     strs = strings_at(sorted({g for d in st.values() for g in d["globals"]}))
+    import fallassets
+    ev = fallassets.evidence()
 
     # clusters: functions run in exactly the same episodes
     groups = collections.defaultdict(list)
@@ -319,16 +356,23 @@ def analyze():
         for va in vas:
             cid[va] = k
 
-    def assoc(s):
-        """The features that go with running in episode set s: (token, n, lift), best first."""
+    def assoc(s, asset=False):
+        """The features that go with running in episode set s: (token, n, lift), best first.
+        The inputs, or (asset=True) the assets read: kept apart, as rare assets would
+        outrank every key and click."""
         c = collections.Counter(t for i in s for t in eps[i]["tokens"])
         out = []
         for t, n in c.items():
             lift = (n / len(s)) / (tokn[t] / N)
-            if n >= 2 and lift >= 1.5 and not t.startswith("from:"):
+            if n >= 2 and lift >= 1.5 and not t.startswith("from:") and t.startswith(ASSET_TOKENS) == asset:
                 out.append((t, n, lift))
         out.sort(key=lambda x: -(math.log(x[2]) * min(x[1], 8)))
         return out[:6]
+
+    def feats(s, asset=False):
+        if not s or len(s) >= N * 0.8:
+            return "always" if s and not asset else ""
+        return "; ".join("%s (%d, x%.1f)" % x for x in assoc(s, asset))
 
     def examples(s, k=4):
         """Labels of a few episodes: play steps first (they have commands), shortest set."""
@@ -347,12 +391,14 @@ def analyze():
             "called": called_text(calls.get("%X" % va)),
             "called with the player entity": called_text(calls.get("%X/entity" % va)),
             "cluster": cid.get(va, ""),
-            "features": "; ".join("%s (%d, x%.1f)" % (t, n, l) for t, n, l in assoc(s)) if s and len(s) < N * 0.8 else ("always" if s else ""),
+            "features": feats(s),
+            "asset features": feats(s, True),
             "examples": " | ".join(examples(s)) if s and len(s) < N * 0.8 else "",
             "callers": " ".join(sorted(known.get("func_%08X" % c, "%X" % c) for c in callers.get(va, ())))[:300],
             "callees": " ".join(sorted(known.get("func_%08X" % c, "%X" % c) for c in d["calls"]))[:300],
             "strings": " | ".join(repr(strs[g])[1:-1][:60] for g in sorted(d["globals"]) if g in strs)[:400],
         })
+        rows[-1].update({k: ev.get(va, {}).get(k, "") for k in ASSET_LINES})
     with open(os.path.join(OUT, "functions.csv"), "w", newline="") as f:
         w = csv.DictWriter(f, fieldnames=list(rows[0]))
         w.writeheader()
@@ -369,7 +415,9 @@ def analyze():
             f.write("## cluster %d: %d functions, %d episodes\n\n" % (k, len(vas), len(s)))
             f.write("units: %s\n\n" % ", ".join("%s %d" % kv for kv in units.most_common(8)))
             if len(s) < N * 0.8:
-                f.write("features: %s\n\n" % "; ".join("%s (%d, x%.1f)" % x for x in assoc(s)))
+                f.write("features: %s\n\n" % feats(s))
+                if feats(s, True):
+                    f.write("asset features: %s\n\n" % feats(s, True))
                 f.write("examples:\n%s\n\n" % "\n".join("- " + x for x in examples(s, 6)))
             f.write("functions: %s\n\n" % " ".join(info[v][0] if v in info else "%X" % v for v in sorted(vas)))
 
@@ -381,10 +429,19 @@ def analyze():
             hit = sum(1 for r in rs if r["episodes"])
             f.write("# %s: %d functions, %d ran in play (episodes); `called` is what a direct call "
                     "with all-zero arguments did (tools/fallcall.py sweep)\n\n" % (u, len(rs), hit))
+            f.write("`asset features`: like `features`, for what the episodes read (asset:FILE/RECORD, "
+                    "rsc:TEXT.RSC id, snd:sound); "
+                    "`buttons`: the button-table entries (table[index] and screen box) it handles; "
+                    "`texts`, `sounds`: TEXT.RSC records and DAGGER.SND sounds it asks for, by "
+                    "constant ids at its calls (tools/asset_ids.py) and in the traced episodes "
+                    "(\"in play\"); `macros`: text macros it expands; `assets`: files read within "
+                    "3 calls of it in the traced episodes and save loads (tools/fallassets.py), "
+                    "[n] = calls between it and the read.\n\n")
             for r in rs:
                 f.write("## %s (%s episodes, cluster %s)\n\n" % (r["name"], r["episodes"], r["cluster"]))
-                for k in ("features", "examples", "called", "called with the player entity",
-                          "strings", "callers", "callees"):
+                for k in ("features", "asset features", "examples", "called", "called with the player entity",
+                          "buttons", "texts", "sounds", "macros", "assets", "strings", "callers",
+                          "callees"):
                     if r[k]:
                         f.write("- %s: %s\n" % (k, r[k]))
                 f.write("\n")

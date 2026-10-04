@@ -8,8 +8,9 @@ overhead. Watching the loaded bytes or a game object costs 1.25–3x. The chains
 with community format tables (UESP, Daggerfall Unity), already name the loaders, the monster
 spawn, animation, sound, damage and text paths, and settle four uncertain unit boundaries.
 
-The experiment scripts and outputs were in `build/asset_trace/` (not committed; Stage 1 makes them a tool). Nothing in tools/, src/, docs/ or config/
-was changed.
+The experiment scripts and outputs were in `build/asset_trace/` (not committed). Stages 1 and
+2 below are now tools: `tools/fallassets.py`, `tools/asset_ids.py` and `tools/assets.py`, with
+their evidence in `tools/fallevidence.py`'s pages.
 
 ## 1. What was built for the experiments
 
@@ -248,61 +249,122 @@ The unit boundaries listed as uncertain are settled by this evidence:
 
 ## 3. Staged plan
 
-### Stage 1: `tools/fallassets.py`, attributed asset reads for every episode (recommended first)
+### Stage 1: `tools/fallassets.py`, attributed asset reads for every episode (built)
 
-**What to build**
+**What was built**
 
-- Promote `atrace.FileTrace` and `vstack` to `tools/fallassets.py`, and `bsa.py`/`assets.py`
-  to an `assets` helper.
-- Commands:
-  - `collect` replays every fallevidence episode and logs each read. The episodes are play
-    steps and fuzz corpus states, via the same `todo()`/`replay_step` (wrapping `Emu.load`,
-    or a hook argument added to `replay_step`). Each read gets its file, record (BSA / SND /
-    RSC / TEXTURE archive), bytes and validated chain. Output: `build/assets/reads.jsonl`.
-  - `loads` runs `exp2_load.py` for all 18 saves (full-load traces).
-  - `report` writes per asset class the loader API and consumer chains, and per function the
-    assets it reads, directly or within 3 frames.
+- `tools/fallassets.py` holds the stack walk (`vstack`, `chain`) and `Trace`, which follows
+  `atrace.FileTrace`. It logs each DOS read (int 21h AH=3Fh) with the file, position, bytes,
+  tick and validated chain. Library frames are left out, and a run of reads straight through
+  one record by the same chain is merged (`k` reads).
+- `Trace` also hooks the sound loader objlib.c `func_00085A51` (the record id is in EAX).
+  A sound's file read happens only the first time, because the game caches 256 sounds, so
+  only the hook sees every sound that is asked for.
+- `tools/assets.py` has the file readers, from `bsa.py` and `assets.py`:
+  - BSA and DAGGER.SND records;
+  - TEXT.RSC text (variants joined by " / ");
+  - TEXTURE archives (their names, e.g. TEXTURE.280 is "Frost Daedra");
+  - sound names: a record id gives the directory index, and the index gives Daggerfall Unity's
+    `SoundClips` name (`config/sound_clips.csv`, taken from DFU at 2343305d).
+- Every machine gets a `Trace` through `fallemu.LOAD_HOOKS`: functions that `Emu.load` calls
+  with each machine it makes. The episodes replay through `fallevidence.replay(item, ov)`,
+  which was split out of `fallevidence.work`, so both tools run exactly the same replay.
+- The hooks don't change the runs: the 535 episodes that both tools replayed have the same
+  exact/not-exact result.
 
-**Tools to extend**
+**How to run** (8 workers on this Mac; each worker peaks at about 1.4 GB; memwatch runs, and
+workers restart themselves at 2 GB)
 
-- `fallevidence.py`:
-  - asset tokens as episode features (`asset:MONSTER.BSA/ASCR0025`,
-    `snd:EnemyFrostDaedraBark`, `rsc:354`) for the lift scores;
-  - an `assets` column in functions.csv and units/*.md.
-- `docs/state.md`: the confirmed fields (current health +0x7C; monster object +0/+27/+71/
-  +574/+577/+705).
+```
+.venv/bin/python tools/fallassets.py collect    # 544 episodes in 7 min: build/assets/reads.jsonl
+.venv/bin/python tools/fallassets.py loads      # 18 save loads in 70 s: build/assets/loads.jsonl
+.venv/bin/python tools/fallassets.py report     # build/assets/report.md
+.venv/bin/python tools/fallevidence.py gather   # adds the asset tokens to the episodes
+.venv/bin/python tools/fallevidence.py analyze
+```
 
-**Yield**
+**What it found (2026-10-04)**
 
-- Asset evidence for more than 165 functions now, and more as play and fuzzing grow.
-- The 15–20 loader APIs named.
-- Unit-boundary checks.
-- The 18 full-load traces (each about 25 s) cover the load paths of every save, including the
-  Crux.
+- The episodes: 543 of 544 were traced. They made 3209 reads (47 MB) and asked for 1153 sounds.
+  338 episodes read a file and 346 asked for a sound.
+- The 18 save loads made 4199 more reads. Every save reached the world, with env 1, 2 or 3
+  afterwards.
+- 225 functions have traced asset evidence: assets within 3 calls, texts or sounds.
+- The loaders (the `read by` lines of report.md) confirm the API table in Q1. One addition is
+  names.c `func_0008BCE9`, which reads NAMEGEN.DAT for the name generator, under
+  talk/parse/spfx callers.
 
-**Effort**: half a day. CPU: the replays cost what `fallevidence collect` costs now, plus 15%.
+**In fallevidence** (functions.csv columns, and lines in units/*.md)
 
-### Stage 2: static id census at the asset API call sites (pairs with Stage 1)
+- `assets`: the files read within 3 calls, grouped by class, with records (`MONSTER.BSA:
+  ASCR0032.ANC, ...`) or files (`*.IMG: REST01I0.IMG, ...`). `[n]` is the number of calls
+  between the function and the read.
+- `texts` and `sounds`: the constant ids from Stage 2. Ids seen only in play are added as
+  `in play:`. They are credited to the first function on the chain that isn't a text or sound
+  API. For an API, the line says which argument carries the id.
+- `asset features`: the lift features of the episode tokens `asset:MONSTER.BSA/ASCR0032`,
+  `rsc:8550` and `snd:EnemyLichBark`. They are ranked apart from `features` (keys, clicks,
+  commands). In one list, rare assets outranked every key, and 572 functions lost all their
+  key features. 1012 functions have asset features.
 
-**What to build**
+### Stage 2: static id census at the asset API call sites (built)
 
-- A small script, `tools/asset_ids.py`, needs no emulator. It scans `asm/nonmatchings` (or the C)
-  for the constant first argument of each API Stage 1 found:
-  - TEXT.RSC: `func_0003F09F`, `func_0007DDC9`, parse `func_0004A6B5`;
-  - sound: `func_00069938`, `func_0006998C`, `func_00069A62`;
-  - format strings such as `ASCR%04d.ANC` and `CLASS%02d.CFG`.
-- It names each id: TEXT.RSC text from `assets.rsc_text`, sounds by DAGGER.SND index from
-  Daggerfall Unity's SoundClips.
+**What was built**: `tools/asset_ids.py`. It needs no emulator and runs in under a second.
 
-**Yield**
+- **The APIs are found, not listed.** The ids are followed outward from the two readers:
+  - text.c `func_0003D412`, argument 1, is a TEXT.RSC id;
+  - objlib.c `func_00085A51`, argument 1, is a DAGGER.SND id.
 
-- About 150 functions get a line such as:
-  - "shows 454 'You do not have enough gold.'"
-  - "shows 5100/5102 (tavern room rental)"
-  - "plays EquipPlate"
-- This covers code that play never reached.
+  Any function that passes one of its own parameters there, either as is or plus a constant,
+  is an API too. Following these gives 18 text APIs. Examples: `func_0003E8A8`,
+  `func_0003F09F`, `func_0003F181`, `func_0007DDC9`, `func_0004A6B5`/`4A82A`, talk.c
+  `func_0001652C`, faction.c `func_0001CF3E` (argument 5), and career.c `func_000245EF`
+  (argument 1 + 4116). It also gives 6 sound APIs: `func_00069938`, `6998C`, `699D8`, `69A62`, `69AB8`.
+  `asset_ids.py apis` lists them.
+- **Quest files are left out.** The quest-file readers `func_0003E6B1`, `3E7D7` and `3EAB4`
+  point `func_0003D412` at a .QRC, so their ids aren't TEXT.RSC ids.
+- **Each call to an API is read from the C.** A call whose id is a constant, a `?:` of
+  constants, or a parameter plus a constant is named. So is a base, `expression + N` with
+  N ≥ 100, written `N+`: for example 500+ dungeon flavour text, 1200+ spell descriptions,
+  and 10091+ werewolf sounds.
+- **Button tables** are arrays of `{short x0, y0, x1, y1; void (*handler)()}` in object 3. They
+  are found as runs of function pointers (LE fixups) 12 bytes apart, each behind a box that
+  fits the screen. Null-handler entries can sit inside a run. A table is split where the code
+  reads an entry as a whole (all four box fields, or the handler), and that entry starts the
+  next table. No byte-sized tables turned up.
+- **Text macros** (`%pcf`, `%hnt`, `%1com`, ...) are `{char name[5]; handler}` entries, 9 bytes
+  apart, in four letter-group tables.
 
-**Effort**: 2–3 hours.
+**How to run**: `.venv/bin/python tools/asset_ids.py`. It writes three files to
+`build/assets/`:
+
+- `ids.csv` (function, api, asset, id, meaning);
+- `buttons.csv` (table, name, index, box, handler);
+- `macros.csv` (table, index, macro, handler).
+
+**What it found**
+
+- 329 ids in 183 functions:
+  - TEXT.RSC: 227 (function, id) pairs in 119 functions, 201 distinct ids;
+  - sounds: 102 pairs in 73 functions, 54 distinct ids.
+- 480 buttons in 37 tables, with 284 distinct handlers. 235 of those handlers have no caller
+  in the C, so their evidence page used to be empty.
+- Every table with handlers that the naming agents dumped by hand is found, with its size:
+  talk 19, automap 12, town map 6, sheet 23, spellshop 5, inventory modes 5×7, inventory 45,
+  transport 4 (+ EXIT with no handler), travel bar 7, travel popup 10. `guild_menu_buttons`
+  has no handlers (the menu returns the index), so it isn't found.
+- 27 more tables aren't named yet. By their handlers' units: the tavern menu `D_00179E24`,
+  the bank `D_00186E24`, the spellbook (spells.c), options, the spell and item makers
+  (custom.c, itemmakr.c), notes, books, the HUD icons, the logbook, the load screen, and
+  others.
+- 255 text macros with their handlers.
+- Example (bank.c), every bank button with its box and texts:
+  - `func_0006BD2D` is `D_00186E24[1]` (217,60)-(268,74), with 290 "My sincere apologies, but
+    you do not have that much in your account";
+  - `bank_buy_ship` is `D_00186E24[8]`, with 284/285 "You already own a ship" / "This is not
+    a port town".
+- Not done: the format strings (`ASCR%04d.ANC`, `CLASS%02d.CFG`). The `strings` line already
+  shows them (`ascr%04d.anc` for moninit.c).
 
 ### Stage 3: struct access maps for the entities assets lead to
 
