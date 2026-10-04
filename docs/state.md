@@ -236,6 +236,39 @@ saves.
 questions, or the class maker) → background (random, or 12 questions) → name, face,
 attributes, skills, reflexes → the intro movie.
 
+## World, maps and time
+
+These come from the world naming agent; details are in build/names/world.md. Direct calls
+from a morthag1 snapshot confirmed:
+- `calendar_format_date` → "6th of Frostfall", and `calendar_update` gives year 406;
+- `building_is_open` follows an open-hours table that equals Daggerfall Unity's;
+- `region_update_prices` moves prices 2% a day, as Daggerfall Unity does;
+- `location_reveal` writes MAPSAVE.SAV;
+- `map_goto_location` moved the player to Charmarket, and into a dungeon;
+- the encounter tables fill on entering a dungeon (table 19 is underwater).
+
+**Map location record** (17 bytes):
+- +0: bits 0–19 the map pixel, bits 20–31 the MAPPITEM/MAPDITEM index;
+- +0x0C: the dungeon type; +0x0D: a mask of the town's services.
+
+**Region record:** Daggerfall Unity's 80-byte RegionDataRecord, at 0x18F044:
+- +0x48: precipitation override; +0x49: punishment flags; +0x4A: legal reputation;
+- +0x4C: the persecuted temple; +0x4E: the price adjustment.
+
+**FACTION.TXT** is parsed through a 19-entry {hash, handler} keyword table. That names the
+faction fields ruler (+0x02), vam (+0x23), flats (+0x2F), race (+0x35) and ggroup (+0x37).
+
+**Weather** is rolled daily for each climate from a [season][climate][7] chance table.
+
+**Encounters:** Daggerfall Unity's 45 encounter tables.
+- A content filter (settings bit 2) rerolls Nymph, Daedra Seducer and Lamia.
+- Ghosts and Wraiths are rerolled by day.
+- The swamp climate falls into a dungeon table, which looks like an original bug.
+
+**Debug menu:** kludge.c has a debug pick list ("Get rumor" … "Enter Tavern"). Its handlers
+are `spell_effect_handlers[51..63]`, so that table has 64 entries. Its last labels are off
+by one: "Generate Songs" runs the tavern.
+
 ## Input, movement and the interface
 
 These come from the UI and input naming agent; details are in build/names/ui_input.md.
@@ -348,7 +381,13 @@ The naming agents found these functions filed under the wrong unit:
 - 0x641CD–0x64301 (filed under monster.c) belong to links.c.
 - 0x74024 and 0x7425E (filed under weapons.c) belong to click.c; 0x79A28 (moninit.c)
   belongs to loadsave.c.
-- 0x7242F and 0x728D2 (filed under rest.c) are probably weapons.c.
+- 0x7242F (`fatigue_add`) belongs to rest.c; 0x728D2 (filed under rest.c) is weapons.c.
+- faction.c starts at 0x191DA. camera.c is the screenshot code (PICS\SCR%d.BMP).
+- Probably filed in the wrong unit, with no file string to settle it:
+  - kludge.c's 0x45A1D and 0x45AED (item helpers used by the loot code) and 0x45E45
+    (location door code);
+  - sound.c's 0x69E3C (DPMI memory code);
+  - rumor.c's 0x13E17 and 0x13F06 (region flags).
 - 0x684E9–0x686DA (filed under disease.c) are trade.c's unused haggling window.
 - 0x1EE84 and 0x1EF2E (filed under maploads.c) belong to tavern.c; 0x1FE74 (tavern.c)
   belongs to region.c.

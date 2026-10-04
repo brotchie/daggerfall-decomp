@@ -1,7 +1,7 @@
 kind,address,name,confidence,evidence
 global,0x000C0BA8,disk_last_file_size,confirmed,length of the last file disk_read_file read: 8738 after flats.cfg (exp_chain); init divides it by 89 for spell_record_count; the FLATS.CFG parser counts it down
 global,0x000CAF24,spell_cost_formulas,strong,"7 function pointers (0x3937B, 0x3946E, 0x395AA, 0x39635, 0x396C0, 0x3978C, 0x3988A), the jump table of func_000CAE07 (jmp [eax*4+0xCAF24]); in xn_CAF00.asm"
-global,0x000CAF40,spell_effect_handlers,confirmed,"60 function pointers: 0-50 the spell effects (0x88CF5 Paralyze ... 0x8A344 Recall (43) ... 0x8A4BD), 51-54 kludge.c (0x44EE0, 0x44F5C, 0x44F3A, 0x44EFD), 55-58 disease.c (0x66352, 0x6691F, 0x66D3C, 0x67309), 59 0x45B41; in xn_CAF00.asm; exp1b (build/names/scratch/magic/exp1b.py, save_morthag1): 22 effect types reached the handlers listed"
+global,0x000CAF40,spell_effect_handlers,confirmed,"64 entries (world agent): 0-50 the spell effects, 51-63 the handlers of kludge.c's debug pick list ('Get rumor' ... 'Enter Tavern'). 60 function pointers: 0-50 the spell effects (0x88CF5 Paralyze ... 0x8A344 Recall (43) ... 0x8A4BD), 51-54 kludge.c (0x44EE0, 0x44F5C, 0x44F3A, 0x44EFD), 55-58 disease.c (0x66352, 0x6691F, 0x66D3C, 0x67309), 59 0x45B41; in xn_CAF00.asm; exp1b (build/names/scratch/magic/exp1b.py, save_morthag1): 22 effect types reached the handlers listed"
 global,0x000CDE2F,internal_check_failed,candidate,non-zero: fatal_error reports 'Failed internal check %lx.' with it instead of the message
 global,0x00120290,pick_distance,strong,distance to the clicked object: every click handler refuses beyond 128/150/160/256 with 'You are too far away...'
 global,0x0012AC00,mouse_buttons,strong,byte: mouse button state; inventory_frame and transport_menu act when it is set and was not last frame
@@ -27,6 +27,7 @@ global,0x00142324,key_down_enter,strong,key_down[0x1C] Enter
 global,0x00142325,key_down_ctrl,strong,key_down[0x1D]: Ctrl with the cheat keys (Ctrl+F1/F4/F9) and Ctrl+Shift+X (exit) in keys_world_actions and class_questions_run
 global,0x00142326,key_down_a,strong,key_down[0x1E]: answer a in class_question_get_answer (chargen play: key a)
 global,0x00142332,key_down_lshift,strong,"key_down[0x2A]: Ctrl+LShift+X exits the game (keys_world_actions, class_questions_run)"
+global,0x00142333,key_down_backslash,strong,key_down[0x2B]; screenshot_poll saves a screenshot while it is down
 global,0x00142335,key_down_x,strong,key_down[0x2D]: Ctrl+LShift+X exits the game
 global,0x00142336,key_down_c,strong,key_down[0x2E]: answer c in class_question_get_answer (chargen play: key c)
 global,0x00142338,key_down_b,strong,"key_down[0x30]: B, answer b in class_question_get_answer; Ctrl+B opens the save screen (7B222(1)) in keys_world_actions"
@@ -79,11 +80,14 @@ global,0x00179CFA,talk_regional_regions,candidate,region of each knightly order 
 global,0x00179D0C,talk_category_building_types,strong,"13 building types that have a where-is category (alchemist 0, armorer 2, bank 3 ... weapon smith 13, temple 14, tavern 15)"
 global,0x00179D19,talk_category_names,strong,"15 pointers: Alchemists, Armorers, Banks, Bookstores, Clothing stores, Gem stores, General stores, Libraries, Guilds, Pawn shops, Weapon smiths, Local temples, Taverns, General, Regional"
 global,0x00179D55,talk_organisations,strong,"34 faction ids of the tell-me-about organisations (42 Thieves Guild, 40 Mages Guild, 108 Dark Brotherhood, 129 Blades ...)"
+global,0x00179D74,climate_categories,strong,"byte table indexed by CLIMATE.PAK value: 223-225 -> 0, 226 -> 1, 227 -> 2, 228 -> 3, 229 -> 4, 230-232 -> 5 (desert, mountain, rainforest, swamp, subtropical, woodlands); climate_category"
+global,0x00179D9C,faction_keywords,confirmed,"19 x {u16 hash, handler} for FACTION.TXT keywords: the hashes equal (hash<<1)+char of type, name, rep, summon, region, power, flags, ally, enemy, ruler, face, flat, race, sgroup, ggroup, minf, maxf, rank, vam"
 global,0x00179E24,tavern_buttons,confirmed,"4 x {x0,y0,x1,y1,handler}: ROOM, TALK, FOOD & DRINKS, GOODBYE at x 99-220, y 51/60/69/78 (experiment screenshot and clicks)"
 global,0x00179EAC,crime_reputation_loss,strong,"13 ints, crimes 1-13: 10,5,10,8,20,10,2,1,2,2,75,2,8 (DFU's legal reputation loss per crime); court_open halves it; crime_reputation_penalty reads it as D_00179EA8[crime]"
 global,0x00179EE0,crime_fine_table,strong,"13 x 8 bytes {per-reputation multiplier byte, base, min, max shorts}: assault 6/1000/10/1500, murder 10/10000/9000/12000, ... (DFU's penalty tables); experiment: assault at reputation 0 -> 1000 split into 560 gold + 33 days"
 global,0x00179F74,career_answer_boxes,strong,"8 boxes {x0,y0,x1,y1,..}: question (10,23)-(309,68) then answers in two columns (10/160, 71..164)"
 global,0x0017A002,career_bio_buttons,strong,"3 x {x0,y0,x1,y1,handler}: page up (181,188), page down (209,188), and the exit box"
+global,0x0017A028,loan_collector_monsters,candidate,"4 mobile ids 129, 144, 130, 139 (Spellsword, Warrior, Battlemage, Assassin) sent by loan_spawn_collectors"
 global,0x0017A02C,automap_buttons,confirmed,"12 x {x0,y0,x1,y1,handler}: grid/view, forward, back, left, right, rotate left, rotate right, upstairs, downstairs, EXIT, map area, note line; matches the automap bar in the save_mord screenshot"
 global,0x0017A0BC,town_map_buttons,confirmed,"6 x {x0,y0,x1,y1,handler}: the 4 arrows, EXIT, map area"
 global,0x0017A11D,automap_view_initialised,candidate,automap_init_view sets the camera only the first time (flag)
@@ -94,6 +98,9 @@ global,0x0017A15A,struck_body_part_table,strong,"20 bytes 0,0,1,1,1,2,2,2,3,3,3,
 global,0x0017A16E,monster_corpse_textures,strong,"{u16 archive, u16 record} per monster: Rat 401/1 ... = DFU CorpseTexture; damage_creature_death gives the corpse this picture"
 global,0x0017A21A,weapon_swing_sounds,strong,"s16 sound per weapon index: 374 SwingHighPitch, 91 SwingMediumPitch, 373 SwingLowPitch (in play)"
 global,0x0017A240,monster_parry_ids,strong,28 ids 7 8 12 15 21 24 25 26 27 31 36 38 129 130 133-146 = exactly DFU's ParrySounds = true; damage_miss_sound
+global,0x0017A288,month_seasons,strong,"12 bytes month -> season 0 winter (months 0, 1, 11), 1 spring, 2 summer, 3 autumn; weather_roll and climate_set_textures (winter textures)"
+global,0x0017A2F4,weather_chances,strong,[4 seasons][6 climates][7 weathers] percent chances for weather_roll (mountain winter: 35 snow; desert summer: 85 sunny)
+global,0x0017A780,encounter_tables,confirmed,"45 pointers to 20-byte monster id tables (DFU RandomEncounters): table 19 = 11 Slaughterfish, 41 Dreugh, 42 Lamia (underwater), 32 = humanoid classes; exp3: dungeon picks came from the Graveyard table"
 global,0x0017A84C,spell_effect_school,strong,"byte per effect type: 0 Alteration, 1 Restoration, 2 Destruction, 3 Mysticism, 4 Thaumaturgy, 5 Illusion (index into magic_school_skills); spell_cost uses it: exp1b reproduced the spellbook costs"
 global,0x0017A87F,spell_effect_target_class,strong,"byte per effect type: 0 caster only (Create Item, Lock, Open, Teleport...), 1 others only (Damage, Paralyze...), 2 any; spellmaker_add_effect filters by it"
 global,0x0017A8B2,spell_effect_elemental,candidate,"byte per effect type: nonzero (Paralyze, Damage, Drain...) lets the spellmaker choose the element; spellmaker_effects_allow_element"
@@ -121,9 +128,11 @@ global,0x0017C47E,macro_letter_tables,strong,"per-letter pointers into macro_tab
 global,0x0017C4F2,macro_letter_counts,strong,"short count of entries per letter table (a 11, b 6, c 14, d 14 ... q 40, 1 9, 2 6, 3 6)"
 global,0x0017C52C,weight_fractions,strong,""".00"","".25"","".50"","".75"" (%kg)"
 global,0x0017C54E,legal_reputation_ranges,candidate,"pairs of int (low, high) bounds matching legal_reputation_names (%ltn)"
+global,0x0017C5B8,building_open_hours,confirmed,"17 x {open hour, close hour} by building type: 7-22, 8-16, 9-19, 8-15, 0-25, 9-21, 10-19, 10-20, 9-18, 6-23, 9-23, 11-23, 9-20, 9-20, 0-25, 0-25, 10-16 (DFU's); exp1: building_is_open at 03/12/20h agrees"
 global,0x0017C5DC,talk_regional_names,strong,"28 names: Temple of Akatosh ... Knights of the Hawk, Mages Guild, Fighters Guild, Tavern ... Clothing store"
 global,0x0017C650,ruler_fates,strong,"5 pointers: ""died of heart failure"" .. ""was overthrown"" (%olf)"
 global,0x0017C668,region_neighbours,candidate,11 bytes per region: bordering regions (faction_regions_border)
+global,0x0017CA0A,climate_texture_sets,strong,"per climate index: 0 desert, 1 mountain, 4 swamp/rainforest, 3 temperate (bytes 0,0,1,4,4,0,3,3,3); x100+2 gives the ground archive"
 global,0x0017CA24,holiday_days,strong,"short day of year of each holiday (holiday_index, holiday_today)"
 global,0x0017CA8E,holiday_regions,strong,"byte region+1 of each holiday, 255 for all (holiday_index, holiday_today)"
 global,0x0017CAC3,holiday_names,strong,"holiday names: New Life, Scour Day, Ovank'a, South Wind's Prayer, Day of Lights... (holiday_name)"
@@ -175,6 +184,7 @@ global,0x0018426D,codeword_first_words,strong,"False, Grand, Step, Second, Basta
 global,0x001842A1,codeword_second_words,strong,"Sire, Dam, Scion, Cousin... (%dbp low nibble)"
 global,0x001842D9,monster_weights,strong,"u16 weight per creature type: Rat 2, Imp 40, Spriggan 240, Giant Bat 80, Grizzly 1000 ...; DFU: 'Weights in classic (From offset 0x1BD8D9 in FALL.EXE)' (= VA 0x1842D9); the knockback code divides by it"
 global,0x0018432D,imperial_names,strong,"""Pelagius"",""Cephorus"",""Uriel"",""Cassynder"" (%imp)"
+global,0x0018437F,rmb_name_templates,strong,"8-byte RMB name templates 'TVRN????.RMB', 'GENR????.RMB', 'RESI??', ... filled in by town_block_load_rmb"
 global,0x00184644,location_type_names,strong,"10 pointers: Town, Village, Community, Farm, Dungeon Entrance, Temple, Tavern, Castle, Manor, Shrine (%ct)"
 global,0x0018467C,text_blank,confirmed,"pointer to ""BLANK"": what the unimplemented macros return (%cn2 %du %hc %pd ...); experiment: their direct calls returned ""BLANK"""
 global,0x001846FC,key_names,strong,"string pointer per scan code drawn on the controls screen: [72] UP, [73] PG UP, [14] BCKSPC, [57] SPCBAR, [28] ENTER, [56] ALT"
@@ -226,6 +236,7 @@ global,0x00186A64,disease_table,candidate,disease_infect copies a 47-byte record
 global,0x00186D83,poison_table,candidate,"4 s16 per poison id-128: incubation min/max (+0x17), duration min/max (+0x1B); poison_apply, poison_init_record"
 global,0x00186DE3,vampire_spells,candidate,spell ids (255 ends) every new vampire gets (disease_become_vampire)
 global,0x00186DE7,lycanthrope_attributes,strong,4 attribute indexes 0 4 3 6 (STR END AGI SPD) that disease_become_lycanthrope raises by 40 (DFU)
+global,0x00186DEC,sound_volume,candidate,digital volume set by sound_set_volume and applied by sound_apply_volume
 global,0x00186DF0,logbook_buttons,strong,"4 x {x0,y0,x1,y1,handler}: prev, next, notes, exit"
 global,0x00186E20,logbook_notes_file,strong,pointer to 'copyfile.dat'
 global,0x00186E24,bank_buttons,strong,"19 x {x0,y0,x1,y1 shorts, handler}: 0-10 main (DEPOSIT WITHDRAW, letters of credit, REPAY BORROW, house BUY SELL, ship BUY SELL, EXIT), 11-15 house list, 16-18 ship list (build/assets/buttons.csv); experiment clicks hit them"
@@ -310,11 +321,14 @@ global,0x0018DE14,saved_positions,confirmed,"x,y,z (12 bytes) per slot (player_p
 global,0x0018DE44,savevars_0f7,candidate,"SAVEVARS.DAT 0xF7, 512 bytes, unknown"
 global,0x0018E044,book_list,candidate,"{u16 id, u16 level} per book found by books_scan"
 global,0x0018F044,region_event_values,confirmed,"29 bytes per 80-byte region record (index region*80 + flag): region_flag_set stores random(min,max) there; exp1: 7 for flag 2. The record starts here, not at region_politics (0x18F060)"
-global,0x0018F060,region_politics,candidate,"80-byte per-region politics records (war, famine, plague... flags) used by faction_politics_update"
+global,0x0018F060,region_politics,candidate,"base+0x1C of the 80-byte region records at 0x18F044, not a field start (world agent); 80-byte per-region politics records (war, famine, plague... flags) used by faction_politics_update"
 global,0x0018F061,region_event_flags,confirmed,"29 flags at region record +0x1D; exp1: region_flag_set(20, 2) set +0x1F"
 global,0x0018F07E,region_event_groups,confirmed,14 bytes at region record +0x3A: a group is set while one of its flags is; exp1
+global,0x0018F08C,region_precipitation_override,strong,"region record +0x48 (80-byte stride from region_event_values, DFU PrecipitationOverride): weather + 1 forced for the region; sky_update and weather_draw_precipitation use it instead of the rolled weather"
+global,0x0018F08D,region_punishment_flags,strong,"region record +0x49 (DFU SeverePunishmentFlags): the byte region+0x2D crime_flags names (bit 0 banished, bit 1 death sentence); time_pass_minutes rolls guards on bit 0"
 global,0x0018F08E,region_legal_reputation,strong,"short per region (80-byte stride, index current_region): the Stendarr blessing adds to it ('blessed your reputation with the law', TEXT 716)"
 global,0x0018F090,region_persecuted_temple,candidate,u16 at region record +0x4C: the god faction id region_flag_set(18) picks (DFU IDOfPersecutedTemple)
+global,0x0018F092,region_price_adjustment,confirmed,"region record +0x4E (DFU PriceAdjustment), u16 250-4000, 1000 normal: trade_region_price multiplies by it; exp1: region_update_prices moved 44 regions by 2% (960 -> 940)"
 global,0x001903A4,text_buffer,strong,"sprintf target for every text line drawn by the sheet, travel map and automap (and 76 other files); D_001903A5, its second byte, is overwritten with a colour code"
 global,0x00190444,shelf_book_ids,candidate,shorts: the book id of each row of the book list
 global,0x00190484,key_was_down,strong,byte per scan code: key_pressed_once's edge memory
@@ -364,10 +378,13 @@ global,0x00191834,arena2_path_alt,candidate,"second directory searched for quest
 global,0x00191884,cfg_last_path,candidate,config_read copies each 'path' / 'pathcd' value here too ('C:\ARENA2\' in save_tlalac_s)
 global,0x001918D4,flats_cfg,strong,"FLATS.CFG records, 40 bytes: u16 picture (archive<<7|record), name, flags (2 '?', 1 '2'), three numbers; flats_cfg_find searches it"
 global,0x001940D4,view_flags,candidate,"SAVEVARS.DAT 0x3BD, 8 bytes of view/redraw flags (D_001940D5 |= 2 after a teleport, D_001940D7 |= 1, D_001940D8 |= 8); DFU weaponDrawn is bit 0x40 of 0x3BF"
+global,0x001940D6,debug_display_flags,candidate,"bit 0 world position (Toggle World Position), bit 3 second compass (Toggle Second Compass), from the debug list"
 global,0x001940DB,player_motion_flags,strong,"bit 2 crouching (CROUCH toggles; exp_steer.py D: 0 -> 4 -> 0; walk steps 5 instead of 10, crouched body shape), bit 5 climbing ('Climbing mode.'), bit 6 cleared by player_motion_clear_bit6"
 global,0x001940DC,horse_overlay_image,strong,mred00i0.cfa (init_game_data); player_frame_update draws it while riding a horse (transport flag 0x200)
 global,0x001940E0,cart_overlay_image,strong,mred01i0.cfa (init_game_data); player_frame_update draws it with a cart (transport flag 0x400)
 global,0x001940E4,location_grid,candidate,32x32 object pointers: dungeon blocks (1024 units) or town blocks (4096)
+global,0x001950EC,dungeon_water_monster_table,confirmed,"256 ids from table 19 (underwater) for markers below the water level; exp3: 11, 41, 42, 38"
+global,0x001951EC,dungeon_monster_table,confirmed,256 monster ids rolled by dungeon_roll_monster_tables for the dungeon; exp3: filled from the Graveyard table on entering
 global,0x001952EC,quest_global_states,strong,"byte array of global (main quest) states: a state record with is_global (+2) keeps its value at quest_global_states[+3]; snapshots: 0/1 values shared by s0000999, s0000016, s0000008"
 global,0x0019532C,ai_characters,strong,"entity+0x47 (character record) per AI index, made with ai_entities"
 global,0x0019552C,ai_entities,strong,"copy of creature_list (entity pointers) per AI index, made by ai_update_creatures each frame; ai_pick_target and weapon code index it"
@@ -377,6 +394,7 @@ global,0x0019597C,right_hand_ready_delay,candidate,accumulates the ready time of
 global,0x00195980,left_hand_ready_delay,candidate,same for the left hand (equipped[21])
 global,0x00195984,quest_passed_items,candidate,"four item records (args 1-4) set by opcode 75 while it runs, cleared after the opcode loop; qinit copies them into a starting quest's items of category 100"
 global,0x00195998,last_skill_check_minutes,candidate,game_minutes of the last raise_skills from a trip: travel_begin_trip runs it again after 360 minutes
+global,0x0019599C,loan_collectors_next,candidate,game_minutes when loan_collectors_update next checks overdue loans (+1400-1700); town_load resets it
 global,0x001959A0,bank_ship_price,confirmed,"price paid for the ship (saved, loadsave.c); bank_sell_ship offers 85%; experiment: 200000 -> sold for 170000; 100000 after buying the small ship"
 global,0x001959A4,bank_house_price,confirmed,"price paid for the house (saved in the save game, loadsave.c); bank_sell_house offers 85% of it; experiment: 363485 after buying"
 global,0x001959A8,nonworld_root,strong,"type-39 object (DFU classic name NonWorld, 'parent of various objects'), id 700: object_heap_init creates it; quest items, NPCs and places and tavern rooms are created under it; saved after the location tree"
@@ -433,10 +451,16 @@ global,0x00195B10,clothing_gender_group,strong,"SAVEVARS.DAT 0x3D1 = DFU '6 for 
 global,0x00195B14,creature_count,strong,active creatures: ai_update_creatures loops over them; inv_use_item says 'There are no monsters nearby.' when 0
 global,0x00195B18,clothing_gender_offset,candidate,"SAVEVARS.DAT 0x3D5: 0 female, 512 male (set next to clothing_gender_group)"
 global,0x00195B20,inv_right_container,confirmed,"container listed on the right (ground pile, wagon, shop or trade pile); exp: WAGON set it to the wagon and back at close"
+global,0x00195B24,calendar_year,confirmed,calendar_update: game_minutes / 518400 + 400; 406 in save_morthag1 (exp1)
+global,0x00195B28,calendar_weekday,confirmed,calendar_update: day % 7; 6 in save_morthag1 (exp1)
 global,0x00195B2C,spfx_popup_handler,strong,"pending spell popup: 1 = Recall (spell_recall_prompt sets it), else the choice-list callback; spfx_popup_update runs and clears it"
+global,0x00195B30,current_region_data,confirmed,pointer to the current region's 80-byte record: region_enter sets it to region_event_values + current_region*80; exp1: equal in save_morthag1
 global,0x00195B34,inv_right_container_base,candidate,the container the right list was opened with (ground pile or shop container); trade totals sum it
+global,0x00195B38,calendar_month,confirmed,calendar_update: (minutes % 518400) / 43200; 9 (Frostfall) in save_morthag1 (exp1); disease.c reads it
+global,0x00195B3C,calendar_minute,confirmed,calendar_update: minute; 11 at 08:11 (exp1)
 global,0x00195B40,spell_ready_missile,strong,"spell object readied to fire (distance/area targets, ""Press button to fire spell.""); intrface.c and weapons.c fire it (cast_fire_missile, spell_area_effect); cast_recast_last refuses while set"
 global,0x00195B48,spell_ready_touch,strong,spell object readied for a touch
+global,0x00195B4C,calendar_hour,confirmed,"calendar_update: hour; 8 at 08:11 (exp1), 9 after time_pass(60)"
 global,0x00195B50,guild_npc_object,strong,the clicked guild NPC object (guild_service_dispatch)
 global,0x00195B54,weight_total,strong,accumulator object_weight_add adds to; object_weight returns it
 global,0x00195B58,spellshop_icons,strong,"mask04i0.img, spell icons drawn by spellshop_draw_spell"
@@ -462,6 +486,7 @@ global,0x00195BF8,game_settings,confirmed,"pointer to the settings record (setti
 global,0x00195BFC,hud_message_ptrs,strong,16 pointers to the top messages' text
 global,0x00195C40,load_tick,candidate,SAVEVARS.DAT 0x3CD; load_game and init set it to the BIOS tick (0x46C)
 global,0x00195C44,scratch_buffer,candidate,"pointer to a large work buffer: +55000 popup text, +60000 status list, 50000 bytes of town-map notes"
+global,0x00195C48,collide_hit_object,candidate,object a collision test hit (model or creature)
 global,0x00195C50,cfg_map_file,strong,"config key 'mapfile' (12 characters, config flag 4); a name starting with 'd' starts in a dungeon (environment 3)"
 global,0x00195C5C,cfg_item_file,strong,config key 'item' (20 characters)
 global,0x00195C74,floor_height,candidate,y the falling object stops at (object_apply_gravity)
@@ -490,6 +515,7 @@ global,0x00195D34,talk_disposition,strong,"faction rep + player rep with the sgr
 global,0x00195D38,trade_mode,strong,"0 inventory, 1 buy, 2 sell, 3 repair, 4 identify: selects the button set D_00188281[mode], the trade total and payment; callers pass 4 for the identify spell and guild identify"
 global,0x00195D40,magic_def_count,strong,number of magic.def entries (first dword of magic.def)
 global,0x00195D44,inventory_action,confirmed,"1 info, 2 equip/select, 3 remove, 4 use, 5 hide; exp: INFO/EQUIP/REMOVE/USE set 1/2/3/4; 2 when the inventory opens"
+global,0x00195D48,sky_loaded_frame,candidate,"SKY file*32+frame last loaded by sky_load_day; 10000 forces a reload (town_load, rest_close, loads)"
 global,0x00195D4C,magic_def,strong,"magic.def entries (name, kind, enchantment pairs, condition, value, material) read by magic_def_load"
 global,0x00195D50,quest_potential_questor,strong,person picked by quest_find_potential_questor / quest_npc_offers_quest; %pqn and %pqp read it
 global,0x00195D58,talk_prostitute_price,strong,"1d(50-75) - disposition, taken from the gold"
@@ -504,12 +530,14 @@ global,0x00195D78,text_rsc_main_file,candidate,handle of the main TEXT.RSC; pars
 global,0x00195D7C,player_death_timer,strong,damage_creature_death sets 1000 when the player dies (exp_c1); the frame loop (10585) counts it down by frame_ticks and main reacts when it goes negative
 global,0x00195D80,books_path,strong,directory the books are read from: arena2_path or arena2_path_alt (books_find_path)
 global,0x00195D88,compass_image,strong,compass.img loaded by init_game_data
+global,0x00195D90,nearest_creature_distance,strong,its distance
 global,0x00195D94,text_macro_city,candidate,"when set, the %cn macro returns it instead of the current location name"
 global,0x00195D98,spell_record_count,strong,"89 in save_morthag1, the number of named SPELLS.STD records at spell_records"
 global,0x00195D9C,compass_box_image,strong,compbox.img loaded by init_game_data
 global,0x00195DA4,qbn_opcode_arg_counts,strong,"pointer to a digit string, argument count per opcode (""3332531535442255...""); read in save_dorian, it matches UESP's sub-record count of every documented opcode; quest_unlink_for_save and quest_relink_after_load refresh qbn_op+0x04 from it"
 global,0x00195DAC,ai_monster_flags,strong,monster_table_flags of the creature being thought about (ai_creature_think); monster_move_step reads bit 0 (flying) and bit 6 (aquatic)
 global,0x00195DB0,text_macro_travel_city,candidate,"destination name for %tcn (""Do you wish to travel to %tcn?"")"
+global,0x00195DB4,nearest_creature,strong,"creature nearest to the player (creatures_find_nearest, per frame)"
 global,0x00195DBC,cfg_magic_repair,strong,config key 'MagicRepair'
 global,0x00195DC0,click_face_texture,candidate,the clicked face's texture: +0x02 archive<<7 | record (click_world_face)
 global,0x00195DC6,painting_subject_text,strong,TEXT.RSC id of the painting subject (%sub)
@@ -529,6 +557,8 @@ global,0x00195E7F,view_cursor_active,confirmed,"toggled by ACTIVATE CURSOR (Ente
 global,0x00195E80,joystick_threshold,strong,"CENTER THRESHOLD: 10 LOW, 20 MED, 40 HIGH"
 global,0x00195EB0,key_map,strong,"action -> scan code table (action 27 travel map = W, 12 rest = R, 24 logbook, 26 automap); matches Options > CONTROLS (travel play agent)"
 global,0x00195F22,book_count,candidate,u16 number of books found by books_scan
+global,0x00195F24,lunar_cycle_a,candidate,calendar_update: day % 22; disease.c (lycanthropy) compares it with 0/8/16/24
+global,0x00195F25,lunar_cycle_b,candidate,calendar_update: day & 15; disease.c compares it with lunar_cycle_a's values
 global,0x00195F30,spell_effect_slot,strong,"short: effect slot (0-2) being edited/costed: the cost formulas, settings spinners and spell_cost index the spell with it"
 global,0x00195F36,text_cursor_x,candidate,"short: x of the 0xF8 input-cursor code in the last rendered box (text input), also the notebook cursor"
 global,0x00195F38,text_cursor_y,candidate,short: y of the input cursor; msgbox_draw_buttons sets it to the buttons' y (exp3: 101)
@@ -564,6 +594,7 @@ global,0x00196276,interaction_mode,strong,"0 grab F2, 1 info F3, 2 steal F1, 3 t
 global,0x00196277,player_on_ground,confirmed,"1 standing (save_tlalac_s), 0 after J in exp_steer.py; steering only works on the ground, in water or climbing; levitation sets it"
 global,0x00196278,cfg_fade_colour,strong,config key 'fadecolor' (config_read)
 global,0x00196279,mouse_buttons_prev,strong,mouse_buttons from the last frame: handlers act on (mouse_buttons & 1) && !(this & 1); the automap copies mouse_buttons into it each frame
+global,0x0019627B,current_climate,confirmed,byte: CLIMATE.PAK value 223-232 at the player (climate_lookup); 231 in Ipscart Rock; climate_set_textures uses it - 224
 global,0x0019627C,player_underwater,strong,SAVEVARS.DAT 0x3A5: init 50A25 sets it when the eye is below dungeon_water_level and switches XnGine's underwater view
 global,0x0019627D,in_dungeon_water,strong,SAVEVARS.DAT 0x3A6 = DFU inDungeonWater; main.c 10585 uses it for swimming speed
 global,0x0019627E,crime_current,strong,"byte: the crime the guards act on (1-based, DFU order): rest.c sets 8 (vagrancy) for sleeping in town, people.c 5 (murder), click.c 13 (theft); court_trial passes it to court_open; experiment: court_open(4) named it 'Assault'"
@@ -571,12 +602,15 @@ global,0x0019627F,people_witness_flags,candidate,"byte: people_check_witnesses: 
 global,0x00196280,is_daytime,candidate,nonzero with a vampire (race 8) or career flag 16: 'You cannot initiate fast travel during the day.'; trips then end after 18:00
 global,0x00196281,swift_present,candidate,byte: a SWIFT 3D input device answered (always 0: swift_init is a stub)
 global,0x00196283,hud_text_shadow,candidate,"text shadow colour that follows the fog (0, 107, 119, 223); main copies it to text_shadow_colour every frame"
+global,0x00196285,climate_is_ocean,candidate,"byte set by climate_lookup when the CLIMATE.PAK value is 223 (ocean, then treated as 228); read by travel.c"
 global,0x00196288,inv_right_icon,strong,"byte: picture of inve16i0.cif shown for the right container: 2 ground at open, 3 wagon after WAGON (exp)"
+global,0x00196289,world_loading,candidate,"counter raised by map_goto_location around building_enter and by the save load: the entry texts, quest links and Open-spell checks are skipped while it is set"
 global,0x0019628F,text_macro_gender,candidate,"gender index (0 he, 1 she, 2 it) for %g %g2 %g3"
 global,0x00196290,player_ailment_flags,strong,"bit 0 poisoned (set by poison_tick), bit 1 diseased (spfx_disease_daily); cleared by tamriel.c; hud_portrait_overlay_index"
 global,0x00196291,cast_strike_spell,candidate,byte: 1 while func_0002E2CF casts a weapon's cast-when-strikes spell; cast_spell_on then plays the creature cast animation instead of the player's
 global,0x00196295,text_missing_ok,candidate,"byte: when set, text_rsc_load returns 0 for a missing id instead of the 'Bad DAGTEXT' text (set by logbook_build_entries)"
 global,0x0019629A,cast_ignore_silence,candidate,byte: potion_drink sets it so cast_player_spell skips the silence check
+global,0x0019629B,night_sky_loaded,candidate,"set by sky_load_night, cleared by the day sky and on loads"
 global,0x001962A6,cfg_artifact,strong,config key 'artifact'
 global,0x001962A9,quests_suspended,candidate,when set quests_run_all and quest_event_individual_npc do nothing
 global,0x001962AA,exiting,strong,set by game_exit and fatal_error; fatal_error returns at once while it is set (no error during shutdown)
@@ -588,8 +622,10 @@ global,0x001962B4,archive_directories,strong,"directory pointer per handle (18-b
 global,0x00196304,archive_types,strong,"short directory type per handle: 256 = named entries (UESP BSA type 0x0100), else numbered"
 global,0x0019632C,archive_record_counts,strong,"short record count per handle, the BSA header's first u16"
 global,0x00196354,archive_names,strong,13-byte file name per archive handle (archive_open copies it; the 'not found in %s' errors print it)
+global,0x00196458,screenshot_number,confirmed,n of PICS\SCR%d.BMP; screenshot_save_bmp raised it 0 -> 1 (exp3)
 global,0x00196470,marquee_x,candidate,int: x of the marquee text
 global,0x00196474,marquee_text,candidate,pointer: current character of the scrolling marquee text
+global,0x00196484,pick_result,candidate,"18-byte result of engine_pick_object: flags, object, plane..."
 global,0x00196488,talk_regional_rows,candidate,row -> regional group index
 global,0x001964B0,talk_place_rows,candidate,row -> talk_place_topics index for the place list
 global,0x00196570,talk_question_lines,confirmed,char* per line of the composed question; experiment read the questions through it
@@ -643,22 +679,55 @@ global,0x001966B8,talk_key_index,candidate,which of the two 65-byte key texts th
 global,0x001966B9,talk_prostitute_offer,strong,set by talk_start for faction 512 (The Prostitutes) and opposite gender; talk_prostitute_update runs the offer (TEXT 7200-7203)
 global,0x001966BA,talk_refused,candidate,set when talk_faction_greeting rolls badly: the greeting is shown as a popup and the window closes; only GOODBYE/scroll buttons work
 global,0x001966BB,talk_logbook_ready,candidate,set when an answer is copied to the logbook buffer; COPY TO LOGBOOK needs it
+global,0x001966BC,faction_parse_parents,candidate,last record at each tab depth (16) while faction_add_record builds the tree
+global,0x001966FC,bio_person_counts,candidate,"per kind (enemy, friend) the biography persons made, at most 8 (bio_person_add)"
+global,0x00196704,rumor_file,strong,"rumor.dat file handle (rumor_file_open/close, rumor_add_faction/quest)"
+global,0x00196708,rumor_added_count,candidate,rumours appended since rumor_file_open
 global,0x00196710,faction_count,strong,number of faction records
 global,0x0019671C,faction_match,candidate,result/default slot of faction searches; guild_npc_menu leaves the guild's faction in it
 global,0x0019672C,factions,strong,"faction records (92 bytes) as one array and tree root; faction_find walks it, faction_politics_update indexes it up to faction_count"
+global,0x00196734,region_location_type_counts,confirmed,"14 ints: locations per type (map_location+4 bits 25-29), counted by maploads_load_region; exp2: equal to a count of region 21's 719 records"
+global,0x0019676C,dungeon_blocks,confirmed,"4-byte dungeon block entries {x, z, u16 number | start bit 10 | prefix index << 11}: exp3 read (0,0,1,0x2C) = start block M0000001 and border blocks B0000009"
 global,0x001967F0,rmb_origin_z,candidate,z added to the RMB records' positions
 global,0x001967F4,rmb_origin_y,candidate,y added to the RMB records' positions
 global,0x001967F8,rmb_origin_x,candidate,x added to the RMB records' positions
 global,0x001967FC,rmb_origin_yaw,candidate,angle the RMB records are rotated by (rotate_xz)
+global,0x00196800,town_house_skip_percent,candidate,"66 (8x8 city), 50 (other cities), 33 (kind 1) or 0, set by town_load_blocks; objlib 85040 makes that share of houses (types 17-20, not Thieves Guild/Dark Brotherhood) not enterable"
+global,0x00196808,town_building_counter,candidate,zeroed by town_load_blocks; objlib numbers the town's buildings with it
 global,0x00196888,rmb_record_ptr,strong,read pointer into the RMB block data: rmb_add_subrecord parses the subrecord here and advances it past the people (17 bytes) and doors (19 bytes)
+global,0x0019688C,location_exterior,strong,"412-byte exterior data read after a MAPPITEM record (location_load_exterior): block index/number/letter tables, port flag"
 global,0x001968BB,location_is_port,candidate,"byte, nonzero in a port town: bank_buy_ship refuses with 285 'This is not a port town' when 0; 16 in dorian and kralvamp, 0 elsewhere (save survey)"
+global,0x001968BD,location_block_indexes,strong,location_exterior+0x31: per block the RMB name template index (town_block_load_rmb)
+global,0x001968FD,location_block_numbers,strong,"location_exterior+0x71: per block the RMB number (2 digits, or a letter + digit for templates 13/14)"
+global,0x0019693D,location_block_letters,candidate,location_exterior+0xB1: per block a letter index (D_00179E10 'ALMS') and a flag bit for the name's 5th letter
 global,0x00196A28,region_location_count,candidate,number of map_location records at region_locations
+global,0x00196A2C,rmb_block,strong,"pointer to the RMB block being built (in big_buffer): town_block_load_rmb reads it from BLOCKS.BSA, rmb_index_records indexes it"
+global,0x00196A30,region_dungeon_type_counts,confirmed,19 ints: locations per dungeon type (map_location+0x0C); exp2: equal to the records' histogram
 global,0x00196A7C,region_location_names,candidate,"pointer to 32-byte records, name at +4, parallel to region_locations"
+global,0x00196A80,location_here,confirmed,"pointer to the map_location record at the player's map pixel (region_find_location), 0 in the wilderness; exp2: its map id matched the region record of Ipscart Rock"
+global,0x00196A84,region_dungeon_count,confirmed,"locations with a dungeon type; 173 in region 21 (exp2, the histogram's sum)"
+global,0x00196A88,loaded_location,strong,"20-byte struct of the MAPS location record being loaded: +0 index, +4 door count, +8 doors, +12 object header, +16 data (location_read_record); town_load/dungeon_load copy +12/+16 into location_object/current_location"
+global,0x00196A8C,loaded_location_door_count,strong,loaded_location+4: door count (location_read_record)
+global,0x00196A90,loaded_location_doors,strong,"loaded_location+8: 6-byte door records (location_find_door, quest place code)"
+global,0x00196A94,loaded_location_object,strong,loaded_location+12: the 71-byte object header read from MAPS; town_load copies 55 bytes of it into location_object
+global,0x00196A98,loaded_location_data,strong,loaded_location+16: the 48-byte location data; town_load copies it into current_location
 global,0x00196A9C,region_locations,candidate,"pointer to the region's 17-byte map_location records (D_00196A28 of them), from maploads.c"
+global,0x00196AA0,blocks_bsa,strong,"BLOCKS.BSA handle opened by town_load_blocks and dungeon_load from 'blocks.bsa', read by town_block_load_rmb and dungeon_load_rdb_block (traces: RMB/RDB reads)"
+global,0x00196AA4,block_origin_x,strong,"x of the town block being built (location_object x + column*4096), town_load_blocks"
+global,0x00196AA8,block_origin_z,strong,z of the town block being built (location_object z + (row+1)*4096)
 global,0x00196AAC,maps_bsa,strong,handle of MAPS.BSA (init 4ED36 opens 'maps.bsa'); 8 in save_tlalac_s
+global,0x00196AB0,dungeon_header,candidate,10 bytes read after a MAPDITEM record for loaded_location; its +3 byte is dungeon_block_count
+global,0x00196AB3,dungeon_block_count,confirmed,byte: blocks in the dungeon; 5 in The Masterford Graveyard (exp3); dungeon_load loads that many RDB blocks
+global,0x00196ABA,region_locations_region,candidate,u16 region whose locations are loaded; maploads_load_region saves that region's MAPSAVE flags before loading another
 global,0x00196ABC,tavern_room_list,candidate,scratch list of 26-byte building entries built by tavern_collect_* (in scratch_buffer)
 global,0x00196AC0,tavern_menu_image,strong,"tvrn00i0.img, loaded by tavern_open, drawn by tavern_frame, freed by tavern_close"
+global,0x00196B00,politic_pak,confirmed,POLITIC.PAK loaded by region_load_tables; politic_region_at looks the player's position up in it and returned current_region (21) in save_morthag1 (exp1)
+global,0x00196B04,climate_pak,confirmed,CLIMATE.PAK loaded by region_load_tables; climate_lookup at the player gave 231 (woodlands) = current_climate (exp1)
 global,0x00196B08,court_reputation_change,confirmed,"crime_reputation_loss[crime]/2 set by court_open, used by court_reputation_restore; experiment: 4 for assault, legal reputation +3 per call"
+global,0x00196B0C,collide_candidate_count,strong,entries in collide_candidates
+global,0x00196B40,collide_candidates,strong,"up to 128 model objects near the move (collide_gather_cb, 'Exceeded maximum collisions.')"
+global,0x00196D60,collide_height,candidate,floor height found by collide_vertical_cb (collide_floor_height returns it)
+global,0x00196D64,collide_flags,strong,"result bits of a collision move: 1 floor, 2 wall/model, 4 slide, 8 creature, 16 nothing near"
 global,0x00196D68,career_bio_line,candidate,first line number shown
 global,0x00196D6C,career_bio_text,strong,bio.dat loaded by career_show_biography
 global,0x00196D70,career_bio_end,candidate,end of the biography text
@@ -684,6 +753,16 @@ global,0x00196DC1,quest_debug_kind,candidate,"text-variable section the overlay 
 global,0x001970C4,monsters_woken,candidate,set once by monster_wake_all
 global,0x001970DC,quest_init_retry,candidate,counts persons that could not be placed yet: quest_init_resources repeats the person pass while it is set
 global,0x001970DD,quest_init_local,candidate,"0/1 picked per person (flag 0x200 or random): local or regional NPC, selects the faction's person picture ids"
+global,0x001970E0,sky_image_a,candidate,"112640-byte sky half allocated by sky_init, filled by sky_load_day / sky_load_night"
+global,0x001970E4,sky_image_b,candidate,the other 112640-byte sky half
+global,0x00198500,moon0_image,strong,moon00i0.cfa loaded by sky_init; sky_update sets its screen position (+6/+8)
+global,0x00198504,moon1_image,strong,moon01i0.cfa loaded by sky_init
+global,0x0019857C,sun_light,candidate,sun light level 0-63 by time of day set by sky_update (0 at night); sky_apply_sunlight runs when it is set
+global,0x00198580,moon0_phase,confirmed,"sky_update_moons: day & 31 (3 in save_morthag1, exp3)"
+global,0x00198588,moon1_phase,confirmed,"sky_update_moons: (day + 4) & 31 (7, exp3)"
+global,0x001985A8,moon1_direction,candidate,x/y/z of moon 1 on its 3500-minute orbit
+global,0x001985B4,moon0_direction,candidate,x/y/z of moon 0 on its 2500-minute orbit (sky_update_moons)
+global,0x001985C8,sun_direction,candidate,x/y/z of the sun (sky_sun_direction); sky_apply_sunlight uses it
 global,0x0019961C,spell_effect_cost_current,strong,"the 8-byte cost record (4 shorts) of the effect being costed, copied from spell_effect_costs; read by spell_cost_formulas"
 global,0x00199624,spellmaker_settings_image,strong,"mask05i0.img (spellmaker_open): the effect settings panel drawn by spellmaker_settings_update, freed by spellmaker_exit"
 global,0x0019962C,spellmaker_alter_row,candidate,"short: effect row waiting for the ""alter the spell?"" answer (-1 none): yes edits it, no deletes the effect"
@@ -713,6 +792,7 @@ global,0x00199704,joystick_button_latch,candidate,2 bytes: key_action_pressed's 
 global,0x00199708,controls_view_image,candidate,"cnfg00i1.img, drawn over the controls screen in view mode (options_controls_draw)"
 global,0x0019970C,options_image,strong,"optn00i0.img, loaded by options_open, drawn by options_draw, freed by options_close"
 global,0x00199710,options_saved_screen,strong,64000-byte copy of the screen under the options window (options_open / options_draw)
+global,0x00199728,kludge_menu_active,candidate,"set by kludge_menu_open, cleared when kludge_menu_update runs the picked entry"
 global,0x0019972C,parse_name_seed,strong,"random seed saved by parse_expand at its start; the name macros reseed from it (+0 %fn, +123 %fn2, +3457 %mn and %bn, +9543 %mn2) so one text gets the same names"
 global,0x00199730,parse_output,candidate,the destination buffer of the current parse_expand call
 global,0x00199734,parse_number,candidate,number read after a %z.. macro by parse_read_number
@@ -783,9 +863,16 @@ global,0x001A3AA8,magicka_max_modifier,candidate,"effects_tick: -max/2 or -max m
 global,0x001A3AAC,trade_haggle_minimum,candidate,"double: the lowest price the merchant takes, from the buyer's PER/reputation/skill and the shop quality"
 global,0x001A3AB4,trade_haggle_asking,strong,"double: the merchant's asking price (price*quantity at the start), shown by trade_haggle_show_offer, lowered by the steps; set by 0x684E9 (named shrine_donation, really the haggle start)"
 global,0x001A3AD4,trade_haggle_step_size,candidate,double: concession per round (trade_haggle_step)
+global,0x001A3AE8,sound_channels,strong,"4 x 268-byte channel records (HMI SOS sample structs + priority, object, position); channel 3 for loops"
 global,0x001A3F18,nearest_fire_distance,strong,its distance (2048 = none)
 global,0x001A3F1C,nearest_fire,strong,the nearest burning flat (world_collect_object); sound.c plays 242 Burning at it within 300
+global,0x001A3F20,ambient_rain_channel,strong,channel of the AmbientRaining loop (385) started by sound_update_ambient
+global,0x001A3F24,ambient_crickets_channel,strong,channel of the AmbientCrickets loop (375)
+global,0x001A3F28,ambient_fire_channel,strong,channel of the Burning loop (242) near a fire
+global,0x001A3F30,music_song,candidate,"handle of the loaded song (sosez 11870), started by music_play, restarted by music_update"
 global,0x001A3F44,midi_bsa,strong,handle of MIDI.BSA read by sos_load_song (traced MIDI.BSA reads 11870 <- 6974E); 11 in save_tlalac_s
+global,0x001A3F50,music_current,confirmed,13-byte name of the song playing; music_play('04.HMI') stored it (exp3)
+global,0x001A3F5D,sound_enabled,strong,set by sound_init_music; every sound and music function returns at once when 0
 global,0x001A3F5E,music_uses_fm,candidate,"selects the FM song names (fm_dngn1.hmi, gshop -> fm_sqr_2.hmi) in music_select_tables / music_choose_song"
 global,0x001A3FA0,logbook_first_entry,strong,int: entry at the top of the page (prev/next)
 global,0x001A3FA4,logbook_show_notes,strong,byte: 1 = the copied talk notes view (logbook_toggle_notes)
@@ -816,6 +903,10 @@ global,0x001A4A18,spellshop_saved_seed,candidate,RNG seed saved while the spell 
 global,0x001A4A1A,guild_npc_seed,candidate,high word of the NPC's record id; seeds the spell shop list
 global,0x001A4A1C,guild_gift_pending,candidate,set by guild_give_gift; guild_service_dispatch then opens the trade container
 global,0x001A4A1D,guild_join_asked,candidate,counter: the join question is asked only when it becomes 1
+global,0x001A4A20,rest_ticks_per_hour,candidate,BIOS ticks per rested hour: 9 or 32
+global,0x001A4A24,breath_last_tick,candidate,BIOS tick of the last breath decrement
+global,0x001A4A28,rest_image,strong,"rest01i0.img/rest02i0.img loaded by rest_update, freed by rest_close"
+global,0x001A4A2C,rest_loitering,strong,"1 for LOITER (3 hours max, TEXT 27/349), 0 for REST (99 hours, TEXT 26/353)"
 global,0x001A4A30,weapon_hand_item,candidate,the item drawn in each hand (0 = fists)
 global,0x001A4A58,weapon_hand_cif,strong,"2 loaded weapon CIF images (right, left hand); weapon_load_hand_sprite / weapon_free_sprites"
 global,0x001A4A60,weapon_hand_frame,candidate,position in weapon_hand_anim (or a reload countdown)
@@ -887,6 +978,13 @@ global,0x001A9444,arch3d_bsa,confirmed,handle of ARCH3D.BSA (init 4ED36 opens 'a
 global,0x001A9448,dagger_snd,confirmed,handle of DAGGER.SND (init 4ED36 opens 'dagger.snd'); sound_cache_load reads records through it (traced DAGGER.SND reads)
 global,0x001A944C,model_heap,strong,"jmem pool for ARCH3D models (model_heap_init, 819200 bytes)"
 global,0x001A949D,model_cache_flush_count,candidate,bumped by model_cache_flush; world_render clears it each frame; model_load does not flush again while it is set
+global,0x001A94A0,terrain_cell_ids,candidate,4 cell ids last seen by terrain_update_cells
+global,0x001A94B0,terrain_cell_dirty,candidate,4 flags set when terrain_update_cells sees a new cell
+global,0x001A94C4,terrain_cell_at_player,candidate,XnGine cell id (func_000C2D81) of the player's map pixel; world_update_location reacts when it changes (-1 forces it)
+global,0x001A94C8,climate_index,confirmed,"current_climate - 224 (7 in Ipscart Rock, exp4); indexes region_flats and climate_texture_sets"
+global,0x001A94CC,ground_texture_archive,confirmed,"climate_texture_sets[climate]*100+2 (+1 winter/snow, +2 rain): 302 in save_morthag1 (exp4), DFU's terrain archives 2/102/302/402"
+global,0x001A94D0,nature_texture_archive,confirmed,"nature flat archive of the climate (regflat.bin +0, +1 in winter): 504 in save_morthag1 (exp4); town_block_create_misc_objects puts it on nature flats"
+global,0x001A94D4,region_flats,strong,regflat.bin loaded by region_load_tables: per climate a nature archive and 129 bytes of settings copied to XnGine (climate_set_textures)
 global,0x001A99F8,recall_anchor_location,candidate,location id (location_object +0x1B) saved when Recall sets the anchor
 global,0x001A99FC,recall_anchor_region,candidate,current_region saved with the Recall anchor
 global,0x001A9A00,recall_anchor_building,candidate,"the building (player object parent +0x1B) when anchored indoors, else 0"
@@ -1070,14 +1168,20 @@ field,door+0x19,lockpick_skill_tried,strong,u16 the Lockpicking value at the las
 field,entity+0x47,character,confirmed,player_character = player_entity + 0x47 in 2 saves; disease code: entity+71 == player_character
 field,faction+0x00,type,strong,"byte: 2 group, 4 individual, 7 noble, 9 temple, 14 courts, 15 people (faction.txt types); talk walks up to 2/7/9"
 field,faction+0x01,region,strong,"byte region index, 255 = none; compared with current_region"
+field,faction+0x02,ruler,strong,byte from FACTION.TXT 'ruler' (faction_parse_ruler)
 field,faction+0x03,name,strong,"26-char name: talk prints it (individual NPC names, organisation list)"
 field,faction+0x1D,reputation,strong,"short -100..100, player's standing; faction_add_reputation; added to talk_disposition"
 field,faction+0x1F,power,strong,"short 1..100; faction_add_power, politics"
 field,faction+0x21,id,strong,u16 faction id as in faction.txt (#40 Mages Guild...); faction_find matches it
+field,faction+0x23,vampire_clan,strong,u16 from 'vam' (faction_parse_vam)
 field,faction+0x25,flags,candidate,u16; bit 4 stops ruler changes in politics
+field,faction+0x27,seed,candidate,u32 random value set by faction_add_record
 field,faction+0x2B,politics_factor,candidate,"u32 20-70, rerolled when a ruler changes; weighs power drift and treaties"
+field,faction+0x2F,flats,strong,2 x u16 archive<<7|record from 'flat' (faction_parse_flat); random TEXTURE flats when missing
 field,faction+0x33,face,strong,face index for talk_load_face (individuals)
+field,faction+0x35,race,strong,byte from 'race' (faction_parse_race)
 field,faction+0x36,social_group,strong,byte 0 commoners .. 4 underworld (faction.txt sgroup); indexes character reputation
+field,faction+0x37,guild_group,strong,byte from 'ggroup' (faction_parse_ggroup)
 field,faction+0x38,allies,strong,3 faction pointers
 field,faction+0x44,enemies,strong,3 faction pointers
 field,faction+0x50,next,strong,next sibling in the faction tree
@@ -1114,6 +1218,10 @@ field,link+0x11,speed,strong,"16.16 units per tick, negated when reversed"
 field,link+0x19,start_tick,strong,BIOS tick (0x46C) when the step started
 field,link+0x1D,delta,candidate,"3 shorts: the object's last x/y/z move, returned by links_object_motion"
 field,link+0x23,object,strong,the moved object (pointer; a record id in the save)
+field,location+0x00,name,confirmed,"32-char location name ('You are entering %s'); exp2/3: 'Ipscart Rock', then 'Charmarket' and 'The Masterford Graveyard' after map_goto_location"
+field,location+0x20,width,strong,"blocks across (7 in Ipscart Rock, 2 in Charmarket); town_load_blocks, location_contains"
+field,location+0x21,height,strong,blocks down (6 in Ipscart Rock)
+field,location+0x22,kind,strong,"dungeons: the dungeon type (18 The Masterford Graveyard, exp3; encounter table index); towns: size class read by town_load_blocks (0 city) and rest_allowed"
 field,location+0x25,object_counter,strong,"u16: objects made while building a location get id = location_object id + this++ (object_create_in_block, rmb_make_door/light/flat, rmb_add_subrecord)"
 field,location+0x27,marker_counter,candidate,"u16: quest and item markers (kinds 9, 16) count their ids from this instead (rmb_make_marker)"
 field,location+0x29,building_count,strong,u16 buildings in the current town
@@ -1122,8 +1230,11 @@ field,logbook+0x00,quest_ids,confirmed,"32 x u16 quest ids (logbook_add_entry, l
 field,logbook+0x2C0,message_times,confirmed,32 x 10 x u32 game_minutes when each message was logged; exp4 (scratch/text/exp4.py save_morthag1): = game_minutes
 field,logbook+0x40,message_ids,confirmed,32 x 10 x u16 QRC message ids per quest; exp4 (scratch/text/exp4.py save_morthag1): 1011 at slot 0 index 3
 field,logbook+0x7C0,places,confirmed,32 x 32-byte place names (current_location) for %cn; exp4 (scratch/text/exp4.py save_morthag1): 'Ipscart Rock'
+field,map_location+0x00,map_id,confirmed,"u32: bits 0-19 the map pixel id region_find_location searches (sorted), bits 20-31 the entry's index in MAPPITEM/MAPDITEM (town_load(id >> 20)); exp2: index 416 = Ipscart Rock's record"
 field,map_location+0x04,x_type_flags,candidate,"u32: bits 0-24 x (world/32768 -> map pixel), 25-29 location type (category via location_type_category), bit 30 discovered, bit 31 hidden; only discovered, not hidden ones are drawn unless D_00195AE8 bit 3 (reveal cheat?)"
-field,map_location+0x08,y,candidate,"u32: bits 0-23 the north coordinate, mapped to map pixels with 499-origin"
+field,map_location+0x08,y_size,candidate,"the top byte also holds the area's size (world agent); u32: bits 0-23 the north coordinate, mapped to map pixels with 499-origin"
+field,map_location+0x0C,dungeon_type,confirmed,"byte dungeon type 0-18, 255 none; exp2: the histogram equals region_dungeon_type_counts; exp3: The Masterford Graveyard is 18"
+field,map_location+0x0D,services,candidate,"u32 bit mask of the town's buildings (temples by god, guilds...), read by location_has_service for quest and talk place picks"
 field,mem_block+0x00,magic,strong,"0x69696969 ('iiii') in every used block: mem_pool_alloc writes it, mem_pool_release and mem_check_heap fail without it"
 field,mem_block+0x04,next,strong,"next block in the pool (mem_pool_alloc splits, mem_pool_release merges, mem_check_heap walks it)"
 field,mem_block+0x08,prev,strong,previous block ('Invalid memory stack pointer.' when next->prev is not this block)
@@ -1265,7 +1376,18 @@ field,quest+0x06,name,confirmed,"8-character file name (""s0000999"", ""B0B71Y03
 field,quest+0x0F,flags,strong,bit 1 set by opcode 4 (rewarded): opcode 6 then posts 1007 not 1006 and skips the -2; UESP HasDebugInfo byte
 field,quest+0x10,section_counts,confirmed,"short[10] records per QBN section (+0x20 opcodes, +0x22 states, +0x1C timers, +0x1E foes, +0x16 persons, +0x18 places); read in 7 saves"
 field,quest+0x24,section_offsets,confirmed,short[11] offsets of the sections from the quest start (quest_section); offset 10 = text variables
-field,region+0x2D,crime_flags,candidate,"byte in the 80-byte region record (region_politics): court bit 0 banished (8063), bit 1 sentenced to death (8060)"
+field,region+0x49,crime_flags,candidate,"offset from the record's start at 0x18F044 (world agent; it was measured from region_politics, base+0x1C): byte in the 80-byte region record (region_politics): court bit 0 banished (8063), bit 1 sentenced to death (8060)"
+field,rumor+0x00,faction1,strong,"s16 first faction id (rumor_add_faction, rumor_is_eligible)"
+field,rumor+0x02,faction2,strong,s16 second faction id
+field,rumor+0x04,kind,strong,"i32 politics event kind, 100 = not a politics rumour"
+field,rumor+0x08,region,strong,byte region; rumor_collect_local matches current_region
+field,rumor+0x09,flags,strong,"1 regional, 2 quest NPC, 4 quest, 8 faction, 32 dropped (rumor_file_purge)"
+field,rumor+0x0A,quest_id,strong,byte quest id of a quest rumour (rumor_add_quest; purge drops it when the quest has ended)
+field,rumor+0x0B,quest_name,strong,9-char quest file name
+field,rumor+0x14,message,candidate,s16 quest message id
+field,rumor+0x16,target,candidate,i32 matched by rumor_find_for_npc
+field,rumor+0x1A,text_length,strong,bytes of text after the 34-byte header
+field,rumor+0x1E,expires,strong,"game_minutes when it lapses (faction rumours +43140, quest ones 30 or 180 days)"
 field,settings+0x00,view_flags,confirmed,"bit 0 full screen (no HUD bar; hud_draw and hud_draw_heading_strip test it), bit 1 head bobbing; exp_options.py: 3 -> 1 -> 0 with the two buttons"
 field,settings+0x01,detail_level,strong,0..127 from the DETAIL bar (options_detail_slider); 126 in save_tlalac_s
 field,settings+0x02,sound_volume,strong,u16 0..127 from the SOUND bar (options_sound_slider); 60 in save_tlalac_s
@@ -1327,11 +1449,30 @@ func,0x0001335E,archive_write_record,strong,"seeks to a record and writes it bac
 func,0x00013438,lockpick_door_unused,candidate,"steal.c, not archive.c: calls lockpick_door and ignores the result; no callers"
 func,0x0001345E,lockpick_door,strong,"steal.c, not archive.c (0x13438-0x13731 follow archive.c's last MemCheck): Lockpicking (skill 13, uses +1) against the door's lock (+0x17, >= 20 never), chance skill or the Open spell's lock_open_chance + (level - lock)*5 clamped 5-95; success sets flags +0x15 bit 6, 'The lock clicks open.', links_trigger(door, 7), sound ActivateLockUnlock; failure 'It does not unlock.' and remembers the skill (+0x19); caller door_try_open"
 func,0x000135E6,lockpick_action_door,strong,"steal.c: the same roll for a locked action object or block door (a1, lock a2, door a3) with the crime count (guild_count_crime 5, breaking and entering) on success; callers click.c 7461D, maplogic 86F50"
+func,0x0001374D,pickpocket_attempt,strong,"Pickpocket skill (character+0xF7) +5 per level above a creature's, 5-95: fail 'You are not successful...' (crime 12, wakes monsters); else 33% the handkerchief (8999) or 'You pinched %d gold pieces.'; callers pick_gold, 75F48, 763C6"
+func,0x000138E4,lock_show_difficulty,strong,"(lock level): 'This is a magically held lock...' at 20+, else by Lockpicking (character+0xEB) - lock*5: 'This lock has nothing to fear from you...' to 'This lock seems relatively easy...'"
+func,0x00013981,door_key_match_cb,candidate,callback: an item of group 27 index 3 whose +0x24 and +0x3F match the door (D_00190BE4) -> found_record
+func,0x00013A00,door_find_key,candidate,"(container, a, b): searches the player's items with door_key_match_cb; caller door_try_open (7425E, whose notes say key 13A00)"
+func,0x00013A52,screenshot_poll,strong,"when the screenshot key flag (D_00142333) is set, saves PICS\SCR%d.BMP (screenshot_save_bmp) and waits for the key; callers main, automap_open, town_map_open"
+func,0x00013AB6,screenshot_save_bmp,confirmed,"writes a 320x200 BMP: the 1078-byte header with the palette, then the rows of VGA memory 0xA0000 bottom up; bumps the screenshot number; exp3: wrote a 65078-byte 320x200 BMP and screenshot_number 0 -> 1"
 func,0x00013C56,marquee_update,candidate,"every frame (game_frame): if marquee_text, draws up to 80 chars of it at (marquee_x, 140) and scrolls 2 px left; at the end marquee_stop. Only marquee_show_* (no callers) start it, so it never shows"
 func,0x00013D2D,marquee_start,candidate,"(text): frees the previous owned text, marquee_text = text, x 320 (owned when D_001940DA bit 3)"
 func,0x00013DB6,marquee_stop,candidate,"frees the owned text, marquee_text 0"
 func,0x00013E17,region_flag_set,confirmed,"(region, flag): clears the other flags of its group (region_event_flag_groups), sets the flag and group, value = random(min,max) from region_event_durations; flag 18 picks a random type-1 (god) faction into region_persecuted_temple; callers quest_run_opcodes, faction_politics_update; exp1: region 20 flag 2 -> value 7, flag 1 cleared"
 func,0x00013F06,region_flag_clear,confirmed,"(region, flag): clears the flag and its group; exp1: flag 2 and group 0 cleared"
+func,0x00013F4B,engine_pick_object,strong,"(screen x, y, result): XnGine pick (12A608) then finds the object owning the hit model or sprite, when y is inside the 3D view (199, or the view's height); callers weapon_melee_strike, click 80A72, automap_button_map_click"
+func,0x00014048,model_point_at,candidate,"the i-th 8-byte entry after an 8-byte header, if i < its count byte; no caller seen"
+func,0x00014096,arch3d_plane_at,candidate,"(model, i): walks the model's planes (list at +60, each 8 + 8*points bytes) to the i-th"
+func,0x0001410F,pick_model_cb,candidate,"callback: finds the model object (types 43, 56, 6, 32) whose model the pick hit"
+func,0x00014334,pick_sprite_cb,candidate,"callback: finds the sprite object (types 2, 8, 18, 33, 34, 44, 53) the pick hit this frame"
+func,0x00014438,arch3d_plane_index,candidate,"index of a plane pointer in a model, -1 if none"
+func,0x0001449D,player_move_by_velocity,candidate,moves the player object by D_00120288's x/z >> 9; no caller seen
+func,0x00014518,arch3d_apply_climate_textures,strong,"for each plane of a model, maps its texture archive through texture_archive_for_climate; caller objlib 85407 (model load)"
+func,0x000145CD,texture_archive_for_climate,strong,"(archive, record): outside, climate-dependent archives become set*100+n (+1 in snow); inside, the same for building archives; in dungeons the dungeon textures chosen by dungeon_choose_textures"
+func,0x0001478F,dungeon_choose_textures,strong,"seeded by the location id: 5 dungeon texture archives from the climate set (D_00179954), used by texture_archive_for_climate; caller dungeon_load; exp3: 23, 23, 19, 19, 23 in the Graveyard (woodlands set 19-23)"
+func,0x00014853,interior_stock_shelves,strong,"for each model in a building interior: shelves (418, 410) get shop_generate_stock by the building's quality and type"
+func,0x0001490D,shelf_kind_is_stocked,candidate,"1 for shelf kinds 3, 4, 7, 8, 32-38, 50, 51"
+func,0x0001497D,world_for_each_object,strong,"calls a callback on every object of the town, interior or dungeon around the player, skipping block objects (38/47); caller engine_pick_object"
 func,0x00014AE8,talk_open,confirmed,"talk_start calls it with the NPC object: sets game_mode=12, loads talk01i0/02i0/03i0.img, saves the screen, greets by disposition (TEXT 7206-7209); with 0 it only returns whether game_mode==12 (called so every frame by talk_update); experiment: TALK in a guild menu -> mode 12"
 func,0x00014EA8,talk_update,strong,"main loop every frame; returns unless talk_open(0); redraws when talk_redraw is set, Up/Down/PgUp/PgDn scroll the topic list, Esc closes, mouse clicks hit-test talk_buttons (19 rects) and call the handler"
 func,0x00015176,talk_draw,strong,"redraws the talk window: NPC name at (213,53), face, answer and question panes, tab/tone highlights; composes the question from TEXT 7211-7233 by tone/mode/tab; ran in every step that changed the window (20 episodes)"
@@ -1429,7 +1570,74 @@ func,0x0001B418,faction_add_reputation,strong,"reputation (+0x1D) += a2, clamped
 func,0x0001B470,faction_change_reputation,strong,"player's reputation with a faction += d (allies +d/2, enemies -d/2, up and down the tree); 240 means the player's temple; callers crime.c, qcom.c (quest command), quests.c"
 func,0x0001B554,faction_add_reputation_r,candidate,"recursive: target gets d, other members of the subtree d/2"
 func,0x0001B5BE,faction_propagate_reputation,candidate,"walks to the root (stopping at the Dark Brotherhood, 108) and applies the change; 844 Generic Knightly Order means the player's order"
+func,0x0001B69D,faction_load_file,strong,"parses FACTION.TXT ('#id', tab depth, 19 keywords hashed in faction_keywords) into the factions tree; 'Invalid command in line %d.'; trace: FACTION.TXT read"
+func,0x0001BAB4,faction_link_relations,strong,"turns allies[3]/enemies[3] faction ids into record pointers (faction_find_r), recursively"
+func,0x0001BB95,faction_free,strong,frees the factions array
+func,0x0001BBE2,faction_add_record,strong,copies a parsed record into the array and links it in the tree by its tab depth; random +0x27 and politics factor 20-70
+func,0x0001BD1A,faction_parse_type,strong,faction_keywords 'type' -> +0x00
+func,0x0001BD9C,faction_parse_name,strong,faction_keywords 'name' -> +0x03
+func,0x0001BE07,faction_parse_rep,strong,faction_keywords 'rep' -> +0x1D
+func,0x0001BE8B,faction_parse_summon,strong,faction_keywords 'summon': skips the number
+func,0x0001BEFE,faction_parse_region,strong,"faction_keywords 'region' -> +0x01 (minus 1, 255 none)"
+func,0x0001BF99,faction_parse_power,strong,faction_keywords 'power' -> +0x1F
+func,0x0001C01D,faction_parse_flags,strong,faction_keywords 'flags' -> +0x25 (or-ed)
+func,0x0001C0A1,faction_parse_ally,strong,faction_keywords 'ally' -> next of allies[3] (+0x38)
+func,0x0001C143,faction_parse_enemy,strong,faction_keywords 'enemy' -> next of enemies[3] (+0x44)
+func,0x0001C1E5,faction_parse_ruler,strong,faction_keywords 'ruler' -> +0x02
+func,0x0001C268,faction_parse_face,strong,faction_keywords 'face' -> +0x33
+func,0x0001C2BE,faction_parse_vam,strong,faction_keywords 'vam' -> +0x23
+func,0x0001C314,faction_parse_flat,strong,"faction_keywords 'flat' -> +0x2F/+0x31 (archive<<7 | record, two per record)"
+func,0x0001C45F,faction_parse_race,strong,faction_keywords 'race' -> +0x35
+func,0x0001C4E2,faction_parse_sgroup,strong,faction_keywords 'sgroup' -> +0x36
+func,0x0001C565,faction_parse_ggroup,strong,faction_keywords 'ggroup' -> +0x37
+func,0x0001C5E8,faction_parse_minf,strong,faction_keywords 'minf': skips the number
+func,0x0001C65B,faction_parse_maxf,strong,faction_keywords 'maxf': skips the number
+func,0x0001C6CE,faction_parse_rank,strong,faction_keywords 'rank': skips the number
+func,0x0001C713,bio_person_add,strong,"(character record, class record, kind): adds a type 45+kind object (0 enemy AE, 1 friend AF/AO) with a 560-byte character and 74-byte class, at most 8; caller career_answer_effect"
+func,0x0001C7D6,bio_person_get,candidate,"(kind, n): the n-th biography person of a kind, with skills, health, magicka and level copied from the player's"
+func,0x0001C8DE,bio_person_count,candidate,"(class or -1, kind): counts biography persons of a kind"
+func,0x0001C960,faction_save,strong,"writes faction_count and every record (faction_save_r) to the save file, then relinks; caller loadsave save 7BEFC"
+func,0x0001C9A5,faction_save_r,strong,"writes each 92-byte record with allies/enemies turned back into ids, children first"
+func,0x0001CA8C,faction_load,strong,"reloads FACTION.TXT, then overlays the first 80 bytes of each saved record (rep clamped to +-100) from the save; caller loadsave 7B9A1; trace: SAVEVARS.DAT, FACTION.TXT"
+func,0x0001CB3C,faction_membership_related_cb,candidate,callback: a type-10 membership whose faction is faction_match or its ally/enemy counts and is kept in guild_membership
+func,0x0001CBBD,faction_player_related,strong,"count of the player's memberships in the faction, its allies or enemies; rumours of politics are only kept when this is nonzero; exp2: 1 for the Mages Guild (the player is a member)"
+func,0x0001CC16,faction_count_allies,strong,nonzero allies[3]; exp2: 1 for the Mages Guild
+func,0x0001CC6E,faction_count_enemies,strong,nonzero enemies[3]
+func,0x0001CCC6,faction_make_alliance,strong,adds each to the other's allies and the rumour 1400 '%fx1 has just allied with...'; caller faction_politics_update
+func,0x0001CD56,faction_make_enemies,strong,"adds each to the other's enemies, rumour 1401 '...had a grudge against %fx1'"
+func,0x0001CDE6,faction_break_alliance,strong,"removes an ally both ways, rumour 1402 '%fl1 insulted %fl2 in a missive'"
+func,0x0001CE92,faction_make_peace,strong,"removes an enemy both ways, rumour 1403 '%fx1 and %fx2 have patched up their differences'"
+func,0x0001CF3E,rumor_add_faction,strong,"(faction 1, 2, kind, region, TEXT id): expands the text and appends a 34-byte rumour header + text to rumor.dat, expiring in 43140 minutes"
+func,0x0001D113,rumor_file_open,strong,opens (or creates) rumor.dat into rumor_file and seeks to its end
+func,0x0001D176,rumor_file_close,strong,closes rumor_file
+func,0x0001D1A1,rumor_collect_local,strong,"all regional rumours of the current region from rumor.dat, after the location name; caller faction_rumor_text"
+func,0x0001D2F0,rumor_pick_news,confirmed,a random eligible rumour from rumor.dat for 'Any news?'; caller talk_ask_news; exp2: returned 'Gondard Masterham sure wasn't Alabistyr Woodfield's only dupe...'
+func,0x0001D46A,rumor_find_for_npc,candidate,the quest rumour (flag 2) whose +22 matches; caller talk_open
+func,0x0001D54B,rumor_is_eligible,candidate,"regional mode: rumour of the current region with flag 1; else flags 4/8, and faction rumours of secret factions (flag 1) only on a roll above 75"
+func,0x0001D66C,rumor_flags_for_kind,candidate,"1 (regional) for politics kinds 4, 7, 10, 18, 26-28, else 8"
 func,0x0001D739,faction_rumor_text,candidate,faction.c; opens rumor.dat; direct call (all-zero args) shows a rumour about a faction; called by func_00044EE0
+func,0x0001D766,rumor_add_quest,strong,"(quest, message, npc, flags): appends a quest message (quest_load_text) as a rumour lasting 30 or 180 days; callers quest opcodes 29958, 4BDB7, 4CE24"
+func,0x0001D8AD,rumor_file_purge,strong,"rewrites rumor.dat without expired rumours or those of finished quests, keeping at most 200 NPC rumours; callers faction_politics_update, quest opcodes"
+func,0x0001DA2D,rumor_copy,strong,"copies a 34-byte rumour header and its text, returns the end"
+func,0x0001DA9C,rumor_drop_oldest_npc,candidate,marks the first NPC rumour (flag 2) dropped (flag 32)
+func,0x0001DAED,region_locations_load_discovered,strong,reads record MAPSAVE.%03d (region) from MAPSAVE.SAV and copies bits 6/7 of each byte into map_location+7 (discovered/hidden flags); trace: MAPSAVE.SAV read under it
+func,0x0001DC12,region_locations_save_discovered,strong,writes each map_location's +7 bits 6/7 into MAPSAVE.%03d of MAPSAVE.SAV (func_0001335E writes a BSA record); counterpart of region_locations_load_discovered
+func,0x0001DD39,maploads_load_region,strong,"saves and frees the old region's locations, loads MAPTABLE.%03d into region_locations (17-byte records), counts location types (region_location_type_counts) and dungeon types (region_dungeon_type_counts), loads MAPSAVE flags, sets location_here; trace: MAPTABLE reads"
+func,0x0001DF08,region_load_location_names,strong,reads MAPNAMES.%03d into big_buffer and points region_location_names at it; caller travel_open_region; trace: MAPNAMES reads
+func,0x0001DF7F,maploads_enter_region,candidate,"wrapper of maploads_load_region, called by region_enter"
+func,0x0001DFA2,region_location_names_release,candidate,clears region_location_names; caller travel_button_exit
+func,0x0001DFCD,location_read_record,strong,"(loc, file): reads a MAPS location record: door count and 6-byte doors, the 119-byte object header (71-byte object + 48-byte data), then data+0x29 buildings x 26 bytes (UESP/DFU LocationRecordElement)"
+func,0x0001E0C6,location_load_dungeon,strong,"(loc, index): reads entry index of MAPDITEM.%03d (current_region) with location_read_record; for loaded_location also the 10-byte dungeon header and the 128-byte block list; trace: MAPDITEM reads"
+func,0x0001E1F1,location_load_dungeon_by_id,strong,"as location_load_dungeon but finds the MAPDITEM entry whose id matches, else 'Invalid dungeon ID.'; caller dungeon_load"
+func,0x0001E34D,location_load_nth_dungeon_of_type,candidate,"loads the n-th dungeon of a dungeon type (map_location+0x0C) with location_load_dungeon (index 0 when not found); callers quest_pick_location, disease 66352"
+func,0x0001E3D3,location_load_exterior,strong,"(loc, index): reads entry index of MAPPITEM.%03d; for loaded_location also the 412-byte exterior data (location_exterior: block indexes, numbers, letters); trace: MAPPITEM reads"
+func,0x0001E502,location_load_nth_of_type,candidate,loads the n-th location of a location type (map_location+4 bits 25-29) with location_load_exterior; no caller seen
+func,0x0001E576,town_block_create_object,candidate,"creates the type-38 object for the current town block at (block_x, terrain height - 8, block_z - 4096), id = location_object id + current_location+0x25 counter"
+func,0x0001E614,town_block_load_rmb,strong,"builds the block name from location_exterior's index/number/letter tables and the RMB name templates at 0x18437F ('TVRN????.RMB'...), reads it from BLOCKS.BSA into rmb_block; trace: BLOCKS.BSA RMB reads"
+func,0x0001E7A8,rmb_index_records,strong,"sets rmb_block's per-subrecord pointers (from +0x6C3 sizes, data at +6776) and the pointers to its 66-byte 3D objects and 17-byte flats (counts at +1/+2), the DFU RmbBlock layout"
+func,0x0001E854,town_block_place_building,candidate,"(buildings, i): sets the building model globals from the RMB block position i (x, z, height, angle); a building named KRAVE01.HS2 becomes a guild hall (type 11) of faction 414 The Order of the Raven"
+func,0x0001E928,town_block_create_misc_objects,candidate,"creates the type-56 object holding the block's loose 3D objects and flats, offsets them to the block; flats with a person id spawn NPCs, nature flats (502-510) take the climate's nature archive, lights (210) get their size; copies the 429-byte name table"
+func,0x0001EC32,town_load_blocks,strong,"for each block of current_location (width x height): block object, RMB load, building placement, objlib buildings, misc objects, town map pixels; sets town_house_skip_percent (66/50/33/0 by size); 'Invalid map data.'; trace: BLOCKS.BSA RMB reads"
 func,0x0001EE84,tavern_open,confirmed,"(open) filed under maploads.c: open=1 loads tvrn00i0.img, tavern_state=0, game_mode=20, tavern_building=current_building; returns game_mode==20; callers click.c (innkeeper), qmisc.c, xn_CAF00 table; experiment (scratch/econ/exp_tavern.py: entered the nearest tavern, tavern_open(1), clicks): game_mode 0->20, ROOM / TALK / FOOD & DRINKS / GOODBYE menu"
 func,0x0001EF2E,tavern_frame,confirmed,"filed under maploads.c; every frame from main(): tavern_buy_food after the food picklist, tavern_room_offer / tavern_room_pay by tavern_state, trade_settle_offer, draws tvrn00i0, Esc closes, hit-tests tavern_buttons (4 rows) with ButtonClick; all tavern clicks in the experiments ran through it"
 func,0x0001F0C5,tavern_close,confirmed,"GOODBYE D_00179E24[3] (99,78)-(220,86) and Esc: game_mode=0, frees tvrn00i0.img; also called by tavern_talk_button and qmisc.c"
@@ -1456,6 +1664,19 @@ func,0x0001FBF5,tavern_item_in_rented_room,candidate,"(item): 1 if the item lies
 func,0x0001FD7C,tavern_purge_expired,candidate,"object-walk callback: frees a type-57 record when all its entries have expired, a type-58 record when its +0x2B expiry has passed"
 func,0x0001FE4D,tavern_purge_expired_records,candidate,walks D_001959A8 with tavern_purge_expired
 func,0x0001FE74,region_load_tables,candidate,"filed under tavern.c, belongs to region.c: reads politic.pak, climate.pak and regflat.bin (D_00196B00, D_00196B04, D_001A94D4); caller init 4ED36"
+func,0x0001FEBD,region_free_tables,strong,frees politic_pak and climate_pak (D_00196B00/B04) with the 'region.c' file tag; counterpart of region_load_tables; caller shutdown 4F5F3
+func,0x0001FF3F,region_enter,strong,"(old, new): sets current_region, current_region_data = region_event_values + new*80, previous_region, unloads the region (region_unload) and loads MAPTABLE.%03d (maploads_load_region); trace: MAPTABLE reads"
+func,0x0001FF92,region_update_from_player,strong,"politic_region_at(player x, z); calls region_enter and returns 1 when the region changed; caller world_update_location"
+func,0x0001FFF1,climate_category,confirmed,"climate_categories[current_climate]: 0 desert, 1 mountain, 2 rainforest, 3 swamp, 4 subtropical, 5 woodlands (CLIMATE.PAK 223-232 table at 0x179D74); indexes climate_weathers in sky, sound and texture code; 19 callers; exp1: 5 for climate 231"
+func,0x0002001F,climate_update_at_player,strong,"climate_at(player x, z): sets current_climate; callers world_update_location, travel_route"
+func,0x00020057,climate_at,candidate,"one-line wrapper of climate_lookup(x, z) (src/region.c); callers travel_pixel_time (terrain cost) and loadsave 7A983"
+func,0x00020089,politic_region_at,confirmed,"world (x, z) -> map pixel (x>>15)+2, 499-(z>>15), looked up in POLITIC.PAK (politic_pak); 64 (sea) -> 31, else value & 127 = region (UESP/DFU POLITIC.PAK); exp1 (save_morthag1): at the player it returned 21 = current_region"
+func,0x0002010F,climate_lookup,confirmed,"world (x, z) -> CLIMATE.PAK value into current_climate; 223 (ocean) becomes 228 with climate_is_ocean set and category 3; else climate_categories[value]; exp1: at the player it set current_climate 231 and returned 5"
+func,0x000201B8,pak_lookup,strong,"(x, row, pak): reads a run-length .PAK row (row offset table, then {u16 count, u8 value} runs), the UESP POLITIC/CLIMATE.PAK format"
+func,0x0002021B,ground_tile_at,candidate,"(x, z): finds the loaded terrain cell (XnGine D_000C2893 ids) and returns the 6-bit ground tile (RMB tile texture) of the 256-unit square from the tile map D_000C28C4; callers collision 2294E (footsteps/water)"
+func,0x000202C5,daedra_summon,strong,"summoning service: the Daedra Prince of today (16 summoning days, 0x179E60), price (100-rep)*1000+100000, chance, then starts the prince's quest (%c0c0%cy00.qbn); TEXT 480-484, 'There are to be no summonings this day'"
+func,0x000209F3,song_generate,candidate,"writes a random poem: title from TEXT 850/851 ('Ode to', 'Sonnet to'...) '%s (%ld)', lines from 900+; no caller: the debug list's 'Generate Songs' row has no handler left"
+func,0x00020BBB,song_init_seeds,candidate,fills scratch globals D_00190CD4-D_00190D22 with random seeds and the player's gender bit; no caller seen
 func,0x00020C55,crime_remove_monster,strong,"filed under song.c; object-walk callback used only by court_open's bribe path: removes type-18 objects (monsters, i.e. the guards) via 7D6EA"
 func,0x00020C87,court_open,confirmed,"(crime id, 1-based; 0 = is the court up?): fine = base +- legal reputation * k clamped (crime_fine_table), then per 40 gold a coin toss between 40 gold of fine and 3 days of prison, more days if the fine exceeds the gold; cort01i0.img, game_mode 21; Thieves Guild (crimes 1-3, 12) or Dark Brotherhood (4-5) members are freed by a bribe (550/551) when their rank >= rand(0,19); asks 8050 GUILTY / NOT GUILTY; experiment (scratch/econ/exp_court2.py: court_open(4) in save_tlalac_s, clicks): assault -> 'fines of 560 gold and 33 days', game_mode 21"
 func,0x0002118B,court_frame,confirmed,"every frame from main(): the court state machine (court_state): 1 plea (guilty: verdict 0 banish 8063, 1 execute 8060, else fine and days halved and paid; not guilty -> 8064 DEBATE (Etiquette) / LIE (Streetwise)), 8 the argument roll ((PER+skill)/2 + legal rep, 5..95) -> 8062 not guilty or the sentence (fine x2 or /2 by rep roll), 2 sentence 8055, 3 prison, 100 close; experiment: GUILTY -> fine 280 paid, 16 days, state 100; NOT GUILTY + LIE -> state 2"
@@ -1465,6 +1686,23 @@ func,0x00021680,court_close,confirmed,"passes 240 minutes (4AB2F) keeping fatigu
 func,0x0002171A,court_remove_creatures,strong,destroys every creature in creature_list except the player entity
 func,0x00021775,court_restore_vitals,strong,"health = max, magicka (+0x8D) = max (+0x8F), fatigue = (STR+END)<<6, D_00195D7C=0; after prison and bribes"
 func,0x000217E7,prison_serve_sentence,confirmed,"(days): pris00i0.img, passes 1440 minutes per day showing '%d days until freedom.', then court_restore_vitals; court_frame state 3 calls it; experiment: a 16-day sentence advanced game_minutes by 16*1440 (+240 from court_close) | earlier: crime.c; opens pris00i0.img; string '%d days until freedom.'; a direct call draws the prison screen"
+func,0x000219B8,collide_move_missile,strong,"(object, new position, new angles): 2 below ground or into a model, 8 into a creature, else moves it; callers spell_missile_update, weapon_arrow_update"
+func,0x00021B04,collide_segment_model_cb,candidate,"callback: segment test (14A300) of the move against a model object's (types 43, 56, 6, 32) planes; sets hit flag 2, hit plane and object"
+func,0x00021D97,collide_vertical_cb,candidate,callback: vertical segment test against models; keeps the nearest floor (or ceiling) height in collide_height and its object in D_00195CB8
+func,0x00022174,collide_sphere_cb,candidate,callback: sphere test (14AA92) of the moving object against models' planes; sets flag 2 and the hit plane
+func,0x0002257C,collide_move_object,strong,"moves an object (creature) through the collision: gathers candidate models, collide_step_object, slides along the hit plane and retries; callers monster_move_step, monster_move_to, damage_knockback_move, mplace"
+func,0x0002294E,collide_step_player,candidate,"one collision step for the player: floor (terrain or models), ground_tile_at, sphere against models, creatures; caller collide_move_player"
+func,0x000231F5,collide_for_each_nearby,strong,"calls a callback for every object around the given one: dungeon_grid_visit_near, the building interior, or town_grid_visit_near"
+func,0x0002325A,collide_gather_cb,candidate,"callback: models whose bounds meet the move sphere are added to the candidate list (128 max, 'Exceeded maximum collisions.')"
+func,0x000234AE,collide_find_floor_object,candidate,returns the model object hit by collide_vertical_cb around the object; no caller seen
+func,0x000234EB,collide_move_player,strong,"moves the player through the collision with sliding, moving platforms (657B2) and automap seen marks for touched models; tests the player object; callers 820AF 8227A 824C1"
+func,0x00023A6A,collide_line_of_sight_cb,candidate,callback: sets the blocked flag when the segment hits a model
+func,0x00023C72,collide_line_of_sight,strong,"(from, to): 1 when no model blocks the segment between two objects; callers ai_pick_target, ai_creature_think, spells"
+func,0x00023D16,creatures_find_nearest,strong,per frame: nearest creature to the player in D_00195DB4 and its distance in D_00195D90
+func,0x00023DE0,collide_creature_near,candidate,"(object, position): a creature or the player within 50 units across and 0-100 below, other than the object; sets D_00195C48"
+func,0x00023EC2,collide_creature_within,candidate,"as collide_creature_near with the radius given; callers collide_move_missile, cast_fire_missile, cast_creature_missile"
+func,0x00023FA5,collide_step_object,candidate,"one collision step for a creature (floor, sphere, creatures); caller collide_move_object"
+func,0x0002455D,collide_floor_height,candidate,"height of the nearest model floor at an object's position (-20..+40), 100000 if none; callers objlib 8591A 85992"
 func,0x000245EF,career_background_summary,confirmed,"(class, ask): the background questions: class 18 (custom) -> career_nearest_class; reads biog%02dt0.txt, 12 questions asked (ask=1, biog00i0.img) or answered at random (ask=0), applies each answer's effects, writes the biography (TEXT.RSC 4116+class) to bio.dat, shows 35 'Your reputation has changed as follows'; experiment (scratch/econ/exp_chargen.py: tools/scenarios/newgame.txt from the title menu, calls counted per step): ran with ask=0 (fast start) after the class, 12 random answers | earlier: career.c; biog%02dt0.txt, bio.dat, class*.cfg, namegen.dat; direct call (all-zero args) shows 'Your reputation has changed as follows'"
 func,0x0002482A,career_skip_word,confirmed,returns the pointer past the current word and the blanks after it (biog parsing); experiment: 103 calls
 func,0x0002487C,career_find_question,confirmed,(n): finds the biog line starting with the number n and shows it (career_show_question); experiment: 12 calls
@@ -1484,6 +1722,17 @@ func,0x000255B7,career_show_biography,strong,"career.c; bio.dat, lgbk00i0.img; d
 func,0x0002576B,career_bio_draw,strong,"draws 21 lines of bio.dat from the page start at (10, 25+7k)"
 func,0x0002581C,career_bio_count_lines,strong,counts the NUL-separated lines of bio.dat
 func,0x0002586B,monster_make_corpse,candidate,"filed under career.c, belongs to mplace.c/monster code: a killed creature (city watch, id 146, is removed) becomes object type 34 with a corpse image (25487/25488 by gender), keeping quest items and arrows; caller support.c 7D819; ran in 38 combat episodes"
+func,0x0002599F,place_spawn_from_marker,strong,"when the player is near (place_marker_in_range), turns a monster marker into a creature (type 18, monster_init, monster_pacify_check) and drops it through the collision; caller world_collect_object"
+func,0x00025BDD,encounter_pick_monster,confirmed,"picks from the 45 encounter tables (20 ids each, 0x17A780): dungeon type, building type (39-44), climate x town/day/night (20-37), 19 underwater; level window around the player's; rerolls Ghost/Wraith by day outside and Nymph/Seducer/Lamia when settings bit 2 is set; DFU RandomEncounters; exp3: -1 in town by day; 20 picks in the Graveyard: 19, 3, 7, 17, 0, 1, 134 (its table); table 19 holds 11, 41, 42 (Slaughterfish, Dreugh, Lamia)"
+func,0x00026081,place_marker_in_range,candidate,"(marker, mode): 1 when the player is within the marker kind's distance (outside 4096)"
+func,0x0002631D,place_assign_marker_monster,candidate,"callback: a random-monster marker flat (type 34, record 15) gets a monster from the dungeon's tables (dungeon_monster_table, or the underwater one below the water level)"
+func,0x000263D0,dungeon_roll_monster_tables,confirmed,"seeded by the location id, fills the 256-entry dungeon and underwater monster tables with encounter_pick_monster, then assigns the markers; caller dungeon_load; exp3: on entering the Graveyard both tables were filled (7, 134, 19, 1 ... / 11, 42, 41)"
+func,0x00026476,loan_collectors_update,strong,"per frame outside: every 1400-1700 minutes, for each region with an overdue bank loan (bank_account+8) sends loan_spawn_collectors"
+func,0x00026508,loan_spawn_collectors,candidate,"spawns 2-5 creatures from {129 Spellsword, 144 Warrior, 130 Battlemage, 139 Assassin} near the player"
+func,0x00026565,encounter_tick,strong,"each game minute: random encounters outside (town at night 1/24, wilderness night 1/24 or day 1/36) and in dungeons while resting (game mode 16, 1/36); caller time_pass_minutes"
+func,0x000266C7,encounter_spawn_hidden,candidate,"creates a creature (monster_init) at a hidden spot 384-768 away (77960), else deletes it"
+func,0x0002675D,encounter_spawn_ahead,candidate,creates a creature 1024 units ahead of the player on the terrain
+func,0x0002682B,place_settle_creature,candidate,"for a creature flagged 0x10 (not yet on the floor), moves it through collide_move_object and clears the flag when it lands; caller ai_update_creatures"
 func,0x00026904,automap_open,strong,"runs with M (key:m x14.6, 38 episodes): indoors loads amap00i0.img/amap01i0.img and loops over automap_buttons until a handler returns 1 or Esc; outdoors in a town runs town_map_open"
 func,0x00026D8D,automap_draw,strong,"one frame of the automap loop (22 episodes with M): background, 3D view (automap_render), note line at (2,191), block overview"
 func,0x00026E87,automap_button_note_line,candidate,"handler of the note line (0,190)-(319,199): 50-char input for the selected object's note, replacing the old note"
@@ -1566,6 +1815,7 @@ func,0x0002CBA6,quest_state_from_timer,candidate,sets state arg0 to the expired 
 func,0x0002CC40,qaction_op25_countdown,candidate,"opcode 25: while state arg1 is clear, counts arg2 down once per run; at 0 sets state arg1 (or just finishes when arg1 is -1); not in UESP's list"
 func,0x0002CD0C,qaction_op11_remove_topics,strong,"opcode 11: sets bit 7 (topic hidden) of the place (+2), person (+3) and item (+2) resources args 1-3; UESP 0x0B ""Remove Topics"" (Location, NPC, Item)"
 func,0x0002CDD5,qaction_op10_add_topics,strong,"opcode 10: clears bit 7 of the place, person and item resources args 1-3; UESP 0x0A ""Add Topics"": enable ""Where is""/""Tell me about""; DFU AddDialog"
+func,0x0002CE9E,quest_symbol_text,strong,"(symbol, flags): the text for a quest symbol: item name (or a book's title from bok%05u.txt), place name or region, person's name or faction; callers parse_expand, talk_add_quest_topics, talk_add_quest_rumors"
 func,0x0002D62F,damage_resolve_attack,confirmed,"damage.c (filed under qkey.c). (attacker, target, hand slot 19/21): exp_c1: weapon_melee_strike calls it for every strike; monsters roll up to 5 attacks (50-(player reflexes-2)*10% each, to-hit, random(attack_damage)): the Frost Daedra did 56/92/71/86 (table 50-100); weapons roll weapon_damage_min/max + swing, STR, material, race, proficiency, Skeleton silver x2; 'The material of the weapon you are using is ineffective.'; backstab x3 'Successful backstab!' = DFU CalculateAttackDamage"
 func,0x0002E032,damage_roll_to_hit,strong,"ran before every hit in exp_c1 and the fallcall player hit; (attacker, target, body part, chance, weapon, material mod): DFU CalculateSuccessfulHit: adrenaline rush +-5 (class+0x04 bit 2, health < max/8), swing to-hit, AGI and LUC differences /10, target armor_values[part], +40 vs monsters, race bonuses, -Dodging/4, Critical Strike, -50, clamp 3..97; tallies skills 34 and 20; exp_c1: called before each hit with chance 100"
 func,0x0002E2CF,damage_weapon_strike_effects,strong,"after a weapon hit: enchantment 2 cast-when-strikes (spell on the target, weapon wear 10), 6/1 vampiric (heals the wielder damage/2 via damage_heal), 26/2 Mace of Molag Bal (drains magicka or STR into spell_points_bonus / strength_bonus for 12 minutes) = DFU EnchantmentTypes / ArtifactsSubTypes; exp_c1: 10-25 calls after weapon hits"
@@ -1645,6 +1895,32 @@ func,0x000342E3,quest_find_site_for_building,strong,"for a building record (+0x1
 func,0x0003445C,pick_random_of_three,candidate,returns one of up to 3 non-null pointers at random (faction allies/enemies lists); caller quest_init_person
 func,0x000344D3,faction_random_hostile_id,candidate,a random faction id (+0x21) among the factions with negative reputation (+0x1D < 0); caller quest_init_person
 func,0x000345A5,quest_object_in_use,strong,1 if an active quest's place or person object has this id; fallcall with the player's id returned 0 (save_tlalac_s); caller quest_init_place / quest_init_person avoid reusing sites
+func,0x000346C4,sky_init,strong,"loads moon00i0.cfa and moon01i0.cfa (the two moons), allocates the two 112640-byte sky halves, scales the 32 sky colours; caller init 4ED36"
+func,0x0003478D,sky_update,strong,"per frame: dungeon light from the block region; indoor light by hour; outside the sun position, weather (region precipitation override), day sky (sky_load_day/sky_draw_day) or night sky, the two moons' screen positions; trace: SKY%02d.DAT, NIGHTSKY.COL reads"
+func,0x00034EC1,sky_apply_sunlight,candidate,"when sun_light is set, passes the sun direction relative to the player to XnGine (136AD8); caller 82DF6"
+func,0x00034F3F,sky_update_moons,confirmed,"each game minute: orbits the two moons (periods 2500 and 3500 minutes) and sets their phases (day & 31, (day+4) & 31); exp3: phases 3 and 7 = day & 31 and (day+4) & 31"
+func,0x0003503D,sky_free,strong,frees the moon images and sky halves sky_init allocated; caller shutdown 4F5F3
+func,0x00035129,sky_sun_direction,candidate,"(vec, y, minutes since 06:00): the sun's direction from the sine tables"
+func,0x000351B6,sky_orbit_direction,candidate,"(vec, radius, t, period): a moon's direction on its orbit"
+func,0x0003522C,weather_roll,strong,"daily: rolls climate_weathers, the weather of each of the 6 climate categories from weather_chances[season][climate][7]; rain gets bit 7 15%, snow 10%; callers time_pass_minutes, init"
+func,0x0003533F,weather_draw_precipitation,strong,"per frame outside: draws snow (weather 5) or rain (4) through XnGine C9A89/C9CB9, with the region's precipitation override"
+func,0x00035476,sky_load_day,strong,"(minutes): picks SKY%02d.DAT by weather and climate (seeded by day) and the frame by hour, loads its palette, colour map and both sky halves; trace: SKY03-27.DAT reads"
+func,0x000356EF,sky_draw_day,strong,copies the visible part of the day sky halves above the horizon by the view yaw; fog/overcast fills colour 119
+func,0x000359B4,sky_set_time_colour,candidate,sets palette entry 255 to one of 32 sky colours by the time of day
+func,0x00035A64,sky_stub,candidate,"empty function, no caller"
+func,0x00035A7F,sky_load_night,strong,"loads NIGHTSKY.COL and NITE%02dI0.IMG for the climate, adds stars, sets night_sky_loaded; trace: NIGHTSKY.COL, NITE02I0.IMG"
+func,0x00035B3A,sky_draw_night,strong,loads the night sky if needed and copies it above the horizon by the view yaw
+func,0x00035CE5,sky_add_stars,candidate,puts 300 random star colours on dark pixels (< 16) of the night sky
+func,0x00035D6D,dungeon_load_rdb_block,strong,"reads %c%07d.RDB ('NWLSBM' prefixes) from BLOCKS.BSA, makes the 2x2 type-47 quarter objects, their objects and action links, then the .RDI into a type-60 object; trace: B0000001.RDB/RDI reads"
+func,0x000361B7,rdb_model_find_action,candidate,"walks the RDB model list (header +9020) to the model's entry and copies its action offset (+6), flags (+10, +12) into the object record"
+func,0x00036233,rdb_create_objects,strong,"walks an RDB object list: 3D models (type 6; 550 doors -> type 32), lights (type 7), flats: editor markers (TEXTURE.199), NPCs (845F1) and plain flats (type 33); 'Object count exceeded.'"
+func,0x000367E5,rdb_link_actions,candidate,second pass over an RDB object list: builds action records for models with actions and for some flats
+func,0x000369A0,rdb_model_id_from_name,candidate,"parses a 5-digit model name: first 3 digits -> object+0x1D, next 2 -> +0x1B"
+func,0x00036A41,rdb_object_id_by_offset,candidate,looks up the object id made for an RDB file offset in the 512-entry table D_001985D4
+func,0x00036AA7,rdb_build_action_chain,candidate,follows an action's 'next' links creating chained action records (action_record_add_chained)
+func,0x00036C6F,action_record_add,candidate,"adds a 39-byte action record (D_00199D78, count D_001A3A78) for a model, flat or light"
+func,0x00036DC9,action_record_add_chained,candidate,"as action_record_add, counting it in the previous record's +10"
+func,0x00036F18,action_axis_to_translation,candidate,"turns an axis action (types 2-7) into a translation (type 1) along axis ((type-2)^1)+1, magnitude << 3, 50 ticks"
 func,0x00036F69,spellmaker_open,confirmed,"unit spells.c (filed under fs2df.c). (open) game_mode=2, loads info01i0.img, mask01i0.img, mask05i0.img, spellmaker_new; called by spellmaker_update every frame (open=0) and guild_service_dispatch (Make Spells, cases 64/497); exp: fallcall 0x36F69 1 drew the spellmaker (MAX SP, MONEY, SPELL COST, CASTING COST, SPELL NAME, BUY/NEW/EXIT): scratch/magic/open_0x36F69.png"
 func,0x00037014,spellmaker_update,strong,"every frame (game_frame, 501 episodes) but returns unless spellmaker_open says mode 2; draws MAX SP/MONEY/SPELL COST (sum of effect costs*target factor*2)/CASTING COST (spell_cost)/name, element and target icons, effect names; hit-tests the 18 spellmaker_buttons (ButtonClick 203); handles the alter-effect popup"
 func,0x00037732,spellmaker_exit,strong,"spellmaker_buttons[12] (244,179)-(268,195) EXIT: right-click shows TEXT 1814 ""Exit from SpellMaker""; left frees the images, game_mode=0; with cheat_flags bit 0 a right-click deletes a SPELLS.STD entry (spells_std_delete)"
@@ -1709,6 +1985,8 @@ func,0x0003A2AD,spell_add_skill_uses,strong,"(spell, uses): skill_add_uses(magic
 func,0x0003A325,intro_play_logo,strong,intro.c; opens anim0001.vid; direct call (all-zero args) shows 'Bethesda Softworks presents'; called by main
 func,0x0003A3CE,title_menu,strong,intro.c; pick03i0.img; direct call (all-zero args) shows Load Saved Game / Start New Game / Exit; called by main
 func,0x0003AF3F,intro_play_movie,strong,"intro.c; opens anim0000.vid (also anim0011.vid, dag2.vid); direct call (all-zero args) shows the opening cinematic; called by title_menu"
+func,0x0003B0B4,chargen_popup_choice,strong,"(TEXT id, button ids, image...): shows a text popup over an image and waits for an answer; callers title_menu (2200 gender, 2100+ race), 51026"
+func,0x0003B1D6,chargen_give_starting_equipment,candidate,wrapper of starting_equipment_give; caller title_menu
 func,0x0003B1F3,sheet_open,strong,"polled every frame (sheet_update, levelup_check): opens on key action 36 in the world, or for a level-up (adds HP gain to character+0x7E/+0x5C); sets game_mode 3, loads info00i0.img popu00i0.img cust09i0.img; returns 1 while the sheet is up"
 func,0x0003B436,sheet_close,strong,"handler of the EXIT box (50,179)-(88,197) (docs EXIT 70,187; 25 episodes); in level-up refuses with 'You must distribute all bonus points.'; game_mode 0, frees the 3 images"
 func,0x0003B59E,sheet_update,strong,"every frame from main 1025B: if sheet_open says the sheet is up, draws it, Esc closes, a click runs the sheet_buttons handler under the mouse (first 12 disabled during level-up)"
@@ -1853,8 +2131,34 @@ func,0x00044B1C,options_joystick_threshold_med,strong,CENTER THRESHOLD MED: joys
 func,0x00044B53,options_joystick_threshold_high,strong,CENTER THRESHOLD HIGH: joystick_threshold = 40
 func,0x00044B8A,options_joystick_direction,candidate,octant 0..7 of the stick (joystick_x/y beyond +-2048) for options_joystick_draw's arrows
 func,0x00044CA0,options_controls_is_duplicate,strong,1 when another of the 38 actions has the same key; options_controls_draw shows those in colour 244
-func,0x00044EE0,show_rumor,candidate,kludge.c; opens rumor.dat; direct call (all-zero args) shows a rumour; calls faction_rumor_text
+func,0x00044D03,kludge_print_build,strong,reads %sverstr.dat from the ARENA2 path and prints 'Daggerfall Build %d'
+func,0x00044E20,kludge_find_creature_cb,candidate,callback: remembers a type-18 creature in D_00199724
+func,0x00044E52,kludge_menu_open,strong,"opens the debug pick list ('Get rumor', 'Advance level', 'Jump 1 month', 'Good merchant rep', 'Become Vampire'...) with pick00i0.img, game mode 200"
+func,0x00044E89,kludge_menu_update,strong,"per frame: when a debug list row is picked, runs entry 51+row of spell_effect_handlers (thunk CAE1C)"
+func,0x00044EE0,show_rumor,confirmed,"debug menu entry 51 ('Get rumor', spell_effect_handlers[51]; world agent); kludge.c; opens rumor.dat; direct call (all-zero args) shows a rumour; calls faction_rumor_text"
+func,0x00044EFD,kludge_good_merchant_rep,strong,debug entry 54 'Good merchant rep': character+0x93 (merchants reputation) = 10-59
+func,0x00044F3A,kludge_jump_month,confirmed,debug entry 53 'Jump 1 month': game_minutes += 43200; exp1: game_minutes +43200
+func,0x00044F5C,kludge_advance_level,strong,debug entry 52 'Advance level': sets the level-up flag and opens the sheet in level-up mode
+func,0x00044F85,kludge_make_test_character_with_spells,candidate,"kludge_make_test_character, then a copy of every spell in spell_records in the spellbook"
+func,0x0004504D,kludge_make_test_character,strong,"seeded 12345: 5000 gold, level 2, optionally class02.cfg and the name 'Deathstroke Bunwun', random skills, Dark Brotherhood rank 9, a wagon, items and artifacts"
+func,0x0004579D,starting_equipment_give,strong,"new character's equipment: clothes by gender, the class weapon (D_0017BABC), arrows for archers, a spellbook and starting spells (starting_spells_give)"
+func,0x0004596E,kludge_add_random_item,candidate,adds a random item of a group to a container (with its contents for flag-8 items)
+func,0x00045A1D,item_add_to_container,strong,"(container, group, index, equip): makes an item (item_make) in the container, optionally equipped; callers loot_generate, loot_fill_container, starting equipment"
+func,0x00045AED,item_add_random_to_container,candidate,makes a random item of a group (item_make_random) in the container
+func,0x00045B41,kludge_toggle_world_position,strong,debug entry 59 'Toggle World Position': D_001940D6 ^= 1
+func,0x00045B60,kludge_toggle_second_compass,strong,debug entry 60 'Toggle Second Compass': D_001940D6 ^= 8 (hand code 5D151 tests it)
 func,0x00045B7F,pick_gold,candidate,kludge.c; string 'Picking from %s.'; direct call (all-zero args) shows 'You picked N gold pieces'
+func,0x00045C6B,kludge_toggle_quest_debug,strong,"debug entry 63: D_001940DA ^= 2, 'Quest DEBUGGING on'"
+func,0x00045C9D,kludge_remove_all_items,candidate,clears the 27 equip slots (character+0x16F) and deletes all the player's possessions
+func,0x00045CF5,kludge_show_memory,strong,lists the 512 allocations '%ld : %s' and 'Total memory : %ld'
+func,0x00045E45,location_find_door,candidate,"returns loaded_location's 6-byte door whose +4 short matches; callers quest_object_delete, object.c 8EBFD"
+func,0x00045EB1,class_has_magic_skill,strong,1 when one of the class's 12 skills (+0x10) is a magic school (22-27); caller starting_spells_give
+func,0x00045F25,cheat_raise_reputation,strong,'Rasing reputation...': +10 to every faction reputation up to 90; caller keys.c 425F2
+func,0x00045F8F,cheat_raise_skills,strong,'Raising skills': +1 to every skill below 100; caller keys.c 425F2
+func,0x00045FFB,starting_spells_give,strong,for the classes 0-6 and custom classes with a magic skill: copies the class's starting spells (D_0017BB3F) from spell_records into the spellbook
+func,0x00046114,kludge_find_door_cb,candidate,"callback: keeps the type-32 door at height -1300..-1200 nearest to (location +664, +2035)"
+func,0x000461A3,kludge_find_door,candidate,returns the door kludge_find_door_cb finds in the dungeon
+func,0x000461E9,kludge_fix_dungeon_door,candidate,"for a dungeon whose first block is W0000009 (kind 1, number 9): replaces that door with model 703; caller dungeon_load"
 func,0x0004633F,parse_expand,confirmed,"the text macro expander (src, dst): ""%xxx"" via the per-letter tables D_0017C47E/D_0017C4F2 (9-byte {name[5], handler}), ""_sym_""/""=sym_"" quest symbols via qkey.c 2CE9E with a hash (998C8) and level (_ +16 each, = +1 each); ""Invalid parse command (%lx,%s)"" when a handler returns <1000; experiment: expanding ""%ra|%pcn|%cn|%dat|%tim|%god|%rn..."" in save_dorian gave ""Dark Elf|Dorian Kaine|Sentinel|Middas the 23th of Evening Star|18:55|Arkay|Queen Akorithi..."""
 func,0x000466C6,macro_fal_faction_name,candidate,macro table %fal -> func_000466C6: name of the faction in D_00196724; never used by TEXT.RSC or QRC
 func,0x000466EC,macro_a_price,strong,"macro table %a -> func_000466EC: trade_price as decimal; rsc8 ""Training will cost you %a""; direct call in save_dorian returned '0'"
@@ -2112,6 +2416,24 @@ func,0x0004A8B6,parse_stub_zero,strong,"returns 0 whatever its argument (511, 51
 func,0x0004A8DB,holiday_index,candidate,"index of the regional holiday (D_0017CA8E region == region+1, day of year >= D_0017CA24[i]) for a time, 0 if none; used by %hod %nhd and holiday_name"
 func,0x0004A98C,holiday_today,strong,"1 + index of the holiday falling on that day of the year in that region (255 = all regions), 0 if none; experiment: days 1/15/46 -> 1/4/10; called by the shops (spellshop_buy, guild_buy_magic_items, inventory_draw)"
 func,0x0004AA47,holiday_name,confirmed,"D_0017CAC3[holiday_index] (""New Life"", ""Scour Day""..); experiment returned ""New Life""; used by %nh"
+func,0x0004AA7D,calendar_format_date,confirmed,"(minutes, buf): '%d%s of %s' with the day of the 30-day month, ordinal_suffixes and month_names; caller parse.c 486F2 (%dat); exp1: game_minutes 3506891 -> '6th of Frostfall'"
+func,0x0004AB2F,time_pass,confirmed,"wrapper of time_pass_minutes; callers travel_begin_trip, prison_serve_sentence, training_update, talk_prostitute_update, main; exp1: time_pass(60) added 60 minutes and calendar_hour 8 -> 9"
+func,0x0004AB52,time_update_realtime,strong,"per frame: one game minute per 90 BIOS ticks (0x46C, about 5 seconds) since load_tick, through time_pass_minutes; adds Running (skill 21) uses while running"
+func,0x0004AC01,time_pass_minutes,confirmed,"adds minutes to game_minutes and runs the world clock: daily (diseases, weather_roll, automap expiry), weekly politics (faction_politics_update), daily prices (region_update_prices), effects, quests, encounters (encounter_tick), loan and crime checks; exp1: via time_pass(60): +60 minutes, calendar updated"
+func,0x0004B0C3,calendar_update,confirmed,"from game_minutes: year 400+ (518400/year), month (43200), weekday (day % 7), hour, minute, and two day cycles % 22 and & 15; exp1: year 406, month 9, weekday 6, 08:11 for game_minutes 3506891"
+func,0x0004B192,player_in_daylight,confirmed,"1 between 06:00 and 18:00 when outside; callers vampire/disease sun damage 67D4F 680DD, rest_recover; exp1: 0 at 00:00, 1 at 12:00 outside"
+func,0x0004B1FB,player_in_temple,strong,1 inside a building of type 14 (temple); callers disease 67D4F 680DD
+func,0x0004B25B,find_type8_object_cb,candidate,callback: sets D_00190CE4 when the object is of type 8; no caller seen
+func,0x0004B28C,building_is_open,confirmed,"DB/TG members always, Fighters/Mages Guild rank 6+ always, houses by day 50%, else building_open_hours[type] (alchemist 7-22 ... palace 10-16, DFU's open hours exactly); exp1: at 03h only temple, tavern and the (member) guild hall open; at 20h alchemist, bookseller, general store, library open, armorer, bank, pawn, palace closed"
+func,0x0004B4A2,building_minutes_to_close,confirmed,"minutes until building_open_hours' closing hour, 0 when closed; caller building_enter (visit time); exp1: at 12:00 alchemist 600, bank 180, palace 240 minutes"
+func,0x0004B54F,interior_object_mark_open_cb,candidate,"callback: for type-8 objects without flag 0x800, clears flag 0x200"
+func,0x0004B595,interior_object_mark_closed_cb,candidate,"callback: for type-8 objects with +0x26 == 0, sets flag 0x200"
+func,0x0004B5CF,building_update_open_state,candidate,"inside a building: walks its objects with interior_object_mark_open_cb when it is open and not the player's house, else interior_object_mark_closed_cb; callers building_enter, loadsave"
+func,0x0004B66E,reputation_decay,strong,"every 161280 minutes (112 days): region legal reputations and faction reputations move one step toward 0 (faction rep < -100 is set to +100, a bug)"
+func,0x0004B796,holiday_announce,strong,shows TEXT 8349 + holiday_today() ('Today the people of %cn are having the New Life F...'); caller 80051
+func,0x0004B7E3,region_update_prices,confirmed,"daily per region: region_price_adjustment * 51/50 or 49/50 by The Merchants' (510) power against the regional noble's, clamped 250-4000; region_flag_set/clear flags 19/20 (prices high/low) as DFU's RegionPowerAndConditionsUpdate; exp1: one call moved 44 regions price_adjustment by 2% (960 -> 940, 580 -> 591)"
+func,0x0004B9A1,crime_check_beast_form_in_town,candidate,"every 30 minutes, when the character's race/form is above 8 (werewolf, wereboar form) outside inside a town area, raises the guard alarm (func_00040C87)"
+func,0x0004BA0F,loan_due_penalty,strong,"for each region whose bank loan is due this minute (bank_account+8), legal reputation -= 5"
 func,0x0004BA70,quest_init_record_sizes,confirmed,"called by main: qbn_record_sizes = 19, 94, 34, 20, 24, 16, 33, 14, 87, 8; experiment: read back from save_dorian, the record sizes of UESP's QBN sections"
 func,0x0004BAE2,quests_run_all,strong,"every frame (game_frame, and time passing 4AC01) unless quests_suspended: quest_run_opcodes on each type-14 child of quest_root"
 func,0x0004BB64,quest_find_by_id,strong,"data of the active quest with that id (quest+0x00), also in quest_tick_data"
@@ -2539,6 +2861,30 @@ func,0x00068845,trade_haggle_counter,candidate,"(counter offer): compares it wit
 func,0x0006899B,trade_haggle_step,candidate,"concession step = (k - shop quality*a + buyer +0x11B and +0x2A (PER)*b + +0x93*c) * (asking - minimum), constants D_00175A96..AE"
 func,0x00068A1D,sound_init_music,candidate,"filed under trade.c, belongs to sound.c: reads hmiset.cfg (HMI driver), opens midi.bsa, 4 voices tagged 0x12345678, allocates the music buffers; caller init 4ED36"
 func,0x00068B1B,sound_shutdown_music,candidate,"filed under trade.c, belongs to sound.c: stops and frees what sound_init_music set up (closes midi.bsa, 4 voices, frees the buffers); callers 4F5F3, 6A606"
+func,0x00068BA8,sound_channel_set_source,candidate,"(object, channel): stores the sound's object and copies its x/y/z into the 268-byte channel record"
+func,0x00068C06,sound_update_channels,strong,"per frame: recomputes volume and pan of the playing channels from the player's position; range 320 for nearest_fire, 1024 with class flag bit 0 (acute hearing), else 768"
+func,0x00068DA6,sound_volume_pan,strong,"(..., &volume, &pan): volume falls off with distance to the range, pan from the angle to the player's yaw"
+func,0x00068F5E,sound_play_sample,strong,"(sample, length, object, priority): picks one of channels 0-2 (stealing a lower priority) or channel 3 for loops (-1), sets volume/pan and starts it at 11025 Hz"
+func,0x00069281,sound_play_sample_loud,candidate,"plays a sample at full volume, priority 127, 11111 Hz, looping; no caller seen"
+func,0x000694B8,sound_play_sample_flat,strong,"plays a sample at full volume, priority 90, not positioned; caller sound_play_ui"
+func,0x000696A3,sound_stop_channel,strong,stops a channel and marks it free (0x12345678)
+func,0x000696F9,sound_channel_done,candidate,1 when the channel is free or finished
+func,0x0006974E,music_play,strong,"(name): when not already playing, stops the song, loads the HMI from MIDI.BSA (sosez 11870) and starts it; callers 20C87, 77B9E; trace: MIDI.BSA/*.HMI reads; exp3: music_play('04.HMI') stored the name"
+func,0x000697E3,music_stop,strong,stops and frees the current song
+func,0x0006987B,sound_apply_volume,candidate,"sets the digital volume to sound_volume; callers 10585, 3F25E"
+func,0x000698AF,sound_set_volume,strong,"sets and stores the digital volume; callers options 43818, loadsave"
+func,0x000698EC,music_update,strong,per frame: restarts the song when it has finished
+func,0x00069938,sound_play,strong,"(DAGGER.SND id, object, priority): loads the sound (objlib 85A51) and plays it positioned; the main sound API (60 callers)"
+func,0x0006998C,sound_play_ui,strong,"(DAGGER.SND id): plays a sound flat at full volume; callers title_menu, 517EC, 91A99"
+func,0x000699D8,sound_play_at_point,strong,"(id, x, y, z, priority): plays a sound at a position (a fake object)"
+func,0x00069A62,sound_play_ambient_loop,strong,"(id, object, priority): loops a sound on channel 3; caller sound_update_ambient"
+func,0x00069AB8,sound_play_loop,candidate,"(id, object, priority): loops a sound on any channel; caller 82376"
+func,0x00069B0E,sound_timer_add,candidate,"registers a timer callback at a rate with the HMI SOS timer (9E2BB, as main 11016 does at 90); caller sound_init_music"
+func,0x00069B53,sound_timer_remove,candidate,removes an SOS timer event (9E61A); caller sound_shutdown_music
+func,0x00069B7F,sound_update_ambient,strong,"per frame: outside, rain (385 AmbientRaining) when the weather is rain and crickets (375) at night in fair weather; indoors the fire (242 Burning) at nearest_fire within 300"
+func,0x00069D36,sound_stop_ambient,strong,"stops the three ambient loops and every channel; callers dungeon_load, town_load, location_unload, building_enter/exit"
+func,0x00069DAA,sound_stop_all,strong,stops every playing channel
+func,0x00069E3C,dpmi_memory_stats,candidate,calls DPMI 0500h (int.c 99490) into D_001A3F60 and keeps used/total memory in KB; caller main
 func,0x00069E9E,mem_pool_init,strong,"pool +4 = malloc(size) ('Insufficent memory to service request.'), one free block of size-18; callers object_heap_init (object_heap) and objlib 850EF (model_heap)"
 func,0x00069F39,mem_pool_free,strong,frees the pool's memory (pool +4); callers object_heap_shutdown and objlib 85141 (model_heap_free_all)
 func,0x00069F8A,mem_pool_alloc,strong,"first fit: rounds the size up to even + 18, splits the free block, sets magic 0x69696969 and the used bit (+16), returns block+18 or 0; callers object_alloc and the model loader 852A6"
@@ -2660,6 +3006,14 @@ func,0x00071475,guild_heal_cleanup,candidate,"guild_heal walk callback: deletes 
 func,0x00071518,guild_heal,strong,guilds.c; direct call (all-zero args) shows 'You are healed'; called by func_0006DC35
 func,0x00071606,rest_recover,strong,"(unit rest.c?) heals a creature: health by Medical skill (character+0x9D, tallies Medical use) and END, magicka by 1/8; no healing for a starving vampire (race 8); callers rest loop 7193D, 7242F"
 func,0x000717EC,rest_open,strong,"(unit rest.c?) R key (35 episodes, key:r x12): vampire 'too long since you sated' (36), 'There are enemies nearby.' (354), 'You cannot sleep now.' (355), else loads rest00i0.img, game_mode=16"
+func,0x0007193D,rest_update,strong,"the REST/LOITER window (game mode 16): 'You cannot rest for more than 99 hours', loiter max 3, an hour per tick through time_pass_minutes and rest_recover, 'You wake up.', 'You are healed.', 'There are enemies nearby.'"
+func,0x0007212B,rest_close,strong,"ends resting: back to the world, transformation videos anim0002/anim0004 for vampires/were-creatures, raise_skills after 6 hours"
+func,0x00072360,fatigue_update,strong,"each game minute: fatigue -11, -44 when swimming (Swimming skill 17 roll, not Argonians), -88 running, -22 when D_001940DB bit 5"
+func,0x0007242F,fatigue_add,confirmed,"adds to fatigue (character+0x9B), capped at (STR+END)<<6; at 0 'You drop to the ground, completely exhausted' (1071/1072, death with enemies near); exp4: -640 lowered fatigue 9193 -> 8553; a big gain capped at 9600 = (STR+END)<<6"
+func,0x00072517,breath_update,strong,"underwater: breath_remaining = END/2 (max 50) + rank*3 in guild kind 149, falls each second, drawn as a bar at x 310; drowning at 0"
+func,0x0007269F,rest_allowed,strong,"'It is illegal to camp in or near a city.' (17, crime 8); taverns need a rented room (tavern_room_rented), Fighters Guild members rest in the hall, own house or ship; exp4: in Ipscart Rock it set crime_current 8 (and waited on the popup)"
+func,0x00072851,rest_room_expired,strong,1 in a tavern whose rented room has expired ('Your time for this room has expired.')
+func,0x000728D2,weapon_reload_hand_sprites,strong,"filed under rest.c, belongs to weapons.c: weapon_free_sprites then weapon_load_hand_sprite for the right (slot 19) and left (21) hands; callers inventory_close, item_break"
 func,0x00072916,weapon_load_hand_sprite,strong,"(item, hand): loads WEAPON%02d.CIF (weapon_cif_by_index; 10 fists, 11 beast form) or WEAPO1%02d.CIF for bows into weapon_hand_cif[hand] (asset trace: WEAPON04/09/10/11, WEAPO104); weapons.c"
 func,0x00072AA0,weapon_reload_sprites,strong,after a save load (loadsave 7A983): reloads both hands' sprites (728D2) (asset trace: weapo104.cif weapon10.cif)
 func,0x00072AC7,weapon_start_swing,strong,"with the attack key (action 33) and a mouse move of >= 45: direction (16 sectors) -> swing type (weapon_swing_types), swing_to_hit/swing_damage from swing_to_hit_mods/swing_damage_mods (= DFU CalculateSwingModifiers: up +10/-4, down -10/+4, diagonals +-5/-+2); exp_c1: 2 swings"
@@ -2959,6 +3313,37 @@ func,0x0008600F,model_unlink_objects,candidate,model_unlink_object_cb over locat
 func,0x00086041,flat_random_person,candidate,"a random person picture: the dungeon table (D_00187EC8) or one of 7 town tables (D_00187DE8, 28 bytes each)"
 func,0x00086093,flat_table_pick,candidate,picks a random record within a table's ranges and returns archive<<7 | record
 func,0x00086149,player_light_draw,candidate,adds a flickering light (XnGine 136AD8) and a TEXTURE.210 sprite (26883 = 210<<7|3) just ahead of the player; world_draw_objects calls it when the player has character+0x89 bit 4 (an active light effect)
+func,0x00086314,region_unload,strong,"automap_save, location_unload, frees region_locations; caller region_enter"
+func,0x00086397,location_free,strong,"frees a loaded location's buildings (data+0x2B), object header (+12) and doors (+8) and zeroes the 20-byte struct; callers quest place pickers, talk_find_regional"
+func,0x0008649F,region_find_location,confirmed,"binary search of region_locations for map id (map_location+0 & 0xFFFFF = map pixel); callers maploads_load_region, world_update_location, terrain_update_cells; exp2: location_here's map id found its own record"
+func,0x00086560,location_here_contains,strong,"1 if (x, z) is inside location_here's area (map_location x, y, width/height in 4096-unit blocks: one block wider than the town each side) and its bit 31 is clear; exp1: 1 at the player in Ipscart Rock"
+func,0x0008661C,location_contains,strong,"1 if (x, z) is inside the loaded location_object's rectangle (current_location width/height blocks); callers automap_open, town_map_open, encounter_tick"
+func,0x000866B4,world_update_location,strong,"outside: updates terrain cells; when the map pixel changes, unloads the location, updates region and climate, finds location_here, sets textures (climate_set_textures); loads the town (town_load) when the player enters its rectangle; caller game_frame 10B11"
+func,0x00086794,dungeon_load,confirmed,"(index or -1): reads the MAPDITEM record, loads each dungeon block from BLOCKS.BSA (dungeon_load_rdb_block), places the player at the start marker ('Invalid start marker.'), sets player_environment = 3; trace: BLOCKS RDB/RDI and MAPDITEM reads; exp3: map_goto_location(env 3) loaded The Masterford Graveyard: 5 blocks, texture.199, haze.000, player_environment 3"
+func,0x00086A71,town_door_set_lock,candidate,"callback over town objects: a type-32 door of a guild hall, temple or tavern is unlocked (+0x17 = 0, flag 0x40), other buildings 90% of the time"
+func,0x00086B0B,town_load,confirmed,"(location index): loads the MAPPITEM record, town blocks (town_load_blocks), quests and NPCs, says 'You are entering %s' or the dungeon-site text 520+type (529 'The ground vibrates underfoot'); trace: MAPPITEM and RMB reads; exp2: map_goto_location loaded Charmarket (blocks.bsa opened, current_location renamed)"
+func,0x00086D37,location_unload,strong,"(location id, 65535 = none): reattaches the player, clears creatures, frees the location (location_free), saves the automap; leaving a dungeon sets player_environment back to 1"
+func,0x00086F50,building_try_enter,strong,"1 if the player may go in: own house, open hours (building_is_open), a cast Open spell (character+0x89 bit 6, cleared), Dark Brotherhood/Thieves Guild members, houses by day (TEXT 256 'Come in'), steal mode lockpicking (lock_show_difficulty, crime 1 breaking and entering)"
+func,0x000871FA,building_load_interior,candidate,"finds the building's interior object, stocks its shelves (interior_stock_shelves), puts the player in it; 'This house has nothing of value.' when it has none"
+func,0x00087281,building_enter,strong,"(building): building_try_enter, sets current_building, the building's music, visit times, shop_quality_message for shops, building_load_interior, player_environment = 2; callers click 7461D, map_goto_location"
+func,0x000873DE,building_exit,strong,"back outside: player_environment = 1, current_building = 0, guild_membership = 0; notes a bought house on the town map (town_map_note_building)"
+func,0x000874C0,location_place_player_at_edge,strong,"(direction 0-7): puts the player at the middle of the town's south/west/north/east edge facing in; callers travel_begin_trip, travel_teleport_yes"
+func,0x000876AD,map_goto_location,confirmed,"(region, environment, location index, building): moves the player to a location outside, into a building or a dungeon, entering the region first; callers travel_begin_trip, travel_teleport_yes, transport_toggle_ship, quests, loadsave; exp2: (21, 1, 2, 0) moved the player to Charmarket outside; exp3: (21, 3, 0, 0) into The Masterford Graveyard, player_environment 3"
+func,0x0008795D,location_has_service,candidate,"(map_location+0x0D bits, building kind, sub kind): reads the bit for a building type (temples by god id 21-35, guilds) from the 4-byte service mask"
+func,0x00087D71,location_pick_random_with_service,candidate,"loads a random location of the region whose service mask has the building kind (location_has_service); callers quest_pick_location, talk_find_regional"
+func,0x00087E68,location_pick_random_town,strong,"loads a random city, hamlet or village (location types 0-2) of the region; callers quest_pick_location, qmisc 31B8A"
+func,0x00087F76,quest_pick_location,candidate,"(slot, kind, sub, mode): mode 0 the current town; kind 0 a town with a building kind (D_00187EE4) or any town, kind 1 a dungeon of a type or any; mode 1 retries until it differs from the current place; caller qmisc 32A05"
+func,0x000880F8,location_pick_random_undiscovered,strong,loads a random region location with map_location bits 30/31 clear (or any); caller inv_read_map_scrap (reading a map reveals a place)
+func,0x00088213,location_set_discovered,strong,"sets map_location[index]+4 bit 30; callers town_load (entered = discovered), location_reveal, inv_read_map_scrap"
+func,0x0008824A,location_set_hidden,candidate,sets map_location[index]+4 bit 31 (location_reveal clears it)
+func,0x00088281,location_flatten_terrain,candidate,"averages the terrain heights around location_here's rectangle and fills the area with it (heights & 127), so towns stand on flat ground; caller terrain_update_cells"
+func,0x00088551,town_block_apply_ground,strong,copies rmb_block's 16x16 ground tiles (+1739) and scenery (+1995) into the XnGine terrain tile maps for the block's cell; caller town_load_blocks
+func,0x00088732,terrain_update_cells,strong,"for each of the 4 terrain cells XnGine has loaded: when it changed, finds its location, shows the dungeon-site text 500+type when the player is there, flattens the town ground and rebuilds the cell"
+func,0x000888C2,town_map_add_block,strong,copies the RMB block's 64x64 automap picture (+2251) into town_map_pixels at the block's place; caller town_load_blocks
+func,0x0008896D,location_find_building,confirmed,"returns current_location's building whose id (+0x14) matches, else 0; no caller seen; exp4: found building #3 by its id"
+func,0x000889DD,location_reveal,confirmed,"(region, map id): loads the region, sets the location discovered and not hidden, reloads the current region (MAPSAVE written); caller quest opcodes 29958 (UESP 'Reveal location'); exp2: an undiscovered dungeon of region 21 got bit 30 set; mapsave.sav read and written"
+func,0x00088A68,climate_set_textures,confirmed,"from regflat.bin (region_flats) for the climate: nature flat archive, sky/ground settings to XnGine, ground archive climate_texture_sets*100+2 (+1 snow or winter, +2 rain): TEXTURE.002/102/302/402 as in DFU; exp4: ground archive 302 and nature archive 504 for climate 231 (temperate, DFU)"
+func,0x00088B98,region_nth_dungeon,strong,"index of the n-th region location with a dungeon type (map_location+0x0C != 255), -1 if none; exp4: 0, 1, 6 for n = 0..2 (entries with a dungeon type)"
 func,0x00088C0E,spfx_create_item_cb,strong,"unit spfx.c (filed under maplogic.c). Create Item list callback: item_make of the chosen armor piece (D_00187F44 group/index; names D_001832C4 Leather Cuirass...), expiry time at object+0x2B, flag 0x1000, inv_store_item"
 func,0x00088CF5,spfx_paralyze,confirmed,"spell_effect_handlers[0] (filed under maplogic.c). Immune: race 4 (High Elf), class immunity bit 0, already paralyzed, Free Action (+0x8A bit 7); chance roll; sets character+0x89 bit 0, ""You are paralyzed.""; exp1b (build/names/scratch/magic/exp1b.py, save_morthag1): type 0 set conditions bit 0"
 func,0x00088DE6,spfx_continuous_damage,confirmed,"spell_effect_handlers[1] (filed under maplogic.c): one spfx_effect_tick now (then each round); exp1b (build/names/scratch/magic/exp1b.py, save_morthag1): type 1/0 took 10 (5 from the shield, 5 health)"
@@ -3315,6 +3700,7 @@ func,0x0009D61E,travel_trip_cost,strong,"inns 5*((hours-ocean)/24)+5 unless free
 func,0x0009D6F8,travel_button_im_at,strong,"handler of (3,186)-(47,196) labelled I'M AT: world view flashes the player's region (marker 0 seen after the click), region view marks the player"
 func,0x0009D764,travel_draw_buttons,strong,draws FIND/I'M AT (region vs world) and the 4 filter buttons lit or not by travel_filter; 21 episodes
 func,0x0009D8BD,travel_button_filter,strong,"handler of (50,175)-(228,196) = DUNGEONS/HOMES/TEMPLES/TOWNS (screenshot): toggles travel_filter bit 0/1/2/3 by quadrant, redraws the region"
+func,0x0009D960,travel_stub,candidate,returns 0; no caller
 func,0x0009D986,travel_show_days_left,strong,"'Days left: %ld' (minutes/1440) at (240,2) over the saved map picture; called from tamriel.c 4AC01 while a trip's time passes"
 func,0x000CAE07,spell_cost_formula_dispatch,strong,XnGine-object thunk: jmp spell_cost_formulas[eax]
 func,0x000CAE0E,spell_effect_dispatch,confirmed,"XnGine-object thunk: push spell_effect_handlers[eax], shift edx/ebx/ecx into eax/edx/ebx and return into it: handler(spell object, slot, target); exp1b (build/names/scratch/magic/exp1b.py, save_morthag1):"
