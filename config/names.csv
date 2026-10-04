@@ -213,6 +213,7 @@ func,0x00010010,main,strong,"entry from the C runtime with (argc, argv); setup, 
 func,0x0001025B,game_frame,strong,main()'s loop calls it once per iteration with no arguments; updates the world (frame_checkpoint 98-107 inside)
 func,0x0001D739,faction_rumor_text,candidate,faction.c; opens rumor.dat; direct call (all-zero args) shows a rumour about a faction; called by func_00044EE0
 func,0x0001F15D,tavern_rent_room,strong,tavern.c; direct call (all-zero args) shows 'for how many days will you require the room?'
+func,0x000217E7,prison_serve_sentence,strong,crime.c; opens pris00i0.img; string '%d days until freedom.'; a direct call draws the prison screen
 func,0x000245EF,career_background_summary,strong,"career.c; biog%02dt0.txt, bio.dat, class*.cfg, namegen.dat; direct call (all-zero args) shows 'Your reputation has changed as follows'"
 func,0x000255B7,career_show_biography,strong,"career.c; bio.dat, lgbk00i0.img; direct call (all-zero args) shows the character's biography page"
 func,0x00026904,automap_open,strong,"runs with M (key:m x14.6, 38 episodes): indoors loads amap00i0.img/amap01i0.img and loops over automap_buttons until a handler returns 1 or Esc; outdoors in a town runs town_map_open"
@@ -320,9 +321,12 @@ func,0x0003D113,level_skill_sum,strong,"sum of the 6 primary+major skills minus 
 func,0x0003D2B6,skill_ready_to_advance,strong,uses*(reflex modifier) >= multiplier*value*class+0x36*1.04^level*k + 1: DFU's skill advancement formula
 func,0x0003D39D,text_rsc_open,candidate,opens 'text.rsc' into text_rsc_file; called from init.c
 func,0x0003D3F0,text_rsc_close,candidate,closes text_rsc_file; called from init.c
+func,0x00040FC1,court_trial,strong,"text.c; direct call with the player entity first shows 'You, <name>, are accused of the crime of Criminal Conspiracy... 280 gold pieces in fines and 15 days in prison... How plea you?' GUILTY / NOT GUILTY"
 func,0x000445B5,options_joystick_calibrate,strong,"options.c; cnfg04i0.img, cnfg05i0.cif, cnfg06i0.img; direct call (all-zero args) shows the joystick calibration window"
 func,0x00044EE0,show_rumor,candidate,kludge.c; opens rumor.dat; direct call (all-zero args) shows a rumour; calls faction_rumor_text
 func,0x00045B7F,pick_gold,candidate,kludge.c; string 'Picking from %s.'; direct call (all-zero args) shows 'You picked N gold pieces'
+func,0x0004D1E6,note_open_notebook,candidate,"note.c; strings notebook.tde, note.rci, mask02i0.img, 'Unable to create new notebook!'"
+func,0x00051DCF,pflc_read_savetree,candidate,"pflc.c; strings 'save2\\savetree.dat', 'Unable to open %s.'"
 func,0x0005DE74,item_init_from_template,strong,"fills an item record from item template idx (D_0017D22A, 48 bytes each, 288 of them, 'Invalid index requested %d -> %d'): name, group/index, value, flags, condition, images, weight; then per-group rolls (clothing style, material, armor type, arrows 1-20, books, paintings); ran entering shops (cmd:enter x15.8) and in dungeons"
 func,0x0005E37F,item_make_in_range,candidate,"item_make with the index random in [lo,hi] (magic items, artifacts and maps special-cased); callers kludge.c, guilds.c, moninit.c"
 func,0x0005E450,item_make_random,strong,"random index of a group from its template list (D_00185F88[group], -1 end) then item_init_from_template; 5 artifact, 4 magic item, 11 map special; called by all loot/stock makers; ran on shop entry and dungeon loot"
@@ -372,6 +376,7 @@ func,0x0006228A,ai_turn_away,candidate,turns object yaw toward angle+1024 in ste
 func,0x00065937,disease_infect,strong,"(entity, list, disease id, skip resistance): never level 1, resistance roll, allocates a type-11 effect record from disease_table; a direct call on the player links it to character+0x2CC (fallcall)"
 func,0x00065A8C,poison_apply,candidate,"mirror of disease_infect for poison ids >= 128 (immunity bit 2, a type-11 record from the table at D_00186D83)"
 func,0x000684E9,shrine_donation,candidate,disease.c; direct call (all-zero args) shows 'The current amount in the shrine is 0 gold' with buttons
+func,0x000686DA,shrine_donate,candidate,disease.c; direct call with the player entity first shows 'You do not have enough gold.' (next to shrine_donation)
 func,0x000687C5,trade_counter_offer,strong,trade.c; direct call (all-zero args) shows 'Enter counter offer'; called by func_000685EC
 func,0x0006BE24,bank_deposit_letters_of_credit,candidate,bank.c; direct call (all-zero args) shows 'Am I to understand that you would like to deposit all of your letters of credit?'; no direct caller
 func,0x0006C0F7,bank_buy_house,candidate,"bank.c; direct call (all-zero args) shows 'it is a seller's market for houses, there are none available'; no direct caller"

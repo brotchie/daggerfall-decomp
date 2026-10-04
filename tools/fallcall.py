@@ -166,6 +166,11 @@ def changed_words(before, after, lo):
 CALL = os.path.join(ROOT, "build", "call")
 
 
+def call_dir(policy):
+    """Where a sweep with this argument policy keeps its results (zero: build/call)."""
+    return CALL if policy == "zero" else CALL + "_" + policy
+
+
 def prototypes():
     """{va: (number of arguments, all on the stack)} from the C definitions and pragmas."""
     out, stackp = {}, set()
@@ -199,10 +204,10 @@ def safe_snapshot(snap):
     return path
 
 
-def probe(safe, va, args, stack, max_ticks, shot_dir, fvas, lib):
+def probe(safe, va, args, stack, max_ticks, shot_dir, fvas, lib, ov):
     """One call from a fresh game at the safe point: what it did."""
     import fallplay
-    emu = fallemu.Emu.load(safe, overlay=os.path.join(CALL, "ov_%d" % os.getpid()))
+    emu = fallemu.Emu.load(safe, overlay=ov)
     try:
         stack_lo = emu.r("esp") - L - 0x8000
         o3 = bytes(emu.uc.mem_read(L + O3, O3_END - O3))
@@ -238,15 +243,17 @@ def sweep_work(k, n, snap, targets, max_ticks, policy):
     with open(os.path.join(ROOT, "config", "functions.csv"), newline="") as f:
         fvas = sorted(v for v in (int(r["va"], 16) for r in csv.DictReader(f)) if fallcov.LO <= v < fallcov.HI)
     safe = safe_snapshot(snap)
-    shots = os.path.join(CALL, "shots")
+    out_dir = call_dir(policy)
+    ov = os.path.join(out_dir, "ov_%d" % os.getpid())
+    shots = os.path.join(out_dir, "shots")
     os.makedirs(shots, exist_ok=True)
-    part = os.path.join(CALL, "sweep_%d.jsonl" % k)
+    part = os.path.join(out_dir, "sweep_%d.jsonl" % k)
     done = set()
     if os.path.exists(part):
         done = {json.loads(line)["va"] for line in open(part)}
     out = open(part, "a")
     acc = 0
-    emu0 = fallemu.Emu.load(safe, overlay=os.path.join(CALL, "ov_%d" % os.getpid()))
+    emu0 = fallemu.Emu.load(safe, overlay=ov)
     entity = struct.unpack("<I", bytes(emu0.uc.mem_read(L + 0x195AA0, 4)))[0]
     emu0.close()
     for i, va in enumerate(targets):
@@ -259,7 +266,7 @@ def sweep_work(k, n, snap, targets, max_ticks, policy):
         if policy == "entity" and nargs:
             args[0] = entity
         try:
-            rec = probe(safe, va, args, stack, max_ticks, shots, fvas, lib)
+            rec = probe(safe, va, args, stack, max_ticks, shots, fvas, lib, ov)
         except Exception as e:                      # noqa: BLE001  (a bad call: note it)
             rec = {"va": "%X" % va, "error": str(e)[:200]}
         cov = rec.pop("cov", None)
@@ -268,7 +275,7 @@ def sweep_work(k, n, snap, targets, max_ticks, policy):
         out.write(json.dumps(rec) + "\n")
         out.flush()
     if acc:
-        write = os.path.join(fallcov.COV, "call_%d.cov" % k)
+        write = os.path.join(fallcov.COV, "call_%s_%d.cov" % (policy, k))
         with open(write, "wb") as f:
             f.write(zlib.compress(json.dumps({"call": k}).encode() + b"\n" + acc.to_bytes(fallcov.HI - fallcov.LO, "little")))
 
@@ -277,9 +284,10 @@ def sweep(snap, targets, j, max_ticks, policy):
     import memwatch
     import subprocess
     memwatch.start()
-    os.makedirs(CALL, exist_ok=True)
+    out_dir = call_dir(policy)
+    os.makedirs(out_dir, exist_ok=True)
     safe_snapshot(snap)
-    tfile = os.path.join(CALL, "targets.txt")
+    tfile = os.path.join(out_dir, "targets.txt")
     with open(tfile, "w") as f:
         f.write(" ".join("%X" % v for v in targets))
     j = fallemu.workers(j)
@@ -294,7 +302,7 @@ def sweep(snap, targets, j, max_ticks, policy):
                 procs[k] = start(k)
             else:
                 del procs[k]
-    recs = [json.loads(line) for p in sorted(glob.glob(os.path.join(CALL, "sweep_*.jsonl"))) for line in open(p)]
+    recs = [json.loads(line) for p in sorted(glob.glob(os.path.join(out_dir, "sweep_*.jsonl"))) for line in open(p)]
     ok = sum(1 for r in recs if r.get("returned"))
     hung = sum(1 for r in recs if "returned" in r and not r["returned"])
     err = sum(1 for r in recs if "error" in r or r.get("exit") is not None)
@@ -303,7 +311,7 @@ def sweep(snap, targets, j, max_ticks, policy):
         ran |= set(r.get("ran", ()))
     print("%d calls: %d returned, %d did not return in %d ticks, %d failed; %d functions ran; %d screens in %s" % (
         len(recs), ok, hung, max_ticks, err, len(ran), sum(1 for r in recs if r.get("shot")),
-        os.path.join(CALL, "shots")))
+        os.path.join(out_dir, "shots")))
 
 
 def report():
@@ -358,6 +366,9 @@ def main():
         ev = list(csv.DictReader(open(os.path.join(ROOT, "build", "evidence", "functions.csv"))))
         if a.funcs == "unrun":
             targets = [int(r["va"], 16) for r in ev if r["kind"] == "game" and r["episodes"] == "0"]
+            if a.policy != "zero":                  # only those that take arguments
+                protos = prototypes()
+                targets = [v for v in targets if protos.get(v, (0, False))[0] > 0]
         elif a.funcs.endswith(".c"):
             targets = [int(r["va"], 16) for r in ev if r["unit"] == a.funcs]
         else:

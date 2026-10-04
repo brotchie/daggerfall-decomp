@@ -199,9 +199,12 @@ def collect(j, resume=False):
                     "tokens": ["cmd:explore", "from:save_" + base],
                     "functions": ["%X" % va for va, _n, _g, _k in fns
                                   if fallcov.LO <= va < fallcov.HI and m[va - fallcov.LO]]})
-    for p in sorted(glob.glob(os.path.join(ROOT, "build", "call", "sweep_*.jsonl"))):  # direct calls
+    for p in sorted(glob.glob(os.path.join(ROOT, "build", "call*", "sweep_*.jsonl"))):  # direct calls
+        tag = os.path.basename(os.path.dirname(p))[4:].lstrip("_")
         for line in open(p):
             r = json.loads(line)
+            if tag:
+                r["va"] = r["va"] + "/" + tag
             if not r.get("ran"):
                 continue
             toks = {"cmd:call", "called:" + r["va"]} | {
@@ -270,6 +273,17 @@ def strings_at(addrs):
 
 
 # ---- analysis --------------------------------------------------------------------------------
+def called_text(e):
+    """One line on what a direct call did (an episode of kind call), or ''."""
+    if not e:
+        return ""
+    files = [x[5:] for x in e["tokens"] if x.startswith("file:")]
+    return "%s; ran %d functions%s%s" % (
+        "did not return" if "no-return" in e["tokens"] else "returned", len(e["functions"]),
+        "; files " + " ".join(files) if files else "",
+        "; drew " + e["label"].split(", drew ")[1] if ", drew " in e["label"] else "")
+
+
 def analyze():
     import fallcov
     import names as namesmod
@@ -330,13 +344,8 @@ def analyze():
             "va": "0x%08X" % va, "name": known.get(name, name), "unit": group, "kind": kind,
             "episodes": len(s), "share": "%.3f" % (len(s) / N),
             "calls": called_in.get("%X" % va, 0),
-            "called": ("%s; ran %d functions%s%s" % (
-                "returned" if "no-return" not in calls["%X" % va]["tokens"] else "did not return",
-                len(calls["%X" % va]["functions"]),
-                "; files " + " ".join(x[5:] for x in calls["%X" % va]["tokens"] if x.startswith("file:"))
-                if any(x.startswith("file:") for x in calls["%X" % va]["tokens"]) else "",
-                "; drew " + calls["%X" % va]["label"].split(", drew ")[1] if ", drew " in calls["%X" % va]["label"] else ""))
-            if "%X" % va in calls else "",
+            "called": called_text(calls.get("%X" % va)),
+            "called with the player entity": called_text(calls.get("%X/entity" % va)),
             "cluster": cid.get(va, ""),
             "features": "; ".join("%s (%d, x%.1f)" % (t, n, l) for t, n, l in assoc(s)) if s and len(s) < N * 0.8 else ("always" if s else ""),
             "examples": " | ".join(examples(s)) if s and len(s) < N * 0.8 else "",
@@ -374,7 +383,8 @@ def analyze():
                     "with all-zero arguments did (tools/fallcall.py sweep)\n\n" % (u, len(rs), hit))
             for r in rs:
                 f.write("## %s (%s episodes, cluster %s)\n\n" % (r["name"], r["episodes"], r["cluster"]))
-                for k in ("features", "examples", "called", "strings", "callers", "callees"):
+                for k in ("features", "examples", "called", "called with the player entity",
+                          "strings", "callers", "callees"):
                     if r[k]:
                         f.write("- %s: %s\n" % (k, r[k]))
                 f.write("\n")
