@@ -1,4 +1,6 @@
 kind,address,name,confidence,evidence
+global,0x000CAF24,spell_cost_formulas,strong,"7 function pointers (0x3937B, 0x3946E, 0x395AA, 0x39635, 0x396C0, 0x3978C, 0x3988A), the jump table of func_000CAE07 (jmp [eax*4+0xCAF24]); in xn_CAF00.asm"
+global,0x000CAF40,spell_effect_handlers,confirmed,"60 function pointers: 0-50 the spell effects (0x88CF5 Paralyze ... 0x8A344 Recall (43) ... 0x8A4BD), 51-54 kludge.c (0x44EE0, 0x44F5C, 0x44F3A, 0x44EFD), 55-58 disease.c (0x66352, 0x6691F, 0x66D3C, 0x67309), 59 0x45B41; in xn_CAF00.asm; exp1b (build/names/scratch/magic/exp1b.py, save_morthag1): 22 effect types reached the handlers listed"
 global,0x0012AC00,mouse_buttons,strong,byte: mouse button state; inventory_frame and transport_menu act when it is set and was not last frame
 global,0x0012AC02,mouse_double_click,candidate,"with Enter, opens a where-is category in talk_list_click (experiment: double-click opened Taverns)"
 global,0x0012AC04,mouse_x,confirmed,"compared with the x of button rects (talk_buttons, guild menu); experiment: clicks at x,y called the matching handler"
@@ -17,6 +19,7 @@ global,0x00143550,screen_buffer,strong,pointer to the 320-wide 8-bit frame buffe
 global,0x00147954,big_buffer,candidate,"pointer to a large shared buffer; talk uses +16384 (topics), +90000 (answer text), +95000 (logbook copy)"
 global,0x001788DF,trade_price_scale,strong,price factor /256: guild_confirm_price applies it; guilds set (10-rank)/10 discounts and 128 (half) on holidays
 global,0x001788E3,travel_filter,strong,"4 bits toggled by the bar's DUNGEONS(1) HOMES(2) TEMPLES(4) TOWNS(8) quadrants (screenshot labels), lit by travel_draw_buttons; a location is drawn when its type's category bit (location_type_category) is set; 0xF in 4 saves"
+global,0x001789F8,cast_anim_state,strong,"short: casting animation, element << 4 | frame, -1 idle (cast_anim_start, cast_anim_update)"
 global,0x001789FA,player_environment,confirmed,"1 outside, 2 inside a building, 3 dungeon or palace: constant across 16 states in 3 groups (docs/state.md)"
 global,0x00178A0A,spellshop_spell,strong,"the selected 89-byte spell record (spellshop_update), bought by spellshop_buy"
 global,0x00178A0E,travel_options,strong,"trip options: bits 0/1 cautious/reckless, 2/3 foot-horse/ship, 4/5 inns/camp out (pairs toggled by the popup boxes, ticks at D_0018886C); reckless halves the time, camp x300/256, inns and ship cost gold; 0x19 or 0x16 in saves"
@@ -37,6 +40,17 @@ global,0x00179D55,talk_organisations,strong,"34 faction ids of the tell-me-about
 global,0x0017A02C,automap_buttons,confirmed,"12 x {x0,y0,x1,y1,handler}: grid/view, forward, back, left, right, rotate left, rotate right, upstairs, downstairs, EXIT, map area, note line; matches the automap bar in the save_mord screenshot"
 global,0x0017A0BC,town_map_buttons,confirmed,"6 x {x0,y0,x1,y1,handler}: the 4 arrows, EXIT, map area"
 global,0x0017A11D,automap_view_initialised,candidate,automap_init_view sets the camera only the first time (flag)
+global,0x0017A84C,spell_effect_school,strong,"byte per effect type: 0 Alteration, 1 Restoration, 2 Destruction, 3 Mysticism, 4 Thaumaturgy, 5 Illusion (index into magic_school_skills); spell_cost uses it: exp1b reproduced the spellbook costs"
+global,0x0017A87F,spell_effect_target_class,strong,"byte per effect type: 0 caster only (Create Item, Lock, Open, Teleport...), 1 others only (Damage, Paralyze...), 2 any; spellmaker_add_effect filters by it"
+global,0x0017A8B2,spell_effect_elemental,candidate,"byte per effect type: nonzero (Paralyze, Damage, Drain...) lets the spellmaker choose the element; spellmaker_effects_allow_element"
+global,0x0017A8E5,spell_effect_text_base,strong,"u16 per effect type: offset of its help texts (TEXT.RSC 1200+, 1500+) before the subtype is added (func spell_effect_text_index)"
+global,0x0017A94B,spell_effect_settings,strong,"12 bytes per effect type, one per subtype: bit 0 duration, 1 chance, 2 magnitude (spell_compute_values computes only these; the settings panel enables those spinner rows); e.g. Paralyze 3, Damage 4, Continuous Damage 5"
+global,0x0017AE13,spell_effect_costs,strong,8-byte cost records (4 shorts) indexed by spell_effect_cost_index; copied to spell_effect_cost_current for the cost formulas
+global,0x0017AF6B,spell_effect_cost_index,strong,12 bytes per effect type: per subtype index into spell_effect_costs
+global,0x0017B202,spell_effect_cost_formula,strong,"byte per effect type 1-7: spell_cost_formulas[n-1] computes its cost (Damage 5 = magnitude, Cure 4 = chance, Create Item 3 = duration)"
+global,0x0017B235,spell_target_cost_factor,strong,"5 shorts by target type (caster, touch, distance, area, area at distance) = 2, 2, 3, 4, 5: costs are multiplied by it and halved (spell_cost, spellmaker price)"
+global,0x0017B23F,spellmaker_buttons,strong,"18 x {x0,y0,x1,y1,handler}: 5 elements, 5 targets, BUY, NEW, EXIT, add effect, ICON, icon up/down, SPELL NAME (dumped from FALL.EXE; layout matches open_0x36F69.png)"
+global,0x0017B317,spellmaker_setting_buttons,strong,"34 x {rect, handler}: 11 setting spinners (duration/chance/magnitude rows at y 94/114/134), their up and down halves (11-32), and the panel exit (33)"
 global,0x0017B4C0,skill_advance_multipliers,strong,"35 shorts 12,1,1,5,15..,2,1,2,2,1,2,1,4,50,1,2,1,1,2,1,2,2,2,2,2,1,8 = DFU's per-skill advancement multipliers; used by skill_ready_to_advance and guild training"
 global,0x0017B506,sheet_buttons,confirmed,"23 x {x0,y0,x1,y1,handler} hit boxes for the sheet (dumped from the image): NAME row, INVENTORY, SPELLBOOK, AFFILIATIONS, PRIMARY/MAJOR/MINOR/MISC, HISTORY, LOG, HEALTH row, FATIGUE row, EXIT, 8 attribute boxes, 2 level-up spinner arrows; boxes match the labels in docs/play.md"
 global,0x0017C5DC,talk_regional_names,strong,"28 names: Temple of Akatosh ... Knights of the Hawk, Mages Guild, Fighters Guild, Tavern ... Clothing store"
@@ -47,8 +61,28 @@ global,0x0017CCB7,skill_governing_attributes,confirmed,"35 bytes, attribute inde
 global,0x0017CCDA,attribute_abbrevs,confirmed,8 string pointers STR INT WIL AGI END PER SPD LUC
 global,0x0017CEF2,faction_rank_names,candidate,table of rank-name tables by faction type; sheet_affiliation_line prints rank names from it
 global,0x0017D22A,item_templates,strong,"288 item templates of 48 bytes ('Ruby' first): name, weight, condition, value, pictures; item_init_from_template refuses idx >= 288"
-global,0x00180B3A,potion_recipes,candidate,"potion recipe table, 109-byte entries; a potion's type-31 child is a copy; value at +8"
+global,0x00180A7A,enchant_power_names,strong,"15 strings: Cast when used/held/strikes, Extra spell pts, Potent vs, Regens health, Vampiric effect, Increased Weight Allowance, Repairs objects, Absorbs spells, Enhances skill, Feather Weight, Strengthens armor, Improves talents, Good rep with (item+0x43 types 0-14)"
+global,0x00180B0A,enchant_side_effect_names,strong,"11 strings: Soul bound, Item deteriorates, User takes damage, Vision problems, Walking problems, Low damage vs, Health leech, Bad reactions from, Extra weight, Weakens armor, Bad rep with (types 15-25)"
+global,0x00180B3A,potion_recipes,strong,"20 potion recipes x 109 bytes: +0 8 ingredient indices (-2 end), +8 value, +0x0A 8 ingredient groups, +0x14 an 89-byte spell (name at +0x43): Stamina, Orc Strength, Healing, Waterwalking...; a potion's type-31 child is a copy"
+global,0x00182686,spell_effect_names,confirmed,"51 string pointers by effect type: Paralyze, Continuous Damage, Create Item, Cure, Damage, ... Teleport (43), Comprehend Languages (44); null for 29, 32, 36-38, 41, 42, 45-50 (not offered); exp1b (build/names/scratch/magic/exp1b.py, save_morthag1): effect types 0, 7, 9, 13-17, 19, 26-28, 30, 31, 35, 39, 42, 44 did what these names say"
+global,0x00182752,spell_effect_subtype_names,strong,"51 x 12 string pointers: subtypes (Health/Fatigue/Spell Points, the 8 attributes, Disease/Poison/Paralyzation, Fire/Frost/Poison/Shock/Magicka, Normal/True, Magic/Enemy/Treasure...)"
+global,0x001830E6,monster_names,strong,"string per monster id: Rat, Imp, Spriggan, Giant bat, Grizzly bear, Sabretooth tiger, Spider, Orc, Centaur, Werewolf (DFU MobileTypes order); soul lists"
 global,0x001837E8,region_names,confirmed,"62 string pointers Alik'r Desert, Dragontail Mountains .. Cybiades (DFU region order); D_001837E4 is the same table indexed by region+1 and D_001835E8 by world-map pixel (128+region)"
+global,0x001857A1,enchant_power_params,strong,"15 entries: 1-3 the spell lists, 4 souls, else a pointer to the parameter labels (seasons/moons, monster kinds, skills, talents, social groups)"
+global,0x001857E5,enchant_power_costs,candidate,per power: cost code (< 100) or a pointer to costs by parameter
+global,0x00185875,enchant_spell_lists,strong,3 pointers to 255-terminated SPELLS.STD id lists for cast when used / held / strikes
+global,0x001858AB,enchant_side_effect_params,strong,"11 entries: 4 souls, else parameter labels"
+global,0x001858DB,enchant_side_effect_costs,candidate,per side effect: cost code (99 soul) or costs by parameter
+global,0x0018598A,enchant_fixed_costs,candidate,"shorts by cost code: 0, -3000, -2500, -100, -700, ..., 900, 1500"
+global,0x00185AF4,itemmaker_buttons,strong,"20 x {rect, handler}: ITEM NAME, powers list, ADD POWERS, side effects list, ADD SIDE EFFECTS, item slot, ENCHANT, EXIT, item column (8-12), scroll (13-14, inven.c), tabs (15-18); layout matches open_0x55E35.png"
+global,0x00185C14,spell_last_cast_id,strong,"short: id of the last spell the player cast (cast_player_spell), -1 none; cast_recast_last recasts it"
+global,0x00185C16,spell_missile_textures,strong,5 u16 archive<<7|record by element (TEXTURE.375-379); missile objects get it at +0x17
+global,0x00185C20,spell_cast_sounds,strong,5 DAGGER.SND ids by element: 352 353 350 351 349 (CastSpell1-5; 349 and 352 heard in play from cast_spell_on)
+global,0x00185C2A,spell_impact_sounds,strong,5 sound ids by element: 357 358 355 356 354 (357 SpellImpactFire in play from spell_missile_update)
+global,0x00185C34,magic_school_skills,strong,"first 6 bytes: skill ids 25 Alteration, 23 Restoration, 22 Destruction, 27 Mysticism, 26 Thaumaturgy, 24 Illusion by school; spell_cost reads character skills at +0x9D+6*skill"
+global,0x00185C3A,spell_element_class_bits,strong,"5 bytes by element: the class tolerance bit (fire 8, frost 16, poison 4, shock 32, magic 2) passed to spfx_resist_roll"
+global,0x00185C3F,spell_concealment_effects,candidate,"3 x {byte effect, u32 conditions mask}: Invisibility 0x4, Chameleon 0x1000, Shadow 0x2000 (spell_break_concealment)"
+global,0x00185CEC,spell_hud_icon_x,candidate,"12 shorts: x of the HUD spell icons (16, 40, ... 280)"
 global,0x00185F88,item_group_templates,candidate,"per item group, a -1-ended list of template indices (index within group -> template)"
 global,0x00186A64,disease_table,candidate,disease_infect copies a 47-byte record from here + id*47
 global,0x00186F08,guild_rank_primary_skill,strong,"10 bytes 22,30..94: best guild skill needed per rank"
@@ -61,8 +95,12 @@ global,0x00187369,guild_service_labels,strong,"92 label pointers: Training, Buy 
 global,0x001874CD,spellshop_buttons,confirmed,"5 x {rect, handler}: 3 effect slots, BUY (23,167)-(65,181), EXIT (242,170)-(278,178); experiment: BUY (45,174) -> spellshop_buy"
 global,0x00187509,guild_menu_buttons,confirmed,"4 x {x0,y0,x1,y1,..}: JOIN (99,51)-(220,59), TALK (99,60)-(220,68), service (99,69)-(220,77), EXIT (139,80)-(181,94); experiment: clicks matched"
 global,0x00187545,temple_quest_types,candidate,quest type per temple kind (index kind-142) for guild_temple_quest
+global,0x00187966,monster_soul_values,candidate,"u32 per monster id: soul value (Imp 1000, Orc 1000, Centaur 3000); soul_trap_add_soul, enchant_slot_cost"
 global,0x00187CA8,world_running,candidate,byte cleared when the inventory opens and set at close; ai_update_creatures returns while it is 0
+global,0x00187FB8,dispel_monster_ids,strong,"2 x 7 monster ids: undead 15 18 19 23 28 30 32, daedra 1 25 26 27 29 31 100 (spfx_dispel_creatures)"
+global,0x00187FC6,spell_resist_flags,confirmed,"5 u32 masks by element in character+0x89: fire 0x2, frost 0x10000000, poison 0x20000000, shock 0x40000000, magic 0x80000000; exp1b (build/names/scratch/magic/exp1b.py, save_morthag1): Resist frost set 0x10000000"
 global,0x00187FDC,next_record_id,candidate,goes up by one when disease_infect allocates an effect record (fallcall)
+global,0x00187FE0,potionmaker_buttons,strong,"5 x {rect, handler}: RECIPES, MIX, scroll up, scroll down, EXIT (dumped; layout matches open_0x8F246.png)"
 global,0x0018822C,item_group_tab,strong,"29 bytes: item group -> inventory tab (2,2,0,0,1,1,2.. 14-22 -> 3); matches where items sit in save_tlalac_s"
 global,0x00188281,inv_mode_buttons,strong,"5 trade modes x 7 buttons {x0,y0,x1,y1,handler}: WAGON INFO EQUIP REMOVE USE GOLD EXIT in mode 0; dumped from memory, each handler confirmed by a click"
 global,0x00188425,inv_buttons,strong,"45 buttons {x0,y0,x1,y1,handler}: 0-11 slots, 12 paper doll, 27-36 list rows, 37-40 scroll, 41-44 tabs"
@@ -85,10 +123,14 @@ global,0x00190704,monster_anim_records,candidate,"the loaded ASCR animation reco
 global,0x00190BF0,automap_pitch,confirmed,"512 looking straight down, 128 in the perspective view: the grid button switched it 512 -> 128 in save_mord"
 global,0x00190BF4,automap_yaw,confirmed,the rotate buttons add/subtract 16 a frame (0 -> 512 after a click in save_mord)
 global,0x00190C34,training_state,candidate,"training_update state: 1234 ask to pay, 1235 done, 1236 skill chosen"
+global,0x00190CE4,itemmaker_slot_kinds,strong,"10 bytes: -1 empty, 0 power, 1 side effect"
 global,0x00190CE8,travel_zoomed,candidate,"4x zoom on the region map, toggled by travel_toggle_zoom (right click)"
 global,0x00190D0F,talk_wrap_to_question,candidate,"while set, talk_wrap_text writes to the question pane instead of the answer log"
 global,0x00190D10,talk_face_loaded,candidate,set when talk_load_face has loaded a portrait
 global,0x00190D20,search_kind,candidate,guild kind / kind bits the membership searches look for
+global,0x00190D64,itemmaker_slot,candidate,short: slot being filled
+global,0x00190D66,itemmaker_power,candidate,short: power being added
+global,0x00190D68,itemmaker_mode,candidate,short: itemmaker_open's argument; 2 allows Soul bound without souls
 global,0x00190D8C,levelup_attribute_floor,candidate,copy of character+0x30 taken when the sheet opens; sheet_levelup_adjust won't lower an attribute below it
 global,0x00190DDC,search_faction,candidate,faction id the membership search looks for
 global,0x00190DE4,text_macro_fpc,strong,"faction record for %fpc (the player's guild), set by talk_faction_relation"
@@ -99,13 +141,16 @@ global,0x00190DF4,text_macro_fae,strong,faction record for %fae (the player's al
 global,0x00190DF8,text_macro_fea,strong,faction record for %fea (the player's enemy allied to the NPC's faction)
 global,0x00190DFC,text_macro_fpa,strong,faction record for %fpa (common parent)
 global,0x00190FE4,text_rsc_buffer,strong,output of the TEXT.RSC expander (parse.c func_0004A6B5); talk copies its answers from here
+global,0x001913E4,enchant_text,candidate,text buffer built by enchant_powers_text
 global,0x0019572C,text_macro_fcn,strong,%fcn text (parse.c 47815): name of the nearest town with the asked-for group (talk_find_regional)
+global,0x0019574C,enchant_reference_character,candidate,a character record whose 35 skills enchant_spell_cost sets to 50 before costing a spell
 global,0x0019597C,right_hand_ready_delay,candidate,accumulates the ready time of a changed right-hand weapon (inv_track_hand_weapons); >0 at close gives 'Equipping %it'
 global,0x00195980,left_hand_ready_delay,candidate,same for the left hand (equipped[21])
 global,0x00195998,last_skill_check_minutes,candidate,game_minutes of the last raise_skills from a trip: travel_begin_trip runs it again after 360 minutes
 global,0x001959AC,frame_counter,confirmed,main()'s loop does D_001959AC++ once per iteration (src/hand/func_00010010.c); rises ~119 per 400 timer ticks
 global,0x001959D8,inventory_containers,confirmed,"5 container objects (record type 52) under player_entity: tabs 0 weapons/armor, 1 magic items, 2 clothing/misc, 3 ingredients, 4 wagon; exp: tab click lists inventory_containers[tab]"
 global,0x001959E8,wagon_container,confirmed,inventory_containers[4]: exp: WAGON lists it on the right; capacity 3000 (750 kg) and '%s / 750'
+global,0x001959FC,spell_points_bonus,candidate,spell points spent before magicka by cast_recast_last (extra spell points)
 global,0x00195A00,quest_root,candidate,object whose child list (+0x3F) holds the active quests (type 14) that talk lists
 global,0x00195A80,text_macro_item,candidate,"item record the %it text macro reads ('Equipping %it', item info)"
 global,0x00195A9C,current_building,strong,"the building entered: +0x12 faction (40 at the Mages Guild hall, experiment), +0x19 quality (spell list size)"
@@ -114,13 +159,18 @@ global,0x00195AA4,player_object,confirmed,pointer to the player's world object: 
 global,0x00195AC4,location_object,candidate,root object of the loaded location/dungeon: its +0x1F high word is the id in the at%05d.amf/.atf file names; its children are walked for seen marks
 global,0x00195AC8,monster_bsa_handle,candidate,MONSTER.BSA's open archive handle (exp2 traces)
 global,0x00195ACC,text_macro_potion,candidate,potion recipe the %po macro reads ('Recipe for %po.')
+global,0x00195AE8,cheat_flags,strong,"bits: 3 reveal maps (Ctrl+F1), 6 no spell damage to the player (Ctrl+F4, spfx_damage), 0 SPELLS.STD editing in the spellmaker, 2 free enchanting (itemmaker_enchant), 7 creatures cast nothing (cast_spell_on); keys.c toggles 3 and 6 in cheat mode"
 global,0x00195AF4,found_record,candidate,result of the membership searches (object pointer)
-global,0x00195B04,spell_records,candidate,89-byte spell records (name at +0x2F) the spell shop chooses from
+global,0x00195B04,spell_records,confirmed,"pointer to SPELLS.STD in memory: 89-byte spell records, 128 max (name +0x2F, id +0x49); in save_morthag1 89 records (Fenrik's Door Jam, Buoyancy, Frostbite...); exp1b: cast_item_used_spell(82) found Orc Strength by id here"
 global,0x00195B14,creature_count,strong,active creatures: ai_update_creatures loops over them; inv_use_item says 'There are no monsters nearby.' when 0
 global,0x00195B20,inv_right_container,confirmed,"container listed on the right (ground pile, wagon, shop or trade pile); exp: WAGON set it to the wagon and back at close"
+global,0x00195B2C,spfx_popup_handler,strong,"pending spell popup: 1 = Recall (spell_recall_prompt sets it), else the choice-list callback; spfx_popup_update runs and clears it"
 global,0x00195B34,inv_right_container_base,candidate,the container the right list was opened with (ground pile or shop container); trade totals sum it
+global,0x00195B40,spell_ready_missile,strong,"spell object readied to fire (distance/area targets, ""Press button to fire spell.""); intrface.c and weapons.c fire it (cast_fire_missile, spell_area_effect); cast_recast_last refuses while set"
+global,0x00195B48,spell_ready_touch,strong,spell object readied for a touch
 global,0x00195B50,guild_npc_object,strong,the clicked guild NPC object (guild_service_dispatch)
 global,0x00195B58,spellshop_icons,strong,"mask04i0.img, spell icons drawn by spellshop_draw_spell"
+global,0x00195B7C,list_popup_callback,strong,"function called with the entry picked in a list popup (spells_list_poll): spellmaker_pick_effect_cb/pick_subtype_cb, itemmaker_add_power_cb, ..."
 global,0x00195B84,faction_scratch,candidate,counter/flags used by the recursive faction walks
 global,0x00195BDC,current_location,strong,"location record: +0x29 building count, +0x2B 26-byte building records (talk lists them, town_has_building)"
 global,0x00195BE0,player_character,confirmed,"pointer to the player character record (= *player_entity + 0x47): name, attributes, level, gold, magicka in every save (docs/state.md)"
@@ -138,10 +188,13 @@ global,0x00195D44,inventory_action,confirmed,"1 info, 2 equip/select, 3 remove, 
 global,0x00195D4C,magic_def,strong,"magic.def entries (name, kind, enchantment pairs, condition, value, material) read by magic_def_load"
 global,0x00195D58,talk_prostitute_price,strong,"1d(50-75) - disposition, taken from the gold"
 global,0x00195D6C,text_rsc_file,candidate,"file handle from text_rsc_open('text.rsc'), closed by text_rsc_close; text.c reads messages through it"
-global,0x00195D98,spell_record_count,candidate,number of spell_records
+global,0x00195D98,spell_record_count,strong,"89 in save_morthag1, the number of named SPELLS.STD records at spell_records"
 global,0x00195EB0,key_map,strong,"action -> scan code table (action 27 travel map = W, 12 rest = R, 24 logbook, 26 automap); matches Options > CONTROLS (travel play agent)"
 global,0x00195F22,book_count,candidate,u16 number of books found by books_scan
+global,0x00195F30,spell_effect_slot,strong,"short: effect slot (0-2) being edited/costed: the cost formulas, settings spinners and spell_cost index the spell with it"
 global,0x00195F5C,text_macro_n_text,strong,text id the %n macro uses when nonzero (parse.c 4878B); %1com sets it to 7221-7223 (friend/stranger/buddy)
+global,0x00195F62,spell_ready_cost,candidate,"short magicka cost of the spell being cast; cast_recast_last spends it, spfx_identify refunds it"
+global,0x00196036,spellmaker_spell,strong,89-byte spell being made: spellmaker_new points spellshop_spell at it and clears it; potion_mix_unknown also builds its spell here
 global,0x001960D9,trade_container,candidate,item list the guild services stock (shop_stock_*) and hand to the trade window (generate.c func_000922F6)
 global,0x001961F5,pending_quest_file,candidate,"13-char quest file name queued by guild_check_invitations (o0a0al00.qbn, l0a01l00.qbn)"
 global,0x00196268,current_region,strong,"byte region index of the player: the world view paints pixels 128+this red (the highlighted region in cheat_morthag1, value 21 Anticlere), I'M AT and travel_mark_player use it, closing the map reloads it"
@@ -155,6 +208,8 @@ global,0x00196276,interaction_mode,strong,"0 grab F2, 1 info F3, 2 steal F1, 3 t
 global,0x00196279,mouse_buttons_prev,strong,mouse_buttons from the last frame: handlers act on (mouse_buttons & 1) && !(this & 1); the automap copies mouse_buttons into it each frame
 global,0x00196280,is_daytime,candidate,nonzero with a vampire (race 8) or career flag 16: 'You cannot initiate fast travel during the day.'; trips then end after 18:00
 global,0x00196288,inv_right_icon,strong,"byte: picture of inve16i0.cif shown for the right container: 2 ground at open, 3 wagon after WAGON (exp)"
+global,0x00196291,cast_strike_spell,candidate,byte: 1 while func_0002E2CF casts a weapon's cast-when-strikes spell; cast_spell_on then plays the creature cast animation instead of the player's
+global,0x0019629A,cast_ignore_silence,candidate,byte: potion_drink sets it so cast_player_spell skips the silence check
 global,0x001962AB,forced_material,candidate,"byte: when set, the next rolled material is n-1 (then cleared)"
 global,0x00196488,talk_regional_rows,candidate,row -> regional group index
 global,0x001964B0,talk_place_rows,candidate,row -> talk_place_topics index for the place list
@@ -227,14 +282,34 @@ global,0x00196DAC,automap_selected_note,candidate,"text of the selected object's
 global,0x00196DB0,automap_selected_object,candidate,object picked by a left click on the automap; the note line edits its note
 global,0x00196DB4,automap_notes,candidate,pointer to the notes in automap_record (object+0x47): entries u16 object id + string
 global,0x00196DB8,automap_top_down,confirmed,"1 top-down plan, 0 perspective: automap_button_view_mode flipped it 1 -> 0 and the picture changed"
+global,0x0019961C,spell_effect_cost_current,strong,"the 8-byte cost record (4 shorts) of the effect being costed, copied from spell_effect_costs; read by spell_cost_formulas"
+global,0x00199624,spellmaker_settings_image,strong,"mask05i0.img (spellmaker_open): the effect settings panel drawn by spellmaker_settings_update, freed by spellmaker_exit"
+global,0x0019962C,spellmaker_alter_row,candidate,"short: effect row waiting for the ""alter the spell?"" answer (-1 none): yes edits it, no deletes the effect"
+global,0x0019962E,spellmaker_settings_kind,strong,"byte: spell_effect_settings of the effect being edited (bits duration/chance/magnitude), 0 = settings panel closed"
 global,0x00199644,sheet_hth_damage_line,candidate,set when a skill list includes skill 30 (Hand-to-Hand) so the popup adds 'Hand-to-Hand dmg: %d-%d' (seen in the keophex PRIMARY popup)
+global,0x00199868,itemmaker_slot_exclusions,candidate,"10 x 10 bytes: per slot 5 (type, param) pairs ruled out"
+global,0x001998E0,itemmaker_slots,strong,"10 x {s16 type, s16 param}: the enchantments being made, copied to item+0x43 by itemmaker_enchant"
+global,0x00199908,itemmaker_item,strong,item data being enchanted (itemmaker_pick_item); enchant points item+0x3D
+global,0x0019990C,itemmaker_item_object,strong,its object
+global,0x00199910,itemmaker_slot_from_soul,candidate,10 bytes: slot was filled by a bound soul
 global,0x001A4A10,guild_saved_screen,strong,64000-byte copy of the screen under the guild menu / spell shop
 global,0x001A4A14,guild_membership,strong,the player's membership record for the current guild (or 0); experiment at the Mages Guild: rank 9 kind 1 faction 40
 global,0x001A4A18,spellshop_saved_seed,candidate,RNG seed saved while the spell shop is open
 global,0x001A4A1A,guild_npc_seed,candidate,high word of the NPC's record id; seeds the spell shop list
 global,0x001A4A1C,guild_gift_pending,candidate,set by guild_give_gift; guild_service_dispatch then opens the trade container
 global,0x001A4A1D,guild_join_asked,candidate,counter: the join question is asked only when it becomes 1
+global,0x001A99F8,recall_anchor_location,candidate,location id (location_object +0x1B) saved when Recall sets the anchor
+global,0x001A99FC,recall_anchor_region,candidate,current_region saved with the Recall anchor
+global,0x001A9A00,recall_anchor_building,candidate,"the building (player object parent +0x1B) when anchored indoors, else 0"
+global,0x001A9A04,recall_anchor_environment,candidate,player_environment saved with the anchor; spfx_popup_update reloads the place (func_000876AD) on Teleport
 global,0x001A9AB8,spellshop_list,candidate,picklist control of the spell shop
+global,0x001A9BB4,potion_cauldron_ids,candidate,"8 bytes: ingredient id per cauldron cell, 254 empty"
+global,0x001A9BBC,potion_cauldron,strong,8 ingredient object pointers in the cauldron
+global,0x001A9BDC,potion_ingredients,strong,up to 512 ingredient objects listed on the left
+global,0x001AA3DC,potion_ingredient_scroll,strong,first listed ingredient (scroll buttons move it by 3)
+global,0x001AA3E4,potion_ingredient_count,strong,number of potion_ingredients
+global,0x001AA3E8,potion_name,strong,"pointer to the potion name shown (""Unnamed potion"" or the recipe's)"
+global,0x001AA3EC,potion_cauldron_count,strong,short: ingredients in the cauldron
 global,0x001AA41C,inventory_images,strong,"inventory_load_images stores 8 image handles here, one per inve*.img/cif it opens (fallcall)"
 global,0x001AA45C,inv_temp_pile,strong,"loot pile object (type 33, treasure texture 216, at the player) made by inventory_open; freed at close when empty"
 global,0x001AA53C,inv_ground_pile,candidate,right container saved at open; inv_wagon_button switches back to it
@@ -279,10 +354,14 @@ field,character+0x20,attributes,confirmed,8 x u16 STR INT WIL AGI END PER SPD LU
 field,character+0x209,last_training_minutes,strong,i32 game minutes of the last guild training: training_offer refuses with TEXT.RSC 4023 ('cannot train ... more than one skill in a single day') within 720 minutes; training_update sets it
 field,character+0x211,thieves_invite_time,strong,game_minutes when the Thieves Guild invitation comes (guild_check_invitations)
 field,character+0x215,brotherhood_invite_time,strong,game_minutes when the Dark Brotherhood invitation comes
+field,character+0x219,shield_points,confirmed,"u32 damage the Shield effect still absorbs; exp1b (build/names/scratch/magic/exp1b.py, save_morthag1): Shield set 10, Transfer and Continuous Damage hits took 10 -> 5 -> 0; the HUD ends the Shield spell at 0"
+field,character+0x21E,lock_open_chance,strong,"byte: chance of the last Lock, Open or Identify spell, used on the next door/chest or identify; exp1b (build/names/scratch/magic/exp1b.py, save_morthag1): Lock set it to 100"
 field,character+0x21F,brotherhood_invite_count,strong,"kills counted toward the Dark Brotherhood invitation (15), 100 once invited; 100 in save_kralvamp"
 field,character+0x220,hidden_load_percent,candidate,byte: hidden items' weight as % of equip_hiding_capacity (inv_update_hidden_load)
+field,character+0x221,detect_kind,candidate,"byte: Detect subtype (0 magic, 1 enemy, 2 treasure) set each round by spfx_effect_tick"
 field,character+0x222,thieves_invite_count,strong,"thefts counted toward the Thieves Guild invitation (6), 100 once invited; 100 in 4 saves"
 field,character+0x227,faction_id,strong,NPC records: faction id passed to faction_find by talk_start (0 in the player's record)
+field,character+0x22B,resist_chances,confirmed,"5 bytes by element: elemental resistance chance; exp1b (build/names/scratch/magic/exp1b.py, save_morthag1): Resist frost chance 100 -> [0,100,0,0,0]; spfx_resist_roll saves outright on a roll <= this when the element's spell_resist_flags bit is set"
 field,character+0x230,class,strong,the class (career) record is embedded here: player_class = player_character + 0x230 in save_blades
 field,character+0x2CC,effects_list,candidate,disease_infect links its new 47+71-byte record (type 11) at the head of this list
 field,character+0x30,base_attributes,strong,"permanent attributes: sheet_draw colours an attribute red when +0x20 is below this, another colour when above (STR 50 < 85 went red); level-up points raise both sets; clamped to 100 by raise_skills"
@@ -294,6 +373,8 @@ field,character+0x50,skills_raised_lo,candidate,"u32 bit per skill 0-31: raise_s
 field,character+0x54,skills_raised_hi,candidate,"u32 bits for skills 32-34, as skills_raised_lo"
 field,character+0x58,level_skill_sum_start,strong,"i32: raise_skills sets level = (level_skill_sum - this + 28) / 15, DFU's level formula; 170 in save_blades, 169 in save_keophex"
 field,character+0x5C,max_health_base,strong,i32 (not u16): the level-up HP gain is added to it and to +0x7E; equals max health in 3 saves
+field,character+0x64,shield_end_time,candidate,u32 duration + game_minutes written by spfx_shield
+field,character+0x68,shapechange_form,candidate,"int: subtype of effect 29 (Bat, Raven, Fish, Wolf) set by spfx_lycanthropy"
 field,character+0x74,house,candidate,building given by the knightly order's 'Receive House' (848); 0 = none ('You have not earned a house' 460)
 field,character+0x78,ship_owned,strong,i32 set by bank.c from its ship-sale table; nonzero waives the ship fare in travel_trip_cost and the ship-option gold check (DFU hasShip)
 field,character+0x7C,health,confirmed,u16 current health: writing 123 in save_keophex made the sheet show HEALTH 123/489; guild/inn healing sets it to +0x7E; travel refills it
@@ -301,7 +382,7 @@ field,character+0x7E,max_health,strong,"u16 drawn after the / of HEALTH (489 in 
 field,character+0x81,level,confirmed,"byte: 21, 13, 20 = the sheet's level in 3 saves"
 field,character+0x82,reflexes,strong,"byte: skill_ready_to_advance scales uses by (0x10000-((r-2)<<13))/0x10000, DFU's reflexes modifier; 0 in two saves"
 field,character+0x85,gold,confirmed,i32 gold coins: +5000 per gold cheat in 2 saves; writing it changes gold shown and encumbrance by the coins' weight
-field,character+0x89,conditions,candidate,int cleared by guild_heal; bit 3 blocks rest ('You cannot sleep now.')
+field,character+0x89,conditions,confirmed,"u32 active spell-effect flags (one bit per effect, same in creatures): 0 paralyzed, 1 resist fire, 2 invisible, 3 levitating, 4 light, 5 lock, 6 open, 7 regenerate, 8 silence, 9 absorption, 10 reflection, 11 spell resistance, 12 chameleon, 13 shadow, 14 slowfall, 15 free action, 16 jumping, 17 climbing, 18 effect 29, 19 water breathing, 20 water walking, 21 effect 32, 22 shield, 23 detect, 24 darkness, 25 comprehend languages, 26/27 effects 45/46, 28-31 resist frost/poison/shock/magic; guild_heal clears it, rest refuses while levitating (bit 3); exp1b (build/names/scratch/magic/exp1b.py, save_morthag1): each handler set its bit; spfx_effect_end clears them"
 field,character+0x8A,equip_effect_flags,confirmed,"bit 1 spells absorbed (enchantment 9): exp: 6 -> 4 when the amulet came off, back to 6 when re-equipped"
 field,character+0x8D,magicka,strong,u16 = 28 in morthag1 (sheet 28/160)
 field,character+0x8F,max_magicka,strong,u16 = 160 in morthag1
@@ -309,12 +390,21 @@ field,character+0x91,reputation,strong,"5 shorts by social group (commoners, mer
 field,character+0x9B,fatigue,confirmed,u16 current fatigue x64: sheet shows +0x9B>>6 / (STR+END); writing 77*64 made FATIGUE 77/187 in keophex; 12206 in blades = 190 as on its sheet. Max fatigue is not stored
 field,character+0x9D,skills,strong,"35 x 6 bytes, u16 value first: Mercantile (14) at +0xF1 in prices, Pickpocket (15) at +0xF7 in shop theft, enchantment 10 adds 15 to skill[param]"
 field,character+0x9F,skill_uses,candidate,"u16 per skill (stride 6): skill_add_uses adds and clamps 0..20000, raise_skills compares it with the advance threshold and zeroes it, training adds random(10,20)*multiplier"
+field,class+0x00,resistance_flags,strong,"byte: spfx_resist_roll raises the save chance x1.5 for these bits (spell_element_class_bits: fire 8, frost 16, poison 4, shock 32, magic 2, disease 64); DFU DFCareer order resistances, immunities, low tolerances, critical weaknesses"
 field,class+0x01,immunity_flags,candidate,"byte: disease_infect gives up when bit 6 is set, the poison code tests bit 2 (DFU CFG ImmunityFlags: 4 poison, 64 disease)"
+field,class+0x02,low_tolerance_flags,strong,byte: spfx_resist_roll halves the save chance for these bits
+field,class+0x03,critical_weakness_flags,strong,byte: spfx_resist_roll returns 100 (no save) for these bits
 field,class+0x04,flags,candidate,"u16: bit 3 stops travel refilling magicka, bit 4 forbids fast travel by day like a vampire ('You cannot initiate fast travel during the day.'); 0x8 for the blades Wizard"
+field,class+0x09,spell_absorption_flags,candidate,"byte bits 0-2: class spell absorption (1 in light?, 2 in darkness via func_0004B192, 4 always); spell_resist_check"
 field,class+0x10,skills,strong,"12 skill indexes: 3 primary, 3 major, 6 minor; PRIMARY/MAJOR/MINOR popups list them (keophex PRIMARY = Archery, Hand-to-Hand, Restoration); misc = the rest"
 field,class+0x1C,name,strong,"16-byte class name drawn on the sheet's CLASS line (46,24): 'Wizard' in save_blades, matching its sheet"
 field,class+0x34,hp_per_level,strong,"level-up HP = random(hp/2..hp) + END/10 - 5, min 1 (DFU's formula); 16 for the blades Wizard"
 field,class+0x36,advancement_multiplier,strong,16.16 fixed multiplier in the skill-advance threshold (DFU careerAdvancementMultiplier); 0xCCCE (0.8) in save_blades
+field,disease+0x00,id,candidate,type-11 record data: disease id (< 100; poisons are >= 128); spfx_cure_disease / spfx_cure test it
+field,disease+0x01,stat_flags,candidate,"11 x s16: which stats the disease hits (8 attributes, 8 health, 9 fatigue, 10 magicka); spfx_disease_daily"
+field,disease+0x17,damage_min,candidate,s16 daily damage range low (+0x19 high); spfx_disease_daily rolls it
+field,disease+0x1B,days_left,candidate,"s16 days left, 255 forever, 254 finished; spfx_disease_daily counts it down"
+field,disease+0x1F,drained,candidate,8 x s16 attribute points taken so far; given back by spfx_cure_disease and spfx_disease_recover
 field,entity+0x47,character,confirmed,player_character = player_entity + 0x47 in 2 saves; disease code: entity+71 == player_character
 field,faction+0x00,type,strong,"byte: 2 group, 4 individual, 7 noble, 9 temple, 14 courts, 15 people (faction.txt types); talk walks up to 2/7/9"
 field,faction+0x01,region,strong,"byte region index, 255 = none; compared with current_region"
@@ -345,6 +435,7 @@ field,item+0x36,material,candidate,byte: weapon/armor material rolled by item_ro
 field,item+0x37,armor_type,candidate,byte: 0 leather 1 chain 2 plate (item_roll_armor_type); equip sound 231+n; class armor mask bit 6+n
 field,item+0x38,color,candidate,byte: dye / palette remap row used when drawing (material+16 for metal)
 field,item+0x39,weight,candidate,"u32 from the template, scaled by material"
+field,item+0x3D,enchant_points,strong,"u16 enchantment capacity: itemmaker_pick_item refuses 0 (""This item cannot be enchanted.""), itemmaker_enchant refuses more points than it (TEXT 1651), shown as ENCHANTMENT POINTS used/limit"
 field,item+0x3F,message,candidate,"book id (books\\bok%05d.txt), letter/spell id"
 field,item+0x43,enchantments,strong,"10 x {u16 type, u16 param}, type -1 ends: 0 cast when used, 1 cast when held, 3 extra spell points, 8 repairs, 9 absorbs spells, 10 +skill, 15 soul bound, 26 artifact special; the amulet's (3,0,9,8) changed character+0x8A on unequip"
 field,location+0x29,building_count,strong,u16 buildings in the current town
@@ -375,11 +466,29 @@ field,object+0x1B,world_image,candidate,u16 archive<<7|record for the object in 
 field,object+0x1F,record_id,candidate,"u32 save-tree id; 8EB88 makes new ones, high word = block (100 for carried items)"
 field,object+0x26,quest_id,candidate,byte: quest the item belongs to; quest items get a highlighted cell and quest letter text
 field,object+0x2B,repair_due,strong,u32 game minutes when an item in repair (type 54) is ready: 'DONE' or '%d days' (minutes/1440)
+field,object+0x2F,caster,confirmed,"type-9 (spell) objects: the casting entity; exp1b (build/names/scratch/magic/exp1b.py, save_morthag1): an Orc Strength cast by the player had caster = parent = player_entity; spfx_dispel_magic_cb and spfx_caster_level_roll read the caster's level through it"
 field,object+0x33,twin,candidate,pointer to a linked object that shares the record id (item_sync_twin_id)
 field,object+0x37,next,confirmed,pointer to the next sibling: walked the character's containers and items in save_tlalac_s
 field,object+0x3F,children,confirmed,pointer to the first child (containers -> items); walked in save_tlalac_s
 field,object+0x43,parent,confirmed,pointer to the parent: items -> their tab container -> player_entity -> player_object (player_entity+0x43 = player_object in save_tlalac_s; +0x40 is misaligned there)
 field,object+0x47,record_data,strong,record data (item or character) follows the 71-byte header: player_character = player_entity + 0x47
+field,potion_recipe+0x00,ingredient_indices,strong,"8 signed bytes: ingredient template index, -2 ends (Stamina 4 16 13)"
+field,potion_recipe+0x08,value,strong,"u16 value of the potion made (25 Stamina, 50 Orc Strength)"
+field,potion_recipe+0x0A,ingredient_groups,strong,"8 bytes: item group of each ingredient (20, 16, 16)"
+field,potion_recipe+0x14,spell,strong,89-byte spell record of the potion (name at +0x43 Stamina; Stamina heals fatigue 10/9); potion_drink casts it
+field,spell+0x00,effects,confirmed,"3 x {u8 type, u8 subtype}, 255 none; exp1b (build/names/scratch/magic/exp1b.py, save_morthag1): the dispatcher spell_apply_effect ran the handler of spell_effect_names[type]"
+field,spell+0x06,element,strong,"0 fire, 1 frost, 2 poison, 3 shock, 4 magic (spellmaker element buttons, TEXT 1801-1805); indexes spell_cast_sounds and spell_resist_flags"
+field,spell+0x07,target,strong,"0 caster, 1 touch, 2 distance, 3 area around caster, 4 area at distance (TEXT 1806-1810); cast_player_spell/cast_creature_spell_at switch on it"
+field,spell+0x08,effect_costs,strong,3 x u16 gold cost per effect (spellmaker stores spell_cost_formulas results; price = sum*target factor*2); Shock 225 in SPELLS.STD
+field,spell+0x0E,durations,strong,"3 x {base, plus, per_level} bytes (-1 base = permanent item spell); spellmaker limits 60/60/20; spell_compute_values"
+field,spell+0x17,chances,strong,"3 x {base, plus, per_level}; Resist Cold 30/5/1, Cure Poison 60/2/1 in SPELLS.STD"
+field,spell+0x20,magnitudes,strong,"3 x {base_min, base_max, plus_min, plus_max, per_level}; Shock 1-20 + 1-4 per level"
+field,spell+0x2F,name,confirmed,"25 bytes: the names shown in the spellbook (Shock, Identify, Morthag's Storm in save_morthag1)"
+field,spell+0x48,icon,strong,"spell icon 0-68 (spell_icon_cycle mod 69, drawn on the HUD by spell_hud_draw_icons); 200+slot marks a cast-when-held item spell, 250 an item/potion/strike spell"
+field,spell+0x49,id,strong,"spell id (SPELLS.STD index field): 82 Orc Strength, 92 !Lycanthropy, 94 Recall; the recast key and item enchantments refer to spells by it"
+field,spell+0x4A,cast_durations,confirmed,"3 x u16 rounds left, computed at cast (spell_compute_values), counted down by spell_tick (0xFFFF permanent); exp1b (build/names/scratch/magic/exp1b.py, save_morthag1): Orc Strength cast at level 13 had 18"
+field,spell+0x50,cast_magnitudes,confirmed,"3 x u16 magnitude rolled at cast; exp1b (build/names/scratch/magic/exp1b.py, save_morthag1): Orc Strength had 20 and STR went 80 -> 100"
+field,spell+0x56,cast_chances,strong,"3 x u8 chance % computed at cast; handlers roll 1-100 against it (Paralyze, Disintegrate, Silence...)"
 func,0x00010010,main,strong,"entry from the C runtime with (argc, argv); setup, then the endless frame loop that calls game_frame and bumps frame_counter"
 func,0x0001025B,game_frame,strong,main()'s loop calls it once per iteration with no arguments; updates the world (frame_checkpoint 98-107 inside)
 func,0x00014AE8,talk_open,confirmed,"talk_start calls it with the NPC object: sets game_mode=12, loads talk01i0/02i0/03i0.img, saves the screen, greets by disposition (TEXT 7206-7209); with 0 it only returns whether game_mode==12 (called so every frame by talk_update); experiment: TALK in a guild menu -> mode 12"
@@ -548,8 +657,67 @@ func,0x000297BA,qcond_op70_player_has_items,candidate,quest opcode 70: true when
 func,0x000298F3,unequip_object,candidate,clears the character+0x16F equipped slots holding this object; called when an object is deleted (object.c 8EBFD) or given away
 func,0x0002F369,damage_collapse_exhausted,strong,"damage.c; direct call (all-zero args) shows 'You drop to the ground, completely exhausted...'; called by func_0002F02C"
 func,0x0002FA97,play_death_video,strong,damage.c; opens anim0012.vid; a direct call shows the funeral cutscene (fallcall)
+func,0x00036F69,spellmaker_open,confirmed,"unit spells.c (filed under fs2df.c). (open) game_mode=2, loads info01i0.img, mask01i0.img, mask05i0.img, spellmaker_new; called by spellmaker_update every frame (open=0) and guild_service_dispatch (Make Spells, cases 64/497); exp: fallcall 0x36F69 1 drew the spellmaker (MAX SP, MONEY, SPELL COST, CASTING COST, SPELL NAME, BUY/NEW/EXIT): scratch/magic/open_0x36F69.png"
+func,0x00037014,spellmaker_update,strong,"every frame (game_frame, 501 episodes) but returns unless spellmaker_open says mode 2; draws MAX SP/MONEY/SPELL COST (sum of effect costs*target factor*2)/CASTING COST (spell_cost)/name, element and target icons, effect names; hit-tests the 18 spellmaker_buttons (ButtonClick 203); handles the alter-effect popup"
+func,0x00037732,spellmaker_exit,strong,"spellmaker_buttons[12] (244,179)-(268,195) EXIT: right-click shows TEXT 1814 ""Exit from SpellMaker""; left frees the images, game_mode=0; with cheat_flags bit 0 a right-click deletes a SPELLS.STD entry (spells_std_delete)"
 func,0x00037856,spellmaker_enter_name,strong,spells.c; direct call (all-zero args) shows 'Enter spell name'
-func,0x00039C09,spells_pick_list,candidate,"spells.c; opens spells.std; direct call (all-zero args) shows a spell list window; called by func_00039F94, func_00039FD6"
+func,0x000378D1,spellmaker_element_fire,strong,"spellmaker_buttons[0] (299,114): right-click TEXT 1801 ""Save versus fire""; sets spell+0x06 element = 0 when an effect allows elements"
+func,0x00037934,spellmaker_element_frost,strong,"spellmaker_buttons[1] (299,130): TEXT 1802 ""Save versus frost""; element = 1"
+func,0x00037997,spellmaker_element_poison,strong,"spellmaker_buttons[2] (299,146): TEXT 1803 ""Save versus poison""; element = 2"
+func,0x000379FA,spellmaker_element_shock,strong,"spellmaker_buttons[3] (299,162): TEXT 1804 ""Save versus shock""; element = 3"
+func,0x00037A5D,spellmaker_element_magic,strong,"spellmaker_buttons[4] (299,178): TEXT 1805 ""Save versus magicka""; element = 4 (always allowed)"
+func,0x00037AB7,spellmaker_effects_allow_element,candidate,max of spell_effect_elemental[type] over the 3 effects of the current spell; 0 forces element 4 (magic)
+func,0x00037B6A,spellmaker_target_caster,strong,"spellmaker_buttons[5] (275,114): TEXT 1806 ""Spell affects caster only""; spell+0x07 target = 0 unless the effects need another target"
+func,0x00037BCE,spellmaker_target_touch,strong,"spellmaker_buttons[6] (275,130): TEXT 1807 ""Spell affects target by touch""; target = 1"
+func,0x00037C31,spellmaker_target_distance,strong,"spellmaker_buttons[7] (275,146): TEXT 1808 ""Spell casts at a distance""; target = 2"
+func,0x00037C94,spellmaker_target_area,strong,"spellmaker_buttons[8] (275,162): TEXT 1809 ""Spell affects area around caster""; target = 3"
+func,0x00037CF7,spellmaker_target_area_at_distance,strong,"spellmaker_buttons[9] (275,178): TEXT 1810 ""Spell affects area at a distance""; target = 4"
+func,0x00037D5A,spellmaker_allowed_targets,candidate,"combines spell_effect_target_class of the 3 effects (2 any, 0 caster only, 1 others) via spellmaker_allowed_targets_cb"
+func,0x00037DBB,spellmaker_allowed_targets_cb,candidate,"per effect type: unless 255 or class 2, D_0019962F = spell_effect_target_class[type]"
+func,0x00037E07,spellmaker_buy,strong,"spellmaker_buttons[10] (244,147)-(268,163) BUY: texts 1704 (needs a name), 1702 (gold), 1709 (book full, 128), 1705 ""inscribed in your grimoire"", 1812 ""Buy spell""; pays sum(effect costs)*target factor*2, adds an 89-byte type-9 copy to the spellbook with spell_assign_new_id, ParchmentScratching 206; cheat_flags bit 0: appends to SPELLS.STD instead"
+func,0x00038067,spellmaker_new,strong,"spellmaker_buttons[11] (244,163)-(268,179) NEW: TEXT 1813 ""Erase current spell, begin new one""; points spellshop_spell at spellmaker_spell and clears it (effects 255, element 4, target 0, costs 0); cheat_flags bit 0: right-click loads a SPELLS.STD entry (spells_std_edit)"
+func,0x0003817F,spellmaker_pick_subtype_cb,strong,"list_popup_callback after an effect with subtypes: stores the subtype at spell+1+slot*2, loads its cost factors (spell_effect_cost_index) and opens the settings panel kind (spell_effect_settings)"
+func,0x00038228,spellmaker_pick_effect_cb,strong,"list_popup_callback of ADD EFFECT: puts the effect type in the first free slot, fixes element/target for it, then opens the subtype list (spell_effect_subtype_names) or the settings panel"
+func,0x000383CC,spellmaker_add_effect,strong,"spellmaker_buttons[13] (244,114)-(271,144): TEXT 1811 ""Add effect to spell"", 1707 ""no more than three effects""; lists the named effects (spell_effect_names) compatible with the target class"
+func,0x0003853C,spellmaker_find_effect,strong,"slot (0-2) of effect type a1 in the current spell, -1 if none; called with 255 to find a free slot"
+func,0x0003859F,spellmaker_duration_base,strong,"D_0017B317[0] (64,94)-(87,109) spinner: spell+0x0E+slot*3 (duration base), 1..60"
+func,0x000385DE,spellmaker_duration_plus,strong,"D_0017B317[1] (104,94): spell+0x0F+slot*3 (duration plus), 1..60"
+func,0x0003861E,spellmaker_duration_per_level,strong,"D_0017B317[2] (160,94): spell+0x10+slot*3 (duration per level), 1..20"
+func,0x00038660,spellmaker_chance_base,strong,"D_0017B317[3] (64,114): spell+0x17+slot*3 (chance base), 1..100"
+func,0x0003869F,spellmaker_chance_plus,strong,"D_0017B317[4] (104,114): spell+0x18+slot*3, 1..100"
+func,0x000386DF,spellmaker_chance_per_level,strong,"D_0017B317[5] (160,114): spell+0x19+slot*3, 1..20"
+func,0x00038721,spellmaker_magnitude_base_min,strong,"D_0017B317[6] (64,134): spell+0x20+slot*5, 1..100, keeps max >= min"
+func,0x00038763,spellmaker_magnitude_base_max,strong,"D_0017B317[7] (104,134): spell+0x21+slot*5, keeps min <= max"
+func,0x000387A6,spellmaker_magnitude_plus_min,strong,"D_0017B317[8] (144,134): spell+0x22+slot*5"
+func,0x000387EB,spellmaker_magnitude_plus_max,strong,"D_0017B317[9] (184,134): spell+0x23+slot*5"
+func,0x00038830,spellmaker_magnitude_per_level,strong,"D_0017B317[10] (240,134): spell+0x24+slot*5, 1..20"
+func,0x00038872,spellmaker_adjust_value,strong,"(byte*, delta, max, linked offset): adds delta, clamps 1..max, keeps the linked min/max byte ordered; called by the 11 setting spinners"
+func,0x00038911,spellmaker_settings_update,strong,"effect settings panel (spellmaker_settings_kind != 0): shows TEXT 1500+effect (1502 ""Paralyzation...""), its exit box (281,94)-(304,109), the up/down halves of D_0017B317[11..32] and drag-spinning; draws the values and the effect cost; stores spell_cost_formulas[kind] into spell+0x08+slot*2"
+func,0x000390AD,spellmaker_settings_close,candidate,"D_0017B317[33] (281,94)-(304,109): sets D_001940D5 bit 5 and closes the settings panel (spellmaker_settings_kind = 0)"
+func,0x000390D3,spellmaker_effect_rows,strong,"clicks on the 3 effect rows (y 30+32k): right-click TEXT 1200+effect (1202 ""Paralysis Duration...""), left-click asks TEXT 1708 ""How would you like to alter the spell?"" (spellmaker_alter_row)"
+func,0x00039224,spell_effect_text_index,strong,"spell_effect_text_index[type] + subtype (not for type 29): offset of the effect help texts at 1200+ and 1500+; callers spellmaker, spellbook, spellshop_show_effect"
+func,0x000392AD,spells_list_poll,strong,"modal pick-list poll: Esc -> -2 (cancels a half-picked effect when the callback is spellmaker_pick_subtype_cb), a pick -> its row (list closed), else -1; called by the spellmaker, itemmaker_update, potionmaker_update, spfx_popup_update, training_update, sheet.c, click.c, kludge.c"
+func,0x0003937B,spell_cost_duration_chance,strong,"spell_cost_formulas[0] (formula 1): f0*dur.base + f1*(dur.plus/dur.per) + f2*chance.base + f3*(chance.plus/chance.per) for the current slot, f = spell_effect_cost_current"
+func,0x0003946E,spell_cost_duration_magnitude,strong,spell_cost_formulas[1] (formula 2): duration terms + f2*avg(magnitude base) + f3*avg(magnitude plus)/per
+func,0x000395AA,spell_cost_duration,strong,spell_cost_formulas[2] (formula 3): f0*dur.base + f1*(dur.plus/dur.per)
+func,0x00039635,spell_cost_chance,strong,spell_cost_formulas[3] (formula 4): f0*chance.base + f1*(chance.plus/chance.per)
+func,0x000396C0,spell_cost_magnitude,strong,spell_cost_formulas[4] (formula 5): f0*avg(magnitude base) + f1*avg(magnitude plus)/per
+func,0x0003978C,spell_cost_duration_magnitude_alt,candidate,"spell_cost_formulas[5] (formula 6, Fortify Attribute and Transfer): duration and magnitude terms with the factors in another order"
+func,0x0003988A,spell_cost_magnitude_by_duration,candidate,"spell_cost_formulas[6] (formula 7, used by no effect): magnitude terms * dur.base / dur.plus"
+func,0x00039993,spell_icon_cycle,strong,"spellmaker_buttons[14] (288,94)-(302,108) ICON and spellbook button (172,32)-(187,47): spell+0x48 icon +1 (left) or -1 (right) mod 69"
+func,0x000399FD,spell_icon_next,strong,"spellmaker_buttons[15] (270,94)-(280,99) up arrow next to ICON: icon+1 mod 69"
+func,0x00039A46,spell_icon_prev,strong,"spellmaker_buttons[16] (270,100)-(280,108) down arrow: icon-1 mod 69"
+func,0x00039A8F,spell_assign_new_id,strong,"lowest id not used by spell_records (+0x49) nor by the spellbook (spellbook_has_spell_id), stored at the current spell +0x49; before buying or appending"
+func,0x00039B50,spellbook_find_id_cb,strong,object walk callback: type 9 with +0x49 == D_00199630 -> found (guild_npc_object reused as the result)
+func,0x00039B93,spellbook_has_spell_id,strong,finds the spellbook (container 27) and walks it with spellbook_find_id_cb; 1 if a spell has that id
+func,0x00039C09,spells_pick_list,strong,"dev: modal list of the SPELLS.STD names (spells_std_name_list), returns the record picked; callers spells_std_delete and spells_std_edit (cheat_flags bit 0); direct call opened spells.std and drew the list"
+func,0x00039D24,spells_std_name_list,strong,reads spells.std into scratch_buffer and builds a 0-terminated list of the names (optionally only ids in a 255-terminated list); for spells_pick_list
+func,0x00039E5F,spells_std_names_for_ids,strong,"reads spells.std, returns the names of a 255-terminated id list; itemmaker_pick_param_list uses it for the cast-when-used/held/strikes spell lists"
+func,0x00039F94,spells_std_delete,candidate,"dev (cheat_flags bit 0, right-click EXIT): pick a SPELLS.STD spell, clear its name, write spells.std (128*89 bytes)"
+func,0x00039FD6,spells_std_edit,candidate,"dev (cheat_flags bit 0, right-click NEW): pick a SPELLS.STD spell, copy it into the spellmaker, remove it from spells.std"
+func,0x0003A036,spells_std_append,strong,"dev (cheat_flags bit 0, right-click BUY): appends the current spell to spells.std; TEXT 1706 ""The spell has been inscribed to the general list and Ted is..."""
+func,0x0003A0C0,spell_cost,confirmed,"(spell, character): magicka cost = max(5, target factor/2 * sum over effects of formula cost*(110-school skill)/100); also points spellshop_spell at the spell. exp1b (build/names/scratch/magic/exp1b.py, save_morthag1): returned 35, 61, 52, 66, 23, 18, 22, 14, 40, 22, 120, 92, 85, 115 for the spellbook spells, the numbers the spellbook shows (build/play/magic1/010.png)"
+func,0x0003A2AD,spell_add_skill_uses,strong,"(spell, uses): skill_add_uses(magic_school_skills[spell_effect_school[type]], uses) per effect; callers: casting from the spellbook (1), the recast key, keys.c (-1 when a readied spell is dropped)"
 func,0x0003A325,intro_play_logo,strong,intro.c; opens anim0001.vid; direct call (all-zero args) shows 'Bethesda Softworks presents'; called by main
 func,0x0003A3CE,title_menu,strong,intro.c; pick03i0.img; direct call (all-zero args) shows Load Saved Game / Start New Game / Exit; called by main
 func,0x0003AF3F,intro_play_movie,strong,"intro.c; opens anim0000.vid (also anim0011.vid, dag2.vid); direct call (all-zero args) shows the opening cinematic; called by title_menu"
@@ -595,6 +763,84 @@ func,0x00044EE0,show_rumor,candidate,kludge.c; opens rumor.dat; direct call (all
 func,0x00045B7F,pick_gold,candidate,kludge.c; string 'Picking from %s.'; direct call (all-zero args) shows 'You picked N gold pieces'
 func,0x0004D1E6,note_open_notebook,candidate,"note.c; strings notebook.tde, note.rci, mask02i0.img, 'Unable to create new notebook!'"
 func,0x00051DCF,pflc_read_savetree,candidate,"pflc.c; strings 'save2\\savetree.dat', 'Unable to open %s.'"
+func,0x00055E35,itemmaker_open,confirmed,"unit itemmakr.c (filed under custom.c). (kind) game_mode=10, loads item00i0.img, item01i0.img, spells.std, selects tab 0, itemmaker_reset; called every frame by itemmaker_update (0) and by guild_service_dispatch; exp: fallcall 0x55E35 1 drew ITEM NAME, CURRENT GOLD, TOTAL COST, ENCHANTMENT POINTS, POWERS, SIDE EFFECTS, ENCHANT, ADD POWERS, ADD SIDE EFFECTS (scratch/magic/open_0x55E35.png)"
+func,0x00055F0F,itemmaker_reset,strong,"clears the item, the 10 enchantment slots and their tables"
+func,0x00056004,itemmaker_update,strong,"every frame (game_frame): itemmaker_open(0) check, draws (itemmaker_draw), polls the list popup (spells_list_poll -> list_popup_callback), Esc closes, hit-tests itemmaker_buttons (ButtonClick 203)"
+func,0x000561D8,itemmaker_close,strong,"itemmaker_buttons[7] (206,176)-(244,197) EXIT: puts back the item, frees images, game_mode=0"
+func,0x000562A1,itemmaker_draw,strong,"draws gold (%ld), the item name, total cost (itemmaker_gold_cost), enchantment points used/limit (%ld/%ld), the item lists and the powers/side effects with their parameters"
+func,0x000567CA,itemmaker_select_tab,strong,"itemmaker_buttons[15-18] (175,6..41): the 4 inventory tabs (WEAPONS & ARMOR, MAGIC ITEMS, CLOTHING & MISC, INGREDIENTS): inv_tab, inv_left_container"
+func,0x0005681F,itemmaker_enter_name,strong,"itemmaker_buttons[0] (3,1)-(163,9) ITEM NAME: TEXT 1653 ""An item must be selected to be enchanted."" or the name prompt"
+func,0x000568B1,itemmaker_powers_click,strong,"itemmaker_buttons[1] (8,58)-(84,177): removes the power on the row clicked (itemmaker_remove_slot)"
+func,0x000568D6,itemmaker_set_power_param_cb,strong,"list callback: parameter of the power being added, and its exclusions"
+func,0x000569D7,itemmaker_add_power_cb,strong,"list callback with the power picked: TEXT 1657 ""You cannot enchant this item with any more powers.""; opens its parameter list (spells, souls or labels)"
+func,0x00056B40,itemmaker_add_powers,strong,"itemmaker_buttons[2] (9,183)-(84,191) ADD POWERS: TEXT 1653; lists enchant_power_names"
+func,0x00056B88,itemmaker_side_effects_click,strong,"itemmaker_buttons[3] (106,58)-(182,177): removes the side effect on the row clicked"
+func,0x00056BB0,itemmaker_set_side_effect_param_cb,strong,list callback: side-effect parameter; Soul bound adds the soul's powers (itemmaker_add_soul_powers)
+func,0x00056CF8,itemmaker_add_side_effect_cb,strong,"list callback: TEXT 1658 ""No further side-effects may be enchanted in this item."""
+func,0x00056E5C,itemmaker_add_side_effects,strong,"itemmaker_buttons[4] (106,183)-(182,191) ADD SIDE EFFECTS: TEXT 1653; lists enchant_side_effect_names"
+func,0x00056EA7,itemmaker_return_item,strong,"itemmaker_buttons[5] (201,68)-(250,104) ITEM TO BE ENCHANTED: puts the item back in the inventory"
+func,0x00056EF0,itemmaker_enchant,strong,"itemmaker_buttons[6] (204,115)-(246,129) ENCHANT: TEXT 1651 (beyond its limit: points used > item+0x3D), 1650 (gold), 1652 ""The item has been enchanted.""; writes the slots to item+0x43 (+15 for side effects), item flags |= 0x20, name, soul used, MakeItem 207; cheat_flags bit 2 skips the checks"
+func,0x00057111,itemmaker_store_item,strong,"inv_store_item of the enchanted item, clears the selection"
+func,0x00057147,itemmaker_set_exclusions,candidate,"(slot, type, param, 4 more): the (type, param) pairs this slot rules out, at itemmaker_slot_exclusions[slot]"
+func,0x000571C7,itemmaker_remove_slot,strong,empties an enchantment slot (not soul-given ones; removing Soul bound clears them)
+func,0x00057266,itemmaker_soul_list_cb,strong,"player item walk: soul records (type 20) -> monster_names of the soul (Rat, Imp...) for the Soul bound list; marks the one picked"
+func,0x00057342,itemmaker_pick_param_list,strong,"parameter lists 1-3: SPELLS.STD spells for cast when used/held/strikes (spells_std_names_for_ids(enchant_spell_lists)); 4: trapped souls, ""You have no captured spirits."""
+func,0x0005742F,itemmaker_free_slot,strong,"first empty slot of 10, -1 if none"
+func,0x00057485,itemmaker_free_slot_count,strong,number of empty slots
+func,0x000574DA,itemmaker_show_list,strong,"(names, first index): list popup of the powers or side effects still allowed (not excluded, one Soul bound, one Health leech...)"
+func,0x000576FF,itemmaker_show_param_list,strong,"(names, type): list popup of the parameters not excluded by other slots"
+func,0x00057903,itemmaker_row_slot,strong,(side): slot of the powers/side-effects row under the mouse (rows from y 60)
+func,0x00057981,spell_name_by_id,strong,"(id): the spell_records name with that id, ""ERROR"" if none; enchantment texts"
+func,0x000579FC,enchant_spell_cost,strong,"(spell id): spell_cost of that SPELLS.STD spell for a reference character with all skills 50 (enchant_reference_character), x10"
+func,0x00057AB4,itemmaker_points_used,strong,"enchantment points used by the slots (powers and side effects, soul values /100); compared with item+0x3D"
+func,0x00057BAE,enchant_slot_cost,strong,"(cost code, param, as_points, power): 99 soul value (monster_soul_values, /100 as points), 5-7 a spell's enchant_spell_cost, else enchant_fixed_costs[code]"
+func,0x00057C5F,enchant_value_slot_cost,strong,as enchant_slot_cost with the spell id as the parameter; enchant_item_value
+func,0x00057CFB,itemmaker_gold_cost,strong,gold for the powers x10 (TOTAL COST; itemmaker_enchant pays it)
+func,0x00057DCA,itemmaker_consume_soul,strong,"after enchanting with Soul bound: deletes the soul record used and its soul gem, unless the gem's first enchantment is 26 (artifact special: Azura's Star)"
+func,0x00057E76,itemmaker_has_soul_bound,strong,a side-effect slot holds Soul bound (0)
+func,0x00057EDB,itemmaker_has_health_leech,strong,a side-effect slot holds Health leech (6)
+func,0x00057F42,itemmaker_apply_name,candidate,copies the entered name (D_00195C5C) to the item
+func,0x00057F8B,itemmaker_add_soul_powers,strong,"(soul): adds the bound soul's predefined powers to free slots (flagged itemmaker_slot_from_soul), ""No room in item..."""
+func,0x00058473,itemmaker_clear_soul_slots,strong,empties the slots a soul added
+func,0x0005852D,itemmaker_draw_item_list,candidate,draws the item column (texture.301 read in the direct call); no callers found
+func,0x000585D6,itemmaker_draw_item_cb,candidate,one visible row of the item column (inv_draw_item_cell)
+func,0x00058679,itemmaker_list_parent,strong,"itemmaker_buttons[8] (264,10)-(311,44): goes up to the parent container"
+func,0x000586AF,itemmaker_pick_item,strong,"itemmaker_buttons[9-12] item rows: TEXT 1660 ""already been enchanted"" (item+0x43 set), 1659 ""cannot be enchanted"" (item+0x3D 0); unequips and selects it"
+func,0x0005879B,enchant_item_value,strong,sum of the costs of an item's enchantments (item+0x43); item_make_magic and item_refresh_magic_value_cb set item values with it
+func,0x00058890,itemmaker_param_excluded,strong,Good rep with (14) / Bad rep with (25): All (5) excludes the others and vice versa
+func,0x00058A31,itemmaker_power_excluded,strong,power 14/25 already set to All
+func,0x00058AF7,itemmaker_swap_side_offsets,candidate,adds/removes 15 on the side-effect slots' types around the exclusion checks
+func,0x00058B76,enchant_powers_text,strong,"(item): text listing the powers and side effects with parameters (""Powers unknown."" unless identified, flag 0x20); func_00048663"
+func,0x0005A72F,spell_tick,strong,"unit runspell.c? (filed under book.c). Per entity each update (tamriel.c, player and creatures): ticks its type-9 spells (spell_tick_spell) and type-19 soul trap markers (deleted at 0); clears D_001940D6 bit 4 for the player"
+func,0x0005A7D5,spell_tick_spell,strong,"(filed under book.c): per effect: item spells (duration -1) end when the item at equipped[icon-200] is gone; else spfx_effect_tick while duration > 0, duration-1, spfx_effect_end at 0; deletes the spell when all ended"
+func,0x0005A91A,cast_item_used_spell,confirmed,"(spell id): from inv_use_item (cast when used): copies the spell_records entry with that id into a new type-9 object, returns its spell_cost and casts it (cast_player_spell); exp1b (build/names/scratch/magic/exp1b.py, save_morthag1): id 82 Orc Strength: returned 102, STR 80 -> 100"
+func,0x0005A9F8,cast_item_strike_spell,strong,"(spell id, target): func_0002E2CF (weapon enchantment ""cast when strikes"", player as attacker): spell from spell_records, icon 250, cost, cast_item_spell_at"
+func,0x0005AAE4,cast_creature_spell,strong,"(caster, target, spell id): spell from spell_records with that caster; cast_creature_spell_at; callers 2E2CF (creature weapon enchantment), damage.c (id 66 Spider Touch on a creature hit unless already on), 6480F"
+func,0x0005ABE6,cast_spell_on,confirmed,"(spell object, target, no_save): cast sound spell_cast_sounds[element] and cast animation; unless no_save, spell_resist_check (0 -> ""Save versus spell made.""); clones the spell, sets caster, spell_compute_values, spell_extend_duration or spell_apply_effect per effect, links the clone to the target if any effect lasts; exp1b (build/names/scratch/magic/exp1b.py, save_morthag1): Orc Strength made a type-9 child of the player with duration 18, magnitude 20"
+func,0x0005AE5F,cast_player_spell,strong,"(spell object): caster = player, spell_last_cast_id = id; id 92 (!Lycanthropy) -> func_00067027; refused while silenced (unless cast_ignore_silence); caster-only casts now, touch readies spell_ready_touch, others spell_ready_missile (""Press button to fire spell.""); callers spellbook cast, recast key, items, potion_drink"
+func,0x0005AFD5,cast_item_spell_at,strong,"(spell object, target): item/strike casts without readying: caster-only on the player, touch/distance on the target, area around the caster via spell_area_effect"
+func,0x0005B107,cast_creature_spell_at,strong,"(spell, caster, target) by target type: caster-only on the caster, touch and area on the target, distance and area at distance as a missile (cast_creature_missile); callers cast_creature_spell, monster.c func_00062D57"
+func,0x0005B206,spellbook_find_last_cast_cb,strong,object walk callback: type-9 child whose id (+0x49) == spell_last_cast_id -> found (guild_npc_object reused)
+func,0x0005B24C,cast_recast_last,strong,"Q key (features: key:q x92): ""You already have a spell loaded."", ""You have no spellbook!"", ""You don't have the spell points.""; finds spell_last_cast_id in the spellbook, spends spell_ready_cost (spell_points_bonus first), spell_add_skill_uses, casts a copy (cast_player_spell)"
+func,0x0005B408,spell_resist_check,strong,"(spell, &target) -> effect %: caster-only/self-area 100; absorption (class flags or Spell Absorption: magicka += cost, ""Spell was absorped."" -> 0), reflection (target becomes the caster, ""Spell was reflected.""), Spell Resistance (""Spell was resisted."" -> 0), then spfx_resist_roll(element...)"
+func,0x0005B6AE,spell_base_cost,candidate,"sum over effects of effect cost (+0x08) * (110 - school skill) / 100, without the target factor; no callers found"
+func,0x0005B772,spell_find_on_entity,strong,"(entity, id, icon): the entity's type-9 spell with that id (and icon if given); item_remove_equip_effects finds the cast-when-held spell by id and slot+200; damage.c tests for Spider Touch (66)"
+func,0x0005B828,spell_break_concealment,strong,"qkey.c combat: for Invisibility, Chameleon, Shadow (spell_concealment_effects): clears the conditions bit if no such spell; a Normal (subtype 0) one ends (spfx_effect_end / spell_end)"
+func,0x0005B905,spell_find_active_effect,strong,"(entity, type, &chance, &magnitude): the entity's spell with that effect type, its chance and magnitude; sets spell_effect_slot; spell_resist_check uses it for absorption/reflection/resistance"
+func,0x0005B9DF,spell_apply_effect,confirmed,"(spell object, slot, target): spell_effect_dispatch(effect type) -> spell_effect_handlers[type](spell, slot, target); exp1b (build/names/scratch/magic/exp1b.py, save_morthag1): 25 effect types gave the effects of their handlers"
+func,0x0005BA28,spell_compute_values,strong,"(spell, caster level, percent): per effect by spell_effect_settings: duration = (base + plus*(level/per))*%/100 (0xFFFF if base -1), chance = base + plus*(level/per), magnitude = (rand(min,max) + level/per*rand(plus min,max))*%/100; item spells use level 8; matches DFU; exp1b (build/names/scratch/magic/exp1b.py, save_morthag1): Orc Strength level 13: duration 18, magnitude 20"
+func,0x0005BC5B,spell_remove_effect_type,strong,"(entity, type): removes that effect from the entity's spells (deletes a spell left empty); cure paralysis (0), Free Action, func_00010585 (35 Shield)"
+func,0x0005BCDE,cast_fire_missile,strong,"fires spell_ready_missile (intrface.c, weapons.c on the click): missile object aimed by the mouse, texture spell_missile_textures[element]; at once hits a target in reach (spell_missile_hit) or explodes; sounds spell_impact_sounds, CastSpell4 (352) in play"
+func,0x0005C1CA,cast_creature_missile,strong,"(missile, caster, target): creature version of cast_fire_missile, aimed at the target"
+func,0x0005C448,spell_missile_update,strong,"missile flight step (support.c): explodes beyond 2048 or on hitting a wall/creature (func_00064589, spell_impact_sounds[element]: SpellImpactFire 357 in play), spell_missile_hit on the creature hit"
+func,0x0005C6A2,spell_area_effect,strong,"area spells (target 3/4; func_000830C7, weapons.c): radius (caster level*4+64)*3 (168*3 for item spells); every creature in line of sight is knocked back and hit (spell_missile_hit), and the player"
+func,0x0005C856,spell_missile_hit,candidate,"(missile, target): spell_lookup_name, then applies the spell to a creature (type 18) target via func_0007D774"
+func,0x0005C897,cast_anim_start,strong,(element): starts the casting-hands animation: cast_anim_state = element << 4 unless one is running
+func,0x0005C8CA,cast_anim_update,strong,every frame: draws frame (cast_anim_state & 15) of the element's hands (D_00195CBC) and advances; ends after frame 6
+func,0x0005C9BF,spell_player_has_spell,candidate,(id): the player has an active spell with that id; monster.c checks it before casting
+func,0x0005CA28,spell_name_from_book_cb,candidate,spellbook walk callback: copies the name of the book spell with the same id
+func,0x0005CA87,spell_lookup_name,candidate,"(spell): sets the spell's name from spell_records by id, or from the player's spellbook for custom ids"
+func,0x0005CB47,spell_hud_draw_icons,strong,"every frame: draws an icon per active spell on the player (icon field, 10 for item spells; others' spells in another row), blinking near expiry; ends a Shield whose points are gone; clamps attributes to base when no spell is active"
 func,0x0005DE74,item_init_from_template,strong,"fills an item record from item template idx (D_0017D22A, 48 bytes each, 288 of them, 'Invalid index requested %d -> %d'): name, group/index, value, flags, condition, images, weight; then per-group rolls (clothing style, material, armor type, arrows 1-20, books, paintings); ran entering shops (cmd:enter x15.8) and in dungeons"
 func,0x0005E37F,item_make_in_range,candidate,"item_make with the index random in [lo,hi] (magic items, artifacts and maps special-cased); callers kludge.c, guilds.c, moninit.c"
 func,0x0005E450,item_make_random,strong,"random index of a group from its template list (D_00185F88[group], -1 end) then item_init_from_template; 5 artifact, 4 magic item, 11 map special; called by all loot/stock makers; ran on shop entry and dungeon loot"
@@ -702,8 +948,98 @@ func,0x00071475,guild_heal_cleanup,candidate,"guild_heal walk callback: deletes 
 func,0x00071518,guild_heal,strong,guilds.c; direct call (all-zero args) shows 'You are healed'; called by func_0006DC35
 func,0x00071606,rest_recover,strong,"(unit rest.c?) heals a creature: health by Medical skill (character+0x9D, tallies Medical use) and END, magicka by 1/8; no healing for a starving vampire (race 8); callers rest loop 7193D, 7242F"
 func,0x000717EC,rest_open,strong,"(unit rest.c?) R key (35 episodes, key:r x12): vampire 'too long since you sated' (36), 'There are enemies nearby.' (354), 'You cannot sleep now.' (355), else loads rest00i0.img, game_mode=16"
+func,0x00088C0E,spfx_create_item_cb,strong,"unit spfx.c (filed under maplogic.c). Create Item list callback: item_make of the chosen armor piece (D_00187F44 group/index; names D_001832C4 Leather Cuirass...), expiry time at object+0x2B, flag 0x1000, inv_store_item"
+func,0x00088CF5,spfx_paralyze,confirmed,"spell_effect_handlers[0] (filed under maplogic.c). Immune: race 4 (High Elf), class immunity bit 0, already paralyzed, Free Action (+0x8A bit 7); chance roll; sets character+0x89 bit 0, ""You are paralyzed.""; exp1b (build/names/scratch/magic/exp1b.py, save_morthag1): type 0 set conditions bit 0"
+func,0x00088DE6,spfx_continuous_damage,confirmed,"spell_effect_handlers[1] (filed under maplogic.c): one spfx_effect_tick now (then each round); exp1b (build/names/scratch/magic/exp1b.py, save_morthag1): type 1/0 took 10 (5 from the shield, 5 health)"
+func,0x00088E11,spfx_create_item,strong,"spell_effect_handlers[2] (filed under maplogic.c): expiry = duration + game_minutes, shows the item list (spfx_show_choice_list D_001832C4, spfx_create_item_cb)"
+func,0x00088E62,spfx_cure,strong,"spell_effect_handlers[3] (filed under maplogic.c): chance roll (""Spell effect failed.""); subtype 0 disease (spfx_cure_disease), 1 poison (type-11 records with id >= 128: drained attributes restored, record deleted), 2 paralysis"
+func,0x00089035,spfx_damage,confirmed,"spell_effect_handlers[4] (filed under maplogic.c): subtype 0 health (func_0002E914; skipped for the player with cheat_flags bit 6), 1 fatigue, 2 magicka, by the cast magnitude; exp1b (build/names/scratch/magic/exp1b.py, save_morthag1): type 4/2 magnitude 10: magicka 28 -> 18. The monster spell that hit the player in asset_tracing exp10 came this way"
+func,0x0008917D,spfx_disintegrate,strong,"spell_effect_handlers[5] (filed under maplogic.c): chance roll, then func_0002ECBE (kills the target) or ""Spell effect failed."""
+func,0x000891E6,spfx_dispel_magic_cb,strong,"choice callback of Dispel Magic: chance = spell chance + (player level - caster level)*5, 5..95; spell_end on the chosen active spell; ""Dispel magic was a success..."" / ""Dispel magic failed..."""
+func,0x000892BB,spfx_dispel,strong,"spell_effect_handlers[6]: subtype 0 magic lists the player's active spells by name (spfx_show_choice_list, spfx_dispel_magic_cb); 1 undead, 2 daedra -> spfx_dispel_creatures"
+func,0x00089408,spfx_dispel_creatures,strong,"(chance, 0 undead/1 daedra): every creature whose monster id is in dispel_monster_ids[kind] is removed on a roll of chance + level difference*5"
+func,0x0008950A,spfx_drain,confirmed,"spell_effect_handlers[7]: subtype 8 health (damage), 9 fatigue, else attribute -= magnitude (min 1); ""You feel drained.""; exp1b (build/names/scratch/magic/exp1b.py, save_morthag1): type 7/1 lowered INT by 10"
+func,0x0008962A,spfx_elemental_resistance,confirmed,"spell_effect_handlers[8]: conditions |= spell_resist_flags[subtype], character+0x22B+subtype = chance; exp1b (build/names/scratch/magic/exp1b.py, save_morthag1): frost: 0x10000000 set, resist_chances [0,100,0,0,0]"
+func,0x000896A7,spfx_fortify_attribute,confirmed,"spell_effect_handlers[9]: attribute[subtype] += magnitude (capped at 100), ""You are fortified.""; exp1b (build/names/scratch/magic/exp1b.py, save_morthag1): type 9/0 STR 80 -> 90"
+func,0x00089757,spfx_heal,strong,"spell_effect_handlers[10]: subtypes 0-7 attributes up to base, 8 health up to max, 9 fatigue (x64) up to (STR+END)*64, 10 magicka up to max"
+func,0x000898DE,spfx_transfer,confirmed,"spell_effect_handlers[11]: halves the magnitude, drains the target (spfx_drain) and heals the player (spfx_heal); exp1b (build/names/scratch/magic/exp1b.py, save_morthag1): type 11/8 did 5 damage"
+func,0x0008992F,spfx_soul_trap,strong,"spell_effect_handlers[12]: ""Trap will not work on humanoids."" (monster id >= 128) or ""Trap active."": a type-19 marker child with the duration and chance"
+func,0x000899DF,spfx_invisibility,confirmed,"spell_effect_handlers[13]: conditions bit 2, ""You are invisible.""; exp1b (build/names/scratch/magic/exp1b.py, save_morthag1):"
+func,0x00089A2E,spfx_levitate,confirmed,"spell_effect_handlers[14]: conditions bit 3, dismounts (transport_choose 0), ""You are levitating.""; exp1b (build/names/scratch/magic/exp1b.py, save_morthag1):"
+func,0x00089A92,spfx_light,confirmed,"spell_effect_handlers[15]: conditions bit 4; exp1b (build/names/scratch/magic/exp1b.py, save_morthag1):"
+func,0x00089ACC,spfx_lock,confirmed,"spell_effect_handlers[16]: conditions bit 5, character+0x21E = chance (weapons.c tries it on the next door); exp1b (build/names/scratch/magic/exp1b.py, save_morthag1): bit 5 and +0x21E 100"
+func,0x00089B23,spfx_open,confirmed,"spell_effect_handlers[17]: conditions bit 6, character+0x21E = chance (doors, archive.c chests); exp1b (build/names/scratch/magic/exp1b.py, save_morthag1):"
+func,0x00089B7A,spfx_regenerate,strong,"spell_effect_handlers[18]: conditions bit 7, ""You are regenerating.""; spfx_effect_tick heals each round"
+func,0x00089BC9,spfx_silence,confirmed,"spell_effect_handlers[19]: chance roll, conditions bit 8 (+0x8A bit 0), ""You are silenced.""; cast_player_spell refuses while it is set; exp1b (build/names/scratch/magic/exp1b.py, save_morthag1): and the cast after it failed"
+func,0x00089C52,spfx_spell_absorption,strong,"spell_effect_handlers[20]: conditions bit 9 (+0x8A bit 1, the same bit the absorbs-spells enchantment sets); spell_resist_check absorbs on it"
+func,0x00089C8C,spfx_spell_reflection,strong,"spell_effect_handlers[21]: conditions bit 10; spell_resist_check reflects (""Spell was reflected."")"
+func,0x00089CC6,spfx_spell_resistance,strong,"spell_effect_handlers[22]: conditions bit 11; spell_resist_check (""Spell was resisted."")"
+func,0x00089D00,spfx_chameleon,strong,"spell_effect_handlers[23]: conditions bit 12, ""You are blending."""
+func,0x00089D4F,spfx_shadow,strong,"spell_effect_handlers[24]: conditions bit 13, ""You are a shade."""
+func,0x00089D9E,spfx_slowfall,strong,"spell_effect_handlers[25]: conditions bit 14, ""Slow fall active."" (intrface.c falling tests +0x8A bit 6)"
+func,0x00089DED,spfx_free_action,confirmed,"spell_effect_handlers[26]: conditions bit 15 (spfx_paralyze checks it) and ends a paralysis (spell_remove_effect_type 0); exp1b (build/names/scratch/magic/exp1b.py, save_morthag1): it set bit 15 and cleared bit 0"
+func,0x00089E59,spfx_jumping,confirmed,"spell_effect_handlers[27]: conditions bit 16; intrface.c doubles the jump with it; exp1b (build/names/scratch/magic/exp1b.py, save_morthag1):"
+func,0x00089E93,spfx_climbing,confirmed,"spell_effect_handlers[28]: conditions bit 17; intrface.c climbing skips the 95% fail roll with it; exp1b (build/names/scratch/magic/exp1b.py, save_morthag1):"
+func,0x00089ECD,spfx_lycanthropy,candidate,"spell_effect_handlers[29] (no name in spell_effect_names; subtypes Bat/Raven/Fish/Wolf; SPELLS.STD ""!Lycanthropy"" id 92 uses it): conditions bit 18 and character+0x68 = subtype, fails if already set"
+func,0x00089F42,spfx_water_breathing,confirmed,"spell_effect_handlers[30]: conditions bit 19 (rest.c breath counter skips with it); exp1b (build/names/scratch/magic/exp1b.py, save_morthag1):"
+func,0x00089F7C,spfx_water_walking,confirmed,"spell_effect_handlers[31]: conditions bit 20; exp1b (build/names/scratch/magic/exp1b.py, save_morthag1):"
+func,0x00089FB6,spfx_diminution,candidate,"spell_effect_handlers[32]: no name in spell_effect_names (Daggerfall Unity calls 32 Diminution); conditions bit 21 and an empty func_0007F87E; SPELLS.STD ""Jumping"" uses this effect"
+func,0x00089FF5,spfx_pacify,strong,"spell_effect_handlers[33] (""Pacify"": Animal/Undead/Humanoid/Daedra): only monster ids < 128, chance roll, character+0x41 bit 7"
+func,0x0008A084,spfx_charm,strong,"spell_effect_handlers[34]: only humanoids (id >= 128), chance roll, character+0x41 bit 7"
+func,0x0008A113,spfx_shield,confirmed,"spell_effect_handlers[35]: conditions bit 22, character+0x219 = magnitude, +0x64 = duration + game_minutes; exp1b (build/names/scratch/magic/exp1b.py, save_morthag1): shield 10, then damage took it 10 -> 5 -> 0"
+func,0x0008A189,spfx_telekinesis,candidate,"spell_effect_handlers[36]: returns 1 and does nothing (no name; DFU: Telekinesis); exp1b (build/names/scratch/magic/exp1b.py, save_morthag1): no change"
+func,0x0008A1B0,spfx_astral_travel,candidate,"spell_effect_handlers[37]: returns 1, does nothing (no name; DFU: Astral Travel)"
+func,0x0008A1D7,spfx_etherealness,candidate,"spell_effect_handlers[38]: returns 1, does nothing (no name; DFU: Etherealness)"
+func,0x0008A1FE,spfx_detect,confirmed,"spell_effect_handlers[39]: conditions bit 23; spfx_effect_tick sets D_001940D6 bit 4 and character+0x221 = subtype each round; exp1b (build/names/scratch/magic/exp1b.py, save_morthag1):"
+func,0x0008A238,spfx_identify,strong,"spell_effect_handlers[40]: character+0x21E = chance, refunds the cast cost, opens the inventory in identify mode (inventory_open(1, 4, 8))"
+func,0x0008A2E3,spfx_wizard_sight,candidate,"spell_effect_handlers[41]: returns 1, does nothing (no name; DFU: Wizard Sight)"
+func,0x0008A30A,spfx_darkness,candidate,"spell_effect_handlers[42] (no name; DFU: Darkness): conditions bit 24; exp1b (build/names/scratch/magic/exp1b.py, save_morthag1):"
 func,0x0008A344,spell_recall_prompt,strong,spfx.c (spell effects); direct call (all-zero args) shows 'Do you wish to Teleport or Set an Anchor?' (the Recall effect)
+func,0x0008A39A,spfx_comprehend_languages,confirmed,"spell_effect_handlers[44]: conditions bit 25; func_00079913 adds spell_active_chance(player, 44) to creature reactions; exp1b (build/names/scratch/magic/exp1b.py, save_morthag1):"
+func,0x0008A3D4,spfx_intensify_fire,candidate,spell_effect_handlers[45] (no name; DFU: Intensify Fire): conditions bit 26
+func,0x0008A40E,spfx_diminish_fire,candidate,spell_effect_handlers[46] (no name; DFU: Diminish Fire): conditions bit 27
+func,0x0008A448,spfx_wall_of_stone,candidate,"spell_effect_handlers[47] (no name; DFU: Wall of Stone): returns 0, no effect; exp1b (build/names/scratch/magic/exp1b.py, save_morthag1):"
+func,0x0008A46F,spfx_wall_of_fire,candidate,spell_effect_handlers[48] (no name; DFU): returns 0
+func,0x0008A496,spfx_wall_of_frost,candidate,spell_effect_handlers[49] (no name; DFU): returns 0
+func,0x0008A4BD,spfx_wall_of_poison,candidate,spell_effect_handlers[50] (no name; DFU): returns 0
+func,0x0008A4E4,spell_end,confirmed,"undoes every effect of a spell object (spfx_effect_end on its target, object+0x43) and deletes it; callers spfx_dispel_magic_cb, item_remove_equip_effects, the HUD Shield expiry; exp1b (build/names/scratch/magic/exp1b.py, save_morthag1): on the Orc Strength object: STR 100 -> 80, object gone"
+func,0x0008A550,spfx_effect_end,confirmed,"undo of one effect slot: Paralyze bit 0, Drain/Fortify attribute back, resistance flag, and the conditions bit of effects 13-32, 35, 39, 42, 44-46; exp1b (build/names/scratch/magic/exp1b.py, save_morthag1): (via spell_end) Fortify STR undone"
+func,0x0008A858,spfx_entity_has_effect,candidate,walks the entity's type-9 children for an effect type (func_000CE4C4); optional chance roll (compares with a pointer: bug); no callers found
+func,0x0008A90C,spfx_effect_tick,strong,"per round for an effect with duration left (spell_tick): Continuous Damage -> spfx_damage, Regenerate -> spfx_heal health, Detect -> D_001940D6 bit 4 and character+0x221"
+func,0x0008A9A3,spfx_walk_effect_records,strong,"(list, callback): for each type-11 record flagged 0x8000 calls callback(data), deleting the record when it returns 0; tamriel.c runs it daily with spfx_disease_daily and with disease.c's func_00065C38"
+func,0x0008AA11,spfx_disease_daily,strong,"type-11 records with id < 100 (diseases), once a game day (tamriel.c): rolls damage +0x17..+0x19 against the flagged stats (health, fatigue, magicka, attributes, kept at +0x1F), counts days at +0x1B (254 = over), ""You feel somewhat bad."""
+func,0x0008AC0E,spfx_caster_level_roll,candidate,"chance + (caster level - target level)*5 > rand(0,100); no callers found"
+func,0x0008AC9B,spfx_disease_recover,candidate,"for a finished disease record (+0x1B == 254) moves drained attributes back one point per call; tamriel.c passes it the player entity itself, not its children"
+func,0x0008ADC3,spfx_resist_roll,strong,"(element, element bit, target character, target class, unused, modifier): class immunity -> 0, critical weakness -> 100, low tolerance halves, resistance x1.5 the base 50; + modifier + D_0018DDD8 (-5 in saves); Nord +30 vs frost, Breton +30 vs magic; returns 100 (full effect) .. 0 (saved); spell_resist_check, disease_infect, poison_apply, qkey.c artifact kill"
+func,0x0008AF3E,spfx_cure_disease,strong,"unequips, deletes the type-11 records with id < 100 restoring the attributes they drained, clears character+0x1F3 and +0x6C, re-equips; callers spfx_cure, guild_cure_diseases, qcom.c, disease.c"
+func,0x0008B054,spfx_show_choice_list,strong,"(strings, callback): shows a list popup and sets spfx_popup_handler; Create Item, Dispel Magic"
+func,0x0008B080,spfx_popup_update,strong,"every frame (game_frame): spfx_popup_handler 1 = Recall's ""Teleport or Set an Anchor?"" answer: anchor (saves location, region, building) or teleport (TEXT 4001 ""An Anchor must be set before you can Teleport."" without one); else calls the handler with the row picked (spells_list_poll)"
+func,0x0008B1CC,spell_extend_duration,strong,"if the target already has a spell with the same effect type/subtype, adds the new cast duration to it and returns 1 (cast_spell_on skips re-applying)"
+func,0x0008B29A,spell_active_chance,strong,"(entity, type, subtype): cast chance of an active effect, 0 if none; func_00079913 adds spell_active_chance(player, 44 Comprehend Languages, 255)"
+func,0x0008B341,spfx_created_item_expire_cb,strong,player item walk callback: an item flagged 0x1000 whose time at object+0x2B has passed is unequipped and deleted
+func,0x0008B3EA,spfx_expire_created_items,strong,"tamriel.c each update: walks the player's items with spfx_created_item_expire_cb, re-readies weapons if one went"
+func,0x0008B43B,name_generate_seeded,candidate,"unit names.c (filed under spfx.c): generates a name (func_0008B572, NAMEGEN.DAT read 1 call below) from (name set, gender) with the RNG seeded by a3, restoring the seed"
+func,0x0008B48B,npc_display_name,candidate,"unit names.c: type 8/53 object name: an individual faction's name (faction+3), else name_generate_seeded(region name set, gender bit, record id); callers talk_draw and others (NAMEGEN.DAT 2 calls below)"
+func,0x0008EE48,potionmaker_scroll_up,strong,"unit potions.c (filed under object.c). potionmaker_buttons[2] (6,30)-(15,45): ingredient list up 3"
+func,0x0008EE7A,potionmaker_scroll_down,strong,"unit potions.c (filed under object.c). potionmaker_buttons[3] (6,156)-(15,171): down 3"
+func,0x0008EEBC,potionmaker_mix,strong,"potionmaker_buttons[1] (169,42)-(204,57) MIX: matches the cauldron against the 20 potion_recipes (potion_match_recipe) or makes an ""Unknown Powers"" spell (potion_mix_unknown); a glass bottle (item group 1/1) with a type-31 recipe child, ""Your potion has been mixed."", MakePotion 208; consumes the ingredients"
+func,0x0008F11D,potion_recipe_list_cb,strong,player item walk: recipe items (group 27 index 4) -> their recipe names (recipe+0x43)
+func,0x0008F1B2,potionmaker_recipes,strong,"potionmaker_buttons[0] (169,26)-(204,41) RECIPES: ""You have no recipies."", one recipe -> potion_make, else a list; PageTurn 205"
+func,0x0008F246,potionmaker_open,confirmed,"(open): game_mode=1, mask00i0.img, name ""Unnamed potion"", empty cauldron; called every frame by potionmaker_update and by guild_service_dispatch; exp: fallcall 0x8F246 1 drew AVAILABLE INGREDIENTS, RECIPES, MIX, MIXING CAULDRON (scratch/magic/open_0x8F246.png)"
+func,0x0008F31F,potionmaker_update,strong,"every frame (game_frame): draws name and gold, lists the ingredients (potionmaker_ingredient_cb), the cauldron; TEXT 34 ""You don't have any potion ingredients.""; clicks: potionmaker_buttons, an ingredient adds it, a cauldron cell removes it"
+func,0x0008F89A,potionmaker_add_ingredient,strong,"(list index): puts the ingredient in the next cauldron cell with its effect, subtype and potency (item_make side globals D_00195F28, D_0019626E, D_0019626D)"
+func,0x0008F94D,potionmaker_in_cauldron,strong,"(group, index): that ingredient is already in the cauldron"
+func,0x0008F9E1,potionmaker_ingredient_cb,strong,player item walk: unequipped items flagged as ingredients (item flags bit 0) not in the cauldron: listed (max 512) and the visible 12 drawn
+func,0x0008FBE8,potion_ingredient_cb,candidate,sets potion_ingredient_count = 1 if an item is an ingredient (flags bit 0)
+func,0x0008FC3A,potion_have_ingredients,candidate,the ingredients tab (inventory_containers[3]) holds an ingredient; no callers found
+func,0x0008FC79,potionmaker_close,strong,"potionmaker_buttons[4] (290,178)-(306,202) EXIT (and Esc): game_mode=0, frees the image"
+func,0x0008FCE7,potion_match_recipe,strong,"(recipe, cauldron ids, potencies, &value): all the recipe's ingredients (indices +0, groups +0x0A) and nothing else; value = (extra potency)/2 + 5"
+func,0x0008FE48,potion_mix_unknown,strong,"builds a spell named ""Unknown Powers"" from the cauldron's ingredient effects (merging equal effects, at most 3 dominant ones): element 4, caster target, fixed duration/chance/magnitude settings"
+func,0x00090261,potion_sort_ingredients,candidate,"sorts 3 parallel byte arrays by the first, descending"
+func,0x0009038D,potion_drink,strong,inv_use_item: copies the potion's spell (recipe child +0x14) into a type-9 object and casts it on the player (cast_player_spell) with cast_ignore_silence
 func,0x00090426,potion_make,strong,potions.c; string 'You do not have the ingredients required.'; direct call (all-zero args) shows that message
+func,0x0009046D,potion_have_recipe_ingredients,strong,(recipe item): every ingredient of its recipe is among the listed ingredients
+func,0x00090572,potion_load_recipe,strong,(recipe item): puts the recipe's ingredients in the cauldron (potionmaker_add_ingredient) and shows its name
 func,0x0009063D,chargen_name_character,strong,"generate.c; tamriel.img, char00i0.img, face%d%di0.cif; direct call (all-zero args) shows 'Name thyself'"
 func,0x00092349,inventory_load_images,confirmed,"loads inve00/01/02/05/06/07i0.img, shop00i0.img, inve16i0.cif and inve%02di0.img (trade mode*2+6/+7); exp: called once when F6 opens the inventory (save_tlalac_s)"
 func,0x00092476,inventory_free_images,confirmed,frees the same image handles (inven.c lines 322-334) and poisons them with 0x97979797; exp: called once by EXIT
@@ -838,3 +1174,7 @@ func,0x0009D6F8,travel_button_im_at,strong,"handler of (3,186)-(47,196) labelled
 func,0x0009D764,travel_draw_buttons,strong,draws FIND/I'M AT (region vs world) and the 4 filter buttons lit or not by travel_filter; 21 episodes
 func,0x0009D8BD,travel_button_filter,strong,"handler of (50,175)-(228,196) = DUNGEONS/HOMES/TEMPLES/TOWNS (screenshot): toggles travel_filter bit 0/1/2/3 by quadrant, redraws the region"
 func,0x0009D986,travel_show_days_left,strong,"'Days left: %ld' (minutes/1440) at (240,2) over the saved map picture; called from tamriel.c 4AC01 while a trip's time passes"
+func,0x000CAE07,spell_cost_formula_dispatch,strong,XnGine-object thunk: jmp spell_cost_formulas[eax]
+func,0x000CAE0E,spell_effect_dispatch,confirmed,"XnGine-object thunk: push spell_effect_handlers[eax], shift edx/ebx/ecx into eax/edx/ebx and return into it: handler(spell object, slot, target); exp1b (build/names/scratch/magic/exp1b.py, save_morthag1):"
+func,0x000CE4C4,spell_find_effect_type,strong,asm helper: slot+1 of effect type dl in the spell at eax (0 if none); spell_remove_effect_type and spfx_entity_has_effect use it as a 0-based slot (bug)
+func,0x000CE4E0,spell_has_no_effects,candidate,"asm helper: 1 if effect types at +0 and +2 are 255 (tests +2 twice, never +4)"

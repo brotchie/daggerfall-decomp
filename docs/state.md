@@ -104,6 +104,35 @@ the last rank change.
 - +0x91: reputation with the 5 social groups;
 - +0x211 to +0x222: Thieves Guild and Dark Brotherhood invitation times and counts.
 
+## Magic
+
+These come from the magic naming agent; details are in build/names/magic.md.
+
+**Spell record** (89 bytes, the SPELLS.STD format): effects, element, target, gold costs,
+the duration/chance/magnitude settings, name, icon and id. Bytes +0x4A to +0x58 are filled
+in at cast time.
+- An active spell is a type-9 object, a child of its target, with its caster at header +0x2F.
+- Casting spell 82 (Orc Strength) through 0x5A91A raised STR from 80 to 100. `spell_end`
+  (0x8A4E4) put it back.
+
+**Effect handlers** are a 60-entry table at 0xCAF40, in the XnGine object, reached through
+the thunk at 0xCAE0E.
+- Entries 0–50 are the spell effects, named from FALL.EXE's own effect-name table at
+  0x182686.
+- 25 hand-built spells sent through `spell_apply_effect` (0x5B9DF) each did what the name
+  says.
+
+**Magicka cost** = max(5, target factor / 2 × the sum of the cost formulas × (110 − school
+skill) / 100). The formulas are a 7-entry table at 0xCAF24. `spell_cost` (0x3A0C0) returned
+exactly the costs the spellbook shows.
+
+**Character fields used by magic:**
+- +0x89: 32 active-effect flags, one bit per effect plus four resistance bits;
+- +0x219: shield points; +0x21E: the lock and open chance; +0x22B: resistance chances.
+
+**Crafting:** direct calls to 0x36F69, 0x55E35 and 0x8F246 open the spellmaker, the item
+enchanter and the potion maker. A potion recipe is 109 bytes.
+
 ## Source units that are mislabelled
 
 config/units.csv takes each unit's range from its first and last MemCheck file reference.
@@ -116,6 +145,13 @@ The naming agents found these functions filed under the wrong unit:
   from qcom.c.
 - 0x191DA–0x1B5BE, filed under talk.c, are probably faction.c's faction tree and politics.
 - 0x6D91A, filed under disk.c, belongs to guilds.c; 0x71606 and 0x717EC look like rest.c.
+- spells.c starts at 0x36F69 (filed under fs2df.c).
+- spfx.c starts at 0x88C0E; the effect handlers 0x88CF5–0x891E6 are filed under
+  maplogic.c. spfx.c ends at 0x8B3EA; 0x8B43B and 0x8B48B are names.c.
+- itemmakr.c starts at 0x55E35 (filed under custom.c).
+- potions.c starts at 0x8EE48 (filed under object.c).
+- 0x5A72F and 0x5A7D5, filed under book.c, are probably runspell.c.
+- 0x2E914 belongs to damage.c (filed under qkey.c).
 
 ## Calling functions directly
 
