@@ -170,6 +170,39 @@ Direct calls confirmed:
 - `monster_summon_near_player` (id 25) summons a Frost Daedra;
 - lycanthropy infection and shapechanging back from wolf form.
 
+## Banks, taverns, courts and character creation
+
+These come from the economy and character-creation naming agent; details are in
+build/names/economy_chargen.md. Most were confirmed by clicking through the screens in live
+saves.
+
+**Bank:**
+- Accounts are a type-25 record (`bank_accounts`, `D_00195A04`): 62 regions × 13 bytes,
+  holding the balance, loan owed, loan due date and a defaulted flag.
+- A letter of credit costs amount / 100 + 1.
+- Loans go up to level × 50000, at 10%, due in 360 days.
+- Houses and ships sell back for 85% of the price. A ship costs 100000 or 200000 and needs
+  a port town.
+
+**Tavern:**
+- A room costs 7 gold a day, haggled down by `trade_adjust_price`. Knights stay free, and
+  Heart's Day gives a free day; the most you can book is 350 days.
+- A meal heals 2 × its price, once per 240 minutes (character+0x205).
+- The code that would keep rented rooms and their items between visits is dead.
+
+**Court:**
+- The crime reputation table and the fine table match Daggerfall Unity's.
+- The fine is paid in 40-gold units, each a coin toss between 40 gold and 3 days of prison.
+- Pleading guilty halves both. Not guilty leads to a DEBATE (Etiquette) or LIE (Streetwise)
+  roll.
+
+**Class record** (74 bytes, fully mapped). The class maker's advancement multiplier is
+1.0 + advantage costs − disadvantage costs + (HP per level − 8) × 0.05.
+
+**Character creation** runs province → race → gender → class (from the list, the 10
+questions, or the class maker) → background (random, or 12 questions) → name, face,
+attributes, skills, reflexes → the intro movie.
+
 ## Text macros and quests
 
 These come from the text and quests naming agent; details are in build/names/text_quests.md.
@@ -222,8 +255,14 @@ The naming agents found these functions filed under the wrong unit:
 - 0x641CD–0x64301 (filed under monster.c) belong to links.c.
 - 0x74024 and 0x7425E (filed under weapons.c) belong to click.c; 0x79A28 (moninit.c)
   belongs to loadsave.c.
-- 0x7242F and 0x728D2 (filed under rest.c) are probably weapons.c; 0x685EC (disease.c) is
-  probably trade.c.
+- 0x7242F and 0x728D2 (filed under rest.c) are probably weapons.c.
+- 0x684E9–0x686DA (filed under disease.c) are trade.c's unused haggling window.
+- 0x1EE84 and 0x1EF2E (filed under maploads.c) belong to tavern.c; 0x1FE74 (tavern.c)
+  belongs to region.c.
+- 0x20C55 (filed under song.c) belongs to crime.c; 0x68A1D and 0x68B1B (trade.c) belong to
+  sound.c.
+- 0x2586B (filed under career.c) turns killed creatures into corpses: mplace.c or the
+  monster code.
 
 ## Calling functions directly
 

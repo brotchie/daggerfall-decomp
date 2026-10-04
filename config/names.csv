@@ -38,6 +38,11 @@ global,0x00179CFA,talk_regional_regions,candidate,region of each knightly order 
 global,0x00179D0C,talk_category_building_types,strong,"13 building types that have a where-is category (alchemist 0, armorer 2, bank 3 ... weapon smith 13, temple 14, tavern 15)"
 global,0x00179D19,talk_category_names,strong,"15 pointers: Alchemists, Armorers, Banks, Bookstores, Clothing stores, Gem stores, General stores, Libraries, Guilds, Pawn shops, Weapon smiths, Local temples, Taverns, General, Regional"
 global,0x00179D55,talk_organisations,strong,"34 faction ids of the tell-me-about organisations (42 Thieves Guild, 40 Mages Guild, 108 Dark Brotherhood, 129 Blades ...)"
+global,0x00179E24,tavern_buttons,confirmed,"4 x {x0,y0,x1,y1,handler}: ROOM, TALK, FOOD & DRINKS, GOODBYE at x 99-220, y 51/60/69/78 (experiment screenshot and clicks)"
+global,0x00179EAC,crime_reputation_loss,strong,"13 ints, crimes 1-13: 10,5,10,8,20,10,2,1,2,2,75,2,8 (DFU's legal reputation loss per crime); court_open halves it; crime_reputation_penalty reads it as D_00179EA8[crime]"
+global,0x00179EE0,crime_fine_table,strong,"13 x 8 bytes {per-reputation multiplier byte, base, min, max shorts}: assault 6/1000/10/1500, murder 10/10000/9000/12000, ... (DFU's penalty tables); experiment: assault at reputation 0 -> 1000 split into 560 gold + 33 days"
+global,0x00179F74,career_answer_boxes,strong,"8 boxes {x0,y0,x1,y1,..}: question (10,23)-(309,68) then answers in two columns (10/160, 71..164)"
+global,0x0017A002,career_bio_buttons,strong,"3 x {x0,y0,x1,y1,handler}: page up (181,188), page down (209,188), and the exit box"
 global,0x0017A02C,automap_buttons,confirmed,"12 x {x0,y0,x1,y1,handler}: grid/view, forward, back, left, right, rotate left, rotate right, upstairs, downstairs, EXIT, map area, note line; matches the automap bar in the save_mord screenshot"
 global,0x0017A0BC,town_map_buttons,confirmed,"6 x {x0,y0,x1,y1,handler}: the 4 arrows, EXIT, map area"
 global,0x0017A11D,automap_view_initialised,candidate,automap_init_view sets the camera only the first time (flag)
@@ -96,6 +101,9 @@ global,0x0017D06A,province_terrain_names,strong,"8 pointers: rolling hills, dese
 global,0x0017D08A,attribute_rating_names,strong,"8x10 pointers by attribute and value/10: pathetic, frail, weak, below average.. superhuman (%ark)"
 global,0x0017D206,direction_names,strong,8 pointers: north..northwest (%di)
 global,0x0017D22A,item_templates,strong,"288 item templates of 48 bytes ('Ruby' first): name, weight, condition, value, pictures; item_init_from_template refuses idx >= 288"
+global,0x0018082A,classmaker_help_topics,strong,"8 strings General, Class Name, Attributes, Skills, Special Advantages, Special Disadvantages, Reputations, Skill Advancement (dump)"
+global,0x0018084E,classmaker_advantage_names,confirmed,11 strings Resistance ... Expertise in (dump; picklist in the experiment screenshot)
+global,0x0018092E,classmaker_disadvantage_names,strong,11 strings 'Inability to Regen Spell Points' ... 'Forbidden Material' (dump)
 global,0x00180A7A,enchant_power_names,strong,"15 strings: Cast when used/held/strikes, Extra spell pts, Potent vs, Regens health, Vampiric effect, Increased Weight Allowance, Repairs objects, Absorbs spells, Enhances skill, Feather Weight, Strengthens armor, Improves talents, Good rep with (item+0x43 types 0-14)"
 global,0x00180B0A,enchant_side_effect_names,strong,"11 strings: Soul bound, Item deteriorates, User takes damage, Vision problems, Walking problems, Low damage vs, Health leech, Bad reactions from, Extra weight, Weakens armor, Bad rep with (types 15-25)"
 global,0x00180B3A,potion_recipes,strong,"20 potion recipes x 109 bytes: +0 8 ingredient indices (-2 end), +8 value, +0x0A 8 ingredient groups, +0x14 an 89-byte spell (name at +0x43): Stamina, Orc Strength, Healing, Waterwalking...; a potion's type-31 child is a copy"
@@ -104,6 +112,8 @@ global,0x00182752,spell_effect_subtype_names,strong,"51 x 12 string pointers: su
 global,0x001830E6,monster_names,strong,"string per monster id: Rat, Imp, Spriggan, Giant bat, Grizzly bear, Sabretooth tiger, Spider, Orc, Centaur, Werewolf (DFU MobileTypes order); soul lists"
 global,0x001837B4,ruler_titles,strong,"pointers indexed by faction+0x02: -, King, Queen, Duke, Duchess, Marquis, ... Lord, Lady (parse_faction_ruler_title)"
 global,0x001837E8,region_names,confirmed,"62 string pointers Alik'r Desert, Dragontail Mountains .. Cybiades (DFU region order); D_001837E4 is the same table indexed by region+1 and D_001835E8 by world-map pixel (128+region)"
+global,0x001840A0,tavern_food_names,confirmed,"11 strings 'Ale (1 gold)' ... 'Stew (3 gold)', the food picklist (experiment screenshot)"
+global,0x001841D8,tavern_food_prices,confirmed,"11 bytes 1,1,2,3,1,1,2,3,2,2,3; experiment: Ale cost 1 and healed 2"
 global,0x00184229,crime_names,strong,14 pointers: Attempted Breaking and Entering .. Treason (%cri)
 global,0x00184261,penalty_texts,strong,"3 pointers: Banishment, Execution, ""%gtp gold pieces in fines and %dip days in prison"" (%pen)"
 global,0x0018426D,codeword_first_words,strong,"False, Grand, Step, Second, Bastard... (%dbp high nibble)"
@@ -118,6 +128,16 @@ global,0x00184FD7,monster_category,strong,"byte per creature type: 0 undead, 1 d
 global,0x0018508B,honorifics,strong,"""Sir"", ""Ma'am"" by gender (%hnr)"
 global,0x0018509F,legal_reputation_names,strong,"8 pointers: hated, pond scum, a villain, a criminal, a scoundrel, undependable, a common citizen, dependable.. (%ltn)"
 global,0x0018513E,body_part_armor_slots,strong,"equipped slot per body part: 12 head, 13 right pauldron, 15 left pauldron, 18 cuirass, 20 gauntlets, 23 greaves, 26 boots; the hit wears the target's armor there"
+global,0x00185370,classmaker_advantage_sublists,strong,per advantage its sub-choice string list or 0 (Acute Hearing none; Bonus to hit -> Animals/Daedra/Humanoid/Undead in the experiment)
+global,0x001853A0,classmaker_advantage_costs,confirmed,"per advantage a pointer to 16.16 costs per sub-choice (e.g. Acute Hearing 3277 = 0.05, Bonus to hit Animals 19661 = 0.3); experiment: multiplier 1.0 -> 1.05 -> 1.35"
+global,0x0018549C,classmaker_disadvantage_sublists,strong,per disadvantage its sub-choice list or 0
+global,0x001854C8,classmaker_disadvantage_costs,strong,"the same for disadvantages, subtracted by classmaker_update_advancement"
+global,0x001854F4,classmaker_buttons,strong,"28 x {x0,y0,x1,y1,handler}: EXIT, name, 12 skill slots, HELP, advantages, disadvantages, reputations, 8 attributes, HP up/down (buttons.csv; the experiment clicks hit them)"
+global,0x00185644,classmaker_attribute_up_box,strong,single button box moved to the selected attribute row by classmaker_select_attribute; handler classmaker_attribute_up
+global,0x00185650,classmaker_attribute_down_box,strong,the matching down arrow; handler classmaker_attribute_down
+global,0x0018565C,classmaker_reputation_buttons,strong,"6 entries: the 5 reputation bars and EXIT (168,170)"
+global,0x001856A4,classmaker_specials_buttons,strong,"3 entries: EXIT (3,176), ADD (99,6), the list (3,32)"
+global,0x001856C8,classmaker_help_texts,strong,TEXT.RSC ids 2400-2407 shown for the help topics
 global,0x001857A1,enchant_power_params,strong,"15 entries: 1-3 the spell lists, 4 souls, else a pointer to the parameter labels (seasons/moons, monster kinds, skills, talents, social groups)"
 global,0x001857E5,enchant_power_costs,candidate,per power: cost code (< 100) or a pointer to costs by parameter
 global,0x00185875,enchant_spell_lists,strong,3 pointers to 255-terminated SPELLS.STD id lists for cast when used / held / strikes
@@ -139,6 +159,7 @@ global,0x00186A64,disease_table,candidate,disease_infect copies a 47-byte record
 global,0x00186D83,poison_table,candidate,"4 s16 per poison id-128: incubation min/max (+0x17), duration min/max (+0x1B); poison_apply, poison_init_record"
 global,0x00186DE3,vampire_spells,candidate,spell ids (255 ends) every new vampire gets (disease_become_vampire)
 global,0x00186DE7,lycanthrope_attributes,strong,4 attribute indexes 0 4 3 6 (STR END AGI SPD) that disease_become_lycanthrope raises by 40 (DFU)
+global,0x00186E24,bank_buttons,strong,"19 x {x0,y0,x1,y1 shorts, handler}: 0-10 main (DEPOSIT WITHDRAW, letters of credit, REPAY BORROW, house BUY SELL, ship BUY SELL, EXIT), 11-15 house list, 16-18 ship list (build/assets/buttons.csv); experiment clicks hit them"
 global,0x00186F08,guild_rank_primary_skill,strong,"10 bytes 22,30..94: best guild skill needed per rank"
 global,0x00186F12,guild_rank_secondary_skill,strong,"10 bytes 4,8..40: second guild skill needed per rank"
 global,0x00187023,guild_skill_lists,strong,"per guild kind a 255-terminated skill list: MG 22-27 (magic schools), FG 32 31 33 28 29 6 4, TG 13 15 2 16 18 19 28, DB 28 33 19 2 16 18 22 9 34"
@@ -179,6 +200,8 @@ global,0x00187FB8,dispel_monster_ids,strong,"2 x 7 monster ids: undead 15 18 19 
 global,0x00187FC6,spell_resist_flags,confirmed,"5 u32 masks by element in character+0x89: fire 0x2, frost 0x10000000, poison 0x20000000, shock 0x40000000, magic 0x80000000; exp1b (build/names/scratch/magic/exp1b.py, save_morthag1): Resist frost set 0x10000000"
 global,0x00187FDC,next_record_id,candidate,goes up by one when disease_infect allocates an effect record (fallcall)
 global,0x00187FE0,potionmaker_buttons,strong,"5 x {rect, handler}: RECIPES, MIX, scroll up, scroll down, EXIT (dumped; layout matches open_0x8F246.png)"
+global,0x0018801C,chargen_buttons,strong,"40 x {x0,y0,x1,y1,handler}: OK, name, 12 skills, 6 skill arrows, 8 attributes, save/restore roll, 2 attribute arrows, roll, 2 face arrows, 5 reflexes (buttons.csv)"
+global,0x001881FC,chargen_career_skill_bonus,strong,"12 bytes 25,25,25,15,15,15,10 x6: added to the 3 primary, 3 major and 6 minor skills at the start of chargen_name_character"
 global,0x0018822C,item_group_tab,strong,"29 bytes: item group -> inventory tab (2,2,0,0,1,1,2.. 14-22 -> 3); matches where items sit in save_tlalac_s"
 global,0x00188281,inv_mode_buttons,strong,"5 trade modes x 7 buttons {x0,y0,x1,y1,handler}: WAGON INFO EQUIP REMOVE USE GOLD EXIT in mode 0; dumped from memory, each handler confirmed by a click"
 global,0x00188425,inv_buttons,strong,"45 buttons {x0,y0,x1,y1,handler}: 0-11 slots, 12 paper doll, 27-36 list rows, 37-40 scroll, 41-44 tabs"
@@ -206,11 +229,21 @@ global,0x00190CE4,itemmaker_slot_kinds,strong,"10 bytes: -1 empty, 0 power, 1 si
 global,0x00190CE8,travel_zoomed,candidate,"4x zoom on the region map, toggled by travel_toggle_zoom (right click)"
 global,0x00190D0F,talk_wrap_to_question,candidate,"while set, talk_wrap_text writes to the question pane instead of the answer log"
 global,0x00190D10,talk_face_loaded,candidate,set when talk_load_face has loaded a portrait
+global,0x00190D18,court_state,confirmed,"byte: the court state machine (1 plea, 2 guilty sentence, 3 prison, 5 banished, 6 execution, 7 executed, 8 argument, 9 acquitted, 100 close); experiment: 1 -> 100 (guilty), 1 -> 2 (lie failed)"
 global,0x00190D20,search_kind,candidate,guild kind / kind bits the membership searches look for
+global,0x00190D23,tavern_state,confirmed,"byte: 0 menu, 1 waiting for the number of days, 2 room offer pending (tavern_frame dispatches on it); experiment: 1 after ROOM, 0 after paying"
 global,0x00190D64,itemmaker_slot,candidate,short: slot being filled
 global,0x00190D66,itemmaker_power,candidate,short: power being added
 global,0x00190D68,itemmaker_mode,candidate,short: itemmaker_open's argument; 2 allows Soul bound without souls
+global,0x00190D6C,classmaker_done,strong,short: set by classmaker_exit_button when the class is valid; ends classmaker_run
+global,0x00190D70,chargen_selected_attribute,confirmed,"short: attribute row selected for the up/down arrows, in the class maker (classmaker_select_attribute) and chargen (chargen_select_attribute); experiment: 2 after clicking WIL"
+global,0x00190D76,classmaker_screen,confirmed,"short: 0 main, 1 reputations, 2 advantages, 3 disadvantages; bit 16 while a picklist is open; experiment: 0 -> 1 -> 0 -> 2 -> 18"
+global,0x00190D7E,classmaker_special_counts,confirmed,2 bytes: advantages and disadvantages picked (max 7); experiment: 0 -> 1 -> 2
+global,0x00190D82,classmaker_special_list,strong,"short: 0 advantages, 1 disadvantages (the screen being edited)"
+global,0x00190D86,classmaker_hp_repeat,candidate,short: frames before the HP arrows repeat (20 after each step)
 global,0x00190D8C,levelup_attribute_floor,candidate,copy of character+0x30 taken when the sheet opens; sheet_levelup_adjust won't lower an attribute below it
+global,0x00190DC8,court_prison_days,confirmed,"short: days of prison (3 per lost coin toss, more for an unpaid fine; halved by a guilty plea); %dip in 8055; experiment: 33 -> 16"
+global,0x00190DCA,court_extra_days,candidate,"short: extra days because the fine could not be paid ((fine - gold)/40 + 1), text 8052"
 global,0x00190DDC,search_faction,candidate,faction id the membership search looks for
 global,0x00190DE4,text_macro_fpc,strong,"faction record for %fpc (the player's guild), set by talk_faction_relation"
 global,0x00190DE8,text_macro_fnpc,strong,faction record for %fnpc (the NPC's faction)
@@ -219,6 +252,8 @@ global,0x00190DF0,text_macro_fa,strong,faction record for %fa (shared ally)
 global,0x00190DF4,text_macro_fae,strong,faction record for %fae (the player's ally that the NPC's faction fights)
 global,0x00190DF8,text_macro_fea,strong,faction record for %fea (the player's enemy allied to the NPC's faction)
 global,0x00190DFC,text_macro_fpa,strong,faction record for %fpa (common parent)
+global,0x00190E0C,classmaker_picklist,candidate,"the string list the specials picklist shows (names, or a sub-list)"
+global,0x00190E10,classmaker_picklist_costs,candidate,the cost table matching classmaker_picklist
 global,0x00190EAC,text_macro_map_location,candidate,location record whose name (+0x10) %map returns (map items)
 global,0x00190FE4,text_rsc_buffer,strong,output of the TEXT.RSC expander (parse.c func_0004A6B5); talk copies its answers from here
 global,0x001913E4,enchant_text,candidate,text buffer built by enchant_powers_text
@@ -233,11 +268,14 @@ global,0x0019597C,right_hand_ready_delay,candidate,accumulates the ready time of
 global,0x00195980,left_hand_ready_delay,candidate,same for the left hand (equipped[21])
 global,0x00195984,quest_passed_items,candidate,"four item records (args 1-4) set by opcode 75 while it runs, cleared after the opcode loop; qinit copies them into a starting quest's items of category 100"
 global,0x00195998,last_skill_check_minutes,candidate,game_minutes of the last raise_skills from a trip: travel_begin_trip runs it again after 360 minutes
+global,0x001959A0,bank_ship_price,confirmed,"price paid for the ship (saved, loadsave.c); bank_sell_ship offers 85%; experiment: 200000 -> sold for 170000; 100000 after buying the small ship"
+global,0x001959A4,bank_house_price,confirmed,"price paid for the house (saved in the save game, loadsave.c); bank_sell_house offers 85% of it; experiment: 363485 after buying"
 global,0x001959AC,frame_counter,confirmed,main()'s loop does D_001959AC++ once per iteration (src/hand/func_00010010.c); rises ~119 per 400 timer ticks
 global,0x001959D8,inventory_containers,confirmed,"5 container objects (record type 52) under player_entity: tabs 0 weapons/armor, 1 magic items, 2 clothing/misc, 3 ingredients, 4 wagon; exp: tab click lists inventory_containers[tab]"
 global,0x001959E8,wagon_container,confirmed,inventory_containers[4]: exp: WAGON lists it on the right; capacity 3000 (750 kg) and '%s / 750'
 global,0x001959FC,spell_points_bonus,candidate,spell points spent before magicka by cast_recast_last (extra spell points)
 global,0x00195A00,quest_root,candidate,object whose child list (+0x3F) holds the active quests (type 14) that talk lists
+global,0x00195A04,bank_accounts,confirmed,"pointer to the type-25 record (init.c: child of the player entity, 806 bytes = 62 regions x 13) holding every region's bank account at +0x47; the experiments read balances there (tlalac 70771/owed 330000, morthag1 423106)"
 global,0x00195A08,strength_bonus,candidate,temporary STR: the Mace of Molag Bal (damage_weapon_strike_effects) adds the STR it drains; damage_resolve_attack's damage bonus is (STR+this-50)/5; cleared at strength_bonus_end
 global,0x00195A0C,spell_points_bonus_end,candidate,"game_minutes + 12 when spell_points_bonus (magicka drained by the Mace of Molag Bal, damage_weapon_strike_effects) is cleared by damage_expire_drain_bonuses"
 global,0x00195A14,quest_faces,strong,"10 slots of 10 bytes, the escort faces drawn at the top left: +0 face bits (gender<<7, race<<6, index), +1 quest id, +2 object id, +6 image (quest_face_add, quest_faces_draw)"
@@ -258,9 +296,11 @@ global,0x00195ACC,text_macro_potion,candidate,potion recipe the %po macro reads 
 global,0x00195AD4,text_macro_book,strong,"book header that %bt (title, +0) and %ba (author, +64) read"
 global,0x00195AD8,ai_chosen_spell,candidate,"spell object picked by ai_pick_ranged_spell / ai_pick_touch_spell / ai_has_spell, cast by monster_cast_spell"
 global,0x00195AE8,cheat_flags,strong,"bits: 3 reveal maps (Ctrl+F1), 6 no spell damage to the player (Ctrl+F4, spfx_damage), 0 SPELLS.STD editing in the spellmaker, 2 free enchanting (itemmaker_enchant), 7 creatures cast nothing (cast_spell_on); keys.c toggles 3 and 6 in cheat mode"
+global,0x00195AF0,tavern_building,confirmed,"pointer to the building entry whose room is rented: tavern_open sets it to current_building (rest.c too); the rent fields are written there (experiment: building+0x02 expiry, +0x0F 2)"
 global,0x00195AF4,found_record,candidate,result of the membership searches (object pointer)
 global,0x00195B04,spell_records,confirmed,"pointer to SPELLS.STD in memory: 89-byte spell records, 128 max (name +0x2F, id +0x49); in save_morthag1 89 records (Fenrik's Door Jam, Buoyancy, Frostbite...); exp1b: cast_item_used_spell(82) found Orc Strength by id here"
 global,0x00195B08,effect_tick_minutes,candidate,minutes (/4) since the last effects_tick; the regeneration and enchantment amounts
+global,0x00195B0C,trade_haggle_result,candidate,"the agreed price (0 when rejected or unaffordable), set when the haggle window closes (686DA)"
 global,0x00195B14,creature_count,strong,active creatures: ai_update_creatures loops over them; inv_use_item says 'There are no monsters nearby.' when 0
 global,0x00195B20,inv_right_container,confirmed,"container listed on the right (ground pile, wagon, shop or trade pile); exp: WAGON set it to the wagon and back at close"
 global,0x00195B2C,spfx_popup_handler,strong,"pending spell popup: 1 = Recall (spell_recall_prompt sets it), else the choice-list callback; spfx_popup_update runs and clears it"
@@ -278,6 +318,7 @@ global,0x00195BE8,window_image,strong,"background image of the open window: talk
 global,0x00195BEC,player_class,strong,"the class (career) record inside the character (player_character+0x230): item_forbidden_for_class reads +0x0B forbidden materials and +0x0E forbidden armor/shield/weapon bits (message 1068); disease/poison code reads immunity bits at +0x01, which fit class advantages"
 global,0x00195BF4,game_minutes,strong,"game time in minutes: %1440 with 1080/360 for 18:00/06:00 when trips end, 'Days left' = /1440, training once per 720, automap notes kept 43200 (30 days), files 129600 (90 days); save_blades = day 671 22:10"
 global,0x00195C44,scratch_buffer,candidate,"pointer to a large work buffer: +55000 popup text, +60000 status list, 50000 bytes of town-map notes"
+global,0x00195C94,classmaker_file,strong,"custom class file name from the command line ('custom NAME', args.c 82A63): classmaker_run loads the class from it, classmaker_save_file writes it"
 global,0x00195CB0,ai_los_index,strong,"round-robin AI index: only that creature re-tests line of sight (23C72) this frame, setting/clearing character+0x40 bit 7; ai_update_creatures advances it mod creature_count"
 global,0x00195D00,quest_tick_object,candidate,object of the quest being run or started
 global,0x00195D04,quest_face_images,candidate,"four face image sets by gender and race (quest_face_add, quest_faces_after_load)"
@@ -324,6 +365,7 @@ global,0x00196272,screen_active,candidate,"set to 1 when the sheet, travel map o
 global,0x00196274,game_mode,strong,"which screen has the input: 0 world, 3 sheet, 4 inventory, 5 spellbook, 7 options, 14 logbook, 16 rest, 19 travel map; same from 3 saves (fallstate screens); hand code already calls it MODE"
 global,0x00196276,interaction_mode,strong,"0 grab F2, 1 info F3, 2 steal F1, 3 talk F4; same from 3 saves (fallstate modes)"
 global,0x00196279,mouse_buttons_prev,strong,mouse_buttons from the last frame: handlers act on (mouse_buttons & 1) && !(this & 1); the automap copies mouse_buttons into it each frame
+global,0x0019627E,crime_current,strong,"byte: the crime the guards act on (1-based, DFU order): rest.c sets 8 (vagrancy) for sleeping in town, people.c 5 (murder), click.c 13 (theft); court_trial passes it to court_open; experiment: court_open(4) named it 'Assault'"
 global,0x00196280,is_daytime,candidate,nonzero with a vampire (race 8) or career flag 16: 'You cannot initiate fast travel during the day.'; trips then end after 18:00
 global,0x00196288,inv_right_icon,strong,"byte: picture of inve16i0.cif shown for the right container: 2 ground at open, 3 wagon after WAGON (exp)"
 global,0x0019628F,text_macro_gender,candidate,"gender index (0 he, 1 she, 2 it) for %g %g2 %g3"
@@ -387,10 +429,20 @@ global,0x001966BB,talk_logbook_ready,candidate,set when an answer is copied to t
 global,0x00196710,faction_count,strong,number of faction records
 global,0x0019671C,faction_match,candidate,result/default slot of faction searches; guild_npc_menu leaves the guild's faction in it
 global,0x0019672C,factions,strong,"faction records (92 bytes) as one array and tree root; faction_find walks it, faction_politics_update indexes it up to faction_count"
+global,0x001968BB,location_is_port,candidate,"byte, nonzero in a port town: bank_buy_ship refuses with 285 'This is not a port town' when 0; 16 in dorian and kralvamp, 0 elsewhere (save survey)"
 global,0x00196A28,region_location_count,candidate,number of map_location records at region_locations
 global,0x00196A7C,region_location_names,candidate,"pointer to 32-byte records, name at +4, parallel to region_locations"
 global,0x00196A9C,region_locations,candidate,"pointer to the region's 17-byte map_location records (D_00196A28 of them), from maploads.c"
+global,0x00196ABC,tavern_room_list,candidate,scratch list of 26-byte building entries built by tavern_collect_* (in scratch_buffer)
+global,0x00196AC0,tavern_menu_image,strong,"tvrn00i0.img, loaded by tavern_open, drawn by tavern_frame, freed by tavern_close"
+global,0x00196B08,court_reputation_change,confirmed,"crime_reputation_loss[crime]/2 set by court_open, used by court_reputation_restore; experiment: 4 for assault, legal reputation +3 per call"
+global,0x00196D68,career_bio_line,candidate,first line number shown
+global,0x00196D6C,career_bio_text,strong,bio.dat loaded by career_show_biography
+global,0x00196D70,career_bio_end,candidate,end of the biography text
+global,0x00196D74,career_bio_lines,strong,line count from career_bio_count_lines
+global,0x00196D78,career_bio_page,strong,current page start in the biography text
 global,0x00196D7C,reputation_baseline,strong,"5 shorts: the social-group reputations %r1..%r5 compare with character+0x91.. (""Lower""/""Higher""/""Unchanged""); experiment: 0 against 25 gave ""Higher"""
+global,0x00196D86,career_bio_ask,strong,"byte: 1 when the questions are asked (texts drawn), 0 for random answers"
 global,0x00196D88,town_map_view_x,candidate,left column of the town map shown; notes are drawn at (x-this)*2+10
 global,0x00196D8C,town_map_view_y,candidate,top row of the town map shown
 global,0x00196D90,town_map_scroll_y,candidate,scroll offset changed by town_map_scroll directions 0/1
@@ -429,6 +481,8 @@ global,0x001997A4,quest_prompt_quest,strong,quest of the yes/no question in prog
 global,0x001997AA,quest_find_id,candidate,quest id quest_find_by_id_cb looks for
 global,0x001997AC,quest_event_code,strong,"short: event being dispatched (1 item to npc, 2 kill, 3 item found, 5 item dropped, 21 foe hurt, 28 npc clicked, 71 pay, 73 spell, 78 faction); quest_dispatch_event runs the opcodes equal to it"
 global,0x001997AE,quest_test_started,candidate,set once quest_start_test_quest has started quest_test_file
+global,0x00199820,classmaker_specials,strong,"[2][7] {kind, sub-choice} of the picked advantages and disadvantages"
+global,0x0019983C,classmaker_current_buttons,strong,"the button table for classmaker_screen: classmaker_buttons (28), the reputation table (6) or the specials table (1 or 3)"
 global,0x00199868,itemmaker_slot_exclusions,candidate,"10 x 10 bytes: per slot 5 (type, param) pairs ruled out"
 global,0x001998E0,itemmaker_slots,strong,"10 x {s16 type, s16 param}: the enchantments being made, copied to item+0x43 by itemmaker_enchant"
 global,0x00199908,itemmaker_item,strong,item data being enchanted (itemmaker_pick_item); enchant points item+0x3D
@@ -437,6 +491,21 @@ global,0x00199910,itemmaker_slot_from_soul,candidate,10 bytes: slot was filled b
 global,0x00199D74,anim_changed_this_frame,candidate,"ai_creature_think clears it, monster_set_action sets it: one animation change per creature per frame"
 global,0x001A3AA4,extra_spell_points,candidate,enchant_extra_spell_points accumulates 75 per active ExtraSpellPts enchantment
 global,0x001A3AA8,magicka_max_modifier,candidate,"effects_tick: -max/2 or -max magicka for darkness/light-powered magery, plus extra spell points"
+global,0x001A3AAC,trade_haggle_minimum,candidate,"double: the lowest price the merchant takes, from the buyer's PER/reputation/skill and the shop quality"
+global,0x001A3AB4,trade_haggle_asking,strong,"double: the merchant's asking price (price*quantity at the start), shown by trade_haggle_show_offer, lowered by the steps; set by 0x684E9 (named shrine_donation, really the haggle start)"
+global,0x001A3AD4,trade_haggle_step_size,candidate,double: concession per round (trade_haggle_step)
+global,0x001A3FAC,bank_houses_for_sale,strong,"20 x 20 bytes: +0 building record data, +4 building entry, +8 price, +0xC building id, +0x10 saved record+0x34; filled by bank_add_house_for_sale (experiment dump: 4A5D058B for 363485 ...)"
+global,0x001A413C,bank_list_top,strong,first house row shown; bank_house_list_up/down move it
+global,0x001A4144,bank_saved_screen,strong,"64000-byte copy of the screen taken by bank_open, redrawn under the window by bank_draw"
+global,0x001A4148,bank_ships_for_sale,strong,"2 x 74 bytes model entries: +0 model 415, +4 model, +0x42 ship id (0x3E00001 / 0x3E10001), +0x46 price (100000 / 200000); experiment dump"
+global,0x001A41DC,bank_bought_house_building,candidate,building entry of the house just bought (bank_house_bought)
+global,0x001A41E0,bank_preview_distance,candidate,"camera distance of the 3D preview, 1500 at open, keys move it by 8 within 100..2000"
+global,0x001A41E4,bank_bought_house,candidate,"record of the house just bought (bank_house_bought), 0 at open"
+global,0x001A41EC,bank_account,confirmed,"pointer to this region's account (bank_accounts+0x47+region*13), set by bank_open; every handler changes it (experiments)"
+global,0x001A41F0,bank_ship_count,strong,"byte: ships for sale (2), set by bank_init_ships"
+global,0x001A41F1,bank_screen,confirmed,"byte: 0 main, 1 house list, 2 ship list; selects the button rows bank_frame tests; experiment: 0 -> 1 on HOUSE BUY, 2 on SHIP BUY, 0 on EXIT"
+global,0x001A41F2,bank_selected,confirmed,byte: selected row in the house or ship list; experiment: 2 after clicking row 2
+global,0x001A41F3,bank_house_count,strong,"byte: houses for sale listed (max 20); 20 in morthag1 and kralvamp, 16 in tlalac"
 global,0x001A4A10,guild_saved_screen,strong,64000-byte copy of the screen under the guild menu / spell shop
 global,0x001A4A14,guild_membership,strong,the player's membership record for the current guild (or 0); experiment at the Mages Guild: rank 9 kind 1 faction 40
 global,0x001A4A18,spellshop_saved_seed,candidate,RNG seed saved while the spell shop is open
@@ -464,6 +533,13 @@ global,0x001AA3DC,potion_ingredient_scroll,strong,first listed ingredient (scrol
 global,0x001AA3E4,potion_ingredient_count,strong,number of potion_ingredients
 global,0x001AA3E8,potion_name,strong,"pointer to the potion name shown (""Unnamed potion"" or the recipe's)"
 global,0x001AA3EC,potion_cauldron_count,strong,short: ingredients in the cauldron
+global,0x001AA3F0,chargen_saved_minimums,strong,8 shorts: the rolled minimums saved with the roll
+global,0x001AA400,chargen_saved_attributes,strong,8 shorts saved by chargen_save_roll
+global,0x001AA410,chargen_face_images,strong,"face%d%di0.cif for the gender and race, loaded by chargen_name_character, drawn by chargen_draw_face"
+global,0x001AA414,chargen_reflex_image,strong,"char05i1.img, the reflex highlight drawn by chargen_draw"
+global,0x001AA418,chargen_roll_saved,strong,byte: set by chargen_save_roll; chargen_restore_roll needs it
+global,0x001AA419,chargen_saved_points,strong,byte: bonus points saved with the roll
+global,0x001AA41A,chargen_screen,confirmed,"byte bits of the chargen screens being drawn: 1 name, 2 face, 4 attributes, 8 skills, 16 reflexes, 255 summary (chargen_name_character sets them in order; the experiment saw the matching draw functions per step)"
 global,0x001AA41C,inventory_images,strong,"inventory_load_images stores 8 image handles here, one per inve*.img/cif it opens (fallcall)"
 global,0x001AA45C,inv_temp_pile,strong,"loot pile object (type 33, treasure texture 216, at the player) made by inventory_open; freed at close when empty"
 global,0x001AA53C,inv_ground_pile,candidate,right container saved at open; inv_wagon_button switches back to it
@@ -491,11 +567,17 @@ global,0x001AA6A5,travel_map_part,candidate,bit 0 / bit 1: which horizontal / ve
 global,0x001AA6A6,travel_map_mode,candidate,"how the map was opened (objcode func_0009A993): 1 the W key, 100 teleport (tele00i0.img, guilds.c): mode 100 skips the clock and shows YES/NO"
 field,automap+0x000,notes,candidate,"2048 bytes of notes: u16 object id, string; automap = payload of the type-51 object, saved as at%05d.amf"
 field,automap+0x800,seen_bits,candidate,"bit per object id (record_id low word, object+0x1F) set by automap_mark_seen, applied by automap_restore_seen"
+field,bank_account+0x00,balance,confirmed,i32 gold in the account; experiments: deposit/withdraw/letters/loan/house/ship all moved it
+field,bank_account+0x04,loan_owed,confirmed,"i32 amount owed: borrow sets amount*1.1, repay lowers it; experiment 1000 -> 1100, 330000 -> 329900"
+field,bank_account+0x08,loan_due,confirmed,"u32 game_minutes the loan is due (borrow: now + 518400); mplace.c 26476 checks overdue loans, tamriel.c 4BA0F takes 5 legal reputation at the due minute; experiment 3506891 -> 4025291"
+field,bank_account+0x0C,flags,strong,"byte: bit 0 = defaulted on a loan: bank_borrow refuses with 288 '%pcn, you have defaulted on a prior loan with this bank'"
 field,blessing+0x00,target,strong,"skill id, 128|attribute, or 255 for regional legal reputation"
 field,blessing+0x01,amount,strong,amount added by blessing_apply
 field,blessing+0x02,end_time,strong,game_minutes when guild_expire_blessings removes it
+field,building+0x02,rent_expires,confirmed,u32 game_minutes until which the tavern room is rented (tavern_rent / tavern_extend_room); experiment: now + days*1440
 field,building+0x0F,flags,candidate,bit 3 set by talk_mark_quest_buildings
 field,building+0x12,faction_id,strong,"u16: 40 for the Mages Guild hall in pilot3 (experiment), passed to guild_find_membership_by_faction"
+field,building+0x14,id,strong,"u32 building id (location key << 16 | n): matched with object+0x1F by bank_add_house_for_sale and the tavern room code, stored in character+0x74 when the house is bought (experiment: 0x4A5D058B)"
 field,building+0x18,type,strong,"byte building type (0 alchemist ... 15 tavern, 16 palace, 17+ houses)"
 field,building+0x19,quality,strong,"byte: spell shop list size (quality*5+30), shop stock"
 field,character+0x00,name,confirmed,32-byte name: Dafydd gen orbo (save_blades)
@@ -509,6 +591,7 @@ field,character+0x1FB,to_hit_bonus,candidate,s16 added to the attacker's to-hit 
 field,character+0x1FD,last_kill_time,strong,player: damage_creature_death writes game_minutes here at every kill; item_enchantment_tick's health leech (21) hurts the player once 1440/10080 minutes pass without a kill (DFU HealthLeech daily/weekly); creatures use the same offset as monster+0x244 give_up_timer
 field,character+0x20,attributes,confirmed,8 x u16 STR INT WIL AGI END PER SPD LUC as on the sheet
 field,character+0x201,last_shapechange_time,confirmed,player: fallcall save_kralwolf 0x67027 1 wrote it; the lycanthrope shapechange works once per 1200 minutes from it
+field,character+0x205,last_meal_time,confirmed,game_minutes of the last tavern meal: tavern_food_button refuses within 240 minutes ('You are not hungry.'); experiment: set to now by buying Ale
 field,character+0x209,last_training_minutes,strong,i32 game minutes of the last guild training: training_offer refuses with TEXT.RSC 4023 ('cannot train ... more than one skill in a single day') within 720 minutes; training_update sets it
 field,character+0x20D,last_stealth_check_minutes,strong,player: game_minutes of the last stealth roll; ai_stealth_check returns the old result within the same minute (DFU TimeOfLastStealthCheck)
 field,character+0x211,thieves_invite_time,strong,game_minutes when the Thieves Guild invitation comes (guild_check_invitations)
@@ -541,10 +624,11 @@ field,character+0x64,shield_end_time,candidate,u32 duration + game_minutes writt
 field,character+0x68,shapechange_form,candidate,"int: subtype of effect 29 (Bat, Raven, Fish, Wolf) set by spfx_lycanthropy"
 field,character+0x6C,special_infection,confirmed,"player: fallcall disease_infect_lycanthropy set it to 1 (werewolf); 0 vampirism, 2 wereboar; disease_special_infection_tick turns it into the disease"
 field,character+0x70,target,strong,exp_c1: ai_update_creatures writes each creature's target entity here and the creature into its target's +0x70 (also the player's record)
-field,character+0x74,house,candidate,building given by the knightly order's 'Receive House' (848); 0 = none ('You have not earned a house' 460)
-field,character+0x78,ship_owned,strong,i32 set by bank.c from its ship-sale table; nonzero waives the ship fare in travel_trip_cost and the ship-option gold check (DFU hasShip)
+field,character+0x74,house,confirmed,"building id of the player's house (bank_house_bought sets it, bank_sell_house clears it; tavern code and rest.c compare it with building+0x14); also the knightly order's 'Receive House' (848); experiment: 0 -> 0x4A5D058B on buying | earlier: building given by the knightly order's 'Receive House' (848); 0 = none ('You have not earned a house' 460)"
+field,character+0x78,ship_owned,confirmed,"ship location id: 0x3E00001 small (992) / 0x3E10001 large (993), set by bank_ship_bought, cleared by bank_sell_ship; waives the ship fare (DFU hasShip); experiment: 0x3E10001 -> 0 -> 0x3E00001 | earlier: i32 set by bank.c from its ship-sale table; nonzero waives the ship fare in travel_trip_cost and the ship-option gold check (DFU hasShip)"
 field,character+0x7C,health,confirmed,u16 current health: writing 123 in save_keophex made the sheet show HEALTH 123/489; guild/inn healing sets it to +0x7E; travel refills it
 field,character+0x7E,max_health,strong,"u16 drawn after the / of HEALTH (489 in keophex, 356 in blades); level-up adds the HP gain; healing copies it to +0x7C"
+field,character+0x80,face,strong,"byte 0-9: face picture, chargen_face_previous/next and chargen_draw_face"
 field,character+0x81,level,confirmed,"byte: 21, 13, 20 = the sheet's level in 3 saves"
 field,character+0x82,reflexes,strong,"byte: skill_ready_to_advance scales uses by (0x10000-((r-2)<<13))/0x10000, DFU's reflexes modifier; 0 in two saves"
 field,character+0x85,gold,confirmed,i32 gold coins: +5000 per gold cheat in 2 saves; writing it changes gold shown and encumbrance by the coins' weight
@@ -552,7 +636,7 @@ field,character+0x89,conditions,confirmed,"u32 active spell-effect flags (one bi
 field,character+0x8A,equip_effect_flags,confirmed,"bit 1 spells absorbed (enchantment 9): exp: 6 -> 4 when the amulet came off, back to 6 when re-equipped"
 field,character+0x8D,magicka,strong,u16 = 28 in morthag1 (sheet 28/160)
 field,character+0x8F,max_magicka,strong,u16 = 160 in morthag1
-field,character+0x91,reputation,strong,"5 shorts by social group (commoners, merchants, scholars, nobility, underworld), added to talk_disposition by the faction's sgroup"
+field,character+0x91,reputation,confirmed,"5 shorts, social groups commoners/merchants/scholars/nobility/underworld: the class maker's reputation bars write them (experiment +4, -3/+3) and the biography effects 'r<g> n' add to them | earlier: 5 shorts by social group (commoners, merchants, scholars, nobility, underworld), added to talk_disposition by the faction's sgroup"
 field,character+0x9B,fatigue,confirmed,u16 current fatigue x64: sheet shows +0x9B>>6 / (STR+END); writing 77*64 made FATIGUE 77/187 in keophex; 12206 in blades = 190 as on its sheet. Max fatigue is not stored
 field,character+0x9D,skills,strong,"35 x 6 bytes, u16 value first: Mercantile (14) at +0xF1 in prices, Pickpocket (15) at +0xF7 in shop theft, enchantment 10 adds 15 to skill[param]"
 field,character+0x9F,skill_uses,candidate,"u16 per skill (stride 6): skill_add_uses adds and clamps 0..20000, raise_skills compares it with the advance threshold and zeroes it, training adds random(10,20)*multiplier"
@@ -561,14 +645,18 @@ field,class+0x01,immunity_flags,strong,"CFG byte 1 = DFU ImmunityFlags (EffectFl
 field,class+0x02,low_tolerance_flags,strong,byte: spfx_resist_roll halves the save chance for these bits
 field,class+0x03,critical_weakness_flags,strong,byte: spfx_resist_roll returns 100 (no save) for these bits
 field,class+0x04,flags,candidate,"u16: bit 3 stops travel refilling magicka, bit 4 forbids fast travel by day like a vampire ('You cannot initiate fast travel during the day.'); 0x8 for the blades Wizard"
+field,class+0x06,rapid_healing_flags,strong,"bits 0-2 (general, in darkness, in light): HISTORY 'Rapid healing'"
 field,class+0x07,regeneration_flags,strong,"CFG byte 7 (DFU Regeneration flags): effects_tick heals the player by these bits (bit 3 always, bits 0/1 by light or darkness (4B192), bit 2 with D_0019627D/D_001962A0)"
-field,class+0x09,spell_absorption_flags,candidate,"byte bits 0-2: class spell absorption (1 in light?, 2 in darkness via func_0004B192, 4 always); spell_resist_check"
+field,class+0x09,spell_absorption_flags,strong,"bits 0-2: HISTORY 'Spell Absorption' | earlier: byte bits 0-2: class spell absorption (1 in light?, 2 in darkness via func_0004B192, 4 always); spell_resist_check"
 field,class+0x0A,attack_modifier_flags,strong,"CFG byte 10 (DFU AttackModifierFlags): bits 0-3 bonus, 4-7 phobia vs undead/daedra/humanoid/animals (damage_bonus_vs_target)"
+field,class+0x0B,forbidden_materials,strong,"u16, 10 material bits: item_forbidden_for_class and HISTORY 'Forbidden material'"
 field,class+0x0D,expert_weapons,strong,CFG byte 13: weapon proficiency bits the class is expert in (Archer 0x20 missile in CLASS13.CFG); damage_resolve_attack adds level to-hit and level/3+1 damage (DFU CalculateProficiencyModifiers)
+field,class+0x0E,forbidden_equipment,strong,"u16: bits 0-5 weapon kinds, 6-8 armor types, 9-12 shield types (HISTORY 'Forbidden weaponry/armor type/shield type'; item_forbidden_for_class, message 1068)"
 field,class+0x10,skills,strong,"12 skill indexes: 3 primary, 3 major, 6 minor; PRIMARY/MAJOR/MINOR popups list them (keophex PRIMARY = Archery, Hand-to-Hand, Restoration); misc = the rest"
-field,class+0x1C,name,strong,"16-byte class name drawn on the sheet's CLASS line (46,24): 'Wizard' in save_blades, matching its sheet"
-field,class+0x34,hp_per_level,strong,"level-up HP = random(hp/2..hp) + END/10 - 5, min 1 (DFU's formula); 16 for the blades Wizard"
-field,class+0x36,advancement_multiplier,strong,16.16 fixed multiplier in the skill-advance threshold (DFU careerAdvancementMultiplier); 0xCCCE (0.8) in save_blades
+field,class+0x1C,name,confirmed,"class name; classmaker_name_button writes it (char1/22 typed 'zed', read back at class+0x1C); 'Wizard' in save_blades | earlier: 16-byte class name drawn on the sheet's CLASS line (46,24): 'Wizard' in save_blades, matching its sheet"
+field,class+0x34,hp_per_level,confirmed,"byte HP per level: classmaker arrows 4..30, default 8, feeding the advancement multiplier; experiment: 8 -> 28 -> 18 changed class+0x36 to 2.0 and 1.5 (also sheet/level-up code) | earlier: level-up HP = random(hp/2..hp) + END/10 - 5, min 1 (DFU's formula); 16 for the blades Wizard"
+field,class+0x36,advancement_multiplier,confirmed,16.16: classmaker_update_advancement computes it (experiment 1.0/2.0/1.5/1.05/1.35); the skill-advance threshold multiplier (DFU careerAdvancementMultiplier); 0xCCCE in save_blades | earlier: 16.16 fixed multiplier in the skill-advance threshold (DFU careerAdvancementMultiplier); 0xCCCE (0.8) in save_blades
+field,class+0x3A,attributes,confirmed,"8 x u16 base attributes STR..LUC: the class maker sets 50 and allows 10..75; chargen rolls each as rand(this, this+10); experiment: the class maker showed and kept 50 in each"
 field,disease+0x00,id,candidate,type-11 record data: disease id (< 100; poisons are >= 128); spfx_cure_disease / spfx_cure test it
 field,disease+0x01,stat_flags,candidate,"11 x s16: which stats the disease hits (8 attributes, 8 health, 9 fatigue, 10 magicka); spfx_disease_daily"
 field,disease+0x17,damage_min,candidate,s16 daily damage range low (+0x19 high); spfx_disease_daily rolls it
@@ -711,6 +799,7 @@ field,quest+0x06,name,confirmed,"8-character file name (""s0000999"", ""B0B71Y03
 field,quest+0x0F,flags,strong,bit 1 set by opcode 4 (rewarded): opcode 6 then posts 1007 not 1006 and skips the -2; UESP HasDebugInfo byte
 field,quest+0x10,section_counts,confirmed,"short[10] records per QBN section (+0x20 opcodes, +0x22 states, +0x1C timers, +0x1E foes, +0x16 persons, +0x18 places); read in 7 saves"
 field,quest+0x24,section_offsets,confirmed,short[11] offsets of the sections from the quest start (quest_section); offset 10 = text variables
+field,region+0x2D,crime_flags,candidate,"byte in the 80-byte region record (region_politics): court bit 0 banished (8063), bit 1 sentenced to death (8060)"
 field,spell+0x00,effects,confirmed,"3 x {u8 type, u8 subtype}, 255 none; exp1b (build/names/scratch/magic/exp1b.py, save_morthag1): the dispatcher spell_apply_effect ran the handler of spell_effect_names[type]"
 field,spell+0x06,element,strong,"0 fire, 1 frost, 2 poison, 3 shock, 4 magic (spellmaker element buttons, TEXT 1801-1805); indexes spell_cast_sounds and spell_resist_flags"
 field,spell+0x07,target,strong,"0 caster, 1 touch, 2 distance, 3 area around caster, 4 area at distance (TEXT 1806-1810); cast_player_spell/cast_creature_spell_at switch on it"
@@ -824,10 +913,60 @@ func,0x0001B470,faction_change_reputation,strong,"player's reputation with a fac
 func,0x0001B554,faction_add_reputation_r,candidate,"recursive: target gets d, other members of the subtree d/2"
 func,0x0001B5BE,faction_propagate_reputation,candidate,"walks to the root (stopping at the Dark Brotherhood, 108) and applies the change; 844 Generic Knightly Order means the player's order"
 func,0x0001D739,faction_rumor_text,candidate,faction.c; opens rumor.dat; direct call (all-zero args) shows a rumour about a faction; called by func_00044EE0
-func,0x0001F15D,tavern_rent_room,strong,tavern.c; direct call (all-zero args) shows 'for how many days will you require the room?'
-func,0x000217E7,prison_serve_sentence,strong,crime.c; opens pris00i0.img; string '%d days until freedom.'; a direct call draws the prison screen
-func,0x000245EF,career_background_summary,strong,"career.c; biog%02dt0.txt, bio.dat, class*.cfg, namegen.dat; direct call (all-zero args) shows 'Your reputation has changed as follows'"
+func,0x0001EE84,tavern_open,confirmed,"(open) filed under maploads.c: open=1 loads tvrn00i0.img, tavern_state=0, game_mode=20, tavern_building=current_building; returns game_mode==20; callers click.c (innkeeper), qmisc.c, xn_CAF00 table; experiment (scratch/econ/exp_tavern.py: entered the nearest tavern, tavern_open(1), clicks): game_mode 0->20, ROOM / TALK / FOOD & DRINKS / GOODBYE menu"
+func,0x0001EF2E,tavern_frame,confirmed,"filed under maploads.c; every frame from main(): tavern_buy_food after the food picklist, tavern_room_offer / tavern_room_pay by tavern_state, trade_settle_offer, draws tvrn00i0, Esc closes, hit-tests tavern_buttons (4 rows) with ButtonClick; all tavern clicks in the experiments ran through it"
+func,0x0001F0C5,tavern_close,confirmed,"GOODBYE D_00179E24[3] (99,78)-(220,86) and Esc: game_mode=0, frees tvrn00i0.img; also called by tavern_talk_button and qmisc.c"
+func,0x0001F15D,tavern_rent_room,confirmed,"ROOM D_00179E24[0] (99,51): asks the days (5102, or 5100 'still rented for %dwr hours' when tavern_room_rented), tavern_state=1; experiment: ROOM -> popup, state 1 | earlier: tavern.c; direct call (all-zero args) shows 'for how many days will you require the room?'"
+func,0x0001F1C2,tavern_room_offer,confirmed,"tavern_state 1: 16 if days + days left > 350; price = 7 gold a day (a day crossing day-of-year 46, Heart's Day, is free: 'Room is free due to Heart's Day.'); knights (guild_is_local_knight) free; else trade_adjust_price + trade_make_offer, state 2; experiment: free for a knight; with the knight check off 12 days -> price 84 haggled to 68"
+func,0x0001F32D,tavern_room_pay,confirmed,"tavern_state 2 after the offer: NO -> nothing; 454 if gold < trade_price; pays, then tavern_extend_room or tavern_rent; experiment: YES -> gold 1000 -> 932, room expires now + 12 days"
+func,0x0001F3BC,tavern_food_button,confirmed,"FOOD & DRINKS D_00179E24[2] (99,69): 'You are not hungry.' within 240 minutes of character+0x205, else the picklist of tavern_food_names; experiment: list shown, a second visit said not hungry"
+func,0x0001F40E,tavern_buy_food,confirmed,"(item): price tavern_food_prices[item], halved on holiday 37, free on holiday 1; 454 if short; gold -= price, health += 2*price (max health cap), character+0x205 = now; experiment: Ale -> gold -1, health 10 -> 12"
+func,0x0001F4E6,tavern_stub,candidate,"empty function (src/tavern.c), no callers"
+func,0x0001F4FE,tavern_talk_button,strong,"TALK D_00179E24[1] (99,60): tavern_close then talks to the innkeeper (756C6 with D_00195CE8, the clicked NPC)"
+func,0x0001F525,tavern_go_to_room,strong,"moves the player object to the rented room's bed object (9A0A0 by room number building+0x07); rest.c 7269F calls it when resting in a tavern with tavern_room_rented (else a 'no room' message), in a Fighters Guild hall (faction 41) for members, or at home"
+func,0x0001F592,tavern_rent,confirmed,"(minutes): finds a room object in the interior (9A139), sets building+0x02 = now + minutes, building+0x0F bits 0-2 = 2 (rented), +0x07 = room number; experiment: expiry 1714190 + 13*1440 written to tavern_building"
+func,0x0001F5FD,tavern_room_rented,strong,"1 if tavern_building has the rented bit (+0x0F & 2) and +0x02 is still ahead of game_minutes; callers tavern_rent_room, rest.c, support.c"
+func,0x0001F653,tavern_room_days_left,strong,"days left on the room: (expiry - now + 1439) / 1440, 0 if not rented; used for the 350-day limit"
+func,0x0001F6BB,tavern_extend_room,strong,(minutes): building+0x02 += minutes when the room is still rented
+func,0x0001F6E2,tavern_store_room_item,candidate,"object-walk callback of tavern_save_rooms: an item (type 2) in a rented tavern room or the player's house (tavern_item_in_rented_room) is copied into a type-58 record (with location, building and expiry) under D_001959A8; part of an unused chain"
+func,0x0001F7B3,tavern_restore_room_item,candidate,callback of tavern_restore_rooms: a type-58 record of this location becomes an item again in its building (8E925 by building id) and the record is freed
+func,0x0001F89F,tavern_save_rooms,candidate,"purges expired records, collects this town's rented building entries (and earlier ones) into one type-57 record of 26-byte entries, then stores items left in rented rooms/houses; no references at all in the executable (fixups or calls): dead code"
+func,0x0001F958,tavern_restore_rooms,candidate,"copies the stored type-57 building entries (rent expiry and flags) back over this location's building table, then restores the stored items; no references: dead code"
+func,0x0001FA3A,tavern_match_rooms_record,candidate,object-walk callback: the first type-57 record whose id's high word is this location's -> found_record
+func,0x0001FAB2,tavern_collect_saved_rooms,candidate,appends the 26-byte entries of this location's type-57 record to the list at D_00196ABC (count in faction_scratch)
+func,0x0001FB3F,tavern_collect_rented_rooms,candidate,appends this location's building entries with rent bits (+0x0F & 3) to the list at D_00196ABC
+func,0x0001FBF5,tavern_item_in_rented_room,candidate,"(item): 1 if the item lies in a building whose entry is a tavern (15) with a room still rented, or the player's house (type 1, id == character+0x74, kept forever: expiry 0x7FFFFFFF); sets D_00190BE4 to the expiry"
+func,0x0001FD7C,tavern_purge_expired,candidate,"object-walk callback: frees a type-57 record when all its entries have expired, a type-58 record when its +0x2B expiry has passed"
+func,0x0001FE4D,tavern_purge_expired_records,candidate,walks D_001959A8 with tavern_purge_expired
+func,0x0001FE74,region_load_tables,candidate,"filed under tavern.c, belongs to region.c: reads politic.pak, climate.pak and regflat.bin (D_00196B00, D_00196B04, D_001A94D4); caller init 4ED36"
+func,0x00020C55,crime_remove_monster,strong,"filed under song.c; object-walk callback used only by court_open's bribe path: removes type-18 objects (monsters, i.e. the guards) via 7D6EA"
+func,0x00020C87,court_open,confirmed,"(crime id, 1-based; 0 = is the court up?): fine = base +- legal reputation * k clamped (crime_fine_table), then per 40 gold a coin toss between 40 gold of fine and 3 days of prison, more days if the fine exceeds the gold; cort01i0.img, game_mode 21; Thieves Guild (crimes 1-3, 12) or Dark Brotherhood (4-5) members are freed by a bribe (550/551) when their rank >= rand(0,19); asks 8050 GUILTY / NOT GUILTY; experiment (scratch/econ/exp_court2.py: court_open(4) in save_tlalac_s, clicks): assault -> 'fines of 560 gold and 33 days', game_mode 21"
+func,0x0002118B,court_frame,confirmed,"every frame from main(): the court state machine (court_state): 1 plea (guilty: verdict 0 banish 8063, 1 execute 8060, else fine and days halved and paid; not guilty -> 8064 DEBATE (Etiquette) / LIE (Streetwise)), 8 the argument roll ((PER+skill)/2 + legal rep, 5..95) -> 8062 not guilty or the sentence (fine x2 or /2 by rep roll), 2 sentence 8055, 3 prison, 100 close; experiment: GUILTY -> fine 280 paid, 16 days, state 100; NOT GUILTY + LIE -> state 2"
+func,0x00021597,crime_reputation_penalty,strong,"when a crime is committed (caller 2E914, damage code): region_legal_reputation -= crime_reputation_loss[crime_current]; the region's people faction (type 15) loses half (DFU's crime reputation table matches)"
+func,0x00021603,court_reputation_restore,confirmed,"after a sentence or bribe: legal reputation += court_reputation_change - 1 and the people faction by -(that)/2, clears D_001A4A70/74, sets D_001962B2; experiment: legal 0 -> 6 after the guilty plea (called after the fine and after prison)"
+func,0x00021680,court_close,confirmed,"passes 240 minutes (4AB2F) keeping fatigue, game_mode=0, frees cort01i0.img, removes the creatures (court_remove_creatures); experiment: game_mode 21 -> 0, minutes +240 beyond the prison days"
+func,0x0002171A,court_remove_creatures,strong,destroys every creature in creature_list except the player entity
+func,0x00021775,court_restore_vitals,strong,"health = max, magicka (+0x8D) = max (+0x8F), fatigue = (STR+END)<<6, D_00195D7C=0; after prison and bribes"
+func,0x000217E7,prison_serve_sentence,confirmed,"(days): pris00i0.img, passes 1440 minutes per day showing '%d days until freedom.', then court_restore_vitals; court_frame state 3 calls it; experiment: a 16-day sentence advanced game_minutes by 16*1440 (+240 from court_close) | earlier: crime.c; opens pris00i0.img; string '%d days until freedom.'; a direct call draws the prison screen"
+func,0x000245EF,career_background_summary,confirmed,"(class, ask): the background questions: class 18 (custom) -> career_nearest_class; reads biog%02dt0.txt, 12 questions asked (ask=1, biog00i0.img) or answered at random (ask=0), applies each answer's effects, writes the biography (TEXT.RSC 4116+class) to bio.dat, shows 35 'Your reputation has changed as follows'; experiment (scratch/econ/exp_chargen.py: tools/scenarios/newgame.txt from the title menu, calls counted per step): ran with ask=0 (fast start) after the class, 12 random answers | earlier: career.c; biog%02dt0.txt, bio.dat, class*.cfg, namegen.dat; direct call (all-zero args) shows 'Your reputation has changed as follows'"
+func,0x0002482A,career_skip_word,confirmed,returns the pointer past the current word and the blanks after it (biog parsing); experiment: 103 calls
+func,0x0002487C,career_find_question,confirmed,(n): finds the biog line starting with the number n and shows it (career_show_question); experiment: 12 calls
+func,0x000248FE,career_show_question,confirmed,draws the question text (career_draw_lines) and counts its answers into D_00190D64; experiment: 12 calls
+func,0x000249CE,career_draw_lines,strong,draws text lines at the answer box positions (career_answer_boxes) when asking; returns the next line
+func,0x00024AB1,career_wait_answer,strong,"waits for a click on one of the answer boxes (career_answer_boxes[1..]), ButtonClick; the choice into D_00190D66"
+func,0x00024BD9,career_random_answer,confirmed,picks an answer at random (fast start); experiment: 12 calls with ask=0
+func,0x00024C06,career_apply_answer,confirmed,(question): finds the chosen answer 'a.'.. and runs its effect lines (career_answer_effect); experiment: 12 calls
+func,0x00024C88,career_answer_effect,confirmed,"one effect line: GP gold, rf faction rep, rr regional legal rep, IT item, AE/AF/AO a person record (faction.c 1C713: gender M/F/O(pposite), race, CLASS%02d.CFG class, level; E named by %bn, F/O by %gn), RR character+0x224, RD/MR/TH/RP/FT bonuses, digits n skill += n, r<g> social reputation, #/!/? answer codes for the biography; experiment: 18 effect lines and 2 NPCs (1C713) in the random background"
+func,0x000252C7,career_effect_mi_plus,candidate,empty: the 'MI +n' biography effect does nothing
+func,0x000252E2,career_effect_mi_minus,candidate,empty: the 'MI -n' effect does nothing
+func,0x000252FD,career_slot_weight,strong,"(slot): 3 for primary slots 0-2, 2 for major 3-5, 1 for minor (src/career.c)"
+func,0x00025340,career_nearest_class,strong,for a custom class: loads class00..17.cfg and scores each by the custom class's 12 skills and their slot weights; returns the best-matching class (whose biog file is used)
+func,0x000254E2,career_bio_page_down,strong,"D_0017A002[1] (209,188)-(222,195): biography page down 21 lines"
+func,0x00025539,career_bio_page_up,strong,"D_0017A002[0] (181,188)-(193,195): biography page up 21 lines"
 func,0x000255B7,career_show_biography,strong,"career.c; bio.dat, lgbk00i0.img; direct call (all-zero args) shows the character's biography page"
+func,0x0002576B,career_bio_draw,strong,"draws 21 lines of bio.dat from the page start at (10, 25+7k)"
+func,0x0002581C,career_bio_count_lines,strong,counts the NUL-separated lines of bio.dat
+func,0x0002586B,monster_make_corpse,candidate,"filed under career.c, belongs to mplace.c/monster code: a killed creature (city watch, id 146, is removed) becomes object type 34 with a corpse image (25487/25488 by gender), keeping quest items and arrows; caller support.c 7D819; ran in 38 combat episodes"
 func,0x00026904,automap_open,strong,"runs with M (key:m x14.6, 38 episodes): indoors loads amap00i0.img/amap01i0.img and loops over automap_buttons until a handler returns 1 or Esc; outdoors in a town runs town_map_open"
 func,0x00026D8D,automap_draw,strong,"one frame of the automap loop (22 episodes with M): background, 3D view (automap_render), note line at (2,191), block overview"
 func,0x00026E87,automap_button_note_line,candidate,"handler of the note line (0,190)-(319,199): 50-char input for the selected object's note, replacing the old note"
@@ -1072,7 +1211,7 @@ func,0x0003D113,level_skill_sum,strong,"sum of the 6 primary+major skills minus 
 func,0x0003D2B6,skill_ready_to_advance,strong,uses*(reflex modifier) >= multiplier*value*class+0x36*1.04^level*k + 1: DFU's skill advancement formula
 func,0x0003D39D,text_rsc_open,candidate,opens 'text.rsc' into text_rsc_file; called from init.c
 func,0x0003D3F0,text_rsc_close,candidate,closes text_rsc_file; called from init.c
-func,0x00040FC1,court_trial,strong,"text.c; direct call with the player entity first shows 'You, <name>, are accused of the crime of Criminal Conspiracy... 280 gold pieces in fines and 15 days in prison... How plea you?' GUILTY / NOT GUILTY"
+func,0x00040FC1,crime_guards_or_court,strong,"decides between the guards attacking and sending you to court (economy agent: code); with the player entity a direct call went on to the court screen (court_open, 0x20C87)"
 func,0x000445B5,options_joystick_calibrate,strong,"options.c; cnfg04i0.img, cnfg05i0.cif, cnfg06i0.img; direct call (all-zero args) shows the joystick calibration window"
 func,0x00044EE0,show_rumor,candidate,kludge.c; opens rumor.dat; direct call (all-zero args) shows a rumour; calls faction_rumor_text
 func,0x00045B7F,pick_gold,candidate,kludge.c; string 'Picking from %s.'; direct call (all-zero args) shows 'You picked N gold pieces'
@@ -1369,6 +1508,68 @@ func,0x0004CFA7,armor_value_for_part,candidate,"100 minus the armour on one body
 func,0x0004D195,character_update_armor_values,strong,"fills character+0x44 armor_values[7] from armor_value_for_part; callers 58E15, 792C1; not quest code"
 func,0x0004D1E6,note_open_notebook,candidate,"note.c; strings notebook.tde, note.rci, mask02i0.img, 'Unable to create new notebook!'"
 func,0x00051DCF,pflc_read_savetree,candidate,"pflc.c; strings 'save2\\savetree.dat', 'Unable to open %s.'"
+func,0x00052DC3,classmaker_run,strong,"title_menu calls it for class 18 'Custom': clears the class (skills 255, HP/level 8, flags 0x1400, attributes 50), loads cust00/08/09/03/01/02i0.img and the custom class file if given, then loops: per-screen buttons (classmaker_buttons), draw, until classmaker_done; char play (char1/19) entered it"
+func,0x00053494,classmaker_draw,confirmed,"main screen: background, attribute arrows and bonus points at the selected row, class name (110,5), HP per level (287,55), the 12 skill names, the 8 attributes; experiment: per frame on the main screen"
+func,0x000537B6,classmaker_draw_reputations,confirmed,"cust03i0.img: 5 bars from character+0x91 (red below, green above), each value, and minus their sum; experiment: per frame on the reputation screen"
+func,0x000539D2,classmaker_exit_button,confirmed,"EXIT D_001854F4[0] (263,172): 301 no name, 300 'Three primary, three major, and six minor skills must be selected', 302 points left, 306 dagger in the red (outside 81..161), else classmaker_save_file and classmaker_done; experiment: refused with 11 skills unset"
+func,0x00053A89,classmaker_input_text,strong,"(dest, max length, redraw callback): line input at (100,5) (8C566), redrawing through the callback until Enter; class name (14) and chargen's 'Name thyself' (31, chargen_name_button); char1/22 typed 'zed' into class+0x1C"
+func,0x00053B22,classmaker_name_button,confirmed,"D_001854F4[1] (8,2)-(315,13): classmaker_input_text(class+0x1C, 14); char1/22 set the name 'zed' (read back from class+0x1C)"
+func,0x00053B51,classmaker_skill_primary_1,strong,"D_001854F4[2] (66,31): class+0x10 = skill picked from skill_names (classmaker_pick_from_list, chosen skills left out)"
+func,0x00053B83,classmaker_skill_primary_2,strong,"D_001854F4[3] (66,41): class+0x11 = skill picked from skill_names (classmaker_pick_from_list, chosen skills left out)"
+func,0x00053BB5,classmaker_skill_primary_3,strong,"D_001854F4[4] (66,51): class+0x12 = skill picked from skill_names (classmaker_pick_from_list, chosen skills left out)"
+func,0x00053BE7,classmaker_skill_major_1,strong,"D_001854F4[5] (66,80): class+0x13 = skill picked from skill_names (classmaker_pick_from_list, chosen skills left out)"
+func,0x00053C19,classmaker_skill_major_2,strong,"D_001854F4[6] (66,90): class+0x14 = skill picked from skill_names (classmaker_pick_from_list, chosen skills left out)"
+func,0x00053C4B,classmaker_skill_major_3,strong,"D_001854F4[7] (66,100): class+0x15 = skill picked from skill_names (classmaker_pick_from_list, chosen skills left out)"
+func,0x00053C7D,classmaker_skill_minor_1,confirmed,"D_001854F4[8] (66,129): class+0x16 = skill picked from skill_names (classmaker_pick_from_list, chosen skills left out); char1/19-21 picked Alteration into the first minor slot"
+func,0x00053CAF,classmaker_skill_minor_2,strong,"D_001854F4[9] (66,139): class+0x17 = skill picked from skill_names (classmaker_pick_from_list, chosen skills left out)"
+func,0x00053CE1,classmaker_skill_minor_3,strong,"D_001854F4[10] (66,149): class+0x18 = skill picked from skill_names (classmaker_pick_from_list, chosen skills left out)"
+func,0x00053D13,classmaker_skill_minor_4,strong,"D_001854F4[11] (66,159): class+0x19 = skill picked from skill_names (classmaker_pick_from_list, chosen skills left out)"
+func,0x00053D45,classmaker_skill_minor_5,strong,"D_001854F4[12] (66,169): class+0x1A = skill picked from skill_names (classmaker_pick_from_list, chosen skills left out)"
+func,0x00053D77,classmaker_skill_minor_6,strong,"D_001854F4[13] (66,179): class+0x1B = skill picked from skill_names (classmaker_pick_from_list, chosen skills left out)"
+func,0x00053DA9,classmaker_help_button,confirmed,"HELP D_001854F4[14] (249,74): picklist of classmaker_help_topics, shows classmaker_help_texts[k] (2400-2407); experiment: HELP opened the list"
+func,0x00053DE6,classmaker_advantages_button,confirmed,"EDIT SPECIAL ADVANTAGES D_001854F4[15] (249,98): classmaker_screen=2 with the advantage lists; experiment: screen 0 -> 2"
+func,0x00053E24,classmaker_disadvantages_button,strong,"EDIT SPECIAL DISADVANTAGES D_001854F4[16] (249,122): classmaker_screen=3 with the disadvantage lists"
+func,0x00053E62,classmaker_reputations_button,confirmed,"EDIT REPUTATIONS D_001854F4[17] (249,146): classmaker_screen=1; experiment: screen 0 -> 1"
+func,0x00053E83,classmaker_select_attribute,confirmed,(k): chargen_selected_attribute = k and moves the up/down arrow boxes (D_00185644/50) to the attribute's row; experiment: clicking WIL selected 2
+func,0x00053EFE,classmaker_attribute_str,strong,"D_001855CC[0] (7,20)-(42,..): classmaker_select_attribute(0)"
+func,0x00053F1D,classmaker_attribute_int,strong,"D_001855CC[1] (7,42)-(42,..): classmaker_select_attribute(1)"
+func,0x00053F3F,classmaker_attribute_wil,confirmed,"D_001855CC[2] (7,64)-(42,..): classmaker_select_attribute(2); experiment: clicked WIL"
+func,0x00053F61,classmaker_attribute_agi,strong,"D_001855CC[3] (7,86)-(42,..): classmaker_select_attribute(3)"
+func,0x00053F83,classmaker_attribute_end,strong,"D_001855CC[4] (7,108)-(42,..): classmaker_select_attribute(4)"
+func,0x00053FA5,classmaker_attribute_per,strong,"D_001855CC[5] (7,130)-(42,..): classmaker_select_attribute(5)"
+func,0x00053FC7,classmaker_attribute_spd,strong,"D_001855CC[6] (7,151)-(42,..): classmaker_select_attribute(6)"
+func,0x00053FE9,classmaker_attribute_luc,strong,"D_001855CC[7] (7,174)-(42,..): classmaker_select_attribute(7)"
+func,0x0005400B,classmaker_attribute_up,strong,"button D_00185644 (moved to the selected row), repeats every 6 BIOS ticks while held: class+0x3A attribute +1 (max 75), one bonus point less"
+func,0x00054082,classmaker_attribute_down,strong,"button D_00185650: class+0x3A attribute -1 (min 10), one bonus point more"
+func,0x000540F9,classmaker_pick_from_list,confirmed,"(list, background): picklist (7D3CA) modal loop; for skill_names leaves out chosen skills (classmaker_skill_taken) and maps back to the skill id; returns the choice; experiment: HELP and skill picks ran it"
+func,0x0005425C,classmaker_set_reputation,confirmed,"(group): character+0x91+2*group = (81 - mouse y)/5, from the bar under the mouse; experiment: click y=60 -> +4, y=100 -> -3"
+func,0x00054352,classmaker_reputation_commoners,confirmed,"D_0018565C[0] bar (42,30)-(46,132): classmaker_set_reputation(0) (social group order of character+0x91); experiment: set reputation[0]"
+func,0x00054371,classmaker_reputation_merchants,confirmed,"D_0018565C[1] bar (75,30)-(79,132): classmaker_set_reputation(1) (social group order of character+0x91); experiment: set reputation[1]"
+func,0x00054393,classmaker_reputation_scholars,strong,"D_0018565C[2] bar (108,30)-(112,132): classmaker_set_reputation(2) (social group order of character+0x91)"
+func,0x000543B5,classmaker_reputation_nobility,strong,"D_0018565C[3] bar (141,30)-(145,132): classmaker_set_reputation(3) (social group order of character+0x91)"
+func,0x000543D7,classmaker_reputation_underworld,strong,"D_0018565C[4] bar (174,30)-(178,132): classmaker_set_reputation(4) (social group order of character+0x91)"
+func,0x000543F9,classmaker_reputations_exit,confirmed,"D_0018565C[5] (168,170)-(201,184): 303 'Reputation balance must equal zero before exiting.' unless the 5 reputations sum to 0, else classmaker_screen=0; experiment: refused at +4, left at -3/+3"
+func,0x00054484,classmaker_picklist_wait,confirmed,"modal loop on the open picklist: returns choice+1, or 0 when cancelled (-2); experiment: ran when ADD opened the advantage list"
+func,0x00054526,classmaker_specials_screen,confirmed,"advantages/disadvantages screen (cust01i0/cust02i0): lists the picked specials with their sub-choices; when adding (classmaker_screen bit 16) runs the picklists, checks conflicts (1350) and sets the class bits; experiment: Acute Hearing and Bonus to hit (Animals) added"
+func,0x000549DB,classmaker_drop_duplicate_special,confirmed,"(list): if the last pick repeats an earlier kind/sub-choice, drops it (count--) and returns 1; experiment: ran after each pick"
+func,0x00054AAF,classmaker_specials_exit,confirmed,"EXIT D_001856A4[0] (3,176)-(164,198): classmaker_screen=0; experiment: back to the main screen"
+func,0x00054AE0,classmaker_specials_add,confirmed,"ADD D_001856A4[1] (99,6)-(154,24): unless 7 are picked, sets classmaker_screen bit 16 and opens the list (advantage/disadvantage names, or a sub-list); experiment: opened the advantage list"
+func,0x00054B27,classmaker_specials_sublist_click,candidate,"older picker: mouse row in the current string list -> sub-choice, then classmaker_set_advantage/disadvantage; no references in the executable (dead code)"
+func,0x00054D75,classmaker_specials_picked,confirmed,"ends a pick: clears bit 16, resets the list to the names, count++; experiment: advantage count 0 -> 1 -> 2"
+func,0x00054DC5,classmaker_update_advancement,confirmed,"class+0x36 = 1.0 + advantage costs - disadvantage costs + (HP/level - 8)*0.05 (x2 below 8), min 0.1 (16.16); the dagger's y (115 at 1.0); experiment: HP 28 -> 2.0, 18 -> 1.5, Acute Hearing -> 1.05, + Bonus to hit (Animals) -> 1.35"
+func,0x00054F81,classmaker_hp_up,confirmed,"D_001855CC[8] (252,46)-(260,56): class+0x34 HP per level +1 (max 30), auto-repeat every 20 frames; experiment: 8 -> 28 while held"
+func,0x00054FC8,classmaker_hp_down,confirmed,"D_001855CC[9] (252,57)-(260,67): class+0x34 -1 (min 4); experiment: 28 -> 18"
+func,0x0005500F,classmaker_skill_taken,strong,(skill): 1 if one of the class's 12 skill slots already holds it
+func,0x0005506F,classmaker_draw_dagger,confirmed,"draws the SKILL ADVANCEMENT bar (219,46) and the dagger (cust08i0.img) at its y; experiment: per frame"
+func,0x000550D6,classmaker_specials_remove,strong,"D_001856A4[2] list (3,32)-(164,174): clicking a listed special clears its class bits (classmaker_set_advantage/disadvantage with remove) and drops it"
+func,0x000551B1,classmaker_set_advantage,confirmed,"(slot, remove): sets or clears the class bits of picked advantage kind 0-10 (resistance +0x00, immunity +0x01, acute hearing +0x04 bit 0, spell absorption +0x09, ...); experiment: ran for each advantage picked"
+func,0x000553B2,classmaker_set_disadvantage,strong,"(slot, remove): the same for disadvantages (low tolerance +0x02, critical weakness +0x03, forbidden material +0x0B, forbidden weapons/armor/shields +0x0E, ...)"
+func,0x0005559C,classmaker_save_file,strong,writes the 74-byte class record to the custom class file (classmaker_file) when EXIT accepts
+func,0x000555E5,classmaker_special_conflicts,confirmed,"(list, kind, sub): 1 when an advantage resistance/immunity clashes with a low tolerance/critical weakness of the same element (or the reverse): 1350 'You have already picked an advantage or disadvantage than conflicts'; experiment: ran on the second pick"
+func,0x00055748,career_specials_text,strong,HISTORY text of the class's special advantages and disadvantages (career_advantages_text + career_disadvantages_text) in scratch_buffer+55000; caller sheet_button_history
+func,0x000557A7,career_advantages_text,strong,"one line per set bit: 'Resistance'/'Immunity' to class+0x00/+0x01 elements, 'Acute hearing' +0x04 bit 0, 'Spell Absorption' +0x09, 'Rapid healing' +0x06, 'Regenerate' +0x07, 'Bonus to hit' +0x0A low nibble, 'Atheleticism' bit 1, 'Increased magery' bits 10-12, 'Adrenaline rush' bit 2, 'Expertise in' +0x0D"
+func,0x00055A5B,career_disadvantages_text,strong,"'Inability to regenerate spell points' +0x04 bit 3, 'Damage' bits 4-5, 'Phobia' +0x0A high nibble, light/darkness-powered magery bits 6-9, 'Forbidden weaponry' +0x0E bits 0-5, 'Low tolerance' +0x02, 'Critical weakness' +0x03, armor +0x0E bits 6-8, shields bits 9-12, 'Forbidden material' +0x0B"
+func,0x00055D93,career_specials_line,strong,"(label, value): appends '%s %s' (or the label alone) and a line break to the specials text"
 func,0x00055E35,itemmaker_open,confirmed,"unit itemmakr.c (filed under custom.c). (kind) game_mode=10, loads item00i0.img, item01i0.img, spells.std, selects tab 0, itemmaker_reset; called every frame by itemmaker_update (0) and by guild_service_dispatch; exp: fallcall 0x55E35 1 drew ITEM NAME, CURRENT GOLD, TOTAL COST, ENCHANTMENT POINTS, POWERS, SIDE EFFECTS, ENCHANT, ADD POWERS, ADD SIDE EFFECTS (scratch/magic/open_0x55E35.png)"
 func,0x00055F0F,itemmaker_reset,strong,"clears the item, the 10 enchantment slots and their tables"
 func,0x00056004,itemmaker_update,strong,"every frame (game_frame): itemmaker_open(0) check, draws (itemmaker_draw), polls the list popup (spells_list_poll -> list_popup_callback), Esc closes, hit-tests itemmaker_buttons (ButtonClick 203)"
@@ -1548,17 +1749,45 @@ func,0x00067C04,item_artifact_equipped,strong,"1 if an equipped item has artifac
 func,0x00067CA4,item_damage_artifact,candidate,"item_damage on the equipped item with artifact effect (26, n); no caller in the C"
 func,0x00067D4F,effects_tick,strong,"every frame (game_frame): elapsed minutes (effect_tick_minutes); class regeneration flags (class+0x07) heal, sun/holy damage (class+0x04 bits 4/5), every equipped item's enchantments (item_enchantment_tick), darkness/light-powered magery (class+0x04 bits 6-9 -> magicka_max_modifier) = DFU career specials"
 func,0x000680DD,item_enchantment_tick,strong,"(item, type, param): 3 extra spell points, 5 regenerates health (param by light/darkness), 17 user takes damage, 16 deteriorates, 21 health leech (unless a kill within a day/week: last_kill_time), 8 repairs objects (item_repair_cb), 1 cast-when-held wear, 6 vampiric at range = DFU EnchantmentTypes"
-func,0x000684E9,shrine_donation,candidate,disease.c; direct call (all-zero args) shows 'The current amount in the shrine is 0 gold' with buttons
-func,0x000685EC,shrine_donation_update,candidate,"trade.c? (filed under disease.c, before trade.c's first ref 0x68731): per frame in game mode 13: popup answers 1/2/3 -> shrine_donate / trade_counter_offer"
-func,0x000686DA,shrine_donate,candidate,disease.c; direct call with the player entity first shows 'You do not have enough gold.' (next to shrine_donation)
+func,0x000684E9,trade_haggle_start,candidate,"an unused haggling window (ACCEPT / REJECT / COUNTER, no references; economy agent); a direct call with zero arguments drew it"
+func,0x000685EC,trade_haggle_frame,candidate,the unused haggling window's per-frame handler (economy agent)
+func,0x000686DA,trade_haggle_close,candidate,the unused haggling window's close (economy agent); with the player entity a direct call says 'You do not have enough gold.'
+func,0x00068731,trade_haggle_show_offer,strong,'The current amount in the offering is : %ld gold.' (the asking price D_001A3AB4) with ACCEPT / REJECT / COUNTER buttons; sweep screenshot build/call/shots/68731.png
 func,0x000687C5,trade_counter_offer,strong,trade.c; direct call (all-zero args) shows 'Enter counter offer'; called by func_000685EC
-func,0x0006BE24,bank_deposit_letters_of_credit,candidate,bank.c; direct call (all-zero args) shows 'Am I to understand that you would like to deposit all of your letters of credit?'; no direct caller
-func,0x0006C0F7,bank_buy_house,candidate,"bank.c; direct call (all-zero args) shows 'it is a seller's market for houses, there are none available'; no direct caller"
-func,0x0006C153,bank_sell_house,candidate,bank.c; direct call (all-zero args) shows 'We would gladly purchase your house for the generous sum of ... gold'; no direct caller
-func,0x0006C1C9,bank_buy_ship,candidate,"bank.c; direct call (all-zero args) shows 'You already own a ship, you must sell it before you can buy another'; no direct caller"
-func,0x0006C225,bank_sell_ship,candidate,bank.c; direct call (all-zero args) shows 'Your ship is worth ... gold'; no direct caller
-func,0x0006C818,bank_house_bought,strong,"bank.c (strings Crossing, region names); direct call (all-zero args) shows 'Congratulations! You have purchased a lovely home here in Crossing'; no direct caller (a handler)"
-func,0x0006C924,bank_ship_bought,candidate,bank.c; direct call (all-zero args) shows 'Congratulations! You have purchased a ...' ship; no direct caller
+func,0x00068845,trade_haggle_counter,candidate,"(counter offer): compares it with the asking price and the minimum (doubles D_001A3AB4/D_001A3AAC +- the step D_001A3AD4): returns the offer when acceptable, -1 when insulting (below the minimum), 0 to go on after each side concedes a step (trade_haggle_step)"
+func,0x0006899B,trade_haggle_step,candidate,"concession step = (k - shop quality*a + buyer +0x11B and +0x2A (PER)*b + +0x93*c) * (asking - minimum), constants D_00175A96..AE"
+func,0x00068A1D,sound_init_music,candidate,"filed under trade.c, belongs to sound.c: reads hmiset.cfg (HMI driver), opens midi.bsa, 4 voices tagged 0x12345678, allocates the music buffers; caller init 4ED36"
+func,0x00068B1B,sound_shutdown_music,candidate,"filed under trade.c, belongs to sound.c: stops and frees what sound_init_music set up (closes midi.bsa, 4 voices, frees the buffers); callers 4F5F3, 6A606"
+func,0x0006B376,bank_open,confirmed,"(open): open=1 loads bank00i0/bank01i0/01i1/01i2.img, saves the screen, game_mode=15, points bank_account at this region's account, lists houses for sale (bank_add_house_for_sale) and the 2 ships; returns game_mode==15 (open=0: is the bank up?). Callers: click.c 751DB (banker) and bank_frame; experiment (scratch/econ/exp_bank*.py, bank_open(1) then clicks): mode 0->15, BANKING screen drawn"
+func,0x0006B510,bank_close,confirmed,"EXIT button D_00186E24[10] (141,164)-(179,182) and Esc: frees the images, bank_restore_houses, game_mode=0, world_running=1; experiment: EXIT click -> game_mode 15->0"
+func,0x0006B6BB,bank_frame,confirmed,"called every frame by main(): returns unless bank_open(0); bank_draw, Esc closes, hit-tests D_00186E24 rows 0-10 / 11-15 / 16-18 by bank_screen with ButtonClick 203; every bank click in the experiments ran through it"
+func,0x0006B7EE,bank_add_house_for_sale,strong,"object-walk callback (bank_open, guild_service_dispatch 'Receive House'): type-43 building objects whose building entry (location+0x2B, 26 bytes) has type 1 (house for sale); records it in bank_houses_for_sale, price = 5 x the largest model radius; max 20; experiment: 20 houses in Daggerfall city (morthag1) priced 363485..669645"
+func,0x0006B987,bank_init_ships,strong,"fills bank_ships_for_sale: model 415, ship id 0x3E00001 for 100000 and 0x3E10001 for 200000, count 2 (experiment: dumped after bank_open)"
+func,0x0006BA50,bank_draw,strong,"restores the saved screen, draws the window; screen 0: balance (197,19), gold incl. letters of credit (203,29), loan owed and due date if a loan; screen 1/2: house or ship list + bank_draw_preview; the experiment screenshots show these values"
+func,0x0006BCCC,bank_deposit_gold,confirmed,"D_00186E24[0] DEPOSIT (166,60): amount from bank_input_amount; 454 'You do not have enough gold.' if character+0x85 < amount; experiment: 1000 -> balance +1000, gold -1000"
+func,0x0006BD2D,bank_withdraw_gold,confirmed,"D_00186E24[1] WITHDRAW (217,60): 290 'not that much in your account' (offers all), 'You cannot carry so much gold.'; experiment: 50 -> gold +50, balance -50"
+func,0x0006BDB8,bank_deposit_letter,strong,"object-walk callback of bank_deposit_letters_of_credit: item group 27 index 2 (letter of credit): balance += item+0x24 value, item destroyed; experiment: deposit-all moved 90700 into the account"
+func,0x0006BE24,bank_deposit_letters_of_credit,confirmed,"D_00186E24[2] (165,78): asks 291 'deposit all of your letters of credit?' then walks the player's items with bank_deposit_letter; experiment (morthag1): YES -> balance +90700 = the inventory's letters of credit | earlier: bank.c; direct call (all-zero args) shows 'Am I to understand that you would like to deposit all of your letters of credit?'; no direct caller"
+func,0x0006BE5C,bank_withdraw_letter_of_credit,confirmed,"D_00186E24[3] (217,78): 293 under 100 gold; fee = amount/100 + 1 (292 if the account cannot cover it); makes item group 27 index 2 with value = amount; experiment: 200 -> balance -203, 300 -> -304"
+func,0x0006BF30,bank_repay_loan,confirmed,"D_00186E24[4] REPAY (165,96): from the account, then from carried gold; 294 on overpayment; clears the due date when paid; experiment: 100 -> balance -100, owed 330000 -> 329900"
+func,0x0006C008,bank_borrow,confirmed,"D_00186E24[5] BORROW (217,96): 288 if defaulted (flags bit 0), 289 if a loan is open, 296 under 100, 295 over level*50000; owed = amount*1.1, due = now + 518400 min (360 days), balance += amount; experiment: 1000 -> owed 1100, due 3506891+518400"
+func,0x0006C0F7,bank_buy_house,confirmed,"D_00186E24[6] HOUSE BUY (165,114): 287 'no houses available' if none listed, 286 if character+0x74 is set, else bank_screen=1 (house list); experiment: refused with a house (tlalac), opened the 20-house list (morthag1) | earlier: bank.c; direct call (all-zero args) shows 'it is a seller's market for houses, there are none available'; no direct caller"
+func,0x0006C153,bank_sell_house,confirmed,"D_00186E24[7] HOUSE SELL (217,114): offer = bank_house_price - 15% (298), on YES balance += offer, clears character+0x74; experiment: house bought for 363485 offered 308963 | earlier: bank.c; direct call (all-zero args) shows 'We would gladly purchase your house for the generous sum of ... gold'; no direct caller"
+func,0x0006C1C9,bank_buy_ship,confirmed,"D_00186E24[8] SHIP BUY (165,132): 284 if character+0x78 is set, 285 'This is not a port town' if D_001968BB is 0, else bank_screen=2; experiment: refused (morthag1, no port), ship list opened (kralvamp, port) | earlier: bank.c; direct call (all-zero args) shows 'You already own a ship, you must sell it before you can buy another'; no direct caller"
+func,0x0006C225,bank_sell_ship,confirmed,"D_00186E24[9] SHIP SELL (217,132): offer = bank_ship_price - 15% (299); experiment (kralvamp): large ship 200000 sold for 170000, character+0x78 cleared | earlier: bank.c; direct call (all-zero args) shows 'Your ship is worth ... gold'; no direct caller"
+func,0x0006C29B,bank_draw_preview,strong,"(count, model list): renders the selected house's or ship's 3D models in the preview pane, zoom keys adjust bank_preview_distance (100..2000); callers bank_draw only; the house and ship previews appear in the experiment screenshots"
+func,0x0006C55B,bank_draw_house_list,strong,"11 rows from bank_list_top: 'Price : %ld gold' at (52, 38+7k), selected row in colour 246; scroll arrows bank01i1/i2; seen in the experiment screenshot"
+func,0x0006C692,bank_draw_ship_list,strong,"the 2 ship prices (100000 / 200000) at (52, 38+7k); seen in the experiment screenshot"
+func,0x0006C722,bank_house_list_click,confirmed,"D_00186E24[11] (52,38)-(152,117): bank_selected = bank_list_top + (y-38)/7; experiment: click y=52 -> row 2"
+func,0x0006C76F,bank_house_list_up,strong,"D_00186E24[14] (153,38)-(161,53): bank_list_top-- (scroll arrow)"
+func,0x0006C796,bank_house_list_down,strong,"D_00186E24[15] (153,102)-(161,117): bank_list_top++ while more than 11 rows remain"
+func,0x0006C7D2,bank_ship_list_click,confirmed,"D_00186E24[16] (52,38)-(152,117): bank_selected = (y-38)/7 if < ship count; experiment: row 0 picked the small ship"
+func,0x0006C818,bank_house_bought,confirmed,"D_00186E24[12] BUY (87,121) on the house list: 454 if the account is short; balance -= price, bank_house_price = price, character+0x74 = building id, 282 'Congratulations! ... a lovely home here in %cn'; experiment: balance 424106 -> 60621, house 0x4A5D058B | earlier: bank.c (strings Crossing, region names); direct call (all-zero args) shows 'Congratulations! You have purchased a lovely home here in Crossing'; no direct caller (a handler)"
+func,0x0006C924,bank_ship_bought,confirmed,"D_00186E24[17] BUY (87,121) on the ship list: 454 if short; balance -= price, bank_ship_price = price, character+0x78 = ship id, 283; experiment: small ship -> balance -100000, ship 0x3E00001 | earlier: bank.c; direct call (all-zero args) shows 'Congratulations! You have purchased a ...' ship; no direct caller"
+func,0x0006C9C3,bank_list_exit,confirmed,"D_00186E24[13] and [18] EXIT (198,121) on the house/ship lists: bank_screen = 0; experiment: back to screen 0"
+func,0x0006C9E2,bank_confirm,confirmed,(text id): yes/no popup (7DDC9) looping the bank's redraw until popup_answer is 1 (returns 1) or 2 (0); experiment: YES on 298/299/291 completed the sale/deposit
+func,0x0006CA5C,bank_input_amount,confirmed,"reads a number typed into the TRANSACTION AMOUNT field (157,152), 10 characters, redrawing the bank each frame; returns atoi; experiment: typed 1000/500/100/200/50 were used by the handlers"
+func,0x0006CB02,bank_restore_houses,candidate,on close: puts back each listed house record's +0x34 saved by bank_add_house_for_sale (the preview changes it)
 func,0x0006D91A,guild_join_or_promote,strong,"(kind, joining): joining asks 'worthy to join' (guild_messages.join_offer, e.g. 606) after guild_join_check, adds a rank-0 membership; else every 28 days (40320 min) re-ranks from guild_rank_for_skills/rep: promotion texts (5236...), demotion 667, expulsion 668; ran on every guild NPC click"
 func,0x0006DC35,guild_service_dispatch,confirmed,"click.c 7550D calls it for a guild NPC: membership by the building's faction, guild_join_or_promote, menu gild00i0/gild01i0.img (guild_menu): JOIN/TALK/service/EXIT, then the service by the NPC's faction (841 Buy Potions ... 813 Cure Diseases) with rank checks ('persons of a certain rank', 3100) or 'My services are reserved for members only.'; experiment pilot3: Mages Guild NPC -> menu, TALK -> talk_start"
 func,0x0006F484,guild_rank_roll,candidate,(rank+1)*5% chance from the Dark Brotherhood membership (a1==4) or the Thieves Guild membership (a1<3); no caller seen (a pointer?)
@@ -1728,7 +1957,36 @@ func,0x0009038D,potion_drink,strong,inv_use_item: copies the potion's spell (rec
 func,0x00090426,potion_make,strong,potions.c; string 'You do not have the ingredients required.'; direct call (all-zero args) shows that message
 func,0x0009046D,potion_have_recipe_ingredients,strong,(recipe item): every ingredient of its recipe is among the listed ingredients
 func,0x00090572,potion_load_recipe,strong,(recipe item): puts the recipe's ingredients in the cauldron (potionmaker_add_ingredient) and shows its name
-func,0x0009063D,chargen_name_character,strong,"generate.c; tamriel.img, char00i0.img, face%d%di0.cif; direct call (all-zero args) shows 'Name thyself'"
+func,0x0009063D,chargen_name_character,confirmed,"the whole stats sequence, not only the name: skills 3-6 plus career bonuses (+25/+15/+10), then screens name (char00i0), face (char01i0, face%d%di0.cif), attributes (char02i0), skills (char03i0), reflexes (char05i0), summary (char04i0); returns 1 to restart; experiment (scratch/econ/exp_chargen.py: tools/scenarios/newgame.txt from the title menu, calls counted per step): name -> face -> attributes -> skills -> reflexes -> summary in that order | earlier: generate.c; tamriel.img, char00i0.img, face%d%di0.cif; direct call (all-zero args) shows 'Name thyself'"
+func,0x00090C3A,chargen_draw,confirmed,"redraws the current chargen screen by chargen_screen bits (face, attributes, skills, reflexes, the 307 reflexes help, the name); returns 1 when the mouse is on OK (263,172)-(301,193); experiment: thousands of calls per screen, also the name-input callback"
+func,0x00090E79,chargen_free_images,confirmed,"chargen_screen=0 and frees the face, skill, attribute and reflex images; experiment: once, at the summary's OK"
+func,0x00090FA1,chargen_screen_loop,confirmed,"(first, last button): runs a screen with chargen_buttons[first..last] (summary: all, with the reflex rows moved); OK returns 0 when all bonus points are spent, else 14 'You must distribute your bonus points.'; returns 1 for a restart; experiment: one call per screen"
+func,0x0009114E,chargen_reflexes_button,strong,"chargen_buttons[35-39] (127,148..192): character+0x82 reflexes = row (0-4)"
+func,0x0009117A,chargen_draw_face,confirmed,draws face number character+0x80 from the face%d%di0.cif images; experiment: per frame on the face screen
+func,0x00091247,chargen_draw_attributes,confirmed,"the 8 attributes, bonus points and the derived %dam %enc %spt %mad %thd %hea lines (50344); experiment: per frame on the attribute and summary screens"
+func,0x000914C8,chargen_draw_skills,confirmed,"3 group arrows with points left, the 12 career skill names and values; experiment: per frame on the skills screen"
+func,0x00091657,chargen_ok_button,strong,"chargen_buttons[0] (263,172)-(301,193): empty handler (chargen_screen_loop tests OK itself)"
+func,0x0009166F,chargen_name_button,strong,"chargen_buttons[1] (8,2)-(315,13): renames the character (classmaker_input_text(character, 31, chargen_draw)) on the summary"
+func,0x0009169B,chargen_select_skill,confirmed,"(button 2-13): moves its group's arrow (primary 2-4, major 5-7, minor 8-13) to that skill; experiment: ran on each skill click"
+func,0x000917F0,chargen_attribute_button,confirmed,"chargen_buttons[20-27] (7,20+22k): chargen_select_attribute(button-20); experiment: clicked STR"
+func,0x00091817,chargen_skill_arrow,confirmed,"chargen_buttons[14-19]: up/down for the selected skill of each group, spending the group's 6 points, not below the start value; experiment: 6 clicks per group"
+func,0x0009190C,chargen_attribute_arrow,confirmed,"chargen_buttons[30] up / [31] down: selected attribute +-1 against the bonus points (max 100, not below the roll); experiment: ten points into STR"
+func,0x000919FE,chargen_face_previous,strong,"chargen_buttons[33] (245,69)-(286,77): character+0x80 face - 1 (wraps to 9)"
+func,0x00091A4B,chargen_face_next,strong,"chargen_buttons[34] (287,69)-(312,77): character+0x80 = (face + 1) % 10"
+func,0x00091A99,chargen_roll_attributes,confirmed,"chargen_buttons[32] (263,142)-(301,168), DiceRoll2 (220): each attribute = rand(class+0x3A[k], +10) capped 100, bonus points rand(6,14); on the summary it restarts character creation (chargen_screen_loop returns 1, title_menu goes back to the province map); experiment: called once on entering the attribute screen"
+func,0x00091B80,chargen_select_attribute,confirmed,"(k): chargen_selected_attribute = k, moves the arrow boxes to its row; experiment: ran on entering and on the STR click"
+func,0x00091BFB,chargen_restore_roll,strong,"chargen_buttons[29] (162,172)-(232,178): puts back the saved attributes, minimums and bonus points if a roll was saved"
+func,0x00091C91,chargen_save_roll,strong,"chargen_buttons[28] (162,162)-(232,169): saves the attributes, minimums and bonus points (chargen_saved_*)"
+func,0x00091D20,inv_match_arrows,strong,"filed under generate.c, belongs to inven.c: object-walk callback: an item (type 2) with record id 998 and +0x1B 0 (an arrow stack) -> found_record; callers inv_add_arrows, inv_merge_arrows, inv_take_arrow"
+func,0x00091D8D,inv_sum_hidden_weight,strong,"inven.c callback: adds item+0x39 weight of items flagged hidden (item+0x2A & 64) to faction_scratch; callers inv_toggle_hidden, inv_update_hidden_load"
+func,0x00091DE1,trade_add_buy_price,strong,"inven.c callback of trade_total_buy: unpaid goods (object flag 0x20): value (x count for arrows) into trade_total, half price on holiday 49 for weapons at a weapon smith, holiday 29 at a general store, or a sale flag; also the steal penalty sum D_00190CA8"
+func,0x00091F7C,trade_add_repair_cost,strong,"inven.c callback of trade_total_repair: items not in repair add value*10% (no enchantment) or value*75% (enchanted) to trade_total, min 1"
+func,0x00092013,inv_return_unpaid_item,strong,"inven.c callback (inv_close_return_unpaid, trade_clear_button): unpaid goods go back to the right container and are unequipped; bought arrows merge back"
+func,0x0009219A,inv_store_callback,strong,inven.c callback: inv_store_item for items (type 2); caller inv_close_return_unpaid (via 96AB4)
+func,0x000921CC,inv_claim_item,strong,"inven.c callback (inv_claim_items, trade_steal_button): clears the unpaid flag, stores the item unless it is in the wagon, a bought wagon (group 23 index 0) creates the wagon"
+func,0x00092280,inv_assign_item_id,strong,"inven.c callback (inv_close_assign_ids, 86D37): gives an item a new record id 100<<16|n (8EB88) unless it has one"
+func,0x000922CA,inv_reset_left_list,strong,"inven.c: inv_left_scroll = 0, inv_left_container = the first inventory container; callers init 4F47C, 50E3F, loadsave 7A983"
+func,0x000922F6,inventory_open_container,strong,"inven.c: (container, trade mode, icon) sets inv_right_container(_base) and inventory_open(2, ...), else frees the container; callers the guild services, click.c shops, quests"
 func,0x00092349,inventory_load_images,confirmed,"loads inve00/01/02/05/06/07i0.img, shop00i0.img, inve16i0.cif and inve%02di0.img (trade mode*2+6/+7); exp: called once when F6 opens the inventory (save_tlalac_s)"
 func,0x00092476,inventory_free_images,confirmed,frees the same image handles (inven.c lines 322-334) and poisons them with 0x97979797; exp: called once by EXIT
 func,0x000926AD,inventory_open,confirmed,"(how 0 key/1 fresh/2 given container, trade_mode, right icon): with how=0 opens on key action 37; refuses if race>8 ('You cannot access the inventory while shapechanged...', seen in save_kralwolf); creates the ground pile, sets game_mode=4; exp: F6 -> game_mode 0->4; callers sheet/HUD icon (1,0,2), identify spell (1,4,8)"
