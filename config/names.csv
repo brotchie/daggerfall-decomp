@@ -3,6 +3,7 @@ global,0x000C0BA8,disk_last_file_size,confirmed,length of the last file disk_rea
 global,0x000CAF24,spell_cost_formulas,strong,"7 function pointers (0x3937B, 0x3946E, 0x395AA, 0x39635, 0x396C0, 0x3978C, 0x3988A), the jump table of func_000CAE07 (jmp [eax*4+0xCAF24]); in xn_CAF00.asm"
 global,0x000CAF40,spell_effect_handlers,confirmed,"60 function pointers: 0-50 the spell effects (0x88CF5 Paralyze ... 0x8A344 Recall (43) ... 0x8A4BD), 51-54 kludge.c (0x44EE0, 0x44F5C, 0x44F3A, 0x44EFD), 55-58 disease.c (0x66352, 0x6691F, 0x66D3C, 0x67309), 59 0x45B41; in xn_CAF00.asm; exp1b (build/names/scratch/magic/exp1b.py, save_morthag1): 22 effect types reached the handlers listed"
 global,0x000CDE2F,internal_check_failed,candidate,non-zero: fatal_error reports 'Failed internal check %lx.' with it instead of the message
+global,0x00120290,pick_distance,strong,distance to the clicked object: every click handler refuses beyond 128/150/160/256 with 'You are too far away...'
 global,0x0012AC00,mouse_buttons,strong,byte: mouse button state; inventory_frame and transport_menu act when it is set and was not last frame
 global,0x0012AC02,mouse_double_click,candidate,"with Enter, opens a where-is category in talk_list_click (experiment: double-click opened Taverns)"
 global,0x0012AC04,mouse_x,confirmed,"compared with the x of button rects (talk_buttons, guild menu); experiment: clicks at x,y called the matching handler"
@@ -20,24 +21,42 @@ global,0x0012DA74,font_glyphs,candidate,pointer to the current font's glyph tabl
 global,0x0012DE00,dungeon_water_level,strong,SAVEVARS.DAT 0x17A8 (DFU dungeonWaterLevelOffset); 10000 = no water (init 4F4B7); init 50A25 compares the eye height with it
 global,0x00142308,key_down,strong,"key state by scan code: keys.c returns key_down[key_map[action]]; the automap reads +0x01 Esc, +0x48 up, +0x50 down, +0x4B left, +0x4D right, matching key:up/down/left/right lifts on its move functions"
 global,0x00142309,key_down_esc,strong,"key_down[0x01] (Esc): ends the automap, town map and sheet loops"
+global,0x00142314,key_down_minus,candidate,key_down[0x0C]: with cheat_mode runs 45F25 (keys_world_actions)
+global,0x00142315,key_down_equals,candidate,key_down[0x0D]: with cheat_mode runs 45F8F (keys_world_actions)
 global,0x00142324,key_down_enter,strong,key_down[0x1C] Enter
+global,0x00142325,key_down_ctrl,strong,key_down[0x1D]: Ctrl with the cheat keys (Ctrl+F1/F4/F9) and Ctrl+Shift+X (exit) in keys_world_actions and class_questions_run
+global,0x00142326,key_down_a,strong,key_down[0x1E]: answer a in class_question_get_answer (chargen play: key a)
+global,0x00142332,key_down_lshift,strong,"key_down[0x2A]: Ctrl+LShift+X exits the game (keys_world_actions, class_questions_run)"
+global,0x00142335,key_down_x,strong,key_down[0x2D]: Ctrl+LShift+X exits the game
+global,0x00142336,key_down_c,strong,key_down[0x2E]: answer c in class_question_get_answer (chargen play: key c)
+global,0x00142338,key_down_b,strong,"key_down[0x30]: B, answer b in class_question_get_answer; Ctrl+B opens the save screen (7B222(1)) in keys_world_actions"
+global,0x00142340,key_down_alt,strong,key_down[0x38]: Alt+F11 runs cheat_return_to_last_position (docs/play.md: Alt+F11 goes back to the last position)
+global,0x0014234F,key_down_home,strong,key_down[0x47]: Home moves the text cursor to the start (inpstr_read_key code 131)
 global,0x00142350,key_down_up,strong,key_down[0x48]: automap_move_forward (key:up x2.3)
 global,0x00142351,key_down_pgup,strong,key_down[0x49] PgUp: talk list up x10
 global,0x00142353,key_down_left,strong,key_down[0x4B]: automap_move_left (key:left x4.5)
 global,0x00142355,key_down_right,strong,key_down[0x4D]: automap_move_right (key:right x2.9)
+global,0x00142357,key_down_end,strong,key_down[0x4F]: End moves the text cursor to the end (inpstr_read_key code 130)
 global,0x00142358,key_down_down,strong,key_down[0x50]: automap_move_back (key:down x6.7)
 global,0x00142359,key_down_pgdn,strong,key_down[0x51] PgDn: talk list down x10
 global,0x00142928,pen_x,candidate,short: x where the book/logbook line is drawn; start point of XnGine's line draw 1532B4
 global,0x0014292C,pen_y,candidate,short: y of the pen
 global,0x00143550,screen_buffer,strong,pointer to the 320-wide 8-bit frame buffer every inventory blit writes (y*320+x)
 global,0x00147954,big_buffer,candidate,"pointer to a large shared buffer; talk uses +16384 (topics), +90000 (answer text), +95000 (logbook copy)"
+global,0x00152A02,joystick_status,candidate,"1 on (the controls rebind reads the joystick), 2 off; set from joystick_setting by the DISABLED box; 2 in save_tlalac_s"
+global,0x00152A20,joystick_x,candidate,axis: bindings 204/205 test < 0 / > 0; +-2048 thresholds pick the joystick screen's arrow (options_joystick_direction)
+global,0x00152A24,joystick_y,candidate,axis: bindings 206/207; options_joystick_direction
+global,0x00152A30,joystick_button1,candidate,binding 200 in key_action_held; the controls screen's rebind takes 200 when it is set
+global,0x00152A31,joystick_button2,candidate,binding 201 in key_action_held / options_controls_rebind
 global,0x00153404,cfg_helmet,strong,config key 'helmet'; init_game_data switches an XnGine mode (153500) by it
 global,0x0017886C,weapon_skills,strong,"skill per weapon index (item+0x22): 28 short blade, 29 long blade, 31 axe, 32 blunt, 33 archery (indexes 16/17 bows); damage_resolve_attack uses it"
+global,0x001788CF,steer_max_accel,candidate,"(mouse turn rate * 2) + 4, set each frame by player_movement_update; caps the steering acceleration D_001A5AFC"
 global,0x001788DF,trade_price_scale,strong,price factor /256: guild_confirm_price applies it; guilds set (10-rank)/10 discounts and 128 (half) on holidays
 global,0x001788E3,travel_filter,strong,"4 bits toggled by the bar's DUNGEONS(1) HOMES(2) TEMPLES(4) TOWNS(8) quadrants (screenshot labels), lit by travel_draw_buttons; a location is drawn when its type's category bit (location_type_category) is set; 0xF in 4 saves"
 global,0x001788E4,controls_file,candidate,pointer to the controls file name (config key 'controls' copies 4 characters into it); init_game_data opens it
 global,0x001789F8,cast_anim_state,strong,"short: casting animation, element << 4 | frame, -1 idle (cast_anim_start, cast_anim_update)"
 global,0x001789FA,player_environment,confirmed,"1 outside, 2 inside a building, 3 dungeon or palace: constant across 16 states in 3 groups (docs/state.md)"
+global,0x00178A01,player_speed,strong,"short: forward speed this frame; intrface_steer sets player_base_speed, the regions scale it"
 global,0x00178A08,msgbox_wrap_width,candidate,short: line width passed to text_rsc_load for message boxes
 global,0x00178A0A,selected_spell,strong,"the current spell for the spell shop, the spellmaker and the spellbook (UI and magic agents); was spellshop_spell; the selected 89-byte spell record (spellshop_update), bought by spellshop_buy"
 global,0x00178A0E,travel_options,strong,"trip options: bits 0/1 cautious/reckless, 2/3 foot-horse/ship, 4/5 inns/camp out (pairs toggled by the popup boxes, ticks at D_0018886C); reckless halves the time, camp x300/256, inns and ship cost gold; 0x19 or 0x16 in saves"
@@ -86,11 +105,17 @@ global,0x0017B202,spell_effect_cost_formula,strong,"byte per effect type 1-7: sp
 global,0x0017B235,spell_target_cost_factor,strong,"5 shorts by target type (caster, touch, distance, area, area at distance) = 2, 2, 3, 4, 5: costs are multiplied by it and halved (spell_cost, spellmaker price)"
 global,0x0017B23F,spellmaker_buttons,strong,"18 x {x0,y0,x1,y1,handler}: 5 elements, 5 targets, BUY, NEW, EXIT, add effect, ICON, icon up/down, SPELL NAME (dumped from FALL.EXE; layout matches open_0x36F69.png)"
 global,0x0017B317,spellmaker_setting_buttons,strong,"34 x {rect, handler}: 11 setting spinners (duration/chance/magnitude rows at y 94/114/134), their up and down halves (11-32), and the panel exit (33)"
+global,0x0017B41C,binding_names_base,candidate,"indexed by bindings 200+ (the table proper starts 800 bytes on): [200] JOY 1, [202] M 1, [203] M 2, [212] M 3; options_controls_draw"
 global,0x0017B4C0,skill_advance_multipliers,strong,"35 shorts 12,1,1,5,15..,2,1,2,2,1,2,1,4,50,1,2,1,1,2,1,2,2,2,2,2,1,8 = DFU's per-skill advancement multipliers; used by skill_ready_to_advance and guild training"
 global,0x0017B506,sheet_buttons,confirmed,"23 x {x0,y0,x1,y1,handler} hit boxes for the sheet (dumped from the image): NAME row, INVENTORY, SPELLBOOK, AFFILIATIONS, PRIMARY/MAJOR/MINOR/MISC, HISTORY, LOG, HEALTH row, FATIGUE row, EXIT, 8 attribute boxes, 2 level-up spinner arrows; boxes match the labels in docs/play.md"
 global,0x0017B62F,anim_mirror_facing,candidate,"facing 5,6,7 -> 3,2,1 for the mirrored sprite views (monster_set_action sets monster+0x2D2 bit 7); DFU uses the same 8 views with flips"
 global,0x0017B630,msgbox_border_sizes,candidate,"bytes {w, h} per border style: 22x22, 17x17, ..."
 global,0x0017B6CD,guard_team,candidate,byte 1: team (character+0x229) given to spawned guards; guards_are_present tests it
+global,0x0017B6D0,spellbook_buttons,strong,"9 x {x0,y0,x1,y1,handler}: name, icon, 3 effect boxes, DELETE, UP, DOWN, EXIT; SORT (between UP and DOWN on the picture) has no entry"
+global,0x0017B790,options_buttons,confirmed,"10 x {x0,y0,x1,y1,handler}: SAVE GAME, LOAD GAME, EXIT GAME, SOUND, MUSIC, DETAIL bars, FULL SCREEN, HEAD BOBBING, CONTROLS, CONTINUE; screenshot options2.png and exp_options.py clicks"
+global,0x0017B808,controls_buttons,confirmed,"42 x {rect, handler}: the 38 bindings in key_map order (FORWARD .. INVENTORY), JOYSTICK, MOUSE, DEFAULT, CONTINUE; screenshot controls.png"
+global,0x0017BA0C,options_mouse_buttons,confirmed,"7 x {rect, handler}: CURSOR, VIEW, HORIZONTAL, VERTICAL, TURN RATE, REVERSE VERTICAL, CONTINUE; screenshot mouse.png"
+global,0x0017BA60,options_joystick_buttons,strong,"6 x {rect, handler}: DISABLED, CALIBRATE, LOW, MED, HIGH, CONTINUE; screenshot 445B5.png"
 global,0x0017BB6C,macro_table,strong,"start of the 255 text macro entries {char name[5]; char *(*handler)(void)} (9 bytes), grouped by first letter (tools/asset_ids.py, build/assets/macros.csv)"
 global,0x0017C47E,macro_letter_tables,strong,"per-letter pointers into macro_table, indexed by c-'a' (digits: c-23); parse_expand looks a %name up only in its letter's table"
 global,0x0017C4F2,macro_letter_counts,strong,"short count of entries per letter table (a 11, b 6, c 14, d 14 ... q 40, 1 9, 2 6, 3 6)"
@@ -152,6 +177,7 @@ global,0x001842D9,monster_weights,strong,"u16 weight per creature type: Rat 2, I
 global,0x0018432D,imperial_names,strong,"""Pelagius"",""Cephorus"",""Uriel"",""Cassynder"" (%imp)"
 global,0x00184644,location_type_names,strong,"10 pointers: Town, Village, Community, Farm, Dungeon Entrance, Temple, Tavern, Castle, Manor, Shrine (%ct)"
 global,0x0018467C,text_blank,confirmed,"pointer to ""BLANK"": what the unimplemented macros return (%cn2 %du %hc %pd ...); experiment: their direct calls returned ""BLANK"""
+global,0x001846FC,key_names,strong,"string pointer per scan code drawn on the controls screen: [72] UP, [73] PG UP, [14] BCKSPC, [57] SPCBAR, [28] ENTER, [56] ALT"
 global,0x0018484C,default_key_map,strong,38 bytes copied to key_map by init_game_data before the controls file is read
 global,0x0018487A,monster_table,strong,"29-byte records by creature type (character+0x43): +0 HP bonus, +1 armor (x5 into armor_values), +2 loot table (1-based A..), +3 weapon material needed to hit, +4 flags, +6 attack damage min/max x3, +26/27 a range, +28 level; monster_init reads it; values = DFU EnemyBasics (Rat 1d8+8 HP = 9-16, damage 1-4, level 1; Frost Daedra 50-100, level 17, armor -5)"
 global,0x0018487E,monster_table_flags,strong,"monster_table+4 as the code reads it (u16 per type): bit 0 flying (Imp, Bat, Harpy, Ghost, Wraith), 1 spellcaster (Imp, Ghost, Wraith, daedra, vampires, liches, caster classes: monster_init_gear gives class types spells by it), 2 can open doors (DFU CanOpenDoors), 4 spectral (Ghost, Wraith), 5 shoots arrows (class types; ai_creature_think's archer branch), 6 aquatic (Slaughterfish, Dreugh, Lamia)"
@@ -162,6 +188,9 @@ global,0x0018513E,body_part_armor_slots,strong,"equipped slot per body part: 12 
 global,0x00185148,note_buttons,strong,"14 x {x0,y0,x1,y1,handler}: 0 exit 4D904 .. 13 goto page 4E227 (read from FALL.EXE)"
 global,0x001851FF,note_colour,candidate,short: colour of new elements
 global,0x00185208,cfg_texture_memory,strong,config key 'TextureMemory'; init_game_data passes it <<10 to XnGine 136026
+global,0x0018520B,class_answer_kinds,candidate,[question-1][answer] -> answer kind 0..2 (class_questions_run)
+global,0x00185291,class_result_ids,candidate,"class number per classes.dat result (17 16 15 14 10 7 ...), confirmed with text 2100+class"
+global,0x001852A3,class_answer_cels,strong,"3 file names warrior.cel, rogue.cel, mage.cel played for an answer kind"
 global,0x00185370,classmaker_advantage_sublists,strong,per advantage its sub-choice string list or 0 (Acute Hearing none; Bonus to hit -> Animals/Daedra/Humanoid/Undead in the experiment)
 global,0x001853A0,classmaker_advantage_costs,confirmed,"per advantage a pointer to 16.16 costs per sub-choice (e.g. Acute Hearing 3277 = 0.05, Bonus to hit Animals 19661 = 0.3); experiment: multiplier 1.0 -> 1.05 -> 1.35"
 global,0x0018549C,classmaker_disadvantage_sublists,strong,per disadvantage its sub-choice list or 0
@@ -187,6 +216,7 @@ global,0x00185C2A,spell_impact_sounds,strong,5 sound ids by element: 357 358 355
 global,0x00185C34,magic_school_skills,strong,"first 6 bytes: skill ids 25 Alteration, 23 Restoration, 22 Destruction, 27 Mysticism, 26 Thaumaturgy, 24 Illusion by school; spell_cost reads character skills at +0x9D+6*skill"
 global,0x00185C3A,spell_element_class_bits,strong,"5 bytes by element: the class tolerance bit (fire 8, frost 16, poison 4, shock 32, magic 2) passed to spfx_resist_roll"
 global,0x00185C3F,spell_concealment_effects,candidate,"3 x {byte effect, u32 conditions mask}: Invisibility 0x4, Chameleon 0x1000, Shadow 0x2000 (spell_break_concealment)"
+global,0x00185C58,hud_buttons,confirmed,"11 x {x0,y0,x1,y1,handler}: portrait, spellbook, interaction mode, inventory, weapon, use magic item, transport, map, rest, OPTIONS, status; matches the HUD picture, exp_hud*.py clicks"
 global,0x00185CEC,spell_hud_icon_x,candidate,"12 shorts: x of the HUD spell icons (16, 40, ... 280)"
 global,0x00185F88,item_group_templates,candidate,"per item group, a -1-ended list of template indices (index within group -> template)"
 global,0x00186A14,ai_octant_angles,candidate,"8 angles (512, 0, 1024, 512, 1536, 1024, 0, 1536) by ai_octant_toward result; ai_move_toward_target's detour headings"
@@ -214,6 +244,11 @@ global,0x0018755E,weapon_swing_types,strong,"16 swing types by mouse direction s
 global,0x0018756E,swing_to_hit_mods,strong,"s16 per sector: -10, 5, 5, 0, 0, 10 x6, 0, 0, -5, -5, -10 = DFU swing to-hit"
 global,0x0018758E,swing_damage_mods,strong,"s16 per sector: 4, -2, -2, 0, 0, -4 x6, 0, 0, 2, 2, 4 = DFU swing damage"
 global,0x001875B7,bow_anim_script,candidate,"frame script of bows (codes 3 wait for button, 5 fire, 7 reload) used by weapon_load_hand_sprite / weapon_bow_update"
+global,0x001875C0,repair_menu_buttons,confirmed,"4 x {x0,y0,x1,y1,handler}: REPAIR ITEM, TALK, SELL, EXIT; screenshot repair_menu.png, docs/play.md shopkeeper rows y 55/64/73/87"
+global,0x001875F0,coven_menu_buttons,confirmed,"4 x {rect, handler}: TALK, DAEDRA SUMMONING, QUEST, EXIT; screenshot coven_menu.png"
+global,0x00187620,service_menu_buttons,strong,"3 x {rect, handler}: TALK (two rows), the service row (label at 159,70), EXIT"
+global,0x00187670,footstep_sound_ids,strong,"pairs of footstep sound ids: 53/74 dungeon stone, 57/77 building wood, 54/75 outside, 55/76 outside in climate 5, 56/78 swimming, 90/90 SplashSmall (footstep_sounds; in play 53 54 57 74 75 77 90)"
+global,0x00187894,music_special_dungeon_ids,candidate,10 location ids (50002 .. 50032) with their own songs (music_dungeon_song)
 global,0x001878FC,class_creature_types,strong,"creature type (character+0x43) per enemy class (id-128): Mage 53, Spellsword 43, Battlemage 57, ... city watch 59 (+1 for the other sex); texture = 432+type (Mage 485/486 = DFU)"
 global,0x00187914,monster_spells_imp,strong,spell id list (255 ends) 07 0A 1D 2C; DFU EnemyEntity 'From FALL.EXE offset 0x1C0F14' (= VA 0x187914) ImpSpells; the other lists follow
 global,0x00187919,monster_spells_ghost,strong,22 (DFU GhostSpells); monster_init_gear case 18
@@ -237,6 +272,7 @@ global,0x00187A62,monster_language_skill,strong,"language skill per monster type
 global,0x00187A90,saveload_buttons,strong,"14 x {short x0, y0, x1, y1; handler}: 6 slot pictures and 6 name bars (saveload_click_slot), [12] the load/save button (saveload_confirm), [13] exit (saveload_exit)"
 global,0x00187B38,savetree_version,strong,u32 294 (0x126) that save_game writes first in SAVETREE.DAT (DFU checks 0x126)
 global,0x00187B3C,fire_flat_records,strong,"8 TEXTURE.210 record numbers that burn: 0, 1, 6, 16-20"
+global,0x00187CA4,player_momentum,candidate,"last speed, kept while airborne (no steering off the ground)"
 global,0x00187CA8,world_running,candidate,byte cleared when the inventory opens and set at close; ai_update_creatures returns while it is 0
 global,0x00187CAD,mem_check_level,strong,"non-zero turns the heap checks on (mem_check_heap, mem_check_crt_heap); args.c prints 'Memory checking is active for this session.' when set; mem_check_now raises it around a forced check; fatal_error and game_exit clear it"
 global,0x00187FB8,dispel_monster_ids,strong,"2 x 7 monster ids: undead 15 18 19 23 28 30 32, daedra 1 25 26 27 29 31 100 (spfx_dispel_creatures)"
@@ -280,9 +316,12 @@ global,0x0018F07E,region_event_groups,confirmed,14 bytes at region record +0x3A:
 global,0x0018F08E,region_legal_reputation,strong,"short per region (80-byte stride, index current_region): the Stendarr blessing adds to it ('blessed your reputation with the law', TEXT 716)"
 global,0x0018F090,region_persecuted_temple,candidate,u16 at region record +0x4C: the god faction id region_flag_set(18) picks (DFU IDOfPersecutedTemple)
 global,0x001903A4,text_buffer,strong,"sprintf target for every text line drawn by the sheet, travel map and automap (and 76 other files); D_001903A5, its second byte, is overwritten with a colour code"
+global,0x00190444,shelf_book_ids,candidate,shorts: the book id of each row of the book list
 global,0x00190484,key_was_down,strong,byte per scan code: key_pressed_once's edge memory
 global,0x00190504,creature_list,candidate,creature objects processed by ai_update_creatures (the player appended at the end each frame)
 global,0x00190704,monster_anim_records,candidate,"the loaded ASCR animation records, read only by XnGine's animation-script interpreter xn_C0100 (exp4)"
+global,0x00190904,hud_compass_image,strong,"cmpa00i0.bss, frames by yaw, drawn by hud_draw_compass"
+global,0x00190B44,inpstr_saved_text,candidate,"160-byte copy taken at the start, restored on Esc; other code uses it as a scratch string (magic_items_add_cb's parse_expand output)"
 global,0x00190BF0,automap_pitch,confirmed,"512 looking straight down, 128 in the perspective view: the grid button switched it 512 -> 128 in save_mord"
 global,0x00190BF4,automap_yaw,confirmed,the rotate buttons add/subtract 16 a frame (0 -> 512 after a click in save_mord)
 global,0x00190C34,training_state,candidate,"training_update state: 1234 ask to pay, 1235 done, 1236 skill chosen"
@@ -325,6 +364,7 @@ global,0x00191834,arena2_path_alt,candidate,"second directory searched for quest
 global,0x00191884,cfg_last_path,candidate,config_read copies each 'path' / 'pathcd' value here too ('C:\ARENA2\' in save_tlalac_s)
 global,0x001918D4,flats_cfg,strong,"FLATS.CFG records, 40 bytes: u16 picture (archive<<7|record), name, flags (2 '?', 1 '2'), three numbers; flats_cfg_find searches it"
 global,0x001940D4,view_flags,candidate,"SAVEVARS.DAT 0x3BD, 8 bytes of view/redraw flags (D_001940D5 |= 2 after a teleport, D_001940D7 |= 1, D_001940D8 |= 8); DFU weaponDrawn is bit 0x40 of 0x3BF"
+global,0x001940DB,player_motion_flags,strong,"bit 2 crouching (CROUCH toggles; exp_steer.py D: 0 -> 4 -> 0; walk steps 5 instead of 10, crouched body shape), bit 5 climbing ('Climbing mode.'), bit 6 cleared by player_motion_clear_bit6"
 global,0x001940DC,horse_overlay_image,strong,mred00i0.cfa (init_game_data); player_frame_update draws it while riding a horse (transport flag 0x200)
 global,0x001940E0,cart_overlay_image,strong,mred01i0.cfa (init_game_data); player_frame_update draws it with a cart (transport flag 0x400)
 global,0x001940E4,location_grid,candidate,32x32 object pointers: dungeon blocks (1024 units) or town blocks (4096)
@@ -343,7 +383,8 @@ global,0x001959A8,nonworld_root,strong,"type-39 object (DFU classic name NonWorl
 global,0x001959AC,frame_counter,confirmed,main()'s loop does D_001959AC++ once per iteration (src/hand/func_00010010.c); rises ~119 per 400 timer ticks
 global,0x001959B0,logbook_object,confirmed,"object whose data (+0x47) is the logbook record: 32 quest ids, 32 x 10 message ids, times and places; exp4 (scratch/text/exp4.py save_morthag1): its data changed as logbook_add_entry wrote"
 global,0x001959B4,options_object,strong,"type-23 record (DFU 'Options', fixsave 'user options'), 6 bytes of data; init.c creates it, savetree_register_record sets it"
-global,0x001959B8,view_angle_offsets,strong,SAVEVARS.DAT 0x70: 3 ints added to the camera object's pitch and yaw for the 3D view (main.c 10B11)
+global,0x001959B8,view_look_pitch,confirmed,"+-256: LOOK UP/DOWN (Ins/Del) add -+32, CENTER VIEW (Home) sets 32, LOOK AROUND moves it with the mouse; exp_steer.py: Ins -> -256, Home -> 32"
+global,0x001959BC,view_look_yaw,candidate,+-512: LOOK AROUND (Alt held) adds horizontal mouse motion (player_mouse_look); CENTER VIEW zeroes it
 global,0x001959C4,savevars_0e1,candidate,"SAVEVARS.DAT 0xE1, 20 bytes, unknown"
 global,0x001959D8,inventory_containers,confirmed,"9 container slots (objects agent): 0-3 the inventory tabs, 4 the wagon, 5-8 house, ship, rented rooms, items in repair; 5 container objects (record type 52) under player_entity: tabs 0 weapons/armor, 1 magic items, 2 clothing/misc, 3 ingredients, 4 wagon; exp: tab click lists inventory_containers[tab]"
 global,0x001959E8,wagon_container,confirmed,inventory_containers[4]: exp: WAGON lists it on the right; capacity 3000 (750 kg) and '%s / 750'
@@ -364,19 +405,24 @@ global,0x00195A78,strength_bonus_end,candidate,game_minutes + 12 when strength_b
 global,0x00195A7C,detect_target,confirmed,"object the Detect arrow points at (detect_consider); read by 5DB95 and detect_arrow_frame; exp5 (scratch/text/exp5.py save_mord, Detect bit and character+0x221 set, world_collect_objects called): the creature / loot pile / item by kind, 0 with Detect off"
 global,0x00195A80,text_macro_item,candidate,"item record the %it text macro reads ('Equipping %it', item info)"
 global,0x00195A84,text_macro_npc,candidate,"the talk NPC's record (char.c 59973, set by the NPC click 756C6): %n name, %oth oath by its race (+0x43)"
+global,0x00195A8C,jump_velocity,strong,"from player_compute_jump_velocity (-32256 in save_tlalac_s), added to vertical_velocity by the jump"
 global,0x00195A98,camera_object,strong,type-5 object (DFU classic name Eye): init.c creates it under the player object 75 units up; savetree_register_record; the 3D view's pitch/yaw/roll come from its +1/+3/+5 (main.c 10B11)
 global,0x00195A9C,current_building,strong,"the building entered: +0x12 faction (40 at the Mages Guild hall, experiment), +0x19 quality (spell list size)"
 global,0x00195AA0,player_entity,confirmed,"pointer to the player's creature entity: the character record is at +0x47 (2 saves), its parent (+0x43, the generic record header) is the world object; disease code checks entity+71 == player_character"
 global,0x00195AA4,player_object,confirmed,pointer to the player's world object: x/y/z ints at +7/+11/+15 move the player (fallplay tp); it is player_entity's parent (+0x43)
 global,0x00195AB0,frame_ticks,candidate,"time of the last frame: attack and death timers are counted down by it, movement is speed*frame_ticks/1000 (ai_creature_think, monster_move_step, weapon_player_update, 10585)"
-global,0x00195AB8,savevars_173f,candidate,"SAVEVARS.DAT 0x173F, 4 bytes, unknown"
+global,0x00195AB8,vertical_velocity,confirmed,"fall speed: gravity adds to it, fall damage from it (sounds 359/360); -8379 just after the jump in exp_steer.py"
 global,0x00195ABC,attack_angle,candidate,angle from attacker to target set by weapon_melee_strike; damage_resolve_attack passes it to damage_knockback
 global,0x00195AC4,location_object,candidate,root object of the loaded location/dungeon: its +0x1F high word is the id in the at%05d.amf/.atf file names; its children are walked for seen marks
 global,0x00195AC8,monster_bsa_handle,candidate,MONSTER.BSA's open archive handle (exp2 traces)
 global,0x00195ACC,text_macro_potion,candidate,potion recipe the %po macro reads ('Recipe for %po.')
 global,0x00195AD4,text_macro_book,strong,"book header that %bt (title, +0) and %ba (author, +64) read"
 global,0x00195AD8,ai_chosen_spell,candidate,"spell object picked by ai_pick_ranged_spell / ai_pick_touch_spell / ai_has_spell, cast by monster_cast_spell"
+global,0x00195ADC,inventory_close_callback,candidate,"set to shelf_return_items when a shelf opens the inventory, cleared by it"
+global,0x00195AE0,click_hit,candidate,"the pick record of the click (+0x04 the object), set by click_world_object"
+global,0x00195AE4,shelf_list_callback,candidate,function called with the row chosen in the book list (shelf_book_chosen)
 global,0x00195AE8,cheat_flags,strong,"bits: 3 reveal maps (Ctrl+F1), 6 no spell damage to the player (Ctrl+F4, spfx_damage), 0 SPELLS.STD editing in the spellmaker, 2 free enchanting (itemmaker_enchant), 7 creatures cast nothing (cast_spell_on); keys.c toggles 3 and 6 in cheat mode"
+global,0x00195AEC,shelf_object,candidate,the shelf whose items are in trade_container
 global,0x00195AF0,tavern_building,confirmed,"pointer to the building entry whose room is rented: tavern_open sets it to current_building (rest.c too); the rent fields are written there (experiment: building+0x02 expiry, +0x0F 2)"
 global,0x00195AF4,found_record,candidate,result of the membership searches (object pointer)
 global,0x00195AFC,picklist_image,strong,pick00i0.img (picklist_open*)
@@ -394,25 +440,33 @@ global,0x00195B48,spell_ready_touch,strong,spell object readied for a touch
 global,0x00195B50,guild_npc_object,strong,the clicked guild NPC object (guild_service_dispatch)
 global,0x00195B54,weight_total,strong,accumulator object_weight_add adds to; object_weight returns it
 global,0x00195B58,spellshop_icons,strong,"mask04i0.img, spell icons drawn by spellshop_draw_spell"
+global,0x00195B68,hud_bar_image,strong,"main00i0.img (init 4ED36), the HUD bar drawn by hud_draw"
+global,0x00195B6C,hud_mode_icons,strong,"main01i0.img: the interaction-mode icon, frame per interaction_mode, at (131,154)"
 global,0x00195B74,paperdoll_mask,candidate,125x? buffer: slot+64 per pixel where an item was drawn (paperdoll_draw_item)
+global,0x00195B78,hud_portrait,candidate,"2048-byte portrait image drawn centred at (23,176) by hud_draw"
 global,0x00195B7C,list_popup_callback,strong,"function called with the entry picked in a list popup (spells_list_poll): spellmaker_pick_effect_cb/pick_subtype_cb, itemmaker_add_power_cb, ..."
 global,0x00195B84,shared_scratch,candidate,"a scratch int shared by unrelated code: faction walks, the Detect distance, gold amounts, spell code (text, magic and combat agents); was faction_scratch"
 global,0x00195B88,icon_image,strong,icon00i0.img loaded by init_game_data
+global,0x00195B8C,inpstr_result,strong,"value of the finished entry (atoi), set by inpstr_update"
 global,0x00195B90,buttons_rci,strong,buttons.rci loaded by init_game_data
+global,0x00195B94,inpstr_text,strong,the string being edited (inpstr_begin_*)
 global,0x00195B98,hud_message_expiry,strong,16 BIOS tick counts (0 = free slot)
 global,0x00195BD8,hud_status_expiry,strong,BIOS tick count when the status line goes
 global,0x00195BDC,current_location,strong,"location record: +0x29 building count, +0x2B 26-byte building records (talk lists them, town_has_building)"
 global,0x00195BE0,player_character,confirmed,"pointer to the player character record (= *player_entity + 0x47): name, attributes, level, gold, magicka in every save (docs/state.md)"
+global,0x00195BE4,cursor_arrow_image,strong,"arrow.raw loaded by intrface_init, drawn by cursor_draw_arrow"
 global,0x00195BE8,window_image,strong,"background image of the open window: talk01i0.img (talk), spbk01i0.img (spell shop); freed on close"
 global,0x00195BEC,player_class,strong,"the class (career) record inside the character (player_character+0x230): item_forbidden_for_class reads +0x0B forbidden materials and +0x0E forbidden armor/shield/weapon bits (message 1068); disease/poison code reads immunity bits at +0x01, which fit class advantages"
 global,0x00195BF4,game_minutes,strong,"game time in minutes: %1440 with 1080/360 for 18:00/06:00 when trips end, 'Days left' = /1440, training once per 720, automap notes kept 43200 (30 days), files 129600 (90 days); save_blades = day 671 22:10"
-global,0x00195BF8,options,strong,"options_object+0x47: u16 flags (bit 0 picks the view centre 160,100 or 160,77, bit 2 set when DAGGER.GRD exists), then two shorts init.c sets to 127 and 128 (+4 goes to sound 698AF on load)"
+global,0x00195BF8,game_settings,confirmed,"pointer to the settings record (settings+...): FULL SCREEN / HEAD BOBBING bits, detail, sound and music volume; exp_options.py read and changed it"
 global,0x00195BFC,hud_message_ptrs,strong,16 pointers to the top messages' text
 global,0x00195C40,load_tick,candidate,SAVEVARS.DAT 0x3CD; load_game and init set it to the BIOS tick (0x46C)
 global,0x00195C44,scratch_buffer,candidate,"pointer to a large work buffer: +55000 popup text, +60000 status list, 50000 bytes of town-map notes"
 global,0x00195C50,cfg_map_file,strong,"config key 'mapfile' (12 characters, config flag 4); a name starting with 'd' starts in a dungeon (environment 3)"
 global,0x00195C5C,cfg_item_file,strong,config key 'item' (20 characters)
+global,0x00195C74,floor_height,candidate,y the falling object stops at (object_apply_gravity)
 global,0x00195C78,trespassing,strong,"int: the main loop's trespass test (interior restriction - building access > 0, or dungeon flag): crime 2 or 3 and guards"
+global,0x00195C7C,hud_vital_bar_images,candidate,"main03i0.img: the three bar images (health, fatigue, magicka) hud_draw draws in part"
 global,0x00195C90,flats_cfg_count,strong,number of flats_cfg records
 global,0x00195C94,classmaker_file,strong,"custom class file name from the command line ('custom NAME', args.c 82A63): classmaker_run loads the class from it, classmaker_save_file writes it"
 global,0x00195CB0,ai_los_index,strong,"round-robin AI index: only that creature re-tests line of sight (23C72) this frame, setting/clearing character+0x40 bit 7; ai_update_creatures advances it mod creature_count"
@@ -440,8 +494,12 @@ global,0x00195D4C,magic_def,strong,"magic.def entries (name, kind, enchantment p
 global,0x00195D50,quest_potential_questor,strong,person picked by quest_find_potential_questor / quest_npc_offers_quest; %pqn and %pqp read it
 global,0x00195D58,talk_prostitute_price,strong,"1d(50-75) - disposition, taken from the gold"
 global,0x00195D5C,spell_cast_queue_count,candidate,int
+global,0x00195D60,spell_cast_busy,candidate,non-zero while a cast is under way: recast (keys_world_actions) and spellbook_open refuse with 'You are not ready yet.'
+global,0x00195D64,magic_items_image,strong,"main02i0.img, the USE MAGIC ITEM window (magic_items_open / close)"
 global,0x00195D68,free_later_count,strong,int
 global,0x00195D6C,text_rsc_file,candidate,"file handle from text_rsc_open('text.rsc'), closed by text_rsc_close; text.c reads messages through it"
+global,0x00195D70,head_bob_offset,strong,"view bob offset from D_0018767C (0,0,0,0,2,0,0,0,4,0), 0 without HEAD BOBBING"
+global,0x00195D74,hud_portrait_overlays,candidate,mcol00i0.cif: the portrait overlays picked by hud_portrait_overlay_index
 global,0x00195D78,text_rsc_main_file,candidate,handle of the main TEXT.RSC; parse_rsc_text and parse_rsc_text_copy switch text_rsc_file to it while reading (6 in save_dorian)
 global,0x00195D7C,player_death_timer,strong,damage_creature_death sets 1000 when the player dies (exp_c1); the frame loop (10585) counts it down by frame_ticks and main reacts when it goes negative
 global,0x00195D80,books_path,strong,directory the books are read from: arena2_path or arena2_path_alt (books_find_path)
@@ -453,6 +511,7 @@ global,0x00195DA4,qbn_opcode_arg_counts,strong,"pointer to a digit string, argum
 global,0x00195DAC,ai_monster_flags,strong,monster_table_flags of the creature being thought about (ai_creature_think); monster_move_step reads bit 0 (flying) and bit 6 (aquatic)
 global,0x00195DB0,text_macro_travel_city,candidate,"destination name for %tcn (""Do you wish to travel to %tcn?"")"
 global,0x00195DBC,cfg_magic_repair,strong,config key 'MagicRepair'
+global,0x00195DC0,click_face_texture,candidate,the clicked face's texture: +0x02 archive<<7 | record (click_world_face)
 global,0x00195DC6,painting_subject_text,strong,TEXT.RSC id of the painting subject (%sub)
 global,0x00195DC8,painting_adjective_text,strong,TEXT.RSC id of the painting adjective (%adj)
 global,0x00195DCA,painting_prefix1_text,strong,TEXT.RSC id of painting prefix 1 (%pp1)
@@ -461,14 +520,24 @@ global,0x00195E18,object_heap,strong,"jmem pool for every game object: object_he
 global,0x00195E1C,object_heap_blocks,strong,"object_heap+4: first block of the object heap, walked by mem_check_heap ('Invalid memory header.')"
 global,0x00195E2A,climate_weathers,strong,"SAVEVARS.DAT 0x3B7 and again 0x17A2 (6 bytes, DFU climateWeathers: classic reads both, the second wins); fog code 50C23 indexes it by climate (weather 3 / bit 7)"
 global,0x00195E6C,swift_state,candidate,14 bytes from SWIFT 'get position and buttons'
-global,0x00195E7A,control_settings,candidate,"54 bytes read from the controls file (config key 'controls') before the key map: +2/+3 window size / 6, +4, +8 (46 bytes copied to XnGine 152A04)"
+global,0x00195E7A,mouse_control_mode,confirmed,"0 CURSOR (steering by cursor regions), 1 VIEW (mouse look); options_mouse_cursor_mode / view_mode; 0 in save_tlalac_s"
+global,0x00195E7B,mouse_turn_rate,strong,"bits 0-6 TURN RATE (steer_max_accel = rate*2+4), bit 7 REVERSE VERTICAL"
+global,0x00195E7C,mouse_sensitivity_x,strong,HORIZONTAL sensitivity 1..15 (8 in save_tlalac_s)
+global,0x00195E7D,mouse_sensitivity_y,strong,VERTICAL sensitivity 1..15 (8 in save_tlalac_s)
+global,0x00195E7E,joystick_setting,strong,"1 joystick on, 2 DISABLED (the box is marked at 2)"
+global,0x00195E7F,view_cursor_active,confirmed,"toggled by ACTIVATE CURSOR (Enter, action 19): in view mode the mouse stops turning and clicks act at the cursor; exp_steer.py: Enter 0 -> 1"
+global,0x00195E80,joystick_threshold,strong,"CENTER THRESHOLD: 10 LOW, 20 MED, 40 HIGH"
 global,0x00195EB0,key_map,strong,"action -> scan code table (action 27 travel map = W, 12 rest = R, 24 logbook, 26 automap); matches Options > CONTROLS (travel play agent)"
 global,0x00195F22,book_count,candidate,u16 number of books found by books_scan
 global,0x00195F30,spell_effect_slot,strong,"short: effect slot (0-2) being edited/costed: the cost formulas, settings spinners and spell_cost index the spell with it"
 global,0x00195F36,text_cursor_x,candidate,"short: x of the 0xF8 input-cursor code in the last rendered box (text input), also the notebook cursor"
 global,0x00195F38,text_cursor_y,candidate,short: y of the input cursor; msgbox_draw_buttons sets it to the buttons' y (exp3: 101)
+global,0x00195F4E,player_base_speed,candidate,short: walking speed the steering starts from (7 in save_tlalac_s); also picks the horse sound
+global,0x00195F58,shelf_shop_id,candidate,short: shop owner id the shelf items return to
 global,0x00195F5C,text_macro_n_text,strong,text id the %n macro uses when nonzero (parse.c 4878B); %1com sets it to 7221-7223 (friend/stranger/buddy)
 global,0x00195F62,spell_ready_cost,candidate,"short magicka cost of the spell being cast; cast_recast_last spends it, spfx_identify refunds it"
+global,0x00195F64,mouse_motion_x,strong,"horizontal mouse motion: added to the player's yaw in view mode (player_mouse_look), to view_look_yaw when looking around"
+global,0x00195F66,mouse_motion_y,strong,"vertical mouse motion: pitch in view mode (reversed by mouse_turn_rate bit 7), view_look_pitch when looking around"
 global,0x00195F68,quest_giver_faction,candidate,"faction given to a new ""Y"" quest (quest+0x02); 240 means the current building's faction"
 global,0x00195F6A,found_marker,confirmed,"71-byte type-34 header the marker searches fill (x at +7 = D_00195F71, picture at +0x1B = D_00195F85, block id at +0x1F = D_00195F89): marker_find_first returned it in save_mord"
 global,0x00195FB1,savevars_object_copy,candidate,"SAVEVARS.DAT 0x2F8, 71 bytes (an object header's size), right after found_marker"
@@ -492,6 +561,7 @@ global,0x00196272,screen_active,candidate,"set to 1 when the sheet, travel map o
 global,0x00196274,game_mode,strong,"which screen has the input: 0 world, 3 sheet, 4 inventory, 5 spellbook, 7 options, 14 logbook, 16 rest, 19 travel map; same from 3 saves (fallstate screens); hand code already calls it MODE"
 global,0x00196275,info_popup_saved_screen_active,candidate,screen_active before the info popup
 global,0x00196276,interaction_mode,strong,"0 grab F2, 1 info F3, 2 steal F1, 3 talk F4; same from 3 saves (fallstate modes)"
+global,0x00196277,player_on_ground,confirmed,"1 standing (save_tlalac_s), 0 after J in exp_steer.py; steering only works on the ground, in water or climbing; levitation sets it"
 global,0x00196278,cfg_fade_colour,strong,config key 'fadecolor' (config_read)
 global,0x00196279,mouse_buttons_prev,strong,mouse_buttons from the last frame: handlers act on (mouse_buttons & 1) && !(this & 1); the automap copies mouse_buttons into it each frame
 global,0x0019627C,player_underwater,strong,SAVEVARS.DAT 0x3A5: init 50A25 sets it when the eye is below dungeon_water_level and switches XnGine's underwater view
@@ -503,6 +573,7 @@ global,0x00196281,swift_present,candidate,byte: a SWIFT 3D input device answered
 global,0x00196283,hud_text_shadow,candidate,"text shadow colour that follows the fog (0, 107, 119, 223); main copies it to text_shadow_colour every frame"
 global,0x00196288,inv_right_icon,strong,"byte: picture of inve16i0.cif shown for the right container: 2 ground at open, 3 wagon after WAGON (exp)"
 global,0x0019628F,text_macro_gender,candidate,"gender index (0 he, 1 she, 2 it) for %g %g2 %g3"
+global,0x00196290,player_ailment_flags,strong,"bit 0 poisoned (set by poison_tick), bit 1 diseased (spfx_disease_daily); cleared by tamriel.c; hud_portrait_overlay_index"
 global,0x00196291,cast_strike_spell,candidate,byte: 1 while func_0002E2CF casts a weapon's cast-when-strikes spell; cast_spell_on then plays the creature cast animation instead of the player's
 global,0x00196295,text_missing_ok,candidate,"byte: when set, text_rsc_load returns 0 for a missing id instead of the 'Bad DAGTEXT' text (set by logbook_build_entries)"
 global,0x0019629A,cast_ignore_silence,candidate,byte: potion_drink sets it so cast_player_spell skips the silence check
@@ -636,6 +707,12 @@ global,0x001996E8,people_max,candidate,int: people_max_count's result for this f
 global,0x001996EC,people_idle_count,candidate,int: pedestrians standing still this frame (person_walk stops at 3)
 global,0x001996F0,people_spawn_range,confirmed,int: distance beyond which a pedestrian is re-placed (people_set_spawn_range 3100); exp4 (scratch/text/exp4.py save_morthag1): 3100 in town
 global,0x001996F4,people_count,confirmed,"int: entries in people_list; exp4 (scratch/text/exp4.py save_morthag1): 15, 0 after people_clear"
+global,0x001996F8,spellbook_saved_screen,strong,64000-byte copy of the screen under the spellbook (spellbook_open / frame / close)
+global,0x00199700,cheat_marker_index,candidate,"[ and ] (cheat_mode, in a dungeon) step it through the location's type-9 and type-16 children and teleport there (docs/play.md: [ and ] cycle through quest locations)"
+global,0x00199704,joystick_button_latch,candidate,2 bytes: key_action_pressed's latch for joystick buttons (bindings 200/201)
+global,0x00199708,controls_view_image,candidate,"cnfg00i1.img, drawn over the controls screen in view mode (options_controls_draw)"
+global,0x0019970C,options_image,strong,"optn00i0.img, loaded by options_open, drawn by options_draw, freed by options_close"
+global,0x00199710,options_saved_screen,strong,64000-byte copy of the screen under the options window (options_open / options_draw)
 global,0x0019972C,parse_name_seed,strong,"random seed saved by parse_expand at its start; the name macros reseed from it (+0 %fn, +123 %fn2, +3457 %mn and %bn, +9543 %mn2) so one text gets the same names"
 global,0x00199730,parse_output,candidate,the destination buffer of the current parse_expand call
 global,0x00199734,parse_number,candidate,number read after a %z.. macro by parse_read_number
@@ -653,6 +730,7 @@ global,0x001997A4,quest_prompt_quest,strong,quest of the yes/no question in prog
 global,0x001997AA,quest_find_id,candidate,quest id quest_find_by_id_cb looks for
 global,0x001997AC,quest_event_code,strong,"short: event being dispatched (1 item to npc, 2 kill, 3 item found, 5 item dropped, 21 foe hurt, 28 npc clicked, 71 pay, 73 spell, 78 faction); quest_dispatch_event runs the opcodes equal to it"
 global,0x001997AE,quest_test_started,candidate,set once quest_start_test_quest has started quest_test_file
+global,0x001997B5,class_question_answer_row,candidate,indexed by the answer letter ('a'..'c' at +0x61..): the text row of that answer (class_question_show)
 global,0x001997BC,note_file_size,candidate,int: notebook.tde length
 global,0x001997C0,note_rci,candidate,note.rci tool/font button images
 global,0x001997C4,note_search_text,candidate,24-byte search text (scratch+56000)
@@ -671,6 +749,8 @@ global,0x001997EA,note_tool,confirmed,"byte: 0 text, 2 line, 3 box select (exp2)
 global,0x001997EC,note_action,candidate,"byte: 0 idle, 1 typing, 2 drawing a line, 3 dragging a box, 4 waiting for the page number"
 global,0x001997ED,note_silent,candidate,"byte: opened with 100: no screen, no sounds"
 global,0x00199808,daylight,candidate,"1 between 6:00 and 18:00 (game_minutes % 1440 in 361-1079), set by update_fog and load_game 7C432"
+global,0x0019980C,class_questions_asked,strong,10 question numbers already asked (class_question_show)
+global,0x00199819,class_answer_counts,strong,"3 bytes: answers of each kind (warrior, rogue, mage), max 10; class_question_pick_class reads them"
 global,0x00199820,classmaker_specials,strong,"[2][7] {kind, sub-choice} of the picked advantages and disadvantages"
 global,0x0019983C,classmaker_current_buttons,strong,"the button table for classmaker_screen: classmaker_buttons (28), the reputation table (6) or the specials table (1 or 3)"
 global,0x00199868,itemmaker_slot_exclusions,candidate,"10 x 10 bytes: per slot 5 (type, param) pairs ruled out"
@@ -688,6 +768,9 @@ global,0x00199D5A,book_file,strong,short: the open book's file handle (< 1: no b
 global,0x00199D5C,book_page,confirmed,short: page shown (exp2: 0 -> 1 after book_next_page)
 global,0x00199D5E,book_image_count,candidate,short
 global,0x00199D60,book_page_count,confirmed,short: pages in the book (exp2: 3)
+global,0x00199D68,magic_items_saved_screen,strong,64000-byte copy of the screen under the USE MAGIC ITEM list
+global,0x00199D70,hud_pressed_button,strong,"index of the HUD button pressed, 255 none: the handler runs on release over the same button"
+global,0x00199D71,player_under_spell,candidate,set by spell_hud_draw_icons when a spell on the player was cast by someone else; hud_portrait_overlay_index frame 0
 global,0x00199D74,anim_changed_this_frame,candidate,"ai_creature_think clears it, monster_set_action sets it: one animation change per creature per frame"
 global,0x00199D78,links,strong,1024 x 39-byte link records ('Exceeded maximum number of links.' in links_resolve); saved and loaded by links_save / links_load
 global,0x001A3978,active_links,strong,"pointers to the first record of each running link chain (links_trigger adds, links_update removes); saved as indices"
@@ -703,6 +786,7 @@ global,0x001A3AD4,trade_haggle_step_size,candidate,double: concession per round 
 global,0x001A3F18,nearest_fire_distance,strong,its distance (2048 = none)
 global,0x001A3F1C,nearest_fire,strong,the nearest burning flat (world_collect_object); sound.c plays 242 Burning at it within 300
 global,0x001A3F44,midi_bsa,strong,handle of MIDI.BSA read by sos_load_song (traced MIDI.BSA reads 11870 <- 6974E); 11 in save_tlalac_s
+global,0x001A3F5E,music_uses_fm,candidate,"selects the FM song names (fm_dngn1.hmi, gshop -> fm_sqr_2.hmi) in music_select_tables / music_choose_song"
 global,0x001A3FA0,logbook_first_entry,strong,int: entry at the top of the page (prev/next)
 global,0x001A3FA4,logbook_show_notes,strong,byte: 1 = the copied talk notes view (logbook_toggle_notes)
 global,0x001A3FA8,logbook_entry_count,strong,int: entries built by logbook_build_entries
@@ -739,6 +823,19 @@ global,0x001A4A68,weapon_hand_anim,candidate,frame script per hand (bow_anim_scr
 global,0x001A4A70,weapon_swing_state,candidate,"per hand: 5 when a swing starts, counts down per frame step; 0 idle"
 global,0x001A4B7A,swing_to_hit,strong,to-hit modifier of the current swing (swing_to_hit_mods[direction]); damage_roll_to_hit adds it for the player
 global,0x001A4B7C,swing_damage,strong,damage modifier of the current swing (swing_damage_mods[direction]); damage_resolve_attack adds it for the player
+global,0x001A4B80,stocked_shop_ids,strong,shop ids whose shelves were filled (shelf_shop_stocked)
+global,0x001A4C80,service_menu_label,strong,"'Banking' or 'Sell', drawn by service_menu_frame"
+global,0x001A4C84,service_menu_npc,strong,the NPC the service menu acts for
+global,0x001A4C88,coven_menu_npc,strong,the NPC the coven menu acts for
+global,0x001A4C8C,stocked_shop_count,strong,number of stocked_shop_ids
+global,0x001A4C90,repair_menu_npc,strong,the shopkeeper the repair menu acts for
+global,0x001A4C98,service_menu_handler,strong,the service row's function: bank_open or service_menu_sell
+global,0x001A4C9C,shelf_list_active,candidate,"set while the shelf's book list is open (shelf_open_books, shelf_book_list_update)"
+global,0x001A4C9D,repair_menu_kind,candidate,"2 armorer, 3 weaponsmith, 255 general store (npc_click_service); passed to shop_open_repair, which ignores it"
+global,0x001A4CA0,position_history,strong,"32 x {x,y,z} ring of the player's positions every 100 units (position_history_record); spawn points reuse them"
+global,0x001A4E20,ground_position_history,strong,"32 x {x,y,z} ring of positions while on the ground; cheat_return_to_last_position steps back through it"
+global,0x001A4FB8,position_history_next,strong,next slot of position_history
+global,0x001A4FC8,ground_position_history_next,strong,next slot of ground_position_history
 global,0x001A4FE0,load_relink_root,candidate,the other tree load_fix_object_cb looks twins up in
 global,0x001A4FE4,save_version,confirmed,"u32 read from SAVETREE.DAT's first 4 bytes: load_game accepts 293-294 ('Invalid save game format.'), SAVEVARS has 3 more dwords from 294; 0x126 = 294 in save_tlalac_s (DFU SaveTree version 0x126)"
 global,0x001A4FE8,spell_cast_queue_list,candidate,"{caster, spell} pairs queued by spell_cast_queue"
@@ -749,6 +846,24 @@ global,0x001A5928,hud_status_text,confirmed,1440-byte status line text (hud_stat
 global,0x001A59D4,arrival_delay,candidate,int: frames until arrival_room_messages runs (10 after a load)
 global,0x001A59E8,info_popup_text,confirmed,text of the info popup (info_popup_open; exp2)
 global,0x001A5A52,mode_stack_depth,strong,short
+global,0x001A5A68,cursor_saved_background,candidate,"10x10 background saved under the arrow by cursor_draw_arrow, put back by cursor_restore_background"
+global,0x001A5ACC,cursor_saved_y,candidate,y of the saved background (cursor_draw_arrow)
+global,0x001A5AD0,riding_sound,candidate,"handle of the looping horse sound, -1 none (player_horse_sounds)"
+global,0x001A5AF4,turn_this_frame,strong,"yaw change set by the turning regions, applied and cleared by player_movement_update"
+global,0x001A5B08,move_angle_offset,confirmed,"added to the yaw for this frame's move: 0 forward, 1024 back, -512/512 slide (exp_steer.py)"
+global,0x001A5B14,cursor_saved_x,candidate,x of the saved background (cursor_draw_arrow)
+global,0x001A5B18,cursor_region_images,strong,"pnter.cif loaded by intrface_init: one cursor per steering region, drawn by cursor_draw"
+global,0x001A5B1C,steer_row_y1,confirmed,first row boundary (view y + height/3); 66
+global,0x001A5B1E,steer_row_y2,confirmed,second row boundary; 132
+global,0x001A5B20,steer_col_x1,confirmed,first column boundary (view x + width/3); 106 in save_tlalac_s
+global,0x001A5B22,steer_col_x2,confirmed,second column boundary (view x + 2*width/3); 212
+global,0x001A5B24,steer_weight_down,strong,(mouse_y - region top)*256/height: scales backward speed (steer_backward)
+global,0x001A5B26,steer_weight_right,strong,(mouse_x - region left)*256/width: scales right turns and slides
+global,0x001A5B28,steer_region_width,confirmed,"width/3 (106), the divisor of the steer weights"
+global,0x001A5B2A,steer_region_height,confirmed,height/3 (66)
+global,0x001A5B2C,steer_weight_left,strong,the remainder of the width: scales left turns and slides
+global,0x001A5B2E,steer_weight_up,strong,the remainder of the height: scales forward speed
+global,0x001A5B32,steer_key_region,strong,"short: region chosen by the movement keys (intrface_key_region), -1 none"
 global,0x001A5B38,cfg_block_str,strong,config key 'blockStr' (80 characters)
 global,0x001A5B88,cfg_mapsave_file,strong,"config key 'maps' (80 characters): 'mapsave.sav', the discovered-locations file save_game and load_game copy"
 global,0x001A5BD8,cfg_seed,strong,config key 'seed'
@@ -782,7 +897,11 @@ global,0x001A9A38,namegen_name,confirmed,40-byte buffer name_generate returns (e
 global,0x001A9A60,namegen_part_name,strong,30-byte buffer for the first name / surname
 global,0x001A9A7E,namegen_syllable,strong,10 bytes read by namegen_read_part
 global,0x001A9A9C,namegen_file,strong,short: NAMEGEN.DAT handle while a name is made
+global,0x001A9AA0,inpstr_number_text,candidate,10-byte buffer the number is written into (inpstr_begin_number)
+global,0x001A9AAC,inpstr_max_length,strong,short: most characters (8 for numbers)
+global,0x001A9AAE,inpstr_cursor,strong,short: cursor index in inpstr_text
 global,0x001A9AB0,input_digits_only,strong,byte: inpstr.c's editor accepts only 0-9 (set by 8C4E4 number input and input_edit_number_box)
+global,0x001A9AB4,picklist_repeat_clock,candidate,BIOS tick of the last scroll step: the arrows repeat every 3 ticks
 global,0x001A9AB8,shared_picklist,candidate,"the pick list the spell shop, the spellbook, the magic-item list and support.c's popups all use (UI agent); was spellshop_list; picklist control of the spell shop"
 global,0x001A9AF4,object_move_new,candidate,"object_set_position's new x, y, z, angle x, yaw, angle z (6 ints) that object_follow_move_cb applies to children"
 global,0x001A9B0C,object_debug_watch,candidate,that object's pointer
@@ -824,6 +943,8 @@ global,0x001AA584,inv_right_count,strong,short: items in the right list
 global,0x001AA58A,inv_left_count,strong,"short: items in the left list; exp: 0 for the weapons tab (all worn), 2 for magic items"
 global,0x001AA5F7,trade_offer_pending,candidate,"byte set by trade_make_offer, cleared by trade_settle_offer"
 global,0x001AA5F9,inv_tab,confirmed,byte: selected tab 0-3; exp: 1 after clicking MAGIC ITEMS
+global,0x001AA600,color_remap_tables,candidate,256-byte aligned 32 x 256 translation tables (color_init_remap_tables)
+global,0x001AA604,doors_moving,strong,16 pointers to doors swinging (door_start_swing / doors_update)
 global,0x001AA644,marker_best,candidate,"countdown or best distance of the marker search (-1 find, 1 count, 500000 nearest)"
 global,0x001AA648,marker_kind,strong,the marker kind (TEXTURE.199 record - 2) being searched
 global,0x001AA668,travel_region_image,candidate,"the loaded region map fmap0iNN.img / fmap%ci%02d.img, freed by travel_close_region"
@@ -1081,6 +1202,23 @@ field,object+0x3F,children,confirmed,pointer to the first child (containers -> i
 field,object+0x43,parent,confirmed,pointer to the parent: items -> their tab container -> player_entity -> player_object (player_entity+0x43 = player_object in save_tlalac_s; +0x40 is misaligned there)
 field,object+0x47,record_data,strong,record data (item or character) follows the 71-byte header: player_character = player_entity + 0x47
 field,person+0x02,flags,candidate,"byte of a type-8 person's data (object+0x49): bit 7 marks a potential quest giver (quest_mark_giver_cb, npc_is_quest_giver)"
+field,picklist+0x00,framed,strong,byte: when set picklist_init saves and picklist_draw restores the backgrounds
+field,picklist+0x01,colour_normal,candidate,entry colour (146 in every caller)
+field,picklist+0x02,colour_flagged,candidate,entry colour when the entry's flags bit 0 is set
+field,picklist+0x03,colour_selected,candidate,colour of the selected entry (244 in every caller)
+field,picklist+0x04,colour_thumb,candidate,colour of the scroll thumb (114)
+field,picklist+0x05,list_rect,strong,"x,y,w,h of the entries (spellbook 27,30,111,131)"
+field,picklist+0x0D,up_rect,strong,"x,y,w,h of the scroll-up arrow (spellbook 144,29,8,15)"
+field,picklist+0x15,down_rect,strong,"x,y,w,h of the scroll-down arrow"
+field,picklist+0x1D,bar_rect,strong,"x,y,w,h of the scroll bar; clicks there jump (picklist_poll -4)"
+field,picklist+0x25,count,strong,u16 number of entries
+field,picklist+0x27,top,strong,u16 first visible entry
+field,picklist+0x29,selected,strong,u16 selected entry; spellbook_frame reads it as D_001A9AE1
+field,picklist+0x2B,visible_rows,strong,u16 rows that fit (picklist_update_thumb)
+field,picklist+0x2D,thumb_height,strong,short thumb height (picklist_update_thumb)
+field,picklist+0x2F,entries,strong,"44-byte entries {u16 flags, u16 index, char text[40]}"
+field,picklist+0x33,list_background,strong,saved screen under list_rect
+field,picklist+0x37,bar_background,strong,saved screen under bar_rect
 field,potion_recipe+0x00,ingredient_indices,strong,"8 signed bytes: ingredient template index, -2 ends (Stamina 4 16 13)"
 field,potion_recipe+0x08,value,strong,"u16 value of the potion made (25 Stamina, 50 Orc Strength)"
 field,potion_recipe+0x0A,ingredient_groups,strong,"8 bytes: item group of each ingredient (20, 16, 16)"
@@ -1128,6 +1266,10 @@ field,quest+0x0F,flags,strong,bit 1 set by opcode 4 (rewarded): opcode 6 then po
 field,quest+0x10,section_counts,confirmed,"short[10] records per QBN section (+0x20 opcodes, +0x22 states, +0x1C timers, +0x1E foes, +0x16 persons, +0x18 places); read in 7 saves"
 field,quest+0x24,section_offsets,confirmed,short[11] offsets of the sections from the quest start (quest_section); offset 10 = text variables
 field,region+0x2D,crime_flags,candidate,"byte in the 80-byte region record (region_politics): court bit 0 banished (8063), bit 1 sentenced to death (8060)"
+field,settings+0x00,view_flags,confirmed,"bit 0 full screen (no HUD bar; hud_draw and hud_draw_heading_strip test it), bit 1 head bobbing; exp_options.py: 3 -> 1 -> 0 with the two buttons"
+field,settings+0x01,detail_level,strong,0..127 from the DETAIL bar (options_detail_slider); 126 in save_tlalac_s
+field,settings+0x02,sound_volume,strong,u16 0..127 from the SOUND bar (options_sound_slider); 60 in save_tlalac_s
+field,settings+0x04,music_volume,strong,"u16 0..127 from the MUSIC bar (options_music_slider, applied by 698AF)"
 field,spell+0x00,effects,confirmed,"3 x {u8 type, u8 subtype}, 255 none; exp1b (build/names/scratch/magic/exp1b.py, save_morthag1): the dispatcher spell_apply_effect ran the handler of spell_effect_names[type]"
 field,spell+0x06,element,strong,"0 fire, 1 frost, 2 poison, 3 shock, 4 magic (spellmaker element buttons, TEXT 1801-1805); indexes spell_cast_sounds and spell_resist_flags"
 field,spell+0x07,target,strong,"0 caster, 1 touch, 2 distance, 3 area around caster, 4 area at distance (TEXT 1806-1810); cast_player_spell/cast_creature_spell_at switch on it"
@@ -1653,7 +1795,64 @@ func,0x000411BF,person_load_face,strong,"(person, buf): seeded by the person's i
 func,0x00041347,people_check_witnesses,candidate,"outside: ORs line-of-sight (23C72) from each pedestrian to the player into people_witness_flags (bit 1 for guards); callers talk_open, person_killed, 7425E, 86F50"
 func,0x00041409,person_killed,strong,"(person): if anyone saw it, crime_current 5 (murder) and guards_summon(1); re-places the person; guild_count_crime(6, 5) (Dark Brotherhood count); caller weapon_melee_strike"
 func,0x00041455,people_debug_map,candidate,"debug: draws the town map with pedestrians (145), creatures (161), the player (244) and 'LOC: %d, %d'; no callers"
+func,0x00041672,spellbook_add_spell_cb,strong,"callback over the spellbook's children: each type-9 spell becomes '%d - %s' (spell_cost, name; cost/4 for names ending '$') in the picklist and its record goes into the row array (D_00190DE4)"
+func,0x000417C8,spellbook_open,confirmed,"CAST SPELL (Backspace, action 28) or a1=1 (HUD, sheet, inv_use_item): refuses while spell_cast_busy; builds the list, game_mode 5, spbk00i0.img + mask04i0.img, 237 OpenBook; exp_hud.py: HUD button -> game_mode 5"
+func,0x0004193C,spellbook_frame,strong,"each frame in game_mode 5: draws the window and 'magicka/max', polls the list; a double-click casts (cost * spell_cost_item_percent / 100, 'You don't have the spell points.', 'You are silenced.'), else shows the selected spell; dispatches spellbook_buttons"
+func,0x00041D27,spellbook_close,strong,"EXIT (spellbook_buttons[8], (242,170)) and Esc: frees the list and images, game_mode 0, returns to the sheet or inventory it came from (D_001940D8 bits 5/7); in play magic1: click 260,174"
+func,0x00041E7D,spellbook_draw_spell,strong,"draws the selected spell: icons from mask04i0, name at (148,20), up to 3 effect names and subtype names (spell_effect_names / spell_effect_subtype_names) at x 219, y 63+38k"
+func,0x0004204E,spellbook_effect_help,strong,shows the help text 1200 + spell_effect_text_index for effect slot a1 (texts 1202/1212/1283 in play) and sets spell_effect_slot
+func,0x000420AF,spellbook_effect1_button,strong,"spellbook_buttons[2] (161,58)-(277,85): spellbook_effect_help(0)"
+func,0x000420CE,spellbook_effect2_button,strong,"spellbook_buttons[3] (161,96)-(277,123): spellbook_effect_help(1)"
+func,0x000420F0,spellbook_effect3_button,strong,"spellbook_buttons[4] (161,134)-(277,161): spellbook_effect_help(2)"
+func,0x00042112,spellbook_build_list,strong,"finds the spellbook item (group 27) under the player, sets up the picklist (27,30,111,131) and adds each spell (spellbook_add_spell_cb); text 12 'You have no spells in your spellbook.' when empty"
+func,0x000422B1,spellbook_delete_button,strong,"DELETE (spellbook_buttons[5] (23,167)-(67,181), screenshot magic1/009.png): deletes the selected spell, rebuilds, closes when none are left"
+func,0x000422EE,spellbook_up_button,strong,"UP (spellbook_buttons[6] (68,167)-(112,181), screenshot magic1/009.png): swaps the selected spell with the previous sibling (8E152), rebuilds"
+func,0x00042337,spellbook_down_button,strong,"DOWN (spellbook_buttons[7] (151,167)-(195,181)): swaps the selected spell with the next sibling, rebuilds"
+func,0x00042380,spell_cost_item_percent,candidate,"100, or 75 when an equipped item's type-3 enchantment condition holds (season 0-3, full/half/new moon 4-6, creature category 7-10 nearby); spellbook_frame scales the cast cost by it"
+func,0x0004259C,status_show,strong,"STATUS (I, action 35) or a1=1 (HUD status button): text 22 'You are in %cn. It is %tim on %dat...' then show_health_status"
+func,0x000425F2,keys_world_actions,confirmed,"per-frame world hotkeys (returns while screen_active or game_mode != 0) through key_action_held/pressed: 26 automap, 27 travel map, 12 rest, 13 transport, 14-17 interaction modes, 29 recast, 30 abort spell, 31 use magic item, 32 ready weapon, 34 switch hand, 9 crouch, 19 activate cursor, 20-23 look, cheat keys; exp_steer.py: D toggled crouch, Enter view_cursor_active, Ins/Home view_look_pitch, F1/F4 interaction_mode 2/3, A weapon ready"
+func,0x00042E0C,keys_nop,candidate,empty function between keys_world_actions and interaction_mode_cycle; no callers
+func,0x00042E24,interaction_mode_cycle,confirmed,"interaction_mode = (mode + a1) & 3, then 'Interaction is now %s mode.' (grab/info/steal/dialogue); exp_hud2.py: HUD mode button left click 0->1, right click 1->0; keys F1-F4 call it with 0"
+func,0x00042E8C,keys_joystick_steer_weights,candidate,sets steer_weight_down/right = axis/16 and steer_weight_left/up = -axis/16; called by key_action_held for the joystick-axis bindings 204-207
+func,0x00042F0F,key_action_held,strong,"key_down[key_map[action]], or for bindings >= 200 joystick buttons (200/201), mouse buttons (202/203/212) and joystick axes (204-207); action numbers match the Options > CONTROLS screen (exp_controls.py screenshot: 0 FORWARD .. 37 INVENTORY)"
+func,0x000430CD,key_action_pressed,strong,"edge-triggered key_action_held: latches key_pressed_latch (keys) and joystick_button_latch, mouse via mouse_buttons_prev; used for the toggles (9 crouch, 19 activate cursor, 12 rest, 29 recast, 32 ready weapon); exp_steer.py: one D press toggled crouch once"
+func,0x0004330A,options_open,confirmed,"on Esc (game_mode 0) or a1=1 (HUD OPTIONS strip): game_mode 7, optn00i0.img, saves the screen; exp_options.py: options_open(1) -> mode 7; exp_hud.py: the OPTIONS strip opened it"
+func,0x000433DA,options_frame,strong,"each frame while game_mode is 7: draws (options_draw), Esc closes, clicks dispatch through options_buttons with 203 ButtonClick; exp_options.py clicks"
+func,0x000434F2,options_close,strong,"CONTINUE (options_buttons[9]) and Esc: game_mode 0, world_running 1, frees the image and saved screen; exp_options.py: CONTINUE -> mode 0"
+func,0x0004359C,options_draw,strong,"restores the saved screen, draws optn00i0.img, the FULL SCREEN / HEAD BOBBING marks (settings view_flags bits 0/1) and the SOUND/MUSIC/DETAIL bars (x 91, y 64/72/80, 108 wide)"
+func,0x0004374C,options_save_game,strong,"SAVE GAME (options_buttons[0], (89,44)): closes the options and opens the save screen 7B222(1) (save00i0.img, savename.txt in play)"
+func,0x00043783,options_load_game,strong,LOAD GAME (options_buttons[1]): closes and opens 7B222(0) (load00i0.img)
+func,0x000437B7,options_exit_game,strong,"EXIT GAME (options_buttons[2]): asks text 1069 'Are you sure you want to exit the game?', yes -> 4FF57 (clean exit)"
+func,0x000437F1,options_sound_slider,strong,"SOUND bar (options_buttons[3], y 64): settings sound_volume = options_slider_value()"
+func,0x00043818,options_music_slider,strong,"MUSIC bar (options_buttons[4], y 72): settings music_volume = options_slider_value(), applied by 698AF"
+func,0x0004384D,options_detail_slider,strong,"DETAIL bar (options_buttons[5], y 80): settings detail_level (high byte of the flags word)"
+func,0x00043883,options_slider_value,strong,(mouse_x*128 - 11648)/108 clamped 0..127: the bar position under the mouse (bars at x 91..199)
+func,0x000438DF,options_toggle_full_screen,confirmed,FULL SCREEN (options_buttons[6]) and F10: flips settings view_flags bit 0 and the view size (320x200 / 320x154); exp_options.py: bit 0 cleared and the HUD bar appeared (world_after.png)
+func,0x00043958,options_toggle_head_bobbing,confirmed,"HEAD BOBBING (options_buttons[7]): flips settings view_flags bit 1, which head_bob_update tests; exp_options.py: 3 -> 1"
+func,0x00043978,options_nop,candidate,empty function in the options code; no callers
+func,0x00043990,options_controls_rebind,strong,"handler of the 38 binding buttons (controls_buttons 0-37): waits for a key, joystick button/axis (200-207) or mouse button (202/203/212) and stores it in key_map[button]; Esc keeps the old one, F10 is refused"
+func,0x00043B55,options_controls_draw,strong,"draws the controls screen (cnfg00i0, cnfg00i1 over it in view mode) and each binding's key name (key_names / binding_names_base), duplicates in colour 244; screenshot controls.png"
+func,0x00043CD6,options_controls_screen,confirmed,CONTROLS (options_buttons[8]): modal loop over controls_buttons; on leaving writes the mouse settings (54 bytes from mouse_control_mode) and key_map (38) to a file; exp_controls.py screenshot controls.png
+func,0x00043EDA,options_controls_check,strong,"CONTINUE (controls_buttons[41]) and Esc: refuses with 'You have multiple assignments...' when two actions share a key, else returns 1"
+func,0x00043F64,options_controls_defaults,strong,DEFAULT (controls_buttons[40]): copies key_map_defaults over key_map
+func,0x00043F9C,options_mouse_screen,confirmed,MOUSE (controls_buttons[39]): modal loop over options_mouse_buttons with cnfg01-03i0.img; exp_controls.py screenshot mouse.png (CONFIGURE MOUSE)
+func,0x000441B6,options_mouse_draw,strong,"draws the mouse screen: the CURSOR/VIEW mark (x 134/220), the horizontal/vertical sensitivity and turn-rate blocks at y 108/121/134, the REVERSE VERTICAL mark"
+func,0x000443C9,options_mouse_cursor_mode,confirmed,"CURSOR box (options_mouse_buttons[0]): mouse_control_mode = 0 ('for cursor based movement', screenshot mouse.png)"
+func,0x000443F2,options_mouse_view_mode,confirmed,VIEW box (options_mouse_buttons[1]): mouse_control_mode = 1 ('for view based movement')
+func,0x0004441B,options_mouse_horizontal,strong,"HORIZONTAL sensitivity bar (options_mouse_buttons[2]): mouse_sensitivity_x 1..15, applied by CE88D(x*6, y*6)"
+func,0x0004449C,options_mouse_vertical,strong,VERTICAL sensitivity bar (options_mouse_buttons[3]): mouse_sensitivity_y 1..15
+func,0x0004451D,options_mouse_turn_rate,strong,TURN RATE bar (options_mouse_buttons[4]): mouse_turn_rate bits 0-6 = (x-139)/7
+func,0x0004456A,options_mouse_reverse_vertical,strong,"REVERSE VERTICAL (options_mouse_buttons[5]): flips mouse_turn_rate bit 7, which negates vertical mouse motion in player_mouse_look"
+func,0x00044593,options_screen_continue,strong,"CONTINUE of the mouse and joystick screens (options_mouse_buttons[6], options_joystick_buttons[5]): returns 1, ending the loop"
 func,0x000445B5,options_joystick_screen,strong,"the whole joystick screen (DISABLED, CALIBRATE, a LOW/MED/HIGH threshold); its CALIBRATE button is 0x449D8 (UI agent); was options_joystick_calibrate; options.c; cnfg04i0.img, cnfg05i0.cif, cnfg06i0.img; direct call (all-zero args) shows the joystick calibration window"
+func,0x0004478B,options_joystick_draw,strong,"draws the joystick screen: DISABLED mark (joystick_setting 2), the LOW/MED/HIGH highlight for joystick_threshold 10/20/40, and the arrow for the stick direction (options_joystick_direction); screenshot 445B5.png"
+func,0x00044990,options_joystick_disable,strong,"DISABLED box (options_joystick_buttons[0] (138,42)): joystick_setting 1 <-> 2, copied to joystick_status"
+func,0x000449D8,options_joystick_calibrate_button,strong,CALIBRATE (options_joystick_buttons[1]): resets the joystick range (32000 / 0) and samples it until a click inside the button; nothing when disabled
+func,0x00044AE5,options_joystick_threshold_low,strong,CENTER THRESHOLD LOW: joystick_threshold = 10 (also D_00152A0C)
+func,0x00044B1C,options_joystick_threshold_med,strong,CENTER THRESHOLD MED: joystick_threshold = 20
+func,0x00044B53,options_joystick_threshold_high,strong,CENTER THRESHOLD HIGH: joystick_threshold = 40
+func,0x00044B8A,options_joystick_direction,candidate,octant 0..7 of the stick (joystick_x/y beyond +-2048) for options_joystick_draw's arrows
+func,0x00044CA0,options_controls_is_duplicate,strong,1 when another of the 38 actions has the same key; options_controls_draw shows those in colour 244
 func,0x00044EE0,show_rumor,candidate,kludge.c; opens rumor.dat; direct call (all-zero args) shows a rumour; calls faction_rumor_text
 func,0x00045B7F,pick_gold,candidate,kludge.c; string 'Picking from %s.'; direct call (all-zero args) shows 'You picked N gold pieces'
 func,0x0004633F,parse_expand,confirmed,"the text macro expander (src, dst): ""%xxx"" via the per-letter tables D_0017C47E/D_0017C4F2 (9-byte {name[5], handler}), ""_sym_""/""=sym_"" quest symbols via qkey.c 2CE9E with a hash (998C8) and level (_ +16 each, = +1 each); ""Invalid parse command (%lx,%s)"" when a handler returns <1000; experiment: expanding ""%ra|%pcn|%cn|%dat|%tim|%god|%rn..."" in save_dorian gave ""Dark Elf|Dorian Kaine|Sentinel|Middas the 23th of Evening Star|18:55|Arkay|Queen Akorithi..."""
@@ -2012,6 +2211,15 @@ func,0x00050C23,update_fog,strong,"every frame (game_frame): daylight (6:00-18:0
 func,0x00050E3F,game_reset,strong,"main calls it when player_death_timer < 0 before going back to the title: unloads the location, empties nonworld_root, recreates the player (init_player_records, newgame_init_player), time 519210, factions reloaded, region timers, creature list cleared (frame_checkpoint 500-505)"
 func,0x00050F81,books_find_path,strong,"books_path = arena2_path if ARENA2\books\bok00000.txt opens, else arena2_path_alt (the CD); caller init_game_data"
 func,0x00050FFD,init_misc_state,candidate,"D_0019621B = 18, D_0019625E = location_object; caller init_game_data"
+func,0x00051026,class_questions_run,strong,"character creation's 10 questions: chgn00i0.img, scrl00/01i0.gfx scroll ends, up/down scrolling, an answer counts toward warrior/rogue/mage and plays its CEL; then the class from classes.dat, confirmed with text 2100+class, loads class%02d.cfg; caller title_menu; char1 play"
+func,0x00051490,class_question_show,strong,"picks a random unasked question 1-40 (class_questions_asked), renders its TEXT.RSC 9000 entry line by line into the scroll buffer and notes each answer letter's row"
+func,0x000516FD,class_question_scroll,strong,"scrolls the question text by a2 and redraws the 320x48 window at y 135 (callers class_questions_run on up/down keys or clicks, class_question_show)"
+func,0x0005175B,class_question_scroll_step,candidate,moves the scroll position (D_00190D64) within 0..max (D_00190D66) and draws the scroll-end frame (CD126)
+func,0x000517EC,class_question_answer_anim,strong,plays 18 Ignite and the answer kind's animation (warrior.cel / rogue.cel / mage.cel) through pflc_play
+func,0x0005183B,class_question_get_answer,strong,"1/2/3 for keys A/B/C or a click on the rows of answer a/b/c (class_question_answer_span), 0 none; char1 play: key a/b/c"
+func,0x00051991,class_question_answer_span,candidate,screen y range (135..183) of an answer's text rows at the current scroll; 0 when off screen
+func,0x00051A5A,class_question_pick_class,strong,looks the a/b/c counts up in classes.dat (48 + 18 three-byte entries) and returns the class kind; 'Invalid answer combination.'
+func,0x00051B3E,pflc_play,strong,"plays a FLIC/CEL animation (pflc.c's 5209D open, 523C1 frame, 51CF9 draw, 522B7 close) at its frame delay until it ends or a key/mouse button; loops; filed under question.c, belongs to pflc.c"
 func,0x00051CF9,flc_show_frame,candidate,"copies the frame to VGA memory (0xA0000) through the screen buffer, blitting first when the animation is smaller than 320x200; caller question.c 51B3E"
 func,0x00051DCF,flc_play_with_text,strong,"plays an FLC animation under QRC or TEXT.RSC text pages (objects agent: code); the savetree.dat string on its evidence page was stale buffer text, not a reference; was pflc_read_savetree"
 func,0x0005209D,flc_open,strong,"opens the file (disk_open_data), reads the 128-byte FLC header (frames, speed, width, height), allocates the frame/palette buffers it lacks, reads an optional prefix chunk (0xF100) for the position, seeks to the first frame; traced reads of MAGE.CEL / ROGUE.CEL (question.c's class animations)"
@@ -2188,6 +2396,26 @@ func,0x0005C9BF,spell_player_has_spell,candidate,(id): the player has an active 
 func,0x0005CA28,spell_name_from_book_cb,candidate,spellbook walk callback: copies the name of the book spell with the same id
 func,0x0005CA87,spell_lookup_name,candidate,"(spell): sets the spell's name from spell_records by id, or from the player's spellbook for custom ids"
 func,0x0005CB47,spell_hud_draw_icons,strong,"every frame: draws an icon per active spell on the player (icon field, 10 for item spells; others' spells in another row), blinking near expiry; ends a Shield whose points are gone; clamps attributes to base when no spell is active"
+func,0x0005CE17,hud_draw,strong,"each frame: without full screen (settings view_flags bit 0) draws the HUD bar main00i0, the interaction-mode icon (main01i0, at 131,154), the portrait overlay, the portrait and the compass; always the health/fatigue/magicka bars (x 49/57/65, or -40 in full screen); screenshots"
+func,0x0005D151,hud_draw_compass,strong,"draws the HUD compass (cmpa00i0.bss, frame by the camera's yaw >> 6) with the cmpa01/cmpa02 overlays (D_001940D6 bits 3/4) and cmpa03i0.img; called by hud_draw only with the HUD bar"
+func,0x0005D2DE,hud_buttons_click,confirmed,"hit-tests hud_buttons: on press remembers the button (hud_pressed_button), on release over the same one plays 203 ButtonClick and calls its handler with the buttons; exp_hud2.py clicks"
+func,0x0005D3DB,hud_button_sheet,strong,"hud_buttons[0] (5,159)-(41,194), the portrait: sheet_open(1)"
+func,0x0005D3FD,hud_button_spellbook,confirmed,"hud_buttons[1] (83,154): spellbook_open(1); exp_hud.py: game_mode 5"
+func,0x0005D41F,hud_button_interaction_mode,confirmed,"hud_buttons[2] (131,154): interaction_mode_cycle(+1) on the left button, (-1) on the right; exp_hud2.py: 0 -> 1 -> 0"
+func,0x0005D45D,hud_button_inventory,confirmed,"hud_buttons[3] (178,154): inventory_open(1,0,2); exp_hud2.py: game_mode 4"
+func,0x0005D486,hud_toggle_weapon,confirmed,"hud_buttons[4] (225,154) and READY WEAPON (A, action 32): flips D_001940D6 bit 6 (weapon ready) and plays the equipped weapon's sound (224/225 in play); exp_hud.py and exp_steer.py: bit 6 set then cleared"
+func,0x0005D4F2,hud_button_status,strong,"hud_buttons[10] (274,154)-(319,199): status_show(1)"
+func,0x0005D514,hud_button_transport,confirmed,"hud_buttons[6] (131,177): transport_menu; exp_hud2.py: the click ran it"
+func,0x0005D531,hud_button_map,strong,"hud_buttons[7] (178,177): left button automap_open, right button the travel map (9A993(1))"
+func,0x0005D566,hud_button_rest,strong,"hud_buttons[8] (225,177): rest_open"
+func,0x0005D583,hud_button_options,confirmed,"hud_buttons[9] (71,154)-(82,199), the OPTIONS strip: options_open(1); exp_hud.py: game_mode 7"
+func,0x0005D5A5,magic_items_add_cb,strong,callback over the player's items: an item with a cast-when-used enchantment (type 0) or a filled potion bottle (group 1 index 1 holding a type-31 recipe) goes into the USE MAGIC ITEM list as '%it' / '%po'
+func,0x0005D74A,magic_items_open,strong,"hud_buttons[5] (83,177) and USE MAGIC ITEM (U, action 31): lists usable items (magic_items_add_cb) on main02i0.img, stops the world"
+func,0x0005D876,magic_items_frame,strong,"each frame while the list is open: picklist_poll; a choice runs inv_use_item on it, Esc or the right button closes"
+func,0x0005D97C,magic_items_close,strong,"frees main02i0.img and the list, restores the screen, world_running 1"
+func,0x0005DA1D,hud_update,strong,"from player_movement_update: when the HUD bar is shown and the mouse is at y >= 154, runs hud_buttons_click on press/release and draws the arrow; returns 1 so the click does not steer"
+func,0x0005DB02,hud_portrait_overlay_index,strong,"frame of mcol00i0.cif drawn over the portrait: 2 health below a tenth, 0 under another's spell (player_under_spell), 3 poisoned, 1 diseased (player_ailment_flags), -1 none"
+func,0x0005DB95,hud_draw_heading_strip,strong,"a1=0: in full screen draws the small heading strip at (253,185) with a 245-colour mark toward D_00195A7C (screenshots of save_tlalac_s); a1=1: the strip at (3,174) for the automap; callers automap_draw, main"
 func,0x0005DE74,item_init_from_template,strong,"fills an item record from item template idx (D_0017D22A, 48 bytes each, 288 of them, 'Invalid index requested %d -> %d'): name, group/index, value, flags, condition, images, weight; then per-group rolls (clothing style, material, armor type, arrows 1-20, books, paintings); ran entering shops (cmd:enter x15.8) and in dungeons"
 func,0x0005E37F,item_make_in_range,candidate,"item_make with the index random in [lo,hi] (magic items, artifacts and maps special-cased); callers kludge.c, guilds.c, moninit.c"
 func,0x0005E450,item_make_random,strong,"random index of a group from its template list (D_00185F88[group], -1 end) then item_init_from_template; 5 artifact, 4 magic item, 11 map special; called by all loot/stock makers; ran on shop entry and dungeon loot"
@@ -2446,6 +2674,77 @@ func,0x00073EDB,weapon_free_sprites,strong,frees the two hands' weapon CIFs (wea
 func,0x00073F5D,monster_nearest_to_point,candidate,"nearest creature to (x,y,z) (its distance in faction_scratch / D_00195B84); arrows and spell missiles (5C448) use it"
 func,0x00074024,click_world_object,candidate,"click.c (filed under weapons.c, before click.c's first ref 0x744FD): the object clicked in the world by type (2 item, 6, 8, 18 creature, 32 door, 33, 34, 43, 44 corpse, 53, 56) -> 75E08...76503; caller 80A72"
 func,0x0007425E,door_try_open,candidate,"click.c (filed under weapons.c): opens or unlocks a door (+0x15 flags 0x100/0x40, lock +0x17): key (13A00), an Open spell (character+0x89 bits 5/6 with chance character+0x21E), Stealth-based guard alert (40C87); callers weapon_melee_strike (bash), 75FFF"
+func,0x000744FD,click_describe_item,strong,INFO on an item: 'You see an %s.' / 'You see a %s.' by the first letter against 'euioa'; caller click_item
+func,0x00074589,click_describe_creature,strong,'You see an/a %s.' with the creature's name (+0x1C of its data); caller click_creature
+func,0x0007461D,click_world_face,strong,"run first by click_world_object on a textured face (types 6/43/56): archive 74 building doors (enter 87281 / leave 873DE, 'You cannot enter while not on foot.'), 56/331 dungeon entrances, 95 dungeon exit (text 38 'Do you wish to access your wagon and stay in %cn?'), 71/72/81 shelves; returns 1 when handled; in play: enter, click 165,112"
+func,0x0007499C,shelf_open,strong,"a shelf by building type: guild hall needs the Mages Guild, temple a temple membership ('You need to be a member to access this.'), bookseller/library -> shelf_open_books, shops -> shelf_open_stock"
+func,0x00074ABA,shelf_book_chosen,strong,"the book list's callback: opens book D_00190444[row] in the reader (book.c 59B7B, bok00000.txt in the sweep), then returns the shelf items"
+func,0x00074AF2,shelf_collect_items,strong,"moves the shelf's items (type 36 with the shop's owner id, optionally of one item group) into trade_container as unpaid type-2 items at the player; returns the count"
+func,0x00074C10,shelf_return_items,strong,puts trade_container's items back on the shelf object as type-36 items of shelf_shop_id (set as the inventory close callback)
+func,0x00074C81,shelf_open_books,strong,"fills a book shelf (item_make group 7, quality/2 books) once per shop; in libraries, guild halls and temples lists the titles (book_read_header) in a popup list whose choice opens the book, else opens the buy screen (inventory_open_container 1,4)"
+func,0x00074ECA,shelf_open_stock,strong,"fills a shop shelf once per shop (loot_fill_from_list(32 + building type, quality); general stores also a horse and cart, item group 23), then opens trade_container for buying (inventory_open_container mode 1 or 0, icon 4)"
+func,0x00075101,shelf_book_list_update,strong,each frame: while the book list is open polls it (392AD) and calls the pending callback with the row; when it closes returns the shelf items
+func,0x00075172,book_read_header,strong,"reads the header of books\bok%05d.txt (a2) into a1; callers shelf_open_books, inv_item_info"
+func,0x000751DB,npc_click_service,strong,"the NPC's service by its building type: guild halls/temples guild_service_dispatch, tavern keeper tavern_open, bank 'Banking' service menu, armorer/weaponsmith/general store repair menu, alchemist/bookseller/clothier/gem/pawn 'Sell' service menu, witches coven menu, noble quests (quest_pick_file 'R'); else npc_talk"
+func,0x0007567B,shop_open_repair,strong,"REPAIR ITEM: inventory_open_container(npc, trade_mode 3 repair, icon 7); callers repair_menu_repair, guild_service_dispatch"
+func,0x000756C6,npc_talk,strong,"sets text_macro_npc, raises the quest events (28 clicked, 1, 71), offers a quest (quest_pick_for_npc), else talk_start; called by every TALK button"
+func,0x000757C9,count_items_cb,candidate,callback: counts type-2 children into D_00190BE4
+func,0x000757F9,object_count_items,strong,number of type-2 items under an object (count_items_cb); click_corpse opens a corpse only when it has some
+func,0x00075839,pick_up_item,strong,"GRAB on an item: a pile opens as a container, else the weight checks 'It is too heavy for you.' / 'You are carrying too much to lift this.', quest event 3, inv_store_item"
+func,0x000758F0,repair_menu_open,confirmed,"game_mode 26 with repr01i0.img (window_image); exp_hud.py: call -> mode 26, screenshot repair_menu.png: REPAIR ITEM / TALK / SELL / EXIT"
+func,0x00075968,repair_menu_frame,strong,"each frame in game_mode 26: draws the window, Esc closes, dispatches repair_menu_buttons"
+func,0x00075A75,repair_menu_close,strong,"EXIT (repair_menu_buttons[3]) and Esc: frees the window, game_mode 0; exp_hud.py: Esc -> mode 0"
+func,0x00075AE9,repair_menu_repair,strong,"REPAIR ITEM (repair_menu_buttons[0]): closes and shop_open_repair(repair_menu_kind, repair_menu_npc)"
+func,0x00075B18,repair_menu_talk,strong,TALK (repair_menu_buttons[1]): closes and npc_talk(repair_menu_npc)
+func,0x00075B3F,repair_menu_sell,strong,"SELL (repair_menu_buttons[2]): closes and opens trade_container in trade_mode 2 (sell), icon 6"
+func,0x00075B7A,coven_menu_open,confirmed,"game_mode 27 with daed00i0.img; exp_hud.py: call -> mode 27, screenshot coven_menu.png: TALK / DAEDRA SUMMONING / QUEST / EXIT; npc_click_service opens it for faction type 8"
+func,0x00075BF2,coven_menu_frame,strong,"each frame in game_mode 27: draws, Esc closes, dispatches coven_menu_buttons"
+func,0x00075CFF,coven_menu_close,strong,"EXIT (coven_menu_buttons[3]) and Esc: frees the window, game_mode 0"
+func,0x00075D73,coven_menu_talk,strong,TALK (coven_menu_buttons[0]): npc_talk(coven_menu_npc)
+func,0x00075D9A,coven_menu_summon,strong,DAEDRA SUMMONING (coven_menu_buttons[1]): daedra.c 202C5 (texts 480/481 day of summoning)
+func,0x00075DC1,coven_menu_quest,strong,"QUEST (coven_menu_buttons[2]): quest_pick_file('Q','Q','0','C', level)"
+func,0x00075E08,click_item,strong,"object type 2: INFO describes it (click_describe_item), other modes pick it up within 128 (pick_up_item) else 'You are too far away...'"
+func,0x00075E7B,click_building,candidate,object type 6: click_show_building_info
+func,0x00075EA2,click_npc,strong,"object type 8: INFO 'You see %s.' (npc_display_name), other modes within 256 npc_click_service, else 'You are too far away...'"
+func,0x00075F48,click_creature,strong,"object type 18: a readied touch spell is cast on it within 160; STEAL pickpockets (1374D, steal.c), other modes describe it"
+func,0x00075FFF,click_door,strong,"object type 32 within 128: door_try_open, a2=1 in STEAL mode (lockpicking)"
+func,0x0007606C,click_flat,candidate,object type 34: does nothing
+func,0x00076088,click_interior_model,strong,"object type 43: shop goods open the stock; in someone's house asks text 37 'This looks like private property...', may raise crime 13, opens the house's container (D_00196120; the player's own D_00196092); INFO shows the building"
+func,0x000762B6,click_corpse,strong,"object type 44: INFO 'You see a dead %s.' / 'You see a dead person.', else opens it if it holds items or 'The body has no treasure.'"
+func,0x000763C6,click_mobile_npc,candidate,"object type 53: STEAL pickpockets (1374D) unless +0x19 bit 0x4000, other modes within 256 npc_talk"
+func,0x00076460,click_loot_container,strong,"object type 33 with picture 216/x or 204/0 (loot piles, chests): fills it (loot_fill_container) and opens it (inventory_open_container 0,5)"
+func,0x00076503,click_model,candidate,object type 56: click_show_building_info
+func,0x0007653C,click_show_building_info,strong,"shows a building's name (8BD50), notes it on the town map, and 'Store is closed. Open from %d:00 to %d:00.' (hours D_0017C5B8) for shops; one model (417/39) shows faction_rumor_text"
+func,0x0007667A,quest_active_for_faction,strong,1 when a quest under quest_root has quest+0x02 faction_id == a1; npc_click_service gives no second noble quest
+func,0x000766D1,noble_quest_letter,candidate,"'A'+k for a random set flag k<29 in the region's row of D_0018F061, 0 with 10% or none; the third letter of npc_click_service's 'R' quest file"
+func,0x000767A6,service_menu_open,strong,"game_mode 28 with gnrc01i0.img and the service label a1 ('Banking' for banks, 'Sell' for the other shops; npc_click_service)"
+func,0x00076826,service_menu_frame,strong,"each frame in game_mode 28: draws the window and service_menu_label at (159,70), Esc closes, dispatches service_menu_buttons"
+func,0x00076952,service_menu_close,strong,EXIT (service_menu_buttons[2]) and Esc: game_mode 0
+func,0x000769C6,service_menu_talk,strong,"TALK (service_menu_buttons[0], (99,50)-(220,68)): npc_talk(service_menu_npc)"
+func,0x000769ED,service_menu_service,strong,"the service row (service_menu_buttons[1], where the label is drawn): calls service_menu_handler(1) (bank_open or service_menu_sell)"
+func,0x00076A15,service_menu_sell,strong,the 'Sell' service: repair_menu_sell
+func,0x00076A32,shelf_shop_stocked,strong,1 when shop id a1 is in stocked_shop_ids: its shelves were filled already
+func,0x00076A8F,container_items_to_player,candidate,sets the x/y/z of an object's children to the player's
+func,0x00076AF4,ambient_dungeon_sounds,strong,"each frame in a dungeon (not D_001962A1) when rand() (9DC25) < 20: a random 329-343 ambient sound (AmbientDripShort, AmbientWindMoan, AmbientMonsterRoar ... in play); filed under click.c"
+func,0x00076B50,footstep_sounds,strong,"every 100 units walked on the ground: a footstep from footstep_sound_ids by environment, climate and water, alternating feet (D_001940D7 bit 6); records position_history; in play 53/54/57/74/75/77/90"
+func,0x00076CF7,position_history_reset,strong,fills both 32-entry position rings with the player's position; callers the location loads 86794/86B0B/87281/873DE
+func,0x00076DB9,position_history_record,strong,"adds the player's position to position_history, and to ground_position_history while on the ground; caller footstep_sounds"
+func,0x00076E98,spawn_point_visible,candidate,1 when a point is in line of sight (23C72) and within 400 of the player's facing
+func,0x00076F3D,spawn_point_fits,candidate,collision test (2257C) of an object at its place; 1 when nothing blocks (D_00196D64 bits 1/3 clear)
+func,0x00076FF2,spawn_point_wilderness,candidate,a point ahead of the player (+-45 degrees) at ground height (14B45B) outside towns
+func,0x0007716B,spawn_point_town,candidate,"a random point a2..a3 away (default 128..3096) accepted by 4083A, else a recent position from position_history"
+func,0x00077340,spawn_point_clear_cb,candidate,callback: clears the candidate (in D_00195B50) when a creature (type 18) is within 64 of it
+func,0x000773BE,spawn_point_clear,candidate,1 when no creature of the location is within 64 of the point
+func,0x00077412,spawn_point_building,candidate,a type-6 marker of the building out of sight and more than 80 away (else any marker)
+func,0x00077639,spawn_point_dungeon_level,candidate,the nearest open cell of dungeon level a2 (8x8 grid of the block record 60) within a3..a4 and out of sight
+func,0x000777B8,spawn_point_dungeon,candidate,"spawn_point_dungeon_level on the player's level then the others (clear of creatures), else a recent position_history point that fits"
+func,0x00077960,spawn_find_point,strong,"a place to put a new creature by player_environment: wilderness / town / building / dungeon; x=y=z=0 when none; callers 266C7, 33EE7, crime guards 40E9D, monster spawning 63495"
+func,0x00077A23,head_bob_update,strong,"with settings view_flags bit 1 (HEAD BOBBING, confirmed by exp_options.py) and walking on the ground: head_bob_offset from D_0018767C by a 1000-tick cycle; else 0"
+func,0x00077B03,music_select_tables,candidate,"points the song tables at the FM set (fm_dngn1.hmi, 04fm.hmi ...) when music_uses_fm, else the General MIDI set (dungeon.hmi, 04.hmi ...)"
+func,0x00077B9E,music_choose_song,strong,"picks the song (6974E) for the place: dungeon (special or random by region), outside by climate, night, weather, inside by building type (gshop.hmi, gmage_3.hmi, temples by day, palaces); MIDI.BSA songs in play"
+func,0x00078235,ambient_outdoor_sounds,strong,"random outside sounds: birds 300/301, 16 AmbientCreepyBirdCall and 383 AmbientDistantHowl in some towns, 367 AnimalHorse when riding, 302 in dungeons with water, 376 Bells inside buildings of type 5, 10090 for lycanthropes"
+func,0x00078463,music_dungeon_song,candidate,"song for the 10 special dungeons (music_special_dungeon_ids, d1.hmi..d10.hmi); uses the FM names when music_uses_fm is 0, the reverse of music_select_tables"
+func,0x000784EE,cheat_return_to_last_position,strong,Alt+F11 (keys_world_actions): moves the player to the previous ground_position_history entry (docs/play.md: Alt+F11 goes back to the last position)
 func,0x00078566,monster_init,confirmed,"(entity, id): fallcall 0x63495 25 spawned a Frost Daedra (summon25.png) through it; reads ASCR%04d.ANC, ENEMY%03d.CFG or CLASS%02d.CFG into character+0x230, TEXTURE (255+type for monsters, 432+type for classes, 340 city watch); level, HP (monster_roll_d8_health / monster_roll_class_health), armor x5, loot, metal, flags, damage from monster_table; skills = min(100, 5*level+30); starts idle (48)"
 func,0x00078B8A,monster_reload_anim_cb,strong,"tree-walk callback for type-18 objects: re-reads the ASCR record (MONSTER.BSA, character+0x1F7) into its slot and rebases anim_script_pos; asset trace: MONSTER.BSA reads at every save load"
 func,0x00078C79,monster_reload_anims,strong,"save load (loadsave 7A983): frees every monster_anim_records slot, then monster_reload_anim_cb over the location and the player's tree; asset trace: ASCR0018..ASCR0139 read here"
@@ -2512,7 +2811,7 @@ func,0x0007D12D,mode_pop,strong,pops screen_active and game_mode; game_mode_unde
 func,0x0007D19B,size_fit,candidate,"(&w, &h, max w, max h): scales w,h down to fit, keeping the aspect; callers inv_draw_cart_cell, inv_draw_item_image"
 func,0x0007D24F,picklist_open_strings,strong,"(NUL-separated list): centred pick00i0.img list popup (8CA9A) filled with the strings; callers training_update, 38228, 383CC; sweep read pick00i0.img"
 func,0x0007D3CA,picklist_open,strong,"(NULL-ended pointer list): the same picklist from string pointers; callers spells_pick_list, title_menu, 8B054 ..; pick00i0.img [1]"
-func,0x0007D53F,picklist_poll,strong,"(list): -2 Esc/right click, the picked index, or -1 (still open, redraws); callers spellshop_update, picklist_update"
+func,0x0007D53F,picklist_frame,strong,"per-frame wrapper over the pick list widget (picklist_poll is 0x8CFE6, picklist.c): (list): -2 Esc/right click, the picked index, or -1 (still open, redraws); callers spellshop_update, picklist_update"
 func,0x0007D5D9,picklist_update,strong,"draws pick00i0.img and polls the list; callers spells_pick_list, title_menu"
 func,0x0007D62B,msgbox_choice_rsc,confirmed,"(TEXT.RSC id, 3 button ids, 3 hot keys): message box with buttons (kind 5); popup_answer = the button; callers court_open 20C87/2118B, spell_recall_prompt; sweep drew RSC 0 with a button"
 func,0x0007D6AE,rand_range,confirmed,"(min, max): min + rand() % (max-min+1); 291 episodes, 50+ callers; exp1: 20 calls of (5,10) gave 5..10"
@@ -2585,6 +2884,45 @@ func,0x0007FF73,store_repair_item_cb,candidate,"item in repair (54): deleted aft
 func,0x0007FFE7,restore_repair_item_cb,candidate,item in repair back into its shop unless 180 days passed
 func,0x00080051,arrival_room_messages,strong,"every frame, 10 frames after a town load: town-arrival hook 4B796, then 'You have a room at %s for %d hours.' for each rented tavern room (tavern_room_rented)"
 func,0x000801A4,carry_capacity,confirmed,"STR x 1.5 (kg), x 1.25 / 1.5 with an Increased Weight Allowance enchantment (type 7); callers inv_take_item, sheet_draw; exp1: 150 for STR 100"
+func,0x000802B2,intrface_init,strong,"loads pnter.cif (the steering cursors) and arrow.raw (the arrow cursor), builds the 16x10 mouse cursor (12B45B), then intrface_set_regions; caller 4ED36 (game init)"
+func,0x0008036E,intrface_set_regions,confirmed,"splits the view (D_001789FD x D_001789FF at D_00142940/44) into thirds: steer_col_x1/x2, steer_row_y1/y2 and the region size; save_tlalac_s 106/212 and 66/132 for 320x200"
+func,0x00080446,intrface_free,strong,frees cursor_region_images and cursor_arrow_image (intrface.c lines 67/68); caller 4F5F3 (shutdown)
+func,0x000804C8,cursor_draw,strong,"draws the pnter.cif frame for the steering region under the mouse, or the arrow (cursor_draw_arrow) while a screen is open or in view mode with the cursor on; screenshot world_after.png: the X cursor in the centre region"
+func,0x0008059B,cursor_draw_arrow,strong,"saves the 10x10 background under the mouse, draws arrow.raw and discards the mouse motion (mouse_motion_x/y); called by every modal loop (options, controls, mouse, joystick screens, transport)"
+func,0x00080637,cursor_restore_background,candidate,puts back the background saved by cursor_draw_arrow at its saved place; callers text popups 3F09F/3F181
+func,0x0008066F,player_add_push,candidate,"adds a1 along the player's yaw (sin/cos CE6E2) to the push vector D_001A5B0C/10, sets player_momentum and D_001940D4 bit 4; caller player_add_push_angle"
+func,0x000806DD,player_add_push_angle,candidate,player_add_push with the yaw turned by a2 for the call; no direct callers
+func,0x00080727,steer_forward_left,confirmed,"steering region 0 (top left) in the table at D_000CAF00: turns left by steer_weight_left and walks forward by steer_weight_up; exp_steer.py: button held there ran it 11 times, yaw 1998 -> 1961, moved forward"
+func,0x000807AD,steer_forward,confirmed,"steering region 1 (top centre): walks forward, no turn; exp_steer.py: ran 11 times, yaw unchanged, moved forward (dz +43)"
+func,0x000807F2,steer_forward_right,confirmed,steering region 2 (top right): turns right and walks forward; exp_steer.py: yaw 1961 -> 1997 and moved forward
+func,0x00080872,steer_turn_left,confirmed,"steering region 3 (middle left): turns left, speed 0; exp_steer.py: yaw 1997 -> 1961, no movement"
+func,0x000808DD,steer_center,strong,steering region 4 (centre): stops; with the left button down activates under the cursor (click_activate); the X cursor
+func,0x00080929,steer_turn_right,confirmed,"steering region 5 (middle right): turns right; exp_steer.py: yaw 1961 -> 1998, no movement"
+func,0x0008098C,steer_slide_left,confirmed,"steering region 6 (bottom left): move_angle_offset -512; exp_steer.py: moved left (dx -38), yaw unchanged"
+func,0x000809DC,steer_backward,confirmed,"steering region 7 (bottom centre): move_angle_offset 1024, speed by steer_weight_down; exp_steer.py: moved back (dz -38)"
+func,0x00080A22,steer_slide_right,confirmed,steering region 8 (bottom right): move_angle_offset 512; exp_steer.py: moved right (dx +37)
+func,0x00080A72,click_activate,strong,"activates what is under the cursor (a1 0, +6 in cursor mode) or at the screen centre (a1 1, ACTIVATE CENTER OBJECT): picks (13F4B) then click_world_object, else fires a readied missile spell (cast_fire_missile)"
+func,0x00080B58,intrface_key_region,confirmed,"movement keys -> steering region: FORWARD 1, REVERSE 7, TURN LEFT 3 (with SLIDE 10: 6), TURN RIGHT 5 (8), SLIDE LEFT/RIGHT 6/8, FORWARD+TURN 0/2, -1 none; sets the four steer weights to 255; same handlers as the mouse regions (exp_steer.py)"
+func,0x00080CF9,object_apply_gravity,strong,"falls object a1 (character a2): vertical_velocity += 100352*ticks/1000 down to floor_height; for the player, crossing water_level plays 86 SplashLarge and sets player_in_water; levitation (character+0x89 bit 3) and climbing stop it; exp_steer.py: ran 9 times after the jump; also creature AI 6243B/63B47"
+func,0x00080E34,player_compute_jump_velocity,strong,"jump_velocity = -((SPD + STR)/2 + 50, plus Jumping skill (character+0xAF) percent) << 8; -32256 in save_tlalac_s; caller 50220"
+func,0x00080EA4,camera_roll_turn,candidate,while turning rolls the camera object (D_00195A98+0x05) 8 a frame toward a1 (turn/4); skipped when D_001A5B34 is set
+func,0x00080F2F,camera_roll_recover,candidate,rolls the camera object's +0x05 angle back to 0 by 8 a frame when not turning
+func,0x00080FAB,player_motion_clear_bit6,candidate,player_motion_flags &= ~0x40; no direct callers
+func,0x00080FCD,vector_yaw,candidate,"angle 0..2047 of the vector (x at +0, z at +8) from x / sqrt(x*x + z*z) (14BC00)"
+func,0x00081096,player_mouse_look,strong,"view mode (mouse_control_mode 1, cursor off, SWING WEAPON not held): adds mouse motion to the player's and camera's yaw and pitch (pitch +-256, vertical reversed by mouse_turn_rate bit 7); in cursor mode LOOK AROUND moves view_look_pitch/yaw"
+func,0x000812A0,intrface_poll_controls,strong,"each frame: mouse_buttons_prev = mouse_buttons, polls mouse (12B136, 7EED8) and joystick (152D00), steer_key_region = intrface_key_region(); a key region restarts the acceleration clock D_001A5AE8"
+func,0x00081343,intrface_region_at,confirmed,steering region 0..8 (row*3 + column) of a screen point and the region's origin; its result indexes the steering table (exp_steer.py)
+func,0x00081425,player_movement_update,confirmed,"per-frame controls: HUD clicks (hud_update), steering (intrface_steer), turning, walking in 10-unit steps (5 crouched), climbing (skill 18, 'Climbing mode.'), jump (action 8 or both buttons, skill 3), float (6/7), gravity and fall damage (359/360), activation, horse sounds, bubbles 384; exp_steer.py movement"
+func,0x00081EF4,intrface_steer,strong,with the button down (or a key region) sets the four steer weights from the cursor's place in its region and calls the region handler through func_000CAE00 (table D_000CAF00); player_speed = player_base_speed
+func,0x000820AF,player_try_move,strong,moves the player a1 along yaw + move_angle_offset through collision (234EB) with the standing / crouching / riding / climbing body shape; outside the map sets D_00196D64 bit 3
+func,0x0008227A,player_try_move_vertical,strong,moves the player a1 vertically through the same collision (234EB) and body shapes; player_movement_update passes the jump/fall/float delta
+func,0x00082376,player_horse_sounds,strong,while riding (character+0x40 & 0x600) loops 365/366 HorseClop by speed (in play: 366) or 372 HorseAndCart with the cart (0x400); stops at speed 0
+func,0x00082487,player_horse_sounds_stop,strong,"stops the riding sound (D_001A5AD0 = -1); callers transport_choose, 89A2E"
+func,0x000824C1,player_climb_probe,candidate,collision probe 1024 units along yaw + move_angle_offset with the climbing shape; when it hits nothing climbing (player_motion_flags bit 5) ends
+func,0x00082609,climb_texture_ok,candidate,1 for wall texture 0 or 251..264 (D_00195F5A); gates starting to climb in player_movement_update
+func,0x00082657,string_last_char,candidate,pointer to the last character of a string; caller parse_hex_string
+func,0x0008269B,hex_digit_value,candidate,"'0'-'9' -> 0-9, 'A'-'Z' -> 10+, 'a' -> 10, else 0; caller parse_hex_string"
+func,0x00082750,parse_hex_string,candidate,"hex number from a string, last digit first (16^k); -1 when empty; no callers"
 func,0x000827C3,config_read,strong,"main passes argv[1]: reads 'key value' pairs ('%s %s') for path, pathcd, controls, fadecolor, mapfile, faction, fpu, startMap, artifact, facloop, custom, item, gender, ps2fix, user, region, debug, blockStr, helmet, maps, marker, seed, stereo, objmemsize, TextureMemory, MagicRepair, cheatMode; 'ERR: path not specified', 'There are configuration error(s)'"
 func,0x00082DF6,world_draw_objects,strong,"every frame from world_render (main.c 10B11): weather variant, the player's light (player_light_draw), then each object near the player and the location's objects through object_draw_cb (object_foreach_open), the sky outdoors; probably not args.c"
 func,0x0008302D,rotate_xz,confirmed,"exp_chain2: (1000, 0) by 512 -> (0, 1000), by 1024 -> (-1000, 0): rotates (x, z) by an angle (2048 to a turn) with the sine/cosine tables (D_00150A00, D_00150200); callers object_follow_move_cb, rmb_add_subrecord, rmb_add_doors/people"
@@ -2700,6 +3038,23 @@ func,0x0008BCE9,namegen_read_part,strong,"(file, part): seeks part offset + rand
 func,0x0008BD50,building_name,confirmed,"(building record): 'Your house.', 'House for sale', 'The Bank of %s', 'Palace', 'City Wall', guild halls, 'The %s Residence', or shop/tavern names from word lists seeded by building+0x00 (bit 15 = TEXT.RSC id); exp3 in Sentinel: 'Edwyrick's Finest Smith', 'The Bank of Sentinel', 'The Rat and Jug', 'House for sale', 'Residence'"
 func,0x0008C232,str_list_random,confirmed,"(NULL-ended pointer list): a random entry (rand_range(0, n-2)); building_name's word lists (exp3 names)"
 func,0x0008C286,input_edit_number_box,candidate,"inpstr.c (filed under names.c): (buf, x, y, w, h, max): input_digits_only = 1, runs the line editor 8C2D7, then 0; no callers"
+func,0x0008C2D7,inpstr_edit,strong,"modal text entry in a box (x,y,w,h, max length): blinking caret, Enter returns, Esc restores the old text; callers automap_button_note_line, town_note_input, 8C286; inpstr.c"
+func,0x0008C462,inpstr_read_key,strong,"next typed character, or 128 left, 129 right, 131 Home, 130 End, 0 none"
+func,0x0008C4E4,inpstr_begin_number,strong,"starts entry of a number (digits only, 8 long) from a1 (itoa); callers inv_gold_button, tavern_rent_room, trade_counter_offer, rest (7193D), 5A3BC, 7DE82/7DEFC; in play: rest FOR A WHILE 'press 1; press 2; press enter'"
+func,0x0008C566,inpstr_begin_text,strong,"starts entry of text a1 (max length a2); callers sheet_rename, spellmaker_enter_name, travel_button_find, 4D402, 53A89 ..."
+func,0x0008C5C9,inpstr_update,strong,"per-frame entry: draws the text and caret at inpstr_x/y, handles one key; 0 pending, 1 done (inpstr_result), 2 cancelled (text restored)"
+func,0x0008C6E9,inpstr_handle_key,strong,"edits at the cursor (Backspace 8, Delete 127, arrows, Home/End, digits-only check, width limit); Enter returns atoi(text), Esc 0x8000, else 0x87654321 (keep going)"
+func,0x0008C9D2,inpstr_text_width,strong,pixel width of the first a2 characters of a string (5A4A9): the caret position
+func,0x0008CA25,picklist_save_background,strong,saves the screen under the list area (+0x05) and scroll bar (+0x1D) into +0x33/+0x37 when the list is framed; caller picklist_init (filed under inpstr.c)
+func,0x0008CA9A,picklist_init,strong,"fills a picklist: framed flag, 4 colours, list / up / down / bar rects, visible rows; allocates 35200 bytes of entries (800 x 44); picklist.c; callers spellbook, magic items, spellshop, 7D24F/7D3CA"
+func,0x0008CC33,picklist_update_thumb,strong,visible rows = list height / (font height + 1); thumb height = (bar height - 2) * visible / count
+func,0x0008CCC8,picklist_add,strong,"appends {flags, index, text[40]} (sorted by text when D_001940D8 bit 0 is set), count++, picklist_update_thumb"
+func,0x0008CF0E,picklist_free,strong,"frees the entries and the saved backgrounds, count 0; callers every list closer (spellbook_close, magic_items_close, spellshop_close)"
+func,0x0008CFE6,picklist_poll,strong,"mouse/arrow keys/Enter: returns entry index+1 on Enter or double-click (unless flag 0x80), -5 selected, -3/-2 scrolled down/up (3-tick repeat), -4 bar dragged, -1 nothing"
+func,0x0008D45A,picklist_clip_text,strong,shortens a string until its pixel width (5A4A9) fits a1
+func,0x0008D497,picklist_draw,strong,"restores the backgrounds, draws the thumb, then the visible entries (colour by flags bit 0, selected in the third colour, shadowed)"
+func,0x0008D800,point_in_rect,strong,"x,y inside left,top,right,bottom (swapped into order first); callers picklist_poll, title_menu, 7193D"
+func,0x0008D88B,swap_shorts,strong,xor-swaps two shorts; caller point_in_rect
 func,0x0008D8CC,object_heap_init,strong,"init.c 4F47C (startup): heap size 1280000 or 2048000 (objmemsize), 'Allocating %d memory for the maps.', mem_pool_init(object_heap), creates location_object (type 1 World, 48-byte data) and nonworld_root (type 39 NonWorld, id 700)"
 func,0x0008D9B9,object_heap_shutdown,strong,mem_pool_free(object_heap); only caller init.c 4F5F3 (the shutdown that closes the archives)
 func,0x0008D9DB,object_free_node,strong,"clears the twin's back link (+0x33), object_unlink, object_heap_release; the callback object_free_children walks with"
@@ -2909,6 +3264,14 @@ func,0x0009957D,dpmi_unlock_region,strong,int 31h AX=0601h (unlock linear region
 func,0x0009960A,dpmi_call_ff30,candidate,int 31h with AX=0FF30h (not a standard DPMI function; probably a DOS extender call) after segread; called once by main at startup
 func,0x00099648,dpmi_set_segment_base,strong,"int.asm: int 31h AX=0007h, sets the base address (edx split into cx:dx) of the selector in eax; no callers in the C"
 func,0x00099662,dpmi_alloc_dos_memory,strong,"int.asm: int 31h AX=0100h for (eax+15)>>4 paragraphs, then AX=0006h for the selector's base: returns the block's linear address; no callers in the C"
+func,0x00099689,color_init_remap_tables,candidate,"allocates 32 x 256 colour-translation tables (identity), rewrites palette ranges in rows 1-15 from D_001886A8 and copies 10 16-colour rows from D_001886D2; caller 4ED36 (init); color.c"
+func,0x000998C8,string_hash,candidate,h = h*2 + c over a string; caller parse_expand (filed under color.c)
+func,0x00099922,door_start_swing,strong,"starts a door opening (a2 0, 362 NormalDoorOpen / 27 DungeonDoorOpen) or closing (a2 1) into doors_moving, alerts creatures (ai_alert_creatures); callers door_try_open, weapon_melee_strike, 22174, 6480F; in play: trade1 door clicks"
+func,0x00099A37,doors_update,strong,"each frame swings the doors in doors_moving by the clock; a closing door blocked by the player reopens, a finished one plays 361 NormalDoorClose / 26 DungeonDoorClose; caller 10B11"
+func,0x00099B86,door_blocked_by_player,candidate,1 when the door's collision (14AA92) hits the player's position
+func,0x00099C1B,object_find_building,candidate,"walks up an object's parents to the location and returns the building record (26-byte, location buildings) whose +0x14 id matches the object's record_id; no callers"
+func,0x00099CB9,building_flat_daylight_cb,candidate,callback: type-34 flats with picture index 15/16 get +0x16 bit 1
+func,0x00099D0D,building_flats_daylight,candidate,sets D_00190BE4 to 06:00-18:00 daytime and runs building_flat_daylight_cb over a building's children; caller 871FA (entering a building)
 func,0x00099D75,marker_match_cb,strong,"matches markers of kind marker_kind in marker objects (34) and in block flat lists (43, 56): counts them, or counts down to the wanted one and copies it to found_marker (a fake 71-byte type-34 header)"
 func,0x0009A022,marker_find_first,confirmed,"fallcall marker_find_first(location_object, 8) in save_mord returned found_marker (the start marker); caller automap_draw_block_overview"
 func,0x0009A0A0,marker_find_nth,strong,"the n-th marker of a kind (n in faction_scratch), with its cell; callers tavern_go_to_room (kind 6 near the room), disease_become_vampire, click.c 77412 (kind 16/9), keys"
