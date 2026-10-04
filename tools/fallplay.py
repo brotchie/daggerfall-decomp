@@ -139,6 +139,26 @@ def env(emu):
     return rd(emu, 0x1789FA, "<B")
 
 
+# The game's mode byte D_00196274 (the decomp's MODE): which screen has the input. Found by
+# opening each screen from three saves (tools/fallstate.py screens); see docs/state.md.
+SCREENS = {0: "world", 3: "character sheet", 4: "inventory", 5: "spellbook", 7: "options",
+           14: "logbook", 16: "rest", 19: "travel map"}
+USE_MODES = {0: "grab", 1: "info", 2: "steal", 3: "talk"}          # D_00196276: F2 F3 F1 F4
+
+
+def state(emu):
+    """What the game is doing, read from memory (docs/state.md has the evidence)."""
+    c = rd(emu, 0x195BE0, "<I") - L                 # the player character record
+    mode = rd(emu, 0x196274, "<B")
+    return {"where": ENVS.get(env(emu), "?"), "screen": SCREENS.get(mode, "mode %d" % mode),
+            "use": USE_MODES.get(rd(emu, 0x196276, "<B"), "?"),
+            "name": bytes(emu.uc.mem_read(L + c, 32)).split(b"\0")[0].decode("latin-1"),
+            "level": rd(emu, c + 0x81, "<B"), "gold": rd(emu, c + 0x85, "<i"),
+            "magicka": (rd(emu, c + 0x8D, "<H"), rd(emu, c + 0x8F, "<H")),
+            "max health": rd(emu, c + 0x7C, "<H"),
+            "attributes": struct.unpack("<8H", bytes(emu.uc.mem_read(L + c + 0x20, 16)))}
+
+
 def set_player(emu, x=None, z=None, yaw=None):
     o = player_obj(emu)
     if x is not None:
@@ -383,6 +403,10 @@ def describe(emu, top=6):
     lines = ["you (%s): x %.1f m east, z %.1f m north (world units %d, %d), heading %d deg %s" % (
         ENVS.get(env(emu), "?"), p["x"] / UNITS, p["z"] / UNITS, p["x"], p["z"], round(deg) % 360,
         compass(deg))]
+    st = state(emu)
+    lines.append("state: screen %s, %s mode; %s, level %d, %d gold coins, magicka %d/%d, max "
+                 "health %d" % (st["screen"], st["use"], st["name"], st["level"], st["gold"],
+                                st["magicka"][0], st["magicka"][1], st["max health"]))
     bs = [b for b in buildings(emu) if b["type"] not in range(17, 23)] if env(emu) == 1 else []
     if env(emu) != 1:
         pass
