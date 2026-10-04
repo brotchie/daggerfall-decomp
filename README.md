@@ -17,6 +17,7 @@ Assembler 4.0; the tools check the executables' SHA-1.
 - [docs/head_start.md](docs/head_start.md): the research plan this project started from
 - [docs/progress.md](docs/progress.md): a log of what has been found and done, newest last
 - [docs/xngine.md](docs/xngine.md): the XnGine engine (object 2): plan and log
+- [docs/play.md](docs/play.md): playing the headless game with tools/fallplay.py: commands, start points, UI facts
 
 ## Status
 
@@ -87,7 +88,7 @@ tools/build-and-verify.sh
 | `tools/xn_disasm.py` | disassemble object 2 (XnGine) into TASM modules in `src/xngine/` that reassemble to the original |
 | `tools/xn_link.py` | assemble the XnGine modules with TASM 4.0 under DOSBox-X and check bytes and fixups |
 | `tools/fallemu.py` | run `FALL.EXE` headless (Unicorn): DOS, DPMI, timer, keyboard and mouse, scripted scenarios |
-| `tools/fallplay.py` | play the headless game a step at a time (snapshots, rewind, 2x screenshots, new code per step), for a model at the controls; `FALLEMU_CHEAT=1` boots with the game's cheat mode |
+| `tools/fallplay.py` | play the headless game a step at a time (snapshots, rewind, 2x screenshots, new code per step), for a model at the controls (walk, turn, go to and enter buildings); `FALLEMU_CHEAT=1` boots with the game's cheat mode |
 | `tools/fallcov.py` | code coverage of the headless game: which functions ran, per source unit and XnGine module |
 | `tools/build_unicorn.sh` | build the patched Unicorn `fallemu.py` uses (`tools/unicorn/dagger-unicorn.patch`): ~70x faster in the 3D world |
 | `tools/xn_trace.py`, `tools/xn_record.py` | XnGine code coverage and run-time code writes; record and replay single calls |
