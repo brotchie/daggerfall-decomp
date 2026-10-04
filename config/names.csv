@@ -81,6 +81,7 @@ global,0x0018F060,region_politics,candidate,"80-byte per-region politics records
 global,0x0018F08E,region_legal_reputation,strong,"short per region (80-byte stride, index current_region): the Stendarr blessing adds to it ('blessed your reputation with the law', TEXT 716)"
 global,0x001903A4,text_buffer,strong,"sprintf target for every text line drawn by the sheet, travel map and automap (and 76 other files); D_001903A5, its second byte, is overwritten with a colour code"
 global,0x00190504,creature_list,candidate,creature objects processed by ai_update_creatures (the player appended at the end each frame)
+global,0x00190704,monster_anim_records,candidate,"the loaded ASCR animation records, read only by XnGine's animation-script interpreter xn_C0100 (exp4)"
 global,0x00190BF0,automap_pitch,confirmed,"512 looking straight down, 128 in the perspective view: the grid button switched it 512 -> 128 in save_mord"
 global,0x00190BF4,automap_yaw,confirmed,the rotate buttons add/subtract 16 a frame (0 -> 512 after a click in save_mord)
 global,0x00190C34,training_state,candidate,"training_update state: 1234 ask to pay, 1235 done, 1236 skill chosen"
@@ -111,6 +112,7 @@ global,0x00195A9C,current_building,strong,"the building entered: +0x12 faction (
 global,0x00195AA0,player_entity,confirmed,"pointer to the player's creature entity: the character record is at +0x47 (2 saves), its parent (+0x43, the generic record header) is the world object; disease code checks entity+71 == player_character"
 global,0x00195AA4,player_object,confirmed,pointer to the player's world object: x/y/z ints at +7/+11/+15 move the player (fallplay tp); it is player_entity's parent (+0x43)
 global,0x00195AC4,location_object,candidate,root object of the loaded location/dungeon: its +0x1F high word is the id in the at%05d.amf/.atf file names; its children are walked for seen marks
+global,0x00195AC8,monster_bsa_handle,candidate,MONSTER.BSA's open archive handle (exp2 traces)
 global,0x00195ACC,text_macro_potion,candidate,potion recipe the %po macro reads ('Recipe for %po.')
 global,0x00195AF4,found_record,candidate,result of the membership searches (object pointer)
 global,0x00195B04,spell_records,candidate,89-byte spell records (name at +0x2F) the spell shop chooses from
@@ -354,6 +356,12 @@ field,membership+0x02,kind,strong,"guild kind (guild_kind_of_faction): 0 DB, 1 M
 field,membership+0x03,faction,strong,short faction id (40 at the Mages Guild in the experiment)
 field,membership+0x05,rank_time,strong,game_minutes of the last rank change; re-ranked after 40320
 field,membership+0x09,armor_received,candidate,bit per rank: knightly 'Receive Armor' already given (461)
+field,monster+0x00,type,strong,"monster object: type byte 18 (exp5, the C of func_00078B8A; docs/asset_tracing.md)"
+field,monster+0x1B,texture,strong,monster object: sprite texture archive<<7 | record (exp7)
+field,monster+0x23E,monster_type,strong,u16 monster id = Daggerfall Unity's MobileTypes (25 Frost Daedra); changing it changes the ASCR animation and bark sound loaded (exp7)
+field,monster+0x241,sound_type,strong,byte copy of the monster id; its sound is 10000 + 10 * id (func_000633BC)
+field,monster+0x2C1,anim_state,candidate,ASCR animation state (exp4/exp6)
+field,monster+0x47,character,strong,"monster object: a character record laid out like the player's (name, health at +195/+197 of the object) (exp5)"
 field,object+0x00,record_type,strong,"byte: 2 item, 3 character, 9 spell, 20 soul, 31 potion recipe, 33 loot pile, 52 item container, 54 item in repair/sold pile (read in save_tlalac_s; code tests)"
 field,object+0x01,angle_x,strong,"player object: short; yaw is +0x03 (2048 to a turn, clockwise from north)"
 field,object+0x03,yaw,confirmed,"player object: short, 2048 to a turn, clockwise from north; the camera follows the game's own turning only"

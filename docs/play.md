@@ -131,12 +131,13 @@ creation into the first dungeon.
   - [ and ] cycle through quest locations
   - Alt+F11 goes back to the last position
 
-## Start points to be wary of
+## The main-quest ending saves
 
-Six of the "indoors" saves (blades, orcs, worms, uking, sentinel, wayrest) all start at the
-same spot (x 1045 m, z 408390 m), in an odd pink-floored room with a green cube. save_mord
-starts in a real dungeon corridor. Something about loading those saves is off; use them
-for screens and the character, not for dungeons.
+Six of the indoor saves (blades, orcs, worms, uking, sentinel, wayrest) all start at the
+same spot (x 1045 m, z 408390 m), in a pink-floored room with a green cube. These are the
+six main-quest ending saves, inside the Mantellan Crux: they load BLOCKS.BSA
+S0000000–S0000006. The load is fine (docs/asset_tracing.md). save_mord starts in an
+ordinary dungeon, with three monsters about 13 m below the player.
 
 ## For coverage
 
