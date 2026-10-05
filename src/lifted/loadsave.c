@@ -45,7 +45,7 @@ extern char saved_region_name[];
 extern char bio_modifiers[];
 extern char saved_positions[];
 extern char D_0018DE44[];
-extern signed char region_event_values[];
+extern signed char regions[];
 extern signed char text_buffer[];
 extern signed char D_001903A8;
 extern signed char scratch_190d16;
@@ -710,7 +710,7 @@ void savevars_read(int slot)
     read(save_file_handle, (int)clothing_gender_group, 4);
     read(save_file_handle, (int)clothing_gender_offset, 4);
     read(save_file_handle, (int)&weapon_active_hand, 1);
-    read(save_file_handle, (int)region_event_values, 4960);
+    read(save_file_handle, (int)regions, 4960);
     read(save_file_handle, (int)&current_region, 1);
     read(save_file_handle, (int)cheat_flags, 4);
     read(save_file_handle, (int)&vertical_velocity, 4);
@@ -782,7 +782,7 @@ void savevars_write(int slot)
     write(save_file_handle, (int)clothing_gender_group, 4);
     write(save_file_handle, (int)clothing_gender_offset, 4);
     write(save_file_handle, (int)&weapon_active_hand, 1);
-    write(save_file_handle, (int)region_event_values, 4960);
+    write(save_file_handle, (int)regions, 4960);
     write(save_file_handle, (int)&current_region, 1);
     write(save_file_handle, (int)cheat_flags, 4);
     write(save_file_handle, (int)&vertical_velocity, 4);

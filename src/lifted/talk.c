@@ -46,7 +46,7 @@ extern int talk_category_names[];
 extern int talk_regional_names[];
 extern char region_neighbours[];
 extern signed char D_00187CA8;
-extern signed char region_event_values[];
+extern signed char regions[];
 extern signed char D_0018F045[];
 extern signed char D_0018F046[];
 extern signed char region_event_flags[];
@@ -1723,7 +1723,7 @@ void region_reset_war(struct faction *faction)
 {
     if (faction->type != 7 || faction->region == 255) return;
     region_event_groups[faction->region * 80] = 0;
-    region_event_values[faction->region * 80] = 0;
+    regions[faction->region * 80] = 0;
     region_event_flags[faction->region * 80] = 0;
     D_0018F062[faction->region * 80] = 0;
     D_0018F063[faction->region * 80] = 0;
@@ -1741,7 +1741,7 @@ void func_0001B2ED(struct faction *faction)
 void func_0001B36A(struct faction *faction, int index)
 {
     if (faction->type != 7 || faction->region == 255) return;
-    region_event_values[faction->region * 80] = 0;
+    regions[faction->region * 80] = 0;
     D_0018F045[faction->region * 80] = 0;
     D_0018F046[(faction->region * 80) + index] = 0;
     D_0018F063[(faction->region * 80) + index] = 1;

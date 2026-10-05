@@ -8,7 +8,7 @@ extern char *xn_world_tile_layer;
 extern char D_001705F8[];
 extern signed char climate_categories[];
 extern int D_00187F30[];
-extern signed char region_event_values[];
+extern signed char regions[];
 extern struct record *player_object;
 extern char current_region_data[];
 extern signed char current_region;
@@ -41,7 +41,7 @@ void region_free_tables(void)
 void region_enter(unsigned char old_region, unsigned char region)
 {
     current_region = region;
-    *(int *)current_region_data = ((int)region_event_values) + (((int)(unsigned char)current_region) * 80);
+    *(int *)current_region_data = ((int)regions) + (((int)(unsigned char)current_region) * 80);
     D_00196269 = current_region;
     region_unload();
     maploads_enter_region((int)(unsigned char)region);

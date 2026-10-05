@@ -42,7 +42,7 @@ extern int mem_check_level;
 extern int frame_checkpoint;
 extern int engine_running;
 extern char saved_positions[];
-extern signed char region_event_values[];
+extern signed char regions[];
 extern char region_price_adjustment[];
 extern signed char text_buffer[];
 extern struct record *creature_list[];
@@ -293,7 +293,7 @@ void newgame_place_player(void)
         player_environment = 1;
     }
     current_region = cfg_region;
-    *(int *)current_region_data = ((int)region_event_values) + (((int)(unsigned char)current_region) * 80);
+    *(int *)current_region_data = ((int)regions) + (((int)(unsigned char)current_region) * 80);
     region_enter(0, (int)(unsigned char)current_region);
     dungeon_water_level = 10000;
     if (((int)player_environment) == 1) {

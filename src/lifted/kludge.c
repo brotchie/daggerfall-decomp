@@ -30,7 +30,7 @@ extern signed char D_0017BB3F[];
 extern char potion_recipes[];
 extern char D_00180B42[];
 extern char monster_names[];
-extern signed char region_event_values[];
+extern signed char regions[];
 extern signed char text_buffer[];
 extern char D_001903BA[];
 extern signed char scratch_190ce4[];
@@ -263,7 +263,7 @@ void kludge_make_test_character(int full)
     for (i = 0; i < 35; i++) {
         player_character->skills[i].pad4 = player_character->skills[i].value;
     }
-    *(int *)current_region_data = (int)region_event_values;
+    *(int *)current_region_data = (int)regions;
     object = object_create_child(D_001959E0, 0, 107);
     object->image2 = 202;
     object->type = 2;

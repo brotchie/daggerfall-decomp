@@ -9,7 +9,7 @@ extern int marquee_owned_text;
 extern char region_event_flag_groups[];
 extern signed char region_event_durations[];
 extern signed char D_00178EB0[];
-extern signed char region_event_values[];
+extern signed char regions[];
 extern signed char region_event_flags[];
 extern char region_event_groups[];
 extern char region_persecuted_temple[];
@@ -70,7 +70,7 @@ void region_flag_set(int region, int flag)
     }
     region_event_flags[(region * 80) + flag] = 1;
     *(signed char *)(region_event_groups + (region * 80) + *(unsigned char *)(region_event_flag_groups + flag)) = 1;
-    region_event_values[(region * 80) + flag] = rand_range((int)(unsigned char)region_event_durations[flag * 2], (int)(unsigned char)D_00178EB0[flag * 2]);
+    regions[(region * 80) + flag] = rand_range((int)(unsigned char)region_event_durations[flag * 2], (int)(unsigned char)D_00178EB0[flag * 2]);
     if (flag != 18) return;
     *(short *)(region_persecuted_temple + (region * 80)) = *(short *)((char *)faction_random_of_type(1) + 33);
 }
