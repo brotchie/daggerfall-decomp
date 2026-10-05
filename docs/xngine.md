@@ -646,6 +646,73 @@ What the pilot taught, now in the guide:
   with the register-operand helpers.
 - `bsr` of zero is kept with `xn_bsr(v, old)`.
 
-**Left:** the other 657 functions, in about six groups (the guide's split), on the designs
-in `build/xn_readable/structs/` and `build/xn_readable/smc/`. Interrupt handlers need a
-stub of their own (`iret`), and the generated code's pools stay byte-exact.
+**The conversion (2026-10-05).** Six agents converted the rest, a group of subsystems each,
+from the designs in docs/engine/ (the data structures with their evidence, `structs.md`; the
+self-modifying, unrolled and generated code, `smc/`). Each group worked in its own folder and
+its own copy of the interface table. The coordinator merged the groups into `src/engine/`
+(97 files), the agents' interface overrides into `config/xngine_abi_override.csv` (148 rows,
+each with its reason and, for a live function, a passing clobber test), and their names into
+`config/names.csv` (336 more, 277 of them the patch fields).
+
+| Group | Subsystems | In C | Records (alone and all routed) |
+|---|---|---|---|
+| pilot | vec, mat, math | 62 / 62 | 803 |
+| 2D drawing | draw, img, font | 72 / 75 | 983 |
+| rasteriser | span, shade, tmap, light, `xn_render_frame` | all but data | 1,165 |
+| 3D pipeline | poly, render, flat, model, cam, tex | 111 / 111 | 2,197 |
+| world | collide, world, terrain, sky | 104 / 105 | 1,375 |
+| water and screen | water, gfx, vid, pal | 64 / 64 | 489 |
+| system and input | dos, sys, str, mem, rand, timer, serial, helmet, anim, mouse, kbd, joy, bits, spell, input | 174 / 228 | 1,186 |
+
+**648 of the 719 functions run as C** (281 direct, 258 through glue, 104 keep-eax, 5 interrupt
+handlers). The other 71 are not missing:
+- 62 are blocks inside another function's code, which that function's C covers: the run-time
+  blocks of `xn_render_frame` and of the keyboard, joystick, divide-error and serial handlers,
+  two jump targets, an unreachable failure tail and an unreachable continuation;
+- 9 are data the disassembly listed as code: the four code templates (the texture mapper's
+  and the three light shaders'), two offset tables and three strings.
+
+The code generators stay byte-exact (the records compare the pools), but the C never runs
+the generated code: it evaluates the light shaders and the texture-mapper copies from the
+copies' own operands. Patched operands are named variables at their fields' addresses.
+Unrolled bodies with a planted `ret` are loops whose count is read from where the `ret` was
+planted.
+
+**Verification, all of it in C at once:**
+- `xn_rc.py test ... --all`: 613 / 613 functions with records pass all of them (8,157 records).
+- `xn_rc.py test --corpus`: 8,204 / 8,204 records pass, each compared by its own function's
+  interface; 8,198 of them run some of the C (209,970 entries).
+- Differential tests (made-up entry states, and the agents' targeted and service-call states)
+  for the functions without records.
+- `xn_rc.py frames SNAP` (new): the game a frame at a time in lockstep. From the same machine,
+  one pass of main's loop runs with the asm and with the C, the timer held, and then all of
+  memory and the screen are compared. On all 18 saves: 20 frames
+  standing and 20 after walking with the timer held, then 30 frames walking and 30 walking and
+  turning with the same timer interrupts given to both machines each frame (`--irqs`; every
+  one of the 30 screens differs from the one before). All 1,800 frames are identical in all of
+  memory and on the screen.
+- `play --compare` runs by timer ticks instead. The timer fires every so many instructions, the
+  C takes a different number, and a moving scene ends differently (lights flicker on other
+  ticks); 300 ticks from six saves run without a fault.
+
+**What the merge needed:**
+- A game function with a C definition is called by its C prototype in the analysis.
+  `mem_check_heap` had made every register an input, and spurious outputs cascaded through
+  `xn_render_frame`'s callees.
+- A replayed DOS/DPMI/BIOS call now writes back only the registers the service defines
+  (tools/xn_services.py). The others keep what the replayed code holds, which differs when C
+  keeps its own stack addresses across an `int`.
+- Declarations across groups. A group that called another group's function declared it with
+  the asm's register convention; once both were C, the call went to the C definition. The
+  world group's DOS calls were fixed to the system group's prototypes. A check of every
+  `#pragma aux` against the definition's (tools/xn_declcheck.py) leaves only
+  compatible ones.
+- Two names for one address, where the C views a struct and its first field
+  (config/xngine_aliases.csv).
+
+**Left:** the C is readable, but it still answers to the asm. Interfaces follow the asm's
+registers (`#pragma aux`, the `_r` adapters). Values that callers or the records see are kept:
+leftover registers, scratch globals, patched code bytes, the generated code, 16-bit wraps and
+the original bugs. Data stays at its addresses in the game. A next pass can drop each of those
+once nothing asm calls the engine, testing against the game's calls and the frames instead of
+each function's records.

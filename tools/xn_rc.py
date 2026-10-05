@@ -100,7 +100,10 @@ FLAGS = "-mf -4r -s -zl -zld -ox -bt=dos -w3 -zq".split()
 
 _names = None
 # config/names.csv, then the names the conversion proposes (merged into it by the coordinator)
-NAME_FILES = [os.path.join(ROOT, "config", "names.csv"), os.path.join(BASE_OUT, "names.csv")] + \
+# config/xngine_aliases.csv: second names for an address that the C views two ways (a struct
+# and its first field); names.csv holds one name per address
+NAME_FILES = [os.path.join(ROOT, "config", "names.csv"),
+              os.path.join(ROOT, "config", "xngine_aliases.csv"), os.path.join(BASE_OUT, "names.csv")] + \
     ([os.path.join(OUT, "names.csv")] if OUT != BASE_OUT else [])
 
 
@@ -240,8 +243,9 @@ _obj2 = None
 
 
 def handler_entry(va):
-    """For an interrupt or exception handler (asm that returns with iretd or retf): (the
-    return opcode, the address of the data selector its prologue loads into DS, or None).
+    """For an interrupt or exception handler (asm that returns with iretd, iret or retf): (the
+    return instruction's bytes, the address of the data selector its prologue loads into DS,
+    or None).
     The prologue's `mov ax, SEL; mov ds, eax` holds the loader's selector for the data object
     in its immediate; the route's stub loads DS and ES from there, as the asm would."""
     global _obj2
@@ -255,11 +259,8 @@ def handler_entry(va):
     import capstone
     md = capstone.Cs(capstone.CS_ARCH_X86, capstone.CS_MODE_32)
     for i in md.disasm(code, va):
-        if i.mnemonic in ("iretd", "iret"):
-            ret = b"\xCF"
-            break
-        if i.mnemonic == "retf":
-            ret = b"\xCB"
+        if i.mnemonic in ("iretd", "iret", "retf"):
+            ret = bytes(i.bytes)        # as the asm has it (66 CF: a 16-bit iret, which it is)
             break
         if i.mnemonic == "ret":
             break
@@ -733,6 +734,101 @@ def play(snap, ticks, shot=None, asm=False, compare=False, script=""):
                          img=None if asm else RImage(), what="the readable C")
 
 
+def frames(snap, n, ticks=0, script="", irqs=0):
+    """The game a frame at a time in lockstep: from the same machine, one pass of main's loop
+    (func_0001025B to func_0001025B) with the asm and with every converted function in C,
+    the timer held (no interrupts in the frame), then all of low and program memory and the
+    screen compared. The asm machine goes on to the next frame; the C machine starts each
+    frame from a copy of it. `play --compare` runs by timer ticks, which come every so many
+    instructions: the C's other instruction counts move the ticks, and a moving scene ends
+    differently. This compares the frames themselves. irqs: timer interrupts given to both
+    machines at the start of each frame, at the same instruction, so game time moves (walking,
+    animation, flicker) the same in both."""
+    import fallemu
+    import fallcall
+    safe = fallemu.LOAD + fallcall.SAFE
+    path = snap if os.path.exists(snap) else os.path.join(fallemu.SNAPS, snap + ".snap")
+    state = os.path.join(OUT, "frames_state.snap")
+    os.makedirs(OUT, exist_ok=True)
+    asm = fallemu.Emu.load(path, overlay=os.path.join(OUT, "overlay_frames_asm"))
+    img = RImage()
+
+    def one_frame(emu, cap=2_000_000_000):
+        """Run main's loop once, interrupts held; the instructions it took, or None. A code
+        hook at the safe point stops the CPU (emu_start's `until` is compiled into translated
+        blocks, and a block translated before is not stopped by it)."""
+        from unicorn import UC_HOOK_CODE
+        hit = []
+
+        def stop(uc, address, size, _user):
+            if armed:
+                hit.append(address)
+                uc.emu_stop()
+        armed = False
+        hk = emu.uc.hook_add(UC_HOOK_CODE, stop, None, safe, safe)
+        try:
+            emu.uc.emu_start(emu.r("eip"), 0xFFFFFFFF, count=1)   # off the safe point
+            for _ in range(irqs):           # the same timer interrupts at the same place
+                if emu.r("eflags") & 0x200:
+                    emu.ticks += 1
+                    emu.pit_reads = 0
+                    emu.irq(8)
+            armed = True
+            done = 0
+            while done < cap and not hit:
+                emu.uc.emu_start(emu.r("eip"), 0xFFFFFFFF, count=fallemu.TICK)
+                while not hit and emu.clear_exception_state():
+                    emu.uc.emu_start(emu.r("eip"), 0xFFFFFFFF, count=fallemu.TICK)
+                done += fallemu.TICK
+            return done if hit else None
+        finally:
+            emu.uc.hook_del(hk)
+
+    bad = 0
+    try:
+        if ticks:
+            asm.run(asm.ticks + ticks, fallemu.parse_script(script))
+        if not fallcall.run_until(asm, fallcall.SAFE, 3000):
+            print("%s: the game does not reach its frame loop" % os.path.basename(path))
+            return 1
+        for k in range(n):
+            asm.save(state)
+            c = fallemu.Emu.load(state, overlay=os.path.join(OUT, "overlay_frames_c"))
+            try:
+                img.install(c)
+                img.route(c, sorted(img.funcs))
+                hits0 = img.hits
+                na, nc = one_frame(asm), one_frame(c)
+                if na is None or nc is None:
+                    print("frame %d: %s did not finish" % (k, "asm" if na is None else "C"))
+                    bad += 1
+                    break
+                esp = asm.r("esp")
+                diffs = []
+                for base, size in ((0, fallemu.LOW), (fallemu.LOAD, fallemu.MEM)):
+                    ma, mc = asm.read(base, size), c.read(base, size)
+                    if ma == mc:
+                        continue
+                    for off in range(0, size, 4096):
+                        if ma[off:off + 4096] != mc[off:off + 4096]:
+                            a = base + off
+                            if esp - (1 << 20) <= a < esp:      # the dead stack below ESP
+                                continue
+                            diffs.append(a)
+                regs = [r for r in ("eax", "ebx", "ecx", "edx", "esi", "edi", "ebp", "esp")
+                        if asm.r(r) != c.r(r)]
+                print("frame %d: asm %d M insns, C %d M (C entered %d times): %s" % (
+                    k, na // 1000000, nc // 1000000, img.hits - hits0,
+                    "identical" if not diffs else "%d pages differ (first %08X)" % (
+                        len(diffs), diffs[0])) + (" [registers %s]" % " ".join(regs) if regs else ""))
+                bad += bool(diffs)
+            finally:
+                c.close()
+        return 1 if bad else 0
+    finally:
+        asm.close()
+
+
 # --------------------------------------------------------------------------------------------
 # Report
 
@@ -1003,6 +1099,12 @@ def main():
     p.add_argument("--asm", action="store_true")
     p.add_argument("--compare", action="store_true")
     p.add_argument("--script", default="")
+    fr = sub.add_parser("frames")
+    fr.add_argument("snap")
+    fr.add_argument("--frames", type=int, default=10)
+    fr.add_argument("--ticks", type=int, default=0, help="play this many ticks (asm) first")
+    fr.add_argument("--script", default="")
+    fr.add_argument("--irqs", type=int, default=0, help="timer interrupts at each frame's start")
     sub.add_parser("report")
     for n in ("asm", "abi"):
         q = sub.add_parser(n)
@@ -1021,6 +1123,8 @@ def main():
         return diff(expand(a.funcs), untested=a.untested, trials=a.trials, verbose=a.v)
     if a.cmd == "play":
         return play(a.snap, a.ticks, a.shot, a.asm, a.compare, a.script)
+    if a.cmd == "frames":
+        return frames(a.snap, a.frames, a.ticks, a.script, a.irqs)
     if a.cmd == "report":
         return report()
     if a.cmd == "asm":

@@ -5,11 +5,17 @@ subsystem at a time. The pilot (vec, mat and math: 62 functions in `src/engine/`
 this way and is the worked example. The log and the numbers are in `docs/xngine.md`, "phase
 6: readable C".
 
+**Status (2026-10-05): done.** All of XnGine is readable C in `src/engine/`: 648 of the 719
+functions run as C, and the other 71 are blocks inside other functions or data. Every record
+of the corpus passes with all of it routed at once, and lockstep frames of the game match the
+asm in all of memory. The guide stays as the reference for how the C runs, how its interfaces
+are declared and tested, and how to change it.
+
 Read these before starting a subsystem:
-- `build/xn_readable/structs/`: the engine's data structures, as C. `engine_structs.h` has
+- `docs/engine/`: the engine's data structures. `src/engine/xnstruct.h` has
   64 structs with compile-checked offsets; `structs.md` has the evidence. Their field and
   global names are merged into `config/names.csv`.
-- `build/xn_readable/smc/`: a design for every function that patches code, plants `ret`s,
+- `docs/engine/smc/`: a design for every function that patches code, plants `ret`s,
   runs unrolled bodies or generates code. `index.md` gives the rules, there is one `.md`
   per subsystem, and `groups.csv` lists the groups that must convert together and the
   records that test them. `patch_fields.csv` names all 292 patch fields.
@@ -95,7 +101,7 @@ most negative input. Keep such details; they are what makes it exact.
   linker resolves every name the C does not define to the loaded game.
   - Functions and globals resolve by their `config/names.csv` names, then by
     `build/xn_readable/names.csv` (merged proposals), `$XN_RC_OUT/names.csv` (yours) and
-    the patch fields' proposed names in `build/xn_readable/smc/patch_fields.csv`.
+    the patch fields' proposed names in `docs/engine/smc/patch_fields.csv`.
   - `xn_data_15A3C0`, `xn_code_...`, `D_...` and `func_...` resolve to any address.
   - `asm_NAME` is always the asm entry, even once NAME is C.
 - Data stays where the asm has it, in object 2 and the game's memory. Declare it `extern`
@@ -233,7 +239,7 @@ emulators). The parallel commands start `tools/memwatch.py` themselves.
 
 ## Hard cases
 
-**Self-modifying code.** Follow the design in `build/xn_readable/smc/`.
+**Self-modifying code.** Follow the design in `docs/engine/smc/`.
 - A patch field becomes an extern at the field's address, under its name in
   `patch_fields.csv`. The setup routine writes it as a variable, and the reader reads it.
   While any asm still executes the patched instruction, the C must write the same bytes to

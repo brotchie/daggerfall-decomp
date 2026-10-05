@@ -3,7 +3,7 @@
    Groundwork for the readable C of the engine (src/engine/): the layouts were recovered from
    the asm's addressing ([reg+disp] on a known pointer, loop strides), from the recorded calls'
    memory (build/xngine/records) and from the game-side structs (include/structs.h,
-   include/records.h). build/xn_readable/structs/structs.md has, per struct, where its
+   include/records.h). docs/engine/structs.md has, per struct, where its
    instances live, its users, the evidence per field, the confidence and the open questions;
    fields.csv lists every field with its evidence, globals.csv the new global names.
 

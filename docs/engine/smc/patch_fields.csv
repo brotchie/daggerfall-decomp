@@ -1,0 +1,293 @@
+field,size,kind,reader,reader_name,group,insn_text,writers,self_patch,proposed_name,c_type
+0C08AD,4,placeholder,0C0700,xn_draw_image_scaled,DRAW-SCALED,"cmp edi, 0x186a0",0C0700@0C084E,yes,xn_draw_scaled_bottom,s32
+0C08B9,4,placeholder,0C0700,xn_draw_image_scaled,DRAW-SCALED,"add esi, 0x186a0",0C0700@0C07BB,yes,xn_draw_scaled_stride,s32
+0C08BE,1,placeholder,0C0700,xn_draw_image_scaled,DRAW-SCALED,"mov bh, 0x64",0C0700@0C0880,yes,xn_draw_scaled_yint_op,u8
+0C83F6,1,opcode,0C83F6,xn_draw_shaded_row_unrolled,DRAW-SHADED-ROW,"mov al, byte ptr [esi + 0x100]",0C8395@0C83CB 0C8395@0C83EE,no,(planted ret: no variable),u8 (code)
+0C9D89,1,opcode,0C9D63,xn_sky_draw_rain_streak_bottom_clip,SKY-RAIN,"mov al, byte ptr [esi + 1]",0C9D63@0C9D82 0C9D63@0C9EA0,yes,(planted ret: no variable),u8 (code)
+12A931,4,placeholder,12A870,xn_render_frame,RENDER-FRAME,"sub ebx, 0x186a0",12A2D0@12A335,no,xn_render_frame_centre_x,s32
+12A950,4,placeholder,12A94E,xn_render_frame_next_row,RENDER-FRAME,"add edi, 0x186a0",12A870@12A8DE,no,xn_render_frame_width,s32
+12A963,4,placeholder,12A94E,xn_render_frame_next_row,RENDER-FRAME,"cmp dword ptr [0xcea6c], 0x186a0",12A870@12A8C3,no,xn_render_frame_end_row,s32
+12DD02,1,placeholder,12DC44,xn_font_draw_glyph,FONT-GLYPH,"shl eax, 0x64",12DC44@12DC9C 12DC44@12DCBA,yes,xn_font_glyph_skip,u8
+12DD10,4,placeholder,12DC44,xn_font_draw_glyph,FONT-GLYPH,"add edi, 0x3e8",12DC44@12DCEC,yes,xn_font_glyph_step,s32
+12F976,4,placeholder,12F79C,xn_water_draw,WATER-DRAW,"add edx, 0x186a0",12F79C@12F87A,yes,xn_water_row_inv_step,s32
+12F9E0,1,opcode,12F9E0,xn_water_span_unrolled,WATER-SPAN,"mov ebx, dword ptr [esi + 0x400]",12F9A0@12F9BC 12F9A0@12F9CB,no,(planted ret: no variable),u8 (code)
+136C3B,4,address,136C30,xn_light_tmpl_1,LIGHT-SHADERS,"mov eax, dword ptr [ebx*4 + 0x186a0]",15BCF6@15BD22,no,xn_light_t1_sq_y,pointer
+136C45,4,address,136C30,xn_light_tmpl_1,LIGHT-SHADERS,"add eax, dword ptr [edx*4 + 0x186a0]",15BCF6@15BD1D,no,xn_light_t1_sq_x,pointer
+136C4A,4,placeholder,136C30,xn_light_tmpl_1,LIGHT-SHADERS,"mov ebp, 0x186a0",15BCF6@15BD55,no,xn_light_t1_row,s32
+136C51,4,address,136C30,xn_light_tmpl_1,LIGHT-SHADERS,"add eax, dword ptr [ecx*4 + 0x186a0]",15BCF6@15BD28,no,xn_light_t1_sq_z,pointer
+136C57,4,address,136C30,xn_light_tmpl_1,LIGHT-SHADERS,mul dword ptr [0x136909],15BCF6@15BD44,no,xn_light_t1_falloff_p,pointer
+136C67,4,address,136C30,xn_light_tmpl_1,LIGHT-SHADERS,"mov dx, word ptr [edx*2 + 0x186a0]",136A00@136A46,no,xn_light_t1_tab,pointer
+136C6D,4,placeholder,136C30,xn_light_tmpl_1,LIGHT-SHADERS,"imul edx, edx, 0x186a0",15BCF6@15BD3C,no,xn_light_t1_intensity,s32
+136C78,4,placeholder,136C30,xn_light_tmpl_1,LIGHT-SHADERS,"cmp ebp, 0x186a0",136B88@136BB7,no,xn_light_t1_max_a,s32
+136C7F,4,placeholder,136C30,xn_light_tmpl_1,LIGHT-SHADERS,"mov ebp, 0x186a0",136B88@136BBC,no,xn_light_t1_max_b,s32
+136C92,4,address,136C84,xn_light_tmpl_2,LIGHT-SHADERS,"mov eax, dword ptr [ebx*4 + 0x186a0]",15BD78@15BDA4,no,xn_light_t2_sq_y1,pointer
+136C99,4,address,136C84,xn_light_tmpl_2,LIGHT-SHADERS,"add eax, dword ptr [edx*4 + 0x186a0]",15BD78@15BD9F,no,xn_light_t2_sq_x1,pointer
+136CA0,4,address,136C84,xn_light_tmpl_2,LIGHT-SHADERS,"add eax, dword ptr [ecx*4 + 0x186a0]",15BD78@15BDAA,no,xn_light_t2_sq_z1,pointer
+136CA7,4,address,136C84,xn_light_tmpl_2,LIGHT-SHADERS,"mov ecx, dword ptr [ecx*4 + 0x186a0]",15BD78@15BDFD,no,xn_light_t2_sq_z2,pointer
+136CAE,4,address,136C84,xn_light_tmpl_2,LIGHT-SHADERS,"add ecx, dword ptr [ebx*4 + 0x186a0]",15BD78@15BDF7,no,xn_light_t2_sq_y2,pointer
+136CB5,4,address,136C84,xn_light_tmpl_2,LIGHT-SHADERS,"add ecx, dword ptr [edx*4 + 0x186a0]",15BD78@15BDF2,no,xn_light_t2_sq_x2,pointer
+136CBB,4,address,136C84,xn_light_tmpl_2,LIGHT-SHADERS,mul dword ptr [0x136909],15BD78@15BDC6,no,xn_light_t2_falloff_p1,pointer
+136CC0,4,placeholder,136C84,xn_light_tmpl_2,LIGHT-SHADERS,"mov ebp, 0x186a0",15BD78@15BE2A,no,xn_light_t2_row,s32
+136CD2,4,address,136C84,xn_light_tmpl_2,LIGHT-SHADERS,"mov dx, word ptr [edx*2 + 0x186a0]",136A00@136A4B,no,xn_light_t2_tab1,pointer
+136CD8,4,placeholder,136C84,xn_light_tmpl_2,LIGHT-SHADERS,"imul edx, edx, 0x186a0",15BD78@15BDBE,no,xn_light_t2_intensity1,s32
+136CE3,4,address,136C84,xn_light_tmpl_2,LIGHT-SHADERS,mul dword ptr [0x136909],15BD78@15BE19,no,xn_light_t2_falloff_p2,pointer
+136CF3,4,address,136C84,xn_light_tmpl_2,LIGHT-SHADERS,"mov dx, word ptr [edx*2 + 0x186a0]",136A00@136A50,no,xn_light_t2_tab2,pointer
+136CF9,4,placeholder,136C84,xn_light_tmpl_2,LIGHT-SHADERS,"imul edx, edx, 0x186a0",15BD78@15BE11,no,xn_light_t2_intensity2,s32
+136D04,4,placeholder,136C84,xn_light_tmpl_2,LIGHT-SHADERS,"cmp ebp, 0x186a0",136B88@136BC1,no,xn_light_t2_max_a,s32
+136D0B,4,placeholder,136C84,xn_light_tmpl_2,LIGHT-SHADERS,"mov ebp, 0x186a0",136B88@136BC6,no,xn_light_t2_max_b,s32
+136D1E,4,address,136D10,xn_light_tmpl_3,LIGHT-SHADERS,"mov eax, dword ptr [ebx*4 + 0x186a0]",15BE4D@15BE79,no,xn_light_t3_sq_y1,pointer
+136D25,4,address,136D10,xn_light_tmpl_3,LIGHT-SHADERS,"add eax, dword ptr [edx*4 + 0x186a0]",15BE4D@15BE74,no,xn_light_t3_sq_x1,pointer
+136D2C,4,address,136D10,xn_light_tmpl_3,LIGHT-SHADERS,"add eax, dword ptr [ecx*4 + 0x186a0]",15BE4D@15BE7F,no,xn_light_t3_sq_z1,pointer
+136D33,4,address,136D10,xn_light_tmpl_3,LIGHT-SHADERS,"mov ebp, dword ptr [ecx*4 + 0x186a0]",15BE4D@15BED2,no,xn_light_t3_sq_z2,pointer
+136D3A,4,address,136D10,xn_light_tmpl_3,LIGHT-SHADERS,"add ebp, dword ptr [ebx*4 + 0x186a0]",15BE4D@15BECC,no,xn_light_t3_sq_y2,pointer
+136D41,4,address,136D10,xn_light_tmpl_3,LIGHT-SHADERS,"add ebp, dword ptr [edx*4 + 0x186a0]",15BE4D@15BEC7,no,xn_light_t3_sq_x2,pointer
+136D48,4,address,136D10,xn_light_tmpl_3,LIGHT-SHADERS,"mov ecx, dword ptr [ecx*4 + 0x186a0]",15BE4D@15BF25,no,xn_light_t3_sq_z3,pointer
+136D4F,4,address,136D10,xn_light_tmpl_3,LIGHT-SHADERS,"add ecx, dword ptr [ebx*4 + 0x186a0]",15BE4D@15BF1F,no,xn_light_t3_sq_y3,pointer
+136D56,4,address,136D10,xn_light_tmpl_3,LIGHT-SHADERS,"add ecx, dword ptr [edx*4 + 0x186a0]",15BE4D@15BF1A,no,xn_light_t3_sq_x3,pointer
+136D5C,4,address,136D10,xn_light_tmpl_3,LIGHT-SHADERS,mul dword ptr [0x136909],15BE4D@15BE9B,no,xn_light_t3_falloff_p1,pointer
+136D66,4,address,136D10,xn_light_tmpl_3,LIGHT-SHADERS,mul dword ptr [0x136909],15BE4D@15BEEE,no,xn_light_t3_falloff_p2,pointer
+136D70,4,address,136D10,xn_light_tmpl_3,LIGHT-SHADERS,mul dword ptr [0x136909],15BE4D@15BF41,no,xn_light_t3_falloff_p3,pointer
+136D75,4,placeholder,136D10,xn_light_tmpl_3,LIGHT-SHADERS,"mov ebp, 0x186a0",15BE4D@15BF52,no,xn_light_t3_row,s32
+136D85,4,address,136D10,xn_light_tmpl_3,LIGHT-SHADERS,"mov bx, word ptr [ebx*2 + 0x186a0]",136A00@136A55,no,xn_light_t3_tab1,pointer
+136D8B,4,placeholder,136D10,xn_light_tmpl_3,LIGHT-SHADERS,"imul ebx, ebx, 0x186a0",15BE4D@15BE93,no,xn_light_t3_intensity1,s32
+136DA0,4,address,136D10,xn_light_tmpl_3,LIGHT-SHADERS,"mov cx, word ptr [ecx*2 + 0x186a0]",136A00@136A5A,no,xn_light_t3_tab2,pointer
+136DA6,4,placeholder,136D10,xn_light_tmpl_3,LIGHT-SHADERS,"imul ecx, ecx, 0x186a0",15BE4D@15BEE6,no,xn_light_t3_intensity2,s32
+136DBB,4,address,136D10,xn_light_tmpl_3,LIGHT-SHADERS,"mov dx, word ptr [edx*2 + 0x186a0]",136A00@136A5F,no,xn_light_t3_tab3,pointer
+136DC1,4,placeholder,136D10,xn_light_tmpl_3,LIGHT-SHADERS,"imul edx, edx, 0x186a0",15BE4D@15BF39,no,xn_light_t3_intensity3,s32
+136DCC,4,placeholder,136D10,xn_light_tmpl_3,LIGHT-SHADERS,"cmp ebp, 0x186a0",136B88@136BCB,no,xn_light_t3_max_a,s32
+136DD3,4,placeholder,136D10,xn_light_tmpl_3,LIGHT-SHADERS,"mov ebp, 0x186a0",136B88@136BD0,no,xn_light_t3_max_b,s32
+13E98A,4,placeholder,13E8C8,xn_terrain_transform_grid,TERRAIN-GRID,"mov dword ptr [0x13e9b7], 0x186a0",13E8C8@13E8FF 13E8C8@13EAF1,yes,xn_tgrid_row_x,s32
+13E994,4,placeholder,13E8C8,xn_terrain_transform_grid,TERRAIN-GRID,"mov dword ptr [0x13e9be], 0x186a0",13E8C8@13E904 13E8C8@13EAFB,yes,xn_tgrid_row_y,s32
+13E99E,4,placeholder,13E8C8,xn_terrain_transform_grid,TERRAIN-GRID,"mov dword ptr [0x13e9c3], 0x186a0",13E8C8@13E90A 13E8C8@13EB05,yes,xn_tgrid_row_z,s32
+13E9B7,4,placeholder,13E8C8,xn_terrain_transform_grid,TERRAIN-GRID,"mov eax, 0x186a0",13E8C8@13E984 13E8C8@13EAC2,yes,xn_tgrid_x,s32
+13E9BE,4,placeholder,13E8C8,xn_terrain_transform_grid,TERRAIN-GRID,"mov ebp, 0x186a0",13E8C8@13E98E 13E8C8@13EACC,yes,xn_tgrid_y,s32
+13E9C3,4,placeholder,13E8C8,xn_terrain_transform_grid,TERRAIN-GRID,"mov ebx, 0x186a0",13E8C8@13E998 13E8C8@13EAD6,yes,xn_tgrid_z,s32
+13EA75,4,placeholder,13E8C8,xn_terrain_transform_grid,TERRAIN-GRID,"imul eax, eax, 0x186a0",12A2D0@12A314,no,xn_tgrid_sx,s32
+13EA7D,4,placeholder,13E8C8,xn_terrain_transform_grid,TERRAIN-GRID,"add edx, 0x186a0",12A2D0@12A38B,no,xn_tgrid_cx,s32
+13EA8D,4,placeholder,13E8C8,xn_terrain_transform_grid,TERRAIN-GRID,"imul eax, eax, 0x186a0",12A2D0@12A319,no,xn_tgrid_sy,s32
+13EA95,4,placeholder,13E8C8,xn_terrain_transform_grid,TERRAIN-GRID,"add edx, 0x186a0",12A2D0@12A391,no,xn_tgrid_cy,s32
+13EAC8,4,placeholder,13E8C8,xn_terrain_transform_grid,TERRAIN-GRID,"add dword ptr [0x13e9b7], 0x186a0",13E8C8@13E921,yes,xn_tgrid_col_dx,s32
+13EAD2,4,placeholder,13E8C8,xn_terrain_transform_grid,TERRAIN-GRID,"add dword ptr [0x13e9be], 0x186a0",13E8C8@13E926,yes,xn_tgrid_col_dy,s32
+13EADC,4,placeholder,13E8C8,xn_terrain_transform_grid,TERRAIN-GRID,"add dword ptr [0x13e9c3], 0x186a0",13E8C8@13E92C,yes,xn_tgrid_col_dz,s32
+13EAE7,4,placeholder,13E8C8,xn_terrain_transform_grid,TERRAIN-GRID,"cmp edi, 0x186a0",13E8C8@13E9A8,yes,xn_tgrid_row_end,s32
+13EAF7,4,placeholder,13E8C8,xn_terrain_transform_grid,TERRAIN-GRID,"add dword ptr [0x13e98a], 0x186a0",13E8C8@13E943,yes,xn_tgrid_row_dx,s32
+13EB01,4,placeholder,13E8C8,xn_terrain_transform_grid,TERRAIN-GRID,"add dword ptr [0x13e994], 0x186a0",13E8C8@13E948,yes,xn_tgrid_row_dy,s32
+13EB0B,4,placeholder,13E8C8,xn_terrain_transform_grid,TERRAIN-GRID,"add dword ptr [0x13e99e], 0x186a0",13E8C8@13E94E,yes,xn_tgrid_row_dz,s32
+13EB16,4,placeholder,13E8C8,xn_terrain_transform_grid,TERRAIN-GRID,"cmp edi, 0x186a0",13E8C8@13E97A,yes,xn_tgrid_end,s32
+13F06A,4,placeholder,13EFD7,xn_terrain_draw_cells,TERRAIN-CELLS,"mov dword ptr [edi + 0x3c], 0x186a0",13EFD7@13F009,yes,xn_tcells_setup_a,s32
+13F0A2,4,placeholder,13EFD7,xn_terrain_draw_cells,TERRAIN-CELLS,"mov eax, 0x186a0",13EFD7@13EFE3,yes,xn_tcells_archive_a,s32
+13F0E3,4,placeholder,13EFD7,xn_terrain_draw_cells,TERRAIN-CELLS,"mov dword ptr [edi + 0x3c], 0x186a0",13EFD7@13F00E,yes,xn_tcells_setup_b,s32
+13F11B,4,placeholder,13EFD7,xn_terrain_draw_cells,TERRAIN-CELLS,"mov eax, 0x186a0",13EFD7@13EFE8,yes,xn_tcells_archive_b,s32
+13F182,4,placeholder,13EFD7,xn_terrain_draw_cells,TERRAIN-CELLS,"mov dword ptr [edi + 0x3c], 0x186a0",13EFD7@13F013,yes,xn_tcells_setup_c,s32
+13F1BA,4,placeholder,13EFD7,xn_terrain_draw_cells,TERRAIN-CELLS,"mov eax, 0x186a0",13EFD7@13EFED,yes,xn_tcells_archive_c,s32
+14030A,4,placeholder,140284,xn_model_draw,MODEL-DRAW,"mov ebp, 0x186a0",12A3AC@12A41A,no,xn_model_depth_scale,s32
+14040B,4,placeholder,1403AF,xn_model_draw_faces,MODEL-FACES-CLEAR,"imul eax, dword ptr [ebx], 0x186a0",140284@1402E1,no,xn_model_eye_bf_x,s32
+140412,4,placeholder,1403AF,xn_model_draw_faces,MODEL-FACES-CLEAR,"imul edx, dword ptr [ebx + 4], 0x186a0",140284@1402EB,no,xn_model_eye_bf_y,s32
+140419,4,placeholder,1403AF,xn_model_draw_faces,MODEL-FACES-CLEAR,"imul ecx, dword ptr [ebx + 8], 0x186a0",140284@1402F7,no,xn_model_eye_bf_z,s32
+140446,4,placeholder,1403AF,xn_model_draw_faces,MODEL-FACES-CLEAR,"imul eax, dword ptr [esi], 0x186a0",140284@140312,no,xn_model_depth_x,s32
+14044D,4,placeholder,1403AF,xn_model_draw_faces,MODEL-FACES-CLEAR,"imul edx, dword ptr [esi + 4], 0x186a0",140284@14031D,no,xn_model_depth_y,s32
+140454,4,placeholder,1403AF,xn_model_draw_faces,MODEL-FACES-CLEAR,"imul ebp, dword ptr [esi + 8], 0x186a0",140284@140328,no,xn_model_depth_z,s32
+140497,4,placeholder,1403AF,xn_model_draw_faces,MODEL-FACES-CLEAR,"mov dword ptr [edi + 4], 0x186a0",140284@140297,no,xn_model_draw_handle,s32
+1404EB,4,placeholder,1403AF,xn_model_draw_faces,MODEL-FACES-CLEAR,"cmp ebx, 0x186a0",1403AF@140404,yes,xn_model_faces_end,s32
+14051C,4,address,1404FA,xn_model_transform_face_verts,MODEL-VERTS,"mov eax, dword ptr [edi + 0x186a0]",1403AF@1403D6,no,xn_model_points_x,pointer
+140522,4,address,1404FA,xn_model_transform_face_verts,MODEL-VERTS,"mov edx, dword ptr [edi + 0x186a0]",1403AF@1403DE,no,xn_model_points_y,pointer
+140528,4,address,1404FA,xn_model_transform_face_verts,MODEL-VERTS,"mov ebx, dword ptr [edi + 0x186a0]",1403AF@1403E6,no,xn_model_points_z,pointer
+14052D,4,placeholder,1404FA,xn_model_transform_face_verts,MODEL-VERTS,"add eax, 0x186a0",140284@1402E6,no,xn_model_eye_x,s32
+140533,4,placeholder,1404FA,xn_model_transform_face_verts,MODEL-VERTS,"add edx, 0x186a0",140284@1402F1,no,xn_model_eye_y,s32
+140539,4,placeholder,1404FA,xn_model_transform_face_verts,MODEL-VERTS,"add ebx, 0x186a0",140284@1402FD,no,xn_model_eye_z,s32
+14053E,4,placeholder,1404FA,xn_model_transform_face_verts,MODEL-VERTS,"mov ecx, 0x186a0",140284@140333,no,xn_model_matrix_slot,s32
+1405B4,4,placeholder,1404FA,xn_model_transform_face_verts,MODEL-VERTS,"imul eax, eax, 0x186a0",12A2D0@12A309,no,xn_model_vert_sx,s32
+1405BC,4,placeholder,1404FA,xn_model_transform_face_verts,MODEL-VERTS,"add edx, 0x186a0",12A2D0@12A37F,no,xn_model_vert_cx,s32
+1405CC,4,placeholder,1404FA,xn_model_transform_face_verts,MODEL-VERTS,"imul eax, eax, 0x186a0",12A2D0@12A30E,no,xn_model_vert_sy,s32
+1405D4,4,placeholder,1404FA,xn_model_transform_face_verts,MODEL-VERTS,"add edx, 0x186a0",12A2D0@12A385,no,xn_model_vert_cy,s32
+140666,4,placeholder,140606,xn_model_build_light_list,MODEL-LIGHTS,"sub eax, 0x186a0",140606@140615,yes,xn_model_light_pos_x,s32
+14066C,4,placeholder,140606,xn_model_build_light_list,MODEL-LIGHTS,"sub edx, 0x186a0",140606@14061A,yes,xn_model_light_pos_y,s32
+140672,4,placeholder,140606,xn_model_build_light_list,MODEL-LIGHTS,"sub ebx, 0x186a0",140606@140620,yes,xn_model_light_pos_z,s32
+14068B,4,placeholder,140606,xn_model_build_light_list,MODEL-LIGHTS,"sub ebp, 0x186a0",140606@140639,yes,xn_model_light_r2,s32
+1406DD,4,placeholder,1406D6,xn_model_scale_matrix,MODEL-SCALE,"mov ebx, 0x186a0",12A3AC@12A3D3,no,xn_model_scale_inv_x,s32
+1406E2,4,placeholder,1406D6,xn_model_scale_matrix,MODEL-SCALE,"mov ebp, 0x186a0",12A274@12A2B1,no,xn_model_scale_focal_x,s32
+14072A,4,placeholder,1406D6,xn_model_scale_matrix,MODEL-SCALE,"mov ebx, 0x186a0",12A3AC@12A3FF,no,xn_model_scale_inv_y,s32
+14072F,4,placeholder,1406D6,xn_model_scale_matrix,MODEL-SCALE,"mov ebp, 0x186a0",12A274@12A2C3,no,xn_model_scale_focal_y,s32
+140A28,1,opcode,140A28,xn_model_clear_vert_flags,MODEL-FACES-CLEAR,"mov byte ptr [edi + 0x100], al",1403AF@1403BE 1403AF@1403CA,no,(planted ret: no variable),u8 (code)
+14501C,1,opcode,14501C,xn_draw_transparent_row,DRAW-TRANSPARENT,"mov al, byte ptr [esi + 0x100]",144FC8@144FFE 144FC8@145011,no,(planted ret: no variable),u8 (code)
+14D320,1,opcode,14D320,xn_shade_fog_pixels,SHADE-FOG,"mov eax, ecx",150040@1500E3 150040@1500EF 150040@150120 150040@15012C,no,(planted ret: no variable),u8 (code)
+150056,4,placeholder,150040,xn_shade_fog_span,SHADE-FOG,"sub ecx, 0x186a0",14D23C@14D291,no,xn_fog_inv_start_a,s32
+150071,4,placeholder,150040,xn_shade_fog_span,SHADE-FOG,"mov ecx, 0x186a0",14D23C@14D296,no,xn_fog_inv_start_b,s32
+15009B,4,placeholder,150040,xn_shade_fog_span,SHADE-FOG,"mov edx, 0x186a0",14D23C@14D271,no,xn_fog_step_a,s32
+1500BC,4,placeholder,150040,xn_shade_fog_span,SHADE-FOG,"mov edx, 0x186a0",14D23C@14D276,no,xn_fog_step_b,s32
+1500D7,4,placeholder,150040,xn_shade_fog_span,SHADE-FOG,"sub ecx, 0x186a0",14D23C@14D2A3,no,xn_fog_start_step_a,s32
+1500DF,4,placeholder,150040,xn_shade_fog_span,SHADE-FOG,"add ecx, 0x186a0",14D23C@14D25E,no,xn_fog_table_last_a,s32
+1500FA,4,placeholder,150040,xn_shade_fog_span,SHADE-FOG,"cmp ecx, 0x186a0",14D23C@14D29B,no,xn_fog_inv_start_c,s32
+150103,4,placeholder,150040,xn_shade_fog_span,SHADE-FOG,"mov edx, 0x186a0",14D23C@14D27B,no,xn_fog_step_c,s32
+15010A,4,placeholder,150040,xn_shade_fog_span,SHADE-FOG,"sub eax, 0x186a0",14D23C@14D2A9,no,xn_fog_start_step_b,s32
+15011C,4,address,150040,xn_shade_fog_span,SHADE-FOG,"lea ecx, [eax + 0x186a0]",14D23C@14D263,no,xn_fog_table_last_b,pointer
+1550ED,4,placeholder,1550E0,xn_flat_setup_gradients,FLAT-GRAD,"imul esi, dword ptr [0x120288], 0x186a0",12A2D0@12A32A,no,xn_flat_grad_sx,s32
+1550F7,4,placeholder,1550E0,xn_flat_setup_gradients,FLAT-GRAD,"imul ebp, dword ptr [0x12028c], 0x186a0",12A2D0@12A32F,no,xn_flat_grad_sy,s32
+155110,4,placeholder,1550E0,xn_flat_setup_gradients,FLAT-GRAD,"mov eax, 0x186a0",155415@1554C6,no,xn_flat_axis_u_x,s32
+155120,4,placeholder,1550E0,xn_flat_setup_gradients,FLAT-GRAD,"mov eax, 0x186a0",155415@1554CB,no,xn_flat_axis_u_y,s32
+15512A,4,placeholder,1550E0,xn_flat_setup_gradients,FLAT-GRAD,"mov eax, 0x186a0",155415@1554D1,no,xn_flat_axis_u_z,s32
+15514C,4,placeholder,1550E0,xn_flat_setup_gradients,FLAT-GRAD,"mov eax, 0x186a0",155415@1554F6,no,xn_flat_axis_v_x,s32
+155163,4,placeholder,1550E0,xn_flat_setup_gradients,FLAT-GRAD,"mov eax, 0x186a0",155415@1554FB,no,xn_flat_axis_v_y,s32
+15516D,4,placeholder,1550E0,xn_flat_setup_gradients,FLAT-GRAD,"mov eax, 0x186a0",155415@155501,no,xn_flat_axis_v_z,s32
+15526F,4,placeholder,15526C,xn_flat_span_emit,FLAT-EMIT,"mov esi, 0x186a0",154E20@154EC2,no,xn_flat_emit_flat,s32
+155275,4,address,15526C,xn_flat_span_emit,FLAT-EMIT,"lea edi, [ebx + 0x186a0]",1552A0@1552C3 155332@155361,no,xn_flat_emit_row,pointer
+1552E0,4,placeholder,1552A0,xn_flat_raster,FLAT-RASTER,"mov ebp, 0x186a0",1552A0@1552A0 1552A0@1552E4,yes,xn_flat_raster_left,s32
+15534F,4,address,155332,xn_flat_raster_rows,FLAT-RASTER,"add dword ptr [0x154c58], 0x186a0",1550E0@1551AA,no,xn_flat_row_u_var,pointer
+155353,4,placeholder,155332,xn_flat_raster_rows,FLAT-RASTER,"add dword ptr [0x154c58], 0x186a0",1550E0@155195,no,xn_flat_row_u_step,s32
+155359,4,address,155332,xn_flat_raster_rows,FLAT-RASTER,"add dword ptr [0x154c50], 0x186a0",1550E0@1551C5,no,xn_flat_row_v_var,pointer
+15535D,4,placeholder,155332,xn_flat_raster_rows,FLAT-RASTER,"add dword ptr [0x154c50], 0x186a0",1550E0@1551B6,no,xn_flat_row_v_step,s32
+155367,4,operand,155332,xn_flat_raster_rows,FLAT-RASTER,"add dword ptr [0x155275], 0x140",155415@1554A2,no,xn_flat_row_stride,s32
+155373,4,placeholder,155332,xn_flat_raster_rows,FLAT-RASTER,"add ebp, 0x186a0",1552A0@15531C,no,xn_flat_raster_dxl,s32
+155379,4,placeholder,155332,xn_flat_raster_rows,FLAT-RASTER,"add ebx, 0x186a0",155332@1553C6,yes,xn_flat_raster_dxr,s32
+15537F,4,placeholder,155332,xn_flat_raster_rows,FLAT-RASTER,"add ecx, 0x186a0",1552A0@155329,no,xn_flat_raster_dzl,s32
+15539D,4,placeholder,155332,xn_flat_raster_rows,FLAT-RASTER,"mov ebx, 0x186a0",1552A0@1552A6 155332@1553A1,no,xn_flat_raster_right,s32
+155636,4,placeholder,155610,xn_flat_span_light_setup,FLAT-LIGHT,"add ebp, 0x186a0",12A4F0@12A5E5,no,xn_flat_ambient_row,s32
+155880,1,opcode,155880,xn_span_solid_lit_tail,SPAN-SOLID-LIT,"mov ah, ch",155920@155A75 155920@155A81,no,(planted ret: no variable),u8 (code)
+155944,4,placeholder,155920,xn_span_solid_lit,SPAN-SOLID-LIT,"mov eax, 0x186a0",12A870@12A8F9,no,xn_span_solid_lit_ray_a,s32
+155984,4,placeholder,155920,xn_span_solid_lit,SPAN-SOLID-LIT,"add ecx, 0x186a0",155920@15592A,yes,xn_span_solid_lit_dz16,s32
+155996,4,placeholder,155920,xn_span_solid_lit,SPAN-SOLID-LIT,"add ebx, 0x186a0",12A3AC@12A4E9,no,xn_span_solid_lit_ray_dx16,s32
+15599B,4,placeholder,155920,xn_span_solid_lit,SPAN-SOLID-LIT,"mov eax, 0x186a0",12A870@12A8FE,no,xn_span_solid_lit_ray_b,s32
+1559B9,1,placeholder,155920,xn_span_solid_lit,SPAN-SOLID-LIT,"mov al, 0x64",155920@155968,yes,xn_span_solid_lit_colour,u8
+155A21,4,placeholder,155920,xn_span_solid_lit,SPAN-SOLID-LIT,"cmp edi, 0x186a0",155920@15596F 155920@155975 155920@15597C,yes,xn_span_solid_lit_end,s32
+155A4B,4,placeholder,155920,xn_span_solid_lit,SPAN-SOLID-LIT,"mov eax, 0x186a0",12A870@12A903,no,xn_span_solid_lit_ray_c,s32
+155C00,1,opcode,155C00,xn_span_tex_tail,SPAN-TEX,"mov edx, ebx",155D20@155F27 155D20@155F3B 155F70@1561F7 155F70@15620B,no,(planted ret: no variable),u8 (code)
+155D34,4,address,155D20,xn_span_tex_8,SPAN-TEX,"mov ecx, dword ptr [ecx*4 + 0x186a0]",12A100@12A1A4,no,xn_span_tex8_recip_a,pointer
+155DC7,4,placeholder,155D20,xn_span_tex_8,SPAN-TEX,"add ecx, 0x186a0",155D20@155D89,yes,xn_span_tex8_dz,s32
+155DD1,4,placeholder,155D20,xn_span_tex_8,SPAN-TEX,"add dword ptr [0x155b04], 0x186a0",155D20@155D99,yes,xn_span_tex8_dv,s32
+155DDB,4,placeholder,155D20,xn_span_tex_8,SPAN-TEX,"add dword ptr [0x155b00], 0x186a0",155D20@155D94,yes,xn_span_tex8_du,s32
+155DEC,4,address,155D20,xn_span_tex_8,SPAN-TEX,"mov ecx, dword ptr [ecx*4 + 0x186a0]",12A100@12A1A9,no,xn_span_tex8_recip_b,pointer
+155E2B,4,placeholder,155D20,xn_span_tex_8,SPAN-TEX,"add ebx, 0x186a0",155D20@155DA5,yes,xn_span_tex8_origin,s32
+155EBD,4,placeholder,155D20,xn_span_tex_8,SPAN-TEX,"cmp edi, 0x186a0",155D20@155DAC 155D20@155DB2 155D20@155DB9,yes,xn_span_tex8_end,s32
+155EDD,4,address,155D20,xn_span_tex_8,SPAN-TEX,"mov eax, dword ptr [ecx*4 + 0x186a0]",12A100@12A1AE,no,xn_span_tex8_recip_c,pointer
+155F84,4,address,155F70,xn_span_tex_16,SPAN-TEX,"mov ecx, dword ptr [ecx*4 + 0x186a0]",12A100@12A1B3,no,xn_span_tex16_recip_a,pointer
+156017,4,placeholder,155F70,xn_span_tex_16,SPAN-TEX,"add ecx, 0x186a0",155F70@155FD9,yes,xn_span_tex16_dz,s32
+156021,4,placeholder,155F70,xn_span_tex_16,SPAN-TEX,"add dword ptr [0x155b04], 0x186a0",155F70@155FE9,yes,xn_span_tex16_dv,s32
+15602B,4,placeholder,155F70,xn_span_tex_16,SPAN-TEX,"add dword ptr [0x155b00], 0x186a0",155F70@155FE4,yes,xn_span_tex16_du,s32
+15603C,4,address,155F70,xn_span_tex_16,SPAN-TEX,"mov ecx, dword ptr [ecx*4 + 0x186a0]",12A100@12A1B8,no,xn_span_tex16_recip_b,pointer
+15607B,4,placeholder,155F70,xn_span_tex_16,SPAN-TEX,"add ebx, 0x186a0",155F70@155FF5,yes,xn_span_tex16_origin,s32
+15618D,4,placeholder,155F70,xn_span_tex_16,SPAN-TEX,"cmp edi, 0x186a0",155F70@155FFC 155F70@156002 155F70@156009,yes,xn_span_tex16_end,s32
+1561AD,4,address,155F70,xn_span_tex_16,SPAN-TEX,"mov eax, dword ptr [ecx*4 + 0x186a0]",12A100@12A1BD,no,xn_span_tex16_recip_c,pointer
+156320,1,opcode,156320,xn_span_tex_shaded_tail,SPAN-TEX-SHADED,"mov edx, ebx",156460@156692 156460@1566AA 1566C4@15698E 1566C4@1569A6,no,(planted ret: no variable),u8 (code)
+15647D,4,address,156460,xn_span_tex_shaded_8,SPAN-TEX-SHADED,"mov ecx, dword ptr [ecx*4 + 0x186a0]",12A100@12A1C2,no,xn_span_texsh8_recip_a,pointer
+156510,4,placeholder,156460,xn_span_tex_shaded_8,SPAN-TEX-SHADED,"add ecx, 0x186a0",156460@1564D2,yes,xn_span_texsh8_dz,s32
+15651A,4,placeholder,156460,xn_span_tex_shaded_8,SPAN-TEX-SHADED,"add dword ptr [0x156304], 0x186a0",156460@1564E2,yes,xn_span_texsh8_dv,s32
+156524,4,placeholder,156460,xn_span_tex_shaded_8,SPAN-TEX-SHADED,"add dword ptr [0x156300], 0x186a0",156460@1564DD,yes,xn_span_texsh8_du,s32
+156535,4,address,156460,xn_span_tex_shaded_8,SPAN-TEX-SHADED,"mov ecx, dword ptr [ecx*4 + 0x186a0]",12A100@12A1C7,no,xn_span_texsh8_recip_b,pointer
+156577,4,placeholder,156460,xn_span_tex_shaded_8,SPAN-TEX-SHADED,"add ebx, 0x186a0",156460@1564EE,yes,xn_span_texsh8_origin,s32
+156625,4,placeholder,156460,xn_span_tex_shaded_8,SPAN-TEX-SHADED,"cmp edi, 0x186a0",156460@1564F5 156460@1564FB 156460@156502,yes,xn_span_texsh8_end,s32
+156645,4,address,156460,xn_span_tex_shaded_8,SPAN-TEX-SHADED,"mov eax, dword ptr [ecx*4 + 0x186a0]",12A100@12A1CC,no,xn_span_texsh8_recip_c,pointer
+1566E1,4,address,1566C4,xn_span_tex_shaded_16,SPAN-TEX-SHADED,"mov ecx, dword ptr [ecx*4 + 0x186a0]",12A100@12A1D1,no,xn_span_texsh16_recip_a,pointer
+156774,4,placeholder,1566C4,xn_span_tex_shaded_16,SPAN-TEX-SHADED,"add ecx, 0x186a0",1566C4@156736,yes,xn_span_texsh16_dz,s32
+15677E,4,placeholder,1566C4,xn_span_tex_shaded_16,SPAN-TEX-SHADED,"add dword ptr [0x156304], 0x186a0",1566C4@156746,yes,xn_span_texsh16_dv,s32
+156788,4,placeholder,1566C4,xn_span_tex_shaded_16,SPAN-TEX-SHADED,"add dword ptr [0x156300], 0x186a0",1566C4@156741,yes,xn_span_texsh16_du,s32
+156799,4,address,1566C4,xn_span_tex_shaded_16,SPAN-TEX-SHADED,"mov ecx, dword ptr [ecx*4 + 0x186a0]",12A100@12A1D6,no,xn_span_texsh16_recip_b,pointer
+1567DB,4,placeholder,1566C4,xn_span_tex_shaded_16,SPAN-TEX-SHADED,"add ebx, 0x186a0",1566C4@156752,yes,xn_span_texsh16_origin,s32
+156921,4,placeholder,1566C4,xn_span_tex_shaded_16,SPAN-TEX-SHADED,"cmp edi, 0x186a0",1566C4@156759 1566C4@15675F 1566C4@156766,yes,xn_span_texsh16_end,s32
+156941,4,address,1566C4,xn_span_tex_shaded_16,SPAN-TEX-SHADED,"mov eax, dword ptr [ecx*4 + 0x186a0]",12A100@12A1DB,no,xn_span_texsh16_recip_c,pointer
+156AB7,4,address,156A94,xn_span_tex_lit,SPAN-TEX-LIT,"mov ecx, dword ptr [ecx*4 + 0x186a0]",12A100@12A1E0,no,xn_span_texlit_recip_a,pointer
+156AC9,4,placeholder,156A94,xn_span_tex_lit,SPAN-TEX-LIT,"mov eax, 0x186a0",12A870@12A908,no,xn_span_texlit_ray_a,s32
+156B74,4,placeholder,156A94,xn_span_tex_lit,SPAN-TEX-LIT,"add dword ptr [0x156a60], 0x186a0",12A3AC@12A4E4,no,xn_span_texlit_ray_dx16,s32
+156B7E,4,placeholder,156A94,xn_span_tex_lit,SPAN-TEX-LIT,"add dword ptr [0x156a54], 0x186a0",156A94@156B42,yes,xn_span_texlit_du,s32
+156B88,4,placeholder,156A94,xn_span_tex_lit,SPAN-TEX-LIT,"add dword ptr [0x156a50], 0x186a0",156A94@156B3D,yes,xn_span_texlit_dv,s32
+156B8E,4,placeholder,156A94,xn_span_tex_lit,SPAN-TEX-LIT,"add ecx, 0x186a0",156A94@156B32,yes,xn_span_texlit_dz,s32
+156B9F,4,address,156A94,xn_span_tex_lit,SPAN-TEX-LIT,"mov ecx, dword ptr [ecx*4 + 0x186a0]",12A100@12A1E5,no,xn_span_texlit_recip_b,pointer
+156BAE,4,placeholder,156A94,xn_span_tex_lit,SPAN-TEX-LIT,"mov eax, 0x186a0",12A870@12A90D,no,xn_span_texlit_ray_b,s32
+156BF4,4,placeholder,156A94,xn_span_tex_lit,SPAN-TEX-LIT,"add ebx, 0x186a0",156A94@156B4E,yes,xn_span_texlit_origin,s32
+156C10,4,placeholder,156A94,xn_span_tex_lit,SPAN-TEX-LIT,"cmp edi, 0x186a0",156A94@156B5B 156A94@156B61 156A94@156B68,yes,xn_span_texlit_end,s32
+156C40,4,address,156A94,xn_span_tex_lit,SPAN-TEX-LIT,"mov ecx, dword ptr [ecx*4 + 0x186a0]",12A100@12A1EA,no,xn_span_texlit_recip_c,pointer
+156C59,4,placeholder,156A94,xn_span_tex_lit,SPAN-TEX-LIT,"mov eax, 0x186a0",12A870@12A912,no,xn_span_texlit_ray_c,s32
+156D40,1,opcode,156D40,xn_span_tex64_tail,SPAN-TEX64,"mov edx, ebx",156E60@1570DB 156E60@1570EF,no,(planted ret: no variable),u8 (code)
+156E74,4,address,156E60,xn_span_tex64,SPAN-TEX64,"mov ecx, dword ptr [ecx*4 + 0x186a0]",12A100@12A186,no,xn_span_tex64_recip_a,pointer
+156EE9,4,placeholder,156E60,xn_span_tex64,SPAN-TEX64,"add ecx, 0x186a0",156E60@156ED7,yes,xn_span_tex64_dz,s32
+156EEE,4,placeholder,156E60,xn_span_tex64,SPAN-TEX64,"add eax, 0x186a0",156E60@156EC5,yes,xn_span_tex64_du,s32
+156EF4,4,placeholder,156E60,xn_span_tex64,SPAN-TEX64,"add edx, 0x186a0",156E60@156ECE,yes,xn_span_tex64_dv,s32
+156F07,4,address,156E60,xn_span_tex64,SPAN-TEX64,"mov ecx, dword ptr [ecx*4 + 0x186a0]",12A100@12A18B,no,xn_span_tex64_recip_b,pointer
+156F19,4,placeholder,156E60,xn_span_tex64,SPAN-TEX64,"add ecx, 0x186a0",156E60@156EAD,yes,xn_span_tex64_origin,s32
+157090,4,address,156E60,xn_span_tex64,SPAN-TEX64,"mov eax, dword ptr [ecx*4 + 0x186a0]",12A100@12A190,no,xn_span_tex64_recip_c,pointer
+157100,1,opcode,157100,xn_span_tex64_shaded_tail,SPAN-TEX64-SHADED,"mov edx, ebx",157240@1574FC 157240@157515,no,(planted ret: no variable),u8 (code)
+157254,4,address,157240,xn_span_tex64_shaded,SPAN-TEX64-SHADED,"mov ecx, dword ptr [ecx*4 + 0x186a0]",12A100@12A195,no,xn_span_tex64sh_recip_a,pointer
+1572D6,4,placeholder,157240,xn_span_tex64_shaded,SPAN-TEX64-SHADED,"add ecx, 0x186a0",157240@1572C2,yes,xn_span_tex64sh_dz,s32
+1572DB,4,placeholder,157240,xn_span_tex64_shaded,SPAN-TEX64-SHADED,"add eax, 0x186a0",157240@1572B0,yes,xn_span_tex64sh_du,s32
+1572E1,4,placeholder,157240,xn_span_tex64_shaded,SPAN-TEX64-SHADED,"add edx, 0x186a0",157240@1572B9,yes,xn_span_tex64sh_dv,s32
+1572F4,4,address,157240,xn_span_tex64_shaded,SPAN-TEX64-SHADED,"mov ebp, dword ptr [ecx*4 + 0x186a0]",12A100@12A19A,no,xn_span_tex64sh_recip_b,pointer
+157306,4,placeholder,157240,xn_span_tex64_shaded,SPAN-TEX64-SHADED,"add ebp, 0x186a0",157240@15728D,yes,xn_span_tex64sh_origin,s32
+15730B,4,placeholder,157240,xn_span_tex64_shaded,SPAN-TEX64-SHADED,"mov eax, 0x186a0",157240@1572CB,yes,xn_span_tex64sh_row,s32
+157486,4,placeholder,157240,xn_span_tex64_shaded,SPAN-TEX64-SHADED,"cmp edi, 0x186a0",157240@1572A7,yes,xn_span_tex64sh_end,s32
+1574B1,4,address,157240,xn_span_tex64_shaded,SPAN-TEX64-SHADED,"mov eax, dword ptr [ecx*4 + 0x186a0]",12A100@12A19F,no,xn_span_tex64sh_recip_c,pointer
+157622,4,placeholder,157620,xn_span_flat_transparent,SPAN-FLAT-TRANSPARENT,"sub ebx, 0x2710",12A2D0@12A33C,no,xn_span_flat_transparent_cx,s32
+15762E,4,address,157620,xn_span_flat_transparent,SPAN-FLAT-TRANSPARENT,"mov ecx, dword ptr [ecx*4 + 0x186a0]",12A100@12A1EF,no,xn_span_flat_transparent_recip,pointer
+157760,1,opcode,157760,xn_span_flat_transparent_tail,SPAN-FLAT-TRANSPARENT,"mov eax, ebx",157620@157737 157620@157743,no,(planted ret: no variable),u8 (code)
+157802,4,placeholder,157800,xn_span_flat_transparent_shaded,SPAN-FLAT-SHADED,"sub ebx, 0x2710",12A2D0@12A342,no,xn_span_flat_shaded_cx,s32
+15780E,4,address,157800,xn_span_flat_transparent_shaded,SPAN-FLAT-SHADED,"mov ecx, dword ptr [ecx*4 + 0x186a0]",12A100@12A1F4,no,xn_span_flat_shaded_recip,pointer
+157918,4,placeholder,157800,xn_span_flat_transparent_shaded,SPAN-FLAT-SHADED,"add ebx, 0x186a0",157800@157858,yes,xn_span_flat_shaded_rem,s32
+157960,1,opcode,157960,xn_span_flat_transparent_shaded_tail,SPAN-FLAT-SHADED,"mov edx, ebx",157800@157934 157800@157940,no,(planted ret: no variable),u8 (code)
+157B22,4,placeholder,157B20,xn_span_flat_lit_fogged,SPAN-FLAT-FOGGED,"sub ebx, 0x2710",12A2D0@12A348,no,xn_span_flat_fogged_cx,s32
+157B2E,4,address,157B20,xn_span_flat_lit_fogged,SPAN-FLAT-FOGGED,"mov ecx, dword ptr [ecx*4 + 0x186a0]",12A100@12A1F9,no,xn_span_flat_fogged_recip,pointer
+157B99,4,placeholder,157B20,xn_span_flat_lit_fogged,SPAN-FLAT-FOGGED,"mov ebp, 0x186a0",157B20@157B75,yes,xn_span_flat_fogged_step,s32
+157C58,4,placeholder,157B20,xn_span_flat_lit_fogged,SPAN-FLAT-FOGGED,"add ebx, 0x186a0",157B20@157B7E,yes,xn_span_flat_fogged_rem,s32
+157CA0,1,opcode,157CA0,xn_span_flat_lit_fogged_tail,SPAN-FLAT-FOGGED,"mov edx, ebx",157B20@157C74 157B20@157C88,no,(planted ret: no variable),u8 (code)
+157E22,4,placeholder,157E20,xn_span_flat_translucent,SPAN-FLAT-TRANSLUCENT,"sub ebx, 0x2710",12A2D0@12A34E,no,xn_span_flat_translucent_cx,s32
+157E2E,4,address,157E20,xn_span_flat_translucent,SPAN-FLAT-TRANSLUCENT,"mov ecx, dword ptr [ecx*4 + 0x186a0]",12A100@12A1FE,no,xn_span_flat_translucent_recip,pointer
+157E98,4,placeholder,157E20,xn_span_flat_translucent,SPAN-FLAT-TRANSLUCENT,"mov ebp, 0x186a0",157E20@157E75,yes,xn_span_flat_translucent_step,s32
+157F67,4,placeholder,157E20,xn_span_flat_translucent,SPAN-FLAT-TRANSLUCENT,"add ebx, 0x186a0",157E20@157E7E,yes,xn_span_flat_translucent_rem,s32
+157FA0,1,opcode,157FA0,xn_span_flat_translucent_tail,SPAN-FLAT-TRANSLUCENT,"mov edx, ebx",157E20@157F83 157E20@157F97,no,(planted ret: no variable),u8 (code)
+1583AF,4,placeholder,158360,xn_poly_project_flat,POLY-PROJECT,"imul eax, eax, 0x186a0",12A2D0@12A2E8,no,xn_poly_flat_sx,s32
+1583B7,4,placeholder,158360,xn_poly_project_flat,POLY-PROJECT,"add edx, 0x186a0",12A2D0@12A367,no,xn_poly_flat_cx,s32
+1583C5,4,placeholder,158360,xn_poly_project_flat,POLY-PROJECT,"imul eax, eax, 0x186a0",12A2D0@12A2F7,no,xn_poly_flat_sy,s32
+1583CD,4,placeholder,158360,xn_poly_project_flat,POLY-PROJECT,"add edx, 0x186a0",12A2D0@12A36D,no,xn_poly_flat_cy,s32
+1584AD,4,placeholder,158420,xn_poly_project_face,POLY-PROJECT,"imul eax, eax, 0x186a0",12A2D0@12A2ED,no,xn_poly_face_sx,s32
+1584B5,4,placeholder,158420,xn_poly_project_face,POLY-PROJECT,"add edx, 0x186a0",12A2D0@12A373,no,xn_poly_face_cx,s32
+1584C3,4,placeholder,158420,xn_poly_project_face,POLY-PROJECT,"imul eax, eax, 0x186a0",12A2D0@12A2FD,no,xn_poly_face_sy,s32
+1584CB,4,placeholder,158420,xn_poly_project_face,POLY-PROJECT,"add edx, 0x186a0",12A2D0@12A379,no,xn_poly_face_cy,s32
+158608,4,placeholder,1585C0,xn_poly_project_terrain,POLY-PROJECT,"imul eax, eax, 0x186a0",12A2D0@12A2F2,no,xn_poly_terrain_sx,s32
+158610,4,placeholder,1585C0,xn_poly_project_terrain,POLY-PROJECT,"add edx, 0x186a0",12A2D0@12A397,no,xn_poly_terrain_cx,s32
+15861E,4,placeholder,1585C0,xn_poly_project_terrain,POLY-PROJECT,"imul eax, eax, 0x186a0",12A2D0@12A303,no,xn_poly_terrain_sy,s32
+158626,4,placeholder,1585C0,xn_poly_project_terrain,POLY-PROJECT,"add edx, 0x186a0",12A2D0@12A39D,no,xn_poly_terrain_cy,s32
+15B9C4,4,placeholder,15B9A0,xn_poly_rasterize,POLY-RASTER,"mov ebp, 0x186a0",15B9A0@15B9A0 15B9A0@15B9C8,yes,xn_raster_left,s32
+15BA3C,4,placeholder,15BA16,xn_poly_rasterize_row_loop,POLY-RASTER,"add ebp, 0x186a0",15B9A0@15BA00,no,xn_raster_dxl,s32
+15BA42,4,placeholder,15BA16,xn_poly_rasterize_row_loop,POLY-RASTER,"add ebx, 0x186a0",15BA16@15BA91,yes,xn_raster_dxr,s32
+15BA48,4,placeholder,15BA16,xn_poly_rasterize_row_loop,POLY-RASTER,"add ecx, 0x186a0",15B9A0@15BA0D,no,xn_raster_dzl,s32
+15BA68,4,placeholder,15BA16,xn_poly_rasterize_row_loop,POLY-RASTER,"mov ebx, 0x186a0",15B9A0@15B9A6 15BA16@15BA6C,no,xn_raster_right,s32
+15BAE8,4,placeholder,15BAC0,xn_poly_tex_gradients,POLY-GRAD,"mov eax, 0x186a0",15BAC0@15BAC3,yes,xn_grad_u0_a,s32
+15BB0C,4,placeholder,15BAC0,xn_poly_tex_gradients,POLY-GRAD,"mov eax, 0x186a0",15BAC0@15BAC8,yes,xn_grad_u0_b,s32
+15BB4D,4,placeholder,15BAC0,xn_poly_tex_gradients,POLY-GRAD,"mov eax, 0x186a0",15BAC0@15BB2D,yes,xn_grad_v0_a,s32
+15BB6E,4,placeholder,15BAC0,xn_poly_tex_gradients,POLY-GRAD,"mov eax, 0x186a0",15BAC0@15BB32,yes,xn_grad_v0_b,s32
+15BBB9,1,operand,15BB8C,xn_poly_setup_textured,POLY-SETUP-TEX,"shr edx, 0x12",12A4F0@12A600,no,xn_poly_subdiv_shift,u8
+15BBDE,4,placeholder,15BB8C,xn_poly_setup_textured,POLY-SETUP-TEX,"imul esi, dword ptr [edi + 0x18], 0x186a0",12A2D0@12A31F,no,xn_poly_setup_sx,s32
+15BBE5,4,placeholder,15BB8C,xn_poly_setup_textured,POLY-SETUP-TEX,"imul ecx, dword ptr [edi + 0x1c], 0x186a0",12A2D0@12A324,no,xn_poly_setup_sy,s32
+15BC61,4,placeholder,15BC42,xn_light_setup_poly,LIGHT-SETUP,"add ebx, 0x186a0",12A4F0@12A5E0,no,xn_light_ambient_row,s32
+15C307,4,register,15C300,xn_tmap_template,TMAP,"and eax, 0x186a0",15C274@15C2AC,no,xn_tmap_tmpl_mask_a0,s32
+15C30F,4,register,15C300,xn_tmap_template,TMAP,"mov dl, byte ptr [eax + 0x186a0]",15C274@15C2A9,no,xn_tmap_tmpl_base_a0,pointer
+15C321,4,register,15C300,xn_tmap_template,TMAP,"and eax, 0x186a0",15C274@15C2B2,no,xn_tmap_tmpl_mask_b0,s32
+15C329,4,register,15C300,xn_tmap_template,TMAP,"mov dl, byte ptr [eax + 0x186a0]",15C274@15C2AF,no,xn_tmap_tmpl_base_b0,pointer
+15C33B,4,register,15C300,xn_tmap_template,TMAP,"and eax, 0x186a0",15C274@15C2AC,no,xn_tmap_tmpl_mask_a1,s32
+15C343,4,register,15C300,xn_tmap_template,TMAP,"mov dl, byte ptr [eax + 0x186a0]",15C274@15C2A9,no,xn_tmap_tmpl_base_a1,pointer
+15C355,4,register,15C300,xn_tmap_template,TMAP,"and eax, 0x186a0",15C274@15C2B2,no,xn_tmap_tmpl_mask_b1,s32
+15C35D,4,register,15C300,xn_tmap_template,TMAP,"mov dl, byte ptr [eax + 0x186a0]",15C274@15C2AF,no,xn_tmap_tmpl_base_b1,pointer
+15C36F,4,register,15C300,xn_tmap_template,TMAP,"and eax, 0x186a0",15C274@15C2AC,no,xn_tmap_tmpl_mask_a2,s32
+15C377,4,register,15C300,xn_tmap_template,TMAP,"mov dl, byte ptr [eax + 0x186a0]",15C274@15C2A9,no,xn_tmap_tmpl_base_a2,pointer
+15C389,4,register,15C300,xn_tmap_template,TMAP,"and eax, 0x186a0",15C274@15C2B2,no,xn_tmap_tmpl_mask_b2,s32
+15C391,4,register,15C300,xn_tmap_template,TMAP,"mov dl, byte ptr [eax + 0x186a0]",15C274@15C2AF,no,xn_tmap_tmpl_base_b2,pointer
+15C3A3,4,register,15C300,xn_tmap_template,TMAP,"and eax, 0x186a0",15C274@15C2AC,no,xn_tmap_tmpl_mask_a3,s32
+15C3AB,4,register,15C300,xn_tmap_template,TMAP,"mov dl, byte ptr [eax + 0x186a0]",15C274@15C2A9,no,xn_tmap_tmpl_base_a3,pointer
+15C3BD,4,register,15C300,xn_tmap_template,TMAP,"and eax, 0x186a0",15C274@15C2B2,no,xn_tmap_tmpl_mask_b3,s32
+15C3C5,4,register,15C300,xn_tmap_template,TMAP,"mov dl, byte ptr [eax + 0x186a0]",15C274@15C2AF,no,xn_tmap_tmpl_base_b3,pointer
+15C3D7,4,register,15C300,xn_tmap_template,TMAP,"and eax, 0x186a0",15C274@15C2AC,no,xn_tmap_tmpl_mask_a4,s32
+15C3DF,4,register,15C300,xn_tmap_template,TMAP,"mov dl, byte ptr [eax + 0x186a0]",15C274@15C2A9,no,xn_tmap_tmpl_base_a4,pointer
+15C3F1,4,register,15C300,xn_tmap_template,TMAP,"and eax, 0x186a0",15C274@15C2B2,no,xn_tmap_tmpl_mask_b4,s32
+15C3F9,4,register,15C300,xn_tmap_template,TMAP,"mov dl, byte ptr [eax + 0x186a0]",15C274@15C2AF,no,xn_tmap_tmpl_base_b4,pointer
+15C40B,4,register,15C300,xn_tmap_template,TMAP,"and eax, 0x186a0",15C274@15C2AC,no,xn_tmap_tmpl_mask_a5,s32
+15C413,4,register,15C300,xn_tmap_template,TMAP,"mov dl, byte ptr [eax + 0x186a0]",15C274@15C2A9,no,xn_tmap_tmpl_base_a5,pointer
+15C425,4,register,15C300,xn_tmap_template,TMAP,"and eax, 0x186a0",15C274@15C2B2,no,xn_tmap_tmpl_mask_b5,s32
+15C42D,4,register,15C300,xn_tmap_template,TMAP,"mov dl, byte ptr [eax + 0x186a0]",15C274@15C2AF,no,xn_tmap_tmpl_base_b5,pointer
+15C43F,4,register,15C300,xn_tmap_template,TMAP,"and eax, 0x186a0",15C274@15C2AC,no,xn_tmap_tmpl_mask_a6,s32
+15C447,4,register,15C300,xn_tmap_template,TMAP,"mov dl, byte ptr [eax + 0x186a0]",15C274@15C2A9,no,xn_tmap_tmpl_base_a6,pointer
+15C459,4,register,15C300,xn_tmap_template,TMAP,"and eax, 0x186a0",15C274@15C2B2,no,xn_tmap_tmpl_mask_b6,s32
+15C461,4,register,15C300,xn_tmap_template,TMAP,"mov dl, byte ptr [eax + 0x186a0]",15C274@15C2AF,no,xn_tmap_tmpl_base_b6,pointer
+15C473,4,register,15C300,xn_tmap_template,TMAP,"and eax, 0x186a0",15C274@15C2AC,no,xn_tmap_tmpl_mask_a7,s32
+15C47B,4,register,15C300,xn_tmap_template,TMAP,"mov dl, byte ptr [eax + 0x186a0]",15C274@15C2A9,no,xn_tmap_tmpl_base_a7,pointer
+15C48D,4,register,15C300,xn_tmap_template,TMAP,"and eax, 0x186a0",15C274@15C2B2,no,xn_tmap_tmpl_mask_b7,s32
+15C495,4,register,15C300,xn_tmap_template,TMAP,"mov dl, byte ptr [eax + 0x186a0]",15C274@15C2AF,no,xn_tmap_tmpl_base_b7,pointer
+15FFCC,4,placeholder,15FF53,xn_gfx_vesa_blit_rect_banked,GFX-VESA-BLIT,"mov ecx, 0x186a0",15FF53@15FF89,yes,xn_vesa_blit_dwords,s32
+15FFD3,4,placeholder,15FF53,xn_gfx_vesa_blit_rect_banked,GFX-VESA-BLIT,"mov ecx, 0x186a0",15FF53@15FF94,yes,xn_vesa_blit_bytes,s32
+15FFDB,4,placeholder,15FF53,xn_gfx_vesa_blit_rect_banked,GFX-VESA-BLIT,"add edi, 0x186a0",15FF53@15FF7E,yes,xn_vesa_blit_skip,s32

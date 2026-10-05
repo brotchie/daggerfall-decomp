@@ -1,0 +1,5 @@
+kind,address,name,confidence,evidence
+global,0x000C10FF,xn_vid_state,strong,"alias of xn_vid_audio_state: the VID player's state (struct xn_vid_player) starts with the audio state; src/engine/vid.c reads the struct, others the field"
+global,0x00120288,xn_pick_view_x,strong,"alias of xn_scratch_vecs: the scratch vectors' first dword, the pick's view x, read as a scalar in the pick and helmet code"
+global,0x0014A100,xn_collide_matrix_b,strong,"alias of xn_collide_work: its first field is both the probe matrix and the ground triangle"
+global,0x0014AF0C,xn_collide_sph,strong,"alias of xn_collide_sph_points: the sphere test's state block (struct) starts with its points"

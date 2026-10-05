@@ -1593,3 +1593,36 @@ the fix.
 
 **Next:** readable XnGine C (locals instead of the register struct, structs, loops for the
 unrolled spans), and retyping the callers behind the 309 disagreeing declarations.
+
+## 2026-10-05: XnGine as readable C
+
+All of XnGine is now readable C, in `src/engine/` (docs/xngine.md "phase 6", the guide
+docs/xngine_readable.md).
+- **Calling convention.** The C is written as a person would write it and compiled by Watcom
+  10.0a. It runs natively on the game's own stack: the asm calls it through `#pragma aux`
+  register interfaces.
+- **Interfaces.** `tools/xn_abi.py` derives the interfaces from liveness over both objects.
+  The corpus checks them: every claimed clobber scrambled at 9M returns, every non-input at
+  entry.
+- **Who did what.** An infrastructure agent built the tools and the vec/mat/math pilot. Two
+  analysis agents wrote the engine's data structures (64 structs) and designs for its
+  self-modifying, unrolled and generated code (docs/engine/). Six agents then converted a
+  group of subsystems each.
+- **Coverage.** 648 of 719 functions run as C. The other 71 are blocks inside functions (their
+  function's C covers them) or data.
+- **Records.** With all of it routed at once, every one of the 8,204 records passes, compared
+  by each function's interface.
+- **Lockstep frames.** The new `xn_rc.py frames` runs the game a frame at a time, asm and C
+  from the same machine with the same timer interrupts, and compares all of memory. Every
+  frame matched on all 18 saves: still, walking and turning.
+- **Kept on purpose.** The original bugs and quirks are kept and commented (the first piece of
+  every billboard is never drawn, the serial receive returns the ring's first byte, ...). So
+  are the values callers see: leftover registers, scratch globals, patched code bytes and the
+  generated code's bytes.
+
+**Next:** with no asm left in the engine, a pass can drop what only the asm needed:
+- the register interfaces and the `_r` adapters;
+- leftovers no game code reads;
+- code patching and generation (the texture mapper and the light shaders as plain C);
+- data at fixed addresses, which can become C definitions.
+It would be tested against the game's calls into the engine and lockstep frames.

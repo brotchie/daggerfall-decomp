@@ -1,0 +1,105 @@
+va,name,group,file,mechanism,must_convert_with,constraint,records,status
+0C0700,xn_draw_image_scaled,DRAW-SCALED,draw.md,self-patched operands (3); runs generated code,,row loop calls [big_buffer],"own 24/24; all-C runs 24; via game C (inventory, paperdoll)",design + sketch
+0C08CC,xn_draw_image_scaled_clip,DRAW-SCALED,draw.md,none (group member: clip),,,"own 24/24; all-C runs 48; via game C (inventory, paperdoll)",design + sketch
+0C094A,xn_draw_image_scaled_compile_row,DRAW-SCALED,draw.md,code generator (scaled row into big_buffer),,convert first: its records test the emitted bytes,"own 24/24; all-C runs 48; via game C (inventory, paperdoll)",design + sketch
+0C0A36,xn_img_unpack_rows,DRAW-SCALED,draw.md,none (group member: unpack),,,"own 24/24; all-C runs 36; via game C (inventory, paperdoll)",design + sketch
+0C8381,xn_draw_image_shaded,DRAW-SHADED-ROW,draw.md,none (stack wrapper),,dead,own 2/2; all-C runs 2; via -,design + sketch
+0C8395,xn_draw_image_shaded_regs,DRAW-SHADED-ROW,draw.md,planted ret planter (word saved and restored),0C83F6,dead; soft: RET adapter,own 2/2; all-C runs 4; via -,design + sketch
+0C83F6,xn_draw_shaded_row_unrolled,DRAW-SHADED-ROW,draw.md,"unrolled body x321, planted ret",0C8395,dead; soft: RET adapter (stride 18),own 2/2; all-C runs 2; via -,design + sketch
+0C9D19,xn_sky_draw_rain_streak,SKY-RAIN,sky.md,planted ret with a pushed return address; body x31,0C9D63,soft: shares the body,own 25/25; all-C runs 50; via 0C9CB9 xn_sky_draw_rain,design + sketch
+0C9D63,xn_sky_draw_rain_streak_bottom_clip,SKY-RAIN,sky.md,shared body entry (planted ret),0C9D19,no caller; soft,own 2/2; all-C runs 2; via 0C9CB9 xn_sky_draw_rain,design + sketch
+0C9F4F,xn_draw_remap_rows_320,DRAW-REMAP320,draw.md,fixed unrolled (320 per row),,dead,own 1/1; all-C runs 1; via -,design + sketch
+0CB552,xn_draw_fullscreen_overlay_shaded,DRAW-OVERLAY,draw.md,fixed unrolled (320 x 200),,,own 24/24; all-C runs 24; via game C (9 sites),design + sketch
+0CD39B,xn_draw_fill_rows_pattern8,DRAW-PATTERN8,draw.md,fixed unrolled (40 per row),,dead,own 1/1; all-C runs 1; via -,design + sketch
+0CD53C,xn_draw_view_checkerboard,DRAW-CHECKER,draw.md,"fixed unrolled (2 x 160), entered mid-loop by parity",,,own 16/16; all-C runs 17; via game C damage_player_hurt,design + sketch
+12A100,xn_render_init,RENDER-SETUP,render.md,patch writer (25 fields),,,"own 2/2; all-C runs 2; via every frame-function record (12A870 28, 12A7D0 28, 12A814 28)",design + sketch
+12A274,xn_cam_set_focal,RENDER-SETUP,render.md,patch writer (2 fields),,,"own 6/6; all-C runs 8; via every frame-function record (12A870 28, 12A7D0 28, 12A814 28)",design + sketch
+12A2D0,xn_cam_set_view_window,RENDER-SETUP,render.md,patch writer (29 fields),,,"own 25/25; all-C runs 27; via every frame-function record (12A870 28, 12A7D0 28, 12A814 28)",design + sketch
+12A3AC,xn_cam_update_derived,RENDER-SETUP,render.md,patch writer (5 fields),,,"own 27/27; all-C runs 60; via every frame-function record (12A870 28, 12A7D0 28, 12A814 28)",design + sketch
+12A4F0,xn_render_begin_frame,RENDER-SETUP,render.md,patch writer (3 fields),,,"own 28/28; all-C runs 28; via every frame-function record (12A870 28, 12A7D0 28, 12A814 28)",design + sketch
+12A870,xn_render_frame,RENDER-FRAME,render.md,self-patched operands (2); patch writer (6 ray fields); stack unwinding row end,12A949 12A94E 12A969 12A975 12A976 12A97C 12A97E,hard: 12A949 unwinds the caller frame,own 28/28; all-C runs 28; via its own; it runs every span routine and the fog hook,design + sketch
+12A949,xn_render_frame_row_end,RENDER-FRAME,render.md,run-time block of xn_render_frame,12A870 12A94E 12A969 12A975 12A976 12A97C 12A97E,hard: 12A949 unwinds the caller frame,own 0; all-C runs 28; via its own; it runs every span routine and the fog hook,design + sketch
+12A94E,xn_render_frame_next_row,RENDER-FRAME,render.md,run-time block of xn_render_frame,12A870 12A949 12A969 12A975 12A976 12A97C 12A97E,hard: 12A949 unwinds the caller frame,own 0; all-C runs 28; via its own; it runs every span routine and the fog hook,design + sketch
+12A969,xn_render_frame_rows_done,RENDER-FRAME,render.md,run-time block of xn_render_frame,12A870 12A949 12A94E 12A975 12A976 12A97C 12A97E,hard: 12A949 unwinds the caller frame,own 0; all-C runs 28; via its own; it runs every span routine and the fog hook,design + sketch
+12A975,xn_render_frame_rows_done_popfd,RENDER-FRAME,render.md,run-time block of xn_render_frame,12A870 12A949 12A94E 12A969 12A976 12A97C 12A97E,hard: 12A949 unwinds the caller frame,own 0; all-C runs 28; via its own; it runs every span routine and the fog hook,design + sketch
+12A976,xn_render_frame_flats,RENDER-FRAME,render.md,run-time block of xn_render_frame,12A870 12A949 12A94E 12A969 12A975 12A97C 12A97E,hard: 12A949 unwinds the caller frame,own 0; all-C runs 28; via its own; it runs every span routine and the fog hook,design + sketch
+12A97C,xn_render_frame_flats_check,RENDER-FRAME,render.md,run-time block of xn_render_frame,12A870 12A949 12A94E 12A969 12A975 12A976 12A97E,hard: 12A949 unwinds the caller frame,own 0; all-C runs 56; via its own; it runs every span routine and the fog hook,design + sketch
+12A97E,xn_render_frame_exit,RENDER-FRAME,render.md,run-time block of xn_render_frame,12A870 12A949 12A94E 12A969 12A975 12A976 12A97C,hard: 12A949 unwinds the caller frame,own 0; all-C runs 28; via its own; it runs every span routine and the fog hook,design + sketch
+12DC44,xn_font_draw_glyph,FONT-GLYPH,font.md,self-patched operands (2),,,"own 26/26; all-C runs 51; via 12DBCC xn_font_draw_string (25), 12DB50 xn_font_select (25)",design + sketch
+12F79C,xn_water_draw,WATER-DRAW,water.md,self-patched operand (1),,,own 24/24; all-C runs 24; via game C world_render,design + sketch
+12F9A0,xn_water_span,WATER-SPAN,water.md,planted ret planter,12F9E0,soft: RET adapter,own 24/24; all-C runs 48; via 12F79C xn_water_draw (24),design + sketch
+12F9E0,xn_water_span_unrolled,WATER-SPAN,water.md,"unrolled body x641, planted ret",12F9A0,soft: RET adapter (stride 21),own 12/12; all-C runs 31; via 12F79C xn_water_draw (24),design + sketch
+136A00,xn_light_init,LIGHT-SHADERS,light.md,patch writer (6 template fields),,,own 2/2; all-C runs 2; via 15BC42 xn_light_setup_poly (3); 155920 (24) and 156A94 (26) run the copies,design + sketch
+136B88,xn_shade_load,LIGHT-SHADERS,light.md,patch writer (6 template fields),,,own 2/2; all-C runs 2; via 15BC42 xn_light_setup_poly (3); 155920 (24) and 156A94 (26) run the copies,design + sketch
+136C30,xn_light_tmpl_1,LIGHT-SHADERS,light.md,"code template (1 light), never run in place",,extern u8[0x54]; never routed,own 2/2; all-C runs 2; via 15BC42 xn_light_setup_poly (3); 155920 (24) and 156A94 (26) run the copies,design + sketch
+136C84,xn_light_tmpl_2,LIGHT-SHADERS,light.md,code template (2 lights),,extern u8[0x8C]; never routed,own 2/2; all-C runs 2; via 15BC42 xn_light_setup_poly (3); 155920 (24) and 156A94 (26) run the copies,design + sketch
+136D10,xn_light_tmpl_3,LIGHT-SHADERS,light.md,code template (3 lights),,extern u8[0xCC]; never routed,own 2/2; all-C runs 2; via 15BC42 xn_light_setup_poly (3); 155920 (24) and 156A94 (26) run the copies,design + sketch
+13E744,xn_terrain_setup_axes,TERRAIN-AXES,terrain.md,fixed unrolled (6 + 9),,,own 26/26; all-C runs 52; via 13E600 xn_terrain_draw (26),design + sketch
+13E8C8,xn_terrain_transform_grid,TERRAIN-GRID,terrain.md,self-patched walker state (20) + view fields (4),,,own 26/26; all-C runs 52; via 13E600 xn_terrain_draw (26),design + sketch
+13EFD7,xn_terrain_draw_cells,TERRAIN-CELLS,terrain.md,self-patched constants (6); small fixed unroll (4 corners),,,own 26/26; all-C runs 52; via 13E600 xn_terrain_draw (26),design + sketch
+140284,xn_model_draw,MODEL-DRAW,model.md,patch writer (13 fields); patched operand (1),,,own 28/28; all-C runs 84; via 12A7D0 xn_render_draw_models (28),design + sketch
+1403AF,xn_model_draw_faces,MODEL-FACES-CLEAR,model.md,planted ret planter; patch writer (4); patched operands (8),140A28,soft: RET adapter,own 28/28; all-C runs 112; via 140284 xn_model_draw (28),design + sketch
+1404FA,xn_model_transform_face_verts,MODEL-VERTS,model.md,patched operands (11),,,own 28/28; all-C runs 140; via 1403AF (28),design + sketch
+140606,xn_model_build_light_list,MODEL-LIGHTS,model.md,self-patched operands (4); reads 140497 as data,,,own 28/28; all-C runs 112; via 140284 (28),design + sketch
+1406D6,xn_model_scale_matrix,MODEL-SCALE,model.md,patched operands (4),,,own 28/28; all-C runs 112; via 140284 (28),design + sketch
+140A28,xn_model_clear_vert_flags,MODEL-FACES-CLEAR,model.md,"unrolled body x1024, planted ret",1403AF,soft: RET adapter (stride 6),own 28/28; all-C runs 140; via 140284 xn_model_draw (28),design + sketch
+143BB0,xn_gfx_copy_and_clear_unrolled,GFX-COPYCLEAR-UNROLLED,gfx.md,fixed unrolled (128 per 512 bytes),,dead,own 2/2; all-C runs 2; via -,design + sketch
+144F58,xn_draw_img_record_transparent_regs,DRAW-TRANSPARENT,draw.md,"none (IMG record wrapper, jmp 144FC8)",,,own 2/2; all-C runs 4; via 12B3ED xn_mouse_cursor_draw; game C (34 sites),design + sketch
+144FB4,xn_draw_image_transparent,DRAW-TRANSPARENT,draw.md,none (stack wrapper),,,own 28/28; all-C runs 28; via 12B3ED xn_mouse_cursor_draw; game C (34 sites),design + sketch
+144FC8,xn_draw_image_transparent_regs,DRAW-TRANSPARENT,draw.md,planted ret planter (word saved and restored),14501C,soft: RET adapter,own 28/28; all-C runs 108; via 12B3ED xn_mouse_cursor_draw; game C (34 sites),design + sketch
+14501C,xn_draw_transparent_row,DRAW-TRANSPARENT,draw.md,"unrolled body x640, planted ret",144FC8,soft: RET adapter (stride 16),own 25/25; all-C runs 129; via 12B3ED xn_mouse_cursor_draw; game C (34 sites),design + sketch
+14D23C,xn_shade_set_fog,SHADE-FOG-SETUP,shade.md,patch writer (10 fields),,,own 29/29; all-C runs 29; via game C update_fog; 150040 (29) reads its fields,design + sketch
+14D300,xn_shade_fog_span_off,SHADE-FOG,shade.md,none (the empty hook),,,own 24/24; all-C runs 24; via 12A870 xn_render_frame (28),design + sketch
+14D320,xn_shade_fog_pixels,SHADE-FOG,shade.md,"unrolled body x641, planted ret",150040,soft: RET adapter (stride 18),own 29/29; all-C runs 62; via 12A870 xn_render_frame (28),design + sketch
+150040,xn_shade_fog_span,SHADE-FOG,shade.md,planted ret planter; patched operands (10),14D320,soft: RET adapter,own 29/29; all-C runs 57; via 12A870 xn_render_frame (28),design + sketch
+154E20,xn_flat_draw,FLAT-WRITERS,flat.md,patch writer (1 field),,,own 28/28; all-C runs 80; via 12A814 xn_render_draw_flats (28),design + sketch
+1550E0,xn_flat_setup_gradients,FLAT-GRAD,flat.md,"patched operands (8); patch writer (4, incl. 2 address fields)",,,own 29/29; all-C runs 142; via 1552A0 (28),design + sketch
+15526C,xn_flat_span_emit,FLAT-EMIT,flat.md,patched operands (2),,,own 26/26; all-C runs 120; via 155200 xn_flat_span_clip (28),design + sketch
+1552A0,xn_flat_raster,FLAT-RASTER,flat.md,self-patched walker state; patch writer,155332,hard: 155332 is inside its body,own 28/28; all-C runs 113; via 158360 xn_poly_project_flat (28),design + sketch
+155332,xn_flat_raster_rows,FLAT-RASTER,flat.md,entry inside 1552A0 (self-patched walker),1552A0,hard; no caller,own 1/1; all-C runs 1; via 158360 xn_poly_project_flat (28),design + sketch
+155415,xn_flat_begin_frame,FLAT-WRITERS,flat.md,patch writer (7 fields),,,own 28/28; all-C runs 80; via 12A814 xn_render_draw_flats (28),design + sketch
+155610,xn_flat_span_light_setup,FLAT-LIGHT,flat.md,patched operand (1),,,own 26/26; all-C runs 125; via 15526C (26),design + sketch
+155880,xn_span_solid_lit_tail,SPAN-SOLID-LIT,span.md,"unrolled body x16, planted ret",155920,soft: RET adapter (stride 9),own 25/25; all-C runs 75; via 12A870 (28),design + sketch
+155920,xn_span_solid_lit,SPAN-SOLID-LIT,span.md,unrolled 16-px block; planted ret planter; self-patched (4) and patched (4) operands; runs a generated shader,155880,soft: RET adapter,own 24/24; all-C runs 50; via 12A870 (28),design + sketch
+155C00,xn_span_tex_tail,SPAN-TEX,span.md,"unrolled body x16, planted ret (shared tail)",155D20 155F60 155F70,soft: RET adapter (stride 17),own 26/26; all-C runs 115; via 12A870 (28),design + sketch
+155D20,xn_span_tex_8,SPAN-TEX,span.md,"unrolled 8-px block; planted ret planter; self-patched (5), patched (3)",155F60 155F70 155C00,soft,own 24/24; all-C runs 24; via 12A870 (28),design + sketch
+155F60,xn_span_tex_16_setup,SPAN-TEX,span.md,"none (setup, falls into 155F70)",155D20 155F70 155C00,,own 26/26; all-C runs 40; via 12A870 (28),design + sketch
+155F70,xn_span_tex_16,SPAN-TEX,span.md,"unrolled 16-px block; planted ret planter; self-patched (5), patched (3)",155D20 155F60 155C00,soft,own 26/26; all-C runs 66; via 12A870 (28),design + sketch
+156320,xn_span_tex_shaded_tail,SPAN-TEX-SHADED,span.md,"unrolled body x16, planted ret (shared tail)",156460 1566B4 1566C4,soft: RET adapter (stride 19),own 28/28; all-C runs 139; via 12A870 (28),design + sketch
+156460,xn_span_tex_shaded_8,SPAN-TEX-SHADED,span.md,"unrolled 8-px block; planted ret planter; self-patched (5), patched (3)",1566B4 1566C4 156320,soft,own 24/24; all-C runs 25; via 12A870 (28),design + sketch
+1566B4,xn_span_tex_shaded_16_setup,SPAN-TEX-SHADED,span.md,"none (setup, falls into 1566C4)",156460 1566C4 156320,,own 28/28; all-C runs 59; via 12A870 (28),design + sketch
+1566C4,xn_span_tex_shaded_16,SPAN-TEX-SHADED,span.md,"unrolled 16-px block; planted ret planter; self-patched (5), patched (3)",156460 1566B4 156320,soft,own 28/28; all-C runs 87; via 12A870 (28),design + sketch
+156A80,xn_span_tex_lit_setup,SPAN-TEX-LIT,span.md,"none (setup, falls into 156A94)",156A94,,own 26/26; all-C runs 59; via 12A870 (28),design + sketch
+156A94,xn_span_tex_lit,SPAN-TEX-LIT,span.md,"self-patched (5), patched (7); runs generated tmap copies and shaders; plants a ret in the heap copy",156A80,,own 26/26; all-C runs 85; via 12A870 (28),design + sketch
+156D40,xn_span_tex64_tail,SPAN-TEX64,span.md,"unrolled body x16, planted ret",156E60,soft: RET adapter (stride 17),own 12/12; all-C runs 24; via 12A870 (28),design + sketch
+156E60,xn_span_tex64,SPAN-TEX64,span.md,"unrolled 16-px block; planted ret planter; self-patched (4), patched (3)",156D40,soft,own 12/12; all-C runs 12; via 12A870 (28),design + sketch
+157100,xn_span_tex64_shaded_tail,SPAN-TEX64-SHADED,span.md,"unrolled body x16, planted ret",157240,soft: RET adapter (stride 19),own 27/27; all-C runs 98; via 12A870 (28),design + sketch
+157240,xn_span_tex64_shaded,SPAN-TEX64-SHADED,span.md,"unrolled 16-px block; planted ret planter; self-patched (6), patched (3)",157100,soft,own 26/26; all-C runs 74; via 12A870 (28),design + sketch
+157620,xn_span_flat_transparent,SPAN-FLAT-TRANSPARENT,span.md,unrolled 8-px block; planted ret planter; patched (2),157760,soft,own 26/26; all-C runs 61; via 15526C xn_flat_span_emit (26),design + sketch
+157760,xn_span_flat_transparent_tail,SPAN-FLAT-TRANSPARENT,span.md,"unrolled body x8, planted ret",157620,soft: RET adapter (stride 19),own 26/26; all-C runs 84; via 15526C xn_flat_span_emit (26),design + sketch
+157800,xn_span_flat_transparent_shaded,SPAN-FLAT-SHADED,span.md,"unrolled 8-px block; planted ret planter; self-patched (1), patched (2)",157960,soft,own 24/24; all-C runs 92; via 15526C (26),design + sketch
+157960,xn_span_flat_transparent_shaded_tail,SPAN-FLAT-SHADED,span.md,"unrolled body x8, planted ret",157800,soft: RET adapter (stride 21),own 27/27; all-C runs 103; via 15526C (26),design + sketch
+157B20,xn_span_flat_lit_fogged,SPAN-FLAT-FOGGED,span.md,"unrolled 8-px block; planted ret planter; self-patched (2), patched (2)",157CA0,soft,own 25/25; all-C runs 37; via 15526C (26),design + sketch
+157CA0,xn_span_flat_lit_fogged_tail,SPAN-FLAT-FOGGED,span.md,"unrolled body x8, planted ret",157B20,soft: RET adapter (stride 23),own 24/24; all-C runs 60; via 15526C (26),design + sketch
+157E02,xn_span_tail_offsets_25_entry1,SPAN-FLAT-TRANSLUCENT,span.md,not code (an offsets-table entry decoded as code),157E20 157FA0,no C,own 0; all-C runs 0; via none in play: differential tests,design + sketch
+157E20,xn_span_flat_translucent,SPAN-FLAT-TRANSLUCENT,span.md,"unrolled 8-px block; planted ret planter; self-patched (2), patched (2)",157FA0 157E02,soft; never ran,own 0; all-C runs 0; via none in play: differential tests,design + sketch
+157FA0,xn_span_flat_translucent_tail,SPAN-FLAT-TRANSLUCENT,span.md,"unrolled body x8, planted ret",157E20 157E02,soft: RET adapter (stride 25),own 2/2; all-C runs 2; via none in play: differential tests,design + sketch
+158360,xn_poly_project_flat,POLY-PROJECT,poly.md,patched operands (4),,,"own 28/28; all-C runs 85; via 1403AF (28), 154E20 (28), 13EFD7 (26)",design + sketch
+158420,xn_poly_project_face,POLY-PROJECT,poly.md,patched operands (4),,,"own 28/28; all-C runs 114; via 1403AF (28), 154E20 (28), 13EFD7 (26)",design + sketch
+1585C0,xn_poly_project_terrain,POLY-PROJECT,poly.md,patched operands (4),,,"own 26/26; all-C runs 99; via 1403AF (28), 154E20 (28), 13EFD7 (26)",design + sketch
+15B9A0,xn_poly_rasterize,POLY-RASTER,poly.md,self-patched walker state (5),15BA16,hard: 15BA16 is inside its body,"own 28/28; all-C runs 236; via 13EFD7, 158420, 1585C0",design + sketch
+15BA16,xn_poly_rasterize_row_loop,POLY-RASTER,poly.md,entry inside 15B9A0,15B9A0,hard; unreachable,"own 1/1; all-C runs 1; via 13EFD7, 158420, 1585C0",design + sketch
+15BAC0,xn_poly_tex_gradients,POLY-GRAD,poly.md,self-patched operands as saved registers (4),,,own 28/28; all-C runs 84; via 15BB8C (28),design + sketch
+15BB8C,xn_poly_setup_textured,POLY-SETUP-TEX,poly.md,"patched operands (3, one a byte shift count); tail-jumps to the span routine",,,own 28/28; all-C runs 56; via 12A870 (28) through [poly+3Ch],design + sketch
+15BC42,xn_light_setup_poly,LIGHT-SETUP,light.md,patched operand (ambient row); tail-jumps into the generators,15BF75,hard: 15BF75 pops its return address and jumps to 15BE4D,"own 3/3; all-C runs 112; via 15BB8C (28), 12A700 (28)",design + sketch
+15BC9C,xn_light_setup_terrain,LIGHT-SETUP,light.md,none; tail-jumps into the generators,,,"own 26/26; all-C runs 76; via 15BB8C (28), 12A700 (28)",design + sketch
+15BCF6,xn_light_build_shader_1,LIGHT-SHADERS,light.md,code generator (shader 1),,flags pass through (CF),own 26/26; all-C runs 82; via 15BC42 xn_light_setup_poly (3); 155920 (24) and 156A94 (26) run the copies,design + sketch
+15BD78,xn_light_build_shader_2,LIGHT-SHADERS,light.md,code generator (shader 2),,flags pass through (CF),own 25/25; all-C runs 40; via 15BC42 xn_light_setup_poly (3); 155920 (24) and 156A94 (26) run the copies,design + sketch
+15BE4D,xn_light_build_shader_3,LIGHT-SHADERS,light.md,code generator (shader 3),,flags pass through (CF); also jumped to from 15C040,own 24/24; all-C runs 30; via 15BC42 xn_light_setup_poly (3); 155920 (24) and 156A94 (26) run the copies,design + sketch
+15BF75,xn_light_add_point,LIGHT-SETUP,light.md,none; frame-skipping jmp into the generator,15BC42,hard,"own 28/28; all-C runs 111; via 15BB8C (28), 12A700 (28)",design + sketch
+15C200,xn_tmap_pool_alloc,TMAP,tmap.md,none (allocates the pool),,,"own 2/2; all-C runs 4; via 135EAB xn_tex_load_archive (26), 135D00 xn_tex_cache_lookup (29), 135E39 (6); 156A94 runs the copies",design + sketch
+15C274,xn_tmap_compile,TMAP,tmap.md,"code generator (patches the template in place, copies 418 bytes)",,CF out,"own 26/26; all-C runs 37; via 135EAB xn_tex_load_archive (26), 135D00 xn_tex_cache_lookup (29), 135E39 (6); 156A94 runs the copies",design + sketch
+15C2DC,xn_tmap_rebase,TMAP,tmap.md,code patcher (rebases a copy),,,"own 2/2; all-C runs 2; via 135EAB xn_tex_load_archive (26), 135D00 xn_tex_cache_lookup (29), 135E39 (6); 156A94 runs the copies",design + sketch
+15C2F0,xn_tmap_pool_reset,TMAP,tmap.md,none (pool reset),,,"own 2/2; all-C runs 8; via 135EAB xn_tex_load_archive (26), 135D00 xn_tex_cache_lookup (29), 135E39 (6); 156A94 runs the copies",design + sketch
+15C300,xn_tmap_template,TMAP,tmap.md,"code template (8 two-pixel steps), never run in place; copies get planted rets",,extern u8[418]; never routed,"own 0; all-C runs 0; via 135EAB xn_tex_load_archive (26), 135D00 xn_tex_cache_lookup (29), 135E39 (6); 156A94 runs the copies",design + sketch
+15FF53,xn_gfx_vesa_blit_rect_banked,GFX-VESA-BLIT,gfx.md,self-patched operands (3),,dead,own 0; all-C runs 0; via -,design + sketch

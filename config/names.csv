@@ -5,10 +5,24 @@ global,0x000C0400,xn_sys_old_int24_sel,strong,Word: selector of the int 24h vect
 global,0x000C0402,xn_sys_old_int24_offset,strong,Dword: offset of the saved int 24h vector (C0520); C0580 restores it.
 global,0x000C0406,xn_sys_int24_installed,strong,Byte: 1 once C0520 installed the critical error handler C0500; C0580 restores only when set.
 global,0x000C0600,xn_draw_scaled_flags,strong,"Word: the flags argument of xn_draw_image_scaled (bit 3 row-compressed, bit 15 remap through D_00195B80)."
+global,0x000C0602,xn_draw_scaled_x,strong,"Word: xn_draw_image_scaled's x (C070F), moved to xn_gfx_clip_left by the clip C08CC; the row compiler C094A starts its columns there"
+global,0x000C0604,xn_draw_scaled_y,strong,"Word: xn_draw_image_scaled's y (C0715), moved to xn_gfx_clip_top by C08CC; C0853 takes its row"
 global,0x000C0606,xn_draw_scaled_src_w,strong,Word: source width (columns left after clipping); also set by CD291 for C0A36.
 global,0x000C0608,xn_draw_scaled_src_h,strong,Word: source height (rows left after clipping); also set by CD291 for C0A36.
+global,0x000C060A,xn_draw_scaled_w,strong,Word: xn_draw_image_scaled's destination width (C071C); the x step is w * 256 / src_w
+global,0x000C060C,xn_draw_scaled_h,strong,Word: xn_draw_image_scaled's destination height (C0723); the y step is h * 256 / src_h
 global,0x000C060E,xn_draw_scaled_src,strong,Dword: the source image data (scratch_buffer after C0A36 unpacked it); also set by CD291.
+global,0x000C0612,xn_draw_scaled_x_int,strong,"Byte: the x step's integer part (w * 256 / src_w >> 8, C077C): destination pixels per source column"
+global,0x000C0613,xn_draw_scaled_y_int,strong,Byte: the y step's integer part (C07AB): destination rows per source row
+global,0x000C0614,xn_draw_scaled_x_frac,strong,"Word: the x step's fraction (its low byte, C0786), added to the row compiler's 8.8 accumulator per column"
+global,0x000C0616,xn_draw_scaled_y_frac,strong,Word: the y step's fraction (C07B5)
+global,0x000C0618,xn_draw_scaled_skip_x,strong,Word: destination columns the clip C08CC cut on the left (clip_left - x)
+global,0x000C061A,xn_draw_scaled_skip_y,strong,Word: destination rows the clip C08CC cut at the top (clip_top - y)
+global,0x000C061C,xn_draw_scaled_src_ofs,strong,"Word: the source offset of the next column: skipped rows * src_w + skipped columns (C0803/C0834), +1 per column the row compiler C094A visits (C0A18)"
 global,0x000C061E,xn_draw_scaled_compile_fn,strong,Dword: the row compiler xn_draw_image_scaled calls through (C094A).
+global,0x000C08AD,xn_draw_scaled_bottom,strong,"patch field (placeholder, 4 bytes, s32): read by 0C0700 xn_draw_image_scaled (cmp edi, 0x186a0), written at 0C0700@0C084E; patched by its own function"
+global,0x000C08B9,xn_draw_scaled_stride,strong,"patch field (placeholder, 4 bytes, s32): read by 0C0700 xn_draw_image_scaled (add esi, 0x186a0), written at 0C0700@0C07BB; patched by its own function"
+global,0x000C08BE,xn_draw_scaled_yint_op,strong,"patch field (placeholder, 1 bytes, u8): read by 0C0700 xn_draw_image_scaled (mov bh, 0x64), written at 0C0700@0C0880; patched by its own function"
 global,0x000C0B00,xn_dos_msg_not_found,confirmed,'DOS: File not found: $' (C0C8C).
 global,0x000C0B16,xn_dos_msg_create_failed,confirmed,'DOS: Error creating file: $' (C0D54).
 global,0x000C0B31,xn_dos_msg_out_of_memory,confirmed,'DOS: Out of memory loading file: $' (C0E24).
@@ -35,6 +49,7 @@ global,0x000C1462,xn_vid_timer,strong,"Dword: the sound_timer_add handle of C1CD
 global,0x000C1466,xn_vid_frame_ticks,strong,"Word: 60 Hz ticks until the next frame (C1BBE adds, C1CDC subtracts)."
 global,0x000C146C,xn_vid_path,strong,129 bytes: copy of the movie path xn_vid_play opens.
 global,0x000C14ED,xn_vid_skippable,strong,Dword: the fourth argument of xn_vid_play; non-zero lets a mouse button or key stop the movie.
+global,0x000C1F00,xn_vec_angles_in,strong,"vec3: xn_vec_unit_to_angles_regs (0xC20B8) stores its input (x, y, z) here first and reads y back; readable C pilot (src/engine/vec.c)"
 global,0x000C2300,xn_world_msg_out_of_memory,confirmed,"'WORLD: Out of memory.' + CRLF$ (C2D00, C322D)."
 global,0x000C2318,xn_world_msg_open_failed,confirmed,'WORLD: Error opening WorldFile.' + CRLF$ (C310F).
 global,0x000C233A,xn_world_file,strong,Dword: DOS handle of the world file (WOODS.WLD) opened by C310F.
@@ -46,6 +61,10 @@ global,0x000C2352,xn_world_lone_tile_table,strong,"16 bytes: replacement tile fo
 global,0x000C2362,xn_world_tile_class,strong,"65 bytes: class 0..3 of a ground tile 0..63 (FFh = not a base tile): 0,1,2,3 and the transition tiles; C3C3C, C3EFE."
 global,0x000C23A3,xn_world_dir_dx,strong,"8 bytes: x steps of the 8 neighbour directions (1,1,0,-1,-1,-1,0,1); y steps in D_000C23AB. Used by C3B1D."
 global,0x000C23AB,xn_world_dir_dy,strong,"8 bytes: y steps of the 8 neighbour directions (0,1,1,1,0,-1,-1,-1), with xn_world_dir_dx (C3B32, C3B5A)"
+global,0x000C23B3,xn_world_last_dx,strong,"s8: the dead walkers' last step x (C3E36, C3EAA; C3B65 negates it: a step straight back sets CF)"
+global,0x000C23B4,xn_world_last_dy,strong,"s8: the dead walkers' last step y (C3E3B, C3EAF; C3B71)"
+global,0x000C23B5,xn_world_path_avoid_dx,candidate,s8 FFh (C3E04): the dead path walker replaces a step with this dx (or dy) by its negation in both (C3E17..C3E34): paths go right and down
+global,0x000C23B6,xn_world_path_avoid_dy,candidate,s8 FFh (C3E0B): see xn_world_path_avoid_dx
 global,0x000C23B8,xn_cam_pitch,confirmed,Camera pitch 0..2047: world_render and sky_update store (camera_object->angle_x + view_look_pitch) & 2047 and pass it to 0x137000.
 global,0x000C23BC,xn_cam_yaw,confirmed,Camera yaw 0..2047: world_render and sky_update store (camera_object->yaw + D_001959BC) & 2047; read by 12F59C.
 global,0x000C23C0,xn_cam_roll,confirmed,Camera roll: world_render stores camera_object->angle_z (plus a sway table entry in water); sky_update stores 0.
@@ -117,6 +136,7 @@ global,0x000C7DE7,xn_snow_speed_medium,strong,"fall speed of the 30 medium flake
 global,0x000C7DEB,xn_snow_speed_large,strong,"fall speed of the 20 large flakes, frame_ticks*3200/1000 (initial 4)"
 global,0x000C7DEF,xn_snow_drift_speed,strong,"word: sideways drift per frame, frame_ticks*1280/1000 (initial 2)"
 global,0x000C7DF1,xn_rain_streak_colours,strong,"30 colour bytes '||||||||||{{{{{{{{zzzzzzyyyyxx' (0x7C..0x78), one rain streak from top to bottom (C9D19)"
+global,0x000C9EA0,xn_sky_rain_restore_op,strong,"the rain streak's restoring instruction (mov [ecx+0C9D89h], bl): its first byte; a planted ret at step 31 (n = 31, only from the dead C9D63) lands on it and stays"
 global,0x000CAF00,xn_steer_region_handlers,confirmed,"9 function pointers steer_forward_left, steer_forward, steer_forward_right, steer_turn_left, steer_center, steer_turn_right, steer_slide_left, steer_backward, steer_slide_right; CAE00 jumps through it"
 global,0x000CAF24,spell_cost_formulas,strong,"7 function pointers (0x3937B, 0x3946E, 0x395AA, 0x39635, 0x396C0, 0x3978C, 0x3988A), the jump table of func_000CAE07 (jmp [eax*4+0xCAF24]); in xn_CAF00.asm"
 global,0x000CAF40,spell_effect_handlers,confirmed,"64 function pointers in xn_CAF00.asm, called through spell_effect_dispatch (0xCAE0E): 0-50 the spell effects (0x88CF5 Paralyze ... 0x8A344 Recall (43) ... 0x8A4BD); 51-63 the handlers of kludge.c's debug pick list (kludge_menu_update through 0xCAE1C, world agent): 51 kludge_show_rumor, 52 kludge_advance_level, 53 kludge_jump_month, 54 kludge_good_merchant_rep, 55-58 disease.c (become/cure vampire, werething), 59 kludge_toggle_world_position, 60 kludge_toggle_second_compass, 61 kludge_pick_gold, 62 tavern_open, 63 kludge_toggle_quest_debug; exp1b (build/names/scratch/magic/exp1b.py, save_morthag1): 22 effect types reached the handlers listed"
@@ -148,6 +168,7 @@ global,0x000CEA40,xn_cam_focal_y,strong,vertical projection scale (180 from xn_c
 global,0x000CEA44,xn_cam_inv_focal_y,candidate,2^38/focal_y (12A274); nothing reads it
 global,0x000CEA48,xn_render_mode,strong,"render mode set by xn_render_set_mode: byte offset 0 (span ends), 4 (solid colour), 8 (textured, always used)"
 global,0x000CEA4C,xn_render_poly_count,candidate,zeroed by 12A4F0; the model draw (1403AF) adds each model's polygon count: a per-frame statistic nothing reads
+global,0x000CEA54,xn_render_unused_54,candidate,xn_view+0x34: zeroed by xn_render_begin_frame (12A5A4) only; no reader
 global,0x000CEA58,xn_render_span_hook,strong,"routine 12A870 calls after every span: xn_shade_fog_span (0x150040) or the empty xn_shade_fog_span_off (0x14D300), chosen by xn_shade_set_fog"
 global,0x000CEA5C,xn_render_frame_flags,strong,"argument of xn_render_frame: bit 1 (2, outdoors) skips the background fill 12A98B"
 global,0x000CEA60,xn_render_span_next,strong,next free 16-byte span node (pool after the row heads at 0xF39F0); the span inserters 158420/158D04 take nodes from it
@@ -177,7 +198,7 @@ global,0x000F39F0,xn_render_span_rows,strong,"one 16-byte list head per screen r
 global,0x00116C80,xn_render_light_list_pool,strong,"pool of per-object light lists (light ptr, x, y, z in object space, radius, intensity<<4; -1 ends) reset by 12A4F0"
 global,0x00120280,xn_render_light_list_pool_start,candidate,"dword 01116C80h = xn_render_light_list_pool, an initialised pointer (LE fixup) with no reader; with 0x120284 it bounds the light-list pool"
 global,0x00120284,xn_render_light_list_pool_end,candidate,"dword 01119200h: the end of the light-list pool (400 entries of 24 bytes); no reader, so the pool is unchecked; 0x119200..0x12027F after it is 28800 zero bytes nothing addresses"
-global,0x00120288,xn_pick_view_x,candidate,"x of the shared (x,y,z) view-space point whose z is pick_distance: xn_render_pick leaves the picked point's view x here (func_0001449D reads it); flats, the sphere test and the model code also use it as scratch"
+global,0x00120288,xn_scratch_vecs,strong,"struct xn_scratch (44 bytes): the shared scratch vectors a (xn_pick_view_x/_y, pick_distance), b (xn_scratch_vec_b), flat, len2, t; the terrain's face planes keep their edges there (13EB4E..)"
 global,0x0012028C,xn_pick_view_y,candidate,y of the same point: (y - centre_y)*z/focal_y after xn_render_pick
 global,0x00120290,pick_distance,strong,distance to the clicked object: every click handler refuses beyond 128/150/160/256 with 'You are too far away...'
 global,0x00120294,xn_scratch_vec_b,strong,"xn_vec3: second shared scratch vector (struct xn_scratch.b): 13FFCB/13FFD8/13FFE5 (uv axes e2), 140886.. (face normal cross input), 12A653/12A641 (xn_render_pick: the screen point from xn_flat_pick), 155508/15550D (written by xn_flat_pick), 13EB87 (terrain)"
@@ -202,6 +223,9 @@ global,0x0012A019,xn_render_span_setup_terrain_ptr,strong,entry 4 of xn_render_s
 global,0x0012A01D,xn_render_solid_span_fns,strong,3 span drawers chosen by the shading result 0/4/8 of 15BC42: 155800 (plain fill) 155820 (shaded fill) 155920 (lit)
 global,0x0012A029,xn_render_tmap_span_fns,strong,6 textured span drawers (155D20 156460 156A80 / 155F60 1566B4 156A80) chosen by 15BB8C from the shading result and the 1/z gradient size
 global,0x0012A041,xn_render_terrain_span_fns,strong,3 terrain span drawers (156E60 157240 157240) chosen by 12A740 from the 15BC9C result
+global,0x0012A931,xn_render_frame_centre_x,strong,"patch field (placeholder, 4 bytes, s32): read by 12A870 xn_render_frame (sub ebx, 0x186a0), written at 12A2D0@12A335"
+global,0x0012A950,xn_render_frame_width,strong,"patch field (placeholder, 4 bytes, s32): read by 12A94E xn_render_frame_next_row (add edi, 0x186a0), written at 12A870@12A8DE"
+global,0x0012A963,xn_render_frame_end_row,strong,"patch field (placeholder, 4 bytes, s32): read by 12A94E xn_render_frame_next_row (cmp dword ptr [0xcea6c], 0x186a0), written at 12A870@12A8C3"
 global,0x0012AA04,xn_timer_fps,strong,"frames per second: main sets 23 at start, CE7BB stores each second's count and returns it; guards_summon scales a delay by it"
 global,0x0012AC00,mouse_buttons,strong,byte: mouse button state; inventory_frame and transport_menu act when it is set and was not last frame
 global,0x0012AC01,xn_mouse_buttons_prev,strong,byte: mouse_buttons of the previous poll (12B196 detects new presses with it)
@@ -232,13 +256,19 @@ global,0x0012AF3A,mouse_y_max,strong,short
 global,0x0012B500,xn_pal_current,strong,pointer to the palette last set by xn_pal_set; fades and nearest-colour searches start from it; sky_load_day/night read it
 global,0x0012B504,text_shadow_colour,strong,"byte: colour of the +1,+1 shadow (text_draw_shadow); 156 in most callers"
 global,0x0012B508,text_colour,candidate,set to 145/146/199/244 just before text is drawn in all three units
+global,0x0012B80C,xn_pal_hsv_target,strong,"3 words h s v: xn_pal_find_nearest_hsv's target (12D496-12D4A4 stores bx cx dx; 12D4B8 reads); 12D514 and 12D6AB push, use and pop them"
 global,0x0012B812,xn_pal_ega16_map,candidate,"16 bytes, identity in the file: palette index per EGA colour, rebuilt by the dead 12D970; 0x147820 takes its address"
 global,0x0012B822,xn_pal_ega16_rgb,strong,the 16 standard EGA colours as 6-bit RGB triples (00/15/2A/3F)
+global,0x0012B852,xn_pal_best_dist,strong,"dword: the least distance so far in xn_pal_find_nearest (12D411 mov [12B852h],7FFFFFFFh; 12D458 cmp; 12D466 mov) and xn_pal_find_nearest_hsv"
+global,0x0012B856,xn_pal_best_index,strong,"dword: the index of the least distance (12D460 mov [12B856h],edi; 12D478 mov eax,[12B856h] the result)"
+global,0x0012B85A,xn_pal_hsv_scratch,strong,"words r g b (+0 +2 +4, 12D52F-12D53D), f p q t (+0Ch-+12h, 12D6FF-12D780), max min delta (+14h +16h +18h: 12D557 12D576 12D5DD) of xn_pal_rgb_to_hsv / hsv_to_rgb"
 global,0x0012B878,xn_pal_black,strong,768 zero bytes: the target of xn_pal_fade_to_black
 global,0x0012BB78,xn_pal_fade_rgb,strong,768 dwords: 16.16 components during xn_pal_fade_to
 global,0x0012C778,xn_pal_fade_step,strong,768 dwords: per-step 16.16 deltas of xn_pal_fade_to
 global,0x0012DA00,xn_font_filename,strong,'font????.fnt': xn_font_load writes the number at +4
+global,0x0012DA0D,xn_font_msg_no_font,confirmed,'FONT: Attempt to set non-existing font.\n\r$': xn_font_select prints it (int 21h AH=9) before exiting when the slot is empty
 global,0x0012DA38,xn_font_text_x0,strong,x where xn_font_draw_string started (CR returns to it)
+global,0x0012DA3C,xn_font_text_y0,strong,"y where xn_font_draw_string started (12DBD5), beside xn_font_text_x0; written, not read"
 global,0x0012DA40,font_space_width,strong,"build/names/scratch/audit_tq/exp_globals.py save_tlalac_s: +5 to it made ""a a"" 17 -> 22 px wide (font_text_width)"
 global,0x0012DA44,font_height,strong,build/names/scratch/audit_tq/exp_note.py save_dorian/build/names/scratch/audit_tq/exp_small.py: note_text_box y1 = y + it (7 for font 0)
 global,0x0012DA48,font_char_spacing,strong,"build/names/scratch/audit_tq/exp_globals.py save_tlalac_s: +1 to it made ""AAAA"" 20 -> 24 px wide"
@@ -246,6 +276,8 @@ global,0x0012DA4C,xn_font_line_gap,strong,extra pixels between lines on LF (1 fr
 global,0x0012DA50,xn_font_current,strong,slot of the selected font (xn_font_select); inpstr saves it
 global,0x0012DA54,xn_font_table,strong,"8 font file pointers by slot, filled by xn_font_load (slots 1-4 = FONT0000-0003)"
 global,0x0012DA74,font_glyphs,candidate,code reading (glyph table of the current font); not varied
+global,0x0012DD02,xn_font_glyph_skip,strong,"patch field (placeholder, 1 bytes, u8): read by 12DC44 xn_font_draw_glyph (shl eax, 0x64), written at 12DC44@12DC9C 12DC44@12DCBA; patched by its own function"
+global,0x0012DD10,xn_font_glyph_step,strong,"patch field (placeholder, 4 bytes, s32): read by 12DC44 xn_font_draw_glyph (add edi, 0x3e8), written at 12DC44@12DCEC; patched by its own function"
 global,0x0012DE00,dungeon_water_level,strong,SAVEVARS.DAT 0x17A8 (DFU dungeonWaterLevelOffset); 10000 = no water (init 4F4B7); init 50A25 compares the eye height with it
 global,0x0012DE04,xn_water_span_fn,strong,"pointer to xn_water_span, called by xn_water_draw per pixel run"
 global,0x0012DE10,xn_water_row,strong,screen row xn_water_draw is processing
@@ -258,6 +290,10 @@ global,0x0012EF78,xn_water_unroll_offsets,strong,"641 words k*21: byte offset of
 global,0x0012F47A,xn_water_line_p0,candidate,"view-space x,y,z and outcode (+0Ch) of the first end of the water line (12F59C)"
 global,0x0012F48A,xn_water_line_p1,candidate,the second end of the water line
 global,0x0012F49A,xn_water_quadrant_dirs,strong,"4 x (x0,z0,x1,z1): points +-2^20 ahead and behind along the axis of each yaw quadrant ((yaw+256)>>9)"
+global,0x0012F976,xn_water_row_inv_step,strong,"patch field (placeholder, 4 bytes, s32): read by 12F79C xn_water_draw (add edx, 0x186a0), written at 12F79C@12F87A; patched by its own function"
+global,0x00132F00,xn_tex_msg_out_of_memory,strong,'SET: Out of memory.\n\r$': printed with int 21h AH=9 by xn_tex_cache_init (1360BF) before exiting
+global,0x00132F16,xn_tex_msg_no_room,strong,'SET: Out of memory in find_memory.\n\r$': xn_tex_heap_alloc (136138) when the eviction fails
+global,0x00132F3B,xn_tex_msg_unpack_full,strong,'SET: Out of unpackmemory.\n\r$': xn_tex_unpack_alloc (1363CC)
 global,0x00132F58,xn_tex_cache_full,strong,"byte: set when a texture archive could not be loaded or placed; the lookups then fail, xn_render_frame returns 1 and world_render/bank flush (135E39) and redraw"
 global,0x00132F5C,xn_tex_cur_archive,strong,"archive number of the current lookup (135D00/135DE4), part of the unpack key"
 global,0x00132F60,xn_tex_cur_record,strong,record number of the current lookup
@@ -279,6 +315,7 @@ global,0x00134BFA,xn_tex_unpack_strip_count,strong,strips in use this frame
 global,0x00134BFE,xn_tex_unpack_used,strong,"bytes used in the decoded-frame list (8 per entry, 0x800 max)"
 global,0x00134C02,xn_tex_unpack_entries,strong,"256 x (key, pixels) of frames decoded this frame (pixels at 0x134C06)"
 global,0x00135402,xn_tex_record_offsets,strong,512 dwords record*20: offset of a record's 20-byte entry in a loaded archive
+global,0x00136500,xn_light_msg_no_memory,strong,"'ENGINE: Out of memory for shaders.\n\r$' (bytes at 136500): xn_light_init prints it with int 21h ah=9 (136A88) when the shade table or light.dat's falloff table cannot be allocated, then exits"
 global,0x00136525,xn_shade_filename,strong,'shade.000' loaded by xn_shade_load
 global,0x0013652F,xn_light_filename,strong,'light.dat' loaded by xn_light_init
 global,0x00136540,xn_light_table,strong,"32 light records of 29 bytes: x,y,z, radius (+0Ch, -1 free), radius/2*intensity, intensity^2*radius/2, type (+18h, 8 = direction)"
@@ -294,6 +331,51 @@ global,0x0013691D,xn_shade_table_last_row,strong,xn_shade_table + 0x3F00: clamp 
 global,0x00136921,xn_shade_blend_tables,strong,"pointer table indexed by a texture directory entry's word +0Ah (154E38/154E3C mov ebx,[ebx*4+136921h]); [1] is xn_shade_translucent_table 0x136925 (CDC4B builds it, CDC99 sets the word to 1 for the ghost and wraith archives); [0] is never written (0)"
 global,0x00136925,xn_shade_translucent_table,strong,pointer (entry 1 of the remap-table list D_00136921 the flat setup 154E20 indexes by record+0x0A) to the 16x256 table CDC4B builds; init_game_data aligns and fills it
 global,0x0013695D,xn_water_tint_table,strong,256-aligned colour table init_game_data loads from water.tbl; xn_water_span maps pixels through it
+global,0x00136C3B,xn_light_t1_sq_y,strong,"patch field (address, 4 bytes, pointer): read by 136C30 xn_light_tmpl_1 (mov eax, dword ptr [ebx*4 + 0x186a0]), written at 15BCF6@15BD22"
+global,0x00136C45,xn_light_t1_sq_x,strong,"patch field (address, 4 bytes, pointer): read by 136C30 xn_light_tmpl_1 (add eax, dword ptr [edx*4 + 0x186a0]), written at 15BCF6@15BD1D"
+global,0x00136C4A,xn_light_t1_row,strong,"patch field (placeholder, 4 bytes, s32): read by 136C30 xn_light_tmpl_1 (mov ebp, 0x186a0), written at 15BCF6@15BD55"
+global,0x00136C51,xn_light_t1_sq_z,strong,"patch field (address, 4 bytes, pointer): read by 136C30 xn_light_tmpl_1 (add eax, dword ptr [ecx*4 + 0x186a0]), written at 15BCF6@15BD28"
+global,0x00136C57,xn_light_t1_falloff_p,strong,"patch field (address, 4 bytes, pointer): read by 136C30 xn_light_tmpl_1 (mul dword ptr [0x136909]), written at 15BCF6@15BD44"
+global,0x00136C67,xn_light_t1_tab,strong,"patch field (address, 4 bytes, pointer): read by 136C30 xn_light_tmpl_1 (mov dx, word ptr [edx*2 + 0x186a0]), written at 136A00@136A46"
+global,0x00136C6D,xn_light_t1_intensity,strong,"patch field (placeholder, 4 bytes, s32): read by 136C30 xn_light_tmpl_1 (imul edx, edx, 0x186a0), written at 15BCF6@15BD3C"
+global,0x00136C78,xn_light_t1_max_a,strong,"patch field (placeholder, 4 bytes, s32): read by 136C30 xn_light_tmpl_1 (cmp ebp, 0x186a0), written at 136B88@136BB7"
+global,0x00136C7F,xn_light_t1_max_b,strong,"patch field (placeholder, 4 bytes, s32): read by 136C30 xn_light_tmpl_1 (mov ebp, 0x186a0), written at 136B88@136BBC"
+global,0x00136C92,xn_light_t2_sq_y1,strong,"patch field (address, 4 bytes, pointer): read by 136C84 xn_light_tmpl_2 (mov eax, dword ptr [ebx*4 + 0x186a0]), written at 15BD78@15BDA4"
+global,0x00136C99,xn_light_t2_sq_x1,strong,"patch field (address, 4 bytes, pointer): read by 136C84 xn_light_tmpl_2 (add eax, dword ptr [edx*4 + 0x186a0]), written at 15BD78@15BD9F"
+global,0x00136CA0,xn_light_t2_sq_z1,strong,"patch field (address, 4 bytes, pointer): read by 136C84 xn_light_tmpl_2 (add eax, dword ptr [ecx*4 + 0x186a0]), written at 15BD78@15BDAA"
+global,0x00136CA7,xn_light_t2_sq_z2,strong,"patch field (address, 4 bytes, pointer): read by 136C84 xn_light_tmpl_2 (mov ecx, dword ptr [ecx*4 + 0x186a0]), written at 15BD78@15BDFD"
+global,0x00136CAE,xn_light_t2_sq_y2,strong,"patch field (address, 4 bytes, pointer): read by 136C84 xn_light_tmpl_2 (add ecx, dword ptr [ebx*4 + 0x186a0]), written at 15BD78@15BDF7"
+global,0x00136CB5,xn_light_t2_sq_x2,strong,"patch field (address, 4 bytes, pointer): read by 136C84 xn_light_tmpl_2 (add ecx, dword ptr [edx*4 + 0x186a0]), written at 15BD78@15BDF2"
+global,0x00136CBB,xn_light_t2_falloff_p1,strong,"patch field (address, 4 bytes, pointer): read by 136C84 xn_light_tmpl_2 (mul dword ptr [0x136909]), written at 15BD78@15BDC6"
+global,0x00136CC0,xn_light_t2_row,strong,"patch field (placeholder, 4 bytes, s32): read by 136C84 xn_light_tmpl_2 (mov ebp, 0x186a0), written at 15BD78@15BE2A"
+global,0x00136CD2,xn_light_t2_tab1,strong,"patch field (address, 4 bytes, pointer): read by 136C84 xn_light_tmpl_2 (mov dx, word ptr [edx*2 + 0x186a0]), written at 136A00@136A4B"
+global,0x00136CD8,xn_light_t2_intensity1,strong,"patch field (placeholder, 4 bytes, s32): read by 136C84 xn_light_tmpl_2 (imul edx, edx, 0x186a0), written at 15BD78@15BDBE"
+global,0x00136CE3,xn_light_t2_falloff_p2,strong,"patch field (address, 4 bytes, pointer): read by 136C84 xn_light_tmpl_2 (mul dword ptr [0x136909]), written at 15BD78@15BE19"
+global,0x00136CF3,xn_light_t2_tab2,strong,"patch field (address, 4 bytes, pointer): read by 136C84 xn_light_tmpl_2 (mov dx, word ptr [edx*2 + 0x186a0]), written at 136A00@136A50"
+global,0x00136CF9,xn_light_t2_intensity2,strong,"patch field (placeholder, 4 bytes, s32): read by 136C84 xn_light_tmpl_2 (imul edx, edx, 0x186a0), written at 15BD78@15BE11"
+global,0x00136D04,xn_light_t2_max_a,strong,"patch field (placeholder, 4 bytes, s32): read by 136C84 xn_light_tmpl_2 (cmp ebp, 0x186a0), written at 136B88@136BC1"
+global,0x00136D0B,xn_light_t2_max_b,strong,"patch field (placeholder, 4 bytes, s32): read by 136C84 xn_light_tmpl_2 (mov ebp, 0x186a0), written at 136B88@136BC6"
+global,0x00136D1E,xn_light_t3_sq_y1,strong,"patch field (address, 4 bytes, pointer): read by 136D10 xn_light_tmpl_3 (mov eax, dword ptr [ebx*4 + 0x186a0]), written at 15BE4D@15BE79"
+global,0x00136D25,xn_light_t3_sq_x1,strong,"patch field (address, 4 bytes, pointer): read by 136D10 xn_light_tmpl_3 (add eax, dword ptr [edx*4 + 0x186a0]), written at 15BE4D@15BE74"
+global,0x00136D2C,xn_light_t3_sq_z1,strong,"patch field (address, 4 bytes, pointer): read by 136D10 xn_light_tmpl_3 (add eax, dword ptr [ecx*4 + 0x186a0]), written at 15BE4D@15BE7F"
+global,0x00136D33,xn_light_t3_sq_z2,strong,"patch field (address, 4 bytes, pointer): read by 136D10 xn_light_tmpl_3 (mov ebp, dword ptr [ecx*4 + 0x186a0]), written at 15BE4D@15BED2"
+global,0x00136D3A,xn_light_t3_sq_y2,strong,"patch field (address, 4 bytes, pointer): read by 136D10 xn_light_tmpl_3 (add ebp, dword ptr [ebx*4 + 0x186a0]), written at 15BE4D@15BECC"
+global,0x00136D41,xn_light_t3_sq_x2,strong,"patch field (address, 4 bytes, pointer): read by 136D10 xn_light_tmpl_3 (add ebp, dword ptr [edx*4 + 0x186a0]), written at 15BE4D@15BEC7"
+global,0x00136D48,xn_light_t3_sq_z3,strong,"patch field (address, 4 bytes, pointer): read by 136D10 xn_light_tmpl_3 (mov ecx, dword ptr [ecx*4 + 0x186a0]), written at 15BE4D@15BF25"
+global,0x00136D4F,xn_light_t3_sq_y3,strong,"patch field (address, 4 bytes, pointer): read by 136D10 xn_light_tmpl_3 (add ecx, dword ptr [ebx*4 + 0x186a0]), written at 15BE4D@15BF1F"
+global,0x00136D56,xn_light_t3_sq_x3,strong,"patch field (address, 4 bytes, pointer): read by 136D10 xn_light_tmpl_3 (add ecx, dword ptr [edx*4 + 0x186a0]), written at 15BE4D@15BF1A"
+global,0x00136D5C,xn_light_t3_falloff_p1,strong,"patch field (address, 4 bytes, pointer): read by 136D10 xn_light_tmpl_3 (mul dword ptr [0x136909]), written at 15BE4D@15BE9B"
+global,0x00136D66,xn_light_t3_falloff_p2,strong,"patch field (address, 4 bytes, pointer): read by 136D10 xn_light_tmpl_3 (mul dword ptr [0x136909]), written at 15BE4D@15BEEE"
+global,0x00136D70,xn_light_t3_falloff_p3,strong,"patch field (address, 4 bytes, pointer): read by 136D10 xn_light_tmpl_3 (mul dword ptr [0x136909]), written at 15BE4D@15BF41"
+global,0x00136D75,xn_light_t3_row,strong,"patch field (placeholder, 4 bytes, s32): read by 136D10 xn_light_tmpl_3 (mov ebp, 0x186a0), written at 15BE4D@15BF52"
+global,0x00136D85,xn_light_t3_tab1,strong,"patch field (address, 4 bytes, pointer): read by 136D10 xn_light_tmpl_3 (mov bx, word ptr [ebx*2 + 0x186a0]), written at 136A00@136A55"
+global,0x00136D8B,xn_light_t3_intensity1,strong,"patch field (placeholder, 4 bytes, s32): read by 136D10 xn_light_tmpl_3 (imul ebx, ebx, 0x186a0), written at 15BE4D@15BE93"
+global,0x00136DA0,xn_light_t3_tab2,strong,"patch field (address, 4 bytes, pointer): read by 136D10 xn_light_tmpl_3 (mov cx, word ptr [ecx*2 + 0x186a0]), written at 136A00@136A5A"
+global,0x00136DA6,xn_light_t3_intensity2,strong,"patch field (placeholder, 4 bytes, s32): read by 136D10 xn_light_tmpl_3 (imul ecx, ecx, 0x186a0), written at 15BE4D@15BEE6"
+global,0x00136DBB,xn_light_t3_tab3,strong,"patch field (address, 4 bytes, pointer): read by 136D10 xn_light_tmpl_3 (mov dx, word ptr [edx*2 + 0x186a0]), written at 136A00@136A5F"
+global,0x00136DC1,xn_light_t3_intensity3,strong,"patch field (placeholder, 4 bytes, s32): read by 136D10 xn_light_tmpl_3 (imul edx, edx, 0x186a0), written at 15BE4D@15BF39"
+global,0x00136DCC,xn_light_t3_max_a,strong,"patch field (placeholder, 4 bytes, s32): read by 136D10 xn_light_tmpl_3 (cmp ebp, 0x186a0), written at 136B88@136BCB"
+global,0x00136DD3,xn_light_t3_max_b,strong,"patch field (placeholder, 4 bytes, s32): read by 136D10 xn_light_tmpl_3 (mov ebp, 0x186a0), written at 136B88@136BD0"
 global,0x00136E00,xn_cam_rotation,strong,3x3 2.28 eye rotation: world_render builds it from pitch/yaw/roll (137000)
 global,0x00136E18,xn_cam_forward_x,strong,row 2 of xn_cam_rotation: view direction x (C7FB6 reads row 2)
 global,0x00136E1C,xn_cam_forward_y,strong,view direction y
@@ -302,6 +384,8 @@ global,0x00136E24,xn_cam_view_matrix,strong,"xn_cam_rotation with rows 0/1 scale
 global,0x00136E48,xn_terrain_step_x,candidate,"3 dwords: the camera-space step of one terrain cell along +x (0x137657 from 0x13E600), rounded by 0x13E744; added per column in 0x13E8C8"
 global,0x00136E54,xn_terrain_step_y,candidate,3 dwords: camera-space step of one height unit (y axis scaled -0x1000000); 0x13E84F multiplies the heights by it
 global,0x00136E60,xn_terrain_step_z,candidate,3 dwords: camera-space step of one terrain row (z axis scaled -0x1000000); added per row in 0x13E8C8
+global,0x00136E84,xn_mat_scaled_axes_in,strong,"3 dwords: xn_mat_scaled_axes (0x137657) stores its scales a, b, c here and reads a back; src/engine/mat.c"
+global,0x0013719F,xn_mat_from_angles_tmp,strong,"3 dwords in code: xn_mat_from_angles (0x137000) keeps sin(roll)sin(yaw), sin(yaw)cos(roll), sin(pitch)cos(yaw) (2.28, rounded) here; src/engine/mat.c"
 global,0x00137900,xn_terrain_height_cam_x,strong,"256 dwords (128 heights twice, for height byte bit 7): camera x offset of each height level, built per frame by 0x13E84F, subtracted in 0x13E8C8"
 global,0x00137D00,xn_terrain_height_cam_y,strong,256 dwords: camera y offset of each height level (0x13E84F / 0x13E8C8)
 global,0x00138100,xn_terrain_height_cam_z,strong,256 dwords: camera z (depth) offset of each height level (0x13E84F / 0x13E8C8)
@@ -312,6 +396,30 @@ global,0x00138538,xn_terrain_u_axis_fns,strong,8 code pointers [rotation 0-3][fl
 global,0x00138558,xn_terrain_v_axis_fns,strong,8 code pointers [rotation 0-3][flip bit 1]: the v-axis setter per cell (0x13EFD7)
 global,0x00138578,xn_terrain_vert_x,strong,"1024 entries, 12-byte stride: camera x of each grid vertex before the aspect scale (0x13E8C8); the face plane routines 0x13EB21/0x13EC22 read it"
 global,0x0013B578,xn_terrain_vert_y,strong,"1024 entries, 12-byte stride: camera y of each grid vertex before the aspect scale (0x13E8C8 / 0x13EB21 / 0x13EC22)"
+global,0x0013E98A,xn_tgrid_row_x,strong,"patch field (placeholder, 4 bytes, s32): read by 13E8C8 xn_terrain_transform_grid (mov dword ptr [0x13e9b7], 0x186a0), written at 13E8C8@13E8FF 13E8C8@13EAF1; patched by its own function"
+global,0x0013E994,xn_tgrid_row_y,strong,"patch field (placeholder, 4 bytes, s32): read by 13E8C8 xn_terrain_transform_grid (mov dword ptr [0x13e9be], 0x186a0), written at 13E8C8@13E904 13E8C8@13EAFB; patched by its own function"
+global,0x0013E99E,xn_tgrid_row_z,strong,"patch field (placeholder, 4 bytes, s32): read by 13E8C8 xn_terrain_transform_grid (mov dword ptr [0x13e9c3], 0x186a0), written at 13E8C8@13E90A 13E8C8@13EB05; patched by its own function"
+global,0x0013E9B7,xn_tgrid_x,strong,"patch field (placeholder, 4 bytes, s32): read by 13E8C8 xn_terrain_transform_grid (mov eax, 0x186a0), written at 13E8C8@13E984 13E8C8@13EAC2; patched by its own function"
+global,0x0013E9BE,xn_tgrid_y,strong,"patch field (placeholder, 4 bytes, s32): read by 13E8C8 xn_terrain_transform_grid (mov ebp, 0x186a0), written at 13E8C8@13E98E 13E8C8@13EACC; patched by its own function"
+global,0x0013E9C3,xn_tgrid_z,strong,"patch field (placeholder, 4 bytes, s32): read by 13E8C8 xn_terrain_transform_grid (mov ebx, 0x186a0), written at 13E8C8@13E998 13E8C8@13EAD6; patched by its own function"
+global,0x0013EA75,xn_tgrid_sx,strong,"patch field (placeholder, 4 bytes, s32): read by 13E8C8 xn_terrain_transform_grid (imul eax, eax, 0x186a0), written at 12A2D0@12A314"
+global,0x0013EA7D,xn_tgrid_cx,strong,"patch field (placeholder, 4 bytes, s32): read by 13E8C8 xn_terrain_transform_grid (add edx, 0x186a0), written at 12A2D0@12A38B"
+global,0x0013EA8D,xn_tgrid_sy,strong,"patch field (placeholder, 4 bytes, s32): read by 13E8C8 xn_terrain_transform_grid (imul eax, eax, 0x186a0), written at 12A2D0@12A319"
+global,0x0013EA95,xn_tgrid_cy,strong,"patch field (placeholder, 4 bytes, s32): read by 13E8C8 xn_terrain_transform_grid (add edx, 0x186a0), written at 12A2D0@12A391"
+global,0x0013EAC8,xn_tgrid_col_dx,strong,"patch field (placeholder, 4 bytes, s32): read by 13E8C8 xn_terrain_transform_grid (add dword ptr [0x13e9b7], 0x186a0), written at 13E8C8@13E921; patched by its own function"
+global,0x0013EAD2,xn_tgrid_col_dy,strong,"patch field (placeholder, 4 bytes, s32): read by 13E8C8 xn_terrain_transform_grid (add dword ptr [0x13e9be], 0x186a0), written at 13E8C8@13E926; patched by its own function"
+global,0x0013EADC,xn_tgrid_col_dz,strong,"patch field (placeholder, 4 bytes, s32): read by 13E8C8 xn_terrain_transform_grid (add dword ptr [0x13e9c3], 0x186a0), written at 13E8C8@13E92C; patched by its own function"
+global,0x0013EAE7,xn_tgrid_row_end,strong,"patch field (placeholder, 4 bytes, s32): read by 13E8C8 xn_terrain_transform_grid (cmp edi, 0x186a0), written at 13E8C8@13E9A8; patched by its own function"
+global,0x0013EAF7,xn_tgrid_row_dx,strong,"patch field (placeholder, 4 bytes, s32): read by 13E8C8 xn_terrain_transform_grid (add dword ptr [0x13e98a], 0x186a0), written at 13E8C8@13E943; patched by its own function"
+global,0x0013EB01,xn_tgrid_row_dy,strong,"patch field (placeholder, 4 bytes, s32): read by 13E8C8 xn_terrain_transform_grid (add dword ptr [0x13e994], 0x186a0), written at 13E8C8@13E948; patched by its own function"
+global,0x0013EB0B,xn_tgrid_row_dz,strong,"patch field (placeholder, 4 bytes, s32): read by 13E8C8 xn_terrain_transform_grid (add dword ptr [0x13e99e], 0x186a0), written at 13E8C8@13E94E; patched by its own function"
+global,0x0013EB16,xn_tgrid_end,strong,"patch field (placeholder, 4 bytes, s32): read by 13E8C8 xn_terrain_transform_grid (cmp edi, 0x186a0), written at 13E8C8@13E97A; patched by its own function"
+global,0x0013F06A,xn_tcells_setup_a,strong,"patch field (placeholder, 4 bytes, s32): read by 13EFD7 xn_terrain_draw_cells (mov dword ptr [edi + 0x3c], 0x186a0), written at 13EFD7@13F009; patched by its own function"
+global,0x0013F0A2,xn_tcells_archive_a,strong,"patch field (placeholder, 4 bytes, s32): read by 13EFD7 xn_terrain_draw_cells (mov eax, 0x186a0), written at 13EFD7@13EFE3; patched by its own function"
+global,0x0013F0E3,xn_tcells_setup_b,strong,"patch field (placeholder, 4 bytes, s32): read by 13EFD7 xn_terrain_draw_cells (mov dword ptr [edi + 0x3c], 0x186a0), written at 13EFD7@13F00E; patched by its own function"
+global,0x0013F11B,xn_tcells_archive_b,strong,"patch field (placeholder, 4 bytes, s32): read by 13EFD7 xn_terrain_draw_cells (mov eax, 0x186a0), written at 13EFD7@13EFE8; patched by its own function"
+global,0x0013F182,xn_tcells_setup_c,strong,"patch field (placeholder, 4 bytes, s32): read by 13EFD7 xn_terrain_draw_cells (mov dword ptr [edi + 0x3c], 0x186a0), written at 13EFD7@13F013; patched by its own function"
+global,0x0013F1BA,xn_tcells_archive_c,strong,"patch field (placeholder, 4 bytes, s32): read by 13EFD7 xn_terrain_draw_cells (mov eax, 0x186a0), written at 13EFD7@13EFED; patched by its own function"
 global,0x0013F700,xn_model_msg_too_many_verts,confirmed,'XnGine: Object has too many vertices.' DOS $ string printed by 0x13FE15
 global,0x0013F728,xn_model_msg_corrupted,confirmed,'XnGine: Object is corrupted: $' printed by 0x13FE15 when a face vertex offset is not a multiple of 12 or past the vertex count
 global,0x0013F748,xn_model_rot_matrix,strong,"3x3 rotation of the model being drawn, built by 0x140284 from handle angles +2Ch..34h (0x137000); multiplied into the camera matrix; 0x140606 rotates lights by it"
@@ -323,6 +431,34 @@ global,0x0013FDC5,xn_model_bounds_x0,strong,screen left of the model's projected
 global,0x0013FDC9,xn_model_bounds_y0,strong,screen top of the model's projected bounding sphere (0x140981)
 global,0x0013FDCD,xn_model_bounds_x1,strong,screen right of the model's projected bounding sphere (0x140981)
 global,0x0013FDD1,xn_model_bounds_y1,strong,screen bottom of the model's projected bounding sphere (0x140981)
+global,0x0014030A,xn_model_depth_scale,strong,"patch field (placeholder, 4 bytes, s32): read by 140284 xn_model_draw (mov ebp, 0x186a0), written at 12A3AC@12A41A"
+global,0x0014040B,xn_model_eye_bf_x,strong,"patch field (placeholder, 4 bytes, s32): read by 1403AF xn_model_draw_faces (imul eax, dword ptr [ebx], 0x186a0), written at 140284@1402E1"
+global,0x00140412,xn_model_eye_bf_y,strong,"patch field (placeholder, 4 bytes, s32): read by 1403AF xn_model_draw_faces (imul edx, dword ptr [ebx + 4], 0x186a0), written at 140284@1402EB"
+global,0x00140419,xn_model_eye_bf_z,strong,"patch field (placeholder, 4 bytes, s32): read by 1403AF xn_model_draw_faces (imul ecx, dword ptr [ebx + 8], 0x186a0), written at 140284@1402F7"
+global,0x00140446,xn_model_depth_x,strong,"patch field (placeholder, 4 bytes, s32): read by 1403AF xn_model_draw_faces (imul eax, dword ptr [esi], 0x186a0), written at 140284@140312"
+global,0x0014044D,xn_model_depth_y,strong,"patch field (placeholder, 4 bytes, s32): read by 1403AF xn_model_draw_faces (imul edx, dword ptr [esi + 4], 0x186a0), written at 140284@14031D"
+global,0x00140454,xn_model_depth_z,strong,"patch field (placeholder, 4 bytes, s32): read by 1403AF xn_model_draw_faces (imul ebp, dword ptr [esi + 8], 0x186a0), written at 140284@140328"
+global,0x00140497,xn_model_draw_handle,strong,"patch field (placeholder, 4 bytes, s32): read by 1403AF xn_model_draw_faces (mov dword ptr [edi + 4], 0x186a0), written at 140284@140297"
+global,0x001404EB,xn_model_faces_end,strong,"patch field (placeholder, 4 bytes, s32): read by 1403AF xn_model_draw_faces (cmp ebx, 0x186a0), written at 1403AF@140404; patched by its own function"
+global,0x0014051C,xn_model_points_x,strong,"patch field (address, 4 bytes, pointer): read by 1404FA xn_model_transform_face_verts (mov eax, dword ptr [edi + 0x186a0]), written at 1403AF@1403D6"
+global,0x00140522,xn_model_points_y,strong,"patch field (address, 4 bytes, pointer): read by 1404FA xn_model_transform_face_verts (mov edx, dword ptr [edi + 0x186a0]), written at 1403AF@1403DE"
+global,0x00140528,xn_model_points_z,strong,"patch field (address, 4 bytes, pointer): read by 1404FA xn_model_transform_face_verts (mov ebx, dword ptr [edi + 0x186a0]), written at 1403AF@1403E6"
+global,0x0014052D,xn_model_eye_x,strong,"patch field (placeholder, 4 bytes, s32): read by 1404FA xn_model_transform_face_verts (add eax, 0x186a0), written at 140284@1402E6"
+global,0x00140533,xn_model_eye_y,strong,"patch field (placeholder, 4 bytes, s32): read by 1404FA xn_model_transform_face_verts (add edx, 0x186a0), written at 140284@1402F1"
+global,0x00140539,xn_model_eye_z,strong,"patch field (placeholder, 4 bytes, s32): read by 1404FA xn_model_transform_face_verts (add ebx, 0x186a0), written at 140284@1402FD"
+global,0x0014053E,xn_model_matrix_slot,strong,"patch field (placeholder, 4 bytes, s32): read by 1404FA xn_model_transform_face_verts (mov ecx, 0x186a0), written at 140284@140333"
+global,0x001405B4,xn_model_vert_sx,strong,"patch field (placeholder, 4 bytes, s32): read by 1404FA xn_model_transform_face_verts (imul eax, eax, 0x186a0), written at 12A2D0@12A309"
+global,0x001405BC,xn_model_vert_cx,strong,"patch field (placeholder, 4 bytes, s32): read by 1404FA xn_model_transform_face_verts (add edx, 0x186a0), written at 12A2D0@12A37F"
+global,0x001405CC,xn_model_vert_sy,strong,"patch field (placeholder, 4 bytes, s32): read by 1404FA xn_model_transform_face_verts (imul eax, eax, 0x186a0), written at 12A2D0@12A30E"
+global,0x001405D4,xn_model_vert_cy,strong,"patch field (placeholder, 4 bytes, s32): read by 1404FA xn_model_transform_face_verts (add edx, 0x186a0), written at 12A2D0@12A385"
+global,0x00140666,xn_model_light_pos_x,strong,"patch field (placeholder, 4 bytes, s32): read by 140606 xn_model_build_light_list (sub eax, 0x186a0), written at 140606@140615; patched by its own function"
+global,0x0014066C,xn_model_light_pos_y,strong,"patch field (placeholder, 4 bytes, s32): read by 140606 xn_model_build_light_list (sub edx, 0x186a0), written at 140606@14061A; patched by its own function"
+global,0x00140672,xn_model_light_pos_z,strong,"patch field (placeholder, 4 bytes, s32): read by 140606 xn_model_build_light_list (sub ebx, 0x186a0), written at 140606@140620; patched by its own function"
+global,0x0014068B,xn_model_light_r2,strong,"patch field (placeholder, 4 bytes, s32): read by 140606 xn_model_build_light_list (sub ebp, 0x186a0), written at 140606@140639; patched by its own function"
+global,0x001406DD,xn_model_scale_inv_x,strong,"patch field (placeholder, 4 bytes, s32): read by 1406D6 xn_model_scale_matrix (mov ebx, 0x186a0), written at 12A3AC@12A3D3"
+global,0x001406E2,xn_model_scale_focal_x,strong,"patch field (placeholder, 4 bytes, s32): read by 1406D6 xn_model_scale_matrix (mov ebp, 0x186a0), written at 12A274@12A2B1"
+global,0x0014072A,xn_model_scale_inv_y,strong,"patch field (placeholder, 4 bytes, s32): read by 1406D6 xn_model_scale_matrix (mov ebx, 0x186a0), written at 12A3AC@12A3FF"
+global,0x0014072F,xn_model_scale_focal_y,strong,"patch field (placeholder, 4 bytes, s32): read by 1406D6 xn_model_scale_matrix (mov ebp, 0x186a0), written at 12A274@12A2C3"
 global,0x00142300,xn_kbd_old_int9_offset,confirmed,"offset of the int 9 vector saved by 0x142700 (_dos_getvect 9), restored by 0x142764"
 global,0x00142304,xn_kbd_old_int9_selector,confirmed,selector of the saved int 9 vector (0x142700 / 0x142764)
 global,0x00142306,xn_kbd_installed,confirmed,"1 while XnGine's int 9 handler is installed (0x142700 sets, 0x142764 clears); 0x1427A8 falls back to BIOS int 16h when 0"
@@ -392,7 +528,7 @@ global,0x00149980,xn_colour_fill_table,strong,256 dwords i*01010101h (colour byt
 global,0x00149D80,xn_sys_old_div_handler_offset,confirmed,"offset of the previous exception 0 handler (DPMI 0202h) saved by 0x149F4C, restored by 0x149F98"
 global,0x00149D84,xn_sys_old_div_handler_selector,confirmed,selector of the previous exception 0 handler
 global,0x00149D86,xn_sys_div_handler_installed,confirmed,1 while XnGine's divide-error handler is installed (0x149F4C / 0x149F98)
-global,0x0014A100,xn_collide_matrix_b,candidate,3x3 rotation of the second object (sphere set) in 14AA92 14A710 14B017; 14B45B reuses its first 36 bytes for the ground triangle
+global,0x0014A100,xn_collide_work,strong,"struct xn_collide_scratch (0x148 bytes, 0x14A100..0x14A247): the collision code's globals; xn_terrain_height_at's ground triangle at +0 (union with the probe matrix xn_collide_matrix_b)"
 global,0x0014A13C,xn_collide_flat_normal,candidate,vec3: 16.16 normal of the flat's plane (14BDF7 of the segment's x-z direction) in 14B1E0
 global,0x0014A148,xn_collide_model_matrix,strong,3x3 rotation of the model instance from its angles (137000) in 14A300 14AA92 14A710
 global,0x0014A16C,xn_collide_model_matrix_inv,strong,transpose of xn_collide_model_matrix (15D2EC): world to model space
@@ -417,7 +553,7 @@ global,0x0014A22C,xn_collide_build_out,candidate,"char *: 14B58E's ebx, the outp
 global,0x0014A230,xn_collide_build_min,candidate,"xn_vec3: the points' minimum (14B5D9 = 0x800000, 14B625..) (dead 14B58E)"
 global,0x0014A23C,xn_collide_build_max,candidate,"xn_vec3: the points' maximum (14B5F7 = 0xFF800000, 14B632..) (dead 14B58E)"
 global,0x0014A249,xn_collide_flat_anchor_shift,candidate,byte pairs indexed by (flags>>1)&15 (odd bytes read): shift giving the flat's centre height (1 centred 31 standing) in 14B1E0
-global,0x0014A68F,xn_collide_seg_points,candidate,14A300: the model's point list (model + [model+30h])
+global,0x0014A68F,xn_collide_seg,strong,"struct xn_collide_seg_state (36 bytes, 0x14A68F..0x14A6B2): xn_collide_segment_model's variables after its ret"
 global,0x0014A693,xn_collide_seg_normals,candidate,14A300: the model's normal list (model + [model+34h])
 global,0x0014A697,xn_collide_seg_model,strong,"struct xn_model *: 14A300's model base, face offsets of the sphere lists are added to it (14A400 write, 14A57B/14A5D2 read); in code after 14A300's ret (struct xn_collide_seg_state +0x08)"
 global,0x0014A69B,xn_collide_seg_normal,strong,"xn_vec3 *: the normal of the face under test in 14A300 (14A58C write, 14A5CA/14A633 read); xn_collide_seg_state +0x0C"
@@ -426,6 +562,7 @@ global,0x0014A6A3,xn_collide_seg_list_next,strong,"struct xn_model_sphere_face *
 global,0x0014A6A7,xn_collide_seg_plane_count,candidate,14A300: planes in the merged list gathered from the hit spheres
 global,0x0014A6AB,xn_collide_seg_hits,candidate,14A300: the hit list (big_buffer: count then 30-byte records) returned to the caller
 global,0x0014A6AF,xn_collide_seg_hit_next,strong,"struct xn_collide_hit *: where 14A300 writes the next hit (14A442 = big_buffer + 4, 14A5F2 read, 14A669 add 0x1e); xn_collide_seg_state +0x20"
+global,0x0014AA66,xn_collide_detail,candidate,"struct xn_collide_detail_state (0x2C bytes, in code after 14A6C0's exit): the unreachable detailed model-model test's sphere lists and pairs (14A791..14A9AC)"
 global,0x0014AF0C,xn_collide_sph_points,strong,"xn_vec3 *: model + point_offset in 14AA92 (14AC4F write, 14ADED/14AE6B read); struct xn_collide_sph_state +0x00, in code after 14AA92's ret"
 global,0x0014AF10,xn_collide_sph_normals,strong,"xn_vec3 *: model + normal_offset in 14AA92 (14AC5A write, 14ADFA/14AE65/14AEB7 read); xn_collide_sph_state +0x04"
 global,0x0014AF14,xn_collide_sph_model,strong,"struct xn_model *: 14AA92's model base for the face offsets (14AC60 write, 14ADE2/14AE56 read); xn_collide_sph_state +0x08"
@@ -435,16 +572,38 @@ global,0x0014AF20,xn_collide_sph_list,strong,"struct xn_model_sphere_face *: mer
 global,0x0014AF24,xn_collide_sph_list_next,strong,"struct xn_model_sphere_face *: merge output in 14AA92 (14AC7D big_buffer + 0x3000, 14AD2B, 14ADC0); xn_collide_sph_state +0x18"
 global,0x0014AF28,xn_collide_sph_list_count,strong,"int: entries in xn_collide_sph_list (14AC83 = 0, 14AD47 inc, 14ADCD read); xn_collide_sph_state +0x1C"
 global,0x0014AF2C,xn_collide_sph_probe_count,strong,int: probe spheres that met the model's bounding sphere (14AB36 write; 14ABF2/14ACC7/14AE1D loop counts); xn_collide_sph_state +0x20
+global,0x0014B193,xn_collide_ss_hits,candidate,struct xn_collide_hits * in code after the dead 14B017's ret: its hit list (big_buffer)
+global,0x0014B197,xn_collide_ss_hit_next,candidate,struct xn_collide_hit * in code: the dead 14B017's next hit
+global,0x0014B453,xn_collide_flat_height,strong,"s32 in code after 14B1E0's ret: the flat's height, image height * scale >> 8 (14B21E)"
+global,0x0014B457,xn_collide_flat_width,strong,s32 in code after 14B1E0's ret: the flat's width (14B223)
+global,0x0014BA7D,xn_collide_build,candidate,"struct xn_collide_build_state (0x18 bytes, in code after the dead 14B58E's exit): points, normals, face, face index, faces left, next list node"
 global,0x0014BB00,xn_math_tri_edges,candidate,two edge vectors and the query offset used by 14C021 and 14BF41
+global,0x0014BB24,xn_collide_mid,candidate,"xn_vec3 (in xn_math_tri_edges' unused24): the middle of the segment of the dead 14C9D2 (14CA0A..); the plane constants d1, d2 of the dead 14C4A6 (14C5A3, 14C5DC)"
 global,0x0014BB3C,xn_collide_normal,candidate,vec3 (BB3C/40/44): plane normal kept by the plane and sphere tests (14C2AD 14C711 ...)
 global,0x0014BB48,xn_collide_vec_a,candidate,vec3: point minus segment start in 14C7E5 14C904
 global,0x0014BB54,xn_collide_vec_b,candidate,vec3: segment end minus start in 14C7E5 14C904
+global,0x0014BB60,xn_vec_blend_weights,strong,2 dwords: xn_vec_blend (0x14BC74) keeps its weights << 10 here; src/engine/vec.c
+global,0x0014C6FD,xn_collide_ppl_axis,candidate,"s32 in code after the dead 14C4A6's ret: the axis plane its line is solved on (1 x, 2 y, 3 z)"
+global,0x0014C701,xn_collide_ppl_n1,candidate,xn_vec3 * in code: the dead 14C4A6's first plane's normal (eax)
+global,0x0014C705,xn_collide_ppl_p1,candidate,xn_vec3 *: its first plane's point (edx)
+global,0x0014C709,xn_collide_ppl_n2,candidate,xn_vec3 *: its second plane's normal (ebx)
+global,0x0014C70D,xn_collide_ppl_p2,candidate,xn_vec3 *: its second plane's point (ecx)
 global,0x0014CC00,xn_haze_filename,candidate,'haze.???' file name loaded by 14D200 (??? at D_0014CC05)
 global,0x0014CC0C,xn_fog_table_last,strong,pointer to the last 256-byte level of the fog table; update_fog stores it (table + 16128) before 14D23C
 global,0x0014CC10,xn_fog_start,strong,fog start distance from 14D23C (the view distance when fog is off); flats fog from it (155610)
 global,0x0014CC14,xn_fog_step,strong,3F00h / (far - start): fog table bytes per unit of distance
 global,0x0014CC18,xn_fog_min_inv_z,candidate,2^40 / view distance: the 1/z clamp of the fog span callback 150040
 global,0x0014CC1C,xn_fog_unroll_offsets,strong,640 words 0 18 36 ...: offset in 14D320 after n pixels where 150040 plants its ret
+global,0x00150056,xn_fog_inv_start_a,strong,"patch field (placeholder, 4 bytes, s32): read by 150040 xn_shade_fog_span (sub ecx, 0x186a0), written at 14D23C@14D291"
+global,0x00150071,xn_fog_inv_start_b,strong,"patch field (placeholder, 4 bytes, s32): read by 150040 xn_shade_fog_span (mov ecx, 0x186a0), written at 14D23C@14D296"
+global,0x0015009B,xn_fog_step_a,strong,"patch field (placeholder, 4 bytes, s32): read by 150040 xn_shade_fog_span (mov edx, 0x186a0), written at 14D23C@14D271"
+global,0x001500BC,xn_fog_step_b,strong,"patch field (placeholder, 4 bytes, s32): read by 150040 xn_shade_fog_span (mov edx, 0x186a0), written at 14D23C@14D276"
+global,0x001500D7,xn_fog_start_step_a,strong,"patch field (placeholder, 4 bytes, s32): read by 150040 xn_shade_fog_span (sub ecx, 0x186a0), written at 14D23C@14D2A3"
+global,0x001500DF,xn_fog_table_last_a,strong,"patch field (placeholder, 4 bytes, s32): read by 150040 xn_shade_fog_span (add ecx, 0x186a0), written at 14D23C@14D25E"
+global,0x001500FA,xn_fog_inv_start_c,strong,"patch field (placeholder, 4 bytes, s32): read by 150040 xn_shade_fog_span (cmp ecx, 0x186a0), written at 14D23C@14D29B"
+global,0x00150103,xn_fog_step_c,strong,"patch field (placeholder, 4 bytes, s32): read by 150040 xn_shade_fog_span (mov edx, 0x186a0), written at 14D23C@14D27B"
+global,0x0015010A,xn_fog_start_step_b,strong,"patch field (placeholder, 4 bytes, s32): read by 150040 xn_shade_fog_span (sub eax, 0x186a0), written at 14D23C@14D2A9"
+global,0x0015011C,xn_fog_table_last_b,strong,"patch field (address, 4 bytes, pointer): read by 150040 xn_shade_fog_span (lea ecx, [eax + 0x186a0]), written at 14D23C@14D263"
 global,0x00150200,xn_sin_table,strong,sine in 2.28 (10000000h = 1) for angles 0..2047 (it runs on into the cosine table); rotation matrices 137000 and the game's rotate_xz
 global,0x00150A00,xn_cos_table,strong,cosine in 2.28 for angles 0..2047 (= sine + 512)
 global,0x00152A00,xn_joy_axis_mask,candidate,axis bits found at 152B00 (bits of port 201h that did not answer)
@@ -496,17 +655,77 @@ global,0x00154C5C,xn_flat_tex_h,candidate,texture height of the flat being drawn
 global,0x00154C60,xn_flat_ignore_pitch,candidate,"Byte: 64h makes xn_flat_begin_frame build the flat matrix without the camera pitch (15541B); no writer, 0 in the records"
 global,0x00154C61,xn_flat_matrix,strong,3x3 rotation from the camera pitch (155415) applied to the corner offsets (1553D8)
 global,0x00154C85,xn_flat_proj_matrix,candidate,xn_flat_matrix rows scaled by the projection factors D_000CEA99/9D (third row halved)
+global,0x001550ED,xn_flat_grad_sx,strong,"patch field (placeholder, 4 bytes, s32): read by 1550E0 xn_flat_setup_gradients (imul esi, dword ptr [0x120288], 0x186a0), written at 12A2D0@12A32A"
+global,0x001550F7,xn_flat_grad_sy,strong,"patch field (placeholder, 4 bytes, s32): read by 1550E0 xn_flat_setup_gradients (imul ebp, dword ptr [0x12028c], 0x186a0), written at 12A2D0@12A32F"
+global,0x00155110,xn_flat_axis_u_x,strong,"patch field (placeholder, 4 bytes, s32): read by 1550E0 xn_flat_setup_gradients (mov eax, 0x186a0), written at 155415@1554C6"
+global,0x00155120,xn_flat_axis_u_y,strong,"patch field (placeholder, 4 bytes, s32): read by 1550E0 xn_flat_setup_gradients (mov eax, 0x186a0), written at 155415@1554CB"
+global,0x0015512A,xn_flat_axis_u_z,strong,"patch field (placeholder, 4 bytes, s32): read by 1550E0 xn_flat_setup_gradients (mov eax, 0x186a0), written at 155415@1554D1"
+global,0x0015514C,xn_flat_axis_v_x,strong,"patch field (placeholder, 4 bytes, s32): read by 1550E0 xn_flat_setup_gradients (mov eax, 0x186a0), written at 155415@1554F6"
+global,0x00155163,xn_flat_axis_v_y,strong,"patch field (placeholder, 4 bytes, s32): read by 1550E0 xn_flat_setup_gradients (mov eax, 0x186a0), written at 155415@1554FB"
+global,0x0015516D,xn_flat_axis_v_z,strong,"patch field (placeholder, 4 bytes, s32): read by 1550E0 xn_flat_setup_gradients (mov eax, 0x186a0), written at 155415@155501"
+global,0x0015526F,xn_flat_emit_flat,strong,"patch field (placeholder, 4 bytes, s32): read by 15526C xn_flat_span_emit (mov esi, 0x186a0), written at 154E20@154EC2"
+global,0x00155275,xn_flat_emit_row,strong,"patch field (address, 4 bytes, pointer): read by 15526C xn_flat_span_emit (lea edi, [ebx + 0x186a0]), written at 1552A0@1552C3 155332@155361"
+global,0x001552E0,xn_flat_raster_left,strong,"patch field (placeholder, 4 bytes, s32): read by 1552A0 xn_flat_raster (mov ebp, 0x186a0), written at 1552A0@1552A0 1552A0@1552E4; patched by its own function"
+global,0x0015534F,xn_flat_row_u_var,strong,"patch field (address, 4 bytes, pointer): read by 155332 xn_flat_raster_rows (add dword ptr [0x154c58], 0x186a0), written at 1550E0@1551AA"
+global,0x00155353,xn_flat_row_u_step,strong,"patch field (placeholder, 4 bytes, s32): read by 155332 xn_flat_raster_rows (add dword ptr [0x154c58], 0x186a0), written at 1550E0@155195"
+global,0x00155359,xn_flat_row_v_var,strong,"patch field (address, 4 bytes, pointer): read by 155332 xn_flat_raster_rows (add dword ptr [0x154c50], 0x186a0), written at 1550E0@1551C5"
+global,0x0015535D,xn_flat_row_v_step,strong,"patch field (placeholder, 4 bytes, s32): read by 155332 xn_flat_raster_rows (add dword ptr [0x154c50], 0x186a0), written at 1550E0@1551B6"
+global,0x00155367,xn_flat_row_stride,strong,"patch field (operand, 4 bytes, s32): read by 155332 xn_flat_raster_rows (add dword ptr [0x155275], 0x140), written at 155415@1554A2"
+global,0x00155373,xn_flat_raster_dxl,strong,"patch field (placeholder, 4 bytes, s32): read by 155332 xn_flat_raster_rows (add ebp, 0x186a0), written at 1552A0@15531C"
+global,0x00155379,xn_flat_raster_dxr,strong,"patch field (placeholder, 4 bytes, s32): read by 155332 xn_flat_raster_rows (add ebx, 0x186a0), written at 155332@1553C6; patched by its own function"
+global,0x0015537F,xn_flat_raster_dzl,strong,"patch field (placeholder, 4 bytes, s32): read by 155332 xn_flat_raster_rows (add ecx, 0x186a0), written at 1552A0@155329"
+global,0x0015539D,xn_flat_raster_right,strong,"patch field (placeholder, 4 bytes, s32): read by 155332 xn_flat_raster_rows (mov ebx, 0x186a0), written at 1552A0@1552A6 155332@1553A1"
+global,0x00155636,xn_flat_ambient_row,strong,"patch field (placeholder, 4 bytes, s32): read by 155610 xn_flat_span_light_setup (add ebp, 0x186a0), written at 12A4F0@12A5E5"
 global,0x00155860,xn_span_solid_lit_tail_offsets,strong,"16 words 0,9,..,135: offset of pixel n's step in 0x155880, where 0x155920 plants a ret"
 global,0x00155911,xn_span_solid_lit_shade,strong,Shade pointer returned by the light shader at the previous 16-px boundary (0x155920)
+global,0x00155944,xn_span_solid_lit_ray_a,strong,"patch field (placeholder, 4 bytes, s32): read by 155920 xn_span_solid_lit (mov eax, 0x186a0), written at 12A870@12A8F9"
+global,0x00155984,xn_span_solid_lit_dz16,strong,"patch field (placeholder, 4 bytes, s32): read by 155920 xn_span_solid_lit (add ecx, 0x186a0), written at 155920@15592A; patched by its own function"
+global,0x00155996,xn_span_solid_lit_ray_dx16,strong,"patch field (placeholder, 4 bytes, s32): read by 155920 xn_span_solid_lit (add ebx, 0x186a0), written at 12A3AC@12A4E9"
+global,0x0015599B,xn_span_solid_lit_ray_b,strong,"patch field (placeholder, 4 bytes, s32): read by 155920 xn_span_solid_lit (mov eax, 0x186a0), written at 12A870@12A8FE"
+global,0x001559B9,xn_span_solid_lit_colour,strong,"patch field (placeholder, 1 bytes, u8): read by 155920 xn_span_solid_lit (mov al, 0x64), written at 155920@155968; patched by its own function"
+global,0x00155A21,xn_span_solid_lit_end,strong,"patch field (placeholder, 4 bytes, s32): read by 155920 xn_span_solid_lit (cmp edi, 0x186a0), written at 155920@15596F 155920@155975 155920@15597C; patched by its own function"
+global,0x00155A4B,xn_span_solid_lit_ray_c,strong,"patch field (placeholder, 4 bytes, s32): read by 155920 xn_span_solid_lit (mov eax, 0x186a0), written at 12A870@12A903"
 global,0x00155B00,xn_span_tex_u_num,strong,"u/z numerator (gradients +24/+28/+2C) at the next boundary, stepped per 8/16 px by 0x155D20/0x155F70"
 global,0x00155B04,xn_span_tex_v_num,strong,v/z numerator (+30/+34/+38) for 0x155D20/0x155F70
 global,0x00155B08,xn_span_tex_u_prev,strong,"u (perspective-divided) at the previous boundary, for the affine step of 0x155D20/0x155F70"
 global,0x00155B0C,xn_span_tex_v_prev,strong,v at the previous boundary for 0x155D20/0x155F70
+global,0x00155D34,xn_span_tex8_recip_a,strong,"patch field (address, 4 bytes, pointer): read by 155D20 xn_span_tex_8 (mov ecx, dword ptr [ecx*4 + 0x186a0]), written at 12A100@12A1A4"
+global,0x00155DC7,xn_span_tex8_dz,strong,"patch field (placeholder, 4 bytes, s32): read by 155D20 xn_span_tex_8 (add ecx, 0x186a0), written at 155D20@155D89; patched by its own function"
+global,0x00155DD1,xn_span_tex8_dv,strong,"patch field (placeholder, 4 bytes, s32): read by 155D20 xn_span_tex_8 (add dword ptr [0x155b04], 0x186a0), written at 155D20@155D99; patched by its own function"
+global,0x00155DDB,xn_span_tex8_du,strong,"patch field (placeholder, 4 bytes, s32): read by 155D20 xn_span_tex_8 (add dword ptr [0x155b00], 0x186a0), written at 155D20@155D94; patched by its own function"
+global,0x00155DEC,xn_span_tex8_recip_b,strong,"patch field (address, 4 bytes, pointer): read by 155D20 xn_span_tex_8 (mov ecx, dword ptr [ecx*4 + 0x186a0]), written at 12A100@12A1A9"
+global,0x00155E2B,xn_span_tex8_origin,strong,"patch field (placeholder, 4 bytes, s32): read by 155D20 xn_span_tex_8 (add ebx, 0x186a0), written at 155D20@155DA5; patched by its own function"
+global,0x00155EBD,xn_span_tex8_end,strong,"patch field (placeholder, 4 bytes, s32): read by 155D20 xn_span_tex_8 (cmp edi, 0x186a0), written at 155D20@155DAC 155D20@155DB2 155D20@155DB9; patched by its own function"
+global,0x00155EDD,xn_span_tex8_recip_c,strong,"patch field (address, 4 bytes, pointer): read by 155D20 xn_span_tex_8 (mov eax, dword ptr [ecx*4 + 0x186a0]), written at 12A100@12A1AE"
+global,0x00155F84,xn_span_tex16_recip_a,strong,"patch field (address, 4 bytes, pointer): read by 155F70 xn_span_tex_16 (mov ecx, dword ptr [ecx*4 + 0x186a0]), written at 12A100@12A1B3"
+global,0x00156017,xn_span_tex16_dz,strong,"patch field (placeholder, 4 bytes, s32): read by 155F70 xn_span_tex_16 (add ecx, 0x186a0), written at 155F70@155FD9; patched by its own function"
+global,0x00156021,xn_span_tex16_dv,strong,"patch field (placeholder, 4 bytes, s32): read by 155F70 xn_span_tex_16 (add dword ptr [0x155b04], 0x186a0), written at 155F70@155FE9; patched by its own function"
+global,0x0015602B,xn_span_tex16_du,strong,"patch field (placeholder, 4 bytes, s32): read by 155F70 xn_span_tex_16 (add dword ptr [0x155b00], 0x186a0), written at 155F70@155FE4; patched by its own function"
+global,0x0015603C,xn_span_tex16_recip_b,strong,"patch field (address, 4 bytes, pointer): read by 155F70 xn_span_tex_16 (mov ecx, dword ptr [ecx*4 + 0x186a0]), written at 12A100@12A1B8"
+global,0x0015607B,xn_span_tex16_origin,strong,"patch field (placeholder, 4 bytes, s32): read by 155F70 xn_span_tex_16 (add ebx, 0x186a0), written at 155F70@155FF5; patched by its own function"
+global,0x0015618D,xn_span_tex16_end,strong,"patch field (placeholder, 4 bytes, s32): read by 155F70 xn_span_tex_16 (cmp edi, 0x186a0), written at 155F70@155FFC 155F70@156002 155F70@156009; patched by its own function"
+global,0x001561AD,xn_span_tex16_recip_c,strong,"patch field (address, 4 bytes, pointer): read by 155F70 xn_span_tex_16 (mov eax, dword ptr [ecx*4 + 0x186a0]), written at 12A100@12A1BD"
 global,0x00156300,xn_span_tex_shaded_u_num,strong,u/z numerator for 0x156460/0x1566C4
 global,0x00156304,xn_span_tex_shaded_v_num,strong,v/z numerator for 0x156460/0x1566C4
 global,0x00156308,xn_span_tex_shaded_u_prev,strong,u at the previous boundary for 0x156460/0x1566C4
 global,0x0015630C,xn_span_tex_shaded_v_prev,strong,v at the previous boundary for 0x156460/0x1566C4
 global,0x00156310,xn_span_tex_shaded_row,strong,The polygon's constant shade row [poly+14h] (256-byte remap) used by 0x156460/0x1566C4 and their tail
+global,0x0015647D,xn_span_texsh8_recip_a,strong,"patch field (address, 4 bytes, pointer): read by 156460 xn_span_tex_shaded_8 (mov ecx, dword ptr [ecx*4 + 0x186a0]), written at 12A100@12A1C2"
+global,0x00156510,xn_span_texsh8_dz,strong,"patch field (placeholder, 4 bytes, s32): read by 156460 xn_span_tex_shaded_8 (add ecx, 0x186a0), written at 156460@1564D2; patched by its own function"
+global,0x0015651A,xn_span_texsh8_dv,strong,"patch field (placeholder, 4 bytes, s32): read by 156460 xn_span_tex_shaded_8 (add dword ptr [0x156304], 0x186a0), written at 156460@1564E2; patched by its own function"
+global,0x00156524,xn_span_texsh8_du,strong,"patch field (placeholder, 4 bytes, s32): read by 156460 xn_span_tex_shaded_8 (add dword ptr [0x156300], 0x186a0), written at 156460@1564DD; patched by its own function"
+global,0x00156535,xn_span_texsh8_recip_b,strong,"patch field (address, 4 bytes, pointer): read by 156460 xn_span_tex_shaded_8 (mov ecx, dword ptr [ecx*4 + 0x186a0]), written at 12A100@12A1C7"
+global,0x00156577,xn_span_texsh8_origin,strong,"patch field (placeholder, 4 bytes, s32): read by 156460 xn_span_tex_shaded_8 (add ebx, 0x186a0), written at 156460@1564EE; patched by its own function"
+global,0x00156625,xn_span_texsh8_end,strong,"patch field (placeholder, 4 bytes, s32): read by 156460 xn_span_tex_shaded_8 (cmp edi, 0x186a0), written at 156460@1564F5 156460@1564FB 156460@156502; patched by its own function"
+global,0x00156645,xn_span_texsh8_recip_c,strong,"patch field (address, 4 bytes, pointer): read by 156460 xn_span_tex_shaded_8 (mov eax, dword ptr [ecx*4 + 0x186a0]), written at 12A100@12A1CC"
+global,0x001566E1,xn_span_texsh16_recip_a,strong,"patch field (address, 4 bytes, pointer): read by 1566C4 xn_span_tex_shaded_16 (mov ecx, dword ptr [ecx*4 + 0x186a0]), written at 12A100@12A1D1"
+global,0x00156774,xn_span_texsh16_dz,strong,"patch field (placeholder, 4 bytes, s32): read by 1566C4 xn_span_tex_shaded_16 (add ecx, 0x186a0), written at 1566C4@156736; patched by its own function"
+global,0x0015677E,xn_span_texsh16_dv,strong,"patch field (placeholder, 4 bytes, s32): read by 1566C4 xn_span_tex_shaded_16 (add dword ptr [0x156304], 0x186a0), written at 1566C4@156746; patched by its own function"
+global,0x00156788,xn_span_texsh16_du,strong,"patch field (placeholder, 4 bytes, s32): read by 1566C4 xn_span_tex_shaded_16 (add dword ptr [0x156300], 0x186a0), written at 1566C4@156741; patched by its own function"
+global,0x00156799,xn_span_texsh16_recip_b,strong,"patch field (address, 4 bytes, pointer): read by 1566C4 xn_span_tex_shaded_16 (mov ecx, dword ptr [ecx*4 + 0x186a0]), written at 12A100@12A1D6"
+global,0x001567DB,xn_span_texsh16_origin,strong,"patch field (placeholder, 4 bytes, s32): read by 1566C4 xn_span_tex_shaded_16 (add ebx, 0x186a0), written at 1566C4@156752; patched by its own function"
+global,0x00156921,xn_span_texsh16_end,strong,"patch field (placeholder, 4 bytes, s32): read by 1566C4 xn_span_tex_shaded_16 (cmp edi, 0x186a0), written at 1566C4@156759 1566C4@15675F 1566C4@156766; patched by its own function"
+global,0x00156941,xn_span_texsh16_recip_c,strong,"patch field (address, 4 bytes, pointer): read by 1566C4 xn_span_tex_shaded_16 (mov eax, dword ptr [ecx*4 + 0x186a0]), written at 12A100@12A1DB"
 global,0x00156A00,xn_tmap_ret_offsets,strong,"16 dwords 0,28,52,80..392: byte offset of pixel n inside a compiled tmap instance; 0x156A94 plants a ret there for the last run"
 global,0x00156A40,xn_span_tex_lit_tmap,strong,Compiled tmap instance of the current polygon ([poly+44h]) called by 0x156A94
 global,0x00156A44,xn_span_tex_lit_shader,strong,Light shader of the current polygon ([poly+14h]) called by 0x156A94 every 16 px
@@ -517,16 +736,69 @@ global,0x00156A54,xn_span_tex_lit_u_num,strong,u/z numerator for 0x156A94
 global,0x00156A58,xn_span_tex_lit_v_prev,strong,v at the previous boundary for 0x156A94
 global,0x00156A5C,xn_span_tex_lit_u_prev,strong,u at the previous boundary for 0x156A94
 global,0x00156A60,xn_span_tex_lit_ray_x,strong,"x view ray (D_00120AC0[x]) at the current boundary, stepped by the 16-px increment patched by 0x12A3AC"
+global,0x00156AB7,xn_span_texlit_recip_a,strong,"patch field (address, 4 bytes, pointer): read by 156A94 xn_span_tex_lit (mov ecx, dword ptr [ecx*4 + 0x186a0]), written at 12A100@12A1E0"
+global,0x00156AC9,xn_span_texlit_ray_a,strong,"patch field (placeholder, 4 bytes, s32): read by 156A94 xn_span_tex_lit (mov eax, 0x186a0), written at 12A870@12A908"
+global,0x00156B74,xn_span_texlit_ray_dx16,strong,"patch field (placeholder, 4 bytes, s32): read by 156A94 xn_span_tex_lit (add dword ptr [0x156a60], 0x186a0), written at 12A3AC@12A4E4"
+global,0x00156B7E,xn_span_texlit_du,strong,"patch field (placeholder, 4 bytes, s32): read by 156A94 xn_span_tex_lit (add dword ptr [0x156a54], 0x186a0), written at 156A94@156B42; patched by its own function"
+global,0x00156B88,xn_span_texlit_dv,strong,"patch field (placeholder, 4 bytes, s32): read by 156A94 xn_span_tex_lit (add dword ptr [0x156a50], 0x186a0), written at 156A94@156B3D; patched by its own function"
+global,0x00156B8E,xn_span_texlit_dz,strong,"patch field (placeholder, 4 bytes, s32): read by 156A94 xn_span_tex_lit (add ecx, 0x186a0), written at 156A94@156B32; patched by its own function"
+global,0x00156B9F,xn_span_texlit_recip_b,strong,"patch field (address, 4 bytes, pointer): read by 156A94 xn_span_tex_lit (mov ecx, dword ptr [ecx*4 + 0x186a0]), written at 12A100@12A1E5"
+global,0x00156BAE,xn_span_texlit_ray_b,strong,"patch field (placeholder, 4 bytes, s32): read by 156A94 xn_span_tex_lit (mov eax, 0x186a0), written at 12A870@12A90D"
+global,0x00156BF4,xn_span_texlit_origin,strong,"patch field (placeholder, 4 bytes, s32): read by 156A94 xn_span_tex_lit (add ebx, 0x186a0), written at 156A94@156B4E; patched by its own function"
+global,0x00156C10,xn_span_texlit_end,strong,"patch field (placeholder, 4 bytes, s32): read by 156A94 xn_span_tex_lit (cmp edi, 0x186a0), written at 156A94@156B5B 156A94@156B61 156A94@156B68; patched by its own function"
+global,0x00156C40,xn_span_texlit_recip_c,strong,"patch field (address, 4 bytes, pointer): read by 156A94 xn_span_tex_lit (mov ecx, dword ptr [ecx*4 + 0x186a0]), written at 12A100@12A1EA"
+global,0x00156C59,xn_span_texlit_ray_c,strong,"patch field (placeholder, 4 bytes, s32): read by 156A94 xn_span_tex_lit (mov eax, 0x186a0), written at 12A870@12A912"
 global,0x00156D20,xn_span_tail_offsets_17,strong,"16 words 0,17,..,255: planted-ret offsets for the 17-byte-step tails 0x155C00 and 0x156D40"
+global,0x00156E74,xn_span_tex64_recip_a,strong,"patch field (address, 4 bytes, pointer): read by 156E60 xn_span_tex64 (mov ecx, dword ptr [ecx*4 + 0x186a0]), written at 12A100@12A186"
+global,0x00156EE9,xn_span_tex64_dz,strong,"patch field (placeholder, 4 bytes, s32): read by 156E60 xn_span_tex64 (add ecx, 0x186a0), written at 156E60@156ED7; patched by its own function"
+global,0x00156EEE,xn_span_tex64_du,strong,"patch field (placeholder, 4 bytes, s32): read by 156E60 xn_span_tex64 (add eax, 0x186a0), written at 156E60@156EC5; patched by its own function"
+global,0x00156EF4,xn_span_tex64_dv,strong,"patch field (placeholder, 4 bytes, s32): read by 156E60 xn_span_tex64 (add edx, 0x186a0), written at 156E60@156ECE; patched by its own function"
+global,0x00156F07,xn_span_tex64_recip_b,strong,"patch field (address, 4 bytes, pointer): read by 156E60 xn_span_tex64 (mov ecx, dword ptr [ecx*4 + 0x186a0]), written at 12A100@12A18B"
+global,0x00156F19,xn_span_tex64_origin,strong,"patch field (placeholder, 4 bytes, s32): read by 156E60 xn_span_tex64 (add ecx, 0x186a0), written at 156E60@156EAD; patched by its own function"
+global,0x00157090,xn_span_tex64_recip_c,strong,"patch field (address, 4 bytes, pointer): read by 156E60 xn_span_tex64 (mov eax, dword ptr [ecx*4 + 0x186a0]), written at 12A100@12A190"
+global,0x00157254,xn_span_tex64sh_recip_a,strong,"patch field (address, 4 bytes, pointer): read by 157240 xn_span_tex64_shaded (mov ecx, dword ptr [ecx*4 + 0x186a0]), written at 12A100@12A195"
+global,0x001572D6,xn_span_tex64sh_dz,strong,"patch field (placeholder, 4 bytes, s32): read by 157240 xn_span_tex64_shaded (add ecx, 0x186a0), written at 157240@1572C2; patched by its own function"
+global,0x001572DB,xn_span_tex64sh_du,strong,"patch field (placeholder, 4 bytes, s32): read by 157240 xn_span_tex64_shaded (add eax, 0x186a0), written at 157240@1572B0; patched by its own function"
+global,0x001572E1,xn_span_tex64sh_dv,strong,"patch field (placeholder, 4 bytes, s32): read by 157240 xn_span_tex64_shaded (add edx, 0x186a0), written at 157240@1572B9; patched by its own function"
+global,0x001572F4,xn_span_tex64sh_recip_b,strong,"patch field (address, 4 bytes, pointer): read by 157240 xn_span_tex64_shaded (mov ebp, dword ptr [ecx*4 + 0x186a0]), written at 12A100@12A19A"
+global,0x00157306,xn_span_tex64sh_origin,strong,"patch field (placeholder, 4 bytes, s32): read by 157240 xn_span_tex64_shaded (add ebp, 0x186a0), written at 157240@15728D; patched by its own function"
+global,0x0015730B,xn_span_tex64sh_row,strong,"patch field (placeholder, 4 bytes, s32): read by 157240 xn_span_tex64_shaded (mov eax, 0x186a0), written at 157240@1572CB; patched by its own function"
+global,0x00157486,xn_span_tex64sh_end,strong,"patch field (placeholder, 4 bytes, s32): read by 157240 xn_span_tex64_shaded (cmp edi, 0x186a0), written at 157240@1572A7; patched by its own function"
+global,0x001574B1,xn_span_tex64sh_recip_c,strong,"patch field (address, 4 bytes, pointer): read by 157240 xn_span_tex64_shaded (mov eax, dword ptr [ecx*4 + 0x186a0]), written at 12A100@12A19F"
 global,0x00157600,xn_span_tail_offsets_19,strong,"16 words 0,19,..,285: planted-ret offsets for the 19-byte-step tails 0x156320, 0x157100, 0x157760"
+global,0x00157622,xn_span_flat_transparent_cx,strong,"patch field (placeholder, 4 bytes, s32): read by 157620 xn_span_flat_transparent (sub ebx, 0x2710), written at 12A2D0@12A33C"
+global,0x0015762E,xn_span_flat_transparent_recip,strong,"patch field (address, 4 bytes, pointer): read by 157620 xn_span_flat_transparent (mov ecx, dword ptr [ecx*4 + 0x186a0]), written at 12A100@12A1EF"
+global,0x00157802,xn_span_flat_shaded_cx,strong,"patch field (placeholder, 4 bytes, s32): read by 157800 xn_span_flat_transparent_shaded (sub ebx, 0x2710), written at 12A2D0@12A342"
+global,0x0015780E,xn_span_flat_shaded_recip,strong,"patch field (address, 4 bytes, pointer): read by 157800 xn_span_flat_transparent_shaded (mov ecx, dword ptr [ecx*4 + 0x186a0]), written at 12A100@12A1F4"
+global,0x00157918,xn_span_flat_shaded_rem,strong,"patch field (placeholder, 4 bytes, s32): read by 157800 xn_span_flat_transparent_shaded (add ebx, 0x186a0), written at 157800@157858; patched by its own function"
 global,0x00157B00,xn_span_tail_offsets_23,strong,"16 words 0,23,..,345: planted-ret offsets for 0x157CA0"
+global,0x00157B22,xn_span_flat_fogged_cx,strong,"patch field (placeholder, 4 bytes, s32): read by 157B20 xn_span_flat_lit_fogged (sub ebx, 0x2710), written at 12A2D0@12A348"
+global,0x00157B2E,xn_span_flat_fogged_recip,strong,"patch field (address, 4 bytes, pointer): read by 157B20 xn_span_flat_lit_fogged (mov ecx, dword ptr [ecx*4 + 0x186a0]), written at 12A100@12A1F9"
+global,0x00157B99,xn_span_flat_fogged_step,strong,"patch field (placeholder, 4 bytes, s32): read by 157B20 xn_span_flat_lit_fogged (mov ebp, 0x186a0), written at 157B20@157B75; patched by its own function"
+global,0x00157C58,xn_span_flat_fogged_rem,strong,"patch field (placeholder, 4 bytes, s32): read by 157B20 xn_span_flat_lit_fogged (add ebx, 0x186a0), written at 157B20@157B7E; patched by its own function"
 global,0x00157E00,xn_span_tail_offsets_25,strong,"16 words 0,25,..,375: planted-ret offsets for 0x157FA0"
+global,0x00157E22,xn_span_flat_translucent_cx,strong,"patch field (placeholder, 4 bytes, s32): read by 157E20 xn_span_flat_translucent (sub ebx, 0x2710), written at 12A2D0@12A34E"
+global,0x00157E2E,xn_span_flat_translucent_recip,strong,"patch field (address, 4 bytes, pointer): read by 157E20 xn_span_flat_translucent (mov ecx, dword ptr [ecx*4 + 0x186a0]), written at 12A100@12A1FE"
+global,0x00157E98,xn_span_flat_translucent_step,strong,"patch field (placeholder, 4 bytes, s32): read by 157E20 xn_span_flat_translucent (mov ebp, 0x186a0), written at 157E20@157E75; patched by its own function"
+global,0x00157F67,xn_span_flat_translucent_rem,strong,"patch field (placeholder, 4 bytes, s32): read by 157E20 xn_span_flat_translucent (add ebx, 0x186a0), written at 157E20@157E7E; patched by its own function"
 global,0x00158200,xn_poly_clip_src,strong,"Current vertex list (16-byte x,y,z,outcode) being clipped/projected; swapped with D_00158204 after each plane (0x1587D4)"
 global,0x00158204,xn_poly_clip_dst,strong,Output vertex buffer of the current clip pass
 global,0x00158208,xn_poly_clip_src_end,strong,End of the current vertex list
 global,0x0015820C,xn_poly_clip_intersect_fn,strong,"Plane intersection routine for the current clip pass (0x158864..0x158B1C), set by 0x158678"
 global,0x00158210,xn_poly_clip_outcode_and,strong,"AND of the vertices' outcodes (non-zero: polygon outside one plane, rejected)"
 global,0x00158211,xn_poly_clip_outcode_or,strong,OR of the vertices' outcodes: the planes to clip against; also set from the object's sphere test 0x15CF18
+global,0x001583AF,xn_poly_flat_sx,strong,"patch field (placeholder, 4 bytes, s32): read by 158360 xn_poly_project_flat (imul eax, eax, 0x186a0), written at 12A2D0@12A2E8"
+global,0x001583B7,xn_poly_flat_cx,strong,"patch field (placeholder, 4 bytes, s32): read by 158360 xn_poly_project_flat (add edx, 0x186a0), written at 12A2D0@12A367"
+global,0x001583C5,xn_poly_flat_sy,strong,"patch field (placeholder, 4 bytes, s32): read by 158360 xn_poly_project_flat (imul eax, eax, 0x186a0), written at 12A2D0@12A2F7"
+global,0x001583CD,xn_poly_flat_cy,strong,"patch field (placeholder, 4 bytes, s32): read by 158360 xn_poly_project_flat (add edx, 0x186a0), written at 12A2D0@12A36D"
+global,0x001584AD,xn_poly_face_sx,strong,"patch field (placeholder, 4 bytes, s32): read by 158420 xn_poly_project_face (imul eax, eax, 0x186a0), written at 12A2D0@12A2ED"
+global,0x001584B5,xn_poly_face_cx,strong,"patch field (placeholder, 4 bytes, s32): read by 158420 xn_poly_project_face (add edx, 0x186a0), written at 12A2D0@12A373"
+global,0x001584C3,xn_poly_face_sy,strong,"patch field (placeholder, 4 bytes, s32): read by 158420 xn_poly_project_face (imul eax, eax, 0x186a0), written at 12A2D0@12A2FD"
+global,0x001584CB,xn_poly_face_cy,strong,"patch field (placeholder, 4 bytes, s32): read by 158420 xn_poly_project_face (add edx, 0x186a0), written at 12A2D0@12A379"
+global,0x00158608,xn_poly_terrain_sx,strong,"patch field (placeholder, 4 bytes, s32): read by 1585C0 xn_poly_project_terrain (imul eax, eax, 0x186a0), written at 12A2D0@12A2F2"
+global,0x00158610,xn_poly_terrain_cx,strong,"patch field (placeholder, 4 bytes, s32): read by 1585C0 xn_poly_project_terrain (add edx, 0x186a0), written at 12A2D0@12A397"
+global,0x0015861E,xn_poly_terrain_sy,strong,"patch field (placeholder, 4 bytes, s32): read by 1585C0 xn_poly_project_terrain (imul eax, eax, 0x186a0), written at 12A2D0@12A303"
+global,0x00158626,xn_poly_terrain_cy,strong,"patch field (placeholder, 4 bytes, s32): read by 1585C0 xn_poly_project_terrain (add edx, 0x186a0), written at 12A2D0@12A39D"
 global,0x00158C00,xn_light_terrain_dispatch,strong,"3 handlers by light type 0/4/8 for terrain (0x15C08A, 0x15C08B, 0x15C08C), used by 0x15BC9C"
 global,0x00158C0C,xn_light_dispatch,strong,"3 handlers by light type 0/4/8 for faces (0x15BF75 point, 0x15C045, 0x15C046 directional), used by 0x15BC42"
 global,0x00158C18,xn_light_shader_builders,strong,"By number of point lights in range: 0x15BCE8 (constant), 0x15BCF6, 0x15BD78, 0x15BE4D (1-3 light shaders)"
@@ -543,11 +815,56 @@ global,0x001592FC,xn_poly_ring_b,strong,"Same rings for buffer B (D_001590A0), u
 global,0x00159380,xn_poly_ring_tables,strong,"the vertex-pointer tables the rings point at (after ring_b, which ends at 0x159370, and 4 filler dwords; the n = 3 table of ring a starts at 0x159380: 3n+1 pointers per n); data, built into the binary"
 global,0x0015B980,xn_span_dzdx,strong,"d(1/z)/dx of the polygon being rasterized, set by the terrain/model code and used by 0x158D04"
 global,0x0015B984,xn_poly_vertex_count,strong,Vertex count of the polygon being rasterized (counted down by 0x15B9A0)
+global,0x0015B9C4,xn_raster_left,strong,"patch field (placeholder, 4 bytes, s32): read by 15B9A0 xn_poly_rasterize (mov ebp, 0x186a0), written at 15B9A0@15B9A0 15B9A0@15B9C8; patched by its own function"
+global,0x0015BA3C,xn_raster_dxl,strong,"patch field (placeholder, 4 bytes, s32): read by 15BA16 xn_poly_rasterize_row_loop (add ebp, 0x186a0), written at 15B9A0@15BA00"
+global,0x0015BA42,xn_raster_dxr,strong,"patch field (placeholder, 4 bytes, s32): read by 15BA16 xn_poly_rasterize_row_loop (add ebx, 0x186a0), written at 15BA16@15BA91; patched by its own function"
+global,0x0015BA48,xn_raster_dzl,strong,"patch field (placeholder, 4 bytes, s32): read by 15BA16 xn_poly_rasterize_row_loop (add ecx, 0x186a0), written at 15B9A0@15BA0D"
+global,0x0015BA68,xn_raster_right,strong,"patch field (placeholder, 4 bytes, s32): read by 15BA16 xn_poly_rasterize_row_loop (mov ebx, 0x186a0), written at 15B9A0@15B9A6 15BA16@15BA6C"
+global,0x0015BAE8,xn_grad_u0_a,strong,"patch field (placeholder, 4 bytes, s32): read by 15BAC0 xn_poly_tex_gradients (mov eax, 0x186a0), written at 15BAC0@15BAC3; patched by its own function"
+global,0x0015BB0C,xn_grad_u0_b,strong,"patch field (placeholder, 4 bytes, s32): read by 15BAC0 xn_poly_tex_gradients (mov eax, 0x186a0), written at 15BAC0@15BAC8; patched by its own function"
+global,0x0015BB4D,xn_grad_v0_a,strong,"patch field (placeholder, 4 bytes, s32): read by 15BAC0 xn_poly_tex_gradients (mov eax, 0x186a0), written at 15BAC0@15BB2D; patched by its own function"
+global,0x0015BB6E,xn_grad_v0_b,strong,"patch field (placeholder, 4 bytes, s32): read by 15BAC0 xn_poly_tex_gradients (mov eax, 0x186a0), written at 15BAC0@15BB32; patched by its own function"
+global,0x0015BBB9,xn_poly_subdiv_shift,strong,"patch field (operand, 1 bytes, u8): read by 15BB8C xn_poly_setup_textured (shr edx, 0x12), written at 12A4F0@12A600"
+global,0x0015BBDE,xn_poly_setup_sx,strong,"patch field (placeholder, 4 bytes, s32): read by 15BB8C xn_poly_setup_textured (imul esi, dword ptr [edi + 0x18], 0x186a0), written at 12A2D0@12A31F"
+global,0x0015BBE5,xn_poly_setup_sy,strong,"patch field (placeholder, 4 bytes, s32): read by 15BB8C xn_poly_setup_textured (imul ecx, dword ptr [edi + 0x1c], 0x186a0), written at 12A2D0@12A324"
+global,0x0015BC61,xn_light_ambient_row,strong,"patch field (placeholder, 4 bytes, s32): read by 15BC42 xn_light_setup_poly (add ebx, 0x186a0), written at 12A4F0@12A5E0"
 global,0x0015C100,xn_tmap_msg_no_memory,strong,"'XnGine: Out of memory for Shaders.' then 'XnGine: Out of space for Shaders.' ($-terminated), printed by 0x15C200"
 global,0x0015C14C,xn_tmap_pool_block,strong,Block returned by malloc for the instance pool (freed by 0x15C260)
 global,0x0015C150,xn_tmap_pool,strong,32-byte-aligned base of the compiled texture mapper instances (418 bytes each)
 global,0x0015C154,xn_tmap_pool_end,candidate,xn_tmap_pool + 0x10000 (15C224); never read
 global,0x0015C158,xn_tmap_pool_count,strong,Number of compiled instances (max 768)
+global,0x0015C307,xn_tmap_tmpl_mask_a0,strong,"patch field (register, 4 bytes, s32): read by 15C300 xn_tmap_template (and eax, 0x186a0), written at 15C274@15C2AC"
+global,0x0015C30F,xn_tmap_tmpl_base_a0,strong,"patch field (register, 4 bytes, pointer): read by 15C300 xn_tmap_template (mov dl, byte ptr [eax + 0x186a0]), written at 15C274@15C2A9"
+global,0x0015C321,xn_tmap_tmpl_mask_b0,strong,"patch field (register, 4 bytes, s32): read by 15C300 xn_tmap_template (and eax, 0x186a0), written at 15C274@15C2B2"
+global,0x0015C329,xn_tmap_tmpl_base_b0,strong,"patch field (register, 4 bytes, pointer): read by 15C300 xn_tmap_template (mov dl, byte ptr [eax + 0x186a0]), written at 15C274@15C2AF"
+global,0x0015C33B,xn_tmap_tmpl_mask_a1,strong,"patch field (register, 4 bytes, s32): read by 15C300 xn_tmap_template (and eax, 0x186a0), written at 15C274@15C2AC"
+global,0x0015C343,xn_tmap_tmpl_base_a1,strong,"patch field (register, 4 bytes, pointer): read by 15C300 xn_tmap_template (mov dl, byte ptr [eax + 0x186a0]), written at 15C274@15C2A9"
+global,0x0015C355,xn_tmap_tmpl_mask_b1,strong,"patch field (register, 4 bytes, s32): read by 15C300 xn_tmap_template (and eax, 0x186a0), written at 15C274@15C2B2"
+global,0x0015C35D,xn_tmap_tmpl_base_b1,strong,"patch field (register, 4 bytes, pointer): read by 15C300 xn_tmap_template (mov dl, byte ptr [eax + 0x186a0]), written at 15C274@15C2AF"
+global,0x0015C36F,xn_tmap_tmpl_mask_a2,strong,"patch field (register, 4 bytes, s32): read by 15C300 xn_tmap_template (and eax, 0x186a0), written at 15C274@15C2AC"
+global,0x0015C377,xn_tmap_tmpl_base_a2,strong,"patch field (register, 4 bytes, pointer): read by 15C300 xn_tmap_template (mov dl, byte ptr [eax + 0x186a0]), written at 15C274@15C2A9"
+global,0x0015C389,xn_tmap_tmpl_mask_b2,strong,"patch field (register, 4 bytes, s32): read by 15C300 xn_tmap_template (and eax, 0x186a0), written at 15C274@15C2B2"
+global,0x0015C391,xn_tmap_tmpl_base_b2,strong,"patch field (register, 4 bytes, pointer): read by 15C300 xn_tmap_template (mov dl, byte ptr [eax + 0x186a0]), written at 15C274@15C2AF"
+global,0x0015C3A3,xn_tmap_tmpl_mask_a3,strong,"patch field (register, 4 bytes, s32): read by 15C300 xn_tmap_template (and eax, 0x186a0), written at 15C274@15C2AC"
+global,0x0015C3AB,xn_tmap_tmpl_base_a3,strong,"patch field (register, 4 bytes, pointer): read by 15C300 xn_tmap_template (mov dl, byte ptr [eax + 0x186a0]), written at 15C274@15C2A9"
+global,0x0015C3BD,xn_tmap_tmpl_mask_b3,strong,"patch field (register, 4 bytes, s32): read by 15C300 xn_tmap_template (and eax, 0x186a0), written at 15C274@15C2B2"
+global,0x0015C3C5,xn_tmap_tmpl_base_b3,strong,"patch field (register, 4 bytes, pointer): read by 15C300 xn_tmap_template (mov dl, byte ptr [eax + 0x186a0]), written at 15C274@15C2AF"
+global,0x0015C3D7,xn_tmap_tmpl_mask_a4,strong,"patch field (register, 4 bytes, s32): read by 15C300 xn_tmap_template (and eax, 0x186a0), written at 15C274@15C2AC"
+global,0x0015C3DF,xn_tmap_tmpl_base_a4,strong,"patch field (register, 4 bytes, pointer): read by 15C300 xn_tmap_template (mov dl, byte ptr [eax + 0x186a0]), written at 15C274@15C2A9"
+global,0x0015C3F1,xn_tmap_tmpl_mask_b4,strong,"patch field (register, 4 bytes, s32): read by 15C300 xn_tmap_template (and eax, 0x186a0), written at 15C274@15C2B2"
+global,0x0015C3F9,xn_tmap_tmpl_base_b4,strong,"patch field (register, 4 bytes, pointer): read by 15C300 xn_tmap_template (mov dl, byte ptr [eax + 0x186a0]), written at 15C274@15C2AF"
+global,0x0015C40B,xn_tmap_tmpl_mask_a5,strong,"patch field (register, 4 bytes, s32): read by 15C300 xn_tmap_template (and eax, 0x186a0), written at 15C274@15C2AC"
+global,0x0015C413,xn_tmap_tmpl_base_a5,strong,"patch field (register, 4 bytes, pointer): read by 15C300 xn_tmap_template (mov dl, byte ptr [eax + 0x186a0]), written at 15C274@15C2A9"
+global,0x0015C425,xn_tmap_tmpl_mask_b5,strong,"patch field (register, 4 bytes, s32): read by 15C300 xn_tmap_template (and eax, 0x186a0), written at 15C274@15C2B2"
+global,0x0015C42D,xn_tmap_tmpl_base_b5,strong,"patch field (register, 4 bytes, pointer): read by 15C300 xn_tmap_template (mov dl, byte ptr [eax + 0x186a0]), written at 15C274@15C2AF"
+global,0x0015C43F,xn_tmap_tmpl_mask_a6,strong,"patch field (register, 4 bytes, s32): read by 15C300 xn_tmap_template (and eax, 0x186a0), written at 15C274@15C2AC"
+global,0x0015C447,xn_tmap_tmpl_base_a6,strong,"patch field (register, 4 bytes, pointer): read by 15C300 xn_tmap_template (mov dl, byte ptr [eax + 0x186a0]), written at 15C274@15C2A9"
+global,0x0015C459,xn_tmap_tmpl_mask_b6,strong,"patch field (register, 4 bytes, s32): read by 15C300 xn_tmap_template (and eax, 0x186a0), written at 15C274@15C2B2"
+global,0x0015C461,xn_tmap_tmpl_base_b6,strong,"patch field (register, 4 bytes, pointer): read by 15C300 xn_tmap_template (mov dl, byte ptr [eax + 0x186a0]), written at 15C274@15C2AF"
+global,0x0015C473,xn_tmap_tmpl_mask_a7,strong,"patch field (register, 4 bytes, s32): read by 15C300 xn_tmap_template (and eax, 0x186a0), written at 15C274@15C2AC"
+global,0x0015C47B,xn_tmap_tmpl_base_a7,strong,"patch field (register, 4 bytes, pointer): read by 15C300 xn_tmap_template (mov dl, byte ptr [eax + 0x186a0]), written at 15C274@15C2A9"
+global,0x0015C48D,xn_tmap_tmpl_mask_b7,strong,"patch field (register, 4 bytes, s32): read by 15C300 xn_tmap_template (and eax, 0x186a0), written at 15C274@15C2B2"
+global,0x0015C495,xn_tmap_tmpl_base_b7,strong,"patch field (register, 4 bytes, pointer): read by 15C300 xn_tmap_template (mov dl, byte ptr [eax + 0x186a0]), written at 15C274@15C2AF"
 global,0x0015C500,xn_collide_edge_v0,strong,"xn_vec3: edge start minus the test point in xn_collide_point_in_face 15CB00 (15CBB3 x, 15CB51 y, 15CB74 z); also 15CC36/15CD33 (dead)"
 global,0x0015C50C,xn_collide_edge_v1,strong,"xn_vec3: edge end minus the test point (15CB9C x, 15CB82 y, 15CB5F z) in 15CB00"
 global,0x0015C518,xn_collide_test_point,strong,"xn_vec3: the point tested by xn_collide_point_in_face (15CB01/15CB06/15CB0C from eax, edx, ebx)"
@@ -555,8 +872,16 @@ global,0x0015C524,xn_face_edge_tables,strong,"By vertex count: tables of vertex-
 global,0x0015C588,xn_face_edge_slots,strong,"int[319]: the 22 tables (3..24 points) xn_face_edge_tables points at: n+1 point slot offsets 0, 8, .., 8(n-1), 0 (memory dump); 15CB2D/15CB30 read them"
 global,0x0015CC2E,xn_collide_face_normal_ptr,strong,"xn_vec3 *: the face normal (edi) for 15CB00's sign test (15CB12 write, 15CBF2 read); in code after 15CB00's ret"
 global,0x0015CC32,xn_collide_face_points,strong,"xn_vec3 *: the model's point list (esi) for 15CB00 (15CB18 write, 15CB3C/15CB42 add)"
+global,0x0015CE76,xn_collide_area_points,candidate,xn_vec3 * in code after the dead 15CD33's ret: the model's points
+global,0x0015CE7A,xn_collide_area_last,candidate,s32 in code: the dead 15CD33's last fan triangle (point count - 2)
 global,0x0015CED6,xn_collide_edge_first,strong,"struct xn_model_face_point *: the face's first point, for the closing edge in xn_collide_face_test_edges 15CE7E (15CE8D, 15CEA4); in code"
 global,0x0015CEDA,xn_collide_edge_points,strong,"xn_vec3 *: the point list in 15CE7E (15CE7F write, 15CE99/15CEAF add)"
+global,0x0015CF11,xn_collide_vertex_points,candidate,xn_vec3 * in code after the dead 15CEDE's ret: the model's points
+global,0x0015D165,xn_mat_int_strides,strong,2 dwords in code: xn_mat_mul_int (0x15D100) keeps A's row and B's (and C's) row in bytes here; xn_mat_dot_int (0x15D141) steps down B's column by the second; src/engine/mat.c
+global,0x0015D1E9,xn_mat_fixed_strides,strong,2 dwords in code: xn_mat_mul_fixed (0x15D170): A's and B's row in bytes; xn_mat_dot_fixed (0x15D1B7) steps down B's column by the second; src/engine/mat.c
+global,0x0015D1F1,xn_mat_fixed_shift,strong,dword in code: xn_mat_mul_fixed's result shift (EBP); xn_mat_dot_fixed shifts each 64-bit sum by it; src/engine/mat.c
+global,0x0015D27C,xn_mat_fixed64_strides,strong,2 dwords in code: xn_mat_mul_fixed64 (0x15D1F8): A's and B's row in bytes (8-byte elements); src/engine/mat.c
+global,0x0015D284,xn_mat_fixed64_shift,strong,word in code: xn_mat_mul_fixed64's result shift (BP); xn_mat_dot_fixed64 shifts each 64-bit sum by it; src/engine/mat.c
 global,0x0015DC00,xn_math_asin_table,strong,"512 dwords asin(i/512) in 2048-per-turn units (0..491), read by the math code 0x1371AB/0x1371D5/0x1372BF"
 global,0x0015E500,xn_math_sqrt_table,strong,4096 bytes 4*sqrt(i) for 0x15F50C
 global,0x0015F604,xn_timer_zen_saved_flags,candidate,Zen timer (unreachable code at 0x15F800): high byte of the caller's flags saved by the start routine
@@ -568,6 +893,7 @@ global,0x0015F62E,xn_timer_zen_msg_overflow,strong,"'The timer overflowed, so th
 global,0x0015FA00,xn_gfx_vesa_dos_selector,strong,"Selector of the VBE DOS buffer (DPMI 100h), 0 when none"
 global,0x0015FA04,xn_gfx_vesa_dos_buffer,strong,Linear address of the VBE DOS buffer (controller and mode info land here)
 global,0x0015FA08,xn_gfx_vesa_rm_regs,strong,"DPMI real-mode register block for int 10h calls (EBX +10h, EDX +14h, ECX +18h, EAX +1Ch, ES +22h, DS +24h)"
+global,0x0015FA3A,xn_gfx_vesa_bank_step,strong,"word: window positions per 64K bank, 64 / WinGranularity (15FDD2 mov [15FA3Ah],ax after div); the bank table's step"
 global,0x0015FA3C,xn_gfx_vesa_bank_table,strong,16 words: VBE window position of each 64K bank (multiples of 64/granularity)
 global,0x0015FA5C,xn_gfx_vesa_copy_fn,strong,Row copy routine used by 0x15FEAE
 global,0x0015FA60,xn_gfx_vesa_present,strong,1 when VBE 1.2+ was found by 0x15FC00
@@ -575,6 +901,9 @@ global,0x0015FA61,xn_gfx_vesa_page,strong,Current page index for LFB page flippi
 global,0x0015FA65,xn_gfx_vesa_lfb,strong,"Linear address of the mapped VBE frame buffer, 0 if none"
 global,0x0015FA69,xn_gfx_vesa_bank,strong,Bank last set by 0x15FE05
 global,0x0015FA6D,xn_gfx_vesa_mode_info,strong,"256-byte copy of the VBE ModeInfoBlock (XResolution +12h D_0015FA7F, YResolution +14h, NumberOfImagePages +1Dh, PhysBasePtr +28h D_0015FA95)"
+global,0x0015FFCC,xn_vesa_blit_dwords,strong,"patch field (placeholder, 4 bytes, s32): read by 15FF53 xn_gfx_vesa_blit_rect_banked (mov ecx, 0x186a0), written at 15FF53@15FF89; patched by its own function"
+global,0x0015FFD3,xn_vesa_blit_bytes,strong,"patch field (placeholder, 4 bytes, s32): read by 15FF53 xn_gfx_vesa_blit_rect_banked (mov ecx, 0x186a0), written at 15FF53@15FF94; patched by its own function"
+global,0x0015FFDB,xn_vesa_blit_skip,strong,"patch field (placeholder, 4 bytes, s32): read by 15FF53 xn_gfx_vesa_blit_rect_banked (add edi, 0x186a0), written at 15FF53@15FF7E; patched by its own function"
 global,0x00160000,xn_serial_port_active,strong,"4 bytes: set when the IRQ handler of COM1-4 is installed (0x160900), cleared by close"
 global,0x00160004,xn_serial_port_base,strong,"4 dwords 3F8h, 2F8h, 3E8h, 2E8h"
 global,0x00160014,xn_serial_port_vector,strong,"4 dwords: interrupt vector of each port (0Ch, 0Bh, 0Ch, 0Bh)"
@@ -588,6 +917,9 @@ global,0x00160860,xn_serial_rx_tail,strong,4 dwords: ring write index per port
 global,0x00160870,xn_serial_rx_count,strong,4 dwords: bytes waiting per port
 global,0x00160D00,xn_helmet_a_port,strong,COM port of head tracker driver A (default 1)
 global,0x00160D04,xn_helmet_a_record,strong,24-byte '$'-terminated record buffer filled by 0x160E6F/0x160EAC
+global,0x00160D1C,xn_helmet_a_angles,candidate,3 dwords after driver A's record that 160E00 clears; nothing else reads or writes them
+global,0x00160F08,xn_helmet_b_str_mode,strong,"'!M2,C,B' CR FFh: driver B's mode command, sent by 161000 until the tracker answers 'O'"
+global,0x00160F13,xn_helmet_b_str_bang,strong,'!' CR FFh: sent by 161000 (via 1610B4) before the start command
 global,0x00160F18,xn_helmet_b_yaw_sign,strong,+1 or -1 (firmware version >= 1.003) applied to the yaw word by 0x16116C
 global,0x00161300,xn_helmet_c_rm_regs,strong,DPMI real-mode register block for driver C's int 33h calls
 global,0x00161332,xn_helmet_c_dos_selector,strong,Selector of driver C's DOS buffer
@@ -999,6 +1331,7 @@ global,0x00195AEC,shelf_object,confirmed,"the shelf object whose items are in tr
 global,0x00195AF0,tavern_building,confirmed,"pointer to the building entry whose room is rented: tavern_open sets it to current_building (rest.c too); the rent fields are written there (experiment: building+0x02 expiry, +0x0F 2)"
 global,0x00195AF4,found_object,strong,"the result of object walks and searches (objects agent: the searches pass key and result through globals): object_find_type, object_find_item, object_find_quest, object_random_child_of_type, the membership finders (guild_find_membership_by_*), gold_find_credit, inv_match_arrows/inv_take_arrow, automap_find_record, quest_match_person_cb, collide_* callbacks, marker_nearest_cb; was found_record (object = struct record, as found_marker)"
 global,0x00195AFC,list_popup_image,strong,"pick00i0.img, the list popup's window (list_popup_open/_open_strings load it, list_popup_update and list_popup_poll draw it); was picklist_image"
+global,0x00195B00,frame_timer_ms,candidate,"xn_timer_add_25 (CE7B3, dead) adds 25 to it, shaped like a 40 Hz timer callback; frame_timer_init (support.c) copies it to D_001A59D0 and D_001A59C8"
 global,0x00195B04,spell_records,confirmed,"pointer to SPELLS.STD in memory: 89-byte spell records, 128 max (name +0x2F, id +0x49); in save_morthag1 89 records (Fenrik's Door Jam, Buoyancy, Frostbite...); exp1b: cast_item_used_spell(82) found Orc Strength by id here"
 global,0x00195B08,effect_tick_minutes,candidate,"minutes (/4) since the last effects_tick; the regeneration and enchantment amounts. Keep: code only (effects_tick, item_enchantment_tick)"
 global,0x00195B0C,trade_haggle_result,strong,"the agreed price of the unused haggling window (0 when rejected or unaffordable), set by trade_haggle_close. New: exp_haggle: ACCEPT -> 282 (the asking price); close with more than the gold -> 0"
@@ -1024,6 +1357,7 @@ global,0x00195B6C,hud_mode_icons,strong,"main01i0.img: the interaction-mode icon
 global,0x00195B74,paperdoll_mask,confirmed,"125-wide mask filled by paperdoll_draw_item: slot+64 per pixel where an equipped item was drawn; inv_click_paperdoll reads it through inv_paperdoll_slot_at; build/names/scratch/audit_tq/exp_misc.py; audit: build/names/scratch/audit_euw/C/s3_engine.py save_morthag1: after paperdoll_draw its values were exactly 64 + each equipped slot 12-26 (76-79, 82-85, 87, 88, 90) and inv_paperdoll_slot_at(125,103) returned the mask's 85"
 global,0x00195B78,hud_portrait,confirmed,"2048-byte copy of the player's face picture (paperdoll_draw copies it from the race/gender face CIF), drawn centred at (23,176) by hud_draw; audit: build/names/scratch/audit_euw/C/s3_engine.py save_morthag1: hud_draw put all 678 opaque pixels of its 31x27 image at (8,163) of the screen buffer; its header matched the face image paperdoll_draw loaded"
 global,0x00195B7C,list_popup_callback,strong,"function called with the entry picked in a list popup (spells_list_poll): spellmaker_pick_effect_cb/pick_subtype_cb, itemmaker_add_power_cb, ..."
+global,0x00195B80,color_remap,strong,"pointer to the current 256-byte colour remap (a dye): func_000934F6 sets it to color_remap_tables + dye << 8; xn_draw_image_scaled (flag 8000h), xn_draw_cif_rle_frame, xn_draw_img_masked_remap and xn_draw_paperdoll_item remap through it"
 global,0x00195B84,shared_scratch,candidate,"a scratch int shared by unrelated code: faction walks, the Detect distance, gold amounts, spell code (text, magic and combat agents); was faction_scratch. Keep: an honestly neutral name for an int reused by unrelated code (faction walks, rumours, detect distance, gold sums, the reaction mod...); nothing to settle"
 global,0x00195B88,icon_image,strong,icon00i0.img loaded by init_game_data
 global,0x00195B8C,inpstr_result,strong,"value of the finished entry (atoi), set by inpstr_update"
@@ -1066,6 +1400,7 @@ global,0x00195CE4,location_grid_z,strong,"z offset added before dividing by 1024
 global,0x00195D00,quest_tick_object,strong,build/names/scratch/audit_tq/exp_globals.py save_tlalac_s: after quests_run_all = quest_tick_data - 0x47 (the quest object)
 global,0x00195D04,quest_face_images,strong,"face00i0.cif, then face01i0, face10i0, face11i0 (+4, +8, +12): escort face sets by gender and name bank (quest_face_add, quest_faces_after_load); build/names/scratch/audit_tq/exp_final.py save_tlalac_s; audit keep: already strong; the file names are init_game_data's strings"
 global,0x00195D14,quest_face_images_special,candidate,code reading (faction 514 persons); not tested
+global,0x00195D18,haze_table_1,candidate,"the game's haze.001 table, 64 rows of 256 (src/hand/func_0004ED36.c init_game_data: disk_read_file(..., D_00195D18 = xn_mem_align_up(D_00195CF8, 256))); xn_shade_init_reserved (0C9EF8) maps colour 255 to 77h in each row; src/lifted/init.c update_fog uses D_00195D18 + 16128 (its last row) as xn_fog_table_last"
 global,0x00195D28,talk_where_target,candidate,"points at a struct (0x1965FC) the %hnt macro reads: +0x12 target building, +0x07 region, +0x10 kind. Keep: code only; the evidence agent's parse.c macros read it"
 global,0x00195D2C,trade_total,strong,"trade total (the 'cost'): trade_total_buy/sell/repair/identify set it, inventory_draw shows it at (77,15). New: exp_inven/exp_inven2/exp_inven3: each trade_total_* left its total here; Daggerfall Unity DaggerfallTradeWindow keeps the same 'cost' (UpdateCostAndGold) and ShowTradePopup compares the price with cost>>1 and cost-(cost>>2) as trade_make_offer does"
 global,0x00195D30,trade_price,strong,"price after trade_adjust_price (the merchant's offer), paid or received when accepted. New: exp_inven: set by trade_total_*; exp_glob: trade_settle_offer returned it (900) on YES; Daggerfall Unity's tradePrice (CalculateTradePrice)"
@@ -1457,6 +1792,7 @@ global,0x001A3F20,ambient_rain_channel,strong,channel of the AmbientRaining loop
 global,0x001A3F24,ambient_crickets_channel,strong,channel of the AmbientCrickets loop (375)
 global,0x001A3F28,ambient_fire_channel,strong,channel of the Burning loop (242) near a fire
 global,0x001A3F30,music_song,candidate,"handle of the loaded song (sosez 11870), started by music_play, restarted by music_update; audit keep: 0xFFFFFFFF in 6 saves and after music_play('04.HMI') (returned 10): the emulator has no MIDI device; a stub driver would settle it"
+global,0x001A3F40,timer_tick_count,strong,"incremented by xn_timer_tick_callback (CDDA8), which sound_init_music registers as a 140 Hz timer callback; frame_ticks_update (support.c) turns it into ms (x1828/256) and clears it; trade.c locks it"
 global,0x001A3F44,midi_bsa,strong,handle of MIDI.BSA read by sos_load_song (traced MIDI.BSA reads 11870 <- 6974E); 11 in save_tlalac_s
 global,0x001A3F50,music_current,confirmed,13-byte name of the song playing; music_play('04.HMI') stored it (exp3)
 global,0x001A3F5D,sound_enabled,strong,set by sound_init_music; every sound and music function returns at once when 0

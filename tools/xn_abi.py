@@ -1556,7 +1556,7 @@ class Analysis:
                 used[f] |= GPR | self.status_flags(f)   # no caller: every register
             if self.is_handler(f):
                 used[f] |= REGS
-        # xn_render_frame's run-time blocks are pieces of it (docs: build/xn_readable/smc/
+        # xn_render_frame's run-time blocks are pieces of it (docs: docs/engine/smc/
         # render.md): the span routines return into them, and their `popal; ret` returns from
         # render_frame to the game. What render_frame's callers read is all that is live there.
         for b in RENDER_FRAME_BLOCKS:

@@ -5,19 +5,19 @@ va,name,subsystem,convention,inputs,stack_args,outputs,flags_out,clobber,ret_pop
 0C013B,xn_anim_update,anim,reg,eax edx,0,,,eax ecx dx bx esi,0,known,called from the game's C (1 sites)
 0C019C,xn_anim_tick,anim,reg,eax edx,0,dx,CF,eax ecx ebx esi,0,known,
 0C01EB,xn_anim_run_opcodes,anim,reg,dx esi edi,0,dx edi,,eax ecx ebx,0,known,
-0C020A,xn_anim_op_loop_start,anim,reg,dx edi,0,ax dx edi,CF,,0,partial,
-0C0221,xn_anim_op_loop_end,anim,reg,esi edi,0,eax ebx edi,CF,,0,partial,
-0C023B,xn_anim_op_set_events,anim,reg,esi edi,0,ax edi,CF,,0,partial,
-0C0248,xn_anim_op_set_byte13,anim,reg,esi edi,0,al edi,CF,,0,partial,
-0C0253,xn_anim_op_set_mirror,anim,reg,esi edi,0,al edi,CF,,0,partial,
-0C026B,xn_anim_op_restart,anim,reg,esi,0,eax edi,CF,,0,partial,
-0C027B,xn_anim_op_stop,anim,reg,,0,edi,CF,,0,partial,
-0C027F,xn_anim_op_frame_wait,anim,reg,esi edi,0,ax edi,CF,,0,partial,
-0C029C,xn_anim_op_goto,anim,reg,esi edi,0,eax edi,CF,,0,partial,
-0C02A7,xn_anim_op_goto_random,anim,reg,eax.u dx esi edi,0,eax dx edi,CF,,0,partial,
-0C02C5,xn_anim_op_goto_if_events,anim,reg,eax.u esi edi ZF,0,eax edi,CF,,0,partial,
-0C02DF,xn_anim_op_set_record,anim,reg,esi edi,0,al edi,CF,,0,partial,
-0C02E9,xn_anim_rand_range,anim,reg,ax dx,0,ax dx,,,0,known,
+0C020A,xn_anim_op_loop_start,anim,reg,dx edi,0,edi,CF,eax,0,partial,"outputs overridden: live: an ASCR opcode handler; its only caller is xn_anim_run_opcodes' call through xn_anim_opcodes, which reads EDI (and CF, DX) after it (xn_abi.py clobber); clobber overridden: EAX/EBX: its count, chosen in AL"
+0C0221,xn_anim_op_loop_end,anim,reg,esi edi,0,edi,CF,eax ebx,0,partial,"outputs overridden: live: an ASCR opcode handler; its only caller is xn_anim_run_opcodes' call through xn_anim_opcodes, which reads EDI (and CF, DX) after it (xn_abi.py clobber); clobber overridden: EAX/EBX: the loop start's address and offset"
+0C023B,xn_anim_op_set_events,anim,reg,esi edi,0,edi,CF,eax,0,partial,"outputs overridden: live: an ASCR opcode handler; its only caller is xn_anim_run_opcodes' call through xn_anim_opcodes, which reads EDI (and CF, DX) after it (xn_abi.py clobber); clobber overridden: EAX/EBX: the event bits"
+0C0248,xn_anim_op_set_byte13,anim,reg,esi edi,0,edi,CF,eax,0,partial,"outputs overridden: live: an ASCR opcode handler; its only caller is xn_anim_run_opcodes' call through xn_anim_opcodes, which reads EDI (and CF, DX) after it (xn_abi.py clobber); clobber overridden: EAX/EBX: the operand"
+0C0253,xn_anim_op_set_mirror,anim,reg,esi edi,0,edi,CF,eax,0,partial,"outputs overridden: live: an ASCR opcode handler; its only caller is xn_anim_run_opcodes' call through xn_anim_opcodes, which reads EDI (and CF, DX) after it (xn_abi.py clobber); clobber overridden: EAX/EBX: the operand"
+0C026B,xn_anim_op_restart,anim,reg,esi,0,edi,CF,eax,0,partial,"outputs overridden: live: an ASCR opcode handler; its only caller is xn_anim_run_opcodes' call through xn_anim_opcodes, which reads EDI (and CF, DX) after it (xn_abi.py clobber); clobber overridden: EAX/EBX: the restart offset"
+0C027B,xn_anim_op_stop,anim,reg,,0,edi,CF,,0,partial,"outputs overridden: live: an ASCR opcode handler; its only caller is xn_anim_run_opcodes' call through xn_anim_opcodes, which reads EDI (and CF, DX) after it (xn_abi.py clobber); clobber overridden: it changes nothing else"
+0C027F,xn_anim_op_frame_wait,anim,reg,esi edi,0,edi,CF,eax,0,partial,"outputs overridden: live: an ASCR opcode handler; its only caller is xn_anim_run_opcodes' call through xn_anim_opcodes, which reads EDI (and CF, DX) after it (xn_abi.py clobber); clobber overridden: EAX/EBX: the wait"
+0C029C,xn_anim_op_goto,anim,reg,esi edi,0,edi,CF,eax,0,partial,"outputs overridden: live: an ASCR opcode handler; its only caller is xn_anim_run_opcodes' call through xn_anim_opcodes, which reads EDI (and CF, DX) after it (xn_abi.py clobber); clobber overridden: EAX/EBX: the target offset"
+0C02A7,xn_anim_op_goto_random,anim,reg,eax.u dx esi edi,0,edi,CF,eax,0,partial,"outputs overridden: live: an ASCR opcode handler; its only caller is xn_anim_run_opcodes' call through xn_anim_opcodes, which reads EDI (and CF, DX) after it (xn_abi.py clobber); clobber overridden: EAX/EBX: the random number or the target offset"
+0C02C5,xn_anim_op_goto_if_events,anim,reg,eax.u esi edi ZF,0,edi,CF,eax,0,partial,"outputs overridden: live: an ASCR opcode handler; its only caller is xn_anim_run_opcodes' call through xn_anim_opcodes, which reads EDI (and CF, DX) after it (xn_abi.py clobber); clobber overridden: EAX/EBX: the event bits or the target offset"
+0C02DF,xn_anim_op_set_record,anim,reg,esi edi,0,edi,CF,eax,0,partial,"outputs overridden: live: an ASCR opcode handler; its only caller is xn_anim_run_opcodes' call through xn_anim_opcodes, which reads EDI (and CF, DX) after it (xn_abi.py clobber); clobber overridden: EAX/EBX: the operand"
+0C02E9,xn_anim_rand_range,anim,reg,ax dx,0,ax,,,0,known,"outputs overridden: live: DX comes back as it was (pushed and popped as a word, which the analysis does not pair); its callers, opcodes 0 and 7, read AL (xn_abi.py clobber)"
 0C0307,xn_anim_rand_next,anim,reg,,0,ax,,dx,0,known,
 0C0500,xn_sys_crit_error_handler,sys,interrupt,ecx edx ebx ebp esi edi fs gs,8,eax,,,0,unknown,address escapes (escape): every register it may change is an output
 0C0520,xn_sys_install_crit_error_handler,sys,reg,ch ecx.u esi edi,0,,,eax edx,0,known,called from the game's C (1 sites)
@@ -26,8 +26,8 @@ va,name,subsystem,convention,inputs,stack_args,outputs,flags_out,clobber,ret_pop
 0C08CC,xn_draw_image_scaled_clip,draw,reg,,0,,CF,eax cx dx bx bp esi edi,0,known,
 0C094A,xn_draw_image_scaled_compile_row,draw,reg,eax ecx.u,0,eax ecx dx bx bp,,,0,partial,
 0C0A36,xn_img_unpack_rows,img,watcom,,0,,,eax dx bp esi,0,known,
-0C0C00,xn_dos_load_palette,dos,reg,eax ecx edx ebx ebp esi fs gs,0,eax esi,,,0,unknown,no caller: every register it may change is an output
-0C0C7C,xn_dos_open_c,dos,reg,eax ecx ebx ebp esi edi fs gs,0,eax ecx esi edi,,,0,unknown,no caller: every register it may change is an output
+0C0C00,xn_dos_load_palette,dos,reg,eax ecx edx ebx ebp esi fs gs,0,eax,,esi,0,unknown,"no caller: every register it may change is an output; outputs overridden: dead: the palette buffer; ESI is the shift loop's pointer (the other registers it may change are those of the fatal path, which does not return); clobber overridden: dead: ESI is the shift loop's pointer"
+0C0C7C,xn_dos_open_c,dos,reg,eax ecx ebx ebp esi edi fs gs,0,eax,,,0,unknown,"no caller: every register it may change is an output; outputs overridden: dead: the handle (the other registers are those of the fatal path, which does not return); clobber overridden: dead: it keeps the rest"
 0C0C8C,xn_dos_open,dos,reg,eax ecx edx ebx ebp esi edi fs gs,0,eax ecx edx ebx esi edi fs gs,CF,,0,known,
 0C0CC0,xn_dos_close_c,dos,reg,eax,0,,,,0,unknown,no caller: every register it may change is an output
 0C0CCC,xn_dos_close,dos,reg,ebx,0,,,,0,known,
@@ -35,17 +35,17 @@ va,name,subsystem,convention,inputs,stack_args,outputs,flags_out,clobber,ret_pop
 0C0CF0,xn_dos_find_first,dos,reg,al eax.u edx,0,,CF,eax ecx edx,0,known,
 0C0CF8,xn_dos_find_next_c,dos,reg,al eax.u CF,0,eax,,,0,unknown,no caller: every register it may change is an output
 0C0D0C,xn_dos_find_next,dos,reg,al eax.u,0,,CF,eax ecx edx,0,known,
-0C0D14,xn_dos_file_exists_c,dos,reg,eax ebx,0,eax ebx,,,0,unknown,no caller: every register it may change is an output
+0C0D14,xn_dos_file_exists_c,dos,reg,eax ebx,0,eax,,ebx,0,unknown,no caller: every register it may change is an output; outputs overridden: dead: 1 when the file does not open; EBX is the closed handle; clobber overridden: dead: EBX is the closed handle
 0C0D28,xn_dos_file_exists,dos,reg,edx ebx,0,ebx,CF,eax,0,known,
-0C0D44,xn_dos_create_c,dos,reg,eax ecx ebx ebp esi edi fs gs,0,eax ecx esi edi,,,0,unknown,no caller: every register it may change is an output
+0C0D44,xn_dos_create_c,dos,reg,eax ecx ebx ebp esi edi fs gs,0,eax,,,0,unknown,"no caller: every register it may change is an output; outputs overridden: dead: the handle (the other registers are those of the fatal path, which does not return); clobber overridden: dead: it keeps the rest"
 0C0D54,xn_dos_create,dos,reg,eax ecx edx ebx ebp esi edi fs gs,0,ecx edx ebx esi edi fs gs,,eax,0,known,
-0C0D78,xn_dos_write_c,dos,reg,eax edx ebx,0,eax edx,,,0,unknown,no caller: every register it may change is an output
+0C0D78,xn_dos_write_c,dos,reg,eax edx ebx,0,eax,,edx,0,unknown,no caller: every register it may change is an output; outputs overridden: dead: the carry as 0/1; EDX is the buffer advanced past the whole pieces; clobber overridden: dead: EDX is the buffer advanced past the whole pieces
 0C0D8C,xn_dos_write,dos,reg,ecx edx ebx,0,edx,CF,eax ecx,0,known,
-0C0DB8,xn_dos_read_c,dos,reg,eax edx ebx,0,eax edx,,,0,unknown,no caller: every register it may change is an output
+0C0DB8,xn_dos_read_c,dos,reg,eax edx ebx,0,eax,,edx,0,unknown,no caller: every register it may change is an output; outputs overridden: dead: the bytes read; EDX is the buffer; clobber overridden: dead: EDX is the buffer
 0C0DC4,xn_dos_read,dos,reg,ecx edx ebx,0,eax,,,0,known,
-0C0DCC,xn_dos_seek_c,dos,reg,al eax.u edx ebx,0,eax edx,,,0,unknown,no caller: every register it may change is an output
+0C0DCC,xn_dos_seek_c,dos,reg,al eax.u edx ebx,0,eax,,edx,0,unknown,no caller: every register it may change is an output; outputs overridden: dead: the carry as 0/1; EDX is DOS's DX (the position's high word); clobber overridden: dead: EDX is DOS's DX (the position's high word)
 0C0DE7,xn_dos_seek,dos,reg,al eax.u ecx edx ebx,0,eax edx,CF,ecx,0,known,
-0C0DEC,xn_dos_file_size_c,dos,reg,eax ecx ebx ebp esi edi fs gs,0,eax esi edi,,,0,unknown,no caller: every register it may change is an output
+0C0DEC,xn_dos_file_size_c,dos,reg,eax ecx ebx ebp esi edi fs gs,0,eax,,,0,unknown,"no caller: every register it may change is an output; outputs overridden: dead: the size (the other registers are those of the fatal path, which does not return); clobber overridden: dead: it keeps the rest"
 0C0DFC,xn_dos_file_size,dos,reg,eax ecx edx ebx ebp esi edi fs gs,0,eax esi edi fs gs,,ecx,0,known,
 0C0E24,xn_dos_load_file,dos,reg,eax ecx edx ebx ebp esi edi fs gs,0,eax ecx ebx esi edi fs gs,,edx,0,known,ESP -20 at the return at C0ECF
 0C0ED0,xn_dos_make_path,dos,reg,edx,0,edx,CF,,0,known,
@@ -82,7 +82,7 @@ va,name,subsystem,convention,inputs,stack_args,outputs,flags_out,clobber,ret_pop
 0C2F66,xn_world_load_north,world,reg,ecx bh ebx.u esi edi,0,bh ebx.u esi edi,,eax edx bl ebp,0,known,
 0C2FAB,xn_world_load_south,world,reg,ecx bh ebx.u esi edi,0,bh ebx.u esi edi,,eax edx bl ebp,0,known,
 0C2FF5,xn_world_reload,world,watcom,ecx,0,,,eax ecx edx ebx,0,known,called from the game's C (4 sites)
-0C30D6,xn_world_create_file,world,reg,eax ecx edx ebx ebp esi edi fs gs,0,eax ecx edx ebx esi edi,,,0,unknown,no caller: every register it may change is an output
+0C30D6,xn_world_create_file,world,reg,eax ecx edx ebx ebp esi edi fs gs,0,,,eax edx ebx,0,unknown,"no caller: every register it may change is an output; outputs overridden: dead (an editor's create-file, no caller): the handle, table pointer and size it leaves in ebx, eax and edx go to memory too; clobber overridden: dead: the registers it changes (xn_dos_create keeps eax and ecx; the game's malloc keeps the rest)"
 0C310F,xn_world_open,world,reg,eax ecx ebx ebp esi edi fs gs,0,,,eax ecx edx ebx ebp esi edi,0,known,ESP -32 at the return at C31AC; called from the game's C (1 sites)
 0C31AE,xn_world_read_height_bands,world,watcom,al eax.u ebx,0,,,eax ecx edx ebx ebp esi edi,0,known,
 0C31DB,xn_world_write_header,world,reg,,0,,,,0,unknown,no caller: every register it may change is an output
@@ -101,9 +101,9 @@ va,name,subsystem,convention,inputs,stack_args,outputs,flags_out,clobber,ret_pop
 0C3C3C,xn_world_fix_lone_tiles,world,reg,ah eax.u,0,eax.u ebx.u,,ax ecx edx bx ebp esi edi,0,known,
 0C3D14,xn_world_rock_slopes,world,watcom,eax.u ebx.u,0,,,eax ecx edx ebx ebp esi edi,0,known,
 0C3DA8,xn_world_gen_paths,world,reg,,0,,,ax ecx edx bx ebp esi edi,0,known,
-0C3DA9,xn_world_gen_paths_body,world,reg,eax ebx ebp,0,eax ecx ebx esi edi,,,0,unknown,no caller: every register it may change is an output
+0C3DA9,xn_world_gen_paths_body,world,reg,eax ebx ebp,0,,,eax ecx ebx esi edi,0,unknown,"no caller: every register it may change is an output; outputs overridden: dead body after the ret at C3DA8 (no caller): the paths go to the tile layer; clobber overridden: dead: the registers it changes (the walker's position, step, layer pointers; xn_world_steepest_neighbour keeps edx and ebp)"
 0C3E69,xn_world_gen_river,world,reg,,0,,,ax ecx edx bx ebp esi edi,0,known,
-0C3E6A,xn_world_gen_river_body,world,reg,ebp,0,eax ecx ebx esi edi,,,0,unknown,no caller: every register it may change is an output
+0C3E6A,xn_world_gen_river_body,world,reg,ebp,0,,,eax ecx ebx esi edi,0,unknown,no caller: every register it may change is an output; outputs overridden: dead body after the ret at C3E69 (no caller): the river goes to the layers; clobber overridden: dead: the registers it changes
 0C3EFE,xn_world_blend_tiles,world,watcom,,0,,,eax ecx edx bl ebp esi edi,0,known,
 0C3FCB,xn_world_mark_nonplanar_quads,world,watcom,bh ebx.u,0,,,eax ecx edx ebx esi edi,0,known,called from the game's C (1 sites)
 0C5200,xn_rand_noise_init,rand,watcom,,0,,,eax ecx edx ebx esi edi,0,known,called from the game's C (1 sites)
@@ -114,10 +114,10 @@ va,name,subsystem,convention,inputs,stack_args,outputs,flags_out,clobber,ret_pop
 0C7F07,xn_model_set_angles,model,watcom,ax ecx dx bx,0,,,eax ecx edx ebx,0,known,called from the game's C (3 sites)
 0C7F14,xn_model_compose_angles,model,watcom,eax ecx edx ebx,0,,,eax ecx edx ebx esi edi,0,known,called from the game's C (2 sites)
 0C7F98,xn_model_set_angles_yaw_offset,model,watcom,eax edx,0,,,eax ecx edx ebx esi edi,0,known,called from the game's C (2 sites)
-0C7FB6,xn_cam_forward_angles,cam,reg,eax edx,0,eax edx,,,0,unknown,no caller: every register it may change is an output
+0C7FB6,xn_cam_forward_angles,cam,watcom,eax edx,0,,,eax edx,0,unknown,no caller: every register it may change is an output; outputs overridden: dead (no caller): the natural interface stores both angles through the pointers; nothing reads the registers; clobber overridden: dead (no caller): the registers xn_vec_dir_to_angles_regs leaves (it keeps ebx and ecx)
 0C7FD9,xn_math_approx_dist2d,math,watcom,eax ecx edx ebx,0,eax,,ecx edx ebx,0,known,called from the game's C (46 sites)
 0C7FF4,xn_math_approx_hypot,math,watcom,eax edx,0,eax,,ecx edx ebx esi edi,0,known,called from the game's C (17 sites)
-0C800B,xn_str_copy_dword,str,reg,eax edx,0,edx,,,0,unknown,no caller: every register it may change is an output
+0C800B,xn_str_copy_dword,str,reg,eax edx,0,,,edx,0,unknown,no caller: every register it may change is an output; outputs overridden: dead: the copy goes to memory; EDX is the dword it moved; clobber overridden: dead: EDX is the dword it moved
 0C8010,xn_math_diff_div,math,reg,eax edx ebx,0,eax edx,,,0,unknown,no caller: every register it may change is an output
 0C8017,xn_img_rle_decode,img,reg,eax edx,0,ecx.u,,eax cx edx ebx ebp,0,known,
 0C8054,xn_math_exp_series,math,reg,edx,0,eax,,,0,unknown,no caller: every register it may change is an output
@@ -130,25 +130,25 @@ va,name,subsystem,convention,inputs,stack_args,outputs,flags_out,clobber,ret_pop
 0C8292,xn_sky_rotate_stars,sky,reg,,0,,,,0,unknown,no caller: every register it may change is an output
 0C82C2,xn_math_angles_to_vector,math,reg,eax edx ebx,0,eax edx ebx,,ebp esi,0,known,
 0C8315,xn_draw_clip_image_rect,draw,reg,eax ecx edx ebx ebp esi,0,eax ecx edx ebx ebp esi,CF,edi,0,known,
-0C8381,xn_draw_image_shaded,draw,reg,eax ecx edx ebx,4,eax ecx edx ebx,,,4,unknown,no caller: every register it may change is an output
+0C8381,xn_draw_image_shaded,draw,watcom,eax ecx edx ebx,4,,,eax ecx edx ebx,4,unknown,"no caller: every register it may change is an output; outputs overridden: dead (no caller): EAX ECX EDX EBX are 0x0C8395's clip and loop leftovers; clobber overridden: dead (no caller): Watcom's convention for (x, y, w, h, [stack] src)"
 0C8394,xn_draw_ret_stub,draw,reg,,0,,,,0,unknown,no caller: every register it may change is an output
-0C8395,xn_draw_image_shaded_regs,draw,reg,eax ecx edx ebx esi,0,eax ecx edx ebx,,ebp esi edi,0,known,
+0C8395,xn_draw_image_shaded_regs,draw,reg,eax ecx edx ebx esi,0,,,eax ecx edx ebx ebp esi edi,0,known,outputs overridden: its only caller is the dead 0x0C8381 (no caller): EAX ECX EDX EBX are clip and loop leftovers; clobber overridden: its only caller is the dead 0x0C8381
 0C83F6,xn_draw_shaded_row_unrolled,draw,reg,ah eax.u esi edi,0,al,,,0,known,
 0C9A89,xn_sky_draw_snow,sky,watcom,,0,,,eax ecx edx ebx esi edi,0,known,called from the game's C (1 sites)
 0C9BF7,xn_sky_snow_init,sky,watcom,,0,,,eax edx ebx,0,known,called from the game's C (1 sites)
 0C9C70,xn_sky_snow_update_speeds,sky,watcom,,0,,,eax edx,0,known,called from the game's C (1 sites)
 0C9CB9,xn_sky_draw_rain,sky,reg,bh ebx.u ebp fs gs,0,,,eax ecx edx ebx esi edi,0,known,called from the game's C (1 sites)
 0C9D19,xn_sky_draw_rain_streak,sky,unknown,eax edx bh ebx.u ebp fs gs,0,bh ebx.u ebp,,eax ecx edx bl esi edi,0,known,leaves through C9EA6
-0C9D63,xn_sky_draw_rain_streak_bottom_clip,sky,unknown,eax ecx edx bh ebx.u ebp esi fs gs,0,eax ecx edx ebx ebp esi edi,,,0,unknown,no caller: every register it may change is an output; leaves through C9EA6
+0C9D63,xn_sky_draw_rain_streak_bottom_clip,sky,unknown,eax ecx edx bh ebx.u ebp esi fs gs,0,,,eax ecx edx bl esi edi,0,unknown,"no caller: every register it may change is an output; leaves through C9EA6; outputs overridden: dead (no caller; C9D19 jumps past it): a streak's run like C9D19's, whose callers read none of the registers it changes; clobber overridden: dead: the registers its run changes, as C9D19's row (bl holds the code byte it restores)"
 0C9EA7,xn_shade_table_63,shade,watcom,,0,eax,,edx ebx,0,known,called from the game's C (1 sites)
 0C9EB2,xn_shade_init_reserved,shade,watcom,,0,,,eax edx,0,known,called from the game's C (1 sites)
 0C9F08,xn_timer_bios_ticks,timer,watcom,,0,eax,,ecx edx ebx,0,known,called from the game's C (2 sites)
 0C9F10,xn_math_scale_110,math,reg,eax edx ebx,0,eax edx,,,0,unknown,no caller: every register it may change is an output
 0C9F29,xn_sys_set_dos_transfer_buffer,sys,reg,esi edi,0,,,eax edx,0,known,called from the game's C (1 sites)
 0C9F4F,xn_draw_remap_rows_320,draw,reg,eax ecx edx ebx,0,,,,0,unknown,no caller: every register it may change is an output
-0CAE00,xn_input_steer_dispatch,input,watcom,eax,0,,,eax ecx edx ebx esi edi,0,known,called from the game's C (1 sites)
+0CAE00,xn_input_steer_dispatch,input,watcom,eax,0,,,eax ecx edx ebx esi edi,0,known,"called from the game's C (1 sites); outputs overridden: live: it jumps to xn_steer_region_handlers[region], the game's Watcom C void(void), which keeps EBP and never touches FS or GS (the records check EBP kept)"
 0CAE07,spell_cost_formula_dispatch,,watcom,eax,0,eax,,ecx edx ebx,0,known,called from the game's C (3 sites)
-0CAE0E,spell_effect_dispatch,,unknown,eax ecx edx ebx ebp esi edi fs gs CF PF AF ZF SF OF,0,eax ebp,,ecx edx ebx esi edi,0,known,called from the game's C (1 sites); leaves through CAE1B
+0CAE0E,spell_effect_dispatch,,unknown,eax ecx edx ebx ebp esi edi fs gs CF PF AF ZF SF OF,0,eax,,ecx edx ebx esi edi,0,known,"called from the game's C (1 sites); leaves through CAE1B; outputs overridden: live: it returns into spell_effect_handlers[type], the game's Watcom C, which keeps EBP: only EAX comes back (the records check EBP kept)"
 0CAE1C,xn_spell_kludge_menu_dispatch,spell,unknown,eax ecx edx ebx ebp esi edi fs gs CF PF AF ZF SF OF,0,,,eax ecx edx ebx ebp esi edi,0,known,called from the game's C (1 sites); leaves through CAE28
 0CB300,xn_shade_keep_colours_0_255,shade,watcom,,0,,,eax edx ebx,0,known,called from the game's C (2 sites)
 0CB31E,xn_sky_copy_rows,sky,watcom,eax ecx edx ebx,0,,,eax ecx edx ebx,0,known,called from the game's C (9 sites)
@@ -156,7 +156,7 @@ va,name,subsystem,convention,inputs,stack_args,outputs,flags_out,clobber,ret_pop
 0CB381,xn_img_cif_group,img,watcom,eax edx,0,eax,,ecx edx ebp edi,0,known,called from the game's C (2 sites)
 0CB39A,xn_draw_cif_rle_frame,draw,watcom,eax edx ebx,0,,,eax ecx edx ebx esi edi,0,known,called from the game's C (4 sites)
 0CB473,xn_draw_img_masked_remap,draw,watcom,eax edx,0,,,eax ecx edx ebx esi edi,0,known,called from the game's C (1 sites)
-0CB4D7,xn_img_rle_frame_unpack,img,reg,eax edx ebx,0,eax edx ebx,,,0,unknown,no caller: every register it may change is an output
+0CB4D7,xn_img_rle_frame_unpack,img,watcom,eax edx ebx,0,eax,,edx ebx,0,unknown,"no caller: every register it may change is an output; outputs overridden: dead (no caller): returns 1 in EAX; EDX (the width) and EBX (the group) are leftovers; clobber overridden: dead (no caller): Watcom's convention for (group, frame, dst)"
 0CB54C,xn_img_rle_frame_unpack_fail,img,reg,,8,eax ecx esi edi,,,0,unknown,ESP +12 at the return at CB551; no caller: every register it may change is an output
 0CB552,xn_draw_fullscreen_overlay_shaded,draw,reg,eax,0,,,al,0,known,called from the game's C (9 sites)
 0CD0F1,xn_draw_darken_rect,draw,watcom,eax ecx edx ebx,0,,,eax ecx edx ebx esi edi,0,known,called from the game's C (1 sites)
@@ -170,15 +170,15 @@ va,name,subsystem,convention,inputs,stack_args,outputs,flags_out,clobber,ret_pop
 0CD32C,xn_gfx_wait_vretraces,gfx,reg,eax dx,0,eax dx,,,0,unknown,no caller: every register it may change is an output
 0CD33A,xn_pal_set_range_8bit,pal,reg,eax dx bx,0,,,ax edx ebx,0,known,called from the game's C (9 sites)
 0CD367,xn_pal_set_all_8bit,pal,watcom,eax,0,,,eax ecx edx ebx,0,known,called from the game's C (5 sites)
-0CD37B,xn_img_skip_records,img,reg,eax edx,0,eax edx,,,0,unknown,no caller: every register it may change is an output
+0CD37B,xn_img_skip_records,img,watcom,eax edx,0,eax,,edx,0,unknown,"no caller: every register it may change is an output; outputs overridden: dead (no caller): returns the k-th record in EAX; EDX is the spent count; clobber overridden: dead (no caller): Watcom's convention for (img, k)"
 0CD38E,xn_timer_wait_change,timer,reg,eax edx,0,,,,0,unknown,no caller: every register it may change is an output
-0CD39B,xn_draw_fill_rows_pattern8,draw,reg,eax edx ebx,0,eax edx ebx,,,0,unknown,no caller: every register it may change is an output
+0CD39B,xn_draw_fill_rows_pattern8,draw,watcom,eax edx ebx,0,,,eax edx ebx,0,unknown,"no caller: every register it may change is an output; outputs overridden: dead (no caller): EAX and EDX are the last row's pattern, EBX the spent row count; clobber overridden: dead (no caller): Watcom's convention for (src, dst, rows)"
 0CD53C,xn_draw_view_checkerboard,draw,watcom,,0,,,eax ecx edx ebx esi edi,0,known,called from the game's C (1 sites)
 0CDB7A,xn_draw_cast_anim_mirrored,draw,watcom,eax edx ebx,0,,,eax ecx edx ebx ebp esi edi,0,known,called from the game's C (2 sites)
 0CDC4B,xn_shade_build_translucent_table,shade,watcom,eax,0,,,eax edx ebx,0,known,called from the game's C (1 sites)
 0CDC99,xn_tex_archive_set_translucent,tex,watcom,eax,0,,,eax edx,0,known,called from the game's C (3 sites)
 0CDCB8,xn_draw_image_masked_at_origin,draw,watcom,eax edx ebx,0,,,eax edx ebx,0,known,called from the game's C (1 sites)
-0CDCE5,xn_draw_remap_masked_rect,draw,reg,eax ecx edx ebx,8,eax ecx edx,,,0,unknown,no caller: every register it may change is an output
+0CDCE5,xn_draw_remap_masked_rect,draw,reg,eax ecx edx ebx,8,,,eax ecx edx ebx,0,unknown,"no caller: every register it may change is an output; outputs overridden: dead (no caller): EAX ECX EDX are its bounds and loop leftovers; clobber overridden: dead (no caller): Watcom's argument registers (x, y, w, h); the caller pops the 8 stack bytes"
 0CDD49,xn_draw_zoom4x,draw,watcom,eax edx ebx,0,,,eax ecx edx ebx esi edi,0,known,called from the game's C (1 sites)
 0CDD6C,xn_draw_mark_matching,draw,watcom,eax ecx edx bl,0,,,eax ecx edx ebx esi edi,0,known,called from the game's C (1 sites)
 0CDD81,xn_gfx_present_inclusive,gfx,reg,eax ecx edx esi edi,0,,,,0,known,called from the game's C (28 sites)
@@ -187,12 +187,12 @@ va,name,subsystem,convention,inputs,stack_args,outputs,flags_out,clobber,ret_pop
 0CE31C,xn_draw_copy_rect_stride_bytes,draw,reg,eax ecx edx ebx,4,ecx,,eax edx ebx,4,known,called from the game's C (7 sites)
 0CE3E3,xn_str_copy_word,str,watcom,eax edx,0,,,eax ecx edx ebx esi edi,0,known,called from the game's C (1 sites)
 0CE3FD,xn_str_copy_alnum,str,watcom,eax edx,0,eax,,edx,0,known,called from the game's C (1 sites)
-0CE435,xn_str_find_char_n,str,reg,eax dl ebx,0,eax ebx,,,0,unknown,no caller: every register it may change is an output
+0CE435,xn_str_find_char_n,str,reg,eax dl ebx,0,eax,,ebx,0,unknown,no caller: every register it may change is an output; outputs overridden: dead: the pointer found; EBX is the count left; clobber overridden: dead: EBX is the count left
 0CE44C,xn_str_find_u32,str,watcom,eax edx ebx,0,eax,,edx ebx,0,known,called from the game's C (9 sites)
 0CE45E,xn_str_find_u16,str,watcom,eax dx ebx,0,eax,,ecx edx ebx,0,known,called from the game's C (7 sites)
 0CE46D,xn_str_copy_until,str,watcom,eax edx bl,0,,,eax edx ebx,0,known,called from the game's C (2 sites)
 0CE483,xn_str_fill_u16,str,reg,eax dx bx,0,,,ax edx ebx,0,known,called from the game's C (2 sites)
-0CE495,xn_str_fill_ascending_v2,str,reg,eax dl ebx,0,eax dl ebx,,,0,unknown,no caller: every register it may change is an output
+0CE495,xn_str_fill_ascending_v2,str,watcom,eax dl ebx,0,,,eax edx ebx,0,unknown,"no caller: every register it may change is an output; outputs overridden: dead copy of xn_str_fill_ascending (0xCE663), whose callers read nothing back; clobber overridden: dead copy of xn_str_fill_ascending: its pointer, value and count registers"
 0CE49E,xn_str_append_char,str,watcom,eax dl,0,,,eax edx ebx,0,known,called from the game's C (1 sites)
 0CE4A9,xn_bits_set_or_clear_u8,bits,reg,eax dl ebx,0,,,ax ecx edx ebx ebp esi edi,0,known,called from the game's C (10 sites)
 0CE4B5,xn_bits_set_or_clear_u16,bits,reg,eax dx ebx,0,,,ax ecx edx ebx ebp esi edi,0,known,called from the game's C (12 sites)
@@ -235,11 +235,11 @@ va,name,subsystem,convention,inputs,stack_args,outputs,flags_out,clobber,ret_pop
 12A3AC,xn_cam_update_derived,cam,watcom,,0,,,eax ecx edx ebx ebp esi edi,0,known,
 12A4F0,xn_render_begin_frame,render,watcom,,0,,,eax ecx edx ebx,0,known,called from the game's C (3 sites)
 12A608,xn_render_pick,render,unknown,eax ecx edx ebx ebp esi fs gs,0,eax fs gs,,ecx edx ebx esi edi,0,known,called from the game's C (1 sites); stack use not followed
-12A700,xn_render_span_setup_solid,render,reg,eax ecx ebx ebp esi edi,0,eax ecx edx ebx ebp esi edi,,,0,partial,
-12A740,xn_render_span_setup_terrain,render,reg,eax ebx ebp esi edi,0,eax ecx edx ebx ebp esi edi,,,0,partial,
-12A7A0,xn_render_span_setup_terrain_solid,render,reg,eax ecx ebp edi,0,eax ecx edx ebx edi,,,0,unknown,no caller: every register it may change is an output
-12A7D0,xn_render_draw_models,render,reg,edx ebp esi fs gs,0,edx fs gs,CF,eax ecx ebx ebp esi edi,0,known,
-12A814,xn_render_draw_flats,render,reg,eax ecx edx ebx ebp esi edi fs gs,0,eax ecx edx ebx ebp esi edi fs gs,CF,,0,known,
+12A700,xn_render_span_setup_solid,render,reg,eax ecx ebx ebp esi edi,0,,,eax ecx edx ebx ebp esi edi,0,partial,"outputs overridden: its only caller is xn_render_frame's polygon dispatch (12A939), which reads none of them back in C; it tail-jumps into a span routine whose leftovers the analysis keeps because the dispatch is indirect. Scrambling them leaves every caller record's memory and I/O identical (raster agent's clobber_mem); backed by xn_abi.py clobber; clobber overridden: its only caller is xn_render_frame's polygon dispatch (12A939), which reads none of them back in C; it tail-jumps into a span routine whose leftovers the analysis keeps because the dispatch is indirect. Scrambling them leaves every caller record's memory and I/O identical (raster agent's clobber_mem); backed by xn_abi.py clobber"
+12A740,xn_render_span_setup_terrain,render,reg,eax ebx ebp esi edi,0,,,eax ecx edx ebx ebp esi edi,0,partial,"outputs overridden: its only caller is xn_render_frame's polygon dispatch (12A939), which reads none of them back in C; it tail-jumps into a span routine whose leftovers the analysis keeps because the dispatch is indirect. Scrambling them leaves every caller record's memory and I/O identical (raster agent's clobber_mem); backed by xn_abi.py clobber; clobber overridden: its only caller is xn_render_frame's polygon dispatch (12A939), which reads none of them back in C; it tail-jumps into a span routine whose leftovers the analysis keeps because the dispatch is indirect. Scrambling them leaves every caller record's memory and I/O identical (raster agent's clobber_mem); backed by xn_abi.py clobber"
+12A7A0,xn_render_span_setup_terrain_solid,render,reg,eax ecx ebp edi,0,,,eax ecx edx ebx edi,0,unknown,"no caller: every register it may change is an output; outputs overridden: its only caller is xn_render_frame's polygon dispatch (12A939), which reads none of them back in C; it tail-jumps into a span routine whose leftovers the analysis keeps because the dispatch is indirect. Scrambling them leaves every caller record's memory and I/O identical (raster agent's clobber_mem); backed by xn_abi.py clobber; clobber overridden: its only caller is xn_render_frame's polygon dispatch (12A939), which reads none of them back in C; it tail-jumps into a span routine whose leftovers the analysis keeps because the dispatch is indirect. Scrambling them leaves every caller record's memory and I/O identical (raster agent's clobber_mem); backed by xn_abi.py clobber"
+12A7D0,xn_render_draw_models,render,reg,edx ebp esi fs gs,0,,CF,eax ecx edx ebx ebp esi edi,0,known,"outputs overridden: xn_render_draw_models: EDX (xn_model_draw's leftover) is live only into xn_render_frame's span loop, where the span routines and the span hook drop it (raster agent's overrides); xn_render_frame reads CF. Backed by xn_abi.py clobber; clobber overridden: see outputs"
+12A814,xn_render_draw_flats,render,reg,eax ecx edx ebx ebp esi edi fs gs,0,,CF,eax ecx edx ebx ebp esi edi,0,known,outputs overridden: xn_render_draw_flats: its only caller is the RENDER-FRAME block 12A976 (popal; call 12A814; 12A97C jb; 12A97E popal; ret): xn_render_frame restores every register after it and reads CF. The block split loses that (raster agent owns 12A870). Backed by xn_abi.py clobber; clobber overridden: see outputs
 12A860,xn_render_span_mark_ends,render,reg,ebp edi,0,al,,,0,unknown,no caller: every register it may change is an output
 12A870,xn_render_frame,render,reg,eax edx ebx ebp esi edi fs gs,0,eax fs gs,,ecx edx ebx,0,known,called from the game's C (4 sites)
 12A949,xn_render_frame_row_end,render,reg,eax ecx edx ebx ebp fs gs,48,eax ecx edx ebx ebp esi edi fs gs,,,0,partial,ESP +28 at the return at 12A94D
@@ -261,13 +261,13 @@ va,name,subsystem,convention,inputs,stack_args,outputs,flags_out,clobber,ret_pop
 12B47E,xn_mouse_read_motion,mouse,reg,eax edx,0,fs,,eax edx,0,known,called from the game's C (2 sites)
 12B49E,xn_mouse_set_position,mouse,reg,eax edx,0,fs,,eax ecx edx ebx esi edi,0,known,called from the game's C (3 sites)
 12D40E,xn_pal_find_nearest,pal,watcom,cl dl bl,0,al,,ah eax.u ecx edx ebx,0,known,
-12D481,xn_pal_find_nearest_hsv,pal,reg,cx dx bx,0,eax cx dx bx,,,0,unknown,no caller: every register it may change is an output
+12D481,xn_pal_find_nearest_hsv,pal,watcom,cx dx bx,0,eax,,ecx edx ebx,0,unknown,no caller: every register it may change is an output; outputs overridden: dead (no caller): the nearest index; BX CX DX are the last entry's HSV from xn_pal_rgb_to_hsv; clobber overridden: dead (no caller): BX CX DX are the last entry's HSV from xn_pal_rgb_to_hsv
 12D514,xn_pal_rgb_to_hsv,pal,reg,cl dl bl,0,cx dx bx,,eax ebp,0,known,
-12D6AB,xn_pal_hsv_to_rgb,pal,unknown,eax ecx edx ebx ebp esi edi fs gs,0,eax ecx edx ebx ebp esi edi,,,0,unknown,no caller: every register it may change is an output; leaves through 12D6F4 12D7A5 12D7C5 12D7E5
+12D6AB,xn_pal_hsv_to_rgb,pal,unknown,eax ecx edx ebx ebp esi edi fs gs,0,cx dx bx,,eax,0,unknown,no caller: every register it may change is an output; leaves through 12D6F4 12D7A5 12D7C5 12D7E5; outputs overridden: dead (no caller): the RGB in BX CX DX; EAX's low word is the last level computed (t); clobber overridden: dead (no caller): EAX's low word is the last level computed
 12D851,xn_pal_set,pal,watcom,eax,0,,,eax ecx ebx,0,known,called from the game's C (1 sites)
 12D887,xn_pal_get,pal,watcom,eax,0,,,eax,0,known,called from the game's C (2 sites)
 12D8AB,xn_pal_stub_empty,pal,reg,,0,,,,0,unknown,no caller: every register it may change is an output
-12D8AE,xn_pal_fade_to_black,pal,watcom,eax,0,eax,,,0,unknown,no caller: every register it may change is an output
+12D8AE,xn_pal_fade_to_black,pal,watcom,eax,0,,,eax,0,unknown,no caller: every register it may change is an output; outputs overridden: dead (no caller): EAX is the black palette's address it passed to xn_pal_fade_to; clobber overridden: dead (no caller): EAX is the black palette's address it passed to xn_pal_fade_to
 12D8BD,xn_pal_fade_to,pal,reg,eax edx,0,,,edx,0,known,called from the game's C (1 sites)
 12D94E,xn_pal_fade_write_entry,pal,reg,cl esi,0,,,eax edx ebp,0,known,
 12D970,xn_pal_build_ega16_map,pal,reg,,0,,,,0,unknown,no caller: every register it may change is an output
@@ -280,7 +280,7 @@ va,name,subsystem,convention,inputs,stack_args,outputs,flags_out,clobber,ret_pop
 12F500,xn_water_init,water,watcom,,0,,,eax edx ebx,0,known,called from the game's C (1 sites)
 12F59C,xn_water_clip_extent,water,reg,,0,,CF,eax ecx edx ebx ebp esi edi,0,known,
 12F79C,xn_water_draw,water,watcom,,0,,,eax ecx edx ebx ebp esi edi,0,known,called from the game's C (1 sites)
-12F9A0,xn_water_span,water,reg,eax ebx ebp edi,0,eax ebp,,,0,partial,
+12F9A0,xn_water_span,water,reg,eax ebx ebp edi,0,,,eax ebp,0,partial,"outputs overridden: called only through xn_water_span_fn by xn_water_draw (12F79C), which sets EAX and EBP again before reading them (12F906/12F936/12F961 and every call site; clobber test): EAX is the tint table with the last pixel, EBP the planted offset; clobber overridden: the tint table with the last pixel (EAX) and the planted offset (EBP): xn_water_draw reads neither"
 12F9E0,xn_water_span_unrolled,water,reg,ah eax.u esi edi,0,al,,ebx esi edi,0,known,
 132E80,xn_water_stub_ret,water,reg,,0,,,,0,unknown,no caller: every register it may change is an output
 135D00,xn_tex_cache_lookup,tex,reg,eax edx ebx ebp edi fs gs,0,eax edx ebx fs gs,CF,,0,known,called from the game's C (11 sites)
@@ -292,10 +292,10 @@ va,name,subsystem,convention,inputs,stack_args,outputs,flags_out,clobber,ret_pop
 136026,xn_tex_cache_init,tex,reg,eax ecx edx ebx ebp esi edi fs gs,0,fs gs,,eax ecx edx ebx,0,known,called from the game's C (1 sites)
 1360CC,xn_tex_cache_free,tex,reg,ecx edx ebx ebp esi edi fs gs,0,fs gs,,eax,0,known,
 1360EE,xn_tex_heap_alloc,tex,reg,eax ecx edx ebx ebp esi edi fs gs,0,eax fs gs,CF,ecx edx ebx ebp esi edi,0,known,
-136145,xn_tex_heap_evict,tex,reg,eax ecx edx ebx,0,ecx edx ebx,CF,,0,known,
+136145,xn_tex_heap_evict,tex,reg,eax ecx edx ebx,0,,CF,ecx edx ebx,0,known,"outputs overridden: ecx edx ebx are live only on xn_tex_heap_alloc's unreachable fatal exit (136107 jb 13611D; evict's stc at 136170 is followed by clc, so CF is always 0). Backed by xn_abi.py clobber; clobber overridden: see outputs"
 136173,xn_tex_heap_find_lru,tex,reg,,0,eax edx,,,0,known,
 1361B8,xn_tex_heap_alloc_first_fit,tex,watcom,eax,0,eax,,ecx edx ebx ebp esi edi,0,known,
-13622F,xn_tex_heap_free,tex,reg,eax,0,ecx ebx,,eax,0,known,
+13622F,xn_tex_heap_free,tex,watcom,eax,0,,,eax ecx ebx,0,known,"outputs overridden: ecx ebx are live only on xn_tex_heap_alloc's fatal exit after xn_tex_heap_evict (136107 jb 13611D: kbd/joy/render/gfx/mem shutdown, then int 21h 4Ch), whose callees' conservative inputs read every register; that jb is never taken: evict's stc at 136170 is followed by clc. Backed by xn_abi.py clobber; clobber overridden: see outputs"
 136282,xn_tex_decode_frame,tex,reg,ebx esi fs gs,0,eax fs gs,,esi,0,known,
 1362CF,xn_tex_unpack_alloc,tex,reg,eax edx ebx esi fs gs,0,eax edx edi fs gs,CF,ecx ebx ebp,0,known,
 1363D9,xn_tex_unpack_find,tex,reg,ebp edi,0,edi,CF,ecx,0,known,
@@ -319,7 +319,7 @@ va,name,subsystem,convention,inputs,stack_args,outputs,flags_out,clobber,ret_pop
 1373E2,xn_mat_identity_q28,mat,reg,eax,0,,,,0,unknown,no caller: every register it may change is an output
 1373F8,xn_mat_set_scale_thunk,mat,reg,eax,0,,,,0,unknown,no caller: every register it may change is an output
 1373FE,xn_mat_set_scale,mat,reg,eax,0,,,,0,known,
-13742B,xn_cam_scale_matrix_in_place,cam,watcom,eax,0,eax,,,0,unknown,no caller: every register it may change is an output
+13742B,xn_cam_scale_matrix_in_place,cam,watcom,eax,0,,,eax,0,unknown,no caller: every register it may change is an output; outputs overridden: dead (no caller): scales the matrix in place; EAX is only the last product's low dword; clobber overridden: dead (no caller): the asm keeps edx ebx esi
 137486,xn_mat_transform_ptr,mat,watcom,eax ecx edx ebx,0,,,eax ecx edx ebx,0,known,called from the game's C (8 sites)
 13749E,xn_mat_transform,mat,reg,eax ecx edx ebx,0,eax edx ebx,,,0,known,
 1374FC,xn_mat_transform_transposed_ptr,mat,watcom,eax ecx edx ebx,0,,,eax ecx edx ebx,0,known,called from the game's C (1 sites)
@@ -332,7 +332,7 @@ va,name,subsystem,convention,inputs,stack_args,outputs,flags_out,clobber,ret_pop
 1376E1,xn_cam_project,cam,reg,eax edx ebx,0,eax edx,,ebp,0,known,
 1376FB,xn_cam_project_scaled,cam,reg,eax edx ebx,0,eax edx,,,0,unknown,no caller: every register it may change is an output
 137725,xn_cam_scale_matrix,cam,watcom,eax edx,0,,,eax edx,0,known,called from the game's C (7 sites)
-137790,xn_cam_unscale_matrix,cam,watcom,eax,0,eax,,,0,unknown,no caller: every register it may change is an output
+137790,xn_cam_unscale_matrix,cam,watcom,eax,0,,,eax,0,unknown,no caller: every register it may change is an output; outputs overridden: dead (no caller): divides the matrix in place; EAX is only the last quotient; clobber overridden: dead (no caller): the asm keeps edx ebx esi
 137804,xn_mat_multiply,mat,watcom,eax edx ebx,0,,,eax ecx edx ebx ebp esi,0,known,
 13E600,xn_terrain_draw,terrain,reg,fs gs,0,fs gs,,eax ecx,0,known,called from the game's C (1 sites)
 13E63C,xn_terrain_build_light_list,terrain,watcom,,0,,,eax ecx edx ebx ebp esi edi,0,known,
@@ -340,14 +340,14 @@ va,name,subsystem,convention,inputs,stack_args,outputs,flags_out,clobber,ret_pop
 13E744,xn_terrain_setup_axes,terrain,watcom,,0,,,eax ecx edx ebx ebp esi edi,0,known,
 13E84F,xn_terrain_build_height_table,terrain,watcom,,0,,,eax ecx edx ebx ebp esi edi,0,known,
 13E8C8,xn_terrain_transform_grid,terrain,watcom,,0,,,eax ecx edx ebx ebp esi edi,0,known,
-13EB21,xn_terrain_face_plane_a,terrain,reg,esi edi,0,ah eax.u dh edx.u ebx ebp,CF,al ecx dl,0,known,
-13EC22,xn_terrain_face_plane_b,terrain,reg,esi edi,0,ah eax.u dh edx.u ebx ebp,CF,al ecx dl,0,known,
-13ED23,xn_terrain_draw_tri_a,terrain,reg,esi edi,0,ah eax.u dh edx.u ebp,,al ecx dl ebx edi,0,known,
-13EDCD,xn_terrain_draw_tri_b,terrain,reg,esi edi,0,ah eax.u dh edx.u bl ebx.u ebp,,al ecx dl bh edi,0,known,
-13EE77,xn_terrain_draw_tri_a_clipped,terrain,reg,bx esi edi,0,ah eax.u dh edx.u ebp,,al ecx dl ebx edi,0,known,
-13EF27,xn_terrain_draw_tri_b_clipped,terrain,reg,bx esi edi,0,ah eax.u dh edx.u bl ebx.u ebp,,al ecx dl bh edi,0,known,
+13EB21,xn_terrain_face_plane_a,terrain,reg,esi edi,0,,CF,eax ecx edx ebx ebp,0,known,"outputs overridden: its callers are 13ED23 13EE77 13EFD7 (terrain): the row's ah eax.u dh edx.u ebx ebp are partial-register artifacts (13EFD7 reads them only through `and eax, 0F8h`, `and edx, 3Fh`, `and ebx, 7F00h` after loading their low bytes, and passes ebp to asm callees that set it before use); backed by xn_abi.py clobber; clobber overridden: terrain-internal: the leftovers of the cross product and plane test; only CF is a result (backed by xn_abi.py clobber)"
+13EC22,xn_terrain_face_plane_b,terrain,reg,esi edi,0,,CF,eax ecx edx ebx ebp,0,known,outputs overridden: as 0x13EB21 (the other triangle of a cell): its callers 13EDCD 13EF27 read only CF; clobber overridden: as 0x13EB21 (backed by xn_abi.py clobber)
+13ED23,xn_terrain_draw_tri_a,terrain,reg,esi edi,0,,,eax ecx edx ebx ebp edi,0,known,"outputs overridden: called only by 13EFD7, which reads the row's ah eax.u dh edx.u ebp only as artifacts (partial-register loads before `and reg, imm`; ebp set before use by its asm callees); clobber overridden: terrain-internal: the triangle goes to memory (backed by xn_abi.py clobber)"
+13EDCD,xn_terrain_draw_tri_b,terrain,reg,esi edi,0,,,eax ecx edx ebx ebp edi,0,known,outputs overridden: as 0x13ED23; clobber overridden: as 0x13ED23 (backed by xn_abi.py clobber)
+13EE77,xn_terrain_draw_tri_a_clipped,terrain,reg,bx esi edi,0,,,eax ecx edx ebx ebp edi,0,known,outputs overridden: as 0x13ED23; clobber overridden: as 0x13ED23 (backed by xn_abi.py clobber)
+13EF27,xn_terrain_draw_tri_b_clipped,terrain,reg,bx esi edi,0,,,eax ecx edx ebx ebp edi,0,known,outputs overridden: as 0x13ED23; clobber overridden: as 0x13ED23 (backed by xn_abi.py clobber)
 13EFD7,xn_terrain_draw_cells,terrain,reg,fs gs,0,fs gs,CF,eax ecx edx ebx ebp esi edi,0,known,
-13F3C1,xn_terrain_setup_tex_gradients,terrain,reg,,0,ebp edi,,eax ecx edx ebx esi,0,known,
+13F3C1,xn_terrain_setup_tex_gradients,terrain,watcom,,0,,,eax ecx edx ebx ebp esi edi,0,known,"outputs overridden: called only at the start of 13EFD7, whose next reader of ebp/edi is xn_tex_cache_lookup's pass-through of them (its inputs ebp edi come from the conservative calls into the game in xn_tex_load_archive); clobber overridden: the texture origins and axes go to memory (backed by xn_abi.py clobber)"
 13F4CC,xn_terrain_u_axis_x,terrain,reg,edi,0,ecx,,,0,partial,
 13F4F4,xn_terrain_u_axis_z,terrain,reg,edi,0,ecx,,,0,partial,
 13F51C,xn_terrain_u_axis_neg_x,terrain,reg,edi,0,ecx,,,0,partial,
@@ -361,11 +361,11 @@ va,name,subsystem,convention,inputs,stack_args,outputs,flags_out,clobber,ret_pop
 13FF65,xn_model_calc_face_uv_axes,model,reg,ebx esi edi,0,,,eax edx ebp,0,known,
 1401D4,xn_model_submit,model,watcom,eax edx,0,,,eax ecx edx,0,known,called from the game's C (8 sites)
 1401E0,xn_model_cull_and_queue,model,reg,al edi,0,,,eax ecx edx ebx ebp esi edi,0,known,
-140284,xn_model_draw,model,reg,edx edi fs gs,0,edx fs gs,CF,eax ecx ebx ebp esi edi,0,known,
+140284,xn_model_draw,model,reg,edx edi fs gs,0,,CF,eax ecx edx ebx ebp esi edi,0,known,outputs overridden: xn_model_draw: EDX is a leftover of xn_model_draw_faces / xn_poly_project_face that reaches only xn_render_draw_models' EDX (see 12A7D0); callers read CF. Backed by xn_abi.py clobber; clobber overridden: see outputs
 140369,xn_model_set_frame,model,reg,eax edx,0,eax edx,,,0,unknown,no caller: every register it may change is an output
 14037A,xn_model_set_frame_regs,model,reg,eax ebx esi,0,eax edx,,ebx,0,known,
-1403AF,xn_model_draw_faces,model,reg,esi fs gs,0,edx fs gs,CF,eax ecx ebx ebp esi edi,0,known,
-1404FA,xn_model_transform_face_verts,model,reg,edx esi,0,edx bx,,eax ecx ebx.u ebp esi edi,0,known,
+1403AF,xn_model_draw_faces,model,reg,esi fs gs,0,,CF,eax ecx edx ebx ebp esi edi,0,known,outputs overridden: xn_model_draw_faces: EDX as xn_model_draw's (see 140284); its caller reads CF. Backed by xn_abi.py clobber; clobber overridden: see outputs
+1404FA,xn_model_transform_face_verts,model,reg,edx esi,0,bx,,eax ecx edx ebx.u ebp esi edi,0,known,"outputs overridden: xn_model_transform_face_verts: the outcodes' AND/OR in BX; EDX (the last vertex's projection leftovers) is overwritten by xn_model_draw_faces before any read but on its last face, where it reaches the dropped EDX chain (see 140284). Backed by xn_abi.py clobber; clobber overridden: see outputs"
 140606,xn_model_build_light_list,model,watcom,,0,,,eax ecx edx ebx ebp esi edi,0,known,
 1406D6,xn_model_scale_matrix,model,reg,,0,edx,,eax ecx ebx ebp esi edi,0,known,
 140790,xn_model_calc_face_planes,model,reg,eax,0,,,,0,known,
@@ -403,13 +403,13 @@ va,name,subsystem,convention,inputs,stack_args,outputs,flags_out,clobber,ret_pop
 1438DC,xn_gfx_build_row_offsets,gfx,watcom,,0,,,eax ecx edx ebx ebp esi edi,0,known,
 1438FC,xn_gfx_set_clip,gfx,watcom,eax ecx edx ebx,0,,,eax ecx edx ebx ebp esi edi,0,known,
 143914,xn_gfx_clear,gfx,reg,eax,0,,,,0,known,called from the game's C (5 sites)
-143924,xn_gfx_drv0_clear,gfx,reg,eax,0,eax ecx edx edi,,,0,partial,
+143924,xn_gfx_drv0_clear,gfx,watcom,eax,0,,,eax ecx edx edi,0,partial,"outputs overridden: called only through the driver table xn_gfx_drv_clear by xn_gfx_clear (143914), which saves every register around the call (pushad/popad): its fill dword, count, offset and end pointer reach no caller; clobber overridden: its fill dword, count, offset and end pointer: xn_gfx_clear (pushad/popad) is its only caller"
 14395C,xn_gfx_present,gfx,reg,eax ecx edx esi edi,0,,,ah,0,known,
-14396C,xn_gfx_drv0_present,gfx,reg,eax ecx edx esi edi,0,eax ecx edx esi edi,,,0,partial,
+14396C,xn_gfx_drv0_present,gfx,reg,eax ecx edx esi edi,0,,,eax ecx edx esi edi,0,partial,"outputs overridden: called only through the driver table xn_gfx_drv_present by xn_gfx_present (14395C), which saves every register around the call (pushad/popad): the copy routines' registers reach no caller; clobber overridden: the copy routines' registers: xn_gfx_present (pushad/popad) is its only caller"
 143A28,xn_gfx_get_cursor_pos,gfx,reg,al eax.u ecx edx esi edi,0,eax ecx edx ebx esi edi,,,0,unknown,no caller: every register it may change is an output
 143A3F,xn_gfx_set_cursor_pos,gfx,reg,eax ecx edx esi edi,0,eax ecx edx ebx esi edi,,,0,unknown,no caller: every register it may change is an output
 143B80,xn_gfx_copy_and_clear,gfx,reg,ecx esi edi,0,eax ecx esi edi,,,0,partial,
-143BB0,xn_gfx_copy_and_clear_unrolled,gfx,reg,eax ecx esi edi,0,eax ecx edx esi edi,,,0,unknown,no caller: every register it may change is an output
+143BB0,xn_gfx_copy_and_clear_unrolled,gfx,reg,eax ecx esi edi,0,,,eax ecx edx esi edi,0,unknown,no caller: every register it may change is an output; outputs overridden: dead (no caller): its registers are its loop's; clobber overridden: dead (no caller): its registers are its loop's
 144BFC,xn_gfx_copy_rows,gfx,reg,ecx esi edi,0,ecx esi edi,,,0,unknown,address escapes (escape): every register it may change is an output
 144C0D,xn_gfx_drv0_shutdown,gfx,reg,,0,,,,0,partial,
 144D00,xn_draw_fill_rect,draw,watcom,eax ecx edx ebx,0,,,eax ecx edx ebx,0,known,called from the game's C (13 sites)
@@ -430,10 +430,10 @@ va,name,subsystem,convention,inputs,stack_args,outputs,flags_out,clobber,ret_pop
 144FC8,xn_draw_image_transparent_regs,draw,reg,eax ecx edx ebx esi,0,eax ecx edx ebx,,ebp esi edi,0,known,
 14501C,xn_draw_transparent_row,draw,reg,esi edi,0,al,,,0,known,
 147820,xn_img_remap_colours,img,reg,eax,0,,,,0,unknown,no caller: every register it may change is an output
-147848,xn_draw_remap_rect,draw,reg,eax ecx edx ebx,4,eax ecx,,,4,unknown,no caller: every register it may change is an output
+147848,xn_draw_remap_rect,draw,watcom,eax ecx edx ebx,4,,,eax ecx edx ebx,4,unknown,"no caller: every register it may change is an output; outputs overridden: dead (no caller): EAX and ECX are 0x147858's leftovers (the last colour, the row count); clobber overridden: dead (no caller): Watcom's convention for (buf, skip, w, h, [stack] table)"
 147858,xn_draw_remap_rect_regs,draw,reg,eax ecx edx ebx ebp,0,eax ecx,,ebp,0,known,
 149E00,xn_mem_init,mem,reg,eax ecx edx ebx ebp esi edi fs gs,0,fs gs,,eax edx ebx,0,known,ESP -32 at the return at 149EF7; called from the game's C (1 sites)
-149EF8,xn_mem_shutdown,mem,reg,ecx edx ebx ebp esi edi fs gs,0,fs gs,CF PF AF ZF SF OF,ah edx,0,known,called from the game's C (1 sites)
+149EF8,xn_mem_shutdown,mem,reg,ecx edx ebx ebp esi edi fs gs,0,fs gs,,ah edx,0,known,"called from the game's C (1 sites); flags_out overridden: live: the only site with flags live after it is C32D1, xn_world's out-of-memory exit, where they reach only int 21h 09h and 4C00h (the analysis' every-register-live int); nothing tests them (xn_abi.py clobber 149EF8)"
 149F0C,xn_mem_lock_region,mem,reg,eax edx ebp fs gs,0,fs gs,,eax ecx edx ebx esi edi,0,known,ESP -32 at the return at 149F4B
 149F4C,xn_sys_install_divide_handler,sys,reg,ebp fs gs,0,fs gs,,eax ecx edx ebx edi,0,known,
 149F98,xn_sys_remove_divide_handler,sys,reg,ecx.u,0,,,eax,0,known,
@@ -471,18 +471,18 @@ va,name,subsystem,convention,inputs,stack_args,outputs,flags_out,clobber,ret_pop
 14A0C8,xn_sys_divfault_skip2,sys,reg,ecx ebx ebp esi edi fs gs,8,eax edx,,,0,known,
 14A0CF,xn_sys_divfault_return,sys,interrupt,eax ecx ebx ebp esi edi fs gs,8,edx,,,0,known,
 14A300,xn_collide_segment_model,collide,watcom,eax ecx edx ebx,0,eax,,ecx edx ebx esi edi,0,known,called from the game's C (9 sites)
-14A6C0,xn_collide_model_model,collide,reg,eax edx ebx,0,eax edx ebx,,,0,unknown,no caller: every register it may change is an output
+14A6C0,xn_collide_model_model,collide,watcom,eax edx ebx,0,eax,,edx ebx,0,unknown,"no caller: every register it may change is an output; outputs overridden: dead (no caller): the natural result, 0 or -1; EDX and EBX are xn_collide_sphere_sphere's high dword and d^2; clobber overridden: dead: the bounding test's leftovers"
 14A710,xn_collide_model_model_detail,collide,reg,,12,eax ecx edx ebx ebp esi edi,,,0,unknown,ESP +16 at the return at 14AA65; no caller: every register it may change is an output
 14AA92,xn_collide_spheres_model,collide,unknown,eax ecx edx ebx ebp esi edi,0,eax ecx ebp esi edi,,edx ebx,0,known,called from the game's C (7 sites); stack use not followed
-14AF30,xn_collide_segment_spheres,collide,reg,eax edx ebx,0,eax edx ebx,,,0,unknown,no caller: every register it may change is an output
-14B017,xn_collide_spheres_spheres,collide,reg,eax edx,0,eax edx,,,0,unknown,no caller: every register it may change is an output
-14B19B,xn_collide_miss_stk,collide,reg,,0,eax,,,8,unknown,no caller: every register it may change is an output
+14AF30,xn_collide_segment_spheres,collide,watcom,eax edx ebx,0,eax,,edx ebx,0,unknown,no caller: every register it may change is an output; outputs overridden: dead (no caller): 0 or -1; EDX and EBX are the last segment-sphere test's leftovers; clobber overridden: dead: leftovers
+14B017,xn_collide_spheres_spheres,collide,watcom,eax edx,0,eax,,edx,0,unknown,no caller: every register it may change is an output; outputs overridden: dead (no caller): the hit list or -1; EDX is the last sphere-sphere test's high dword; clobber overridden: dead: leftover
+14B19B,xn_collide_miss_stk,collide,reg,,8,eax,,,8,unknown,"no caller: every register it may change is an output; stack_args overridden: dead stub: it loads two stack arguments ([ebp+8], [ebp+0Ch]) and pops them (ret 8)"
 14B1B1,xn_collide_miss,collide,watcom,,0,eax,,ebp esi edi,0,known,
 14B1B7,xn_collide_ref_helpers,collide,reg,eax ecx edx ebx esi edi,0,eax ecx edx ebx esi edi,,,0,unknown,no caller: every register it may change is an output
 14B1C7,xn_collide_segment_flat_stk,collide,reg,eax ecx edx ebx fs gs,12,eax fs gs,,ecx edx ebx esi edi,12,known,called from the game's C (1 sites)
 14B1E0,xn_collide_segment_flat,collide,reg,eax ecx edx ebx ebp esi edi fs gs,0,eax fs gs,,ecx edx ebx ebp esi edi,0,known,
 14B45B,xn_terrain_height_at,terrain,reg,eax edx bh ebx.u,0,eax,,edx,0,known,called from the game's C (18 sites)
-14B58E,xn_collide_build_model_spheres,collide,reg,eax edx ebx,0,eax edx ebx,,,0,unknown,no caller: every register it may change is an output
+14B58E,xn_collide_build_model_spheres,collide,reg,eax edx ebx,0,eax edx,,ebx,0,unknown,"no caller: every register it may change is an output; outputs overridden: dead (a tool's sphere builder, no caller): the bytes written and the spheres' count; EBX is a leftover; clobber overridden: dead: leftover"
 14BC00,xn_math_isqrt,math,reg,eax ecx,0,eax,,edx ebx,0,known,called from the game's C (4 sites)
 14BC34,xn_math_isqrt64,math,reg,eax ecx edx,0,eax,,edx,0,known,
 14BC74,xn_vec_blend,vec,reg,eax ecx edx ebx,0,eax edx ebx,,,0,unknown,no caller: every register it may change is an output
@@ -499,30 +499,30 @@ va,name,subsystem,convention,inputs,stack_args,outputs,flags_out,clobber,ret_pop
 14C021,xn_math_triangle_y_at,math,watcom,eax edx ebx,0,eax,,ecx edx ebx ebp esi edi,0,known,
 14C111,xn_collide_line_plane_point,collide,reg,eax ecx edx ebx esi edi,0,eax ecx edx ebx,,,0,unknown,no caller: every register it may change is an output
 14C1DD,xn_collide_vline_plane_point,collide,reg,eax ecx edx ebx esi edi,0,eax ecx edx ebx,,,0,unknown,no caller: every register it may change is an output
-14C25F,xn_collide_plane_distance,collide,reg,eax ecx edx ebx esi,0,eax edx ebx,,,0,unknown,no caller: every register it may change is an output
+14C25F,xn_collide_plane_distance,collide,reg,eax ecx edx ebx esi,0,eax,,edx ebx,0,unknown,no caller: every register it may change is an output; outputs overridden: dead (no caller): the distance; EDX and EBX are the rounded sum's high dword and a partial sum; clobber overridden: dead: leftovers
 14C2AD,xn_collide_segment_plane,collide,reg,eax ecx edx ebx esi edi,0,eax ecx edx ebx,,,0,known,
 14C3D9,xn_collide_vsegment_plane,collide,reg,eax ecx edx ebx esi edi,0,eax ecx edx ebx,,,0,unknown,no caller: every register it may change is an output
-14C4A6,xn_collide_plane_plane_line,collide,reg,eax ecx edx ebx ebp,0,eax ecx edx ebx ebp esi edi,,,0,unknown,no caller: every register it may change is an output
+14C4A6,xn_collide_plane_plane_line,collide,reg,eax ecx edx ebx ebp,0,eax edx ebx,,ecx ebp esi edi,0,unknown,"no caller: every register it may change is an output; outputs overridden: dead (no caller): the point on the planes' line (garbage when they are parallel, kept); ECX EBP ESI EDI are the solve's leftovers; clobber overridden: dead: leftovers"
 14C711,xn_collide_sphere_plane,collide,reg,eax ecx edx ebx esi edi,0,eax edx ebx,,,0,known,
-14C762,xn_collide_sphere_plane_xz,collide,reg,eax ecx ebx esi edi,0,eax edx ebx,,,0,unknown,no caller: every register it may change is an output
-14C79D,xn_collide_sphere_plane_yz,collide,reg,ecx edx ebx esi edi,0,eax edx ebx,,,0,unknown,no caller: every register it may change is an output
+14C762,xn_collide_sphere_plane_xz,collide,reg,eax ecx ebx esi edi,0,eax edx,,ebx,0,unknown,no caller: every register it may change is an output; outputs overridden: dead (no caller): r - |d| and d; EBX is a product's low dword; clobber overridden: dead: leftover
+14C79D,xn_collide_sphere_plane_yz,collide,reg,ecx edx ebx esi edi,0,eax edx,,ebx,0,unknown,no caller: every register it may change is an output; outputs overridden: dead (no caller): as 14C762; clobber overridden: dead: leftover
 14C7DA,xn_collide_sphere_plane_z,collide,reg,ecx esi edi,0,eax,,,0,unknown,no caller: every register it may change is an output
 14C7E5,xn_collide_segment_sphere_fx,collide,reg,eax ecx edx ebx esi edi,0,eax esi,,edx ebx edi,0,known,
 14C904,xn_collide_segment_sphere,collide,reg,eax ecx edx ebx esi edi,0,eax edx ebx,,ecx esi edi,0,known,
-14C9D2,xn_collide_segment_sphere_approx,collide,reg,eax ecx edx ebx esi edi,0,eax edx ebx esi,,,0,unknown,no caller: every register it may change is an output
+14C9D2,xn_collide_segment_sphere_approx,collide,reg,eax ecx edx ebx esi edi,0,eax,,edx ebx esi,0,unknown,"no caller: every register it may change is an output; outputs overridden: dead (no caller): the first non-negative test; EDX EBX are xn_vec_length_approx's terms, ESI a point; clobber overridden: dead: leftovers"
 14CA44,xn_collide_sphere_sphere,collide,reg,eax ecx edx ebx esi edi,0,eax edx ebx,,ecx,0,known,
-14CA83,xn_collide_sphere_sphere_approx,collide,reg,eax ecx edx ebx esi edi,0,eax edx ebx,,,0,unknown,no caller: every register it may change is an output
+14CA83,xn_collide_sphere_sphere_approx,collide,reg,eax ecx edx ebx esi edi,0,eax,,edx ebx,0,unknown,no caller: every register it may change is an output; outputs overridden: dead (no caller): r1 + r2 - the distance; EDX EBX are xn_vec_length_approx's terms; clobber overridden: dead: leftovers
 14CA97,xn_collide_point_in_sphere,collide,reg,eax ecx edx ebx esi,0,eax,,edx ebx,0,known,
 14CAD8,xn_collide_point_in_sphere_approx,collide,reg,eax ecx edx ebx esi,0,eax edx ebx,,,0,known,
 14CAEA,xn_collide_point_in_cylinder,collide,reg,eax ecx edx ebx esi edi,0,eax,,ecx edx ebp esi edi,0,known,
-14CB24,xn_collide_point_in_box,collide,reg,eax ecx edx ebx esi,0,eax edx ebx,,,0,unknown,no caller: every register it may change is an output
-14CB4F,xn_collide_point_in_cube,collide,reg,eax ecx edx ebx esi,0,eax edx ebx,,,0,unknown,no caller: every register it may change is an output
+14CB24,xn_collide_point_in_box,collide,reg,eax ecx edx ebx esi,0,eax,,edx ebx,0,unknown,no caller: every register it may change is an output; outputs overridden: dead (no caller): the sign test; EDX and EBX are its per-axis terms; clobber overridden: dead: leftovers
+14CB4F,xn_collide_point_in_cube,collide,reg,eax ecx edx ebx esi,0,eax,,edx ebx,0,unknown,no caller: every register it may change is an output; outputs overridden: dead (no caller): as 14CB24; clobber overridden: dead: leftovers
 14CB78,xn_math_rotate_xz,math,reg,eax edx ebx,0,eax edx,,ebx,0,unknown,"no caller: every register it may change is an output; outputs overridden: dead: the rotated (x, z); EBX is the angle masked to 11 bits; clobber overridden: dead: EBX is the angle masked to 11 bits"
 14D200,xn_shade_load_haze,shade,reg,eax ecx ebp esi edi fs gs,0,,,,0,unknown,no caller: every register it may change is an output
 14D23C,xn_shade_set_fog,shade,watcom,eax,0,,,eax ecx edx ebx,0,known,called from the game's C (7 sites)
 14D300,xn_shade_fog_span_off,shade,reg,,0,,,,0,partial,
 14D320,xn_shade_fog_pixels,shade,reg,ecx edx edi,0,eax ecx,,,0,known,
-150040,xn_shade_fog_span,shade,reg,edx ebx ebp esi edi,0,eax ecx edx ebx ebp edi,,,0,partial,
+150040,xn_shade_fog_span,shade,reg,edx ebx ebp esi edi,0,,,eax ecx edx ebx ebp edi,0,partial,"outputs overridden: xn_shade_fog_span, the span hook: its one caller xn_render_frame (call [xn_render_span_hook] at 12A940) reloads EAX EBX EBP EDI ESI before reading them (12A917..12A928); ECX and EDX reach only xn_render_draw_flats through 12A969's pushad/popad and 12A97C's popad, which overwrites them. The analysis keeps them live because it treats the frame's run-time blocks as functions of their own. Backed by xn_abi.py clobber; clobber overridden: xn_shade_fog_span: see outputs"
 152B00,xn_joy_init,joy,reg,edx.u ebp esi edi fs gs,0,fs gs,,eax ecx edx ebx,0,known,called from the game's C (1 sites)
 152BA8,xn_joy_shutdown,joy,reg,,0,,,ah,0,known,called from the game's C (1 sites)
 152BDC,xn_joy_reset_range,joy,watcom,,0,,,eax ecx edx ebx,0,known,called from the game's C (1 sites)
@@ -534,15 +534,15 @@ va,name,subsystem,convention,inputs,stack_args,outputs,flags_out,clobber,ret_pop
 152F3F,xn_joy_timer_isr_pop_ds,joy,reg,fs gs,40,eax ecx edx ebx ebp esi edi,,,0,known,
 152F40,xn_joy_timer_isr_iret,joy,interrupt,fs gs,40,eax ecx edx ebx ebp esi edi,,,0,known,
 15310C,xn_draw_hline,draw,watcom,eax edx ebx,0,,,eax ecx edx ebx ebp edi,0,known,
-15317C,xn_draw_vline_keep_regs,draw,reg,eax edx ebx,0,ecx edx,,,0,unknown,no caller: every register it may change is an output
-153188,xn_draw_vline,draw,reg,eax ecx edx,0,ecx edx,,ebp edi,0,known,
+15317C,xn_draw_vline_keep_regs,draw,watcom,eax edx ebx,0,,,eax ecx edx ebx,0,unknown,"no caller: every register it may change is an output; outputs overridden: dead (no caller): a vertical line (x, y1, y2); ECX and EDX are xn_draw_vline's leftovers; clobber overridden: dead (no caller): Watcom's convention for (x, y1, y2), and ECX, which it changes"
+153188,xn_draw_vline,draw,reg,eax ecx edx,0,,,ecx edx ebp edi,0,known,"outputs overridden: ECX and EDX (its row count and the colour byte it leaves) are read only after the calls in the dead 0x15317C and 0x15E45C; xn_draw_line_unclipped (0x153210) tail-jumps to it with nothing live after; tools/xn_abi.py clobber 0x153188 scrambles them; clobber overridden: ECX and EDX are read only by dead callers (0x15317C, 0x15E45C)"
 1531F0,xn_draw_line,draw,watcom,eax ecx edx ebx,0,,,eax ecx edx ebx,0,known,called from the game's C (2 sites)
 153204,xn_draw_line_nosave,draw,watcom,eax ecx edx ebx,0,,,eax ecx edx ebx ebp esi edi,0,known,
 153210,xn_draw_line_unclipped,draw,watcom,eax ecx edx ebx,0,,,eax ecx edx ebx ebp esi edi,0,known,
 1532B4,xn_draw_line_to,draw,watcom,eax edx,0,,,eax edx,0,known,called from the game's C (12 sites)
 1532D4,xn_draw_line_clip,draw,reg,eax ecx edx ebx,0,eax ecx edx ebx,CF,ebp esi edi,0,known,
 153500,xn_helmet_open,helmet,reg,eax ecx edx ebx ebp esi edi fs gs CF,0,,,eax ecx edx ebx esi edi,0,known,called from the game's C (2 sites)
-153530,xn_helmet_close,helmet,reg,ecx edx ebx esi,0,eax ecx edx ebx esi,,,0,unknown,no caller: every register it may change is an output
+153530,xn_helmet_close,helmet,reg,ecx edx ebx esi,0,,,eax edx,0,unknown,no caller: every register it may change is an output; outputs overridden: dead: unreferenced; it closes the tracker and the port; clobber overridden: dead: EAX and EDX are the port and the driver offset
 153550,xn_helmet_request,helmet,reg,,0,,,,0,unknown,no caller: every register it may change is an output
 15356C,xn_helmet_poll,helmet,reg,edx ebx esi,0,,,,0,unknown,no caller: every register it may change is an output
 1535A4,xn_helmet_smooth,helmet,reg,eax edx ebx,0,eax edx ebx,,ecx ebp esi edi,0,known,
@@ -550,98 +550,98 @@ va,name,subsystem,convention,inputs,stack_args,outputs,flags_out,clobber,ret_pop
 15370C,xn_str_char_upper,str,reg,al,0,al,,,0,unknown,no caller: every register it may change is an output
 153718,xn_str_copy,str,watcom,eax edx,0,,,eax edx,0,known,
 153728,xn_str_nop,str,reg,,0,,,,0,unknown,no caller: every register it may change is an output
-15372C,xn_str_insert_char,str,reg,al esi edi,0,al,,,0,unknown,no caller: every register it may change is an output
-15373C,xn_str_delete_char,str,reg,eax edx,0,al edx,,,0,unknown,no caller: every register it may change is an output
+15372C,xn_str_insert_char,str,reg,al esi edi,0,,,al,0,unknown,no caller: every register it may change is an output; outputs overridden: dead: the string changes in memory; AL ends as the terminator moved; clobber overridden: dead: AL ends as the terminator moved
+15373C,xn_str_delete_char,str,watcom,eax edx,0,,,eax edx,0,unknown,no caller: every register it may change is an output; outputs overridden: dead: the string changes in memory; AL and EDX are the last byte moved and its address; clobber overridden: dead: AL and EDX are the last byte moved and its address
 15374C,xn_str_length,str,watcom,eax,0,eax,,,0,unknown,no caller: every register it may change is an output
 15375C,xn_font_string_width,font,watcom,eax,0,eax,,,0,unknown,no caller: every register it may change is an output
 15377E,xn_str_find_char,str,reg,eax dl,0,eax,,,0,unknown,no caller: every register it may change is an output
-153798,xn_font_string_width_n,font,reg,eax edx,0,eax edx,,,0,unknown,no caller: every register it may change is an output
-153900,xn_str_from_int,str,reg,eax edx ebx,0,edx,,eax,0,known,
+153798,xn_font_string_width_n,font,watcom,eax edx,0,eax,,edx,0,unknown,"no caller: every register it may change is an output; outputs overridden: dead (no caller): returns the width in EAX; EDX is the count left; clobber overridden: dead (no caller): Watcom's convention for (text, n)"
+153900,xn_str_from_int,str,reg,eax edx ebx,0,,,eax edx,0,known,"outputs overridden: live: the only site reading EDX after it is 14D20B in the dead xn_shade_load_haze, and there only through the game malloc 0xA10A8's summary; the font and shade loaders do not (xn_abi.py clobber 153900); clobber overridden: EDX is the last digit's remainder (or the destination when ndigits is 1)"
 15392C,xn_str_to_int,str,watcom,eax,0,eax,,ecx edx ebp esi edi,0,known,
-153964,xn_str_copy_word_max80,str,reg,esi edi,0,al esi edi,,,0,unknown,no caller: every register it may change is an output
+153964,xn_str_copy_word_max80,str,reg,esi edi,0,,,al esi edi,0,unknown,"no caller: every register it may change is an output; outputs overridden: dead: the copy goes to memory; AL, ESI and EDI are the last byte and the two pointers; clobber overridden: dead: AL, ESI and EDI are the last byte and the two pointers"
 153978,xn_rand_seed_from_ticks,rand,reg,,0,,,,0,unknown,no caller: every register it may change is an output
 153990,xn_rand_next,rand,watcom,,0,eax,,,0,known,
 154D00,xn_flat_add,flat,watcom,eax ecx edx ebx,12,eax,,ecx edx ebx esi edi,12,known,called from the game's C (14 sites)
 154D20,xn_flat_add_body,flat,reg,eax ecx edx ebx ebp esi edi,0,edi,,eax ecx edx ebx ebp esi,0,known,
 154DA5,xn_flat_add_view,flat,watcom,eax ecx edx ebx,0,,,eax ecx edx ebx ebp esi,0,known,
-154E20,xn_flat_draw,flat,reg,ebp esi edi fs gs,12,edx ebx ebp esi edi fs gs,CF,eax ecx,0,known,
+154E20,xn_flat_draw,flat,reg,ebp esi edi fs gs,12,,CF,eax ecx edx ebx ebp esi edi,0,known,outputs overridden: xn_flat_draw: its caller xn_render_draw_flats (12A84B) reads CF; the registers are live only through the RENDER-FRAME block split (12A976 popal; call draw_flats; xn_render_frame restores every register). Backed by xn_abi.py clobber; clobber overridden: see outputs
 154EDC,xn_flat_quad_centred,flat,reg,eax edx edi,0,eax ecx edx ebx ebp esi,,,0,partial,
 154FD4,xn_flat_quad_none,flat,reg,,0,,,,0,partial,
 154FD8,xn_flat_quad_standing,flat,reg,eax edx edi,0,eax ecx edx ebx ebp esi,,,0,partial,
 1550BC,xn_flat_quad_none_8,flat,reg,,0,,,,0,partial,
 1550C0,xn_flat_quad_none_16,flat,reg,,0,,,,0,partial,
-1550E0,xn_flat_setup_gradients,flat,reg,eax,0,ebx ebp,,ecx edx esi edi,0,known,
-155200,xn_flat_span_clip,flat,reg,eax ecx edx ebx ebp esi edi fs gs,36,eax edx fs gs,,ebx ebp esi,0,known,
-15526C,xn_flat_span_emit,flat,reg,eax ecx edx ebx ebp edi fs gs,36,eax edx fs gs,,ebx ebp esi,0,known,
-1552A0,xn_flat_raster,flat,reg,eax ebp fs gs,20,edx ebx ebp esi edi fs gs,,eax ecx,0,known,
-155332,xn_flat_raster_rows,flat,reg,ecx edx ebx ebp esi edi fs gs,20,eax ecx edx ebx ebp esi edi,,,0,unknown,no caller: every register it may change is an output
+1550E0,xn_flat_setup_gradients,flat,reg,eax,0,,,ecx edx ebx ebp esi edi,0,known,"outputs overridden: xn_flat_setup_gradients: its one caller xn_flat_raster (1552AC) overwrites EBP at once and EBX before any read but its own early return (the flat chain's spurious outputs). Backed by xn_abi.py clobber; clobber overridden: see outputs (EAX, the top row, is kept: xn_flat_raster reads it after)"
+155200,xn_flat_span_clip,flat,reg,eax ecx edx ebx ebp esi edi fs gs,36,,,eax edx ebx ebp esi,0,known,"outputs overridden: xn_flat_span_clip: EAX EDX come from the flat span routines (no outputs, raster agent) and reach xn_flat_raster's spurious outputs only. Backed by xn_abi.py clobber; clobber overridden: see outputs"
+15526C,xn_flat_span_emit,flat,reg,eax ecx edx ebx ebp edi fs gs,36,,,eax edx ebx ebp esi,0,known,outputs overridden: xn_flat_span_emit: as xn_flat_span_clip. Backed by xn_abi.py clobber; clobber overridden: see outputs
+1552A0,xn_flat_raster,flat,reg,eax ebp fs gs,20,,,eax ecx edx ebx ebp esi edi,0,known,outputs overridden: xn_flat_raster: its caller xn_poly_project_flat returns at once into xn_flat_draw (the flat chain from the 12A976 block split). Backed by xn_abi.py clobber; clobber overridden: see outputs
+155332,xn_flat_raster_rows,flat,reg,ecx edx ebx ebp esi edi fs gs,20,,,eax ecx edx ebx ebp esi edi,0,unknown,no caller: every register it may change is an output; outputs overridden: xn_flat_raster_rows: dead (an entry inside 1552A0's row loop; no caller); clobber overridden: dead (no caller)
 1553D8,xn_flat_rotate_offset,flat,reg,ecx ebp,0,eax edx ebx ebp,,ecx,0,known,
 155415,xn_flat_begin_frame,flat,reg,,0,esi,,eax ecx edx ebx edi,0,known,
 155508,xn_flat_pick,flat,reg,eax edx ebx ebp fs gs,0,eax fs gs,,ecx edx ebx esi edi,0,known,
-155610,xn_flat_span_light_setup,flat,reg,eax ecx edx ebx ebp esi edi,0,eax ecx edx ebx ebp edi,,,0,partial,
-155800,xn_span_solid,span,reg,eax ebp edi,0,eax ecx edi,,,0,partial,
-155820,xn_span_solid_shaded_setup,span,reg,eax ebp edi,0,eax ecx ebx edi,,,0,partial,
-155880,xn_span_solid_lit_tail,span,reg,al eax.u ecx ebp edi,0,ah ecx dl,,,0,known,
-155920,xn_span_solid_lit,span,reg,eax ebx ebp esi edi,0,eax ecx edx ebx ebp esi edi,,,0,partial,
-155C00,xn_span_tex_tail,span,reg,eax ecx ebx esi edi,0,edx ebx,,,0,known,
-155D20,xn_span_tex_8,span,reg,eax ebx ebp esi edi,0,eax ecx edx ebx ebp esi edi,,,0,unknown,no caller: every register it may change is an output
-155F60,xn_span_tex_16_setup,span,reg,eax ebx ebp esi edi,0,eax ecx edx ebx ebp esi edi,,,0,partial,
-155F70,xn_span_tex_16,span,reg,eax ebx ebp esi edi,0,eax ecx edx ebx ebp esi edi,,,0,partial,
-156320,xn_span_tex_shaded_tail,span,reg,ah eax.u ecx ebx ebp esi edi,0,edx ebx,,eax,0,known,
-156460,xn_span_tex_shaded_8,span,reg,eax ebx ebp esi edi,0,eax ecx edx ebx ebp esi edi,,,0,partial,
-1566B4,xn_span_tex_shaded_16_setup,span,reg,eax ebx ebp esi edi,0,eax ecx edx ebx ebp esi edi,,,0,partial,
-1566C4,xn_span_tex_shaded_16,span,reg,eax ebx ebp esi edi,0,eax ecx edx ebx ebp esi edi,,,0,partial,
-156A80,xn_span_tex_lit_setup,span,reg,eax ebx ebp esi edi,0,eax ecx edx ebx ebp esi edi,,,0,partial,
-156A94,xn_span_tex_lit,span,reg,eax ebx ebp esi edi,0,eax ecx edx ebx ebp esi edi,,,0,partial,
-156D40,xn_span_tex64_tail,span,reg,eax ecx ebx esi edi,0,edx ebx,,,0,known,
-156E60,xn_span_tex64,span,reg,eax ebx ebp esi edi,0,eax ecx edx ebx ebp esi edi,,,0,unknown,no caller: every register it may change is an output
-157100,xn_span_tex64_shaded_tail,span,reg,ah eax.u ecx ebx ebp esi edi,0,al edx ebx,,ebp,0,known,
-157240,xn_span_tex64_shaded,span,reg,eax ebx ebp esi edi,0,eax ecx edx ebx ebp esi edi,,,0,partial,
-157620,xn_span_flat_transparent,span,reg,ecx ebx ebp esi edi,0,eax ecx edx ebx ebp esi edi,,,0,partial,
-157760,xn_span_flat_transparent_tail,span,reg,ecx ebx esi edi,0,eax ebx,,,0,known,
-157800,xn_span_flat_transparent_shaded,span,reg,ecx ebx ebp esi edi,0,eax ecx edx ebx ebp esi edi,,,0,partial,
-157960,xn_span_flat_transparent_shaded_tail,span,reg,ah eax.u ecx ebx esi edi,0,al edx ebx,,,0,known,
+155610,xn_flat_span_light_setup,flat,reg,eax ecx edx ebx ebp esi edi,0,,,eax ecx edx ebx ebp edi,0,partial,"outputs overridden: xn_flat_span_light_setup: called through [flat+3Ch] by xn_flat_span_emit (15527B), which pops EDI ECX back and returns into xn_flat_span_clip / xn_flat_raster (outputs dropped above); as the other flat span routines (raster agent). Backed by xn_abi.py clobber; clobber overridden: see outputs"
+155800,xn_span_solid,span,reg,eax ebp edi,0,,,eax ecx edi,0,partial,"outputs overridden: called through [poly+3Ch] by xn_render_frame (12A939), which pops EBX EBP EDI ESI back; EAX ECX EDX reach only the span hook (150040 reloads EAX and ECX and never reads EDX; 14D300 is a ret) and the next span call, which reads none of them; the analysis keeps ECX/EDX live only through the frame's run-time blocks (12A969 pushad/popad, 12A97C popad). Backed by xn_abi.py clobber (installed by 155820); clobber overridden: see outputs"
+155820,xn_span_solid_shaded_setup,span,reg,eax ebp edi,0,,,eax ecx ebx edi,0,partial,"outputs overridden: called through [poly+3Ch] by xn_render_frame (12A939), which pops EBX EBP EDI ESI back; EAX ECX EDX reach only the span hook (150040 reloads EAX and ECX and never reads EDX; 14D300 is a ret) and the next span call, which reads none of them; the analysis keeps ECX/EDX live only through the frame's run-time blocks (12A969 pushad/popad, 12A97C popad). Backed by xn_abi.py clobber (also reached by tail jumps from the setups 15BB8C/12A700/12A740 and by falling in from its setup routine); clobber overridden: see outputs"
+155880,xn_span_solid_lit_tail,span,reg,al eax.u ecx ebp edi,0,,,eax ecx edx,0,known,"outputs overridden: a planted-ret body: its planter only puts back the planted byte and returns, reading none of these. Backed by xn_abi.py clobber; clobber overridden: see outputs"
+155920,xn_span_solid_lit,span,reg,eax ebx ebp esi edi,0,,,eax ecx edx ebx ebp esi edi,0,partial,"outputs overridden: called through [poly+3Ch] by xn_render_frame (12A939), which pops EBX EBP EDI ESI back; EAX ECX EDX reach only the span hook (150040 reloads EAX and ECX and never reads EDX; 14D300 is a ret) and the next span call, which reads none of them; the analysis keeps ECX/EDX live only through the frame's run-time blocks (12A969 pushad/popad, 12A97C popad). Backed by xn_abi.py clobber (also reached by tail jumps from the setups 15BB8C/12A700/12A740 and by falling in from its setup routine); clobber overridden: see outputs"
+155C00,xn_span_tex_tail,span,reg,eax ecx ebx esi edi,0,,,edx ebx,0,known,"outputs overridden: a planted-ret body: its planter only puts back the planted byte and returns, reading none of these. Backed by xn_abi.py clobber; clobber overridden: see outputs"
+155D20,xn_span_tex_8,span,reg,eax ebx ebp esi edi,0,,,eax ecx edx ebx ebp esi edi,0,unknown,"no caller: every register it may change is an output; outputs overridden: called through [poly+3Ch] by xn_render_frame (12A939), which pops EBX EBP EDI ESI back; EAX ECX EDX reach only the span hook (150040 reloads EAX and ECX and never reads EDX; 14D300 is a ret) and the next span call, which reads none of them; the analysis keeps ECX/EDX live only through the frame's run-time blocks (12A969 pushad/popad, 12A97C popad). Backed by xn_abi.py clobber (also reached by tail jumps from the setups 15BB8C/12A700/12A740 and by falling in from its setup routine); clobber overridden: see outputs"
+155F60,xn_span_tex_16_setup,span,reg,eax ebx ebp esi edi,0,,,eax ecx edx ebx ebp esi edi,0,partial,"outputs overridden: called through [poly+3Ch] by xn_render_frame (12A939), which pops EBX EBP EDI ESI back; EAX ECX EDX reach only the span hook (150040 reloads EAX and ECX and never reads EDX; 14D300 is a ret) and the next span call, which reads none of them; the analysis keeps ECX/EDX live only through the frame's run-time blocks (12A969 pushad/popad, 12A97C popad). Backed by xn_abi.py clobber (also reached by tail jumps from the setups 15BB8C/12A700/12A740 and by falling in from its setup routine); clobber overridden: see outputs"
+155F70,xn_span_tex_16,span,reg,eax ebx ebp esi edi,0,,,eax ecx edx ebx ebp esi edi,0,partial,"outputs overridden: called through [poly+3Ch] by xn_render_frame (12A939), which pops EBX EBP EDI ESI back; EAX ECX EDX reach only the span hook (150040 reloads EAX and ECX and never reads EDX; 14D300 is a ret) and the next span call, which reads none of them; the analysis keeps ECX/EDX live only through the frame's run-time blocks (12A969 pushad/popad, 12A97C popad). Backed by xn_abi.py clobber (also reached by tail jumps from the setups 15BB8C/12A700/12A740 and by falling in from its setup routine); clobber overridden: see outputs"
+156320,xn_span_tex_shaded_tail,span,reg,ah eax.u ecx ebx ebp esi edi,0,,,eax edx ebx,0,known,"outputs overridden: a planted-ret body: its planter only puts back the planted byte and returns, reading none of these. Backed by xn_abi.py clobber; clobber overridden: see outputs"
+156460,xn_span_tex_shaded_8,span,reg,eax ebx ebp esi edi,0,,,eax ecx edx ebx ebp esi edi,0,partial,"outputs overridden: called through [poly+3Ch] by xn_render_frame (12A939), which pops EBX EBP EDI ESI back; EAX ECX EDX reach only the span hook (150040 reloads EAX and ECX and never reads EDX; 14D300 is a ret) and the next span call, which reads none of them; the analysis keeps ECX/EDX live only through the frame's run-time blocks (12A969 pushad/popad, 12A97C popad). Backed by xn_abi.py clobber (also reached by tail jumps from the setups 15BB8C/12A700/12A740 and by falling in from its setup routine); clobber overridden: see outputs"
+1566B4,xn_span_tex_shaded_16_setup,span,reg,eax ebx ebp esi edi,0,,,eax ecx edx ebx ebp esi edi,0,partial,"outputs overridden: called through [poly+3Ch] by xn_render_frame (12A939), which pops EBX EBP EDI ESI back; EAX ECX EDX reach only the span hook (150040 reloads EAX and ECX and never reads EDX; 14D300 is a ret) and the next span call, which reads none of them; the analysis keeps ECX/EDX live only through the frame's run-time blocks (12A969 pushad/popad, 12A97C popad). Backed by xn_abi.py clobber (also reached by tail jumps from the setups 15BB8C/12A700/12A740 and by falling in from its setup routine); clobber overridden: see outputs"
+1566C4,xn_span_tex_shaded_16,span,reg,eax ebx ebp esi edi,0,,,eax ecx edx ebx ebp esi edi,0,partial,"outputs overridden: called through [poly+3Ch] by xn_render_frame (12A939), which pops EBX EBP EDI ESI back; EAX ECX EDX reach only the span hook (150040 reloads EAX and ECX and never reads EDX; 14D300 is a ret) and the next span call, which reads none of them; the analysis keeps ECX/EDX live only through the frame's run-time blocks (12A969 pushad/popad, 12A97C popad). Backed by xn_abi.py clobber (also reached by tail jumps from the setups 15BB8C/12A700/12A740 and by falling in from its setup routine); clobber overridden: see outputs"
+156A80,xn_span_tex_lit_setup,span,reg,eax ebx ebp esi edi,0,,,eax ecx edx ebx ebp esi edi,0,partial,"outputs overridden: called through [poly+3Ch] by xn_render_frame (12A939), which pops EBX EBP EDI ESI back; EAX ECX EDX reach only the span hook (150040 reloads EAX and ECX and never reads EDX; 14D300 is a ret) and the next span call, which reads none of them; the analysis keeps ECX/EDX live only through the frame's run-time blocks (12A969 pushad/popad, 12A97C popad). Backed by xn_abi.py clobber (also reached by tail jumps from the setups 15BB8C/12A700/12A740 and by falling in from its setup routine); clobber overridden: see outputs"
+156A94,xn_span_tex_lit,span,reg,eax ebx ebp esi edi,0,,,eax ecx edx ebx ebp esi edi,0,partial,"outputs overridden: called through [poly+3Ch] by xn_render_frame (12A939), which pops EBX EBP EDI ESI back; EAX ECX EDX reach only the span hook (150040 reloads EAX and ECX and never reads EDX; 14D300 is a ret) and the next span call, which reads none of them; the analysis keeps ECX/EDX live only through the frame's run-time blocks (12A969 pushad/popad, 12A97C popad). Backed by xn_abi.py clobber (also reached by tail jumps from the setups 15BB8C/12A700/12A740 and by falling in from its setup routine); clobber overridden: see outputs"
+156D40,xn_span_tex64_tail,span,reg,eax ecx ebx esi edi,0,,,edx ebx,0,known,"outputs overridden: a planted-ret body: its planter only puts back the planted byte and returns, reading none of these. Backed by xn_abi.py clobber; clobber overridden: see outputs"
+156E60,xn_span_tex64,span,reg,eax ebx ebp esi edi,0,,,eax ecx edx ebx ebp esi edi,0,unknown,"no caller: every register it may change is an output; outputs overridden: called through [poly+3Ch] by xn_render_frame (12A939), which pops EBX EBP EDI ESI back; EAX ECX EDX reach only the span hook (150040 reloads EAX and ECX and never reads EDX; 14D300 is a ret) and the next span call, which reads none of them; the analysis keeps ECX/EDX live only through the frame's run-time blocks (12A969 pushad/popad, 12A97C popad). Backed by xn_abi.py clobber (also reached by tail jumps from the setups 15BB8C/12A700/12A740 and by falling in from its setup routine); clobber overridden: see outputs"
+157100,xn_span_tex64_shaded_tail,span,reg,ah eax.u ecx ebx ebp esi edi,0,,,eax edx ebx ebp,0,known,"outputs overridden: a planted-ret body: its planter only puts back the planted byte and returns, reading none of these. Backed by xn_abi.py clobber; clobber overridden: see outputs"
+157240,xn_span_tex64_shaded,span,reg,eax ebx ebp esi edi,0,,,eax ecx edx ebx ebp esi edi,0,partial,"outputs overridden: called through [poly+3Ch] by xn_render_frame (12A939), which pops EBX EBP EDI ESI back; EAX ECX EDX reach only the span hook (150040 reloads EAX and ECX and never reads EDX; 14D300 is a ret) and the next span call, which reads none of them; the analysis keeps ECX/EDX live only through the frame's run-time blocks (12A969 pushad/popad, 12A97C popad). Backed by xn_abi.py clobber (also reached by tail jumps from the setups 15BB8C/12A700/12A740 and by falling in from its setup routine); clobber overridden: see outputs"
+157620,xn_span_flat_transparent,span,reg,ecx ebx ebp esi edi,0,,,eax ecx edx ebx ebp esi edi,0,partial,"outputs overridden: called through [flat+3Ch] by xn_flat_span_emit (15527B), which pops EDI ECX back; its callers xn_flat_span_clip and xn_flat_raster reload EAX (15520E, 1553A8) and EDX (155217, 1552FC, 1553AD) before reading them; their conservative rows (callers through the run-time blocks of 12A870) keep them live. Backed by xn_abi.py clobber; clobber overridden: see outputs"
+157760,xn_span_flat_transparent_tail,span,reg,ecx ebx esi edi,0,,,eax ebx,0,known,"outputs overridden: a planted-ret body: its planter only puts back the planted byte and returns, reading none of these. Backed by xn_abi.py clobber; clobber overridden: see outputs"
+157800,xn_span_flat_transparent_shaded,span,reg,ecx ebx ebp esi edi,0,,,eax ecx edx ebx ebp esi edi,0,partial,"outputs overridden: called through [flat+3Ch] by xn_flat_span_emit (15527B), which pops EDI ECX back; its callers xn_flat_span_clip and xn_flat_raster reload EAX (15520E, 1553A8) and EDX (155217, 1552FC, 1553AD) before reading them; their conservative rows (callers through the run-time blocks of 12A870) keep them live. Backed by xn_abi.py clobber; clobber overridden: see outputs"
+157960,xn_span_flat_transparent_shaded_tail,span,reg,ah eax.u ecx ebx esi edi,0,,,eax edx ebx,0,known,"outputs overridden: a planted-ret body: its planter only puts back the planted byte and returns, reading none of these. Backed by xn_abi.py clobber; clobber overridden: see outputs"
 157B02,xn_span_tail_offsets_23_entry1,span,unknown,al ecx dx ebx ebp esi edi,4,eax ecx edx ebx ebp esi edi,,,0,unknown,no caller: every register it may change is an output; stack use not followed
-157B20,xn_span_flat_lit_fogged,span,reg,ecx ebx ebp esi edi,0,eax ecx edx ebx ebp esi edi,,,0,partial,
-157CA0,xn_span_flat_lit_fogged_tail,span,reg,ah eax.u ecx ebx ebp esi edi,0,al cl edx ebx,,ebp,0,known,
+157B20,xn_span_flat_lit_fogged,span,reg,ecx ebx ebp esi edi,0,,,eax ecx edx ebx ebp esi edi,0,partial,"outputs overridden: called through [flat+3Ch] by xn_flat_span_emit (15527B), which pops EDI ECX back; its callers xn_flat_span_clip and xn_flat_raster reload EAX (15520E, 1553A8) and EDX (155217, 1552FC, 1553AD) before reading them; their conservative rows (callers through the run-time blocks of 12A870) keep them live. Backed by xn_abi.py clobber; clobber overridden: see outputs"
+157CA0,xn_span_flat_lit_fogged_tail,span,reg,ah eax.u ecx ebx ebp esi edi,0,,,eax ecx edx ebx ebp,0,known,"outputs overridden: a planted-ret body: its planter only puts back the planted byte and returns, reading none of these. Backed by xn_abi.py clobber; clobber overridden: see outputs"
 157E02,xn_span_tail_offsets_25_entry1,span,reg,eax ecx dl ebx ebp esi edi CF,0,eax ecx edx ebx ebp esi edi,CF,,0,unknown,no caller: every register it may change is an output
-157E20,xn_span_flat_translucent,span,reg,ecx ebx ebp esi edi,0,eax ecx edx ebx ebp esi edi,CF,,0,partial,
-157FA0,xn_span_flat_translucent_tail,span,reg,al eax.u ecx ebx ebp esi edi,0,ax edx ebx,CF,ebp,0,known,
+157E20,xn_span_flat_translucent,span,reg,ecx ebx ebp esi edi,0,,,eax ecx edx ebx ebp esi edi,0,partial,"outputs overridden: called through [flat+3Ch] by xn_flat_span_emit (15527B), which pops EDI ECX back; its callers xn_flat_span_clip and xn_flat_raster reload EAX (15520E, 1553A8) and EDX (155217, 1552FC, 1553AD) before reading them; their conservative rows (callers through the run-time blocks of 12A870) keep them live. Backed by xn_abi.py clobber; never ran in play (no records): the same call site as the other three; clobber overridden: see outputs; flags_out overridden: CF: its callers compare before any flag read (155200 cmp ebx, ebp; 1552A0 add/or); as the other flat routines, which have no flags out"
+157FA0,xn_span_flat_translucent_tail,span,reg,al eax.u ecx ebx ebp esi edi,0,,,eax edx ebx ebp,0,known,"outputs overridden: a planted-ret body: its planter only puts back the planted byte and returns, reading none of these. Backed by xn_abi.py clobber; clobber overridden: see outputs; flags_out overridden: CF: its callers compare before any flag read (155200 cmp ebx, ebp; 1552A0 add/or); as the other flat routines, which have no flags out"
 158100,xn_render_sort_pairs_saveregs,render,reg,eax edx ebx ebp esi,0,,,,0,unknown,no caller: every register it may change is an output
 15810E,xn_render_sort_pairs,render,reg,eax edx ebx ebp esi,0,ebp esi,,ecx edi,0,known,
 15811C,xn_render_sort_pairs_range,render,reg,eax edx ebx,0,ebp esi,,ecx edi,0,known,
 158300,xn_poly_outcode_eax,poly,reg,eax edx ebx,0,eax ebx,,,0,unknown,no caller: every register it may change is an output
 15830C,xn_poly_outcode,poly,reg,eax edx ebx,0,ecx ebx,,,0,known,
-158360,xn_poly_project_flat,poly,reg,edx ebx ebp esi edi fs gs,16,edx ebx ebp esi edi fs gs,,eax ecx,0,known,
-158420,xn_poly_project_face,poly,reg,bx ebp esi,0,edx ebp,CF,eax ecx ebx esi edi,0,known,
+158360,xn_poly_project_flat,poly,reg,edx ebx ebp esi edi fs gs,16,,,eax ecx edx ebx ebp esi edi,0,known,outputs overridden: xn_poly_project_flat: the flat chain's outputs come from the RENDER-FRAME block split (12A976 popal; call draw_flats): xn_render_frame restores every register after it. Backed by xn_abi.py clobber; clobber overridden: see outputs
+158420,xn_poly_project_face,poly,reg,bx ebp esi,0,,CF,eax ecx edx ebx ebp esi edi,0,known,"outputs overridden: xn_poly_project_face: its caller xn_model_draw_faces (14047C) reads CF; EDX/EBP leak only through draw_faces/model_draw/draw_models into xn_render_frame's span loop (span routines' and fog hook's overrides, raster agent). Backed by xn_abi.py clobber; clobber overridden: see outputs"
 1585B3,xn_poly_clc_stub,poly,reg,,0,,CF,,0,unknown,no caller: every register it may change is an output
-1585C0,xn_poly_project_terrain,poly,reg,ecx ebx ebp esi edi,0,ah eax.u dh edx.u bl ebx.u ebp,,al ecx dl bh esi edi,0,known,
-158678,xn_poly_clip_frustum,poly,reg,ah eax.u edx ebx ebp esi edi,0,ah eax.u edx ebx ebp esi edi,CF,al ecx,0,known,
-1587D4,xn_poly_clip_plane,poly,reg,ah eax.u edx ebp,0,ah eax.u edx ebx esi edi,,al ecx,0,known,
+1585C0,xn_poly_project_terrain,poly,reg,ecx ebx ebp esi edi,0,,,eax ecx edx ebx ebp esi edi,0,known,"outputs overridden: xn_poly_project_terrain: the terrain cells (13EFC9, 13F2A5, 13EF19) read the leftovers only through partial-register writes and and-masks (13F02C mov bh / 13F03B and ebx, 7F00h); scrambled, the records keep memory and I/O. Backed by xn_abi.py clobber; clobber overridden: see outputs"
+158678,xn_poly_clip_frustum,poly,reg,ah eax.u edx ebx ebp esi edi,0,,CF,eax ecx edx ebx ebp esi edi,0,known,outputs overridden: xn_poly_clip_frustum: its registers leak only through the projectors' early return on a rejected polygon (158387/158487/1585E2 jae ret) into the projectors' spurious outputs (the 12A976 block / span-routine edx chains; raster agent's evidence). Callers read CF. Backed by xn_abi.py clobber; clobber overridden: see outputs
+1587D4,xn_poly_clip_plane,poly,reg,ah eax.u edx ebp,0,,,eax ecx edx ebx esi edi,0,known,outputs overridden: xn_poly_clip_plane: its one caller xn_poly_clip_frustum reads only memory after it (outcode bytes); the registers leaked through clip_frustum's outputs (see 158678). Backed by xn_abi.py clobber; clobber overridden: see outputs
 158864,xn_poly_clip_intersect_left,poly,reg,ebx esi edi,0,eax ecx edx ebx edi,ZF,,0,partial,
 1588F0,xn_poly_clip_intersect_right,poly,reg,ebx esi edi,0,eax ecx edx ebx edi,ZF,,0,partial,
 158978,xn_poly_clip_intersect_bottom,poly,reg,ebx esi edi,0,eax ecx edx ebx edi,ZF,,0,partial,
 158A04,xn_poly_clip_intersect_top,poly,reg,ebx esi edi,0,eax ecx edx ebx edi,ZF,,0,partial,
 158A90,xn_poly_clip_intersect_near,poly,reg,ebx esi edi,0,eax ecx edx ebx edi,ZF,,0,partial,
 158B1C,xn_poly_clip_intersect_far,poly,reg,ebx esi edi,0,eax ecx edx ebx edi,ZF,,0,partial,
-158D04,xn_span_insert,span,reg,ecx ebx ebp esi,0,ah eax.u edx,,al ecx ebx ebp esi edi,0,known,
-15B9A0,xn_poly_rasterize,poly,reg,eax edx ebx ebp,0,ah eax.u edx bl ebx.u ebp,,al ecx bh esi edi,0,known,
-15BA16,xn_poly_rasterize_row_loop,poly,reg,eax ecx edx ebx ebp esi edi,0,eax ecx edx ebx ebp esi edi,,,0,unknown,no caller: every register it may change is an output
+158D04,xn_span_insert,span,reg,ecx ebx ebp esi,0,,,eax ecx edx ebx ebp esi edi,0,known,"outputs overridden: xn_span_insert: its one caller xn_poly_rasterize (15BA27) pops EDI ESI ECX EBP EBX after it and writes EAX (15BA73) and EDX (15BA78) before reading them (15BA5D's test eax only sets flags that dec overwrites but CF, which test clears); the rasterizer's conservative row (its callers in the pipeline) keeps AH/EAX.u/EDX live. Backed by xn_abi.py clobber; clobber overridden: see outputs"
+15B9A0,xn_poly_rasterize,poly,reg,eax edx ebx ebp,0,,,eax ecx edx ebx ebp esi edi,0,known,"outputs overridden: xn_poly_rasterize: leftovers (span_insert's EAX/EDX, the edges' x) that reach callers only through the terrain/model/flat chains' conservative outputs; with the span routines' and span_insert's overrides (raster agent) the callers' memory and I/O do not change when they are scrambled. Backed by xn_abi.py clobber; clobber overridden: see outputs"
+15BA16,xn_poly_rasterize_row_loop,poly,reg,eax ecx edx ebx ebp esi edi,0,,,eax ecx edx ebx ebp esi edi,0,unknown,no caller: every register it may change is an output; outputs overridden: xn_poly_rasterize_row_loop: dead (an entry inside 15B9A0's loop after an unconditional jump; no caller); clobber overridden: dead (no caller)
 15BAC0,xn_poly_tex_gradients,poly,reg,ecx edx edi,0,,,eax ecx edx ebx ebp esi,0,known,
-15BB8C,xn_poly_setup_textured,poly,reg,eax ecx ebx ebp esi edi fs gs,48,eax ecx edx ebx ebp esi edi fs gs,,,0,partial,
+15BB8C,xn_poly_setup_textured,poly,reg,eax ecx ebx ebp esi edi fs gs,48,,,eax ecx edx ebx ebp esi edi,0,partial,"outputs overridden: its only caller is xn_render_frame's polygon dispatch (12A939), which reads none of them back in C; it tail-jumps into a span routine whose leftovers the analysis keeps because the dispatch is indirect. Scrambling them leaves every caller record's memory and I/O identical (raster agent's clobber_mem); backed by xn_abi.py clobber; clobber overridden: its only caller is xn_render_frame's polygon dispatch (12A939), which reads none of them back in C; it tail-jumps into a span routine whose leftovers the analysis keeps because the dispatch is indirect. Scrambling them leaves every caller record's memory and I/O identical (raster agent's clobber_mem); backed by xn_abi.py clobber"
 15BC41,xn_poly_ret_stub,poly,reg,,0,,,,0,unknown,no caller: every register it may change is an output
-15BC42,xn_light_setup_poly,light,reg,ecx edi,0,eax edx,,ecx ebx ebp esi,0,known,
-15BC9C,xn_light_setup_terrain,light,reg,ecx edi,0,eax edx,,ecx ebx ebp esi,0,known,
+15BC42,xn_light_setup_poly,light,reg,ecx edi,0,eax,,ecx edx ebx ebp esi,0,known,"outputs overridden: xn_light_setup_poly: EDX is live after 12A706 only because 12A72C's jmp ecx (to xn_render_solid_span_fns: 155800, 155820, 155920) is not followed; none of the three reads EDX; 15BBA9 reads EAX only. Backed by xn_abi.py clobber; clobber overridden: xn_light_setup_poly: see outputs"
+15BC9C,xn_light_setup_terrain,light,reg,ecx edi,0,eax,,ecx edx ebx ebp esi,0,known,"outputs overridden: xn_light_setup_terrain: its callers 12A740 (12A752) and the dead 12A7A0 (12A7A6, no caller, so its row keeps everything live) read EAX; 12A740 then jumps (jmp ecx, not followed) to xn_render_terrain_span_fns (156E60, 157240), which do not read EDX. Backed by xn_abi.py clobber; clobber overridden: xn_light_setup_terrain: see outputs"
 15BCE8,xn_light_shade_constant,light,reg,edi,0,eax,,,0,partial,callers read flags it leaves alone: CF
 15BCF6,xn_light_build_shader_1,light,reg,edi,0,eax ecx edx ebx esi,,,0,partial,callers read flags it leaves alone: CF
 15BD78,xn_light_build_shader_2,light,reg,edi,0,eax ecx edx ebx esi,,,0,partial,callers read flags it leaves alone: CF
 15BE4D,xn_light_build_shader_3,light,reg,edi,0,eax ecx edx ebx esi,,,0,partial,callers read flags it leaves alone: CF
-15BF75,xn_light_add_point,light,reg,ecx ebp esi edi,0,eax ecx edx ebx ebp esi,CF,,0,partial,ESP +4 at the return at 15C040
+15BF75,xn_light_add_point,light,reg,ecx ebp esi edi,0,ebp esi,CF,eax ecx edx ebx,0,partial,"ESP +4 at the return at 15C040; outputs overridden: xn_light_add_point, a dispatch-table handler: its caller's loop (15BC83) reads CF, EBP (the slot count) and ESI (the list entry, which it keeps) and reloads EAX (15BC7B); EBX ECX EDX reach only the builders, which write them, or the setup's callers (see 15BC42). On its third slot it jumps to xn_light_build_shader_3, whose EAX (8) and ESI go to the setup's caller: that path returns through the builder, not through this function's ret. Backed by xn_abi.py clobber; clobber overridden: xn_light_add_point: see outputs"
 15C045,xn_light_add_type4_noop,light,reg,,0,,,,0,partial,callers read flags it leaves alone: CF
-15C046,xn_light_add_directional,light,reg,ebp esi edi,0,eax ecx edx ebx ebp,CF,,0,partial,
+15C046,xn_light_add_directional,light,reg,ebp esi edi,0,ebp,CF,eax ecx edx ebx,0,partial,"outputs overridden: xn_light_add_directional, a dispatch-table handler: its callers (15BC83's loop) read CF and EBP (the point-slot count) only; EAX is reloaded (15BC7B), EBX/ECX/EDX are written by the builders or reach the setup's callers, which do not read them (see 15BC42). Backed by xn_abi.py clobber; clobber overridden: xn_light_add_directional: see outputs"
 15C08A,xn_light_terrain_add_point_noop,light,reg,,0,,,,0,partial,callers read flags it leaves alone: CF
 15C08B,xn_light_terrain_add_type4_noop,light,reg,,0,,,,0,partial,callers read flags it leaves alone: CF
-15C08C,xn_light_terrain_add_directional,light,reg,ebp esi edi,0,eax edx ebx ebp,CF,,0,partial,
+15C08C,xn_light_terrain_add_directional,light,reg,ebp esi edi,0,ebp,CF,eax edx ebx,0,partial,outputs overridden: xn_light_terrain_add_directional: as 15C046 for 15BCCF's loop. Backed by xn_abi.py clobber; clobber overridden: xn_light_terrain_add_directional: see outputs
 15C200,xn_tmap_pool_alloc,tmap,reg,eax ecx edx ebx ebp esi edi fs gs,0,fs gs,,eax ecx edx ebx ebp esi edi,0,known,
 15C260,xn_tmap_pool_free,tmap,reg,ecx edx ebx ebp esi edi fs gs,0,fs gs,,eax ecx edx ebx ebp esi edi,0,known,
 15C274,xn_tmap_compile,tmap,reg,eax edx,0,eax,CF,ecx edx ebp esi edi,0,known,
@@ -649,10 +649,10 @@ va,name,subsystem,convention,inputs,stack_args,outputs,flags_out,clobber,ret_pop
 15C2F0,xn_tmap_pool_reset,tmap,watcom,,0,,,eax ecx edx ebx ebp esi edi,0,known,
 15C300,xn_tmap_template,tmap,template,eax ecx ebx ebp esi edi,0,eax edx ebx esi,,,0,unknown,address escapes (escape): every register it may change is an output
 15CB00,xn_collide_point_in_face,collide,reg,eax ecx edx ebx esi edi,0,eax edx ebx esi edi,,,0,known,
-15CC36,xn_collide_point_in_face_v2,collide,reg,eax ecx edx ebx esi edi,0,eax edx ebx esi edi,CF,,0,unknown,no caller: every register it may change is an output
-15CD33,xn_collide_face_area,collide,reg,eax edx,0,eax edx,,,0,unknown,no caller: every register it may change is an output
+15CC36,xn_collide_point_in_face_v2,collide,reg,eax ecx edx ebx esi edi,0,,CF,eax edx ebx esi edi,0,unknown,no caller: every register it may change is an output; outputs overridden: dead (no caller): the result is CF; EAX EDX EBX ESI EDI are the edge test's leftovers; clobber overridden: dead: leftovers
+15CD33,xn_collide_face_area,collide,watcom,eax edx,0,eax,,edx,0,unknown,no caller: every register it may change is an output; outputs overridden: dead (no caller): the area; EDX is the sum before the halving; clobber overridden: dead: leftover
 15CE7E,xn_collide_face_test_edges,collide,reg,eax ecx edx ebx esi edi,0,eax ecx esi edi,,,0,known,
-15CEDE,xn_collide_face_test_vertices,collide,reg,eax ecx edx ebx esi edi,0,eax ecx esi edi,,,0,unknown,no caller: every register it may change is an output
+15CEDE,xn_collide_face_test_vertices,collide,reg,eax ecx edx ebx esi edi,0,eax,,ecx esi edi,0,unknown,"no caller: every register it may change is an output; outputs overridden: dead (no caller): the first non-negative test or -1; ECX (the radius after its xchg), ESI (the point) and EDI (the slot) are leftovers; clobber overridden: dead: leftovers"
 15CF18,xn_cam_cull_sphere,cam,reg,eax ecx edx ebx,0,eax,CF,ecx edx ebx ebp esi,0,known,
 15D03C,xn_cam_sphere_dist_x,cam,reg,eax ebx edi,0,eax,ZF SF OF,ecx edx ebx ebp esi,0,known,
 15D05C,xn_cam_sphere_dist_y,cam,reg,eax ebx edi,0,eax,ZF SF OF,ecx edx ebx ebp esi,0,known,
@@ -666,8 +666,8 @@ va,name,subsystem,convention,inputs,stack_args,outputs,flags_out,clobber,ret_pop
 15D2B4,xn_mat_identity64,mat,reg,eax edx ebx,0,,,eax edx,0,unknown,"no caller: every register it may change is an output; outputs overridden: dead: the matrix goes to memory; EAX and EDX are its end pointer and diagonal value, as in xn_mat_identity (0x15D288), whose callers read nothing back; clobber overridden: dead: EAX and EDX are its end pointer and diagonal value"
 15D2EC,xn_mat_transpose_copy3,mat,watcom,eax edx,0,,,eax ecx edx ebx ebp esi edi,0,known,
 15E400,xn_draw_clip_rect_xyxy,draw,reg,eax ecx edx ebx,0,eax ecx edx ebx,CF,ebp,0,known,
-15E45C,xn_draw_rect_outline,draw,reg,eax ecx edx ebx,0,eax ecx edx ebx,,,0,unknown,no caller: every register it may change is an output
-15E4A4,xn_draw_fill_rect_clipped,draw,reg,eax ecx edx ebx,0,eax ecx edx ebx,,,0,unknown,no caller: every register it may change is an output
+15E45C,xn_draw_rect_outline,draw,watcom,eax ecx edx ebx,0,,,eax ecx edx ebx,0,unknown,"no caller: every register it may change is an output; outputs overridden: dead (no caller): a rectangle outline; the registers are the clipped corners its line calls leave; clobber overridden: dead (no caller): Watcom's convention for (x1, y1, x2, y2)"
+15E4A4,xn_draw_fill_rect_clipped,draw,watcom,eax ecx edx ebx,0,,,eax ecx edx ebx,0,unknown,"no caller: every register it may change is an output; outputs overridden: dead (no caller): a filled rectangle; the registers are its loop leftovers; clobber overridden: dead (no caller): Watcom's convention for (x1, y1, x2, y2)"
 15F50C,xn_math_isqrt_lookup,math,reg,eax ecx,0,eax,,edx,0,known,
 15FC00,xn_gfx_vesa_init,gfx,reg,,0,,CF,eax ebp edi,0,known,
 15FC93,xn_gfx_vesa_free,gfx,watcom,,0,,,eax ecx edx ebx ebp esi edi,0,known,
@@ -678,9 +678,9 @@ va,name,subsystem,convention,inputs,stack_args,outputs,flags_out,clobber,ret_pop
 15FE3F,xn_gfx_vesa_get_bank,gfx,reg,ecx edx,0,eax,,,0,unknown,no caller: every register it may change is an output
 15FE6F,xn_gfx_vesa_int10,gfx,reg,eax ecx edx ebx,0,,CF,eax,0,known,
 15FEAE,xn_gfx_vesa_present_banked,gfx,reg,eax ecx,0,,,,0,known,
-15FF53,xn_gfx_vesa_blit_rect_banked,gfx,reg,eax ecx edx ebx ebp esi edi,0,eax ecx edx ebp esi edi,,,0,unknown,no caller: every register it may change is an output
+15FF53,xn_gfx_vesa_blit_rect_banked,gfx,reg,eax ecx edx ebx ebp esi edi,0,,,eax ecx edx ebp esi edi,0,unknown,"no caller: every register it may change is an output; outputs overridden: dead (no caller): its loop's registers, and EBP and EDI swapped by its own pops (push ebp; push edi ... pop ebp; pop edi); clobber overridden: dead (no caller): its loop's registers, and EBP and EDI swapped by its own pops"
 160900,xn_serial_open,serial,reg,eax ch ecx.u edx ebx ebp esi edi fs gs,0,edx fs gs,CF,eax ebp esi edi,0,known,
-1609C0,xn_serial_close,serial,reg,eax ecx edx ebx,0,eax ecx edx ebx,,,0,known,ESP -12 at the return at 1609F2
+1609C0,xn_serial_close,serial,reg,eax ecx edx ebx,0,,,eax,0,known,"ESP -12 at the return at 1609F2; outputs overridden: live: its callers are 153549 in xn_helmet_close (unreferenced: its every-register-live exit is no caller's) and 161077 in driver B's failed open, which reads nothing after it (xn_abi.py clobber); clobber overridden: EAX is _dos_setvect's with AL = 20h (the EOI)"
 1609F9,xn_serial_close_restore_vector,serial,reg,eax ecx.u ebx,8,ax ecx edx ebx,,,0,known,ESP +12 at the return at 160A15
 160A18,xn_serial_rx_reset,serial,reg,eax,0,,,ebp esi edi,0,known,
 160A3C,xn_serial_read_lsr,serial,watcom,eax,0,al,,ah eax.u,0,known,

@@ -1,15 +1,294 @@
 va,field,value,reason
 0x00137572,outputs,,"dead copy of xn_mat_transform_ptr (0x137486), whose callers read nothing back: its results go through the pointers"
-0x00137572,clobber,eax ecx edx ebx,"dead copy of xn_mat_transform_ptr (0x137486): the registers it leaves as its twin does"
-0x0014BEE2,outputs,eax,"dead: the angle; EDX is the divide's remainder"
-0x0014BEE2,clobber,edx,"dead: EDX is the divide's remainder"
-0x0014BFE1,outputs,eax,"dead: the height; EDX and EBX are the divide's remainder and a product's low dword"
-0x0014BFE1,clobber,edx ebx,"dead: EDX and EBX are the divide's remainder and a product's low dword"
+0x00137572,clobber,eax ecx edx ebx,dead copy of xn_mat_transform_ptr (0x137486): the registers it leaves as its twin does
+0x0014BEE2,outputs,eax,dead: the angle; EDX is the divide's remainder
+0x0014BEE2,clobber,edx,dead: EDX is the divide's remainder
+0x0014BFE1,outputs,eax,dead: the height; EDX and EBX are the divide's remainder and a product's low dword
+0x0014BFE1,clobber,edx ebx,dead: EDX and EBX are the divide's remainder and a product's low dword
 0x0014CB78,outputs,eax edx,"dead: the rotated (x, z); EBX is the angle masked to 11 bits"
-0x0014CB78,clobber,ebx,"dead: EBX is the angle masked to 11 bits"
+0x0014CB78,clobber,ebx,dead: EBX is the angle masked to 11 bits
 0x0015D100,outputs,,"dead: the product goes to memory; EDX, EBX and ESI are its loop counter and pointers, as in xn_mat_mul_fixed (0x15D170), whose callers read nothing back"
 0x0015D100,clobber,edx ebx esi,"dead: EDX, EBX and ESI are its loop counter and pointers"
 0x0015D1F8,outputs,,"dead: the product goes to memory; EDX, EBX and ESI are its loop counter and pointers, as in xn_mat_mul_fixed (0x15D170)"
 0x0015D1F8,clobber,edx ebx esi,"dead: EDX, EBX and ESI are its loop counter and pointers"
 0x0015D2B4,outputs,,"dead: the matrix goes to memory; EAX and EDX are its end pointer and diagonal value, as in xn_mat_identity (0x15D288), whose callers read nothing back"
-0x0015D2B4,clobber,eax edx,"dead: EAX and EDX are its end pointer and diagonal value"
+0x0015D2B4,clobber,eax edx,dead: EAX and EDX are its end pointer and diagonal value
+0x0012A700,outputs,,"its only caller is xn_render_frame's polygon dispatch (12A939), which reads none of them back in C; it tail-jumps into a span routine whose leftovers the analysis keeps because the dispatch is indirect. Scrambling them leaves every caller record's memory and I/O identical (raster agent's clobber_mem); backed by xn_abi.py clobber"
+0x0012A700,clobber,eax ecx edx ebx ebp esi edi,"its only caller is xn_render_frame's polygon dispatch (12A939), which reads none of them back in C; it tail-jumps into a span routine whose leftovers the analysis keeps because the dispatch is indirect. Scrambling them leaves every caller record's memory and I/O identical (raster agent's clobber_mem); backed by xn_abi.py clobber"
+0x0012A740,outputs,,"its only caller is xn_render_frame's polygon dispatch (12A939), which reads none of them back in C; it tail-jumps into a span routine whose leftovers the analysis keeps because the dispatch is indirect. Scrambling them leaves every caller record's memory and I/O identical (raster agent's clobber_mem); backed by xn_abi.py clobber"
+0x0012A740,clobber,eax ecx edx ebx ebp esi edi,"its only caller is xn_render_frame's polygon dispatch (12A939), which reads none of them back in C; it tail-jumps into a span routine whose leftovers the analysis keeps because the dispatch is indirect. Scrambling them leaves every caller record's memory and I/O identical (raster agent's clobber_mem); backed by xn_abi.py clobber"
+0x0012A7A0,outputs,,"its only caller is xn_render_frame's polygon dispatch (12A939), which reads none of them back in C; it tail-jumps into a span routine whose leftovers the analysis keeps because the dispatch is indirect. Scrambling them leaves every caller record's memory and I/O identical (raster agent's clobber_mem); backed by xn_abi.py clobber"
+0x0012A7A0,clobber,eax ecx edx ebx edi,"its only caller is xn_render_frame's polygon dispatch (12A939), which reads none of them back in C; it tail-jumps into a span routine whose leftovers the analysis keeps because the dispatch is indirect. Scrambling them leaves every caller record's memory and I/O identical (raster agent's clobber_mem); backed by xn_abi.py clobber"
+0x0015BB8C,outputs,,"its only caller is xn_render_frame's polygon dispatch (12A939), which reads none of them back in C; it tail-jumps into a span routine whose leftovers the analysis keeps because the dispatch is indirect. Scrambling them leaves every caller record's memory and I/O identical (raster agent's clobber_mem); backed by xn_abi.py clobber"
+0x0015BB8C,clobber,eax ecx edx ebx ebp esi edi,"its only caller is xn_render_frame's polygon dispatch (12A939), which reads none of them back in C; it tail-jumps into a span routine whose leftovers the analysis keeps because the dispatch is indirect. Scrambling them leaves every caller record's memory and I/O identical (raster agent's clobber_mem); backed by xn_abi.py clobber"
+0x0015317C,outputs,,"dead (no caller): a vertical line (x, y1, y2); ECX and EDX are xn_draw_vline's leftovers"
+0x0015317C,clobber,eax ecx edx ebx,"dead (no caller): Watcom's convention for (x, y1, y2), and ECX, which it changes"
+0x0015E45C,outputs,,dead (no caller): a rectangle outline; the registers are the clipped corners its line calls leave
+0x0015E45C,clobber,eax ecx edx ebx,"dead (no caller): Watcom's convention for (x1, y1, x2, y2)"
+0x0015E4A4,outputs,,dead (no caller): a filled rectangle; the registers are its loop leftovers
+0x0015E4A4,clobber,eax ecx edx ebx,"dead (no caller): Watcom's convention for (x1, y1, x2, y2)"
+0x00153188,outputs,,ECX and EDX (its row count and the colour byte it leaves) are read only after the calls in the dead 0x15317C and 0x15E45C; xn_draw_line_unclipped (0x153210) tail-jumps to it with nothing live after; tools/xn_abi.py clobber 0x153188 scrambles them
+0x00153188,clobber,ecx edx ebp edi,"ECX and EDX are read only by dead callers (0x15317C, 0x15E45C)"
+0x000CB4D7,outputs,eax,dead (no caller): returns 1 in EAX; EDX (the width) and EBX (the group) are leftovers
+0x000CB4D7,clobber,edx ebx,"dead (no caller): Watcom's convention for (group, frame, dst)"
+0x000CD37B,outputs,eax,dead (no caller): returns the k-th record in EAX; EDX is the spent count
+0x000CD37B,clobber,edx,"dead (no caller): Watcom's convention for (img, k)"
+0x000CDCE5,outputs,,dead (no caller): EAX ECX EDX are its bounds and loop leftovers
+0x000CDCE5,clobber,eax ecx edx ebx,"dead (no caller): Watcom's argument registers (x, y, w, h); the caller pops the 8 stack bytes"
+0x00147848,outputs,,"dead (no caller): EAX and ECX are 0x147858's leftovers (the last colour, the row count)"
+0x00147848,clobber,eax ecx edx ebx,"dead (no caller): Watcom's convention for (buf, skip, w, h, [stack] table)"
+0x000CD39B,outputs,,"dead (no caller): EAX and EDX are the last row's pattern, EBX the spent row count"
+0x000CD39B,clobber,eax edx ebx,"dead (no caller): Watcom's convention for (src, dst, rows)"
+0x000C8381,outputs,,dead (no caller): EAX ECX EDX EBX are 0x0C8395's clip and loop leftovers
+0x000C8381,clobber,eax ecx edx ebx,"dead (no caller): Watcom's convention for (x, y, w, h, [stack] src)"
+0x000C8395,outputs,,its only caller is the dead 0x0C8381 (no caller): EAX ECX EDX EBX are clip and loop leftovers
+0x000C8395,clobber,eax ecx edx ebx ebp esi edi,its only caller is the dead 0x0C8381
+0x00153798,outputs,eax,dead (no caller): returns the width in EAX; EDX is the count left
+0x00153798,clobber,edx,"dead (no caller): Watcom's convention for (text, n)"
+0x0012D481,outputs,eax,dead (no caller): the nearest index; BX CX DX are the last entry's HSV from xn_pal_rgb_to_hsv
+0x0012D481,clobber,ecx edx ebx,dead (no caller): BX CX DX are the last entry's HSV from xn_pal_rgb_to_hsv
+0x0012D8AE,outputs,,dead (no caller): EAX is the black palette's address it passed to xn_pal_fade_to
+0x0012D8AE,clobber,eax,dead (no caller): EAX is the black palette's address it passed to xn_pal_fade_to
+0x00143924,outputs,,"called only through the driver table xn_gfx_drv_clear by xn_gfx_clear (143914), which saves every register around the call (pushad/popad): its fill dword, count, offset and end pointer reach no caller"
+0x00143924,clobber,eax ecx edx edi,"its fill dword, count, offset and end pointer: xn_gfx_clear (pushad/popad) is its only caller"
+0x0014396C,outputs,,"called only through the driver table xn_gfx_drv_present by xn_gfx_present (14395C), which saves every register around the call (pushad/popad): the copy routines' registers reach no caller"
+0x0014396C,clobber,eax ecx edx esi edi,the copy routines' registers: xn_gfx_present (pushad/popad) is its only caller
+0x00143BB0,outputs,,dead (no caller): its registers are its loop's
+0x00143BB0,clobber,eax ecx edx esi edi,dead (no caller): its registers are its loop's
+0x0015FF53,outputs,,"dead (no caller): its loop's registers, and EBP and EDI swapped by its own pops (push ebp; push edi ... pop ebp; pop edi)"
+0x0015FF53,clobber,eax ecx edx ebp esi edi,"dead (no caller): its loop's registers, and EBP and EDI swapped by its own pops"
+0x0012F9A0,outputs,,"called only through xn_water_span_fn by xn_water_draw (12F79C), which sets EAX and EBP again before reading them (12F906/12F936/12F961 and every call site; clobber test): EAX is the tint table with the last pixel, EBP the planted offset"
+0x0012F9A0,clobber,eax ebp,the tint table with the last pixel (EAX) and the planted offset (EBP): xn_water_draw reads neither
+0x0012D6AB,outputs,cx dx bx,dead (no caller): the RGB in BX CX DX; EAX's low word is the last level computed (t)
+0x0012D6AB,clobber,eax,dead (no caller): EAX's low word is the last level computed
+0x00150040,outputs,,"xn_shade_fog_span, the span hook: its one caller xn_render_frame (call [xn_render_span_hook] at 12A940) reloads EAX EBX EBP EDI ESI before reading them (12A917..12A928); ECX and EDX reach only xn_render_draw_flats through 12A969's pushad/popad and 12A97C's popad, which overwrites them. The analysis keeps them live because it treats the frame's run-time blocks as functions of their own. Backed by xn_abi.py clobber"
+0x00150040,clobber,eax ecx edx ebx ebp edi,xn_shade_fog_span: see outputs
+0x0015BC42,outputs,eax,"xn_light_setup_poly: EDX is live after 12A706 only because 12A72C's jmp ecx (to xn_render_solid_span_fns: 155800, 155820, 155920) is not followed; none of the three reads EDX; 15BBA9 reads EAX only. Backed by xn_abi.py clobber"
+0x0015BC42,clobber,ecx edx ebx ebp esi,xn_light_setup_poly: see outputs
+0x0015BC9C,outputs,eax,"xn_light_setup_terrain: its callers 12A740 (12A752) and the dead 12A7A0 (12A7A6, no caller, so its row keeps everything live) read EAX; 12A740 then jumps (jmp ecx, not followed) to xn_render_terrain_span_fns (156E60, 157240), which do not read EDX. Backed by xn_abi.py clobber"
+0x0015BC9C,clobber,ecx edx ebx ebp esi,xn_light_setup_terrain: see outputs
+0x0015C046,outputs,ebp,"xn_light_add_directional, a dispatch-table handler: its callers (15BC83's loop) read CF and EBP (the point-slot count) only; EAX is reloaded (15BC7B), EBX/ECX/EDX are written by the builders or reach the setup's callers, which do not read them (see 15BC42). Backed by xn_abi.py clobber"
+0x0015C046,clobber,eax ecx edx ebx,xn_light_add_directional: see outputs
+0x0015C08C,outputs,ebp,xn_light_terrain_add_directional: as 15C046 for 15BCCF's loop. Backed by xn_abi.py clobber
+0x0015C08C,clobber,eax edx ebx,xn_light_terrain_add_directional: see outputs
+0x00155800,outputs,,"called through [poly+3Ch] by xn_render_frame (12A939), which pops EBX EBP EDI ESI back; EAX ECX EDX reach only the span hook (150040 reloads EAX and ECX and never reads EDX; 14D300 is a ret) and the next span call, which reads none of them; the analysis keeps ECX/EDX live only through the frame's run-time blocks (12A969 pushad/popad, 12A97C popad). Backed by xn_abi.py clobber (installed by 155820)"
+0x00155800,clobber,eax ecx edi,see outputs
+0x00155820,outputs,,"called through [poly+3Ch] by xn_render_frame (12A939), which pops EBX EBP EDI ESI back; EAX ECX EDX reach only the span hook (150040 reloads EAX and ECX and never reads EDX; 14D300 is a ret) and the next span call, which reads none of them; the analysis keeps ECX/EDX live only through the frame's run-time blocks (12A969 pushad/popad, 12A97C popad). Backed by xn_abi.py clobber (also reached by tail jumps from the setups 15BB8C/12A700/12A740 and by falling in from its setup routine)"
+0x00155820,clobber,eax ecx ebx edi,see outputs
+0x00155880,outputs,,"a planted-ret body: its planter only puts back the planted byte and returns, reading none of these. Backed by xn_abi.py clobber"
+0x00155880,clobber,eax ecx edx,see outputs
+0x00155920,outputs,,"called through [poly+3Ch] by xn_render_frame (12A939), which pops EBX EBP EDI ESI back; EAX ECX EDX reach only the span hook (150040 reloads EAX and ECX and never reads EDX; 14D300 is a ret) and the next span call, which reads none of them; the analysis keeps ECX/EDX live only through the frame's run-time blocks (12A969 pushad/popad, 12A97C popad). Backed by xn_abi.py clobber (also reached by tail jumps from the setups 15BB8C/12A700/12A740 and by falling in from its setup routine)"
+0x00155920,clobber,eax ecx edx ebx ebp esi edi,see outputs
+0x00155C00,outputs,,"a planted-ret body: its planter only puts back the planted byte and returns, reading none of these. Backed by xn_abi.py clobber"
+0x00155C00,clobber,edx ebx,see outputs
+0x00155D20,outputs,,"called through [poly+3Ch] by xn_render_frame (12A939), which pops EBX EBP EDI ESI back; EAX ECX EDX reach only the span hook (150040 reloads EAX and ECX and never reads EDX; 14D300 is a ret) and the next span call, which reads none of them; the analysis keeps ECX/EDX live only through the frame's run-time blocks (12A969 pushad/popad, 12A97C popad). Backed by xn_abi.py clobber (also reached by tail jumps from the setups 15BB8C/12A700/12A740 and by falling in from its setup routine)"
+0x00155D20,clobber,eax ecx edx ebx ebp esi edi,see outputs
+0x00155F60,outputs,,"called through [poly+3Ch] by xn_render_frame (12A939), which pops EBX EBP EDI ESI back; EAX ECX EDX reach only the span hook (150040 reloads EAX and ECX and never reads EDX; 14D300 is a ret) and the next span call, which reads none of them; the analysis keeps ECX/EDX live only through the frame's run-time blocks (12A969 pushad/popad, 12A97C popad). Backed by xn_abi.py clobber (also reached by tail jumps from the setups 15BB8C/12A700/12A740 and by falling in from its setup routine)"
+0x00155F60,clobber,eax ecx edx ebx ebp esi edi,see outputs
+0x00155F70,outputs,,"called through [poly+3Ch] by xn_render_frame (12A939), which pops EBX EBP EDI ESI back; EAX ECX EDX reach only the span hook (150040 reloads EAX and ECX and never reads EDX; 14D300 is a ret) and the next span call, which reads none of them; the analysis keeps ECX/EDX live only through the frame's run-time blocks (12A969 pushad/popad, 12A97C popad). Backed by xn_abi.py clobber (also reached by tail jumps from the setups 15BB8C/12A700/12A740 and by falling in from its setup routine)"
+0x00155F70,clobber,eax ecx edx ebx ebp esi edi,see outputs
+0x00156320,outputs,,"a planted-ret body: its planter only puts back the planted byte and returns, reading none of these. Backed by xn_abi.py clobber"
+0x00156320,clobber,eax edx ebx,see outputs
+0x00156460,outputs,,"called through [poly+3Ch] by xn_render_frame (12A939), which pops EBX EBP EDI ESI back; EAX ECX EDX reach only the span hook (150040 reloads EAX and ECX and never reads EDX; 14D300 is a ret) and the next span call, which reads none of them; the analysis keeps ECX/EDX live only through the frame's run-time blocks (12A969 pushad/popad, 12A97C popad). Backed by xn_abi.py clobber (also reached by tail jumps from the setups 15BB8C/12A700/12A740 and by falling in from its setup routine)"
+0x00156460,clobber,eax ecx edx ebx ebp esi edi,see outputs
+0x001566B4,outputs,,"called through [poly+3Ch] by xn_render_frame (12A939), which pops EBX EBP EDI ESI back; EAX ECX EDX reach only the span hook (150040 reloads EAX and ECX and never reads EDX; 14D300 is a ret) and the next span call, which reads none of them; the analysis keeps ECX/EDX live only through the frame's run-time blocks (12A969 pushad/popad, 12A97C popad). Backed by xn_abi.py clobber (also reached by tail jumps from the setups 15BB8C/12A700/12A740 and by falling in from its setup routine)"
+0x001566B4,clobber,eax ecx edx ebx ebp esi edi,see outputs
+0x001566C4,outputs,,"called through [poly+3Ch] by xn_render_frame (12A939), which pops EBX EBP EDI ESI back; EAX ECX EDX reach only the span hook (150040 reloads EAX and ECX and never reads EDX; 14D300 is a ret) and the next span call, which reads none of them; the analysis keeps ECX/EDX live only through the frame's run-time blocks (12A969 pushad/popad, 12A97C popad). Backed by xn_abi.py clobber (also reached by tail jumps from the setups 15BB8C/12A700/12A740 and by falling in from its setup routine)"
+0x001566C4,clobber,eax ecx edx ebx ebp esi edi,see outputs
+0x00156A80,outputs,,"called through [poly+3Ch] by xn_render_frame (12A939), which pops EBX EBP EDI ESI back; EAX ECX EDX reach only the span hook (150040 reloads EAX and ECX and never reads EDX; 14D300 is a ret) and the next span call, which reads none of them; the analysis keeps ECX/EDX live only through the frame's run-time blocks (12A969 pushad/popad, 12A97C popad). Backed by xn_abi.py clobber (also reached by tail jumps from the setups 15BB8C/12A700/12A740 and by falling in from its setup routine)"
+0x00156A80,clobber,eax ecx edx ebx ebp esi edi,see outputs
+0x00156A94,outputs,,"called through [poly+3Ch] by xn_render_frame (12A939), which pops EBX EBP EDI ESI back; EAX ECX EDX reach only the span hook (150040 reloads EAX and ECX and never reads EDX; 14D300 is a ret) and the next span call, which reads none of them; the analysis keeps ECX/EDX live only through the frame's run-time blocks (12A969 pushad/popad, 12A97C popad). Backed by xn_abi.py clobber (also reached by tail jumps from the setups 15BB8C/12A700/12A740 and by falling in from its setup routine)"
+0x00156A94,clobber,eax ecx edx ebx ebp esi edi,see outputs
+0x00156D40,outputs,,"a planted-ret body: its planter only puts back the planted byte and returns, reading none of these. Backed by xn_abi.py clobber"
+0x00156D40,clobber,edx ebx,see outputs
+0x00156E60,outputs,,"called through [poly+3Ch] by xn_render_frame (12A939), which pops EBX EBP EDI ESI back; EAX ECX EDX reach only the span hook (150040 reloads EAX and ECX and never reads EDX; 14D300 is a ret) and the next span call, which reads none of them; the analysis keeps ECX/EDX live only through the frame's run-time blocks (12A969 pushad/popad, 12A97C popad). Backed by xn_abi.py clobber (also reached by tail jumps from the setups 15BB8C/12A700/12A740 and by falling in from its setup routine)"
+0x00156E60,clobber,eax ecx edx ebx ebp esi edi,see outputs
+0x00157100,outputs,,"a planted-ret body: its planter only puts back the planted byte and returns, reading none of these. Backed by xn_abi.py clobber"
+0x00157100,clobber,eax edx ebx ebp,see outputs
+0x00157240,outputs,,"called through [poly+3Ch] by xn_render_frame (12A939), which pops EBX EBP EDI ESI back; EAX ECX EDX reach only the span hook (150040 reloads EAX and ECX and never reads EDX; 14D300 is a ret) and the next span call, which reads none of them; the analysis keeps ECX/EDX live only through the frame's run-time blocks (12A969 pushad/popad, 12A97C popad). Backed by xn_abi.py clobber (also reached by tail jumps from the setups 15BB8C/12A700/12A740 and by falling in from its setup routine)"
+0x00157240,clobber,eax ecx edx ebx ebp esi edi,see outputs
+0x00157620,outputs,,"called through [flat+3Ch] by xn_flat_span_emit (15527B), which pops EDI ECX back; its callers xn_flat_span_clip and xn_flat_raster reload EAX (15520E, 1553A8) and EDX (155217, 1552FC, 1553AD) before reading them; their conservative rows (callers through the run-time blocks of 12A870) keep them live. Backed by xn_abi.py clobber"
+0x00157620,clobber,eax ecx edx ebx ebp esi edi,see outputs
+0x00157760,outputs,,"a planted-ret body: its planter only puts back the planted byte and returns, reading none of these. Backed by xn_abi.py clobber"
+0x00157760,clobber,eax ebx,see outputs
+0x00157800,outputs,,"called through [flat+3Ch] by xn_flat_span_emit (15527B), which pops EDI ECX back; its callers xn_flat_span_clip and xn_flat_raster reload EAX (15520E, 1553A8) and EDX (155217, 1552FC, 1553AD) before reading them; their conservative rows (callers through the run-time blocks of 12A870) keep them live. Backed by xn_abi.py clobber"
+0x00157800,clobber,eax ecx edx ebx ebp esi edi,see outputs
+0x00157960,outputs,,"a planted-ret body: its planter only puts back the planted byte and returns, reading none of these. Backed by xn_abi.py clobber"
+0x00157960,clobber,eax edx ebx,see outputs
+0x00157B20,outputs,,"called through [flat+3Ch] by xn_flat_span_emit (15527B), which pops EDI ECX back; its callers xn_flat_span_clip and xn_flat_raster reload EAX (15520E, 1553A8) and EDX (155217, 1552FC, 1553AD) before reading them; their conservative rows (callers through the run-time blocks of 12A870) keep them live. Backed by xn_abi.py clobber"
+0x00157B20,clobber,eax ecx edx ebx ebp esi edi,see outputs
+0x00157CA0,outputs,,"a planted-ret body: its planter only puts back the planted byte and returns, reading none of these. Backed by xn_abi.py clobber"
+0x00157CA0,clobber,eax ecx edx ebx ebp,see outputs
+0x00157E20,outputs,,"called through [flat+3Ch] by xn_flat_span_emit (15527B), which pops EDI ECX back; its callers xn_flat_span_clip and xn_flat_raster reload EAX (15520E, 1553A8) and EDX (155217, 1552FC, 1553AD) before reading them; their conservative rows (callers through the run-time blocks of 12A870) keep them live. Backed by xn_abi.py clobber; never ran in play (no records): the same call site as the other three"
+0x00157E20,clobber,eax ecx edx ebx ebp esi edi,see outputs
+0x00157E20,flags_out,,"CF: its callers compare before any flag read (155200 cmp ebx, ebp; 1552A0 add/or); as the other flat routines, which have no flags out"
+0x00157FA0,outputs,,"a planted-ret body: its planter only puts back the planted byte and returns, reading none of these. Backed by xn_abi.py clobber"
+0x00157FA0,clobber,eax edx ebx ebp,see outputs
+0x00157FA0,flags_out,,"CF: its callers compare before any flag read (155200 cmp ebx, ebp; 1552A0 add/or); as the other flat routines, which have no flags out"
+0x00158D04,outputs,,"xn_span_insert: its one caller xn_poly_rasterize (15BA27) pops EDI ESI ECX EBP EBX after it and writes EAX (15BA73) and EDX (15BA78) before reading them (15BA5D's test eax only sets flags that dec overwrites but CF, which test clears); the rasterizer's conservative row (its callers in the pipeline) keeps AH/EAX.u/EDX live. Backed by xn_abi.py clobber"
+0x00158D04,clobber,eax ecx edx ebx ebp esi edi,see outputs
+0x0015BF75,outputs,ebp esi,"xn_light_add_point, a dispatch-table handler: its caller's loop (15BC83) reads CF, EBP (the slot count) and ESI (the list entry, which it keeps) and reloads EAX (15BC7B); EBX ECX EDX reach only the builders, which write them, or the setup's callers (see 15BC42). On its third slot it jumps to xn_light_build_shader_3, whose EAX (8) and ESI go to the setup's caller: that path returns through the builder, not through this function's ret. Backed by xn_abi.py clobber"
+0x0015BF75,clobber,eax ecx edx ebx,xn_light_add_point: see outputs
+0x000C9D63,outputs,,"dead (no caller; C9D19 jumps past it): a streak's run like C9D19's, whose callers read none of the registers it changes"
+0x000C9D63,clobber,eax ecx edx bl esi edi,"dead: the registers its run changes, as C9D19's row (bl holds the code byte it restores)"
+0x0013EB21,outputs,,"its callers are 13ED23 13EE77 13EFD7 (terrain): the row's ah eax.u dh edx.u ebx ebp are partial-register artifacts (13EFD7 reads them only through `and eax, 0F8h`, `and edx, 3Fh`, `and ebx, 7F00h` after loading their low bytes, and passes ebp to asm callees that set it before use); backed by xn_abi.py clobber"
+0x0013EB21,clobber,eax ecx edx ebx ebp,terrain-internal: the leftovers of the cross product and plane test; only CF is a result (backed by xn_abi.py clobber)
+0x0013EC22,outputs,,as 0x13EB21 (the other triangle of a cell): its callers 13EDCD 13EF27 read only CF
+0x0013EC22,clobber,eax ecx edx ebx ebp,as 0x13EB21 (backed by xn_abi.py clobber)
+0x0013ED23,outputs,,"called only by 13EFD7, which reads the row's ah eax.u dh edx.u ebp only as artifacts (partial-register loads before `and reg, imm`; ebp set before use by its asm callees)"
+0x0013ED23,clobber,eax ecx edx ebx ebp edi,terrain-internal: the triangle goes to memory (backed by xn_abi.py clobber)
+0x0013EDCD,outputs,,as 0x13ED23
+0x0013EDCD,clobber,eax ecx edx ebx ebp edi,as 0x13ED23 (backed by xn_abi.py clobber)
+0x0013EE77,outputs,,as 0x13ED23
+0x0013EE77,clobber,eax ecx edx ebx ebp edi,as 0x13ED23 (backed by xn_abi.py clobber)
+0x0013EF27,outputs,,as 0x13ED23
+0x0013EF27,clobber,eax ecx edx ebx ebp edi,as 0x13ED23 (backed by xn_abi.py clobber)
+0x0013F3C1,outputs,,"called only at the start of 13EFD7, whose next reader of ebp/edi is xn_tex_cache_lookup's pass-through of them (its inputs ebp edi come from the conservative calls into the game in xn_tex_load_archive)"
+0x0013F3C1,clobber,eax ecx edx ebx ebp esi edi,the texture origins and axes go to memory (backed by xn_abi.py clobber)
+0x000C30D6,outputs,,"dead (an editor's create-file, no caller): the handle, table pointer and size it leaves in ebx, eax and edx go to memory too"
+0x000C30D6,clobber,eax edx ebx,dead: the registers it changes (xn_dos_create keeps eax and ecx; the game's malloc keeps the rest)
+0x000C3DA9,outputs,,dead body after the ret at C3DA8 (no caller): the paths go to the tile layer
+0x000C3DA9,clobber,eax ecx ebx esi edi,"dead: the registers it changes (the walker's position, step, layer pointers; xn_world_steepest_neighbour keeps edx and ebp)"
+0x000C3E6A,outputs,,dead body after the ret at C3E69 (no caller): the river goes to the layers
+0x000C3E6A,clobber,eax ecx ebx esi edi,dead: the registers it changes
+0x0014A6C0,outputs,eax,"dead (no caller): the natural result, 0 or -1; EDX and EBX are xn_collide_sphere_sphere's high dword and d^2"
+0x0014A6C0,clobber,edx ebx,dead: the bounding test's leftovers
+0x0014AF30,outputs,eax,dead (no caller): 0 or -1; EDX and EBX are the last segment-sphere test's leftovers
+0x0014AF30,clobber,edx ebx,dead: leftovers
+0x0014B017,outputs,eax,dead (no caller): the hit list or -1; EDX is the last sphere-sphere test's high dword
+0x0014B017,clobber,edx,dead: leftover
+0x0014C25F,outputs,eax,dead (no caller): the distance; EDX and EBX are the rounded sum's high dword and a partial sum
+0x0014C25F,clobber,edx ebx,dead: leftovers
+0x0014C9D2,outputs,eax,"dead (no caller): the first non-negative test; EDX EBX are xn_vec_length_approx's terms, ESI a point"
+0x0014C9D2,clobber,edx ebx esi,dead: leftovers
+0x0014CA83,outputs,eax,dead (no caller): r1 + r2 - the distance; EDX EBX are xn_vec_length_approx's terms
+0x0014CA83,clobber,edx ebx,dead: leftovers
+0x0014CB24,outputs,eax,dead (no caller): the sign test; EDX and EBX are its per-axis terms
+0x0014CB24,clobber,edx ebx,dead: leftovers
+0x0014CB4F,outputs,eax,dead (no caller): as 14CB24
+0x0014CB4F,clobber,edx ebx,dead: leftovers
+0x0015CD33,outputs,eax,dead (no caller): the area; EDX is the sum before the halving
+0x0015CD33,clobber,edx,dead: leftover
+0x0015CEDE,outputs,eax,"dead (no caller): the first non-negative test or -1; ECX (the radius after its xchg), ESI (the point) and EDI (the slot) are leftovers"
+0x0015CEDE,clobber,ecx esi edi,dead: leftovers
+0x0014B19B,stack_args,8,"dead stub: it loads two stack arguments ([ebp+8], [ebp+0Ch]) and pops them (ret 8)"
+0x0014B58E,outputs,eax edx,"dead (a tool's sphere builder, no caller): the bytes written and the spheres' count; EBX is a leftover"
+0x0014B58E,clobber,ebx,dead: leftover
+0x0014C4A6,outputs,eax edx ebx,"dead (no caller): the point on the planes' line (garbage when they are parallel, kept); ECX EBP ESI EDI are the solve's leftovers"
+0x0014C4A6,clobber,ecx ebp esi edi,dead: leftovers
+0x0014C762,outputs,eax edx,dead (no caller): r - |d| and d; EBX is a product's low dword
+0x0014C762,clobber,ebx,dead: leftover
+0x0014C79D,outputs,eax edx,dead (no caller): as 14C762
+0x0014C79D,clobber,ebx,dead: leftover
+0x0015CC36,outputs,,dead (no caller): the result is CF; EAX EDX EBX ESI EDI are the edge test's leftovers
+0x0015CC36,clobber,eax edx ebx esi edi,dead: leftovers
+0x000C7FB6,outputs,,dead (no caller): the natural interface stores both angles through the pointers; nothing reads the registers
+0x000C7FB6,clobber,eax edx,dead (no caller): the registers xn_vec_dir_to_angles_regs leaves (it keeps ebx and ecx)
+0x0013742B,outputs,,dead (no caller): scales the matrix in place; EAX is only the last product's low dword
+0x0013742B,clobber,eax,dead (no caller): the asm keeps edx ebx esi
+0x00137790,outputs,,dead (no caller): divides the matrix in place; EAX is only the last quotient
+0x00137790,clobber,eax,dead (no caller): the asm keeps edx ebx esi
+0x0013622F,outputs,,"ecx ebx are live only on xn_tex_heap_alloc's fatal exit after xn_tex_heap_evict (136107 jb 13611D: kbd/joy/render/gfx/mem shutdown, then int 21h 4Ch), whose callees' conservative inputs read every register; that jb is never taken: evict's stc at 136170 is followed by clc. Backed by xn_abi.py clobber"
+0x0013622F,clobber,eax ecx ebx,see outputs
+0x00136145,outputs,,"ecx edx ebx are live only on xn_tex_heap_alloc's unreachable fatal exit (136107 jb 13611D; evict's stc at 136170 is followed by clc, so CF is always 0). Backed by xn_abi.py clobber"
+0x00136145,clobber,ecx edx ebx,see outputs
+0x00158678,outputs,,xn_poly_clip_frustum: its registers leak only through the projectors' early return on a rejected polygon (158387/158487/1585E2 jae ret) into the projectors' spurious outputs (the 12A976 block / span-routine edx chains; raster agent's evidence). Callers read CF. Backed by xn_abi.py clobber
+0x00158678,clobber,eax ecx edx ebx ebp esi edi,see outputs
+0x001587D4,outputs,,xn_poly_clip_plane: its one caller xn_poly_clip_frustum reads only memory after it (outcode bytes); the registers leaked through clip_frustum's outputs (see 158678). Backed by xn_abi.py clobber
+0x001587D4,clobber,eax ecx edx ebx esi edi,see outputs
+0x0015B9A0,outputs,,"xn_poly_rasterize: leftovers (span_insert's EAX/EDX, the edges' x) that reach callers only through the terrain/model/flat chains' conservative outputs; with the span routines' and span_insert's overrides (raster agent) the callers' memory and I/O do not change when they are scrambled. Backed by xn_abi.py clobber"
+0x0015B9A0,clobber,eax ecx edx ebx ebp esi edi,see outputs
+0x00158420,outputs,,"xn_poly_project_face: its caller xn_model_draw_faces (14047C) reads CF; EDX/EBP leak only through draw_faces/model_draw/draw_models into xn_render_frame's span loop (span routines' and fog hook's overrides, raster agent). Backed by xn_abi.py clobber"
+0x00158420,clobber,eax ecx edx ebx ebp esi edi,see outputs
+0x001585C0,outputs,,"xn_poly_project_terrain: the terrain cells (13EFC9, 13F2A5, 13EF19) read the leftovers only through partial-register writes and and-masks (13F02C mov bh / 13F03B and ebx, 7F00h); scrambled, the records keep memory and I/O. Backed by xn_abi.py clobber"
+0x001585C0,clobber,eax ecx edx ebx ebp esi edi,see outputs
+0x00158360,outputs,,xn_poly_project_flat: the flat chain's outputs come from the RENDER-FRAME block split (12A976 popal; call draw_flats): xn_render_frame restores every register after it. Backed by xn_abi.py clobber
+0x00158360,clobber,eax ecx edx ebx ebp esi edi,see outputs
+0x0015BA16,outputs,,xn_poly_rasterize_row_loop: dead (an entry inside 15B9A0's loop after an unconditional jump; no caller)
+0x0015BA16,clobber,eax ecx edx ebx ebp esi edi,dead (no caller)
+0x00154E20,outputs,,xn_flat_draw: its caller xn_render_draw_flats (12A84B) reads CF; the registers are live only through the RENDER-FRAME block split (12A976 popal; call draw_flats; xn_render_frame restores every register). Backed by xn_abi.py clobber
+0x00154E20,clobber,eax ecx edx ebx ebp esi edi,see outputs
+0x001550E0,outputs,,xn_flat_setup_gradients: its one caller xn_flat_raster (1552AC) overwrites EBP at once and EBX before any read but its own early return (the flat chain's spurious outputs). Backed by xn_abi.py clobber
+0x001550E0,clobber,ecx edx ebx ebp esi edi,"see outputs (EAX, the top row, is kept: xn_flat_raster reads it after)"
+0x00155200,outputs,,"xn_flat_span_clip: EAX EDX come from the flat span routines (no outputs, raster agent) and reach xn_flat_raster's spurious outputs only. Backed by xn_abi.py clobber"
+0x00155200,clobber,eax edx ebx ebp esi,see outputs
+0x0015526C,outputs,,xn_flat_span_emit: as xn_flat_span_clip. Backed by xn_abi.py clobber
+0x0015526C,clobber,eax edx ebx ebp esi,see outputs
+0x001552A0,outputs,,xn_flat_raster: its caller xn_poly_project_flat returns at once into xn_flat_draw (the flat chain from the 12A976 block split). Backed by xn_abi.py clobber
+0x001552A0,clobber,eax ecx edx ebx ebp esi edi,see outputs
+0x00155332,outputs,,xn_flat_raster_rows: dead (an entry inside 1552A0's row loop; no caller)
+0x00155332,clobber,eax ecx edx ebx ebp esi edi,dead (no caller)
+0x00155610,outputs,,"xn_flat_span_light_setup: called through [flat+3Ch] by xn_flat_span_emit (15527B), which pops EDI ECX back and returns into xn_flat_span_clip / xn_flat_raster (outputs dropped above); as the other flat span routines (raster agent). Backed by xn_abi.py clobber"
+0x00155610,clobber,eax ecx edx ebx ebp edi,see outputs
+0x0012A814,outputs,,xn_render_draw_flats: its only caller is the RENDER-FRAME block 12A976 (popal; call 12A814; 12A97C jb; 12A97E popal; ret): xn_render_frame restores every register after it and reads CF. The block split loses that (raster agent owns 12A870). Backed by xn_abi.py clobber
+0x0012A814,clobber,eax ecx edx ebx ebp esi edi,see outputs
+0x0012A7D0,outputs,,"xn_render_draw_models: EDX (xn_model_draw's leftover) is live only into xn_render_frame's span loop, where the span routines and the span hook drop it (raster agent's overrides); xn_render_frame reads CF. Backed by xn_abi.py clobber"
+0x0012A7D0,clobber,eax ecx edx ebx ebp esi edi,see outputs
+0x00140284,outputs,,xn_model_draw: EDX is a leftover of xn_model_draw_faces / xn_poly_project_face that reaches only xn_render_draw_models' EDX (see 12A7D0); callers read CF. Backed by xn_abi.py clobber
+0x00140284,clobber,eax ecx edx ebx ebp esi edi,see outputs
+0x001403AF,outputs,,xn_model_draw_faces: EDX as xn_model_draw's (see 140284); its caller reads CF. Backed by xn_abi.py clobber
+0x001403AF,clobber,eax ecx edx ebx ebp esi edi,see outputs
+0x001404FA,outputs,bx,"xn_model_transform_face_verts: the outcodes' AND/OR in BX; EDX (the last vertex's projection leftovers) is overwritten by xn_model_draw_faces before any read but on its last face, where it reaches the dropped EDX chain (see 140284). Backed by xn_abi.py clobber"
+0x001404FA,clobber,eax ecx edx ebx.u ebp esi edi,see outputs
+0x000C800B,outputs,,dead: the copy goes to memory; EDX is the dword it moved
+0x000C800B,clobber,edx,dead: EDX is the dword it moved
+0x000CE435,outputs,eax,dead: the pointer found; EBX is the count left
+0x000CE435,clobber,ebx,dead: EBX is the count left
+0x000CE495,outputs,,"dead copy of xn_str_fill_ascending (0xCE663), whose callers read nothing back"
+0x000CE495,clobber,eax edx ebx,"dead copy of xn_str_fill_ascending: its pointer, value and count registers"
+0x0015372C,outputs,,dead: the string changes in memory; AL ends as the terminator moved
+0x0015372C,clobber,al,dead: AL ends as the terminator moved
+0x0015373C,outputs,,dead: the string changes in memory; AL and EDX are the last byte moved and its address
+0x0015373C,clobber,eax edx,dead: AL and EDX are the last byte moved and its address
+0x00153964,outputs,,"dead: the copy goes to memory; AL, ESI and EDI are the last byte and the two pointers"
+0x00153964,clobber,al esi edi,"dead: AL, ESI and EDI are the last byte and the two pointers"
+0x000CAE0E,outputs,eax,"live: it returns into spell_effect_handlers[type], the game's Watcom C, which keeps EBP: only EAX comes back (the records check EBP kept)"
+0x000CAE00,outputs,,"live: it jumps to xn_steer_region_handlers[region], the game's Watcom C void(void), which keeps EBP and never touches FS or GS (the records check EBP kept)"
+0x000C0C00,outputs,eax,"dead: the palette buffer; ESI is the shift loop's pointer (the other registers it may change are those of the fatal path, which does not return)"
+0x000C0C00,clobber,esi,dead: ESI is the shift loop's pointer
+0x000C0C7C,outputs,eax,"dead: the handle (the other registers are those of the fatal path, which does not return)"
+0x000C0C7C,clobber,,dead: it keeps the rest
+0x000C0D14,outputs,eax,dead: 1 when the file does not open; EBX is the closed handle
+0x000C0D14,clobber,ebx,dead: EBX is the closed handle
+0x000C0D44,outputs,eax,"dead: the handle (the other registers are those of the fatal path, which does not return)"
+0x000C0D44,clobber,,dead: it keeps the rest
+0x000C0D78,outputs,eax,dead: the carry as 0/1; EDX is the buffer advanced past the whole pieces
+0x000C0D78,clobber,edx,dead: EDX is the buffer advanced past the whole pieces
+0x000C0DB8,outputs,eax,dead: the bytes read; EDX is the buffer
+0x000C0DB8,clobber,edx,dead: EDX is the buffer
+0x000C0DCC,outputs,eax,dead: the carry as 0/1; EDX is DOS's DX (the position's high word)
+0x000C0DCC,clobber,edx,dead: EDX is DOS's DX (the position's high word)
+0x000C0DEC,outputs,eax,"dead: the size (the other registers are those of the fatal path, which does not return)"
+0x000C0DEC,clobber,,dead: it keeps the rest
+0x00149EF8,flags_out,,"live: the only site with flags live after it is C32D1, xn_world's out-of-memory exit, where they reach only int 21h 09h and 4C00h (the analysis' every-register-live int); nothing tests them (xn_abi.py clobber 149EF8)"
+0x00153900,outputs,,"live: the only site reading EDX after it is 14D20B in the dead xn_shade_load_haze, and there only through the game malloc 0xA10A8's summary; the font and shade loaders do not (xn_abi.py clobber 153900)"
+0x00153900,clobber,eax edx,EDX is the last digit's remainder (or the destination when ndigits is 1)
+0x000C020A,outputs,edi,"live: an ASCR opcode handler; its only caller is xn_anim_run_opcodes' call through xn_anim_opcodes, which reads EDI (and CF, DX) after it (xn_abi.py clobber)"
+0x000C020A,clobber,eax,"EAX/EBX: its count, chosen in AL"
+0x000C0221,outputs,edi,"live: an ASCR opcode handler; its only caller is xn_anim_run_opcodes' call through xn_anim_opcodes, which reads EDI (and CF, DX) after it (xn_abi.py clobber)"
+0x000C0221,clobber,eax ebx,EAX/EBX: the loop start's address and offset
+0x000C023B,outputs,edi,"live: an ASCR opcode handler; its only caller is xn_anim_run_opcodes' call through xn_anim_opcodes, which reads EDI (and CF, DX) after it (xn_abi.py clobber)"
+0x000C023B,clobber,eax,EAX/EBX: the event bits
+0x000C0248,outputs,edi,"live: an ASCR opcode handler; its only caller is xn_anim_run_opcodes' call through xn_anim_opcodes, which reads EDI (and CF, DX) after it (xn_abi.py clobber)"
+0x000C0248,clobber,eax,EAX/EBX: the operand
+0x000C0253,outputs,edi,"live: an ASCR opcode handler; its only caller is xn_anim_run_opcodes' call through xn_anim_opcodes, which reads EDI (and CF, DX) after it (xn_abi.py clobber)"
+0x000C0253,clobber,eax,EAX/EBX: the operand
+0x000C026B,outputs,edi,"live: an ASCR opcode handler; its only caller is xn_anim_run_opcodes' call through xn_anim_opcodes, which reads EDI (and CF, DX) after it (xn_abi.py clobber)"
+0x000C026B,clobber,eax,EAX/EBX: the restart offset
+0x000C027B,outputs,edi,"live: an ASCR opcode handler; its only caller is xn_anim_run_opcodes' call through xn_anim_opcodes, which reads EDI (and CF, DX) after it (xn_abi.py clobber)"
+0x000C027B,clobber,,it changes nothing else
+0x000C027F,outputs,edi,"live: an ASCR opcode handler; its only caller is xn_anim_run_opcodes' call through xn_anim_opcodes, which reads EDI (and CF, DX) after it (xn_abi.py clobber)"
+0x000C027F,clobber,eax,EAX/EBX: the wait
+0x000C029C,outputs,edi,"live: an ASCR opcode handler; its only caller is xn_anim_run_opcodes' call through xn_anim_opcodes, which reads EDI (and CF, DX) after it (xn_abi.py clobber)"
+0x000C029C,clobber,eax,EAX/EBX: the target offset
+0x000C02A7,outputs,edi,"live: an ASCR opcode handler; its only caller is xn_anim_run_opcodes' call through xn_anim_opcodes, which reads EDI (and CF, DX) after it (xn_abi.py clobber)"
+0x000C02A7,clobber,eax,EAX/EBX: the random number or the target offset
+0x000C02C5,outputs,edi,"live: an ASCR opcode handler; its only caller is xn_anim_run_opcodes' call through xn_anim_opcodes, which reads EDI (and CF, DX) after it (xn_abi.py clobber)"
+0x000C02C5,clobber,eax,EAX/EBX: the event bits or the target offset
+0x000C02DF,outputs,edi,"live: an ASCR opcode handler; its only caller is xn_anim_run_opcodes' call through xn_anim_opcodes, which reads EDI (and CF, DX) after it (xn_abi.py clobber)"
+0x000C02DF,clobber,eax,EAX/EBX: the operand
+0x000C02E9,outputs,ax,"live: DX comes back as it was (pushed and popped as a word, which the analysis does not pair); its callers, opcodes 0 and 7, read AL (xn_abi.py clobber)"
+0x001609C0,outputs,,"live: its callers are 153549 in xn_helmet_close (unreferenced: its every-register-live exit is no caller's) and 161077 in driver B's failed open, which reads nothing after it (xn_abi.py clobber)"
+0x001609C0,clobber,eax,EAX is _dos_setvect's with AL = 20h (the EOI)
+0x00153530,outputs,,dead: unreferenced; it closes the tracker and the port
+0x00153530,clobber,eax edx,dead: EAX and EDX are the port and the driver offset
