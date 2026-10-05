@@ -19,6 +19,7 @@ Assembler 4.0; the tools check the executables' SHA-1.
 - [docs/xngine.md](docs/xngine.md): the XnGine engine (object 2): plan and log
 - [docs/play.md](docs/play.md): playing the headless game with tools/fallplay.py: commands, start points, UI facts
 - [docs/state.md](docs/state.md): where the game keeps its state in memory (player, character record, mode, location), with the evidence for each
+- [docs/naming.md](docs/naming.md): the naming convention for functions, globals and record fields
 
 ## Status
 

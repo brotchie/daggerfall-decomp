@@ -1,7 +1,7 @@
 kind,address,name,confidence,evidence
 global,0x000C0BA8,disk_last_file_size,confirmed,length of the last file disk_read_file read: 8738 after flats.cfg (exp_chain); init divides it by 89 for spell_record_count; the FLATS.CFG parser counts it down
 global,0x000CAF24,spell_cost_formulas,strong,"7 function pointers (0x3937B, 0x3946E, 0x395AA, 0x39635, 0x396C0, 0x3978C, 0x3988A), the jump table of func_000CAE07 (jmp [eax*4+0xCAF24]); in xn_CAF00.asm"
-global,0x000CAF40,spell_effect_handlers,confirmed,"64 entries (world agent): 0-50 the spell effects, 51-63 the handlers of kludge.c's debug pick list ('Get rumor' ... 'Enter Tavern'). 60 function pointers: 0-50 the spell effects (0x88CF5 Paralyze ... 0x8A344 Recall (43) ... 0x8A4BD), 51-54 kludge.c (0x44EE0, 0x44F5C, 0x44F3A, 0x44EFD), 55-58 disease.c (0x66352, 0x6691F, 0x66D3C, 0x67309), 59 0x45B41; in xn_CAF00.asm; exp1b (build/names/scratch/magic/exp1b.py, save_morthag1): 22 effect types reached the handlers listed"
+global,0x000CAF40,spell_effect_handlers,confirmed,"64 function pointers in xn_CAF00.asm, called through spell_effect_dispatch (0xCAE0E): 0-50 the spell effects (0x88CF5 Paralyze ... 0x8A344 Recall (43) ... 0x8A4BD); 51-63 the handlers of kludge.c's debug pick list (kludge_menu_update through 0xCAE1C, world agent): 51 kludge_show_rumor, 52 kludge_advance_level, 53 kludge_jump_month, 54 kludge_good_merchant_rep, 55-58 disease.c (become/cure vampire, werething), 59 kludge_toggle_world_position, 60 kludge_toggle_second_compass, 61 kludge_pick_gold, 62 tavern_open, 63 kludge_toggle_quest_debug; exp1b (build/names/scratch/magic/exp1b.py, save_morthag1): 22 effect types reached the handlers listed"
 global,0x000CDE2F,internal_check_failed,candidate,non-zero: fatal_error reports 'Failed internal check %lx.' with it instead of the message
 global,0x00120290,pick_distance,strong,distance to the clicked object: every click handler refuses beyond 128/150/160/256 with 'You are too far away...'
 global,0x0012AC00,mouse_buttons,strong,byte: mouse button state; inventory_frame and transport_menu act when it is set and was not last frame
@@ -286,7 +286,7 @@ global,0x00187B3C,fire_flat_records,strong,"8 TEXTURE.210 record numbers that bu
 global,0x00187CA4,player_momentum,candidate,"last speed, kept while airborne (no steering off the ground)"
 global,0x00187CA8,world_running,candidate,byte cleared when the inventory opens and set at close; ai_update_creatures returns while it is 0
 global,0x00187CAD,mem_check_level,strong,"non-zero turns the heap checks on (mem_check_heap, mem_check_crt_heap); args.c prints 'Memory checking is active for this session.' when set; mem_check_now raises it around a forced check; fatal_error and game_exit clear it"
-global,0x00187FB8,dispel_monster_ids,strong,"2 x 7 monster ids: undead 15 18 19 23 28 30 32, daedra 1 25 26 27 29 31 100 (spfx_dispel_creatures)"
+global,0x00187FB8,undead_daedra_ids,strong,"2 x 7 monster ids: undead 15 18 19 23 28 30 32, daedra 1 25 26 27 29 31 100; spfx_dispel_creatures indexes it by kind (0 undead, 1 daedra), monster_sees_invisible memchr()s all 14 (= DFU SeesThroughInvisibility, combat agent); was dispel_monster_ids"
 global,0x00187FC6,spell_resist_flags,confirmed,"5 u32 masks by element in character+0x89: fire 0x2, frost 0x10000000, poison 0x20000000, shock 0x40000000, magic 0x80000000; exp1b (build/names/scratch/magic/exp1b.py, save_morthag1): Resist frost set 0x10000000"
 global,0x00187FDC,next_record_id,candidate,goes up by one when disease_infect allocates an effect record (fallcall)
 global,0x00187FE0,potionmaker_buttons,strong,"5 x {rect, handler}: RECIPES, MIX, scroll up, scroll down, EXIT (dumped; layout matches open_0x8F246.png)"
@@ -321,7 +321,6 @@ global,0x0018DE14,saved_positions,confirmed,"x,y,z (12 bytes) per slot (player_p
 global,0x0018DE44,savevars_0f7,candidate,"SAVEVARS.DAT 0xF7, 512 bytes, unknown"
 global,0x0018E044,book_list,candidate,"{u16 id, u16 level} per book found by books_scan"
 global,0x0018F044,region_event_values,confirmed,"29 bytes per 80-byte region record (index region*80 + flag): region_flag_set stores random(min,max) there; exp1: 7 for flag 2. The record starts here, not at region_politics (0x18F060)"
-global,0x0018F060,region_politics,candidate,"base+0x1C of the 80-byte region records at 0x18F044, not a field start (world agent); 80-byte per-region politics records (war, famine, plague... flags) used by faction_politics_update"
 global,0x0018F061,region_event_flags,confirmed,"29 flags at region record +0x1D; exp1: region_flag_set(20, 2) set +0x1F"
 global,0x0018F07E,region_event_groups,confirmed,14 bytes at region record +0x3A: a group is set while one of its flags is; exp1
 global,0x0018F08C,region_precipitation_override,strong,"region record +0x48 (80-byte stride from region_event_values, DFU PrecipitationOverride): weather + 1 forced for the region; sky_update and weather_draw_precipitation use it instead of the rolled weather"
@@ -339,17 +338,17 @@ global,0x00190B44,inpstr_saved_text,candidate,"160-byte copy taken at the start,
 global,0x00190BF0,automap_pitch,confirmed,"512 looking straight down, 128 in the perspective view: the grid button switched it 512 -> 128 in save_mord"
 global,0x00190BF4,automap_yaw,confirmed,the rotate buttons add/subtract 16 a frame (0 -> 512 after a click in save_mord)
 global,0x00190C34,training_state,candidate,"training_update state: 1234 ask to pay, 1235 done, 1236 skill chosen"
-global,0x00190CE4,itemmaker_slot_kinds,strong,"10 bytes: -1 empty, 0 power, 1 side effect"
+global,0x00190CE4,scratch_190ce4,strong,"shared scratch slot of the 0x190BE4-0x190E1F temporaries block (consistency pass, global_users.py over src): itemmakr 10 bytes of slot kinds (-1 empty, 0 power, 1 side effect); travel.c the region shown (region+1, 0 world; 16 functions); object.c the type/quest key of object_find_quest/object_delete_type/object_random_child_of_type; chargen roll arrays; collide_line_of_sight flag; climate texture set; inv_count_cart_cb; was itemmaker_slot_kinds"
 global,0x00190CE8,travel_zoomed,candidate,"4x zoom on the region map, toggled by travel_toggle_zoom (right click)"
 global,0x00190D0F,talk_wrap_to_question,candidate,"while set, talk_wrap_text writes to the question pane instead of the answer log"
 global,0x00190D10,talk_face_loaded,candidate,set when talk_load_face has loaded a portrait
-global,0x00190D16,saveload_cancelled,candidate,"byte: saveload_exit sets 1, saveload_confirm clears it; travel.c also uses it"
+global,0x00190D16,scratch_190d16,strong,"shared scratch slot of the 0x190BE4-0x190E1F temporaries block (consistency pass, global_users.py over src): byte: the court verdict (court_open/court_frame, %pen), saveload_exit/saveload_confirm cancel flag, transport_menu/transport_choose, rumor_add_faction, title_menu; was saveload_cancelled"
 global,0x00190D18,court_state,confirmed,"byte: the court state machine (1 plea, 2 guilty sentence, 3 prison, 5 banished, 6 execution, 7 executed, 8 argument, 9 acquitted, 100 close); experiment: 1 -> 100 (guilty), 1 -> 2 (lie failed)"
-global,0x00190D20,search_kind,candidate,guild kind / kind bits the membership searches look for
+global,0x00190D20,scratch_190d20,strong,"shared scratch slot of the 0x190BE4-0x190E1F temporaries block (consistency pass, global_users.py over src): the guild kind/kind bits the membership searches look for (guild_find_membership_by_*), the book-title hero gender for %1hn/%1g1-%1g3, song_init_seeds; was search_kind"
 global,0x00190D23,tavern_state,confirmed,"byte: 0 menu, 1 waiting for the number of days, 2 room offer pending (tavern_frame dispatches on it); experiment: 1 after ROOM, 0 after paying"
-global,0x00190D64,itemmaker_slot,candidate,short: slot being filled
-global,0x00190D66,itemmaker_power,candidate,short: power being added
-global,0x00190D68,itemmaker_mode,candidate,short: itemmaker_open's argument; 2 allows Soul bound without souls
+global,0x00190D64,scratch_190d64,strong,"shared scratch slot of the 0x190BE4-0x190E1F temporaries block (consistency pass, global_users.py over src): short: itemmaker slot being filled; sheet level-up bonus points; spellbook/magic-item row count; class question scroll position; book/logbook line length; travel zoom origin; chargen and classmaker counters; tavern room offer; quest op68/op69 callbacks; was itemmaker_slot"
+global,0x00190D66,scratch_190d66,strong,"shared scratch slot of the 0x190BE4-0x190E1F temporaries block (consistency pass, global_users.py over src): short: itemmaker power being added; class question scroll maximum; book/logbook centre flag; travel zoom origin; career answers; classmaker; was itemmaker_power"
+global,0x00190D68,scratch_190d68,strong,"shared scratch slot of the 0x190BE4-0x190E1F temporaries block (consistency pass, global_users.py over src): short: itemmaker_open's argument (2 allows Soul bound without souls); current class question; book goto-page state; town notes x; classmaker advancement dagger; career background; was itemmaker_mode"
 global,0x00190D6C,classmaker_done,strong,short: set by classmaker_exit_button when the class is valid; ends classmaker_run
 global,0x00190D70,chargen_selected_attribute,confirmed,"short: attribute row selected for the up/down arrows, in the class maker (classmaker_select_attribute) and chargen (chargen_select_attribute); experiment: 2 after clicking WIL"
 global,0x00190D76,classmaker_screen,confirmed,"short: 0 main, 1 reputations, 2 advantages, 3 disadvantages; bit 16 while a picklist is open; experiment: 0 -> 1 -> 0 -> 2 -> 18"
@@ -359,26 +358,26 @@ global,0x00190D86,classmaker_hp_repeat,candidate,short: frames before the HP arr
 global,0x00190D8C,levelup_attribute_floor,candidate,copy of character+0x30 taken when the sheet opens; sheet_levelup_adjust won't lower an attribute below it
 global,0x00190DC8,court_prison_days,confirmed,"short: days of prison (3 per lost coin toss, more for an unpaid fine; halved by a guilty plea); %dip in 8055; experiment: 33 -> 16"
 global,0x00190DCA,court_extra_days,candidate,"short: extra days because the fine could not be paid ((fine - gold)/40 + 1), text 8052"
-global,0x00190DDC,search_faction,candidate,faction id the membership search looks for
-global,0x00190DE4,text_macro_fpc,strong,"faction record for %fpc (the player's guild), set by talk_faction_relation"
-global,0x00190DE8,text_macro_fnpc,strong,faction record for %fnpc (the NPC's faction)
-global,0x00190DEC,text_macro_fe,strong,faction record for %fe (shared enemy)
-global,0x00190DF0,text_macro_fa,strong,faction record for %fa (shared ally)
-global,0x00190DF4,text_macro_fae,strong,faction record for %fae (the player's ally that the NPC's faction fights)
-global,0x00190DF8,text_macro_fea,strong,faction record for %fea (the player's enemy allied to the NPC's faction)
-global,0x00190DFC,text_macro_fpa,strong,faction record for %fpa (common parent)
+global,0x00190DDC,guild_search_faction,candidate,"faction id the membership searches look for (guild_match_membership, guild_find_membership_by_*; only guilds.c uses it); was search_faction"
+global,0x00190DE4,scratch_190de4,strong,"shared scratch slot of the 0x190BE4-0x190E1F temporaries block (consistency pass, global_users.py over src): faction record for %fpc (talk_faction_relation, macro_fpc_player_faction); row -> record array of the spellbook and magic-item lists; ai_pick_*_spell candidate spells; model_unlink_objects freed model; automap and town map background image; training skill list; classmaker and chargen images and arrows; potion recipe list; spfx_dispel; was text_macro_fpc"
+global,0x00190DE8,scratch_190de8,strong,"shared scratch slot of the 0x190BE4-0x190E1F temporaries block (consistency pass, global_users.py over src): faction record for %fnpc (talk_faction_relation, macro_fnpc_npc_faction); automap note list (automap_find_note, automap_delete_note); classmaker image; was text_macro_fnpc"
+global,0x00190DEC,scratch_190dec,strong,"shared scratch slot of the 0x190BE4-0x190E1F temporaries block (consistency pass, global_users.py over src): faction record for %fe (talk_faction_relation, macro_fe_shared_enemy); classmaker image; chargen name screen; was text_macro_fe"
+global,0x00190DF0,scratch_190df0,strong,"shared scratch slot of the 0x190BE4-0x190E1F temporaries block (consistency pass, global_users.py over src): faction record for %fa (talk_faction_relation, macro_fa_shared_ally); classmaker image header (+4 width, +6 height, +12 pixels); chargen skill arrows; was text_macro_fa"
+global,0x00190DF4,scratch_190df4,strong,"shared scratch slot of the 0x190BE4-0x190E1F temporaries block (consistency pass, global_users.py over src): faction record for %fae (talk_faction_relation); the classmaker image its 12 skill buttons, reputations and help use (17 functions); was text_macro_fae"
+global,0x00190DF8,scratch_190df8,strong,"shared scratch slot of the 0x190BE4-0x190E1F temporaries block (consistency pass, global_users.py over src): faction record for %fea (talk_faction_relation, macro_fea_player_enemy_npc_ally); classmaker_run and classmaker_draw_reputations image; was text_macro_fea"
+global,0x00190DFC,scratch_190dfc,strong,"shared scratch slot of the 0x190BE4-0x190E1F temporaries block (consistency pass, global_users.py over src): faction record for %fpa (talk_faction_relation, macro_fpa_shared_faction); classmaker_run and classmaker_specials_screen image; was text_macro_fpa"
 global,0x00190E0C,classmaker_picklist,candidate,"the string list the specials picklist shows (names, or a sub-list)"
 global,0x00190E10,classmaker_picklist_costs,candidate,the cost table matching classmaker_picklist
 global,0x00190EAC,text_macro_map_location,candidate,location record whose name (+0x10) %map returns (map items)
-global,0x00190FE4,text_rsc_buffer,strong,output of the TEXT.RSC expander (parse.c func_0004A6B5); talk copies its answers from here
+global,0x00190FE4,text_rsc_buffer,strong,"the text expansion buffer: macro handlers write their result here (71 parse.c uses), talk copies its answers from it, quest and rumor texts; also borrowed as a plain buffer by savevars_read/write, save_game/load_game, town_load, building_name and as monster_alloc_anim_slot's 128-byte slot bitmap (combat agent)"
 global,0x001910E4,qrc_name,candidate,8-char QRC file name text_qrc_load opens
 global,0x001913E4,enchant_text,candidate,text buffer built by enchant_powers_text
 global,0x001917E4,arena2_path,candidate,"""C:\ARENA2\"" in save_dorian; quest_start and quests_start_initial look for quest files here first"
 global,0x00191834,arena2_path_alt,candidate,"second directory searched for quest files (""C:\ARENA2\"" in save_dorian; probably the CD)"
 global,0x00191884,cfg_last_path,candidate,config_read copies each 'path' / 'pathcd' value here too ('C:\ARENA2\' in save_tlalac_s)
 global,0x001918D4,flats_cfg,strong,"FLATS.CFG records, 40 bytes: u16 picture (archive<<7|record), name, flags (2 '?', 1 '2'), three numbers; flats_cfg_find searches it"
-global,0x001940D4,view_flags,candidate,"SAVEVARS.DAT 0x3BD, 8 bytes of view/redraw flags (D_001940D5 |= 2 after a teleport, D_001940D7 |= 1, D_001940D8 |= 8); DFU weaponDrawn is bit 0x40 of 0x3BF"
-global,0x001940D6,debug_display_flags,candidate,"bit 0 world position (Toggle World Position), bit 3 second compass (Toggle Second Compass), from the debug list"
+global,0x001940D4,game_state_flags,candidate,"SAVEVARS.DAT 0x3BD, 8 flag bytes (byte 2 is display_flags, byte 7 player_motion_flags; DFU weaponDrawn is bit 0x40 of 0x3BF); this byte holds list and popup state used by 36 functions: bit 2 list popup open (list_popup_open), 5 USE MAGIC ITEM list, 7 set by spellbook_open, 4 player_add_push (ui_input.md); was view_flags, which is also the settings record field settings+0x00"
+global,0x001940D6,display_flags,candidate,"bit 0 world position, 3 second compass (the debug list toggles), 4 Detect arrow, 6 weapon ready (the HUD weapon button and A; SAVEVARS 0x3BF bit 0x40 = DFU weaponDrawn) (world and UI agents); was debug_display_flags"
 global,0x001940DB,player_motion_flags,strong,"bit 2 crouching (CROUCH toggles; exp_steer.py D: 0 -> 4 -> 0; walk steps 5 instead of 10, crouched body shape), bit 5 climbing ('Climbing mode.'), bit 6 cleared by player_motion_clear_bit6"
 global,0x001940DC,horse_overlay_image,strong,mred00i0.cfa (init_game_data); player_frame_update draws it while riding a horse (transport flag 0x200)
 global,0x001940E0,cart_overlay_image,strong,mred01i0.cfa (init_game_data); player_frame_update draws it with a cart (transport flag 0x400)
@@ -442,8 +441,8 @@ global,0x00195AE4,shelf_list_callback,candidate,function called with the row cho
 global,0x00195AE8,cheat_flags,strong,"bits: 3 reveal maps (Ctrl+F1), 6 no spell damage to the player (Ctrl+F4, spfx_damage), 0 SPELLS.STD editing in the spellmaker, 2 free enchanting (itemmaker_enchant), 7 creatures cast nothing (cast_spell_on); keys.c toggles 3 and 6 in cheat mode"
 global,0x00195AEC,shelf_object,candidate,the shelf whose items are in trade_container
 global,0x00195AF0,tavern_building,confirmed,"pointer to the building entry whose room is rented: tavern_open sets it to current_building (rest.c too); the rent fields are written there (experiment: building+0x02 expiry, +0x0F 2)"
-global,0x00195AF4,found_record,candidate,result of the membership searches (object pointer)
-global,0x00195AFC,picklist_image,strong,pick00i0.img (picklist_open*)
+global,0x00195AF4,found_object,strong,"the result of object walks and searches (objects agent: the searches pass key and result through globals): object_find_type, object_find_item, object_find_quest, object_random_child_of_type, the membership finders (guild_find_membership_by_*), gold_find_credit, inv_match_arrows/inv_take_arrow, automap_find_record, quest_match_person_cb, collide_* callbacks, marker_nearest_cb; was found_record (object = struct record, as found_marker)"
+global,0x00195AFC,list_popup_image,strong,"pick00i0.img, the list popup's window (list_popup_open/_open_strings load it, list_popup_update and list_popup_poll draw it); was picklist_image"
 global,0x00195B04,spell_records,confirmed,"pointer to SPELLS.STD in memory: 89-byte spell records, 128 max (name +0x2F, id +0x49); in save_morthag1 89 records (Fenrik's Door Jam, Buoyancy, Frostbite...); exp1b: cast_item_used_spell(82) found Orc Strength by id here"
 global,0x00195B08,effect_tick_minutes,candidate,minutes (/4) since the last effects_tick; the regeneration and enchantment amounts
 global,0x00195B0C,trade_haggle_result,candidate,"the agreed price (0 when rejected or unaffordable), set when the haggle window closes (686DA)"
@@ -461,9 +460,9 @@ global,0x00195B3C,calendar_minute,confirmed,calendar_update: minute; 11 at 08:11
 global,0x00195B40,spell_ready_missile,strong,"spell object readied to fire (distance/area targets, ""Press button to fire spell.""); intrface.c and weapons.c fire it (cast_fire_missile, spell_area_effect); cast_recast_last refuses while set"
 global,0x00195B48,spell_ready_touch,strong,spell object readied for a touch
 global,0x00195B4C,calendar_hour,confirmed,"calendar_update: hour; 8 at 08:11 (exp1), 9 after time_pass(60)"
-global,0x00195B50,guild_npc_object,strong,the clicked guild NPC object (guild_service_dispatch)
+global,0x00195B50,scratch_object,strong,"a record pointer that callbacks and walks leave their result in (magic, combat and UI agents; global_users.py): the clicked guild NPC (guild_service_dispatch, guild_temple_quest), spellbook_find_id_cb/spellbook_has_spell_id, spellbook_find_last_cast_cb, spell_find_active_effect, itemmaker_soul_list_cb, the empty soul trap at death (damage_find_empty_soul_trap_cb), spawn_point_clear's candidate point, location_store_objects, inv_count_cart_cb; was guild_npc_object"
 global,0x00195B54,weight_total,strong,accumulator object_weight_add adds to; object_weight returns it
-global,0x00195B58,spellshop_icons,strong,"mask04i0.img, spell icons drawn by spellshop_draw_spell"
+global,0x00195B58,magic_window_image,strong,"the second window image of every magic screen (magic agent): mask04i0.img in the spell shop (spellshop_open) and the spellbook (spellbook_open), mask01i0.img in the spellmaker (spellmaker_open), item01i0.img in the item maker (itemmaker_open); freed by their close functions; was spellshop_icons"
 global,0x00195B68,hud_bar_image,strong,"main00i0.img (init 4ED36), the HUD bar drawn by hud_draw"
 global,0x00195B6C,hud_mode_icons,strong,"main01i0.img: the interaction-mode icon, frame per interaction_mode, at (131,154)"
 global,0x00195B74,paperdoll_mask,candidate,125x? buffer: slot+64 per pixel where an item was drawn (paperdoll_draw_item)
@@ -502,7 +501,7 @@ global,0x00195CC4,spell_cast_anim_poison,strong,pois00c6.cif
 global,0x00195CC8,spell_cast_anim_shock,strong,shok00c6.cif
 global,0x00195CCC,spell_cast_anim_magic,strong,mjic00c6.cif
 global,0x00195CD0,grid_visit_func,candidate,object-walk function (8E357 / 8E4A8) the grid visits call
-global,0x00195CDC,breath_remaining,candidate,SAVEVARS.DAT 0x3AB = DFU breathRemaining
+global,0x00195CDC,breath_remaining,strong,"SAVEVARS.DAT 0x3AB = DFU breathRemaining; breath_update (rest.c): under water (fog_colour 107) it starts at END/2 (at most 50, +3 per rank of membership kind 149), counts down every 18 BIOS ticks (Argonians, race 7, every other time), draws the breath bar, and at 0 kills the player; 0 above water (world agent; code)"
 global,0x00195CE0,location_grid_x,candidate,x offset added before dividing by 1024
 global,0x00195CE4,location_grid_z,candidate,z offset
 global,0x00195D00,quest_tick_object,candidate,object of the quest being run or started
@@ -571,7 +570,7 @@ global,0x00195F66,mouse_motion_y,strong,"vertical mouse motion: pitch in view mo
 global,0x00195F68,quest_giver_faction,candidate,"faction given to a new ""Y"" quest (quest+0x02); 240 means the current building's faction"
 global,0x00195F6A,found_marker,confirmed,"71-byte type-34 header the marker searches fill (x at +7 = D_00195F71, picture at +0x1B = D_00195F85, block id at +0x1F = D_00195F89): marker_find_first returned it in save_mord"
 global,0x00195FB1,savevars_object_copy,candidate,"SAVEVARS.DAT 0x2F8, 71 bytes (an object header's size), right after found_marker"
-global,0x00195FF8,picklist_control,strong,the list control picklist_open* fill (8CA9A/8CCC8) and picklist_poll polls
+global,0x00195FF8,list_popup_picklist,strong,"the picklist struct of the list popup: list_popup_open/_open_strings fill it (picklist_init/picklist_add), list_popup_update and list_popup_poll poll and draw it; was picklist_control"
 global,0x00196033,msgbox_button_keys,strong,"3 scan codes that press the box's buttons (msgbox_yes_no_rsc: 21 Y, 49 N)"
 global,0x00196036,spellmaker_spell,strong,89-byte spell being made: spellmaker_new points spellshop_spell at it and clears it; potion_mix_unknown also builds its spell here
 global,0x0019608F,msgbox_button_ids,strong,"3 button image numbers (4 YES, 5 NO; 0 none) drawn by msgbox_draw_buttons; exp2: YES/NO shown"
@@ -601,7 +600,7 @@ global,0x0019627E,crime_current,strong,"byte: the crime the guards act on (1-bas
 global,0x0019627F,people_witness_flags,candidate,"byte: people_check_witnesses: bit 0 a pedestrian sees the player, bit 1 a guard does"
 global,0x00196280,is_daytime,candidate,nonzero with a vampire (race 8) or career flag 16: 'You cannot initiate fast travel during the day.'; trips then end after 18:00
 global,0x00196281,swift_present,candidate,byte: a SWIFT 3D input device answered (always 0: swift_init is a stub)
-global,0x00196283,hud_text_shadow,candidate,"text shadow colour that follows the fog (0, 107, 119, 223); main copies it to text_shadow_colour every frame"
+global,0x00196283,fog_colour,candidate,"palette index of the fog, set by update_fog with the fog distance: 0 outside at night or in clear weather, 119 fog or heavy weather, 107 under dungeon water, 223 in a dungeon; main copies it to text_shadow_colour every frame; breath_update tests 107 for under water; was hud_text_shadow (consistency pass: one use of three)"
 global,0x00196285,climate_is_ocean,candidate,"byte set by climate_lookup when the CLIMATE.PAK value is 223 (ocean, then treated as 228); read by travel.c"
 global,0x00196288,inv_right_icon,strong,"byte: picture of inve16i0.cif shown for the right container: 2 ground at open, 3 wagon after WAGON (exp)"
 global,0x00196289,world_loading,candidate,"counter raised by map_goto_location around building_enter and by the save load: the entry texts, quest links and Open-spell checks are skipped while it is set"
@@ -684,7 +683,7 @@ global,0x001966FC,bio_person_counts,candidate,"per kind (enemy, friend) the biog
 global,0x00196704,rumor_file,strong,"rumor.dat file handle (rumor_file_open/close, rumor_add_faction/quest)"
 global,0x00196708,rumor_added_count,candidate,rumours appended since rumor_file_open
 global,0x00196710,faction_count,strong,number of faction records
-global,0x0019671C,faction_match,candidate,result/default slot of faction searches; guild_npc_menu leaves the guild's faction in it
+global,0x0019671C,found_faction,candidate,"result/default slot of faction searches (parse.c rumor and faction macros, talk, guilds, faction.c, daedra_summon); guild_npc_menu leaves the guild's faction in it; a struct faction * (econ and quests struct agents); was faction_match"
 global,0x0019672C,factions,strong,"faction records (92 bytes) as one array and tree root; faction_find walks it, faction_politics_update indexes it up to faction_count"
 global,0x00196734,region_location_type_counts,confirmed,"14 ints: locations per type (map_location+4 bits 25-29), counted by maploads_load_region; exp2: equal to a count of region 21's 719 records"
 global,0x0019676C,dungeon_blocks,confirmed,"4-byte dungeon block entries {x, z, u16 number | start bit 10 | prefix index << 11}: exp3 read (0,0,1,0x2C) = start block M0000001 and border blocks B0000009"
@@ -798,6 +797,7 @@ global,0x00199730,parse_output,candidate,the destination buffer of the current p
 global,0x00199734,parse_number,candidate,number read after a %z.. macro by parse_read_number
 global,0x00199738,parse_stop,candidate,"when set, parse_expand stops after the current character (cleared on stop)"
 global,0x00199764,current_quest,strong,"data (+0x47) of the quest being run or started: set by quest_run_opcodes, quest_start, quest_load_text, quest_event_individual_npc"
+global,0x00199768,quest_reward_container,strong,"record pointer: qaction_op04_give_reward points it at the trade container (D_001960D9, emptied first) or inv_right_container and reparents the reward items into it; quest_run_opcodes shows it with inventory_open_container(.., 6) after the opcodes run when it has children; inventory_close clears it (quests struct agent)"
 global,0x0019976C,quest_debug_data,strong,data of quest_debug_object; also set by quest_start and quests_run_all when 0; cleared by quest_end
 global,0x00199770,object_found_last,candidate,object_find_by_id with root 0 stores its result here
 global,0x00199774,quest_event_object2,strong,"second object of the event (the person given an item: quest_raise_event(1, 0, npc))"
@@ -828,7 +828,7 @@ global,0x001997E8,note_file,candidate,short: notebook.tde handle
 global,0x001997EA,note_tool,confirmed,"byte: 0 text, 2 line, 3 box select (exp2)"
 global,0x001997EC,note_action,candidate,"byte: 0 idle, 1 typing, 2 drawing a line, 3 dragging a box, 4 waiting for the page number"
 global,0x001997ED,note_silent,candidate,"byte: opened with 100: no screen, no sounds"
-global,0x00199808,daylight,candidate,"1 between 6:00 and 18:00 (game_minutes % 1440 in 361-1079), set by update_fog and load_game 7C432"
+global,0x00199808,daylight,strong,"1 between 6:00 and 18:00 (game_minutes % 1440 in 361-1079), set by update_fog and load_game 7C432; sky_update reads it as named (world agent)"
 global,0x0019980C,class_questions_asked,strong,10 question numbers already asked (class_question_show)
 global,0x00199819,class_answer_counts,strong,"3 bytes: answers of each kind (warrior, rogue, mage), max 10; class_question_pick_class reads them"
 global,0x00199820,classmaker_specials,strong,"[2][7] {kind, sub-choice} of the picked advantages and disadvantages"
@@ -1000,7 +1000,7 @@ global,0x001A9AAC,inpstr_max_length,strong,short: most characters (8 for numbers
 global,0x001A9AAE,inpstr_cursor,strong,short: cursor index in inpstr_text
 global,0x001A9AB0,input_digits_only,strong,byte: inpstr.c's editor accepts only 0-9 (set by 8C4E4 number input and input_edit_number_box)
 global,0x001A9AB4,picklist_repeat_clock,candidate,BIOS tick of the last scroll step: the arrows repeat every 3 ticks
-global,0x001A9AB8,shared_picklist,candidate,"the pick list the spell shop, the spellbook, the magic-item list and support.c's popups all use (UI agent); was spellshop_list; picklist control of the spell shop"
+global,0x001A9AB8,shared_picklist,candidate,"the picklist struct the spellbook (spellbook_build_list, spellbook_frame), the USE MAGIC ITEM list (magic_items_*) and the spell shop (spellshop_build_list, spellshop_update) share (UI agent; global_users.py); support.c's list popups use list_popup_picklist instead; was spellshop_list"
 global,0x001A9AF4,object_move_new,candidate,"object_set_position's new x, y, z, angle x, yaw, angle z (6 ints) that object_follow_move_cb applies to children"
 global,0x001A9B0C,object_debug_watch,candidate,that object's pointer
 global,0x001A9B10,object_delete_block_id,candidate,high word of the block whose objects object_delete_block deletes
@@ -1066,14 +1066,18 @@ field,bank_account+0x0C,flags,strong,"byte: bit 0 = defaulted on a loan: bank_bo
 field,blessing+0x00,target,strong,"skill id, 128|attribute, or 255 for regional legal reputation"
 field,blessing+0x01,amount,strong,amount added by blessing_apply
 field,blessing+0x02,end_time,strong,game_minutes when guild_expire_blessings removes it
+field,blessing+0x06,region,candidate,byte (records.h): for target 255 (regional legal reputation) the region blessing_remove restores
 field,block+0x00,model_count,strong,byte count of 66-byte model records (DFU RmbSubRecord); rmb_add_subrecord loads each model
 field,block+0x01,flat_count,strong,byte count of 17-byte flat records; editor flats (TEXTURE.199) become markers
 field,block+0x02,section3_count,strong,byte count of 16-byte records (DFU RmbSubRecord section 3)
+field,block+0x03,people_count,strong,"byte (records.h): 17-byte people records after the subrecord, not copied (rmb_add_people)"
+field,block+0x04,door_count,strong,"byte (records.h): 19-byte door records after the people, not copied (rmb_add_doors)"
 field,block+0x05,models,strong,pointer to the model records (relocated after copying)
 field,block+0x09,flats,strong,pointer to the flat records; the marker searches read x/y/z and the picture (+12) of each
 field,block+0x0D,section3,strong,pointer to the section-3 records
 field,building+0x00,name_seed,strong,u16: random seed for building_name's words; bit 15 set = TEXT.RSC record id instead (building_name)
 field,building+0x02,rent_expires,confirmed,u32 game_minutes until which the tavern room is rented (tavern_rent / tavern_extend_room); experiment: now + days*1440
+field,building+0x07,room,strong,byte (records.h): a tavern room number: tavern_rent stores the bed marker's +0x17 there (economy agent)
 field,building+0x08,access_level,confirmed,"byte: access granted by building_grant_access (quest op 17, shop hours) while +0x0F bit 0 and +0x02 not passed; exp3: 5"
 field,building+0x0F,flags,candidate,bit 3 set by talk_mark_quest_buildings
 field,building+0x12,faction_id,strong,"u16: 40 for the Mages Guild hall in pilot3 (experiment), passed to guild_find_membership_by_faction"
@@ -1084,9 +1088,14 @@ field,character+0x00,name,confirmed,32-byte name: Dafydd gen orbo (save_blades)
 field,character+0x16F,equipped,confirmed,"27 item pointers by slot (0-1 amulets, 2-3 bracelets, 4-5 rings, 6-7 bracers, 8-9 marks, 10-11 crystals, 12 head, 13 right pauldron, 14/16 cloaks, 15 left pauldron, 17 chest clothes, 18 cuirass, 19 right hand, 20 gauntlets, 21 left hand, 23 greaves, 24 legs clothes, 26 boots); save read + exp REMOVE/EQUIP"
 field,character+0x1BB,right_hand,strong,equipped[19]: weapons; inv_track_hand_weapons watches it
 field,character+0x1C3,left_hand,strong,equipped[21]: shields and off-hand weapons
+field,character+0x1DB,table_flags,strong,u16 (records.h character.table_flags; was monster+0x222): creatures: copied from monster_table_flags by monster_init
+field,character+0x1DD,attack_damage,strong,"5 x {u16 min, max} (records.h; was monster+0x224): creatures: copied from monster_table by monster_init; damage_resolve_attack rolls each; exp_c1: the Frost Daedra hit for 56, 92, 71, 86 (table 50-100); the player's are set to 1 and 2 by newgame_init_player (objects struct agent)"
 field,character+0x1F2,original_race,strong,player: disease_become_vampire / disease_become_lycanthrope save the race here; the cures and disease_lycanthrope_shapechange restore character+0x43 from it (fallcall save_kralwolf 0x67027 1 changed the race back)
 field,character+0x1F3,special_infection_time,confirmed,player: fallcall disease_infect_lycanthropy set game_minutes+4320; disease_special_infection_tick acts after it; guild_cure_diseases clears it
+field,character+0x1F7,ascr_record,strong,byte (records.h; was monster+0x23E): creatures: the ASCR animation record number (combat agent: code); changing it changes the ASCR record and bark loaded (asset tracing exp7)
+field,character+0x1F8,action,confirmed,"byte (records.h; was monster+0x23F): creatures: monster_set_action writes the action (exp_c1: 48 idle, 8 attack, 32 spell, 0 move), knockback writes 16 (hurt; fallcall save_mord 0x2D62F); the player's is set to 1 when the vampire cure quest is given (disease_start_cure_quest)"
 field,character+0x1F9,target_score,strong,"exp_c1: ai_pick_target writes 0/20/50 (+5 untargeted, +20 in sight, +30-dist/128)"
+field,character+0x1FA,mobile_id,strong,"byte (records.h; was monster+0x241): the full mobile id (DFU MobileTypes; 25 Frost Daedra); its sound is 10000 + 10 * id (monster_play_sound); the player's is 200 (title_menu at a new game, world struct agent)"
 field,character+0x1FB,to_hit_bonus,candidate,s16 added to the attacker's to-hit by damage_roll_to_hit
 field,character+0x1FD,last_kill_time,strong,player: damage_creature_death writes game_minutes here at every kill; item_enchantment_tick's health leech (21) hurts the player once 1440/10080 minutes pass without a kill (DFU HealthLeech daily/weekly); creatures use the same offset as monster+0x244 give_up_timer
 field,character+0x20,attributes,confirmed,8 x u16 STR INT WIL AGI END PER SPD LUC as on the sheet
@@ -1103,16 +1112,20 @@ field,character+0x21F,brotherhood_invite_count,strong,"kills counted toward the 
 field,character+0x220,hidden_load_percent,candidate,byte: hidden items' weight as % of equip_hiding_capacity (inv_update_hidden_load)
 field,character+0x221,detect_kind,candidate,"byte: Detect subtype (0 magic, 1 enemy, 2 treasure) set each round by spfx_effect_tick"
 field,character+0x222,thieves_invite_count,strong,"thefts counted toward the Thieves Guild invitation (6), 100 once invited; 100 in 4 saves"
+field,character+0x223,codeword,candidate,"byte (records.h): macro_dbp_codeword: high nibble the first word, low nibble the second"
+field,character+0x224,reputation_mod,strong,"signed byte (records.h): the biography's ""RR"" answers add to it (career_answer_effect); item_reputation_mod adds it to a reputation (econ struct agent)"
+field,character+0x225,career_id,candidate,u16 (records.h; union with the creatures' spawn_seed): biography persons: the class number (CLASS%02d.CFG) career_answer_effect (AE/AF/AO) stores before bio_person_add; bio_person_count compares it
 field,character+0x227,faction_id,strong,NPC records: faction id passed to faction_find by talk_start (0 in the player's record)
-field,character+0x229,team,candidate,byte: creatures of the same value never target (ai_pick_target) or strike (weapon_melee_strike) each other; summons get 0 (DFU MobileTeams)
+field,character+0x229,team,strong,"byte: creatures of the same value never target (ai_pick_target) or strike (weapon_melee_strike) each other; every spawned creature gets 1 (place_spawn_from_marker, encounter_spawn_*), summons 0 (DFU MobileTeams) (world struct agent)"
 field,character+0x22B,resist_chances,confirmed,"5 bytes by element: elemental resistance chance; exp1b (build/names/scratch/magic/exp1b.py, save_morthag1): Resist frost chance 100 -> [0,100,0,0,0]; spfx_resist_roll saves outright on a roll <= this when the element's spell_resist_flags bit is set"
-field,character+0x230,class,strong,the class (career) record is embedded here: player_class = player_character + 0x230 in save_blades
+field,character+0x230,career,strong,"the class (career) record is embedded here (records.h character.career, struct career): player_class = player_character + 0x230 in save_blades; the class+ field rows are its offsets; was class"
 field,character+0x30,base_attributes,strong,"permanent attributes: sheet_draw colours an attribute red when +0x20 is below this, another colour when above (STR 50 < 85 went red); level-up points raise both sets; clamped to 100 by raise_skills"
 field,character+0x40,flags,strong,"flag word, for creatures too: lycanthropy infection sets bit 0x10 (fallcall on save_blades); the female bit is unverified (combat and inventory agents)"
 field,character+0x41,transport_flags,strong,"bit 1 riding a horse, bit 2 a cart: transport_choose sets/clears them (FOOT clears both); exp ran the handler"
 field,character+0x42,min_metal_to_hit,confirmed,"byte: weapons of a lower material do nothing ('The material of the weapon you are using is ineffective.'); monsters from monster_table (Imp steel, werewolf silver, daedra mithril = DFU MinMetalToHit); fallcall save_kralwolf 0x67027 1 (lycanthrope back to human) changed it 2 -> 0"
 field,character+0x43,race,confirmed,"byte: 8 vampire (save_kralvamp), 9 werewolf (save_kralwolf); >8 blocks the inventory: exp F6 in save_kralwolf gave 'You cannot access the inventory while shapechanged...'"
 field,character+0x44,armor_values,confirmed,"7 signed bytes, one per body part, drawn as (100-v)/5; exp: removing the helm changed [0] from -10 to 75"
+field,character+0x4B,anim_slot,strong,"byte (records.h character.anim_slot; was monster+0x92): creatures: index into monster_anim_records, from monster_alloc_anim_slot (fallcall summon)"
 field,character+0x4C,fall_velocity,strong,exp_c1: monster_move_step / monster_apply_gravity write it every frame; landing deals ((v/256)/40-5)^2/3 (creatures) or (v/256)/80-3 damage
 field,character+0x50,skills_raised_lo,candidate,"u32 bit per skill 0-31: raise_skills sets the bit when the skill goes up, skill_raised_recently tests it to colour the skill line, sheet_close clears it"
 field,character+0x54,skills_raised_hi,candidate,"u32 bits for skills 32-34, as skills_raised_lo"
@@ -1122,6 +1135,7 @@ field,character+0x60,lycanthrope_kill_time,strong,player: game_minutes of the la
 field,character+0x64,shield_end_time,candidate,u32 duration + game_minutes written by spfx_shield
 field,character+0x68,shapechange_form,candidate,"int: subtype of effect 29 (Bat, Raven, Fish, Wolf) set by spfx_lycanthropy"
 field,character+0x6C,special_infection,confirmed,"player: fallcall disease_infect_lycanthropy set it to 1 (werewolf); 0 vampirism, 2 wereboar; disease_special_infection_tick turns it into the disease"
+field,character+0x6E,knockback_speed,confirmed,"short (records.h character.knockback_speed; was monster+0xB5): fallcall save_mord 0x2D62F @entity <Frost Daedra> 19: knockback speed 0 -> 15 (the minimum); DFU knockback formula in damage_knockback; capped 40, moves at most 25, -5 per frame (damage_knockback_move)"
 field,character+0x70,target,strong,exp_c1: ai_update_creatures writes each creature's target entity here and the creature into its target's +0x70 (also the player's record)
 field,character+0x74,house,confirmed,"building id of the player's house (bank_house_bought sets it, bank_sell_house clears it; tavern code and rest.c compare it with building+0x14); also the knightly order's 'Receive House' (848); experiment: 0 -> 0x4A5D058B on buying | earlier: building given by the knightly order's 'Receive House' (848); 0 = none ('You have not earned a house' 460)"
 field,character+0x78,ship_owned,confirmed,"ship location id: 0x3E00001 small (992) / 0x3E10001 large (993), set by bank_ship_bought, cleared by bank_sell_ship; waives the ship fare (DFU hasShip); experiment: 0x3E10001 -> 0 -> 0x3E00001 | earlier: i32 set by bank.c from its ship-sale table; nonzero waives the ship fare in travel_trip_cost and the ship-option gold check (DFU hasShip)"
@@ -1159,12 +1173,12 @@ field,class+0x3A,attributes,confirmed,"8 x u16 base attributes STR..LUC: the cla
 field,disease+0x00,id,candidate,type-11 record data: disease id (< 100; poisons are >= 128); spfx_cure_disease / spfx_cure test it
 field,disease+0x01,stat_flags,candidate,"11 x s16: which stats the disease hits (8 attributes, 8 health, 9 fatigue, 10 magicka); spfx_disease_daily"
 field,disease+0x17,damage_min,candidate,s16 daily damage range low (+0x19 high); spfx_disease_daily rolls it
+field,disease+0x19,damage_max,candidate,short (records.h): the top of the damage range that starts at +0x17 damage_min
 field,disease+0x1B,days_left,candidate,"s16 days left, 255 forever, 254 finished; spfx_disease_daily counts it down"
 field,disease+0x1D,stage,candidate,s16: poison_tick sets 1 when it starts and 2 after a one-time effect; with +0x1B at 0 a stage-2 record ends (254)
 field,disease+0x1F,drained,candidate,8 x s16 attribute points taken so far; given back by spfx_cure_disease and spfx_disease_recover
 field,door+0x17,lock_level,strong,u16 lock of a door object (type 32): lockpick_door refuses 20 and more and rolls (level - lock)*5; RMB door records give it (objlib 847BC copies byte +17); link action 15 sets it
 field,door+0x19,lockpick_skill_tried,strong,u16 the Lockpicking value at the last failed attempt: lockpick_door gives up at once while the skill is unchanged
-field,entity+0x47,character,confirmed,player_character = player_entity + 0x47 in 2 saves; disease code: entity+71 == player_character
 field,faction+0x00,type,strong,"byte: 2 group, 4 individual, 7 noble, 9 temple, 14 courts, 15 people (faction.txt types); talk walks up to 2/7/9"
 field,faction+0x01,region,strong,"byte region index, 255 = none; compared with current_region"
 field,faction+0x02,ruler,strong,byte from FACTION.TXT 'ruler' (faction_parse_ruler)
@@ -1193,15 +1207,18 @@ field,item+0x24,value,strong,u32 base value; gold pieces' amount; trade totals a
 field,item+0x2A,item_flags,strong,"u16: 0x20 identified, 0x40 hidden, 0x800 artifact (artifacts in save_tlalac_s and item_make_artifact set 0x820), 0x4 one-handed?"
 field,item+0x2C,condition,confirmed,"u16 current condition: 795 of 800 etc. in save_tlalac_s; item_damage lowers it, item_break at 0"
 field,item+0x2E,max_condition,confirmed,u16 maximum condition (save_tlalac_s); repair stops there
+field,item+0x30,magicka_bonus,candidate,byte (records.h): enchantment 3 (extra spell points): taken off magicka and max_magicka when unequipped; 0 on the amulet that has it (inventory agent)
 field,item+0x31,stack_count,strong,"byte: arrows in a stack (max 199, drawn as '%d'); potion recipe index for recipes"
 field,item+0x32,inventory_image,strong,u16 archive<<7|record of the picture inv_draw_item_image draws
-field,item+0x34,dropped_image,candidate,u16 picture given to the world object when the item is dropped
+field,item+0x34,dropped_image,strong,u16 picture given to the world object (object+0x1B image) when the item is dropped: inv_click_paperdoll sets it (docs/structs.md)
 field,item+0x36,material,candidate,byte: weapon/armor material rolled by item_roll_material; class forbidden-materials mask bit
 field,item+0x37,armor_type,candidate,byte: 0 leather 1 chain 2 plate (item_roll_armor_type); equip sound 231+n; class armor mask bit 6+n
 field,item+0x38,color,candidate,byte: dye / palette remap row used when drawing (material+16 for metal)
 field,item+0x39,weight,candidate,"u32 from the template, scaled by material"
 field,item+0x3D,enchant_points,strong,"u16 enchantment capacity: itemmaker_pick_item refuses 0 (""This item cannot be enchanted.""), itemmaker_enchant refuses more points than it (TEXT 1651), shown as ENCHANTMENT POINTS used/limit"
 field,item+0x3F,message,candidate,"book id (books\\bok%05d.txt), letter/spell id"
+field,item+0x41,variants,strong,"byte (records.h): template byte 41: picture variants added to inventory_image (item_roll_style); ingredients: the id the potion recipes compare (potion_match_recipe, potionmaker_add_ingredient) (magic/combat struct agent)"
+field,item+0x42,draw_order,strong,"byte (records.h): template byte 42: the paperdoll's drawing order (paperdoll_add_item sorts by it, +5 for left-hand shields; paperdoll_draw clears it for the cloak copy) (quests/text struct agent)"
 field,item+0x43,enchantments,strong,"10 x {u16 type, u16 param}, type -1 ends: 0 cast when used, 1 cast when held, 3 extra spell points, 8 repairs, 9 absorbs spells, 10 +skill, 15 soul bound, 26 artifact special; the amulet's (3,0,9,8) changed character+0x8A on unequip"
 field,link+0x00,object_id,strong,u16 low word of the object's record id: links_trigger and links_set_reverse match objects by it
 field,link+0x02,trigger,strong,"byte trigger kind compared with links_trigger's argument (DFU RdbTriggerFlags: 1 collision, 2 click, 5 attack, 8/9 multi, 10 door); links_resolve rewrites 6 to 2"
@@ -1211,6 +1228,7 @@ field,link+0x05,duration,strong,short ticks to reach the end (DFU Duration); lin
 field,link+0x07,magnitude,strong,short distance or angle (DFU Magnitude); speed = magnitude<<16 / duration
 field,link+0x09,action,strong,"byte action type (DFU RdbActionFlags: 1 translate, 8 rotate, 9 cast spell, 11/12 text, 14 teleport, 16-20 doors, 21-25 hurt, 26 poison, 28 drain magicka, 129 combination)"
 field,link+0x0A,chain_count,strong,number of records that follow in the same chain (links_trigger starts count+1 records)
+field,link+0x0B,combination,candidate,"byte (records.h): action 129: the low nibble collects the switches' bits, done when it equals the high nibble"
 field,link+0x0C,flags,strong,"1 finished, 2 reversed, 4 sound played, 16 stop the chain, 32 axis override applied"
 field,link+0x0D,start,strong,"start position or angle of the moved object, from link_start"
 field,link+0x11,speed,strong,"16.16 units per tick, negated when reversed"
@@ -1249,34 +1267,31 @@ field,model_node+0x04,right,strong,BNODE right child
 field,model_node+0x08,last_frame,strong,frame_counter when last used; model_cache_purge_unused frees old ones
 field,model_node+0x0C,key,strong,model id + variant<<17
 field,model_node+0x10,model,strong,the loaded ARCH3D record in model_heap
-field,monster+0x00,type,strong,"monster object: type byte 18 (exp5, the C of func_00078B8A; docs/asset_tracing.md)"
-field,monster+0x1B,texture,strong,monster object: sprite texture archive<<7 | record (exp7)
-field,monster+0x222,table_flags,strong,u16 (character+0x1DB) copied from monster_table_flags by monster_init
-field,monster+0x224,attack_damage,strong,"5 x {u16 min, max} (character+0x1DD) copied from monster_table by monster_init; damage_resolve_attack rolls each; exp_c1: the Frost Daedra hit for 56, 92, 71, 86 (table 50-100)"
-field,monster+0x23E,ascr_record,strong,byte: the monster's ASCR animation record number (combat agent: code); changing it changes the ASCR record and bark loaded (asset tracing exp7)
-field,monster+0x23F,action,confirmed,"fallcall save_mord 0x2D62F @entity <Frost Daedra> 19 (the player's weapon hit, read back from a --save snapshot): became 16 (hurt); byte (character+0x1F8): exp_c1: monster_set_action writes the action (48 idle, 8 attack, 32 spell, 0 move), the knockback code writes 16 (hurt)"
 field,monster+0x24,wait_state,candidate,short: nonzero (and D_00195C78 clear) keeps the creature idle; 99 = asleep until hurt (damage_apply calls monster_wake_all)
-field,monster+0x241,mobile_id,strong,"the full mobile id (Daggerfall Unity MobileTypes; 25 Frost Daedra); its sound is 10000 + 10 * id (func_000633BC) (combat agent, asset tracing)"
 field,monster+0x244,give_up_timer,confirmed,"fallcall save_mord 0x2D62F @entity <Frost Daedra> 19 (the player's weapon hit, read back from a --save snapshot): 184 -> 60 (damage_apply); int (character+0x1FD; the player's +0x1FD is last_kill_time): exp_c1 counts 183, 182, ...; set to 200 on detection (DFU GiveUpTimer 'value is from classic'), 60 when hit"
+field,monster+0x248,detour_yaw,candidate,"int (records.h union with character+0x201): creatures: heading of a detour (monster_wander, docs/structs.md)"
+field,monster+0x24C,detour_steps,candidate,"int (records.h union with character+0x205): creatures: steps left on the detour, 1000 none (monster_wander)"
+field,monster+0x250,detour_side,candidate,int (records.h union with character+0x209): creatures: bit 0 turns the next detour left/right (monster_wander)
 field,monster+0x264,nav_blocked,strong,byte (character+0x21D): ai_move_toward_target's blocked/detour bits (exp_c1 writes 0/1)
 field,monster+0x265,nav_direction,candidate,byte (character+0x21E): detour direction bit 2/4/8 (heading octant +0/+1024/+1536); monster_init sets 2
 field,monster+0x266,nav_turn_count,strong,"byte (character+0x21F): exp_c1 writes 12; monster_init sets 12, ai_move_toward_target counts it down"
 field,monster+0x267,nav_stuck_count,strong,"byte (character+0x220): exp_c1 writes 5, 7, 0; > 6 failed steps set the blocked bit"
+field,monster+0x26C,spawn_seed,strong,"u16 (records.h union with character+0x225): creatures: their marker's spawn seed (header +0x19; place_spawn_from_marker), given back to the corpse by monster_make_corpse (world struct agent)"
 field,monster+0x2C1,anim_frame,candidate,the animation frame index (combat agent); the animation struct's request byte is +0x2D5 and its state +0x2D8
 field,monster+0x2C5,anim_script,strong,pointer: the ASCR record (monster_init / monster_reload_anim_cb store it; also in monster_anim_records[anim_slot])
 field,monster+0x2C9,anim_script_pos,strong,pointer into the ASCR script; exp_c1: XnGine xn_C0100 (C013B/C019C) advances it; monster_reload_anim_cb rebases it after a load
+field,monster+0x2CD,frame_count,strong,"short (records.h monster_anim.frame_count): from the ASCR image header +22 (monster_init, object_draw_cb)"
+field,monster+0x2CF,timer,candidate,short (records.h monster_anim.timer): the animation timer (combat agent's table)
 field,monster+0x2D1,anim_events,confirmed,"exp_c1: XnGine C023B sets bit 0 at the strike frame, ai_update_creatures clears it and calls weapon_melee_strike; bit 1 = missile release (monster_shoot_arrow)"
 field,monster+0x2D2,anim_flags,strong,exp_c1: monster_set_action writes bit 7 (mirrored view: 128/0)
 field,monster+0x2D5,anim_request,confirmed,"exp_c1: monster_set_action writes the action, XnGine C013B takes it and writes 255; a new action is accepted only at 255"
 field,monster+0x2D6,anim_facing,strong,"exp_c1: 0-4 written by monster_set_action (view of the sprite from the player, mirrored for 5-7)"
 field,monster+0x2D7,anim_record,strong,"exp_c1: XnGine C02DF writes the texture record group of the state: 0 move, 5 attack, 15 idle, 20 spell (DFU records 0-4, 5-9, 15-19, 20-24)"
 field,monster+0x2D8,anim_current,confirmed,"exp_c1: XnGine C013B writes the state it started (48, 8, 32) after monster_set_action requested it"
-field,monster+0x47,character,strong,"monster object: a character record laid out like the player's (name, health at +195/+197 of the object) (exp5)"
-field,monster+0x92,anim_slot,strong,"byte (character+0x4B): index into monster_anim_records, from monster_alloc_anim_slot (fallcall summon)"
 field,monster+0x9F,floor_y,candidate,int (character+0x58; the player's +0x58 is something else): monster_move_step stores D_00195C74 (-120 in exp_c1)
 field,monster+0xB3,knockback_angle,strong,short (character+0x6C): direction of the hit (attack_angle) set by damage_knockback; damage_knockback_move moves along it
-field,monster+0xB5,knockback_speed,confirmed,"fallcall save_mord 0x2D62F @entity <Frost Daedra> 19 (the player's weapon hit, read back from a --save snapshot): health 81 -> 48 and knockback speed 0 -> 15 (the minimum); short (character+0x6E): DFU knockback formula ((10d-w)*256/(w+10d)*2d, speed (10d/w)*(2d-amount/256), at least 15) in damage_knockback; capped 40, moves at most 25, -5 per frame (damage_knockback_move = DFU KnockbackMovement)"
 field,monster+0xBB,attack_timer,strong,"int (character+0x74; the player's +0x74 is house): exp_c1: counts down by frame_ticks in ai_creature_think (clamped at 0); a melee attack needs 0 and resets it to random(1500,3000)-(player level-10)*50+(reflexes-2)*450 = DFU MeleeTimer"
+field,monster+0xD8,loot_table,strong,"short (records.h union with character+0x91 reputation[0]): creatures: the loot table, 1-based: monster_init copies monster_table +2 and passes it - 1 to loot_generate (magic/combat struct agent)"
 field,note_line+0x01,x0,candidate,short: an 11-byte line element (kind 2)
 field,note_line+0x05,x1,candidate,"short; y0 +0x03, y1 +0x07"
 field,note_line+0x09,colour,candidate,byte
@@ -1288,18 +1303,18 @@ field,note_text+0x05,font,candidate,byte
 field,note_text+0x06,flags,candidate,"byte: 1 centred, 2 shadow, 64 selected"
 field,note_text+0x07,colour,confirmed,byte (exp3: 32)
 field,note_text+0x0B,text,confirmed,80 chars (exp3: 'Your earliest memories of your homelife ...')
-field,object+0x00,record_type,strong,"byte: 2 item, 3 character, 9 spell, 20 soul, 31 potion recipe, 33 loot pile, 52 item container, 54 item in repair/sold pile (read in save_tlalac_s; code tests)"
+field,object+0x00,type,strong,"byte (records.h record.type, DFU RecordTypes): 2 item, 3 character, 9 spell, 20 soul, 31 potion recipe, 33 loot pile, 52 item container, 54 item in repair/sold pile (read in save_tlalac_s; code tests); 18 creatures (exp5); 1 location, 4 the player object, 5 camera, 10 guild membership, 11 disease/poison, 14 quest, 16 quest root, 39 nonworld root, 43 block/building, 51 automap, 65 quest NPC (objects and automap agents); was record_type"
 field,object+0x01,angle_x,strong,"player object: short; yaw is +0x03 (2048 to a turn, clockwise from north)"
 field,object+0x03,yaw,confirmed,"player object: short, 2048 to a turn, clockwise from north; the camera follows the game's own turning only"
 field,object+0x05,angle_z,candidate,player object: short next to the yaw
 field,object+0x07,x,confirmed,"player object: int, 1/40 m, east"
 field,object+0x0B,y,confirmed,"player object: int, 1/40 m, height"
 field,object+0x0F,z,confirmed,"player object: int, 1/40 m, north"
-field,object+0x15,object_flags,strong,"u16: 0x20 not owned (unpaid shop goods: 'You do not own this item.'), 0x02 not listed; loot piles get 0x05"
+field,object+0x15,flags,strong,"u16 (records.h record.flags): 0x20 not owned (unpaid shop goods: 'You do not own this item.'), 0x02 not listed; loot piles get 0x05; 0x80 drawn on the automap, 0x400 marked by a right click (automap agent); doors 0x40 unlocked (world struct agent); was object_flags"
 field,object+0x17,owner,candidate,u16: shop owner id; the right list in a shop shows items whose owner is D_00195D54
-field,object+0x1B,world_image,candidate,u16 archive<<7|record for the object in the world; a dropped item gets item+0x34; loot pile 216<<7|n
+field,object+0x1B,image,candidate,"u16 archive<<7|record (records.h record.image, DFU SpriteIndex): the object's picture in the world; a dropped item gets item+0x34; loot pile 216<<7|n; a creature's sprite texture (exp7, was monster+0x1B texture); other types' meanings are records.h union members (building_index, model_count, soul_creature ...); was world_image"
 field,object+0x1D,image2,candidate,"u16 DFU RecordRoot Picture2 (inventory picture); for 3D objects (6/32) the model id is +0x1D*100 + +0x1B (model_get calls, link_model_axis_override keys); block objects keep the building index here"
-field,object+0x1F,record_id,confirmed,"u32 id: object_find_by_id(0, 0xD6DA) found the player object; object_new_id(1) made 0x12C1A (high word = block); the save stores links as these ids"
+field,object+0x1F,id,confirmed,"u32 record id (records.h record.id): object_find_by_id(0, 0xD6DA) found the player object; object_new_id(1) made 0x12C1A (high word = block); the save stores links as these ids; was record_id"
 field,object+0x23,link_flag,candidate,byte set to 255 by links_resolve on every object that has an action link
 field,object+0x26,quest_id,candidate,byte: quest the item belongs to; quest items get a highlighted cell and quest letter text
 field,object+0x27,parent_id,strong,"u32 parent record id in SAVETREE.DAT (DFU ParentRecordID): savetree_write_record stores the parent's id here, savetree_attach_record finds the parent by it and zeroes it"
@@ -1310,7 +1325,8 @@ field,object+0x37,next,confirmed,pointer to the next sibling: walked the charact
 field,object+0x3B,prev,strong,pointer to the previous sibling: object_unlink and object_insert_after keep it; object_create_child walks it back to set the parent's first child
 field,object+0x3F,children,confirmed,pointer to the first child (containers -> items); walked in save_tlalac_s
 field,object+0x43,parent,confirmed,pointer to the parent: items -> their tab container -> player_entity -> player_object (player_entity+0x43 = player_object in save_tlalac_s; +0x40 is misaligned there)
-field,object+0x47,record_data,strong,record data (item or character) follows the 71-byte header: player_character = player_entity + 0x47
+field,object+0x47,data,strong,"the record's data (records.h record.data, a union by type) follows the 71-byte header: player_character = player_entity + 0x47; was record_data"
+field,person+0x00,faction_id,strong,u16 (records.h struct person): npc_click_service and guild_service_dispatch pick the service by it; npc_talk passes it to quest_event_clicked_faction; rmb_make_flat sets it (UI and objects struct agents)
 field,person+0x02,flags,candidate,"byte of a type-8 person's data (object+0x49): bit 7 marks a potential quest giver (quest_mark_giver_cb, npc_is_quest_giver)"
 field,picklist+0x00,framed,strong,byte: when set picklist_init saves and picklist_draw restores the backgrounds
 field,picklist+0x01,colour_normal,candidate,entry colour (146 in every caller)
@@ -1340,21 +1356,35 @@ field,qbn_arg+0x07,value,strong,"record index or constant; -1 none, -2 filler; U
 field,qbn_arg+0x0B,object,strong,world object of the resource (an id in the save); UESP ObjectPtr
 field,qbn_foe+0x03,type,confirmed,monster type; experiment: 139 for S0000101's foe (UESP MobType)
 field,qbn_foe+0x04,count,confirmed,short count; experiment: 3 (UESP MobCount)
+field,qbn_foe+0x05,killed,strong,byte (records.h): counted up by qcond_op02_foe_killed until it equals (short)args[2].value
+field,qbn_foe+0x06,symbol,strong,"int (records.h): the name's hash, compared by quest_symbol_text"
 field,qbn_foe+0x0A,object,strong,world object of the foe (relinked on load; opcode 87 deletes its type-34 twin)
 field,qbn_item+0x02,flags,strong,bit 7 topic hidden (opcodes 10/11); UESP Reward byte in the file
+field,qbn_item+0x03,group,strong,"short (records.h): item group (< 0 random); gold: the maximum; 100 copies a template (quest_init_item, quest_init_resources)"
+field,qbn_item+0x05,index,strong,"short (records.h): item index (-1 random, filled in); gold: the minimum, -1 by level (quest_init_item)"
+field,qbn_item+0x07,symbol,strong,"int (records.h): the name's hash, compared by quest_symbol_text and talk_add_quest_topics"
 field,qbn_item+0x0B,object,strong,world object of the item (relinked on load; cleared by opcodes 36/54)
+field,qbn_item+0x0F,messages,strong,2 shorts (records.h): the QRC message ids the talk topics show
 field,qbn_op+0x00,opcode,confirmed,"short opcode the quest_run_opcodes / quest_dispatch_event switches use; read in the saves (12, 76, 30, 28, 29, 51...)"
 field,qbn_op+0x02,flags,strong,"bit 0 done (quest_op_done; set in the saves on finished opcodes), bits 1/2 started/delivered (opcode 76)"
 field,qbn_op+0x04,arg_count,strong,"number of valid arguments, refreshed from qbn_opcode_arg_counts"
 field,qbn_op+0x06,args,strong,five 15-byte qbn_arg records; arg 0 is the state
 field,qbn_op+0x51,message,strong,"QRC message shown when done (quest_op_done), -1 none; UESP Message ID"
 field,qbn_op+0x53,last_minutes,strong,"game_minutes of the last run (opcodes 9/87 spawn interval, 76, 84); UESP LastUpdate"
-field,qbn_person+0x03,flags,strong,"bit 7 topic hidden (opcodes 10/11), bit 6 set by opcode 81, bit 5 follows opcode 82's state; with bit 5 set an event on this person (28, 1, 71) still lets the click go on to talk (quest_dispatch_event returns 0); UESP FacePictureIndex in the file"
+field,qbn_person+0x02,flags,strong,"u16, always a word (records.h; objects struct agent): low byte 0 here, 255 random, else elsewhere; 0x100 any building, 0x200/0x400 the gender, 0x1000/0x4000 door flags (quest_init_person, quest_find_site_for_building); 0x2000 follows opcode 82's state, 0x4000 set by opcode 81, 0x8000 topic hidden (opcodes 10/11) (was +0x03 bits 5/6/7); with 0x2000 set an event on this person (28, 1, 71) still lets the click go on to talk"
 field,qbn_person+0x04,kind,candidate,short; 21 gets the questor rumors 1008/1009 (quest_add_questor_rumor); UESP Unknown1
 field,qbn_person+0x06,faction_id,strong,copied to type-65 person objects on load (+0x19); UESP FactionIndex
+field,qbn_person+0x08,symbol,strong,"int (records.h): the name's hash, compared by quest_symbol_text and talk_add_quest_topics"
 field,qbn_person+0x0C,object,strong,world object of the person (cleared by opcode 44)
+field,qbn_person+0x10,messages,strong,2 shorts (records.h): the QRC message ids the talk topics show
 field,qbn_place+0x02,flags,strong,"bit 7 topic hidden (opcodes 10/11), bit 6 opcode 81"
+field,qbn_place+0x03,scope,candidate,"signed byte (records.h): 0 a fixed place (10 once made), > 0 another location (counted down), -1 here (quest_init_place)"
+field,qbn_place+0x04,p1,candidate,"u16 (records.h, DFU Places.txt p1): 0 a building, else a door/marker; a fixed place: the id's high word"
+field,qbn_place+0x06,p2,candidate,"short (records.h, DFU p2): the building type (< 0 any shop, 17-20 houses, 11 temple); a fixed place: the id's low word"
+field,qbn_place+0x08,p3,candidate,"short (records.h, DFU p3): -1 any door, 0 door flag 0x4000, 1 door flag 0x1000"
+field,qbn_place+0x0C,symbol,strong,"int (records.h): the name's hash, compared by quest_symbol_text and talk_add_quest_topics"
 field,qbn_place+0x10,object,strong,"world object of the place (relinked on load, an error when it is missing)"
+field,qbn_place+0x14,messages,strong,2 shorts (records.h): the QRC message ids the talk topics show
 field,qbn_state+0x00,index,strong,short state index; UESP FlagIndex
 field,qbn_state+0x02,is_global,confirmed,non-zero: the value lives in quest_global_states[+3]; experiment: quest_arg_state matched 51/51
 field,qbn_state+0x03,value,confirmed,"the state (0, 1, or 128 from a timer) of a local state, or the global index"
@@ -1375,7 +1405,8 @@ field,quest+0x06,name,confirmed,"8-character file name (""s0000999"", ""B0B71Y03
 field,quest+0x0F,flags,strong,bit 1 set by opcode 4 (rewarded): opcode 6 then posts 1007 not 1006 and skips the -2; UESP HasDebugInfo byte
 field,quest+0x10,section_counts,confirmed,"short[10] records per QBN section (+0x20 opcodes, +0x22 states, +0x1C timers, +0x1E foes, +0x16 persons, +0x18 places); read in 7 saves"
 field,quest+0x24,section_offsets,confirmed,short[11] offsets of the sections from the quest start (quest_section); offset 10 = text variables
-field,region+0x49,crime_flags,candidate,"offset from the record's start at 0x18F044 (world agent; it was measured from region_politics, base+0x1C): byte in the 80-byte region record (region_politics): court bit 0 banished (8063), bit 1 sentenced to death (8060)"
+field,quest+0x38,text_offset,strong,"int (records.h): offset of section 10, the text variables (struct qbn_text_var), 0 none; a u16 and a zero u16 in the file (DFU Null1), read as one int by quest_init_resources, quest_relink_after_load and quest_debug_overlay"
+field,region+0x49,punishment_flags,candidate,"byte at record +0x49 of the 80-byte region record (base 0x18F044; region 0's copy is the global region_punishment_flags 0x18F08D; DFU SeverePunishmentFlags): court bit 0 banished (8063), bit 1 sentenced to death (8060); was crime_flags"
 field,rumor+0x00,faction1,strong,"s16 first faction id (rumor_add_faction, rumor_is_eligible)"
 field,rumor+0x02,faction2,strong,s16 second faction id
 field,rumor+0x04,kind,strong,"i32 politics event kind, 100 = not a politics rumour"
@@ -1387,8 +1418,7 @@ field,rumor+0x14,message,candidate,s16 quest message id
 field,rumor+0x16,target,candidate,i32 matched by rumor_find_for_npc
 field,rumor+0x1A,text_length,strong,bytes of text after the 34-byte header
 field,rumor+0x1E,expires,strong,"game_minutes when it lapses (faction rumours +43140, quest ones 30 or 180 days)"
-field,settings+0x00,view_flags,confirmed,"bit 0 full screen (no HUD bar; hud_draw and hud_draw_heading_strip test it), bit 1 head bobbing; exp_options.py: 3 -> 1 -> 0 with the two buttons"
-field,settings+0x01,detail_level,strong,0..127 from the DETAIL bar (options_detail_slider); 126 in save_tlalac_s
+field,settings+0x00,view_flags,confirmed,"one u16, always read as a word (records.h; UI and world struct agents): bit 0 full screen (no HUD bar; hud_draw and hud_draw_heading_strip test it), bit 1 head bobbing, bit 2 DAGGER.GRD exists, bits 8-15 the detail level 0..127 from the DETAIL bar (options_detail_slider writes (value << 8) | low byte; 126 in save_tlalac_s); exp_options.py: 3 -> 1 -> 0 with the two buttons"
 field,settings+0x02,sound_volume,strong,u16 0..127 from the SOUND bar (options_sound_slider); 60 in save_tlalac_s
 field,settings+0x04,music_volume,strong,"u16 0..127 from the MUSIC bar (options_music_slider, applied by 698AF)"
 field,spell+0x00,effects,confirmed,"3 x {u8 type, u8 subtype}, 255 none; exp1b (build/names/scratch/magic/exp1b.py, save_morthag1): the dispatcher spell_apply_effect ran the handler of spell_effect_names[type]"
@@ -1781,17 +1811,17 @@ func,0x00028EAA,automap_reattach_record,candidate,automap_find_record and keep t
 func,0x00028ED1,automap_restore_seen_one,candidate,callback: a type 6 or 34 object whose seen bit is set gets object_flags bit 0x80
 func,0x00028F56,automap_restore_seen,strong,"15 episodes with M: finds the record if needed, applies the seen bits to all location objects; after automap_load and on loading a game"
 func,0x00028F8B,automap_unmark_seen_one,candidate,callback: clears object_flags bit 0x80 (run over all objects as the automap closes)
-func,0x00028FAD,qcond_op05_event_at_place,strong,"event 5, raised by the inventory drop code (inven 94324/946D4, 9401E): the dropped object's twin is the item resource and it lies in the same place (type 43 parent) as the player -> state; UESP type 5 (Item, Location); DFU DroppedItemAtPlace"
+func,0x00028FAD,qcond_op05_item_dropped_at_place,strong,"event 5, raised by the inventory drop code (inv_click_paperdoll, inv_click_left_item, inv_click_equip_slot): the dropped object's twin is the item resource and it lies in the same place (type 43 parent) as the player -> state; UESP type 5; DFU DroppedItemAtPlace; was qcond_op05_event_at_place"
 func,0x000290DD,qcond_op43_pc_at_place,strong,"opcode 43 in the 29958 switch (every frame with a quest): arg2 state = player's place (type 43/47/1 parent) has the place resource's id (+0x1F); UESP 0x2B ""PC at Location""; DFU PcAt"
-func,0x000292C5,quest_op17_grant_building_access,strong,"calls building_grant_access, which the main loop's trespassing check reads (text agent, exp3); was quest_op17_set_timer; quest opcode 17: on the resource's placed object calls support.c 7E3CD with a byte and game_minutes + a duration"
+func,0x000292C5,qaction_op17_grant_building_access,strong,"opcode 17, an action: building_grant_access on the building holding the resource's object, access level = low byte of args[2].value, until now + args[3].value (text agent exp3; world struct agent); was quest_op17_grant_building_access"
 func,0x00029324,qcond_op01_item_given_to_npc,strong,"event 1, raised by the NPC click (click.c 756C6: quest_raise_event(1, 0, npc)): the item resource is carried by player_entity and the clicked person is the person resource -> state, item removed (unequip_object, object delete); UESP type 1 ""set State when Item is given to NPC""; DFU TotingItemAndClickedNpc"
-func,0x00029441,qcond_op03_event_object,strong,"event 3, raised when an item is picked up (inven.c, click 75839): the event object's twin is the item resource -> state; UESP type 3 ""PC finds Item""; DFU ClickedItem"
-func,0x00029490,qcond_op21_event_same_kind,strong,"event 21, raised by the damage code (qkey.c 2E914 after a hit): the hurt creature's +0x1D matches the foe resource -> state; UESP 0x15 ""Mob hurt by PC""; DFU InjuredFoe"
-func,0x000294E5,qcond_op02_event_count,strong,"event 2, raised by the death code (2ECBE: quest_raise_event(2, creature, 0)): counts kills of the foe kind in the state record +5 up to arg2, then state; UESP type 2 ""Check Kill Count""; DFU KilledFoe"
+func,0x00029441,qcond_op03_item_found,strong,"event 3, raised when an item is picked up (inven.c, pick_up_item): the event object's twin is the item resource -> state; UESP type 3 ""PC finds Item""; DFU ClickedItem; was qcond_op03_event_object"
+func,0x00029490,qcond_op21_foe_hurt,strong,"event 21, raised by damage_apply after a hit: the hurt creature's +0x1D matches the foe resource -> state; UESP 0x15 ""Mob hurt by PC""; DFU InjuredFoe; was qcond_op21_event_same_kind"
+func,0x000294E5,qcond_op02_foe_killed,strong,"event 2, raised by the death code (damage_creature_death: quest_raise_event(2, creature, 0)): counts kills of the foe kind in qbn_foe.killed up to arg2, then sets the state; UESP type 2 ""Check Kill Count""; DFU KilledFoe; was qcond_op02_event_count"
 func,0x0002956B,quest_resource_unplace,candidate,clears a resource's placement links and resets its id to the current location
-func,0x000295BE,quest_op09_spawn_repeat,strong,"opcode 9 (267 episodes): every arg2 minutes, with arg3 % chance, while arg4 lasts (-1 forever), creates the foe (qinit 33764); UESP type 9 ""Repeating Spawn"" (Mob, delay, chance, count); DFU CreateFoe"
-func,0x00029670,quest_op87_respawn,strong,"opcode 87: like op 9 but first deletes the previous creature (type 34); UESP 0x57 (Mob, delay, chance, total count)"
-func,0x00029738,qcond_op28_event_person,strong,"event 28, raised by the NPC click (click.c 756C6: quest_raise_event(28, npc, 0)): the clicked person is the person resource (type-65 faction id or twin) -> state; UESP 0x1C ""PC meets NPC""; DFU ClickedNpc"
+func,0x000295BE,qaction_op09_spawn_repeat,strong,"opcode 9, an action (quest_run_opcodes): every arg2 minutes, with arg3 % chance, while arg4 lasts (-1 forever), creates the foe (qaction_place_foe); UESP type 9 ""Repeating Spawn""; DFU CreateFoe; was quest_op09_spawn_repeat (opcode handlers are qaction_/qcond_)"
+func,0x00029670,qaction_op87_respawn,strong,"opcode 87, an action: like op 9 but first deletes the previous creature (type 34); UESP 0x57 (Mob, delay, chance, total count); was quest_op87_respawn"
+func,0x00029738,qcond_op28_npc_clicked,strong,"event 28, raised by the NPC click (npc_talk: quest_raise_event(28, npc, 0)): the clicked person is the person resource (type-65 faction id or twin) -> state; UESP 0x1C ""PC meets NPC""; DFU ClickedNpc; was qcond_op28_event_person"
 func,0x000297BA,qcond_op70_player_has_items,strong,"opcode 70: arg1 state = all item resources args 2-4 are carried by player_entity; UESP 0x46 ""PC has Items""; DFU HaveItem"
 func,0x000298F3,unequip_object,candidate,clears the character+0x16F equipped slots holding this object; called when an object is deleted (object.c 8EBFD) or given away
 func,0x00029958,quest_run_opcodes,strong,"runs one quest: for each 87-byte opcode record (quest_section(q,8), count quest+0x20) switches on the opcode: 0 place item, 4 reward, 6 end, 7 clear states, 8 start s%07d.qbn, 9 spawn, 10/11 topics, 12/13 timer, 19/20 reveal, 22/33 place foe, 23/24 log, 29 prompt, 30 place npc, 31 daily clock, 34/35 states, 43 pc at, 49 cure disease, 50 anim%04d.vid, 52/53 and/or, 55/56 faces, 58/59 cure vampirism/lycanthropy, 60/84 sound, 61/65 reputation, 62 weather, 72 disease, 76 give item, 77/79 level/repute, 83 teleport, 85/86 questor..; most cases: state arg0 true and not done -> handler, then quest_op_done; called every frame by quests_run_all (495 episodes)"
@@ -1922,7 +1952,7 @@ func,0x00036DC9,action_record_add_chained,candidate,"as action_record_add, count
 func,0x00036F18,action_axis_to_translation,candidate,"turns an axis action (types 2-7) into a translation (type 1) along axis ((type-2)^1)+1, magnitude << 3, 50 ticks"
 func,0x00036F69,spellmaker_open,confirmed,"unit spells.c (filed under fs2df.c). (open) game_mode=2, loads info01i0.img, mask01i0.img, mask05i0.img, spellmaker_new; called by spellmaker_update every frame (open=0) and guild_service_dispatch (Make Spells, cases 64/497); exp: fallcall 0x36F69 1 drew the spellmaker (MAX SP, MONEY, SPELL COST, CASTING COST, SPELL NAME, BUY/NEW/EXIT): scratch/magic/open_0x36F69.png"
 func,0x00037014,spellmaker_update,strong,"every frame (game_frame, 501 episodes) but returns unless spellmaker_open says mode 2; draws MAX SP/MONEY/SPELL COST (sum of effect costs*target factor*2)/CASTING COST (spell_cost)/name, element and target icons, effect names; hit-tests the 18 spellmaker_buttons (ButtonClick 203); handles the alter-effect popup"
-func,0x00037732,spellmaker_exit,strong,"spellmaker_buttons[12] (244,179)-(268,195) EXIT: right-click shows TEXT 1814 ""Exit from SpellMaker""; left frees the images, game_mode=0; with cheat_flags bit 0 a right-click deletes a SPELLS.STD entry (spells_std_delete)"
+func,0x00037732,spellmaker_close,strong,"spellmaker_buttons[12] (244,179)-(268,195) EXIT: right-click shows TEXT 1814 ""Exit from SpellMaker""; left frees the images, game_mode=0 (the spellmaker's close, as itemmaker_close, potionmaker_close, spellbook_close, spellshop_close); with cheat_flags bit 0 a right-click deletes a SPELLS.STD entry (spells_std_delete); was spellmaker_exit"
 func,0x00037856,spellmaker_enter_name,strong,spells.c; direct call (all-zero args) shows 'Enter spell name'
 func,0x000378D1,spellmaker_element_fire,strong,"spellmaker_buttons[0] (299,114): right-click TEXT 1801 ""Save versus fire""; sets spell+0x06 element = 0 when an effect allows elements"
 func,0x00037934,spellmaker_element_frost,strong,"spellmaker_buttons[1] (299,130): TEXT 1802 ""Save versus frost""; element = 1"
@@ -1959,7 +1989,7 @@ func,0x00038911,spellmaker_settings_update,strong,"effect settings panel (spellm
 func,0x000390AD,spellmaker_settings_close,candidate,"D_0017B317[33] (281,94)-(304,109): sets D_001940D5 bit 5 and closes the settings panel (spellmaker_settings_kind = 0)"
 func,0x000390D3,spellmaker_effect_rows,strong,"clicks on the 3 effect rows (y 30+32k): right-click TEXT 1200+effect (1202 ""Paralysis Duration...""), left-click asks TEXT 1708 ""How would you like to alter the spell?"" (spellmaker_alter_row)"
 func,0x00039224,spell_effect_text_index,strong,"spell_effect_text_index[type] + subtype (not for type 29): offset of the effect help texts at 1200+ and 1500+; callers spellmaker, spellbook, spellshop_show_effect"
-func,0x000392AD,spells_list_poll,strong,"modal pick-list poll: Esc -> -2 (cancels a half-picked effect when the callback is spellmaker_pick_subtype_cb), a pick -> its row (list closed), else -1; called by the spellmaker, itemmaker_update, potionmaker_update, spfx_popup_update, training_update, sheet.c, click.c, kludge.c"
+func,0x000392AD,list_popup_poll,strong,"modal poll of the list popup (list_popup_picklist, list_popup_image, list_popup_callback): Esc -> -2 (cancels a half-picked effect when the callback is spellmaker_pick_subtype_cb), a pick -> its row (list closed), else -1; called by the spellmaker, itemmaker_update, potionmaker_update, spfx_popup_update, training_update, sheet.c, click.c, kludge.c (it lives in spells.c but serves every list popup); was spells_list_poll"
 func,0x0003937B,spell_cost_duration_chance,strong,"spell_cost_formulas[0] (formula 1): f0*dur.base + f1*(dur.plus/dur.per) + f2*chance.base + f3*(chance.plus/chance.per) for the current slot, f = spell_effect_cost_current"
 func,0x0003946E,spell_cost_duration_magnitude,strong,spell_cost_formulas[1] (formula 2): duration terms + f2*avg(magnitude base) + f3*avg(magnitude plus)/per
 func,0x000395AA,spell_cost_duration,strong,spell_cost_formulas[2] (formula 3): f0*dur.base + f1*(dur.plus/dur.per)
@@ -2049,15 +2079,15 @@ func,0x0003F71B,msgbox_draw_buttons,strong,"(y): draws 1-3 32x16 buttons (msgbox
 func,0x0003F89F,msgbox_button_at,strong,"(x, y): which of the 1-3 buttons the click (or its hot key msgbox_button_keys) hits, 0 none; caller msgbox_update"
 func,0x0003FC4B,people_spawn_tick,strong,"people.c (filed under text.c): every frame: people_max_count; while people_count < max adds a type-53 child of the location and places it (person_place); callers game_frame, 86B0B (town load); exp4 (scratch/text/exp4.py save_morthag1): people_count reached people_max (15) within 60 frames"
 func,0x0003FCBD,people_update,strong,"people.c (filed under text.c): every frame: each person farther than people_spawn_range is re-placed near the player or deleted (too many), else walks (person_walk); its sprite frame cycles (+0x1B low bits)"
-func,0x0003FDD2,person_walk,candidate,"(person, distance): moves a type-53 person along its heading by frame_ticks, turns at town-map obstacles (person_can_stand_at), stands still when creatures are around or too many stuck; sets the 8-view sprite and mirror bit"
-func,0x000401F1,person_place,strong,"(person): makes it a type-53 pedestrian: random home building, new record id, faction = the region's type-15 people faction, sprite (person_pick_sprite), random spot 1024-1536 from the player that person_spawn_spot_ok accepts (10 tries)"
+func,0x0003FDD2,pedestrian_walk,candidate,"people.c works on type-53 pedestrians; ""person"" is the type-8 NPC record (struct person, DFU Person) and the QBN person resource; (pedestrian, distance): moves it along its heading by frame_ticks, turns at town-map obstacles (pedestrian_can_stand_at), stands still when creatures are around or too many are stuck; sets the 8-view sprite and mirror bit; was person_walk"
+func,0x000401F1,pedestrian_place,strong,"people.c works on type-53 pedestrians; ""person"" is the type-8 NPC record (struct person, DFU Person) and the QBN person resource; (pedestrian): makes it a type-53 pedestrian: random home building, new record id, faction = the region's type-15 people faction, sprite (pedestrian_pick_sprite), random spot 1024-1536 from the player that pedestrian_spawn_spot_ok accepts (10 tries); was person_place"
 func,0x0004037E,people_max_count,confirmed,"how many pedestrians: 0 unless outside in a town (not types 4/7/>8), human form, no creatures, in the town area (8661C); else 2 x town width x height clamped 8..30, halved when D_00195E2A[1FFF1()] >= 3; exp4 (scratch/text/exp4.py save_morthag1): 15, and 15 type-53 pedestrians in people_list 60 frames later"
 func,0x000404D9,town_map_area_clear,candidate,"(x, z): 1 if the 3x3 town-map pixels (town_map_pixels, 64 units each) around the point are all 0 (no building)"
 func,0x000405EB,people_set_spawn_range,candidate,"people_spawn_range = 1 when the location has no map (+0x1B == 0xFFFF), else 3100"
 func,0x0004062E,player_in_town_area,confirmed,1 if the player is within the town's blocks (+-2048 margin); no callers; exp1: 1 in save_dorian
-func,0x000406DC,person_clear_of_others,candidate,"(person, distance): 0 if another person in people_list is closer than distance"
-func,0x00040794,person_can_stand_at,candidate,"(x, z): 2021B passes and the point is inside the town map and town_map_area_clear"
-func,0x0004083A,person_spawn_spot_ok,candidate,"(person, x, z): inside the town, free town-map area, clear of others (64), not colliding (23DE0), and out of the player's view (angle > 400 or town_map_line_blocked)"
+func,0x000406DC,pedestrian_clear_of_others,candidate,"people.c works on type-53 pedestrians; ""person"" is the type-8 NPC record (struct person, DFU Person) and the QBN person resource; (pedestrian, distance): 0 if another one in people_list is closer than distance; was person_clear_of_others"
+func,0x00040794,pedestrian_can_stand_at,candidate,"people.c works on type-53 pedestrians; ""person"" is the type-8 NPC record (struct person, DFU Person) and the QBN person resource; (x, z): ground_tile_at passes and the point is inside the town map and town_map_area_clear; was person_can_stand_at"
+func,0x0004083A,pedestrian_spawn_spot_ok,candidate,"people.c works on type-53 pedestrians; ""person"" is the type-8 NPC record (struct person, DFU Person) and the QBN person resource; (pedestrian, x, z): inside the town, free town-map area, clear of others (64), not colliding, and out of the player's view (angle > 400 or town_map_line_blocked); was person_spawn_spot_ok"
 func,0x00040983,town_map_line_blocked,candidate,"(x, z): walks the town-map pixels from the player to the point; 1 when a building pixel (1-99) is crossed"
 func,0x00040AFD,guards_are_present,confirmed,"1 if a creature has the guard sprite (TEXTURE.399) and team 1 (character+0x229, guard_team); damage_apply then asks 'Do you surrender?' (TEXT 15) and starts court_trial; exp4 (scratch/text/exp4.py save_morthag1): 0 -> 1 after guards_summon"
 func,0x00040B83,is_guard_sprite,strong,"(object): 1 if its world image archive (+0x1B >> 7) is 399, the city watch sprites (exp2: a spawned guard had 399)"
@@ -2067,10 +2097,10 @@ func,0x00040E9D,guard_spawn,confirmed,"(person or 0): new type-18 creature under
 func,0x00040F7F,guards_timer_tick,strong,every frame (game_frame): counts guards_timer down and calls guards_summon(1) when it reaches 0
 func,0x00040FC1,crime_guards_or_court,strong,"decides between the guards attacking and sending you to court (economy agent: code); with the player entity a direct call went on to the court screen (court_open, 0x20C87)"
 func,0x0004105A,people_clear,confirmed,"deletes every pedestrian in people_list, people_count 0, clears the list; callers 86B0B/86D37/871FA (location load/unload); exp4 (scratch/text/exp4.py save_morthag1): people_count 15 -> 0"
-func,0x000410D7,person_pick_sprite,strong,"(person): sprite archive<<7 from D_0017B66D by the area kind (1FFF1 = D_00179D74[D_0019627B]) and a random variant, random mirror; 1 in 32 is a guard (399<<7 = 51072)"
-func,0x000411BF,person_load_face,strong,"(person, buf): seeded by the person's id, reads its 64x64 talk portrait (4096 bytes) from TFAC00I0.RCI by sprite; caller talk_open; asset TFAC00I0.RCI [0]"
+func,0x000410D7,pedestrian_pick_sprite,strong,"people.c works on type-53 pedestrians; ""person"" is the type-8 NPC record (struct person, DFU Person) and the QBN person resource; (pedestrian): sprite archive<<7 by the area kind and a random variant, random mirror; 1 in 32 is a guard (399<<7); was person_pick_sprite"
+func,0x000411BF,npc_load_face,strong,"(talk_npc_object, buf): seeded by the NPC's id, reads its 64x64 talk portrait (4096 bytes) from TFAC00I0.RCI by sprite; caller talk_open for any NPC (types 8, 53, creatures), not only pedestrians; was person_load_face"
 func,0x00041347,people_check_witnesses,candidate,"outside: ORs line-of-sight (23C72) from each pedestrian to the player into people_witness_flags (bit 1 for guards); callers talk_open, person_killed, 7425E, 86F50"
-func,0x00041409,person_killed,strong,"(person): if anyone saw it, crime_current 5 (murder) and guards_summon(1); re-places the person; guild_count_crime(6, 5) (Dark Brotherhood count); caller weapon_melee_strike"
+func,0x00041409,pedestrian_killed,strong,"people.c works on type-53 pedestrians; ""person"" is the type-8 NPC record (struct person, DFU Person) and the QBN person resource; (pedestrian from people_list): if anyone saw it, crime_current 5 (murder) and guards_summon(1); re-places it; guild_count_crime(6, 5); caller weapon_melee_strike; was person_killed"
 func,0x00041455,people_debug_map,candidate,"debug: draws the town map with pedestrians (145), creatures (161), the player (244) and 'LOC: %d, %d'; no callers"
 func,0x00041672,spellbook_add_spell_cb,strong,"callback over the spellbook's children: each type-9 spell becomes '%d - %s' (spell_cost, name; cost/4 for names ending '$') in the picklist and its record goes into the row array (D_00190DE4)"
 func,0x000417C8,spellbook_open,confirmed,"CAST SPELL (Backspace, action 28) or a1=1 (HUD, sheet, inv_use_item): refuses while spell_cast_busy; builds the list, game_mode 5, spbk00i0.img + mask04i0.img, 237 OpenBook; exp_hud.py: HUD button -> game_mode 5"
@@ -2134,7 +2164,7 @@ func,0x00044D03,kludge_print_build,strong,reads %sverstr.dat from the ARENA2 pat
 func,0x00044E20,kludge_find_creature_cb,candidate,callback: remembers a type-18 creature in D_00199724
 func,0x00044E52,kludge_menu_open,strong,"opens the debug pick list ('Get rumor', 'Advance level', 'Jump 1 month', 'Good merchant rep', 'Become Vampire'...) with pick00i0.img, game mode 200"
 func,0x00044E89,kludge_menu_update,strong,"per frame: when a debug list row is picked, runs entry 51+row of spell_effect_handlers (thunk CAE1C)"
-func,0x00044EE0,show_rumor,confirmed,"debug menu entry 51 ('Get rumor', spell_effect_handlers[51]; world agent); kludge.c; opens rumor.dat; direct call (all-zero args) shows a rumour; calls faction_rumor_text"
+func,0x00044EE0,kludge_show_rumor,confirmed,"debug menu entry 51 ('Get rumor', spell_effect_handlers[51]; world agent); kludge.c, like the other debug handlers kludge_*; opens rumor.dat; direct call (all-zero args) shows a rumour; calls faction_rumor_text; was show_rumor"
 func,0x00044EFD,kludge_good_merchant_rep,strong,debug entry 54 'Good merchant rep': character+0x93 (merchants reputation) = 10-59
 func,0x00044F3A,kludge_jump_month,confirmed,debug entry 53 'Jump 1 month': game_minutes += 43200; exp1: game_minutes +43200
 func,0x00044F5C,kludge_advance_level,strong,debug entry 52 'Advance level': sets the level-up flag and opens the sheet in level-up mode
@@ -2146,7 +2176,7 @@ func,0x00045A1D,item_add_to_container,strong,"(container, group, index, equip): 
 func,0x00045AED,item_add_random_to_container,candidate,makes a random item of a group (item_make_random) in the container
 func,0x00045B41,kludge_toggle_world_position,strong,debug entry 59 'Toggle World Position': D_001940D6 ^= 1
 func,0x00045B60,kludge_toggle_second_compass,strong,debug entry 60 'Toggle Second Compass': D_001940D6 ^= 8 (hand code 5D151 tests it)
-func,0x00045B7F,pick_gold,candidate,kludge.c; string 'Picking from %s.'; direct call (all-zero args) shows 'You picked N gold pieces'
+func,0x00045B7F,kludge_pick_gold,candidate,debug menu entry 61 (labelled 'Pick pockets'; world agent); kludge.c; string 'Picking from %s.'; direct call (all-zero args) shows 'You picked N gold pieces'; was pick_gold
 func,0x00045C6B,kludge_toggle_quest_debug,strong,"debug entry 63: D_001940DA ^= 2, 'Quest DEBUGGING on'"
 func,0x00045C9D,kludge_remove_all_items,candidate,clears the 27 equip slots (character+0x16F) and deletes all the player's possessions
 func,0x00045CF5,kludge_show_memory,strong,lists the 512 allocations '%ld : %s' and 'Total memory : %ld'
@@ -3064,7 +3094,7 @@ func,0x00075FFF,click_door,strong,"object type 32 within 128: door_try_open, a2=
 func,0x0007606C,click_flat,candidate,object type 34: does nothing
 func,0x00076088,click_interior_model,strong,"object type 43: shop goods open the stock; in someone's house asks text 37 'This looks like private property...', may raise crime 13, opens the house's container (D_00196120; the player's own D_00196092); INFO shows the building"
 func,0x000762B6,click_corpse,strong,"object type 44: INFO 'You see a dead %s.' / 'You see a dead person.', else opens it if it holds items or 'The body has no treasure.'"
-func,0x000763C6,click_mobile_npc,candidate,"object type 53: STEAL pickpockets (1374D) unless +0x19 bit 0x4000, other modes within 256 npc_talk"
+func,0x000763C6,click_pedestrian,candidate,"object type 53 (a pedestrian): STEAL pickpockets (pickpocket_attempt) unless +0x19 bit 0x4000, other modes within 256 npc_talk; was click_mobile_npc"
 func,0x00076460,click_loot_container,strong,"object type 33 with picture 216/x or 204/0 (loot piles, chests): fills it (loot_fill_container) and opens it (inventory_open_container 0,5)"
 func,0x00076503,click_model,candidate,object type 56: click_show_building_info
 func,0x0007653C,click_show_building_info,strong,"shows a building's name (8BD50), notes it on the town map, and 'Store is closed. Open from %d:00 to %d:00.' (hours D_0017C5B8) for shops; one model (417/39) shows faction_rumor_text"
@@ -3145,11 +3175,11 @@ func,0x0007C432,load_reset_state,candidate,"caller load_game after the save vars
 func,0x0007C56F,load_fix_object_cb,strong,"after a load: relinks twins (+0x33) by id ('Invalid quest object.' for a missing one in the location), merges duplicate containers into inventory_containers[+0x1B], loot piles in containers 0-4 become items (type 2), clears model pointers of 6/32/43/56 objects"
 func,0x0007C78B,load_fix_ids_cb,candidate,"after a load: deletes types 0 and 42 (DFU OneShot hit effects); spells (9) lying in the world (parent the location (1), a town block (38) or a dungeon block (47)) are deleted unless flagged 0x2000 and not cast by the player, kept ones get an id in the location's block; other spells get block-801 ids"
 func,0x0007C8AF,load_fix_objects,strong,"load_fix_object_cb over both trees (each relinking twins in the other), then load_fix_ids_cb; caller load_game"
-func,0x0007C908,text_draw_centered_shadow,candidate,draws a string centred with a black shadow 1 pixel down-right (book.c 5A5D2 twice); no callers; probably support.c
+func,0x0007C908,text_draw_centred_black_shadow,candidate,"draws a string centred with a black shadow 1 pixel down-right (text_draw_centred twice), like text_draw_black_shadow; no callers; probably support.c; was text_draw_centered_shadow, one letter from text_draw_centred_shadow (0x5A60C)"
 func,0x0007C965,text_draw_white_shadow,candidate,draws a string with a white (15) shadow (book.c 5A54A twice); no callers; probably support.c
 func,0x0007C9C2,text_draw_black_shadow,candidate,draws a string with a black shadow (book.c 5A54A twice); no callers; probably support.c
-func,0x0007CA1F,text_draw_colored,strong,"draws a string at x,y in a text colour and shadow colour (book.c 5A577), restoring them; 128 episodes, callers career, spellmaker, classmaker, bank, potionmaker, chargen screens; probably support.c"
-func,0x0007CA85,text_draw_centered_colored,strong,"draws a string centred on x in a text colour and shadow colour (book.c 5A60C); 222 episodes, callers sheet_draw, talk_draw, title_menu, saveload_draw, travel popups; probably support.c"
+func,0x0007CA1F,text_draw_coloured,strong,"draws a string at x,y in a text colour and shadow colour (text_draw_shadow), restoring them; 128 episodes, callers career, spellmaker, classmaker, bank, potionmaker, chargen screens; probably support.c; was text_draw_colored (the family spells colour/centred)"
+func,0x0007CA85,text_draw_centred_coloured,strong,"draws a string centred on x in a text colour and shadow colour (text_draw_centred_shadow); 222 episodes, callers sheet_draw, talk_draw, title_menu, saveload_draw, travel popups; probably support.c; was text_draw_centered_colored"
 func,0x0007CAEB,text_draw_number_in_box,candidate,"itoa(n) drawn centred in the box (x0,y0)-(x1,y1) with text_draw_centered_colored; caller spellmaker_settings_update; probably support.c"
 func,0x0007CB4F,hud_status_set,confirmed,"(text): the one-line status text above the toolbar for 2 s (36 BIOS ticks); 12 callers (click.c, weapons, pickbook); exp1: 'A LONGER STATUS MESSAGE' drawn above the toolbar"
 func,0x0007CBA1,hud_message_add,confirmed,"(text): adds a line to the 16 top-of-screen messages, each for 2 s; 51 callers; exp1: 'HUD LINE ONE', 'HUD LINE TWO' at the top"
@@ -3162,10 +3192,10 @@ func,0x0007D068,key_pressed_once,strong,"(scan code): 1 on the frame the key goe
 func,0x0007D0DA,mode_push,strong,pushes screen_active and game_mode (mode_stack) and sets game_mode_under_popup; every message box opens with it
 func,0x0007D12D,mode_pop,strong,pops screen_active and game_mode; game_mode_under_popup = the one below or 255; msgbox_close
 func,0x0007D19B,size_fit,candidate,"(&w, &h, max w, max h): scales w,h down to fit, keeping the aspect; callers inv_draw_cart_cell, inv_draw_item_image"
-func,0x0007D24F,picklist_open_strings,strong,"(NUL-separated list): centred pick00i0.img list popup (8CA9A) filled with the strings; callers training_update, 38228, 383CC; sweep read pick00i0.img"
-func,0x0007D3CA,picklist_open,strong,"(NULL-ended pointer list): the same picklist from string pointers; callers spells_pick_list, title_menu, 8B054 ..; pick00i0.img [1]"
+func,0x0007D24F,list_popup_open_strings,strong,"(NUL-separated list): opens the centred pick00i0.img list popup filled with the strings; callers training_update, spellmaker_pick_effect_cb, spellmaker_add_effect; was picklist_open_strings"
+func,0x0007D3CA,list_popup_open,strong,"(NULL-ended pointer list): opens the list popup (list_popup_picklist on pick00i0.img) from string pointers; callers spells_pick_list, title_menu, spfx_show_choice_list; was picklist_open (support.c, the popup above picklist.c's widget)"
 func,0x0007D53F,picklist_frame,strong,"per-frame wrapper over the pick list widget (picklist_poll is 0x8CFE6, picklist.c): (list): -2 Esc/right click, the picked index, or -1 (still open, redraws); callers spellshop_update, picklist_update"
-func,0x0007D5D9,picklist_update,strong,"draws pick00i0.img and polls the list; callers spells_pick_list, title_menu"
+func,0x0007D5D9,list_popup_update,strong,"draws pick00i0.img and runs picklist_frame on list_popup_picklist; callers spells_pick_list, title_menu; was picklist_update"
 func,0x0007D62B,msgbox_choice_rsc,confirmed,"(TEXT.RSC id, 3 button ids, 3 hot keys): message box with buttons (kind 5); popup_answer = the button; callers court_open 20C87/2118B, spell_recall_prompt; sweep drew RSC 0 with a button"
 func,0x0007D6AE,rand_range,confirmed,"(min, max): min + rand() % (max-min+1); 291 episodes, 50+ callers; exp1: 20 calls of (5,10) gave 5..10"
 func,0x0007D6EA,object_free_later,strong,(object): queues it in free_later_list (freed by object_free_pending after the world walk)
@@ -3199,8 +3229,8 @@ func,0x0007EB0B,town_grid_visit_near,candidate,"(object, cb): runs grid_visit_fu
 func,0x0007EC28,object_closeness,candidate,"(a, b): 0 beyond 512, else distance x 128 / 512; no callers"
 func,0x0007EC8F,buttons_draw_hover_label,candidate,"(x, y, n, rects, labels): draws the label of the button under the mouse at x,y; caller spellmaker_update"
 func,0x0007ED48,int_identity,candidate,returns its argument (the compass frame); caller 5D151 (compass)
-func,0x0007ED6C,detect_arrow_frame,strong,"frame 0-31 of the Detect arrow: direction to detect_target, or random when none; caller 5D151 (compass, D_001940D6 bit 4); exp5 (scratch/text/exp5.py save_mord, Detect bit and character+0x221 set, world_collect_objects called): returned 4 with a target"
-func,0x0007EDD3,icon_cycle_frame,candidate,frame 0-31 advancing every 38 BIOS ticks; caller 5D151 (icon shown when D_001940D6 bit 3)
+func,0x0007ED6C,detect_arrow_anim_frame,strong,"returns the animation frame 0-31 of the Detect arrow (not a per-frame handler: _frame names those): direction to detect_target, or random when none; caller hud_draw_compass (display_flags bit 4); exp5 (scratch/text/exp5.py save_mord, Detect bit and character+0x221 set, world_collect_objects called): returned 4 with a target; was detect_arrow_frame"
+func,0x0007EDD3,icon_cycle_anim_frame,candidate,returns an animation frame 0-31 advancing every 38 BIOS ticks; caller hud_draw_compass (icon shown when display_flags bit 3); was icon_cycle_frame
 func,0x0007EE38,save_thumbnail_capture,candidate,copies every 4th pixel of the screen (80x50) to big_buffer+24000; caller 4330A (save game)
 func,0x0007EEAF,swift_init,candidate,"SWIFT 3D-device support stub: swift_present 0, returns 0; caller init 4ED36"
 func,0x0007EED8,swift_poll,candidate,"if swift_present: swift_call(0x5301) = SWIFT 'get position and buttons'; callers 81096, 812A0 (every frame)"
@@ -3536,7 +3566,7 @@ func,0x00091D8D,inv_sum_hidden_weight,strong,"inven.c callback: adds item+0x39 w
 func,0x00091DE1,trade_add_buy_price,strong,"inven.c callback of trade_total_buy: unpaid goods (object flag 0x20): value (x count for arrows) into trade_total, half price on holiday 49 for weapons at a weapon smith, holiday 29 at a general store, or a sale flag; also the steal penalty sum D_00190CA8"
 func,0x00091F7C,trade_add_repair_cost,strong,"inven.c callback of trade_total_repair: items not in repair add value*10% (no enchantment) or value*75% (enchanted) to trade_total, min 1"
 func,0x00092013,inv_return_unpaid_item,strong,"inven.c callback (inv_close_return_unpaid, trade_clear_button): unpaid goods go back to the right container and are unequipped; bought arrows merge back"
-func,0x0009219A,inv_store_callback,strong,inven.c callback: inv_store_item for items (type 2); caller inv_close_return_unpaid (via 96AB4)
+func,0x0009219A,inv_store_cb,strong,inven.c callback (callbacks end in _cb): inv_store_item for items (type 2); caller inv_close_return_unpaid (via 96AB4); was inv_store_callback
 func,0x000921CC,inv_claim_item,strong,"inven.c callback (inv_claim_items, trade_steal_button): clears the unpaid flag, stores the item unless it is in the wagon, a bought wagon (group 23 index 0) creates the wagon"
 func,0x00092280,inv_assign_item_id,strong,"inven.c callback (inv_close_assign_ids, 86D37): gives an item a new record id 100<<16|n (8EB88) unless it has one"
 func,0x000922CA,inv_reset_left_list,strong,"inven.c: inv_left_scroll = 0, inv_left_container = the first inventory container; callers init 4F47C, 50E3F, loadsave 7A983"
