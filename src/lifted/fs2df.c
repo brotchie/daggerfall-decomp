@@ -15,9 +15,9 @@ extern char D_00196272[];
 extern char game_mode[];
 extern char D_001985D4[];
 extern char D_001985D8[];
-extern char D_001995E4[];
+extern struct link *D_001995E4;
 extern char D_001995E8[];
-extern char D_001995EC[];
+extern struct link *D_001995EC;
 extern char D_001995F0[];
 extern char D_001995F4[];
 extern char D_00199600[];
@@ -37,7 +37,7 @@ void func_000361B7(int);
 void func_00036AA7(int);
 void func_00036C6F(int, int, int, unsigned char);
 void func_00036DC9(int, int, int, unsigned char);
-void func_00036F18(int);
+void func_00036F18(struct link *);
 
 void func_000361B7(int a1)
 {
@@ -172,75 +172,75 @@ L36C60:;
 
 void func_00036C6F(int a1, int a2, int a3, unsigned char a4)
 {
-    *(int *)D_001995EC = (*(int *)D_001995E4 = ((int)D_00199D78) + ((*(int *)link_count)++ * 39));
-    mc_memset(*(int *)D_001995EC, 0, 39, (int)D_00170AB4, 447, 4);
-    *(short *)(*(char **)D_001995EC) = *(short *)D_00199618;
+    D_001995EC = (D_001995E4 = (struct link *)(((int)D_00199D78) + ((*(int *)link_count)++ * 39)));
+    mc_memset((int)D_001995EC, 0, 39, (int)D_00170AB4, 447, 4);
+    D_001995EC->object_id = *(short *)D_00199618;
     if (a2 == 0) goto L36D3C;
-    *(signed char *)(*(char **)D_001995EC + 2) = *(signed char *)((char *)a1 + 14);
-    *(signed char *)(*(char **)D_001995EC + 3) = *(signed char *)((char *)a1 + 18);
-    *(signed char *)(*(char **)D_001995EC + 4) = *(signed char *)((char *)a2);
-    *(short *)(*(char **)D_001995EC + 5) = *(short *)((char *)a2 + 1);
-    *(short *)(*(char **)D_001995EC + 7) = *(short *)((char *)a2 + 3);
-    *(signed char *)(*(char **)D_001995EC + 9) = *(signed char *)((char *)a2 + 9);
+    D_001995EC->trigger = *(signed char *)((char *)a1 + 14);
+    D_001995EC->param = *(signed char *)((char *)a1 + 18);
+    D_001995EC->axis = *(signed char *)((char *)a2);
+    D_001995EC->duration = *(short *)((char *)a2 + 1);
+    D_001995EC->magnitude = *(short *)((char *)a2 + 3);
+    D_001995EC->action = *(signed char *)((char *)a2 + 9);
     goto L36D89;
 L36D3C:;
     if (a3 == 0) goto L36D7D;
-    *(signed char *)(*(char **)D_001995EC + 2) = *(signed char *)((char *)a3 + 2);
-    *(signed char *)(*(char **)D_001995EC + 3) = *(signed char *)((char *)a3 + 5);
-    *(signed char *)(*(char **)D_001995EC + 4) = *(signed char *)((char *)a3 + 4);
-    *(signed char *)(*(char **)D_001995EC + 9) = a4;
+    D_001995EC->trigger = *(signed char *)((char *)a3 + 2);
+    D_001995EC->param = *(signed char *)((char *)a3 + 5);
+    D_001995EC->axis = *(signed char *)((char *)a3 + 4);
+    D_001995EC->action = a4;
     goto L36D89;
 L36D7D:;
-    *(signed char *)(*(char **)D_001995EC + 9) = a4;
+    D_001995EC->action = a4;
 L36D89:;
-    if (((int)(unsigned char)*(signed char *)(*(char **)D_001995EC + 9)) <= 1) goto L36DAD;
-    if (((int)(unsigned char)*(signed char *)(*(char **)D_001995EC + 9)) < 8) goto L36DAF;
+    if (D_001995EC->action <= 1) goto L36DAD;
+    if (D_001995EC->action < 8) goto L36DAF;
 L36DAD:;
     goto L36DB9;
 L36DAF:;
-    func_00036F18(*(int *)D_001995EC);
+    func_00036F18(D_001995EC);
 L36DB9:;
-    *(signed char *)(*(char **)D_001995EC + 10) = 0;
+    D_001995EC->chain_count = 0;
 }
 
 void func_00036DC9(int a1, int a2, int a3, unsigned char a4)
 {
-    (*(signed char *)(*(char **)D_001995E4 + 10))++;
-    *(int *)D_001995EC = ((int)D_00199D78) + ((*(int *)link_count)++ * 39);
-    mc_memset(*(int *)D_001995EC, 0, 39, (int)D_00170AB4, 490, 4);
-    *(short *)(*(char **)D_001995EC) = *(short *)D_00199618;
+    D_001995E4->chain_count++;
+    D_001995EC = (struct link *)(((int)D_00199D78) + ((*(int *)link_count)++ * 39));
+    mc_memset((int)D_001995EC, 0, 39, (int)D_00170AB4, 490, 4);
+    D_001995EC->object_id = *(short *)D_00199618;
     if (a2 == 0) goto L36E94;
-    *(signed char *)(*(char **)D_001995EC + 2) = *(signed char *)((char *)a1 + 14);
-    *(signed char *)(*(char **)D_001995EC + 3) = *(signed char *)((char *)a1 + 18);
-    *(signed char *)(*(char **)D_001995EC + 4) = *(signed char *)((char *)a2);
-    *(short *)(*(char **)D_001995EC + 5) = *(short *)((char *)a2 + 1);
-    *(short *)(*(char **)D_001995EC + 7) = *(short *)((char *)a2 + 3);
-    *(signed char *)(*(char **)D_001995EC + 9) = *(signed char *)((char *)a2 + 9);
+    D_001995EC->trigger = *(signed char *)((char *)a1 + 14);
+    D_001995EC->param = *(signed char *)((char *)a1 + 18);
+    D_001995EC->axis = *(signed char *)((char *)a2);
+    D_001995EC->duration = *(short *)((char *)a2 + 1);
+    D_001995EC->magnitude = *(short *)((char *)a2 + 3);
+    D_001995EC->action = *(signed char *)((char *)a2 + 9);
     goto L36EE1;
 L36E94:;
     if (a3 == 0) goto L36ED5;
-    *(signed char *)(*(char **)D_001995EC + 2) = *(signed char *)((char *)a3 + 2);
-    *(signed char *)(*(char **)D_001995EC + 3) = *(signed char *)((char *)a3 + 5);
-    *(signed char *)(*(char **)D_001995EC + 4) = *(signed char *)((char *)a3 + 4);
-    *(signed char *)(*(char **)D_001995EC + 9) = a4;
+    D_001995EC->trigger = *(signed char *)((char *)a3 + 2);
+    D_001995EC->param = *(signed char *)((char *)a3 + 5);
+    D_001995EC->axis = *(signed char *)((char *)a3 + 4);
+    D_001995EC->action = a4;
     goto L36EE1;
 L36ED5:;
-    *(signed char *)(*(char **)D_001995EC + 9) = a4;
+    D_001995EC->action = a4;
 L36EE1:;
-    if (((int)(unsigned char)*(signed char *)(*(char **)D_001995EC + 9)) <= 1) goto L36F05;
-    if (((int)(unsigned char)*(signed char *)(*(char **)D_001995EC + 9)) < 8) goto L36F07;
+    if (D_001995EC->action <= 1) goto L36F05;
+    if (D_001995EC->action < 8) goto L36F07;
 L36F05:;
     return;
 L36F07:;
-    func_00036F18(*(int *)D_001995EC);
+    func_00036F18(D_001995EC);
 }
 
-void func_00036F18(int a1)
+void func_00036F18(struct link *a1)
 {
-    *(short *)((char *)a1 + 7) = ((int)(unsigned char)*(signed char *)((char *)a1 + 4)) << 3;
-    *(signed char *)((char *)a1 + 4) = ((*(signed char *)((char *)a1 + 9) - 2) ^ 1) + 1;
-    *(short *)((char *)a1 + 5) = 50;
-    *(signed char *)((char *)a1 + 9) = 1;
+    a1->magnitude = a1->axis << 3;
+    a1->axis = ((a1->action - 2) ^ 1) + 1;
+    a1->duration = 50;
+    a1->action = 1;
 }
 
 int spellmaker_open(int a1)

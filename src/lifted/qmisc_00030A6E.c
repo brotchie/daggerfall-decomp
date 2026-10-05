@@ -43,7 +43,7 @@ L30AFB:;
     *(int *)(D_00195A16 + (l_1C * 10)) = a4;
     *(signed char *)(D_00195A15 + (l_1C * 10)) = (signed char)current_quest->id;
     if (a1->type == 18) goto L30B46;
-    if (((int)(unsigned short)*(short *)((char *)a1 + 89)) == 514) goto L30B48;
+    if (a1->data.building.faction_id == 514) goto L30B48;
 L30B46:;
     goto L30B7E;
 L30B48:;

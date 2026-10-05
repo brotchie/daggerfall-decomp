@@ -3,15 +3,6 @@
 
 #pragma pack(1)
 struct R6 { unsigned short w0; unsigned short flags; unsigned short w4; };
-struct T {                  /* a QBN place (struct qbn_place): the fields its pad holds */
-    char pad0[3];
-    signed char cnt;        /* 0x03 */
-    unsigned short w4;      /* 0x04 */
-    short s6;               /* 0x06 */
-    short mode;             /* 0x08 */
-    char pad0a[6];
-    struct record *obj;     /* 0x10 */
-};
 #pragma pack()
 extern char D_00170A64[];
 extern struct record *nonworld_root;
@@ -28,7 +19,7 @@ extern struct record *D_001970D4;
 extern struct location *D_001970D8;
 extern struct quest *current_quest;
 extern struct faction *faction_find_type_in_region(short, short);
-extern int func_000337AD(struct R6 *, struct T *, struct building *);
+extern int func_000337AD(struct R6 *, struct qbn_place *, struct building *);
 extern int quest_object_in_use(int);
 extern void location_free(short *);
 extern void func_00087F76(short *, unsigned short, short, int);
@@ -37,7 +28,7 @@ extern int rand();
 extern int mc_strncpy();
 extern int mc_memcpy();
 
-int quest_init_place(struct T *a1)
+int quest_init_place(struct qbn_place *a1)
 {
     struct R6 *base;
     struct R6 *ptr;
@@ -54,23 +45,23 @@ int quest_init_place(struct T *a1)
 
     tries = 0;
 retry:
-    if (a1->cnt == 0) {
-        a1->cnt = 10;
+    if (a1->scope == 0) {
+        a1->scope = 10;
         obj = object_create_child(nonworld_root, 0, 26);
         obj->type = 40;
-        a1->obj = obj;
-        obj->id = (a1->w4 << 16) | (unsigned short)(a1->s6 & 0xffff);
+        a1->object = obj;
+        obj->id = (a1->p1 << 16) | (unsigned short)(a1->p2 & 0xffff);
         obj->repair_due = obj->id;
         obj->flags = 0x202;
         obj->owner = current_quest->id;
         obj->quest_id = current_quest->id;
         return 1;
     }
-    if (a1->cnt > 0)
-        a1->cnt--;
-    if (a1->cnt != 0) {
+    if (a1->scope > 0)
+        a1->scope--;
+    if (a1->scope != 0) {
         location_free(&D_001970C8);
-        func_00087F76(&D_001970C8, a1->w4, a1->s6, a1->cnt);
+        func_00087F76(&D_001970C8, a1->p1, a1->p2, a1->scope);
         base = D_001970D0;
         n = D_001970CC;
         l40 = D_001970D4;
@@ -83,14 +74,14 @@ retry:
     }
     list = D_00195C44;
     count = 0;
-    if (a1->w4 == 0) {
+    if (a1->p1 == 0) {
         for (count = i = 0, ptr = base; i < n; i++, ptr++) {
             if (func_000337AD(ptr, a1, &l38->buildings[ptr->w0]))
                 list[count++] = (ptr->w0 << 16) + ptr->w4;
         }
     } else {
         for (i = 0, ptr = base; i < n; i++, ptr++) {
-            switch (a1->mode) {
+            switch (a1->p3) {
             case -1:
                 list[count++] = ptr->w4;
                 break;
@@ -106,11 +97,11 @@ retry:
         }
     }
     i = 0;
-    if (a1->cnt > -1)
-        a1->cnt++;
+    if (a1->scope > -1)
+        a1->scope++;
     if (count == 0 && ++tries < 100)
         goto retry;
-    a1->cnt--;
+    a1->scope--;
     if (count == 0)
         return 0;
     i = rand() % count;
@@ -125,19 +116,19 @@ retry:
     obj->repair_due = obj->id;
     obj->quest_id = current_quest->id;
     obj->link_flag = D_001970D8->kind;
-    obj->pad19 = (unsigned short)current_region;
-    a1->obj = obj;
+    obj->region = (unsigned short)current_region;
+    a1->object = obj;
     obj->x = l40->x;
     obj->y = l40->y;
     obj->z = l40->z;
-    if (a1->cnt != 1)
+    if (a1->scope != 1)
         obj->image2 = list[i] >> 16;
     else
         obj->image2 = 0xffff;
-    p = (struct building *)&obj->data;
+    p = &obj->data.building;
     if (p->faction_id == 0)
         p->faction_id = faction_find_type_in_region(current_region, 15)->id;
-    if (a1->w4 != 1)
+    if (a1->p1 != 1)
         mc_memcpy(p, &l38->buildings[list[i] >> 16], 26, D_00170A64, 483, 4);
     mc_strncpy((char *)p + 26, l38, 4, D_00170A64, 485);
     location_free(&D_001970C8);

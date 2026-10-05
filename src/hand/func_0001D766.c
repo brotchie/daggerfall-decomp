@@ -1,18 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0001D766 */
 #include "records.h"
 
-#pragma pack(1)
-struct rec {
-    char pad[9];
-    char flags;
-    char kind;
-    char name[9];
-    short a2;
-    int a3;
-    int len;
-    char *ptr;
-};
-#pragma pack()
 extern char D_00170464[];
 extern char D_001704BB[];
 extern char text_rsc_buffer[];
@@ -33,7 +21,7 @@ void rumor_add_quest(struct quest *a1, int a2, int a3, int a4)
 {
     int l_14;
     int l_10;
-    struct rec r;
+    struct rumor r;
 
     if (disk_file_exists(D_001704BB) == 0) return;
     D_00196295 = 1;
@@ -44,14 +32,14 @@ void rumor_add_quest(struct quest *a1, int a2, int a3, int a4)
     lseek(rumor_file, 0, 2);
     l_10 = (a4 & 2) ? 180 : 30;
     mc_memset(&r, 0, 34, D_00170464, 1808, 4);
-    mc_strncpy(r.name, a1->name, 9, D_00170464, 1809);
-    r.kind = a1->id;
-    r.a2 = a2;
-    r.a3 = a3;
+    mc_strncpy(r.quest_name, a1->name, 9, D_00170464, 1809);
+    r.quest_id = a1->id;
+    r.message = a2;
+    r.target = a3;
     r.flags = a4;
-    r.ptr = game_minutes + l_10 * 1440;
-    r.len = func_000A0DF4(text_rsc_buffer) + 1;
+    r.expires = (unsigned)(game_minutes + l_10 * 1440);
+    r.text_length = func_000A0DF4(text_rsc_buffer) + 1;
     write(rumor_file, &r, 34);
-    write(rumor_file, text_rsc_buffer, r.len);
+    write(rumor_file, text_rsc_buffer, r.text_length);
     func_0009DEA7(rumor_file);
 }

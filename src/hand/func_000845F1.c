@@ -27,11 +27,11 @@ struct record *rmb_make_flat(struct record *a1, short a2, short a3, int a4)
         default:
             l_1C = object_create_child(a1, 0, 0);
             l_1C->type = 33;
-            *(short *)((char *)l_1C + 19) = 8000;
+            l_1C->pad13 = 8000;
             l_1C->image = a2;
             l_1C->id = D_00195AC4->id + current_location->object_counter++;
             l_20 = flats_cfg_find(a2);
-            if ((l_20[6] & 2) && (*(unsigned short *)game_settings & 4))
+            if ((l_20[6] & 2) && (game_settings->view_flags & 4))
                 l_1C->image = 0;
             break;
         }
@@ -40,13 +40,13 @@ struct record *rmb_make_flat(struct record *a1, short a2, short a3, int a4)
         l_1C->type = 8;
         l_1C->id = D_00195AC4->id + current_location->object_counter++;
         l_1C->image = a2;
-        *(short *)((char *)l_1C + 19) = 8000;
+        l_1C->pad13 = 8000;
         l_20 = flats_cfg_find(a2);
-        if ((l_20[6] & 2) && (*(unsigned short *)game_settings & 4))
+        if ((l_20[6] & 2) && (game_settings->view_flags & 4))
             l_1C->image = 0;
         if (a3 == 0)
             a3 = *(short *)(D_00187D30 + *(unsigned char *)current_region * 2);
-        *(short *)RECORD_DATA(l_1C) = a3;
+        l_1C->data.person.faction_id = a3;
     }
     return l_1C;
 }

@@ -100,10 +100,10 @@ void paperdoll_draw(int x, int y)
         mc_strncpy(text_buffer, D_00175743, 160, D_0017573C, 64);
     } else if (player_character->race == 8) {
         func_000A0ED9(66, D_0017573C);
-        mc_sprintf(text_buffer, D_0017576C, (unsigned short)(player_character->flags & 1), player_character->original_race, ((unsigned short)*(short *)game_settings & 4) != 0 ? 49 : 48);
+        mc_sprintf(text_buffer, D_0017576C, (unsigned short)(player_character->flags & 1), player_character->original_race, (game_settings->view_flags & 4) != 0 ? 49 : 48);
     } else {
         func_000A0ED9(68, D_0017573C);
-        mc_sprintf(text_buffer, D_0017576C, (unsigned short)(player_character->flags & 1), player_character->race, ((unsigned short)*(short *)game_settings & 4) != 0 ? 49 : 48);
+        mc_sprintf(text_buffer, D_0017576C, (unsigned short)(player_character->flags & 1), player_character->race, (game_settings->view_flags & 4) != 0 ? 49 : 48);
     }
     pic = disk_read_file(text_buffer, 0);
     func_00144FB4(pic->x + x, pic->y + y, pic->w, pic->h, pic->data);

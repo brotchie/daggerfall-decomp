@@ -25,9 +25,9 @@ int func_00031843(short a1, struct record *a2, struct record *a3)
         return 0;
     /* a person's (type 8) data starts with its faction id; a quest NPC (type 65) has it at +0x19 */
     if (a2->type == 8)
-        id = *(short *)((char *)a2 + 71);
+        id = (short)a2->data.person.faction_id;
     else if (a3->type == 8)
-        id = *(short *)((char *)a3 + 71);
+        id = (short)a3->data.person.faction_id;
     else
         return 0;
     if (faction_find(id)->type != 4)
@@ -38,7 +38,7 @@ int func_00031843(short a1, struct record *a2, struct record *a3)
             current_quest = &t->data.quest;
             p = quest_section(current_quest, 3);
             for (i = 0; i < current_quest->section_counts[3]; p++, i++) {
-                if (p->object->type == 65 && id == *(unsigned short *)((char *)p->object + 25)) {
+                if (p->object->type == 65 && id == (unsigned short)p->object->faction_id) {
                     quest_event_code = a1;
                     quest_event_object = a2;
                     quest_event_object2 = a3;

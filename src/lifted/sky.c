@@ -325,14 +325,14 @@ void sky_draw_day(int a1, int a2, int a3, int a4)
     int l_C;
 
     *(signed char *)D_0019629B = 0;
-    l_14 = ((((int)(unsigned short)(*(short *)game_settings & 1)) != 0) ? 199 : (int)(unsigned short)*(short *)(*(char **)hud_bar_image + 2));
+    l_14 = ((((int)(unsigned short)(game_settings->view_flags & 1)) != 0) ? 199 : (int)(unsigned short)*(short *)(*(char **)hud_bar_image + 2));
     if (((int)(unsigned char)(*(signed char *)(climate_weathers + a4) & 127)) == 3) goto L3576A;
     if (((int)(unsigned char)(*(signed char *)(climate_weathers + a4) & 128)) == 0) goto L35791;
 L3576A:;
     mc_memset(*(int *)screen_buffer, 119, l_14 * 320, (int)D_00170A86, 598, 4);
     return;
 L35791:;
-    l_14 = ((((int)(unsigned short)(*(short *)game_settings & 1)) != 0) ? 199 : (int)(unsigned short)*(short *)(*(char **)hud_bar_image + 2));
+    l_14 = ((((int)(unsigned short)(game_settings->view_flags & 1)) != 0) ? 199 : (int)(unsigned short)*(short *)(*(char **)hud_bar_image + 2));
     l_28 = (139 - a1) << 9;
     if (l_28 >= 0) goto L357E0;
     l_28 = 0;
@@ -443,7 +443,7 @@ void sky_draw_night(int a1, int a2)
     if (*(signed char *)D_0019629B != 0) goto L35B5B;
     sky_load_night();
 L35B5B:;
-    l_1C = ((((int)(unsigned short)(*(short *)game_settings & 1)) != 0) ? 199 : (int)(unsigned short)*(short *)(*(char **)hud_bar_image + 2));
+    l_1C = ((((int)(unsigned short)(game_settings->view_flags & 1)) != 0) ? 199 : (int)(unsigned short)*(short *)(*(char **)hud_bar_image + 2));
     l_30 = (139 - a1) << 9;
     if (l_30 >= 0) goto L35BAA;
     l_30 = 0;

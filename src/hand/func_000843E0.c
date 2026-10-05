@@ -14,7 +14,7 @@ struct record *rmb_make_door(struct record *a1, short a2, short a3, int a4)
     l_1C->lock_level = 0;
     l_1C->image2 = a2;
     l_1C->image = a3;
-    *(short *)((char *)l_1C + 19) = 8000;
+    l_1C->pad13 = 8000;
     l_1C->id = D_00195AC4->id + current_location->object_counter++;
     return l_1C;
 }

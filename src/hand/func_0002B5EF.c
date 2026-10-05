@@ -32,9 +32,6 @@ extern int func_0012DB50();
 extern int func_000A0ED9(int, char *);
 extern int mc_sprintf(char *, ...);
 
-#pragma pack(1)
-struct Ent { char name[20]; unsigned char type; char pad[2]; char *data; };   /* a text variable (section 10) */
-#pragma pack()
 
 #define COLOR (*(unsigned char *)D_0012B508)
 #define LINEH (*(short *)D_0012DA44)
@@ -45,7 +42,7 @@ struct Ent { char name[20]; unsigned char type; char pad[2]; char *data; };   /*
 
 void quest_debug_overlay(void)
 {
-    struct Ent *l_44;
+    struct qbn_text_var *l_44;
     struct record *l_40;
     int l_3C;
     int l_38;
@@ -77,31 +74,31 @@ void quest_debug_overlay(void)
     func_0012DB50(3);
     l_30 = 200 / LINEH;
     l_34 = 0;
-    if (*(int *)((char *)CUR + 56)) {
-        l_44 = (struct Ent *)(*(int *)((char *)CUR + 56) + (char *)CUR);
+    if (CUR->text_offset) {
+        l_44 = (struct qbn_text_var *)(CUR->text_offset + (char *)CUR);
         while (l_44->name[0] != 0) {
-            if (l_44->type == *D_00196DC1) {
+            if (l_44->section == *D_00196DC1) {
                 COLOR = 145;
                 l_40 = 0;
-                switch (l_44->type) {
+                switch (l_44->section) {
                 case 3:
-                    l_2C = (struct qbn_person *)l_44->data;
+                    l_2C = (struct qbn_person *)l_44->record;
                     l_40 = l_2C->object;
                     break;
                 case 4:
-                    l_28 = (struct qbn_place *)l_44->data;
+                    l_28 = (struct qbn_place *)l_44->record;
                     l_40 = l_28->object;
                     break;
                 case 7:
-                    l_24 = (struct qbn_foe *)l_44->data;
+                    l_24 = (struct qbn_foe *)l_44->record;
                     l_40 = l_24->object;
                     break;
                 case 0:
-                    l_20 = (struct qbn_item *)l_44->data;
+                    l_20 = (struct qbn_item *)l_44->record;
                     l_40 = l_20->object;
                     break;
                 case 9:
-                    l_1C = (struct qbn_state *)l_44->data;
+                    l_1C = (struct qbn_state *)l_44->record;
                     if (l_1C->is_global)
                         l_3C = ((unsigned char *)quest_global_states)[l_1C->value];
                     else
@@ -111,7 +108,7 @@ void quest_debug_overlay(void)
                     mc_sprintf(text_buffer, D_00170819, l_44, l_3C ? D_0017080E : D_00170813);
                     break;
                 case 6:
-                    l_18 = (struct qbn_timer *)l_44->data;
+                    l_18 = (struct qbn_timer *)l_44->record;
                     func_000A0ED9(892, D_001707F0);
                     mc_sprintf(text_buffer, D_00170823, l_44, *(int *)game_minutes - l_18->start, l_18->delay);
                     break;

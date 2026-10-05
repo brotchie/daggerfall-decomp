@@ -1,7 +1,5 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x00087F76 */
 #include "records.h"
-/* loaded_location: +0 index, +4 door count, +8 doors, +0xC the object header, +0x10 data */
-struct loaded_location { char pad[0xc]; struct record *object; };
 extern char D_00176C94[];       /* __FILE__ */
 extern int D_00187EE4[];
 extern struct record *D_00195AC4;

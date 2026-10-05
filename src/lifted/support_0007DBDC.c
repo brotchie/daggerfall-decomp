@@ -9,7 +9,7 @@ extern char D_00195B84[];
 
 void detect_consider_creature(struct record *a1, int a2)
 {
-    *(short *)((char *)a1 + 23) = a2;
+    a1->detect_distance = a2;
     if (a2 >= *(int *)D_00195B84) goto L7DC0D;
     if (a2 < 2048) goto L7DC0F;
 L7DC0D:;

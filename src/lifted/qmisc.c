@@ -16,7 +16,7 @@ extern char D_00190D64[];
 extern char D_001940D5[];
 extern char quest_global_states[];
 extern struct record *inventory_containers[];
-extern char D_001959DC[];
+extern struct record *D_001959DC;
 extern struct record *D_00195A00;
 extern char quest_faces[];
 extern char D_00195A15[];
@@ -43,7 +43,7 @@ extern char D_0019629E[];
 extern char D_001962A8[];
 extern char D_00196A28[];
 extern char loaded_location_door_count[];
-extern char D_00196A9C[];
+extern struct map_location *D_00196A9C;
 extern struct record *D_00199768;
 
 extern struct faction *faction_find(short);
@@ -150,7 +150,7 @@ L3067C:;
     goto L306F0;
 L306B5:;
     func_000A0ED9(332, (int)D_00170A1A);
-    mc_sprintf((int)text_buffer, (int)D_00170A22, (int)a1->name, *(int *)((char *)l_1C + 7));
+    mc_sprintf((int)text_buffer, (int)D_00170A22, (int)a1->name, l_1C->symbol);
     hud_message_add((int)text_buffer);
 L306F0:;
     goto L305ED;
@@ -190,7 +190,7 @@ void quest_give_item_to_player(struct record *a1)
 
     l_20 = &a1->data.item;
     if (l_20->enchantments[0].type == (-1)) goto L30884;
-    l_18 = (struct record *)*(int *)D_001959DC;
+    l_18 = D_001959DC;
     goto L308A7;
 L30884:;
     l_18 = inventory_containers[(int)(unsigned char)*(signed char *)(item_group_tab + l_20->group)];
@@ -215,11 +215,11 @@ void qaction_op37_repute_exceeds(struct quest *a1, struct qbn_op *a2)
     l_1C = (struct qbn_state *)a2->args[1].record;
     if (l_28 == 0) return;
     if (l_28->type != 65) goto L30937;
-    *(int *)&l_14 = (int)(unsigned short)*(short *)((char *)l_28 + 25);
+    *(int *)&l_14 = (int)(unsigned short)l_28->faction_id;
     goto L30954;
 L30937:;
-    if (*(short *)((char *)l_28 + 89) == 0) goto L3094F;
-    *(int *)&l_14 = (int)(unsigned short)*(short *)((char *)l_28 + 89);
+    if (l_28->data.building.faction_id == 0) goto L3094F;
+    *(int *)&l_14 = l_28->data.building.faction_id;
     goto L30954;
 L3094F:;
     return;
@@ -508,7 +508,7 @@ case 34:
     goto L314B7;
 case 8:
     l_34 = a2;
-    *(signed char *)((char *)l_34 + 73) |= 128;
+    l_34->data.person.flags |= 128;
     goto L314B7;
 case 40:
     a2 = object_find_by_id(D_00195AC4, a2->id);
@@ -525,10 +525,10 @@ default:
     return 0;
 L314B7:;
     l_34->quest_id = a1->quest_id;
-    *(int *)((char *)l_34 + 43) = *(int *)((char *)a1 + 43);
+    l_34->name_seed = a1->name_seed;
     l_2C = (int)RECORD_DATA(l_34);
     if (((int)(unsigned char)(*(signed char *)((char *)l_2C + 2) & 128)) != 0) goto L314F6;
-    *(short *)((char *)l_2C) = *(short *)((char *)a1 + 89);
+    *(short *)((char *)l_2C) = a1->data.building.faction_id;
 L314F6:;
     if (*(short *)((char *)l_2C) != 0) goto L3152A;
     func_000A0ED9(819, (int)D_00170A1A);
@@ -666,7 +666,7 @@ void qaction_op83_teleport_pc(struct qbn_op *a1)
     l_1C = a1->args[2].value;
     l_20 = a1->args[3].value;
     maploads_load_region(l_1C);
-    l_2C = (struct map_location *)*(int *)D_00196A9C;
+    l_2C = D_00196A9C;
     l_24 = 0;
 L31A03:;
     if (l_24 < *(int *)D_00196A28) goto L31A22;

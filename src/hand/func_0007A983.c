@@ -175,7 +175,7 @@ int load_game(char *name)
         automap_restore_seen();
     if (player_environment == 2)
         D_00195D84 = D_00186503[(current_building = object_building(player_object))->type];
-    if ((int)(unsigned short)(*(unsigned short *)game_settings & 1) != 0)
+    if ((int)(unsigned short)(game_settings->view_flags & 1) != 0)
         func_0012A2D0(160, 100, 160, 100);
     else
         func_0012A2D0(160, 77, 160, 77);

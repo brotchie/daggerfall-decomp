@@ -108,21 +108,21 @@ done:
     val = (110 - player_character->skills[magic_school_skills[spell_effect_school[selected_spell->effects[spell_effect_slot].type]]].value) * val / 100;
     text_draw_colored(func_000A0DD9(val, text_buffer, 10), 275, 119, 145, 156);
     if ((int)(unsigned char)(spellmaker_settings_kind & 1) != 0) {
-        func_0007CAEB(64, 94, 87, 109, (signed char)selected_spell->durations[spell_effect_slot].base, 145, 156);
-        func_0007CAEB(104, 94, 127, 109, (signed char)selected_spell->durations[spell_effect_slot].plus, 145, 156);
-        func_0007CAEB(160, 94, 183, 109, (signed char)selected_spell->durations[spell_effect_slot].per_level, 145, 156);
+        func_0007CAEB(64, 94, 87, 109, selected_spell->durations[spell_effect_slot].base, 145, 156);
+        func_0007CAEB(104, 94, 127, 109, selected_spell->durations[spell_effect_slot].plus, 145, 156);
+        func_0007CAEB(160, 94, 183, 109, selected_spell->durations[spell_effect_slot].per_level, 145, 156);
     }
     if ((int)(unsigned char)(spellmaker_settings_kind & 2) != 0) {
-        func_0007CAEB(64, 114, 87, 129, (signed char)selected_spell->chances[spell_effect_slot].base, 145, 156);
-        func_0007CAEB(104, 114, 127, 129, (signed char)selected_spell->chances[spell_effect_slot].plus, 145, 156);
-        func_0007CAEB(160, 114, 183, 129, (signed char)selected_spell->chances[spell_effect_slot].per_level, 145, 156);
+        func_0007CAEB(64, 114, 87, 129, selected_spell->chances[spell_effect_slot].base, 145, 156);
+        func_0007CAEB(104, 114, 127, 129, selected_spell->chances[spell_effect_slot].plus, 145, 156);
+        func_0007CAEB(160, 114, 183, 129, selected_spell->chances[spell_effect_slot].per_level, 145, 156);
     }
     if ((int)(unsigned char)(spellmaker_settings_kind & 4) != 0) {
-        func_0007CAEB(64, 134, 87, 149, (signed char)selected_spell->magnitudes[spell_effect_slot].base_min, 145, 156);
-        func_0007CAEB(104, 134, 127, 149, (signed char)selected_spell->magnitudes[spell_effect_slot].base_max, 145, 156);
-        func_0007CAEB(144, 134, 167, 149, (signed char)selected_spell->magnitudes[spell_effect_slot].plus_min, 145, 156);
-        func_0007CAEB(184, 134, 207, 149, (signed char)selected_spell->magnitudes[spell_effect_slot].plus_max, 145, 156);
-        func_0007CAEB(240, 134, 263, 149, (signed char)selected_spell->magnitudes[spell_effect_slot].per_level, 145, 156);
+        func_0007CAEB(64, 134, 87, 149, selected_spell->magnitudes[spell_effect_slot].base_min, 145, 156);
+        func_0007CAEB(104, 134, 127, 149, selected_spell->magnitudes[spell_effect_slot].base_max, 145, 156);
+        func_0007CAEB(144, 134, 167, 149, selected_spell->magnitudes[spell_effect_slot].plus_min, 145, 156);
+        func_0007CAEB(184, 134, 207, 149, selected_spell->magnitudes[spell_effect_slot].plus_max, 145, 156);
+        func_0007CAEB(240, 134, 263, 149, selected_spell->magnitudes[spell_effect_slot].per_level, 145, 156);
     }
     selected_spell->effect_costs[spell_effect_slot] = spell_cost_formula_dispatch(spell_effect_cost_formula[selected_spell->effects[spell_effect_slot].type] - 1);
 }

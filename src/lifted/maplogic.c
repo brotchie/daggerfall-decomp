@@ -50,7 +50,7 @@ extern struct career *player_class;
 extern char game_minutes[];
 extern char D_00195C44[];
 extern char D_00195C88[];
-extern char D_00195CB8[];
+extern struct record *D_00195CB8;
 extern char D_00195CF4[];
 extern char D_00195D84[];
 extern char D_00195F28[];
@@ -69,11 +69,11 @@ extern char dungeon_blocks[];
 extern char D_001967A1[];
 extern char D_00196A28[];
 extern char rmb_block[];
-extern char location_here[];
-extern char loaded_location[];
-extern char loaded_location_object[];
-extern char loaded_location_data[];
-extern char D_00196A9C[];
+extern struct map_location *location_here;
+extern struct loaded_location loaded_location;
+extern struct record *loaded_location_object;
+extern struct location *loaded_location_data;
+extern struct map_location *D_00196A9C;
 extern char blocks_bsa[];
 extern char dungeon_block_count[];
 extern char D_00196DA4[];
@@ -122,9 +122,9 @@ extern void lock_show_difficulty(int);
 extern void dungeon_choose_textures(void);
 extern void interior_stock_shelves(struct record *, struct building *);
 extern void maploads_load_region(int);
-extern void location_load_dungeon(int, int);
-extern void location_load_dungeon_by_id(int, int);
-extern void location_load_exterior(int, int);
+extern void location_load_dungeon(struct loaded_location *, int);
+extern void location_load_dungeon_by_id(struct loaded_location *, int);
+extern void location_load_exterior(struct loaded_location *, int);
 extern void dungeon_roll_monster_tables(void);
 extern void town_map_note_building(int, int);
 extern void automap_save(void);
@@ -161,7 +161,7 @@ extern void shop_quality_message(struct building *);
 extern void func_00099D0D(struct record *);
 struct map_location *region_find_location(int);
 int building_try_enter(struct building *);
-void location_free(int);
+void location_free(struct loaded_location *);
 void func_000871FA(struct building *);
 void location_set_discovered(int, int);
 void func_0008824A(int, int);
@@ -170,48 +170,48 @@ void region_unload(void)
 {
     automap_save();
     location_unload(D_00195AC4->image);
-    if (*(int *)D_00196A9C == 0) goto L8634F;
-    if (*(int *)D_00196A9C != (-1751672937)) goto L86351;
+    if ((int)D_00196A9C == 0) goto L8634F;
+    if ((int)D_00196A9C != (-1751672937)) goto L86351;
 L8634F:;
     goto L8636F;
 L86351:;
-    mc_free(*(int *)D_00196A9C, (int)D_00176C94, 64);
-    *(int *)D_00196A9C = -1751672937;
+    mc_free((int)D_00196A9C, (int)D_00176C94, 64);
+    D_00196A9C = (struct map_location *)-1751672937;
 L8636F:;
-    *(int *)D_00196A9C = 0;
+    D_00196A9C = 0;
     *(int *)D_00196A28 = 0;
-    *(int *)location_here = 0;
+    location_here = 0;
 }
 
-void location_free(int a1)
+void location_free(struct loaded_location *a1)
 {
-    if (*(int *)((char *)a1 + 16) == 0) goto L863FF;
-    if (*(int *)(*(char **)((char *)a1 + 16) + 43) == 0) goto L863FF;
-    if (*(int *)(*(char **)((char *)a1 + 16) + 43) == 0) goto L863D8;
-    if (*(int *)(*(char **)((char *)a1 + 16) + 43) != (-1751672937)) goto L863DA;
+    if (a1->data == 0) goto L863FF;
+    if (a1->data->buildings == 0) goto L863FF;
+    if (a1->data->buildings == 0) goto L863D8;
+    if ((int)a1->data->buildings != (-1751672937)) goto L863DA;
 L863D8:;
     goto L863FF;
 L863DA:;
-    mc_free(*(int *)(*(char **)((char *)a1 + 16) + 43), (int)D_00176C94, 83);
-    *(int *)(*(char **)((char *)a1 + 16) + 43) = -1751672937;
+    mc_free((int)a1->data->buildings, (int)D_00176C94, 83);
+    a1->data->buildings = (struct building *)-1751672937;
 L863FF:;
-    if (*(int *)((char *)a1 + 12) == 0) goto L8643E;
-    if (*(int *)((char *)a1 + 12) == 0) goto L8641D;
-    if (*(int *)((char *)a1 + 12) != (-1751672937)) goto L8641F;
+    if (a1->object == 0) goto L8643E;
+    if (a1->object == 0) goto L8641D;
+    if ((int)a1->object != (-1751672937)) goto L8641F;
 L8641D:;
     goto L8643E;
 L8641F:;
-    mc_free(*(int *)((char *)a1 + 12), (int)D_00176C94, 86);
-    *(int *)((char *)a1 + 12) = -1751672937;
+    mc_free((int)a1->object, (int)D_00176C94, 86);
+    a1->object = (struct record *)-1751672937;
 L8643E:;
-    if (*(int *)((char *)a1 + 8) == 0) goto L8647D;
-    if (*(int *)((char *)a1 + 8) == 0) goto L8645C;
-    if (*(int *)((char *)a1 + 8) != (-1751672937)) goto L8645E;
+    if (a1->doors == 0) goto L8647D;
+    if (a1->doors == 0) goto L8645C;
+    if ((int)a1->doors != (-1751672937)) goto L8645E;
 L8645C:;
     goto L8647D;
 L8645E:;
-    mc_free(*(int *)((char *)a1 + 8), (int)D_00176C94, 89);
-    *(int *)((char *)a1 + 8) = -1751672937;
+    mc_free((int)a1->doors, (int)D_00176C94, 89);
+    a1->doors = (char *)-1751672937;
 L8647D:;
     mc_memset(a1, 0, 20, (int)D_00176C94, 91, 4);
 }
@@ -229,7 +229,7 @@ struct map_location *region_find_location(int a1)
 L864CA:;
     if (l_20 <= l_24) goto L86524;
     l_1C = (l_20 + l_24) >> 1;
-    l_28 = (struct map_location *)(*(char **)D_00196A9C + (l_1C * 17));
+    l_28 = (struct map_location *)((char *)D_00196A9C + (l_1C * 17));
     if ((l_28->map_id & 1048575) != a1) goto L86503;
     return l_28;
 L86503:;
@@ -241,8 +241,8 @@ L8651B:;
 L86522:;
     goto L864CA;
 L86524:;
-    if ((*(int *)((char *)(int)(*(char **)D_00196A9C + (l_24 * 17))) & 1048575) != a1) goto L8654C;
-    return (struct map_location *)(*(char **)D_00196A9C + (l_24 * 17));
+    if ((D_00196A9C[l_24].map_id & 1048575) != a1) goto L8654C;
+    return (struct map_location *)((char *)D_00196A9C + (l_24 * 17));
 L8654C:;
     return 0;
 }
@@ -261,12 +261,12 @@ void world_update_location(void)
     region_update_from_player();
     climate_update_at_player();
     *(int *)climate_index = ((int)(unsigned char)*(signed char *)current_climate) - 224;
-    *(int *)location_here = (int)region_find_location(*(int *)D_001A94C4);
+    location_here = (struct map_location *)((int)region_find_location(*(int *)D_001A94C4));
     climate_set_textures();
 L86744:;
-    if (*(int *)location_here == 0) return;
+    if ((int)location_here == 0) return;
     if (location_here_contains(player_object->x, player_object->z) == 0) goto L86777;
-    town_load(((unsigned)*(int *)(*(char **)location_here)) >> 20);
+    town_load(((unsigned)location_here->map_id) >> 20);
     return;
 L86777:;
     location_unload(D_00195AC4->image);
@@ -290,13 +290,13 @@ L86811:;
     l_20 = D_00195AC4->id;
     location_unload(D_00195AC4->image);
     if (a1 != (-1)) goto L86844;
-    location_load_dungeon_by_id((int)loaded_location, l_20);
+    location_load_dungeon_by_id(&loaded_location, l_20);
     goto L86851;
 L86844:;
-    location_load_dungeon((int)loaded_location, a1);
+    location_load_dungeon(&loaded_location, a1);
 L86851:;
-    mc_memcpy((int)D_00195AC4, *(int *)loaded_location_object, 55, (int)D_00176C94, 247, 4);
-    mc_memcpy((int)current_location, *(int *)loaded_location_data, 48, (int)D_00176C94, 248, 4);
+    mc_memcpy((int)D_00195AC4, (int)loaded_location_object, 55, (int)D_00176C94, 247, 4);
+    mc_memcpy((int)current_location, (int)loaded_location_data, 48, (int)D_00176C94, 248, 4);
     *(int *)blocks_bsa = archive_open((int)D_00176C9F, 0, 0);
     if ((((unsigned)D_00195AC4->id) >> 16) != 50015) goto L868BF;
     *(signed char *)D_001967A1 = 254;
@@ -318,7 +318,7 @@ L868F0:;
     func_0007E5C2();
     dungeon_choose_textures();
     *(signed char *)D_0019628C = 0;
-    *(int *)D_00195CB8 = 0;
+    D_00195CB8 = 0;
     *(signed char *)player_environment = 3;
     *(int *)dungeon_water_level = 10000;
     func_0004CA9D();
@@ -359,12 +359,12 @@ void func_00086A71(struct record *a1)
 case 11:
 case 14:
 case 15:
-    a1->owner = 0;
+    a1->lock_level = 0;
     a1->flags |= 64;
     return;
 default:
     if ((rand() % 100) >= 90) return;
-    a1->owner = 0;
+    a1->lock_level = 0;
     a1->flags |= 64;
 }
 }
@@ -508,7 +508,7 @@ L87372:;
     position_history_reset();
     *(signed char *)player_environment = 2;
     *(signed char *)D_001940D5 |= 2;
-    *(int *)D_00195CB8 = 0;
+    D_00195CB8 = 0;
     *(signed char *)D_001A4A1D = 0;
     if (*(signed char *)D_00196289 != 0) goto L873B1;
     func_0004B5CF();
@@ -544,14 +544,14 @@ L87460:;
     *(int *)D_001A41E4 = 0;
 }
 
-void location_pick_random_town(int a1)
+void location_pick_random_town(struct loaded_location *a1)
 {
     struct map_location *l_24;
     int l_20;
     int l_1C;
     int l_18;
 
-    l_24 = *(struct map_location **)D_00196A9C;
+    l_24 = D_00196A9C;
     l_18 = 0;
     mc_memset(a1, 0, 20, (int)D_00176C94, 991, 4);
     l_20 = 0;
@@ -578,7 +578,7 @@ L87EE7:;
     return;
 L87EFA:;
     l_1C = (rand() % l_18) + 1;
-    l_24 = *(struct map_location **)D_00196A9C;
+    l_24 = D_00196A9C;
     l_20 = 0;
 L87F1C:;
     if (l_20 < *(int *)D_00196A28) goto L87F38;
@@ -605,13 +605,13 @@ L87F6A:;
 }
 }
 
-void location_pick_random_undiscovered(int a1)
+void location_pick_random_undiscovered(struct loaded_location *a1)
 {
     struct map_location *l_20;
     int l_1C;
     int l_18;
 
-    l_20 = *(struct map_location **)D_00196A9C;
+    l_20 = D_00196A9C;
     l_18 = 0;
     mc_memset(a1, 0, 20, (int)D_00176C94, 1108, 4);
     l_1C = 0;
@@ -638,7 +638,7 @@ L88172:;
     return;
 L8819D:;
     l_18 = rand() % l_18;
-    l_20 = *(struct map_location **)D_00196A9C;
+    l_20 = D_00196A9C;
     l_1C = 0;
 L881BE:;
     if (l_1C < *(int *)D_00196A28) goto L881DA;
@@ -664,12 +664,12 @@ L88207:;
 
 void location_set_discovered(int a1, int a2)
 {
-    ((struct bf32_30_1 *)((char *)(int)((a1 * 17) + *(char **)D_00196A9C) + 4))->f = a2;
+    ((struct bf32_30_1 *)((char *)(int)((a1 * 17) + (char *)D_00196A9C) + 4))->f = a2;
 }
 
 void func_0008824A(int a1, int a2)
 {
-    ((struct bf32_31_1 *)((char *)(int)((a1 * 17) + *(char **)D_00196A9C) + 4))->f = a2;
+    ((struct bf32_31_1 *)((char *)(int)((a1 * 17) + (char *)D_00196A9C) + 4))->f = a2;
 }
 
 void func_00088281(int a1, int a2)
@@ -684,18 +684,18 @@ void func_00088281(int a1, int a2)
     int l_18;
     int l_14;
 
-    if (((struct bf8_1_5 *)(*(char **)location_here + 7))->f != 0) goto L88307;
+    if (((struct bf8_1_5 *)((char *)location_here + 7))->f != 0) goto L88307;
     l_20 = 1;
-    l_28 = (*(int *)(*(char **)location_here + 4) & 33554431) + 1536;
+    l_28 = (location_here->x_type_flags & 33554431) + 1536;
     l_28 = (l_28 & 32767) >> 8;
-    l_24 = ((*(int *)(*(char **)location_here + 8) & 16777215) + ((((unsigned)*(int *)(*(char **)location_here + 8)) >> 28) << 12)) - 1537;
+    l_24 = ((location_here->y_size & 16777215) + ((((unsigned)location_here->y_size) >> 28) << 12)) - 1537;
     l_24 = 128 - ((l_24 & 32767) >> 8);
     goto L8836E;
 L88307:;
     l_20 = 2;
-    l_28 = (*(int *)(*(char **)location_here + 4) & 33554431) + 3584;
+    l_28 = (location_here->x_type_flags & 33554431) + 3584;
     l_28 = (l_28 & 32767) >> 8;
-    l_24 = ((*(int *)(*(char **)location_here + 8) & 16777215) + (((((unsigned)*(int *)(*(char **)location_here + 8)) >> 28) - 1) << 12)) + 511;
+    l_24 = ((location_here->y_size & 16777215) + (((((unsigned)location_here->y_size) >> 28) - 1) << 12)) + 511;
     l_24 = 128 - ((l_24 & 32767) >> 8);
 L8836E:;
     l_34 = a1;
@@ -704,8 +704,8 @@ L8836E:;
     a1 = l_34;
     a2 += l_24 << 8;
     a2 += l_28;
-    l_1C = (((((unsigned)(*(int *)(*(char **)location_here + 8) << 4)) >> 28) - l_20) << 4) + 8;
-    l_18 = (((((unsigned)*(int *)(*(char **)location_here + 8)) >> 28) - l_20) << 4) + 8;
+    l_1C = (((((unsigned)(location_here->y_size << 4)) >> 28) - l_20) << 4) + 8;
+    l_18 = (((((unsigned)location_here->y_size) >> 28) - l_20) << 4) + 8;
     if (((128 - l_28) - 4) >= l_1C) goto L883E7;
     l_1C = (128 - l_28) - 4;
 L883E7:;
@@ -906,7 +906,7 @@ void location_reveal(int a1, int a2)
 
     l_14 = (int)(unsigned char)*(signed char *)current_region;
     maploads_load_region(a1);
-    l_1C = *(struct map_location **)D_00196A9C;
+    l_1C = D_00196A9C;
     l_18 = 0;
 L88A11:;
     if (l_18 < *(int *)D_00196A28) goto L88A2D;
@@ -931,7 +931,7 @@ int region_nth_dungeon(int a1)
     struct map_location *l_20;
     int l_1C;
 
-    l_20 = *(struct map_location **)D_00196A9C;
+    l_20 = D_00196A9C;
     l_1C = 0;
 L88BB8:;
     if (l_1C < *(int *)D_00196A28) goto L88BD4;

@@ -44,10 +44,10 @@ extern char D_00196A28[];
 extern char rmb_block[];
 extern char region_dungeon_type_counts[];
 extern char D_00196A7C[];
-extern char location_here[];
+extern struct map_location *location_here;
 extern char region_dungeon_count[];
-extern char loaded_location[];
-extern char D_00196A9C[];
+extern struct loaded_location loaded_location;
+extern struct map_location *D_00196A9C;
 extern char blocks_bsa[];
 extern char block_origin_x[];
 extern char block_origin_z[];
@@ -101,8 +101,8 @@ struct record *func_0001E576(void);
 void region_locations_load_discovered(int);
 void region_locations_save_discovered(int);
 void maploads_load_region(int);
-void location_read_record(int, int);
-void location_load_exterior(int, int);
+void location_read_record(struct loaded_location *, int);
+void location_load_exterior(struct loaded_location *, int);
 void rmb_index_records(void);
 void func_0001E928(struct record *);
 #pragma aux func_000A0ED9 parm routine [];
@@ -116,7 +116,7 @@ void region_locations_load_discovered(int a1)
     int l_1C;
     int l_18;
 
-    l_2C = *(struct map_location **)D_00196A9C;
+    l_2C = D_00196A9C;
     l_28 = *(int *)D_00195C44;
     l_18 = mc_malloc(4096, (int)D_001704CC, 57);
     func_000A0ED9(59, (int)D_001704CC);
@@ -161,7 +161,7 @@ void region_locations_save_discovered(int a1)
     int l_1C;
     int l_18;
 
-    l_2C = *(struct map_location **)D_00196A9C;
+    l_2C = D_00196A9C;
     l_28 = *(int *)D_00195C44;
     l_18 = mc_malloc(4096, (int)D_001704CC, 88);
     l_1C = 0;
@@ -205,15 +205,15 @@ void maploads_load_region(int a1)
     int l_1C;
     int l_18;
 
-    if (*(int *)D_00196A9C == 0) goto L1DD95;
+    if ((int)D_00196A9C == 0) goto L1DD95;
     region_locations_save_discovered((int)(unsigned short)*(short *)D_00196ABA);
-    if (*(int *)D_00196A9C == 0) goto L1DD75;
-    if (*(int *)D_00196A9C != (-1751672937)) goto L1DD77;
+    if ((int)D_00196A9C == 0) goto L1DD75;
+    if ((int)D_00196A9C != (-1751672937)) goto L1DD77;
 L1DD75:;
     goto L1DD95;
 L1DD77:;
-    mc_free(*(int *)D_00196A9C, (int)D_001704CC, 123);
-    *(int *)D_00196A9C = -1751672937;
+    mc_free((int)D_00196A9C, (int)D_001704CC, 123);
+    D_00196A9C = (struct map_location *)-1751672937;
 L1DD95:;
     *(short *)D_00196ABA = a1;
     func_000A0ED9(127, (int)D_001704CC);
@@ -221,8 +221,8 @@ L1DD95:;
     l_20 = archive_find_record(*(int *)maps_bsa, (int)text_buffer, 13);
     l_1C = archive_record_size(*(int *)maps_bsa, l_20);
     *(int *)D_00196A28 = ((unsigned)l_1C) / 17;
-    l_24 = (struct map_location *)(*(int *)D_00196A9C = mc_malloc(l_1C, (int)D_001704CC, 133));
-    archive_read_record(*(int *)maps_bsa, l_20, *(int *)D_00196A9C);
+    l_24 = (struct map_location *)(*(int *)&D_00196A9C = mc_malloc(l_1C, (int)D_001704CC, 133));
+    archive_read_record(*(int *)maps_bsa, l_20, (int)D_00196A9C);
     mc_memset((int)region_location_type_counts, 0, 56, (int)D_001704CC, 137, 56);
     mc_memset((int)region_dungeon_type_counts, 0, 76, (int)D_001704CC, 138, 76);
     *(int *)region_dungeon_count = 0;
@@ -243,7 +243,7 @@ L1DED5:;
     goto L1DE85;
 L1DED7:;
     region_locations_load_discovered(a1);
-    *(int *)location_here = region_find_location(func_000C2D81(player_object->x, player_object->z));
+    location_here = (struct map_location *)region_find_location(func_000C2D81(player_object->x, player_object->z));
 }
 
 void region_load_location_names(int a1)
@@ -271,22 +271,22 @@ void func_0001DFA2(void)
     *(int *)D_00196A7C = 0;
 }
 
-void location_read_record(int a1, int a2)
+void location_read_record(struct loaded_location *a1, int a2)
 {
     int l_14;
 
-    func_000A00CB(a2, a1 + 4, 4);
-    *(int *)((char *)a1 + 8) = mc_malloc(*(int *)((char *)a1 + 4) * 6, (int)D_001704CC, 219);
-    func_000A00CB(a2, *(int *)((char *)a1 + 8), *(int *)((char *)a1 + 4) * 6);
-    *(int *)((char *)a1 + 12) = mc_malloc(119, (int)D_001704CC, 223);
-    *(int *)((char *)a1 + 16) = (int)(*(char **)((char *)a1 + 12) + 71);
-    func_000A00CB(a2, *(int *)((char *)a1 + 12), 119);
-    if (*(short *)(*(char **)((char *)a1 + 16) + 41) == 0) return;
-    *(int *)(*(char **)((char *)a1 + 16) + 43) = mc_malloc(((int)(unsigned short)*(short *)(*(char **)((char *)a1 + 16) + 41)) * 26, (int)D_001704CC, 231);
-    func_000A00CB(a2, *(int *)(*(char **)((char *)a1 + 16) + 43), ((int)(unsigned short)*(short *)(*(char **)((char *)a1 + 16) + 41)) * 26);
+    func_000A00CB(a2, (int)&a1->door_count, 4);
+    a1->doors = (char *)mc_malloc(a1->door_count * 6, (int)D_001704CC, 219);
+    func_000A00CB(a2, (int)a1->doors, a1->door_count * 6);
+    a1->object = (struct record *)mc_malloc(119, (int)D_001704CC, 223);
+    a1->data = &a1->object->data.location;
+    func_000A00CB(a2, (int)a1->object, 119);
+    if (a1->data->building_count == 0) return;
+    a1->data->buildings = (struct building *)mc_malloc(a1->data->building_count * 26, (int)D_001704CC, 231);
+    func_000A00CB(a2, (int)a1->data->buildings, a1->data->building_count * 26);
 }
 
-void location_load_dungeon(int a1, int a2)
+void location_load_dungeon(struct loaded_location *a1, int a2)
 {
     int l_20;
     int l_1C;
@@ -303,16 +303,16 @@ void location_load_dungeon(int a1, int a2)
     func_000A00CB(*(int *)maps_bsa, l_14, l_20 << 3);
     l_18 = *(int *)((char *)((a2 << 3) + l_14));
     lseek(*(int *)maps_bsa, l_18, 1);
-    *(int *)((char *)a1) = a2;
+    a1->index = a2;
     location_read_record(a1, *(int *)maps_bsa);
-    if (((int)loaded_location) != a1) return;
-    *(short *)(*(char **)((char *)a1 + 16) + 37) = 2;
-    *(short *)(*(char **)((char *)a1 + 16) + 39) = 64000;
+    if (&loaded_location != a1) return;
+    a1->data->object_counter = 2;
+    a1->data->marker_counter = 64000;
     func_000A00CB(*(int *)maps_bsa, (int)D_00196AB0, 10);
     func_000A00CB(*(int *)maps_bsa, (int)dungeon_blocks, 128);
 }
 
-void location_load_dungeon_by_id(int a1, int a2)
+void location_load_dungeon_by_id(struct loaded_location *a1, int a2)
 {
     int l_24;
     int l_20;
@@ -343,16 +343,16 @@ L1E2BE:;
     fatal_error((int)D_0017050E);
 L1E2D0:;
     lseek(*(int *)maps_bsa, *(int *)((char *)l_14), 1);
-    *(int *)((char *)a1) = l_20;
+    a1->index = l_20;
     location_read_record(a1, *(int *)maps_bsa);
-    if (((int)loaded_location) != a1) return;
-    *(short *)(*(char **)((char *)a1 + 16) + 37) = 2;
-    *(short *)(*(char **)((char *)a1 + 16) + 39) = 64000;
+    if (&loaded_location != a1) return;
+    a1->data->object_counter = 2;
+    a1->data->marker_counter = 64000;
     func_000A00CB(*(int *)maps_bsa, (int)D_00196AB0, 10);
     func_000A00CB(*(int *)maps_bsa, (int)dungeon_blocks, 128);
 }
 
-void location_load_exterior(int a1, int a2)
+void location_load_exterior(struct loaded_location *a1, int a2)
 {
     int l_24;
     int l_20;
@@ -367,22 +367,22 @@ void location_load_exterior(int a1, int a2)
     lseek(*(int *)maps_bsa, (a2 << 2) + l_1C, 0);
     func_000A00CB(*(int *)maps_bsa, (int)&l_14, 4);
     lseek(*(int *)maps_bsa, l_14 + ((*(int *)D_00196A28 << 2) + l_1C), 0);
-    *(int *)((char *)a1) = a2;
+    a1->index = a2;
     location_read_record(a1, *(int *)maps_bsa);
-    if (((int)loaded_location) != a1) return;
-    l_18 = ((int)(unsigned char)*(signed char *)(*(char **)((char *)a1 + 16) + 32)) * ((int)(unsigned char)*(signed char *)(*(char **)((char *)a1 + 16) + 33));
-    *(short *)(*(char **)((char *)a1 + 16) + 37) = 2;
-    *(short *)(*(char **)((char *)a1 + 16) + 39) = 64000;
+    if (&loaded_location != a1) return;
+    l_18 = a1->data->width * a1->data->height;
+    a1->data->object_counter = 2;
+    a1->data->marker_counter = 64000;
     func_000A00CB(*(int *)maps_bsa, (int)location_exterior, 412);
     func_000A00CB(*(int *)maps_bsa, (int)&l_24, 4);
 }
 
-void func_0001E502(int a1, int a2, int a3)
+void func_0001E502(struct loaded_location *a1, int a2, int a3)
 {
     struct map_location *l_14;
     int l_10;
 
-    l_14 = *(struct map_location **)D_00196A9C;
+    l_14 = D_00196A9C;
     l_10 = 0;
 L1E526:;
     if (l_10 < *(int *)D_00196A28) goto L1E542;
@@ -411,7 +411,7 @@ struct record *func_0001E576(void)
     l_1C->x = *(int *)block_origin_x;
     l_1C->y = func_0014B45B(*(int *)block_origin_x, *(int *)block_origin_z) - 8;
     l_1C->z = *(int *)block_origin_z - 4096;
-    *(short *)((char *)l_1C + 19) = 32768;
+    l_1C->pad13 = 32768;
     l_1C->id = D_00195AC4->id + current_location->object_counter++;
     return l_1C;
 }
@@ -453,8 +453,8 @@ void func_0001E928(struct record *a1)
     l_20 += ((int)(unsigned char)*(signed char *)(*(char **)rmb_block + 2)) * 17;
     l_34 = object_create_child(a1, 0, l_20);
     l_34->type = 56;
-    l_34->image = (unsigned short)(unsigned char)*(signed char *)(*(char **)rmb_block + 1);
-    l_34->owner = (unsigned short)(unsigned char)*(signed char *)(*(char **)rmb_block + 2);
+    l_34->model_count = (unsigned short)(unsigned char)*(signed char *)(*(char **)rmb_block + 1);
+    l_34->flat_count = (unsigned short)(unsigned char)*(signed char *)(*(char **)rmb_block + 2);
     l_34->id = D_00195AC4->id;
     l_30 = (int)RECORD_DATA(l_34);
     l_2C = l_30 + (((int)(unsigned char)*(signed char *)(*(char **)rmb_block + 1)) * 66);
@@ -593,7 +593,7 @@ L1EDCA:;
     l_28 = rmb_add_building(l_2C, l_24);
     if ((l_28->flags & 8) != 0) goto L1EE3B;
     if (l_28->id != current_location->buildings[l_28->image].id) goto L1EE31;
-    l_28->owner = l_30->type;
+    l_28->building_type = l_30->type;
     l_30++;
     goto L1EE3B;
 L1EE31:;

@@ -323,8 +323,8 @@ L8996C:;
     l_18 = object_create_child(a3, 0, 0);
     l_18->type = 19;
     l_18->flags = 3;
-    *(short *)((char *)l_18 + 29) = l_14->cast_durations[a2];
-    *(short *)((char *)l_18 + 27) = (unsigned short)l_14->cast_chances[a2];
+    l_18->trap_duration = l_14->cast_durations[a2];
+    l_18->trap_chance = (unsigned short)l_14->cast_chances[a2];
     l_14->effects[a2].type = 255;
     return 1;
 }
@@ -1103,7 +1103,7 @@ void spfx_created_item_expire_cb(struct record *a1)
 L8B376:;
     goto L8B386;
 L8B378:;
-    if (((unsigned)*(int *)((char *)a1 + 43)) < *(int *)game_minutes) goto L8B388;
+    if (((unsigned)a1->expire_minutes) < *(int *)game_minutes) goto L8B388;
 L8B386:;
     return;
 L8B388:;
@@ -1165,7 +1165,7 @@ L8B4C8:;
     return (int)l_1C->name;
 L8B502:;
     if (a1->twin == 0) goto L8B539;
-    return func_0008B43B((int)(unsigned char)*(signed char *)(D_001841E3 + ((int)(unsigned char)*(signed char *)current_region)), (int)(unsigned char)((signed char)a1->flags & 4), *(int *)((char *)a1 + 43));
+    return func_0008B43B((int)(unsigned char)*(signed char *)(D_001841E3 + ((int)(unsigned char)*(signed char *)current_region)), (int)(unsigned char)((signed char)a1->flags & 4), a1->name_seed);
 L8B539:;
     return func_0008B43B((int)(unsigned char)*(signed char *)(D_001841E3 + ((int)(unsigned char)*(signed char *)current_region)), (int)(unsigned char)(*(signed char *)((char *)l_20 + 2) & 16), a1->id);
 }

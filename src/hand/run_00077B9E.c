@@ -93,7 +93,7 @@ int spawn_find_point(struct record *a1, int a2, int a3)
 
 void head_bob_update(void)
 {
-    if (!(*(unsigned short *)game_settings & 2) || (player_motion_flags & 0x20) || in_dungeon_water || (player_character->conditions & 8)) {
+    if (!(game_settings->view_flags & 2) || (player_motion_flags & 0x20) || in_dungeon_water || (player_character->conditions & 8)) {
         head_bob_offset = 0;
         return;
     }

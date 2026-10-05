@@ -68,8 +68,8 @@ extern char D_001940D6[];
 extern char D_001940D7[];
 extern char D_001940D9[];
 extern struct record *wagon_container;
-extern char D_00195A00[];
-extern char D_00195A84[];
+extern struct record *D_00195A00;
+extern struct character *D_00195A84;
 extern struct building *current_building;
 extern struct record *player_object;
 extern char D_00195AB4[];
@@ -77,14 +77,14 @@ extern struct record *D_00195AC4;
 extern char D_00195ADC[];
 extern char D_00195AE0[];
 extern char D_00195AE4[];
-extern char D_00195AEC[];
-extern char spell_ready_touch[];
-extern char guild_npc_object[];
+extern struct record *D_00195AEC;
+extern struct record *spell_ready_touch;
+extern struct record *guild_npc_object;
 extern struct location *current_location;
 extern struct character *player_character;
 extern char window_image[];
 extern char D_00195C44[];
-extern char D_00195CE8[];
+extern struct record *D_00195CE8;
 extern char D_00195D3C[];
 extern char D_00195D54[];
 extern char D_00195DC0[];
@@ -115,10 +115,10 @@ extern char D_00199808[];
 extern char D_001A3F5E[];
 extern char stocked_shop_ids[];
 extern char service_menu_label[];
-extern char service_menu_npc[];
-extern char coven_menu_npc[];
+extern struct record *service_menu_npc;
+extern struct record *coven_menu_npc;
 extern char stocked_shop_count[];
-extern char repair_menu_npc[];
+extern struct record *repair_menu_npc;
 extern char service_menu_handler[];
 extern char D_001A4C9C[];
 extern char D_001A4C9D[];
@@ -355,7 +355,7 @@ L7482D:;
     goto L74889;
 L7482F:;
     func_0005FA0E(14, (struct record *)D_001960D9, l_24->quality, (int)(unsigned short)(player_character->flags & 1));
-    *(int *)D_00195AEC = *(int *)((char *)a1 + 4);
+    D_00195AEC = (struct record *)(*(int *)((char *)a1 + 4));
     shelf_return_items();
     shelf_open_stock((struct record *)*(int *)((char *)a1 + 4), l_24, *(int *)D_00195D54);
     return 1;
@@ -460,7 +460,7 @@ L74B21:;
     if (a1 == 0) goto L74BFF;
     l_18 = a1->next;
     if (a1->type != 36) goto L74B54;
-    if (((int)(unsigned short)*(short *)((char *)a1 + 27)) == a3) goto L74B59;
+    if (a1->shelf_owner == a3) goto L74B59;
 L74B54:;
     goto L74BF4;
 L74B59:;
@@ -505,9 +505,9 @@ L74C30:;
     l_18 = l_1C->next;
     l_1C->flags |= 2;
     func_0008DADD(l_1C);
-    object_reparent((struct record *)*(int *)D_00195AEC, l_1C);
+    object_reparent(D_00195AEC, l_1C);
     l_1C->type = 36;
-    *(short *)((char *)l_1C + 27) = *(short *)D_00195F58;
+    l_1C->shelf_owner = *(short *)D_00195F58;
     l_1C = l_18;
     goto L74C30;
 }
@@ -577,13 +577,13 @@ L74E62:;
     *(int *)D_00195AE4 = (int)shelf_book_chosen;
     *(signed char *)D_00196272 = 1;
     *(int *)D_00195ADC = (int)shelf_return_items;
-    *(int *)D_00195AEC = (int)a1;
+    D_00195AEC = a1;
     *(signed char *)D_001A4C9C = 1;
     return;
 L74E9C:;
     inventory_open_container((struct record *)D_001960D9, 1, 4);
     *(int *)D_00195ADC = (int)shelf_return_items;
-    *(int *)D_00195AEC = (int)a1;
+    D_00195AEC = a1;
 }
 
 void shelf_open_stock(struct record *a1, struct building *a2, int a3)
@@ -650,7 +650,7 @@ L750D6:;
     inventory_open_container((struct record *)D_001960D9, 0, 4);
 L750E7:;
     *(int *)D_00195ADC = (int)shelf_return_items;
-    *(int *)D_00195AEC = (int)a1;
+    D_00195AEC = a1;
 }
 
 void shelf_book_list_update(void)
@@ -678,48 +678,48 @@ L75153:;
 
 void npc_click_service(struct record *a1)
 {
-    int l_20;
+    struct person *l_20;
     struct building *l_1C;
     struct faction *l_18;
 
-    *(int *)coven_menu_npc = (int)a1;
-    *(int *)D_00195CE8 = (int)a1;
-    l_20 = (int)RECORD_DATA(a1);
-    *(short *)D_00195F68 = *(short *)((char *)l_20);
+    coven_menu_npc = a1;
+    D_00195CE8 = a1;
+    l_20 = &a1->data.person;
+    *(short *)D_00195F68 = l_20->faction_id;
     l_1C = object_building(a1);
-    l_18 = faction_find((int)(short)*(short *)((char *)l_20));
+    l_18 = faction_find((int)(short)l_20->faction_id);
     if (l_18 != 0) goto L75245;
     l_18 = faction_find_type_in_region((int)(short)((int)(unsigned char)*(signed char *)current_region), 15);
 L75245:;
     if (a1->quest_id != 0) goto L7530A;
-    if (((int)(unsigned short)*(short *)((char *)l_20)) == 852) goto L7528A;
+    if (l_20->faction_id == 852) goto L7528A;
     if (l_18->type != 7) goto L75285;
     if (l_18->region != 255) goto L7528A;
 L75285:;
     goto L7530A;
 L7528A:;
-    if (((int)(unsigned short)*(short *)((char *)l_20)) != 852) goto L752C4;
+    if (l_20->faction_id != 852) goto L752C4;
     l_18 = faction_find_type_in_region((int)(short)((int)(unsigned char)*(signed char *)current_region), 7);
     if (l_18 == 0) goto L752C4;
-    *(short *)((char *)l_20) = l_18->id;
+    l_20->faction_id = l_18->id;
 L752C4:;
     if (quest_active_for_faction((int)(short)l_18->id) != 0) goto L7530A;
     quest_pick_file(82, 0, func_000766D1(), 67, player_character->level);
     if (*(signed char *)D_001961F5 != 0) return;
 L7530A:;
     if (a1->quest_id != 0) goto L7531F;
-    if (func_0004CD80(l_20) != 0) goto L75321;
+    if (func_0004CD80((int)l_20) != 0) goto L75321;
 L7531F:;
     goto L75326;
 L75321:;
     return;
 L75326:;
-    if (*(short *)((char *)l_20) == 0) goto L75341;
-    if (((int)(unsigned short)*(short *)((char *)l_20)) != 65535) goto L75343;
+    if (l_20->faction_id == 0) goto L75341;
+    if (l_20->faction_id != 65535) goto L75343;
 L75341:;
     goto L7535A;
 L75343:;
-    if (faction_find((int)(short)*(short *)((char *)l_20))->type == 8) goto L7535C;
+    if (faction_find((int)(short)l_20->faction_id)->type == 8) goto L7535C;
 L7535A:;
     goto L7536B;
 L7535C:;
@@ -773,7 +773,7 @@ case 14:
     guild_service_dispatch(a1);
     goto L75667;
 case 15:
-    if (((int)(unsigned char)(*(signed char *)((char *)l_20 + 2) & 8)) == 0) goto L7552F;
+    if (((int)(unsigned char)(l_20->flags & 8)) == 0) goto L7552F;
     tavern_open(1);
     goto L75537;
 L7552F:;
@@ -782,8 +782,8 @@ L75537:;
     goto L75667;
 case 3:
     *(int *)service_menu_handler = (int)bank_open;
-    *(int *)service_menu_npc = (int)a1;
-    if (((int)(unsigned char)(*(signed char *)((char *)l_20 + 2) & 8)) == 0) goto L7556B;
+    service_menu_npc = a1;
+    if (((int)(unsigned char)(l_20->flags & 8)) == 0) goto L7556B;
     service_menu_open((int)D_0017628F);
     goto L75573;
 L7556B:;
@@ -791,9 +791,9 @@ L7556B:;
 L75573:;
     goto L75667;
 case 2:
-    if (((int)(unsigned short)(*(short *)((char *)l_20) & 8)) == 0) goto L755A7;
+    if (((int)(unsigned short)(l_20->faction_id & 8)) == 0) goto L755A7;
     *(signed char *)D_001A4C9D = 2;
-    *(int *)repair_menu_npc = (int)a1;
+    repair_menu_npc = a1;
     repair_menu_open(1);
     goto L755AF;
 L755A7:;
@@ -801,9 +801,9 @@ L755A7:;
 L755AF:;
     goto L75667;
 case 13:
-    if (((int)(unsigned char)(*(signed char *)((char *)l_20 + 2) & 8)) == 0) goto L755E0;
+    if (((int)(unsigned char)(l_20->flags & 8)) == 0) goto L755E0;
     *(signed char *)D_001A4C9D = 3;
-    *(int *)repair_menu_npc = (int)a1;
+    repair_menu_npc = a1;
     repair_menu_open(1);
     goto L755E8;
 L755E0:;
@@ -811,9 +811,9 @@ L755E0:;
 L755E8:;
     goto L75667;
 case 9:
-    if (((int)(unsigned short)(*(short *)((char *)l_20) & 8)) == 0) goto L7561C;
+    if (((int)(unsigned short)(l_20->faction_id & 8)) == 0) goto L7561C;
     *(signed char *)D_001A4C9D = 255;
-    *(int *)repair_menu_npc = (int)a1;
+    repair_menu_npc = a1;
     repair_menu_open(1);
     goto L75624;
 L7561C:;
@@ -825,8 +825,8 @@ case 5:
 case 6:
 case 8:
 case 12:
-    if (((int)(unsigned char)(*(signed char *)((char *)l_20 + 2) & 8)) == 0) goto L75655;
-    *(int *)service_menu_npc = (int)a1;
+    if (((int)(unsigned char)(l_20->flags & 8)) == 0) goto L75655;
+    service_menu_npc = a1;
     *(int *)service_menu_handler = (int)service_menu_sell;
     service_menu_open((int)D_00176297);
     goto L7565D;
@@ -861,8 +861,8 @@ void npc_talk(struct record *a1)
     int l_1C;
     unsigned short l_18;
 
-    *(int *)D_00195A84 = npc_talk_record_build(a1);
-    l_18 = *(short *)((char *)a1 + 71);
+    D_00195A84 = (struct character *)npc_talk_record_build(a1);
+    l_18 = a1->data.person.faction_id;
     l_1C = func_00031843(28, a1, 0);
     l_1C |= func_00031843(1, 0, a1);
     l_1C |= quest_raise_event(28, a1, 0);
@@ -881,9 +881,9 @@ L7576E:;
 L7578C:;
     goto L757B7;
 L7578E:;
-    if (((int)(unsigned char)(*(signed char *)((char *)a1 + 73) & 128)) == 0) goto L757B7;
+    if (((int)(unsigned char)(a1->data.person.flags & 128)) == 0) goto L757B7;
     quest_pick_for_npc(a1);
-    *(signed char *)((char *)a1 + 73) &= 127;
+    a1->data.person.flags &= 127;
     if (*(signed char *)D_001961F5 != 0) return;
 L757B7:;
     talk_start(a1);
@@ -990,13 +990,13 @@ L75AD1:;
 void repair_menu_repair(void)
 {
     repair_menu_close();
-    shop_open_repair((int)(unsigned char)*(signed char *)D_001A4C9D, (struct record *)*(int *)repair_menu_npc);
+    shop_open_repair((int)(unsigned char)*(signed char *)D_001A4C9D, repair_menu_npc);
 }
 
 void repair_menu_talk(void)
 {
     repair_menu_close();
-    npc_talk((struct record *)*(int *)repair_menu_npc);
+    npc_talk(repair_menu_npc);
 }
 
 void repair_menu_sell(void)
@@ -1094,13 +1094,13 @@ L75D5B:;
 void coven_menu_talk(void)
 {
     coven_menu_close();
-    npc_talk((struct record *)*(int *)coven_menu_npc);
+    npc_talk(coven_menu_npc);
 }
 
 void coven_menu_summon(void)
 {
     coven_menu_close();
-    daedra_summon(*(int *)coven_menu_npc);
+    daedra_summon((int)coven_menu_npc);
 }
 
 void click_item(int a1, struct record *a2)
@@ -1133,7 +1133,7 @@ void func_00075E7B(int a1, struct record *a2)
 
 void click_npc(int a1, struct record *a2)
 {
-    *(int *)D_00195A84 = npc_talk_record_build(a2);
+    D_00195A84 = (struct character *)npc_talk_record_build(a2);
     switch (*(unsigned char *)interaction_mode) {
     return;
 case 0:
@@ -1161,14 +1161,14 @@ void click_creature(int a1, struct record *a2)
 
     l_18 = &a2->data.character;
     l_14 = &l_18->career;
-    if (*(int *)spell_ready_touch == 0) goto L75F84;
+    if ((int)spell_ready_touch == 0) goto L75F84;
     if (*(int *)pick_distance < 160) goto L75F86;
 L75F84:;
     goto L75FA9;
 L75F86:;
-    cast_spell_on(*(int *)spell_ready_touch, a2, 0);
-    object_delete(*(int *)spell_ready_touch);
-    *(int *)spell_ready_touch = 0;
+    cast_spell_on((int)spell_ready_touch, a2, 0);
+    object_delete((int)spell_ready_touch);
+    spell_ready_touch = 0;
 L75FA9:;
     switch (*(unsigned char *)interaction_mode) {
     return;
@@ -1350,8 +1350,8 @@ case 2:
     hud_status_set(*(int *)D_0017CA14);
     goto L76435;
 L76411:;
-    if (((int)(unsigned short)(a2->pad19 & 16384)) != 0) goto L76435;
-    a2->pad19 |= 0x4000;
+    if (((int)(unsigned short)(a2->npc_flags & 16384)) != 0) goto L76435;
+    a2->npc_flags |= 0x4000;
     pickpocket_attempt(a2);
 L76435:;
     return;
@@ -1446,7 +1446,7 @@ int quest_active_for_faction(short a1)
 {
     struct record *l_20;
 
-    l_20 = (struct record *)*(int *)(*(char **)D_00195A00 + 63);
+    l_20 = D_00195A00->children;
 L76696:;
     if (l_20 == 0) goto L766BD;
     if (l_20->data.quest.faction_id != a1) goto L766B2;
@@ -1591,7 +1591,7 @@ L769AE:;
 void service_menu_talk(void)
 {
     service_menu_close();
-    npc_talk((struct record *)*(int *)service_menu_npc);
+    npc_talk(service_menu_npc);
 }
 
 void service_menu_service(void)
@@ -1869,18 +1869,18 @@ void func_00077340(struct record *a1)
 {
     int l_18;
 
-    if (*(int *)guild_npc_object == 0) return;
+    if ((int)guild_npc_object == 0) return;
     if (a1->type != 18) return;
-    l_18 = func_000C7FF4(*(int *)(*(char **)guild_npc_object + 11) - a1->y, func_000C7FD9(*(int *)(*(char **)guild_npc_object + 7), *(int *)(*(char **)guild_npc_object + 15), a1->x, a1->z));
+    l_18 = func_000C7FF4(guild_npc_object->y - a1->y, func_000C7FD9(guild_npc_object->x, guild_npc_object->z, a1->x, a1->z));
     if (l_18 >= 64) return;
-    *(int *)guild_npc_object = 0;
+    guild_npc_object = 0;
 }
 
 int func_000773BE(struct record *a1)
 {
-    *(int *)guild_npc_object = (int)a1;
+    guild_npc_object = a1;
     object_foreach(D_00195AC4, (int)func_00077340);
-    return ((*(int *)guild_npc_object == 0) ? 1 : 0);
+    return (((int)guild_npc_object == 0) ? 1 : 0);
 }
 
 int func_00077412(struct record *a1)

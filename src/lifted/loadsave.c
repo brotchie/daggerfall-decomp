@@ -70,14 +70,14 @@ extern char bank_ship_price[];
 extern char bank_house_price[];
 extern struct record *nonworld_root;
 extern char frame_counter[];
-extern char logbook_object[];
-extern char options_object[];
+extern struct record *logbook_object;
+extern struct record *options_object;
 extern char view_look_pitch[];
 extern char D_001959C4[];
 extern struct record *inventory_containers[];
 extern char D_001959FC[];
-extern char D_00195A00[];
-extern char bank_accounts[];
+extern struct record *D_00195A00;
+extern struct record *bank_accounts;
 extern char D_00195A08[];
 extern char D_00195A0C[];
 extern char quest_faces[];
@@ -132,7 +132,7 @@ extern char D_0019966C[];
 extern char quest_debug_data[];
 extern char D_00199808[];
 extern char save_file_handle[];
-extern char D_001A4FE0[];
+extern struct record *D_001A4FE0;
 extern char save_version[];
 extern char cfg_mapsave_file[];
 extern char D_001A94C4[];
@@ -345,7 +345,7 @@ case 33:
     if (a1->children == 0) goto L79FBB;
     return 1;
 L79FBB:;
-    if (a1->lockpick_skill_tried == 0) goto L79FCE;
+    if (a1->pad19 == 0) goto L79FCE;
     return 1;
 L79FCE:;
     goto L7A016;
@@ -385,16 +385,16 @@ L7A133:;
 L7A148:;
     return;
 case 16:
-    *(int *)D_00195A00 = (int)a1;
+    D_00195A00 = a1;
     return;
 case 23:
-    game_settings = (struct settings *)((*(int *)options_object = (int)a1) + 71);
+    game_settings = (struct settings *)((*(int *)&options_object = (int)a1) + 71);
     return;
 case 24:
-    *(int *)logbook_object = (int)a1;
+    logbook_object = a1;
     return;
 case 25:
-    *(int *)bank_accounts = (int)a1;
+    bank_accounts = a1;
     return;
 case 39:
     nonworld_root = a1;
@@ -584,12 +584,12 @@ int save_game(int a1, int a2)
     write(*(int *)save_file_handle, (int)&l_18, 4);
     write(*(int *)save_file_handle, (int)current_location->buildings, l_18);
     l_18 = 0;
-    quests_unlink_all(*(int *)D_00195A00);
+    quests_unlink_all((int)D_00195A00);
     savetree_write_saved(D_00195AC4->children);
     write(*(int *)save_file_handle, (int)&l_18, 4);
     object_foreach_pre(nonworld_root->children, (int)savetree_write_record);
     write(*(int *)save_file_handle, (int)&l_18, 4);
-    quests_relink_all(*(int *)D_00195A00);
+    quests_relink_all((int)D_00195A00);
     links_save(*(int *)save_file_handle);
     func_0009DEA7(*(int *)save_file_handle);
     *(signed char *)mouse_buttons = (*(signed char *)mouse_buttons_prev = 0);
@@ -610,7 +610,7 @@ void func_0007A8BE(void)
     int l_1C;
     int l_18;
 
-    l_24 = (struct record *)*(int *)(*(char **)D_00195A00 + 63);
+    l_24 = D_00195A00->children;
     l_1C = 0;
     l_18 = 0;
     if (((int)(unsigned char)*(signed char *)current_region) == 31) return;
@@ -956,7 +956,7 @@ void func_0007C432(void)
     *(signed char *)D_00196289 = 1;
     *(int *)quest_debug_data = 0;
     *(int *)D_001A94C4 = -1;
-    if (((int)(unsigned short)(*(short *)(*(char **)&game_settings) & 1)) == 0) goto L7C48C;
+    if (((int)(unsigned short)(game_settings->view_flags & 1)) == 0) goto L7C48C;
     func_0012A2D0(160, 100, 160, 100);
     goto L7C4A5;
 L7C48C:;
@@ -1001,9 +1001,9 @@ void load_fix_object_cb(struct record *a1)
 
     if (a1->twin == 0) goto L7C5F2;
     if (a1->quest_id == 0) goto L7C5E8;
-    l_3C = object_find_by_id(*(struct record **)D_001A4FE0, (int)a1->twin);
+    l_3C = object_find_by_id(D_001A4FE0, (int)a1->twin);
     a1->twin = l_3C;
-    if (*(int *)D_001A4FE0 != (int)D_00195AC4) goto L7C5E6;
+    if ((int)D_001A4FE0 != (int)D_00195AC4) goto L7C5E6;
     if (a1->twin != 0) goto L7C5CE;
     fatal_error((int)D_001769F7);
 L7C5CE:;
@@ -1117,9 +1117,9 @@ default:;
 
 void load_fix_objects(void)
 {
-    *(int *)D_001A4FE0 = (int)nonworld_root;
+    D_001A4FE0 = nonworld_root;
     object_foreach(D_00195AC4, (int)load_fix_object_cb);
-    *(int *)D_001A4FE0 = (int)D_00195AC4;
+    D_001A4FE0 = D_00195AC4;
     object_foreach(nonworld_root, (int)load_fix_object_cb);
     object_foreach_post(D_00195AC4, (int)func_0007C78B);
 }

@@ -109,7 +109,7 @@ void player_frame_update(void)
             rnd = 0;
         else
             rnd = (*(unsigned int *)0x46c >> 1) & 3;
-        func_000CB39A(sound, rnd, (*(unsigned short *)game_settings & 1) ? hud_bar_image->f6 : 0, 0);
+        func_000CB39A(sound, rnd, (game_settings->view_flags & 1) ? hud_bar_image->f6 : 0, 0);
     }
     D_00195F4E = (speed * D_00195AB0) / 1000;
     if (player_character->flags & 1) {

@@ -1,19 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0001CF3E */
 #include "records.h"
 
-struct msg {
-    short id1;                  /* 0x00 */
-    short id2;                  /* 0x02 */
-    int kind;                   /* 0x04 */
-    unsigned char sub;          /* 0x08 */
-    unsigned char chk;          /* 0x09 */
-    unsigned char zero;         /* 0x0a */
-    char name[9];               /* 0x0b */
-    short f20;                  /* 0x14 */
-    int f22;                    /* 0x16 */
-    int len;                    /* 0x1a */
-    int time;                   /* 0x1e */
-};
 extern char D_00170464[];        /* __FILE__ */
 extern unsigned char D_00190D16;
 extern unsigned char D_00190D17;
@@ -27,7 +14,7 @@ extern int D_00196708;
 extern struct faction *D_0019670C;
 extern struct faction *D_0019671C;
 extern int faction_player_related(struct faction *);
-extern unsigned char func_0001D66C(struct msg *);
+extern unsigned char func_0001D66C(struct rumor *);
 extern void parse_rsc_text(int, int, int);
 extern int rand_range(int, int);
 extern void mc_memset(char *, int, int, char *, int, int);
@@ -37,7 +24,7 @@ extern int func_000A0DF4(char *);
 void rumor_add_faction(struct faction *a1, struct faction *a2, int a3, unsigned char a4, int a5)
 {
     int unused;
-    struct msg m;
+    struct rumor m;
     int saved;
 
     saved = D_00195B84;
@@ -63,23 +50,23 @@ void rumor_add_faction(struct faction *a1, struct faction *a2, int a3, unsigned 
         D_00196269 = rand_range(0, 61);
     parse_rsc_text(a5, 0, 0);
     if (a1 != 0)
-        m.id1 = a1->id;
+        m.faction1 = a1->id;
     else
-        m.id1 = 0;
+        m.faction1 = 0;
     if (a2 != 0)
-        m.id2 = a2->id;
+        m.faction2 = a2->id;
     else
-        m.id2 = 0;
+        m.faction2 = 0;
     m.kind = a3;
-    m.sub = a4;
-    m.chk = func_0001D66C(&m);
-    m.zero = 0;
-    mc_memset(m.name, 0, 9, D_00170464, 1606, 9);
-    m.f20 = 0;
-    m.f22 = 0;
-    m.len = func_000A0DF4(text_rsc_buffer) + 1;
-    m.time = game_minutes + 43140;
+    m.region = a4;
+    m.flags = func_0001D66C(&m);
+    m.quest_id = 0;
+    mc_memset(m.quest_name, 0, 9, D_00170464, 1606, 9);
+    m.message = 0;
+    m.target = 0;
+    m.text_length = func_000A0DF4(text_rsc_buffer) + 1;
+    m.expires = game_minutes + 43140;
     write(rumor_file, &m, 34);
-    write(rumor_file, text_rsc_buffer, m.len);
+    write(rumor_file, text_rsc_buffer, m.text_length);
     D_00195B84 = saved;
 }

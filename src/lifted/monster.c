@@ -24,9 +24,9 @@ extern struct record *D_00195AC4;
 extern struct record *D_00195AD8;
 extern char creature_count[];
 extern struct character *player_character;
-extern char D_00195C70[];
+extern struct record *D_00195C70;
 extern char D_00195C74[];
-extern char D_00195CB8[];
+extern struct record *D_00195CB8;
 extern char ai_monster_flags[];
 extern char D_00196167[];
 extern char player_on_ground[];
@@ -833,5 +833,5 @@ L64214:;
 void func_00064301(void)
 {
     *(int *)link_count = 0;
-    *(int *)D_00195CB8 = (*(int *)D_00195C70 = 0);
+    *(int *)&D_00195CB8 = (*(int *)&D_00195C70 = 0);
 }

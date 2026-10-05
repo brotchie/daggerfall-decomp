@@ -25,7 +25,7 @@ extern struct building *current_building;
 extern struct record *player_entity;
 extern struct record *player_object;
 extern struct record *D_00195AC4;
-extern char tavern_building[];
+extern struct building *tavern_building;
 extern char creature_count[];
 extern struct location *current_location;
 extern struct character *player_character;
@@ -288,7 +288,7 @@ L72765:;
     return 0;
 case 2:
     if (((int)(unsigned char)(signed char)current_building->type) != 15) goto L727DF;
-    *(int *)tavern_building = (int)current_building;
+    tavern_building = current_building;
     if (tavern_room_rented() != 0) goto L727D1;
     msgbox_show_string(*(int *)D_00185087, 1);
     return 0;

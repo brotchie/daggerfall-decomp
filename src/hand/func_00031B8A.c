@@ -4,18 +4,7 @@
 #pragma pack(1)
 struct Kind { char pad[6]; unsigned char flags; };
 struct Ent6 { unsigned short a; unsigned short b; unsigned short c; };
-struct Req {                    /* a QBN person (struct qbn_person), its +0x02 read as a u16 */
-    char pad0[2];
-    short flags;                /* 2 */
-    short kind;                 /* 4 */
-    short arg;                  /* 6 */
-    char pad1[4];
-    struct record *obj;         /* 12 */
-};
 #pragma pack()
-/* a quest NPC's data (types 41, 65): a copy of its building record, then 4 bytes of the
- * town name at +0x1A */
-#define NPC_SITE(r) ((struct building *)&(r)->data)
 extern char D_00170A64[];
 extern unsigned char D_0017A25C[];
 extern short D_0017A270[];
@@ -40,7 +29,7 @@ extern struct faction *faction_find_type_in_region(short, int);
 extern struct faction *faction_find(short);
 extern struct faction *faction_random_of_type(unsigned char);
 extern struct qbn_person *quest_record(struct quest *, int, int);
-extern int func_000339B2(struct Ent6 *, struct Req *, struct building *, int);
+extern int func_000339B2(struct Ent6 *, struct qbn_person *, struct building *, int);
 extern struct faction *func_0003445C(struct faction **);
 extern int func_000344D3(void);
 extern int quest_object_in_use(int);
@@ -56,7 +45,7 @@ extern int rand(void);
 extern int mc_strncpy(char *, char *, int, char *, int);
 extern int mc_memcpy(void *, void *, int, char *, int, int);
 
-int quest_init_person(struct Req *r)
+int quest_init_person(struct qbn_person *r)
 {
     struct Ent6 *list;
     struct Ent6 *e;
@@ -90,21 +79,21 @@ int quest_init_person(struct Req *r)
             if (sub->faction_id == 0)
                 sub->faction_id = faction_find_type_in_region(current_region, 15)->id;
             mc_memcpy(&it->data, sub, 26, D_00170A64, 64, 4);
-        } else if (*(short *)RECORD_DATA(D_00195CE8) != 0) {
-            NPC_SITE(it)->faction_id = *(short *)RECORD_DATA(D_00195CE8);
+        } else if (D_00195CE8->data.person.faction_id != 0) {
+            it->data.building.faction_id = D_00195CE8->data.person.faction_id;
         }
-        if (*(short *)RECORD_DATA(D_00195CE8) != 0)
-            it->pad19 = *(short *)RECORD_DATA(D_00195CE8);
+        if (D_00195CE8->data.person.faction_id != 0)
+            it->faction_id = D_00195CE8->data.person.faction_id;
         else
-            it->pad19 = sub->faction_id;
+            it->faction_id = sub->faction_id;
         mc_strncpy(RECORD_DATA(it) + 26, (char *)current_location, 4, D_00170A64, 76);
         mc_memcpy(&it->x, &D_00195CE8->x, 12, D_00170A64, 77, 4);
         it->type = 41;
         it->image = D_00195CE8->image;
-        r->obj = it;
+        r->object = it;
         it->flags = 514;
         it->flags |= (int)(unsigned char)(kind->flags & 1) != 0 ? 4 : 0;
-        it->owner = (unsigned short)current_region;
+        it->home_region = (unsigned short)current_region;
         it->quest_id = current_quest->id;
         it->id = D_00195CE8->id;
         it->repair_due = it->id;
@@ -118,103 +107,103 @@ int quest_init_person(struct Req *r)
         it = object_create_child(nonworld_root, 0, 0);
         it->type = 65;
         it->image = 0;
-        r->obj = it;
+        r->object = it;
         it->repair_due = 0;
         it->id = object_new_id(800);
         it->flags = 514;
-        it->pad19 = r->arg;
+        it->faction_id = r->faction_id;
         it->flags |= (int)(unsigned char)(flats_cfg_find(it->image)->flags & 1) != 0 ? 4 : 0;
-        it->owner = (unsigned short)current_region;
+        it->home_region = (unsigned short)current_region;
         it->quest_id = current_quest->id;
         return 1;
     }
     if (!(r->kind != -1 || (int)(short)(r->flags & 0x100) != 0)) {
-        np = faction_find(r->arg);
+        np = faction_find(r->faction_id);
         if (np->type == 4) {
             kind = flats_cfg_find(np->flats[0]);
             it = object_create_child(nonworld_root, 0, 58);
-            it->pad19 = np->id;
+            it->faction_id = np->id;
             it->type = 41;
             it->image = np->flats[0];
             it->flags = 514;
             it->flags |= (int)(unsigned char)(kind->flags & 1) != 0 ? 4 : 0;
-            it->owner = (unsigned short)current_region;
+            it->home_region = (unsigned short)current_region;
             it->quest_id = current_quest->id;
-            r->obj = it;
+            r->object = it;
             it->repair_due = it->id = object_new_id(800);
-            NPC_SITE(it)->faction_id = r->arg;
+            it->data.building.faction_id = r->faction_id;
             return 1;
         }
     }
     if (r->kind == -2) {
-        if (r->arg == 10)
+        if (r->faction_id == 10)
             npc = D_0017A270[rand_range(0, 9)];
         else
-            npc = faction_random_of_type(r->arg)->id;
+            npc = faction_random_of_type(r->faction_id)->id;
         r->kind = -1;
     }
-    if (!(r->kind != -4 || r->arg != 10000)) {
+    if (!(r->kind != -4 || r->faction_id != 10000)) {
         i = func_000344D3();
         if (i == 0) {
             r->kind = -6;
         } else {
             r->kind = -1;
-            r->arg = i;
+            r->faction_id = i;
         }
     }
     if (r->kind >= -5 && r->kind <= -3 || r->kind == -7) {
-        slot = quest_record(current_quest, 3, r->arg);
+        slot = quest_record(current_quest, 3, r->faction_id);
         if (slot == 0) {
-            r->obj = 0;
+            r->object = 0;
             D_001970DC++;
             return 1;
         }
         it = slot->object;
         if (it == 0) {
-            r->obj = 0;
+            r->object = 0;
             D_001970DC++;
             return 1;
         }
         switch ((unsigned short)(r->kind + 7)) {
         case 0:
             ((unsigned char *)&r->flags)[1] &= 0xf9;
-            r->flags |= (int)(unsigned short)(it->flags & 4) != 0 ? 1024 : 512;
+            *(short *)&r->flags |= (int)(unsigned short)(it->flags & 4) != 0 ? 1024 : 512;
             r->kind = -6;
             break;
         case 2:
-            r->arg = NPC_SITE(it)->faction_id;
+            r->faction_id = it->data.building.faction_id;
             r->kind = -1;
             break;
         case 3:
-            np = faction_find(NPC_SITE(it)->faction_id);
+            np = faction_find(it->data.building.faction_id);
             if (np != 0) {
                 np = func_0003445C(np->enemies);
             } else {
-                r->obj = 0;
+                r->object = 0;
                 r->kind = -5;
                 D_001970DC++;
                 return 1;
             }
             if (np != 0)
-                r->arg = np->id;
+                r->faction_id = np->id;
             else
-                r->arg = 510;
+                r->faction_id = 510;
             r->kind = -1;
             break;
         case 4:
-            np = faction_find(NPC_SITE(it)->faction_id);
+            np = faction_find(it->data.building.faction_id);
             if (np != 0) {
                 np = func_0003445C(np->allies);
             } else {
-                r->obj = 0;
+                r->object = 0;
                 r->kind = -5;
                 D_001970DC++;
                 return 1;
             }
             if (np != 0)
-                r->arg = np->id;
+                r->faction_id = np->id;
             else
-                r->arg = 510;
+                r->faction_id = 510;
             r->kind = -1;
             break;
         }
@@ -260,16 +249,16 @@ retry:
     }
     if (found == 0 && (int)(short)(r->flags & 0xff) == 0) {
         if (r->kind == -1)
-            npc = r->arg;
+            npc = r->faction_id;
         if (r->kind == -2)
-            npc = faction_random_of_type(r->arg)->id;
+            npc = faction_random_of_type(r->faction_id)->id;
         r->kind = -6;
     }
     if (found == 0 && r->kind != -6) {
         if (r->kind == -1)
-            npc = r->arg;
+            npc = r->faction_id;
         if (r->kind == -2)
-            npc = faction_random_of_type(r->arg)->id;
+            npc = faction_random_of_type(r->faction_id)->id;
         if (tries < 50)
             goto retry;
         r->kind = -6;
@@ -285,15 +274,15 @@ retry:
     mc_memcpy(&it->x, &src->x, 12, D_00170A64, 307, 4);
     mc_memcpy(&it->data, &rec->buildings[(unsigned)buf[i] >> 16], 26, D_00170A64, 308, 4);
     mc_strncpy(RECORD_DATA(it) + 26, (char *)rec, 4, D_00170A64, 309);
-    if (NPC_SITE(it)->faction_id == 0)
-        NPC_SITE(it)->faction_id = faction_find_type_in_region(current_region, 15)->id;
+    if (it->data.building.faction_id == 0)
+        it->data.building.faction_id = faction_find_type_in_region(current_region, 15)->id;
     if (npc != 0)
-        NPC_SITE(it)->faction_id = npc;
+        it->data.building.faction_id = npc;
     else if (r->kind == -1)
-        NPC_SITE(it)->faction_id = r->arg;
+        it->data.building.faction_id = r->faction_id;
     it->type = 41;
     it->image = 0;
-    r->obj = it;
+    r->object = it;
     if (any != 0 && (int)(short)(r->flags & 0x100) != 0) {
         it->id = object_new_id((unsigned)src->id >> 16);
         it->repair_due = it->id;
@@ -304,20 +293,20 @@ retry:
     it->flags = 514;
     if (npc != 0) {
         it->image = faction_find(npc)->flats[D_001970DD];
-        it->pad19 = npc;
+        it->faction_id = npc;
     } else if (r->kind == -1) {
-        it->image = faction_find(r->arg)->flats[D_001970DD];
-        it->pad19 = r->arg;
-    } else if ((short)NPC_SITE(it)->faction_id > 0) {
-        it->image = faction_find(NPC_SITE(it)->faction_id)->flats[D_001970DD];
-        it->pad19 = NPC_SITE(it)->faction_id;
+        it->image = faction_find(r->faction_id)->flats[D_001970DD];
+        it->faction_id = r->faction_id;
+    } else if ((short)it->data.building.faction_id > 0) {
+        it->image = faction_find(it->data.building.faction_id)->flats[D_001970DD];
+        it->faction_id = it->data.building.faction_id;
     } else {
         it->image = D_0017A25C[D_001970DD * 10 + rand_range(0, 9)] + 23296;
-        it->pad19 = 510;
+        it->faction_id = 510;
     }
     kind = flats_cfg_find(it->image);
     it->flags |= (int)(unsigned char)(kind->flags & 1) != 0 ? 4 : 0;
-    it->owner = (unsigned short)current_region;
+    it->home_region = (unsigned short)current_region;
     it->quest_id = current_quest->id;
     if (any != 0 && (int)(short)(r->flags & 0x100) == 0) {
         it2 = object_create_child(nonworld_root, 0, 26);

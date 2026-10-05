@@ -205,7 +205,7 @@ L4361B:;
     l_18++;
     goto L43613;
 L43623:;
-    if ((*(unsigned short *)(*(char **)&game_settings) & (1 << l_18)) == 0) goto L4367A;
+    if ((game_settings->view_flags & (1 << l_18)) == 0) goto L4367A;
     l_1C = ((int)options_buttons) + ((l_18 + 6) * 12);
     func_00144D00((int)(short)(*(short *)((char *)l_1C + 4) - 5), (int)(short)(*(short *)((char *)l_1C + 2) + 3), 3, 3);
 L4367A:;
@@ -217,8 +217,8 @@ L436B9:;
     if (game_settings->music_volume == 0) goto L436F6;
     func_00144D00(91, 72, (int)(short)((((int)(short)game_settings->music_volume) * 108) / 128), 3);
 L436F6:;
-    if (((int)(unsigned short)(*(short *)(*(char **)&game_settings) & -256)) == 0) return;
-    func_00144D00(91, 80, (int)(short)(((((int)(unsigned short)*(short *)(*(char **)&game_settings)) >> 8) * 108) / 128), 3);
+    if (((int)(unsigned short)(game_settings->view_flags & -256)) == 0) return;
+    func_00144D00(91, 80, (int)(short)(((game_settings->view_flags >> 8) * 108) / 128), 3);
 }
 
 void options_save_game(void)
@@ -264,7 +264,7 @@ void options_music_slider(void)
 
 void options_detail_slider(void)
 {
-    *(short *)((char *)game_settings) = (options_slider_value() << 8) | (*(short *)(*(char **)&game_settings) & 255);
+    game_settings->view_flags = (options_slider_value() << 8) | (game_settings->view_flags & 255);
 }
 
 int options_slider_value(void)
@@ -285,7 +285,7 @@ L438CC:;
 void options_toggle_full_screen(void)
 {
     game_settings->view_flags ^= 1;
-    if (((int)(unsigned short)(*(short *)(*(char **)&game_settings) & 1)) == 0) goto L43926;
+    if (((int)(unsigned short)(game_settings->view_flags & 1)) == 0) goto L43926;
     func_0012A2D0(160, 100, 160, 100);
     goto L4393F;
 L43926:;

@@ -294,7 +294,7 @@ L8C154:;
 L8C156:;
     goto L8C186;
 L8C158:;
-    l_24 = func_0008B43B((int)(unsigned char)*(signed char *)(D_001841E3 + ((int)(unsigned char)*(signed char *)current_region)), (int)(unsigned char)((signed char)l_1C->flags & 4), *(int *)((char *)l_1C + 43));
+    l_24 = func_0008B43B((int)(unsigned char)*(signed char *)(D_001841E3 + ((int)(unsigned char)*(signed char *)current_region)), (int)(unsigned char)((signed char)l_1C->flags & 4), l_1C->name_seed);
     goto L8C1B1;
 L8C186:;
     l_24 = func_0008B43B((int)(unsigned char)*(signed char *)(D_001841E3 + ((int)(unsigned char)*(signed char *)current_region)), 0, (((unsigned)a1->id) >> 16) ^ a1->id);

@@ -31,19 +31,19 @@ extern char D_00195AB0[];
 extern struct record *D_00195AC4;
 extern char D_00195AE0[];
 extern char creature_count[];
-extern char spell_ready_missile[];
+extern struct record *spell_ready_missile;
 extern char hud_bar_image[];
 extern char D_00195B84[];
 extern struct character *player_character;
 extern struct settings *game_settings;
-extern char D_00195C48[];
+extern struct record *D_00195C48;
 extern char D_00195D5C[];
 extern char mouse_motion_x[];
 extern char mouse_motion_y[];
 extern char weapon_active_hand[];
 extern char mouse_buttons_prev[];
 extern char crime_current[];
-extern char loaded_location[];
+extern struct loaded_location loaded_location;
 extern char collide_flags[];
 extern char D_001A4A30[];
 extern char D_001A4A38[];
@@ -235,7 +235,7 @@ L72DA1:;
     *(int *)(D_001A4A60 + (((int)(unsigned char)*(signed char *)weapon_active_hand) << 2)) = ((100 - player_character->attributes[6]) * 10) + 1000;
     return;
 L72DFE:;
-    func_000CB39A(*(int *)(weapon_hand_cif + (((int)(unsigned char)*(signed char *)weapon_active_hand) << 2)), (int)(unsigned char)*(signed char *)((char *)(*(int *)(D_001A4A68 + (((int)(unsigned char)*(signed char *)weapon_active_hand) << 2)) + *(int *)(D_001A4A60 + (((int)(unsigned char)*(signed char *)weapon_active_hand) << 2)))), ((((int)(unsigned short)(*(short *)(*(char **)&game_settings) & 1)) != 0) ? 0 : -((int)(unsigned short)*(short *)(*(char **)hud_bar_image + 6))), (int)(unsigned char)*(signed char *)weapon_active_hand);
+    func_000CB39A(*(int *)(weapon_hand_cif + (((int)(unsigned char)*(signed char *)weapon_active_hand) << 2)), (int)(unsigned char)*(signed char *)((char *)(*(int *)(D_001A4A68 + (((int)(unsigned char)*(signed char *)weapon_active_hand) << 2)) + *(int *)(D_001A4A60 + (((int)(unsigned char)*(signed char *)weapon_active_hand) << 2)))), ((((int)(unsigned short)(game_settings->view_flags & 1)) != 0) ? 0 : -((int)(unsigned short)*(short *)(*(char **)hud_bar_image + 6))), (int)(unsigned char)*(signed char *)weapon_active_hand);
 }
 
 void weapon_fire_arrow(void)
@@ -260,7 +260,7 @@ L739AB:;
     func_000C2000((int)player_object + 7, (int)l_24, *(int *)((char *)l_24 + 12) + 142);
     *(int *)(*(char **)((char *)l_24 + 12) + 7) = player_object->x;
     *(int *)(*(char **)((char *)l_24 + 12) + 11) = player_object->y - 70;
-    if (((int)(unsigned short)(*(short *)(*(char **)&game_settings) & 1)) != 0) goto L73AA6;
+    if (((int)(unsigned short)(game_settings->view_flags & 1)) != 0) goto L73AA6;
     *(int *)(*(char **)((char *)l_24 + 12) + 11) -= 10;
 L73AA6:;
     *(int *)(*(char **)((char *)l_24 + 12) + 15) = player_object->z;
@@ -275,7 +275,7 @@ void func_00073ADF(struct record *a1)
 
     mc_memcpy((int)l_24, (char *)a1 + 142, 12, (int)D_0017615C, 426, 12);
     func_000C2068((int)l_24);
-    *(short *)((char *)a1 + 23) = (short)*(int *)l_24 & 2047;
+    a1->missile_yaw = (short)*(int *)l_24 & 2047;
     a1->angle_z = (short)*(int *)((char *)l_24 + 4) & 2047;
 }
 }
@@ -303,7 +303,7 @@ L73BA7:;
     *(int *)((char *)l_40 + 8) = 0;
     *(signed char *)collide_flags |= 4;
     l_24 = collide_move_missile(a1, (int)l_34, (int)l_40);
-    if (*(short *)((char *)a1 + 25) != 0) goto L73CC8;
+    if (a1->from_player != 0) goto L73CC8;
     l_20 = func_000C7FF4(player_object->y - a1->y, func_000C7FD9(player_object->x, player_object->z, a1->x, a1->z));
     if (l_20 >= 125) goto L73CA6;
     sound_play(7, player_object, 100);
@@ -319,18 +319,18 @@ L73CC3:;
     goto L73DE5;
 L73CC8:;
     if ((l_24 & 2) == 0) goto L73CF4;
-    links_trigger(*(struct record **)D_00195C48, 5);
+    links_trigger(D_00195C48, 5);
     object_free_later(a1);
     return 0;
 L73CF4:;
     if ((l_24 & 8) == 0) goto L73D0E;
-    if (((int)(unsigned char)*(signed char *)(*(char **)D_00195C48)) == 18) goto L73D10;
+    if (D_00195C48->type == 18) goto L73D10;
 L73D0E:;
     goto L73D5D;
 L73D10:;
-    sound_play(7, *(struct record **)D_00195C48, 100);
-    damage_resolve_attack(player_entity, *(struct record **)D_00195C48, 19);
-    inv_merge_arrows(*(struct record **)D_00195C48, a1, 0);
+    sound_play(7, D_00195C48, 100);
+    damage_resolve_attack(player_entity, D_00195C48, 19);
+    inv_merge_arrows(D_00195C48, a1, 0);
     object_free_later(a1);
     return 0;
 L73D5D:;
@@ -363,12 +363,12 @@ void weapon_monster_arrow(struct record *a1, struct record *a2)
     item_make(3, 18, &l_14->data.item);
     l_14->data.item.stack_count = 1;
     func_000C2000(&a1->x, &a2->x, (char *)l_14 + 142);
-    *(short *)((char *)l_14 + 23) = 0;
+    l_14->missile_yaw = 0;
     l_14->angle_z = 0;
     l_14->x = a1->x;
     l_14->y = a1->y - 60;
     l_14->z = a1->z;
-    *(short *)((char *)l_14 + 25) = 0;
+    l_14->from_player = 0;
     *(int *)((char *)l_14 + 43) = 1;
     func_000C2043((char *)l_14 + 142, 160, &l_14->x);
 }
@@ -426,21 +426,21 @@ void func_00074024(int a1, struct record *a2)
 {
     int l_14;
 
-    l_14 = *(int *)loaded_location;
+    l_14 = loaded_location.index;
     *(int *)D_00195AE0 = a1;
-    if (*(int *)spell_ready_missile == 0) goto L740CD;
-    if (((int)(unsigned char)*(signed char *)(*(char **)spell_ready_missile + 78)) != 3) goto L740B4;
+    if ((int)spell_ready_missile == 0) goto L740CD;
+    if (spell_ready_missile->data.spell.target != 3) goto L740B4;
     *(int *)D_00195D5C = 0;
-    *(int *)(*(char **)spell_ready_missile + 7) = player_object->x;
-    *(int *)(*(char **)spell_ready_missile + 11) = player_object->y;
-    *(int *)(*(char **)spell_ready_missile + 15) = player_object->z;
-    spell_area_effect(*(int *)spell_ready_missile);
+    spell_ready_missile->x = player_object->x;
+    spell_ready_missile->y = player_object->y;
+    spell_ready_missile->z = player_object->z;
+    spell_area_effect((int)spell_ready_missile);
     spell_cast_queued_run();
     goto L740BE;
 L740B4:;
-    cast_fire_missile(*(int *)spell_ready_missile);
+    cast_fire_missile((int)spell_ready_missile);
 L740BE:;
-    *(int *)spell_ready_missile = 0;
+    spell_ready_missile = 0;
     return;
 L740CD:;
     if (*(int *)pick_distance > 128) goto L740E6;
@@ -453,7 +453,7 @@ L740FE:;
 L74100:;
     return;
 L74105:;
-    if (l_14 != *(int *)loaded_location) return;
+    if (l_14 != loaded_location.index) return;
     switch (a2->type) {
     return;
 case 2:

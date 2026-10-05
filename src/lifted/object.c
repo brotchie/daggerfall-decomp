@@ -26,7 +26,7 @@ extern char D_001A9B04[];
 extern char D_001A9B08[];
 extern char D_001A9B0C[];
 extern char D_001A9B10[];
-extern char D_001A9B14[];
+extern struct record *D_001A9B14;
 extern char D_001A9B18[];
 extern char D_001A9B1C[];
 extern char D_001A9B20[];
@@ -578,7 +578,7 @@ L8E857:;
 L8E866:;
     l_10->type = a2;
     l_10->image = a4;
-    *(short *)((char *)l_10 + 19) = a5;
+    l_10->pad13 = a5;
     l_10->id = D_00195AC4->id + ((int)(unsigned short)(current_location->object_counter)++);
     if (l_10->id != (-1016397758)) goto L8E8D7;
     mc_memcpy((int)D_001A9B44, l_10, 71, (int)D_00176E44, 634, 4);
@@ -590,27 +590,27 @@ L8E8D7:;
 int object_find_by_id_cb(struct record *a1)
 {
     if (a1->id != *(int *)D_001A9B18) goto L8E910;
-    *(int *)D_001A9B14 = (int)a1;
+    D_001A9B14 = a1;
 L8E910:;
-    return *(int *)D_001A9B14;
+    return (int)D_001A9B14;
 }
 
 struct record *object_find_by_id(struct record *a1, int a2)
 {
     *(int *)D_001A9B18 = a2;
-    *(int *)D_001A9B14 = 0;
+    D_001A9B14 = 0;
     if (a1 != 0) goto L8E99F;
     object_foreach(D_00195AC4, (int)object_find_by_id_cb);
-    *(int *)D_00199770 = *(int *)D_001A9B14;
-    if (*(int *)D_001A9B14 == 0) goto L8E97C;
-    return *(struct record **)D_001A9B14;
+    *(int *)D_00199770 = (int)D_001A9B14;
+    if ((int)D_001A9B14 == 0) goto L8E97C;
+    return D_001A9B14;
 L8E97C:;
     object_foreach(nonworld_root, (int)object_find_by_id_cb);
-    *(int *)D_00199770 = *(int *)D_001A9B14;
-    return *(struct record **)D_001A9B14;
+    *(int *)D_00199770 = (int)D_001A9B14;
+    return D_001A9B14;
 L8E99F:;
     object_find(a1, (int)object_find_by_id_cb);
-    return *(struct record **)D_001A9B14;
+    return D_001A9B14;
 }
 
 int object_random_type_cb(struct record *a1)
@@ -689,7 +689,7 @@ void object_delete_quest_cb(struct record *a1)
 
     if (a1->quest_id != *(signed char *)itemmaker_slot_kinds) return;
     if (a1->type != 8) goto L8EC65;
-    if (((int)(unsigned char)(*(signed char *)((char *)a1 + 73) & 128)) == 0) goto L8EC65;
+    if (((int)(unsigned char)(a1->data.person.flags & 128)) == 0) goto L8EC65;
     a1->twin->twin = 0;
     a1->twin = 0;
     a1->quest_id = 0;

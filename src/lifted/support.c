@@ -34,7 +34,7 @@ extern char D_001940D5[];
 extern char D_001940D6[];
 extern char D_001940DA[];
 extern char D_001940E4[];
-extern char D_001959E0[];
+extern struct record *D_001959E0;
 extern struct record *D_001959EC;
 extern struct record *D_001959F0;
 extern struct record *D_001959F4;
@@ -50,7 +50,7 @@ extern struct record *D_00195AF4;
 extern char picklist_image[];
 extern char D_00195B00[];
 extern char creature_count[];
-extern char guild_npc_object[];
+extern struct record *guild_npc_object;
 extern char D_00195B84[];
 extern char hud_message_expiry[];
 extern char hud_status_expiry[];
@@ -87,7 +87,7 @@ extern struct record *people_list[];
 extern char people_count[];
 extern struct quest *current_quest;
 extern char nearest_fire_distance[];
-extern char nearest_fire[];
+extern struct record *nearest_fire;
 extern char D_001A3F40[];
 extern char D_001A4FE8[];
 extern char D_001A4FEC[];
@@ -530,7 +530,7 @@ L7D91D:;
     l_18 = func_000C7FF4(player_object->y - a1->y, func_000C7FD9(player_object->x, player_object->z, a1->x, a1->z));
     if (l_18 >= *(int *)nearest_fire_distance) goto L7D973;
     *(int *)nearest_fire_distance = l_18;
-    *(int *)nearest_fire = (int)a1;
+    nearest_fire = a1;
 L7D973:;
     return;
 case 18:
@@ -544,7 +544,7 @@ L7D9A4:;
 L7D9C2:;
     goto L7D9D5;
 L7D9C4:;
-    detect_consider_creature(a1, (int)(unsigned short)*(short *)((char *)a1 + 23));
+    detect_consider_creature(a1, a1->detect_distance);
 L7D9D5:;
     return;
 case 2:
@@ -575,8 +575,8 @@ case 34:
     switch (((int)(unsigned short)(a1->image & 31)) - 2) {
 case 13:
 case 14:
-    if (a1->pad19 != 0) goto L7DABA;
-    a1->pad19 = rand();
+    if (a1->spawn_seed != 0) goto L7DABA;
+    a1->spawn_seed = rand();
 L7DABA:;
     place_spawn_from_marker(a1);
     goto L7DB53;
@@ -628,7 +628,7 @@ void world_collect_objects(void)
     struct record *l_1C;
     struct record *l_18;
 
-    *(int *)nearest_fire = 0;
+    nearest_fire = 0;
     *(int *)nearest_fire_distance = 2048;
     if (((int)(unsigned char)*(signed char *)player_environment) != 2) goto L7DC65;
     current_building = object_building(player_object);
@@ -798,7 +798,7 @@ int func_0007E1A7(struct record *a1)
     func_00135E39();
     l_1C = func_00135DE4(a1->image >> 7, (int)(unsigned short)(a1->image & 127));
 L7E213:;
-    return ((*(unsigned short *)((char *)a1 + 23) >= *(unsigned short *)((char *)l_1C + 20)) ? 1 : 0);
+    return ((a1->anim_frame >= *(unsigned short *)((char *)l_1C + 20)) ? 1 : 0);
 }
 
 void func_0007E246(struct record *a1)
@@ -811,21 +811,21 @@ void func_0007E246(struct record *a1)
     func_00135E39();
     l_1C = func_00135DE4(a1->image >> 7, (int)(unsigned short)(a1->image & 127));
 L7E2B2:;
-    l_18 = ((*(int *)D_001343C0 >> 5) - ((int)(unsigned short)*(short *)((char *)a1 + 19))) << 5;
+    l_18 = ((*(int *)D_001343C0 >> 5) - a1->anim_time) << 5;
     if (l_18 < 0) goto L7E2DE;
     if (l_18 <= 2000) goto L7E2EA;
 L7E2DE:;
     l_18 = (int)(unsigned short)*(short *)((char *)l_1C + 22);
 L7E2EA:;
     if (((int)(unsigned short)*(short *)((char *)l_1C + 22)) > l_18) return;
-    *(short *)((char *)a1 + 19) = *(int *)D_001343C0 >> 5;
-    (*(short *)((char *)a1 + 23))++;
+    a1->anim_time = *(int *)D_001343C0 >> 5;
+    a1->anim_frame++;
 }
 
 void func_0007E31C(struct record *a1)
 {
-    *(short *)((char *)a1 + 19) = *(int *)D_001343C0 >> 5;
-    *(short *)((char *)a1 + 23) = 0;
+    a1->anim_time = *(int *)D_001343C0 >> 5;
+    a1->anim_frame = 0;
 }
 
 void func_0007EB0B(struct record *a1, int a2)
@@ -1131,7 +1131,7 @@ void gold_make_credit_letter(int a1)
 {
     struct record *l_18;
 
-    l_18 = item_add_to_container(*(int *)D_001959E0, 27, 2, 0);
+    l_18 = item_add_to_container((int)D_001959E0, 27, 2, 0);
     l_18->data.item.value = a1;
 }
 
@@ -1264,7 +1264,7 @@ L7F902:;
     if (l_1C == 0) goto L7F9A3;
     l_18 = l_1C->next;
     if (l_1C->type != 64) goto L7F932;
-    if (((unsigned)*(int *)((char *)l_1C + 43)) < *(int *)game_minutes) goto L7F934;
+    if (((unsigned)l_1C->building_id) < *(int *)game_minutes) goto L7F934;
 L7F932:;
     goto L7F93E;
 L7F934:;
@@ -1272,7 +1272,7 @@ L7F934:;
     goto L7F998;
 L7F93E:;
     if (l_1C->type != 64) goto L7F961;
-    if (object_find_by_id(D_00195AC4, *(int *)((char *)l_1C + 43)) != 0) goto L7F963;
+    if (object_find_by_id(D_00195AC4, l_1C->building_id) != 0) goto L7F963;
 L7F961:;
     goto L7F998;
 L7F963:;
@@ -1319,7 +1319,7 @@ void location_store_objects(void)
     *(int *)free_later_count = 0;
     func_0008E447(D_00195AC4->children, (int)func_0007FF73);
     if (D_001959F4 == 0) goto L7FB6B;
-    *(int *)guild_npc_object = (int)D_001959F4;
+    guild_npc_object = D_001959F4;
     func_0008E447(D_00195AC4, (int)func_0007FCBF);
     l_1C = current_location->buildings;
     l_18 = 0;
@@ -1343,7 +1343,7 @@ L7FB17:;
     l_20 = object_create_child(D_001959F4, 0, 26);
     l_20->type = 64;
     l_20->image = l_18;
-    *(int *)((char *)l_20 + 43) = l_1C->id;
+    l_20->building_id = l_1C->id;
     mc_memcpy(RECORD_DATA(l_20), l_1C, 26, (int)D_00176A10, 1392, 4);
 L7FB66:;
     goto L7FAD5;
@@ -1354,8 +1354,8 @@ L7FB90:;
     goto L7FC14;
 L7FB95:;
     object_free_children(D_001959EC);
-    if ((*(int *)guild_npc_object = (int)D_001959EC) != 0) goto L7FBED;
-    *(int *)guild_npc_object = (int)(D_001959EC = object_create_child(player_entity, 0, 0));
+    if ((*(int *)&guild_npc_object = (int)D_001959EC) != 0) goto L7FBED;
+    guild_npc_object = (struct record *)((int)(D_001959EC = object_create_child(player_entity, 0, 0)));
     D_001959EC->type = 52;
     D_001959EC->flags = 3;
     D_001959EC->image = 5;
@@ -1369,8 +1369,8 @@ L7FC31:;
     goto L7FCB0;
 L7FC36:;
     object_free_children(D_001959F0);
-    if ((*(int *)guild_npc_object = (int)D_001959F0) != 0) goto L7FC8E;
-    *(int *)guild_npc_object = (int)(D_001959F0 = object_create_child(player_entity, 0, 0));
+    if ((*(int *)&guild_npc_object = (int)D_001959F0) != 0) goto L7FC8E;
+    guild_npc_object = (struct record *)((int)(D_001959F0 = object_create_child(player_entity, 0, 0)));
     D_001959F0->type = 52;
     D_001959F0->flags = 3;
     D_001959F0->image = 6;
@@ -1398,9 +1398,9 @@ L7FCFB:;
 L7FD35:;
     return;
 L7FD37:;
-    *(int *)((char *)a1 + 47) = l_18->id;
-    *(int *)((char *)a1 + 43) = l_18->rent_expires;
-    object_reparent((struct record *)*(int *)guild_npc_object, a1);
+    a1->home_id = l_18->id;
+    a1->repair_due = l_18->rent_expires;
+    object_reparent(guild_npc_object, a1);
     a1->type = 58;
     a1->id = object_new_id(100);
 }
@@ -1410,11 +1410,11 @@ void func_0007FD7E(struct record *a1)
     struct record *l_18;
 
     if (a1->type != 58) return;
-    if (((unsigned)*(int *)game_minutes) <= *(int *)((char *)a1 + 43)) goto L7FDB6;
+    if (((unsigned)*(int *)game_minutes) <= a1->repair_due) goto L7FDB6;
     object_delete(a1);
     return;
 L7FDB6:;
-    l_18 = object_find_by_id(D_00195AC4, *(int *)((char *)a1 + 47));
+    l_18 = object_find_by_id(D_00195AC4, a1->home_id);
     if (l_18 == 0) return;
     object_reparent(l_18, a1);
     a1->type = 33;
@@ -1446,8 +1446,8 @@ L7FE62:;
     return;
 L7FE64:;
     l_18 = object_building(a1);
-    *(int *)((char *)a1 + 47) = l_18->id;
-    object_reparent((struct record *)*(int *)guild_npc_object, a1);
+    a1->home_id = l_18->id;
+    object_reparent(guild_npc_object, a1);
     if (a1->type != 33) goto L7FE9D;
     a1->type = 58;
 L7FE9D:;
@@ -1479,7 +1479,7 @@ L7FF2C:;
 L7FF2E:;
     return;
 L7FF30:;
-    l_18 = object_find_by_id(D_00195AC4, *(int *)((char *)a1 + 47));
+    l_18 = object_find_by_id(D_00195AC4, a1->home_id);
     if (l_18 == 0) goto L7FF56;
     object_reparent(l_18, a1);
     goto L7FF63;
@@ -1496,7 +1496,7 @@ void func_0007FF73(struct record *a1)
     object_free_single(a1);
     return;
 L7FFAF:;
-    *(int *)((char *)a1 + 47) = a1->parent->id;
+    a1->home_id = a1->parent->id;
     a1->id = object_new_id(100);
     object_reparent(D_001959F8, a1);
 }
@@ -1510,7 +1510,7 @@ void func_0007FFE7(struct record *a1)
     object_free_single(a1);
     return;
 L80023:;
-    l_18 = object_find_by_id(D_00195AC4, *(int *)((char *)a1 + 47));
+    l_18 = object_find_by_id(D_00195AC4, a1->home_id);
     if (l_18 == 0) return;
     object_reparent(l_18, a1);
 }

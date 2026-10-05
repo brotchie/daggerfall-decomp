@@ -31,12 +31,12 @@ void weather_draw_precipitation(void)
         kind = region_precipitation_override[current_region].f0 - 1;
     if ((kind & 127) == 5) {
         old = D_0014294C;
-        D_0014294C = (*(unsigned short *)game_settings & 1) ? 199 : hud_bar_image->f2 - 2;
+        D_0014294C = (game_settings->view_flags & 1) ? 199 : hud_bar_image->f2 - 2;
         func_000C9A89();
         D_0014294C = old;
     } else if ((kind & 127) == 4) {
         old = D_0014294C;
-        D_0014294C = (*(unsigned short *)game_settings & 1) ? 199 : hud_bar_image->f2 - 2;
+        D_0014294C = (game_settings->view_flags & 1) ? 199 : hud_bar_image->f2 - 2;
         func_000C9CB9();
         D_0014294C = old;
     }

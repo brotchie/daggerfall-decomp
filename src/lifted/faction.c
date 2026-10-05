@@ -60,12 +60,12 @@ extern void object_foreach(struct record *, int);
 int faction_count_allies(struct faction *);
 int faction_count_enemies(struct faction *);
 int rumor_collect_local(void);
-int rumor_copy(int, int);
+int rumor_copy(int, struct rumor *);
 void faction_link_relations(struct faction *);
 void faction_free(void);
 void faction_save_r(int, struct faction *);
 void func_0001CB3C(struct record *);
-void func_0001DA9C(int, int);
+void func_0001DA9C(struct rumor *, int);
 #pragma aux func_000A0ED9 parm routine [];
 
 void faction_link_relations(struct faction *a1)
@@ -580,7 +580,7 @@ L1C903:;
     if (l_20->type != (a2 + 45)) goto L1C943;
     l_1C = &l_20->data.character;
     if (a1 == (-1)) goto L1C93D;
-    if (((int)(unsigned short)*(short *)((char *)l_1C + 549)) != a1) goto L1C943;
+    if (l_1C->career_id != a1) goto L1C943;
 L1C93D:;
     l_18++;
 L1C943:;
@@ -848,7 +848,7 @@ void rumor_file_close(void)
 int rumor_collect_local(void)
 {
     int l_24;
-    int l_20;
+    struct rumor *l_20;
     int l_1C;
 
     l_24 = *(int *)D_00147954 + 60000;
@@ -865,17 +865,17 @@ L1D21C:;
     return 0;
 L1D241:;
     l_1C = (int)(*(char **)D_00147954 + *(int *)disk_last_file_size);
-    l_20 = *(int *)D_00147954;
+    l_20 = (struct rumor *)*(int *)D_00147954;
 L1D259:;
     if (((unsigned)l_20) >= l_1C) goto L1D2C9;
-    if (func_0001D54B(l_20, 0, 1, 0) == 0) goto L1D2B6;
-    mc_memcpy(l_24, l_20 + 34, *(int *)((char *)l_20 + 26), (int)D_00170464, 1658, 4);
-    l_24 += *(int *)((char *)l_20 + 26) - 1;
+    if (func_0001D54B((int)l_20, 0, 1, 0) == 0) goto L1D2B6;
+    mc_memcpy(l_24, (int)l_20 + 34, l_20->text_length, (int)D_00170464, 1658, 4);
+    l_24 += l_20->text_length - 1;
     *(signed char *)((char *)l_24 + 1) = 252;
     *(signed char *)((char *)l_24) = *(signed char *)((char *)l_24 + 1);
     l_24 += 2;
 L1D2B6:;
-    l_20 = (l_20 + *(int *)((char *)l_20 + 26)) + 34;
+    l_20 = (struct rumor *)(((int)l_20 + l_20->text_length) + 34);
     goto L1D259;
 L1D2C9:;
     *(signed char *)((char *)l_24) = 0;
@@ -924,7 +924,7 @@ L1D41D:;
 
 int func_0001D46A(int a1)
 {
-    int l_20;
+    struct rumor *l_20;
     int l_1C;
 
     if (disk_file_exists((int)D_001704BB) != 0) goto L1D495;
@@ -935,75 +935,75 @@ L1D495:;
     return 0;
 L1D4BA:;
     l_1C = (int)(*(char **)D_00195C44 + *(int *)disk_last_file_size);
-    l_20 = *(int *)D_00195C44;
+    l_20 = (struct rumor *)*(int *)D_00195C44;
 L1D4D2:;
     if (((unsigned)l_20) >= l_1C) goto L1D537;
-    if (((int)(unsigned char)(*(signed char *)((char *)l_20 + 9) & 2)) == 0) goto L1D4F6;
-    if (*(int *)((char *)l_20 + 22) == a1) goto L1D4F8;
+    if (((int)(unsigned char)(l_20->flags & 2)) == 0) goto L1D4F6;
+    if (l_20->target == a1) goto L1D4F8;
 L1D4F6:;
     goto L1D524;
 L1D4F8:;
-    mc_memcpy(*(int *)D_00195C44, l_20 + 34, *(int *)((char *)l_20 + 26), (int)D_00170464, 1720, 4);
+    mc_memcpy(*(int *)D_00195C44, (int)l_20 + 34, l_20->text_length, (int)D_00170464, 1720, 4);
     return *(int *)D_00195C44;
 L1D524:;
-    l_20 = (l_20 + *(int *)((char *)l_20 + 26)) + 34;
+    l_20 = (struct rumor *)(((int)l_20 + l_20->text_length) + 34);
     goto L1D4D2;
 L1D537:;
     return 0;
 }
 
-int func_0001D66C(int a1)
+int func_0001D66C(struct rumor *a1)
 {
     int l_1C;
 
     l_1C = 0;
-    if (*(int *)((char *)a1 + 4) == 10) goto L1D696;
-    if (*(int *)((char *)a1 + 4) != 18) goto L1D698;
+    if (a1->kind == 10) goto L1D696;
+    if (a1->kind != 18) goto L1D698;
 L1D696:;
     goto L1D6A1;
 L1D698:;
-    if (*(int *)((char *)a1 + 4) != 7) goto L1D6A3;
+    if (a1->kind != 7) goto L1D6A3;
 L1D6A1:;
     goto L1D6AC;
 L1D6A3:;
-    if (*(int *)((char *)a1 + 4) != 4) goto L1D6AE;
+    if (a1->kind != 4) goto L1D6AE;
 L1D6AC:;
     goto L1D6B7;
 L1D6AE:;
-    if (*(int *)((char *)a1 + 4) != 28) goto L1D6B9;
+    if (a1->kind != 28) goto L1D6B9;
 L1D6B7:;
     goto L1D6C2;
 L1D6B9:;
-    if (*(int *)((char *)a1 + 4) != 27) goto L1D6C4;
+    if (a1->kind != 27) goto L1D6C4;
 L1D6C2:;
     goto L1D6CD;
 L1D6C4:;
-    if (*(int *)((char *)a1 + 4) != 26) goto L1D6D1;
+    if (a1->kind != 26) goto L1D6D1;
 L1D6CD:;
     l_1C |= 1;
 L1D6D1:;
-    if (*(int *)((char *)a1 + 4) == 10) goto L1D6E3;
-    if (*(int *)((char *)a1 + 4) != 18) goto L1D6E5;
+    if (a1->kind == 10) goto L1D6E3;
+    if (a1->kind != 18) goto L1D6E5;
 L1D6E3:;
     goto L1D6EE;
 L1D6E5:;
-    if (*(int *)((char *)a1 + 4) != 7) goto L1D6F0;
+    if (a1->kind != 7) goto L1D6F0;
 L1D6EE:;
     goto L1D6F9;
 L1D6F0:;
-    if (*(int *)((char *)a1 + 4) != 4) goto L1D6FB;
+    if (a1->kind != 4) goto L1D6FB;
 L1D6F9:;
     goto L1D704;
 L1D6FB:;
-    if (*(int *)((char *)a1 + 4) != 28) goto L1D706;
+    if (a1->kind != 28) goto L1D706;
 L1D704:;
     goto L1D70F;
 L1D706:;
-    if (*(int *)((char *)a1 + 4) != 27) goto L1D711;
+    if (a1->kind != 27) goto L1D711;
 L1D70F:;
     goto L1D71A;
 L1D711:;
-    if (*(int *)((char *)a1 + 4) != 26) goto L1D722;
+    if (a1->kind != 26) goto L1D722;
 L1D71A:;
     return l_1C;
 L1D722:;
@@ -1021,7 +1021,7 @@ void func_0001D739(void)
 
 void rumor_file_purge(void)
 {
-    int l_28;
+    struct rumor *l_28;
     int l_24;
     int l_20;
     struct quest *l_1C;
@@ -1031,51 +1031,51 @@ void rumor_file_purge(void)
     if (disk_file_exists((int)D_001704BB) == 0) return;
     disk_read_file((int)D_001704BB, *(int *)D_00147954);
     if (*(int *)disk_last_file_size == 0) return;
-    l_28 = *(int *)D_00147954;
+    l_28 = (struct rumor *)*(int *)D_00147954;
     l_24 = *(int *)D_00195C44;
     l_20 = (int)(*(char **)D_00147954 + *(int *)disk_last_file_size);
 L1D911:;
     if (((unsigned)l_28) >= l_20) goto L1DA0A;
-    if (((int)(unsigned char)(*(signed char *)((char *)l_28 + 9) & 4)) == 0) goto L1D975;
-    l_1C = quest_find_by_id((int)(short)((unsigned short)(unsigned char)*(signed char *)((char *)l_28 + 10)));
+    if (((int)(unsigned char)(l_28->flags & 4)) == 0) goto L1D975;
+    l_1C = quest_find_by_id((int)(short)((unsigned short)l_28->quest_id));
     if (l_1C == 0) goto L1D9F4;
-    if (stricmp(l_1C->name, l_28 + 11) != 0) goto L1D9F4;
+    if (stricmp(l_1C->name, (int)l_28 + 11) != 0) goto L1D9F4;
     l_24 = rumor_copy(l_24, l_28);
     goto L1D9F4;
 L1D975:;
-    if (((unsigned)*(int *)game_minutes) > *(int *)((char *)l_28 + 30)) goto L1D9F4;
-    if (((int)(unsigned char)(*(signed char *)((char *)l_28 + 9) & 8)) == 0) goto L1D9A8;
+    if (((unsigned)*(int *)game_minutes) > l_28->expires) goto L1D9F4;
+    if (((int)(unsigned char)(l_28->flags & 8)) == 0) goto L1D9A8;
     l_24 = rumor_copy(l_24, l_28);
     goto L1D9F4;
 L1D9A8:;
-    if (((int)(unsigned char)(*(signed char *)((char *)l_28 + 9) & 2)) == 0) goto L1D9F4;
-    if (((int)(unsigned char)(*(signed char *)((char *)l_28 + 9) & 32)) != 0) goto L1D9F4;
+    if (((int)(unsigned char)(l_28->flags & 2)) == 0) goto L1D9F4;
+    if (((int)(unsigned char)(l_28->flags & 32)) != 0) goto L1D9F4;
     l_18++;
     l_24 = rumor_copy(l_24, l_28);
     if (l_18 <= 200) goto L1D9F4;
-    func_0001DA9C(*(int *)D_00195C44, l_24);
+    func_0001DA9C((struct rumor *)*(int *)D_00195C44, l_24);
 L1D9F4:;
-    l_28 = (l_28 + *(int *)((char *)l_28 + 26)) + 34;
+    l_28 = (struct rumor *)(((int)l_28 + l_28->text_length) + 34);
     goto L1D911;
 L1DA0A:;
     disk_write_arena2_file((int)D_001704BB, *(int *)D_00195C44, l_24 - *(int *)D_00195C44);
 }
 
-int rumor_copy(int a1, int a2)
+int rumor_copy(int a1, struct rumor *a2)
 {
-    mc_memcpy(a1, a2, 34, (int)D_00170464, 1873, 4);
-    mc_memcpy(a1 + 34, a2 + 34, *(int *)((char *)a2 + 26), (int)D_00170464, 1874, 4);
-    return (a1 + 34) + *(int *)((char *)a2 + 26);
+    mc_memcpy(a1, (int)a2, 34, (int)D_00170464, 1873, 4);
+    mc_memcpy(a1 + 34, (int)a2 + 34, a2->text_length, (int)D_00170464, 1874, 4);
+    return (a1 + 34) + a2->text_length;
 }
 
-void func_0001DA9C(int a1, int a2)
+void func_0001DA9C(struct rumor *a1, int a2)
 {
 L1DAAF:;
     if (((unsigned)a1) >= a2) return;
-    if (((int)(unsigned char)(*(signed char *)((char *)a1 + 9) & 2)) == 0) goto L1DAD1;
-    *(signed char *)((char *)a1 + 9) |= 32;
+    if (((int)(unsigned char)(a1->flags & 2)) == 0) goto L1DAD1;
+    a1->flags |= 32;
     return;
 L1DAD1:;
-    a1 = (a1 + *(int *)((char *)a1 + 26)) + 34;
+    a1 = (struct rumor *)(((int)a1 + a1->text_length) + 34);
     goto L1DAAF;
 }

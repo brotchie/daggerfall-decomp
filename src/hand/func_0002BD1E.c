@@ -17,12 +17,6 @@ extern struct record *object_find_by_id(struct record *, int);
         if ((short)o->quest_id != a1->id) fatal_error(msg); \
         o = (struct record *)o->id; \
     }
-/* the same for a timer's links, kept as ints */
-#define FIXI(v, msg) \
-    if (v) { \
-        if ((short)((struct record *)v)->quest_id != a1->id) fatal_error(msg); \
-        v = ((struct record *)v)->id; \
-    }
 
 void quest_unlink_for_save(struct quest *a1)
 {
@@ -61,8 +55,8 @@ void quest_unlink_for_save(struct quest *a1)
             if (object_find_by_id(nonworld_root, (int)l_38->object) == 0) fatal_error(D_0017089B);
             if (l_38->object == 0) fatal_error(D_001708B7);
             /* +0x03 the place's type (10: a fixed object), +0x04/+0x06 the object id's halves */
-            if (*(signed char *)((char *)l_38 + 3) == 10) {
-                if (((*(unsigned short *)((char *)l_38 + 6) & 0xffff) | (*(unsigned short *)((char *)l_38 + 4) << 16)) != (int)l_38->object)
+            if (l_38->scope == 10) {
+                if ((((unsigned short)l_38->p2 & 0xffff) | (l_38->p1 << 16)) != (int)l_38->object)
                     fatal_error(D_001708D1);
             }
         }
@@ -77,7 +71,7 @@ void quest_unlink_for_save(struct quest *a1)
     }
     l_18 = (struct qbn_timer *)((char *)a1 + a1->section_offsets[6]);
     for (l_1C = 0; l_1C < a1->section_counts[6]; l_1C++, l_18++) {
-        FIXI(l_18->link1, D_00170878)
-        FIXI(l_18->link2, D_00170878)
+        FIX(l_18->link1, D_00170878)
+        FIX(l_18->link2, D_00170878)
     }
 }

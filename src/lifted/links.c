@@ -194,80 +194,80 @@ void link_hurt_player(int a1, int a2)
     object_delete(l_18);
 }
 
-void link_start(int a1)
+void link_start(struct link *a1)
 {
     int l_20;
     int l_1C;
     int l_18;
 
-    *(signed char *)((char *)a1 + 12) &= 250;
-    switch (*(unsigned char *)((char *)a1 + 9)) {
+    a1->flags &= 250;
+    switch (a1->action) {
 case 1:
-    if (*(short *)((char *)a1 + 5) == 0) goto L65569;
-    *(int *)((char *)a1 + 17) = (((int)(short)*(short *)((char *)a1 + 7)) << 16) / ((int)(short)*(short *)((char *)a1 + 5));
+    if (a1->duration == 0) goto L65569;
+    a1->speed = (a1->magnitude << 16) / a1->duration;
     goto L65579;
 L65569:;
-    *(int *)((char *)a1 + 17) = ((int)(short)*(short *)((char *)a1 + 7)) << 16;
+    a1->speed = a1->magnitude << 16;
 L65579:;
-    if (((int)(unsigned char)(*(signed char *)((char *)a1 + 12) & 2)) == 0) goto L65590;
-    *(int *)((char *)a1 + 17) = -(*(int *)((char *)a1 + 17));
+    if (((int)(unsigned char)(a1->flags & 2)) == 0) goto L65590;
+    a1->speed = -a1->speed;
 L65590:;
     l_1C = 1132;
-    *(int *)((char *)a1 + 25) = *(int *)((char *)l_1C);
-    switch (((int)(unsigned char)*(signed char *)((char *)a1 + 4)) - 1) {
+    a1->start_tick = *(int *)((char *)l_1C);
+    switch (a1->axis - 1) {
     goto L655FC;
 case 0:
 case 1:
-    *(int *)((char *)a1 + 13) = *(int *)(*(char **)((char *)a1 + 35) + 7);
+    a1->start = a1->object->x;
     goto L655FC;
 case 2:
 case 3:
-    *(int *)((char *)a1 + 13) = *(int *)(*(char **)((char *)a1 + 35) + 11);
+    a1->start = a1->object->y;
     goto L655FC;
 case 4:
 case 5:
-    *(int *)((char *)a1 + 13) = *(int *)(*(char **)((char *)a1 + 35) + 15);
+    a1->start = a1->object->z;
 default:
 L655FC:;
     return;
 }
 case 8:
-    if (*(short *)((char *)a1 + 5) == 0) goto L6562B;
-    *(int *)((char *)a1 + 17) = (((int)(short)*(short *)((char *)a1 + 7)) << 16) / ((int)(short)*(short *)((char *)a1 + 5));
+    if (a1->duration == 0) goto L6562B;
+    a1->speed = (a1->magnitude << 16) / a1->duration;
     goto L6563B;
 L6562B:;
-    *(int *)((char *)a1 + 17) = ((int)(short)*(short *)((char *)a1 + 7)) << 16;
+    a1->speed = a1->magnitude << 16;
 L6563B:;
-    if (((int)(unsigned char)(*(signed char *)((char *)a1 + 12) & 2)) == 0) goto L65652;
-    *(int *)((char *)a1 + 17) = -(*(int *)((char *)a1 + 17));
+    if (((int)(unsigned char)(a1->flags & 2)) == 0) goto L65652;
+    a1->speed = -a1->speed;
 L65652:;
     l_18 = 1132;
-    *(int *)((char *)a1 + 25) = *(int *)((char *)l_18);
-    if (((int)(unsigned char)(*(signed char *)((char *)a1 + 12) & 32)) != 0) goto L6569E;
-    l_20 = func_000658CA((int)(unsigned short)*(short *)(*(char **)((char *)a1 + 35) + 29), (int)(unsigned short)*(short *)(*(char **)((char *)a1 + 35) + 27));
+    a1->start_tick = *(int *)((char *)l_18);
+    if (((int)(unsigned char)(a1->flags & 32)) != 0) goto L6569E;
+    l_20 = func_000658CA(a1->object->image2, a1->object->image);
     if (l_20 != 0) goto L656A0;
 L6569E:;
     goto L656C7;
 L656A0:;
-    *(signed char *)((char *)a1 + 12) |= 32;
-    if (((int)(unsigned char)(*(signed char *)((char *)a1 + 4) & 1)) == 0) goto L656BE;
+    a1->flags |= 32;
+    if (((int)(unsigned char)(a1->axis & 1)) == 0) goto L656BE;
     l_20++;
 L656BE:;
-    *(signed char *)((char *)a1 + 4) = *(signed char *)&l_20;
+    a1->axis = *(signed char *)&l_20;
 L656C7:;
-    switch (((int)(unsigned char)*(signed char *)((char *)a1 + 4)) - 1) {
+    switch (a1->axis - 1) {
     goto L65724;
 case 0:
 case 1:
-    *(int *)((char *)a1 + 13) = (int)(short)*(short *)(*(char **)((char *)a1 + 35) + 1);
+    a1->start = a1->object->angle_x;
     goto L65724;
 case 2:
 case 3:
-    *(int *)((char *)a1 + 13) = (int)(short)*(short *)(*(char **)((char *)a1 + 35) + 3);
+    a1->start = a1->object->yaw;
     goto L65724;
 case 4:
 case 5:
-    *(int *)((char *)a1 + 13) = (int)(short)*(short *)(*(char **)((char *)a1 + 35) + 5);
+    a1->start = a1->object->angle_z;
 default:
 L65724:;
     return;
@@ -277,8 +277,8 @@ case 17:
 case 18:
 case 19:
 case 20:
-    if (((int)(unsigned char)(*(signed char *)((char *)a1 + 12) & 2)) == 0) return;
-    *(signed char *)((char *)a1 + 12) |= 1;
+    if (((int)(unsigned char)(a1->flags & 2)) == 0) return;
+    a1->flags |= 1;
 default:;
 }
 }

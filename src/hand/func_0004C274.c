@@ -45,7 +45,7 @@ int quest_pick_file(unsigned char a1, unsigned char a2, unsigned char a3, unsign
         else if (ff.name[1] == a3)
             if (ff.name[2] == a4)
                 if (ff.name[3] - '0' <= a5)
-                    if ((*(unsigned short *)game_settings & 4) && (ff.name[4] == 'X' || ff.name[4] == 'Y'))
+                    if ((game_settings->view_flags & 4) && (ff.name[4] == 'X' || ff.name[4] == 'Y'))
                         ;
                     else
                         n = func_0004C4A0(ff.name, n);
@@ -60,7 +60,7 @@ int quest_pick_file(unsigned char a1, unsigned char a2, unsigned char a3, unsign
         else if (ff.name[1] == a3)
             if (ff.name[2] == a4)
                 if (ff.name[3] - '0' <= a5)
-                    if ((*(unsigned short *)game_settings & 4) && (ff.name[4] == 'X' || ff.name[4] == 'Y'))
+                    if ((game_settings->view_flags & 4) && (ff.name[4] == 'X' || ff.name[4] == 'Y'))
                         ;
                     else
                         n = func_0004C4A0(ff.name, n);

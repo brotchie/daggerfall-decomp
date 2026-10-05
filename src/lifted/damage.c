@@ -39,10 +39,10 @@ extern char D_0019629B[];
 extern char D_00196DC4[];
 extern char D_001970C4[];
 extern struct quest *current_quest;
-extern char quest_event_object[];
-extern char D_00199780[];
-extern char quest_prompt_op[];
-extern char quest_prompt_quest[];
+extern struct record *quest_event_object;
+extern struct quest *D_00199780;
+extern struct qbn_op *quest_prompt_op;
+extern struct quest *quest_prompt_quest;
 extern char D_001997AA[];
 
 extern int object_weight(struct record *);
@@ -380,8 +380,8 @@ void func_0002FDB0(struct record *a1)
     if (a1->type != 14) return;
     l_18 = &a1->data.quest;
     if (l_18->id != *(short *)D_001997AA) return;
-    *(int *)D_00199780 = (int)l_18;
-    *(int *)quest_event_object = (int)a1;
+    D_00199780 = l_18;
+    quest_event_object = a1;
 }
 
 void func_0002FE02(struct record *a1)
@@ -503,8 +503,8 @@ L30254:;
 void qaction_op29_prompt(struct quest *a1, struct qbn_op *a2)
 {
     *(signed char *)D_001940DA |= 32;
-    *(int *)quest_prompt_op = (int)a2;
-    *(int *)quest_prompt_quest = (int)a1;
+    quest_prompt_op = a2;
+    quest_prompt_quest = a1;
     quest_op_done(a1, a2);
     quest_show_message(a1, a2->args[3].value);
     quest_prompt_answer();
@@ -519,7 +519,7 @@ void quest_prompt_answer(void)
 L30411:;
     return;
 L30413:;
-    l_18 = *(struct qbn_state **)(*(char **)quest_prompt_op + 7 + (((int)(unsigned char)*(signed char *)D_00196271) * 15));
+    l_18 = *(struct qbn_state **)((char *)quest_prompt_op + 7 + (((int)(unsigned char)*(signed char *)D_00196271) * 15));
     if (l_18->is_global == 0) goto L30447;
     *(signed char *)(quest_global_states + l_18->value) = 1;
     goto L3044E;

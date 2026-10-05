@@ -30,8 +30,10 @@ usage:
         Repeats until nothing changes (outer casts become reachable once inner ones are done).
         --retype first turns the file's `extern char g[];` into the typed declaration for the
         globals in GLOBAL_TYPES (their loads become `*(T *)&g`, their address `(char *)&g`).
-        --prefer picks among union members: NAME (everywhere), VAR=NAME or FUNC:VAR=NAME; a
-        record's data (`r->data.X`) needs it: --prefer item, --prefer l_28=item.
+        --prefer picks among union members: NAME (everywhere), VAR=NAME or FUNC:VAR=NAME (VAR
+        may be a base expression, `a1->children`); a record's data (`r->data.X`) needs it,
+        --prefer item, --prefer l_28=item, and so do the header unions that start with a padNN
+        (records.h), --prefer l_14=light_radius.
         --dry lists the casts and their natural form without compiling.
 
 Address forms recognised: `(char *)V + N`, `(char *)V`, `*(char **)G + N`,
@@ -75,9 +77,84 @@ GLOBAL_TYPES = {
     "wagon_container": "record",
     "D_00195AF4": "record",             # an item record (inventory, arrows)
     "D_00195A80": "item",               # the item data shown by inv_item_info
+    # phase C: merged from the phase B agents' notes (build/structs/*.md)
+    "D_00195A00": "record",             # quest_root: its children are the type-14 quests
+    "D_00199780": "quest",              # quest_tick_data: the running quest's data
+    "D_00195D00": "record",             # quest_tick_object
+    "D_00199768": "record",             # the quest reward container
+    "quest_event_object": "record",
+    "quest_event_object2": "record",
+    "quest_prompt_op": "qbn_op",        # qaction_op29_prompt; quest_prompt_answer
+    "quest_prompt_quest": "quest",
+    "D_001959DC": "record",             # inventory_containers[1]
+    "D_001959E0": "record",             # inventory_containers[2] (letters of credit)
+    "D_001959E4": "record",             # inventory_containers[3]
+    "D_001959EC": "record",             # inventory_containers[5]: house_container
+    "D_001959F0": "record",             # inventory_containers[6]: ship_container
+    "D_001959F4": "record",             # inventory_containers[7]: room_storage_container
+    "D_001959F8": "record",             # inventory_containers[8]: repair_container
+    "options_object": "record",
+    "logbook_object": "record",
+    "bank_accounts": "record",          # the type-25 record: data.bank_accounts[62]
+    "bank_account": "bank_account",     # &bank_accounts->data.bank_accounts[region] (bank_open)
+    "tavern_building": "building",
+    "D_00196ABC": "building",           # tavern_room_list: the rented rooms' building entries
+    "factions": "faction",              # the faction tree (an array; the _r walkers' root)
+    "D_0019670C": "faction",            # the %-macro / rumor-template faction slots (parse.c)
+    "D_00196714": "faction",
+    "D_0019671C": "faction",            # faction_match
+    "D_00196720": "faction",
+    "D_00196724": "faction",
+    "D_00196728": "faction",
+    "talk_npc_own_faction": "faction",
+    "talk_npc_faction": "faction",
+    "talk_npc_record": "character",
+    "talk_npc_object": "record",
+    "D_00195A84": "character",          # text_macro_npc: npc_talk_record_build's record
+    "D_001A3AE0": "character",          # trade.c haggling: the customer (a4 + 71)
+    "itemmaker_item": "item",           # &record->data.item (itemmaker_pick_item)
+    "itemmaker_item_object": "record",
+    "guild_npc_object": "record",       # a scratch "found object" for callbacks
+    "spell_ready_missile": "record",
+    "spell_ready_touch": "record",
+    "D_00199D64": "spell",
+    "D_00195C48": "record",             # the object a collision hit
+    "D_00195CB8": "record",             # the floor object (automap_open walks its parents)
+    "D_00195C70": "record",             # the moving model
+    "detect_target": "record",
+    "D_00195A88": "record",             # the player object's parent while riding (main.c)
+    "D_001A4FE0": "record",             # the root load_fix_object_cb searches
+    "D_00195CE8": "record",             # the clicked NPC (quest_init_person)
+    "D_001970D4": "record",             # the other town's location object (quest places)
+    "D_001970D8": "location",           # its data
+    "D_001A9B14": "record",             # object_find_by_id's result
+    "repair_menu_npc": "record",
+    "coven_menu_npc": "record",
+    "service_menu_npc": "record",
+    "D_00195AEC": "record",             # the shelf whose items are shown
+    "location_here": "map_location",
+    "D_00196A9C": "map_location",       # region_locations: MAPTABLE, indexed x17
+    "loaded_location_object": "record",
+    "loaded_location_data": "location",
+    "D_00199714": "record",             # kludge.c door and creature scratch
+    "D_00199720": "record",
+    "D_00199724": "record",
+    "nearest_fire": "record",
+    "nearest_creature": "record",
+    "D_00196DA0": "record",             # automap_record (type 51)
+    "D_00196DB0": "record",             # automap_selected_object
+    "D_001995EC": "link",               # the link fs2df.c is building (in D_00199D78[])
+    "D_001995E4": "link",               # the first link of its chain
+    "model_cache_root": "model_node",
     # arrays of record pointers
     "inventory_containers[]": "record",
     "D_00190504[]": "record",           # the creatures (creature_count of them)
+    "ai_entities[]": "record",          # ai_update_creatures fills it from D_00190504
+    "ai_characters[]": "character",     # ai_entities[i] + 71
+    "potion_ingredients[]": "record",
+    "potion_cauldron[]": "record",
+    "people_list[]": "record",          # pedestrians (people_count of them)
+    "collide_candidates[]": "record",   # func_0002325A fills up to 128
 }
 GLOBAL_BASES = {"*" + g: t for g, t in GLOBAL_TYPES.items() if not g.endswith("[]")}
 
@@ -89,13 +166,15 @@ BASIC = {"char": 1, "signed char": 1, "unsigned char": 1, "short": 2, "unsigned 
 # ---- records.h layout ---------------------------------------------------------------------
 
 class Field:
-    def __init__(self, name, off, ctype, dims, size, elem):
+    def __init__(self, name, off, ctype, dims, size, elem, bits=None):
         self.name, self.off, self.ctype, self.dims, self.size, self.elem = \
             name, off, ctype, dims, size, elem   # elem: size of one element (array) or size
+        self.bits = bits                         # a bitfield: (first bit, width) in its unit
 
     def __repr__(self):
-        return "%s @%#x %s%s" % (self.name, self.off, self.ctype,
-                                 "".join("[%d]" % d for d in self.dims))
+        return "%s @%#x %s%s%s" % (self.name, self.off, self.ctype,
+                                   "".join("[%d]" % d for d in self.dims),
+                                   ":%d" % self.bits[1] if self.bits else "")
 
 
 def strip_comments(text):
@@ -115,7 +194,7 @@ def parse_records(path=RECORDS_H):
     text = "\n".join(l for l in lines if not l.lstrip().startswith("#"))
     text = re.sub(r"RECORD_(SIZE|OFFSET)\([^)]*\);", "", text)
     text = strip_comments(text)
-    toks = re.findall(r"@[0-9A-Fa-f]+@|[A-Za-z_]\w*|\d+|[{}\[\];,*()]", text)
+    toks = re.findall(r"@[0-9A-Fa-f]+@|[A-Za-z_]\w*|\d+|[{}\[\];,*():]", text)
     structs = {}
     problems = []
     pos = [0]
@@ -165,11 +244,13 @@ def parse_records(path=RECORDS_H):
         raise SyntaxError("unknown type " + ctype)
 
     def parse_members(base, is_union):
-        """Parse members up to '}'; return (size, fields)."""
+        """Parse members up to '}'; return (size, fields). Bitfields share a unit of their
+        type's size (`unsigned x:25; unsigned type:5;` is one 4-byte unit), as Watcom packs them."""
         fields = []
         off = 0
         size = 0
         pending = []    # fields declared since the last offset marker
+        unit = None     # the open bitfield unit: [offset in the struct, size, bits used]
         while peek() != "}":
             if peek().startswith("@"):
                 # an offset comment belongs to the members declared just before it
@@ -182,6 +263,8 @@ def parse_records(path=RECORDS_H):
                 continue
             ctype, anon = parse_type()
             start = base + (0 if is_union else off)
+            if anon or peek(1) != ":":
+                unit = None
             if anon:
                 take("{")
                 sub_size, sub_fields = parse_members(start, anon == "anon-union")
@@ -209,6 +292,23 @@ def parse_records(path=RECORDS_H):
                     for d in dims:
                         n *= d
                     fctype = ctype + " " + "*" * ptr if ptr else ctype
+                    if peek() == ":":
+                        take()
+                        nbits = int(take())
+                        if unit is None or unit[1] != elem or unit[2] + nbits > 8 * elem:
+                            unit = [base + (0 if is_union else off + msize), elem, 0]
+                            msize += elem
+                        f = Field(name, unit[0], fctype.strip(), [], elem, elem, (unit[2], nbits))
+                        unit[2] += nbits
+                        fields.append(f)
+                        if not pending:
+                            pending.append(f)
+                        if peek() == ",":
+                            take()
+                            continue
+                        take(";")
+                        break
+                    unit = None
                     fstart = base + (0 if is_union else off + msize)
                     f = Field(name, fstart, fctype.strip(), dims, elem * n, elem)
                     fields.append(f)
@@ -246,17 +346,23 @@ def parse_records(path=RECORDS_H):
     return structs, problems
 
 
-def leaves(structs, tag, base=0, prefix=""):
-    """Flatten a struct into leaf fields: (offset, size, path, ctype, dims, elem)."""
+def leaves(structs, tag, base=0, prefix="", bits=False):
+    """Flatten a struct into leaf fields: (offset, size, path, ctype, dims, elem). Bitfields
+    are left out (an offset cast never names one) unless `bits`: their ctype is then
+    `unsigned int:FIRST:WIDTH`."""
     out = []
     for f in structs[tag][1]:
         p = prefix + f.name
+        if f.bits:
+            if bits:
+                out.append((base + f.off, f.size, p, "%s:%d:%d" % ((f.ctype,) + f.bits), [], f.elem, None))
+            continue
         if f.ctype.startswith("struct ") and not f.ctype.endswith("*"):
             sub = f.ctype[7:]
             if f.dims:
                 out.append((base + f.off, f.size, p, f.ctype, f.dims, f.elem, sub))
             else:
-                out += leaves(structs, sub, base + f.off, p + ".")
+                out += leaves(structs, sub, base + f.off, p + ".", bits)
         else:
             out.append((base + f.off, f.size, p, f.ctype, f.dims, f.elem, None))
     return out
@@ -467,8 +573,10 @@ def leaf_width(ctype):
     return 4 if ctype.endswith("*") else BASIC.get(ctype)
 
 
-def member_at(structs, tag, off, prefer=()):
-    """(path, ctype) of the scalar member that starts exactly at `off`, or None."""
+def member_at(structs, tag, off, prefer=(), width=None):
+    """(path, ctype) of the scalar member that starts exactly at `off`, or None. Among union
+    members: a --prefer name, else the first one (of the access's `width` when one is), but
+    none when the union's first member is a padNN (records.h: no default meaning)."""
     cands = []
     for (o, size, path, ctype, dims, elem, sub) in leaves(structs, tag):
         if not (o <= off < o + size):
@@ -504,6 +612,12 @@ def member_at(structs, tag, off, prefer=()):
     variants = {parts(c[0])[1] for c in real if parts(c[0])[0] == "data" and len(parts(c[0])) > 1}
     if len(variants) > 1:
         return None
+    if real and parts(cands[0][0])[-1].startswith("pad"):
+        return None             # a union without a default: --prefer says which
+    if real and width:
+        same = [c for c in real if leaf_width(c[1]) == width]
+        if same:
+            return same[0]
     return real[0] if real else cands[0]
 
 
@@ -683,18 +797,24 @@ def _postfix(e):
 
 def site_prefer(prefer_all, func, base):
     """The member names preferred for a cast through `base` in `func`: `--prefer` items are
-    NAME (everywhere), VAR=NAME (casts through VAR) or FUNC:VAR=NAME; scoped ones first."""
+    NAME (everywhere), VAR=NAME (casts through VAR, or through the base expression VAR:
+    `a1->children=light_radius`) or FUNC:VAR=NAME; the whole base expression first, then the
+    variable, then the plain names."""
     root = re.match(r"\w+", base).group(0)
-    scoped, plain = [], []
+    exact, scoped, plain = [], [], []
     for p in prefer_all:
         if "=" in p:
             lhs, name = p.split("=", 1)
             f, _c, var = lhs.rpartition(":")
-            if var == root and (not f or f == func):
+            if f and f != func:
+                continue
+            if var == base and var != root:
+                exact.append(name)
+            elif var == root:
                 scoped.append(name)
         else:
             plain.append(p)
-    return tuple(scoped + plain)
+    return tuple(exact + scoped + plain)
 
 
 def collect_sites(s, structs, prefer=()):
@@ -705,38 +825,58 @@ def collect_sites(s, structs, prefer=()):
     line_starts = [0] + [m.end() for m in re.finditer(r"\n", s)]
     import bisect
     sites, skipped = [], []
-    bare = re.compile(r"(&)?\*\((" + TYPES + r") ?\*\)&?(\w+)\b(?!\s*\()")
-    gfix = None
-    if glob:
-        gfix = re.compile(r"(\*\((?:" + TYPES + r") ?\*\))(" + "|".join(map(re.escape, glob)) + r")\b(?!\s*\()")
+    # `*(T *)&g`: the value of a retyped global (`*(T *)g` without the & is a load through a
+    # global already declared as a pointer: left alone)
+    bare = re.compile(r"(&)?\*\((" + TYPES + r") ?\*\)&(\w+)\b(?!\s*\()")
     for fname, _st, bo, be, _params in funcs:
         names = per[fname]
         body = s[bo:be]
         cand = []
-        # `*(T *)(g + (x << 2))` of an array of record pointers: g[x]
-        for m in re.finditer(r"\*\((int|char \*) ?\*\)\((?:\(char \*\))?(\w+)(?: \+ (\([^()]*\)|\w+))?\)", body):
-            g = m.group(2)
+        # `*(T *)((char *)g + (x << 2))` of an array of record pointers: g[x]
+        for m in re.finditer(r"\*\((int|char \*|struct \w+ \*) ?\*\)(\()(?:\(char \*\))?(\w+)\b", body):
+            g = m.group(3)
             if g + "[]" not in glob:
                 continue
-            if m.group(3) is None:
+            tag = glob[g + "[]"]
+            a = bo + m.start()
+            j = matching_paren(s, bo + m.end(2))
+            inner = s[bo + m.end(2):j]
+            terms = split_terms(inner)
+            if _strip(terms[0]) not in ("(char *)" + g, g) or len(terms) > 2:
+                continue
+            if len(terms) == 1:
                 x, e = "0", 4
-            elif re.fullmatch(r"\d+", m.group(3)):
-                if int(m.group(3)) % 4:
+            elif re.fullmatch(r"\d+", terms[1]):
+                if int(terms[1]) % 4:
                     continue
-                x, e = str(int(m.group(3)) // 4), 4
+                x, e = str(int(terms[1]) // 4), 4
             else:
-                x, e = index_term(m.group(3))
+                x, e = index_term(terms[1])
             if e != 4:
                 continue
-            a, b = bo + m.start(), bo + m.end()
-            t = m.group(1) if m.group(1) == "int" else "char *"
+            b = j + 1
+            t = m.group(1)
+            rawt = s[a:b]
+            elem = "%s[%s]" % (g, x)
             after = s[b:b + 16].lstrip()
-            rawt = "*(%s%s*)((char *)%s%s)" % (t, "" if t.endswith("*") else " ", g,
-                                              " + " + m.group(3) if m.group(3) else "")
-            if after.startswith(ASSIGN_OPS) or (after.startswith("=") and not after.startswith("==")):
+            if after.startswith("=") and not after.startswith("=="):
+                st = _store_rhs(s, s.index("=", b))
+                if not st:
+                    cand.append((a, b, {"r": rawt}, ""))
+                    continue
+                rhs, semi = st
+                mm = re.fullmatch(r"\(int\)(\w+)", rhs)
+                if t == "struct %s *" % tag or (mm and names.get(mm.group(1)) == tag) or rhs == "0":
+                    val = mm.group(1) if mm and names.get(mm.group(1)) == tag else rhs
+                else:
+                    val = _cast_to("struct %s *" % tag, rhs)
+                cand.append((a, semi, {"n": "%s = %s" % (elem, val), "r": s[a:semi]}, ""))
+            elif after.startswith(ASSIGN_OPS):
                 cand.append((a, b, {"r": rawt}, ""))
+            elif t == "struct %s *" % tag:
+                cand.append((a, b, {"n": elem, "r": rawt}, ""))
             else:
-                cand.append((a, b, {"n": "(%s)%s[%s]" % (t, g, x), "r": rawt}, ""))
+                cand.append((a, b, {"n": "(%s)%s" % (t, elem), "r": rawt}, ""))
         for m in DEREF.finditer(body):
             t = m.group(1)
             ds = bo + m.start()
@@ -750,9 +890,6 @@ def collect_sites(s, structs, prefer=()):
             raw = s[ds:j + 1]
             if fix:
                 raw = raw.replace(fix[0], fix[1], 1)
-            if gfix is not None:
-                # a retyped global: `*(char **)g` is `*(char **)&g`, the same value
-                raw = gfix.sub(r"\1&\2", raw)
 
             def skip(why):
                 skipped.append((fname, ln, why))
@@ -763,19 +900,19 @@ def collect_sites(s, structs, prefer=()):
                 continue
             size = structs[tag][0]
             btext = base
+            width = WIDTH.get(t, 4)
             if idx:
                 x, stride = index_term(idx[0])
                 if stride == size:
                     # an array of records: base[x]
                     k, off = divmod(off, size)
                     btext = "%s[%s]" % (base, x if k == 0 else "%s + %d" % (x, k))
-                    mem = member_at(structs, tag, off, prefer)
+                    mem = member_at(structs, tag, off, prefer, width)
                 else:
                     mem = indexed_member(structs, tag, off, x, stride, prefer)
             else:
-                mem = member_at(structs, tag, off, prefer)
+                mem = member_at(structs, tag, off, prefer, width)
             sep = "." if btext != base else "->"
-            width = WIDTH.get(t, 4)
             # context
             before = s[:ds]
             after = s[j + 1:j + 16].lstrip()
@@ -1124,8 +1261,8 @@ def retype_globals(s, names=None):
                 continue
             s = s.replace(decl, "extern struct %s *%s[];" % (tag, g))
             out, pos = [], 0
-            for m in re.finditer(r"\b%s\b" % re.escape(g), s):
-                if re.search(r"struct \w+ \*$", s[max(0, m.start() - 60):m.start()]):
+            for m in re.finditer(r"(?<![.>])\b%s\b" % re.escape(g), s):
+                if re.search(r"(?:struct \w+ \*|\bstruct\s+)$", s[max(0, m.start() - 60):m.start()]):
                     continue
                 out.append(s[pos:m.start()])
                 deref = re.search(r"\*\((?:" + TYPES + r") ?\*\)$", s[max(0, m.start() - 30):m.start()])
@@ -1142,11 +1279,13 @@ def retype_globals(s, names=None):
         s = s.replace(decl, "extern struct %s *%s;" % (tag, g))
         # every other use of g: a deref through it stays, the address becomes (char *)&g
         out, pos = [], 0
-        for m in re.finditer(r"\b%s\b" % re.escape(g), s):
+        # (not a member of the same name, `->data.bank_accounts`, nor a struct tag of the same
+        # name, `struct bank_account *bank_account;`)
+        for m in re.finditer(r"(?<![.>])\b%s\b" % re.escape(g), s):
             if m.start() < pos:
                 continue
             pre = s[max(0, m.start() - 60):m.start()]
-            if re.search(r"struct \w+ \*$", pre):
+            if re.search(r"(?:struct \w+ \*|\bstruct\s+)$", pre):
                 continue
             out.append(s[pos:m.start()])
             if re.search(r"\*\((?:" + TYPES + r") ?\*\)$", pre):
@@ -1273,7 +1412,7 @@ def main():
             print("PROBLEM:", p)
         sys.exit(1 if problems else 0)
     if a.cmd == "layout":
-        for (o, size, path, ctype, dims, elem, _sub) in leaves(structs, a.struct):
+        for (o, size, path, ctype, dims, elem, _sub) in leaves(structs, a.struct, bits=True):
             print("+0x%03X %4d  %-3d %-18s %s%s" % (o, o, size, ctype, path,
                                                  "".join("[%d]" % d for d in dims)))
         return

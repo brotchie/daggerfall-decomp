@@ -67,7 +67,7 @@ unsigned char *career_answer_effect(unsigned char *a1)
         else
             func_000252E2(atoi(a1));
     } else if (*(unsigned short *)a1 == 0x5252)
-        player_character->pad224 += atoi(career_skip_word(a1));
+        player_character->reputation_mod += atoi(career_skip_word(a1));
     else if (*(unsigned short *)a1 == 0x4452)
         bio_modifiers += atoi(career_skip_word(a1));
     else if (*(unsigned short *)a1 == 0x524D)
@@ -93,7 +93,7 @@ unsigned char *career_answer_effect(unsigned char *a1)
         p->race = atoi(a1);
         a1 = career_skip_word(a1);
         n = atoi(a1);
-        *(short *)p->pad225 = n;    /* the person's class: CLASS%02d.CFG */
+        p->career_id = n;    /* the person's class: CLASS%02d.CFG */
         a1 = career_skip_word(a1);
         p->level = atoi(a1);
         func_000A0ED9(292, D_00170738);

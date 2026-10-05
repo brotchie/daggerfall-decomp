@@ -12,9 +12,9 @@ int spell_cost_duration_magnitude(void)
 {
     short v;
 
-    v = spell_effect_cost_current * (signed char)selected_spell->durations[spell_effect_slot].base;
-    v += D_0019961E * ((signed char)selected_spell->durations[spell_effect_slot].plus / (signed char)selected_spell->durations[spell_effect_slot].per_level);
-    v += D_00199620 * (((signed char)selected_spell->magnitudes[spell_effect_slot].base_min + (signed char)selected_spell->magnitudes[spell_effect_slot].base_max) / 2);
-    v += (((signed char)selected_spell->magnitudes[spell_effect_slot].plus_min + (signed char)selected_spell->magnitudes[spell_effect_slot].plus_max) / 2 / (signed char)selected_spell->magnitudes[spell_effect_slot].per_level) * D_00199622;
+    v = spell_effect_cost_current * selected_spell->durations[spell_effect_slot].base;
+    v += D_0019961E * (selected_spell->durations[spell_effect_slot].plus / selected_spell->durations[spell_effect_slot].per_level);
+    v += D_00199620 * ((selected_spell->magnitudes[spell_effect_slot].base_min + selected_spell->magnitudes[spell_effect_slot].base_max) / 2);
+    v += ((selected_spell->magnitudes[spell_effect_slot].plus_min + selected_spell->magnitudes[spell_effect_slot].plus_max) / 2 / selected_spell->magnitudes[spell_effect_slot].per_level) * D_00199622;
     return v;
 }

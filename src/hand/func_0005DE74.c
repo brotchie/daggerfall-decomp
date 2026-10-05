@@ -97,7 +97,7 @@ void item_init_from_template(unsigned short idx, short type, short sub, struct i
     }
     it->item_flags = (unsigned short)def->f43;
     it->condition = it->max_condition = def->f28;
-    it->pad30 = 0;
+    it->magicka_bonus = 0;
     if (def->f46 != 0 && def->f44 == 0)
         it->dropped_image = def->f46;
     if (def->f44 != 0 && def->f46 == 0)
@@ -123,8 +123,8 @@ void item_init_from_template(unsigned short idx, short type, short sub, struct i
     }
     it->weight = def->f24;
     it->enchant_points = def->f38;
-    ((unsigned char *)&it->message)[2] = def->f41;
-    ((unsigned char *)&it->message)[3] = def->f42;
+    it->variants = def->f41;
+    it->draw_order = def->f42;
     mc_memset(it->enchantments, -1, 40, D_001758B8, 118, 40);
     D_0019626D = def->f40;
     D_00195F28 = def->f42;
@@ -148,5 +148,5 @@ void item_init_from_template(unsigned short idx, short type, short sub, struct i
     if (type == 7)
         item_init_book(it, sub);
     if (type == 13)
-        *(short *)&it->message = rand();
+        it->message = rand();
 }

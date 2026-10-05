@@ -405,7 +405,7 @@ L5A80F:;
 L5A817:;
     if (l_14->effects[l_20].type == 255) goto L5A80F;
     l_1C++;
-    if (((int)(signed char)l_14->durations[l_20].base) != (-1)) goto L5A8AE;
+    if (((int)l_14->durations[l_20].base) != (-1)) goto L5A8AE;
     if (player_character->equipped[l_14->icon - 200] == 0) goto L5A88E;
     if (player_character->equipped[l_14->icon - 200]->data.item.enchantments[0].type != (-1)) goto L5A890;
 L5A88E:;

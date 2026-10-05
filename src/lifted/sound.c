@@ -32,7 +32,7 @@ extern char D_001A3BE4[];
 extern char D_001A3EFC[];
 extern char D_001A3F08[];
 extern char nearest_fire_distance[];
-extern char nearest_fire[];
+extern struct record *nearest_fire;
 extern char ambient_rain_channel[];
 extern char ambient_crickets_channel[];
 extern char ambient_fire_channel[];
@@ -425,7 +425,7 @@ L69CCB:;
 L69CD7:;
     goto L69CF5;
 L69CD9:;
-    *(int *)ambient_fire_channel = sound_play_ambient_loop(242, *(struct record **)nearest_fire, 100);
+    *(int *)ambient_fire_channel = sound_play_ambient_loop(242, nearest_fire, 100);
     return;
 L69CF5:;
     if (*(int *)ambient_fire_channel == 0) goto L69D0A;
@@ -437,7 +437,7 @@ L69D0C:;
     *(int *)ambient_fire_channel = 0;
     return;
 L69D22:;
-    *(int *)D_001A3F08 = *(int *)nearest_fire;
+    *(int *)D_001A3F08 = (int)nearest_fire;
 }
 
 void sound_stop_ambient(void)

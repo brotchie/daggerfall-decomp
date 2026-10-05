@@ -80,12 +80,12 @@ found:
                     return;
                 }
                 if (guild_npc_object != 0) {
-                    if (l_18 == 0 && rand_range(0, 100) > *(unsigned short *)((char *)l_28 + 27))
+                    if (l_18 == 0 && rand_range(0, 100) > l_28->soul_creature)
                         break;
                     l_28 = object_create_child(guild_npc_object, 0, 0);
                     l_28->flags = 3;
                     l_28->type = 20;
-                    *(unsigned short *)((char *)l_28 + 27) = l_2C->race;
+                    l_28->soul_creature = l_2C->race;
                 }
                 break;
             }

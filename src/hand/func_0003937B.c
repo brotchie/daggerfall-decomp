@@ -9,9 +9,9 @@ int spell_cost_duration_chance(void)
 {
     short cost;
 
-    cost = spell_effect_cost_current[0] * (signed char)selected_spell->durations[spell_effect_slot].base;
-    cost += ((signed char)selected_spell->durations[spell_effect_slot].plus / (signed char)selected_spell->durations[spell_effect_slot].per_level) * spell_effect_cost_current[1];
-    cost += (signed char)selected_spell->chances[spell_effect_slot].base * spell_effect_cost_current[2];
-    cost += ((signed char)selected_spell->chances[spell_effect_slot].plus / (signed char)selected_spell->chances[spell_effect_slot].per_level) * spell_effect_cost_current[3];
+    cost = spell_effect_cost_current[0] * selected_spell->durations[spell_effect_slot].base;
+    cost += (selected_spell->durations[spell_effect_slot].plus / selected_spell->durations[spell_effect_slot].per_level) * spell_effect_cost_current[1];
+    cost += selected_spell->chances[spell_effect_slot].base * spell_effect_cost_current[2];
+    cost += (selected_spell->chances[spell_effect_slot].plus / selected_spell->chances[spell_effect_slot].per_level) * spell_effect_cost_current[3];
     return cost;
 }

@@ -28,13 +28,13 @@ int spell_missile_update(struct record *m, int a2)
     int dist;
     struct record *obj;
 
-    if ((int)(unsigned short)(*(unsigned short *)((char *)m + 23) & 1) != 0)
+    if ((int)(unsigned short)(m->missile_texture & 1) != 0)
         return m->image2 == 0x8fff ? 1 : 0;
     dist = func_000C7FF4(player_object->y - m->y, func_000C7FD9(player_object->x, player_object->z, m->x, m->z));
     if (dist > 2048) {
-        (*(unsigned short *)((char *)m + 23))++;
+        m->missile_texture++;
         m->image2 = 0x8000;
-        *(short *)((char *)m->children + 23) <<= 2;
+        m->children->light_radius <<= 2;
         return 0;
     }
     pos.x = m->x;
@@ -49,9 +49,9 @@ int spell_missile_update(struct record *m, int a2)
     if (hit & 10) {
         links_trigger(D_00195C48, 6);
         sound_play(spell_impact_sounds[m->data.spell.element], m, 110);
-        *(unsigned short *)((char *)m + 23) |= 1;
+        m->missile_texture |= 1;
         m->image2 = 0x8000;
-        *(short *)((char *)m->children + 23) <<= 2;
+        m->children->light_radius <<= 2;
         if ((hit & 8) && m->data.spell.target == 2)
             func_0005C856(m, D_00195C48);
     }
@@ -62,9 +62,9 @@ int spell_missile_update(struct record *m, int a2)
         return 0;
     links_trigger(obj, 6);
     sound_play(spell_impact_sounds[m->data.spell.element], m, 110);
-    *(unsigned short *)((char *)m + 23) |= 1;
+    m->missile_texture |= 1;
     m->image2 = 0x8000;
-    *(short *)((char *)m->children + 23) <<= 2;
+    m->children->light_radius <<= 2;
     func_0005C856(m, obj);
     return 0;
 }

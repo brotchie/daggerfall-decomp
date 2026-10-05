@@ -20,7 +20,7 @@ extern char collide_candidate_count[];
 extern char D_00196D4C[];
 extern char D_00196D50[];
 extern char collide_flags[];
-extern int func_0002294E(struct record *, int, int);
+extern int func_0002294E(struct record *, int, struct move_request *);
 extern void collide_for_each_nearby(struct record *, int);
 extern void func_0002325A(int);
 extern void automap_mark_seen(int);
@@ -54,7 +54,7 @@ struct vec3 {
     int z;
 };
 
-int collide_move_player(struct record *a1, int a2, struct vec3 *a3, int a4)
+int collide_move_player(struct record *a1, int a2, struct move_request *a3, int a4)
 {
     int l_44;
     int l_40;           /* l_40, l_3C and l_34 are never read: they only shape the frame */
@@ -85,7 +85,7 @@ int collide_move_player(struct record *a1, int a2, struct vec3 *a3, int a4)
         return FLAGS = 16;
     l_14 = FLAGS;
     *(char *)player_on_ground = 1;
-    l_44 = func_0002294E(a1, a2, (int)a3);
+    l_44 = func_0002294E(a1, a2, a3);
     *(unsigned char *)D_001940D7 &= 223;
     if (*(char *)player_on_ground != 0 && *(char *)D_00196296 != 0)
         *(char *)D_00196296 = 0;
@@ -95,7 +95,7 @@ int collide_move_player(struct record *a1, int a2, struct vec3 *a3, int a4)
             a3->y += l_10[1];
             a3->z += l_10[2];
             *(unsigned char *)collide_flags |= 4;
-            l_44 = func_0002294E(a1, a2, (int)a3);
+            l_44 = func_0002294E(a1, a2, a3);
         }
     }
     if (*(int *)D_00195C70 != 0 && (l_10 = (short *)func_000657B2(*(int *)D_00195C70)) != 0) {
@@ -103,7 +103,7 @@ int collide_move_player(struct record *a1, int a2, struct vec3 *a3, int a4)
         a3->y += l_10[1];
         a3->z += l_10[2];
         *(unsigned char *)collide_flags |= 4;
-        l_44 = func_0002294E(a1, a2, (int)a3);
+        l_44 = func_0002294E(a1, a2, a3);
     }
     if (*(int *)D_00195CB8 != 0)
         automap_mark_seen(*(int *)D_00195CB8);
@@ -156,7 +156,7 @@ int collide_move_player(struct record *a1, int a2, struct vec3 *a3, int a4)
         *(int *)D_00195CD8 = *(int *)D_00195CD4 = 0;
         l_14 = FLAGS;
         *(char *)player_on_ground = 1;
-        l_44 = func_0002294E(a1, a2, (int)a3);
+        l_44 = func_0002294E(a1, a2, a3);
         *(unsigned char *)D_001940D7 &= 223;
         if (*(char *)player_on_ground != 0 && *(char *)D_00196296 != 0)
             *(char *)D_00196296 = 0;

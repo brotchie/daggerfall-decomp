@@ -64,22 +64,22 @@ extern struct character *player_character;
 extern char game_minutes[];
 extern struct settings *game_settings;
 extern char D_00195C44[];
-extern char D_00195CB8[];
+extern struct record *D_00195CB8;
 extern char D_00196272[];
 extern char mouse_buttons_prev[];
 extern char D_0019629F[];
 extern char D_00196D88[];
 extern char D_00196D8C[];
 extern char D_00196D94[];
-extern char D_00196DA0[];
+extern struct record *D_00196DA0;
 extern char D_00196DA4[];
 extern char D_00196DA8[];
 extern char D_00196DAC[];
-extern char D_00196DB0[];
+extern struct record *D_00196DB0;
 extern char D_00196DB4[];
 extern char automap_top_down[];
-extern char quest_event_object2[];
-extern char quest_event_object[];
+extern struct record *quest_event_object2;
+extern struct record *quest_event_object;
 extern char cfg_show_markers[];
 
 extern int engine_pick_object(int, int, int);
@@ -215,13 +215,13 @@ L2694A:;
     automap_find_record();
     *(int *)text_macro_fnpc = 0;
     l_18 = 0;
-    if (*(int *)D_00195CB8 == 0) goto L26A3E;
+    if ((int)D_00195CB8 == 0) goto L26A3E;
     if (((int)(unsigned char)*(signed char *)player_environment) == 3) goto L26A4E;
 L26A3E:;
     if (((int)(unsigned char)*(signed char *)player_environment) != 2) goto L26B3B;
 L26A4E:;
     if (((int)(unsigned char)*(signed char *)player_environment) != 3) goto L26A97;
-    l_1C = (struct record *)*(int *)D_00195CB8;
+    l_1C = D_00195CB8;
 L26A62:;
     if (l_1C == 0) goto L26A77;
     if (l_1C->type != 47) goto L26A79;
@@ -327,7 +327,7 @@ L26D00:;
     if (l_18 == 0) goto L26D0E;
     object_free_single(l_18);
 L26D0E:;
-    if (((int)(unsigned short)(*(short *)(*(char **)&game_settings) & 1)) == 0) goto L26D3F;
+    if (((int)(unsigned short)(game_settings->view_flags & 1)) == 0) goto L26D3F;
     func_0012A2D0(160, 100, 160, 100);
     goto L26D58;
 L26D3F:;
@@ -367,7 +367,7 @@ L26E4C:;
 
 int func_00026E87(void)
 {
-    if (*(int *)D_00196DB0 != 0) goto L26EAA;
+    if ((int)D_00196DB0 != 0) goto L26EAA;
     return 0;
 L26EAA:;
     if (*(int *)D_00196DAC == 0) goto L26ED4;
@@ -385,9 +385,9 @@ L26F2D:;
     func_000276B8();
 L26F32:;
     if (*(signed char *)text_buffer == 0) goto L26F4A;
-    func_00027717((struct record *)*(int *)D_00196DB0, (int)text_buffer);
+    func_00027717(D_00196DB0, (int)text_buffer);
 L26F4A:;
-    *(int *)D_00196DAC = func_00027641((struct record *)*(int *)D_00196DB0);
+    *(int *)D_00196DAC = func_00027641(D_00196DB0);
     sound_play(206, player_object, 100);
     return 0;
 }
@@ -573,11 +573,11 @@ L274A6:;
     (*(struct record **)(l_2C + 4))->flags |= 0x400;
     goto L274F5;
 L274DE:;
-    *(int *)D_00196DAC = func_00027641((struct record *)(*(int *)D_00196DB0 = *(int *)((char *)l_2C + 4)));
+    *(int *)D_00196DAC = func_00027641((struct record *)(*(int *)&D_00196DB0 = *(int *)((char *)l_2C + 4)));
 L274F5:;
     goto L27501;
 L274F7:;
-    *(int *)D_00196DB0 = 0;
+    D_00196DB0 = 0;
 L27501:;
     return 0;
 }
@@ -586,21 +586,21 @@ void automap_find_record(void)
 {
     struct record *l_18;
 
-    D_00195AF4 = (struct record *)((*(int *)D_00196DA0 = 0));
+    D_00195AF4 = (struct record *)((*(int *)&D_00196DA0 = 0));
     if (player_entity == 0) return;
     object_foreach(player_entity->children, (int)automap_match_record);
     if (D_00195AF4 != 0) goto L275D6;
     l_18 = object_create_child(player_entity, 0, 10240);
     l_18->type = 51;
     l_18->id = object_new_id(D_00195AC4->id >> 16);
-    *(int *)((char *)l_18 + 43) = *(int *)game_minutes;
-    *(short *)((char *)l_18 + 27) = (current_location->object_counter + 7) / 8;
+    l_18->created_minutes = *(int *)game_minutes;
+    l_18->seen_count = (current_location->object_counter + 7) / 8;
     *(int *)D_00196DB4 = (int)RECORD_DATA(l_18);
-    *(int *)D_00196DA0 = (int)l_18;
+    D_00196DA0 = l_18;
     return;
 L275D6:;
     *(int *)D_00196DB4 = (int)RECORD_DATA(D_00195AF4);
-    *(int *)D_00196DA0 = (int)D_00195AF4;
+    D_00196DA0 = D_00195AF4;
 }
 
 void automap_match_record(struct record *a1)
@@ -704,7 +704,7 @@ L278FD:;
     if (l_1C == 0) return;
     l_18 = l_1C->next;
     if (l_1C->type != 51) goto L27935;
-    if (((unsigned)(*(int *)game_minutes - *(int *)((char *)l_1C + 43))) <= 43200) goto L27935;
+    if (((unsigned)(*(int *)game_minutes - l_1C->created_minutes)) <= 43200) goto L27935;
     object_free_single(l_1C);
 L27935:;
     l_1C = l_18;
@@ -990,12 +990,12 @@ L28BBE:;
 void automap_save(void)
 {
     if (((int)(unsigned char)*(signed char *)player_environment) != 3) goto L28BF0;
-    if (*(int *)D_00196DA0 != 0) goto L28BF2;
+    if ((int)D_00196DA0 != 0) goto L28BF2;
 L28BF0:;
     return;
 L28BF2:;
     *(int *)(*(char **)D_00195C44) = *(int *)game_minutes;
-    mc_memcpy((int)(*(char **)D_00195C44 + 4), *(int *)D_00196DA0, 10240, (int)D_001707AE, 1055, 4);
+    mc_memcpy((int)(*(char **)D_00195C44 + 4), (int)D_00196DA0, 10240, (int)D_001707AE, 1055, 4);
     func_000A0ED9(1056, (int)D_001707AE);
     mc_sprintf((int)text_buffer, (int)D_001707E4, D_00195AC4->id >> 16);
     disk_write_arena2_file((int)text_buffer, *(int *)D_00195C44, 10244);
@@ -1062,7 +1062,7 @@ void func_00028DFD(void)
 void func_00028EAA(void)
 {
     automap_find_record();
-    *(int *)D_00196DA0 = (int)D_00195AF4;
+    D_00196DA0 = D_00195AF4;
 }
 
 void func_00028ED1(struct record *a1)
@@ -1076,7 +1076,7 @@ L28F00:;
 L28F02:;
     return;
 L28F04:;
-    l_18 = *(int *)D_00196DA0 + 71;
+    l_18 = (int)D_00196DA0 + 71;
     l_18 += 2048;
     if ((((int)(unsigned char)*(signed char *)((char *)((((unsigned)(a1->id & 65535)) >> 3) + l_18))) & (1 << ((a1->id & 65535) & 7))) == 0) return;
     a1->flags |= 128;
@@ -1084,7 +1084,7 @@ L28F04:;
 
 void automap_restore_seen(void)
 {
-    if (*(int *)D_00196DA0 != 0) goto L28F72;
+    if ((int)D_00196DA0 != 0) goto L28F72;
     automap_find_record();
 L28F72:;
     object_foreach(D_00195AC4, (int)func_00028ED1);
@@ -1136,7 +1136,7 @@ L2907F:;
     if (l_18->type == 43) goto L29097;
     return 0;
 L29097:;
-    if (*(int *)(*(char **)quest_event_object + 51) != (int)a2->args[1].object) goto L290AF;
+    if ((int)quest_event_object->twin != (int)a2->args[1].object) goto L290AF;
     if (l_1C == l_18) goto L290B1;
 L290AF:;
     goto L290CA;
@@ -1257,9 +1257,9 @@ L29394:;
     return 0;
 L293AB:;
     if (a2->args[2].object->type != 65) goto L293D2;
-    if (*(short *)(*(char **)quest_event_object2 + 71) == *(short *)((char *)a2->args[2].object + 25)) goto L293E2;
+    if ((short)quest_event_object2->data.person.faction_id == a2->args[2].object->faction_id) goto L293E2;
 L293D2:;
-    if (*(int *)(*(char **)quest_event_object2 + 51) != (int)a2->args[2].object) goto L2942E;
+    if ((int)quest_event_object2->twin != (int)a2->args[2].object) goto L2942E;
 L293E2:;
     quest_set_state(a1, a2, 1);
     func_000298F3(a2->args[1].object->twin);
@@ -1273,7 +1273,7 @@ L2942E:;
 
 int qcond_op03_event_object(struct quest *a1, struct qbn_op *a2)
 {
-    if (*(int *)(*(char **)quest_event_object + 51) != (int)a2->args[1].object) goto L2947D;
+    if ((int)quest_event_object->twin != (int)a2->args[1].object) goto L2947D;
     quest_set_state(a1, a2, 1);
     return 1;
 L2947D:;
@@ -1282,7 +1282,7 @@ L2947D:;
 
 int qcond_op21_event_same_kind(struct quest *a1, struct qbn_op *a2)
 {
-    if ((short)a2->args[1].object->image2 != *(short *)(*(char **)quest_event_object + 29)) goto L294D2;
+    if ((short)a2->args[1].object->image2 != (short)quest_event_object->image2) goto L294D2;
     quest_set_state(a1, a2, 1);
     return 1;
 L294D2:;
@@ -1294,10 +1294,10 @@ int qcond_op02_event_count(struct quest *a1, struct qbn_op *a2)
     struct qbn_foe *l_18;
 
     l_18 = (struct qbn_foe *)a2->args[1].record;
-    if ((short)a2->args[1].object->image2 != *(short *)(*(char **)quest_event_object + 29)) goto L29558;
-    if ((short)(short)((int)(unsigned char)*(signed char *)((char *)l_18 + 5)) >= (short)a2->args[2].value) goto L29558;
-    (*(signed char *)((char *)l_18 + 5))++;
-    if ((short)((int)(unsigned char)*(signed char *)((char *)l_18 + 5)) != (short)a2->args[2].value) goto L29558;
+    if ((short)a2->args[1].object->image2 != (short)quest_event_object->image2) goto L29558;
+    if ((short)(short)(l_18->killed) >= (short)a2->args[2].value) goto L29558;
+    l_18->killed++;
+    if ((short)(l_18->killed) != (short)a2->args[2].value) goto L29558;
     quest_set_state(a1, a2, 1);
     return 1;
 L29558:;
@@ -1337,9 +1337,9 @@ L29725:;
 int qcond_op28_event_person(struct quest *a1, struct qbn_op *a2)
 {
     if (a2->args[1].object->type != 65) goto L29773;
-    if (*(short *)((char *)a2->args[1].object + 25) == *(short *)(*(char **)quest_event_object + 71)) goto L2978E;
+    if (a2->args[1].object->faction_id == (short)quest_event_object->data.person.faction_id) goto L2978E;
 L29773:;
-    if (*(int *)(*(char **)quest_event_object + 51) != (int)a2->args[1].object) goto L2978C;
+    if ((int)quest_event_object->twin != (int)a2->args[1].object) goto L2978C;
     if (a2->args[0].value != (-1)) goto L2978E;
 L2978C:;
     goto L297A7;

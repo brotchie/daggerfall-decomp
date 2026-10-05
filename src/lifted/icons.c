@@ -28,7 +28,7 @@ extern char D_001940D4[];
 extern char D_001940D6[];
 extern char D_001940D8[];
 extern struct record *wagon_container;
-extern char D_001959EC[];
+extern struct record *D_001959EC;
 extern struct item *D_00195A80;
 extern struct record *player_entity;
 extern struct record *player_object;
@@ -202,7 +202,7 @@ void magic_items_add_cb(struct record *a1)
     l_18 = a1->parent;
 L5D5D2:;
     if (l_18 == 0) goto L5D5EE;
-    if (func_000CE44C((int)D_001959EC, l_18, 4) == 0) goto L5D5F0;
+    if (func_000CE44C((int)((char *)&D_001959EC), l_18, 4) == 0) goto L5D5F0;
 L5D5EE:;
     goto L5D5FB;
 L5D5F0:;
@@ -339,7 +339,7 @@ int hud_update(void)
 L5DA42:;
     goto L5DA5A;
 L5DA44:;
-    if (((int)(unsigned short)(*(short *)(*(char **)&game_settings) & 1)) == 0) goto L5DA5F;
+    if (((int)(unsigned short)(game_settings->view_flags & 1)) == 0) goto L5DA5F;
 L5DA5A:;
     goto L5DAEE;
 L5DA5F:;

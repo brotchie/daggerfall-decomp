@@ -26,7 +26,7 @@ void hud_draw_heading_strip(int a1)
     int pos;
 
     if (a1 == 0) {
-        if ((int)(unsigned short)(*(unsigned short *)game_settings & 1) == 0)
+        if ((int)(unsigned short)(game_settings->view_flags & 1) == 0)
             return;
         if (game_mode != 0)
             return;

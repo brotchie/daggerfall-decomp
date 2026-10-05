@@ -246,22 +246,22 @@ L467AD:;
 
 int macro_ach_chance_per_level(void)
 {
-    return func_000A0DD9((int)(signed char)selected_spell->chances[(int)(short)*(short *)spell_effect_slot].plus, (int)text_rsc_buffer, 10);
+    return func_000A0DD9((int)selected_spell->chances[(int)(short)*(short *)spell_effect_slot].plus, (int)text_rsc_buffer, 10);
 }
 
 int macro_adr_duration_per_level(void)
 {
-    return func_000A0DD9((int)(signed char)selected_spell->durations[(int)(short)*(short *)spell_effect_slot].plus, (int)text_rsc_buffer, 10);
+    return func_000A0DD9((int)selected_spell->durations[(int)(short)*(short *)spell_effect_slot].plus, (int)text_rsc_buffer, 10);
 }
 
 int macro_1am_magnitude_per_level_min(void)
 {
-    return func_000A0DD9((int)(signed char)selected_spell->magnitudes[(int)(short)*(short *)spell_effect_slot].plus_min, (int)text_rsc_buffer, 10);
+    return func_000A0DD9((int)selected_spell->magnitudes[(int)(short)*(short *)spell_effect_slot].plus_min, (int)text_rsc_buffer, 10);
 }
 
 int macro_2am_magnitude_per_level_max(void)
 {
-    return func_000A0DD9((int)(signed char)selected_spell->magnitudes[(int)(short)*(short *)spell_effect_slot].plus_max, (int)text_rsc_buffer, 10);
+    return func_000A0DD9((int)selected_spell->magnitudes[(int)(short)*(short *)spell_effect_slot].plus_max, (int)text_rsc_buffer, 10);
 }
 
 int macro_ark_attribute_rating(void)
@@ -322,22 +322,22 @@ int func_00046A7F(void)
 
 int macro_bch_base_chance(void)
 {
-    return func_000A0DD9((int)(signed char)selected_spell->chances[(int)(short)*(short *)spell_effect_slot].base, (int)text_rsc_buffer, 10);
+    return func_000A0DD9((int)selected_spell->chances[(int)(short)*(short *)spell_effect_slot].base, (int)text_rsc_buffer, 10);
 }
 
 int macro_bdr_base_duration(void)
 {
-    return func_000A0DD9((int)(signed char)selected_spell->durations[(int)(short)*(short *)spell_effect_slot].base, (int)text_rsc_buffer, 10);
+    return func_000A0DD9((int)selected_spell->durations[(int)(short)*(short *)spell_effect_slot].base, (int)text_rsc_buffer, 10);
 }
 
 int macro_1bm_base_magnitude_min(void)
 {
-    return func_000A0DD9((int)(signed char)selected_spell->magnitudes[(int)(short)*(short *)spell_effect_slot].base_min, (int)text_rsc_buffer, 10);
+    return func_000A0DD9((int)selected_spell->magnitudes[(int)(short)*(short *)spell_effect_slot].base_min, (int)text_rsc_buffer, 10);
 }
 
 int macro_2bm_base_magnitude_max(void)
 {
-    return func_000A0DD9((int)(signed char)selected_spell->magnitudes[(int)(short)*(short *)spell_effect_slot].base_max, (int)text_rsc_buffer, 10);
+    return func_000A0DD9((int)selected_spell->magnitudes[(int)(short)*(short *)spell_effect_slot].base_max, (int)text_rsc_buffer, 10);
 }
 
 int macro_bt_book_title(void)
@@ -373,17 +373,17 @@ int macro_ct_location_type(void)
 
 int macro_clc_chance_levels(void)
 {
-    return func_000A0DD9((int)(signed char)selected_spell->chances[(int)(short)*(short *)spell_effect_slot].per_level, (int)text_rsc_buffer, 10);
+    return func_000A0DD9((int)selected_spell->chances[(int)(short)*(short *)spell_effect_slot].per_level, (int)text_rsc_buffer, 10);
 }
 
 int macro_cld_duration_levels(void)
 {
-    return func_000A0DD9((int)(signed char)selected_spell->durations[(int)(short)*(short *)spell_effect_slot].per_level, (int)text_rsc_buffer, 10);
+    return func_000A0DD9((int)selected_spell->durations[(int)(short)*(short *)spell_effect_slot].per_level, (int)text_rsc_buffer, 10);
 }
 
 int macro_clm_magnitude_levels(void)
 {
-    return func_000A0DD9((int)(signed char)selected_spell->magnitudes[(int)(short)*(short *)spell_effect_slot].per_level, (int)text_rsc_buffer, 10);
+    return func_000A0DD9((int)selected_spell->magnitudes[(int)(short)*(short *)spell_effect_slot].per_level, (int)text_rsc_buffer, 10);
 }
 
 int func_00046E42(void)
@@ -520,7 +520,7 @@ L472E2:;
 int macro_dbp_codeword(void)
 {
     func_000A0ED9(454, (int)D_0017110C);
-    mc_sprintf((int)text_rsc_buffer, (int)D_0017114E, *(int *)(codeword_first_words + ((player_character->pad223 >> 4) << 2)), *(int *)(codeword_second_words + (((int)(unsigned char)(player_character->pad223 & 15)) << 2)));
+    mc_sprintf((int)text_rsc_buffer, (int)D_0017114E, *(int *)(codeword_first_words + ((player_character->codeword >> 4) << 2)), *(int *)(codeword_second_words + (((int)(unsigned char)(player_character->codeword & 15)) << 2)));
     return (int)text_rsc_buffer;
 }
 

@@ -84,7 +84,7 @@ extern char D_001967F4[];
 extern char D_001967F8[];
 extern char D_001967FC[];
 extern char rmb_record_ptr[];
-extern char D_00196DB0[];
+extern struct record *D_00196DB0;
 extern char cfg_block_str[];
 extern char cfg_mapsave_file[];
 extern char cfg_seed[];
@@ -441,7 +441,7 @@ L83FD2:;
     return 0;
 L83FDE:;
     *(int *)&l_18 = 1132;
-    if (*(int *)D_00196DB0 != (int)a1) goto L83FF7;
+    if ((int)D_00196DB0 != (int)a1) goto L83FF7;
     if (((struct bf8_3_1 *)(*(char **)&l_18))->f == 0) goto L83FF9;
 L83FF7:;
     goto L84005;
@@ -454,7 +454,7 @@ L84029:;
     if (func_000C7FD9(a1->x, a1->z, *(int *)D_00190BE4, *(int *)D_00190BEC) <= 2048) goto L84059;
     return 0;
 L84059:;
-    *(int *)((char *)a1 + 47) = 0;
+    a1->draw_handle = 0;
     *(int *)D_000C5404 = 0;
     switch (a1->type) {
 case 34:
@@ -464,7 +464,7 @@ case 34:
 L840F3:;
     goto L843CC;
 L840F8:;
-    *(int *)((char *)a1 + 47) = func_00154D00(a1->x, a1->y, a1->z, a1->image, -1, 4, 4129024);
+    a1->draw_handle = func_00154D00(a1->x, a1->y, a1->z, a1->image, -1, 4, 4129024);
     goto L843CC;
 case 43:
     l_3C = (int)RECORD_DATA(a1);
@@ -498,7 +498,7 @@ L841D5:;
     if (a1->image2 != 998) goto L842A7;
     if (weapon_arrow_update(a1) == 0) goto L843CC;
     func_00073ADF(a1);
-    *(int *)((char *)l_40 + 44) = a1->owner;
+    *(int *)((char *)l_40 + 44) = a1->missile_yaw;
     *(int *)((char *)l_40 + 48) = a1->angle_z;
     *(int *)((char *)l_40 + 52) = 0;
     goto L84326;
@@ -549,13 +549,13 @@ struct record *rmb_make_light(struct record *a1, int a2, int a3)
     l_14 = object_create_child(a1, 0, 0);
     l_14->type = 7;
     l_14->image = a2;
-    l_14->owner = a3;
-    *(short *)((char *)l_14 + 19) = 8000;
+    l_14->light_radius = a3;
+    l_14->pad13 = 8000;
     l_14->id = D_00195AC4->id + ((int)(unsigned short)(current_location->object_counter)++);
     return l_14;
 }
 
-void rmb_add_doors(struct record *a1, int a2)
+void rmb_add_doors(struct record *a1, struct block_door *a2)
 {
     struct record *l_18;
     int l_14;
@@ -567,23 +567,23 @@ L847E5:;
     return;
 L847FC:;
     l_14++;
-    (*(char (**)[19])&a2)++;
+    a2++;
     goto L847E5;
 L8480B:;
-    l_18 = rmb_make_door(a1, (int)(short)*(short *)((char *)a2 + 14), (int)(short)((unsigned short)(unsigned char)*(signed char *)((char *)a2 + 16)), 1);
-    func_000C7F07(0, (((int)(short)*(short *)((char *)a2 + 12)) + *(int *)D_001967FC) % 2048, 0, (int)RECORD_DATA(l_18) + 12);
-    l_18->lock_level = (unsigned short)(unsigned char)*(signed char *)((char *)a2 + 17);
-    rotate_xz(a2, a2 + 8, *(int *)D_001967FC);
-    *(int *)((char *)a2) += *(int *)D_001967F8;
-    l_18->x = *(int *)((char *)a2);
-    *(int *)((char *)a2 + 8) += *(int *)D_001967F0;
-    l_18->z = *(int *)((char *)a2 + 8);
-    *(int *)((char *)a2 + 4) += *(int *)D_001967F4;
-    l_18->y = *(int *)((char *)a2 + 4);
+    l_18 = rmb_make_door(a1, a2->image2, (int)(short)((unsigned short)a2->image), 1);
+    func_000C7F07(0, (a2->yaw + *(int *)D_001967FC) % 2048, 0, (int)RECORD_DATA(l_18) + 12);
+    l_18->lock_level = (unsigned short)a2->lock_level;
+    rotate_xz((int)&a2->x, (int)&a2->z, *(int *)D_001967FC);
+    a2->x += *(int *)D_001967F8;
+    l_18->x = a2->x;
+    a2->z += *(int *)D_001967F0;
+    l_18->z = a2->z;
+    a2->y += *(int *)D_001967F4;
+    l_18->y = a2->y;
     goto L847FC;
 }
 
-void rmb_add_people(struct record *a1, int a2)
+void rmb_add_people(struct record *a1, struct block_flat *a2)
 {
     struct record *l_18;
     int l_14;
@@ -595,25 +595,25 @@ L848F3:;
     return;
 L8490A:;
     l_14++;
-    (*(char (**)[17])&a2)++;
+    a2++;
     goto L848F3;
 L84919:;
-    l_18 = rmb_make_flat(a1, (int)(short)*(short *)((char *)a2 + 12), (int)(short)*(short *)((char *)a2 + 14), 0);
-    rotate_xz(a2, a2 + 8, *(int *)D_001967FC);
-    *(int *)((char *)a2) += *(int *)D_001967F8;
-    l_18->x = *(int *)((char *)a2);
-    *(int *)((char *)a2 + 8) += *(int *)D_001967F0;
-    l_18->z = *(int *)((char *)a2 + 8);
-    *(int *)((char *)a2 + 4) += *(int *)D_001967F4;
-    l_18->y = *(int *)((char *)a2 + 4);
-    if (((int)(unsigned char)(*(signed char *)((char *)a2 + 16) & 4)) == 0) goto L849A6;
-    *(signed char *)((char *)l_18 + 73) |= 8;
+    l_18 = rmb_make_flat(a1, (int)(short)a2->image, (int)(short)a2->faction_id, 0);
+    rotate_xz((int)&a2->x, (int)&a2->z, *(int *)D_001967FC);
+    a2->x += *(int *)D_001967F8;
+    l_18->x = a2->x;
+    a2->z += *(int *)D_001967F0;
+    l_18->z = a2->z;
+    a2->y += *(int *)D_001967F4;
+    l_18->y = a2->y;
+    if (((int)(unsigned char)(a2->flags & 4)) == 0) goto L849A6;
+    l_18->data.person.flags |= 8;
 L849A6:;
-    if (((int)(unsigned char)(*(signed char *)((char *)a2 + 16) & 8)) == 0) goto L849BE;
-    *(signed char *)((char *)l_18 + 73) |= 32;
+    if (((int)(unsigned char)(a2->flags & 8)) == 0) goto L849BE;
+    l_18->data.person.flags |= 32;
 L849BE:;
-    if (((int)(unsigned char)(*(signed char *)((char *)a2 + 16) & 32)) == 0) goto L849D6;
-    *(signed char *)((char *)l_18 + 73) |= 16;
+    if (((int)(unsigned char)(a2->flags & 32)) == 0) goto L849D6;
+    l_18->data.person.flags |= 16;
 L849D6:;
     goto L8490A;
 }

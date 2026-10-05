@@ -15,14 +15,14 @@ struct record *rmb_make_marker(struct record *a1, int a2)
     if (l_1C == 13 || l_1C == 14) {
         l_18 = 659;
         l_20 = object_create_child(a1, 0, l_18);
-        *(short *)((char *)l_20 + 19) = 0;
+        l_20->mobile_id = 0;
     } else {
         l_20 = object_create_child(a1, 0, 0);
-        *(short *)((char *)l_20 + 19) = 0;
+        l_20->mobile_id = 0;
     }
     l_20->type = 34;
     l_20->image2 = 0;
-    *(short *)((char *)l_20 + 19) = 0;
+    l_20->mobile_id = 0;
     l_20->image = a2;
     if (l_1C == 9 || l_1C == 16) {
         l_20->id = D_00195AC4->id + current_location->marker_counter++;

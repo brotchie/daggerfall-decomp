@@ -51,7 +51,7 @@ extern struct record *player_entity;
 extern struct record *player_object;
 extern char cheat_flags[];
 extern struct spell *spell_records;
-extern char guild_npc_object[];
+extern struct record *guild_npc_object;
 extern char spellshop_icons[];
 extern char list_popup_callback[];
 extern char D_00195B84[];
@@ -74,8 +74,8 @@ extern char D_00199871[];
 extern char D_001998CC[];
 extern char itemmaker_slots[];
 extern char D_001998E2[];
-extern char itemmaker_item[];
-extern char itemmaker_item_object[];
+extern struct item *itemmaker_item;
+extern struct record *itemmaker_item_object;
 extern char D_00199910[];
 extern char inv_left_scroll[];
 extern char inv_left_rows[];
@@ -138,8 +138,8 @@ void func_00058AF7(void);
 void itemmaker_reset(void)
 {
     *(int *)D_00190BE8 = (*(int *)D_00190BE4 = 0);
-    *(int *)itemmaker_item_object = 0;
-    *(int *)itemmaker_item = 0;
+    itemmaker_item_object = 0;
+    itemmaker_item = 0;
     *(int *)inv_left_scroll = 0;
     mc_memset((int)itemmaker_slot_kinds, -1, 10, (int)D_001756A3, 77, 128);
     mc_memset((int)D_00190CEE, -1, 30, (int)D_001756A3, 78, 4);
@@ -154,8 +154,8 @@ int itemmaker_close(void)
 L561E6:;
     if (*(signed char *)key_down_esc != 0) goto L561E6;
     *(signed char *)D_00187CA8 = 1;
-    if (*(int *)itemmaker_item == 0) goto L56209;
-    inv_store_item(*(int *)itemmaker_item_object);
+    if ((int)itemmaker_item == 0) goto L56209;
+    inv_store_item((int)itemmaker_item_object);
 L56209:;
     *(signed char *)game_mode = 0;
     if (*(int *)window_image == 0) goto L56225;
@@ -184,7 +184,7 @@ void itemmaker_enter_name(void)
 {
     int l_18;
 
-    if (*(int *)itemmaker_item != 0) goto L56847;
+    if ((int)itemmaker_item != 0) goto L56847;
     msgbox_show_rsc(1653, 1);
     return;
 L56847:;
@@ -192,7 +192,7 @@ L56847:;
     func_000A0ED9(242, (int)D_001756A3);
     mc_sprintf(l_18, (int)D_001756BE, *(int *)D_0017D1EA);
     *(signed char *)((char *)(func_000A0DF4(l_18) + l_18) + 1) = 0;
-    inpstr_begin_text(*(int *)itemmaker_item, 23);
+    inpstr_begin_text((int)itemmaker_item, 23);
     msgbox_show_string(l_18, 2);
 }
 
@@ -205,7 +205,7 @@ void itemmaker_add_powers(void)
 {
     int l_18;
 
-    if (*(int *)itemmaker_item != 0) goto L56B68;
+    if ((int)itemmaker_item != 0) goto L56B68;
     msgbox_show_rsc(1653, 1);
     return;
 L56B68:;
@@ -243,7 +243,7 @@ void itemmaker_add_side_effects(void)
 {
     int l_18;
 
-    if (*(int *)itemmaker_item != 0) goto L56E84;
+    if ((int)itemmaker_item != 0) goto L56E84;
     msgbox_show_rsc(1653, 1);
     return;
 L56E84:;
@@ -256,11 +256,11 @@ void itemmaker_return_item(void)
     int l_1C;
     int l_18;
 
-    if (*(int *)itemmaker_item == 0) goto L56EC8;
-    inv_store_item(*(int *)itemmaker_item_object);
+    if ((int)itemmaker_item == 0) goto L56EC8;
+    inv_store_item((int)itemmaker_item_object);
 L56EC8:;
-    *(int *)itemmaker_item_object = 0;
-    *(int *)itemmaker_item = 0;
+    itemmaker_item_object = 0;
+    itemmaker_item = 0;
     *(int *)D_00190BE4 = 0;
 }
 
@@ -269,12 +269,12 @@ void itemmaker_enchant(void)
     int l_1C;
     int l_18;
 
-    if (*(int *)itemmaker_item != 0) goto L56F1B;
+    if ((int)itemmaker_item != 0) goto L56F1B;
     msgbox_show_rsc(1653, 1);
     return;
 L56F1B:;
     if (((struct bf8_2_1 *)&cheat_flags)->f != 0) goto L56F78;
-    if (itemmaker_points_used() <= ((int)(unsigned short)*(short *)(*(char **)itemmaker_item + 61))) goto L56F4C;
+    if (itemmaker_points_used() <= itemmaker_item->enchant_points) goto L56F4C;
     msgbox_show_rsc(1651, 1);
     return;
 L56F4C:;
@@ -295,11 +295,11 @@ L56FA0:;
     goto L56F95;
 L56FA8:;
     if (((int)(signed char)*(signed char *)(itemmaker_slot_kinds + l_1C)) == (-1)) goto L56FF5;
-    *(short *)(*(char **)itemmaker_item + 67 + (l_18 << 2)) = *(short *)(itemmaker_slots + (l_1C << 2));
-    *(short *)(*(char **)itemmaker_item + 69 + (l_18 << 2)) = *(short *)(D_001998E2 + (l_1C << 2));
+    itemmaker_item->enchantments[l_18].type = *(short *)(itemmaker_slots + (l_1C << 2));
+    itemmaker_item->enchantments[l_18].param = *(short *)(D_001998E2 + (l_1C << 2));
 L56FF5:;
     if (*(signed char *)(itemmaker_slot_kinds + l_1C) <= 0) goto L57014;
-    *(short *)(*(char **)itemmaker_item + 67 + (l_18 << 2)) += 15;
+    itemmaker_item->enchantments[l_18].type += 15;
 L57014:;
     if (*(signed char *)(itemmaker_slot_kinds + l_1C) != 0) goto L57058;
     if (*(short *)(itemmaker_slots + (l_1C << 2)) == 0) goto L57042;
@@ -313,7 +313,7 @@ L57056:;
 L57058:;
     goto L57095;
 L5705A:;
-    *(short *)(*(char **)itemmaker_item + 69 + (l_18 << 2)) = (int)(unsigned char)*(signed char *)((char *)(int)(*(char **)(enchant_spell_lists + (((int)(short)*(short *)(itemmaker_slots + (l_1C << 2))) << 2)) + ((int)(short)*(short *)(D_001998E2 + (l_1C << 2)))));
+    itemmaker_item->enchantments[l_18].param = (int)(unsigned char)*(signed char *)((char *)(int)(*(char **)(enchant_spell_lists + (((int)(short)*(short *)(itemmaker_slots + (l_1C << 2))) << 2)) + ((int)(short)*(short *)(D_001998E2 + (l_1C << 2)))));
 L57095:;
     if (((int)(signed char)*(signed char *)(itemmaker_slot_kinds + l_1C)) == (-1)) goto L570AA;
     l_18++;
@@ -326,10 +326,10 @@ L570B7:;
     l_18++;
     goto L570AF;
 L570BF:;
-    *(short *)(*(char **)itemmaker_item + 67 + (l_18 << 2)) = 65535;
+    itemmaker_item->enchantments[l_18].type = 65535;
     goto L570B7;
 L570D5:;
-    *(signed char *)(*(char **)itemmaker_item + 42) |= 32;
+    itemmaker_item->item_flags |= 32;
     func_00057F42();
     itemmaker_consume_soul();
     itemmaker_store_item();
@@ -339,9 +339,9 @@ L570D5:;
 
 void itemmaker_store_item(void)
 {
-    inv_store_item(*(int *)itemmaker_item_object);
-    *(int *)itemmaker_item = 0;
-    *(int *)itemmaker_item_object = 0;
+    inv_store_item((int)itemmaker_item_object);
+    itemmaker_item = 0;
+    itemmaker_item_object = 0;
 }
 
 void itemmaker_remove_slot(short a1)
@@ -372,14 +372,14 @@ void itemmaker_soul_list_cb(struct record *a1)
 L5728F:;
     return;
 L57294:;
-    if (*(signed char *)D_00190D63 != *(unsigned short *)((char *)a1 + 27)) goto L572B3;
-    *(int *)guild_npc_object = (int)a1;
+    if (*(signed char *)D_00190D63 != a1->soul_creature) goto L572B3;
+    guild_npc_object = a1;
 L572B3:;
-    *(signed char *)(text_rsc_buffer + *(int *)D_00195B84) = *(signed char *)((char *)a1 + 27);
+    *(signed char *)(text_rsc_buffer + *(int *)D_00195B84) = (signed char)a1->soul_creature;
     *(int *)(D_00190EE4 + ((*(int *)D_00195B84)++ << 2)) = *(int *)D_00190EDC;
-    mc_strncpy(*(int *)D_00190EDC, *(int *)(monster_names + (((int)(unsigned short)*(short *)((char *)a1 + 27)) << 2)), 4, (int)D_001756A3, 526);
+    mc_strncpy(*(int *)D_00190EDC, *(int *)(monster_names + (a1->soul_creature << 2)), 4, (int)D_001756A3, 526);
     l_18 = *(int *)D_00190EDC;
-    l_18 += func_000A0DF4(*(int *)(monster_names + (((int)(unsigned short)*(short *)((char *)a1 + 27)) << 2))) + 1;
+    l_18 += func_000A0DF4(*(int *)(monster_names + (a1->soul_creature << 2))) + 1;
     *(int *)D_00190EDC = l_18;
 }
 
@@ -505,7 +505,7 @@ L57617:;
 L5761C:;
     goto L5751B;
 L57621:;
-    if (((int)(unsigned short)*(short *)(*(char **)itemmaker_item + 32)) == 3) goto L5763D;
+    if (itemmaker_item->group == 3) goto L5763D;
     if (((int)(short)*(short *)&a2) == 20) goto L5763F;
 L5763D:;
     goto L57644;
@@ -696,8 +696,8 @@ L57E13:;
     *(signed char *)D_00190D63 = *(signed char *)(D_001998E2 + (l_1C << 2));
     *(int *)D_00195B84 = 0;
     object_foreach(player_entity->children, (int)itemmaker_soul_list_cb);
-    l_18 = *(struct record **)(*(char **)guild_npc_object + 67);
-    object_delete(*(int *)guild_npc_object);
+    l_18 = guild_npc_object->parent;
+    object_delete((int)guild_npc_object);
     if (l_18->data.item.enchantments[0].type == 26) return;
     object_free_single(l_18);
 }
@@ -756,7 +756,7 @@ void func_00057F42(void)
 
     if (*(signed char *)cfg_item_file == 0) return;
     l_18 = disk_create((int)cfg_item_file);
-    write(l_18, *(int *)itemmaker_item, 107);
+    write(l_18, (int)itemmaker_item, 107);
     func_0009DEA7(l_18);
 }
 
@@ -858,8 +858,8 @@ L5873B:;
 L5876C:;
     goto L58733;
 L5876E:;
-    *(int *)itemmaker_item_object = (int)l_1C;
-    *(int *)D_00190BE4 = (int)(unsigned short)*(short *)((char *)(*(int *)itemmaker_item = (int)l_18) + 61);
+    itemmaker_item_object = l_1C;
+    *(int *)D_00190BE4 = (int)(unsigned short)*(short *)((char *)(*(int *)&itemmaker_item = (int)l_18) + 61);
 }
 
 int enchant_item_value(int a1)

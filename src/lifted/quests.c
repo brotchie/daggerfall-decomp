@@ -29,7 +29,7 @@ extern char D_00195B85[];
 extern struct character *player_character;
 extern char game_minutes[];
 extern char D_00195C44[];
-extern char D_00195D00[];
+extern struct record *D_00195D00;
 extern char quest_potential_questor[];
 extern char D_00195F68[];
 extern char D_001961F5[];
@@ -143,7 +143,7 @@ L4BFBA:;
     l_24->faction_id = 0;
 L4BFC3:;
     current_quest = l_24;
-    *(int *)D_00195D00 = (int)l_28;
+    D_00195D00 = l_28;
     if (quest_init_resources(l_24) != 0) goto L4BFFF;
     quest_end(l_24);
     msgbox_show_rsc(600, 1);
@@ -201,7 +201,7 @@ int func_0004C526(struct record *a1)
     if (a1->type == 8) goto L4C54F;
     return 0;
 L4C54F:;
-    if (((int)(unsigned short)*(short *)((char *)a1 + 71)) != *(int *)D_00190BE4) goto L4C574;
+    if (a1->data.person.faction_id != *(int *)D_00190BE4) goto L4C574;
     D_00195AF4 = a1;
     return 1;
 L4C574:;
@@ -218,7 +218,7 @@ void func_0004C588(struct record *a1)
 L4C5C5:;
     goto L4C6CB;
 L4C5CA:;
-    *(int *)D_00190BE4 = (int)(unsigned short)*(short *)((char *)a1 + 89);
+    *(int *)D_00190BE4 = a1->data.building.faction_id;
     D_00195AF4 = 0;
     object_find((int)D_00195AC4, (int)func_0004C526);
     if (D_00195AF4 == 0) return;
@@ -232,7 +232,7 @@ L4C649:;
     D_00195AF4->quest_id = a1->quest_id;
     a1->twin = D_00195AF4;
     D_00195AF4->twin = a1;
-    *(signed char *)((char *)D_00195AF4 + 73) |= 128;
+    D_00195AF4->data.person.flags |= 128;
     if (((int)(unsigned short)(a1->flags & 2048)) == 0) goto L4C6C6;
     a1->flags |= 0x200;
 L4C6C6:;
@@ -420,7 +420,7 @@ L4CAFB:;
 
 int func_0004CB2F(struct record *a1)
 {
-    return (int)(unsigned char)(*(signed char *)((char *)a1 + 73) & 128);
+    return (int)(unsigned char)(a1->data.person.flags & 128);
 }
 
 void quest_pick_for_npc(struct record *a1)
@@ -428,7 +428,7 @@ void quest_pick_for_npc(struct record *a1)
     struct faction *l_18;
 
     if (a1 == 0) return;
-    l_18 = faction_find((int)(short)*(short *)((char *)a1 + 71));
+    l_18 = faction_find((int)(short)a1->data.person.faction_id);
     if (l_18->type != 4) goto L4CBA9;
     if (l_18->id != 407) goto L4CBAB;
 L4CBA9:;
@@ -448,7 +448,7 @@ void func_0004CC14(struct record *a1)
 L4CC3D:;
     return;
 L4CC3F:;
-    if (((int)(unsigned char)(*(signed char *)((char *)a1 + 73) & 128)) == 0) return;
+    if (((int)(unsigned char)(a1->data.person.flags & 128)) == 0) return;
     if (((struct bf8_7_1 *)&D_00195B85)->f == 0) goto L4CC61;
     (*(int *)D_00195B84)++;
     goto L4CC67;

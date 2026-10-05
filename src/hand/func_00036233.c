@@ -79,7 +79,7 @@ void rdb_create_objects(struct record *a1, struct node *a2, int a3)
         case 2:
             D_001995F4 = (struct spot *)(D_001995E8 + a2->data);
             obj = object_create_in_block(a1, 7, 0, D_001995F4->f0, a3);
-            *(unsigned short *)((char *)obj + 23) = D_001995F4->f8;
+            obj->light_radius = D_001995F4->f8;
             break;
         case 3:
             D_001995F0 = (struct rdb_flat *)(D_001995E8 + a2->data);
@@ -87,17 +87,17 @@ void rdb_create_objects(struct record *a1, struct node *a2, int a3)
                 switch ((D_001995F0->f0 & 31) - 2) {
                 case 14:
                     obj = rmb_make_marker(a1, D_001995F0->f0);
-                    *(unsigned short *)((char *)obj + 23) = D_001995F0->f5;
-                    *(unsigned short *)((char *)obj + 19) = D_001995F0->f4;
+                    obj->trigger_range = D_001995F0->f5;
+                    obj->mobile_id = D_001995F0->f4;
                     obj->link_flag = D_001995F0->f2;
                     obj->wait_state = D_001995F0->f10;
                     break;
                 case 13:
                     obj = rmb_make_marker(a1, D_001995F0->f0);
-                    *(unsigned short *)((char *)obj + 23) = D_001995F0->f5;
-                    *(unsigned short *)((char *)obj + 19) = D_001995F0->f2;
-                    if (*(unsigned short *)((char *)obj + 19) == 0)
-                        *(unsigned short *)((char *)obj + 19) = rand_range(1, 6);
+                    obj->trigger_range = D_001995F0->f5;
+                    obj->mobile_id = D_001995F0->f2;
+                    if (obj->mobile_id == 0)
+                        obj->mobile_id = rand_range(1, 6);
                     obj->wait_state = D_001995F0->f10;
                     break;
                 case 8:

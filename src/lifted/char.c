@@ -34,7 +34,7 @@ int npc_talk_record_build(struct record *a1)
     l_2C = (int)RECORD_DATA(a1);
     mc_memset((int)npc_record_buffer, 0, 560, (int)D_0017573C, 226, 4);
     if (a1->type != 53) goto L59A0D;
-    *(short *)D_0019995C = ((int)(unsigned short)*(short *)D_0019995C) | ((((int)(unsigned short)(a1->pad19 & 16384)) != 0) ? 1 : 0);
+    *(short *)D_0019995C = ((int)(unsigned short)*(short *)D_0019995C) | ((((int)(unsigned short)(a1->npc_flags & 16384)) != 0) ? 1 : 0);
     goto L59A4F;
 L59A0D:;
     if (l_20 == 0) goto L59A24;

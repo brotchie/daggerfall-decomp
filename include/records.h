@@ -10,7 +10,11 @@
  * names.csv names (`character+0x81 level` is `struct character`'s `level`). Fields nobody
  * has named are padNN, named by their offset. Everything is packed: fields sit at odd
  * offsets. Each struct's size is checked at compile time (RECORD_SIZE below), and
- * tools/offset_casts.py checks every offset comment against the layout. */
+ * tools/offset_casts.py checks every offset comment against the layout.
+ *
+ * Anonymous unions give one offset its meaning per record type. The first member is the
+ * default; a union whose first member is a padNN has none (offset_casts.py names the field
+ * only under --prefer). */
 #ifndef RECORDS_H
 #define RECORDS_H
 
@@ -28,7 +32,11 @@ struct record;
 /* character attributes[] and base_attributes[], career attributes[] */
 enum { ATTR_STR, ATTR_INT, ATTR_WIL, ATTR_AGI, ATTR_END, ATTR_PER, ATTR_SPD, ATTR_LUC };
 
-/* character skills[] (DFU DFCareer.Skills order); career skills[] holds these ids */
+/* character skills[] (DFU DFCareer.Skills order); career skills[] holds these ids. Checked
+ * against the code: player_frame_update scales the speed by skills[21] (running);
+ * the lycanthropy bonuses are +30 to 3, 21, 16, 34, 18, 30 (and 17): jumping, running,
+ * stealth, critical strike, climbing, hand-to-hand (swimming); lockpick_door reads 13; the
+ * career popup's hand-to-hand damage reads 30 (+0x151); inventory prices read 14. */
 enum {
     SKILL_MEDICAL, SKILL_ETIQUETTE, SKILL_STREETWISE, SKILL_JUMPING, SKILL_ORCISH,
     SKILL_HARPY, SKILL_GIANTISH, SKILL_DRAGONISH, SKILL_NYMPH, SKILL_DAEDRIC,
@@ -58,7 +66,7 @@ struct career {
     unsigned short flags;                   /* +0x04: bit 3 no magicka from travel, bit 4 no fast travel by day */
     unsigned char rapid_healing_flags;      /* +0x06 */
     unsigned char regeneration_flags;       /* +0x07 */
-    unsigned char pad08;                    /* +0x08 */
+    unsigned char pad08;                    /* +0x08: flags; classmaker advantage 11 sets one */
     unsigned char spell_absorption_flags;   /* +0x09 */
     unsigned char attack_modifier_flags;    /* +0x0A */
     unsigned short forbidden_materials;     /* +0x0B */
@@ -124,18 +132,21 @@ struct character {
     unsigned char face;                     /* +0x080 */
     unsigned char level;                    /* +0x081 */
     unsigned char reflexes;                 /* +0x082 */
-    short pad83;                            /* +0x083 */
+    short pad83;                            /* +0x083: the player's is set to 1 at a new game */
     int gold;                               /* +0x085 */
     unsigned int conditions;                /* +0x089: a bit per active effect; byte 1 is equip_effect_flags */
     short magicka;                          /* +0x08D */
     short max_magicka;                      /* +0x08F */
-    short reputation[5];                    /* +0x091: commoners, merchants, scholars, nobility, underworld */
+    union {
+        short reputation[5];                /* +0x091: commoners, merchants, scholars, nobility, underworld */
+        short loot_table;                   /* +0x091: creatures: the loot table, 1-based (monster_init) */
+    };
     unsigned short fatigue;                 /* +0x09B: x 64 */
     struct character_skill skills[35];      /* +0x09D: SKILL_* */
     struct record *equipped[27];            /* +0x16F: EQUIP_*; right_hand [19], left_hand [21] */
     unsigned short table_flags;             /* +0x1DB: creatures (monster+0x222) */
     unsigned short attack_damage[5][2];     /* +0x1DD: creatures (monster+0x224): {min, max} */
-    unsigned char pad1F1;                   /* +0x1F1 */
+    unsigned char pad1F1;                   /* +0x1F1: creatures get 255 (monster_init) */
     unsigned char original_race;            /* +0x1F2: player */
     int special_infection_time;             /* +0x1F3: player */
     unsigned char ascr_record;              /* +0x1F7: creatures (monster+0x23E) */
@@ -183,12 +194,18 @@ struct character {
     };
     unsigned char detect_kind;              /* +0x221 */
     unsigned char thieves_invite_count;     /* +0x222 */
-    unsigned char pad223;                   /* +0x223 */
-    unsigned char pad224;                   /* +0x224: chargen's RR effect */
-    char pad225[2];                         /* +0x225 */
+    unsigned char codeword;                 /* +0x223: macro_dbp_codeword: high nibble the first word,
+                                               low nibble the second */
+    signed char reputation_mod;             /* +0x224: the biography's "RR" answers add to it;
+                                               func_000679BB adds it to a reputation */
+    union {
+        unsigned short career_id;           /* +0x225: biography persons: the class (CLASS%02d.CFG) */
+        unsigned short spawn_seed;          /* +0x225: creatures: their marker's spawn seed (header +0x19),
+                                               given back to the corpse */
+    };
     short faction_id;                       /* +0x227: NPCs */
     unsigned char team;                     /* +0x229 */
-    unsigned char pad22A;                   /* +0x22A */
+    unsigned char pad22A;                   /* +0x22A: creatures: rand_range(table +26, +27) (monster_init) */
     unsigned char resist_chances[5];        /* +0x22B: by element */
     struct career career;                   /* +0x230: names.csv class; player_class points here */
 };                                          /* +0x27A */
@@ -200,10 +217,15 @@ struct monster_anim {
     short pad02;                    /* +0x02 */
     char *anim_script;              /* +0x04: the ASCR record */
     char *anim_script_pos;          /* +0x08 */
-    short pad0C;                    /* +0x0C */
+    short frame_count;              /* +0x0C: from the ASCR image header +22 (monster_init, object_draw_cb) */
     short timer;                    /* +0x0E */
-    unsigned char anim_events;      /* +0x10: bit 0 strike, bit 1 missile */
-    unsigned char anim_flags;       /* +0x11: bit 7 mirrored */
+    union {
+        struct {
+            unsigned char anim_events;  /* +0x10: bit 0 strike, bit 1 missile */
+            unsigned char anim_flags;   /* +0x11: bit 7 mirrored */
+        };
+        unsigned short anim_bits;   /* +0x10: the two read as a word (object_draw_cb, ai_creature_think) */
+    };
     char pad12[2];                  /* +0x12 */
     unsigned char anim_request;     /* +0x14: 255 none */
     unsigned char anim_facing;      /* +0x15 */
@@ -236,7 +258,7 @@ struct item {
     unsigned short item_flags;      /* +0x2A: 0x20 identified, 0x40 hidden, 0x800 artifact */
     unsigned short condition;       /* +0x2C */
     unsigned short max_condition;   /* +0x2E */
-    unsigned char pad30;            /* +0x30 */
+    unsigned char magicka_bonus;    /* +0x30: enchantment 3: taken off magicka and max_magicka when unequipped */
     unsigned char stack_count;      /* +0x31: also a potion's recipe index */
     unsigned short inventory_image; /* +0x32 */
     unsigned short dropped_image;   /* +0x34 */
@@ -245,7 +267,10 @@ struct item {
     unsigned char color;            /* +0x38 */
     unsigned int weight;            /* +0x39 */
     unsigned short enchant_points;  /* +0x3D */
-    unsigned int message;           /* +0x3F: book id, letter */
+    unsigned short message;         /* +0x3F: book id, letter, painting seed (always read as 16 bits) */
+    unsigned char variants;         /* +0x41: template byte 41: picture variants added to inventory_image;
+                                       ingredients: compared by the potion recipes */
+    unsigned char draw_order;       /* +0x42: template byte 42: the paperdoll's drawing order */
     struct enchantment enchantments[10]; /* +0x43 */
 };                                  /* +0x6B */
 RECORD_SIZE(item, 107);
@@ -257,18 +282,18 @@ struct spell_effect {
     unsigned char subtype;          /* +0x01 */
 };
 
-struct spell_range {                /* durations and chances */
-    unsigned char base;             /* +0x00 */
-    unsigned char plus;             /* +0x01 */
-    unsigned char per_level;        /* +0x02 */
+struct spell_range {                /* durations and chances: every read is signed (movsx) */
+    signed char base;               /* +0x00: -1 none */
+    signed char plus;               /* +0x01 */
+    signed char per_level;          /* +0x02 */
 };
 
-struct spell_magnitude {
-    unsigned char base_min;         /* +0x00 */
-    unsigned char base_max;         /* +0x01 */
-    unsigned char plus_min;         /* +0x02 */
-    unsigned char plus_max;         /* +0x03 */
-    unsigned char per_level;        /* +0x04 */
+struct spell_magnitude {            /* every read is signed (movsx) */
+    signed char base_min;           /* +0x00 */
+    signed char base_max;           /* +0x01 */
+    signed char plus_min;           /* +0x02 */
+    signed char plus_max;           /* +0x03 */
+    signed char per_level;          /* +0x04 */
 };
 
 struct spell {
@@ -306,7 +331,7 @@ RECORD_SIZE(disease, 47);
 struct potion_recipe {
     signed char ingredient_indices[8]; /* +0x00: -2 ends */
     unsigned short value;           /* +0x08 */
-    unsigned char ingredient_groups[8]; /* +0x0A */
+    signed char ingredient_groups[8]; /* +0x0A: compared signed (movsx) */
     char pad12[2];                  /* +0x12 */
     struct spell spell;             /* +0x14 */
 };                                  /* +0x6D */
@@ -365,8 +390,14 @@ RECORD_SIZE(bank_account, 13);
 
 struct map_location {
     unsigned int map_id;            /* +0x00: bits 0-19 map pixel, 20-31 MAPPITEM/MAPDITEM index */
-    unsigned int x_type_flags;      /* +0x04: x 0-24, type 25-29, discovered 30, hidden 31 */
-    unsigned int y_size;            /* +0x08: z 0-23, area width/height 24-31 */
+    union {
+        unsigned int x_type_flags;  /* +0x04 */
+        struct { unsigned x:25; unsigned type:5; unsigned discovered:1; unsigned hidden:1; };
+    };
+    union {
+        unsigned int y_size;        /* +0x08 */
+        struct { unsigned z:24; unsigned width:4; unsigned height:4; };
+    };
     unsigned char dungeon_type;     /* +0x0C: 255 none */
     unsigned int services;          /* +0x0D */
 };                                  /* +0x11 */
@@ -406,8 +437,9 @@ RECORD_SIZE(building, 26);
 /* ---- the settings record: type 23 (Options), 6 bytes (game_settings) --------------------- */
 
 struct settings {
-    unsigned char view_flags;       /* +0x00: bit 0 full screen, bit 1 head bobbing */
-    unsigned char detail_level;     /* +0x01 */
+    unsigned short view_flags;      /* +0x00: bit 0 full screen, bit 1 head bobbing, bit 2 DAGGER.GRD
+                                       exists (load_game: hides FLATS.CFG flag-2 flats), bits 8-15
+                                       the detail level 0..127; always read as a word */
     unsigned short sound_volume;    /* +0x02 */
     unsigned short music_volume;    /* +0x04 */
 };                                  /* +0x06 */
@@ -455,9 +487,12 @@ struct quest {
     char name[9];                   /* +0x06 */
     unsigned char flags;            /* +0x0F: bit 1 rewarded */
     short section_counts[10];       /* +0x10 */
-    short section_offsets[11];      /* +0x24: from the quest start; 10 = text variables */
-};                                  /* +0x3A */
-RECORD_SIZE(quest, 0x3A);
+    short section_offsets[10];      /* +0x24: from the quest start */
+    int text_offset;                /* +0x38: section 10, the text variables (struct qbn_text_var),
+                                       0 none: a u16 and a zero u16 in the file (DFU's Null1), read
+                                       as one int (quest_init_resources, quest_relink_after_load) */
+};                                  /* +0x3C */
+RECORD_SIZE(quest, 0x3C);
 
 struct qbn_arg {
     unsigned char negate;           /* +0x00 */
@@ -488,14 +523,15 @@ RECORD_SIZE(qbn_state, 8);
 
 struct qbn_timer {                  /* section 6 */
     short pad00;                    /* +0x00 */
-    unsigned short flags;           /* +0x02: 64 running, 128 expired, 0x400 links resolved */
-    unsigned char type;             /* +0x04 */
+    unsigned short flags;           /* +0x02: 64 running, 128 expired, 0x400 links resolved, 16 doubled,
+                                       256/512 link1/link2 is a person (func_0002CB34 reads it signed) */
+    unsigned char type;             /* +0x04: 0 random, 1 fixed, 2-5 travel time to places/persons */
     int minimum;                    /* +0x05 */
     int maximum;                    /* +0x09 */
-    int start;                      /* +0x0D */
-    int delay;                      /* +0x11 */
-    int link1;                      /* +0x15 */
-    int link2;                      /* +0x19 */
+    int start;                      /* +0x0D: game_minutes */
+    unsigned int delay;             /* +0x11: expired when game_minutes - start > delay (unsigned) */
+    struct record *link1;           /* +0x15: a place or person index in the file, then its object */
+    struct record *link2;           /* +0x19 */
     int state_hash;                 /* +0x1D */
 };                                  /* +0x21 */
 RECORD_SIZE(qbn_timer, 33);
@@ -503,27 +539,39 @@ RECORD_SIZE(qbn_timer, 33);
 struct qbn_item {                   /* section 0 */
     char pad00[2];                  /* +0x00 */
     unsigned char flags;            /* +0x02: bit 7 topic hidden */
-    char pad03[8];                  /* +0x03 */
+    short group;                    /* +0x03: item group (< 0 random); gold: the maximum; 100 a template */
+    short index;                    /* +0x05: item index (-1 random); gold: the minimum, -1 by level */
+    int symbol;                     /* +0x07: the name's hash (quest_symbol_text) */
     struct record *object;          /* +0x0B */
     short messages[2];              /* +0x0F */
 };                                  /* +0x13 */
 RECORD_SIZE(qbn_item, 19);
 
 struct qbn_person {                 /* section 3 */
-    char pad00[3];                  /* +0x00 */
-    unsigned char flags;            /* +0x03 */
-    short kind;                     /* +0x04 */
+    char pad00[2];                  /* +0x00 */
+    unsigned short flags;           /* +0x02: always a word: low byte 0 here, 255 random, else elsewhere;
+                                       0x100 any building, 0x200/0x400 the gender, 0x1000/0x4000 door
+                                       flags; 0x2000 opcode 82, 0x4000 opcode 81, 0x8000 topic hidden */
+    short kind;                     /* +0x04: 21 gets the questor rumors */
     short faction_id;               /* +0x06 */
-    char pad08[4];                  /* +0x08 */
+    int symbol;                     /* +0x08: the name's hash (quest_symbol_text) */
     struct record *object;          /* +0x0C */
     short messages[2];              /* +0x10 */
 };                                  /* +0x14 */
 RECORD_SIZE(qbn_person, 20);
 
-struct qbn_place {                  /* section 4 */
+struct qbn_place {                  /* section 4 (DFU Places.txt: p1 p2 p3) */
     char pad00[2];                  /* +0x00 */
-    unsigned char flags;            /* +0x02 */
-    char pad03[13];                 /* +0x03 */
+    unsigned char flags;            /* +0x02: bit 7 topic hidden, bit 6 opcode 81 */
+    signed char scope;              /* +0x03: 0 a fixed place (10 once made), > 0 another location
+                                       (counted down), -1 here (quest_init_place) */
+    unsigned short p1;              /* +0x04: 0 a building, else a door/marker; a fixed place: the
+                                       id's high word */
+    short p2;                       /* +0x06: the building type (< 0 any shop, 17-20 houses, 11 temple);
+                                       a fixed place: the id's low word */
+    short p3;                       /* +0x08: -1 any door, 0 door flag 0x4000, 1 door flag 0x1000 */
+    char pad0A[2];                  /* +0x0A */
+    int symbol;                     /* +0x0C: the name's hash (quest_symbol_text) */
     struct record *object;          /* +0x10 */
     short messages[2];              /* +0x14 */
 };                                  /* +0x18 */
@@ -531,12 +579,103 @@ RECORD_SIZE(qbn_place, 24);
 
 struct qbn_foe {                    /* section 7 */
     char pad00[3];                  /* +0x00 */
-    unsigned char type;             /* +0x03 */
-    short count;                    /* +0x04 */
-    char pad06[4];                  /* +0x06 */
+    unsigned char type;             /* +0x03: the monster type */
+    unsigned char count;            /* +0x04: a byte (quest_op09_spawn_repeat, func_000295BE) */
+    unsigned char killed;           /* +0x05: counted up by qcond_op02_event_count */
+    int symbol;                     /* +0x06: the name's hash (quest_symbol_text) */
     struct record *object;          /* +0x0A */
 };                                  /* +0x0E */
 RECORD_SIZE(qbn_foe, 14);
+
+struct qbn_text_var {               /* section 10 (quest text_offset): the text variables */
+    char name[20];                  /* +0x00: 0 ends the list */
+    unsigned char section;          /* +0x14 */
+    short index;                    /* +0x15 */
+    char *record;                   /* +0x17: quest_record(section, index) (quest_init_resources) */
+};                                  /* +0x1B */
+RECORD_SIZE(qbn_text_var, 27);
+
+/* ---- NPCs, blessings, the automap -------------------------------------------------------- */
+
+/* the data of a type-8 NPC (a flat person in a building or block; 3 bytes, rmb_make_flat) */
+struct person {
+    unsigned short faction_id;      /* +0x00: guild_service_dispatch picks the service by it */
+    unsigned char flags;            /* +0x02: bit 3 shopkeeper (the building menus), bit 4 female,
+                                       bit 7 a potential quest giver; others from the RMB flat */
+};                                  /* +0x03 */
+RECORD_SIZE(person, 3);
+
+/* the data of a blessing (type 30), bought from a temple */
+struct blessing {
+    unsigned char target;           /* +0x00: skill id, 128|attribute, or 255 regional legal reputation */
+    signed char amount;             /* +0x01: what blessing_apply added */
+    unsigned int end_time;          /* +0x02: game_minutes when guild_expire_blessings removes it */
+    unsigned char region;           /* +0x06: target 255: the region (blessing_remove) */
+};                                  /* +0x07 */
+RECORD_SIZE(blessing, 7);
+
+/* the data of the automap record (type 51), saved as AT%05d.AMF */
+struct automap {
+    char notes[2048];               /* +0x0000: u16 object id, string */
+    unsigned char seen_bits[8192];  /* +0x0800: a bit per object id (record_id low word) */
+};                                  /* +0x2800 */
+RECORD_SIZE(automap, 10240);
+
+/* ---- RMB blocks (the data of a type-43 object) ----------------------------------------- */
+
+/* a 3D object of an RMB block, 66 bytes (DFU RmbBlock3dObjectRecord) */
+struct block_model {
+    unsigned short id;              /* +0x00: model id (418/410 shelves); <= 10 none */
+    unsigned char variant;          /* +0x02: model_get's second argument; the shelf kind */
+    unsigned char kind;             /* +0x03: DFU ObjectType */
+    char *model;                    /* +0x04: the loaded model (model_get), 0 none */
+    char pad08[28];                 /* +0x08 */
+    int x;                          /* +0x24: made absolute by rmb_add_subrecord */
+    int y;                          /* +0x28 */
+    int z;                          /* +0x2C */
+    char pad30[4];                  /* +0x30 */
+    int yaw;                        /* +0x34: the block's yaw is added */
+    char pad38[10];                 /* +0x38 */
+};                                  /* +0x42 */
+RECORD_SIZE(block_model, 66);
+
+/* a flat of an RMB block, 17 bytes (DFU RmbBlockFlatObjectRecord); people use the same layout */
+struct block_flat {
+    int x;                          /* +0x00: made absolute by rmb_add_subrecord */
+    int y;                          /* +0x04 */
+    int z;                          /* +0x08 */
+    unsigned short image;           /* +0x0C: archive<<7 | record; 199<<7 editor markers */
+    unsigned short faction_id;      /* +0x0E */
+    unsigned char flags;            /* +0x10 */
+};                                  /* +0x11 */
+RECORD_SIZE(block_flat, 17);
+
+/* a door of an RMB block, 19 bytes (rmb_add_doors, after the people) */
+struct block_door {
+    int x;                          /* +0x00 */
+    int y;                          /* +0x04 */
+    int z;                          /* +0x08 */
+    short yaw;                      /* +0x0C: the block's yaw is added */
+    short image2;                   /* +0x0E: the door object's image2 and image: model id */
+    unsigned char image;            /* +0x10:   image2 * 100 + image */
+    unsigned char lock_level;       /* +0x11 */
+    unsigned char pad12;            /* +0x12 */
+};                                  /* +0x13 */
+RECORD_SIZE(block_door, 19);
+
+/* the data of a type-43 object: an RMB subrecord's counts and lists (rmb_add_subrecord copies
+ * the header and the three lists, then points the pointers at the copies) */
+struct block {
+    unsigned char model_count;      /* +0x00: struct block_model */
+    unsigned char flat_count;       /* +0x01: struct block_flat */
+    unsigned char section3_count;   /* +0x02: 16-byte records */
+    unsigned char people_count;     /* +0x03: 17-byte people after the subrecord (not copied) */
+    unsigned char door_count;       /* +0x04: 19-byte doors after them (not copied) */
+    struct block_model *models;     /* +0x05 */
+    struct block_flat *flats;       /* +0x09 */
+    char *section3;                 /* +0x0D */
+};                                  /* +0x11 */
+RECORD_SIZE(block, 17);
 
 /* ---- the record --------------------------------------------------------------------------- */
 
@@ -554,37 +693,119 @@ union record_data {
     struct quest quest;             /* 14 a quest: the QBN file */
     struct settings settings;       /* 23 options */
     struct bank_account bank_accounts[62]; /* 25 one per region */
+    struct person person;           /* 8 NPCs */
+    struct blessing blessing;       /* 30 */
+    struct building building;       /* 40 quest places, 41 quest NPCs (then the location's name at
+                                       +0x1A), 64 stored buildings */
+    struct block block;             /* 43 RMB blocks */
+    struct automap automap;         /* 51 */
 };
 
 /* ---- the header ------------------------------------------------------------------------ */
 
 struct record {
     unsigned char type;             /* +0x00: 2 item, 3 character, 9 spell, 11 effect, ... */
-    short angle_x;                  /* +0x01 */
+    union {
+        short angle_x;              /* +0x01: the pitch */
+        short draw_frame;           /* +0x01: flats, items, creatures, NPCs, loot (2, 8, 18, 33, 34,
+                                       44, 53): frame_counter when last drawn (object_draw_cb) */
+    };
     short yaw;                      /* +0x03: 2048 to a turn, clockwise from north */
     short angle_z;                  /* +0x05 */
     int x;                          /* +0x07: 1/40 m east */
     int y;                          /* +0x0B: 1/40 m, height */
     int z;                          /* +0x0F: 1/40 m north */
-    char pad13[2];                  /* +0x13 */
+    union {
+        unsigned short pad13;       /* +0x13: 8000 flats, lights and doors; 32768 RMB blocks (43) and
+                                       town blocks (38) */
+        unsigned short mobile_id;   /* +0x13: markers: the creature to spawn (a monster table index,
+                                       then its id; bit 7 no water check); corpses (34): the creature's */
+        unsigned short anim_time;   /* +0x13: animated flats: the frame time (ticks >> 5) */
+        unsigned char block_special; /* +0x13: dungeon block quarters (47): the start marker's special
+                                       flag (castle music, no ambient sound) */
+    };
     unsigned short flags;           /* +0x15: names.csv object_flags; 0x20 not owned, 0x02 not listed */
     union {
-        unsigned short owner;       /* +0x17: a shop item's owner */
+        unsigned short pad17;       /* +0x17 */
+        unsigned short owner;       /* +0x17: shop items: the shop; quest places (40): the quest id;
+                                       tavern room markers: the room; type 57: the building count */
         unsigned short lock_level;  /* +0x17: doors (type 32) */
+        unsigned short missile_texture; /* +0x17: spell missiles (9): spell_missile_textures[element],
+                                       bit 0 once it has hit */
+        unsigned short light_radius; /* +0x17: lights (7): 64, << 2 on a missile's impact */
+        unsigned short missile_yaw; /* +0x17: arrows in flight (2): the heading of the velocity */
+        unsigned short flat_count;  /* +0x17: type 56: the 17-byte flats after its models */
+        unsigned short trigger_range; /* +0x17: markers: 0-6 (func_00026081) */
+        unsigned short light_level; /* +0x17: dungeon block quarters (47) (sky_update) */
+        unsigned short building_type; /* +0x17: building objects: the building's type */
+        unsigned short detect_distance; /* +0x17: creatures: Detect's distance */
+        unsigned short anim_frame;  /* +0x17: animated flats: the frame counter */
+        unsigned short home_region; /* +0x17: quest NPCs (41, 65): the region (the name set) */
+        unsigned short home_building; /* +0x17: pedestrians (53): a building index (person_place) */
     };
     union {
         short pad19;                /* +0x19: a new loot pile gets 1 */
         unsigned short lockpick_skill_tried; /* +0x19: doors */
+        short faction_id;           /* +0x19: quest NPCs (41, 65): qbn_person.faction_id */
+        short region;               /* +0x19: quest places (40) */
+        unsigned short npc_flags;   /* +0x19: pedestrians (53): 0x4000 female (npc_talk_record_build;
+                                       func_000763C6 sets it before pickpocket_attempt), 0x8000 a
+                                       failed pickpocket */
+        short water_level;          /* +0x19: dungeon block quarters (47): 10000 none */
+        unsigned short spawn_seed;  /* +0x19: markers: the spawn's srand() seed; corpses get it back */
+        short from_player;          /* +0x19: arrows in flight (2): 1 fired by the player */
     };
-    unsigned short image;           /* +0x1B: names.csv world_image; archive<<7 | record */
-    unsigned short image2;          /* +0x1D */
+    union {
+        unsigned short pad1B;       /* +0x1B */
+        unsigned short image;       /* +0x1B: names.csv world_image; archive<<7 | record */
+        unsigned short soul_creature; /* +0x1B: trapped souls (20): the creature (monster) id */
+        unsigned short trap_chance; /* +0x1B: soul-trap effects (19): the chance (cast_chances) */
+        unsigned short model_count; /* +0x1B: type 56: its 66-byte RMB models */
+        unsigned short building_index; /* +0x1B: building objects, building markers (43), stored
+                                       buildings (64): index into current_location->buildings */
+        unsigned short block_number; /* +0x1B: dungeon block quarters (47): the RDB block number */
+        unsigned short shelf_owner; /* +0x1B: items on a shop shelf (36): the shop */
+        unsigned short location_index; /* +0x1B: the location object: its index, 0xFFFF wilderness */
+        unsigned short seen_count;  /* +0x1B: the automap (51): bytes of seen bits */
+    };
+    union {
+        unsigned short pad1D;       /* +0x1D */
+        unsigned short image2;      /* +0x1D: DFU Picture2; 3D objects: the model id's hundreds */
+        unsigned short trap_duration; /* +0x1D: soul-trap effects (19): rounds (cast_durations) */
+    };
     unsigned int id;                /* +0x1F: names.csv record_id */
     unsigned char link_flag;        /* +0x23 */
-    short wait_state;               /* +0x24: creatures (monster+0x24): 99 asleep until hurt */
+    union {
+        short pad24;                /* +0x24 */
+        short wait_state;           /* +0x24: creatures (monster+0x24): 99 asleep until hurt */
+        short door_angle;           /* +0x24: doors (32): 0..512, set by doors_update */
+    };
     unsigned char quest_id;         /* +0x26 */
     unsigned int parent_id;         /* +0x27: in the save file */
-    unsigned int repair_due;        /* +0x2B: items in repair (type 54) */
-    struct record *caster;          /* +0x2F: spells (type 9) */
+    union {
+        unsigned int pad2B;         /* +0x2B */
+        unsigned int repair_due;    /* +0x2B: items in repair (54): game_minutes when ready; a rented
+                                       room's loot pile (58): the rent's end */
+        unsigned int expire_minutes; /* +0x2B: spell-created and conjured items: game_minutes when
+                                       they vanish */
+        int name_seed;              /* +0x2B: NPCs (8, 53), quest NPCs and foes: the name seed */
+        unsigned int door_swing;    /* +0x2B: doors (32): bits 0-29 the BIOS tick the swing began,
+                                       bit 30 swinging, bit 31 open */
+        unsigned int building_id;   /* +0x2B: stored buildings (64): the building's id; quest places
+                                       and NPCs (40, 41, 65): a copy of their id */
+        unsigned int created_minutes; /* +0x2B: the automap (51): expires 43200 minutes after */
+        unsigned int move_frame;    /* +0x2B: models (6): frame_counter when a link last moved it */
+        unsigned int move_remainder; /* +0x2B: pedestrians (53): the x and z fractions of the last
+                                       move (bytes 0 and 1) */
+    };
+    union {
+        unsigned int pad2F;         /* +0x2F */
+        struct record *caster;      /* +0x2F: spells (type 9) */
+        int draw_handle;            /* +0x2F: other drawn objects: the XnGine draw handle
+                                       (object_draw_cb, automap_draw_object_cb, pick_sprite_cb) */
+        unsigned int home_id;       /* +0x2F: items in repair (54), room loot piles (58): the id of
+                                       the object to go back to */
+    };
     struct record *twin;            /* +0x33 */
     struct record *next;            /* +0x37 */
     struct record *prev;            /* +0x3B */
@@ -596,6 +817,98 @@ RECORD_OFFSET(record, data, 0x47);
 
 /* the data of a record as a char pointer: `(char *)r + 71` */
 #define RECORD_DATA(r) ((char *)(r) + 0x47)
+
+/* ---- other structures (not records) --------------------------------------------------------- */
+
+/* a rumor (RUMOR.DAT): the 34-byte header, then text_length bytes of text */
+struct rumor {
+    short faction1;                 /* +0x00: faction ids (rumor_add_faction, rumor_is_eligible) */
+    short faction2;                 /* +0x02 */
+    int kind;                       /* +0x04: the politics event; 100 not a politics rumor */
+    unsigned char region;           /* +0x08: rumor_collect_local matches current_region */
+    unsigned char flags;            /* +0x09: 1 regional, 2 quest NPC, 4 quest, 8 faction, 0x20 dropped */
+    unsigned char quest_id;         /* +0x0A */
+    char quest_name[9];             /* +0x0B */
+    short message;                  /* +0x14: the quest message */
+    int target;                     /* +0x16: an object id (flag 2; rumor_find_for_npc) */
+    int text_length;                /* +0x1A */
+    unsigned int expires;           /* +0x1E: game_minutes */
+};                                  /* +0x22 */
+RECORD_SIZE(rumor, 34);
+
+/* the MAPS location record being loaded (the global loaded_location, 0x196A88) */
+struct loaded_location {
+    int index;                      /* +0x00 */
+    int door_count;                 /* +0x04 */
+    char *doors;                    /* +0x08: 6-byte door records (location_find_door) */
+    struct record *object;          /* +0x0C: the header read from MAPS, then the location (malloc 119) */
+    struct location *data;          /* +0x10: object + 0x47 */
+};                                  /* +0x14 */
+RECORD_SIZE(loaded_location, 20);
+
+/* the header of a block of the game's memory pools (jmem.c); the data follows */
+struct mem_block {
+    unsigned int magic;             /* +0x00: 0x69696969 in a used block */
+    struct mem_block *next;         /* +0x04 */
+    struct mem_block *prev;         /* +0x08 */
+    unsigned int size;              /* +0x0C: the data's size */
+    unsigned short flags;           /* +0x10: bit 0 used */
+};                                  /* +0x12 */
+RECORD_SIZE(mem_block, 18);
+
+/* a memory pool (mem_pool_init, mem_pool_alloc, mem_pool_free) */
+struct mem_pool {
+    int pad00;                      /* +0x00: cleared by mem_pool_init */
+    struct mem_block *first;        /* +0x04: the malloc'd area, one free block at first */
+    int pad08;                      /* +0x08 */
+    int size;                       /* +0x0C */
+};                                  /* +0x10 */
+RECORD_SIZE(mem_pool, 16);
+
+/* an action link of a dungeon object (an RDB action record, as loaded; links.c) */
+struct link {
+    unsigned short object_id;       /* +0x00: the low word of the object's record id */
+    unsigned char trigger;          /* +0x02: DFU RdbTriggerFlags (1 collision, 2 click, 5 attack, ...) */
+    unsigned char param;            /* +0x03: the sound; the text/spell/sound of actions 9, 11, 12, 30, 99 */
+    unsigned char axis;             /* +0x04: 1-6 +x -x +y -y +z -z; a second parameter for others */
+    short duration;                 /* +0x05: ticks */
+    short magnitude;                /* +0x07: distance or angle */
+    unsigned char action;           /* +0x09: DFU RdbActionFlags (1 translate, 8 rotate, ...) */
+    unsigned char chain_count;      /* +0x0A: records that follow in the same chain */
+    unsigned char combination;      /* +0x0B: action 129: the low nibble collects the switches' bits,
+                                       done when it equals the high nibble */
+    unsigned char flags;            /* +0x0C: 1 finished, 2 reversed, 4 sound played, 16 stop, 32 axis */
+    int start;                      /* +0x0D: the start position or angle */
+    int speed;                      /* +0x11: 16.16 per tick */
+    char pad15[4];                  /* +0x15 */
+    int start_tick;                 /* +0x19: BIOS tick */
+    short delta[3];                 /* +0x1D: the object's last move */
+    struct record *object;          /* +0x23: the moved object (a record id in the save) */
+};                                  /* +0x27 */
+RECORD_SIZE(link, 39);
+
+/* a node of the model cache's binary tree (objlib.c) */
+struct model_node {
+    struct model_node *left;        /* +0x00 */
+    struct model_node *right;       /* +0x04 */
+    int last_frame;                 /* +0x08: frame_counter when last used */
+    int key;                        /* +0x0C: model id + variant << 17 */
+    char *model;                    /* +0x10: the ARCH3D record */
+};                                  /* +0x14 */
+RECORD_SIZE(model_node, 20);
+
+/* what the collision code is asked to move (colstuff.c) */
+struct move_request {
+    int x;                          /* +0x00 */
+    int y;                          /* +0x04 */
+    int z;                          /* +0x08 */
+    int angle_x;                    /* +0x0C */
+    int yaw;                        /* +0x10 */
+    int angle_z;                    /* +0x14 */
+    int *probe;                     /* +0x18: x, y, z (D_00196D4C) */
+    unsigned short flags;           /* +0x1C: bit 0 (func_00023FA5) */
+};                                  /* +0x1E */
+RECORD_SIZE(move_request, 30);
 
 #pragma pack()
 

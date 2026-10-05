@@ -9,7 +9,7 @@ int spell_cost_magnitude(void)
 {
     short cost;
 
-    cost = ((signed char)selected_spell->magnitudes[spell_effect_slot].base_min + (signed char)selected_spell->magnitudes[spell_effect_slot].base_max) / 2 * spell_effect_cost_current[0];
-    cost += (((signed char)selected_spell->magnitudes[spell_effect_slot].plus_min + (signed char)selected_spell->magnitudes[spell_effect_slot].plus_max) / 2 / (signed char)selected_spell->magnitudes[spell_effect_slot].per_level) * spell_effect_cost_current[1];
+    cost = (selected_spell->magnitudes[spell_effect_slot].base_min + selected_spell->magnitudes[spell_effect_slot].base_max) / 2 * spell_effect_cost_current[0];
+    cost += ((selected_spell->magnitudes[spell_effect_slot].plus_min + selected_spell->magnitudes[spell_effect_slot].plus_max) / 2 / selected_spell->magnitudes[spell_effect_slot].per_level) * spell_effect_cost_current[1];
     return cost;
 }

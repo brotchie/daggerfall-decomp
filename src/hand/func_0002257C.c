@@ -2,7 +2,6 @@
 #include "records.h"
 
 struct vec3 { int x, y, z; };
-struct move { int x, y, z; int f12, f16, f20; };
 struct plane { char pad[16]; int nx, ny, nz; char pad2[2]; };
 struct planes { int count; struct plane p[1]; };
 extern unsigned char player_environment;
@@ -18,12 +17,12 @@ extern int D_00196D60;
 extern short collide_flags;
 extern void collide_for_each_nearby(struct record *, void (*)(int));
 extern void func_0002325A(int);
-extern int func_00023FA5(struct record *, int, struct move *);
+extern int func_00023FA5(struct record *, int, struct move_request *);
 extern void object_set_position(struct record *, int, int, int, int, int, int);
 extern int func_0014B45B(int, int);
 extern void func_0014BDDD(struct vec3 *);
 
-int collide_move_object(struct record *o, int a2, struct move *m, int a4)
+int collide_move_object(struct record *o, int a2, struct move_request *m, int a4)
 {
     int result;
     int unused40;           /* never used, but it has a stack slot */
@@ -53,7 +52,7 @@ int collide_move_object(struct record *o, int a2, struct move *m, int a4)
         return 0;
     if (collide_candidate_count == 0 && player_environment == 1) {
         D_00196D60 = func_0014B45B(o->x, o->z);
-        object_set_position(o, m->x, D_00196D60, m->z, m->f12, m->f16, m->f20);
+        object_set_position(o, m->x, D_00196D60, m->z, m->angle_x, m->yaw, m->angle_z);
         return 0;
     }
     flags = collide_flags;

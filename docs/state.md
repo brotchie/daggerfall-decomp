@@ -304,8 +304,9 @@ left, back, slide right). The movement keys use the same handlers.
 fall damage every frame. The on-ground flag, vertical velocity, crouch and look pitch were
 confirmed by experiment.
 
-**Settings:** `game_settings` (0x195BF8) points at the settings record. Its view flags hold
-full screen (bit 0) and head bobbing (bit 1), then detail and the volumes.
+**Settings:** `game_settings` (0x195BF8) points at the settings record. Its first word (always
+read as one u16) holds full screen (bit 0), head bobbing (bit 1), the content filter (bit 2,
+set by load_game when DAGGER.GRD exists) and the detail level (bits 8-15); the volumes follow.
 
 **HUD:**
 - 11 buttons.
@@ -436,7 +437,10 @@ include/records.h defines the records as C structs: the 71-byte header (`struct 
 a union of the data that follows it (`r->data.character`, `r->data.item`, ...), and the
 character (634 bytes, with the class record `career` inside it), monster, item, spell,
 disease, potion recipe, faction, membership, bank account, map location, location, building,
-pick list and the quest/QBN records. Every size and offset is checked at compile time and by
+NPC person, blessing, automap, RMB block lists, pick list and the quest/QBN records (the QBN
+header is 60 bytes), and some structures that are not records: rumors, the loaded MAPS
+location, links, memory blocks and pools, the model cache nodes and the collision move
+request. Every size and offset is checked at compile time and by
 `tools/offset_casts.py check`. docs/structs.md has the rules for converting code to them.
 
 ## Calling functions directly

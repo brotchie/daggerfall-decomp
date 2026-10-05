@@ -61,7 +61,7 @@ extern char saved_region_name[];
 extern char text_buffer[];
 extern struct record *player_object;
 extern struct record *D_00195AC4;
-extern char guild_npc_object[];
+extern struct record *guild_npc_object;
 extern struct location *current_location;
 extern struct career *player_class;
 extern char D_001960D9[];
@@ -211,10 +211,10 @@ void guild_service_dispatch(struct record *a1)
     D_0019671C = faction_find(current_building->faction_id);
     guild_membership = guild_find_membership_by_faction(current_building->faction_id);
     l_2C = guild_kind_of_faction((int)D_0019671C);
-    *(int *)guild_npc_object = (int)a1;
+    guild_npc_object = a1;
     guild_join_or_promote(l_2C, 0);
     *(short *)D_001A4A1A = ((unsigned)a1->id) >> 16;
-    l_1C = guild_service_label((int)(short)*(short *)((char *)a1 + 71));
+    l_1C = guild_service_label((int)(short)a1->data.person.faction_id);
     if (l_1C != 0) goto L6DCEE;
     npc_talk(a1);
     return;
@@ -281,7 +281,7 @@ L6DE67:;
     goto L6F43A;
 case 0:
     if (guild_membership == 0) goto L6E093;
-    switch (*(unsigned short *)((char *)a1 + 71)) {
+    switch (a1->data.person.faction_id) {
 case 839:
     training_offer((int)D_00186F37);
     goto L6E093;
@@ -341,7 +341,7 @@ L6E0D9:;
     player_character->magicka = player_character->max_magicka;
     msgbox_show_rsc(465, 1);
 L6E101:;
-    switch (*(unsigned short *)((char *)a1 + 71)) {
+    switch (a1->data.person.faction_id) {
 case 61:
     training_offer((int)D_00186F5F);
     goto L6E215;
@@ -389,7 +389,7 @@ L6E217:;
 L6E21E:;
     if (l_20 == 0) goto L6E338;
 }
-    switch (*(unsigned short *)((char *)a1 + 71)) {
+    switch (a1->data.person.faction_id) {
 case 60:
     guild_buy_spells();
     goto L6E338;
@@ -418,7 +418,7 @@ L6E338:;
 }
 case 2:
     if (guild_membership == 0) goto L6E403;
-    switch (*(unsigned short *)((char *)a1 + 71)) {
+    switch (a1->data.person.faction_id) {
 case 849:
     training_offer((int)D_00186F74);
     goto L6E401;
@@ -442,7 +442,7 @@ L6E403:;
     l_20 = 1;
 L6E40A:;
     if (l_20 == 0) goto L6E463;
-    if (((int)(unsigned short)*(short *)((char *)a1 + 71)) != 851) goto L6E45B;
+    if (a1->data.person.faction_id != 851) goto L6E45B;
     if (a1->quest_id != 0) goto L6E451;
     quest_pick_file(77, 0, 48, 67, guild_membership->rank);
     goto L6E459;
@@ -459,7 +459,7 @@ case 3:
     if (guild_membership != 0) goto L6E486;
     goto L6E57A;
 L6E486:;
-    switch ((unsigned short)(*(short *)((char *)a1 + 71) - 803)) {
+    switch ((unsigned short)(a1->data.person.faction_id - 803)) {
 case 0:
     training_offer((int)D_00186F4C);
     goto L6E57A;
@@ -504,7 +504,7 @@ case 75:
 case 76:
 case 77:
     if (guild_membership == 0) goto L6E7B0;
-    switch (*(unsigned short *)((char *)a1 + 71)) {
+    switch (a1->data.person.faction_id) {
 case 845:
     if (((1 << (guild_membership->rank)) & guild_membership->armor_received) == 0) goto L6E5EC;
     msgbox_show_rsc(461, 1);
@@ -554,7 +554,7 @@ L6E7B0:;
 L6E7B7:;
     if (l_20 == 0) goto L6E854;
 }
-    switch (*(unsigned short *)((char *)a1 + 71)) {
+    switch (a1->data.person.faction_id) {
 case 846:
     if (a1->quest_id == 0) goto L6E7EA;
     npc_talk(a1);
@@ -577,7 +577,7 @@ case 142:
     goto L6E942;
 L6E87A:;
     guild_heal();
-    switch ((unsigned short)(*(short *)((char *)a1 + 71) - 453)) {
+    switch ((unsigned short)(a1->data.person.faction_id - 453)) {
 case 0:
     if ((guild_membership->rank) < 1) goto L6E8C2;
     guild_buy_potions();
@@ -619,7 +619,7 @@ L6E942:;
 L6E949:;
     if (l_20 == 0) goto L6E9C3;
 }
-    switch (*(unsigned short *)((char *)a1 + 71)) {
+    switch (a1->data.person.faction_id) {
 case 241:
     training_offer((int)D_00186F88);
     goto L6E9C3;
@@ -642,7 +642,7 @@ case 143:
     if ((guild_membership->rank) < 2) goto L6E9EB;
     guild_heal();
 L6E9EB:;
-    switch (*(unsigned short *)((char *)a1 + 71)) {
+    switch (a1->data.person.faction_id) {
 case 462:
     if ((guild_membership->rank) < 1) goto L6EA36;
     guild_buy_potions();
@@ -676,7 +676,7 @@ L6EA92:;
 L6EA99:;
     if (l_20 == 0) goto L6EB2C;
 }
-    switch (*(unsigned short *)((char *)a1 + 71)) {
+    switch (a1->data.person.faction_id) {
 case 243:
     training_offer((int)D_00186F9E);
     goto L6EB2C;
@@ -702,7 +702,7 @@ case 144:
     if ((guild_membership->rank) < 1) goto L6EB54;
     guild_heal();
 L6EB54:;
-    switch (*(unsigned short *)((char *)a1 + 71)) {
+    switch (a1->data.person.faction_id) {
 case 468:
     if ((guild_membership->rank) < 2) goto L6EB9F;
     guild_buy_potions();
@@ -736,7 +736,7 @@ L6EBFB:;
 L6EC02:;
     if (l_20 == 0) goto L6EC95;
 }
-    switch (*(unsigned short *)((char *)a1 + 71)) {
+    switch (a1->data.person.faction_id) {
 case 245:
     training_offer((int)D_00186FB6);
     goto L6EC95;
@@ -762,7 +762,7 @@ case 145:
     if ((guild_membership->rank) < 1) goto L6ECBD;
     guild_heal();
 L6ECBD:;
-    switch (*(unsigned short *)((char *)a1 + 71)) {
+    switch (a1->data.person.faction_id) {
 case 473:
     if ((guild_membership->rank) < 4) goto L6ED08;
     guild_buy_potions();
@@ -796,7 +796,7 @@ L6ED64:;
 L6ED6B:;
     if (l_20 == 0) goto L6EDFE;
 }
-    switch (*(unsigned short *)((char *)a1 + 71)) {
+    switch (a1->data.person.faction_id) {
 case 247:
     training_offer((int)D_00186FC9);
     goto L6EDFE;
@@ -822,7 +822,7 @@ case 146:
     if ((guild_membership->rank) < 2) goto L6EE26;
     guild_heal();
 L6EE26:;
-    switch (*(unsigned short *)((char *)a1 + 71)) {
+    switch (a1->data.person.faction_id) {
 case 480:
     if ((guild_membership->rank) < 3) goto L6EE71;
     guild_buy_magic_items();
@@ -856,7 +856,7 @@ L6EECD:;
 L6EED4:;
     if (l_20 == 0) goto L6EF86;
 }
-    switch (*(unsigned short *)((char *)a1 + 71)) {
+    switch (a1->data.person.faction_id) {
 case 249:
     training_offer((int)D_00186FDB);
     goto L6EF86;
@@ -882,7 +882,7 @@ case 147:
     if ((guild_membership->rank) < 2) goto L6EFAE;
     guild_heal();
 L6EFAE:;
-    switch (*(unsigned short *)((char *)a1 + 71)) {
+    switch (a1->data.person.faction_id) {
 case 485:
     if ((guild_membership->rank) < 1) goto L6F008;
     guild_buy_potions();
@@ -916,7 +916,7 @@ L6F064:;
 L6F06B:;
     if (l_20 == 0) goto L6F11D;
 }
-    switch (*(unsigned short *)((char *)a1 + 71)) {
+    switch (a1->data.person.faction_id) {
 case 250:
     training_offer((int)D_00186FEE);
     goto L6F11D;
@@ -940,7 +940,7 @@ L6F11D:;
 case 148:
     if (guild_membership == 0) goto L6F1EA;
     guild_heal();
-    switch (*(unsigned short *)((char *)a1 + 71)) {
+    switch (a1->data.person.faction_id) {
 case 490:
     if ((guild_membership->rank) < 2) goto L6F18E;
     guild_buy_potions();
@@ -974,7 +974,7 @@ L6F1EA:;
 L6F1F1:;
     if (l_20 == 0) goto L6F2A3;
 }
-    switch (*(unsigned short *)((char *)a1 + 71)) {
+    switch (a1->data.person.faction_id) {
 case 252:
     training_offer((int)D_00187001);
     goto L6F2A3;
@@ -1000,7 +1000,7 @@ case 149:
     if ((guild_membership->rank) < 1) goto L6F2CB;
     guild_heal();
 L6F2CB:;
-    switch (*(unsigned short *)((char *)a1 + 71)) {
+    switch (a1->data.person.faction_id) {
 case 496:
     if ((guild_membership->rank) < 3) goto L6F325;
     guild_buy_spells();
@@ -1034,7 +1034,7 @@ L6F381:;
 L6F388:;
     if (l_20 == 0) goto L6F43A;
 }
-    switch (*(unsigned short *)((char *)a1 + 71)) {
+    switch (a1->data.person.faction_id) {
 case 254:
     training_offer((int)D_00187017);
     goto L6F43A;

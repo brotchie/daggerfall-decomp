@@ -9,7 +9,7 @@ int spell_cost_duration(void)
 {
     short cost;
 
-    cost = (signed char)selected_spell->durations[spell_effect_slot].base * spell_effect_cost_current[0];
-    cost += ((signed char)selected_spell->durations[spell_effect_slot].plus / (signed char)selected_spell->durations[spell_effect_slot].per_level) * spell_effect_cost_current[1];
+    cost = selected_spell->durations[spell_effect_slot].base * spell_effect_cost_current[0];
+    cost += (selected_spell->durations[spell_effect_slot].plus / selected_spell->durations[spell_effect_slot].per_level) * spell_effect_cost_current[1];
     return cost;
 }

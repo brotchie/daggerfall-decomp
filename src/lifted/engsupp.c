@@ -52,7 +52,7 @@ int engine_pick_object(int a1, int a2, int a3)
 {
     int l_14;
 
-    l_14 = ((((int)(unsigned short)(*(short *)(*(char **)&game_settings) & 1)) != 0) ? 199 : (int)(unsigned short)*(short *)(*(char **)hud_bar_image + 2));
+    l_14 = ((((int)(unsigned short)(game_settings->view_flags & 1)) != 0) ? 199 : (int)(unsigned short)*(short *)(*(char **)hud_bar_image + 2));
     if (a2 <= l_14) goto L13FA8;
     return 0;
 L13FA8:;
@@ -109,8 +109,8 @@ L140FD:;
 int func_0001410F(struct record *a1)
 {
     int l_28;
-    int l_24;
-    int l_20;
+    struct block *l_24;
+    struct block_model *l_20;
     int l_1C;
 
     if (((struct bf8_0_1 *)(*(char **)D_00196484))->f == 0) goto L14136;
@@ -118,20 +118,20 @@ int func_0001410F(struct record *a1)
 L14136:;
     switch (a1->type) {
 case 43:
-    l_24 = (int)RECORD_DATA(a1);
-    l_20 = *(int *)((char *)l_24 + 5);
+    l_24 = &a1->data.block;
+    l_20 = l_24->models;
     l_1C = 0;
 L14196:;
-    if (((int)(unsigned char)*(signed char *)((char *)l_24)) > l_1C) goto L141B9;
+    if (l_24->model_count > l_1C) goto L141B9;
     goto L14227;
 L141AA:;
     l_1C++;
-    (*(char (**)[66])&l_20)++;
+    l_20++;
     goto L14196;
 L141B9:;
-    if ((l_20 + 4) != *(int *)D_0019647C) goto L14225;
+    if ((int)&l_20->model != *(int *)D_0019647C) goto L14225;
     *(int *)D_00195D54 = l_1C;
-    *(int *)D_00195D3C = l_20;
+    *(int *)D_00195D3C = (int)l_20;
     *(signed char *)(*(char **)D_00196484) |= 13;
     *(int *)(*(char **)D_00196484 + 4) = (int)a1;
     *(int *)(*(char **)D_00196484 + 8) = (int)&*(signed char *)((char *)(l_1C << 8) + func_00014438(*(int *)D_0019647C, *(int *)D_00195DC0));
@@ -142,22 +142,22 @@ L14225:;
 L14227:;
     return 0;
 case 56:
-    l_20 = (int)RECORD_DATA(a1);
+    l_20 = (struct block_model *)RECORD_DATA(a1);
     l_1C = 0;
 L14243:;
-    if (((int)(unsigned short)*(short *)((char *)a1 + 27)) > l_1C) goto L14268;
+    if (a1->model_count > l_1C) goto L14268;
     goto L142D0;
 L14259:;
     l_1C++;
-    (*(char (**)[66])&l_20)++;
+    l_20++;
     goto L14243;
 L14268:;
-    if ((l_20 + 4) != *(int *)D_0019647C) goto L142CE;
+    if ((int)&l_20->model != *(int *)D_0019647C) goto L142CE;
     *(signed char *)(*(char **)D_00196484) |= 5;
     *(int *)(*(char **)D_00196484 + 4) = (int)a1;
     *(int *)(*(char **)D_00196484 + 8) = func_00014438(*(int *)D_0019647C, *(int *)D_00195DC0);
-    *(short *)(*(char **)D_00196484 + 14) = *(short *)((char *)l_20);
-    *(short *)(*(char **)D_00196484 + 16) = (int)(unsigned char)*(signed char *)((char *)l_20 + 2);
+    *(short *)(*(char **)D_00196484 + 14) = l_20->id;
+    *(short *)(*(char **)D_00196484 + 16) = l_20->variant;
     return 1;
 L142CE:;
     goto L14259;

@@ -59,7 +59,7 @@ L137FF:;
     *(signed char *)crime_current = 12;
     guards_summon(1);
     if (a1->type != 53) goto L13830;
-    a1->lockpick_skill_tried |= 0x8000;
+    a1->npc_flags |= 0x8000;
 L13830:;
     return;
 L13835:;

@@ -11,6 +11,9 @@ usage:
   names.py check                   names are identifiers, unique, at known addresses
   names.py merge FILE.csv ...      add proposals (same columns); a clash keeps the more
                                    certain name and is reported
+  names.py audit FILE.csv ...      apply audit decisions (the columns plus `action`):
+                                   upgrade/rename/apply-field replace the row at that
+                                   address, drop deletes it, keep updates its evidence
   names.py show NAME|ADDRESS       look one up
   names.py annotate FILE.c         print a source file with names after func_/D_ tokens
 """
@@ -121,6 +124,35 @@ def merge(rows, new):
     return added, clashes
 
 
+def audit(rows, decisions):
+    """Apply audit rows to rows in place: {action: count}, and problems."""
+    idx = {(r["kind"], r["address"].upper()): r for r in rows}
+    done, problems = {}, []
+    for d in decisions:
+        act = (d.get("action") or "").strip()
+        k = (d["kind"], d["address"].upper())
+        row = {f: (d.get(f) or "").strip() for f in FIELDS}
+        if act in ("upgrade", "rename", "apply-field", "apply"):
+            if k in idx:
+                idx[k].update(row)
+            else:
+                rows.append(row)
+                idx[k] = row
+        elif act == "drop":
+            if k in idx:
+                rows.remove(idx.pop(k))
+            else:
+                problems.append("drop: no row %s %s" % k)
+        elif act == "keep":
+            if k in idx and row["evidence"]:
+                idx[k]["evidence"] = row["evidence"]
+        else:
+            problems.append("unknown action %r at %s %s" % (act, d["kind"], d["address"]))
+            continue
+        done[act] = done.get(act, 0) + 1
+    return done, problems
+
+
 def main():
     if len(sys.argv) < 2:
         raise SystemExit(__doc__)
@@ -137,6 +169,17 @@ def main():
         errs = check(rows)
         if errs:
             raise SystemExit("not saved:\n" + "\n".join(errs))
+        save(rows)
+    elif cmd == "audit":
+        for p in args:
+            with open(p, newline="") as f:
+                done, problems = audit(rows, list(csv.DictReader(f)))
+            print("%s: %s" % (p, ", ".join("%d %s" % (n, a) for a, n in sorted(done.items()))))
+            for x in problems[:20]:
+                print("  " + x)
+        errs = check(rows)
+        if errs:
+            raise SystemExit("not saved:\n" + "\n".join(errs[:40]))
         save(rows)
     elif cmd == "show":
         q = args[0].lower()

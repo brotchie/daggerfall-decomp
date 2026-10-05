@@ -72,7 +72,7 @@ int object_draw_cb(struct record *a1)
     if (a1->flags & 512)
         return 0;
     if (a1->type != 9)
-        *(int *)((char *)a1 + 47) = 0;
+        a1->draw_handle = 0;
     D_000C5404 = 0;
     switch (a1->type) {
     case 18:
@@ -81,7 +81,7 @@ int object_draw_cb(struct record *a1)
         func_000C013B(l_38);
         a1->image = (a1->image & -128) | (l_38->anim_record + l_38->anim_facing);
         l_20 = (unsigned char *)func_00135DE4(a1->image >> 7, a1->image & 127);
-        *(short *)((char *)l_38 + 12) = *(short *)(l_20 + 22);
+        l_38->frame_count = *(short *)(l_20 + 22);
         l_34 = a1->image >> 7;
         if (l_34 == 280 || l_34 == 281) {
             func_00136AD8(a1->x, a1->y, a1->z, 31, 256, 0);
@@ -94,9 +94,9 @@ int object_draw_cb(struct record *a1)
         l_24 = &a1->data.character;
         if ((l_24->conditions & 4) == 0) {
             if ((monster_table_flags[l_24->race].flags & 1) && l_24->race != 29 && a1->y - 90 > l_24->floor_y)
-                *(int *)((char *)a1 + 47) = func_00154D00(a1->x, a1->y - 30, a1->z, a1->image, l_38->anim_frame, (*(unsigned short *)((char *)l_38 + 16) >> 10) & 32 | 4, l_30 + 256);
+                a1->draw_handle = func_00154D00(a1->x, a1->y - 30, a1->z, a1->image, l_38->anim_frame, (l_38->anim_bits >> 10) & 32 | 4, l_30 + 256);
             else
-                *(int *)((char *)a1 + 47) = func_00154D00(a1->x, a1->y, a1->z, a1->image, l_38->anim_frame, (*(unsigned short *)((char *)l_38 + 16) >> 10) & 32 | 4, l_30 + 256);
+                a1->draw_handle = func_00154D00(a1->x, a1->y, a1->z, a1->image, l_38->anim_frame, (l_38->anim_bits >> 10) & 32 | 4, l_30 + 256);
         }
         break;
     case 42:
@@ -104,7 +104,7 @@ int object_draw_cb(struct record *a1)
             object_free_later(a1);
             break;
         }
-        *(int *)((char *)a1 + 47) = func_00154D00(a1->x, a1->y, a1->z, a1->image, a1->owner, 1, 256);
+        a1->draw_handle = func_00154D00(a1->x, a1->y, a1->z, a1->image, a1->anim_frame, 1, 256);
         func_0007E246(a1);
         break;
     case 53:
@@ -114,9 +114,9 @@ int object_draw_cb(struct record *a1)
         else
             l_34 = 4;
         if ((a1->image & 127) >= 5)
-            *(int *)((char *)a1 + 47) = func_00154D00(a1->x, a1->y, a1->z, a1->image, (unsigned)(*(int *)0x46c & 32) >> 5, l_34, 256);
+            a1->draw_handle = func_00154D00(a1->x, a1->y, a1->z, a1->image, (unsigned)(*(int *)0x46c & 32) >> 5, l_34, 256);
         else
-            *(int *)((char *)a1 + 47) = func_00154D00(a1->x, a1->y, a1->z, a1->image, -1, l_34, 256);
+            a1->draw_handle = func_00154D00(a1->x, a1->y, a1->z, a1->image, -1, l_34, 256);
         break;
     case 8:
         a1->angle_x = frame_counter;
@@ -124,7 +124,7 @@ int object_draw_cb(struct record *a1)
             l_34 = 1;
             break;
         }
-        *(int *)((char *)a1 + 47) = func_00154D00(a1->x, a1->y, a1->z, a1->image, -1, 4, 256);
+        a1->draw_handle = func_00154D00(a1->x, a1->y, a1->z, a1->image, -1, 4, 256);
         break;
     case 2:
         if (a1->image2 == 998 && a1->image == 0) {
@@ -137,7 +137,7 @@ int object_draw_cb(struct record *a1)
                 if (weapon_arrow_update(a1) == 0)
                     break;
                 func_00073ADF(a1);
-                l_4C->f44 = a1->owner;
+                l_4C->f44 = a1->missile_yaw;
                 l_4C->f48 = a1->angle_z;
                 l_4C->f52 = 0;
                 func_001401D4(l_4C, 0);
@@ -151,7 +151,7 @@ int object_draw_cb(struct record *a1)
             l_30 = 63;
         else
             l_30 = 0;
-        *(int *)((char *)a1 + 47) = func_00154D00(a1->x, a1->y, a1->z, a1->image, -1, 4, (l_30 << 16) + 256);
+        a1->draw_handle = func_00154D00(a1->x, a1->y, a1->z, a1->image, -1, 4, (l_30 << 16) + 256);
         break;
     case 34:
         if (cfg_show_markers == 0)
@@ -165,35 +165,35 @@ int object_draw_cb(struct record *a1)
             l_30 = 63;
         else
             l_30 = 0;
-        *(int *)((char *)a1 + 47) = func_00154D00(a1->x, a1->y, a1->z, a1->image, -1, 4, (l_30 << 16) + 256);
+        a1->draw_handle = func_00154D00(a1->x, a1->y, a1->z, a1->image, -1, 4, (l_30 << 16) + 256);
         break;
     case 9:
         if (a1->flags & 8192) {
             if (a1->image2 & 32768) {
                 if (a1->image2 == 32768)
                     spell_area_effect(a1);
-                l_3C = (unsigned char *)func_00135DE4(a1->owner >> 7, a1->owner & 127);
+                l_3C = (unsigned char *)func_00135DE4(a1->missile_texture >> 7, a1->missile_texture & 127);
                 if ((int)((struct stat15 *)&a1->image2)->f >= (int)*(unsigned short *)(l_3C + 20)) {
                     a1->image2 = 36863;
                 } else {
-                    func_00154D00(a1->x, a1->y, a1->z, a1->owner, ((struct stat15 *)&a1->image2)->f, 1, 4129024);
+                    func_00154D00(a1->x, a1->y, a1->z, a1->missile_texture, ((struct stat15 *)&a1->image2)->f, 1, 4129024);
                     a1->image2++;
-                    a1->children->owner >>= 1;
+                    a1->children->light_radius >>= 1;
                 }
             } else {
-                func_00154D00(a1->x, a1->y, a1->z, a1->owner, -1, 1, 256);
+                func_00154D00(a1->x, a1->y, a1->z, a1->missile_texture, -1, 1, 256);
             }
         }
         break;
     case 7:
         if (a1->parent->type == 4) {
-            *(int *)((char *)a1 + 47) = func_00136AD8(a1->x, a1->y, a1->z, a1->image, 255, 0);
+            a1->draw_handle = func_00136AD8(a1->x, a1->y, a1->z, a1->image, 255, 0);
         } else {
             l_28 = func_000C5280(a1->x ^ a1->z, (D_001343C0 / 40) << 7);
             l_28 >>= 3;
             l_28 = 256 - l_28;
-            l_28 = (a1->owner * l_28) >> 8;
-            *(int *)((char *)a1 + 47) = func_00136AD8(a1->x, a1->y, a1->z, a1->image, l_28, 0);
+            l_28 = (a1->light_radius * l_28) >> 8;
+            a1->draw_handle = func_00136AD8(a1->x, a1->y, a1->z, a1->image, l_28, 0);
         }
         break;
     case 43:
@@ -233,7 +233,7 @@ int object_draw_cb(struct record *a1)
                 if (weapon_arrow_update(a1) == 0)
                     break;
                 func_00073ADF(a1);
-                l_4C->f44 = a1->owner;
+                l_4C->f44 = a1->missile_yaw;
                 l_4C->f48 = a1->angle_z;
                 l_4C->f52 = 0;
             } else if (a1->link_flag != 255) {
@@ -248,13 +248,13 @@ int object_draw_cb(struct record *a1)
         break;
     case 56:
         l_40 = (struct anim *)&a1->data;
-        l_44 = (struct light *)(l_40 + a1->image);
-        for (l_34 = 0; a1->image > l_34; l_34++, l_40++) {
+        l_44 = (struct light *)(l_40 + a1->model_count);
+        for (l_34 = 0; a1->model_count > l_34; l_34++, l_40++) {
             l_40->handle = model_get(l_40->id, l_40->rec, (current_climate << 2) + D_001A949C);
             if (l_40->handle != 0)
                 func_001401D4(&l_40->handle, 0);
         }
-        for (l_34 = 0; a1->owner > l_34; l_34++, l_44++) {
+        for (l_34 = 0; a1->flat_count > l_34; l_34++, l_44++) {
             if (l_44->snd == 0 || l_44->snd == 65535)
                 continue;
             if ((l_44->snd >> 7) == 199 && cfg_show_markers == 0)

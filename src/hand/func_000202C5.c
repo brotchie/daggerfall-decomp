@@ -52,13 +52,13 @@ void daedra_summon(struct record *a1)
     int l_2C;
     int l_28;
     unsigned char *l_24;
-    unsigned char *l_20;
+    struct person *l_20;
     unsigned char l_1C;
     unsigned char l_18;
 
     l_18 = 48;
-    l_20 = (unsigned char *)RECORD_DATA(a1);
-    l_40 = faction_find(*(short *)l_20);
+    l_20 = &a1->data.person;
+    l_40 = faction_find(l_20->faction_id);
     while (l_40->parent != 0)
         l_40 = l_40->parent;
     if (l_40->id == 40 || l_40->type == 8) {
@@ -76,7 +76,7 @@ void daedra_summon(struct record *a1)
         l_3C = faction_find(l_34);
         D_0019671C = l_3C;
         if (REGION(l_3C) == 56) {
-            if (*(unsigned short *)game_settings & 4) {
+            if (game_settings->view_flags & 4) {
                 msgbox_show_rsc(400, 1);
                 return;
             }
@@ -118,7 +118,7 @@ void daedra_summon(struct record *a1)
         l_3C = faction_find(l_34);
         D_0019671C = l_3C;
         if (REGION(l_3C) == 56) {
-            if (*(unsigned short *)game_settings & 4) {
+            if (game_settings->view_flags & 4) {
                 msgbox_show_rsc(400, 1);
                 return;
             }
@@ -140,7 +140,7 @@ void daedra_summon(struct record *a1)
         l_3C = faction_find(l_34);
         D_0019671C = l_3C;
         if (REGION(l_3C) == 56) {
-            if (*(unsigned short *)game_settings & 4) {
+            if (game_settings->view_flags & 4) {
                 msgbox_show_rsc(400, 1);
                 return;
             }

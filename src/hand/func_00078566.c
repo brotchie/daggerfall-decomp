@@ -123,7 +123,7 @@ L7876D:;
     func_00135E39();
 L7878D:;
     if (l_2C == 0) goto L7876D;
-    l_34->pad0C = *(short *)(*(char **)((char *)l_2C + 12) + 22);
+    l_34->frame_count = *(short *)(*(char **)((char *)l_2C + 12) + 22);
     l_3C->magicka = (l_3C->max_magicka = 0);
     if (a2 == 23) goto L787D0;
     if (a2 != 18) goto L787DB;
