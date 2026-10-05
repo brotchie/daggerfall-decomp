@@ -3702,6 +3702,249 @@ func,0x0009D764,travel_draw_buttons,strong,draws FIND/I'M AT (region vs world) a
 func,0x0009D8BD,travel_button_filter,strong,"handler of (50,175)-(228,196) = DUNGEONS/HOMES/TEMPLES/TOWNS (screenshot): toggles travel_filter bit 0/1/2/3 by quadrant, redraws the region"
 func,0x0009D960,travel_stub,candidate,returns 0; no caller
 func,0x0009D986,travel_show_days_left,strong,"'Days left: %ld' (minutes/1440) at (240,2) over the saved map picture; called from tamriel.c 4AC01 while a trip's time passes"
+func,0x0009DAEE,printf,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:printf
+func,0x0009DB11,exit,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:exit
+func,0x0009DC25,rand,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:rand
+func,0x0009DC49,srand,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:rand
+func,0x0009DC59,open,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:open
+func,0x0009DC7D,sopen,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:open
+func,0x0009DE42,__set_binary,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:open
+func,0x0009DEA7,close_handle,candidate,"(handle): close (identified while matching, docs/progress.md); not byte-identical to Watcom's close; 40 calls"
+func,0x0009DEAC,abs_value,candidate,"abs (identified while matching, docs/progress.md); not byte-identical to Watcom's abs; 25 calls"
+func,0x0009DEB4,_cstart,candidate,99% of the bytes equal (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:cstrt386: probably another version of it
+func,0x0009E145,__do_exit_with_msg__,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:cstrt386
+func,0x0009E180,__GETDS,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:cstrt386 DOS/CSTRTX3R.OBJ:CSTRTX3R.OBJ
+func,0x000A0024,mc_free,strong,"MemCheck's checked replacement: not byte-identical to Watcom's (libmatch), called with the caller's source file and line (MemCheck's convention); (ptr, __FILE__, __LINE__); 236 calls"
+func,0x000A0040,mc_memset,strong,"MemCheck's checked replacement: not byte-identical to Watcom's (libmatch), called with the caller's source file and line (MemCheck's convention); (dst, value, n, __FILE__, __LINE__, 4), e.g. (655360, 0, 64000, ...) clears the screen; 187 calls"
+func,0x000A006E,lseek,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:lseek
+func,0x000A00AF,mc_malloc,strong,"MemCheck's checked replacement: not byte-identical to Watcom's (libmatch), called with the caller's source file and line (MemCheck's convention); (size, __FILE__, __LINE__) returns a pointer; 35 calls"
+func,0x000A00CB,read,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:read
+func,0x000A01DE,strncmp,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:strncmp
+func,0x000A0AD9,mc_strncpy,strong,"MemCheck's checked replacement: not byte-identical to Watcom's (libmatch), called with the caller's source file and line (MemCheck's convention); (dst, src, n, __FILE__, __LINE__); 137 calls"
+func,0x000A0B42,write,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:write
+func,0x000A0D13,atoi,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:atoi DOS/CLIB3R.LIB:atol; also atol
+func,0x000A0D8F,utoa,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:itoa
+func,0x000A0DD9,itoa,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:itoa DOS/CLIB3R.LIB:ltoa; also ltoa
+func,0x000A0DF4,strlen,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:strlen
+func,0x000A0E0D,mc_memmove,strong,"MemCheck's checked replacement: not byte-identical to Watcom's (libmatch), called with the caller's source file and line (MemCheck's convention); (dst, src, n, __FILE__, __LINE__, 4); 13 calls"
+func,0x000A0E3B,stricmp,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:stricmp
+func,0x000A0E74,toupper,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:toupper
+func,0x000A0E82,strnicmp,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:strnicmp
+func,0x000A0ED9,mc_set_location,candidate,"(line, file), declared parm routine []: called before library calls with the caller's line and file string (MemCheck records where a call came from)"
+func,0x000A0F5C,mc_sprintf,strong,"(buffer, format, ...): sprintf (identified while matching, docs/progress.md), not byte-identical to Watcom's sprintf (libmatch): MemCheck's checked version; 128 calls"
+func,0x000A1004,unlink,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:unlnk
+func,0x000A1023,mc_memcpy,strong,"MemCheck's checked replacement: not byte-identical to Watcom's (libmatch), called with the caller's source file and line (MemCheck's convention); (dst, src, n, __FILE__, __LINE__, 4) at every call site, e.g. disease.c line 83"
+func,0x000A1079,memchr,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:memchr
+func,0x000A1097,tolower,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:tolower
+func,0x000A1235,filelength,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:filelen
+func,0x000A1272,_dos_getvect,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:d_getvec
+func,0x000A12D1,getenv,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:getenv
+func,0x000A132C,memcmp,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:memcmp
+func,0x000A13DA,_dos_findfirst,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:find386
+func,0x000A13F7,_dos_findnext,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:find386
+func,0x000A167C,__CHP,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a MATH387R.LIB:fchop
+func,0x000A16A4,cget_string,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:sscanf
+func,0x000A16D1,vfscanf,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:fscanf DOS/CLIB3R.LIB:sscanf; also vsscanf
+func,0x000A16F8,fprintf,confirmed,"byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:fprintf DOS/CLIB3R.LIB:fscanf DOS/CLIB3R.LIB:sscanf; also fscanf, sscanf"
+func,0x000A1720,strcmp,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:cmp386
+func,0x000A17C1,strchr,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:strchr
+func,0x000A17DC,strstr,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:strstr
+func,0x000A199E,___DEXP1,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a MATH387R.LIB:exp387
+func,0x000A19A6,IF_EXP,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a MATH387R.LIB:exp387
+func,0x000A19A8,___DEXP,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a MATH387R.LIB:exp387
+func,0x000A1A0A,exp,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a MATH387R.LIB:exp387
+func,0x000A2A76,_nheapwalk,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:nheapwal
+func,0x000A2A84,__NHeapWalk,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:nheapwal
+func,0x000A2EAC,int386x,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:intx386
+func,0x000A2EFC,__open_flags,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:fopen
+func,0x000A2FB0,__doopen,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:fopen
+func,0x000A3078,_fsopen,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:fopen
+func,0x000A3093,fopen,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:fopen
+func,0x000A309D,close_file,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:fopen
+func,0x000A3105,freopen,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:fopen
+func,0x000A3129,cget_file,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:fscanf
+func,0x000A317F,vfscanf_2,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:fscanf DOS/CLIB3R.LIB:sscanf; also vsscanf
+func,0x000A31A6,fprintf_2,confirmed,"byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:fprintf DOS/CLIB3R.LIB:fscanf DOS/CLIB3R.LIB:sscanf; also fscanf, sscanf"
+func,0x000A31C7,fclose,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:fclose
+func,0x000A31F6,__shutdown_stream,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:fclose
+func,0x000A320B,__hex,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:fclose
+func,0x000A3217,__MkTmpFile,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:fclose
+func,0x000A3280,__doclose,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:fclose
+func,0x000A330C,int386,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:int386
+func,0x000A3327,segread,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:segread
+func,0x000A363C,_fstrlen,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:fstrlen
+func,0x000A3655,_fmemcpy,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:fmemcpy
+func,0x000A367E,file_putc,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:fprtf
+func,0x000A368F,__fprtf,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:fprtf
+func,0x000A37E2,isatty,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:isatt
+func,0x000A3800,__set_EDOM,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:seterrno
+func,0x000A3805,__set_doserrno,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:seterrno; also __set_errno
+func,0x000A3811,__set_ERANGE,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:seterrno
+func,0x000A3828,__set_doserrno_2,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:seterrno; also __set_errno
+func,0x000A3847,__set_errno_dos,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:dosret
+func,0x000A38AD,__IOMode,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:iomode
+func,0x000A3902,__SetIOMode,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:iomode
+func,0x000A3917,__close,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:_clse
+func,0x000A394C,__CMain,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:cmain386
+func,0x000A399C,__InitRtns,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:inirt386
+func,0x000A39E7,__FiniRtns,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:inirt386
+func,0x000A3A37,__Init_Argv,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:initargv
+func,0x000A3AF4,_SplitParms,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:initargv
+func,0x000A4590,strcpy,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:strcpy
+func,0x000A8CFD,strcpy_2,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:strcpy
+func,0x000A8D1C,stackavail,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:stack386
+func,0x000A9529,mem_putc,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:sprintf DOS/CLIB3R.LIB:vsprintf
+func,0x000A953C,vsprintf,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:vsprintf
+func,0x000A95CE,malloc,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:nmalloc
+func,0x000A96B1,free,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:nfree
+func,0x000A970F,_dos_setvect,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:d_setvec
+func,0x000A9878,__doserror,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:error386
+func,0x000A98D6,__pow87_err,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a MATH387R.LIB:pow87e
+func,0x000AA00C,__setEFGfmt,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:setefg
+func,0x000AA28C,__init_8087,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:chk8087
+func,0x000AA2C7,__chk8087,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:chk8087
+func,0x000AA307,__scnf,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:scnf
+func,0x000AA528,get_opt,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:scnf
+func,0x000AA601,scan_white,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:scnf
+func,0x000AA636,scan_char,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:scnf
+func,0x000AA6BC,scan_string,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:scnf
+func,0x000AA7AA,report_scan,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:scnf
+func,0x000AA808,makelist,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:scnf
+func,0x000AA84B,scan_arb,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:scnf
+func,0x000AA931,scan_float,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:scnf
+func,0x000AAC0F,scan_int,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:scnf
+func,0x000AAE07,radix_value,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:scnf
+func,0x000AAE2E,cgetw,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:scnf
+func,0x000AB6C0,memset,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:set386
+func,0x000AB6D8,__math87_err,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a MATH387R.LIB:math87e
+func,0x000AC38B,mem_putc_2,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:sprintf DOS/CLIB3R.LIB:vsprintf
+func,0x000AC39E,sprintf,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:sprintf
+func,0x000AC418,__int386x,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:intxa386
+func,0x000AC450,intxa386_static_38,strong,"byte-identical to the code at +0x38 of Watcom C32 10.0a DOS/CLIB3R.LIB:intxa386, after its public __int386x: a static function (no symbol of its own)"
+func,0x000AC475,_DoINTR,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:intxa386
+func,0x000AC4C2,intxa386_static_4d,strong,"byte-identical to the code at +0x4D of Watcom C32 10.0a DOS/CLIB3R.LIB:intxa386, after its public _DoINTR: a static function (no symbol of its own)"
+func,0x000AC509,intxa386_static_94,strong,"byte-identical to the code at +0x94 of Watcom C32 10.0a DOS/CLIB3R.LIB:intxa386, after its public _DoINTR: a static function (no symbol of its own)"
+func,0x000AC551,intxa386_static_dc,strong,"byte-identical to the code at +0xDC of Watcom C32 10.0a DOS/CLIB3R.LIB:intxa386, after its public _DoINTR: a static function (no symbol of its own)"
+func,0x000AC5EA,intxa386_static_175,strong,"byte-identical to the code at +0x175 of Watcom C32 10.0a DOS/CLIB3R.LIB:intxa386, after its public _DoINTR: a static function (no symbol of its own)"
+func,0x000AC5ED,intxa386_static_178,strong,"byte-identical to the code at +0x178 of Watcom C32 10.0a DOS/CLIB3R.LIB:intxa386, after its public _DoINTR: a static function (no symbol of its own)"
+func,0x000AC5F0,intxa386_static_17b,strong,"byte-identical to the code at +0x17B of Watcom C32 10.0a DOS/CLIB3R.LIB:intxa386, after its public _DoINTR: a static function (no symbol of its own)"
+func,0x000AC5F6,intxa386_static_181,strong,"byte-identical to the code at +0x181 of Watcom C32 10.0a DOS/CLIB3R.LIB:intxa386, after its public _DoINTR: a static function (no symbol of its own)"
+func,0x000AC5F9,intxa386_static_184,strong,"byte-identical to the code at +0x184 of Watcom C32 10.0a DOS/CLIB3R.LIB:intxa386, after its public _DoINTR: a static function (no symbol of its own)"
+func,0x000AC5FC,intxa386_static_187,strong,"byte-identical to the code at +0x187 of Watcom C32 10.0a DOS/CLIB3R.LIB:intxa386, after its public _DoINTR: a static function (no symbol of its own)"
+func,0x000AC617,intxa386_static_1a2,strong,"byte-identical to the code at +0x1A2 of Watcom C32 10.0a DOS/CLIB3R.LIB:intxa386, after its public _DoINTR: a static function (no symbol of its own)"
+func,0x000AC7F6,__allocfp,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:allocfp
+func,0x000AC8F5,__update_buffer,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:fseek
+func,0x000AC937,fseek,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:fseek
+func,0x000ACA33,__chktty,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:chktty
+func,0x000ACA64,fgetc,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:fgetc
+func,0x000ACAED,__filbuf,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:fgetc
+func,0x000ACB1C,__fill_buffer,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:fgetc
+func,0x000ACBC7,ungetc,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:ungetc
+func,0x000ACC4F,__flush,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:flush
+func,0x000ACD0E,ftell,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:ftell
+func,0x000AD326,memcpy,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:memcpy
+func,0x000AD34B,fputc,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:fputc
+func,0x000AD3EF,__ioalloc,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:ioalloc
+func,0x000AD466,__prtf,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:prtf
+func,0x000AD6E7,getprintspecs,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:prtf
+func,0x000AD81A,evalflags,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:prtf
+func,0x000AD875,far_strlen,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:prtf
+func,0x000AD899,far_other_strlen,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:prtf
+func,0x000AD8BC,fmt4hex,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:prtf
+func,0x000AD91D,FixedPoint_Format,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:prtf
+func,0x000AD9FF,formstring,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:prtf
+func,0x000ADE48,zupstr,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:prtf
+func,0x000ADE60,Free,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/GRAPH.LIB:fontsupps
+func,0x000ADE7C,__CommonInit,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:cinit MATH3R.LIB:fpestub; also __grab_fpe
+func,0x000B2B52,_dos_read,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:io386
+func,0x000B2C07,__fatal_runtime_error,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:xmsg
+func,0x000B2C24,memmove,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:memmove
+func,0x000B2C70,_fmemset,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:fmemset
+func,0x000B2ED8,_fmemcmp,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:fmemcmp
+func,0x000B2F57,strcat,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:strcat
+func,0x000B2F8E,__MemAllocator,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:memalloc
+func,0x000B3036,__MemFree,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:memalloc
+func,0x000B3141,__unlink,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:grownear
+func,0x000B3180,__FreeDPMIBlocks,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:grownear
+func,0x000B31DE,__ReAllocDPMIBlock,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:grownear
+func,0x000B32E1,__LinkUpNewMHeap,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:grownear
+func,0x000B3355,__LastFree,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:grownear
+func,0x000B33A3,RationalAlloc,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:grownear
+func,0x000B3476,__CreateNewNHeap,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:grownear
+func,0x000B3525,__ExpandDGROUP,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:grownear
+func,0x000B3669,__AdjustAmount,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:grownear
+func,0x000B36E3,__setenvp,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:setenvp
+func,0x000B37B7,strncpy,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:strncpy
+func,0x000B382E,__math1err,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a MATH387R.LIB:math2err MATH3R.LIB:math2err
+func,0x000B3838,__math2err,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a MATH387R.LIB:math2err
+func,0x000B3913,_EFG_Format,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:efgfmt
+func,0x000B39F0,forcedecpt,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:efgfmt
+func,0x000B3A38,__cnvs2d,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a MATH387R.LIB:cnvs2d
+func,0x000B3A46,_Not_Enough_Memory,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:noefgfmt DOS/CLIB3R.LIB:nomem; also _no_support_loaded
+func,0x000B6C7E,__hook387,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:hook387
+func,0x000B6D48,__unhook387,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:hook387
+func,0x000B6DA2,__init_80x87,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:ini87386
+func,0x000B6DCA,_GR__FDFS,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:fdfs386 DOS/GRAPH.LIB:fdfs386; also __FDFS
+func,0x000B6E16,fputs,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:fputs
+func,0x000B6E97,time,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:time
+func,0x000B6EC4,convDec,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:asctime
+func,0x000B6EF7,_asctime,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:asctime
+func,0x000B6FE0,_ctime,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:asctime
+func,0x000B7207,__STOSD,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:__stos
+func,0x000B7273,_nmsize,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:nmsize
+func,0x000B727C,tell,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:tell
+func,0x000B728D,__InitFiles,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:initfile
+func,0x000B7316,docloseall,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:ioexit
+func,0x000B7368,flushall,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:flushall
+func,0x000B736D,__flushall,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:flushall
+func,0x000B739C,getche,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:gtche
+func,0x000B73B9,__qread,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:qread
+func,0x000B73D8,__qwrite,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:qwrit
+func,0x000B75BE,ultoa,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:ltoa
+func,0x000B7607,itoa_2,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:itoa DOS/CLIB3R.LIB:ltoa; also ltoa
+func,0x000B7691,__EnterWVIDEO,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:enterdb
+func,0x000B76B7,access,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:accss
+func,0x000B829C,_heapenable,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:heapen
+func,0x000B82AC,sbrk,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:sbrk386
+func,0x000B836B,__brk,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:sbrk386
+func,0x000B8433,__rterrmsg,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a MATH387R.LIB:_matherr MATH3R.LIB:_matherr
+func,0x000B847B,_matherr,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a MATH387R.LIB:_matherr
+func,0x000B84B0,DoEFormat,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a MATH387R.LIB:ftos MATH3R.LIB:ftos
+func,0x000B8557,DoFFormat,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a MATH387R.LIB:ftos MATH3R.LIB:ftos
+func,0x000B85BA,AdjField,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a MATH387R.LIB:ftos MATH3R.LIB:ftos
+func,0x000B8625,_FtoS,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a MATH387R.LIB:ftos
+func,0x000B8A17,__getctime,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:gtctm
+func,0x000B8ADA,mktime,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:mktime
+func,0x000B8C2E,_localtime,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:localtim
+func,0x000B8C7F,asctime,confirmed,"byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:asctime DOS/CLIB3R.LIB:dir DOS/CLIB3R.LIB:fputchar DOS/CLIB3R.LIB:gmtime DOS/CLIB3R.LIB:localtim; also fputchar, gmtime, localtime, opendir"
+func,0x000B8E55,_fstrcpy,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:fstrcpy
+func,0x000B9D17,__get_std_stream,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:iobaddr
+func,0x000B9D36,__Nan_Inf,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a MATH387R.LIB:nan_inf
+func,0x000B9DBA,floor,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a MATH387R.LIB:floor
+func,0x000B9DF6,_Scale,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a MATH387R.LIB:scale
+func,0x000B9E37,_Scale10V,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a MATH387R.LIB:scale
+func,0x000B9F1E,__cvt,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a MATH387R.LIB:cvt
+func,0x000BA104,__ModF,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:amodf386
+func,0x000BA194,__ZBuf2F,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:amodf386
+func,0x000BA1DF,amodf386_static_4b,strong,"byte-identical to the code at +0x4B of Watcom C32 10.0a DOS/CLIB3R.LIB:amodf386, after its public __ZBuf2F: a static function (no symbol of its own)"
+func,0x000BA230,__leapyear,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:timeutil
+func,0x000BA26B,calc_yday,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:timeutil
+func,0x000BA350,check_order,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:timeutil
+func,0x000BA378,__isindst,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:timeutil
+func,0x000BA62B,time_less,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:timeutil
+func,0x000BA65B,__brktime,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:gmtime
+func,0x000BA770,_gmtime,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:gmtime
+func,0x000BA78C,asctime_2,confirmed,"byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:asctime DOS/CLIB3R.LIB:dir DOS/CLIB3R.LIB:fputchar DOS/CLIB3R.LIB:gmtime DOS/CLIB3R.LIB:localtim; also fputchar, gmtime, localtime, opendir"
+func,0x000BA79A,tzset,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:tzset
+func,0x000BA7AD,parse_time,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:tzset
+func,0x000BA7D3,parse_offset,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:tzset
+func,0x000BAAB8,modf,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a MATH387R.LIB:modf387
+func,0x000BAAD2,__CmpBigInt,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a MATH387R.LIB:i64ts386 MATH3R.LIB:i64ts386
+func,0x000BAB0C,__Rnd2Int,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a MATH387R.LIB:i64ts386 MATH3R.LIB:i64ts386
+func,0x000BAB77,__Bin2String,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a MATH387R.LIB:i64ts386
+func,0x000BABE1,i64ts386_static_6a,strong,"byte-identical to the code at +0x6A of Watcom C32 10.0a MATH387R.LIB:i64ts386, after its public __Bin2String: a static function (no symbol of its own)"
+func,0x000BAC96,i64ts386_static_11f,strong,"byte-identical to the code at +0x11F of Watcom C32 10.0a MATH387R.LIB:i64ts386, after its public __Bin2String: a static function (no symbol of its own)"
+func,0x000BAC98,frexp,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a MATH387R.LIB:frexp
 func,0x000CAE07,spell_cost_formula_dispatch,strong,XnGine-object thunk: jmp spell_cost_formulas[eax]
 func,0x000CAE0E,spell_effect_dispatch,confirmed,"XnGine-object thunk: push spell_effect_handlers[eax], shift edx/ebx/ecx into eax/edx/ebx and return into it: handler(spell object, slot, target); exp1b (build/names/scratch/magic/exp1b.py, save_morthag1):"
 func,0x000CE4C4,spell_find_effect_type,strong,asm helper: slot+1 of effect type dl in the spell at eax (0 if none); spell_remove_effect_type and spfx_entity_has_effect use it as a 0-based slot (bug)

@@ -93,6 +93,24 @@ which holds quest objects and tavern rooms. `object_find_by_id` searches the loc
 - profile.c is HMI's INI library, and sosez.c is the HMI SOS sound wrapper.
 - args.c reads the Z.CFG keys into 22 `cfg_*` globals.
 
+## The library region
+
+The library region (0x9DA1C–0xBB27F, 1018 functions) holds several libraries:
+- **Watcom C32 10.0a's runtime** (clib3r, math387r, emu387). tools/libmatch.py names 233 of
+  them: 218 byte-identical once relocations are masked, 14 static functions inside matched
+  modules, and `_cstart` as a near match.
+- **StratosWare MemCheck** (0xA8D26–0xA93EA and around). It replaces memcpy, memset,
+  memmove, strncpy, malloc, free and sprintf with checked versions that take the caller's
+  `__FILE__` and `__LINE__`. Those calls are where the original source file names and line
+  numbers come from (config/units.csv).
+- **HMI SOS:** the MIDI song player (0x9E18C–0xA0AD9), the digital driver loader
+  (0xA45AF–0xA89E8, HMIMDRV.386) and hardware detection (around 0xADE87, hmidet.386).
+- **Rational's DOS/4G interface** (0xB3A76–0xB6C36), and an exception-dump handler
+  (0xA1A16–0xA2A2B, "XXDEF.C" with register dumps).
+
+None of the non-Watcom libraries are available to match against; naming them would need
+their APIs (HMI SOS headers, the MemCheck API).
+
 ## Records in general
 
 Every game record (item, character, spell, loot pile, container, effect) starts with a
