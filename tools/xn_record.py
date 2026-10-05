@@ -726,9 +726,11 @@ def base_machine(path):
     return _bases[path]
 
 
-def replay(rec, patch=None):
-    """Run one record again from its exact entry state. `patch(emu)` may replace the
-    function's code first (a C version). Returns a list of differences (empty: it matched)."""
+def replay_run(rec, patch=None, entry=None, top=None):
+    """Run one record again from its exact entry state (its registers, or `entry`'s where
+    given). `patch(emu)` may replace the function's code first (a C version). Returns
+    call_once's result, or {"stopped": reason} when the call asked for more services than
+    were recorded or the machine faulted."""
     emu, (low, mem) = base_machine(rec["base"])
     emu.write(0, low)
     emu.write(LOAD, mem)
@@ -740,6 +742,8 @@ def replay(rec, patch=None):
     emu.exc = dict(rec.get("exc", {}))
     for r, v in rec["entry"].items():
         emu.w(r, v)
+    for r, v in (entry or {}).items():
+        emu.w(r, v)
     emu.w("eip", rec["eip"])
     if patch:
         patch(emu)
@@ -748,11 +752,19 @@ def replay(rec, patch=None):
     emu.int_replay = [(e[1], e[2]) for e in rec["io"] if e[0] == "int-ret"]
     emu.in_replay = [e[2] for e in rec["io"] if e[0] == "in"]   # and ports read as they were
     try:
-        got = call_once(emu, footprint=False, top=rec.get("top"))
+        got = call_once(emu, footprint=False, top=top or rec.get("top"))
     except (IndexError, fallemu.Stop) as e:   # asked for more services than recorded; a fault
         emu.int_replay = emu.in_replay = None
-        return ["stopped: %r" % e]
+        return {"stopped": "stopped: %r" % e}
     emu.int_replay = emu.in_replay = None
+    return got
+
+
+def compare(rec, got):
+    """The differences between a replay and its record (empty: it matched): every exit
+    register, the six arithmetic flags, every byte written, the port I/O and interrupts."""
+    if "stopped" in got:
+        return [got["stopped"]]
     diffs = []
     if not got["returned"]:
         diffs.append("did not return")
@@ -772,6 +784,16 @@ def replay(rec, patch=None):
     if got["io"] != rec["io"]:
         diffs.append("port I/O or interrupts differ")
     return diffs
+
+
+def replay(rec, patch=None, compare_with=None):
+    """Run one record again from its exact entry state. `patch(emu)` may replace the
+    function's code first (a C version). Returns a list of differences (empty: it matched);
+    compare_with(rec, got) replaces the exact comparison (tools/xn_abi.py abi_compare)."""
+    got = replay_run(rec, patch)
+    if "stopped" in got:
+        return [got["stopped"]]
+    return (compare_with or compare)(rec, got)
 
 
 # ---- jobs ---------------------------------------------------------------------------------

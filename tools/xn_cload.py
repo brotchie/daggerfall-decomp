@@ -230,9 +230,10 @@ def kind(cls):
     return 1
 
 
-def link(paths, base=CBASE):
+def link(paths, base=CBASE, resolve=None):
     """Lay out the objects (code, data, BSS) from base and resolve fixups. Returns (image
-    bytes, {global symbol: address})."""
+    bytes, {global symbol: address}). resolve(name): the address of a symbol no object
+    defines (tools/xn_rc.py: XnGine's and the game's functions and data), or None."""
     objs = [Obj(p) for p in paths]
     addr = {}       # (obj index, seg index) -> address
     pos = base
@@ -288,6 +289,8 @@ def link(paths, base=CBASE):
                     tgt = addr[(oi, lsi)] + loff
                 elif name in syms:
                     tgt = syms[name]
+                elif resolve is not None and resolve(name) is not None:
+                    tgt = resolve(name)
                 else:
                     missing.add(name)
                     continue
@@ -508,22 +511,26 @@ def machine_of(xn_record, base):
     return m[0] if m else None
 
 
-def replay_c(xn_record, img, rec, route):
-    """Replay a record with the functions in `route` sent to their C; the differences."""
+def replay_c(xn_record, img, rec, route, compare_with=None, entry=None):
+    """Replay a record with the functions in `route` sent to their C (img: a CImage, or any
+    image with install/route/unroute: tools/xn_rc.py's); the differences, exact or by
+    compare_with(rec, got)."""
     hooks = []
 
     def patch(emu):
         img.install(emu)
         hooks.extend(img.route(emu, route))
     try:
-        diffs = xn_record.replay(rec, patch=patch)
+        got = xn_record.replay_run(rec, patch=patch, entry=entry)
+        diffs = [got["stopped"]] if "stopped" in got else \
+            (compare_with or xn_record.compare)(rec, got)
     except Exception as e:      # noqa: BLE001  (an emulator error: a fault in the C)
         emu = machine_of(xn_record, rec["base"])
         diffs = ["error: %r at eip %08X" % (e, emu.r("eip") if emu else 0)]
     finally:
         emu = machine_of(xn_record, rec["base"])
         if emu is not None:
-            CImage.unroute(emu, hooks)
+            img.unroute(emu, hooks)
     if diffs and diffs[0].startswith("error"):
         drop_machine(xn_record, rec["base"])
     if diffs and diffs[0] == "did not return" and not getattr(xn_record, "_xn_c_long", False):
@@ -532,18 +539,82 @@ def replay_c(xn_record, img, rec, route):
         longer_calls(xn_record, 3_000_000_000)
         xn_record._xn_c_long = True
         try:
-            diffs = replay_c(xn_record, img, rec, route)
+            diffs = replay_c(xn_record, img, rec, route, compare_with, entry)
         finally:
             longer_calls(xn_record)
             xn_record._xn_c_long = False
     return diffs
 
 
-def test_files(files, funcs=None, all_c=False, max_per=0, verbose=False):
-    """Replay the records in these files; {va: [passed, total, [diffs...]]} and C entries."""
+# --------------------------------------------------------------------------------------------
+# Worker processes: a task over record files, side by side
+
+def parallel(task, files, spec, jobs=None):
+    """Run task(files, spec) ("module:function", returning something JSON can hold) over
+    contiguous runs of `files` (a run's records share their base snapshots) in worker
+    processes: as many as asked, capped by fallemu.workers() (memory), with tools/memwatch.py
+    watching. Returns the list of results."""
+    import subprocess
+    import tempfile
+    import fallemu
+    jobs = min(fallemu.workers(jobs), max(1, len(files)))
+    if jobs <= 1:
+        return [_task(task)(files, spec)]
+    import memwatch
+    memwatch.start()
+    n = len(files)
+    groups = [files[k * n // jobs:(k + 1) * n // jobs] for k in range(jobs)]
+    procs = []
+    os.makedirs(WORK, exist_ok=True)
+    for k, g in enumerate(groups):
+        fd, out = tempfile.mkstemp(prefix="xn_task_", suffix=".json", dir=WORK)
+        os.close(fd)
+        # an overlay of the worker's own (another tool's workers may run beside these)
+        env = dict(os.environ, XN_REPLAY_OVERLAY=os.path.join(
+            ROOT, "build", "emu", "overlay_replay_%d_%d" % (os.getpid(), k)))
+        arg = os.path.join(WORK, os.path.basename(out)[:-5] + ".in.json")
+        with open(arg, "w") as f:
+            json.dump({"task": task, "files": g, "spec": spec}, f)
+        procs.append((subprocess.Popen([sys.executable, os.path.abspath(__file__), "task", arg,
+                                        out], env=env), out, arg))
+    res = []
+    for k, (pr, out, arg) in enumerate(procs):
+        pr.wait()
+        shutil.rmtree(os.path.join(ROOT, "build", "emu", "overlay_replay_%d_%d" % (os.getpid(), k)),
+                      ignore_errors=True)
+        try:
+            with open(out) as f:
+                res.append(json.load(f))
+        except (OSError, ValueError):
+            print("a worker failed (exit %s)" % pr.returncode)
+        for p in (out, arg):
+            if os.path.exists(p):
+                os.remove(p)
+    return res
+
+
+def _task(name):
+    import importlib
+    mod, fn = name.split(":")
+    return getattr(importlib.import_module(mod), fn)
+
+
+def task_main(arg, out):
+    with open(arg) as f:
+        a = json.load(f)
+    r = _task(a["task"])(a["files"], a["spec"])
+    with open(out, "w") as f:
+        json.dump(r, f)
+
+
+def test_files(files, funcs=None, all_c=False, max_per=0, verbose=False, img=None,
+               compare_for=None):
+    """Replay the records in these files; {va: [passed, total, [diffs...]]} and C entries.
+    img: the image (default the literal C's CImage); compare_for(va): a comparison for that
+    function's records (default exact)."""
     import xn_record
     longer_calls(xn_record)
-    img = CImage()
+    img = img or CImage()
     stats = {}
     ran = {}
     every = sorted(img.funcs)
@@ -564,7 +635,8 @@ def test_files(files, funcs=None, all_c=False, max_per=0, verbose=False):
             continue
         seen[va] += 1
         img.entered = set()
-        diffs = replay_c(xn_record, img, rec, every if all_c else [va])
+        diffs = replay_c(xn_record, img, rec, every if all_c else [va],
+                         compare_for(va) if compare_for else None)
         if all_c:
             # every function whose C ran inside this record: passed or failed with it
             for f in img.entered:
@@ -582,6 +654,29 @@ def test_files(files, funcs=None, all_c=False, max_per=0, verbose=False):
     return stats, img.hits, ran
 
 
+def _test_task(files, sp):
+    funcs = set(sp["funcs"]) if sp["funcs"] else None
+    stats, hits, ran = test_files(files, funcs, sp["all_c"], sp["max_per"], sp["verbose"])
+    return {"stats": stats, "hits": hits, "ran": ran}
+
+
+def merge_stats(results):
+    """The per-worker results of a test task, added up: (stats, hits, ran)."""
+    stats, hits, ran = {}, 0, {}
+    for d in results:
+        hits += d.get("hits", 0)
+        for k, v in d.get("ran", {}).items():
+            e = ran.setdefault(int(k), [0, 0])
+            e[0] += v[0]
+            e[1] += v[1]
+        for k, v in d["stats"].items():
+            st = stats.setdefault(int(k), [0, 0, []])
+            st[0] += v[0]
+            st[1] += v[1]
+            st[2] += v[2]
+    return stats, hits, ran
+
+
 def test(funcs=None, dirs=None, all_c=False, max_per=0, verbose=False, jobs=1):
     """Replay every record (of `funcs`) with the function in C (all_c: every function in C),
     in `jobs` worker processes; write the report."""
@@ -595,37 +690,8 @@ def test(funcs=None, dirs=None, all_c=False, max_per=0, verbose=False, jobs=1):
     if jobs <= 1:
         stats, hits, ran = test_files(files, funcs, all_c, max_per, verbose)
     else:
-        import subprocess
-        import tempfile
-        n = len(files)      # contiguous runs of files: a job's records share their bases
-        groups = [files[k * n // jobs:(k + 1) * n // jobs] for k in range(jobs)]
-        procs = []
-        for k, g in enumerate(groups):
-            spec = {"files": g, "funcs": funcs, "all_c": all_c, "max_per": max_per,
-                    "verbose": verbose}
-            fd, out = tempfile.mkstemp(prefix="xn_c_test_", suffix=".json", dir=WORK)
-            os.close(fd)
-            env = dict(os.environ, XN_REPLAY_OVERLAY=os.path.join(
-                ROOT, "build", "emu", "overlay_replay_c%d" % k))
-            procs.append((subprocess.Popen(
-                [sys.executable, os.path.abspath(__file__), "worker", json.dumps(spec), out],
-                env=env), out))
-        stats, hits, ran = {}, 0, {}
-        for pr, out in procs:
-            pr.wait()
-            with open(out) as f:
-                d = json.load(f)
-            os.remove(out)
-            hits += d["hits"]
-            for k, v in d["ran"].items():
-                e = ran.setdefault(int(k), [0, 0])
-                e[0] += v[0]
-                e[1] += v[1]
-            for k, v in d["stats"].items():
-                st = stats.setdefault(int(k), [0, 0, []])
-                st[0] += v[0]
-                st[1] += v[1]
-                st[2] += v[2]
+        spec = {"funcs": funcs, "all_c": all_c, "max_per": max_per, "verbose": verbose}
+        stats, hits, ran = merge_stats(parallel("xn_cload:_test_task", files, spec, jobs))
     dt = time.time() - t0
     print("C entered %d times" % hits)
     write_report(stats, mode="allc" if all_c else "records", ran=ran)
@@ -637,14 +703,6 @@ def test(funcs=None, dirs=None, all_c=False, max_per=0, verbose=False, jobs=1):
         if s[0] != s[1]:
             print("  %06X %d/%d  %s" % (va, s[0], s[1], "; ".join(s[2][0][:3])))
     return 0
-
-
-def worker_main(spec, out):
-    sp = json.loads(spec)
-    funcs = set(sp["funcs"]) if sp["funcs"] else None
-    stats, hits, ran = test_files(sp["files"], funcs, sp["all_c"], sp["max_per"], sp["verbose"])
-    with open(out, "w") as f:
-        json.dump({"stats": stats, "hits": hits, "ran": ran}, f)
 
 
 COLUMNS = ("function", "name", "module", "instructions", "translated", "asm_fallbacks",
@@ -777,18 +835,22 @@ def synthetic(xn_record, src, func, regs):
     return rec
 
 
-def diff_test(funcs=None, dirs=None, trials=8, verbose=False, seed=1, nbases=2, per_base=6):
+def diff_test(funcs=None, dirs=None, trials=8, verbose=False, seed=1, nbases=2, per_base=6,
+              img=None, compare_for=None, report=None, fail_dir=None):
     """For each function: up to `trials` made-up entry states (registers from records of other
     functions, small numbers, random values) on the machine state of a record; each one whose
-    asm call returns becomes a record, which the C must then replay exactly. The states come
-    from `nbases` base snapshots (`per_base` records each), a base at a time: loading a base
-    is the slow part."""
+    asm call returns becomes a record, which the C must then replay exactly (or as
+    compare_for(va) compares). The states come from `nbases` base snapshots (`per_base`
+    records each), a base at a time: loading a base is the slow part. img: the image (default
+    the literal C's); report(res): where results go (default build/xngine/c_work/diff.json)."""
     import random
     import fallemu
     import xn_c
     import xn_record
     longer_calls(xn_record)
-    img = CImage()
+    img = img or CImage()
+    report = report or write_diff_report
+    fail_dir = fail_dir or os.path.join(WORK, "fail")
     prog = xn_c.Program()
     rnd = random.Random(seed)
     by_base = collections.OrderedDict()
@@ -840,21 +902,22 @@ def diff_test(funcs=None, dirs=None, trials=8, verbose=False, seed=1, nbases=2, 
                     drop_machine(xn_record, src["base"])
                     continue
                 tried += 1
-                diffs = replay_c(xn_record, img, rec, [va])
+                diffs = replay_c(xn_record, img, rec, [va],
+                                 compare_for(va) if compare_for else None)
                 r[1] += 1
                 if not diffs:
                     r[0] += 1
                 elif not r[2]:
                     r[2] = "; ".join(diffs[:2])
-                    os.makedirs(os.path.join(WORK, "fail"), exist_ok=True)
-                    with open(os.path.join(WORK, "fail", "diff_%06X.pkl" % va), "wb") as f:
+                    os.makedirs(fail_dir, exist_ok=True)
+                    with open(os.path.join(fail_dir, "diff_%06X.pkl" % va), "wb") as f:
                         pickle.dump([rec], f)
                     if verbose:
                         print("DIFF %06X: %s" % (va, r[2]), flush=True)
             if n % 50 == 49:
                 print("  %d functions, %.0f s" % (n + 1, time.time() - t0), flush=True)
-                write_diff_report({k: tuple(v) for k, v in res.items() if v[1]})
-    write_diff_report({k: tuple(v) for k, v in res.items()})
+                report({k: tuple(v) for k, v in res.items() if v[1]})
+    report({k: tuple(v) for k, v in res.items()})
     n = sum(1 for v in res.values() if v[1])
     good = sum(1 for v in res.values() if v[1] and v[0] == v[1])
     print("%d / %d functions agree on every made-up state (%d of %d functions had a state "
@@ -882,17 +945,17 @@ def write_diff_report(res):
 # --------------------------------------------------------------------------------------------
 # The game itself with XnGine in C
 
-def play(snap, ticks, all_c=True, shot=None, funcs=None, script=""):
+def play(snap, ticks, all_c=True, shot=None, funcs=None, script="", img=None, what="XnGine in C"):
     """Run the game from a snapshot for `ticks` timer ticks with every translated function (or
     `funcs`) in C, and save the screen. The C runs with interrupts off and takes more
-    instructions than the asm, so the run is not tick-for-tick the asm's: compare screens."""
+    instructions than the asm, so the run is not tick-for-tick the asm's: compare screens.
+    img: another image to route (tools/xn_rc.py's readable C)."""
     import fallemu
     path = snap if os.path.exists(snap) else os.path.join(fallemu.SNAPS, snap + ".snap")
     emu = fallemu.Emu.load(path, overlay=os.path.join(WORK, "overlay_play"))
     try:
-        img = None
         if all_c or funcs:
-            img = CImage()
+            img = img or CImage()
             img.install(emu)
             img.route(emu, funcs or sorted(img.funcs))
             # The emulator delivers interrupts between slices, wherever the CPU stopped. The
@@ -919,7 +982,7 @@ def play(snap, ticks, all_c=True, shot=None, funcs=None, script=""):
         start, t0 = emu.ticks, time.time()
         ok = emu.run(start + ticks, [(start + t, a, g) for t, a, g in fallemu.parse_script(script)])
         print("%s: %d ticks %s in %.0f s%s; C entered %d times" % (
-            os.path.basename(path), emu.ticks - start, "with XnGine in C" if img else "(asm)",
+            os.path.basename(path), emu.ticks - start, "with " + what if img else "(asm)",
             time.time() - t0, "" if ok else " (stopped: CPU error)", img.hits if img else 0))
         if shot:
             emu.screenshot(shot)
@@ -930,5 +993,5 @@ def play(snap, ticks, all_c=True, shot=None, funcs=None, script=""):
 
 
 if __name__ == "__main__":
-    if len(sys.argv) == 4 and sys.argv[1] == "worker":
-        worker_main(sys.argv[2], sys.argv[3])
+    if len(sys.argv) == 4 and sys.argv[1] == "task":
+        task_main(sys.argv[2], sys.argv[3])

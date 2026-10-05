@@ -1,0 +1,720 @@
+va,name,subsystem,convention,inputs,stack_args,outputs,flags_out,clobber,ret_pop,callers,notes
+0C0100,xn_anim_rand_seed,anim,watcom,,0,,,eax edx ebx,0,known,called from the game's C (1 sites)
+0C010F,xn_anim_reset,anim,watcom,eax,0,eax,,,0,known,called from the game's C (2 sites)
+0C0131,xn_anim_reset_with_rate,anim,reg,eax dx,0,eax,,,0,unknown,no caller: every register it may change is an output
+0C013B,xn_anim_update,anim,reg,eax edx,0,,,eax ecx dx bx esi,0,known,called from the game's C (1 sites)
+0C019C,xn_anim_tick,anim,reg,eax edx,0,dx,CF,eax ecx ebx esi,0,known,
+0C01EB,xn_anim_run_opcodes,anim,reg,dx esi edi,0,dx edi,,eax ecx ebx,0,known,
+0C020A,xn_anim_op_loop_start,anim,reg,dx edi,0,ax dx edi,CF,,0,partial,
+0C0221,xn_anim_op_loop_end,anim,reg,esi edi,0,eax ebx edi,CF,,0,partial,
+0C023B,xn_anim_op_set_events,anim,reg,esi edi,0,ax edi,CF,,0,partial,
+0C0248,xn_anim_op_set_byte13,anim,reg,esi edi,0,al edi,CF,,0,partial,
+0C0253,xn_anim_op_set_mirror,anim,reg,esi edi,0,al edi,CF,,0,partial,
+0C026B,xn_anim_op_restart,anim,reg,esi,0,eax edi,CF,,0,partial,
+0C027B,xn_anim_op_stop,anim,reg,,0,edi,CF,,0,partial,
+0C027F,xn_anim_op_frame_wait,anim,reg,esi edi,0,ax edi,CF,,0,partial,
+0C029C,xn_anim_op_goto,anim,reg,esi edi,0,eax edi,CF,,0,partial,
+0C02A7,xn_anim_op_goto_random,anim,reg,eax.u dx esi edi,0,eax dx edi,CF,,0,partial,
+0C02C5,xn_anim_op_goto_if_events,anim,reg,eax.u esi edi ZF,0,eax edi,CF,,0,partial,
+0C02DF,xn_anim_op_set_record,anim,reg,esi edi,0,al edi,CF,,0,partial,
+0C02E9,xn_anim_rand_range,anim,reg,ax dx,0,ax dx,,,0,known,
+0C0307,xn_anim_rand_next,anim,reg,,0,ax,,dx,0,known,
+0C0500,xn_sys_crit_error_handler,sys,interrupt,ecx edx ebx ebp esi edi fs gs,8,eax,,,0,unknown,address escapes (escape): every register it may change is an output
+0C0520,xn_sys_install_crit_error_handler,sys,reg,ecx ebx ebp esi edi fs gs,0,fs gs,,eax edx,0,known,called from the game's C (1 sites)
+0C0580,xn_sys_restore_crit_error_handler,sys,reg,ecx.u ebp esi edi fs gs,0,fs gs,,eax ecx edx ebx ebp esi edi,0,known,called from the game's C (1 sites)
+0C0700,xn_draw_image_scaled,draw,watcom,ax ecx edx ebx,16,,,eax ecx edx ebx,16,known,called from the game's C (4 sites)
+0C08CC,xn_draw_image_scaled_clip,draw,reg,,0,,CF,eax cx dx bx bp esi edi,0,known,
+0C094A,xn_draw_image_scaled_compile_row,draw,reg,eax ecx.u,0,eax ecx dx bx bp,,,0,partial,
+0C0A36,xn_img_unpack_rows,img,watcom,,0,,,eax dx bp esi,0,known,
+0C0C00,xn_dos_load_palette,dos,reg,eax ecx edx ebx ebp esi fs gs,0,eax ebp esi,,,0,unknown,no caller: every register it may change is an output
+0C0C7C,xn_dos_open_c,dos,reg,eax ecx ebx ebp esi edi fs gs,0,eax ecx ebp esi edi,,,0,unknown,no caller: every register it may change is an output
+0C0C8C,xn_dos_open,dos,reg,eax ecx edx ebx ebp esi edi fs gs,0,eax ecx edx ebx ebp esi edi fs gs,CF,,0,known,
+0C0CC0,xn_dos_close_c,dos,reg,eax,0,,,,0,unknown,no caller: every register it may change is an output
+0C0CCC,xn_dos_close,dos,reg,ebx,0,,,,0,known,
+0C0CD8,xn_dos_find_first_c,dos,watcom,eax,0,eax,,,0,unknown,no caller: every register it may change is an output
+0C0CF0,xn_dos_find_first,dos,reg,al eax.u edx,0,,CF,eax ecx edx,0,known,
+0C0CF8,xn_dos_find_next_c,dos,reg,al eax.u CF,0,eax,,,0,unknown,no caller: every register it may change is an output
+0C0D0C,xn_dos_find_next,dos,reg,al eax.u,0,,CF,eax ecx edx,0,known,
+0C0D14,xn_dos_file_exists_c,dos,reg,eax ebx,0,eax ebx,,,0,unknown,no caller: every register it may change is an output
+0C0D28,xn_dos_file_exists,dos,reg,edx ebx,0,ebx,CF,eax,0,known,
+0C0D44,xn_dos_create_c,dos,reg,eax ecx ebx ebp esi edi fs gs,0,eax ecx ebp esi edi,,,0,unknown,no caller: every register it may change is an output
+0C0D54,xn_dos_create,dos,reg,eax ecx edx ebx ebp esi edi fs gs,0,ecx edx ebx ebp esi edi fs gs,,eax,0,known,
+0C0D78,xn_dos_write_c,dos,reg,eax edx ebx,0,eax edx,,,0,unknown,no caller: every register it may change is an output
+0C0D8C,xn_dos_write,dos,reg,ecx edx ebx,0,edx,CF,eax ecx,0,known,
+0C0DB8,xn_dos_read_c,dos,reg,eax edx ebx,0,eax edx,,,0,unknown,no caller: every register it may change is an output
+0C0DC4,xn_dos_read,dos,reg,ecx edx ebx,0,eax,,,0,known,
+0C0DCC,xn_dos_seek_c,dos,reg,al eax.u edx ebx,0,eax edx,,,0,unknown,no caller: every register it may change is an output
+0C0DE7,xn_dos_seek,dos,reg,al eax.u ecx edx ebx,0,eax edx,CF,ecx,0,known,
+0C0DEC,xn_dos_file_size_c,dos,reg,eax ecx ebx ebp esi edi fs gs,0,eax ebp esi edi,,,0,unknown,no caller: every register it may change is an output
+0C0DFC,xn_dos_file_size,dos,reg,eax ecx edx ebx ebp esi edi fs gs,0,eax ebp esi edi fs gs,,ecx,0,known,
+0C0E24,xn_dos_load_file,dos,reg,eax ecx edx ebx ebp esi edi fs gs,0,eax ecx ebx ebp esi edi fs gs,,edx,0,known,ESP -20 at the return at C0ECF
+0C0ED0,xn_dos_make_path,dos,reg,edx,0,edx,CF,,0,known,
+0C1500,xn_vid_play,vid,reg,eax ecx edx ebx ebp esi edi fs gs,0,eax fs gs,CF,,0,unknown,address escapes (escape): every register it may change is an output; called from the game's C (8 sites)
+0C1654,xn_vid_open,vid,reg,eax ecx edx ebx ebp esi edi fs gs,0,fs gs,,eax,0,known,
+0C17D6,xn_vid_update,vid,reg,ecx edx ebx ebp esi edi fs gs,0,fs gs,,eax,0,known,
+0C1844,xn_vid_finish,vid,reg,ecx edx ebx ebp esi edi fs gs,0,ecx edx ebx ebp esi edi fs gs,,eax,0,known,
+0C18A3,xn_vid_decode_chunk,vid,reg,edx ebx ebp fs gs,0,fs gs,,eax ecx edx ebx ebp esi edi,0,known,
+0C1B1A,xn_vid_close_file,vid,reg,ebx,0,bx,,eax,0,known,
+0C1B43,xn_vid_refill,vid,reg,ebx esi,0,bx esi,,eax,0,known,
+0C1B9A,xn_vid_fill,vid,reg,ebx.u,0,edx bx,,eax ecx esi edi,0,known,
+0C1BBE,xn_vid_schedule_frame,vid,reg,ax ebx ebp esi edi fs gs,0,fs gs,,eax,0,known,
+0C1C4A,xn_vid_read_audio,vid,reg,ebx esi,0,,,eax ecx edx ebx ebp esi edi,0,known,
+0C1CDC,xn_vid_timer_cb,vid,reg,,0,,,,0,unknown,address escapes (escape): every register it may change is an output
+0C1D00,xn_vid_audio_done_cb,vid,reg,,4,,,,0,unknown,address escapes (escape): every register it may change is an output
+0C1D4D,xn_vid_audio_stop,vid,reg,ecx edx ebx ebp esi edi,0,edx,,eax,0,known,
+0C1D6E,xn_vid_audio_start,vid,reg,ebx ebp esi edi fs gs,0,fs gs,,eax,0,known,
+0C2000,xn_vec_unit_direction,vec,watcom,eax edx ebx,0,,,eax edx ebx,0,known,called from the game's C (4 sites)
+0C2043,xn_vec_advance,vec,watcom,eax edx ebx,0,,,eax edx ebx,0,known,called from the game's C (5 sites)
+0C2068,xn_vec_dir_to_angles,vec,watcom,eax,0,,,eax ecx edx ebx esi edi,0,known,called from the game's C (1 sites)
+0C2088,xn_vec_dir_to_angles_regs,vec,reg,eax edx ebx,0,eax edx,,ecx ebx,0,known,
+0C2098,xn_vec_unit_to_angles,vec,watcom,eax,0,eax,,,0,unknown,no caller: every register it may change is an output
+0C20B8,xn_vec_unit_to_angles_regs,vec,reg,eax edx ebx,0,eax edx,,ebx,0,known,
+0C2143,xn_vec_scale_unit14,vec,reg,eax ecx edx ebx,0,eax edx ebx,CF,ecx,0,known,
+0C2173,xn_mat_to_angles,mat,reg,eax,0,eax edx ebx,CF,ecx ebp esi edi,0,known,
+0C2D00,xn_world_init,world,reg,ecx edx ebx ebp esi edi fs gs,0,ecx ebx ebp esi edi fs gs,,eax edx,0,known,ESP -32 at the return at C2D60; called from the game's C (1 sites)
+0C2D62,xn_world_shutdown,world,reg,ecx edx ebx ebp esi edi fs gs,0,ecx edx ebx ebp esi edi fs gs,,eax,0,known,
+0C2D81,xn_world_cell_at,world,watcom,eax edx,0,eax,,edx,0,known,called from the game's C (4 sites)
+0C2D8F,xn_world_cell_index,world,reg,eax ebx,0,edi,,edx,0,known,
+0C2DB8,xn_world_cell_slot,world,reg,eax ebx,0,esi,,edx ebp,0,known,
+0C2E05,xn_world_update,world,reg,ecx,0,,,eax,0,known,called from the game's C (1 sites)
+0C2EE1,xn_world_load_west,world,reg,ecx bh ebx.u esi edi,0,bh ebx.u esi edi,,eax edx bl ebp,0,known,
+0C2F21,xn_world_load_east,world,reg,ecx bh ebx.u esi edi,0,bh ebx.u esi edi,,eax edx bl ebp,0,known,
+0C2F66,xn_world_load_north,world,reg,ecx bh ebx.u esi edi,0,bh ebx.u esi edi,,eax edx bl ebp,0,known,
+0C2FAB,xn_world_load_south,world,reg,ecx bh ebx.u esi edi,0,bh ebx.u esi edi,,eax edx bl ebp,0,known,
+0C2FF5,xn_world_reload,world,watcom,ecx,0,,,eax ecx edx ebx,0,known,called from the game's C (4 sites)
+0C30D6,xn_world_create_file,world,reg,eax ecx edx ebx ebp esi edi fs gs,0,eax ecx edx ebx ebp esi edi,,,0,unknown,no caller: every register it may change is an output
+0C310F,xn_world_open,world,reg,eax ecx ebx ebp esi edi fs gs,0,fs gs,,eax ecx edx ebx ebp esi edi,0,known,ESP -32 at the return at C31AC; called from the game's C (1 sites)
+0C31AE,xn_world_read_height_bands,world,watcom,al eax.u ebx,0,,,eax ecx edx ebx ebp esi edi,0,known,
+0C31DB,xn_world_write_header,world,reg,,0,,,,0,unknown,no caller: every register it may change is an output
+0C322D,xn_world_read_header,world,unknown,eax ebx ebp esi edi fs gs,0,al eax.u ebx fs gs,,ah ecx edx ebp esi edi,0,known,leaves through C32E5
+0C32E6,xn_world_free_offsets,world,reg,ecx edx ebx ebp esi edi fs gs,0,ecx edx ebx ebp esi edi fs gs,,eax,0,known,
+0C3301,xn_world_read_cell,world,reg,ecx edi,0,,,eax edx bl ebp,0,known,
+0C33F4,xn_world_write_cell,world,reg,ecx edx edi,0,,,,0,unknown,no caller: every register it may change is an output
+0C3430,xn_world_unpack_cell_slot,world,watcom,eax,0,eax,,,0,unknown,no caller: every register it may change is an output
+0C343E,xn_world_unpack_cell,world,reg,,0,,,,0,known,
+0C3515,xn_world_random_elevations,world,reg,edi,0,edi,,,0,unknown,no caller: every register it may change is an output
+0C354D,xn_world_gen_heightmap_slot,world,reg,eax,0,,,,0,unknown,no caller: every register it may change is an output
+0C355D,xn_world_gen_heightmap,world,watcom,,0,,,eax edx bl ebp,0,known,
+0C3A60,xn_world_place_nature_flats,world,watcom,eax,0,,,eax edx ebx,0,known,called from the game's C (1 sites)
+0C3B1D,xn_world_steepest_neighbour,world,reg,ecx ebp edi,0,eax ebx,CF,,0,known,
+0C3B87,xn_world_gen_tiles,world,watcom,ah eax.u bh ebx.u,0,,,eax ecx edx ebx ebp esi edi,0,known,
+0C3C3C,xn_world_fix_lone_tiles,world,reg,ah eax.u,0,eax.u ebx.u,,ax ecx edx bx ebp esi edi,0,known,
+0C3D14,xn_world_rock_slopes,world,watcom,eax.u ebx.u,0,,,eax ecx edx ebx ebp esi edi,0,known,
+0C3DA8,xn_world_gen_paths,world,reg,,0,,,ax ecx edx bx ebp esi edi,0,known,
+0C3DA9,xn_world_gen_paths_body,world,reg,eax ebx ebp,0,eax ecx ebx esi edi,,,0,unknown,no caller: every register it may change is an output
+0C3E69,xn_world_gen_river,world,reg,,0,,,ax ecx edx bx ebp esi edi,0,known,
+0C3E6A,xn_world_gen_river_body,world,reg,ebp,0,eax ecx ebx esi edi,,,0,unknown,no caller: every register it may change is an output
+0C3EFE,xn_world_blend_tiles,world,watcom,,0,,,eax ecx edx bl ebp esi edi,0,known,
+0C3FCB,xn_world_mark_nonplanar_quads,world,watcom,bh ebx.u,0,,,eax edx ebx,0,known,called from the game's C (1 sites)
+0C5200,xn_rand_noise_init,rand,watcom,,0,,,eax,0,known,called from the game's C (1 sites)
+0C524A,xn_rand_noise_fade_init,rand,watcom,,0,,,eax ecx edx ebx ebp esi edi,0,known,
+0C5280,xn_rand_noise_2d,rand,watcom,eax edx,0,eax,,ecx edx ebx,0,known,called from the game's C (6 sites)
+0C5304,xn_rand_noise_empty,rand,reg,,0,,,,0,unknown,no caller: every register it may change is an output
+0C7F00,xn_sys_yield,sys,reg,eax.u ecx edx ebx esi edi,0,ecx edx ebx esi edi,,eax,0,known,called from the game's C (1 sites)
+0C7F07,xn_model_set_angles,model,watcom,ax ecx dx bx,0,,,eax ecx edx ebx,0,known,called from the game's C (3 sites)
+0C7F14,xn_model_compose_angles,model,watcom,eax ecx edx ebx,0,,,eax ecx edx ebx esi edi,0,known,called from the game's C (2 sites)
+0C7F98,xn_model_set_angles_yaw_offset,model,watcom,eax edx,0,,,eax ecx edx ebx esi edi,0,known,called from the game's C (2 sites)
+0C7FB6,xn_cam_forward_angles,cam,reg,eax edx,0,eax edx,,,0,unknown,no caller: every register it may change is an output
+0C7FD9,xn_math_approx_dist2d,math,watcom,eax ecx edx ebx,0,eax,,ecx edx ebx,0,known,called from the game's C (46 sites)
+0C7FF4,xn_math_approx_hypot,math,watcom,eax edx,0,eax,,edx ebx,0,known,called from the game's C (17 sites)
+0C800B,xn_str_copy_dword,str,reg,eax edx,0,edx,,,0,unknown,no caller: every register it may change is an output
+0C8010,xn_math_diff_div,math,reg,eax edx ebx,0,eax edx,,,0,unknown,no caller: every register it may change is an output
+0C8017,xn_img_rle_decode,img,reg,eax edx,0,ecx.u,,eax cx edx ebx ebp,0,known,
+0C8054,xn_math_exp_series,math,reg,edx,0,eax,,,0,unknown,no caller: every register it may change is an output
+0C808D,xn_math_angle_to_point,math,watcom,eax ecx edx ebx,0,eax,,ecx edx ebx,0,known,called from the game's C (20 sites)
+0C80CC,xn_model_centroid_to_pick,model,reg,eax,0,,,,0,unknown,no caller: every register it may change is an output
+0C810C,xn_model_push_player_from_pick,model,watcom,eax,0,,,eax edx,0,known,called from the game's C (1 sites)
+0C8167,xn_math_fixmul28_v2,math,watcom,eax edx,0,eax,,ecx edx ebx esi edi,0,known,called from the game's C (4 sites)
+0C816E,xn_sky_init_stars,sky,watcom,,0,,,eax ecx edx ebx ebp esi edi,0,known,called from the game's C (1 sites)
+0C81F2,xn_sky_draw_stars,sky,reg,,0,,,,0,unknown,no caller: every register it may change is an output
+0C8292,xn_sky_rotate_stars,sky,reg,,0,,,,0,unknown,no caller: every register it may change is an output
+0C82C2,xn_math_angles_to_vector,math,reg,eax edx ebx,0,eax edx ebx,,ebp esi,0,known,
+0C8315,xn_draw_clip_image_rect,draw,reg,eax ecx edx ebx ebp esi,0,eax ecx edx ebx ebp esi,CF,edi,0,known,
+0C8381,xn_draw_image_shaded,draw,reg,eax ecx edx ebx,4,eax ecx edx ebx,,,4,unknown,no caller: every register it may change is an output
+0C8394,xn_draw_ret_stub,draw,reg,,0,,,,0,unknown,no caller: every register it may change is an output
+0C8395,xn_draw_image_shaded_regs,draw,reg,eax ecx edx ebx esi,0,eax ecx edx ebx,,ebp esi edi,0,known,
+0C83F6,xn_draw_shaded_row_unrolled,draw,reg,ah eax.u esi edi,0,al,,,0,known,
+0C9A89,xn_sky_draw_snow,sky,watcom,,0,,,eax ecx edx ebx esi edi,0,known,called from the game's C (1 sites)
+0C9BF7,xn_sky_snow_init,sky,watcom,,0,,,eax,0,known,called from the game's C (1 sites)
+0C9C70,xn_sky_snow_update_speeds,sky,watcom,,0,,,eax edx,0,known,called from the game's C (1 sites)
+0C9CB9,xn_sky_draw_rain,sky,reg,bh ebx.u ebp fs gs,0,,,eax ecx edx ebx esi edi,0,known,called from the game's C (1 sites)
+0C9D19,xn_sky_draw_rain_streak,sky,unknown,eax edx bh ebx.u ebp fs gs,0,bh ebx.u ebp,,eax ecx edx bl esi edi,0,known,leaves through C9EA6
+0C9D63,xn_sky_draw_rain_streak_bottom_clip,sky,unknown,eax ecx edx bh ebx.u ebp esi fs gs,0,eax ecx edx ebx ebp esi edi,,,0,unknown,no caller: every register it may change is an output; leaves through C9EA6
+0C9EA7,xn_shade_table_63,shade,watcom,,0,eax,,edx ebx,0,known,called from the game's C (1 sites)
+0C9EB2,xn_shade_init_reserved,shade,watcom,,0,,,eax,0,known,called from the game's C (1 sites)
+0C9F08,xn_timer_bios_ticks,timer,watcom,,0,eax,,ecx edx ebx,0,known,called from the game's C (2 sites)
+0C9F10,xn_math_scale_110,math,reg,eax edx ebx,0,eax edx,,,0,unknown,no caller: every register it may change is an output
+0C9F29,xn_sys_set_dos_transfer_buffer,sys,reg,esi edi,0,,,eax edx,0,known,called from the game's C (1 sites)
+0C9F4F,xn_draw_remap_rows_320,draw,reg,eax ecx edx ebx,0,,,,0,unknown,no caller: every register it may change is an output
+0CAE00,xn_input_steer_dispatch,input,reg,eax ecx edx ebx ebp esi edi fs gs,0,ebp fs gs,,eax ecx edx ebx esi edi,0,known,called from the game's C (1 sites)
+0CAE07,spell_cost_formula_dispatch,,watcom,eax,0,eax,,edx ebx,0,known,called from the game's C (3 sites)
+0CAE0E,spell_effect_dispatch,,unknown,eax ecx edx ebx ebp esi edi fs gs CF PF AF ZF SF OF,0,eax ebp,,ecx edx ebx esi edi,0,known,called from the game's C (1 sites); leaves through CAE1B
+0CAE1C,xn_spell_kludge_menu_dispatch,spell,unknown,eax ecx edx ebx ebp esi edi fs gs CF PF AF ZF SF OF,0,,,eax ecx edx ebx ebp esi edi,0,known,called from the game's C (1 sites); leaves through CAE28
+0CB300,xn_shade_keep_colours_0_255,shade,watcom,,0,,,eax edx ebx,0,known,called from the game's C (2 sites)
+0CB31E,xn_sky_copy_rows,sky,watcom,eax ecx edx ebx,0,,,eax ecx edx ebx,0,known,called from the game's C (9 sites)
+0CB34E,xn_draw_copy_rect_stride,draw,watcom,eax ecx edx ebx,4,,,eax ecx edx ebx esi edi,4,known,called from the game's C (1 sites)
+0CB381,xn_img_cif_group,img,watcom,eax edx,0,eax,,ecx edx,0,known,called from the game's C (2 sites)
+0CB39A,xn_draw_cif_rle_frame,draw,watcom,eax edx ebx,0,,,eax ecx edx ebx,0,known,called from the game's C (4 sites)
+0CB473,xn_draw_img_masked_remap,draw,watcom,eax edx,0,,,eax ecx edx ebx esi,0,known,called from the game's C (1 sites)
+0CB4D7,xn_img_rle_frame_unpack,img,reg,eax edx ebx,0,eax edx ebx,,,0,unknown,no caller: every register it may change is an output
+0CB54C,xn_img_rle_frame_unpack_fail,img,reg,,8,eax ecx esi edi,,,0,unknown,ESP +12 at the return at CB551; no caller: every register it may change is an output
+0CB552,xn_draw_fullscreen_overlay_shaded,draw,watcom,eax,0,,,eax,0,known,called from the game's C (9 sites)
+0CD0F1,xn_draw_darken_rect,draw,watcom,eax ecx edx ebx,0,,,eax ecx edx ebx esi edi,0,known,called from the game's C (1 sites)
+0CD126,xn_draw_cel_frame,draw,watcom,eax ecx.u edx ebx,0,,,eax ecx edx ebx ebp esi edi,0,known,called from the game's C (1 sites)
+0CD1C5,xn_draw_image_drop_shadow,draw,watcom,eax ecx edx ebx,4,,,eax ecx edx ebx,4,known,called from the game's C (2 sites)
+0CD20E,xn_draw_spell_icon,draw,watcom,eax edx bx,0,,,eax edx ebx,0,known,called from the game's C (4 sites)
+0CD262,xn_draw_paperdoll_mask,draw,reg,eax ecx edx ebx,4,,,eax ecx edx ebx ebp esi edi,0,known,called from the game's C (1 sites)
+0CD291,xn_draw_paperdoll_item,draw,watcom,eax ecx edx ebx,4,,,eax ecx edx ebx esi edi,4,known,called from the game's C (1 sites)
+0CD308,xn_gfx_wait_vretrace_start,gfx,reg,ax dx,0,ax dx,,,0,known,called from the game's C (3 sites)
+0CD31A,xn_gfx_wait_vretrace_end,gfx,reg,ax dx,0,ax dx,,,0,known,called from the game's C (3 sites)
+0CD32C,xn_gfx_wait_vretraces,gfx,reg,eax dx,0,eax dx,,,0,unknown,no caller: every register it may change is an output
+0CD33A,xn_pal_set_range_8bit,pal,watcom,eax dx bx,0,,,eax edx ebx,0,known,called from the game's C (9 sites)
+0CD367,xn_pal_set_all_8bit,pal,watcom,eax,0,,,eax edx,0,known,called from the game's C (5 sites)
+0CD37B,xn_img_skip_records,img,reg,eax edx,0,eax edx,,,0,unknown,no caller: every register it may change is an output
+0CD38E,xn_timer_wait_change,timer,reg,eax edx,0,,,,0,unknown,no caller: every register it may change is an output
+0CD39B,xn_draw_fill_rows_pattern8,draw,reg,eax edx ebx,0,eax edx ebx,,,0,unknown,no caller: every register it may change is an output
+0CD53C,xn_draw_view_checkerboard,draw,watcom,,0,,,eax ecx edx ebx esi edi,0,known,called from the game's C (1 sites)
+0CDB7A,xn_draw_cast_anim_mirrored,draw,watcom,eax edx ebx,0,,,eax ecx edx ebx ebp esi edi,0,known,called from the game's C (2 sites)
+0CDC4B,xn_shade_build_translucent_table,shade,watcom,eax,0,,,eax edx ebx,0,known,called from the game's C (1 sites)
+0CDC99,xn_tex_archive_set_translucent,tex,watcom,eax,0,,,eax,0,known,called from the game's C (3 sites)
+0CDCB8,xn_draw_image_masked_at_origin,draw,watcom,eax edx ebx,0,,,eax edx ebx,0,known,called from the game's C (1 sites)
+0CDCE5,xn_draw_remap_masked_rect,draw,reg,eax ecx edx ebx,8,eax ecx edx,,,0,unknown,no caller: every register it may change is an output
+0CDD49,xn_draw_zoom4x,draw,watcom,eax edx ebx,0,,,eax ecx edx ebx esi edi,0,known,called from the game's C (1 sites)
+0CDD6C,xn_draw_mark_matching,draw,watcom,eax ecx edx bl,0,,,eax ecx edx ebx,0,known,called from the game's C (1 sites)
+0CDD81,xn_gfx_present_inclusive,gfx,reg,eax ecx edx esi edi,0,,,,0,known,called from the game's C (28 sites)
+0CDDA8,xn_timer_tick_callback,timer,reg,,0,,,,0,unknown,address escapes (escape): every register it may change is an output
+0CE300,xn_str_copy_line,str,watcom,eax edx,0,eax,,ecx edx ebx esi edi,0,known,called from the game's C (2 sites)
+0CE31C,xn_draw_copy_rect_stride_bytes,draw,reg,eax ecx edx ebx,4,ecx,,eax edx ebx,4,known,called from the game's C (7 sites)
+0CE3E3,xn_str_copy_word,str,watcom,eax edx,0,,,eax ecx edx ebx esi edi,0,known,called from the game's C (1 sites)
+0CE3FD,xn_str_copy_alnum,str,watcom,eax edx,0,eax,,edx,0,known,called from the game's C (1 sites)
+0CE435,xn_str_find_char_n,str,reg,eax dl ebx,0,eax ebx,,,0,unknown,no caller: every register it may change is an output
+0CE44C,xn_str_find_u32,str,watcom,eax edx ebx,0,eax,,edx ebx,0,known,called from the game's C (9 sites)
+0CE45E,xn_str_find_u16,str,watcom,eax dx ebx,0,eax,,edx ebx,0,known,called from the game's C (7 sites)
+0CE46D,xn_str_copy_until,str,watcom,eax edx bl,0,,,eax edx ebx,0,known,called from the game's C (2 sites)
+0CE483,xn_str_fill_u16,str,reg,eax dx bx,0,,,ax edx ebx,0,known,called from the game's C (2 sites)
+0CE495,xn_str_fill_ascending_v2,str,reg,eax dl ebx,0,eax dl ebx,,,0,unknown,no caller: every register it may change is an output
+0CE49E,xn_str_append_char,str,watcom,eax dl,0,,,eax edx ebx,0,known,called from the game's C (1 sites)
+0CE4A9,xn_bits_set_or_clear_u8,bits,watcom,eax dl ebx,0,,,eax ecx edx ebx ebp esi edi,0,known,called from the game's C (10 sites)
+0CE4B5,xn_bits_set_or_clear_u16,bits,watcom,eax dx ebx,0,,,eax ecx edx ebx ebp esi edi,0,known,called from the game's C (12 sites)
+0CE4C4,spell_find_effect_type,,watcom,eax dl,0,eax,,edx,0,known,called from the game's C (2 sites)
+0CE4E0,spell_has_no_effects,,watcom,eax,0,eax,,,0,known,called from the game's C (1 sites)
+0CE4FA,xn_draw_line_text_colour,draw,reg,eax ecx edx ebx esi edi,0,esi edi,,eax ecx edx ebx,0,known,ESP -12 at the return at CE5B9; called from the game's C (4 sites)
+0CE61E,xn_draw_line_text_colour_step_x,draw,reg,ecx ebx esi edi,8,al ecx esi edi,,,0,partial,ESP +12 at the return at CE662
+0CE63F,xn_draw_line_text_colour_step_y,draw,reg,ecx ebx esi edi,8,al ecx esi edi,,,0,partial,ESP +12 at the return at CE662
+0CE663,xn_str_fill_ascending,str,watcom,eax dl ebx,0,,,eax ecx edx ebx esi,0,known,called from the game's C (11 sites)
+0CE66C,xn_mem_align_up,mem,watcom,eax edx,0,eax,,edx,0,known,called from the game's C (5 sites)
+0CE69A,xn_mouse_set_range_320x200,mouse,watcom,eax.u ecx.u edx.u,0,,,eax ecx edx ebx,0,known,called from the game's C (1 sites)
+0CE6B7,xn_mouse_set_range_640x480,mouse,reg,eax.u ecx.u edx.u,0,,,,0,unknown,no caller: every register it may change is an output
+0CE6D4,xn_math_mul_sin,math,watcom,eax edx,0,eax,,ecx edx ebx esi edi,0,known,called from the game's C (1 sites)
+0CE6E2,xn_math_yaw_offset_xz,math,reg,eax ecx edx ebx,0,,,eax edx,0,known,called from the game's C (14 sites)
+0CE70D,xn_math_advance_pitch_yaw,math,watcom,eax ecx edx ebx,0,,,eax ecx edx ebx,0,known,called from the game's C (4 sites)
+0CE74F,xn_math_fixmul28,math,watcom,eax edx,0,eax,,ecx edx ebx esi edi,0,known,called from the game's C (4 sites)
+0CE758,xn_pal_read_dac,pal,watcom,eax,0,,,eax edx ebx,0,known,called from the game's C (1 sites)
+0CE77F,xn_str_count_nonzero,str,watcom,eax edx,0,eax,,ecx edx ebx esi edi,0,known,called from the game's C (1 sites)
+0CE790,xn_str_skip_fields,str,watcom,eax dl ebx,0,eax,,edx ebx,0,known,called from the game's C (1 sites)
+0CE7A7,xn_str_find_byte_pair,str,watcom,eax dx ebx,0,eax,,edx ebx,0,known,called from the game's C (1 sites)
+0CE7B3,xn_timer_add_25,timer,reg,,0,,,,0,unknown,no caller: every register it may change is an output
+0CE7BB,xn_timer_fps_update,timer,watcom,,0,eax,,edx,0,known,called from the game's C (1 sites)
+0CE808,xn_model_max_y,model,watcom,eax,0,eax,,edx ebx,0,known,called from the game's C (1 sites)
+0CE828,xn_model_xz_extent,model,reg,eax edx ebx,0,,,,0,unknown,no caller: every register it may change is an output
+0CE87B,xn_str_find_nonzero,str,watcom,eax edx,0,eax,,edx,0,known,called from the game's C (1 sites)
+0CE88D,xn_mouse_set_sensitivity,mouse,watcom,eax edx,0,,,eax edx,0,known,called from the game's C (4 sites)
+0CE8A0,xn_mouse_get_sensitivity,mouse,reg,eax ecx edx ebx esi edi,0,,,eax edx,0,known,called from the game's C (3 sites)
+0CE8B2,xn_timer_read_pit,timer,watcom,eax.u,0,eax,,ecx edx ebx esi edi,0,known,called from the game's C (2 sites)
+0CE8C4,xn_sys_zero_page_save,sys,watcom,,0,,,eax,0,known,called from the game's C (1 sites)
+0CE8D5,xn_sys_zero_page_check,sys,reg,edx ebx ebp fs gs,0,fs gs,,eax edx,0,known,called from the game's C (1 sites)
+0CE918,xn_timer_wait_ticks,timer,watcom,eax,0,,,eax edx,0,known,called from the game's C (1 sites)
+0CE92C,xn_kbd_wait_all_released,kbd,watcom,,0,,,eax dx,0,known,called from the game's C (3 sites)
+0CE94B,xn_mouse_ps2_set_sample_rate,mouse,reg,al ecx edx bl ebx.u esi edi,0,,,,0,unknown,no caller: every register it may change is an output
+0CE957,xn_kbd_numlock_off,kbd,watcom,al eax.u,0,,,eax edx,0,known,called from the game's C (1 sites)
+12A100,xn_render_init,render,reg,ebp esi fs gs,0,fs gs,,eax ecx edx ebx,0,known,called from the game's C (1 sites)
+12A230,xn_render_shutdown,render,reg,ecx edx ebx ebp esi edi fs gs,0,fs gs,,ah,0,known,called from the game's C (1 sites)
+12A254,xn_render_set_mode,render,watcom,eax,0,,,eax,0,known,called from the game's C (4 sites)
+12A274,xn_cam_set_focal,cam,reg,eax edx,0,,,eax dl,0,known,called from the game's C (3 sites)
+12A2D0,xn_cam_set_view_window,cam,watcom,eax ecx edx ebx,0,,,eax ecx edx ebx,0,known,called from the game's C (13 sites)
+12A3AC,xn_cam_update_derived,cam,watcom,,0,,,eax ecx edx ebx ebp esi edi,0,known,
+12A4F0,xn_render_begin_frame,render,watcom,,0,,,eax ecx edx ebx,0,known,called from the game's C (3 sites)
+12A608,xn_render_pick,render,unknown,eax ecx edx ebx ebp esi fs gs,0,eax fs gs,,ecx edx ebx esi edi,0,known,called from the game's C (1 sites); stack use not followed
+12A700,xn_render_span_setup_solid,render,reg,eax ecx ebx ebp esi edi,0,eax ecx edx ebx ebp esi edi,,,0,partial,
+12A740,xn_render_span_setup_terrain,render,reg,eax ebx ebp esi edi,0,eax ecx edx ebx ebp esi edi,,,0,partial,
+12A7A0,xn_render_span_setup_terrain_solid,render,reg,eax ecx ebp edi,0,eax ecx edx ebx edi,,,0,unknown,no caller: every register it may change is an output
+12A7D0,xn_render_draw_models,render,reg,ecx edx ebx ebp esi edi fs gs,0,ecx edx ebx ebp esi edi fs gs,CF,eax,0,known,
+12A814,xn_render_draw_flats,render,reg,eax ecx edx ebx ebp esi edi fs gs,0,eax ecx edx ebx ebp esi edi fs gs,CF,,0,known,
+12A860,xn_render_span_mark_ends,render,reg,ebp edi,0,al,,,0,unknown,no caller: every register it may change is an output
+12A870,xn_render_frame,render,reg,eax ecx edx ebx ebp esi edi fs gs,0,eax fs gs,,,0,known,called from the game's C (4 sites)
+12A949,xn_render_frame_row_end,render,reg,eax ecx edx ebx ebp fs gs,48,eax ecx edx ebx ebp esi edi fs gs,,,0,partial,ESP +28 at the return at 12A94D
+12A94E,xn_render_frame_next_row,render,reg,eax ecx edx ebx ebp esi edi fs gs,20,eax ecx edx ebx ebp esi edi fs gs,,,0,known,
+12A969,xn_render_frame_rows_done,render,reg,eax ecx edx ebx ebp esi edi fs gs,20,eax ecx edx ebx ebp esi edi fs gs,,,0,known,ESP -36 at the return at 12A970
+12A975,xn_render_frame_rows_done_popfd,render,reg,fs gs,56,eax ecx edx ebx ebp esi edi fs gs,,,0,known,
+12A976,xn_render_frame_flats,render,reg,fs gs,56,eax ecx edx ebx ebp esi edi fs gs,,,0,known,ESP +32 at the return at 12A977
+12A97C,xn_render_frame_flats_check,render,reg,CF,24,eax ecx edx ebx ebp esi edi,,,0,known,ESP +32 at the return at 12A98A
+12A97E,xn_render_frame_exit,render,reg,,24,eax ecx edx ebx ebp esi edi,,,0,known,ESP +32 at the return at 12A982
+12A98B,xn_render_fill_background,render,reg,ecx ebx ebp esi edi,0,ecx ebx ebp esi edi,,eax,0,known,
+12B100,xn_mouse_init,mouse,reg,,0,,,ax cx dx ebx,0,known,called from the game's C (1 sites)
+12B136,xn_mouse_poll_clamped,mouse,reg,,0,fs,,,0,known,called from the game's C (107 sites)
+12B196,xn_mouse_poll,mouse,reg,,0,fs,,eax ecx edx ebx ebp esi edi,0,known,
+12B2D3,xn_mouse_cursor_move,mouse,reg,ax dx,0,,,edx,0,known,called from the game's C (14 sites)
+12B2EB,xn_mouse_cursor_erase,mouse,reg,,0,,,,0,known,called from the game's C (8 sites)
+12B326,xn_mouse_cursor_clip,mouse,watcom,,0,,,eax ecx edx ebx ebp esi edi,0,known,
+12B3ED,xn_mouse_cursor_draw,mouse,reg,,0,,,dl,0,known,called from the game's C (9 sites)
+12B45B,xn_mouse_set_cursor_image,mouse,watcom,eax dx bx,0,,,eax ecx edx ebx ebp esi edi,0,known,called from the game's C (1 sites)
+12B47E,xn_mouse_read_motion,mouse,reg,eax edx,0,ah eax.u fs,,al edx,0,known,called from the game's C (2 sites)
+12B49E,xn_mouse_set_position,mouse,reg,eax edx,0,fs,,eax edx,0,known,called from the game's C (3 sites)
+12D40E,xn_pal_find_nearest,pal,watcom,cl dl bl,0,al,,ah eax.u ecx edx ebx,0,known,
+12D481,xn_pal_find_nearest_hsv,pal,reg,cx dx bx,0,eax cx dx bx,,,0,unknown,no caller: every register it may change is an output
+12D514,xn_pal_rgb_to_hsv,pal,reg,cl dl bl,0,cx dx bx,,eax ebp,0,known,
+12D6AB,xn_pal_hsv_to_rgb,pal,unknown,eax ecx edx ebx ebp esi edi fs gs,0,eax ecx edx ebx ebp esi edi,,,0,unknown,no caller: every register it may change is an output; leaves through 12D6F4 12D7A5 12D7C5 12D7E5
+12D851,xn_pal_set,pal,watcom,eax,0,,,eax,0,known,called from the game's C (1 sites)
+12D887,xn_pal_get,pal,watcom,eax,0,,,eax,0,known,called from the game's C (2 sites)
+12D8AB,xn_pal_stub_empty,pal,reg,,0,,,,0,unknown,no caller: every register it may change is an output
+12D8AE,xn_pal_fade_to_black,pal,watcom,eax,0,eax,,,0,unknown,no caller: every register it may change is an output
+12D8BD,xn_pal_fade_to,pal,reg,eax edx,0,,,edx,0,known,called from the game's C (1 sites)
+12D94E,xn_pal_fade_write_entry,pal,reg,cl esi,0,,,eax edx ebp,0,known,
+12D970,xn_pal_build_ega16_map,pal,reg,,0,,,,0,unknown,no caller: every register it may change is an output
+12DB00,xn_font_init,font,watcom,,0,,,eax ecx edx ebx,0,known,called from the game's C (1 sites)
+12DB28,xn_font_load,font,reg,eax ecx edx ebp esi edi fs gs,0,ecx ebx ebp esi edi fs gs,,eax edx,0,known,called from the game's C (4 sites)
+12DB50,xn_font_select,font,reg,eax ecx edx ebx ebp esi edi fs gs,0,eax.u edx ebx fs gs,,ax,0,known,called from the game's C (47 sites)
+12DBCC,xn_font_draw_string,font,watcom,eax edx ebx,0,eax,,ecx edx ebx esi edi,0,known,called from the game's C (4 sites)
+12DC44,xn_font_draw_glyph,font,reg,eax edx ebx esi,0,,,ecx ebp esi edi,0,known,
+12DD1C,xn_font_glyph_width,font,watcom,eax,0,eax,,,0,known,
+12F500,xn_water_init,water,watcom,,0,,,eax edx ebx,0,known,called from the game's C (1 sites)
+12F59C,xn_water_clip_extent,water,reg,,0,,CF,eax ecx edx ebx ebp esi edi,0,known,
+12F79C,xn_water_draw,water,watcom,,0,,,eax ecx edx ebx ebp esi edi,0,known,called from the game's C (1 sites)
+12F9A0,xn_water_span,water,reg,eax ebx ebp edi,0,eax ebp,,,0,partial,
+12F9E0,xn_water_span_unrolled,water,reg,ah eax.u esi edi,0,al,,ebx esi edi,0,known,
+132E80,xn_water_stub_ret,water,reg,,0,,,,0,unknown,no caller: every register it may change is an output
+135D00,xn_tex_cache_lookup,tex,reg,eax edx ebx ebp edi fs gs,0,eax edx ebx fs gs,CF,,0,known,called from the game's C (11 sites)
+135DE4,xn_tex_cache_lookup_image,tex,reg,eax edx ebx ebp edi fs gs,0,eax fs gs,,ecx edx,0,known,called from the game's C (8 sites)
+135E39,xn_tex_cache_flush,tex,watcom,,0,,,eax edx,0,known,called from the game's C (12 sites)
+135E90,xn_tex_cache_begin_frame,tex,reg,,0,,,al,0,known,called from the game's C (8 sites)
+135EAB,xn_tex_load_archive,tex,reg,eax ecx ebx.u ebp edi fs gs,0,fs gs,CF,eax ecx edx ebx ebp esi edi,0,known,
+135FCF,xn_tex_check_transparent,tex,reg,ebx,0,,,ebp esi edi,0,known,
+136026,xn_tex_cache_init,tex,reg,eax ecx edx ebx ebp esi edi fs gs,0,fs gs,,eax edx ebx,0,known,called from the game's C (1 sites)
+1360CC,xn_tex_cache_free,tex,reg,ecx edx ebx ebp esi edi fs gs,0,fs gs,,eax,0,known,
+1360EE,xn_tex_heap_alloc,tex,reg,eax ecx edx ebx ebp esi edi fs gs,0,eax fs gs,CF,ecx edx ebx ebp esi edi,0,known,
+136145,xn_tex_heap_evict,tex,reg,eax ecx edx ebx,0,ecx edx ebx,CF,,0,known,
+136173,xn_tex_heap_find_lru,tex,reg,,0,eax edx,,,0,known,
+1361B8,xn_tex_heap_alloc_first_fit,tex,watcom,eax,0,eax,,ecx edx ebx ebp esi edi,0,known,
+13622F,xn_tex_heap_free,tex,reg,eax,0,ecx ebx,,eax,0,known,
+136282,xn_tex_decode_frame,tex,reg,ebx esi fs gs,0,eax fs gs,,esi,0,known,
+1362CF,xn_tex_unpack_alloc,tex,reg,eax edx ebx esi fs gs,0,eax edx edi fs gs,CF,ecx ebx ebp,0,known,
+1363D9,xn_tex_unpack_find,tex,reg,ebp edi,0,edi,CF,ecx,0,known,
+1363F8,xn_tex_heap_sum_free,tex,reg,,0,,,,0,known,
+13641D,xn_tex_decode_to_big_buffer,tex,reg,esi,0,,,eax ecx edx ebx ebp esi edi,0,known,
+136A00,xn_light_init,light,reg,ecx edx ebx ebp esi edi fs gs,0,fs gs,,eax edx ebx,0,known,ESP -32 at the return at 136A97; called from the game's C (1 sites)
+136A98,xn_light_free,light,reg,ecx edx ebx ebp esi edi fs gs,0,fs gs,,eax,0,known,
+136AB4,xn_light_reset,light,watcom,,0,,,eax,0,known,called from the game's C (3 sites)
+136AD8,xn_light_add,light,watcom,eax ecx edx ebx,8,eax,,ecx edx ebx,8,known,called from the game's C (10 sites)
+136AF0,xn_light_add_regs,light,reg,eax ecx edx ebx ebp esi,0,eax,,ecx edx ebx ebp esi edi,0,known,
+136B88,xn_shade_load,shade,reg,eax ecx ebp esi edi fs gs,0,fs gs,,eax edx ebx,0,known,called from the game's C (2 sites)
+136BD8,xn_light_to_view,light,watcom,,0,,,eax ecx edx ebx edi,0,known,
+136C30,xn_light_tmpl_1,light,template,eax ecx ebp,0,eax ecx edx ebx ebp,,,0,unknown,address escapes (escape): every register it may change is an output
+136C84,xn_light_tmpl_2,light,template,eax ecx ebp,0,eax ecx edx ebx ebp,,,0,unknown,address escapes (escape): every register it may change is an output
+136D10,xn_light_tmpl_3,light,template,eax ecx ebp,0,eax ecx edx ebx ebp,,,0,unknown,address escapes (escape): every register it may change is an output
+137000,xn_mat_from_angles,mat,watcom,eax ecx edx ebx,0,,,eax ecx edx ebx,0,known,called from the game's C (12 sites)
+1371AB,xn_math_asin_coarse,math,watcom,eax,0,eax,,,0,unknown,no caller: every register it may change is an output
+1371D5,xn_math_asin,math,watcom,eax,0,eax,,edx ebp,0,known,
+1372BF,xn_math_acos_coarse,math,watcom,eax,0,eax,,,0,unknown,no caller: every register it may change is an output
+1372F3,xn_math_acos,math,watcom,eax,0,eax,,ecx ebx,0,known,
+1373E2,xn_mat_identity_q28,mat,reg,eax,0,,,,0,unknown,no caller: every register it may change is an output
+1373F8,xn_mat_set_scale_thunk,mat,reg,eax,0,,,,0,unknown,no caller: every register it may change is an output
+1373FE,xn_mat_set_scale,mat,reg,eax,0,,,,0,known,
+13742B,xn_cam_scale_matrix_in_place,cam,watcom,eax,0,eax,,,0,unknown,no caller: every register it may change is an output
+137486,xn_mat_transform_ptr,mat,watcom,eax ecx edx ebx,0,,,eax ecx edx ebx,0,known,called from the game's C (8 sites)
+13749E,xn_mat_transform,mat,reg,eax ecx edx ebx,0,eax edx ebx,,,0,known,
+1374FC,xn_mat_transform_transposed_ptr,mat,watcom,eax ecx edx ebx,0,,,eax ecx edx ebx,0,known,called from the game's C (1 sites)
+137514,xn_mat_transform_transposed,mat,reg,eax ecx edx ebx,0,eax edx ebx,,,0,known,
+137572,xn_mat_transform_ptr_v2,mat,watcom,eax ecx edx ebx,0,,,eax ecx edx ebx,0,unknown,"no caller: every register it may change is an output; outputs overridden: dead copy of xn_mat_transform_ptr (0x137486), whose callers read nothing back: its results go through the pointers; clobber overridden: dead copy of xn_mat_transform_ptr (0x137486): the registers it leaves as its twin does"
+13758A,xn_mat_transform_wide,mat,reg,eax ecx edx ebx,0,eax edx ebx,,edi,0,known,
+1375F9,xn_mat_transform_transposed_v2,mat,reg,eax ecx edx ebx,0,eax edx ebx,,,0,unknown,no caller: every register it may change is an output
+137657,xn_mat_scaled_axes,mat,watcom,eax ecx edx ebx,0,,,eax ecx edx ebx ebp esi edi,0,known,
+1376C8,xn_cam_project_ptr,cam,watcom,eax ecx edx ebx,4,,,eax ecx edx ebx,4,known,called from the game's C (3 sites)
+1376E1,xn_cam_project,cam,reg,eax edx ebx,0,eax edx,,ebp,0,known,
+1376FB,xn_cam_project_scaled,cam,reg,eax edx ebx,0,eax edx,,,0,unknown,no caller: every register it may change is an output
+137725,xn_cam_scale_matrix,cam,watcom,eax edx,0,,,eax edx,0,known,called from the game's C (7 sites)
+137790,xn_cam_unscale_matrix,cam,watcom,eax,0,eax,,,0,unknown,no caller: every register it may change is an output
+137804,xn_mat_multiply,mat,watcom,eax edx ebx,0,,,eax ecx edx ebx ebp esi,0,known,
+13E600,xn_terrain_draw,terrain,reg,fs gs,0,fs gs,,eax,0,known,called from the game's C (1 sites)
+13E63C,xn_terrain_build_light_list,terrain,watcom,,0,,,eax ecx edx ebx ebp esi edi,0,known,
+13E69C,xn_terrain_add_nature_flats,terrain,watcom,,0,,,eax ecx edx ebx ebp esi edi,0,known,
+13E744,xn_terrain_setup_axes,terrain,watcom,,0,,,eax ecx edx ebx ebp esi edi,0,known,
+13E84F,xn_terrain_build_height_table,terrain,watcom,,0,,,eax ecx edx ebx ebp esi edi,0,known,
+13E8C8,xn_terrain_transform_grid,terrain,watcom,,0,,,eax ecx edx ebx ebp esi edi,0,known,
+13EB21,xn_terrain_face_plane_a,terrain,reg,esi edi,0,ah eax.u dh edx.u ebx ebp,CF,al ecx dl,0,known,
+13EC22,xn_terrain_face_plane_b,terrain,reg,esi edi,0,ah eax.u dh edx.u ebx ebp,CF,al ecx dl,0,known,
+13ED23,xn_terrain_draw_tri_a,terrain,reg,esi edi,0,ah eax.u dh edx.u ebp,,al ecx dl ebx edi,0,known,
+13EDCD,xn_terrain_draw_tri_b,terrain,reg,esi edi,0,ah eax.u dh edx.u bl ebx.u ebp,,al ecx dl bh edi,0,known,
+13EE77,xn_terrain_draw_tri_a_clipped,terrain,reg,bx esi edi,0,ah eax.u dh edx.u ebp,,al ecx dl ebx edi,0,known,
+13EF27,xn_terrain_draw_tri_b_clipped,terrain,reg,bx esi edi,0,ah eax.u dh edx.u bl ebx.u ebp,,al ecx dl bh edi,0,known,
+13EFD7,xn_terrain_draw_cells,terrain,reg,fs gs,0,fs gs,CF,eax ecx edx ebx ebp esi edi,0,known,
+13F3C1,xn_terrain_setup_tex_gradients,terrain,reg,,0,ebp edi,,eax ecx edx ebx esi,0,known,
+13F4CC,xn_terrain_u_axis_x,terrain,reg,edi,0,ecx,,,0,partial,
+13F4F4,xn_terrain_u_axis_z,terrain,reg,edi,0,ecx,,,0,partial,
+13F51C,xn_terrain_u_axis_neg_x,terrain,reg,edi,0,ecx,,,0,partial,
+13F550,xn_terrain_u_axis_neg_z,terrain,reg,edi,0,ecx,,,0,partial,
+13F584,xn_terrain_v_axis_z,terrain,reg,edi,0,ecx,,,0,partial,
+13F5AC,xn_terrain_v_axis_x,terrain,reg,edi,0,ecx,,,0,partial,
+13F5D4,xn_terrain_v_axis_neg_z,terrain,reg,edi,0,ecx,,,0,partial,
+13F608,xn_terrain_v_axis_neg_x,terrain,reg,edi,0,ecx,,,0,partial,
+13FE15,xn_model_prepare,model,unknown,eax ecx edx ebx ebp esi edi fs gs,0,eax ebx.u ebp fs gs,,ecx edx bx esi edi,0,known,called from the game's C (1 sites); stack use not followed
+13FF0E,xn_model_calc_uv_axes,model,reg,eax,0,,,ecx edx esi,0,known,
+13FF65,xn_model_calc_face_uv_axes,model,reg,ebx esi edi,0,,,eax edx ebp,0,known,
+1401D4,xn_model_submit,model,watcom,eax edx,0,,,eax edx,0,known,called from the game's C (8 sites)
+1401E0,xn_model_cull_and_queue,model,reg,al edi,0,,,eax ecx edx ebx ebp esi edi,0,known,
+140284,xn_model_draw,model,reg,edx ebx ebp edi fs gs,0,edx ebx ebp edi fs gs,CF,eax ecx esi,0,known,
+140369,xn_model_set_frame,model,reg,eax edx,0,eax edx,,,0,unknown,no caller: every register it may change is an output
+14037A,xn_model_set_frame_regs,model,reg,eax ebx esi,0,eax edx,,ebx,0,known,
+1403AF,xn_model_draw_faces,model,reg,ebp esi fs gs,0,edx ebx ebp edi fs gs,CF,eax ecx esi,0,known,
+1404FA,xn_model_transform_face_verts,model,reg,edx esi,0,edx bx ebp edi,,eax ecx ebx.u esi,0,known,
+140606,xn_model_build_light_list,model,watcom,,0,,,eax ecx edx ebx ebp esi edi,0,known,
+1406D6,xn_model_scale_matrix,model,reg,,0,edx ebx ebp edi,,eax ecx esi,0,known,
+140790,xn_model_calc_face_planes,model,reg,eax,0,,,,0,known,
+1407DE,xn_model_calc_radius,model,reg,eax,0,,,ecx edx esi,0,known,
+14081C,xn_model_calc_face_normals,model,reg,eax edx,0,,,ecx esi,0,known,
+140845,xn_model_calc_face_normal,model,reg,eax edx ebx esi,0,,,eax edx ebx ebp edi,0,known,
+1408D3,xn_model_calc_centroid,model,reg,eax,0,,,,0,unknown,no caller: every register it may change is an output
+140910,xn_model_is_occluded,model,reg,esi edi,0,,CF,eax ecx esi,0,known,
+140981,xn_model_project_bounds,model,reg,esi edi,0,eax ecx edx ebx edi,CF,ebp esi,0,known,
+140A28,xn_model_clear_vert_flags,model,reg,al edi,0,,,eax ecx edx,0,known,
+142700,xn_kbd_install,kbd,reg,ch ecx.u edx ebp esi edi fs gs,0,fs gs,,,0,unknown,address escapes (escape): every register it may change is an output; called from the game's C (1 sites)
+142764,xn_kbd_remove,kbd,reg,,0,,,ah,0,known,called from the game's C (1 sites)
+142790,xn_kbd_flush,kbd,reg,,0,,,ax,0,known,called from the game's C (11 sites)
+1427A8,xn_kbd_read_key,kbd,reg,al eax.u ecx edx ebx esi edi,0,eax ecx edx ebx esi edi,,,0,known,called from the game's C (3 sites)
+142808,xn_kbd_wait_key,kbd,reg,al eax.u ecx edx ebx esi edi,0,eax ecx edx ebx esi edi,,,0,unknown,no caller: every register it may change is an output
+142840,xn_kbd_int9_handler,kbd,interrupt,eax ecx edx ebx ebp esi edi fs gs,0,eax ecx edx ebx ebp esi edi fs gs,,,0,unknown,ESP -48 at the return at 14284B; address escapes (escape): every register it may change is an output
+14284D,xn_kbd_int9_read_scancode,kbd,reg,ah eax.u ecx edx ebp esi edi fs gs,48,eax ecx edx ebx ebp esi edi fs gs,,,0,known,
+142862,xn_kbd_int9_make_ctrl,kbd,reg,eax ecx edx ebx ebp esi edi fs gs,48,eax ecx edx ebx ebp esi edi fs gs,,,0,known,
+14286E,xn_kbd_int9_make_lshift,kbd,reg,eax ecx edx ebx ebp esi edi fs gs,48,eax ecx edx ebx ebp esi edi fs gs,,,0,known,
+14287A,xn_kbd_int9_make_rshift,kbd,reg,eax ecx edx ebx ebp esi edi fs gs,48,eax ecx edx ebx ebp esi edi fs gs,,,0,known,
+142886,xn_kbd_int9_make_alt,kbd,reg,eax ecx edx ebx ebp esi edi fs gs,48,eax ecx edx ebx ebp esi edi fs gs,,,0,known,
+142892,xn_kbd_int9_key_down,kbd,reg,ah eax.u ecx edx ebx ebp esi edi,48,eax ecx edx ebx ebp esi edi fs gs,,,0,known,
+1428A1,xn_kbd_int9_break_ctrl,kbd,reg,eax ecx edx ebx ebp esi edi fs gs,48,eax ecx edx ebx ebp esi edi fs gs,,,0,known,
+1428B0,xn_kbd_int9_break_lshift,kbd,reg,eax ecx edx ebx ebp esi edi fs gs,48,eax ecx edx ebx ebp esi edi fs gs,,,0,known,
+1428BC,xn_kbd_int9_break_rshift,kbd,reg,eax ecx edx ebx ebp esi edi fs gs,48,eax ecx edx ebx ebp esi edi fs gs,,,0,known,
+1428C8,xn_kbd_int9_break_alt,kbd,reg,eax ecx edx ebx ebp esi edi fs gs,48,eax ecx edx ebx ebp esi edi fs gs,,,0,known,
+1428D4,xn_kbd_int9_key_up,kbd,reg,ah eax.u ecx edx ebx ebp esi edi,48,eax ecx edx ebx ebp esi edi fs gs,,,0,known,
+1428E2,xn_kbd_int9_eoi,kbd,reg,ah eax.u ecx edx ebx ebp esi edi,48,eax ecx edx ebx ebp esi edi fs gs,,,0,known,ESP +8 at the return at 1428EA
+1428EB,xn_kbd_int9_pop_ds,kbd,reg,fs gs,40,eax ecx edx ebx ebp esi edi,,,0,known,
+1428EC,xn_kbd_int9_iret,kbd,interrupt,fs gs,40,eax ecx edx ebx ebp esi edi,,,0,known,
+143600,xn_gfx_set_mode,gfx,reg,eax ecx edx ebx esi fs gs,0,eax.u fs gs,,ax cl edx ebx,0,known,called from the game's C (1 sites)
+143700,xn_gfx_restore_mode,gfx,reg,ecx edx ebx ebp esi edi fs gs,0,fs gs,,ah,0,known,called from the game's C (2 sites)
+14373F,xn_gfx_change_mode,gfx,reg,eax ecx edx ebx ebp esi edi fs gs,0,eax,CF,,0,unknown,no caller: every register it may change is an output
+143870,xn_gfx_set_mode13,gfx,watcom,,0,,,eax ebp edi,0,known,
+1438DC,xn_gfx_build_row_offsets,gfx,watcom,,0,,,eax ecx edx ebx ebp esi edi,0,known,
+1438FC,xn_gfx_set_clip,gfx,watcom,eax ecx edx ebx,0,,,eax ecx edx ebx ebp esi edi,0,known,
+143914,xn_gfx_clear,gfx,reg,eax,0,,,,0,known,called from the game's C (5 sites)
+143924,xn_gfx_drv0_clear,gfx,reg,eax,0,eax ecx edx edi,,,0,partial,
+14395C,xn_gfx_present,gfx,reg,eax ecx edx esi edi,0,,,ah,0,known,
+14396C,xn_gfx_drv0_present,gfx,reg,eax ecx edx esi edi,0,eax ecx edx esi edi,,,0,partial,
+143A28,xn_gfx_get_cursor_pos,gfx,reg,al eax.u ecx edx esi edi,0,eax ecx edx ebx esi edi,,,0,unknown,no caller: every register it may change is an output
+143A3F,xn_gfx_set_cursor_pos,gfx,reg,eax ecx edx esi edi,0,eax ecx edx ebx esi edi,,,0,unknown,no caller: every register it may change is an output
+143B80,xn_gfx_copy_and_clear,gfx,reg,ecx esi edi,0,eax ecx esi edi,,,0,partial,
+143BB0,xn_gfx_copy_and_clear_unrolled,gfx,reg,eax ecx esi edi,0,eax ecx edx esi edi,,,0,unknown,no caller: every register it may change is an output
+144BFC,xn_gfx_copy_rows,gfx,reg,ecx esi edi,0,ecx esi edi,,,0,unknown,address escapes (escape): every register it may change is an output
+144C0D,xn_gfx_drv0_shutdown,gfx,reg,,0,,,,0,partial,
+144D00,xn_draw_fill_rect,draw,watcom,eax ecx edx ebx,0,,,eax ecx edx ebx,0,known,called from the game's C (13 sites)
+144E00,xn_draw_clip_rect,draw,reg,eax ecx edx ebx ebp esi,0,eax ecx edx ebx ebp esi,CF,edi,0,known,
+144E84,xn_draw_get_rect,draw,watcom,eax ecx edx ebx,8,,,eax ecx edx ebx,8,known,called from the game's C (7 sites)
+144E9C,xn_draw_get_rect_regs,draw,reg,eax ecx edx ebx ebp edi,0,,,eax ecx edx ebx ebp esi edi,0,known,
+144ED8,xn_draw_put_rect,draw,watcom,eax ecx edx ebx,8,,,eax ecx edx ebx,8,known,called from the game's C (5 sites)
+144EF0,xn_draw_put_rect_regs,draw,reg,eax ecx edx ebx ebp esi,0,,,eax ecx edx ebx ebp esi edi,0,known,
+144F28,xn_draw_img_record,draw,reg,eax edx ebx,0,eax edx ebx,,,0,unknown,no caller: every register it may change is an output
+144F38,xn_draw_img_record_regs,draw,reg,eax edx ebx,0,eax edx ebx,,ecx ebp esi edi,0,known,
+144F47,xn_draw_unused_ret_144f47,draw,reg,,0,,,,0,unknown,no caller: every register it may change is an output
+144F48,xn_draw_img_record_transparent,draw,reg,eax edx ebx,0,eax edx ebx,,,0,unknown,no caller: every register it may change is an output
+144F58,xn_draw_img_record_transparent_regs,draw,reg,eax edx ebx,0,eax edx ebx,,ecx ebp esi edi,0,known,
+144F68,xn_draw_image,draw,reg,eax ecx edx ebx,4,eax ecx edx ebx,,,4,unknown,address escapes (escape): every register it may change is an output; called from the game's C (67 sites)
+144F7C,xn_draw_image_regs,draw,reg,eax ecx edx ebx esi,0,eax ecx edx ebx,,ebp esi edi,0,known,
+144FB4,xn_draw_image_transparent,draw,reg,eax ecx edx ebx,4,eax ecx edx ebx,,,4,unknown,address escapes (escape): every register it may change is an output; called from the game's C (33 sites)
+144FC7,xn_draw_unused_ret_144fc7,draw,reg,,0,,,,0,unknown,no caller: every register it may change is an output
+144FC8,xn_draw_image_transparent_regs,draw,reg,eax ecx edx ebx esi,0,eax ecx edx ebx,,ebp esi edi,0,known,
+14501C,xn_draw_transparent_row,draw,reg,esi edi,0,al,,,0,known,
+147820,xn_img_remap_colours,img,reg,eax,0,,,,0,unknown,no caller: every register it may change is an output
+147848,xn_draw_remap_rect,draw,reg,eax ecx edx ebx,4,eax ecx,,,4,unknown,no caller: every register it may change is an output
+147858,xn_draw_remap_rect_regs,draw,reg,eax ecx edx ebx ebp,0,eax ecx,,ebp,0,known,
+149E00,xn_mem_init,mem,reg,eax ecx edx ebx ebp esi edi fs gs,0,fs gs,,eax edx ebx,0,known,ESP -32 at the return at 149EF7; called from the game's C (1 sites)
+149EF8,xn_mem_shutdown,mem,reg,ecx edx ebx ebp esi edi fs gs,0,fs gs,CF PF AF ZF SF OF,ah edx,0,known,called from the game's C (1 sites)
+149F0C,xn_mem_lock_region,mem,reg,eax edx ebp fs gs,0,fs gs,,eax ecx edx ebx esi edi,0,known,ESP -32 at the return at 149F4B
+149F4C,xn_sys_install_divide_handler,sys,reg,ebp fs gs,0,fs gs,,eax ecx edx ebx edi,0,known,
+149F98,xn_sys_remove_divide_handler,sys,reg,ecx.u,0,,,eax,0,known,
+149FC8,xn_sys_divide_error_handler,sys,interrupt,ecx edx ebx ebp esi edi fs gs,12,eax edx,,,0,unknown,address escapes (escape): every register it may change is an output
+149FD6,xn_sys_divfault_modrm_35,sys,interrupt,eax ecx edx ebx ebp esi edi fs gs,8,eax edx,,,0,known,
+149FE0,xn_sys_divfault_modrm_70,sys,interrupt,eax ecx edx ebx ebp esi edi fs gs,8,eax edx,,,0,known,
+149FEA,xn_sys_divfault_modrm_71,sys,interrupt,eax ecx edx ebx ebp esi edi fs gs,8,eax edx,,,0,known,
+149FF4,xn_sys_divfault_modrm_72,sys,interrupt,eax ecx edx ebx ebp esi edi fs gs,8,eax edx,,,0,known,
+149FFE,xn_sys_divfault_modrm_73,sys,interrupt,eax ecx edx ebx ebp esi edi fs gs,8,eax edx,,,0,known,
+14A008,xn_sys_divfault_modrm_75,sys,interrupt,eax ecx edx ebx ebp esi edi fs gs,8,eax edx,,,0,known,
+14A012,xn_sys_divfault_modrm_76,sys,interrupt,eax ecx edx ebx ebp esi edi fs gs,8,eax edx,,,0,known,
+14A01C,xn_sys_divfault_modrm_77,sys,interrupt,eax ecx edx ebx ebp esi edi fs gs,8,eax edx,,,0,known,
+14A026,xn_sys_divfault_modrm_78,sys,interrupt,eax ecx edx ebx ebp esi edi fs gs,8,eax edx,,,0,known,
+14A030,xn_sys_divfault_modrm_79,sys,interrupt,eax ecx edx ebx ebp esi edi fs gs,8,eax edx,,,0,known,
+14A03A,xn_sys_divfault_modrm_7a,sys,interrupt,eax ecx edx ebx ebp esi edi fs gs,8,eax edx,,,0,known,
+14A044,xn_sys_divfault_modrm_7b,sys,interrupt,eax ecx edx ebx ebp esi edi fs gs,8,eax edx,,,0,known,
+14A04E,xn_sys_divfault_modrm_7d,sys,interrupt,eax ecx edx ebx ebp esi edi fs gs,8,eax edx,,,0,known,
+14A058,xn_sys_divfault_modrm_7e,sys,interrupt,eax ecx edx ebx ebp esi edi fs gs,8,eax edx,,,0,known,
+14A05E,xn_sys_divfault_modrm_7f,sys,interrupt,eax ecx edx ebx ebp esi edi fs gs,8,eax edx,,,0,known,
+14A068,xn_sys_divfault_modrm_b0,sys,interrupt,eax ecx edx ebx ebp esi edi fs gs,8,eax edx,,,0,known,
+14A072,xn_sys_divfault_modrm_b1,sys,interrupt,eax ecx edx ebx ebp esi edi fs gs,8,eax edx,,,0,known,
+14A07C,xn_sys_divfault_modrm_b2,sys,interrupt,eax ecx edx ebx ebp esi edi fs gs,8,eax edx,,,0,known,
+14A086,xn_sys_divfault_modrm_b3,sys,interrupt,eax ecx edx ebx ebp esi edi fs gs,8,eax edx,,,0,known,
+14A08C,xn_sys_divfault_modrm_b5,sys,interrupt,eax ecx edx ebx ebp esi edi fs gs,8,eax edx,,,0,known,
+14A092,xn_sys_divfault_modrm_b6,sys,interrupt,eax ecx edx ebx ebp esi edi fs gs,8,eax edx,,,0,known,
+14A098,xn_sys_divfault_modrm_b7,sys,interrupt,eax ecx edx ebx ebp esi edi fs gs,8,eax edx,,,0,known,
+14A09E,xn_sys_divfault_modrm_b8,sys,interrupt,eax ecx edx ebx ebp esi edi fs gs,8,eax edx,,,0,known,
+14A0A4,xn_sys_divfault_modrm_b9,sys,interrupt,eax ecx edx ebx ebp esi edi fs gs,8,eax edx,,,0,known,
+14A0AA,xn_sys_divfault_modrm_ba,sys,interrupt,eax ecx edx ebx ebp esi edi fs gs,8,eax edx,,,0,known,
+14A0B0,xn_sys_divfault_modrm_bb,sys,interrupt,eax ecx edx ebx ebp esi edi fs gs,8,eax edx,,,0,known,
+14A0B6,xn_sys_divfault_modrm_bd,sys,interrupt,eax ecx edx ebx ebp esi edi fs gs,8,eax edx,,,0,known,
+14A0BC,xn_sys_divfault_modrm_be,sys,interrupt,eax ecx edx ebx ebp esi edi fs gs,8,eax edx,,,0,known,
+14A0C2,xn_sys_divfault_modrm_bf,sys,reg,eax ecx edx ebx ebp esi edi fs gs,8,eax edx,,,0,known,
+14A0C6,xn_sys_divfault_modrm_bf_je,sys,interrupt,ecx edx ebx ebp esi edi fs gs ZF,8,eax edx,,,0,known,
+14A0C8,xn_sys_divfault_skip2,sys,reg,ecx ebx ebp esi edi fs gs,8,eax edx,,,0,known,
+14A0CF,xn_sys_divfault_return,sys,interrupt,eax ecx ebx ebp esi edi fs gs,8,edx,,,0,known,
+14A300,xn_collide_segment_model,collide,watcom,eax ecx edx ebx,0,eax,,ecx edx ebx esi edi,0,known,called from the game's C (9 sites)
+14A6C0,xn_collide_model_model,collide,reg,eax edx ebx,0,eax edx ebx,,,0,unknown,no caller: every register it may change is an output
+14A710,xn_collide_model_model_detail,collide,reg,,12,eax ecx edx ebx ebp esi edi,,,0,unknown,ESP +16 at the return at 14AA65; no caller: every register it may change is an output
+14AA92,xn_collide_spheres_model,collide,unknown,eax ecx edx ebx ebp esi edi,0,eax ecx ebp esi edi,,edx ebx,0,known,called from the game's C (7 sites); stack use not followed
+14AF30,xn_collide_segment_spheres,collide,reg,eax edx ebx,0,eax edx ebx,,,0,unknown,no caller: every register it may change is an output
+14B017,xn_collide_spheres_spheres,collide,reg,eax edx,0,eax edx,,,0,unknown,no caller: every register it may change is an output
+14B19B,xn_collide_miss_stk,collide,reg,,0,eax,,,8,unknown,no caller: every register it may change is an output
+14B1B1,xn_collide_miss,collide,watcom,,0,eax,,ebp esi edi,0,known,
+14B1B7,xn_collide_ref_helpers,collide,reg,eax ecx edx ebx esi edi,0,eax ecx edx ebx esi edi,,,0,unknown,no caller: every register it may change is an output
+14B1C7,xn_collide_segment_flat_stk,collide,reg,eax ecx edx ebx fs gs,12,eax fs gs,,ecx edx ebx esi edi,12,known,called from the game's C (1 sites)
+14B1E0,xn_collide_segment_flat,collide,reg,eax ecx edx ebx ebp esi edi fs gs,0,eax fs gs,,ecx edx ebx ebp esi edi,0,known,
+14B45B,xn_terrain_height_at,terrain,reg,eax edx bh ebx.u,0,eax,,edx,0,known,called from the game's C (18 sites)
+14B58E,xn_collide_build_model_spheres,collide,reg,eax edx ebx,0,eax edx ebx,,,0,unknown,no caller: every register it may change is an output
+14BC00,xn_math_isqrt,math,reg,eax ecx,0,eax,,edx ebx,0,known,called from the game's C (4 sites)
+14BC34,xn_math_isqrt64,math,reg,eax ecx edx,0,eax,,edx,0,known,
+14BC74,xn_vec_blend,vec,reg,eax ecx edx ebx,0,eax edx ebx,,,0,unknown,no caller: every register it may change is an output
+14BD09,xn_vec_cross,vec,reg,eax edx,0,eax edx ebx,,ecx ebp esi edi,0,known,
+14BD75,xn_vec_length,vec,watcom,eax edx ebx,0,eax,,ecx edx ebx ebp esi edi,0,known,
+14BD94,xn_vec_length_approx,vec,reg,eax edx ebx,0,eax edx ebx,,,0,known,
+14BDDD,xn_vec_normalize_ptr,vec,watcom,eax,0,,,eax edx ebx,0,known,called from the game's C (3 sites)
+14BDF7,xn_vec_normalize,vec,reg,eax edx ebx,0,eax edx ebx,,ecx,0,known,
+14BE4C,xn_vec_normalize_q28,vec,reg,eax edx ebx,0,eax edx ebx,,,0,unknown,no caller: every register it may change is an output
+14BEA1,xn_vec_normalize_shift,vec,reg,eax ecx edx ebx,0,eax edx ebx,,,0,unknown,no caller: every register it may change is an output
+14BEE2,xn_math_angle_xy,math,watcom,eax edx,0,eax,,edx,0,unknown,no caller: every register it may change is an output; outputs overridden: dead: the angle; EDX is the divide's remainder; clobber overridden: dead: EDX is the divide's remainder
+14BF41,xn_vec_triangle_normal,vec,reg,eax,0,eax edx ebx,,,0,unknown,no caller: every register it may change is an output
+14BFE1,xn_math_plane_y_at,math,reg,eax ecx edx ebx esi edi,0,eax,,edx ebx,0,unknown,no caller: every register it may change is an output; outputs overridden: dead: the height; EDX and EBX are the divide's remainder and a product's low dword; clobber overridden: dead: EDX and EBX are the divide's remainder and a product's low dword
+14C021,xn_math_triangle_y_at,math,watcom,eax edx ebx,0,eax,,ecx edx ebx ebp esi edi,0,known,
+14C111,xn_collide_line_plane_point,collide,reg,eax ecx edx ebx esi edi,0,eax ecx edx ebx,,,0,unknown,no caller: every register it may change is an output
+14C1DD,xn_collide_vline_plane_point,collide,reg,eax ecx edx ebx esi edi,0,eax ecx edx ebx,,,0,unknown,no caller: every register it may change is an output
+14C25F,xn_collide_plane_distance,collide,reg,eax ecx edx ebx esi,0,eax edx ebx,,,0,unknown,no caller: every register it may change is an output
+14C2AD,xn_collide_segment_plane,collide,reg,eax ecx edx ebx esi edi,0,eax ecx edx ebx,,,0,known,
+14C3D9,xn_collide_vsegment_plane,collide,reg,eax ecx edx ebx esi edi,0,eax ecx edx ebx,,,0,unknown,no caller: every register it may change is an output
+14C4A6,xn_collide_plane_plane_line,collide,reg,eax ecx edx ebx ebp,0,eax ecx edx ebx ebp esi edi,,,0,unknown,no caller: every register it may change is an output
+14C711,xn_collide_sphere_plane,collide,reg,eax ecx edx ebx esi edi,0,eax edx ebx,,,0,known,
+14C762,xn_collide_sphere_plane_xz,collide,reg,eax ecx ebx esi edi,0,eax edx ebx,,,0,unknown,no caller: every register it may change is an output
+14C79D,xn_collide_sphere_plane_yz,collide,reg,ecx edx ebx esi edi,0,eax edx ebx,,,0,unknown,no caller: every register it may change is an output
+14C7DA,xn_collide_sphere_plane_z,collide,reg,ecx esi edi,0,eax,,,0,unknown,no caller: every register it may change is an output
+14C7E5,xn_collide_segment_sphere_fx,collide,reg,eax ecx edx ebx esi edi,0,eax esi,,edx ebx edi,0,known,
+14C904,xn_collide_segment_sphere,collide,reg,eax ecx edx ebx esi edi,0,eax edx ebx,,ecx esi edi,0,known,
+14C9D2,xn_collide_segment_sphere_approx,collide,reg,eax ecx edx ebx esi edi,0,eax edx ebx esi,,,0,unknown,no caller: every register it may change is an output
+14CA44,xn_collide_sphere_sphere,collide,reg,eax ecx edx ebx esi edi,0,eax edx ebx,,ecx,0,known,
+14CA83,xn_collide_sphere_sphere_approx,collide,reg,eax ecx edx ebx esi edi,0,eax edx ebx,,,0,unknown,no caller: every register it may change is an output
+14CA97,xn_collide_point_in_sphere,collide,reg,eax ecx edx ebx esi,0,eax,,edx ebx,0,known,
+14CAD8,xn_collide_point_in_sphere_approx,collide,reg,eax ecx edx ebx esi,0,eax edx ebx,,,0,known,
+14CAEA,xn_collide_point_in_cylinder,collide,reg,eax ecx edx ebx esi edi,0,eax,,ecx edx ebp esi edi,0,known,
+14CB24,xn_collide_point_in_box,collide,reg,eax ecx edx ebx esi,0,eax edx ebx,,,0,unknown,no caller: every register it may change is an output
+14CB4F,xn_collide_point_in_cube,collide,reg,eax ecx edx ebx esi,0,eax edx ebx,,,0,unknown,no caller: every register it may change is an output
+14CB78,xn_math_rotate_xz,math,reg,eax edx ebx,0,eax edx,,ebx,0,unknown,"no caller: every register it may change is an output; outputs overridden: dead: the rotated (x, z); EBX is the angle masked to 11 bits; clobber overridden: dead: EBX is the angle masked to 11 bits"
+14D200,xn_shade_load_haze,shade,reg,eax ecx ebp esi edi fs gs,0,,,,0,unknown,no caller: every register it may change is an output
+14D23C,xn_shade_set_fog,shade,watcom,eax,0,,,eax ecx edx ebx,0,known,called from the game's C (7 sites)
+14D300,xn_shade_fog_span_off,shade,reg,,0,,,,0,partial,
+14D320,xn_shade_fog_pixels,shade,reg,ecx edx edi,0,eax ecx,,,0,known,
+150040,xn_shade_fog_span,shade,reg,edx ebx ebp esi edi,0,eax ecx edx ebx ebp edi,,,0,partial,
+152B00,xn_joy_init,joy,reg,edx.u ebp esi edi fs gs,0,fs gs,,eax ecx edx ebx,0,known,called from the game's C (1 sites)
+152BA8,xn_joy_shutdown,joy,reg,,0,,,ah,0,known,called from the game's C (1 sites)
+152BDC,xn_joy_reset_range,joy,watcom,,0,,,eax ecx edx ebx,0,known,called from the game's C (1 sites)
+152C40,xn_joy_calibrate,joy,watcom,,0,,,eax edx,0,known,called from the game's C (2 sites)
+152D00,xn_joy_poll,joy,reg,,0,,,al edx,0,known,called from the game's C (3 sites)
+152EA0,xn_joy_timer_isr,joy,interrupt,eax ecx edx ebx ebp esi edi fs gs,0,eax ecx edx ebx ebp esi edi fs gs,,,0,unknown,ESP -48 at the return at 152EAB; address escapes (escape): every register it may change is an output
+152EAD,xn_joy_timer_isr_read,joy,reg,eax ecx edx ebx ebp esi edi,48,eax ecx edx ebx ebp esi edi fs gs,,,0,known,
+152F3A,xn_joy_timer_isr_pop_segs,joy,reg,eax ecx edx ebx ebp esi edi,48,eax ecx edx ebx ebp esi edi fs gs,,,0,known,ESP +8 at the return at 152F3E
+152F3F,xn_joy_timer_isr_pop_ds,joy,reg,fs gs,40,eax ecx edx ebx ebp esi edi,,,0,known,
+152F40,xn_joy_timer_isr_iret,joy,interrupt,fs gs,40,eax ecx edx ebx ebp esi edi,,,0,known,
+15310C,xn_draw_hline,draw,watcom,eax edx ebx,0,,,eax ecx edx ebx ebp edi,0,known,
+15317C,xn_draw_vline_keep_regs,draw,reg,eax edx ebx,0,ecx edx,,,0,unknown,no caller: every register it may change is an output
+153188,xn_draw_vline,draw,reg,eax ecx edx,0,ecx edx,,ebp edi,0,known,
+1531F0,xn_draw_line,draw,watcom,eax ecx edx ebx,0,,,eax ecx edx ebx,0,known,called from the game's C (2 sites)
+153204,xn_draw_line_nosave,draw,watcom,eax ecx edx ebx,0,,,eax ecx edx ebx ebp esi edi,0,known,
+153210,xn_draw_line_unclipped,draw,watcom,eax ecx edx ebx,0,,,eax ecx edx ebx ebp esi edi,0,known,
+1532B4,xn_draw_line_to,draw,watcom,eax edx,0,,,eax edx,0,known,called from the game's C (12 sites)
+1532D4,xn_draw_line_clip,draw,reg,eax ecx edx ebx,0,eax ecx edx ebx,CF,ebp esi edi,0,known,
+153500,xn_helmet_open,helmet,reg,eax ecx edx ebx ebp esi edi fs gs CF,0,ecx ebx esi fs gs,,eax edx,0,known,called from the game's C (2 sites)
+153530,xn_helmet_close,helmet,reg,ecx edx ebx esi,0,eax ecx edx ebx esi,,,0,unknown,no caller: every register it may change is an output
+153550,xn_helmet_request,helmet,reg,,0,,,,0,unknown,no caller: every register it may change is an output
+15356C,xn_helmet_poll,helmet,reg,edx ebx esi,0,,,,0,unknown,no caller: every register it may change is an output
+1535A4,xn_helmet_smooth,helmet,reg,eax edx ebx,0,eax edx ebx,,ecx ebp esi edi,0,known,
+153700,xn_str_char_lower,str,reg,al,0,al,,,0,unknown,no caller: every register it may change is an output
+15370C,xn_str_char_upper,str,reg,al,0,al,,,0,unknown,no caller: every register it may change is an output
+153718,xn_str_copy,str,watcom,eax edx,0,,,eax edx,0,known,
+153728,xn_str_nop,str,reg,,0,,,,0,unknown,no caller: every register it may change is an output
+15372C,xn_str_insert_char,str,reg,al esi edi,0,al,,,0,unknown,no caller: every register it may change is an output
+15373C,xn_str_delete_char,str,reg,eax edx,0,al edx,,,0,unknown,no caller: every register it may change is an output
+15374C,xn_str_length,str,watcom,eax,0,eax,,,0,unknown,no caller: every register it may change is an output
+15375C,xn_font_string_width,font,watcom,eax,0,eax,,,0,unknown,no caller: every register it may change is an output
+15377E,xn_str_find_char,str,reg,eax dl,0,eax,,,0,unknown,no caller: every register it may change is an output
+153798,xn_font_string_width_n,font,reg,eax edx,0,eax edx,,,0,unknown,no caller: every register it may change is an output
+153900,xn_str_from_int,str,reg,eax edx ebx,0,edx,,eax,0,known,
+15392C,xn_str_to_int,str,watcom,eax,0,eax,,ecx edx ebp esi edi,0,known,
+153964,xn_str_copy_word_max80,str,reg,esi edi,0,al esi edi,,,0,unknown,no caller: every register it may change is an output
+153978,xn_rand_seed_from_ticks,rand,reg,,0,,,,0,unknown,no caller: every register it may change is an output
+153990,xn_rand_next,rand,watcom,,0,eax,,,0,known,
+154D00,xn_flat_add,flat,watcom,eax ecx edx ebx,12,eax,,ecx edx ebx,12,known,called from the game's C (14 sites)
+154D20,xn_flat_add_body,flat,reg,eax ecx edx ebx ebp esi edi,0,edi,,eax ecx edx ebx ebp esi,0,known,
+154DA5,xn_flat_add_view,flat,watcom,eax ecx edx ebx,0,,,eax ecx edx ebx ebp esi,0,known,
+154E20,xn_flat_draw,flat,reg,ebp esi edi fs gs,12,edx ebx ebp esi edi fs gs,CF,eax ecx,0,known,
+154EDC,xn_flat_quad_centred,flat,reg,eax edx edi,0,eax ecx edx ebx ebp esi,,,0,partial,
+154FD4,xn_flat_quad_none,flat,reg,,0,,,,0,partial,
+154FD8,xn_flat_quad_standing,flat,reg,eax edx edi,0,eax ecx edx ebx ebp esi,,,0,partial,
+1550BC,xn_flat_quad_none_8,flat,reg,,0,,,,0,partial,
+1550C0,xn_flat_quad_none_16,flat,reg,,0,,,,0,partial,
+1550E0,xn_flat_setup_gradients,flat,reg,eax,0,ebx ebp,,ecx edx esi edi,0,known,
+155200,xn_flat_span_clip,flat,reg,eax ecx edx ebx ebp esi edi fs gs,36,eax edx fs gs,,ebx ebp esi,0,known,
+15526C,xn_flat_span_emit,flat,reg,eax ecx edx ebx ebp edi fs gs,36,eax edx fs gs,,ebx ebp esi,0,known,
+1552A0,xn_flat_raster,flat,reg,eax ebp fs gs,20,edx ebx ebp esi edi fs gs,,eax ecx,0,known,
+155332,xn_flat_raster_rows,flat,reg,ecx edx ebx ebp esi edi fs gs,20,eax ecx edx ebx ebp esi edi,,,0,unknown,no caller: every register it may change is an output
+1553D8,xn_flat_rotate_offset,flat,reg,ecx ebp,0,eax edx ebx ebp,,ecx,0,known,
+155415,xn_flat_begin_frame,flat,reg,,0,esi,,eax ecx edx ebx edi,0,known,
+155508,xn_flat_pick,flat,reg,eax edx ebx ebp fs gs,0,eax fs gs,,ecx edx ebx esi edi,0,known,
+155610,xn_flat_span_light_setup,flat,reg,eax ecx edx ebx ebp esi edi,0,eax ecx edx ebx ebp edi,,,0,partial,
+155800,xn_span_solid,span,reg,eax ebp edi,0,eax ecx edi,,,0,partial,
+155820,xn_span_solid_shaded_setup,span,reg,eax ebp edi,0,eax ecx ebx edi,,,0,partial,
+155880,xn_span_solid_lit_tail,span,reg,al eax.u ecx ebp edi,0,ah ecx dl,,,0,known,
+155920,xn_span_solid_lit,span,reg,eax ebx ebp esi edi,0,eax ecx edx ebx ebp esi edi,,,0,partial,
+155C00,xn_span_tex_tail,span,reg,eax ecx ebx esi edi,0,edx ebx,,,0,known,
+155D20,xn_span_tex_8,span,reg,eax ebx ebp esi edi,0,eax ecx edx ebx ebp esi edi,,,0,unknown,no caller: every register it may change is an output
+155F60,xn_span_tex_16_setup,span,reg,eax ebx ebp esi edi,0,eax ecx edx ebx ebp esi edi,,,0,partial,
+155F70,xn_span_tex_16,span,reg,eax ebx ebp esi edi,0,eax ecx edx ebx ebp esi edi,,,0,partial,
+156320,xn_span_tex_shaded_tail,span,reg,ah eax.u ecx ebx ebp esi edi,0,edx ebx,,eax,0,known,
+156460,xn_span_tex_shaded_8,span,reg,eax ebx ebp esi edi,0,eax ecx edx ebx ebp esi edi,,,0,partial,
+1566B4,xn_span_tex_shaded_16_setup,span,reg,eax ebx ebp esi edi,0,eax ecx edx ebx ebp esi edi,,,0,partial,
+1566C4,xn_span_tex_shaded_16,span,reg,eax ebx ebp esi edi,0,eax ecx edx ebx ebp esi edi,,,0,partial,
+156A80,xn_span_tex_lit_setup,span,reg,eax ebx ebp esi edi,0,eax ecx edx ebx ebp esi edi,,,0,partial,
+156A94,xn_span_tex_lit,span,reg,eax ebx ebp esi edi,0,eax ecx edx ebx ebp esi edi,,,0,partial,
+156D40,xn_span_tex64_tail,span,reg,eax ecx ebx esi edi,0,edx ebx,,,0,known,
+156E60,xn_span_tex64,span,reg,eax ebx ebp esi edi,0,eax ecx edx ebx ebp esi edi,,,0,unknown,no caller: every register it may change is an output
+157100,xn_span_tex64_shaded_tail,span,reg,ah eax.u ecx ebx ebp esi edi,0,al edx ebx,,ebp,0,known,
+157240,xn_span_tex64_shaded,span,reg,eax ebx ebp esi edi,0,eax ecx edx ebx ebp esi edi,,,0,partial,
+157620,xn_span_flat_transparent,span,reg,ecx ebx ebp esi edi,0,eax ecx edx ebx ebp esi edi,,,0,partial,
+157760,xn_span_flat_transparent_tail,span,reg,ecx ebx esi edi,0,eax ebx,,,0,known,
+157800,xn_span_flat_transparent_shaded,span,reg,ecx ebx ebp esi edi,0,eax ecx edx ebx ebp esi edi,,,0,partial,
+157960,xn_span_flat_transparent_shaded_tail,span,reg,ah eax.u ecx ebx esi edi,0,al edx ebx,,,0,known,
+157B02,xn_span_tail_offsets_23_entry1,span,unknown,al ecx dx ebx ebp esi edi,4,eax ecx edx ebx ebp esi edi,,,0,unknown,no caller: every register it may change is an output; stack use not followed
+157B20,xn_span_flat_lit_fogged,span,reg,ecx ebx ebp esi edi,0,eax ecx edx ebx ebp esi edi,,,0,partial,
+157CA0,xn_span_flat_lit_fogged_tail,span,reg,ah eax.u ecx ebx ebp esi edi,0,al cl edx ebx,,ebp,0,known,
+157E02,xn_span_tail_offsets_25_entry1,span,reg,eax ecx dl ebx ebp esi edi CF,0,eax ecx edx ebx ebp esi edi,CF,,0,unknown,no caller: every register it may change is an output
+157E20,xn_span_flat_translucent,span,reg,ecx ebx ebp esi edi,0,eax ecx edx ebx ebp esi edi,CF,,0,partial,
+157FA0,xn_span_flat_translucent_tail,span,reg,al eax.u ecx ebx ebp esi edi,0,ax edx ebx,CF,ebp,0,known,
+158100,xn_render_sort_pairs_saveregs,render,reg,eax edx ebx ebp esi,0,,,,0,unknown,no caller: every register it may change is an output
+15810E,xn_render_sort_pairs,render,reg,eax edx ebx ebp esi,0,ebp esi,,ecx edi,0,known,
+15811C,xn_render_sort_pairs_range,render,reg,eax edx ebx,0,ebp esi,,ecx edi,0,known,
+158300,xn_poly_outcode_eax,poly,reg,eax edx ebx,0,eax ebx,,,0,unknown,no caller: every register it may change is an output
+15830C,xn_poly_outcode,poly,reg,eax edx ebx,0,ecx ebx,,,0,known,
+158360,xn_poly_project_flat,poly,reg,edx ebx ebp esi edi fs gs,16,edx ebx ebp esi edi fs gs,,eax ecx,0,known,
+158420,xn_poly_project_face,poly,reg,bx ebp esi,0,edx ebp,CF,eax ecx ebx esi edi,0,known,
+1585B3,xn_poly_clc_stub,poly,reg,,0,,CF,,0,unknown,no caller: every register it may change is an output
+1585C0,xn_poly_project_terrain,poly,reg,ecx ebx ebp esi edi,0,ah eax.u dh edx.u bl ebx.u ebp,,al ecx dl bh esi edi,0,known,
+158678,xn_poly_clip_frustum,poly,reg,ah eax.u edx ebx ebp esi edi,0,ah eax.u edx ebx ebp esi edi,CF,al ecx,0,known,
+1587D4,xn_poly_clip_plane,poly,reg,ah eax.u edx ebp,0,ah eax.u edx ebx esi edi,,al ecx,0,known,
+158864,xn_poly_clip_intersect_left,poly,reg,ebx esi edi,0,eax ecx edx ebx edi,ZF,,0,partial,
+1588F0,xn_poly_clip_intersect_right,poly,reg,ebx esi edi,0,eax ecx edx ebx edi,ZF,,0,partial,
+158978,xn_poly_clip_intersect_bottom,poly,reg,ebx esi edi,0,eax ecx edx ebx edi,ZF,,0,partial,
+158A04,xn_poly_clip_intersect_top,poly,reg,ebx esi edi,0,eax ecx edx ebx edi,ZF,,0,partial,
+158A90,xn_poly_clip_intersect_near,poly,reg,ebx esi edi,0,eax ecx edx ebx edi,ZF,,0,partial,
+158B1C,xn_poly_clip_intersect_far,poly,reg,ebx esi edi,0,eax ecx edx ebx edi,ZF,,0,partial,
+158D04,xn_span_insert,span,reg,ecx ebx ebp esi,0,ah eax.u edx,,al ecx ebx ebp esi edi,0,known,
+15B9A0,xn_poly_rasterize,poly,reg,eax edx ebx ebp,0,ah eax.u edx bl ebx.u ebp,,al ecx bh esi edi,0,known,
+15BA16,xn_poly_rasterize_row_loop,poly,reg,eax ecx edx ebx ebp esi edi,0,eax ecx edx ebx ebp esi edi,,,0,unknown,no caller: every register it may change is an output
+15BAC0,xn_poly_tex_gradients,poly,reg,ecx edx edi,0,,,eax ecx edx ebx ebp esi,0,known,
+15BB8C,xn_poly_setup_textured,poly,reg,eax ecx ebx ebp esi edi fs gs,48,eax ecx edx ebx ebp esi edi fs gs,,,0,partial,
+15BC41,xn_poly_ret_stub,poly,reg,,0,,,,0,unknown,no caller: every register it may change is an output
+15BC42,xn_light_setup_poly,light,reg,ecx edi,0,eax edx,,ecx ebx ebp esi,0,known,
+15BC9C,xn_light_setup_terrain,light,reg,ecx edi,0,eax edx,,ecx ebx ebp esi,0,known,
+15BCE8,xn_light_shade_constant,light,reg,edi,0,eax,,,0,partial,callers read flags it leaves alone: CF
+15BCF6,xn_light_build_shader_1,light,reg,edi,0,eax ecx edx ebx esi,,,0,partial,callers read flags it leaves alone: CF
+15BD78,xn_light_build_shader_2,light,reg,edi,0,eax ecx edx ebx esi,,,0,partial,callers read flags it leaves alone: CF
+15BE4D,xn_light_build_shader_3,light,reg,edi,0,eax ecx edx ebx esi,,,0,partial,callers read flags it leaves alone: CF
+15BF75,xn_light_add_point,light,reg,ecx ebp esi edi,0,eax ecx edx ebx ebp esi,CF,,0,partial,ESP +4 at the return at 15C040
+15C045,xn_light_add_type4_noop,light,reg,,0,,,,0,partial,callers read flags it leaves alone: CF
+15C046,xn_light_add_directional,light,reg,ebp esi edi,0,eax ecx edx ebx ebp,CF,,0,partial,
+15C08A,xn_light_terrain_add_point_noop,light,reg,,0,,,,0,partial,callers read flags it leaves alone: CF
+15C08B,xn_light_terrain_add_type4_noop,light,reg,,0,,,,0,partial,callers read flags it leaves alone: CF
+15C08C,xn_light_terrain_add_directional,light,reg,ebp esi edi,0,eax edx ebx ebp,CF,,0,partial,
+15C200,xn_tmap_pool_alloc,tmap,reg,eax ecx edx ebx ebp esi edi fs gs,0,fs gs,,eax ecx edx ebx ebp esi edi,0,known,
+15C260,xn_tmap_pool_free,tmap,reg,ecx edx ebx ebp esi edi fs gs,0,fs gs,,eax ecx edx ebx ebp esi edi,0,known,
+15C274,xn_tmap_compile,tmap,reg,eax edx,0,eax,CF,ecx edx ebp esi edi,0,known,
+15C2DC,xn_tmap_rebase,tmap,watcom,eax edx,0,,,eax edx esi,0,known,
+15C2F0,xn_tmap_pool_reset,tmap,watcom,,0,,,eax ecx edx ebx ebp esi edi,0,known,
+15C300,xn_tmap_template,tmap,template,eax ecx ebx ebp esi edi,0,eax edx ebx esi,,,0,unknown,address escapes (escape): every register it may change is an output
+15CB00,xn_collide_point_in_face,collide,reg,eax ecx edx ebx esi edi,0,eax edx ebx esi edi,,,0,known,
+15CC36,xn_collide_point_in_face_v2,collide,reg,eax ecx edx ebx esi edi,0,eax edx ebx esi edi,CF,,0,unknown,no caller: every register it may change is an output
+15CD33,xn_collide_face_area,collide,reg,eax edx,0,eax edx,,,0,unknown,no caller: every register it may change is an output
+15CE7E,xn_collide_face_test_edges,collide,reg,eax ecx edx ebx esi edi,0,eax ecx esi edi,,,0,known,
+15CEDE,xn_collide_face_test_vertices,collide,reg,eax ecx edx ebx esi edi,0,eax ecx esi edi,,,0,unknown,no caller: every register it may change is an output
+15CF18,xn_cam_cull_sphere,cam,reg,eax ecx edx ebx,0,eax,CF,ecx edx ebx ebp esi,0,known,
+15D03C,xn_cam_sphere_dist_x,cam,reg,eax ebx edi,0,eax,ZF SF OF,ecx edx ebx ebp esi,0,known,
+15D05C,xn_cam_sphere_dist_y,cam,reg,eax ebx edi,0,eax,ZF SF OF,ecx edx ebx ebp esi,0,known,
+15D100,xn_mat_mul_int,mat,reg,eax ecx edx ebx esi edi,0,,,edx ebx esi,0,unknown,"no caller: every register it may change is an output; outputs overridden: dead: the product goes to memory; EDX, EBX and ESI are its loop counter and pointers, as in xn_mat_mul_fixed (0x15D170), whose callers read nothing back; clobber overridden: dead: EDX, EBX and ESI are its loop counter and pointers"
+15D141,xn_mat_dot_int,mat,reg,ecx ebx esi edi,0,,,,0,known,
+15D170,xn_mat_mul_fixed,mat,reg,eax ecx edx ebx ebp esi edi,0,,,eax ecx edx ebx ebp esi edi,0,known,
+15D1B7,xn_mat_dot_fixed,mat,reg,ecx ebx esi edi,0,,,ebp,0,known,
+15D1F8,xn_mat_mul_fixed64,mat,reg,eax ecx edx ebx bp esi edi,0,,,edx ebx esi,0,unknown,"no caller: every register it may change is an output; outputs overridden: dead: the product goes to memory; EDX, EBX and ESI are its loop counter and pointers, as in xn_mat_mul_fixed (0x15D170); clobber overridden: dead: EDX, EBX and ESI are its loop counter and pointers"
+15D240,xn_mat_dot_fixed64,mat,reg,ecx ebx esi edi,0,,,,0,known,
+15D288,xn_mat_identity,mat,watcom,eax edx ebx,0,,,eax edx ebx,0,known,
+15D2B4,xn_mat_identity64,mat,reg,eax edx ebx,0,,,eax edx,0,unknown,"no caller: every register it may change is an output; outputs overridden: dead: the matrix goes to memory; EAX and EDX are its end pointer and diagonal value, as in xn_mat_identity (0x15D288), whose callers read nothing back; clobber overridden: dead: EAX and EDX are its end pointer and diagonal value"
+15D2EC,xn_mat_transpose_copy3,mat,watcom,eax edx,0,,,eax ecx edx ebx ebp esi edi,0,known,
+15E400,xn_draw_clip_rect_xyxy,draw,reg,eax ecx edx ebx,0,eax ecx edx ebx,CF,ebp,0,known,
+15E45C,xn_draw_rect_outline,draw,reg,eax ecx edx ebx,0,eax ecx edx ebx,,,0,unknown,no caller: every register it may change is an output
+15E4A4,xn_draw_fill_rect_clipped,draw,reg,eax ecx edx ebx,0,eax ecx edx ebx,,,0,unknown,no caller: every register it may change is an output
+15F50C,xn_math_isqrt_lookup,math,reg,eax ecx,0,eax,,edx,0,known,
+15FC00,xn_gfx_vesa_init,gfx,reg,,0,,CF,eax ebp edi,0,known,
+15FC93,xn_gfx_vesa_free,gfx,watcom,,0,,,eax ecx edx ebx ebp esi edi,0,known,
+15FCA7,xn_gfx_vesa_set_mode,gfx,reg,eax ecx edx ebx,0,,CF,eax ebp edi,0,known,
+15FDAA,xn_gfx_vesa_get_mode_info,gfx,reg,eax edx ebx,0,,CF,eax ecx ebx ebp esi edi,0,known,
+15FDF4,xn_gfx_vesa_set_display_start,gfx,reg,eax edx,0,,,eax,0,known,
+15FE05,xn_gfx_vesa_set_bank,gfx,reg,eax ecx edx.u,0,,,,0,known,
+15FE3F,xn_gfx_vesa_get_bank,gfx,reg,ecx edx,0,eax,,,0,unknown,no caller: every register it may change is an output
+15FE6F,xn_gfx_vesa_int10,gfx,reg,eax ecx edx ebx,0,,CF,eax,0,known,
+15FEAE,xn_gfx_vesa_present_banked,gfx,reg,eax ecx,0,,,,0,known,
+15FF53,xn_gfx_vesa_blit_rect_banked,gfx,reg,eax ecx edx ebx ebp esi edi,0,eax ecx edx ebp esi edi,,,0,unknown,no caller: every register it may change is an output
+160900,xn_serial_open,serial,reg,eax ch ecx.u edx ebx ebp esi edi fs gs,0,edx fs gs,CF,eax ebp esi edi,0,known,
+1609C0,xn_serial_close,serial,reg,eax ecx edx ebx,0,eax ecx edx ebx,,,0,known,ESP -12 at the return at 1609F2
+1609F9,xn_serial_close_restore_vector,serial,reg,eax ecx.u ebx,8,ax ecx edx ebx,,,0,known,ESP +12 at the return at 160A15
+160A18,xn_serial_rx_reset,serial,reg,eax,0,,,ebp esi edi,0,known,
+160A3C,xn_serial_read_lsr,serial,watcom,eax,0,al,,ah eax.u,0,known,
+160A54,xn_serial_send_byte,serial,reg,eax edx,0,eax,CF,edx,0,known,
+160A9C,xn_serial_rx_get,serial,reg,eax,0,al,CF,ah eax.u ebp esi,0,known,
+160AE0,xn_serial_irq_com1,serial,interrupt,eax ecx edx ebx ebp esi edi fs gs,8,,,,0,unknown,no caller: every register it may change is an output
+160E00,xn_helmet_a_open,helmet,reg,eax ch ecx.u ebp esi edi fs gs,0,fs gs,CF,,0,partial,
+160E44,xn_helmet_a_close,helmet,reg,,0,,,,0,partial,callers read flags it leaves alone: CF
+160E45,xn_helmet_a_reset,helmet,reg,CF,0,,CF,,0,partial,
+160E57,xn_helmet_a_send_h,helmet,reg,CF,0,,CF,,0,partial,
+160E64,xn_helmet_a_request,helmet,reg,CF,0,eax,CF,,0,partial,
+160E6F,xn_helmet_a_read_text,helmet,watcom,,0,eax,,,0,unknown,no caller: every register it may change is an output
+160EAC,xn_helmet_a_read,helmet,reg,,0,eax,CF,,0,partial,
+160EE1,xn_helmet_a_fail_stub,helmet,watcom,,0,eax,,,0,unknown,no caller: every register it may change is an output
+160EE7,xn_helmet_a_send,helmet,reg,eax,0,eax,CF,,0,known,
+160F00,xn_helmet_b_str_reset,helmet,unknown,eax ecx edx ebx ebp esi edi fs gs,0,eax ecx edx ebx ebp esi edi,,,0,unknown,address escapes (escape): every register it may change is an output; leaves through 160F03; stack use not followed
+160F04,xn_helmet_b_str_version,helmet,unknown,eax ecx edx ebx ebp esi edi fs gs,0,eax ecx edx ebx ebp esi edi,,,0,unknown,address escapes (escape): every register it may change is an output; leaves through 160F07; stack use not followed
+160F11,xn_helmet_b_str_start,helmet,unknown,eax ecx edx ebx ebp esi edi fs gs CF PF AF ZF SF OF,0,eax ecx edx ebx ebp esi edi,,,0,unknown,address escapes (escape): every register it may change is an output; leaves through 160F12; stack use not followed
+161000,xn_helmet_b_open,helmet,reg,eax ecx ebp esi edi fs gs,0,eax fs gs,CF,,0,partial,
+161084,xn_helmet_b_close,helmet,reg,,0,,CF,,0,partial,
+161094,xn_helmet_b_reset,helmet,reg,,0,,CF,,0,partial,
+1610B4,xn_helmet_b_send_bang,helmet,reg,,0,,CF,,0,partial,
+1610C4,xn_helmet_b_start,helmet,reg,,0,,CF,,0,partial,
+1610D4,xn_helmet_b_request_version,helmet,reg,,0,,CF,eax ebp esi edi,0,known,
+161110,xn_helmet_b_stub,helmet,reg,,0,,,,0,unknown,no caller: every register it may change is an output
+161114,xn_helmet_b_parse_version,helmet,watcom,,0,eax,,ecx edx ebx ebp esi edi,0,known,
+16116C,xn_helmet_b_read,helmet,reg,ah eax.u edx ebx,0,eax edx ebx,CF,,0,partial,
+161224,xn_helmet_b_send_str,helmet,reg,eax,0,,CF,eax ebp esi edi,0,known,
+161250,xn_helmet_b_wait_ok,helmet,reg,,0,,CF,eax ebp esi edi,0,known,
+16126C,xn_helmet_b_wait_rx,helmet,reg,,0,,CF,eax ebp esi edi,0,known,
+161400,xn_helmet_c_open,helmet,reg,,0,eax,CF,,0,partial,
+1614D0,xn_helmet_c_close,helmet,reg,,0,,CF,,0,partial,
+1614E4,xn_helmet_c_reset_noop,helmet,reg,,0,,,,0,partial,callers read flags it leaves alone: CF
+1614E8,xn_helmet_c_request_noop,helmet,reg,,0,,,,0,partial,callers read flags it leaves alone: CF
+1614EC,xn_helmet_c_cmd2_noop,helmet,reg,,0,,,,0,partial,callers read flags it leaves alone: CF
+1614F0,xn_helmet_c_read,helmet,reg,ebx esi,0,eax ecx edx ebx esi,CF,,0,partial,
+161524,xn_helmet_c_int33,helmet,reg,eax ecx edx ebx,0,eax ecx edx ebx,,,0,known,

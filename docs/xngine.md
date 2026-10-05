@@ -532,3 +532,120 @@ scene ends a little differently from the asm's, but renders the same way.
   parameters.
 - **The runtime is for mixed asm and C**, inside the emulator. Once everything is C, the
   thunks, trampolines, frame unwinding and interrupt windows go away with the asm.
+
+## 2026-10-05: phase 6, readable C
+
+The literal C (phase 5) is the asm's register-level dataflow. Phase 6 rewrites the engine as
+readable C: named parameters and locals, structured control flow, named globals and
+structs, loops where the asm unrolled. Each function is still checked against the recorded
+calls. The infrastructure is done, and the pilot proves it: the vec, mat and math
+subsystems (62 functions, 1,827 instructions) are readable C in `src/engine/`.
+`docs/xngine_readable.md` is the guide for converting the rest.
+
+**The interfaces** (`tools/xn_abi.py analyze`, 30 s, writes `config/xngine_abi.csv`). Each
+row gives a function's register interface:
+- its inputs and stack arguments;
+- the outputs callers read and the flags they read (`flags_out`);
+- the clobbers no caller reads;
+- `ret N`, the convention, and whether all its callers are known.
+
+How the analysis works:
+- **Registers in parts.** AL, AH and the upper half are tracked apart, so `mov dx, [..]`
+  reads nothing of EDX. A `bsr` or `bsf` counts its destination as an input: a zero
+  source leaves it.
+- **Per function.** A forward pass follows ESP and a value token per register and stack
+  slot (push/pop pairs, pushad/popad), to find what each function preserves. Strong
+  liveness then runs over registers, flags and stack slots: a pop into a dead register
+  makes nothing live.
+- **Interprocedural**, over objects 1 and 2 (4,034 functions). The forward stage goes
+  bottom-up over the call graph's strongly connected components; the liveness stage is a
+  worklist.
+- **The game's calls.** The game's Watcom 10.0a code never reads, after a call, EAX
+  (unless it is the result) or the argument registers it passed. Watcom 10.0a does not
+  preserve a callee's argument registers: a two-argument function never saves EDX. The
+  brief assumed "every register but EAX"; the game's code shows otherwise.
+- **Indirect calls** resolve through jump and call tables, constant stores into variables
+  and struct fields, and `xn_abi.py trace`: the targets the record corpus reaches
+  (`build/xn_readable/indirect.json`, 45 sites, 503 targets). Jumps into the middle of a
+  function are analysed as entries of their own; calls into generated code are anything,
+  and so is `push target; ret`.
+- **DOS, DPMI, mouse and BIOS calls** have their registers listed, by the constant in AH or
+  AX.
+- **Overrides.** `config/xngine_abi_override.csv` replaces a column where there is no
+  caller to decide (7 overrides, the pilot's dead functions). `xn_abi.py overrides`
+  applies them in seconds.
+
+| | |
+|---|---|
+| Conventions | reg 499, watcom 166, interrupt 37, unknown 13, template 4 |
+| Callers | known 468, partial 89, unknown 162 (143 with no caller: every register they change is an output; 19 whose address escapes) |
+| flags_out | 94 functions: CF in 85, ZF in 6, ZF SF OF in 2, all six in 1 |
+| Outputs | none 237, one 122, several 360 |
+
+Cross-checks on the record corpus:
+- `check` (static): in every one of 8,116 records, the registers a row says are preserved
+  hold their entry values at exit.
+- `clobber --all`: at every return of every function, its clobbers, and the flags it does
+  not output, are scrambled. 8,204 / 8,204 records pass, compared by each record's own
+  row; the scramblers fired at 9.0M returns of 636 functions. The test found two analysis
+  bugs on the way: a call that falls into the next function's entry has to count that
+  function's needs as live after it (`xn_render_frame` reads CF that `xn_render_draw_flats`
+  leaves), and what is live at a function's returns, for its own calls' sake, includes the
+  registers its callers read that it preserves, not only its outputs.
+- `inputs`: every register that is not an input, and every flag, is scrambled at entry.
+  8,107 / 8,107 records pass (the 97 of handlers, data and templates are not tried). In a
+  record that calls DOS or the BIOS, the replay answers with the recorded registers, so
+  there the test compares outputs, memory and I/O. The test found that `push target; ret`
+  dispatchers are jumps, not returns.
+
+**How readable C runs** (`tools/xn_rc.py`):
+- `build` compiles `src/engine/*.c` and `glue.asm` with Watcom 10.0a and links them at
+  0x11000000 (`tools/xn_cload.py`'s linker, given a resolver for names to the loaded game).
+- The C runs natively on the game's stack: no `R`, no thunk. A code hook at a converted
+  function's asm entry sends its asm callers there, in one of three ways:
+  - **direct**: a pragma (`parm`, `value`, `modify exact`) or Watcom's own convention
+    matches the row;
+  - **keep-eax**: `push eax; call; pop eax` for callers that need EAX kept, which
+    Watcom's code never keeps;
+  - **glue**: `pushfd; pushad; call NAME_r; popad; popfd` for several outputs or flags
+    out. `NAME_r(xn_regs *r)` unpacks the registers into a natural call.
+- `test` compares as the interface sees it: memory exactly except the dead stack below
+  the exit ESP; registers except the clobbers, preserved ones against their entry values;
+  flags only for `flags_out`; I/O and interrupts exactly.
+- Also `diff` (made-up states, `tools/xn_cload.py`'s diff_test), `play --compare` (screens
+  against the asm), `report` (`build/xngine/rc_report.csv`), `skel` (a header and stub
+  C from the rows) and `asm` (a listing with names).
+- Shared pieces:
+  - `tools/xn_record.py`'s replay is split into `replay_run` and `compare`;
+  - `tools/xn_cload.py`'s `replay_c`, `test_files`, `diff_test` and `play` take any image;
+  - its `parallel` runs a task over the record files in `fallemu.workers()` processes,
+    with memwatch.
+
+The literal C still passes (`xn_c.py test 0x157620`).
+
+**The pilot.** `src/engine/xngine.h` (types, the 64-bit helpers, `xn_regs`), `glue.asm`
+(`xn_asmcall`, `int` calls), and `xvec.h`/`vec.c`, `xmat.h`/`mat.c`, `xmath.h`/`math.c`.
+The 62 functions route 33 direct, 7 keep-eax and 22 through glue.
+
+| | |
+|---|---|
+| Records, each function alone in C | 62 / 62 functions, 803 / 803 records |
+| Records, all 62 in C at once | 62 / 62, 803 / 803 |
+| The whole corpus with all 62 in C | 8,204 / 8,204 records pass, each compared by its own function's row; 1,814 of them run pilot C (43,562 entries) |
+| Differential tests | 59 / 60 functions agree on every made-up state. `xn_mat_dot_fixed` differs on 1 of 7: a count of 3.6M walks its pointers through the dead stack, where the C's frame lives |
+| The game | four dungeon saves render pixel-identical to the asm after 300 ticks; two saves walk 1,500 ticks (750,000 C calls each) without a fault. Outdoors, rain and walking people make the screens differ (timing) |
+
+What the pilot taught, now in the guide:
+- `modify exact`: without it, Watcom changes a pragma function's parameter registers.
+- Watcom's code never keeps EAX, hence the keep-eax stubs.
+- Watcom will not take EBP in a pragma.
+- Scratch globals the asm writes are kept, with names: `xn_mat_from_angles_tmp`,
+  `xn_math_tri_edges`, `xn_vec_angles_in`, the matrix strides. They are proposed in
+  `build/xn_readable/names.csv`.
+- Divide errors, with XnGine's own handler, are reproduced by dividing where the asm does
+  with the register-operand helpers.
+- `bsr` of zero is kept with `xn_bsr(v, old)`.
+
+**Left:** the other 657 functions, in about six groups (the guide's split), on the designs
+in `build/xn_readable/structs/` and `build/xn_readable/smc/`. Interrupt handlers need a
+stub of their own (`iret`), and the generated code's pools stay byte-exact.
