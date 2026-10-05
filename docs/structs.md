@@ -25,7 +25,8 @@ the way, the decisions taken, and what is still unknown.
   entries, flc_player, rect, pick_result, notebook entries, collision probes and hits, item,
   magic and monster templates, the SOS sound structs...). The lifter's bit-test helpers went
   in **include/bitfield.h**. Headers need 8.3 names because the compiler runs under DOSBox.
-  Result: **1530 casts to 231**, file-local struct definitions 305 to 72.
+  Result: **574 casts to 231** (the local-naming pass had already taken 1530 to 574 by
+  retyping locals), file-local struct definitions 305 to 72.
 - **Final round** (2026-10-05, one owner):
   - the RMB and RDB block files in records.h (rmb_file, rdb_file, rdb_object, rdb_model,
     rdb_action, rdb_light...), named after Daggerfall Unity's DFBlock and checked against
