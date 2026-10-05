@@ -22,9 +22,10 @@ that into ordinary C. Every function still compiles with Watcom C32 10.0a to FAL
 |---|---|---|
 | `goto`s / labels | 11,969 / 10,611 | 71 / 34 |
 | `l_XX` locals and `aN` parameters | 29,964 | 0 |
-| record offset casts (`offset_casts.py count`) | ~7,900 | 231 |
-| file-local struct definitions | 305 (struct pass start) | 72 |
-| declarations that disagree with the definition | 959 | 316 |
+| record offset casts (`offset_casts.py count`) | ~7,900 | 2 |
+| file-local struct definitions | 305 (struct pass start) | 50 |
+| `extern char g[];` declarations (mostly strings and buffers now) | 4,861 | 1,992 |
+| declarations that disagree with the definition | 959 | 309 |
 
 ## Structuring and typed globals
 
@@ -351,8 +352,8 @@ disagree. Every file compiles on its own, so nothing breaks, but the C says two 
   - pointer-typed candidates are tried first;
   - a definition's pointer is never turned back into an integer.
 
-On 2026-10-05: 959 disagreeing declarations; `run` fixed 627 and `unify` 10 functions; 316
-are left. Those are load-bearing: the callers' code was compiled against other types than the
+On 2026-10-05: 959 disagreeing declarations; `run` fixed 627 and `unify` 10 functions, and
+the last struct round fixed a few by hand; 309 are left. Those are load-bearing: the callers' code was compiled against other types than the
 definition's. text_draw_coloured is the common case: its callers' declarations say
 `unsigned char` for the colour, and with that prototype Watcom loads the constant through a
 register before pushing it (`mov eax, 0x9c; push eax`). With the definition's `int` it would

@@ -1556,3 +1556,40 @@ that gives more evidence.
 
 Every change compiles byte-identical with Watcom 10.0a, so the build checks all of it.
 
+
+## 2026-10-05: natural C (phase 3) and XnGine in C (phase 7)
+
+**Natural C (phase 3)** is done. Every change compiled byte-identical with Watcom 10.0a, and
+the matching build checked all of it (docs/natural_c.md, docs/structs.md):
+- Six agents named every lifter placeholder local and parameter (29,964 `l_XX`/`aN` to 0)
+  and retyped the ones holding records and strings.
+- Two struct rounds replaced file-local copies and the remaining offset casts with shared
+  structs:
+  - include/structs.h (new): file formats, UI, sound, collision, templates;
+  - include/records.h gained the logbook, the RMB and RDB block files, and `struct region`.
+  - Offset casts went from 1530 to 2, and file-local struct definitions from 305 to 50.
+- tools/protos.py made each file's declarations agree with the function's definition where
+  the code allows: 959 disagreements down to 309. The rest are load-bearing: the callers'
+  code was compiled against other types.
+- Left: 71 gotos (jumps into shared code, two-level exits), the 2 casts through XnGine's
+  allocation header, and a few spellings kept because they match.
+
+A build risk the last round found: `rdb_model_id_from_name` (src/hand/func_000369A0.c)
+compiled once with ecx and edx swapped in the full build. It matched alone, and matches now
+in every order tried. Watcom 10.0a seems to read memory left over from the previous compile in
+the DOSBox session. If a header change flips it again, padding or reordering the headers is
+the fix.
+
+**XnGine in C (phase 7)** is done (docs/xngine.md "phase 5, literal C"):
+- Names: all 719 functions are named; the engine map is docs/xngine_map.md.
+- Record corpus: tools/xn_record.py has 8,204 recorded calls of 620 functions.
+- tools/xn_c.py translates every function to literal C on a register struct. It compiles with
+  Watcom 10.0a.
+- Replay: all 8,204 records pass with one function at a time in C, and with all of XnGine in
+  C at once.
+- Differential tests: 4,033 cover functions the records never reach.
+- The game runs with XnGine in C: 8 saves × 2,000 ticks, and a still scene is
+  pixel-identical to the asm.
+
+**Next:** readable XnGine C (locals instead of the register struct, structs, loops for the
+unrolled spans), and retyping the callers behind the 309 disagreeing declarations.

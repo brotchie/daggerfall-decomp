@@ -18,6 +18,24 @@ the way, the decisions taken, and what is still unknown.
   `tools/build-and-verify.sh` BUILD OK. `offset_casts.py count` also counts casts through
   pointers that are not records (image headers, text cursors, the lifter's frame arrays,
   BIOS tick reads): most of the 1530 are those.
+- **Shared structs** (2026-10-05, one owner): one definition for each data structure that
+  files had copied locally. Record data went in records.h (logbook, model instance, quest
+  NPC, the record +0x1B/+0x2B overlays, house and ship for sale...). Everything else went in
+  the new **include/structs.h** (profile, image/CFA/texture headers, BSA and TEXT.RSC
+  entries, flc_player, rect, pick_result, notebook entries, collision probes and hits, item,
+  magic and monster templates, the SOS sound structs...). The lifter's bit-test helpers went
+  in **include/bitfield.h**. Headers need 8.3 names because the compiler runs under DOSBox.
+  Result: **1530 casts to 231**, file-local struct definitions 305 to 72.
+- **Final round** (2026-10-05, one owner):
+  - the RMB and RDB block files in records.h (rmb_file, rdb_file, rdb_object, rdb_model,
+    rdb_action, rdb_light...), named after Daggerfall Unity's DFBlock and checked against
+    the code;
+  - `struct region` (80 bytes) for `regions[]` and current_region_data, in place of the
+    per-field globals;
+  - the arch3d model headers and planes, and the talk window's tables;
+  - the lifter's frame arrays, as local structs with the same layout.
+
+  Result: **231 casts to 2**, local struct definitions 72 to 50.
 - **include/records.h**: the structs below, packed, each size checked at compile time
   (`RECORD_SIZE`); `tools/offset_casts.py check` checks every `/* +0xNN */` comment against
   the computed layout.
@@ -402,23 +420,33 @@ func_00087F76 (loaded_location), run_0006480F (link).
 - Header +0x2B on a creature's arrow (weapon_monster_arrow sets 1) and +0x17 on 3D objects.
 - The type-41 quest NPC's data is a building copy, but npc code sets bit 4 of data+2 (the
   person flags' place) for its gender.
-- Not yet structs: notebook elements (note.c), the logbook, the RMB file layout (`rmb_block`,
-  build/names/world.md), RDB records (fs2df.c), the monster table (29 bytes), the engine's
-  pick result, image headers, region records.
+- All of these are structs now: notebook elements, the logbook, the RMB and RDB files, the
+  monster table, the pick result, image headers and region records (structs.h, records.h).
+  XnGine's allocation header is the one layout still read raw.
 
 ## What is left
 
-Most of the 1530 casts are not through records: pflc.c (91, the FLC player), note.c (85),
-profile*.c and sosez*.c (HMI), text cursors in faction.c's FACTION.TXT parser, image headers
-(options.c, travel.c, click.c's menus), BIOS tick reads, the lifter's frame arrays (mplace.c,
-weapons.c, potions.c, sound.c). Record casts still raw: the RMB file (`rmb_block`,
-`rmb_record_ptr`) in objlib/maploads/args, RDB data in fs2df.c, colstuff.c's hit list and
-probe (`D_00196D48`, `D_00196D4C`), click.c's pick result and menu windows, the heap header
-reads at record-6/-18 (`struct mem_block` now exists), and functions whose locals are still
-`int` (`offset_casts.py scan FILE --all` lists them). Hand files that keep local copies of
-records.h types: func_000830C7 (`struct anim`/`struct light` = block_model/block_flat in
-type-56 data), func_00036233 (RDB records), func_000699D8 and func_00077639 (72-byte header
-copies on the stack: a `struct record` local would change the frame).
+- **2 offset casts**, in kludge.c's kludge_show_memory. It reads XnGine's allocation header,
+  22 bytes before each texture archive (the size is at +8), and nothing documents that
+  layout.
+- **crime.c's court_frame** keeps `extern char region_legal_reputation[]` for one line. With
+  any `regions[]` spelling, Watcom evaluates the two sides of the add in the other order.
+- **Local copies that stay local** because the shared struct changes the frame:
+  - func_0002F824's 60-byte move request view and func_00063FCF's 44-byte one; the shared
+    struct moves the parameter spill slots;
+  - the two 34-byte rumor copies (a `text[]` member would enlarge `struct rumor`);
+  - func_000699D8 and func_00077639's 72-byte record header copies on the stack.
+- **Spellings kept because they match**:
+  - the loot chance table read as `table[category]` for categories 2 to 14;
+  - the notebook page walkers stepping a `char *`;
+  - `(*(signed char *)&skill->value)++` in generate.c;
+  - byte steps in the arch3d plane walks;
+  - the flat `unsigned char *color_remap_tables`;
+  - signedness casts at a few sites.
+- **Scratch globals** (scratch_190df0, scratch_buffer) are typed per file, because each
+  file uses them for something else.
+- Unknown member meanings are `unknown_XX`/`pad_XX`. The RDB light's +0x03 and +0x04
+  (`action`, `next_object_offset`) are named from the code; DFU calls them Unknown1/2.
 
 ## Phase A pilot units
 
