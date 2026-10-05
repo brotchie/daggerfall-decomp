@@ -2,15 +2,15 @@
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
 
-extern char key_down_esc[];
-extern char screen_buffer[];
+extern signed char key_down_esc;
+extern int screen_buffer;
 extern char D_00170EDB[];
 extern char D_00170EE8[];
-extern char D_00187CA8[];
-extern char D_00196272[];
-extern char game_mode[];
-extern char options_image[];
-extern char options_saved_screen[];
+extern signed char D_00187CA8;
+extern signed char D_00196272;
+extern signed char game_mode;
+extern int options_image;
+extern int options_saved_screen;
 
 extern int disk_read_file(int, int);
 extern int key_pressed_once(unsigned char);
@@ -23,27 +23,22 @@ int options_open(short a1)
 {
     int l_20;
 
-    if (a1 != 0) goto L4333B;
-    if (*(signed char *)game_mode != 0) goto L43339;
-    if (key_pressed_once(1) != 0) goto L4333B;
-L43339:;
-    goto L433AB;
-L4333B:;
-    if (*(signed char *)key_down_esc != 0) goto L4333B;
-    func_0007EE38();
-    *(signed char *)D_00187CA8 = 0;
-    *(signed char *)game_mode = 7;
-    *(int *)options_image = disk_read_file((int)D_00170EDB, 0);
-    *(signed char *)D_00196272 = 1;
-    *(int *)options_saved_screen = mc_malloc(64000, (int)D_00170EE8, 120);
-    mc_memcpy(*(int *)options_saved_screen, *(int *)screen_buffer, 64000, (int)D_00170EE8, 121, 4);
-    logbook_prune_quests();
-L433AB:;
-    if (((int)(unsigned char)*(signed char *)game_mode) != 7) goto L433C0;
-    l_20 = 1;
-    goto L433C7;
-L433C0:;
-    l_20 = 0;
-L433C7:;
+    if (a1 != 0 || (game_mode == 0 && key_pressed_once(1) != 0)) {
+        do {
+        } while (key_down_esc != 0);
+        func_0007EE38();
+        D_00187CA8 = 0;
+        game_mode = 7;
+        options_image = disk_read_file((int)D_00170EDB, 0);
+        D_00196272 = 1;
+        options_saved_screen = mc_malloc(64000, (int)D_00170EE8, 120);
+        mc_memcpy(options_saved_screen, screen_buffer, 64000, (int)D_00170EE8, 121, 4);
+        logbook_prune_quests();
+    }
+    if (((int)(unsigned char)game_mode) == 7) {
+        l_20 = 1;
+    } else {
+        l_20 = 0;
+    }
     return l_20;
 }

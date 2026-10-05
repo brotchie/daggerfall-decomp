@@ -15,7 +15,7 @@ extern char D_0017590A[];
 extern char D_00175913[];
 extern char D_0017591E[];
 extern struct slot D_0018E044[];
-extern char text_buffer[];
+extern signed char text_buffer[];
 extern struct flags16 *game_settings;
 extern struct savehdr *D_00195C44;
 extern char *books_path;
@@ -40,13 +40,13 @@ void books_scan(void)
     D_00195F22 = 0;
     buf = D_00195C44;
     func_000A0ED9(694, D_001758B8);
-    mc_sprintf(text_buffer, D_00175913, books_path, D_0017590A);
-    rc = func_000A13DA(text_buffer, 0, &ff);
+    mc_sprintf(((char *)text_buffer), D_00175913, books_path, D_0017590A);
+    rc = func_000A13DA(((char *)text_buffer), 0, &ff);
     while (rc == 0) {
         D_0018E044[D_00195F22].id = atoi(ff.name + 3);
         func_000A0ED9(699, D_001758B8);
-        mc_sprintf(text_buffer, D_0017591E, ff.name);
-        fd = disk_open_data(text_buffer);
+        mc_sprintf(((char *)text_buffer), D_0017591E, ff.name);
+        fd = disk_open_data(((char *)text_buffer));
         func_000A00CB(fd, buf, 234);
         func_0009DEA7(fd);
         if (buf->f128 == 0 || (game_settings->f0 & 4) == 0)

@@ -4,8 +4,8 @@
 
 extern char D_00170404[];
 extern char D_00170411[];
-extern char D_00190D10[];
-extern char talk_face_image[];
+extern signed char D_00190D10;
+extern int talk_face_image;
 
 extern int disk_open_data(int);
 extern int rand_range(int, int);
@@ -18,18 +18,17 @@ void talk_load_face(int a1)
     int l_1C;
     int l_18;
 
-    *(signed char *)D_00190D10 = 1;
-    if (a1 < 1000) goto L16B11;
-    l_18 = ((a1 == 1000) ? 0 : 6);
-    l_18 += rand_range(0, 5);
-    l_1C = disk_open_data((int)D_00170404);
-    lseek(l_1C, l_18 << 12, 0);
-    goto L16B35;
-L16B11:;
-    *(signed char *)D_00190D10 = 1;
-    l_1C = disk_open_data((int)D_00170411);
-    lseek(l_1C, a1 << 12, 0);
-L16B35:;
-    func_000A00CB(l_1C, *(int *)talk_face_image, 4096);
+    D_00190D10 = 1;
+    if (a1 >= 1000) {
+        l_18 = ((a1 == 1000) ? 0 : 6);
+        l_18 += rand_range(0, 5);
+        l_1C = disk_open_data((int)D_00170404);
+        lseek(l_1C, l_18 << 12, 0);
+    } else {
+        D_00190D10 = 1;
+        l_1C = disk_open_data((int)D_00170411);
+        lseek(l_1C, a1 << 12, 0);
+    }
+    func_000A00CB(l_1C, talk_face_image, 4096);
     func_0009DEA7(l_1C);
 }

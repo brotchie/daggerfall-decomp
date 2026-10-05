@@ -1,6 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0007CD98 */
 extern unsigned char mouse_buttons;
-extern char text_buffer[];
+extern signed char text_buffer[];
 extern unsigned char D_00196272;
 extern unsigned char D_00196275;
 extern unsigned char mouse_buttons_prev;
@@ -26,8 +26,8 @@ void info_popup_update(void)
         return;
     p = info_popup_text;
     do {
-        p = func_000CE300(text_buffer, p);
-        i = font_text_width(text_buffer);
+        p = func_000CE300(((char *)text_buffer), p);
+        i = font_text_width(((char *)text_buffer));
         if (i > w)
             w = i;
         n++;
@@ -38,8 +38,8 @@ void info_popup_update(void)
     x = 160 - w + 5;
     y = 100 - n * 5;
     for (i = 0; i < n; i++, y += 10) {
-        p = func_000CE300(text_buffer, p);
-        text_draw(text_buffer, x, y);
+        p = func_000CE300(((char *)text_buffer), p);
+        text_draw(((char *)text_buffer), x, y);
     }
     if (D_00196272 == 1 && (mouse_buttons & 1) == 0 && (mouse_buttons_prev & 1) != 0) {
         D_00196272 = D_00196275;

@@ -9,7 +9,7 @@ extern char *screen_buffer;
 extern char D_00175CC4[];        /* __FILE__ */
 extern char D_00175CCB[];
 extern char D_00190B44[];
-extern char text_rsc_buffer[];
+extern signed char text_rsc_buffer[];
 extern struct Img *D_00195B5C;
 extern struct Img *window_image;
 extern int game_minutes;
@@ -39,10 +39,10 @@ void bank_draw(void)
     func_00144F68(img->x, img->y, img->w, img->h, img->data);
     switch (bank_screen) {
     case 0:
-        text_draw_colored(func_000A0DD9(bank_account->balance, text_rsc_buffer, 10), 197, 19, 145, 156);
-        text_draw_colored(func_000A0DD9(gold_total(), text_rsc_buffer, 10), 203, 29, 145, 156);
+        text_draw_colored(func_000A0DD9(bank_account->balance, ((char *)text_rsc_buffer), 10), 197, 19, 145, 156);
+        text_draw_colored(func_000A0DD9(gold_total(), ((char *)text_rsc_buffer), 10), 203, 29, 145, 156);
         if (bank_account->loan_due != 0) {
-            text_draw_colored(func_000A0DD9(bank_account->loan_owed, text_rsc_buffer, 10), 143, 39, 145, 156);
+            text_draw_colored(func_000A0DD9(bank_account->loan_owed, ((char *)text_rsc_buffer), 10), 143, 39, 145, 156);
             saved = game_minutes;
             game_minutes = bank_account->loan_due;
             parse_expand(D_00175CCB, D_00190B44);

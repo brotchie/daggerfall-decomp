@@ -7,7 +7,7 @@ extern char D_0012B508;
 extern int screen_buffer;
 extern char D_00175420[];
 extern struct R classmaker_reputation_buttons[];
-extern char text_buffer[];
+extern signed char text_buffer[];
 extern int text_macro_fae;
 extern char *text_macro_fea;
 extern struct character *player_character;
@@ -43,10 +43,10 @@ void classmaker_draw_reputations(void)
             D_0012B508 = 0xc5;
             func_00144D00(classmaker_reputation_buttons[n].x0, 81 - m, h, m);
         }
-        text_draw_centered_colored(func_000A0DD9(player_character->reputation[n], text_buffer, 10), n * 33 + 58, 149, 145, 141);
+        text_draw_centered_colored(func_000A0DD9(player_character->reputation[n], ((char *)text_buffer), 10), n * 33 + 58, 149, 145, 141);
         total += player_character->reputation[n];
     }
-    text_draw_centered_colored(func_000A0DD9(-total, text_buffer, 10), 105, 179, 145, 141);
+    text_draw_centered_colored(func_000A0DD9(-total, ((char *)text_buffer), 10), 105, 179, 145, 141);
     msgbox_update();
     func_0012B3ED();
 }

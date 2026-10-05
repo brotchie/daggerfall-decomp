@@ -21,7 +21,7 @@ extern unsigned char player_environment;
 extern unsigned short spell_last_cast_id;
 extern int D_00186503[];
 extern int screen_shake;
-extern char text_rsc_buffer[];
+extern signed char text_rsc_buffer[];
 extern char D_001917E4[];
 extern struct record *nonworld_root;
 extern char inventory_containers[];
@@ -109,8 +109,8 @@ int load_game(char *name)
     func_000A0ED9(637, D_00176884);
     mc_sprintf(buf, D_00176909, name);
     func_000A0ED9(638, D_00176884);
-    mc_sprintf(text_rsc_buffer, D_001768DF, buf, D_00176927);
-    fd = open(text_rsc_buffer, 512);
+    mc_sprintf(((char *)text_rsc_buffer), D_001768DF, buf, D_00176927);
+    fd = open(((char *)text_rsc_buffer), 512);
     if (fd < 0)
         return 0;
     func_000A00CB(fd, &save_version, 4);
@@ -135,8 +135,8 @@ int load_game(char *name)
     l24 = current_region;
     current_region = 255;
     func_000A0ED9(677, D_00176884);
-    mc_sprintf(text_rsc_buffer, D_001768DF, buf, D_00176927);
-    save_file_handle = open(text_rsc_buffer, 512);
+    mc_sprintf(((char *)text_rsc_buffer), D_001768DF, buf, D_00176927);
+    save_file_handle = open(((char *)text_rsc_buffer), 512);
     func_000A00CB(save_file_handle, &save_version, 4);
     func_000A00CB(save_file_handle, &vec, 12);
     func_000A00CB(save_file_handle, &l18, 2);

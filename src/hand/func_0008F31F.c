@@ -2,33 +2,33 @@
 #include "records.h"
 
 struct bf8_2_1 { unsigned char _:2; unsigned char f:1; };
-extern char mouse_buttons[];
-extern char mouse_x[];
-extern char mouse_y[];
-extern char key_down_esc[];
+extern signed char mouse_buttons;
+extern short mouse_x;
+extern short mouse_y;
+extern signed char key_down_esc;
 extern char D_00176E94[];
 extern char potionmaker_buttons[];
 extern char D_00187FE2[];
 extern char D_00187FE4[];
 extern char D_00187FE6[];
 extern char D_00187FE8[];
-extern char text_buffer[];
+extern signed char text_buffer[];
 extern char D_00190BE4[];
-extern char D_001940D4[];
+extern signed char D_001940D4;
 extern struct record *player_entity;
 extern struct record *player_object;
 extern struct character *player_character;
-extern char window_image[];
-extern char mouse_buttons_prev[];
+extern int window_image;
+extern signed char mouse_buttons_prev;
 extern char D_001A9B9C[];
-extern char D_001A9BB4[];
+extern signed char D_001A9BB4[];
 extern char potion_cauldron[];
 extern char potion_ingredients[];
 extern char potion_ingredient_scroll[];
-extern char D_001AA3E0[];
+extern int D_001AA3E0;
 extern char potion_ingredient_count[];
-extern char potion_name[];
-extern char potion_cauldron_count[];
+extern int potion_name;
+extern short potion_cauldron_count;
 extern int spells_list_poll(void);
 extern void msgbox_show_rsc(int, int);
 extern int sound_play(int, struct record *, int);
@@ -67,9 +67,9 @@ struct hotspot {
     void (*fn)(void);
 };
 
-#define COUNT (*(short *)potion_cauldron_count)
-#define MOUSE_X (*(short *)mouse_x)
-#define MOUSE_Y (*(short *)mouse_y)
+#define COUNT (potion_cauldron_count)
+#define MOUSE_X (mouse_x)
+#define MOUSE_Y (mouse_y)
 
 void potionmaker_update(void)
 {
@@ -80,9 +80,9 @@ void potionmaker_update(void)
     short l_18;
 
     if (potionmaker_open(0) == 0) return;
-    func_000CB552(*(int *)window_image);
+    func_000CB552(window_image);
     func_0012DB50(4);
-    text_draw_colored(*(int *)potion_name, 31, 185, 145, 156);
+    text_draw_colored(potion_name, 31, 185, 145, 156);
     text_draw_colored(func_000A0DD9(player_character->gold, (int)text_buffer, 10), 235, 185, 145, 156);
     func_0012DB50(3);
     *(int *)potion_ingredient_count = 0;
@@ -97,15 +97,15 @@ void potionmaker_update(void)
             ((short *)D_001A9B9C)[COUNT++] = l_1C;
         }
     }
-    if (*(int *)potion_ingredient_count == 0 && *(int *)D_001AA3E0 == 0 && COUNT == 0) {
+    if (*(int *)potion_ingredient_count == 0 && D_001AA3E0 == 0 && COUNT == 0) {
         msgbox_show_rsc(34, 1);
         potionmaker_close();
     }
     if (((struct bf8_2_1 *)&D_001940D4)->f && (l_1C = spells_list_poll()) > -1)
         potion_make(((struct item **)D_00190BE4)[l_1C]);
-    if (*(char *)key_down_esc != 0)
+    if ((char)key_down_esc != 0)
         potionmaker_close();
-    if (*(char *)mouse_buttons == 0 || (*(char *)mouse_buttons != 0 && *(char *)mouse_buttons_prev != 0)) return;
+    if ((char)mouse_buttons == 0 || ((char)mouse_buttons != 0 && (char)mouse_buttons_prev != 0)) return;
     for (l_1C = 0; l_1C < 5; l_1C++) {
         if (MOUSE_X > ((struct hotspot *)potionmaker_buttons)[l_1C].x0 && MOUSE_X < ((struct hotspot *)potionmaker_buttons)[l_1C].x1
          && MOUSE_Y > ((struct hotspot *)potionmaker_buttons)[l_1C].y0 && MOUSE_Y < ((struct hotspot *)potionmaker_buttons)[l_1C].y1) {

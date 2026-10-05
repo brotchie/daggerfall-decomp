@@ -5,7 +5,7 @@ extern char D_001704CC[];
 extern char D_00170530[];
 extern char D_00179E10[];
 extern struct rec13 rmb_name_templates[];
-extern char text_buffer[];
+extern signed char text_buffer[];
 extern char D_001968BA;
 extern unsigned char location_block_indexes[];
 extern unsigned char location_block_numbers[];
@@ -48,10 +48,10 @@ void town_block_load_rmb(int a1)
     }
     if (cfg_debug == 0) {
         func_000A0ED9(476, D_001704CC);
-        mc_sprintf(text_buffer, D_00170530, &rmb_name_templates[l_24]);
+        mc_sprintf(((char *)text_buffer), D_00170530, &rmb_name_templates[l_24]);
     } else {
-        mc_strncpy(text_buffer, cfg_block_str, 160, D_001704CC, 478);
+        mc_strncpy(((char *)text_buffer), cfg_block_str, 160, D_001704CC, 478);
     }
-    l_1C = archive_find_record(blocks_bsa, text_buffer, 8);
+    l_1C = archive_find_record(blocks_bsa, ((char *)text_buffer), 8);
     archive_read_record(blocks_bsa, l_1C, rmb_block);
 }

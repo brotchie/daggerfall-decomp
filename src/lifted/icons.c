@@ -5,11 +5,11 @@
 
 struct bf8_5_1 { unsigned char _:5; unsigned char f:1; };
 struct bf8_6_1 { unsigned char _:6; unsigned char f:1; };
-extern char mouse_buttons[];
-extern char mouse_x[];
-extern char mouse_y[];
-extern char key_down_esc[];
-extern char screen_buffer[];
+extern signed char mouse_buttons;
+extern short mouse_x;
+extern short mouse_y;
+extern signed char key_down_esc;
+extern int screen_buffer;
 extern char D_00175898[];
 extern char D_001758A0[];
 extern char D_001758A4[];
@@ -19,32 +19,32 @@ extern char D_00185C5A[];
 extern char D_00185C5C[];
 extern char D_00185C5E[];
 extern char D_00185C60[];
-extern char D_00187CA8[];
-extern char D_00188208[];
+extern signed char D_00187CA8;
+extern short D_00188208[];
 extern char D_00190B44[];
 extern char D_00190D64[];
 extern char text_macro_fpc[];
-extern char D_001940D4[];
-extern char D_001940D6[];
-extern char D_001940D8[];
+extern signed char D_001940D4;
+extern signed char D_001940D6;
+extern signed char D_001940D8;
 extern struct record *wagon_container;
 extern struct record *D_001959EC;
 extern struct item *D_00195A80;
 extern struct record *player_entity;
 extern struct record *player_object;
-extern char D_00195ACC[];
+extern int D_00195ACC;
 extern struct character *player_character;
 extern struct settings *game_settings;
-extern char magic_items_image[];
-extern char mouse_control_mode[];
-extern char view_cursor_active[];
-extern char D_00196272[];
-extern char mouse_buttons_prev[];
-extern char player_ailment_flags[];
-extern char magic_items_saved_screen[];
-extern char hud_pressed_button[];
-extern char D_00199D71[];
-extern char steer_key_region[];
+extern char *magic_items_image;
+extern signed char mouse_control_mode;
+extern signed char view_cursor_active;
+extern signed char D_00196272;
+extern signed char mouse_buttons_prev;
+extern signed char player_ailment_flags;
+extern int magic_items_saved_screen;
+extern signed char hud_pressed_button;
+extern signed char D_00199D71;
+extern short steer_key_region;
 extern struct picklist D_001A9AB8;
 extern struct record *inv_selected_item;
 
@@ -83,48 +83,20 @@ void hud_buttons_click(int a1)
 {
     int l_18;
 
-    if (((int)(unsigned char)*(signed char *)mouse_control_mode) != 1) goto L5D304;
-    if (*(signed char *)view_cursor_active == 0) goto L5D306;
-L5D304:;
-    goto L5D30B;
-L5D306:;
-    return;
-L5D30B:;
-    l_18 = 0;
-L5D312:;
-    if (l_18 < 11) goto L5D325;
-    return;
-L5D31D:;
-    l_18++;
-    goto L5D312;
-L5D325:;
-    if (*(short *)mouse_x <= *(short *)(hud_buttons + (l_18 * 12))) goto L5D34D;
-    if (*(short *)mouse_x < *(short *)(D_00185C5C + (l_18 * 12))) goto L5D34F;
-L5D34D:;
-    goto L5D363;
-L5D34F:;
-    if (*(short *)mouse_y > *(short *)(D_00185C5A + (l_18 * 12))) goto L5D365;
-L5D363:;
-    goto L5D379;
-L5D365:;
-    if (*(short *)mouse_y < *(short *)(D_00185C5E + (l_18 * 12))) goto L5D37B;
-L5D379:;
-    goto L5D3CC;
-L5D37B:;
-    if (a1 == 0) goto L5D38D;
-    if (((int)(unsigned char)*(signed char *)hud_pressed_button) == l_18) goto L5D38F;
-L5D38D:;
-    goto L5D3BE;
-L5D38F:;
-    sound_play(203, player_object, 100);
-    ((int (*)())(*(int *)(D_00185C60 + (l_18 * 12))))((int)(unsigned char)*(signed char *)mouse_buttons_prev);
-    *(signed char *)hud_pressed_button = 255;
-    return;
-L5D3BE:;
-    if (a1 != 0) goto L5D3CC;
-    *(signed char *)hud_pressed_button = *(signed char *)&l_18;
-L5D3CC:;
-    goto L5D31D;
+    if (((int)(unsigned char)mouse_control_mode) == 1 && view_cursor_active == 0) {
+        return;
+    }
+    for (l_18 = 0; l_18 < 11; l_18++) {
+        if (mouse_x > *(short *)(hud_buttons + (l_18 * 12)) && mouse_x < *(short *)(D_00185C5C + (l_18 * 12)) && mouse_y > *(short *)(D_00185C5A + (l_18 * 12)) && mouse_y < *(short *)(D_00185C5E + (l_18 * 12))) {
+            if (a1 != 0 && ((int)(unsigned char)hud_pressed_button) == l_18) {
+                sound_play(203, player_object, 100);
+                ((int (*)())(*(int *)(D_00185C60 + (l_18 * 12))))((int)(unsigned char)mouse_buttons_prev);
+                hud_pressed_button = 255;
+                return;
+            }
+            if (a1 == 0) hud_pressed_button = *(signed char *)&l_18;
+        }
+    }
 }
 
 void hud_button_sheet(void)
@@ -139,10 +111,10 @@ void hud_button_spellbook(void)
 
 void hud_button_interaction_mode(void)
 {
-    if (((int)(unsigned char)(*(signed char *)mouse_buttons_prev & 1)) == 0) goto L5D449;
-    interaction_mode_cycle(1);
-    return;
-L5D449:;
+    if (((int)(unsigned char)(mouse_buttons_prev & 1)) != 0) {
+        interaction_mode_cycle(1);
+        return;
+    }
     interaction_mode_cycle(-1);
 }
 
@@ -155,11 +127,11 @@ void hud_toggle_weapon(void)
 {
     short l_18;
 
-    *(signed char *)D_001940D6 ^= 64;
+    D_001940D6 ^= 64;
     if (((struct bf8_6_1 *)&D_001940D6)->f == 0) return;
     if (player_character->equipped[19] == 0) return;
     *(int *)&l_18 = (int)player_character->equipped[19] + 71;
-    sound_play((int)(short)*(short *)(D_00188208 + (((int)(unsigned short)*(short *)(*(char **)&l_18 + 34)) * 2)), player_object, 100);
+    sound_play((int)(short)D_00188208[((int)(unsigned short)*(short *)(*(char **)&l_18 + 34))], player_object, 100);
 }
 
 void hud_button_status(void)
@@ -174,10 +146,10 @@ void hud_button_transport(void)
 
 void hud_button_map(int a1)
 {
-    if ((a1 & 2) == 0) goto L5D557;
-    travel_map_open(1);
-    return;
-L5D557:;
+    if ((a1 & 2) != 0) {
+        travel_map_open(1);
+        return;
+    }
     automap_open();
 }
 
@@ -200,62 +172,34 @@ void magic_items_add_cb(struct record *a1)
 
     if (a1->type != 2) return;
     l_18 = a1->parent;
-L5D5D2:;
-    if (l_18 == 0) goto L5D5EE;
-    if (func_000CE44C((int)((char *)&D_001959EC), l_18, 4) == 0) goto L5D5F0;
-L5D5EE:;
-    goto L5D5FB;
-L5D5F0:;
-    l_18 = l_18->parent;
-    goto L5D5D2;
-L5D5FB:;
+    while (l_18 != 0 && func_000CE44C((int)((char *)&D_001959EC), l_18, 4) == 0) {
+        l_18 = l_18->parent;
+    }
     if (l_18 != 0) return;
     if (a1->parent == wagon_container) return;
     l_24 = &a1->data.item;
     l_1C = 0;
-    if (l_24->group != 1) goto L5D649;
-    if (l_24->index == 1) goto L5D64B;
-L5D649:;
-    goto L5D654;
-L5D64B:;
-    if (a1->children != 0) goto L5D656;
-L5D654:;
-    goto L5D668;
-L5D656:;
-    if (a1->children->type == 31) goto L5D66A;
-L5D668:;
-    goto L5D673;
-L5D66A:;
-    l_1C = 2;
-    goto L5D683;
-L5D673:;
-    if (l_24->enchantments[0].type == (-1)) return;
-L5D683:;
-    if (l_1C != 0) goto L5D6D1;
-    l_20 = 0;
-    l_1C = l_20;
-L5D696:;
-    if (l_20 < 10) goto L5D6A6;
-    goto L5D6D1;
-L5D69E:;
-    l_20++;
-    goto L5D696;
-L5D6A6:;
-    if (l_24->enchantments[l_20].type == (-1)) goto L5D6D1;
-    if (l_24->enchantments[l_20].type != 0) goto L5D6CF;
-    l_1C = 1;
-L5D6CF:;
-    goto L5D69E;
-L5D6D1:;
+    if (l_24->group == 1 && l_24->index == 1 && a1->children != 0 && a1->children->type == 31) {
+        l_1C = 2;
+    } else {
+        if (l_24->enchantments[0].type == (-1)) return;
+    }
+    if (l_1C == 0) {
+        l_20 = 0;
+        l_1C = l_20;
+        for (; l_20 < 10; l_20++) {
+            if (l_24->enchantments[l_20].type == (-1)) break;
+            if (l_24->enchantments[l_20].type == 0) l_1C = 1;
+        }
+    }
     if (l_1C == 0) return;
     D_00195A80 = l_24;
-    if (l_1C != 2) goto L5D704;
-    *(int *)D_00195ACC = (int)&a1->children->data.potion_recipe;
-    parse_expand((int)D_001758A0, (int)D_00190B44);
-    goto L5D713;
-L5D704:;
-    parse_expand((int)D_001758A4, (int)D_00190B44);
-L5D713:;
+    if (l_1C == 2) {
+        D_00195ACC = (int)&a1->children->data.potion_recipe;
+        parse_expand((int)D_001758A0, (int)D_00190B44);
+    } else {
+        parse_expand((int)D_001758A4, (int)D_00190B44);
+    }
     picklist_add(&D_001A9AB8, (int)D_00190B44, 0);
     *(int *)(text_macro_fpc + (((int)(short)(*(short *)D_00190D64)++) << 2)) = (int)a1;
 }
@@ -267,17 +211,17 @@ void magic_items_open(void)
     *(short *)D_00190D64 = 0;
     picklist_init(&D_001A9AB8, 100, 159, 166, 34, 88, 159, 8, 15, 88, 179, 8, 59, 0, 0, 1, 1, 146, 146, 244, 114, 0);
     object_foreach(player_entity->children, (int)magic_items_add_cb);
-    if (*(short *)D_00190D64 != 0) goto L5D805;
-    picklist_free(&D_001A9AB8);
-    return;
-L5D805:;
-    *(signed char *)D_00187CA8 = 0;
-    *(signed char *)D_001940D8 &= 254;
-    *(signed char *)D_001940D4 |= 32;
-    *(int *)magic_items_image = disk_read_file((int)D_001758A8, 0);
-    *(signed char *)D_00196272 = 1;
-    *(int *)magic_items_saved_screen = mc_malloc(64000, (int)D_00175898, 358);
-    mc_memcpy(*(int *)magic_items_saved_screen, *(int *)screen_buffer, 64000, (int)D_00175898, 359, 4);
+    if (*(short *)D_00190D64 == 0) {
+        picklist_free(&D_001A9AB8);
+        return;
+    }
+    D_00187CA8 = 0;
+    D_001940D8 &= 254;
+    D_001940D4 |= 32;
+    *(int *)&magic_items_image = disk_read_file((int)D_001758A8, 0);
+    D_00196272 = 1;
+    magic_items_saved_screen = mc_malloc(64000, (int)D_00175898, 358);
+    mc_memcpy(magic_items_saved_screen, screen_buffer, 64000, (int)D_00175898, 359, 4);
 }
 
 void magic_items_frame(void)
@@ -285,104 +229,64 @@ void magic_items_frame(void)
     short l_18;
 
     if (((struct bf8_5_1 *)&D_001940D4)->f == 0) return;
-    mc_memcpy(*(int *)screen_buffer, *(int *)magic_items_saved_screen, 64000, (int)D_00175898, 368, 4);
-    func_00144F68((int)(unsigned short)*(short *)(*(char **)magic_items_image), (int)(unsigned short)*(short *)(*(char **)magic_items_image + 2), (int)(unsigned short)*(short *)(*(char **)magic_items_image + 4), (int)(unsigned short)*(short *)(*(char **)magic_items_image + 6), (int)(*(char **)magic_items_image + 12));
-    if (*(signed char *)key_down_esc != 0) goto L5D911;
-    if (((int)(unsigned char)(*(signed char *)mouse_buttons & 2)) == 0) goto L5D931;
-L5D911:;
-    if (*(signed char *)key_down_esc != 0) goto L5D911;
-L5D91A:;
-    if (*(signed char *)mouse_buttons == 0) goto L5D92A;
-    func_0012B136();
-    goto L5D91A;
-L5D92A:;
-    magic_items_close();
-    return;
-L5D931:;
+    mc_memcpy(screen_buffer, magic_items_saved_screen, 64000, (int)D_00175898, 368, 4);
+    func_00144F68((int)(unsigned short)*(short *)(magic_items_image), (int)(unsigned short)*(short *)(magic_items_image + 2), (int)(unsigned short)*(short *)(magic_items_image + 4), (int)(unsigned short)*(short *)(magic_items_image + 6), (int)(magic_items_image + 12));
+    if (key_down_esc != 0 || ((int)(unsigned char)(mouse_buttons & 2)) != 0) {
+        do {
+        } while (key_down_esc != 0);
+        while (mouse_buttons != 0) func_0012B136();
+        magic_items_close();
+        return;
+    }
     *(int *)&l_18 = picklist_poll(&D_001A9AB8) - 1;
-    if (((int)(short)l_18) <= (-1)) goto L5D966;
-    magic_items_close();
-    inv_selected_item = (struct record *)(*(int *)(text_macro_fpc + (((int)(short)l_18) << 2)));
-    inv_use_item();
-    return;
-L5D966:;
+    if (((int)(short)l_18) > (-1)) {
+        magic_items_close();
+        inv_selected_item = (struct record *)(*(int *)(text_macro_fpc + (((int)(short)l_18) << 2)));
+        inv_use_item();
+        return;
+    }
     picklist_draw(&D_001A9AB8, 0);
 }
 
 void magic_items_close(void)
 {
-    *(signed char *)D_001940D4 &= 223;
-    if (*(int *)magic_items_image == 0) goto L5D9A6;
-    if (*(int *)magic_items_image != (-1751672937)) goto L5D9A8;
-L5D9A6:;
-    goto L5D9C6;
-L5D9A8:;
-    mc_free(*(int *)magic_items_image, (int)D_00175898, 396);
-    *(int *)magic_items_image = -1751672937;
-L5D9C6:;
+    D_001940D4 &= 223;
+    if ((int)magic_items_image != 0 && (int)magic_items_image != (-1751672937)) {
+        mc_free((int)magic_items_image, (int)D_00175898, 396);
+        *(int *)&magic_items_image = -1751672937;
+    }
     picklist_free(&D_001A9AB8);
-    *(signed char *)D_00196272 = 0;
-    *(signed char *)D_00187CA8 = 1;
-    if (*(int *)magic_items_saved_screen == 0) goto L5D9F3;
-    if (*(int *)magic_items_saved_screen != (-1751672937)) goto L5D9F5;
-L5D9F3:;
-    return;
-L5D9F5:;
-    mc_free(*(int *)magic_items_saved_screen, (int)D_00175898, 400);
-    *(int *)magic_items_saved_screen = -1751672937;
+    D_00196272 = 0;
+    D_00187CA8 = 1;
+    if (magic_items_saved_screen == 0 || magic_items_saved_screen == (-1751672937)) {
+        return;
+    }
+    mc_free(magic_items_saved_screen, (int)D_00175898, 400);
+    magic_items_saved_screen = -1751672937;
 }
 
 int hud_update(void)
 {
-    if (((int)(short)*(short *)mouse_y) < 154) goto L5DA42;
-    if (*(signed char *)D_00196272 == 0) goto L5DA44;
-L5DA42:;
-    goto L5DA5A;
-L5DA44:;
-    if (((int)(unsigned short)(game_settings->view_flags & 1)) == 0) goto L5DA5F;
-L5DA5A:;
-    goto L5DAEE;
-L5DA5F:;
-    if (((int)(unsigned char)(*(signed char *)mouse_buttons & 3)) == 0) goto L5DA7F;
-    if (((int)(unsigned char)(*(signed char *)mouse_buttons_prev & 3)) == 0) goto L5DA81;
-L5DA7F:;
-    goto L5DA88;
-L5DA81:;
-    hud_buttons_click(0);
-L5DA88:;
-    if (((int)(unsigned char)(*(signed char *)mouse_buttons & 3)) != 0) goto L5DAA8;
-    if (((int)(unsigned char)(*(signed char *)mouse_buttons_prev & 3)) != 0) goto L5DAAA;
-L5DAA8:;
-    goto L5DAB4;
-L5DAAA:;
-    hud_buttons_click(1);
-L5DAB4:;
-    if (*(signed char *)mouse_control_mode == 0) goto L5DAD4;
-    if (((int)(unsigned char)*(signed char *)mouse_control_mode) != 1) goto L5DAD2;
-    if (*(signed char *)view_cursor_active != 0) goto L5DAD4;
-L5DAD2:;
-    goto L5DAEE;
-L5DAD4:;
-    cursor_draw_arrow();
-    if (((int)(short)*(short *)steer_key_region) != (-1)) goto L5DAEE;
-    return 1;
-L5DAEE:;
+    if (((int)(short)mouse_y) >= 154 && D_00196272 == 0 && ((int)(unsigned short)(game_settings->view_flags & 1)) == 0) {
+        if (((int)(unsigned char)(mouse_buttons & 3)) != 0 && ((int)(unsigned char)(mouse_buttons_prev & 3)) == 0) {
+            hud_buttons_click(0);
+        }
+        if (((int)(unsigned char)(mouse_buttons & 3)) == 0 && ((int)(unsigned char)(mouse_buttons_prev & 3)) != 0) {
+            hud_buttons_click(1);
+        }
+        if (mouse_control_mode == 0 || (((int)(unsigned char)mouse_control_mode) == 1 && view_cursor_active != 0)) {
+            cursor_draw_arrow();
+            if (((int)(short)steer_key_region) == (-1)) return 1;
+        }
+    }
     return 0;
 }
 
 int hud_portrait_overlay_index(void)
 {
-    if (player_character->health >= (player_character->max_health / 10)) goto L5DB3D;
-    return 2;
-L5DB3D:;
-    if (*(signed char *)D_00199D71 == 0) goto L5DB4F;
-    return 0;
-L5DB4F:;
-    if (((int)(unsigned char)(*(signed char *)player_ailment_flags & 1)) == 0) goto L5DB68;
-    return 3;
-L5DB68:;
-    if (((int)(unsigned char)(*(signed char *)player_ailment_flags & 2)) == 0) goto L5DB81;
-    return 1;
-L5DB81:;
+    if (player_character->health < (player_character->max_health / 10)) return 2;
+    if (D_00199D71 != 0) return 0;
+    if (((int)(unsigned char)(player_ailment_flags & 1)) != 0) return 3;
+    if (((int)(unsigned char)(player_ailment_flags & 2)) != 0) return 1;
     return -1;
 }

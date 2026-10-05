@@ -6,10 +6,10 @@
 struct bf8_0_1 { unsigned char f:1; };
 struct bf8_3_1 { unsigned char _:3; unsigned char f:1; };
 struct bf8_4_1 { unsigned char _:4; unsigned char f:1; };
-extern char D_000C5404[];
-extern char D_00150200[];
-extern char D_00150A00[];
-extern char cfg_helmet[];
+extern int D_000C5404;
+extern int D_00150200[];
+extern int D_00150A00[];
+extern int cfg_helmet;
 extern char D_00176A88[];
 extern char D_00176A8F[];
 extern char D_00176A91[];
@@ -46,60 +46,60 @@ extern char D_00176B82[];
 extern char D_00176B9F[];
 extern char D_00176BC1[];
 extern char D_00176BED[];
-extern char D_001788E4[];
-extern char player_environment[];
-extern char cfg_texture_memory[];
-extern char mem_check_level[];
+extern int D_001788E4;
+extern unsigned char player_environment;
+extern int cfg_texture_memory;
+extern int mem_check_level;
 extern char D_00190BE4[];
-extern char D_00190BE8[];
-extern char D_00190BEC[];
-extern char D_001917E3[];
+extern int D_00190BE8;
+extern int D_00190BEC;
+extern signed char D_001917E3[];
 extern char D_001917E4[];
-extern char D_00191833[];
+extern signed char D_00191833[];
 extern char D_00191834[];
 extern char D_00191884[];
-extern char player_motion_flags[];
+extern signed char player_motion_flags;
 extern struct record *player_object;
 extern struct record *D_00195AC4;
 extern char cheat_flags[];
 extern struct location *current_location;
 extern struct character *player_character;
-extern char cfg_map_file[];
+extern signed char cfg_map_file;
 extern char cfg_item_file[];
 extern char classmaker_file[];
-extern char D_00195D5C[];
-extern char free_later_count[];
-extern char cfg_magic_repair[];
-extern char climate_weathers[];
-extern char D_001961AE[];
-extern char cfg_user[];
-extern char cfg_fade_colour[];
-extern char current_climate[];
-extern char cfg_artifact[];
-extern char cfg_fpu[];
-extern char cfg_ps2fix[];
-extern char cfg_stereo[];
-extern char D_001967F0[];
-extern char D_001967F4[];
-extern char D_001967F8[];
+extern int D_00195D5C;
+extern int free_later_count;
+extern int cfg_magic_repair;
+extern signed char climate_weathers[];
+extern signed char D_001961AE;
+extern signed char cfg_user;
+extern signed char cfg_fade_colour;
+extern signed char current_climate;
+extern signed char cfg_artifact;
+extern signed char cfg_fpu;
+extern signed char cfg_ps2fix;
+extern signed char cfg_stereo;
+extern int D_001967F0;
+extern int D_001967F4;
+extern int D_001967F8;
 extern char D_001967FC[];
-extern char rmb_record_ptr[];
+extern char *rmb_record_ptr;
 extern struct record *D_00196DB0;
 extern char cfg_block_str[];
 extern char cfg_mapsave_file[];
-extern char cfg_seed[];
-extern char cfg_start_map[];
-extern char cfg_facloop[];
-extern char cfg_faction[];
-extern char cfg_show_markers[];
-extern char cfg_debug[];
-extern char cheat_mode[];
-extern char cfg_gender[];
-extern char cfg_flags[];
-extern char cfg_region[];
-extern char D_001A949C[];
-extern char D_001A949D[];
-extern char object_heap_size[];
+extern int cfg_seed;
+extern int cfg_start_map;
+extern short cfg_facloop;
+extern short cfg_faction;
+extern signed char cfg_show_markers;
+extern signed char cfg_debug;
+extern signed char cheat_mode;
+extern signed char cfg_gender;
+extern signed char cfg_flags;
+extern signed char cfg_region;
+extern signed char D_001A949C;
+extern signed char D_001A949D;
+extern int object_heap_size;
 
 extern int climate_category(void);
 extern int weapon_arrow_update(struct record *);
@@ -146,166 +146,110 @@ void config_read(int a1)
 {
     int l_1C;
     unsigned char l_18;
-{
-    char l_60[32];
-    char l_40[32];
+    {
+        char l_60[32];
+        char l_40[32];
 
-    l_18 = 0;
-    func_0009DA1C(62, (int)D_00176A88);
-    l_1C = fopen(a1, (int)D_00176A8F);
-    if (l_1C == 0) goto L82CFE;
-L827FF:;
-    if (fprintf_2(l_1C, (int)D_00176A91, (int)l_60, (int)l_40) == (-1)) goto L82CE6;
-    if (stricmp((int)l_60, (int)D_00176A97) != 0) goto L828A6;
-    mc_strncpy((int)D_001917E4, (int)l_40, 80, (int)D_00176A88, 70);
-    if (((int)(unsigned char)*(signed char *)(D_001917E3 + func_000A0DF4((int)D_001917E4))) == 92) goto L82881;
-    func_000A1054((int)D_001917E4, (int)D_00176A9C, (int)D_00176A88, 72, 80);
-L82881:;
-    mc_strncpy((int)D_00191884, (int)l_40, 80, (int)D_00176A88, 73);
-    *(signed char *)cfg_flags |= 1;
-    goto L82CE1;
-L828A6:;
-    if (stricmp((int)l_60, (int)D_00176A9E) != 0) goto L8292A;
-    mc_strncpy((int)D_00191834, (int)l_40, 80, (int)D_00176A88, 78);
-    if (((int)(unsigned char)*(signed char *)(D_00191833 + func_000A0DF4((int)D_00191834))) == 92) goto L82905;
-    func_000A1054((int)D_00191834, (int)D_00176A9C, (int)D_00176A88, 80, 80);
-L82905:;
-    mc_strncpy((int)D_00191884, (int)l_40, 80, (int)D_00176A88, 81);
-    *(signed char *)cfg_flags |= 1;
-    goto L82CE1;
-L8292A:;
-    if (stricmp((int)l_60, (int)D_00176AA5) != 0) goto L82959;
-    mc_strncpy(*(int *)D_001788E4, (int)l_40, 4, (int)D_00176A88, 86);
-    goto L82CE1;
-L82959:;
-    if (stricmp((int)l_60, (int)D_00176AAE) != 0) goto L8297C;
-    *(signed char *)cfg_fade_colour = atoi((int)l_40);
-    goto L82CE1;
-L8297C:;
-    if (stricmp((int)l_60, (int)D_00176AB8) != 0) goto L829B2;
-    mc_strncpy((int)cfg_map_file, (int)l_40, 12, (int)D_00176A88, 94);
-    *(signed char *)cfg_flags |= 4;
-    goto L82CE1;
-L829B2:;
-    if (stricmp((int)l_60, (int)D_00176AC0) != 0) goto L829D6;
-    *(short *)cfg_faction = atoi((int)l_40);
-    goto L82CE1;
-L829D6:;
-    if (stricmp((int)l_60, (int)D_00176AC8) != 0) goto L829F9;
-    *(signed char *)cfg_fpu = atoi((int)l_40);
-    goto L82CE1;
-L829F9:;
-    if (stricmp((int)l_60, (int)D_00176ACC) != 0) goto L82A1C;
-    *(int *)cfg_start_map = atoi((int)l_40);
-    goto L82CE1;
-L82A1C:;
-    if (stricmp((int)l_60, (int)D_00176AD5) != 0) goto L82A3F;
-    *(signed char *)cfg_artifact = atoi((int)l_40);
-    goto L82CE1;
-L82A3F:;
-    if (stricmp((int)l_60, (int)D_00176ADE) != 0) goto L82A63;
-    *(short *)cfg_facloop = atoi((int)l_40);
-    goto L82CE1;
-L82A63:;
-    if (stricmp((int)l_60, (int)D_00176AE6) != 0) goto L82A92;
-    mc_strncpy((int)classmaker_file, (int)l_40, 20, (int)D_00176A88, 119);
-    goto L82CE1;
-L82A92:;
-    if (stricmp((int)l_60, (int)D_00176AED) != 0) goto L82AC1;
-    mc_strncpy((int)cfg_item_file, (int)l_40, 20, (int)D_00176A88, 123);
-    goto L82CE1;
-L82AC1:;
-    if (stricmp((int)l_60, (int)D_00176AF2) != 0) goto L82AE4;
-    *(signed char *)cfg_gender = atoi((int)l_40);
-    goto L82CE1;
-L82AE4:;
-    if (stricmp((int)l_60, (int)D_00176AF9) != 0) goto L82B07;
-    *(signed char *)cfg_ps2fix = atoi((int)l_40);
-    goto L82CE1;
-L82B07:;
-    if (stricmp((int)l_60, (int)D_00176B00) != 0) goto L82B2A;
-    *(signed char *)cfg_user = atoi((int)l_40);
-    goto L82CE1;
-L82B2A:;
-    if (stricmp((int)l_60, (int)D_00176B05) != 0) goto L82B4D;
-    *(signed char *)cfg_region = atoi((int)l_40);
-    goto L82CE1;
-L82B4D:;
-    if (stricmp((int)l_60, (int)D_00176B0C) != 0) goto L82B70;
-    *(signed char *)cfg_debug = atoi((int)l_40);
-    goto L82CE1;
-L82B70:;
-    if (stricmp((int)l_60, (int)D_00176B12) != 0) goto L82BA2;
-    mc_strncpy((int)cfg_block_str, (int)l_40, 80, (int)D_00176A88, 147);
-    goto L82CE1;
-L82BA2:;
-    if (stricmp((int)l_60, (int)D_00176B1B) != 0) goto L82BC5;
-    *(int *)cfg_helmet = atoi((int)l_40);
-    goto L82CE1;
-L82BC5:;
-    if (stricmp((int)l_60, (int)D_00176B22) != 0) goto L82BF7;
-    mc_strncpy((int)cfg_mapsave_file, (int)l_40, 80, (int)D_00176A88, 155);
-    goto L82CE1;
-L82BF7:;
-    if (stricmp((int)l_60, (int)D_00176B27) != 0) goto L82C1A;
-    *(signed char *)cfg_show_markers = atoi((int)l_40);
-    goto L82CE1;
-L82C1A:;
-    if (stricmp((int)l_60, (int)D_00176B2E) != 0) goto L82C3D;
-    *(int *)cfg_seed = atoi((int)l_40);
-    goto L82CE1;
-L82C3D:;
-    if (stricmp((int)l_60, (int)D_00176B33) != 0) goto L82C60;
-    *(signed char *)cfg_stereo = atoi((int)l_40);
-    goto L82CE1;
-L82C60:;
-    if (stricmp((int)l_60, (int)D_00176B3A) != 0) goto L82C83;
-    *(int *)object_heap_size = atoi((int)l_40) << 10;
-    goto L82CE1;
-L82C83:;
-    if (stricmp((int)l_60, (int)D_00176B45) != 0) goto L82CA3;
-    *(int *)cfg_texture_memory = atoi((int)l_40);
-    goto L82CE1;
-L82CA3:;
-    if (stricmp((int)l_60, (int)D_00176B53) != 0) goto L82CC3;
-    *(int *)cfg_magic_repair = atoi((int)l_40);
-    goto L82CE1;
-L82CC3:;
-    if (stricmp((int)l_60, (int)D_00176B5F) != 0) goto L82CE1;
-    *(signed char *)cheat_mode = atoi((int)l_40);
-L82CE1:;
-    goto L827FF;
-L82CE6:;
-    func_0009DA1C(196, (int)D_00176A88);
-    fclose(l_1C);
-L82CFE:;
-    if (((int)(unsigned char)(*(signed char *)cfg_flags & 1)) != 0) goto L82D30;
-    func_0009DA1C(201, (int)D_00176A88);
-    printf((int)D_00176B69);
-    l_18 = 1;
-L82D30:;
-    if (((int)(unsigned char)(*(signed char *)cfg_flags & 4)) != 0) goto L82D64;
-    func_0009DA1C(207, (int)D_00176A88);
-    printf((int)D_00176B82);
-    l_18 = 1;
-    goto L82D77;
-L82D64:;
-    if (((int)(unsigned char)*(signed char *)cfg_map_file) != 100) goto L82D77;
-    *(signed char *)player_environment = 3;
-L82D77:;
-    if (l_18 == 0) goto L82DA5;
-    func_0009DA1C(216, (int)D_00176A88);
-    printf((int)D_00176B9F);
-    exit(5);
-L82DA5:;
-    if (*(int *)mem_check_level == 0) goto L82DCE;
-    func_000A0ED9(221, (int)D_00176A88);
-    func_000A148C((int)D_00176BC1);
-    return;
-L82DCE:;
-    func_000A0ED9(223, (int)D_00176A88);
-    func_000A148C((int)D_00176BED);
-}
+        l_18 = 0;
+        func_0009DA1C(62, (int)D_00176A88);
+        l_1C = fopen(a1, (int)D_00176A8F);
+        if (l_1C != 0) {
+            while (fprintf_2(l_1C, (int)D_00176A91, (int)l_60, (int)l_40) != (-1)) {
+                if (stricmp((int)l_60, (int)D_00176A97) == 0) {
+                    mc_strncpy((int)D_001917E4, (int)l_40, 80, (int)D_00176A88, 70);
+                    if (((int)(unsigned char)D_001917E3[func_000A0DF4((int)D_001917E4)]) != 92) {
+                        func_000A1054((int)D_001917E4, (int)D_00176A9C, (int)D_00176A88, 72, 80);
+                    }
+                    mc_strncpy((int)D_00191884, (int)l_40, 80, (int)D_00176A88, 73);
+                    cfg_flags |= 1;
+                } else if (stricmp((int)l_60, (int)D_00176A9E) == 0) {
+                    mc_strncpy((int)D_00191834, (int)l_40, 80, (int)D_00176A88, 78);
+                    if (((int)(unsigned char)D_00191833[func_000A0DF4((int)D_00191834)]) != 92) {
+                        func_000A1054((int)D_00191834, (int)D_00176A9C, (int)D_00176A88, 80, 80);
+                    }
+                    mc_strncpy((int)D_00191884, (int)l_40, 80, (int)D_00176A88, 81);
+                    cfg_flags |= 1;
+                } else if (stricmp((int)l_60, (int)D_00176AA5) == 0) {
+                    mc_strncpy(D_001788E4, (int)l_40, 4, (int)D_00176A88, 86);
+                } else if (stricmp((int)l_60, (int)D_00176AAE) == 0) {
+                    cfg_fade_colour = atoi((int)l_40);
+                } else if (stricmp((int)l_60, (int)D_00176AB8) == 0) {
+                    mc_strncpy((int)&cfg_map_file, (int)l_40, 12, (int)D_00176A88, 94);
+                    cfg_flags |= 4;
+                } else if (stricmp((int)l_60, (int)D_00176AC0) == 0) {
+                    cfg_faction = atoi((int)l_40);
+                } else if (stricmp((int)l_60, (int)D_00176AC8) == 0) {
+                    cfg_fpu = atoi((int)l_40);
+                } else if (stricmp((int)l_60, (int)D_00176ACC) == 0) {
+                    cfg_start_map = atoi((int)l_40);
+                } else if (stricmp((int)l_60, (int)D_00176AD5) == 0) {
+                    cfg_artifact = atoi((int)l_40);
+                } else if (stricmp((int)l_60, (int)D_00176ADE) == 0) {
+                    cfg_facloop = atoi((int)l_40);
+                } else if (stricmp((int)l_60, (int)D_00176AE6) == 0) {
+                    mc_strncpy((int)classmaker_file, (int)l_40, 20, (int)D_00176A88, 119);
+                } else if (stricmp((int)l_60, (int)D_00176AED) == 0) {
+                    mc_strncpy((int)cfg_item_file, (int)l_40, 20, (int)D_00176A88, 123);
+                } else if (stricmp((int)l_60, (int)D_00176AF2) == 0) {
+                    cfg_gender = atoi((int)l_40);
+                } else if (stricmp((int)l_60, (int)D_00176AF9) == 0) {
+                    cfg_ps2fix = atoi((int)l_40);
+                } else if (stricmp((int)l_60, (int)D_00176B00) == 0) {
+                    cfg_user = atoi((int)l_40);
+                } else if (stricmp((int)l_60, (int)D_00176B05) == 0) {
+                    cfg_region = atoi((int)l_40);
+                } else if (stricmp((int)l_60, (int)D_00176B0C) == 0) {
+                    cfg_debug = atoi((int)l_40);
+                } else if (stricmp((int)l_60, (int)D_00176B12) == 0) {
+                    mc_strncpy((int)cfg_block_str, (int)l_40, 80, (int)D_00176A88, 147);
+                } else if (stricmp((int)l_60, (int)D_00176B1B) == 0) {
+                    cfg_helmet = atoi((int)l_40);
+                } else if (stricmp((int)l_60, (int)D_00176B22) == 0) {
+                    mc_strncpy((int)cfg_mapsave_file, (int)l_40, 80, (int)D_00176A88, 155);
+                } else if (stricmp((int)l_60, (int)D_00176B27) == 0) {
+                    cfg_show_markers = atoi((int)l_40);
+                } else if (stricmp((int)l_60, (int)D_00176B2E) == 0) {
+                    cfg_seed = atoi((int)l_40);
+                } else if (stricmp((int)l_60, (int)D_00176B33) == 0) {
+                    cfg_stereo = atoi((int)l_40);
+                } else if (stricmp((int)l_60, (int)D_00176B3A) == 0) {
+                    object_heap_size = atoi((int)l_40) << 10;
+                } else if (stricmp((int)l_60, (int)D_00176B45) == 0) {
+                    cfg_texture_memory = atoi((int)l_40);
+                } else if (stricmp((int)l_60, (int)D_00176B53) == 0) {
+                    cfg_magic_repair = atoi((int)l_40);
+                } else if (stricmp((int)l_60, (int)D_00176B5F) == 0) {
+                    cheat_mode = atoi((int)l_40);
+                }
+            }
+            func_0009DA1C(196, (int)D_00176A88);
+            fclose(l_1C);
+        }
+        if (((int)(unsigned char)(cfg_flags & 1)) == 0) {
+            func_0009DA1C(201, (int)D_00176A88);
+            printf((int)D_00176B69);
+            l_18 = 1;
+        }
+        if (((int)(unsigned char)(cfg_flags & 4)) == 0) {
+            func_0009DA1C(207, (int)D_00176A88);
+            printf((int)D_00176B82);
+            l_18 = 1;
+        } else if (((int)(unsigned char)cfg_map_file) == 100) {
+            player_environment = 3;
+        }
+        if (l_18 != 0) {
+            func_0009DA1C(216, (int)D_00176A88);
+            printf((int)D_00176B9F);
+            exit(5);
+        }
+        if (mem_check_level != 0) {
+            func_000A0ED9(221, (int)D_00176A88);
+            func_000A148C((int)D_00176BC1);
+            return;
+        }
+        func_000A0ED9(223, (int)D_00176A88);
+        func_000A148C((int)D_00176BED);
+    }
 }
 
 void world_draw_objects(void)
@@ -318,68 +262,61 @@ void world_draw_objects(void)
     struct record *l_1C;
     unsigned short l_18;
 
-    *(signed char *)D_001A949C = *(signed char *)(climate_weathers + climate_category());
-    *(signed char *)D_001A949D = 0;
-    *(int *)free_later_count = 0;
-    *(int *)D_00195D5C = 0;
-    if (*(signed char *)D_001961AE == 0) goto L82E42;
-    object_draw_cb((struct record *)D_001961AE);
-L82E42:;
-    if (((int)(unsigned char)*(signed char *)player_environment) >= 3) goto L82F56;
-    if (((struct bf8_0_1 *)&player_motion_flags)->f != 0) goto L82E9C;
-    if ((player_character->conditions & 0x10) == 0) goto L82E70;
-    func_00086149();
-    goto L82E9C;
-L82E70:;
-    func_00136AD8(player_object->x, player_object->y - 60, player_object->z, 16, 128, 0);
-L82E9C:;
-    if (player_object->parent->type == 1) goto L82EC7;
-    object_foreach_open(player_object->parent->children, (int)object_draw_cb);
-    goto L82ED6;
-L82EC7:;
-    func_0007EB0B(player_object, (int)object_draw_cb);
-L82ED6:;
-    l_20 = D_00195AC4->children;
-L82EE1:;
-    if (l_20 == 0) goto L82F40;
-    l_24 = l_20->next;
-    l_1C = l_20->children;
-    l_18 = l_20->flags;
-    if (l_20->type == 38) goto L82F38;
-    object_draw_cb(l_20);
-    if (((int)(unsigned short)(*(int *)&l_18 & 1)) != 0) goto L82F38;
-    object_foreach_open(l_1C, (int)object_draw_cb);
-L82F38:;
-    l_20 = l_24;
-    goto L82EE1;
-L82F40:;
-    if (((int)(unsigned char)*(signed char *)player_environment) != 1) goto L82F51;
-    func_00034EC1();
-L82F51:;
-    goto L83019;
-L82F56:;
-    if (((struct bf8_0_1 *)&player_motion_flags)->f != 0) goto L82FA0;
-    if ((player_character->conditions & 0x10) == 0) goto L82F74;
-    func_00086149();
-    goto L82FA0;
-L82F74:;
-    func_00136AD8(player_object->x, player_object->y - 60, player_object->z, 16, 128, 0);
-L82FA0:;
-    func_0007E815(player_object, (int)object_draw_cb);
-    l_20 = D_00195AC4->children;
-L82FBA:;
-    if (l_20 == 0) goto L83019;
-    l_24 = l_20->next;
-    l_1C = l_20->children;
-    l_18 = l_20->flags;
-    if (l_20->type == 47) goto L83011;
-    object_draw_cb(l_20);
-    if (((int)(unsigned short)(*(int *)&l_18 & 1)) != 0) goto L83011;
-    object_foreach_open(l_1C, (int)object_draw_cb);
-L83011:;
-    l_20 = l_24;
-    goto L82FBA;
-L83019:;
+    D_001A949C = climate_weathers[climate_category()];
+    D_001A949D = 0;
+    free_later_count = 0;
+    D_00195D5C = 0;
+    if (D_001961AE != 0) object_draw_cb((struct record *)&D_001961AE);
+    if (((int)player_environment) < 3) {
+        if (((struct bf8_0_1 *)&player_motion_flags)->f == 0) {
+            if ((player_character->conditions & 0x10) != 0) {
+                func_00086149();
+            } else {
+                func_00136AD8(player_object->x, player_object->y - 60, player_object->z, 16, 128, 0);
+            }
+        }
+        if (player_object->parent->type != 1) {
+            object_foreach_open(player_object->parent->children, (int)object_draw_cb);
+        } else {
+            func_0007EB0B(player_object, (int)object_draw_cb);
+        }
+        l_20 = D_00195AC4->children;
+        while (l_20 != 0) {
+            l_24 = l_20->next;
+            l_1C = l_20->children;
+            l_18 = l_20->flags;
+            if (l_20->type != 38) {
+                object_draw_cb(l_20);
+                if (((int)(unsigned short)(*(int *)&l_18 & 1)) == 0) {
+                    object_foreach_open(l_1C, (int)object_draw_cb);
+                }
+            }
+            l_20 = l_24;
+        }
+        if (((int)player_environment) == 1) func_00034EC1();
+    } else {
+        if (((struct bf8_0_1 *)&player_motion_flags)->f == 0) {
+            if ((player_character->conditions & 0x10) != 0) {
+                func_00086149();
+            } else {
+                func_00136AD8(player_object->x, player_object->y - 60, player_object->z, 16, 128, 0);
+            }
+        }
+        func_0007E815(player_object, (int)object_draw_cb);
+        l_20 = D_00195AC4->children;
+        while (l_20 != 0) {
+            l_24 = l_20->next;
+            l_1C = l_20->children;
+            l_18 = l_20->flags;
+            if (l_20->type != 47) {
+                object_draw_cb(l_20);
+                if (((int)(unsigned short)(*(int *)&l_18 & 1)) == 0) {
+                    object_foreach_open(l_1C, (int)object_draw_cb);
+                }
+            }
+            l_20 = l_24;
+        }
+    }
     spell_cast_queued_run();
     object_free_pending();
 }
@@ -392,8 +329,8 @@ void rotate_xz(int a1, int a2, int a3)
     l_14 = *(int *)((char *)a1);
     l_10 = *(int *)((char *)a2);
     a3 &= 2047;
-    *(int *)((char *)a1) = func_000CE74F(l_14, *(int *)(D_00150A00 + (a3 << 2))) - func_000CE74F(l_10, *(int *)(D_00150200 + (a3 << 2)));
-    *(int *)((char *)a2) = func_000CE74F(l_10, *(int *)(D_00150A00 + (a3 << 2))) + func_000CE74F(l_14, *(int *)(D_00150200 + (a3 << 2)));
+    *(int *)((char *)a1) = func_000CE74F(l_14, D_00150A00[a3]) - func_000CE74F(l_10, D_00150200[a3]);
+    *(int *)((char *)a2) = func_000CE74F(l_10, D_00150A00[a3]) + func_000CE74F(l_14, D_00150200[a3]);
 }
 
 int automap_draw_object_cb(struct record *a1)
@@ -409,137 +346,76 @@ int automap_draw_object_cb(struct record *a1)
     int l_20;
     short l_18;
 
-    if (*(signed char *)D_001A949D == 0) goto L83F05;
-    return 1;
-L83F05:;
-    if ((a1->flags & 512) == 0) goto L83F26;
-    return 0;
-L83F26:;
-    if ((a1->flags & 1024) == 0) goto L83F47;
-    return 0;
-L83F47:;
-    if (((int)(unsigned char)*(signed char *)player_environment) == 2) goto L84005;
-    if (a1->type != 34) goto L83F7F;
-    if (((a1->image & 31) - 2) == 8) goto L83F81;
-L83F7F:;
-    goto L83F86;
-L83F81:;
-    goto L84005;
-L83F86:;
-    if ((a1->flags & 128) != 0) goto L83FA4;
-    if (((struct bf8_4_1 *)&cheat_flags)->f == 0) goto L83FA6;
-L83FA4:;
-    goto L83FB2;
-L83FA6:;
-    return 0;
-L83FB2:;
-    if (a1->type == 6) goto L83FD0;
-    if (a1->type != 32) goto L83FD2;
-L83FD0:;
-    goto L83FDE;
-L83FD2:;
-    return 0;
-L83FDE:;
-    *(int *)&l_18 = 1132;
-    if ((int)D_00196DB0 != (int)a1) goto L83FF7;
-    if (((struct bf8_3_1 *)(*(char **)&l_18))->f == 0) goto L83FF9;
-L83FF7:;
-    goto L84005;
-L83FF9:;
-    return 0;
-L84005:;
-    if (func_0009DEAC(a1->y - *(int *)D_00190BE8) <= 700) goto L84029;
-    return 0;
-L84029:;
-    if (func_000C7FD9(a1->x, a1->z, *(int *)D_00190BE4, *(int *)D_00190BEC) <= 2048) goto L84059;
-    return 0;
-L84059:;
+    if (D_001A949D != 0) return 1;
+    if ((a1->flags & 512) != 0) return 0;
+    if ((a1->flags & 1024) != 0) return 0;
+    if (((int)player_environment) != 2) {
+        if (a1->type == 34 && ((a1->image & 31) - 2) == 8) {
+        } else {
+            if ((a1->flags & 128) == 0 && ((struct bf8_4_1 *)&cheat_flags)->f == 0) return 0;
+            if (a1->type != 6 && a1->type != 32) return 0;
+            *(int *)&l_18 = 1132;
+            if ((int)D_00196DB0 == (int)a1 && ((struct bf8_3_1 *)(*(char **)&l_18))->f == 0) {
+                return 0;
+            }
+        }
+    }
+    if (func_0009DEAC(a1->y - D_00190BE8) > 700) return 0;
+    if (func_000C7FD9(a1->x, a1->z, *(int *)D_00190BE4, D_00190BEC) > 2048) return 0;
     a1->draw_handle = 0;
-    *(int *)D_000C5404 = 0;
+    D_000C5404 = 0;
     switch (a1->type) {
-case 34:
-    if (*(signed char *)cfg_show_markers == 0) goto L843CC;
-    if (a1->image == 0) goto L840F3;
-    if (a1->image != 65535) goto L840F8;
+    case 34:
+        if (cfg_show_markers == 0) break;
+        if (a1->image == 0) goto L840F3;
+        if (a1->image != 65535) goto L840F8;
 L840F3:;
-    goto L843CC;
+        break;
 L840F8:;
-    a1->draw_handle = func_00154D00(a1->x, a1->y, a1->z, a1->image, -1, 4, 4129024);
-    goto L843CC;
-case 43:
-    l_3C = (int)RECORD_DATA(a1);
-    l_34 = *(int *)((char *)l_3C + 5);
-    l_38 = *(int *)((char *)l_3C + 9);
-    l_28 = 0;
-L84150:;
-    if (((int)(unsigned char)*(signed char *)((char *)l_3C)) > l_28) goto L84173;
-    goto L841D5;
-L84164:;
-    l_28++;
-    (*(char (**)[66])&l_34)++;
-    goto L84150;
-L84173:;
-    if (func_0009DEAC(*(int *)((char *)l_34 + 40) - *(int *)D_00190BE8) > 100) goto L84164;
-    *(int *)((char *)l_34 + 4) = model_get((int)(unsigned short)*(short *)((char *)l_34), (int)(unsigned char)*(signed char *)((char *)l_34 + 2), (((int)(unsigned char)*(signed char *)current_climate) << 2) + ((int)(unsigned char)*(signed char *)D_001A949C));
-    if (*(int *)((char *)l_34 + 4) == 0) goto L841D3;
-    func_001401D4(l_34 + 4, 0);
-L841D3:;
-    goto L84164;
-case 6:
-case 32:
-L841D5:;
-    if (a1->image2 == 0) goto L843CC;
-    l_40 = (int)RECORD_DATA(a1);
-    *(int *)((char *)l_40) = model_get(a1->image2, a1->image, (((int)(unsigned char)*(signed char *)current_climate) << 2) + ((int)(unsigned char)*(signed char *)D_001A949C));
-    if (*(int *)((char *)l_40) == 0) goto L84330;
-    *(int *)((char *)l_40 + 32) = a1->x;
-    *(int *)((char *)l_40 + 36) = a1->y;
-    *(int *)((char *)l_40 + 40) = a1->z;
-    if (a1->image2 != 998) goto L842A7;
-    if (weapon_arrow_update(a1) == 0) goto L843CC;
-    func_00073ADF(a1);
-    *(int *)((char *)l_40 + 44) = a1->missile_yaw;
-    *(int *)((char *)l_40 + 48) = a1->angle_z;
-    *(int *)((char *)l_40 + 52) = 0;
-    goto L84326;
-L842A7:;
-    if (a1->link_flag == 255) goto L842CD;
-    func_000C7F98(l_40 + 12, a1->wait_state);
-    goto L84326;
-L842CD:;
-    if (a1->image2 != 610) goto L842F1;
-    if (a1->image == 32) goto L842F3;
-L842F1:;
-    goto L842FD;
-L842F3:;
-    *(int *)D_000C5404 = 3;
-L842FD:;
-    func_000C7F14(l_40 + 12, a1->angle_x, a1->yaw + a1->wait_state, a1->angle_z);
-L84326:;
-    func_001401D4(l_40, 0);
-L84330:;
-    goto L843CC;
-case 56:
-    l_34 = (int)RECORD_DATA(a1);
-    l_28 = 0;
-L84345:;
-    if (a1->image > l_28) goto L8436A;
-    goto L843CC;
-L8435B:;
-    l_28++;
-    (*(char (**)[66])&l_34)++;
-    goto L84345;
-L8436A:;
-    if (func_0009DEAC(*(int *)((char *)l_34 + 40) - *(int *)D_00190BE8) > 100) goto L8435B;
-    *(int *)((char *)l_34 + 4) = model_get((int)(unsigned short)*(short *)((char *)l_34), (int)(unsigned char)*(signed char *)((char *)l_34 + 2), (((int)(unsigned char)*(signed char *)current_climate) << 2) + ((int)(unsigned char)*(signed char *)D_001A949C));
-    if (*(int *)((char *)l_34 + 4) == 0) goto L843CA;
-    func_001401D4(l_34 + 4, 0);
-L843CA:;
-    goto L8435B;
-default:
-L843CC:;
+        a1->draw_handle = func_00154D00(a1->x, a1->y, a1->z, a1->image, -1, 4, 4129024);
+        break;
+    case 43:
+        l_3C = (int)RECORD_DATA(a1);
+        l_34 = *(int *)((char *)l_3C + 5);
+        l_38 = *(int *)((char *)l_3C + 9);
+        for (l_28 = 0; ((int)(unsigned char)*(signed char *)((char *)l_3C)) > l_28; l_28++, (*(char (**)[66])&l_34)++) {
+            if (func_0009DEAC(*(int *)((char *)l_34 + 40) - D_00190BE8) > 100) continue;
+            *(int *)((char *)l_34 + 4) = model_get((int)(unsigned short)*(short *)((char *)l_34), (int)(unsigned char)*(signed char *)((char *)l_34 + 2), (((int)(unsigned char)current_climate) << 2) + ((int)(unsigned char)D_001A949C));
+            if (*(int *)((char *)l_34 + 4) != 0) func_001401D4(l_34 + 4, 0);
+        }
+    case 6:
+    case 32:
+        if (a1->image2 == 0) break;
+        l_40 = (int)RECORD_DATA(a1);
+        *(int *)((char *)l_40) = model_get(a1->image2, a1->image, (((int)(unsigned char)current_climate) << 2) + ((int)(unsigned char)D_001A949C));
+        if (*(int *)((char *)l_40) != 0) {
+            *(int *)((char *)l_40 + 32) = a1->x;
+            *(int *)((char *)l_40 + 36) = a1->y;
+            *(int *)((char *)l_40 + 40) = a1->z;
+            if (a1->image2 == 998) {
+                if (weapon_arrow_update(a1) == 0) break;
+                func_00073ADF(a1);
+                *(int *)((char *)l_40 + 44) = a1->missile_yaw;
+                *(int *)((char *)l_40 + 48) = a1->angle_z;
+                *(int *)((char *)l_40 + 52) = 0;
+            } else if (a1->link_flag != 255) {
+                func_000C7F98(l_40 + 12, a1->wait_state);
+            } else {
+                if (a1->image2 == 610 && a1->image == 32) D_000C5404 = 3;
+                func_000C7F14(l_40 + 12, a1->angle_x, a1->yaw + a1->wait_state, a1->angle_z);
+            }
+            func_001401D4(l_40, 0);
+        }
+        break;
+    case 56:
+        l_34 = (int)RECORD_DATA(a1);
+        for (l_28 = 0; a1->image > l_28; l_28++, (*(char (**)[66])&l_34)++) {
+            if (func_0009DEAC(*(int *)((char *)l_34 + 40) - D_00190BE8) > 100) continue;
+            *(int *)((char *)l_34 + 4) = model_get((int)(unsigned short)*(short *)((char *)l_34), (int)(unsigned char)*(signed char *)((char *)l_34 + 2), (((int)(unsigned char)current_climate) << 2) + ((int)(unsigned char)D_001A949C));
+            if (*(int *)((char *)l_34 + 4) != 0) func_001401D4(l_34 + 4, 0);
+        }
+    }
     return 0;
-}
 }
 
 struct record *rmb_make_light(struct record *a1, int a2, int a3)
@@ -560,27 +436,19 @@ void rmb_add_doors(struct record *a1, struct block_door *a2)
     struct record *l_18;
     int l_14;
 
-    if (*(signed char *)(*(char **)rmb_record_ptr + 4) == 0) return;
-    l_14 = 0;
-L847E5:;
-    if (((int)(unsigned char)*(signed char *)(*(char **)rmb_record_ptr + 4)) > l_14) goto L8480B;
-    return;
-L847FC:;
-    l_14++;
-    a2++;
-    goto L847E5;
-L8480B:;
-    l_18 = rmb_make_door(a1, a2->image2, (int)(short)((unsigned short)a2->image), 1);
-    func_000C7F07(0, (a2->yaw + *(int *)D_001967FC) % 2048, 0, (int)RECORD_DATA(l_18) + 12);
-    l_18->lock_level = (unsigned short)a2->lock_level;
-    rotate_xz((int)&a2->x, (int)&a2->z, *(int *)D_001967FC);
-    a2->x += *(int *)D_001967F8;
-    l_18->x = a2->x;
-    a2->z += *(int *)D_001967F0;
-    l_18->z = a2->z;
-    a2->y += *(int *)D_001967F4;
-    l_18->y = a2->y;
-    goto L847FC;
+    if (*(signed char *)(rmb_record_ptr + 4) == 0) return;
+    for (l_14 = 0; ((int)(unsigned char)*(signed char *)(rmb_record_ptr + 4)) > l_14; l_14++, a2++) {
+        l_18 = rmb_make_door(a1, a2->image2, (int)(short)((unsigned short)a2->image), 1);
+        func_000C7F07(0, (a2->yaw + *(int *)D_001967FC) % 2048, 0, (int)RECORD_DATA(l_18) + 12);
+        l_18->lock_level = (unsigned short)a2->lock_level;
+        rotate_xz((int)&a2->x, (int)&a2->z, *(int *)D_001967FC);
+        a2->x += D_001967F8;
+        l_18->x = a2->x;
+        a2->z += D_001967F0;
+        l_18->z = a2->z;
+        a2->y += D_001967F4;
+        l_18->y = a2->y;
+    }
 }
 
 void rmb_add_people(struct record *a1, struct block_flat *a2)
@@ -588,32 +456,18 @@ void rmb_add_people(struct record *a1, struct block_flat *a2)
     struct record *l_18;
     int l_14;
 
-    if (*(signed char *)(*(char **)rmb_record_ptr + 3) == 0) return;
-    l_14 = 0;
-L848F3:;
-    if (((int)(unsigned char)*(signed char *)(*(char **)rmb_record_ptr + 3)) > l_14) goto L84919;
-    return;
-L8490A:;
-    l_14++;
-    a2++;
-    goto L848F3;
-L84919:;
-    l_18 = rmb_make_flat(a1, (int)(short)a2->image, (int)(short)a2->faction_id, 0);
-    rotate_xz((int)&a2->x, (int)&a2->z, *(int *)D_001967FC);
-    a2->x += *(int *)D_001967F8;
-    l_18->x = a2->x;
-    a2->z += *(int *)D_001967F0;
-    l_18->z = a2->z;
-    a2->y += *(int *)D_001967F4;
-    l_18->y = a2->y;
-    if (((int)(unsigned char)(a2->flags & 4)) == 0) goto L849A6;
-    l_18->data.person.flags |= 8;
-L849A6:;
-    if (((int)(unsigned char)(a2->flags & 8)) == 0) goto L849BE;
-    l_18->data.person.flags |= 32;
-L849BE:;
-    if (((int)(unsigned char)(a2->flags & 32)) == 0) goto L849D6;
-    l_18->data.person.flags |= 16;
-L849D6:;
-    goto L8490A;
+    if (*(signed char *)(rmb_record_ptr + 3) == 0) return;
+    for (l_14 = 0; ((int)(unsigned char)*(signed char *)(rmb_record_ptr + 3)) > l_14; l_14++, a2++) {
+        l_18 = rmb_make_flat(a1, (int)(short)a2->image, (int)(short)a2->faction_id, 0);
+        rotate_xz((int)&a2->x, (int)&a2->z, *(int *)D_001967FC);
+        a2->x += D_001967F8;
+        l_18->x = a2->x;
+        a2->z += D_001967F0;
+        l_18->z = a2->z;
+        a2->y += D_001967F4;
+        l_18->y = a2->y;
+        if (((int)(unsigned char)(a2->flags & 4)) != 0) l_18->data.person.flags |= 8;
+        if (((int)(unsigned char)(a2->flags & 8)) != 0) l_18->data.person.flags |= 32;
+        if (((int)(unsigned char)(a2->flags & 32)) != 0) l_18->data.person.flags |= 16;
+    }
 }

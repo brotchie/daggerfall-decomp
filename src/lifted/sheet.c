@@ -5,13 +5,13 @@
 struct bf8_2_1 { unsigned char _:2; unsigned char f:1; };
 #include "records.h"
 
-extern char mouse_buttons[];
-extern char mouse_x[];
-extern char mouse_y[];
-extern char text_shadow_colour[];
-extern char D_0012B508[];
-extern char D_0012DA44[];
-extern char key_down_esc[];
+extern signed char mouse_buttons;
+extern short mouse_x;
+extern short mouse_y;
+extern signed char text_shadow_colour;
+extern signed char D_0012B508;
+extern short D_0012DA44;
+extern signed char key_down_esc;
 extern char D_00170C40[];
 extern char D_00170C67[];
 extern char D_00170C79[];
@@ -23,63 +23,63 @@ extern char D_00170CEC[];
 extern char D_00170CFD[];
 extern char D_00170D0F[];
 extern char D_00170D4C[];
-extern char D_00178A08[];
-extern char skill_advance_multipliers[];
+extern short D_00178A08;
+extern short skill_advance_multipliers[];
 extern char sheet_buttons[];
 extern char D_0017B508[];
 extern char D_0017B50A[];
 extern char D_0017B50C[];
 extern char D_0017B50E[];
-extern char D_0017B604[];
-extern char D_0017B608[];
-extern char D_0017B610[];
-extern char D_0017B614[];
+extern short D_0017B604;
+extern short D_0017B608;
+extern short D_0017B610;
+extern short D_0017B614;
 extern char skill_names[];
-extern char skill_governing_attributes[];
-extern char attribute_abbrevs[];
-extern char D_0017CEF2[];
-extern char D_0017D1EA[];
-extern char D_00182682[];
-extern char D_00184225[];
-extern char D_00185073[];
-extern char D_00187CA8[];
-extern char text_buffer[];
-extern char D_001903A5[];
+extern signed char skill_governing_attributes[];
+extern int attribute_abbrevs[];
+extern char *D_0017CEF2[];
+extern int D_0017D1EA;
+extern int D_00182682;
+extern int D_00184225;
+extern int D_00185073;
+extern signed char D_00187CA8;
+extern signed char text_buffer[];
+extern signed char D_001903A5;
 extern char D_00190BE4[];
-extern char D_00190C34[];
+extern int D_00190C34;
 extern char D_00190D64[];
-extern char D_00190D6A[];
-extern char D_00190D8C[];
+extern short D_00190D6A;
+extern short D_00190D8C[];
 extern char text_macro_fpc[];
-extern char D_001940D4[];
-extern char D_001940D8[];
-extern char D_001940D9[];
+extern signed char D_001940D4;
+extern signed char D_001940D8;
+extern signed char D_001940D9;
 extern struct record *player_entity;
 extern struct record *player_object;
-extern char creature_count[];
-extern char D_00195B5C[];
+extern int creature_count;
+extern int D_00195B5C;
 extern char D_00195B84[];
 extern struct character *player_character;
-extern char window_image[];
+extern int window_image;
 extern struct career *player_class;
-extern char game_minutes[];
-extern char D_00195C44[];
-extern char D_00195D30[];
+extern int game_minutes;
+extern int D_00195C44;
+extern int D_00195D30;
 extern char D_00195D6C[];
-extern char D_00195D78[];
-extern char D_00195F36[];
-extern char D_0019626C[];
-extern char D_0019626F[];
-extern char D_00196271[];
-extern char D_00196272[];
-extern char game_mode[];
-extern char mouse_buttons_prev[];
-extern char D_001962A2[];
-extern char D_001962A7[];
-extern char D_00199638[];
-extern char D_0019963C[];
-extern char D_00199640[];
-extern char D_00199644[];
+extern int D_00195D78;
+extern short D_00195F36;
+extern signed char D_0019626C;
+extern unsigned char D_0019626F;
+extern unsigned char D_00196271;
+extern signed char D_00196272;
+extern signed char game_mode;
+extern signed char mouse_buttons_prev;
+extern signed char D_001962A2;
+extern char D_001962A7;
+extern int D_00199638;
+extern int D_0019963C;
+extern int D_00199640;
+extern signed char D_00199644;
 extern struct membership *guild_membership;
 
 extern struct faction *faction_find(short);
@@ -142,57 +142,36 @@ int sheet_close(void)
     int l_20;
     int l_1C;
 
-    if (((struct bf8_2_1 *)&D_001940D9)->f == 0) goto L3B457;
-    if (*(short *)D_00190D64 != 0) goto L3B459;
-L3B457:;
-    goto L3B4AF;
-L3B459:;
-    l_20 = 0;
-    l_1C = l_20;
-L3B466:;
-    if (l_20 < 8) goto L3B476;
-    goto L3B48B;
-L3B46E:;
-    l_20++;
-    goto L3B466;
-L3B476:;
-    l_1C += player_character->attributes[l_20];
-    goto L3B46E;
-L3B48B:;
-    if (l_1C >= 800) goto L3B4AF;
-    msgbox_show_string(*(int *)D_00184225, 1);
-    return 0;
-L3B4AF:;
-    if (*(signed char *)key_down_esc != 0) goto L3B4AF;
+    if (((struct bf8_2_1 *)&D_001940D9)->f != 0 && *(short *)D_00190D64 != 0) {
+        l_20 = 0;
+        l_1C = l_20;
+        for (; l_20 < 8; l_20++) {
+            l_1C += player_character->attributes[l_20];
+        }
+        if (l_1C < 800) {
+            msgbox_show_string(D_00184225, 1);
+            return 0;
+        }
+    }
+    do {
+    } while (key_down_esc != 0);
     player_character->skills_raised_lo = (player_character->skills_raised_hi = 0);
-    *(signed char *)D_00187CA8 = 1;
-    *(signed char *)D_001940D9 &= 251;
-    *(signed char *)game_mode = 0;
-    if (*(int *)window_image == 0) goto L3B4F9;
-    if (*(int *)window_image != (-1751672937)) goto L3B4FB;
-L3B4F9:;
-    goto L3B519;
-L3B4FB:;
-    mc_free(*(int *)window_image, (int)D_00170C67, 128);
-    *(int *)window_image = -1751672937;
-L3B519:;
-    if (*(int *)D_00199638 == 0) goto L3B52E;
-    if (*(int *)D_00199638 != (-1751672937)) goto L3B530;
-L3B52E:;
-    goto L3B54E;
-L3B530:;
-    mc_free(*(int *)D_00199638, (int)D_00170C67, 129);
-    *(int *)D_00199638 = -1751672937;
-L3B54E:;
-    if (*(int *)D_00195B5C == 0) goto L3B563;
-    if (*(int *)D_00195B5C != (-1751672937)) goto L3B565;
-L3B563:;
-    goto L3B583;
-L3B565:;
-    mc_free(*(int *)D_00195B5C, (int)D_00170C67, 130);
-    *(int *)D_00195B5C = -1751672937;
-L3B583:;
-    *(signed char *)D_00196272 = 0;
+    D_00187CA8 = 1;
+    D_001940D9 &= 251;
+    game_mode = 0;
+    if (window_image != 0 && window_image != (-1751672937)) {
+        mc_free(window_image, (int)D_00170C67, 128);
+        window_image = -1751672937;
+    }
+    if (D_00199638 != 0 && D_00199638 != (-1751672937)) {
+        mc_free(D_00199638, (int)D_00170C67, 129);
+        D_00199638 = -1751672937;
+    }
+    if (D_00195B5C != 0 && D_00195B5C != (-1751672937)) {
+        mc_free(D_00195B5C, (int)D_00170C67, 130);
+        D_00195B5C = -1751672937;
+    }
+    D_00196272 = 0;
     return 1;
 }
 
@@ -201,64 +180,32 @@ void sheet_update(void)
     int l_18;
 
     if (sheet_open(0) == 0) return;
-    func_000CB552(*(int *)window_image);
+    func_000CB552(window_image);
     paperdoll_draw(0, 0);
     func_0012DB50(4);
     sheet_draw();
-    if (*(signed char *)key_down_esc == 0) goto L3B5EB;
-    sheet_close();
-L3B5EB:;
-    if (*(signed char *)mouse_buttons == 0) goto L3B608;
-    if (*(signed char *)mouse_buttons == 0) goto L3B606;
-    if (*(signed char *)mouse_buttons_prev != 0) goto L3B608;
-L3B606:;
-    goto L3B60D;
-L3B608:;
-    return;
-L3B60D:;
-    *(signed char *)D_0012B508 = 146;
-    *(signed char *)text_shadow_colour = 92;
-    l_18 = 0;
-L3B622:;
-    if (l_18 < 23) goto L3B635;
-    return;
-L3B62D:;
-    l_18++;
-    goto L3B622;
-L3B635:;
-    if (*(short *)mouse_x <= *(short *)(sheet_buttons + (l_18 * 12))) goto L3B65D;
-    if (*(short *)mouse_x < *(short *)(D_0017B50A + (l_18 * 12))) goto L3B65F;
-L3B65D:;
-    goto L3B673;
-L3B65F:;
-    if (*(short *)mouse_y > *(short *)(D_0017B508 + (l_18 * 12))) goto L3B675;
-L3B673:;
-    goto L3B689;
-L3B675:;
-    if (*(short *)mouse_y < *(short *)(D_0017B50C + (l_18 * 12))) goto L3B68B;
-L3B689:;
-    goto L3B6C0;
-L3B68B:;
-    if (l_18 >= 12) goto L3B69A;
-    if (((struct bf8_2_1 *)&D_001940D9)->f != 0) goto L3B69C;
-L3B69A:;
-    goto L3B69E;
-L3B69C:;
-    goto L3B62D;
-L3B69E:;
-    sound_play(203, player_object, 110);
-    ((int (*)())(*(int *)(D_0017B50E + (l_18 * 12))))(l_18);
-L3B6C0:;
-    goto L3B62D;
+    if (key_down_esc != 0) sheet_close();
+    if (mouse_buttons == 0 || (mouse_buttons != 0 && mouse_buttons_prev != 0)) {
+        return;
+    }
+    D_0012B508 = 146;
+    text_shadow_colour = 92;
+    for (l_18 = 0; l_18 < 23; l_18++) {
+        if (mouse_x > *(short *)(sheet_buttons + (l_18 * 12)) && mouse_x < *(short *)(D_0017B50A + (l_18 * 12)) && mouse_y > *(short *)(D_0017B508 + (l_18 * 12)) && mouse_y < *(short *)(D_0017B50C + (l_18 * 12))) {
+            if (l_18 < 12 && ((struct bf8_2_1 *)&D_001940D9)->f != 0) continue;
+            sound_play(203, player_object, 110);
+            ((int (*)())(*(int *)(D_0017B50E + (l_18 * 12))))(l_18);
+        }
+    }
 }
 
 void sheet_rename(void)
 {
     int l_18;
 
-    l_18 = *(int *)D_00195C44 + 55000;
+    l_18 = D_00195C44 + 55000;
     func_000A0ED9(232, (int)D_00170C67);
-    mc_sprintf(l_18, (int)D_00170C79, *(int *)D_0017D1EA);
+    mc_sprintf(l_18, (int)D_00170C79, D_0017D1EA);
     *(signed char *)((char *)(func_000A0DF4(l_18) + l_18) + 1) = 0;
     inpstr_begin_text(player_character->name, 23);
     msgbox_show_string(l_18, 2);
@@ -266,14 +213,10 @@ void sheet_rename(void)
 
 void sheet_button_inventory(void)
 {
-L3BB56:;
-    if (*(signed char *)mouse_buttons == 0) goto L3BB66;
-    func_0012B136();
-    goto L3BB56;
-L3BB66:;
+    while (mouse_buttons != 0) func_0012B136();
     sheet_close();
     inventory_open(1, 0, 2);
-    *(signed char *)D_001940D8 |= 32;
+    D_001940D8 |= 32;
 }
 
 void sheet_affiliation_line(struct record *a1)
@@ -285,38 +228,34 @@ void sheet_affiliation_line(struct record *a1)
     l_1C = &a1->data.membership;
     l_18 = faction_find(l_1C->faction);
     func_000A0ED9(255, (int)D_00170C67);
-    mc_sprintf((int)text_buffer, (int)D_00170CA7, l_18->name, *(int *)((char *)(int)(*(char **)(D_0017CEF2 + (((int)(unsigned char)(l_1C->kind & 31)) << 2)) + (l_1C->rank << 2))));
-    func_000A1054(*(int *)D_0019963C, (int)text_buffer, (int)D_00170C67, 256, 4);
-    (*(short *)D_00195F36)++;
+    mc_sprintf((int)text_buffer, (int)D_00170CA7, l_18->name, *(int *)((char *)(int)(D_0017CEF2[((int)(unsigned char)(l_1C->kind & 31))] + (l_1C->rank << 2))));
+    func_000A1054(D_0019963C, (int)text_buffer, (int)D_00170C67, 256, 4);
+    (D_00195F36)++;
 }
 
 void sheet_show_affiliations(void)
 {
-    *(short *)D_00195F36 = 0;
-    *(int *)D_0019963C = *(int *)D_00195C44 + 55000;
+    D_00195F36 = 0;
+    D_0019963C = D_00195C44 + 55000;
     func_000A0ED9(264, (int)D_00170C67);
-    mc_sprintf(*(int *)D_0019963C, (int)D_00170CB1, *(int *)D_00182682);
+    mc_sprintf(D_0019963C, (int)D_00170CB1, D_00182682);
     object_foreach(player_entity->children, (int)sheet_affiliation_line);
-    if (*(short *)D_00195F36 != 0) goto L3BCC5;
-    msgbox_show_rsc(19, 1);
-    return;
-L3BCC5:;
-    *(short *)D_00178A08 = 250;
-    *(signed char *)((char *)(int)(func_000A0DF4(*(int *)D_0019963C) + *(char **)D_0019963C) - 1) = 0;
-    msgbox_show_string(*(int *)D_0019963C, 1);
-    *(short *)D_00178A08 = 310;
+    if (D_00195F36 == 0) {
+        msgbox_show_rsc(19, 1);
+        return;
+    }
+    D_00178A08 = 250;
+    *(signed char *)((char *)(int)(func_000A0DF4(D_0019963C) + *(char **)&D_0019963C) - 1) = 0;
+    msgbox_show_string(D_0019963C, 1);
+    D_00178A08 = 310;
 }
 
 void sheet_button_spellbook(void)
 {
-L3BD14:;
-    if (*(signed char *)mouse_buttons == 0) goto L3BD24;
-    func_0012B136();
-    goto L3BD14;
-L3BD24:;
+    while (mouse_buttons != 0) func_0012B136();
     sheet_close();
     spellbook_open(1);
-    *(signed char *)D_001940D8 |= 32;
+    D_001940D8 |= 32;
 }
 
 void sheet_show_primary_skills(void)
@@ -336,23 +275,20 @@ void sheet_show_minor_skills(void)
 
 void sheet_format_skill(int a1, short a2, int a3)
 {
-{
-    int l_1C;
+    {
+        int l_1C;
 
-    if (((int)(short)a2) != 30) goto L3C035;
-    *(signed char *)D_00199644 = 1;
-L3C035:;
-    func_000A0ED9(349, (int)D_00170C67);
-    mc_sprintf((int)text_buffer, (int)D_00170CDB, *(int *)(skill_names + (((int)(short)a2) << 2)), player_character->skills[(int)(short)a2].value, *(int *)(attribute_abbrevs + (((int)(unsigned char)*(signed char *)(skill_governing_attributes + ((int)(short)a2))) << 2)));
-    if (a3 == 0) goto L3C0A3;
-    l_1C = 96;
-    goto L3C0AA;
-L3C0A3:;
-    l_1C = 145;
-L3C0AA:;
-    *(signed char *)D_001903A5 = *(signed char *)&l_1C;
-    func_000A1054(a1, (int)text_buffer, (int)D_00170C67, 351, 4);
-}
+        if (((int)(short)a2) == 30) D_00199644 = 1;
+        func_000A0ED9(349, (int)D_00170C67);
+        mc_sprintf((int)text_buffer, (int)D_00170CDB, *(int *)(skill_names + (((int)(short)a2) << 2)), player_character->skills[(int)(short)a2].value, attribute_abbrevs[((int)(unsigned char)skill_governing_attributes[(int)(short)a2])]);
+        if (a3 != 0) {
+            l_1C = 96;
+        } else {
+            l_1C = 145;
+        }
+        D_001903A5 = *(signed char *)&l_1C;
+        func_000A1054(a1, (int)text_buffer, (int)D_00170C67, 351, 4);
+    }
 }
 
 void sheet_show_misc_skills(void)
@@ -364,65 +300,51 @@ void sheet_show_misc_skills(void)
     int l_1C;
     short l_18;
 
-    l_24 = *(int *)D_00195C44 + 55000;
-    *(signed char *)D_00199644 = 0;
+    l_24 = D_00195C44 + 55000;
+    D_00199644 = 0;
     *(signed char *)((char *)l_24) = 0;
     l_20 = 0;
     l_1C = l_20;
-L3C108:;
-    if (((int)(short)*(short *)&l_20) < 35) goto L3C11E;
-    goto L3C2B7;
-L3C116:;
-    l_20++;
-    goto L3C108;
-L3C11E:;
-    if (memchr(player_class->skills, (int)(short)*(short *)&l_20, 12) != 0) goto L3C2B2;
-    *(int *)&l_18 = func_0003C3A8((int)(short)*(short *)&l_20);
-    if (((int)(short)(l_1C & 1)) == 0) goto L3C205;
-    if (((int)(short)*(short *)&l_20) != 30) goto L3C169;
-    *(signed char *)D_00199644 = 1;
-L3C169:;
-    func_000A0ED9(372, (int)D_00170C67);
-    mc_sprintf((int)text_buffer, (int)D_00170CEC, *(int *)(skill_names + (((int)(short)*(short *)&l_20) << 2)), player_character->skills[(int)(short)*(short *)&l_20].value, *(int *)(attribute_abbrevs + (((int)(unsigned char)*(signed char *)(skill_governing_attributes + ((int)(short)*(short *)&l_20))) << 2)));
-    if (l_18 == 0) goto L3C1D8;
-    l_28 = 96;
-    goto L3C1DF;
-L3C1D8:;
-    l_28 = 145;
-L3C1DF:;
-    *(signed char *)D_001903A5 = *(signed char *)&l_28;
-    func_000A1054(l_24, (int)text_buffer, (int)D_00170C67, 374, 4);
-    goto L3C2AC;
-L3C205:;
-    if (((int)(short)*(short *)&l_20) != 30) goto L3C215;
-    *(signed char *)D_00199644 = 1;
-L3C215:;
-    func_000A0ED9(379, (int)D_00170C67);
-    mc_sprintf((int)text_buffer, (int)D_00170CFD, *(int *)(skill_names + (((int)(short)*(short *)&l_20) << 2)), player_character->skills[(int)(short)*(short *)&l_20].value, *(int *)(attribute_abbrevs + (((int)(unsigned char)*(signed char *)(skill_governing_attributes + ((int)(short)*(short *)&l_20))) << 2)));
-    if (l_18 == 0) goto L3C284;
-    l_2C = 96;
-    goto L3C28B;
-L3C284:;
-    l_2C = 145;
-L3C28B:;
-    *(signed char *)D_001903A5 = *(signed char *)&l_2C;
-    func_000A1054(l_24, (int)text_buffer, (int)D_00170C67, 381, 4);
-L3C2AC:;
-    l_1C++;
-L3C2B2:;
-    goto L3C116;
-L3C2B7:;
-    if (*(signed char *)D_00199644 == 0) goto L3C33A;
-    func_000A0ED9(389, (int)D_00170C67);
-    mc_sprintf((int)text_buffer, (int)D_00170CC0, (player_character->skills[30].value / 10) + 1, (player_character->skills[30].value / 5) + 1);
-    *(signed char *)D_001903A5 = 96;
-    func_000A1054(l_24, (int)text_buffer, (int)D_00170C67, 391, 4);
-L3C33A:;
-    if (((int)(short)(l_1C & 1)) == 0) goto L3C356;
-    *(signed char *)((char *)(func_000A0DF4(l_24) + l_24) - 2) = 0;
-L3C356:;
+    for (; ((int)(short)*(short *)&l_20) < 35; l_20++) {
+        if (memchr(player_class->skills, (int)(short)*(short *)&l_20, 12) == 0) {
+            *(int *)&l_18 = func_0003C3A8((int)(short)*(short *)&l_20);
+            if (((int)(short)(l_1C & 1)) != 0) {
+                if (((int)(short)*(short *)&l_20) == 30) D_00199644 = 1;
+                func_000A0ED9(372, (int)D_00170C67);
+                mc_sprintf((int)text_buffer, (int)D_00170CEC, *(int *)(skill_names + (((int)(short)*(short *)&l_20) << 2)), player_character->skills[(int)(short)*(short *)&l_20].value, attribute_abbrevs[((int)(unsigned char)skill_governing_attributes[(int)(short)*(short *)&l_20])]);
+                if (l_18 != 0) {
+                    l_28 = 96;
+                } else {
+                    l_28 = 145;
+                }
+                D_001903A5 = *(signed char *)&l_28;
+                func_000A1054(l_24, (int)text_buffer, (int)D_00170C67, 374, 4);
+            } else {
+                if (((int)(short)*(short *)&l_20) == 30) D_00199644 = 1;
+                func_000A0ED9(379, (int)D_00170C67);
+                mc_sprintf((int)text_buffer, (int)D_00170CFD, *(int *)(skill_names + (((int)(short)*(short *)&l_20) << 2)), player_character->skills[(int)(short)*(short *)&l_20].value, attribute_abbrevs[((int)(unsigned char)skill_governing_attributes[(int)(short)*(short *)&l_20])]);
+                if (l_18 != 0) {
+                    l_2C = 96;
+                } else {
+                    l_2C = 145;
+                }
+                D_001903A5 = *(signed char *)&l_2C;
+                func_000A1054(l_24, (int)text_buffer, (int)D_00170C67, 381, 4);
+            }
+            l_1C++;
+        }
+    }
+    if (D_00199644 != 0) {
+        func_000A0ED9(389, (int)D_00170C67);
+        mc_sprintf((int)text_buffer, (int)D_00170CC0, (player_character->skills[30].value / 10) + 1, (player_character->skills[30].value / 5) + 1);
+        D_001903A5 = 96;
+        func_000A1054(l_24, (int)text_buffer, (int)D_00170C67, 391, 4);
+    }
+    if (((int)(short)(l_1C & 1)) != 0) {
+        *(signed char *)((char *)(func_000A0DF4(l_24) + l_24) - 2) = 0;
+    }
     *(signed char *)((char *)(func_000A0DF4(l_24) + l_24) - 1) = 0;
-    func_000CB552(*(int *)window_image);
+    func_000CB552(window_image);
     paperdoll_draw(0, 0);
     func_0012DB50(4);
     sheet_draw();
@@ -432,9 +354,7 @@ L3C356:;
 
 int func_0003C3A8(int a1)
 {
-    if (a1 >= 32) goto L3C3D8;
-    return (1 << a1) & (int)player_character->skills_raised_lo;
-L3C3D8:;
+    if (a1 < 32) return (1 << a1) & (int)player_character->skills_raised_lo;
     return (1 << (a1 - 32)) & (int)player_character->skills_raised_hi;
 }
 
@@ -443,40 +363,23 @@ void sheet_button_history(void)
     int l_18;
 
     l_18 = career_specials_text();
-L3C416:;
-    if (*(signed char *)mouse_buttons == 0) goto L3C426;
-    func_0012B136();
-    goto L3C416;
-L3C426:;
-    if (*(signed char *)((char *)l_18) == 0) goto L3C43B;
-    msgbox_show_string(l_18, 1);
-L3C43B:;
-    if (*(signed char *)mouse_buttons == 0) goto L3C44B;
-    func_0012B136();
-    goto L3C43B;
-L3C44B:;
-    if (*(int *)window_image == 0) goto L3C460;
-    if (*(int *)window_image != (-1751672937)) goto L3C462;
-L3C460:;
-    goto L3C480;
-L3C462:;
-    mc_free(*(int *)window_image, (int)D_00170C67, 428);
-    *(int *)window_image = -1751672937;
-L3C480:;
+    while (mouse_buttons != 0) func_0012B136();
+    if (*(signed char *)((char *)l_18) != 0) msgbox_show_string(l_18, 1);
+    while (mouse_buttons != 0) func_0012B136();
+    if (window_image != 0 && window_image != (-1751672937)) {
+        mc_free(window_image, (int)D_00170C67, 428);
+        window_image = -1751672937;
+    }
     career_show_biography();
-    *(int *)window_image = disk_read_file((int)D_00170C40, 0);
+    window_image = disk_read_file((int)D_00170C40, 0);
 }
 
 void sheet_button_log(void)
 {
-L3C4AE:;
-    if (*(signed char *)mouse_buttons == 0) goto L3C4BE;
-    func_0012B136();
-    goto L3C4AE;
-L3C4BE:;
+    while (mouse_buttons != 0) func_0012B136();
     sheet_close();
     logbook_open(1);
-    *(signed char *)D_001940D8 |= 32;
+    D_001940D8 |= 32;
 }
 
 void show_health_status(void)
@@ -484,33 +387,28 @@ void show_health_status(void)
     int l_18;
 
     l_18 = health_status_text();
-    if (l_18 != 0) goto L3C50B;
-    msgbox_show_rsc(18, 1);
-    return;
-L3C50B:;
+    if (l_18 == 0) {
+        msgbox_show_rsc(18, 1);
+        return;
+    }
     msgbox_show_string(l_18, 1);
 }
 
 void sheet_select_attribute(int a1)
 {
-    *(signed char *)D_0019626C = *(signed char *)&a1 - 13;
-    if (((struct bf8_2_1 *)&D_001940D9)->f == 0) goto L3C580;
-    if (((int)(unsigned char)(*(signed char *)mouse_buttons & 2)) == 0) goto L3C57E;
-    if (((int)(unsigned char)(*(signed char *)mouse_buttons_prev & 2)) == 0) goto L3C580;
-L3C57E:;
-    goto L3C592;
-L3C580:;
-    msgbox_show_rsc((int)(short)((int)(unsigned char)*(signed char *)D_0019626C), 1);
-L3C592:;
+    D_0019626C = *(signed char *)&a1 - 13;
+    if (((struct bf8_2_1 *)&D_001940D9)->f == 0 || (((int)(unsigned char)(mouse_buttons & 2)) != 0 && ((int)(unsigned char)(mouse_buttons_prev & 2)) == 0)) {
+        msgbox_show_rsc((int)(short)((int)(unsigned char)D_0019626C), 1);
+    }
     sheet_place_spinner(a1);
 }
 
 void sheet_place_spinner(int a1)
 {
-    *(short *)D_0017B604 = (*(short *)D_00190D6A = *(short *)(D_0017B508 + (a1 * 12)) + 1);
-    *(short *)D_0017B608 = *(short *)D_00190D6A + 6;
-    *(short *)D_0017B610 = *(short *)D_00190D6A + 13;
-    *(short *)D_0017B614 = *(short *)D_00190D6A + 19;
+    D_0017B604 = (D_00190D6A = *(short *)(D_0017B508 + (a1 * 12)) + 1);
+    D_0017B608 = D_00190D6A + 6;
+    D_0017B610 = D_00190D6A + 13;
+    D_0017B614 = D_00190D6A + 19;
 }
 
 int health_status_text(void)
@@ -519,35 +417,22 @@ int health_status_text(void)
     int l_20;
     short l_18;
 
-    *(signed char *)D_001962A7 = (*(signed char *)D_001962A2 = 0);
+    D_001962A7 = (D_001962A2 = 0);
     *(int *)D_00195B84 = 0;
     object_foreach(player_entity->children, (int)func_0003C610);
-    if (*(int *)D_00195B84 != 0) goto L3C741;
-    return 0;
-L3C741:;
-    l_20 = (int)(*(char **)D_00195C44 + 55000);
+    if (*(int *)D_00195B84 == 0) return 0;
+    l_20 = (int)(*(char **)&D_00195C44 + 55000);
     l_18 = 0;
     *(signed char *)((char *)l_20) = *(signed char *)&l_18;
-L3C75E:;
-    if (((int)(short)l_18) < *(int *)D_00195B84) goto L3C778;
-    goto L3C7FA;
-L3C76F:;
-    l_18++;
-    goto L3C75E;
-L3C778:;
-    l_24 = text_rsc_load((int)(short)((unsigned short)(unsigned char)*(signed char *)((char *)(int)(((int)(short)l_18) + *(char **)D_00195C44) + 60000)), 0, 310);
-    func_000A1054(l_20, l_24, (int)D_00170C67, 525, 4);
-    if (l_24 == 0) goto L3C7C1;
-    if (l_24 != (-1751672937)) goto L3C7C3;
-L3C7C1:;
-    goto L3C7DC;
-L3C7C3:;
-    mc_free(l_24, (int)D_00170C67, 526);
-    l_24 = -1751672937;
-L3C7DC:;
-    func_000A1054(l_20, (int)D_00170D0F, (int)D_00170C67, 527, 4);
-    goto L3C76F;
-L3C7FA:;
+    for (; ((int)(short)l_18) < *(int *)D_00195B84; l_18++) {
+        l_24 = text_rsc_load((int)(short)((unsigned short)(unsigned char)*(signed char *)((char *)(int)(((int)(short)l_18) + *(char **)&D_00195C44) + 60000)), 0, 310);
+        func_000A1054(l_20, l_24, (int)D_00170C67, 525, 4);
+        if (l_24 != 0 && l_24 != (-1751672937)) {
+            mc_free(l_24, (int)D_00170C67, 526);
+            l_24 = -1751672937;
+        }
+        func_000A1054(l_20, (int)D_00170D0F, (int)D_00170C67, 527, 4);
+    }
     *(signed char *)((char *)(func_000A0DF4(l_20) + l_20) + 1) = 0;
     return l_20;
 }
@@ -555,8 +440,8 @@ L3C7FA:;
 void func_0003C81C(void)
 {
     if (((struct bf8_2_1 *)&D_001940D9)->f == 0) return;
-    func_00144FB4(176, (int)(short)*(short *)D_00190D6A, (int)(unsigned short)*(short *)(*(char **)D_00195B5C + 4), (int)(unsigned short)*(short *)(*(char **)D_00195B5C + 6), *(int *)D_00195B5C + 12);
-    text_draw_centered_colored(func_000A0DD9((int)(short)*(short *)D_00190D64, (int)text_buffer, 10), 182, (int)(short)(((*(short *)D_00190D6A + 13) - *(short *)D_0012DA44) + 1), 145, 141);
+    func_00144FB4(176, (int)(short)D_00190D6A, (int)(unsigned short)*(short *)(((char *)D_00195B5C) + 4), (int)(unsigned short)*(short *)(((char *)D_00195B5C) + 6), D_00195B5C + 12);
+    text_draw_centered_colored(func_000A0DD9((int)(short)*(short *)D_00190D64, (int)text_buffer, 10), 182, (int)(short)(((D_00190D6A + 13) - D_0012DA44) + 1), 145, 141);
 }
 
 void sheet_levelup_adjust(int a1)
@@ -569,38 +454,32 @@ void sheet_levelup_adjust(int a1)
     if (((unsigned)(*(int *)((char *)l_1C) - *(int *)D_00190BE4)) < 6) return;
     l_18 = 1132;
     *(int *)D_00190BE4 = *(int *)((char *)l_18);
-    if (a1 != 21) goto L3C95D;
-    if (*(short *)D_00190D64 == 0) goto L3C927;
-    if (player_character->base_attributes[(int)(unsigned char)*(signed char *)D_0019626C] < 100) goto L3C929;
-L3C927:;
-    goto L3C95B;
-L3C929:;
-    (*(short *)D_00190D64)--;
-    player_character->attributes[(int)(unsigned char)*(signed char *)D_0019626C]++;
-    player_character->base_attributes[(int)(unsigned char)*(signed char *)D_0019626C]++;
-L3C95B:;
-    return;
-L3C95D:;
-    if (player_character->base_attributes[(int)(unsigned char)*(signed char *)D_0019626C] <= *(short *)(D_00190D8C + (((int)(unsigned char)*(signed char *)D_0019626C) * 2))) return;
+    if (a1 == 21) {
+        if (*(short *)D_00190D64 != 0 && player_character->base_attributes[(int)(unsigned char)D_0019626C] < 100) {
+            (*(short *)D_00190D64)--;
+            player_character->attributes[(int)(unsigned char)D_0019626C]++;
+            player_character->base_attributes[(int)(unsigned char)D_0019626C]++;
+        }
+        return;
+    }
+    if (player_character->base_attributes[(int)(unsigned char)D_0019626C] <= D_00190D8C[((int)(unsigned char)D_0019626C)]) return;
     (*(short *)D_00190D64)++;
-    player_character->attributes[(int)(unsigned char)*(signed char *)D_0019626C]--;
-    player_character->base_attributes[(int)(unsigned char)*(signed char *)D_0019626C]--;
+    player_character->attributes[(int)(unsigned char)D_0019626C]--;
+    player_character->base_attributes[(int)(unsigned char)D_0019626C]--;
 }
 
 void training_offer(int a1)
 {
-    if (((unsigned)(*(int *)game_minutes - player_character->last_training_minutes)) >= 720) goto L3C9FB;
-    msgbox_show_rsc(4023, 1);
-    return;
-L3C9FB:;
+    if (((unsigned)(game_minutes - player_character->last_training_minutes)) < 720) {
+        msgbox_show_rsc(4023, 1);
+        return;
+    }
     *(int *)text_macro_fpc = a1;
-    *(int *)D_00190C34 = 1234;
-    *(signed char *)game_mode = 23;
-    *(signed char *)D_00196272 = 1;
-    *(int *)D_00195D30 = player_character->level * 100;
-    if (guild_membership != 0) goto L3CA43;
-    *(int *)D_00195D30 <<= 2;
-L3CA43:;
+    D_00190C34 = 1234;
+    game_mode = 23;
+    D_00196272 = 1;
+    D_00195D30 = player_character->level * 100;
+    if (guild_membership == 0) D_00195D30 <<= 2;
     msgbox_yes_no_rsc(8);
 }
 
@@ -610,62 +489,55 @@ void training_update(void)
     int l_1C;
     int l_18;
 
-    if (((int)(unsigned char)*(signed char *)game_mode) != 23) return;
-    switch (*(int *)D_00190C34) {
-case 1234:
-    if (((int)(unsigned char)*(signed char *)D_00196271) != 2) goto L3CACD;
-    *(int *)D_00190C34 = 1235;
-    return;
-L3CACD:;
-    if (gold_can_afford(*(int *)D_00195D30) != 0) goto L3CAF9;
-    msgbox_show_rsc(454, 1);
-    *(int *)D_00190C34 = 1235;
-    return;
-L3CAF9:;
-    *(signed char *)D_001940D8 |= 1;
-    l_20 = *(int *)text_macro_fpc;
-    l_18 = 0;
-    l_1C = *(int *)D_00195C44;
-L3CB17:;
-    if (((int)(unsigned char)*(signed char *)((char *)(l_20 + l_18))) == 255) goto L3CB6D;
-    mc_strncpy(l_1C, *(int *)(skill_names + (((int)(unsigned char)*(signed char *)((char *)(l_20 + l_18))) << 2)), 4, (int)D_00170C67, 615);
-    l_1C += func_000A0DF4(l_1C) + 1;
-    l_18++;
-    goto L3CB17;
-L3CB6D:;
-    *(signed char *)((char *)l_1C) = 0;
-    picklist_open_strings(*(int *)D_00195C44);
-    *(int *)D_00190C34 = 1236;
-    return;
-case 1235:
-    *(signed char *)D_00196272 = 0;
-    *(signed char *)game_mode = 0;
-    return;
-case 1236:
-    if (((struct bf8_2_1 *)&D_001940D4)->f == 0) goto L3CBB6;
-    l_18 = spells_list_poll();
-    if (l_18 > (-1)) goto L3CBBB;
-L3CBB6:;
-    goto L3CC86;
-L3CBBB:;
-    l_20 = *(int *)text_macro_fpc;
-    if (player_character->skills[(int)(unsigned char)*(signed char *)((char *)(l_20 + l_18))].value <= 50) goto L3CC05;
-    msgbox_show_rsc(4022, 1);
-    *(int *)D_00190C34 = 1235;
-    return;
-L3CC05:;
-    gold_spend(*(int *)D_00195D30);
-    player_character->last_training_minutes = *(int *)game_minutes;
-    skill_add_uses((int)(unsigned char)*(signed char *)((char *)(l_20 + l_18)), rand_range(10, 20) * ((int)(short)*(short *)(skill_advance_multipliers + (((int)(unsigned char)*(signed char *)((char *)(l_20 + l_18))) * 2))));
-    *(signed char *)D_0012B508 = 146;
-    msgbox_show_rsc(5221, 1);
-    *(int *)D_00190C34 = 1235;
-    time_pass(180);
-L3CC86:;
-    if (((struct bf8_2_1 *)&D_001940D4)->f != 0) return;
-    *(int *)D_00190C34 = 1235;
-default:;
-}
+    if (((int)(unsigned char)game_mode) != 23) return;
+    switch (D_00190C34) {
+    case 1234:
+        if (((int)D_00196271) == 2) {
+            D_00190C34 = 1235;
+            return;
+        }
+        if (gold_can_afford(D_00195D30) == 0) {
+            msgbox_show_rsc(454, 1);
+            D_00190C34 = 1235;
+            return;
+        }
+        D_001940D8 |= 1;
+        l_20 = *(int *)text_macro_fpc;
+        l_18 = 0;
+        l_1C = D_00195C44;
+        while (((int)(unsigned char)*(signed char *)((char *)(l_20 + l_18))) != 255) {
+            mc_strncpy(l_1C, *(int *)(skill_names + (((int)(unsigned char)*(signed char *)((char *)(l_20 + l_18))) << 2)), 4, (int)D_00170C67, 615);
+            l_1C += func_000A0DF4(l_1C) + 1;
+            l_18++;
+        }
+        *(signed char *)((char *)l_1C) = 0;
+        picklist_open_strings(D_00195C44);
+        D_00190C34 = 1236;
+        return;
+    case 1235:
+        D_00196272 = 0;
+        game_mode = 0;
+        return;
+    case 1236:
+        if (((struct bf8_2_1 *)&D_001940D4)->f != 0 && (l_18 = spells_list_poll()) > (-1)) {
+            l_20 = *(int *)text_macro_fpc;
+            if (player_character->skills[(int)(unsigned char)*(signed char *)((char *)(l_20 + l_18))].value > 50) {
+                msgbox_show_rsc(4022, 1);
+                D_00190C34 = 1235;
+                return;
+            }
+            gold_spend(D_00195D30);
+            player_character->last_training_minutes = game_minutes;
+            skill_add_uses((int)(unsigned char)*(signed char *)((char *)(l_20 + l_18)), rand_range(10, 20) * ((int)(short)skill_advance_multipliers[((int)(unsigned char)*(signed char *)((char *)(l_20 + l_18)))]));
+            D_0012B508 = 146;
+            msgbox_show_rsc(5221, 1);
+            D_00190C34 = 1235;
+            time_pass(180);
+        }
+        if (((struct bf8_2_1 *)&D_001940D4)->f != 0) return;
+        D_00190C34 = 1235;
+    default:;
+    }
 }
 
 void raise_skills(void)
@@ -684,132 +556,72 @@ void raise_skills(void)
     l_18 = func_0003D0A8();
     player_character->skills_raised_lo = (player_character->skills_raised_hi = 0);
     disease_remove_skill_bonuses();
-    l_24 = 0;
-L3CCE3:;
-    if (l_24 < 35) goto L3CCF6;
-    goto L3CE5C;
-L3CCEE:;
-    l_24++;
-    goto L3CCE3;
-L3CCF6:;
-    if (skill_ready_to_advance(player_character->skills[l_24].value, player_character->skills[l_24].uses, player_class->advancement_multiplier, l_24) == 0) goto L3CE57;
-    player_character->skills[l_24].uses = 0;
-    l_28 = player_character->skills[l_24].value;
-    if (l_28 < 95) goto L3CD69;
-    if (l_18 != 0) goto L3CD6B;
-L3CD69:;
-    goto L3CD6D;
-L3CD6B:;
-    goto L3CCEE;
-L3CD6D:;
-    if (player_character->skills[l_24].value >= 100) goto L3CE08;
-    func_000A0ED9(674, (int)D_00170C67);
-    mc_sprintf((int)text_buffer, *(int *)D_00185073, *(int *)(skill_names + (l_24 << 2)));
-    hud_message_add((int)text_buffer);
-    player_character->skills[l_24].value++;
-    if (l_24 >= 32) goto L3CDEF;
-    player_character->skills_raised_lo |= 1 << l_24;
-    goto L3CE06;
-L3CDEF:;
-    player_character->skills_raised_hi |= 1 << (l_24 - 32);
-L3CE06:;
-    goto L3CE57;
-L3CE08:;
-    l_28 = 0;
-    l_2C = l_28;
-L3CE15:;
-    if (l_2C < 6) goto L3CE25;
-    goto L3CE42;
-L3CE1D:;
-    l_2C++;
-    goto L3CE15;
-L3CE25:;
-    if (player_class->skills[l_2C] != l_24) goto L3CE40;
-    l_28++;
-L3CE40:;
-    goto L3CE1D;
-L3CE42:;
-    if (l_28 == 0) goto L3CE57;
-    *(int *)D_00199640 = l_24;
-    l_1C = 1;
-L3CE57:;
-    goto L3CCEE;
-L3CE5C:;
-    l_24 = 0;
-L3CE63:;
-    if (l_24 < 8) goto L3CE73;
-    goto L3CEC5;
-L3CE6B:;
-    l_24++;
-    goto L3CE63;
-L3CE73:;
-    if (player_character->attributes[l_24] > 100) goto L3CE9D;
-    if (player_character->base_attributes[l_24] <= 100) goto L3CEC3;
-L3CE9D:;
-    player_character->attributes[l_24] = (player_character->base_attributes[l_24] = 100);
-L3CEC3:;
-    goto L3CE6B;
-L3CEC5:;
-    l_24 = 0;
-L3CECC:;
-    if (l_24 < 35) goto L3CEDC;
-    goto L3CF0A;
-L3CED4:;
-    l_24++;
-    goto L3CECC;
-L3CEDC:;
-    if (player_character->skills[l_24].value <= 100) goto L3CF08;
-    player_character->skills[l_24].value = 100;
-L3CF08:;
-    goto L3CED4;
-L3CF0A:;
+    for (l_24 = 0; l_24 < 35; l_24++) {
+        if (skill_ready_to_advance(player_character->skills[l_24].value, player_character->skills[l_24].uses, player_class->advancement_multiplier, l_24) != 0) {
+            player_character->skills[l_24].uses = 0;
+            l_28 = player_character->skills[l_24].value;
+            if (l_28 >= 95 && l_18 != 0) continue;
+            if (player_character->skills[l_24].value < 100) {
+                func_000A0ED9(674, (int)D_00170C67);
+                mc_sprintf((int)text_buffer, D_00185073, *(int *)(skill_names + (l_24 << 2)));
+                hud_message_add((int)text_buffer);
+                player_character->skills[l_24].value++;
+                if (l_24 < 32) {
+                    player_character->skills_raised_lo |= 1 << l_24;
+                } else {
+                    player_character->skills_raised_hi |= 1 << (l_24 - 32);
+                }
+            } else {
+                l_28 = 0;
+                for (l_2C = l_28; l_2C < 6; l_2C++) {
+                    if (player_class->skills[l_2C] == l_24) l_28++;
+                }
+                if (l_28 != 0) {
+                    D_00199640 = l_24;
+                    l_1C = 1;
+                }
+            }
+        }
+    }
+    for (l_24 = 0; l_24 < 8; l_24++) {
+        if (player_character->attributes[l_24] > 100 || player_character->base_attributes[l_24] > 100) {
+            player_character->attributes[l_24] = (player_character->base_attributes[l_24] = 100);
+        }
+    }
+    for (l_24 = 0; l_24 < 35; l_24++) {
+        if (player_character->skills[l_24].value > 100) player_character->skills[l_24].value = 100;
+    }
     l_20 = ((int)&*(signed char *)((char *)(level_skill_sum() - player_character->level_skill_sum_start) + 28)) / 15;
     disease_restore_skill_bonuses();
-    if (l_20 >= 1) goto L3CF3C;
-    l_20 = 1;
-L3CF3C:;
-    if (l_1C == 0) goto L3CF66;
-    msgbox_show_rsc(4020, 1);
-    sound_play(34, player_object, 100);
-L3CF66:;
+    if (l_20 < 1) l_20 = 1;
+    if (l_1C != 0) {
+        msgbox_show_rsc(4020, 1);
+        sound_play(34, player_object, 100);
+    }
     if (player_character->level == l_20) return;
-    if (player_character->level >= l_20) goto L3CFA4;
-    player_character->level++;
-    *(signed char *)D_001940D9 |= 4;
-    return;
-L3CFA4:;
+    if (player_character->level < l_20) {
+        player_character->level++;
+        D_001940D9 |= 4;
+        return;
+    }
     player_character->level--;
 }
 
 void levelup_check(void)
 {
-    if (((struct bf8_2_1 *)&D_001940D9)->f == 0) goto L3CFD9;
-    if (*(int *)creature_count == 0) goto L3CFDB;
-L3CFD9:;
-    goto L3CFE4;
-L3CFDB:;
-    if (*(signed char *)game_mode == 0) goto L3CFE6;
-L3CFE4:;
-    goto L3CFF2;
-L3CFE6:;
-    if (((int)(unsigned char)*(signed char *)D_0019626F) == 16) goto L3CFF4;
-L3CFF2:;
-    goto L3D006;
-L3CFF4:;
-    if (player_character->race < 9) goto L3D008;
-L3D006:;
-    return;
-L3D008:;
+    if (((struct bf8_2_1 *)&D_001940D9)->f == 0 || creature_count != 0 || game_mode != 0 || ((int)D_0019626F) != 16 || player_character->race >= 9) {
+        return;
+    }
     sheet_open(1);
 }
 
 void skill_add_uses(int a1, int a2)
 {
     player_character->skills[a1].uses += a2;
-    if (player_character->skills[a1].uses >= 0) goto L3D071;
-    player_character->skills[a1].uses = 0;
-    return;
-L3D071:;
+    if (player_character->skills[a1].uses < 0) {
+        player_character->skills[a1].uses = 0;
+        return;
+    }
     if (player_character->skills[a1].uses <= 20000) return;
     player_character->skills[a1].uses = 20000;
 }
@@ -818,19 +630,9 @@ int func_0003D0A8(void)
 {
     int l_1C;
 
-    l_1C = 0;
-L3D0BD:;
-    if (l_1C < 6) goto L3D0CD;
-    goto L3D0FF;
-L3D0C5:;
-    l_1C++;
-    goto L3D0BD;
-L3D0CD:;
-    if (player_character->skills[player_class->skills[l_1C]].value != 100) goto L3D0FD;
-    return 1;
-L3D0FD:;
-    goto L3D0C5;
-L3D0FF:;
+    for (l_1C = 0; l_1C < 6; l_1C++) {
+        if (player_character->skills[player_class->skills[l_1C]].value == 100) return 1;
+    }
     return 0;
 }
 
@@ -838,13 +640,12 @@ int func_0003D39D(void)
 {
     int l_1C;
 
-    *(int *)D_00195D78 = (*(int *)D_00195D6C = disk_open_data((int)D_00170D4C));
-    if (*(int *)D_00195D6C <= 0) goto L3D3D6;
-    l_1C = 1;
-    goto L3D3DD;
-L3D3D6:;
-    l_1C = 0;
-L3D3DD:;
+    D_00195D78 = (*(int *)D_00195D6C = disk_open_data((int)D_00170D4C));
+    if (*(int *)D_00195D6C > 0) {
+        l_1C = 1;
+    } else {
+        l_1C = 0;
+    }
     return l_1C;
 }
 

@@ -13,27 +13,23 @@ extern unsigned short _FP_SEG( const volatile void __far * );
 
 void dpmi_get_free_memory(int a1)
 {
-{
-    char l_40[28];
-    char l_24[12];
+    {
+        char l_40[28];
+        char l_24[12];
 
-    mc_memset((int)l_24, 0, 12, (int)D_00177348, 39, 4);
-    *(int *)l_40 = 1280;
-    *(int *)((char *)l_40 + 20) = a1;
-    *(short *)l_24 = _FP_SEG((void *)a1);
-    int386x(49, (int)l_40, (int)l_40, (int)l_24);
-}
+        mc_memset((int)l_24, 0, 12, (int)D_00177348, 39, 4);
+        *(int *)l_40 = 1280;
+        *(int *)((char *)l_40 + 20) = a1;
+        *(short *)l_24 = _FP_SEG((void *)a1);
+        int386x(49, (int)l_40, (int)l_40, (int)l_24);
+    }
 }
 
 int dpmi_lock_region(int a1, int a2)
 {
     char l_38[28];
 
-    if (a1 == 0) goto L9950F;
-    if (a2 != 0) goto L99518;
-L9950F:;
-    return 0;
-L99518:;
+    if (a1 == 0 || a2 == 0) return 0;
     mc_memset((int)l_38, 0, 28, (int)D_00177348, 66, 4);
     *(short *)l_38 = 1536;
     *(short *)((char *)l_38 + 4) = a1 >> 16;
@@ -48,11 +44,7 @@ int dpmi_unlock_region(int a1, int a2)
 {
     char l_38[28];
 
-    if (a1 == 0) goto L9959C;
-    if (a2 != 0) goto L995A5;
-L9959C:;
-    return 0;
-L995A5:;
+    if (a1 == 0 || a2 == 0) return 0;
     mc_memset((int)l_38, 0, 28, (int)D_00177348, 86, 4);
     *(short *)l_38 = 1537;
     *(short *)((char *)l_38 + 4) = a1 >> 16;

@@ -5,7 +5,7 @@
 
 extern char D_0017110C[];
 extern char D_001711A4[];
-extern char text_rsc_buffer[];
+extern signed char text_rsc_buffer[];
 extern struct quest *current_quest;
 
 extern int text_qrc_load(int, short, short, short);
@@ -22,22 +22,17 @@ void quest_load_text(struct quest *a1, int a2, short a3, int a4)
     char l_2C[16];
 
     current_quest = a1;
-    if (a1->text_file == 0) goto L4A79D;
-    func_000A0ED9(2016, (int)D_0017110C);
-    mc_sprintf((int)l_2C, (int)D_001711A4, a1->text_file);
-    goto L4A7BC;
-L4A79D:;
-    mc_memcpy((int)l_2C, a1->name, 8, (int)D_0017110C, 2018, 13);
-L4A7BC:;
+    if (a1->text_file != 0) {
+        func_000A0ED9(2016, (int)D_0017110C);
+        mc_sprintf((int)l_2C, (int)D_001711A4, a1->text_file);
+    } else {
+        mc_memcpy((int)l_2C, a1->name, 8, (int)D_0017110C, 2018, 13);
+    }
     *(signed char *)((char *)l_2C + 8) = 0;
     l_10 = text_qrc_load((int)l_2C, (int)(short)*(short *)&a2, (int)(short)a3, (int)(short)*(short *)&a4);
     if (l_10 == 0) return;
     mc_strncpy((int)text_rsc_buffer, l_10, 2048, (int)D_0017110C, 2022);
-    if (l_10 == 0) goto L4A808;
-    if (l_10 != (-1751672937)) goto L4A80A;
-L4A808:;
-    return;
-L4A80A:;
+    if (l_10 == 0 || l_10 == (-1751672937)) return;
     mc_free(l_10, (int)D_0017110C, 2023);
     l_10 = -1751672937;
 }

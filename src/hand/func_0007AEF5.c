@@ -11,7 +11,7 @@ extern char D_00176884[];       /* __FILE__ */
 extern char D_00176909[];
 extern char D_0017696F[];
 extern char D_00176977[];
-extern char text_buffer[];
+extern signed char text_buffer[];
 extern char D_001917E4[];
 extern void disk_copy_file(char *, char *, char *);
 extern unsigned func_000A13DA(char *, unsigned, struct find_t *);   /* _dos_findfirst */
@@ -26,21 +26,21 @@ void save_copy_automap_files(int a1)
     struct find_t f;
 
     func_000A0ED9(787, D_00176884);
-    mc_sprintf(text_buffer, D_0017696F, D_001917E4);
-    r = func_000A13DA(text_buffer, 0, &f);
+    mc_sprintf(((char *)text_buffer), D_0017696F, D_001917E4);
+    r = func_000A13DA(((char *)text_buffer), 0, &f);
     func_000A0ED9(789, D_00176884);
-    mc_sprintf(text_buffer, D_00176909, a1);
+    mc_sprintf(((char *)text_buffer), D_00176909, a1);
     while (r == 0) {
-        disk_copy_file(f.name, D_001917E4, text_buffer);
+        disk_copy_file(f.name, D_001917E4, ((char *)text_buffer));
         r = func_000A13F7(&f);
     }
     func_000A0ED9(796, D_00176884);
-    mc_sprintf(text_buffer, D_00176977, D_001917E4);
-    r = func_000A13DA(text_buffer, 0, &f);
+    mc_sprintf(((char *)text_buffer), D_00176977, D_001917E4);
+    r = func_000A13DA(((char *)text_buffer), 0, &f);
     func_000A0ED9(798, D_00176884);
-    mc_sprintf(text_buffer, D_00176909, a1);
+    mc_sprintf(((char *)text_buffer), D_00176909, a1);
     while (r == 0) {
-        disk_copy_file(f.name, D_001917E4, text_buffer);
+        disk_copy_file(f.name, D_001917E4, ((char *)text_buffer));
         r = func_000A13F7(&f);
     }
 }

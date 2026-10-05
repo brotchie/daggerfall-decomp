@@ -4,7 +4,7 @@
 extern char D_00170464[];        /* __FILE__ */
 extern unsigned char D_00190D16;
 extern unsigned char D_00190D17;
-extern char text_rsc_buffer[];
+extern signed char text_rsc_buffer[];
 extern int D_00195B84;
 extern int game_minutes;
 extern unsigned char D_00196269;
@@ -64,9 +64,9 @@ void rumor_add_faction(struct faction *a1, struct faction *a2, int a3, unsigned 
     mc_memset(m.quest_name, 0, 9, D_00170464, 1606, 9);
     m.message = 0;
     m.target = 0;
-    m.text_length = func_000A0DF4(text_rsc_buffer) + 1;
+    m.text_length = func_000A0DF4(((char *)text_rsc_buffer)) + 1;
     m.expires = game_minutes + 43140;
     write(rumor_file, &m, 34);
-    write(rumor_file, text_rsc_buffer, m.text_length);
+    write(rumor_file, ((char *)text_rsc_buffer), m.text_length);
     D_00195B84 = saved;
 }

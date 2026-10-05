@@ -4,7 +4,7 @@ extern int D_000C2893[];
 extern char *D_000C28BC;
 extern char *D_000C28C0;
 extern int D_00187F30[];
-extern char text_rsc_buffer[];
+extern signed char text_rsc_buffer[];
 extern struct record *player_object;
 extern char D_00196289;
 extern struct map_location *location_here;
@@ -41,7 +41,7 @@ void terrain_update_cells(void)
                     case 10:
                     case 12:
                         parse_rsc_text(location_here->dungeon_type + 500, 0, 0);
-                        hud_message_add(text_rsc_buffer);
+                        hud_message_add(((char *)text_rsc_buffer));
                     }
                 }
                 func_00088281(D_000C28BC + D_00187F30[D_001A94C0], D_000C28C0 + D_00187F30[D_001A94C0]);

@@ -11,7 +11,7 @@ extern unsigned char D_00179E90[];
 extern unsigned char D_00179E94[];
 extern unsigned char D_001850D4[];
 extern int D_001850E5[];
-extern char text_buffer[];
+extern signed char text_buffer[];
 extern unsigned game_minutes;
 extern struct settings *game_settings;
 extern int D_00195D30;
@@ -189,6 +189,6 @@ void daedra_summon(struct record *a1)
     }
     l_3C->flags |= 64;
     func_000A0ED9(200, D_00170634);
-    mc_sprintf(text_buffer, D_0017063D, REGION(l_3C), l_18);
-    mc_strncpy(D_001961F5, text_buffer, 13, D_00170634, 201);
+    mc_sprintf(((char *)text_buffer), D_0017063D, REGION(l_3C), l_18);
+    mc_strncpy(D_001961F5, ((char *)text_buffer), 13, D_00170634, 201);
 }

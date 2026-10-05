@@ -14,23 +14,21 @@ void func_0005E37F(short a1, int a2, int a3, struct item *a4)
 {
     int l_14;
 
-    if (a2 != a3) goto L5E3A6;
-    l_14 = a2;
-    goto L5E3B4;
-L5E3A6:;
-    l_14 = rand_range(a2, a3);
-L5E3B4:;
+    if (a2 == a3) {
+        l_14 = a2;
+    } else {
+        l_14 = rand_range(a2, a3);
+    }
     switch ((unsigned short)*(int *)&a1) {
-case 5:
-    item_make_artifact(a4, rand_range(a2, a3));
-    return;
-case 4:
-    item_make_magic(a4, -1);
-    return;
-case 11:
-    item_init_from_template(287, 27, 8, a4);
-    return;
-default:
+    case 5:
+        item_make_artifact(a4, rand_range(a2, a3));
+        return;
+    case 4:
+        item_make_magic(a4, -1);
+        return;
+    case 11:
+        item_init_from_template(287, 27, 8, a4);
+        return;
+    }
     item_init_from_template((int)(unsigned short)*(short *)((char *)(int)(*(char **)(D_00185F88 + (((int)(unsigned short)a1) << 2)) + (l_14 * 2))), (int)(short)a1, (int)(short)*(short *)&l_14, a4);
-}
 }

@@ -4,8 +4,8 @@
 extern char D_00170D55[];       /* __FILE__ */
 extern char D_00170DA2[];
 extern char D_00170DA7[];
-extern char text_buffer[];
-extern char text_rsc_buffer[];
+extern signed char text_buffer[];
+extern signed char text_rsc_buffer[];
 extern char D_00190FEC;
 extern int D_00195D6C;
 extern struct quest *current_quest;
@@ -28,14 +28,14 @@ int func_0003E6B1(struct quest *s, short a2, short a3, short a4)
         return 0;
     if (s->text_file != 0) {
         func_000A0ED9(545, D_00170D55);
-        mc_sprintf(text_rsc_buffer, D_00170DA2, s->text_file);
+        mc_sprintf(((char *)text_rsc_buffer), D_00170DA2, s->text_file);
     } else {
-        mc_memcpy(text_rsc_buffer, s->name, 8, D_00170D55, 547, 2048);
+        mc_memcpy(((char *)text_rsc_buffer), s->name, 8, D_00170D55, 547, 2048);
     }
     D_00190FEC = 0;
     func_000A0ED9(550, D_00170D55);
-    mc_sprintf(text_buffer, D_00170DA7, text_rsc_buffer);
-    if ((D_00195D6C = disk_open_data(text_buffer)) > 0) {
+    mc_sprintf(((char *)text_buffer), D_00170DA7, ((char *)text_rsc_buffer));
+    if ((D_00195D6C = disk_open_data(((char *)text_buffer))) > 0) {
         res = text_rsc_load(a2, 0, a4);
         func_0009DEA7(D_00195D6C);
         D_00195D6C = saved;

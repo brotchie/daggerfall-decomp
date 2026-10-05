@@ -11,7 +11,7 @@ extern char D_001709ED[];
 struct pic { short file, rec; };
 extern struct pic monster_corpse_textures[];
 extern char D_00187B44[];
-extern char text_buffer[];
+extern signed char text_buffer[];
 extern unsigned char D_001940D7;
 extern struct record *player_entity;
 extern struct record *player_object;
@@ -98,8 +98,8 @@ found:
     quest_raise_event(2, a1, 0);
     l_2C = &a1->data.character;
     func_000A0ED9(587, D_001709E4);
-    mc_sprintf(text_buffer, D_001709ED, l_2C->name);
-    hud_message_add(text_buffer);
+    mc_sprintf(((char *)text_buffer), D_001709ED, l_2C->name);
+    hud_message_add(((char *)text_buffer));
     a1->type = 44;
     if (l_2C->mobile_id < 43) {
         if (*game_settings & 4)

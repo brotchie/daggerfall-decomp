@@ -16,29 +16,21 @@ int profile_close(int a1)
 {
     int l_10;
 
-    if (((struct bf8_7_1 *)((char *)a1 + 1))->f == 0) goto L11CC8;
-    l_10 = open(a1 + 4, 610, 0);
-    if (l_10 != (-1)) goto L11CA6;
-    if (*(int *)((char *)a1 + 132) == 0) goto L11C76;
-    if (*(int *)((char *)a1 + 132) != (-1751672937)) goto L11C78;
-L11C76:;
-    goto L11C9D;
-L11C78:;
-    mc_free(*(int *)((char *)a1 + 132), (int)D_00170129, 171);
-    *(int *)((char *)a1 + 132) = -1751672937;
-L11C9D:;
-    return 0;
-L11CA6:;
-    write(l_10, *(int *)((char *)a1 + 132), *(int *)((char *)a1 + 136));
-    func_0009DEA7(l_10);
-L11CC8:;
-    if (*(int *)((char *)a1 + 132) == 0) goto L11CE3;
-    if (*(int *)((char *)a1 + 132) != (-1751672937)) goto L11CE5;
-L11CE3:;
-    goto L11D0A;
-L11CE5:;
-    mc_free(*(int *)((char *)a1 + 132), (int)D_00170129, 185);
-    *(int *)((char *)a1 + 132) = -1751672937;
-L11D0A:;
+    if (((struct bf8_7_1 *)((char *)a1 + 1))->f != 0) {
+        l_10 = open(a1 + 4, 610, 0);
+        if (l_10 == (-1)) {
+            if (*(int *)((char *)a1 + 132) != 0 && *(int *)((char *)a1 + 132) != (-1751672937)) {
+                mc_free(*(int *)((char *)a1 + 132), (int)D_00170129, 171);
+                *(int *)((char *)a1 + 132) = -1751672937;
+            }
+            return 0;
+        }
+        write(l_10, *(int *)((char *)a1 + 132), *(int *)((char *)a1 + 136));
+        func_0009DEA7(l_10);
+    }
+    if (*(int *)((char *)a1 + 132) != 0 && *(int *)((char *)a1 + 132) != (-1751672937)) {
+        mc_free(*(int *)((char *)a1 + 132), (int)D_00170129, 185);
+        *(int *)((char *)a1 + 132) = -1751672937;
+    }
     return 1;
 }

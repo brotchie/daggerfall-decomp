@@ -18,54 +18,54 @@ extern char D_00177409[];
 extern char D_00177416[];
 extern char D_00177423[];
 extern char D_00177430[];
-extern char player_environment[];
+extern unsigned char player_environment;
 extern char travel_options[];
-extern char D_0018507B[];
-extern char D_00187CA8[];
-extern char D_00190CAC[];
-extern char itemmaker_slot_kinds[];
-extern char D_00190CE5[];
-extern char D_00190CE7[];
-extern char D_001940D5[];
+extern int D_0018507B;
+extern signed char D_00187CA8;
+extern int D_00190CAC;
+extern signed char itemmaker_slot_kinds[];
+extern signed char D_00190CE5;
+extern signed char D_00190CE7;
+extern signed char D_001940D5;
 extern char D_001940E4[];
 extern struct record *player_object;
 extern struct record *D_00195AC4;
 extern struct record *D_00195AF4;
-extern char creature_count[];
-extern char D_00195B5C[];
+extern int creature_count;
+extern int D_00195B5C;
 extern char D_00195B84[];
 extern struct character *player_character;
-extern char window_image[];
+extern int window_image;
 extern struct career *player_class;
-extern char D_00195C44[];
-extern char D_00195CE0[];
-extern char D_00195CE4[];
+extern int D_00195C44;
+extern int D_00195CE0;
+extern int D_00195CE4;
 extern char found_marker[];
-extern char D_00195F71[];
-extern char D_00195F75[];
-extern char D_00195F79[];
-extern char D_00195F81[];
-extern char D_00195F85[];
-extern char D_00195F89[];
-extern char D_0019626F[];
-extern char D_00196272[];
-extern char game_mode[];
-extern char D_00196280[];
-extern char D_001AA644[];
-extern char marker_kind[];
-extern char D_001AA64C[];
-extern char D_001AA650[];
-extern char D_001AA654[];
-extern char D_001AA658[];
+extern int D_00195F71;
+extern int D_00195F75;
+extern int D_00195F79;
+extern short D_00195F81;
+extern short D_00195F85;
+extern int D_00195F89;
+extern unsigned char D_0019626F;
+extern signed char D_00196272;
+extern signed char game_mode;
+extern signed char D_00196280;
+extern int D_001AA644;
+extern int marker_kind;
+extern char *D_001AA64C;
+extern char *D_001AA650;
+extern char *D_001AA654;
+extern char *D_001AA658;
 extern char D_001AA65C[];
-extern char D_001AA660[];
-extern char D_001AA668[];
-extern char D_001AA66C[];
-extern char D_001AA670[];
-extern char D_001AA6A0[];
-extern char D_001AA6A4[];
-extern char D_001AA6A5[];
-extern char D_001AA6A6[];
+extern int D_001AA660;
+extern int D_001AA668;
+extern int D_001AA66C;
+extern char *D_001AA670;
+extern int D_001AA6A0;
+extern signed char D_001AA6A4;
+extern signed char D_001AA6A5;
+extern signed char D_001AA6A6;
 
 extern int disk_read_file(int, int);
 extern int gold_can_afford(int);
@@ -93,101 +93,66 @@ int marker_match_cb(struct record *a1)
     int l_1C;
 
     switch (a1->type) {
-case 34:
-    if ((a1->image >> 7) != 199) goto L99DE9;
-    if (((a1->image & 31) - 2) == *(int *)marker_kind) goto L99DEB;
-L99DE9:;
-    goto L99E34;
-L99DEB:;
-    if (*(int *)D_00195B84 != 0) goto L99DFD;
-    if (*(int *)D_001AA644 < 0) goto L99DFF;
-L99DFD:;
-    goto L99E29;
-L99DFF:;
-    mc_memcpy((int)found_marker, a1, 55, (int)D_00177358, 191, 4);
-    return 1;
-L99E29:;
-    *(int *)D_00195B84 += *(int *)D_001AA644;
-L99E34:;
-    goto L9A00E;
-case 43:
-    l_2C = &a1->data.block;
-    l_28 = l_2C->flats;
-    l_1C = 0;
-L99E52:;
-    if (l_2C->flat_count > l_1C) goto L99E76;
-    goto L99F1B;
-L99E67:;
-    l_1C++;
-    l_28++;
-    goto L99E52;
-L99E76:;
-    if ((l_28->image >> 7) != 199) goto L99F16;
-    if ((((int)(unsigned short)(l_28->image & 31)) - 2) != *(int *)marker_kind) goto L99F16;
-    if (*(int *)D_00195B84 != 0) goto L99EBE;
-    if (*(int *)D_001AA644 < 0) goto L99EC0;
-L99EBE:;
-    goto L99F0B;
-L99EC0:;
-    *(int *)D_00195F71 = l_28->x;
-    *(int *)D_00195F79 = l_28->z;
-    *(int *)D_00195F75 = l_28->y;
-    *(short *)D_00195F85 = l_28->image;
-    *(int *)D_00195F89 = a1->id;
-    *(signed char *)found_marker = 34;
-    return 1;
-L99F0B:;
-    *(int *)D_00195B84 += *(int *)D_001AA644;
-L99F16:;
-    goto L99E67;
-L99F1B:;
-    goto L9A00E;
-case 56:
-    l_24 = (int)RECORD_DATA(a1);
-    l_28 = (struct block_flat *)(l_24 + (a1->model_count * 66));
-    l_1C = 0;
-L99F47:;
-    if (a1->flat_count > l_1C) goto L99F6C;
-    goto L9A00E;
-L99F5D:;
-    l_1C++;
-    l_28++;
-    goto L99F47;
-L99F6C:;
-    if ((l_28->image >> 7) != 199) goto L9A009;
-    if ((((int)(unsigned short)(l_28->image & 31)) - 2) != *(int *)marker_kind) goto L9A009;
-    if (*(int *)D_00195B84 != 0) goto L99FB4;
-    if (*(int *)D_001AA644 < 0) goto L99FB6;
-L99FB4:;
-    goto L99FFE;
-L99FB6:;
-    *(int *)D_00195F71 = l_28->x;
-    *(int *)D_00195F79 = l_28->z;
-    *(int *)D_00195F75 = l_28->y;
-    *(short *)D_00195F85 = l_28->image;
-    *(int *)D_00195F89 = a1->id;
-    *(signed char *)found_marker = 34;
-    return 1;
-L99FFE:;
-    *(int *)D_00195B84 += *(int *)D_001AA644;
-L9A009:;
-    goto L99F5D;
-default:
-L9A00E:;
+    case 34:
+        if ((a1->image >> 7) == 199 && ((a1->image & 31) - 2) == marker_kind) {
+            if (*(int *)D_00195B84 == 0 && D_001AA644 < 0) {
+                mc_memcpy((int)found_marker, a1, 55, (int)D_00177358, 191, 4);
+                return 1;
+            }
+            *(int *)D_00195B84 += D_001AA644;
+        }
+        break;
+    case 43:
+        l_2C = &a1->data.block;
+        l_28 = l_2C->flats;
+        for (l_1C = 0; l_2C->flat_count > l_1C; l_1C++, l_28++) {
+            if ((l_28->image >> 7) == 199) {
+                if ((((int)(unsigned short)(l_28->image & 31)) - 2) == marker_kind) {
+                    if (*(int *)D_00195B84 == 0 && D_001AA644 < 0) {
+                        D_00195F71 = l_28->x;
+                        D_00195F79 = l_28->z;
+                        D_00195F75 = l_28->y;
+                        D_00195F85 = l_28->image;
+                        D_00195F89 = a1->id;
+                        *(signed char *)found_marker = 34;
+                        return 1;
+                    }
+                    *(int *)D_00195B84 += D_001AA644;
+                }
+            }
+        }
+        break;
+    case 56:
+        l_24 = (int)RECORD_DATA(a1);
+        l_28 = (struct block_flat *)(l_24 + (a1->model_count * 66));
+        for (l_1C = 0; a1->flat_count > l_1C; l_1C++, l_28++) {
+            if ((l_28->image >> 7) == 199) {
+                if ((((int)(unsigned short)(l_28->image & 31)) - 2) == marker_kind) {
+                    if (*(int *)D_00195B84 == 0 && D_001AA644 < 0) {
+                        D_00195F71 = l_28->x;
+                        D_00195F79 = l_28->z;
+                        D_00195F75 = l_28->y;
+                        D_00195F85 = l_28->image;
+                        D_00195F89 = a1->id;
+                        *(signed char *)found_marker = 34;
+                        return 1;
+                    }
+                    *(int *)D_00195B84 += D_001AA644;
+                }
+            }
+        }
+    }
     return 0;
-}
 }
 
 struct record *marker_find_first(struct record *a1, int a2)
 {
-    *(int *)marker_kind = a2;
+    marker_kind = a2;
     *(int *)D_00195B84 = 0;
-    *(int *)D_001AA644 = -1;
+    D_001AA644 = -1;
     mc_memset((int)found_marker, 0, 71, (int)D_00177358, 261, 4);
     object_find_open(a1, (int)marker_match_cb);
-    if (*(signed char *)found_marker == 0) goto L9A08D;
-    return (struct record *)found_marker;
-L9A08D:;
+    if (*(signed char *)found_marker != 0) return (struct record *)found_marker;
     return 0;
 }
 
@@ -195,16 +160,14 @@ struct record *marker_find_nth(struct record *a1, int a2, int a3)
 {
     int l_14;
 
-    *(int *)marker_kind = a2;
+    marker_kind = a2;
     *(int *)D_00195B84 = a3;
-    *(int *)D_001AA644 = -1;
+    D_001AA644 = -1;
     mc_memset((int)found_marker, 0, 71, (int)D_00177358, 287, 4);
     object_find_open(a1, (int)marker_match_cb);
-    l_14 = location_cell_at(*(int *)D_00195F71, *(int *)D_00195F79);
-    *(short *)D_00195F81 = a3;
-    if (*(signed char *)found_marker == 0) goto L9A127;
-    return (struct record *)found_marker;
-L9A127:;
+    l_14 = location_cell_at(D_00195F71, D_00195F79);
+    D_00195F81 = a3;
+    if (*(signed char *)found_marker != 0) return (struct record *)found_marker;
     return 0;
 }
 
@@ -212,18 +175,16 @@ struct record *marker_find_random(struct record *a1, int a2)
 {
     int l_18;
 
-    *(int *)marker_kind = a2;
+    marker_kind = a2;
     *(int *)D_00195B84 = 0;
-    *(int *)D_001AA644 = 1;
+    D_001AA644 = 1;
     mc_memset((int)found_marker, 0, 71, (int)D_00177358, 317, 4);
     object_find_open(a1, (int)marker_match_cb);
-    if (*(int *)D_00195B84 != 0) goto L9A1A4;
-    return 0;
-L9A1A4:;
+    if (*(int *)D_00195B84 == 0) return 0;
     l_18 = (*(int *)D_00195B84 = rand() % *(int *)D_00195B84);
-    *(int *)D_001AA644 = -1;
+    D_001AA644 = -1;
     object_foreach_open(a1, (int)marker_match_cb);
-    *(short *)D_00195F81 = l_18;
+    D_00195F81 = l_18;
     return (struct record *)found_marker;
 }
 
@@ -236,115 +197,78 @@ void marker_nearest_cb(struct record *a1)
     int l_18;
 
     switch (a1->type) {
-case 34:
-    if ((a1->image >> 7) != 199) goto L9A26B;
-    if (((a1->image & 31) - 2) != *(int *)marker_kind) goto L9A26D;
-L9A26B:;
-    goto L9A272;
-L9A26D:;
-    return;
-L9A272:;
-    l_1C = (a1->x - player_object->x) * (a1->x - player_object->x);
-    l_1C += ((a1->y - player_object->y) * (a1->y - player_object->y)) * 2;
-    l_1C += (a1->z - player_object->z) * (a1->z - player_object->z);
-    if (l_1C == 0) goto L9A2F7;
-    l_1C = func_0014BC00(l_1C);
-L9A2F7:;
-    if (l_1C >= *(int *)D_001AA644) goto L9A330;
-    D_00195AF4 = a1;
-    *(int *)D_001AA644 = l_1C;
-    mc_memcpy((int)found_marker, a1, 55, (int)D_00177358, 363, 4);
-L9A330:;
-    return;
-case 43:
-    l_28 = &a1->data.block;
-    l_24 = l_28->flats;
-    l_18 = 0;
-L9A34E:;
-    if (l_28->flat_count > l_18) goto L9A372;
-    goto L9A483;
-L9A363:;
-    l_18++;
-    l_24++;
-    goto L9A34E;
-L9A372:;
-    if ((l_24->image >> 7) != 199) goto L9A3A4;
-    if ((((int)(unsigned short)(l_24->image & 31)) - 2) == *(int *)marker_kind) goto L9A3A9;
-L9A3A4:;
-    goto L9A47E;
-L9A3A9:;
-    l_1C = (l_24->x - player_object->x) * (l_24->x - player_object->x);
-    l_1C += ((l_24->y - player_object->y) * (l_24->y - player_object->y)) * 2;
-    l_1C += (l_24->z - player_object->z) * (l_24->z - player_object->z);
-    if (l_1C == 0) goto L9A42C;
-    l_1C = func_0014BC00(l_1C);
-L9A42C:;
-    if (l_1C >= *(int *)D_001AA644) goto L9A47E;
-    *(int *)D_001AA644 = l_1C;
-    *(signed char *)found_marker = 34;
-    *(int *)D_00195F71 = l_24->x;
-    *(int *)D_00195F79 = l_24->z;
-    *(int *)D_00195F75 = l_24->y;
-    *(short *)D_00195F85 = l_24->image;
-    *(int *)D_00195F89 = a1->id;
-L9A47E:;
-    goto L9A363;
-L9A483:;
-    return;
-case 56:
-    l_20 = (int)RECORD_DATA(a1);
-    l_24 = (struct block_flat *)(l_20 + (a1->model_count * 66));
-    l_18 = 0;
-L9A4AF:;
-    if (a1->flat_count > l_18) goto L9A4D4;
-    return;
-L9A4C5:;
-    l_18++;
-    l_24++;
-    goto L9A4AF;
-L9A4D4:;
-    if ((l_24->image >> 7) != 199) goto L9A506;
-    if ((((int)(unsigned short)(l_24->image & 31)) - 2) == *(int *)marker_kind) goto L9A50B;
-L9A506:;
-    goto L9A5E0;
-L9A50B:;
-    l_1C = (l_24->x - player_object->x) * (l_24->x - player_object->x);
-    l_1C += ((l_24->y - player_object->y) * (l_24->y - player_object->y)) * 2;
-    l_1C += (l_24->z - player_object->z) * (l_24->z - player_object->z);
-    if (l_1C == 0) goto L9A58E;
-    l_1C = func_0014BC00(l_1C);
-L9A58E:;
-    if (l_1C >= *(int *)D_001AA644) goto L9A5E0;
-    *(int *)D_001AA644 = l_1C;
-    *(signed char *)found_marker = 34;
-    *(int *)D_00195F71 = l_24->x;
-    *(int *)D_00195F79 = l_24->z;
-    *(int *)D_00195F75 = l_24->y;
-    *(short *)D_00195F85 = l_24->image;
-    *(int *)D_00195F89 = a1->id;
-L9A5E0:;
-    goto L9A4C5;
-default:;
-}
+    case 34:
+        if ((a1->image >> 7) == 199 && ((a1->image & 31) - 2) != marker_kind) return;
+        l_1C = (a1->x - player_object->x) * (a1->x - player_object->x);
+        l_1C += ((a1->y - player_object->y) * (a1->y - player_object->y)) * 2;
+        l_1C += (a1->z - player_object->z) * (a1->z - player_object->z);
+        if (l_1C != 0) l_1C = func_0014BC00(l_1C);
+        if (l_1C < D_001AA644) {
+            D_00195AF4 = a1;
+            D_001AA644 = l_1C;
+            mc_memcpy((int)found_marker, a1, 55, (int)D_00177358, 363, 4);
+        }
+        return;
+    case 43:
+        l_28 = &a1->data.block;
+        l_24 = l_28->flats;
+        for (l_18 = 0; l_28->flat_count > l_18; l_18++, l_24++) {
+            if ((l_24->image >> 7) == 199 && (((int)(unsigned short)(l_24->image & 31)) - 2) == marker_kind) {
+                l_1C = (l_24->x - player_object->x) * (l_24->x - player_object->x);
+                l_1C += ((l_24->y - player_object->y) * (l_24->y - player_object->y)) * 2;
+                l_1C += (l_24->z - player_object->z) * (l_24->z - player_object->z);
+                if (l_1C != 0) l_1C = func_0014BC00(l_1C);
+                if (l_1C < D_001AA644) {
+                    D_001AA644 = l_1C;
+                    *(signed char *)found_marker = 34;
+                    D_00195F71 = l_24->x;
+                    D_00195F79 = l_24->z;
+                    D_00195F75 = l_24->y;
+                    D_00195F85 = l_24->image;
+                    D_00195F89 = a1->id;
+                }
+            }
+        }
+        return;
+    case 56:
+        l_20 = (int)RECORD_DATA(a1);
+        l_24 = (struct block_flat *)(l_20 + (a1->model_count * 66));
+        for (l_18 = 0; a1->flat_count > l_18; l_18++, l_24++) {
+            if ((l_24->image >> 7) == 199 && (((int)(unsigned short)(l_24->image & 31)) - 2) == marker_kind) {
+                l_1C = (l_24->x - player_object->x) * (l_24->x - player_object->x);
+                l_1C += ((l_24->y - player_object->y) * (l_24->y - player_object->y)) * 2;
+                l_1C += (l_24->z - player_object->z) * (l_24->z - player_object->z);
+                if (l_1C != 0) l_1C = func_0014BC00(l_1C);
+                if (l_1C < D_001AA644) {
+                    D_001AA644 = l_1C;
+                    *(signed char *)found_marker = 34;
+                    D_00195F71 = l_24->x;
+                    D_00195F79 = l_24->z;
+                    D_00195F75 = l_24->y;
+                    D_00195F85 = l_24->image;
+                    D_00195F89 = a1->id;
+                }
+            }
+        }
+    default:;
+    }
 }
 
 struct record *marker_find_nearest(struct record *a1, int a2)
 {
-    *(int *)marker_kind = a2;
-    *(int *)D_001AA644 = 500000;
+    marker_kind = a2;
+    D_001AA644 = 500000;
     mc_memset((int)found_marker, 0, 71, (int)D_00177358, 432, 4);
     object_foreach_open(a1, (int)marker_nearest_cb);
-    if (*(signed char *)found_marker == 0) goto L9A650;
-    return (struct record *)found_marker;
-L9A650:;
+    if (*(signed char *)found_marker != 0) return (struct record *)found_marker;
     return 0;
 }
 
 int marker_count(struct record *a1, int a2)
 {
-    *(int *)marker_kind = a2;
+    marker_kind = a2;
     *(int *)D_00195B84 = 0;
-    *(int *)D_001AA644 = 1;
+    D_001AA644 = 1;
     mc_memset((int)found_marker, 0, 71, (int)D_00177358, 456, 4);
     object_find_open(a1, (int)marker_match_cb);
     return *(int *)D_00195B84;
@@ -355,13 +279,13 @@ int player_to_nearest_marker(struct record *a1, int a2)
     struct record *l_18;
 
     l_18 = marker_find_nearest(a1, a2);
-    if (l_18 == 0) goto L9A731;
-    player_object->x = *(int *)D_00195F71;
-    player_object->y = *(int *)D_00195F75;
-    player_object->z = *(int *)D_00195F79;
-    *(signed char *)D_001940D5 |= 2;
-    return 1;
-L9A731:;
+    if (l_18 != 0) {
+        player_object->x = D_00195F71;
+        player_object->y = D_00195F75;
+        player_object->z = D_00195F79;
+        D_001940D5 |= 2;
+        return 1;
+    }
     return 0;
 }
 
@@ -370,13 +294,13 @@ int player_to_random_marker(struct record *a1, int a2)
     struct record *l_18;
 
     l_18 = marker_find_random(a1, a2);
-    if (l_18 == 0) goto L9A7A5;
-    player_object->x = *(int *)D_00195F71;
-    player_object->y = *(int *)D_00195F75;
-    player_object->z = *(int *)D_00195F79;
-    *(signed char *)D_001940D5 |= 2;
-    return 1;
-L9A7A5:;
+    if (l_18 != 0) {
+        player_object->x = D_00195F71;
+        player_object->y = D_00195F75;
+        player_object->z = D_00195F79;
+        D_001940D5 |= 2;
+        return 1;
+    }
     return 0;
 }
 
@@ -384,8 +308,8 @@ int location_cell_at(int a1, int a2)
 {
     int l_18;
 
-    a1 = ((a1 - D_00195AC4->x) + *(int *)D_00195CE0) / 1024;
-    a2 = ((a2 - D_00195AC4->z) + *(int *)D_00195CE4) / 1024;
+    a1 = ((a1 - D_00195AC4->x) + D_00195CE0) / 1024;
+    a2 = ((a2 - D_00195AC4->z) + D_00195CE4) / 1024;
     l_18 = a1 + (a2 << 5);
     return *(int *)(D_001940E4 + (l_18 << 2));
 }
@@ -394,77 +318,52 @@ int travel_map_open(int a1)
 {
     short l_18;
 
-    if (((int)(unsigned char)*(signed char *)D_0019626F) != 19) goto L9A9BC;
-    if (((int)(unsigned char)*(signed char *)game_mode) == 8) goto L9A9BE;
-L9A9BC:;
-    goto L9A9CA;
-L9A9BE:;
-    return 1;
-L9A9CA:;
-    if (((int)(unsigned char)*(signed char *)player_environment) == 1) goto L9A9E2;
-    return 0;
-L9A9E2:;
-    if (a1 == 0) goto L9AC14;
-    if (player_character->race == 8) goto L9AA15;
-    if ((player_class->flags & 16) == 0) goto L9AA1E;
-L9AA15:;
-    if (*(signed char *)D_00196280 != 0) goto L9AA20;
-L9AA1E:;
-    goto L9AA3B;
-L9AA20:;
-    msgbox_show_string((int)D_00177364, 1);
-    return 0;
-L9AA3B:;
-    if (*(int *)creature_count == 0) goto L9AA5F;
-    msgbox_show_string(*(int *)D_0018507B, 1);
-    return 0;
-L9AA5F:;
-    if (((int)(unsigned short)(*(short *)travel_options & 16)) == 0) goto L9AA81;
-    if (gold_can_afford(travel_trip_cost()) == 0) goto L9AA83;
-L9AA81:;
-    goto L9AA8A;
-L9AA83:;
-    *(signed char *)travel_options ^= 48;
-L9AA8A:;
-    if (((int)(unsigned short)(*(short *)travel_options & 8)) == 0) goto L9AAA9;
-    if (player_character->ship_owned == 0) goto L9AAAB;
-L9AAA9:;
-    goto L9AAB9;
-L9AAAB:;
-    if (gold_can_afford(travel_trip_cost()) == 0) goto L9AABB;
-L9AAB9:;
-    goto L9AAC2;
-L9AABB:;
-    *(signed char *)travel_options ^= 12;
-L9AAC2:;
-    *(signed char *)D_001AA6A6 = *(signed char *)&a1;
-    *(int *)window_image = disk_read_file((int)D_00177394, 0);
-    if (a1 != 100) goto L9AAF4;
-    *(int *)D_001AA6A0 = disk_read_file((int)D_001773A1, 0);
-    goto L9AB05;
-L9AAF4:;
-    *(int *)D_001AA6A0 = disk_read_file((int)D_001773AE, 0);
-L9AB05:;
-    *(int *)D_001AA66C = disk_read_file((int)D_001773BB, 0);
-    *(int *)D_001AA65C = disk_read_file((int)D_001773C8, 0);
-    *(int *)D_001AA660 = disk_read_file((int)D_001773D5, 0);
-    *(int *)D_001AA670 = disk_read_file((int)D_001773E2, 0);
-    *(int *)D_001AA64C = disk_read_file((int)D_001773EF, 0);
-    *(int *)D_001AA650 = disk_read_file((int)D_001773FC, 0);
-    *(int *)D_001AA654 = disk_read_file((int)D_00177409, 0);
-    *(int *)D_001AA658 = disk_read_file((int)D_00177416, 0);
-    *(int *)D_00195B5C = disk_read_file((int)D_00177423, 0);
-    disk_read_file((int)D_00177430, *(int *)D_00195C44);
-    func_000CD367(*(int *)D_00195C44 + 8);
-    *(int *)&l_18 = 1132;
-    *(int *)D_00190CAC = *(int *)(*(char **)&l_18);
-    *(signed char *)D_001AA6A4 = (*(signed char *)D_001AA6A5 = 0);
-    *(signed char *)D_00190CE5 = (*(signed char *)itemmaker_slot_kinds = 0);
-    *(int *)D_001AA668 = 0;
-    *(signed char *)game_mode = 19;
-    *(signed char *)D_00196272 = 1;
-    *(signed char *)D_00187CA8 = 0;
-    *(signed char *)D_00190CE7 = 0;
-L9AC14:;
-    return ((((int)(unsigned char)*(signed char *)game_mode) == 19) ? 1 : 0);
+    if (((int)D_0019626F) == 19 && ((int)(unsigned char)game_mode) == 8) {
+        return 1;
+    }
+    if (((int)player_environment) != 1) return 0;
+    if (a1 != 0) {
+        if ((player_character->race == 8 || (player_class->flags & 16) != 0) && D_00196280 != 0) {
+            msgbox_show_string((int)D_00177364, 1);
+            return 0;
+        }
+        if (creature_count != 0) {
+            msgbox_show_string(D_0018507B, 1);
+            return 0;
+        }
+        if (((int)(unsigned short)(*(short *)travel_options & 16)) != 0 && gold_can_afford(travel_trip_cost()) == 0) {
+            *(signed char *)travel_options ^= 48;
+        }
+        if (((int)(unsigned short)(*(short *)travel_options & 8)) != 0 && player_character->ship_owned == 0 && gold_can_afford(travel_trip_cost()) == 0) {
+            *(signed char *)travel_options ^= 12;
+        }
+        D_001AA6A6 = *(signed char *)&a1;
+        window_image = disk_read_file((int)D_00177394, 0);
+        if (a1 == 100) {
+            D_001AA6A0 = disk_read_file((int)D_001773A1, 0);
+        } else {
+            D_001AA6A0 = disk_read_file((int)D_001773AE, 0);
+        }
+        D_001AA66C = disk_read_file((int)D_001773BB, 0);
+        *(int *)D_001AA65C = disk_read_file((int)D_001773C8, 0);
+        D_001AA660 = disk_read_file((int)D_001773D5, 0);
+        *(int *)&D_001AA670 = disk_read_file((int)D_001773E2, 0);
+        *(int *)&D_001AA64C = disk_read_file((int)D_001773EF, 0);
+        *(int *)&D_001AA650 = disk_read_file((int)D_001773FC, 0);
+        *(int *)&D_001AA654 = disk_read_file((int)D_00177409, 0);
+        *(int *)&D_001AA658 = disk_read_file((int)D_00177416, 0);
+        D_00195B5C = disk_read_file((int)D_00177423, 0);
+        disk_read_file((int)D_00177430, D_00195C44);
+        func_000CD367(D_00195C44 + 8);
+        *(int *)&l_18 = 1132;
+        D_00190CAC = *(int *)(*(char **)&l_18);
+        D_001AA6A4 = (D_001AA6A5 = 0);
+        D_00190CE5 = (itemmaker_slot_kinds[0] = 0);
+        D_001AA668 = 0;
+        game_mode = 19;
+        D_00196272 = 1;
+        D_00187CA8 = 0;
+        D_00190CE7 = 0;
+    }
+    return ((((int)(unsigned char)game_mode) == 19) ? 1 : 0);
 }

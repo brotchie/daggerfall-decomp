@@ -28,7 +28,7 @@ extern char D_00188024[];
 extern struct box D_001880C6[3];
 extern short D_0018810C;
 extern short D_00188110;
-extern char text_buffer[];
+extern signed char text_buffer[];
 extern char D_00190B44[];
 extern int D_00190BE8;
 extern short D_00190D64;
@@ -124,9 +124,9 @@ void chargen_draw_attributes(void)
     x = (D_0018810C + D_00188110) >> 1;
     func_0012DB50(4);
     for (i = 0; i < 8; i++) {
-        text_draw_centered_colored(func_000A0DD9(player_character->attributes[i], text_buffer, 10), x, (short)(((struct region *)chargen_buttons)[i + 20].y2 - D_0012DA44 + 1), 145, 141);
+        text_draw_centered_colored(func_000A0DD9(player_character->attributes[i], ((char *)text_buffer), 10), x, (short)(((struct region *)chargen_buttons)[i + 20].y2 - D_0012DA44 + 1), 145, 141);
     }
-    text_draw_centered_colored(func_000A0DD9(D_00190D64, text_buffer, 10), 51, (short)(D_00190D6A + 13 - D_0012DA44 + 1), 145, 141);
+    text_draw_centered_colored(func_000A0DD9(D_00190D64, ((char *)text_buffer), 10), 51, (short)(D_00190D6A + 13 - D_0012DA44 + 1), 145, 141);
     character_reset_magicka(player_character, player_class);
     if (chargen_screen == 255)
         return;
@@ -152,12 +152,12 @@ void chargen_draw_skills(void)
 
     for (i = 0; i < 3; i++) {
         func_00144F68(203, text_macro_fpc[i], *(unsigned short *)(D_00195B60 + 4), *(unsigned short *)(D_00195B60 + 6), D_00195B60 + 12);
-        text_draw_centered_colored(func_000A0DD9(D_00190DEA[i], text_buffer, 10), 221, text_macro_fpc[i] + 8 - D_0012DA44 + 1, 145, 141);
+        text_draw_centered_colored(func_000A0DD9(D_00190DEA[i], ((char *)text_buffer), 10), 221, text_macro_fpc[i] + 8 - D_0012DA44 + 1, 145, 141);
     }
     for (i = 0; i < 12; i++) {
         k = player_class->skills[i];
         text_draw_colored(*(char **)(skill_names + (k << 2)), *(short *)(chargen_buttons + ((i + 2) * 12)) + 2, *(short *)(D_0018801E + ((i + 2) * 12)) + 1, 145, 141);
-        text_draw_centered_colored(func_000A0DD9(player_character->skills[k].value, text_buffer, 10), 192, *(short *)(D_0018801E + ((i + 2) * 12)) + 1, 145, 141);
+        text_draw_centered_colored(func_000A0DD9(player_character->skills[k].value, ((char *)text_buffer), 10), 192, *(short *)(D_0018801E + ((i + 2) * 12)) + 1, 145, 141);
     }
 }
 

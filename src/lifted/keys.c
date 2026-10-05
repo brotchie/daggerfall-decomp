@@ -2,58 +2,46 @@
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
 
-extern char mouse_buttons[];
-extern char key_down[];
-extern char D_00152A30[];
-extern char key_was_down[];
+extern signed char mouse_buttons;
+extern signed char key_down[];
+extern signed char D_00152A30[];
+extern signed char key_was_down[];
 extern char key_map[];
-extern char mouse_buttons_prev[];
-extern char D_00199704[];
+extern signed char mouse_buttons_prev;
+extern signed char D_00199704[];
 
 
 int key_action_pressed(int a1)
 {
     int l_1C;
 
-    if (((int)(unsigned char)*(signed char *)(key_map + a1)) < 200) goto L4327C;
-    switch (*(unsigned char *)(key_map + a1)) {
-    goto L43270;
-case 200:
-case 201:
-    l_1C = ((((int)(unsigned char)*(signed char *)(key_map + a1)) == 200) ? 0 : 1);
-    if (*(signed char *)(D_00152A30 + l_1C) == 0) goto L4317F;
-    if (*(signed char *)(D_00199704 + l_1C) == 0) goto L43181;
-L4317F:;
-    goto L43197;
-L43181:;
-    *(signed char *)(D_00199704 + l_1C) = 1;
-    return 1;
-L43197:;
-    if (*(signed char *)(D_00152A30 + l_1C) != 0) goto L431AD;
-    *(signed char *)(D_00199704 + l_1C) = 0;
-L431AD:;
+    if (((int)(unsigned char)*(signed char *)(key_map + a1)) >= 200) {
+        switch (*(unsigned char *)(key_map + a1)) {
+            break;
+        case 200:
+        case 201:
+            l_1C = ((((int)(unsigned char)*(signed char *)(key_map + a1)) == 200) ? 0 : 1);
+            if (D_00152A30[l_1C] != 0 && D_00199704[l_1C] == 0) {
+                D_00199704[l_1C] = 1;
+                return 1;
+            }
+            if (D_00152A30[l_1C] == 0) D_00199704[l_1C] = 0;
+            return 0;
+        case 202:
+            return (((((int)(unsigned char)(mouse_buttons & 1)) != 0) && (((int)(unsigned char)(mouse_buttons_prev & 1)) == 0)) ? 1 : 0);
+        case 203:
+            return (((((int)(unsigned char)(mouse_buttons & 2)) != 0) && (((int)(unsigned char)(mouse_buttons_prev & 2)) == 0)) ? 1 : 0);
+        case 212:
+            return (((((int)(unsigned char)(mouse_buttons & 4)) != 0) && (((int)(unsigned char)(mouse_buttons_prev & 4)) == 0)) ? 1 : 0);
+        }
+        return 0;
+    }
+    if (key_down[(int)(unsigned char)*(signed char *)(key_map + a1)] != 0 && key_was_down[(int)(unsigned char)*(signed char *)(key_map + a1)] == 0) {
+        key_was_down[(int)(unsigned char)*(signed char *)(key_map + a1)] = 1;
+        return 1;
+    }
+    if (key_down[(int)(unsigned char)*(signed char *)(key_map + a1)] == 0) {
+        key_was_down[(int)(unsigned char)*(signed char *)(key_map + a1)] = 0;
+    }
     return 0;
-case 202:
-    return (((((int)(unsigned char)(*(signed char *)mouse_buttons & 1)) != 0) && (((int)(unsigned char)(*(signed char *)mouse_buttons_prev & 1)) == 0)) ? 1 : 0);
-case 203:
-    return (((((int)(unsigned char)(*(signed char *)mouse_buttons & 2)) != 0) && (((int)(unsigned char)(*(signed char *)mouse_buttons_prev & 2)) == 0)) ? 1 : 0);
-case 212:
-    return (((((int)(unsigned char)(*(signed char *)mouse_buttons & 4)) != 0) && (((int)(unsigned char)(*(signed char *)mouse_buttons_prev & 4)) == 0)) ? 1 : 0);
-default:
-L43270:;
-    return 0;
-L4327C:;
-    if (*(signed char *)(key_down + ((int)(unsigned char)*(signed char *)(key_map + a1))) == 0) goto L432AA;
-    if (*(signed char *)(key_was_down + ((int)(unsigned char)*(signed char *)(key_map + a1))) == 0) goto L432AC;
-L432AA:;
-    goto L432CA;
-L432AC:;
-    *(signed char *)(key_was_down + ((int)(unsigned char)*(signed char *)(key_map + a1))) = 1;
-    return 1;
-L432CA:;
-    if (*(signed char *)(key_down + ((int)(unsigned char)*(signed char *)(key_map + a1))) != 0) goto L432F6;
-    *(signed char *)(key_was_down + ((int)(unsigned char)*(signed char *)(key_map + a1))) = 0;
-L432F6:;
-    return 0;
-}
 }

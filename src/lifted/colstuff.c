@@ -7,62 +7,62 @@ struct bf8_0_1 { unsigned char f:1; };
 struct bf8_3_1 { unsigned char _:3; unsigned char f:1; };
 struct bf8_5_1 { unsigned char _:5; unsigned char f:1; };
 struct bf8_7_1 { unsigned char _:7; unsigned char f:1; };
-extern char dungeon_water_level[];
+extern int dungeon_water_level;
 extern char D_00170710[];
 extern char D_0017071B[];
-extern char player_environment[];
+extern unsigned char player_environment;
 extern char monster_table_flags[];
 extern struct record *D_00190504[];
 extern char D_00190BE4[];
-extern char itemmaker_slot_kinds[];
-extern char D_001940D7[];
-extern char player_motion_flags[];
+extern signed char itemmaker_slot_kinds[];
+extern unsigned char D_001940D7;
+extern signed char player_motion_flags;
 extern char frame_counter[];
 extern struct record *player_object;
-extern char D_00195AB4[];
-extern char vertical_velocity[];
+extern int D_00195AB4;
+extern int vertical_velocity;
 extern struct record *D_00195AC4;
 extern char cheat_flags[];
 extern struct record *D_00195AF4;
-extern char creature_count[];
+extern int creature_count;
 extern struct character *player_character;
 extern struct record *D_00195C48;
 extern struct record *D_00195C70;
-extern char D_00195C74[];
+extern int D_00195C74;
 extern struct record *D_00195CB8;
-extern char D_00195CD0[];
-extern char D_00195CD4[];
-extern char D_00195CD8[];
-extern char nearest_creature_distance[];
-extern char ai_monster_flags[];
+extern int D_00195CD0;
+extern int D_00195CD4;
+extern int D_00195CD8;
+extern int nearest_creature_distance;
+extern int ai_monster_flags;
 extern struct record *nearest_creature;
-extern char D_00195DC0[];
-extern char player_on_ground[];
-extern char in_dungeon_water[];
-extern char D_00196296[];
-extern char D_00196297[];
-extern char D_001962A0[];
-extern char collide_candidate_count[];
+extern int D_00195DC0;
+extern signed char player_on_ground;
+extern signed char in_dungeon_water;
+extern signed char D_00196296;
+extern signed char D_00196297;
+extern signed char D_001962A0;
+extern int collide_candidate_count;
 extern char D_00196B10[];
-extern char D_00196B14[];
-extern char D_00196B18[];
+extern int D_00196B14;
+extern int D_00196B18;
 extern char D_00196B1C[];
-extern char D_00196B20[];
-extern char D_00196B24[];
+extern int D_00196B20;
+extern int D_00196B24;
 extern char D_00196B28[];
-extern char D_00196B2C[];
-extern char D_00196B30[];
-extern char D_00196B34[];
-extern char D_00196B38[];
-extern char D_00196B3C[];
+extern int D_00196B2C;
+extern int D_00196B30;
+extern int D_00196B34;
+extern int D_00196B38;
+extern int D_00196B3C;
 extern struct record *collide_candidates[];
-extern char D_00196D48[];
-extern char D_00196D4C[];
-extern char D_00196D50[];
+extern int D_00196D48;
+extern int D_00196D4C;
+extern int D_00196D50;
 extern char D_00196D54[];
-extern char D_00196D58[];
-extern char D_00196D5C[];
-extern char D_00196D60[];
+extern int D_00196D58;
+extern int D_00196D5C;
+extern int D_00196D60;
 extern char collide_flags[];
 
 extern int object_find_open(int, int);
@@ -96,26 +96,23 @@ int collide_move_missile(struct record *a1, int a2, int a3)
 
     l_14 = 0;
     *(signed char *)collide_flags &= 252;
-    *(int *)D_00196D60 = a1->y;
-    if (((int)(unsigned char)*(signed char *)player_environment) != 1) goto L21A22;
-    if ((*(int *)D_00196D60 = func_0014B45B(a1->x, a1->z)) > a1->y) goto L21A22;
-    return 2;
-L21A22:;
-    if (func_00023EC2(a1, a2, 100) == 0) goto L21A49;
-    *(signed char *)collide_flags |= 8;
-    return 8;
-L21A49:;
+    D_00196D60 = a1->y;
+    if (((int)player_environment) == 1) {
+        if ((D_00196D60 = func_0014B45B(a1->x, a1->z)) <= a1->y) return 2;
+    }
+    if (func_00023EC2(a1, a2, 100) != 0) {
+        *(signed char *)collide_flags |= 8;
+        return 8;
+    }
     *(int *)D_00196B10 = a1->x;
-    *(int *)D_00196B14 = a1->y;
-    *(int *)D_00196B18 = a1->z;
+    D_00196B14 = a1->y;
+    D_00196B18 = a1->z;
     mc_memcpy((int)D_00196B28, a2, 12, (int)D_00170710, 61, 4);
-    if (a3 == 0) goto L21AA6;
-    mc_memcpy((int)D_00196B34, a3, 12, (int)D_00170710, 63, 4);
-L21AA6:;
+    if (a3 != 0) mc_memcpy((int)&D_00196B34, a3, 12, (int)D_00170710, 63, 4);
     collide_for_each_nearby(a1, (int)func_00021B04);
-    if (((int)(short)(*(short *)collide_flags & 10)) != 0) goto L21AEF;
-    object_set_position(a1, *(int *)D_00196B28, *(int *)D_00196B2C, *(int *)D_00196B30, *(int *)D_00196B34, *(int *)D_00196B38, *(int *)D_00196B3C);
-L21AEF:;
+    if (((int)(short)(*(short *)collide_flags & 10)) == 0) {
+        object_set_position(a1, *(int *)D_00196B28, D_00196B2C, D_00196B30, D_00196B34, D_00196B38, D_00196B3C);
+    }
     return (int)(short)*(short *)collide_flags;
 }
 
@@ -132,86 +129,52 @@ void func_00021B04(struct record *a1)
 
     if ((a1->flags & 512) != 0) return;
     switch (a1->type) {
-case 43:
-    l_30 = &a1->data.block;
-    l_2C = l_30->models;
-    l_20 = 0;
-L21B8E:;
-    if (l_30->model_count > l_20) goto L21BB1;
-    goto L21C3B;
-L21BA2:;
-    l_20++;
-    l_2C++;
-    goto L21B8E;
-L21BB1:;
-    if (((int)(short)(*(short *)collide_flags & 4)) == 0) goto L21BD1;
-    if (((int)(short)(*(short *)collide_flags & 2)) == 0) goto L21BD3;
-L21BD1:;
-    goto L21C36;
-L21BD3:;
-    l_34 = (int)&l_2C->model;
-    if (*(int *)((char *)l_34) == 0) goto L21C36;
-    if ((*(int *)D_00196D48 = func_0014A300(l_34, (int)D_00196B10, (int)D_00196B28, 0)) == 0) goto L21C0F;
-    if (*(int *)D_00196D48 != (-1)) goto L21C11;
-L21C0F:;
-    goto L21C36;
-L21C11:;
-    *(int *)D_00195DC0 = (int)(*(char **)((char *)l_34) + *(int *)(*(char **)D_00196D48 + 16));
-    *(signed char *)collide_flags |= 2;
-    D_00195C48 = a1;
-L21C36:;
-    goto L21BA2;
-L21C3B:;
-    return;
-case 56:
-    l_2C = (struct block_model *)RECORD_DATA(a1);
-    l_20 = 0;
-L21C50:;
-    if (a1->model_count > l_20) goto L21C75;
-    goto L21CFF;
-L21C66:;
-    l_20++;
-    l_2C++;
-    goto L21C50;
-L21C75:;
-    if (((int)(short)(*(short *)collide_flags & 4)) == 0) goto L21C95;
-    if (((int)(short)(*(short *)collide_flags & 2)) == 0) goto L21C97;
-L21C95:;
-    goto L21CFA;
-L21C97:;
-    l_34 = (int)&l_2C->model;
-    if (*(int *)((char *)l_34) == 0) goto L21CFA;
-    if ((*(int *)D_00196D48 = func_0014A300(l_34, (int)D_00196B10, (int)D_00196B28, 0)) == 0) goto L21CD3;
-    if (*(int *)D_00196D48 != (-1)) goto L21CD5;
-L21CD3:;
-    goto L21CFA;
-L21CD5:;
-    *(int *)D_00195DC0 = (int)(*(char **)((char *)l_34) + *(int *)(*(char **)D_00196D48 + 16));
-    *(signed char *)collide_flags |= 2;
-    D_00195C48 = a1;
-L21CFA:;
-    goto L21C66;
-L21CFF:;
-    return;
-case 6:
-case 32:
-    l_34 = (int)RECORD_DATA(a1);
-    if (*(int *)((char *)l_34) == 0) return;
-    if (((int)(short)(*(short *)collide_flags & 4)) == 0) goto L21D39;
-    if (((int)(short)(*(short *)collide_flags & 2)) == 0) goto L21D3B;
-L21D39:;
-    return;
-L21D3B:;
-    if ((*(int *)D_00196D48 = func_0014A300(l_34, (int)D_00196B10, (int)D_00196B28, 0)) == 0) goto L21D66;
-    if (*(int *)D_00196D48 != (-1)) goto L21D68;
-L21D66:;
-    return;
-L21D68:;
-    *(int *)D_00195DC0 = (int)(*(char **)((char *)l_34) + *(int *)(*(char **)D_00196D48 + 16));
-    *(signed char *)collide_flags |= 2;
-    D_00195C48 = a1;
-default:;
-}
+    case 43:
+        l_30 = &a1->data.block;
+        l_2C = l_30->models;
+        for (l_20 = 0; l_30->model_count > l_20; l_20++, l_2C++) {
+            if (((int)(short)(*(short *)collide_flags & 4)) != 0 && ((int)(short)(*(short *)collide_flags & 2)) == 0) {
+                l_34 = (int)&l_2C->model;
+                if (*(int *)((char *)l_34) != 0) {
+                    if ((D_00196D48 = func_0014A300(l_34, (int)D_00196B10, (int)D_00196B28, 0)) != 0 && D_00196D48 != (-1)) {
+                        D_00195DC0 = (int)(*(char **)((char *)l_34) + *(int *)(*(char **)&D_00196D48 + 16));
+                        *(signed char *)collide_flags |= 2;
+                        D_00195C48 = a1;
+                    }
+                }
+            }
+        }
+        return;
+    case 56:
+        l_2C = (struct block_model *)RECORD_DATA(a1);
+        for (l_20 = 0; a1->model_count > l_20; l_20++, l_2C++) {
+            if (((int)(short)(*(short *)collide_flags & 4)) != 0 && ((int)(short)(*(short *)collide_flags & 2)) == 0) {
+                l_34 = (int)&l_2C->model;
+                if (*(int *)((char *)l_34) != 0) {
+                    if ((D_00196D48 = func_0014A300(l_34, (int)D_00196B10, (int)D_00196B28, 0)) != 0 && D_00196D48 != (-1)) {
+                        D_00195DC0 = (int)(*(char **)((char *)l_34) + *(int *)(*(char **)&D_00196D48 + 16));
+                        *(signed char *)collide_flags |= 2;
+                        D_00195C48 = a1;
+                    }
+                }
+            }
+        }
+        return;
+    case 6:
+    case 32:
+        l_34 = (int)RECORD_DATA(a1);
+        if (*(int *)((char *)l_34) == 0) return;
+        if (((int)(short)(*(short *)collide_flags & 4)) == 0 || ((int)(short)(*(short *)collide_flags & 2)) != 0) {
+            return;
+        }
+        if ((D_00196D48 = func_0014A300(l_34, (int)D_00196B10, (int)D_00196B28, 0)) == 0 || D_00196D48 == (-1)) {
+            return;
+        }
+        D_00195DC0 = (int)(*(char **)((char *)l_34) + *(int *)(*(char **)&D_00196D48 + 16));
+        *(signed char *)collide_flags |= 2;
+        D_00195C48 = a1;
+    default:;
+    }
 }
 
 void func_00021D97(struct record *a1)
@@ -223,131 +186,65 @@ void func_00021D97(struct record *a1)
     int l_1C;
     int l_18;
 
-    if ((a1->flags & 512) != 0) goto L21DC6;
-    if (((struct bf8_5_1 *)&cheat_flags)->f == 0) goto L21DCB;
-L21DC6:;
-    return;
-L21DCB:;
+    if ((a1->flags & 512) != 0 || ((struct bf8_5_1 *)&cheat_flags)->f != 0) return;
     switch (a1->type) {
-case 43:
-    l_28 = &a1->data.block;
-    l_24 = l_28->models;
-    l_20 = 0;
-L21E2B:;
-    if (l_28->model_count > l_20) goto L21E4E;
-    goto L21F44;
-L21E3F:;
-    l_20++;
-    l_24++;
-    goto L21E2B;
-L21E4E:;
-    l_2C = (int)&l_24->model;
-    if (*(int *)((char *)l_2C) == 0) goto L21F3F;
-    if ((*(int *)D_00196D48 = func_0014A300(l_2C, (int)D_00196B10, (int)D_00196B1C, 0)) == 0) goto L21E8E;
-    if (*(int *)D_00196D48 != (-1)) goto L21E93;
-L21E8E:;
-    goto L21F3F;
-L21E93:;
-    l_1C = 0;
-L21E9A:;
-    if (l_1C < *(int *)(*(char **)D_00196D48)) goto L21EB4;
-    goto L21F38;
-L21EAC:;
-    l_1C++;
-    goto L21E9A;
-L21EB4:;
-    if (*(int *)D_00190BE4 == 0) goto L21ED3;
-    if (*(int *)(*(char **)D_00196D48 + 8 + (l_1C * 30)) > *(int *)D_00196D60) goto L21EE9;
-L21ED3:;
-    if (*(int *)(*(char **)D_00196D48 + 8 + (l_1C * 30)) >= *(int *)D_00196D60) goto L21F33;
-L21EE9:;
-    *(int *)D_00196D60 = *(int *)(*(char **)D_00196D48 + 8 + (l_1C * 30));
-    *(int *)D_00195AB4 = (int)(*(char **)((char *)l_2C) + *(int *)(*(char **)D_00196D48 + 16 + (l_1C * 30)));
-    *(int *)D_00195CD8 = (int)(*(char **)D_00196D48 + 4 + (l_1C * 30));
-    D_00195CB8 = a1;
-L21F33:;
-    goto L21EAC;
-L21F38:;
-    *(signed char *)collide_flags |= 1;
-L21F3F:;
-    goto L21E3F;
-L21F44:;
-    return;
-case 56:
-    l_24 = (struct block_model *)RECORD_DATA(a1);
-    l_20 = 0;
-L21F59:;
-    if (a1->model_count > l_20) goto L21F7E;
-    goto L22074;
-L21F6F:;
-    l_20++;
-    l_24++;
-    goto L21F59;
-L21F7E:;
-    l_2C = (int)&l_24->model;
-    if (*(int *)((char *)l_2C) == 0) goto L2206F;
-    if ((*(int *)D_00196D48 = func_0014A300(l_2C, (int)D_00196B10, (int)D_00196B28, 0)) == 0) goto L21FBE;
-    if (*(int *)D_00196D48 != (-1)) goto L21FC3;
-L21FBE:;
-    goto L2206F;
-L21FC3:;
-    l_1C = 0;
-L21FCA:;
-    if (l_1C < *(int *)(*(char **)D_00196D48)) goto L21FE4;
-    goto L22068;
-L21FDC:;
-    l_1C++;
-    goto L21FCA;
-L21FE4:;
-    if (*(int *)D_00190BE4 == 0) goto L22003;
-    if (*(int *)(*(char **)D_00196D48 + 8 + (l_1C * 30)) > *(int *)D_00196D60) goto L22019;
-L22003:;
-    if (*(int *)(*(char **)D_00196D48 + 8 + (l_1C * 30)) >= *(int *)D_00196D60) goto L22063;
-L22019:;
-    *(int *)D_00196D60 = *(int *)(*(char **)D_00196D48 + 8 + (l_1C * 30));
-    *(int *)D_00195AB4 = (int)(*(char **)((char *)l_2C) + *(int *)(*(char **)D_00196D48 + 16 + (l_1C * 30)));
-    *(int *)D_00195CD8 = (int)(*(char **)D_00196D48 + 4 + (l_1C * 30));
-    D_00195CB8 = a1;
-L22063:;
-    goto L21FDC;
-L22068:;
-    *(signed char *)collide_flags |= 1;
-L2206F:;
-    goto L21F6F;
-L22074:;
-    return;
-case 6:
-case 32:
-    l_2C = (int)RECORD_DATA(a1);
-    if (*(int *)((char *)l_2C) == 0) return;
-    if ((*(int *)D_00196D48 = func_0014A300(l_2C, (int)D_00196B10, (int)D_00196B1C, 0)) == 0) goto L220B9;
-    if (*(int *)D_00196D48 != (-1)) goto L220BE;
-L220B9:;
-    return;
-L220BE:;
-    l_1C = 0;
-L220C5:;
-    if (l_1C < *(int *)(*(char **)D_00196D48)) goto L220DF;
-    goto L22163;
-L220D7:;
-    l_1C++;
-    goto L220C5;
-L220DF:;
-    if (*(int *)D_00190BE4 == 0) goto L220FE;
-    if (*(int *)(*(char **)D_00196D48 + 8 + (l_1C * 30)) > *(int *)D_00196D60) goto L22114;
-L220FE:;
-    if (*(int *)(*(char **)D_00196D48 + 8 + (l_1C * 30)) >= *(int *)D_00196D60) goto L2215E;
-L22114:;
-    *(int *)D_00196D60 = *(int *)(*(char **)D_00196D48 + 8 + (l_1C * 30));
-    *(int *)D_00195AB4 = (int)(*(char **)((char *)l_2C) + *(int *)(*(char **)D_00196D48 + 16 + (l_1C * 30)));
-    *(int *)D_00195CD8 = (int)(*(char **)D_00196D48 + 4 + (l_1C * 30));
-    D_00195CB8 = a1;
-L2215E:;
-    goto L220D7;
-L22163:;
-    *(signed char *)collide_flags |= 1;
-default:;
-}
+    case 43:
+        l_28 = &a1->data.block;
+        l_24 = l_28->models;
+        for (l_20 = 0; l_28->model_count > l_20; l_20++, l_24++) {
+            l_2C = (int)&l_24->model;
+            if (*(int *)((char *)l_2C) != 0) {
+                if ((D_00196D48 = func_0014A300(l_2C, (int)D_00196B10, (int)D_00196B1C, 0)) != 0 && D_00196D48 != (-1)) {
+                    for (l_1C = 0; l_1C < *(int *)(*(char **)&D_00196D48); l_1C++) {
+                        if ((*(int *)D_00190BE4 != 0 && *(int *)(*(char **)&D_00196D48 + 8 + (l_1C * 30)) > D_00196D60) || *(int *)(*(char **)&D_00196D48 + 8 + (l_1C * 30)) < D_00196D60) {
+                            D_00196D60 = *(int *)(*(char **)&D_00196D48 + 8 + (l_1C * 30));
+                            D_00195AB4 = (int)(*(char **)((char *)l_2C) + *(int *)(*(char **)&D_00196D48 + 16 + (l_1C * 30)));
+                            D_00195CD8 = (int)(*(char **)&D_00196D48 + 4 + (l_1C * 30));
+                            D_00195CB8 = a1;
+                        }
+                    }
+                    *(signed char *)collide_flags |= 1;
+                }
+            }
+        }
+        return;
+    case 56:
+        l_24 = (struct block_model *)RECORD_DATA(a1);
+        for (l_20 = 0; a1->model_count > l_20; l_20++, l_24++) {
+            l_2C = (int)&l_24->model;
+            if (*(int *)((char *)l_2C) != 0) {
+                if ((D_00196D48 = func_0014A300(l_2C, (int)D_00196B10, (int)D_00196B28, 0)) != 0 && D_00196D48 != (-1)) {
+                    for (l_1C = 0; l_1C < *(int *)(*(char **)&D_00196D48); l_1C++) {
+                        if ((*(int *)D_00190BE4 != 0 && *(int *)(*(char **)&D_00196D48 + 8 + (l_1C * 30)) > D_00196D60) || *(int *)(*(char **)&D_00196D48 + 8 + (l_1C * 30)) < D_00196D60) {
+                            D_00196D60 = *(int *)(*(char **)&D_00196D48 + 8 + (l_1C * 30));
+                            D_00195AB4 = (int)(*(char **)((char *)l_2C) + *(int *)(*(char **)&D_00196D48 + 16 + (l_1C * 30)));
+                            D_00195CD8 = (int)(*(char **)&D_00196D48 + 4 + (l_1C * 30));
+                            D_00195CB8 = a1;
+                        }
+                    }
+                    *(signed char *)collide_flags |= 1;
+                }
+            }
+        }
+        return;
+    case 6:
+    case 32:
+        l_2C = (int)RECORD_DATA(a1);
+        if (*(int *)((char *)l_2C) == 0) return;
+        if ((D_00196D48 = func_0014A300(l_2C, (int)D_00196B10, (int)D_00196B1C, 0)) == 0 || D_00196D48 == (-1)) {
+            return;
+        }
+        for (l_1C = 0; l_1C < *(int *)(*(char **)&D_00196D48); l_1C++) {
+            if ((*(int *)D_00190BE4 != 0 && *(int *)(*(char **)&D_00196D48 + 8 + (l_1C * 30)) > D_00196D60) || *(int *)(*(char **)&D_00196D48 + 8 + (l_1C * 30)) < D_00196D60) {
+                D_00196D60 = *(int *)(*(char **)&D_00196D48 + 8 + (l_1C * 30));
+                D_00195AB4 = (int)(*(char **)((char *)l_2C) + *(int *)(*(char **)&D_00196D48 + 16 + (l_1C * 30)));
+                D_00195CD8 = (int)(*(char **)&D_00196D48 + 4 + (l_1C * 30));
+                D_00195CB8 = a1;
+            }
+        }
+        *(signed char *)collide_flags |= 1;
+    default:;
+    }
 }
 
 void func_00022174(struct record *a1)
@@ -361,124 +258,81 @@ void func_00022174(struct record *a1)
     int l_1C;
     int l_18;
 
-    if ((a1->flags & 512) != 0) goto L221A3;
-    if (((struct bf8_5_1 *)&cheat_flags)->f == 0) goto L221A8;
-L221A3:;
-    return;
-L221A8:;
+    if ((a1->flags & 512) != 0 || ((struct bf8_5_1 *)&cheat_flags)->f != 0) return;
     switch (a1->type) {
-case 43:
-    l_30 = &a1->data.block;
-    l_2C = l_30->models;
-    l_28 = 0;
-L2221D:;
-    if (l_30->model_count > l_28) goto L22240;
-    goto L222E0;
-L22231:;
-    l_28++;
-    l_2C++;
-    goto L2221D;
-L22240:;
-    if (((int)(short)(*(short *)collide_flags & 4)) == 0) goto L22260;
-    if (((int)(short)(*(short *)collide_flags & 2)) == 0) goto L22265;
-L22260:;
-    goto L222DB;
-L22265:;
-    l_34 = (int)&l_2C->model;
-    if (*(int *)((char *)l_34) == 0) goto L222DB;
-    if ((*(int *)D_00196D48 = func_0014AA92(l_34, *(int *)D_00196D4C, 0)) == 0) goto L2229D;
-    if (*(int *)D_00196D48 != (-1)) goto L2229F;
-L2229D:;
-    goto L222DB;
-L2229F:;
-    *(int *)D_00196D50 = *(int *)D_00196D48;
-    *(int *)D_00195DC0 = (int)(*(char **)((char *)l_34) + *(int *)(*(char **)D_00196D48 + 16));
-    *(int *)D_00195CD4 = *(int *)D_00196D48 + 4;
-    *(signed char *)collide_flags |= 2;
-    D_00195C48 = a1;
-L222DB:;
-    goto L22231;
-L222E0:;
-    return;
-case 56:
-    l_2C = (struct block_model *)RECORD_DATA(a1);
-    l_28 = 0;
-L222F5:;
-    if (a1->model_count > l_28) goto L2231A;
-    goto L223BA;
-L2230B:;
-    l_28++;
-    l_2C++;
-    goto L222F5;
-L2231A:;
-    if (((int)(short)(*(short *)collide_flags & 4)) == 0) goto L2233A;
-    if (((int)(short)(*(short *)collide_flags & 2)) == 0) goto L2233F;
-L2233A:;
-    goto L223B5;
-L2233F:;
-    l_34 = (int)&l_2C->model;
-    if (*(int *)((char *)l_34) == 0) goto L223B5;
-    if ((*(int *)D_00196D48 = func_0014AA92(l_34, *(int *)D_00196D4C, 0)) == 0) goto L22377;
-    if (*(int *)D_00196D48 != (-1)) goto L22379;
-L22377:;
-    goto L223B5;
-L22379:;
-    *(int *)D_00196D50 = *(int *)D_00196D48;
-    *(int *)D_00195DC0 = (int)(*(char **)((char *)l_34) + *(int *)(*(char **)D_00196D48 + 16));
-    *(int *)D_00195CD4 = *(int *)D_00196D48 + 4;
-    *(signed char *)collide_flags |= 2;
-    D_00195C48 = a1;
-L223B5:;
-    goto L2230B;
-L223BA:;
-    return;
-case 32:
-    if ((a1->flags & 256) != 0) return;
-    if (D_00195AF4->type != 18) goto L22468;
-    l_20 = &D_00195AF4->data.character;
-    if ((l_20->mobile_id & 128) != 0) goto L2242F;
-    if (((int)(unsigned short)(*(short *)(monster_table_flags + (l_20->race * 29)) & 4)) == 0) goto L22468;
+    case 43:
+        l_30 = &a1->data.block;
+        l_2C = l_30->models;
+        for (l_28 = 0; l_30->model_count > l_28; l_28++, l_2C++) {
+            if (((int)(short)(*(short *)collide_flags & 4)) != 0 && ((int)(short)(*(short *)collide_flags & 2)) == 0) {
+                l_34 = (int)&l_2C->model;
+                if (*(int *)((char *)l_34) != 0) {
+                    if ((D_00196D48 = func_0014AA92(l_34, D_00196D4C, 0)) != 0 && D_00196D48 != (-1)) {
+                        D_00196D50 = D_00196D48;
+                        D_00195DC0 = (int)(*(char **)((char *)l_34) + *(int *)(*(char **)&D_00196D48 + 16));
+                        D_00195CD4 = D_00196D48 + 4;
+                        *(signed char *)collide_flags |= 2;
+                        D_00195C48 = a1;
+                    }
+                }
+            }
+        }
+        return;
+    case 56:
+        l_2C = (struct block_model *)RECORD_DATA(a1);
+        for (l_28 = 0; a1->model_count > l_28; l_28++, l_2C++) {
+            if (((int)(short)(*(short *)collide_flags & 4)) != 0 && ((int)(short)(*(short *)collide_flags & 2)) == 0) {
+                l_34 = (int)&l_2C->model;
+                if (*(int *)((char *)l_34) != 0) {
+                    if ((D_00196D48 = func_0014AA92(l_34, D_00196D4C, 0)) != 0 && D_00196D48 != (-1)) {
+                        D_00196D50 = D_00196D48;
+                        D_00195DC0 = (int)(*(char **)((char *)l_34) + *(int *)(*(char **)&D_00196D48 + 16));
+                        D_00195CD4 = D_00196D48 + 4;
+                        *(signed char *)collide_flags |= 2;
+                        D_00195C48 = a1;
+                    }
+                }
+            }
+        }
+        return;
+    case 32:
+        if ((a1->flags & 256) != 0) return;
+        if (D_00195AF4->type != 18) goto L22468;
+        l_20 = &D_00195AF4->data.character;
+        if ((l_20->mobile_id & 128) != 0) goto L2242F;
+        if (((int)(unsigned short)(*(short *)(monster_table_flags + (l_20->race * 29)) & 4)) == 0) goto L22468;
 L2242F:;
-    if (a1->lock_level == 0) goto L2244E;
-    if ((a1->flags & 64) == 0) goto L22468;
+        if (a1->lock_level == 0) goto L2244E;
+        if ((a1->flags & 64) == 0) goto L22468;
 L2244E:;
-    if (door_start_swing(a1, 0) == 0) goto L22468;
-    a1->flags |= 0x100;
-    return;
-case 6:
+        if (door_start_swing(a1, 0) == 0) goto L22468;
+        a1->flags |= 0x100;
+        return;
+    case 6:
 L22468:;
-    l_34 = (int)RECORD_DATA(a1);
-    if (*(int *)((char *)l_34) == 0) goto L2251A;
-    if (a1->move_frame == *(int *)frame_counter) goto L224AD;
-    if (((int)(short)(*(short *)collide_flags & 4)) == 0) goto L224AB;
-    if (((int)(short)(*(short *)collide_flags & 2)) == 0) goto L224AD;
-L224AB:;
-    goto L2251A;
-L224AD:;
-    if ((*(int *)D_00196D48 = func_0014AA92(l_34, *(int *)D_00196D4C, 0)) == 0) goto L224D4;
-    if (*(int *)D_00196D48 != (-1)) goto L224D6;
-L224D4:;
-    goto L2251A;
-L224D6:;
-    *(int *)D_00196D50 = *(int *)D_00196D48;
-    *(int *)D_00195DC0 = (int)(*(char **)((char *)l_34) + *(int *)(*(char **)D_00196D48 + 16));
-    *(int *)D_00195CD4 = *(int *)D_00196D48 + 4;
-    *(signed char *)collide_flags |= 2;
-    D_00195C70 = a1;
-    D_00195C48 = a1;
-L2251A:;
-    return;
-case 18:
-    if (D_00195AF4 == a1) return;
-    if ((*(int *)D_00196D48 = func_0014B1C7(&a1->x, (int)D_00196B10, (int)D_00196B28, a1->image, 4, 0, 0)) == 0) goto L22561;
-    if (*(int *)D_00196D48 != (-1)) goto L22563;
-L22561:;
-    return;
-L22563:;
-    D_00195C48 = a1;
-    *(signed char *)collide_flags |= 8;
-default:;
-}
+        l_34 = (int)RECORD_DATA(a1);
+        if (*(int *)((char *)l_34) != 0) {
+            if (a1->move_frame == *(int *)frame_counter || (((int)(short)(*(short *)collide_flags & 4)) != 0 && ((int)(short)(*(short *)collide_flags & 2)) == 0)) {
+                if ((D_00196D48 = func_0014AA92(l_34, D_00196D4C, 0)) != 0 && D_00196D48 != (-1)) {
+                    D_00196D50 = D_00196D48;
+                    D_00195DC0 = (int)(*(char **)((char *)l_34) + *(int *)(*(char **)&D_00196D48 + 16));
+                    D_00195CD4 = D_00196D48 + 4;
+                    *(signed char *)collide_flags |= 2;
+                    D_00195C70 = a1;
+                    D_00195C48 = a1;
+                }
+            }
+        }
+        return;
+    case 18:
+        if (D_00195AF4 == a1) return;
+        if ((D_00196D48 = func_0014B1C7(&a1->x, (int)D_00196B10, (int)D_00196B28, a1->image, 4, 0, 0)) == 0 || D_00196D48 == (-1)) {
+            return;
+        }
+        D_00195C48 = a1;
+        *(signed char *)collide_flags |= 8;
+    default:;
+    }
 }
 
 int func_0002294E(struct record *a1, int a2, struct move_request *a3)
@@ -489,281 +343,145 @@ int func_0002294E(struct record *a1, int a2, struct move_request *a3)
     int l_14;
 
     l_1C = 0;
-    *(signed char *)D_00196297 = 1;
-    *(int *)D_00195C74 = a1->y - 120;
+    D_00196297 = 1;
+    D_00195C74 = a1->y - 120;
     *(int *)D_00190BE4 = 0;
-    *(int *)((char *)(*(int *)D_00196D4C = (int)a3->probe)) = a3->x;
-    *(int *)(*(char **)D_00196D4C + 4) = a3->y;
-    *(int *)(*(char **)D_00196D4C + 8) = a3->z;
+    *(int *)((char *)(D_00196D4C = (int)a3->probe)) = a3->x;
+    *(int *)(((char *)D_00196D4C) + 4) = a3->y;
+    *(int *)(((char *)D_00196D4C) + 8) = a3->z;
     *(signed char *)collide_flags &= 228;
     D_00195AF4 = a1;
-    *(signed char *)D_001962A0 = 0;
-    if (((int)(unsigned char)*(signed char *)player_environment) != 1) goto L22A24;
-    *(int *)D_00196D60 = func_0014B45B(a1->x, a1->z);
-    if (a1->y < *(int *)D_00196D60) goto L22A19;
-    if ((signed char)func_0002021B(a3->x, a3->z) == 0) goto L22A1B;
-L22A19:;
-    goto L22A22;
-L22A1B:;
-    *(signed char *)D_001962A0 = 1;
-L22A22:;
-    goto L22A34;
-L22A24:;
-    *(int *)D_00196D60 = a1->y + 1000;
-L22A34:;
+    D_001962A0 = 0;
+    if (((int)player_environment) == 1) {
+        D_00196D60 = func_0014B45B(a1->x, a1->z);
+        if (a1->y >= D_00196D60 && (signed char)func_0002021B(a3->x, a3->z) == 0) {
+            D_001962A0 = 1;
+        }
+    } else {
+        D_00196D60 = a1->y + 1000;
+    }
     mc_memcpy((int)D_00196B28, a3, 12, (int)D_00170710, 474, 4);
-    if (((int)(short)(*(short *)collide_flags & 4)) == 0) goto L22A79;
-    if (memcmp(a3, &a1->x, 12) == 0) goto L22A7B;
-L22A79:;
-    goto L22A82;
-L22A7B:;
+    if (((int)(short)(*(short *)collide_flags & 4)) != 0 && memcmp(a3, &a1->x, 12) == 0) {
+        *(signed char *)collide_flags &= 251;
+    }
+    if (vertical_velocity > 5120) {
+        *(int *)D_00196B10 = *(int *)D_00196D54;
+        D_00196B14 = D_00196D58 - 20;
+        D_00196B18 = D_00196D5C;
+        *(int *)D_00196B1C = a3->x;
+        D_00196B20 = a3->y + 20;
+        D_00196B24 = a3->z;
+        for (l_14 = 0; l_14 < collide_candidate_count; l_14++) {
+            func_00021D97(collide_candidates[l_14]);
+        }
+    }
+    if (vertical_velocity < 0 || ((a1 == player_object && ((player_character->conditions & 0x8) != 0 || in_dungeon_water != 0)) || ((struct bf8_5_1 *)&player_motion_flags)->f != 0)) {
+        *(int *)D_00190BE4 = 1;
+        *(signed char *)collide_flags &= 254;
+        *(int *)D_00196B10 = a3->x;
+        D_00196B14 = a3->y - 60;
+        D_00196B18 = a3->z;
+        *(int *)D_00196B1C = a3->x;
+        D_00196B20 = a3->y - 120;
+        D_00196B24 = a3->z;
+        for (l_14 = 0; l_14 < collide_candidate_count; l_14++) {
+            func_00021D97(collide_candidates[l_14]);
+        }
+        *(int *)D_00190BE4 = 0;
+        if (((int)(short)(*(short *)collide_flags & 1)) != 0) {
+            D_00195C74 = D_00196D60;
+        } else {
+            D_00195C74 = a1->y - 120;
+        }
+        *(signed char *)collide_flags &= 254;
+        if (((int)player_environment) == 1) {
+            D_00196D60 = func_0014B45B(a1->x, a1->z);
+        } else {
+            D_00196D60 = a1->y + 1000;
+        }
+    }
+    if (((int)(short)(*(short *)collide_flags & 1)) == 0) {
+        *(int *)D_00196B10 = a3->x;
+        D_00196B14 = a3->y - 25;
+        D_00196B18 = a3->z;
+        *(int *)D_00196B1C = a3->x;
+        if (((struct bf8_3_1 *)&player_motion_flags)->f != 0) {
+            D_00196B20 = a3->y + 140;
+        } else {
+            D_00196B20 = a3->y + 40;
+        }
+        D_00196B24 = a3->z;
+        for (l_14 = 0; l_14 < collide_candidate_count; l_14++) {
+            func_00021D97(collide_candidates[l_14]);
+        }
+    }
+    if (D_00196D60 < a3->y) {
+        D_00196B14 = (D_00196B2C = D_00196D60);
+        *(int *)(((char *)D_00196D4C) + 4) = D_00196B14;
+    }
+    for (l_14 = 0; l_14 < collide_candidate_count; l_14++) {
+        func_00022174(collide_candidates[l_14]);
+    }
+    if (func_00023DE0(a1, a3) != 0) *(signed char *)collide_flags |= 8;
+    if (((int)(short)(*(short *)collide_flags & 10)) != 0 && ((int)(short)(*(short *)collide_flags & 4)) != 0) {
+        if (a1 == player_object && ((struct bf8_5_1 *)&player_motion_flags)->f != 0) {
+            if (a3->y < a1->y && (a3->y - 90) > D_00195C74) {
+                object_move_by(a1, 0, -(a1->y - a3->y), 0, 0, a1->yaw - a3->yaw, 0);
+            } else if (a3->y > a1->y && D_00196D60 > a3->y) {
+                object_move_by(a1, 0, -(a1->y - a3->y), 0, 0, a1->yaw - a3->yaw, 0);
+            }
+        }
+        if ((D_00196D60 < a3->y && (((int)(short)(*(short *)collide_flags & 1)) != 0 || ((int)player_environment) == 1)) || ((struct bf8_5_1 *)&D_001940D7)->f != 0) {
+            D_001940D7 &= 223;
+            object_move_by(a1, 0, D_00196D60 - a1->y, 0, 0, 0, 0);
+            l_1C = 1;
+        } else if (D_00196D60 != a1->y) {
+            if (((struct bf8_5_1 *)&player_motion_flags)->f == 0 && D_00196296 == 0 && (player_character->conditions & 0x8) == 0 && in_dungeon_water == 0 && (D_00196D60 - a1->y) < 30) {
+                object_move_by(a1, 0, D_00196D60 - a1->y, 0, 0, 0, 0);
+            } else {
+                *(signed char *)collide_flags |= 16;
+                if (((int)(short)(*(short *)collide_flags & 1)) == 0) {
+                    object_move_by(a1, 0, a3->y - a1->y, 0, 0, 0, 0);
+                }
+                player_on_ground = 0;
+            }
+        } else if (((int)(short)(*(short *)collide_flags & 16)) != 0) {
+            object_set_position(a1, a1->x, a1->y, a1->z, a3->angle_x, a3->yaw, a3->angle_z);
+        }
+        return (int)(short)*(short *)collide_flags;
+    }
+    if ((D_00196D60 < a3->y && (((int)(short)(*(short *)collide_flags & 1)) != 0 || ((int)player_environment) == 1)) || ((struct bf8_5_1 *)&D_001940D7)->f != 0) {
+        D_001940D7 &= 223;
+        object_move_by(a1, 0, D_00196D60 - a1->y, 0, 0, 0, 0);
+        l_1C = 1;
+    } else if (D_00196D60 >= a1->y && ((int)(short)(*(short *)collide_flags & 8)) == 0) {
+        if (((struct bf8_5_1 *)&player_motion_flags)->f == 0 && D_00196296 == 0 && in_dungeon_water == 0 && (player_character->conditions & 0x8) == 0 && (D_00196D60 - a1->y) < 30) {
+            object_move_by(a1, 0, D_00196D60 - a1->y, 0, 0, 0, 0);
+        } else {
+            if ((a3->y - 100) >= D_00195C74) {
+                object_move_by(a1, 0, a3->y - a1->y, 0, 0, 0, 0);
+            } else if ((a3->y - 100) < D_00195C74 && a3->y > a1->y) {
+                object_move_by(a1, 0, a3->y - a1->y, 0, 0, 0, 0);
+            }
+            if (D_00196D60 > a1->y) {
+                *(signed char *)collide_flags |= 16;
+                player_on_ground = 0;
+            }
+        }
+    }
+    if (((int)(short)(*(short *)collide_flags & 10)) == 0 && ((int)(short)(*(short *)collide_flags & 4)) != 0) {
+        if (((struct bf8_5_1 *)&player_motion_flags)->f == 0) {
+            object_set_position(a1, *(int *)D_00196B28, a1->y, D_00196B30, a3->angle_x, a3->yaw, a3->angle_z);
+        }
+    } else if (((struct bf8_5_1 *)&player_motion_flags)->f == 0) {
+        object_set_position(a1, a1->x, a1->y, a1->z, a3->angle_x, a3->yaw, a3->angle_z);
+    }
     *(signed char *)collide_flags &= 251;
-L22A82:;
-    if (*(int *)vertical_velocity <= 5120) goto L22B05;
-    *(int *)D_00196B10 = *(int *)D_00196D54;
-    *(int *)D_00196B14 = *(int *)D_00196D58 - 20;
-    *(int *)D_00196B18 = *(int *)D_00196D5C;
-    *(int *)D_00196B1C = a3->x;
-    *(int *)D_00196B20 = a3->y + 20;
-    *(int *)D_00196B24 = a3->z;
-    l_14 = 0;
-L22ADD:;
-    if (l_14 < *(int *)collide_candidate_count) goto L22AF2;
-    goto L22B05;
-L22AEA:;
-    l_14++;
-    goto L22ADD;
-L22AF2:;
-    func_00021D97(collide_candidates[l_14]);
-    goto L22AEA;
-L22B05:;
-    if (*(int *)vertical_velocity < 0) goto L22B3F;
-    if (a1 != player_object) goto L22B32;
-    if ((player_character->conditions & 0x8) != 0) goto L22B30;
-    if (*(signed char *)in_dungeon_water == 0) goto L22B32;
-L22B30:;
-    goto L22B3F;
-L22B32:;
-    if (((struct bf8_5_1 *)&player_motion_flags)->f == 0) goto L22C34;
-L22B3F:;
-    *(int *)D_00190BE4 = 1;
-    *(signed char *)collide_flags &= 254;
-    *(int *)D_00196B10 = a3->x;
-    *(int *)D_00196B14 = a3->y - 60;
-    *(int *)D_00196B18 = a3->z;
-    *(int *)D_00196B1C = a3->x;
-    *(int *)D_00196B20 = a3->y - 120;
-    *(int *)D_00196B24 = a3->z;
-    l_14 = 0;
-L22B9D:;
-    if (l_14 < *(int *)collide_candidate_count) goto L22BB2;
-    goto L22BC5;
-L22BAA:;
-    l_14++;
-    goto L22B9D;
-L22BB2:;
-    func_00021D97(collide_candidates[l_14]);
-    goto L22BAA;
-L22BC5:;
-    *(int *)D_00190BE4 = 0;
-    if (((int)(short)(*(short *)collide_flags & 1)) == 0) goto L22BEB;
-    *(int *)D_00195C74 = *(int *)D_00196D60;
-    goto L22BF9;
-L22BEB:;
-    *(int *)D_00195C74 = a1->y - 120;
-L22BF9:;
-    *(signed char *)collide_flags &= 254;
-    if (((int)(unsigned char)*(signed char *)player_environment) != 1) goto L22C24;
-    *(int *)D_00196D60 = func_0014B45B(a1->x, a1->z);
-    goto L22C34;
-L22C24:;
-    *(int *)D_00196D60 = a1->y + 1000;
-L22C34:;
-    if (((int)(short)(*(short *)collide_flags & 1)) != 0) goto L22CD8;
-    *(int *)D_00196B10 = a3->x;
-    *(int *)D_00196B14 = a3->y - 25;
-    *(int *)D_00196B18 = a3->z;
-    *(int *)D_00196B1C = a3->x;
-    if (((struct bf8_3_1 *)&player_motion_flags)->f == 0) goto L22C90;
-    *(int *)D_00196B20 = a3->y + 140;
-    goto L22C9E;
-L22C90:;
-    *(int *)D_00196B20 = a3->y + 40;
-L22C9E:;
-    *(int *)D_00196B24 = a3->z;
-    l_14 = 0;
-L22CB0:;
-    if (l_14 < *(int *)collide_candidate_count) goto L22CC5;
-    goto L22CD8;
-L22CBD:;
-    l_14++;
-    goto L22CB0;
-L22CC5:;
-    func_00021D97(collide_candidates[l_14]);
-    goto L22CBD;
-L22CD8:;
-    if (*(int *)D_00196D60 >= a3->y) goto L22D08;
-    *(int *)D_00196B14 = (*(int *)D_00196B2C = *(int *)D_00196D60);
-    *(int *)(*(char **)D_00196D4C + 4) = *(int *)D_00196B14;
-L22D08:;
-    l_14 = 0;
-L22D0F:;
-    if (l_14 < *(int *)collide_candidate_count) goto L22D24;
-    goto L22D37;
-L22D1C:;
-    l_14++;
-    goto L22D0F;
-L22D24:;
-    func_00022174(collide_candidates[l_14]);
-    goto L22D1C;
-L22D37:;
-    if (func_00023DE0(a1, a3) == 0) goto L22D4D;
-    *(signed char *)collide_flags |= 8;
-L22D4D:;
-    if (((int)(short)(*(short *)collide_flags & 10)) == 0) goto L22D6D;
-    if (((int)(short)(*(short *)collide_flags & 4)) != 0) goto L22D72;
-L22D6D:;
-    goto L22F98;
-L22D72:;
-    if (a1 != player_object) goto L22D86;
-    if (((struct bf8_5_1 *)&player_motion_flags)->f != 0) goto L22D8B;
-L22D86:;
-    goto L22E2C;
-L22D8B:;
-    if (a3->y >= a1->y) goto L22DAA;
-    if ((a3->y - 90) > *(int *)D_00195C74) goto L22DAC;
-L22DAA:;
-    goto L22DDE;
-L22DAC:;
-    object_move_by(a1, 0, -(a1->y - a3->y), 0, 0, a1->yaw - a3->yaw, 0);
-    goto L22E2C;
-L22DDE:;
-    if (a3->y <= a1->y) goto L22DFA;
-    if (*(int *)D_00196D60 > a3->y) goto L22DFC;
-L22DFA:;
-    goto L22E2C;
-L22DFC:;
-    object_move_by(a1, 0, -(a1->y - a3->y), 0, 0, a1->yaw - a3->yaw, 0);
-L22E2C:;
-    if (*(int *)D_00196D60 >= a3->y) goto L22E58;
-    if (((int)(short)(*(short *)collide_flags & 1)) != 0) goto L22E56;
-    if (((int)(unsigned char)*(signed char *)player_environment) != 1) goto L22E58;
-L22E56:;
-    goto L22E61;
-L22E58:;
-    if (((struct bf8_5_1 *)&D_001940D7)->f == 0) goto L22E95;
-L22E61:;
-    *(signed char *)D_001940D7 &= 223;
-    object_move_by(a1, 0, *(int *)D_00196D60 - a1->y, 0, 0, 0, 0);
-    l_1C = 1;
-    goto L22F89;
-L22E95:;
-    if (*(int *)D_00196D60 == a1->y) goto L22F4D;
-    if (((struct bf8_5_1 *)&player_motion_flags)->f != 0) goto L22EB9;
-    if (*(signed char *)D_00196296 == 0) goto L22EBB;
-L22EB9:;
-    goto L22EC9;
-L22EBB:;
-    if ((player_character->conditions & 0x8) == 0) goto L22ECB;
-L22EC9:;
-    goto L22ED4;
-L22ECB:;
-    if (*(signed char *)in_dungeon_water == 0) goto L22ED6;
-L22ED4:;
-    goto L22EE6;
-L22ED6:;
-    if ((*(int *)D_00196D60 - a1->y) < 30) goto L22EE8;
-L22EE6:;
-    goto L22F0B;
-L22EE8:;
-    object_move_by(a1, 0, *(int *)D_00196D60 - a1->y, 0, 0, 0, 0);
-    goto L22F4B;
-L22F0B:;
-    *(signed char *)collide_flags |= 16;
-    if (((int)(short)(*(short *)collide_flags & 1)) != 0) goto L22F44;
-    object_move_by(a1, 0, a3->y - a1->y, 0, 0, 0, 0);
-L22F44:;
-    *(signed char *)player_on_ground = 0;
-L22F4B:;
-    goto L22F89;
-L22F4D:;
-    if (((int)(short)(*(short *)collide_flags & 16)) == 0) goto L22F89;
-    object_set_position(a1, a1->x, a1->y, a1->z, a3->angle_x, a3->yaw, a3->angle_z);
-L22F89:;
-    return (int)(short)*(short *)collide_flags;
-L22F98:;
-    if (*(int *)D_00196D60 >= a3->y) goto L22FC4;
-    if (((int)(short)(*(short *)collide_flags & 1)) != 0) goto L22FC2;
-    if (((int)(unsigned char)*(signed char *)player_environment) != 1) goto L22FC4;
-L22FC2:;
-    goto L22FCD;
-L22FC4:;
-    if (((struct bf8_5_1 *)&D_001940D7)->f == 0) goto L23001;
-L22FCD:;
-    *(signed char *)D_001940D7 &= 223;
-    object_move_by(a1, 0, *(int *)D_00196D60 - a1->y, 0, 0, 0, 0);
-    l_1C = 1;
-    goto L2311F;
-L23001:;
-    if (*(int *)D_00196D60 < a1->y) goto L2301F;
-    if (((int)(short)(*(short *)collide_flags & 8)) == 0) goto L23024;
-L2301F:;
-    goto L2311F;
-L23024:;
-    if (((struct bf8_5_1 *)&player_motion_flags)->f != 0) goto L23036;
-    if (*(signed char *)D_00196296 == 0) goto L23038;
-L23036:;
-    goto L23041;
-L23038:;
-    if (*(signed char *)in_dungeon_water == 0) goto L23043;
-L23041:;
-    goto L23051;
-L23043:;
-    if ((player_character->conditions & 0x8) == 0) goto L23053;
-L23051:;
-    goto L23063;
-L23053:;
-    if ((*(int *)D_00196D60 - a1->y) < 30) goto L23065;
-L23063:;
-    goto L2308B;
-L23065:;
-    object_move_by(a1, 0, *(int *)D_00196D60 - a1->y, 0, 0, 0, 0);
-    goto L2311F;
-L2308B:;
-    if ((a3->y - 100) < *(int *)D_00195C74) goto L230C0;
-    object_move_by(a1, 0, a3->y - a1->y, 0, 0, 0, 0);
-    goto L23103;
-L230C0:;
-    if ((a3->y - 100) >= *(int *)D_00195C74) goto L230DF;
-    if (a3->y > a1->y) goto L230E1;
-L230DF:;
-    goto L23103;
-L230E1:;
-    object_move_by(a1, 0, a3->y - a1->y, 0, 0, 0, 0);
-L23103:;
-    if (*(int *)D_00196D60 <= a1->y) goto L2311F;
-    *(signed char *)collide_flags |= 16;
-    *(signed char *)player_on_ground = 0;
-L2311F:;
-    if (((int)(short)(*(short *)collide_flags & 10)) != 0) goto L2313F;
-    if (((int)(short)(*(short *)collide_flags & 4)) != 0) goto L23141;
-L2313F:;
-    goto L23178;
-L23141:;
-    if (((struct bf8_5_1 *)&player_motion_flags)->f != 0) goto L23176;
-    object_set_position(a1, *(int *)D_00196B28, a1->y, *(int *)D_00196B30, a3->angle_x, a3->yaw, a3->angle_z);
-L23176:;
-    goto L231AD;
-L23178:;
-    if (((struct bf8_5_1 *)&player_motion_flags)->f != 0) goto L231AD;
-    object_set_position(a1, a1->x, a1->y, a1->z, a3->angle_x, a3->yaw, a3->angle_z);
-L231AD:;
-    *(signed char *)collide_flags &= 251;
-    if (a1 != player_object) goto L231E0;
-    *(int *)D_00196D54 = a1->x;
-    *(int *)D_00196D58 = a1->y;
-    *(int *)D_00196D5C = a1->z;
-L231E0:;
+    if (a1 == player_object) {
+        *(int *)D_00196D54 = a1->x;
+        D_00196D58 = a1->y;
+        D_00196D5C = a1->z;
+    }
     return (int)(short)*(short *)collide_flags;
 }
 
@@ -779,72 +497,44 @@ void func_0002325A(struct record *a1)
 
     if ((a1->flags & 512) != 0) return;
     switch (a1->type) {
-case 43:
-    l_2C = &a1->data.block;
-    l_28 = l_2C->models;
-    l_24 = 0;
-L232E4:;
-    if (l_2C->model_count > l_24) goto L23307;
-    goto L23374;
-L232F8:;
-    l_24++;
-    l_28++;
-    goto L232E4;
-L23307:;
-    l_30 = (int)&l_28->model;
-    if (*(int *)((char *)l_30) == 0) goto L23372;
-    if ((*(int *)D_00196D48 = func_0014AA92(l_30, *(int *)D_00196D4C, 2)) != 0) goto L23342;
-    if (*(int *)D_00196D48 != (-1)) goto L23344;
-L23342:;
-    goto L23372;
-L23344:;
-    collide_candidates[(*(int *)collide_candidate_count)++] = a1;
-    if (*(int *)collide_candidate_count <= 128) goto L23372;
-    fatal_error((int)D_0017071B);
-L23372:;
-    goto L232F8;
-L23374:;
-    return;
-case 56:
-    l_28 = (struct block_model *)RECORD_DATA(a1);
-    l_24 = 0;
-L23389:;
-    if (a1->model_count > l_24) goto L233AE;
-    goto L2341B;
-L2339F:;
-    l_24++;
-    l_28++;
-    goto L23389;
-L233AE:;
-    l_30 = (int)&l_28->model;
-    if (*(int *)((char *)l_30) == 0) goto L23419;
-    if ((*(int *)D_00196D48 = func_0014AA92(l_30, *(int *)D_00196D4C, 2)) != 0) goto L233E9;
-    if (*(int *)D_00196D48 != (-1)) goto L233EB;
-L233E9:;
-    goto L23419;
-L233EB:;
-    collide_candidates[(*(int *)collide_candidate_count)++] = a1;
-    if (*(int *)collide_candidate_count <= 128) goto L23419;
-    fatal_error((int)D_0017071B);
-L23419:;
-    goto L2339F;
-L2341B:;
-    return;
-case 32:
-    if ((a1->flags & 256) != 0) return;
-case 6:
-    l_30 = (int)RECORD_DATA(a1);
-    if (*(int *)((char *)l_30) == 0) return;
-    if ((*(int *)D_00196D48 = func_0014AA92(l_30, *(int *)D_00196D4C, 2)) != 0) goto L23474;
-    if (*(int *)D_00196D48 != (-1)) goto L23476;
-L23474:;
-    return;
-L23476:;
-    collide_candidates[(*(int *)collide_candidate_count)++] = a1;
-    if (*(int *)collide_candidate_count <= 128) return;
-    fatal_error((int)D_0017071B);
-default:;
-}
+    case 43:
+        l_2C = &a1->data.block;
+        l_28 = l_2C->models;
+        for (l_24 = 0; l_2C->model_count > l_24; l_24++, l_28++) {
+            l_30 = (int)&l_28->model;
+            if (*(int *)((char *)l_30) != 0) {
+                if ((D_00196D48 = func_0014AA92(l_30, D_00196D4C, 2)) == 0 && D_00196D48 != (-1)) {
+                    collide_candidates[(collide_candidate_count)++] = a1;
+                    if (collide_candidate_count > 128) fatal_error((int)D_0017071B);
+                }
+            }
+        }
+        return;
+    case 56:
+        l_28 = (struct block_model *)RECORD_DATA(a1);
+        for (l_24 = 0; a1->model_count > l_24; l_24++, l_28++) {
+            l_30 = (int)&l_28->model;
+            if (*(int *)((char *)l_30) != 0) {
+                if ((D_00196D48 = func_0014AA92(l_30, D_00196D4C, 2)) == 0 && D_00196D48 != (-1)) {
+                    collide_candidates[(collide_candidate_count)++] = a1;
+                    if (collide_candidate_count > 128) fatal_error((int)D_0017071B);
+                }
+            }
+        }
+        return;
+    case 32:
+        if ((a1->flags & 256) != 0) return;
+    case 6:
+        l_30 = (int)RECORD_DATA(a1);
+        if (*(int *)((char *)l_30) == 0) return;
+        if ((D_00196D48 = func_0014AA92(l_30, D_00196D4C, 2)) != 0 || D_00196D48 == (-1)) {
+            return;
+        }
+        collide_candidates[(collide_candidate_count)++] = a1;
+        if (collide_candidate_count <= 128) return;
+        fatal_error((int)D_0017071B);
+    default:;
+    }
 }
 
 int func_000234AE(struct record *a1)
@@ -863,88 +553,58 @@ int func_00023A6A(struct record *a1)
     int l_20;
     short l_18;
 
-    if ((a1->flags & 512) == 0) goto L23A9C;
-    return 0;
-L23A9C:;
+    if ((a1->flags & 512) != 0) return 0;
     switch (a1->type) {
-case 43:
-    l_2C = &a1->data.block;
-    l_28 = l_2C->models;
-    l_24 = 0;
-L23AFC:;
-    if (l_2C->model_count > l_24) goto L23B1C;
-    goto L23B6F;
-L23B0D:;
-    l_24++;
-    l_28++;
-    goto L23AFC;
-L23B1C:;
-    l_30 = (int)&l_28->model;
-    if (*(int *)((char *)l_30) == 0) goto L23B6D;
-    if ((*(int *)D_00196D48 = func_0014A300(l_30, (int)D_00196B10, (int)D_00196B1C, 0)) == 0) goto L23B58;
-    if (*(int *)D_00196D48 != (-1)) goto L23B5A;
-L23B58:;
-    goto L23B6D;
-L23B5A:;
-    *(signed char *)itemmaker_slot_kinds = 1;
-    return 1;
-L23B6D:;
-    goto L23B0D;
-L23B6F:;
-    goto L23C5E;
-case 56:
-    l_28 = (struct block_model *)RECORD_DATA(a1);
-    l_24 = 0;
-L23B84:;
-    if (a1->model_count > l_24) goto L23BA6;
-    goto L23BF9;
-L23B97:;
-    l_24++;
-    l_28++;
-    goto L23B84;
-L23BA6:;
-    l_30 = (int)&l_28->model;
-    if (*(int *)((char *)l_30) == 0) goto L23BF7;
-    if ((*(int *)D_00196D48 = func_0014A300(l_30, (int)D_00196B10, (int)D_00196B1C, 0)) == 0) goto L23BE2;
-    if (*(int *)D_00196D48 != (-1)) goto L23BE4;
-L23BE2:;
-    goto L23BF7;
-L23BE4:;
-    *(signed char *)itemmaker_slot_kinds = 1;
-    return 1;
-L23BF7:;
-    goto L23B97;
-L23BF9:;
-    goto L23C5E;
-case 32:
-    if ((a1->flags & 256) != 0) goto L23C5E;
-case 6:
-    l_30 = (int)RECORD_DATA(a1);
-    if (*(int *)((char *)l_30) == 0) goto L23C5E;
-    if ((*(int *)D_00196D48 = func_0014A300(l_30, (int)D_00196B10, (int)D_00196B1C, 0)) == 0) goto L23C4C;
-    if (*(int *)D_00196D48 != (-1)) goto L23C4E;
-L23C4C:;
-    goto L23C5E;
-L23C4E:;
-    *(signed char *)itemmaker_slot_kinds = 1;
-    return 1;
-default:
-L23C5E:;
+    case 43:
+        l_2C = &a1->data.block;
+        l_28 = l_2C->models;
+        for (l_24 = 0; l_2C->model_count > l_24; l_24++, l_28++) {
+            l_30 = (int)&l_28->model;
+            if (*(int *)((char *)l_30) != 0) {
+                if ((D_00196D48 = func_0014A300(l_30, (int)D_00196B10, (int)D_00196B1C, 0)) != 0 && D_00196D48 != (-1)) {
+                    itemmaker_slot_kinds[0] = 1;
+                    return 1;
+                }
+            }
+        }
+        break;
+    case 56:
+        l_28 = (struct block_model *)RECORD_DATA(a1);
+        for (l_24 = 0; a1->model_count > l_24; l_24++, l_28++) {
+            l_30 = (int)&l_28->model;
+            if (*(int *)((char *)l_30) != 0) {
+                if ((D_00196D48 = func_0014A300(l_30, (int)D_00196B10, (int)D_00196B1C, 0)) != 0 && D_00196D48 != (-1)) {
+                    itemmaker_slot_kinds[0] = 1;
+                    return 1;
+                }
+            }
+        }
+        break;
+    case 32:
+        if ((a1->flags & 256) != 0) break;
+    case 6:
+        l_30 = (int)RECORD_DATA(a1);
+        if (*(int *)((char *)l_30) != 0) {
+            if ((D_00196D48 = func_0014A300(l_30, (int)D_00196B10, (int)D_00196B1C, 0)) != 0 && D_00196D48 != (-1)) {
+                itemmaker_slot_kinds[0] = 1;
+                return 1;
+            }
+        }
+    }
     return 0;
-}
 }
 
 int collide_line_of_sight(struct record *a1, struct record *a2)
 {
-    *(signed char *)itemmaker_slot_kinds = 0;
+    itemmaker_slot_kinds[0] = 0;
     mc_memcpy((int)D_00196B10, (int)&a1->x, 12, (int)D_00170710, 923, 4);
     mc_memcpy((int)D_00196B1C, (int)&a2->x, 12, (int)D_00170710, 924, 4);
-    *(int *)D_00196B14 -= 40;
-    *(int *)D_00196B20 -= 40;
-    *(int *)D_00195CD0 = (int)object_find_open;
+    D_00196B14 -= 40;
+    D_00196B20 -= 40;
+    D_00195CD0 = (int)object_find_open;
     collide_for_each_nearby(a1, (int)func_00023A6A);
-    *(int *)D_00195CD0 = (int)object_foreach_open;
-    return (int)(signed char)(*(signed char *)itemmaker_slot_kinds ^ 1);
+    D_00195CD0 = (int)object_foreach_open;
+    return (int)(signed char)(itemmaker_slot_kinds[0] ^ 1);
 }
 
 void creatures_find_nearest(void)
@@ -955,21 +615,14 @@ void creatures_find_nearest(void)
 
     l_20 = 10000;
     nearest_creature = 0;
-    l_1C = 0;
-L23D3C:;
-    if (l_1C < *(int *)creature_count) goto L23D54;
-    return;
-L23D4C:;
-    l_1C++;
-    goto L23D3C;
-L23D54:;
-    l_18 = func_000C7FF4(player_object->y - D_00190504[l_1C]->y, func_000C7FD9(player_object->x, player_object->z, D_00190504[l_1C]->x, D_00190504[l_1C]->z));
-    if (l_18 >= l_20) goto L23DD1;
-    *(int *)nearest_creature_distance = l_18;
-    nearest_creature = (struct record *)((int)D_00190504[l_1C]);
-    l_20 = l_18;
-L23DD1:;
-    goto L23D4C;
+    for (l_1C = 0; l_1C < creature_count; l_1C++) {
+        l_18 = func_000C7FF4(player_object->y - D_00190504[l_1C]->y, func_000C7FD9(player_object->x, player_object->z, D_00190504[l_1C]->x, D_00190504[l_1C]->z));
+        if (l_18 < l_20) {
+            nearest_creature_distance = l_18;
+            nearest_creature = (struct record *)((int)D_00190504[l_1C]);
+            l_20 = l_18;
+        }
+    }
 }
 
 int func_00023DE0(struct record *a1, struct move_request *a2)
@@ -977,28 +630,16 @@ int func_00023DE0(struct record *a1, struct move_request *a2)
     int l_1C;
     int l_18;
 
-    D_00190504[*(int *)creature_count] = player_object;
-    l_1C = 0;
-L23E0E:;
-    if (l_1C <= *(int *)creature_count) goto L23E26;
-    goto L23EAF;
-L23E1E:;
-    l_1C++;
-    goto L23E0E;
-L23E26:;
-    if (D_00190504[l_1C] == a1) goto L23E1E;
-    l_18 = D_00190504[l_1C]->y - a2->y;
-    if (l_18 < 0) goto L23E5B;
-    if (l_18 <= 100) goto L23E5D;
-L23E5B:;
-    goto L23E1E;
-L23E5D:;
-    if (func_000C7FD9(D_00190504[l_1C]->x, D_00190504[l_1C]->z, a2->x, a2->z) >= 50) goto L23EAA;
-    D_00195C48 = (struct record *)((int)D_00190504[l_1C]);
-    return 1;
-L23EAA:;
-    goto L23E1E;
-L23EAF:;
+    D_00190504[creature_count] = player_object;
+    for (l_1C = 0; l_1C <= creature_count; l_1C++) {
+        if (D_00190504[l_1C] == a1) continue;
+        l_18 = D_00190504[l_1C]->y - a2->y;
+        if (l_18 < 0 || l_18 > 100) continue;
+        if (func_000C7FD9(D_00190504[l_1C]->x, D_00190504[l_1C]->z, a2->x, a2->z) < 50) {
+            D_00195C48 = (struct record *)((int)D_00190504[l_1C]);
+            return 1;
+        }
+    }
     return 0;
 }
 
@@ -1007,28 +648,16 @@ int func_00023EC2(struct record *a1, int a2, int a3)
     int l_18;
     int l_14;
 
-    D_00190504[*(int *)creature_count] = player_object;
-    l_18 = 0;
-L23EF2:;
-    if (l_18 <= *(int *)creature_count) goto L23F0A;
-    goto L23F93;
-L23F02:;
-    l_18++;
-    goto L23EF2;
-L23F0A:;
-    if (D_00190504[l_18] == a1) goto L23F02;
-    l_14 = D_00190504[l_18]->y - *(int *)((char *)a2 + 4);
-    if (l_14 < 0) goto L23F3F;
-    if (l_14 <= 100) goto L23F41;
-L23F3F:;
-    goto L23F02;
-L23F41:;
-    if (func_000C7FD9(D_00190504[l_18]->x, D_00190504[l_18]->z, *(int *)((char *)a2), *(int *)((char *)a2 + 8)) >= a3) goto L23F8E;
-    D_00195C48 = (struct record *)((int)D_00190504[l_18]);
-    return 1;
-L23F8E:;
-    goto L23F02;
-L23F93:;
+    D_00190504[creature_count] = player_object;
+    for (l_18 = 0; l_18 <= creature_count; l_18++) {
+        if (D_00190504[l_18] == a1) continue;
+        l_14 = D_00190504[l_18]->y - *(int *)((char *)a2 + 4);
+        if (l_14 < 0 || l_14 > 100) continue;
+        if (func_000C7FD9(D_00190504[l_18]->x, D_00190504[l_18]->z, *(int *)((char *)a2), *(int *)((char *)a2 + 8)) < a3) {
+            D_00195C48 = (struct record *)((int)D_00190504[l_18]);
+            return 1;
+        }
+    }
     return 0;
 }
 
@@ -1041,193 +670,109 @@ int func_00023FA5(struct record *a1, int a2, struct move_request *a3)
     struct character *l_14;
 
     l_20 = 0;
-    *(signed char *)D_00196297 = 0;
-    *(int *)D_00195C74 = a1->y - 120;
+    D_00196297 = 0;
+    D_00195C74 = a1->y - 120;
     *(int *)D_00190BE4 = 0;
     l_14 = &a1->data.character;
-    *(int *)((char *)(*(int *)D_00196D4C = (int)a3->probe)) = a3->x;
-    *(int *)(*(char **)D_00196D4C + 4) = a3->y;
-    *(int *)(*(char **)D_00196D4C + 8) = a3->z;
+    *(int *)((char *)(D_00196D4C = (int)a3->probe)) = a3->x;
+    *(int *)(((char *)D_00196D4C) + 4) = a3->y;
+    *(int *)(((char *)D_00196D4C) + 8) = a3->z;
     *(signed char *)collide_flags &= 228;
     D_00195AF4 = a1;
-    if (((int)(unsigned char)*(signed char *)player_environment) != 1) goto L24052;
-    *(int *)D_00196D60 = func_0014B45B(a1->x, a1->z);
-    goto L24062;
-L24052:;
-    *(int *)D_00196D60 = a1->y + 1000;
-L24062:;
+    if (((int)player_environment) == 1) {
+        D_00196D60 = func_0014B45B(a1->x, a1->z);
+    } else {
+        D_00196D60 = a1->y + 1000;
+    }
     mc_memcpy((int)D_00196B28, a3, 12, (int)D_00170710, 1021, 4);
-    if (((int)(short)(*(short *)collide_flags & 4)) == 0) goto L240A7;
-    if (memcmp(a3, &a1->x, 12) == 0) goto L240A9;
-L240A7:;
-    goto L240B0;
-L240A9:;
-    *(signed char *)collide_flags &= 251;
-L240B0:;
-    if (l_14->fall_velocity <= 5120) goto L2412C;
-    *(int *)D_00196B10 = *(int *)D_00196D54;
-    *(int *)D_00196B14 = *(int *)D_00196D58 - 20;
-    *(int *)D_00196B18 = *(int *)D_00196D5C;
-    *(int *)D_00196B1C = a3->x;
-    *(int *)D_00196B20 = a3->y;
-    *(int *)D_00196B24 = a3->z;
-    l_18 = 0;
-L24104:;
-    if (l_18 < *(int *)collide_candidate_count) goto L24119;
-    goto L2412C;
-L24111:;
-    l_18++;
-    goto L24104;
-L24119:;
-    func_00021D97(collide_candidates[l_18]);
-    goto L24111;
-L2412C:;
-    if (l_14->fall_velocity < 0) goto L24142;
-    if (((struct bf8_0_1 *)&ai_monster_flags)->f == 0) goto L24243;
-L24142:;
-    *(int *)D_00190BE4 = 1;
-    *(int *)D_00196B10 = a1->x;
-    *(int *)D_00196B14 = a1->y - 60;
-    *(int *)D_00196B18 = a1->z;
-    *(int *)D_00196B1C = a1->x;
-    *(int *)D_00196B20 = a1->y - 120;
-    *(int *)D_00196B24 = a1->z;
-    l_18 = 0;
-L2419B:;
-    if (l_18 < *(int *)collide_candidate_count) goto L241B0;
-    goto L241C3;
-L241A8:;
-    l_18++;
-    goto L2419B;
-L241B0:;
-    func_00021D97(collide_candidates[l_18]);
-    goto L241A8;
-L241C3:;
-    *(int *)D_00190BE4 = 0;
-    if (((int)(short)(*(short *)collide_flags & 1)) == 0) goto L241E9;
-    *(int *)D_00195C74 = *(int *)D_00196D60;
-    goto L241F7;
-L241E9:;
-    *(int *)D_00195C74 = a1->y - 120;
-L241F7:;
-    if (*(int *)dungeon_water_level == 10000) goto L24210;
-    if (*(int *)dungeon_water_level > *(int *)D_00195C74) goto L24212;
-L24210:;
-    goto L24220;
-L24212:;
-    if (a3->y > *(int *)dungeon_water_level) goto L24222;
-L24220:;
-    goto L2422C;
-L24222:;
-    *(int *)D_00195C74 = *(int *)dungeon_water_level;
-L2422C:;
-    *(signed char *)collide_flags &= 254;
-    *(int *)D_00196D60 = a1->y + 1000;
-L24243:;
-    if (((int)(short)(*(short *)collide_flags & 1)) != 0) goto L242E9;
-    *(int *)D_00196B10 = a1->x;
-    *(int *)D_00196B14 = a1->y - 25;
-    *(int *)D_00196B18 = a1->z;
-    *(int *)D_00196B1C = a1->x;
-    if (((struct bf8_3_1 *)&player_motion_flags)->f == 0) goto L242A1;
-    *(int *)D_00196B20 = a1->y + 140;
-    goto L242AF;
-L242A1:;
-    *(int *)D_00196B20 = a1->y + 40;
-L242AF:;
-    *(int *)D_00196B24 = a1->z;
-    l_18 = 0;
-L242C1:;
-    if (l_18 < *(int *)collide_candidate_count) goto L242D6;
-    goto L242E9;
-L242CE:;
-    l_18++;
-    goto L242C1;
-L242D6:;
-    func_00021D97(collide_candidates[l_18]);
-    goto L242CE;
-L242E9:;
-    if (*(int *)D_00196D60 >= a3->y) goto L24319;
-    *(int *)D_00196B14 = (*(int *)D_00196B2C = *(int *)D_00196D60);
-    *(int *)(*(char **)D_00196D4C + 4) = *(int *)D_00196B14;
-L24319:;
-    l_18 = 0;
-L24320:;
-    if (l_18 < *(int *)collide_candidate_count) goto L24335;
-    goto L24348;
-L2432D:;
-    l_18++;
-    goto L24320;
-L24335:;
-    func_00022174(collide_candidates[l_18]);
-    goto L2432D;
-L24348:;
-    if (((int)(unsigned char)*(signed char *)player_environment) == 2) goto L24363;
-    if (func_00023DE0(a1, a3) != 0) goto L24365;
-L24363:;
-    goto L2436C;
-L24365:;
-    *(signed char *)collide_flags |= 8;
-L2436C:;
-    if (((int)(unsigned short)(a3->flags & 1)) != 0) goto L2438A;
-    if (((struct bf8_7_1 *)&D_001940D7)->f != 0) goto L2438C;
-L2438A:;
-    goto L24395;
-L2438C:;
-    if (((struct bf8_0_1 *)&ai_monster_flags)->f == 0) goto L24397;
-L24395:;
-    goto L243C4;
-L24397:;
-    *(signed char *)D_001940D7 &= 127;
-    if ((*(int *)D_00196D60 - a3->y) <= 60) goto L243C4;
-    *(signed char *)collide_flags |= 2;
-    return (int)(short)*(short *)collide_flags;
-L243C4:;
-    if (((int)(short)(*(short *)collide_flags & 10)) == 0) goto L243E4;
-    if (((int)(short)(*(short *)collide_flags & 4)) != 0) goto L243E6;
-L243E4:;
-    goto L243F5;
-L243E6:;
-    return (int)(short)*(short *)collide_flags;
-L243F5:;
-    if ((*(int *)D_00196D60 - a3->y) >= 30) goto L2440E;
-    if (((struct bf8_0_1 *)&ai_monster_flags)->f == 0) goto L24410;
-L2440E:;
-    goto L24431;
-L24410:;
-    object_move_by(a1, 0, *(int *)D_00196D60 - a1->y, 0, 0, 0, 0);
-L24431:;
-    if (*(int *)D_00196D60 >= a3->y) goto L2444F;
-    if ((*(int *)D_00196D60 - 90) > *(int *)D_00195C74) goto L24451;
-L2444F:;
-    goto L2446F;
-L24451:;
-    if (((int)(short)(*(short *)collide_flags & 1)) != 0) goto L2446D;
-    if (((int)(unsigned char)*(signed char *)player_environment) != 1) goto L2446F;
-L2446D:;
-    goto L24478;
-L2446F:;
-    if (((struct bf8_5_1 *)&D_001940D7)->f == 0) goto L244A9;
-L24478:;
-    *(signed char *)D_001940D7 &= 223;
-    object_move_by(a1, 0, *(int *)D_00196D60 - a1->y, 0, 0, 0, 0);
-    l_20 = 1;
-    goto L244C5;
-L244A9:;
-    if (*(int *)D_00196D60 == a1->y) goto L244C5;
-    *(signed char *)collide_flags |= 16;
-    *(signed char *)player_on_ground = 0;
-L244C5:;
-    if (((int)(short)(*(short *)collide_flags & 10)) != 0) goto L244E5;
-    if (((int)(short)(*(short *)collide_flags & 4)) != 0) goto L244E7;
-L244E5:;
-    goto L24515;
-L244E7:;
-    object_set_position(a1, *(int *)D_00196B28, a1->y, *(int *)D_00196B30, a3->angle_x, a3->yaw, a3->angle_z);
-    goto L24541;
-L24515:;
-    object_set_position(a1, a1->x, a1->y, a1->z, a3->angle_x, a3->yaw, a3->angle_z);
-L24541:;
+    if (((int)(short)(*(short *)collide_flags & 4)) != 0 && memcmp(a3, &a1->x, 12) == 0) {
+        *(signed char *)collide_flags &= 251;
+    }
+    if (l_14->fall_velocity > 5120) {
+        *(int *)D_00196B10 = *(int *)D_00196D54;
+        D_00196B14 = D_00196D58 - 20;
+        D_00196B18 = D_00196D5C;
+        *(int *)D_00196B1C = a3->x;
+        D_00196B20 = a3->y;
+        D_00196B24 = a3->z;
+        for (l_18 = 0; l_18 < collide_candidate_count; l_18++) {
+            func_00021D97(collide_candidates[l_18]);
+        }
+    }
+    if (l_14->fall_velocity < 0 || ((struct bf8_0_1 *)&ai_monster_flags)->f != 0) {
+        *(int *)D_00190BE4 = 1;
+        *(int *)D_00196B10 = a1->x;
+        D_00196B14 = a1->y - 60;
+        D_00196B18 = a1->z;
+        *(int *)D_00196B1C = a1->x;
+        D_00196B20 = a1->y - 120;
+        D_00196B24 = a1->z;
+        for (l_18 = 0; l_18 < collide_candidate_count; l_18++) {
+            func_00021D97(collide_candidates[l_18]);
+        }
+        *(int *)D_00190BE4 = 0;
+        if (((int)(short)(*(short *)collide_flags & 1)) != 0) {
+            D_00195C74 = D_00196D60;
+        } else {
+            D_00195C74 = a1->y - 120;
+        }
+        if (dungeon_water_level != 10000 && dungeon_water_level > D_00195C74 && a3->y > dungeon_water_level) {
+            D_00195C74 = dungeon_water_level;
+        }
+        *(signed char *)collide_flags &= 254;
+        D_00196D60 = a1->y + 1000;
+    }
+    if (((int)(short)(*(short *)collide_flags & 1)) == 0) {
+        *(int *)D_00196B10 = a1->x;
+        D_00196B14 = a1->y - 25;
+        D_00196B18 = a1->z;
+        *(int *)D_00196B1C = a1->x;
+        if (((struct bf8_3_1 *)&player_motion_flags)->f != 0) {
+            D_00196B20 = a1->y + 140;
+        } else {
+            D_00196B20 = a1->y + 40;
+        }
+        D_00196B24 = a1->z;
+        for (l_18 = 0; l_18 < collide_candidate_count; l_18++) {
+            func_00021D97(collide_candidates[l_18]);
+        }
+    }
+    if (D_00196D60 < a3->y) {
+        D_00196B14 = (D_00196B2C = D_00196D60);
+        *(int *)(((char *)D_00196D4C) + 4) = D_00196B14;
+    }
+    for (l_18 = 0; l_18 < collide_candidate_count; l_18++) {
+        func_00022174(collide_candidates[l_18]);
+    }
+    if (((int)player_environment) != 2 && func_00023DE0(a1, a3) != 0) {
+        *(signed char *)collide_flags |= 8;
+    }
+    if (((int)(unsigned short)(a3->flags & 1)) == 0 && ((struct bf8_7_1 *)&D_001940D7)->f != 0 && ((struct bf8_0_1 *)&ai_monster_flags)->f == 0) {
+        D_001940D7 &= 127;
+        if ((D_00196D60 - a3->y) > 60) {
+            *(signed char *)collide_flags |= 2;
+            return (int)(short)*(short *)collide_flags;
+        }
+    }
+    if (((int)(short)(*(short *)collide_flags & 10)) != 0 && ((int)(short)(*(short *)collide_flags & 4)) != 0) {
+        return (int)(short)*(short *)collide_flags;
+    }
+    if ((D_00196D60 - a3->y) < 30 && ((struct bf8_0_1 *)&ai_monster_flags)->f == 0) {
+        object_move_by(a1, 0, D_00196D60 - a1->y, 0, 0, 0, 0);
+    }
+    if ((D_00196D60 < a3->y && (D_00196D60 - 90) > D_00195C74 && (((int)(short)(*(short *)collide_flags & 1)) != 0 || ((int)player_environment) == 1)) || ((struct bf8_5_1 *)&D_001940D7)->f != 0) {
+        D_001940D7 &= 223;
+        object_move_by(a1, 0, D_00196D60 - a1->y, 0, 0, 0, 0);
+        l_20 = 1;
+    } else if (D_00196D60 != a1->y) {
+        *(signed char *)collide_flags |= 16;
+        player_on_ground = 0;
+    }
+    if (((int)(short)(*(short *)collide_flags & 10)) == 0 && ((int)(short)(*(short *)collide_flags & 4)) != 0) {
+        object_set_position(a1, *(int *)D_00196B28, a1->y, D_00196B30, a3->angle_x, a3->yaw, a3->angle_z);
+    } else {
+        object_set_position(a1, a1->x, a1->y, a1->z, a3->angle_x, a3->yaw, a3->angle_z);
+    }
     *(signed char *)collide_flags &= 251;
     return (int)(short)*(short *)collide_flags;
 }
@@ -1236,9 +781,9 @@ int func_0002455D(struct record *a1)
 {
     mc_memcpy((int)D_00196B10, (int)&a1->x, 12, (int)D_00170710, 1143, 4);
     mc_memcpy((int)D_00196B1C, (int)&a1->x, 12, (int)D_00170710, 1144, 4);
-    *(int *)D_00196B14 -= 20;
-    *(int *)D_00196B20 += 40;
-    *(int *)D_00196D60 = 100000;
+    D_00196B14 -= 20;
+    D_00196B20 += 40;
+    D_00196D60 = 100000;
     object_foreach(D_00195AC4->children, (int)func_00021D97);
-    return *(int *)D_00196D60;
+    return D_00196D60;
 }

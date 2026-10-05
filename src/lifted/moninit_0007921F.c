@@ -14,15 +14,13 @@ struct record *monster_make_item(struct record *a1, int a2, int a3, int a4, int 
     struct record *l_14;
     struct item *l_10;
 
-    if (rand_range(1, 100) <= a6) goto L79253;
-    return 0;
-L79253:;
+    if (rand_range(1, 100) > a6) return 0;
     l_14 = object_create_child(a1, 0, 107);
     l_14->type = 2;
     l_14->id = object_new_id(((unsigned)a1->id) >> 16);
     l_10 = &l_14->data.item;
-L7928A:;
-    func_0005E37F((int)(unsigned short)*(short *)&a2, a3, a4, l_10);
-    if (l_10->index == a5) goto L7928A;
+    do {
+        func_0005E37F((int)(unsigned short)*(short *)&a2, a3, a4, l_10);
+    } while (l_10->index == a5);
     return l_14;
 }

@@ -13,7 +13,7 @@ extern char D_00170AB4[];       /* __FILE__ */
 extern char D_00170ABC[];
 extern char D_00170AC7[];
 extern unsigned char D_0017A844[];
-extern char text_buffer[];
+extern signed char text_buffer[];
 extern struct record *D_00195AC4;
 extern char *D_00195C44;
 extern unsigned char D_001962A1;
@@ -47,8 +47,8 @@ void dungeon_load_rdb_block(struct rec *r)
     D_00199608 = r;
     D_001995E8 = D_00195C44;
     func_000A0ED9(59, D_00170AB4);
-    mc_sprintf(text_buffer, D_00170ABC, D_0017A844[r->kind], r->num);
-    n = archive_find_record(blocks_bsa, text_buffer, 13);
+    mc_sprintf(((char *)text_buffer), D_00170ABC, D_0017A844[r->kind], r->num);
+    n = archive_find_record(blocks_bsa, ((char *)text_buffer), 13);
     archive_read_record(blocks_bsa, n, D_001995E8);
     D_001995F8 = 16;
     D_001995FC = 10000;
@@ -86,8 +86,8 @@ void dungeon_load_rdb_block(struct rec *r)
     }
     o = object_create_in_block(D_001995D4[0][0], 60, 512, 0, 0);
     func_000A0ED9(107, D_00170AB4);
-    mc_sprintf(text_buffer, D_00170AC7, D_0017A844[r->kind], r->num);
-    n = archive_find_record(blocks_bsa, text_buffer, 13);
+    mc_sprintf(((char *)text_buffer), D_00170AC7, D_0017A844[r->kind], r->num);
+    n = archive_find_record(blocks_bsa, ((char *)text_buffer), 13);
     archive_read_record(blocks_bsa, n, RECORD_DATA(o));
     o->x = D_001995D4[0][0]->x;
     o->z = D_001995D4[0][0]->z;

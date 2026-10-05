@@ -12,7 +12,7 @@ extern unsigned char spell_effect_school[];
 extern unsigned char spell_effect_cost_formula[];
 extern struct Box spellmaker_setting_buttons[];
 extern unsigned char magic_school_skills[];
-extern char text_buffer[];
+extern signed char text_buffer[];
 extern unsigned char D_001940D5;
 extern struct character *player_character;
 extern short spell_effect_slot;
@@ -106,7 +106,7 @@ void spellmaker_settings_update(void)
 done:
     val = selected_spell->effect_costs[spell_effect_slot];
     val = (110 - player_character->skills[magic_school_skills[spell_effect_school[selected_spell->effects[spell_effect_slot].type]]].value) * val / 100;
-    text_draw_colored(func_000A0DD9(val, text_buffer, 10), 275, 119, 145, 156);
+    text_draw_colored(func_000A0DD9(val, ((char *)text_buffer), 10), 275, 119, 145, 156);
     if ((int)(unsigned char)(spellmaker_settings_kind & 1) != 0) {
         func_0007CAEB(64, 94, 87, 109, selected_spell->durations[spell_effect_slot].base, 145, 156);
         func_0007CAEB(104, 94, 127, 109, selected_spell->durations[spell_effect_slot].plus, 145, 156);

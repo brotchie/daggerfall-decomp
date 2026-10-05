@@ -17,7 +17,7 @@ extern char D_00176F9C[];
 extern char D_00176FA9[];
 extern char D_00176FB6[];
 extern unsigned char chargen_career_skill_bonus[];
-extern char text_buffer[];
+extern signed char text_buffer[];
 extern int D_00190BE8;
 extern unsigned char D_00190CEE[];
 extern short D_00190D64;
@@ -84,8 +84,8 @@ int chargen_name_character(void)
         FREE(window_image, 114);
     }
     func_000A0ED9(117, D_00176F41);
-    mc_sprintf(text_buffer, D_00176F4C, player_character->flags & 1, player_character->race);
-    chargen_face_images = disk_read_file(text_buffer, 0);
+    mc_sprintf(((char *)text_buffer), D_00176F4C, player_character->flags & 1, player_character->race);
+    chargen_face_images = disk_read_file(((char *)text_buffer), 0);
     chargen_screen = 2;
     window_image = disk_read_file(D_00176F5B, 0);
     chargen_screen_loop(33, 34);
@@ -121,8 +121,8 @@ int chargen_name_character(void)
     msgbox_update();
     chargen_screen = 255;
     func_000A0ED9(155, D_00176F41);
-    mc_sprintf(text_buffer, D_00176F4C, player_character->flags & 1, player_character->race);
-    chargen_face_images = disk_read_file(text_buffer, 0);
+    mc_sprintf(((char *)text_buffer), D_00176F4C, player_character->flags & 1, player_character->race);
+    chargen_face_images = disk_read_file(((char *)text_buffer), 0);
     D_00195B60 = disk_read_file(D_00176F8F, 0);
     window_image = disk_read_file(D_00176FB6, 0);
     chargen_reflex_image = disk_read_file(D_00176FA9, 0);

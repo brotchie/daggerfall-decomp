@@ -2,17 +2,17 @@
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
 
-extern char mouse_buttons[];
-extern char screen_buffer[];
+extern signed char mouse_buttons;
+extern int screen_buffer;
 extern char D_00170D55[];
-extern char D_00178A08[];
-extern char msgbox_kind[];
-extern char D_00196271[];
-extern char D_00196272[];
-extern char game_mode[];
-extern char mouse_buttons_prev[];
+extern short D_00178A08;
+extern signed char msgbox_kind;
+extern unsigned char D_00196271;
+extern signed char D_00196272;
+extern signed char game_mode;
+extern signed char mouse_buttons_prev;
 extern char msgbox_image[];
-extern char msgbox_saved_screen[];
+extern int msgbox_saved_screen;
 
 extern int text_expand_wrap(unsigned short, short, int, int, int);
 extern int mc_free();
@@ -34,37 +34,32 @@ void msgbox_show_string(int a1, short a2)
     int l_18;
     int l_1C;
 
-    if (*(signed char *)msgbox_kind != 0) return;
-    *(int *)msgbox_saved_screen = mc_malloc(64000, (int)D_00170D55, 697);
-    mc_memcpy(*(int *)msgbox_saved_screen, *(int *)screen_buffer, 64000, (int)D_00170D55, 698, 4);
+    if (msgbox_kind != 0) return;
+    msgbox_saved_screen = mc_malloc(64000, (int)D_00170D55, 697);
+    mc_memcpy(msgbox_saved_screen, screen_buffer, 64000, (int)D_00170D55, 698, 4);
     func_0012DB50(4);
     l_20 = func_000A0DF4(a1);
     l_28 = mc_malloc(l_20 + 16, (int)D_00170D55, 702);
     l_18 = mc_malloc(((l_20 < 4096) ? 8192 : l_20 * 2), (int)D_00170D55, 703);
     l_1C = mc_malloc(((l_20 < 4096) ? 8192 : l_20 * 2), (int)D_00170D55, 704);
     mc_strncpy(l_28, a1, 4, (int)D_00170D55, 705);
-    if (((int)(short)a2) != 5) goto L3ED58;
-    l_24 = 4;
-    *(signed char *)D_00196271 = 0;
-    goto L3ED5F;
-L3ED58:;
-    l_24 = 0;
-L3ED5F:;
-    l_28 = text_expand_wrap((int)(unsigned short)(l_24 | 32770), (int)(short)*(short *)D_00178A08, l_28, l_18, l_1C);
+    if (((int)(short)a2) == 5) {
+        l_24 = 4;
+        D_00196271 = 0;
+    } else {
+        l_24 = 0;
+    }
+    l_28 = text_expand_wrap((int)(unsigned short)(l_24 | 32770), (int)(short)D_00178A08, l_28, l_18, l_1C);
     msgbox_render(l_28, (int)msgbox_image);
-    if (l_28 == 0) goto L3EDA1;
-    if (l_28 != (-1751672937)) goto L3EDA3;
-L3EDA1:;
-    goto L3EDBC;
-L3EDA3:;
-    mc_free(l_28, (int)D_00170D55, 717);
-    l_28 = -1751672937;
-L3EDBC:;
-    *(signed char *)msgbox_kind = *(signed char *)&a2;
+    if (l_28 != 0 && l_28 != (-1751672937)) {
+        mc_free(l_28, (int)D_00170D55, 717);
+        l_28 = -1751672937;
+    }
+    msgbox_kind = *(signed char *)&a2;
     mode_push();
-    *(signed char *)game_mode = 8;
-    *(signed char *)D_00196272 = 1;
-    *(signed char *)mouse_buttons_prev = *(signed char *)mouse_buttons;
+    game_mode = 8;
+    D_00196272 = 1;
+    mouse_buttons_prev = mouse_buttons;
     func_0012B136();
     msgbox_wait();
 }

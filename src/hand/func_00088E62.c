@@ -1,6 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x00088E62 */
 #include "records.h"
-extern char D_00185097[];
+extern int D_00185097;
 extern struct character *player_character;
 extern void spell_remove_effect_type(struct record *, int);
 extern int hud_message_add(int);
@@ -20,7 +20,7 @@ int spfx_cure(struct record *a1, int a2, struct record *a3)
     l_28 = &a1->data.spell;
     l_24 = &a3->data.character;
     if (rand_range(1, 100) > l_28->cast_chances[a2]) {
-        hud_message_add(*(int *)D_00185097);
+        hud_message_add(D_00185097);
         return 0;
     }
     switch (l_28->effects[a2].subtype) {

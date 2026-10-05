@@ -3,21 +3,21 @@
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
 
-extern char D_0012B508[];
+extern signed char D_0012B508;
 extern char D_0017018C[];
-extern char D_00178A08[];
-extern char D_00183258[];
-extern char D_0018325C[];
-extern char D_00183260[];
-extern char D_00183264[];
-extern char D_0018328C[];
-extern char D_0018333C[];
-extern char D_00183340[];
-extern char text_buffer[];
+extern short D_00178A08;
+extern int D_00183258;
+extern int D_0018325C;
+extern int D_00183260;
+extern int D_00183264[];
+extern int D_0018328C;
+extern int D_0018333C;
+extern int D_00183340;
+extern signed char text_buffer[];
 extern char D_00190BE4[];
 extern struct record *D_00195AF4;
 extern struct character *player_character;
-extern char crime_current[];
+extern signed char crime_current;
 
 extern int hud_message_add(int);
 extern int rand();
@@ -40,39 +40,33 @@ void pickpocket_attempt(struct record *a1)
 
     l_1C = (int)(short)player_character->skills[15].value;
     skill_add_uses(15, 1);
-    if (a1->type != 18) goto L137B7;
-    l_18 = &a1->data.character;
-    l_1C += (player_character->level - l_18->level) * 5;
-L137B7:;
-    if (l_1C >= 5) goto L137C6;
-    l_1C = 5;
-    goto L137D3;
-L137C6:;
-    if (l_1C <= 95) goto L137D3;
-    l_1C = 95;
-L137D3:;
-    if ((rand() % 101) <= l_1C) goto L13835;
-    if (a1->type != 18) goto L137FF;
-    func_0002FBCC();
-L137FF:;
-    hud_message_add(*(int *)D_0018333C);
-    *(signed char *)crime_current = 12;
-    guards_summon(1);
-    if (a1->type != 53) goto L13830;
-    a1->npc_flags |= 0x8000;
-L13830:;
-    return;
-L13835:;
-    if ((rand() % 101) >= 33) goto L1385E;
-    msgbox_show_rsc(8999, 1);
-    return;
-L1385E:;
-    *(short *)D_00178A08 = 250;
-    *(signed char *)D_0012B508 = 145;
+    if (a1->type == 18) {
+        l_18 = &a1->data.character;
+        l_1C += (player_character->level - l_18->level) * 5;
+    }
+    if (l_1C < 5) {
+        l_1C = 5;
+    } else if (l_1C > 95) {
+        l_1C = 95;
+    }
+    if ((rand() % 101) > l_1C) {
+        if (a1->type == 18) func_0002FBCC();
+        hud_message_add(D_0018333C);
+        crime_current = 12;
+        guards_summon(1);
+        if (a1->type == 53) a1->npc_flags |= 0x8000;
+        return;
+    }
+    if ((rand() % 101) < 33) {
+        msgbox_show_rsc(8999, 1);
+        return;
+    }
+    D_00178A08 = 250;
+    D_0012B508 = 145;
     l_20 = (rand() % 5) + 1;
     player_character->gold += l_20;
     func_000A0ED9(155, (int)D_0017018C);
-    mc_sprintf((int)text_buffer, *(int *)D_00183340, l_20);
+    mc_sprintf((int)text_buffer, D_00183340, l_20);
     msgbox_show_string((int)text_buffer, 1);
     guild_count_crime(5, 1);
 }
@@ -81,24 +75,24 @@ void lock_show_difficulty(int a1)
 {
     int l_18;
 
-    if (a1 < 20) goto L1390A;
-    hud_status_set(*(int *)D_0018328C);
-    return;
-L1390A:;
+    if (a1 >= 20) {
+        hud_status_set(D_0018328C);
+        return;
+    }
     l_18 = player_character->skills[13].value - (a1 * 5);
-    if (l_18 >= 30) goto L13933;
-    hud_status_set(*(int *)D_00183258);
-    return;
-L13933:;
-    if (l_18 >= 35) goto L13945;
-    hud_status_set(*(int *)D_0018325C);
-    return;
-L13945:;
-    if (l_18 >= 45) goto L13957;
-    hud_status_set(*(int *)D_00183260);
-    return;
-L13957:;
-    hud_status_set(*(int *)(D_00183264 + (((l_18 - 45) / 5) << 2)));
+    if (l_18 < 30) {
+        hud_status_set(D_00183258);
+        return;
+    }
+    if (l_18 < 35) {
+        hud_status_set(D_0018325C);
+        return;
+    }
+    if (l_18 < 45) {
+        hud_status_set(D_00183260);
+        return;
+    }
+    hud_status_set(D_00183264[((l_18 - 45) / 5)]);
 }
 
 void func_00013981(struct record *a1)
@@ -107,15 +101,7 @@ void func_00013981(struct record *a1)
 
     if (a1->type != 2) return;
     l_18 = &a1->data.item;
-    if (l_18->group != 27) goto L139CC;
-    if (l_18->index == 3) goto L139CE;
-L139CC:;
-    return;
-L139CE:;
-    if (l_18->value != *(int *)D_00190BE4) goto L139EC;
-    if ((short)l_18->message == *(short *)D_00190BE4) goto L139EE;
-L139EC:;
-    return;
-L139EE:;
+    if (l_18->group != 27 || l_18->index != 3) return;
+    if (l_18->value != *(int *)D_00190BE4 || (short)l_18->message != *(short *)D_00190BE4) return;
     D_00195AF4 = a1;
 }

@@ -23,7 +23,7 @@ extern char *D_00183240;
 extern char *D_00183244;
 extern char *D_00184876;
 extern short D_00187CA9;
-extern char text_buffer[];
+extern signed char text_buffer[];
 extern struct bits8 D_001940D5;
 extern struct bits8 D_001940D6;
 extern struct bits8 D_001940D9;
@@ -153,10 +153,10 @@ void keys_world_actions(void)
         if (o == 0 || o->data.item.group == 3) {
             weapon_active_hand ^= 1;
             func_000A0ED9(96, D_00170E38);
-            mc_sprintf(text_buffer, D_0018323C, weapon_active_hand ? D_00183240 : D_00183244);
+            mc_sprintf(((char *)text_buffer), D_0018323C, weapon_active_hand ? D_00183240 : D_00183244);
             D_00195F2E = 20;
             D_0012B508 = 146;
-            hud_message_add(text_buffer);
+            hud_message_add(((char *)text_buffer));
         }
     }
     if (key_pressed_once(68))
@@ -264,8 +264,8 @@ void interaction_mode_cycle(int a1)
 {
     interaction_mode = (interaction_mode + a1) & 3;
     func_000A0ED9(231, D_00170E38);
-    mc_sprintf(text_buffer, D_0017D1EE, D_0017D1CA[interaction_mode]);
-    hud_status_set(text_buffer);
+    mc_sprintf(((char *)text_buffer), D_0017D1EE, D_0017D1CA[interaction_mode]);
+    hud_status_set(((char *)text_buffer));
 }
 
 void func_00042E8C(int a1)

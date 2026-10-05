@@ -8,63 +8,63 @@ struct bf8_0_4 { unsigned char f:4; };
 struct bf8_1_1 { unsigned char _:1; unsigned char f:1; };
 struct bf8_2_1 { unsigned char _:2; unsigned char f:1; };
 struct bf8_4_1 { unsigned char _:4; unsigned char f:1; };
-extern char D_000C23B8[];
-extern char D_000C23BC[];
-extern char D_000C23C0[];
-extern char D_000C23C4[];
-extern char D_000C23C8[];
-extern char D_000C23CC[];
-extern char D_000C287D[];
-extern char D_000C287F[];
-extern char D_0012B508[];
-extern char dungeon_water_level[];
-extern char D_00132F58[];
+extern int D_000C23B8;
+extern int D_000C23BC;
+extern int D_000C23C0;
+extern int D_000C23C4;
+extern int D_000C23C8;
+extern int D_000C23CC;
+extern short D_000C287D;
+extern short D_000C287F;
+extern signed char D_0012B508;
+extern int dungeon_water_level;
+extern signed char D_00132F58;
 extern char D_00136E00[];
 extern char D_00136E24[];
-extern char D_0013F76C[];
+extern int D_0013F76C;
 extern char D_001700A0[];
-extern char D_001788E8[];
-extern char D_00178968[];
-extern char player_environment[];
-extern char D_001845C8[];
-extern char D_00187CA8[];
-extern char D_0018DBF8[];
-extern char frame_checkpoint[];
-extern char screen_shake[];
-extern char D_0018DC08[];
-extern char D_0018DC10[];
-extern char D_0018DC14[];
-extern char D_0018DC18[];
-extern char D_0018DC28[];
-extern char D_0018DC2C[];
-extern char D_0018DC30[];
-extern char player_motion_flags[];
+extern int D_001788E8[];
+extern int D_00178968[];
+extern unsigned char player_environment;
+extern int D_001845C8;
+extern signed char D_00187CA8;
+extern int D_0018DBF8;
+extern int frame_checkpoint;
+extern int screen_shake;
+extern int D_0018DC08;
+extern int D_0018DC10;
+extern int D_0018DC14;
+extern int D_0018DC18;
+extern int D_0018DC28;
+extern int D_0018DC2C;
+extern int D_0018DC30;
+extern signed char player_motion_flags;
 extern char frame_counter[];
-extern char view_look_pitch[];
-extern char D_001959BC[];
+extern int view_look_pitch;
+extern int D_001959BC;
 extern struct record *D_00195A88;
 extern struct record *camera_object;
 extern struct record *player_entity;
 extern struct record *player_object;
-extern char D_00195AB0[];
+extern int D_00195AB0;
 extern struct record *inv_right_container;
 extern struct record *D_00195B34;
-extern char hud_message_expiry[];
+extern int hud_message_expiry[];
 extern struct character *player_character;
-extern char hud_message_ptrs[];
-extern char D_00195C74[];
-extern char D_00195CEC[];
-extern char head_bob_offset[];
-extern char player_death_timer[];
+extern int hud_message_ptrs[];
+extern int D_00195C74;
+extern int D_00195CEC;
+extern int head_bob_offset;
+extern int player_death_timer;
 extern char D_001960D9[];
-extern char D_0019626F[];
-extern char game_mode[];
-extern char player_on_ground[];
-extern char in_dungeon_water[];
-extern char D_001962A0[];
-extern char D_001A949D[];
-extern char ground_texture_archive[];
-extern char nature_texture_archive[];
+extern unsigned char D_0019626F;
+extern signed char game_mode;
+extern signed char player_on_ground;
+extern signed char in_dungeon_water;
+extern signed char D_001962A0;
+extern signed char D_001A949D;
+extern short ground_texture_archive;
+extern short nature_texture_archive;
 
 extern struct record *object_reparent(struct record *, struct record *);
 extern int rand();
@@ -164,61 +164,44 @@ void game_frame(void)
 
     mem_check_crt_heap(98);
     music_choose_song();
-    if (((struct bf8_0_4 *)&frame_counter)->f != 0) goto L10286;
-    music_update();
-L10286:;
-    *(int *)frame_checkpoint = 99;
+    if (((struct bf8_0_4 *)&frame_counter)->f == 0) music_update();
+    frame_checkpoint = 99;
     frame_ticks_update();
     func_000C9C70();
-    *(int *)frame_checkpoint = 100;
+    frame_checkpoint = 100;
     update_fog();
     head_bob_update();
     player_entity->x = player_object->x;
     player_entity->y = player_object->y;
     player_entity->z = player_object->z;
-    if ((int)D_00195A88 == 0) goto L102F3;
-    if (*(signed char *)player_on_ground != 0) goto L102F5;
-L102F3:;
-    goto L10305;
-L102F5:;
-    if ((int)player_object->parent != (int)D_00195A88) goto L10307;
-L10305:;
-    goto L10317;
-L10307:;
-    object_reparent(D_00195A88, player_object);
-L10317:;
+    if ((int)D_00195A88 != 0 && player_on_ground != 0 && (int)player_object->parent != (int)D_00195A88) {
+        object_reparent(D_00195A88, player_object);
+    }
     l_1C = 1132;
-    l_20 = *(int *)((char *)l_1C) - *(int *)D_0018DC30;
-    *(int *)frame_checkpoint = 101;
+    l_20 = *(int *)((char *)l_1C) - D_0018DC30;
+    frame_checkpoint = 101;
     links_update();
-    *(int *)frame_checkpoint = 102;
+    frame_checkpoint = 102;
     sky_update();
-    *(int *)frame_checkpoint = 103;
+    frame_checkpoint = 103;
     world_render();
-    *(int *)frame_checkpoint = 104;
-    if (*(signed char *)D_00187CA8 == 0) goto L10376;
-    world_collect_objects();
-    people_spawn_tick();
-L10376:;
-    *(int *)frame_checkpoint = 107;
-    *(signed char *)D_0012B508 = 146;
+    frame_checkpoint = 104;
+    if (D_00187CA8 != 0) {
+        world_collect_objects();
+        people_spawn_tick();
+    }
+    frame_checkpoint = 107;
+    D_0012B508 = 146;
     func_0012DB50(4);
-    if (((int)(unsigned char)*(signed char *)D_0019626F) != 4) goto L103A9;
-    if (((int)(unsigned char)*(signed char *)game_mode) == 8) goto L103B2;
-L103A9:;
-    l_2C = 1;
-    goto L103B9;
-L103B2:;
-    l_2C = 0;
-L103B9:;
-    if (l_2C == 0) goto L103CB;
-    if (((int)(unsigned char)*(signed char *)game_mode) != 4) goto L103CD;
-L103CB:;
-    goto L103E1;
-L103CD:;
-    inv_right_container = (struct record *)D_001960D9;
-    D_00195B34 = (struct record *)D_001960D9;
-L103E1:;
+    if (((int)D_0019626F) != 4 || ((int)(unsigned char)game_mode) != 8) {
+        l_2C = 1;
+    } else {
+        l_2C = 0;
+    }
+    if (l_2C != 0 && ((int)(unsigned char)game_mode) != 4) {
+        inv_right_container = (struct record *)D_001960D9;
+        D_00195B34 = (struct record *)D_001960D9;
+    }
     loan_collectors_update();
     weather_draw_precipitation();
     cast_anim_update();
@@ -226,18 +209,18 @@ L103E1:;
     guards_timer_tick();
     footstep_sounds();
     time_update_realtime();
-    *(int *)frame_checkpoint = 109;
+    frame_checkpoint = 109;
     spell_hud_draw_icons();
     hud_draw();
-    *(int *)frame_checkpoint = 110;
-    if (*(signed char *)D_00187CA8 == 0) goto L10449;
-    ai_update_creatures();
-    *(int *)frame_checkpoint = 111;
-    people_update();
-    *(int *)frame_checkpoint = 112;
-L10449:;
+    frame_checkpoint = 110;
+    if (D_00187CA8 != 0) {
+        ai_update_creatures();
+        frame_checkpoint = 111;
+        people_update();
+        frame_checkpoint = 112;
+    }
     quests_run_all();
-    *(int *)frame_checkpoint = 113;
+    frame_checkpoint = 113;
     kludge_menu_update();
     potionmaker_update();
     spellmaker_update();
@@ -247,7 +230,7 @@ L10449:;
     spellbook_frame();
     itemmaker_update();
     book_update();
-    *(int *)frame_checkpoint = 114;
+    frame_checkpoint = 114;
     logbook_update();
     bank_frame();
     func_000685EC();
@@ -262,24 +245,24 @@ L10449:;
     shelf_book_list_update();
     magic_items_frame();
     options_frame();
-    *(int *)frame_checkpoint = 115;
+    frame_checkpoint = 115;
     func_0002F992();
     talk_update();
     training_update();
     info_popup_update();
     func_00013C56();
-    *(int *)frame_checkpoint = 116;
+    frame_checkpoint = 116;
     ambient_dungeon_sounds();
     quest_faces_draw();
     quest_start_pending();
     quest_prompt_answer();
     sound_update_channels();
     guild_check_invitations();
-    *(int *)frame_checkpoint = 117;
-    if (((struct bf8_4_1 *)&player_motion_flags)->f == 0) goto L10549;
-    *(int *)hud_message_ptrs = *(int *)D_001845C8;
-    *(int *)hud_message_expiry = 2;
-L10549:;
+    frame_checkpoint = 117;
+    if (((struct bf8_4_1 *)&player_motion_flags)->f != 0) {
+        hud_message_ptrs[0] = D_001845C8;
+        hud_message_expiry[0] = 2;
+    }
     creatures_find_nearest();
     effects_tick();
     player_frame_update();
@@ -288,7 +271,7 @@ L10549:;
     breath_update();
     hud_messages_draw();
     arrival_room_messages();
-    *(int *)frame_checkpoint = 118;
+    frame_checkpoint = 118;
 }
 
 void world_render(void)
@@ -304,113 +287,91 @@ void world_render(void)
     int l_18;
 
     l_18 = 0;
-    if (*(signed char *)D_00187CA8 == 0) return;
-    *(signed char *)D_001A949D = 0;
+    if (D_00187CA8 == 0) return;
+    D_001A949D = 0;
     doors_update();
-L10B3F:;
-    *(int *)D_000C23C4 = player_object->x;
-    *(int *)D_000C23CC = player_object->z;
-    if (((struct bf8_2_1 *)&player_motion_flags)->f == 0) goto L10B6B;
-    l_34 = 35;
-    goto L10B72;
-L10B6B:;
-    l_34 = 72;
-L10B72:;
-    *(int *)D_000C23C8 = (player_object->y - l_34) - *(int *)head_bob_offset;
-    if ((player_character->flags & 1536) == 0) goto L10BA8;
-    *(int *)D_000C23C8 -= 50;
-L10BA8:;
-    if (*(int *)player_death_timer <= 0) goto L10BEA;
-    *(int *)D_000C23C8 = ((((*(int *)D_000C23C8 - (player_object->y - 20)) * *(int *)player_death_timer) / 1000) + player_object->y) - 20;
-L10BEA:;
-    if (*(signed char *)D_001962A0 == 0) goto L10C12;
-    if (*(int *)player_death_timer > 0) goto L10C05;
-    l_38 = 1;
-    goto L10C0C;
-L10C05:;
-    l_38 = 0;
-L10C0C:;
-    if (l_38 != 0) goto L10C14;
-L10C12:;
-    goto L10C1B;
+    for (;;) {
+        D_000C23C4 = player_object->x;
+        D_000C23CC = player_object->z;
+        if (((struct bf8_2_1 *)&player_motion_flags)->f != 0) {
+            l_34 = 35;
+        } else {
+            l_34 = 72;
+        }
+        D_000C23C8 = (player_object->y - l_34) - head_bob_offset;
+        if ((player_character->flags & 1536) != 0) D_000C23C8 -= 50;
+        if (player_death_timer > 0) {
+            D_000C23C8 = ((((D_000C23C8 - (player_object->y - 20)) * player_death_timer) / 1000) + player_object->y) - 20;
+        }
+        if (D_001962A0 != 0) {
+            if (player_death_timer <= 0) {
+                l_38 = 1;
+            } else {
+                l_38 = 0;
+            }
+            if (l_38 != 0) goto L10C14;
+        }
+        goto L10C1B;
 L10C14:;
-    *(int *)D_000C23C8 += 50;
+        D_000C23C8 += 50;
 L10C1B:;
-    *(int *)D_000C23B8 = (camera_object->angle_x + *(int *)view_look_pitch) & 2047;
-    *(int *)D_000C23BC = (camera_object->yaw + *(int *)D_001959BC) & 2047;
-    *(int *)D_000C23C0 = camera_object->angle_z;
-    if (*(signed char *)in_dungeon_water != 0) goto L10C71;
-    if (*(signed char *)D_001962A0 == 0) goto L10CE4;
-L10C71:;
-    *(int *)D_00195CEC += (*(int *)D_00195AB0 << 11) / 1000;
-    *(int *)D_00195CEC &= 8191;
-    if (*(signed char *)in_dungeon_water == 0) goto L10CAF;
-    if ((*(int *)D_00195C74 + 5) < *(int *)D_000C23C8) goto L10CB1;
-L10CAF:;
-    goto L10CCD;
-L10CB1:;
-    *(int *)D_000C23C8 += (*(int *)(D_001788E8 + ((*(int *)D_00195CEC >> 8) << 2)) * 2) - 3;
-L10CCD:;
-    *(int *)D_000C23C0 += *(int *)(D_00178968 + ((*(int *)D_00195CEC >> 8) << 2));
-L10CE4:;
-    if (*(int *)dungeon_water_level == 10000) goto L10D05;
-    if (func_0009DEAC(*(int *)D_000C23C8 - *(int *)dungeon_water_level) < 5) goto L10D07;
-L10D05:;
-    goto L10D0E;
-L10D07:;
-    *(int *)D_000C23C8 -= 10;
-L10D0E:;
-    screen_shake_offset((int)&l_24, (int)&l_20);
-    *(int *)D_000C23B8 += l_24;
-    *(int *)D_000C23B8 &= 2047;
-    *(int *)D_000C23BC += l_20;
-    *(int *)D_000C23BC &= 2047;
-    *(int *)frame_checkpoint = 200;
-    func_00135E90();
-    func_0012A4F0();
-    func_00136AB4();
-    func_00137000(*(int *)D_000C23B8, *(int *)D_000C23BC, *(int *)D_000C23C0, (int)D_00136E00);
-    func_00137725((int)D_00136E00, (int)D_00136E24);
-    *(int *)frame_checkpoint = 201;
-    world_draw_objects();
-    *(int *)frame_checkpoint = 202;
-    if (*(signed char *)D_001A949D != 0) goto L10B3F;
-    if (((int)(unsigned char)*(signed char *)player_environment) != 1) goto L10DFC;
-    func_000C2E05();
-    world_update_location();
-    if (*(signed char *)D_001A949D != 0) goto L10B3F;
-    *(short *)D_000C287F = *(short *)ground_texture_archive;
-    *(short *)D_000C287D = *(short *)nature_texture_archive;
-    *(int *)frame_checkpoint = 203;
-    func_0013E600();
-    *(int *)frame_checkpoint = 204;
-L10DFC:;
-    *(int *)D_0018DC10 = *(int *)D_0013F76C;
-    *(int *)frame_checkpoint = 205;
-    if (((int)(unsigned char)*(signed char *)player_environment) != 1) goto L10E2B;
-    l_1C = func_0012A870(2);
-    goto L10E35;
-L10E2B:;
-    l_1C = func_0012A870(0);
-L10E35:;
-    *(int *)frame_checkpoint = 206;
-    *(int *)D_0018DC08 = *(int *)D_0013F76C;
-    if (l_1C != 0) goto L10E58;
-    if (*(signed char *)D_00132F58 == 0) goto L10E7C;
-L10E58:;
-    ++l_18;
-    if (l_18 == 1) goto L10E6B;
-    fatal_error((int)D_001700A0);
-L10E6B:;
-    *(signed char *)D_00132F58 = 0;
-    func_00135E39();
-    goto L10B3F;
-L10E7C:;
-    if (*(int *)dungeon_water_level == 10000) goto L10E95;
-    if (*(int *)D_000C23C8 != *(int *)dungeon_water_level) goto L10E97;
-L10E95:;
-    return;
-L10E97:;
+        D_000C23B8 = (camera_object->angle_x + view_look_pitch) & 2047;
+        D_000C23BC = (camera_object->yaw + D_001959BC) & 2047;
+        D_000C23C0 = camera_object->angle_z;
+        if (in_dungeon_water != 0 || D_001962A0 != 0) {
+            D_00195CEC += (D_00195AB0 << 11) / 1000;
+            D_00195CEC &= 8191;
+            if (in_dungeon_water != 0 && (D_00195C74 + 5) < D_000C23C8) {
+                D_000C23C8 += (D_001788E8[(D_00195CEC >> 8)] * 2) - 3;
+            }
+            D_000C23C0 += D_00178968[(D_00195CEC >> 8)];
+        }
+        if (dungeon_water_level != 10000 && func_0009DEAC(D_000C23C8 - dungeon_water_level) < 5) {
+            D_000C23C8 -= 10;
+        }
+        screen_shake_offset((int)&l_24, (int)&l_20);
+        D_000C23B8 += l_24;
+        D_000C23B8 &= 2047;
+        D_000C23BC += l_20;
+        D_000C23BC &= 2047;
+        frame_checkpoint = 200;
+        func_00135E90();
+        func_0012A4F0();
+        func_00136AB4();
+        func_00137000(D_000C23B8, D_000C23BC, D_000C23C0, (int)D_00136E00);
+        func_00137725((int)D_00136E00, (int)D_00136E24);
+        frame_checkpoint = 201;
+        world_draw_objects();
+        frame_checkpoint = 202;
+        if (D_001A949D != 0) continue;
+        if (((int)player_environment) == 1) {
+            func_000C2E05();
+            world_update_location();
+            if (D_001A949D != 0) continue;
+            D_000C287F = ground_texture_archive;
+            D_000C287D = nature_texture_archive;
+            frame_checkpoint = 203;
+            func_0013E600();
+            frame_checkpoint = 204;
+        }
+        D_0018DC10 = D_0013F76C;
+        frame_checkpoint = 205;
+        if (((int)player_environment) == 1) {
+            l_1C = func_0012A870(2);
+        } else {
+            l_1C = func_0012A870(0);
+        }
+        frame_checkpoint = 206;
+        D_0018DC08 = D_0013F76C;
+        if (l_1C == 0) if (D_00132F58 == 0) break;
+        ++l_18;
+        if (l_18 != 1) fatal_error((int)D_001700A0);
+        D_00132F58 = 0;
+        func_00135E39();
+    }
+    if (dungeon_water_level == 10000 || D_000C23C8 == dungeon_water_level) {
+        return;
+    }
     func_0012F79C();
 }
 
@@ -418,45 +379,39 @@ void screen_shake_offset(int a1, int a2)
 {
     *(int *)((char *)a1) = 0;
     *(int *)((char *)a2) = 0;
-    if (*(int *)screen_shake != 0) goto L10EEC;
-    *(int *)((char *)a2) = 0;
-    *(int *)((char *)a1) = *(int *)((char *)a2);
-    return;
-L10EEC:;
-    *(int *)D_0018DC18 -= *(int *)D_00195AB0;
-    if (*(int *)D_0018DC18 <= 0) goto L10F1B;
-    *(int *)((char *)a1) = *(int *)D_0018DC2C;
-    *(int *)((char *)a2) = *(int *)D_0018DBF8;
-    return;
-L10F1B:;
-    *(int *)D_0018DC18 = 60;
-    *(int *)screen_shake -= 2;
-    *(int *)D_0018DC14 += 128;
-    *(int *)D_0018DC14 &= 2047;
-    *(int *)((char *)a1) = func_000CE6D4(*(int *)screen_shake, *(int *)D_0018DC14);
+    if (screen_shake == 0) {
+        *(int *)((char *)a2) = 0;
+        *(int *)((char *)a1) = *(int *)((char *)a2);
+        return;
+    }
+    D_0018DC18 -= D_00195AB0;
+    if (D_0018DC18 > 0) {
+        *(int *)((char *)a1) = D_0018DC2C;
+        *(int *)((char *)a2) = D_0018DBF8;
+        return;
+    }
+    D_0018DC18 = 60;
+    screen_shake -= 2;
+    D_0018DC14 += 128;
+    D_0018DC14 &= 2047;
+    *(int *)((char *)a1) = func_000CE6D4(screen_shake, D_0018DC14);
     *(int *)((char *)a2) = *(int *)((char *)a1);
-    if (((struct bf8_0_1 *)&D_0018DC28)->f == 0) goto L10F6F;
-    *(int *)((char *)a1) = -(*(int *)((char *)a1));
-L10F6F:;
-    if (((struct bf8_1_1 *)&D_0018DC28)->f == 0) goto L10F7D;
-    *(int *)((char *)a2) = -(*(int *)((char *)a2));
-L10F7D:;
-    *(int *)D_0018DC2C = *(int *)((char *)a1);
-    *(int *)D_0018DBF8 = *(int *)((char *)a2);
+    if (((struct bf8_0_1 *)&D_0018DC28)->f != 0) *(int *)((char *)a1) = -(*(int *)((char *)a1));
+    if (((struct bf8_1_1 *)&D_0018DC28)->f != 0) *(int *)((char *)a2) = -(*(int *)((char *)a2));
+    D_0018DC2C = *(int *)((char *)a1);
+    D_0018DBF8 = *(int *)((char *)a2);
 }
 
 void screen_shake_start(int a1)
 {
-    *(int *)screen_shake = a1 / 2;
-    if (((struct bf8_0_1 *)&screen_shake)->f == 0) goto L10FCC;
-    (*(int *)screen_shake)++;
-L10FCC:;
-    *(int *)D_0018DC28 = rand();
-    *(int *)D_0018DC14 = 0;
-    *(int *)D_0018DC18 = 60;
+    screen_shake = a1 / 2;
+    if (((struct bf8_0_1 *)&screen_shake)->f != 0) (screen_shake)++;
+    D_0018DC28 = rand();
+    D_0018DC14 = 0;
+    D_0018DC18 = 60;
 }
 
 void screen_shake_stop(void)
 {
-    *(int *)screen_shake = 0;
+    screen_shake = 0;
 }

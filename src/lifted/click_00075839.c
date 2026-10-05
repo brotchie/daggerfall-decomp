@@ -22,25 +22,21 @@ void pick_up_item(struct record *a1)
     int l_18;
 
     l_24 = &a1->data.item;
-    if (a1->children == 0) goto L7586E;
-    if (a1->children->type == 2) goto L75870;
-L7586E:;
-    goto L75881;
-L75870:;
-    inventory_open_container(a1, 0, 5);
-    return;
-L75881:;
+    if (a1->children != 0 && a1->children->type == 2) {
+        inventory_open_container(a1, 0, 5);
+        return;
+    }
     l_20 = object_weight(a1);
     l_1C = object_weight(player_entity);
     l_18 = carry_capacity() << 2;
-    if (l_20 <= l_18) goto L758B8;
-    hud_message_add((int)D_0017629C);
-    return;
-L758B8:;
-    if ((l_20 + l_1C) <= l_18) goto L758CF;
-    hud_message_add((int)D_001762B5);
-    return;
-L758CF:;
+    if (l_20 > l_18) {
+        hud_message_add((int)D_0017629C);
+        return;
+    }
+    if ((l_20 + l_1C) > l_18) {
+        hud_message_add((int)D_001762B5);
+        return;
+    }
     quest_raise_event(3, a1, 0);
     inv_store_item(a1);
 }

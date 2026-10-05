@@ -2,20 +2,20 @@
 #include "records.h"
 
 extern char D_00142950[];
-extern char screen_buffer[];
+extern int screen_buffer;
 extern char D_00175898[];
 extern char D_00185CDC[];
-extern char D_001959FC[];
-extern char hud_bar_image[];
-extern char hud_mode_icons[];
+extern int D_001959FC;
+extern char *hud_bar_image;
+extern int hud_mode_icons;
 extern char D_00195B78[];
 extern struct character *player_character;
 extern struct settings *game_settings;
-extern char D_00195C7C[];
-extern char D_00195C80[];
-extern char D_00195C84[];
-extern char D_00195D74[];
-extern char interaction_mode[];
+extern int D_00195C7C;
+extern int D_00195C80;
+extern int D_00195C84;
+extern int D_00195D74;
+extern unsigned char interaction_mode;
 extern void hud_draw_compass(void);
 extern int hud_portrait_overlay_index(void);
 extern int mc_memcpy();
@@ -34,7 +34,7 @@ struct img {
 };
 
 #define IMG(g) (*(struct img **)(g))
-#define BARS ((struct img **)D_00195C7C)
+#define BARS ((struct img **)&D_00195C7C)
 
 void hud_draw(void)
 {
@@ -47,11 +47,11 @@ void hud_draw(void)
     struct img *l_18;
 
     if ((game_settings->view_flags & 1) == 0) {
-        mc_memcpy(*(char **)screen_buffer + ((int *)D_00142950)[IMG(hud_bar_image)->y], IMG(hud_bar_image)->data, IMG(hud_bar_image)->size, D_00175898, 124, 4);
-        func_00144ED8(131, 154, 47, 22, *(char **)hud_mode_icons + ((int *)D_00185CDC)[*(unsigned char *)interaction_mode], 0);
+        mc_memcpy(*(char **)&screen_buffer + ((int *)D_00142950)[IMG(((char *)&hud_bar_image))->y], IMG(((char *)&hud_bar_image))->data, IMG(((char *)&hud_bar_image))->size, D_00175898, 124, 4);
+        func_00144ED8(131, 154, 47, 22, *(char **)&hud_mode_icons + ((int *)D_00185CDC)[interaction_mode], 0);
         l_1C = hud_portrait_overlay_index();
         if (l_1C != -1) {
-            l_18 = *(struct img **)D_00195D74;
+            l_18 = ((struct img *)D_00195D74);
             while (l_1C != 0) {
                 l_18 = (struct img *)((char *)l_18 + l_18->size + 12);
                 l_1C--;
@@ -77,8 +77,8 @@ void hud_draw(void)
         if (l_24 != 0)
             func_00144F68(l_20 + 57, 32 - l_24 + 161, 4, l_24, BARS[1]->data + (32 - l_24) * 4);
     }
-    if (player_character->magicka + *(int *)D_001959FC > 0) {
-        l_24 = (((player_character->magicka + *(int *)D_001959FC) << 8) / player_character->max_magicka << 5) / 256;
+    if (player_character->magicka + D_001959FC > 0) {
+        l_24 = (((player_character->magicka + D_001959FC) << 8) / player_character->max_magicka << 5) / 256;
         if (l_24 != 0)
             func_00144F68(l_20 + 65, 32 - l_24 + 161, 4, l_24, BARS[2]->data + (32 - l_24) * 4);
     }

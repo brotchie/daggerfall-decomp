@@ -3,12 +3,12 @@
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
 
-extern char mouse_buttons[];
-extern char mouse_x[];
-extern char mouse_y[];
-extern char D_0012B508[];
-extern char screen_buffer[];
-extern char D_00147964[];
+extern signed char mouse_buttons;
+extern short mouse_x;
+extern short mouse_y;
+extern signed char D_0012B508;
+extern int screen_buffer;
+extern signed char D_00147964;
 extern char D_00175420[];
 extern char D_00175429[];
 extern char D_00175436[];
@@ -46,89 +46,89 @@ extern char D_00175698[];
 extern char skill_names[];
 extern char classmaker_help_topics[];
 extern char classmaker_advantage_names[];
-extern char D_0018087E[];
-extern char D_0018089E[];
-extern char D_001808AE[];
-extern char D_001808BE[];
-extern char D_001808D2[];
-extern char D_001808E6[];
-extern char D_001808FE[];
+extern int D_0018087E[];
+extern int D_0018089E[];
+extern int D_001808AE[];
+extern int D_001808BE[];
+extern int D_001808D2[];
+extern int D_001808E6[];
+extern int D_001808FE[];
 extern char classmaker_disadvantage_names[];
-extern char D_0018096E[];
-extern char D_0018097A[];
-extern char D_00180986[];
-extern char D_00180992[];
-extern char D_001809A2[];
-extern char D_001809B6[];
-extern char classmaker_advantage_costs[];
-extern char classmaker_disadvantage_costs[];
+extern int D_0018096E[];
+extern int D_0018097A[];
+extern int D_00180986[];
+extern int D_00180992[];
+extern int D_001809A2[];
+extern int D_001809B6[];
+extern char *classmaker_advantage_costs[];
+extern char *classmaker_disadvantage_costs[];
 extern char classmaker_buttons[];
-extern char classmaker_attribute_up_box[];
-extern char D_00185646[];
-extern char D_00185648[];
-extern char D_0018564A[];
-extern char D_0018564C[];
-extern char classmaker_attribute_down_box[];
-extern char D_00185652[];
-extern char D_00185654[];
-extern char D_00185656[];
-extern char D_00185658[];
+extern short classmaker_attribute_up_box;
+extern short D_00185646;
+extern short D_00185648;
+extern short D_0018564A;
+extern int D_0018564C;
+extern short classmaker_attribute_down_box;
+extern short D_00185652;
+extern short D_00185654;
+extern short D_00185656;
+extern int D_00185658;
 extern char classmaker_reputation_buttons[];
 extern char D_0018565E[];
 extern char D_00185662[];
 extern char classmaker_specials_buttons[];
-extern char classmaker_help_texts[];
-extern char D_00187CA8[];
-extern char text_buffer[];
+extern short classmaker_help_texts[];
+extern signed char D_00187CA8;
+extern signed char text_buffer[];
 extern char D_00190BE4[];
-extern char D_00190BE8[];
-extern char itemmaker_slot_kinds[];
+extern int D_00190BE8;
+extern signed char itemmaker_slot_kinds[];
 extern char D_00190D64[];
 extern char D_00190D66[];
-extern char D_00190D68[];
-extern char classmaker_done[];
-extern char chargen_selected_attribute[];
-extern char D_00190D72[];
-extern char D_00190D74[];
+extern short D_00190D68;
+extern short classmaker_done;
+extern short chargen_selected_attribute;
+extern short D_00190D72;
+extern short D_00190D74;
 extern char classmaker_screen[];
-extern char D_00190D78[];
-extern char D_00190D7C[];
-extern char classmaker_special_counts[];
-extern char D_00190D7F[];
-extern char classmaker_special_list[];
-extern char D_00190D84[];
-extern char D_00190D86[];
+extern short D_00190D78;
+extern short D_00190D7C;
+extern signed char classmaker_special_counts[];
+extern signed char D_00190D7F;
+extern short classmaker_special_list;
+extern short D_00190D84;
+extern short D_00190D86;
 extern char text_macro_fpc[];
-extern char text_macro_fnpc[];
-extern char text_macro_fe[];
+extern int text_macro_fnpc;
+extern int text_macro_fe;
 extern char text_macro_fa[];
-extern char text_macro_fae[];
-extern char text_macro_fea[];
-extern char text_macro_fpa[];
-extern char D_00190E00[];
-extern char D_00190E0C[];
-extern char D_00190E10[];
-extern char D_00190EE0[];
+extern int text_macro_fae;
+extern int text_macro_fea;
+extern int text_macro_fpa;
+extern int D_00190E00;
+extern int D_00190E0C;
+extern int D_00190E10;
+extern int D_00190EE0;
 extern char D_00190EE4[];
-extern char D_001940D4[];
-extern char D_001940D8[];
+extern signed char D_001940D4;
+extern signed char D_001940D8;
 extern struct record *player_object;
-extern char spellshop_icons[];
+extern int spellshop_icons;
 extern struct character *player_character;
-extern char window_image[];
+extern int window_image;
 extern struct career *player_class;
-extern char D_00195C44[];
+extern int D_00195C44;
 extern char classmaker_file[];
-extern char D_0019626F[];
-extern char D_00196272[];
-extern char game_mode[];
-extern char mouse_buttons_prev[];
-extern char D_0019981C[];
-extern char classmaker_specials[];
-extern char D_00199821[];
-extern char D_0019982E[];
-extern char D_0019982F[];
-extern char classmaker_current_buttons[];
+extern unsigned char D_0019626F;
+extern signed char D_00196272;
+extern signed char game_mode;
+extern signed char mouse_buttons_prev;
+extern int D_0019981C;
+extern signed char classmaker_specials[];
+extern signed char D_00199821[];
+extern signed char D_0019982E[];
+extern signed char D_0019982F[];
+extern char *classmaker_current_buttons;
 
 extern int classmaker_draw(short);
 extern int sound_play(int, int, int);
@@ -183,218 +183,134 @@ void classmaker_run(void)
     player_class->hp_per_level = 8;
     player_class->flags = 5120;
     func_000CE483((int)player_class + 58, 50, 16);
-    *(signed char *)classmaker_special_counts = (*(signed char *)D_00190D7F = (*(short *)D_00190D7C = (*(short *)D_00190D78 = (*(short *)classmaker_done = (*(short *)D_00190D66 = (*(short *)D_00190D64 = 0))))));
-    *(signed char *)D_00147964 &= 254;
-    *(short *)D_00190D68 = 115;
+    classmaker_special_counts[0] = (D_00190D7F = (D_00190D7C = (D_00190D78 = (classmaker_done = (*(short *)D_00190D66 = (*(short *)D_00190D64 = 0))))));
+    D_00147964 &= 254;
+    D_00190D68 = 115;
     classmaker_select_attribute(0);
     *(short *)classmaker_screen = 0;
-    *(short *)D_00190D84 = 65535;
-    *(short *)D_00190D86 = 0;
-    *(signed char *)D_001940D8 |= 1;
-    if (*(signed char *)classmaker_file == 0) goto L52EBC;
-    disk_read_file((int)classmaker_file, (int)player_class);
-L52EBC:;
-    disk_read_file((int)D_00175429, *(int *)screen_buffer);
-    *(int *)text_macro_fae = mc_malloc(64000, (int)D_00175420, 105);
-    mc_memcpy(*(int *)text_macro_fae, *(int *)screen_buffer, 64000, (int)D_00175420, 106, 4);
-    *(int *)text_macro_fe = disk_read_file((int)D_00175436, 0);
+    D_00190D84 = 65535;
+    D_00190D86 = 0;
+    D_001940D8 |= 1;
+    if (*(signed char *)classmaker_file != 0) {
+        disk_read_file((int)classmaker_file, (int)player_class);
+    }
+    disk_read_file((int)D_00175429, screen_buffer);
+    text_macro_fae = mc_malloc(64000, (int)D_00175420, 105);
+    mc_memcpy(text_macro_fae, screen_buffer, 64000, (int)D_00175420, 106, 4);
+    text_macro_fe = disk_read_file((int)D_00175436, 0);
     *(int *)text_macro_fpc = mc_malloc(5520, (int)D_00175420, 109);
     func_00144E84(219, 46, 40, 138, *(int *)text_macro_fpc, 0);
     *(int *)text_macro_fa = disk_read_file((int)D_00175443, 0);
-    *(int *)text_macro_fnpc = mc_malloc(((int)(unsigned short)*(short *)(*(char **)text_macro_fa + 4)) * ((int)(unsigned short)*(short *)(*(char **)text_macro_fa + 6)), (int)D_00175420, 113);
-    *(int *)text_macro_fea = disk_read_file((int)D_00175450, 0);
-    *(int *)D_00190E00 = disk_read_file((int)D_0017545D, 0);
-    *(int *)text_macro_fpa = disk_read_file((int)D_0017546A, 0);
+    text_macro_fnpc = mc_malloc(((int)(unsigned short)*(short *)(*(char **)text_macro_fa + 4)) * ((int)(unsigned short)*(short *)(*(char **)text_macro_fa + 6)), (int)D_00175420, 113);
+    text_macro_fea = disk_read_file((int)D_00175450, 0);
+    D_00190E00 = disk_read_file((int)D_0017545D, 0);
+    text_macro_fpa = disk_read_file((int)D_0017546A, 0);
     l_28 = 1132;
     *(int *)D_00190BE4 = *(int *)((char *)l_28);
-L52FD3:;
-    if (*(short *)classmaker_done != 0) goto L533C3;
-    keys_world_actions();
-    *(signed char *)mouse_buttons_prev = *(signed char *)mouse_buttons;
-    func_0012B136();
-    func_0012B2D3((int)(short)*(short *)mouse_x, (int)(short)*(short *)mouse_y);
-    if (*(signed char *)mouse_buttons != 0) goto L53031;
-    *(short *)D_00190D86 = 0;
-    *(short *)D_00190D72 = 16;
-    *(short *)D_00190D74 = 16;
-    goto L530F9;
-L53031:;
-    if (*(short *)classmaker_screen != 0) goto L530F9;
-    if (*(short *)mouse_x <= *(short *)classmaker_attribute_down_box) goto L5305D;
-    if (*(short *)mouse_x < *(short *)D_00185654) goto L5305F;
-L5305D:;
-    goto L5306E;
-L5305F:;
-    if (*(short *)mouse_y > *(short *)D_00185652) goto L53070;
-L5306E:;
-    goto L5307F;
-L53070:;
-    if (*(short *)mouse_y < *(short *)D_00185656) goto L53081;
-L5307F:;
-    goto L5309C;
-L53081:;
-    sound_play(203, (int)player_object, 100);
-    ((int (*)())(*(int *)D_00185658))();
-L5309C:;
-    if (*(short *)mouse_x <= *(short *)classmaker_attribute_up_box) goto L530BA;
-    if (*(short *)mouse_x < *(short *)D_00185648) goto L530BC;
-L530BA:;
-    goto L530CB;
-L530BC:;
-    if (*(short *)mouse_y > *(short *)D_00185646) goto L530CD;
-L530CB:;
-    goto L530DC;
-L530CD:;
-    if (*(short *)mouse_y < *(short *)D_0018564A) goto L530DE;
-L530DC:;
-    goto L530F9;
-L530DE:;
-    sound_play(203, (int)player_object, 100);
-    ((int (*)())(*(int *)D_0018564C))();
-L530F9:;
-    if (*(short *)D_00190D86 == 0) goto L5310A;
-    (*(short *)D_00190D86)--;
-L5310A:;
-    if (*(short *)classmaker_screen != 0) goto L53127;
-    *(int *)classmaker_current_buttons = (int)classmaker_buttons;
-    *(int *)&l_1C = 28;
-    goto L53176;
-L53127:;
-    if (((int)(short)*(short *)classmaker_screen) != 1) goto L53146;
-    *(int *)classmaker_current_buttons = (int)classmaker_reputation_buttons;
-    *(int *)&l_1C = 6;
-    goto L53176;
-L53146:;
-    *(int *)classmaker_current_buttons = (int)classmaker_specials_buttons;
-    if (((int)(short)(*(short *)classmaker_screen & 16)) == 0) goto L53169;
-    l_2C = 1;
-    goto L53170;
-L53169:;
-    l_2C = 3;
-L53170:;
-    *(int *)&l_1C = l_2C;
-L53176:;
-    if (((int)(unsigned char)*(signed char *)game_mode) == 8) goto L5333E;
-    if (*(short *)classmaker_screen != 0) goto L53199;
-    if (*(signed char *)mouse_buttons != 0) goto L5319B;
-L53199:;
-    goto L531A8;
-L5319B:;
-    if (*(signed char *)mouse_buttons != *(signed char *)mouse_buttons_prev) goto L531AD;
-L531A8:;
-    goto L5326E;
-L531AD:;
-    *(int *)&l_18 = 0;
-L531B4:;
-    if ((short)(short)*(int *)&l_18 < l_1C) goto L531CA;
-    goto L53269;
-L531C2:;
-    (*(int *)&l_18)++;
-    goto L531B4;
-L531CA:;
-    if (*(short *)mouse_x <= *(short *)((char *)(int)(*(char **)classmaker_current_buttons + (((int)(short)l_18) * 12)))) goto L531FF;
-    if (*(short *)mouse_x < *(short *)(*(char **)classmaker_current_buttons + 4 + (((int)(short)l_18) * 12))) goto L53201;
-L531FF:;
-    goto L5321C;
-L53201:;
-    if (*(short *)mouse_y > *(short *)(*(char **)classmaker_current_buttons + 2 + (((int)(short)l_18) * 12))) goto L5321E;
-L5321C:;
-    goto L53239;
-L5321E:;
-    if (*(short *)mouse_y < *(short *)(*(char **)classmaker_current_buttons + 6 + (((int)(short)l_18) * 12))) goto L5323B;
-L53239:;
-    goto L53264;
-L5323B:;
-    sound_play(203, (int)player_object, 100);
-    ((int (*)())(*(int *)(*(char **)classmaker_current_buttons + 8 + (((int)(short)l_18) * 12))))();
-    goto L53269;
-L53264:;
-    goto L531C2;
-L53269:;
-    goto L5333E;
-L5326E:;
-    if (((int)(unsigned char)(*(signed char *)mouse_buttons & 1)) == 0) goto L5333E;
-    *(int *)&l_18 = 0;
-L53289:;
-    if ((short)(short)*(int *)&l_18 < l_1C) goto L5329F;
-    goto L5333E;
-L53297:;
-    (*(int *)&l_18)++;
-    goto L53289;
-L5329F:;
-    if (*(short *)mouse_x <= *(short *)((char *)(int)(*(char **)classmaker_current_buttons + (((int)(short)l_18) * 12)))) goto L532D4;
-    if (*(short *)mouse_x < *(short *)(*(char **)classmaker_current_buttons + 4 + (((int)(short)l_18) * 12))) goto L532D6;
-L532D4:;
-    goto L532F1;
-L532D6:;
-    if (*(short *)mouse_y > *(short *)(*(char **)classmaker_current_buttons + 2 + (((int)(short)l_18) * 12))) goto L532F3;
-L532F1:;
-    goto L5330E;
-L532F3:;
-    if (*(short *)mouse_y < *(short *)(*(char **)classmaker_current_buttons + 6 + (((int)(short)l_18) * 12))) goto L53310;
-L5330E:;
-    goto L53339;
-L53310:;
-    sound_play(203, (int)player_object, 100);
-    ((int (*)())(*(int *)(*(char **)classmaker_current_buttons + 8 + (((int)(short)l_18) * 12))))();
-    goto L5333E;
-L53339:;
-    goto L53297;
-L5333E:;
-    if (*(short *)classmaker_screen != 0) goto L53354;
-    classmaker_draw(1);
-    goto L5336C;
-L53354:;
-    if (((int)(short)*(short *)classmaker_screen) != 1) goto L53367;
-    classmaker_draw_reputations();
-    goto L5336C;
-L53367:;
-    classmaker_specials_screen();
-L5336C:;
-    classmaker_update_advancement();
-    mc_memcpy(655360, *(int *)screen_buffer, 64000, (int)D_00175420, 205, 4);
-    l_24 = 1132;
-    if (*(int *)D_00190BE4 == *(int *)((char *)l_24)) goto L533BE;
-    (*(short *)D_00190D74)++;
-    l_20 = 1132;
-    *(int *)D_00190BE4 = *(int *)((char *)l_20);
-L533BE:;
-    goto L52FD3;
-L533C3:;
-    *(signed char *)D_001940D8 &= 254;
+    while (classmaker_done == 0) {
+        keys_world_actions();
+        mouse_buttons_prev = mouse_buttons;
+        func_0012B136();
+        func_0012B2D3((int)(short)mouse_x, (int)(short)mouse_y);
+        if (mouse_buttons == 0) {
+            D_00190D86 = 0;
+            D_00190D72 = 16;
+            D_00190D74 = 16;
+        } else if (*(short *)classmaker_screen == 0) {
+            if (mouse_x > classmaker_attribute_down_box && mouse_x < D_00185654 && mouse_y > D_00185652 && mouse_y < D_00185656) {
+                sound_play(203, (int)player_object, 100);
+                ((int (*)())(D_00185658))();
+            }
+            if (mouse_x > classmaker_attribute_up_box && mouse_x < D_00185648 && mouse_y > D_00185646 && mouse_y < D_0018564A) {
+                sound_play(203, (int)player_object, 100);
+                ((int (*)())(D_0018564C))();
+            }
+        }
+        if (D_00190D86 != 0) (D_00190D86)--;
+        if (*(short *)classmaker_screen == 0) {
+            *(int *)&classmaker_current_buttons = (int)classmaker_buttons;
+            *(int *)&l_1C = 28;
+        } else if (((int)(short)*(short *)classmaker_screen) == 1) {
+            *(int *)&classmaker_current_buttons = (int)classmaker_reputation_buttons;
+            *(int *)&l_1C = 6;
+        } else {
+            *(int *)&classmaker_current_buttons = (int)classmaker_specials_buttons;
+            if (((int)(short)(*(short *)classmaker_screen & 16)) != 0) {
+                l_2C = 1;
+            } else {
+                l_2C = 3;
+            }
+            *(int *)&l_1C = l_2C;
+        }
+        if (((int)(unsigned char)game_mode) != 8) {
+            if (*(short *)classmaker_screen == 0 && mouse_buttons != 0 && mouse_buttons != mouse_buttons_prev) {
+                *(int *)&l_18 = 0;
+                for (; (short)(short)*(int *)&l_18 < l_1C; (*(int *)&l_18)++) {
+                    if (mouse_x > *(short *)((char *)(int)(classmaker_current_buttons + (((int)(short)l_18) * 12))) && mouse_x < *(short *)(classmaker_current_buttons + 4 + (((int)(short)l_18) * 12)) && mouse_y > *(short *)(classmaker_current_buttons + 2 + (((int)(short)l_18) * 12)) && mouse_y < *(short *)(classmaker_current_buttons + 6 + (((int)(short)l_18) * 12))) {
+                        sound_play(203, (int)player_object, 100);
+                        ((int (*)())(*(int *)(classmaker_current_buttons + 8 + (((int)(short)l_18) * 12))))();
+                        break;
+                    }
+                }
+            } else if (((int)(unsigned char)(mouse_buttons & 1)) != 0) {
+                *(int *)&l_18 = 0;
+                for (; (short)(short)*(int *)&l_18 < l_1C; (*(int *)&l_18)++) {
+                    if (mouse_x > *(short *)((char *)(int)(classmaker_current_buttons + (((int)(short)l_18) * 12))) && mouse_x < *(short *)(classmaker_current_buttons + 4 + (((int)(short)l_18) * 12)) && mouse_y > *(short *)(classmaker_current_buttons + 2 + (((int)(short)l_18) * 12)) && mouse_y < *(short *)(classmaker_current_buttons + 6 + (((int)(short)l_18) * 12))) {
+                        sound_play(203, (int)player_object, 100);
+                        ((int (*)())(*(int *)(classmaker_current_buttons + 8 + (((int)(short)l_18) * 12))))();
+                        break;
+                    }
+                }
+            }
+        }
+        if (*(short *)classmaker_screen == 0) {
+            classmaker_draw(1);
+        } else if (((int)(short)*(short *)classmaker_screen) == 1) {
+            classmaker_draw_reputations();
+        } else {
+            classmaker_specials_screen();
+        }
+        classmaker_update_advancement();
+        mc_memcpy(655360, screen_buffer, 64000, (int)D_00175420, 205, 4);
+        l_24 = 1132;
+        if (*(int *)D_00190BE4 != *(int *)((char *)l_24)) {
+            (D_00190D74)++;
+            l_20 = 1132;
+            *(int *)D_00190BE4 = *(int *)((char *)l_20);
+        }
+    }
+    D_001940D8 &= 254;
     mc_free(*(int *)text_macro_fpc, (int)D_00175420, 217);
-    mc_free(*(int *)text_macro_fe, (int)D_00175420, 218);
-    mc_free(*(int *)text_macro_fnpc, (int)D_00175420, 219);
+    mc_free(text_macro_fe, (int)D_00175420, 218);
+    mc_free(text_macro_fnpc, (int)D_00175420, 219);
     mc_free(*(int *)text_macro_fa, (int)D_00175420, 220);
-    mc_free(*(int *)text_macro_fae, (int)D_00175420, 221);
-    mc_free(*(int *)text_macro_fea, (int)D_00175420, 222);
-    mc_free(*(int *)text_macro_fpa, (int)D_00175420, 223);
-    mc_free(*(int *)D_00190E00, (int)D_00175420, 224);
+    mc_free(text_macro_fae, (int)D_00175420, 221);
+    mc_free(text_macro_fea, (int)D_00175420, 222);
+    mc_free(text_macro_fpa, (int)D_00175420, 223);
+    mc_free(D_00190E00, (int)D_00175420, 224);
     mc_memset((int)text_macro_fpc, 0, 512, (int)D_00175420, 226, 512);
 }
 
 void classmaker_exit_button(void)
 {
-    if (player_class->name[0] != 0) goto L539FF;
-    msgbox_show_rsc(301, 1);
-    return;
-L539FF:;
-    if (memchr((int)player_class + 16, -1, 12) == 0) goto L53A2B;
-    msgbox_show_rsc(300, 1);
-    return;
-L53A2B:;
-    if (*(short *)D_00190D64 == 0) goto L53A46;
-    msgbox_show_rsc(302, 1);
-    return;
-L53A46:;
-    if (((int)(short)*(short *)D_00190D68) < 81) goto L53A60;
-    if (((int)(short)*(short *)D_00190D68) <= 161) goto L53A71;
-L53A60:;
-    msgbox_show_rsc(306, 1);
-    return;
-L53A71:;
+    if (player_class->name[0] == 0) {
+        msgbox_show_rsc(301, 1);
+        return;
+    }
+    if (memchr((int)player_class + 16, -1, 12) != 0) {
+        msgbox_show_rsc(300, 1);
+        return;
+    }
+    if (*(short *)D_00190D64 != 0) {
+        msgbox_show_rsc(302, 1);
+        return;
+    }
+    if (((int)(short)D_00190D68) < 81 || ((int)(short)D_00190D68) > 161) {
+        msgbox_show_rsc(306, 1);
+        return;
+    }
     classmaker_save_file();
-    *(short *)classmaker_done = 1;
+    classmaker_done = 1;
 }
 
 void classmaker_name_button(void)
@@ -404,83 +320,83 @@ void classmaker_name_button(void)
 
 void classmaker_skill_primary_1(void)
 {
-    player_class->skills[0] = classmaker_pick_from_list((int)skill_names, *(int *)text_macro_fae);
+    player_class->skills[0] = classmaker_pick_from_list((int)skill_names, text_macro_fae);
 }
 
 void classmaker_skill_primary_2(void)
 {
-    player_class->skills[1] = classmaker_pick_from_list((int)skill_names, *(int *)text_macro_fae);
+    player_class->skills[1] = classmaker_pick_from_list((int)skill_names, text_macro_fae);
 }
 
 void classmaker_skill_primary_3(void)
 {
-    player_class->skills[2] = classmaker_pick_from_list((int)skill_names, *(int *)text_macro_fae);
+    player_class->skills[2] = classmaker_pick_from_list((int)skill_names, text_macro_fae);
 }
 
 void classmaker_skill_major_1(void)
 {
-    player_class->skills[3] = classmaker_pick_from_list((int)skill_names, *(int *)text_macro_fae);
+    player_class->skills[3] = classmaker_pick_from_list((int)skill_names, text_macro_fae);
 }
 
 void classmaker_skill_major_2(void)
 {
-    player_class->skills[4] = classmaker_pick_from_list((int)skill_names, *(int *)text_macro_fae);
+    player_class->skills[4] = classmaker_pick_from_list((int)skill_names, text_macro_fae);
 }
 
 void classmaker_skill_major_3(void)
 {
-    player_class->skills[5] = classmaker_pick_from_list((int)skill_names, *(int *)text_macro_fae);
+    player_class->skills[5] = classmaker_pick_from_list((int)skill_names, text_macro_fae);
 }
 
 void classmaker_skill_minor_1(void)
 {
-    player_class->skills[6] = classmaker_pick_from_list((int)skill_names, *(int *)text_macro_fae);
+    player_class->skills[6] = classmaker_pick_from_list((int)skill_names, text_macro_fae);
 }
 
 void classmaker_skill_minor_2(void)
 {
-    player_class->skills[7] = classmaker_pick_from_list((int)skill_names, *(int *)text_macro_fae);
+    player_class->skills[7] = classmaker_pick_from_list((int)skill_names, text_macro_fae);
 }
 
 void classmaker_skill_minor_3(void)
 {
-    player_class->skills[8] = classmaker_pick_from_list((int)skill_names, *(int *)text_macro_fae);
+    player_class->skills[8] = classmaker_pick_from_list((int)skill_names, text_macro_fae);
 }
 
 void classmaker_skill_minor_4(void)
 {
-    player_class->skills[9] = classmaker_pick_from_list((int)skill_names, *(int *)text_macro_fae);
+    player_class->skills[9] = classmaker_pick_from_list((int)skill_names, text_macro_fae);
 }
 
 void classmaker_skill_minor_5(void)
 {
-    player_class->skills[10] = classmaker_pick_from_list((int)skill_names, *(int *)text_macro_fae);
+    player_class->skills[10] = classmaker_pick_from_list((int)skill_names, text_macro_fae);
 }
 
 void classmaker_skill_minor_6(void)
 {
-    player_class->skills[11] = classmaker_pick_from_list((int)skill_names, *(int *)text_macro_fae);
+    player_class->skills[11] = classmaker_pick_from_list((int)skill_names, text_macro_fae);
 }
 
 void classmaker_help_button(void)
 {
-    msgbox_show_rsc((int)(short)*(short *)(classmaker_help_texts + (classmaker_pick_from_list((int)classmaker_help_topics, *(int *)text_macro_fae) * 2)), 1);
+    msgbox_show_rsc((int)(short)classmaker_help_texts[classmaker_pick_from_list((int)classmaker_help_topics, text_macro_fae)], 1);
 }
 
 void classmaker_advantages_button(void)
 {
-    *(int *)D_00190E0C = (int)classmaker_advantage_names;
-    *(int *)D_00190E10 = (int)classmaker_advantage_costs;
+    D_00190E0C = (int)classmaker_advantage_names;
+    D_00190E10 = (int)classmaker_advantage_costs;
     *(short *)classmaker_screen = 2;
-    *(short *)classmaker_special_list = 0;
+    classmaker_special_list = 0;
 }
 
 void classmaker_disadvantages_button(void)
 {
-    *(int *)D_00190E0C = (int)classmaker_disadvantage_names;
-    *(int *)D_00190E10 = (int)classmaker_disadvantage_costs;
+    D_00190E0C = (int)classmaker_disadvantage_names;
+    D_00190E10 = (int)classmaker_disadvantage_costs;
     *(short *)classmaker_screen = 3;
-    *(short *)classmaker_special_list = 1;
+    classmaker_special_list = 1;
 }
 
 void classmaker_reputations_button(void)
@@ -534,11 +450,11 @@ void classmaker_attribute_up(void)
     int l_18;
 
     l_1C = 1132;
-    if (((unsigned)(*(int *)((char *)l_1C) - *(int *)D_00190BE8)) < 6) return;
+    if (((unsigned)(*(int *)((char *)l_1C) - D_00190BE8)) < 6) return;
     l_18 = 1132;
-    *(int *)D_00190BE8 = *(int *)((char *)l_18);
-    if (player_class->attributes[(int)(short)*(short *)chargen_selected_attribute] == 75) return;
-    player_class->attributes[(int)(short)*(short *)chargen_selected_attribute]++;
+    D_00190BE8 = *(int *)((char *)l_18);
+    if (player_class->attributes[(int)(short)chargen_selected_attribute] == 75) return;
+    player_class->attributes[(int)(short)chargen_selected_attribute]++;
     (*(short *)D_00190D64)--;
 }
 
@@ -548,11 +464,11 @@ void classmaker_attribute_down(void)
     int l_18;
 
     l_1C = 1132;
-    if (((unsigned)(*(int *)((char *)l_1C) - *(int *)D_00190BE8)) < 6) return;
+    if (((unsigned)(*(int *)((char *)l_1C) - D_00190BE8)) < 6) return;
     l_18 = 1132;
-    *(int *)D_00190BE8 = *(int *)((char *)l_18);
-    if (player_class->attributes[(int)(short)*(short *)chargen_selected_attribute] == 10) return;
-    player_class->attributes[(int)(short)*(short *)chargen_selected_attribute]--;
+    D_00190BE8 = *(int *)((char *)l_18);
+    if (player_class->attributes[(int)(short)chargen_selected_attribute] == 10) return;
+    player_class->attributes[(int)(short)chargen_selected_attribute]--;
     (*(short *)D_00190D64)++;
 }
 
@@ -561,45 +477,38 @@ int classmaker_pick_from_list(int a1, int a2)
     short l_14;
     short l_18;
 
-    if (((int)skill_names) != a1) goto L54194;
-    *(int *)&l_14 = 0;
-    *(int *)&l_18 = *(int *)&l_14;
-L54127:;
-    if (*(int *)((char *)((((int)(short)l_14) << 2) + a1)) == 0) goto L54177;
-    if (classmaker_skill_taken((int)(short)l_14) != 0) goto L5416E;
-    *(signed char *)(itemmaker_slot_kinds + ((int)(short)l_18)) = *(signed char *)&l_14;
-    *(int *)(D_00190EE4 + (((int)(short)(*(int *)&l_18)++) << 2)) = *(int *)((char *)(int)((char *)a1 + (((int)(short)l_14) << 2)));
-L5416E:;
-    l_14++;
-    goto L54127;
-L54177:;
-    *(int *)(D_00190EE4 + (((int)(short)l_18) << 2)) = 0;
-    picklist_open((int)D_00190EE4);
-    goto L5419C;
-L54194:;
-    picklist_open(a1);
-L5419C:;
-    *(signed char *)D_001940D4 &= 254;
-L541A3:;
-    keys_world_actions();
-    func_0012B136();
-    mc_memcpy(*(int *)screen_buffer, a2, 64000, (int)D_00175420, 558, 4);
-    l_14 = picklist_update();
-    if (((int)(short)l_14) <= (-1)) goto L54210;
-L541DD:;
-    if (*(signed char *)mouse_buttons == 0) goto L541ED;
-    func_0012B136();
-    goto L541DD;
-L541ED:;
-    if (((int)skill_names) != a1) goto L54207;
-    return (int)(signed char)*(signed char *)(itemmaker_slot_kinds + ((int)(short)l_14));
-L54207:;
-    return (int)(short)l_14;
-L54210:;
-    *(signed char *)D_00147964 &= 254;
-    func_0012B2D3((int)(short)*(short *)mouse_x, (int)(short)*(short *)mouse_y);
-    mc_memcpy(655360, *(int *)screen_buffer, 64000, (int)D_00175420, 568, 4);
-    goto L541A3;
+    if (((int)skill_names) == a1) {
+        *(int *)&l_14 = 0;
+        *(int *)&l_18 = *(int *)&l_14;
+        while (*(int *)((char *)((((int)(short)l_14) << 2) + a1)) != 0) {
+            if (classmaker_skill_taken((int)(short)l_14) == 0) {
+                itemmaker_slot_kinds[(int)(short)l_18] = *(signed char *)&l_14;
+                *(int *)(D_00190EE4 + (((int)(short)(*(int *)&l_18)++) << 2)) = *(int *)((char *)(int)((char *)a1 + (((int)(short)l_14) << 2)));
+            }
+            l_14++;
+        }
+        *(int *)(D_00190EE4 + (((int)(short)l_18) << 2)) = 0;
+        picklist_open((int)D_00190EE4);
+    } else {
+        picklist_open(a1);
+    }
+    D_001940D4 &= 254;
+    for (;;) {
+        keys_world_actions();
+        func_0012B136();
+        mc_memcpy(screen_buffer, a2, 64000, (int)D_00175420, 558, 4);
+        l_14 = picklist_update();
+        if (((int)(short)l_14) > (-1)) {
+            while (mouse_buttons != 0) func_0012B136();
+            if (((int)skill_names) == a1) {
+                return (int)(signed char)itemmaker_slot_kinds[(int)(short)l_14];
+            }
+            return (int)(short)l_14;
+        }
+        D_00147964 &= 254;
+        func_0012B2D3((int)(short)mouse_x, (int)(short)mouse_y);
+        mc_memcpy(655360, screen_buffer, 64000, (int)D_00175420, 568, 4);
+    }
 }
 
 void classmaker_set_reputation(int a1)
@@ -608,16 +517,13 @@ void classmaker_set_reputation(int a1)
     int l_18;
 
     l_18 = (((int)(short)*(short *)(D_0018565E + (((int)(short)*(short *)&a1) * 12))) + ((int)(short)*(short *)(D_00185662 + (((int)(short)*(short *)&a1) * 12)))) >> 1;
-    if (((int)(short)*(short *)mouse_y) >= 81) goto L542CA;
-    player_character->reputation[(int)(short)*(short *)&a1] = (((int)(short)*(short *)mouse_y) - 81) / 5;
-    goto L5431C;
-L542CA:;
-    if (((int)(short)*(short *)mouse_y) <= 81) goto L54304;
-    player_character->reputation[(int)(short)*(short *)&a1] = (((int)(short)*(short *)mouse_y) - 81) / 5;
-    goto L5431C;
-L54304:;
-    player_character->reputation[(int)(short)*(short *)&a1] = 0;
-L5431C:;
+    if (((int)(short)mouse_y) < 81) {
+        player_character->reputation[(int)(short)*(short *)&a1] = (((int)(short)mouse_y) - 81) / 5;
+    } else if (((int)(short)mouse_y) > 81) {
+        player_character->reputation[(int)(short)*(short *)&a1] = (((int)(short)mouse_y) - 81) / 5;
+    } else {
+        player_character->reputation[(int)(short)*(short *)&a1] = 0;
+    }
     player_character->reputation[(int)(short)*(short *)&a1] = -player_character->reputation[(int)(short)*(short *)&a1];
 }
 
@@ -653,52 +559,38 @@ void classmaker_reputations_exit(void)
 
     l_1C = 0;
     l_18 = l_1C;
-L54414:;
-    if (((int)(short)*(short *)&l_1C) < 5) goto L54427;
-    goto L54442;
-L5441F:;
-    l_1C++;
-    goto L54414;
-L54427:;
-    l_18 += player_character->reputation[(int)(short)*(short *)&l_1C];
-    goto L5441F;
-L54442:;
-    if (l_18 == 0) goto L54461;
-    *(signed char *)D_0012B508 = 145;
-    msgbox_show_rsc(303, 1);
-    return;
-L54461:;
+    for (; ((int)(short)*(short *)&l_1C) < 5; l_1C++) {
+        l_18 += player_character->reputation[(int)(short)*(short *)&l_1C];
+    }
+    if (l_18 != 0) {
+        D_0012B508 = 145;
+        msgbox_show_rsc(303, 1);
+        return;
+    }
     *(short *)classmaker_screen = 0;
-L5446A:;
-    if (*(signed char *)mouse_buttons == 0) return;
-    func_0012B136();
-    goto L5446A;
+    while (mouse_buttons != 0) func_0012B136();
 }
 
 int classmaker_picklist_wait(void)
 {
     int l_1C;
 
-L54492:;
-    keys_world_actions();
-    func_0012B136();
-    l_1C = picklist_update();
-    if (l_1C <= (-1)) goto L544CA;
-L544AA:;
-    if (*(signed char *)mouse_buttons == 0) goto L544BA;
-    func_0012B136();
-    goto L544AA;
-L544BA:;
-    *(signed char *)D_00147964 &= 254;
-    return l_1C + 1;
-L544CA:;
-    if (l_1C != (-2)) goto L544E0;
-    *(signed char *)D_00147964 &= 254;
-    return 0;
-L544E0:;
-    func_0012B2D3((int)(short)*(short *)mouse_x, (int)(short)*(short *)mouse_y);
-    mc_memcpy(655360, *(int *)screen_buffer, 64000, (int)D_00175420, 655, 4);
-    goto L54492;
+    for (;;) {
+        keys_world_actions();
+        func_0012B136();
+        l_1C = picklist_update();
+        if (l_1C > (-1)) {
+            while (mouse_buttons != 0) func_0012B136();
+            D_00147964 &= 254;
+            return l_1C + 1;
+        }
+        if (l_1C == (-2)) {
+            D_00147964 &= 254;
+            return 0;
+        }
+        func_0012B2D3((int)(short)mouse_x, (int)(short)mouse_y);
+        mc_memcpy(655360, screen_buffer, 64000, (int)D_00175420, 655, 4);
+    }
 }
 
 int classmaker_drop_duplicate_special(int a1)
@@ -707,44 +599,29 @@ int classmaker_drop_duplicate_special(int a1)
     int l_20;
     int l_1C;
 
-    l_20 = (int)(unsigned char)*(signed char *)(classmaker_specials + ((a1 * 14) + (((int)(unsigned char)*(signed char *)(classmaker_special_counts + a1)) * 2)));
-    l_1C = (int)(unsigned char)*(signed char *)(D_00199821 + ((a1 * 14) + (((int)(unsigned char)*(signed char *)(classmaker_special_counts + a1)) * 2)));
-    l_24 = 0;
-L54A32:;
-    if (((int)(unsigned char)*(signed char *)(classmaker_special_counts + a1)) > l_24) goto L54A4F;
-    goto L54A9B;
-L54A47:;
-    l_24++;
-    goto L54A32;
-L54A4F:;
-    if (((int)(unsigned char)*(signed char *)(classmaker_specials + ((a1 * 14) + (l_24 * 2)))) != l_20) goto L54A85;
-    if (((int)(unsigned char)*(signed char *)(D_00199821 + ((a1 * 14) + (l_24 * 2)))) == l_1C) goto L54A87;
-L54A85:;
-    goto L54A99;
-L54A87:;
-    (*(signed char *)(classmaker_special_counts + a1))--;
-    return 1;
-L54A99:;
-    goto L54A47;
-L54A9B:;
+    l_20 = (int)(unsigned char)classmaker_specials[(a1 * 14) + (((int)(unsigned char)classmaker_special_counts[a1]) * 2)];
+    l_1C = (int)(unsigned char)D_00199821[(a1 * 14) + (((int)(unsigned char)classmaker_special_counts[a1]) * 2)];
+    for (l_24 = 0; ((int)(unsigned char)classmaker_special_counts[a1]) > l_24; l_24++) {
+        if (((int)(unsigned char)classmaker_specials[(a1 * 14) + (l_24 * 2)]) == l_20 && ((int)(unsigned char)D_00199821[(a1 * 14) + (l_24 * 2)]) == l_1C) {
+            (classmaker_special_counts[a1])--;
+            return 1;
+        }
+    }
     return 0;
 }
 
 void classmaker_specials_exit(void)
 {
     *(short *)classmaker_screen = 0;
-L54AC6:;
-    if (*(signed char *)mouse_buttons == 0) return;
-    func_0012B136();
-    goto L54AC6;
+    while (mouse_buttons != 0) func_0012B136();
 }
 
 void classmaker_specials_add(void)
 {
-    if (((int)(unsigned char)*(signed char *)(classmaker_special_counts + ((int)(short)*(short *)classmaker_special_list))) == 7) return;
+    if (((int)(unsigned char)classmaker_special_counts[(int)(short)classmaker_special_list]) == 7) return;
     *(signed char *)classmaker_screen |= 16;
-    picklist_open(*(int *)D_00190E0C);
-    *(signed char *)D_001940D4 |= 1;
+    picklist_open(D_00190E0C);
+    D_001940D4 |= 1;
 }
 
 void classmaker_specials_picked(void)
@@ -752,14 +629,13 @@ void classmaker_specials_picked(void)
     int l_18;
 
     *(signed char *)classmaker_screen &= 239;
-    if (((int)(short)*(short *)classmaker_screen) != 2) goto L54D9F;
-    l_18 = (int)classmaker_advantage_names;
-    goto L54DA6;
-L54D9F:;
-    l_18 = (int)classmaker_disadvantage_names;
-L54DA6:;
-    *(int *)D_00190E0C = l_18;
-    (*(signed char *)(classmaker_special_counts + ((int)(short)*(short *)classmaker_special_list)))++;
+    if (((int)(short)*(short *)classmaker_screen) == 2) {
+        l_18 = (int)classmaker_advantage_names;
+    } else {
+        l_18 = (int)classmaker_disadvantage_names;
+    }
+    D_00190E0C = l_18;
+    (classmaker_special_counts[(int)(short)classmaker_special_list])++;
 }
 
 int classmaker_update_advancement(void)
@@ -773,72 +649,41 @@ int classmaker_update_advancement(void)
     l_28 = 65536;
     l_24 = 0;
     *(int *)&l_18 = 0;
-L54DE8:;
-    if ((short)(short)((int)(unsigned char)*(signed char *)classmaker_special_counts) > l_18) goto L54DFF;
-    goto L54E37;
-L54DF7:;
-    (*(int *)&l_18)++;
-    goto L54DE8;
-L54DFF:;
-    l_24 += *(int *)((char *)(int)(*(char **)(classmaker_advantage_costs + (((int)(unsigned char)*(signed char *)(classmaker_specials + (((int)(short)l_18) * 2))) << 2)) + (((int)(unsigned char)*(signed char *)(D_00199821 + (((int)(short)l_18) * 2))) << 2)));
-    goto L54DF7;
-L54E37:;
+    for (; (short)(short)((int)(unsigned char)classmaker_special_counts[0]) > l_18; (*(int *)&l_18)++) {
+        l_24 += *(int *)((char *)(int)(classmaker_advantage_costs[((int)(unsigned char)classmaker_specials[((int)(short)l_18) * 2])] + (((int)(unsigned char)D_00199821[((int)(short)l_18) * 2]) << 2)));
+    }
     l_2C = 0;
     *(int *)&l_18 = 0;
-L54E45:;
-    if ((short)(short)((int)(unsigned char)*(signed char *)D_00190D7F) > l_18) goto L54E5C;
-    goto L54E94;
-L54E54:;
-    (*(int *)&l_18)++;
-    goto L54E45;
-L54E5C:;
-    l_2C += *(int *)((char *)(int)(*(char **)(classmaker_disadvantage_costs + (((int)(unsigned char)*(signed char *)(D_0019982E + (((int)(short)l_18) * 2))) << 2)) + (((int)(unsigned char)*(signed char *)(D_0019982F + (((int)(short)l_18) * 2))) << 2)));
-    goto L54E54;
-L54E94:;
+    for (; (short)(short)((int)(unsigned char)D_00190D7F) > l_18; (*(int *)&l_18)++) {
+        l_2C += *(int *)((char *)(int)(classmaker_disadvantage_costs[((int)(unsigned char)D_0019982E[((int)(short)l_18) * 2])] + (((int)(unsigned char)D_0019982F[((int)(short)l_18) * 2]) << 2)));
+    }
     *(int *)&l_1C = (player_class->hp_per_level - 8) * 3277;
-    if (player_class->hp_per_level >= 8) goto L54EC2;
-    *(int *)&l_1C <<= 1;
-L54EC2:;
+    if (player_class->hp_per_level < 8) *(int *)&l_1C <<= 1;
     l_28 = (int)(*(char **)&l_1C + ((l_24 + 65536) - l_2C));
-    if (l_28 >= 6554) goto L54EE5;
-    l_28 = 6554;
-L54EE5:;
+    if (l_28 < 6554) l_28 = 6554;
     player_class->advancement_multiplier = l_28;
-    if (l_28 <= 65536) goto L54F24;
-    *(short *)D_00190D68 = 115 - (((l_28 - 65536) * 69) / 262144);
-    goto L54F59;
-L54F24:;
-    if (l_28 >= 65536) goto L54F50;
-    *(short *)D_00190D68 = (((65536 - l_28) * 69) / 65536) + 115;
-    goto L54F59;
-L54F50:;
-    *(short *)D_00190D68 = 115;
-L54F59:;
-    if (((int)(short)*(short *)D_00190D68) >= 46) goto L54F6E;
-    *(short *)D_00190D68 = 46;
-L54F6E:;
+    if (l_28 > 65536) {
+        D_00190D68 = 115 - (((l_28 - 65536) * 69) / 262144);
+    } else if (l_28 < 65536) {
+        D_00190D68 = (((65536 - l_28) * 69) / 65536) + 115;
+    } else {
+        D_00190D68 = 115;
+    }
+    if (((int)(short)D_00190D68) < 46) D_00190D68 = 46;
     return l_28;
 }
 
 void classmaker_hp_up(void)
 {
-    if (player_class->hp_per_level == 30) goto L54FAB;
-    if (*(short *)D_00190D86 == 0) goto L54FAD;
-L54FAB:;
-    return;
-L54FAD:;
-    *(short *)D_00190D86 = 20;
+    if (player_class->hp_per_level == 30 || D_00190D86 != 0) return;
+    D_00190D86 = 20;
     player_class->hp_per_level++;
 }
 
 void classmaker_hp_down(void)
 {
-    if (player_class->hp_per_level == 4) goto L54FF2;
-    if (*(short *)D_00190D86 == 0) goto L54FF4;
-L54FF2:;
-    return;
-L54FF4:;
-    *(short *)D_00190D86 = 20;
+    if (player_class->hp_per_level == 4 || D_00190D86 != 0) return;
+    D_00190D86 = 20;
     player_class->hp_per_level--;
 }
 
@@ -847,18 +692,9 @@ int classmaker_skill_taken(short a1)
     short l_18;
 
     *(int *)&l_18 = 0;
-L55027:;
-    if (((int)(short)l_18) < 12) goto L5503A;
-    goto L5505B;
-L55032:;
-    (*(int *)&l_18)++;
-    goto L55027;
-L5503A:;
-    if ((short)((unsigned short)player_class->skills[(int)(short)l_18]) != a1) goto L55059;
-    return 1;
-L55059:;
-    goto L55032;
-L5505B:;
+    for (; ((int)(short)l_18) < 12; (*(int *)&l_18)++) {
+        if ((short)((unsigned short)player_class->skills[(int)(short)l_18]) == a1) return 1;
+    }
     return 0;
 }
 
@@ -878,362 +714,172 @@ int classmaker_special_conflicts(int a1, int a2, int a3)
     int l_18;
     int l_14;
 
-    if (a1 != 0) goto L55606;
-    if (a2 >= 2) goto L55608;
-L55606:;
-    goto L55614;
-L55608:;
-    return 0;
-L55614:;
-    if (a1 == 0) goto L55620;
-    if (a2 != 6) goto L55622;
-L55620:;
-    goto L55628;
-L55622:;
-    if (a2 != 7) goto L5562A;
-L55628:;
-    goto L55636;
-L5562A:;
-    return 0;
-L55636:;
-    l_18 = 0;
-L5563D:;
-    if (l_18 < 2) goto L55650;
-    goto L55736;
-L55648:;
-    l_18++;
-    goto L5563D;
-L55650:;
-    l_14 = (int)(unsigned char)*(signed char *)(classmaker_special_counts + l_18);
-    l_1C = 0;
-L55665:;
-    if (l_1C < l_14) goto L5567A;
-    goto L55731;
-L55672:;
-    l_1C++;
-    goto L55665;
-L5567A:;
-    if (l_18 != 0) goto L5569B;
-    if (((int)(unsigned char)*(signed char *)(classmaker_specials + ((l_18 * 14) + (l_1C * 2)))) < 2) goto L5569D;
-L5569B:;
-    goto L556B8;
-L5569D:;
-    if (((int)(unsigned char)*(signed char *)(D_00199821 + ((l_18 * 14) + (l_1C * 2)))) == a3) goto L556BA;
-L556B8:;
-    goto L556C6;
-L556BA:;
-    return 1;
-L556C6:;
-    if (l_18 == 0) goto L55704;
-    if (((int)(unsigned char)*(signed char *)(classmaker_specials + ((l_18 * 14) + (l_1C * 2)))) == 6) goto L55702;
-    if (((int)(unsigned char)*(signed char *)(classmaker_specials + ((l_18 * 14) + (l_1C * 2)))) != 7) goto L55704;
-L55702:;
-    goto L55706;
-L55704:;
-    goto L55721;
-L55706:;
-    if (((int)(unsigned char)*(signed char *)(D_00199821 + ((l_18 * 14) + (l_1C * 2)))) == a3) goto L55723;
-L55721:;
-    goto L5572C;
-L55723:;
-    return 1;
-L5572C:;
-    goto L55672;
-L55731:;
-    goto L55648;
-L55736:;
+    if (a1 == 0 && a2 >= 2) return 0;
+    if (a1 != 0 && a2 != 6 && a2 != 7) return 0;
+    for (l_18 = 0; l_18 < 2; l_18++) {
+        l_14 = (int)(unsigned char)classmaker_special_counts[l_18];
+        for (l_1C = 0; l_1C < l_14; l_1C++) {
+            if (l_18 == 0 && ((int)(unsigned char)classmaker_specials[(l_18 * 14) + (l_1C * 2)]) < 2 && ((int)(unsigned char)D_00199821[(l_18 * 14) + (l_1C * 2)]) == a3) {
+                return 1;
+            }
+            if (l_18 != 0 && (((int)(unsigned char)classmaker_specials[(l_18 * 14) + (l_1C * 2)]) == 6 || ((int)(unsigned char)classmaker_specials[(l_18 * 14) + (l_1C * 2)]) == 7) && ((int)(unsigned char)D_00199821[(l_18 * 14) + (l_1C * 2)]) == a3) {
+                return 1;
+            }
+        }
+    }
     return 0;
 }
 
 int career_specials_text(void)
 {
-    *(signed char *)((char *)(*(int *)D_0019981C = *(int *)D_00195C44 + 55000)) = 0;
+    *(signed char *)((char *)(D_0019981C = D_00195C44 + 55000)) = 0;
     career_advantages_text();
     career_disadvantages_text();
-    *(signed char *)((char *)(int)(func_000A0DF4(*(int *)D_0019981C) + *(char **)D_0019981C) + 1) = 0;
-    return *(int *)D_00195C44 + 55000;
+    *(signed char *)((char *)(int)(func_000A0DF4(D_0019981C) + *(char **)&D_0019981C) + 1) = 0;
+    return D_00195C44 + 55000;
 }
 
 void career_advantages_text(void)
 {
     int l_18;
 
-    l_18 = 0;
-L557BC:;
-    if (l_18 < 7) goto L557CC;
-    goto L557FE;
-L557C4:;
-    l_18++;
-    goto L557BC;
-L557CC:;
-    if ((player_class->resistance_flags & (1 << l_18)) == 0) goto L557FC;
-    career_specials_line((int)D_00175477, *(int *)(D_0018087E + (l_18 << 2)));
-L557FC:;
-    goto L557C4;
-L557FE:;
-    l_18 = 0;
-L55805:;
-    if (l_18 < 7) goto L55815;
-    goto L55845;
-L5580D:;
-    l_18++;
-    goto L55805;
-L55815:;
-    if ((player_class->immunity_flags & (1 << l_18)) == 0) goto L55843;
-    career_specials_line((int)D_00175482, *(int *)(D_0018087E + (l_18 << 2)));
-L55843:;
-    goto L5580D;
-L55845:;
-    if (((int)(unsigned short)(player_class->flags & 1)) == 0) goto L55868;
-    career_specials_line((int)D_0017548B, 0);
-L55868:;
-    l_18 = 0;
-L5586F:;
-    if (l_18 < 3) goto L5587F;
-    goto L558AF;
-L55877:;
-    l_18++;
-    goto L5586F;
-L5587F:;
-    if ((player_class->spell_absorption_flags & (1 << l_18)) == 0) goto L558AD;
-    career_specials_line((int)D_00175499, *(int *)(D_0018089E + (l_18 << 2)));
-L558AD:;
-    goto L55877;
-L558AF:;
-    l_18 = 0;
-L558B6:;
-    if (l_18 < 3) goto L558C6;
-    goto L558F6;
-L558BE:;
-    l_18++;
-    goto L558B6;
-L558C6:;
-    if ((player_class->rapid_healing_flags & (1 << l_18)) == 0) goto L558F4;
-    career_specials_line((int)D_001754AA, *(int *)(D_001808AE + (l_18 << 2)));
-L558F4:;
-    goto L558BE;
-L558F6:;
-    l_18 = 0;
-L558FD:;
-    if (l_18 < 4) goto L5590D;
-    goto L5593D;
-L55905:;
-    l_18++;
-    goto L558FD;
-L5590D:;
-    if ((player_class->regeneration_flags & (1 << l_18)) == 0) goto L5593B;
-    career_specials_line((int)D_001754B8, *(int *)(D_001808BE + (l_18 << 2)));
-L5593B:;
-    goto L55905;
-L5593D:;
-    l_18 = 0;
-L55944:;
-    if (l_18 < 4) goto L55954;
-    goto L55984;
-L5594C:;
-    l_18++;
-    goto L55944;
-L55954:;
-    if ((player_class->attack_modifier_flags & (1 << l_18)) == 0) goto L55982;
-    career_specials_line((int)D_001754C3, *(int *)(D_001808D2 + (l_18 << 2)));
-L55982:;
-    goto L5594C;
-L55984:;
-    if (((int)(unsigned short)(player_class->flags & 2)) == 0) goto L559A7;
-    career_specials_line((int)D_001754D0, 0);
-L559A7:;
-    if (((player_class->flags >> 10) & 7) >= 5) goto L559E7;
-    career_specials_line((int)D_001754DD, *(int *)(D_001808E6 + (((player_class->flags >> 10) & 7) << 2)));
-L559E7:;
-    if (((int)(unsigned short)(player_class->flags & 4)) == 0) goto L55A0A;
-    career_specials_line((int)D_001754EE, 0);
-L55A0A:;
-    l_18 = 0;
-L55A11:;
-    if (l_18 < 6) goto L55A21;
-    return;
-L55A19:;
-    l_18++;
-    goto L55A11;
-L55A21:;
-    if ((player_class->expert_weapons & (1 << l_18)) == 0) goto L55A4F;
-    career_specials_line((int)D_001754FE, *(int *)(D_001808FE + (l_18 << 2)));
-L55A4F:;
-    goto L55A19;
+    for (l_18 = 0; l_18 < 7; l_18++) {
+        if ((player_class->resistance_flags & (1 << l_18)) != 0) {
+            career_specials_line((int)D_00175477, D_0018087E[l_18]);
+        }
+    }
+    for (l_18 = 0; l_18 < 7; l_18++) {
+        if ((player_class->immunity_flags & (1 << l_18)) != 0) {
+            career_specials_line((int)D_00175482, D_0018087E[l_18]);
+        }
+    }
+    if (((int)(unsigned short)(player_class->flags & 1)) != 0) {
+        career_specials_line((int)D_0017548B, 0);
+    }
+    for (l_18 = 0; l_18 < 3; l_18++) {
+        if ((player_class->spell_absorption_flags & (1 << l_18)) != 0) {
+            career_specials_line((int)D_00175499, D_0018089E[l_18]);
+        }
+    }
+    for (l_18 = 0; l_18 < 3; l_18++) {
+        if ((player_class->rapid_healing_flags & (1 << l_18)) != 0) {
+            career_specials_line((int)D_001754AA, D_001808AE[l_18]);
+        }
+    }
+    for (l_18 = 0; l_18 < 4; l_18++) {
+        if ((player_class->regeneration_flags & (1 << l_18)) != 0) {
+            career_specials_line((int)D_001754B8, D_001808BE[l_18]);
+        }
+    }
+    for (l_18 = 0; l_18 < 4; l_18++) {
+        if ((player_class->attack_modifier_flags & (1 << l_18)) != 0) {
+            career_specials_line((int)D_001754C3, D_001808D2[l_18]);
+        }
+    }
+    if (((int)(unsigned short)(player_class->flags & 2)) != 0) {
+        career_specials_line((int)D_001754D0, 0);
+    }
+    if (((player_class->flags >> 10) & 7) < 5) {
+        career_specials_line((int)D_001754DD, D_001808E6[((player_class->flags >> 10) & 7)]);
+    }
+    if (((int)(unsigned short)(player_class->flags & 4)) != 0) {
+        career_specials_line((int)D_001754EE, 0);
+    }
+    for (l_18 = 0; l_18 < 6; l_18++) {
+        if ((player_class->expert_weapons & (1 << l_18)) != 0) {
+            career_specials_line((int)D_001754FE, D_001808FE[l_18]);
+        }
+    }
 }
 
 void career_disadvantages_text(void)
 {
     int l_18;
 
-    if (((int)(unsigned short)(player_class->flags & 8)) == 0) goto L55A8C;
-    career_specials_line((int)D_0017550B, 0);
-L55A8C:;
-    l_18 = 0;
-L55A93:;
-    if (l_18 < 2) goto L55AA3;
-    goto L55ADC;
-L55A9B:;
-    l_18++;
-    goto L55A93;
-L55AA3:;
-    if ((player_class->flags & (1 << (l_18 + 4))) == 0) goto L55ADA;
-    career_specials_line((int)D_00175530, *(int *)(D_0018096E + (l_18 << 2)));
-L55ADA:;
-    goto L55A9B;
-L55ADC:;
-    l_18 = 0;
-L55AE3:;
-    if (l_18 < 4) goto L55AF3;
-    goto L55B2B;
-L55AEB:;
-    l_18++;
-    goto L55AE3;
-L55AF3:;
-    if ((player_class->attack_modifier_flags & (1 << (l_18 + 4))) == 0) goto L55B29;
-    career_specials_line((int)D_00175537, *(int *)(D_001808D2 + (l_18 << 2)));
-L55B29:;
-    goto L55AEB;
-L55B2B:;
-    l_18 = 0;
-L55B32:;
-    if (l_18 < 2) goto L55B42;
-    goto L55B7B;
-L55B3A:;
-    l_18++;
-    goto L55B32;
-L55B42:;
-    if ((player_class->flags & (1 << (l_18 + 6))) == 0) goto L55B79;
-    career_specials_line((int)D_0017553E, *(int *)(D_0018097A + (l_18 << 2)));
-L55B79:;
-    goto L55B3A;
-L55B7B:;
-    l_18 = 0;
-L55B82:;
-    if (l_18 < 2) goto L55B92;
-    goto L55BCB;
-L55B8A:;
-    l_18++;
-    goto L55B82;
-L55B92:;
-    if ((player_class->flags & (1 << (l_18 + 8))) == 0) goto L55BC9;
-    career_specials_line((int)D_00175553, *(int *)(D_00180986 + (l_18 << 2)));
-L55BC9:;
-    goto L55B8A;
-L55BCB:;
-    l_18 = 0;
-L55BD2:;
-    if (l_18 < 6) goto L55BE2;
-    goto L55C13;
-L55BDA:;
-    l_18++;
-    goto L55BD2;
-L55BE2:;
-    if ((player_class->forbidden_equipment & (1 << l_18)) == 0) goto L55C11;
-    career_specials_line((int)D_0017556B, *(int *)(D_001808FE + (l_18 << 2)));
-L55C11:;
-    goto L55BDA;
-L55C13:;
-    l_18 = 0;
-L55C1A:;
-    if (l_18 < 7) goto L55C2A;
-    goto L55C5A;
-L55C22:;
-    l_18++;
-    goto L55C1A;
-L55C2A:;
-    if ((player_class->low_tolerance_flags & (1 << l_18)) == 0) goto L55C58;
-    career_specials_line((int)D_0017557E, *(int *)(D_0018087E + (l_18 << 2)));
-L55C58:;
-    goto L55C22;
-L55C5A:;
-    l_18 = 0;
-L55C61:;
-    if (l_18 < 7) goto L55C71;
-    goto L55CA1;
-L55C69:;
-    l_18++;
-    goto L55C61;
-L55C71:;
-    if ((player_class->critical_weakness_flags & (1 << l_18)) == 0) goto L55C9F;
-    career_specials_line((int)D_0017558C, *(int *)(D_0018087E + (l_18 << 2)));
-L55C9F:;
-    goto L55C69;
-L55CA1:;
-    l_18 = 0;
-L55CA8:;
-    if (l_18 < 3) goto L55CB8;
-    goto L55CF1;
-L55CB0:;
-    l_18++;
-    goto L55CA8;
-L55CB8:;
-    if ((player_class->forbidden_equipment & (1 << (l_18 + 6))) == 0) goto L55CEF;
-    career_specials_line((int)D_0017559E, *(int *)(D_00180992 + (l_18 << 2)));
-L55CEF:;
-    goto L55CB0;
-L55CF1:;
-    l_18 = 0;
-L55CF8:;
-    if (l_18 < 4) goto L55D08;
-    goto L55D41;
-L55D00:;
-    l_18++;
-    goto L55CF8;
-L55D08:;
-    if ((player_class->forbidden_equipment & (1 << (l_18 + 9))) == 0) goto L55D3F;
-    career_specials_line((int)D_001755B3, *(int *)(D_001809A2 + (l_18 << 2)));
-L55D3F:;
-    goto L55D00;
-L55D41:;
-    l_18 = 0;
-L55D48:;
-    if (l_18 < 10) goto L55D58;
-    return;
-L55D50:;
-    l_18++;
-    goto L55D48;
-L55D58:;
-    if ((player_class->forbidden_materials & (1 << l_18)) == 0) goto L55D87;
-    career_specials_line((int)D_001755C9, *(int *)(D_001809B6 + (l_18 << 2)));
-L55D87:;
-    goto L55D50;
+    if (((int)(unsigned short)(player_class->flags & 8)) != 0) {
+        career_specials_line((int)D_0017550B, 0);
+    }
+    for (l_18 = 0; l_18 < 2; l_18++) {
+        if ((player_class->flags & (1 << (l_18 + 4))) != 0) {
+            career_specials_line((int)D_00175530, D_0018096E[l_18]);
+        }
+    }
+    for (l_18 = 0; l_18 < 4; l_18++) {
+        if ((player_class->attack_modifier_flags & (1 << (l_18 + 4))) != 0) {
+            career_specials_line((int)D_00175537, D_001808D2[l_18]);
+        }
+    }
+    for (l_18 = 0; l_18 < 2; l_18++) {
+        if ((player_class->flags & (1 << (l_18 + 6))) != 0) {
+            career_specials_line((int)D_0017553E, D_0018097A[l_18]);
+        }
+    }
+    for (l_18 = 0; l_18 < 2; l_18++) {
+        if ((player_class->flags & (1 << (l_18 + 8))) != 0) {
+            career_specials_line((int)D_00175553, D_00180986[l_18]);
+        }
+    }
+    for (l_18 = 0; l_18 < 6; l_18++) {
+        if ((player_class->forbidden_equipment & (1 << l_18)) != 0) {
+            career_specials_line((int)D_0017556B, D_001808FE[l_18]);
+        }
+    }
+    for (l_18 = 0; l_18 < 7; l_18++) {
+        if ((player_class->low_tolerance_flags & (1 << l_18)) != 0) {
+            career_specials_line((int)D_0017557E, D_0018087E[l_18]);
+        }
+    }
+    for (l_18 = 0; l_18 < 7; l_18++) {
+        if ((player_class->critical_weakness_flags & (1 << l_18)) != 0) {
+            career_specials_line((int)D_0017558C, D_0018087E[l_18]);
+        }
+    }
+    for (l_18 = 0; l_18 < 3; l_18++) {
+        if ((player_class->forbidden_equipment & (1 << (l_18 + 6))) != 0) {
+            career_specials_line((int)D_0017559E, D_00180992[l_18]);
+        }
+    }
+    for (l_18 = 0; l_18 < 4; l_18++) {
+        if ((player_class->forbidden_equipment & (1 << (l_18 + 9))) != 0) {
+            career_specials_line((int)D_001755B3, D_001809A2[l_18]);
+        }
+    }
+    for (l_18 = 0; l_18 < 10; l_18++) {
+        if ((player_class->forbidden_materials & (1 << l_18)) != 0) {
+            career_specials_line((int)D_001755C9, D_001809B6[l_18]);
+        }
+    }
 }
 
 void career_specials_line(int a1, int a2)
 {
-    if (a2 == 0) goto L55DDA;
-    func_000A0ED9(1221, (int)D_00175420);
-    mc_sprintf((int)text_buffer, (int)D_001755DC, a1, a2);
-    goto L55DF6;
-L55DDA:;
-    mc_strncpy((int)text_buffer, a1, 160, (int)D_00175420, 1223);
-L55DF6:;
-    func_000A1054(*(int *)D_0019981C, (int)text_buffer, (int)D_00175420, 1225, 4);
-    func_000A1054(*(int *)D_0019981C, (int)D_001755E2, (int)D_00175420, 1226, 4);
+    if (a2 != 0) {
+        func_000A0ED9(1221, (int)D_00175420);
+        mc_sprintf((int)text_buffer, (int)D_001755DC, a1, a2);
+    } else {
+        mc_strncpy((int)text_buffer, a1, 160, (int)D_00175420, 1223);
+    }
+    func_000A1054(D_0019981C, (int)text_buffer, (int)D_00175420, 1225, 4);
+    func_000A1054(D_0019981C, (int)D_001755E2, (int)D_00175420, 1226, 4);
 }
 
 int itemmaker_open(int a1)
 {
-    if (((int)(unsigned char)*(signed char *)D_0019626F) != 10) goto L55E5E;
-    if (((int)(unsigned char)*(signed char *)game_mode) == 8) goto L55E60;
-L55E5E:;
-    goto L55E6C;
-L55E60:;
-    return 1;
-L55E6C:;
-    if (a1 == 0) goto L55EE0;
-    *(short *)D_00190D68 = a1;
-    *(signed char *)D_00187CA8 = 0;
-    *(signed char *)D_001940D8 |= 4;
-    *(signed char *)game_mode = 10;
-    *(int *)window_image = disk_read_file((int)D_0017567E, 0);
-    *(int *)spellshop_icons = disk_read_file((int)D_0017568B, 0);
-    *(int *)D_00190EE0 = disk_read_file((int)D_00175698, 0);
-    *(signed char *)D_00196272 = 1;
-    *(signed char *)D_001940D8 &= 254;
-    itemmaker_select_tab(15);
-    itemmaker_reset();
-L55EE0:;
-    return ((((int)(unsigned char)*(signed char *)game_mode) == 10) ? 1 : 0);
+    if (((int)D_0019626F) == 10 && ((int)(unsigned char)game_mode) == 8) {
+        return 1;
+    }
+    if (a1 != 0) {
+        D_00190D68 = a1;
+        D_00187CA8 = 0;
+        D_001940D8 |= 4;
+        game_mode = 10;
+        window_image = disk_read_file((int)D_0017567E, 0);
+        spellshop_icons = disk_read_file((int)D_0017568B, 0);
+        D_00190EE0 = disk_read_file((int)D_00175698, 0);
+        D_00196272 = 1;
+        D_001940D8 &= 254;
+        itemmaker_select_tab(15);
+        itemmaker_reset();
+    }
+    return ((((int)(unsigned char)game_mode) == 10) ? 1 : 0);
 }

@@ -1,12 +1,12 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0003A3CE */
 #include "records.h"
 
-extern char mouse_buttons[];
-extern char mouse_x[];
-extern char mouse_y[];
-extern char D_0012B508[];
-extern char screen_buffer[];
-extern char D_00147964[];
+extern signed char mouse_buttons;
+extern short mouse_x;
+extern short mouse_y;
+extern signed char D_0012B508;
+extern int screen_buffer;
+extern signed char D_00147964;
 extern char D_00170B88[];
 extern char D_00170B90[];
 extern char D_00170B9D[];
@@ -17,26 +17,26 @@ extern char D_00170BE6[];
 extern char D_00170BF3[];
 extern char D_00170C00[];
 extern char D_00170C0E[];
-extern char D_0017B4B0[];
-extern char D_0017B4B7[];
+extern int D_0017B4B0;
+extern signed char D_0017B4B7[];
 extern char D_0017CCFA[];
-extern char text_buffer[];
-extern char D_00190D16[];
+extern signed char text_buffer[];
+extern signed char D_00190D16;
 extern char D_001917E4[];
-extern char D_001940D4[];
-extern char D_001940D5[];
+extern signed char D_001940D4;
+extern signed char D_001940D5;
 extern struct character *player_character;
 extern struct career *player_class;
-extern char D_00195C40[];
-extern char D_00195C44[];
-extern char msgbox_button_keys[];
-extern char D_00196034[];
-extern char msgbox_button_ids[];
-extern char D_00196090[];
-extern char D_00196271[];
-extern char D_00196273[];
-extern char mouse_buttons_prev[];
-extern char D_00199634[];
+extern int D_00195C40;
+extern int D_00195C44;
+extern signed char msgbox_button_keys;
+extern signed char D_00196034;
+extern signed char msgbox_button_ids;
+extern signed char D_00196090;
+extern unsigned char D_00196271;
+extern signed char D_00196273;
+extern signed char mouse_buttons_prev;
+extern int D_00199634;
 extern void career_background_summary(int, short);
 extern void intro_play_movie(void);
 extern int chargen_popup_choice(int, unsigned char, unsigned char, int, unsigned char, unsigned char);
@@ -86,77 +86,47 @@ void title_menu(void)
     int l_u4;
     unsigned char l_1C;
 
-L3A3DC:;
-    if (*(signed char *)mouse_buttons == 0) goto L3A3EC;
-    func_0012B136();
-    goto L3A3DC;
+    while (mouse_buttons != 0) func_0012B136();
 L3A3EC:;
-    if (*(signed char *)mouse_buttons == 0) goto L3A3FC;
-    func_0012B136();
-    goto L3A3EC;
-L3A3FC:;
-    disk_read_file((int)D_00170B90, *(int *)D_00195C44);
-    mc_memcpy(*(int *)screen_buffer, *(int *)D_00195C44, 64000, (int)D_00170B88, 55, 4);
-    mc_memcpy(655360, *(int *)screen_buffer, 64000, (int)D_00170B88, 56, 4);
-    l_28 = 0;
-L3A44F:;
-    if (((int)(short)*(short *)&l_28) < 768) goto L3A464;
-    goto L3A479;
-L3A45C:;
-    l_28++;
-    goto L3A44F;
-L3A464:;
-    (*(char **)D_00195C44)[l_28 + 64000] <<= 2;
-    goto L3A45C;
-L3A479:;
-    func_000CD33A(*(int *)D_00195C44 + 64000, 0, 256);
-    *(signed char *)D_00147964 &= 254;
+    if (mouse_buttons != 0) {
+        func_0012B136();
+        goto L3A3EC;
+    }
+    disk_read_file((int)D_00170B90, D_00195C44);
+    mc_memcpy(screen_buffer, D_00195C44, 64000, (int)D_00170B88, 55, 4);
+    mc_memcpy(655360, screen_buffer, 64000, (int)D_00170B88, 56, 4);
+    for (l_28 = 0; ((int)(short)*(short *)&l_28) < 768; l_28++) {
+        (*(char **)&D_00195C44)[l_28 + 64000] <<= 2;
+    }
+    func_000CD33A(D_00195C44 + 64000, 0, 256);
+    D_00147964 &= 254;
 L3A496:;
-    if (*(signed char *)mouse_buttons == 0) goto L3A4A6;
-    func_0012B136();
-    goto L3A496;
-L3A4A6:;
-    *(signed char *)D_001940D4 &= 254;
-    l_18 = wait_key_from_list(*(int *)D_0017B4B0, 3);
-    if (((int)(signed char)l_18) == (-1)) goto L3A4D1;
-    if (((int)(signed char)l_18) != 2) goto L3A4D3;
-L3A4D1:;
-    goto L3A509;
-L3A4D3:;
-    if (((int)(signed char)l_18) != (-2)) goto L3A507;
-    if (point_in_rect((int)(short)*(short *)mouse_x, (int)(short)*(short *)mouse_y, 125, 145, 165, 158) != 0) goto L3A509;
-L3A507:;
-    goto L3A510;
-L3A509:;
-    game_exit(0);
-L3A510:;
-    if (l_18 == 0) goto L3A549;
-    if (((int)(signed char)l_18) != (-2)) goto L3A547;
-    if (point_in_rect((int)(short)*(short *)mouse_x, (int)(short)*(short *)mouse_y, 72, 46, 217, 58) != 0) goto L3A549;
-L3A547:;
-    goto L3A581;
-L3A549:;
-    mc_memset(655360, 0, 64000, (int)D_00170B88, 72, 4);
-    palette_restore();
-    saveload_menu(0);
-    if (*(signed char *)D_00190D16 != 0) goto L3A3EC;
-    return;
-L3A581:;
-    if (((int)(signed char)l_18) == 1) goto L3A5BD;
-    if (((int)(signed char)l_18) != (-2)) goto L3A5BB;
-    if (point_in_rect((int)(short)*(short *)mouse_x, (int)(short)*(short *)mouse_y, 74, 100, 217, 112) != 0) goto L3A5BD;
-L3A5BB:;
-    goto L3A5BF;
-L3A5BD:;
-    goto L3A5C4;
-L3A5BF:;
-    goto L3A496;
-L3A5C4:;
-    *(signed char *)D_00196273 = 1;
+    while (1) {
+        if (mouse_buttons != 0) {
+            func_0012B136();
+            goto L3A496;
+        }
+        D_001940D4 &= 254;
+        l_18 = wait_key_from_list(D_0017B4B0, 3);
+        if (((int)(signed char)l_18) == (-1) || ((int)(signed char)l_18) == 2 || (((int)(signed char)l_18) == (-2) && point_in_rect((int)(short)mouse_x, (int)(short)mouse_y, 125, 145, 165, 158) != 0)) {
+            game_exit(0);
+        }
+        if (l_18 == 0 || (((int)(signed char)l_18) == (-2) && point_in_rect((int)(short)mouse_x, (int)(short)mouse_y, 72, 46, 217, 58) != 0)) {
+            mc_memset(655360, 0, 64000, (int)D_00170B88, 72, 4);
+            palette_restore();
+            saveload_menu(0);
+            if (D_00190D16 != 0) goto L3A3EC;
+            return;
+        }
+        if (((int)(signed char)l_18) == 1 || (((int)(signed char)l_18) == (-2) && point_in_rect((int)(short)mouse_x, (int)(short)mouse_y, 74, 100, 217, 112) != 0)) {
+            break;
+        }
+    }
+    D_00196273 = 1;
     func_000A0ED9(97, (int)D_00170B88);
     mc_sprintf((int)text_buffer, (int)D_00170B9D, (int)D_001917E4);
     unlink((int)text_buffer);
-    *(signed char *)D_00196273 = 0;
+    D_00196273 = 0;
     mc_memset((int)player_character, 0, 560, (int)D_00170B88, 122, 4);
     player_character->pad83 = 1;
     player_character->reflexes = 2;
@@ -167,264 +137,159 @@ L3A5C4:;
     automap_delete_files();
     mc_memset(655360, 0, 64000, (int)D_00170B88, 139, 4);
     palette_restore();
-L3A694:;
-    *(signed char *)D_00196271 = 0;
-    mc_memset((int)player_character, 0, 560, (int)D_00170B88, 148, 4);
-    player_character->pad83 = 1;
-    player_character->reflexes = 2;
-    player_character->mobile_id = 200;
-    mc_memset((int)player_class, 0, 74, (int)D_00170B88, 152, 4);
-    disk_read_file((int)D_00170BAD, *(int *)D_00195C44);
-    l_28 = 0;
-L3A712:;
-    if (((int)(short)*(short *)&l_28) < 768) goto L3A727;
-    goto L3A738;
-L3A71F:;
-    l_28++;
-    goto L3A712;
-L3A727:;
-    *(signed char *)((char *)(int)(*(char **)D_00195C44 + ((int)(short)*(short *)&l_28))) <<= 2;
-    goto L3A71F;
-L3A738:;
-    func_000CD367(*(int *)D_00195C44);
-L3A742:;
-    if (((int)(unsigned char)*(signed char *)D_00196271) == 1) goto L3A8FB;
-    disk_read_file((int)D_00170BB5, *(int *)D_00195C44);
-    mc_memcpy(*(int *)screen_buffer, *(int *)D_00195C44, 64000, (int)D_00170B88, 161, 4);
-    text_draw_centered_colored((int)D_00170BC2, 160, 16, 145, 156);
-    disk_read_file((int)D_00170BE6, *(int *)D_00195C44);
-    *(signed char *)D_00147964 &= 254;
-    *(signed char *)D_001940D4 |= 1;
-    l_18 = 255;
-L3A7C4:;
-    if (l_18 >= 0) goto L3A8E9;
-L3A7CE:;
-    if (((int)(signed char)l_18) == (-2)) goto L3A7F2;
-    l_18 = wait_key_from_list(0, 0);
-    if (((int)(signed char)l_18) == (-1)) goto L3A3EC;
-    goto L3A7CE;
-L3A7F2:;
-    l_18 = *(signed char *)((char *)(int)(*(char **)D_00195C44 + (*(short *)mouse_y * 320 + *(short *)mouse_x)));
-    if (l_18 != 0) goto L3A81F;
-    l_18 = 255;
-L3A81F:;
-    if (l_18 <= 0) goto L3A8E4;
-L3A829:;
-    if (*(signed char *)mouse_buttons == 0) goto L3A839;
-    func_0012B136();
-    goto L3A829;
-L3A839:;
-    *(signed char *)D_0012B508 = 146;
-    *(signed char *)msgbox_button_ids = 4;
-    *(signed char *)D_00196090 = 5;
-    *(signed char *)msgbox_button_keys = 21;
-    *(signed char *)D_00196034 = 49;
-    disk_read_file((int)D_00170BB5, *(int *)D_00195C44);
-    mc_memcpy(*(int *)screen_buffer, *(int *)D_00195C44, 64000, (int)D_00170B88, 186, 4);
-    *(signed char *)mouse_buttons = (*(signed char *)mouse_buttons_prev = 0);
-    func_0012B136();
-L3A8A3:;
-    if (*(signed char *)mouse_buttons == 0) goto L3A8B3;
-    func_0012B136();
-    goto L3A8A3;
-L3A8B3:;
-    sound_play_ui(((int)(signed char)l_18) + 208);
-    *(signed char *)D_001940D5 |= 128;
-    msgbox_show_rsc((int)(short)(((unsigned short)(unsigned char)*(signed char *)(D_0017B4B7 + ((int)(signed char)l_18))) + 2000), 5);
-L3A8E4:;
-    goto L3A7C4;
-L3A8E9:;
-    player_character->race = l_18 - 1;
-    goto L3A742;
-L3A8FB:;
-    if (chargen_popup_choice(2200, 7, 8, (int)D_00170BB5, 50, 33) != 0) goto L3A92F;
-    player_character->flags &= ~0x1;
-    goto L3A938;
-L3A92F:;
-    player_character->flags |= 1;
-L3A938:;
-    disk_read_file((int)D_00170BB5, *(int *)D_00195C44);
-    mc_memcpy(*(int *)screen_buffer, *(int *)D_00195C44, 64000, (int)D_00170B88, 213, 4);
-    l_3C = disk_read_file((int)D_00170BF3, 0);
-    func_00144F68(68, 28, 184, 144, l_3C);
-    if (l_3C == 0) goto L3A9A4;
-    if (l_3C != (-1751672937)) goto L3A9A6;
-L3A9A4:;
-    goto L3A9BF;
-L3A9A6:;
-    mc_free(l_3C, (int)D_00170B88, 217);
-    l_3C = -1751672937;
-L3A9BF:;
-    if (*(signed char *)mouse_buttons == 0) goto L3A9CF;
-    func_0012B136();
-    goto L3A9BF;
-L3A9CF:;
-    *(signed char *)D_00147964 &= 254;
-L3A9D6:;
-    keys_world_actions();
-    func_0012B136();
-    func_0012B2D3((int)(short)*(short *)mouse_x, (int)(short)*(short *)mouse_y);
-    mc_memcpy(655360, *(int *)screen_buffer, 64000, (int)D_00170B88, 226, 4);
-    if (((int)(unsigned char)(*(signed char *)mouse_buttons & 1)) == 0) goto L3AAAC;
-    if (((int)(short)*(short *)mouse_x) <= 68) goto L3AA42;
-    if (((int)(short)*(short *)mouse_x) < 251) goto L3AA44;
-L3AA42:;
-    goto L3AA50;
-L3AA44:;
-    if (((int)(short)*(short *)mouse_y) > 60) goto L3AA52;
-L3AA50:;
-    goto L3AA5E;
-L3AA52:;
-    if (((int)(short)*(short *)mouse_y) < 111) goto L3AA60;
-L3AA5E:;
-    goto L3AA69;
-L3AA60:;
-    l_28 = 2;
-    goto L3AAB1;
-L3AA69:;
-    if (((int)(short)*(short *)mouse_x) <= 68) goto L3AA83;
-    if (((int)(short)*(short *)mouse_x) < 251) goto L3AA85;
-L3AA83:;
-    goto L3AA91;
-L3AA85:;
-    if (((int)(short)*(short *)mouse_y) > 112) goto L3AA93;
-L3AA91:;
-    goto L3AAA1;
-L3AA93:;
-    if (((int)(short)*(short *)mouse_y) < 171) goto L3AAA3;
-L3AAA1:;
-    goto L3AAAC;
-L3AAA3:;
-    l_28 = 1;
-    goto L3AAB1;
-L3AAAC:;
-    goto L3A9D6;
-L3AAB1:;
-    if (((int)(short)*(short *)&l_28) != 2) goto L3AC8B;
+    do {
+        D_00196271 = 0;
+        mc_memset((int)player_character, 0, 560, (int)D_00170B88, 148, 4);
+        player_character->pad83 = 1;
+        player_character->reflexes = 2;
+        player_character->mobile_id = 200;
+        mc_memset((int)player_class, 0, 74, (int)D_00170B88, 152, 4);
+        disk_read_file((int)D_00170BAD, D_00195C44);
+        for (l_28 = 0; ((int)(short)*(short *)&l_28) < 768; l_28++) {
+            *(signed char *)((char *)(int)(*(char **)&D_00195C44 + ((int)(short)*(short *)&l_28))) <<= 2;
+        }
+        func_000CD367(D_00195C44);
+        while (((int)D_00196271) != 1) {
+            disk_read_file((int)D_00170BB5, D_00195C44);
+            mc_memcpy(screen_buffer, D_00195C44, 64000, (int)D_00170B88, 161, 4);
+            text_draw_centered_colored((int)D_00170BC2, 160, 16, 145, 156);
+            disk_read_file((int)D_00170BE6, D_00195C44);
+            D_00147964 &= 254;
+            D_001940D4 |= 1;
+            l_18 = 255;
+            while (l_18 < 0) {
+                while (((int)(signed char)l_18) != (-2)) {
+                    l_18 = wait_key_from_list(0, 0);
+                    if (((int)(signed char)l_18) == (-1)) goto L3A3EC;
+                }
+                l_18 = *(signed char *)((char *)(int)(*(char **)&D_00195C44 + (mouse_y * 320 + mouse_x)));
+                if (l_18 == 0) l_18 = 255;
+                if (l_18 > 0) {
+                    while (mouse_buttons != 0) func_0012B136();
+                    D_0012B508 = 146;
+                    msgbox_button_ids = 4;
+                    D_00196090 = 5;
+                    msgbox_button_keys = 21;
+                    D_00196034 = 49;
+                    disk_read_file((int)D_00170BB5, D_00195C44);
+                    mc_memcpy(screen_buffer, D_00195C44, 64000, (int)D_00170B88, 186, 4);
+                    mouse_buttons = (mouse_buttons_prev = 0);
+                    func_0012B136();
+                    while (mouse_buttons != 0) func_0012B136();
+                    sound_play_ui(((int)(signed char)l_18) + 208);
+                    D_001940D5 |= 128;
+                    msgbox_show_rsc((int)(short)(((unsigned short)(unsigned char)D_0017B4B7[(int)(signed char)l_18]) + 2000), 5);
+                }
+            }
+            player_character->race = l_18 - 1;
+        }
+        if (chargen_popup_choice(2200, 7, 8, (int)D_00170BB5, 50, 33) == 0) {
+            player_character->flags &= ~0x1;
+        } else {
+            player_character->flags |= 1;
+        }
+        disk_read_file((int)D_00170BB5, D_00195C44);
+        mc_memcpy(screen_buffer, D_00195C44, 64000, (int)D_00170B88, 213, 4);
+        l_3C = disk_read_file((int)D_00170BF3, 0);
+        func_00144F68(68, 28, 184, 144, l_3C);
+        if (l_3C != 0 && l_3C != (-1751672937)) {
+            mc_free(l_3C, (int)D_00170B88, 217);
+            l_3C = -1751672937;
+        }
+        while (mouse_buttons != 0) func_0012B136();
+        D_00147964 &= 254;
+        while (1) {
+            keys_world_actions();
+            func_0012B136();
+            func_0012B2D3((int)(short)mouse_x, (int)(short)mouse_y);
+            mc_memcpy(655360, screen_buffer, 64000, (int)D_00170B88, 226, 4);
+            if (((int)(unsigned char)(mouse_buttons & 1)) != 0) {
+                if (((int)(short)mouse_x) > 68 && ((int)(short)mouse_x) < 251 && ((int)(short)mouse_y) > 60 && ((int)(short)mouse_y) < 111) {
+                    l_28 = 2;
+                    break;
+                }
+                if (((int)(short)mouse_x) > 68 && ((int)(short)mouse_x) < 251 && ((int)(short)mouse_y) > 112 && ((int)(short)mouse_y) < 171) {
+                    l_28 = 1;
+                    break;
+                }
+            }
+        }
+        if (((int)(short)*(short *)&l_28) == 2) {
 L3AABE:;
-    disk_read_file((int)D_00170BAD, *(int *)D_00195C44);
-    l_28 = 0;
-L3AAD5:;
-    if (((int)(short)*(short *)&l_28) < 768) goto L3AAEA;
-    goto L3AAFB;
-L3AAE2:;
-    l_28++;
-    goto L3AAD5;
-L3AAEA:;
-    *(signed char *)((char *)(int)(*(char **)D_00195C44 + ((int)(short)*(short *)&l_28))) <<= 2;
-    goto L3AAE2;
-L3AAFB:;
-    func_000CD367(*(int *)D_00195C44);
-    disk_read_file((int)D_00170BB5, *(int *)D_00195C44);
-    mc_memcpy(*(int *)screen_buffer, *(int *)D_00195C44, 64000, (int)D_00170B88, 251, 4);
-    picklist_open((int)D_0017CCFA);
-L3AB40:;
-    keys_world_actions();
-    func_0012B136();
-    mc_memcpy(*(int *)screen_buffer, *(int *)D_00195C44, 64000, (int)D_00170B88, 258, 4);
-    l_28 = picklist_update();
-    if (((int)(short)*(short *)&l_28) <= (-1)) goto L3AC49;
-    *(int *)D_00199634 = (int)(short)*(short *)&l_28;
-    if (((int)(short)*(short *)&l_28) != 18) goto L3AB9C;
-    classmaker_run();
-    goto L3AC89;
-L3AB9C:;
-    sound_play_ui(217);
-    if (chargen_popup_choice((int)(short)(l_28 + 2100), 4, 5, (int)D_00170BB5, 21, 49) != 0) goto L3AC0E;
-    func_000A0ED9(272, (int)D_00170B88);
-    mc_sprintf((int)text_buffer, (int)D_00170C00, (int)(short)*(short *)&l_28);
-    disk_read_file((int)text_buffer, (int)player_class);
-    goto L3AC89;
-L3AC0E:;
-    disk_read_file((int)D_00170BB5, *(int *)D_00195C44);
-    mc_memcpy(*(int *)screen_buffer, *(int *)D_00195C44, 64000, (int)D_00170B88, 278, 4);
-    picklist_open((int)D_0017CCFA);
-L3AC49:;
-    *(signed char *)D_00147964 &= 254;
-    func_0012B2D3((int)(short)*(short *)mouse_x, (int)(short)*(short *)mouse_y);
-    mc_memcpy(655360, *(int *)screen_buffer, 64000, (int)D_00170B88, 283, 4);
-    goto L3AB40;
-L3AC89:;
-    goto L3ACE9;
-L3AC8B:;
-    if ((*(int *)D_00199634 = class_questions_run()) < 0) goto L3AABE;
-    disk_read_file((int)D_00170BAD, *(int *)D_00195C44);
-    l_28 = 0;
-L3ACB9:;
-    if (((int)(short)*(short *)&l_28) < 768) goto L3ACCE;
-    goto L3ACDF;
-L3ACC6:;
-    l_28++;
-    goto L3ACB9;
-L3ACCE:;
-    *(signed char *)((char *)(int)(*(char **)D_00195C44 + ((int)(short)*(short *)&l_28))) <<= 2;
-    goto L3ACC6;
-L3ACDF:;
-    func_000CD367(*(int *)D_00195C44);
-L3ACE9:;
-    disk_read_file((int)D_00170BB5, *(int *)D_00195C44);
-    mc_memcpy(*(int *)screen_buffer, *(int *)D_00195C44, 64000, (int)D_00170B88, 299, 4);
-    l_3C = disk_read_file((int)D_00170C0E, 0);
-    func_00144F68((int)(unsigned short)*(short *)((char *)l_3C), (int)(unsigned short)*(short *)((char *)l_3C + 2), (int)(unsigned short)*(short *)((char *)l_3C + 4), (int)(unsigned short)*(short *)((char *)l_3C + 6), l_3C + 12);
-    if (l_3C == 0) goto L3AD6A;
-    if (l_3C != (-1751672937)) goto L3AD6C;
-L3AD6A:;
-    goto L3AD85;
-L3AD6C:;
-    mc_free(l_3C, (int)D_00170B88, 303);
-    l_3C = -1751672937;
-L3AD85:;
-    if (*(signed char *)mouse_buttons == 0) goto L3AD95;
-    func_0012B136();
-    goto L3AD85;
-L3AD95:;
-    *(signed char *)D_00147964 &= 254;
-L3AD9C:;
-    keys_world_actions();
-    func_0012B136();
-    func_0012B2D3((int)(short)*(short *)mouse_x, (int)(short)*(short *)mouse_y);
-    mc_memcpy(655360, *(int *)screen_buffer, 64000, (int)D_00170B88, 311, 4);
-    if (((int)(unsigned char)(*(signed char *)mouse_buttons & 1)) == 0) goto L3AE74;
-    if (((int)(short)*(short *)mouse_x) <= 76) goto L3AE08;
-    if (((int)(short)*(short *)mouse_x) < 243) goto L3AE0A;
-L3AE08:;
-    goto L3AE16;
-L3AE0A:;
-    if (((int)(short)*(short *)mouse_y) > 58) goto L3AE18;
-L3AE16:;
-    goto L3AE24;
-L3AE18:;
-    if (((int)(short)*(short *)mouse_y) < 111) goto L3AE26;
-L3AE24:;
-    goto L3AE2F;
-L3AE26:;
-    l_28 = 0;
-    goto L3AE79;
-L3AE2F:;
-    if (((int)(short)*(short *)mouse_x) <= 76) goto L3AE49;
-    if (((int)(short)*(short *)mouse_x) < 243) goto L3AE4B;
-L3AE49:;
-    goto L3AE59;
-L3AE4B:;
-    if (((int)(short)*(short *)mouse_y) > 130) goto L3AE5B;
-L3AE59:;
-    goto L3AE69;
-L3AE5B:;
-    if (((int)(short)*(short *)mouse_y) < 176) goto L3AE6B;
-L3AE69:;
-    goto L3AE74;
-L3AE6B:;
-    l_28 = 1;
-    goto L3AE79;
-L3AE74:;
-    goto L3AD9C;
-L3AE79:;
-    player_character->gold = 100;
-    career_background_summary(*(int *)D_00199634, (int)(short)*(short *)&l_28);
-    palette_restore();
-    if (chargen_name_character() != 0) goto L3A694;
+            disk_read_file((int)D_00170BAD, D_00195C44);
+            for (l_28 = 0; ((int)(short)*(short *)&l_28) < 768; l_28++) {
+                *(signed char *)((char *)(int)(*(char **)&D_00195C44 + ((int)(short)*(short *)&l_28))) <<= 2;
+            }
+            func_000CD367(D_00195C44);
+            disk_read_file((int)D_00170BB5, D_00195C44);
+            mc_memcpy(screen_buffer, D_00195C44, 64000, (int)D_00170B88, 251, 4);
+            picklist_open((int)D_0017CCFA);
+            for (;;) {
+                keys_world_actions();
+                func_0012B136();
+                mc_memcpy(screen_buffer, D_00195C44, 64000, (int)D_00170B88, 258, 4);
+                l_28 = picklist_update();
+                if (((int)(short)*(short *)&l_28) > (-1)) {
+                    D_00199634 = (int)(short)*(short *)&l_28;
+                    if (((int)(short)*(short *)&l_28) == 18) {
+                        classmaker_run();
+                        break;
+                    }
+                    sound_play_ui(217);
+                    if (chargen_popup_choice((int)(short)(l_28 + 2100), 4, 5, (int)D_00170BB5, 21, 49) == 0) {
+                        func_000A0ED9(272, (int)D_00170B88);
+                        mc_sprintf((int)text_buffer, (int)D_00170C00, (int)(short)*(short *)&l_28);
+                        disk_read_file((int)text_buffer, (int)player_class);
+                        break;
+                    }
+                    disk_read_file((int)D_00170BB5, D_00195C44);
+                    mc_memcpy(screen_buffer, D_00195C44, 64000, (int)D_00170B88, 278, 4);
+                    picklist_open((int)D_0017CCFA);
+                }
+                D_00147964 &= 254;
+                func_0012B2D3((int)(short)mouse_x, (int)(short)mouse_y);
+                mc_memcpy(655360, screen_buffer, 64000, (int)D_00170B88, 283, 4);
+            }
+        } else {
+            if ((D_00199634 = class_questions_run()) < 0) goto L3AABE;
+            disk_read_file((int)D_00170BAD, D_00195C44);
+            for (l_28 = 0; ((int)(short)*(short *)&l_28) < 768; l_28++) {
+                *(signed char *)((char *)(int)(*(char **)&D_00195C44 + ((int)(short)*(short *)&l_28))) <<= 2;
+            }
+            func_000CD367(D_00195C44);
+        }
+        disk_read_file((int)D_00170BB5, D_00195C44);
+        mc_memcpy(screen_buffer, D_00195C44, 64000, (int)D_00170B88, 299, 4);
+        l_3C = disk_read_file((int)D_00170C0E, 0);
+        func_00144F68((int)(unsigned short)*(short *)((char *)l_3C), (int)(unsigned short)*(short *)((char *)l_3C + 2), (int)(unsigned short)*(short *)((char *)l_3C + 4), (int)(unsigned short)*(short *)((char *)l_3C + 6), l_3C + 12);
+        if (l_3C != 0 && l_3C != (-1751672937)) {
+            mc_free(l_3C, (int)D_00170B88, 303);
+            l_3C = -1751672937;
+        }
+        while (mouse_buttons != 0) func_0012B136();
+        D_00147964 &= 254;
+        while (1) {
+            keys_world_actions();
+            func_0012B136();
+            func_0012B2D3((int)(short)mouse_x, (int)(short)mouse_y);
+            mc_memcpy(655360, screen_buffer, 64000, (int)D_00170B88, 311, 4);
+            if (((int)(unsigned char)(mouse_buttons & 1)) != 0) {
+                if (((int)(short)mouse_x) > 76 && ((int)(short)mouse_x) < 243 && ((int)(short)mouse_y) > 58 && ((int)(short)mouse_y) < 111) {
+                    l_28 = 0;
+                    break;
+                }
+                if (((int)(short)mouse_x) > 76 && ((int)(short)mouse_x) < 243 && ((int)(short)mouse_y) > 130 && ((int)(short)mouse_y) < 176) {
+                    l_28 = 1;
+                    break;
+                }
+            }
+        }
+        player_character->gold = 100;
+        career_background_summary(D_00199634, (int)(short)*(short *)&l_28);
+        palette_restore();
+    } while (chargen_name_character() != 0);
     mc_memset(655360, 0, 64000, (int)D_00170B88, 335, 4);
-    mc_memset(*(int *)screen_buffer, 0, 64000, (int)D_00170B88, 336, 4);
+    mc_memset(screen_buffer, 0, 64000, (int)D_00170B88, 336, 4);
     intro_play_movie();
     func_0003B1D6();
     newgame_init_player();
@@ -432,6 +297,6 @@ L3AE79:;
     mc_memset(655360, 0, 64000, (int)D_00170B88, 343, 4);
     palette_restore();
     newgame_place_player();
-    *(int *)D_00195C40 = *(int *)((char *)1132);
+    D_00195C40 = *(int *)((char *)1132);
     quests_start_initial();
 }

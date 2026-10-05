@@ -7,7 +7,7 @@ extern char D_0017089B[];
 extern char D_001708B7[];
 extern char D_001708D1[];
 extern struct record *nonworld_root;
-extern char qbn_opcode_arg_counts[];
+extern int qbn_opcode_arg_counts;
 extern void fatal_error(char *);
 extern struct record *object_find_by_id(struct record *, int);
 
@@ -37,7 +37,7 @@ void quest_unlink_for_save(struct quest *a1)
     l_48 = (struct qbn_op *)((char *)a1 + a1->section_offsets[8]);
     for (l_1C = 0; l_1C < a1->section_counts[8]; l_1C++, l_48++) {
         l_44 = l_48->args;
-        l_48->arg_count = (*(unsigned char **)qbn_opcode_arg_counts)[l_48->opcode] - '0';
+        l_48->arg_count = (*(unsigned char **)&qbn_opcode_arg_counts)[l_48->opcode] - '0';
         for (l_20 = 0; l_20 < l_48->arg_count; l_20++, l_44++) {
             if (l_44->record) l_44->record -= (int)a1;
             if (l_44->object) l_44->object = (struct record *)l_44->object->id;

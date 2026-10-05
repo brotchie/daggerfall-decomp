@@ -17,19 +17,10 @@ void func_0007F0F3(int a1)
 
     if (a1 == 0) return;
     l_1C = current_location->buildings;
-    l_20 = 0;
-L7F120:;
-    if (current_location->building_count > l_20) goto L7F144;
-    return;
-L7F135:;
-    l_20++;
-    l_1C++;
-    goto L7F120;
-L7F144:;
-    if (l_1C->faction_id != a1) goto L7F179;
-    l_18 = object_find_by_id(D_00195AC4, l_1C->id);
-    if (l_18 == 0) goto L7F179;
-    town_map_note_building(l_18, l_1C);
-L7F179:;
-    goto L7F135;
+    for (l_20 = 0; current_location->building_count > l_20; l_20++, l_1C++) {
+        if (l_1C->faction_id == a1) {
+            l_18 = object_find_by_id(D_00195AC4, l_1C->id);
+            if (l_18 != 0) town_map_note_building(l_18, l_1C);
+        }
+    }
 }

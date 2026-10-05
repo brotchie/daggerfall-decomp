@@ -13,29 +13,25 @@ int cast_creature_spell_at(struct record *a1, struct record *a2, struct record *
 {
     struct spell *l_14;
 
-__dagger_tbl5B11F:;
     l_14 = &a1->data.spell;
     a1->caster = a2;
     switch (l_14->target) {
-case 0:
-    cast_spell_on(a1, a2, 0);
-    if (a2 == player_entity) goto L5B191;
-    damage_spawn_splash(a2, 3, 3);
-L5B191:;
+    case 0:
+        cast_spell_on(a1, a2, 0);
+        if (a2 != player_entity) damage_spawn_splash(a2, 3, 3);
+        return 1;
+    case 1:
+        cast_spell_on(a1, a3, 0);
+        return 1;
+    case 2:
+        cast_creature_missile(a1, a2, a3);
+        return 0;
+    case 3:
+        cast_spell_on(a1, a3, 0);
+        return 1;
+    case 4:
+        cast_creature_missile(a1, a2, a3);
+        return 0;
+    }
     return 1;
-case 1:
-    cast_spell_on(a1, a3, 0);
-    return 1;
-case 2:
-    cast_creature_missile(a1, a2, a3);
-    return 0;
-case 3:
-    cast_spell_on(a1, a3, 0);
-    return 1;
-case 4:
-    cast_creature_missile(a1, a2, a3);
-    return 0;
-default:
-    return 1;
-}
 }

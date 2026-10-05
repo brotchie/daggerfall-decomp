@@ -3,7 +3,7 @@
 
 extern char D_00170738[];        /* __FILE__ */
 extern char D_00170765[];
-extern char text_buffer[];
+extern signed char text_buffer[];
 extern struct career *player_class;
 extern struct career *D_00195C44;     /* scratch_buffer: the 18 classes CLASS00-17.CFG */
 extern int career_slot_weight(int);
@@ -28,8 +28,8 @@ int career_nearest_class(void)
     mc_memset(sc, 0, 72, D_00170738, 397, 72);
     for (i = 0; i < 18; i++) {
         func_000A0ED9(401, D_00170738);
-        mc_sprintf(text_buffer, D_00170765, i);
-        disk_read_file(text_buffer, &base[i]);
+        mc_sprintf(((char *)text_buffer), D_00170765, i);
+        disk_read_file(((char *)text_buffer), &base[i]);
     }
     for (i = 0; i < 12; i++) {
         s = career_slot_weight(i);

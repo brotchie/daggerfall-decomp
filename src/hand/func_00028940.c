@@ -12,7 +12,7 @@ struct find_t {
 extern char D_001707AE[];
 extern char D_001707D0[];
 extern char D_001707DA[];
-extern char text_buffer[];
+extern signed char text_buffer[];
 extern char D_001917E4[];
 extern unsigned game_minutes;
 extern int disk_open_data(char *);
@@ -33,25 +33,25 @@ void automap_purge_old_files(void)
     int fh;
 
     func_000A0ED9(996, D_001707AE);
-    mc_sprintf(text_buffer, D_001707D0, D_001917E4);
-    rc = func_000A13DA(text_buffer, 0, &ff);
+    mc_sprintf(((char *)text_buffer), D_001707D0, D_001917E4);
+    rc = func_000A13DA(((char *)text_buffer), 0, &ff);
     while (rc == 0) {
         fh = disk_open_data(ff.name);
         func_000A00CB(fh, &t, 4);
         func_0009DEA7(fh);
         if (game_minutes - t > 129600)
-            unlink(text_buffer);
+            unlink(((char *)text_buffer));
         rc = func_000A13F7(&ff);
     }
     func_000A0ED9(1008, D_001707AE);
-    mc_sprintf(text_buffer, D_001707DA, D_001917E4);
-    rc = func_000A13DA(text_buffer, 0, &ff);
+    mc_sprintf(((char *)text_buffer), D_001707DA, D_001917E4);
+    rc = func_000A13DA(((char *)text_buffer), 0, &ff);
     while (rc == 0) {
         fh = disk_open_data(ff.name);
         func_000A00CB(fh, &t, 4);
         func_0009DEA7(fh);
         if (game_minutes - t > 129600)
-            unlink(text_buffer);
+            unlink(((char *)text_buffer));
         rc = func_000A13F7(&ff);
     }
 }

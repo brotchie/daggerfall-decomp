@@ -19,10 +19,10 @@ void itemmaker_set_power_param_cb(int a1)
 
     *(short *)(D_001998E2 + (((int)(short)*(short *)D_00190D64) << 2)) = a1;
     *(int *)&l_18 = (int)(unsigned char)*(signed char *)(D_00185766 + ((int)(short)*(short *)D_00190D66));
-    if (l_18 != 0) goto L56947;
-    func_00057147((int)(short)*(short *)D_00190D64, (int)(short)*(short *)D_00190D66, (int)(short)*(short *)&a1, -1, -1, -1, -1);
-    return;
-L56947:;
+    if (l_18 == 0) {
+        func_00057147((int)(short)*(short *)D_00190D64, (int)(short)*(short *)D_00190D66, (int)(short)*(short *)&a1, -1, -1, -1, -1);
+        return;
+    }
     (*(int *)&l_18)--;
     func_00057147((int)(short)*(short *)D_00190D64, (int)(short)*(short *)D_00190D66, (int)(short)*(short *)&a1, (int)(short)((int)(unsigned char)*(signed char *)(D_00185716 + ((((int)(short)l_18) * 20) + (((int)(short)*(short *)&a1) << 2)))), (int)(short)((unsigned short)(unsigned char)*(signed char *)(D_00185717 + ((((int)(short)l_18) * 20) + (((int)(short)*(short *)&a1) << 2)))), (int)(short)((unsigned short)(unsigned char)*(signed char *)(D_00185718 + ((((int)(short)l_18) * 20) + (((int)(short)*(short *)&a1) << 2)))), (int)(short)((unsigned short)(unsigned char)*(signed char *)(D_00185719 + ((((int)(short)l_18) * 20) + (((int)(short)*(short *)&a1) << 2)))));
 }

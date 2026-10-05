@@ -5,16 +5,16 @@
 
 struct bf8_5_1 { unsigned char _:5; unsigned char f:1; };
 extern char disk_last_file_size[];
-extern char mouse_buttons[];
-extern char mouse_x[];
-extern char mouse_y[];
-extern char D_0012B508[];
-extern char D_0012DA44[];
-extern char key_down_esc[];
-extern char D_00142928[];
-extern char D_0014292C[];
-extern char screen_buffer[];
-extern char D_00147954[];
+extern signed char mouse_buttons;
+extern short mouse_x;
+extern short mouse_y;
+extern signed char D_0012B508;
+extern short D_0012DA44;
+extern signed char key_down_esc;
+extern short D_00142928;
+extern short D_0014292C;
+extern int screen_buffer;
+extern int D_00147954;
 extern char D_00175C6C[];
 extern char D_00175C86[];
 extern char logbook_buttons[];
@@ -22,26 +22,26 @@ extern char D_00186DF2[];
 extern char D_00186DF4[];
 extern char D_00186DF6[];
 extern char D_00186DF8[];
-extern char logbook_notes_file[];
-extern char D_00187CA8[];
-extern char text_buffer[];
+extern int logbook_notes_file;
+extern signed char D_00187CA8;
+extern signed char text_buffer[];
 extern char D_00190BE4[];
 extern char D_00190D64[];
 extern char D_00190D66[];
-extern char text_rsc_buffer[];
-extern char D_001940D8[];
+extern signed char text_rsc_buffer[];
+extern signed char D_001940D8;
 extern struct record *logbook_object;
 extern struct record *player_object;
-extern char window_image[];
-extern char D_00195C44[];
-extern char D_00195D94[];
-extern char D_00196272[];
-extern char game_mode[];
-extern char mouse_buttons_prev[];
-extern char D_00196295[];
-extern char logbook_first_entry[];
+extern int window_image;
+extern int D_00195C44;
+extern int D_00195D94;
+extern signed char D_00196272;
+extern signed char game_mode;
+extern signed char mouse_buttons_prev;
+extern signed char D_00196295;
+extern int logbook_first_entry;
 extern char logbook_show_notes[];
-extern char logbook_entry_count[];
+extern int logbook_entry_count;
 
 extern int sheet_open(int);
 extern struct quest *quest_find_by_id(int);
@@ -79,71 +79,40 @@ void logbook_update(void)
     int l_18;
 
     if (logbook_open(0) == 0) return;
-    mc_memcpy(*(int *)screen_buffer, *(int *)window_image, 64000, (int)D_00175C86, 53, 4);
+    mc_memcpy(screen_buffer, window_image, 64000, (int)D_00175C86, 53, 4);
     logbook_draw();
-    if (*(signed char *)key_down_esc == 0) goto L6A7AA;
-    logbook_close();
-L6A7AA:;
-    if (*(signed char *)mouse_buttons == 0) goto L6A7C7;
-    if (*(signed char *)mouse_buttons == 0) goto L6A7C5;
-    if (*(signed char *)mouse_buttons_prev != 0) goto L6A7C7;
-L6A7C5:;
-    goto L6A7CC;
-L6A7C7:;
-    return;
-L6A7CC:;
-    l_18 = 0;
-L6A7D3:;
-    if (l_18 < 4) goto L6A7E6;
-    return;
-L6A7DE:;
-    l_18++;
-    goto L6A7D3;
-L6A7E6:;
-    if (*(short *)mouse_x <= *(short *)(logbook_buttons + (l_18 * 12))) goto L6A80E;
-    if (*(short *)mouse_x < *(short *)(D_00186DF4 + (l_18 * 12))) goto L6A810;
-L6A80E:;
-    goto L6A824;
-L6A810:;
-    if (*(short *)mouse_y > *(short *)(D_00186DF2 + (l_18 * 12))) goto L6A826;
-L6A824:;
-    goto L6A83A;
-L6A826:;
-    if (*(short *)mouse_y < *(short *)(D_00186DF6 + (l_18 * 12))) goto L6A83C;
-L6A83A:;
-    goto L6A846;
-L6A83C:;
-    ((int (*)())(*(int *)(D_00186DF8 + (l_18 * 12))))();
-L6A846:;
-    goto L6A7DE;
+    if (key_down_esc != 0) logbook_close();
+    if (mouse_buttons == 0 || (mouse_buttons != 0 && mouse_buttons_prev != 0)) {
+        return;
+    }
+    for (l_18 = 0; l_18 < 4; l_18++) {
+        if (mouse_x > *(short *)(logbook_buttons + (l_18 * 12)) && mouse_x < *(short *)(D_00186DF4 + (l_18 * 12)) && mouse_y > *(short *)(D_00186DF2 + (l_18 * 12)) && mouse_y < *(short *)(D_00186DF6 + (l_18 * 12))) {
+            ((int (*)())(*(int *)(D_00186DF8 + (l_18 * 12))))();
+        }
+    }
 }
 
 int logbook_close(void)
 {
-    *(int *)D_00195D94 = 0;
-L6A86A:;
-    if (*(signed char *)key_down_esc != 0) goto L6A86A;
-    if (*(int *)logbook_show_notes == 0) goto L6A88D;
-    logbook_toggle_notes();
-    return 0;
-L6A88D:;
-    *(signed char *)game_mode = 0;
-    *(signed char *)D_00196272 = 0;
-    if (*(int *)window_image == 0) goto L6A8B0;
-    if (*(int *)window_image != (-1751672937)) goto L6A8B2;
-L6A8B0:;
-    goto L6A8D0;
-L6A8B2:;
-    mc_free(*(int *)window_image, (int)D_00175C86, 80);
-    *(int *)window_image = -1751672937;
-L6A8D0:;
-    if (((struct bf8_5_1 *)&D_001940D8)->f == 0) goto L6A8EC;
-    *(signed char *)D_001940D8 &= 223;
-    sheet_open(1);
-    goto L6A8F3;
-L6A8EC:;
-    *(signed char *)D_00187CA8 = 1;
-L6A8F3:;
+    D_00195D94 = 0;
+    do {
+    } while (key_down_esc != 0);
+    if (*(int *)logbook_show_notes != 0) {
+        logbook_toggle_notes();
+        return 0;
+    }
+    game_mode = 0;
+    D_00196272 = 0;
+    if (window_image != 0 && window_image != (-1751672937)) {
+        mc_free(window_image, (int)D_00175C86, 80);
+        window_image = -1751672937;
+    }
+    if (((struct bf8_5_1 *)&D_001940D8)->f != 0) {
+        D_001940D8 &= 223;
+        sheet_open(1);
+    } else {
+        D_00187CA8 = 1;
+    }
     return 1;
 }
 
@@ -153,84 +122,79 @@ void logbook_draw_entry(int a1)
     int l_1C;
     short l_18;
 
-    *(signed char *)D_0012B508 = 146;
-    l_18 = *(short *)D_0012DA44;
-L6A928:;
-    if (*(signed char *)((char *)a1) == 0) goto L6AAF2;
-    switch (*(unsigned char *)((char *)a1)) {
-case 251:
-    *(short *)D_00142928 = *(short *)((char *)a1 + 1);
-    a1 += 3;
-    goto L6AAED;
-case 247:
-    func_0005A1C8(a1 + 1);
-L6A9B2:;
-    if (*(signed char *)((char *)a1++) != 0) goto L6A9B2;
-    goto L6AAED;
-case 250:
-    *(signed char *)D_0012B508 = *(signed char *)((char *)a1 + 1);
-    a1 += 2;
-    goto L6AAED;
-case 249:
-    book_flush_line();
-    func_0012DB50((int)(short)((unsigned short)(unsigned char)*(signed char *)((char *)a1 + 1)));
-    a1 += 2;
-    if ((short)(short)*(int *)&l_18 >= *(short *)D_0012DA44) goto L6AA02;
-    l_18 = *(short *)D_0012DA44;
-L6AA02:;
-    goto L6AAED;
-case 252:
-    l_18 = *(short *)D_0012DA44;
-    *(short *)D_00142928 = 30;
-    *(short *)D_0014292C += *(int *)&l_18;
-    a1++;
-    *(signed char *)(text_buffer + ((int)(short)*(short *)D_00190D64)) = 0;
-    book_flush_line();
-    *(short *)D_00190D64 = 0;
-    if (((int)(short)*(short *)D_0014292C) > 160) goto L6AB05;
-    goto L6AAED;
-case 253:
-    l_18 = *(short *)D_0012DA44;
-    *(short *)D_00142928 = 30;
-    *(short *)D_0014292C += *(int *)&l_18;
-    a1++;
-    *(signed char *)(text_buffer + ((int)(short)*(short *)D_00190D64)) = 0;
-    *(short *)D_00190D66 = 1;
-    book_flush_line();
-    *(short *)D_00190D64 = 0;
-    if (((int)(short)*(short *)D_0014292C) > 160) goto L6AB05;
-    goto L6AAED;
-case 1:
-    a1++;
-    *(signed char *)(text_buffer + ((int)(short)*(short *)D_00190D64)) = 0;
-    book_flush_line();
-    goto L6AAED;
-default:
-    *(signed char *)(text_buffer + ((int)(short)(*(short *)D_00190D64)++)) = *(signed char *)((char *)a1++);
-L6AAED:;
-    goto L6A928;
-L6AAF2:;
-    *(signed char *)(text_buffer + ((int)(short)*(short *)D_00190D64)) = 0;
+    D_0012B508 = 146;
+    l_18 = D_0012DA44;
+    while (*(signed char *)((char *)a1) != 0) {
+        switch (*(unsigned char *)((char *)a1)) {
+        case 251:
+            D_00142928 = *(short *)((char *)a1 + 1);
+            a1 += 3;
+            break;
+        case 247:
+            func_0005A1C8(a1 + 1);
+            do {
+            } while (*(signed char *)((char *)a1++) != 0);
+            break;
+        case 250:
+            D_0012B508 = *(signed char *)((char *)a1 + 1);
+            a1 += 2;
+            break;
+        case 249:
+            book_flush_line();
+            func_0012DB50((int)(short)((unsigned short)(unsigned char)*(signed char *)((char *)a1 + 1)));
+            a1 += 2;
+            if ((short)(short)*(int *)&l_18 < D_0012DA44) l_18 = D_0012DA44;
+            break;
+        case 252:
+            l_18 = D_0012DA44;
+            D_00142928 = 30;
+            D_0014292C += *(int *)&l_18;
+            a1++;
+            text_buffer[(int)(short)*(short *)D_00190D64] = 0;
+            book_flush_line();
+            *(short *)D_00190D64 = 0;
+            if (((int)(short)D_0014292C) > 160) goto L6AB05;
+            break;
+        case 253:
+            l_18 = D_0012DA44;
+            D_00142928 = 30;
+            D_0014292C += *(int *)&l_18;
+            a1++;
+            text_buffer[(int)(short)*(short *)D_00190D64] = 0;
+            *(short *)D_00190D66 = 1;
+            book_flush_line();
+            *(short *)D_00190D64 = 0;
+            if (((int)(short)D_0014292C) > 160) goto L6AB05;
+            break;
+        case 1:
+            a1++;
+            text_buffer[(int)(short)*(short *)D_00190D64] = 0;
+            book_flush_line();
+            break;
+        default:
+            text_buffer[(int)(short)(*(short *)D_00190D64)++] = *(signed char *)((char *)a1++);
+        }
+    }
+    text_buffer[(int)(short)*(short *)D_00190D64] = 0;
     book_flush_line();
 L6AB05:;
-    *(short *)D_00142928 = 30;
-    l_18 = *(short *)D_0012DA44;
-    *(short *)D_0014292C += *(int *)&l_18;
-}
+    D_00142928 = 30;
+    l_18 = D_0012DA44;
+    D_0014292C += *(int *)&l_18;
 }
 
 void logbook_prev_page(void)
 {
-    if (*(int *)logbook_first_entry == 0) return;
+    if (logbook_first_entry == 0) return;
     sound_play(205, (int)player_object, 100);
-    (*(int *)logbook_first_entry)--;
+    (logbook_first_entry)--;
 }
 
 void logbook_next_page(void)
 {
-    if ((*(int *)logbook_entry_count - 1) <= *(int *)logbook_first_entry) return;
+    if ((logbook_entry_count - 1) <= logbook_first_entry) return;
     sound_play(205, (int)player_object, 100);
-    (*(int *)logbook_first_entry)++;
+    (logbook_first_entry)++;
 }
 
 void logbook_build_entries(void)
@@ -241,57 +205,37 @@ void logbook_build_entries(void)
     struct quest *l_1C;
     int l_18;
 
-    l_18 = *(int *)D_00195C44 + 20000;
-    if (*(int *)logbook_show_notes == 0) goto L6ABDA;
-    if (disk_file_exists(*(int *)logbook_notes_file) != 0) goto L6ABDC;
-L6ABDA:;
-    goto L6ABE6;
-L6ABDC:;
-    logbook_load_notes();
-    return;
-L6ABE6:;
-    *(signed char *)D_00196295 = 1;
-    *(int *)logbook_entry_count = 0;
+    l_18 = D_00195C44 + 20000;
+    if (*(int *)logbook_show_notes != 0 && disk_file_exists(logbook_notes_file) != 0) {
+        logbook_load_notes();
+        return;
+    }
+    D_00196295 = 1;
+    logbook_entry_count = 0;
     l_28 = (int)RECORD_DATA(logbook_object);
-    l_24 = 0;
-L6AC09:;
-    if (l_24 < 32) goto L6AC1C;
-    goto L6AD3C;
-L6AC14:;
-    l_24++;
-    goto L6AC09;
-L6AC1C:;
-    if (*(short *)((char *)((l_24 * 2) + l_28)) == 0) goto L6AC14;
-    l_1C = quest_find_by_id((int)(short)*(short *)((char *)((l_24 * 2) + l_28)));
-    if (l_1C != 0) goto L6AC76;
-    *(short *)((char *)((l_24 * 2) + l_28)) = 0;
-    mc_memset((l_28 + 64) + (l_24 * 20), 0, 20, (int)D_00175C86, 204, 20);
-    goto L6AC14;
-L6AC76:;
-    l_20 = 0;
-L6AC7D:;
-    if (l_20 < 10) goto L6AC90;
-    goto L6AD37;
-L6AC88:;
-    l_20++;
-    goto L6AC7D;
-L6AC90:;
-    if (*(short *)((char *)(int)((char *)((l_24 * 20) + l_28) + (l_20 * 2)) + 64) == 0) goto L6AC88;
-    *(int *)D_00195D94 = (l_28 + 1984) + (l_24 << 5);
-    *(int *)D_00190BE4 = *(int *)((char *)((l_28 + (l_24 * 40)) + (l_20 << 2)) + 704);
-    *(signed char *)text_rsc_buffer = 0;
-    quest_load_text(l_1C, (int)(short)*(short *)((char *)(((l_24 * 20) + l_28) + (l_20 * 2)) + 64), 0, 0);
-    if (*(signed char *)text_rsc_buffer == 0) goto L6AC88;
-    mc_strncpy(l_18, (int)text_rsc_buffer, 4, (int)D_00175C86, 216);
-    l_18 += func_000A0DF4(l_18) + 1;
-    (*(int *)logbook_entry_count)++;
-    goto L6AC88;
-L6AD37:;
-    goto L6AC14;
-L6AD3C:;
+    for (l_24 = 0; l_24 < 32; l_24++) {
+        if (*(short *)((char *)((l_24 * 2) + l_28)) == 0) continue;
+        l_1C = quest_find_by_id((int)(short)*(short *)((char *)((l_24 * 2) + l_28)));
+        if (l_1C == 0) {
+            *(short *)((char *)((l_24 * 2) + l_28)) = 0;
+            mc_memset((l_28 + 64) + (l_24 * 20), 0, 20, (int)D_00175C86, 204, 20);
+            continue;
+        }
+        for (l_20 = 0; l_20 < 10; l_20++) {
+            if (*(short *)((char *)(int)((char *)((l_24 * 20) + l_28) + (l_20 * 2)) + 64) == 0) continue;
+            D_00195D94 = (l_28 + 1984) + (l_24 << 5);
+            *(int *)D_00190BE4 = *(int *)((char *)((l_28 + (l_24 * 40)) + (l_20 << 2)) + 704);
+            text_rsc_buffer[0] = 0;
+            quest_load_text(l_1C, (int)(short)*(short *)((char *)(((l_24 * 20) + l_28) + (l_20 * 2)) + 64), 0, 0);
+            if (text_rsc_buffer[0] == 0) continue;
+            mc_strncpy(l_18, (int)text_rsc_buffer, 4, (int)D_00175C86, 216);
+            l_18 += func_000A0DF4(l_18) + 1;
+            (logbook_entry_count)++;
+        }
+    }
     *(signed char *)((char *)l_18++) = 0;
-    *(int *)D_00195D94 = 0;
-    *(signed char *)D_00196295 = 0;
+    D_00195D94 = 0;
+    D_00196295 = 0;
 }
 
 void logbook_load_notes(void)
@@ -299,15 +243,13 @@ void logbook_load_notes(void)
     int l_1C;
     int l_18;
 
-    l_1C = *(int *)D_00195C44 + 20000;
+    l_1C = D_00195C44 + 20000;
     mc_memset(l_1C, 0, 35000, (int)D_00175C86, 233, 4);
     disk_read_file((int)D_00175C6C, l_1C);
-L6ADA3:;
-    if (*(signed char *)((char *)l_1C) == 0) goto L6ADBF;
-    l_1C += func_000A0DF4(l_1C) + 1;
-    (*(int *)logbook_entry_count)++;
-    goto L6ADA3;
-L6ADBF:;
+    while (*(signed char *)((char *)l_1C) != 0) {
+        l_1C += func_000A0DF4(l_1C) + 1;
+        (logbook_entry_count)++;
+    }
     *(signed char *)((char *)l_1C++) = 0;
     *(signed char *)((char *)l_1C++) = 0;
 }
@@ -317,33 +259,26 @@ void logbook_draw(void)
     int l_1C;
     int l_18;
 
-    *(short *)D_00142928 = 30;
-    *(short *)D_0014292C = 25;
+    D_00142928 = 30;
+    D_0014292C = 25;
     *(short *)D_00190D66 = 0;
     func_0012DB50(4);
-    l_18 = func_0006AE87(*(int *)D_00195C44 + 20000, *(int *)logbook_first_entry);
-    l_1C = *(int *)logbook_first_entry;
-L6AE2E:;
-    if (l_1C < *(int *)logbook_entry_count) goto L6AE43;
-    return;
-L6AE3B:;
-    l_1C++;
-    goto L6AE2E;
-L6AE43:;
-    if (((int)(short)*(short *)D_0014292C) > 160) return;
-    logbook_draw_entry(l_18);
-    l_18 += func_000A0DF4(l_18) + 1;
-    if (*(signed char *)((char *)l_18) != 0) goto L6AE7B;
-    l_18++;
-    *(short *)D_0014292C += 8;
-L6AE7B:;
-    goto L6AE3B;
+    l_18 = func_0006AE87(D_00195C44 + 20000, logbook_first_entry);
+    for (l_1C = logbook_first_entry; l_1C < logbook_entry_count; l_1C++) {
+        if (((int)(short)D_0014292C) > 160) return;
+        logbook_draw_entry(l_18);
+        l_18 += func_000A0DF4(l_18) + 1;
+        if (*(signed char *)((char *)l_18) == 0) {
+            l_18++;
+            D_0014292C += 8;
+        }
+    }
 }
 
 void logbook_toggle_notes(void)
 {
     *(signed char *)logbook_show_notes ^= 1;
-    *(int *)logbook_first_entry = 0;
+    logbook_first_entry = 0;
     logbook_build_entries();
     sound_play(237, (int)player_object, 100);
 }
@@ -356,32 +291,24 @@ void logbook_copy_text(int a1)
     int l_18;
 
     *(signed char *)&l_18 = 0;
-    if (disk_file_exists(*(int *)logbook_notes_file) == 0) goto L6B162;
-    l_24 = disk_open_rw(*(int *)logbook_notes_file);
-    goto L6B16F;
-L6B162:;
-    l_24 = disk_create(*(int *)logbook_notes_file);
-L6B16F:;
+    if (disk_file_exists(logbook_notes_file) != 0) {
+        l_24 = disk_open_rw(logbook_notes_file);
+    } else {
+        l_24 = disk_create(logbook_notes_file);
+    }
     if (l_24 == (-1)) return;
     l_20 = lseek(l_24, 0, 2);
     l_1C = 0;
-L6B192:;
-    if (*(signed char *)((char *)a1) == 0) goto L6B1F7;
-    l_1C += font_char_width((int)(unsigned char)*(signed char *)((char *)a1));
-    if (l_1C <= 240) goto L6B1C4;
-    if (((int)(unsigned char)*(signed char *)((char *)a1)) == 32) goto L6B1C6;
-L6B1C4:;
-    goto L6B1DF;
-L6B1C6:;
-    write(l_24, (int)&l_18, 1);
-    l_1C = 0;
-    goto L6B1EF;
-L6B1DF:;
-    write(l_24, a1, 1);
-L6B1EF:;
-    a1++;
-    goto L6B192;
-L6B1F7:;
+    while (*(signed char *)((char *)a1) != 0) {
+        l_1C += font_char_width((int)(unsigned char)*(signed char *)((char *)a1));
+        if (l_1C > 240 && ((int)(unsigned char)*(signed char *)((char *)a1)) == 32) {
+            write(l_24, (int)&l_18, 1);
+            l_1C = 0;
+        } else {
+            write(l_24, a1, 1);
+        }
+        a1++;
+    }
     write(l_24, a1, 1);
     *(signed char *)&l_18 = 32;
     write(l_24, (int)&l_18, 1);
@@ -396,20 +323,14 @@ void func_0006B24F(void)
 {
     int l_18;
 
-    disk_read_file(*(int *)logbook_notes_file, *(int *)D_00147954);
-L6B26D:;
-    if (*(int *)disk_last_file_size <= 32768) goto L6B2C2;
-    l_18 = *(int *)D_00147954;
-L6B281:;
-    if (*(signed char *)((char *)l_18) == 0) goto L6B291;
-    l_18++;
-    goto L6B281;
-L6B291:;
-    mc_memcpy(*(int *)D_00147954, l_18 + 1, 40960, (int)D_00175C86, 401, 4);
-    *(int *)disk_last_file_size -= (l_18 + 1) - *(int *)D_00147954;
-    goto L6B26D;
-L6B2C2:;
-    disk_write_arena2_file(*(int *)logbook_notes_file, *(int *)D_00147954, *(int *)disk_last_file_size);
+    disk_read_file(logbook_notes_file, D_00147954);
+    while (*(int *)disk_last_file_size > 32768) {
+        l_18 = D_00147954;
+        while (*(signed char *)((char *)l_18) != 0) l_18++;
+        mc_memcpy(D_00147954, l_18 + 1, 40960, (int)D_00175C86, 401, 4);
+        *(int *)disk_last_file_size -= (l_18 + 1) - D_00147954;
+    }
+    disk_write_arena2_file(logbook_notes_file, D_00147954, *(int *)disk_last_file_size);
 }
 
 void logbook_prune_quests(void)
@@ -419,19 +340,13 @@ void logbook_prune_quests(void)
     struct quest *l_18;
 
     l_20 = (int)RECORD_DATA(logbook_object);
-    l_1C = 0;
-L6B302:;
-    if (l_1C < 32) goto L6B312;
-    return;
-L6B30A:;
-    l_1C++;
-    goto L6B302;
-L6B312:;
-    if (*(short *)((char *)((l_1C * 2) + l_20)) == 0) goto L6B36A;
-    l_18 = quest_find_by_id((int)(short)*(short *)((char *)((l_1C * 2) + l_20)));
-    if (l_18 != 0) goto L6B36A;
-    *(short *)((char *)((l_1C * 2) + l_20)) = 0;
-    mc_memset((l_20 + 64) + (l_1C * 20), 0, 20, (int)D_00175C86, 422, 20);
-L6B36A:;
-    goto L6B30A;
+    for (l_1C = 0; l_1C < 32; l_1C++) {
+        if (*(short *)((char *)((l_1C * 2) + l_20)) != 0) {
+            l_18 = quest_find_by_id((int)(short)*(short *)((char *)((l_1C * 2) + l_20)));
+            if (l_18 == 0) {
+                *(short *)((char *)((l_1C * 2) + l_20)) = 0;
+                mc_memset((l_20 + 64) + (l_1C * 20), 0, 20, (int)D_00175C86, 422, 20);
+            }
+        }
+    }
 }

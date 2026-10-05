@@ -9,7 +9,7 @@ extern char D_00170464[];
 extern char D_0017046E[];
 extern unsigned char D_00178630[];
 extern struct cmd faction_keywords[];
-extern char text_buffer[];
+extern signed char text_buffer[];
 extern int faction_count;
 extern struct faction *factions;
 extern unsigned char D_00196732;
@@ -123,8 +123,8 @@ void faction_load_file(void)
             }
             if (!found) {
                 func_000A0ED9(1049, D_00170464);
-                mc_sprintf(text_buffer, D_0017046E, line);
-                fatal_error(text_buffer);
+                mc_sprintf(((char *)text_buffer), D_0017046E, line);
+                fatal_error(((char *)text_buffer));
             }
             break;
         }

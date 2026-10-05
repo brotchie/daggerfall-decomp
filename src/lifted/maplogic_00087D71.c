@@ -3,7 +3,7 @@
  * tables from the start of the file, so moving functions can change the code. */
 
 extern char D_00176C94[];
-extern char D_00196A28[];
+extern int D_00196A28;
 extern char D_00196A9C[];
 
 extern int func_0008795D(int, int, int);
@@ -22,37 +22,20 @@ void func_00087D71(int a1, int a2, int a3)
     l_1C = *(int *)D_00196A9C;
     l_14 = 0;
     mc_memset(a1, 0, 20, (int)D_00176C94, 952, 4);
-    l_18 = 0;
-L87DB7:;
-    if (l_18 < *(int *)D_00196A28) goto L87DD3;
-    goto L87DE9;
-L87DC4:;
-    l_18++;
-    (*(char (**)[17])&l_1C)++;
-    goto L87DB7;
-L87DD3:;
-    l_14 += func_0008795D(l_1C + 13, a2, a3);
-    goto L87DC4;
-L87DE9:;
-    if (l_14 != 0) goto L87DF9;
-    location_free(a1);
-    return;
-L87DF9:;
+    for (l_18 = 0; l_18 < D_00196A28; l_18++, (*(char (**)[17])&l_1C)++) {
+        l_14 += func_0008795D(l_1C + 13, a2, a3);
+    }
+    if (l_14 == 0) {
+        location_free(a1);
+        return;
+    }
     l_1C = *(int *)D_00196A9C;
     l_10 = (rand() % l_14) + 1;
-    l_18 = 0;
-L87E1B:;
-    if (l_18 < *(int *)D_00196A28) goto L87E37;
-    return;
-L87E28:;
-    l_18++;
-    (*(char (**)[17])&l_1C)++;
-    goto L87E1B;
-L87E37:;
-    l_10 -= func_0008795D(l_1C + 13, a2, a3);
-    if (l_10 != 0) goto L87E5E;
-    location_load_exterior(a1, l_18);
-    return;
-L87E5E:;
-    goto L87E28;
+    for (l_18 = 0; l_18 < D_00196A28; l_18++, (*(char (**)[17])&l_1C)++) {
+        l_10 -= func_0008795D(l_1C + 13, a2, a3);
+        if (l_10 == 0) {
+            location_load_exterior(a1, l_18);
+            return;
+        }
+    }
 }

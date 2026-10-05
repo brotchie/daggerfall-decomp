@@ -5,71 +5,71 @@
 
 struct bf8_4_1 { unsigned char _:4; unsigned char f:1; };
 struct bf8_6_1 { unsigned char _:6; unsigned char f:1; };
-extern char D_0012B508[];
+extern signed char D_0012B508;
 extern char D_001711AC[];
-extern char player_environment[];
-extern char building_open_hours[];
-extern char D_0017C5B9[];
-extern char month_names[];
-extern char ordinal_suffixes[];
-extern char D_001830E2[];
-extern char D_00187CA8[];
-extern char frame_checkpoint[];
-extern char region_punishment_flags[];
+extern unsigned char player_environment;
+extern signed char building_open_hours[];
+extern signed char D_0017C5B9[];
+extern int month_names[];
+extern int ordinal_suffixes[];
+extern int D_001830E2;
+extern signed char D_00187CA8;
+extern int frame_checkpoint;
+extern signed char region_punishment_flags[];
 extern char region_legal_reputation[];
 extern char region_price_adjustment[];
 extern struct record *D_00190504[];
-extern char itemmaker_slot_kinds[];
-extern char D_001940D8[];
-extern char D_001940D9[];
+extern signed char itemmaker_slot_kinds[];
+extern signed char D_001940D8;
+extern signed char D_001940D9;
 extern struct record *D_00195A00;
 extern struct record *bank_accounts;
 extern struct record *player_entity;
 extern struct record *player_object;
 extern struct record *D_00195AA8;
 extern struct record *D_00195AC4;
-extern char creature_count[];
-extern char calendar_year[];
-extern char calendar_weekday[];
-extern char calendar_month[];
-extern char calendar_minute[];
-extern char calendar_hour[];
+extern int creature_count;
+extern int calendar_year;
+extern int calendar_weekday;
+extern int calendar_month;
+extern int calendar_minute;
+extern int calendar_hour;
 extern struct character *player_character;
-extern char game_minutes[];
-extern char D_00195C40[];
+extern int game_minutes;
+extern int D_00195C40;
 extern struct record *D_00195D00;
-extern char player_death_timer[];
-extern char D_00195F24[];
-extern char D_00195F25[];
-extern char current_region[];
-extern char game_mode[];
-extern char crime_current[];
-extern char D_00196280[];
-extern char player_ailment_flags[];
-extern char D_00196298[];
-extern char D_001962A4[];
-extern char D_001962A5[];
-extern char D_001962A9[];
-extern char D_001962B0[];
-extern char faction_count[];
+extern int player_death_timer;
+extern signed char D_00195F24;
+extern signed char D_00195F25;
+extern signed char current_region;
+extern signed char game_mode;
+extern signed char crime_current;
+extern signed char D_00196280;
+extern signed char player_ailment_flags;
+extern signed char D_00196298;
+extern signed char D_001962A4;
+extern signed char D_001962A5;
+extern signed char D_001962A9;
+extern signed char D_001962B0;
+extern int faction_count;
 extern struct faction *factions;
 extern struct quest *current_quest;
-extern char quest_debug_data[];
+extern int quest_debug_data;
 extern struct record *quest_event_object;
 extern struct quest *D_00199780;
-extern char quest_ended_id[];
-extern char qbn_record_sizes[];
-extern char D_0019978A[];
-extern char D_0019978C[];
-extern char D_0019978E[];
-extern char D_00199790[];
-extern char D_00199792[];
-extern char D_00199794[];
-extern char D_00199796[];
-extern char D_00199798[];
-extern char D_0019979A[];
-extern char quest_event_code[];
-extern char D_001AA698[];
+extern int quest_ended_id;
+extern short qbn_record_sizes[];
+extern short D_0019978A;
+extern short D_0019978C;
+extern short D_0019978E;
+extern short D_00199790;
+extern short D_00199792;
+extern short D_00199794;
+extern short D_00199796;
+extern short D_00199798;
+extern short D_0019979A;
+extern short quest_event_code;
+extern int D_001AA698;
 
 extern struct faction *faction_find_type_in_region(int, short);
 extern struct faction *faction_find(short);
@@ -127,7 +127,7 @@ int calendar_format_date(int a1, int a2)
 
     *(int *)&l_14 = ((unsigned)(((unsigned)(((unsigned)a1) % 518400)) / 1440)) % 30;
     func_000A0ED9(79, (int)D_001711AC);
-    mc_sprintf(a2, *(int *)D_001830E2, ((int)(short)l_14) + 1, *(int *)(ordinal_suffixes + (((((int)(short)l_14) > 3) ? 3 : (int)(short)l_14) << 2)), *(int *)(month_names + ((((unsigned)(((unsigned)a1) % 518400)) / 43200) << 2)));
+    mc_sprintf(a2, D_001830E2, ((int)(short)l_14) + 1, ordinal_suffixes[((((int)(short)l_14) > 3) ? 3 : (int)(short)l_14)], month_names[(((unsigned)(((unsigned)a1) % 518400)) / 43200)]);
     return a2;
 }
 
@@ -143,24 +143,18 @@ void time_update_realtime(void)
     int l_1C;
     int l_18;
 
-    if (((struct bf8_6_1 *)&D_001940D8)->f != 0) goto L4AB72;
-    if (*(signed char *)D_00187CA8 != 0) goto L4AB88;
-L4AB72:;
-    l_1C = 1132;
-    *(int *)D_00195C40 = *(int *)((char *)l_1C);
-    return;
-L4AB88:;
-    l_20 = *(int *)game_minutes;
+    if (((struct bf8_6_1 *)&D_001940D8)->f != 0 || D_00187CA8 == 0) {
+        l_1C = 1132;
+        D_00195C40 = *(int *)((char *)l_1C);
+        return;
+    }
+    l_20 = game_minutes;
     l_18 = 1132;
-    l_24 = ((unsigned)(*(int *)((char *)l_18) - *(int *)D_00195C40)) / 90;
-    *(int *)D_00195C40 += l_24 * 90;
-    if (((struct bf8_4_1 *)&D_001940D9)->f == 0) goto L4ABD8;
-    if (((int)(unsigned short)(player_character->flags & 1536)) == 0) goto L4ABDA;
-L4ABD8:;
-    goto L4ABE9;
-L4ABDA:;
-    skill_add_uses(21, 1);
-L4ABE9:;
+    l_24 = ((unsigned)(*(int *)((char *)l_18) - D_00195C40)) / 90;
+    D_00195C40 += l_24 * 90;
+    if (((struct bf8_4_1 *)&D_001940D9)->f != 0 && ((int)(unsigned short)(player_character->flags & 1536)) == 0) {
+        skill_add_uses(21, 1);
+    }
     if (l_24 == 0) return;
     time_pass_minutes(l_24);
 }
@@ -174,182 +168,110 @@ void time_pass_minutes(int a1)
     int l_20;
     int l_1C;
     int l_18;
-{
-    unsigned char l_38;
+    {
+        unsigned char l_38;
 
-    l_1C = *(int *)game_minutes;
-    l_18 = 0;
-    if (((unsigned)a1) <= 200000) goto L4AC31;
-    a1 = 1;
-L4AC31:;
-    *(signed char *)player_ailment_flags = 0;
-    l_28 = ((unsigned)*(int *)game_minutes) / 1440;
-    l_24 = ((unsigned)*(int *)game_minutes) / 10080;
-    *(int *)game_minutes += a1;
-    l_20 = ((unsigned)*(int *)game_minutes) % 1440;
-    if (l_20 <= 360) goto L4AC86;
-    if (l_20 < 1080) goto L4AC88;
-L4AC86:;
-    goto L4AC8E;
-L4AC88:;
-    l_38 = 1;
-    goto L4AC92;
-L4AC8E:;
-    l_38 = 0;
-L4AC92:;
-    *(signed char *)D_00196280 = l_38;
-    l_28 = (((unsigned)*(int *)game_minutes) / 1440) - l_28;
-    *(int *)frame_checkpoint = 2000;
-    l_2C = 0;
-L4ACBF:;
-    if (l_2C < l_28) goto L4ACD1;
-    goto L4AD23;
-L4ACC9:;
-    l_2C++;
-    goto L4ACBF;
-L4ACD1:;
-    if (*(signed char *)D_001962A4 != 0) goto L4ACEC;
-    spfx_walk_effect_records(player_entity->children, (int)spfx_disease_daily);
-L4ACEC:;
-    *(int *)frame_checkpoint = 2001;
-    if (*(int *)player_death_timer < 0) return;
-    *(int *)frame_checkpoint = 2002;
-    weather_roll();
-    *(int *)frame_checkpoint = 2003;
-    func_000278E4();
-    goto L4ACC9;
-L4AD23:;
-    *(int *)frame_checkpoint = 2004;
-    if (l_28 == 0) goto L4AD38;
-    automap_purge_old_files();
-L4AD38:;
-    calendar_update();
-    if (*(int *)player_death_timer < 0) return;
-    *(int *)frame_checkpoint = 2005;
-    l_2C = 0;
-L4AD5B:;
-    if (((unsigned)l_2C) < a1) goto L4AD70;
-    goto L4AFA6;
-L4AD68:;
-    l_2C++;
-    goto L4AD5B;
-L4AD70:;
-    l_18++;
-    if (*(int *)D_001AA698 == 0) goto L4AD88;
-    if ((l_18 & 1023) == 0) goto L4AD8A;
-L4AD88:;
-    goto L4AD95;
-L4AD8A:;
-    travel_show_days_left(a1 - l_2C);
-L4AD95:;
-    *(int *)frame_checkpoint = 2006;
-    l_30 = (l_1C + l_2C) % 10080;
-    if (l_30 != 0) goto L4AE0E;
-    faction_politics_update(1);
-    l_30 = (l_1C + l_2C) % 54720;
-    if (l_30 != 0) goto L4AE0E;
-    *(int *)frame_checkpoint = 2008;
-    faction_politics_update(2);
-    *(int *)frame_checkpoint = 2009;
-    disease_start_cure_quest(0);
-    *(int *)frame_checkpoint = 2010;
-L4AE0E:;
-    if (((l_1C + l_2C) % 1440) != 0) goto L4AE42;
-    region_update_prices(((l_30 == 0) ? 2 : 0));
-L4AE42:;
-    l_30 = (l_1C + l_2C) % 161280;
-    if (l_30 != 0) goto L4AE62;
-    reputation_decay();
-L4AE62:;
-    l_30 = (l_1C + l_2C) % 120960;
-    if (l_30 != 0) goto L4AE87;
-    disease_start_cure_quest(1);
-L4AE87:;
-    *(int *)frame_checkpoint = 2013;
-    if (*(signed char *)D_001962A4 != 0) goto L4AEE8;
-    *(int *)frame_checkpoint = 2017;
-    spell_tick(player_entity);
-    spfx_walk_effect_records(player_entity, (int)func_0008AC9B);
-    D_00195AA8 = player_entity;
-    spfx_walk_effect_records(player_entity->children, (int)poison_tick);
-    fatigue_update();
-    *(int *)frame_checkpoint = 2018;
-L4AEE8:;
-    *(int *)frame_checkpoint = 2019;
-    sky_update_moons();
-    *(int *)frame_checkpoint = 2020;
-    func_0004B9A1();
-    if (*(signed char *)D_001962A5 == 0) goto L4AF14;
-    quests_run_all();
-L4AF14:;
-    *(int *)frame_checkpoint = 2022;
-    loan_due_penalty();
-    if (*(int *)player_death_timer < 0) return;
-    l_30 = 0;
-L4AF37:;
-    if (l_30 < *(int *)creature_count) goto L4AF4C;
-    goto L4AF94;
-L4AF44:;
-    l_30++;
-    goto L4AF37;
-L4AF4C:;
-    if ((int)D_00190504[l_30] == (-1768515946)) goto L4AF44;
-    spell_tick(D_00190504[l_30]);
-    D_00195AA8 = D_00190504[l_30];
-    spfx_walk_effect_records(D_00195AA8->children, (int)poison_tick);
-    goto L4AF44;
-L4AF94:;
-    if (*(int *)player_death_timer < 0) return;
-    goto L4AD68;
-L4AFA6:;
-    *(int *)frame_checkpoint = 2026;
-    guild_expire_blessings();
-    *(int *)frame_checkpoint = 2027;
-    l_2C = 0;
-L4AFC6:;
-    if (((unsigned)l_2C) < a1) goto L4AFD8;
-    goto L4AFED;
-L4AFD0:;
-    l_2C++;
-    goto L4AFC6;
-L4AFD8:;
-    encounter_tick(((*(int *)game_minutes - a1) + l_2C) + 1, 0);
-    goto L4AFD0;
-L4AFED:;
-    if (((int)(short)*(short *)(region_legal_reputation + (((int)(unsigned char)*(signed char *)current_region) * 80))) >= (-10)) goto L4B017;
-    if (rand_range(1, 100) < 5) goto L4B019;
-L4B017:;
-    goto L4B022;
-L4B019:;
-    if (*(signed char *)game_mode == 0) goto L4B024;
-L4B022:;
-    goto L4B032;
-L4B024:;
-    *(signed char *)crime_current = 7;
-    guards_summon(0);
-L4B032:;
-    if (((int)(unsigned char)(*(signed char *)(region_punishment_flags + (((int)(unsigned char)*(signed char *)current_region) * 80)) & 1)) == 0) goto L4B061;
-    if (rand_range(1, 100) < 10) goto L4B063;
-L4B061:;
-    goto L4B06C;
-L4B063:;
-    if (*(signed char *)game_mode == 0) goto L4B06E;
-L4B06C:;
-    goto L4B07C;
-L4B06E:;
-    *(signed char *)crime_current = 7;
-    guards_summon(0);
-L4B07C:;
-    *(int *)frame_checkpoint = 2028;
-    disease_lycanthrope_tick();
-    *(int *)frame_checkpoint = 2029;
-    if (*(signed char *)D_001962A4 != 0) goto L4B0A3;
-    disease_special_infection_tick();
-L4B0A3:;
-    spfx_expire_created_items();
-    *(signed char *)D_00196298 = 1;
-    *(int *)frame_checkpoint = 2030;
-}
+        l_1C = game_minutes;
+        l_18 = 0;
+        if (((unsigned)a1) > 200000) a1 = 1;
+        player_ailment_flags = 0;
+        l_28 = ((unsigned)game_minutes) / 1440;
+        l_24 = ((unsigned)game_minutes) / 10080;
+        game_minutes += a1;
+        l_20 = ((unsigned)game_minutes) % 1440;
+        if (l_20 > 360 && l_20 < 1080) {
+            l_38 = 1;
+        } else {
+            l_38 = 0;
+        }
+        D_00196280 = l_38;
+        l_28 = (((unsigned)game_minutes) / 1440) - l_28;
+        frame_checkpoint = 2000;
+        for (l_2C = 0; l_2C < l_28; l_2C++) {
+            if (D_001962A4 == 0) {
+                spfx_walk_effect_records(player_entity->children, (int)spfx_disease_daily);
+            }
+            frame_checkpoint = 2001;
+            if (player_death_timer < 0) return;
+            frame_checkpoint = 2002;
+            weather_roll();
+            frame_checkpoint = 2003;
+            func_000278E4();
+        }
+        frame_checkpoint = 2004;
+        if (l_28 != 0) automap_purge_old_files();
+        calendar_update();
+        if (player_death_timer < 0) return;
+        frame_checkpoint = 2005;
+        for (l_2C = 0; ((unsigned)l_2C) < a1; l_2C++) {
+            l_18++;
+            if (D_001AA698 != 0 && (l_18 & 1023) == 0) travel_show_days_left(a1 - l_2C);
+            frame_checkpoint = 2006;
+            l_30 = (l_1C + l_2C) % 10080;
+            if (l_30 == 0) {
+                faction_politics_update(1);
+                l_30 = (l_1C + l_2C) % 54720;
+                if (l_30 == 0) {
+                    frame_checkpoint = 2008;
+                    faction_politics_update(2);
+                    frame_checkpoint = 2009;
+                    disease_start_cure_quest(0);
+                    frame_checkpoint = 2010;
+                }
+            }
+            if (((l_1C + l_2C) % 1440) == 0) region_update_prices(((l_30 == 0) ? 2 : 0));
+            l_30 = (l_1C + l_2C) % 161280;
+            if (l_30 == 0) reputation_decay();
+            l_30 = (l_1C + l_2C) % 120960;
+            if (l_30 == 0) disease_start_cure_quest(1);
+            frame_checkpoint = 2013;
+            if (D_001962A4 == 0) {
+                frame_checkpoint = 2017;
+                spell_tick(player_entity);
+                spfx_walk_effect_records(player_entity, (int)func_0008AC9B);
+                D_00195AA8 = player_entity;
+                spfx_walk_effect_records(player_entity->children, (int)poison_tick);
+                fatigue_update();
+                frame_checkpoint = 2018;
+            }
+            frame_checkpoint = 2019;
+            sky_update_moons();
+            frame_checkpoint = 2020;
+            func_0004B9A1();
+            if (D_001962A5 != 0) quests_run_all();
+            frame_checkpoint = 2022;
+            loan_due_penalty();
+            if (player_death_timer < 0) return;
+            for (l_30 = 0; l_30 < creature_count; l_30++) {
+                if ((int)D_00190504[l_30] == (-1768515946)) continue;
+                spell_tick(D_00190504[l_30]);
+                D_00195AA8 = D_00190504[l_30];
+                spfx_walk_effect_records(D_00195AA8->children, (int)poison_tick);
+            }
+            if (player_death_timer < 0) return;
+        }
+        frame_checkpoint = 2026;
+        guild_expire_blessings();
+        frame_checkpoint = 2027;
+        for (l_2C = 0; ((unsigned)l_2C) < a1; l_2C++) {
+            encounter_tick(((game_minutes - a1) + l_2C) + 1, 0);
+        }
+        if (((int)(short)*(short *)(region_legal_reputation + (((int)(unsigned char)current_region) * 80))) < (-10) && rand_range(1, 100) < 5 && game_mode == 0) {
+            crime_current = 7;
+            guards_summon(0);
+        }
+        if (((int)(unsigned char)(region_punishment_flags[((int)(unsigned char)current_region) * 80] & 1)) != 0 && rand_range(1, 100) < 10 && game_mode == 0) {
+            crime_current = 7;
+            guards_summon(0);
+        }
+        frame_checkpoint = 2028;
+        disease_lycanthrope_tick();
+        frame_checkpoint = 2029;
+        if (D_001962A4 == 0) disease_special_infection_tick();
+        spfx_expire_created_items();
+        D_00196298 = 1;
+        frame_checkpoint = 2030;
+    }
 }
 
 void calendar_update(void)
@@ -357,13 +279,13 @@ void calendar_update(void)
     int l_1C;
     int l_18;
 
-    *(int *)calendar_year = (((unsigned)*(int *)game_minutes) / 518400) + 400;
-    *(int *)calendar_month = ((unsigned)(((unsigned)*(int *)game_minutes) % 518400)) / 43200;
-    *(int *)calendar_weekday = ((unsigned)(((unsigned)*(int *)game_minutes) / 1440)) % 7;
-    *(int *)calendar_hour = ((unsigned)(((unsigned)*(int *)game_minutes) / 60)) % 24;
-    *(int *)calendar_minute = ((unsigned)*(int *)game_minutes) % 60;
-    *(signed char *)D_00195F24 = ((unsigned)(((unsigned)*(int *)game_minutes) / 1440)) % 22;
-    *(signed char *)D_00195F25 = (((unsigned)*(int *)game_minutes) / 1440) & 15;
+    calendar_year = (((unsigned)game_minutes) / 518400) + 400;
+    calendar_month = ((unsigned)(((unsigned)game_minutes) % 518400)) / 43200;
+    calendar_weekday = ((unsigned)(((unsigned)game_minutes) / 1440)) % 7;
+    calendar_hour = ((unsigned)(((unsigned)game_minutes) / 60)) % 24;
+    calendar_minute = ((unsigned)game_minutes) % 60;
+    D_00195F24 = ((unsigned)(((unsigned)game_minutes) / 1440)) % 22;
+    D_00195F25 = (((unsigned)game_minutes) / 1440) & 15;
 }
 
 int player_in_daylight(void)
@@ -371,18 +293,13 @@ int player_in_daylight(void)
     int l_20;
     int l_1C;
 
-    l_1C = ((unsigned)*(int *)game_minutes) % 1440;
-    if (l_1C < 360) goto L4B1C3;
-    if (l_1C <= 1080) goto L4B1CC;
-L4B1C3:;
-    return 0;
-L4B1CC:;
-    if (((int)(unsigned char)*(signed char *)player_environment) != 1) goto L4B1E1;
-    l_20 = 1;
-    goto L4B1E8;
-L4B1E1:;
-    l_20 = 0;
-L4B1E8:;
+    l_1C = ((unsigned)game_minutes) % 1440;
+    if (l_1C < 360 || l_1C > 1080) return 0;
+    if (((int)player_environment) == 1) {
+        l_20 = 1;
+    } else {
+        l_20 = 0;
+    }
     return l_20;
 }
 
@@ -392,22 +309,21 @@ int player_in_temple(void)
     struct building *l_1C;
 
     l_1C = object_building(player_object->parent);
-    if (l_1C == 0) goto L4B247;
-    if (l_1C->type != 14) goto L4B238;
-    l_20 = 1;
-    goto L4B23F;
-L4B238:;
-    l_20 = 0;
-L4B23F:;
-    return l_20;
-L4B247:;
+    if (l_1C != 0) {
+        if (l_1C->type == 14) {
+            l_20 = 1;
+        } else {
+            l_20 = 0;
+        }
+        return l_20;
+    }
     return 0;
 }
 
 void func_0004B25B(struct record *a1)
 {
     if (a1->type != 8) return;
-    *(signed char *)itemmaker_slot_kinds = 1;
+    itemmaker_slot_kinds[0] = 1;
 }
 
 int building_is_open(struct building *a1)
@@ -418,88 +334,32 @@ int building_is_open(struct building *a1)
     struct membership *l_1C;
 
     l_24 = object_find_by_id(D_00195AC4, a1->id);
-    if (a1->faction_id != 108) goto L4B2CC;
-    if (guild_find_membership_by_kind(0) != 0) goto L4B2CE;
-L4B2CC:;
-    goto L4B2DA;
-L4B2CE:;
-    return 1;
-L4B2DA:;
-    if (a1->faction_id != 42) goto L4B2F9;
-    if (guild_find_membership_by_kind(3) != 0) goto L4B2FB;
-L4B2F9:;
-    goto L4B307;
-L4B2FB:;
-    return 1;
-L4B307:;
-    if (a1->faction_id != 41) goto L4B32B;
-    l_1C = guild_find_membership_by_kind(2);
-    if (l_1C != 0) goto L4B32D;
-L4B32B:;
-    goto L4B33C;
-L4B32D:;
-    if (l_1C->rank >= 6) goto L4B33E;
-L4B33C:;
-    goto L4B34A;
-L4B33E:;
-    return 1;
-L4B34A:;
-    if (a1->faction_id != 40) goto L4B36E;
-    l_1C = guild_find_membership_by_kind(1);
-    if (l_1C != 0) goto L4B370;
-L4B36E:;
-    goto L4B37F;
-L4B370:;
-    if (l_1C->rank >= 6) goto L4B381;
-L4B37F:;
-    goto L4B38D;
-L4B381:;
-    return 1;
-L4B38D:;
+    if (a1->faction_id == 108 && guild_find_membership_by_kind(0) != 0) return 1;
+    if (a1->faction_id == 42 && guild_find_membership_by_kind(3) != 0) return 1;
+    if (a1->faction_id == 41 && (l_1C = guild_find_membership_by_kind(2)) != 0 && l_1C->rank >= 6) {
+        return 1;
+    }
+    if (a1->faction_id == 40 && (l_1C = guild_find_membership_by_kind(1)) != 0 && l_1C->rank >= 6) {
+        return 1;
+    }
     l_20 = player_object->parent;
-L4B398:;
-    if (l_20 == 0) goto L4B3AD;
-    if (l_20->type != 43) goto L4B3AF;
-L4B3AD:;
-    goto L4B3BA;
-L4B3AF:;
-    l_20 = l_20->parent;
-    goto L4B398;
-L4B3BA:;
-    if (a1->type < 17) goto L4B3DA;
-    if (a1->type <= 20) goto L4B3DC;
-L4B3DA:;
-    goto L4B3E5;
-L4B3DC:;
-    if (*(signed char *)D_00196280 != 0) goto L4B3E7;
-L4B3E5:;
-    goto L4B400;
-L4B3E7:;
-    if ((a1->id & 65535) % 100 < 50) goto L4B402;
-L4B400:;
-    goto L4B40E;
-L4B402:;
-    return 1;
-L4B40E:;
-    if (a1->type <= 16) goto L4B427;
-    return 0;
-L4B427:;
-    l_28 = ((unsigned)(((unsigned)*(int *)game_minutes) % 1440)) / 60;
-    return (((((int)(unsigned char)*(signed char *)(building_open_hours + (a1->type * 2))) <= l_28) && (((int)(unsigned char)*(signed char *)(D_0017C5B9 + (a1->type * 2))) > l_28)) ? 1 : 0);
+    while (l_20 != 0 && l_20->type != 43) l_20 = l_20->parent;
+    if (a1->type >= 17 && a1->type <= 20 && D_00196280 != 0 && (a1->id & 65535) % 100 < 50) {
+        return 1;
+    }
+    if (a1->type > 16) return 0;
+    l_28 = ((unsigned)(((unsigned)game_minutes) % 1440)) / 60;
+    return (((((int)(unsigned char)building_open_hours[a1->type * 2]) <= l_28) && (((int)(unsigned char)D_0017C5B9[a1->type * 2]) > l_28)) ? 1 : 0);
 }
 
 int building_minutes_to_close(struct building *a1)
 {
     int l_1C;
 
-    l_1C = ((unsigned)(((unsigned)*(int *)game_minutes) % 1440)) / 60;
-    if (((int)(unsigned char)*(signed char *)(building_open_hours + (a1->type * 2))) > l_1C) goto L4B509;
-    if (((int)(unsigned char)*(signed char *)(D_0017C5B9 + (a1->type * 2))) > l_1C) goto L4B50B;
-L4B509:;
-    goto L4B53B;
-L4B50B:;
-    return (((int)(unsigned char)*(signed char *)(D_0017C5B9 + (a1->type * 2))) * 60) - (((unsigned)*(int *)game_minutes) % 1440);
-L4B53B:;
+    l_1C = ((unsigned)(((unsigned)game_minutes) % 1440)) / 60;
+    if (((int)(unsigned char)building_open_hours[a1->type * 2]) <= l_1C && ((int)(unsigned char)D_0017C5B9[a1->type * 2]) > l_1C) {
+        return (((int)(unsigned char)D_0017C5B9[a1->type * 2]) * 60) - (((unsigned)game_minutes) % 1440);
+    }
     return 0;
 }
 
@@ -522,18 +382,17 @@ void func_0004B5CF(void)
     int l_1C;
     struct building *l_18;
 
-    if (((int)(unsigned char)*(signed char *)player_environment) > 2) return;
+    if (((int)player_environment) > 2) return;
     l_18 = object_building(player_object->parent);
     if (l_18 == 0) return;
-    if (building_is_open(l_18) == 0) goto L4B636;
-    if (l_18->id == player_character->house) goto L4B629;
-    l_1C = 1;
-    goto L4B630;
-L4B629:;
-    l_1C = 0;
-L4B630:;
-    if (l_1C != 0) goto L4B638;
-L4B636:;
+    if (building_is_open(l_18) != 0) {
+        if (l_18->id != player_character->house) {
+            l_1C = 1;
+        } else {
+            l_1C = 0;
+        }
+        if (l_1C != 0) goto L4B638;
+    }
     goto L4B64F;
 L4B638:;
     object_foreach(player_object->parent->children, (int)func_0004B54F);
@@ -546,56 +405,36 @@ void reputation_decay(void)
 {
     int l_18;
 
-    if (*(signed char *)D_001962B0 != 0) goto L4B6D2;
-    l_18 = 0;
-L4B68C:;
-    if (l_18 < 62) goto L4B69C;
-    goto L4B6D2;
-L4B694:;
-    l_18++;
-    goto L4B68C;
-L4B69C:;
-    if (*(short *)(region_legal_reputation + (l_18 * 80)) <= 0) goto L4B6B7;
-    (*(short *)(region_legal_reputation + (l_18 * 80)))--;
-    goto L4B6D0;
-L4B6B7:;
-    if (*(short *)(region_legal_reputation + (l_18 * 80)) >= 0) goto L4B6D0;
-    (*(short *)(region_legal_reputation + (l_18 * 80)))++;
-L4B6D0:;
-    goto L4B694;
-L4B6D2:;
-    l_18 = 0;
-L4B6D9:;
-    if (l_18 < *(int *)faction_count) goto L4B6F1;
-    return;
-L4B6E9:;
-    l_18++;
-    goto L4B6D9;
-L4B6F1:;
-    if (factions[l_18].reputation <= 100) goto L4B719;
-    factions[l_18].reputation = 100;
-    goto L4B73F;
-L4B719:;
-    if (factions[l_18].reputation >= (-100)) goto L4B73F;
-    factions[l_18].reputation = 100;
-L4B73F:;
-    if (factions[l_18].reputation <= 0) goto L4B764;
-    factions[l_18].reputation--;
-    goto L4B787;
-L4B764:;
-    if (factions[l_18].reputation >= 0) goto L4B787;
-    factions[l_18].reputation++;
-L4B787:;
-    goto L4B6E9;
+    if (D_001962B0 == 0) {
+        for (l_18 = 0; l_18 < 62; l_18++) {
+            if (*(short *)(region_legal_reputation + (l_18 * 80)) > 0) {
+                (*(short *)(region_legal_reputation + (l_18 * 80)))--;
+            } else if (*(short *)(region_legal_reputation + (l_18 * 80)) < 0) {
+                (*(short *)(region_legal_reputation + (l_18 * 80)))++;
+            }
+        }
+    }
+    for (l_18 = 0; l_18 < faction_count; l_18++) {
+        if (factions[l_18].reputation > 100) {
+            factions[l_18].reputation = 100;
+        } else if (factions[l_18].reputation < (-100)) {
+            factions[l_18].reputation = 100;
+        }
+        if (factions[l_18].reputation > 0) {
+            factions[l_18].reputation--;
+        } else if (factions[l_18].reputation < 0) {
+            factions[l_18].reputation++;
+        }
+    }
 }
 
 void holiday_announce(void)
 {
     int l_18;
 
-    l_18 = holiday_today(*(int *)game_minutes, (int)(unsigned char)*(signed char *)current_region);
+    l_18 = holiday_today(game_minutes, (int)(unsigned char)current_region);
     if (l_18 == 0) return;
-    *(signed char *)D_0012B508 = 146;
+    D_0012B508 = 146;
     msgbox_show_rsc((int)(short)(l_18 + 8349), 1);
 }
 
@@ -605,60 +444,37 @@ void region_update_prices(int a1)
     int l_1C;
     struct faction *l_18;
 
-    l_20 = 0;
-L4B7FB:;
-    if (l_20 < 62) goto L4B80E;
-    return;
-L4B806:;
-    l_20++;
-    goto L4B7FB;
-L4B80E:;
-    l_18 = faction_find_type_in_region((int)(short)*(short *)&l_20, 7);
-    if (l_18 == 0) goto L4B806;
-    l_1C = (faction_find(510)->power - l_18->power) / 5;
-    l_1C = (l_1C + 50) - ((((int)(unsigned short)*(short *)(region_price_adjustment + (l_20 * 80))) - 1000) / 25);
-    if (rand_range(0, 100) >= l_1C) goto L4B8B5;
-    *(short *)(region_price_adjustment + (l_20 * 80)) = (((int)(unsigned short)*(short *)(region_price_adjustment + (l_20 * 80))) * 51) / 50;
-    goto L4B8E2;
-L4B8B5:;
-    *(short *)(region_price_adjustment + (l_20 * 80)) = (((int)(unsigned short)*(short *)(region_price_adjustment + (l_20 * 80))) * 49) / 50;
-L4B8E2:;
-    if (((int)(unsigned short)*(short *)(region_price_adjustment + (l_20 * 80))) <= 4000) goto L4B908;
-    *(short *)(region_price_adjustment + (l_20 * 80)) = 4000;
-    goto L4B92C;
-L4B908:;
-    if (((int)(unsigned short)*(short *)(region_price_adjustment + (l_20 * 80))) >= 250) goto L4B92C;
-    *(short *)(region_price_adjustment + (l_20 * 80)) = 250;
-L4B92C:;
-    if (((int)(unsigned short)*(short *)(region_price_adjustment + (l_20 * 80))) <= 2000) goto L4B952;
-    region_flag_set(l_20, 19);
-    goto L4B992;
-L4B952:;
-    if (((int)(unsigned short)*(short *)(region_price_adjustment + (l_20 * 80))) >= 500) goto L4B978;
-    region_flag_set(l_20, 20);
-    goto L4B992;
-L4B978:;
-    region_flag_clear(l_20, 19);
-    region_flag_clear(l_20, 20);
-L4B992:;
-    goto L4B806;
+    for (l_20 = 0; l_20 < 62; l_20++) {
+        l_18 = faction_find_type_in_region((int)(short)*(short *)&l_20, 7);
+        if (l_18 == 0) continue;
+        l_1C = (faction_find(510)->power - l_18->power) / 5;
+        l_1C = (l_1C + 50) - ((((int)(unsigned short)*(short *)(region_price_adjustment + (l_20 * 80))) - 1000) / 25);
+        if (rand_range(0, 100) < l_1C) {
+            *(short *)(region_price_adjustment + (l_20 * 80)) = (((int)(unsigned short)*(short *)(region_price_adjustment + (l_20 * 80))) * 51) / 50;
+        } else {
+            *(short *)(region_price_adjustment + (l_20 * 80)) = (((int)(unsigned short)*(short *)(region_price_adjustment + (l_20 * 80))) * 49) / 50;
+        }
+        if (((int)(unsigned short)*(short *)(region_price_adjustment + (l_20 * 80))) > 4000) {
+            *(short *)(region_price_adjustment + (l_20 * 80)) = 4000;
+        } else if (((int)(unsigned short)*(short *)(region_price_adjustment + (l_20 * 80))) < 250) {
+            *(short *)(region_price_adjustment + (l_20 * 80)) = 250;
+        }
+        if (((int)(unsigned short)*(short *)(region_price_adjustment + (l_20 * 80))) > 2000) {
+            region_flag_set(l_20, 19);
+        } else if (((int)(unsigned short)*(short *)(region_price_adjustment + (l_20 * 80))) < 500) {
+            region_flag_set(l_20, 20);
+        } else {
+            region_flag_clear(l_20, 19);
+            region_flag_clear(l_20, 20);
+        }
+    }
 }
 
 void func_0004B9A1(void)
 {
-    if (player_character->race <= 8) goto L4B9CD;
-    if (((int)(unsigned char)*(signed char *)player_environment) == 1) goto L4B9CF;
-L4B9CD:;
-    goto L4B9E8;
-L4B9CF:;
-    if (location_here_contains(player_object->x, player_object->z) != 0) goto L4B9EA;
-L4B9E8:;
-    goto L4B9FC;
-L4B9EA:;
-    if ((((unsigned)*(int *)game_minutes) % 30) == 0) goto L4B9FE;
-L4B9FC:;
-    return;
-L4B9FE:;
+    if (player_character->race <= 8 || ((int)player_environment) != 1 || location_here_contains(player_object->x, player_object->z) == 0 || (((unsigned)game_minutes) % 30) != 0) {
+        return;
+    }
     guards_summon(0);
 }
 
@@ -668,33 +484,26 @@ void loan_due_penalty(void)
     struct bank_account *l_18;
 
     l_18 = (bank_accounts)->data.bank_accounts;
-    l_1C = 0;
-L4BA2F:;
-    if (l_1C < 62) goto L4BA3F;
-    return;
-L4BA37:;
-    l_1C++;
-    goto L4BA2F;
-L4BA3F:;
-    if (l_18->loan_due == 0) goto L4BA37;
-    if (l_18->loan_due != *(int *)game_minutes) goto L4BA62;
-    *(short *)(region_legal_reputation + (l_1C * 80)) -= 5;
-L4BA62:;
-    goto L4BA37;
+    for (l_1C = 0; l_1C < 62; l_1C++) {
+        if (l_18->loan_due == 0) continue;
+        if (l_18->loan_due == game_minutes) {
+            *(short *)(region_legal_reputation + (l_1C * 80)) -= 5;
+        }
+    }
 }
 
 void quest_init_record_sizes(void)
 {
-    *(short *)qbn_record_sizes = 19;
-    *(short *)D_0019978A = 94;
-    *(short *)D_0019978C = 34;
-    *(short *)D_0019978E = 20;
-    *(short *)D_00199790 = 24;
-    *(short *)D_00199792 = 16;
-    *(short *)D_00199794 = 33;
-    *(short *)D_00199796 = 14;
-    *(short *)D_00199798 = 87;
-    *(short *)D_0019979A = 8;
+    qbn_record_sizes[0] = 19;
+    D_0019978A = 94;
+    D_0019978C = 34;
+    D_0019978E = 20;
+    D_00199790 = 24;
+    D_00199792 = 16;
+    D_00199794 = 33;
+    D_00199796 = 14;
+    D_00199798 = 87;
+    D_0019979A = 8;
 }
 
 void quests_run_all(void)
@@ -702,21 +511,18 @@ void quests_run_all(void)
     struct record *l_1C;
     struct record *l_18;
 
-    if (*(signed char *)D_001962A9 != 0) return;
+    if (D_001962A9 != 0) return;
     l_1C = D_00195A00->children;
-L4BB04:;
-    if (l_1C == 0) return;
-    l_18 = l_1C->next;
-    if (l_1C->type != 14) goto L4BB52;
-    D_00195D00 = l_1C;
-    D_00199780 = (struct quest *)((int)&l_1C->data.quest);
-    if (*(int *)quest_debug_data != 0) goto L4BB48;
-    *(int *)quest_debug_data = (int)D_00199780;
-L4BB48:;
-    quest_run_opcodes((int)D_00199780);
-L4BB52:;
-    l_1C = l_18;
-    goto L4BB04;
+    while (l_1C != 0) {
+        l_18 = l_1C->next;
+        if (l_1C->type == 14) {
+            D_00195D00 = l_1C;
+            D_00199780 = (struct quest *)((int)&l_1C->data.quest);
+            if (quest_debug_data == 0) quest_debug_data = (int)D_00199780;
+            quest_run_opcodes((int)D_00199780);
+        }
+        l_1C = l_18;
+    }
 }
 
 struct quest *quest_find_by_id(int a1)
@@ -725,17 +531,16 @@ struct quest *quest_find_by_id(int a1)
     struct quest *l_1C;
 
     l_20 = D_00195A00->children;
-L4BB80:;
-    if (l_20 == 0) goto L4BBC4;
-    if (l_20->type != 14) goto L4BBB9;
-    l_1C = &l_20->data.quest;
-    if (l_1C->id != a1) goto L4BBB9;
-    D_00199780 = l_1C;
-    return l_1C;
-L4BBB9:;
-    l_20 = l_20->next;
-    goto L4BB80;
-L4BBC4:;
+    while (l_20 != 0) {
+        if (l_20->type == 14) {
+            l_1C = &l_20->data.quest;
+            if (l_1C->id == a1) {
+                D_00199780 = l_1C;
+                return l_1C;
+            }
+        }
+        l_20 = l_20->next;
+    }
     return 0;
 }
 
@@ -744,22 +549,19 @@ void quests_raise_event_all(int a1, int a2)
     struct record *l_18;
     int l_14;
 
-    *(short *)quest_event_code = a1;
+    quest_event_code = a1;
     quest_event_object = (struct record *)a2;
     l_18 = D_00195A00->children;
-L4BC72:;
-    if (l_18 == 0) return;
-    if (l_18->type != 14) goto L4BC92;
-    quest_dispatch_event(&l_18->data.quest);
-L4BC92:;
-    l_18 = l_18->next;
-    goto L4BC72;
+    while (l_18 != 0) {
+        if (l_18->type == 14) quest_dispatch_event(&l_18->data.quest);
+        l_18 = l_18->next;
+    }
 }
 
 void quest_end(int a1)
 {
-    *(int *)quest_ended_id = current_quest->id;
+    quest_ended_id = current_quest->id;
     quest_faces_remove_quest((int)(unsigned char)(signed char)current_quest->id);
     quest_remove_objects((int)(unsigned char)(signed char)current_quest->id);
-    *(int *)quest_debug_data = 0;
+    quest_debug_data = 0;
 }

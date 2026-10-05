@@ -32,7 +32,7 @@ extern char *D_001832A4;
 extern unsigned char D_001860DA[];
 extern unsigned char D_00186104[];
 extern short D_00188208[];
-extern char text_buffer[];
+extern signed char text_buffer[];
 extern unsigned char D_001940D8;
 extern struct node *wagon_container;
 extern int player_object;
@@ -131,8 +131,8 @@ void func_00095EDB(void)
     gold_add(D_001AA454);
     D_0012B508 = 144;
     func_000A0ED9(1688, D_0017704C);
-    mc_sprintf(text_buffer, D_001832A4, D_001AA454);
-    msgbox_show_string(text_buffer, 1);
+    mc_sprintf(((char *)text_buffer), D_001832A4, D_001AA454);
+    msgbox_show_string(((char *)text_buffer), 1);
 }
 
 void inv_equip_item(char *obj)

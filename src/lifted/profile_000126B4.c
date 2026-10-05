@@ -10,11 +10,7 @@ extern int profile_get_number(int, ...);
 
 int profile_get_item_number(int a1, int a2, int a3)
 {
-    if ((short)profile_find_item(a1, a2) != 0) goto L126DD;
-    return 0;
-L126DD:;
-    if ((short)profile_get_number(a1, a3) != 0) goto L126FB;
-    return 0;
-L126FB:;
+    if ((short)profile_find_item(a1, a2) == 0) return 0;
+    if ((short)profile_get_number(a1, a3) == 0) return 0;
     return 1;
 }

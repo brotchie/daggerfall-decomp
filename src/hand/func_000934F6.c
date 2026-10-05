@@ -1,21 +1,21 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x000934F6 */
-extern char screen_buffer[];
+extern int screen_buffer;
 extern char D_0017704C[];
 extern char D_001770B0[];
 extern char D_001770B3[];
 extern char D_001770B8[];
-extern char text_buffer[];
+extern signed char text_buffer[];
 extern char D_00195AA8[];
 extern char inv_right_container[];
-extern char D_00195B80[];
-extern char game_minutes[];
-extern char trade_mode[];
-extern char D_0019626F[];
-extern char game_mode[];
-extern char D_001AA420[];
+extern int D_00195B80;
+extern int game_minutes;
+extern int trade_mode;
+extern unsigned char D_0019626F;
+extern signed char game_mode;
+extern int D_001AA420;
 extern char inv_selected_item[];
 extern char inv_left_container[];
-extern char D_001AA600[];
+extern int D_001AA600;
 struct Rect { short x0, y0, x1, y1; char pad[4]; };
 
 extern void text_draw_colored(char *, short, short, int, unsigned char);
@@ -29,10 +29,10 @@ extern int func_000A0ED9(int, char *);
 extern int mc_sprintf(char *, ...);
 
 
-#define SCREEN (*(char **)screen_buffer)
-#define BUFS ((char **)D_001AA420)
-#define MODE (*(unsigned char *)game_mode)
-#define MODE2 (*(unsigned char *)D_0019626F)
+#define SCREEN (*(char **)&screen_buffer)
+#define BUFS ((char **)&D_001AA420)
+#define MODE ((unsigned char)game_mode)
+#define MODE2 (D_0019626F)
 #define U16(p, o) (*(unsigned short *)((p) + (o)))
 
 int inv_draw_item_cell(char *a1, short a2, struct Rect *a3)
@@ -73,7 +73,7 @@ int inv_draw_item_cell(char *a1, short a2, struct Rect *a3)
         func_00093DCB(380, 7, a3, a2);
     if (U16(a1, 21) & 32)
         func_00093DCB(380, 6, a3, a2);
-    *(char **)D_00195B80 = *(char **)D_001AA600 + (*(unsigned char *)(l_38 + 56) << 8);
+    *(char **)&D_00195B80 = *(char **)&D_001AA600 + (*(unsigned char *)(l_38 + 56) << 8);
     if (U16(l_38, 32) == 3 && U16(l_38, 34) == 8) {
         l_40++;
         (*(short *)(l_38 + 50))++;
@@ -83,23 +83,23 @@ int inv_draw_item_cell(char *a1, short a2, struct Rect *a3)
     else
         inv_draw_item_image(l_38, a3, a2);
     *(short *)(l_38 + 50) -= l_40;
-    *(char **)D_00195B80 = *(char **)D_001AA600;
+    *(char **)&D_00195B80 = *(char **)&D_001AA600;
     if (U16(l_38, 32) == 3 && U16(l_38, 34) == 18) {
         func_000A0ED9(723, D_0017704C);
-        mc_sprintf(text_buffer, D_001770B0, *(unsigned char *)(l_38 + 49));
-        text_draw_colored(text_buffer, a3[a2].x0 + 3, a3[a2].y0 + 2, 145, 156);
+        mc_sprintf(((char *)text_buffer), D_001770B0, *(unsigned char *)(l_38 + 49));
+        text_draw_colored(((char *)text_buffer), a3[a2].x0 + 3, a3[a2].y0 + 2, 145, 156);
     }
-    if (*(int *)trade_mode == 3 && *(unsigned char *)a1 == 54) {
-        if (*(unsigned *)game_minutes >= *(unsigned *)(a1 + 43)) {
+    if (trade_mode == 3 && *(unsigned char *)a1 == 54) {
+        if ((unsigned)game_minutes >= *(unsigned *)(a1 + 43)) {
             *(short *)(l_38 + 44) = *(short *)(l_38 + 46);
-            mc_strncpy(text_buffer, D_001770B3, 160, D_0017704C, 732);
+            mc_strncpy(((char *)text_buffer), D_001770B3, 160, D_0017704C, 732);
         } else {
-            l_28 = (*(unsigned *)(a1 + 43) - *(unsigned *)game_minutes) / 1440;
+            l_28 = (*(unsigned *)(a1 + 43) - (unsigned)game_minutes) / 1440;
             if (l_28 == 0) l_28++;
             func_000A0ED9(738, D_0017704C);
-            mc_sprintf(text_buffer, D_001770B8, l_28);
+            mc_sprintf(((char *)text_buffer), D_001770B8, l_28);
         }
-        text_draw_colored(text_buffer, a3[a2].x0 + 3, a3[a2].y0 + 2, 145, 156);
+        text_draw_colored(((char *)text_buffer), a3[a2].x0 + 3, a3[a2].y0 + 2, 145, 156);
     }
     return 1;
 }

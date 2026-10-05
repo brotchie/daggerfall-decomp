@@ -6,26 +6,14 @@
 
 short func_0008269B(int a1)
 {
-    if (((int)(unsigned char)*(signed char *)((char *)a1)) < 48) goto L826CA;
-    if (((int)(unsigned char)*(signed char *)((char *)a1)) <= 57) goto L826CC;
-L826CA:;
-    goto L826DE;
-L826CC:;
-    return ((unsigned short)(unsigned char)*(signed char *)((char *)a1)) - 48;
-L826DE:;
-    if (((int)(unsigned char)*(signed char *)((char *)a1)) < 65) goto L826FC;
-    if (((int)(unsigned char)*(signed char *)((char *)a1)) <= 90) goto L826FE;
-L826FC:;
-    goto L8270D;
-L826FE:;
-    return ((unsigned short)(unsigned char)*(signed char *)((char *)a1)) - 55;
-L8270D:;
-    if (((int)(unsigned char)*(signed char *)((char *)a1)) < 97) goto L8272B;
-    if (((int)(unsigned char)*(signed char *)((char *)a1)) <= 97) goto L8272D;
-L8272B:;
-    goto L8273C;
-L8272D:;
-    return ((unsigned short)(unsigned char)*(signed char *)((char *)a1)) - 87;
-L8273C:;
+    if (((int)(unsigned char)*(signed char *)((char *)a1)) >= 48 && ((int)(unsigned char)*(signed char *)((char *)a1)) <= 57) {
+        return ((unsigned short)(unsigned char)*(signed char *)((char *)a1)) - 48;
+    }
+    if (((int)(unsigned char)*(signed char *)((char *)a1)) >= 65 && ((int)(unsigned char)*(signed char *)((char *)a1)) <= 90) {
+        return ((unsigned short)(unsigned char)*(signed char *)((char *)a1)) - 55;
+    }
+    if (((int)(unsigned char)*(signed char *)((char *)a1)) >= 97 && ((int)(unsigned char)*(signed char *)((char *)a1)) <= 97) {
+        return ((unsigned short)(unsigned char)*(signed char *)((char *)a1)) - 87;
+    }
     return 0;
 }

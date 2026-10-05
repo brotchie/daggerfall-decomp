@@ -4,8 +4,8 @@ extern int dungeon_water_level;
 extern char D_00176C94[];       /* __FILE__ */
 extern char D_00176CC9[];
 extern int D_00187F2C;
-extern char text_buffer[];
-extern char text_rsc_buffer[];
+extern signed char text_buffer[];
+extern signed char text_rsc_buffer[];
 extern unsigned D_0019599C;
 extern struct record *D_00195AC4;
 extern struct location *current_location;
@@ -80,12 +80,12 @@ void town_load(int id)
         case 10:
         case 12:
             parse_rsc_text(location_here->dungeon_type + 520, 0, 0);
-            hud_message_add(text_rsc_buffer);
+            hud_message_add(((char *)text_rsc_buffer));
             break;
         default:
             func_000A0ED9(401, D_00176C94);
-            mc_sprintf(text_buffer, D_00176CC9, current_location->name);
-            hud_message_add(text_buffer);
+            mc_sprintf(((char *)text_buffer), D_00176CC9, current_location->name);
+            hud_message_add(((char *)text_buffer));
             break;
         }
     }

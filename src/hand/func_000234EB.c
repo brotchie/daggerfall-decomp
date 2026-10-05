@@ -3,22 +3,22 @@
 
 struct bf8_4_1 { unsigned char _:4; unsigned char f:1; };
 struct bf8_5_1 { unsigned char _:5; unsigned char f:1; };
-extern char player_environment[];
+extern unsigned char player_environment;
 extern char D_00179F48[];
-extern char D_001940D7[];
-extern char player_motion_flags[];
+extern unsigned char D_001940D7;
+extern signed char player_motion_flags;
 extern struct record *player_object;
 extern struct character *player_character;
 extern char D_00195C70[];
 extern char D_00195CB8[];
-extern char D_00195CD4[];
-extern char D_00195CD8[];
-extern char D_00195F5A[];
-extern char player_on_ground[];
-extern char D_00196296[];
-extern char collide_candidate_count[];
-extern char D_00196D4C[];
-extern char D_00196D50[];
+extern int D_00195CD4;
+extern int D_00195CD8;
+extern short D_00195F5A;
+extern signed char player_on_ground;
+extern signed char D_00196296;
+extern int collide_candidate_count;
+extern int D_00196D4C;
+extern int D_00196D50;
 extern char collide_flags[];
 extern int func_0002294E(struct record *, int, struct move_request *);
 extern void collide_for_each_nearby(struct record *, int);
@@ -44,7 +44,7 @@ struct planes {
     struct plane p[1];
 };
 
-#define PLANES (*(struct planes **)D_00196D50)
+#define PLANES (((struct planes *)D_00196D50))
 #define PL (PLANES->p)
 #define FLAGS (*(short *)collide_flags)
 
@@ -73,22 +73,22 @@ int collide_move_player(struct record *a1, int a2, struct move_request *a3, int 
 
     l_34 = 0;
     *(int *)D_00195CB8 = *(int *)D_00195C70 = 0;
-    *(short *)D_00195F5A = 10000;
-    *(int *)D_00195CD8 = *(int *)D_00195CD4 = 0;
-    *(int *)D_00196D50 = 0;
-    *(int *)collide_candidate_count = 0;
-    (*(struct vec3 **)D_00196D4C = (struct vec3 *)D_00179F48)->x = a3->x;
-    (*(struct vec3 **)D_00196D4C)->y = a3->y;
-    (*(struct vec3 **)D_00196D4C)->z = a3->z;
+    D_00195F5A = 10000;
+    D_00195CD8 = D_00195CD4 = 0;
+    D_00196D50 = 0;
+    collide_candidate_count = 0;
+    (*(struct vec3 **)&D_00196D4C = (struct vec3 *)D_00179F48)->x = a3->x;
+    (((struct vec3 *)D_00196D4C))->y = a3->y;
+    (((struct vec3 *)D_00196D4C))->z = a3->z;
     collide_for_each_nearby(a1, (int)func_0002325A);
-    if (!((player_character->conditions & 0x8) || *(int *)collide_candidate_count != 0 || *(unsigned char *)player_environment == 1))
+    if (!((player_character->conditions & 0x8) || collide_candidate_count != 0 || player_environment == 1))
         return FLAGS = 16;
     l_14 = FLAGS;
-    *(char *)player_on_ground = 1;
+    player_on_ground = 1;
     l_44 = func_0002294E(a1, a2, a3);
-    *(unsigned char *)D_001940D7 &= 223;
-    if (*(char *)player_on_ground != 0 && *(char *)D_00196296 != 0)
-        *(char *)D_00196296 = 0;
+    D_001940D7 &= 223;
+    if ((char)player_on_ground != 0 && (char)D_00196296 != 0)
+        D_00196296 = 0;
     if (*(int *)D_00195CB8 != 0 && (l_10 = (short *)func_000657B2(*(int *)D_00195CB8)) != 0) {
         if (l_10[0] != 0 || l_10[2] != 0) {
             a3->x += l_10[0];
@@ -110,7 +110,7 @@ int collide_move_player(struct record *a1, int a2, struct move_request *a3, int 
     if (*(int *)D_00195C70 != 0)
         automap_mark_seen(*(int *)D_00195C70);
     if (l_44 & 2)
-        *(short *)D_00195F5A = 0;
+        D_00195F5A = 0;
     if (a1 == player_object && ((struct bf8_5_1 *)&player_motion_flags)->f)
         return 0;
     if (!(l_44 & 10) || !(l_14 & 4))
@@ -119,7 +119,7 @@ int collide_move_player(struct record *a1, int a2, struct move_request *a3, int 
     l_5C.y = a3->y - a1->y;
     l_5C.z = a3->z - a1->z;
     func_0014BDDD((int)&l_5C);
-    if (*(int *)D_00196D50 == 0)
+    if (D_00196D50 == 0)
         return 1;
     if (PLANES->count > 1) {
         l_24 = 0;
@@ -151,15 +151,15 @@ int collide_move_player(struct record *a1, int a2, struct move_request *a3, int 
     a3->x = a1->x + l_30;
     a3->y = a1->y + l_2C;
     a3->z = a1->z + l_28;
-    *(short *)D_00195F5A = func_0009DEAC(l_1C >> 16);
+    D_00195F5A = func_0009DEAC(l_1C >> 16);
     if (l_30 != 0 || l_2C != 0 || l_28 != 0) {
-        *(int *)D_00195CD8 = *(int *)D_00195CD4 = 0;
+        D_00195CD8 = D_00195CD4 = 0;
         l_14 = FLAGS;
-        *(char *)player_on_ground = 1;
+        player_on_ground = 1;
         l_44 = func_0002294E(a1, a2, a3);
-        *(unsigned char *)D_001940D7 &= 223;
-        if (*(char *)player_on_ground != 0 && *(char *)D_00196296 != 0)
-            *(char *)D_00196296 = 0;
+        D_001940D7 &= 223;
+        if ((char)player_on_ground != 0 && (char)D_00196296 != 0)
+            D_00196296 = 0;
         if (*(int *)D_00195CB8 != 0)
             automap_mark_seen(*(int *)D_00195CB8);
         if (*(int *)D_00195C70 != 0)

@@ -10,7 +10,7 @@ extern char inv_mode_buttons[];
 extern char inv_buttons[];
 extern char D_00188569[];
 extern char D_001885A5[];
-extern char text_buffer[];
+extern signed char text_buffer[];
 extern unsigned char player_motion_flags;
 extern int wagon_container;
 extern char *D_00195B64;
@@ -84,8 +84,8 @@ void inventory_draw(void)
             val = 0;
         else
             val = D_00195D2C;
-        text_draw_colored(func_000A0DD9(D_00195D2C, text_buffer, 10), 77, 15, 145, 156);
-        text_draw_colored(func_000A0DD9(gold_total_alias(), text_buffer, 10), 107, 15, 145, 156);
+        text_draw_colored(func_000A0DD9(D_00195D2C, ((char *)text_buffer), 10), 77, 15, 145, 156);
+        text_draw_colored(func_000A0DD9(gold_total_alias(), ((char *)text_buffer), 10), 107, 15, 145, 156);
     }
     inv_draw_armor_values();
     inv_draw_left_list(D_00188569);

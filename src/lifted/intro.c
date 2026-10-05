@@ -2,8 +2,8 @@
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
 
-extern char mouse_buttons[];
-extern char screen_buffer[];
+extern signed char mouse_buttons;
+extern int screen_buffer;
 extern char D_00170B7B[];
 extern char D_00170B88[];
 extern char D_00170C1B[];
@@ -33,20 +33,12 @@ void intro_play_logo(void)
     int l_1C;
     int l_18;
 
-L3A333:;
-    if (*(signed char *)mouse_buttons == 0) goto L3A343;
-    func_0012B136();
-    goto L3A333;
-L3A343:;
+    while (mouse_buttons != 0) func_0012B136();
     l_18 = disk_resolve_path((int)D_00170B7B);
     func_000C1500(l_18, 0, 0, 1);
     mc_memset(655360, 0, 64000, (int)D_00170B88, 34, 4);
-    mc_memset(*(int *)screen_buffer, 0, 64000, (int)D_00170B88, 35, 4);
-L3A395:;
-    if (*(signed char *)mouse_buttons == 0) goto L3A3A5;
-    func_0012B136();
-    goto L3A395;
-L3A3A5:;
+    mc_memset(screen_buffer, 0, 64000, (int)D_00170B88, 35, 4);
+    while (mouse_buttons != 0) func_0012B136();
     mc_memset(655360, 0, 64000, (int)D_00170B88, 39, 4);
     palette_restore();
 }
@@ -56,33 +48,21 @@ void intro_play_movie(void)
     int l_18;
 
     mc_memset(655360, 0, 64000, (int)D_00170B88, 358, 4);
-L3AF6A:;
-    if (*(signed char *)mouse_buttons == 0) goto L3AF7A;
-    func_0012B136();
-    goto L3AF6A;
-L3AF7A:;
+    while (mouse_buttons != 0) func_0012B136();
     l_18 = disk_resolve_path((int)D_00170C1B);
     func_000C1500(l_18, 0, 0, 1);
     mc_memset(655360, 0, 64000, (int)D_00170B88, 363, 4);
-    mc_memset(*(int *)screen_buffer, 0, 64000, (int)D_00170B88, 364, 4);
-L3AFD2:;
-    if (*(signed char *)mouse_buttons == 0) goto L3AFE2;
-    func_0012B136();
-    goto L3AFD2;
-L3AFE2:;
+    mc_memset(screen_buffer, 0, 64000, (int)D_00170B88, 364, 4);
+    while (mouse_buttons != 0) func_0012B136();
     l_18 = disk_resolve_path((int)D_00170C28);
     func_000C1500(l_18, 0, 0, 1);
     mc_memset(655360, 0, 64000, (int)D_00170B88, 369, 4);
-    mc_memset(*(int *)screen_buffer, 0, 64000, (int)D_00170B88, 370, 4);
-L3B03A:;
-    if (*(signed char *)mouse_buttons == 0) goto L3B04A;
-    func_0012B136();
-    goto L3B03A;
-L3B04A:;
+    mc_memset(screen_buffer, 0, 64000, (int)D_00170B88, 370, 4);
+    while (mouse_buttons != 0) func_0012B136();
     l_18 = disk_resolve_path((int)D_00170C35);
     func_000C1500(l_18, 32, 0, 1);
     mc_memset(655360, 0, 64000, (int)D_00170B88, 375, 4);
-    mc_memset(*(int *)screen_buffer, 0, 64000, (int)D_00170B88, 376, 4);
+    mc_memset(screen_buffer, 0, 64000, (int)D_00170B88, 376, 4);
     palette_restore();
 }
 

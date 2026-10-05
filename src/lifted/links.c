@@ -3,22 +3,22 @@
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
 
-extern char D_00147954[];
+extern int D_00147954;
 extern char D_00175962[];
-extern char text_rsc_buffer[];
-extern char D_00190FE5[];
+extern signed char text_rsc_buffer[];
+extern signed char D_00190FE5[];
 extern struct record *player_entity;
 extern struct record *D_00195AC4;
 extern struct spell *spell_records;
 extern struct character *player_character;
-extern char D_00195C44[];
+extern int D_00195C44;
 extern char D_00199D78[];
-extern char D_00199D7B[];
-extern char D_00199D84[];
+extern signed char D_00199D7B[];
+extern signed char D_00199D84[];
 extern char D_00199D9B[];
-extern char active_links[];
-extern char link_count[];
-extern char active_link_count[];
+extern int active_links[];
+extern int link_count;
+extern int active_link_count;
 
 extern int func_000658CA(unsigned short, unsigned short);
 extern int hud_message_add(int);
@@ -41,79 +41,44 @@ void links_save(int a1)
     int l_1C;
     int l_18;
 
-    if (*(int *)active_link_count >= 0) goto L6435B;
-    *(int *)active_link_count = 0;
-L6435B:;
-    mc_memcpy(*(int *)D_00147954, (int)D_00199D78, *(int *)link_count * 39, (int)D_00175962, 78, 4);
-    l_1C = *(int *)D_00147954;
-    l_20 = 0;
-L64389:;
-    if (l_20 < *(int *)link_count) goto L6439E;
-    goto L643C4;
-L64396:;
-    l_20++;
-    goto L64389;
-L6439E:;
-    if (*(int *)((char *)((l_20 * 39) + l_1C) + 35) == 0) goto L643C2;
-    *(int *)((char *)((l_20 * 39) + l_1C) + 35) = *(int *)(*(char **)((char *)((l_20 * 39) + l_1C) + 35) + 31);
-L643C2:;
-    goto L64396;
-L643C4:;
-    write(a1, (int)link_count, 4);
-    write(a1, l_1C, *(int *)link_count * 39);
-    write(a1, (int)active_link_count, 4);
-    l_18 = *(int *)D_00147954;
-    l_20 = 0;
-L64409:;
-    if (l_20 < *(int *)active_link_count) goto L6441E;
-    goto L64449;
-L64416:;
-    l_20++;
-    goto L64409;
-L6441E:;
-    *(int *)((char *)((l_20 << 2) + l_18)) = ((unsigned)(*(int *)(active_links + (l_20 << 2)) - ((int)D_00199D78))) / 39;
-    goto L64416;
-L64449:;
-    write(a1, l_18, *(int *)active_link_count << 2);
+    if (active_link_count < 0) active_link_count = 0;
+    mc_memcpy(D_00147954, (int)D_00199D78, link_count * 39, (int)D_00175962, 78, 4);
+    l_1C = D_00147954;
+    for (l_20 = 0; l_20 < link_count; l_20++) {
+        if (*(int *)((char *)((l_20 * 39) + l_1C) + 35) != 0) {
+            *(int *)((char *)((l_20 * 39) + l_1C) + 35) = *(int *)(*(char **)((char *)((l_20 * 39) + l_1C) + 35) + 31);
+        }
+    }
+    write(a1, (int)&link_count, 4);
+    write(a1, l_1C, link_count * 39);
+    write(a1, (int)&active_link_count, 4);
+    l_18 = D_00147954;
+    for (l_20 = 0; l_20 < active_link_count; l_20++) {
+        *(int *)((char *)((l_20 << 2) + l_18)) = ((unsigned)(active_links[l_20] - ((int)D_00199D78))) / 39;
+    }
+    write(a1, l_18, active_link_count << 2);
 }
 
 void links_load(int a1)
 {
     int l_18;
 
-    func_000A00CB(a1, (int)link_count, 4);
-    func_000A00CB(a1, (int)D_00199D78, *(int *)link_count * 39);
-    l_18 = 0;
-L644A5:;
-    if (l_18 < *(int *)link_count) goto L644BA;
-    goto L64506;
-L644B2:;
-    l_18++;
-    goto L644A5;
-L644BA:;
-    if (((int)(unsigned char)*(signed char *)(D_00199D7B + (l_18 * 39))) != 108) goto L644D9;
-    *(signed char *)(D_00199D7B + (l_18 * 39)) = 100;
-L644D9:;
-    if (*(int *)(D_00199D9B + (l_18 * 39)) == 0) goto L64504;
-    *(int *)(D_00199D9B + (l_18 * 39)) = (int)object_find_by_id(D_00195AC4, *(int *)(D_00199D9B + (l_18 * 39)));
-L64504:;
-    goto L644B2;
-L64506:;
-    func_000A00CB(a1, (int)active_link_count, 4);
-    if (*(int *)active_link_count >= 0) goto L6452B;
-    *(int *)active_link_count = 0;
-L6452B:;
-    func_000A00CB(a1, (int)active_links, *(int *)active_link_count << 2);
-    l_18 = 0;
-L64548:;
-    if (l_18 < *(int *)active_link_count) goto L6455D;
-    return;
-L64555:;
-    l_18++;
-    goto L64548;
-L6455D:;
-    *(int *)(active_links + (l_18 << 2)) = ((int)D_00199D78) + (*(int *)(active_links + (l_18 << 2)) * 39);
-    goto L64555;
+    func_000A00CB(a1, (int)&link_count, 4);
+    func_000A00CB(a1, (int)D_00199D78, link_count * 39);
+    for (l_18 = 0; l_18 < link_count; l_18++) {
+        if (((int)(unsigned char)D_00199D7B[l_18 * 39]) == 108) {
+            D_00199D7B[l_18 * 39] = 100;
+        }
+        if (*(int *)(D_00199D9B + (l_18 * 39)) != 0) {
+            *(int *)(D_00199D9B + (l_18 * 39)) = (int)object_find_by_id(D_00195AC4, *(int *)(D_00199D9B + (l_18 * 39)));
+        }
+    }
+    func_000A00CB(a1, (int)&active_link_count, 4);
+    if (active_link_count < 0) active_link_count = 0;
+    func_000A00CB(a1, (int)active_links, active_link_count << 2);
+    for (l_18 = 0; l_18 < active_link_count; l_18++) {
+        active_links[l_18] = ((int)D_00199D78) + (active_links[l_18] * 39);
+    }
 }
 
 void link_show_text(int a1)
@@ -121,28 +86,17 @@ void link_show_text(int a1)
     int l_1C;
     int l_18;
 
-    parse_rsc_text_copy(a1, *(int *)D_00195C44);
-    l_1C = *(int *)D_00195C44;
-L65333:;
-    if (*(signed char *)((char *)l_1C) == 0) return;
-    l_18 = l_1C;
-L65341:;
-    if (*(signed char *)((char *)l_18) == 0) goto L6535A;
-    if (((int)(unsigned char)*(signed char *)((char *)l_18)) != 252) goto L6535C;
-L6535A:;
-    goto L6536D;
-L6535C:;
-    if (((int)(unsigned char)*(signed char *)((char *)l_18)) != 253) goto L6536F;
-L6536D:;
-    goto L65377;
-L6536F:;
-    l_18++;
-    goto L65341;
-L65377:;
-    *(signed char *)((char *)l_18) = 0;
-    hud_message_add(l_1C);
-    l_1C = l_18 + 1;
-    goto L65333;
+    parse_rsc_text_copy(a1, D_00195C44);
+    l_1C = D_00195C44;
+    while (*(signed char *)((char *)l_1C) != 0) {
+        l_18 = l_1C;
+        while (*(signed char *)((char *)l_18) != 0 && ((int)(unsigned char)*(signed char *)((char *)l_18)) != 252 && ((int)(unsigned char)*(signed char *)((char *)l_18)) != 253) {
+            l_18++;
+        }
+        *(signed char *)((char *)l_18) = 0;
+        hud_message_add(l_1C);
+        l_1C = l_18 + 1;
+    }
 }
 
 int link_answer_matches(int a1, int a2)
@@ -152,31 +106,17 @@ int link_answer_matches(int a1, int a2)
 
     parse_rsc_text(a1, 0, 0);
     l_18 = func_000A0DF4((int)text_rsc_buffer);
+    for (l_1C = 1; l_1C < l_18; l_1C++) {
+        if (((int)(unsigned char)text_rsc_buffer[l_1C]) == 44 || ((int)(unsigned char)text_rsc_buffer[l_1C]) == 34) {
+            text_rsc_buffer[l_1C] = 0;
+        }
+    }
+    D_00190FE5[l_1C] = 0;
     l_1C = 1;
-L653CB:;
-    if (l_1C < l_18) goto L653DD;
-    goto L6540F;
-L653D5:;
-    l_1C++;
-    goto L653CB;
-L653DD:;
-    if (((int)(unsigned char)*(signed char *)(text_rsc_buffer + l_1C)) == 44) goto L65403;
-    if (((int)(unsigned char)*(signed char *)(text_rsc_buffer + l_1C)) != 34) goto L6540D;
-L65403:;
-    *(signed char *)(text_rsc_buffer + l_1C) = 0;
-L6540D:;
-    goto L653D5;
-L6540F:;
-    *(signed char *)(D_00190FE5 + l_1C) = 0;
-    l_1C = 1;
-L65420:;
-    if (*(signed char *)(text_rsc_buffer + l_1C) == 0) goto L6545C;
-    if (stricmp(((int)text_rsc_buffer) + l_1C, a2) != 0) goto L65449;
-    return 1;
-L65449:;
-    l_1C += func_000A0DF4(((int)text_rsc_buffer) + l_1C) + 1;
-    goto L65420;
-L6545C:;
+    while (text_rsc_buffer[l_1C] != 0) {
+        if (stricmp(((int)text_rsc_buffer) + l_1C, a2) == 0) return 1;
+        l_1C += func_000A0DF4(((int)text_rsc_buffer) + l_1C) + 1;
+    }
     return 0;
 }
 
@@ -202,104 +142,80 @@ void link_start(struct link *a1)
 
     a1->flags &= 250;
     switch (a1->action) {
-case 1:
-    if (a1->duration == 0) goto L65569;
-    a1->speed = (a1->magnitude << 16) / a1->duration;
-    goto L65579;
-L65569:;
-    a1->speed = a1->magnitude << 16;
-L65579:;
-    if (((int)(unsigned char)(a1->flags & 2)) == 0) goto L65590;
-    a1->speed = -a1->speed;
-L65590:;
-    l_1C = 1132;
-    a1->start_tick = *(int *)((char *)l_1C);
-    switch (a1->axis - 1) {
-    goto L655FC;
-case 0:
-case 1:
-    a1->start = a1->object->x;
-    goto L655FC;
-case 2:
-case 3:
-    a1->start = a1->object->y;
-    goto L655FC;
-case 4:
-case 5:
-    a1->start = a1->object->z;
-default:
-L655FC:;
-    return;
-}
-case 8:
-    if (a1->duration == 0) goto L6562B;
-    a1->speed = (a1->magnitude << 16) / a1->duration;
-    goto L6563B;
-L6562B:;
-    a1->speed = a1->magnitude << 16;
-L6563B:;
-    if (((int)(unsigned char)(a1->flags & 2)) == 0) goto L65652;
-    a1->speed = -a1->speed;
-L65652:;
-    l_18 = 1132;
-    a1->start_tick = *(int *)((char *)l_18);
-    if (((int)(unsigned char)(a1->flags & 32)) != 0) goto L6569E;
-    l_20 = func_000658CA(a1->object->image2, a1->object->image);
-    if (l_20 != 0) goto L656A0;
-L6569E:;
-    goto L656C7;
-L656A0:;
-    a1->flags |= 32;
-    if (((int)(unsigned char)(a1->axis & 1)) == 0) goto L656BE;
-    l_20++;
-L656BE:;
-    a1->axis = *(signed char *)&l_20;
-L656C7:;
-    switch (a1->axis - 1) {
-    goto L65724;
-case 0:
-case 1:
-    a1->start = a1->object->angle_x;
-    goto L65724;
-case 2:
-case 3:
-    a1->start = a1->object->yaw;
-    goto L65724;
-case 4:
-case 5:
-    a1->start = a1->object->angle_z;
-default:
-L65724:;
-    return;
-}
-case 16:
-case 17:
-case 18:
-case 19:
-case 20:
-    if (((int)(unsigned char)(a1->flags & 2)) == 0) return;
-    a1->flags |= 1;
-default:;
-}
+    case 1:
+        if (a1->duration != 0) {
+            a1->speed = (a1->magnitude << 16) / a1->duration;
+        } else {
+            a1->speed = a1->magnitude << 16;
+        }
+        if (((int)(unsigned char)(a1->flags & 2)) != 0) a1->speed = -a1->speed;
+        l_1C = 1132;
+        a1->start_tick = *(int *)((char *)l_1C);
+        switch (a1->axis - 1) {
+            break;
+        case 0:
+        case 1:
+            a1->start = a1->object->x;
+            break;
+        case 2:
+        case 3:
+            a1->start = a1->object->y;
+            break;
+        case 4:
+        case 5:
+            a1->start = a1->object->z;
+        }
+        return;
+    case 8:
+        if (a1->duration != 0) {
+            a1->speed = (a1->magnitude << 16) / a1->duration;
+        } else {
+            a1->speed = a1->magnitude << 16;
+        }
+        if (((int)(unsigned char)(a1->flags & 2)) != 0) a1->speed = -a1->speed;
+        l_18 = 1132;
+        a1->start_tick = *(int *)((char *)l_18);
+        if (((int)(unsigned char)(a1->flags & 32)) == 0 && (l_20 = func_000658CA(a1->object->image2, a1->object->image)) != 0) {
+            a1->flags |= 32;
+            if (((int)(unsigned char)(a1->axis & 1)) != 0) l_20++;
+            a1->axis = *(signed char *)&l_20;
+        }
+        switch (a1->axis - 1) {
+            break;
+        case 0:
+        case 1:
+            a1->start = a1->object->angle_x;
+            break;
+        case 2:
+        case 3:
+            a1->start = a1->object->yaw;
+            break;
+        case 4:
+        case 5:
+            a1->start = a1->object->angle_z;
+        }
+        return;
+    case 16:
+    case 17:
+    case 18:
+    case 19:
+    case 20:
+        if (((int)(unsigned char)(a1->flags & 2)) == 0) return;
+        a1->flags |= 1;
+    default:;
+    }
 }
 
 void func_00065748(short a1, int a2)
 {
     int l_18;
 
-    l_18 = 0;
-L65762:;
-    if (l_18 < *(int *)link_count) goto L65777;
-    return;
-L6576F:;
-    l_18++;
-    goto L65762;
-L65777:;
-    if (*(unsigned short *)(D_00199D78 + (l_18 * 39)) != (short)a1) goto L657A7;
-    *(signed char *)(D_00199D84 + (l_18 * 39)) &= 253;
-    *(signed char *)(D_00199D84 + (l_18 * 39)) |= *(signed char *)&a2 & 2;
-L657A7:;
-    goto L6576F;
+    for (l_18 = 0; l_18 < link_count; l_18++) {
+        if (*(unsigned short *)(D_00199D78 + (l_18 * 39)) == (short)a1) {
+            D_00199D84[l_18 * 39] &= 253;
+            D_00199D84[l_18 * 39] |= *(signed char *)&a2 & 2;
+        }
+    }
 }
 
 int func_000657B2(int a1)
@@ -309,36 +225,15 @@ int func_000657B2(int a1)
     int l_20;
     int l_1C;
 
-    l_28 = 0;
-L657CA:;
-    if (l_28 < *(int *)active_link_count) goto L657E2;
-    goto L65850;
-L657DA:;
-    l_28++;
-    goto L657CA;
-L657E2:;
-    l_1C = *(int *)(active_links + (l_28 << 2));
-    l_24 = ((int)(unsigned char)*(signed char *)((char *)l_1C + 10)) + 1;
-    l_20 = 0;
-L65807:;
-    if (l_20 < l_24) goto L65820;
-    goto L6584E;
-L65811:;
-    l_20++;
-    (*(char (**)[39])&l_1C)++;
-    goto L65807;
-L65820:;
-    if (*(int *)((char *)l_1C + 35) != a1) goto L6583F;
-    if (func_000CE77F(l_1C + 29, 6) != 0) goto L65841;
-L6583F:;
-    goto L6584C;
-L65841:;
-    return l_1C + 29;
-L6584C:;
-    goto L65811;
-L6584E:;
-    goto L657DA;
-L65850:;
+    for (l_28 = 0; l_28 < active_link_count; l_28++) {
+        l_1C = active_links[l_28];
+        l_24 = ((int)(unsigned char)*(signed char *)((char *)l_1C + 10)) + 1;
+        for (l_20 = 0; l_20 < l_24; l_20++, (*(char (**)[39])&l_1C)++) {
+            if (*(int *)((char *)l_1C + 35) == a1 && func_000CE77F(l_1C + 29, 6) != 0) {
+                return l_1C + 29;
+            }
+        }
+    }
     return 0;
 }
 
@@ -347,12 +242,6 @@ struct spell *func_00065864(int a1)
     int l_1C;
 
     l_1C = 0;
-L6587C:;
-    if (spell_records[l_1C].name[0] == 0) goto L658A6;
-    if (spell_records[l_1C].id == a1) goto L658AE;
-L658A6:;
-    l_1C++;
-    goto L6587C;
-L658AE:;
+    while (spell_records[l_1C].name[0] == 0 || spell_records[l_1C].id != a1) l_1C++;
     return &spell_records[l_1C];
 }

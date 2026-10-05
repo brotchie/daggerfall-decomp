@@ -4,75 +4,63 @@
 #include "records.h"
 
 struct bf8_0_1 { unsigned char f:1; };
-extern char mouse_buttons[];
-extern char mouse_x[];
-extern char mouse_y[];
-extern char D_001788CF[];
-extern char player_speed[];
+extern signed char mouse_buttons;
+extern short mouse_x;
+extern short mouse_y;
+extern int D_001788CF;
+extern short player_speed;
 extern struct character *player_character;
-extern char mouse_control_mode[];
-extern char D_00195F4E[];
-extern char D_0019628E[];
-extern char D_001A5AE8[];
+extern signed char mouse_control_mode;
+extern short D_00195F4E;
+extern signed char D_0019628E;
+extern int D_001A5AE8;
 extern char turn_this_frame[];
-extern char D_001A5AFC[];
-extern char move_angle_offset[];
-extern char steer_weight_down[];
-extern char steer_weight_right[];
-extern char steer_region_width[];
-extern char steer_region_height[];
-extern char steer_weight_left[];
-extern char steer_weight_up[];
-extern char steer_key_region[];
+extern int D_001A5AFC;
+extern int move_angle_offset;
+extern short steer_weight_down;
+extern short steer_weight_right;
+extern short steer_region_width;
+extern short steer_region_height;
+extern short steer_weight_left;
+extern short steer_weight_up;
+extern short steer_key_region;
 
 extern int func_000CAE00();
 
 void intrface_steer(int a1, int a2, int a3, int a4)
 {
     int l_C;
-{
-    unsigned char l_20;
+    {
+        unsigned char l_20;
 
-    if (((int)(unsigned char)(*(signed char *)mouse_buttons & 1)) != 0) goto L81F2B;
-    if (((int)(short)*(short *)steer_key_region) == (-1)) goto L82013;
-L81F2B:;
-    if (((int)(short)*(short *)steer_key_region) != (-1)) goto L81FE5;
-    *(int *)D_001A5AFC = *(int *)D_001788CF;
-    *(short *)steer_weight_right = ((((int)(short)*(short *)mouse_x) - a3) << 8) / ((int)(short)*(short *)steer_region_width);
-    *(short *)steer_weight_down = ((((int)(short)*(short *)mouse_y) - a4) << 8) / ((int)(short)*(short *)steer_region_height);
-    *(short *)steer_weight_left = ((((int)(short)*(short *)steer_region_width) - (((int)(short)*(short *)mouse_x) - a3)) << 8) / ((int)(short)*(short *)steer_region_width);
-    *(short *)steer_weight_up = ((((int)(short)*(short *)steer_region_height) - (((int)(short)*(short *)mouse_y) - a4)) << 8) / ((int)(short)*(short *)steer_region_height);
-    goto L82013;
-L81FE5:;
-    l_C = 1132;
-    if ((*(int *)D_001A5AFC = *(int *)((char *)l_C) - *(int *)D_001A5AE8) <= *(int *)D_001788CF) goto L82013;
-    *(int *)D_001A5AFC = *(int *)D_001788CF;
-L82013:;
-    *(int *)move_angle_offset = 0;
-    *(short *)player_speed = *(short *)D_00195F4E;
-    if ((player_character->conditions & 0x1) != 0) goto L82061;
-    if (((int)(unsigned char)*(signed char *)mouse_control_mode) == 1) goto L82053;
-    if (((int)(unsigned char)(*(signed char *)mouse_buttons & 1)) != 0) goto L8205F;
-L82053:;
-    if (((int)(short)*(short *)steer_key_region) == (-1)) goto L82061;
-L8205F:;
-    goto L82063;
-L82061:;
-    goto L8206D;
-L82063:;
-    func_000CAE00(a2);
-    goto L8208A;
-L8206D:;
-    *(short *)player_speed = 0;
-    *(int *)turn_this_frame = 0;
-    *(int *)move_angle_offset = 0;
-L8208A:;
-    if (((int)(short)*(short *)player_speed) <= 2) goto L8209C;
-    l_20 = 1;
-    goto L820A0;
-L8209C:;
-    l_20 = 0;
-L820A0:;
-    *(signed char *)D_0019628E = l_20;
-}
+        if (((int)(unsigned char)(mouse_buttons & 1)) != 0 || ((int)(short)steer_key_region) != (-1)) {
+            if (((int)(short)steer_key_region) == (-1)) {
+                D_001A5AFC = D_001788CF;
+                steer_weight_right = ((((int)(short)mouse_x) - a3) << 8) / ((int)(short)steer_region_width);
+                steer_weight_down = ((((int)(short)mouse_y) - a4) << 8) / ((int)(short)steer_region_height);
+                steer_weight_left = ((((int)(short)steer_region_width) - (((int)(short)mouse_x) - a3)) << 8) / ((int)(short)steer_region_width);
+                steer_weight_up = ((((int)(short)steer_region_height) - (((int)(short)mouse_y) - a4)) << 8) / ((int)(short)steer_region_height);
+            } else {
+                l_C = 1132;
+                if ((D_001A5AFC = *(int *)((char *)l_C) - D_001A5AE8) > D_001788CF) {
+                    D_001A5AFC = D_001788CF;
+                }
+            }
+        }
+        move_angle_offset = 0;
+        player_speed = D_00195F4E;
+        if ((player_character->conditions & 0x1) == 0 && ((((int)(unsigned char)mouse_control_mode) != 1 && ((int)(unsigned char)(mouse_buttons & 1)) != 0) || ((int)(short)steer_key_region) != (-1))) {
+            func_000CAE00(a2);
+        } else {
+            player_speed = 0;
+            *(int *)turn_this_frame = 0;
+            move_angle_offset = 0;
+        }
+        if (((int)(short)player_speed) > 2) {
+            l_20 = 1;
+        } else {
+            l_20 = 0;
+        }
+        D_0019628E = l_20;
+    }
 }

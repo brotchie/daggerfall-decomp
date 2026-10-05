@@ -4,19 +4,19 @@
 
 extern char D_001700D5[];
 extern char D_00170112[];
-extern char D_0018DC34[];
+extern int D_0018DC34;
 extern char D_0018DC38[];
-extern char sos_drum_bank[];
-extern char sos_melodic_bank[];
+extern int sos_drum_bank;
+extern int sos_melodic_bank;
 extern char D_0018DD4C[];
 extern char D_0018DD50[];
-extern char D_0018DD54[];
-extern char D_0018DD58[];
-extern char D_0018DD5C[];
-extern char D_0018DD60[];
+extern int D_0018DD54;
+extern int D_0018DD58;
+extern int D_0018DD5C;
+extern int D_0018DD60;
 extern char D_0018DD64[];
-extern char D_001A3F48[];
-extern char D_001A3F4C[];
+extern int D_001A3F48;
+extern int D_001A3F4C;
 
 extern int dpmi_unlock_region(int, int);
 extern int open(int, ...);
@@ -40,56 +40,43 @@ extern int strncmp();
 int sos_shutdown(void)
 {
     func_0009E61A(*(int *)D_0018DD50);
-    if (*(int *)D_0018DD5C == (-1)) goto L112D3;
-    func_0009F9A7(*(int *)D_0018DD60, 1, 1);
-L112D3:;
-    if (*(int *)D_0018DD54 == (-1)) goto L112EB;
-    func_0009F253(*(int *)D_0018DD58, 1);
-L112EB:;
+    if (D_0018DD5C != (-1)) func_0009F9A7(D_0018DD60, 1, 1);
+    if (D_0018DD54 != (-1)) func_0009F253(D_0018DD58, 1);
     func_0009EC0A();
     func_0009E95B();
     func_0009E281(0);
     dpmi_unlock_region((int)D_0018DC38, 268);
     dpmi_unlock_region((int)D_0018DD64, 46);
-    dpmi_unlock_region((int)D_0018DD5C, 4);
-    dpmi_unlock_region((int)D_0018DD60, 4);
+    dpmi_unlock_region((int)&D_0018DD5C, 4);
+    dpmi_unlock_region((int)&D_0018DD60, 4);
     dpmi_unlock_region((int)D_0018DD50, 4);
-    dpmi_unlock_region((int)D_0018DD54, 4);
-    dpmi_unlock_region((int)D_0018DD58, 4);
+    dpmi_unlock_region((int)&D_0018DD54, 4);
+    dpmi_unlock_region((int)&D_0018DD58, 4);
     dpmi_unlock_region((int)D_0018DD4C, 4);
-    dpmi_unlock_region((int)D_0018DC34, 4);
-    dpmi_unlock_region((int)sos_melodic_bank, 4);
-    dpmi_unlock_region((int)sos_drum_bank, 4);
-    if (*(int *)sos_melodic_bank == 0) goto L113EE;
-    dpmi_unlock_region(*(int *)sos_melodic_bank, 8192);
-    if (*(int *)sos_melodic_bank == 0) goto L113CE;
-    if (*(int *)sos_melodic_bank != (-1751672937)) goto L113D0;
-L113CE:;
-    goto L113EE;
-L113D0:;
-    mc_free(*(int *)sos_melodic_bank, (int)D_001700D5, 191);
-    *(int *)sos_melodic_bank = -1751672937;
-L113EE:;
-    if (*(int *)sos_drum_bank == 0) goto L1143B;
-    dpmi_unlock_region(*(int *)sos_drum_bank, 8192);
-    if (*(int *)sos_drum_bank == 0) goto L1141B;
-    if (*(int *)sos_drum_bank != (-1751672937)) goto L1141D;
-L1141B:;
-    goto L1143B;
-L1141D:;
-    mc_free(*(int *)sos_drum_bank, (int)D_001700D5, 197);
-    *(int *)sos_drum_bank = -1751672937;
-L1143B:;
-    if (*(int *)D_0018DC34 == 0) goto L11489;
-    dpmi_unlock_region(*(int *)D_001A3F48, *(int *)D_001A3F4C);
-    if (*(int *)D_001A3F48 == 0) goto L11469;
-    if (*(int *)D_001A3F48 != (-1751672937)) goto L1146B;
-L11469:;
-    goto L11489;
-L1146B:;
-    mc_free(*(int *)D_001A3F48, (int)D_001700D5, 203);
-    *(int *)D_001A3F48 = -1751672937;
-L11489:;
+    dpmi_unlock_region((int)&D_0018DC34, 4);
+    dpmi_unlock_region((int)&sos_melodic_bank, 4);
+    dpmi_unlock_region((int)&sos_drum_bank, 4);
+    if (sos_melodic_bank != 0) {
+        dpmi_unlock_region(sos_melodic_bank, 8192);
+        if (sos_melodic_bank != 0 && sos_melodic_bank != (-1751672937)) {
+            mc_free(sos_melodic_bank, (int)D_001700D5, 191);
+            sos_melodic_bank = -1751672937;
+        }
+    }
+    if (sos_drum_bank != 0) {
+        dpmi_unlock_region(sos_drum_bank, 8192);
+        if (sos_drum_bank != 0 && sos_drum_bank != (-1751672937)) {
+            mc_free(sos_drum_bank, (int)D_001700D5, 197);
+            sos_drum_bank = -1751672937;
+        }
+    }
+    if (D_0018DC34 != 0) {
+        dpmi_unlock_region(D_001A3F48, D_001A3F4C);
+        if (D_001A3F48 != 0 && D_001A3F48 != (-1751672937)) {
+            mc_free(D_001A3F48, (int)D_001700D5, 203);
+            D_001A3F48 = -1751672937;
+        }
+    }
     return 1;
 }
 
@@ -102,53 +89,45 @@ int func_0001167F(int a1)
     int l_10;
 
     l_20 = open(a1, 512);
-    if (l_20 != (-1)) goto L116B0;
-    return 0;
-L116B0:;
+    if (l_20 == (-1)) return 0;
     l_1C = lseek(l_20, 0, 2);
     lseek(l_20, 0, 0);
     l_18 = mc_malloc(l_1C + 240, (int)D_001700D5, 302);
-    if (l_18 != 0) goto L11702;
-    func_0009DEA7(l_20);
-    return 0;
-L11702:;
-    if (func_000A00CB(l_20, l_18 + 240, l_1C) == l_1C) goto L11759;
-    func_0009DEA7(l_20);
-    if (l_18 == 0) goto L11732;
-    if (l_18 != (-1751672937)) goto L11734;
-L11732:;
-    goto L1174D;
-L11734:;
-    mc_free(l_18, (int)D_001700D5, 318);
-    l_18 = -1751672937;
-L1174D:;
-    return 0;
-L11759:;
+    if (l_18 == 0) {
+        func_0009DEA7(l_20);
+        return 0;
+    }
+    if (func_000A00CB(l_20, l_18 + 240, l_1C) != l_1C) {
+        func_0009DEA7(l_20);
+        if (l_18 != 0 && l_18 != (-1751672937)) {
+            mc_free(l_18, (int)D_001700D5, 318);
+            l_18 = -1751672937;
+        }
+        return 0;
+    }
     func_0009DEA7(l_20);
     mc_memset(l_18, 0, 240, (int)D_001700D5, 328, 4);
     l_14 = l_18;
-    if (strncmp(l_18 + 240, (int)D_00170112, 4) != 0) goto L1180E;
-    l_10 = l_18 + 240;
-    *(int *)((char *)l_14) = l_18 + 284;
-    *(int *)((char *)l_14 + 12) = *(int *)((char *)l_10 + 40) - 44;
-    *(int *)((char *)l_14 + 56) = (int)(short)*(short *)((char *)l_10 + 34);
-    *(int *)((char *)l_14 + 60) = (int)(short)*(short *)((char *)l_10 + 22);
-    if (((int)(short)*(short *)((char *)l_10 + 34)) != 8) goto L117F6;
-    *(int *)((char *)l_14 + 64) = 32768;
-    goto L11800;
-L117F6:;
-    *(int *)((char *)l_14 + 64) = 0;
-L11800:;
-    *(int *)((char *)l_14 + 52) = *(int *)((char *)l_10 + 24);
-    goto L1184C;
-L1180E:;
-    *(int *)((char *)l_14) = l_18 + 240;
-    *(int *)((char *)l_14 + 12) = l_1C;
-    *(int *)((char *)l_14 + 56) = 8;
-    *(int *)((char *)l_14 + 60) = 1;
-    *(int *)((char *)l_14 + 64) = 32768;
-    *(int *)((char *)l_14 + 52) = 11025;
-L1184C:;
+    if (strncmp(l_18 + 240, (int)D_00170112, 4) == 0) {
+        l_10 = l_18 + 240;
+        *(int *)((char *)l_14) = l_18 + 284;
+        *(int *)((char *)l_14 + 12) = *(int *)((char *)l_10 + 40) - 44;
+        *(int *)((char *)l_14 + 56) = (int)(short)*(short *)((char *)l_10 + 34);
+        *(int *)((char *)l_14 + 60) = (int)(short)*(short *)((char *)l_10 + 22);
+        if (((int)(short)*(short *)((char *)l_10 + 34)) == 8) {
+            *(int *)((char *)l_14 + 64) = 32768;
+        } else {
+            *(int *)((char *)l_14 + 64) = 0;
+        }
+        *(int *)((char *)l_14 + 52) = *(int *)((char *)l_10 + 24);
+    } else {
+        *(int *)((char *)l_14) = l_18 + 240;
+        *(int *)((char *)l_14 + 12) = l_1C;
+        *(int *)((char *)l_14 + 56) = 8;
+        *(int *)((char *)l_14 + 60) = 1;
+        *(int *)((char *)l_14 + 64) = 32768;
+        *(int *)((char *)l_14 + 52) = 11025;
+    }
     *(int *)((char *)l_14 + 68) = 32768;
     *(int *)((char *)l_14 + 44) = 2147450879;
     return l_14;

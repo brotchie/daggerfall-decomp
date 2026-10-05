@@ -27,7 +27,7 @@ extern unsigned char D_0018520B[][3];
 extern unsigned char D_00185284[];
 extern unsigned char D_0018528E[];
 extern unsigned char D_00185291[];
-extern char text_buffer[];
+extern signed char text_buffer[];
 extern short D_00190D68;
 extern struct career *player_class;
 extern char *D_00195C44;
@@ -113,8 +113,8 @@ int class_questions_run(void)
         sel = -1;
     if (sel != -1) {
         func_000A0ED9(134, D_0017539B);
-        mc_sprintf(text_buffer, D_001753CD, sel);
-        disk_read_file(text_buffer, (int)player_class);
+        mc_sprintf(((char *)text_buffer), D_001753CD, sel);
+        disk_read_file(((char *)text_buffer), (int)player_class);
     }
     if (h.a != 0 && h.a != (char *)0x97979797) {
         mc_free(h.a, D_0017539B, 138);

@@ -11,7 +11,7 @@ struct find_t {             /* DOS find buffer */
 };
 extern char D_00174F47[];        /* __FILE__ */
 extern char D_00174F69[];
-extern char text_buffer[];
+extern signed char text_buffer[];
 extern char D_001917E4[];
 extern char D_00191834[];
 extern struct settings *game_settings;
@@ -37,8 +37,8 @@ int quest_pick_file(unsigned char a1, unsigned char a2, unsigned char a3, unsign
     p = D_00195C44;
     n = 0;
     func_000A0ED9(323, D_00174F47);
-    mc_sprintf(text_buffer, D_00174F69, D_00191834);
-    rc = func_000A13DA(text_buffer, 0, &ff);
+    mc_sprintf(((char *)text_buffer), D_00174F69, D_00191834);
+    rc = func_000A13DA(((char *)text_buffer), 0, &ff);
     while (rc == 0) {
         if (ff.name[0] != a1 && ff.name[0] != a2)
             ;
@@ -52,8 +52,8 @@ int quest_pick_file(unsigned char a1, unsigned char a2, unsigned char a3, unsign
         rc = func_000A13F7(&ff);
     }
     func_000A0ED9(338, D_00174F47);
-    mc_sprintf(text_buffer, D_00174F69, D_001917E4);
-    rc = func_000A13DA(text_buffer, 0, &ff);
+    mc_sprintf(((char *)text_buffer), D_00174F69, D_001917E4);
+    rc = func_000A13DA(((char *)text_buffer), 0, &ff);
     while (rc == 0) {
         if (ff.name[0] != a1 && ff.name[0] != a2)
             ;

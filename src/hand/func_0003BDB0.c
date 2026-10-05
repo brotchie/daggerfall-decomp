@@ -4,7 +4,7 @@
 extern char D_00170C67[];
 extern char D_00170CC0[];
 extern short D_00178A08;
-extern char text_buffer[];
+extern signed char text_buffer[];
 extern char D_001903A5;
 extern struct character *player_character;
 extern int window_image;
@@ -44,9 +44,9 @@ void sheet_show_career_skills(short a1, short a2)
     }
     if (D_00199644) {
         func_000A0ED9(327, D_00170C67);
-        mc_sprintf(text_buffer, D_00170CC0, player_character->skills[30].value / 10 + 1, player_character->skills[30].value / 5 + 1);
+        mc_sprintf(((char *)text_buffer), D_00170CC0, player_character->skills[30].value / 10 + 1, player_character->skills[30].value / 5 + 1);
         D_001903A5 = 96;
-        func_000A1054(p, text_buffer, D_00170C67, 329, 4);
+        func_000A1054(p, ((char *)text_buffer), D_00170C67, 329, 4);
     }
     p[func_000A0DF4(p) - 1] = 0;
     func_000CB552(window_image);

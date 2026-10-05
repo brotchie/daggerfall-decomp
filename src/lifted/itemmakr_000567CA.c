@@ -5,14 +5,14 @@
 extern char inventory_containers[];
 extern char inv_left_scroll[];
 extern char inv_left_container[];
-extern char inv_tab[];
+extern signed char inv_tab;
 
 
 void itemmaker_select_tab(int a1)
 {
     a1 += -15;
     if (*(int *)(inventory_containers + (a1 << 2)) == 0) return;
-    *(signed char *)inv_tab = *(signed char *)&a1;
-    *(int *)inv_left_container = *(int *)(inventory_containers + (((int)(unsigned char)*(signed char *)inv_tab) << 2));
+    inv_tab = *(signed char *)&a1;
+    *(int *)inv_left_container = *(int *)(inventory_containers + (((int)(unsigned char)inv_tab) << 2));
     *(int *)inv_left_scroll = 0;
 }

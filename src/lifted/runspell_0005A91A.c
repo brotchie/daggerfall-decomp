@@ -23,19 +23,11 @@ int cast_item_used_spell(int a1)
 
     l_20 = 0;
     l_1C = object_create_child(player_object->parent, 0, 89);
-L5A949:;
-    if (spell_records[l_20].name[0] == 0) goto L5A973;
-    if (spell_records[l_20].id == a1) goto L5A97B;
-L5A973:;
-    l_20++;
-    goto L5A949;
-L5A97B:;
+    while (spell_records[l_20].name[0] == 0 || spell_records[l_20].id != a1) l_20++;
     l_1C->type = 9;
     l_1C->id = object_new_id(((unsigned)D_00195AC4->id) >> 16);
     mc_memcpy(&l_1C->data.spell, &spell_records[l_20], 89, (int)D_001757F4, 103, 4);
     l_20 = spell_cost(&l_1C->data.spell, player_character);
-    if (cast_player_spell(l_1C) == 0) goto L5A9E5;
-    object_delete(l_1C);
-L5A9E5:;
+    if (cast_player_spell(l_1C) != 0) object_delete(l_1C);
     return l_20;
 }

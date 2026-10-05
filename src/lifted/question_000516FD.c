@@ -3,7 +3,7 @@
  * tables from the start of the file, so moving functions can change the code. */
 
 extern char D_00190D64[];
-extern char D_00195C44[];
+extern int D_00195C44;
 
 extern int func_0012B2EB();
 extern int func_0012B3ED();
@@ -14,6 +14,6 @@ void class_question_scroll(int a1, short a2)
 {
     func_0012B2EB();
     func_0005175B(a1, (int)(short)a2);
-    func_00144FB4(0, 135, 320, 48, (int)(*(char **)D_00195C44 + (((int)(short)*(short *)D_00190D64) * 320)));
+    func_00144FB4(0, 135, 320, 48, (int)(*(char **)&D_00195C44 + (((int)(short)*(short *)D_00190D64) * 320)));
     func_0012B3ED();
 }

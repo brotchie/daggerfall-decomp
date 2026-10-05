@@ -3,36 +3,36 @@
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
 
-extern char dungeon_water_level[];
+extern int dungeon_water_level;
 extern char D_00170788[];
-extern char player_environment[];
-extern char D_0017A028[];
-extern char encounter_tables[];
+extern unsigned char player_environment;
+extern signed char D_0017A028[];
+extern int encounter_tables[];
 extern char monster_table_flags[];
 extern char D_00187B6E[];
-extern char D_001940D7[];
-extern char player_motion_flags[];
-extern char dungeon_water_monster_table[];
-extern char dungeon_monster_table[];
-extern char D_001951ED[];
+extern unsigned char D_001940D7;
+extern signed char player_motion_flags;
+extern signed char dungeon_water_monster_table[];
+extern signed char dungeon_monster_table[];
+extern signed char D_001951ED[];
 extern char frame_counter[];
 extern struct record *player_object;
 extern struct record *D_00195AC4;
 extern struct location *current_location;
 extern struct character *player_character;
 extern struct settings *game_settings;
-extern char D_00195C74[];
-extern char game_mode[];
-extern char player_on_ground[];
-extern char current_climate[];
-extern char D_00196280[];
-extern char D_00196293[];
-extern char D_00196294[];
-extern char D_00196299[];
-extern char D_001962A0[];
+extern int D_00195C74;
+extern signed char game_mode;
+extern signed char player_on_ground;
+extern signed char current_climate;
+extern signed char D_00196280;
+extern signed char D_00196293;
+extern signed char D_00196294;
+extern signed char D_00196299;
+extern signed char D_001962A0;
 extern struct map_location *location_here;
 extern char collide_flags[];
-extern char D_00199808[];
+extern int D_00199808;
 
 extern int climate_category(void);
 extern int collide_move_object(struct record *, int, int, int);
@@ -67,75 +67,55 @@ int place_spawn_from_marker(struct record *a1)
     int l_24;
     struct character *l_20;
     int l_1C;
-{
-    char l_54[12];
-    char l_48[28];
+    {
+        char l_54[12];
+        char l_48[28];
 
-    l_28 = (int)(unsigned char)*(signed char *)player_on_ground;
-    l_24 = *(int *)D_00195C74;
-    if ((a1->flags & 512) == 0) goto L259E3;
-    return 0;
-L259E3:;
-    if (func_00026081(a1, 1) != 0) goto L25A00;
-    return 0;
-L25A00:;
-    if (*(int *)frame_counter >= 5) goto L25A15;
-    return 0;
-L25A15:;
-    *(int *)((char *)l_48 + 24) = rand();
-    srand((int)(unsigned short)a1->spawn_seed);
-    *(int *)((char *)l_48 + 20) = (int)a1;
-    l_20 = &(*(struct record **)((char *)l_48 + 20))->data.character;
-    if ((((int)(unsigned short)(*(short *)(*(char **)((char *)l_48 + 20) + 27) & 31)) - 2) != 13) goto L25A5F;
-    l_20->flags |= 64;
-    goto L25A6A;
-L25A5F:;
-    *(signed char *)D_00196293 = a1->link_flag;
-L25A6A:;
-    l_1C = (int)(unsigned short)*(short *)(*(char **)((char *)l_48 + 20) + 19);
-    if ((l_1C & 128) != 0) goto L25A98;
-    if (((int)(unsigned short)(*(short *)(monster_table_flags + (l_1C * 29)) & 64)) != 0) goto L25A9A;
-L25A98:;
-    goto L25AB9;
-L25A9A:;
-    if (*(int *)dungeon_water_level == 10000) goto L25AB7;
-    if ((*(int *)dungeon_water_level - 20) <= *(int *)(*(char **)((char *)l_48 + 20) + 11)) goto L25AB9;
-L25AB7:;
-    goto L25ABB;
-L25AB9:;
-    goto L25AC7;
-L25ABB:;
-    return 0;
-L25AC7:;
-    if (l_1C != (-1)) goto L25AE1;
-    srand(*(int *)((char *)l_48 + 24));
-    return 0;
-L25AE1:;
-    *(signed char *)(*(char **)((char *)l_48 + 20)) = 18;
-    *(signed char *)(*(char **)((char *)l_48 + 20) + 21) |= 1;
-    monster_init(*(struct record **)((char *)l_48 + 20), l_1C);
-    *(int *)(*(char **)((char *)l_48 + 20) + 11) -= 5;
-    l_20->team = 1;
-    l_20->career_id = *(short *)(*(char **)((char *)l_48 + 20) + 25);
-    l_20->target = 0;
-    monster_pacify_check(*(struct record **)((char *)l_48 + 20));
-    *(signed char *)D_00196293 = 0;
-    *(signed char *)D_001940D7 |= 32;
-    *(signed char *)D_001940D7 |= 128;
-    mc_memcpy((int)l_54, *(int *)((char *)l_48 + 20) + 7, 12, (int)D_00170788, 119, 4);
-    mc_memset((int)l_48, 0, 12, (int)D_00170788, 120, 4);
-    *(int *)((char *)l_48 + 12) = (int)D_00187B6E;
-    *(signed char *)player_motion_flags |= 8;
-    collide_move_object(*(struct record **)((char *)l_48 + 20), 0, (int)l_54, 0);
-    *(signed char *)player_motion_flags &= 247;
-    *(signed char *)player_on_ground = *(signed char *)&l_28;
-    *(int *)D_00195C74 = l_24;
-    srand(*(int *)((char *)l_48 + 24));
-    if (((int)(short)(*(short *)collide_flags & 1)) != 0) goto L25BC9;
-    a1->flags |= 16;
-L25BC9:;
-    return 1;
-}
+        l_28 = (int)(unsigned char)player_on_ground;
+        l_24 = D_00195C74;
+        if ((a1->flags & 512) != 0) return 0;
+        if (func_00026081(a1, 1) == 0) return 0;
+        if (*(int *)frame_counter < 5) return 0;
+        *(int *)((char *)l_48 + 24) = rand();
+        srand((int)(unsigned short)a1->spawn_seed);
+        *(int *)((char *)l_48 + 20) = (int)a1;
+        l_20 = &(*(struct record **)((char *)l_48 + 20))->data.character;
+        if ((((int)(unsigned short)(*(short *)(*(char **)((char *)l_48 + 20) + 27) & 31)) - 2) == 13) {
+            l_20->flags |= 64;
+        } else {
+            D_00196293 = a1->link_flag;
+        }
+        l_1C = (int)(unsigned short)*(short *)(*(char **)((char *)l_48 + 20) + 19);
+        if ((l_1C & 128) == 0 && ((int)(unsigned short)(*(short *)(monster_table_flags + (l_1C * 29)) & 64)) != 0 && (dungeon_water_level == 10000 || (dungeon_water_level - 20) > *(int *)(*(char **)((char *)l_48 + 20) + 11))) {
+            return 0;
+        }
+        if (l_1C == (-1)) {
+            srand(*(int *)((char *)l_48 + 24));
+            return 0;
+        }
+        *(signed char *)(*(char **)((char *)l_48 + 20)) = 18;
+        *(signed char *)(*(char **)((char *)l_48 + 20) + 21) |= 1;
+        monster_init(*(struct record **)((char *)l_48 + 20), l_1C);
+        *(int *)(*(char **)((char *)l_48 + 20) + 11) -= 5;
+        l_20->team = 1;
+        l_20->career_id = *(short *)(*(char **)((char *)l_48 + 20) + 25);
+        l_20->target = 0;
+        monster_pacify_check(*(struct record **)((char *)l_48 + 20));
+        D_00196293 = 0;
+        D_001940D7 |= 32;
+        D_001940D7 |= 128;
+        mc_memcpy((int)l_54, *(int *)((char *)l_48 + 20) + 7, 12, (int)D_00170788, 119, 4);
+        mc_memset((int)l_48, 0, 12, (int)D_00170788, 120, 4);
+        *(int *)((char *)l_48 + 12) = (int)D_00187B6E;
+        player_motion_flags |= 8;
+        collide_move_object(*(struct record **)((char *)l_48 + 20), 0, (int)l_54, 0);
+        player_motion_flags &= 247;
+        player_on_ground = *(signed char *)&l_28;
+        D_00195C74 = l_24;
+        srand(*(int *)((char *)l_48 + 24));
+        if (((int)(short)(*(short *)collide_flags & 1)) == 0) a1->flags |= 16;
+        return 1;
+    }
 }
 
 int encounter_pick_monster(int a1)
@@ -150,163 +130,126 @@ int encounter_pick_monster(int a1)
     l_28 = -1;
     l_24 = 0;
 L25BFC:;
-    l_24 = 0;
-    l_28 = -1;
-    if (((int)(unsigned char)*(signed char *)player_environment) == 3) goto L25EC3;
-    if ((int)location_here == 0) goto L25C54;
-    if (location_here_contains(player_object->x, player_object->z) == 0) goto L25C54;
-    l_28 = ((unsigned)(location_here->x_type_flags << 2)) >> 27;
-    l_24 = 1;
-L25C54:;
-    if (l_24 == 0) goto L25D8C;
-    l_30 = object_building(player_object->parent);
-    if (l_30 == 0) goto L25CEC;
-    switch (l_30->type) {
-    goto L25CE0;
-case 11:
-    l_28 = 40;
-    goto L25CE7;
-case 14:
-    l_28 = 41;
-    goto L25CE7;
-case 16:
-case 17:
-    l_28 = 42;
-    goto L25CE7;
-case 18:
-    l_28 = 43;
-    goto L25CE7;
-case 19:
-    l_28 = 44;
-    goto L25CE7;
-default:
+    while (1) {
+        l_24 = 0;
+        l_28 = -1;
+        if (((int)player_environment) != 3) {
+            if ((int)location_here != 0) {
+                if (location_here_contains(player_object->x, player_object->z) != 0) {
+                    l_28 = ((unsigned)(location_here->x_type_flags << 2)) >> 27;
+                    l_24 = 1;
+                }
+            }
+            if (l_24 != 0) {
+                l_30 = object_building(player_object->parent);
+                if (l_30 != 0) {
+                    switch (l_30->type) {
+                        goto L25CE0;
+                    case 11:
+                        l_28 = 40;
+                        break;
+                    case 14:
+                        l_28 = 41;
+                        break;
+                    case 16:
+                    case 17:
+                        l_28 = 42;
+                        break;
+                    case 18:
+                        l_28 = 43;
+                        break;
+                    case 19:
+                        l_28 = 44;
+                        break;
+                    default:
 L25CE0:;
-    l_28 = 39;
-L25CE7:;
-    goto L25D87;
-L25CEC:;
-    if (*(int *)D_00199808 == 0) goto L25D01;
-    return -1;
-L25D01:;
-    l_28 = climate_category();
-    if (((int)(unsigned char)*(signed char *)current_climate) != 232) goto L25D1E;
-    l_28 = 232;
-L25D1E:;
-}
-    switch ((unsigned)l_28) {
-    goto L25D87;
-case 0:
-    l_28 = 20;
-    goto L25D87;
-case 1:
-    l_28 = 23;
-    goto L25D87;
-case 2:
-    l_28 = 26;
-    goto L25D87;
-case 4:
-    l_28 = 29;
-    goto L25D87;
-case 5:
-    l_28 = 32;
-    goto L25D87;
-case 232:
-    l_28 = 35;
-default:
-L25D87:;
-    goto L25EC1;
-L25D8C:;
-    l_28 = climate_category();
-    if (((int)(unsigned char)*(signed char *)current_climate) != 232) goto L25DA9;
-    l_28 = 232;
-L25DA9:;
-}
-    switch ((unsigned)l_28) {
-    goto L25EC1;
-case 0:
-    l_28 = ((*(int *)D_00199808 != 0) ? 21 : 22);
-    goto L25EC1;
-case 1:
-    l_28 = ((*(int *)D_00199808 != 0) ? 24 : 25);
-    goto L25EC1;
-case 2:
-    l_28 = ((*(int *)D_00199808 != 0) ? 27 : 28);
-    goto L25EC1;
-case 4:
-    l_28 = ((*(int *)D_00199808 != 0) ? 30 : 31);
-    goto L25EC1;
-case 5:
-    l_28 = ((*(int *)D_00199808 != 0) ? 33 : 34);
-    goto L25EC1;
-case 232:
-    l_28 = ((*(int *)D_00199808 != 0) ? 36 : 37);
-default:
-L25EC1:;
-    goto L25ED1;
-L25EC3:;
-    l_28 = current_location->kind;
-L25ED1:;
-    if (a1 == 0) goto L25EDE;
-    l_28 = 19;
-L25EDE:;
-    l_2C = *(int *)(encounter_tables + (l_28 << 2));
-    l_28 = rand_range(1, 100);
-    if (l_28 > 80) goto L25F33;
-    l_20 = player_character->level - 3;
-    l_1C = player_character->level + 3;
-    goto L25F98;
-L25F33:;
-    if (l_28 > 95) goto L25F56;
-    l_20 = 0;
-    l_1C = player_character->level + 1;
-    goto L25F98;
-L25F56:;
-    if (player_character->level <= 5) goto L25F7B;
-    l_20 = 0;
-    l_1C = 19;
-    goto L25F98;
-L25F7B:;
-    l_20 = 0;
-    l_1C = player_character->level + 2;
-L25F98:;
-    if (l_20 >= 0) goto L25FAC;
-    l_20 = 0;
-    l_1C = 5;
-L25FAC:;
-    if (l_1C <= 19) goto L25FC0;
-    l_20 = 14;
-    l_1C = 19;
-L25FC0:;
-    l_28 = rand_range(l_20, l_1C);
-    if (((int)(unsigned char)*(signed char *)((char *)(l_2C + l_28))) == 29) goto L25FF2;
-    if (((int)(unsigned char)*(signed char *)((char *)(l_2C + l_28))) != 10) goto L25FF4;
-L25FF2:;
-    goto L26006;
-L25FF4:;
-    if (((int)(unsigned char)*(signed char *)((char *)(l_2C + l_28))) != 42) goto L2601C;
-L26006:;
-    if (((int)(unsigned short)(game_settings->view_flags & 4)) != 0) goto L2601E;
-L2601C:;
-    goto L26023;
-L2601E:;
-    goto L25BFC;
-L26023:;
-    if (*(signed char *)D_00196280 == 0) goto L26038;
-    if (((int)(unsigned char)*(signed char *)player_environment) == 1) goto L2603A;
-L26038:;
-    goto L26060;
-L2603A:;
-    if (((int)(unsigned char)*(signed char *)((char *)(l_2C + l_28))) == 18) goto L2605E;
-    if (((int)(unsigned char)*(signed char *)((char *)(l_2C + l_28))) != 23) goto L26060;
-L2605E:;
-    goto L26062;
-L26060:;
-    goto L26067;
-L26062:;
-    goto L25BFC;
-L26067:;
+                        l_28 = 39;
+                    }
+                } else {
+                    if (D_00199808 != 0) return -1;
+                    l_28 = climate_category();
+                    if (((int)(unsigned char)current_climate) == 232) l_28 = 232;
+                    switch ((unsigned)l_28) {
+                        break;
+                    case 0:
+                        l_28 = 20;
+                        break;
+                    case 1:
+                        l_28 = 23;
+                        break;
+                    case 2:
+                        l_28 = 26;
+                        break;
+                    case 4:
+                        l_28 = 29;
+                        break;
+                    case 5:
+                        l_28 = 32;
+                        break;
+                    case 232:
+                        l_28 = 35;
+                    }
+                }
+            } else {
+                l_28 = climate_category();
+                if (((int)(unsigned char)current_climate) == 232) l_28 = 232;
+                switch ((unsigned)l_28) {
+                    break;
+                case 0:
+                    l_28 = ((D_00199808 != 0) ? 21 : 22);
+                    break;
+                case 1:
+                    l_28 = ((D_00199808 != 0) ? 24 : 25);
+                    break;
+                case 2:
+                    l_28 = ((D_00199808 != 0) ? 27 : 28);
+                    break;
+                case 4:
+                    l_28 = ((D_00199808 != 0) ? 30 : 31);
+                    break;
+                case 5:
+                    l_28 = ((D_00199808 != 0) ? 33 : 34);
+                    break;
+                case 232:
+                    l_28 = ((D_00199808 != 0) ? 36 : 37);
+                }
+            }
+        } else {
+            l_28 = current_location->kind;
+        }
+        if (a1 != 0) l_28 = 19;
+        l_2C = encounter_tables[l_28];
+        l_28 = rand_range(1, 100);
+        if (l_28 <= 80) {
+            l_20 = player_character->level - 3;
+            l_1C = player_character->level + 3;
+        } else if (l_28 <= 95) {
+            l_20 = 0;
+            l_1C = player_character->level + 1;
+        } else if (player_character->level > 5) {
+            l_20 = 0;
+            l_1C = 19;
+        } else {
+            l_20 = 0;
+            l_1C = player_character->level + 2;
+        }
+        if (l_20 < 0) {
+            l_20 = 0;
+            l_1C = 5;
+        }
+        if (l_1C > 19) {
+            l_20 = 14;
+            l_1C = 19;
+        }
+        l_28 = rand_range(l_20, l_1C);
+        if ((((int)(unsigned char)*(signed char *)((char *)(l_2C + l_28))) == 29 || ((int)(unsigned char)*(signed char *)((char *)(l_2C + l_28))) == 10 || ((int)(unsigned char)*(signed char *)((char *)(l_2C + l_28))) == 42) && ((int)(unsigned short)(game_settings->view_flags & 4)) != 0) {
+            goto L25BFC;
+        }
+        if (D_00196280 == 0 || ((int)player_environment) != 1 || (((int)(unsigned char)*(signed char *)((char *)(l_2C + l_28))) != 18 && ((int)(unsigned char)*(signed char *)((char *)(l_2C + l_28))) != 23)) {
+            break;
+        }
+    }
     return (int)(unsigned char)*(signed char *)((char *)(l_2C + l_28));
-}
 }
 
 int func_00026081(struct record *a1, int a2)
@@ -314,142 +257,87 @@ int func_00026081(struct record *a1, int a2)
     int l_20;
     int l_1C;
     int l_18;
-{
-    int l_30;
-    int l_2C;
+    {
+        int l_30;
+        int l_2C;
 
-    l_20 = a1->y - player_object->y;
-    l_18 = func_0009DEAC(l_20);
-    l_1C = func_000C7FD9(a1->x, a1->z, player_object->x, player_object->z);
-    if (((int)(unsigned char)*(signed char *)player_environment) != 1) goto L260EA;
-    if (l_1C < 4096) goto L260EC;
-L260EA:;
-    goto L260F8;
-L260EC:;
-    return 1;
-L260F8:;
-    if (a2 != 0) goto L2618F;
-    if (a1->trigger_range < 4) goto L26142;
-    if (l_18 > 768) goto L26125;
-    if (l_1C <= 768) goto L26127;
-L26125:;
-    goto L26130;
-L26127:;
-    l_2C = 1;
-    goto L26137;
-L26130:;
-    l_2C = 0;
-L26137:;
-    return l_2C;
-L26142:;
-    if (l_18 > 384) goto L26154;
-    if (l_1C <= 1024) goto L26156;
-L26154:;
-    goto L2615F;
-L26156:;
-    l_30 = 1;
-    goto L26166;
-L2615F:;
-    l_30 = 0;
-L26166:;
-    return l_30;
-__dagger_tbl26173:;
-L2618F:;
-    switch (a1->trigger_range) {
-case 0:
-    if (l_18 > 128) goto L261C6;
-    if (l_1C <= 1024) goto L261C8;
-L261C6:;
-    goto L261D1;
-L261C8:;
-{
-    int l_4C;
-    int l_48;
-    int l_44;
-    int l_40;
-    int l_3C;
-    int l_38;
-    l_38 = 1;
-    goto L261D8;
-L261D1:;
-    l_38 = 0;
-L261D8:;
-    return l_38;
-case 1:
-    if (l_18 > 128) goto L261F5;
-    if (l_1C <= 384) goto L261F7;
-L261F5:;
-    goto L26200;
-L261F7:;
-    l_3C = 1;
-    goto L26207;
-L26200:;
-    l_3C = 0;
-L26207:;
-    return l_3C;
-case 2:
-    if (l_18 > 128) goto L26224;
-    if (l_1C <= 640) goto L26226;
-L26224:;
-    goto L2622F;
-L26226:;
-    l_40 = 1;
-    goto L26236;
-L2622F:;
-    l_40 = 0;
-L26236:;
-    return l_40;
-case 3:
-    if (l_18 > 384) goto L26253;
-    if (l_1C <= 768) goto L26255;
-L26253:;
-    goto L2625E;
-L26255:;
-    l_44 = 1;
-    goto L26265;
-L2625E:;
-    l_44 = 0;
-L26265:;
-    return l_44;
-case 4:
-    if (l_20 > 128) goto L26282;
-    if (l_20 >= (-768)) goto L26284;
-L26282:;
-    goto L2628D;
-L26284:;
-    if (l_1C <= 768) goto L2628F;
-L2628D:;
-    goto L26298;
-L2628F:;
-    l_48 = 1;
-    goto L2629F;
-L26298:;
-    l_48 = 0;
-L2629F:;
-    return l_48;
-case 5:
-    if (l_20 < (-128)) goto L262B9;
-    if (l_20 <= 768) goto L262BB;
-L262B9:;
-    goto L262C4;
-L262BB:;
-    if (l_1C <= 768) goto L262C6;
-L262C4:;
-    goto L262CF;
-L262C6:;
-    l_4C = 1;
-    goto L262D6;
-L262CF:;
-    l_4C = 0;
-L262D6:;
-    return l_4C;
-case 6:
-    return (((l_18 <= 256) && (l_1C <= 768)) ? 1 : 0);
-default:
-    return 0;
-}
-}
-}
+        l_20 = a1->y - player_object->y;
+        l_18 = func_0009DEAC(l_20);
+        l_1C = func_000C7FD9(a1->x, a1->z, player_object->x, player_object->z);
+        if (((int)player_environment) == 1 && l_1C < 4096) return 1;
+        if (a2 == 0) {
+            if (a1->trigger_range >= 4) {
+                if (l_18 <= 768 && l_1C <= 768) {
+                    l_2C = 1;
+                } else {
+                    l_2C = 0;
+                }
+                return l_2C;
+            }
+            if (l_18 <= 384 && l_1C <= 1024) {
+                l_30 = 1;
+            } else {
+                l_30 = 0;
+            }
+            return l_30;
+        }
+        switch (a1->trigger_range) {
+        case 0:
+            {
+                int l_4C;
+                int l_48;
+                int l_44;
+                int l_40;
+                int l_3C;
+                int l_38;
+                if (l_18 <= 128 && l_1C <= 1024) {
+                    l_38 = 1;
+                } else {
+                    l_38 = 0;
+                }
+                return l_38;
+            case 1:
+                if (l_18 <= 128 && l_1C <= 384) {
+                    l_3C = 1;
+                } else {
+                    l_3C = 0;
+                }
+                return l_3C;
+            case 2:
+                if (l_18 <= 128 && l_1C <= 640) {
+                    l_40 = 1;
+                } else {
+                    l_40 = 0;
+                }
+                return l_40;
+            case 3:
+                if (l_18 <= 384 && l_1C <= 768) {
+                    l_44 = 1;
+                } else {
+                    l_44 = 0;
+                }
+                return l_44;
+            case 4:
+                if (l_20 <= 128 && l_20 >= (-768) && l_1C <= 768) {
+                    l_48 = 1;
+                } else {
+                    l_48 = 0;
+                }
+                return l_48;
+            case 5:
+                if (l_20 >= (-128) && l_20 <= 768 && l_1C <= 768) {
+                    l_4C = 1;
+                } else {
+                    l_4C = 0;
+                }
+                return l_4C;
+            case 6:
+                return (((l_18 <= 256) && (l_1C <= 768)) ? 1 : 0);
+            default:
+                return 0;
+            }
+        }
+    }
 }
 
 void func_0002631D(struct record *a1)
@@ -457,23 +345,15 @@ void func_0002631D(struct record *a1)
     struct record *l_1C;
     short l_18;
 
-    if (a1->type != 34) goto L26356;
-    if (((a1->image & 31) - 2) == 13) goto L26358;
-L26356:;
-    return;
-L26358:;
+    if (a1->type != 34 || ((a1->image & 31) - 2) != 13) return;
     l_1C = a1;
-L2635E:;
-    if (l_1C->type == 47) goto L26378;
-    l_1C = l_1C->parent;
-    goto L2635E;
-L26378:;
+    while (l_1C->type != 47) l_1C = l_1C->parent;
     l_18 = l_1C->water_level;
-    if (((int)(short)l_18) >= a1->y) goto L263AB;
-    a1->mobile_id = (unsigned short)(unsigned char)*(signed char *)(dungeon_water_monster_table + a1->mobile_id);
-    return;
-L263AB:;
-    a1->mobile_id = (unsigned short)(unsigned char)*(signed char *)(dungeon_monster_table + a1->mobile_id);
+    if (((int)(short)l_18) < a1->y) {
+        a1->mobile_id = (unsigned short)(unsigned char)dungeon_water_monster_table[a1->mobile_id];
+        return;
+    }
+    a1->mobile_id = (unsigned short)(unsigned char)dungeon_monster_table[a1->mobile_id];
 }
 
 void dungeon_roll_monster_tables(void)
@@ -483,28 +363,12 @@ void dungeon_roll_monster_tables(void)
 
     l_18 = rand();
     srand(((unsigned)D_00195AC4->id) >> 16);
-    l_1C = 0;
-L263FD:;
-    if (l_1C < 256) goto L26410;
-    goto L26424;
-L26408:;
-    l_1C++;
-    goto L263FD;
-L26410:;
-    *(signed char *)(dungeon_monster_table + l_1C) = encounter_pick_monster(0);
-    goto L26408;
-L26424:;
-    l_1C = 0;
-L2642B:;
-    if (l_1C < 256) goto L2643E;
-    goto L26455;
-L26436:;
-    l_1C++;
-    goto L2642B;
-L2643E:;
-    *(signed char *)(dungeon_water_monster_table + l_1C) = encounter_pick_monster(1);
-    goto L26436;
-L26455:;
+    for (l_1C = 0; l_1C < 256; l_1C++) {
+        dungeon_monster_table[l_1C] = encounter_pick_monster(0);
+    }
+    for (l_1C = 0; l_1C < 256; l_1C++) {
+        dungeon_water_monster_table[l_1C] = encounter_pick_monster(1);
+    }
     object_foreach(D_00195AC4, (int)func_0002631D);
     srand(l_18);
 }
@@ -515,63 +379,41 @@ void func_00026508(void)
     int l_18;
 
     l_1C = rand_range(2, 5);
-    l_18 = 0;
-L2652F:;
-    if (l_18 < l_1C) goto L26541;
-    return;
-L26539:;
-    l_18++;
-    goto L2652F;
-L26541:;
-    func_000266C7((int)(unsigned char)*(signed char *)(D_0017A028 + (rand() & 3)));
-    goto L26539;
+    for (l_18 = 0; l_18 < l_1C; l_18++) {
+        func_000266C7((int)(unsigned char)D_0017A028[rand() & 3]);
+    }
 }
 
 void encounter_tick(int a1, int a2)
 {
-    if (*(signed char *)D_001962A0 != 0) return;
-    if (a2 != 0) goto L265AC;
-    if (*(signed char *)D_00196294 != 0) return;
-    if ((((unsigned)a1) % 12) != 0) return;
-L265AC:;
-    if (((int)(unsigned char)*(signed char *)player_environment) != 1) goto L26676;
-    a1 = ((unsigned)a1) % 1440;
-    if (location_contains(player_object->x, player_object->z) == 0) goto L2662A;
-    if (a2 != 0) goto L265F4;
-    if (((unsigned)a1) >= 360) goto L265F6;
-L265F4:;
-    goto L265FF;
-L265F6:;
-    if (((unsigned)a1) <= 1080) goto L26628;
-L265FF:;
-    if (a2 != 0) goto L26615;
-    if (rand_range(0, 23) != 0) goto L26617;
-L26615:;
-    goto L2661C;
-L26617:;
-    return;
-L2661C:;
-    func_000266C7(encounter_pick_monster(0));
-L26628:;
-    goto L26674;
-L2662A:;
-    if (a2 != 0) goto L26668;
-    if (((unsigned)a1) < 360) goto L26642;
-    if (((unsigned)a1) <= 1080) goto L26658;
-L26642:;
-    if (rand_range(0, 23) != 0) return;
-    goto L26668;
-L26658:;
+    if (D_001962A0 != 0) return;
+    if (a2 == 0) {
+        if (D_00196294 != 0) return;
+        if ((((unsigned)a1) % 12) != 0) return;
+    }
+    if (((int)player_environment) == 1) {
+        a1 = ((unsigned)a1) % 1440;
+        if (location_contains(player_object->x, player_object->z) != 0) {
+            if (a2 != 0 || ((unsigned)a1) < 360 || ((unsigned)a1) > 1080) {
+                if (a2 == 0 && rand_range(0, 23) != 0) return;
+                func_000266C7(encounter_pick_monster(0));
+            }
+        } else {
+            if (a2 == 0) {
+                if (((unsigned)a1) < 360 || ((unsigned)a1) > 1080) {
+                    if (rand_range(0, 23) != 0) return;
+                } else {
+                    if (rand_range(0, 35) != 0) return;
+                }
+            }
+            func_0002675D(encounter_pick_monster(0));
+        }
+        return;
+    }
+    if (((int)player_environment) != 3) return;
+    if (((int)(unsigned char)game_mode) != 16) return;
     if (rand_range(0, 35) != 0) return;
-L26668:;
-    func_0002675D(encounter_pick_monster(0));
-L26674:;
-    return;
-L26676:;
-    if (((int)(unsigned char)*(signed char *)player_environment) != 3) return;
-    if (((int)(unsigned char)*(signed char *)game_mode) != 16) return;
-    if (rand_range(0, 35) != 0) return;
-    func_000266C7((int)(unsigned char)*(signed char *)(D_001951ED + (rand() % 6)));
+    func_000266C7((int)(unsigned char)D_001951ED[rand() % 6]);
 }
 
 void func_000266C7(int a1)
@@ -585,11 +427,11 @@ void func_000266C7(int a1)
     l_18->id = object_new_id(((unsigned)D_00195AC4->id) >> 16);
     monster_init(l_18, a1);
     l_18->data.character.team = 1;
-    if (spawn_find_point(l_18, 384, 768) != 0) goto L2674C;
-    object_delete(l_18);
-    return;
-L2674C:;
-    *(signed char *)D_00196299 = 1;
+    if (spawn_find_point(l_18, 384, 768) == 0) {
+        object_delete(l_18);
+        return;
+    }
+    D_00196299 = 1;
 }
 
 void func_0002675D(int a1)
@@ -607,5 +449,5 @@ void func_0002675D(int a1)
     l_18->x += player_object->x;
     l_18->z += player_object->z;
     l_18->y = func_0014B45B(l_18->x, l_18->z);
-    *(signed char *)D_00196299 = 1;
+    D_00196299 = 1;
 }

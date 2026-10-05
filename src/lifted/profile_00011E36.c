@@ -17,55 +17,37 @@ int profile_find_item(int a1, int a2)
     l_10 = 0;
     l_20 = *(int *)((char *)a1 + 144);
     l_14 = *(int *)((char *)a1 + 148);
-L11E60:;
-    l_18 = a2;
-    if (*(signed char *)((char *)l_20) != *(signed char *)((char *)l_18)) goto L11F4E;
-    l_1C = l_20;
-    l_20++;
-    l_18++;
-    l_14++;
-L11E8E:;
-    if (*(signed char *)((char *)l_20) != *(signed char *)((char *)l_18)) goto L11EA8;
-    if (((unsigned)l_14) < *(int *)((char *)a1 + 136)) goto L11EAA;
-L11EA8:;
-    goto L11EBE;
-L11EAA:;
-    l_20++;
-    l_18++;
-    l_14++;
-    goto L11E8E;
-L11EBE:;
-    if (*(signed char *)((char *)l_18) != 0) goto L11F4E;
-L11ECA:;
-    if (((int)(unsigned char)*(signed char *)((char *)l_20)) == 61) goto L11EE8;
-    if (((int)(unsigned char)*(signed char *)((char *)l_20)) != 13) goto L11EEA;
-L11EE8:;
-    goto L11EF8;
-L11EEA:;
-    l_20++;
-    l_14++;
-    goto L11ECA;
-L11EF8:;
-    if (((int)(unsigned char)*(signed char *)((char *)l_20)) != 61) goto L11F21;
-    l_20++;
-    l_14++;
-    *(int *)((char *)a1 + 160) = l_20;
-    goto L11F2E;
-L11F21:;
-    *(int *)((char *)a1 + 160) = 0;
-L11F2E:;
-    *(int *)((char *)a1 + 156) = l_1C;
-    *(int *)((char *)a1 + 164) = 0;
-    l_10 = 1;
-L11F4E:;
-    l_20++;
-    l_14++;
-    if (l_10 != 0) goto L11F6E;
-    if (((unsigned)l_14) < *(int *)((char *)a1 + 136)) goto L11F70;
-L11F6E:;
-    goto L11F83;
-L11F70:;
-    if (((int)(unsigned char)*(signed char *)((char *)l_20)) != 91) goto L11E60;
-L11F83:;
+    do {
+        l_18 = a2;
+        if (*(signed char *)((char *)l_20) == *(signed char *)((char *)l_18)) {
+            l_1C = l_20;
+            l_20++;
+            l_18++;
+            l_14++;
+            while (*(signed char *)((char *)l_20) == *(signed char *)((char *)l_18) && ((unsigned)l_14) < *(int *)((char *)a1 + 136)) {
+                l_20++;
+                l_18++;
+                l_14++;
+            }
+            if (*(signed char *)((char *)l_18) == 0) {
+                while (((int)(unsigned char)*(signed char *)((char *)l_20)) != 61 && ((int)(unsigned char)*(signed char *)((char *)l_20)) != 13) {
+                    l_20++;
+                    l_14++;
+                }
+                if (((int)(unsigned char)*(signed char *)((char *)l_20)) == 61) {
+                    l_20++;
+                    l_14++;
+                    *(int *)((char *)a1 + 160) = l_20;
+                } else {
+                    *(int *)((char *)a1 + 160) = 0;
+                }
+                *(int *)((char *)a1 + 156) = l_1C;
+                *(int *)((char *)a1 + 164) = 0;
+                l_10 = 1;
+            }
+        }
+        l_20++;
+        l_14++;
+    } while (l_10 == 0 && ((unsigned)l_14) < *(int *)((char *)a1 + 136) && ((int)(unsigned char)*(signed char *)((char *)l_20)) != 91);
     return l_10;
 }

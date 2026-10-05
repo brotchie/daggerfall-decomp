@@ -8,7 +8,7 @@ extern char D_0017743D[];
 extern unsigned short travel_options;
 extern short D_0018886C[];
 extern int travel_selected_location;
-extern char text_buffer[];
+extern signed char text_buffer[];
 extern struct character *player_character;
 extern struct Q *D_00196A7C;
 extern int D_001AA680;
@@ -29,8 +29,8 @@ void travel_draw_trip_popup(void)
 
     func_00144F68(D_001AA6A0[0], D_001AA6A0[1], D_001AA6A0[2], D_001AA6A0[3], (char *)D_001AA6A0 + 12);
     if (D_001AA6A6 == 100) {
-        mc_strncpy(text_buffer, D_00196A7C[travel_selected_location].name, 160, D_0017743D, 654);
-        text_draw_centered_colored(text_buffer, 160, 74, 145, 156);
+        mc_strncpy(((char *)text_buffer), D_00196A7C[travel_selected_location].name, 160, D_0017743D, 654);
+        text_draw_centered_colored(((char *)text_buffer), 160, 74, 145, 156);
         return;
     }
     D_0012B508 = 199;
@@ -38,9 +38,9 @@ void travel_draw_trip_popup(void)
         if (travel_options & (1 << i))
             func_00144D00(D_0018886C[i * 4], D_0018886C[i * 4 + 1], 4, 4);
     }
-    text_draw_colored(func_000A0DD9(player_character->gold, text_buffer, 10), 148, 97, 145, 156);
-    text_draw_colored(utoa(travel_trip_cost(), text_buffer, 10), 117, 107, 146, 156);
-    text_draw_colored(func_000A0DD9(D_001AA680 / 1440 + 1, text_buffer, 10), 129, 117, 145, 156);
-    mc_strncpy(text_buffer, D_00196A7C[travel_selected_location].name, 160, D_0017743D, 668);
-    text_draw_centered_colored(text_buffer, 160, 2, 145, 156);
+    text_draw_colored(func_000A0DD9(player_character->gold, ((char *)text_buffer), 10), 148, 97, 145, 156);
+    text_draw_colored(utoa(travel_trip_cost(), ((char *)text_buffer), 10), 117, 107, 146, 156);
+    text_draw_colored(func_000A0DD9(D_001AA680 / 1440 + 1, ((char *)text_buffer), 10), 129, 117, 145, 156);
+    mc_strncpy(((char *)text_buffer), D_00196A7C[travel_selected_location].name, 160, D_0017743D, 668);
+    text_draw_centered_colored(((char *)text_buffer), 160, 2, 145, 156);
 }

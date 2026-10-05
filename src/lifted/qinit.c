@@ -7,7 +7,7 @@ extern char D_00170A64[];
 extern char D_00178A10[];
 extern char D_00185F88[];
 extern char region_price_adjustment[];
-extern char D_001940D5[];
+extern signed char D_001940D5;
 extern char D_00195984[];
 extern struct record *nonworld_root;
 extern struct record *D_00195A00;
@@ -15,18 +15,18 @@ extern struct record *camera_object;
 extern struct record *player_object;
 extern struct record *D_00195AC4;
 extern struct character *player_character;
-extern char game_minutes[];
+extern int game_minutes;
 extern struct record *D_00195D00;
-extern char qbn_opcode_arg_counts[];
-extern char current_region[];
-extern char D_00196299[];
-extern char D_001962A3[];
-extern char faction_count[];
+extern int qbn_opcode_arg_counts;
+extern signed char current_region;
+extern signed char D_00196299;
+extern signed char D_001962A3;
+extern int faction_count;
 extern struct faction *factions;
-extern char D_001970DC[];
+extern signed char D_001970DC;
 extern struct quest *current_quest;
 extern struct quest *D_00199780;
-extern char qbn_record_sizes[];
+extern short qbn_record_sizes[];
 extern struct membership *guild_membership;
 
 extern struct faction *faction_find(short);
@@ -69,88 +69,67 @@ struct record *quest_init_item(struct qbn_item *a1)
 
     l_34 = (int)D_00195AC4 + 71;
     l_1C = 0;
-    if ((a1->flags & 2) == 0) goto L330CE;
-    if (a1->index != (-1)) goto L3301E;
-    if (current_quest->faction_id == 0) goto L32F74;
-    l_1C = faction_find(current_quest->faction_id);
-    if (l_1C == 0) goto L32F3F;
-    if (faction_player_related(l_1C) != 0) goto L32F41;
-L32F3F:;
-    goto L32F53;
-L32F41:;
-    l_24 = guild_membership->rank + 1;
-    goto L32F72;
-L32F53:;
-    l_24 = (player_character->level / 2) + 1;
-L32F72:;
-    goto L32F93;
-L32F74:;
-    l_24 = (player_character->level / 2) + 1;
-L32F93:;
-    if (l_24 <= 10) goto L32FA0;
-    l_24 = 10;
-L32FA0:;
-    if (l_1C == 0) goto L32FB2;
-    l_20 = l_1C->power;
-    goto L32FB9;
-L32FB2:;
-    l_20 = 50;
-L32FB9:;
-    l_28 = ((l_20 + 50) * ((((int)&*(signed char *)((char *)(((int)(unsigned short)*(short *)(region_price_adjustment + (((int)(unsigned char)*(signed char *)current_region) * 80))) / 2) + 500)) * rand_range(l_24 * 150, l_24 * 200)) / 1000)) / 100;
-    goto L33034;
-L3301E:;
-    l_28 = rand_range(a1->index, a1->group);
-L33034:;
-    if (l_28 >= 1) goto L33041;
-    l_28 = 1;
-L33041:;
-    l_30 = object_create_child(nonworld_root, 0, 107);
-    l_30->type = 2;
-    l_30->image2 = *(short *)D_00178A10;
-    l_30->flags = 0;
-    l_30->quest_id = (signed char)current_quest->id;
-    l_30->id = object_new_id(700);
-    a1->object = l_30;
-    l_2C = &l_30->data.item;
-    item_make(28, 0, l_2C);
-    l_2C->value = l_28;
-    l_30->image = l_2C->dropped_image;
-    goto L33229;
-L330CE:;
-    if (a1->group >= 0) goto L33107;
-L330D8:;
-    a1->group = rand() % 28;
-    if (*(int *)(D_00185F88 + (a1->group << 2)) == 0) goto L330D8;
-L33107:;
-    l_30 = object_create_child(nonworld_root, 0, 107);
-    l_30->type = 2;
-    l_30->image2 = *(short *)D_00178A10;
-    l_30->flags = 0;
-    l_30->quest_id = (signed char)current_quest->id;
-    l_30->id = object_new_id(700);
-    a1->object = l_30;
-    l_2C = &l_30->data.item;
-    l_2C->message = 0;
-    if (a1->index < 0) goto L33199;
-    item_make((int)(unsigned short)a1->group, a1->index, l_2C);
-    goto L331BB;
-L33199:;
-    item_make_random((int)(unsigned short)a1->group, l_2C);
-    a1->index = l_2C->index;
-L331BB:;
-    l_30->image = l_2C->dropped_image;
-    if (l_2C->group != 9) goto L331EB;
-    if (l_2C->index == 5) goto L331ED;
-L331EB:;
-    goto L331F7;
-L331ED:;
-    if (a1->messages[1] != 0) goto L331F9;
-L331F7:;
-    goto L33229;
-L331F9:;
-    l_2C->message = a1->messages[1];
-    mc_strncpy(&l_2C->name[10], (int)(signed char *)&current_quest->name[0], 4, (int)D_00170A64, 572);
-L33229:;
+    if ((a1->flags & 2) != 0) {
+        if (a1->index == (-1)) {
+            if (current_quest->faction_id != 0) {
+                l_1C = faction_find(current_quest->faction_id);
+                if (l_1C != 0 && faction_player_related(l_1C) != 0) {
+                    l_24 = guild_membership->rank + 1;
+                } else {
+                    l_24 = (player_character->level / 2) + 1;
+                }
+            } else {
+                l_24 = (player_character->level / 2) + 1;
+            }
+            if (l_24 > 10) l_24 = 10;
+            if (l_1C != 0) {
+                l_20 = l_1C->power;
+            } else {
+                l_20 = 50;
+            }
+            l_28 = ((l_20 + 50) * ((((int)&*(signed char *)((char *)(((int)(unsigned short)*(short *)(region_price_adjustment + (((int)(unsigned char)current_region) * 80))) / 2) + 500)) * rand_range(l_24 * 150, l_24 * 200)) / 1000)) / 100;
+        } else {
+            l_28 = rand_range(a1->index, a1->group);
+        }
+        if (l_28 < 1) l_28 = 1;
+        l_30 = object_create_child(nonworld_root, 0, 107);
+        l_30->type = 2;
+        l_30->image2 = *(short *)D_00178A10;
+        l_30->flags = 0;
+        l_30->quest_id = (signed char)current_quest->id;
+        l_30->id = object_new_id(700);
+        a1->object = l_30;
+        l_2C = &l_30->data.item;
+        item_make(28, 0, l_2C);
+        l_2C->value = l_28;
+        l_30->image = l_2C->dropped_image;
+    } else {
+        if (a1->group < 0) {
+            do {
+                a1->group = rand() % 28;
+            } while (*(int *)(D_00185F88 + (a1->group << 2)) == 0);
+        }
+        l_30 = object_create_child(nonworld_root, 0, 107);
+        l_30->type = 2;
+        l_30->image2 = *(short *)D_00178A10;
+        l_30->flags = 0;
+        l_30->quest_id = (signed char)current_quest->id;
+        l_30->id = object_new_id(700);
+        a1->object = l_30;
+        l_2C = &l_30->data.item;
+        l_2C->message = 0;
+        if (a1->index >= 0) {
+            item_make((int)(unsigned short)a1->group, a1->index, l_2C);
+        } else {
+            item_make_random((int)(unsigned short)a1->group, l_2C);
+            a1->index = l_2C->index;
+        }
+        l_30->image = l_2C->dropped_image;
+        if (l_2C->group == 9 && l_2C->index == 5 && a1->messages[1] != 0) {
+            l_2C->message = a1->messages[1];
+            mc_strncpy(&l_2C->name[10], (int)(signed char *)&current_quest->name[0], 4, (int)D_00170A64, 572);
+        }
+    }
     return l_30;
 }
 
@@ -195,176 +174,88 @@ int quest_init_resources(struct quest *a1)
     l_2C = 0;
     current_quest = a1;
     l_4C = (struct qbn_person *)((char *)a1 + a1->section_offsets[3]);
-    *(signed char *)D_001970DC = 0;
-    l_30 = 0;
-L33334:;
-    if (a1->section_counts[3] > l_30) goto L33351;
-    goto L33375;
-L33342:;
-    l_30++;
-    l_4C++;
-    goto L33334;
-L33351:;
-    l_4C->object = 0;
-    if (quest_init_person(l_4C) != 0) goto L33373;
-    return 0;
-L33373:;
-    goto L33342;
-L33375:;
-    if (*(signed char *)D_001970DC == 0) goto L333FB;
-    l_4C = (struct qbn_person *)((char *)a1 + a1->section_offsets[3]);
-    *(signed char *)D_001970DC = 0;
-    l_30 = 0;
-L3339F:;
-    if (a1->section_counts[3] > l_30) goto L333BC;
-    goto L333DF;
-L333AD:;
-    l_30++;
-    l_4C++;
-    goto L3339F;
-L333BC:;
-    if (l_4C->object != 0) goto L333AD;
-    if (quest_init_person(l_4C) != 0) goto L333DD;
-    return 0;
-L333DD:;
-    goto L333AD;
-L333DF:;
-    if (l_2C++ <= 20) goto L333F6;
-    return 0;
-L333F6:;
-    goto L33375;
-L333FB:;
+    D_001970DC = 0;
+    for (l_30 = 0; a1->section_counts[3] > l_30; l_30++, l_4C++) {
+        l_4C->object = 0;
+        if (quest_init_person(l_4C) == 0) return 0;
+    }
+    while (D_001970DC != 0) {
+        l_4C = (struct qbn_person *)((char *)a1 + a1->section_offsets[3]);
+        D_001970DC = 0;
+        for (l_30 = 0; a1->section_counts[3] > l_30; l_30++, l_4C++) {
+            if (l_4C->object != 0) continue;
+            if (quest_init_person(l_4C) == 0) return 0;
+        }
+        if (l_2C++ > 20) return 0;
+    }
     l_50 = (struct qbn_place *)((char *)a1 + a1->section_offsets[4]);
-    l_30 = 0;
-L33411:;
-    if (a1->section_counts[4] > l_30) goto L3342E;
-    goto L33452;
-L3341F:;
-    l_30++;
-    l_50++;
-    goto L33411;
-L3342E:;
-    l_50->object = 0;
-    if (quest_init_place(l_50) != 0) goto L33450;
-    return 0;
-L33450:;
-    goto L3341F;
-L33452:;
+    for (l_30 = 0; a1->section_counts[4] > l_30; l_30++, l_50++) {
+        l_50->object = 0;
+        if (quest_init_place(l_50) == 0) return 0;
+    }
     l_48 = (struct qbn_item *)((char *)a1 + a1->section_offsets[0]);
-    l_30 = 0;
-L33468:;
-    if (a1->section_counts[0] > l_30) goto L33488;
-    goto L334F6;
-L33479:;
-    l_30++;
-    l_48++;
-    goto L33468;
-L33488:;
-    if ((l_48->flags & 2) != 0) goto L334A5;
-    if (l_48->group == 100) goto L334A7;
-L334A5:;
-    goto L334D2;
-L334A7:;
-    mc_memcpy(l_48, *(int *)(D_00195984 + (l_48->index << 2)), 19, (int)D_00170A64, 660, 4);
-    goto L334F4;
-L334D2:;
-    l_48->object = 0;
-    if (quest_init_item(l_48) != 0) goto L334F4;
-    return 0;
-L334F4:;
-    goto L33479;
-L334F6:;
+    for (l_30 = 0; a1->section_counts[0] > l_30; l_30++, l_48++) {
+        if ((l_48->flags & 2) == 0 && l_48->group == 100) {
+            mc_memcpy(l_48, *(int *)(D_00195984 + (l_48->index << 2)), 19, (int)D_00170A64, 660, 4);
+        } else {
+            l_48->object = 0;
+            if (quest_init_item(l_48) == 0) return 0;
+        }
+    }
     l_44 = (struct qbn_foe *)((char *)a1 + a1->section_offsets[7]);
-    l_30 = 0;
-L3350C:;
-    if (a1->section_counts[7] > l_30) goto L33529;
-    goto L3354D;
-L3351A:;
-    l_30++;
-    l_44++;
-    goto L3350C;
-L33529:;
-    l_44->object = 0;
-    if (quest_init_foe(l_44) != 0) goto L3354B;
-    return 0;
-L3354B:;
-    goto L3351A;
-L3354D:;
+    for (l_30 = 0; a1->section_counts[7] > l_30; l_30++, l_44++) {
+        l_44->object = 0;
+        if (quest_init_foe(l_44) == 0) return 0;
+    }
     l_40 = (struct qbn_op *)((char *)a1 + a1->section_offsets[8]);
-    l_30 = 0;
-L33563:;
-    if (a1->section_counts[8] > l_30) goto L33583;
-    goto L33692;
-L33574:;
-    l_30++;
-    l_40++;
-    goto L33563;
-L33583:;
-    l_3C = l_40->args;
-    l_40->last_minutes = *(int *)game_minutes;
-    l_40->arg_count = ((int)(unsigned char)*(signed char *)((char *)(int)(*(char **)qbn_opcode_arg_counts + l_40->opcode))) - 48;
-    *(int *)&l_1C = 0;
-L335BB:;
-    if (l_40->arg_count > *(int *)&l_1C) goto L335DB;
-    goto L3368D;
-L335CC:;
-    (*(int *)&l_1C)++;
-    l_3C++;
-    goto L335BB;
-L335DB:;
-    if ((int)l_3C->record == 305419896) goto L33674;
-    if (l_3C->value == (-1)) goto L335FD;
-    if (l_3C->value != (-2)) goto L335FF;
-L335FD:;
-    goto L3365E;
-L335FF:;
-    l_28 = (int)l_3C->record & 255;
-    l_24 = (int)l_3C->record >> 8;
-    l_38 = (int)a1 + a1->section_offsets[l_24];
-    l_38 += ((int)(short)*(short *)(qbn_record_sizes + (l_24 * 2))) * l_28;
-    l_3C->record = (char *)l_38;
-    l_3C->object = quest_record_object(l_24, l_38);
-    goto L33672;
-L3365E:;
-    l_3C->record = 0;
-    l_3C->object = 0;
-L33672:;
-    goto L33688;
-L33674:;
-    l_3C->record = 0;
-    l_3C->object = 0;
-L33688:;
-    goto L335CC;
-L3368D:;
-    goto L33574;
-L33692:;
-    if (a1->text_offset == 0) goto L336DA;
-    l_34 = (struct qbn_text_var *)((int)a1 + a1->text_offset);
-L336A7:;
-    if (l_34->name[0] == 0) goto L336DA;
-    l_34->record = (char *)quest_record(a1, (int)(short)((unsigned short)l_34->section), l_34->index);
-    l_34++;
-    goto L336A7;
-L336DA:;
+    for (l_30 = 0; a1->section_counts[8] > l_30; l_30++, l_40++) {
+        l_3C = l_40->args;
+        l_40->last_minutes = game_minutes;
+        l_40->arg_count = ((int)(unsigned char)*(signed char *)((char *)(int)(*(char **)&qbn_opcode_arg_counts + l_40->opcode))) - 48;
+        *(int *)&l_1C = 0;
+        for (; l_40->arg_count > *(int *)&l_1C; (*(int *)&l_1C)++, l_3C++) {
+            if ((int)l_3C->record != 305419896) {
+                if (l_3C->value != (-1) && l_3C->value != (-2)) {
+                    l_28 = (int)l_3C->record & 255;
+                    l_24 = (int)l_3C->record >> 8;
+                    l_38 = (int)a1 + a1->section_offsets[l_24];
+                    l_38 += ((int)(short)qbn_record_sizes[l_24]) * l_28;
+                    l_3C->record = (char *)l_38;
+                    l_3C->object = quest_record_object(l_24, l_38);
+                } else {
+                    l_3C->record = 0;
+                    l_3C->object = 0;
+                }
+            } else {
+                l_3C->record = 0;
+                l_3C->object = 0;
+            }
+        }
+    }
+    if (a1->text_offset != 0) {
+        l_34 = (struct qbn_text_var *)((int)a1 + a1->text_offset);
+        while (l_34->name[0] != 0) {
+            l_34->record = (char *)quest_record(a1, (int)(short)((unsigned short)l_34->section), l_34->index);
+            l_34++;
+        }
+    }
     return 1;
 }
 
 struct record *quest_record_object(int a1, int a2)
 {
     switch ((unsigned)a1) {
-    goto L33751;
-case 3:
-    return ((struct qbn_person *)a2)->object;
-case 0:
-    return ((struct qbn_item *)a2)->object;
-case 4:
-    return ((struct qbn_place *)a2)->object;
-case 7:
-    return ((struct qbn_foe *)a2)->object;
-default:
-L33751:;
+        break;
+    case 3:
+        return ((struct qbn_person *)a2)->object;
+    case 0:
+        return ((struct qbn_item *)a2)->object;
+    case 4:
+        return ((struct qbn_place *)a2)->object;
+    case 7:
+        return ((struct qbn_foe *)a2)->object;
+    }
     return 0;
-}
 }
 
 void qaction_place_foe(struct qbn_op *a1, struct qbn_place *a2)
@@ -373,60 +264,32 @@ void qaction_place_foe(struct qbn_op *a1, struct qbn_place *a2)
 
     l_14 = a1->args[1].object;
     if (quest_place_object(l_14, a2) == 0) return;
-    if (a2 != 0) goto L3379C;
-    *(signed char *)D_00196299 = 1;
-L3379C:;
+    if (a2 == 0) D_00196299 = 1;
     monster_init_gear(l_14);
 }
 
 int func_000337AD(int a1, struct qbn_place *a2, struct building *a3)
 {
-    if (a2->p2 <= (-1)) goto L338A4;
-    if (a2->p2 < 17) goto L337EA;
-    if (a2->p2 <= 20) goto L337EC;
-L337EA:;
-    goto L337FC;
-L337EC:;
-    if (a3->type >= 17) goto L337FE;
-L337FC:;
-    goto L3380E;
-L337FE:;
-    if (a3->type <= 20) goto L33813;
-L3380E:;
-    goto L338A4;
-L33813:;
-    if (a2->p3 != (-1)) goto L33838;
-    return (int)(unsigned short)(*(short *)((char *)a1 + 2) & 20480);
-L33838:;
-    if (a2->p3 == 1) goto L3388B;
-    return (((((int)(unsigned short)(*(short *)((char *)a1 + 2) & 16384)) != 0) && (((int)(unsigned short)(*(short *)((char *)a1 + 2) & 4096)) == 0)) ? 1 : 0);
-L3388B:;
-    return (int)(unsigned short)(*(short *)((char *)a1 + 2) & 4096);
-L338A4:;
-    if (a2->p2 <= (-1)) goto L33921;
-    if (a3->type != 11) goto L338D5;
-    if ((short)(a3->type) == a2->p2) goto L338D7;
-L338D5:;
-    goto L338E8;
-L338D7:;
-    if (a3->faction_id == 40) goto L338EA;
-L338E8:;
-    goto L338EC;
-L338EA:;
-    goto L33921;
-L338EC:;
-    if (a2->p2 != 11) goto L33904;
-    return 0;
-L33904:;
-    if ((short)(a3->type) == a2->p2) goto L33921;
-    return 0;
-L33921:;
-    if (a2->p3 != (-1)) goto L33943;
-    return (int)(unsigned short)(*(short *)((char *)a1 + 2) & 20480);
-L33943:;
-    if (a2->p3 == 1) goto L33993;
-    return (((((int)(unsigned short)(*(short *)((char *)a1 + 2) & 16384)) != 0) && (((int)(unsigned short)(*(short *)((char *)a1 + 2) & 4096)) == 0)) ? 1 : 0);
-L33993:;
+    if (a2->p2 > (-1)) {
+        if (a2->p2 >= 17 && a2->p2 <= 20 && a3->type >= 17 && a3->type <= 20) {
+            if (a2->p3 == (-1)) return (int)(unsigned short)(*(short *)((char *)a1 + 2) & 20480);
+            if (a2->p3 != 1) {
+                return (((((int)(unsigned short)(*(short *)((char *)a1 + 2) & 16384)) != 0) && (((int)(unsigned short)(*(short *)((char *)a1 + 2) & 4096)) == 0)) ? 1 : 0);
+            }
+            return (int)(unsigned short)(*(short *)((char *)a1 + 2) & 4096);
+        }
+    }
+    if (a2->p2 > (-1)) {
+        if (a3->type == 11 && (short)(a3->type) == a2->p2 && a3->faction_id == 40) {
+        } else {
+            if (a2->p2 == 11) return 0;
+            if ((short)(a3->type) != a2->p2) return 0;
+        }
+    }
+    if (a2->p3 == (-1)) return (int)(unsigned short)(*(short *)((char *)a1 + 2) & 20480);
+    if (a2->p3 != 1) {
+        return (((((int)(unsigned short)(*(short *)((char *)a1 + 2) & 16384)) != 0) && (((int)(unsigned short)(*(short *)((char *)a1 + 2) & 4096)) == 0)) ? 1 : 0);
+    }
     return (int)(unsigned short)(*(short *)((char *)a1 + 2) & 4096);
 }
 
@@ -435,46 +298,34 @@ int quest_place_object(struct record *a1, struct qbn_place *a2)
     struct record *l_1C;
     short l_14;
 
-    if (a2 != 0) goto L33F7F;
-    if (spawn_find_point(a1, 512, 1024) == 0) goto L33F73;
-    l_1C = object_create_child(player_object->parent, 0, 0);
-    l_1C->x = a1->x;
-    l_1C->y = a1->y;
-    l_1C->z = a1->z;
-    func_000310E1(a1, l_1C);
-    object_free_single(l_1C);
-    return a1->id;
-L33F73:;
-    return 0;
-L33F7F:;
-    if (a1->twin == 0) goto L33F93;
-    object_delete(a1->twin);
-L33F93:;
+    if (a2 == 0) {
+        if (spawn_find_point(a1, 512, 1024) != 0) {
+            l_1C = object_create_child(player_object->parent, 0, 0);
+            l_1C->x = a1->x;
+            l_1C->y = a1->y;
+            l_1C->z = a1->z;
+            func_000310E1(a1, l_1C);
+            object_free_single(l_1C);
+            return a1->id;
+        }
+        return 0;
+    }
+    if (a1->twin != 0) object_delete(a1->twin);
     l_1C = object_find_by_id(nonworld_root, a2->object->id);
-    if (l_1C != 0) goto L33FBB;
-    return 0;
-L33FBB:;
+    if (l_1C == 0) return 0;
     object_reparent(l_1C, a1);
     a1->id = object_new_id(((unsigned)l_1C->id) >> 16);
     l_1C = a1->children;
-L33FE5:;
-    if (l_1C == 0) goto L3400F;
-    l_1C->id = object_new_id(((unsigned)l_1C->parent->id) >> 16);
-    l_1C = l_1C->next;
-    goto L33FE5;
-L3400F:;
-    if (a1->type == 2) goto L3402D;
-    if (a1->type != 18) goto L3402F;
-L3402D:;
-    goto L34068;
-L3402F:;
-    l_14 = a1->data.building.faction_id;
-    mc_memcpy(&a1->data, &a2->object->data, 26, (int)D_00170A64, 924, 4);
-    a1->data.building.faction_id = *(int *)&l_14;
-L34068:;
-    if ((((unsigned)a1->id) >> 16) != (((unsigned)D_00195AC4->id) >> 16)) goto L3408D;
-    a1 = func_000310E1(a1, 0);
-L3408D:;
+    while (l_1C != 0) {
+        l_1C->id = object_new_id(((unsigned)l_1C->parent->id) >> 16);
+        l_1C = l_1C->next;
+    }
+    if (a1->type != 2 && a1->type != 18) {
+        l_14 = a1->data.building.faction_id;
+        mc_memcpy(&a1->data, &a2->object->data, 26, (int)D_00170A64, 924, 4);
+        a1->data.building.faction_id = *(int *)&l_14;
+    }
+    if ((((unsigned)a1->id) >> 16) == (((unsigned)D_00195AC4->id) >> 16)) a1 = func_000310E1(a1, 0);
     return a1->id;
 }
 
@@ -483,10 +334,10 @@ void qaction_place_item(struct quest *a1, struct qbn_op *a2)
     struct record *l_14;
 
     l_14 = a2->args[1].object;
-    if (l_14->twin == 0) goto L340DC;
-    object_delete(l_14->twin);
-    l_14->twin = 0;
-L340DC:;
+    if (l_14->twin != 0) {
+        object_delete(l_14->twin);
+        l_14->twin = 0;
+    }
     quest_place_object(l_14, (struct qbn_place *)a2->args[2].record);
 }
 
@@ -497,24 +348,22 @@ void qaction_place_npc(struct quest *a1, struct qbn_op *a2)
     int l_18;
     int l_14;
 
-    if (a2->args[1].value != (-1)) goto L3419A;
-    l_1C = a2->args[2].object;
-    map_goto_location((int)(unsigned char)*(signed char *)current_region, 3, l_1C->image, l_1C->image2);
-    l_1C = a2->args[2].object->twin;
-    if (l_1C == 0) goto L34198;
-    player_object->x = l_1C->x;
-    player_object->y = l_1C->y;
-    player_object->z = l_1C->z;
-    player_object->yaw = camera_object->yaw;
-    *(signed char *)D_001940D5 |= 2;
-L34198:;
-    return;
-L3419A:;
+    if (a2->args[1].value == (-1)) {
+        l_1C = a2->args[2].object;
+        map_goto_location((int)(unsigned char)current_region, 3, l_1C->image, l_1C->image2);
+        l_1C = a2->args[2].object->twin;
+        if (l_1C != 0) {
+            player_object->x = l_1C->x;
+            player_object->y = l_1C->y;
+            player_object->z = l_1C->z;
+            player_object->yaw = camera_object->yaw;
+            D_001940D5 |= 2;
+        }
+        return;
+    }
     l_1C = a2->args[1].object;
     if (l_1C->type == 65) return;
-    if (l_1C->twin == 0) goto L341C6;
-    object_delete(l_1C->twin);
-L341C6:;
+    if (l_1C->twin != 0) object_delete(l_1C->twin);
     l_1C->twin = 0;
     quest_place_object(l_1C, (struct qbn_place *)a2->args[2].record);
 }
@@ -526,21 +375,21 @@ void qaction_give_item_to_foe(struct quest *a1, struct qbn_op *a2)
     struct record *l_14;
 
     l_1C = a2->args[1].object;
-    if (l_1C->twin == 0) goto L34221;
-    object_delete(l_1C->twin);
-    l_1C->twin = 0;
-L34221:;
+    if (l_1C->twin != 0) {
+        object_delete(l_1C->twin);
+        l_1C->twin = 0;
+    }
     l_14 = a2->args[2].object->twin;
-    if (l_14 == 0) goto L342B0;
-    l_18 = object_create_child(l_14, 0, 107);
-    l_18->type = 2;
-    l_18->id = object_new_id(((unsigned)D_00195AC4->id) >> 16);
-    l_18->image = l_1C->image;
-    l_18->quest_id = (signed char)a1->id;
-    l_18->twin = l_1C;
-    l_1C->twin = l_18;
-    mc_memcpy(&l_18->data, &l_1C->data, 107, (int)D_00170A64, 1008, 4);
-L342B0:;
+    if (l_14 != 0) {
+        l_18 = object_create_child(l_14, 0, 107);
+        l_18->type = 2;
+        l_18->id = object_new_id(((unsigned)D_00195AC4->id) >> 16);
+        l_18->image = l_1C->image;
+        l_18->quest_id = (signed char)a1->id;
+        l_18->twin = l_1C;
+        l_1C->twin = l_18;
+        mc_memcpy(&l_18->data, &l_1C->data, 107, (int)D_00170A64, 1008, 4);
+    }
     l_14 = a2->args[2].object;
     l_1C->id = object_new_id(((unsigned)l_14->id) >> 16);
     object_reparent(l_14, l_1C);
@@ -557,63 +406,34 @@ struct record *quest_find_site_for_building(struct building *a1)
     int l_1C;
 
     l_34 = D_00195A00->children;
-L342FF:;
-    if (l_34 == 0) goto L34448;
-    l_30 = l_34->next;
-    if (l_34->type != 14) goto L3443D;
-    D_00195D00 = l_34;
-    D_00199780 = (struct quest *)((int)&l_34->data.quest);
-    l_28 = (struct qbn_place *)quest_section(D_00199780, 4);
-    l_1C = 0;
-L34351:;
-    if (D_00199780->section_counts[4] > l_1C) goto L34370;
-    goto L343BD;
-L34361:;
-    l_1C++;
-    l_28++;
-    goto L34351;
-L34370:;
-    l_2C = l_28->object;
-    if ((l_28->flags & 64) == 0) goto L34393;
-    *(signed char *)D_001962A3 = 1;
-    goto L3439A;
-L34393:;
-    *(signed char *)D_001962A3 = 0;
-L3439A:;
-    if (l_2C == 0) goto L343AE;
-    if (a1->id == l_2C->data.building.id) goto L343B0;
-L343AE:;
-    goto L343BB;
-L343B0:;
-    return l_2C;
-L343BB:;
-    goto L34361;
-L343BD:;
-    l_24 = (struct qbn_person *)quest_section(D_00199780, 3);
-    l_1C = 0;
-L343D6:;
-    if (D_00199780->section_counts[3] > l_1C) goto L343F5;
-    goto L3443D;
-L343E6:;
-    l_1C++;
-    l_24++;
-    goto L343D6;
-L343F5:;
-    l_20 = (int)RECORD_DATA(l_24->object);
-    if (((int)(short)(l_24->flags & 16384)) == 0) goto L3441B;
-    *(signed char *)D_001962A3 = 1;
-    goto L34422;
-L3441B:;
-    *(signed char *)D_001962A3 = 0;
-L34422:;
-    if (a1->id != *(int *)((char *)l_20 + 20)) goto L3443B;
-    return l_24->object;
-L3443B:;
-    goto L343E6;
-L3443D:;
-    l_34 = l_30;
-    goto L342FF;
-L34448:;
+    while (l_34 != 0) {
+        l_30 = l_34->next;
+        if (l_34->type == 14) {
+            D_00195D00 = l_34;
+            D_00199780 = (struct quest *)((int)&l_34->data.quest);
+            l_28 = (struct qbn_place *)quest_section(D_00199780, 4);
+            for (l_1C = 0; D_00199780->section_counts[4] > l_1C; l_1C++, l_28++) {
+                l_2C = l_28->object;
+                if ((l_28->flags & 64) != 0) {
+                    D_001962A3 = 1;
+                } else {
+                    D_001962A3 = 0;
+                }
+                if (l_2C != 0 && a1->id == l_2C->data.building.id) return l_2C;
+            }
+            l_24 = (struct qbn_person *)quest_section(D_00199780, 3);
+            for (l_1C = 0; D_00199780->section_counts[3] > l_1C; l_1C++, l_24++) {
+                l_20 = (int)RECORD_DATA(l_24->object);
+                if (((int)(short)(l_24->flags & 16384)) != 0) {
+                    D_001962A3 = 1;
+                } else {
+                    D_001962A3 = 0;
+                }
+                if (a1->id == *(int *)((char *)l_20 + 20)) return l_24->object;
+            }
+        }
+        l_34 = l_30;
+    }
     return 0;
 }
 
@@ -623,22 +443,10 @@ int func_0003445C(int a1)
     int l_1C;
 
     l_1C = 0;
-    l_20 = 0;
-L3447B:;
-    if (l_20 < 3) goto L3448B;
-    goto L344A1;
-L34483:;
-    l_20++;
-    goto L3447B;
-L3448B:;
-    if (*(int *)((char *)((l_20 << 2) + a1)) == 0) goto L3449F;
-    l_1C++;
-L3449F:;
-    goto L34483;
-L344A1:;
-    if (l_1C != 0) goto L344B0;
-    return 0;
-L344B0:;
+    for (l_20 = 0; l_20 < 3; l_20++) {
+        if (*(int *)((char *)((l_20 << 2) + a1)) != 0) l_1C++;
+    }
+    if (l_1C == 0) return 0;
     return *(int *)((char *)((rand_range(0, l_1C - 1) << 2) + a1));
 }
 
@@ -649,37 +457,16 @@ int func_000344D3(void)
 
     l_20 = 0;
     l_1C = l_20;
-L344EE:;
-    if (l_20 < *(int *)faction_count) goto L34503;
-    goto L3451E;
-L344FB:;
-    l_20++;
-    goto L344EE;
-L34503:;
-    if (factions[l_20].reputation >= 0) goto L3451C;
-    l_1C++;
-L3451C:;
-    goto L344FB;
-L3451E:;
-    if (l_1C != 0) goto L34530;
-    return 0;
-L34530:;
+    for (; l_20 < faction_count; l_20++) {
+        if (factions[l_20].reputation < 0) l_1C++;
+    }
+    if (l_1C == 0) return 0;
     l_1C = rand_range(0, l_1C - 1);
-    l_20 = 0;
-L34545:;
-    if (l_20 < *(int *)faction_count) goto L3455A;
-    goto L34591;
-L34552:;
-    l_20++;
-    goto L34545;
-L3455A:;
-    if (factions[l_20].reputation >= 0) goto L34552;
-    if (l_1C != 0) goto L34589;
-    return factions[l_20].id;
-L34589:;
-    l_1C--;
-    goto L34552;
-L34591:;
+    for (l_20 = 0; l_20 < faction_count; l_20++) {
+        if (factions[l_20].reputation >= 0) continue;
+        if (l_1C == 0) return factions[l_20].id;
+        l_1C--;
+    }
     return 0;
 }
 
@@ -692,44 +479,23 @@ int quest_object_in_use(int a1)
     int l_1C;
 
     l_2C = D_00195A00->children;
-L345C1:;
-    if (l_2C == 0) goto L346A4;
-    if (l_2C->type != 14) goto L34696;
-    l_20 = &l_2C->data.quest;
-    l_28 = (struct qbn_place *)quest_section(l_20, 4);
-    l_1C = 0;
-L345FE:;
-    if (l_20->section_counts[4] > l_1C) goto L3461B;
-    goto L34640;
-L3460C:;
-    l_1C++;
-    l_28++;
-    goto L345FE;
-L3461B:;
-    if (l_28->object == 0) goto L3463E;
-    if (l_28->object->id != a1) goto L3463E;
-    return 1;
-L3463E:;
-    goto L3460C;
-L34640:;
-    l_24 = (struct qbn_person *)quest_section(l_20, 3);
-    l_1C = 0;
-L34657:;
-    if (l_20->section_counts[3] > l_1C) goto L34674;
-    goto L34696;
-L34665:;
-    l_1C++;
-    l_24++;
-    goto L34657;
-L34674:;
-    if (l_24->object == 0) goto L34694;
-    if (l_24->object->id != a1) goto L34694;
-    return 1;
-L34694:;
-    goto L34665;
-L34696:;
-    l_2C = l_2C->next;
-    goto L345C1;
-L346A4:;
+    while (l_2C != 0) {
+        if (l_2C->type == 14) {
+            l_20 = &l_2C->data.quest;
+            l_28 = (struct qbn_place *)quest_section(l_20, 4);
+            for (l_1C = 0; l_20->section_counts[4] > l_1C; l_1C++, l_28++) {
+                if (l_28->object != 0) {
+                    if (l_28->object->id == a1) return 1;
+                }
+            }
+            l_24 = (struct qbn_person *)quest_section(l_20, 3);
+            for (l_1C = 0; l_20->section_counts[3] > l_1C; l_1C++, l_24++) {
+                if (l_24->object != 0) {
+                    if (l_24->object->id == a1) return 1;
+                }
+            }
+        }
+        l_2C = l_2C->next;
+    }
     return 0;
 }

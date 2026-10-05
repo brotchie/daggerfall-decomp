@@ -6,7 +6,7 @@ extern char D_00170129[];
 extern char D_00170133[];
 extern char D_00170137[];
 extern char D_0017013B[];
-extern char D_00178848[];
+extern int D_00178848[];
 
 extern int profile_find_section(int, ...);
 extern int profile_find_item(int, ...);
@@ -32,38 +32,22 @@ int func_00012203(int a1, int a2, int a3)
     int l_10;
 
     l_18 = *(int *)((char *)a1 + 168);
-    if (l_18 == 0) goto L1222F;
-    if (((int)(unsigned char)*(signed char *)((char *)l_18)) != 91) goto L12231;
-L1222F:;
-    goto L12240;
-L12231:;
-    if (((int)(unsigned char)*(signed char *)((char *)l_18)) != 13) goto L1224C;
-L12240:;
-    return 0;
-L1224C:;
+    if (l_18 == 0 || ((int)(unsigned char)*(signed char *)((char *)l_18)) == 91 || ((int)(unsigned char)*(signed char *)((char *)l_18)) == 13) {
+        return 0;
+    }
     l_14 = (int)(*(char **)((char *)a1 + 132) + *(int *)((char *)a1 + 136));
     l_10 = 0;
-L1226A:;
-    if (((int)(unsigned char)*(signed char *)((char *)l_18)) != 32) goto L12281;
-    l_18++;
-    goto L1226A;
-L12281:;
-    if (((int)(unsigned char)*(signed char *)((char *)l_18)) == 13) goto L12299;
-    if (((unsigned)(a3 - 1)) > l_10) goto L1229B;
-L12299:;
-    goto L122B0;
-L1229B:;
-    *(signed char *)((char *)(l_10++ + a2)) = *(signed char *)((char *)l_18++);
-    goto L12281;
-L122B0:;
+    while (((int)(unsigned char)*(signed char *)((char *)l_18)) == 32) l_18++;
+    while (((int)(unsigned char)*(signed char *)((char *)l_18)) != 13 && ((unsigned)(a3 - 1)) > l_10) {
+        *(signed char *)((char *)(l_10++ + a2)) = *(signed char *)((char *)l_18++);
+    }
     *(signed char *)((char *)(a2 + l_10)) = 0;
     l_18 += 2;
-    if (((unsigned)l_18) < l_14) goto L122D4;
-    *(int *)((char *)a1 + 168) = 0;
-    goto L122E0;
-L122D4:;
-    *(int *)((char *)a1 + 168) = l_18;
-L122E0:;
+    if (((unsigned)l_18) >= l_14) {
+        *(int *)((char *)a1 + 168) = 0;
+    } else {
+        *(int *)((char *)a1 + 168) = l_18;
+    }
     return 1;
 }
 
@@ -71,43 +55,27 @@ int profile_get_yes(int a1, int a2)
 {
     char l_2C[32];
 
-    if ((short)profile_find_item(a1, a2) != 0) goto L12669;
-    return 0;
-L12669:;
-    if ((short)profile_get_string(a1, (int)l_2C, 32) != 0) goto L12689;
-    return 0;
-L12689:;
-    if (stricmp((int)l_2C, (int)D_00170133) != 0) goto L126A3;
-    return 1;
-L126A3:;
+    if ((short)profile_find_item(a1, a2) == 0) return 0;
+    if ((short)profile_get_string(a1, (int)l_2C, 32) == 0) return 0;
+    if (stricmp((int)l_2C, (int)D_00170133) == 0) return 1;
     return 0;
 }
 
 int profile_get_item_string(int a1, int a2, int a3, int a4)
 {
-    if ((short)profile_find_item(a1, a2) != 0) goto L12735;
-    return 0;
-L12735:;
-    if ((short)profile_get_string(a1, a3, a4) != 0) goto L12757;
-    return 0;
-L12757:;
+    if ((short)profile_find_item(a1, a2) == 0) return 0;
+    if ((short)profile_get_string(a1, a3, a4) == 0) return 0;
     return 1;
 }
 
 int profile_set_yes_no(int a1, int a2, short a3)
 {
-    if ((short)profile_find_item(a1, a2) != 0) goto L12791;
-    return 0;
-L12791:;
-    if (a3 == 0) goto L127BA;
-    if ((short)profile_set_string(a1, (int)D_00170137) != 0) goto L127B8;
-    return 0;
-L127B8:;
-    goto L127DA;
-L127BA:;
-    if ((short)profile_set_string(a1, (int)D_0017013B) != 0) goto L127DA;
-    return 0;
-L127DA:;
+    if ((short)profile_find_item(a1, a2) == 0) return 0;
+    if (a3 != 0) {
+        if ((short)profile_set_string(a1, (int)D_00170137) == 0) return 0;
+    } else if ((short)profile_set_string(a1, (int)D_0017013B) == 0) {
+        return 0;
+    }
     return 1;
 }
 
@@ -117,21 +85,13 @@ int profile_delete_section(int a1, int a2)
     int l_14;
     int l_10;
 
-    if ((short)profile_find_section(a1, a2) != 0) goto L128CE;
-    return 0;
-L128CE:;
+    if ((short)profile_find_section(a1, a2) == 0) return 0;
     l_18 = *(int *)((char *)a1 + 152);
     l_14 = (int)(*(char **)((char *)a1 + 132) + *(int *)((char *)a1 + 136));
     l_10 = 1;
-L128F8:;
-    if (((int)(unsigned char)*(signed char *)((char *)(l_18 + l_10))) == 91) goto L12915;
-    if (((unsigned)(l_18 + l_10)) < l_14) goto L12917;
-L12915:;
-    goto L1291F;
-L12917:;
-    l_10++;
-    goto L128F8;
-L1291F:;
+    while (((int)(unsigned char)*(signed char *)((char *)(l_18 + l_10))) != 91 && ((unsigned)(l_18 + l_10)) < l_14) {
+        l_10++;
+    }
     mc_memmove(l_18, l_18 + l_10, l_14 - (l_18 + l_10), (int)D_00170129, 1179, 4);
     *(int *)((char *)a1 + 136) -= l_10;
     *(signed char *)((char *)a1 + 1) |= 128;
@@ -143,23 +103,17 @@ int profile_add_section(int a1, int a2)
     int l_14;
     int l_10;
 
-    if ((short)profile_find_section(a1, a2) == 0) goto L12996;
-    return 0;
-L12996:;
+    if ((short)profile_find_section(a1, a2) != 0) return 0;
     l_14 = (int)(*(char **)((char *)a1 + 132) + *(int *)((char *)a1 + 136));
     l_10 = func_000A0DF4(a2) + 6;
-    if (((unsigned)(*(int *)((char *)a1 + 136) + l_10)) <= *(int *)((char *)a1 + 140)) goto L129DE;
-    return 0;
-L129DE:;
+    if (((unsigned)(*(int *)((char *)a1 + 136) + l_10)) > *(int *)((char *)a1 + 140)) return 0;
     *(signed char *)((char *)l_14++) = 13;
     *(signed char *)((char *)l_14++) = 10;
     *(int *)((char *)a1 + 152) = l_14;
     *(signed char *)((char *)l_14++) = 91;
-L12A05:;
-    if (*(signed char *)((char *)a2) == 0) goto L12A1F;
-    *(signed char *)((char *)l_14++) = *(signed char *)((char *)a2++);
-    goto L12A05;
-L12A1F:;
+    while (*(signed char *)((char *)a2) != 0) {
+        *(signed char *)((char *)l_14++) = *(signed char *)((char *)a2++);
+    }
     *(signed char *)((char *)l_14++) = 93;
     *(signed char *)((char *)l_14++) = 13;
     *(signed char *)((char *)l_14++) = 10;
@@ -180,10 +134,10 @@ int profile_hex_to_int(int a1)
     l_28 = 0;
     l_24 = func_000A0DF4(a1);
     l_1C = 0;
-L12D65:;
-    l_28 += profile_hex_digit((int)(signed char)*(signed char *)((char *)(l_1C++ + a1))) * *(int *)(D_00178848 + (l_24 << 2));
-    l_24--;
-    if (((unsigned)l_24) > 0) goto L12D65;
+    do {
+        l_28 += profile_hex_digit((int)(signed char)*(signed char *)((char *)(l_1C++ + a1))) * D_00178848[l_24];
+        l_24--;
+    } while (((unsigned)l_24) > 0);
     return l_28;
 }
 
@@ -191,18 +145,10 @@ int profile_hex_digit(signed char a1)
 {
     int l_20;
 
-    l_20 = 0;
-L12DBD:;
-    if (((unsigned)l_20) < 16) goto L12DCD;
-    goto L12DF0;
-L12DC5:;
-    l_20++;
-    goto L12DBD;
-L12DCD:;
-    if (((int)(unsigned char)*(signed char *)((char *)(*(int *)D_00178848 + l_20))) != toupper((int)(signed char)a1)) goto L12DEE;
-    return l_20;
-L12DEE:;
-    goto L12DC5;
-L12DF0:;
+    for (l_20 = 0; ((unsigned)l_20) < 16; l_20++) {
+        if (((int)(unsigned char)*(signed char *)((char *)(D_00178848[0] + l_20))) == toupper((int)(signed char)a1)) {
+            return l_20;
+        }
+    }
     return -1;
 }

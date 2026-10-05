@@ -5,7 +5,7 @@ extern char D_00187D30[];
 extern struct record *D_00195AC4;
 extern struct location *current_location;
 extern struct settings *game_settings;
-extern char current_region[];
+extern signed char current_region;
 extern char *flats_cfg_find(int);
 extern struct record *rmb_make_light(struct record *, int, short);
 extern struct record *rmb_make_marker(struct record *, int);
@@ -45,7 +45,7 @@ struct record *rmb_make_flat(struct record *a1, short a2, short a3, int a4)
         if ((l_20[6] & 2) && (game_settings->view_flags & 4))
             l_1C->image = 0;
         if (a3 == 0)
-            a3 = *(short *)(D_00187D30 + *(unsigned char *)current_region * 2);
+            a3 = *(short *)(D_00187D30 + (unsigned char)current_region * 2);
         l_1C->data.person.faction_id = a3;
     }
     return l_1C;

@@ -5,13 +5,13 @@ struct mobile { unsigned char f0; char f1; int f2; };   /* a blessing's data (ty
 extern char D_00175EAA[];        /* __FILE__ */
 extern char D_00176089[];
 extern char D_00176096[];
-extern char trade_price_scale[];
-extern char player_environment[];
+extern int trade_price_scale;
+extern unsigned char player_environment;
 extern struct record *player_entity;
 extern struct character *player_character;
 extern int game_minutes;
-extern char D_00195D2C[];
-extern char D_00195D30[];
+extern int D_00195D2C;
+extern int D_00195D30;
 extern char D_001960D9[];
 extern char D_001961F5[];
 extern struct membership *guild_membership;
@@ -35,36 +35,14 @@ int guild_confirm_price(int);
 
 void guild_check_invitations(void)
 {
-    if (player_character->thieves_invite_count == 100) goto L704C7;
-    if (player_character->thieves_invite_time != 0) goto L704C9;
-L704C7:;
-    goto L704DC;
-L704C9:;
-    if (((unsigned)player_character->thieves_invite_time) < game_minutes) goto L704DE;
-L704DC:;
-    goto L704EA;
-L704DE:;
-    if (((int)(unsigned char)*(signed char *)player_environment) == 1) goto L704EC;
-L704EA:;
-    goto L70525;
-L704EC:;
-    player_character->thieves_invite_count = 100;
-    player_character->thieves_invite_time = 0;
-    mc_strncpy((int)D_001961F5, (int)D_00176089, 13, (int)D_00175EAA, 1233);
-L70525:;
-    if (player_character->brotherhood_invite_count == 100) goto L70548;
-    if (player_character->brotherhood_invite_time != 0) goto L7054A;
-L70548:;
-    goto L7055D;
-L7054A:;
-    if (((unsigned)player_character->brotherhood_invite_time) < game_minutes) goto L7055F;
-L7055D:;
-    goto L7056B;
-L7055F:;
-    if (((int)(unsigned char)*(signed char *)player_environment) == 1) goto L7056D;
-L7056B:;
-    return;
-L7056D:;
+    if (player_character->thieves_invite_count != 100 && player_character->thieves_invite_time != 0 && ((unsigned)player_character->thieves_invite_time) < game_minutes && ((int)player_environment) == 1) {
+        player_character->thieves_invite_count = 100;
+        player_character->thieves_invite_time = 0;
+        mc_strncpy((int)D_001961F5, (int)D_00176089, 13, (int)D_00175EAA, 1233);
+    }
+    if (player_character->brotherhood_invite_count == 100 || player_character->brotherhood_invite_time == 0 || ((unsigned)player_character->brotherhood_invite_time) >= game_minutes || ((int)player_environment) != 1) {
+        return;
+    }
     player_character->brotherhood_invite_count = 100;
     player_character->brotherhood_invite_time = 0;
     mc_strncpy((int)D_001961F5, (int)D_00176096, 13, (int)D_00175EAA, 1243);
@@ -72,7 +50,7 @@ L7056D:;
 
 void guild_teleport(void)
 {
-    *(signed char *)player_environment = 1;
+    player_environment = 1;
     travel_map_open(100);
 }
 
@@ -105,8 +83,8 @@ int guild_confirm_price(int a1)
 {
     int l_1C;
 
-    *(int *)D_00195D2C = func_00097BD9((*(int *)D_00195D2C = a1));
-    *(int *)D_00195D30 = ((*(int *)D_00195D30 = trade_adjust_price(*(int *)D_00195D2C, 0)) * *(int *)trade_price_scale) / 256;
+    D_00195D2C = func_00097BD9((D_00195D2C = a1));
+    D_00195D30 = ((D_00195D30 = trade_adjust_price(D_00195D2C, 0)) * trade_price_scale) / 256;
     func_00097A85();
     l_1C = func_00097B2A();
     return l_1C;
@@ -128,33 +106,28 @@ void guild_cure_diseases(void)
 
     l_20 = 0;
     l_24 = player_entity->children;
-L70775:;
-    if (l_24 == 0) goto L707B3;
-    if (l_24->type != 11) goto L707A8;
-    l_18 = &l_24->data.disease;
-    if (l_18->id >= 100) goto L707A8;
-    l_20++;
-L707A8:;
-    l_24 = l_24->next;
-    goto L70775;
-L707B3:;
-    if (player_character->special_infection_time == 0) goto L707C7;
-    l_20++;
-L707C7:;
-    if (l_20 != 0) goto L707E1;
-    msgbox_show_rsc(30, 1);
-    return;
-L707E1:;
+    while (l_24 != 0) {
+        if (l_24->type == 11) {
+            l_18 = &l_24->data.disease;
+            if (l_18->id < 100) l_20++;
+        }
+        l_24 = l_24->next;
+    }
+    if (player_character->special_infection_time != 0) l_20++;
+    if (l_20 == 0) {
+        msgbox_show_rsc(30, 1);
+        return;
+    }
     l_1C = l_20 * 250;
-    if (guild_membership->kind != 142) goto L70837;
-    l_1C = (l_1C * (((10 - guild_membership->rank) << 8) / 10)) / 256;
-L70837:;
+    if (guild_membership->kind == 142) {
+        l_1C = (l_1C * (((10 - guild_membership->rank) << 8) / 10)) / 256;
+    }
     l_1C = guild_confirm_price(l_1C);
     if (l_1C < 1) return;
-    if (gold_can_afford(l_1C) != 0) goto L70865;
-    msgbox_show_rsc(454, 1);
-    return;
-L70865:;
+    if (gold_can_afford(l_1C) == 0) {
+        msgbox_show_rsc(454, 1);
+        return;
+    }
     gold_spend(l_1C);
     spfx_cure_disease((int)player_entity, (int)player_character);
 }

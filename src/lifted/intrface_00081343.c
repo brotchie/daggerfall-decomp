@@ -2,50 +2,36 @@
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
 
-extern char D_00142940[];
-extern char D_00142944[];
-extern char steer_row_y1[];
-extern char steer_row_y2[];
-extern char steer_col_x1[];
-extern char steer_col_x2[];
+extern short D_00142940;
+extern short D_00142944;
+extern short steer_row_y1;
+extern short steer_row_y2;
+extern short steer_col_x1;
+extern short steer_col_x2;
 
 
 int intrface_region_at(int a1, int a2, int a3, int a4)
 {
     int l_10;
 
-    if (((int)(short)*(short *)steer_row_y1) <= a2) goto L8137B;
-    l_10 = 0;
-    *(int *)((char *)a4) = (int)(short)*(short *)D_00142944;
-    goto L813BD;
-L8137B:;
-    if (((int)(short)*(short *)steer_row_y1) > a2) goto L81393;
-    if (((int)(short)*(short *)steer_row_y2) > a2) goto L81395;
-L81393:;
-    goto L813AA;
-L81395:;
-    l_10 = 3;
-    *(int *)((char *)a4) = (int)(short)*(short *)steer_row_y1;
-    goto L813BD;
-L813AA:;
-    l_10 = 6;
-    *(int *)((char *)a4) = (int)(short)*(short *)steer_row_y2;
-L813BD:;
-    if (((int)(short)*(short *)steer_col_x1) <= a1) goto L813D7;
-    *(int *)((char *)a3) = (int)(short)*(short *)D_00142940;
-    goto L81415;
-L813D7:;
-    if (((int)(short)*(short *)steer_col_x1) > a1) goto L813EF;
-    if (((int)(short)*(short *)steer_col_x2) > a1) goto L813F1;
-L813EF:;
-    goto L81405;
-L813F1:;
-    l_10++;
-    *(int *)((char *)a3) = (int)(short)*(short *)steer_col_x1;
-    goto L81415;
-L81405:;
-    l_10 += 2;
-    *(int *)((char *)a3) = (int)(short)*(short *)steer_col_x2;
-L81415:;
+    if (((int)(short)steer_row_y1) > a2) {
+        l_10 = 0;
+        *(int *)((char *)a4) = (int)(short)D_00142944;
+    } else if (((int)(short)steer_row_y1) <= a2 && ((int)(short)steer_row_y2) > a2) {
+        l_10 = 3;
+        *(int *)((char *)a4) = (int)(short)steer_row_y1;
+    } else {
+        l_10 = 6;
+        *(int *)((char *)a4) = (int)(short)steer_row_y2;
+    }
+    if (((int)(short)steer_col_x1) > a1) {
+        *(int *)((char *)a3) = (int)(short)D_00142940;
+    } else if (((int)(short)steer_col_x1) <= a1 && ((int)(short)steer_col_x2) > a1) {
+        l_10++;
+        *(int *)((char *)a3) = (int)(short)steer_col_x1;
+    } else {
+        l_10 += 2;
+        *(int *)((char *)a3) = (int)(short)steer_col_x2;
+    }
     return l_10;
 }

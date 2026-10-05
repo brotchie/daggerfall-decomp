@@ -6,7 +6,7 @@ extern char D_0012B508;
 extern short D_0012DA44;
 extern char *screen_buffer;
 extern char D_00170D55[];       /* __FILE__ */
-extern char text_buffer[];
+extern signed char text_buffer[];
 extern struct flags5 D_001940D5;
 extern struct flags6 D_001940D6;
 extern short D_00195F36;
@@ -156,46 +156,46 @@ void msgbox_render(char *text, char **out)
     D_0012B508 = savedcolor;
     h = D_0012DA44;
     n = 0;
-    text_buffer[0] = 0;
+    ((char *)text_buffer)[0] = 0;
     mode = 252;
     while ((*q != 0 || q[-1] != 0) && stop == 0) {
         switch (c = *q++) {
         case 0:
             if (mode == 252)
-                text_draw_shadow(text_buffer, x, y);
+                text_draw_shadow(((char *)text_buffer), x, y);
             else
-                text_draw_centred_shadow(text_buffer, 160, y);
+                text_draw_centred_shadow(((char *)text_buffer), 160, y);
             y += h;
             n = 0;
             h = D_0012DA44;
             x = xbase;
-            text_buffer[0] = 0;
+            ((char *)text_buffer)[0] = 0;
             if (msgbox_next_page != 0 && msgbox_next_page <= q)
                 stop = 1;
             break;
         case 251:
             if (mode == 252)
-                text_draw_shadow(text_buffer, x, y);
+                text_draw_shadow(((char *)text_buffer), x, y);
             else
-                text_draw_centred_shadow(text_buffer, 160, y);
+                text_draw_centred_shadow(((char *)text_buffer), 160, y);
             x = xbase + (unsigned char)*q++;
-            text_buffer[0] = 0;
+            ((char *)text_buffer)[0] = 0;
             n = 0;
             break;
         case 249:
             if (mode == 252)
-                text_draw_shadow(text_buffer, x, y);
+                text_draw_shadow(((char *)text_buffer), x, y);
             else
-                text_draw_centred_shadow(text_buffer, 160, y);
-            x += font_text_width(text_buffer);
-            text_buffer[0] = 0;
+                text_draw_centred_shadow(((char *)text_buffer), 160, y);
+            x += font_text_width(((char *)text_buffer));
+            ((char *)text_buffer)[0] = 0;
             n = 0;
             func_0012DB50((unsigned char)*q++);
             if (h < D_0012DA44)
                 h = D_0012DA44;
             break;
         case 248:
-            D_00195F36 = x + font_text_width(text_buffer);
+            D_00195F36 = x + font_text_width(((char *)text_buffer));
             D_00195F38 = y;
             q++;
             break;
@@ -209,17 +209,17 @@ void msgbox_render(char *text, char **out)
             break;
         case 250:
             if (mode == 252)
-                text_draw_shadow(text_buffer, x, y);
+                text_draw_shadow(((char *)text_buffer), x, y);
             else
-                text_draw_centred_shadow(text_buffer, 160, y);
-            x += font_text_width(text_buffer);
-            text_buffer[0] = 0;
+                text_draw_centred_shadow(((char *)text_buffer), 160, y);
+            x += font_text_width(((char *)text_buffer));
+            ((char *)text_buffer)[0] = 0;
             n = 0;
             D_0012B508 = *q++;
             break;
         default:
-            text_buffer[n++] = c;
-            text_buffer[n] = 0;
+            ((char *)text_buffer)[n++] = c;
+            ((char *)text_buffer)[n] = 0;
             break;
         }
     }

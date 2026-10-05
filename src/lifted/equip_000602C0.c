@@ -9,75 +9,59 @@ int func_000602C0(int a1, int a2)
 {
     int l_18;
 
-__dagger_tbl602D8:;
     switch (a2) {
-case 0:
-    if (a1 != 0) goto L6031A;
-    l_18 = 3;
-    goto L6033B;
-L6031A:;
-    if (a1 != 1) goto L60329;
-    l_18 = 7;
-    goto L6033B;
-L60329:;
-    l_18 = rand_range(4, 6);
-L6033B:;
-    goto L6041E;
-case 1:
-    if (a1 != 0) goto L6034F;
-    l_18 = 8;
-    goto L60356;
-L6034F:;
-    l_18 = 9;
-L60356:;
-    goto L6041E;
-case 2:
-    if (a1 != 0) goto L60375;
-    l_18 = rand_range(10, 11);
-    goto L60396;
-L60375:;
-    if (a1 != 1) goto L60384;
-    l_18 = 16;
-    goto L60396;
-L60384:;
-    l_18 = rand_range(12, 15);
-L60396:;
-    goto L6041E;
-case 3:
-    if (a1 != 0) goto L603AA;
-    l_18 = 17;
-    goto L603CB;
-L603AA:;
-    if (a1 != 1) goto L603B9;
-    l_18 = 21;
-    goto L603CB;
-L603B9:;
-    l_18 = rand_range(18, 20);
-L603CB:;
-    goto L6041E;
-case 4:
-    if (a1 != 0) goto L603DC;
-    l_18 = 22;
-    goto L603FD;
-L603DC:;
-    if (a1 != 1) goto L603EB;
-    l_18 = 26;
-    goto L603FD;
-L603EB:;
-    l_18 = rand_range(23, 25);
-L603FD:;
-    goto L6041E;
-case 6:
-    if (a1 != 0) goto L6040E;
-    l_18 = 0;
-    goto L60415;
-L6040E:;
-    l_18 = 1;
-L60415:;
-    goto L6041E;
-default:
-    l_18 = -1;
-L6041E:;
+    case 0:
+        if (a1 == 0) {
+            l_18 = 3;
+        } else if (a1 == 1) {
+            l_18 = 7;
+        } else {
+            l_18 = rand_range(4, 6);
+        }
+        break;
+    case 1:
+        if (a1 == 0) {
+            l_18 = 8;
+        } else {
+            l_18 = 9;
+        }
+        break;
+    case 2:
+        if (a1 == 0) {
+            l_18 = rand_range(10, 11);
+        } else if (a1 == 1) {
+            l_18 = 16;
+        } else {
+            l_18 = rand_range(12, 15);
+        }
+        break;
+    case 3:
+        if (a1 == 0) {
+            l_18 = 17;
+        } else if (a1 == 1) {
+            l_18 = 21;
+        } else {
+            l_18 = rand_range(18, 20);
+        }
+        break;
+    case 4:
+        if (a1 == 0) {
+            l_18 = 22;
+        } else if (a1 == 1) {
+            l_18 = 26;
+        } else {
+            l_18 = rand_range(23, 25);
+        }
+        break;
+    case 6:
+        if (a1 == 0) {
+            l_18 = 0;
+        } else {
+            l_18 = 1;
+        }
+        break;
+    default:
+        l_18 = -1;
+    }
     return l_18;
-}
 }

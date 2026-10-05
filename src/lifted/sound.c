@@ -4,18 +4,18 @@
 #include "records.h"
 
 extern char D_00175ACC[];
-extern char player_environment[];
-extern char D_00186DEC[];
-extern char D_0018DC34[];
-extern char D_0018DD54[];
-extern char D_0018DD5C[];
-extern char D_0018DD60[];
+extern unsigned char player_environment;
+extern int D_00186DEC;
+extern int D_0018DC34;
+extern int D_0018DD54;
+extern int D_0018DD5C;
+extern int D_0018DD60;
 extern struct record *player_object;
 extern struct settings *game_settings;
-extern char sound_last_size[];
-extern char climate_weathers[];
-extern char D_00196280[];
-extern char cfg_stereo[];
+extern int sound_last_size;
+extern signed char climate_weathers[];
+extern signed char D_00196280;
+extern signed char cfg_stereo;
 extern char sound_channels[];
 extern char D_001A3AF4[];
 extern char D_001A3AF8[];
@@ -29,19 +29,19 @@ extern char D_001A3B2C[];
 extern char D_001A3BD8[];
 extern char D_001A3BDC[];
 extern char D_001A3BE4[];
-extern char D_001A3EFC[];
-extern char D_001A3F08[];
-extern char nearest_fire_distance[];
+extern int D_001A3EFC;
+extern int D_001A3F08;
+extern int nearest_fire_distance;
 extern struct record *nearest_fire;
-extern char ambient_rain_channel[];
-extern char ambient_crickets_channel[];
-extern char ambient_fire_channel[];
-extern char D_001A3F2C[];
-extern char D_001A3F30[];
-extern char D_001A3F48[];
+extern int ambient_rain_channel;
+extern int ambient_crickets_channel;
+extern int ambient_fire_channel;
+extern int D_001A3F2C;
+extern int D_001A3F30;
+extern int D_001A3F48;
 extern char music_current[];
-extern char sound_enabled[];
-extern char D_001A5AD0[];
+extern signed char sound_enabled;
+extern int D_001A5AD0;
 
 extern int sos_load_song(int, ...);
 extern int climate_category(void);
@@ -94,36 +94,28 @@ void sound_volume_pan(int a1, int a2, int a3, int a4, int a5)
     a1 = (int)&player_object->x;
     l_18 = func_000C7FF4(*(int *)((char *)a1 + 4) - *(int *)((char *)a2 + 4), func_000C7FD9(*(int *)((char *)a1), *(int *)((char *)a1 + 8), *(int *)((char *)a2), *(int *)((char *)a2 + 8)));
     l_C = l_18;
-    if (l_18 >= 25) goto L68E53;
-    *(int *)((char *)a3) = (((int)(short)game_settings->sound_volume) * 32767) / 128;
-    *(int *)((char *)a4) = 32768;
-    return;
-L68E53:;
-    l_1C = *(int *)D_001A3F2C;
-    if (l_18 <= l_1C) goto L68E6E;
-    *(int *)((char *)a3) = 0;
-    goto L68E89;
-L68E6E:;
-    *(int *)((char *)a3) = 32767 - ((l_18 * 32767) / l_1C);
-L68E89:;
-    if (*(int *)((char *)a3) <= 32767) goto L68E9D;
-    *(int *)((char *)a3) = 32767;
-L68E9D:;
+    if (l_18 < 25) {
+        *(int *)((char *)a3) = (((int)(short)game_settings->sound_volume) * 32767) / 128;
+        *(int *)((char *)a4) = 32768;
+        return;
+    }
+    l_1C = D_001A3F2C;
+    if (l_18 > l_1C) {
+        *(int *)((char *)a3) = 0;
+    } else {
+        *(int *)((char *)a3) = 32767 - ((l_18 * 32767) / l_1C);
+    }
+    if (*(int *)((char *)a3) > 32767) *(int *)((char *)a3) = 32767;
     l_14 = func_000C808D(*(int *)((char *)a1), *(int *)((char *)a1 + 8), *(int *)((char *)a2), *(int *)((char *)a2 + 8));
     l_10 = ai_angle_diff(player_object->yaw, l_14, (int)&l_18);
-    if (l_10 <= 512) goto L68EED;
-    l_10 = 512 - (l_10 - 512);
-L68EED:;
+    if (l_10 > 512) l_10 = 512 - (l_10 - 512);
     l_10 = (l_10 << 15) / 512;
-    if (*(signed char *)cfg_stereo == 0) goto L68F0F;
-    l_10 = -l_10;
-L68F0F:;
-    if (l_18 <= 0) goto L68F24;
-    *(int *)((char *)a4) = l_10 + 32768;
-    goto L68F31;
-L68F24:;
-    *(int *)((char *)a4) = 32768 - l_10;
-L68F31:;
+    if (cfg_stereo != 0) l_10 = -l_10;
+    if (l_18 > 0) {
+        *(int *)((char *)a4) = l_10 + 32768;
+    } else {
+        *(int *)((char *)a4) = 32768 - l_10;
+    }
     *(int *)((char *)a3) = (*(int *)((char *)a3) * ((int)(short)game_settings->sound_volume)) / 128;
 }
 
@@ -136,41 +128,21 @@ int func_00069281(int a1, int a2)
     int l_18;
 
     l_18 = 1;
-    if (*(signed char *)sound_enabled != 0) goto L692B0;
-    return -1;
-L692B0:;
-    if (*(int *)D_0018DD5C != (-1)) goto L692C5;
-    return -1;
-L692C5:;
-    l_28 = 0;
-L692CC:;
-    if (l_28 < 3) goto L692DC;
-    goto L6930B;
-L692D4:;
-    l_28++;
-    goto L692CC;
-L692DC:;
-    if (*(int *)(D_001A3BD8 + (l_28 * 268)) == 305419896) goto L6930B;
-    if ((short)func_000A2460(*(int *)D_0018DD60, *(int *)(D_001A3BD8 + (l_28 * 268))) == 0) goto L692D4;
-L6930B:;
-    if (l_28 != 3) goto L69353;
-    l_28 = 0;
-L69318:;
-    if (l_28 < 3) goto L69328;
-    goto L69353;
-L69320:;
-    l_28++;
-    goto L69318;
-L69328:;
-    if (*(int *)(D_001A3BDC + (l_28 * 268)) >= 127) goto L69351;
-    func_000A2687(*(int *)D_0018DD60, *(int *)(D_001A3BD8 + (l_28 * 268)));
-    goto L69353;
-L69351:;
-    goto L69320;
-L69353:;
-    if (l_28 != 3) goto L69365;
-    return -1;
-L69365:;
+    if (sound_enabled == 0) return -1;
+    if (D_0018DD5C == (-1)) return -1;
+    for (l_28 = 0; l_28 < 3; l_28++) {
+        if (*(int *)(D_001A3BD8 + (l_28 * 268)) == 305419896) break;
+        if ((short)func_000A2460(D_0018DD60, *(int *)(D_001A3BD8 + (l_28 * 268))) != 0) break;
+    }
+    if (l_28 == 3) {
+        for (l_28 = 0; l_28 < 3; l_28++) {
+            if (*(int *)(D_001A3BDC + (l_28 * 268)) < 127) {
+                func_000A2687(D_0018DD60, *(int *)(D_001A3BD8 + (l_28 * 268)));
+                break;
+            }
+        }
+    }
+    if (l_28 == 3) return -1;
     l_24 = 32767;
     l_20 = 32768;
     mc_memset(((int)sound_channels) + (l_28 * 268), 0, 240, (int)D_00175ACC, 291, 4);
@@ -186,7 +158,7 @@ L69365:;
     *(int *)(D_001A3B20 + (l_28 * 268)) = 8;
     *(int *)(D_001A3B24 + (l_28 * 268)) = 1;
     *(int *)(D_001A3BE4 + (l_28 * 268)) = 0;
-    *(int *)(D_001A3BD8 + (l_28 * 268)) = func_000A2504(*(int *)D_0018DD60, ((int)sound_channels) + (l_28 * 268));
+    *(int *)(D_001A3BD8 + (l_28 * 268)) = func_000A2504(D_0018DD60, ((int)sound_channels) + (l_28 * 268));
     return l_28;
 }
 
@@ -199,41 +171,21 @@ int sound_play_sample_flat(int a1, int a2)
     int l_18;
 
     l_18 = 0;
-    if (*(signed char *)sound_enabled != 0) goto L694E7;
-    return -1;
-L694E7:;
-    if (*(int *)D_0018DD5C != (-1)) goto L694FC;
-    return -1;
-L694FC:;
-    l_28 = 0;
-L69503:;
-    if (l_28 < 3) goto L69513;
-    goto L69542;
-L6950B:;
-    l_28++;
-    goto L69503;
-L69513:;
-    if (*(int *)(D_001A3BD8 + (l_28 * 268)) == 305419896) goto L69542;
-    if ((short)func_000A2460(*(int *)D_0018DD60, *(int *)(D_001A3BD8 + (l_28 * 268))) == 0) goto L6950B;
-L69542:;
-    if (l_28 != 3) goto L6958A;
-    l_28 = 0;
-L6954F:;
-    if (l_28 < 3) goto L6955F;
-    goto L6958A;
-L69557:;
-    l_28++;
-    goto L6954F;
-L6955F:;
-    if (*(int *)(D_001A3BDC + (l_28 * 268)) >= 90) goto L69588;
-    func_000A2687(*(int *)D_0018DD60, *(int *)(D_001A3BD8 + (l_28 * 268)));
-    goto L6958A;
-L69588:;
-    goto L69557;
-L6958A:;
-    if (l_28 != 3) goto L6959C;
-    return -1;
-L6959C:;
+    if (sound_enabled == 0) return -1;
+    if (D_0018DD5C == (-1)) return -1;
+    for (l_28 = 0; l_28 < 3; l_28++) {
+        if (*(int *)(D_001A3BD8 + (l_28 * 268)) == 305419896) break;
+        if ((short)func_000A2460(D_0018DD60, *(int *)(D_001A3BD8 + (l_28 * 268))) != 0) break;
+    }
+    if (l_28 == 3) {
+        for (l_28 = 0; l_28 < 3; l_28++) {
+            if (*(int *)(D_001A3BDC + (l_28 * 268)) < 90) {
+                func_000A2687(D_0018DD60, *(int *)(D_001A3BD8 + (l_28 * 268)));
+                break;
+            }
+        }
+    }
+    if (l_28 == 3) return -1;
     mc_memset(((int)sound_channels) + (l_28 * 268), 0, 240, (int)D_00175ACC, 336, 4);
     *(int *)(D_001A3BDC + (l_28 * 268)) = 90;
     *(int *)(sound_channels + (l_28 * 268)) = a1;
@@ -245,215 +197,175 @@ L6959C:;
     *(int *)(D_001A3B20 + (l_28 * 268)) = 8;
     *(int *)(D_001A3B24 + (l_28 * 268)) = 1;
     *(int *)(D_001A3BE4 + (l_28 * 268)) = 0;
-    *(int *)(D_001A3BD8 + (l_28 * 268)) = func_000A2504(*(int *)D_0018DD60, ((int)sound_channels) + (l_28 * 268));
+    *(int *)(D_001A3BD8 + (l_28 * 268)) = func_000A2504(D_0018DD60, ((int)sound_channels) + (l_28 * 268));
     return l_28;
 }
 
 void sound_stop_channel(int a1)
 {
     if (*(int *)(D_001A3BD8 + (a1 * 268)) == 305419896) return;
-    func_000A2687(*(int *)D_0018DD60, *(int *)(D_001A3BD8 + (a1 * 268)));
+    func_000A2687(D_0018DD60, *(int *)(D_001A3BD8 + (a1 * 268)));
     *(int *)(D_001A3BD8 + (a1 * 268)) = 305419896;
 }
 
 int func_000696F9(int a1)
 {
-    if (*(int *)(D_001A3BD8 + (a1 * 268)) != 305419896) goto L69726;
-    return 1;
-L69726:;
-    return (int)(short)func_000A2460(*(int *)D_0018DD60, *(int *)(D_001A3BD8 + (a1 * 268)));
+    if (*(int *)(D_001A3BD8 + (a1 * 268)) == 305419896) return 1;
+    return (int)(short)func_000A2460(D_0018DD60, *(int *)(D_001A3BD8 + (a1 * 268)));
 }
 
 void music_play(int a1)
 {
-    if (*(signed char *)sound_enabled == 0) return;
+    if (sound_enabled == 0) return;
     if (stricmp((int)music_current, a1) == 0) return;
     music_stop();
     mc_strncpy((int)music_current, a1, 13, (int)D_00175ACC, 374);
-    *(int *)D_001A3F30 = sos_load_song((int)music_current);
-    if (*(int *)D_0018DC34 == 0) goto L697CF;
-    dpmi_lock_region(*(int *)D_0018DC34, func_000A277F(*(int *)D_0018DC34));
-L697CF:;
-    func_000A27A0(*(int *)D_001A3F30);
+    D_001A3F30 = sos_load_song((int)music_current);
+    if (D_0018DC34 != 0) {
+        dpmi_lock_region(D_0018DC34, func_000A277F(D_0018DC34));
+    }
+    func_000A27A0(D_001A3F30);
 }
 
 void music_stop(void)
 {
-    if (*(signed char *)sound_enabled == 0) goto L69803;
-    if (*(int *)D_001A3F48 != 0) goto L69805;
-L69803:;
-    return;
-L69805:;
-    func_000A2857(*(int *)D_001A3F30);
-    func_000A0517(*(int *)D_001A3F30);
-    dpmi_unlock_region(*(int *)D_0018DC34, func_000A277F(*(int *)D_0018DC34));
-    if (*(int *)D_001A3F48 == 0) goto L69847;
-    if (*(int *)D_001A3F48 != (-1751672937)) goto L69849;
-L69847:;
-    goto L69867;
-L69849:;
-    mc_free(*(int *)D_001A3F48, (int)D_00175ACC, 393);
-    *(int *)D_001A3F48 = -1751672937;
-L69867:;
-    *(int *)D_0018DC34 = 0;
+    if (sound_enabled == 0 || D_001A3F48 == 0) return;
+    func_000A2857(D_001A3F30);
+    func_000A0517(D_001A3F30);
+    dpmi_unlock_region(D_0018DC34, func_000A277F(D_0018DC34));
+    if (D_001A3F48 != 0 && D_001A3F48 != (-1751672937)) {
+        mc_free(D_001A3F48, (int)D_00175ACC, 393);
+        D_001A3F48 = -1751672937;
+    }
+    D_0018DC34 = 0;
 }
 
 void func_0006987B(void)
 {
-    if (*(signed char *)sound_enabled == 0) return;
-    if (*(int *)D_0018DD54 == (-1)) return;
-    func_000A1D3C(*(int *)D_00186DEC);
+    if (sound_enabled == 0) return;
+    if (D_0018DD54 == (-1)) return;
+    func_000A1D3C(D_00186DEC);
 }
 
 void music_update(void)
 {
-    if (*(signed char *)sound_enabled == 0) return;
-    if (*(int *)D_001A3F48 == 0) return;
-    if (*(int *)D_0018DD54 == (-1)) return;
-    if ((short)func_000A2941(*(int *)D_001A3F30) == 0) return;
-    func_000A27A0(*(int *)D_001A3F30);
+    if (sound_enabled == 0) return;
+    if (D_001A3F48 == 0) return;
+    if (D_0018DD54 == (-1)) return;
+    if ((short)func_000A2941(D_001A3F30) == 0) return;
+    func_000A27A0(D_001A3F30);
 }
 
 int sound_play(int a1, struct record *a2, int a3)
 {
     int l_14;
 
-    if (*(signed char *)sound_enabled != 0) goto L6995F;
-    return -1;
-L6995F:;
+    if (sound_enabled == 0) return -1;
     l_14 = sound_cache_load(a1);
-    return sound_play_sample(l_14, *(int *)sound_last_size, a2, a3);
+    return sound_play_sample(l_14, sound_last_size, a2, a3);
 }
 
 int sound_play_ui(int a1)
 {
     int l_1C;
 
-    if (*(signed char *)sound_enabled != 0) goto L699AF;
-    return -1;
-L699AF:;
+    if (sound_enabled == 0) return -1;
     l_1C = sound_cache_load(a1);
-    return sound_play_sample_flat(l_1C, *(int *)sound_last_size);
+    return sound_play_sample_flat(l_1C, sound_last_size);
 }
 
 int sound_play_ambient_loop(int a1, struct record *a2, int a3)
 {
     int l_14;
 
-    if (*(signed char *)sound_enabled != 0) goto L69A89;
-    return -1;
-L69A89:;
+    if (sound_enabled == 0) return -1;
     l_14 = sound_cache_load(a1);
-    return sound_play_sample(l_14, *(int *)sound_last_size, a2, -1);
+    return sound_play_sample(l_14, sound_last_size, a2, -1);
 }
 
 int func_00069AB8(int a1, struct record *a2, int a3)
 {
     int l_14;
 
-    if (*(signed char *)sound_enabled != 0) goto L69ADF;
-    return -1;
-L69ADF:;
+    if (sound_enabled == 0) return -1;
     l_14 = sound_cache_load(a1);
-    return sound_play_sample(l_14, *(int *)sound_last_size, a2, -2);
+    return sound_play_sample(l_14, sound_last_size, a2, -2);
 }
 
 int func_00069B0E(int a1, int a2)
 {
     int l_18;
 
-    if (*(signed char *)sound_enabled != 0) goto L69B33;
-    return -1;
-L69B33:;
+    if (sound_enabled == 0) return -1;
     func_0009E2BB(a2, a1, (int)&l_18);
     return l_18;
 }
 
 void func_00069B53(int a1)
 {
-    if (*(signed char *)sound_enabled == 0) return;
+    if (sound_enabled == 0) return;
     func_0009E61A(a1);
 }
 
 void sound_update_ambient(void)
 {
-    if (((int)(unsigned char)*(signed char *)player_environment) != 1) goto L69C7A;
-    if (*(int *)ambient_fire_channel == 0) goto L69BBA;
-    sound_stop_channel(*(int *)ambient_fire_channel);
-    *(int *)ambient_fire_channel = 0;
-L69BBA:;
-    if (((int)(unsigned char)(*(signed char *)(climate_weathers + climate_category()) & 127)) != 4) goto L69BF6;
-    if (*(int *)ambient_rain_channel != 0) goto L69BF4;
-    *(int *)ambient_rain_channel = sound_play_ambient_loop(385, player_object, 100);
-L69BF4:;
-    goto L69C13;
-L69BF6:;
-    if (*(int *)ambient_rain_channel == 0) goto L69C13;
-    sound_stop_channel(*(int *)ambient_rain_channel);
-    *(int *)ambient_rain_channel = 0;
-L69C13:;
-    if (*(signed char *)D_00196280 != 0) goto L69C31;
-    if (((int)(unsigned char)*(signed char *)(climate_weathers + climate_category())) < 2) goto L69C33;
-L69C31:;
-    goto L69C58;
-L69C33:;
-    if (*(int *)ambient_crickets_channel != 0) goto L69C56;
-    *(int *)ambient_crickets_channel = sound_play_ambient_loop(375, player_object, 100);
-L69C56:;
-    goto L69C75;
-L69C58:;
-    if (*(int *)ambient_crickets_channel == 0) goto L69C75;
-    sound_stop_channel(*(int *)ambient_crickets_channel);
-    *(int *)ambient_crickets_channel = 0;
-L69C75:;
-    return;
-L69C7A:;
-    if (*(int *)ambient_rain_channel == 0) goto L69C97;
-    sound_stop_channel(*(int *)ambient_rain_channel);
-    *(int *)ambient_rain_channel = 0;
-L69C97:;
-    if (*(int *)ambient_crickets_channel == 0) goto L69CB4;
-    sound_stop_channel(*(int *)ambient_crickets_channel);
-    *(int *)ambient_crickets_channel = 0;
-L69CB4:;
-    if (*(int *)nearest_fire_distance >= 300) goto L69CC9;
-    if (*(int *)ambient_fire_channel == 0) goto L69CCB;
-L69CC9:;
-    goto L69CD7;
-L69CCB:;
-    if (*(int *)D_001A3EFC == 305419896) goto L69CD9;
-L69CD7:;
-    goto L69CF5;
-L69CD9:;
-    *(int *)ambient_fire_channel = sound_play_ambient_loop(242, nearest_fire, 100);
-    return;
-L69CF5:;
-    if (*(int *)ambient_fire_channel == 0) goto L69D0A;
-    if (*(int *)nearest_fire_distance >= 300) goto L69D0C;
-L69D0A:;
-    goto L69D22;
-L69D0C:;
-    sound_stop_channel(*(int *)ambient_fire_channel);
-    *(int *)ambient_fire_channel = 0;
-    return;
-L69D22:;
-    *(int *)D_001A3F08 = (int)nearest_fire;
+    if (((int)player_environment) == 1) {
+        if (ambient_fire_channel != 0) {
+            sound_stop_channel(ambient_fire_channel);
+            ambient_fire_channel = 0;
+        }
+        if (((int)(unsigned char)(climate_weathers[climate_category()] & 127)) == 4) {
+            if (ambient_rain_channel == 0) {
+                ambient_rain_channel = sound_play_ambient_loop(385, player_object, 100);
+            }
+        } else if (ambient_rain_channel != 0) {
+            sound_stop_channel(ambient_rain_channel);
+            ambient_rain_channel = 0;
+        }
+        if (D_00196280 == 0 && ((int)(unsigned char)climate_weathers[climate_category()]) < 2) {
+            if (ambient_crickets_channel == 0) {
+                ambient_crickets_channel = sound_play_ambient_loop(375, player_object, 100);
+            }
+        } else if (ambient_crickets_channel != 0) {
+            sound_stop_channel(ambient_crickets_channel);
+            ambient_crickets_channel = 0;
+        }
+        return;
+    }
+    if (ambient_rain_channel != 0) {
+        sound_stop_channel(ambient_rain_channel);
+        ambient_rain_channel = 0;
+    }
+    if (ambient_crickets_channel != 0) {
+        sound_stop_channel(ambient_crickets_channel);
+        ambient_crickets_channel = 0;
+    }
+    if (nearest_fire_distance < 300 && ambient_fire_channel == 0 && D_001A3EFC == 305419896) {
+        ambient_fire_channel = sound_play_ambient_loop(242, nearest_fire, 100);
+        return;
+    }
+    if (ambient_fire_channel != 0 && nearest_fire_distance >= 300) {
+        sound_stop_channel(ambient_fire_channel);
+        ambient_fire_channel = 0;
+        return;
+    }
+    D_001A3F08 = (int)nearest_fire;
 }
 
 void sound_stop_ambient(void)
 {
-    if (*(int *)ambient_fire_channel == 0) goto L69D61;
-    sound_stop_channel(*(int *)ambient_fire_channel);
-    *(int *)ambient_fire_channel = 0;
-L69D61:;
-    if (*(int *)ambient_crickets_channel == 0) goto L69D7E;
-    sound_stop_channel(*(int *)ambient_crickets_channel);
-    *(int *)ambient_crickets_channel = 0;
-L69D7E:;
-    if (*(int *)ambient_rain_channel == 0) goto L69D9B;
-    sound_stop_channel(*(int *)ambient_rain_channel);
-    *(int *)ambient_rain_channel = 0;
-L69D9B:;
+    if (ambient_fire_channel != 0) {
+        sound_stop_channel(ambient_fire_channel);
+        ambient_fire_channel = 0;
+    }
+    if (ambient_crickets_channel != 0) {
+        sound_stop_channel(ambient_crickets_channel);
+        ambient_crickets_channel = 0;
+    }
+    if (ambient_rain_channel != 0) {
+        sound_stop_channel(ambient_rain_channel);
+        ambient_rain_channel = 0;
+    }
     sound_stop_all();
 }
 
@@ -461,20 +373,12 @@ void sound_stop_all(void)
 {
     int l_18;
 
-    l_18 = 0;
-L69DBF:;
-    if (l_18 < 4) goto L69DCF;
-    goto L69E28;
-L69DC7:;
-    l_18++;
-    goto L69DBF;
-L69DCF:;
-    if (*(int *)(D_001A3BD8 + (l_18 * 268)) == 305419896) goto L69DC7;
-    if ((short)func_000A2460(*(int *)D_0018DD60, *(int *)(D_001A3BD8 + (l_18 * 268))) != 0) goto L69E15;
-    func_000A2687(*(int *)D_0018DD60, *(int *)(D_001A3BD8 + (l_18 * 268)));
-L69E15:;
-    *(int *)(D_001A3BD8 + (l_18 * 268)) = 305419896;
-    goto L69DC7;
-L69E28:;
-    *(int *)D_001A5AD0 = -1;
+    for (l_18 = 0; l_18 < 4; l_18++) {
+        if (*(int *)(D_001A3BD8 + (l_18 * 268)) == 305419896) continue;
+        if ((short)func_000A2460(D_0018DD60, *(int *)(D_001A3BD8 + (l_18 * 268))) == 0) {
+            func_000A2687(D_0018DD60, *(int *)(D_001A3BD8 + (l_18 * 268)));
+        }
+        *(int *)(D_001A3BD8 + (l_18 * 268)) = 305419896;
+    }
+    D_001A5AD0 = -1;
 }

@@ -2,19 +2,19 @@
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
 
-extern char D_0012B508[];
+extern signed char D_0012B508;
 extern char D_001702CC[];
-extern char D_00178E54[];
+extern int D_00178E54;
 extern char region_event_flag_groups[];
-extern char region_event_durations[];
-extern char D_00178EB0[];
-extern char region_event_values[];
-extern char region_event_flags[];
+extern signed char region_event_durations[];
+extern signed char D_00178EB0[];
+extern signed char region_event_values[];
+extern signed char region_event_flags[];
 extern char region_event_groups[];
 extern char D_0018F090[];
-extern char text_buffer[];
-extern char D_00196470[];
-extern char D_00196474[];
+extern signed char text_buffer[];
+extern int D_00196470;
+extern int D_00196474;
 
 extern int faction_random_of_type(unsigned char);
 extern int font_char_width(unsigned char);
@@ -29,66 +29,53 @@ void func_00013C56(void)
     int l_1C;
     int l_18;
 
-    if (*(int *)D_00196474 == 0) return;
-    *(signed char *)D_0012B508 = 146;
-    l_18 = (320 - *(int *)D_00196470) / 4;
-    if (l_18 <= 80) goto L13CA0;
-    l_18 = 80;
-L13CA0:;
-    mc_memcpy((int)text_buffer, *(int *)D_00196474, l_18, (int)D_001702CC, 35, 160);
-    *(signed char *)(text_buffer + l_18) = 0;
-    text_draw((int)text_buffer, *(int *)D_00196470, 140);
-    *(int *)D_00196470 -= 2;
-    l_1C = font_char_width((int)(unsigned char)*(signed char *)(*(char **)D_00196474));
-    if ((-*(int *)D_00196470) <= l_1C) goto L13D14;
-    (*(int *)D_00196474)++;
-    *(int *)D_00196470 += l_1C;
-L13D14:;
-    if (*(signed char *)(*(char **)D_00196474) != 0) return;
+    if (D_00196474 == 0) return;
+    D_0012B508 = 146;
+    l_18 = (320 - D_00196470) / 4;
+    if (l_18 > 80) l_18 = 80;
+    mc_memcpy((int)text_buffer, D_00196474, l_18, (int)D_001702CC, 35, 160);
+    text_buffer[l_18] = 0;
+    text_draw((int)text_buffer, D_00196470, 140);
+    D_00196470 -= 2;
+    l_1C = font_char_width((int)(unsigned char)*(signed char *)(*(char **)&D_00196474));
+    if ((-D_00196470) > l_1C) {
+        (D_00196474)++;
+        D_00196470 += l_1C;
+    }
+    if (*(signed char *)(*(char **)&D_00196474) != 0) return;
     func_00013DB6();
 }
 
 void func_00013DB6(void)
 {
-    if (*(int *)D_00178E54 == 0) goto L13DD9;
-    if (*(int *)D_00178E54 != (-1751672937)) goto L13DDB;
-L13DD9:;
-    goto L13DF9;
-L13DDB:;
-    mc_free(*(int *)D_00178E54, (int)D_001702CC, 62);
-    *(int *)D_00178E54 = -1751672937;
-L13DF9:;
-    *(int *)D_00178E54 = 0;
-    *(int *)D_00196474 = 0;
+    if (D_00178E54 != 0 && D_00178E54 != (-1751672937)) {
+        mc_free(D_00178E54, (int)D_001702CC, 62);
+        D_00178E54 = -1751672937;
+    }
+    D_00178E54 = 0;
+    D_00196474 = 0;
 }
 
 void region_flag_set(int a1, int a2)
 {
     int l_14;
 
-    if (*(signed char *)(region_event_groups + (a1 * 80) + *(unsigned char *)(region_event_flag_groups + a2)) == 0) goto L13E82;
-    l_14 = 0;
-L13E4E:;
-    if (l_14 < 29) goto L13E5E;
-    goto L13E82;
-L13E56:;
-    l_14++;
-    goto L13E4E;
-L13E5E:;
-    if (*(signed char *)(region_event_flag_groups + a2) != *(signed char *)(region_event_flag_groups + l_14)) goto L13E80;
-    *(signed char *)(region_event_flags + ((a1 * 80) + l_14)) = 0;
-L13E80:;
-    goto L13E56;
-L13E82:;
-    *(signed char *)(region_event_flags + ((a1 * 80) + a2)) = 1;
+    if (*(signed char *)(region_event_groups + (a1 * 80) + *(unsigned char *)(region_event_flag_groups + a2)) != 0) {
+        for (l_14 = 0; l_14 < 29; l_14++) {
+            if (*(signed char *)(region_event_flag_groups + a2) == *(signed char *)(region_event_flag_groups + l_14)) {
+                region_event_flags[(a1 * 80) + l_14] = 0;
+            }
+        }
+    }
+    region_event_flags[(a1 * 80) + a2] = 1;
     *(signed char *)(region_event_groups + (a1 * 80) + *(unsigned char *)(region_event_flag_groups + a2)) = 1;
-    *(signed char *)(region_event_values + ((a1 * 80) + a2)) = rand_range((int)(unsigned char)*(signed char *)(region_event_durations + (a2 * 2)), (int)(unsigned char)*(signed char *)(D_00178EB0 + (a2 * 2)));
+    region_event_values[(a1 * 80) + a2] = rand_range((int)(unsigned char)region_event_durations[a2 * 2], (int)(unsigned char)D_00178EB0[a2 * 2]);
     if (a2 != 18) return;
     *(short *)(D_0018F090 + (a1 * 80)) = *(short *)((char *)faction_random_of_type(1) + 33);
 }
 
 void region_flag_clear(int a1, int a2)
 {
-    *(signed char *)(region_event_flags + ((a1 * 80) + a2)) = 0;
+    region_event_flags[(a1 * 80) + a2] = 0;
     *(signed char *)(region_event_groups + (a1 * 80) + *(unsigned char *)(region_event_flag_groups + a2)) = 0;
 }

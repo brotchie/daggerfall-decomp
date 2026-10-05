@@ -4,7 +4,7 @@
 #include "records.h"
 
 extern struct spell *selected_spell;
-extern char D_001940D5[];
+extern signed char D_001940D5;
 
 extern int spell_effect_text_index(short);
 extern void msgbox_show_rsc(int, int);
@@ -12,6 +12,6 @@ extern void msgbox_show_rsc(int, int);
 void func_0006FD03(short a1)
 {
     if (selected_spell->effects[(int)(short)a1].type == 255) return;
-    *(signed char *)D_001940D5 |= 1;
+    D_001940D5 |= 1;
     msgbox_show_rsc((int)(short)(spell_effect_text_index((int)(short)a1) + 1200), 1);
 }

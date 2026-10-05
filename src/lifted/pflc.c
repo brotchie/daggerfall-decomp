@@ -3,15 +3,15 @@
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
 
-extern char mouse_buttons[];
-extern char D_0014231D[];
-extern char D_00142339[];
-extern char screen_buffer[];
+extern signed char mouse_buttons;
+extern signed char D_0014231D;
+extern signed char D_00142339;
+extern int screen_buffer;
 extern char D_00175404[];
 extern char D_0017540B[];
-extern char text_buffer[];
-extern char text_rsc_buffer[];
-extern char mouse_buttons_prev[];
+extern signed char text_buffer[];
+extern signed char text_rsc_buffer[];
+extern signed char mouse_buttons_prev;
 extern struct quest *current_quest;
 
 extern int flc_open(int, int);
@@ -45,19 +45,17 @@ void flc_decode_brun(int, int);
 
 void func_00051CF9(int a1)
 {
-    if (((int)(short)*(short *)((char *)a1 + 18)) != 320) goto L51D26;
-    if (((int)(short)*(short *)((char *)a1 + 20)) == 200) goto L51D6D;
-L51D26:;
-    func_00144FB4((int)(short)*(short *)((char *)a1 + 14), (int)(short)*(short *)((char *)a1 + 16), (int)(short)*(short *)((char *)a1 + 18), (int)(short)*(short *)((char *)a1 + 20), *(int *)((char *)a1 + 30));
-    mc_memcpy(655360, *(int *)screen_buffer, 64000, (int)D_00175404, 113, 4);
-    return;
-L51D6D:;
-    if (*(short *)((char *)a1 + 6) == 0) goto L51D97;
-    mc_memcpy(655360, *(int *)screen_buffer, 64000, (int)D_00175404, 117, 4);
-    return;
-L51D97:;
+    if (((int)(short)*(short *)((char *)a1 + 18)) != 320 || ((int)(short)*(short *)((char *)a1 + 20)) != 200) {
+        func_00144FB4((int)(short)*(short *)((char *)a1 + 14), (int)(short)*(short *)((char *)a1 + 16), (int)(short)*(short *)((char *)a1 + 18), (int)(short)*(short *)((char *)a1 + 20), *(int *)((char *)a1 + 30));
+        mc_memcpy(655360, screen_buffer, 64000, (int)D_00175404, 113, 4);
+        return;
+    }
+    if (*(short *)((char *)a1 + 6) != 0) {
+        mc_memcpy(655360, screen_buffer, 64000, (int)D_00175404, 117, 4);
+        return;
+    }
     if (((int)(unsigned char)*(signed char *)((char *)a1 + 43)) <= 1) return;
-    mc_memcpy(655360, *(int *)screen_buffer, 64000, (int)D_00175404, 118, 4);
+    mc_memcpy(655360, screen_buffer, 64000, (int)D_00175404, 118, 4);
 }
 
 int flc_play_with_text(int a1, int a2, int a3, int a4)
@@ -71,82 +69,69 @@ int flc_play_with_text(int a1, int a2, int a3, int a4)
 
     l_18 = 0;
     mc_memset(a2, 0, 44, (int)D_00175404, 127, 4);
-    if (flc_open(a1, a2) != 0) goto L51E46;
-    func_000A0ED9(131, (int)D_00175404);
-    mc_sprintf((int)text_buffer, (int)D_0017540B, a1);
-    fatal_error((int)text_buffer);
-L51E46:;
-    mc_memset(*(int *)screen_buffer, 0, 64000, (int)D_00175404, 135, 4);
+    if (flc_open(a1, a2) == 0) {
+        func_000A0ED9(131, (int)D_00175404);
+        mc_sprintf((int)text_buffer, (int)D_0017540B, a1);
+        fatal_error((int)text_buffer);
+    }
+    mc_memset(screen_buffer, 0, 64000, (int)D_00175404, 135, 4);
     *(signed char *)((char *)a2 + 43) = 255;
-    if (current_quest == 0) goto L51E86;
-    quest_load_text(current_quest, a3, 0, 0);
-    goto L51E92;
-L51E86:;
-    parse_rsc_text(a3, 0, 0);
-L51E92:;
-    if (*(signed char *)(text_rsc_buffer + l_18) == 0) goto L51EC4;
-    if (((int)(unsigned char)(*(signed char *)(text_rsc_buffer + l_18) & 128)) == 0) goto L51EBC;
-    *(signed char *)(text_rsc_buffer + l_18) = 0;
-L51EBC:;
-    l_18++;
-    goto L51E92;
-L51EC4:;
+    if (current_quest != 0) {
+        quest_load_text(current_quest, a3, 0, 0);
+    } else {
+        parse_rsc_text(a3, 0, 0);
+    }
+    while (text_rsc_buffer[l_18] != 0) {
+        if (((int)(unsigned char)(text_rsc_buffer[l_18] & 128)) != 0) {
+            text_rsc_buffer[l_18] = 0;
+        }
+        l_18++;
+    }
     l_1C = (int)text_rsc_buffer;
-L51ECB:;
-    *(short *)((char *)a2 + 6) += *(short *)((char *)a2 + 4);
-    if (*(signed char *)((char *)a2 + 43) != 0) goto L51EE9;
-    (*(short *)((char *)a2 + 6))--;
-L51EE9:;
-    if ((*(short *)((char *)a2 + 6))-- == 0) goto L52033;
-    l_14 = 1132;
-    l_24 = *(int *)((char *)l_14);
-    if (flc_next_frame(a2) != 0) goto L52033;
-    l_20 = flc_draw_text_page(l_1C);
-    if (*(short *)((char *)a2 + 6) == 0) goto L51F57;
-    mc_memcpy(655360, *(int *)screen_buffer, 64000, (int)D_00175404, 163, 4);
-    goto L51F88;
-L51F57:;
-    if (((int)(unsigned char)*(signed char *)((char *)a2 + 43)) <= 1) goto L51F88;
-    mc_memcpy(655360, *(int *)screen_buffer, 64000, (int)D_00175404, 164, 4);
-L51F88:;
-    *(signed char *)mouse_buttons_prev = *(signed char *)mouse_buttons;
-    func_0012B136();
-    if (l_20 != 0) goto L51FA3;
-    if (a4 != 0) goto L51FA5;
-L51FA3:;
-    goto L51FDF;
-L51FA5:;
-    if (*(signed char *)D_0014231D == 0) goto L51FC2;
-    flc_close(a2);
-    return 1;
-L51FC2:;
-    if (*(signed char *)D_00142339 == 0) goto L51FDF;
-    flc_close(a2);
-    return 2;
-L51FDF:;
-    if (*(signed char *)mouse_buttons == 0) goto L51FF1;
-    if (*(signed char *)mouse_buttons_prev == 0) goto L51FF3;
-L51FF1:;
-    goto L5200B;
-L51FF3:;
-    if (l_20 == 0) goto L52001;
-    l_1C = l_20;
-    goto L5200B;
-L52001:;
-    if (a4 == 0) goto L52084;
-L5200B:;
-    *(int *)&l_C = 1132;
-    if ((*(int *)((char *)*(int *)&l_C) - l_24) < *(unsigned short *)((char *)a2 + 8)) goto L51F88;
-    goto L51EE9;
-L52033:;
-    if (*(signed char *)((char *)a2 + 43) == 0) goto L52084;
-    if (((int)(unsigned char)*(signed char *)((char *)a2 + 43)) == 255) goto L5205D;
-    (*(signed char *)((char *)a2 + 43))--;
-    if (*(signed char *)((char *)a2 + 43) == 0) goto L52084;
-L5205D:;
-    lseek((int)(unsigned short)*(short *)((char *)a2 + 2), *(int *)((char *)a2 + 10), 0);
-    *(short *)((char *)a2 + 6) = 0;
-    goto L51ECB;
+    for (;;) {
+        *(short *)((char *)a2 + 6) += *(short *)((char *)a2 + 4);
+        if (*(signed char *)((char *)a2 + 43) == 0) (*(short *)((char *)a2 + 6))--;
+        while ((*(short *)((char *)a2 + 6))-- != 0) {
+            l_14 = 1132;
+            l_24 = *(int *)((char *)l_14);
+            if (flc_next_frame(a2) != 0) break;
+            l_20 = flc_draw_text_page(l_1C);
+            if (*(short *)((char *)a2 + 6) != 0) {
+                mc_memcpy(655360, screen_buffer, 64000, (int)D_00175404, 163, 4);
+            } else if (((int)(unsigned char)*(signed char *)((char *)a2 + 43)) > 1) {
+                mc_memcpy(655360, screen_buffer, 64000, (int)D_00175404, 164, 4);
+            }
+            do {
+                mouse_buttons_prev = mouse_buttons;
+                func_0012B136();
+                if (l_20 == 0 && a4 != 0) {
+                    if (D_0014231D != 0) {
+                        flc_close(a2);
+                        return 1;
+                    }
+                    if (D_00142339 != 0) {
+                        flc_close(a2);
+                        return 2;
+                    }
+                }
+                if (mouse_buttons != 0 && mouse_buttons_prev == 0) {
+                    if (l_20 != 0) {
+                        l_1C = l_20;
+                    } else {
+                        if (a4 == 0) goto L52084;
+                    }
+                }
+                *(int *)&l_C = 1132;
+            } while ((*(int *)((char *)*(int *)&l_C) - l_24) < *(unsigned short *)((char *)a2 + 8));
+        }
+        if (*(signed char *)((char *)a2 + 43) == 0) break;
+        if (((int)(unsigned char)*(signed char *)((char *)a2 + 43)) != 255) {
+            (*(signed char *)((char *)a2 + 43))--;
+            if (*(signed char *)((char *)a2 + 43) == 0) break;
+        }
+        lseek((int)(unsigned short)*(short *)((char *)a2 + 2), *(int *)((char *)a2 + 10), 0);
+        *(short *)((char *)a2 + 6) = 0;
+    }
 L52084:;
     flc_close(a2);
     return 0;
@@ -154,55 +139,42 @@ L52084:;
 
 void flc_close(int a1)
 {
-    if (((int)(unsigned short)(*(short *)((char *)a1) & 1)) == 0) goto L52312;
-    if (*(int *)((char *)a1 + 22) == 0) goto L522F1;
-    if (*(int *)((char *)a1 + 22) != (-1751672937)) goto L522F3;
-L522F1:;
-    goto L52312;
-L522F3:;
-    mc_free(*(int *)((char *)a1 + 22), (int)D_00175404, 263);
-    *(int *)((char *)a1 + 22) = -1751672937;
-L52312:;
-    if (((int)(unsigned short)(*(short *)((char *)a1) & 2)) == 0) goto L5235C;
-    if (*(int *)((char *)a1 + 26) == 0) goto L5233B;
-    if (*(int *)((char *)a1 + 26) != (-1751672937)) goto L5233D;
-L5233B:;
-    goto L5235C;
-L5233D:;
-    mc_free(*(int *)((char *)a1 + 26), (int)D_00175404, 264);
-    *(int *)((char *)a1 + 26) = -1751672937;
-L5235C:;
-    if (((int)(unsigned short)(*(short *)((char *)a1) & 64)) == 0) goto L523A6;
-    if (*(int *)((char *)a1 + 30) == 0) goto L52385;
-    if (*(int *)((char *)a1 + 30) != (-1751672937)) goto L52387;
-L52385:;
-    goto L523A6;
-L52387:;
-    mc_free(*(int *)((char *)a1 + 30), (int)D_00175404, 265);
-    *(int *)((char *)a1 + 30) = -1751672937;
-L523A6:;
+    if (((int)(unsigned short)(*(short *)((char *)a1) & 1)) != 0) {
+        if (*(int *)((char *)a1 + 22) != 0 && *(int *)((char *)a1 + 22) != (-1751672937)) {
+            mc_free(*(int *)((char *)a1 + 22), (int)D_00175404, 263);
+            *(int *)((char *)a1 + 22) = -1751672937;
+        }
+    }
+    if (((int)(unsigned short)(*(short *)((char *)a1) & 2)) != 0) {
+        if (*(int *)((char *)a1 + 26) != 0 && *(int *)((char *)a1 + 26) != (-1751672937)) {
+            mc_free(*(int *)((char *)a1 + 26), (int)D_00175404, 264);
+            *(int *)((char *)a1 + 26) = -1751672937;
+        }
+    }
+    if (((int)(unsigned short)(*(short *)((char *)a1) & 64)) != 0) {
+        if (*(int *)((char *)a1 + 30) != 0 && *(int *)((char *)a1 + 30) != (-1751672937)) {
+            mc_free(*(int *)((char *)a1 + 30), (int)D_00175404, 265);
+            *(int *)((char *)a1 + 30) = -1751672937;
+        }
+    }
     func_0009DEA7((int)(unsigned short)*(short *)((char *)a1 + 2));
 }
 
 int flc_next_frame(int a1)
 {
-    if (((int)(unsigned short)(*(short *)((char *)a1) & 4)) == 0) goto L523F9;
-    *(signed char *)((char *)a1 + 43) = 0;
-    return 1;
-L523F9:;
+    if (((int)(unsigned short)(*(short *)((char *)a1) & 4)) != 0) {
+        *(signed char *)((char *)a1 + 43) = 0;
+        return 1;
+    }
     flc_read_frame(a1);
-    if (((int)(unsigned short)(*(short *)((char *)a1) & 4)) == 0) goto L52425;
-    *(signed char *)((char *)a1 + 43) = 0;
-    return 1;
-L52425:;
-    if (((int)(unsigned short)(*(short *)((char *)a1) & 8)) == 0) goto L5244D;
-    if (((int)(unsigned short)(*(short *)((char *)a1) & 16)) == 0) goto L5244F;
-L5244D:;
-    goto L52467;
-L5244F:;
-    *(signed char *)((char *)a1) &= 247;
-    func_000CD33A(*(int *)((char *)a1 + 26), 0, 256);
-L52467:;
+    if (((int)(unsigned short)(*(short *)((char *)a1) & 4)) != 0) {
+        *(signed char *)((char *)a1 + 43) = 0;
+        return 1;
+    }
+    if (((int)(unsigned short)(*(short *)((char *)a1) & 8)) != 0 && ((int)(unsigned short)(*(short *)((char *)a1) & 16)) == 0) {
+        *(signed char *)((char *)a1) &= 247;
+        func_000CD33A(*(int *)((char *)a1 + 26), 0, 256);
+    }
     return 0;
 }
 
@@ -211,82 +183,70 @@ void flc_read_frame(int a1)
     unsigned short l_20;
     unsigned short l_1C;
     short l_18;
-{
-    char l_2C[8];
+    {
+        char l_2C[8];
 
-    l_20 = *(short *)((char *)a1 + 2);
-L52496:;
-    func_000A00CB((int)(unsigned short)l_20, (int)l_2C, 6);
-    if (((int)(unsigned short)*(short *)((char *)l_2C + 4)) == 61946) goto L524CE;
-    lseek((int)(unsigned short)l_20, (int)(*(char **)l_2C - 6), 1);
-    goto L52496;
-L524CE:;
-    func_000A00CB((int)(unsigned short)l_20, (int)&l_18, 2);
-    lseek((int)(unsigned short)l_20, 8, 1);
-    *(int *)&l_1C = 0;
-L524FD:;
-    if ((unsigned short)l_1C < (short)l_18) goto L52518;
-    goto L527A5;
-L52510:;
-    (*(int *)&l_1C)++;
-    goto L524FD;
-L52518:;
-    func_000A00CB((int)(unsigned short)l_20, (int)l_2C, 6);
-    *(int *)l_2C += -6;
-    switch ((unsigned short)*(int *)((char *)l_2C + 4)) {
-case 4:
-    if (((int)(unsigned short)(*(short *)((char *)a1) & 16)) == 0) goto L525D2;
-    lseek((int)(unsigned short)l_20, (int)(unsigned short)*(short *)l_2C, 1);
-    goto L5261E;
-L525D2:;
-    func_0012D887((int)(*(char **)((char *)a1 + 26) + 768));
-    func_000A00CB((int)(unsigned short)l_20, (int)(*(char **)((char *)a1 + 26) + 768), (int)(unsigned short)*(short *)l_2C);
-    flc_decode_palette(*(int *)((char *)a1 + 26), (int)&*(signed char *)(*(char **)((char *)a1 + 26) + 768), 0);
-    *(signed char *)((char *)a1) |= 8;
-L5261E:;
-    goto L527A0;
-case 11:
-    if (((int)(unsigned short)(*(short *)((char *)a1) & 16)) == 0) goto L5264F;
-    lseek((int)(unsigned short)l_20, (int)(unsigned short)*(short *)l_2C, 1);
-    goto L5269B;
-L5264F:;
-    func_0012D887((int)(*(char **)((char *)a1 + 26) + 768));
-    func_000A00CB((int)(unsigned short)l_20, (int)(*(char **)((char *)a1 + 26) + 768), (int)(unsigned short)*(short *)l_2C);
-    flc_decode_palette(*(int *)((char *)a1 + 26), (int)&*(signed char *)(*(char **)((char *)a1 + 26) + 768), 0);
-    *(signed char *)((char *)a1) |= 8;
-L5269B:;
-    goto L527A0;
-case 13:
-    mc_memset(*(int *)((char *)a1 + 30), 0, ((int)(short)*(short *)((char *)a1 + 18)) * ((int)(short)*(short *)((char *)a1 + 20)), (int)D_00175404, 347, 4);
-    goto L527A0;
-case 16:
-    if (((int)(unsigned short)(*(short *)((char *)a1) & 128)) != 0) goto L526FC;
-    func_000A00CB((int)(unsigned short)l_20, *(int *)screen_buffer, (int)(unsigned short)*(short *)l_2C);
-    goto L52713;
-L526FC:;
-    func_000A00CB((int)(unsigned short)l_20, *(int *)((char *)a1 + 30), (int)(unsigned short)*(short *)l_2C);
-L52713:;
-    goto L527A0;
-case 15:
-    func_000A00CB((int)(unsigned short)l_20, *(int *)((char *)a1 + 22), (int)(unsigned short)*(short *)l_2C);
-    flc_decode_brun(*(int *)((char *)a1 + 22), a1);
-    goto L527A0;
-case 12:
-    func_000A00CB((int)(unsigned short)l_20, *(int *)((char *)a1 + 22), (int)(unsigned short)*(short *)l_2C);
-    flc_decode_lc(*(int *)((char *)a1 + 22), a1);
-    goto L527A0;
-case 7:
-    func_000A00CB((int)(unsigned short)l_20, *(int *)((char *)a1 + 22), (int)(unsigned short)*(short *)l_2C);
-    flc_decode_ss2(*(int *)((char *)a1 + 22), a1);
-    goto L527A0;
-default:
-    lseek((int)(unsigned short)l_20, *(int *)l_2C, 1);
-L527A0:;
-    goto L52510;
-L527A5:;
-    func_00144F68((int)(short)*(short *)((char *)a1 + 14), (int)(short)*(short *)((char *)a1 + 16), (int)(short)*(short *)((char *)a1 + 18), (int)(short)*(short *)((char *)a1 + 20), *(int *)((char *)a1 + 30));
-}
-}
+        l_20 = *(short *)((char *)a1 + 2);
+        for (;;) {
+            func_000A00CB((int)(unsigned short)l_20, (int)l_2C, 6);
+            if (((int)(unsigned short)*(short *)((char *)l_2C + 4)) == 61946) break;
+            lseek((int)(unsigned short)l_20, (int)(*(char **)l_2C - 6), 1);
+        }
+        func_000A00CB((int)(unsigned short)l_20, (int)&l_18, 2);
+        lseek((int)(unsigned short)l_20, 8, 1);
+        *(int *)&l_1C = 0;
+        for (; (unsigned short)l_1C < (short)l_18; (*(int *)&l_1C)++) {
+            func_000A00CB((int)(unsigned short)l_20, (int)l_2C, 6);
+            *(int *)l_2C += -6;
+            switch ((unsigned short)*(int *)((char *)l_2C + 4)) {
+            case 4:
+                if (((int)(unsigned short)(*(short *)((char *)a1) & 16)) != 0) {
+                    lseek((int)(unsigned short)l_20, (int)(unsigned short)*(short *)l_2C, 1);
+                } else {
+                    func_0012D887((int)(*(char **)((char *)a1 + 26) + 768));
+                    func_000A00CB((int)(unsigned short)l_20, (int)(*(char **)((char *)a1 + 26) + 768), (int)(unsigned short)*(short *)l_2C);
+                    flc_decode_palette(*(int *)((char *)a1 + 26), (int)&*(signed char *)(*(char **)((char *)a1 + 26) + 768), 0);
+                    *(signed char *)((char *)a1) |= 8;
+                }
+                break;
+            case 11:
+                if (((int)(unsigned short)(*(short *)((char *)a1) & 16)) != 0) {
+                    lseek((int)(unsigned short)l_20, (int)(unsigned short)*(short *)l_2C, 1);
+                } else {
+                    func_0012D887((int)(*(char **)((char *)a1 + 26) + 768));
+                    func_000A00CB((int)(unsigned short)l_20, (int)(*(char **)((char *)a1 + 26) + 768), (int)(unsigned short)*(short *)l_2C);
+                    flc_decode_palette(*(int *)((char *)a1 + 26), (int)&*(signed char *)(*(char **)((char *)a1 + 26) + 768), 0);
+                    *(signed char *)((char *)a1) |= 8;
+                }
+                break;
+            case 13:
+                mc_memset(*(int *)((char *)a1 + 30), 0, ((int)(short)*(short *)((char *)a1 + 18)) * ((int)(short)*(short *)((char *)a1 + 20)), (int)D_00175404, 347, 4);
+                break;
+            case 16:
+                if (((int)(unsigned short)(*(short *)((char *)a1) & 128)) == 0) {
+                    func_000A00CB((int)(unsigned short)l_20, screen_buffer, (int)(unsigned short)*(short *)l_2C);
+                } else {
+                    func_000A00CB((int)(unsigned short)l_20, *(int *)((char *)a1 + 30), (int)(unsigned short)*(short *)l_2C);
+                }
+                break;
+            case 15:
+                func_000A00CB((int)(unsigned short)l_20, *(int *)((char *)a1 + 22), (int)(unsigned short)*(short *)l_2C);
+                flc_decode_brun(*(int *)((char *)a1 + 22), a1);
+                break;
+            case 12:
+                func_000A00CB((int)(unsigned short)l_20, *(int *)((char *)a1 + 22), (int)(unsigned short)*(short *)l_2C);
+                flc_decode_lc(*(int *)((char *)a1 + 22), a1);
+                break;
+            case 7:
+                func_000A00CB((int)(unsigned short)l_20, *(int *)((char *)a1 + 22), (int)(unsigned short)*(short *)l_2C);
+                flc_decode_ss2(*(int *)((char *)a1 + 22), a1);
+                break;
+            default:
+                lseek((int)(unsigned short)l_20, *(int *)l_2C, 1);
+            }
+        }
+        func_00144F68((int)(short)*(short *)((char *)a1 + 14), (int)(short)*(short *)((char *)a1 + 16), (int)(short)*(short *)((char *)a1 + 18), (int)(short)*(short *)((char *)a1 + 20), *(int *)((char *)a1 + 30));
+    }
 }
 
 void flc_decode_brun(int a1, int a2)
@@ -295,31 +255,22 @@ void flc_decode_brun(int a1, int a2)
     signed char l_14;
     short l_18;
 
-    l_1C = 0;
-L52915:;
-    if ((short)(short)l_1C < *(short *)((char *)a2 + 20)) goto L5292E;
-    return;
-L52926:;
-    l_1C++;
-    goto L52915;
-L5292E:;
-    ++a1;
-    l_18 = 0;
-L52938:;
-    l_14 = *(signed char *)((char *)a1++);
-    if (l_14 <= 0) goto L52991;
-    mc_memset((int)(*(char **)((char *)a2 + 30) + (((int)(short)*(short *)((char *)a2 + 18)) * ((int)(short)*(short *)&l_1C))) + ((int)(short)l_18), (int)(unsigned char)*(signed char *)((char *)a1), (int)(signed char)l_14, (int)D_00175404, 443, 4);
-    l_18 += (short)(signed char)l_14;
-    a1++;
-    goto L529DC;
-L52991:;
-    if (l_14 >= 0) goto L529DC;
-    mc_memcpy((int)(*(char **)((char *)a2 + 30) + (((int)(short)*(short *)((char *)a2 + 18)) * ((int)(short)*(short *)&l_1C))) + ((int)(short)l_18), a1, -((int)(signed char)l_14), (int)D_00175404, 449, 4);
-    l_18 -= (short)(signed char)l_14;
-    a1 -= (int)(signed char)l_14;
-L529DC:;
-    if ((short)(short)*(int *)&l_18 < *(short *)((char *)a2 + 18)) goto L52938;
-    goto L52926;
+    for (l_1C = 0; (short)(short)l_1C < *(short *)((char *)a2 + 20); l_1C++) {
+        ++a1;
+        l_18 = 0;
+        do {
+            l_14 = *(signed char *)((char *)a1++);
+            if (l_14 > 0) {
+                mc_memset((int)(*(char **)((char *)a2 + 30) + (((int)(short)*(short *)((char *)a2 + 18)) * ((int)(short)*(short *)&l_1C))) + ((int)(short)l_18), (int)(unsigned char)*(signed char *)((char *)a1), (int)(signed char)l_14, (int)D_00175404, 443, 4);
+                l_18 += (short)(signed char)l_14;
+                a1++;
+            } else if (l_14 < 0) {
+                mc_memcpy((int)(*(char **)((char *)a2 + 30) + (((int)(short)*(short *)((char *)a2 + 18)) * ((int)(short)*(short *)&l_1C))) + ((int)(short)l_18), a1, -((int)(signed char)l_14), (int)D_00175404, 449, 4);
+                l_18 -= (short)(signed char)l_14;
+                a1 -= (int)(signed char)l_14;
+            }
+        } while ((short)(short)*(int *)&l_18 < *(short *)((char *)a2 + 18));
+    }
 }
 
 int flc_draw_text_page(int a1)
@@ -329,20 +280,12 @@ int flc_draw_text_page(int a1)
 
     l_1C = 0;
     l_20 = 150;
-L52D5B:;
-    if (*(signed char *)((char *)a1) == 0) goto L52D69;
-    if (l_1C < 4) goto L52D6B;
-L52D69:;
-    goto L52D9F;
-L52D6B:;
-    text_draw_centered_colored(a1, 160, (int)(short)*(short *)&l_20, 145, 156);
-    l_20 += 10;
-    l_1C++;
-    a1 += func_000A0DF4(a1) + 1;
-    goto L52D5B;
-L52D9F:;
-    if (*(signed char *)((char *)a1) == 0) goto L52DAF;
-    return a1;
-L52DAF:;
+    while (*(signed char *)((char *)a1) != 0 && l_1C < 4) {
+        text_draw_centered_colored(a1, 160, (int)(short)*(short *)&l_20, 145, 156);
+        l_20 += 10;
+        l_1C++;
+        a1 += func_000A0DF4(a1) + 1;
+    }
+    if (*(signed char *)((char *)a1) != 0) return a1;
     return 0;
 }

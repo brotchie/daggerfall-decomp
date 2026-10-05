@@ -24,7 +24,7 @@ extern char D_0017576C[];
 extern char D_0017577C[];
 extern char D_0017578A[];
 extern char D_00175797[];
-extern char text_buffer[];
+extern signed char text_buffer[];
 extern struct bits8 D_001940D8;
 extern struct record *player_entity;
 extern int D_00195B64;
@@ -71,14 +71,14 @@ void paperdoll_draw(int x, int y)
     if (!D_001940D8.b3) return;
     D_001940D8.b3 = 0;
     if (player_character->race == 9) {
-        mc_strncpy(text_buffer, D_00175743, 160, D_0017573C, 40);
+        mc_strncpy(((char *)text_buffer), D_00175743, 160, D_0017573C, 40);
     } else if (player_character->race == 10) {
-        mc_strncpy(text_buffer, D_00175750, 160, D_0017573C, 42);
+        mc_strncpy(((char *)text_buffer), D_00175750, 160, D_0017573C, 42);
     } else {
         func_000A0ED9(44, D_0017573C);
-        mc_sprintf(text_buffer, D_0017575D, player_character->race);
+        mc_sprintf(((char *)text_buffer), D_0017575D, player_character->race);
     }
-    pic = disk_read_file(text_buffer, 0);
+    pic = disk_read_file(((char *)text_buffer), 0);
     func_00144F68(pic->x + x, pic->y + y, pic->w, pic->h, pic->data);
     mc_memset((void *)D_00147954, 0, 64000, D_0017573C, 48, 4);
     saved = screen_buffer;
@@ -95,17 +95,17 @@ void paperdoll_draw(int x, int y)
     mc_memset(D_00199B50, 0, 112, D_0017573C, 58, 4);
     mc_memset(D_00195B74, 0, 24625, D_0017573C, 59, 4);
     if (player_character->race == 10) {
-        mc_strncpy(text_buffer, D_00175750, 160, D_0017573C, 62);
+        mc_strncpy(((char *)text_buffer), D_00175750, 160, D_0017573C, 62);
     } else if (player_character->race == 9) {
-        mc_strncpy(text_buffer, D_00175743, 160, D_0017573C, 64);
+        mc_strncpy(((char *)text_buffer), D_00175743, 160, D_0017573C, 64);
     } else if (player_character->race == 8) {
         func_000A0ED9(66, D_0017573C);
-        mc_sprintf(text_buffer, D_0017576C, (unsigned short)(player_character->flags & 1), player_character->original_race, (game_settings->view_flags & 4) != 0 ? 49 : 48);
+        mc_sprintf(((char *)text_buffer), D_0017576C, (unsigned short)(player_character->flags & 1), player_character->original_race, (game_settings->view_flags & 4) != 0 ? 49 : 48);
     } else {
         func_000A0ED9(68, D_0017573C);
-        mc_sprintf(text_buffer, D_0017576C, (unsigned short)(player_character->flags & 1), player_character->race, (game_settings->view_flags & 4) != 0 ? 49 : 48);
+        mc_sprintf(((char *)text_buffer), D_0017576C, (unsigned short)(player_character->flags & 1), player_character->race, (game_settings->view_flags & 4) != 0 ? 49 : 48);
     }
-    pic = disk_read_file(text_buffer, 0);
+    pic = disk_read_file(((char *)text_buffer), 0);
     func_00144FB4(pic->x + x, pic->y + y, pic->w, pic->h, pic->data);
     if (pic != 0 && pic != (struct img *)0x97979797) {
         mc_free(pic, D_0017573C, 71);
@@ -115,16 +115,16 @@ void paperdoll_draw(int x, int y)
     if (player_character->race == 9 || player_character->race == 10) {
         n = 0;
         func_000A0ED9(78, D_0017573C);
-        mc_sprintf(text_buffer, D_0017577C, 1 - (player_character->race - 9));
+        mc_sprintf(((char *)text_buffer), D_0017577C, 1 - (player_character->race - 9));
     } else if (player_character->race == 8) {
-        mc_strncpy(text_buffer, D_0017578A, 160, D_0017573C, 82);
+        mc_strncpy(((char *)text_buffer), D_0017578A, 160, D_0017573C, 82);
         n = ((unsigned short)player_character->flags & 1) != 0 ? 0 : 8;
         n += player_character->original_race;
     } else {
         func_000A0ED9(87, D_0017573C);
-        mc_sprintf(text_buffer, D_00175797, (unsigned short)(player_character->flags & 1), player_character->race);
+        mc_sprintf(((char *)text_buffer), D_00175797, (unsigned short)(player_character->flags & 1), player_character->race);
     }
-    pic = disk_read_file(text_buffer, 0);
+    pic = disk_read_file(((char *)text_buffer), 0);
     strip = pic;
     i = 0;
     while (i < n) {

@@ -20,28 +20,22 @@ int sos_load_file(int a1)
     int l_10;
 
     l_10 = open(a1, 512);
-    if (l_10 != (-1)) goto L119BB;
-    return 0;
-L119BB:;
+    if (l_10 == (-1)) return 0;
     l_14 = lseek(l_10, 0, 2);
     lseek(l_10, 0, 0);
     l_18 = mc_malloc(l_14, (int)D_001700D5, 441);
-    if (l_18 != 0) goto L11A05;
-    func_0009DEA7(l_10);
-    return 0;
-L11A05:;
-    if (func_000A00CB(l_10, l_18, l_14) == l_14) goto L11A53;
-    func_0009DEA7(l_10);
-    if (l_18 == 0) goto L11A2F;
-    if (l_18 != (-1751672937)) goto L11A31;
-L11A2F:;
-    goto L11A4A;
-L11A31:;
-    mc_free(l_18, (int)D_001700D5, 457);
-    l_18 = -1751672937;
-L11A4A:;
-    return 0;
-L11A53:;
+    if (l_18 == 0) {
+        func_0009DEA7(l_10);
+        return 0;
+    }
+    if (func_000A00CB(l_10, l_18, l_14) != l_14) {
+        func_0009DEA7(l_10);
+        if (l_18 != 0 && l_18 != (-1751672937)) {
+            mc_free(l_18, (int)D_001700D5, 457);
+            l_18 = -1751672937;
+        }
+        return 0;
+    }
     func_0009DEA7(l_10);
     return l_18;
 }

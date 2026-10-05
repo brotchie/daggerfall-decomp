@@ -4,13 +4,13 @@
 #include "records.h"
 
 extern char D_0017573C[];
-extern char D_001841E3[];
-extern char current_region[];
+extern signed char D_001841E3[];
+extern signed char current_region;
 extern char npc_record_buffer[];
 extern char D_0019995C[];
-extern char D_0019995F[];
-extern char D_001999AD[];
-extern char D_00199B43[];
+extern signed char D_0019995F;
+extern short D_001999AD[];
+extern short D_00199B43;
 
 extern struct faction *faction_find_type_in_region(int, short);
 extern int faction_find(short);
@@ -33,58 +33,32 @@ int npc_talk_record_build(struct record *a1)
     l_20 = flats_cfg_find(a1->image);
     l_2C = (int)RECORD_DATA(a1);
     mc_memset((int)npc_record_buffer, 0, 560, (int)D_0017573C, 226, 4);
-    if (a1->type != 53) goto L59A0D;
-    *(short *)D_0019995C = ((int)(unsigned short)*(short *)D_0019995C) | ((((int)(unsigned short)(a1->npc_flags & 16384)) != 0) ? 1 : 0);
-    goto L59A4F;
-L59A0D:;
-    if (l_20 == 0) goto L59A24;
-    if (((int)(unsigned char)(*(signed char *)((char *)l_20 + 6) & 1)) != 0) goto L59A26;
-L59A24:;
-    goto L59A2F;
-L59A26:;
-    *(signed char *)D_0019995C |= 1;
-    goto L59A4F;
-L59A2F:;
-    if (l_20 != 0) goto L59A46;
-    if (((int)(unsigned char)(*(signed char *)((char *)l_2C + 2) & 16)) != 0) goto L59A48;
-L59A46:;
-    goto L59A4F;
-L59A48:;
-    *(signed char *)D_0019995C |= 1;
-L59A4F:;
-    *(signed char *)D_0019995F = *(signed char *)(D_001841E3 + ((int)(unsigned char)*(signed char *)current_region));
-    if (a1->type != 8) goto L59A7E;
-    *(short *)D_00199B43 = *(short *)((char *)l_2C);
-    goto L59A9A;
-L59A7E:;
-    *(short *)D_00199B43 = faction_find_type_in_region((int)(short)((int)(unsigned char)*(signed char *)current_region), 15)->id;
-L59A9A:;
-    if (*(short *)D_00199B43 != 0) goto L59AC0;
-    *(short *)D_00199B43 = faction_find_type_in_region((int)(short)((int)(unsigned char)*(signed char *)current_region), 15)->id;
-L59AC0:;
-    l_1C = (struct faction *)faction_find((int)(short)*(short *)D_00199B43);
-    if (l_1C == 0) goto L59AE4;
-    if (l_1C->type == 4) goto L59AE6;
-L59AE4:;
-    goto L59B07;
-L59AE6:;
-    mc_strncpy((int)npc_record_buffer, (int)l_1C->name, 32, (int)D_0017573C, 245);
-    goto L59B2A;
-L59B07:;
-    mc_strncpy((int)npc_record_buffer, func_0008B48B(a1), 32, (int)D_0017573C, 247);
-L59B2A:;
+    if (a1->type == 53) {
+        *(short *)D_0019995C = ((int)(unsigned short)*(short *)D_0019995C) | ((((int)(unsigned short)(a1->npc_flags & 16384)) != 0) ? 1 : 0);
+    } else if (l_20 != 0 && ((int)(unsigned char)(*(signed char *)((char *)l_20 + 6) & 1)) != 0) {
+        *(signed char *)D_0019995C |= 1;
+    } else if (l_20 == 0 && ((int)(unsigned char)(*(signed char *)((char *)l_2C + 2) & 16)) != 0) {
+        *(signed char *)D_0019995C |= 1;
+    }
+    D_0019995F = D_001841E3[(int)(unsigned char)current_region];
+    if (a1->type == 8) {
+        D_00199B43 = *(short *)((char *)l_2C);
+    } else {
+        D_00199B43 = faction_find_type_in_region((int)(short)((int)(unsigned char)current_region), 15)->id;
+    }
+    if (D_00199B43 == 0) {
+        D_00199B43 = faction_find_type_in_region((int)(short)((int)(unsigned char)current_region), 15)->id;
+    }
+    l_1C = (struct faction *)faction_find((int)(short)D_00199B43);
+    if (l_1C != 0 && l_1C->type == 4) {
+        mc_strncpy((int)npc_record_buffer, (int)l_1C->name, 32, (int)D_0017573C, 245);
+    } else {
+        mc_strncpy((int)npc_record_buffer, func_0008B48B(a1), 32, (int)D_0017573C, 247);
+    }
     srand(a1->id);
-    l_28 = 1;
-L59B3C:;
-    if (l_28 < 5) goto L59B4C;
-    goto L59B5F;
-L59B44:;
-    l_28++;
-    goto L59B3C;
-L59B4C:;
-    *(short *)(D_001999AD + (l_28 * 2)) = rand();
-    goto L59B44;
-L59B5F:;
+    for (l_28 = 1; l_28 < 5; l_28++) {
+        D_001999AD[l_28] = rand();
+    }
     srand(l_24);
     return (int)npc_record_buffer;
 }

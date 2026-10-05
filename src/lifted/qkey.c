@@ -4,7 +4,7 @@
 #include "records.h"
 
 struct bf8_6_1 { unsigned char _:6; unsigned char f:1; };
-extern char D_00147954[];
+extern int D_00147954;
 extern char D_001708F0[];
 extern char D_001708F7[];
 extern char D_00170909[];
@@ -15,50 +15,50 @@ extern char D_0017093A[];
 extern char D_00170949[];
 extern char D_00170959[];
 extern char D_00170968[];
-extern char weapon_skills[];
-extern char D_0017A144[];
-extern char struck_body_part_table[];
+extern signed char weapon_skills[];
+extern signed char D_0017A144[];
+extern signed char struck_body_part_table[];
 extern char D_0017CAFA[];
 extern char material_to_hit[];
 extern char weapon_damage_min[];
 extern char weapon_damage_max[];
 extern char monster_names[];
 extern char region_names[];
-extern char D_001841E3[];
-extern char text_blank[];
+extern signed char D_001841E3[];
+extern int text_blank;
 extern char monster_category[];
-extern char D_0018506F[];
-extern char body_part_armor_slots[];
+extern int D_0018506F;
+extern signed char body_part_armor_slots[];
 extern char weapon_proficiency_bits[];
-extern char D_0018DDDC[];
-extern char text_buffer[];
+extern int D_0018DDDC;
+extern signed char text_buffer[];
 extern struct record *D_00190504[];
 extern char D_00190B44[];
-extern char text_rsc_buffer[];
-extern char D_001940D7[];
+extern signed char text_rsc_buffer[];
+extern unsigned char D_001940D7;
 extern char D_00195A08[];
 extern struct item *D_00195A80;
 extern struct record *player_entity;
 extern struct record *player_object;
 extern struct record *D_00195AA8;
-extern char D_00195ABC[];
+extern int D_00195ABC;
 extern char cheat_flags[];
 extern struct record *D_00195AF4;
-extern char creature_count[];
+extern int creature_count;
 extern struct record *guild_npc_object;
 extern struct character *player_character;
 extern struct career *player_class;
-extern char current_region[];
-extern char D_00196271[];
-extern char game_mode[];
-extern char D_0019628D[];
-extern char D_0019628E[];
-extern char D_0019628F[];
-extern char D_0019629C[];
-extern char D_001962B2[];
+extern signed char current_region;
+extern unsigned char D_00196271;
+extern signed char game_mode;
+extern signed char D_0019628D;
+extern signed char D_0019628E;
+extern signed char D_0019628F;
+extern signed char D_0019629C;
+extern signed char D_001962B2;
 extern struct quest *current_quest;
-extern char swing_to_hit[];
-extern char swing_damage[];
+extern short swing_to_hit;
+extern short swing_damage;
 
 extern struct faction *faction_find(short);
 extern int damage_miss_sound(struct item *, int);
@@ -122,215 +122,141 @@ int quest_symbol_text(int a1, int a2, int a3)
     int l_1C;
     struct character *l_18;
     int l_14;
-{
-    int l_60;
+    {
+        int l_60;
 
-    if (current_quest == 0) goto L2D61C;
-    l_40 = quest_section(current_quest, 0);
-    l_24 = 0;
-L2CED6:;
-    if (current_quest->section_counts[0] > l_24) goto L2CEF5;
-    goto L2CF00;
-L2CEE6:;
-    l_24++;
-    l_40++;
-    goto L2CED6;
-L2CEF5:;
-    if (a1 != l_40->symbol) goto L2CEE6;
-L2CF00:;
-    if (current_quest->section_counts[0] <= l_24) goto L2D02E;
-    l_40->flags &= 127;
-    l_30 = l_40->object;
-    if (l_30 == 0) goto L2D02E;
-    if ((D_00195A80 = &l_30->data.item)->group != 28) goto L2CF56;
-    if (D_00195A80->index == 0) goto L2CF58;
-L2CF56:;
-    goto L2CF77;
-L2CF58:;
-    return func_000A0DD9(D_00195A80->value, (int)text_rsc_buffer, 10);
-L2CF77:;
-    if (D_00195A80->group != 7) goto L2D013;
-    l_14 = (int)(*(char **)D_00147954 + 90000);
-    func_000A0ED9(115, (int)D_001708F0);
-    mc_sprintf((int)text_buffer, (int)D_001708F7, (int)(unsigned short)(short)D_00195A80->message);
-    l_1C = disk_open_data((int)text_buffer);
-    func_000A00CB(l_1C, l_14, 234);
-    func_0009DEA7(l_1C);
-    mc_strncpy((int)text_rsc_buffer, l_14, 2048, (int)D_001708F0, 119);
-    return (int)text_rsc_buffer;
-L2D013:;
-    parse_expand((int)D_00170909, (int)D_00190B44);
-    return (int)D_00190B44;
-L2D02E:;
-    l_48 = quest_section(current_quest, 4);
-    l_44 = 0;
-    l_24 = 0;
-L2D04E:;
-    if (current_quest->section_counts[4] > l_24) goto L2D06D;
-    goto L2D082;
-L2D05E:;
-    l_24++;
-    l_48++;
-    goto L2D04E;
-L2D06D:;
-    if (a1 != l_48->symbol) goto L2D080;
-    l_44 = l_48;
-    goto L2D082;
-L2D080:;
-    goto L2D05E;
-L2D082:;
-    if (l_44 == 0) goto L2D105;
-    l_48->flags &= 127;
-    l_30 = l_48->object;
-    if (l_30 == 0) goto L2D105;
-    if ((a2 & 240) != 0) goto L2D0C4;
-    l_2C = (struct building *)RECORD_DATA(l_30);
-    return building_name(l_2C);
-L2D0C4:;
-    if ((a2 & 240) > 32) goto L2D0DF;
-    return (int)RECORD_DATA(l_30) + 26;
-L2D0DF:;
-    if ((a2 & 240) == 0) goto L2D105;
-    return *(int *)(region_names + (((int)(unsigned short)l_30->region) << 2));
-L2D105:;
-    l_3C = quest_section(current_quest, 3);
-    l_24 = 0;
-L2D11E:;
-    if (current_quest->section_counts[3] > l_24) goto L2D13D;
-    goto L2D148;
-L2D12E:;
-    l_24++;
-    l_3C++;
-    goto L2D11E;
-L2D13D:;
-    if (a1 != l_3C->symbol) goto L2D12E;
-L2D148:;
-    if (current_quest->section_counts[3] <= l_24) goto L2D3DB;
-    l_3C->flags &= ~0x8000;
-    l_30 = l_3C->object;
-    if (l_30 == 0) goto L2D3DB;
-    if (l_30->type != 65) goto L2D19A;
-    return (int)faction_find(l_30->faction_id)->name;
-L2D19A:;
-    if (((int)(unsigned short)(l_30->flags & 4)) == 0) goto L2D1B8;
-    l_60 = 1;
-    goto L2D1BF;
-L2D1B8:;
-    l_60 = 0;
-L2D1BF:;
-    *(signed char *)D_0019628F = *(signed char *)&l_60;
-    if ((a2 & 15) != 1) goto L2D1EE;
-    return flats_cfg_find(l_30->image) + 9;
-L2D1EE:;
-    if ((a2 & 15) <= 1) goto L2D226;
-    if (l_30->faction_id == 0) goto L2D21A;
-    return (int)faction_find(l_30->faction_id)->name;
-L2D21A:;
-    return (int)D_0017090D;
-L2D226:;
-    switch (a2 & 240) {
-case 0:
-    l_50 = faction_find((int)(short)l_30->data.building.faction_id);
-    if (l_50 == 0) goto L2D293;
-    if (l_50->type == 4) goto L2D295;
-L2D293:;
-    goto L2D2A3;
-L2D295:;
-    return (int)l_50->name;
-L2D2A3:;
-    if (l_3C->kind != (-1)) goto L2D2DB;
-    l_50 = faction_find(l_3C->faction_id);
-    if (l_50->type != 4) goto L2D2DB;
-    return (int)l_50->name;
-L2D2DB:;
-    return func_0008B43B((int)(unsigned char)*(signed char *)(D_001841E3 + l_30->home_region), (int)(unsigned char)((signed char)l_30->flags & 4), l_30->name_seed);
-case 16:
-    if ((l_30->id >> 16) != 50015) goto L2D32D;
-    return (int)D_00170918;
-L2D32D:;
-    if ((l_30->id >> 16) != 50027) goto L2D349;
-    return (int)D_00170928;
-L2D349:;
-    if ((l_30->id >> 16) != 50029) goto L2D365;
-    return (int)D_0017093A;
-L2D365:;
-    if ((l_30->id >> 16) != 50033) goto L2D381;
-    return (int)D_00170949;
-L2D381:;
-    if ((l_30->id >> 16) != 50041) goto L2D39D;
-    return (int)D_00170959;
-L2D39D:;
-    return building_name((struct building *)RECORD_DATA(l_30));
-case 32:
-    return (int)RECORD_DATA(l_30) + 26;
-case 48:
-    return *(int *)(region_names + (l_30->home_region << 2));
-default:
+        if (current_quest != 0) {
+            l_40 = quest_section(current_quest, 0);
+            for (l_24 = 0; current_quest->section_counts[0] > l_24; l_24++, l_40++) {
+                if (a1 == l_40->symbol) break;
+            }
+            if (current_quest->section_counts[0] > l_24) {
+                l_40->flags &= 127;
+                l_30 = l_40->object;
+                if (l_30 != 0) {
+                    if ((D_00195A80 = &l_30->data.item)->group == 28 && D_00195A80->index == 0) {
+                        return func_000A0DD9(D_00195A80->value, (int)text_rsc_buffer, 10);
+                    }
+                    if (D_00195A80->group == 7) {
+                        l_14 = (int)(*(char **)&D_00147954 + 90000);
+                        func_000A0ED9(115, (int)D_001708F0);
+                        mc_sprintf((int)text_buffer, (int)D_001708F7, (int)(unsigned short)(short)D_00195A80->message);
+                        l_1C = disk_open_data((int)text_buffer);
+                        func_000A00CB(l_1C, l_14, 234);
+                        func_0009DEA7(l_1C);
+                        mc_strncpy((int)text_rsc_buffer, l_14, 2048, (int)D_001708F0, 119);
+                        return (int)text_rsc_buffer;
+                    }
+                    parse_expand((int)D_00170909, (int)D_00190B44);
+                    return (int)D_00190B44;
+                }
+            }
+            l_48 = quest_section(current_quest, 4);
+            l_44 = 0;
+            for (l_24 = 0; current_quest->section_counts[4] > l_24; l_24++, l_48++) {
+                if (a1 == l_48->symbol) {
+                    l_44 = l_48;
+                    break;
+                }
+            }
+            if (l_44 != 0) {
+                l_48->flags &= 127;
+                l_30 = l_48->object;
+                if (l_30 != 0) {
+                    if ((a2 & 240) == 0) {
+                        l_2C = (struct building *)RECORD_DATA(l_30);
+                        return building_name(l_2C);
+                    }
+                    if ((a2 & 240) <= 32) return (int)RECORD_DATA(l_30) + 26;
+                    if ((a2 & 240) != 0) {
+                        return *(int *)(region_names + (((int)(unsigned short)l_30->region) << 2));
+                    }
+                }
+            }
+            l_3C = quest_section(current_quest, 3);
+            for (l_24 = 0; current_quest->section_counts[3] > l_24; l_24++, l_3C++) {
+                if (a1 == l_3C->symbol) break;
+            }
+            if (current_quest->section_counts[3] <= l_24) goto L2D3DB;
+            l_3C->flags &= ~0x8000;
+            l_30 = l_3C->object;
+            if (l_30 == 0) goto L2D3DB;
+            if (l_30->type == 65) return (int)faction_find(l_30->faction_id)->name;
+            if (((int)(unsigned short)(l_30->flags & 4)) != 0) {
+                l_60 = 1;
+            } else {
+                l_60 = 0;
+            }
+            D_0019628F = *(signed char *)&l_60;
+            if ((a2 & 15) == 1) return flats_cfg_find(l_30->image) + 9;
+            if ((a2 & 15) > 1) {
+                if (l_30->faction_id != 0) return (int)faction_find(l_30->faction_id)->name;
+                return (int)D_0017090D;
+            }
+            switch (a2 & 240) {
+            case 0:
+                l_50 = faction_find((int)(short)l_30->data.building.faction_id);
+                if (l_50 != 0 && l_50->type == 4) return (int)l_50->name;
+                if (l_3C->kind == (-1)) {
+                    l_50 = faction_find(l_3C->faction_id);
+                    if (l_50->type == 4) return (int)l_50->name;
+                }
+                return func_0008B43B((int)(unsigned char)D_001841E3[l_30->home_region], (int)(unsigned char)((signed char)l_30->flags & 4), l_30->name_seed);
+            case 16:
+                if ((l_30->id >> 16) == 50015) return (int)D_00170918;
+                if ((l_30->id >> 16) == 50027) return (int)D_00170928;
+                if ((l_30->id >> 16) == 50029) return (int)D_0017093A;
+                if ((l_30->id >> 16) == 50033) return (int)D_00170949;
+                if ((l_30->id >> 16) == 50041) return (int)D_00170959;
+                return building_name((struct building *)RECORD_DATA(l_30));
+            case 32:
+                return (int)RECORD_DATA(l_30) + 26;
+            case 48:
+                return *(int *)(region_names + (l_30->home_region << 2));
+            default:
 L2D3DB:;
-    l_4C = quest_section(current_quest, 7);
-    l_24 = 0;
-L2D3F4:;
-    if (current_quest->section_counts[7] > l_24) goto L2D413;
-    goto L2D41E;
-L2D404:;
-    l_24++;
-    l_4C++;
-    goto L2D3F4;
-L2D413:;
-    if (a1 != l_4C->symbol) goto L2D404;
-L2D41E:;
-    if (current_quest->section_counts[7] <= l_24) goto L2D525;
-    l_30 = l_4C->object;
-    if (l_30 == 0) goto L2D525;
-    l_18 = &l_30->data.character;
-    if ((a2 & 15) != 1) goto L2D4D5;
-    if (l_18->mobile_id < 128) goto L2D4A1;
-    return func_0008B43B((int)(unsigned char)*(signed char *)(D_001841E3 + ((int)(unsigned char)*(signed char *)current_region)), (int)(unsigned char)((signed char)l_18->flags & 1), l_30->name_seed);
-L2D4A1:;
-    return func_0008B43B((int)(unsigned char)*(signed char *)(D_0017A144 + (current_quest->id % 3)), 0, l_30->name_seed);
-L2D4D5:;
-    if (l_18->mobile_id < 128) goto L2D509;
-    return *(int *)(D_0017CAFA + (l_18->mobile_id << 2));
-L2D509:;
-    return *(int *)(monster_names + (l_18->race << 2));
-L2D525:;
-    l_38 = quest_section(current_quest, 6);
-    l_24 = 0;
-L2D53E:;
-    if (current_quest->section_counts[6] > l_24) goto L2D55D;
-    goto L2D568;
-L2D54E:;
-    l_24++;
-    l_38++;
-    goto L2D53E;
-L2D55D:;
-    if (a1 != l_38->state_hash) goto L2D54E;
-L2D568:;
-    l_20 = l_38->delay;
-    if (a3 == 0) goto L2D5C3;
-    l_34 = quest_section(current_quest, 6);
-    l_24 = 0;
-L2D590:;
-    if (current_quest->section_counts[6] > l_24) goto L2D5AF;
-    goto L2D5BA;
-L2D5A0:;
-    l_24++;
-    l_34++;
-    goto L2D590;
-L2D5AF:;
-    if (a3 != l_34->state_hash) goto L2D5A0;
-L2D5BA:;
-    l_20 += l_34->delay;
-L2D5C3:;
-    if (current_quest->section_counts[6] <= l_24) goto L2D61C;
-    if ((a2 & 15) == 0) goto L2D605;
-    return func_000A0DD9((l_20 + 1439) / 1440, (int)text_rsc_buffer, 10);
-L2D605:;
-    return func_000A0DD9(l_20, (int)text_rsc_buffer, 10);
-L2D61C:;
-    return *(int *)text_blank;
-}
-}
+                l_4C = quest_section(current_quest, 7);
+                for (l_24 = 0; current_quest->section_counts[7] > l_24; l_24++, l_4C++) {
+                    if (a1 == l_4C->symbol) break;
+                }
+                if (current_quest->section_counts[7] > l_24) {
+                    l_30 = l_4C->object;
+                    if (l_30 != 0) {
+                        l_18 = &l_30->data.character;
+                        if ((a2 & 15) == 1) {
+                            if (l_18->mobile_id >= 128) {
+                                return func_0008B43B((int)(unsigned char)D_001841E3[(int)(unsigned char)current_region], (int)(unsigned char)((signed char)l_18->flags & 1), l_30->name_seed);
+                            }
+                            return func_0008B43B((int)(unsigned char)D_0017A144[current_quest->id % 3], 0, l_30->name_seed);
+                        }
+                        if (l_18->mobile_id >= 128) {
+                            return *(int *)(D_0017CAFA + (l_18->mobile_id << 2));
+                        }
+                        return *(int *)(monster_names + (l_18->race << 2));
+                    }
+                }
+            }
+            l_38 = quest_section(current_quest, 6);
+            for (l_24 = 0; current_quest->section_counts[6] > l_24; l_24++, l_38++) {
+                if (a1 == l_38->state_hash) break;
+            }
+            l_20 = l_38->delay;
+            if (a3 != 0) {
+                l_34 = quest_section(current_quest, 6);
+                for (l_24 = 0; current_quest->section_counts[6] > l_24; l_24++, l_34++) {
+                    if (a3 == l_34->state_hash) break;
+                }
+                l_20 += l_34->delay;
+            }
+            if (current_quest->section_counts[6] > l_24) {
+                if ((a2 & 15) != 0) {
+                    return func_000A0DD9((l_20 + 1439) / 1440, (int)text_rsc_buffer, 10);
+                }
+                return func_000A0DD9(l_20, (int)text_rsc_buffer, 10);
+            }
+        }
+        return text_blank;
+    }
 }
 
 void damage_resolve_attack(struct record *a1, struct record *a2, int a3)
@@ -353,247 +279,151 @@ void damage_resolve_attack(struct record *a1, struct record *a2, int a3)
     int l_14;
     struct monster_anim *l_10;
 
-    if (((int)(unsigned char)*(signed char *)game_mode) == 21) return;
-    if (a2 == player_entity) goto L2D696;
-    l_30 = 0;
-L2D666:;
-    if (l_30 < *(int *)creature_count) goto L2D67B;
-    goto L2D696;
-L2D673:;
-    l_30++;
-    goto L2D666;
-L2D67B:;
-    if (D_00190504[l_30] != a2) goto L2D694;
-    l_24 = l_30;
-    goto L2D696;
-L2D694:;
-    goto L2D673;
-L2D696:;
-    if (a1 != player_entity) goto L2D6B5;
-    if (rand_range(1, 100) <= 20) goto L2D6BA;
-L2D6B5:;
-    goto L2D784;
-L2D6BA:;
-    if (player_character->race != 8) goto L2D724;
-    sound_play(((((int)(unsigned short)(player_character->flags & 1)) != 0) ? (rand() & 1) + 10281 : (rand() & 1) + 10301), player_object, 100);
-    goto L2D784;
-L2D724:;
-    if (player_character->race != 9) goto L2D755;
-    sound_play((rand() & 1) + 10091, player_object, 100);
-    goto L2D784;
-L2D755:;
-    if (player_character->race != 10) goto L2D784;
-    sound_play((rand() & 1) + 10141, player_object, 100);
-L2D784:;
-    l_40 = (int)(unsigned char)*(signed char *)(struck_body_part_table + rand_range(0, 19));
+    if (((int)(unsigned char)game_mode) == 21) return;
+    if (a2 != player_entity) {
+        for (l_30 = 0; l_30 < creature_count; l_30++) {
+            if (D_00190504[l_30] == a2) {
+                l_24 = l_30;
+                break;
+            }
+        }
+    }
+    if (a1 == player_entity && rand_range(1, 100) <= 20) {
+        if (player_character->race == 8) {
+            sound_play(((((int)(unsigned short)(player_character->flags & 1)) != 0) ? (rand() & 1) + 10281 : (rand() & 1) + 10301), player_object, 100);
+        } else if (player_character->race == 9) {
+            sound_play((rand() & 1) + 10091, player_object, 100);
+        } else if (player_character->race == 10) {
+            sound_play((rand() & 1) + 10141, player_object, 100);
+        }
+    }
+    l_40 = (int)(unsigned char)struck_body_part_table[rand_range(0, 19)];
     l_50 = &a1->data.character;
     l_4C = &a2->data.character;
     D_00195AA8 = l_50->equipped[a3];
     l_48 = &l_50->equipped[a3]->data.item;
-    if (l_50->equipped[a3] == 0) goto L2D7FB;
-    if (l_48->group == 3) goto L2D7FD;
-L2D7FB:;
-    goto L2D80F;
-L2D7FD:;
-    if (player_character->race < 9) goto L2D811;
-L2D80F:;
-    goto L2D827;
-L2D811:;
-    l_3C = (int)(unsigned char)*(signed char *)(weapon_skills + l_48->index);
-    goto L2D82E;
-L2D827:;
-    l_3C = 30;
-L2D82E:;
+    if (l_50->equipped[a3] != 0 && l_48->group == 3 && player_character->race < 9) {
+        l_3C = (int)(unsigned char)weapon_skills[l_48->index];
+    } else {
+        l_3C = 30;
+    }
     l_34 = l_50->skills[l_3C].value;
-    if (l_3C == 30) goto L2D850;
-    if (l_50 == player_character) goto L2D852;
-L2D850:;
-    goto L2D878;
-L2D852:;
-    if ((((int)(short)*(short *)(weapon_proficiency_bits + (l_48->index * 2))) & player_class->expert_weapons) != 0) goto L2D87A;
-L2D878:;
-    goto L2D88D;
-L2D87A:;
-    l_34 += player_character->level;
-L2D88D:;
+    if (l_3C != 30 && l_50 == player_character && (((int)(short)*(short *)(weapon_proficiency_bits + (l_48->index * 2))) & player_class->expert_weapons) != 0) {
+        l_34 += player_character->level;
+    }
     l_18 = 0;
-    if (a1 != player_entity) goto L2D8FB;
-    l_10 = &a2->data.monster.anim;
-    if (l_10->anim_request == 57) return;
-    if (l_10->anim_facing <= 2) goto L2D8FB;
-    l_34 += player_character->skills[SKILL_BACKSTABBING].value;
-    skill_add_uses(19, 1);
-    l_18 = player_character->skills[SKILL_BACKSTABBING].value;
-L2D8FB:;
-    if (a1 != player_entity) goto L2D913;
-    skill_add_uses(l_3C, 1);
-L2D913:;
-    if (l_3C != 30) goto L2DBBC;
-    if (a1 != player_entity) goto L2D9FF;
-    if (damage_roll_to_hit(l_50, l_4C, l_40, l_34, -1, 0) == 0) goto L2D9FA;
-    l_28 = rand_range((player_character->skills[SKILL_HAND_TO_HAND].value / 10) + 1, (int)&*(signed char *)((char *)(player_character->skills[SKILL_HAND_TO_HAND].value / 5) + 1));
-    if (l_18 == 0) goto L2D9B6;
-    if (rand_range(1, 100) > l_18) goto L2D9B6;
-    l_28 = l_28 * 3;
-    hud_message_add(*(int *)D_0018506F);
-L2D9B6:;
-    l_38 = damage_apply(a2, l_28, 0) + ((int)(short)*(short *)swing_damage);
-    spell_break_concealment(a1);
-    if (l_38 == 0) goto L2D9FA;
-    l_2C += l_38;
-    damage_knockback(a2, l_38 * 10, *(int *)D_00195ABC, l_38 * 2);
-L2D9FA:;
-    goto L2DB6C;
-L2D9FF:;
-    l_30 = 0;
-    l_2C = l_30;
-L2DA0C:;
-    if (l_30 < 5) goto L2DA1F;
-    goto L2DB6C;
-L2DA17:;
-    l_30++;
-    goto L2DA0C;
-L2DA1F:;
-    if ((rand() % 100) >= (50 - ((player_character->reflexes - 2) * 10))) goto L2DA68;
-    if (l_50->attack_damage[l_30][0] != 0) goto L2DA6A;
-L2DA68:;
-    goto L2DA83;
-L2DA6A:;
-    if (damage_roll_to_hit(l_50, l_4C, l_40, l_34, -1, 0) != 0) goto L2DA88;
-L2DA83:;
-    goto L2DB67;
-L2DA88:;
-    l_28 = rand_range(l_50->attack_damage[l_30][0], l_50->attack_damage[l_30][1]);
-    if (l_18 == 0) goto L2DAE4;
-    if (rand_range(1, 100) > l_18) goto L2DAE4;
-    l_28 = l_28 * 3;
-    hud_message_add(*(int *)D_0018506F);
-L2DAE4:;
-    l_38 = damage_apply(a2, l_28, 0);
-    if (a1 != player_entity) goto L2DB09;
-    l_38 += (int)(short)*(short *)swing_damage;
-L2DB09:;
-    l_2C += l_38;
-    if (a1 != player_entity) goto L2DB20;
-    if (l_38 != 0) goto L2DB22;
-L2DB20:;
-    goto L2DB39;
-L2DB22:;
-    damage_knockback(a2, l_38 * 10, *(int *)D_00195ABC, l_38 * 2);
-L2DB39:;
-    if (l_38 == 0) goto L2DB4A;
-    damage_monster_hit_effects(a1, a2);
-L2DB4A:;
-    if (a1->type != 18) goto L2DB67;
-    damage_namira_reflect(a1, a2, l_38);
-L2DB67:;
-    goto L2DA17;
-L2DB6C:;
-    if (l_2C == 0) goto L2DB96;
-    sound_play((rand() & 1) + 380, a2, 110);
-    spell_break_concealment(a1);
-    goto L2DBB7;
-L2DB96:;
-    sound_play(damage_miss_sound(0, l_4C->mobile_id), a2, 110);
-L2DBB7:;
-    return;
-L2DBBC:;
-    if (l_4C->min_metal_to_hit <= l_48->material) goto L2DBD5;
-    if (a1 == player_entity) goto L2DBD7;
-L2DBD5:;
-    goto L2DBE1;
-L2DBD7:;
-    hud_message_add((int)D_00170968);
-L2DBE1:;
-    if (l_4C->min_metal_to_hit > l_48->material) goto L2DC26;
-    if (damage_roll_to_hit(l_50, l_4C, l_40, l_34, l_48->index, (int)(short)*(short *)(material_to_hit + (l_48->material * 2))) != 0) goto L2DC2B;
-L2DC26:;
-    goto L2E008;
-L2DC2B:;
-    l_28 = rand_range((int)(short)*(short *)(weapon_damage_min + (l_48->index << 2)), (int)(short)*(short *)(weapon_damage_max + (l_48->index << 2)));
-    if (l_50->race != 1) goto L2DC80;
-    if (l_48->index < 16) goto L2DC82;
-L2DC80:;
-    goto L2DCA0;
-L2DC82:;
-    l_28 += l_50->level / 3;
-L2DCA0:;
-    if (l_50->race != 5) goto L2DCC1;
-    if (l_48->index >= 16) goto L2DCC3;
-L2DCC1:;
-    goto L2DCE1;
-L2DCC3:;
-    l_28 += l_50->level / 3;
-L2DCE1:;
-    if (l_50->race != 3) goto L2DD10;
-    l_28 += l_50->level / 4;
-L2DD10:;
-    if (a1 != player_entity) goto L2DD6D;
-    l_28 += (int)(short)*(short *)swing_damage;
-    if ((((int)(short)*(short *)(weapon_proficiency_bits + (l_48->index * 2))) & player_class->expert_weapons) == 0) goto L2DD6D;
-    l_28 += (player_character->level / 3) + 1;
-L2DD6D:;
-    if (((int)(unsigned short)(player_character->flags & 512)) == 0) goto L2DD8D;
-    if (*(signed char *)D_0019628E != 0) goto L2DD8F;
-L2DD8D:;
-    goto L2DDA5;
-L2DD8F:;
-    l_28 += (l_28 << 6) / 256;
-L2DDA5:;
-    if (*(signed char *)D_0019628E == 0) goto L2DDC4;
-    l_28 += (l_28 << 5) / 256;
-L2DDC4:;
-    if (l_4C->race != 15) goto L2DDFF;
-    if (l_48->material != 2) goto L2DDE7;
-    l_28 <<= 1;
-L2DDE7:;
-    if (((int)(unsigned short)(l_48->item_flags & 16)) != 0) goto L2DDFF;
-    l_28 >>= 1;
-L2DDFF:;
-    l_28 += ((int)(short)*(short *)(material_to_hit + (l_48->material * 2))) / 10;
-    l_28 += ((int)&*(signed char *)((char *)(l_50->attributes[ATTR_STR] + *(int *)D_00195A08) - 50)) / 5;
-    if (l_28 >= 1) goto L2DE4F;
-    l_28 = 0;
-L2DE4F:;
-    l_28 += damage_bonus_vs_target(l_48, l_50, l_4C);
-    if (l_18 == 0) goto L2DE8D;
-    if (rand_range(1, 100) > l_18) goto L2DE8D;
-    l_28 = l_28 * 3;
-    hud_message_add(*(int *)D_0018506F);
-L2DE8D:;
-    l_38 = damage_apply(a2, l_28, l_50->equipped[a3]);
-    if (*(signed char *)D_0019629C != 0) return;
-    if (a1 != player_entity) goto L2DEC8;
-    if (l_38 != 0) goto L2DECA;
-L2DEC8:;
-    goto L2DEE1;
-L2DECA:;
-    damage_knockback(a2, l_38 * 10, *(int *)D_00195ABC, l_38 * 2);
-L2DEE1:;
-    if (l_38 == 0) goto L2DEFC;
-    if (l_50->equipped[a3]->children != 0) goto L2DEFE;
-L2DEFC:;
-    goto L2DF3E;
-L2DEFE:;
-    l_44 = &l_50->equipped[a3]->children->data.disease;
-    func_00065A8C(a2, l_44->id, 0);
-    object_free_single(l_50->equipped[a3]->children);
-L2DF3E:;
-    if (l_38 == 0) goto L2E006;
-    spell_break_concealment(a1);
-    damage_weapon_strike_effects(l_48, a1, a2, l_38);
-    if (a1->type != 18) goto L2DF7E;
-    damage_namira_reflect(a1, a2, l_38);
-L2DF7E:;
-    sound_play(rand_range(0, 4) + 378, a2, 110);
-    if (l_50->equipped[a3] == 0) goto L2DFC7;
-    func_000601ED(l_50->equipped[a3], l_38);
-L2DFC7:;
-    if (l_4C->equipped[(int)(unsigned char)*(signed char *)(body_part_armor_slots + l_40)] == 0) goto L2E006;
-    func_000601ED(l_4C->equipped[(int)(unsigned char)*(signed char *)(body_part_armor_slots + l_40)], l_38);
-L2E006:;
-    return;
-L2E008:;
+    if (a1 == player_entity) {
+        l_10 = &a2->data.monster.anim;
+        if (l_10->anim_request == 57) return;
+        if (l_10->anim_facing > 2) {
+            l_34 += player_character->skills[SKILL_BACKSTABBING].value;
+            skill_add_uses(19, 1);
+            l_18 = player_character->skills[SKILL_BACKSTABBING].value;
+        }
+    }
+    if (a1 == player_entity) skill_add_uses(l_3C, 1);
+    if (l_3C == 30) {
+        if (a1 == player_entity) {
+            if (damage_roll_to_hit(l_50, l_4C, l_40, l_34, -1, 0) != 0) {
+                l_28 = rand_range((player_character->skills[SKILL_HAND_TO_HAND].value / 10) + 1, (int)&*(signed char *)((char *)(player_character->skills[SKILL_HAND_TO_HAND].value / 5) + 1));
+                if (l_18 != 0) {
+                    if (rand_range(1, 100) <= l_18) {
+                        l_28 = l_28 * 3;
+                        hud_message_add(D_0018506F);
+                    }
+                }
+                l_38 = damage_apply(a2, l_28, 0) + ((int)(short)swing_damage);
+                spell_break_concealment(a1);
+                if (l_38 != 0) {
+                    l_2C += l_38;
+                    damage_knockback(a2, l_38 * 10, D_00195ABC, l_38 * 2);
+                }
+            }
+        } else {
+            l_30 = 0;
+            l_2C = l_30;
+            for (; l_30 < 5; l_30++) {
+                if ((rand() % 100) < (50 - ((player_character->reflexes - 2) * 10)) && l_50->attack_damage[l_30][0] != 0 && damage_roll_to_hit(l_50, l_4C, l_40, l_34, -1, 0) != 0) {
+                    l_28 = rand_range(l_50->attack_damage[l_30][0], l_50->attack_damage[l_30][1]);
+                    if (l_18 != 0) {
+                        if (rand_range(1, 100) <= l_18) {
+                            l_28 = l_28 * 3;
+                            hud_message_add(D_0018506F);
+                        }
+                    }
+                    l_38 = damage_apply(a2, l_28, 0);
+                    if (a1 == player_entity) l_38 += (int)(short)swing_damage;
+                    l_2C += l_38;
+                    if (a1 == player_entity && l_38 != 0) {
+                        damage_knockback(a2, l_38 * 10, D_00195ABC, l_38 * 2);
+                    }
+                    if (l_38 != 0) damage_monster_hit_effects(a1, a2);
+                    if (a1->type == 18) damage_namira_reflect(a1, a2, l_38);
+                }
+            }
+        }
+        if (l_2C != 0) {
+            sound_play((rand() & 1) + 380, a2, 110);
+            spell_break_concealment(a1);
+        } else {
+            sound_play(damage_miss_sound(0, l_4C->mobile_id), a2, 110);
+        }
+        return;
+    }
+    if (l_4C->min_metal_to_hit > l_48->material && a1 == player_entity) {
+        hud_message_add((int)D_00170968);
+    }
+    if (l_4C->min_metal_to_hit <= l_48->material && damage_roll_to_hit(l_50, l_4C, l_40, l_34, l_48->index, (int)(short)*(short *)(material_to_hit + (l_48->material * 2))) != 0) {
+        l_28 = rand_range((int)(short)*(short *)(weapon_damage_min + (l_48->index << 2)), (int)(short)*(short *)(weapon_damage_max + (l_48->index << 2)));
+        if (l_50->race == 1 && l_48->index < 16) l_28 += l_50->level / 3;
+        if (l_50->race == 5 && l_48->index >= 16) l_28 += l_50->level / 3;
+        if (l_50->race == 3) l_28 += l_50->level / 4;
+        if (a1 == player_entity) {
+            l_28 += (int)(short)swing_damage;
+            if ((((int)(short)*(short *)(weapon_proficiency_bits + (l_48->index * 2))) & player_class->expert_weapons) != 0) {
+                l_28 += (player_character->level / 3) + 1;
+            }
+        }
+        if (((int)(unsigned short)(player_character->flags & 512)) != 0 && D_0019628E != 0) {
+            l_28 += (l_28 << 6) / 256;
+        }
+        if (D_0019628E != 0) l_28 += (l_28 << 5) / 256;
+        if (l_4C->race == 15) {
+            if (l_48->material == 2) l_28 <<= 1;
+            if (((int)(unsigned short)(l_48->item_flags & 16)) == 0) l_28 >>= 1;
+        }
+        l_28 += ((int)(short)*(short *)(material_to_hit + (l_48->material * 2))) / 10;
+        l_28 += ((int)&*(signed char *)((char *)(l_50->attributes[ATTR_STR] + *(int *)D_00195A08) - 50)) / 5;
+        if (l_28 < 1) l_28 = 0;
+        l_28 += damage_bonus_vs_target(l_48, l_50, l_4C);
+        if (l_18 != 0) {
+            if (rand_range(1, 100) <= l_18) {
+                l_28 = l_28 * 3;
+                hud_message_add(D_0018506F);
+            }
+        }
+        l_38 = damage_apply(a2, l_28, l_50->equipped[a3]);
+        if (D_0019629C != 0) return;
+        if (a1 == player_entity && l_38 != 0) {
+            damage_knockback(a2, l_38 * 10, D_00195ABC, l_38 * 2);
+        }
+        if (l_38 != 0 && l_50->equipped[a3]->children != 0) {
+            l_44 = &l_50->equipped[a3]->children->data.disease;
+            func_00065A8C(a2, l_44->id, 0);
+            object_free_single(l_50->equipped[a3]->children);
+        }
+        if (l_38 != 0) {
+            spell_break_concealment(a1);
+            damage_weapon_strike_effects(l_48, a1, a2, l_38);
+            if (a1->type == 18) damage_namira_reflect(a1, a2, l_38);
+            sound_play(rand_range(0, 4) + 378, a2, 110);
+            if (l_50->equipped[a3] != 0) func_000601ED(l_50->equipped[a3], l_38);
+            if (l_4C->equipped[(int)(unsigned char)body_part_armor_slots[l_40]] != 0) {
+                func_000601ED(l_4C->equipped[(int)(unsigned char)body_part_armor_slots[l_40]], l_38);
+            }
+        }
+        return;
+    }
     sound_play(damage_miss_sound(l_48, l_4C->mobile_id), a2, 110);
 }
 
@@ -601,65 +431,37 @@ int damage_roll_to_hit(struct character *a1, struct character *a2, int a3, int a
 {
     struct career *l_10;
 
-    if (a1->health >= (a1->max_health >> 3)) goto L2E084;
-    l_10 = &a1->career;
-    if (((int)(unsigned short)(l_10->flags & 4)) == 0) goto L2E084;
-    a4 += 5;
-L2E084:;
-    if (a2->health >= (a2->max_health >> 3)) goto L2E0BF;
-    l_10 = &a2->career;
-    if (((int)(unsigned short)(l_10->flags & 4)) == 0) goto L2E0BF;
-    a4 += -5;
-L2E0BF:;
-    if (a1 != player_character) goto L2E0D4;
-    a4 += (int)(short)*(short *)swing_to_hit;
-L2E0D4:;
-    if (a2 != player_character) goto L2E0E7;
-    a4 -= *(int *)D_0018DDDC;
-L2E0E7:;
+    if (a1->health < (a1->max_health >> 3)) {
+        l_10 = &a1->career;
+        if (((int)(unsigned short)(l_10->flags & 4)) != 0) a4 += 5;
+    }
+    if (a2->health < (a2->max_health >> 3)) {
+        l_10 = &a2->career;
+        if (((int)(unsigned short)(l_10->flags & 4)) != 0) a4 += -5;
+    }
+    if (a1 == player_character) a4 += (int)(short)swing_to_hit;
+    if (a2 == player_character) a4 -= D_0018DDDC;
     a4 += a6;
     a4 += (a1->attributes[ATTR_AGI] - a2->attributes[ATTR_AGI]) / 10;
     a4 += (a1->attributes[ATTR_LUC] - a2->attributes[ATTR_LUC]) / 10;
     a4 += a2->armor_values[a3];
-    if (a2->race >= 43) goto L2E150;
-    a4 += 40;
-L2E150:;
+    if (a2->race < 43) a4 += 40;
     a4 += a1->to_hit_bonus;
-    if (a1->race != 1) goto L2E173;
-    if (a5 < 16) goto L2E175;
-L2E173:;
-    goto L2E193;
-L2E175:;
-    a4 += a1->level / 3;
-L2E193:;
-    if (a1->race != 5) goto L2E1A9;
-    if (a5 >= 16) goto L2E1AB;
-L2E1A9:;
-    goto L2E1C9;
-L2E1AB:;
-    a4 += a1->level / 3;
-L2E1C9:;
-    if (a1->race != 3) goto L2E1F8;
-    a4 += a1->level / 4;
-L2E1F8:;
+    if (a1->race == 1 && a5 < 16) a4 += a1->level / 3;
+    if (a1->race == 5 && a5 >= 16) a4 += a1->level / 3;
+    if (a1->race == 3) a4 += a1->level / 4;
     a4 -= a1->skills[SKILL_DODGING].value / 4;
-    if (rand_range(1, 100) >= a1->skills[SKILL_CRITICAL_STRIKE].value) goto L2E248;
-    a4 += a1->skills[SKILL_CRITICAL_STRIKE].value / 10;
-L2E248:;
-    if (a1 != player_character) goto L2E262;
-    skill_add_uses(34, 1);
-L2E262:;
-    if (a2 != player_character) goto L2E27C;
-    skill_add_uses(20, 1);
-L2E27C:;
+    if (rand_range(1, 100) < a1->skills[SKILL_CRITICAL_STRIKE].value) {
+        a4 += a1->skills[SKILL_CRITICAL_STRIKE].value / 10;
+    }
+    if (a1 == player_character) skill_add_uses(34, 1);
+    if (a2 == player_character) skill_add_uses(20, 1);
     a4 += -50;
-    if (a4 >= 3) goto L2E28F;
-    a4 = 3;
-    goto L2E29C;
-L2E28F:;
-    if (a4 <= 97) goto L2E29C;
-    a4 = 97;
-L2E29C:;
+    if (a4 < 3) {
+        a4 = 3;
+    } else if (a4 > 97) {
+        a4 = 97;
+    }
     return ((rand_range(0, 100) <= a4) ? 1 : 0);
 }
 
@@ -672,101 +474,46 @@ int damage_bonus_vs_target(struct item *a1, struct character *a2, struct charact
 
     l_18 = 0;
     l_14 = &a2->career;
-    if (l_14->attack_modifier_flags == 0) goto L2E77A;
-    if (((int)(unsigned char)(l_14->attack_modifier_flags & 1)) == 0) goto L2E5B5;
-    if (*(signed char *)(monster_category + a3->race) == 0) goto L2E5B7;
-L2E5B5:;
-    goto L2E5C8;
-L2E5B7:;
-    l_18 += a2->level;
-L2E5C8:;
-    if (((int)(unsigned char)(l_14->attack_modifier_flags & 2)) == 0) goto L2E5F4;
-    if (((int)(unsigned char)*(signed char *)(monster_category + a3->race)) == 1) goto L2E5F6;
-L2E5F4:;
-    goto L2E607;
-L2E5F6:;
-    l_18 += a2->level;
-L2E607:;
-    if (((int)(unsigned char)(l_14->attack_modifier_flags & 4)) == 0) goto L2E633;
-    if (((int)(unsigned char)*(signed char *)(monster_category + a3->race)) == 2) goto L2E635;
-L2E633:;
-    goto L2E646;
-L2E635:;
-    l_18 += a2->level;
-L2E646:;
-    if (((int)(unsigned char)(l_14->attack_modifier_flags & 8)) == 0) goto L2E672;
-    if (((int)(unsigned char)*(signed char *)(monster_category + a3->race)) == 3) goto L2E674;
-L2E672:;
-    goto L2E685;
-L2E674:;
-    l_18 += a2->level;
-L2E685:;
-    if (((int)(unsigned char)(l_14->attack_modifier_flags & 16)) == 0) goto L2E6AA;
-    if (*(signed char *)(monster_category + a3->race) == 0) goto L2E6AC;
-L2E6AA:;
-    goto L2E6BD;
-L2E6AC:;
-    l_18 -= a2->level;
-L2E6BD:;
-    if (((int)(unsigned char)(l_14->attack_modifier_flags & 32)) == 0) goto L2E6E9;
-    if (((int)(unsigned char)*(signed char *)(monster_category + a3->race)) == 1) goto L2E6EB;
-L2E6E9:;
-    goto L2E6FC;
-L2E6EB:;
-    l_18 -= a2->level;
-L2E6FC:;
-    if (((int)(unsigned char)(l_14->attack_modifier_flags & 64)) == 0) goto L2E728;
-    if (((int)(unsigned char)*(signed char *)(monster_category + a3->race)) == 2) goto L2E72A;
-L2E728:;
-    goto L2E73B;
-L2E72A:;
-    l_18 -= a2->level;
-L2E73B:;
-    if (((int)(unsigned char)(l_14->attack_modifier_flags & 128)) == 0) goto L2E767;
-    if (((int)(unsigned char)*(signed char *)(monster_category + a3->race)) == 3) goto L2E769;
-L2E767:;
-    goto L2E77A;
-L2E769:;
-    l_18 -= a2->level;
-L2E77A:;
-    if (a1->enchantments[0].type != (-1)) goto L2E792;
-    return 0;
-L2E792:;
+    if (l_14->attack_modifier_flags != 0) {
+        if (((int)(unsigned char)(l_14->attack_modifier_flags & 1)) != 0 && *(signed char *)(monster_category + a3->race) == 0) {
+            l_18 += a2->level;
+        }
+        if (((int)(unsigned char)(l_14->attack_modifier_flags & 2)) != 0 && ((int)(unsigned char)*(signed char *)(monster_category + a3->race)) == 1) {
+            l_18 += a2->level;
+        }
+        if (((int)(unsigned char)(l_14->attack_modifier_flags & 4)) != 0 && ((int)(unsigned char)*(signed char *)(monster_category + a3->race)) == 2) {
+            l_18 += a2->level;
+        }
+        if (((int)(unsigned char)(l_14->attack_modifier_flags & 8)) != 0 && ((int)(unsigned char)*(signed char *)(monster_category + a3->race)) == 3) {
+            l_18 += a2->level;
+        }
+        if (((int)(unsigned char)(l_14->attack_modifier_flags & 16)) != 0 && *(signed char *)(monster_category + a3->race) == 0) {
+            l_18 -= a2->level;
+        }
+        if (((int)(unsigned char)(l_14->attack_modifier_flags & 32)) != 0 && ((int)(unsigned char)*(signed char *)(monster_category + a3->race)) == 1) {
+            l_18 -= a2->level;
+        }
+        if (((int)(unsigned char)(l_14->attack_modifier_flags & 64)) != 0 && ((int)(unsigned char)*(signed char *)(monster_category + a3->race)) == 2) {
+            l_18 -= a2->level;
+        }
+        if (((int)(unsigned char)(l_14->attack_modifier_flags & 128)) != 0 && ((int)(unsigned char)*(signed char *)(monster_category + a3->race)) == 3) {
+            l_18 -= a2->level;
+        }
+    }
+    if (a1->enchantments[0].type == (-1)) return 0;
     l_1C = a3->race;
-    l_20 = 0;
-L2E7A4:;
-    if (l_20 < 10) goto L2E7B7;
-    goto L2E89D;
-L2E7AF:;
-    l_20++;
-    goto L2E7A4;
-L2E7B7:;
-    if (a1->enchantments[l_20].type != (-1)) goto L2E7D5;
-    return 0;
-L2E7D5:;
-    if (a1->enchantments[l_20].type != 4) goto L2E801;
-    if ((short)((unsigned short)(unsigned char)*(signed char *)(monster_category + l_1C)) == a1->enchantments[l_20].param) goto L2E803;
-L2E801:;
-    goto L2E814;
-L2E803:;
-    l_18 += a2->level;
-L2E814:;
-    if (a1->enchantments[l_20].type != 20) goto L2E840;
-    if ((short)((unsigned short)(unsigned char)*(signed char *)(monster_category + l_1C)) == a1->enchantments[l_20].param) goto L2E842;
-L2E840:;
-    goto L2E853;
-L2E842:;
-    l_18 -= a2->level;
-L2E853:;
-    if (a1->enchantments[l_20].type != 21) goto L2E875;
-    if (a1->enchantments[l_20].param == 0) goto L2E877;
-L2E875:;
-    goto L2E898;
-L2E877:;
-    damage_apply((struct record *)((char *)a2 - 71), (int)&*(signed char *)((char *)(a2->level >> 2) + 1), 0);
-L2E898:;
-    goto L2E7AF;
-L2E89D:;
+    for (l_20 = 0; l_20 < 10; l_20++) {
+        if (a1->enchantments[l_20].type == (-1)) return 0;
+        if (a1->enchantments[l_20].type == 4 && (short)((unsigned short)(unsigned char)*(signed char *)(monster_category + l_1C)) == a1->enchantments[l_20].param) {
+            l_18 += a2->level;
+        }
+        if (a1->enchantments[l_20].type == 20 && (short)((unsigned short)(unsigned char)*(signed char *)(monster_category + l_1C)) == a1->enchantments[l_20].param) {
+            l_18 -= a2->level;
+        }
+        if (a1->enchantments[l_20].type == 21 && a1->enchantments[l_20].param == 0) {
+            damage_apply((struct record *)((char *)a2 - 71), (int)&*(signed char *)((char *)(a2->level >> 2) + 1), 0);
+        }
+    }
     return l_18;
 }
 
@@ -776,10 +523,10 @@ int func_0002E8AE(struct character *a1, int a2)
 
     l_18 = a2;
     a1->health += a2;
-    if (a1->health <= a1->max_health) goto L2E902;
-    l_18 -= a1->health - a1->max_health;
-    a1->health = a1->max_health;
-L2E902:;
+    if (a1->health > a1->max_health) {
+        l_18 -= a1->health - a1->max_health;
+        a1->health = a1->max_health;
+    }
     return l_18;
 }
 
@@ -789,107 +536,66 @@ int damage_apply(struct record *a1, int a2, struct record *a3)
     int l_18;
     struct item *l_14;
 
-    if (a1 != 0) goto L2E93B;
-    return 0;
-L2E93B:;
-    if (a1 != player_entity) goto L2E94F;
-    if (((struct bf8_6_1 *)&cheat_flags)->f != 0) goto L2E951;
-L2E94F:;
-    goto L2E95D;
-L2E951:;
-    return 0;
-L2E95D:;
-    if (*(signed char *)D_0019628D != 0) goto L2E971;
-    if (a1 == player_entity) goto L2E973;
-L2E971:;
-    goto L2E97C;
-L2E973:;
-    if (guards_are_present() != 0) goto L2E97E;
-L2E97C:;
-    goto L2E9CE;
-L2E97E:;
-    if (((int)(unsigned char)*(signed char *)game_mode) != 21) goto L2E996;
-    return 0;
-L2E996:;
-    crime_reputation_penalty();
-    msgbox_yes_no_rsc(15);
-    *(signed char *)D_0019628D = 1;
-    if (((int)(unsigned char)*(signed char *)D_00196271) != 1) goto L2E9CE;
-    crime_guards_or_court(1);
-    return 0;
-L2E9CE:;
-    if (*(signed char *)D_001962B2 == 0) goto L2E9E3;
-    return 0;
-L2E9E3:;
-    if (a1->wait_state != 99) goto L2E9F4;
-    func_0002FBCC();
-L2E9F4:;
-    if (a2 > 0) goto L2EA06;
-    return 0;
-L2EA06:;
+    if (a1 == 0) return 0;
+    if (a1 == player_entity && ((struct bf8_6_1 *)&cheat_flags)->f != 0) return 0;
+    if (D_0019628D == 0 && a1 == player_entity && guards_are_present() != 0) {
+        if (((int)(unsigned char)game_mode) == 21) return 0;
+        crime_reputation_penalty();
+        msgbox_yes_no_rsc(15);
+        D_0019628D = 1;
+        if (((int)D_00196271) == 1) {
+            crime_guards_or_court(1);
+            return 0;
+        }
+    }
+    if (D_001962B2 != 0) return 0;
+    if (a1->wait_state == 99) func_0002FBCC();
+    if (a2 <= 0) return 0;
     l_1C = &a1->data.character;
-    if (a1 == player_entity) goto L2EA29;
-    l_1C->give_up_timer = 60;
-    goto L2EA87;
-L2EA29:;
-    if ((l_1C->conditions & 0x400000) == 0) goto L2EA75;
-    l_1C->shield_points -= a2;
-    if (l_1C->shield_points <= 3000000) goto L2EA6E;
-    a2 = -l_1C->shield_points;
-    l_1C->shield_points = 0;
-    goto L2EA75;
-L2EA6E:;
-    a2 = 0;
-L2EA75:;
-    if (a2 != 0) goto L2EA87;
-    return 0;
-L2EA87:;
-    if (a1 == player_entity) goto L2EAAD;
-    a1->data.character.flags &= ~0x8000;
-    damage_spawn_splash(a1, 0, 2);
-    goto L2EAB5;
-L2EAAD:;
-    damage_player_hurt(a2);
-L2EAB5:;
-    if (a3 == 0) goto L2EB72;
-    l_14 = &a3->data.item;
-    if (l_14->enchantments[0].type != 26) goto L2EAE0;
-    if (l_14->enchantments[0].param == 6) goto L2EAE2;
-L2EAE0:;
-    goto L2EAF2;
-L2EAE2:;
-    monster_wabbajack(a3, a1);
-    goto L2EB72;
-L2EAF2:;
-    if (l_14->enchantments[0].type != 26) goto L2EB0A;
-    if (l_14->enchantments[0].param == 1) goto L2EB0C;
-L2EB0A:;
-    goto L2EB72;
-L2EB0C:;
-    if (spfx_resist_roll(4, 2, l_1C, &l_1C->career, 2, 0) == 100) goto L2EB72;
-    damage_creature_death(a1);
-    item_damage(a3, (int)&*(signed char *)((char *)(l_1C->health / 8) + 1));
-    quest_raise_event(21, a1, 0);
-    return l_1C->health;
-L2EB72:;
+    if (a1 != player_entity) {
+        l_1C->give_up_timer = 60;
+    } else {
+        if ((l_1C->conditions & 0x400000) != 0) {
+            l_1C->shield_points -= a2;
+            if (l_1C->shield_points > 3000000) {
+                a2 = -l_1C->shield_points;
+                l_1C->shield_points = 0;
+            } else {
+                a2 = 0;
+            }
+        }
+        if (a2 == 0) return 0;
+    }
+    if (a1 != player_entity) {
+        a1->data.character.flags &= ~0x8000;
+        damage_spawn_splash(a1, 0, 2);
+    } else {
+        damage_player_hurt(a2);
+    }
+    if (a3 != 0) {
+        l_14 = &a3->data.item;
+        if (l_14->enchantments[0].type == 26 && l_14->enchantments[0].param == 6) {
+            monster_wabbajack(a3, a1);
+        } else if (l_14->enchantments[0].type == 26 && l_14->enchantments[0].param == 1) {
+            if (spfx_resist_roll(4, 2, l_1C, &l_1C->career, 2, 0) != 100) {
+                damage_creature_death(a1);
+                item_damage(a3, (int)&*(signed char *)((char *)(l_1C->health / 8) + 1));
+                quest_raise_event(21, a1, 0);
+                return l_1C->health;
+            }
+        }
+    }
     l_1C->health -= a2;
-    if (l_1C->health >= 1) goto L2EBB1;
-    if (guards_are_present() == 0) goto L2EB9C;
-    if (a1 == player_entity) goto L2EB9E;
-L2EB9C:;
-    goto L2EBA7;
-L2EB9E:;
-    crime_guards_or_court(0);
-    goto L2EBAF;
-L2EBA7:;
-    damage_creature_death(a1);
-L2EBAF:;
-    goto L2EBC6;
-L2EBB1:;
-    if (a2 == 0) goto L2EBC6;
-    quest_raise_event(21, a1, 0);
-L2EBC6:;
-    *(signed char *)D_001940D7 |= 8;
+    if (l_1C->health < 1) {
+        if (guards_are_present() != 0 && a1 == player_entity) {
+            crime_guards_or_court(0);
+        } else {
+            damage_creature_death(a1);
+        }
+    } else if (a2 != 0) {
+        quest_raise_event(21, a1, 0);
+    }
+    D_001940D7 |= 8;
     return a2;
 }
 
@@ -899,23 +605,11 @@ void func_0002EBDE(struct record *a1)
 
     if (a1->type != 2) return;
     l_18 = &a1->data.item;
-    if (l_18->enchantments[0].type != 26) goto L2EC23;
-    if (l_18->enchantments[0].param == 9) goto L2EC25;
-L2EC23:;
-    goto L2EC2E;
-L2EC25:;
-    if (a1->children == 0) goto L2EC30;
-L2EC2E:;
-    goto L2EC3A;
-L2EC30:;
-    guild_npc_object = a1;
-    return;
-L2EC3A:;
-    if (l_18->group != 27) goto L2EC5C;
-    if (l_18->index == 1) goto L2EC5E;
-L2EC5C:;
-    return;
-L2EC5E:;
+    if (l_18->enchantments[0].type == 26 && l_18->enchantments[0].param == 9 && a1->children == 0) {
+        guild_npc_object = a1;
+        return;
+    }
+    if (l_18->group != 27 || l_18->index != 1) return;
     if (a1->children != 0) return;
     guild_npc_object = a1;
 }

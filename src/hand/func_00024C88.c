@@ -14,7 +14,7 @@ extern int D_0018DDDC;
 extern int D_0018DDE0;
 extern int D_0018DDE4;
 extern struct dun region_legal_reputation[];
-extern char text_buffer[];
+extern signed char text_buffer[];
 extern int D_00190BE4[];
 extern int D_00190CAC;
 extern short D_00190D68;
@@ -97,8 +97,8 @@ unsigned char *career_answer_effect(unsigned char *a1)
         a1 = career_skip_word(a1);
         p->level = atoi(a1);
         func_000A0ED9(292, D_00170738);
-        mc_sprintf(text_buffer, D_00170765, n);
-        disk_read_file(text_buffer, q);
+        mc_sprintf(((char *)text_buffer), D_00170765, n);
+        disk_read_file(((char *)text_buffer), q);
         if (c == 'E') {
             parse_expand(D_00170773, p);
             bio_person_add(p, q, 0);

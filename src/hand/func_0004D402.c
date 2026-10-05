@@ -1,13 +1,13 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0004D402 */
-extern char mouse_buttons[];
-extern char mouse_x[];
-extern char mouse_y[];
-extern char D_0012B508[];
-extern char D_0012DA44[];
-extern char key_down_esc[];
-extern char key_down_enter[];
-extern char D_00142928[];
-extern char D_0014292C[];
+extern signed char mouse_buttons;
+extern short mouse_x;
+extern short mouse_y;
+extern signed char D_0012B508;
+extern short D_0012DA44;
+extern signed char key_down_esc;
+extern signed char key_down_enter;
+extern short D_00142928;
+extern short D_0014292C;
 extern char D_00174FAC[];
 extern char note_buttons[];
 extern char D_0018514A[];
@@ -16,29 +16,29 @@ extern char D_0018514E[];
 extern char D_00185150[];
 extern char D_001851F0[];
 extern char D_001851FF[];
-extern char D_00185201[];
-extern char text_buffer[];
-extern char text_rsc_buffer[];
-extern char D_001940D5[];
+extern signed char D_00185201[];
+extern signed char text_buffer[];
+extern signed char text_rsc_buffer[];
+extern signed char D_001940D5;
 extern char inpstr_result[];
-extern char window_image[];
-extern char D_00195F38[];
-extern char game_mode[];
-extern char mouse_buttons_prev[];
-extern char D_001997B0[];
-extern char D_001997B2[];
-extern char D_001997B4[];
-extern char D_001997B6[];
-extern char D_001997C0[];
-extern char D_001997C8[];
+extern int window_image;
+extern unsigned short D_00195F38;
+extern signed char game_mode;
+extern signed char mouse_buttons_prev;
+extern short D_001997B0;
+extern short D_001997B2;
+extern short D_001997B4;
+extern short D_001997B6;
+extern int D_001997C0;
+extern int D_001997C8;
 extern char note_font[];
 extern char D_001997DE[];
-extern char D_001997E0[];
-extern char D_001997E2[];
-extern char D_001997E6[];
-extern char note_tool[];
-extern char D_001997EB[];
-extern char D_001997EC[];
+extern short D_001997E0;
+extern short D_001997E2;
+extern short D_001997E6;
+extern signed char note_tool;
+extern signed char D_001997EB;
+extern signed char D_001997EC;
 extern int func_0004D1E6(int);
 extern int note_close(void);
 extern void func_0004DABF(void);
@@ -69,151 +69,85 @@ void func_0004D402(void)
     int l_18;
 
     if (func_0004D1E6(0) == 0) return;
-    func_000CB552(*(int *)window_image);
+    func_000CB552(window_image);
     func_0012DB50(4);
-    func_00144F68(182, 176, 44, 9, (int)(*(char **)D_001997C0 + (((int)(unsigned char)*(signed char *)note_tool) * 396)));
-    func_00144F68(226, 176, 44, 9, (int)(*(char **)D_001997C0 + ((((int)(short)*(short *)note_font) * 396) + 1584)));
-    func_00144FB4((((int)(unsigned char)*(signed char *)D_001997EB) << 3) + 53, 185, 5, 3, (int)D_001851F0);
-    *(signed char *)D_0012B508 = 145;
-    text_draw_centered_colored(func_000A0DD9((((int)(short)*(short *)D_001997E2) + 1), (int)text_buffer, 10), 303, 4, 145, 141);
+    func_00144F68(182, 176, 44, 9, (int)(*(char **)&D_001997C0 + (((int)(unsigned char)note_tool) * 396)));
+    func_00144F68(226, 176, 44, 9, (int)(*(char **)&D_001997C0 + ((((int)(short)*(short *)note_font) * 396) + 1584)));
+    func_00144FB4((((int)(unsigned char)D_001997EB) << 3) + 53, 185, 5, 3, (int)D_001851F0);
+    D_0012B508 = 145;
+    text_draw_centered_colored(func_000A0DD9((((int)(short)D_001997E2) + 1), (int)text_buffer, 10), 303, 4, 145, 141);
     note_find();
     func_0004DD12();
-    if (((int)(unsigned char)*(signed char *)D_001997EC) != 1) goto L4D610;
-    *(signed char *)D_0012B508 = *(signed char *)D_001851FF;
-    func_0012DB50((int)(short)((unsigned short)(unsigned char)*(signed char *)(D_00185201 + ((int)(short)*(short *)note_font))));
-    if (inpstr_update() == 0) goto L4D60B;
-    if (*(signed char *)text_rsc_buffer == 0) goto L4D563;
-    if (((int)(short)(*(short *)D_001997DE & 32)) == 0) goto L4D565;
-L4D563:;
-    goto L4D56F;
-L4D565:;
-    note_add_text((int)text_rsc_buffer);
-L4D56F:;
-    if (*(signed char *)text_rsc_buffer != 0) goto L4D588;
-    if (((int)(short)(*(short *)D_001997DE & 32)) != 0) goto L4D58A;
-L4D588:;
-    goto L4D598;
-L4D58A:;
-    *(signed char *)(*(char **)D_001997C8 + 6) |= 64;
-    func_0004EC7A();
-L4D598:;
-    *(signed char *)D_001997DE &= 223;
-    if (*(signed char *)key_down_enter == 0) goto L4D5B1;
-    if (*(signed char *)text_rsc_buffer != 0) goto L4D5B3;
-L4D5B1:;
-    goto L4D5FD;
-L4D5B3:;
-    *(short *)D_001997E0 += *(short *)D_0012DA44;
-    *(short *)D_00195F38 = *(short *)D_001997E0;
-    mc_memset((int)text_rsc_buffer, 0, 81, (int)D_00174FAC, 137, 2048);
-    inpstr_begin_text((int)text_rsc_buffer, 79);
-    goto L4D60B;
-L4D5FD:;
-    *(signed char *)D_001940D5 &= 251;
-    *(signed char *)D_001997EC = 0;
-L4D60B:;
-    goto L4D79D;
-L4D610:;
-    if (((int)(unsigned char)*(signed char *)D_001997EC) != 2) goto L4D656;
-    *(signed char *)D_0012B508 = *(signed char *)D_001851FF;
-    *(short *)D_00142928 = *(short *)D_001997E6;
-    *(short *)D_0014292C = *(short *)D_001997E0;
-    func_001532B4((int)(short)*(short *)mouse_x, (int)(short)*(short *)mouse_y);
-    goto L4D79D;
-L4D656:;
-    if (((int)(unsigned char)*(signed char *)D_001997EC) != 3) goto L4D771;
-    if (((int)(unsigned char)(*(signed char *)mouse_buttons & 1)) == 0) goto L4D6DF;
-    *(short *)D_00142928 = *(short *)D_001997B0;
-    *(short *)D_0014292C = *(short *)D_001997B2;
-    func_001532B4((int)(short)*(short *)mouse_x, (int)(short)*(short *)D_001997B2);
-    func_001532B4((int)(short)*(short *)mouse_x, (int)(short)*(short *)mouse_y);
-    func_001532B4((int)(short)*(short *)D_001997B0, (int)(short)*(short *)mouse_y);
-    func_001532B4((int)(short)*(short *)D_001997B0, (int)(short)*(short *)D_001997B2);
-    goto L4D76F;
-L4D6DF:;
-    *(short *)D_001997B4 = *(short *)mouse_x;
-    *(short *)D_001997B6 = *(short *)mouse_y;
-    if (*(short *)D_001997B0 <= *(short *)D_001997B4) goto L4D72D;
-    *(short *)D_001997B0 ^= *(short *)D_001997B4;
-    *(short *)D_001997B4 ^= *(short *)D_001997B0;
-    *(short *)D_001997B0 ^= *(short *)D_001997B4;
-L4D72D:;
-    if (*(short *)D_001997B2 <= *(short *)D_001997B6) goto L4D763;
-    *(short *)D_001997B2 ^= *(short *)D_001997B6;
-    *(short *)D_001997B6 ^= *(short *)D_001997B2;
-    *(short *)D_001997B2 ^= *(short *)D_001997B6;
-L4D763:;
-    func_0004EB71();
-    *(signed char *)D_001997EC = 0;
-L4D76F:;
-    goto L4D79D;
-L4D771:;
-    if (((int)(unsigned char)*(signed char *)D_001997EC) != 4) goto L4D79D;
-    if (((int)(unsigned char)*(signed char *)game_mode) == 8) goto L4D79D;
-    *(signed char *)D_001997EC = 0;
-    func_0004E2AB((int)(short)(*(short *)inpstr_result - 1));
-L4D79D:;
-    *(signed char *)D_0012B508 = 146;
-    if (*(signed char *)mouse_buttons == 0) goto L4D7C1;
-    if (*(signed char *)mouse_buttons == 0) goto L4D7BF;
-    if (*(signed char *)mouse_buttons_prev != 0) goto L4D7C1;
-L4D7BF:;
-    goto L4D7C6;
-L4D7C1:;
-    return;
-L4D7C6:;
-    if (key_pressed_once(72) != 0) goto L4D7E2;
-    if (key_pressed_once(73) == 0) goto L4D7E7;
-L4D7E2:;
-    func_0004E30F();
-L4D7E7:;
-    if (key_pressed_once(80) != 0) goto L4D803;
-    if (key_pressed_once(81) == 0) goto L4D808;
-L4D803:;
-    func_0004E360();
-L4D808:;
-    if (((int)(unsigned char)(*(signed char *)mouse_buttons & 1)) == 0) goto L4D824;
-    if (((int)(short)*(short *)mouse_y) > 10) goto L4D826;
-L4D824:;
-    goto L4D834;
-L4D826:;
-    if (((int)(short)*(short *)mouse_y) < 173) goto L4D836;
-L4D834:;
-    goto L4D840;
-L4D836:;
-    func_0004DABF();
-    goto L4D8EC;
-L4D840:;
-    if (*(signed char *)D_001997EC != 0) goto L4D859;
-    if (((int)(unsigned char)(*(signed char *)mouse_buttons & 1)) != 0) goto L4D85E;
-L4D859:;
-    goto L4D8EC;
-L4D85E:;
-    l_1C = 0;
-L4D865:;
-    if (((int)(short)*(short *)&l_1C) < 14) goto L4D87B;
-    goto L4D8EC;
-L4D873:;
-    l_1C++;
-    goto L4D865;
-L4D87B:;
-    if (*(short *)mouse_x <= *(short *)(note_buttons + (((int)(short)*(short *)&l_1C) * 12))) goto L4D8A9;
-    if (*(short *)mouse_x < *(short *)(D_0018514C + (((int)(short)*(short *)&l_1C) * 12))) goto L4D8AB;
-L4D8A9:;
-    goto L4D8C2;
-L4D8AB:;
-    if (*(short *)mouse_y > *(short *)(D_0018514A + (((int)(short)*(short *)&l_1C) * 12))) goto L4D8C4;
-L4D8C2:;
-    goto L4D8DB;
-L4D8C4:;
-    if (*(short *)mouse_y < *(short *)(D_0018514E + (((int)(short)*(short *)&l_1C) * 12))) goto L4D8DD;
-L4D8DB:;
-    goto L4D8EA;
-L4D8DD:;
-    ((int (*)())(*(int *)(D_00185150 + (((int)(short)*(short *)&l_1C) * 12))))();
-L4D8EA:;
-    goto L4D873;
-L4D8EC:;
-    if (*(signed char *)key_down_esc == 0) return;
+    if (((int)(unsigned char)D_001997EC) == 1) {
+        D_0012B508 = *(signed char *)D_001851FF;
+        func_0012DB50((int)(short)((unsigned short)(unsigned char)D_00185201[(int)(short)*(short *)note_font]));
+        if (inpstr_update() != 0) {
+            if (text_rsc_buffer[0] != 0 && ((int)(short)(*(short *)D_001997DE & 32)) == 0) {
+                note_add_text((int)text_rsc_buffer);
+            }
+            if (text_rsc_buffer[0] == 0 && ((int)(short)(*(short *)D_001997DE & 32)) != 0) {
+                *(signed char *)(((char *)D_001997C8) + 6) |= 64;
+                func_0004EC7A();
+            }
+            *(signed char *)D_001997DE &= 223;
+            if (key_down_enter != 0 && text_rsc_buffer[0] != 0) {
+                D_001997E0 += D_0012DA44;
+                D_00195F38 = D_001997E0;
+                mc_memset((int)text_rsc_buffer, 0, 81, (int)D_00174FAC, 137, 2048);
+                inpstr_begin_text((int)text_rsc_buffer, 79);
+            } else {
+                D_001940D5 &= 251;
+                D_001997EC = 0;
+            }
+        }
+    } else if (((int)(unsigned char)D_001997EC) == 2) {
+        D_0012B508 = *(signed char *)D_001851FF;
+        D_00142928 = D_001997E6;
+        D_0014292C = D_001997E0;
+        func_001532B4((int)(short)mouse_x, (int)(short)mouse_y);
+    } else if (((int)(unsigned char)D_001997EC) == 3) {
+        if (((int)(unsigned char)(mouse_buttons & 1)) != 0) {
+            D_00142928 = D_001997B0;
+            D_0014292C = D_001997B2;
+            func_001532B4((int)(short)mouse_x, (int)(short)D_001997B2);
+            func_001532B4((int)(short)mouse_x, (int)(short)mouse_y);
+            func_001532B4((int)(short)D_001997B0, (int)(short)mouse_y);
+            func_001532B4((int)(short)D_001997B0, (int)(short)D_001997B2);
+        } else {
+            D_001997B4 = mouse_x;
+            D_001997B6 = mouse_y;
+            if (D_001997B0 > D_001997B4) {
+                D_001997B0 ^= D_001997B4;
+                D_001997B4 ^= D_001997B0;
+                D_001997B0 ^= D_001997B4;
+            }
+            if (D_001997B2 > D_001997B6) {
+                D_001997B2 ^= D_001997B6;
+                D_001997B6 ^= D_001997B2;
+                D_001997B2 ^= D_001997B6;
+            }
+            func_0004EB71();
+            D_001997EC = 0;
+        }
+    } else if (((int)(unsigned char)D_001997EC) == 4) {
+        if (((int)(unsigned char)game_mode) != 8) {
+            D_001997EC = 0;
+            func_0004E2AB((int)(short)(*(short *)inpstr_result - 1));
+        }
+    }
+    D_0012B508 = 146;
+    if (mouse_buttons == 0 || (mouse_buttons != 0 && mouse_buttons_prev != 0)) return;
+    if (key_pressed_once(72) != 0 || key_pressed_once(73) != 0) func_0004E30F();
+    if (key_pressed_once(80) != 0 || key_pressed_once(81) != 0) func_0004E360();
+    if (((int)(unsigned char)(mouse_buttons & 1)) != 0 && ((int)(short)mouse_y) > 10 && ((int)(short)mouse_y) < 173) {
+        func_0004DABF();
+    } else if (D_001997EC == 0 && ((int)(unsigned char)(mouse_buttons & 1)) != 0) {
+        for (l_1C = 0; ((int)(short)*(short *)&l_1C) < 14; l_1C++) {
+            if (mouse_x > *(short *)(note_buttons + (((int)(short)*(short *)&l_1C) * 12)) && mouse_x < *(short *)(D_0018514C + (((int)(short)*(short *)&l_1C) * 12)) && mouse_y > *(short *)(D_0018514A + (((int)(short)*(short *)&l_1C) * 12)) && mouse_y < *(short *)(D_0018514E + (((int)(short)*(short *)&l_1C) * 12))) {
+                ((int (*)())(*(int *)(D_00185150 + (((int)(short)*(short *)&l_1C) * 12))))();
+            }
+        }
+    }
+    if (key_down_esc == 0) return;
     note_close();
 }

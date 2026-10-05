@@ -9,7 +9,7 @@ struct entry {
     char name[31];              /* 0x09 */
 };
 extern char D_0017531A[];
-extern char text_buffer[];
+extern signed char text_buffer[];
 extern struct entry flats_cfg[];
 extern int D_00195C44;
 extern int flats_cfg_count;
@@ -32,14 +32,14 @@ void flats_cfg_load(void)
         b = func_000505A3(&fh);
         flats_cfg[flats_cfg_count].id = (a << 7) | b;
         func_00050540(&fh, flats_cfg[flats_cfg_count].name);
-        func_00050540(&fh, text_buffer);
-        if (text_buffer[0] == '?') {
+        func_00050540(&fh, ((char *)text_buffer));
+        if (((char *)text_buffer)[0] == '?') {
             flats_cfg[flats_cfg_count].flags |= 2;
             a = 1;
         } else {
             a = 0;
         }
-        if (text_buffer[a] == '2')
+        if (((char *)text_buffer)[a] == '2')
             flats_cfg[flats_cfg_count].flags |= 1;
         flats_cfg[flats_cfg_count].f7 = func_000505A3(&fh);
         flats_cfg[flats_cfg_count].f8 = func_000505A3(&fh);

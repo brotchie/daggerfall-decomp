@@ -19,13 +19,13 @@ struct record *func_0004596E(struct record *a1, int a2)
     l_20->type = 2;
     l_18 = &l_20->data.item;
     item_make_random((int)(unsigned short)*(short *)&a2, l_18);
-    if ((l_18->item_flags & 8) == 0) goto L45A0B;
-    l_1C = object_create_child(a1, 0, 107);
-    l_1C->type = 2;
-    object_reparent(l_1C, l_20);
-    l_18 = &l_1C->data.item;
-    item_make(1, 1, l_18);
-    return l_1C;
-L45A0B:;
+    if ((l_18->item_flags & 8) != 0) {
+        l_1C = object_create_child(a1, 0, 107);
+        l_1C->type = 2;
+        object_reparent(l_1C, l_20);
+        l_18 = &l_1C->data.item;
+        item_make(1, 1, l_18);
+        return l_1C;
+    }
     return l_20;
 }

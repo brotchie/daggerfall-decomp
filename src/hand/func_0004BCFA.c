@@ -10,7 +10,7 @@ struct find_t {             /* DOS find buffer */
 extern char D_00174F47[];        /* __FILE__ */
 extern char D_00174F50[];
 extern char D_00174F57[];
-extern char text_buffer[];
+extern signed char text_buffer[];
 extern char D_001917E4[];
 extern char D_00191834[];
 extern void quest_start(char *);
@@ -26,12 +26,12 @@ void quests_start_initial(void)
     int rc;
 
     func_000A0ED9(142, D_00174F47);
-    mc_sprintf(text_buffer, D_00174F57, D_001917E4, D_00174F50);
-    rc = func_000A13DA(text_buffer, 0, &ff);
+    mc_sprintf(((char *)text_buffer), D_00174F57, D_001917E4, D_00174F50);
+    rc = func_000A13DA(((char *)text_buffer), 0, &ff);
     if (rc != 0) {
         func_000A0ED9(146, D_00174F47);
-        mc_sprintf(text_buffer, D_00174F57, D_00191834, D_00174F50);
-        rc = func_000A13DA(text_buffer, 0, &ff);
+        mc_sprintf(((char *)text_buffer), D_00174F57, D_00191834, D_00174F50);
+        rc = func_000A13DA(((char *)text_buffer), 0, &ff);
     }
     while (rc == 0) {
         quest_start(ff.name);

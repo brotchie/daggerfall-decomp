@@ -3,8 +3,8 @@
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
 
-extern char game_minutes[];
-extern char inventory_action[];
+extern int game_minutes;
+extern int inventory_action;
 extern struct record *inv_selected_item;
 
 extern int inv_take_item(int);
@@ -15,50 +15,35 @@ extern void inv_equip_item(int);
 void inv_click_right_item(int a1)
 {
     int l_18;
-{
-    int l_20;
+    {
+        int l_20;
 
-__dagger_tbl945D4:;
-    inv_selected_item = (struct record *)a1;
-    l_18 = a1 + 71;
-    l_20 = *(int *)inventory_action - 1;
-    switch (l_20) {
-case 0:
-    inv_item_info((int)inv_selected_item, l_18);
-    return;
-case 1:
-    if (inv_selected_item->type != 54) goto L94646;
-    if (((unsigned)*(int *)game_minutes) < *(int *)((char *)a1 + 43)) goto L94648;
-L94646:;
-    goto L9464D;
-L94648:;
-    return;
-L9464D:;
-    if (((int)(unsigned short)(*(short *)((char *)a1 + 21) & 32)) == 0) goto L9466E;
-    if (((int)(short)*(short *)((char *)l_18 + 67)) != (-1)) goto L94670;
-L9466E:;
-    goto L9467C;
-L94670:;
-    inv_take_item((int)inv_selected_item);
-    goto L94694;
-L9467C:;
-    if (inv_take_item((int)inv_selected_item) == 0) goto L94694;
-    inv_equip_item((int)inv_selected_item);
-L94694:;
-    return;
-case 2:
-    if (inv_selected_item->type != 54) goto L946B5;
-    if (((unsigned)*(int *)game_minutes) < *(int *)((char *)a1 + 43)) goto L946B7;
-L946B5:;
-    goto L946B9;
-L946B7:;
-    return;
-L946B9:;
-    inv_take_item((int)inv_selected_item);
-    return;
-case 3:
-    inv_use_item();
-default:;
-}
-}
+        inv_selected_item = (struct record *)a1;
+        l_18 = a1 + 71;
+        l_20 = inventory_action - 1;
+        switch (l_20) {
+        case 0:
+            inv_item_info((int)inv_selected_item, l_18);
+            return;
+        case 1:
+            if (inv_selected_item->type == 54 && ((unsigned)game_minutes) < *(int *)((char *)a1 + 43)) {
+                return;
+            }
+            if (((int)(unsigned short)(*(short *)((char *)a1 + 21) & 32)) != 0 && ((int)(short)*(short *)((char *)l_18 + 67)) != (-1)) {
+                inv_take_item((int)inv_selected_item);
+            } else if (inv_take_item((int)inv_selected_item) != 0) {
+                inv_equip_item((int)inv_selected_item);
+            }
+            return;
+        case 2:
+            if (inv_selected_item->type == 54 && ((unsigned)game_minutes) < *(int *)((char *)a1 + 43)) {
+                return;
+            }
+            inv_take_item((int)inv_selected_item);
+            return;
+        case 3:
+            inv_use_item();
+        default:;
+        }
+    }
 }

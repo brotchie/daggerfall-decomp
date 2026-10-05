@@ -4,22 +4,22 @@
 
 extern char D_001700C0[];
 extern char D_001700CC[];
-extern char D_0018DC34[];
+extern int D_0018DC34;
 extern char D_0018DC38[];
-extern char D_0018DC3C[];
-extern char D_0018DC7C[];
-extern char D_0018DD3C[];
-extern char D_0018DD40[];
-extern char sos_drum_bank[];
-extern char sos_melodic_bank[];
+extern int D_0018DC3C;
+extern int D_0018DC7C;
+extern int D_0018DD3C;
+extern int D_0018DD40;
+extern int sos_drum_bank;
+extern int sos_melodic_bank;
 extern char D_0018DD4C[];
 extern char D_0018DD50[];
-extern char D_0018DD54[];
-extern char D_0018DD58[];
-extern char D_0018DD5C[];
-extern char D_0018DD60[];
+extern int D_0018DD54;
+extern int D_0018DD58;
+extern int D_0018DD5C;
+extern int D_0018DD60;
 extern char D_0018DD64[];
-extern char D_001A3F5E[];
+extern signed char D_001A3F5E;
 
 extern int sos_shutdown(void);
 extern int sos_load_file(int, ...);
@@ -39,63 +39,59 @@ extern int func_0009FEE5();
 
 int sos_init(int a1, int a2)
 {
-    *(int *)D_0018DC3C = 11025;
-    *(int *)D_0018DC7C = 4096;
+    D_0018DC3C = 11025;
+    D_0018DC7C = 4096;
     func_0009E1A1(65280, 0);
     func_0009E8FF(0, 0);
     func_0009E9C2(0, 0);
-    if (a2 == (-1)) goto L1109E;
-    *(int *)D_0018DD64 = a2;
-    if (func_0009EC82((int)D_0018DD64, (int)D_0018DD58) == 0) goto L1109E;
-    func_0009F9A7(*(int *)D_0018DD60, 1, 1);
-    func_0009E95B();
-    func_0009EC0A();
-    return 2;
-L1109E:;
-    if (a1 == (-1)) goto L110D0;
-    *(int *)D_0018DD3C = a1;
-    if (func_0009F4DE((int)D_0018DC38, (int)D_0018DD60) == 0) goto L110D0;
-    func_0009E95B();
-    return 1;
-L110D0:;
-    if (a1 == (-1)) goto L110EB;
-    func_0009E2BB(90, *(int *)D_0018DD40, (int)D_0018DD50);
-L110EB:;
-    if (a2 == 40962) goto L11108;
-    if (a2 != 40969) goto L11103;
-    if (a2 != (-1)) goto L11108;
-L11103:;
-    goto L111CD;
-L11108:;
-    *(signed char *)D_001A3F5E = 1;
-    if ((*(int *)sos_melodic_bank = sos_load_file((int)D_001700C0)) != 0) goto L1113C;
-    sos_shutdown();
-    return 3;
-L1113C:;
-    if ((*(int *)sos_drum_bank = sos_load_file((int)D_001700CC)) != 0) goto L11169;
-    sos_shutdown();
-    return 4;
-L11169:;
-    if (func_0009FEE5(*(int *)D_0018DD58, (void __far *)(void *)*(int *)sos_melodic_bank, 1) == 0) goto L1119B;
-    sos_shutdown();
-    return 5;
-L1119B:;
-    if (func_0009FEE5(*(int *)D_0018DD58, (void __far *)(void *)*(int *)sos_drum_bank, 1) == 0) goto L111CD;
-    sos_shutdown();
-    return 5;
-L111CD:;
+    if (a2 != (-1)) {
+        *(int *)D_0018DD64 = a2;
+        if (func_0009EC82((int)D_0018DD64, (int)&D_0018DD58) != 0) {
+            func_0009F9A7(D_0018DD60, 1, 1);
+            func_0009E95B();
+            func_0009EC0A();
+            return 2;
+        }
+    }
+    if (a1 != (-1)) {
+        D_0018DD3C = a1;
+        if (func_0009F4DE((int)D_0018DC38, (int)&D_0018DD60) != 0) {
+            func_0009E95B();
+            return 1;
+        }
+    }
+    if (a1 != (-1)) func_0009E2BB(90, D_0018DD40, (int)D_0018DD50);
+    if (a2 == 40962 || (a2 == 40969 && a2 != (-1))) {
+        D_001A3F5E = 1;
+        if ((sos_melodic_bank = sos_load_file((int)D_001700C0)) == 0) {
+            sos_shutdown();
+            return 3;
+        }
+        if ((sos_drum_bank = sos_load_file((int)D_001700CC)) == 0) {
+            sos_shutdown();
+            return 4;
+        }
+        if (func_0009FEE5(D_0018DD58, (void __far *)(void *)sos_melodic_bank, 1) != 0) {
+            sos_shutdown();
+            return 5;
+        }
+        if (func_0009FEE5(D_0018DD58, (void __far *)(void *)sos_drum_bank, 1) != 0) {
+            sos_shutdown();
+            return 5;
+        }
+    }
     dpmi_lock_region((int)D_0018DC38, 268);
     dpmi_lock_region((int)D_0018DD64, 46);
-    dpmi_lock_region((int)D_0018DD5C, 4);
-    dpmi_lock_region((int)D_0018DD60, 4);
+    dpmi_lock_region((int)&D_0018DD5C, 4);
+    dpmi_lock_region((int)&D_0018DD60, 4);
     dpmi_lock_region((int)D_0018DD50, 4);
-    dpmi_lock_region((int)D_0018DD54, 4);
-    dpmi_lock_region((int)D_0018DD58, 4);
+    dpmi_lock_region((int)&D_0018DD54, 4);
+    dpmi_lock_region((int)&D_0018DD58, 4);
     dpmi_lock_region((int)D_0018DD4C, 4);
-    dpmi_lock_region((int)D_0018DC34, 4);
-    dpmi_lock_region((int)sos_melodic_bank, 4);
-    dpmi_lock_region((int)sos_drum_bank, 4);
-    dpmi_lock_region(*(int *)sos_melodic_bank, 8192);
-    dpmi_lock_region(*(int *)sos_drum_bank, 8192);
+    dpmi_lock_region((int)&D_0018DC34, 4);
+    dpmi_lock_region((int)&sos_melodic_bank, 4);
+    dpmi_lock_region((int)&sos_drum_bank, 4);
+    dpmi_lock_region(sos_melodic_bank, 8192);
+    dpmi_lock_region(sos_drum_bank, 8192);
     return 0;
 }

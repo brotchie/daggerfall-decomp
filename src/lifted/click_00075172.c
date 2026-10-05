@@ -4,7 +4,7 @@
 
 extern char D_00176198[];
 extern char D_0017627D[];
-extern char text_buffer[];
+extern signed char text_buffer[];
 
 extern int disk_open_data(int);
 extern int func_0009DEA7();

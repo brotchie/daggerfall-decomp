@@ -49,7 +49,7 @@ extern char *D_001788E4;
 extern char default_key_map[];
 extern int cfg_texture_memory;
 extern struct Npc region_price_adjustment[];
-extern char text_buffer[];
+extern signed char text_buffer[];
 extern char *hud_compass_image;
 extern char *D_00190908;
 extern char *D_0019090C;
@@ -91,7 +91,7 @@ extern unsigned spell_record_count;
 extern char *compass_box_image;
 extern int D_00195DA0;
 extern char *qbn_opcode_arg_counts;
-extern char mouse_control_mode[];
+extern signed char mouse_control_mode;
 extern unsigned char mouse_sensitivity_x;
 extern unsigned char mouse_sensitivity_y;
 extern char joystick_setting;
@@ -187,8 +187,8 @@ void init_game_data(void)
     D_00195C84 = disk_read_file(D_001750A0, 0);
     D_00195D74 = disk_read_file(D_001750AD, 0);
     func_000A0ED9(85, D_00175040);
-    mc_sprintf(text_buffer, D_001750BA, D_001917E4);
-    unlink(text_buffer);
+    mc_sprintf(((char *)text_buffer), D_001750BA, D_001917E4);
+    unlink(((char *)text_buffer));
     spell_cast_anims_load();
     hud_compass_image = disk_read_file(D_001750C6, 0);
     D_00190908 = disk_read_file(D_001750D3, 0);
@@ -231,7 +231,7 @@ void init_game_data(void)
     mc_memcpy(key_map, default_key_map, 38, D_00175040, 145, 38);
     fd = disk_open_data(D_001788E4);
     if (fd > 0) {
-        func_000A00CB(fd, mouse_control_mode, 54);
+        func_000A00CB(fd, ((char *)&mouse_control_mode), 54);
         func_000A00CB(fd, key_map, 38);
         w = mouse_sensitivity_x * 6;
         h = mouse_sensitivity_y * 6;
