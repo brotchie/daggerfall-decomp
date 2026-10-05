@@ -1,5 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0003EAB4 */
-struct save { char pad[4]; short slot; char name[8]; };
+#include "records.h"
+
 extern char D_00170D55[];
 extern char D_00170DA2[];
 extern char D_00170DA7[];
@@ -9,7 +10,7 @@ extern char text_rsc_buffer[];
 extern char D_00190FEC;
 extern int D_00195D6C;
 extern int msgbox_next_page;
-extern struct save *current_quest;
+extern struct quest *current_quest;
 extern int text_rsc_load(short, short, short);
 extern void msgbox_render(int, int);
 extern void msgbox_show_more_pages(int);
@@ -21,7 +22,7 @@ extern void mc_memcpy(char *, char *, int, char *, int, int);
 extern void func_000A0ED9(int, char *);
 extern int mc_sprintf(char *, char *, ...);
 
-int msgbox_render_quest_text(struct save *a1, short a2, int a3, short a4)
+int msgbox_render_quest_text(struct quest *a1, short a2, int a3, short a4)
 {
     short saved;
     int h;
@@ -29,9 +30,9 @@ int msgbox_render_quest_text(struct save *a1, short a2, int a3, short a4)
 
     saved = D_00195D6C;
     current_quest = a1;
-    if (a1->slot != 0) {
+    if (a1->text_file != 0) {
         func_000A0ED9(657, D_00170D55);
-        mc_sprintf(text_rsc_buffer, D_00170DA2, a1->slot);
+        mc_sprintf(text_rsc_buffer, D_00170DA2, a1->text_file);
     } else {
         mc_memcpy(text_rsc_buffer, a1->name, 8, D_00170D55, 659, 2048);
     }

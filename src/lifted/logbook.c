@@ -1,6 +1,7 @@
 /* logbook.c: functions first lifted from the assembly by tools/lift_all.py (2026-10), now
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
+#include "records.h"
 
 struct bf8_5_1 { unsigned char _:5; unsigned char f:1; };
 extern char disk_last_file_size[];
@@ -29,8 +30,8 @@ extern char D_00190D64[];
 extern char D_00190D66[];
 extern char text_rsc_buffer[];
 extern char D_001940D8[];
-extern char logbook_object[];
-extern char player_object[];
+extern struct record *logbook_object;
+extern struct record *player_object;
 extern char window_image[];
 extern char D_00195C44[];
 extern char D_00195D94[];
@@ -43,7 +44,7 @@ extern char logbook_show_notes[];
 extern char logbook_entry_count[];
 
 extern int sheet_open(int);
-extern int quest_find_by_id(int);
+extern struct quest *quest_find_by_id(int);
 extern int font_char_width(unsigned char);
 extern int sound_play(int, int, int);
 extern int logbook_open(int);
@@ -62,7 +63,7 @@ extern int write();
 extern int func_000A0DF4();
 extern int mc_memcpy();
 extern int func_0012DB50();
-extern void quest_load_text(int, int, int, int);
+extern void quest_load_text(struct quest *, int, int, int);
 extern void book_flush_line(void);
 extern void func_0005A1C8(int);
 int logbook_close(void);
@@ -221,14 +222,14 @@ L6AB05:;
 void logbook_prev_page(void)
 {
     if (*(int *)logbook_first_entry == 0) return;
-    sound_play(205, *(int *)player_object, 100);
+    sound_play(205, (int)player_object, 100);
     (*(int *)logbook_first_entry)--;
 }
 
 void logbook_next_page(void)
 {
     if ((*(int *)logbook_entry_count - 1) <= *(int *)logbook_first_entry) return;
-    sound_play(205, *(int *)player_object, 100);
+    sound_play(205, (int)player_object, 100);
     (*(int *)logbook_first_entry)++;
 }
 
@@ -237,7 +238,7 @@ void logbook_build_entries(void)
     int l_28;
     int l_24;
     int l_20;
-    int l_1C;
+    struct quest *l_1C;
     int l_18;
 
     l_18 = *(int *)D_00195C44 + 20000;
@@ -251,7 +252,7 @@ L6ABDC:;
 L6ABE6:;
     *(signed char *)D_00196295 = 1;
     *(int *)logbook_entry_count = 0;
-    l_28 = *(int *)logbook_object + 71;
+    l_28 = (int)RECORD_DATA(logbook_object);
     l_24 = 0;
 L6AC09:;
     if (l_24 < 32) goto L6AC1C;
@@ -344,7 +345,7 @@ void logbook_toggle_notes(void)
     *(signed char *)logbook_show_notes ^= 1;
     *(int *)logbook_first_entry = 0;
     logbook_build_entries();
-    sound_play(237, *(int *)player_object, 100);
+    sound_play(237, (int)player_object, 100);
 }
 
 void logbook_copy_text(int a1)
@@ -415,9 +416,9 @@ void logbook_prune_quests(void)
 {
     int l_20;
     int l_1C;
-    int l_18;
+    struct quest *l_18;
 
-    l_20 = *(int *)logbook_object + 71;
+    l_20 = (int)RECORD_DATA(logbook_object);
     l_1C = 0;
 L6B302:;
     if (l_1C < 32) goto L6B312;

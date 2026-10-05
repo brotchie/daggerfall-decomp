@@ -1,8 +1,8 @@
 /* names.c: functions first lifted from the assembly by tools/lift_all.py (2026-10), now
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
+#include "records.h"
 
-struct bf16_0_15 { unsigned short f:15; };
 extern char D_00176D8C[];
 extern char D_00176D98[];
 extern char D_00176DA0[];
@@ -26,8 +26,8 @@ extern char D_00184872[];
 extern char text_buffer[];
 extern char D_00190B44[];
 extern char text_rsc_buffer[];
-extern char D_00195AC4[];
-extern char player_character[];
+extern struct record *D_00195AC4;
+extern struct character *player_character;
 extern char current_region[];
 extern char namegen_part_offsets[];
 extern char namegen_name[];
@@ -37,7 +37,7 @@ extern char namegen_file[];
 extern char input_digits_only[];
 
 extern int faction_find(short);
-extern int quest_find_site_for_building(int);
+extern struct record *quest_find_site_for_building(struct building *);
 extern int disk_open_data(int);
 extern int guild_find_membership_by_kind(unsigned char);
 extern int rand_range(int, int);
@@ -189,29 +189,29 @@ L8BCD6:;
 }
 }
 
-int building_name(int a1)
+int building_name(struct building *a1)
 {
     int l_30;
     int l_2C;
-    int l_28;
+    struct faction *l_28;
     int l_24;
     int l_20;
-    int l_1C;
+    struct record *l_1C;
 
     if (a1 != 0) goto L8BD73;
     return (int)D_00176DA6;
 L8BD73:;
     l_30 = rand();
-    if (*(int *)((char *)a1 + 20) != *(int *)(*(char **)player_character + 116)) goto L8BDA7;
+    if (a1->id != player_character->house) goto L8BDA7;
     parse_expand(*(int *)D_00184872, (int)D_00190B44);
     return (int)D_00190B44;
 L8BDA7:;
-    if (((int)(unsigned short)(*(short *)((char *)a1) & 32768)) == 0) goto L8BDDE;
-    parse_rsc_text((int)(unsigned short)((struct bf16_0_15 *)((char *)a1))->f, 0, 0);
+    if (((int)(unsigned short)(a1->name_seed & 32768)) == 0) goto L8BDDE;
+    parse_rsc_text(a1->name_seed & 0x7FFF, 0, 0);
     return (int)text_rsc_buffer;
 L8BDDE:;
-    srand((int)(unsigned short)*(short *)((char *)a1));
-    switch (*(unsigned char *)((char *)a1 + 24)) {
+    srand(a1->name_seed);
+    switch (a1->type) {
     goto L8C096;
 case 0:
 case 2:
@@ -224,11 +224,11 @@ case 10:
 case 12:
 case 13:
     func_000A0ED9(308, (int)D_00176D98);
-    mc_sprintf((int)text_buffer, (int)D_00176DB0, str_list_random((int)shop_name_first_words), str_list_random(*(int *)(shop_name_last_words + (((int)(unsigned char)*(signed char *)((char *)a1 + 24)) << 2))));
+    mc_sprintf((int)text_buffer, (int)D_00176DB0, str_list_random((int)shop_name_first_words), str_list_random(*(int *)(shop_name_last_words + (a1->type << 2))));
     parse_expand((int)text_buffer, (int)text_rsc_buffer);
     goto L8C216;
 case 1:
-    if (((*(int *)(*(char **)D_00195AC4 + 31) & -65536) + *(int *)((char *)a1 + 20)) != *(int *)(*(char **)player_character + 116)) goto L8BF10;
+    if (((D_00195AC4->id & -65536) + a1->id) != player_character->house) goto L8BF10;
     mc_strncpy((int)text_rsc_buffer, (int)D_00176DB6, 2048, (int)D_00176D98, 313);
     goto L8BF2E;
 L8BF10:;
@@ -240,19 +240,19 @@ case 3:
     mc_sprintf((int)text_rsc_buffer, (int)D_00176DD1, *(int *)(region_names + (((int)(unsigned char)*(signed char *)current_region) << 2)));
     goto L8C216;
 case 11:
-    l_28 = faction_find((int)(short)*(short *)((char *)a1 + 18));
+    l_28 = (struct faction *)faction_find((int)(short)a1->faction_id);
     if (l_28 == 0) goto L8BFA0;
-    mc_strncpy((int)text_rsc_buffer, l_28 + 3, 2048, (int)D_00176D98, 323);
+    mc_strncpy((int)text_rsc_buffer, (int)l_28->name, 2048, (int)D_00176D98, 323);
 L8BFA0:;
     goto L8C216;
 case 14:
-    l_28 = faction_find((int)(short)*(short *)((char *)a1 + 18));
-    if (*(int *)((char *)l_28 + 84) == 0) goto L8BFE1;
-    mc_strncpy((int)text_rsc_buffer, (int)&*(signed char *)(*(char **)((char *)l_28 + 84) + 3), 2048, (int)D_00176D98, 332);
+    l_28 = (struct faction *)faction_find((int)(short)a1->faction_id);
+    if (l_28->child == 0) goto L8BFE1;
+    mc_strncpy((int)text_rsc_buffer, (int)l_28->child->name, 2048, (int)D_00176D98, 332);
     goto L8C006;
 L8BFE1:;
     if (l_28 == 0) goto L8C006;
-    mc_strncpy((int)text_rsc_buffer, l_28 + 3, 2048, (int)D_00176D98, 334);
+    mc_strncpy((int)text_rsc_buffer, (int)l_28->name, 2048, (int)D_00176D98, 334);
 L8C006:;
     goto L8C216;
 case 15:
@@ -268,7 +268,7 @@ case 23:
     goto L8C216;
 default:
 L8C096:;
-    if (((int)(unsigned short)*(short *)((char *)a1 + 18)) != 108) goto L8C0B2;
+    if (a1->faction_id != 108) goto L8C0B2;
     if (guild_find_membership_by_kind(0) != 0) goto L8C0B4;
 L8C0B2:;
     goto L8C0D7;
@@ -276,7 +276,7 @@ L8C0B4:;
     mc_strncpy((int)text_rsc_buffer, (int)D_00176DF1, 2048, (int)D_00176D98, 351);
     goto L8C216;
 L8C0D7:;
-    if (((int)(unsigned short)*(short *)((char *)a1 + 18)) != 42) goto L8C0F6;
+    if (a1->faction_id != 42) goto L8C0F6;
     if (guild_find_membership_by_kind(3) != 0) goto L8C0F8;
 L8C0F6:;
     goto L8C11B;
@@ -287,17 +287,17 @@ L8C11B:;
     l_1C = quest_find_site_for_building(a1);
     if (l_1C == 0) goto L8C1F8;
     if (l_1C == 0) goto L8C156;
-    if (((int)(unsigned char)*(signed char *)((char *)l_1C)) == 41) goto L8C154;
-    if (((int)(unsigned char)*(signed char *)((char *)l_1C)) != 8) goto L8C156;
+    if (l_1C->type == 41) goto L8C154;
+    if (l_1C->type != 8) goto L8C156;
 L8C154:;
     goto L8C158;
 L8C156:;
     goto L8C186;
 L8C158:;
-    l_24 = func_0008B43B((int)(unsigned char)*(signed char *)(D_001841E3 + ((int)(unsigned char)*(signed char *)current_region)), (int)(unsigned char)(*(signed char *)((char *)l_1C + 21) & 4), *(int *)((char *)l_1C + 43));
+    l_24 = func_0008B43B((int)(unsigned char)*(signed char *)(D_001841E3 + ((int)(unsigned char)*(signed char *)current_region)), (int)(unsigned char)((signed char)l_1C->flags & 4), *(int *)((char *)l_1C + 43));
     goto L8C1B1;
 L8C186:;
-    l_24 = func_0008B43B((int)(unsigned char)*(signed char *)(D_001841E3 + ((int)(unsigned char)*(signed char *)current_region)), 0, (((unsigned)*(int *)((char *)a1 + 20)) >> 16) ^ *(int *)((char *)a1 + 20));
+    l_24 = func_0008B43B((int)(unsigned char)*(signed char *)(D_001841E3 + ((int)(unsigned char)*(signed char *)current_region)), 0, (((unsigned)a1->id) >> 16) ^ a1->id);
 L8C1B1:;
     l_20 = strchr(l_24, 32);
     if (l_20 == 0) goto L8C1CE;

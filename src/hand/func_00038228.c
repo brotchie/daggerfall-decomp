@@ -1,6 +1,8 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x00038228 */
+#include "records.h"
+
 extern char D_00170B13[];
-extern char selected_spell[];
+extern struct spell *selected_spell;
 extern char spell_effect_settings[];
 extern char spell_effect_costs[];
 extern char spell_effect_cost_index[];
@@ -24,15 +26,15 @@ void spellmaker_pick_effect_cb(short a1)
 {
     short j;
 
-    *(char *)(*(char **)selected_spell + (*(short *)spell_effect_slot = spellmaker_find_effect(255)) * 2) = a1;
+    selected_spell->effects[*(short *)spell_effect_slot = spellmaker_find_effect(255)].type = a1;
     if (func_00037AB7() == 0)
-        *(char *)(*(char **)selected_spell + 6) = 4;
+        selected_spell->element = 4;
     j = func_00037D5A();
     if (j != 2) {
-        if (j == 0 && *(char *)(*(char **)selected_spell + 7) != 0)
-            *(char *)(*(char **)selected_spell + 7) = 0;
-        if (j == 1 && *(char *)(*(char **)selected_spell + 7) == 0)
-            (*(char *)(*(char **)selected_spell + 7))++;
+        if (j == 0 && selected_spell->target != 0)
+            selected_spell->target = 0;
+        if (j == 1 && selected_spell->target == 0)
+            (selected_spell->target)++;
     }
     if (*(int *)(spell_effect_subtype_names + a1 * 48) == 0) {
         mc_memcpy(spell_effect_cost_current, spell_effect_costs + (*(unsigned char *)(spell_effect_cost_index + a1 * 12) << 3), 8, D_00170B13, 1058, 8);

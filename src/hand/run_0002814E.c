@@ -1,4 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2): a run of automap.c from 0x00027A10 to 0x0002814E, kept together for its switch table's alignment */
+#include "records.h"
+
 extern char mouse_buttons[];
 extern char mouse_x[];
 extern char mouse_y[];
@@ -23,9 +25,9 @@ extern char D_0018507F[];
 extern char text_buffer[];
 extern char D_00190CE5[];
 extern char text_macro_fpc[];
-extern char player_object[];
-extern char D_00195AC4[];
-extern char current_location[];
+extern struct record *player_object;
+extern struct record *D_00195AC4;
+extern struct location *current_location;
 extern char game_minutes[];
 extern char D_00195C44[];
 extern char D_00196272[];
@@ -44,7 +46,7 @@ extern int automap_move_left(int);
 extern int automap_move_right(int);
 extern void town_map_draw(void);
 extern int func_000281AF(void);
-extern int sound_play(int, int, int);
+extern int sound_play(int, struct record *, int);
 extern int disk_read_file(int, int);
 extern int disk_write_arena2_file(int, int, int);
 extern int disk_open_rw(int);
@@ -84,16 +86,16 @@ void town_map_open(void)
 
     l_24 = 0;
     if (((int)(unsigned char)*(signed char *)player_environment) != 1) return;
-    if (location_contains(*(int *)(*(char **)player_object + 7), *(int *)(*(char **)player_object + 15)) != 0) goto L27A5D;
+    if (location_contains(player_object->x, player_object->z) != 0) goto L27A5D;
     hud_message_add(*(int *)D_0018507F);
     return;
 L27A5D:;
-    if (((int)(unsigned char)*(signed char *)(*(char **)current_location + 34)) == 7) goto L27A81;
-    if (((int)(unsigned char)*(signed char *)(*(char **)current_location + 34)) != 4) goto L27A83;
+    if (current_location->kind == 7) goto L27A81;
+    if (current_location->kind != 4) goto L27A83;
 L27A81:;
     goto L27A95;
 L27A83:;
-    if (((int)(unsigned char)*(signed char *)(*(char **)current_location + 34)) < 9) goto L27AA4;
+    if (current_location->kind < 9) goto L27AA4;
 L27A95:;
     hud_message_add(*(int *)D_0018507F);
     return;
@@ -103,7 +105,7 @@ L27AA4:;
     *(signed char *)D_00190CE5 = 0;
     mc_memset(*(int *)D_00195C44, 0, 50000, (int)D_001707AE, 624, 4);
     func_000A0ED9(625, (int)D_001707AE);
-    mc_sprintf((int)text_buffer, (int)D_001707B8, ((unsigned)*(int *)(*(char **)D_00195AC4 + 31)) >> 16);
+    mc_sprintf((int)text_buffer, (int)D_001707B8, D_00195AC4->id >> 16);
     l_18 = disk_open_rw((int)text_buffer);
     if (l_18 == (-1)) goto L27B70;
     func_000A00CB(l_18, *(int *)D_00195C44, 50000);
@@ -171,7 +173,7 @@ L27D18:;
 L27D38:;
     goto L27D4F;
 L27D3A:;
-    sound_play(203, *(int *)player_object, 100);
+    sound_play(203, player_object, 100);
 L27D4F:;
     l_24 = ((int (*)())(*(int *)(D_0017A0C4 + (l_20 * 12))))(l_20);
 L27D5F:;
@@ -201,7 +203,7 @@ L27DEB:;
     *(signed char *)D_00196272 = *(signed char *)&l_1C;
     if (*(signed char *)D_00190CE5 == 0) return;
     func_000A0ED9(686, (int)D_001707AE);
-    mc_sprintf((int)text_buffer, (int)D_001707B8, ((unsigned)*(int *)(*(char **)D_00195AC4 + 31)) >> 16);
+    mc_sprintf((int)text_buffer, (int)D_001707B8, D_00195AC4->id >> 16);
     disk_write_arena2_file((int)text_buffer, *(int *)D_00195C44, func_000281AF());
 }
 
@@ -220,19 +222,19 @@ void town_map_draw(void)
     int l_1C;
 
     mc_memcpy(*(int *)screen_buffer, *(int *)text_macro_fpc, 64000, D_001707AE, 695, 4);
-    l_30 = *(int *)(*(char **)player_object + 7) - *(int *)(*(char **)D_00195AC4 + 7);
-    l_2C = *(int *)(*(char **)player_object + 15) - *(int *)(*(char **)D_00195AC4 + 15);
+    l_30 = player_object->x - D_00195AC4->x;
+    l_2C = player_object->z - D_00195AC4->z;
     l_30 >>= 6;
     l_2C >>= 6;
-    l_2C = (*(unsigned char *)(*(char **)current_location + 33) << 6) - l_2C - 1;
+    l_2C = (current_location->height << 6) - l_2C - 1;
     VX = l_30;
     VY = l_2C;
     VX -= 37;
     VY -= 20;
     VX += *(int *)D_00196D98;
     VY += *(int *)D_00196D90;
-    l_40 = *(unsigned char *)(*(char **)current_location + 33) << 6;
-    l_3C = *(unsigned char *)(*(char **)current_location + 32) << 6;
+    l_40 = current_location->height << 6;
+    l_3C = current_location->width << 6;
     if (VX < 0) {
         *(int *)D_00196D98 -= VX;
         VX = 0;

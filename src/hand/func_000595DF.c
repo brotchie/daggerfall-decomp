@@ -1,4 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x000595DF */
+#include "records.h"
+
 extern char D_00195B74[];
 extern char D_00195B80[];
 extern char D_00195C44[];
@@ -9,7 +11,7 @@ extern int func_000CD291();
 extern int func_00135D00();
 extern int func_00135E39();
 
-void paperdoll_draw_item(int a1, int a2, int a3, int a4)
+void paperdoll_draw_item(struct item *a1, int a2, int a3, int a4)
 {
     int l_2C;
     int l_28;
@@ -21,15 +23,15 @@ void paperdoll_draw_item(int a1, int a2, int a3, int a4)
     short l_10;
     short l_C;
 
-    *(int *)D_00195B80 = (int)(*(char **)D_001AA600 + (((int)(unsigned char)*(signed char *)((char *)a1 + 56)) << 8));
-    l_24 = func_00135D00(((int)(unsigned short)*(short *)((char *)a1 + 50)) >> 7, (int)(unsigned short)(*(short *)((char *)a1 + 50) & 127), -1);
+    *(int *)D_00195B80 = (int)(*(char **)D_001AA600 + (a1->color << 8));
+    l_24 = func_00135D00(a1->inventory_image >> 7, (int)(unsigned short)(a1->inventory_image & 127), -1);
     if (l_24 != 0) goto L59677;
     func_00135E39();
-    l_24 = func_00135D00(((int)(unsigned short)*(short *)((char *)a1 + 50)) >> 7, (int)(unsigned short)(*(short *)((char *)a1 + 50) & 127), -1);
+    l_24 = func_00135D00(a1->inventory_image >> 7, (int)(unsigned short)(a1->inventory_image & 127), -1);
 L59677:;
     l_28 = *(int *)((char *)l_24 + 12);
-    if (((int)(short)*(short *)((char *)a1 + 67)) != 26) goto L59698;
-    if (((int)(short)*(short *)((char *)a1 + 69)) == 6) goto L5969A;
+    if (a1->enchantments[0].type != 26) goto L59698;
+    if (a1->enchantments[0].param == 6) goto L5969A;
 L59698:;
     goto L596FC;
 L5969A:;

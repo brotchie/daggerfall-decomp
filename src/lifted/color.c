@@ -1,6 +1,7 @@
 /* color.c: functions first lifted from the assembly by tools/lift_all.py (2026-10), now
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
+#include "records.h"
 
 struct bf8_7_1 { unsigned char _:7; unsigned char f:1; };
 extern char D_00177350[];
@@ -12,9 +13,9 @@ extern char D_001886A8[];
 extern char D_001886A9[];
 extern char D_001886D2[];
 extern char D_00190BE4[];
-extern char player_object[];
-extern char D_00195AC4[];
-extern char current_location[];
+extern struct record *player_object;
+extern struct record *D_00195AC4;
+extern struct location *current_location;
 extern char game_minutes[];
 extern char D_001AA5FC[];
 extern char D_001AA600[];
@@ -26,9 +27,9 @@ extern int mc_memcpy();
 extern int func_000CE663();
 extern int func_000CE66C();
 extern int func_0014AA92();
-extern void object_foreach_post(int, int);
+extern void object_foreach_post(struct record *, int);
 int func_00099B86(int);
-void func_00099CB9(int);
+void func_00099CB9(struct record *);
 
 void func_00099689(void)
 {
@@ -165,9 +166,9 @@ int func_00099B86(int a1)
     int l_20;
     int l_1C;
 
-    *(int *)D_00187B6E = *(int *)(*(char **)player_object + 7);
-    *(int *)D_00187B72 = *(int *)(*(char **)player_object + 11);
-    *(int *)D_00187B76 = *(int *)(*(char **)player_object + 15);
+    *(int *)D_00187B6E = player_object->x;
+    *(int *)D_00187B72 = player_object->y;
+    *(int *)D_00187B76 = player_object->z;
     l_20 = a1 + 71;
     if (*(int *)((char *)l_20) == 0) goto L99C07;
     l_1C = func_0014AA92(l_20, (int)D_00187B6E, 0);
@@ -176,27 +177,27 @@ L99C07:;
     return 0;
 }
 
-int func_00099C1B(int a1)
+struct building *func_00099C1B(struct record *a1)
 {
     short l_18;
 
-    a1 = *(int *)((char *)a1 + 67);
+    a1 = a1->parent;
 L99C35:;
     if (a1 == 0) goto L99C46;
-    if (a1 != *(int *)D_00195AC4) goto L99C48;
+    if (a1 != D_00195AC4) goto L99C48;
 L99C46:;
     goto L99CA5;
 L99C48:;
     *(int *)&l_18 = 0;
 L99C4F:;
-    if ((short)l_18 < *(unsigned short *)(*(char **)current_location + 41)) goto L99C6F;
+    if ((short)l_18 < current_location->building_count) goto L99C6F;
     goto L99CA3;
 L99C67:;
     (*(int *)&l_18)++;
     goto L99C4F;
 L99C6F:;
-    if (*(int *)((char *)(int)((((int)(short)l_18) * 26) + *(char **)(*(char **)current_location + 43)) + 20) != *(int *)((char *)a1 + 31)) goto L99CA1;
-    return *(int *)(*(char **)current_location + 43) + (((int)(short)l_18) * 26);
+    if (current_location->buildings[(int)(short)l_18].id != a1->id) goto L99CA1;
+    return &current_location->buildings[(int)(short)l_18];
 L99CA1:;
     goto L99C67;
 L99CA3:;
@@ -205,23 +206,23 @@ L99CA5:;
     return 0;
 }
 
-void func_00099CB9(int a1)
+void func_00099CB9(struct record *a1)
 {
     int l_18;
 
-    if (((int)(unsigned char)*(signed char *)((char *)a1)) != 34) return;
-    l_18 = ((int)(unsigned short)(*(short *)((char *)a1 + 27) & 31)) - 2;
+    if (a1->type != 34) return;
+    l_18 = ((int)(unsigned short)(a1->image & 31)) - 2;
     if (l_18 == 13) goto L99CFC;
     if (l_18 != 14) return;
 L99CFC:;
-    *(signed char *)((char *)a1 + 22) |= 2;
+    a1->flags |= 0x200;
 }
 
-void func_00099D0D(int a1)
+void func_00099D0D(struct record *a1)
 {
     int l_18;
 
     l_18 = ((unsigned)*(int *)game_minutes) % 1440;
     *(int *)D_00190BE4 = (((l_18 > 360) && (l_18 < 1080)) ? 1 : 0);
-    object_foreach_post(*(int *)((char *)a1 + 63), (int)func_00099CB9);
+    object_foreach_post(a1->children, (int)func_00099CB9);
 }

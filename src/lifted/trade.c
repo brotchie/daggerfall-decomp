@@ -1,6 +1,7 @@
 /* trade.c: functions first lifted from the assembly by tools/lift_all.py (2026-10), now
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
+#include "records.h"
 
 extern char D_000CDDA8[];
 extern char D_0012B508[];
@@ -17,7 +18,7 @@ extern char D_0018DC64[];
 extern char D_0018DD54[];
 extern char D_0018DD5C[];
 extern char text_buffer[];
-extern char current_building[];
+extern struct building *current_building;
 extern char D_00195C44[];
 extern char msgbox_button_keys[];
 extern char D_00196034[];
@@ -32,7 +33,7 @@ extern char D_001A3AC4[];
 extern char D_001A3ACC[];
 extern char D_001A3AD4[];
 extern char D_001A3ADC[];
-extern char D_001A3AE0[];
+extern struct character *D_001A3AE0;
 extern char sound_channels[];
 extern char D_001A3BD8[];
 extern char D_001A3F3C[];
@@ -133,7 +134,7 @@ L68982:;
 
 void func_0006899B(void)
 {
-    *(double *)D_001A3AD4 = ((((*(double *)D_00175A9E - ((short)((int)(unsigned char)*(signed char *)(*(char **)current_building + 25)) * *(double *)D_00175A96)) + (*(short *)(*(char **)D_001A3AE0 + 283) * *(double *)D_00175AA6)) + (*(short *)(*(char **)D_001A3AE0 + 42) * *(double *)D_00175AA6)) + (*(short *)(*(char **)D_001A3AE0 + 147) * *(double *)D_00175AAE)) * (*(double *)trade_haggle_asking - *(double *)D_001A3AAC);
+    *(double *)D_001A3AD4 = ((((*(double *)D_00175A9E - ((short)(current_building->quality) * *(double *)D_00175A96)) + (D_001A3AE0->skills[21].value * *(double *)D_00175AA6)) + (D_001A3AE0->attributes[5] * *(double *)D_00175AA6)) + (D_001A3AE0->reputation[1] * *(double *)D_00175AAE)) * (*(double *)trade_haggle_asking - *(double *)D_001A3AAC);
 }
 
 int func_00068A1D(void)

@@ -1,18 +1,20 @@
 /* matched by the real Watcom C32 10.0a (-d2): a run of guilds from 0x70AFA to 0x70EC0, kept together for its switch table's alignment */
+#include "records.h"
+
 struct rep { short value; char pad[78]; };
 extern unsigned char key_down_enter;
 extern int D_00185077;
 extern unsigned char *D_00187545;
 extern struct rep region_legal_reputation[];
 extern int inpstr_result;
-extern unsigned char *guild_npc_object;
-extern unsigned char *player_character;
+extern struct record *guild_npc_object;
+extern struct character *player_character;
 extern unsigned char current_region;
-extern unsigned char *D_0019671C;
-extern unsigned char *guild_membership;
+extern struct faction *D_0019671C;
+extern struct membership *guild_membership;
 extern void msgbox_show_rsc(int, int);
 extern int quest_pick_file(unsigned char, unsigned char, unsigned char, unsigned char, unsigned char);
-extern void npc_talk(unsigned char *);
+extern void npc_talk(struct record *);
 extern int rand_range(int, int);
 extern void msgbox_prompt_number(int, int);
 extern void gold_spend(int);
@@ -26,10 +28,10 @@ void blessing_remove(unsigned char *a1)
         return;
     }
     if (a1[0] & 128) {
-        *(short *)(player_character + 32 + (a1[0] & 127) * 2) -= a1[1];
+        player_character->attributes[a1[0] & 127] -= a1[1];
         return;
     }
-    *(short *)(player_character + 157 + a1[0] * 6) -= a1[1];
+    player_character->skills[a1[0]].value -= a1[1];
 }
 
 int blessing_apply(unsigned char *a1, int a2)
@@ -43,16 +45,16 @@ int blessing_apply(unsigned char *a1, int a2)
             region_legal_reputation[current_region].value = 100;
         }
     } else if (a1[0] & 128) {
-        *(short *)(player_character + 32 + (a1[0] & 127) * 2) += a2;
-        if (*(short *)(player_character + 32 + (a1[0] & 127) * 2) > 100) {
-            l_18 = a2 - (*(short *)(player_character + 32 + (a1[0] & 127) * 2) - 100);
-            *(short *)(player_character + 32 + (a1[0] & 127) * 2) = 100;
+        player_character->attributes[a1[0] & 127] += a2;
+        if (player_character->attributes[a1[0] & 127] > 100) {
+            l_18 = a2 - (player_character->attributes[a1[0] & 127] - 100);
+            player_character->attributes[a1[0] & 127] = 100;
         }
     } else {
-        *(short *)(player_character + 157 + a1[0] * 6) += a2;
-        if (*(short *)(player_character + 157 + a1[0] * 6) > 100) {
-            l_18 = a2 - (*(short *)(player_character + 157 + a1[0] * 6) - 100);
-            *(short *)(player_character + 157 + a1[0] * 6) = 100;
+        player_character->skills[a1[0]].value += a2;
+        if (player_character->skills[a1[0]].value > 100) {
+            l_18 = a2 - (player_character->skills[a1[0]].value - 100);
+            player_character->skills[a1[0]].value = 100;
         }
     }
     return a2;
@@ -70,27 +72,27 @@ void guild_donate(void)
         return;
     }
     gold_spend(inpstr_result);
-    if (rand_range(1, 100) <= inpstr_result * 2 / (func_0009DEAC(*(short *)(D_0019671C + 29)) + 1))
-        (*(short *)(D_0019671C + 29))++;
+    if (rand_range(1, 100) <= inpstr_result * 2 / (func_0009DEAC(D_0019671C->reputation) + 1))
+        D_0019671C->reputation++;
     msgbox_show_rsc(703, 1);
 }
 
 void guild_temple_quest(void)
 {
-    if (guild_npc_object[38] != 0) {
+    if (guild_npc_object->quest_id != 0) {
         npc_talk(guild_npc_object);
         return;
     }
     if (guild_membership != 0) {
-        quest_pick_file(*(D_00187545 - 142 + guild_membership[2]), 67, 48, 66, guild_membership[0]);
+        quest_pick_file(*(D_00187545 - 142 + guild_membership->kind), 67, 48, 66, guild_membership->rank);
         return;
     }
-    quest_pick_file(*(D_00187545 - 142 + guild_membership[2]), 67, 48, 67, player_character[129]);
+    quest_pick_file(*(D_00187545 - 142 + guild_membership->kind), 67, 48, 67, player_character->level);
 }
 
-int guild_kind_of_faction(unsigned char *a1)
+int guild_kind_of_faction(struct faction *a1)
 {
-    switch (*(unsigned short *)(a1 + 33)) {
+    switch (a1->id) {
     case 108:
         return 0;
     case 42:

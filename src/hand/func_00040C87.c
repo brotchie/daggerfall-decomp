@@ -1,17 +1,17 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x00040C87 */
-#pragma pack(1)
-struct Obj { char pad0[3]; short angle; char pad1[2]; int x; int y; int z; };
+#include "records.h"
+
 extern int D_0012AA04;
 extern unsigned char player_environment;
 extern int D_00178A14;
-extern struct Obj *player_object;
+extern struct record *player_object;
 extern int creature_count;
 extern unsigned char D_0019627F;
-extern struct Obj *people_list[];
+extern struct record *people_list[];
 extern int people_count;
-extern void person_place(struct Obj *);
-extern int is_guard_sprite(struct Obj *);
-extern void guard_spawn(struct Obj *);
+extern void person_place(struct record *);
+extern int is_guard_sprite(struct record *);
+extern void guard_spawn(struct record *);
 extern int ai_angle_diff(int, int, int *);
 extern int rand_range(int, int);
 extern int rand(void);
@@ -35,7 +35,7 @@ void guards_summon(int a1)
                 continue;
             if (is_guard_sprite(people_list[i]) == 0) {
                 d = func_000C808D(player_object->x, player_object->z, people_list[i]->x, people_list[i]->z);
-                a = ai_angle_diff(player_object->angle, d, &tmp);
+                a = ai_angle_diff(player_object->yaw, d, &tmp);
                 if (a < 600)
                     continue;
             }

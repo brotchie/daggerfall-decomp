@@ -1,6 +1,7 @@
 /* song.c: functions first lifted from the assembly by tools/lift_all.py (2026-10), now
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
+#include "records.h"
 
 extern char D_001706B6[];
 extern char D_001706BD[];
@@ -18,7 +19,7 @@ extern char D_00190D21[];
 extern char D_00190D22[];
 extern char D_00190D64[];
 extern char text_rsc_buffer[];
-extern char player_character[];
+extern struct character *player_character;
 extern char D_00195C44[];
 
 extern int rand_range(int, int);
@@ -30,7 +31,7 @@ extern int mc_sprintf(int, ...);
 extern int func_000A1054();
 extern int func_000CE790();
 extern void parse_rsc_text(int, int, int);
-extern void object_free_later(int);
+extern void object_free_later(struct record *);
 #pragma aux func_000A0ED9 parm routine [];
 
 void func_000209F3(int a1)
@@ -79,7 +80,7 @@ void func_00020BBB(int a1)
     *(signed char *)D_00190D1F = rand() & -255;
     if (a1 == 0) goto L20BF9;
     *(int *)D_00190CD4 = 0;
-    *(signed char *)D_00190D20 = *(signed char *)(*(char **)player_character + 64) & 1;
+    *(signed char *)D_00190D20 = (signed char)player_character->flags & 1;
     goto L20C0F;
 L20BF9:;
     *(int *)D_00190CD4 = rand();
@@ -98,8 +99,8 @@ L20C32:;
 }
 }
 
-void crime_remove_monster(int a1)
+void crime_remove_monster(struct record *a1)
 {
-    if (((int)(unsigned char)*(signed char *)((char *)a1)) != 18) return;
+    if (a1->type != 18) return;
     object_free_later(a1);
 }

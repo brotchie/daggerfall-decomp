@@ -1,6 +1,7 @@
 /* rest.c: functions first lifted from the assembly by tools/lift_all.py (2026-10), now
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
+#include "records.h"
 
 struct bf8_0_1 { unsigned char f:1; };
 struct bf8_0_2 { unsigned char f:2; };
@@ -20,14 +21,14 @@ extern char D_001940D9[];
 extern char player_motion_flags[];
 extern char D_00195998[];
 extern char frame_counter[];
-extern char current_building[];
-extern char player_entity[];
-extern char player_object[];
-extern char D_00195AC4[];
+extern struct building *current_building;
+extern struct record *player_entity;
+extern struct record *player_object;
+extern struct record *D_00195AC4;
 extern char tavern_building[];
 extern char creature_count[];
-extern char current_location[];
-extern char player_character[];
+extern struct location *current_location;
+extern struct character *player_character;
 extern char game_minutes[];
 extern char D_00195CDC[];
 extern char D_00195D48[];
@@ -46,16 +47,16 @@ extern char rest_image[];
 
 extern int tavern_room_rented(void);
 extern int disk_resolve_path(int);
-extern int guild_find_membership_by_kind(unsigned char);
+extern struct membership *guild_find_membership_by_kind(unsigned char);
 extern int rand_range(int, int);
-extern int object_building(int);
+extern struct building *object_building(struct record *);
 extern int mc_free();
 extern int mc_memset();
 extern int func_000C1500();
 extern int func_0012B136();
 extern int func_00144D00();
 extern void tavern_go_to_room(void);
-extern void damage_creature_death(int);
+extern void damage_creature_death(struct record *);
 extern void raise_skills(void);
 extern void skill_add_uses(int, int);
 extern void msgbox_show_string(int, int);
@@ -64,7 +65,7 @@ extern void guards_summon(int);
 extern void time_pass_minutes(int);
 extern void palette_restore(void);
 extern void rest_recover(int);
-extern void weapon_load_hand_sprite(int, int);
+extern void weapon_load_hand_sprite(struct record *, int);
 extern void weapon_free_sprites(void);
 void fatigue_add(int);
 
@@ -88,16 +89,16 @@ L7217E:;
     *(signed char *)D_00196294 = 0;
     *(signed char *)D_0019629B = 0;
     *(int *)D_00195D48 = 10000;
-    if (*(int *)(*(char **)player_character + 499) == 0) goto L721CC;
-    if (*(short *)(*(char **)player_character + 108) != 0) goto L721CE;
+    if (player_character->special_infection_time == 0) goto L721CC;
+    if (player_character->special_infection != 0) goto L721CE;
 L721CC:;
     goto L721E5;
 L721CE:;
-    if (((int)(unsigned short)(*(short *)(*(char **)player_character + 64) & 16)) != 0) goto L721EA;
+    if (((int)(unsigned short)(player_character->flags & 16)) != 0) goto L721EA;
 L721E5:;
     goto L72276;
 L721EA:;
-    *(signed char *)(*(char **)player_character + 64) &= 239;
+    player_character->flags &= ~0x10;
 L721F3:;
     if (*(signed char *)mouse_buttons == 0) goto L72203;
     func_0012B136();
@@ -112,16 +113,16 @@ L72203:;
     *(int *)D_00195D48 = 10000;
     goto L72335;
 L72276:;
-    if (*(int *)(*(char **)player_character + 499) == 0) goto L72290;
-    if (*(short *)(*(char **)player_character + 108) == 0) goto L72292;
+    if (player_character->special_infection_time == 0) goto L72290;
+    if (player_character->special_infection == 0) goto L72292;
 L72290:;
     goto L722A9;
 L72292:;
-    if (((int)(unsigned short)(*(short *)(*(char **)player_character + 64) & 16)) != 0) goto L722AE;
+    if (((int)(unsigned short)(player_character->flags & 16)) != 0) goto L722AE;
 L722A9:;
     goto L72335;
 L722AE:;
-    *(signed char *)(*(char **)player_character + 64) &= 239;
+    player_character->flags &= ~0x10;
 L722B7:;
     if (*(signed char *)mouse_buttons == 0) goto L722C7;
     func_0012B136();
@@ -158,11 +159,11 @@ L7239F:;
 L723A4:;
     l_18 = -11;
     if (*(signed char *)in_dungeon_water == 0) goto L723C6;
-    if (((int)(unsigned char)*(signed char *)(*(char **)player_character + 67)) != 7) goto L723C8;
+    if (player_character->race != 7) goto L723C8;
 L723C6:;
     goto L723FD;
 L723C8:;
-    if (rand_range(1, 100) <= ((int)(short)*(short *)(*(char **)player_character + 259))) goto L723EE;
+    if (rand_range(1, 100) <= player_character->skills[17].value) goto L723EE;
     l_18 = -44;
 L723EE:;
     skill_add_uses(17, 1);
@@ -182,38 +183,38 @@ void fatigue_add(int a1)
     int l_18;
 
     if (*(int *)player_death_timer != 0) return;
-    l_18 = (int)(unsigned short)*(short *)(*(char **)player_character + 155);
+    l_18 = player_character->fatigue;
     l_18 += a1;
-    l_1C = (((int)(short)*(short *)(*(char **)player_character + 32)) + ((int)(short)*(short *)(*(char **)player_character + 40))) << 6;
+    l_1C = (player_character->attributes[0] + player_character->attributes[4]) << 6;
     if (l_18 <= l_1C) goto L7248D;
     l_18 = l_1C;
 L7248D:;
-    *(short *)(*(char **)player_character + 155) = l_18;
+    player_character->fatigue = l_18;
     if (l_18 >= 1) return;
     *(signed char *)D_0012B508 = 146;
-    *(short *)(*(char **)player_character + 155) = 0;
+    player_character->fatigue = 0;
     if (*(int *)creature_count == 0) goto L724DC;
     msgbox_show_rsc(1072, 1);
-    damage_creature_death(*(int *)player_entity);
+    damage_creature_death(player_entity);
     return;
 L724DC:;
     msgbox_show_rsc(1071, 1);
     *(signed char *)D_001962A4 = 1;
     time_pass_minutes(60);
-    rest_recover(*(int *)player_entity);
+    rest_recover((int)player_entity);
     *(signed char *)D_001962A4 = 0;
 }
 
 void breath_update(void)
 {
-    int l_2C;
+    struct membership *l_2C;
     int l_28;
     int l_24;
     int l_20;
     int l_1C;
     int l_18;
 
-    l_28 = (int)(short)*(short *)(*(char **)player_character + 40);
+    l_28 = player_character->attributes[4];
     if (*(signed char *)D_00187CA8 == 0) return;
     if (l_28 <= 100) goto L7254B;
     l_28 = 100;
@@ -224,20 +225,20 @@ L7254B:;
     *(int *)D_001A4A24 = *(int *)((char *)l_24);
     return;
 L72577:;
-    if (((struct bf8_3_1 *)(*(char **)player_character + 139))->f != 0) return;
+    if ((player_character->conditions & 0x80000) != 0) return;
     if (*(int *)D_00195CDC != 0) goto L725D5;
     if ((*(int *)D_00195CDC = l_28 >> 1) <= 50) goto L725AF;
     *(int *)D_00195CDC = 50;
 L725AF:;
     l_2C = guild_find_membership_by_kind(149);
     if (l_2C == 0) goto L725D5;
-    *(int *)D_00195CDC += ((int)(unsigned char)*(signed char *)((char *)l_2C)) * 3;
+    *(int *)D_00195CDC += l_2C->rank * 3;
 L725D5:;
     l_20 = 1132;
     if (((unsigned)(*(int *)((char *)l_20) - *(int *)D_001A4A24)) <= 18) goto L7262C;
     (*(int *)D_00195CDC)--;
     l_1C = 1132;
-    if (((int)(unsigned char)*(signed char *)(*(char **)player_character + 67)) != 7) goto L72613;
+    if (player_character->race != 7) goto L72613;
     if (((struct bf8_0_1 *)((char *)l_1C))->f != 0) goto L72615;
 L72613:;
     goto L7261B;
@@ -255,13 +256,13 @@ L7264B:;
     func_00144D00(310, (int)(short)(120 - (*(short *)D_00195CDC * 2)), 6, (int)(short)(*(short *)D_00195CDC * 2));
 L72682:;
     if (*(int *)D_00195CDC != 0) return;
-    damage_creature_death(*(int *)player_entity);
+    damage_creature_death(player_entity);
 }
 
 int rest_allowed(void)
 {
-    if (*(int *)(*(char **)player_character + 120) == 0) goto L726CA;
-    if (((unsigned)(((unsigned)*(int *)(*(char **)D_00195AC4 + 31)) >> 16)) < 1000) goto L726CC;
+    if (player_character->ship_owned == 0) goto L726CA;
+    if (((unsigned)(((unsigned)(int)D_00195AC4->id) >> 16)) < 1000) goto L726CC;
 L726CA:;
     goto L726D8;
 L726CC:;
@@ -269,15 +270,15 @@ L726CC:;
 L726D8:;
     switch (*(unsigned char *)player_environment) {
 case 1:
-    if (((int)(unsigned short)*(short *)(*(char **)D_00195AC4 + 27)) != 65535) goto L72721;
+    if (((int)(unsigned short)(short)D_00195AC4->image) != 65535) goto L72721;
     return 1;
 L72721:;
-    if (((int)(unsigned char)*(signed char *)(*(char **)current_location + 34)) == 4) goto L72745;
-    if (((int)(unsigned char)*(signed char *)(*(char **)current_location + 34)) != 7) goto L72747;
+    if (((int)(unsigned char)(signed char)current_location->kind) == 4) goto L72745;
+    if (((int)(unsigned char)(signed char)current_location->kind) != 7) goto L72747;
 L72745:;
     goto L72759;
 L72747:;
-    if (((int)(unsigned char)*(signed char *)(*(char **)current_location + 34)) <= 9) goto L72765;
+    if (((int)(unsigned char)(signed char)current_location->kind) <= 9) goto L72765;
 L72759:;
     return 1;
 L72765:;
@@ -286,8 +287,8 @@ L72765:;
     msgbox_show_rsc(17, 1);
     return 0;
 case 2:
-    if (((int)(unsigned char)*(signed char *)(*(char **)current_building + 24)) != 15) goto L727DF;
-    *(int *)tavern_building = *(int *)current_building;
+    if (((int)(unsigned char)(signed char)current_building->type) != 15) goto L727DF;
+    *(int *)tavern_building = (int)current_building;
     if (tavern_room_rented() != 0) goto L727D1;
     msgbox_show_string(*(int *)D_00185087, 1);
     return 0;
@@ -295,7 +296,7 @@ L727D1:;
     tavern_go_to_room();
     return 1;
 L727DF:;
-    if (((int)(unsigned short)*(short *)(*(char **)current_building + 18)) != 41) goto L72800;
+    if (((int)(unsigned short)(short)current_building->faction_id) != 41) goto L72800;
     if (guild_find_membership_by_kind(2) != 0) goto L72802;
 L72800:;
     goto L72810;
@@ -303,7 +304,7 @@ L72802:;
     tavern_go_to_room();
     return 1;
 L72810:;
-    if (*(int *)(*(char **)current_building + 20) == *(int *)(*(char **)player_character + 116)) goto L7283D;
+    if ((int)current_building->id == player_character->house) goto L7283D;
     *(signed char *)crime_current = 8;
     guards_summon(1);
     return 0;
@@ -315,17 +316,17 @@ L7283D:;
 
 int rest_room_expired(void)
 {
-    int l_1C;
+    struct building *l_1C;
 
-    l_1C = object_building(*(int *)player_object);
+    l_1C = object_building(player_object);
     if (l_1C != 0) goto L7287B;
     return 0;
 L7287B:;
-    if (((int)(unsigned char)*(signed char *)((char *)l_1C + 24)) == 15) goto L72894;
+    if (l_1C->type == 15) goto L72894;
     return 0;
 L72894:;
-    if (((int)(unsigned char)(*(signed char *)((char *)l_1C + 15) & 2)) == 0) goto L728B3;
-    if (((unsigned)*(int *)game_minutes) > *(int *)((char *)l_1C + 2)) goto L728B5;
+    if ((l_1C->flags & 2) == 0) goto L728B3;
+    if (*(int *)game_minutes > l_1C->rent_expires) goto L728B5;
 L728B3:;
     goto L728BE;
 L728B5:;
@@ -337,6 +338,6 @@ L728BE:;
 void weapon_reload_hand_sprites(void)
 {
     weapon_free_sprites();
-    weapon_load_hand_sprite(*(int *)(*(char **)player_character + 451), 1);
-    weapon_load_hand_sprite(*(int *)(*(char **)player_character + 443), 0);
+    weapon_load_hand_sprite(player_character->equipped[21], 1);
+    weapon_load_hand_sprite(player_character->equipped[19], 0);
 }

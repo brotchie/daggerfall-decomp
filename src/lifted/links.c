@@ -1,15 +1,16 @@
 /* links.c: functions first lifted from the assembly by tools/lift_all.py (2026-10), now
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
+#include "records.h"
 
 extern char D_00147954[];
 extern char D_00175962[];
 extern char text_rsc_buffer[];
 extern char D_00190FE5[];
-extern char player_entity[];
-extern char D_00195AC4[];
-extern char spell_records[];
-extern char player_character[];
+extern struct record *player_entity;
+extern struct record *D_00195AC4;
+extern struct spell *spell_records;
+extern struct character *player_character;
 extern char D_00195C44[];
 extern char D_00199D78[];
 extern char D_00199D7B[];
@@ -21,10 +22,10 @@ extern char active_link_count[];
 
 extern int func_000658CA(unsigned short, unsigned short);
 extern int hud_message_add(int);
-extern int spfx_damage(int, int, int);
-extern int object_delete(int);
-extern int object_create_child(int, int, int);
-extern int object_find_by_id(int, int);
+extern int spfx_damage(struct record *, int, struct record *);
+extern struct record *object_delete(struct record *);
+extern struct record *object_create_child(struct record *, struct record *, int);
+extern struct record *object_find_by_id(struct record *, int);
 extern int func_000A00CB();
 extern int write();
 extern int func_000A0DF4();
@@ -94,7 +95,7 @@ L644BA:;
     *(signed char *)(D_00199D7B + (l_18 * 39)) = 100;
 L644D9:;
     if (*(int *)(D_00199D9B + (l_18 * 39)) == 0) goto L64504;
-    *(int *)(D_00199D9B + (l_18 * 39)) = object_find_by_id(*(int *)D_00195AC4, *(int *)(D_00199D9B + (l_18 * 39)));
+    *(int *)(D_00199D9B + (l_18 * 39)) = (int)object_find_by_id(D_00195AC4, *(int *)(D_00199D9B + (l_18 * 39)));
 L64504:;
     goto L644B2;
 L64506:;
@@ -181,15 +182,15 @@ L6545C:;
 
 void link_hurt_player(int a1, int a2)
 {
-    int l_18;
-    int l_14;
+    struct record *l_18;
+    struct spell *l_14;
 
-    l_18 = object_create_child(*(int *)D_00195AC4, 0, 89);
-    l_14 = l_18 + 71;
-    *(short *)((char *)l_14 + 80) = a2 * ((unsigned short)(unsigned char)*(signed char *)(*(char **)player_character + 129));
-    *(signed char *)((char *)l_14 + 1) = 0;
-    *(signed char *)((char *)l_14 + 6) = *(signed char *)&a1;
-    spfx_damage(l_18, 0, *(int *)player_entity);
+    l_18 = object_create_child(D_00195AC4, 0, 89);
+    l_14 = &l_18->data.spell;
+    l_14->cast_magnitudes[0] = a2 * ((unsigned short)player_character->level);
+    l_14->effects[0].subtype = 0;
+    l_14->element = *(signed char *)&a1;
+    spfx_damage(l_18, 0, player_entity);
     object_delete(l_18);
 }
 
@@ -341,17 +342,17 @@ L65850:;
     return 0;
 }
 
-int func_00065864(int a1)
+struct spell *func_00065864(int a1)
 {
     int l_1C;
 
     l_1C = 0;
 L6587C:;
-    if (*(signed char *)((char *)(int)(*(char **)spell_records + (l_1C * 89)) + 47) == 0) goto L658A6;
-    if (((int)(unsigned char)*(signed char *)((char *)(int)(*(char **)spell_records + (l_1C * 89)) + 73)) == a1) goto L658AE;
+    if (spell_records[l_1C].name[0] == 0) goto L658A6;
+    if (spell_records[l_1C].id == a1) goto L658AE;
 L658A6:;
     l_1C++;
     goto L6587C;
 L658AE:;
-    return (int)(*(char **)spell_records + (l_1C * 89));
+    return &spell_records[l_1C];
 }

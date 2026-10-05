@@ -1,6 +1,7 @@
 /* generate.c: functions first lifted from the assembly by tools/lift_all.py (2026-10), now
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
+#include "records.h"
 
 struct bf8_7_1 { unsigned char _:7; unsigned char f:1; };
 extern char mouse_buttons[];
@@ -20,18 +21,18 @@ extern char text_macro_fa[];
 extern char D_001940D5[];
 extern char D_001940D6[];
 extern char D_001940D8[];
-extern char inventory_containers[];
-extern char wagon_container[];
-extern char current_building[];
-extern char D_00195AF4[];
-extern char inv_right_container[];
-extern char D_00195B34[];
+extern struct record *inventory_containers[];
+extern struct record *wagon_container;
+extern struct building *current_building;
+extern struct record *D_00195AF4;
+extern struct record *inv_right_container;
+extern struct record *D_00195B34;
 extern char D_00195B5C[];
 extern char D_00195B60[];
 extern char D_00195B84[];
-extern char player_character[];
+extern struct character *player_character;
 extern char window_image[];
-extern char player_class[];
+extern struct career *player_class;
 extern char game_minutes[];
 extern char D_00195D2C[];
 extern char D_00195DA8[];
@@ -48,13 +49,13 @@ extern char chargen_roll_saved[];
 extern char chargen_saved_points[];
 extern char chargen_screen[];
 extern char inv_left_scroll[];
-extern char inv_left_container[];
+extern struct record *inv_left_container;
 
-extern int object_weight(int);
+extern int object_weight(struct record *);
 extern int holiday_today(int, int);
 extern int sound_play_ui(int);
 extern int rand_range(int, int);
-extern int object_reparent(int, int);
+extern int object_reparent(struct record *, struct record *);
 extern int object_new_id(int);
 extern int inventory_open(int, int, int);
 extern int mc_free();
@@ -66,15 +67,15 @@ extern void msgbox_open_rsc(int, int);
 extern void msgbox_update(void);
 extern void keys_world_actions(void);
 extern void text_draw_colored(int, int, int, int, unsigned char);
-extern void object_free_later(int);
-extern void object_free_children(int);
+extern void object_free_later(struct record *);
+extern void object_free_children(struct record *);
 extern void chargen_draw_face(void);
 extern void chargen_draw_attributes(void);
 extern void chargen_draw_skills(void);
 extern void chargen_select_attribute(int);
-extern void inv_store_item(int);
+extern void inv_store_item(struct record *);
 extern void inv_create_wagon(void);
-extern void inv_merge_arrows(int, int, int);
+extern void inv_merge_arrows(struct record *, struct record *, int);
 
 int chargen_draw(void)
 {
@@ -103,7 +104,7 @@ L90CE9:;
     l_1C = 0;
     l_20 = l_1C;
 L90CF6:;
-    func_00144F68(l_20 + 127, l_1C + ((((int)(unsigned char)*(signed char *)(*(char **)player_character + 130)) * 9) + 148), 66, 9, (int)(*(char **)chargen_reflex_image + 12 + (((int)(unsigned char)*(signed char *)(*(char **)player_character + 130)) * 594)));
+    func_00144F68(l_20 + 127, l_1C + ((player_character->reflexes * 9) + 148), 66, 9, (int)(*(char **)chargen_reflex_image + 12 + (player_character->reflexes * 594)));
 L90D46:;
     if (((int)(unsigned char)(*(signed char *)chargen_screen & 16)) == 0) goto L90D64;
     if (((int)(unsigned char)*(signed char *)chargen_screen) != 255) goto L90D66;
@@ -123,7 +124,7 @@ L90D93:;
 L90DAD:;
     goto L90DCE;
 L90DAF:;
-    text_draw_colored(*(int *)player_character, 80, 5, 145, 141);
+    text_draw_colored((int)player_character, 80, 5, 145, 141);
 L90DCE:;
     if (((int)(unsigned char)(*(signed char *)chargen_screen & 1)) != 0) goto L90DE3;
     keys_world_actions();
@@ -213,7 +214,7 @@ void chargen_skill_arrow(int a1)
 {
     int l_28;
     int l_24;
-    int l_20;
+    struct character_skill *l_20;
     int l_1C;
     int l_18;
 
@@ -231,8 +232,8 @@ L9187A:;
     return;
 L9187F:;
     l_24 = (int)(short)*(short *)(text_macro_fa + (l_28 * 2));
-    l_20 = (int)(*(char **)player_character + 157 + (((int)(unsigned char)*(signed char *)((char *)(*(int *)player_class + l_24) + 16)) * 6));
-    if (*(unsigned char *)((char *)l_20) != *(signed char *)(D_00190CEE + l_24)) goto L918D1;
+    l_20 = &player_character->skills[player_class->skills[l_24]];
+    if ((unsigned char)l_20->value != *(signed char *)(D_00190CEE + l_24)) goto L918D1;
     if ((a1 & 1) == 0) goto L918D3;
 L918D1:;
     goto L918D5;
@@ -251,15 +252,15 @@ L918F1:;
 void chargen_face_previous(void)
 {
     if (*(signed char *)mouse_buttons_prev != 0) return;
-    (*(signed char *)(*(char **)player_character + 128))--;
-    if (((int)(unsigned char)*(signed char *)(*(char **)player_character + 128)) <= 10) return;
-    *(signed char *)(*(char **)player_character + 128) = 9;
+    player_character->face--;
+    if (player_character->face <= 10) return;
+    player_character->face = 9;
 }
 
 void chargen_face_next(void)
 {
     if (*(signed char *)mouse_buttons_prev != 0) return;
-    *(signed char *)(*(char **)player_character + 128) = (((int)(unsigned char)*(signed char *)(*(char **)player_character + 128)) + 1) % 10;
+    player_character->face = (player_character->face + 1) % 10;
 }
 
 void chargen_roll_attributes(void)
@@ -280,10 +281,10 @@ L91AE3:;
     l_1C++;
     goto L91AD8;
 L91AEB:;
-    l_18 = (int)(short)*(short *)(*(char **)player_class + 58 + (l_1C * 2));
-    *(signed char *)(itemmaker_slot_kinds + l_1C) = (*(short *)(*(char **)player_character + 32 + (l_1C * 2)) = rand_range(l_18, l_18 + 10));
-    if (((int)(short)*(short *)(*(char **)player_character + 32 + (l_1C * 2))) <= 100) goto L91B55;
-    *(short *)(*(char **)player_character + 32 + (l_1C * 2)) = 100;
+    l_18 = player_class->attributes[l_1C];
+    *(signed char *)(itemmaker_slot_kinds + l_1C) = (player_character->attributes[l_1C] = rand_range(l_18, l_18 + 10));
+    if (player_character->attributes[l_1C] <= 100) goto L91B55;
+    player_character->attributes[l_1C] = 100;
 L91B55:;
     goto L91AE3;
 L91B57:;
@@ -305,7 +306,7 @@ L91C2E:;
     l_18++;
     goto L91C26;
 L91C36:;
-    *(short *)(*(char **)player_character + 32 + (l_18 * 2)) = *(short *)(chargen_saved_attributes + (l_18 * 2));
+    player_character->attributes[l_18] = *(short *)(chargen_saved_attributes + (l_18 * 2));
     *(signed char *)(itemmaker_slot_kinds + l_18) = *(signed char *)(chargen_saved_minimums + (l_18 * 2));
     goto L91C2E;
 L91C69:;
@@ -330,7 +331,7 @@ L91CC8:;
     l_18++;
     goto L91CC0;
 L91CD0:;
-    *(short *)(chargen_saved_attributes + (l_18 * 2)) = *(short *)(*(char **)player_character + 32 + (l_18 * 2));
+    *(short *)(chargen_saved_attributes + (l_18 * 2)) = player_character->attributes[l_18];
     *(short *)(chargen_saved_minimums + (l_18 * 2)) = (short)*(signed char *)(itemmaker_slot_kinds + l_18);
     goto L91CC8;
 L91D05:;
@@ -338,82 +339,82 @@ L91D05:;
     *(signed char *)mouse_buttons = 0;
 }
 
-int inv_match_arrows(int a1)
+int inv_match_arrows(struct record *a1)
 {
     int l_1C;
 
-    if (((int)(unsigned char)*(signed char *)((char *)a1)) == 2) goto L91D49;
+    if (a1->type == 2) goto L91D49;
     return 0;
 L91D49:;
-    if (((int)(unsigned short)*(short *)((char *)a1 + 29)) != 998) goto L91D66;
-    if (*(short *)((char *)a1 + 27) == 0) goto L91D68;
+    if (a1->image2 != 998) goto L91D66;
+    if (a1->image == 0) goto L91D68;
 L91D66:;
     goto L91D79;
 L91D68:;
-    *(int *)D_00195AF4 = a1;
+    D_00195AF4 = a1;
     return 1;
 L91D79:;
     return 0;
 }
 
-void inv_sum_hidden_weight(int a1)
+void inv_sum_hidden_weight(struct record *a1)
 {
-    int l_18;
+    struct item *l_18;
 
-    if (((int)(unsigned char)*(signed char *)((char *)a1)) != 2) return;
-    l_18 = a1 + 71;
-    if (((int)(unsigned short)(*(short *)((char *)l_18 + 42) & 64)) == 0) return;
-    *(int *)D_00195B84 += *(int *)((char *)l_18 + 57);
+    if (a1->type != 2) return;
+    l_18 = &a1->data.item;
+    if (((int)(unsigned short)(l_18->item_flags & 64)) == 0) return;
+    *(int *)D_00195B84 += l_18->weight;
 }
 
-void trade_add_buy_price(int a1)
+void trade_add_buy_price(struct record *a1)
 {
-    int l_1C;
+    struct item *l_1C;
     int l_18;
 
     if (a1 == 0) return;
-    if (((int)(unsigned char)*(signed char *)((char *)a1)) != 2) return;
-    l_1C = a1 + 71;
-    if (((int)(unsigned short)*(short *)((char *)a1 + 29)) != 998) goto L91E3C;
-    if (((int)(unsigned short)*(short *)((char *)l_1C + 32)) == 3) goto L91E3E;
+    if (a1->type != 2) return;
+    l_1C = &a1->data.item;
+    if (a1->image2 != 998) goto L91E3C;
+    if (l_1C->group == 3) goto L91E3E;
 L91E3C:;
     goto L91E4F;
 L91E3E:;
-    if (((int)(unsigned short)*(short *)((char *)l_1C + 34)) == 18) goto L91E51;
+    if (l_1C->index == 18) goto L91E51;
 L91E4F:;
     goto L91E5B;
 L91E51:;
-    if (*(short *)((char *)l_1C + 44) == 0) goto L91E5D;
+    if (l_1C->condition == 0) goto L91E5D;
 L91E5B:;
     goto L91E62;
 L91E5D:;
     return;
 L91E62:;
     *(int *)D_00190CA8 += object_weight(a1);
-    l_18 = *(int *)((char *)l_1C + 36);
-    if (((int)(unsigned short)*(short *)((char *)a1 + 29)) != 998) goto L91EA1;
-    l_18 = *(int *)((char *)l_1C + 36) * ((int)(unsigned short)*(short *)((char *)l_1C + 44));
+    l_18 = l_1C->value;
+    if (a1->image2 != 998) goto L91EA1;
+    l_18 = l_1C->value * l_1C->condition;
 L91EA1:;
-    if (((int)(unsigned short)*(short *)((char *)a1 + 29)) == 998) goto L91EC9;
-    if (((int)(unsigned short)(*(short *)((char *)a1 + 21) & 32)) == 0) goto L91ECB;
+    if (a1->image2 == 998) goto L91EC9;
+    if (((int)(unsigned short)(a1->flags & 32)) == 0) goto L91ECB;
 L91EC9:;
     goto L91ED0;
 L91ECB:;
     return;
 L91ED0:;
-    if (((int)(unsigned char)*(signed char *)(*(char **)current_building + 24)) != 13) goto L91EF9;
+    if (current_building->type != 13) goto L91EF9;
     if (holiday_today(*(int *)game_minutes, (int)(unsigned char)*(signed char *)current_region) == 49) goto L91EFB;
 L91EF9:;
     goto L91F0C;
 L91EFB:;
-    if (((int)(unsigned short)*(short *)((char *)l_1C + 32)) == 3) goto L91F0E;
+    if (l_1C->group == 3) goto L91F0E;
 L91F0C:;
     goto L91F1B;
 L91F0E:;
     *(int *)D_00195D2C += l_18 >> 1;
     return;
 L91F1B:;
-    if (((int)(unsigned char)*(signed char *)(*(char **)current_building + 24)) != 9) goto L91F44;
+    if (current_building->type != 9) goto L91F44;
     if (holiday_today(*(int *)game_minutes, (int)(unsigned char)*(signed char *)current_region) == 29) goto L91F46;
 L91F44:;
     goto L91F53;
@@ -428,70 +429,70 @@ L91F69:;
     *(int *)D_00195D2C += l_18;
 }
 
-void trade_add_repair_cost(int a1)
+void trade_add_repair_cost(struct record *a1)
 {
-    int l_18;
+    struct item *l_18;
 
-    if (((int)(unsigned char)*(signed char *)((char *)a1)) != 2) goto L91FB1;
-    if (((int)(unsigned short)(*(short *)((char *)a1 + 21) & 512)) == 0) goto L91FB3;
+    if (a1->type != 2) goto L91FB1;
+    if (((int)(unsigned short)(a1->flags & 512)) == 0) goto L91FB3;
 L91FB1:;
     return;
 L91FB3:;
-    l_18 = a1 + 71;
-    if (((int)(short)*(short *)((char *)l_18 + 67)) != (-1)) goto L91FE0;
-    *(int *)D_00195D2C += ((unsigned)(*(int *)((char *)l_18 + 36) * 10)) / 100;
+    l_18 = &a1->data.item;
+    if (l_18->enchantments[0].type != (-1)) goto L91FE0;
+    *(int *)D_00195D2C += ((unsigned)(l_18->value * 10)) / 100;
     goto L91FF6;
 L91FE0:;
-    *(int *)D_00195D2C += ((unsigned)(*(int *)((char *)l_18 + 36) * 75)) / 100;
+    *(int *)D_00195D2C += ((unsigned)(l_18->value * 75)) / 100;
 L91FF6:;
     if (*(int *)D_00195D2C >= 1) return;
     *(int *)D_00195D2C = 1;
 }
 
-void inv_return_unpaid_item(int a1)
+void inv_return_unpaid_item(struct record *a1)
 {
     int l_20;
     int l_1C;
-    int l_18;
+    struct item *l_18;
 
-    if (((int)(unsigned char)*(signed char *)((char *)a1)) != 2) return;
-    l_18 = a1 + 71;
-    if (((int)(unsigned short)*(short *)((char *)a1 + 29)) != 998) goto L92064;
-    if (((int)(unsigned short)*(short *)((char *)l_18 + 32)) == 3) goto L92066;
+    if (a1->type != 2) return;
+    l_18 = &a1->data.item;
+    if (a1->image2 != 998) goto L92064;
+    if (l_18->group == 3) goto L92066;
 L92064:;
     goto L92077;
 L92066:;
-    if (((int)(unsigned short)*(short *)((char *)l_18 + 34)) == 18) goto L92079;
+    if (l_18->index == 18) goto L92079;
 L92077:;
     goto L92083;
 L92079:;
-    if (*(short *)((char *)l_18 + 44) == 0) goto L92085;
+    if (l_18->condition == 0) goto L92085;
 L92083:;
     goto L9208A;
 L92085:;
     return;
 L9208A:;
-    if (((int)(unsigned short)*(short *)((char *)a1 + 29)) != 998) goto L920AE;
-    if (((int)(unsigned short)*(short *)((char *)l_18 + 32)) == 3) goto L920B0;
+    if (a1->image2 != 998) goto L920AE;
+    if (l_18->group == 3) goto L920B0;
 L920AE:;
     goto L920C1;
 L920B0:;
-    if (((int)(unsigned short)*(short *)((char *)l_18 + 34)) == 18) goto L920C3;
+    if (l_18->index == 18) goto L920C3;
 L920C1:;
     goto L9211D;
 L920C3:;
-    l_1C = ((int)(unsigned char)*(signed char *)((char *)l_18 + 49)) - ((int)(unsigned short)*(short *)((char *)l_18 + 44));
-    *(signed char *)((char *)l_18 + 49) = *(signed char *)((char *)l_18 + 44);
-    inv_merge_arrows(*(int *)inv_right_container, a1, 0);
-    *(short *)((char *)l_18 + 44) = 0;
-    *(signed char *)((char *)l_18 + 49) = *(signed char *)&l_1C;
+    l_1C = l_18->stack_count - l_18->condition;
+    l_18->stack_count = (signed char)l_18->condition;
+    inv_merge_arrows(inv_right_container, a1, 0);
+    l_18->condition = 0;
+    l_18->stack_count = *(signed char *)&l_1C;
     if (l_1C != 0) goto L92118;
     object_free_later(a1);
 L92118:;
     return;
 L9211D:;
-    if (((int)(unsigned short)(*(short *)((char *)a1 + 21) & 32)) == 0) return;
-    object_reparent(*(int *)inv_right_container, a1);
+    if (((int)(unsigned short)(a1->flags & 32)) == 0) return;
+    object_reparent(inv_right_container, a1);
     l_20 = 0;
 L92146:;
     if (l_20 < 27) goto L92156;
@@ -500,61 +501,61 @@ L9214E:;
     l_20++;
     goto L92146;
 L92156:;
-    if (*(int *)(*(char **)player_character + 367 + (l_20 << 2)) != a1) goto L92187;
-    *(int *)(*(char **)player_character + 367 + (l_20 << 2)) = 0;
+    if (player_character->equipped[l_20] != a1) goto L92187;
+    player_character->equipped[l_20] = 0;
 L92187:;
     goto L9214E;
 L92189:;
     *(signed char *)D_001940D8 |= 8;
 }
 
-void inv_store_callback(int a1)
+void inv_store_callback(struct record *a1)
 {
-    if (((int)(unsigned char)*(signed char *)((char *)a1)) != 2) return;
+    if (a1->type != 2) return;
     inv_store_item(a1);
 }
 
-void inv_claim_item(int a1)
+void inv_claim_item(struct record *a1)
 {
-    int l_18;
+    struct item *l_18;
 
-    if (((int)(unsigned char)*(signed char *)((char *)a1)) != 2) return;
-    l_18 = a1 + 71;
-    if (((int)(unsigned short)*(short *)((char *)a1 + 29)) != 998) goto L92215;
-    *(short *)((char *)l_18 + 44) = 0;
+    if (a1->type != 2) return;
+    l_18 = &a1->data.item;
+    if (a1->image2 != 998) goto L92215;
+    l_18->condition = 0;
 L92215:;
-    if (((int)(unsigned short)(*(short *)((char *)a1 + 21) & 32)) == 0) return;
-    *(signed char *)((char *)a1 + 21) &= 223;
-    if (*(int *)((char *)a1 + 67) != *(int *)wagon_container) goto L9224C;
-    if (*(int *)inv_left_container == *(int *)wagon_container) goto L92254;
+    if (((int)(unsigned short)(a1->flags & 32)) == 0) return;
+    a1->flags &= ~0x20;
+    if (a1->parent != wagon_container) goto L9224C;
+    if (inv_left_container == wagon_container) goto L92254;
 L9224C:;
     inv_store_item(a1);
 L92254:;
-    if (((int)(unsigned short)*(short *)((char *)l_18 + 32)) != 23) goto L9226F;
-    if (*(short *)((char *)l_18 + 34) == 0) goto L92271;
+    if (l_18->group != 23) goto L9226F;
+    if (l_18->index == 0) goto L92271;
 L9226F:;
     return;
 L92271:;
     inv_create_wagon();
 }
 
-void inv_assign_item_id(int a1)
+void inv_assign_item_id(struct record *a1)
 {
-    if (((int)(unsigned char)*(signed char *)((char *)a1)) != 2) return;
-    if ((((unsigned)*(int *)((char *)a1 + 31)) >> 16) == 100) return;
-    *(int *)((char *)a1 + 31) = object_new_id(100);
+    if (a1->type != 2) return;
+    if ((((unsigned)a1->id) >> 16) == 100) return;
+    a1->id = object_new_id(100);
 }
 
 void inv_reset_left_list(void)
 {
     *(int *)inv_left_scroll = 0;
-    *(int *)inv_left_container = *(int *)inventory_containers;
+    inv_left_container = inventory_containers[0];
 }
 
-void inventory_open_container(int a1, int a2, int a3)
+void inventory_open_container(struct record *a1, int a2, int a3)
 {
-    *(int *)D_00195DA8 = a1;
-    *(int *)inv_right_container = (*(int *)D_00195B34 = a1);
+    *(int *)D_00195DA8 = (int)a1;
+    inv_right_container = (D_00195B34 = a1);
     if (inventory_open(2, a2, a3) != 0) return;
     object_free_children(a1);
 }

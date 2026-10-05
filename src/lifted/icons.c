@@ -1,6 +1,7 @@
 /* icons.c: functions first lifted from the assembly by tools/lift_all.py (2026-10), now
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
+#include "records.h"
 
 struct bf8_5_1 { unsigned char _:5; unsigned char f:1; };
 struct bf8_6_1 { unsigned char _:6; unsigned char f:1; };
@@ -26,14 +27,14 @@ extern char text_macro_fpc[];
 extern char D_001940D4[];
 extern char D_001940D6[];
 extern char D_001940D8[];
-extern char wagon_container[];
+extern struct record *wagon_container;
 extern char D_001959EC[];
-extern char D_00195A80[];
-extern char player_entity[];
-extern char player_object[];
+extern struct item *D_00195A80;
+extern struct record *player_entity;
+extern struct record *player_object;
 extern char D_00195ACC[];
-extern char player_character[];
-extern char game_settings[];
+extern struct character *player_character;
+extern struct settings *game_settings;
 extern char magic_items_image[];
 extern char mouse_control_mode[];
 extern char view_cursor_active[];
@@ -44,15 +45,15 @@ extern char magic_items_saved_screen[];
 extern char hud_pressed_button[];
 extern char D_00199D71[];
 extern char steer_key_region[];
-extern char D_001A9AB8[];
-extern char inv_selected_item[];
+extern struct picklist D_001A9AB8;
+extern struct record *inv_selected_item;
 
 extern int sheet_open(int);
 extern int spellbook_open(int);
 extern int options_open(int);
-extern int sound_play(int, int, int);
+extern int sound_play(int, struct record *, int);
 extern int disk_read_file(int, int);
-extern int picklist_poll(int);
+extern int picklist_poll(struct picklist *);
 extern int inventory_open(int, int, int);
 extern int travel_map_open(int);
 extern int mc_free();
@@ -67,15 +68,15 @@ extern void interaction_mode_cycle(int);
 extern void parse_expand(int, int);
 extern void rest_open(void);
 extern void cursor_draw_arrow(void);
-extern void picklist_init(int, short, short, int, short, short, short, short, short, short, short, short, short, short, short, short, short, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char);
-extern void picklist_add(int, int, int);
-extern void picklist_free(int);
-extern void picklist_draw(int, int);
-extern void object_foreach(int, int);
+extern void picklist_init(struct picklist *, short, short, int, short, short, short, short, short, short, short, short, short, short, short, short, short, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char);
+extern void picklist_add(struct picklist *, int, int);
+extern void picklist_free(struct picklist *);
+extern void picklist_draw(struct picklist *, int);
+extern void object_foreach(struct record *, int);
 extern void inv_use_item(void);
 extern void transport_menu(void);
 void hud_buttons_click(int);
-void magic_items_add_cb(int);
+void magic_items_add_cb(struct record *);
 void magic_items_close(void);
 
 void hud_buttons_click(int a1)
@@ -115,7 +116,7 @@ L5D37B:;
 L5D38D:;
     goto L5D3BE;
 L5D38F:;
-    sound_play(203, *(int *)player_object, 100);
+    sound_play(203, player_object, 100);
     ((int (*)())(*(int *)(D_00185C60 + (l_18 * 12))))((int)(unsigned char)*(signed char *)mouse_buttons_prev);
     *(signed char *)hud_pressed_button = 255;
     return;
@@ -156,9 +157,9 @@ void hud_toggle_weapon(void)
 
     *(signed char *)D_001940D6 ^= 64;
     if (((struct bf8_6_1 *)&D_001940D6)->f == 0) return;
-    if (*(int *)(*(char **)player_character + 443) == 0) return;
-    *(int *)&l_18 = *(int *)(*(char **)player_character + 443) + 71;
-    sound_play((int)(short)*(short *)(D_00188208 + (((int)(unsigned short)*(short *)(*(char **)&l_18 + 34)) * 2)), *(int *)player_object, 100);
+    if (player_character->equipped[19] == 0) return;
+    *(int *)&l_18 = (int)player_character->equipped[19] + 71;
+    sound_play((int)(short)*(short *)(D_00188208 + (((int)(unsigned short)*(short *)(*(char **)&l_18 + 34)) * 2)), player_object, 100);
 }
 
 void hud_button_status(void)
@@ -190,45 +191,45 @@ void hud_button_options(void)
     options_open(1);
 }
 
-void magic_items_add_cb(int a1)
+void magic_items_add_cb(struct record *a1)
 {
-    int l_24;
+    struct item *l_24;
     int l_20;
     int l_1C;
-    int l_18;
+    struct record *l_18;
 
-    if (((int)(unsigned char)*(signed char *)((char *)a1)) != 2) return;
-    l_18 = *(int *)((char *)a1 + 67);
+    if (a1->type != 2) return;
+    l_18 = a1->parent;
 L5D5D2:;
     if (l_18 == 0) goto L5D5EE;
     if (func_000CE44C((int)D_001959EC, l_18, 4) == 0) goto L5D5F0;
 L5D5EE:;
     goto L5D5FB;
 L5D5F0:;
-    l_18 = *(int *)((char *)l_18 + 67);
+    l_18 = l_18->parent;
     goto L5D5D2;
 L5D5FB:;
     if (l_18 != 0) return;
-    if (*(int *)((char *)a1 + 67) == *(int *)wagon_container) return;
-    l_24 = a1 + 71;
+    if (a1->parent == wagon_container) return;
+    l_24 = &a1->data.item;
     l_1C = 0;
-    if (((int)(unsigned short)*(short *)((char *)l_24 + 32)) != 1) goto L5D649;
-    if (((int)(unsigned short)*(short *)((char *)l_24 + 34)) == 1) goto L5D64B;
+    if (l_24->group != 1) goto L5D649;
+    if (l_24->index == 1) goto L5D64B;
 L5D649:;
     goto L5D654;
 L5D64B:;
-    if (*(int *)((char *)a1 + 63) != 0) goto L5D656;
+    if (a1->children != 0) goto L5D656;
 L5D654:;
     goto L5D668;
 L5D656:;
-    if (((int)(unsigned char)*(signed char *)(*(char **)((char *)a1 + 63))) == 31) goto L5D66A;
+    if (a1->children->type == 31) goto L5D66A;
 L5D668:;
     goto L5D673;
 L5D66A:;
     l_1C = 2;
     goto L5D683;
 L5D673:;
-    if (((int)(short)*(short *)((char *)l_24 + 67)) == (-1)) return;
+    if (l_24->enchantments[0].type == (-1)) return;
 L5D683:;
     if (l_1C != 0) goto L5D6D1;
     l_20 = 0;
@@ -240,23 +241,23 @@ L5D69E:;
     l_20++;
     goto L5D696;
 L5D6A6:;
-    if (((int)(short)*(short *)((char *)((l_20 << 2) + l_24) + 67)) == (-1)) goto L5D6D1;
-    if (*(short *)((char *)((l_20 << 2) + l_24) + 67) != 0) goto L5D6CF;
+    if (l_24->enchantments[l_20].type == (-1)) goto L5D6D1;
+    if (l_24->enchantments[l_20].type != 0) goto L5D6CF;
     l_1C = 1;
 L5D6CF:;
     goto L5D69E;
 L5D6D1:;
     if (l_1C == 0) return;
-    *(int *)D_00195A80 = l_24;
+    D_00195A80 = l_24;
     if (l_1C != 2) goto L5D704;
-    *(int *)D_00195ACC = *(int *)((char *)a1 + 63) + 71;
+    *(int *)D_00195ACC = (int)&a1->children->data.potion_recipe;
     parse_expand((int)D_001758A0, (int)D_00190B44);
     goto L5D713;
 L5D704:;
     parse_expand((int)D_001758A4, (int)D_00190B44);
 L5D713:;
-    picklist_add((int)D_001A9AB8, (int)D_00190B44, 0);
-    *(int *)(text_macro_fpc + (((int)(short)(*(short *)D_00190D64)++) << 2)) = a1;
+    picklist_add(&D_001A9AB8, (int)D_00190B44, 0);
+    *(int *)(text_macro_fpc + (((int)(short)(*(short *)D_00190D64)++) << 2)) = (int)a1;
 }
 
 void magic_items_open(void)
@@ -264,10 +265,10 @@ void magic_items_open(void)
     int l_18;
 
     *(short *)D_00190D64 = 0;
-    picklist_init((int)D_001A9AB8, 100, 159, 166, 34, 88, 159, 8, 15, 88, 179, 8, 59, 0, 0, 1, 1, 146, 146, 244, 114, 0);
-    object_foreach(*(int *)(*(char **)player_entity + 63), (int)magic_items_add_cb);
+    picklist_init(&D_001A9AB8, 100, 159, 166, 34, 88, 159, 8, 15, 88, 179, 8, 59, 0, 0, 1, 1, 146, 146, 244, 114, 0);
+    object_foreach(player_entity->children, (int)magic_items_add_cb);
     if (*(short *)D_00190D64 != 0) goto L5D805;
-    picklist_free((int)D_001A9AB8);
+    picklist_free(&D_001A9AB8);
     return;
 L5D805:;
     *(signed char *)D_00187CA8 = 0;
@@ -298,14 +299,14 @@ L5D92A:;
     magic_items_close();
     return;
 L5D931:;
-    *(int *)&l_18 = picklist_poll((int)D_001A9AB8) - 1;
+    *(int *)&l_18 = picklist_poll(&D_001A9AB8) - 1;
     if (((int)(short)l_18) <= (-1)) goto L5D966;
     magic_items_close();
-    *(int *)inv_selected_item = *(int *)(text_macro_fpc + (((int)(short)l_18) << 2));
+    inv_selected_item = (struct record *)(*(int *)(text_macro_fpc + (((int)(short)l_18) << 2)));
     inv_use_item();
     return;
 L5D966:;
-    picklist_draw((int)D_001A9AB8, 0);
+    picklist_draw(&D_001A9AB8, 0);
 }
 
 void magic_items_close(void)
@@ -319,7 +320,7 @@ L5D9A8:;
     mc_free(*(int *)magic_items_image, (int)D_00175898, 396);
     *(int *)magic_items_image = -1751672937;
 L5D9C6:;
-    picklist_free((int)D_001A9AB8);
+    picklist_free(&D_001A9AB8);
     *(signed char *)D_00196272 = 0;
     *(signed char *)D_00187CA8 = 1;
     if (*(int *)magic_items_saved_screen == 0) goto L5D9F3;
@@ -338,7 +339,7 @@ int hud_update(void)
 L5DA42:;
     goto L5DA5A;
 L5DA44:;
-    if (((int)(unsigned short)(*(short *)(*(char **)game_settings) & 1)) == 0) goto L5DA5F;
+    if (((int)(unsigned short)(*(short *)(*(char **)&game_settings) & 1)) == 0) goto L5DA5F;
 L5DA5A:;
     goto L5DAEE;
 L5DA5F:;
@@ -371,7 +372,7 @@ L5DAEE:;
 
 int hud_portrait_overlay_index(void)
 {
-    if (((int)(short)*(short *)(*(char **)player_character + 124)) >= (((int)(short)*(short *)(*(char **)player_character + 126)) / 10)) goto L5DB3D;
+    if (player_character->health >= (player_character->max_health / 10)) goto L5DB3D;
     return 2;
 L5DB3D:;
     if (*(signed char *)D_00199D71 == 0) goto L5DB4F;

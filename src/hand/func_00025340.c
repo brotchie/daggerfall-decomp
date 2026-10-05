@@ -1,13 +1,13 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x00025340 */
-struct rec { char pad0[16]; char name[58]; };      /* 74 bytes */
-struct pc { char pad0[16]; unsigned char f16[12]; };
+#include "records.h"
+
 extern char D_00170738[];        /* __FILE__ */
 extern char D_00170765[];
 extern char text_buffer[];
-extern struct pc *player_class;
-extern struct rec *D_00195C44;
+extern struct career *player_class;
+extern struct career *D_00195C44;     /* scratch_buffer: the 18 classes CLASS00-17.CFG */
 extern int career_slot_weight(int);
-extern int disk_read_file(char *, struct rec *);
+extern int disk_read_file(char *, struct career *);
 extern int func_0009DEAC(int);
 extern void mc_memset(void *, int, int, char *, int, int);
 extern char *memchr(char *, int, int);
@@ -18,7 +18,7 @@ extern int mc_sprintf(char *, char *, ...);
 int career_nearest_class(void)
 {
     int sc[18];
-    struct rec *base;
+    struct career *base;
     int j;
     int k;
     int i;
@@ -34,7 +34,7 @@ int career_nearest_class(void)
     for (i = 0; i < 12; i++) {
         s = career_slot_weight(i);
         for (j = 0; j < 18; j++) {
-            k = memchr(base[j].name, player_class->f16[i], 12) - base[j].name;
+            k = memchr((char *)base[j].skills, player_class->skills[i], 12) - (char *)base[j].skills;
             if (k >= 0) {
                 if (career_slot_weight(k) == s)
                     sc[j] += s;

@@ -1,10 +1,12 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0006B072 */
+#include "records.h"
+
 struct slot { short v[10]; };
 struct tab {
     short id[32];
     struct slot s[32];
 };
-extern char *logbook_object;
+extern struct record *logbook_object;
 
 void logbook_remove_entry(unsigned char a1, int a2)
 {
@@ -12,7 +14,7 @@ void logbook_remove_entry(unsigned char a1, int a2)
     int i;
     int found;
 
-    p = (struct tab *)(logbook_object + 71);
+    p = (struct tab *)RECORD_DATA(logbook_object);
     found = -1;
     for (i = 0; i < 32; i++) {
         if (a1 == p->id[i]) {

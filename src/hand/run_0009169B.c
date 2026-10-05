@@ -1,4 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2): a run of generate.c from 0x00090FA1 to 0x0009169B, kept together for its switch table's alignment */
+#include "records.h"
+
 struct rect { short x, y, w, h; };
 struct img { struct rect r; char pad[4]; char data[1]; };
 struct region { short x1, y1, x2, y2; void (*fn)(); };     /* mouse hit box */
@@ -38,15 +40,15 @@ extern short D_00190DEE;
 extern short text_macro_fa[3];
 extern struct img *D_00195B5C;
 extern char *D_00195B60;
-extern char *player_character;
-extern char *player_class;
+extern struct character *player_character;
+extern struct career *player_class;
 extern char mouse_buttons_prev;
 extern struct uimg *chargen_face_images;
 extern unsigned char chargen_screen;
 extern void msgbox_show_rsc(int, int);
 extern void parse_expand(char *, char *);
-extern void character_reset_magicka(char *, char *);
-extern void classmaker_input_text(char *, short, int (*)(void));
+extern void character_reset_magicka(struct character *, struct career *);
+extern void classmaker_input_text(struct character *, short, int (*)(void));
 extern void text_draw_colored(char *, short, short, int, unsigned char);
 extern void text_draw_centered_colored(char *, short, short, int, unsigned char);
 extern int chargen_draw(void);
@@ -55,10 +57,6 @@ extern int mc_memcpy();
 extern void func_0012DB50(int);
 extern int func_00144F68();
 extern void func_00144FB4(int, int, int, int, char *);
-
-#pragma pack(1)
-struct E { short s; char pad[4]; };
-struct B { char pad[0x9d]; struct E e[1]; };
 
 int chargen_screen_loop(int first, int last)
 {
@@ -94,7 +92,7 @@ int chargen_screen_loop(int first, int last)
 
 void chargen_reflexes_button(int n)
 {
-    player_character[130] = n - 35;
+    player_character->reflexes = n - 35;
 }
 
 void chargen_draw_face(void)
@@ -104,7 +102,7 @@ void chargen_draw_face(void)
 
     p = chargen_face_images;
     k = 0;
-    while ((unsigned char)player_character[128] > k) {
+    while (player_character->face > k) {
         p = (struct uimg *)(p->len + (char *)p + 12);
         k++;
     }
@@ -126,7 +124,7 @@ void chargen_draw_attributes(void)
     x = (D_0018810C + D_00188110) >> 1;
     func_0012DB50(4);
     for (i = 0; i < 8; i++) {
-        text_draw_centered_colored(func_000A0DD9(((short *)(player_character + 32))[i], text_buffer, 10), x, (short)(((struct region *)chargen_buttons)[i + 20].y2 - D_0012DA44 + 1), 145, 141);
+        text_draw_centered_colored(func_000A0DD9(player_character->attributes[i], text_buffer, 10), x, (short)(((struct region *)chargen_buttons)[i + 20].y2 - D_0012DA44 + 1), 145, 141);
     }
     text_draw_centered_colored(func_000A0DD9(D_00190D64, text_buffer, 10), 51, (short)(D_00190D6A + 13 - D_0012DA44 + 1), 145, 141);
     character_reset_magicka(player_character, player_class);
@@ -157,9 +155,9 @@ void chargen_draw_skills(void)
         text_draw_centered_colored(func_000A0DD9(D_00190DEA[i], text_buffer, 10), 221, text_macro_fpc[i] + 8 - D_0012DA44 + 1, 145, 141);
     }
     for (i = 0; i < 12; i++) {
-        k = *(unsigned char *)(player_class + i + 16);
+        k = player_class->skills[i];
         text_draw_colored(*(char **)(skill_names + (k << 2)), *(short *)(chargen_buttons + ((i + 2) * 12)) + 2, *(short *)(D_0018801E + ((i + 2) * 12)) + 1, 145, 141);
-        text_draw_centered_colored(func_000A0DD9(((struct B *)player_character)->e[k].s, text_buffer, 10), 192, *(short *)(D_0018801E + ((i + 2) * 12)) + 1, 145, 141);
+        text_draw_centered_colored(func_000A0DD9(player_character->skills[k].value, text_buffer, 10), 192, *(short *)(D_0018801E + ((i + 2) * 12)) + 1, 145, 141);
     }
 }
 

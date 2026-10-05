@@ -1,6 +1,7 @@
 /* quests.c: functions first lifted from the assembly by tools/lift_all.py (2026-10), now
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
+#include "records.h"
 
 struct bf8_7_1 { unsigned char _:7; unsigned char f:1; };
 extern char disk_last_file_size[];
@@ -18,14 +19,14 @@ extern char text_buffer[];
 extern char D_00190BE4[];
 extern char D_001917E4[];
 extern char D_00191834[];
-extern char nonworld_root[];
-extern char D_00195A00[];
-extern char current_building[];
-extern char D_00195AC4[];
-extern char D_00195AF4[];
+extern struct record *nonworld_root;
+extern struct record *D_00195A00;
+extern struct building *current_building;
+extern struct record *D_00195AC4;
+extern struct record *D_00195AF4;
 extern char D_00195B84[];
 extern char D_00195B85[];
-extern char player_character[];
+extern struct character *player_character;
 extern char game_minutes[];
 extern char D_00195C44[];
 extern char D_00195D00[];
@@ -33,23 +34,23 @@ extern char quest_potential_questor[];
 extern char D_00195F68[];
 extern char D_001961F5[];
 extern char D_00196282[];
-extern char current_quest[];
+extern struct quest *current_quest;
 extern char quest_debug_data[];
 extern char D_001997AE[];
 extern char D_001A5BE4[];
 
-extern int faction_find(short);
-extern int quest_section(int, int);
-extern int func_000310E1(int, int);
-extern int quest_init_resources(int);
-extern int quest_offer_prompt(int);
+extern struct faction *faction_find(short);
+extern void *quest_section(struct quest *, int);
+extern struct record *func_000310E1(struct record *, struct record *);
+extern int quest_init_resources(struct quest *);
+extern int quest_offer_prompt(struct quest *);
 extern int quest_pick_file(unsigned char, unsigned char, unsigned char, unsigned char, unsigned char);
 extern int disk_read_file(int, int);
 extern int rand_range(int, int);
-extern int object_building(int);
-extern int object_create_child(int, int, int);
+extern struct building *object_building(struct record *);
+extern struct record *object_create_child(struct record *, int, int);
 extern int object_find(int, int);
-extern int object_find_by_id(int, int);
+extern struct record *object_find_by_id(struct record *, int);
 extern int rand();
 extern int srand();
 extern int open(int, ...);
@@ -66,32 +67,32 @@ extern int mc_sprintf(int, ...);
 extern int mc_memcpy();
 extern int tolower();
 extern int func_000A14E8();
-extern void faction_change_reputation(int, int);
-extern void rumor_add_quest(int, int, int, int);
+extern void faction_change_reputation(struct faction *, int);
+extern void rumor_add_quest(struct quest *, int, int, int);
 extern void quest_timers_start_all(void);
 extern void msgbox_show_rsc(int, int);
-extern void quest_end(int);
+extern void quest_end(struct quest *);
 extern void fatal_error(int);
 extern void logbook_prune_quests(void);
-extern void object_foreach(int, int);
-extern void object_foreach_open(int, int);
+extern void object_foreach(struct record *, int);
+extern void object_foreach_open(struct record *, int);
 int quest_start(int);
-int func_0004C526(int);
+int func_0004C526(struct record *);
 int quest_free_id(void);
 int quest_is_active(int);
-int func_0004CF37(int);
-int func_0004CFA7(int, int);
-void func_0004C588(int);
+int func_0004CF37(struct item *);
+int func_0004CFA7(struct record *, int);
+void func_0004C588(struct record *);
 void func_0004C759(void);
-void func_0004C8EB(int);
-void quest_pick_for_npc(int);
-void func_0004CC14(int);
+void func_0004C8EB(struct record *);
+void quest_pick_for_npc(struct record *);
+void func_0004CC14(struct record *);
 #pragma aux func_000A0ED9 parm routine [];
 
 int quest_start(int a1)
 {
-    int l_28;
-    int l_24;
+    struct record *l_28;
+    struct quest *l_24;
     int l_20;
     int l_1C;
 
@@ -117,10 +118,10 @@ L4BEB1:;
     func_0009DEA7(l_1C);
     l_20 = disk_read_file(a1, 0);
     logbook_prune_quests();
-    l_28 = object_create_child(*(int *)D_00195A00, 0, *(int *)disk_last_file_size);
-    *(signed char *)((char *)l_28) = 14;
-    *(short *)((char *)l_28 + 21) = 3;
-    l_24 = l_28 + 71;
+    l_28 = object_create_child(D_00195A00, 0, *(int *)disk_last_file_size);
+    l_28->type = 14;
+    l_28->flags = 3;
+    l_24 = &l_28->data.quest;
     mc_memcpy(l_24, l_20, (int)(short)*(short *)disk_last_file_size, (int)D_00174F47, 193, 4);
     if (l_20 == 0) goto L4BF25;
     if (l_20 != (-1751672937)) goto L4BF27;
@@ -130,26 +131,26 @@ L4BF27:;
     mc_free(l_20, (int)D_00174F47, 194);
     l_20 = -1751672937;
 L4BF40:;
-    *(signed char *)((char *)l_28 + 38) = (*(short *)((char *)l_24) = quest_free_id());
-    func_000A14E8(l_24 + 6, a1, 8, (int)D_00174F47, 197, 9);
+    l_28->quest_id = (l_24->id = quest_free_id());
+    func_000A14E8(l_24->name, a1, 8, (int)D_00174F47, 197, 9);
     if (((int)(short)*(short *)D_00195F68) != 240) goto L4BF95;
-    *(short *)D_00195F68 = *(short *)(*(char **)current_building + 18);
+    *(short *)D_00195F68 = current_building->faction_id;
 L4BF95:;
-    if (toupper((int)(unsigned char)*(signed char *)((char *)l_24 + 11)) != 89) goto L4BFBA;
-    *(short *)((char *)l_24 + 2) = *(short *)D_00195F68;
+    if (toupper((int)(unsigned char)l_24->name[5]) != 89) goto L4BFBA;
+    l_24->faction_id = *(short *)D_00195F68;
     goto L4BFC3;
 L4BFBA:;
-    *(short *)((char *)l_24 + 2) = 0;
+    l_24->faction_id = 0;
 L4BFC3:;
-    *(int *)current_quest = l_24;
-    *(int *)D_00195D00 = l_28;
+    current_quest = l_24;
+    *(int *)D_00195D00 = (int)l_28;
     if (quest_init_resources(l_24) != 0) goto L4BFFF;
     quest_end(l_24);
     msgbox_show_rsc(600, 1);
     return 0;
 L4BFFF:;
     quest_timers_start_all();
-    if (tolower((int)(unsigned char)*(signed char *)((char *)l_24 + 6)) == 115) goto L4C025;
+    if (tolower((int)(unsigned char)l_24->name[0]) == 115) goto L4C025;
     if (quest_offer_prompt(l_24) == 0) goto L4C027;
 L4C025:;
     goto L4C038;
@@ -159,9 +160,9 @@ L4C027:;
 L4C038:;
     logbook_prune_quests();
     func_0004C759();
-    *(int *)quest_debug_data = *(int *)current_quest;
-    rumor_add_quest(*(int *)current_quest, 1005, 0, 4);
-    return l_24;
+    *(int *)quest_debug_data = (int)current_quest;
+    rumor_add_quest(current_quest, 1005, 0, 4);
+    return (int)l_24;
 }
 
 void quest_start_pending(void)
@@ -195,84 +196,84 @@ L4C4F9:;
     return a2 + 1;
 }
 
-int func_0004C526(int a1)
+int func_0004C526(struct record *a1)
 {
-    if (((int)(unsigned char)*(signed char *)((char *)a1)) == 8) goto L4C54F;
+    if (a1->type == 8) goto L4C54F;
     return 0;
 L4C54F:;
     if (((int)(unsigned short)*(short *)((char *)a1 + 71)) != *(int *)D_00190BE4) goto L4C574;
-    *(int *)D_00195AF4 = a1;
+    D_00195AF4 = a1;
     return 1;
 L4C574:;
     return 0;
 }
 
-void func_0004C588(int a1)
+void func_0004C588(struct record *a1)
 {
-    int l_18;
+    struct record *l_18;
 
-    if (*(int *)((char *)a1 + 51) != 0) return;
-    if (((int)(unsigned char)*(signed char *)((char *)a1)) != 41) goto L4C5C5;
-    if ((((unsigned)*(int *)((char *)a1 + 31)) >> 16) == 800) goto L4C5CA;
+    if (a1->twin != 0) return;
+    if (a1->type != 41) goto L4C5C5;
+    if ((((unsigned)a1->id) >> 16) == 800) goto L4C5CA;
 L4C5C5:;
     goto L4C6CB;
 L4C5CA:;
     *(int *)D_00190BE4 = (int)(unsigned short)*(short *)((char *)a1 + 89);
-    *(int *)D_00195AF4 = 0;
-    object_find(*(int *)D_00195AC4, (int)func_0004C526);
-    if (*(int *)D_00195AF4 == 0) return;
-    if (*(int *)(*(char **)D_00195AF4 + 51) == 0) goto L4C649;
+    D_00195AF4 = 0;
+    object_find((int)D_00195AC4, (int)func_0004C526);
+    if (D_00195AF4 == 0) return;
+    if (D_00195AF4->twin == 0) goto L4C649;
     func_000A0ED9(422, (int)D_00174F47);
-    mc_sprintf((int)text_buffer, (int)D_00174F71, (int)(unsigned short)*(short *)(*(char **)D_00195AF4 + 27));
+    mc_sprintf((int)text_buffer, (int)D_00174F71, (int)(unsigned short)(short)D_00195AF4->image);
     fatal_error((int)text_buffer);
 L4C649:;
-    *(int *)((char *)a1 + 31) = *(int *)(*(char **)D_00195AF4 + 31);
-    mc_memcpy(a1 + 7, (int)&*(signed char *)(*(char **)D_00195AF4 + 7), 12, (int)D_00174F47, 427, 4);
-    *(signed char *)(*(char **)D_00195AF4 + 38) = *(signed char *)((char *)a1 + 38);
-    *(int *)((char *)a1 + 51) = *(int *)D_00195AF4;
-    *(int *)(*(char **)D_00195AF4 + 51) = a1;
-    *(signed char *)(*(char **)D_00195AF4 + 73) |= 128;
-    if (((int)(unsigned short)(*(short *)((char *)a1 + 21) & 2048)) == 0) goto L4C6C6;
-    *(signed char *)((char *)a1 + 22) |= 2;
+    a1->id = D_00195AF4->id;
+    mc_memcpy(&a1->x, &D_00195AF4->x, 12, (int)D_00174F47, 427, 4);
+    D_00195AF4->quest_id = a1->quest_id;
+    a1->twin = D_00195AF4;
+    D_00195AF4->twin = a1;
+    *(signed char *)((char *)D_00195AF4 + 73) |= 128;
+    if (((int)(unsigned short)(a1->flags & 2048)) == 0) goto L4C6C6;
+    a1->flags |= 0x200;
 L4C6C6:;
     return;
 L4C6CB:;
-    if ((((unsigned)*(int *)((char *)*(int *)D_00195AC4 + 31)) >> 16) != (((unsigned)*(int *)((char *)a1 + 31)) >> 16)) return;
-    l_18 = object_find_by_id(*(int *)D_00195AC4, *(int *)((char *)a1 + 31));
+    if ((D_00195AC4->id >> 16) != (((unsigned)a1->id) >> 16)) return;
+    l_18 = object_find_by_id(D_00195AC4, a1->id);
     if (l_18 == 0) goto L4C708;
-    if (*(signed char *)((char *)a1) == *(signed char *)((char *)l_18)) goto L4C715;
+    if (a1->type == l_18->type) goto L4C715;
 L4C708:;
     func_000310E1(a1, l_18);
     return;
 L4C715:;
-    *(signed char *)((char *)l_18 + 38) = *(signed char *)((char *)a1 + 38);
-    *(int *)((char *)l_18 + 51) = a1;
-    *(int *)((char *)a1 + 51) = l_18;
-    if (((int)(unsigned short)(*(short *)((char *)a1 + 21) & 2048)) == 0) return;
-    *(signed char *)((char *)l_18 + 22) |= 10;
+    l_18->quest_id = a1->quest_id;
+    l_18->twin = a1;
+    a1->twin = l_18;
+    if (((int)(unsigned short)(a1->flags & 2048)) == 0) return;
+    l_18->flags |= 0xA00;
 }
 
 void func_0004C759(void)
 {
     *(signed char *)D_00196282 = 0;
-    object_foreach_open(*(int *)nonworld_root, (int)func_0004C588);
+    object_foreach_open(nonworld_root, (int)func_0004C588);
 }
 
 int quest_free_id(void)
 {
-    int l_28;
-    int l_24;
+    struct record *l_28;
+    struct quest *l_24;
     int l_20;
     int l_1C;
 
-    l_28 = *(int *)(*(char **)D_00195A00 + 63);
+    l_28 = D_00195A00->children;
     l_20 = *(int *)D_00195C44;
     mc_memset(l_20, 0, 256, (int)D_00174F47, 478, 4);
 L4C7C3:;
     if (l_28 == 0) goto L4C7E8;
-    l_24 = l_28 + 71;
-    (*(signed char *)((char *)(((int)(short)*(short *)((char *)l_24)) + l_20)))++;
-    l_28 = *(int *)((char *)l_28 + 55);
+    l_24 = &l_28->data.quest;
+    (*(signed char *)((char *)(l_24->id + l_20)))++;
+    l_28 = l_28->next;
     goto L4C7C3;
 L4C7E8:;
     l_1C = 1;
@@ -292,52 +293,52 @@ L4C817:;
     return 0;
 }
 
-void qaction_op46_hide_npc(int a1, int a2)
+void qaction_op46_hide_npc(struct quest *a1, struct qbn_op *a2)
 {
-    int l_14;
+    struct record *l_14;
 
-    l_14 = *(int *)((char *)a2 + 32);
-    *(signed char *)((char *)l_14 + 22) |= 10;
-    if (*(int *)((char *)l_14 + 51) == 0) return;
-    *(signed char *)(*(char **)((char *)l_14 + 51) + 22) |= 10;
+    l_14 = a2->args[1].object;
+    l_14->flags |= 0xA00;
+    if (l_14->twin == 0) return;
+    l_14->twin->flags |= 0xA00;
 }
 
-void func_0004C874(int a1, int a2)
-{
-}
-
-void qaction_op48_restore_npc(int a1, int a2)
-{
-    int l_14;
-
-    l_14 = *(int *)((char *)a2 + 32);
-    *(signed char *)((char *)l_14 + 22) &= 245;
-    if (*(int *)((char *)l_14 + 51) == 0) return;
-    *(signed char *)(*(char **)((char *)l_14 + 51) + 22) &= 245;
-}
-
-void func_0004C8CF(int a1, int a2)
+void func_0004C874(struct quest *a1, struct qbn_op *a2)
 {
 }
 
-void func_0004C8EB(int a1)
+void qaction_op48_restore_npc(struct quest *a1, struct qbn_op *a2)
 {
-    int l_24;
-    int l_20;
+    struct record *l_14;
+
+    l_14 = a2->args[1].object;
+    l_14->flags &= ~0xA00;
+    if (l_14->twin == 0) return;
+    l_14->twin->flags &= ~0xA00;
+}
+
+void func_0004C8CF(struct quest *a1, struct qbn_op *a2)
+{
+}
+
+void func_0004C8EB(struct record *a1)
+{
+    struct faction *l_24;
+    struct faction *l_20;
     int l_1C;
-    int l_18;
+    struct building *l_18;
 
-    if (((int)(unsigned char)*(signed char *)((char *)a1)) != 8) return;
+    if (a1->type != 8) return;
     l_18 = object_building(a1);
     if (l_18 == 0) goto L4C930;
-    if (((int)(unsigned char)*(signed char *)((char *)l_18 + 24)) == 11) goto L4C932;
+    if (l_18->type == 11) goto L4C932;
 L4C930:;
     goto L4C937;
 L4C932:;
     return;
 L4C937:;
     if (l_18 == 0) goto L4C94D;
-    if (((int)(unsigned char)*(signed char *)((char *)l_18 + 24)) == 14) goto L4C94F;
+    if (l_18->type == 14) goto L4C94F;
 L4C94D:;
     goto L4C954;
 L4C94F:;
@@ -345,48 +346,48 @@ L4C94F:;
 L4C954:;
     if (((int)(unsigned char)*(signed char *)player_environment) == 3) goto L4C98D;
     if (l_18 == 0) goto L4C976;
-    if (((int)(unsigned char)*(signed char *)((char *)l_18 + 24)) < 16) goto L4C978;
+    if (l_18->type < 16) goto L4C978;
 L4C976:;
     goto L4C988;
 L4C978:;
-    if (((int)(unsigned char)*(signed char *)((char *)l_18 + 24)) != 1) goto L4C98D;
+    if (l_18->type != 1) goto L4C98D;
 L4C988:;
     return;
 L4C98D:;
-    l_1C = a1 + 71;
+    l_1C = (int)RECORD_DATA(a1);
     if (*(short *)((char *)l_1C) == 0) return;
     l_24 = faction_find((int)(short)*(short *)((char *)l_1C));
     l_20 = l_24;
 L4C9B7:;
-    if (*(int *)((char *)l_20 + 88) == 0) goto L4C9CB;
-    l_20 = *(int *)((char *)l_20 + 88);
+    if (l_20->parent == 0) goto L4C9CB;
+    l_20 = l_20->parent;
     goto L4C9B7;
 L4C9CB:;
-    if (((int)(unsigned short)*(short *)((char *)l_20 + 33)) == 108) goto L4C9ED;
-    if (((int)(unsigned short)*(short *)((char *)l_20 + 33)) != 42) goto L4C9EF;
+    if (l_20->id == 108) goto L4C9ED;
+    if (l_20->id != 42) goto L4C9EF;
 L4C9ED:;
     goto L4CA00;
 L4C9EF:;
-    if (((int)(unsigned short)*(short *)((char *)l_20 + 33)) != 40) goto L4CA02;
+    if (l_20->id != 40) goto L4CA02;
 L4CA00:;
     goto L4CA13;
 L4CA02:;
-    if (((int)(unsigned short)*(short *)((char *)l_20 + 33)) != 41) goto L4CA18;
+    if (l_20->id != 41) goto L4CA18;
 L4CA13:;
     return;
 L4CA18:;
-    if (((int)(unsigned char)*(signed char *)((char *)l_24)) == 2) goto L4CA36;
-    if (((int)(unsigned char)*(signed char *)((char *)l_24)) != 12) goto L4CA38;
+    if (l_24->type == 2) goto L4CA36;
+    if (l_24->type != 12) goto L4CA38;
 L4CA36:;
     goto L4CA47;
 L4CA38:;
-    if (((int)(unsigned char)*(signed char *)((char *)l_24)) != 4) goto L4CA49;
+    if (l_24->type != 4) goto L4CA49;
 L4CA47:;
     goto L4CA4B;
 L4CA49:;
     return;
 L4CA4B:;
-    if (((int)(unsigned char)*(signed char *)((char *)l_24)) != 4) goto L4CA74;
+    if (l_24->type != 4) goto L4CA74;
     if ((rand() % 100) > 50) return;
     goto L4CA8C;
 L4CA74:;
@@ -401,48 +402,48 @@ void func_0004CA9D(void)
 
     l_18 = rand();
     if (((int)(unsigned char)*(signed char *)player_environment) != 3) goto L4CAFB;
-    if ((((unsigned)*(int *)(*(char **)D_00195AC4 + 31)) >> 16) == 50027) goto L4CAE3;
-    if ((((unsigned)*(int *)(*(char **)D_00195AC4 + 31)) >> 16) != 50029) goto L4CAE5;
+    if ((((unsigned)D_00195AC4->id) >> 16) == 50027) goto L4CAE3;
+    if ((((unsigned)D_00195AC4->id) >> 16) != 50029) goto L4CAE5;
 L4CAE3:;
     goto L4CAF7;
 L4CAE5:;
-    if ((((unsigned)*(int *)(*(char **)D_00195AC4 + 31)) >> 16) != 50033) goto L4CAF9;
+    if ((((unsigned)D_00195AC4->id) >> 16) != 50033) goto L4CAF9;
 L4CAF7:;
     goto L4CAFB;
 L4CAF9:;
     return;
 L4CAFB:;
     srand(((unsigned)*(int *)game_minutes) / 1440);
-    object_foreach(*(int *)D_00195AC4, (int)func_0004C8EB);
+    object_foreach(D_00195AC4, (int)func_0004C8EB);
     srand(l_18);
 }
 
-int func_0004CB2F(int a1)
+int func_0004CB2F(struct record *a1)
 {
     return (int)(unsigned char)(*(signed char *)((char *)a1 + 73) & 128);
 }
 
-void quest_pick_for_npc(int a1)
+void quest_pick_for_npc(struct record *a1)
 {
-    int l_18;
+    struct faction *l_18;
 
     if (a1 == 0) return;
     l_18 = faction_find((int)(short)*(short *)((char *)a1 + 71));
-    if (((int)(unsigned char)*(signed char *)((char *)l_18)) != 4) goto L4CBA9;
-    if (((int)(unsigned short)*(short *)((char *)l_18 + 33)) != 407) goto L4CBAB;
+    if (l_18->type != 4) goto L4CBA9;
+    if (l_18->id != 407) goto L4CBAB;
 L4CBA9:;
     goto L4CBD4;
 L4CBAB:;
-    quest_pick_file(82, 0, 48, 67, (int)(unsigned char)*(signed char *)(*(char **)player_character + 129));
+    quest_pick_file(82, 0, 48, 67, player_character->level);
     return;
 L4CBD4:;
     if (((int)(unsigned char)*(signed char *)player_environment) == 3) return;
-    quest_pick_file(65, 75, 48, 67, (int)(unsigned char)*(signed char *)(*(char **)player_character + 129));
+    quest_pick_file(65, 75, 48, 67, player_character->level);
 }
 
-void func_0004CC14(int a1)
+void func_0004CC14(struct record *a1)
 {
-    if (((int)(unsigned char)*(signed char *)((char *)a1)) != 8) goto L4CC3D;
+    if (a1->type != 8) goto L4CC3D;
     if (*(int *)D_00195B84 != 0) goto L4CC3F;
 L4CC3D:;
     return;
@@ -455,34 +456,34 @@ L4CC61:;
     (*(int *)D_00195B84)--;
 L4CC67:;
     if (*(int *)D_00195B84 != 0) return;
-    *(int *)D_00195AF4 = a1;
+    D_00195AF4 = a1;
 }
 
 int quest_find_potential_questor(void)
 {
     *(int *)D_00195B84 = 32768;
-    object_foreach(*(int *)D_00195AC4, (int)func_0004CC14);
+    object_foreach(D_00195AC4, (int)func_0004CC14);
     if (*(int *)D_00195B84 != 32768) goto L4CCBE;
     return 0;
 L4CCBE:;
     *(int *)D_00195B84 = rand_range(0, (*(int *)D_00195B84 & 32767) - 1) + 1;
-    *(int *)D_00195AF4 = 0;
-    object_foreach(*(int *)D_00195AC4, (int)func_0004CC14);
-    *(int *)quest_potential_questor = *(int *)D_00195AF4;
-    return *(int *)D_00195AF4;
+    D_00195AF4 = 0;
+    object_foreach(D_00195AC4, (int)func_0004CC14);
+    *(int *)quest_potential_questor = (int)D_00195AF4;
+    return (int)D_00195AF4;
 }
 
-int func_0004CD10(int a1)
+int func_0004CD10(struct record *a1)
 {
     int l_1C;
 
     l_1C = rand();
-    srand(*(int *)((char *)a1 + 31));
+    srand(a1->id);
     *(signed char *)D_001961F5 = 0;
     quest_pick_for_npc(a1);
     srand(l_1C);
     if (*(signed char *)D_001961F5 == 0) goto L4CD6C;
-    *(int *)quest_potential_questor = a1;
+    *(int *)quest_potential_questor = (int)a1;
     *(signed char *)D_001961F5 = 0;
     return 1;
 L4CD6C:;
@@ -502,32 +503,32 @@ L4CDBE:;
     return 1;
 }
 
-void quest_reward_faction(int a1)
+void quest_reward_faction(struct quest *a1)
 {
-    int l_18;
+    struct faction *l_18;
 
-    if (*(short *)((char *)a1 + 2) == 0) return;
-    l_18 = faction_find((int)(short)*(short *)((char *)a1 + 2));
+    if (a1->faction_id == 0) return;
+    l_18 = faction_find(a1->faction_id);
     faction_change_reputation(l_18, 5);
 }
 
-void func_0004CE24(int a1, int a2)
+void func_0004CE24(struct quest *a1, int a2)
 {
-    int l_18;
+    struct qbn_person *l_18;
     int l_14;
 
     l_18 = quest_section(a1, 3);
     l_14 = 0;
 L4CE4E:;
-    if (((int)(short)*(short *)((char *)a1 + 22)) > l_14) goto L4CE6B;
+    if (a1->section_counts[3] > l_14) goto L4CE6B;
     return;
 L4CE5C:;
     l_14++;
-    (*(char (**)[20])&l_18)++;
+    l_18++;
     goto L4CE4E;
 L4CE6B:;
-    if (((int)(short)*(short *)((char *)l_18 + 4)) != 21) goto L4CEB3;
-    rumor_add_quest(a1, ((a2 != 0) ? 1008 : 1009), *(int *)(*(char **)((char *)l_18 + 12) + 31), 2);
+    if (l_18->kind != 21) goto L4CEB3;
+    rumor_add_quest(a1, ((a2 != 0) ? 1008 : 1009), l_18->object->id, 2);
     return;
 L4CEB3:;
     goto L4CE5C;
@@ -535,56 +536,56 @@ L4CEB3:;
 
 int quest_is_active(int a1)
 {
-    int l_20;
-    int l_1C;
+    struct record *l_20;
+    struct quest *l_1C;
 
-    l_20 = *(int *)(*(char **)D_00195A00 + 63);
+    l_20 = D_00195A00->children;
 L4CEDA:;
     if (l_20 == 0) goto L4CF23;
-    if (((int)(unsigned char)*(signed char *)((char *)l_20)) != 14) goto L4CF18;
-    l_1C = l_20 + 71;
-    if (strnicmp(l_1C + 6, a1, 8) != 0) goto L4CF18;
+    if (l_20->type != 14) goto L4CF18;
+    l_1C = &l_20->data.quest;
+    if (strnicmp(l_1C->name, a1, 8) != 0) goto L4CF18;
     return 1;
 L4CF18:;
-    l_20 = *(int *)((char *)l_20 + 55);
+    l_20 = l_20->next;
     goto L4CEDA;
 L4CF23:;
     return 0;
 }
 
-int func_0004CF37(int a1)
+int func_0004CF37(struct item *a1)
 {
     int l_1C;
 
     l_1C = 0;
-    if (((int)(unsigned char)*(signed char *)((char *)a1 + 55)) != 2) goto L4CF7E;
-    return (((int)(short)*(short *)(material_to_hit + (((int)(unsigned char)*(signed char *)((char *)a1 + 54)) * 2))) + l_1C) + 45;
+    if (a1->armor_type != 2) goto L4CF7E;
+    return (((int)(short)*(short *)(material_to_hit + (a1->material * 2))) + l_1C) + 45;
 L4CF7E:;
-    return l_1C + ((int)(short)*(short *)(D_00185128 + (((int)(unsigned char)*(signed char *)((char *)a1 + 55)) * 2)));
+    return l_1C + ((int)(short)*(short *)(D_00185128 + (a1->armor_type * 2)));
 }
 
-int func_0004CFA7(int a1, int a2)
+int func_0004CFA7(struct record *a1, int a2)
 {
-    int l_34;
+    struct character *l_34;
     int l_30;
     int l_2C;
     int l_28;
     int l_24;
     int l_20;
-    int l_1C;
-    int l_18;
+    struct record *l_1C;
+    struct item *l_18;
 
     l_20 = 0;
     l_30 = 100;
-    l_34 = a1 + 71;
-    if (*(int *)((char *)((((int)(unsigned char)*(signed char *)(body_part_armor_slots + a2)) << 2) + l_34) + 367) == 0) goto L4D013;
-    l_30 -= func_0004CF37(*(int *)((char *)((((int)(unsigned char)*(signed char *)(body_part_armor_slots + a2)) << 2) + l_34) + 367) + 71);
+    l_34 = &a1->data.character;
+    if (l_34->equipped[(int)(unsigned char)*(signed char *)(body_part_armor_slots + a2)] == 0) goto L4D013;
+    l_30 -= func_0004CF37(&l_34->equipped[(int)(unsigned char)*(signed char *)(body_part_armor_slots + a2)]->data.item);
 L4D013:;
-    l_1C = *(int *)((char *)l_34 + 451);
+    l_1C = l_34->equipped[EQUIP_LEFT_HAND];
     if (l_1C == 0) goto L4D0A1;
-    l_18 = l_1C + 71;
-    if (((int)(unsigned short)*(short *)((char *)l_18 + 32)) != 2) goto L4D0A1;
-    l_2C = ((int)(unsigned short)*(short *)((char *)l_18 + 34)) - 7;
+    l_18 = &l_1C->data.item;
+    if (l_18->group != 2) goto L4D0A1;
+    l_2C = l_18->index - 7;
     if (l_2C < 0) goto L4D061;
     if (l_2C <= 3) goto L4D063;
 L4D061:;
@@ -612,22 +613,22 @@ L4D0B3:;
     l_28++;
     goto L4D0A8;
 L4D0BB:;
-    if (*(int *)((char *)((l_28 << 2) + l_34) + 367) == 0) goto L4D15B;
-    l_18 = *(int *)((char *)((l_28 << 2) + l_34) + 367) + 71;
-    if (((int)(short)*(short *)((char *)l_18 + 67)) == (-1)) goto L4D0B3;
+    if (l_34->equipped[l_28] == 0) goto L4D15B;
+    l_18 = &l_34->equipped[l_28]->data.item;
+    if (l_18->enchantments[0].type == (-1)) goto L4D0B3;
     l_24 = 0;
 L4D0F9:;
-    if (((int)(short)*(short *)((char *)((l_24 << 2) + l_18) + 67)) == (-1)) goto L4D111;
+    if (l_18->enchantments[l_24].type == (-1)) goto L4D111;
     if (l_24 < 10) goto L4D113;
 L4D111:;
     goto L4D15B;
 L4D113:;
-    if (((int)(short)*(short *)((char *)((l_24 << 2) + l_18) + 67)) != 12) goto L4D132;
+    if (l_18->enchantments[l_24].type != 12) goto L4D132;
     l_30 += -25;
     l_20 = 1;
     goto L4D14F;
 L4D132:;
-    if (((int)(short)*(short *)((char *)((l_24 << 2) + l_18) + 67)) != 24) goto L4D14F;
+    if (l_18->enchantments[l_24].type != 24) goto L4D14F;
     l_30 += 25;
     l_20 = 1;
 L4D14F:;
@@ -645,12 +646,12 @@ L4D183:;
     return l_30;
 }
 
-void character_update_armor_values(int a1)
+void character_update_armor_values(struct record *a1)
 {
     int l_1C;
-    int l_18;
+    struct character *l_18;
 
-    l_18 = a1 + 71;
+    l_18 = &a1->data.character;
     l_1C = 0;
 L4D1B6:;
     if (l_1C < 7) goto L4D1C6;
@@ -659,6 +660,6 @@ L4D1BE:;
     l_1C++;
     goto L4D1B6;
 L4D1C6:;
-    *(signed char *)((char *)(l_18 + l_1C) + 68) = func_0004CFA7(a1, l_1C);
+    l_18->armor_values[l_1C] = func_0004CFA7(a1, l_1C);
     goto L4D1BE;
 }

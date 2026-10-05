@@ -1,6 +1,7 @@
 /* click.c: functions first lifted from the assembly by tools/lift_all.py (2026-10), now
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
+#include "records.h"
 
 struct bf8_1_1 { unsigned char _:1; unsigned char f:1; };
 struct bf8_2_1 { unsigned char _:2; unsigned char f:1; };
@@ -66,21 +67,21 @@ extern char D_001940D5[];
 extern char D_001940D6[];
 extern char D_001940D7[];
 extern char D_001940D9[];
-extern char wagon_container[];
+extern struct record *wagon_container;
 extern char D_00195A00[];
 extern char D_00195A84[];
-extern char current_building[];
-extern char player_object[];
+extern struct building *current_building;
+extern struct record *player_object;
 extern char D_00195AB4[];
-extern char D_00195AC4[];
+extern struct record *D_00195AC4;
 extern char D_00195ADC[];
 extern char D_00195AE0[];
 extern char D_00195AE4[];
 extern char D_00195AEC[];
 extern char spell_ready_touch[];
 extern char guild_npc_object[];
-extern char current_location[];
-extern char player_character[];
+extern struct location *current_location;
+extern struct character *player_character;
 extern char window_image[];
 extern char D_00195C44[];
 extern char D_00195CE8[];
@@ -134,48 +135,48 @@ extern char ground_position_history_next[];
 extern char D_001A4FCC[];
 extern char D_001A4FD4[];
 
-extern int lockpick_action_door(int, int, int);
+extern int lockpick_action_door(struct building *, int, struct record *);
 extern int func_0001490D(int);
-extern int faction_find_type_in_region(int, short);
-extern int faction_find(short);
+extern struct faction *faction_find_type_in_region(int, short);
+extern struct faction *faction_find(short);
 extern int tavern_open(int);
 extern int climate_category(void);
-extern int collide_line_of_sight(int, int);
+extern int collide_line_of_sight(struct record *, struct record *);
 extern int quest_event_clicked_faction(unsigned short);
-extern int func_00031843(int, int, int);
+extern int func_00031843(int, struct record *, struct record *);
 extern int spells_list_poll(void);
-extern int func_0004083A(int, int, int);
-extern int item_add_to_container(int, int, int, int);
-extern int building_is_open(int);
+extern int func_0004083A(struct record *, int, int);
+extern struct record *item_add_to_container(struct record *, int, int, int);
+extern int building_is_open(struct building *);
 extern int quest_raise_event();
 extern int quest_pick_file();
 extern int func_0004CD80(int);
-extern int npc_talk_record_build(int);
+extern int npc_talk_record_build(struct record *);
 extern int func_000612A1(void);
 extern int ai_angle_diff(int, int, int);
-extern int sound_play(int, int, int);
+extern int sound_play(int, struct record *, int);
 extern int sound_play_at_point(int, int, int, int, int);
 extern int bank_open(int);
 extern int disk_read_file(int, int);
 extern int guild_find_membership_by_kind(unsigned char);
 extern int guild_find_membership_by_bits(unsigned char);
-extern int func_00076F3D(int);
+extern int func_00076F3D(struct record *);
 extern int hud_message_add(int);
 extern int rand_range(int, int);
-extern int object_building(int);
+extern struct building *object_building(struct record *);
 extern int location_contains(int, int);
-extern int func_0008B48B(int);
-extern int building_name(int);
+extern int func_0008B48B(struct record *);
+extern int building_name(struct building *);
 extern int object_delete(int);
-extern int func_0008DADD(int);
-extern int object_create_child(int, int, int);
-extern int object_reparent(int, int);
-extern int object_find_type(int, int);
+extern int func_0008DADD(struct record *);
+extern struct record *object_create_child(struct record *, int, int);
+extern int object_reparent(struct record *, struct record *);
+extern struct record *object_find_type(struct record *, int);
 extern int object_new_id(int);
 extern int inventory_open(int, int, int);
-extern int marker_find_nth(int, int, int);
-extern int marker_count(int, int);
-extern int location_cell_at(int, int);
+extern struct record *marker_find_nth(struct record *, int, int);
+extern int marker_count(struct record *, int);
+extern struct record *location_cell_at(int, int);
 extern int rand();
 extern int func_0009DEAC();
 extern int mc_free();
@@ -192,74 +193,74 @@ extern int func_000CE6E2();
 extern int func_0012B136();
 extern int func_00144F68();
 extern int func_0014B45B();
-extern void pickpocket_attempt(int);
-extern void talk_start(int);
+extern void pickpocket_attempt(struct record *);
+extern void talk_start(struct record *);
 extern void func_0001D739(void);
 extern void daedra_summon(int);
-extern void town_map_note_building(int, int);
+extern void town_map_note_building(struct record *, struct building *);
 extern void automap_save(void);
 extern void automap_load(void);
 extern void msgbox_show_string(int, int);
 extern void guards_summon(int);
-extern void quest_pick_for_npc(int);
+extern void quest_pick_for_npc(struct record *);
 extern void book_open(short);
-extern void cast_spell_on(int, int, int);
-extern void item_make(int, int, int);
-extern void func_0005EE0C(int, int, int);
-extern void func_0005FA0E(int, int, int, unsigned short);
-extern void func_0005FE55(int);
-extern void guild_service_dispatch(int);
-extern void func_0007425E(int, int);
+extern void cast_spell_on(int, struct record *, int);
+extern void item_make(int, int, struct item *);
+extern void func_0005EE0C(struct record *, int, int);
+extern void func_0005FA0E(int, struct record *, int, unsigned short);
+extern void func_0005FE55(struct record *);
+extern void guild_service_dispatch(struct record *);
+extern void func_0007425E(struct record *, int);
 extern void book_read_header(int, unsigned short);
-extern void pick_up_item(int);
+extern void pick_up_item(struct record *);
 extern void text_draw_centered_colored(int, int, int, int, unsigned char);
 extern void hud_status_set(int);
 extern void picklist_open_strings(int);
 extern void msgbox_yes_no_rsc(int);
 extern void dungeon_load(int);
 extern void location_unload(unsigned short);
-extern void building_enter(int);
+extern void building_enter(struct building *);
 extern void building_exit(void);
-extern void object_free_children(int);
-extern void object_foreach(int, int);
-extern void inventory_open_container(int, int, int);
+extern void object_free_children(struct record *);
+extern void object_foreach(struct record *, int);
+extern void inventory_open_container(struct record *, int, int);
 extern void func_0009A7B8(void);
-int shelf_collect_items(int, int, int);
-int object_count_items(int);
+int shelf_collect_items(struct record *, int, int);
+int object_count_items(struct record *);
 int repair_menu_open(int);
 int coven_menu_open(int);
 int quest_active_for_faction(short);
 int func_000766D1(void);
 int service_menu_open(int);
 int shelf_shop_stocked(int);
-int func_00076E98(int);
-int func_000773BE(int);
-int func_00077639(int, int, int, int);
-void click_describe_item(int);
-void click_describe_creature(int, int);
-void shelf_open(int, int, int);
+int func_00076E98(struct record *);
+int func_000773BE(struct record *);
+int func_00077639(struct record *, int, int, int);
+void click_describe_item(struct item *);
+void click_describe_creature(struct character *, struct career *);
+void shelf_open(struct record *, struct building *, int);
 void shelf_book_chosen(int);
 void shelf_return_items(void);
-void shelf_open_books(int, int, int);
-void shelf_open_stock(int, int, int);
-void npc_click_service(int);
-void shop_open_repair(int, int);
-void npc_talk(int);
-void func_000757C9(int);
+void shelf_open_books(struct record *, struct building *, int);
+void shelf_open_stock(struct record *, struct building *, int);
+void npc_click_service(struct record *);
+void shop_open_repair(int, struct record *);
+void npc_talk(struct record *);
+void func_000757C9(struct record *);
 void repair_menu_close(void);
 void repair_menu_sell(void);
 void coven_menu_close(void);
-void click_show_building_info(int, int);
+void click_show_building_info(int, struct record *);
 void service_menu_close(void);
 void service_menu_sell(void);
-void func_00076A8F(int);
+void func_00076A8F(struct record *);
 void position_history_record(void);
-void func_00077340(int);
+void func_00077340(struct record *);
 #pragma aux func_000A0ED9 parm routine [];
 
-void click_describe_item(int a1)
+void click_describe_item(struct item *a1)
 {
-    if (strchr(*(int *)D_00183248, (int)(unsigned char)*(signed char *)((char *)a1)) == 0) goto L7454D;
+    if (strchr(*(int *)D_00183248, (int)(unsigned char)a1->name[0]) == 0) goto L7454D;
     func_000A0ED9(204, (int)D_00176198);
     mc_sprintf((int)text_buffer, *(int *)D_0018324C, a1);
     goto L74575;
@@ -270,26 +271,26 @@ L74575:;
     hud_message_add((int)text_buffer);
 }
 
-void click_describe_creature(int a1, int a2)
+void click_describe_creature(struct character *a1, struct career *a2)
 {
-    if (strchr(*(int *)D_00183248, (int)(unsigned char)*(signed char *)((char *)a2 + 28)) == 0) goto L745DF;
+    if (strchr(*(int *)D_00183248, (int)(unsigned char)a2->name[0]) == 0) goto L745DF;
     func_000A0ED9(215, (int)D_00176198);
-    mc_sprintf((int)text_buffer, *(int *)D_0018324C, a2 + 28);
+    mc_sprintf((int)text_buffer, *(int *)D_0018324C, a2->name);
     goto L7460A;
 L745DF:;
     func_000A0ED9(217, (int)D_00176198);
-    mc_sprintf((int)text_buffer, *(int *)D_00183250, a2 + 28);
+    mc_sprintf((int)text_buffer, *(int *)D_00183250, a2->name);
 L7460A:;
     hud_message_add((int)text_buffer);
 }
 
 int click_world_face(int a1)
 {
-    int l_24;
+    struct building *l_24;
     int l_20;
     int l_1C;
 
-    l_24 = object_building(*(int *)((char *)a1 + 4));
+    l_24 = object_building((struct record *)*(int *)((char *)a1 + 4));
     if (((int)(unsigned char)*(signed char *)(*(char **)((char *)a1 + 4))) == 6) goto L74660;
     if (((int)(unsigned char)*(signed char *)(*(char **)((char *)a1 + 4))) != 43) goto L74662;
 L74660:;
@@ -310,7 +311,7 @@ L746C8:;
     switch ((unsigned)l_20) {
 case 56:
 case 331:
-    if (((int)(unsigned short)(*(short *)(*(char **)player_character + 64) & 1536)) == 0) goto L74756;
+    if (((int)(unsigned short)(player_character->flags & 1536)) == 0) goto L74756;
     hud_message_add((int)D_001761A0);
     goto L748B1;
 L74756:;
@@ -318,12 +319,12 @@ L74756:;
     automap_load();
     goto L748B1;
 case 74:
-    if (((int)(unsigned short)(*(short *)(*(char **)player_character + 64) & 1536)) == 0) goto L74790;
+    if (((int)(unsigned short)(player_character->flags & 1536)) == 0) goto L74790;
     hud_message_add((int)D_001761C4);
     goto L748B1;
 L74790:;
-    if (((int)(unsigned char)*(signed char *)(*(char **)(*(char **)player_object + 67))) != 1) goto L747E8;
-    if (func_000CE45E((int)D_00187644, (int)(short)*(short *)((char *)l_24 + 18), 21) == 0) goto L747C4;
+    if (player_object->parent->type != 1) goto L747E8;
+    if (func_000CE45E((int)D_00187644, (int)(short)l_24->faction_id, 21) == 0) goto L747C4;
 {
     unsigned char l_2C;
     l_2C = 1;
@@ -332,7 +333,7 @@ L747C4:;
     l_2C = 0;
 L747C8:;
     *(signed char *)D_00196263 = l_2C;
-    town_map_note_building(*(int *)((char *)a1 + 4), l_24);
+    town_map_note_building((struct record *)*(int *)((char *)a1 + 4), l_24);
     building_enter(l_24);
     goto L747F4;
 L747E8:;
@@ -349,20 +350,20 @@ L74805:;
     goto L7488B;
 L7480A:;
     if (building_is_open(l_24) != 0) goto L7482D;
-    if (lockpick_action_door(l_24, 19, *(int *)((char *)a1 + 4)) != 0) goto L7482F;
+    if (lockpick_action_door(l_24, 19, (struct record *)*(int *)((char *)a1 + 4)) != 0) goto L7482F;
 L7482D:;
     goto L74889;
 L7482F:;
-    func_0005FA0E(14, (int)D_001960D9, (int)(unsigned char)*(signed char *)((char *)l_24 + 25), (int)(unsigned short)(*(short *)(*(char **)player_character + 64) & 1));
+    func_0005FA0E(14, (struct record *)D_001960D9, l_24->quality, (int)(unsigned short)(player_character->flags & 1));
     *(int *)D_00195AEC = *(int *)((char *)a1 + 4);
     shelf_return_items();
-    shelf_open_stock(*(int *)((char *)a1 + 4), l_24, *(int *)D_00195D54);
+    shelf_open_stock((struct record *)*(int *)((char *)a1 + 4), l_24, *(int *)D_00195D54);
     return 1;
 L74889:;
     goto L748B1;
 L7488B:;
     if (l_1C >= 4) goto L748B1;
-    shelf_open(*(int *)((char *)a1 + 4), l_24, *(int *)D_00195D54);
+    shelf_open((struct record *)*(int *)((char *)a1 + 4), l_24, *(int *)D_00195D54);
     return 1;
 default:
 L748B1:;
@@ -373,7 +374,7 @@ L748B6:;
     switch ((unsigned)l_20) {
 case 56:
 case 331:
-    if (((int)(unsigned short)(*(short *)(*(char **)player_character + 64) & 1536)) == 0) goto L74911;
+    if (((int)(unsigned short)(player_character->flags & 1536)) == 0) goto L74911;
     hud_message_add((int)D_001761E8);
     goto L74988;
 L74911:;
@@ -384,7 +385,7 @@ case 74:
     hud_message_add((int)D_0017620C);
     goto L74988;
 case 95:
-    if (*(int *)wagon_container == 0) goto L74943;
+    if (wagon_container == 0) goto L74943;
     msgbox_yes_no_rsc(38);
     goto L7494A;
 L74943:;
@@ -396,16 +397,16 @@ L7494A:;
     goto L74988;
 L74970:;
     automap_save();
-    location_unload((int)(unsigned short)*(short *)(*(char **)D_00195AC4 + 27));
+    location_unload(D_00195AC4->image);
 default:
 L74988:;
     return 0;
 }
 }
 
-void shelf_open(int a1, int a2, int a3)
+void shelf_open(struct record *a1, struct building *a2, int a3)
 {
-    switch (*(unsigned char *)((char *)a2 + 24)) {
+    switch (a2->type) {
     return;
 case 11:
     if (guild_find_membership_by_kind(1) != 0) goto L74A55;
@@ -446,26 +447,26 @@ void shelf_book_chosen(int a1)
     shelf_return_items();
 }
 
-int shelf_collect_items(int a1, int a2, int a3)
+int shelf_collect_items(struct record *a1, int a2, int a3)
 {
     int l_1C;
-    int l_18;
-    int l_14;
+    struct record *l_18;
+    struct item *l_14;
 
     l_1C = 0;
-    object_free_children((int)D_001960D9);
-    a1 = *(int *)((char *)a1 + 63);
+    object_free_children((struct record *)D_001960D9);
+    a1 = a1->children;
 L74B21:;
     if (a1 == 0) goto L74BFF;
-    l_18 = *(int *)((char *)a1 + 55);
-    if (((int)(unsigned char)*(signed char *)((char *)a1)) != 36) goto L74B54;
+    l_18 = a1->next;
+    if (a1->type != 36) goto L74B54;
     if (((int)(unsigned short)*(short *)((char *)a1 + 27)) == a3) goto L74B59;
 L74B54:;
     goto L74BF4;
 L74B59:;
-    l_14 = a1 + 71;
+    l_14 = &a1->data.item;
     if (((struct bf8_1_1 *)&D_001940D7)->f == 0) goto L74B77;
-    if (((int)(short)*(short *)((char *)l_14 + 67)) != (-1)) goto L74B79;
+    if (l_14->enchantments[0].type != (-1)) goto L74B79;
 L74B77:;
     goto L74B84;
 L74B79:;
@@ -473,17 +474,17 @@ L74B79:;
     goto L74BFA;
 L74B84:;
     if (a2 == (-1)) goto L74B9B;
-    if (((int)(unsigned short)*(short *)((char *)l_14 + 32)) != a2) goto L74BF4;
+    if (l_14->group != a2) goto L74BF4;
 L74B9B:;
     l_1C++;
-    *(signed char *)((char *)a1 + 21) &= 253;
-    *(signed char *)((char *)a1 + 21) |= 32;
+    a1->flags &= ~0x2;
+    a1->flags |= 32;
     func_0008DADD(a1);
-    object_reparent((int)D_001960D9, a1);
-    *(int *)((char *)a1 + 7) = *(int *)(*(char **)player_object + 7);
-    *(int *)((char *)a1 + 11) = *(int *)(*(char **)player_object + 11);
-    *(int *)((char *)a1 + 15) = *(int *)(*(char **)player_object + 15);
-    *(signed char *)((char *)a1) = 2;
+    object_reparent((struct record *)D_001960D9, a1);
+    a1->x = player_object->x;
+    a1->y = player_object->y;
+    a1->z = player_object->z;
+    a1->type = 2;
 L74BF4:;
     a1 = l_18;
 L74BFA:;
@@ -494,28 +495,28 @@ L74BFF:;
 
 void shelf_return_items(void)
 {
-    int l_1C;
-    int l_18;
+    struct record *l_1C;
+    struct record *l_18;
 
     *(int *)D_00195ADC = 0;
-    l_1C = *(int *)D_00196118;
+    l_1C = (struct record *)*(int *)D_00196118;
 L74C30:;
     if (l_1C == 0) return;
-    l_18 = *(int *)((char *)l_1C + 55);
-    *(signed char *)((char *)l_1C + 21) |= 2;
+    l_18 = l_1C->next;
+    l_1C->flags |= 2;
     func_0008DADD(l_1C);
-    object_reparent(*(int *)D_00195AEC, l_1C);
-    *(signed char *)((char *)l_1C) = 36;
+    object_reparent((struct record *)*(int *)D_00195AEC, l_1C);
+    l_1C->type = 36;
     *(short *)((char *)l_1C + 27) = *(short *)D_00195F58;
     l_1C = l_18;
     goto L74C30;
 }
 
-void shelf_open_books(int a1, int a2, int a3)
+void shelf_open_books(struct record *a1, struct building *a2, int a3)
 {
     int l_24;
     int l_20;
-    int l_1C;
+    struct record *l_1C;
     int l_18;
     int l_14;
     int l_10;
@@ -529,7 +530,7 @@ L74CCB:;
     goto L74D9C;
 L74CD0:;
     *(int *)(stocked_shop_ids + ((*(int *)stocked_shop_count)++ << 2)) = a3;
-    l_20 = ((int)(unsigned char)*(signed char *)((char *)a2 + 25)) >> 1;
+    l_20 = a2->quality >> 1;
     if (l_20 != 0) goto L74D04;
     l_20++;
 L74D04:;
@@ -541,34 +542,34 @@ L74D18:;
     l_24++;
     goto L74D0B;
 L74D20:;
-    l_1C = object_create_child((int)D_001960D9, 0, 107);
-    *(signed char *)((char *)l_1C) = 2;
-    *(int *)((char *)l_1C + 7) = *(int *)(*(char **)player_object + 7);
-    *(int *)((char *)l_1C + 11) = *(int *)(*(char **)player_object + 11);
-    *(int *)((char *)l_1C + 15) = *(int *)(*(char **)player_object + 15);
-    *(signed char *)((char *)l_1C + 21) |= 32;
-    item_make(7, ((int)(unsigned char)*(signed char *)((char *)a2 + 25)) / 6, l_1C + 71);
+    l_1C = object_create_child((struct record *)D_001960D9, 0, 107);
+    l_1C->type = 2;
+    l_1C->x = player_object->x;
+    l_1C->y = player_object->y;
+    l_1C->z = player_object->z;
+    l_1C->flags |= 32;
+    item_make(7, a2->quality / 6, &l_1C->data.item);
     goto L74D18;
 L74D9C:;
-    if (((int)(unsigned char)*(signed char *)((char *)a2 + 24)) == 10) goto L74DBC;
-    if (((int)(unsigned char)*(signed char *)((char *)a2 + 24)) != 11) goto L74DBE;
+    if (a2->type == 10) goto L74DBC;
+    if (a2->type != 11) goto L74DBE;
 L74DBC:;
     goto L74DD2;
 L74DBE:;
-    if (((int)(unsigned char)*(signed char *)((char *)a2 + 24)) != 14) goto L74E9C;
+    if (a2->type != 14) goto L74E9C;
 L74DD2:;
     l_18 = *(int *)D_00195C44;
     l_14 = *(int *)D_00195C44 + 1000;
     l_10 = l_14;
-    l_1C = *(int *)D_00196118;
+    l_1C = (struct record *)*(int *)D_00196118;
     l_24 = 0;
 L74DFC:;
     if (l_1C == 0) goto L74E62;
-    *(short *)(D_00190444 + (l_24 * 2)) = *(short *)((char *)l_1C + 134);
+    *(short *)(D_00190444 + (l_24 * 2)) = (short)l_1C->data.item.message;
     book_read_header(l_18, (int)(unsigned short)*(short *)(D_00190444 + (l_24++ * 2)));
     mc_strncpy(l_14, l_18, 4, (int)D_00176198, 479);
     l_14 += func_000A0DF4(l_14) + 1;
-    l_1C = *(int *)((char *)l_1C + 55);
+    l_1C = l_1C->next;
     goto L74DFC;
 L74E62:;
     *(signed char *)((char *)l_14) = 0;
@@ -576,20 +577,20 @@ L74E62:;
     *(int *)D_00195AE4 = (int)shelf_book_chosen;
     *(signed char *)D_00196272 = 1;
     *(int *)D_00195ADC = (int)shelf_return_items;
-    *(int *)D_00195AEC = a1;
+    *(int *)D_00195AEC = (int)a1;
     *(signed char *)D_001A4C9C = 1;
     return;
 L74E9C:;
-    inventory_open_container((int)D_001960D9, 1, 4);
+    inventory_open_container((struct record *)D_001960D9, 1, 4);
     *(int *)D_00195ADC = (int)shelf_return_items;
-    *(int *)D_00195AEC = a1;
+    *(int *)D_00195AEC = (int)a1;
 }
 
-void shelf_open_stock(int a1, int a2, int a3)
+void shelf_open_stock(struct record *a1, struct building *a2, int a3)
 {
     int l_24;
     int l_20;
-    int l_1C;
+    struct record *l_1C;
     int l_18;
     int l_14;
     int l_10;
@@ -612,44 +613,44 @@ L74F44:;
     goto L74FB3;
 L74F46:;
     *(int *)(stocked_shop_ids + ((*(int *)stocked_shop_count)++ << 2)) = a3;
-    func_0005EE0C((int)D_001960D9, ((int)(unsigned char)*(signed char *)((char *)a2 + 24)) + 32, (int)(unsigned char)*(signed char *)((char *)a2 + 25));
-    if (*(signed char *)((char *)a2 + 24) != 0) goto L74F98;
+    func_0005EE0C((struct record *)D_001960D9, a2->type + 32, a2->quality);
+    if (a2->type != 0) goto L74F98;
     if (rand_range(1, 100) < 25) goto L74F9A;
 L74F98:;
     goto L74FB3;
 L74F9A:;
-    l_1C = item_add_to_container((int)D_001960D9, 27, 4, 0);
+    l_1C = item_add_to_container((struct record *)D_001960D9, 27, 4, 0);
 L74FB3:;
     if (l_24 != 0) goto L74FC9;
-    if (((int)(unsigned char)*(signed char *)((char *)a2 + 24)) == 9) goto L74FCE;
+    if (a2->type == 9) goto L74FCE;
 L74FC9:;
     goto L750B7;
 L74FCE:;
-    l_1C = object_create_child((int)D_001960D9, 0, 107);
-    *(signed char *)((char *)l_1C) = 2;
-    *(signed char *)((char *)l_1C + 21) |= 33;
-    *(int *)((char *)l_1C + 31) = object_new_id(((unsigned)*(int *)(*(char **)D_00195AC4 + 31)) >> 16);
-    *(int *)((char *)l_1C + 7) = *(int *)(*(char **)player_object + 7);
-    *(int *)((char *)l_1C + 11) = *(int *)(*(char **)player_object + 11);
-    *(int *)((char *)l_1C + 15) = *(int *)(*(char **)player_object + 15);
-    item_make(23, 1, l_1C + 71);
-    l_1C = object_create_child((int)D_001960D9, 0, 107);
-    *(signed char *)((char *)l_1C) = 2;
-    *(signed char *)((char *)l_1C + 21) |= 33;
-    *(int *)((char *)l_1C + 31) = object_new_id(((unsigned)*(int *)(*(char **)D_00195AC4 + 31)) >> 16);
-    *(int *)((char *)l_1C + 7) = *(int *)(*(char **)player_object + 7);
-    *(int *)((char *)l_1C + 11) = *(int *)(*(char **)player_object + 11);
-    *(int *)((char *)l_1C + 15) = *(int *)(*(char **)player_object + 15);
-    item_make(23, 0, l_1C + 71);
+    l_1C = object_create_child((struct record *)D_001960D9, 0, 107);
+    l_1C->type = 2;
+    l_1C->flags |= 33;
+    l_1C->id = object_new_id(((unsigned)D_00195AC4->id) >> 16);
+    l_1C->x = player_object->x;
+    l_1C->y = player_object->y;
+    l_1C->z = player_object->z;
+    item_make(23, 1, &l_1C->data.item);
+    l_1C = object_create_child((struct record *)D_001960D9, 0, 107);
+    l_1C->type = 2;
+    l_1C->flags |= 33;
+    l_1C->id = object_new_id(((unsigned)D_00195AC4->id) >> 16);
+    l_1C->x = player_object->x;
+    l_1C->y = player_object->y;
+    l_1C->z = player_object->z;
+    item_make(23, 0, &l_1C->data.item);
 L750B7:;
     if (((struct bf8_1_1 *)&D_001940D9)->f == 0) goto L750D6;
-    inventory_open_container((int)D_001960D9, 1, 4);
+    inventory_open_container((struct record *)D_001960D9, 1, 4);
     goto L750E7;
 L750D6:;
-    inventory_open_container((int)D_001960D9, 0, 4);
+    inventory_open_container((struct record *)D_001960D9, 0, 4);
 L750E7:;
     *(int *)D_00195ADC = (int)shelf_return_items;
-    *(int *)D_00195AEC = a1;
+    *(int *)D_00195AEC = (int)a1;
 }
 
 void shelf_book_list_update(void)
@@ -675,38 +676,38 @@ L75153:;
     *(signed char *)D_001A4C9C = 0;
 }
 
-void npc_click_service(int a1)
+void npc_click_service(struct record *a1)
 {
     int l_20;
-    int l_1C;
-    int l_18;
+    struct building *l_1C;
+    struct faction *l_18;
 
-    *(int *)coven_menu_npc = a1;
-    *(int *)D_00195CE8 = a1;
-    l_20 = a1 + 71;
+    *(int *)coven_menu_npc = (int)a1;
+    *(int *)D_00195CE8 = (int)a1;
+    l_20 = (int)RECORD_DATA(a1);
     *(short *)D_00195F68 = *(short *)((char *)l_20);
     l_1C = object_building(a1);
     l_18 = faction_find((int)(short)*(short *)((char *)l_20));
     if (l_18 != 0) goto L75245;
     l_18 = faction_find_type_in_region((int)(short)((int)(unsigned char)*(signed char *)current_region), 15);
 L75245:;
-    if (*(signed char *)((char *)a1 + 38) != 0) goto L7530A;
+    if (a1->quest_id != 0) goto L7530A;
     if (((int)(unsigned short)*(short *)((char *)l_20)) == 852) goto L7528A;
-    if (((int)(unsigned char)*(signed char *)((char *)l_18)) != 7) goto L75285;
-    if (((int)(unsigned char)*(signed char *)((char *)l_18 + 1)) != 255) goto L7528A;
+    if (l_18->type != 7) goto L75285;
+    if (l_18->region != 255) goto L7528A;
 L75285:;
     goto L7530A;
 L7528A:;
     if (((int)(unsigned short)*(short *)((char *)l_20)) != 852) goto L752C4;
     l_18 = faction_find_type_in_region((int)(short)((int)(unsigned char)*(signed char *)current_region), 7);
     if (l_18 == 0) goto L752C4;
-    *(short *)((char *)l_20) = *(short *)((char *)l_18 + 33);
+    *(short *)((char *)l_20) = l_18->id;
 L752C4:;
-    if (quest_active_for_faction((int)(short)*(short *)((char *)l_18 + 33)) != 0) goto L7530A;
-    quest_pick_file(82, 0, func_000766D1(), 67, (int)(unsigned char)*(signed char *)(*(char **)player_character + 129));
+    if (quest_active_for_faction((int)(short)l_18->id) != 0) goto L7530A;
+    quest_pick_file(82, 0, func_000766D1(), 67, player_character->level);
     if (*(signed char *)D_001961F5 != 0) return;
 L7530A:;
-    if (*(signed char *)((char *)a1 + 38) != 0) goto L7531F;
+    if (a1->quest_id != 0) goto L7531F;
     if (func_0004CD80(l_20) != 0) goto L75321;
 L7531F:;
     goto L75326;
@@ -718,7 +719,7 @@ L75326:;
 L75341:;
     goto L7535A;
 L75343:;
-    if (((int)(unsigned char)*(signed char *)((char *)faction_find((int)(short)*(short *)((char *)l_20)))) == 8) goto L7535C;
+    if (faction_find((int)(short)*(short *)((char *)l_20))->type == 8) goto L7535C;
 L7535A:;
     goto L7536B;
 L7535C:;
@@ -726,9 +727,9 @@ L7535C:;
     return;
 L7536B:;
     if (l_1C == 0) goto L75669;
-    if (((int)(unsigned short)*(short *)((char *)l_18 + 33)) == 42) goto L753A5;
-    if (*(int *)((char *)l_18 + 88) == 0) goto L753A3;
-    if (((int)(unsigned short)*(short *)(*(char **)((char *)l_18 + 88) + 33)) == 42) goto L753A5;
+    if (l_18->id == 42) goto L753A5;
+    if (l_18->parent == 0) goto L753A3;
+    if (l_18->parent->id == 42) goto L753A5;
 L753A3:;
     goto L753B3;
 L753A5:;
@@ -739,9 +740,9 @@ L753B5:;
     guild_service_dispatch(a1);
     goto L75667;
 L753C2:;
-    if (((int)(unsigned short)*(short *)((char *)l_18 + 33)) == 108) goto L753F2;
-    if (*(int *)((char *)l_18 + 88) == 0) goto L753F0;
-    if (((int)(unsigned short)*(short *)(*(char **)((char *)l_18 + 88) + 33)) == 108) goto L753F2;
+    if (l_18->id == 108) goto L753F2;
+    if (l_18->parent == 0) goto L753F0;
+    if (l_18->parent->id == 108) goto L753F2;
 L753F0:;
     goto L753FD;
 L753F2:;
@@ -752,9 +753,9 @@ L753FF:;
     guild_service_dispatch(a1);
     goto L75667;
 L7540C:;
-    if (((int)(unsigned short)*(short *)((char *)l_18 + 33)) == 108) goto L7543C;
-    if (*(int *)((char *)l_18 + 88) == 0) goto L7543A;
-    if (((int)(unsigned short)*(short *)(*(char **)((char *)l_18 + 88) + 33)) == 108) goto L7543C;
+    if (l_18->id == 108) goto L7543C;
+    if (l_18->parent == 0) goto L7543A;
+    if (l_18->parent->id == 108) goto L7543C;
 L7543A:;
     goto L75447;
 L7543C:;
@@ -765,7 +766,7 @@ L75449:;
     npc_talk(a1);
     goto L75667;
 L75456:;
-    switch (*(unsigned char *)((char *)l_1C + 24)) {
+    switch (l_1C->type) {
     goto L7565F;
 case 11:
 case 14:
@@ -781,7 +782,7 @@ L75537:;
     goto L75667;
 case 3:
     *(int *)service_menu_handler = (int)bank_open;
-    *(int *)service_menu_npc = a1;
+    *(int *)service_menu_npc = (int)a1;
     if (((int)(unsigned char)(*(signed char *)((char *)l_20 + 2) & 8)) == 0) goto L7556B;
     service_menu_open((int)D_0017628F);
     goto L75573;
@@ -792,7 +793,7 @@ L75573:;
 case 2:
     if (((int)(unsigned short)(*(short *)((char *)l_20) & 8)) == 0) goto L755A7;
     *(signed char *)D_001A4C9D = 2;
-    *(int *)repair_menu_npc = a1;
+    *(int *)repair_menu_npc = (int)a1;
     repair_menu_open(1);
     goto L755AF;
 L755A7:;
@@ -802,7 +803,7 @@ L755AF:;
 case 13:
     if (((int)(unsigned char)(*(signed char *)((char *)l_20 + 2) & 8)) == 0) goto L755E0;
     *(signed char *)D_001A4C9D = 3;
-    *(int *)repair_menu_npc = a1;
+    *(int *)repair_menu_npc = (int)a1;
     repair_menu_open(1);
     goto L755E8;
 L755E0:;
@@ -812,7 +813,7 @@ L755E8:;
 case 9:
     if (((int)(unsigned short)(*(short *)((char *)l_20) & 8)) == 0) goto L7561C;
     *(signed char *)D_001A4C9D = 255;
-    *(int *)repair_menu_npc = a1;
+    *(int *)repair_menu_npc = (int)a1;
     repair_menu_open(1);
     goto L75624;
 L7561C:;
@@ -825,7 +826,7 @@ case 6:
 case 8:
 case 12:
     if (((int)(unsigned char)(*(signed char *)((char *)l_20 + 2) & 8)) == 0) goto L75655;
-    *(int *)service_menu_npc = a1;
+    *(int *)service_menu_npc = (int)a1;
     *(int *)service_menu_handler = (int)service_menu_sell;
     service_menu_open((int)D_00176297);
     goto L7565D;
@@ -843,19 +844,19 @@ L75669:;
 }
 }
 
-void shop_open_repair(int a1, int a2)
+void shop_open_repair(int a1, struct record *a2)
 {
-    int l_14;
+    struct record *l_14;
 
     *(signed char *)D_001940D4 &= 253;
-    l_14 = *(int *)((char *)a2 + 63);
+    l_14 = a2->children;
     if (l_14 == 0) goto L756AB;
-    *(signed char *)((char *)l_14 + 21) |= 1;
+    l_14->flags |= 1;
 L756AB:;
     inventory_open_container(a2, 3, 7);
 }
 
-void npc_talk(int a1)
+void npc_talk(struct record *a1)
 {
     int l_1C;
     unsigned short l_18;
@@ -867,7 +868,7 @@ void npc_talk(int a1)
     l_1C |= quest_raise_event(28, a1, 0);
     l_1C |= quest_raise_event(71, a1, 0);
     l_1C |= quest_raise_event(1, 0, a1);
-    if (((int)(unsigned char)*(signed char *)((char *)a1)) != 8) goto L7575E;
+    if (a1->type != 8) goto L7575E;
     if (l_18 != 0) goto L75760;
 L7575E:;
     goto L7576E;
@@ -875,8 +876,8 @@ L75760:;
     l_1C |= quest_event_clicked_faction((int)(unsigned short)l_18);
 L7576E:;
     if (l_1C != 0) return;
-    if (((int)(unsigned char)*(signed char *)((char *)a1)) != 8) goto L7578C;
-    if (*(signed char *)((char *)a1 + 38) == 0) goto L7578E;
+    if (a1->type != 8) goto L7578C;
+    if (a1->quest_id == 0) goto L7578E;
 L7578C:;
     goto L757B7;
 L7578E:;
@@ -888,16 +889,16 @@ L757B7:;
     talk_start(a1);
 }
 
-void func_000757C9(int a1)
+void func_000757C9(struct record *a1)
 {
-    if (((int)(unsigned char)*(signed char *)((char *)a1)) != 2) return;
+    if (a1->type != 2) return;
     (*(int *)D_00190BE4)++;
 }
 
-int object_count_items(int a1)
+int object_count_items(struct record *a1)
 {
     *(int *)D_00190BE4 = 0;
-    object_foreach(*(int *)((char *)a1 + 63), (int)func_000757C9);
+    object_foreach(a1->children, (int)func_000757C9);
     return *(int *)D_00190BE4;
 }
 
@@ -989,20 +990,20 @@ L75AD1:;
 void repair_menu_repair(void)
 {
     repair_menu_close();
-    shop_open_repair((int)(unsigned char)*(signed char *)D_001A4C9D, *(int *)repair_menu_npc);
+    shop_open_repair((int)(unsigned char)*(signed char *)D_001A4C9D, (struct record *)*(int *)repair_menu_npc);
 }
 
 void repair_menu_talk(void)
 {
     repair_menu_close();
-    npc_talk(*(int *)repair_menu_npc);
+    npc_talk((struct record *)*(int *)repair_menu_npc);
 }
 
 void repair_menu_sell(void)
 {
     repair_menu_close();
-    object_free_children((int)D_001960D9);
-    inventory_open_container((int)D_001960D9, 2, 6);
+    object_free_children((struct record *)D_001960D9);
+    inventory_open_container((struct record *)D_001960D9, 2, 6);
 }
 
 int coven_menu_open(int a1)
@@ -1093,7 +1094,7 @@ L75D5B:;
 void coven_menu_talk(void)
 {
     coven_menu_close();
-    npc_talk(*(int *)coven_menu_npc);
+    npc_talk((struct record *)*(int *)coven_menu_npc);
 }
 
 void coven_menu_summon(void)
@@ -1102,9 +1103,9 @@ void coven_menu_summon(void)
     daedra_summon(*(int *)coven_menu_npc);
 }
 
-void click_item(int a1, int a2)
+void click_item(int a1, struct record *a2)
 {
-    int l_14;
+    struct item *l_14;
 
     switch (*(unsigned char *)interaction_mode) {
     return;
@@ -1119,18 +1120,18 @@ L75E57:;
 L75E5F:;
     return;
 case 1:
-    l_14 = a2 + 71;
+    l_14 = &a2->data.item;
     click_describe_item(l_14);
 default:;
 }
 }
 
-void func_00075E7B(int a1, int a2)
+void func_00075E7B(int a1, struct record *a2)
 {
     click_show_building_info(a1, a2);
 }
 
-void click_npc(int a1, int a2)
+void click_npc(int a1, struct record *a2)
 {
     *(int *)D_00195A84 = npc_talk_record_build(a2);
     switch (*(unsigned char *)interaction_mode) {
@@ -1153,13 +1154,13 @@ default:;
 }
 }
 
-void click_creature(int a1, int a2)
+void click_creature(int a1, struct record *a2)
 {
-    int l_18;
-    int l_14;
+    struct character *l_18;
+    struct career *l_14;
 
-    l_18 = a2 + 71;
-    l_14 = l_18 + 560;
+    l_18 = &a2->data.character;
+    l_14 = &l_18->career;
     if (*(int *)spell_ready_touch == 0) goto L75F84;
     if (*(int *)pick_distance < 160) goto L75F86;
 L75F84:;
@@ -1186,7 +1187,7 @@ default:;
 }
 }
 
-void click_door(int a1, int a2)
+void click_door(int a1, struct record *a2)
 {
     if (*(int *)pick_distance <= 128) goto L7602A;
     hud_status_set(*(int *)D_0017CA14);
@@ -1209,9 +1210,9 @@ void func_0007606C(int a1, int a2)
 {
 }
 
-void click_interior_model(int a1, int a2)
+void click_interior_model(int a1, struct record *a2)
 {
-    int l_18;
+    struct building *l_18;
     int l_14;
 
     switch (*(unsigned char *)interaction_mode) {
@@ -1244,9 +1245,9 @@ L76157:;
 L76165:;
     goto L7621E;
 L7616A:;
-    if (*(int *)((char *)l_18 + 20) != *(int *)(*(char **)player_character + 116)) goto L76198;
+    if (l_18->id != player_character->house) goto L76198;
     *(signed char *)D_001940D6 |= 4;
-    inventory_open_container((int)D_00196092, 0, 4);
+    inventory_open_container((struct record *)D_00196092, 0, 4);
     goto L7621C;
 L76198:;
     msgbox_yes_no_rsc(37);
@@ -1256,7 +1257,7 @@ L76198:;
 L761C4:;
     goto L761EB;
 L761C6:;
-    if (rand_range(0, 255) >= (108 - ((int)(short)*(short *)(*(char **)player_character + 247)))) goto L761ED;
+    if (rand_range(0, 255) >= (108 - player_character->skills[15].value)) goto L761ED;
 L761EB:;
     goto L761FE;
 L761ED:;
@@ -1265,7 +1266,7 @@ L761ED:;
 L761FE:;
     if (l_14 == 0) goto L7621C;
     *(signed char *)D_001940D6 |= 4;
-    inventory_open_container((int)D_00196120, 0, 4);
+    inventory_open_container((struct record *)D_00196120, 0, 4);
 L7621C:;
     goto L7625E;
 L7621E:;
@@ -1307,17 +1308,17 @@ default:;
 }
 }
 
-void click_corpse(int a1, int a2)
+void click_corpse(int a1, struct record *a2)
 {
-    int l_14;
+    struct character *l_14;
 
     switch (*(unsigned char *)interaction_mode) {
     return;
 case 1:
-    l_14 = a2 + 71;
-    if (((int)(unsigned char)*(signed char *)((char *)l_14 + 67)) >= 43) goto L76353;
+    l_14 = &a2->data.character;
+    if (l_14->race >= 43) goto L76353;
     func_000A0ED9(1153, (int)D_00176198);
-    mc_sprintf((int)text_buffer, *(int *)D_00184329, *(int *)(monster_names + (((int)(unsigned char)*(signed char *)((char *)l_14 + 67)) << 2)));
+    mc_sprintf((int)text_buffer, *(int *)D_00184329, *(int *)(monster_names + (l_14->race << 2)));
     goto L76372;
 L76353:;
     mc_strncpy((int)text_buffer, *(int *)D_00185093, 160, (int)D_00176198, 1155);
@@ -1340,7 +1341,7 @@ default:;
 }
 }
 
-void func_000763C6(int a1, int a2)
+void func_000763C6(int a1, struct record *a2)
 {
     switch (*(unsigned char *)interaction_mode) {
     return;
@@ -1349,8 +1350,8 @@ case 2:
     hud_status_set(*(int *)D_0017CA14);
     goto L76435;
 L76411:;
-    if (((int)(unsigned short)(*(short *)((char *)a2 + 25) & 16384)) != 0) goto L76435;
-    *(signed char *)((char *)a2 + 26) |= 64;
+    if (((int)(unsigned short)(a2->pad19 & 16384)) != 0) goto L76435;
+    a2->pad19 |= 0x4000;
     pickpocket_attempt(a2);
 L76435:;
     return;
@@ -1366,7 +1367,7 @@ default:;
 }
 }
 
-void click_loot_container(int a1, int a2)
+void click_loot_container(int a1, struct record *a2)
 {
     if (*(int *)pick_distance <= 128) goto L7648E;
     hud_status_set(*(int *)D_0017CA14);
@@ -1378,20 +1379,20 @@ case 0:
 case 1:
 case 2:
 case 3:
-    if ((((int)(unsigned short)*(short *)((char *)a2 + 27)) >> 7) == 216) goto L764C9;
-    if (((int)(unsigned short)*(short *)((char *)a2 + 27)) != 26112) return;
+    if ((a2->image >> 7) == 216) goto L764C9;
+    if (a2->image != 26112) return;
 L764C9:;
-    if (*(int *)((char *)a2 + 63) != 0) goto L764DA;
+    if (a2->children != 0) goto L764DA;
     func_0005FE55(a2);
 L764DA:;
     func_00076A8F(a2);
-    if (*(int *)((char *)a2 + 63) == 0) return;
+    if (a2->children == 0) return;
     inventory_open_container(a2, 0, 5);
 default:;
 }
 }
 
-void func_00076503(int a1, int a2)
+void func_00076503(int a1, struct record *a2)
 {
     switch (*(unsigned char *)interaction_mode) {
     return;
@@ -1404,12 +1405,12 @@ default:;
 }
 }
 
-void click_show_building_info(int a1, int a2)
+void click_show_building_info(int a1, struct record *a2)
 {
-    int l_18;
+    struct building *l_18;
     int l_14;
 
-    if (((int)(unsigned char)*(signed char *)((char *)a2)) != 56) goto L7656E;
+    if (a2->type != 56) goto L7656E;
     if (((int)(short)*(short *)(*(char **)D_00195AE0 + 14)) == 417) goto L76570;
 L7656E:;
     goto L7657E;
@@ -1421,37 +1422,37 @@ L76580:;
     func_0001D739();
     return;
 L7658A:;
-    if (((int)(unsigned char)*(signed char *)(*(char **)((char *)a2 + 67))) != 38) return;
+    if (a2->parent->type != 38) return;
     l_18 = object_building(a2);
     if (l_18 == 0) return;
-    if (((int)(unsigned char)*(signed char *)((char *)l_18 + 24)) == 23) return;
+    if (l_18->type == 23) return;
     town_map_note_building(a2, l_18);
     hud_message_add(building_name(l_18));
-    if (((int)(unsigned char)*(signed char *)((char *)l_18 + 24)) == 1) goto L765FD;
+    if (l_18->type == 1) goto L765FD;
     if (building_is_open(l_18) == 0) goto L765FF;
 L765FD:;
     goto L7660F;
 L765FF:;
-    if (((int)(unsigned char)*(signed char *)((char *)l_18 + 24)) < 14) goto L76611;
+    if (l_18->type < 14) goto L76611;
 L7660F:;
     return;
 L76611:;
     func_000A0ED9(1274, (int)D_00176198);
-    mc_sprintf((int)text_buffer, (int)D_001762F7, (int)(unsigned char)*(signed char *)(building_open_hours + (((int)(unsigned char)*(signed char *)((char *)l_18 + 24)) * 2)), (int)(unsigned char)*(signed char *)(D_0017C5B9 + (((int)(unsigned char)*(signed char *)((char *)l_18 + 24)) * 2)));
+    mc_sprintf((int)text_buffer, (int)D_001762F7, (int)(unsigned char)*(signed char *)(building_open_hours + (l_18->type * 2)), (int)(unsigned char)*(signed char *)(D_0017C5B9 + (l_18->type * 2)));
     hud_message_add((int)text_buffer);
 }
 
 int quest_active_for_faction(short a1)
 {
-    int l_20;
+    struct record *l_20;
 
-    l_20 = *(int *)(*(char **)D_00195A00 + 63);
+    l_20 = (struct record *)*(int *)(*(char **)D_00195A00 + 63);
 L76696:;
     if (l_20 == 0) goto L766BD;
-    if (*(short *)((char *)l_20 + 73) != a1) goto L766B2;
+    if (l_20->data.quest.faction_id != a1) goto L766B2;
     return 1;
 L766B2:;
-    l_20 = *(int *)((char *)l_20 + 55);
+    l_20 = l_20->next;
     goto L76696;
 L766BD:;
     return 0;
@@ -1590,7 +1591,7 @@ L769AE:;
 void service_menu_talk(void)
 {
     service_menu_close();
-    npc_talk(*(int *)service_menu_npc);
+    npc_talk((struct record *)*(int *)service_menu_npc);
 }
 
 void service_menu_service(void)
@@ -1624,16 +1625,16 @@ L76A7B:;
     return 0;
 }
 
-void func_00076A8F(int a1)
+void func_00076A8F(struct record *a1)
 {
     if (a1 == 0) return;
-    a1 = *(int *)((char *)a1 + 63);
+    a1 = a1->children;
 L76AAF:;
     if (a1 == 0) return;
-    *(int *)((char *)a1 + 7) = *(int *)(*(char **)player_object + 7);
-    *(int *)((char *)a1 + 11) = *(int *)(*(char **)player_object + 11);
-    *(int *)((char *)a1 + 15) = *(int *)(*(char **)player_object + 15);
-    a1 = *(int *)((char *)a1 + 55);
+    a1->x = player_object->x;
+    a1->y = player_object->y;
+    a1->z = player_object->z;
+    a1 = a1->next;
     goto L76AAF;
 }
 
@@ -1645,7 +1646,7 @@ L76B17:;
     return;
 L76B19:;
     if (rand() >= 20) return;
-    sound_play(rand_range(0, 14) + 329, *(int *)player_object, 100);
+    sound_play(rand_range(0, 14) + 329, player_object, 100);
 }
 
 void footstep_sounds(void)
@@ -1653,13 +1654,13 @@ void footstep_sounds(void)
     int l_1C;
     int l_18;
 
-    if (func_000C7FD9(*(int *)D_001A4FBC, *(int *)D_001A4FC4, *(int *)(*(char **)player_object + 7), *(int *)(*(char **)player_object + 15)) <= 100) goto L76B8C;
+    if (func_000C7FD9(*(int *)D_001A4FBC, *(int *)D_001A4FC4, player_object->x, player_object->z) <= 100) goto L76B8C;
     if (*(signed char *)player_on_ground != 0) goto L76B91;
 L76B8C:;
     return;
 L76B91:;
-    *(int *)D_001A4FBC = *(int *)(*(char **)player_object + 7);
-    *(int *)D_001A4FC4 = *(int *)(*(char **)player_object + 15);
+    *(int *)D_001A4FBC = player_object->x;
+    *(int *)D_001A4FC4 = player_object->z;
     switch (*(unsigned char *)player_environment) {
 case 1:
     l_18 = (int)(unsigned char)*(signed char *)(climate_weathers + climate_category());
@@ -1682,7 +1683,7 @@ L76C2A:;
 L76C31:;
     l_1C <<= 1;
     if (*(int *)dungeon_water_level == 10000) goto L76C50;
-    if (*(int *)(*(char **)player_object + 11) > *(int *)dungeon_water_level) goto L76C52;
+    if (player_object->y > *(int *)dungeon_water_level) goto L76C52;
 L76C50:;
     goto L76C5B;
 L76C52:;
@@ -1707,12 +1708,12 @@ L76C8D:;
     l_1C = 10;
 L76C9D:;
     position_history_record();
-    if (((int)(unsigned short)(*(short *)(*(char **)player_character + 64) & 1536)) != 0) return;
+    if (((int)(unsigned short)(player_character->flags & 1536)) != 0) return;
     if (((struct bf8_6_1 *)&D_001940D7)->f == 0) goto L76CC8;
     l_1C++;
 L76CC8:;
     *(signed char *)D_001940D7 ^= 64;
-    sound_play((int)(unsigned char)*(signed char *)(footstep_sound_ids + l_1C), *(int *)player_object, 100);
+    sound_play((int)(unsigned char)*(signed char *)(footstep_sound_ids + l_1C), player_object, 100);
 }
 }
 
@@ -1729,28 +1730,28 @@ L76D3C:;
     l_18++;
     goto L76D34;
 L76D44:;
-    *(int *)(position_history + (l_18 * 12)) = (*(int *)(ground_position_history + (l_18 * 12)) = *(int *)(*(char **)player_object + 7));
-    *(int *)(D_001A4CA4 + (l_18 * 12)) = (*(int *)(D_001A4E24 + (l_18 * 12)) = *(int *)(*(char **)player_object + 11));
-    *(int *)(D_001A4CA8 + (l_18 * 12)) = (*(int *)(D_001A4E28 + (l_18 * 12)) = *(int *)(*(char **)player_object + 15));
+    *(int *)(position_history + (l_18 * 12)) = (*(int *)(ground_position_history + (l_18 * 12)) = player_object->x);
+    *(int *)(D_001A4CA4 + (l_18 * 12)) = (*(int *)(D_001A4E24 + (l_18 * 12)) = player_object->y);
+    *(int *)(D_001A4CA8 + (l_18 * 12)) = (*(int *)(D_001A4E28 + (l_18 * 12)) = player_object->z);
     goto L76D3C;
 }
 
 void position_history_record(void)
 {
-    *(int *)(position_history + (*(int *)position_history_next * 12)) = *(int *)(*(char **)player_object + 7);
-    *(int *)(D_001A4CA4 + (*(int *)position_history_next * 12)) = *(int *)(*(char **)player_object + 11);
-    *(int *)(D_001A4CA8 + (*(int *)position_history_next * 12)) = *(int *)(*(char **)player_object + 15);
+    *(int *)(position_history + (*(int *)position_history_next * 12)) = player_object->x;
+    *(int *)(D_001A4CA4 + (*(int *)position_history_next * 12)) = player_object->y;
+    *(int *)(D_001A4CA8 + (*(int *)position_history_next * 12)) = player_object->z;
     *(int *)position_history_next = (*(int *)position_history_next + 1) % 32;
     (*(int *)D_001A4FCC)++;
     if (*(signed char *)player_on_ground == 0) return;
-    *(int *)(ground_position_history + (*(int *)ground_position_history_next * 12)) = *(int *)(*(char **)player_object + 7);
-    *(int *)(D_001A4E24 + (*(int *)ground_position_history_next * 12)) = *(int *)(*(char **)player_object + 11);
-    *(int *)(D_001A4E28 + (*(int *)ground_position_history_next * 12)) = *(int *)(*(char **)player_object + 15);
+    *(int *)(ground_position_history + (*(int *)ground_position_history_next * 12)) = player_object->x;
+    *(int *)(D_001A4E24 + (*(int *)ground_position_history_next * 12)) = player_object->y;
+    *(int *)(D_001A4E28 + (*(int *)ground_position_history_next * 12)) = player_object->z;
     *(int *)ground_position_history_next = (*(int *)ground_position_history_next + 1) % 32;
     (*(int *)D_001A4FD4)++;
 }
 
-int func_00076E98(int a1)
+int func_00076E98(struct record *a1)
 {
     int l_24;
     int l_20;
@@ -1759,15 +1760,15 @@ int func_00076E98(int a1)
     if (*(signed char *)D_0019629D == 0) goto L76EBE;
     return 0;
 L76EBE:;
-    if (collide_line_of_sight(*(int *)player_object, a1) != 0) goto L76ED8;
+    if (collide_line_of_sight(player_object, a1) != 0) goto L76ED8;
     return 0;
 L76ED8:;
-    l_24 = func_000C808D(*(int *)(*(char **)player_object + 7), *(int *)(*(char **)player_object + 15), *(int *)((char *)a1 + 7), *(int *)((char *)a1 + 15));
-    l_20 = ai_angle_diff((int)(short)*(short *)((char *)a1 + 3), l_24, (int)&l_1C);
+    l_24 = func_000C808D(player_object->x, player_object->z, a1->x, a1->z);
+    l_20 = ai_angle_diff(a1->yaw, l_24, (int)&l_1C);
     return ((l_20 < 400) ? 1 : 0);
 }
 
-int func_00076FF2(int a1)
+int func_00076FF2(struct record *a1)
 {
     int l_2C;
     int l_28;
@@ -1777,13 +1778,13 @@ int func_00076FF2(int a1)
 
     l_1C = 0;
     if (l_1C >= 20) goto L770B4;
-    l_2C = ((rand() % 90) + ((int)(short)*(short *)((char *)*(int *)player_object + 3))) - 45;
+    l_2C = ((rand() % 90) + ((int)(short)*(short *)((char *)*(int *)&player_object + 3))) - 45;
     l_2C &= 2047;
     l_28 = (rand_range(1, 512) + *(int *)D_000CEA24) - 256;
     func_000CE6E2(l_2C, l_28, (int)&l_24, (int)&l_20);
-    *(int *)((char *)a1 + 7) = *(int *)(*(char **)player_object + 7) + l_24;
-    *(int *)((char *)a1 + 15) = *(int *)(*(char **)player_object + 15) + l_20;
-    *(int *)((char *)a1 + 11) = func_0014B45B(*(int *)((char *)a1 + 7), *(int *)((char *)a1 + 15));
+    a1->x = player_object->x + l_24;
+    a1->z = player_object->z + l_20;
+    a1->y = func_0014B45B(a1->x, a1->z);
     return 1;
 L770B4:;
     l_1C = 0;
@@ -1795,9 +1796,9 @@ L770C6:;
     goto L770BB;
 L770CE:;
     func_000CE6E2(rand() % 2048, rand_range(512, 768), (int)&l_24, (int)&l_20);
-    *(int *)((char *)a1 + 7) = *(int *)(*(char **)player_object + 7) + l_24;
-    *(int *)((char *)a1 + 15) = *(int *)(*(char **)player_object + 15) + l_20;
-    *(int *)((char *)a1 + 11) = func_0014B45B(*(int *)((char *)a1 + 7), *(int *)((char *)a1 + 15));
+    a1->x = player_object->x + l_24;
+    a1->z = player_object->z + l_20;
+    a1->y = func_0014B45B(a1->x, a1->z);
     if (func_00076E98(a1) != 0) goto L77152;
     return 1;
 L77152:;
@@ -1806,7 +1807,7 @@ L77157:;
     return 0;
 }
 
-int func_0007716B(int a1, int a2, int a3)
+int func_0007716B(struct record *a1, int a2, int a3)
 {
     int l_24;
     int l_20;
@@ -1827,10 +1828,10 @@ L771A6:;
     goto L7719B;
 L771AE:;
     func_000CE6E2(rand() % 2048, rand_range(a2, a3), (int)&l_20, (int)&l_1C);
-    *(int *)((char *)a1 + 7) = *(int *)(*(char **)player_object + 7) + l_20;
-    *(int *)((char *)a1 + 15) = *(int *)(*(char **)player_object + 15) + l_1C;
-    *(int *)((char *)a1 + 11) = func_0014B45B(*(int *)((char *)a1 + 7), *(int *)((char *)a1 + 15));
-    if (func_0004083A(a1, *(int *)((char *)a1 + 7) - *(int *)(*(char **)D_00195AC4 + 7), *(int *)((char *)a1 + 15) - *(int *)(*(char **)D_00195AC4 + 15)) == 0) goto L77250;
+    a1->x = player_object->x + l_20;
+    a1->z = player_object->z + l_1C;
+    a1->y = func_0014B45B(a1->x, a1->z);
+    if (func_0004083A(a1, a1->x - D_00195AC4->x, a1->z - D_00195AC4->z) == 0) goto L77250;
     return 1;
 L77250:;
     goto L771A6;
@@ -1847,16 +1848,16 @@ L7727C:;
     goto L77271;
 L77284:;
     l_14 = rand() % 32;
-    l_24 = func_000C7FD9(*(int *)(*(char **)player_object + 7), *(int *)(*(char **)player_object + 15), *(int *)(position_history + (l_14 * 12)), *(int *)(D_001A4CA8 + (l_14 * 12)));
+    l_24 = func_000C7FD9(player_object->x, player_object->z, *(int *)(position_history + (l_14 * 12)), *(int *)(D_001A4CA8 + (l_14 * 12)));
     if (l_24 <= a2) goto L772D6;
     if (l_24 < a3) goto L772D8;
 L772D6:;
     goto L77329;
 L772D8:;
-    *(int *)((char *)a1 + 7) = *(int *)(position_history + (l_14 * 12));
-    *(int *)((char *)a1 + 11) = *(int *)(D_001A4CA4 + (l_14 * 12));
-    *(int *)((char *)a1 + 15) = *(int *)(D_001A4CA8 + (l_14 * 12));
-    if (func_0004083A(a1, *(int *)((char *)a1 + 7), *(int *)((char *)a1 + 15)) == 0) goto L77329;
+    a1->x = *(int *)(position_history + (l_14 * 12));
+    a1->y = *(int *)(D_001A4CA4 + (l_14 * 12));
+    a1->z = *(int *)(D_001A4CA8 + (l_14 * 12));
+    if (func_0004083A(a1, a1->x, a1->z) == 0) goto L77329;
     return 1;
 L77329:;
     goto L7727C;
@@ -1864,32 +1865,32 @@ L7732E:;
     return 0;
 }
 
-void func_00077340(int a1)
+void func_00077340(struct record *a1)
 {
     int l_18;
 
     if (*(int *)guild_npc_object == 0) return;
-    if (((int)(unsigned char)*(signed char *)((char *)a1)) != 18) return;
-    l_18 = func_000C7FF4(*(int *)(*(char **)guild_npc_object + 11) - *(int *)((char *)a1 + 11), func_000C7FD9(*(int *)(*(char **)guild_npc_object + 7), *(int *)(*(char **)guild_npc_object + 15), *(int *)((char *)a1 + 7), *(int *)((char *)a1 + 15)));
+    if (a1->type != 18) return;
+    l_18 = func_000C7FF4(*(int *)(*(char **)guild_npc_object + 11) - a1->y, func_000C7FD9(*(int *)(*(char **)guild_npc_object + 7), *(int *)(*(char **)guild_npc_object + 15), a1->x, a1->z));
     if (l_18 >= 64) return;
     *(int *)guild_npc_object = 0;
 }
 
-int func_000773BE(int a1)
+int func_000773BE(struct record *a1)
 {
-    *(int *)guild_npc_object = a1;
-    object_foreach(*(int *)D_00195AC4, (int)func_00077340);
+    *(int *)guild_npc_object = (int)a1;
+    object_foreach(D_00195AC4, (int)func_00077340);
     return ((*(int *)guild_npc_object == 0) ? 1 : 0);
 }
 
-int func_00077412(int a1)
+int func_00077412(struct record *a1)
 {
     int l_28;
     int l_24;
     int l_20;
-    int l_1C;
+    struct record *l_1C;
 
-    l_20 = marker_count(*(int *)(*(char **)(*(char **)player_object + 67) + 63), 6);
+    l_20 = marker_count(player_object->parent->children, 6);
     if (l_20 != 0) goto L7744D;
     return 0;
 L7744D:;
@@ -1902,13 +1903,13 @@ L77473:;
     l_28++;
     goto L77466;
 L7747B:;
-    l_1C = marker_find_nth(*(int *)(*(char **)(*(char **)player_object + 67) + 63), 6, l_24);
-    if (func_0009DEAC(*(int *)(*(char **)player_object + 11) - *(int *)((char *)l_1C + 11)) >= 64) goto L77510;
-    if (func_000C7FD9(*(int *)(*(char **)player_object + 7), *(int *)(*(char **)player_object + 15), *(int *)((char *)l_1C + 7), *(int *)((char *)l_1C + 15)) <= 80) goto L77510;
+    l_1C = marker_find_nth(player_object->parent->children, 6, l_24);
+    if (func_0009DEAC(player_object->y - l_1C->y) >= 64) goto L77510;
+    if (func_000C7FD9(player_object->x, player_object->z, l_1C->x, l_1C->z) <= 80) goto L77510;
     if (func_00076E98(a1) != 0) goto L77510;
-    *(int *)((char *)a1 + 7) = *(int *)((char *)l_1C + 7);
-    *(int *)((char *)a1 + 15) = *(int *)((char *)l_1C + 15);
-    *(int *)((char *)a1 + 11) = *(int *)((char *)l_1C + 11);
+    a1->x = l_1C->x;
+    a1->z = l_1C->z;
+    a1->y = l_1C->y;
     return 1;
 L77510:;
     l_24 = (l_24 + 1) % l_20;
@@ -1922,29 +1923,29 @@ L77538:;
     l_28++;
     goto L7752B;
 L77540:;
-    l_1C = marker_find_nth(*(int *)(*(char **)(*(char **)player_object + 67) + 63), 6, l_24);
-    if (func_0009DEAC(*(int *)(*(char **)player_object + 11) - *(int *)((char *)l_1C + 11)) <= 64) goto L775D2;
-    if (func_000C7FD9(*(int *)(*(char **)player_object + 7), *(int *)(*(char **)player_object + 15), *(int *)((char *)l_1C + 7), *(int *)((char *)l_1C + 15)) <= 80) goto L775D2;
+    l_1C = marker_find_nth(player_object->parent->children, 6, l_24);
+    if (func_0009DEAC(player_object->y - l_1C->y) <= 64) goto L775D2;
+    if (func_000C7FD9(player_object->x, player_object->z, l_1C->x, l_1C->z) <= 80) goto L775D2;
     if (func_00076E98(a1) != 0) goto L775D2;
-    *(int *)((char *)a1 + 7) = *(int *)((char *)l_1C + 7);
-    *(int *)((char *)a1 + 15) = *(int *)((char *)l_1C + 15);
-    *(int *)((char *)a1 + 11) = *(int *)((char *)l_1C + 11);
+    a1->x = l_1C->x;
+    a1->z = l_1C->z;
+    a1->y = l_1C->y;
     return 1;
 L775D2:;
     l_24 = (l_24 + 1) % l_20;
     goto L77538;
 L775E6:;
-    l_1C = marker_find_nth(*(int *)(*(char **)(*(char **)player_object + 67) + 63), 6, l_24);
-    *(int *)((char *)a1 + 7) = *(int *)((char *)l_1C + 7);
-    *(int *)((char *)a1 + 15) = *(int *)((char *)l_1C + 15);
-    *(int *)((char *)a1 + 11) = *(int *)((char *)l_1C + 11);
+    l_1C = marker_find_nth(player_object->parent->children, 6, l_24);
+    a1->x = l_1C->x;
+    a1->z = l_1C->z;
+    a1->y = l_1C->y;
     return 1;
 }
 
-int func_00077639(int a1, int a2, int a3, int a4)
+int func_00077639(struct record *a1, int a2, int a3, int a4)
 {
-    int l_2C;
-    int l_28;
+    struct record *l_2C;
+    struct record *l_28;
     char l_80[72];
     int l_20;
     int l_1C;
@@ -1957,12 +1958,12 @@ int func_00077639(int a1, int a2, int a3, int a4)
 L7765C:;
     return 0;
 L77668:;
-    l_2C = location_cell_at(*(int *)(*(char **)player_object + 7), *(int *)(*(char **)player_object + 15));
+    l_2C = location_cell_at(player_object->x, player_object->z);
     l_28 = object_find_type(l_2C, 60);
     if (l_28 != 0) goto L776A2;
     return 0;
 L776A2:;
-    l_20 = (l_28 + 71) + (a2 << 6);
+    l_20 = (int)RECORD_DATA(l_28) + (a2 << 6);
     l_1C = 0;
     l_14 = a4;
     l_10 = 0;
@@ -1974,37 +1975,37 @@ L776D2:;
     goto L776C7;
 L776DA:;
     if (*(signed char *)((char *)l_20++) == 0) goto L777A0;
-    *(int *)((char *)l_80 + 7) = (((l_10 % 8) << 8) + *(int *)((char *)l_28 + 7)) + 128;
-    *(int *)((char *)l_80 + 15) = (((l_10 / 8) << 8) + *(int *)((char *)l_28 + 15)) + 128;
+    *(int *)((char *)l_80 + 7) = (((l_10 % 8) << 8) + l_28->x) + 128;
+    *(int *)((char *)l_80 + 15) = (((l_10 / 8) << 8) + l_28->z) + 128;
     *(int *)((char *)l_80 + 11) = (-(a2 << 8)) - 80;
-    l_18 = func_000C7FD9(*(int *)(*(char **)player_object + 7), *(int *)(*(char **)player_object + 15), *(int *)((char *)l_80 + 7), *(int *)((char *)l_80 + 15));
+    l_18 = func_000C7FD9(player_object->x, player_object->z, *(int *)((char *)l_80 + 7), *(int *)((char *)l_80 + 15));
     if (l_18 >= l_14) goto L7776C;
     if (l_18 > a3) goto L7776E;
 L7776C:;
     goto L7777A;
 L7776E:;
-    if (func_00076E98((int)l_80) == 0) goto L7777C;
+    if (func_00076E98((struct record *)l_80) == 0) goto L7777C;
 L7777A:;
     goto L777A0;
 L7777C:;
     l_14 = l_18;
-    *(int *)((char *)a1 + 7) = *(int *)((char *)l_80 + 7);
-    *(int *)((char *)a1 + 15) = *(int *)((char *)l_80 + 15);
-    *(int *)((char *)a1 + 11) = *(int *)((char *)l_80 + 11) + 80;
+    a1->x = *(int *)((char *)l_80 + 7);
+    a1->z = *(int *)((char *)l_80 + 15);
+    a1->y = *(int *)((char *)l_80 + 11) + 80;
 L777A0:;
     goto L776D2;
 L777A5:;
-    return *(int *)((char *)a1 + 7);
+    return a1->x;
 }
 
-int func_000777B8(int a1, int a2, int a3)
+int func_000777B8(struct record *a1, int a2, int a3)
 {
     int l_20;
     int l_1C;
     int l_18;
     int l_14;
 
-    l_20 = (-*(int *)(*(char **)player_object + 11)) / 256;
+    l_20 = (-player_object->y) / 256;
     if (func_00077639(a1, l_20, a2, a3) == 0) goto L77809;
     if (func_000773BE(a1) == 0) goto L7780B;
 L77809:;
@@ -2041,23 +2042,23 @@ L77886:;
     goto L7787B;
 L7788E:;
     l_1C = rand() % 32;
-    l_18 = func_000C7FD9(*(int *)(*(char **)player_object + 7), *(int *)(*(char **)player_object + 15), *(int *)(position_history + (l_1C * 12)), *(int *)(D_001A4CA8 + (l_1C * 12)));
+    l_18 = func_000C7FD9(player_object->x, player_object->z, *(int *)(position_history + (l_1C * 12)), *(int *)(D_001A4CA8 + (l_1C * 12)));
     if (l_18 <= a2) goto L778E0;
     if (l_18 < a3) goto L778E2;
 L778E0:;
     goto L77927;
 L778E2:;
-    *(int *)((char *)a1 + 7) = *(int *)(position_history + (l_1C * 12));
-    *(int *)((char *)a1 + 11) = *(int *)(D_001A4CA4 + (l_1C * 12));
-    *(int *)((char *)a1 + 15) = *(int *)(D_001A4CA8 + (l_1C * 12));
+    a1->x = *(int *)(position_history + (l_1C * 12));
+    a1->y = *(int *)(D_001A4CA4 + (l_1C * 12));
+    a1->z = *(int *)(D_001A4CA8 + (l_1C * 12));
     if (func_00076F3D(a1) == 0) goto L77927;
     return 1;
 L77927:;
     goto L77886;
 L7792C:;
-    *(int *)((char *)a1 + 15) = 0;
-    *(int *)((char *)a1 + 11) = *(int *)((char *)a1 + 15);
-    *(int *)((char *)a1 + 7) = *(int *)((char *)a1 + 11);
+    a1->z = 0;
+    a1->y = a1->z;
+    a1->x = a1->y;
     return 0;
 }
 
@@ -2068,9 +2069,9 @@ void ambient_outdoor_sounds(void)
     int l_18;
 
     if (((int)(unsigned char)*(signed char *)player_environment) != 1) goto L7839F;
-    l_1C = location_contains(*(int *)(*(char **)player_object + 7), *(int *)(*(char **)player_object + 15));
+    l_1C = location_contains(player_object->x, player_object->z);
     if (l_1C == 0) goto L78283;
-    if (((int)(unsigned char)*(signed char *)(*(char **)current_location + 34)) == 12) goto L78285;
+    if (current_location->kind == 12) goto L78285;
 L78283:;
     goto L7828F;
 L78285:;
@@ -2078,10 +2079,10 @@ L78285:;
 L7828F:;
     goto L782A6;
 L78291:;
-    sound_play(16, *(int *)player_object, 100);
+    sound_play(16, player_object, 100);
 L782A6:;
     if (l_1C == 0) goto L782BE;
-    if (((int)(unsigned char)*(signed char *)(*(char **)current_location + 34)) == 12) goto L782C0;
+    if (current_location->kind == 12) goto L782C0;
 L782BE:;
     goto L782CA;
 L782C0:;
@@ -2089,7 +2090,7 @@ L782C0:;
 L782CA:;
     goto L782E1;
 L782CC:;
-    sound_play(383, *(int *)player_object, 100);
+    sound_play(383, player_object, 100);
 L782E1:;
     l_18 = (int)(unsigned char)*(signed char *)(climate_weathers + climate_category());
     if (l_18 == 4) goto L782FF;
@@ -2118,14 +2119,14 @@ L78339:;
 L78343:;
     goto L78362;
 L78345:;
-    sound_play((rand() & 1) + 300, *(int *)player_object, 100);
+    sound_play((rand() & 1) + 300, player_object, 100);
 L78362:;
-    if (((int)(unsigned short)(*(short *)(*(char **)player_character + 64) & 1536)) == 0) goto L78383;
+    if (((int)(unsigned short)(player_character->flags & 1536)) == 0) goto L78383;
     if (rand() < 80) goto L78385;
 L78383:;
     goto L7839A;
 L78385:;
-    sound_play(367, *(int *)player_object, 100);
+    sound_play(367, player_object, 100);
 L7839A:;
     goto L78426;
 L7839F:;
@@ -2135,24 +2136,24 @@ L7839F:;
 L783C1:;
     goto L783E5;
 L783C3:;
-    sound_play_at_point(302, *(int *)(*(char **)player_object + 7), *(int *)dungeon_water_level, *(int *)(*(char **)player_object + 15), 100);
+    sound_play_at_point(302, player_object->x, *(int *)dungeon_water_level, player_object->z, 100);
 L783E5:;
     goto L78426;
 L783E7:;
     if (((int)(unsigned char)*(signed char *)player_environment) != 2) goto L78426;
-    if (((int)(unsigned char)*(signed char *)(*(char **)current_building + 24)) != 5) goto L7840F;
+    if (current_building->type != 5) goto L7840F;
     if (rand() < 100) goto L78411;
 L7840F:;
     goto L78426;
 L78411:;
-    sound_play(376, *(int *)player_object, 100);
+    sound_play(376, player_object, 100);
 L78426:;
-    if (((int)(unsigned char)*(signed char *)(*(char **)player_character + 67)) <= 8) goto L78442;
+    if (player_character->race <= 8) goto L78442;
     if (rand() < 50) goto L78444;
 L78442:;
     return;
 L78444:;
-    sound_play(10090, *(int *)player_object, 100);
+    sound_play(10090, player_object, 100);
 }
 
 int func_00078463(void)
@@ -2161,7 +2162,7 @@ int func_00078463(void)
     int l_20;
     short l_18;
 
-    *(int *)&l_18 = ((unsigned)*(int *)(*(char **)D_00195AC4 + 31)) >> 16;
+    *(int *)&l_18 = ((unsigned)D_00195AC4->id) >> 16;
     l_20 = 0;
 L78486:;
     if (l_20 < 10) goto L78496;
@@ -2190,8 +2191,8 @@ void cheat_return_to_last_position(void)
     if (*(int *)ground_position_history_next != (-1)) goto L78515;
     *(int *)ground_position_history_next = 31;
 L78515:;
-    *(int *)(*(char **)player_object + 7) = *(int *)(ground_position_history + (*(int *)ground_position_history_next * 12));
-    *(int *)(*(char **)player_object + 11) = *(int *)(D_001A4E24 + (*(int *)ground_position_history_next * 12));
-    *(int *)(*(char **)player_object + 15) = *(int *)(D_001A4E28 + (*(int *)ground_position_history_next * 12));
+    player_object->x = *(int *)(ground_position_history + (*(int *)ground_position_history_next * 12));
+    player_object->y = *(int *)(D_001A4E24 + (*(int *)ground_position_history_next * 12));
+    player_object->z = *(int *)(D_001A4E28 + (*(int *)ground_position_history_next * 12));
     *(signed char *)D_001940D5 |= 2;
 }

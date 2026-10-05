@@ -1,6 +1,7 @@
 /* objcode.c: functions first lifted from the assembly by tools/lift_all.py (2026-10), now
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
+#include "records.h"
 
 extern char D_00177358[];
 extern char D_00177364[];
@@ -27,15 +28,15 @@ extern char D_00190CE5[];
 extern char D_00190CE7[];
 extern char D_001940D5[];
 extern char D_001940E4[];
-extern char player_object[];
-extern char D_00195AC4[];
-extern char D_00195AF4[];
+extern struct record *player_object;
+extern struct record *D_00195AC4;
+extern struct record *D_00195AF4;
 extern char creature_count[];
 extern char D_00195B5C[];
 extern char D_00195B84[];
-extern char player_character[];
+extern struct character *player_character;
 extern char window_image[];
-extern char player_class[];
+extern struct career *player_class;
 extern char D_00195C44[];
 extern char D_00195CE0[];
 extern char D_00195CE4[];
@@ -68,7 +69,7 @@ extern char D_001AA6A6[];
 
 extern int disk_read_file(int, int);
 extern int gold_can_afford(int);
-extern int object_find_open(int, int);
+extern int object_find_open(struct record *, int);
 extern int travel_trip_cost(void);
 extern int rand();
 extern int mc_memset();
@@ -76,14 +77,14 @@ extern int mc_memcpy();
 extern int func_000CD367();
 extern int func_0014BC00();
 extern void msgbox_show_string(int, int);
-extern void object_foreach_open(int, int);
-int marker_match_cb(int);
-int marker_find_random(int, int);
-int marker_find_nearest(int, int);
+extern void object_foreach_open(struct record *, int);
+int marker_match_cb(struct record *);
+struct record *marker_find_random(struct record *, int);
+struct record *marker_find_nearest(struct record *, int);
 int location_cell_at(int, int);
-void marker_nearest_cb(int);
+void marker_nearest_cb(struct record *);
 
-int marker_match_cb(int a1)
+int marker_match_cb(struct record *a1)
 {
     int l_2C;
     int l_28;
@@ -91,10 +92,10 @@ int marker_match_cb(int a1)
     int l_20;
     int l_1C;
 
-    switch (*(unsigned char *)((char *)a1)) {
+    switch (a1->type) {
 case 34:
-    if ((((int)(unsigned short)*(short *)((char *)a1 + 27)) >> 7) != 199) goto L99DE9;
-    if ((((int)(unsigned short)(*(short *)((char *)a1 + 27) & 31)) - 2) == *(int *)marker_kind) goto L99DEB;
+    if ((a1->image >> 7) != 199) goto L99DE9;
+    if (((a1->image & 31) - 2) == *(int *)marker_kind) goto L99DEB;
 L99DE9:;
     goto L99E34;
 L99DEB:;
@@ -110,7 +111,7 @@ L99E29:;
 L99E34:;
     goto L9A00E;
 case 43:
-    l_2C = a1 + 71;
+    l_2C = (int)RECORD_DATA(a1);
     l_28 = *(int *)((char *)l_2C + 9);
     l_1C = 0;
 L99E52:;
@@ -132,7 +133,7 @@ L99EC0:;
     *(int *)D_00195F79 = *(int *)((char *)l_28 + 8);
     *(int *)D_00195F75 = *(int *)((char *)l_28 + 4);
     *(short *)D_00195F85 = *(short *)((char *)l_28 + 12);
-    *(int *)D_00195F89 = *(int *)((char *)a1 + 31);
+    *(int *)D_00195F89 = a1->id;
     *(signed char *)found_marker = 34;
     return 1;
 L99F0B:;
@@ -142,11 +143,11 @@ L99F16:;
 L99F1B:;
     goto L9A00E;
 case 56:
-    l_24 = a1 + 71;
-    l_28 = l_24 + (((int)(unsigned short)*(short *)((char *)a1 + 27)) * 66);
+    l_24 = (int)RECORD_DATA(a1);
+    l_28 = l_24 + (a1->image * 66);
     l_1C = 0;
 L99F47:;
-    if (((int)(unsigned short)*(short *)((char *)a1 + 23)) > l_1C) goto L99F6C;
+    if (a1->owner > l_1C) goto L99F6C;
     goto L9A00E;
 L99F5D:;
     l_1C++;
@@ -164,7 +165,7 @@ L99FB6:;
     *(int *)D_00195F79 = *(int *)((char *)l_28 + 8);
     *(int *)D_00195F75 = *(int *)((char *)l_28 + 4);
     *(short *)D_00195F85 = *(short *)((char *)l_28 + 12);
-    *(int *)D_00195F89 = *(int *)((char *)a1 + 31);
+    *(int *)D_00195F89 = a1->id;
     *(signed char *)found_marker = 34;
     return 1;
 L99FFE:;
@@ -177,7 +178,7 @@ L9A00E:;
 }
 }
 
-int marker_find_first(int a1, int a2)
+struct record *marker_find_first(struct record *a1, int a2)
 {
     *(int *)marker_kind = a2;
     *(int *)D_00195B84 = 0;
@@ -185,12 +186,12 @@ int marker_find_first(int a1, int a2)
     mc_memset((int)found_marker, 0, 71, (int)D_00177358, 261, 4);
     object_find_open(a1, (int)marker_match_cb);
     if (*(signed char *)found_marker == 0) goto L9A08D;
-    return (int)found_marker;
+    return (struct record *)found_marker;
 L9A08D:;
     return 0;
 }
 
-int marker_find_nth(int a1, int a2, int a3)
+struct record *marker_find_nth(struct record *a1, int a2, int a3)
 {
     int l_14;
 
@@ -202,12 +203,12 @@ int marker_find_nth(int a1, int a2, int a3)
     l_14 = location_cell_at(*(int *)D_00195F71, *(int *)D_00195F79);
     *(short *)D_00195F81 = a3;
     if (*(signed char *)found_marker == 0) goto L9A127;
-    return (int)found_marker;
+    return (struct record *)found_marker;
 L9A127:;
     return 0;
 }
 
-int marker_find_random(int a1, int a2)
+struct record *marker_find_random(struct record *a1, int a2)
 {
     int l_18;
 
@@ -223,10 +224,10 @@ L9A1A4:;
     *(int *)D_001AA644 = -1;
     object_foreach_open(a1, (int)marker_match_cb);
     *(short *)D_00195F81 = l_18;
-    return (int)found_marker;
+    return (struct record *)found_marker;
 }
 
-void marker_nearest_cb(int a1)
+void marker_nearest_cb(struct record *a1)
 {
     int l_28;
     int l_24;
@@ -234,29 +235,29 @@ void marker_nearest_cb(int a1)
     int l_1C;
     int l_18;
 
-    switch (*(unsigned char *)((char *)a1)) {
+    switch (a1->type) {
 case 34:
-    if ((((int)(unsigned short)*(short *)((char *)a1 + 27)) >> 7) != 199) goto L9A26B;
-    if ((((int)(unsigned short)(*(short *)((char *)a1 + 27) & 31)) - 2) != *(int *)marker_kind) goto L9A26D;
+    if ((a1->image >> 7) != 199) goto L9A26B;
+    if (((a1->image & 31) - 2) != *(int *)marker_kind) goto L9A26D;
 L9A26B:;
     goto L9A272;
 L9A26D:;
     return;
 L9A272:;
-    l_1C = (*(int *)((char *)a1 + 7) - *(int *)(*(char **)player_object + 7)) * (*(int *)((char *)a1 + 7) - *(int *)(*(char **)player_object + 7));
-    l_1C += ((*(int *)((char *)a1 + 11) - *(int *)(*(char **)player_object + 11)) * (*(int *)((char *)a1 + 11) - *(int *)(*(char **)player_object + 11))) * 2;
-    l_1C += (*(int *)((char *)a1 + 15) - *(int *)(*(char **)player_object + 15)) * (*(int *)((char *)a1 + 15) - *(int *)(*(char **)player_object + 15));
+    l_1C = (a1->x - player_object->x) * (a1->x - player_object->x);
+    l_1C += ((a1->y - player_object->y) * (a1->y - player_object->y)) * 2;
+    l_1C += (a1->z - player_object->z) * (a1->z - player_object->z);
     if (l_1C == 0) goto L9A2F7;
     l_1C = func_0014BC00(l_1C);
 L9A2F7:;
     if (l_1C >= *(int *)D_001AA644) goto L9A330;
-    *(int *)D_00195AF4 = a1;
+    D_00195AF4 = a1;
     *(int *)D_001AA644 = l_1C;
     mc_memcpy((int)found_marker, a1, 55, (int)D_00177358, 363, 4);
 L9A330:;
     return;
 case 43:
-    l_28 = a1 + 71;
+    l_28 = (int)RECORD_DATA(a1);
     l_24 = *(int *)((char *)l_28 + 9);
     l_18 = 0;
 L9A34E:;
@@ -272,9 +273,9 @@ L9A372:;
 L9A3A4:;
     goto L9A47E;
 L9A3A9:;
-    l_1C = (*(int *)((char *)l_24) - *(int *)(*(char **)player_object + 7)) * (*(int *)((char *)l_24) - *(int *)(*(char **)player_object + 7));
-    l_1C += ((*(int *)((char *)l_24 + 4) - *(int *)(*(char **)player_object + 11)) * (*(int *)((char *)l_24 + 4) - *(int *)(*(char **)player_object + 11))) * 2;
-    l_1C += (*(int *)((char *)l_24 + 8) - *(int *)(*(char **)player_object + 15)) * (*(int *)((char *)l_24 + 8) - *(int *)(*(char **)player_object + 15));
+    l_1C = (*(int *)((char *)l_24) - player_object->x) * (*(int *)((char *)l_24) - player_object->x);
+    l_1C += ((*(int *)((char *)l_24 + 4) - player_object->y) * (*(int *)((char *)l_24 + 4) - player_object->y)) * 2;
+    l_1C += (*(int *)((char *)l_24 + 8) - player_object->z) * (*(int *)((char *)l_24 + 8) - player_object->z);
     if (l_1C == 0) goto L9A42C;
     l_1C = func_0014BC00(l_1C);
 L9A42C:;
@@ -285,17 +286,17 @@ L9A42C:;
     *(int *)D_00195F79 = *(int *)((char *)l_24 + 8);
     *(int *)D_00195F75 = *(int *)((char *)l_24 + 4);
     *(short *)D_00195F85 = *(short *)((char *)l_24 + 12);
-    *(int *)D_00195F89 = *(int *)((char *)a1 + 31);
+    *(int *)D_00195F89 = a1->id;
 L9A47E:;
     goto L9A363;
 L9A483:;
     return;
 case 56:
-    l_20 = a1 + 71;
-    l_24 = l_20 + (((int)(unsigned short)*(short *)((char *)a1 + 27)) * 66);
+    l_20 = (int)RECORD_DATA(a1);
+    l_24 = l_20 + (a1->image * 66);
     l_18 = 0;
 L9A4AF:;
-    if (((int)(unsigned short)*(short *)((char *)a1 + 23)) > l_18) goto L9A4D4;
+    if (a1->owner > l_18) goto L9A4D4;
     return;
 L9A4C5:;
     l_18++;
@@ -307,9 +308,9 @@ L9A4D4:;
 L9A506:;
     goto L9A5E0;
 L9A50B:;
-    l_1C = (*(int *)((char *)l_24) - *(int *)(*(char **)player_object + 7)) * (*(int *)((char *)l_24) - *(int *)(*(char **)player_object + 7));
-    l_1C += ((*(int *)((char *)l_24 + 4) - *(int *)(*(char **)player_object + 11)) * (*(int *)((char *)l_24 + 4) - *(int *)(*(char **)player_object + 11))) * 2;
-    l_1C += (*(int *)((char *)l_24 + 8) - *(int *)(*(char **)player_object + 15)) * (*(int *)((char *)l_24 + 8) - *(int *)(*(char **)player_object + 15));
+    l_1C = (*(int *)((char *)l_24) - player_object->x) * (*(int *)((char *)l_24) - player_object->x);
+    l_1C += ((*(int *)((char *)l_24 + 4) - player_object->y) * (*(int *)((char *)l_24 + 4) - player_object->y)) * 2;
+    l_1C += (*(int *)((char *)l_24 + 8) - player_object->z) * (*(int *)((char *)l_24 + 8) - player_object->z);
     if (l_1C == 0) goto L9A58E;
     l_1C = func_0014BC00(l_1C);
 L9A58E:;
@@ -320,26 +321,26 @@ L9A58E:;
     *(int *)D_00195F79 = *(int *)((char *)l_24 + 8);
     *(int *)D_00195F75 = *(int *)((char *)l_24 + 4);
     *(short *)D_00195F85 = *(short *)((char *)l_24 + 12);
-    *(int *)D_00195F89 = *(int *)((char *)a1 + 31);
+    *(int *)D_00195F89 = a1->id;
 L9A5E0:;
     goto L9A4C5;
 default:;
 }
 }
 
-int marker_find_nearest(int a1, int a2)
+struct record *marker_find_nearest(struct record *a1, int a2)
 {
     *(int *)marker_kind = a2;
     *(int *)D_001AA644 = 500000;
     mc_memset((int)found_marker, 0, 71, (int)D_00177358, 432, 4);
     object_foreach_open(a1, (int)marker_nearest_cb);
     if (*(signed char *)found_marker == 0) goto L9A650;
-    return (int)found_marker;
+    return (struct record *)found_marker;
 L9A650:;
     return 0;
 }
 
-int marker_count(int a1, int a2)
+int marker_count(struct record *a1, int a2)
 {
     *(int *)marker_kind = a2;
     *(int *)D_00195B84 = 0;
@@ -349,30 +350,30 @@ int marker_count(int a1, int a2)
     return *(int *)D_00195B84;
 }
 
-int player_to_nearest_marker(int a1, int a2)
+int player_to_nearest_marker(struct record *a1, int a2)
 {
-    int l_18;
+    struct record *l_18;
 
     l_18 = marker_find_nearest(a1, a2);
     if (l_18 == 0) goto L9A731;
-    *(int *)(*(char **)player_object + 7) = *(int *)D_00195F71;
-    *(int *)(*(char **)player_object + 11) = *(int *)D_00195F75;
-    *(int *)(*(char **)player_object + 15) = *(int *)D_00195F79;
+    player_object->x = *(int *)D_00195F71;
+    player_object->y = *(int *)D_00195F75;
+    player_object->z = *(int *)D_00195F79;
     *(signed char *)D_001940D5 |= 2;
     return 1;
 L9A731:;
     return 0;
 }
 
-int player_to_random_marker(int a1, int a2)
+int player_to_random_marker(struct record *a1, int a2)
 {
-    int l_18;
+    struct record *l_18;
 
     l_18 = marker_find_random(a1, a2);
     if (l_18 == 0) goto L9A7A5;
-    *(int *)(*(char **)player_object + 7) = *(int *)D_00195F71;
-    *(int *)(*(char **)player_object + 11) = *(int *)D_00195F75;
-    *(int *)(*(char **)player_object + 15) = *(int *)D_00195F79;
+    player_object->x = *(int *)D_00195F71;
+    player_object->y = *(int *)D_00195F75;
+    player_object->z = *(int *)D_00195F79;
     *(signed char *)D_001940D5 |= 2;
     return 1;
 L9A7A5:;
@@ -383,8 +384,8 @@ int location_cell_at(int a1, int a2)
 {
     int l_18;
 
-    a1 = ((a1 - *(int *)(*(char **)D_00195AC4 + 7)) + *(int *)D_00195CE0) / 1024;
-    a2 = ((a2 - *(int *)(*(char **)D_00195AC4 + 15)) + *(int *)D_00195CE4) / 1024;
+    a1 = ((a1 - D_00195AC4->x) + *(int *)D_00195CE0) / 1024;
+    a2 = ((a2 - D_00195AC4->z) + *(int *)D_00195CE4) / 1024;
     l_18 = a1 + (a2 << 5);
     return *(int *)(D_001940E4 + (l_18 << 2));
 }
@@ -404,8 +405,8 @@ L9A9CA:;
     return 0;
 L9A9E2:;
     if (a1 == 0) goto L9AC14;
-    if (((int)(unsigned char)*(signed char *)(*(char **)player_character + 67)) == 8) goto L9AA15;
-    if (((int)(unsigned short)(*(short *)(*(char **)player_class + 4) & 16)) == 0) goto L9AA1E;
+    if (player_character->race == 8) goto L9AA15;
+    if ((player_class->flags & 16) == 0) goto L9AA1E;
 L9AA15:;
     if (*(signed char *)D_00196280 != 0) goto L9AA20;
 L9AA1E:;
@@ -426,7 +427,7 @@ L9AA83:;
     *(signed char *)travel_options ^= 48;
 L9AA8A:;
     if (((int)(unsigned short)(*(short *)travel_options & 8)) == 0) goto L9AAA9;
-    if (*(int *)(*(char **)player_character + 120) == 0) goto L9AAAB;
+    if (player_character->ship_owned == 0) goto L9AAAB;
 L9AAA9:;
     goto L9AAB9;
 L9AAAB:;

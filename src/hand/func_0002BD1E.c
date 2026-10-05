@@ -1,90 +1,83 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0002BD1E */
+#include "records.h"
+
 extern char D_00170878[];
 extern char D_0017088A[];
 extern char D_0017089B[];
 extern char D_001708B7[];
 extern char D_001708D1[];
-extern char nonworld_root[];
+extern struct record *nonworld_root;
 extern char qbn_opcode_arg_counts[];
 extern void fatal_error(char *);
-extern int object_find_by_id(int, char *);
+extern struct record *object_find_by_id(struct record *, int);
 
-#pragma pack(1)
-struct Obj { char pad[31]; char *next; char pad2[3]; unsigned char owner; };
-struct E15 { char b0; int base; char pad[6]; struct Obj *obj; };
-struct E87 { short kind; short pad; short n; struct E15 e[5]; char pad2[6]; };
-struct E20 { char pad[12]; struct Obj *obj; char pad2[4]; };
-struct E24 { char pad[3]; signed char type; unsigned short hi; unsigned short lo; char pad2[8]; struct Obj *obj; char pad3[4]; };
-struct E19 { char pad[11]; struct Obj *obj; char pad2[4]; };
-struct E14 { char pad[10]; struct Obj *obj; };
-struct E33 { char pad[21]; struct Obj *obj1; struct Obj *obj2; char pad2[4]; };
-struct Hdr {
-    short id; char pad[14];
-    short n19; char pad2[4]; short n20; short n24; char pad3[2]; short n33; short n14; short n87;
-    char pad4[2]; short off19; char pad5[4]; short off20; short off24; char pad6[2]; short off33;
-    short off14; short off87;
-};
-#pragma pack()
-
+/* a resource's object pointer back to the object's id, checking it belongs to this quest */
 #define FIX(o, msg) \
     if (o) { \
-        if ((short)o->owner != a1->id) fatal_error(msg); \
-        o = (struct Obj *)o->next; \
+        if ((short)o->quest_id != a1->id) fatal_error(msg); \
+        o = (struct record *)o->id; \
+    }
+/* the same for a timer's links, kept as ints */
+#define FIXI(v, msg) \
+    if (v) { \
+        if ((short)((struct record *)v)->quest_id != a1->id) fatal_error(msg); \
+        v = ((struct record *)v)->id; \
     }
 
-void quest_unlink_for_save(struct Hdr *a1)
+void quest_unlink_for_save(struct quest *a1)
 {
-    struct E87 *l_48;
-    struct E15 *l_44;
+    struct qbn_op *l_48;
+    struct qbn_arg *l_44;
     int l_40;
     int l_3C;
-    struct E24 *l_38;
-    struct E20 *l_34;
-    struct E19 *l_30;
-    struct E14 *l_2C;
+    struct qbn_place *l_38;
+    struct qbn_person *l_34;
+    struct qbn_item *l_30;
+    struct qbn_foe *l_2C;
     int l_28;
     int l_24;
     int l_20;
     int l_1C;
-    struct E33 *l_18;
+    struct qbn_timer *l_18;
 
-    l_48 = (struct E87 *)((char *)a1 + a1->off87);
-    for (l_1C = 0; l_1C < a1->n87; l_1C++, l_48++) {
-        l_44 = l_48->e;
-        l_48->n = (*(unsigned char **)qbn_opcode_arg_counts)[l_48->kind] - '0';
-        for (l_20 = 0; l_20 < l_48->n; l_20++, l_44++) {
-            if (l_44->base) l_44->base -= (int)a1;
-            if (l_44->obj) l_44->obj = (struct Obj *)l_44->obj->next;
+    l_48 = (struct qbn_op *)((char *)a1 + a1->section_offsets[8]);
+    for (l_1C = 0; l_1C < a1->section_counts[8]; l_1C++, l_48++) {
+        l_44 = l_48->args;
+        l_48->arg_count = (*(unsigned char **)qbn_opcode_arg_counts)[l_48->opcode] - '0';
+        for (l_20 = 0; l_20 < l_48->arg_count; l_20++, l_44++) {
+            if (l_44->record) l_44->record -= (int)a1;
+            if (l_44->object) l_44->object = (struct record *)l_44->object->id;
         }
     }
-    l_34 = (struct E20 *)((char *)a1 + a1->off20);
-    for (l_1C = 0; l_1C < a1->n20; l_1C++, l_34++) {
-        FIX(l_34->obj, D_00170878)
+    l_34 = (struct qbn_person *)((char *)a1 + a1->section_offsets[3]);
+    for (l_1C = 0; l_1C < a1->section_counts[3]; l_1C++, l_34++) {
+        FIX(l_34->object, D_00170878)
     }
-    l_38 = (struct E24 *)((char *)a1 + a1->off24);
-    for (l_1C = 0; l_1C < a1->n24; l_1C++, l_38++) {
-        if (l_38->obj) {
-            if ((short)l_38->obj->owner != a1->id) fatal_error(D_0017088A);
-            l_38->obj = (struct Obj *)l_38->obj->next;
-            if (object_find_by_id(*(int *)nonworld_root, (char *)l_38->obj) == 0) fatal_error(D_0017089B);
-            if (l_38->obj == 0) fatal_error(D_001708B7);
-            if (l_38->type == 10) {
-                if (((l_38->lo & 0xffff) | (l_38->hi << 16)) != (int)l_38->obj)
+    l_38 = (struct qbn_place *)((char *)a1 + a1->section_offsets[4]);
+    for (l_1C = 0; l_1C < a1->section_counts[4]; l_1C++, l_38++) {
+        if (l_38->object) {
+            if ((short)l_38->object->quest_id != a1->id) fatal_error(D_0017088A);
+            l_38->object = (struct record *)l_38->object->id;
+            if (object_find_by_id(nonworld_root, (int)l_38->object) == 0) fatal_error(D_0017089B);
+            if (l_38->object == 0) fatal_error(D_001708B7);
+            /* +0x03 the place's type (10: a fixed object), +0x04/+0x06 the object id's halves */
+            if (*(signed char *)((char *)l_38 + 3) == 10) {
+                if (((*(unsigned short *)((char *)l_38 + 6) & 0xffff) | (*(unsigned short *)((char *)l_38 + 4) << 16)) != (int)l_38->object)
                     fatal_error(D_001708D1);
             }
         }
     }
-    l_30 = (struct E19 *)((char *)a1 + a1->off19);
-    for (l_1C = 0; l_1C < a1->n19; l_1C++, l_30++) {
-        FIX(l_30->obj, D_00170878)
+    l_30 = (struct qbn_item *)((char *)a1 + a1->section_offsets[0]);
+    for (l_1C = 0; l_1C < a1->section_counts[0]; l_1C++, l_30++) {
+        FIX(l_30->object, D_00170878)
     }
-    l_2C = (struct E14 *)((char *)a1 + a1->off14);
-    for (l_1C = 0; l_1C < a1->n14; l_1C++, l_2C++) {
-        FIX(l_2C->obj, D_00170878)
+    l_2C = (struct qbn_foe *)((char *)a1 + a1->section_offsets[7]);
+    for (l_1C = 0; l_1C < a1->section_counts[7]; l_1C++, l_2C++) {
+        FIX(l_2C->object, D_00170878)
     }
-    l_18 = (struct E33 *)((char *)a1 + a1->off33);
-    for (l_1C = 0; l_1C < a1->n33; l_1C++, l_18++) {
-        FIX(l_18->obj1, D_00170878)
-        FIX(l_18->obj2, D_00170878)
+    l_18 = (struct qbn_timer *)((char *)a1 + a1->section_offsets[6]);
+    for (l_1C = 0; l_1C < a1->section_counts[6]; l_1C++, l_18++) {
+        FIXI(l_18->link1, D_00170878)
+        FIXI(l_18->link2, D_00170878)
     }
 }

@@ -1,6 +1,7 @@
 /* archive.c: functions first lifted from the assembly by tools/lift_all.py (2026-10), now
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
+#include "records.h"
 
 struct bf8_6_1 { unsigned char _:6; unsigned char f:1; };
 extern char D_00170150[];
@@ -8,15 +9,15 @@ extern char D_0017015A[];
 extern char D_00170172[];
 extern char lock_text_fail[];
 extern char lock_text_open[];
-extern char player_object[];
-extern char player_character[];
+extern struct record *player_object;
+extern struct character *player_character;
 extern char D_00195C44[];
 extern char archive_directories[];
 extern char archive_types[];
 extern char archive_record_counts[];
 extern char archive_names[];
 
-extern int sound_play(int, int, int);
+extern int sound_play(int, struct record *, int);
 extern int disk_open_data(int);
 extern int disk_open_rw(int);
 extern int hud_message_add(int);
@@ -33,9 +34,9 @@ extern int func_000A0ED9(int, int);
 extern int mc_sprintf(int, ...);
 extern void skill_add_uses(int, int);
 extern void fatal_error(int);
-extern void links_trigger(int, int);
+extern void links_trigger(struct record *, int);
 extern void guild_count_crime(int, unsigned char);
-int lockpick_door(int);
+int lockpick_door(struct record *);
 #pragma aux func_000A0ED9 parm routine [];
 
 int archive_open(int a1, int a2, int a3)
@@ -293,34 +294,34 @@ L13415:;
     write(a1, a3, l_14);
 }
 
-void func_00013438(int a1)
+void func_00013438(struct record *a1)
 {
     int l_18;
 
     l_18 = lockpick_door(a1);
 }
 
-int lockpick_door(int a1)
+int lockpick_door(struct record *a1)
 {
     int l_1C;
 
-    if (*(unsigned short *)((char *)a1 + 25) != *(short *)(*(char **)player_character + 235)) goto L13494;
+    if (a1->lockpick_skill_tried != player_character->skills[SKILL_LOCKPICKING].value) goto L13494;
     return 0;
 L13494:;
-    if (((int)(unsigned short)*(short *)((char *)a1 + 23)) < 20) goto L134C8;
+    if (a1->lock_level < 20) goto L134C8;
     hud_message_add(*(int *)lock_text_fail);
     links_trigger(a1, 4);
     return 0;
 L134C8:;
     skill_add_uses(13, 1);
-    if (((struct bf8_6_1 *)(*(char **)player_character + 137))->f == 0) goto L13504;
-    l_1C = (int)(unsigned char)*(signed char *)(*(char **)player_character + 542);
-    *(signed char *)(*(char **)player_character + 137) &= 191;
+    if ((player_character->conditions & 0x40) == 0) goto L13504;
+    l_1C = (int)(unsigned char)(signed char)player_character->lock_open_chance;
+    player_character->conditions &= ~0x40;
     goto L13513;
 L13504:;
-    l_1C = (int)(short)*(short *)(*(char **)player_character + 235);
+    l_1C = (int)(short)player_character->skills[SKILL_LOCKPICKING].value;
 L13513:;
-    l_1C += (((int)(unsigned char)*(signed char *)((char *)*(int *)player_character + 129)) - ((int)(unsigned short)*(short *)((char *)a1 + 23))) * 5;
+    l_1C += (((int)(unsigned char)(signed char)player_character->level) - a1->lock_level) * 5;
     if (l_1C >= 5) goto L13543;
     l_1C = 5;
     goto L13550;
@@ -329,28 +330,28 @@ L13543:;
     l_1C = 95;
 L13550:;
     if (rand_range(0, 100) > l_1C) goto L1359A;
-    *(signed char *)((char *)a1 + 21) |= 64;
+    a1->flags |= 64;
     hud_message_add(*(int *)lock_text_open);
     links_trigger(a1, 7);
     sound_play(60, a1, 100);
     return 1;
 L1359A:;
-    if (((struct bf8_6_1 *)(*(char **)player_character + 137))->f != 0) goto L135BB;
-    *(short *)((char *)a1 + 25) = *(short *)(*(char **)player_character + 235);
+    if ((player_character->conditions & 0x40) != 0) goto L135BB;
+    a1->lockpick_skill_tried = player_character->skills[SKILL_LOCKPICKING].value;
 L135BB:;
     hud_message_add(*(int *)lock_text_fail);
     links_trigger(a1, 4);
     return 0;
 }
 
-int lockpick_action_door(int a1, int a2, int a3)
+int lockpick_action_door(int a1, int a2, struct record *a3)
 {
     int l_14;
 
     if (((int)(unsigned char)*(signed char *)((char *)a1 + 8)) < 10) goto L13617;
     return 1;
 L13617:;
-    if (*(unsigned short *)((char *)a3 + 25) != *(short *)(*(char **)player_character + 235)) goto L1363C;
+    if (a3->lockpick_skill_tried != player_character->skills[SKILL_LOCKPICKING].value) goto L1363C;
     return 0;
 L1363C:;
     if (a2 < 20) goto L13658;
@@ -358,12 +359,12 @@ L1363C:;
     return 0;
 L13658:;
     skill_add_uses(13, 1);
-    if (((struct bf8_6_1 *)(*(char **)player_character + 137))->f == 0) goto L13694;
-    l_14 = (int)(unsigned char)*(signed char *)(*(char **)player_character + 542);
-    *(signed char *)(*(char **)player_character + 137) &= 191;
+    if ((player_character->conditions & 0x40) == 0) goto L13694;
+    l_14 = player_character->lock_open_chance;
+    player_character->conditions &= ~0x40;
     goto L136A3;
 L13694:;
-    l_14 = (int)(short)*(short *)(*(char **)player_character + 235);
+    l_14 = player_character->skills[SKILL_LOCKPICKING].value;
 L136A3:;
     l_14 -= a2 * 5;
     if (l_14 >= 5) goto L136BB;
@@ -375,12 +376,12 @@ L136BB:;
 L136C8:;
     if (rand_range(0, 100) > l_14) goto L13710;
     hud_message_add(*(int *)lock_text_open);
-    sound_play(60, *(int *)player_object, 110);
+    sound_play(60, player_object, 110);
     guild_count_crime(5, 1);
     return 1;
 L13710:;
-    if (((struct bf8_6_1 *)(*(char **)player_character + 137))->f != 0) goto L13731;
-    *(short *)((char *)a3 + 25) = *(short *)(*(char **)player_character + 235);
+    if ((player_character->conditions & 0x40) != 0) goto L13731;
+    a3->lockpick_skill_tried = player_character->skills[SKILL_LOCKPICKING].value;
 L13731:;
     hud_message_add(*(int *)lock_text_fail);
     return 0;

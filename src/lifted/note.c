@@ -1,6 +1,7 @@
 /* note.c: functions first lifted from the assembly by tools/lift_all.py (2026-10), now
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
+#include "records.h"
 
 struct bf8_4_1 { unsigned char _:4; unsigned char f:1; };
 struct bf8_5_1 { unsigned char _:5; unsigned char f:1; };
@@ -23,7 +24,7 @@ extern char text_rsc_buffer[];
 extern char D_001940D5[];
 extern char D_001940D8[];
 extern char frame_counter[];
-extern char player_object[];
+extern struct record *player_object;
 extern char window_image[];
 extern char D_00195C44[];
 extern char D_00195F36[];
@@ -356,7 +357,7 @@ void func_0004E2AB(int a1)
     *(short *)D_001997E2 = a1;
     func_0004E1BC();
     if (*(signed char *)D_001997ED != 0) return;
-    sound_play(205, *(int *)player_object, 100);
+    sound_play(205, (int)player_object, 100);
 }
 }
 
@@ -367,7 +368,7 @@ void func_0004E30F(void)
     (*(short *)D_001997E2)--;
     func_0004E18B();
     if (*(signed char *)D_001997ED != 0) return;
-    sound_play(205, *(int *)player_object, 100);
+    sound_play(205, (int)player_object, 100);
 }
 
 void func_0004E360(void)
@@ -380,7 +381,7 @@ void func_0004E360(void)
     (*(short *)D_001997E2)++;
     func_0004E18B();
     if (*(signed char *)D_001997ED != 0) goto L4E3CC;
-    sound_play(205, *(int *)player_object, 100);
+    sound_play(205, (int)player_object, 100);
 L4E3CC:;
     return;
 L4E3D1:;
@@ -391,7 +392,7 @@ L4E3D1:;
     *(int *)D_001997BC = filelength((int)(short)*(short *)D_001997E8);
     (*(short *)D_001997E2)++;
     if (*(signed char *)D_001997ED != 0) return;
-    sound_play(205, *(int *)player_object, 100);
+    sound_play(205, (int)player_object, 100);
 }
 
 void note_cycle_tool(void)

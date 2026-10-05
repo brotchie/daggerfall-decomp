@@ -1,7 +1,8 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x00020C87 */
+#include "records.h"
+
 struct row { short v; char pad[78]; };
 struct shop { unsigned char mul; char pad1; short base; short min; short max; };
-struct who { char pad[0x1b]; unsigned short id; };
 struct res { int f0; int f4; };
 extern char *screen_buffer;
 extern char D_001706D4[];
@@ -17,7 +18,7 @@ extern signed char D_00190D17;
 extern char court_state;
 extern short court_prison_days;
 extern unsigned char D_001940D5;
-extern struct who *D_00195AC4;
+extern struct record *D_00195AC4;
 extern int creature_count;
 extern char *window_image;
 extern int free_later_count;
@@ -37,13 +38,13 @@ extern void court_restore_vitals(void);
 extern void msgbox_show_rsc(int, int);
 extern void music_play(int);
 extern char *disk_read_file(char *, int);
-extern unsigned char *guild_find_membership_by_kind(unsigned char);
+extern struct membership *guild_find_membership_by_kind(unsigned char);
 extern void msgbox_choice_rsc(short, unsigned char, unsigned char, int, unsigned char, unsigned char, unsigned char);
 extern int rand_range(int, int);
 extern void object_free_pending(void);
 extern int gold_total(void);
 extern void map_goto_location(int, int, int, int);
-extern void object_foreach(struct who *, void (*)(int));
+extern void object_foreach(struct record *, void (*)(int));
 extern int rand(void);
 extern void mc_memcpy(char *, char *, int, char *, int, int);
 extern int func_000CDD81();
@@ -56,7 +57,7 @@ int court_open(int n)
     int i;
     int cnt;
     int over;
-    unsigned char *item;
+    struct membership *item;
 
     a = 0;
     b = 0;
@@ -69,7 +70,7 @@ int court_open(int n)
         D_00190D17 = n;
         court_reputation_change = crime_reputation_loss[n] >> 1;
         if (player_environment == 2)
-            map_goto_location(current_region, 1, D_00195AC4->id, 0);
+            map_goto_location(current_region, 1, D_00195AC4->image, 0);
         if (region_legal_reputation[current_region].v < 0) {
             a = -region_legal_reputation[current_region].v;
             if (a > 75)
@@ -114,7 +115,7 @@ int court_open(int n)
         D_001940D5 |= 64;
         D_00195F34 = 194;
         item = guild_find_membership_by_kind(0);
-        if ((D_00190D17 == 4 || D_00190D17 == 3) && item != 0 && *item >= rand_range(0, 19)) {
+        if ((D_00190D17 == 4 || D_00190D17 == 3) && item != 0 && item->rank >= rand_range(0, 19)) {
             msgbox_show_rsc(551, 1);
             court_restore_vitals();
             court_reputation_restore();
@@ -126,7 +127,7 @@ int court_open(int n)
             return 0;
         }
         item = guild_find_membership_by_kind(3);
-        if ((D_00190D17 <= 2 || D_00190D17 == 11) && item != 0 && *item >= rand_range(0, 19)) {
+        if ((D_00190D17 <= 2 || D_00190D17 == 11) && item != 0 && item->rank >= rand_range(0, 19)) {
             msgbox_show_rsc(550, 1);
             court_restore_vitals();
             court_reputation_restore();

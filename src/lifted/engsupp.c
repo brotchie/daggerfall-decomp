@@ -1,6 +1,7 @@
 /* engsupp.c: functions first lifted from the assembly by tools/lift_all.py (2026-10), now
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
+#include "records.h"
 
 struct bf8_0_1 { unsigned char f:1; };
 extern char D_001702D4[];
@@ -11,10 +12,10 @@ extern char D_00179966[];
 extern char climate_texture_sets[];
 extern char itemmaker_slot_kinds[];
 extern char D_00190CE5[];
-extern char player_object[];
-extern char D_00195AC4[];
+extern struct record *player_object;
+extern struct record *D_00195AC4;
 extern char hud_bar_image[];
-extern char game_settings[];
+extern struct settings *game_settings;
 extern char D_00195C88[];
 extern char D_00195CD0[];
 extern char D_00195D3C[];
@@ -31,18 +32,18 @@ extern int func_00014334(int);
 extern int texture_archive_for_climate(int, unsigned short);
 extern int climate_category(void);
 extern int rand_range(int, int);
-extern int object_find(int, int);
+extern int object_find(struct record *, int);
 extern int rand();
 extern int srand();
 extern int mc_memset();
 extern int mc_memcpy();
 extern int func_0012A608();
 extern void shop_generate_stock(int, int, int, int, int);
-extern void func_0007E815(int, int);
-extern void func_0007EB0B(int, int);
+extern void func_0007E815(struct record *, int);
+extern void func_0007EB0B(struct record *, int);
 extern void object_foreach_open(int, int);
 int func_00014096(int, short);
-int func_0001410F(int);
+int func_0001410F(struct record *);
 int func_00014438(int, int);
 int func_0001490D(int);
 void world_for_each_object(int);
@@ -51,7 +52,7 @@ int engine_pick_object(int a1, int a2, int a3)
 {
     int l_14;
 
-    l_14 = ((((int)(unsigned short)(*(short *)(*(char **)game_settings) & 1)) != 0) ? 199 : (int)(unsigned short)*(short *)(*(char **)hud_bar_image + 2));
+    l_14 = ((((int)(unsigned short)(*(short *)(*(char **)&game_settings) & 1)) != 0) ? 199 : (int)(unsigned short)*(short *)(*(char **)hud_bar_image + 2));
     if (a2 <= l_14) goto L13FA8;
     return 0;
 L13FA8:;
@@ -105,7 +106,7 @@ L140FD:;
     return l_24;
 }
 
-int func_0001410F(int a1)
+int func_0001410F(struct record *a1)
 {
     int l_28;
     int l_24;
@@ -115,9 +116,9 @@ int func_0001410F(int a1)
     if (((struct bf8_0_1 *)(*(char **)D_00196484))->f == 0) goto L14136;
     return 0;
 L14136:;
-    switch (*(unsigned char *)((char *)a1)) {
+    switch (a1->type) {
 case 43:
-    l_24 = a1 + 71;
+    l_24 = (int)RECORD_DATA(a1);
     l_20 = *(int *)((char *)l_24 + 5);
     l_1C = 0;
 L14196:;
@@ -132,7 +133,7 @@ L141B9:;
     *(int *)D_00195D54 = l_1C;
     *(int *)D_00195D3C = l_20;
     *(signed char *)(*(char **)D_00196484) |= 13;
-    *(int *)(*(char **)D_00196484 + 4) = a1;
+    *(int *)(*(char **)D_00196484 + 4) = (int)a1;
     *(int *)(*(char **)D_00196484 + 8) = (int)&*(signed char *)((char *)(l_1C << 8) + func_00014438(*(int *)D_0019647C, *(int *)D_00195DC0));
     *(short *)(*(char **)D_00196484 + 12) = l_1C;
     return 1;
@@ -141,7 +142,7 @@ L14225:;
 L14227:;
     return 0;
 case 56:
-    l_20 = a1 + 71;
+    l_20 = (int)RECORD_DATA(a1);
     l_1C = 0;
 L14243:;
     if (((int)(unsigned short)*(short *)((char *)a1 + 27)) > l_1C) goto L14268;
@@ -153,7 +154,7 @@ L14259:;
 L14268:;
     if ((l_20 + 4) != *(int *)D_0019647C) goto L142CE;
     *(signed char *)(*(char **)D_00196484) |= 5;
-    *(int *)(*(char **)D_00196484 + 4) = a1;
+    *(int *)(*(char **)D_00196484 + 4) = (int)a1;
     *(int *)(*(char **)D_00196484 + 8) = func_00014438(*(int *)D_0019647C, *(int *)D_00195DC0);
     *(short *)(*(char **)D_00196484 + 14) = *(short *)((char *)l_20);
     *(short *)(*(char **)D_00196484 + 16) = (int)(unsigned char)*(signed char *)((char *)l_20 + 2);
@@ -164,10 +165,10 @@ L142D0:;
     return 0;
 case 6:
 case 32:
-    l_28 = a1 + 71;
+    l_28 = (int)RECORD_DATA(a1);
     if (*(int *)D_0019647C != l_28) goto L14320;
     *(signed char *)(*(char **)D_00196484) |= 5;
-    *(int *)(*(char **)D_00196484 + 4) = a1;
+    *(int *)(*(char **)D_00196484 + 4) = (int)a1;
     *(int *)(*(char **)D_00196484 + 8) = func_00014438(l_28, *(int *)D_00195DC0);
     return 1;
 default:
@@ -229,7 +230,7 @@ void dungeon_choose_textures(void)
     int l_18;
 
     l_18 = rand();
-    srand(((unsigned)*(int *)(*(char **)D_00195AC4 + 31)) >> 16);
+    srand(((unsigned)D_00195AC4->id) >> 16);
     l_1C = (int)(unsigned char)*(signed char *)(climate_texture_sets + climate_category());
     if (l_1C == 1) return;
     mc_memcpy((int)D_00179966, (int)D_0017995C, 10, (int)D_001702D4, 279, 10);
@@ -252,13 +253,13 @@ L14841:;
     srand(l_18);
 }
 
-void interior_stock_shelves(int a1, int a2)
+void interior_stock_shelves(struct record *a1, struct building *a2)
 {
     int l_1C;
     int l_18;
     int l_14;
 
-    l_1C = a1 + 71;
+    l_1C = (int)RECORD_DATA(a1);
     l_18 = *(int *)((char *)l_1C + 5);
     l_14 = 0;
 L1487F:;
@@ -275,7 +276,7 @@ L148A2:;
 L148DA:;
     goto L14902;
 L148DC:;
-    shop_generate_stock((int)D_00196120, (int)(unsigned char)*(signed char *)((char *)l_18 + 2), (int)(unsigned char)*(signed char *)((char *)a2 + 25), (int)(unsigned char)*(signed char *)((char *)a2 + 24), l_14);
+    shop_generate_stock((int)D_00196120, (int)(unsigned char)*(signed char *)((char *)l_18 + 2), a2->quality, a2->type, l_14);
 L14902:;
     goto L14893;
 }
@@ -322,26 +323,26 @@ L1496A:;
 
 void world_for_each_object(int a1)
 {
-    int l_24;
-    int l_20;
-    int l_1C;
+    struct record *l_24;
+    struct record *l_20;
+    struct record *l_1C;
     unsigned short l_18;
 
     *(int *)D_00195CD0 = (int)object_find;
     if (((int)(unsigned char)*(signed char *)player_environment) >= 3) goto L14A49;
-    if (((int)(unsigned char)*(signed char *)(*(char **)(*(char **)player_object + 67))) == 1) goto L149D1;
-    object_find(*(int *)(*(char **)(*(char **)player_object + 67) + 63), a1);
+    if (player_object->parent->type == 1) goto L149D1;
+    object_find(player_object->parent->children, a1);
     goto L149DE;
 L149D1:;
-    func_0007EB0B(*(int *)player_object, a1);
+    func_0007EB0B(player_object, a1);
 L149DE:;
-    l_24 = *(int *)(*(char **)D_00195AC4 + 63);
+    l_24 = D_00195AC4->children;
 L149E9:;
     if (l_24 == 0) goto L14A44;
-    l_20 = *(int *)((char *)l_24 + 55);
-    l_1C = *(int *)((char *)l_24 + 63);
-    l_18 = *(short *)((char *)l_24 + 21);
-    if (((int)(unsigned char)*(signed char *)((char *)l_24)) == 38) goto L14A3C;
+    l_20 = l_24->next;
+    l_1C = l_24->children;
+    l_18 = l_24->flags;
+    if (l_24->type == 38) goto L14A3C;
     ((int (*)())(a1))(l_24);
     if (((int)(unsigned short)(*(int *)&l_18 & 1)) != 0) goto L14A3C;
     object_find(l_1C, a1);
@@ -352,18 +353,18 @@ L14A44:;
     goto L14AD4;
 L14A49:;
     if (*(signed char *)D_0019629F == 0) goto L14A61;
-    object_find(*(int *)D_00195AC4, a1);
+    object_find(D_00195AC4, a1);
     goto L14A6E;
 L14A61:;
-    func_0007E815(*(int *)player_object, a1);
+    func_0007E815(player_object, a1);
 L14A6E:;
-    l_24 = *(int *)(*(char **)D_00195AC4 + 63);
+    l_24 = D_00195AC4->children;
 L14A79:;
     if (l_24 == 0) goto L14AD4;
-    l_20 = *(int *)((char *)l_24 + 55);
-    l_1C = *(int *)((char *)l_24 + 63);
-    l_18 = *(short *)((char *)l_24 + 21);
-    if (((int)(unsigned char)*(signed char *)((char *)l_24)) == 47) goto L14ACC;
+    l_20 = l_24->next;
+    l_1C = l_24->children;
+    l_18 = l_24->flags;
+    if (l_24->type == 47) goto L14ACC;
     ((int (*)())(a1))(l_24);
     if (((int)(unsigned short)(*(int *)&l_18 & 1)) != 0) goto L14ACC;
     object_find(l_1C, a1);

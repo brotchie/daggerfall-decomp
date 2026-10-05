@@ -1,6 +1,7 @@
 /* sound.c: functions first lifted from the assembly by tools/lift_all.py (2026-10), now
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
+#include "records.h"
 
 extern char D_00175ACC[];
 extern char player_environment[];
@@ -9,8 +10,8 @@ extern char D_0018DC34[];
 extern char D_0018DD54[];
 extern char D_0018DD5C[];
 extern char D_0018DD60[];
-extern char player_object[];
-extern char game_settings[];
+extern struct record *player_object;
+extern struct settings *game_settings;
 extern char sound_last_size[];
 extern char climate_weathers[];
 extern char D_00196280[];
@@ -45,7 +46,7 @@ extern char D_001A5AD0[];
 extern int sos_load_song(int, ...);
 extern int climate_category(void);
 extern int ai_angle_diff(int, int, int);
-extern int sound_play_sample(int, int, int, int);
+extern int sound_play_sample(int, int, struct record *, int);
 extern int sound_cache_load(int);
 extern int dpmi_lock_region(int, int);
 extern int dpmi_unlock_region(int, int);
@@ -69,16 +70,16 @@ extern int func_000C7FD9();
 extern int func_000C7FF4();
 extern int func_000C808D();
 int sound_play_sample_flat(int, int);
-int sound_play_ambient_loop(int, int, int);
+int sound_play_ambient_loop(int, struct record *, int);
 void sound_stop_channel(int);
 void music_stop(void);
 void sound_stop_all(void);
 
-void func_00068BA8(int a1, int a2)
+void func_00068BA8(struct record *a1, int a2)
 {
-    *(int *)(D_001A3BE4 + (a2 * 268)) = a1;
+    *(int *)(D_001A3BE4 + (a2 * 268)) = (int)a1;
     if (a1 == 0) return;
-    mc_memcpy((((int)sound_channels) + (a2 * 268)) + 256, a1 + 7, 12, (int)D_00175ACC, 95, 4);
+    mc_memcpy((((int)sound_channels) + (a2 * 268)) + 256, (int)&a1->x, 12, (int)D_00175ACC, 95, 4);
 }
 
 void sound_volume_pan(int a1, int a2, int a3, int a4, int a5)
@@ -90,11 +91,11 @@ void sound_volume_pan(int a1, int a2, int a3, int a4, int a5)
     int l_C;
 
     mc_memcpy(a1, a2, 12, (int)D_00175ACC, 148, 4);
-    a1 = *(int *)player_object + 7;
+    a1 = (int)&player_object->x;
     l_18 = func_000C7FF4(*(int *)((char *)a1 + 4) - *(int *)((char *)a2 + 4), func_000C7FD9(*(int *)((char *)a1), *(int *)((char *)a1 + 8), *(int *)((char *)a2), *(int *)((char *)a2 + 8)));
     l_C = l_18;
     if (l_18 >= 25) goto L68E53;
-    *(int *)((char *)a3) = (((int)(short)*(short *)(*(char **)game_settings + 2)) * 32767) / 128;
+    *(int *)((char *)a3) = (((int)(short)game_settings->sound_volume) * 32767) / 128;
     *(int *)((char *)a4) = 32768;
     return;
 L68E53:;
@@ -109,7 +110,7 @@ L68E89:;
     *(int *)((char *)a3) = 32767;
 L68E9D:;
     l_14 = func_000C808D(*(int *)((char *)a1), *(int *)((char *)a1 + 8), *(int *)((char *)a2), *(int *)((char *)a2 + 8));
-    l_10 = ai_angle_diff((int)(short)*(short *)(*(char **)player_object + 3), l_14, (int)&l_18);
+    l_10 = ai_angle_diff(player_object->yaw, l_14, (int)&l_18);
     if (l_10 <= 512) goto L68EED;
     l_10 = 512 - (l_10 - 512);
 L68EED:;
@@ -123,7 +124,7 @@ L68F0F:;
 L68F24:;
     *(int *)((char *)a4) = 32768 - l_10;
 L68F31:;
-    *(int *)((char *)a3) = (*(int *)((char *)a3) * ((int)(short)*(short *)(*(char **)game_settings + 2))) / 128;
+    *(int *)((char *)a3) = (*(int *)((char *)a3) * ((int)(short)game_settings->sound_volume)) / 128;
 }
 
 int func_00069281(int a1, int a2)
@@ -313,7 +314,7 @@ void music_update(void)
     func_000A27A0(*(int *)D_001A3F30);
 }
 
-int sound_play(int a1, int a2, int a3)
+int sound_play(int a1, struct record *a2, int a3)
 {
     int l_14;
 
@@ -335,7 +336,7 @@ L699AF:;
     return sound_play_sample_flat(l_1C, *(int *)sound_last_size);
 }
 
-int sound_play_ambient_loop(int a1, int a2, int a3)
+int sound_play_ambient_loop(int a1, struct record *a2, int a3)
 {
     int l_14;
 
@@ -346,7 +347,7 @@ L69A89:;
     return sound_play_sample(l_14, *(int *)sound_last_size, a2, -1);
 }
 
-int func_00069AB8(int a1, int a2, int a3)
+int func_00069AB8(int a1, struct record *a2, int a3)
 {
     int l_14;
 
@@ -383,7 +384,7 @@ void sound_update_ambient(void)
 L69BBA:;
     if (((int)(unsigned char)(*(signed char *)(climate_weathers + climate_category()) & 127)) != 4) goto L69BF6;
     if (*(int *)ambient_rain_channel != 0) goto L69BF4;
-    *(int *)ambient_rain_channel = sound_play_ambient_loop(385, *(int *)player_object, 100);
+    *(int *)ambient_rain_channel = sound_play_ambient_loop(385, player_object, 100);
 L69BF4:;
     goto L69C13;
 L69BF6:;
@@ -397,7 +398,7 @@ L69C31:;
     goto L69C58;
 L69C33:;
     if (*(int *)ambient_crickets_channel != 0) goto L69C56;
-    *(int *)ambient_crickets_channel = sound_play_ambient_loop(375, *(int *)player_object, 100);
+    *(int *)ambient_crickets_channel = sound_play_ambient_loop(375, player_object, 100);
 L69C56:;
     goto L69C75;
 L69C58:;
@@ -424,7 +425,7 @@ L69CCB:;
 L69CD7:;
     goto L69CF5;
 L69CD9:;
-    *(int *)ambient_fire_channel = sound_play_ambient_loop(242, *(int *)nearest_fire, 100);
+    *(int *)ambient_fire_channel = sound_play_ambient_loop(242, *(struct record **)nearest_fire, 100);
     return;
 L69CF5:;
     if (*(int *)ambient_fire_channel == 0) goto L69D0A;

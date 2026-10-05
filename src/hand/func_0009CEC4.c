@@ -1,32 +1,19 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0009CEC4 */
-#pragma pack(1)
-struct Ply {
-    char pad0[32];
-    short a;                    /* 32 */
-    char pad1[6];
-    short b;                    /* 40 */
-    char pad2[124 - 42];
-    short c;                    /* 124 */
-    short c2;                   /* 126 */
-    char pad3[141 - 128];
-    short d;                    /* 141 */
-    short d2;                   /* 143 */
-    char pad4[155 - 145];
-    unsigned short e;           /* 155 */
-};
+#include "records.h"
+
 extern char *screen_buffer;
 extern char D_0017743D[];
 extern unsigned short travel_options;
 extern char D_00190CE8;
-extern struct Ply *player_character;
-extern char *player_class;
+extern struct character *player_character;
+extern struct career *player_class;
 extern int D_001AA674;
 extern char *D_001AA690;
 extern int D_001AA698;
 extern unsigned char D_001AA6A6;
 extern int climate_update_at_player(void);
 extern void time_pass(int);
-extern unsigned char *guild_find_membership_by_kind(unsigned char);
+extern struct membership *guild_find_membership_by_kind(unsigned char);
 extern int travel_pixel_time(int, int);
 extern void travel_find_transport(void);
 extern void travel_toggle_zoom(void);
@@ -51,14 +38,14 @@ int travel_route(int x0, int y0, int x1, int y1, int a5)
     int flag;
     int save;
     int unused;
-    unsigned char *p;
+    struct membership *p;
 
     flag = 0;
     if (D_001AA698 != 0) {
         D_001AA690 = mc_malloc(64000, D_0017743D, 984);
         mc_memcpy(D_001AA690, screen_buffer, 64000, D_0017743D, 985, 4);
     }
-    save = player_character->e;
+    save = player_character->fatigue;
     x0 = x0 / 32768;
     y0 = y0 / 32768;
     x1 = x1 / 32768;
@@ -106,12 +93,12 @@ int travel_route(int x0, int y0, int x1, int y1, int a5)
             sum = (sum << 7) / 256;
         time_pass(sum);
         if ((int)(unsigned short)(travel_options & 3) == 2) {
-            player_character->e = save;
+            player_character->fatigue = save;
         } else {
-            player_character->e = (player_character->a + player_character->b) << 6;
-            player_character->c = player_character->c2;
-            if ((int)(unsigned short)(*(unsigned short *)(player_class + 4) & 8) == 0)
-                player_character->d = player_character->d2;
+            player_character->fatigue = (player_character->attributes[ATTR_STR] + player_character->attributes[ATTR_END]) << 6;
+            player_character->health = player_character->max_health;
+            if ((int)(unsigned short)(player_class->flags & 8) == 0)
+                player_character->magicka = player_character->max_magicka;
         }
     } else {
         climate_update_at_player();
@@ -124,6 +111,6 @@ int travel_route(int x0, int y0, int x1, int y1, int a5)
     }
     p = guild_find_membership_by_kind(145);
     if (p != 0)
-        return sum * (((95 - *p) << 8) / 100) / 256;
+        return sum * (((95 - p->rank) << 8) / 100) / 256;
     return sum;
 }

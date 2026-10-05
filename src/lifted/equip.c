@@ -1,6 +1,7 @@
 /* equip.c: functions first lifted from the assembly by tools/lift_all.py (2026-10), now
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
+#include "records.h"
 
 struct bf8_0_1 { unsigned char f:1; };
 struct bf8_1_1 { unsigned char _:1; unsigned char f:1; };
@@ -45,20 +46,20 @@ extern char D_00187CA8[];
 extern char D_0018E044[];
 extern char D_0018E046[];
 extern char text_buffer[];
-extern char D_00190504[];
+extern struct record *D_00190504[];
 extern char D_001940D6[];
 extern char D_001940D7[];
 extern char D_001940DA[];
 extern char ai_characters[];
 extern char ai_entities[];
-extern char current_building[];
-extern char player_entity[];
-extern char player_object[];
+extern struct building *current_building;
+extern struct record *player_entity;
+extern struct record *player_object;
 extern char D_00195AB0[];
-extern char D_00195AC4[];
+extern struct record *D_00195AC4;
 extern char creature_count[];
-extern char current_location[];
-extern char player_character[];
+extern struct location *current_location;
+extern struct character *player_character;
 extern char D_00195C44[];
 extern char trespassing[];
 extern char ai_los_index[];
@@ -76,25 +77,25 @@ extern char D_0019615F[];
 extern char D_001962AB[];
 extern char D_00199D74[];
 
-extern int collide_line_of_sight(int, int);
-extern int item_add_to_container(int, int, int, int);
+extern int collide_line_of_sight(struct record *, struct record *);
+extern int item_add_to_container(struct record *, int, int, int);
 extern int func_000602C0(int, unsigned short);
-extern int monster_set_action(int, int, int);
+extern int monster_set_action(struct record *, int, int);
 extern int func_000629F8(int);
 extern int ai_pick_touch_spell(int);
-extern int monster_cast_spell(int, int);
+extern int monster_cast_spell(struct record *, struct record *);
 extern int ai_angle_diff(int, int, int);
 extern int ai_sees_through_illusion(int);
 extern int ai_stealth_check(int, unsigned short, int, unsigned short);
 extern int disk_read_file(int, int);
 extern int disk_open_data(int);
 extern int rand_range(int, int);
-extern int object_building(int);
-extern int object_delete(int);
-extern int object_create_child(int, int, int);
-extern int object_reparent(int, int);
+extern struct building *object_building(struct record *);
+extern int object_delete(struct record *);
+extern struct record *object_create_child(struct record *, int, int);
+extern int object_reparent(struct record *, struct record *);
 extern int object_new_id(int);
-extern int location_cell_at(int, int);
+extern struct record *location_cell_at(int, int);
 extern int rand();
 extern int srand();
 extern int func_0009DEA7();
@@ -110,34 +111,34 @@ extern int func_000C7FD9();
 extern int func_000C7FF4();
 extern int func_000C808D();
 extern int func_00144F68();
-extern void func_0002682B(int);
-extern void damage_knockback_move(int, int);
+extern void func_0002682B(struct record *);
+extern void damage_knockback_move(struct record *, struct character *);
 extern void msgbox_show_rsc(int, int);
-extern void item_init_from_template(unsigned short, short, short, int);
-extern void item_make_random(unsigned short, int);
-extern void func_0005FA0E(int, int, int, unsigned short);
-extern void item_make_magic(int, int);
-extern void item_make_artifact(int, int);
-extern void monster_shoot_arrow(int, int);
-extern void monster_ambient_sound(int, int);
-extern void ai_move_toward_target(int, int, int, int, int);
+extern void item_init_from_template(unsigned short, short, short, struct item *);
+extern void item_make_random(unsigned short, struct item *);
+extern void func_0005FA0E(int, struct record *, int, unsigned short);
+extern void item_make_magic(struct item *, int);
+extern void item_make_artifact(struct item *, int);
+extern void monster_shoot_arrow(struct record *, struct record *);
+extern void monster_ambient_sound(struct record *, struct character *);
+extern void ai_move_toward_target(struct record *, struct character *, struct record *, int, int);
 extern void monster_apply_gravity(void);
-extern void weapon_melee_strike(int);
-extern void item_break(int);
+extern void weapon_melee_strike(struct record *);
+extern void item_break(struct record *);
 int func_0005F6E9(int);
 int func_0005F955(int);
 int func_000614A9(void);
-int ai_pick_target(int, int, int);
-int ai_turn_toward(int, int);
-void item_make(int, int, int);
-void func_0005ED19(int);
-void func_0005F0E8(int, int);
-void func_00061326(int);
-void func_000614FB(int);
-void ai_creature_think(int, int, int, int);
+int ai_pick_target(struct record *, struct character *, int);
+int ai_turn_toward(struct record *, int);
+void item_make(int, int, struct item *);
+void func_0005ED19(struct item *);
+void func_0005F0E8(struct record *, int);
+void func_00061326(struct record *);
+void func_000614FB(struct record *);
+void ai_creature_think(struct character *, struct record *, struct record *, int);
 #pragma aux func_000A0ED9 parm routine [];
 
-void item_make(int a1, int a2, int a3)
+void item_make(int a1, int a2, struct item *a3)
 {
     switch ((unsigned)a1) {
 case 5:
@@ -154,16 +155,16 @@ default:
 }
 }
 
-void func_0005E5D7(int a1, int a2)
+void func_0005E5D7(struct item *a1, int a2)
 {
     if (a2 <= 7) goto L5E616;
-    *(short *)((char *)a1 + 50) += ((unsigned short)(unsigned char)*(signed char *)(D_00186589 + ((int)(unsigned char)*(signed char *)(*(char **)player_character + 498)))) << 7;
+    a1->inventory_image += ((unsigned short)(unsigned char)*(signed char *)(D_00186589 + player_character->original_race)) << 7;
     return;
 L5E616:;
-    *(short *)((char *)a1 + 50) += ((unsigned short)(unsigned char)*(signed char *)(D_00186589 + a2)) << 7;
+    a1->inventory_image += ((unsigned short)(unsigned char)*(signed char *)(D_00186589 + a2)) << 7;
 }
 
-void func_0005E636(int a1)
+void func_0005E636(struct item *a1)
 {
     int l_28;
     int l_24;
@@ -171,7 +172,7 @@ void func_0005E636(int a1)
     int l_1C;
     int l_18;
 
-    switch (*(unsigned short *)((char *)a1 + 32)) {
+    switch (a1->group) {
 case 12:
     l_1C = 9;
     l_18 = (int)D_00185FFC;
@@ -181,30 +182,30 @@ case 6:
     l_18 = (int)D_0018606B;
     goto L5E6B8;
 case 2:
-    *(short *)((char *)a1 + 50) += rand_range(0, (int)&*(signed char *)((char *)((int)(unsigned char)*(signed char *)((char *)a1 + 65)) - 1));
+    a1->inventory_image += rand_range(0, (int)&*(signed char *)((char *)((int)(unsigned char)*(signed char *)((char *)a1 + 65)) - 1));
     return;
 default:
     l_1C = 0;
 L5E6B8:;
     if (((int)(unsigned char)*(signed char *)((char *)a1 + 65)) < 2) goto L5E6E7;
     l_24 = rand_range(0, (int)&*(signed char *)((char *)((int)(unsigned char)*(signed char *)((char *)a1 + 65)) - 1));
-    *(short *)((char *)a1 + 50) += l_24;
+    a1->inventory_image += l_24;
 L5E6E7:;
     func_0005ED19(a1);
-    if (((int)(unsigned short)*(short *)((char *)a1 + 34)) == l_1C) goto L5E711;
-    if (((int)(unsigned short)*(short *)((char *)a1 + 34)) != (l_1C + 1)) return;
+    if (a1->index == l_1C) goto L5E711;
+    if (a1->index != (l_1C + 1)) return;
 L5E711:;
-    (*(short *)((char *)a1 + 50))++;
+    a1->inventory_image++;
 }
 }
 
-void func_0005E722(int a1)
+void func_0005E722(struct item *a1)
 {
     int l_20;
     int l_1C;
     int l_18;
 
-    if (((int)(unsigned short)*(short *)((char *)a1 + 32)) != 12) goto L5E754;
+    if (a1->group != 12) goto L5E754;
     l_18 = (int)D_00185FFC;
     l_1C = 9;
     goto L5E762;
@@ -212,47 +213,47 @@ L5E754:;
     l_18 = (int)D_0018606B;
     l_1C = 13;
 L5E762:;
-    l_20 = (int)(unsigned short)(*(short *)((char *)a1 + 50) & 127);
+    l_20 = (int)(unsigned short)(a1->inventory_image & 127);
     if (*(signed char *)((char *)(l_18 + l_20)) == 0) return;
     if (*(signed char *)((char *)(l_18 + l_20) + 1) != *(signed char *)((char *)(l_18 + l_20))) goto L5E7A1;
-    (*(short *)((char *)a1 + 50))++;
+    a1->inventory_image++;
     return;
 L5E7A1:;
     l_20--;
 L5E7A7:;
     if (*(signed char *)((char *)(l_18 + l_20) + 1) != *(signed char *)((char *)(l_18 + l_20))) goto L5E7C9;
     l_20--;
-    (*(short *)((char *)a1 + 50))--;
+    a1->inventory_image--;
     goto L5E7A7;
 L5E7C9:;
-    if (((int)(unsigned short)*(short *)((char *)a1 + 34)) == l_1C) goto L5E7EB;
-    if (((int)(unsigned short)*(short *)((char *)a1 + 34)) != (l_1C + 1)) return;
+    if (a1->index == l_1C) goto L5E7EB;
+    if (a1->index != (l_1C + 1)) return;
 L5E7EB:;
-    (*(short *)((char *)a1 + 50))++;
+    a1->inventory_image++;
 }
 
-void func_0005E7FC(int a1)
+void func_0005E7FC(struct item *a1)
 {
     int l_20;
     int l_1C;
     int l_18;
 
-    if (((int)(unsigned short)*(short *)((char *)a1 + 32)) != 12) goto L5E827;
+    if (a1->group != 12) goto L5E827;
     l_18 = (int)D_00185FFC;
     goto L5E82E;
 L5E827:;
     l_18 = (int)D_0018606B;
 L5E82E:;
-    l_20 = (int)(unsigned short)(*(short *)((char *)a1 + 50) & 127);
+    l_20 = (int)(unsigned short)(a1->inventory_image & 127);
     l_20--;
 L5E848:;
     if (*(signed char *)((char *)(l_18 + l_20) + 1) != *(signed char *)((char *)(l_18 + l_20))) return;
     l_20--;
-    (*(short *)((char *)a1 + 50))--;
+    a1->inventory_image--;
     goto L5E848;
 }
 
-void func_0005E874(int a1)
+void func_0005E874(struct item *a1)
 {
     int l_28;
     int l_24;
@@ -260,10 +261,10 @@ void func_0005E874(int a1)
     int l_1C;
     int l_18;
 
-    l_24 = ((((int)(short)*(short *)((char *)a1 + 67)) != (-1)) ? 1 : 0);
-    *(signed char *)((char *)a1 + 54) = 0;
-    if (((int)(unsigned short)*(short *)((char *)a1 + 32)) != 3) goto L5E8D0;
-    if (((int)(unsigned short)*(short *)((char *)a1 + 34)) == 18) goto L5E8D2;
+    l_24 = ((a1->enchantments[0].type != (-1)) ? 1 : 0);
+    a1->material = 0;
+    if (a1->group != 3) goto L5E8D0;
+    if (a1->index == 18) goto L5E8D2;
 L5E8D0:;
     goto L5E8D7;
 L5E8D2:;
@@ -275,7 +276,7 @@ L5E8D7:;
     if (l_28 <= 255) goto L5E900;
     l_28 = 255;
 L5E900:;
-    l_18 = ((int)(unsigned char)*(signed char *)(*(char **)player_character + 129)) - 10;
+    l_18 = player_character->level - 10;
     if (l_18 >= 0) goto L5E922;
     l_18 <<= 2;
     goto L5E925;
@@ -284,7 +285,7 @@ L5E922:;
 L5E925:;
     l_28 += l_18;
     if (((int)(unsigned char)*(signed char *)player_environment) != 2) goto L5E952;
-    l_28 -= (14 - ((int)(unsigned char)*(signed char *)(*(char **)current_building + 25))) * 2;
+    l_28 -= (14 - current_building->quality) * 2;
 L5E952:;
     if (l_28 >= 0) goto L5E961;
     l_28 = 0;
@@ -294,23 +295,23 @@ L5E961:;
     l_28 = 256;
 L5E971:;
     if (*(signed char *)D_001962AB == 0) goto L5E990;
-    *(signed char *)((char *)a1 + 54) = *(signed char *)D_001962AB - 1;
+    a1->material = *(signed char *)D_001962AB - 1;
     *(signed char *)D_001962AB = 0;
     goto L5E9CC;
 L5E990:;
-    if (((int)(unsigned char)*(signed char *)(D_00186591 + ((int)(unsigned char)*(signed char *)((char *)a1 + 54)))) >= l_28) goto L5E9CC;
-    l_28 -= (int)(unsigned char)*(signed char *)(D_00186591 + ((int)(unsigned char)*(signed char *)((char *)a1 + 54)));
-    (*(signed char *)((char *)a1 + 54))++;
+    if (((int)(unsigned char)*(signed char *)(D_00186591 + a1->material)) >= l_28) goto L5E9CC;
+    l_28 -= (int)(unsigned char)*(signed char *)(D_00186591 + a1->material);
+    a1->material++;
     goto L5E990;
 L5E9CC:;
-    *(int *)((char *)a1 + 36) = *(int *)((char *)a1 + 36) * (((int)(short)*(short *)(D_001869C0 + (((int)(unsigned char)*(signed char *)((char *)a1 + 54)) * 2))) * 3);
-    *(int *)((char *)a1 + 57) = ((unsigned)(((int)(short)*(short *)(D_001869D4 + (((int)(unsigned char)*(signed char *)((char *)a1 + 54)) * 2))) * *(int *)((char *)a1 + 57))) >> 2;
-    *(short *)((char *)a1 + 44) = (*(short *)((char *)a1 + 46) = (((int)(unsigned short)*(short *)((char *)a1 + 46)) * ((int)(short)*(short *)(D_001869EA + (((int)(unsigned char)*(signed char *)((char *)a1 + 54)) * 2)))) >> 2);
-    *(short *)((char *)a1 + 61) = (((int)(unsigned short)*(short *)((char *)a1 + 61)) * ((int)(short)*(short *)(D_001869FE + (((int)(unsigned char)*(signed char *)((char *)a1 + 54)) * 2)))) >> 2;
-    *(signed char *)((char *)a1 + 56) = *(signed char *)((char *)a1 + 54) + 16;
+    a1->value = a1->value * (((int)(short)*(short *)(D_001869C0 + (a1->material * 2))) * 3);
+    a1->weight = ((unsigned)(((int)(short)*(short *)(D_001869D4 + (a1->material * 2))) * a1->weight)) >> 2;
+    a1->condition = (a1->max_condition = (a1->max_condition * ((int)(short)*(short *)(D_001869EA + (a1->material * 2)))) >> 2);
+    a1->enchant_points = (a1->enchant_points * ((int)(short)*(short *)(D_001869FE + (a1->material * 2)))) >> 2;
+    a1->color = a1->material + 16;
 }
 
-void func_0005EA8F(int a1)
+void func_0005EA8F(struct item *a1)
 {
     int l_24;
     int l_20;
@@ -323,8 +324,8 @@ void func_0005EA8F(int a1)
 L5EAC1:;
     goto L5EAD2;
 L5EAC3:;
-    *(signed char *)((char *)a1 + 55) = 0;
-    *(unsigned *)((char *)a1 + 57) >>= 1;
+    a1->armor_type = 0;
+    a1->weight >>= 1;
     goto L5EAF3;
 L5EAD2:;
     if (l_24 >= 90) goto L5EAE1;
@@ -332,19 +333,19 @@ L5EAD2:;
 L5EAE1:;
     goto L5EAEC;
 L5EAE3:;
-    *(signed char *)((char *)a1 + 55) = 1;
+    a1->armor_type = 1;
     goto L5EAF3;
 L5EAEC:;
-    *(signed char *)((char *)a1 + 55) = 2;
+    a1->armor_type = 2;
 L5EAF3:;
-    if (((int)(unsigned char)*(signed char *)((char *)a1 + 55)) != 2) goto L5ECBD;
+    if (a1->armor_type != 2) goto L5ECBD;
     l_1C = rand_range(0, 255);
-    if (((int)(short)*(short *)((char *)a1 + 67)) == (-1)) goto L5EB36;
+    if (a1->enchantments[0].type == (-1)) goto L5EB36;
     l_1C += 60;
     if (l_1C <= 255) goto L5EB36;
     l_1C = 255;
 L5EB36:;
-    l_18 = ((int)(unsigned char)*(signed char *)(*(char **)player_character + 129)) - 10;
+    l_18 = player_character->level - 10;
     if (l_18 >= 0) goto L5EB58;
     l_18 <<= 2;
     goto L5EB5B;
@@ -353,7 +354,7 @@ L5EB58:;
 L5EB5B:;
     l_1C += l_18;
     if (((int)(unsigned char)*(signed char *)player_environment) != 2) goto L5EB88;
-    l_1C -= (14 - ((int)(unsigned char)*(signed char *)(*(char **)current_building + 25))) * 2;
+    l_1C -= (14 - current_building->quality) * 2;
 L5EB88:;
     if (l_1C >= 0) goto L5EB97;
     l_1C = 0;
@@ -363,57 +364,57 @@ L5EB97:;
     l_1C = 256;
 L5EBA7:;
     if (*(signed char *)D_001962AB == 0) goto L5EBC6;
-    *(signed char *)((char *)a1 + 54) = *(signed char *)D_001962AB - 1;
+    a1->material = *(signed char *)D_001962AB - 1;
     *(signed char *)D_001962AB = 0;
     goto L5EC02;
 L5EBC6:;
-    if (((int)(unsigned char)*(signed char *)(D_00186591 + ((int)(unsigned char)*(signed char *)((char *)a1 + 54)))) >= l_1C) goto L5EC02;
-    l_1C -= (int)(unsigned char)*(signed char *)(D_00186591 + ((int)(unsigned char)*(signed char *)((char *)a1 + 54)));
-    (*(signed char *)((char *)a1 + 54))++;
+    if (((int)(unsigned char)*(signed char *)(D_00186591 + a1->material)) >= l_1C) goto L5EC02;
+    l_1C -= (int)(unsigned char)*(signed char *)(D_00186591 + a1->material);
+    a1->material++;
     goto L5EBC6;
 L5EC02:;
-    *(int *)((char *)a1 + 36) = *(int *)((char *)a1 + 36) * (((int)(short)*(short *)(D_001869C0 + (((int)(unsigned char)*(signed char *)((char *)a1 + 54)) * 2))) * 3);
-    *(int *)((char *)a1 + 57) = ((unsigned)(((int)(short)*(short *)(D_001869D4 + (((int)(unsigned char)*(signed char *)((char *)a1 + 54)) * 2))) * *(int *)((char *)a1 + 57))) >> 2;
-    *(short *)((char *)a1 + 44) = (*(short *)((char *)a1 + 46) = (((int)(unsigned short)*(short *)((char *)a1 + 46)) * ((int)(short)*(short *)(D_001869EA + (((int)(unsigned char)*(signed char *)((char *)a1 + 54)) * 2)))) >> 2);
-    *(short *)((char *)a1 + 61) = (((int)(unsigned short)*(short *)((char *)a1 + 61)) * ((int)(short)*(short *)(D_001869FE + (((int)(unsigned char)*(signed char *)((char *)a1 + 54)) * 2)))) >> 2;
-    *(signed char *)((char *)a1 + 56) = *(signed char *)((char *)a1 + 54) + 16;
+    a1->value = a1->value * (((int)(short)*(short *)(D_001869C0 + (a1->material * 2))) * 3);
+    a1->weight = ((unsigned)(((int)(short)*(short *)(D_001869D4 + (a1->material * 2))) * a1->weight)) >> 2;
+    a1->condition = (a1->max_condition = (a1->max_condition * ((int)(short)*(short *)(D_001869EA + (a1->material * 2)))) >> 2);
+    a1->enchant_points = (a1->enchant_points * ((int)(short)*(short *)(D_001869FE + (a1->material * 2)))) >> 2;
+    a1->color = a1->material + 16;
     goto L5ECD7;
 L5ECBD:;
-    *(int *)((char *)a1 + 36) = *(int *)((char *)a1 + 36) * ((int)&*(signed char *)((char *)((int)(unsigned char)*(signed char *)((char *)a1 + 55)) + 1));
+    a1->value = a1->value * ((int)&*(signed char *)((char *)(a1->armor_type) + 1));
 L5ECD7:;
-    l_20 = func_000602C0((int)(unsigned char)*(signed char *)((char *)a1 + 55), (int)(unsigned short)*(short *)((char *)a1 + 34));
+    l_20 = func_000602C0(a1->armor_type, a1->index);
     if (l_20 == (-1)) return;
-    *(short *)((char *)a1 + 50) = l_20 + (*(short *)((char *)a1 + 50) & -128);
+    a1->inventory_image = l_20 + (a1->inventory_image & -128);
 }
 
-void func_0005ED19(int a1)
+void func_0005ED19(struct item *a1)
 {
     int l_18;
 
     l_18 = rand_range(0, 100);
     if (l_18 < 25) return;
-    *(signed char *)((char *)a1 + 56) = rand_range(1, 10);
-    if (((int)(unsigned short)*(short *)((char *)a1 + 32)) != 6) goto L5EDCA;
-    if (((int)(unsigned short)*(short *)((char *)a1 + 34)) == 10) goto L5ED8D;
-    if (((int)(unsigned short)*(short *)((char *)a1 + 34)) != 11) goto L5EDA3;
+    a1->color = rand_range(1, 10);
+    if (a1->group != 6) goto L5EDCA;
+    if (a1->index == 10) goto L5ED8D;
+    if (a1->index != 11) goto L5EDA3;
 L5ED8D:;
-    *(signed char *)((char *)a1 + 56) = *(signed char *)(D_0018659B + (rand() & 3));
+    a1->color = *(signed char *)(D_0018659B + (rand() & 3));
     goto L5EDC8;
 L5EDA3:;
-    if (((int)(unsigned short)*(short *)((char *)a1 + 34)) != 4) goto L5EDC8;
-    *(signed char *)((char *)a1 + 56) = *(signed char *)(D_0018659F + (rand() & 3));
+    if (a1->index != 4) goto L5EDC8;
+    a1->color = *(signed char *)(D_0018659F + (rand() & 3));
 L5EDC8:;
     return;
 L5EDCA:;
-    if (((int)(unsigned short)*(short *)((char *)a1 + 32)) != 12) goto L5EDEC;
-    if (((int)(unsigned short)*(short *)((char *)a1 + 34)) == 8) goto L5EDEE;
+    if (a1->group != 12) goto L5EDEC;
+    if (a1->index == 8) goto L5EDEE;
 L5EDEC:;
     return;
 L5EDEE:;
-    *(signed char *)((char *)a1 + 56) = *(signed char *)(D_0018659B + (rand() & 3));
+    a1->color = *(signed char *)(D_0018659B + (rand() & 3));
 }
 
-void func_0005EE0C(int a1, int a2, int a3)
+void func_0005EE0C(struct record *a1, int a2, int a3)
 {
     int l_30;
     int l_2C;
@@ -422,22 +423,22 @@ void func_0005EE0C(int a1, int a2, int a3)
     int l_20;
     int l_1C;
     int l_18;
-    int l_14;
-    int l_10;
+    struct item *l_14;
+    struct record *l_10;
 
     l_20 = *(int *)(D_00186483 + (a2 << 2));
     if (l_20 == 0) return;
 L5EE3A:;
     if (((int)(unsigned char)*(signed char *)((char *)l_20)) == 255) return;
     if (((int)(unsigned char)*(signed char *)((char *)l_20)) != 6) goto L5EE75;
-    if (((int)(unsigned short)(*(short *)(*(char **)player_character + 64) & 1)) != 0) goto L5EE77;
+    if (((int)(unsigned short)(player_character->flags & 1)) != 0) goto L5EE77;
 L5EE75:;
     goto L5EE7D;
 L5EE77:;
     *(signed char *)((char *)l_20) = 12;
 L5EE7D:;
     if (((int)(unsigned char)*(signed char *)((char *)l_20)) != 12) goto L5EEA3;
-    if (((int)(unsigned short)(*(short *)(*(char **)player_character + 64) & 1)) == 0) goto L5EEA5;
+    if (((int)(unsigned short)(player_character->flags & 1)) == 0) goto L5EEA5;
 L5EEA3:;
     goto L5EEAB;
 L5EEA5:;
@@ -478,21 +479,21 @@ L5EFBF:;
     goto L5F07D;
 L5EFC4:;
     l_10 = object_create_child(a1, 0, 107);
-    *(signed char *)((char *)l_10) = 2;
-    *(int *)((char *)l_10 + 7) = *(int *)(*(char **)player_object + 7);
-    *(int *)((char *)l_10 + 11) = *(int *)(*(char **)player_object + 11);
-    *(int *)((char *)l_10 + 15) = *(int *)(*(char **)player_object + 15);
-    *(short *)((char *)l_10 + 29) = 998;
-    *(int *)((char *)l_10 + 31) = object_new_id(((unsigned)*(int *)(*(char **)D_00195AC4 + 31)) >> 16);
+    l_10->type = 2;
+    l_10->x = player_object->x;
+    l_10->y = player_object->y;
+    l_10->z = player_object->z;
+    l_10->image2 = 998;
+    l_10->id = object_new_id(((unsigned)D_00195AC4->id) >> 16);
     if (a2 < 0) goto L5F034;
-    *(signed char *)((char *)l_10 + 21) |= 32;
+    l_10->flags |= 32;
 L5F034:;
-    l_14 = l_10 + 71;
+    l_14 = &l_10->data.item;
     item_make((int)(unsigned char)*(signed char *)((char *)l_20), l_24, l_14);
-    if (((int)(unsigned short)*(short *)((char *)l_14 + 32)) != 3) goto L5F074;
-    if (((int)(unsigned short)*(short *)((char *)l_14 + 34)) == 18) goto L5F07D;
+    if (l_14->group != 3) goto L5F074;
+    if (l_14->index == 18) goto L5F07D;
 L5F074:;
-    *(short *)((char *)l_10 + 29) = 0;
+    l_10->image2 = 0;
 L5F07D:;
     (*(char (**)[2])&l_1C)++;
     l_24++;
@@ -523,10 +524,10 @@ L5F0D5:;
 }
 }
 
-void func_0005F0E8(int a1, int a2)
+void func_0005F0E8(struct record *a1, int a2)
 {
     int l_18;
-    int l_14;
+    struct record *l_14;
 
     a2 = (a2 + 3) / 5;
     if (a2 < 4) goto L5F11C;
@@ -542,20 +543,20 @@ L5F136:;
     goto L5F129;
 L5F13E:;
     l_14 = object_create_child(a1, 0, 107);
-    *(signed char *)((char *)l_14) = 2;
-    *(int *)((char *)l_14 + 7) = *(int *)(*(char **)player_object + 7);
-    *(int *)((char *)l_14 + 11) = *(int *)(*(char **)player_object + 11);
-    *(int *)((char *)l_14 + 15) = *(int *)(*(char **)player_object + 15);
-    *(int *)((char *)l_14 + 31) = object_new_id(((unsigned)*(int *)(*(char **)D_00195AC4 + 31)) >> 16);
-    *(signed char *)((char *)l_14 + 21) |= 32;
-    item_make(7, a2, l_14 + 71);
+    l_14->type = 2;
+    l_14->x = player_object->x;
+    l_14->y = player_object->y;
+    l_14->z = player_object->z;
+    l_14->id = object_new_id(((unsigned)D_00195AC4->id) >> 16);
+    l_14->flags |= 32;
+    item_make(7, a2, &l_14->data.item);
     goto L5F136;
 }
 
-void func_0005F1BD(int a1, int a2, int a3, int a4)
+void func_0005F1BD(struct record *a1, int a2, int a3, int a4)
 {
     int l_14;
-    int l_10;
+    struct record *l_10;
     int l_C;
 
     if (a3 == 0) goto L5F1E1;
@@ -563,88 +564,88 @@ void func_0005F1BD(int a1, int a2, int a3, int a4)
 L5F1E1:;
     l_14 = 0;
 L5F1E8:;
-    if (((((int)(unsigned char)*(signed char *)(*(char **)current_building + 25)) >> 1) + 1) > l_14) goto L5F20A;
+    if (((current_building->quality >> 1) + 1) > l_14) goto L5F20A;
     goto L5F28E;
 L5F202:;
     l_14++;
     goto L5F1E8;
 L5F20A:;
     l_10 = object_create_child(a1, 0, 107);
-    *(signed char *)((char *)l_10) = 2;
-    *(int *)((char *)l_10 + 31) = object_new_id(((unsigned)*(int *)(*(char **)D_00195AC4 + 31)) >> 16);
-    item_make_magic(l_10 + 71, -1);
-    *(int *)((char *)l_10 + 7) = *(int *)(*(char **)player_object + 7);
-    *(int *)((char *)l_10 + 11) = *(int *)(*(char **)player_object + 11);
-    *(int *)((char *)l_10 + 15) = *(int *)(*(char **)player_object + 15);
-    *(short *)((char *)l_10 + 21) |= a3;
+    l_10->type = 2;
+    l_10->id = object_new_id(((unsigned)D_00195AC4->id) >> 16);
+    item_make_magic(&l_10->data.item, -1);
+    l_10->x = player_object->x;
+    l_10->y = player_object->y;
+    l_10->z = player_object->z;
+    l_10->flags |= a3;
     if (a3 == 0) goto L5F289;
-    *(signed char *)((char *)l_10 + 113) |= 32;
+    l_10->data.item.item_flags |= 32;
 L5F289:;
     goto L5F202;
 L5F28E:;
     l_10 = object_create_child(a1, 0, 107);
-    *(signed char *)((char *)l_10) = 2;
-    *(int *)((char *)l_10 + 31) = object_new_id(((unsigned)*(int *)(*(char **)D_00195AC4 + 31)) >> 16);
-    *(int *)((char *)l_10 + 7) = *(int *)(*(char **)player_object + 7);
-    *(int *)((char *)l_10 + 11) = *(int *)(*(char **)player_object + 11);
-    *(int *)((char *)l_10 + 15) = *(int *)(*(char **)player_object + 15);
-    *(signed char *)((char *)l_10 + 21) |= 32;
-    item_make(27, 0, l_10 + 71);
+    l_10->type = 2;
+    l_10->id = object_new_id(((unsigned)D_00195AC4->id) >> 16);
+    l_10->x = player_object->x;
+    l_10->y = player_object->y;
+    l_10->z = player_object->z;
+    l_10->flags |= 32;
+    item_make(27, 0, &l_10->data.item);
     if (a4 == 0) return;
     l_14 = 0;
 L5F312:;
-    if (((((int)(unsigned char)*(signed char *)(*(char **)current_building + 25)) >> 1) + 1) > l_14) goto L5F334;
+    if (((current_building->quality >> 1) + 1) > l_14) goto L5F334;
     return;
 L5F32C:;
     l_14++;
     goto L5F312;
 L5F334:;
     l_10 = object_create_child(a1, 0, 107);
-    *(signed char *)((char *)l_10) = 2;
-    *(int *)((char *)l_10 + 31) = object_new_id(((unsigned)*(int *)(*(char **)D_00195AC4 + 31)) >> 16);
-    *(int *)((char *)l_10 + 7) = *(int *)(*(char **)player_object + 7);
-    *(int *)((char *)l_10 + 11) = *(int *)(*(char **)player_object + 11);
-    *(int *)((char *)l_10 + 15) = *(int *)(*(char **)player_object + 15);
-    *(signed char *)((char *)l_10 + 21) |= 32;
-    item_make(27, 1, l_10 + 71);
+    l_10->type = 2;
+    l_10->id = object_new_id(((unsigned)D_00195AC4->id) >> 16);
+    l_10->x = player_object->x;
+    l_10->y = player_object->y;
+    l_10->z = player_object->z;
+    l_10->flags |= 32;
+    item_make(27, 1, &l_10->data.item);
     if (rand_range(1, 100) >= 25) goto L5F3EB;
     func_00061326(l_10);
-    *(int *)((char *)l_10 + 107) = *(int *)(D_00187966 + (((int)(unsigned short)*(short *)(*(char **)((char *)l_10 + 63) + 27)) << 2)) + 5000;
+    l_10->data.item.value = *(int *)(D_00187966 + (((int)*(unsigned short *)((char *)l_10->children + 27)) << 2)) + 5000;
     goto L5F3F5;
 L5F3EB:;
-    *(int *)((char *)l_10 + 107) = 5000;
+    l_10->data.item.value = 5000;
 L5F3F5:;
     goto L5F32C;
 }
 
-void func_0005F401(int a1)
+void func_0005F401(struct record *a1)
 {
     int l_20;
-    int l_1C;
+    struct record *l_1C;
     int l_18;
 
     l_20 = 0;
 L5F419:;
-    if (((((int)(unsigned char)*(signed char *)(*(char **)current_building + 25)) >> 1) + 1) > l_20) goto L5F43B;
+    if (((current_building->quality >> 1) + 1) > l_20) goto L5F43B;
     return;
 L5F433:;
     l_20++;
     goto L5F419;
 L5F43B:;
     l_1C = object_create_child(a1, 0, 107);
-    *(signed char *)((char *)l_1C) = 2;
-    *(int *)((char *)l_1C + 31) = object_new_id(((unsigned)*(int *)(*(char **)D_00195AC4 + 31)) >> 16);
-    *(int *)((char *)l_1C + 7) = *(int *)(*(char **)player_object + 7);
-    *(int *)((char *)l_1C + 11) = *(int *)(*(char **)player_object + 11);
-    *(int *)((char *)l_1C + 15) = *(int *)(*(char **)player_object + 15);
-    *(signed char *)((char *)l_1C + 21) |= 32;
-    item_make(27, 1, l_1C + 71);
+    l_1C->type = 2;
+    l_1C->id = object_new_id(((unsigned)D_00195AC4->id) >> 16);
+    l_1C->x = player_object->x;
+    l_1C->y = player_object->y;
+    l_1C->z = player_object->z;
+    l_1C->flags |= 32;
+    item_make(27, 1, &l_1C->data.item);
     if (rand_range(1, 100) >= 25) goto L5F4F2;
     func_00061326(l_1C);
-    *(int *)((char *)l_1C + 107) = *(int *)(D_00187966 + (((int)(unsigned short)*(short *)(*(char **)((char *)l_1C + 63) + 27)) << 2)) + 5000;
+    l_1C->data.item.value = *(int *)(D_00187966 + (((int)*(unsigned short *)((char *)l_1C->children + 27)) << 2)) + 5000;
     goto L5F4FC;
 L5F4F2:;
-    *(int *)((char *)l_1C + 107) = 5000;
+    l_1C->data.item.value = 5000;
 L5F4FC:;
     goto L5F433;
 }
@@ -670,13 +671,13 @@ L5F5A3:;
     func_00144F68(160 - (((int)(unsigned short)*(short *)((char *)l_18 + 4)) >> 1), 50, (int)(unsigned short)*(short *)((char *)l_18 + 4), (int)(unsigned short)*(short *)((char *)l_18 + 6), l_18 + 12);
 }
 
-void item_info_painting(int a1)
+void item_info_painting(struct item *a1)
 {
     int l_1C;
     int l_18;
 
     l_18 = rand();
-    *(short *)D_00195DC4 = rand(srand((int)(unsigned short)*(short *)((char *)a1 + 63))) % 180;
+    *(short *)D_00195DC4 = rand(srand((int)(unsigned short)(short)a1->message)) % 180;
     l_1C = disk_open_data((int)D_001758EE);
     lseek(l_1C, ((int)(unsigned short)*(short *)D_00195DC4) * 40, 0);
     func_000A00CB(l_1C, *(int *)D_00195C44, 40);
@@ -710,7 +711,7 @@ L5F737:;
     return (int)(unsigned char)*(signed char *)((char *)(int)((char *)a1 + rand_range(0, l_1C - 1)));
 }
 
-void item_init_book(int a1, int a2)
+void item_init_book(struct item *a1, int a2)
 {
     int l_1C;
     int l_18;
@@ -719,13 +720,13 @@ void item_init_book(int a1, int a2)
     *(short *)((char *)a1 + 63) = *(short *)(D_0018E044 + (func_0005F955(a2) << 2));
     l_1C = *(int *)D_00195C44;
     func_000A0ED9(674, (int)D_001758B8);
-    mc_sprintf((int)text_buffer, (int)D_001758F8, (int)(unsigned short)*(short *)((char *)a1 + 63));
+    mc_sprintf((int)text_buffer, (int)D_001758F8, (int)(unsigned short)(short)a1->message);
     l_18 = disk_open_data((int)text_buffer);
     func_000A00CB(l_18, l_1C, 234);
     func_0009DEA7(l_18);
     l_14 = rand();
     srand(*(int *)((char *)l_1C));
-    *(int *)((char *)a1 + 36) = rand_range(300, 800);
+    a1->value = rand_range(300, 800);
     srand(l_14);
 }
 
@@ -769,7 +770,7 @@ int func_0005FD36(int a1)
 {
     int l_24;
     int l_20;
-    int l_1C;
+    struct item *l_1C;
 
     l_24 = 0;
     l_20 = l_24;
@@ -780,45 +781,45 @@ L5FD5F:;
     l_24++;
     goto L5FD54;
 L5FD67:;
-    if (*(int *)(*(char **)player_character + 367 + (l_24 << 2)) == 0) goto L5FD5F;
-    l_1C = *(int *)(*(char **)player_character + 367 + (l_24 << 2)) + 71;
-    if (((int)(unsigned short)*(short *)((char *)l_1C + 32)) != 1) goto L5FDC4;
-    if (memchr((int)D_00186583, (int)(unsigned short)*(short *)((char *)l_1C + 34), 6) != 0) goto L5FDC6;
+    if (player_character->equipped[l_24] == 0) goto L5FD5F;
+    l_1C = &player_character->equipped[l_24]->data.item;
+    if (l_1C->group != 1) goto L5FDC4;
+    if (memchr((int)D_00186583, l_1C->index, 6) != 0) goto L5FDC6;
 L5FDC4:;
     goto L5FDCC;
 L5FDC6:;
     l_20 += 10;
     goto L5FD5F;
 L5FDCC:;
-    if (((int)(unsigned short)*(short *)((char *)l_1C + 32)) != 2) goto L5FDE3;
+    if (l_1C->group != 2) goto L5FDE3;
     if (a1 != 0) goto L5FDE5;
 L5FDE3:;
     goto L5FE01;
 L5FDE5:;
-    l_20 += (int)(unsigned char)*(signed char *)(D_00186578 + ((int)(unsigned short)*(short *)((char *)l_1C + 34)));
+    l_20 += (int)(unsigned char)*(signed char *)(D_00186578 + l_1C->index);
     goto L5FE3D;
 L5FE01:;
-    if (((int)(unsigned short)*(short *)((char *)l_1C + 32)) == 6) goto L5FE23;
-    if (((int)(unsigned short)*(short *)((char *)l_1C + 32)) != 12) goto L5FE3D;
+    if (l_1C->group == 6) goto L5FE23;
+    if (l_1C->group != 12) goto L5FE3D;
 L5FE23:;
-    l_20 += (int)(unsigned char)*(signed char *)(D_0018654F + ((int)(unsigned short)*(short *)((char *)l_1C + 34)));
+    l_20 += (int)(unsigned char)*(signed char *)(D_0018654F + l_1C->index);
 L5FE3D:;
     goto L5FD5F;
 L5FE42:;
     return l_20;
 }
 
-void func_0005FE55(int a1)
+void func_0005FE55(struct record *a1)
 {
     int l_20;
     int l_1C;
-    int l_18;
+    struct building *l_18;
 
     if (((int)(unsigned char)*(signed char *)player_environment) == 1) goto L5FF6F;
-    l_20 = ((int)(unsigned char)*(signed char *)(D_001865F2 + ((int)(unsigned char)*(signed char *)(*(char **)current_location + 34)))) - 1;
+    l_20 = ((int)(unsigned char)*(signed char *)(D_001865F2 + current_location->kind)) - 1;
 L5FE92:;
-    if (*(int *)((char *)a1 + 63) != 0) goto L5FECD;
-    func_0005FA0E(l_20, a1, (int)(unsigned char)*(signed char *)(*(char **)player_character + 129), (int)(unsigned short)(*(short *)(*(char **)player_character + 64) & 1));
+    if (a1->children != 0) goto L5FECD;
+    func_0005FA0E(l_20, a1, player_character->level, (int)(unsigned short)(player_character->flags & 1));
     goto L5FE92;
 L5FECD:;
     if (l_20 < 9) goto L5FED9;
@@ -828,8 +829,8 @@ L5FED9:;
 L5FEDE:;
     if (rand_range(1, 100) > ((int)(unsigned char)*(signed char *)(D_00186610 + l_20))) goto L5FF29;
     a1 = object_create_child(a1, 0, 107);
-    *(signed char *)((char *)a1) = 2;
-    item_make(27, 8, a1 + 71);
+    a1->type = 2;
+    item_make(27, 8, &a1->data.item);
 L5FF29:;
     if (rand_range(1, 100) >= 4) goto L5FF45;
     func_000614FB(a1);
@@ -844,70 +845,70 @@ L5FF6F:;
     l_20 = 0;
     goto L5FF94;
 L5FF89:;
-    l_20 = (int)(unsigned char)*(signed char *)((char *)l_18 + 24);
+    l_20 = l_18->type;
 L5FF94:;
-    if (*(int *)((char *)a1 + 63) != 0) return;
-    func_0005FA0E(((int)(unsigned char)*(signed char *)(D_00186605 + l_20)) - 1, a1, (int)(unsigned char)*(signed char *)(*(char **)player_character + 129), (int)(unsigned short)(*(short *)(*(char **)player_character + 64) & 1));
+    if (a1->children != 0) return;
+    func_0005FA0E(((int)(unsigned char)*(signed char *)(D_00186605 + l_20)) - 1, a1, player_character->level, (int)(unsigned short)(player_character->flags & 1));
     goto L5FF94;
 }
 
-void func_0005FFE5(int a1, int a2, int a3)
+void func_0005FFE5(struct record *a1, int a2, int a3)
 {
-    int l_14;
-    int l_10;
+    struct record *l_14;
+    struct item *l_10;
 
     l_14 = object_create_child(a1, 0, 107);
-    l_10 = l_14 + 71;
-    *(signed char *)((char *)l_14) = 2;
-    *(int *)((char *)l_14 + 7) = *(int *)((char *)a1 + 7);
-    *(int *)((char *)l_14 + 11) = *(int *)((char *)a1 + 11);
-    *(int *)((char *)l_14 + 15) = *(int *)((char *)a1 + 15);
-    *(short *)((char *)l_10 + 32) = 28;
-    *(short *)((char *)l_10 + 34) = 0;
-    *(int *)((char *)l_10 + 36) = rand_range(a2, a3) * ((int)(unsigned char)*(signed char *)(*(char **)player_character + 129));
+    l_10 = &l_14->data.item;
+    l_14->type = 2;
+    l_14->x = a1->x;
+    l_14->y = a1->y;
+    l_14->z = a1->z;
+    l_10->group = 28;
+    l_10->index = 0;
+    l_10->value = rand_range(a2, a3) * player_character->level;
 }
 
-void func_0006007C(int a1)
+void func_0006007C(struct record *a1)
 {
-    int l_18;
+    struct record *l_18;
 
     l_18 = object_create_child(a1, 0, 107);
-    *(signed char *)((char *)l_18) = 2;
-    *(int *)((char *)l_18 + 7) = *(int *)((char *)a1 + 7);
-    *(int *)((char *)l_18 + 11) = *(int *)((char *)a1 + 11);
-    *(int *)((char *)l_18 + 15) = *(int *)((char *)a1 + 15);
-    item_make_random((int)(unsigned short)((unsigned short)(unsigned char)*(signed char *)(D_0018661E + (rand() % 8))), l_18 + 71);
+    l_18->type = 2;
+    l_18->x = a1->x;
+    l_18->y = a1->y;
+    l_18->z = a1->z;
+    item_make_random((int)(unsigned short)((unsigned short)(unsigned char)*(signed char *)(D_0018661E + (rand() % 8))), &l_18->data.item);
 }
 
-void func_00060100(int a1)
+void func_00060100(struct record *a1)
 {
-    int l_18;
+    struct record *l_18;
 
     l_18 = object_create_child(a1, 0, 107);
-    *(signed char *)((char *)l_18) = 2;
-    *(int *)((char *)l_18 + 7) = *(int *)((char *)a1 + 7);
-    *(int *)((char *)l_18 + 11) = *(int *)((char *)a1 + 11);
-    *(int *)((char *)l_18 + 15) = *(int *)((char *)a1 + 15);
-    item_make_random((int)(unsigned short)((unsigned short)(unsigned char)*(signed char *)(D_00186626 + (rand() % 4))), l_18 + 71);
+    l_18->type = 2;
+    l_18->x = a1->x;
+    l_18->y = a1->y;
+    l_18->z = a1->z;
+    item_make_random((int)(unsigned short)((unsigned short)(unsigned char)*(signed char *)(D_00186626 + (rand() % 4))), &l_18->data.item);
 }
 
-void func_00060184(int a1, int a2)
+void func_00060184(struct record *a1, int a2)
 {
-    int l_14;
+    struct record *l_14;
 
     l_14 = object_create_child(a1, 0, 107);
-    *(signed char *)((char *)l_14) = 2;
-    *(int *)((char *)l_14 + 7) = *(int *)((char *)a1 + 7);
-    *(int *)((char *)l_14 + 11) = *(int *)((char *)a1 + 11);
-    *(int *)((char *)l_14 + 15) = *(int *)((char *)a1 + 15);
-    item_make_random((int)(unsigned short)*(short *)&a2, l_14 + 71);
+    l_14->type = 2;
+    l_14->x = a1->x;
+    l_14->y = a1->y;
+    l_14->z = a1->z;
+    item_make_random((int)(unsigned short)*(short *)&a2, &l_14->data.item);
 }
 
-void func_000601ED(int a1, int a2)
+void func_000601ED(struct record *a1, int a2)
 {
-    int l_14;
+    struct item *l_14;
 
-    l_14 = a1 + 71;
+    l_14 = &a1->data.item;
     a2 = ((a2 * 10) + 50) / 100;
     if (a2 != 0) goto L60239;
     if (rand_range(1, 100) < 20) goto L6023B;
@@ -916,21 +917,21 @@ L60239:;
 L6023B:;
     a2 = 1;
 L60242:;
-    if (((int)(unsigned short)*(short *)((char *)l_14 + 44)) <= a2) goto L6025F;
-    *(short *)((char *)l_14 + 44) -= a2;
+    if (l_14->condition <= a2) goto L6025F;
+    l_14->condition -= a2;
     return;
 L6025F:;
     item_break(a1);
 }
 
-void item_damage(int a1, int a2)
+void item_damage(struct record *a1, int a2)
 {
-    int l_14;
+    struct item *l_14;
 
     if (a1 == 0) return;
-    l_14 = a1 + 71;
-    if (((int)(unsigned short)*(short *)((char *)l_14 + 44)) <= a2) goto L602AF;
-    *(short *)((char *)l_14 + 44) -= a2;
+    l_14 = &a1->data.item;
+    if (l_14->condition <= a2) goto L602AF;
+    l_14->condition -= a2;
     return;
 L602AF:;
     item_break(a1);
@@ -947,14 +948,14 @@ void magic_def_load(void)
     func_0009DEA7(l_18);
 }
 
-void shop_generate_stock(int a1, int a2, int a3, int a4, int a5)
+void shop_generate_stock(struct record *a1, int a2, int a3, int a4, int a5)
 {
     int l_20;
     int l_1C;
     int l_18;
     int l_14;
     int l_10;
-    int l_C;
+    struct record *l_C;
 
     if (a4 >= 21) return;
     if (a2 >= 2) goto L6107D;
@@ -996,32 +997,32 @@ L6110F:;
 L6112B:;
     if (l_18 == 0) return;
     l_C = object_create_child(a1, 0, 107);
-    *(signed char *)((char *)l_C) = 2;
-    *(int *)((char *)l_C + 7) = *(int *)(*(char **)player_object + 7);
-    *(int *)((char *)l_C + 11) = *(int *)(*(char **)player_object + 11);
-    *(int *)((char *)l_C + 15) = *(int *)(*(char **)player_object + 15);
-    *(short *)((char *)l_C + 23) = a5;
-    *(int *)((char *)l_C + 31) = object_new_id(((unsigned)*(int *)(*(char **)D_00195AC4 + 31)) >> 16);
+    l_C->type = 2;
+    l_C->x = player_object->x;
+    l_C->y = player_object->y;
+    l_C->z = player_object->z;
+    l_C->owner = a5;
+    l_C->id = object_new_id(((unsigned)D_00195AC4->id) >> 16);
     if (((int)(unsigned char)*(signed char *)((char *)(l_20 + l_1C))) == 6) goto L611BD;
     if (((int)(unsigned char)*(signed char *)((char *)(l_20 + l_1C))) != 12) goto L611FB;
 L611BD:;
-    if (((int)(unsigned short)(*(short *)(*(char **)player_character + 64) & 1)) != 0) goto L611E6;
-    item_make_random(6, l_C + 71);
+    if (((int)(unsigned short)(player_character->flags & 1)) != 0) goto L611E6;
+    item_make_random(6, &l_C->data.item);
     goto L611F6;
 L611E6:;
-    item_make_random(12, l_C + 71);
+    item_make_random(12, &l_C->data.item);
 L611F6:;
     goto L61271;
 L611FB:;
     if (((int)(unsigned char)*(signed char *)((char *)(l_20 + l_1C))) != 4) goto L6121F;
-    item_make_magic(a1 + 71, -1);
+    item_make_magic(&a1->data.item, -1);
     goto L61271;
 L6121F:;
     if (((int)(unsigned char)*(signed char *)((char *)(l_20 + l_1C))) != 7) goto L61257;
-    item_make(7, (a3 + 3) / 5, l_C + 71);
+    item_make(7, (a3 + 3) / 5, &l_C->data.item);
     goto L61271;
 L61257:;
-    item_make_random((int)(unsigned short)((unsigned short)(unsigned char)*(signed char *)((char *)(l_20 + l_1C))), l_C + 71);
+    item_make_random((int)(unsigned short)((unsigned short)(unsigned char)*(signed char *)((char *)(l_20 + l_1C))), &l_C->data.item);
 L61271:;
     l_14 >>= 1;
     if ((rand() % 100) <= l_14) goto L61293;
@@ -1032,28 +1033,28 @@ L61293:;
 
 int func_000612A1(void)
 {
-    int l_20;
+    struct record *l_20;
     int l_1C;
 
     l_1C = 0;
-    l_20 = *(int *)D_0019615F;
+    l_20 = *(struct record **)D_0019615F;
 L612BE:;
     if (l_20 == 0) goto L61313;
-    if (((int)(unsigned short)*(short *)((char *)l_20 + 23)) != *(int *)D_00195D54) goto L612DE;
+    if (l_20->owner != *(int *)D_00195D54) goto L612DE;
     l_1C++;
 L612DE:;
-    *(int *)((char *)l_20 + 7) = *(int *)(*(char **)player_object + 7);
-    *(int *)((char *)l_20 + 11) = *(int *)(*(char **)player_object + 11);
-    *(int *)((char *)l_20 + 15) = *(int *)(*(char **)player_object + 15);
-    l_20 = *(int *)((char *)l_20 + 55);
+    l_20->x = player_object->x;
+    l_20->y = player_object->y;
+    l_20->z = player_object->z;
+    l_20 = l_20->next;
     goto L612BE;
 L61313:;
     return l_1C;
 }
 
-void func_00061326(int a1)
+void func_00061326(struct record *a1)
 {
-    int l_1C;
+    struct record *l_1C;
     int l_18;
 
     l_18 = rand_range(0, 42);
@@ -1063,21 +1064,21 @@ L61346:;
     goto L61346;
 L61366:;
     l_1C = object_create_child(a1, 0, 0);
-    *(short *)((char *)l_1C + 21) = 3;
-    *(signed char *)((char *)l_1C) = 20;
+    l_1C->flags = 3;
+    l_1C->type = 20;
     *(short *)((char *)l_1C + 27) = l_18;
 }
 
-void func_00061398(int a1)
+void func_00061398(struct record *a1)
 {
     int l_24;
     int l_20;
-    int l_1C;
-    int l_18;
+    struct record *l_1C;
+    struct item *l_18;
 
     l_24 = 0;
 L613B0:;
-    if ((((int)(unsigned char)*(signed char *)(*(char **)current_building + 25)) + 1) > l_24) goto L613D0;
+    if ((current_building->quality + 1) > l_24) goto L613D0;
     return;
 L613C8:;
     l_24++;
@@ -1085,18 +1086,18 @@ L613C8:;
 L613D0:;
     l_20 = func_000614A9();
     l_1C = object_create_child(a1, 0, 107);
-    l_18 = l_1C + 71;
-    *(signed char *)((char *)l_1C) = 2;
-    *(signed char *)((char *)l_1C + 21) |= 33;
-    *(int *)((char *)l_1C + 7) = *(int *)(*(char **)player_object + 7);
-    *(int *)((char *)l_1C + 11) = *(int *)(*(char **)player_object + 11);
-    *(int *)((char *)l_1C + 15) = *(int *)(*(char **)player_object + 15);
+    l_18 = &l_1C->data.item;
+    l_1C->type = 2;
+    l_1C->flags |= 33;
+    l_1C->x = player_object->x;
+    l_1C->y = player_object->y;
+    l_1C->z = player_object->z;
     item_make(1, 1, l_18);
-    *(int *)((char *)l_18 + 36) = (int)(unsigned short)*(short *)(D_00180B42 + (l_20 * 109));
-    *(signed char *)((char *)l_18 + 49) = *(signed char *)&l_20;
+    l_18->value = (int)(unsigned short)*(short *)(D_00180B42 + (l_20 * 109));
+    l_18->stack_count = *(signed char *)&l_20;
     l_1C = object_create_child(l_1C, 0, 109);
-    *(signed char *)((char *)l_1C) = 31;
-    mc_memcpy(l_1C + 71, ((int)potion_recipes) + (l_20 * 109), 109, (int)D_001758B8, 1330, 4);
+    l_1C->type = 31;
+    mc_memcpy(&l_1C->data.potion_recipe, ((int)potion_recipes) + (l_20 * 109), 109, (int)D_001758B8, 1330, 4);
     goto L613C8;
 }
 
@@ -1115,71 +1116,71 @@ L614E0:;
     return rand_range(0, l_1C - 1);
 }
 
-void func_000614FB(int a1)
+void func_000614FB(struct record *a1)
 {
     int l_24;
     int l_20;
-    int l_1C;
-    int l_18;
+    struct record *l_1C;
+    struct item *l_18;
 
     l_20 = func_000614A9();
     l_1C = object_create_child(a1, 0, 107);
-    l_18 = l_1C + 71;
-    *(signed char *)((char *)l_1C) = 2;
-    *(signed char *)((char *)l_1C + 21) |= 1;
-    *(int *)((char *)l_1C + 7) = *(int *)(*(char **)player_object + 7);
-    *(int *)((char *)l_1C + 11) = *(int *)(*(char **)player_object + 11);
-    *(int *)((char *)l_1C + 15) = *(int *)(*(char **)player_object + 15);
+    l_18 = &l_1C->data.item;
+    l_1C->type = 2;
+    l_1C->flags |= 1;
+    l_1C->x = player_object->x;
+    l_1C->y = player_object->y;
+    l_1C->z = player_object->z;
     item_make(1, 1, l_18);
-    *(int *)((char *)l_18 + 36) = (int)(unsigned short)*(short *)(D_00180B42 + (l_20 * 109));
-    *(signed char *)((char *)l_18 + 49) = *(signed char *)&l_20;
+    l_18->value = (int)(unsigned short)*(short *)(D_00180B42 + (l_20 * 109));
+    l_18->stack_count = *(signed char *)&l_20;
     l_1C = object_create_child(l_1C, 0, 109);
-    *(signed char *)((char *)l_1C) = 31;
-    mc_memcpy(l_1C + 71, ((int)potion_recipes) + (l_20 * 109), 109, (int)D_001758B8, 1366, 4);
+    l_1C->type = 31;
+    mc_memcpy(&l_1C->data.potion_recipe, ((int)potion_recipes) + (l_20 * 109), 109, (int)D_001758B8, 1366, 4);
 }
 
-void ai_creature_think(int a1, int a2, int a3, int a4)
+void ai_creature_think(struct character *a1, struct record *a2, struct record *a3, int a4)
 {
     int l_24;
     int l_20;
     int l_1C;
     int l_18;
     int l_14;
-    int l_10;
-    int l_C;
+    struct monster_anim *l_10;
+    struct record *l_C;
 
-    *(int *)((char *)a1 + 116) -= *(int *)D_00195AB0;
-    if (((unsigned)*(int *)((char *)a1 + 116)) <= 100000) goto L61619;
-    *(int *)((char *)a1 + 116) = 0;
+    a1->attack_timer -= *(int *)D_00195AB0;
+    if (((unsigned)a1->attack_timer) <= 100000) goto L61619;
+    a1->attack_timer = 0;
 L61619:;
     if (((int)(unsigned char)*(signed char *)player_environment) != 3) goto L6164F;
-    l_C = location_cell_at(*(int *)((char *)a2 + 7), *(int *)((char *)a2 + 15));
-    if (*(int *)((char *)a2 + 67) == l_C) goto L6164F;
+    l_C = location_cell_at(a2->x, a2->z);
+    if ((int)a2->parent == l_C) goto L6164F;
     object_reparent(l_C, a2);
 L6164F:;
     *(int *)D_00199D74 = 0;
-    *(int *)ai_monster_flags = (int)(unsigned short)*(short *)(monster_table_flags + (((int)(unsigned char)*(signed char *)((char *)a1 + 67)) * 29));
-    *(signed char *)((char *)a2 + 4) &= 7;
+    *(int *)ai_monster_flags = (int)(unsigned short)*(short *)(monster_table_flags + (a1->race * 29));
+    a2->yaw &= ~0xF800;
     monster_ambient_sound(a2, a1);
-    if (((int)(unsigned short)(*(short *)((char *)a1 + 64) & 16384)) != 0) goto L616AF;
-    if (((int)(unsigned char)*(signed char *)((char *)a1 + 67)) == 29) goto L616B1;
+    if (((int)(unsigned short)(a1->flags & 16384)) != 0) goto L616AF;
+    if (a1->race == 29) goto L616B1;
 L616AF:;
     goto L616C1;
 L616B1:;
-    if (*(short *)((char *)a1 + 124) < *(short *)((char *)a1 + 126)) goto L616C3;
+    if (a1->health < a1->max_health) goto L616C3;
 L616C1:;
     goto L616DE;
 L616C3:;
-    *(signed char *)((char *)a1 + 65) |= 64;
+    a1->flags |= 0x4000;
     monster_set_action(a2, 0, 57);
     return;
 L616DE:;
-    l_20 = func_000C808D(*(int *)((char *)a2 + 7), *(int *)((char *)a2 + 15), *(int *)((char *)a3 + 7), *(int *)((char *)a3 + 15));
-    if (((struct bf8_0_1 *)((char *)a1 + 137))->f == 0) goto L6171F;
+    l_20 = func_000C808D(a2->x, a2->z, a3->x, a3->z);
+    if ((a1->conditions & 0x1) == 0) goto L6171F;
     monster_set_action(a2, l_20, 48);
     return;
 L6171F:;
-    if (a3 != *(int *)player_entity) goto L61733;
+    if (a3 != player_entity) goto L61733;
     l_14 = 90;
     goto L6173A;
 L61733:;
@@ -1187,14 +1188,14 @@ L61733:;
 L6173A:;
     if (a4 != *(int *)ai_los_index) goto L61764;
     if (collide_line_of_sight(a2, a3) == 0) goto L6175D;
-    *(signed char *)((char *)a1 + 64) |= 128;
+    a1->flags |= 128;
     goto L61764;
 L6175D:;
-    *(signed char *)((char *)a1 + 64) &= 127;
+    a1->flags &= ~0x80;
 L61764:;
-    l_1C = ai_angle_diff((int)(short)*(short *)((char *)a2 + 3), l_20, (int)&l_18);
-    l_24 = func_000C7FF4(*(int *)((char *)a2 + 11) - *(int *)((char *)a3 + 11), func_000C7FD9(*(int *)((char *)a2 + 7), *(int *)((char *)a2 + 15), *(int *)((char *)a3 + 7), *(int *)((char *)a3 + 15)));
-    if (*(short *)((char *)a2 + 36) == 0) goto L617C1;
+    l_1C = ai_angle_diff(a2->yaw, l_20, (int)&l_18);
+    l_24 = func_000C7FF4(a2->y - a3->y, func_000C7FD9(a2->x, a2->z, a3->x, a3->z));
+    if (a2->wait_state == 0) goto L617C1;
     if (*(int *)trespassing == 0) goto L617C3;
 L617C1:;
     goto L617D8;
@@ -1202,7 +1203,7 @@ L617C3:;
     monster_set_action(a2, l_20, 48);
     return;
 L617D8:;
-    if (((int)(unsigned short)(*(short *)((char *)a1 + 64) & 32768)) == 0) goto L61825;
+    if (((int)(unsigned short)(a1->flags & 32768)) == 0) goto L61825;
     if (l_1C < 128) goto L61810;
     monster_set_action(a2, l_20, 0);
     ai_turn_toward(a2, l_20);
@@ -1212,17 +1213,17 @@ L61810:;
 L61820:;
     return;
 L61825:;
-    l_10 = a2 + 705;
-    *(signed char *)((char *)a1 + 65) &= 254;
-    if (a3 != *(int *)player_entity) goto L6184E;
-    if (*(int *)((char *)a1 + 509) == 0) goto L61850;
+    l_10 = &a2->data.monster.anim;
+    a1->flags &= ~0x100;
+    if (a3 != player_entity) goto L6184E;
+    if (a1->give_up_timer == 0) goto L61850;
 L6184E:;
     goto L618A8;
 L61850:;
     if (l_1C <= 512) goto L61892;
-    if (ai_stealth_check((int)(unsigned char)*(signed char *)((char *)a1 + 67), (int)(unsigned short)(*(short *)((char *)a1 + 64) & 256), l_24, (int)(unsigned short)(*(short *)((char *)a1 + 64) & 8)) == 0) goto L618A6;
+    if (ai_stealth_check(a1->race, (int)(unsigned short)(a1->flags & 256), l_24, (int)(unsigned short)(a1->flags & 8)) == 0) goto L618A6;
 L61892:;
-    if (ai_sees_through_illusion((int)(unsigned char)*(signed char *)((char *)a1 + 67)) != 0) goto L618A8;
+    if (ai_sees_through_illusion(a1->race) != 0) goto L618A8;
 L618A6:;
     goto L618AA;
 L618A8:;
@@ -1231,45 +1232,45 @@ L618AA:;
     monster_set_action(a2, l_20, 48);
     goto L61C67;
 L618BF:;
-    *(short *)((char *)a1 + 64) |= 264;
-    if (*(int *)((char *)a1 + 509) != 0) goto L618E1;
-    *(int *)((char *)a1 + 509) = 200;
+    a1->flags |= 264;
+    if (a1->give_up_timer != 0) goto L618E1;
+    a1->give_up_timer = 200;
 L618E1:;
     if ((l_14 << 2) >= l_24) goto L618F5;
     if (l_24 < 2048) goto L618F7;
 L618F5:;
     goto L6190C;
 L618F7:;
-    if (((int)(unsigned short)(*(short *)((char *)a1 + 64) & 128)) != 0) goto L61911;
+    if (((int)(unsigned short)(a1->flags & 128)) != 0) goto L61911;
 L6190C:;
     goto L61A85;
 L61911:;
-    if (((int)(unsigned short)(*(short *)(monster_table_flags + (((int)(unsigned char)*(signed char *)((char *)a1 + 67)) * 29)) & 32)) == 0) goto L619D8;
+    if (((int)(unsigned short)(*(short *)(monster_table_flags + (a1->race * 29)) & 32)) == 0) goto L619D8;
     if (l_1C < 128) goto L6195B;
     ai_turn_toward(a2, l_20);
     monster_set_action(a2, l_20, 0);
     goto L619BE;
 L6195B:;
     if (rand() >= 1000) goto L6197A;
-    if (((int)(unsigned char)*(signed char *)((char *)a1 + 504)) != 24) goto L6197C;
+    if (a1->action != 24) goto L6197C;
 L6197A:;
     goto L6198E;
 L6197C:;
     monster_set_action(a2, l_20, 24);
     goto L619BE;
 L6198E:;
-    if (((int)(unsigned char)*(signed char *)((char *)l_10 + 20)) != 24) goto L619AE;
-    if (((int)(unsigned char)*(signed char *)((char *)l_10 + 23)) != 24) goto L619BE;
+    if (l_10->anim_request != 24) goto L619AE;
+    if (l_10->anim_current != 24) goto L619BE;
 L619AE:;
     monster_set_action(a2, l_20, 48);
 L619BE:;
-    if (*(int *)((char *)a1 + 509) == 0) goto L619D3;
-    (*(int *)((char *)a1 + 509))--;
+    if (a1->give_up_timer == 0) goto L619D3;
+    a1->give_up_timer--;
 L619D3:;
     goto L61A80;
 L619D8:;
     if (l_24 <= 256) goto L619EE;
-    if (*(short *)((char *)a1 + 141) != 0) goto L619F0;
+    if (a1->magicka != 0) goto L619F0;
 L619EE:;
     goto L619FC;
 L619F0:;
@@ -1291,27 +1292,27 @@ L61A49:;
 L61A59:;
     goto L61A80;
 L61A5B:;
-    ai_move_toward_target(a2, a2 + 71, a3, l_20, l_1C);
+    ai_move_toward_target(a2, &a2->data.character, a3, l_20, l_1C);
     monster_set_action(a2, l_20, 0);
 L61A80:;
     goto L61C67;
 L61A85:;
-    if (((int)(unsigned short)(*(short *)((char *)a1 + 64) & 256)) == 0) goto L61AA2;
+    if (((int)(unsigned short)(a1->flags & 256)) == 0) goto L61AA2;
     if (l_24 > l_14) goto L61AA4;
 L61AA2:;
     goto L61ACE;
 L61AA4:;
-    ai_move_toward_target(a2, a2 + 71, a3, l_20, l_1C);
+    ai_move_toward_target(a2, &a2->data.character, a3, l_20, l_1C);
     monster_set_action(a2, l_20, 0);
     goto L61C67;
 L61ACE:;
-    if (((int)(unsigned short)(*(short *)((char *)a1 + 64) & 128)) == 0) goto L61C67;
+    if (((int)(unsigned short)(a1->flags & 128)) == 0) goto L61C67;
     if (l_1C >= 128) goto L61C4F;
-    if (((int)(unsigned char)*(signed char *)((char *)l_10 + 20)) != 8) goto L61B18;
-    if (((int)(unsigned char)*(signed char *)((char *)l_10 + 20)) == 56) goto L61C4D;
+    if (l_10->anim_request != 8) goto L61B18;
+    if (l_10->anim_request == 56) goto L61C4D;
 L61B18:;
-    if (*(short *)((char *)a1 + 141) == 0) goto L61B2E;
-    if (*(int *)((char *)a1 + 116) == 0) goto L61B30;
+    if (a1->magicka == 0) goto L61B2E;
+    if (a1->attack_timer == 0) goto L61B30;
 L61B2E:;
     goto L61B3C;
 L61B30:;
@@ -1326,21 +1327,21 @@ L61B4F:;
     monster_set_action(a2, l_20, 32);
     goto L61C4D;
 L61B64:;
-    if ((rand() % ((int)(short)*(short *)((char *)a1 + 44))) >= ((((int)(short)*(short *)((char *)a1 + 44)) >> 3) + 6)) goto L61B95;
-    if (*(int *)((char *)a1 + 116) == 0) goto L61B9A;
+    if ((rand() % a1->attributes[6]) >= ((a1->attributes[6] >> 3) + 6)) goto L61B95;
+    if (a1->attack_timer == 0) goto L61B9A;
 L61B95:;
     goto L61C16;
 L61B9A:;
     if (monster_set_action(a2, l_20, 8) == 0) goto L61C14;
-    *(int *)((char *)a1 + 116) = rand_range(1500, 3000);
-    *(int *)((char *)a1 + 116) -= (((int)(unsigned char)*(signed char *)(*(char **)player_character + 129)) - 10) * 50;
-    *(int *)((char *)a1 + 116) += (((int)(unsigned char)*(signed char *)((char *)a1 + 130)) - 2) * 450;
-    if (((unsigned)*(int *)((char *)a1 + 116)) <= 100000) goto L61C14;
-    *(int *)((char *)a1 + 116) = 1500;
+    a1->attack_timer = rand_range(1500, 3000);
+    a1->attack_timer -= (player_character->level - 10) * 50;
+    a1->attack_timer += (a1->reflexes - 2) * 450;
+    if (((unsigned)a1->attack_timer) <= 100000) goto L61C14;
+    a1->attack_timer = 1500;
 L61C14:;
     goto L61C4D;
 L61C16:;
-    if (((int)(unsigned short)(*(short *)((char *)a1 + 64) & 16384)) == 0) goto L61C3D;
+    if (((int)(unsigned short)(a1->flags & 16384)) == 0) goto L61C3D;
     monster_set_action(a2, l_20, 59);
     goto L61C4D;
 L61C3D:;
@@ -1351,19 +1352,19 @@ L61C4F:;
     ai_turn_toward(a2, l_20);
     monster_set_action(a2, l_20, 0);
 L61C67:;
-    if (*(int *)((char *)a1 + 509) == 0) goto L61C7C;
-    (*(int *)((char *)a1 + 509))--;
+    if (a1->give_up_timer == 0) goto L61C7C;
+    a1->give_up_timer--;
 L61C7C:;
     if (((struct bf8_7_1 *)&D_001940DA)->f == 0) goto L61C8E;
     *(signed char *)D_001940DA &= 127;
     return;
 L61C8E:;
     if (((int)(unsigned short)(*(short *)((char *)l_10 + 16) & 2)) == 0) return;
-    *(signed char *)((char *)l_10 + 16) &= 253;
+    l_10->anim_events &= 253;
     monster_shoot_arrow(a2, a3);
 }
 
-int ai_pick_target(int a1, int a2, int a3)
+int ai_pick_target(struct record *a1, struct character *a2, int a3)
 {
     int l_24;
     int l_20;
@@ -1382,15 +1383,15 @@ L61CF5:;
     goto L61CE5;
 L61CFD:;
     if (a3 == l_24) goto L61CF5;
-    if (*(signed char *)((char *)a2 + 553) == *(signed char *)(*(char **)(ai_characters + (l_24 << 2)) + 553)) goto L61CF5;
+    if ((signed char)a2->team == *(signed char *)(*(char **)(ai_characters + (l_24 << 2)) + 553)) goto L61CF5;
     *(signed char *)(*(char **)(ai_characters + (l_24 << 2)) + 505) = 0;
     if (*(int *)(*(char **)(ai_characters + (l_24 << 2)) + 112) != 0) goto L61D5A;
     *(signed char *)(*(char **)(ai_characters + (l_24 << 2)) + 505) += 5;
 L61D5A:;
-    if (collide_line_of_sight(a1, *(int *)(ai_entities + (l_24 << 2))) == 0) goto L61D85;
+    if (collide_line_of_sight(a1, *(struct record **)(ai_entities + (l_24 << 2))) == 0) goto L61D85;
     *(signed char *)(*(char **)(ai_characters + (l_24 << 2)) + 505) += 20;
 L61D85:;
-    l_14 = func_000C7FF4(*(int *)((char *)a1 + 11) - *(int *)(*(char **)(ai_entities + (l_24 << 2)) + 11), func_000C7FD9(*(int *)((char *)a1 + 7), *(int *)((char *)a1 + 15), *(int *)(*(char **)(ai_entities + (l_24 << 2)) + 7), *(int *)(*(char **)(ai_entities + (l_24 << 2)) + 15)));
+    l_14 = func_000C7FF4(a1->y - *(int *)(*(char **)(ai_entities + (l_24 << 2)) + 11), func_000C7FD9(a1->x, a1->z, *(int *)(*(char **)(ai_entities + (l_24 << 2)) + 7), *(int *)(*(char **)(ai_entities + (l_24 << 2)) + 15)));
     l_14 = l_14 / 128;
     l_14 = 30 - l_14;
     if (l_14 >= 0) goto L61E01;
@@ -1404,7 +1405,7 @@ L61E50:;
     goto L61CF5;
 L61E55:;
     if (l_1C >= 8) goto L61E70;
-    if (((int)(unsigned short)(*(short *)((char *)a2 + 64) & 2)) != 0) goto L61E72;
+    if (((int)(unsigned short)((short)a2->flags & 2)) != 0) goto L61E72;
 L61E70:;
     goto L61E7B;
 L61E72:;
@@ -1428,16 +1429,16 @@ void ai_update_creatures(void)
     if (*(signed char *)D_00187CA8 == 0) return;
     if (*(int *)creature_count == 0) return;
     if (*(int *)creature_count != 1) goto L61EED;
-    if (((int)(unsigned short)(*(short *)(*(char **)D_00190504 + 135) & 2)) != 0) goto L61EEF;
+    if (((int)(unsigned short)(D_00190504[0]->data.character.flags & 2)) != 0) goto L61EEF;
 L61EED:;
     goto L61EFE;
 L61EEF:;
-    object_delete(*(int *)D_00190504);
+    object_delete(D_00190504[0]);
     return;
 L61EFE:;
-    *(short *)(*(char **)player_entity + 3) = *(short *)(*(char **)player_object + 3);
-    *(short *)(*(char **)player_entity + 1) = *(short *)(*(char **)player_object + 1);
-    *(int *)(D_00190504 + ((*(int *)creature_count)++ << 2)) = *(int *)player_entity;
+    player_entity->yaw = player_object->yaw;
+    player_entity->angle_x = player_object->angle_x;
+    *(int *)((char *)D_00190504 + ((*(int *)creature_count)++ << 2)) = (int)player_entity;
     l_28 = 0;
 L61F45:;
     if (l_28 < *(int *)creature_count) goto L61F5A;
@@ -1447,9 +1448,9 @@ L61F52:;
     goto L61F45;
 L61F5A:;
     if ((*(int *)creature_count - 1) == l_28) goto L61F76;
-    func_0002682B(*(int *)(D_00190504 + (l_28 << 2)));
+    func_0002682B(D_00190504[l_28]);
 L61F76:;
-    *(int *)(ai_entities + (l_28 << 2)) = *(int *)(D_00190504 + (l_28 << 2));
+    *(int *)(ai_entities + (l_28 << 2)) = (int)D_00190504[l_28];
     *(int *)(ai_characters + (l_28 << 2)) = (int)(*(char **)(ai_entities + (l_28 << 2)) + 71);
     goto L61F52;
 L61FAB:;
@@ -1476,7 +1477,7 @@ L62027:;
 L62029:;
     if (((int)(unsigned char)*(signed char *)(*(char **)(*(char **)(ai_characters + (l_28 << 2)) + 112))) != 34) goto L620AB;
 L62044:;
-    l_24 = ai_pick_target(*(int *)(ai_entities + (l_28 << 2)), *(int *)(ai_characters + (l_28 << 2)), l_28);
+    l_24 = ai_pick_target(*(struct record **)(ai_entities + (l_28 << 2)), *(struct character **)(ai_characters + (l_28 << 2)), l_28);
     if (l_24 != (-1)) goto L62075;
     l_20 = l_28;
     goto L620AB;
@@ -1497,51 +1498,51 @@ L620E7:;
     goto L620D7;
 L620EF:;
     if (((int)(unsigned char)*(signed char *)(*(char **)(ai_entities + (l_28 << 2)))) != 18) goto L620E7;
-    monster_ambient_sound(*(int *)(ai_entities + (l_28 << 2)), *(int *)(ai_characters + (l_28 << 2)));
+    monster_ambient_sound(*(struct record **)(ai_entities + (l_28 << 2)), *(struct character **)(ai_characters + (l_28 << 2)));
     if (((int)(unsigned short)(*(short *)(*(char **)(ai_characters + (l_28 << 2)) + 64) & 32)) == 0) goto L6217C;
-    damage_knockback_move(*(int *)(ai_entities + (l_28 << 2)), *(int *)(ai_characters + (l_28 << 2)));
-    monster_set_action(*(int *)(ai_entities + (l_28 << 2)), 0, 16);
+    damage_knockback_move(*(struct record **)(ai_entities + (l_28 << 2)), *(struct character **)(ai_characters + (l_28 << 2)));
+    monster_set_action(*(struct record **)(ai_entities + (l_28 << 2)), 0, 16);
     goto L621FE;
 L6217C:;
     if (*(int *)(*(char **)(ai_characters + (l_28 << 2)) + 112) == 0) goto L621BD;
-    ai_creature_think(*(int *)(ai_characters + (l_28 << 2)), *(int *)(ai_entities + (l_28 << 2)), *(int *)(*(char **)(ai_characters + (l_28 << 2)) + 112), l_28);
+    ai_creature_think(*(struct character **)(ai_characters + (l_28 << 2)), *(struct record **)(ai_entities + (l_28 << 2)), *(struct record **)(*(char **)(ai_characters + (l_28 << 2)) + 112), l_28);
 L621BD:;
     l_1C = *(int *)(ai_entities + (l_28 << 2)) + 705;
     if (((int)(unsigned short)(*(short *)((char *)l_1C + 16) & 1)) == 0) goto L621FE;
     *(signed char *)((char *)l_1C + 16) &= 254;
-    weapon_melee_strike(*(int *)(D_00190504 + (l_28 << 2)));
+    weapon_melee_strike(D_00190504[l_28]);
 L621FE:;
     goto L620E7;
 L62203:;
     monster_apply_gravity();
     if (l_20 == (-1)) return;
-    object_delete(*(int *)(ai_entities + (l_20 << 2)));
+    object_delete(*(struct record **)(ai_entities + (l_20 << 2)));
 }
 
-int ai_turn_toward(int a1, int a2)
+int ai_turn_toward(struct record *a1, int a2)
 {
     int l_1C;
     int l_18;
 
-    l_1C = ai_angle_diff((int)(short)*(short *)((char *)a1 + 3), a2, (int)&l_18);
+    l_1C = ai_angle_diff(a1->yaw, a2, (int)&l_18);
     if (l_1C >= 64) goto L6226A;
-    *(short *)((char *)a1 + 3) = a2;
+    a1->yaw = a2;
     return 0;
 L6226A:;
-    *(short *)((char *)a1 + 3) += l_18 << 6;
+    a1->yaw += l_18 << 6;
     return 1;
 }
 
-void func_0006228A(int a1, int a2, int a3)
+void func_0006228A(struct record *a1, int a2, int a3)
 {
     int l_14;
     int l_10;
 
     a3 = (a3 + 1024) & 2047;
-    l_14 = ai_angle_diff((int)(short)*(short *)((char *)a1 + 3), a3, (int)&l_10);
+    l_14 = ai_angle_diff(a1->yaw, a3, (int)&l_10);
     if (l_14 >= 32) goto L622D6;
-    *(short *)((char *)a1 + 3) = a3;
+    a1->yaw = a3;
     return;
 L622D6:;
-    *(short *)((char *)a1 + 3) += l_10 << 5;
+    a1->yaw += l_10 << 5;
 }

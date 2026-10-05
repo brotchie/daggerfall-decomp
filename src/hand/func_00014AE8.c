@@ -1,6 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x00014AE8 */
-struct rec { unsigned char type; char pad1[32]; unsigned short f33; char pad35[19]; unsigned char f54; };
-struct who { char pad[31]; int f31; };
+#include "records.h"
+
 extern char D_001703C9[];
 extern char D_001703D6[];
 extern char D_001703E3[];
@@ -18,8 +18,8 @@ extern unsigned char game_mode;
 extern unsigned char crime_current;
 extern unsigned char D_0019627F;
 extern void *talk_saved_screen;
-extern struct rec *talk_npc_own_faction;
-extern struct rec *talk_npc_faction;
+extern struct faction *talk_npc_own_faction;
+extern struct faction *talk_npc_faction;
 extern char *talk_place_topics;
 extern int talk_npc_speech_style;
 extern int talk_npc_attitude;
@@ -27,7 +27,7 @@ extern int D_001965C8;
 extern int talk_attitude_cache;
 extern int D_001965D0;
 extern int D_001965D4;
-extern struct who *talk_npc_object;
+extern struct record *talk_npc_object;
 extern int D_001965E4;
 extern int talk_selected_row;
 extern int talk_face_image;
@@ -59,14 +59,14 @@ extern int talk_roll_attitude(void);
 extern int func_0001D46A(int);
 extern void msgbox_show_rsc(short, int);
 extern void guards_summon(int);
-extern void person_load_face(struct who *, int);
+extern void person_load_face(struct record *, int);
 extern int func_00041347(void);
 extern int disk_read_file(char *, int);
 extern int rand(void);
 extern void *mc_malloc(int, char *, int);
 extern void func_0012DB50(int);
 
-int talk_open(struct who *a1)
+int talk_open(struct record *a1)
 {
     int err;
     int msg;
@@ -74,7 +74,7 @@ int talk_open(struct who *a1)
     if (D_0019626F == 12 && game_mode == 8)
         return 1;
     if (a1 != 0) {
-        if (talk_npc_faction->f54 == 4 && (func_00041347() & 2)) {
+        if (talk_npc_faction->social_group == 4 && (func_00041347() & 2)) {
             D_0019627F &= 2;
             crime_current = 7;
             guards_summon(0);
@@ -115,19 +115,19 @@ int talk_open(struct who *a1)
         D_001965C8 = rand();
         if (D_00190D10 == 0)
             person_load_face(talk_npc_object, talk_face_image);
-        err = func_0001D46A(talk_npc_object->f31);
+        err = func_0001D46A(talk_npc_object->id);
         if (talk_npc_own_faction->type == 15 || talk_npc_own_faction->type == 14)
-            msg = talk_npc_own_faction->f33;
+            msg = talk_npc_own_faction->id;
         else
-            msg = talk_npc_faction->f33;
+            msg = talk_npc_faction->id;
         if (talk_npc_own_faction->type == 15 || talk_npc_own_faction->type == 14) {
-            if (talk_npc_own_faction->f54 < 5)
-                talk_npc_speech_style = talk_npc_own_faction->f54;
+            if (talk_npc_own_faction->social_group < 5)
+                talk_npc_speech_style = talk_npc_own_faction->social_group;
             else
                 talk_npc_speech_style = 1;
         } else {
-            if (talk_npc_faction->f54 < 5)
-                talk_npc_speech_style = talk_npc_faction->f54;
+            if (talk_npc_faction->social_group < 5)
+                talk_npc_speech_style = talk_npc_faction->social_group;
             else
                 talk_npc_speech_style = 1;
         }

@@ -1,6 +1,7 @@
 /* guilds.c: functions first lifted from the assembly by tools/lift_all.py (2026-10), now
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
+#include "records.h"
 
 struct bf8_2_1 { unsigned char _:2; unsigned char f:1; };
 struct bf8_3_1 { unsigned char _:3; unsigned char f:1; };
@@ -16,7 +17,7 @@ extern char D_0017606F[];
 extern char D_0017607C[];
 extern char D_001760A4[];
 extern char trade_price_scale[];
-extern char selected_spell[];
+extern struct spell *selected_spell;
 extern char spell_effect_names[];
 extern char spell_effect_subtype_names[];
 extern char guild_rank_primary_skill[];
@@ -38,16 +39,16 @@ extern char D_00190DDC[];
 extern char D_001940D4[];
 extern char D_001940D8[];
 extern char D_001940D9[];
-extern char current_building[];
-extern char player_entity[];
-extern char player_object[];
+extern struct building *current_building;
+extern struct record *player_entity;
+extern struct record *player_object;
 extern char vertical_velocity[];
-extern char D_00195AC4[];
+extern struct record *D_00195AC4;
 extern char cheat_flags[];
-extern char D_00195AF4[];
+extern struct record *D_00195AF4;
 extern char creature_count[];
 extern char spellshop_icons[];
-extern char player_character[];
+extern struct character *player_character;
 extern char window_image[];
 extern char game_minutes[];
 extern char D_001960D9[];
@@ -61,9 +62,9 @@ extern char in_dungeon_water[];
 extern char D_00196299[];
 extern char D_001962A0[];
 extern char D_001962AF[];
-extern char D_0019671C[];
+extern struct faction *D_0019671C;
 extern char guild_saved_screen[];
-extern char guild_membership[];
+extern struct membership *guild_membership;
 extern char D_001A4A18[];
 extern char D_001A4A1A[];
 extern char D_001A4A1C[];
@@ -71,8 +72,8 @@ extern char rest_image[];
 extern char rest_loitering[];
 extern char D_001A9AB8[];
 
-extern int faction_find(short);
-extern int spell_cost(int, int);
+extern struct faction *faction_find(short);
+extern int spell_cost(struct spell *, struct character *);
 extern int holiday_today(int, int);
 extern int sound_play(int, int, int);
 extern int disk_read_file(int, int);
@@ -80,11 +81,11 @@ extern int spellshop_build_list(void);
 extern int guild_confirm_price(int);
 extern int rand_range(int, int);
 extern int gold_can_afford(int);
-extern int object_free_single(int);
-extern int object_delete(int);
-extern int object_create_child(int, int, int);
-extern int object_reparent(int, int);
-extern int object_find_item(int, int, int);
+extern int object_free_single(struct record *);
+extern int object_delete(struct record *);
+extern struct record *object_create_child(struct record *, int, int);
+extern int object_reparent(struct record *, struct record *);
+extern struct record *object_find_item(struct record *, int, int);
 extern int object_new_id(int);
 extern int rand();
 extern int srand();
@@ -99,7 +100,7 @@ extern int func_0012B136();
 extern int func_00144F68();
 extern void msgbox_show_rsc(int, int);
 extern void keys_world_actions(void);
-extern void item_make(int, int, int);
+extern void item_make(int, int, struct item *);
 extern void func_0005F1BD(int, int, int, int);
 extern void func_00061398(int);
 extern void disease_remove_skill_bonuses(void);
@@ -114,35 +115,35 @@ extern void gold_spend(int);
 extern void player_movement_update(void);
 extern void picklist_free(int);
 extern void object_free_children(int);
-extern void object_foreach_post(int, int);
-extern void object_foreach(int, int);
+extern void object_foreach_post(struct record *, int);
+extern void object_foreach(struct record *, int);
 extern void inventory_open_container(int, int, int);
 int spellshop_close(void);
 int guild_best_skill(int, int, int);
-int guild_find_membership_by_kind(unsigned char);
-int guild_find_membership_by_bits(unsigned char);
+struct membership *guild_find_membership_by_kind(unsigned char);
+struct membership *guild_find_membership_by_bits(unsigned char);
 void spellshop_open(void);
-void func_00070191(int);
-void func_000701F1(int);
-void func_00071475(int);
+void func_00070191(struct record *);
+void func_000701F1(struct record *);
+void func_00071475(struct record *);
 
 int func_0006F484(int a1)
 {
-    int l_1C;
+    struct membership *l_1C;
 
     if (a1 != 4) goto L6F4F0;
     l_1C = guild_find_membership_by_kind(0);
     if (l_1C != 0) goto L6F4B7;
     return 0;
 L6F4B7:;
-    return ((rand_range(1, 100) <= ((((int)(unsigned char)*(signed char *)((char *)l_1C)) + 1) * 5)) ? 1 : 0);
+    return ((rand_range(1, 100) <= ((l_1C->rank + 1) * 5)) ? 1 : 0);
 L6F4F0:;
     if (a1 >= 3) goto L6F54B;
     l_1C = guild_find_membership_by_kind(3);
     if (l_1C != 0) goto L6F512;
     return 0;
 L6F512:;
-    return ((rand_range(1, 100) <= ((((int)(unsigned char)*(signed char *)((char *)l_1C)) + 1) * 5)) ? 1 : 0);
+    return ((rand_range(1, 100) <= ((l_1C->rank + 1) * 5)) ? 1 : 0);
 L6F54B:;
     return 0;
 }
@@ -183,9 +184,9 @@ void guild_buy_magic_items(void)
 
     l_18 = rand();
     object_free_children((int)D_001960D9);
-    srand(*(int *)(*(char **)current_building + 20));
-    if (*(int *)guild_membership == 0) goto L6F6BA;
-    if (((int)(unsigned char)*(signed char *)(*(char **)guild_membership)) >= 4) goto L6F6CF;
+    srand(current_building->id);
+    if (guild_membership == 0) goto L6F6BA;
+    if (guild_membership->rank >= 4) goto L6F6CF;
 L6F6BA:;
     func_0005F1BD((int)D_001960D9, 0, 1, 0);
     goto L6F6E5;
@@ -246,9 +247,9 @@ L6F9D4:;
 void spellshop_buy(void)
 {
     int l_1C;
-    int l_18;
+    struct record *l_18;
 
-    l_1C = spell_cost(*(int *)selected_spell, *(int *)player_character) << 2;
+    l_1C = spell_cost(selected_spell, player_character) << 2;
     if (holiday_today(*(int *)game_minutes, (int)(unsigned char)*(signed char *)current_region) != 43) goto L6FA2D;
     l_1C >>= 1;
 L6FA2D:;
@@ -259,23 +260,23 @@ L6FA2D:;
     return;
 L6FA5F:;
     gold_spend(l_1C);
-    l_18 = object_find_item(*(int *)(*(char **)player_entity + 63), 27, 0);
+    l_18 = object_find_item(player_entity->children, 27, 0);
     l_18 = object_create_child(l_18, 0, 89);
-    *(signed char *)((char *)l_18) = 9;
-    *(int *)((char *)l_18 + 31) = object_new_id(100);
-    mc_memcpy(l_18 + 71, *(int *)selected_spell, 89, (int)D_00175EAA, 992, 4);
+    l_18->type = 9;
+    l_18->id = object_new_id(100);
+    mc_memcpy(&l_18->data.spell, (int)selected_spell, 89, (int)D_00175EAA, 992, 4);
 }
 
-void spellshop_draw_spell(int a1)
+void spellshop_draw_spell(struct spell *a1)
 {
     int l_1C;
     short l_18;
 
     *(signed char *)D_0012B508 = 145;
-    func_000CD20E(172, 32, (int)(unsigned char)*(signed char *)((char *)a1 + 72));
-    func_000CE31C((int)(*(char **)spellshop_icons + (((int)(unsigned char)*(signed char *)((char *)a1 + 6)) * 640)) + 24, (int)(*(char **)screen_buffer + 10486), 16, 16, 40);
-    func_000CE31C((int)(*(char **)spellshop_icons + (((int)(unsigned char)*(signed char *)((char *)a1 + 7)) * 640)), (int)&*(signed char *)(*(char **)screen_buffer + 10445), 24, 16, 40);
-    text_draw_colored(a1 + 47, 148, 20, 145, 141);
+    func_000CD20E(172, 32, a1->icon);
+    func_000CE31C((int)(*(char **)spellshop_icons + (a1->element * 640)) + 24, (int)(*(char **)screen_buffer + 10486), 16, 16, 40);
+    func_000CE31C((int)(*(char **)spellshop_icons + (a1->target * 640)), (int)&*(signed char *)(*(char **)screen_buffer + 10445), 24, 16, 40);
+    text_draw_colored((int)a1->name, 148, 20, 145, 141);
     *(int *)&l_18 = 0;
 L6FB97:;
     if (((int)(short)l_18) < 3) goto L6FBAD;
@@ -284,18 +285,18 @@ L6FBA5:;
     (*(int *)&l_18)++;
     goto L6FB97;
 L6FBAD:;
-    if (((int)(unsigned char)*(signed char *)((char *)((((int)(short)l_18) * 2) + a1))) == 255) goto L6FBA5;
-    text_draw_centered_colored(*(int *)(spell_effect_names + (((int)(unsigned char)*(signed char *)((char *)((((int)(short)l_18) * 2) + a1))) << 2)), 219, (int)(short)((*(int *)&l_18 * 38) + 63), 145, 141);
-    if (((int)(unsigned char)*(signed char *)((char *)((((int)(short)l_18) * 2) + a1) + 1)) == 255) goto L6FC48;
-    if (*(int *)(spell_effect_subtype_names + (((int)(unsigned char)*(signed char *)((char *)((((int)(short)l_18) * 2) + a1))) * 48) + (((int)(unsigned char)*(signed char *)((char *)((((int)(short)l_18) * 2) + a1) + 1)) << 2)) != 0) goto L6FC4A;
+    if (a1->effects[(int)(short)l_18].type == 255) goto L6FBA5;
+    text_draw_centered_colored(*(int *)(spell_effect_names + (a1->effects[(int)(short)l_18].type << 2)), 219, (int)(short)((*(int *)&l_18 * 38) + 63), 145, 141);
+    if (a1->effects[(int)(short)l_18].subtype == 255) goto L6FC48;
+    if (*(int *)(spell_effect_subtype_names + (a1->effects[(int)(short)l_18].type * 48) + (a1->effects[(int)(short)l_18].subtype << 2)) != 0) goto L6FC4A;
 L6FC48:;
     goto L6FC96;
 L6FC4A:;
-    text_draw_centered_colored(*(int *)(spell_effect_subtype_names + (((int)(unsigned char)*(signed char *)((char *)((((int)(short)l_18) * 2) + a1))) * 48) + (((int)(unsigned char)*(signed char *)((char *)((((int)(short)l_18) * 2) + a1) + 1)) << 2)), 219, (int)(short)((*(int *)&l_18 * 38) + 75), 145, 141);
+    text_draw_centered_colored(*(int *)(spell_effect_subtype_names + (a1->effects[(int)(short)l_18].type * 48) + (a1->effects[(int)(short)l_18].subtype << 2)), 219, (int)(short)((*(int *)&l_18 * 38) + 75), 145, 141);
 L6FC96:;
     goto L6FBA5;
 L6FC9B:;
-    l_1C = spell_cost(a1, *(int *)player_character) << 2;
+    l_1C = spell_cost(a1, player_character) << 2;
     if (holiday_today(*(int *)game_minutes, (int)(unsigned char)*(signed char *)current_region) != 43) goto L6FCC9;
     l_1C >>= 1;
 L6FCC9:;
@@ -325,7 +326,7 @@ int guild_rank_for_skills(int a1)
     int l_20;
     int l_1C;
 
-    l_2C = ((int)(short)*(short *)(*(char **)D_0019671C + 29)) / 10;
+    l_2C = D_0019671C->reputation / 10;
     l_28 = guild_best_skill((int)&l_20, *(int *)(guild_skill_lists + (a1 << 2)), -1);
     l_24 = guild_best_skill((int)&l_20, *(int *)(guild_skill_lists + (a1 << 2)), l_20);
     l_20 = 0;
@@ -358,7 +359,7 @@ int guild_best_skill(int a1, int a2, int a3)
     l_20 = 0;
     l_1C = -1;
 L70111:;
-    l_14 = (int)(short)*(short *)(*(char **)player_character + 157 + (((int)(unsigned char)*(signed char *)((char *)(a2 + l_20))) * 6));
+    l_14 = player_character->skills[(int)(unsigned char)*(signed char *)((char *)(a2 + l_20))].value;
     if (l_14 <= l_1C) goto L7014C;
     if (((int)(unsigned char)*(signed char *)((char *)(a2 + l_20))) != a3) goto L7014E;
 L7014C:;
@@ -373,63 +374,63 @@ L70161:;
     return l_1C;
 }
 
-void func_00070191(int a1)
+void func_00070191(struct record *a1)
 {
-    if (((int)(unsigned char)*(signed char *)((char *)a1)) != 10) return;
-    if (*(signed char *)D_00190D20 != *(unsigned char *)((char *)a1 + 73)) goto L701CF;
-    *(int *)D_00195AF4 = a1;
+    if (a1->type != 10) return;
+    if (*(signed char *)D_00190D20 != a1->data.membership.kind) goto L701CF;
+    D_00195AF4 = a1;
 L701CF:;
-    if (*(short *)D_00190DDC != *(short *)((char *)a1 + 74)) return;
-    *(int *)D_00195AF4 = a1;
+    if (*(short *)D_00190DDC != a1->data.membership.faction) return;
+    D_00195AF4 = a1;
 }
 
-void func_000701F1(int a1)
+void func_000701F1(struct record *a1)
 {
-    if (((int)(unsigned char)*(signed char *)((char *)a1)) != 10) return;
-    if ((((int)(signed char)*(signed char *)D_00190D20) & ((int)(unsigned char)*(signed char *)((char *)a1 + 73))) == 0) return;
-    *(int *)D_00195AF4 = a1;
+    if (a1->type != 10) return;
+    if ((((int)(signed char)*(signed char *)D_00190D20) & a1->data.membership.kind) == 0) return;
+    D_00195AF4 = a1;
 }
 
-int guild_find_membership_by_kind(unsigned char a1)
+struct membership *guild_find_membership_by_kind(unsigned char a1)
 {
-    *(int *)D_00195AF4 = 0;
+    D_00195AF4 = 0;
     *(short *)D_00190DDC = 0;
     *(signed char *)D_00190D20 = a1;
-    object_foreach(*(int *)(*(char **)player_entity + 63), (int)func_00070191);
-    if (*(int *)D_00195AF4 != 0) goto L702F0;
+    object_foreach(player_entity->children, (int)func_00070191);
+    if (D_00195AF4 != 0) goto L702F0;
     return 0;
 L702F0:;
-    return *(int *)D_00195AF4 + 71;
+    return &D_00195AF4->data.membership;
 }
 
-int guild_find_membership_by_bits(unsigned char a1)
+struct membership *guild_find_membership_by_bits(unsigned char a1)
 {
-    *(int *)D_00195AF4 = 0;
+    D_00195AF4 = 0;
     *(short *)D_00190DDC = 0;
     *(signed char *)D_00190D20 = a1;
-    object_foreach(*(int *)(*(char **)player_entity + 63), (int)func_000701F1);
-    if (*(int *)D_00195AF4 != 0) goto L70358;
+    object_foreach(player_entity->children, (int)func_000701F1);
+    if (D_00195AF4 != 0) goto L70358;
     return 0;
 L70358:;
-    return *(int *)D_00195AF4 + 71;
+    return &D_00195AF4->data.membership;
 }
 
 void guild_expire_blessings(void)
 {
-    int l_1C;
+    struct record *l_1C;
     int l_18;
 
-    l_1C = *(int *)(*(char **)player_entity + 63);
+    l_1C = player_entity->children;
 L70AA7:;
     if (l_1C == 0) return;
-    if (((int)(unsigned char)*(signed char *)((char *)l_1C)) != 30) goto L70AE5;
-    l_18 = l_1C + 71;
+    if (l_1C->type != 30) goto L70AE5;
+    l_18 = (int)RECORD_DATA(l_1C);
     if (((unsigned)*(int *)((char *)l_18 + 2)) >= *(int *)game_minutes) goto L70AE5;
     blessing_remove(l_18);
     object_free_single(l_1C);
     return;
 L70AE5:;
-    l_1C = *(int *)((char *)l_1C + 55);
+    l_1C = l_1C->next;
     goto L70AA7;
 }
 
@@ -509,7 +510,7 @@ L712AB:;
 L712AD:;
     goto L71241;
 L712AF:;
-    sound_play(203, *(int *)player_object, 100);
+    sound_play(203, (int)player_object, 100);
     l_18 = l_14;
 L712CA:;
     goto L71241;
@@ -535,18 +536,18 @@ L71320:;
 int guild_is_local_knight(void)
 {
     int l_24;
-    int l_20;
-    int l_1C;
+    struct membership *l_20;
+    struct faction *l_1C;
 
     l_20 = guild_find_membership_by_bits(64);
     if (l_20 != 0) goto L7135B;
     return 0;
 L7135B:;
-    l_1C = faction_find((int)(short)*(short *)((char *)l_20 + 3));
-    if (*(signed char *)((char *)l_1C + 1) != *(signed char *)current_region) goto L71381;
+    l_1C = faction_find(l_20->faction);
+    if ((signed char)l_1C->region != *(signed char *)current_region) goto L71381;
     return 1;
 L71381:;
-    if (((int)(unsigned char)*(signed char *)((char *)l_20)) < 4) goto L71399;
+    if (l_20->rank < 4) goto L71399;
     l_24 = 1;
     goto L713A0;
 L71399:;
@@ -557,45 +558,45 @@ L713A0:;
 
 int guild_local_temple_rank(void)
 {
-    int l_20;
-    int l_1C;
+    struct membership *l_20;
+    struct faction *l_1C;
 
     l_20 = guild_find_membership_by_bits(128);
     if (l_20 != 0) goto L713DD;
     return 0;
 L713DD:;
-    l_1C = faction_find((int)(short)*(short *)((char *)l_20 + 3));
-    if (*(signed char *)((char *)l_1C + 1) != *(signed char *)current_region) goto L71406;
-    return (int)(unsigned char)*(signed char *)((char *)l_20);
+    l_1C = faction_find(l_20->faction);
+    if ((signed char)l_1C->region != *(signed char *)current_region) goto L71406;
+    return l_20->rank;
 L71406:;
     return 0;
 }
 
 void func_0007141A(int a1)
 {
-    int l_18;
+    struct record *l_18;
 
     *(signed char *)D_001A4A1C = 1;
-    l_18 = object_create_child(*(int *)D_00195AC4, 0, 107);
-    *(signed char *)((char *)l_18) = 2;
-    item_make(11, 0, l_18 + 71);
-    object_reparent((int)D_001960D9, l_18);
+    l_18 = object_create_child(D_00195AC4, 0, 107);
+    l_18->type = 2;
+    item_make(11, 0, &l_18->data.item);
+    object_reparent((struct record *)D_001960D9, l_18);
 }
 
-void func_00071475(int a1)
+void func_00071475(struct record *a1)
 {
-    int l_18;
+    struct disease *l_18;
 
-    switch (*(unsigned char *)((char *)a1)) {
+    switch (a1->type) {
 case 11:
-    if (((int)(unsigned short)(*(short *)((char *)a1 + 21) & 32768)) == 0) goto L714D7;
-    l_18 = a1 + 71;
-    if (((int)(unsigned char)*(signed char *)((char *)l_18)) > 99) return;
+    if (((int)(unsigned short)(a1->flags & 32768)) == 0) goto L714D7;
+    l_18 = &a1->data.disease;
+    if (l_18->id > 99) return;
 L714D7:;
     object_delete(a1);
     return;
 case 9:
-    switch (*(unsigned char *)(*(char **)((char *)a1 + 67))) {
+    switch (a1->parent->type) {
 case 1:
 case 3:
 case 38:
@@ -612,7 +613,7 @@ void guild_heal(void)
     int l_18;
 
     l_18 = 0;
-    *(short *)(*(char **)player_character + 124) = *(short *)(*(char **)player_character + 126);
+    player_character->health = player_character->max_health;
     msgbox_show_rsc(350, 1);
     l_1C = 0;
 L71556:;
@@ -622,7 +623,7 @@ L7155E:;
     l_1C++;
     goto L71556;
 L71566:;
-    if (*(short *)(*(char **)player_character + 32 + (l_1C * 2)) >= *(short *)(*(char **)player_character + 48 + (l_1C * 2))) goto L71590;
+    if (player_character->attributes[l_1C] >= player_character->base_attributes[l_1C]) goto L71590;
     l_18++;
 L71590:;
     goto L7155E;
@@ -631,9 +632,9 @@ L71592:;
     msgbox_yes_no_rsc(403);
     if (((int)(unsigned char)*(signed char *)D_00196271) == 2) return;
     disease_remove_skill_bonuses();
-    object_foreach_post(*(int *)D_00195AC4, (int)func_00071475);
-    *(int *)(*(char **)player_character + 137) = 0;
-    mc_memcpy((int)(*(char **)player_character + 32), (int)&*(signed char *)(*(char **)player_character + 48), 16, (int)D_00175EAA, 1708, 16);
+    object_foreach_post(D_00195AC4, (int)func_00071475);
+    player_character->conditions = 0;
+    mc_memcpy((int)player_character->attributes, (int)player_character->base_attributes, 16, (int)D_00175EAA, 1708, 16);
     disease_restore_skill_bonuses();
 }
 
@@ -644,8 +645,8 @@ void rest_open(void)
 
     *(signed char *)rest_loitering = 0;
     *(int *)rest_image = 0;
-    if (((int)(unsigned char)*(signed char *)(*(char **)player_character + 67)) != 8) goto L71835;
-    if (((unsigned)(*(int *)game_minutes - *(int *)(*(char **)player_character + 509))) > 960) goto L71837;
+    if (player_character->race != 8) goto L71835;
+    if (((unsigned)(*(int *)game_minutes - player_character->last_kill_time)) > 960) goto L71837;
 L71835:;
     goto L7184B;
 L71837:;
@@ -669,7 +670,7 @@ L71899:;
     msgbox_show_rsc(355, 1);
     return;
 L718B4:;
-    if (((struct bf8_3_1 *)(*(char **)player_character + 137))->f == 0) goto L718CB;
+    if ((player_character->conditions & 0x8) == 0) goto L718CB;
     if (*(signed char *)player_on_ground == 0) goto L718CD;
 L718CB:;
     goto L718E5;

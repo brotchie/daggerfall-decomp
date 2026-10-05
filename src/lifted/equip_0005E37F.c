@@ -1,15 +1,16 @@
 /* equip.c: functions first lifted from the assembly by tools/lift_all.py (2026-10), now
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
+#include "records.h"
 
 extern char D_00185F88[];
 
 extern int rand_range(int, int);
-extern void item_init_from_template(unsigned short, short, short, int);
-extern void item_make_magic(int, int);
-extern void item_make_artifact(int, int);
+extern void item_init_from_template(unsigned short, short, short, struct item *);
+extern void item_make_magic(struct item *, int);
+extern void item_make_artifact(struct item *, int);
 
-void func_0005E37F(short a1, int a2, int a3, int a4)
+void func_0005E37F(short a1, int a2, int a3, struct item *a4)
 {
     int l_14;
 

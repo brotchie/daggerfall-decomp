@@ -1,29 +1,28 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0004A0C0 */
-#pragma pack(1)
-struct rec { char pad0[24]; unsigned char kind; char pad19; };
-#pragma pack()
+#include "records.h"
+
 extern int text_blank;
-extern char *current_location;
+extern struct location *current_location;
 extern int rand_range(int, int);
-extern int building_name(struct rec *);
+extern int building_name(struct building *);
 
 int parse_town_building_name(short a1)
 {
-    struct rec *p;
+    struct building *p;
     short i;
     short c;
 
-    p = *(struct rec **)(current_location + 43);
-    for (c = i = 0; i < *(unsigned short *)(current_location + 41); i++, p++)
-        if (p->kind == a1) c++;
+    p = current_location->buildings;
+    for (c = i = 0; i < current_location->building_count; i++, p++)
+        if (p->type == a1) c++;
     if (c == 0) return text_blank;
     if (c == 1)
         c = 0;
     else
         c = rand_range(0, c - 1) + 1;
-    p = *(struct rec **)(current_location + 43);
+    p = current_location->buildings;
     while (c != 0) {
-        while (p->kind != a1) p++;
+        while (p->type != a1) p++;
         c--;
     }
     return building_name(p);

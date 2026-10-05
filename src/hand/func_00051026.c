@@ -1,4 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x00051026 */
+#include "records.h"
+
 struct anims {
     char *a;
     char *b;
@@ -27,7 +29,7 @@ extern unsigned char D_0018528E[];
 extern unsigned char D_00185291[];
 extern char text_buffer[];
 extern short D_00190D68;
-extern int player_class;
+extern struct career *player_class;
 extern char *D_00195C44;
 extern unsigned char mouse_buttons_prev;
 extern char class_questions_asked[];
@@ -112,7 +114,7 @@ int class_questions_run(void)
     if (sel != -1) {
         func_000A0ED9(134, D_0017539B);
         mc_sprintf(text_buffer, D_001753CD, sel);
-        disk_read_file(text_buffer, player_class);
+        disk_read_file(text_buffer, (int)player_class);
     }
     if (h.a != 0 && h.a != (char *)0x97979797) {
         mc_free(h.a, D_0017539B, 138);

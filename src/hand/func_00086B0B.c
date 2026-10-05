@@ -1,24 +1,5 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x00086B0B */
-struct who {
-    char pad0[7];
-    int x;                  /* 0x07 */
-    int y;                  /* 0x0b */
-    int z;                  /* 0x0f */
-    char pad13[0x1b - 0x13];
-    unsigned short id;      /* 0x1b */
-    char pad1d[0x1f - 0x1d];
-    int f1f;
-    char pad23[0x3f - 0x23];
-    int f3f;
-};
-struct place {
-    int f0;
-    unsigned pad:25;
-    unsigned type:5;
-    unsigned pad2:2;
-    char pad8[4];
-    unsigned char fc;
-};
+#include "records.h"
 extern int dungeon_water_level;
 extern char D_00176C94[];       /* __FILE__ */
 extern char D_00176CC9[];
@@ -26,14 +7,14 @@ extern int D_00187F2C;
 extern char text_buffer[];
 extern char text_rsc_buffer[];
 extern unsigned D_0019599C;
-extern struct who *D_00195AC4;
-extern char *current_location;
+extern struct record *D_00195AC4;
+extern struct location *current_location;
 extern int game_minutes;
 extern int D_00195CB8;
 extern int D_00195D48;
 extern char D_00196289;
 extern char D_0019629B;
-extern struct place *location_here;
+extern struct map_location *location_here;
 extern char loaded_location[];
 extern char *loaded_location_object;
 extern char *loaded_location_data;
@@ -52,12 +33,12 @@ extern int hud_message_add(char *);
 extern int rand_range(int, int);
 extern void func_0007E74E(void);
 extern void location_restore_stored(void);
-extern void func_00086A71(int);
+extern void func_00086A71(struct record *);
 extern void location_set_discovered(int, int);
-extern void object_foreach(struct who *, void (*)(int));
+extern void object_foreach(struct record *, void (*)(struct record *));
 extern void func_0008EAF1(int, int);
 extern void func_0008EB52(void);
-extern int player_to_nearest_marker(struct who *, int);
+extern int player_to_nearest_marker(struct record *, int);
 extern void mc_memcpy(void *, void *, int, char *, int, int);
 extern int func_0014B45B(int, int);
 #pragma aux func_000A0ED9 parm routine [];
@@ -66,12 +47,12 @@ extern int mc_sprintf(char *, char *, ...);
 
 void town_load(int id)
 {
-    if (D_00195AC4->id == id)
+    if (D_00195AC4->image == id)
         return;
     sound_stop_ambient();
     func_0008EB52();
-    if (D_00195AC4->id == 65535)
-        func_0008EAF1(D_00195AC4->f3f, D_00195AC4->f1f);
+    if (D_00195AC4->image == 65535)
+        func_0008EAF1((int)D_00195AC4->children, D_00195AC4->id);
     location_load_exterior(loaded_location, id);
     mc_memcpy(D_00195AC4, loaded_location_object, 55, D_00176C94, 365, 4);
     mc_memcpy(current_location, loaded_location_data, 48, D_00176C94, 366, 4);
@@ -93,17 +74,17 @@ void town_load(int id)
         func_0004C759();
         location_restore_stored();
         func_00028D1A();
-        switch (location_here->type) {
+        switch ((location_here->x_type_flags << 2) >> 27) {
         case 4:
         case 7:
         case 10:
         case 12:
-            parse_rsc_text(location_here->fc + 520, 0, 0);
+            parse_rsc_text(location_here->dungeon_type + 520, 0, 0);
             hud_message_add(text_rsc_buffer);
             break;
         default:
             func_000A0ED9(401, D_00176C94);
-            mc_sprintf(text_buffer, D_00176CC9, current_location);
+            mc_sprintf(text_buffer, D_00176CC9, current_location->name);
             hud_message_add(text_buffer);
             break;
         }

@@ -1,6 +1,7 @@
 /* book.c: functions first lifted from the assembly by tools/lift_all.py (2026-10), now
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
+#include "records.h"
 
 struct bf8_7_1 { unsigned char _:7; unsigned char f:1; };
 extern char mouse_buttons[];
@@ -41,10 +42,10 @@ extern char D_00190D66[];
 extern char D_00190D68[];
 extern char D_001940D6[];
 extern char D_001940D8[];
-extern char player_entity[];
-extern char player_object[];
+extern struct record *player_entity;
+extern struct record *player_object;
 extern char inpstr_result[];
-extern char player_character[];
+extern struct character *player_character;
 extern char window_image[];
 extern char D_00195C44[];
 extern char trade_mode[];
@@ -64,8 +65,8 @@ extern int sound_play(int, int, int);
 extern int disk_read_file(int, int);
 extern int disk_open_data(int);
 extern int key_pressed_once(unsigned char);
-extern int object_free_single(int);
-extern int object_delete(int);
+extern int object_free_single(struct record *);
+extern int object_delete(struct record *);
 extern int inventory_open(int, int, int);
 extern int func_0009DEA7();
 extern int mc_free();
@@ -82,14 +83,14 @@ extern void book_draw_page(short);
 extern void text_draw_centred(int, int, int);
 extern void text_draw_colored(int, int, int, int, unsigned char);
 extern void text_draw_centered_colored(int, int, int, int, unsigned char);
-extern void spfx_effect_end(int, int, int);
-extern void spfx_effect_tick(int, int, int);
+extern void spfx_effect_end(struct spell *, int, struct record *);
+extern void spfx_effect_tick(struct record *, struct record *, int);
 extern void inpstr_begin_number(int);
 void book_close(void);
 void func_0005A230(void);
 void book_prev_page(void);
 void book_next_page(void);
-void spell_tick_spell(int, int);
+void spell_tick_spell(struct record *, struct record *);
 #pragma aux func_000A0ED9 parm routine [];
 
 void book_open(short a1)
@@ -108,7 +109,7 @@ void book_open(short a1)
     *(signed char *)game_mode = 11;
     *(signed char *)D_00196272 = 1;
     *(signed char *)D_00187CA8 = 0;
-    sound_play(237, *(int *)player_object, 100);
+    sound_play(237, (int)player_object, 100);
 }
 
 void book_update(void)
@@ -126,7 +127,7 @@ L59CE9:;
 L59CEB:;
     *(short *)D_00190D68 = 0;
     if (((int)(short)*(short *)book_page_count) < *(int *)inpstr_result) goto L59D25;
-    sound_play(205, *(int *)player_object, 100);
+    sound_play(205, (int)player_object, 100);
     *(short *)book_page = *(short *)inpstr_result - 1;
 L59D25:;
     if (*(signed char *)key_down_esc == 0) goto L59D33;
@@ -167,7 +168,7 @@ L59DE1:;
 L59DF8:;
     goto L59E1C;
 L59DFA:;
-    sound_play(203, *(int *)player_object, 100);
+    sound_play(203, (int)player_object, 100);
     ((int (*)())(*(int *)(D_00185BEC + (((int)(short)l_18) * 12))))();
 L59E1C:;
     goto L59D90;
@@ -272,14 +273,14 @@ L5A2E9:;
 void book_prev_page(void)
 {
     if (*(short *)book_page == 0) return;
-    sound_play(205, *(int *)player_object, 100);
+    sound_play(205, (int)player_object, 100);
     (*(short *)book_page)--;
 }
 
 void book_next_page(void)
 {
     if (((int)(short)*(short *)book_page) == (((int)(short)*(short *)book_page_count) - 1)) return;
-    sound_play(205, *(int *)player_object, 100);
+    sound_play(205, (int)player_object, 100);
     (*(short *)book_page)++;
 }
 
@@ -356,26 +357,26 @@ void func_0005A6ED(int a1, int a2, int a3, int a4)
     *(short *)D_0014294C = a4;
 }
 
-void spell_tick(int a1)
+void spell_tick(struct record *a1)
 {
-    int l_1C;
-    int l_18;
+    struct record *l_1C;
+    struct record *l_18;
 
-    if (*(int *)((char *)a1 + 63) == 0) return;
-    if (a1 != *(int *)player_entity) goto L5A75F;
+    if (a1->children == 0) return;
+    if (a1 != player_entity) goto L5A75F;
     *(signed char *)D_001940D6 &= 239;
 L5A75F:;
     l_1C = a1;
-    a1 = *(int *)((char *)a1 + 63);
+    a1 = a1->children;
 L5A76E:;
     if (a1 == 0) return;
-    l_18 = *(int *)((char *)a1 + 55);
-    switch (*(unsigned char *)((char *)a1)) {
+    l_18 = a1->next;
+    switch (a1->type) {
 case 9:
     spell_tick_spell(a1, l_1C);
     goto L5A7C3;
 case 19:
-    if ((*(short *)((char *)a1 + 29))-- != 0) goto L5A7C3;
+    if (a1->image2-- != 0) goto L5A7C3;
     object_free_single(a1);
 default:
 L5A7C3:;
@@ -384,14 +385,14 @@ L5A7C3:;
 }
 }
 
-void spell_tick_spell(int a1, int a2)
+void spell_tick_spell(struct record *a1, struct record *a2)
 {
     int l_20;
     int l_1C;
     int l_18;
-    int l_14;
+    struct spell *l_14;
 
-    l_14 = a1 + 71;
+    l_14 = &a1->data.spell;
     l_20 = 0;
     l_18 = l_20;
     l_1C = l_18;
@@ -402,11 +403,11 @@ L5A80F:;
     l_20++;
     goto L5A804;
 L5A817:;
-    if (((int)(unsigned char)*(signed char *)((char *)((l_20 * 2) + l_14))) == 255) goto L5A80F;
+    if (l_14->effects[l_20].type == 255) goto L5A80F;
     l_1C++;
-    if (((int)(signed char)*(signed char *)((char *)((l_20 * 3) + l_14) + 14)) != (-1)) goto L5A8AE;
-    if (*(int *)(*(char **)player_character - 433 + (((int)(unsigned char)*(signed char *)((char *)l_14 + 72)) << 2)) == 0) goto L5A88E;
-    if (((int)(short)*(short *)(*(char **)(*(char **)player_character - 433 + (((int)(unsigned char)*(signed char *)((char *)l_14 + 72)) << 2)) + 138)) != (-1)) goto L5A890;
+    if (((int)(signed char)l_14->durations[l_20].base) != (-1)) goto L5A8AE;
+    if (player_character->equipped[l_14->icon - 200] == 0) goto L5A88E;
+    if (player_character->equipped[l_14->icon - 200]->data.item.enchantments[0].type != (-1)) goto L5A890;
 L5A88E:;
     goto L5A895;
 L5A890:;
@@ -416,11 +417,11 @@ L5A895:;
     spfx_effect_end(l_14, l_20, a2);
     goto L5A80F;
 L5A8AE:;
-    if (*(short *)((char *)((l_20 * 2) + l_14) + 74) == 0) goto L5A8CB;
+    if (l_14->cast_durations[l_20] == 0) goto L5A8CB;
     spfx_effect_tick(a1, a2, l_20);
 L5A8CB:;
-    if (*(short *)((char *)((l_20 * 2) + l_14) + 74) == 0) goto L5A8E8;
-    (*(short *)((char *)((l_20 * 2) + l_14) + 74))--;
+    if (l_14->cast_durations[l_20] == 0) goto L5A8E8;
+    l_14->cast_durations[l_20]--;
     goto L5A8FC;
 L5A8E8:;
     l_18++;

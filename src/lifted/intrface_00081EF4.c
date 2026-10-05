@@ -1,6 +1,7 @@
 /* intrface.c: functions first lifted from the assembly by tools/lift_all.py (2026-10), now
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
+#include "records.h"
 
 struct bf8_0_1 { unsigned char f:1; };
 extern char mouse_buttons[];
@@ -8,7 +9,7 @@ extern char mouse_x[];
 extern char mouse_y[];
 extern char D_001788CF[];
 extern char player_speed[];
-extern char player_character[];
+extern struct character *player_character;
 extern char mouse_control_mode[];
 extern char D_00195F4E[];
 extern char D_0019628E[];
@@ -49,7 +50,7 @@ L81FE5:;
 L82013:;
     *(int *)move_angle_offset = 0;
     *(short *)player_speed = *(short *)D_00195F4E;
-    if (((struct bf8_0_1 *)(*(char **)player_character + 137))->f != 0) goto L82061;
+    if ((player_character->conditions & 0x1) != 0) goto L82061;
     if (((int)(unsigned char)*(signed char *)mouse_control_mode) == 1) goto L82053;
     if (((int)(unsigned char)(*(signed char *)mouse_buttons & 1)) != 0) goto L8205F;
 L82053:;

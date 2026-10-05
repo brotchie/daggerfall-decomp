@@ -1,6 +1,7 @@
 /* crime.c: functions first lifted from the assembly by tools/lift_all.py (2026-10), now
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
+#include "records.h"
 
 extern char screen_buffer[];
 extern char D_001706E1[];
@@ -8,17 +9,17 @@ extern char D_00179EA8[];
 extern char D_00187CA8[];
 extern char region_punishment_flags[];
 extern char region_legal_reputation[];
-extern char D_00190504[];
+extern struct record *D_00190504[];
 extern char D_00190CAC[];
 extern char D_00190D16[];
 extern char court_state[];
 extern char court_prison_days[];
 extern char D_00190DCA[];
 extern char D_001940D5[];
-extern char player_entity[];
-extern char D_00195AC4[];
+extern struct record *player_entity;
+extern struct record *D_00195AC4;
 extern char creature_count[];
-extern char player_character[];
+extern struct character *player_character;
 extern char window_image[];
 extern char player_death_timer[];
 extern char D_00195F34[];
@@ -86,7 +87,7 @@ L212A9:;
     *(signed char *)court_state = 3;
     goto L212FA;
 L212E6:;
-    player_to_random_marker(*(int *)D_00195AC4, 8);
+    player_to_random_marker((int)D_00195AC4, 8);
     court_close();
 L212FA:;
     goto L2134B;
@@ -108,7 +109,7 @@ case 2:
     *(signed char *)court_state = 3;
     return;
 case 3:
-    player_to_random_marker(*(int *)D_00195AC4, 8);
+    player_to_random_marker((int)D_00195AC4, 8);
     prison_serve_sentence((int)(short)*(short *)court_prison_days);
     court_restore_vitals();
     court_reputation_restore();
@@ -117,7 +118,7 @@ case 3:
 case 5:
     msgbox_show_rsc(8063, 1);
     *(signed char *)(region_punishment_flags + (((int)(unsigned char)*(signed char *)current_region) * 80)) |= 1;
-    player_to_random_marker(*(int *)D_00195AC4, 8);
+    player_to_random_marker((int)D_00195AC4, 8);
     *(signed char *)court_state = 100;
     return;
 case 6:
@@ -126,18 +127,18 @@ case 6:
     *(signed char *)court_state = 7;
     return;
 case 7:
-    player_to_random_marker(*(int *)D_00195AC4, 4);
+    player_to_random_marker((int)D_00195AC4, 4);
     *(signed char *)court_state = 100;
     return;
 case 8:
     if (((int)(unsigned char)*(signed char *)D_00196271) != 2) goto L21469;
-    l_20 = (int)(short)*(short *)(*(char **)player_character + 169);
+    l_20 = player_character->skills[2].value;
     goto L21478;
 L21469:;
-    l_20 = (int)(short)*(short *)(*(char **)player_character + 163);
+    l_20 = player_character->skills[1].value;
 L21478:;
     skill_add_uses(l_20, 1);
-    l_1C = ((((int)(short)*(short *)(*(char **)player_character + 42)) + l_20) / 2) + ((int)(short)*(short *)(region_legal_reputation + (((int)(unsigned char)*(signed char *)current_region) * 80)));
+    l_1C = ((player_character->attributes[5] + l_20) / 2) + ((int)(short)*(short *)(region_legal_reputation + (((int)(unsigned char)*(signed char *)current_region) * 80)));
     if (l_1C >= 5) goto L214C1;
     l_1C = 5;
     goto L214CE;
@@ -170,7 +171,7 @@ L21567:;
     *(signed char *)court_state = 2;
     return;
 case 9:
-    player_to_random_marker(*(int *)D_00195AC4, 12);
+    player_to_random_marker((int)D_00195AC4, 12);
     *(signed char *)court_state = 100;
     return;
 case 100:
@@ -203,9 +204,9 @@ void court_close(void)
 {
     short l_18;
 
-    *(int *)&l_18 = (int)(unsigned short)*(short *)(*(char **)player_character + 155);
+    *(int *)&l_18 = player_character->fatigue;
     time_pass(240);
-    *(short *)(*(char **)player_character + 155) = *(int *)&l_18;
+    player_character->fatigue = *(int *)&l_18;
     *(signed char *)D_00187CA8 = 1;
     *(signed char *)game_mode = 0;
     *(signed char *)D_00196272 = 0;
@@ -233,15 +234,15 @@ L2173C:;
     l_18++;
     goto L2172F;
 L21744:;
-    if (*(int *)(D_00190504 + (l_18 << 2)) == *(int *)player_entity) goto L2173C;
-    object_delete(*(int *)(D_00190504 + (l_18 << 2)));
+    if ((int)D_00190504[l_18] == (int)player_entity) goto L2173C;
+    object_delete((int)D_00190504[l_18]);
     goto L2173C;
 }
 
 void court_restore_vitals(void)
 {
-    *(short *)(*(char **)player_character + 124) = *(short *)(*(char **)player_character + 126);
-    *(short *)(*(char **)player_character + 141) = *(short *)(*(char **)player_character + 143);
-    *(short *)(*(char **)player_character + 155) = (*(short *)(*(char **)player_character + 32) + *(short *)(*(char **)player_character + 40)) << 6;
+    player_character->health = player_character->max_health;
+    player_character->magicka = player_character->max_magicka;
+    player_character->fatigue = (player_character->attributes[0] + player_character->attributes[4]) << 6;
     *(int *)player_death_timer = 0;
 }

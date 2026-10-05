@@ -1,21 +1,13 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x000844FB */
-struct item {
-    char type;          /* 0 */
-    char pad1[18];
-    short f19;          /* 19 */
-    short f21;          /* 21 */
-    char pad2[4];
-    short f27;          /* 27 */
-    short f29;          /* 29 */
-    int f31;            /* 31: a name address */
-};
-extern char *D_00195AC4;
-extern char *current_location;
-extern struct item *object_create_child(int, int, int);
+#include "records.h"
 
-struct item *rmb_make_marker(int a1, int a2)
+extern struct record *D_00195AC4;
+extern struct location *current_location;
+extern struct record *object_create_child(struct record *, struct record *, int);
+
+struct record *rmb_make_marker(struct record *a1, int a2)
 {
-    struct item *l_20;
+    struct record *l_20;
     int l_1C;
     int l_18;
 
@@ -23,20 +15,20 @@ struct item *rmb_make_marker(int a1, int a2)
     if (l_1C == 13 || l_1C == 14) {
         l_18 = 659;
         l_20 = object_create_child(a1, 0, l_18);
-        l_20->f19 = 0;
+        *(short *)((char *)l_20 + 19) = 0;
     } else {
         l_20 = object_create_child(a1, 0, 0);
-        l_20->f19 = 0;
+        *(short *)((char *)l_20 + 19) = 0;
     }
     l_20->type = 34;
-    l_20->f29 = 0;
-    l_20->f19 = 0;
-    l_20->f27 = a2;
+    l_20->image2 = 0;
+    *(short *)((char *)l_20 + 19) = 0;
+    l_20->image = a2;
     if (l_1C == 9 || l_1C == 16) {
-        l_20->f31 = *(int *)(D_00195AC4 + 31) + (*(unsigned short *)(current_location + 39))++;
+        l_20->id = D_00195AC4->id + current_location->marker_counter++;
     } else {
-        l_20->f31 = *(int *)(D_00195AC4 + 31) + (*(unsigned short *)(current_location + 37))++;
+        l_20->id = D_00195AC4->id + current_location->object_counter++;
     }
-    l_20->f21 = 1;
+    l_20->flags = 1;
     return l_20;
 }

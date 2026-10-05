@@ -1,38 +1,22 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x00018BDC */
-struct faction {
-    char pad0[33];
-    unsigned short id;          /* 33 */
-    char pad23[21];
-    int allies[3];              /* 56 */
-    int enemies[3];             /* 68 */
-    char pad50[8];
-    struct faction *parent;     /* 88 */
-};
-struct thing {
-    unsigned char type;
-    char pad1[54];
-    struct thing *next;         /* 55 */
-    char pad3b[4];
-    struct thing *child;        /* 63 */
-    char pad43[7];
-    short faction;              /* 74 */
-};
+#include "records.h"
+
 extern struct faction *text_macro_fpc;
 extern struct faction *text_macro_fnpc;
-extern int text_macro_fe;
-extern int text_macro_fa;
-extern int text_macro_fae;
-extern int text_macro_fea;
+extern struct faction *text_macro_fe;
+extern struct faction *text_macro_fa;
+extern struct faction *text_macro_fae;
+extern struct faction *text_macro_fea;
 extern struct faction *text_macro_fpa;
-extern struct thing *player_entity;
+extern struct record *player_entity;
 extern short D_001966AC;
 extern struct faction *faction_find(short);
-extern int faction_has_enemy(struct faction *, int);
-extern int faction_has_ally(struct faction *, int);
+extern int faction_has_enemy(struct faction *, struct faction *);
+extern int faction_has_ally(struct faction *, struct faction *);
 
 int talk_faction_relation(short a1)
 {
-    struct thing *t;
+    struct record *t;
     struct faction *other;
     struct faction *me;
     int rel;
@@ -41,10 +25,10 @@ int talk_faction_relation(short a1)
 
     rel = 8;
     me = faction_find(a1);
-    t = player_entity->child;
+    t = player_entity->children;
     while (t != 0) {
         if (t->type == 10) {
-            other = faction_find(t->faction);
+            other = faction_find(t->data.membership.faction);
             text_macro_fpc = other;
             text_macro_fnpc = me;
             if (a1 == other->id)
@@ -59,11 +43,11 @@ int talk_faction_relation(short a1)
                     rel = 1;
                 D_001966AC += 15;
             }
-            if ((faction_has_ally(other, (int)me) || faction_has_ally(me, (int)other)) && rel > 2) {
+            if ((faction_has_ally(other, me) || faction_has_ally(me, other)) && rel > 2) {
                 D_001966AC += 10;
                 rel = 2;
             }
-            if ((faction_has_enemy(other, (int)me) || faction_has_enemy(me, (int)other)) && rel > 3) {
+            if ((faction_has_enemy(other, me) || faction_has_enemy(me, other)) && rel > 3) {
                 D_001966AC = 20;
                 rel = 3;
             }

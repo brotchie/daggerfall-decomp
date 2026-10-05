@@ -1,6 +1,7 @@
 /* objlib.c: functions first lifted from the assembly by tools/lift_all.py (2026-10), now
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
+#include "records.h"
 
 extern char D_001343C0[];
 extern char D_00176C20[];
@@ -20,11 +21,11 @@ extern char text_macro_fpc[];
 extern char D_001910AC[];
 extern char frame_counter[];
 extern char D_001959BC[];
-extern char current_building[];
-extern char player_object[];
-extern char D_00195AC4[];
-extern char current_location[];
-extern char game_settings[];
+extern struct building *current_building;
+extern struct record *player_object;
+extern struct record *D_00195AC4;
+extern struct location *current_location;
+extern struct settings *game_settings;
 extern char D_00195C44[];
 extern char sound_last_size[];
 extern char current_region[];
@@ -62,7 +63,7 @@ extern char D_001A949D[];
 extern int archive_find_record(int, int, int);
 extern int archive_record_size(int, int);
 extern int archive_read_record(int, int, int);
-extern int func_0002455D(int);
+extern int func_0002455D(struct record *);
 extern int flats_cfg_find(int);
 extern int sound_play_at_point(int, int, int, int, int);
 extern int mem_pool_alloc(int, int);
@@ -70,7 +71,7 @@ extern int mem_pool_release(int);
 extern int rand_range(int, int);
 extern int model_get(unsigned short, int, int);
 extern int func_00086093(int);
-extern int object_create_child(int, int, int);
+extern struct record *object_create_child(struct record *, struct record *, int);
 extern int dpmi_lock_region(int, int);
 extern int dpmi_unlock_region(int, int);
 extern int rand();
@@ -93,27 +94,27 @@ extern void fatal_error(int);
 extern void mem_pool_init(int, int);
 extern void mem_pool_free(int);
 extern void rotate_xz(int, int, int);
-extern void rmb_add_doors(int, int);
-extern void rmb_add_people(int, int);
-extern void rmb_add_editor_marker(int, int);
-extern void object_foreach(int, int);
-int rmb_add_subrecord(int);
+extern void rmb_add_doors(struct record *, int);
+extern void rmb_add_people(struct record *, int);
+extern void rmb_add_editor_marker(struct record *, int);
+extern void object_foreach(struct record *, int);
+struct record *rmb_add_subrecord(struct record *);
 int model_load(int, int);
 int model_cache_add(int);
 int func_00086041(int, int);
-void func_00084E5E(int);
+void func_00084E5E(struct record *);
 void model_cache_purge_old(int);
 void model_cache_flush(int);
 void model_cache_purge_unused(int, int, int);
 void model_cache_remove_node(int, int);
 void sound_cache_trim(void);
-void func_00085EF8(int);
+void func_00085EF8(struct record *);
 void func_0008600F(int);
 #pragma aux func_000A0ED9 parm routine [];
 
-int rmb_add_subrecord(int a1)
+struct record *rmb_add_subrecord(struct record *a1)
 {
-    int l_48;
+    struct record *l_48;
     int l_44;
     int l_40;
     int l_3C;
@@ -134,15 +135,15 @@ int rmb_add_subrecord(int a1)
     return 0;
 L84ADE:;
     l_48 = object_create_child(a1, 0, l_1C);
-    *(signed char *)((char *)l_48) = 43;
-    *(int *)((char *)l_48 + 7) = *(int *)D_001967F8;
-    *(int *)((char *)l_48 + 15) = *(int *)D_001967F0;
-    *(int *)((char *)l_48 + 11) = *(int *)D_001967F4;
-    *(short *)((char *)l_48 + 3) = *(short *)D_001967FC;
+    l_48->type = 43;
+    l_48->x = *(int *)D_001967F8;
+    l_48->z = *(int *)D_001967F0;
+    l_48->y = *(int *)D_001967F4;
+    l_48->yaw = *(short *)D_001967FC;
     *(short *)((char *)l_48 + 19) = 32768;
-    *(int *)((char *)l_48 + 31) = *(int *)(*(char **)D_00195AC4 + 31) + ((int)(unsigned short)(*(short *)(*(char **)current_location + 37))++);
-    *(int *)D_001A9438 = *(int *)((char *)l_48 + 31);
-    l_44 = l_48 + 71;
+    l_48->id = D_00195AC4->id + ((int)(unsigned short)(current_location->object_counter)++);
+    *(int *)D_001A9438 = l_48->id;
+    l_44 = (int)RECORD_DATA(l_48);
     mc_memcpy(l_44, *(int *)rmb_record_ptr, l_1C, (int)D_00176C20, 803, 4);
     *(int *)((char *)l_44 + 5) = l_44 + 17;
     l_40 = *(int *)((char *)l_44 + 5);
@@ -194,7 +195,7 @@ L84CEF:;
 L84D49:;
     l_2C = flats_cfg_find((int)(unsigned short)*(short *)((char *)l_3C + 12));
     if (((int)(unsigned char)(*(signed char *)((char *)l_2C + 6) & 2)) == 0) goto L84D84;
-    if (((int)(unsigned short)(*(short *)(*(char **)game_settings) & 4)) != 0) goto L84D86;
+    if (((int)(unsigned short)(*(short *)(*(char **)&game_settings) & 4)) != 0) goto L84D86;
 L84D84:;
     goto L84D8F;
 L84D86:;
@@ -225,25 +226,25 @@ L84DF5:;
     return l_48;
 }
 
-void func_00084E5E(int a1)
+void func_00084E5E(struct record *a1)
 {
     int l_20;
-    int l_1C;
+    struct building *l_1C;
     int l_18;
 
-    l_1C = (int)(*(char **)(*(char **)current_location + 43) + (((int)(unsigned short)*(short *)((char *)a1 + 27)) * 26));
-    if (((int)(unsigned char)*(signed char *)((char *)l_1C + 24)) == 16) goto L84EC1;
-    if (*(short *)((char *)l_1C + 18) != 0) goto L84EBC;
-    *(short *)((char *)l_1C + 18) = *(short *)(D_00187D30 + (((int)(unsigned char)*(signed char *)current_region) * 2));
+    l_1C = &current_location->buildings[a1->image];
+    if (l_1C->type == 16) goto L84EC1;
+    if (l_1C->faction_id != 0) goto L84EBC;
+    l_1C->faction_id = *(short *)(D_00187D30 + (((int)(unsigned char)*(signed char *)current_region) * 2));
 L84EBC:;
     return;
 L84EC1:;
-    *(short *)((char *)l_1C + 18) = ((((int)(unsigned char)(*(signed char *)D_001968BB & 16)) != 0) ? 852 : 242);
-    a1 = *(int *)((char *)a1 + 63);
+    l_1C->faction_id = ((((int)(unsigned char)(*(signed char *)D_001968BB & 16)) != 0) ? 852 : 242);
+    a1 = a1->children;
 L84EF4:;
     if (a1 == 0) return;
-    if (((int)(unsigned char)*(signed char *)((char *)a1)) != 8) goto L84F77;
-    l_20 = a1 + 71;
+    if (a1->type != 8) goto L84F77;
+    l_20 = (int)RECORD_DATA(a1);
     if (*(unsigned short *)((char *)l_20) != *(short *)(D_00187D30 + (((int)(unsigned char)*(signed char *)current_region) * 2))) goto L84F4B;
     *(short *)((char *)l_20) = *(short *)(D_00187CB4 + (((int)(unsigned char)*(signed char *)current_region) * 2));
 L84F4B:;
@@ -254,34 +255,34 @@ L84F6D:;
 L84F6F:;
     *(short *)((char *)l_20) = 242;
 L84F77:;
-    a1 = *(int *)((char *)a1 + 55);
+    a1 = a1->next;
     goto L84EF4;
 }
 
-int rmb_add_building(int a1, int a2)
+struct record *rmb_add_building(struct record *a1, int a2)
 {
     int l_20;
     int l_1C;
-    int l_18;
+    struct record *l_18;
 
     *(int *)rmb_record_ptr = *(int *)(*(char **)rmb_block + 1475 + (a2 << 2));
     l_18 = rmb_add_subrecord(a1);
-    *(short *)((char *)l_18 + 21) = 1;
-    *(short *)((char *)l_18 + 29) = a2;
+    l_18->flags = 1;
+    l_18->image2 = a2;
     l_20 = (int)(unsigned char)*(signed char *)(*(char **)rmb_block + 667 + (a2 * 26));
     switch ((unsigned)l_20) {
     goto L850BA;
 case 21:
 case 22:
-    *(signed char *)((char *)l_18 + 21) |= 8;
-    *(short *)((char *)l_18 + 27) = 65535;
+    l_18->flags |= 8;
+    l_18->image = 65535;
     return l_18;
 case 17:
 case 18:
 case 19:
 case 20:
     l_1C = rand();
-    srand((int)(short)*(short *)((char *)l_18 + 31));
+    srand((int)(short)(short)l_18->id);
     l_20 = rand();
     srand(l_1C);
     if (((int)(unsigned short)*(short *)(*(char **)rmb_block + 661 + (a2 * 26))) == 42) goto L85088;
@@ -290,12 +291,12 @@ L85088:;
     goto L850BA;
 L8508A:;
     if ((l_20 % 100) > *(int *)D_00196800) goto L850BA;
-    *(signed char *)((char *)l_18 + 21) |= 8;
-    *(short *)((char *)l_18 + 27) = 65535;
+    l_18->flags |= 8;
+    l_18->image = 65535;
     return l_18;
 default:
 L850BA:;
-    *(short *)((char *)l_18 + 27) = (*(int *)D_00196808)++;
+    l_18->image = (*(int *)D_00196808)++;
     rmb_add_subrecord(l_18);
     func_00084E5E(l_18);
     return l_18;
@@ -606,40 +607,40 @@ L858D0:;
     model_cache_remove_node(l_14, l_18);
 }
 
-void func_0008591A(int a1, int a2)
+void func_0008591A(struct record *a1, struct building *a2)
 {
     int l_18;
     int l_14;
 
     l_14 = rand();
-    srand(*(int *)((char *)a1 + 31) & 65535);
+    srand(a1->id & 65535);
     l_18 = func_0002455D(a1);
     if (l_18 == 100000) goto L85962;
-    *(int *)((char *)a1 + 11) = l_18;
+    a1->y = l_18;
 L85962:;
-    *(short *)((char *)a1 + 27) = func_00086041((int)(unsigned char)*(signed char *)player_environment, (int)(unsigned char)*(signed char *)(*(char **)current_building + 24));
+    a1->image = func_00086041((int)(unsigned char)*(signed char *)player_environment, current_building->type);
     srand(l_14);
 }
 
-void func_00085992(int a1, int a2)
+void func_00085992(struct record *a1, struct building *a2)
 {
     int l_14;
 
     l_14 = func_0002455D(a1);
     if (l_14 == 100000) goto L859C2;
-    *(int *)((char *)a1 + 11) = l_14;
+    a1->y = l_14;
 L859C2:;
     if (((int)(unsigned char)*(signed char *)player_environment) == 3) goto L859F1;
-    *(signed char *)((char *)a1) = 33;
-    *(short *)((char *)a1 + 27) = *(short *)(D_00187DC0 + (((int)(unsigned char)*(signed char *)((char *)a2 + 24)) * 2));
+    a1->type = 33;
+    a1->image = *(short *)(D_00187DC0 + (a2->type * 2));
     goto L85A25;
 L859F1:;
-    *(signed char *)((char *)a1) = 33;
-    *(short *)((char *)a1 + 27) = ((unsigned short)(unsigned char)*(signed char *)(D_00187DAC + (rand() % 20))) + 27648;
-    *(short *)((char *)a1 + 25) = 1;
+    a1->type = 33;
+    a1->image = ((unsigned short)(unsigned char)*(signed char *)(D_00187DAC + (rand() % 20))) + 27648;
+    a1->lockpick_skill_tried = 1;
 L85A25:;
-    if (*(short *)((char *)a1 + 27) == 0) goto L85A42;
-    if (((int)(unsigned short)*(short *)((char *)a1 + 27)) != 65535) return;
+    if (a1->image == 0) goto L85A42;
+    if (a1->image != 65535) return;
 L85A42:;
     l_14++;
 }
@@ -762,7 +763,7 @@ void flat_animal_sound(int a1, int a2, int a3, int a4, int a5)
 {
     if (a4 != 201) return;
     if (rand() > 100) return;
-    if (func_000C7FD9(a1, a3, *(int *)(*(char **)player_object + 7), *(int *)(*(char **)player_object + 15)) > 768) return;
+    if (func_000C7FD9(a1, a3, player_object->x, player_object->z) > 768) return;
     switch ((unsigned)a5) {
     return;
 case 0:
@@ -788,13 +789,13 @@ default:;
 }
 }
 
-void func_00085EF8(int a1)
+void func_00085EF8(struct record *a1)
 {
     int l_20;
     int l_1C;
     int l_18;
 
-    switch (*(unsigned char *)((char *)a1)) {
+    switch (a1->type) {
 case 6:
 case 32:
     if (*(int *)((char *)a1 + 71) != *(int *)text_macro_fpc) goto L85F5F;
@@ -802,7 +803,7 @@ case 32:
 L85F5F:;
     return;
 case 43:
-    l_20 = a1 + 71;
+    l_20 = (int)RECORD_DATA(a1);
     l_1C = *(int *)((char *)l_20 + 5);
     l_18 = 0;
 L85F7D:;
@@ -820,10 +821,10 @@ L85FB5:;
 L85FB7:;
     return;
 case 56:
-    l_1C = a1 + 71;
+    l_1C = (int)RECORD_DATA(a1);
     l_18 = 0;
 L85FC9:;
-    if (((int)(unsigned short)*(short *)((char *)a1 + 27)) > l_18) goto L85FEB;
+    if (a1->image > l_18) goto L85FEB;
     return;
 L85FDC:;
     l_18++;
@@ -841,7 +842,7 @@ default:;
 void func_0008600F(int a1)
 {
     *(int *)text_macro_fpc = a1;
-    object_foreach(*(int *)D_00195AC4, (int)func_00085EF8);
+    object_foreach(D_00195AC4, (int)func_00085EF8);
 }
 
 int func_00086041(int a1, int a2)
@@ -862,17 +863,17 @@ void func_00086149(void)
     int l_1C;
     int l_18;
 
-    l_2C = func_000C5280(*(int *)(*(char **)player_object + 7) ^ *(int *)(*(char **)player_object + 15), (*(int *)D_001343C0 / 40) << 6);
+    l_2C = func_000C5280(player_object->x ^ player_object->z, (*(int *)D_001343C0 / 40) << 6);
     l_2C >>= 3;
     l_2C = 256 - l_2C;
     l_30 = (l_2C * 192) >> 8;
-    l_20 = func_000C5280(*(int *)(*(char **)player_object + 7) ^ *(int *)(*(char **)player_object + 15), (*(int *)D_001343C0 / 40) << 6);
+    l_20 = func_000C5280(player_object->x ^ player_object->z, (*(int *)D_001343C0 / 40) << 6);
     l_20 >>= 3;
-    l_1C = func_000C5280(*(int *)(*(char **)player_object + 7) + *(int *)(*(char **)player_object + 15), (*(int *)D_001343C0 / 40) << 6);
+    l_1C = func_000C5280(player_object->x + player_object->z, (*(int *)D_001343C0 / 40) << 6);
     l_1C >>= 3;
-    l_18 = func_000C5280(*(int *)(*(char **)player_object + 7) - *(int *)(*(char **)player_object + 15), (*(int *)D_001343C0 / 40) << 6);
+    l_18 = func_000C5280(player_object->x - player_object->z, (*(int *)D_001343C0 / 40) << 6);
     l_18 >>= 3;
-    func_000CE6E2((((int)(short)*(short *)(*(char **)player_object + 3)) + *(int *)D_001959BC) & 2047, 192, (int)&l_28, (int)&l_24);
-    func_00136AD8((*(int *)(*(char **)player_object + 7) + l_28) + (l_20 - 16), (*(int *)(*(char **)player_object + 11) - 50) + (l_1C - 16), (*(int *)(*(char **)player_object + 15) + l_24) + (l_18 - 16), 50, l_30, 0);
-    func_00154D00((*(int *)(*(char **)player_object + 7) + l_28) + (l_20 - 16), (*(int *)(*(char **)player_object + 11) - 50) + (l_1C - 16), (*(int *)(*(char **)player_object + 15) + l_24) + (l_18 - 16), 26883, -1, 1, 400);
+    func_000CE6E2((player_object->yaw + *(int *)D_001959BC) & 2047, 192, (int)&l_28, (int)&l_24);
+    func_00136AD8((player_object->x + l_28) + (l_20 - 16), (player_object->y - 50) + (l_1C - 16), (player_object->z + l_24) + (l_18 - 16), 50, l_30, 0);
+    func_00154D00((player_object->x + l_28) + (l_20 - 16), (player_object->y - 50) + (l_1C - 16), (player_object->z + l_24) + (l_18 - 16), 26883, -1, 1, 400);
 }

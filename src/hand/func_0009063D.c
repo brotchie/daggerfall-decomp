@@ -1,21 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0009063D */
-struct skill { short value; char pad[4]; };
-struct player {
-    unsigned char f0;
-    char pad1[31];
-    short f32[8];               /* 0x20 */
-    short f48[8];               /* 0x30 */
-    unsigned short f64;         /* 0x40 */
-    char pad42;
-    unsigned char f67;          /* 0x43 */
-    char pad44[20];
-    int f88;                    /* 0x58 */
-    char pad5c[37];
-    unsigned char f129;         /* 0x81 */
-    char pad82[27];
-    struct skill skills[35];    /* 0x9d */
-};
-struct career { char pad[16]; unsigned char skill[12]; };
+#include "records.h"
+
 #define FREED ((void *)0x97979797)
 #define FREE(p, line) if ((p) != 0 && (p) != FREED) { mc_free((p), D_00176F41, (line)); (p) = FREED; }
 extern unsigned char D_0012B508;
@@ -43,7 +28,7 @@ extern short D_00190DEE;
 extern unsigned char D_001940D5;
 extern void *D_00195B5C;
 extern void *D_00195B60;
-extern struct player *player_character;
+extern struct character *player_character;
 extern void *window_image;
 extern struct career *player_class;
 extern int D_00195C44;
@@ -53,7 +38,7 @@ extern unsigned char chargen_roll_saved;
 extern unsigned char chargen_screen;
 extern int level_skill_sum(void);
 extern void msgbox_update(void);
-extern void classmaker_input_text(struct player *, short, int (*)(void));
+extern void classmaker_input_text(struct character *, short, int (*)(void));
 extern void *disk_read_file(char *, int);
 extern int rand_range(int, int);
 extern int chargen_draw(void);
@@ -80,26 +65,26 @@ int chargen_name_character(void)
             player_character->skills[i].value = rand_range(3, 6);
     }
     for (i = 0; i < 12; i++) {
-        D_00190CEE[i] = player_character->skills[player_class->skill[i]].value += chargen_career_skill_bonus[i];
+        D_00190CEE[i] = player_character->skills[player_class->skills[i]].value += chargen_career_skill_bonus[i];
     }
-    player_character->f129 = 1;
+    player_character->level = 1;
     disk_read_file(D_00176F28, D_00195C44);
     D_00190DEA = text_macro_fe = D_00190DEE = D_00190D64 = chargen_selected_attribute = 0;
     D_00190BE8 = 0;
-    player_character->f0 = 0;
+    player_character->name[0] = 0;
     D_0012B508 = 146;
     for (i = 0; i < 8; i++) {
-        player_character->f32[i] -= 5;
-        player_character->f48[i] -= 5;
+        player_character->attributes[i] -= 5;
+        player_character->base_attributes[i] -= 5;
     }
-    while (player_character->f0 == 0) {
+    while (player_character->name[0] == 0) {
         chargen_screen = 1;
         window_image = disk_read_file(D_00176F34, 0);
         classmaker_input_text(player_character, 31, chargen_draw);
         FREE(window_image, 114);
     }
     func_000A0ED9(117, D_00176F41);
-    mc_sprintf(text_buffer, D_00176F4C, player_character->f64 & 1, player_character->f67);
+    mc_sprintf(text_buffer, D_00176F4C, player_character->flags & 1, player_character->race);
     chargen_face_images = disk_read_file(text_buffer, 0);
     chargen_screen = 2;
     window_image = disk_read_file(D_00176F5B, 0);
@@ -118,7 +103,7 @@ int chargen_name_character(void)
     D_00195B60 = disk_read_file(D_00176F8F, 0);
     D_00190DEA = text_macro_fe = D_00190DEE = 6;
     for (i = 0; i < 12; i++) {
-        D_00190CEE[i] = player_character->skills[player_class->skill[i]].value;
+        D_00190CEE[i] = player_character->skills[player_class->skills[i]].value;
     }
     chargen_select_skill(2);
     chargen_select_skill(5);
@@ -136,13 +121,13 @@ int chargen_name_character(void)
     msgbox_update();
     chargen_screen = 255;
     func_000A0ED9(155, D_00176F41);
-    mc_sprintf(text_buffer, D_00176F4C, player_character->f64 & 1, player_character->f67);
+    mc_sprintf(text_buffer, D_00176F4C, player_character->flags & 1, player_character->race);
     chargen_face_images = disk_read_file(text_buffer, 0);
     D_00195B60 = disk_read_file(D_00176F8F, 0);
     window_image = disk_read_file(D_00176FB6, 0);
     chargen_reflex_image = disk_read_file(D_00176FA9, 0);
-    mc_memcpy(player_character->f48, player_character->f32, 16, D_00176F41, 161, 16);
-    player_character->f88 = level_skill_sum();
+    mc_memcpy(player_character->base_attributes, player_character->attributes, 16, D_00176F41, 161, 16);
+    player_character->level_skill_sum_start = level_skill_sum();
     if (chargen_screen_loop(0, 39)) {
         chargen_free_images();
         return 1;

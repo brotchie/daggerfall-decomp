@@ -1,6 +1,7 @@
 /* options.c: functions first lifted from the assembly by tools/lift_all.py (2026-10), now
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
+#include "records.h"
 
 extern char mouse_buttons[];
 extern char mouse_x[];
@@ -51,10 +52,10 @@ extern char D_0017BA72[];
 extern char key_names[];
 extern char default_key_map[];
 extern char D_00187CA8[];
-extern char player_object[];
+extern struct record *player_object;
 extern char D_00195B5C[];
 extern char D_00195B60[];
-extern char game_settings[];
+extern struct settings *game_settings;
 extern char mouse_control_mode[];
 extern char mouse_turn_rate[];
 extern char mouse_sensitivity_x[];
@@ -72,7 +73,7 @@ extern char options_image[];
 extern char options_saved_screen[];
 
 extern int options_open(int);
-extern int sound_play(int, int, int);
+extern int sound_play(int, struct record *, int);
 extern int disk_read_file(int, int);
 extern int disk_create(int);
 extern int key_pressed_once(unsigned char);
@@ -153,7 +154,7 @@ L434A6:;
 L434BD:;
     goto L434E3;
 L434BF:;
-    sound_play(203, *(int *)player_object, 100);
+    sound_play(203, player_object, 100);
     ((int (*)())(*(int *)(D_0017B798 + (((int)(short)*(short *)&l_1C) * 12))))();
     return;
 L434E3:;
@@ -204,20 +205,20 @@ L4361B:;
     l_18++;
     goto L43613;
 L43623:;
-    if ((*(unsigned short *)(*(char **)game_settings) & (1 << l_18)) == 0) goto L4367A;
+    if ((*(unsigned short *)(*(char **)&game_settings) & (1 << l_18)) == 0) goto L4367A;
     l_1C = ((int)options_buttons) + ((l_18 + 6) * 12);
     func_00144D00((int)(short)(*(short *)((char *)l_1C + 4) - 5), (int)(short)(*(short *)((char *)l_1C + 2) + 3), 3, 3);
 L4367A:;
     goto L4361B;
 L4367C:;
-    if (*(short *)(*(char **)game_settings + 2) == 0) goto L436B9;
-    func_00144D00(91, 64, (int)(short)((((int)(short)*(short *)(*(char **)game_settings + 2)) * 108) / 128), 3);
+    if (game_settings->sound_volume == 0) goto L436B9;
+    func_00144D00(91, 64, (int)(short)((((int)(short)game_settings->sound_volume) * 108) / 128), 3);
 L436B9:;
-    if (*(short *)(*(char **)game_settings + 4) == 0) goto L436F6;
-    func_00144D00(91, 72, (int)(short)((((int)(short)*(short *)(*(char **)game_settings + 4)) * 108) / 128), 3);
+    if (game_settings->music_volume == 0) goto L436F6;
+    func_00144D00(91, 72, (int)(short)((((int)(short)game_settings->music_volume) * 108) / 128), 3);
 L436F6:;
-    if (((int)(unsigned short)(*(short *)(*(char **)game_settings) & -256)) == 0) return;
-    func_00144D00(91, 80, (int)(short)(((((int)(unsigned short)*(short *)(*(char **)game_settings)) >> 8) * 108) / 128), 3);
+    if (((int)(unsigned short)(*(short *)(*(char **)&game_settings) & -256)) == 0) return;
+    func_00144D00(91, 80, (int)(short)(((((int)(unsigned short)*(short *)(*(char **)&game_settings)) >> 8) * 108) / 128), 3);
 }
 
 void options_save_game(void)
@@ -252,18 +253,18 @@ void options_exit_game(void)
 
 void options_sound_slider(void)
 {
-    *(short *)(*(char **)game_settings + 2) = options_slider_value();
+    game_settings->sound_volume = options_slider_value();
 }
 
 void options_music_slider(void)
 {
-    *(short *)(*(char **)game_settings + 4) = options_slider_value();
-    sound_set_volume((int)(short)*(short *)(*(char **)game_settings + 4));
+    game_settings->music_volume = options_slider_value();
+    sound_set_volume((int)(short)game_settings->music_volume);
 }
 
 void options_detail_slider(void)
 {
-    *(short *)(*(char **)game_settings) = (options_slider_value() << 8) | (*(short *)(*(char **)game_settings) & 255);
+    *(short *)((char *)game_settings) = (options_slider_value() << 8) | (*(short *)(*(char **)&game_settings) & 255);
 }
 
 int options_slider_value(void)
@@ -283,8 +284,8 @@ L438CC:;
 
 void options_toggle_full_screen(void)
 {
-    *(signed char *)(*(char **)game_settings) ^= 1;
-    if (((int)(unsigned short)(*(short *)(*(char **)game_settings) & 1)) == 0) goto L43926;
+    game_settings->view_flags ^= 1;
+    if (((int)(unsigned short)(*(short *)(*(char **)&game_settings) & 1)) == 0) goto L43926;
     func_0012A2D0(160, 100, 160, 100);
     goto L4393F;
 L43926:;
@@ -295,7 +296,7 @@ L4393F:;
 
 void options_toggle_head_bobbing(void)
 {
-    *(signed char *)(*(char **)game_settings) ^= 2;
+    game_settings->view_flags ^= 2;
 }
 
 int options_controls_rebind(int a1, int a2)
@@ -453,7 +454,7 @@ L43DC0:;
 L43DD4:;
     goto L43DFE;
 L43DD6:;
-    sound_play(203, *(int *)player_object, 100);
+    sound_play(203, player_object, 100);
     l_20 = ((int (*)())(*(int *)(D_0017B810 + (l_24 * 12))))(l_24, l_18);
 L43DFE:;
     goto L43D78;
@@ -664,7 +665,7 @@ L44694:;
 L446A8:;
     goto L446D2;
 L446AA:;
-    sound_play(203, *(int *)player_object, 100);
+    sound_play(203, player_object, 100);
     l_20 = ((int (*)())(*(int *)(D_0017BA68 + (l_24 * 12))))(l_24, l_1C);
 L446D2:;
     goto L4464C;

@@ -1,6 +1,7 @@
 /* tamriel.c: functions first lifted from the assembly by tools/lift_all.py (2026-10), now
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
+#include "records.h"
 
 struct bf8_4_1 { unsigned char _:4; unsigned char f:1; };
 struct bf8_6_1 { unsigned char _:6; unsigned char f:1; };
@@ -17,23 +18,23 @@ extern char frame_checkpoint[];
 extern char region_punishment_flags[];
 extern char region_legal_reputation[];
 extern char region_price_adjustment[];
-extern char D_00190504[];
+extern struct record *D_00190504[];
 extern char itemmaker_slot_kinds[];
 extern char D_001940D8[];
 extern char D_001940D9[];
 extern char D_00195A00[];
 extern char bank_accounts[];
-extern char player_entity[];
-extern char player_object[];
-extern char D_00195AA8[];
-extern char D_00195AC4[];
+extern struct record *player_entity;
+extern struct record *player_object;
+extern struct record *D_00195AA8;
+extern struct record *D_00195AC4;
 extern char creature_count[];
 extern char calendar_year[];
 extern char calendar_weekday[];
 extern char calendar_month[];
 extern char calendar_minute[];
 extern char calendar_hour[];
-extern char player_character[];
+extern struct character *player_character;
 extern char game_minutes[];
 extern char D_00195C40[];
 extern char D_00195D00[];
@@ -52,7 +53,7 @@ extern char D_001962A9[];
 extern char D_001962B0[];
 extern char faction_count[];
 extern char factions[];
-extern char current_quest[];
+extern struct quest *current_quest;
 extern char quest_debug_data[];
 extern char quest_event_object[];
 extern char D_00199780[];
@@ -70,18 +71,18 @@ extern char D_0019979A[];
 extern char quest_event_code[];
 extern char D_001AA698[];
 
-extern int faction_find_type_in_region(int, short);
-extern int faction_find(short);
-extern int quest_dispatch_event(int);
+extern struct faction *faction_find_type_in_region(int, short);
+extern struct faction *faction_find(short);
+extern int quest_dispatch_event(struct quest *);
 extern int holiday_today(int, int);
 extern int poison_tick(int);
-extern int guild_find_membership_by_kind(unsigned char);
+extern struct membership *guild_find_membership_by_kind(unsigned char);
 extern int rand_range(int, int);
-extern int object_building(int);
+extern struct building *object_building(struct record *);
 extern int location_here_contains(int, int);
 extern int spfx_disease_daily(int);
 extern int func_0008AC9B(int);
-extern int object_find_by_id(int, int);
+extern struct record *object_find_by_id(struct record *, int);
 extern int func_000A0ED9(int, int);
 extern int mc_sprintf(int, ...);
 extern void region_flag_set(int, int);
@@ -98,21 +99,21 @@ extern void weather_roll(void);
 extern void skill_add_uses(int, int);
 extern void msgbox_show_rsc(int, int);
 extern void guards_summon(int);
-extern void spell_tick(int);
+extern void spell_tick(struct record *);
 extern void disease_lycanthrope_tick(void);
 extern void disease_special_infection_tick(void);
 extern void disease_start_cure_quest(int);
 extern void guild_expire_blessings(void);
 extern void fatigue_update(void);
-extern void spfx_walk_effect_records(int, int);
+extern void spfx_walk_effect_records(struct record *, int);
 extern void spfx_expire_created_items(void);
-extern void object_foreach(int, int);
+extern void object_foreach(struct record *, int);
 extern void travel_show_days_left(int);
-int building_is_open(int);
+int building_is_open(struct building *);
 void time_pass_minutes(int);
 void calendar_update(void);
-void func_0004B54F(int);
-void func_0004B595(int);
+void func_0004B54F(struct record *);
+void func_0004B595(struct record *);
 void reputation_decay(void);
 void region_update_prices(int);
 void func_0004B9A1(void);
@@ -154,7 +155,7 @@ L4AB88:;
     l_24 = ((unsigned)(*(int *)((char *)l_18) - *(int *)D_00195C40)) / 90;
     *(int *)D_00195C40 += l_24 * 90;
     if (((struct bf8_4_1 *)&D_001940D9)->f == 0) goto L4ABD8;
-    if (((int)(unsigned short)(*(short *)(*(char **)player_character + 64) & 1536)) == 0) goto L4ABDA;
+    if (((int)(unsigned short)(player_character->flags & 1536)) == 0) goto L4ABDA;
 L4ABD8:;
     goto L4ABE9;
 L4ABDA:;
@@ -208,7 +209,7 @@ L4ACC9:;
     goto L4ACBF;
 L4ACD1:;
     if (*(signed char *)D_001962A4 != 0) goto L4ACEC;
-    spfx_walk_effect_records(*(int *)(*(char **)player_entity + 63), (int)spfx_disease_daily);
+    spfx_walk_effect_records(player_entity->children, (int)spfx_disease_daily);
 L4ACEC:;
     *(int *)frame_checkpoint = 2001;
     if (*(int *)player_death_timer < 0) return;
@@ -267,10 +268,10 @@ L4AE87:;
     *(int *)frame_checkpoint = 2013;
     if (*(signed char *)D_001962A4 != 0) goto L4AEE8;
     *(int *)frame_checkpoint = 2017;
-    spell_tick(*(int *)player_entity);
-    spfx_walk_effect_records(*(int *)player_entity, (int)func_0008AC9B);
-    *(int *)D_00195AA8 = *(int *)player_entity;
-    spfx_walk_effect_records(*(int *)(*(char **)player_entity + 63), (int)poison_tick);
+    spell_tick(player_entity);
+    spfx_walk_effect_records(player_entity, (int)func_0008AC9B);
+    D_00195AA8 = player_entity;
+    spfx_walk_effect_records(player_entity->children, (int)poison_tick);
     fatigue_update();
     *(int *)frame_checkpoint = 2018;
 L4AEE8:;
@@ -292,10 +293,10 @@ L4AF44:;
     l_30++;
     goto L4AF37;
 L4AF4C:;
-    if (*(int *)(D_00190504 + (l_30 << 2)) == (-1768515946)) goto L4AF44;
-    spell_tick(*(int *)(D_00190504 + (l_30 << 2)));
-    *(int *)D_00195AA8 = *(int *)(D_00190504 + (l_30 << 2));
-    spfx_walk_effect_records(*(int *)(*(char **)D_00195AA8 + 63), (int)poison_tick);
+    if ((int)D_00190504[l_30] == (-1768515946)) goto L4AF44;
+    spell_tick(D_00190504[l_30]);
+    D_00195AA8 = D_00190504[l_30];
+    spfx_walk_effect_records(D_00195AA8->children, (int)poison_tick);
     goto L4AF44;
 L4AF94:;
     if (*(int *)player_death_timer < 0) return;
@@ -388,11 +389,11 @@ L4B1E8:;
 int player_in_temple(void)
 {
     int l_20;
-    int l_1C;
+    struct building *l_1C;
 
-    l_1C = object_building(*(int *)(*(char **)player_object + 67));
+    l_1C = object_building(player_object->parent);
     if (l_1C == 0) goto L4B247;
-    if (((int)(unsigned char)*(signed char *)((char *)l_1C + 24)) != 14) goto L4B238;
+    if (l_1C->type != 14) goto L4B238;
     l_20 = 1;
     goto L4B23F;
 L4B238:;
@@ -403,70 +404,70 @@ L4B247:;
     return 0;
 }
 
-void func_0004B25B(int a1)
+void func_0004B25B(struct record *a1)
 {
-    if (((int)(unsigned char)*(signed char *)((char *)a1)) != 8) return;
+    if (a1->type != 8) return;
     *(signed char *)itemmaker_slot_kinds = 1;
 }
 
-int building_is_open(int a1)
+int building_is_open(struct building *a1)
 {
     int l_28;
-    int l_24;
-    int l_20;
-    int l_1C;
+    struct record *l_24;
+    struct record *l_20;
+    struct membership *l_1C;
 
-    l_24 = object_find_by_id(*(int *)D_00195AC4, *(int *)((char *)a1 + 20));
-    if (((int)(unsigned short)*(short *)((char *)a1 + 18)) != 108) goto L4B2CC;
+    l_24 = object_find_by_id(D_00195AC4, a1->id);
+    if (a1->faction_id != 108) goto L4B2CC;
     if (guild_find_membership_by_kind(0) != 0) goto L4B2CE;
 L4B2CC:;
     goto L4B2DA;
 L4B2CE:;
     return 1;
 L4B2DA:;
-    if (((int)(unsigned short)*(short *)((char *)a1 + 18)) != 42) goto L4B2F9;
+    if (a1->faction_id != 42) goto L4B2F9;
     if (guild_find_membership_by_kind(3) != 0) goto L4B2FB;
 L4B2F9:;
     goto L4B307;
 L4B2FB:;
     return 1;
 L4B307:;
-    if (((int)(unsigned short)*(short *)((char *)a1 + 18)) != 41) goto L4B32B;
+    if (a1->faction_id != 41) goto L4B32B;
     l_1C = guild_find_membership_by_kind(2);
     if (l_1C != 0) goto L4B32D;
 L4B32B:;
     goto L4B33C;
 L4B32D:;
-    if (((int)(unsigned char)*(signed char *)((char *)l_1C)) >= 6) goto L4B33E;
+    if (l_1C->rank >= 6) goto L4B33E;
 L4B33C:;
     goto L4B34A;
 L4B33E:;
     return 1;
 L4B34A:;
-    if (((int)(unsigned short)*(short *)((char *)a1 + 18)) != 40) goto L4B36E;
+    if (a1->faction_id != 40) goto L4B36E;
     l_1C = guild_find_membership_by_kind(1);
     if (l_1C != 0) goto L4B370;
 L4B36E:;
     goto L4B37F;
 L4B370:;
-    if (((int)(unsigned char)*(signed char *)((char *)l_1C)) >= 6) goto L4B381;
+    if (l_1C->rank >= 6) goto L4B381;
 L4B37F:;
     goto L4B38D;
 L4B381:;
     return 1;
 L4B38D:;
-    l_20 = *(int *)(*(char **)player_object + 67);
+    l_20 = player_object->parent;
 L4B398:;
     if (l_20 == 0) goto L4B3AD;
-    if (((int)(unsigned char)*(signed char *)((char *)l_20)) != 43) goto L4B3AF;
+    if (l_20->type != 43) goto L4B3AF;
 L4B3AD:;
     goto L4B3BA;
 L4B3AF:;
-    l_20 = *(int *)((char *)l_20 + 67);
+    l_20 = l_20->parent;
     goto L4B398;
 L4B3BA:;
-    if (((int)(unsigned char)*(signed char *)((char *)a1 + 24)) < 17) goto L4B3DA;
-    if (((int)(unsigned char)*(signed char *)((char *)a1 + 24)) <= 20) goto L4B3DC;
+    if (a1->type < 17) goto L4B3DA;
+    if (a1->type <= 20) goto L4B3DC;
 L4B3DA:;
     goto L4B3E5;
 L4B3DC:;
@@ -474,58 +475,58 @@ L4B3DC:;
 L4B3E5:;
     goto L4B400;
 L4B3E7:;
-    if (((unsigned)(((unsigned)(*(int *)((char *)a1 + 20) & 65535)) % 100)) < 50) goto L4B402;
+    if ((a1->id & 65535) % 100 < 50) goto L4B402;
 L4B400:;
     goto L4B40E;
 L4B402:;
     return 1;
 L4B40E:;
-    if (((int)(unsigned char)*(signed char *)((char *)a1 + 24)) <= 16) goto L4B427;
+    if (a1->type <= 16) goto L4B427;
     return 0;
 L4B427:;
     l_28 = ((unsigned)(((unsigned)*(int *)game_minutes) % 1440)) / 60;
-    return (((((int)(unsigned char)*(signed char *)(building_open_hours + (((int)(unsigned char)*(signed char *)((char *)a1 + 24)) * 2))) <= l_28) && (((int)(unsigned char)*(signed char *)(D_0017C5B9 + (((int)(unsigned char)*(signed char *)((char *)a1 + 24)) * 2))) > l_28)) ? 1 : 0);
+    return (((((int)(unsigned char)*(signed char *)(building_open_hours + (a1->type * 2))) <= l_28) && (((int)(unsigned char)*(signed char *)(D_0017C5B9 + (a1->type * 2))) > l_28)) ? 1 : 0);
 }
 
-int building_minutes_to_close(int a1)
+int building_minutes_to_close(struct building *a1)
 {
     int l_1C;
 
     l_1C = ((unsigned)(((unsigned)*(int *)game_minutes) % 1440)) / 60;
-    if (((int)(unsigned char)*(signed char *)(building_open_hours + (((int)(unsigned char)*(signed char *)((char *)a1 + 24)) * 2))) > l_1C) goto L4B509;
-    if (((int)(unsigned char)*(signed char *)(D_0017C5B9 + (((int)(unsigned char)*(signed char *)((char *)a1 + 24)) * 2))) > l_1C) goto L4B50B;
+    if (((int)(unsigned char)*(signed char *)(building_open_hours + (a1->type * 2))) > l_1C) goto L4B509;
+    if (((int)(unsigned char)*(signed char *)(D_0017C5B9 + (a1->type * 2))) > l_1C) goto L4B50B;
 L4B509:;
     goto L4B53B;
 L4B50B:;
-    return (((int)(unsigned char)*(signed char *)(D_0017C5B9 + (((int)(unsigned char)*(signed char *)((char *)a1 + 24)) * 2))) * 60) - (((unsigned)*(int *)game_minutes) % 1440);
+    return (((int)(unsigned char)*(signed char *)(D_0017C5B9 + (a1->type * 2))) * 60) - (((unsigned)*(int *)game_minutes) % 1440);
 L4B53B:;
     return 0;
 }
 
-void func_0004B54F(int a1)
+void func_0004B54F(struct record *a1)
 {
-    if (((int)(unsigned char)*(signed char *)((char *)a1)) != 8) return;
-    if (((int)(unsigned short)(*(short *)((char *)a1 + 21) & 2048)) != 0) return;
-    *(signed char *)((char *)a1 + 22) &= 253;
+    if (a1->type != 8) return;
+    if ((a1->flags & 2048) != 0) return;
+    a1->flags &= ~0x200;
 }
 
-void func_0004B595(int a1)
+void func_0004B595(struct record *a1)
 {
-    if (((int)(unsigned char)*(signed char *)((char *)a1)) != 8) return;
-    if (*(signed char *)((char *)a1 + 38) != 0) return;
-    *(signed char *)((char *)a1 + 22) |= 2;
+    if (a1->type != 8) return;
+    if (a1->quest_id != 0) return;
+    a1->flags |= 0x200;
 }
 
 void func_0004B5CF(void)
 {
     int l_1C;
-    int l_18;
+    struct building *l_18;
 
     if (((int)(unsigned char)*(signed char *)player_environment) > 2) return;
-    l_18 = object_building(*(int *)(*(char **)player_object + 67));
+    l_18 = object_building(player_object->parent);
     if (l_18 == 0) return;
     if (building_is_open(l_18) == 0) goto L4B636;
-    if (*(int *)((char *)l_18 + 20) == *(int *)(*(char **)player_character + 116)) goto L4B629;
+    if (l_18->id == player_character->house) goto L4B629;
     l_1C = 1;
     goto L4B630;
 L4B629:;
@@ -535,10 +536,10 @@ L4B630:;
 L4B636:;
     goto L4B64F;
 L4B638:;
-    object_foreach(*(int *)(*(char **)(*(char **)player_object + 67) + 63), (int)func_0004B54F);
+    object_foreach(player_object->parent->children, (int)func_0004B54F);
     return;
 L4B64F:;
-    object_foreach(*(int *)(*(char **)(*(char **)player_object + 67) + 63), (int)func_0004B595);
+    object_foreach(player_object->parent->children, (int)func_0004B595);
 }
 
 void reputation_decay(void)
@@ -602,7 +603,7 @@ void region_update_prices(int a1)
 {
     int l_20;
     int l_1C;
-    int l_18;
+    struct faction *l_18;
 
     l_20 = 0;
 L4B7FB:;
@@ -614,7 +615,7 @@ L4B806:;
 L4B80E:;
     l_18 = faction_find_type_in_region((int)(short)*(short *)&l_20, 7);
     if (l_18 == 0) goto L4B806;
-    l_1C = (((int)(short)*(short *)((char *)faction_find(510) + 31)) - ((int)(short)*(short *)((char *)l_18 + 31))) / 5;
+    l_1C = (faction_find(510)->power - l_18->power) / 5;
     l_1C = (l_1C + 50) - ((((int)(unsigned short)*(short *)(region_price_adjustment + (l_20 * 80))) - 1000) / 25);
     if (rand_range(0, 100) >= l_1C) goto L4B8B5;
     *(short *)(region_price_adjustment + (l_20 * 80)) = (((int)(unsigned short)*(short *)(region_price_adjustment + (l_20 * 80))) * 51) / 50;
@@ -645,12 +646,12 @@ L4B992:;
 
 void func_0004B9A1(void)
 {
-    if (((int)(unsigned char)*(signed char *)(*(char **)player_character + 67)) <= 8) goto L4B9CD;
+    if (player_character->race <= 8) goto L4B9CD;
     if (((int)(unsigned char)*(signed char *)player_environment) == 1) goto L4B9CF;
 L4B9CD:;
     goto L4B9E8;
 L4B9CF:;
-    if (location_here_contains(*(int *)(*(char **)player_object + 7), *(int *)(*(char **)player_object + 15)) != 0) goto L4B9EA;
+    if (location_here_contains(player_object->x, player_object->z) != 0) goto L4B9EA;
 L4B9E8:;
     goto L4B9FC;
 L4B9EA:;
@@ -664,9 +665,9 @@ L4B9FE:;
 void loan_due_penalty(void)
 {
     int l_1C;
-    int l_18;
+    struct bank_account *l_18;
 
-    l_18 = *(int *)bank_accounts + 71;
+    l_18 = (*(struct record **)bank_accounts)->data.bank_accounts;
     l_1C = 0;
 L4BA2F:;
     if (l_1C < 62) goto L4BA3F;
@@ -675,8 +676,8 @@ L4BA37:;
     l_1C++;
     goto L4BA2F;
 L4BA3F:;
-    if (*(int *)((char *)l_18 + 8) == 0) goto L4BA37;
-    if (*(int *)((char *)l_18 + 8) != *(int *)game_minutes) goto L4BA62;
+    if (l_18->loan_due == 0) goto L4BA37;
+    if (l_18->loan_due != *(int *)game_minutes) goto L4BA62;
     *(short *)(region_legal_reputation + (l_1C * 80)) -= 5;
 L4BA62:;
     goto L4BA37;
@@ -698,17 +699,17 @@ void quest_init_record_sizes(void)
 
 void quests_run_all(void)
 {
-    int l_1C;
-    int l_18;
+    struct record *l_1C;
+    struct record *l_18;
 
     if (*(signed char *)D_001962A9 != 0) return;
-    l_1C = *(int *)(*(char **)D_00195A00 + 63);
+    l_1C = *(struct record **)(*(char **)D_00195A00 + 63);
 L4BB04:;
     if (l_1C == 0) return;
-    l_18 = *(int *)((char *)l_1C + 55);
-    if (((int)(unsigned char)*(signed char *)((char *)l_1C)) != 14) goto L4BB52;
-    *(int *)D_00195D00 = l_1C;
-    *(int *)D_00199780 = l_1C + 71;
+    l_18 = l_1C->next;
+    if (l_1C->type != 14) goto L4BB52;
+    *(int *)D_00195D00 = (int)l_1C;
+    *(int *)D_00199780 = (int)&l_1C->data.quest;
     if (*(int *)quest_debug_data != 0) goto L4BB48;
     *(int *)quest_debug_data = *(int *)D_00199780;
 L4BB48:;
@@ -718,21 +719,21 @@ L4BB52:;
     goto L4BB04;
 }
 
-int quest_find_by_id(int a1)
+struct quest *quest_find_by_id(int a1)
 {
-    int l_20;
-    int l_1C;
+    struct record *l_20;
+    struct quest *l_1C;
 
-    l_20 = *(int *)(*(char **)D_00195A00 + 63);
+    l_20 = *(struct record **)(*(char **)D_00195A00 + 63);
 L4BB80:;
     if (l_20 == 0) goto L4BBC4;
-    if (((int)(unsigned char)*(signed char *)((char *)l_20)) != 14) goto L4BBB9;
-    l_1C = l_20 + 71;
-    if (((int)(short)*(short *)((char *)l_1C)) != a1) goto L4BBB9;
-    *(int *)D_00199780 = l_1C;
+    if (l_20->type != 14) goto L4BBB9;
+    l_1C = &l_20->data.quest;
+    if (l_1C->id != a1) goto L4BBB9;
+    *(int *)D_00199780 = (int)l_1C;
     return l_1C;
 L4BBB9:;
-    l_20 = *(int *)((char *)l_20 + 55);
+    l_20 = l_20->next;
     goto L4BB80;
 L4BBC4:;
     return 0;
@@ -740,25 +741,25 @@ L4BBC4:;
 
 void quests_raise_event_all(int a1, int a2)
 {
-    int l_18;
+    struct record *l_18;
     int l_14;
 
     *(short *)quest_event_code = a1;
     *(int *)quest_event_object = a2;
-    l_18 = *(int *)(*(char **)D_00195A00 + 63);
+    l_18 = *(struct record **)(*(char **)D_00195A00 + 63);
 L4BC72:;
     if (l_18 == 0) return;
-    if (((int)(unsigned char)*(signed char *)((char *)l_18)) != 14) goto L4BC92;
-    quest_dispatch_event(l_18 + 71);
+    if (l_18->type != 14) goto L4BC92;
+    quest_dispatch_event(&l_18->data.quest);
 L4BC92:;
-    l_18 = *(int *)((char *)l_18 + 55);
+    l_18 = l_18->next;
     goto L4BC72;
 }
 
 void quest_end(int a1)
 {
-    *(int *)quest_ended_id = (int)(short)*(short *)(*(char **)current_quest);
-    quest_faces_remove_quest((int)(unsigned char)*(signed char *)(*(char **)current_quest));
-    quest_remove_objects((int)(unsigned char)*(signed char *)(*(char **)current_quest));
+    *(int *)quest_ended_id = current_quest->id;
+    quest_faces_remove_quest((int)(unsigned char)(signed char)current_quest->id);
+    quest_remove_objects((int)(unsigned char)(signed char)current_quest->id);
     *(int *)quest_debug_data = 0;
 }

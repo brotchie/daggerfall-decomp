@@ -1,6 +1,7 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0001B69D */
-struct rec { char pad[33]; short id; char pad2[57]; };     /* 92 bytes */
-struct cmd { unsigned short hash; void (*fn)(struct rec *, char **, int *, int *); };
+#include "records.h"
+
+struct cmd { unsigned short hash; void (*fn)(struct faction *, char **, int *, int *); };
 extern char *D_00147954;
 extern char D_0017043C[];
 extern char D_00170448[];
@@ -10,16 +11,16 @@ extern unsigned char D_00178630[];
 extern struct cmd faction_keywords[];
 extern char text_buffer[];
 extern int faction_count;
-extern struct rec *factions;
+extern struct faction *factions;
 extern unsigned char D_00196732;
-extern void faction_link_relations(struct rec *);
-extern void faction_add_record(struct rec *, int, struct rec *);
+extern void faction_link_relations(struct faction *);
+extern void faction_add_record(struct faction *, int, struct faction *);
 extern void fatal_error(char *);
 extern int disk_open_data(char *);
 extern void func_0009DEA7(int);
-extern void mc_free(struct rec *, char *, int);
+extern void mc_free(struct faction *, char *, int);
 extern void mc_memset(void *, int, int, char *, int, int);
-extern struct rec *mc_malloc(int, char *, int);
+extern struct faction *mc_malloc(int, char *, int);
 extern int func_000A00CB(int, char *, int);
 extern short atoi(char *);
 extern int tolower(int);
@@ -29,7 +30,7 @@ extern void mc_sprintf(char *, char *, ...);
 
 void faction_load_file(void)
 {
-    struct rec rec;
+    struct faction rec;
     int fh;
     int i;
     int found;
@@ -42,7 +43,7 @@ void faction_load_file(void)
     int prev;
     char *p;
     int have;
-    struct rec *cur;
+    struct faction *cur;
 
     line = 1;
     have = 0;
@@ -60,9 +61,9 @@ void faction_load_file(void)
         if (D_00147954[i] == '#')
             faction_count++;
     if (factions != 0) {
-        if (factions != 0 && factions != (struct rec *)0x97979797) {
+        if (factions != 0 && factions != (struct faction *)0x97979797) {
             mc_free(factions, D_00170464, 973);
-            factions = (struct rec *)0x97979797;
+            factions = (struct faction *)0x97979797;
         }
     }
     cur = factions = mc_malloc(faction_count * 92, D_00170464, 975);

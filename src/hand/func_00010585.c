@@ -1,31 +1,9 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x00010585 */
+#include "records.h"
+
 struct bits8 {
     unsigned char b0:1, b1:1, b2:1, b3:1, b4:1, b5:1, b6:1, b7:1;
 };
-struct mobile {
-    char pad0[34];
-    short f34;                  /* 0x22 */
-    char pad24[8];
-    short f44;                  /* 0x2c */
-    char pad2e[18];
-    unsigned short flags;       /* 0x40 */
-    char pad42[34];
-    unsigned int f100;          /* 0x64 */
-    char pad68[35];
-    struct bits8 f139;          /* 0x8b */
-    char pad8c;
-    short f141;                 /* 0x8d */
-    short f143;                 /* 0x8f */
-    char pad91[114];
-    short f259;                 /* 0x103 */
-    char pad105[22];
-    short f283;                 /* 0x11b */
-    char pad11d[252];
-    int f537;                   /* 0x219 */
-};
-struct thing { unsigned char type; char pad[70]; struct mobile mob; };   /* 10.0a packs structs (-zp1) */
-struct w0 { unsigned short f0; };
-struct w4 { char pad[4]; unsigned short f4; };
 struct w6 { char pad[6]; unsigned short f6; };
 struct nib { unsigned char lo:4; };
 extern unsigned char mouse_buttons;
@@ -41,17 +19,17 @@ extern int cart_overlay_image;
 extern int D_0019597C;
 extern int D_00195980;
 extern struct nib frame_counter;
-extern struct thing *D_00195A88;
-extern int player_entity;
+extern struct record *D_00195A88;
+extern struct record *player_entity;
 extern int D_00195AB0;
 extern int clothing_gender_group;
 extern int creature_count;
 extern int D_00195B18;
 extern struct w6 *hud_bar_image;
-extern struct mobile *player_character;
-extern struct w4 *player_class;
+extern struct character *player_character;
+extern struct career *player_class;
 extern unsigned int game_minutes;
-extern struct w0 *game_settings;
+extern struct settings *game_settings;
 extern unsigned int D_00195C4C;
 extern int trespassing;
 extern int D_00195D60;
@@ -70,7 +48,7 @@ extern short D_001A3AA8;
 extern void play_death_video(void);
 extern void msgbox_close(void);
 extern void guards_summon(int);
-extern void spell_remove_effect_type(int, int);
+extern void spell_remove_effect_type(struct record *, int);
 extern void func_0006987B(void);
 extern void sound_update_ambient(void);
 extern int hud_message_add(char *);
@@ -82,7 +60,7 @@ extern void func_0012B136(void);
 
 void player_frame_update(void)
 {
-    struct mobile *rec;
+    struct character *rec;
     int sound;
     int speed;
     int old;
@@ -107,13 +85,13 @@ void player_frame_update(void)
         guards_summon(0);
     }
     if (D_00195A88 != 0 && D_00195A88->type == 18)
-        rec = &D_00195A88->mob;
+        rec = &D_00195A88->data.character;
     else
         rec = player_character;
     if (player_motion_flags.b2)
-        speed = rec->f44 + 50;
+        speed = rec->attributes[ATTR_SPD] + 50;
     else
-        speed = D_00187CA9 + (rec->f44 - 50);
+        speed = D_00187CA9 + (rec->attributes[ATTR_SPD] - 50);
     sound = 0;
     if (player_character->flags & 512) {
         speed += 225;
@@ -122,16 +100,16 @@ void player_frame_update(void)
         speed += 100;
         sound = cart_overlay_image;
     } else if (D_001940D9.b4 && !in_dungeon_water) {
-        speed = speed * (((player_character->f283 << 8) / 200) + 320) / 256;
-    } else if ((D_001962A0 || in_dungeon_water) && !player_character->f139.b4) {
-        speed = (speed >>= 2) + speed * ((player_character->f259 << 8) / 200) / 256;
+        speed = speed * (((player_character->skills[SKILL_RUNNING].value << 8) / 200) + 320) / 256;
+    } else if ((D_001962A0 || in_dungeon_water) && (player_character->conditions & 0x100000) == 0) {
+        speed = (speed >>= 2) + speed * ((player_character->skills[SKILL_SWIMMING].value << 8) / 200) / 256;
     }
     if (sound != 0 && game_mode == 0) {
         if (D_0019628E == 0)
             rnd = 0;
         else
             rnd = (*(unsigned int *)0x46c >> 1) & 3;
-        func_000CB39A(sound, rnd, (game_settings->f0 & 1) ? hud_bar_image->f6 : 0, 0);
+        func_000CB39A(sound, rnd, (*(unsigned short *)game_settings & 1) ? hud_bar_image->f6 : 0, 0);
     }
     D_00195F4E = (speed * D_00195AB0) / 1000;
     if (player_character->flags & 1) {
@@ -141,7 +119,7 @@ void player_frame_update(void)
         clothing_gender_group = 6;
         D_00195B18 = 512;
     }
-    if ((D_00195C4C = (100 - player_character->f44) * 2 + 70) < 70)
+    if ((D_00195C4C = (100 - player_character->attributes[ATTR_SPD]) * 2 + 70) < 70)
         D_00195C4C = 70;
     else if (D_00195C4C > 800)
         D_00195C4C = 800;
@@ -168,10 +146,10 @@ void player_frame_update(void)
         msgbox_close();
     if (creature_count == 0)
         D_0019628D = 0;
-    player_character->f143 = (rec->f34 * D_001788D3[(player_class->f4 >> 10) & 7]) / 256;
-    player_character->f143 += D_001A3AA8;
-    if (player_character->f141 > player_character->f143)
-        player_character->f141 = player_character->f143;
+    player_character->max_magicka = (rec->attributes[ATTR_INT] * D_001788D3[(player_class->flags >> 10) & 7]) / 256;
+    player_character->max_magicka += D_001A3AA8;
+    if (player_character->magicka > player_character->max_magicka)
+        player_character->magicka = player_character->max_magicka;
     if (player_death_timer > 0) {
         player_death_timer -= D_00195AB0;
         if (player_death_timer == 0)
@@ -189,10 +167,10 @@ void player_frame_update(void)
     }
     func_000CDC99(273);
     func_000CDC99(278);
-    if (player_character->f139.b6 && player_character->f100 < game_minutes) {
+    if ((player_character->conditions & 0x400000) && player_character->shield_end_time < game_minutes) {
         spell_remove_effect_type(player_entity, 35);
-        player_character->f139.b6 = 0;
-        player_character->f537 = 0;
+        player_character->conditions &= ~0x400000;
+        player_character->shield_points = 0;
     }
     if (frame_counter.lo == 0)
         func_0006987B();

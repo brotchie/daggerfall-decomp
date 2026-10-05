@@ -1,17 +1,12 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x000411BF */
-struct mob {
-    char pad0[27];
-    unsigned short f27;         /* 0x1b */
-    char pad1d[2];
-    unsigned int f31;           /* 0x1f */
-};
+#include "records.h"
+
 struct snd { char pad0[4]; unsigned short len; };
-struct pc { char pad0[64]; unsigned short flags; };
 extern char D_00170DC9[];
 extern unsigned char D_0017B667[];
 extern short D_0017B66D[];
 extern short D_0017B69D[];
-extern struct pc *D_00195A84;
+extern struct character *D_00195A84;
 extern int climate_category(void);
 extern struct snd *flats_cfg_find(unsigned short);
 extern int disk_open_data(char *);
@@ -22,7 +17,7 @@ extern void lseek(int, int, int);
 extern void func_000A00CB(int, char *, int);
 extern short *func_000CE45E(short *, short, int);
 
-void person_load_face(struct mob *a1, char *a2)
+void person_load_face(struct record *a1, char *a2)
 {
     short *p;
     struct snd *q;
@@ -31,10 +26,10 @@ void person_load_face(struct mob *a1, char *a2)
     short seed;
 
     seed = rand();
-    srand(a1->f31 | (a1->f31 >> 16));
-    p = func_000CE45E(D_0017B66D, a1->f27 >> 7, 24);
+    srand(a1->id | (a1->id >> 16));
+    p = func_000CE45E(D_0017B66D, a1->image >> 7, 24);
     if (p == 0) {
-        q = flats_cfg_find(a1->f27);
+        q = flats_cfg_find(a1->image);
         if (q != 0 && q->len != 0)
             v = q->len << 12;
         else

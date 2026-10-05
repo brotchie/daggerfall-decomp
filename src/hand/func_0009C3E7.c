@@ -1,8 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0009C3E7 */
-#pragma pack(1)
-struct obj { char pad0[7]; int x; int y; int z; };
-struct marker { char pad0[4]; int f4; int f8; char pad12[5]; };
-#pragma pack()
+#include "records.h"
+
 extern unsigned char mouse_buttons;
 extern int screen_buffer;
 extern char D_0017743D[];
@@ -12,9 +10,9 @@ extern unsigned char D_001889BC;
 extern int travel_selected_location;
 extern unsigned char D_00190CE5;
 extern unsigned D_00195998;
-extern struct obj *player_object;
-extern char *player_character;
-extern char *player_class;
+extern struct record *player_object;
+extern struct character *player_character;
+extern struct career *player_class;
 extern unsigned game_minutes;
 extern int D_00195D48;
 extern unsigned char D_00196271;
@@ -25,14 +23,14 @@ extern unsigned char D_0019629B;
 extern unsigned char D_001962A2;
 extern unsigned char D_001962A8;
 extern unsigned char D_001962A9;
-extern struct marker *D_00196A9C;
+extern struct map_location *D_00196A9C;
 extern int D_001AA678;
 extern int D_001AA67C;
 extern int D_001AA698;
 extern int health_status_text(void);
 extern void raise_skills(void);
 extern void time_pass(int);
-extern int sound_play(int, struct obj *, int);
+extern int sound_play(int, struct record *, int);
 extern void msgbox_yes_no_rsc(int);
 extern void gold_spend(int);
 extern int gold_can_afford(int);
@@ -52,7 +50,7 @@ void travel_begin_trip(void)
     unsigned saved;
     int dir;
 
-    dir = (((func_000C808D(player_object->x, player_object->z, D_00196A9C[travel_selected_location].f4 & 33554431, D_00196A9C[travel_selected_location].f8 & 16777215) >> 2) + 32) & 511) >> 6;
+    dir = (((func_000C808D(player_object->x, player_object->z, D_00196A9C[travel_selected_location].x_type_flags & 33554431, D_00196A9C[travel_selected_location].y_size & 16777215) >> 2) + 32) & 511) >> 6;
     if (((unsigned char)mouse_buttons & 1) == 0 || ((unsigned char)mouse_buttons_prev & 1) != 0) return;
     r = health_status_text();
     if (r != 0 || D_001962A2 != 0) {
@@ -62,7 +60,7 @@ void travel_begin_trip(void)
     if (gold_can_afford(travel_trip_cost()) != 0)
         gold_spend(travel_trip_cost());
     else
-        *(int *)(player_character + 133) = 0;
+        player_character->gold = 0;
     sound_play(203, player_object, 110);
     D_00190CE5 = 0;
     func_0009BE38();
@@ -70,7 +68,7 @@ void travel_begin_trip(void)
     D_00196294 = 1;
     D_00187CA8 = 1;
     D_001962A8 = 1;
-    saved = *(unsigned short *)(player_character + 155);
+    saved = player_character->fatigue;
     D_001AA698 = 1;
     t = travel_route(player_object->x, player_object->z, D_001AA678, D_001AA67C, 1);
     D_001AA698 = 0;
@@ -79,7 +77,7 @@ void travel_begin_trip(void)
     if (t != -1)
         map_goto_location(D_001889BC, 1, travel_selected_location, 0);
     if (t != -1 && (unsigned short)(travel_options & 3) == 1 && D_00196280 == 0) {
-        if (*(unsigned char *)(player_character + 67) != 8) {
+        if (player_character->race != 8) {
             t = game_minutes % 1440;
             if (t >= 1080)
                 time_pass(1440 - t + 370);
@@ -87,15 +85,15 @@ void travel_begin_trip(void)
                 time_pass(360 - t + 10);
         }
     }
-    if (D_00196280 != 0 && (*(unsigned char *)(player_character + 67) == 8 || ((unsigned short)*(short *)(player_class + 4) & 16) != 0)) {
+    if (D_00196280 != 0 && (player_character->race == 8 || (player_class->flags & 16) != 0)) {
         t = game_minutes % 1440;
         if (t < 1080)
             time_pass(1080 - t + 10);
     }
     if ((unsigned short)(travel_options & 3) == 1)
-        *(short *)(player_character + 155) = (*(short *)(player_character + 32) + *(short *)(player_character + 40)) << 6;
+        player_character->fatigue = (player_character->attributes[ATTR_STR] + player_character->attributes[ATTR_END]) << 6;
     else
-        *(short *)(player_character + 155) = saved;
+        player_character->fatigue = saved;
     if (t != -1)
         location_place_player_at_edge(dir);
     if (game_minutes - D_00195998 > 360) {

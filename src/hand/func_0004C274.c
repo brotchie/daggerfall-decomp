@@ -1,4 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0004C274 */
+#include "records.h"
+
 struct find_t {             /* DOS find buffer */
     char reserved[21];
     char attrib;
@@ -12,7 +14,7 @@ extern char D_00174F69[];
 extern char text_buffer[];
 extern char D_001917E4[];
 extern char D_00191834[];
-extern unsigned short *game_settings;
+extern struct settings *game_settings;
 extern char *D_00195C44;
 extern char D_001961F5[];
 extern int func_0004C4A0(unsigned char *, int);
@@ -43,7 +45,7 @@ int quest_pick_file(unsigned char a1, unsigned char a2, unsigned char a3, unsign
         else if (ff.name[1] == a3)
             if (ff.name[2] == a4)
                 if (ff.name[3] - '0' <= a5)
-                    if ((*game_settings & 4) && (ff.name[4] == 'X' || ff.name[4] == 'Y'))
+                    if ((*(unsigned short *)game_settings & 4) && (ff.name[4] == 'X' || ff.name[4] == 'Y'))
                         ;
                     else
                         n = func_0004C4A0(ff.name, n);
@@ -58,7 +60,7 @@ int quest_pick_file(unsigned char a1, unsigned char a2, unsigned char a3, unsign
         else if (ff.name[1] == a3)
             if (ff.name[2] == a4)
                 if (ff.name[3] - '0' <= a5)
-                    if ((*game_settings & 4) && (ff.name[4] == 'X' || ff.name[4] == 'Y'))
+                    if ((*(unsigned short *)game_settings & 4) && (ff.name[4] == 'X' || ff.name[4] == 'Y'))
                         ;
                     else
                         n = func_0004C4A0(ff.name, n);

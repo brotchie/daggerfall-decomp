@@ -1,6 +1,7 @@
 /* bank.c: functions first lifted from the assembly by tools/lift_all.py (2026-10), now
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
+#include "records.h"
 
 extern char D_000C23B8[];
 extern char D_000C23BC[];
@@ -43,16 +44,16 @@ extern char D_00191020[];
 extern char bank_ship_price[];
 extern char bank_house_price[];
 extern char D_001959E0[];
-extern char bank_accounts[];
-extern char player_entity[];
-extern char player_object[];
-extern char D_00195AC4[];
+extern struct record *bank_accounts;
+extern struct record *player_entity;
+extern struct record *player_object;
+extern struct record *D_00195AC4;
 extern char D_00195B5C[];
-extern char current_location[];
-extern char player_character[];
+extern struct location *current_location;
+extern struct character *player_character;
 extern char window_image[];
 extern char game_minutes[];
-extern char game_settings[];
+extern struct settings *game_settings;
 extern char D_00195C44[];
 extern char D_00195D30[];
 extern char climate_weathers[];
@@ -88,7 +89,7 @@ extern char D_001A41DC[];
 extern char D_001A41E0[];
 extern char D_001A41E4[];
 extern char D_001A41E8[];
-extern char bank_account[];
+extern struct bank_account *bank_account;
 extern char bank_ship_count[];
 extern char bank_screen[];
 extern char bank_selected[];
@@ -99,8 +100,8 @@ extern int disk_read_file(int, int);
 extern int gold_can_carry(int);
 extern int model_get(unsigned short, int, int);
 extern int inpstr_update(void);
-extern int object_delete(int);
-extern int object_create_child(int, int, int);
+extern int object_delete(struct record *);
+extern struct record *object_create_child(struct record *, int, int);
 extern int mc_free();
 extern int mc_memset();
 extern int mc_malloc();
@@ -127,20 +128,20 @@ extern int func_0014D23C();
 extern void msgbox_show_string(int, int);
 extern void msgbox_show_rsc(int, int);
 extern void msgbox_update(void);
-extern void item_make(int, int, int);
+extern void item_make(int, int, struct item *);
 extern void bank_draw(void);
 extern void text_draw_colored(int, int, int, int, unsigned char);
 extern void msgbox_yes_no_rsc(int);
 extern void cursor_draw_arrow(void);
 extern void inpstr_begin_text(int, short);
-extern void object_foreach(int, int);
+extern void object_foreach(struct record *, int);
 int bank_open(int);
 int bank_confirm(int);
 int bank_input_amount(void);
 void bank_close(void);
-void bank_add_house_for_sale(int);
+void bank_add_house_for_sale(struct record *);
 void bank_init_ships(void);
-void bank_deposit_letter(int);
+void bank_deposit_letter(struct record *);
 void func_0006CB02(void);
 #pragma aux func_000A0ED9 parm routine [];
 
@@ -173,8 +174,8 @@ L6B3C7:;
     *(int *)D_001A41E0 = 1500;
     *(int *)bank_saved_screen = mc_malloc(64000, (int)D_00175CC4, 89);
     mc_memcpy(*(int *)bank_saved_screen, *(int *)screen_buffer, 64000, (int)D_00175CC4, 90, 4);
-    *(int *)bank_account = (int)(*(char **)bank_accounts + 71 + (((int)(unsigned char)*(signed char *)current_region) * 13));
-    object_foreach(*(int *)D_00195AC4, (int)bank_add_house_for_sale);
+    bank_account = &bank_accounts->data.bank_accounts[(int)(unsigned char)*(signed char *)current_region];
+    object_foreach(D_00195AC4, (int)bank_add_house_for_sale);
     bank_init_ships();
 L6B4E1:;
     return ((((int)(unsigned char)*(signed char *)game_mode) == 15) ? 1 : 0);
@@ -184,7 +185,7 @@ void bank_close(void)
 {
 L6B51E:;
     if (*(signed char *)key_down_esc != 0) goto L6B51E;
-    if (((int)(unsigned short)(*(short *)(*(char **)game_settings) & 1)) == 0) goto L6B558;
+    if (((int)(unsigned short)(*(short *)(*(char **)&game_settings) & 1)) == 0) goto L6B558;
     func_0012A2D0(160, 100, 160, 100);
     goto L6B571;
 L6B558:;
@@ -288,34 +289,34 @@ L6B7AD:;
 L6B7C1:;
     goto L6B7E2;
 L6B7C3:;
-    sound_play(203, *(int *)player_object, 100);
+    sound_play(203, (int)player_object, 100);
     ((int (*)())(*(int *)(D_00186E2C + (l_20 * 12))))();
 L6B7E2:;
     goto L6B765;
 }
 }
 
-void bank_add_house_for_sale(int a1)
+void bank_add_house_for_sale(struct record *a1)
 {
     int l_28;
     int l_24;
-    int l_20;
+    struct building *l_20;
     int l_1C;
     int l_18;
 
-    if (((int)(unsigned char)*(signed char *)((char *)a1)) != 43) return;
-    if (*(int *)((char *)a1 + 63) == 0) return;
+    if (a1->type != 43) return;
+    if (a1->children == 0) return;
     if (((int)(unsigned char)*(signed char *)bank_house_count) == 20) return;
-    l_20 = (int)(*(char **)(*(char **)current_location + 43) + (((int)(unsigned short)*(short *)((char *)a1 + 27)) * 26));
-    if (*(int *)((char *)a1 + 31) != *(int *)((char *)l_20 + 20)) goto L6B869;
-    if (((int)(unsigned char)*(signed char *)((char *)l_20 + 24)) == 1) goto L6B86E;
+    l_20 = &current_location->buildings[a1->image];
+    if (a1->id != l_20->id) goto L6B869;
+    if (l_20->type == 1) goto L6B86E;
 L6B869:;
     return;
 L6B86E:;
-    l_1C = (*(int *)(bank_houses_for_sale + (((int)(unsigned char)*(signed char *)bank_house_count) * 20)) = a1 + 71);
+    l_1C = (*(int *)(bank_houses_for_sale + (((int)(unsigned char)*(signed char *)bank_house_count) * 20)) = (int)RECORD_DATA(a1));
     l_18 = *(int *)((char *)l_1C + 5);
-    *(int *)(D_001A3FB0 + (((int)(unsigned char)*(signed char *)bank_house_count) * 20)) = l_20;
-    *(int *)(D_001A3FB8 + (((int)(unsigned char)*(signed char *)bank_house_count) * 20)) = *(int *)((char *)a1 + 31);
+    *(int *)(D_001A3FB0 + (((int)(unsigned char)*(signed char *)bank_house_count) * 20)) = (int)l_20;
+    *(int *)(D_001A3FB8 + (((int)(unsigned char)*(signed char *)bank_house_count) * 20)) = a1->id;
     *(int *)(D_001A3FBC + (((int)(unsigned char)*(signed char *)bank_house_count) * 20)) = *(int *)((char *)l_18 + 52);
     l_24 = 0;
     l_28 = l_24;
@@ -358,61 +359,61 @@ void bank_deposit_gold(void)
 
     l_18 = bank_input_amount();
     if (l_18 < 1) return;
-    if (((unsigned)*(int *)(*(char **)player_character + 133)) >= l_18) goto L6BD09;
+    if (((unsigned)player_character->gold) >= l_18) goto L6BD09;
     msgbox_show_rsc(454, 1);
     return;
 L6BD09:;
-    *(int *)(*(char **)bank_account) += l_18;
-    *(int *)(*(char **)player_character + 133) -= l_18;
+    bank_account->balance += l_18;
+    player_character->gold -= l_18;
 }
 
 void bank_withdraw_gold(void)
 {
     int l_18;
 
-    if (*(int *)(*(char **)bank_account) <= 0) return;
+    if (bank_account->balance <= 0) return;
     l_18 = bank_input_amount();
     if (l_18 < 1) return;
-    if (*(int *)(*(char **)bank_account) >= l_18) goto L6BD77;
+    if (bank_account->balance >= l_18) goto L6BD77;
     if (bank_confirm(290) == 0) return;
-    l_18 = *(int *)(*(char **)bank_account);
+    l_18 = bank_account->balance;
 L6BD77:;
     if (gold_can_carry(l_18) == 0) goto L6BD9F;
-    *(int *)(*(char **)bank_account) -= l_18;
-    *(int *)(*(char **)player_character + 133) += l_18;
+    bank_account->balance -= l_18;
+    player_character->gold += l_18;
     return;
 L6BD9F:;
     msgbox_show_string((int)D_00175CD0, 1);
 }
 
-void bank_deposit_letter(int a1)
+void bank_deposit_letter(struct record *a1)
 {
-    int l_18;
+    struct item *l_18;
 
-    if (((int)(unsigned char)*(signed char *)((char *)a1)) != 2) return;
-    l_18 = a1 + 71;
-    if (((int)(unsigned short)*(short *)((char *)l_18 + 32)) != 27) goto L6BE03;
-    if (((int)(unsigned short)*(short *)((char *)l_18 + 34)) == 2) goto L6BE05;
+    if (a1->type != 2) return;
+    l_18 = &a1->data.item;
+    if (l_18->group != 27) goto L6BE03;
+    if (l_18->index == 2) goto L6BE05;
 L6BE03:;
     return;
 L6BE05:;
-    *(int *)(*(char **)bank_account) += *(int *)((char *)l_18 + 36);
+    bank_account->balance += l_18->value;
     object_delete(a1);
 }
 
 void bank_deposit_letters_of_credit(void)
 {
     if (bank_confirm(291) == 0) return;
-    object_foreach(*(int *)(*(char **)player_entity + 63), (int)bank_deposit_letter);
+    object_foreach(player_entity->children, (int)bank_deposit_letter);
 }
 
 void bank_withdraw_letter_of_credit(void)
 {
     int l_20;
     int l_1C;
-    int l_18;
+    struct record *l_18;
 
-    if (*(int *)(*(char **)bank_account) <= 0) return;
+    if (bank_account->balance <= 0) return;
     l_1C = bank_input_amount();
     if (l_1C < 1) return;
     if (l_1C >= 100) goto L6BEA4;
@@ -420,27 +421,27 @@ void bank_withdraw_letter_of_credit(void)
     return;
 L6BEA4:;
     l_20 = (l_1C / 100) + 1;
-    if ((l_20 + l_1C) <= *(int *)(*(char **)bank_account)) goto L6BED8;
+    if ((l_20 + l_1C) <= bank_account->balance) goto L6BED8;
     msgbox_show_rsc(292, 1);
     return;
 L6BED8:;
-    *(int *)(*(char **)bank_account) -= l_20 + l_1C;
-    l_18 = object_create_child(*(int *)D_001959E0, 0, 107);
-    *(signed char *)((char *)l_18) = 2;
-    *(short *)((char *)l_18 + 21) = 1;
-    item_make(27, 2, l_18 + 71);
-    *(int *)((char *)l_18 + 107) = l_1C;
+    bank_account->balance -= l_20 + l_1C;
+    l_18 = object_create_child((struct record *)*(int *)D_001959E0, 0, 107);
+    l_18->type = 2;
+    l_18->flags = 1;
+    item_make(27, 2, &l_18->data.item);
+    l_18->data.item.value = l_1C;
 }
 
 void bank_borrow(void)
 {
     int l_18;
 
-    if (((int)(unsigned char)(*(signed char *)(*(char **)bank_account + 12) & 1)) == 0) goto L6C03D;
+    if (((int)(unsigned char)(bank_account->flags & 1)) == 0) goto L6C03D;
     msgbox_show_rsc(288, 1);
     return;
 L6C03D:;
-    if (*(int *)(*(char **)bank_account + 8) == 0) goto L6C05C;
+    if (bank_account->loan_due == 0) goto L6C05C;
     msgbox_show_rsc(289, 1);
     return;
 L6C05C:;
@@ -450,13 +451,13 @@ L6C05C:;
     msgbox_show_rsc(296, 1);
     return;
 L6C085:;
-    if ((((int)(unsigned char)*(signed char *)(*(char **)player_character + 129)) * 50000) >= l_18) goto L6C0B1;
+    if ((player_character->level * 50000) >= l_18) goto L6C0B1;
     msgbox_show_rsc(295, 1);
     return;
 L6C0B1:;
-    *(int *)(*(char **)bank_account + 8) = *(int *)game_minutes + 518400;
-    *(int *)(*(char **)bank_account + 4) = l_18 + ((l_18 * 10) / 100);
-    *(int *)(*(char **)bank_account) += l_18;
+    bank_account->loan_due = *(int *)game_minutes + 518400;
+    bank_account->loan_owed = l_18 + ((l_18 * 10) / 100);
+    bank_account->balance += l_18;
 }
 
 void bank_buy_house(void)
@@ -465,7 +466,7 @@ void bank_buy_house(void)
     msgbox_show_rsc(287, 1);
     return;
 L6C11F:;
-    if (*(int *)(*(char **)player_character + 116) == 0) goto L6C13B;
+    if (player_character->house == 0) goto L6C13B;
     msgbox_show_rsc(286, 1);
     return;
 L6C13B:;
@@ -475,17 +476,17 @@ L6C13B:;
 
 void bank_sell_house(void)
 {
-    if (*(int *)(*(char **)player_character + 116) == 0) return;
+    if (player_character->house == 0) return;
     *(int *)D_00195D30 = *(int *)bank_house_price - ((*(int *)bank_house_price * 15) / 100);
     if (bank_confirm(298) == 0) return;
-    *(int *)(*(char **)bank_account) += *(int *)D_00195D30;
+    bank_account->balance += *(int *)D_00195D30;
     *(int *)bank_house_price = 0;
-    *(int *)(*(char **)player_character + 116) = 0;
+    player_character->house = 0;
 }
 
 void bank_buy_ship(void)
 {
-    if (*(int *)(*(char **)player_character + 120) == 0) goto L6C1F3;
+    if (player_character->ship_owned == 0) goto L6C1F3;
     msgbox_show_rsc(284, 1);
     return;
 L6C1F3:;
@@ -499,12 +500,12 @@ L6C20D:;
 
 void bank_sell_ship(void)
 {
-    if (*(int *)(*(char **)player_character + 120) == 0) return;
+    if (player_character->ship_owned == 0) return;
     *(int *)D_00195D30 = *(int *)bank_ship_price - ((*(int *)bank_ship_price * 15) / 100);
     if (bank_confirm(299) == 0) return;
-    *(int *)(*(char **)bank_account) += *(int *)D_00195D30;
+    bank_account->balance += *(int *)D_00195D30;
     *(int *)bank_ship_price = 0;
-    *(int *)(*(char **)player_character + 120) = 0;
+    player_character->ship_owned = 0;
 }
 
 void bank_draw_preview(int a1, int a2)
@@ -721,30 +722,30 @@ void bank_ship_list_click(void)
 
 void bank_house_bought(void)
 {
-    if (*(int *)(*(char **)bank_account) >= *(int *)(D_001A3FB4 + (((int)(unsigned char)*(signed char *)bank_selected) * 20))) goto L6C854;
+    if (bank_account->balance >= *(int *)(D_001A3FB4 + (((int)(unsigned char)*(signed char *)bank_selected) * 20))) goto L6C854;
     msgbox_show_rsc(454, 1);
     return;
 L6C854:;
     *(int *)bank_house_price = *(int *)(D_001A3FB4 + (((int)(unsigned char)*(signed char *)bank_selected) * 20));
-    *(int *)(*(char **)bank_account) -= *(int *)bank_house_price;
-    *(int *)(*(char **)player_character + 116) = *(int *)(D_001A3FB8 + (((int)(unsigned char)*(signed char *)bank_selected) * 20));
+    bank_account->balance -= *(int *)bank_house_price;
+    player_character->house = *(int *)(D_001A3FB8 + (((int)(unsigned char)*(signed char *)bank_selected) * 20));
     *(int *)D_001A41E4 = (int)(*(char **)(bank_houses_for_sale + (((int)(unsigned char)*(signed char *)bank_selected) * 20)) - 71);
     *(int *)D_001A41DC = *(int *)(D_001A3FB0 + (((int)(unsigned char)*(signed char *)bank_selected) * 20));
     msgbox_show_rsc(282, 1);
     mc_strncpy((int)saved_region_name, *(int *)(region_names + (((int)(unsigned char)*(signed char *)current_region) << 2)), 32, (int)D_00175CC4, 647);
-    mc_strncpy((int)saved_location_name, *(int *)current_location, 32, (int)D_00175CC4, 648);
+    mc_strncpy((int)saved_location_name, (int)current_location, 32, (int)D_00175CC4, 648);
     *(signed char *)bank_screen = 0;
 }
 
 void bank_ship_bought(void)
 {
-    if (*(int *)(*(char **)bank_account) >= *(int *)(D_001A418E + (((int)(unsigned char)*(signed char *)bank_selected) * 74))) goto L6C95D;
+    if (bank_account->balance >= *(int *)(D_001A418E + (((int)(unsigned char)*(signed char *)bank_selected) * 74))) goto L6C95D;
     msgbox_show_rsc(454, 1);
     return;
 L6C95D:;
-    *(int *)(*(char **)bank_account) -= *(int *)(D_001A418E + (((int)(unsigned char)*(signed char *)bank_selected) * 74));
+    bank_account->balance -= *(int *)(D_001A418E + (((int)(unsigned char)*(signed char *)bank_selected) * 74));
     *(int *)bank_ship_price = *(int *)(D_001A418E + (((int)(unsigned char)*(signed char *)bank_selected) * 74));
-    *(int *)(*(char **)player_character + 120) = *(int *)(D_001A418A + (((int)(unsigned char)*(signed char *)bank_selected) * 74));
+    player_character->ship_owned = *(int *)(D_001A418A + (((int)(unsigned char)*(signed char *)bank_selected) * 74));
     msgbox_show_rsc(283, 1);
     *(signed char *)bank_screen = 0;
 }

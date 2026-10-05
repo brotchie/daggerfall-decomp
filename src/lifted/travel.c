@@ -1,10 +1,9 @@
 /* travel.c: functions first lifted from the assembly by tools/lift_all.py (2026-10), now
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
+#include "records.h"
 
 struct bf8_3_1 { unsigned char _:3; unsigned char f:1; };
-struct bf8_6_1 { unsigned char _:6; unsigned char f:1; };
-struct bf8_7_1 { unsigned char _:7; unsigned char f:1; };
 extern char mouse_buttons[];
 extern char mouse_x[];
 extern char mouse_y[];
@@ -63,11 +62,11 @@ extern char D_00190D64[];
 extern char D_00190D66[];
 extern char text_rsc_buffer[];
 extern char D_00190FE8[];
-extern char player_entity[];
-extern char player_object[];
+extern struct record *player_entity;
+extern struct record *player_object;
 extern char cheat_flags[];
 extern char D_00195B5C[];
-extern char player_character[];
+extern struct character *player_character;
 extern char window_image[];
 extern char D_00195C44[];
 extern char D_00195D48[];
@@ -157,7 +156,7 @@ void func_0009BE38(void);
 void travel_popup_exit(void);
 void travel_button_find(void);
 void travel_open_trip(void);
-void travel_check_transport_item(int);
+void travel_check_transport_item(struct record *);
 void travel_load_region_part(void);
 void travel_toggle_zoom(void);
 void func_0009D5AC(int, int, int);
@@ -173,7 +172,7 @@ void travel_map_update(void)
     int l_40;
     int l_3C;
     int l_38;
-    int l_34;
+    struct map_location *l_34;
     int l_30;
     int l_2C;
     int l_28;
@@ -246,7 +245,7 @@ L9AF85:;
     *(signed char *)D_00190CE7 = 0;
     l_50 = travel_find_location((int)text_rsc_buffer);
     if (l_50 == (-1)) goto L9B10B;
-    l_34 = (int)(*(char **)D_00196A9C + (l_50 * 17));
+    l_34 = *(struct map_location **)D_00196A9C + l_50;
     if (((int)(unsigned char)*(signed char *)D_001AA6A4) >= 2) goto L9B00A;
     l_44 = ((int)(short)*(short *)(D_00188898 + (((int)(signed char)*(signed char *)itemmaker_slot_kinds) << 2))) << 15;
     l_40 = (499 - ((int)(short)*(short *)(D_0018889A + (((int)(signed char)*(signed char *)itemmaker_slot_kinds) << 2)))) << 15;
@@ -255,8 +254,8 @@ L9B00A:;
     l_44 = ((int)(short)*(short *)((char *)(int)(*(char **)D_001AA684 + (((int)(unsigned char)*(signed char *)D_001AA6A5) << 2)))) << 15;
     l_40 = (499 - ((int)(short)(*(short **)D_001AA684)[((int)(unsigned char)*(signed char *)D_001AA6A5) * 2 + 1])) << 15;
 L9B04C:;
-    l_4C = ((unsigned)((*(int *)((char *)l_34 + 4) & 33554431) - l_44)) >> 15;
-    l_48 = ((unsigned)(-((*(int *)((char *)l_34 + 8) & 16777215) - l_40))) >> 15;
+    l_4C = ((unsigned)((l_34->x_type_flags & 33554431) - l_44)) >> 15;
+    l_48 = ((unsigned)(-((l_34->y_size & 16777215) - l_40))) >> 15;
     if (((int)(signed char)*(signed char *)itemmaker_slot_kinds) == 62) goto L9B08E;
     if (((int)(signed char)*(signed char *)itemmaker_slot_kinds) != 20) goto L9B09E;
 L9B08E:;
@@ -376,7 +375,7 @@ L9B336:;
     func_0009BE38();
     return;
 L9B349:;
-    sound_play(203, *(int *)player_object, 110);
+    sound_play(203, (int)player_object, 110);
     mc_memset(*(int *)screen_buffer, 0, 64000, (int)D_0017743D, 367, 4);
     func_000CDD81(1);
     palette_restore();
@@ -487,7 +486,7 @@ L9B62F:;
 
 void travel_draw_locations(void)
 {
-    int l_30;
+    struct map_location *l_30;
     int l_2C;
     int l_28;
     int l_24;
@@ -495,7 +494,7 @@ void travel_draw_locations(void)
     int l_1C;
     short l_18;
 
-    l_30 = *(int *)D_00196A9C;
+    l_30 = *(struct map_location **)D_00196A9C;
     *(int *)&l_18 = (int)(short)*(short *)D_0014294C;
     *(short *)D_0014294C = 160;
     if (((int)(unsigned char)*(signed char *)D_001AA6A4) >= 2) goto L9B6B5;
@@ -512,12 +511,12 @@ L9B6FE:;
     goto L9B807;
 L9B70E:;
     l_24++;
-    (*(char (**)[17])&l_30)++;
+    l_30++;
     goto L9B6FE;
 L9B71D:;
     if (((struct bf8_3_1 *)&cheat_flags)->f != 0) goto L9B73A;
-    if (((struct bf8_6_1 *)((char *)l_30 + 7))->f == 0) goto L9B738;
-    if (((struct bf8_7_1 *)((char *)l_30 + 7))->f == 0) goto L9B73A;
+    if ((l_30->x_type_flags & 0x40000000) == 0) goto L9B738;
+    if ((l_30->x_type_flags & 0x80000000) == 0) goto L9B73A;
 L9B738:;
     goto L9B73C;
 L9B73A:;
@@ -525,9 +524,9 @@ L9B73A:;
 L9B73C:;
     goto L9B70E;
 L9B73E:;
-    if ((((int)(unsigned char)*(signed char *)travel_filter) & (1 << ((int)(unsigned char)*(signed char *)(location_type_category + (((unsigned)(*(int *)((char *)l_30 + 4) << 2)) >> 27))))) == 0) goto L9B70E;
-    l_20 = ((unsigned)((*(int *)((char *)l_30 + 4) & 33554431) - l_2C)) >> 15;
-    l_1C = ((unsigned)(-((*(int *)((char *)l_30 + 8) & 16777215) - l_28))) >> 15;
+    if ((((int)(unsigned char)*(signed char *)travel_filter) & (1 << ((int)(unsigned char)*(signed char *)(location_type_category + (((unsigned)(l_30->x_type_flags << 2)) >> 27))))) == 0) goto L9B70E;
+    l_20 = ((unsigned)((l_30->x_type_flags & 33554431) - l_2C)) >> 15;
+    l_1C = ((unsigned)(-((l_30->y_size & 16777215) - l_28))) >> 15;
     if (((int)(signed char)*(signed char *)itemmaker_slot_kinds) == 62) goto L9B7AB;
     if (((int)(signed char)*(signed char *)itemmaker_slot_kinds) != 20) goto L9B7BB;
 L9B7AB:;
@@ -543,7 +542,7 @@ L9B7CD:;
 L9B7CF:;
     (*(int *)D_00196808)++;
 L9B7D5:;
-    func_000A134C((int)(short)(l_20 + 12), (int)(short)(l_1C + 1), (int)(unsigned char)*(signed char *)(D_00188774 + (((unsigned)(*(int *)((char *)l_30 + 4) << 2)) >> 27)));
+    func_000A134C((int)(short)(l_20 + 12), (int)(short)(l_1C + 1), (int)(unsigned char)*(signed char *)(D_00188774 + (((unsigned)(l_30->x_type_flags << 2)) >> 27)));
     goto L9B70E;
 L9B807:;
     *(short *)D_0014294C = *(int *)&l_18;
@@ -622,8 +621,8 @@ L9B9E3:;
     l_20 = ((int)(short)*(short *)((char *)(int)(*(char **)D_001AA684 + (((int)(unsigned char)*(signed char *)D_001AA6A5) << 2)))) << 15;
     l_1C = (499 - ((int)(short)(*(short **)D_001AA684)[((int)(unsigned char)*(signed char *)D_001AA6A5) * 2 + 1])) << 15;
 L9BA25:;
-    l_28 = (*(int *)(*(char **)player_object + 7) - l_20) / 32768;
-    l_24 = (-(*(int *)(*(char **)player_object + 15) - l_1C)) / 32768;
+    l_28 = (player_object->x - l_20) / 32768;
+    l_24 = (-(player_object->z - l_1C)) / 32768;
     if (((int)(signed char)*(signed char *)itemmaker_slot_kinds) == 62) goto L9BA77;
     if (((int)(signed char)*(signed char *)itemmaker_slot_kinds) != 20) goto L9BA87;
 L9BA77:;
@@ -652,7 +651,7 @@ void travel_draw_hover_name(void)
     l_18 = travel_location_at_cursor();
     if (l_18 == (-1)) goto L9BC68;
     if (((struct bf8_3_1 *)&cheat_flags)->f == 0) goto L9BBA9;
-    if ((((int)(unsigned char)*(signed char *)travel_filter) & (1 << ((int)(unsigned char)*(signed char *)(location_type_category + (((unsigned)(*(int *)((char *)(int)(*(char **)D_00196A9C + (l_18 * 17)) + 4) << 2)) >> 27))))) == 0) goto L9BB85;
+    if ((((int)(unsigned char)*(signed char *)travel_filter) & (1 << ((int)(unsigned char)*(signed char *)(location_type_category + (((unsigned)((*(struct map_location **)D_00196A9C)[l_18].x_type_flags << 2)) >> 27))))) == 0) goto L9BB85;
     func_000A0ED9(541, (int)D_0017743D);
     mc_sprintf((int)text_buffer, (int)D_00177455, *(int *)(D_001837E4 + (((int)(signed char)*(signed char *)itemmaker_slot_kinds) << 2)), (int)(*(char **)D_00196A7C + (l_18 << 5)) + 4);
     goto L9BBA4;
@@ -661,10 +660,10 @@ L9BB85:;
 L9BBA4:;
     goto L9BC66;
 L9BBA9:;
-    if (((struct bf8_6_1 *)((char *)(int)(*(char **)D_00196A9C + (l_18 * 17)) + 7))->f != 0) goto L9BBCD;
-    if (((struct bf8_7_1 *)((char *)(int)(*(char **)D_00196A9C + (l_18 * 17)) + 7))->f != 0) goto L9BBFD;
+    if (((*(struct map_location **)D_00196A9C)[l_18].x_type_flags & 0x40000000) != 0) goto L9BBCD;
+    if (((*(struct map_location **)D_00196A9C)[l_18].x_type_flags & 0x80000000) != 0) goto L9BBFD;
 L9BBCD:;
-    if ((((int)(unsigned char)*(signed char *)travel_filter) & (1 << ((int)(unsigned char)*(signed char *)(location_type_category + (((unsigned)(*(int *)((char *)(int)(*(char **)D_00196A9C + (l_18 * 17)) + 4) << 2)) >> 27))))) != 0) goto L9BBFF;
+    if ((((int)(unsigned char)*(signed char *)travel_filter) & (1 << ((int)(unsigned char)*(signed char *)(location_type_category + (((unsigned)((*(struct map_location **)D_00196A9C)[l_18].x_type_flags << 2)) >> 27))))) != 0) goto L9BBFF;
 L9BBFD:;
     goto L9BC47;
 L9BBFF:;
@@ -721,7 +720,7 @@ L9BD9B:;
     return;
 L9BDAE:;
     *(signed char *)D_00190CE8 = 0;
-    sound_play(203, *(int *)player_object, 110);
+    sound_play(203, (int)player_object, 110);
     l_18 = (int)(unsigned char)*(signed char *)((char *)(int)(*(char **)D_001AA66C + ((((int)(short)*(short *)mouse_y) * 320) + ((int)(short)*(short *)mouse_x))));
     if (l_18 < 128) goto L9BE01;
     if (l_18 != 255) goto L9BE03;
@@ -757,7 +756,7 @@ void travel_toggle_option(int a1)
 L9BED7:;
     return;
 L9BEDC:;
-    sound_play(203, *(int *)player_object, 110);
+    sound_play(203, (int)player_object, 110);
     if (a1 >= 2) goto L9BF03;
     *(signed char *)travel_options ^= 3;
     goto L9BFA8;
@@ -765,7 +764,7 @@ L9BF03:;
     if (a1 >= 4) goto L9BF60;
     *(signed char *)travel_options ^= 12;
     if (((int)(unsigned short)(*(short *)travel_options & 8)) == 0) goto L9BF2F;
-    if (*(int *)(*(char **)player_character + 120) == 0) goto L9BF31;
+    if (player_character->ship_owned == 0) goto L9BF31;
 L9BF2F:;
     goto L9BF3F;
 L9BF31:;
@@ -789,7 +788,7 @@ L9BF8B:;
     *(signed char *)D_0012B508 = 146;
     msgbox_show_rsc(454, 1);
 L9BFA8:;
-    *(int *)D_001AA680 = travel_route(*(int *)(*(char **)player_object + 7), *(int *)(*(char **)player_object + 15), *(int *)D_001AA678, *(int *)D_001AA67C, 0);
+    *(int *)D_001AA680 = travel_route(player_object->x, player_object->z, *(int *)D_001AA678, *(int *)D_001AA67C, 0);
     if (((int)(unsigned short)(*(short *)travel_options & 3)) != 2) return;
     *(int *)D_001AA680 = (*(int *)D_001AA680 << 7) / 256;
 }
@@ -801,7 +800,7 @@ void travel_popup_exit(void)
 L9C257:;
     return;
 L9C259:;
-    sound_play(203, *(int *)player_object, 110);
+    sound_play(203, (int)player_object, 110);
     *(signed char *)D_00190CE5 = 0;
 }
 
@@ -821,7 +820,7 @@ L9C76B:;
 L9C770:;
     if (*(signed char *)itemmaker_slot_kinds == 0) return;
     *(signed char *)D_00190CE8 = 0;
-    sound_play(203, *(int *)player_object, 110);
+    sound_play(203, (int)player_object, 110);
     *(signed char *)D_0012B508 = 145;
     func_00142790();
     l_18 = *(int *)D_00195C44 + 55000;
@@ -839,8 +838,8 @@ L9C84F:;
 
 int travel_location_at_cursor(void)
 {
-    int l_44;
-    int l_40;
+    struct map_location *l_44;
+    struct map_location *l_40;
     int l_3C;
     int l_38;
     int l_34;
@@ -851,7 +850,7 @@ int travel_location_at_cursor(void)
     int l_20;
     int l_1C;
 
-    l_44 = *(int *)D_00196A9C;
+    l_44 = *(struct map_location **)D_00196A9C;
     l_28 = 32767;
     if (*(int *)D_001AA694 == 0) goto L9C892;
     return -1;
@@ -889,13 +888,13 @@ L9C9B7:;
     goto L9CA7E;
 L9C9C7:;
     l_24++;
-    (*(char (**)[17])&l_44)++;
+    l_44++;
     goto L9C9B7;
 L9C9D6:;
-    if ((((int)(unsigned char)*(signed char *)travel_filter) & (1 << ((int)(unsigned char)*(signed char *)(location_type_category + (((unsigned)(*(int *)((char *)l_44 + 4) << 2)) >> 27))))) == 0) goto L9C9C7;
+    if ((((int)(unsigned char)*(signed char *)travel_filter) & (1 << ((int)(unsigned char)*(signed char *)(location_type_category + (((unsigned)(l_44->x_type_flags << 2)) >> 27))))) == 0) goto L9C9C7;
     if (((struct bf8_3_1 *)&cheat_flags)->f != 0) goto L9CA1E;
-    if (((struct bf8_6_1 *)((char *)l_44 + 7))->f == 0) goto L9CA1C;
-    if (((struct bf8_7_1 *)((char *)l_44 + 7))->f == 0) goto L9CA1E;
+    if ((l_44->x_type_flags & 0x40000000) == 0) goto L9CA1C;
+    if ((l_44->x_type_flags & 0x80000000) == 0) goto L9CA1E;
 L9CA1C:;
     goto L9CA20;
 L9CA1E:;
@@ -903,8 +902,8 @@ L9CA1E:;
 L9CA20:;
     goto L9C9C7;
 L9CA22:;
-    l_34 = ((unsigned)((*(int *)((char *)l_44 + 4) & 33554431) - l_3C)) >> 15;
-    l_30 = ((unsigned)(-((*(int *)((char *)l_44 + 8) & 16777215) - l_38))) >> 15;
+    l_34 = ((unsigned)((l_44->x_type_flags & 33554431) - l_3C)) >> 15;
+    l_30 = ((unsigned)(-((l_44->y_size & 16777215) - l_38))) >> 15;
     l_2C = func_000C7FD9(l_34, l_30, l_20, l_1C);
     if (l_2C >= l_28) goto L9CA74;
     l_40 = l_44;
@@ -924,11 +923,11 @@ int travel_find_location(int a1)
 {
     int l_28;
     int l_24;
-    int l_20;
+    struct map_location *l_20;
     int l_1C;
 
     l_24 = func_000A0DF4(a1);
-    l_20 = *(int *)D_00196A9C;
+    l_20 = *(struct map_location **)D_00196A9C;
     if (l_24 != 0) goto L9CB01;
     return -1;
 L9CB01:;
@@ -938,12 +937,12 @@ L9CB08:;
     goto L9CB92;
 L9CB18:;
     l_28++;
-    (*(char (**)[17])&l_20)++;
+    l_20++;
     goto L9CB08;
 L9CB27:;
     if (((struct bf8_3_1 *)&cheat_flags)->f != 0) goto L9CB44;
-    if (((struct bf8_6_1 *)((char *)l_20 + 7))->f == 0) goto L9CB42;
-    if (((struct bf8_7_1 *)((char *)l_20 + 7))->f == 0) goto L9CB44;
+    if ((l_20->x_type_flags & 0x40000000) == 0) goto L9CB42;
+    if ((l_20->x_type_flags & 0x80000000) == 0) goto L9CB44;
 L9CB42:;
     goto L9CB46;
 L9CB44:;
@@ -960,19 +959,19 @@ L9CB76:;
 L9CB90:;
     goto L9CB18;
 L9CB92:;
-    l_20 = *(int *)D_00196A9C;
+    l_20 = *(struct map_location **)D_00196A9C;
     l_28 = 0;
 L9CBA1:;
     if (l_28 < *(int *)D_00196A28) goto L9CBC0;
     goto L9CC2B;
 L9CBB1:;
     l_28++;
-    (*(char (**)[17])&l_20)++;
+    l_20++;
     goto L9CBA1;
 L9CBC0:;
     if (((struct bf8_3_1 *)&cheat_flags)->f != 0) goto L9CBDD;
-    if (((struct bf8_6_1 *)((char *)l_20 + 7))->f == 0) goto L9CBDB;
-    if (((struct bf8_7_1 *)((char *)l_20 + 7))->f == 0) goto L9CBDD;
+    if ((l_20->x_type_flags & 0x40000000) == 0) goto L9CBDB;
+    if ((l_20->x_type_flags & 0x80000000) == 0) goto L9CBDD;
 L9CBDB:;
     goto L9CBDF;
 L9CBDD:;
@@ -996,14 +995,14 @@ void travel_open_trip(void)
 {
     if (*(int *)travel_selected_location == (-1)) return;
     *(signed char *)D_00190CE5 = 1;
-    *(int *)D_001AA678 = *(int *)((char *)(int)(*(char **)D_00196A9C + (*(int *)travel_selected_location * 17)) + 4) & 33554431;
-    *(int *)D_001AA67C = *(int *)((char *)(int)(*(char **)D_00196A9C + (*(int *)travel_selected_location * 17)) + 8) & 16777215;
-    *(int *)D_001AA680 = travel_route(*(int *)(*(char **)player_object + 7), *(int *)(*(char **)player_object + 15), *(int *)D_001AA678, *(int *)D_001AA67C, 0);
+    *(int *)D_001AA678 = (*(struct map_location **)D_00196A9C)[*(int *)travel_selected_location].x_type_flags & 33554431;
+    *(int *)D_001AA67C = (*(struct map_location **)D_00196A9C)[*(int *)travel_selected_location].y_size & 16777215;
+    *(int *)D_001AA680 = travel_route(player_object->x, player_object->z, *(int *)D_001AA678, *(int *)D_001AA67C, 0);
     if (((int)(unsigned short)(*(short *)travel_options & 3)) != 2) goto L9CCF0;
     *(int *)D_001AA680 = (*(int *)D_001AA680 << 7) / 256;
 L9CCF0:;
     if (((int)(unsigned short)(*(short *)travel_options & 8)) == 0) goto L9CD0F;
-    if (*(int *)(*(char **)player_character + 120) == 0) goto L9CD11;
+    if (player_character->ship_owned == 0) goto L9CD11;
 L9CD0F:;
     goto L9CD1F;
 L9CD11:;
@@ -1016,8 +1015,8 @@ L9CD21:;
 
 int func_0009CD32(int a1)
 {
-    int l_48;
-    int l_44;
+    struct map_location *l_48;
+    struct map_location *l_44;
     int l_40;
     int l_3C;
     int l_38;
@@ -1029,10 +1028,10 @@ int func_0009CD32(int a1)
     int l_20;
     int l_1C;
 
-    l_48 = *(int *)D_00196A9C;
+    l_48 = *(struct map_location **)D_00196A9C;
     l_2C = 32767;
-    l_24 = *(int *)(*(char **)player_object + 7) / 32768;
-    l_20 = *(int *)(*(char **)player_object + 15) / 32768;
+    l_24 = player_object->x / 32768;
+    l_20 = player_object->z / 32768;
     if (((int)(unsigned char)*(signed char *)D_001AA6A4) >= 2) goto L9CDCB;
     l_40 = ((int)(short)*(short *)(D_00188898 + (((int)(signed char)*(signed char *)itemmaker_slot_kinds) << 2))) << 15;
     l_3C = (499 - ((int)(short)*(short *)(D_0018889A + (((int)(signed char)*(signed char *)itemmaker_slot_kinds) << 2)))) << 15;
@@ -1049,16 +1048,16 @@ L9CE24:;
     l_28++;
     goto L9CE14;
 L9CE2C:;
-    if ((((unsigned)(*(int *)((char *)l_48 + 4) << 2)) >> 27) != a1) goto L9CE24;
-    l_38 = ((unsigned)((*(int *)((char *)l_48 + 4) & 33554431) - l_40)) >> 15;
-    l_34 = ((unsigned)(-((*(int *)((char *)l_48 + 8) & 16777215) - l_3C))) >> 15;
+    if ((((unsigned)(l_48->x_type_flags << 2)) >> 27) != a1) goto L9CE24;
+    l_38 = ((unsigned)((l_48->x_type_flags & 33554431) - l_40)) >> 15;
+    l_34 = ((unsigned)(-((l_48->y_size & 16777215) - l_3C))) >> 15;
     l_30 = func_000C7FD9(l_38, l_34, l_24, l_20);
     if (l_30 >= l_2C) goto L9CE95;
     l_1C = l_28;
     l_44 = l_48;
     l_2C = l_30;
 L9CE95:;
-    (*(char (**)[17])&l_48)++;
+    l_48++;
     goto L9CE24;
 L9CE9E:;
     if (l_2C != 32767) goto L9CEB1;
@@ -1077,7 +1076,7 @@ int travel_pixel_time(int a1, int a2)
     if (*(signed char *)D_00196285 == 0) goto L9D2CB;
     (*(int *)D_001AA674)++;
     if (((int)(unsigned short)(*(short *)travel_options & 8)) != 0) goto L9D2B9;
-    if (*(int *)(*(char **)player_character + 120) == 0) goto L9D2C2;
+    if (player_character->ship_owned == 0) goto L9D2C2;
 L9D2B9:;
     return 51;
 L9D2C2:;
@@ -1086,22 +1085,22 @@ L9D2CB:;
     return (((256 - *(int *)(terrain_travel_modifiers + (l_1C << 2))) + 256) * l_18) / 256;
 }
 
-void travel_check_transport_item(int a1)
+void travel_check_transport_item(struct record *a1)
 {
-    int l_18;
+    struct item *l_18;
 
-    if (((int)(unsigned char)*(signed char *)((char *)a1)) != 2) return;
-    l_18 = a1 + 71;
-    if (((int)(unsigned short)*(short *)((char *)l_18 + 32)) != 23) goto L9D353;
-    if (((int)(unsigned short)*(short *)((char *)l_18 + 34)) == 1) goto L9D355;
+    if (a1->type != 2) return;
+    l_18 = &a1->data.item;
+    if (l_18->group != 23) goto L9D353;
+    if (l_18->index == 1) goto L9D355;
 L9D353:;
     goto L9D366;
 L9D355:;
     *(signed char *)D_00190D16 |= 2;
     *(int *)travel_transport_factor = 128;
 L9D366:;
-    if (((int)(unsigned short)*(short *)((char *)l_18 + 32)) != 23) goto L9D381;
-    if (*(short *)((char *)l_18 + 34) == 0) goto L9D383;
+    if (l_18->group != 23) goto L9D381;
+    if (l_18->index == 0) goto L9D383;
 L9D381:;
     return;
 L9D383:;
@@ -1112,7 +1111,7 @@ L9D383:;
 void travel_find_transport(void)
 {
     *(int *)travel_transport_factor = 256;
-    object_foreach(*(int *)(*(char **)player_entity + 63), (int)travel_check_transport_item);
+    object_foreach((int)player_entity->children, (int)travel_check_transport_item);
 }
 
 void travel_load_region_part(void)
@@ -1153,7 +1152,7 @@ L9D4E8:;
 L9D4EA:;
     *(signed char *)D_001AA6A5 ^= 1;
 L9D4F1:;
-    sound_play(203, *(int *)player_object, 110);
+    sound_play(203, (int)player_object, 110);
     travel_load_region_part();
 }
 
@@ -1207,7 +1206,7 @@ L9D66F:;
     l_1C = (((l_20 - *(int *)D_001AA674) / 24) * 5) + 5;
 L9D68D:;
     if (*(int *)D_001AA674 == 0) goto L9D6A1;
-    if (*(int *)(*(char **)player_character + 120) == 0) goto L9D6A3;
+    if (player_character->ship_owned == 0) goto L9D6A3;
 L9D6A1:;
     goto L9D6B7;
 L9D6A3:;

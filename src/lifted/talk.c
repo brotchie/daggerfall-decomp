@@ -1,6 +1,7 @@
 /* talk.c: functions first lifted from the assembly by tools/lift_all.py (2026-10), now
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
+#include "records.h"
 
 struct bf8_1_1 { unsigned char _:1; unsigned char f:1; };
 struct bf8_2_1 { unsigned char _:2; unsigned char f:1; };
@@ -67,14 +68,14 @@ extern char text_rsc_buffer[];
 extern char D_00191016[];
 extern char D_001940D4[];
 extern char text_macro_fcn[];
-extern char D_00195A00[];
+extern struct record *D_00195A00;
 extern char D_00195A84[];
-extern char player_object[];
+extern struct record *player_object;
 extern char D_00195B84[];
-extern char current_location[];
-extern char player_character[];
+extern struct location *current_location;
+extern struct character *player_character;
 extern char window_image[];
-extern char game_settings[];
+extern struct settings *game_settings;
 extern char D_00195D00[];
 extern char D_00195D28[];
 extern char talk_disposition[];
@@ -95,10 +96,10 @@ extern char D_00196580[];
 extern char talk_text_pool_next[];
 extern char talk_answer_lines[];
 extern char talk_saved_screen[];
-extern char talk_npc_own_faction[];
-extern char talk_npc_faction[];
+extern struct faction *talk_npc_own_faction;
+extern struct faction *talk_npc_faction;
 extern char talk_place_topics[];
-extern char talk_npc_record[];
+extern struct character *talk_npc_record;
 extern char D_001965A0[];
 extern char talk_npc_speech_style[];
 extern char talk_answer_line_count[];
@@ -113,7 +114,7 @@ extern char talk_attitude_cache[];
 extern char D_001965D4[];
 extern char talk_question_line_count[];
 extern char D_001965DC[];
-extern char talk_npc_object[];
+extern struct record *talk_npc_object;
 extern char D_001965E4[];
 extern char talk_selected_row[];
 extern char talk_face_image[];
@@ -143,36 +144,36 @@ extern char D_001966BA[];
 extern char D_001966BB[];
 extern char D_0019670C[];
 extern char faction_count[];
-extern char D_0019671C[];
-extern char factions[];
-extern char current_quest[];
-extern char D_00199780[];
+extern struct faction *D_0019671C;
+extern struct faction *factions;
+extern struct quest *current_quest;
+extern struct quest *D_00199780;
 
 extern int talk_open(int);
 extern int talk_hint_text_id(int);
 extern int town_has_building(short, int);
-extern int building_distance(int);
+extern int building_distance(struct building *);
 extern int talk_faction_relation(short);
-extern int faction_find(short);
+extern struct faction *faction_find(short);
 extern int rumor_pick_news(short);
 extern int quest_symbol_text(int, int, int);
 extern int quest_section(int, int);
-extern int quest_find_site_for_building(int);
+extern int quest_find_site_for_building(struct building *);
 extern int parse_bio_answer_text(int);
 extern int quest_find_by_id(int);
 extern int quest_find_potential_questor(void);
-extern int npc_talk_record_build(int);
+extern struct character *npc_talk_record_build(struct record *);
 extern int font_char_width(unsigned char);
 extern int font_text_width(int);
 extern int func_000679BB(unsigned char);
 extern int item_artifact_equipped(int);
 extern int sound_play(int, int, int);
-extern int guild_find_membership_by_bits(unsigned char);
+extern struct membership *guild_find_membership_by_bits(unsigned char);
 extern int guild_local_temple_rank(void);
 extern int hud_message_add(int);
 extern int key_pressed_once(unsigned char);
 extern int rand_range(int, int);
-extern int object_building(int);
+extern struct building *object_building(struct record *);
 extern int func_0008B48B(int);
 extern int building_name(int);
 extern int rand();
@@ -212,16 +213,16 @@ int func_000164CD(void);
 int func_000169D4(int);
 int talk_next_word(int);
 int talk_alloc_line(void);
-int building_category(int);
+int building_category(struct building *);
 int town_has_category(int);
 int talk_roll_knows(void);
 int talk_roll_attitude(void);
-int faction_nth_r(int);
-int faction_nth_of_type_r(int, unsigned char);
-int faction_is_regional_noble(int);
-int faction_has_enemy(int, int);
-int faction_has_ally(int, int);
-int func_0001B144(int, int);
+struct faction *faction_nth_r(struct faction *);
+struct faction *faction_nth_of_type_r(struct faction *, unsigned char);
+int faction_is_regional_noble(struct faction *);
+int faction_has_enemy(struct faction *, struct faction *);
+int faction_has_ally(struct faction *, struct faction *);
+int func_0001B144(struct faction *, struct faction *);
 void talk_draw(void);
 void talk_prepare_where_answer(void);
 void talk_close(void);
@@ -240,11 +241,11 @@ void talk_list_draw_item(int, int, int, int, int);
 void talk_draw_regional_list(void);
 void talk_add_regional_item(int);
 void talk_draw_categories(void);
-void faction_count_of_type_r(int, unsigned char);
-void func_0001AE63(int);
-void faction_add_reputation(int, int);
-void func_0001B554(int, int, int);
-void func_0001B5BE(int, int);
+void faction_count_of_type_r(struct faction *, unsigned char);
+void func_0001AE63(struct faction *);
+void faction_add_reputation(struct faction *, int);
+void func_0001B554(struct faction *, struct faction *, int);
+void func_0001B5BE(struct faction *, int);
 #pragma aux func_000A0ED9 parm routine [];
 
 void talk_update(void)
@@ -348,7 +349,7 @@ L15084:;
 L15098:;
     goto L150BC;
 L1509A:;
-    sound_play(203, *(int *)player_object, 110);
+    sound_play(203, (int)player_object, 110);
     ((int (*)())(*(int *)(D_00179B80 + (l_18 * 12))))(l_18);
 L150BC:;
     goto L1503C;
@@ -379,7 +380,7 @@ L15136:;
     if (*(signed char *)mouse_buttons != 0) goto L15145;
     if (l_18 != 15) goto L15167;
 L15145:;
-    sound_play(203, *(int *)player_object, 110);
+    sound_play(203, (int)player_object, 110);
     ((int (*)())(*(int *)(D_00179B80 + (l_18 * 12))))(l_18);
 L15167:;
     goto L150D8;
@@ -395,11 +396,11 @@ void talk_draw(void)
 
     l_1C = rand();
     srand(*(int *)D_001965C8);
-    if (((int)(unsigned char)*(signed char *)(*(char **)talk_npc_own_faction)) != 4) goto L151CB;
-    text_draw_centered_colored((int)(*(char **)talk_npc_own_faction + 3), 213, 53, 145, 156);
+    if (talk_npc_own_faction->type != 4) goto L151CB;
+    text_draw_centered_colored((int)((char *)talk_npc_own_faction + 3), 213, 53, 145, 156);
     goto L151EF;
 L151CB:;
-    text_draw_centered_colored(func_0008B48B(*(int *)talk_npc_object), 213, 53, 145, 156);
+    text_draw_centered_colored(func_0008B48B((int)talk_npc_object), 213, 53, 145, 156);
 L151EF:;
     talk_draw_face();
     talk_draw_answer(190, 66, 302, 184);
@@ -489,31 +490,31 @@ L15621:;
 }
 }
 
-void talk_start(int a1)
+void talk_start(struct record *a1)
 {
-    int l_18;
+    struct faction *l_18;
 
     *(int *)talk_face_image = 0;
     *(signed char *)D_00190D10 = 0;
-    *(int *)talk_npc_object = a1;
-    if (((int)(unsigned short)(*(short *)((char *)a1 + 25) & 32768)) == 0) goto L156C7;
+    talk_npc_object = a1;
+    if (((int)(unsigned short)(a1->lockpick_skill_tried & 32768)) == 0) goto L156C7;
     msgbox_show_rsc(7205, 1);
     return;
 L156C7:;
-    if (((int)(unsigned char)*(signed char *)((char *)a1)) == 8) goto L156E5;
-    if (((int)(unsigned char)*(signed char *)((char *)a1)) != 18) goto L156E7;
+    if (a1->type == 8) goto L156E5;
+    if (a1->type != 18) goto L156E7;
 L156E5:;
     goto L156F6;
 L156E7:;
-    if (((int)(unsigned char)*(signed char *)((char *)a1)) != 53) goto L156F8;
+    if (a1->type != 53) goto L156F8;
 L156F6:;
     goto L1570C;
 L156F8:;
     msgbox_show_rsc(7204, 1);
     return;
 L1570C:;
-    if (((int)(unsigned char)*(signed char *)((char *)a1)) != 53) goto L15730;
-    if (((int)(unsigned short)(*(short *)((char *)a1 + 29) & 1)) != 0) goto L15732;
+    if (a1->type != 53) goto L15730;
+    if (((int)(unsigned short)(a1->image2 & 1)) != 0) goto L15732;
 L15730:;
     goto L15741;
 L15732:;
@@ -521,18 +522,18 @@ L15732:;
     return;
 L15741:;
     *(short *)talk_flags = 0;
-    if (((int)(unsigned char)*(signed char *)((char *)a1)) == 8) goto L15768;
-    if (((int)(unsigned char)*(signed char *)((char *)a1)) != 53) goto L15781;
+    if (a1->type == 8) goto L15768;
+    if (a1->type != 53) goto L15781;
 L15768:;
-    *(int *)talk_npc_record = npc_talk_record_build(a1);
+    talk_npc_record = npc_talk_record_build(a1);
     *(signed char *)talk_flags &= 254;
     goto L15811;
 L15781:;
-    if (((int)(unsigned char)*(signed char *)((char *)(*(int *)talk_npc_record = a1 + 71) + 67)) >= 43) goto L157A5;
+    if ((talk_npc_record = &a1->data.character)->race >= 43) goto L157A5;
     *(signed char *)talk_flags |= 1;
 L157A5:;
-    *(short *)talk_language_skill = *(short *)(talk_creature_language + (((int)(unsigned char)*(signed char *)(*(char **)talk_npc_record + 67)) << 2));
-    *(short *)D_001966A6 = *(short *)(D_00179ACE + (((int)(unsigned char)*(signed char *)(*(char **)talk_npc_record + 67)) << 2));
+    *(short *)talk_language_skill = *(short *)(talk_creature_language + (talk_npc_record->race << 2));
+    *(short *)D_001966A6 = *(short *)(D_00179ACE + (talk_npc_record->race << 2));
     if (*(short *)talk_language_skill != 0) goto L157FD;
     msgbox_show_rsc(7204, 1);
     return;
@@ -540,42 +541,42 @@ L157FD:;
     if (((int)(unsigned short)*(short *)talk_language_skill) != 1) goto L15811;
     *(signed char *)talk_flags &= 254;
 L15811:;
-    *(int *)D_00195A84 = *(int *)talk_npc_record;
-    *(int *)talk_npc_faction = faction_find((int)(short)*(short *)(*(char **)talk_npc_record + 551));
+    *(int *)D_00195A84 = (int)talk_npc_record;
+    talk_npc_faction = faction_find(talk_npc_record->faction_id);
     *(int *)talk_face_image = mc_malloc(4096, (int)D_001703F0, 530);
-    if (((int)(unsigned char)*(signed char *)(*(char **)talk_npc_faction)) != 4) goto L1586F;
-    talk_load_face((int)(unsigned short)*(short *)(*(char **)talk_npc_faction + 51));
+    if (talk_npc_faction->type != 4) goto L1586F;
+    talk_load_face(talk_npc_faction->face);
 L1586F:;
-    l_18 = *(int *)talk_npc_faction;
+    l_18 = talk_npc_faction;
 L15877:;
     if (l_18 == 0) goto L158B9;
-    if (((int)(unsigned char)*(signed char *)((char *)l_18)) == 2) goto L1589B;
-    if (((int)(unsigned char)*(signed char *)((char *)l_18)) != 7) goto L1589D;
+    if (l_18->type == 2) goto L1589B;
+    if (l_18->type != 7) goto L1589D;
 L1589B:;
     goto L158AC;
 L1589D:;
-    if (((int)(unsigned char)*(signed char *)((char *)l_18)) != 9) goto L158AE;
+    if (l_18->type != 9) goto L158AE;
 L158AC:;
     goto L158B9;
 L158AE:;
-    l_18 = *(int *)((char *)l_18 + 88);
+    l_18 = l_18->parent;
     goto L15877;
 L158B9:;
-    *(int *)talk_npc_own_faction = *(int *)talk_npc_faction;
+    talk_npc_own_faction = talk_npc_faction;
     if (l_18 == 0) goto L158D1;
-    *(int *)talk_npc_faction = l_18;
+    talk_npc_faction = l_18;
 L158D1:;
-    *(int *)talk_disposition = (int)(short)*(short *)(*(char **)talk_npc_faction + 29);
+    *(int *)talk_disposition = talk_npc_faction->reputation;
     *(int *)talk_disposition += guild_local_temple_rank();
-    if (((int)(unsigned char)*(signed char *)(*(char **)talk_npc_faction + 54)) >= 5) goto L1593A;
-    *(int *)talk_disposition += (int)(short)*(short *)(*(char **)player_character + 145 + (((int)(unsigned char)*(signed char *)(*(char **)talk_npc_faction + 54)) * 2));
-    *(int *)talk_disposition += func_000679BB((int)(unsigned char)*(signed char *)(*(char **)talk_npc_faction + 54));
+    if (talk_npc_faction->social_group >= 5) goto L1593A;
+    *(int *)talk_disposition += player_character->reputation[talk_npc_faction->social_group];
+    *(int *)talk_disposition += func_000679BB(talk_npc_faction->social_group);
     goto L1594A;
 L1593A:;
     *(int *)talk_disposition += func_000679BB(100);
 L1594A:;
     if (item_artifact_equipped(0) == 0) goto L15971;
-    *(int *)talk_disposition += ((int)(short)*(short *)(*(char **)player_character + 42)) / 5;
+    *(int *)talk_disposition += player_character->attributes[5] / 5;
 L15971:;
     if (*(int *)talk_disposition >= (-20)) goto L159C3;
     msgbox_show_rsc(7205, 1);
@@ -590,9 +591,9 @@ L159BE:;
     return;
 L159C3:;
     *(signed char *)talk_prostitute_offer = 0;
-    if (((int)(short)*(short *)(*(char **)talk_npc_record + 551)) != 512) goto L15A3C;
-    if ((((int)(unsigned short)(*(short *)(*(char **)player_character + 64) & 1)) ^ ((int)(unsigned short)(*(short *)(*(char **)talk_npc_record + 64) & 1))) == 0) goto L15A1F;
-    if (((int)(unsigned short)(*(short *)(*(char **)game_settings) & 4)) == 0) goto L15A21;
+    if (talk_npc_record->faction_id != 512) goto L15A3C;
+    if ((((int)(unsigned short)((short)player_character->flags & 1)) ^ ((int)(unsigned short)(talk_npc_record->flags & 1))) == 0) goto L15A1F;
+    if (((int)(unsigned short)(*(short *)(*(char **)&game_settings) & 4)) == 0) goto L15A21;
 L15A1F:;
     goto L15A2A;
 L15A21:;
@@ -604,7 +605,7 @@ L15A2C:;
     *(signed char *)talk_prostitute_state = 0;
     return;
 L15A3C:;
-    talk_open(*(int *)talk_npc_object);
+    talk_open((int)talk_npc_object);
 }
 
 int talk_prostitute_update(void)
@@ -619,7 +620,7 @@ case 0:
     goto L15BB3;
 case 1:
     if (((int)(unsigned char)*(signed char *)D_00196271) != 2) goto L15AD1;
-    talk_open(*(int *)talk_npc_object);
+    talk_open((int)talk_npc_object);
     goto L15B1A;
 L15AD1:;
     if ((*(int *)talk_prostitute_price = rand_range(50, 75) - *(int *)talk_disposition) <= 0) goto L15B09;
@@ -633,21 +634,21 @@ L15B1A:;
     goto L15BB3;
 case 3:
     if (((int)(unsigned char)*(signed char *)D_00196271) != 1) goto L15B7E;
-    *(int *)(*(char **)player_character + 133) -= *(int *)talk_prostitute_price;
-    if (((unsigned)(*(int *)(*(char **)player_character + 133) + *(int *)talk_prostitute_price)) >= *(int *)talk_prostitute_price) goto L15B7E;
-    *(int *)(*(char **)player_character + 133) += *(int *)talk_prostitute_price;
+    player_character->gold -= *(int *)talk_prostitute_price;
+    if (((unsigned)(player_character->gold + *(int *)talk_prostitute_price)) >= *(int *)talk_prostitute_price) goto L15B7E;
+    player_character->gold += *(int *)talk_prostitute_price;
     msgbox_show_rsc(7203, 1);
     *(signed char *)talk_prostitute_offer = 0;
     goto L15BB3;
 case 2:
 L15B7E:;
     if (((int)(unsigned char)*(signed char *)D_00196271) != 2) goto L15B96;
-    talk_open(*(int *)talk_npc_object);
+    talk_open((int)talk_npc_object);
     goto L15BB3;
 L15B96:;
     func_000164EF();
-    time_pass((int)(short)*(short *)(*(char **)player_character + 40));
-    talk_open(*(int *)talk_npc_object);
+    time_pass(player_character->attributes[4]);
+    talk_open((int)talk_npc_object);
 }
 default:
 L15BB3:;
@@ -706,7 +707,7 @@ int talk_ask_news(void)
     if (*(int *)talk_selected_row == 0) goto L15D7E;
     return 0;
 L15D7E:;
-    l_1C = rumor_pick_news((int)(short)*(short *)(*(char **)talk_npc_faction + 33));
+    l_1C = rumor_pick_news((int)(short)talk_npc_faction->id);
     if (l_1C != 0) goto L15D9E;
     return 0;
 L15D9E:;
@@ -771,9 +772,9 @@ L15F65:;
     goto L15F65;
 L15F75:;
     if (*(signed char *)D_001966BA == 0) goto L15FA1;
-    *(signed char *)(*(char **)talk_npc_object + 26) |= 128;
-    if (((int)(unsigned char)*(signed char *)(*(char **)talk_npc_object)) != 53) goto L15FA1;
-    *(signed char *)(*(char **)talk_npc_object + 29) |= 1;
+    talk_npc_object->lockpick_skill_tried |= 0x8000;
+    if (talk_npc_object->type != 53) goto L15FA1;
+    talk_npc_object->image2 |= 1;
 L15FA1:;
     if (*(int *)talk_face_image == 0) goto L15FB6;
     if (*(int *)talk_face_image != (-1751672937)) goto L15FB8;
@@ -930,8 +931,8 @@ case 0:
     *(signed char *)talk_flags &= 253;
     return;
 L16337:;
-    if (((int)(unsigned short)*(short *)(*(char **)talk_npc_own_faction + 33)) == 806) goto L16361;
-    if (((int)(unsigned short)*(short *)(*(char **)talk_npc_own_faction + 33)) != 842) goto L16363;
+    if (talk_npc_own_faction->id == 806) goto L16361;
+    if (talk_npc_own_faction->id != 842) goto L16363;
 L16361:;
     goto L1636A;
 L16363:;
@@ -1016,8 +1017,8 @@ int talk_macro_hint(int a1)
 
     l_1C = talk_hint_text_id(a1);
     if ((l_1C & 32768) == 0) goto L166A5;
-    *(int *)current_quest = (*(int *)D_00199780 = quest_find_by_id((int)(short)(short)*(signed char *)D_00190D11));
-    quest_load_text(*(int *)current_quest, l_1C & 32767, 0, 0);
+    *(int *)&current_quest = (*(int *)&D_00199780 = quest_find_by_id((int)(short)(short)*(signed char *)D_00190D11));
+    quest_load_text((int)current_quest, l_1C & 32767, 0, 0);
     goto L166B1;
 L166A5:;
     parse_rsc_text(l_1C, 0, 0);
@@ -1056,8 +1057,8 @@ int func_000169D4(int a1)
     int l_20;
     int l_1C;
 
-    *(short *)(*(char **)player_character + 159 + (((int)(unsigned short)*(short *)talk_language_skill) * 6)) = 1;
-    if (rand_range(1, 100) > ((int)(short)*(short *)(*(char **)player_character + 157 + (((int)(unsigned short)*(short *)talk_language_skill) * 6)))) goto L16A36;
+    player_character->skills[(int)(unsigned short)*(short *)talk_language_skill].uses = 1;
+    if (rand_range(1, 100) > player_character->skills[(int)(unsigned short)*(short *)talk_language_skill].value) goto L16A36;
     return a1;
 L16A36:;
     l_20 = rand_range(2, 4);
@@ -1337,49 +1338,49 @@ L174B2:;
 
 void talk_add_quest_topics(int a1)
 {
-    int l_40;
-    int l_3C;
-    int l_38;
-    int l_34;
-    int l_30;
-    int l_2C;
+    struct record *l_40;
+    struct record *l_3C;
+    struct record *l_38;
+    struct qbn_place *l_34;
+    struct qbn_person *l_30;
+    struct qbn_item *l_2C;
     int l_28;
     int l_24;
     int l_20;
     int l_1C;
-    int l_18;
+    struct building *l_18;
 
-    l_40 = *(int *)(*(char **)D_00195A00 + 63);
+    l_40 = D_00195A00->children;
 L174DF:;
     if (l_40 == 0) return;
-    l_3C = *(int *)((char *)l_40 + 55);
-    if (((int)(unsigned char)*(signed char *)((char *)l_40)) != 14) goto L17A4C;
-    *(int *)D_00195D00 = l_40;
-    *(int *)current_quest = (*(int *)D_00199780 = l_40 + 71);
+    l_3C = l_40->next;
+    if (l_40->type != 14) goto L17A4C;
+    *(int *)D_00195D00 = (int)l_40;
+    current_quest = (D_00199780 = &l_40->data.quest);
     if (((unsigned)a1) < 5) goto L17541;
     if (((unsigned)a1) <= 5) goto L1776B;
     if (a1 == 6) goto L1790A;
     goto L17A4C;
 L17541:;
     if (a1 != 4) goto L17A4C;
-    l_34 = quest_section(*(int *)D_00199780, 4);
+    l_34 = (struct qbn_place *)quest_section((int)D_00199780, 4);
     l_24 = 0;
 L17564:;
-    if (((int)(short)*(short *)(*(char **)D_00199780 + 24)) > l_24) goto L17586;
+    if (D_00199780->section_counts[4] > l_24) goto L17586;
     goto L17766;
 L17577:;
     l_24++;
-    (*(char (**)[24])&l_34)++;
+    l_34++;
     goto L17564;
 L17586:;
-    if (*(int *)(*(char **)((char *)l_34 + 16) + 51) == 0) goto L17577;
-    if (((int)(unsigned char)(*(signed char *)((char *)l_34 + 2) & 128)) != 0) goto L17577;
-    l_38 = *(int *)(*(char **)((char *)l_34 + 16) + 51);
-    if (((int)(unsigned char)*(signed char *)((char *)l_38)) == 1) goto L17577;
+    if (l_34->object->twin == 0) goto L17577;
+    if (((int)(unsigned char)(l_34->flags & 128)) != 0) goto L17577;
+    l_38 = l_34->object->twin;
+    if (l_38->type == 1) goto L17577;
     l_28 = quest_symbol_text(*(int *)((char *)l_34 + 12), 0, 0);
     l_18 = object_building(l_38);
-    if (((int)(unsigned char)*(signed char *)((char *)l_18 + 24)) >= 17) goto L175FB;
-    if (((int)(unsigned char)*(signed char *)((char *)l_18 + 24)) != 1) goto L17600;
+    if (l_18->type >= 17) goto L175FB;
+    if (l_18->type != 1) goto L17600;
 L175FB:;
     goto L1768A;
 L17600:;
@@ -1391,10 +1392,10 @@ L17614:;
     l_1C++;
     goto L17607;
 L1761C:;
-    if (*(int *)((char *)(int)(*(char **)talk_place_topics + (l_1C * 19)) + 3) != l_18) goto L17683;
-    *(signed char *)((char *)(int)(*(char **)talk_place_topics + (*(int *)talk_place_topic_count * 19)) + 2) = *(signed char *)(*(char **)D_00199780);
-    *(short *)((char *)(int)(*(char **)talk_place_topics + (*(int *)talk_place_topic_count * 19)) + 15) = *(short *)((char *)l_34 + 20);
-    *(short *)((char *)(int)(*(char **)talk_place_topics + ((*(int *)talk_place_topic_count)++ * 19)) + 17) = *(short *)((char *)l_34 + 22);
+    if (*(int *)((char *)(int)(*(char **)talk_place_topics + (l_1C * 19)) + 3) != (int)l_18) goto L17683;
+    *(signed char *)((char *)(int)(*(char **)talk_place_topics + (*(int *)talk_place_topic_count * 19)) + 2) = (signed char)D_00199780->id;
+    *(short *)((char *)(int)(*(char **)talk_place_topics + (*(int *)talk_place_topic_count * 19)) + 15) = l_34->messages[0];
+    *(short *)((char *)(int)(*(char **)talk_place_topics + ((*(int *)talk_place_topic_count)++ * 19)) + 17) = l_34->messages[1];
 L17683:;
     goto L17614;
 L17685:;
@@ -1403,31 +1404,31 @@ L1768A:;
     talk_list_draw_item(l_28, 6, ((*(int *)talk_list_count - *(int *)talk_list_top) * 7) + 71, l_20, 156);
     *(signed char *)((char *)(int)(*(char **)talk_place_topics + (*(int *)talk_place_topic_count * 19))) = building_category(l_18);
     *(int *)((char *)(int)(*(char **)talk_place_topics + (*(int *)talk_place_topic_count * 19)) + 11) = building_distance(l_18);
-    *(int *)((char *)(int)(*(char **)talk_place_topics + (*(int *)talk_place_topic_count * 19)) + 3) = l_18;
+    *(int *)((char *)(int)(*(char **)talk_place_topics + (*(int *)talk_place_topic_count * 19)) + 3) = (int)l_18;
     *(signed char *)((char *)(int)(*(char **)talk_place_topics + (*(int *)talk_place_topic_count * 19)) + 1) = 1;
-    *(signed char *)((char *)(int)(*(char **)talk_place_topics + (*(int *)talk_place_topic_count * 19)) + 2) = *(signed char *)(*(char **)D_00199780);
-    *(short *)((char *)(int)(*(char **)talk_place_topics + (*(int *)talk_place_topic_count * 19)) + 15) = *(short *)((char *)l_34 + 20);
-    *(short *)((char *)(int)(*(char **)talk_place_topics + ((*(int *)talk_place_topic_count)++ * 19)) + 17) = *(short *)((char *)l_34 + 22);
+    *(signed char *)((char *)(int)(*(char **)talk_place_topics + (*(int *)talk_place_topic_count * 19)) + 2) = (signed char)D_00199780->id;
+    *(short *)((char *)(int)(*(char **)talk_place_topics + (*(int *)talk_place_topic_count * 19)) + 15) = l_34->messages[0];
+    *(short *)((char *)(int)(*(char **)talk_place_topics + ((*(int *)talk_place_topic_count)++ * 19)) + 17) = l_34->messages[1];
     goto L17577;
 L17766:;
     goto L17A4C;
 L1776B:;
-    l_30 = quest_section(*(int *)D_00199780, 3);
+    l_30 = (struct qbn_person *)quest_section((int)D_00199780, 3);
     l_24 = 0;
 L17784:;
-    if (((int)(short)*(short *)(*(char **)D_00199780 + 22)) > l_24) goto L177A6;
+    if (D_00199780->section_counts[3] > l_24) goto L177A6;
     goto L17905;
 L17797:;
     l_24++;
-    (*(char (**)[20])&l_30)++;
+    l_30++;
     goto L17784;
 L177A6:;
-    if (*(int *)((char *)l_30 + 12) == 0) goto L177BB;
-    if (*(int *)(*(char **)((char *)l_30 + 12) + 51) != 0) goto L177BD;
+    if (l_30->object == 0) goto L177BB;
+    if (l_30->object->twin != 0) goto L177BD;
 L177BB:;
     goto L17797;
 L177BD:;
-    if (*(int *)(*(char **)((char *)l_30 + 12) + 51) == *(int *)talk_npc_object) goto L17797;
+    if ((int)l_30->object->twin == (int)talk_npc_object) goto L17797;
     if ((((int)(short)*(short *)((char *)l_30 + 2)) & 32768) != 0) goto L17797;
     l_28 = quest_symbol_text(*(int *)((char *)l_30 + 8), 0, 0);
     if (*(int *)talk_list_count < *(int *)talk_list_top) goto L17806;
@@ -1444,25 +1445,25 @@ L1784C:;
     l_20 = 145;
 L17853:;
     talk_list_draw_item(l_28, 6, (int)&*(signed char *)((char *)((*(int *)talk_list_count - *(int *)talk_list_top) * 7) + 71), l_20, 156);
-    *(int *)((char *)(int)(*(char **)talk_place_topics + (*(int *)talk_list_count * 19)) + 3) = object_building(*(int *)(*(char **)((char *)l_30 + 12) + 51));
+    *(int *)((char *)(int)(*(char **)talk_place_topics + (*(int *)talk_list_count * 19)) + 3) = (int)object_building(l_30->object->twin);
     *(signed char *)((char *)(int)(*(char **)talk_place_topics + (*(int *)talk_list_count * 19)) + 1) = 2;
-    *(signed char *)((char *)(int)(*(char **)talk_place_topics + (*(int *)talk_list_count * 19)) + 2) = *(signed char *)(*(char **)D_00199780);
-    *(short *)((char *)(int)(*(char **)talk_place_topics + (*(int *)talk_list_count * 19)) + 15) = *(short *)((char *)l_30 + 16);
-    *(short *)((char *)(int)(*(char **)talk_place_topics + ((*(int *)talk_list_count)++ * 19)) + 17) = *(short *)((char *)l_30 + 18);
+    *(signed char *)((char *)(int)(*(char **)talk_place_topics + (*(int *)talk_list_count * 19)) + 2) = (signed char)D_00199780->id;
+    *(short *)((char *)(int)(*(char **)talk_place_topics + (*(int *)talk_list_count * 19)) + 15) = l_30->messages[0];
+    *(short *)((char *)(int)(*(char **)talk_place_topics + ((*(int *)talk_list_count)++ * 19)) + 17) = l_30->messages[1];
     goto L17797;
 L17905:;
     goto L17A4C;
 L1790A:;
     goto L17A4C;
 L1790F:;
-    if (((int)(short)*(short *)(*(char **)D_00199780 + 16)) > l_24) goto L17931;
+    if (D_00199780->section_counts[0] > l_24) goto L17931;
     goto L17A4C;
 L17922:;
     l_24++;
-    (*(char (**)[19])&l_2C)++;
+    l_2C++;
     goto L1790F;
 L17931:;
-    if (((int)(unsigned char)(*(signed char *)((char *)l_2C + 2) & 128)) != 0) goto L17922;
+    if (((int)(unsigned char)(l_2C->flags & 128)) != 0) goto L17922;
     l_28 = quest_symbol_text(*(int *)((char *)l_2C + 7), 0, 0);
     if (*(int *)talk_list_count < *(int *)talk_list_top) goto L1796E;
     if (*(int *)talk_list_count <= *(int *)talk_list_bottom) goto L17976;
@@ -1479,9 +1480,9 @@ L179B4:;
 L179BB:;
     talk_list_draw_item(l_28, 6, (int)&*(signed char *)((char *)((*(int *)talk_list_count - *(int *)talk_list_top) * 7) + 71), l_20, 156);
     *(signed char *)((char *)(int)(*(char **)talk_place_topics + (*(int *)talk_list_count * 19)) + 1) = 3;
-    *(signed char *)((char *)(int)(*(char **)talk_place_topics + (*(int *)talk_list_count * 19)) + 2) = *(signed char *)(*(char **)D_00199780);
-    *(short *)((char *)(int)(*(char **)talk_place_topics + (*(int *)talk_list_count * 19)) + 15) = *(short *)((char *)l_2C + 15);
-    *(short *)((char *)(int)(*(char **)talk_place_topics + ((*(int *)talk_list_count)++ * 19)) + 17) = *(short *)((char *)l_2C + 17);
+    *(signed char *)((char *)(int)(*(char **)talk_place_topics + (*(int *)talk_list_count * 19)) + 2) = (signed char)D_00199780->id;
+    *(short *)((char *)(int)(*(char **)talk_place_topics + (*(int *)talk_list_count * 19)) + 15) = l_2C->messages[0];
+    *(short *)((char *)(int)(*(char **)talk_place_topics + ((*(int *)talk_list_count)++ * 19)) + 17) = l_2C->messages[1];
     goto L17922;
 L17A4C:;
     l_40 = l_3C;
@@ -1604,38 +1605,38 @@ void talk_build_place_topics(void)
     int l_2C;
     int l_28;
     int l_24;
-    int l_20;
+    struct building *l_20;
     int l_1C;
     int l_18;
 
-    l_20 = *(int *)(*(char **)current_location + 43);
+    l_20 = current_location->buildings;
     *(int *)talk_place_topic_count = 0;
     l_38 = 0;
 L17E85:;
-    if (((int)(unsigned short)*(short *)(*(char **)current_location + 41)) > l_38) goto L17EAC;
+    if (current_location->building_count > l_38) goto L17EAC;
     goto L17FB8;
 L17E9D:;
     l_38++;
-    (*(char (**)[26])&l_20)++;
+    l_20++;
     goto L17E85;
 L17EAC:;
-    if (((int)(unsigned char)*(signed char *)((char *)l_20 + 24)) >= 17) goto L17ECC;
-    if (((int)(unsigned char)*(signed char *)((char *)l_20 + 24)) != 1) goto L17ECE;
+    if (l_20->type >= 17) goto L17ECC;
+    if (l_20->type != 1) goto L17ECE;
 L17ECC:;
     goto L17E9D;
 L17ECE:;
-    l_1C = memchr((int)talk_category_building_types, (int)(unsigned char)*(signed char *)((char *)l_20 + 24), 13);
+    l_1C = memchr((int)talk_category_building_types, l_20->type, 13);
     if (l_1C == 0) goto L17F58;
     *(signed char *)((char *)(int)(*(char **)talk_place_topics + (*(int *)talk_place_topic_count * 19))) = l_1C - ((int)talk_category_building_types);
     *(signed char *)((char *)(int)(*(char **)talk_place_topics + (*(int *)talk_place_topic_count * 19)) + 1) = 0;
     *(int *)((char *)(int)(*(char **)talk_place_topics + (*(int *)talk_place_topic_count * 19)) + 11) = building_distance(l_20);
-    *(int *)((char *)(int)(*(char **)talk_place_topics + ((*(int *)talk_place_topic_count)++ * 19)) + 3) = l_20;
+    *(int *)((char *)(int)(*(char **)talk_place_topics + ((*(int *)talk_place_topic_count)++ * 19)) + 3) = (int)l_20;
     goto L17FB3;
 L17F58:;
     *(signed char *)((char *)(int)(*(char **)talk_place_topics + (*(int *)talk_place_topic_count * 19))) = 13;
     *(signed char *)((char *)(int)(*(char **)talk_place_topics + (*(int *)talk_place_topic_count * 19)) + 1) = 0;
     *(int *)((char *)(int)(*(char **)talk_place_topics + (*(int *)talk_place_topic_count * 19)) + 11) = building_distance(l_20);
-    *(int *)((char *)(int)(*(char **)talk_place_topics + ((*(int *)talk_place_topic_count)++ * 19)) + 3) = l_20;
+    *(int *)((char *)(int)(*(char **)talk_place_topics + ((*(int *)talk_place_topic_count)++ * 19)) + 3) = (int)l_20;
 L17FB3:;
     goto L17E9D;
 L17FB8:;
@@ -1701,22 +1702,22 @@ L18221:;
     goto L181A9;
 }
 
-int building_category(int a1)
+int building_category(struct building *a1)
 {
     int l_1C;
 
-    if (((int)(unsigned char)*(signed char *)((char *)a1 + 24)) == 1) goto L1825E;
-    if (((int)(unsigned char)*(signed char *)((char *)a1 + 24)) <= 16) goto L18260;
+    if (a1->type == 1) goto L1825E;
+    if (a1->type <= 16) goto L18260;
 L1825E:;
     goto L18298;
 L18260:;
-    l_1C = memchr((int)talk_category_building_types, (int)(unsigned char)*(signed char *)((char *)a1 + 24), 13);
+    l_1C = memchr((int)talk_category_building_types, a1->type, 13);
     if (l_1C != 0) goto L18289;
     return 13;
 L18289:;
     return l_1C - ((int)talk_category_building_types);
 L18298:;
-    if (((int)(unsigned char)(*(signed char *)((char *)a1 + 15) & 8)) == 0) goto L182B2;
+    if (((int)(unsigned char)(a1->flags & 8)) == 0) goto L182B2;
     return 13;
 L182B2:;
     return -1;
@@ -1725,16 +1726,16 @@ L182B2:;
 int town_has_category(int a1)
 {
     int l_20;
-    int l_1C;
+    struct building *l_1C;
 
-    l_1C = *(int *)(*(char **)current_location + 43);
+    l_1C = current_location->buildings;
     l_20 = 0;
 L182E9:;
-    if (((int)(unsigned short)*(short *)(*(char **)current_location + 41)) > l_20) goto L1830D;
+    if (current_location->building_count > l_20) goto L1830D;
     goto L18325;
 L182FE:;
     l_20++;
-    (*(char (**)[26])&l_1C)++;
+    l_1C++;
     goto L182E9;
 L1830D:;
     if (building_category(l_1C) != a1) goto L18323;
@@ -1748,64 +1749,64 @@ L18325:;
 void func_00018339(void)
 {
     int l_1C;
-    int l_18;
+    struct building *l_18;
 
-    l_18 = *(int *)(*(char **)current_location + 43);
+    l_18 = current_location->buildings;
     l_1C = 0;
 L18359:;
-    if (((int)(unsigned short)*(short *)(*(char **)current_location + 41)) > l_1C) goto L1837D;
+    if (current_location->building_count > l_1C) goto L1837D;
     return;
 L1836E:;
     l_1C++;
-    (*(char (**)[26])&l_18)++;
+    l_18++;
     goto L18359;
 L1837D:;
     if (quest_find_site_for_building(l_18) == 0) goto L18390;
-    *(signed char *)((char *)l_18 + 15) |= 8;
+    l_18->flags |= 8;
 L18390:;
     goto L1836E;
 }
 
 void func_0001839C(void)
 {
-    int l_38;
-    int l_34;
-    int l_30;
-    int l_2C;
-    int l_28;
+    struct record *l_38;
+    struct record *l_34;
+    struct qbn_place *l_30;
+    struct qbn_person *l_2C;
+    struct qbn_item *l_28;
     int l_24;
     int l_20;
     int l_1C;
     int l_18;
 
-    l_38 = *(int *)(*(char **)D_00195A00 + 63);
+    l_38 = D_00195A00->children;
 L183B5:;
     if (l_38 == 0) return;
-    l_34 = *(int *)((char *)l_38 + 55);
-    if (((int)(unsigned char)*(signed char *)((char *)l_38)) != 14) goto L18889;
-    *(int *)D_00195D00 = l_38;
-    *(int *)current_quest = (*(int *)D_00199780 = l_38 + 71);
-    l_30 = quest_section(*(int *)D_00199780, 4);
+    l_34 = l_38->next;
+    if (l_38->type != 14) goto L18889;
+    *(int *)D_00195D00 = (int)l_38;
+    current_quest = (D_00199780 = &l_38->data.quest);
+    l_30 = (struct qbn_place *)quest_section((int)D_00199780, 4);
     l_20 = 0;
 L18411:;
-    if (((int)(short)*(short *)(*(char **)D_00199780 + 24)) > l_20) goto L18433;
+    if (D_00199780->section_counts[4] > l_20) goto L18433;
     goto L1856C;
 L18424:;
     l_20++;
-    (*(char (**)[24])&l_30)++;
+    l_30++;
     goto L18411;
 L18433:;
-    if (*(short *)((char *)l_30 + 20) != 0) goto L18447;
-    if (*(short *)((char *)l_30 + 22) == 0) goto L18449;
+    if (l_30->messages[0] != 0) goto L18447;
+    if (l_30->messages[1] == 0) goto L18449;
 L18447:;
     goto L1844B;
 L18449:;
     goto L18424;
 L1844B:;
-    if (((int)(unsigned char)(*(signed char *)((char *)l_30 + 2) & 128)) != 0) goto L18424;
-    *(short *)((char *)(int)(*(char **)talk_topics + (((int)(short)*(short *)D_001966A2) * 6))) = *(short *)((char *)l_30 + 20);
-    (*(short **)talk_topics)[((int)(short)*(short *)D_001966A2) * 3 + 1] = *(short *)((char *)l_30 + 22);
-    (*(short **)talk_topics)[((int)(short)*(short *)D_001966A2) * 3 + 2] = *(short *)(*(char **)D_00199780);
+    if (((int)(unsigned char)(l_30->flags & 128)) != 0) goto L18424;
+    *(short *)((char *)(int)(*(char **)talk_topics + (((int)(short)*(short *)D_001966A2) * 6))) = l_30->messages[0];
+    (*(short **)talk_topics)[((int)(short)*(short *)D_001966A2) * 3 + 1] = l_30->messages[1];
+    (*(short **)talk_topics)[((int)(short)*(short *)D_001966A2) * 3 + 2] = D_00199780->id;
     (*(short *)D_001966A2)++;
     if (*(int *)talk_list_count < *(int *)talk_list_top) goto L184D9;
     if (*(int *)talk_list_count <= *(int *)talk_list_bottom) goto L184E4;
@@ -1825,34 +1826,34 @@ L1853B:;
     (*(int *)talk_list_count)++;
     goto L18424;
 L1856C:;
-    l_2C = quest_section(*(int *)D_00199780, 3);
+    l_2C = (struct qbn_person *)quest_section((int)D_00199780, 3);
     l_20 = 0;
 L18585:;
-    if (((int)(short)*(short *)(*(char **)D_00199780 + 22)) > l_20) goto L185A7;
+    if (D_00199780->section_counts[3] > l_20) goto L185A7;
     goto L186FC;
 L18598:;
     l_20++;
-    (*(char (**)[20])&l_2C)++;
+    l_2C++;
     goto L18585;
 L185A7:;
-    if (*(short *)((char *)l_2C + 16) != 0) goto L185BB;
-    if (*(short *)((char *)l_2C + 18) == 0) goto L185BD;
+    if (l_2C->messages[0] != 0) goto L185BB;
+    if (l_2C->messages[1] == 0) goto L185BD;
 L185BB:;
     goto L185BF;
 L185BD:;
     goto L18598;
 L185BF:;
     if ((((int)(short)*(short *)((char *)l_2C + 2)) & 32768) != 0) goto L18598;
-    if (*(int *)(*(char **)((char *)l_2C + 12) + 51) == 0) goto L185E8;
-    if (*(int *)(*(char **)((char *)l_2C + 12) + 51) == *(int *)talk_npc_object) goto L185EA;
+    if (l_2C->object->twin == 0) goto L185E8;
+    if ((int)l_2C->object->twin == (int)talk_npc_object) goto L185EA;
 L185E8:;
     goto L185EC;
 L185EA:;
     goto L18598;
 L185EC:;
-    *(short *)((char *)(int)(*(char **)talk_topics + (((int)(short)*(short *)D_001966A2) * 6))) = *(short *)((char *)l_2C + 16);
-    (*(short **)talk_topics)[((int)(short)*(short *)D_001966A2) * 3 + 1] = *(short *)((char *)l_2C + 18);
-    (*(short **)talk_topics)[((int)(short)*(short *)D_001966A2) * 3 + 2] = *(short *)(*(char **)D_00199780);
+    *(short *)((char *)(int)(*(char **)talk_topics + (((int)(short)*(short *)D_001966A2) * 6))) = l_2C->messages[0];
+    (*(short **)talk_topics)[((int)(short)*(short *)D_001966A2) * 3 + 1] = l_2C->messages[1];
+    (*(short **)talk_topics)[((int)(short)*(short *)D_001966A2) * 3 + 2] = D_00199780->id;
     (*(short *)D_001966A2)++;
     if (*(int *)talk_list_count < *(int *)talk_list_top) goto L18669;
     if (*(int *)talk_list_count <= *(int *)talk_list_bottom) goto L18674;
@@ -1872,24 +1873,24 @@ L186CB:;
     (*(int *)talk_list_count)++;
     goto L18598;
 L186FC:;
-    l_28 = quest_section(*(int *)D_00199780, 0);
+    l_28 = (struct qbn_item *)quest_section((int)D_00199780, 0);
     l_20 = 0;
 L18712:;
-    if (((int)(short)*(short *)(*(char **)D_00199780 + 16)) > l_20) goto L18734;
+    if (D_00199780->section_counts[0] > l_20) goto L18734;
     goto L18889;
 L18725:;
     l_20++;
-    (*(char (**)[19])&l_28)++;
+    l_28++;
     goto L18712;
 L18734:;
-    if (*(short *)((char *)l_28 + 15) != 0) goto L18748;
-    if (*(short *)((char *)l_28 + 17) == 0) goto L1874A;
+    if (l_28->messages[0] != 0) goto L18748;
+    if (l_28->messages[1] == 0) goto L1874A;
 L18748:;
     goto L1874C;
 L1874A:;
     goto L18725;
 L1874C:;
-    if (((int)(unsigned char)(*(signed char *)((char *)l_28 + 2) & 128)) != 0) goto L18725;
+    if (((int)(unsigned char)(l_28->flags & 128)) != 0) goto L18725;
     if (((int)(short)*(short *)((char *)l_28 + 3)) != 9) goto L18775;
     if (((int)(short)*(short *)((char *)l_28 + 5)) == 5) goto L18777;
 L18775:;
@@ -1897,9 +1898,9 @@ L18775:;
 L18777:;
     goto L18725;
 L18779:;
-    *(short *)((char *)(int)(*(char **)talk_topics + (((int)(short)*(short *)D_001966A2) * 6))) = *(short *)((char *)l_28 + 15);
-    (*(short **)talk_topics)[((int)(short)*(short *)D_001966A2) * 3 + 1] = *(short *)((char *)l_28 + 17);
-    (*(short **)talk_topics)[((int)(short)*(short *)D_001966A2) * 3 + 2] = *(short *)(*(char **)D_00199780);
+    *(short *)((char *)(int)(*(char **)talk_topics + (((int)(short)*(short *)D_001966A2) * 6))) = l_28->messages[0];
+    (*(short **)talk_topics)[((int)(short)*(short *)D_001966A2) * 3 + 1] = l_28->messages[1];
+    (*(short **)talk_topics)[((int)(short)*(short *)D_001966A2) * 3 + 2] = D_00199780->id;
     (*(short *)D_001966A2)++;
     if (*(int *)talk_list_count < *(int *)talk_list_top) goto L187F6;
     if (*(int *)talk_list_count <= *(int *)talk_list_bottom) goto L18801;
@@ -1929,7 +1930,7 @@ int talk_faction_greeting(short a1)
     int l_28;
     short l_1C;
 
-    *(int *)&l_1C = faction_find((int)(short)a1);
+    *(int *)&l_1C = (int)faction_find((int)(short)a1);
     if (((int)(unsigned char)*(signed char *)(*(char **)&l_1C)) == 15) goto L18B09;
     if (((int)(unsigned char)*(signed char *)(*(char **)&l_1C)) != 14) goto L18B15;
 L18B09:;
@@ -1938,7 +1939,7 @@ L18B15:;
     l_24 = talk_faction_relation((int)(short)a1);
     *(short *)D_001966AC += *(short *)(*(char **)&l_1C + 29);
     if (((int)(unsigned char)*(signed char *)(*(char **)&l_1C + 54)) >= 5) goto L18B62;
-    *(short *)D_001966AC += *(short *)(*(char **)player_character + 145 + (((int)(unsigned char)*(signed char *)(*(char **)&l_1C + 54)) * 2));
+    *(short *)D_001966AC += player_character->reputation[(int)(unsigned char)*(signed char *)(*(char **)&l_1C + 54)];
 L18B62:;
     l_28 = rand_range(0, 15) - 10;
     if (((int)(short)*(short *)D_001966AC) < l_28) goto L18B8C;
@@ -1963,13 +1964,13 @@ int talk_roll_knows(void)
     int l_1C;
 
     l_1C = rand();
-    if (((int)(unsigned short)*(short *)(*(char **)talk_npc_own_faction + 33)) == 806) goto L18FBC;
-    if (((int)(unsigned short)*(short *)(*(char **)talk_npc_own_faction + 33)) != 842) goto L18FC8;
+    if (talk_npc_own_faction->id == 806) goto L18FBC;
+    if (talk_npc_own_faction->id != 842) goto L18FC8;
 L18FBC:;
     return 1;
 L18FC8:;
     l_24 = ((1 - ((int)(unsigned char)*(signed char *)talk_question_mode)) << 2) + ((int)(unsigned char)*(signed char *)talk_topic_tab);
-    srand(((*(int *)(*(char **)talk_npc_object + 31) ^ (((unsigned)*(int *)(*(char **)talk_npc_object + 31)) >> 16)) + l_24) + *(int *)talk_selected_row);
+    srand(((talk_npc_object->id ^ (((unsigned)talk_npc_object->id) >> 16)) + l_24) + *(int *)talk_selected_row);
     if (rand_range(1, 20) > (((int)(short)*(short *)(D_001799F2 + ((l_24 * 10) + (*(int *)talk_npc_speech_style * 2)))) + 10)) goto L1903F;
     l_28 = 1;
     goto L19046;
@@ -1988,7 +1989,7 @@ int talk_roll_attitude(void)
 
     l_20 = 0;
     if (*(signed char *)talk_tone != 0) goto L190C6;
-    if (rand_range(1, 100) >= ((int)(short)*(short *)(*(char **)player_character + 163))) goto L190AA;
+    if (rand_range(1, 100) >= player_character->skills[1].value) goto L190AA;
     l_20 += 10;
     goto L190AE;
 L190AA:;
@@ -1998,7 +1999,7 @@ L190AE:;
     skill_add_uses(1, 1);
 L190C6:;
     if (((int)(unsigned char)*(signed char *)talk_tone) != 2) goto L19113;
-    if (rand_range(1, 100) >= ((int)(short)*(short *)(*(char **)player_character + 169))) goto L190F7;
+    if (rand_range(1, 100) >= player_character->skills[2].value) goto L190F7;
     l_20 += 10;
     goto L190FB;
 L190F7:;
@@ -2008,7 +2009,7 @@ L190FB:;
     skill_add_uses(2, 1);
 L19113:;
     l_20 += (int)(short)*(short *)(D_001799E2 + ((((1 - ((int)(unsigned char)*(signed char *)talk_question_mode)) << 2) + ((int)(unsigned char)*(signed char *)talk_topic_tab)) * 2));
-    l_20 += ((int)(short)*(short *)(*(char **)player_character + 42)) / 5;
+    l_20 += player_character->attributes[5] / 5;
     l_1C = rand_range(0, 20);
     if (*(int *)(talk_attitude_cache + (((int)(unsigned char)*(signed char *)talk_tone) << 2)) == 0) goto L1918D;
     l_20 = *(int *)(talk_attitude_cache + (((int)(unsigned char)*(signed char *)talk_tone) << 2));
@@ -2025,66 +2026,66 @@ L191C6:;
     return 1;
 }
 
-int faction_find_type_in_region_r(int a1, short a2, short a3)
+struct faction *faction_find_type_in_region_r(struct faction *a1, short a2, short a3)
 {
-    int l_1C;
+    struct faction *l_1C;
 
 L19249:;
     if (a1 == 0) goto L192DC;
-    if ((short)((unsigned short)(unsigned char)*(signed char *)((char *)a1)) != a3) goto L19270;
-    if (((int)(unsigned char)*(signed char *)((char *)a1 + 1)) == (-1)) goto L19272;
+    if ((short)((unsigned short)a1->type) != a3) goto L19270;
+    if (a1->region == (-1)) goto L19272;
 L19270:;
     goto L1927C;
 L19272:;
-    *(int *)D_0019671C = a1;
+    D_0019671C = a1;
     goto L192A1;
 L1927C:;
-    if ((short)((unsigned short)(unsigned char)*(signed char *)((char *)a1)) != a3) goto L19297;
-    if ((short)((unsigned short)(unsigned char)*(signed char *)((char *)a1 + 1)) == a2) goto L19299;
+    if ((short)((unsigned short)a1->type) != a3) goto L19297;
+    if ((short)((unsigned short)a1->region) == a2) goto L19299;
 L19297:;
     goto L192A1;
 L19299:;
     return a1;
 L192A1:;
-    if (*(int *)((char *)a1 + 84) == 0) goto L192CE;
-    l_1C = faction_find_type_in_region_r(*(int *)((char *)a1 + 84), (int)(short)a2, (int)(short)a3);
+    if (a1->child == 0) goto L192CE;
+    l_1C = faction_find_type_in_region_r(a1->child, (int)(short)a2, (int)(short)a3);
     if (l_1C == 0) goto L192CE;
     return l_1C;
 L192CE:;
-    a1 = *(int *)((char *)a1 + 80);
+    a1 = a1->next;
     goto L19249;
 L192DC:;
     return 0;
 }
 
-int faction_find_r(int a1, short a2)
+struct faction *faction_find_r(struct faction *a1, short a2)
 {
     short l_18;
 
 L19336:;
     if (a1 == 0) goto L19389;
-    if (*(unsigned short *)((char *)a1 + 33) != (short)a2) goto L19355;
+    if (a1->id != (short)a2) goto L19355;
     return a1;
 L19355:;
-    if (*(int *)((char *)a1 + 84) == 0) goto L1937E;
-    *(int *)&l_18 = faction_find_r(*(int *)((char *)a1 + 84), (int)(short)a2);
+    if (a1->child == 0) goto L1937E;
+    *(int *)&l_18 = (int)faction_find_r(a1->child, (int)(short)a2);
     if (*(int *)&l_18 == 0) goto L1937E;
-    return *(int *)&l_18;
+    return (struct faction *)*(int *)&l_18;
 L1937E:;
-    a1 = *(int *)((char *)a1 + 80);
+    a1 = a1->next;
     goto L19336;
 L19389:;
     return 0;
 }
 
-void func_000193DD(int a1)
+void func_000193DD(struct faction *a1)
 {
     int l_1C;
     int l_18;
 
 L193EE:;
     if (a1 == 0) return;
-    if (a1 != *(int *)D_00190BE4) goto L1940A;
+    if ((int)a1 != *(int *)D_00190BE4) goto L1940A;
     *(signed char *)D_00195B84 |= 1;
 L1940A:;
     l_18 = 0;
@@ -2095,30 +2096,30 @@ L19419:;
     l_18++;
     goto L19411;
 L19421:;
-    if (*(int *)((char *)((l_18 << 2) + a1) + 56) != *(int *)D_00190BE4) goto L1943C;
+    if ((int)a1->allies[l_18] != *(int *)D_00190BE4) goto L1943C;
     *(signed char *)D_00195B84 |= 1;
 L1943C:;
-    if (*(int *)((char *)((l_18 << 2) + a1) + 68) != *(int *)D_00190BE4) goto L19457;
+    if ((int)a1->enemies[l_18] != *(int *)D_00190BE4) goto L19457;
     *(signed char *)D_00195B84 |= 2;
 L19457:;
     goto L19419;
 L19459:;
-    if (*(int *)((char *)a1 + 84) == 0) goto L1946D;
-    func_000193DD(*(int *)((char *)a1 + 84));
+    if (a1->child == 0) goto L1946D;
+    func_000193DD(a1->child);
 L1946D:;
-    a1 = *(int *)((char *)a1 + 80);
+    a1 = a1->next;
     goto L193EE;
 }
 
-int faction_random(void)
+struct faction *faction_random(void)
 {
     *(int *)D_00195B84 = rand_range(0, *(int *)faction_count - 1);
-    return faction_nth_r(*(int *)factions);
+    return faction_nth_r(factions);
 }
 
-int faction_nth_r(int a1)
+struct faction *faction_nth_r(struct faction *a1)
 {
-    int l_1C;
+    struct faction *l_1C;
 
 L194D1:;
     if (a1 == 0) goto L1951E;
@@ -2126,69 +2127,69 @@ L194D1:;
     return a1;
 L194E8:;
     (*(int *)D_00195B84)--;
-    if (*(int *)((char *)a1 + 84) == 0) goto L19513;
-    l_1C = faction_nth_r(*(int *)((char *)a1 + 84));
+    if (a1->child == 0) goto L19513;
+    l_1C = faction_nth_r(a1->child);
     if (l_1C == 0) goto L19513;
     return l_1C;
 L19513:;
-    a1 = *(int *)((char *)a1 + 80);
+    a1 = a1->next;
     goto L194D1;
 L1951E:;
     return 0;
 }
 
-int faction_nth_of_type_r(int a1, unsigned char a2)
+struct faction *faction_nth_of_type_r(struct faction *a1, unsigned char a2)
 {
     short l_18;
 
 L19545:;
     if (a1 == 0) goto L195B1;
     if (*(int *)D_00195B84 != 0) goto L19562;
-    if (*(unsigned char *)((char *)a1) == a2) goto L19564;
+    if (a1->type == a2) goto L19564;
 L19562:;
     goto L1956C;
 L19564:;
     return a1;
 L1956C:;
-    if (*(int *)((char *)a1 + 84) == 0) goto L19596;
-    *(int *)&l_18 = faction_nth_of_type_r(*(int *)((char *)a1 + 84), (int)(unsigned char)a2);
+    if (a1->child == 0) goto L19596;
+    *(int *)&l_18 = (int)faction_nth_of_type_r(a1->child, (int)(unsigned char)a2);
     if (*(int *)&l_18 == 0) goto L19596;
-    return *(int *)&l_18;
+    return (struct faction *)*(int *)&l_18;
 L19596:;
-    if (*(unsigned char *)((char *)a1) != a2) goto L195A6;
+    if (a1->type != a2) goto L195A6;
     (*(int *)D_00195B84)--;
 L195A6:;
-    a1 = *(int *)((char *)a1 + 80);
+    a1 = a1->next;
     goto L19545;
 L195B1:;
     return 0;
 }
 
-void faction_count_of_type_r(int a1, unsigned char a2)
+void faction_count_of_type_r(struct faction *a1, unsigned char a2)
 {
     int l_18;
 
 L195D7:;
     if (a1 == 0) return;
-    if (*(unsigned char *)((char *)a1) != a2) goto L195ED;
+    if (a1->type != a2) goto L195ED;
     (*(int *)D_00195B84)++;
 L195ED:;
-    if (*(int *)((char *)a1 + 84) == 0) goto L19606;
-    faction_count_of_type_r(*(int *)((char *)a1 + 84), (int)(unsigned char)a2);
+    if (a1->child == 0) goto L19606;
+    faction_count_of_type_r(a1->child, (int)(unsigned char)a2);
 L19606:;
-    a1 = *(int *)((char *)a1 + 80);
+    a1 = a1->next;
     goto L195D7;
 }
 
-int faction_random_of_type(unsigned char a1)
+struct faction *faction_random_of_type(unsigned char a1)
 {
     *(int *)D_00195B84 = 0;
-    faction_count_of_type_r(*(int *)factions, (int)(unsigned char)a1);
+    faction_count_of_type_r(factions, (int)(unsigned char)a1);
     *(int *)D_00195B84 = rand_range(0, *(int *)D_00195B84 - 1);
-    return faction_nth_of_type_r(*(int *)factions, (int)(unsigned char)a1);
+    return faction_nth_of_type_r(factions, (int)(unsigned char)a1);
 }
 
-int func_0001AC53(int a1, int a2)
+int func_0001AC53(struct faction *a1, struct faction *a2)
 {
 {
     int l_20;
@@ -2216,12 +2217,12 @@ L1ACB8:;
 }
 }
 
-int faction_is_regional_noble(int a1)
+int faction_is_regional_noble(struct faction *a1)
 {
-    return (((((int)(unsigned char)*(signed char *)((char *)a1)) == 7) && (((int)(unsigned char)*(signed char *)((char *)a1 + 1)) != 255)) ? 1 : 0);
+    return (((a1->type == 7) && (a1->region != 255)) ? 1 : 0);
 }
 
-int faction_has_enemy(int a1, int a2)
+int faction_has_enemy(struct faction *a1, struct faction *a2)
 {
 {
     int l_20;
@@ -2232,12 +2233,12 @@ L1AD43:;
     if (a1 != 0) goto L1AD52;
     return 0;
 L1AD52:;
-    if (*(int *)((char *)a1 + 68) == a2) goto L1AD68;
-    if (*(int *)((char *)a1 + 72) != a2) goto L1AD6A;
+    if ((int)a1->enemies[0] == a2) goto L1AD68;
+    if ((int)a1->enemies[1] != a2) goto L1AD6A;
 L1AD68:;
     goto L1AD75;
 L1AD6A:;
-    if (*(int *)((char *)a1 + 76) != a2) goto L1AD7E;
+    if ((int)a1->enemies[2] != a2) goto L1AD7E;
 L1AD75:;
     l_20 = 1;
     goto L1AD85;
@@ -2248,7 +2249,7 @@ L1AD85:;
 }
 }
 
-int faction_has_ally(int a1, int a2)
+int faction_has_ally(struct faction *a1, struct faction *a2)
 {
 {
     int l_20;
@@ -2259,12 +2260,12 @@ L1ADB9:;
     if (a2 != 0) goto L1ADC8;
     return 0;
 L1ADC8:;
-    if (*(int *)((char *)a1 + 56) == a2) goto L1ADDE;
-    if (*(int *)((char *)a1 + 60) != a2) goto L1ADE0;
+    if ((int)a1->allies[0] == a2) goto L1ADDE;
+    if ((int)a1->allies[1] != a2) goto L1ADE0;
 L1ADDE:;
     goto L1ADEB;
 L1ADE0:;
-    if (*(int *)((char *)a1 + 64) != a2) goto L1ADF4;
+    if ((int)a1->allies[2] != a2) goto L1ADF4;
 L1ADEB:;
     l_20 = 1;
     goto L1ADFB;
@@ -2275,40 +2276,40 @@ L1ADFB:;
 }
 }
 
-void faction_add_power(int a1, int a2)
+void faction_add_power(struct faction *a1, int a2)
 {
     if (a1 == 0) return;
-    *(short *)((char *)a1 + 31) += a2;
-    if (((int)(short)*(short *)((char *)a1 + 31)) <= 100) goto L1AE47;
-    *(short *)((char *)a1 + 31) = 100;
+    a1->power += a2;
+    if (a1->power <= 100) goto L1AE47;
+    a1->power = 100;
     return;
 L1AE47:;
-    if (*(short *)((char *)a1 + 31) >= 0) return;
-    *(short *)((char *)a1 + 31) = 1;
+    if (a1->power >= 0) return;
+    a1->power = 1;
 }
 
-void func_0001AE63(int a1)
+void func_0001AE63(struct faction *a1)
 {
 L1AE74:;
     if (a1 == 0) return;
-    if (*(int *)((char *)a1 + 84) == 0) goto L1AE8E;
-    func_0001AE63(*(int *)((char *)a1 + 84));
+    if (a1->child == 0) goto L1AE8E;
+    func_0001AE63(a1->child);
 L1AE8E:;
-    if (((int)(short)*(short *)((char *)a1 + 31)) <= *(int *)D_00195B84) goto L1AEA9;
-    *(int *)D_00195B84 = (int)(short)*(short *)((char *)a1 + 31);
+    if (a1->power <= *(int *)D_00195B84) goto L1AEA9;
+    *(int *)D_00195B84 = a1->power;
 L1AEA9:;
-    a1 = *(int *)((char *)a1 + 80);
+    a1 = a1->next;
     goto L1AE74;
 }
 
-int func_0001AEBE(int a1)
+int func_0001AEBE(struct faction *a1)
 {
     *(int *)D_00195B84 = 0;
-    func_0001AE63(*(int *)((char *)a1 + 84));
+    func_0001AE63(a1->child);
     return *(int *)D_00195B84;
 }
 
-int func_0001AEF9(int a1, int a2)
+int func_0001AEF9(struct faction *a1, struct faction *a2)
 {
     int l_20;
     int l_1C;
@@ -2331,7 +2332,7 @@ L1AF39:;
     l_1C++;
     goto L1AF31;
 L1AF41:;
-    if (faction_has_ally(*(int *)((char *)((l_20 << 2) + a1) + 56), *(int *)((char *)((l_1C << 2) + a2) + 56)) == 0) goto L1AF66;
+    if (faction_has_ally(a1->allies[l_20], a2->allies[l_1C]) == 0) goto L1AF66;
     l_18 += 3;
 L1AF66:;
     goto L1AF39;
@@ -2354,7 +2355,7 @@ L1AF90:;
     l_1C++;
     goto L1AF88;
 L1AF98:;
-    if (faction_has_enemy(*(int *)((char *)((l_20 << 2) + a1) + 68), *(int *)((char *)((l_1C << 2) + a2) + 68)) == 0) goto L1AFBD;
+    if (faction_has_enemy(a1->enemies[l_20], a2->enemies[l_1C]) == 0) goto L1AFBD;
     l_18 += 3;
 L1AFBD:;
     goto L1AF90;
@@ -2364,40 +2365,40 @@ L1AFC1:;
     return *(int *)D_00195B84;
 }
 
-int func_0001AFD5(int a1)
+int func_0001AFD5(struct faction *a1)
 {
     if (*(int *)D_00195B84 == 0) goto L1AFFC;
     return *(int *)D_00195B84;
 L1AFFC:;
     if (a1 == 0) goto L1B05A;
-    if (a1 != *(int *)D_0019670C) goto L1B014;
+    if ((int)a1 != *(int *)D_0019670C) goto L1B014;
     *(signed char *)D_00195B84 |= 2;
 L1B014:;
-    if (a1 != *(int *)D_0019671C) goto L1B030;
+    if (a1 != D_0019671C) goto L1B030;
     *(signed char *)D_00195B84 |= 1;
     return *(int *)D_00195B84;
 L1B030:;
-    if (*(int *)((char *)a1 + 84) == 0) goto L1B042;
+    if (a1->child == 0) goto L1B042;
     if (((struct bf8_1_1 *)&D_00195B84)->f == 0) goto L1B044;
 L1B042:;
     goto L1B04F;
 L1B044:;
-    func_0001AFD5(*(int *)((char *)a1 + 84));
+    func_0001AFD5(a1->child);
 L1B04F:;
-    a1 = *(int *)((char *)a1 + 80);
+    a1 = a1->next;
     goto L1AFFC;
 L1B05A:;
     return *(int *)D_00195B84;
 }
 
-int func_0001B144(int a1, int a2)
+int func_0001B144(struct faction *a1, struct faction *a2)
 {
     int l_20;
     int l_1C;
     int l_18;
 
     if (a1 == 0) goto L1B16F;
-    if (((int)(unsigned char)*(signed char *)((char *)a1 + 1)) != 255) goto L1B171;
+    if (a1->region != 255) goto L1B171;
 L1B16F:;
     goto L1B177;
 L1B171:;
@@ -2405,12 +2406,12 @@ L1B171:;
 L1B177:;
     goto L1B18B;
 L1B179:;
-    if (((int)(unsigned char)*(signed char *)((char *)a2 + 1)) != 255) goto L1B18D;
+    if (a2->region != 255) goto L1B18D;
 L1B18B:;
     goto L1B1E4;
 L1B18D:;
-    l_20 = ((int)D_0017C668) + (((int)(unsigned char)*(signed char *)((char *)a1 + 1)) * 11);
-    l_18 = (int)(unsigned char)*(signed char *)((char *)a2 + 1);
+    l_20 = ((int)D_0017C668) + (a1->region * 11);
+    l_18 = a2->region;
     l_1C = 0;
 L1B1B7:;
     if (l_1C < 11) goto L1B1C7;
@@ -2427,78 +2428,78 @@ L1B1E4:;
     return 0;
 }
 
-int faction_power(int a1)
+int faction_power(struct faction *a1)
 {
     if (a1 == 0) goto L1B21A;
-    return (int)(short)*(short *)((char *)a1 + 31);
+    return a1->power;
 L1B21A:;
     return 0;
 }
 
-void func_0001B22E(int a1)
+void func_0001B22E(struct faction *a1)
 {
-    if (((int)(unsigned char)*(signed char *)((char *)a1)) != 7) goto L1B260;
-    if (((int)(unsigned char)*(signed char *)((char *)a1 + 1)) != 255) goto L1B265;
+    if (a1->type != 7) goto L1B260;
+    if (a1->region != 255) goto L1B265;
 L1B260:;
     return;
 L1B265:;
-    *(signed char *)(region_event_groups + (((int)(unsigned char)*(signed char *)((char *)a1 + 1)) * 80)) = 0;
-    *(signed char *)(region_event_values + (((int)(unsigned char)*(signed char *)((char *)a1 + 1)) * 80)) = 0;
-    *(signed char *)(region_event_flags + (((int)(unsigned char)*(signed char *)((char *)a1 + 1)) * 80)) = 0;
-    *(signed char *)(D_0018F062 + (((int)(unsigned char)*(signed char *)((char *)a1 + 1)) * 80)) = 0;
-    *(signed char *)(D_0018F063 + (((int)(unsigned char)*(signed char *)((char *)a1 + 1)) * 80)) = 0;
-    *(signed char *)(D_0018F064 + (((int)(unsigned char)*(signed char *)((char *)a1 + 1)) * 80)) = 0;
+    *(signed char *)(region_event_groups + (a1->region * 80)) = 0;
+    *(signed char *)(region_event_values + (a1->region * 80)) = 0;
+    *(signed char *)(region_event_flags + (a1->region * 80)) = 0;
+    *(signed char *)(D_0018F062 + (a1->region * 80)) = 0;
+    *(signed char *)(D_0018F063 + (a1->region * 80)) = 0;
+    *(signed char *)(D_0018F064 + (a1->region * 80)) = 0;
 }
 
-void func_0001B2ED(int a1)
+void func_0001B2ED(struct faction *a1)
 {
-    if (((int)(unsigned char)*(signed char *)((char *)a1)) != 7) goto L1B31F;
-    if (((int)(unsigned char)*(signed char *)((char *)a1 + 1)) != 255) goto L1B321;
+    if (a1->type != 7) goto L1B31F;
+    if (a1->region != 255) goto L1B321;
 L1B31F:;
     return;
 L1B321:;
-    *(signed char *)(region_event_groups + (((int)(unsigned char)*(signed char *)((char *)a1 + 1)) * 80)) = 1;
-    *(signed char *)(D_0018F045 + (((int)(unsigned char)*(signed char *)((char *)a1 + 1)) * 80)) = 255;
-    *(signed char *)(D_0018F062 + (((int)(unsigned char)*(signed char *)((char *)a1 + 1)) * 80)) = 1;
+    *(signed char *)(region_event_groups + (a1->region * 80)) = 1;
+    *(signed char *)(D_0018F045 + (a1->region * 80)) = 255;
+    *(signed char *)(D_0018F062 + (a1->region * 80)) = 1;
 }
 
-void func_0001B36A(int a1, int a2)
+void func_0001B36A(struct faction *a1, int a2)
 {
-    if (((int)(unsigned char)*(signed char *)((char *)a1)) != 7) goto L1B39E;
-    if (((int)(unsigned char)*(signed char *)((char *)a1 + 1)) != 255) goto L1B3A0;
+    if (a1->type != 7) goto L1B39E;
+    if (a1->region != 255) goto L1B3A0;
 L1B39E:;
     return;
 L1B3A0:;
-    *(signed char *)(region_event_values + (((int)(unsigned char)*(signed char *)((char *)a1 + 1)) * 80)) = 0;
-    *(signed char *)(D_0018F045 + (((int)(unsigned char)*(signed char *)((char *)a1 + 1)) * 80)) = 0;
-    *(signed char *)(D_0018F046 + ((((int)(unsigned char)*(signed char *)((char *)a1 + 1)) * 80) + a2)) = 0;
-    *(signed char *)(D_0018F063 + ((((int)(unsigned char)*(signed char *)((char *)a1 + 1)) * 80) + a2)) = 1;
-    *(signed char *)(region_event_groups + (((int)(unsigned char)*(signed char *)((char *)a1 + 1)) * 80)) = 1;
+    *(signed char *)(region_event_values + (a1->region * 80)) = 0;
+    *(signed char *)(D_0018F045 + (a1->region * 80)) = 0;
+    *(signed char *)(D_0018F046 + ((a1->region * 80) + a2)) = 0;
+    *(signed char *)(D_0018F063 + ((a1->region * 80) + a2)) = 1;
+    *(signed char *)(region_event_groups + (a1->region * 80)) = 1;
 }
 
-void faction_add_reputation(int a1, int a2)
+void faction_add_reputation(struct faction *a1, int a2)
 {
     if (a1 == 0) return;
-    *(short *)((char *)a1 + 29) += a2;
-    if (((int)(short)*(short *)((char *)a1 + 29)) <= 100) goto L1B452;
-    *(short *)((char *)a1 + 29) = 100;
+    a1->reputation += a2;
+    if (a1->reputation <= 100) goto L1B452;
+    a1->reputation = 100;
     return;
 L1B452:;
-    if (((int)(short)*(short *)((char *)a1 + 29)) >= (-100)) return;
-    *(short *)((char *)a1 + 29) = 65436;
+    if (a1->reputation >= (-100)) return;
+    a1->reputation = 65436;
 }
 
-void faction_change_reputation(int a1, int a2)
+void faction_change_reputation(struct faction *a1, int a2)
 {
     int l_1C;
     int l_18;
-    int l_14;
+    struct membership *l_14;
 
     if (a1 == 0) return;
-    if (((int)(unsigned short)*(short *)((char *)a1 + 33)) != 240) goto L1B4C2;
+    if (a1->id != 240) goto L1B4C2;
     l_14 = guild_find_membership_by_bits(128);
     if (l_14 == 0) goto L1B4C2;
-    a1 = faction_find((int)(short)*(short *)((char *)l_14 + 3));
+    a1 = faction_find(l_14->faction);
 L1B4C2:;
     func_0001B5BE(a1, a2);
     l_1C = 0;
@@ -2509,8 +2510,8 @@ L1B4DC:;
     l_1C++;
     goto L1B4D4;
 L1B4E4:;
-    if (*(int *)((char *)((l_1C << 2) + a1) + 56) == 0) goto L1B509;
-    faction_add_reputation(*(int *)((char *)((l_1C << 2) + a1) + 56), a2 >> 1);
+    if (a1->allies[l_1C] == 0) goto L1B509;
+    faction_add_reputation(a1->allies[l_1C], a2 >> 1);
 L1B509:;
     goto L1B4DC;
 L1B50B:;
@@ -2522,13 +2523,13 @@ L1B51A:;
     l_1C++;
     goto L1B512;
 L1B522:;
-    if (*(int *)((char *)((l_1C << 2) + a1) + 68) == 0) goto L1B549;
-    faction_add_reputation(*(int *)((char *)((l_1C << 2) + a1) + 68), -(a2 >> 1));
+    if (a1->enemies[l_1C] == 0) goto L1B549;
+    faction_add_reputation(a1->enemies[l_1C], -(a2 >> 1));
 L1B549:;
     goto L1B51A;
 }
 
-void func_0001B554(int a1, int a2, int a3)
+void func_0001B554(struct faction *a1, struct faction *a2, int a3)
 {
 L1B569:;
     if (a1 == 0) return;
@@ -2538,43 +2539,43 @@ L1B569:;
 L1B584:;
     faction_add_reputation(a1, a3 >> 1);
 L1B591:;
-    if (*(int *)((char *)a1 + 84) == 0) goto L1B5AB;
-    func_0001B554(*(int *)((char *)a1 + 84), a2, a3);
+    if (a1->child == 0) goto L1B5AB;
+    func_0001B554(a1->child, a2, a3);
 L1B5AB:;
-    a1 = *(int *)((char *)a1 + 80);
+    a1 = a1->next;
     goto L1B569;
 }
 
-void func_0001B5BE(int a1, int a2)
+void func_0001B5BE(struct faction *a1, int a2)
 {
-    int l_18;
-    int l_14;
+    struct faction *l_18;
+    struct membership *l_14;
 
     l_18 = a1;
 L1B5D7:;
-    if (*(int *)((char *)a1 + 88) == 0) goto L1B609;
-    if (((int)(unsigned short)*(short *)((char *)a1 + 33)) != 108) goto L1B5FE;
+    if (a1->parent == 0) goto L1B609;
+    if (a1->id != 108) goto L1B5FE;
     faction_add_reputation(a1, a2);
     goto L1B609;
 L1B5FE:;
-    a1 = *(int *)((char *)a1 + 88);
+    a1 = a1->parent;
     goto L1B5D7;
 L1B609:;
-    if (*(int *)((char *)a1 + 88) != 0) goto L1B625;
-    if (((int)(unsigned short)*(short *)((char *)a1 + 33)) != 844) goto L1B627;
+    if (a1->parent != 0) goto L1B625;
+    if (a1->id != 844) goto L1B627;
 L1B625:;
     goto L1B632;
 L1B627:;
     faction_add_reputation(a1, a2);
 L1B632:;
-    if (((int)(unsigned short)*(short *)((char *)a1 + 33)) != 844) goto L1B683;
+    if (a1->id != 844) goto L1B683;
     faction_add_reputation(a1, a2);
     l_14 = guild_find_membership_by_bits(64);
     if (l_14 == 0) goto L1B672;
-    a1 = faction_find((int)(short)*(short *)((char *)l_14 + 3));
+    a1 = faction_find(l_14->faction);
 L1B672:;
     if (a1 == 0) goto L1B683;
     faction_add_reputation(a1, a2);
 L1B683:;
-    func_0001B554(*(int *)((char *)a1 + 84), l_18, a2);
+    func_0001B554(a1->child, l_18, a2);
 }

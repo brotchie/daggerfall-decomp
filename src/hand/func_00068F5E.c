@@ -1,4 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x00068F5E */
+#include "records.h"
+
 struct voice {
     int sample;                 /* 0x00 */
     char pad04[8];
@@ -16,8 +18,8 @@ struct voice {
     int handle;                 /* 0xf0 */
     int prio;                   /* 0xf4 */
     char padf8[4];
-    char *ptr;                  /* 0xfc */
-    char buf[12];               /* 0x100 */
+    struct record *source;      /* 0xfc: the object the sound comes from */
+    char buf[12];               /* 0x100: its x, y, z */
 };
 extern char D_00175ACC[];        /* __FILE__ */
 extern int D_0018DD5C;
@@ -26,14 +28,14 @@ extern struct voice sound_channels[3];
 extern int D_001A3EFC;
 extern int D_001A3F34;
 extern unsigned char sound_enabled;
-extern void func_00068BA8(int, int);
-extern void sound_volume_pan(char *, char *, int *, int *, char *);
+extern void func_00068BA8(struct record *, int);
+extern void sound_volume_pan(char *, char *, int *, int *, struct record *);
 extern void mc_memset(void *, int, int, char *, int, int);
 extern short func_000A2460(int, int);
 extern int func_000A2504(int, struct voice *);
 extern void func_000A2687(int, int);
 
-int sound_play_sample(int a1, int a2, int a3, int a4)
+int sound_play_sample(int a1, int a2, struct record *a3, int a4)
 {
     int i;
     int vol;
@@ -78,10 +80,10 @@ int sound_play_sample(int a1, int a2, int a3, int a4)
     }
     D_001A3F34 = i;
     func_00068BA8(a3, i);
-    if (sound_channels[i].ptr != 0)
-        sound_volume_pan(sound_channels[i].buf, sound_channels[i].ptr + 7, &vol, &x, sound_channels[i].ptr);
+    if (sound_channels[i].source != 0)
+        sound_volume_pan(sound_channels[i].buf, (char *)&sound_channels[i].source->x, &vol, &x, sound_channels[i].source);
     else
-        sound_volume_pan(sound_channels[i].buf, sound_channels[i].buf, &vol, &x, sound_channels[i].ptr);
+        sound_volume_pan(sound_channels[i].buf, sound_channels[i].buf, &vol, &x, sound_channels[i].source);
     mc_memset(&sound_channels[i], 0, 240, D_00175ACC, 246, 4);
     sound_channels[i].prio = a4;
     sound_channels[i].sample = a1;

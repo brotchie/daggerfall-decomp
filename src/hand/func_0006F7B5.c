@@ -1,4 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0006F7B5 */
+#include "records.h"
+
 #pragma pack(1)
 struct Img { unsigned short x; unsigned short y; unsigned short w; unsigned short h; char pad[4]; char data[1]; };
 struct Box { short x0; short y0; short x1; short y1; void (*fn)(); };
@@ -6,9 +8,9 @@ extern unsigned char mouse_buttons;
 extern short mouse_x;
 extern short mouse_y;
 extern char key_down_esc;
-extern char *selected_spell;
+extern struct spell *selected_spell;
 extern struct Box spellshop_buttons[];
-extern char *spell_records;
+extern struct spell *spell_records;
 extern struct Img *window_image;
 extern unsigned char *D_00195C44;
 extern unsigned char mouse_buttons_prev;
@@ -16,7 +18,7 @@ extern char D_001A9AB8[];
 extern unsigned short D_001A9AE1;
 extern void spellshop_close(void);
 extern void spellshop_buy(void);
-extern void spellshop_draw_spell(char *);
+extern void spellshop_draw_spell(struct spell *);
 extern short picklist_frame(char *);
 extern int func_0012DB50();
 extern int func_00144F68();
@@ -38,7 +40,7 @@ void spellshop_update(void)
         spellshop_buy();
         return;
     }
-    spellshop_draw_spell(selected_spell = spell_records + D_00195C44[20000 + D_001A9AE1] * 89);
+    spellshop_draw_spell(selected_spell = &spell_records[D_00195C44[20000 + D_001A9AE1]]);
     if (key_down_esc != 0) {
         spellshop_close();
         return;

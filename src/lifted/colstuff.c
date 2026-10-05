@@ -1,6 +1,7 @@
 /* colstuff.c: functions first lifted from the assembly by tools/lift_all.py (2026-10), now
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
+#include "records.h"
 
 struct bf8_0_1 { unsigned char f:1; };
 struct bf8_3_1 { unsigned char _:3; unsigned char f:1; };
@@ -11,20 +12,20 @@ extern char D_00170710[];
 extern char D_0017071B[];
 extern char player_environment[];
 extern char monster_table_flags[];
-extern char D_00190504[];
+extern struct record *D_00190504[];
 extern char D_00190BE4[];
 extern char itemmaker_slot_kinds[];
 extern char D_001940D7[];
 extern char player_motion_flags[];
 extern char frame_counter[];
-extern char player_object[];
+extern struct record *player_object;
 extern char D_00195AB4[];
 extern char vertical_velocity[];
-extern char D_00195AC4[];
+extern struct record *D_00195AC4;
 extern char cheat_flags[];
-extern char D_00195AF4[];
+extern struct record *D_00195AF4;
 extern char creature_count[];
-extern char player_character[];
+extern struct character *player_character;
 extern char D_00195C48[];
 extern char D_00195C70[];
 extern char D_00195C74[];
@@ -65,7 +66,7 @@ extern char D_00196D60[];
 extern char collide_flags[];
 
 extern int object_find_open(int, int);
-extern int door_start_swing(int, int);
+extern int door_start_swing(struct record *, int);
 extern int mc_memcpy();
 extern int memcmp();
 extern int func_000C7FD9();
@@ -75,38 +76,38 @@ extern int func_0014AA92();
 extern int func_0014B1C7();
 extern int func_0014B45B();
 extern unsigned char func_0002021B(int, int);
-extern void collide_for_each_nearby(int, int);
+extern void collide_for_each_nearby(struct record *, int);
 extern void fatal_error(int);
-extern void object_set_position(int, int, int, int, int, int, int);
-extern void object_move_by(int, int, int, int, int, int, int);
-extern void object_foreach(int, int);
-extern void object_foreach_open(int, int);
-int func_00023A6A(int);
-int func_00023DE0(int, int);
-int func_00023EC2(int, int, int);
-void func_00021B04(int);
-void func_00021D97(int);
-void func_00022174(int);
+extern void object_set_position(struct record *, int, int, int, int, int, int);
+extern void object_move_by(struct record *, int, int, int, int, int, int);
+extern void object_foreach(struct record *, int);
+extern void object_foreach_open(struct record *, int);
+int func_00023A6A(struct record *);
+int func_00023DE0(struct record *, int);
+int func_00023EC2(struct record *, int, int);
+void func_00021B04(struct record *);
+void func_00021D97(struct record *);
+void func_00022174(struct record *);
 
-int collide_move_missile(int a1, int a2, int a3)
+int collide_move_missile(struct record *a1, int a2, int a3)
 {
     int l_18;
     int l_14;
 
     l_14 = 0;
     *(signed char *)collide_flags &= 252;
-    *(int *)D_00196D60 = *(int *)((char *)a1 + 11);
+    *(int *)D_00196D60 = a1->y;
     if (((int)(unsigned char)*(signed char *)player_environment) != 1) goto L21A22;
-    if ((*(int *)D_00196D60 = func_0014B45B(*(int *)((char *)a1 + 7), *(int *)((char *)a1 + 15))) > *(int *)((char *)a1 + 11)) goto L21A22;
+    if ((*(int *)D_00196D60 = func_0014B45B(a1->x, a1->z)) > a1->y) goto L21A22;
     return 2;
 L21A22:;
     if (func_00023EC2(a1, a2, 100) == 0) goto L21A49;
     *(signed char *)collide_flags |= 8;
     return 8;
 L21A49:;
-    *(int *)D_00196B10 = *(int *)((char *)a1 + 7);
-    *(int *)D_00196B14 = *(int *)((char *)a1 + 11);
-    *(int *)D_00196B18 = *(int *)((char *)a1 + 15);
+    *(int *)D_00196B10 = a1->x;
+    *(int *)D_00196B14 = a1->y;
+    *(int *)D_00196B18 = a1->z;
     mc_memcpy((int)D_00196B28, a2, 12, (int)D_00170710, 61, 4);
     if (a3 == 0) goto L21AA6;
     mc_memcpy((int)D_00196B34, a3, 12, (int)D_00170710, 63, 4);
@@ -118,7 +119,7 @@ L21AEF:;
     return (int)(short)*(short *)collide_flags;
 }
 
-void func_00021B04(int a1)
+void func_00021B04(struct record *a1)
 {
     int l_34;
     int l_30;
@@ -129,10 +130,10 @@ void func_00021B04(int a1)
     int l_1C;
     int l_18;
 
-    if (((int)(unsigned short)(*(short *)((char *)a1 + 21) & 512)) != 0) return;
-    switch (*(unsigned char *)((char *)a1)) {
+    if ((a1->flags & 512) != 0) return;
+    switch (a1->type) {
 case 43:
-    l_30 = a1 + 71;
+    l_30 = (int)RECORD_DATA(a1);
     l_2C = *(int *)((char *)l_30 + 5);
     l_20 = 0;
 L21B8E:;
@@ -157,13 +158,13 @@ L21C0F:;
 L21C11:;
     *(int *)D_00195DC0 = (int)(*(char **)((char *)l_34) + *(int *)(*(char **)D_00196D48 + 16));
     *(signed char *)collide_flags |= 2;
-    *(int *)D_00195C48 = a1;
+    *(int *)D_00195C48 = (int)a1;
 L21C36:;
     goto L21BA2;
 L21C3B:;
     return;
 case 56:
-    l_2C = a1 + 71;
+    l_2C = (int)RECORD_DATA(a1);
     l_20 = 0;
 L21C50:;
     if (((int)(unsigned short)*(short *)((char *)a1 + 27)) > l_20) goto L21C75;
@@ -187,14 +188,14 @@ L21CD3:;
 L21CD5:;
     *(int *)D_00195DC0 = (int)(*(char **)((char *)l_34) + *(int *)(*(char **)D_00196D48 + 16));
     *(signed char *)collide_flags |= 2;
-    *(int *)D_00195C48 = a1;
+    *(int *)D_00195C48 = (int)a1;
 L21CFA:;
     goto L21C66;
 L21CFF:;
     return;
 case 6:
 case 32:
-    l_34 = a1 + 71;
+    l_34 = (int)RECORD_DATA(a1);
     if (*(int *)((char *)l_34) == 0) return;
     if (((int)(short)(*(short *)collide_flags & 4)) == 0) goto L21D39;
     if (((int)(short)(*(short *)collide_flags & 2)) == 0) goto L21D3B;
@@ -208,12 +209,12 @@ L21D66:;
 L21D68:;
     *(int *)D_00195DC0 = (int)(*(char **)((char *)l_34) + *(int *)(*(char **)D_00196D48 + 16));
     *(signed char *)collide_flags |= 2;
-    *(int *)D_00195C48 = a1;
+    *(int *)D_00195C48 = (int)a1;
 default:;
 }
 }
 
-void func_00021D97(int a1)
+void func_00021D97(struct record *a1)
 {
     int l_2C;
     int l_28;
@@ -222,14 +223,14 @@ void func_00021D97(int a1)
     int l_1C;
     int l_18;
 
-    if (((int)(unsigned short)(*(short *)((char *)a1 + 21) & 512)) != 0) goto L21DC6;
+    if ((a1->flags & 512) != 0) goto L21DC6;
     if (((struct bf8_5_1 *)&cheat_flags)->f == 0) goto L21DCB;
 L21DC6:;
     return;
 L21DCB:;
-    switch (*(unsigned char *)((char *)a1)) {
+    switch (a1->type) {
 case 43:
-    l_28 = a1 + 71;
+    l_28 = (int)RECORD_DATA(a1);
     l_24 = *(int *)((char *)l_28 + 5);
     l_20 = 0;
 L21E2B:;
@@ -263,7 +264,7 @@ L21EE9:;
     *(int *)D_00196D60 = *(int *)(*(char **)D_00196D48 + 8 + (l_1C * 30));
     *(int *)D_00195AB4 = (int)(*(char **)((char *)l_2C) + *(int *)(*(char **)D_00196D48 + 16 + (l_1C * 30)));
     *(int *)D_00195CD8 = (int)(*(char **)D_00196D48 + 4 + (l_1C * 30));
-    *(int *)D_00195CB8 = a1;
+    *(int *)D_00195CB8 = (int)a1;
 L21F33:;
     goto L21EAC;
 L21F38:;
@@ -273,7 +274,7 @@ L21F3F:;
 L21F44:;
     return;
 case 56:
-    l_24 = a1 + 71;
+    l_24 = (int)RECORD_DATA(a1);
     l_20 = 0;
 L21F59:;
     if (((int)(unsigned short)*(short *)((char *)a1 + 27)) > l_20) goto L21F7E;
@@ -306,7 +307,7 @@ L22019:;
     *(int *)D_00196D60 = *(int *)(*(char **)D_00196D48 + 8 + (l_1C * 30));
     *(int *)D_00195AB4 = (int)(*(char **)((char *)l_2C) + *(int *)(*(char **)D_00196D48 + 16 + (l_1C * 30)));
     *(int *)D_00195CD8 = (int)(*(char **)D_00196D48 + 4 + (l_1C * 30));
-    *(int *)D_00195CB8 = a1;
+    *(int *)D_00195CB8 = (int)a1;
 L22063:;
     goto L21FDC;
 L22068:;
@@ -317,7 +318,7 @@ L22074:;
     return;
 case 6:
 case 32:
-    l_2C = a1 + 71;
+    l_2C = (int)RECORD_DATA(a1);
     if (*(int *)((char *)l_2C) == 0) return;
     if ((*(int *)D_00196D48 = func_0014A300(l_2C, (int)D_00196B10, (int)D_00196B1C, 0)) == 0) goto L220B9;
     if (*(int *)D_00196D48 != (-1)) goto L220BE;
@@ -340,7 +341,7 @@ L22114:;
     *(int *)D_00196D60 = *(int *)(*(char **)D_00196D48 + 8 + (l_1C * 30));
     *(int *)D_00195AB4 = (int)(*(char **)((char *)l_2C) + *(int *)(*(char **)D_00196D48 + 16 + (l_1C * 30)));
     *(int *)D_00195CD8 = (int)(*(char **)D_00196D48 + 4 + (l_1C * 30));
-    *(int *)D_00195CB8 = a1;
+    *(int *)D_00195CB8 = (int)a1;
 L2215E:;
     goto L220D7;
 L22163:;
@@ -349,25 +350,25 @@ default:;
 }
 }
 
-void func_00022174(int a1)
+void func_00022174(struct record *a1)
 {
     int l_34;
     int l_30;
     int l_2C;
     int l_28;
     int l_24;
-    int l_20;
+    struct character *l_20;
     int l_1C;
     int l_18;
 
-    if (((int)(unsigned short)(*(short *)((char *)a1 + 21) & 512)) != 0) goto L221A3;
+    if ((a1->flags & 512) != 0) goto L221A3;
     if (((struct bf8_5_1 *)&cheat_flags)->f == 0) goto L221A8;
 L221A3:;
     return;
 L221A8:;
-    switch (*(unsigned char *)((char *)a1)) {
+    switch (a1->type) {
 case 43:
-    l_30 = a1 + 71;
+    l_30 = (int)RECORD_DATA(a1);
     l_2C = *(int *)((char *)l_30 + 5);
     l_28 = 0;
 L2221D:;
@@ -394,13 +395,13 @@ L2229F:;
     *(int *)D_00195DC0 = (int)(*(char **)((char *)l_34) + *(int *)(*(char **)D_00196D48 + 16));
     *(int *)D_00195CD4 = *(int *)D_00196D48 + 4;
     *(signed char *)collide_flags |= 2;
-    *(int *)D_00195C48 = a1;
+    *(int *)D_00195C48 = (int)a1;
 L222DB:;
     goto L22231;
 L222E0:;
     return;
 case 56:
-    l_2C = a1 + 71;
+    l_2C = (int)RECORD_DATA(a1);
     l_28 = 0;
 L222F5:;
     if (((int)(unsigned short)*(short *)((char *)a1 + 27)) > l_28) goto L2231A;
@@ -426,27 +427,27 @@ L22379:;
     *(int *)D_00195DC0 = (int)(*(char **)((char *)l_34) + *(int *)(*(char **)D_00196D48 + 16));
     *(int *)D_00195CD4 = *(int *)D_00196D48 + 4;
     *(signed char *)collide_flags |= 2;
-    *(int *)D_00195C48 = a1;
+    *(int *)D_00195C48 = (int)a1;
 L223B5:;
     goto L2230B;
 L223BA:;
     return;
 case 32:
-    if (((int)(unsigned short)(*(short *)((char *)a1 + 21) & 256)) != 0) return;
-    if (((int)(unsigned char)*(signed char *)(*(char **)D_00195AF4)) != 18) goto L22468;
-    l_20 = *(int *)D_00195AF4 + 71;
-    if (((int)(unsigned char)(*(signed char *)((char *)l_20 + 506) & 128)) != 0) goto L2242F;
-    if (((int)(unsigned short)(*(short *)(monster_table_flags + (((int)(unsigned char)*(signed char *)((char *)l_20 + 67)) * 29)) & 4)) == 0) goto L22468;
+    if ((a1->flags & 256) != 0) return;
+    if (D_00195AF4->type != 18) goto L22468;
+    l_20 = &D_00195AF4->data.character;
+    if ((l_20->mobile_id & 128) != 0) goto L2242F;
+    if (((int)(unsigned short)(*(short *)(monster_table_flags + (l_20->race * 29)) & 4)) == 0) goto L22468;
 L2242F:;
-    if (*(short *)((char *)a1 + 23) == 0) goto L2244E;
-    if (((int)(unsigned short)(*(short *)((char *)a1 + 21) & 64)) == 0) goto L22468;
+    if (a1->lock_level == 0) goto L2244E;
+    if ((a1->flags & 64) == 0) goto L22468;
 L2244E:;
     if (door_start_swing(a1, 0) == 0) goto L22468;
-    *(signed char *)((char *)a1 + 22) |= 1;
+    a1->flags |= 0x100;
     return;
 case 6:
 L22468:;
-    l_34 = a1 + 71;
+    l_34 = (int)RECORD_DATA(a1);
     if (*(int *)((char *)l_34) == 0) goto L2251A;
     if (*(int *)((char *)a1 + 43) == *(int *)frame_counter) goto L224AD;
     if (((int)(short)(*(short *)collide_flags & 4)) == 0) goto L224AB;
@@ -463,24 +464,24 @@ L224D6:;
     *(int *)D_00195DC0 = (int)(*(char **)((char *)l_34) + *(int *)(*(char **)D_00196D48 + 16));
     *(int *)D_00195CD4 = *(int *)D_00196D48 + 4;
     *(signed char *)collide_flags |= 2;
-    *(int *)D_00195C70 = a1;
-    *(int *)D_00195C48 = a1;
+    *(int *)D_00195C70 = (int)a1;
+    *(int *)D_00195C48 = (int)a1;
 L2251A:;
     return;
 case 18:
-    if (*(int *)D_00195AF4 == a1) return;
-    if ((*(int *)D_00196D48 = func_0014B1C7(a1 + 7, (int)D_00196B10, (int)D_00196B28, (int)(unsigned short)*(short *)((char *)a1 + 27), 4, 0, 0)) == 0) goto L22561;
+    if (D_00195AF4 == a1) return;
+    if ((*(int *)D_00196D48 = func_0014B1C7(&a1->x, (int)D_00196B10, (int)D_00196B28, a1->image, 4, 0, 0)) == 0) goto L22561;
     if (*(int *)D_00196D48 != (-1)) goto L22563;
 L22561:;
     return;
 L22563:;
-    *(int *)D_00195C48 = a1;
+    *(int *)D_00195C48 = (int)a1;
     *(signed char *)collide_flags |= 8;
 default:;
 }
 }
 
-int func_0002294E(int a1, int a2, int a3)
+int func_0002294E(struct record *a1, int a2, int a3)
 {
     int l_20;
     int l_1C;
@@ -489,17 +490,17 @@ int func_0002294E(int a1, int a2, int a3)
 
     l_1C = 0;
     *(signed char *)D_00196297 = 1;
-    *(int *)D_00195C74 = *(int *)((char *)a1 + 11) - 120;
+    *(int *)D_00195C74 = a1->y - 120;
     *(int *)D_00190BE4 = 0;
     *(int *)((char *)(*(int *)D_00196D4C = *(int *)((char *)a3 + 24))) = *(int *)((char *)a3);
     *(int *)(*(char **)D_00196D4C + 4) = *(int *)((char *)a3 + 4);
     *(int *)(*(char **)D_00196D4C + 8) = *(int *)((char *)a3 + 8);
     *(signed char *)collide_flags &= 228;
-    *(int *)D_00195AF4 = a1;
+    D_00195AF4 = a1;
     *(signed char *)D_001962A0 = 0;
     if (((int)(unsigned char)*(signed char *)player_environment) != 1) goto L22A24;
-    *(int *)D_00196D60 = func_0014B45B(*(int *)((char *)a1 + 7), *(int *)((char *)a1 + 15));
-    if (*(int *)((char *)a1 + 11) < *(int *)D_00196D60) goto L22A19;
+    *(int *)D_00196D60 = func_0014B45B(a1->x, a1->z);
+    if (a1->y < *(int *)D_00196D60) goto L22A19;
     if ((signed char)func_0002021B(*(int *)((char *)a3), *(int *)((char *)a3 + 8)) == 0) goto L22A1B;
 L22A19:;
     goto L22A22;
@@ -508,11 +509,11 @@ L22A1B:;
 L22A22:;
     goto L22A34;
 L22A24:;
-    *(int *)D_00196D60 = *(int *)((char *)a1 + 11) + 1000;
+    *(int *)D_00196D60 = a1->y + 1000;
 L22A34:;
     mc_memcpy((int)D_00196B28, a3, 12, (int)D_00170710, 474, 4);
     if (((int)(short)(*(short *)collide_flags & 4)) == 0) goto L22A79;
-    if (memcmp(a3, a1 + 7, 12) == 0) goto L22A7B;
+    if (memcmp(a3, &a1->x, 12) == 0) goto L22A7B;
 L22A79:;
     goto L22A82;
 L22A7B:;
@@ -533,12 +534,12 @@ L22AEA:;
     l_14++;
     goto L22ADD;
 L22AF2:;
-    func_00021D97(*(int *)(collide_candidates + (l_14 << 2)));
+    func_00021D97(*(struct record **)(collide_candidates + (l_14 << 2)));
     goto L22AEA;
 L22B05:;
     if (*(int *)vertical_velocity < 0) goto L22B3F;
-    if (a1 != *(int *)player_object) goto L22B32;
-    if (((struct bf8_3_1 *)(*(char **)player_character + 137))->f != 0) goto L22B30;
+    if (a1 != player_object) goto L22B32;
+    if ((player_character->conditions & 0x8) != 0) goto L22B30;
     if (*(signed char *)in_dungeon_water == 0) goto L22B32;
 L22B30:;
     goto L22B3F;
@@ -561,7 +562,7 @@ L22BAA:;
     l_14++;
     goto L22B9D;
 L22BB2:;
-    func_00021D97(*(int *)(collide_candidates + (l_14 << 2)));
+    func_00021D97(*(struct record **)(collide_candidates + (l_14 << 2)));
     goto L22BAA;
 L22BC5:;
     *(int *)D_00190BE4 = 0;
@@ -569,14 +570,14 @@ L22BC5:;
     *(int *)D_00195C74 = *(int *)D_00196D60;
     goto L22BF9;
 L22BEB:;
-    *(int *)D_00195C74 = *(int *)((char *)a1 + 11) - 120;
+    *(int *)D_00195C74 = a1->y - 120;
 L22BF9:;
     *(signed char *)collide_flags &= 254;
     if (((int)(unsigned char)*(signed char *)player_environment) != 1) goto L22C24;
-    *(int *)D_00196D60 = func_0014B45B(*(int *)((char *)a1 + 7), *(int *)((char *)a1 + 15));
+    *(int *)D_00196D60 = func_0014B45B(a1->x, a1->z);
     goto L22C34;
 L22C24:;
-    *(int *)D_00196D60 = *(int *)((char *)a1 + 11) + 1000;
+    *(int *)D_00196D60 = a1->y + 1000;
 L22C34:;
     if (((int)(short)(*(short *)collide_flags & 1)) != 0) goto L22CD8;
     *(int *)D_00196B10 = *(int *)((char *)a3);
@@ -598,7 +599,7 @@ L22CBD:;
     l_14++;
     goto L22CB0;
 L22CC5:;
-    func_00021D97(*(int *)(collide_candidates + (l_14 << 2)));
+    func_00021D97(*(struct record **)(collide_candidates + (l_14 << 2)));
     goto L22CBD;
 L22CD8:;
     if (*(int *)D_00196D60 >= *(int *)((char *)a3 + 4)) goto L22D08;
@@ -613,7 +614,7 @@ L22D1C:;
     l_14++;
     goto L22D0F;
 L22D24:;
-    func_00022174(*(int *)(collide_candidates + (l_14 << 2)));
+    func_00022174(*(struct record **)(collide_candidates + (l_14 << 2)));
     goto L22D1C;
 L22D37:;
     if (func_00023DE0(a1, a3) == 0) goto L22D4D;
@@ -624,25 +625,25 @@ L22D4D:;
 L22D6D:;
     goto L22F98;
 L22D72:;
-    if (a1 != *(int *)player_object) goto L22D86;
+    if (a1 != player_object) goto L22D86;
     if (((struct bf8_5_1 *)&player_motion_flags)->f != 0) goto L22D8B;
 L22D86:;
     goto L22E2C;
 L22D8B:;
-    if (*(int *)((char *)a3 + 4) >= *(int *)((char *)a1 + 11)) goto L22DAA;
+    if (*(int *)((char *)a3 + 4) >= a1->y) goto L22DAA;
     if ((*(int *)((char *)a3 + 4) - 90) > *(int *)D_00195C74) goto L22DAC;
 L22DAA:;
     goto L22DDE;
 L22DAC:;
-    object_move_by(a1, 0, -(*(int *)((char *)a1 + 11) - *(int *)((char *)a3 + 4)), 0, 0, ((int)(short)*(short *)((char *)a1 + 3)) - *(int *)((char *)a3 + 16), 0);
+    object_move_by(a1, 0, -(a1->y - *(int *)((char *)a3 + 4)), 0, 0, a1->yaw - *(int *)((char *)a3 + 16), 0);
     goto L22E2C;
 L22DDE:;
-    if (*(int *)((char *)a3 + 4) <= *(int *)((char *)a1 + 11)) goto L22DFA;
+    if (*(int *)((char *)a3 + 4) <= a1->y) goto L22DFA;
     if (*(int *)D_00196D60 > *(int *)((char *)a3 + 4)) goto L22DFC;
 L22DFA:;
     goto L22E2C;
 L22DFC:;
-    object_move_by(a1, 0, -(*(int *)((char *)a1 + 11) - *(int *)((char *)a3 + 4)), 0, 0, ((int)(short)*(short *)((char *)a1 + 3)) - *(int *)((char *)a3 + 16), 0);
+    object_move_by(a1, 0, -(a1->y - *(int *)((char *)a3 + 4)), 0, 0, a1->yaw - *(int *)((char *)a3 + 16), 0);
 L22E2C:;
     if (*(int *)D_00196D60 >= *(int *)((char *)a3 + 4)) goto L22E58;
     if (((int)(short)(*(short *)collide_flags & 1)) != 0) goto L22E56;
@@ -653,17 +654,17 @@ L22E58:;
     if (((struct bf8_5_1 *)&D_001940D7)->f == 0) goto L22E95;
 L22E61:;
     *(signed char *)D_001940D7 &= 223;
-    object_move_by(a1, 0, *(int *)D_00196D60 - *(int *)((char *)a1 + 11), 0, 0, 0, 0);
+    object_move_by(a1, 0, *(int *)D_00196D60 - a1->y, 0, 0, 0, 0);
     l_1C = 1;
     goto L22F89;
 L22E95:;
-    if (*(int *)D_00196D60 == *(int *)((char *)a1 + 11)) goto L22F4D;
+    if (*(int *)D_00196D60 == a1->y) goto L22F4D;
     if (((struct bf8_5_1 *)&player_motion_flags)->f != 0) goto L22EB9;
     if (*(signed char *)D_00196296 == 0) goto L22EBB;
 L22EB9:;
     goto L22EC9;
 L22EBB:;
-    if (((struct bf8_3_1 *)(*(char **)player_character + 137))->f == 0) goto L22ECB;
+    if ((player_character->conditions & 0x8) == 0) goto L22ECB;
 L22EC9:;
     goto L22ED4;
 L22ECB:;
@@ -671,23 +672,23 @@ L22ECB:;
 L22ED4:;
     goto L22EE6;
 L22ED6:;
-    if ((*(int *)D_00196D60 - *(int *)((char *)a1 + 11)) < 30) goto L22EE8;
+    if ((*(int *)D_00196D60 - a1->y) < 30) goto L22EE8;
 L22EE6:;
     goto L22F0B;
 L22EE8:;
-    object_move_by(a1, 0, *(int *)D_00196D60 - *(int *)((char *)a1 + 11), 0, 0, 0, 0);
+    object_move_by(a1, 0, *(int *)D_00196D60 - a1->y, 0, 0, 0, 0);
     goto L22F4B;
 L22F0B:;
     *(signed char *)collide_flags |= 16;
     if (((int)(short)(*(short *)collide_flags & 1)) != 0) goto L22F44;
-    object_move_by(a1, 0, *(int *)((char *)a3 + 4) - *(int *)((char *)a1 + 11), 0, 0, 0, 0);
+    object_move_by(a1, 0, *(int *)((char *)a3 + 4) - a1->y, 0, 0, 0, 0);
 L22F44:;
     *(signed char *)player_on_ground = 0;
 L22F4B:;
     goto L22F89;
 L22F4D:;
     if (((int)(short)(*(short *)collide_flags & 16)) == 0) goto L22F89;
-    object_set_position(a1, *(int *)((char *)a1 + 7), *(int *)((char *)a1 + 11), *(int *)((char *)a1 + 15), *(int *)((char *)a3 + 12), *(int *)((char *)a3 + 16), *(int *)((char *)a3 + 20));
+    object_set_position(a1, a1->x, a1->y, a1->z, *(int *)((char *)a3 + 12), *(int *)((char *)a3 + 16), *(int *)((char *)a3 + 20));
 L22F89:;
     return (int)(short)*(short *)collide_flags;
 L22F98:;
@@ -700,11 +701,11 @@ L22FC4:;
     if (((struct bf8_5_1 *)&D_001940D7)->f == 0) goto L23001;
 L22FCD:;
     *(signed char *)D_001940D7 &= 223;
-    object_move_by(a1, 0, *(int *)D_00196D60 - *(int *)((char *)a1 + 11), 0, 0, 0, 0);
+    object_move_by(a1, 0, *(int *)D_00196D60 - a1->y, 0, 0, 0, 0);
     l_1C = 1;
     goto L2311F;
 L23001:;
-    if (*(int *)D_00196D60 < *(int *)((char *)a1 + 11)) goto L2301F;
+    if (*(int *)D_00196D60 < a1->y) goto L2301F;
     if (((int)(short)(*(short *)collide_flags & 8)) == 0) goto L23024;
 L2301F:;
     goto L2311F;
@@ -718,29 +719,29 @@ L23038:;
 L23041:;
     goto L23051;
 L23043:;
-    if (((struct bf8_3_1 *)(*(char **)player_character + 137))->f == 0) goto L23053;
+    if ((player_character->conditions & 0x8) == 0) goto L23053;
 L23051:;
     goto L23063;
 L23053:;
-    if ((*(int *)D_00196D60 - *(int *)((char *)a1 + 11)) < 30) goto L23065;
+    if ((*(int *)D_00196D60 - a1->y) < 30) goto L23065;
 L23063:;
     goto L2308B;
 L23065:;
-    object_move_by(a1, 0, *(int *)D_00196D60 - *(int *)((char *)a1 + 11), 0, 0, 0, 0);
+    object_move_by(a1, 0, *(int *)D_00196D60 - a1->y, 0, 0, 0, 0);
     goto L2311F;
 L2308B:;
     if ((*(int *)((char *)a3 + 4) - 100) < *(int *)D_00195C74) goto L230C0;
-    object_move_by(a1, 0, *(int *)((char *)a3 + 4) - *(int *)((char *)a1 + 11), 0, 0, 0, 0);
+    object_move_by(a1, 0, *(int *)((char *)a3 + 4) - a1->y, 0, 0, 0, 0);
     goto L23103;
 L230C0:;
     if ((*(int *)((char *)a3 + 4) - 100) >= *(int *)D_00195C74) goto L230DF;
-    if (*(int *)((char *)a3 + 4) > *(int *)((char *)a1 + 11)) goto L230E1;
+    if (*(int *)((char *)a3 + 4) > a1->y) goto L230E1;
 L230DF:;
     goto L23103;
 L230E1:;
-    object_move_by(a1, 0, *(int *)((char *)a3 + 4) - *(int *)((char *)a1 + 11), 0, 0, 0, 0);
+    object_move_by(a1, 0, *(int *)((char *)a3 + 4) - a1->y, 0, 0, 0, 0);
 L23103:;
-    if (*(int *)D_00196D60 <= *(int *)((char *)a1 + 11)) goto L2311F;
+    if (*(int *)D_00196D60 <= a1->y) goto L2311F;
     *(signed char *)collide_flags |= 16;
     *(signed char *)player_on_ground = 0;
 L2311F:;
@@ -750,23 +751,23 @@ L2313F:;
     goto L23178;
 L23141:;
     if (((struct bf8_5_1 *)&player_motion_flags)->f != 0) goto L23176;
-    object_set_position(a1, *(int *)D_00196B28, *(int *)((char *)a1 + 11), *(int *)D_00196B30, *(int *)((char *)a3 + 12), *(int *)((char *)a3 + 16), *(int *)((char *)a3 + 20));
+    object_set_position(a1, *(int *)D_00196B28, a1->y, *(int *)D_00196B30, *(int *)((char *)a3 + 12), *(int *)((char *)a3 + 16), *(int *)((char *)a3 + 20));
 L23176:;
     goto L231AD;
 L23178:;
     if (((struct bf8_5_1 *)&player_motion_flags)->f != 0) goto L231AD;
-    object_set_position(a1, *(int *)((char *)a1 + 7), *(int *)((char *)a1 + 11), *(int *)((char *)a1 + 15), *(int *)((char *)a3 + 12), *(int *)((char *)a3 + 16), *(int *)((char *)a3 + 20));
+    object_set_position(a1, a1->x, a1->y, a1->z, *(int *)((char *)a3 + 12), *(int *)((char *)a3 + 16), *(int *)((char *)a3 + 20));
 L231AD:;
     *(signed char *)collide_flags &= 251;
-    if (a1 != *(int *)player_object) goto L231E0;
-    *(int *)D_00196D54 = *(int *)((char *)a1 + 7);
-    *(int *)D_00196D58 = *(int *)((char *)a1 + 11);
-    *(int *)D_00196D5C = *(int *)((char *)a1 + 15);
+    if (a1 != player_object) goto L231E0;
+    *(int *)D_00196D54 = a1->x;
+    *(int *)D_00196D58 = a1->y;
+    *(int *)D_00196D5C = a1->z;
 L231E0:;
     return (int)(short)*(short *)collide_flags;
 }
 
-void func_0002325A(int a1)
+void func_0002325A(struct record *a1)
 {
     int l_30;
     int l_2C;
@@ -776,10 +777,10 @@ void func_0002325A(int a1)
     int l_1C;
     int l_18;
 
-    if (((int)(unsigned short)(*(short *)((char *)a1 + 21) & 512)) != 0) return;
-    switch (*(unsigned char *)((char *)a1)) {
+    if ((a1->flags & 512) != 0) return;
+    switch (a1->type) {
 case 43:
-    l_2C = a1 + 71;
+    l_2C = (int)RECORD_DATA(a1);
     l_28 = *(int *)((char *)l_2C + 5);
     l_24 = 0;
 L232E4:;
@@ -797,7 +798,7 @@ L23307:;
 L23342:;
     goto L23372;
 L23344:;
-    *(int *)(collide_candidates + ((*(int *)collide_candidate_count)++ << 2)) = a1;
+    *(int *)(collide_candidates + ((*(int *)collide_candidate_count)++ << 2)) = (int)a1;
     if (*(int *)collide_candidate_count <= 128) goto L23372;
     fatal_error((int)D_0017071B);
 L23372:;
@@ -805,7 +806,7 @@ L23372:;
 L23374:;
     return;
 case 56:
-    l_28 = a1 + 71;
+    l_28 = (int)RECORD_DATA(a1);
     l_24 = 0;
 L23389:;
     if (((int)(unsigned short)*(short *)((char *)a1 + 27)) > l_24) goto L233AE;
@@ -822,7 +823,7 @@ L233AE:;
 L233E9:;
     goto L23419;
 L233EB:;
-    *(int *)(collide_candidates + ((*(int *)collide_candidate_count)++ << 2)) = a1;
+    *(int *)(collide_candidates + ((*(int *)collide_candidate_count)++ << 2)) = (int)a1;
     if (*(int *)collide_candidate_count <= 128) goto L23419;
     fatal_error((int)D_0017071B);
 L23419:;
@@ -830,30 +831,30 @@ L23419:;
 L2341B:;
     return;
 case 32:
-    if (((int)(unsigned short)(*(short *)((char *)a1 + 21) & 256)) != 0) return;
+    if ((a1->flags & 256) != 0) return;
 case 6:
-    l_30 = a1 + 71;
+    l_30 = (int)RECORD_DATA(a1);
     if (*(int *)((char *)l_30) == 0) return;
     if ((*(int *)D_00196D48 = func_0014AA92(l_30, *(int *)D_00196D4C, 2)) != 0) goto L23474;
     if (*(int *)D_00196D48 != (-1)) goto L23476;
 L23474:;
     return;
 L23476:;
-    *(int *)(collide_candidates + ((*(int *)collide_candidate_count)++ << 2)) = a1;
+    *(int *)(collide_candidates + ((*(int *)collide_candidate_count)++ << 2)) = (int)a1;
     if (*(int *)collide_candidate_count <= 128) return;
     fatal_error((int)D_0017071B);
 default:;
 }
 }
 
-int func_000234AE(int a1)
+int func_000234AE(struct record *a1)
 {
     *(int *)D_00195CB8 = 0;
     collide_for_each_nearby(a1, (int)func_00021D97);
     return *(int *)D_00195CB8;
 }
 
-int func_00023A6A(int a1)
+int func_00023A6A(struct record *a1)
 {
     int l_30;
     int l_2C;
@@ -862,12 +863,12 @@ int func_00023A6A(int a1)
     int l_20;
     short l_18;
 
-    if (((int)(unsigned short)(*(short *)((char *)a1 + 21) & 512)) == 0) goto L23A9C;
+    if ((a1->flags & 512) == 0) goto L23A9C;
     return 0;
 L23A9C:;
-    switch (*(unsigned char *)((char *)a1)) {
+    switch (a1->type) {
 case 43:
-    l_2C = a1 + 71;
+    l_2C = (int)RECORD_DATA(a1);
     l_28 = *(int *)((char *)l_2C + 5);
     l_24 = 0;
 L23AFC:;
@@ -892,7 +893,7 @@ L23B6D:;
 L23B6F:;
     goto L23C5E;
 case 56:
-    l_28 = a1 + 71;
+    l_28 = (int)RECORD_DATA(a1);
     l_24 = 0;
 L23B84:;
     if (((int)(unsigned short)*(short *)((char *)a1 + 27)) > l_24) goto L23BA6;
@@ -916,9 +917,9 @@ L23BF7:;
 L23BF9:;
     goto L23C5E;
 case 32:
-    if (((int)(unsigned short)(*(short *)((char *)a1 + 21) & 256)) != 0) goto L23C5E;
+    if ((a1->flags & 256) != 0) goto L23C5E;
 case 6:
-    l_30 = a1 + 71;
+    l_30 = (int)RECORD_DATA(a1);
     if (*(int *)((char *)l_30) == 0) goto L23C5E;
     if ((*(int *)D_00196D48 = func_0014A300(l_30, (int)D_00196B10, (int)D_00196B1C, 0)) == 0) goto L23C4C;
     if (*(int *)D_00196D48 != (-1)) goto L23C4E;
@@ -933,11 +934,11 @@ L23C5E:;
 }
 }
 
-int collide_line_of_sight(int a1, int a2)
+int collide_line_of_sight(struct record *a1, struct record *a2)
 {
     *(signed char *)itemmaker_slot_kinds = 0;
-    mc_memcpy((int)D_00196B10, a1 + 7, 12, (int)D_00170710, 923, 4);
-    mc_memcpy((int)D_00196B1C, a2 + 7, 12, (int)D_00170710, 924, 4);
+    mc_memcpy((int)D_00196B10, (int)&a1->x, 12, (int)D_00170710, 923, 4);
+    mc_memcpy((int)D_00196B1C, (int)&a2->x, 12, (int)D_00170710, 924, 4);
     *(int *)D_00196B14 -= 40;
     *(int *)D_00196B20 -= 40;
     *(int *)D_00195CD0 = (int)object_find_open;
@@ -962,21 +963,21 @@ L23D4C:;
     l_1C++;
     goto L23D3C;
 L23D54:;
-    l_18 = func_000C7FF4(*(int *)(*(char **)player_object + 11) - *(int *)(*(char **)(D_00190504 + (l_1C << 2)) + 11), func_000C7FD9(*(int *)(*(char **)player_object + 7), *(int *)(*(char **)player_object + 15), *(int *)(*(char **)(D_00190504 + (l_1C << 2)) + 7), *(int *)(*(char **)(D_00190504 + (l_1C << 2)) + 15)));
+    l_18 = func_000C7FF4(player_object->y - D_00190504[l_1C]->y, func_000C7FD9(player_object->x, player_object->z, D_00190504[l_1C]->x, D_00190504[l_1C]->z));
     if (l_18 >= l_20) goto L23DD1;
     *(int *)nearest_creature_distance = l_18;
-    *(int *)nearest_creature = *(int *)(D_00190504 + (l_1C << 2));
+    *(int *)nearest_creature = (int)D_00190504[l_1C];
     l_20 = l_18;
 L23DD1:;
     goto L23D4C;
 }
 
-int func_00023DE0(int a1, int a2)
+int func_00023DE0(struct record *a1, int a2)
 {
     int l_1C;
     int l_18;
 
-    *(int *)(D_00190504 + (*(int *)creature_count << 2)) = *(int *)player_object;
+    D_00190504[*(int *)creature_count] = player_object;
     l_1C = 0;
 L23E0E:;
     if (l_1C <= *(int *)creature_count) goto L23E26;
@@ -985,15 +986,15 @@ L23E1E:;
     l_1C++;
     goto L23E0E;
 L23E26:;
-    if (*(int *)(D_00190504 + (l_1C << 2)) == a1) goto L23E1E;
-    l_18 = *(int *)(*(char **)(D_00190504 + (l_1C << 2)) + 11) - *(int *)((char *)a2 + 4);
+    if (D_00190504[l_1C] == a1) goto L23E1E;
+    l_18 = D_00190504[l_1C]->y - *(int *)((char *)a2 + 4);
     if (l_18 < 0) goto L23E5B;
     if (l_18 <= 100) goto L23E5D;
 L23E5B:;
     goto L23E1E;
 L23E5D:;
-    if (func_000C7FD9(*(int *)(*(char **)(D_00190504 + (l_1C << 2)) + 7), *(int *)(*(char **)(D_00190504 + (l_1C << 2)) + 15), *(int *)((char *)a2), *(int *)((char *)a2 + 8)) >= 50) goto L23EAA;
-    *(int *)D_00195C48 = *(int *)(D_00190504 + (l_1C << 2));
+    if (func_000C7FD9(D_00190504[l_1C]->x, D_00190504[l_1C]->z, *(int *)((char *)a2), *(int *)((char *)a2 + 8)) >= 50) goto L23EAA;
+    *(int *)D_00195C48 = (int)D_00190504[l_1C];
     return 1;
 L23EAA:;
     goto L23E1E;
@@ -1001,12 +1002,12 @@ L23EAF:;
     return 0;
 }
 
-int func_00023EC2(int a1, int a2, int a3)
+int func_00023EC2(struct record *a1, int a2, int a3)
 {
     int l_18;
     int l_14;
 
-    *(int *)(D_00190504 + (*(int *)creature_count << 2)) = *(int *)player_object;
+    D_00190504[*(int *)creature_count] = player_object;
     l_18 = 0;
 L23EF2:;
     if (l_18 <= *(int *)creature_count) goto L23F0A;
@@ -1015,15 +1016,15 @@ L23F02:;
     l_18++;
     goto L23EF2;
 L23F0A:;
-    if (*(int *)(D_00190504 + (l_18 << 2)) == a1) goto L23F02;
-    l_14 = *(int *)(*(char **)(D_00190504 + (l_18 << 2)) + 11) - *(int *)((char *)a2 + 4);
+    if (D_00190504[l_18] == a1) goto L23F02;
+    l_14 = D_00190504[l_18]->y - *(int *)((char *)a2 + 4);
     if (l_14 < 0) goto L23F3F;
     if (l_14 <= 100) goto L23F41;
 L23F3F:;
     goto L23F02;
 L23F41:;
-    if (func_000C7FD9(*(int *)(*(char **)(D_00190504 + (l_18 << 2)) + 7), *(int *)(*(char **)(D_00190504 + (l_18 << 2)) + 15), *(int *)((char *)a2), *(int *)((char *)a2 + 8)) >= a3) goto L23F8E;
-    *(int *)D_00195C48 = *(int *)(D_00190504 + (l_18 << 2));
+    if (func_000C7FD9(D_00190504[l_18]->x, D_00190504[l_18]->z, *(int *)((char *)a2), *(int *)((char *)a2 + 8)) >= a3) goto L23F8E;
+    *(int *)D_00195C48 = (int)D_00190504[l_18];
     return 1;
 L23F8E:;
     goto L23F02;
@@ -1031,39 +1032,39 @@ L23F93:;
     return 0;
 }
 
-int func_00023FA5(int a1, int a2, int a3)
+int func_00023FA5(struct record *a1, int a2, int a3)
 {
     int l_24;
     int l_20;
     int l_1C;
     int l_18;
-    int l_14;
+    struct character *l_14;
 
     l_20 = 0;
     *(signed char *)D_00196297 = 0;
-    *(int *)D_00195C74 = *(int *)((char *)a1 + 11) - 120;
+    *(int *)D_00195C74 = a1->y - 120;
     *(int *)D_00190BE4 = 0;
-    l_14 = a1 + 71;
+    l_14 = &a1->data.character;
     *(int *)((char *)(*(int *)D_00196D4C = *(int *)((char *)a3 + 24))) = *(int *)((char *)a3);
     *(int *)(*(char **)D_00196D4C + 4) = *(int *)((char *)a3 + 4);
     *(int *)(*(char **)D_00196D4C + 8) = *(int *)((char *)a3 + 8);
     *(signed char *)collide_flags &= 228;
-    *(int *)D_00195AF4 = a1;
+    D_00195AF4 = a1;
     if (((int)(unsigned char)*(signed char *)player_environment) != 1) goto L24052;
-    *(int *)D_00196D60 = func_0014B45B(*(int *)((char *)a1 + 7), *(int *)((char *)a1 + 15));
+    *(int *)D_00196D60 = func_0014B45B(a1->x, a1->z);
     goto L24062;
 L24052:;
-    *(int *)D_00196D60 = *(int *)((char *)a1 + 11) + 1000;
+    *(int *)D_00196D60 = a1->y + 1000;
 L24062:;
     mc_memcpy((int)D_00196B28, a3, 12, (int)D_00170710, 1021, 4);
     if (((int)(short)(*(short *)collide_flags & 4)) == 0) goto L240A7;
-    if (memcmp(a3, a1 + 7, 12) == 0) goto L240A9;
+    if (memcmp(a3, &a1->x, 12) == 0) goto L240A9;
 L240A7:;
     goto L240B0;
 L240A9:;
     *(signed char *)collide_flags &= 251;
 L240B0:;
-    if (*(int *)((char *)l_14 + 76) <= 5120) goto L2412C;
+    if (l_14->fall_velocity <= 5120) goto L2412C;
     *(int *)D_00196B10 = *(int *)D_00196D54;
     *(int *)D_00196B14 = *(int *)D_00196D58 - 20;
     *(int *)D_00196B18 = *(int *)D_00196D5C;
@@ -1078,19 +1079,19 @@ L24111:;
     l_18++;
     goto L24104;
 L24119:;
-    func_00021D97(*(int *)(collide_candidates + (l_18 << 2)));
+    func_00021D97(*(struct record **)(collide_candidates + (l_18 << 2)));
     goto L24111;
 L2412C:;
-    if (*(int *)((char *)l_14 + 76) < 0) goto L24142;
+    if (l_14->fall_velocity < 0) goto L24142;
     if (((struct bf8_0_1 *)&ai_monster_flags)->f == 0) goto L24243;
 L24142:;
     *(int *)D_00190BE4 = 1;
-    *(int *)D_00196B10 = *(int *)((char *)a1 + 7);
-    *(int *)D_00196B14 = *(int *)((char *)a1 + 11) - 60;
-    *(int *)D_00196B18 = *(int *)((char *)a1 + 15);
-    *(int *)D_00196B1C = *(int *)((char *)a1 + 7);
-    *(int *)D_00196B20 = *(int *)((char *)a1 + 11) - 120;
-    *(int *)D_00196B24 = *(int *)((char *)a1 + 15);
+    *(int *)D_00196B10 = a1->x;
+    *(int *)D_00196B14 = a1->y - 60;
+    *(int *)D_00196B18 = a1->z;
+    *(int *)D_00196B1C = a1->x;
+    *(int *)D_00196B20 = a1->y - 120;
+    *(int *)D_00196B24 = a1->z;
     l_18 = 0;
 L2419B:;
     if (l_18 < *(int *)collide_candidate_count) goto L241B0;
@@ -1099,7 +1100,7 @@ L241A8:;
     l_18++;
     goto L2419B;
 L241B0:;
-    func_00021D97(*(int *)(collide_candidates + (l_18 << 2)));
+    func_00021D97(*(struct record **)(collide_candidates + (l_18 << 2)));
     goto L241A8;
 L241C3:;
     *(int *)D_00190BE4 = 0;
@@ -1107,7 +1108,7 @@ L241C3:;
     *(int *)D_00195C74 = *(int *)D_00196D60;
     goto L241F7;
 L241E9:;
-    *(int *)D_00195C74 = *(int *)((char *)a1 + 11) - 120;
+    *(int *)D_00195C74 = a1->y - 120;
 L241F7:;
     if (*(int *)dungeon_water_level == 10000) goto L24210;
     if (*(int *)dungeon_water_level > *(int *)D_00195C74) goto L24212;
@@ -1121,20 +1122,20 @@ L24222:;
     *(int *)D_00195C74 = *(int *)dungeon_water_level;
 L2422C:;
     *(signed char *)collide_flags &= 254;
-    *(int *)D_00196D60 = *(int *)((char *)a1 + 11) + 1000;
+    *(int *)D_00196D60 = a1->y + 1000;
 L24243:;
     if (((int)(short)(*(short *)collide_flags & 1)) != 0) goto L242E9;
-    *(int *)D_00196B10 = *(int *)((char *)a1 + 7);
-    *(int *)D_00196B14 = *(int *)((char *)a1 + 11) - 25;
-    *(int *)D_00196B18 = *(int *)((char *)a1 + 15);
-    *(int *)D_00196B1C = *(int *)((char *)a1 + 7);
+    *(int *)D_00196B10 = a1->x;
+    *(int *)D_00196B14 = a1->y - 25;
+    *(int *)D_00196B18 = a1->z;
+    *(int *)D_00196B1C = a1->x;
     if (((struct bf8_3_1 *)&player_motion_flags)->f == 0) goto L242A1;
-    *(int *)D_00196B20 = *(int *)((char *)a1 + 11) + 140;
+    *(int *)D_00196B20 = a1->y + 140;
     goto L242AF;
 L242A1:;
-    *(int *)D_00196B20 = *(int *)((char *)a1 + 11) + 40;
+    *(int *)D_00196B20 = a1->y + 40;
 L242AF:;
-    *(int *)D_00196B24 = *(int *)((char *)a1 + 15);
+    *(int *)D_00196B24 = a1->z;
     l_18 = 0;
 L242C1:;
     if (l_18 < *(int *)collide_candidate_count) goto L242D6;
@@ -1143,7 +1144,7 @@ L242CE:;
     l_18++;
     goto L242C1;
 L242D6:;
-    func_00021D97(*(int *)(collide_candidates + (l_18 << 2)));
+    func_00021D97(*(struct record **)(collide_candidates + (l_18 << 2)));
     goto L242CE;
 L242E9:;
     if (*(int *)D_00196D60 >= *(int *)((char *)a3 + 4)) goto L24319;
@@ -1158,7 +1159,7 @@ L2432D:;
     l_18++;
     goto L24320;
 L24335:;
-    func_00022174(*(int *)(collide_candidates + (l_18 << 2)));
+    func_00022174(*(struct record **)(collide_candidates + (l_18 << 2)));
     goto L2432D;
 L24348:;
     if (((int)(unsigned char)*(signed char *)player_environment) == 2) goto L24363;
@@ -1194,7 +1195,7 @@ L243F5:;
 L2440E:;
     goto L24431;
 L24410:;
-    object_move_by(a1, 0, *(int *)D_00196D60 - *(int *)((char *)a1 + 11), 0, 0, 0, 0);
+    object_move_by(a1, 0, *(int *)D_00196D60 - a1->y, 0, 0, 0, 0);
 L24431:;
     if (*(int *)D_00196D60 >= *(int *)((char *)a3 + 4)) goto L2444F;
     if ((*(int *)D_00196D60 - 90) > *(int *)D_00195C74) goto L24451;
@@ -1209,11 +1210,11 @@ L2446F:;
     if (((struct bf8_5_1 *)&D_001940D7)->f == 0) goto L244A9;
 L24478:;
     *(signed char *)D_001940D7 &= 223;
-    object_move_by(a1, 0, *(int *)D_00196D60 - *(int *)((char *)a1 + 11), 0, 0, 0, 0);
+    object_move_by(a1, 0, *(int *)D_00196D60 - a1->y, 0, 0, 0, 0);
     l_20 = 1;
     goto L244C5;
 L244A9:;
-    if (*(int *)D_00196D60 == *(int *)((char *)a1 + 11)) goto L244C5;
+    if (*(int *)D_00196D60 == a1->y) goto L244C5;
     *(signed char *)collide_flags |= 16;
     *(signed char *)player_on_ground = 0;
 L244C5:;
@@ -1222,22 +1223,22 @@ L244C5:;
 L244E5:;
     goto L24515;
 L244E7:;
-    object_set_position(a1, *(int *)D_00196B28, *(int *)((char *)a1 + 11), *(int *)D_00196B30, *(int *)((char *)a3 + 12), *(int *)((char *)a3 + 16), *(int *)((char *)a3 + 20));
+    object_set_position(a1, *(int *)D_00196B28, a1->y, *(int *)D_00196B30, *(int *)((char *)a3 + 12), *(int *)((char *)a3 + 16), *(int *)((char *)a3 + 20));
     goto L24541;
 L24515:;
-    object_set_position(a1, *(int *)((char *)a1 + 7), *(int *)((char *)a1 + 11), *(int *)((char *)a1 + 15), *(int *)((char *)a3 + 12), *(int *)((char *)a3 + 16), *(int *)((char *)a3 + 20));
+    object_set_position(a1, a1->x, a1->y, a1->z, *(int *)((char *)a3 + 12), *(int *)((char *)a3 + 16), *(int *)((char *)a3 + 20));
 L24541:;
     *(signed char *)collide_flags &= 251;
     return (int)(short)*(short *)collide_flags;
 }
 
-int func_0002455D(int a1)
+int func_0002455D(struct record *a1)
 {
-    mc_memcpy((int)D_00196B10, a1 + 7, 12, (int)D_00170710, 1143, 4);
-    mc_memcpy((int)D_00196B1C, a1 + 7, 12, (int)D_00170710, 1144, 4);
+    mc_memcpy((int)D_00196B10, (int)&a1->x, 12, (int)D_00170710, 1143, 4);
+    mc_memcpy((int)D_00196B1C, (int)&a1->x, 12, (int)D_00170710, 1144, 4);
     *(int *)D_00196B14 -= 20;
     *(int *)D_00196B20 += 40;
     *(int *)D_00196D60 = 100000;
-    object_foreach(*(int *)(*(char **)D_00195AC4 + 63), (int)func_00021D97);
+    object_foreach(D_00195AC4->children, (int)func_00021D97);
     return *(int *)D_00196D60;
 }

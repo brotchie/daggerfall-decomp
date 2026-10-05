@@ -1,19 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0008FE48 */
-#pragma pack(1)
-struct eff { unsigned char type; unsigned char sub; };
-struct chance { unsigned char base; unsigned char plus; unsigned char per_level; };
-struct mag { unsigned char base_min; unsigned char base_max; unsigned char plus_min; unsigned char plus_max; unsigned char per_level; };
-struct spell {
-    struct eff eff[3];          /* 0 */
-    unsigned char f6;           /* 6 */
-    unsigned char f7;           /* 7 */
-    char pad8[6];
-    struct chance chance[3];    /* 14 */
-    struct chance dur[3];       /* 23 */
-    struct mag mag[3];          /* 32 */
-    char name[25];              /* 47 */
-};
-#pragma pack()
+#include "records.h"
+
 extern char D_00176E94[];
 extern char D_00176EEC[];
 extern unsigned char spell_effect_settings[][12];
@@ -83,23 +70,23 @@ int potion_mix_unknown(struct spell *sp)
         }
     }
     if (n == 0) return 0;
-    sp->f6 = 4;
-    sp->f7 = 0;
+    sp->element = 4;
+    sp->target = 0;
     mc_strncpy(sp->name, D_00176EEC, 25, D_00176E94, 482);
-    sp->eff[0].type = sp->eff[1].type = sp->eff[2].type = 255;
+    sp->effects[0].type = sp->effects[1].type = sp->effects[2].type = 255;
     for (i = 0; i < n; i++) {
         c = spell_effect_settings[x[i]][z[i]];
-        sp->eff[i].type = x[i];
-        sp->eff[i].sub = z[i];
+        sp->effects[i].type = x[i];
+        sp->effects[i].subtype = z[i];
         if (c & 1)
-            sp->chance[i].base = sp->chance[i].plus = sp->chance[i].per_level = 1;
+            sp->durations[i].base = sp->durations[i].plus = sp->durations[i].per_level = 1;
         if (c & 2) {
-            sp->dur[i].base = 70;
-            sp->dur[i].plus = sp->dur[i].per_level = 1;
+            sp->chances[i].base = 70;
+            sp->chances[i].plus = sp->chances[i].per_level = 1;
         }
         if (c & 4) {
-            sp->mag[i].base_min = 10;
-            sp->mag[i].base_max = sp->mag[i].plus_min = sp->mag[i].base_max = sp->mag[i].plus_min = 1;
+            sp->magnitudes[i].base_min = 10;
+            sp->magnitudes[i].base_max = sp->magnitudes[i].plus_min = sp->magnitudes[i].base_max = sp->magnitudes[i].plus_min = 1;
         }
     }
     return 1;

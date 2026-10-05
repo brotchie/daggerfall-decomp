@@ -1,6 +1,8 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0006FF7E */
+#include "records.h"
+
 extern int guild_skill_lists[];
-extern char *D_0019671C;
+extern struct faction *D_0019671C;
 extern int guild_best_skill(int *, int, int);
 
 int guild_join_check(int a1)
@@ -10,7 +12,7 @@ int guild_join_check(int a1)
     int l_20;
     int l_1C;
 
-    if (*(short *)(D_0019671C + 29) < 0)
+    if (D_0019671C->reputation < 0)
         return 1;
     l_20 = guild_best_skill(&l_28, guild_skill_lists[a1], -1);
     if (l_20 < 22)

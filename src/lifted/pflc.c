@@ -1,6 +1,7 @@
 /* pflc.c: functions first lifted from the assembly by tools/lift_all.py (2026-10), now
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
+#include "records.h"
 
 extern char mouse_buttons[];
 extern char D_0014231D[];
@@ -11,7 +12,7 @@ extern char D_0017540B[];
 extern char text_buffer[];
 extern char text_rsc_buffer[];
 extern char mouse_buttons_prev[];
-extern char current_quest[];
+extern struct quest *current_quest;
 
 extern int flc_open(int, int);
 extern int func_0009DEA7();
@@ -29,7 +30,7 @@ extern int func_0012D887();
 extern int func_00144F68();
 extern int func_00144FB4();
 extern void parse_rsc_text(int, int, int);
-extern void quest_load_text(int, int, int, int);
+extern void quest_load_text(struct quest *, int, int, int);
 extern void fatal_error(int);
 extern void flc_decode_palette(int, int, unsigned char);
 extern void flc_decode_lc(int, int);
@@ -77,8 +78,8 @@ int flc_play_with_text(int a1, int a2, int a3, int a4)
 L51E46:;
     mc_memset(*(int *)screen_buffer, 0, 64000, (int)D_00175404, 135, 4);
     *(signed char *)((char *)a2 + 43) = 255;
-    if (*(int *)current_quest == 0) goto L51E86;
-    quest_load_text(*(int *)current_quest, a3, 0, 0);
+    if (current_quest == 0) goto L51E86;
+    quest_load_text(current_quest, a3, 0, 0);
     goto L51E92;
 L51E86:;
     parse_rsc_text(a3, 0, 0);

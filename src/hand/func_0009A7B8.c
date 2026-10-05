@@ -1,40 +1,37 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0009A7B8 */
+#include "records.h"
+
 #pragma pack(1)
-struct obj {
-    unsigned char type;
-    char pad1[6];
-    int x;                      /* 7 */
-    int y;                      /* 11 */
-    int z;                      /* 15 */
-    char pad13[2];
-    short flags;                /* 21 */
-    char pad17[40];
-    int f63;                    /* 63 */
-    struct obj *next;           /* 67 */
+struct header_copy {            /* a copy of a record's 71-byte header (found_marker) */
+    char pad00[7];
+    int x;                      /* +0x07 */
+    int y;                      /* +0x0B */
+    int z;                      /* +0x0F */
+    char pad13[52];
 };
 #pragma pack()
 extern char D_00177358[];
 extern unsigned char D_001940D5;
-extern struct obj *player_object;
-extern struct obj *marker_find_nearest(int, int);
+extern struct record *player_object;
+extern struct record *marker_find_nearest(struct record *, int);
 extern int func_0009DEAC(int);
 extern void mc_memcpy(void *, void *, int, char *, int, int);
 
 void func_0009A7B8(void)
 {
-    struct obj a;
-    struct obj b;
-    struct obj *q;
-    struct obj *p;
+    struct header_copy a;
+    struct header_copy b;
+    struct record *q;
+    struct record *p;
 
-    p = player_object->next;
-    while (p != 0 && ((unsigned short)p->flags & 1) == 0)
-        p = p->next;
+    p = player_object->parent;
+    while (p != 0 && (p->flags & 1) == 0)
+        p = p->parent;
     if (p == 0 || p->type != 43) return;
-    q = marker_find_nearest(p->f63, 19);
+    q = marker_find_nearest(p->children, 19);
     if (q == 0) return;
     mc_memcpy(&a, q, 71, D_00177358, 521, 4);
-    q = marker_find_nearest(p->f63, 20);
+    q = marker_find_nearest(p->children, 20);
     if (q == 0) return;
     mc_memcpy(&b, q, 71, D_00177358, 525, 4);
     if (func_0009DEAC(player_object->y - a.y) > func_0009DEAC(player_object->y - b.y)) {

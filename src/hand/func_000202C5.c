@@ -1,4 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x000202C5 */
+#include "records.h"
+
 extern char D_00170604[];
 extern char D_00170634[];
 extern char D_0017063D[];
@@ -11,19 +13,19 @@ extern unsigned char D_001850D4[];
 extern int D_001850E5[];
 extern char text_buffer[];
 extern unsigned game_minutes;
-extern unsigned short *game_settings;
+extern struct settings *game_settings;
 extern int D_00195D30;
 extern unsigned char climate_weathers[];
 extern char D_001961F5[];
 extern unsigned char D_00196271;
-extern unsigned char *D_0019671C;
+extern struct faction *D_0019671C;
 extern int current_quest;
-extern unsigned char *faction_find(short);
+extern struct faction *faction_find(short);
 extern int climate_category(void);
 extern void msgbox_show_string(char *, int);
 extern void msgbox_show_rsc(int, int);
 extern int flc_play_with_text(int, char *, int, int);
-extern unsigned char *monster_summon_near_player(int);
+extern struct record *monster_summon_near_player(int);
 extern int rand_range(int, int);
 extern void msgbox_yes_no_rsc(int);
 extern void gold_spend(int);
@@ -37,13 +39,13 @@ extern char *func_000CE45E(char *, short, int);
 extern int func_000A0ED9(int, char *);
 extern int mc_sprintf(char *, ...);
 
-#define REGION(o) D_001850D4[D_00179E94[*(unsigned short *)((o) + 33)]]
+#define REGION(o) D_001850D4[D_00179E94[(o)->id]]
 
-void daedra_summon(unsigned char *a1)
+void daedra_summon(struct record *a1)
 {
     char l_70[44];
-    unsigned char *l_40;
-    unsigned char *l_3C;
+    struct faction *l_40;
+    struct faction *l_3C;
     char *l_38;
     int l_34;
     int l_30;
@@ -55,15 +57,15 @@ void daedra_summon(unsigned char *a1)
     unsigned char l_18;
 
     l_18 = 48;
-    l_20 = a1 + 71;
+    l_20 = (unsigned char *)RECORD_DATA(a1);
     l_40 = faction_find(*(short *)l_20);
-    while (*(unsigned char **)(l_40 + 88) != 0)
-        l_40 = *(unsigned char **)(l_40 + 88);
-    if (*(unsigned short *)(l_40 + 33) == 40 || *l_40 == 8) {
+    while (l_40->parent != 0)
+        l_40 = l_40->parent;
+    if (l_40->id == 40 || l_40->type == 8) {
     } else {
-        l_40 = *(unsigned char **)(l_40 + 84);
+        l_40 = l_40->child;
     }
-    switch (*(unsigned short *)(l_40 + 33)) {
+    switch (l_40->id) {
     case 40:
         l_38 = func_000CE45E(D_00179E60, game_minutes % 518400 / 1440, 16);
         if (l_38 == 0 || D_00179E66 == l_38) {
@@ -74,13 +76,13 @@ void daedra_summon(unsigned char *a1)
         l_3C = faction_find(l_34);
         D_0019671C = l_3C;
         if (REGION(l_3C) == 56) {
-            if (*game_settings & 4) {
+            if (*(unsigned short *)game_settings & 4) {
                 msgbox_show_rsc(400, 1);
                 return;
             }
             l_18 = 120;
         }
-        D_00195D30 = (100 - *(short *)(l_40 + 29)) * 1000 + 100000;
+        D_00195D30 = (100 - l_40->reputation) * 1000 + 100000;
         msgbox_yes_no_rsc(481);
         if (D_00196271 == 2) return;
         l_30 = 30;
@@ -108,7 +110,7 @@ void daedra_summon(unsigned char *a1)
         }
         l_34 = (l_38 - D_00179E60) / 2 + 1;
         for (l_2C = 0; l_2C < 3; l_2C++) {
-            if (*(unsigned char **)(l_40 + l_2C * 4 + 68) != 0 && *(unsigned short *)(*(unsigned char **)(l_40 + l_2C * 4 + 68) + 33) == l_34) {
+            if (l_40->enemies[l_2C] != 0 && l_40->enemies[l_2C]->id == l_34) {
                 msgbox_show_string(D_00170604, 1);
                 return;
             }
@@ -116,13 +118,13 @@ void daedra_summon(unsigned char *a1)
         l_3C = faction_find(l_34);
         D_0019671C = l_3C;
         if (REGION(l_3C) == 56) {
-            if (*game_settings & 4) {
+            if (*(unsigned short *)game_settings & 4) {
                 msgbox_show_rsc(400, 1);
                 return;
             }
             l_18 = 120;
         }
-        D_00195D30 = (100 - *(short *)(l_40 + 29)) * 1000 + 100000;
+        D_00195D30 = (100 - l_40->reputation) * 1000 + 100000;
         msgbox_yes_no_rsc(481);
         if (D_00196271 == 2) return;
         l_30 = 30;
@@ -131,20 +133,20 @@ void daedra_summon(unsigned char *a1)
         l_28 = rand();
         srand(game_minutes / 1440);
         l_34 = 4;
-        if (*(unsigned short *)(l_40 + 33) != 419) {
+        if (l_40->id != 419) {
             while (l_34 == 4)
                 l_34 = rand_range(1, 16);
         }
         l_3C = faction_find(l_34);
         D_0019671C = l_3C;
         if (REGION(l_3C) == 56) {
-            if (*game_settings & 4) {
+            if (*(unsigned short *)game_settings & 4) {
                 msgbox_show_rsc(400, 1);
                 return;
             }
             l_18 = 120;
         }
-        D_00195D30 = (100 - *(short *)(l_40 + 29)) * 1000 + 100000;
+        D_00195D30 = (100 - l_40->reputation) * 1000 + 100000;
         msgbox_yes_no_rsc(481);
         if (D_00196271 == 2) return;
         l_30 = 30;
@@ -167,7 +169,7 @@ void daedra_summon(unsigned char *a1)
         l_34 = 9;
         l_3C = faction_find(l_34);
     }
-    l_30 += *(short *)(l_3C + 29);
+    l_30 += l_3C->reputation;
     if (D_00179E7F[l_34] == 100 || l_1C == D_00179E7F[l_34])
         l_30 += 30;
     gold_spend(D_00195D30);
@@ -175,17 +177,17 @@ void daedra_summon(unsigned char *a1)
         msgbox_show_rsc(484, 1);
         return;
     }
-    if (*(unsigned short *)(l_3C + 37) & 64) {
+    if (l_3C->flags & 64) {
         l_24 = &REGION(l_3C);
         mc_memset(l_70, 0, 44, D_00170634, 189, 4);
         current_quest = 0;
         flc_play_with_text(D_001850E5[l_24 - D_001850D4], l_70, 482, 0);
         a1 = monster_summon_near_player(D_00179E90[rand_range(0, 4)]);
         if (a1 != 0)
-            a1[624] = 1;
+            a1->data.character.team = 1;
         return;
     }
-    *(unsigned short *)(l_3C + 37) |= 64;
+    l_3C->flags |= 64;
     func_000A0ED9(200, D_00170634);
     mc_sprintf(text_buffer, D_0017063D, REGION(l_3C), l_18);
     mc_strncpy(D_001961F5, text_buffer, 13, D_00170634, 201);

@@ -1,6 +1,7 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0006BA50 */
+#include "records.h"
+
 struct Img { unsigned short x; unsigned short y; unsigned short w; unsigned short h; char pad[4]; char data[1]; };
-struct stats { int f0; int f4; int f8; };
 struct ent { unsigned char f0; char pad1[4]; int f5; };
 struct slot { struct ent *e; char pad[16]; };      /* 20 bytes */
 struct rec { char pad[74]; };
@@ -15,7 +16,7 @@ extern int game_minutes;
 extern struct slot bank_houses_for_sale[];
 extern char *bank_saved_screen;
 extern struct rec bank_ships_for_sale[];
-extern struct stats *bank_account;
+extern struct bank_account *bank_account;
 extern unsigned char bank_screen;
 extern unsigned char bank_selected;
 extern void parse_expand(char *, char *);
@@ -38,12 +39,12 @@ void bank_draw(void)
     func_00144F68(img->x, img->y, img->w, img->h, img->data);
     switch (bank_screen) {
     case 0:
-        text_draw_colored(func_000A0DD9(bank_account->f0, text_rsc_buffer, 10), 197, 19, 145, 156);
+        text_draw_colored(func_000A0DD9(bank_account->balance, text_rsc_buffer, 10), 197, 19, 145, 156);
         text_draw_colored(func_000A0DD9(gold_total(), text_rsc_buffer, 10), 203, 29, 145, 156);
-        if (bank_account->f8 != 0) {
-            text_draw_colored(func_000A0DD9(bank_account->f4, text_rsc_buffer, 10), 143, 39, 145, 156);
+        if (bank_account->loan_due != 0) {
+            text_draw_colored(func_000A0DD9(bank_account->loan_owed, text_rsc_buffer, 10), 143, 39, 145, 156);
             saved = game_minutes;
-            game_minutes = bank_account->f8;
+            game_minutes = bank_account->loan_due;
             parse_expand(D_00175CCB, D_00190B44);
             text_draw_colored(D_00190B44, 119, 49, 145, 156);
             game_minutes = saved;

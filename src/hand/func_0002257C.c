@@ -1,7 +1,8 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0002257C */
+#include "records.h"
+
 struct vec3 { int x, y, z; };
 struct move { int x, y, z; int f12, f16, f20; };
-struct obj { char pad[7]; struct vec3 pos; };   /* 10.0a packs structs (-zp1) */
 struct plane { char pad[16]; int nx, ny, nz; char pad2[2]; };
 struct planes { int count; struct plane p[1]; };
 extern unsigned char player_environment;
@@ -15,14 +16,14 @@ extern struct vec3 *D_00196D4C;
 extern struct planes *D_00196D50;
 extern int D_00196D60;
 extern short collide_flags;
-extern void collide_for_each_nearby(struct obj *, void (*)(int));
+extern void collide_for_each_nearby(struct record *, void (*)(int));
 extern void func_0002325A(int);
-extern int func_00023FA5(struct obj *, int, struct move *);
-extern void object_set_position(struct obj *, int, int, int, int, int, int);
+extern int func_00023FA5(struct record *, int, struct move *);
+extern void object_set_position(struct record *, int, int, int, int, int, int);
 extern int func_0014B45B(int, int);
 extern void func_0014BDDD(struct vec3 *);
 
-int collide_move_object(struct obj *o, int a2, struct move *m, int a4)
+int collide_move_object(struct record *o, int a2, struct move *m, int a4)
 {
     int result;
     int unused40;           /* never used, but it has a stack slot */
@@ -51,7 +52,7 @@ int collide_move_object(struct obj *o, int a2, struct move *m, int a4)
     if (player_environment != 1 && collide_candidate_count == 0)
         return 0;
     if (collide_candidate_count == 0 && player_environment == 1) {
-        D_00196D60 = func_0014B45B(o->pos.x, o->pos.z);
+        D_00196D60 = func_0014B45B(o->x, o->z);
         object_set_position(o, m->x, D_00196D60, m->z, m->f12, m->f16, m->f20);
         return 0;
     }
@@ -63,9 +64,9 @@ int collide_move_object(struct obj *o, int a2, struct move *m, int a4)
     D_00195C70 = saved_c70;
     if (!(result & 10) || !(flags & 4))
         return 0;
-    d.x = m->x - o->pos.x;
-    d.y = m->y - o->pos.y;
-    d.z = m->z - o->pos.z;
+    d.x = m->x - o->x;
+    d.y = m->y - o->y;
+    d.z = m->z - o->z;
     func_0014BDDD(&d);
     if (D_00196D50 == 0)
         return 1;
@@ -83,9 +84,9 @@ int collide_move_object(struct obj *o, int a2, struct move *m, int a4)
         mindot = d.x * D_00196D50->p[0].nx + d.z * D_00196D50->p[0].nz;
         best = 0;
     }
-    dx = (m->x - o->pos.x) * D_00196D50->p[best].nx;
-    dy = (m->y - o->pos.y) * D_00196D50->p[best].ny;
-    dz = (m->z - o->pos.z) * D_00196D50->p[best].nz;
+    dx = (m->x - o->x) * D_00196D50->p[best].nx;
+    dy = (m->y - o->y) * D_00196D50->p[best].ny;
+    dz = (m->z - o->z) * D_00196D50->p[best].nz;
     dx = dz + (dx + dy);
     dy = dx * D_00196D50->p[best].ny;
     dz = dx * D_00196D50->p[best].nz;
@@ -93,12 +94,12 @@ int collide_move_object(struct obj *o, int a2, struct move *m, int a4)
     dx >>= 8;
     dy >>= 8;
     dz >>= 8;
-    dx = (m->x - o->pos.x) - (dx >> 8);
-    dy = (m->y - o->pos.y) - (dy >> 8);
-    dz = (m->z - o->pos.z) - (dz >> 8);
-    m->x = o->pos.x + dx;
-    m->y = o->pos.y + dy;
-    m->z = o->pos.z + dz;
+    dx = (m->x - o->x) - (dx >> 8);
+    dy = (m->y - o->y) - (dy >> 8);
+    dz = (m->z - o->z) - (dz >> 8);
+    m->x = o->x + dx;
+    m->y = o->y + dy;
+    m->z = o->z + dz;
     flags = collide_flags;
     player_on_ground = 1;
     result = func_00023FA5(o, a2, m);

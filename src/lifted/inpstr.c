@@ -1,6 +1,7 @@
 /* inpstr.c: functions first lifted from the assembly by tools/lift_all.py (2026-10), now
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
+#include "records.h"
 
 extern char D_0012DA50[];
 extern char key_down_home[];
@@ -145,9 +146,9 @@ int inpstr_text_width(int a1, short a2)
     return (int)(short)l_18;
 }
 
-void picklist_save_background(int a1)
+void picklist_save_background(struct picklist *a1)
 {
-    if (*(signed char *)((char *)a1) == 0) return;
-    func_00144E84((int)(short)*(short *)((char *)a1 + 5), (int)(short)*(short *)((char *)a1 + 7), (int)(short)*(short *)((char *)a1 + 9), (int)(short)*(short *)((char *)a1 + 11), *(int *)((char *)a1 + 51), 0);
-    func_00144E84((int)(short)*(short *)((char *)a1 + 29), (int)(short)*(short *)((char *)a1 + 31), (int)(short)*(short *)((char *)a1 + 33), (int)(short)*(short *)((char *)a1 + 35), *(int *)((char *)a1 + 55), 0);
+    if (a1->framed == 0) return;
+    func_00144E84(a1->list_rect.x, a1->list_rect.y, a1->list_rect.w, a1->list_rect.h, (int)a1->list_background, 0);
+    func_00144E84(a1->bar_rect.x, a1->bar_rect.y, a1->bar_rect.w, a1->bar_rect.h, (int)a1->bar_background, 0);
 }

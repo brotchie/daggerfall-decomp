@@ -1,6 +1,7 @@
 /* qmisc.c: functions first lifted from the assembly by tools/lift_all.py (2026-10), now
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
+#include "records.h"
 
 extern char quest_faces[];
 extern char D_00195A15[];
@@ -8,11 +9,11 @@ extern char D_00195A16[];
 extern char D_00195A1A[];
 extern char D_00195D04[];
 extern char D_00195D14[];
-extern char current_quest[];
+extern struct quest *current_quest;
 
 extern int rand_range(int, int);
 
-void quest_face_add(int a1, int a2, int a3, int a4)
+void quest_face_add(struct record *a1, int a2, int a3, int a4)
 {
     int l_1C;
     int l_18;
@@ -20,8 +21,8 @@ void quest_face_add(int a1, int a2, int a3, int a4)
     int l_10;
     short l_C;
 
-    if (((int)(unsigned char)*(signed char *)((char *)a1)) != 18) goto L30ACA;
-    *(int *)&l_C = a1 + 71;
+    if (a1->type != 18) goto L30ACA;
+    *(int *)&l_C = (int)&a1->data.character;
     a3 = ((((int)(unsigned short)(*(short *)(*(char **)&l_C + 64) & 1)) != 0) ? 1 : 0);
     goto L30AD7;
 L30ACA:;
@@ -40,8 +41,8 @@ L30AF3:;
 L30AFB:;
     if (l_1C >= 10) return;
     *(int *)(D_00195A16 + (l_1C * 10)) = a4;
-    *(signed char *)(D_00195A15 + (l_1C * 10)) = *(signed char *)(*(char **)current_quest);
-    if (((int)(unsigned char)*(signed char *)((char *)a1)) == 18) goto L30B46;
+    *(signed char *)(D_00195A15 + (l_1C * 10)) = (signed char)current_quest->id;
+    if (a1->type == 18) goto L30B46;
     if (((int)(unsigned short)*(short *)((char *)a1 + 89)) == 514) goto L30B48;
 L30B46:;
     goto L30B7E;

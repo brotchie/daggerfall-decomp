@@ -1,6 +1,7 @@
 /* pickbook.c: functions first lifted from the assembly by tools/lift_all.py (2026-10), now
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
+#include "records.h"
 
 extern char screen_buffer[];
 extern char D_00170DE4[];
@@ -10,7 +11,7 @@ extern char D_00184876[];
 extern char D_00187CA8[];
 extern char D_001940D4[];
 extern char D_001940D8[];
-extern char player_object[];
+extern struct record *player_object;
 extern char spellshop_icons[];
 extern char window_image[];
 extern char D_00195D60[];
@@ -22,7 +23,7 @@ extern char spellbook_saved_screen[];
 
 extern int spellbook_build_list(void);
 extern int key_action_held(int);
-extern int sound_play(int, int, int);
+extern int sound_play(int, struct record *, int);
 extern int disk_read_file(int, int);
 extern int mc_malloc();
 extern int mc_memcpy();
@@ -67,7 +68,7 @@ L4187C:;
     *(int *)window_image = disk_read_file((int)D_00170DF7, 0);
     *(int *)spellshop_icons = disk_read_file((int)D_00170E04, 0);
     *(signed char *)D_00196272 = 1;
-    sound_play(237, *(int *)player_object, 100);
+    sound_play(237, player_object, 100);
 L4190D:;
     if (((int)(unsigned char)*(signed char *)game_mode) != 5) goto L41922;
     l_20 = 1;

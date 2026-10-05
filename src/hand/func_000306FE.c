@@ -1,23 +1,22 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x000306FE */
-#pragma pack(1)
-struct ent { char pad0[7]; unsigned char flags; char pad8[4]; unsigned char kind; char pad13[4]; };
-#pragma pack()
-extern int D_00196A28;
-extern struct ent *D_00196A9C;
+#include "records.h"
 
-void qaction_op19_reveal_location(int a1, int a2, int a3)
+extern int D_00196A28;
+extern struct map_location *D_00196A9C;
+
+void qaction_op19_reveal_location(struct quest *a1, struct qbn_op *a2, int a3)
 {
-    int l_1C;
-    struct ent *p;
+    struct record *l_1C;
+    struct map_location *p;
     int n;
     int i;
 
-    l_1C = *(int *)((char *)a2 + 32);
-    n = *(unsigned short *)((char *)l_1C + 27);
+    l_1C = a2->args[1].object;
+    n = l_1C->image;
     p = D_00196A9C;
     for (i = 0; i < D_00196A28; i++, p++) {
-        if (p->kind != 255)
+        if (p->dungeon_type != 255)
             if (n-- == 0) break;
     }
-    p->flags |= 64;
+    p->x_type_flags |= 0x40000000;
 }

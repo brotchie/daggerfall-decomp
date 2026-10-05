@@ -1,20 +1,5 @@
 /* matched by the real Watcom C32 10.0a (-d2): a run of maplogic from 0x874C0 to 0x8795D, kept together for its switch table's alignment */
-struct obj {
-    char pad[3];
-    short angle;                /* 3 */
-    char pad2[2];
-    int x;                      /* 7 */
-    int y;                      /* 11 */
-    int z;                      /* 15 */
-    char pad3[8];
-    unsigned short f27;         /* 27 */
-    char pad4[34];
-    int f63;                    /* 63 */
-    int f67;                    /* 67 */
-};
-#pragma pack(1)
-struct loc { int f0; int x; int z; char pad[5]; };
-#pragma pack()
+#include "records.h"
 struct bits { unsigned char b0:1, b1:1, b2:1, b3:1, b4:1, b5:1, b6:1, b7:1; };
 struct flags { struct bits f[4]; };
 extern int D_000C23C4;
@@ -23,13 +8,13 @@ extern int D_000C23CC;
 extern char D_00176C94[];
 extern unsigned char player_environment;
 extern unsigned char D_001940D5;
-extern struct obj *camera_object;
-extern struct obj *player_object;
-extern struct obj *D_00195AC4;
-extern unsigned char *current_location;
+extern struct record *camera_object;
+extern struct record *player_object;
+extern struct record *D_00195AC4;
+extern struct location *current_location;
 extern unsigned char current_region;
 extern unsigned char D_00196289;
-extern struct loc *D_00196A9C;
+extern struct map_location *D_00196A9C;
 extern char D_001A94A0[];
 extern char D_001A94B0[];
 extern void region_enter(unsigned char, unsigned char);
@@ -37,8 +22,8 @@ extern void automap_load(void);
 extern void world_update_location(void);
 extern void dungeon_load(int);
 extern void location_unload(unsigned short);
-extern void building_enter(char *);
-extern void player_to_nearest_marker(int, int);
+extern void building_enter(struct building *);
+extern void player_to_nearest_marker(struct record *, int);
 extern int mc_memset();
 extern int func_000C2FF5();
 extern int func_0014B45B(int, int);
@@ -48,74 +33,74 @@ void location_place_player_at_edge(unsigned a1)
     switch (a1) {
     case 0:
     case 1:
-        player_object->x = D_00195AC4->x + (current_location[32] << 11);
+        player_object->x = D_00195AC4->x + (current_location->width << 11);
         player_object->z = D_00195AC4->z - 256;
-        player_object->angle = camera_object->angle = 0;
+        player_object->yaw = camera_object->yaw = 0;
         break;
     case 2:
     case 3:
         player_object->x = D_00195AC4->x - 256;
-        player_object->z = D_00195AC4->z + (current_location[33] << 11);
-        player_object->angle = camera_object->angle = 512;
+        player_object->z = D_00195AC4->z + (current_location->height << 11);
+        player_object->yaw = camera_object->yaw = 512;
         break;
     case 4:
     case 5:
-        player_object->x = D_00195AC4->x + (current_location[32] << 11);
-        player_object->z = D_00195AC4->z + (current_location[33] << 12) + 256;
-        player_object->angle = camera_object->angle = 1024;
+        player_object->x = D_00195AC4->x + (current_location->width << 11);
+        player_object->z = D_00195AC4->z + (current_location->height << 12) + 256;
+        player_object->yaw = camera_object->yaw = 1024;
         break;
     case 6:
     case 7:
-        player_object->x = D_00195AC4->x + (current_location[32] << 12) + 256;
-        player_object->z = D_00195AC4->z + (current_location[33] << 11);
-        player_object->angle = camera_object->angle = 1536;
+        player_object->x = D_00195AC4->x + (current_location->width << 12) + 256;
+        player_object->z = D_00195AC4->z + (current_location->height << 11);
+        player_object->yaw = camera_object->yaw = 1536;
         break;
     }
-    if (current_location[34] == 0)
-        player_to_nearest_marker(D_00195AC4->f63, 8);
+    if (current_location->kind == 0)
+        player_to_nearest_marker(D_00195AC4->children, 8);
     player_object->y = func_0014B45B(player_object->x, player_object->z);
 }
 
 void map_goto_location(int a1, int a2, int a3, int a4)
 {
-    int l_C;
+    struct record *l_C;
 
-    l_C = player_object->f67;
-    if (current_region == a1 && player_environment == a2 && D_00195AC4->f27 == a3) {
+    l_C = player_object->parent;
+    if (current_region == a1 && player_environment == a2 && D_00195AC4->image == a3) {
         if (player_environment == 2)
-            building_enter(*(char **)(current_location + 43) + a4 * 26);
+            building_enter(&current_location->buildings[a4]);
         else
-            player_to_nearest_marker((int)D_00195AC4, 8);
+            player_to_nearest_marker(D_00195AC4, 8);
         return;
     }
-    location_unload(D_00195AC4->f27);
+    location_unload(D_00195AC4->image);
     player_environment = a2;
     if (current_region != a1)
         region_enter(current_region, a1);
     switch (player_environment) {
     case 1:
-        D_000C23C4 = player_object->x = D_00196A9C[a3].x & 33554431;
-        D_000C23CC = player_object->z = D_00196A9C[a3].z & 16777215;
+        D_000C23C4 = player_object->x = D_00196A9C[a3].x_type_flags & 33554431;
+        D_000C23CC = player_object->z = D_00196A9C[a3].y_size & 16777215;
         func_000C2FF5();
         mc_memset(D_001A94B0, 0, 16, D_00176C94, 783, 16);
         mc_memset(D_001A94A0, 0, 16, D_00176C94, 784, 16);
         world_update_location();
         player_object->x = D_00195AC4->x;
         player_object->z = D_00195AC4->z;
-        if (current_location[34] == 0)
-            player_to_nearest_marker(D_00195AC4->f63, 8);
+        if (current_location->kind == 0)
+            player_to_nearest_marker(D_00195AC4->children, 8);
         D_000C23C8 = func_0014B45B(player_object->x, player_object->z);
         player_object->y = D_000C23C8;
         break;
     case 2:
-        D_000C23C4 = player_object->x = D_00196A9C[a3].x & 33554431;
-        D_000C23CC = player_object->z = D_00196A9C[a3].z & 16777215;
+        D_000C23C4 = player_object->x = D_00196A9C[a3].x_type_flags & 33554431;
+        D_000C23CC = player_object->z = D_00196A9C[a3].y_size & 16777215;
         func_000C2FF5();
         mc_memset(D_001A94B0, 0, 16, D_00176C94, 803, 16);
         mc_memset(D_001A94A0, 0, 16, D_00176C94, 804, 16);
         world_update_location();
         D_00196289++;
-        building_enter(*(char **)(current_location + 43) + a4 * 26);
+        building_enter(&current_location->buildings[a4]);
         D_00196289--;
         break;
     case 3:

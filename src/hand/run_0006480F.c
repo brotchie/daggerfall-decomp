@@ -1,4 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2): a run of links.c from 0x00064589 to 0x0006480F, kept together for its switch table's alignment */
+#include "records.h"
+
 #pragma pack(1)
 struct link {
     unsigned short id;
@@ -28,10 +30,10 @@ extern char D_00195798[];
 extern char D_001957CD[];
 extern char D_001957E9[];
 extern char frame_counter[];
-extern char player_entity[];
-extern char player_object[];
+extern struct record *player_entity;
+extern struct record *player_object;
 extern char D_00195AB0[];
-extern char player_character[];
+extern struct character *player_character;
 extern char D_0019621B[];
 extern char D_00196222[];
 extern char D_00196226[];
@@ -40,28 +42,28 @@ extern char interaction_mode[];
 extern char D_0019628C[];
 extern char D_001A3A80[];
 extern char D_001A3A81[];
-extern int damage_apply(int, int, int);
+extern int damage_apply(struct record *, int, int);
 extern void msgbox_show_rsc(int, int);
-extern int cast_creature_spell(int, int, int);
+extern int cast_creature_spell(struct record *, struct record *, int);
 extern void link_show_text(int);
 extern int link_answer_matches(int, int);
 extern void link_hurt_player(int, int);
 extern void func_00065748(short, unsigned char);
-extern int func_00065864(int);
-extern void disease_infect(int, int, int, int);
-extern void func_00065A8C(int, int, int);
+extern struct spell *func_00065864(int);
+extern void disease_infect(struct record *, int, int, int);
+extern void func_00065A8C(struct record *, int, int);
 extern int sound_play(int, int, int);
 extern int hud_message_add(int);
 extern void hud_messages_draw(void);
 extern int rand_range(int, int);
 extern void inpstr_begin_text(int, short);
 extern int inpstr_update(void);
-extern void object_set_position(int, int, int, int, int, int, int);
+extern void object_set_position(struct record *, int, int, int, int, int, int);
 extern int door_start_swing(int, int);
 extern int func_000CDD81();
 extern int func_00142790();
 
-void links_trigger(int a1, int a2)
+void links_trigger(struct record *a1, int a2)
 {
     int i;
     int j;
@@ -71,7 +73,7 @@ void links_trigger(int a1, int a2)
 
     i = 0;
     if (link_count == 0) return;
-    id = *(short *)((char *)a1 + 31);
+    id = a1->id;
     while (i < link_count) {
         if (D_00199D78[i].type != 0 && D_00199D78[i].id == id) {
             if (D_00199D78[i].type < 8 || D_00199D78[i].type > 9) {
@@ -256,7 +258,7 @@ case 9:
     *(int *)D_00195798 -= *(int *)D_00195AB0;
     if (*(int *)D_00195798 > 0) goto L64E69;
     *(int *)D_00195798 = 1000;
-    *(signed char *)D_001957CD = *(signed char *)(*(char **)player_character + 129);
+    *(signed char *)D_001957CD = player_character->level;
     l_40 = 0;
 L64DD5:;
     if (l_40 < 35) goto L64DE5;
@@ -271,11 +273,11 @@ L64DF4:;
     *(int *)D_00196222 = *(int *)(*(char **)((char *)a1 + 35) + 7);
     *(int *)D_00196226 = *(int *)(*(char **)((char *)a1 + 35) + 11) - 40;
     *(int *)D_0019622A = *(int *)(*(char **)((char *)a1 + 35) + 15);
-    if (*(signed char *)((char *)func_00065864((int)(unsigned char)*(signed char *)((char *)a1 + 3)) + 7) != 0) goto L64E51;
-    cast_creature_spell(*(int *)player_entity, *(int *)player_entity, (int)(unsigned char)*(signed char *)((char *)a1 + 3));
+    if (func_00065864((int)(unsigned char)*(signed char *)((char *)a1 + 3))->target != 0) goto L64E51;
+    cast_creature_spell(player_entity, player_entity, (int)(unsigned char)*(signed char *)((char *)a1 + 3));
     goto L64E69;
 L64E51:;
-    cast_creature_spell((int)D_0019621B, *(int *)player_entity, (int)(unsigned char)*(signed char *)((char *)a1 + 3));
+    cast_creature_spell((struct record *)D_0019621B, player_entity, (int)(unsigned char)*(signed char *)((char *)a1 + 3));
 L64E69:;
     goto L652AB;
 case 10:
@@ -306,7 +308,7 @@ L64F5D:;
 case 13:
     goto L652AB;
 case 14:
-    object_set_position(*(int *)player_object, *(int *)(*(char **)((char *)a1 + 74) + 7), *(int *)(*(char **)((char *)a1 + 74) + 11), *(int *)(*(char **)((char *)a1 + 74) + 15), (int)(short)*(short *)(*(char **)player_object + 1), (int)(short)*(short *)(*(char **)player_object + 3), (int)(short)*(short *)(*(char **)player_object + 5));
+    object_set_position(player_object, *(int *)(*(char **)((char *)a1 + 74) + 7), *(int *)(*(char **)((char *)a1 + 74) + 11), *(int *)(*(char **)((char *)a1 + 74) + 15), player_object->angle_x, player_object->yaw, player_object->angle_z);
     goto L652AB;
 case 15:
     *(short *)(*(char **)((char *)a1 + 35) + 23) = (unsigned short)(unsigned char)*(signed char *)((char *)a1 + 4);
@@ -351,11 +353,11 @@ case 21:
     *(int *)D_00195798 -= *(int *)D_00195AB0;
     if (*(int *)D_00195798 > 0) goto L65124;
     *(int *)D_00195798 = 1000;
-    l_34 = rand_range((int)(unsigned char)*(signed char *)((char *)a1 + 3), (int)(unsigned char)*(signed char *)((char *)a1 + 4)) * ((int)(unsigned char)*(signed char *)(*(char **)player_character + 129));
+    l_34 = rand_range((int)(unsigned char)*(signed char *)((char *)a1 + 3), (int)(unsigned char)*(signed char *)((char *)a1 + 4)) * player_character->level;
     if (l_34 != 0) goto L65115;
-    l_34 = (int)(unsigned char)*(signed char *)(*(char **)player_character + 129);
+    l_34 = player_character->level;
 L65115:;
-    damage_apply(*(int *)player_entity, l_34, 0);
+    damage_apply(player_entity, l_34, 0);
 L65124:;
     goto L652AB;
 case 22:
@@ -374,22 +376,22 @@ case 26:
     *(int *)D_00195798 -= *(int *)D_00195AB0;
     if (*(int *)D_00195798 > 0) goto L651BE;
     *(int *)D_00195798 = 1000;
-    func_00065A8C(*(int *)player_entity, (int)&*(signed char *)((char *)rand_range(0, 11) + 128), 0);
+    func_00065A8C(player_entity, (int)&*(signed char *)((char *)rand_range(0, 11) + 128), 0);
 L651BE:;
     goto L652AB;
 case 27:
     *(int *)D_00195798 -= *(int *)D_00195AB0;
     if (*(int *)D_00195798 > 0) goto L65200;
     *(int *)D_00195798 = 1000;
-    disease_infect(*(int *)player_entity, 0, rand_range(0, 16), 0);
+    disease_infect(player_entity, 0, rand_range(0, 16), 0);
 L65200:;
     goto L652AB;
 case 28:
     if (*(signed char *)((char *)a1 + 4) == 0) goto L65224;
-    *(short *)(*(char **)player_character + 141) -= (unsigned short)(unsigned char)*(signed char *)((char *)a1 + 4);
+    player_character->magicka -= (unsigned short)(unsigned char)*(signed char *)((char *)a1 + 4);
     goto L65230;
 L65224:;
-    (*(short *)(*(char **)player_character + 141))--;
+    player_character->magicka--;
 L65230:;
     goto L652AB;
 case 29:

@@ -1,13 +1,14 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x000234EB */
-struct bf8_3_1 { unsigned char _:3; unsigned char f:1; };
+#include "records.h"
+
 struct bf8_4_1 { unsigned char _:4; unsigned char f:1; };
 struct bf8_5_1 { unsigned char _:5; unsigned char f:1; };
 extern char player_environment[];
 extern char D_00179F48[];
 extern char D_001940D7[];
 extern char player_motion_flags[];
-extern char player_object[];
-extern char player_character[];
+extern struct record *player_object;
+extern struct character *player_character;
 extern char D_00195C70[];
 extern char D_00195CB8[];
 extern char D_00195CD4[];
@@ -19,8 +20,8 @@ extern char collide_candidate_count[];
 extern char D_00196D4C[];
 extern char D_00196D50[];
 extern char collide_flags[];
-extern int func_0002294E(int, int, int);
-extern void collide_for_each_nearby(int, int);
+extern int func_0002294E(struct record *, int, int);
+extern void collide_for_each_nearby(struct record *, int);
 extern void func_0002325A(int);
 extern void automap_mark_seen(int);
 extern int func_000657B2(int);
@@ -45,7 +46,6 @@ struct planes {
 
 #define PLANES (*(struct planes **)D_00196D50)
 #define PL (PLANES->p)
-#define PLAYER (*(char **)player_character)
 #define FLAGS (*(short *)collide_flags)
 
 struct vec3 {
@@ -54,12 +54,7 @@ struct vec3 {
     int z;
 };
 
-struct obj {
-    char f0[7];
-    struct vec3 pos;
-};
-
-int collide_move_player(struct obj *a1, int a2, struct vec3 *a3, int a4)
+int collide_move_player(struct record *a1, int a2, struct vec3 *a3, int a4)
 {
     int l_44;
     int l_40;           /* l_40, l_3C and l_34 are never read: they only shape the frame */
@@ -85,12 +80,12 @@ int collide_move_player(struct obj *a1, int a2, struct vec3 *a3, int a4)
     (*(struct vec3 **)D_00196D4C = (struct vec3 *)D_00179F48)->x = a3->x;
     (*(struct vec3 **)D_00196D4C)->y = a3->y;
     (*(struct vec3 **)D_00196D4C)->z = a3->z;
-    collide_for_each_nearby((int)a1, (int)func_0002325A);
-    if (!(((struct bf8_3_1 *)(PLAYER + 137))->f || *(int *)collide_candidate_count != 0 || *(unsigned char *)player_environment == 1))
+    collide_for_each_nearby(a1, (int)func_0002325A);
+    if (!((player_character->conditions & 0x8) || *(int *)collide_candidate_count != 0 || *(unsigned char *)player_environment == 1))
         return FLAGS = 16;
     l_14 = FLAGS;
     *(char *)player_on_ground = 1;
-    l_44 = func_0002294E((int)a1, a2, (int)a3);
+    l_44 = func_0002294E(a1, a2, (int)a3);
     *(unsigned char *)D_001940D7 &= 223;
     if (*(char *)player_on_ground != 0 && *(char *)D_00196296 != 0)
         *(char *)D_00196296 = 0;
@@ -100,7 +95,7 @@ int collide_move_player(struct obj *a1, int a2, struct vec3 *a3, int a4)
             a3->y += l_10[1];
             a3->z += l_10[2];
             *(unsigned char *)collide_flags |= 4;
-            l_44 = func_0002294E((int)a1, a2, (int)a3);
+            l_44 = func_0002294E(a1, a2, (int)a3);
         }
     }
     if (*(int *)D_00195C70 != 0 && (l_10 = (short *)func_000657B2(*(int *)D_00195C70)) != 0) {
@@ -108,7 +103,7 @@ int collide_move_player(struct obj *a1, int a2, struct vec3 *a3, int a4)
         a3->y += l_10[1];
         a3->z += l_10[2];
         *(unsigned char *)collide_flags |= 4;
-        l_44 = func_0002294E((int)a1, a2, (int)a3);
+        l_44 = func_0002294E(a1, a2, (int)a3);
     }
     if (*(int *)D_00195CB8 != 0)
         automap_mark_seen(*(int *)D_00195CB8);
@@ -116,13 +111,13 @@ int collide_move_player(struct obj *a1, int a2, struct vec3 *a3, int a4)
         automap_mark_seen(*(int *)D_00195C70);
     if (l_44 & 2)
         *(short *)D_00195F5A = 0;
-    if ((int)a1 == *(int *)player_object && ((struct bf8_5_1 *)&player_motion_flags)->f)
+    if (a1 == player_object && ((struct bf8_5_1 *)&player_motion_flags)->f)
         return 0;
     if (!(l_44 & 10) || !(l_14 & 4))
         return 0;
-    l_5C.x = a3->x - a1->pos.x;
-    l_5C.y = a3->y - a1->pos.y;
-    l_5C.z = a3->z - a1->pos.z;
+    l_5C.x = a3->x - a1->x;
+    l_5C.y = a3->y - a1->y;
+    l_5C.z = a3->z - a1->z;
     func_0014BDDD((int)&l_5C);
     if (*(int *)D_00196D50 == 0)
         return 1;
@@ -140,9 +135,9 @@ int collide_move_player(struct obj *a1, int a2, struct vec3 *a3, int a4)
         l_1C = l_5C.x * PL[0].nx + l_5C.z * PL[0].nz;
         l_24 = 0;
     }
-    l_30 = (a3->x - a1->pos.x) * PL[l_24].nx;
-    l_2C = (a3->y - a1->pos.y) * PL[l_24].ny;
-    l_28 = (a3->z - a1->pos.z) * PL[l_24].nz;
+    l_30 = (a3->x - a1->x) * PL[l_24].nx;
+    l_2C = (a3->y - a1->y) * PL[l_24].ny;
+    l_28 = (a3->z - a1->z) * PL[l_24].nz;
     l_30 = l_28 + (l_30 + l_2C);
     l_2C = l_30 * PL[l_24].ny;
     l_28 = l_30 * PL[l_24].nz;
@@ -150,18 +145,18 @@ int collide_move_player(struct obj *a1, int a2, struct vec3 *a3, int a4)
     l_30 >>= 8;
     l_2C >>= 8;
     l_28 >>= 8;
-    l_30 = (a3->x - a1->pos.x) - (l_30 >> 8);
-    l_2C = (a3->y - a1->pos.y) - (l_2C >> 8);
-    l_28 = (a3->z - a1->pos.z) - (l_28 >> 8);
-    a3->x = a1->pos.x + l_30;
-    a3->y = a1->pos.y + l_2C;
-    a3->z = a1->pos.z + l_28;
+    l_30 = (a3->x - a1->x) - (l_30 >> 8);
+    l_2C = (a3->y - a1->y) - (l_2C >> 8);
+    l_28 = (a3->z - a1->z) - (l_28 >> 8);
+    a3->x = a1->x + l_30;
+    a3->y = a1->y + l_2C;
+    a3->z = a1->z + l_28;
     *(short *)D_00195F5A = func_0009DEAC(l_1C >> 16);
     if (l_30 != 0 || l_2C != 0 || l_28 != 0) {
         *(int *)D_00195CD8 = *(int *)D_00195CD4 = 0;
         l_14 = FLAGS;
         *(char *)player_on_ground = 1;
-        l_44 = func_0002294E((int)a1, a2, (int)a3);
+        l_44 = func_0002294E(a1, a2, (int)a3);
         *(unsigned char *)D_001940D7 &= 223;
         if (*(char *)player_on_ground != 0 && *(char *)D_00196296 != 0)
             *(char *)D_00196296 = 0;
@@ -169,7 +164,7 @@ int collide_move_player(struct obj *a1, int a2, struct vec3 *a3, int a4)
             automap_mark_seen(*(int *)D_00195CB8);
         if (*(int *)D_00195C70 != 0)
             automap_mark_seen(*(int *)D_00195C70);
-        if ((int)a1 == *(int *)player_object && ((struct bf8_4_1 *)&player_motion_flags)->f)
+        if (a1 == player_object && ((struct bf8_4_1 *)&player_motion_flags)->f)
             return 0;
         if (!(l_44 & 10) || !(l_14 & 4))
             return 0;

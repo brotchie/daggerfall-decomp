@@ -1,6 +1,7 @@
 /* args.c: functions first lifted from the assembly by tools/lift_all.py (2026-10), now
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
+#include "records.h"
 
 struct bf8_0_1 { unsigned char f:1; };
 struct bf8_3_1 { unsigned char _:3; unsigned char f:1; };
@@ -58,11 +59,11 @@ extern char D_00191833[];
 extern char D_00191834[];
 extern char D_00191884[];
 extern char player_motion_flags[];
-extern char player_object[];
-extern char D_00195AC4[];
+extern struct record *player_object;
+extern struct record *D_00195AC4;
 extern char cheat_flags[];
-extern char current_location[];
-extern char player_character[];
+extern struct location *current_location;
+extern struct character *player_character;
 extern char cfg_map_file[];
 extern char cfg_item_file[];
 extern char classmaker_file[];
@@ -101,12 +102,12 @@ extern char D_001A949D[];
 extern char object_heap_size[];
 
 extern int climate_category(void);
-extern int weapon_arrow_update(int);
-extern int object_draw_cb(int);
-extern int rmb_make_door(int, short, short, int);
-extern int rmb_make_flat(int, short, short, int);
+extern int weapon_arrow_update(struct record *);
+extern int object_draw_cb(struct record *);
+extern struct record *rmb_make_door(struct record *, short, short, int);
+extern struct record *rmb_make_flat(struct record *, short, short, int);
 extern int model_get(unsigned short, int, int);
-extern int object_create_child(int, int, int);
+extern struct record *object_create_child(struct record *, struct record *, int);
 extern int func_0009DA1C(int, int);
 extern int printf(int, ...);
 extern int exit();
@@ -130,13 +131,13 @@ extern int func_00136AD8();
 extern int func_001401D4();
 extern int func_00154D00();
 extern void func_00034EC1(void);
-extern void func_00073ADF(int);
+extern void func_00073ADF(struct record *);
 extern void object_free_pending(void);
 extern void spell_cast_queued_run(void);
-extern void func_0007E815(int, int);
-extern void func_0007EB0B(int, int);
+extern void func_0007E815(struct record *, int);
+extern void func_0007EB0B(struct record *, int);
 extern void func_00086149(void);
-extern void object_foreach_open(int, int);
+extern void object_foreach_open(struct record *, int);
 void rotate_xz(int, int, int);
 #pragma aux func_0009DA1C parm routine [];
 #pragma aux func_000A0ED9 parm routine [];
@@ -312,9 +313,9 @@ void world_draw_objects(void)
     int l_30;
     int l_2C;
     int l_28;
-    int l_24;
-    int l_20;
-    int l_1C;
+    struct record *l_24;
+    struct record *l_20;
+    struct record *l_1C;
     unsigned short l_18;
 
     *(signed char *)D_001A949C = *(signed char *)(climate_weathers + climate_category());
@@ -322,29 +323,29 @@ void world_draw_objects(void)
     *(int *)free_later_count = 0;
     *(int *)D_00195D5C = 0;
     if (*(signed char *)D_001961AE == 0) goto L82E42;
-    object_draw_cb((int)D_001961AE);
+    object_draw_cb((struct record *)D_001961AE);
 L82E42:;
     if (((int)(unsigned char)*(signed char *)player_environment) >= 3) goto L82F56;
     if (((struct bf8_0_1 *)&player_motion_flags)->f != 0) goto L82E9C;
-    if (((struct bf8_4_1 *)(*(char **)player_character + 137))->f == 0) goto L82E70;
+    if ((player_character->conditions & 0x10) == 0) goto L82E70;
     func_00086149();
     goto L82E9C;
 L82E70:;
-    func_00136AD8(*(int *)(*(char **)player_object + 7), *(int *)(*(char **)player_object + 11) - 60, *(int *)(*(char **)player_object + 15), 16, 128, 0);
+    func_00136AD8(player_object->x, player_object->y - 60, player_object->z, 16, 128, 0);
 L82E9C:;
-    if (((int)(unsigned char)*(signed char *)(*(char **)(*(char **)player_object + 67))) == 1) goto L82EC7;
-    object_foreach_open(*(int *)(*(char **)(*(char **)player_object + 67) + 63), (int)object_draw_cb);
+    if (player_object->parent->type == 1) goto L82EC7;
+    object_foreach_open(player_object->parent->children, (int)object_draw_cb);
     goto L82ED6;
 L82EC7:;
-    func_0007EB0B(*(int *)player_object, (int)object_draw_cb);
+    func_0007EB0B(player_object, (int)object_draw_cb);
 L82ED6:;
-    l_20 = *(int *)(*(char **)D_00195AC4 + 63);
+    l_20 = D_00195AC4->children;
 L82EE1:;
     if (l_20 == 0) goto L82F40;
-    l_24 = *(int *)((char *)l_20 + 55);
-    l_1C = *(int *)((char *)l_20 + 63);
-    l_18 = *(short *)((char *)l_20 + 21);
-    if (((int)(unsigned char)*(signed char *)((char *)l_20)) == 38) goto L82F38;
+    l_24 = l_20->next;
+    l_1C = l_20->children;
+    l_18 = l_20->flags;
+    if (l_20->type == 38) goto L82F38;
     object_draw_cb(l_20);
     if (((int)(unsigned short)(*(int *)&l_18 & 1)) != 0) goto L82F38;
     object_foreach_open(l_1C, (int)object_draw_cb);
@@ -358,20 +359,20 @@ L82F51:;
     goto L83019;
 L82F56:;
     if (((struct bf8_0_1 *)&player_motion_flags)->f != 0) goto L82FA0;
-    if (((struct bf8_4_1 *)(*(char **)player_character + 137))->f == 0) goto L82F74;
+    if ((player_character->conditions & 0x10) == 0) goto L82F74;
     func_00086149();
     goto L82FA0;
 L82F74:;
-    func_00136AD8(*(int *)(*(char **)player_object + 7), *(int *)(*(char **)player_object + 11) - 60, *(int *)(*(char **)player_object + 15), 16, 128, 0);
+    func_00136AD8(player_object->x, player_object->y - 60, player_object->z, 16, 128, 0);
 L82FA0:;
-    func_0007E815(*(int *)player_object, (int)object_draw_cb);
-    l_20 = *(int *)(*(char **)D_00195AC4 + 63);
+    func_0007E815(player_object, (int)object_draw_cb);
+    l_20 = D_00195AC4->children;
 L82FBA:;
     if (l_20 == 0) goto L83019;
-    l_24 = *(int *)((char *)l_20 + 55);
-    l_1C = *(int *)((char *)l_20 + 63);
-    l_18 = *(short *)((char *)l_20 + 21);
-    if (((int)(unsigned char)*(signed char *)((char *)l_20)) == 47) goto L83011;
+    l_24 = l_20->next;
+    l_1C = l_20->children;
+    l_18 = l_20->flags;
+    if (l_20->type == 47) goto L83011;
     object_draw_cb(l_20);
     if (((int)(unsigned short)(*(int *)&l_18 & 1)) != 0) goto L83011;
     object_foreach_open(l_1C, (int)object_draw_cb);
@@ -395,7 +396,7 @@ void rotate_xz(int a1, int a2, int a3)
     *(int *)((char *)a2) = func_000CE74F(l_10, *(int *)(D_00150A00 + (a3 << 2))) + func_000CE74F(l_14, *(int *)(D_00150200 + (a3 << 2)));
 }
 
-int automap_draw_object_cb(int a1)
+int automap_draw_object_cb(struct record *a1)
 {
     int l_40;
     int l_3C;
@@ -411,62 +412,62 @@ int automap_draw_object_cb(int a1)
     if (*(signed char *)D_001A949D == 0) goto L83F05;
     return 1;
 L83F05:;
-    if (((int)(unsigned short)(*(short *)((char *)a1 + 21) & 512)) == 0) goto L83F26;
+    if ((a1->flags & 512) == 0) goto L83F26;
     return 0;
 L83F26:;
-    if (((int)(unsigned short)(*(short *)((char *)a1 + 21) & 1024)) == 0) goto L83F47;
+    if ((a1->flags & 1024) == 0) goto L83F47;
     return 0;
 L83F47:;
     if (((int)(unsigned char)*(signed char *)player_environment) == 2) goto L84005;
-    if (((int)(unsigned char)*(signed char *)((char *)a1)) != 34) goto L83F7F;
-    if ((((int)(unsigned short)(*(short *)((char *)a1 + 27) & 31)) - 2) == 8) goto L83F81;
+    if (a1->type != 34) goto L83F7F;
+    if (((a1->image & 31) - 2) == 8) goto L83F81;
 L83F7F:;
     goto L83F86;
 L83F81:;
     goto L84005;
 L83F86:;
-    if (((int)(unsigned short)(*(short *)((char *)a1 + 21) & 128)) != 0) goto L83FA4;
+    if ((a1->flags & 128) != 0) goto L83FA4;
     if (((struct bf8_4_1 *)&cheat_flags)->f == 0) goto L83FA6;
 L83FA4:;
     goto L83FB2;
 L83FA6:;
     return 0;
 L83FB2:;
-    if (((int)(unsigned char)*(signed char *)((char *)a1)) == 6) goto L83FD0;
-    if (((int)(unsigned char)*(signed char *)((char *)a1)) != 32) goto L83FD2;
+    if (a1->type == 6) goto L83FD0;
+    if (a1->type != 32) goto L83FD2;
 L83FD0:;
     goto L83FDE;
 L83FD2:;
     return 0;
 L83FDE:;
     *(int *)&l_18 = 1132;
-    if (*(int *)D_00196DB0 != a1) goto L83FF7;
+    if (*(int *)D_00196DB0 != (int)a1) goto L83FF7;
     if (((struct bf8_3_1 *)(*(char **)&l_18))->f == 0) goto L83FF9;
 L83FF7:;
     goto L84005;
 L83FF9:;
     return 0;
 L84005:;
-    if (func_0009DEAC(*(int *)((char *)a1 + 11) - *(int *)D_00190BE8) <= 700) goto L84029;
+    if (func_0009DEAC(a1->y - *(int *)D_00190BE8) <= 700) goto L84029;
     return 0;
 L84029:;
-    if (func_000C7FD9(*(int *)((char *)a1 + 7), *(int *)((char *)a1 + 15), *(int *)D_00190BE4, *(int *)D_00190BEC) <= 2048) goto L84059;
+    if (func_000C7FD9(a1->x, a1->z, *(int *)D_00190BE4, *(int *)D_00190BEC) <= 2048) goto L84059;
     return 0;
 L84059:;
     *(int *)((char *)a1 + 47) = 0;
     *(int *)D_000C5404 = 0;
-    switch (*(unsigned char *)((char *)a1)) {
+    switch (a1->type) {
 case 34:
     if (*(signed char *)cfg_show_markers == 0) goto L843CC;
-    if (*(short *)((char *)a1 + 27) == 0) goto L840F3;
-    if (((int)(unsigned short)*(short *)((char *)a1 + 27)) != 65535) goto L840F8;
+    if (a1->image == 0) goto L840F3;
+    if (a1->image != 65535) goto L840F8;
 L840F3:;
     goto L843CC;
 L840F8:;
-    *(int *)((char *)a1 + 47) = func_00154D00(*(int *)((char *)a1 + 7), *(int *)((char *)a1 + 11), *(int *)((char *)a1 + 15), (int)(unsigned short)*(short *)((char *)a1 + 27), -1, 4, 4129024);
+    *(int *)((char *)a1 + 47) = func_00154D00(a1->x, a1->y, a1->z, a1->image, -1, 4, 4129024);
     goto L843CC;
 case 43:
-    l_3C = a1 + 71;
+    l_3C = (int)RECORD_DATA(a1);
     l_34 = *(int *)((char *)l_3C + 5);
     l_38 = *(int *)((char *)l_3C + 9);
     l_28 = 0;
@@ -487,42 +488,42 @@ L841D3:;
 case 6:
 case 32:
 L841D5:;
-    if (*(short *)((char *)a1 + 29) == 0) goto L843CC;
-    l_40 = a1 + 71;
-    *(int *)((char *)l_40) = model_get((int)(unsigned short)*(short *)((char *)a1 + 29), (int)(unsigned short)*(short *)((char *)a1 + 27), (((int)(unsigned char)*(signed char *)current_climate) << 2) + ((int)(unsigned char)*(signed char *)D_001A949C));
+    if (a1->image2 == 0) goto L843CC;
+    l_40 = (int)RECORD_DATA(a1);
+    *(int *)((char *)l_40) = model_get(a1->image2, a1->image, (((int)(unsigned char)*(signed char *)current_climate) << 2) + ((int)(unsigned char)*(signed char *)D_001A949C));
     if (*(int *)((char *)l_40) == 0) goto L84330;
-    *(int *)((char *)l_40 + 32) = *(int *)((char *)a1 + 7);
-    *(int *)((char *)l_40 + 36) = *(int *)((char *)a1 + 11);
-    *(int *)((char *)l_40 + 40) = *(int *)((char *)a1 + 15);
-    if (((int)(unsigned short)*(short *)((char *)a1 + 29)) != 998) goto L842A7;
+    *(int *)((char *)l_40 + 32) = a1->x;
+    *(int *)((char *)l_40 + 36) = a1->y;
+    *(int *)((char *)l_40 + 40) = a1->z;
+    if (a1->image2 != 998) goto L842A7;
     if (weapon_arrow_update(a1) == 0) goto L843CC;
     func_00073ADF(a1);
-    *(int *)((char *)l_40 + 44) = (int)(unsigned short)*(short *)((char *)a1 + 23);
-    *(int *)((char *)l_40 + 48) = (int)(short)*(short *)((char *)a1 + 5);
+    *(int *)((char *)l_40 + 44) = a1->owner;
+    *(int *)((char *)l_40 + 48) = a1->angle_z;
     *(int *)((char *)l_40 + 52) = 0;
     goto L84326;
 L842A7:;
-    if (((int)(unsigned char)*(signed char *)((char *)a1 + 35)) == 255) goto L842CD;
-    func_000C7F98(l_40 + 12, (int)(short)*(short *)((char *)a1 + 36));
+    if (a1->link_flag == 255) goto L842CD;
+    func_000C7F98(l_40 + 12, a1->wait_state);
     goto L84326;
 L842CD:;
-    if (((int)(unsigned short)*(short *)((char *)a1 + 29)) != 610) goto L842F1;
-    if (((int)(unsigned short)*(short *)((char *)a1 + 27)) == 32) goto L842F3;
+    if (a1->image2 != 610) goto L842F1;
+    if (a1->image == 32) goto L842F3;
 L842F1:;
     goto L842FD;
 L842F3:;
     *(int *)D_000C5404 = 3;
 L842FD:;
-    func_000C7F14(l_40 + 12, (int)(short)*(short *)((char *)a1 + 1), ((int)(short)*(short *)((char *)a1 + 3)) + ((int)(short)*(short *)((char *)a1 + 36)), (int)(short)*(short *)((char *)a1 + 5));
+    func_000C7F14(l_40 + 12, a1->angle_x, a1->yaw + a1->wait_state, a1->angle_z);
 L84326:;
     func_001401D4(l_40, 0);
 L84330:;
     goto L843CC;
 case 56:
-    l_34 = a1 + 71;
+    l_34 = (int)RECORD_DATA(a1);
     l_28 = 0;
 L84345:;
-    if (((int)(unsigned short)*(short *)((char *)a1 + 27)) > l_28) goto L8436A;
+    if (a1->image > l_28) goto L8436A;
     goto L843CC;
 L8435B:;
     l_28++;
@@ -541,22 +542,22 @@ L843CC:;
 }
 }
 
-int rmb_make_light(int a1, int a2, int a3)
+struct record *rmb_make_light(struct record *a1, int a2, int a3)
 {
-    int l_14;
+    struct record *l_14;
 
     l_14 = object_create_child(a1, 0, 0);
-    *(signed char *)((char *)l_14) = 7;
-    *(short *)((char *)l_14 + 27) = a2;
-    *(short *)((char *)l_14 + 23) = a3;
+    l_14->type = 7;
+    l_14->image = a2;
+    l_14->owner = a3;
     *(short *)((char *)l_14 + 19) = 8000;
-    *(int *)((char *)l_14 + 31) = *(int *)(*(char **)D_00195AC4 + 31) + ((int)(unsigned short)(*(short *)(*(char **)current_location + 37))++);
+    l_14->id = D_00195AC4->id + ((int)(unsigned short)(current_location->object_counter)++);
     return l_14;
 }
 
-void rmb_add_doors(int a1, int a2)
+void rmb_add_doors(struct record *a1, int a2)
 {
-    int l_18;
+    struct record *l_18;
     int l_14;
 
     if (*(signed char *)(*(char **)rmb_record_ptr + 4) == 0) return;
@@ -570,21 +571,21 @@ L847FC:;
     goto L847E5;
 L8480B:;
     l_18 = rmb_make_door(a1, (int)(short)*(short *)((char *)a2 + 14), (int)(short)((unsigned short)(unsigned char)*(signed char *)((char *)a2 + 16)), 1);
-    func_000C7F07(0, (((int)(short)*(short *)((char *)a2 + 12)) + *(int *)D_001967FC) % 2048, 0, l_18 + 83);
-    *(short *)((char *)l_18 + 23) = (unsigned short)(unsigned char)*(signed char *)((char *)a2 + 17);
+    func_000C7F07(0, (((int)(short)*(short *)((char *)a2 + 12)) + *(int *)D_001967FC) % 2048, 0, (int)RECORD_DATA(l_18) + 12);
+    l_18->lock_level = (unsigned short)(unsigned char)*(signed char *)((char *)a2 + 17);
     rotate_xz(a2, a2 + 8, *(int *)D_001967FC);
     *(int *)((char *)a2) += *(int *)D_001967F8;
-    *(int *)((char *)l_18 + 7) = *(int *)((char *)a2);
+    l_18->x = *(int *)((char *)a2);
     *(int *)((char *)a2 + 8) += *(int *)D_001967F0;
-    *(int *)((char *)l_18 + 15) = *(int *)((char *)a2 + 8);
+    l_18->z = *(int *)((char *)a2 + 8);
     *(int *)((char *)a2 + 4) += *(int *)D_001967F4;
-    *(int *)((char *)l_18 + 11) = *(int *)((char *)a2 + 4);
+    l_18->y = *(int *)((char *)a2 + 4);
     goto L847FC;
 }
 
-void rmb_add_people(int a1, int a2)
+void rmb_add_people(struct record *a1, int a2)
 {
-    int l_18;
+    struct record *l_18;
     int l_14;
 
     if (*(signed char *)(*(char **)rmb_record_ptr + 3) == 0) return;
@@ -600,11 +601,11 @@ L84919:;
     l_18 = rmb_make_flat(a1, (int)(short)*(short *)((char *)a2 + 12), (int)(short)*(short *)((char *)a2 + 14), 0);
     rotate_xz(a2, a2 + 8, *(int *)D_001967FC);
     *(int *)((char *)a2) += *(int *)D_001967F8;
-    *(int *)((char *)l_18 + 7) = *(int *)((char *)a2);
+    l_18->x = *(int *)((char *)a2);
     *(int *)((char *)a2 + 8) += *(int *)D_001967F0;
-    *(int *)((char *)l_18 + 15) = *(int *)((char *)a2 + 8);
+    l_18->z = *(int *)((char *)a2 + 8);
     *(int *)((char *)a2 + 4) += *(int *)D_001967F4;
-    *(int *)((char *)l_18 + 11) = *(int *)((char *)a2 + 4);
+    l_18->y = *(int *)((char *)a2 + 4);
     if (((int)(unsigned char)(*(signed char *)((char *)a2 + 16) & 4)) == 0) goto L849A6;
     *(signed char *)((char *)l_18 + 73) |= 8;
 L849A6:;

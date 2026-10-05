@@ -1,6 +1,7 @@
 /* maplogic.c: functions first lifted from the assembly by tools/lift_all.py (2026-10), now
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
+#include "records.h"
 
 struct bf32_30_1 { unsigned _:30; unsigned f:1; };
 struct bf32_31_1 { unsigned _:31; unsigned f:1; };
@@ -22,7 +23,7 @@ extern char D_00176CFE[];
 extern char D_00176D20[];
 extern char D_00176D3E[];
 extern char player_environment[];
-extern char selected_spell[];
+extern struct spell *selected_spell;
 extern char D_0018461C[];
 extern char D_00185097[];
 extern char D_00186503[];
@@ -36,16 +37,16 @@ extern char D_00190EE4[];
 extern char D_001940D5[];
 extern char D_001950E4[];
 extern char D_001950E8[];
-extern char current_building[];
-extern char player_entity[];
-extern char player_object[];
-extern char D_00195AC4[];
+extern struct building *current_building;
+extern struct record *player_entity;
+extern struct record *player_object;
+extern struct record *D_00195AC4;
 extern char cheat_flags[];
-extern char D_00195AF4[];
+extern struct record *D_00195AF4;
 extern char clothing_gender_group[];
-extern char current_location[];
-extern char player_character[];
-extern char player_class[];
+extern struct location *current_location;
+extern struct character *player_character;
+extern struct career *player_class;
 extern char game_minutes[];
 extern char D_00195C44[];
 extern char D_00195C88[];
@@ -79,7 +80,7 @@ extern char D_00196DA4[];
 extern char D_001970C4[];
 extern char D_001A41DC[];
 extern char D_001A41E4[];
-extern char guild_membership[];
+extern struct membership *guild_membership;
 extern char D_001A4A1D[];
 extern char stocked_shop_count[];
 extern char D_001A4C94[];
@@ -89,25 +90,25 @@ extern char climate_index[];
 extern char D_001A99F4[];
 
 extern int archive_open(int, int, int);
-extern int lockpick_action_door(int, int, int);
+extern int lockpick_action_door(struct building *, int, struct record *);
 extern int region_update_from_player(void);
 extern int climate_update_at_player(void);
-extern int damage_apply(int, int, int);
-extern int quest_find_site_for_building(int);
+extern int damage_apply(struct record *, int, int);
+extern int quest_find_site_for_building(struct building *);
 extern int func_00041347(void);
-extern int building_is_open(int);
-extern int building_minutes_to_close(int);
+extern int building_is_open(struct building *);
+extern int building_minutes_to_close(struct building *);
 extern int disk_read_file(int, int);
 extern int guild_find_membership_by_kind(unsigned char);
 extern int hud_message_add(int);
 extern int rand_range(int, int);
-extern int object_building(int);
+extern struct building *object_building(struct record *);
 extern int location_here_contains(int, int);
-extern int object_create_child(int, int, int);
-extern int object_reparent(int, int);
-extern int object_find_by_id(int, int);
-extern int marker_count(int, int);
-extern int player_to_nearest_marker(int, int);
+extern struct record *object_create_child(struct record *, int, int);
+extern int object_reparent(struct record *, struct record *);
+extern struct record *object_find_by_id(struct record *, int);
+extern int marker_count(struct record *, int);
+extern int player_to_nearest_marker(struct record *, int);
 extern int rand();
 extern int mc_free();
 extern int mc_memset();
@@ -119,7 +120,7 @@ extern int func_00135E39();
 extern void archive_close(int);
 extern void lock_show_difficulty(int);
 extern void dungeon_choose_textures(void);
-extern void interior_stock_shelves(int, int);
+extern void interior_stock_shelves(struct record *, struct building *);
 extern void maploads_load_region(int);
 extern void location_load_dungeon(int, int);
 extern void location_load_dungeon_by_id(int, int);
@@ -127,10 +128,10 @@ extern void location_load_exterior(int, int);
 extern void dungeon_roll_monster_tables(void);
 extern void town_map_note_building(int, int);
 extern void automap_save(void);
-extern void automap_mark_seen(int);
+extern void automap_mark_seen(struct record *);
 extern void func_00028EAA(void);
 extern void automap_restore_seen(void);
-extern void damage_creature_death(int);
+extern void damage_creature_death(struct record *);
 extern void dungeon_load_rdb_block(int);
 extern void msgbox_show_rsc(int, int);
 extern void guards_summon(int);
@@ -140,35 +141,35 @@ extern void func_0004B5CF(void);
 extern void func_0004C759(void);
 extern void func_0004CA9D(void);
 extern void fatal_error(int);
-extern void item_make(int, int, int);
+extern void item_make(int, int, struct item *);
 extern void links_resolve(void);
 extern void sound_stop_ambient(void);
 extern void position_history_reset(void);
-extern void building_grant_access(int, unsigned char, int);
+extern void building_grant_access(struct building *, unsigned char, int);
 extern void func_0007E5C2(void);
 extern void town_load(int);
 extern void location_unload(unsigned short);
 extern void terrain_update_cells(void);
 extern void climate_set_textures(void);
-extern void spell_end(int);
+extern void spell_end(struct record *);
 extern void spfx_effect_tick(int, int, int);
-extern void object_free_children(int);
+extern void object_free_children(struct record *);
 extern void func_0008EAF1(int, int);
-extern void inv_store_item(int);
-extern void inv_merge_arrows(int, int, int);
-extern void shop_quality_message(int);
-extern void func_00099D0D(int);
-int region_find_location(int);
-int building_try_enter(int);
+extern void inv_store_item(struct record *);
+extern void inv_merge_arrows(struct record *, struct record *, int);
+extern void shop_quality_message(struct building *);
+extern void func_00099D0D(struct record *);
+struct map_location *region_find_location(int);
+int building_try_enter(struct building *);
 void location_free(int);
-void func_000871FA(int);
+void func_000871FA(struct building *);
 void location_set_discovered(int, int);
 void func_0008824A(int, int);
 
 void region_unload(void)
 {
     automap_save();
-    location_unload((int)(unsigned short)*(short *)(*(char **)D_00195AC4 + 27));
+    location_unload(D_00195AC4->image);
     if (*(int *)D_00196A9C == 0) goto L8634F;
     if (*(int *)D_00196A9C != (-1751672937)) goto L86351;
 L8634F:;
@@ -215,9 +216,9 @@ L8647D:;
     mc_memset(a1, 0, 20, (int)D_00176C94, 91, 4);
 }
 
-int region_find_location(int a1)
+struct map_location *region_find_location(int a1)
 {
-    int l_28;
+    struct map_location *l_28;
     int l_24;
     int l_20;
     int l_1C;
@@ -228,11 +229,11 @@ int region_find_location(int a1)
 L864CA:;
     if (l_20 <= l_24) goto L86524;
     l_1C = (l_20 + l_24) >> 1;
-    l_28 = (int)(*(char **)D_00196A9C + (l_1C * 17));
-    if ((*(int *)((char *)l_28) & 1048575) != a1) goto L86503;
+    l_28 = (struct map_location *)(*(char **)D_00196A9C + (l_1C * 17));
+    if ((l_28->map_id & 1048575) != a1) goto L86503;
     return l_28;
 L86503:;
-    if (((unsigned)(*(int *)((char *)l_28) & 1048575)) <= a1) goto L8651B;
+    if ((l_28->map_id & 1048575) <= a1) goto L8651B;
     l_20 = l_1C - 1;
     goto L86522;
 L8651B:;
@@ -241,7 +242,7 @@ L86522:;
     goto L864CA;
 L86524:;
     if ((*(int *)((char *)(int)(*(char **)D_00196A9C + (l_24 * 17))) & 1048575) != a1) goto L8654C;
-    return (int)(*(char **)D_00196A9C + (l_24 * 17));
+    return (struct map_location *)(*(char **)D_00196A9C + (l_24 * 17));
 L8654C:;
     return 0;
 }
@@ -253,22 +254,22 @@ void world_update_location(void)
 
     if (((int)(unsigned char)*(signed char *)player_environment) > 2) return;
     terrain_update_cells();
-    l_18 = func_000C2D81(*(int *)(*(char **)player_object + 7), *(int *)(*(char **)player_object + 15));
+    l_18 = func_000C2D81(player_object->x, player_object->z);
     if (l_18 == *(int *)D_001A94C4) goto L86744;
     *(int *)D_001A94C4 = l_18;
-    location_unload((int)(unsigned short)*(short *)(*(char **)D_00195AC4 + 27));
+    location_unload(D_00195AC4->image);
     region_update_from_player();
     climate_update_at_player();
     *(int *)climate_index = ((int)(unsigned char)*(signed char *)current_climate) - 224;
-    *(int *)location_here = region_find_location(*(int *)D_001A94C4);
+    *(int *)location_here = (int)region_find_location(*(int *)D_001A94C4);
     climate_set_textures();
 L86744:;
     if (*(int *)location_here == 0) return;
-    if (location_here_contains(*(int *)(*(char **)player_object + 7), *(int *)(*(char **)player_object + 15)) == 0) goto L86777;
+    if (location_here_contains(player_object->x, player_object->z) == 0) goto L86777;
     town_load(((unsigned)*(int *)(*(char **)location_here)) >> 20);
     return;
 L86777:;
-    location_unload((int)(unsigned short)*(short *)(*(char **)D_00195AC4 + 27));
+    location_unload(D_00195AC4->image);
 }
 
 void dungeon_load(int a1)
@@ -279,25 +280,25 @@ void dungeon_load(int a1)
     int l_18;
 
     sound_stop_ambient();
-    if (((int)(unsigned short)*(short *)(*(char **)D_00195AC4 + 27)) != 65535) goto L867D4;
-    func_0008EAF1(*(int *)(*(char **)D_00195AC4 + 63), *(int *)(*(char **)D_00195AC4 + 31));
+    if (D_00195AC4->image != 65535) goto L867D4;
+    func_0008EAF1((int)D_00195AC4->children, D_00195AC4->id);
 L867D4:;
     if (*(signed char *)D_00196289 != 0) goto L86811;
-    *(int *)(*(char **)player_object + 39) = *(int *)(*(char **)(*(char **)player_object + 67) + 31);
-    mc_memcpy((int)D_00195FB1, *(int *)player_object, 55, (int)D_00176C94, 235, 4);
+    player_object->parent_id = player_object->parent->id;
+    mc_memcpy((int)D_00195FB1, (int)player_object, 55, (int)D_00176C94, 235, 4);
 L86811:;
-    l_20 = *(int *)(*(char **)D_00195AC4 + 31);
-    location_unload((int)(unsigned short)*(short *)(*(char **)D_00195AC4 + 27));
+    l_20 = D_00195AC4->id;
+    location_unload(D_00195AC4->image);
     if (a1 != (-1)) goto L86844;
     location_load_dungeon_by_id((int)loaded_location, l_20);
     goto L86851;
 L86844:;
     location_load_dungeon((int)loaded_location, a1);
 L86851:;
-    mc_memcpy(*(int *)D_00195AC4, *(int *)loaded_location_object, 55, (int)D_00176C94, 247, 4);
-    mc_memcpy(*(int *)current_location, *(int *)loaded_location_data, 48, (int)D_00176C94, 248, 4);
+    mc_memcpy((int)D_00195AC4, *(int *)loaded_location_object, 55, (int)D_00176C94, 247, 4);
+    mc_memcpy((int)current_location, *(int *)loaded_location_data, 48, (int)D_00176C94, 248, 4);
     *(int *)blocks_bsa = archive_open((int)D_00176C9F, 0, 0);
-    if ((((unsigned)*(int *)(*(char **)D_00195AC4 + 31)) >> 16) != 50015) goto L868BF;
+    if ((((unsigned)D_00195AC4->id) >> 16) != 50015) goto L868BF;
     *(signed char *)D_001967A1 = 254;
 L868BF:;
     l_1C = 0;
@@ -321,15 +322,15 @@ L868F0:;
     *(signed char *)player_environment = 3;
     *(int *)dungeon_water_level = 10000;
     func_0004CA9D();
-    *(int *)(*(char **)player_object + 7) = *(int *)(*(char **)D_00195AC4 + 7);
-    *(int *)(*(char **)player_object + 11) = *(int *)(*(char **)D_00195AC4 + 11);
-    *(int *)(*(char **)player_object + 15) = *(int *)(*(char **)D_00195AC4 + 15);
-    l_1C = player_to_nearest_marker(*(int *)(*(char **)D_00195AC4 + 63), 8);
+    player_object->x = D_00195AC4->x;
+    player_object->y = D_00195AC4->y;
+    player_object->z = D_00195AC4->z;
+    l_1C = player_to_nearest_marker(D_00195AC4->children, 8);
     if (l_1C != 0) goto L8698D;
     fatal_error((int)D_00176CAA);
 L8698D:;
     func_00028EAA();
-    automap_mark_seen(*(int *)D_00195AF4);
+    automap_mark_seen(D_00195AF4);
     position_history_reset();
     dungeon_roll_monster_tables();
     *(signed char *)D_001970C4 = 0;
@@ -340,64 +341,64 @@ L8698D:;
     func_0004C759();
 L869FC:;
     automap_restore_seen();
-    *(int *)D_001950E4 = marker_count(*(int *)D_00195AC4, 9);
-    *(int *)D_001950E8 = marker_count(*(int *)D_00195AC4, 16);
+    *(int *)D_001950E4 = marker_count(D_00195AC4, 9);
+    *(int *)D_001950E8 = marker_count(D_00195AC4, 16);
     *(int *)D_00136911 = 0;
     func_00135E39();
     *(signed char *)text_buffer = (*(signed char *)D_001903A5 = (*(signed char *)D_001903A6 = 0));
     func_000CD33A((int)text_buffer, 255, 1);
 }
 
-void func_00086A71(int a1)
+void func_00086A71(struct record *a1)
 {
-    int l_18;
+    struct building *l_18;
 
-    if (((int)(unsigned char)*(signed char *)((char *)a1)) != 32) return;
+    if (a1->type != 32) return;
     l_18 = object_building(a1);
-    switch (*(unsigned char *)((char *)l_18 + 24)) {
+    switch (l_18->type) {
 case 11:
 case 14:
 case 15:
-    *(short *)((char *)a1 + 23) = 0;
-    *(signed char *)((char *)a1 + 21) |= 64;
+    a1->owner = 0;
+    a1->flags |= 64;
     return;
 default:
     if ((rand() % 100) >= 90) return;
-    *(short *)((char *)a1 + 23) = 0;
-    *(signed char *)((char *)a1 + 21) |= 64;
+    a1->owner = 0;
+    a1->flags |= 64;
 }
 }
 
-int building_try_enter(int a1)
+int building_try_enter(struct building *a1)
 {
-    int l_24;
+    struct record *l_24;
     int l_20;
     int l_1C;
 
     if (*(signed char *)D_00196289 == 0) goto L86F76;
     return 1;
 L86F76:;
-    if (*(int *)((char *)a1 + 20) != *(int *)(*(char **)player_character + 116)) goto L86F93;
+    if (a1->id != player_character->house) goto L86F93;
     return 1;
 L86F93:;
-    if (((int)(unsigned char)*(signed char *)((char *)a1 + 24)) != 24) goto L86FAF;
+    if (a1->type != 24) goto L86FAF;
     return 1;
 L86FAF:;
-    if (((int)(unsigned char)*(signed char *)((char *)a1 + 24)) >= 17) goto L86FCB;
+    if (a1->type >= 17) goto L86FCB;
     if (building_is_open(a1) != 0) goto L86FCD;
 L86FCB:;
     goto L86FD9;
 L86FCD:;
     return 1;
 L86FD9:;
-    if (((int)(unsigned char)*(signed char *)((char *)a1 + 24)) >= 17) goto L86FFA;
-    if (((int)(unsigned char)(*(signed char *)((char *)a1 + 15) & 16)) != 0) goto L86FFC;
+    if (a1->type >= 17) goto L86FFA;
+    if ((a1->flags & 16) != 0) goto L86FFC;
 L86FFA:;
     goto L87008;
 L86FFC:;
     return 0;
 L87008:;
-    if (((int)(unsigned char)(*(signed char *)((char *)a1 + 15) & 16)) == 0) goto L87025;
+    if ((a1->flags & 16) == 0) goto L87025;
     return 1;
 L87025:;
     if (quest_find_site_for_building(a1) == 0) goto L8703A;
@@ -407,26 +408,26 @@ L8703A:;
 L8703C:;
     return 1;
 L87048:;
-    if (((struct bf8_6_1 *)(*(char **)player_character + 137))->f == 0) goto L8706E;
-    *(signed char *)(*(char **)player_character + 137) &= 191;
+    if ((player_character->conditions & 0x40) == 0) goto L8706E;
+    player_character->conditions &= ~0x40;
     return 1;
 L8706E:;
-    if (((int)(unsigned short)*(short *)((char *)a1 + 18)) != 108) goto L8708A;
+    if (a1->faction_id != 108) goto L8708A;
     if (guild_find_membership_by_kind(0) != 0) goto L8708C;
 L8708A:;
     goto L87098;
 L8708C:;
     return 1;
 L87098:;
-    if (((int)(unsigned short)*(short *)((char *)a1 + 18)) != 42) goto L870B7;
+    if (a1->faction_id != 42) goto L870B7;
     if (guild_find_membership_by_kind(3) != 0) goto L870B9;
 L870B7:;
     goto L870C5;
 L870B9:;
     return 1;
 L870C5:;
-    if (((int)(unsigned char)*(signed char *)((char *)a1 + 24)) < 17) goto L870E5;
-    if (((int)(unsigned char)*(signed char *)((char *)a1 + 24)) <= 20) goto L870E7;
+    if (a1->type < 17) goto L870E5;
+    if (a1->type <= 20) goto L870E7;
 L870E5:;
     goto L870F0;
 L870E7:;
@@ -434,7 +435,7 @@ L870E7:;
 L870F0:;
     goto L8710B;
 L870F2:;
-    if (((unsigned)(((unsigned)(*(int *)((char *)a1 + 20) & 65535)) % 100)) < 50) goto L8710D;
+    if ((a1->id & 65535) % 100 < 50) goto L8710D;
 L8710B:;
     goto L87128;
 L8710D:;
@@ -442,39 +443,39 @@ L8710D:;
     return 1;
 L87128:;
     if (((int)(unsigned char)*(signed char *)interaction_mode) != 2) goto L871C6;
-    l_20 = (((int)(unsigned short)*(short *)((char *)a1)) % 10) + 3;
-    l_24 = object_find_by_id(*(int *)D_00195AC4, *(int *)((char *)a1 + 20));
+    l_20 = (a1->name_seed % 10) + 3;
+    l_24 = object_find_by_id(D_00195AC4, a1->id);
     if (lockpick_action_door(a1, l_20, l_24) == 0) goto L871C6;
     if (func_00041347() != 0) goto L871AC;
-    if (rand_range(1, 300) >= (100 - ((int)(short)*(short *)(*(char **)player_character + 253)))) goto L871BD;
+    if (rand_range(1, 300) >= (100 - player_character->skills[16].value)) goto L871BD;
 L871AC:;
     *(signed char *)crime_current = 1;
     guards_summon(1);
 L871BD:;
     return 1;
 L871C6:;
-    lock_show_difficulty((int)&*(signed char *)((char *)(((int)(unsigned short)*(short *)((char *)a1)) % 10) + 3));
+    lock_show_difficulty((a1->name_seed % 10) + 3);
     return 0;
 }
 
-void func_000871FA(int a1)
+void func_000871FA(struct building *a1)
 {
-    int l_18;
+    struct record *l_18;
 
-    l_18 = object_find_by_id(*(int *)D_00195AC4, *(int *)((char *)a1 + 20));
-    object_free_children((int)D_00196120);
-    interior_stock_shelves(*(int *)((char *)l_18 + 63), a1);
+    l_18 = object_find_by_id(D_00195AC4, a1->id);
+    object_free_children((struct record *)D_00196120);
+    interior_stock_shelves(l_18->children, a1);
     if (l_18 == 0) return;
-    if (player_to_nearest_marker(*(int *)((char *)l_18 + 63), 6) != 0) goto L8725C;
+    if (player_to_nearest_marker(l_18->children, 6) != 0) goto L8725C;
     hud_message_add((int)D_00176CDD);
     return;
 L8725C:;
-    object_reparent(l_18, *(int *)player_object);
+    object_reparent(l_18, player_object);
     func_00099D0D(l_18);
     people_clear();
 }
 
-void building_enter(int a1)
+void building_enter(struct building *a1)
 {
     if (a1 != 0) goto L872A7;
     hud_message_add((int)D_00176CFE);
@@ -482,21 +483,21 @@ void building_enter(int a1)
 L872A7:;
     *(short *)D_00195F5E = rand();
     if (building_try_enter(a1) == 0) return;
-    *(int *)current_building = a1;
-    *(int *)D_00195D84 = *(int *)(D_00186503 + (((int)(unsigned char)*(signed char *)((char *)a1 + 24)) << 2));
-    object_free_children((int)D_00196120);
-    if (*(int *)((char *)a1 + 20) == *(int *)(*(char **)player_character + 116)) goto L8731D;
+    current_building = a1;
+    *(int *)D_00195D84 = *(int *)(D_00186503 + (a1->type << 2));
+    object_free_children((struct record *)D_00196120);
+    if (a1->id == player_character->house) goto L8731D;
     building_grant_access(a1, 5, (int)(*(char **)game_minutes + building_minutes_to_close(a1)));
     goto L87336;
 L8731D:;
     building_grant_access(a1, 255, *(int *)game_minutes + 10000000);
 L87336:;
-    if (((int)(unsigned char)*(signed char *)((char *)a1 + 24)) >= 14) goto L87356;
-    if (((int)(unsigned char)*(signed char *)((char *)a1 + 24)) != 1) goto L87358;
+    if (a1->type >= 14) goto L87356;
+    if (a1->type != 1) goto L87358;
 L87356:;
     goto L87368;
 L87358:;
-    if (((int)(unsigned char)*(signed char *)((char *)a1 + 24)) != 3) goto L8736A;
+    if (a1->type != 3) goto L8736A;
 L87368:;
     goto L87372;
 L8736A:;
@@ -512,31 +513,31 @@ L87372:;
     if (*(signed char *)D_00196289 != 0) goto L873B1;
     func_0004B5CF();
 L873B1:;
-    if (*(int *)((char *)a1 + 20) == *(int *)D_001A4C94) return;
+    if (a1->id == *(int *)D_001A4C94) return;
     *(int *)stocked_shop_count = 0;
-    *(int *)D_001A4C94 = *(int *)((char *)a1 + 20);
+    *(int *)D_001A4C94 = a1->id;
 }
 
 void building_exit(void)
 {
-    int l_1C;
+    struct building *l_1C;
     int l_18;
 
-    l_1C = object_building(*(int *)(*(char **)player_object + 67));
-    object_free_children((int)D_00196120);
+    l_1C = object_building(player_object->parent);
+    object_free_children((struct record *)D_00196120);
     building_grant_access(l_1C, 0, 0);
-    player_to_nearest_marker(*(int *)(*(char **)(*(char **)player_object + 67) + 63), 6);
+    player_to_nearest_marker(player_object->parent->children, 6);
     func_000C810C(*(int *)D_00195C88);
-    object_reparent(*(int *)D_00195AC4, *(int *)player_object);
-    if (((int)(unsigned char)*(signed char *)((char *)l_1C + 24)) != 24) goto L87460;
-    player_to_nearest_marker(*(int *)D_00195AC4, 6);
+    object_reparent(D_00195AC4, player_object);
+    if (l_1C->type != 24) goto L87460;
+    player_to_nearest_marker(D_00195AC4, 6);
 L87460:;
     position_history_reset();
     *(signed char *)player_environment = 1;
     *(signed char *)D_001940D5 |= 2;
     *(signed char *)D_001A4A1D = 0;
-    *(int *)current_building = 0;
-    *(int *)guild_membership = 0;
+    current_building = 0;
+    guild_membership = 0;
     sound_stop_ambient();
     if (*(int *)D_001A41E4 == 0) return;
     town_map_note_building(*(int *)D_001A41E4, *(int *)D_001A41DC);
@@ -545,12 +546,12 @@ L87460:;
 
 void location_pick_random_town(int a1)
 {
-    int l_24;
+    struct map_location *l_24;
     int l_20;
     int l_1C;
     int l_18;
 
-    l_24 = *(int *)D_00196A9C;
+    l_24 = *(struct map_location **)D_00196A9C;
     l_18 = 0;
     mc_memset(a1, 0, 20, (int)D_00176C94, 991, 4);
     l_20 = 0;
@@ -559,10 +560,10 @@ L87EAA:;
     goto L87EE7;
 L87EB7:;
     l_20++;
-    (*(char (**)[17])&l_24)++;
+    l_24++;
     goto L87EAA;
 L87EC6:;
-    switch (((unsigned)(*(int *)((char *)l_24 + 4) << 2)) >> 27) {
+    switch ((l_24->x_type_flags << 2) >> 27) {
     goto L87EE5;
 case 0:
 case 1:
@@ -577,18 +578,18 @@ L87EE7:;
     return;
 L87EFA:;
     l_1C = (rand() % l_18) + 1;
-    l_24 = *(int *)D_00196A9C;
+    l_24 = *(struct map_location **)D_00196A9C;
     l_20 = 0;
 L87F1C:;
     if (l_20 < *(int *)D_00196A28) goto L87F38;
     return;
 L87F29:;
     l_20++;
-    (*(char (**)[17])&l_24)++;
+    l_24++;
     goto L87F1C;
 L87F38:;
 }
-    switch (((unsigned)(*(int *)((char *)l_24 + 4) << 2)) >> 27) {
+    switch ((l_24->x_type_flags << 2) >> 27) {
     goto L87F57;
 case 0:
 case 1:
@@ -606,11 +607,11 @@ L87F6A:;
 
 void location_pick_random_undiscovered(int a1)
 {
-    int l_20;
+    struct map_location *l_20;
     int l_1C;
     int l_18;
 
-    l_20 = *(int *)D_00196A9C;
+    l_20 = *(struct map_location **)D_00196A9C;
     l_18 = 0;
     mc_memset(a1, 0, 20, (int)D_00176C94, 1108, 4);
     l_1C = 0;
@@ -619,11 +620,11 @@ L8813A:;
     goto L88172;
 L88147:;
     l_1C++;
-    (*(char (**)[17])&l_20)++;
+    l_20++;
     goto L8813A;
 L88156:;
-    if (((struct bf8_6_1 *)((char *)l_20 + 7))->f != 0) goto L88168;
-    if (((struct bf8_7_1 *)((char *)l_20 + 7))->f == 0) goto L8816A;
+    if ((l_20->x_type_flags & 0x40000000) != 0) goto L88168;
+    if ((l_20->x_type_flags & 0x80000000) == 0) goto L8816A;
 L88168:;
     goto L88170;
 L8816A:;
@@ -637,18 +638,18 @@ L88172:;
     return;
 L8819D:;
     l_18 = rand() % l_18;
-    l_20 = *(int *)D_00196A9C;
+    l_20 = *(struct map_location **)D_00196A9C;
     l_1C = 0;
 L881BE:;
     if (l_1C < *(int *)D_00196A28) goto L881DA;
     return;
 L881CB:;
     l_1C++;
-    (*(char (**)[17])&l_20)++;
+    l_20++;
     goto L881BE;
 L881DA:;
-    if (((struct bf8_6_1 *)((char *)l_20 + 7))->f != 0) goto L881EC;
-    if (((struct bf8_7_1 *)((char *)l_20 + 7))->f == 0) goto L881EE;
+    if ((l_20->x_type_flags & 0x40000000) != 0) goto L881EC;
+    if ((l_20->x_type_flags & 0x80000000) == 0) goto L881EE;
 L881EC:;
     goto L881F4;
 L881EE:;
@@ -846,7 +847,7 @@ void town_map_add_block(int a1, int a2)
     int l_18;
     int l_14;
 
-    l_14 = ((int)(unsigned char)*(signed char *)(*(char **)current_location + 32)) << 6;
+    l_14 = current_location->width << 6;
     a1 <<= 6;
     a2 <<= 6;
     l_20 = a1 + 64;
@@ -874,22 +875,22 @@ L88962:;
     goto L88919;
 }
 
-int location_find_building(int a1)
+struct building *location_find_building(int a1)
 {
-    int l_20;
+    struct building *l_20;
     int l_1C;
 
-    l_20 = *(int *)(*(char **)current_location + 43);
+    l_20 = current_location->buildings;
     l_1C = 0;
 L88990:;
-    if (((int)(unsigned short)*(short *)(*(char **)current_location + 41)) > l_1C) goto L889B4;
+    if (current_location->building_count > l_1C) goto L889B4;
     goto L889C9;
 L889A5:;
     l_1C++;
-    (*(char (**)[26])&l_20)++;
+    l_20++;
     goto L88990;
 L889B4:;
-    if (*(int *)((char *)l_20 + 20) != a1) goto L889C7;
+    if (l_20->id != a1) goto L889C7;
     return l_20;
 L889C7:;
     goto L889A5;
@@ -899,23 +900,23 @@ L889C9:;
 
 void location_reveal(int a1, int a2)
 {
-    int l_1C;
+    struct map_location *l_1C;
     int l_18;
     int l_14;
 
     l_14 = (int)(unsigned char)*(signed char *)current_region;
     maploads_load_region(a1);
-    l_1C = *(int *)D_00196A9C;
+    l_1C = *(struct map_location **)D_00196A9C;
     l_18 = 0;
 L88A11:;
     if (l_18 < *(int *)D_00196A28) goto L88A2D;
     goto L88A57;
 L88A1E:;
     l_18++;
-    (*(char (**)[17])&l_1C)++;
+    l_1C++;
     goto L88A11;
 L88A2D:;
-    if ((*(int *)((char *)l_1C) & 1048575) != a2) goto L88A55;
+    if ((l_1C->map_id & 1048575) != a2) goto L88A55;
     location_set_discovered(l_18, 1);
     func_0008824A(l_18, 0);
     goto L88A57;
@@ -927,20 +928,20 @@ L88A57:;
 
 int region_nth_dungeon(int a1)
 {
-    int l_20;
+    struct map_location *l_20;
     int l_1C;
 
-    l_20 = *(int *)D_00196A9C;
+    l_20 = *(struct map_location **)D_00196A9C;
     l_1C = 0;
 L88BB8:;
     if (l_1C < *(int *)D_00196A28) goto L88BD4;
     goto L88BFA;
 L88BC5:;
     l_1C++;
-    (*(char (**)[17])&l_20)++;
+    l_20++;
     goto L88BB8;
 L88BD4:;
-    if (((int)(unsigned char)*(signed char *)((char *)l_20 + 12)) == 255) goto L88BF8;
+    if (l_20->dungeon_type == 255) goto L88BF8;
     a1 += -1;
     if (a1 >= 0) goto L88BF8;
     return l_1C;
@@ -952,57 +953,57 @@ L88BFA:;
 
 void spfx_create_item_cb(int a1)
 {
-    int l_1C;
-    int l_18;
+    struct record *l_1C;
+    struct item *l_18;
 
-    l_1C = object_create_child(*(int *)D_00195AC4, 0, 107);
-    *(signed char *)((char *)l_1C) = 2;
-    *(int *)((char *)l_1C + 43) = *(int *)D_001A99F4;
-    l_18 = l_1C + 71;
+    l_1C = object_create_child(D_00195AC4, 0, 107);
+    l_1C->type = 2;
+    l_1C->repair_due = *(int *)D_001A99F4;
+    l_18 = &l_1C->data.item;
     if (((int)(short)*(short *)(D_00187F44 + (a1 << 2))) != (-1)) goto L88C7F;
     item_make((int)(unsigned short)*(short *)clothing_gender_group, (int)(short)*(short *)(D_00187F46 + (a1 << 2)), l_18);
     goto L88CA6;
 L88C7F:;
     item_make((int)(unsigned short)*(short *)(D_00187F44 + (a1 << 2)), (int)(short)*(short *)(D_00187F46 + (a1 << 2)), l_18);
 L88CA6:;
-    *(signed char *)((char *)l_1C + 114) |= 16;
+    l_1C->data.item.item_flags |= 0x1000;
     inv_store_item(l_1C);
-    if (((int)(unsigned short)*(short *)((char *)l_18 + 32)) != 3) goto L88CD7;
-    if (((int)(unsigned short)*(short *)((char *)l_18 + 34)) == 18) goto L88CD9;
+    if (l_18->group != 3) goto L88CD7;
+    if (l_18->index == 18) goto L88CD9;
 L88CD7:;
     return;
 L88CD9:;
-    inv_merge_arrows(*(int *)player_entity, l_1C, 1);
+    inv_merge_arrows(player_entity, l_1C, 1);
 }
 
-int spfx_paralyze(int a1, int a2, int a3)
+int spfx_paralyze(struct record *a1, int a2, struct record *a3)
 {
-    int l_18;
-    int l_14;
+    struct character *l_18;
+    struct spell *l_14;
 
-    l_14 = a1 + 71;
-    l_18 = a3 + 71;
-    if (((int)(unsigned char)*(signed char *)((char *)l_18 + 67)) != 4) goto L88D38;
+    l_14 = &a1->data.spell;
+    l_18 = &a3->data.character;
+    if (l_18->race != 4) goto L88D38;
     return 0;
 L88D38:;
-    if (l_18 != *(int *)player_character) goto L88D56;
-    if (((int)(unsigned char)(*(signed char *)(*(char **)player_class + 1) & 1)) != 0) goto L88D58;
+    if (l_18 != player_character) goto L88D56;
+    if (((int)(unsigned char)(player_class->immunity_flags & 1)) != 0) goto L88D58;
 L88D56:;
     goto L88D64;
 L88D58:;
     return 0;
 L88D64:;
-    if (((struct bf8_0_1 *)((char *)l_18 + 137))->f == 0) goto L88D79;
+    if ((l_18->conditions & 0x1) == 0) goto L88D79;
     return 0;
 L88D79:;
-    if (((struct bf8_7_1 *)((char *)l_18 + 138))->f == 0) goto L88D8E;
+    if ((l_18->conditions & 0x8000) == 0) goto L88D8E;
     return 0;
 L88D8E:;
-    if (rand_range(1, 100) <= ((int)(unsigned char)*(signed char *)((char *)(l_14 + a2) + 86))) goto L88DB5;
+    if (rand_range(1, 100) <= l_14->cast_chances[a2]) goto L88DB5;
     return 0;
 L88DB5:;
-    *(signed char *)((char *)l_18 + 137) |= 1;
-    if (l_18 != *(int *)player_character) goto L88DD4;
+    l_18->conditions |= 1;
+    if (l_18 != player_character) goto L88DD4;
     hud_message_add(*(int *)D_0018461C);
 L88DD4:;
     return 1;
@@ -1013,52 +1014,52 @@ void spfx_continuous_damage(int a1, int a2, int a3)
     spfx_effect_tick(a1, a3, a2);
 }
 
-int spfx_damage(int a1, int a2, int a3)
+int spfx_damage(struct record *a1, int a2, struct record *a3)
 {
-    int l_1C;
-    int l_18;
+    struct spell *l_1C;
+    struct character *l_18;
     int l_14;
 
-    l_1C = a1 + 71;
-    l_18 = a3 + 71;
-    switch (*(unsigned char *)((char *)((a2 * 2) + l_1C) + 1)) {
+    l_1C = &a1->data.spell;
+    l_18 = &a3->data.character;
+    switch (l_1C->effects[a2].subtype) {
 case 0:
-    if (l_18 != *(int *)player_character) goto L890A3;
+    if (l_18 != player_character) goto L890A3;
     if (((struct bf8_6_1 *)&cheat_flags)->f != 0) goto L890A5;
 L890A3:;
     goto L890AA;
 L890A5:;
     goto L8916B;
 L890AA:;
-    *(short *)D_00195F28 = *(short *)((char *)((a2 * 2) + l_1C) + 80);
-    damage_apply(a3, (int)(unsigned short)*(short *)((char *)((a2 * 2) + l_1C) + 80), 0);
+    *(short *)D_00195F28 = l_1C->cast_magnitudes[a2];
+    damage_apply(a3, l_1C->cast_magnitudes[a2], 0);
     goto L8916B;
 case 1:
-    *(short *)D_00195F28 = *(short *)((char *)((a2 * 2) + l_1C) + 80);
-    l_14 = (int)(unsigned short)*(short *)((char *)l_18 + 155);
-    l_14 -= (int)(unsigned short)*(short *)((char *)((a2 * 2) + l_1C) + 80);
+    *(short *)D_00195F28 = l_1C->cast_magnitudes[a2];
+    l_14 = l_18->fatigue;
+    l_14 -= l_1C->cast_magnitudes[a2];
     if (l_14 >= 0) goto L8911B;
     l_14 = 0;
 L8911B:;
-    *(short *)((char *)l_18 + 155) = l_14;
+    l_18->fatigue = l_14;
     goto L8916B;
 case 2:
-    *(short *)D_00195F28 = *(short *)((char *)((a2 * 2) + l_1C) + 80);
-    *(short *)((char *)l_18 + 141) -= *(short *)((char *)((a2 * 2) + l_1C) + 80);
-    if (*(short *)((char *)l_18 + 141) >= 0) goto L8916B;
-    *(short *)((char *)l_18 + 141) = 0;
+    *(short *)D_00195F28 = l_1C->cast_magnitudes[a2];
+    l_18->magicka -= l_1C->cast_magnitudes[a2];
+    if (l_18->magicka >= 0) goto L8916B;
+    l_18->magicka = 0;
 default:
 L8916B:;
     return 0;
 }
 }
 
-int spfx_disintegrate(int a1, int a2, int a3)
+int spfx_disintegrate(struct record *a1, int a2, struct record *a3)
 {
-    int l_14;
+    struct spell *l_14;
 
-    l_14 = a1 + 71;
-    if (rand_range(1, 100) <= ((int)(unsigned char)*(signed char *)((char *)(l_14 + a2) + 86))) goto L891CC;
+    l_14 = &a1->data.spell;
+    if (rand_range(1, 100) <= l_14->cast_chances[a2]) goto L891CC;
     hud_message_add(*(int *)D_00185097);
     return 0;
 L891CC:;
@@ -1070,12 +1071,12 @@ void spfx_dispel_magic_cb(int a1)
 {
     int l_20;
     int l_1C;
-    int l_18;
+    struct record *l_18;
 
-    l_18 = *(int *)(D_00190EE4 + (a1 << 2));
-    if (*(int *)((char *)l_18 + 47) == *(int *)player_entity) goto L89271;
-    l_20 = (((int)(unsigned char)*(signed char *)(*(char **)player_character + 129)) - ((int)(unsigned char)*(signed char *)(*(char **)((char *)l_18 + 47) + 200))) * 5;
-    l_1C = l_20 + ((int)(unsigned char)*(signed char *)((char *)(*(int *)selected_spell + *(int *)D_001A99F4) + 86));
+    l_18 = *(struct record **)(D_00190EE4 + (a1 << 2));
+    if (l_18->caster == player_entity) goto L89271;
+    l_20 = (player_character->level - l_18->caster->data.character.level) * 5;
+    l_1C = l_20 + selected_spell->cast_chances[*(int *)D_001A99F4];
     if (l_1C >= 5) goto L89264;
     l_1C = 5;
     goto L89271;
@@ -1083,7 +1084,7 @@ L89264:;
     if (l_1C <= 95) goto L89271;
     l_1C = 95;
 L89271:;
-    if (*(int *)((char *)l_18 + 47) == *(int *)player_entity) goto L89293;
+    if (l_18->caster == player_entity) goto L89293;
     if (rand_range(1, 100) > l_1C) goto L892A7;
 L89293:;
     spell_end(l_18);

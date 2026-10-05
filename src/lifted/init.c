@@ -1,6 +1,7 @@
 /* init.c: functions first lifted from the assembly by tools/lift_all.py (2026-10), now
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
+#include "records.h"
 
 struct bf8_0_5 { unsigned char f:5; };
 extern char disk_last_file_size[];
@@ -44,7 +45,7 @@ extern char saved_positions[];
 extern char region_event_values[];
 extern char region_price_adjustment[];
 extern char text_buffer[];
-extern char D_00190504[];
+extern struct record *D_00190504[];
 extern char D_00190704[];
 extern char hud_compass_image[];
 extern char D_00190908[];
@@ -58,10 +59,10 @@ extern char D_001940D8[];
 extern char horse_overlay_image[];
 extern char cart_overlay_image[];
 extern char D_00195998[];
-extern char nonworld_root[];
+extern struct record *nonworld_root;
 extern char logbook_object[];
 extern char options_object[];
-extern char inventory_containers[];
+extern struct record *inventory_containers[];
 extern char D_001959DC[];
 extern char D_001959E0[];
 extern char D_001959E4[];
@@ -71,14 +72,14 @@ extern char D_001959F4[];
 extern char D_001959F8[];
 extern char D_00195A00[];
 extern char bank_accounts[];
-extern char camera_object[];
-extern char player_entity[];
-extern char player_object[];
-extern char D_00195AC4[];
+extern struct record *camera_object;
+extern struct record *player_entity;
+extern struct record *player_object;
+extern struct record *D_00195AC4;
 extern char D_00195AC8[];
 extern char D_00195AD0[];
 extern char picklist_image[];
-extern char spell_records[];
+extern struct spell *spell_records;
 extern char creature_count[];
 extern char current_region_data[];
 extern char D_00195B64[];
@@ -88,11 +89,11 @@ extern char D_00195B74[];
 extern char D_00195B78[];
 extern char icon_image[];
 extern char buttons_rci[];
-extern char player_character[];
+extern struct character *player_character;
 extern char window_image[];
-extern char player_class[];
+extern struct career *player_class;
 extern char game_minutes[];
-extern char game_settings[];
+extern struct settings *game_settings;
 extern char D_00195C44[];
 extern char cfg_map_file[];
 extern char D_00195C7C[];
@@ -145,10 +146,10 @@ extern char D_001AA5FC[];
 extern int climate_category(void);
 extern int disk_read_file(int, int);
 extern int rand_range(int, int);
-extern int object_delete(int);
-extern int object_create_child(int, int, int);
-extern int marker_count(int, int);
-extern int player_to_nearest_marker(int, int);
+extern struct record *object_delete(struct record *);
+extern struct record *object_create_child(struct record *, struct record *, int);
+extern int marker_count(struct record *, int);
+extern int player_to_nearest_marker(struct record *, int);
 extern int func_0009DA1C(int, int);
 extern int printf(int, ...);
 extern int exit();
@@ -226,7 +227,7 @@ extern void location_unload(unsigned short);
 extern void map_goto_location(int, int, int, int);
 extern void object_heap_init(void);
 extern void object_heap_shutdown(void);
-extern void object_free_children(int);
+extern void object_free_children(struct record *);
 extern void inv_reset_left_list(void);
 extern void dpmi_get_free_memory(int);
 int func_00050607(int);
@@ -237,8 +238,8 @@ void func_0004FEEA(void);
 void palette_restore(void);
 void game_shutdown(void);
 void newgame_init_player(void);
-void character_reset_magicka(int, int);
-void init_player_records(int);
+void character_reset_magicka(struct character *, struct career *);
+void init_player_records(struct record *);
 void spell_cast_anims_free(void);
 #pragma aux func_0009DA1C parm routine [];
 #pragma aux func_000A0ED9 parm routine [];
@@ -278,8 +279,8 @@ L4F454:;
 void init_world_objects(void)
 {
     object_heap_init();
-    *(int *)D_00195AD0 = *(int *)D_00195AC4;
-    init_player_records(*(int *)D_00195AC4);
+    *(int *)D_00195AD0 = (int)D_00195AC4;
+    init_player_records(D_00195AC4);
     inv_reset_left_list();
     calendar_update();
 }
@@ -289,7 +290,7 @@ void newgame_place_player(void)
     int l_1C;
     int l_18;
 
-    *(short *)(*(char **)D_00195AC4 + 27) = 65535;
+    D_00195AC4->image = 65535;
     if (((int)(unsigned char)*(signed char *)cfg_map_file) != 100) goto L4F4E5;
     *(signed char *)player_environment = 3;
     goto L4F4EC;
@@ -305,17 +306,17 @@ L4F4EC:;
     goto L4F5A8;
 L4F54F:;
     map_goto_location((int)(unsigned char)*(signed char *)cfg_region, 1, *(int *)cfg_start_map, 0);
-    player_to_nearest_marker(*(int *)D_00195AC4, 8);
+    player_to_nearest_marker(D_00195AC4, 8);
     dungeon_load(-1);
     automap_load();
-    if (marker_count(*(int *)D_00195AC4, 6) == 0) goto L4F5A8;
-    player_to_nearest_marker(*(int *)D_00195AC4, 6);
+    if (marker_count(D_00195AC4, 6) == 0) goto L4F5A8;
+    player_to_nearest_marker(D_00195AC4, 6);
 L4F5A8:;
-    *(int *)D_000C23C4 = *(int *)(*(char **)player_object + 7);
-    *(int *)D_000C23CC = *(int *)(*(char **)player_object + 15);
-    *(int *)D_000C23C8 = *(int *)(*(char **)player_object + 11);
+    *(int *)D_000C23C4 = player_object->x;
+    *(int *)D_000C23CC = player_object->z;
+    *(int *)D_000C23C8 = player_object->y;
     *(signed char *)view_cursor_active = 0;
-    *(short *)(*(char **)player_character + 124) = *(short *)(*(char **)player_character + 126);
+    player_character->health = player_character->max_health;
 }
 
 void shutdown_free_all(void)
@@ -379,13 +380,13 @@ L4F763:;
     mc_free(*(int *)D_001AA5FC, (int)D_00175040, 327);
     *(int *)D_001AA5FC = -1751672937;
 L4F781:;
-    if (*(int *)spell_records == 0) goto L4F796;
-    if (*(int *)spell_records != (-1751672937)) goto L4F798;
+    if ((int)spell_records == 0) goto L4F796;
+    if ((int)spell_records != (-1751672937)) goto L4F798;
 L4F796:;
     goto L4F7B6;
 L4F798:;
-    mc_free(*(int *)spell_records, (int)D_00175040, 328);
-    *(int *)spell_records = -1751672937;
+    mc_free((int)spell_records, (int)D_00175040, 328);
+    spell_records = (struct spell *)-1751672937;
 L4F7B6:;
     if (*(int *)buttons_rci == 0) goto L4F7CB;
     if (*(int *)buttons_rci != (-1751672937)) goto L4F7CD;
@@ -746,39 +747,39 @@ L500E4:;
 void newgame_init_player(void)
 {
     int l_20;
-    int l_1C;
-    int l_18;
+    struct character *l_1C;
+    struct career *l_18;
 
     player_refresh_paperdoll();
     player_compute_jump_velocity();
     func_000A0ED9(514, (int)D_00175040);
     mc_sprintf((int)text_buffer, (int)D_00175313, (int)D_001917E4);
     disk_copy_file((int)cfg_mapsave_file, (int)text_buffer, (int)D_001917E4);
-    l_1C = *(int *)player_character;
-    l_18 = *(int *)player_class;
-    *(short *)((char *)l_1C + 155) = (*(short *)((char *)l_1C + 32) + *(short *)((char *)l_1C + 40)) << 6;
-    *(short *)((char *)l_1C + 124) = ((int)(unsigned char)*(signed char *)((char *)l_18 + 52)) + 25;
+    l_1C = player_character;
+    l_18 = player_class;
+    l_1C->fatigue = (l_1C->attributes[ATTR_STR] + l_1C->attributes[ATTR_END]) << 6;
+    l_1C->health = l_18->hp_per_level + 25;
     l_20 = 1;
 L502BC:;
-    if (((int)(unsigned char)*(signed char *)((char *)l_1C + 129)) > l_20) goto L502D9;
+    if (l_1C->level > l_20) goto L502D9;
     goto L502F6;
 L502D1:;
     l_20++;
     goto L502BC;
 L502D9:;
-    *(short *)((char *)l_1C + 124) += rand_range(1, (int)(unsigned char)*(signed char *)((char *)l_18 + 52));
+    l_1C->health += rand_range(1, l_18->hp_per_level);
     goto L502D1;
 L502F6:;
-    *(int *)((char *)l_1C + 92) = (int)(short)(*(short *)((char *)l_1C + 126) = *(short *)((char *)l_1C + 124));
+    l_1C->max_health_base = (int)(short)(l_1C->max_health = l_1C->health);
     character_reset_magicka(l_1C, l_18);
-    *(short *)((char *)l_1C + 477) = 1;
-    *(short *)((char *)l_1C + 479) = 2;
+    l_1C->attack_damage[0][0] = 1;
+    l_1C->attack_damage[0][1] = 2;
     weapon_reload_hand_sprites();
 }
 
-void character_reset_magicka(int a1, int a2)
+void character_reset_magicka(struct character *a1, struct career *a2)
 {
-    *(short *)((char *)a1 + 141) = (*(short *)((char *)a1 + 143) = (((int)(short)*(short *)((char *)a1 + 34)) * ((int)(short)*(short *)(D_001788D3 + (((((int)(unsigned short)*(short *)((char *)a2 + 4)) >> 10) & 7) * 2)))) / 256);
+    a1->magicka = (a1->max_magicka = (a1->attributes[ATTR_INT] * ((int)(short)*(short *)(D_001788D3 + (((a2->flags >> 10) & 7) * 2)))) / 256);
 }
 
 int flats_cfg_find(int a1)
@@ -852,62 +853,62 @@ L50688:;
     return a1;
 }
 
-void init_player_records(int a1)
+void init_player_records(struct record *a1)
 {
     int l_1C;
     int l_18;
 
-    *(signed char *)((char *)(*(int *)player_object = object_create_child(a1, 0, 0))) = 4;
-    *(short *)(*(char **)player_object + 21) = 3;
-    *(int *)(*(char **)player_object + 7) = 0;
-    *(int *)(*(char **)player_object + 11) = 0;
-    *(int *)(*(char **)player_object + 15) = 0;
-    *(signed char *)((char *)(*(int *)camera_object = object_create_child(*(int *)player_object, 0, 0))) = 5;
-    *(short *)(*(char **)camera_object + 21) = 2;
-    *(int *)(*(char **)camera_object + 7) = *(int *)(*(char **)player_object + 7);
-    *(int *)(*(char **)camera_object + 11) = *(int *)(*(char **)player_object + 11) - 75;
-    *(int *)(*(char **)camera_object + 15) = *(int *)(*(char **)player_object + 11);
-    *(signed char *)((char *)(*(int *)player_entity = object_create_child(*(int *)player_object, 0, 634))) = 3;
-    *(short *)(*(char **)player_entity + 21) = 3;
-    *(int *)player_class = (*(int *)player_character = *(int *)player_entity + 71) + 560;
-    *(short *)(*(char **)player_character + 131) = 1;
-    *(signed char *)(*(char **)player_character + 130) = 2;
-    *(signed char *)(*(char **)player_character + 506) = 200;
-    *(signed char *)((char *)(*(int *)inventory_containers = object_create_child(*(int *)player_entity, 0, 0))) = 52;
-    *(short *)(*(char **)inventory_containers + 21) = 3;
-    *(short *)(*(char **)inventory_containers + 27) = 0;
-    *(signed char *)((char *)(*(int *)D_001959DC = object_create_child(*(int *)player_entity, 0, 0))) = 52;
+    (player_object = object_create_child(a1, 0, 0))->type = 4;
+    player_object->flags = 3;
+    player_object->x = 0;
+    player_object->y = 0;
+    player_object->z = 0;
+    (camera_object = object_create_child(player_object, 0, 0))->type = 5;
+    camera_object->flags = 2;
+    camera_object->x = player_object->x;
+    camera_object->y = player_object->y - 75;
+    camera_object->z = player_object->y;
+    (player_entity = object_create_child(player_object, 0, 634))->type = 3;
+    player_entity->flags = 3;
+    player_class = &(player_character = &player_entity->data.character)->career;
+    player_character->pad83 = 1;
+    player_character->reflexes = 2;
+    player_character->mobile_id = 200;
+    (inventory_containers[0] = object_create_child(player_entity, 0, 0))->type = 52;
+    inventory_containers[0]->flags = 3;
+    inventory_containers[0]->image = 0;
+    *(signed char *)((char *)(*(int *)D_001959DC = (int)object_create_child(player_entity, 0, 0))) = 52;
     *(short *)(*(char **)D_001959DC + 21) = 3;
     *(short *)(*(char **)D_001959DC + 27) = 1;
-    *(signed char *)((char *)(*(int *)D_001959E0 = object_create_child(*(int *)player_entity, 0, 0))) = 52;
+    *(signed char *)((char *)(*(int *)D_001959E0 = (int)object_create_child(player_entity, 0, 0))) = 52;
     *(short *)(*(char **)D_001959E0 + 21) = 3;
     *(short *)(*(char **)D_001959E0 + 27) = 2;
-    *(signed char *)((char *)(*(int *)D_001959E4 = object_create_child(*(int *)player_entity, 0, 0))) = 52;
+    *(signed char *)((char *)(*(int *)D_001959E4 = (int)object_create_child(player_entity, 0, 0))) = 52;
     *(short *)(*(char **)D_001959E4 + 21) = 3;
     *(short *)(*(char **)D_001959E4 + 27) = 3;
-    *(signed char *)((char *)(*(int *)D_001959EC = object_create_child(*(int *)player_entity, 0, 0))) = 52;
+    *(signed char *)((char *)(*(int *)D_001959EC = (int)object_create_child(player_entity, 0, 0))) = 52;
     *(short *)(*(char **)D_001959EC + 21) = 3;
     *(short *)(*(char **)D_001959EC + 27) = 5;
-    *(signed char *)((char *)(*(int *)D_001959F0 = object_create_child(*(int *)player_entity, 0, 0))) = 52;
+    *(signed char *)((char *)(*(int *)D_001959F0 = (int)object_create_child(player_entity, 0, 0))) = 52;
     *(short *)(*(char **)D_001959F0 + 21) = 3;
     *(short *)(*(char **)D_001959F0 + 27) = 6;
-    *(signed char *)((char *)(*(int *)D_001959F4 = object_create_child(*(int *)player_entity, 0, 0))) = 52;
+    *(signed char *)((char *)(*(int *)D_001959F4 = (int)object_create_child(player_entity, 0, 0))) = 52;
     *(short *)(*(char **)D_001959F4 + 21) = 3;
     *(short *)(*(char **)D_001959F4 + 27) = 7;
-    *(signed char *)((char *)(*(int *)D_001959F8 = object_create_child(*(int *)player_entity, 0, 0))) = 52;
+    *(signed char *)((char *)(*(int *)D_001959F8 = (int)object_create_child(player_entity, 0, 0))) = 52;
     *(short *)(*(char **)D_001959F8 + 21) = 3;
     *(short *)(*(char **)D_001959F8 + 27) = 8;
-    *(signed char *)((char *)(*(int *)D_00195A00 = object_create_child(*(int *)player_entity, 0, 0))) = 16;
+    *(signed char *)((char *)(*(int *)D_00195A00 = (int)object_create_child(player_entity, 0, 0))) = 16;
     *(short *)(*(char **)D_00195A00 + 21) = 3;
-    *(signed char *)((char *)(*(int *)options_object = object_create_child(*(int *)player_entity, 0, 6))) = 23;
+    *(signed char *)((char *)(*(int *)options_object = (int)object_create_child(player_entity, 0, 6))) = 23;
     *(short *)(*(char **)options_object + 21) = 3;
-    *(short *)((char *)(*(int *)game_settings = *(int *)options_object + 71)) = 32514;
-    *(short *)(*(char **)game_settings + 2) = 127;
-    *(short *)(*(char **)game_settings + 4) = 128;
-    *(signed char *)((char *)(*(int *)logbook_object = object_create_child(*(int *)player_entity, 0, 3008))) = 24;
+    *(short *)((char *)(*(int *)&game_settings = *(int *)options_object + 71)) = 32514;
+    game_settings->sound_volume = 127;
+    game_settings->music_volume = 128;
+    *(signed char *)((char *)(*(int *)logbook_object = (int)object_create_child(player_entity, 0, 3008))) = 24;
     *(short *)(*(char **)logbook_object + 21) = 3;
     l_18 = *(int *)logbook_object + 71;
-    *(signed char *)((char *)(*(int *)bank_accounts = object_create_child(*(int *)player_entity, 0, 806))) = 25;
+    *(signed char *)((char *)(*(int *)bank_accounts = (int)object_create_child(player_entity, 0, 806))) = 25;
     *(short *)(*(char **)bank_accounts + 21) = 3;
 }
 
@@ -916,7 +917,7 @@ void update_underwater(void)
     int l_18;
 
     if (*(int *)dungeon_water_level == 10000) return;
-    if ((*(int *)(*(char **)player_object + 11) - 76) <= *(int *)dungeon_water_level) goto L50A5B;
+    if ((player_object->y - 76) <= *(int *)dungeon_water_level) goto L50A5B;
     l_18 = 1;
     goto L50A62;
 L50A5B:;
@@ -1001,7 +1002,7 @@ L50C66:;
     *(int *)D_00199808 = l_20;
     if (((int)(unsigned char)*(signed char *)player_environment) != 1) goto L50D8F;
     if (*(int *)D_00199808 != 0) goto L50CCF;
-    *(int *)D_000CEA24 = ((((int)(unsigned short)*(short *)(*(char **)game_settings)) >> 8) + 129) * 1536;
+    *(int *)D_000CEA24 = ((((int)(unsigned short)*(short *)(*(char **)&game_settings)) >> 8) + 129) * 1536;
     *(int *)D_0014CC0C = *(int *)D_00195D20;
     func_0014D23C((*(int *)D_000CEA24 >> 8) - 512);
     *(signed char *)D_00196283 = 0;
@@ -1011,13 +1012,13 @@ L50CCF:;
     if (((int)(unsigned char)(*(signed char *)(climate_weathers + l_1C) & 127)) == 3) goto L50D00;
     if (((int)(unsigned char)(*(signed char *)(climate_weathers + l_1C) & 128)) == 0) goto L50D42;
 L50D00:;
-    *(int *)D_000CEA24 = ((((int)(unsigned short)*(short *)(*(char **)game_settings)) >> 8) + 129) * 768;
+    *(int *)D_000CEA24 = ((((int)(unsigned short)*(short *)(*(char **)&game_settings)) >> 8) + 129) * 768;
     *(int *)D_0014CC0C = *(int *)D_00195D18 + 16128;
     func_0014D23C(8);
     *(signed char *)D_00196283 = 119;
     goto L50D8A;
 L50D42:;
-    *(int *)D_000CEA24 = ((((int)(unsigned short)*(short *)(*(char **)game_settings)) >> 8) + 129) * 3072;
+    *(int *)D_000CEA24 = ((((int)(unsigned short)*(short *)(*(char **)&game_settings)) >> 8) + 129) * 3072;
     *(int *)D_0014CC0C = *(int *)D_00195CF4 + 16128;
     func_0014D23C((*(int *)D_000CEA24 >> 8) - 512);
     *(signed char *)D_00196283 = 0;
@@ -1025,17 +1026,17 @@ L50D8A:;
     return;
 L50D8F:;
     if (*(int *)dungeon_water_level == 10000) goto L50DAE;
-    if ((*(int *)(*(char **)player_object + 11) - 76) > *(int *)dungeon_water_level) goto L50DB0;
+    if ((player_object->y - 76) > *(int *)dungeon_water_level) goto L50DB0;
 L50DAE:;
     goto L50DF2;
 L50DB0:;
-    *(int *)D_000CEA24 = ((((int)(unsigned short)*(short *)(*(char **)game_settings)) >> 8) + 129) * 768;
+    *(int *)D_000CEA24 = ((((int)(unsigned short)*(short *)(*(char **)&game_settings)) >> 8) + 129) * 768;
     *(int *)D_0014CC0C = *(int *)D_00195CF4 + 16128;
     func_0014D23C(4);
     *(signed char *)D_00196283 = 107;
     return;
 L50DF2:;
-    *(int *)D_000CEA24 = ((((int)(unsigned short)*(short *)(*(char **)game_settings)) >> 8) + 129) * 1536;
+    *(int *)D_000CEA24 = ((((int)(unsigned short)*(short *)(*(char **)&game_settings)) >> 8) + 129) * 1536;
     *(int *)D_0014CC0C = *(int *)D_00195D20;
     func_0014D23C((*(int *)D_000CEA24 >> 8) - 512);
     *(signed char *)D_00196283 = 223;
@@ -1045,13 +1046,13 @@ void game_reset(void)
 {
     int l_18;
 
-    if (((int)(unsigned short)*(short *)(*(char **)D_00195AC4 + 27)) == 65535) goto L50E75;
-    location_unload((int)(unsigned short)*(short *)(*(char **)D_00195AC4 + 27));
+    if (D_00195AC4->image == 65535) goto L50E75;
+    location_unload(D_00195AC4->image);
 L50E75:;
-    object_free_children(*(int *)nonworld_root);
+    object_free_children(nonworld_root);
     *(int *)frame_checkpoint = 500;
-    object_delete(*(int *)player_object);
-    init_player_records(*(int *)D_00195AC4);
+    object_delete(player_object);
+    init_player_records(D_00195AC4);
     *(int *)frame_checkpoint = 501;
     newgame_init_player();
     *(int *)frame_checkpoint = 502;
@@ -1074,7 +1075,7 @@ L50F10:;
     goto L50F08;
 L50F30:;
     mc_memset((int)saved_positions, 0, 48, (int)D_00175040, 851, 48);
-    mc_memset((int)D_00190504, 0, 512, (int)D_00175040, 852, 512);
+    mc_memset((int)((char *)D_00190504), 0, 512, (int)D_00175040, 852, 512);
     *(int *)creature_count = 0;
 }
 
@@ -1096,5 +1097,5 @@ L50FE1:;
 void func_00050FFD(void)
 {
     *(signed char *)D_0019621B = 18;
-    *(int *)D_0019625E = *(int *)D_00195AC4;
+    *(int *)D_0019625E = (int)D_00195AC4;
 }

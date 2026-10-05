@@ -1,4 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0008CFE6 */
+#include "records.h"
+
 extern char mouse_buttons[];
 extern char D_0012AC02[];
 extern char mouse_x[];
@@ -10,25 +12,7 @@ extern char key_down_down[];
 extern char D_001A9AB4[];
 extern int point_in_rect(short, short, short, short, short, short);
 
-#pragma pack(1)
-struct rect { short x; short y; short w; short h; };
-struct item { unsigned short flags; short val; char pad[40]; };
-struct list {
-    char pad0[5];
-    struct rect area;
-    struct rect up;
-    struct rect down;
-    struct rect bar;
-    unsigned short count;
-    unsigned short top;
-    unsigned short sel;
-    unsigned short visible;
-    short pad2d;
-    struct item *items;
-};
-#pragma pack()
-
-short picklist_poll(struct list *l)
+short picklist_poll(struct picklist *l)
 {
     short ratio;
     short pos;
@@ -37,46 +21,46 @@ short picklist_poll(struct list *l)
         if (l->count == 0)
             ratio = 0;
         else
-            ratio = l->top * l->bar.h / l->count;
-        if (*key_down_enter || point_in_rect(*(short *)mouse_x, *(short *)mouse_y, l->area.x, l->area.y, l->area.x + l->area.w - 1, l->area.y + l->area.h - 1)) {
+            ratio = l->top * l->bar_rect.h / l->count;
+        if (*key_down_enter || point_in_rect(*(short *)mouse_x, *(short *)mouse_y, l->list_rect.x, l->list_rect.y, l->list_rect.x + l->list_rect.w - 1, l->list_rect.y + l->list_rect.h - 1)) {
             if (*key_down_enter)
-                pos = l->sel;
+                pos = l->selected;
             else
-                pos = l->top + (*(short *)mouse_y - l->area.y) / (*(short *)D_0012DA44 + 1);
+                pos = l->top + (*(short *)mouse_y - l->list_rect.y) / (*(short *)D_0012DA44 + 1);
             if (pos < l->count) {
-                l->sel = pos;
-                if ((*key_down_enter || *D_0012AC02) && (l->items[l->sel].flags & 128) == 0)
-                    return l->items[l->sel].val + 1;
+                l->selected = pos;
+                if ((*key_down_enter || *D_0012AC02) && (l->entries[l->selected].flags & 128) == 0)
+                    return l->entries[l->selected].index + 1;
             }
             return -5;
         }
-        if ((*key_down_down || point_in_rect(*(short *)mouse_x, *(short *)mouse_y, l->down.x, l->down.y, l->down.x + l->down.w, l->down.y + l->down.h)) && (unsigned)(*(int *)0x46c - *(int *)D_001A9AB4) > 3) {
+        if ((*key_down_down || point_in_rect(*(short *)mouse_x, *(short *)mouse_y, l->down_rect.x, l->down_rect.y, l->down_rect.x + l->down_rect.w, l->down_rect.y + l->down_rect.h)) && (unsigned)(*(int *)0x46c - *(int *)D_001A9AB4) > 3) {
             *(int *)D_001A9AB4 = *(int *)0x46c;
-            if (l->sel < l->count - 1) {
-                l->sel++;
-                if (l->count > l->visible)
-                    if (l->sel >= l->top + l->visible && l->top < l->count - l->visible)
+            if (l->selected < l->count - 1) {
+                l->selected++;
+                if (l->count > l->visible_rows)
+                    if (l->selected >= l->top + l->visible_rows && l->top < l->count - l->visible_rows)
                         l->top++;
                 return -3;
             }
         }
-        if ((*key_down_up || point_in_rect(*(short *)mouse_x, *(short *)mouse_y, l->up.x, l->up.y, l->up.x + l->up.w, l->up.y + l->up.h)) && (unsigned)(*(int *)0x46c - *(int *)D_001A9AB4) > 3) {
+        if ((*key_down_up || point_in_rect(*(short *)mouse_x, *(short *)mouse_y, l->up_rect.x, l->up_rect.y, l->up_rect.x + l->up_rect.w, l->up_rect.y + l->up_rect.h)) && (unsigned)(*(int *)0x46c - *(int *)D_001A9AB4) > 3) {
             *(int *)D_001A9AB4 = *(int *)0x46c;
-            if (l->sel != 0) {
-                l->sel--;
-                if (l->count > l->visible)
-                    if (l->sel < l->top && l->top != 0)
+            if (l->selected != 0) {
+                l->selected--;
+                if (l->count > l->visible_rows)
+                    if (l->selected < l->top && l->top != 0)
                         l->top--;
                 return -2;
             }
         }
-        if (point_in_rect(*(short *)mouse_x, *(short *)mouse_y, l->bar.x, l->bar.y, l->bar.x + l->bar.w, l->bar.y + l->bar.h - 1))
-            if (l->count > l->visible) {
-                pos = l->count * (*(short *)mouse_y - l->bar.y) / l->bar.h;
-                if (pos >= l->count - l->visible)
-                    pos = l->count - l->visible;
+        if (point_in_rect(*(short *)mouse_x, *(short *)mouse_y, l->bar_rect.x, l->bar_rect.y, l->bar_rect.x + l->bar_rect.w, l->bar_rect.y + l->bar_rect.h - 1))
+            if (l->count > l->visible_rows) {
+                pos = l->count * (*(short *)mouse_y - l->bar_rect.y) / l->bar_rect.h;
+                if (pos >= l->count - l->visible_rows)
+                    pos = l->count - l->visible_rows;
                 if (pos != l->top) {
-                    l->sel = pos;
+                    l->selected = pos;
                     l->top = pos;
                     return -4;
                 }

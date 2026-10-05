@@ -1,6 +1,7 @@
 /* sky.c: functions first lifted from the assembly by tools/lift_all.py (2026-10), now
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
+#include "records.h"
 
 extern char D_000C23B8[];
 extern char D_000C23BC[];
@@ -31,11 +32,11 @@ extern char D_0017A3EB[];
 extern char text_buffer[];
 extern char view_look_pitch[];
 extern char D_001959BC[];
-extern char camera_object[];
-extern char player_object[];
+extern struct record *camera_object;
+extern struct record *player_object;
 extern char hud_bar_image[];
 extern char game_minutes[];
-extern char game_settings[];
+extern struct settings *game_settings;
 extern char D_00195C44[];
 extern char D_00195CF4[];
 extern char D_00195D48[];
@@ -123,17 +124,17 @@ void func_00034EC1(void)
     int l_18;
 
     if (*(int *)D_0019857C == 0) return;
-    l_20 = *(int *)(*(char **)player_object + 7) + *(int *)D_001985C8;
-    l_1C = *(int *)(*(char **)player_object + 11) + *(int *)D_001985CC;
-    l_18 = *(int *)(*(char **)player_object + 15) + *(int *)D_001985D0;
+    l_20 = player_object->x + *(int *)D_001985C8;
+    l_1C = player_object->y + *(int *)D_001985CC;
+    l_18 = player_object->z + *(int *)D_001985D0;
     func_0014BDDD((int)&l_20, (int)&l_1C, (int)&l_18);
     func_00136AD8(-l_20, l_1C, -l_18, *(int *)D_0019857C, 0, 8);
 }
 
 void sky_update_moons(void)
 {
-    *(int *)D_000C23B8 = (((int)(short)*(short *)(*(char **)camera_object + 1)) + *(int *)view_look_pitch) & 2047;
-    *(int *)D_000C23BC = (((int)(short)*(short *)(*(char **)camera_object + 3)) + *(int *)D_001959BC) & 2047;
+    *(int *)D_000C23B8 = (camera_object->angle_x + *(int *)view_look_pitch) & 2047;
+    *(int *)D_000C23BC = (camera_object->yaw + *(int *)D_001959BC) & 2047;
     *(int *)D_000C23C0 = 0;
     func_00137000(*(int *)D_000C23B8, *(int *)D_000C23BC, *(int *)D_000C23C0, (int)D_00136E00);
     func_00137725((int)D_00136E00, (int)D_00136E24);
@@ -324,19 +325,19 @@ void sky_draw_day(int a1, int a2, int a3, int a4)
     int l_C;
 
     *(signed char *)D_0019629B = 0;
-    l_14 = ((((int)(unsigned short)(*(short *)(*(char **)game_settings) & 1)) != 0) ? 199 : (int)(unsigned short)*(short *)(*(char **)hud_bar_image + 2));
+    l_14 = ((((int)(unsigned short)(*(short *)game_settings & 1)) != 0) ? 199 : (int)(unsigned short)*(short *)(*(char **)hud_bar_image + 2));
     if (((int)(unsigned char)(*(signed char *)(climate_weathers + a4) & 127)) == 3) goto L3576A;
     if (((int)(unsigned char)(*(signed char *)(climate_weathers + a4) & 128)) == 0) goto L35791;
 L3576A:;
     mc_memset(*(int *)screen_buffer, 119, l_14 * 320, (int)D_00170A86, 598, 4);
     return;
 L35791:;
-    l_14 = ((((int)(unsigned short)(*(short *)(*(char **)game_settings) & 1)) != 0) ? 199 : (int)(unsigned short)*(short *)(*(char **)hud_bar_image + 2));
+    l_14 = ((((int)(unsigned short)(*(short *)game_settings & 1)) != 0) ? 199 : (int)(unsigned short)*(short *)(*(char **)hud_bar_image + 2));
     l_28 = (139 - a1) << 9;
     if (l_28 >= 0) goto L357E0;
     l_28 = 0;
 L357E0:;
-    l_24 = ((((int)(short)*(short *)(*(char **)camera_object + 3)) + *(int *)D_001959BC) - 705) & 2047;
+    l_24 = ((camera_object->yaw + *(int *)D_001959BC) - 705) & 2047;
     l_18 = l_24 / 512;
     l_24 = l_24 % 512;
     if (((unsigned)(((unsigned)*(int *)game_minutes) % 1440)) >= 720) goto L35845;
@@ -442,12 +443,12 @@ void sky_draw_night(int a1, int a2)
     if (*(signed char *)D_0019629B != 0) goto L35B5B;
     sky_load_night();
 L35B5B:;
-    l_1C = ((((int)(unsigned short)(*(short *)(*(char **)game_settings) & 1)) != 0) ? 199 : (int)(unsigned short)*(short *)(*(char **)hud_bar_image + 2));
+    l_1C = ((((int)(unsigned short)(*(short *)game_settings & 1)) != 0) ? 199 : (int)(unsigned short)*(short *)(*(char **)hud_bar_image + 2));
     l_30 = (139 - a1) << 9;
     if (l_30 >= 0) goto L35BAA;
     l_30 = 0;
 L35BAA:;
-    l_2C = ((((int)(short)*(short *)(*(char **)camera_object + 3)) + *(int *)D_001959BC) - 705) & 2047;
+    l_2C = ((camera_object->yaw + *(int *)D_001959BC) - 705) & 2047;
     l_20 = l_2C / 512;
     l_2C = l_2C % 512;
     a1 += 75;

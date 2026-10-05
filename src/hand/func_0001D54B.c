@@ -1,6 +1,7 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0001D54B */
+#include "records.h"
+
 #pragma pack(1)
-struct Item { char pad[37]; unsigned short flags; };
 struct Rec {
     short id1;                  /* 0 */
     short id2;                  /* 2 */
@@ -9,13 +10,13 @@ struct Rec {
     unsigned char flags;        /* 9 */
 };
 extern char current_region;
-extern struct Item *faction_find(short);
+extern struct faction *faction_find(short);
 
 int func_0001D54B(struct Rec *r, short a2, int a3, int a4)
 {
     int unused;
-    struct Item *p1;
-    struct Item *p2;
+    struct faction *p1;
+    struct faction *p2;
 
     p1 = 0;
     p2 = 0;

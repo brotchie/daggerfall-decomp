@@ -1,26 +1,27 @@
 /* people.c: functions first lifted from the assembly by tools/lift_all.py (2026-10), now
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
+#include "records.h"
 
 extern char D_00170DC0[];
 extern char D_00170DD6[];
 extern char player_environment[];
 extern char text_buffer[];
-extern char D_00190504[];
-extern char player_object[];
-extern char D_00195AC4[];
+extern struct record *D_00190504[];
+extern struct record *player_object;
+extern struct record *D_00195AC4;
 extern char creature_count[];
-extern char current_location[];
+extern struct location *current_location;
 extern char game_mode[];
 extern char crime_current[];
 extern char D_0019627F[];
 extern char D_00196DA4[];
-extern char people_list[];
+extern struct record *people_list[];
 extern char people_count[];
 
-extern int collide_line_of_sight(int, int);
-extern int is_guard_sprite(int);
-extern int object_delete(int);
+extern int collide_line_of_sight(struct record *, struct record *);
+extern int is_guard_sprite(struct record *);
+extern int object_delete(struct record *);
 extern int mc_memset();
 extern int func_000A0ED9(int, int);
 extern int mc_sprintf(int, ...);
@@ -45,13 +46,13 @@ L4107C:;
     l_18++;
     goto L4106F;
 L41084:;
-    if (*(int *)(people_list + (l_18 << 2)) == 0) goto L410A4;
-    object_delete(*(int *)(people_list + (l_18 << 2)));
+    if (people_list[l_18] == 0) goto L410A4;
+    object_delete(people_list[l_18]);
 L410A4:;
     goto L4107C;
 L410A6:;
     *(int *)people_count = 0;
-    mc_memset((int)people_list, 0, 120, (int)D_00170DC0, 554, 120);
+    mc_memset((int)((char *)people_list), 0, 120, (int)D_00170DC0, 554, 120);
 }
 
 int func_00041347(void)
@@ -71,12 +72,12 @@ L41388:;
     l_20++;
     goto L4137B;
 L41390:;
-    if (*(int *)(people_list + (l_20 << 2)) == 0) goto L41388;
-    if (is_guard_sprite(*(int *)(people_list + (l_20 << 2))) == 0) goto L413D2;
-    l_1C |= collide_line_of_sight(*(int *)(people_list + (l_20 << 2)), *(int *)player_object) * 2;
+    if (people_list[l_20] == 0) goto L41388;
+    if (is_guard_sprite(people_list[l_20]) == 0) goto L413D2;
+    l_1C |= collide_line_of_sight(people_list[l_20], player_object) * 2;
     goto L413EC;
 L413D2:;
-    l_1C |= collide_line_of_sight(*(int *)(people_list + (l_20 << 2)), *(int *)player_object);
+    l_1C |= collide_line_of_sight(people_list[l_20], player_object);
 L413EC:;
     goto L41388;
 L413EE:;
@@ -102,7 +103,7 @@ void func_00041455(void)
 
     if (*(signed char *)game_mode != 0) return;
     if (((int)(unsigned char)*(signed char *)player_environment) != 1) return;
-    func_000CDCB8(((int)(unsigned char)*(signed char *)(*(char **)current_location + 33)) << 6, ((int)(unsigned char)*(signed char *)(*(char **)current_location + 32)) << 6, *(int *)D_00196DA4);
+    func_000CDCB8(current_location->height << 6, current_location->width << 6, *(int *)D_00196DA4);
     l_20 = 0;
 L414AF:;
     if (l_20 < *(int *)people_count) goto L414C7;
@@ -111,12 +112,12 @@ L414BF:;
     l_20++;
     goto L414AF;
 L414C7:;
-    if (*(int *)(people_list + (l_20 << 2)) == 0) goto L414BF;
-    l_1C = *(int *)(*(char **)(people_list + (l_20 << 2)) + 7) - *(int *)(*(char **)D_00195AC4 + 7);
-    l_18 = *(int *)(*(char **)(people_list + (l_20 << 2)) + 15) - *(int *)(*(char **)D_00195AC4 + 15);
+    if (people_list[l_20] == 0) goto L414BF;
+    l_1C = people_list[l_20]->x - D_00195AC4->x;
+    l_18 = people_list[l_20]->z - D_00195AC4->z;
     l_1C >>= 6;
     l_18 >>= 6;
-    l_18 = ((((int)(unsigned char)*(signed char *)(*(char **)current_location + 33)) << 6) - l_18) - 1;
+    l_18 = ((current_location->height << 6) - l_18) - 1;
     func_000A134C((int)(short)*(short *)&l_1C, (int)(short)*(short *)&l_18, 145);
     goto L414BF;
 L4153F:;
@@ -128,21 +129,21 @@ L41553:;
     l_20++;
     goto L41546;
 L4155B:;
-    l_1C = *(int *)(*(char **)(D_00190504 + (l_20 << 2)) + 7) - *(int *)(*(char **)D_00195AC4 + 7);
-    l_18 = *(int *)(*(char **)(D_00190504 + (l_20 << 2)) + 15) - *(int *)(*(char **)D_00195AC4 + 15);
+    l_1C = D_00190504[l_20]->x - D_00195AC4->x;
+    l_18 = D_00190504[l_20]->z - D_00195AC4->z;
     l_1C >>= 6;
     l_18 >>= 6;
-    l_18 = ((((int)(unsigned char)*(signed char *)(*(char **)current_location + 33)) << 6) - l_18) - 1;
+    l_18 = ((current_location->height << 6) - l_18) - 1;
     func_000A134C((int)(short)*(short *)&l_1C, (int)(short)*(short *)&l_18, 161);
     goto L41553;
 L415C4:;
-    l_1C = *(int *)(*(char **)player_object + 7) - *(int *)(*(char **)D_00195AC4 + 7);
-    l_18 = *(int *)(*(char **)player_object + 15) - *(int *)(*(char **)D_00195AC4 + 15);
+    l_1C = player_object->x - D_00195AC4->x;
+    l_18 = player_object->z - D_00195AC4->z;
     l_1C >>= 6;
     l_18 >>= 6;
-    l_18 = ((((int)(unsigned char)*(signed char *)(*(char **)current_location + 33)) << 6) - l_18) - 1;
+    l_18 = ((current_location->height << 6) - l_18) - 1;
     func_000A134C((int)(short)*(short *)&l_1C, (int)(short)*(short *)&l_18, 244);
     func_000A0ED9(677, (int)D_00170DC0);
     mc_sprintf((int)text_buffer, (int)D_00170DD6, l_1C, l_18);
-    text_draw((int)text_buffer, 0, (int)&*(signed char *)((char *)(((int)(unsigned char)*(signed char *)(*(char **)current_location + 33)) << 6) + 2));
+    text_draw((int)text_buffer, 0, (int)&*(signed char *)((char *)(current_location->height << 6) + 2));
 }

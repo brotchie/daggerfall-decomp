@@ -1,10 +1,9 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0007A983 */
+#include "records.h"
+
 #pragma pack(1)
 struct Vec { int x; int y; int z; };
-struct Ent { char pad[27]; unsigned short id; };
-struct Reg { char pad[41]; unsigned short count; char *data; };
-struct Loc { char pad[24]; unsigned char kind; };
-struct Ply { char pad0[34]; short v22; char pad1[141 - 36]; short v8d; short v8f; };
+#pragma pack()
 extern int D_000C23C4;
 extern int D_000C23C8;
 extern int D_000C23CC;
@@ -24,19 +23,19 @@ extern int D_00186503[];
 extern int screen_shake;
 extern char text_rsc_buffer[];
 extern char D_001917E4[];
-extern int nonworld_root;
+extern struct record *nonworld_root;
 extern char inventory_containers[];
 extern int D_00195A00;
-extern struct Loc *current_building;
-extern int player_entity;
-extern int player_object;
-extern struct Ent *D_00195AC4;
+extern struct building *current_building;
+extern struct record *player_entity;
+extern struct record *player_object;
+extern struct record *D_00195AC4;
 extern int D_00195B44;
-extern struct Reg *current_location;
-extern struct Ply *player_character;
-extern char *player_class;
+extern struct location *current_location;
+extern struct character *player_character;
+extern struct career *player_class;
 extern int game_minutes;
-extern unsigned char *game_settings;
+extern struct settings *game_settings;
 extern int D_00195C40;
 extern int D_00195D48;
 extern int D_00195D84;
@@ -68,7 +67,7 @@ extern int disk_file_exists(char *);
 extern void disk_copy_file(char *, char *, char *);
 extern void weapon_reload_sprites(void);
 extern void monster_reload_anims(void);
-extern void savetree_read_records(int);
+extern void savetree_read_records(struct record *);
 extern void load_relink_all(void);
 extern void func_0007A4B3(void);
 extern void func_0007A8BE(void);
@@ -76,15 +75,15 @@ extern void load_copy_automap_files(char *);
 extern void savevars_read(char *);
 extern void func_0007C432(void);
 extern void load_fix_objects(void);
-extern struct Loc *object_building(int);
+extern struct building *object_building(struct record *);
 extern void location_unload(unsigned short);
 extern void map_goto_location(int, int, int, int);
-extern void object_free_children(int);
-extern int object_free_single(int);
-extern int object_reparent(int, int);
-extern void object_unlink(int);
-extern void object_foreach(struct Ent *, void (*)());
-extern int object_tree_size(int);
+extern void object_free_children(struct record *);
+extern struct record *object_free_single(struct record *);
+extern struct record *object_reparent(struct record *, struct record *);
+extern void object_unlink(struct record *);
+extern void object_foreach(struct record *, void (*)());
+extern int object_tree_size(struct record *);
 extern void inv_reset_left_list(void);
 extern int func_0009DEA7(int);
 extern int mc_memset(void *, int, int, char *, int, int);
@@ -117,15 +116,15 @@ int load_game(char *name)
     func_000A00CB(fd, &save_version, 4);
     func_0009DEA7(fd);
     mem_check_now(1002);
-    location_unload(D_00195AC4->id);
+    location_unload(D_00195AC4->image);
     if (save_version < 293 || save_version > 294)
         fatal_error(D_0017694A);
     mc_memset(inventory_containers, 0, 36, D_00176884, 655, 36);
     object_unlink(player_object);
     object_free_children(player_object);
-    object_free_children((int)D_00195AC4);
+    object_free_children(D_00195AC4);
     object_free_children(nonworld_root);
-    object_reparent((int)D_00195AC4, player_object);
+    object_reparent(D_00195AC4, player_object);
     player_entity = 0;
     disk_copy_file(D_00176915, buf, D_001917E4);
     disk_copy_file(D_0017691F, buf, D_001917E4);
@@ -154,10 +153,10 @@ int load_game(char *name)
         mc_memset(D_001A94A0, 0, 16, D_00176884, 697, 16);
     }
     object_free_single(player_object);
-    sz = current_location->count * 26;
+    sz = current_location->building_count * 26;
     func_000A00CB(save_file_handle, &sz, 4);
-    func_000A00CB(save_file_handle, current_location->data, sz);
-    savetree_read_records((int)D_00195AC4);
+    func_000A00CB(save_file_handle, current_location->buildings, sz);
+    savetree_read_records(D_00195AC4);
     savetree_read_records(nonworld_root);
     links_load(save_file_handle);
     func_0009DEA7(save_file_handle);
@@ -175,12 +174,12 @@ int load_game(char *name)
     if (player_environment == 3)
         automap_restore_seen();
     if (player_environment == 2)
-        D_00195D84 = D_00186503[(current_building = object_building(player_object))->kind];
+        D_00195D84 = D_00186503[(current_building = object_building(player_object))->type];
     if ((int)(unsigned short)(*(unsigned short *)game_settings & 1) != 0)
         func_0012A2D0(160, 100, 160, 100);
     else
         func_0012A2D0(160, 77, 160, 77);
-    sound_set_volume(*(short *)(game_settings + 4));
+    sound_set_volume(game_settings->music_volume);
     mouse_buttons = mouse_buttons_prev = 0;
     func_0012B136();
     while (mouse_buttons != 0)
@@ -194,20 +193,20 @@ int load_game(char *name)
     screen_shake = 0;
     view_cursor_active = 0;
     if (disk_file_exists(D_00176964) != 0) {
-        *game_settings |= 4;
+        game_settings->view_flags |= 4;
         D_00195DA0 = 434;
     } else {
-        *game_settings &= ~4;
+        game_settings->view_flags &= ~4;
         D_00195DA0 = 380;
     }
     sound_stop_ambient();
     object_foreach(D_00195AC4, func_00028F8B);
     D_00195B44 = game_minutes;
     mem_check_now(1003);
-    l20 = object_tree_size((int)D_00195AC4);
+    l20 = object_tree_size(D_00195AC4);
     l20 = object_tree_size(nonworld_root);
-    player_character->v8f = player_character->v22 * D_001788D3[(*(unsigned short *)(player_class + 4) >> 10) & 7] / 256;
-    if (player_character->v8d < 0)
-        player_character->v8d = 0;
+    player_character->max_magicka = player_character->attributes[ATTR_INT] * D_001788D3[(player_class->flags >> 10) & 7] / 256;
+    if (player_character->magicka < 0)
+        player_character->magicka = 0;
     return 1;
 }

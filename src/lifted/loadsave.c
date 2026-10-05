@@ -1,6 +1,7 @@
 /* loadsave.c: functions first lifted from the assembly by tools/lift_all.py (2026-10), now
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
+#include "records.h"
 
 extern char mouse_buttons[];
 extern char D_0012AC02[];
@@ -67,13 +68,13 @@ extern char D_00195998[];
 extern char D_0019599C[];
 extern char bank_ship_price[];
 extern char bank_house_price[];
-extern char nonworld_root[];
+extern struct record *nonworld_root;
 extern char frame_counter[];
 extern char logbook_object[];
 extern char options_object[];
 extern char view_look_pitch[];
 extern char D_001959C4[];
-extern char inventory_containers[];
+extern struct record *inventory_containers[];
 extern char D_001959FC[];
 extern char D_00195A00[];
 extern char bank_accounts[];
@@ -82,13 +83,13 @@ extern char D_00195A0C[];
 extern char quest_faces[];
 extern char D_00195A78[];
 extern char jump_velocity[];
-extern char camera_object[];
-extern char current_building[];
-extern char player_entity[];
-extern char player_object[];
+extern struct record *camera_object;
+extern struct building *current_building;
+extern struct record *player_entity;
+extern struct record *player_object;
 extern char D_00195AAC[];
 extern char vertical_velocity[];
-extern char D_00195AC4[];
+extern struct record *D_00195AC4;
 extern char cheat_flags[];
 extern char clothing_gender_group[];
 extern char D_00195B18[];
@@ -96,13 +97,13 @@ extern char D_00195B44[];
 extern char D_00195B5C[];
 extern char D_00195B84[];
 extern char hud_message_expiry[];
-extern char current_location[];
-extern char player_character[];
+extern struct location *current_location;
+extern struct character *player_character;
 extern char cursor_arrow_image[];
 extern char window_image[];
-extern char player_class[];
+extern struct career *player_class;
 extern char game_minutes[];
-extern char game_settings[];
+extern struct settings *game_settings;
 extern char hud_message_ptrs[];
 extern char D_00195C40[];
 extern char D_00195C44[];
@@ -142,21 +143,21 @@ extern char D_001A9A00[];
 extern char D_001A9A04[];
 extern char D_001AA540[];
 extern char D_001AA544[];
-extern char inv_left_container[];
+extern struct record *inv_left_container;
 extern char D_001AA580[];
 
-extern int func_000641CD(int);
+extern int func_000641CD(struct record *);
 extern int sound_play(int, int, int);
 extern int mem_block_size(int);
 extern int disk_read_file(int, int);
-extern int func_00079A28(int);
-extern int savetree_write_record(int);
+extern int func_00079A28(struct record *);
+extern int savetree_write_record(struct record *);
 extern int load_game(int);
 extern int key_pressed_once(unsigned char);
-extern int object_delete(int);
-extern int object_create_child(int, int, int);
-extern int object_reparent(int, int);
-extern int object_find_by_id(int, int);
+extern struct record *object_delete(struct record *);
+extern struct record *object_create_child(struct record *, struct record *, int);
+extern struct record *object_reparent(struct record *, struct record *);
+extern struct record *object_find_by_id(struct record *, int);
 extern int object_new_id(int);
 extern int open(int, ...);
 extern int func_0009DEA7();
@@ -197,61 +198,61 @@ extern void save_copy_automap_files(int);
 extern void saveload_draw(int, int, int);
 extern void text_draw_centered_colored();
 extern void inpstr_begin_text(int, short);
-extern void object_foreach_pre(int, int);
-extern void object_foreach_post(int, int);
-extern void object_foreach(int, int);
-int savetree_attach_record(int, int, int);
-int savetree_should_save(int);
+extern void object_foreach_pre(struct record *, int);
+extern void object_foreach_post(struct record *, int);
+extern void object_foreach(struct record *, int);
+struct record *savetree_attach_record(struct record *, struct record *, int);
+int savetree_should_save(struct record *);
 int save_write_name(int);
 int save_game(int, int);
 int saveload_click_slot(int, int, int, int);
 int saveload_confirm(int, int, int, int);
-void savetree_write_subtree(int);
-void savetree_write_saved(int);
-void savetree_register_record(int);
-void load_relink_object_cb(int);
-void load_relink_character(int);
-void func_0007A3D0(int);
-void func_0007A42B(int);
+void savetree_write_subtree(struct record *);
+void savetree_write_saved(struct record *);
+void savetree_register_record(struct record *);
+void load_relink_object_cb(struct record *);
+void load_relink_character(struct record *);
+void func_0007A3D0(struct record *);
+void func_0007A42B(struct record *);
 void save_write_image(void);
 void savevars_write(int);
-void load_fix_object_cb(int);
-void func_0007C78B(int);
+void load_fix_object_cb(struct record *);
+void func_0007C78B(struct record *);
 #pragma aux func_000A0ED9 parm routine [];
 
-void savetree_read_records(int a1)
+void savetree_read_records(struct record *a1)
 {
-    int l_24;
-    int l_20;
+    struct record *l_24;
+    struct record *l_20;
     int l_1C;
     int l_18;
 
-    l_24 = *(int *)D_00195C44;
+    l_24 = *(struct record **)D_00195C44;
     l_18 = func_00079A28(l_24);
 L79C08:;
     if (l_18 == 0) return;
-    *(int *)((char *)l_24 + 59) = 0;
-    *(int *)((char *)l_24 + 55) = *(int *)((char *)l_24 + 59);
-    *(int *)((char *)l_24 + 67) = *(int *)((char *)l_24 + 55);
-    *(int *)((char *)l_24 + 63) = *(int *)((char *)l_24 + 67);
+    l_24->prev = 0;
+    l_24->next = l_24->prev;
+    l_24->parent = l_24->next;
+    l_24->children = l_24->parent;
     l_20 = savetree_attach_record(a1, l_24, l_18);
     savetree_register_record(l_20);
-    l_1C = *(int *)((char *)l_20 + 31);
+    l_1C = l_20->id;
     l_18 = func_00079A28(l_24);
     goto L79C08;
 }
 
-void savetree_write_subtree(int a1)
+void savetree_write_subtree(struct record *a1)
 {
-    int l_18;
+    struct record *l_18;
 
-    l_18 = *(int *)((char *)a1 + 55);
-    *(int *)((char *)a1 + 55) = 0;
+    l_18 = a1->next;
+    a1->next = 0;
     object_foreach_pre(a1, (int)savetree_write_record);
-    *(int *)((char *)a1 + 55) = l_18;
+    a1->next = l_18;
 }
 
-void savetree_write_saved(int a1)
+void savetree_write_saved(struct record *a1)
 {
     int l_20;
     int l_1C;
@@ -264,60 +265,60 @@ L79CD1:;
     savetree_write_subtree(a1);
     goto L79CF8;
 L79CED:;
-    savetree_write_saved(*(int *)((char *)a1 + 63));
+    savetree_write_saved(a1->children);
 L79CF8:;
-    a1 = *(int *)((char *)a1 + 55);
+    a1 = a1->next;
     goto L79CD1;
 }
 
-int savetree_attach_record(int a1, int a2, int a3)
+struct record *savetree_attach_record(struct record *a1, struct record *a2, int a3)
 {
-    int l_18;
-    int l_14;
+    struct record *l_18;
+    struct record *l_14;
 
-    l_18 = object_find_by_id(a1, *(int *)((char *)a2 + 39));
+    l_18 = object_find_by_id(a1, a2->parent_id);
     if (l_18 == 0) goto L79E52;
-    l_14 = object_find_by_id(a1, *(int *)((char *)a2 + 31));
+    l_14 = object_find_by_id(a1, a2->id);
     if (l_14 == 0) goto L79D60;
-    if (*(signed char *)((char *)l_14) == *(signed char *)((char *)a2)) goto L79D62;
+    if (l_14->type == a2->type) goto L79D62;
 L79D60:;
     goto L79D73;
 L79D62:;
-    if (*(int *)(*(char **)((char *)l_14 + 67) + 31) == *(int *)((char *)a2 + 39)) goto L79D78;
+    if (l_14->parent->id == a2->parent_id) goto L79D78;
 L79D73:;
     goto L79E2C;
 L79D78:;
-    if (((int)(unsigned char)*(signed char *)((char *)l_14)) != 34) goto L79DD6;
-    if (((int)(unsigned short)(*(short *)((char *)l_14 + 27) & 127)) == ((int)(unsigned short)(*(short *)((char *)a2 + 27) & 127))) goto L79DD6;
+    if (l_14->type != 34) goto L79DD6;
+    if ((l_14->image & 127) == (a2->image & 127)) goto L79DD6;
     l_14 = object_create_child(l_18, a2, a3 - 71);
-    *(int *)((char *)l_14 + 39) = 0;
+    l_14->parent_id = 0;
     return l_14;
 L79DD6:;
     mc_memcpy(l_14, a2, 55, (int)D_00176884, 217, 4);
-    mc_memcpy(l_14 + 71, a2 + 71, (int)&*(signed char *)((char *)mem_block_size(l_14) - 71), (int)D_00176884, 218, 4);
-    *(int *)((char *)l_14 + 39) = 0;
+    mc_memcpy(&l_14->data, &a2->data, (int)&*(signed char *)((char *)mem_block_size((int)l_14) - 71), (int)D_00176884, 218, 4);
+    l_14->parent_id = 0;
     return l_14;
 L79E2C:;
     l_14 = object_create_child(l_18, a2, a3 - 71);
-    *(int *)((char *)l_14 + 39) = 0;
+    l_14->parent_id = 0;
     return l_14;
 L79E52:;
     fatal_error((int)D_001768A8);
     return 0;
 }
 
-int savetree_should_save(int a1)
+int savetree_should_save(struct record *a1)
 {
-    if (*(signed char *)((char *)a1 + 38) == 0) goto L79E94;
+    if (a1->quest_id == 0) goto L79E94;
     return 1;
 L79E94:;
     if (func_000641CD(a1) == 0) goto L79EAC;
     return 1;
 L79EAC:;
-    switch (*(unsigned char *)((char *)a1)) {
+    switch (a1->type) {
     goto L7A00D;
 case 8:
-    return (int)(unsigned short)(*(short *)((char *)a1 + 21) & 512);
+    return a1->flags & 512;
 case 2:
 case 3:
 case 4:
@@ -341,16 +342,16 @@ case 53:
 case 54:
     return 1;
 case 33:
-    if (*(int *)((char *)a1 + 63) == 0) goto L79FBB;
+    if (a1->children == 0) goto L79FBB;
     return 1;
 L79FBB:;
-    if (*(short *)((char *)a1 + 25) == 0) goto L79FCE;
+    if (a1->lockpick_skill_tried == 0) goto L79FCE;
     return 1;
 L79FCE:;
     goto L7A016;
 case 34:
-    if ((((int)(unsigned short)(*(short *)((char *)a1 + 27) & 31)) - 2) == 14) goto L7A002;
-    if ((((int)(unsigned short)(*(short *)((char *)a1 + 27) & 31)) - 2) != 13) goto L7A00B;
+    if (((a1->image & 31) - 2) == 14) goto L7A002;
+    if (((a1->image & 31) - 2) != 13) goto L7A00B;
 L7A002:;
     return 1;
 L7A00B:;
@@ -363,74 +364,74 @@ L7A016:;
 }
 }
 
-void savetree_register_record(int a1)
+void savetree_register_record(struct record *a1)
 {
-    switch (*(unsigned char *)((char *)a1)) {
+    switch (a1->type) {
     return;
 case 4:
-    *(int *)player_object = a1;
+    player_object = a1;
     return;
 case 5:
-    *(int *)camera_object = a1;
+    camera_object = a1;
     return;
 case 3:
-    *(int *)player_class = (*(int *)player_character = (*(int *)player_entity = a1) + 71) + 560;
+    player_class = &(player_character = &(player_entity = a1)->data.character)->career;
     return;
 case 52:
-    if (*(int *)(inventory_containers + (((int)(unsigned short)*(short *)((char *)a1 + 27)) << 2)) == 0) goto L7A133;
-    if (*(int *)(*(char **)(inventory_containers + (((int)(unsigned short)*(short *)((char *)a1 + 27)) << 2)) + 63) != 0) goto L7A148;
+    if (inventory_containers[a1->image] == 0) goto L7A133;
+    if (inventory_containers[a1->image]->children != 0) goto L7A148;
 L7A133:;
-    *(int *)(inventory_containers + (((int)(unsigned short)*(short *)((char *)a1 + 27)) << 2)) = a1;
+    inventory_containers[a1->image] = a1;
 L7A148:;
     return;
 case 16:
-    *(int *)D_00195A00 = a1;
+    *(int *)D_00195A00 = (int)a1;
     return;
 case 23:
-    *(int *)game_settings = (*(int *)options_object = a1) + 71;
+    game_settings = (struct settings *)((*(int *)options_object = (int)a1) + 71);
     return;
 case 24:
-    *(int *)logbook_object = a1;
+    *(int *)logbook_object = (int)a1;
     return;
 case 25:
-    *(int *)bank_accounts = a1;
+    *(int *)bank_accounts = (int)a1;
     return;
 case 39:
-    *(int *)nonworld_root = a1;
+    nonworld_root = a1;
 default:;
 }
 }
 
-void load_relink_object_cb(int a1)
+void load_relink_object_cb(struct record *a1)
 {
-    switch (*(unsigned char *)((char *)a1)) {
+    switch (a1->type) {
 case 3:
 case 18:
 case 44:
     load_relink_character(a1);
     return;
 case 9:
-    *(int *)((char *)a1 + 47) = object_find_by_id(*(int *)D_00195AC4, *(int *)((char *)a1 + 47));
+    a1->caster = object_find_by_id(D_00195AC4, (int)a1->caster);
 default:;
 }
 }
 
 void load_relink_all(void)
 {
-    object_foreach(*(int *)D_00195AC4, (int)load_relink_object_cb);
-    object_foreach(*(int *)nonworld_root, (int)load_relink_object_cb);
-    *(int *)inv_left_container = *(int *)inventory_containers;
+    object_foreach(D_00195AC4, (int)load_relink_object_cb);
+    object_foreach(nonworld_root, (int)load_relink_object_cb);
+    inv_left_container = inventory_containers[0];
 }
 
-void load_relink_character(int a1)
+void load_relink_character(struct record *a1)
 {
-    int l_24;
+    struct character *l_24;
     int l_20;
     int l_1C;
     int l_18;
 
-    l_24 = a1 + 71;
-    l_20 = l_24 + 560;
+    l_24 = &a1->data.character;
+    l_20 = (int)&l_24->career;
     l_1C = l_20 + 74;
     l_18 = 0;
 L7A273:;
@@ -440,28 +441,28 @@ L7A27B:;
     l_18++;
     goto L7A273;
 L7A283:;
-    if (*(int *)((char *)((l_18 << 2) + l_24) + 367) == 0) goto L7A2BF;
-    *(int *)((char *)((l_18 << 2) + l_24) + 367) = object_find_by_id(*(int *)D_00195AC4, *(int *)((char *)((l_18 << 2) + l_24) + 367));
+    if (l_24->equipped[l_18] == 0) goto L7A2BF;
+    l_24->equipped[l_18] = object_find_by_id(D_00195AC4, (int)l_24->equipped[l_18]);
 L7A2BF:;
     goto L7A27B;
 L7A2C1:;
-    if (*(int *)((char *)l_24 + 112) == 0) goto L7A2F5;
-    *(int *)((char *)l_24 + 112) = object_find_by_id(*(int *)D_00195AC4, *(int *)((char *)l_24 + 112));
-    if (*(int *)((char *)l_24 + 112) != 0) goto L7A2F5;
+    if (l_24->target == 0) goto L7A2F5;
+    l_24->target = object_find_by_id(D_00195AC4, (int)l_24->target);
+    if (l_24->target != 0) goto L7A2F5;
     fatal_error((int)D_001768BD);
 L7A2F5:;
-    if (((int)(unsigned char)*(signed char *)((char *)a1)) == 18) goto L7A313;
-    if (((int)(unsigned char)*(signed char *)((char *)a1)) != 44) return;
+    if (a1->type == 18) goto L7A313;
+    if (a1->type != 44) return;
 L7A313:;
     func_000C010F(l_1C);
 }
 
-void save_unlink_character(int a1)
+void save_unlink_character(struct record *a1)
 {
-    int l_1C;
+    struct character *l_1C;
     int l_18;
 
-    l_1C = a1 + 71;
+    l_1C = &a1->data.character;
     l_18 = 0;
 L7A346:;
     if (l_18 < 27) goto L7A356;
@@ -470,37 +471,37 @@ L7A34E:;
     l_18++;
     goto L7A346;
 L7A356:;
-    if (*(int *)((char *)((l_18 << 2) + l_1C) + 367) == 0) goto L7A389;
-    *(int *)((char *)((l_18 << 2) + l_1C) + 367) = *(int *)(*(char **)((char *)((l_18 << 2) + l_1C) + 367) + 31);
+    if (l_1C->equipped[l_18] == 0) goto L7A389;
+    l_1C->equipped[l_18] = (struct record *)l_1C->equipped[l_18]->id;
 L7A389:;
     goto L7A34E;
 L7A38B:;
-    if (*(int *)((char *)l_1C + 112) == 0) return;
-    if (object_find_by_id(*(int *)D_00195AC4, *(int *)(*(char **)((char *)l_1C + 112) + 31)) == 0) goto L7A3BC;
-    *(int *)((char *)l_1C + 112) = *(int *)(*(char **)((char *)l_1C + 112) + 31);
+    if (l_1C->target == 0) return;
+    if (object_find_by_id(D_00195AC4, l_1C->target->id) == 0) goto L7A3BC;
+    l_1C->target = (struct record *)l_1C->target->id;
     return;
 L7A3BC:;
-    *(int *)((char *)l_1C + 112) = 0;
+    l_1C->target = 0;
 }
 
-void func_0007A3D0(int a1)
+void func_0007A3D0(struct record *a1)
 {
-    switch (*(unsigned char *)((char *)a1)) {
+    switch (a1->type) {
 case 18:
 case 33:
 case 44:
-    *(int *)((char *)(int)(*(char **)D_00195C44 + ((*(int *)D_00195B84)++ << 2))) = *(int *)((char *)a1 + 31);
+    *(int *)((char *)(int)(*(char **)D_00195C44 + ((*(int *)D_00195B84)++ << 2))) = a1->id;
 default:;
 }
 }
 
-void func_0007A42B(int a1)
+void func_0007A42B(struct record *a1)
 {
     int l_1C;
     int l_18;
 
-    if (((int)(unsigned char)*(signed char *)((char *)a1)) != 34) goto L7A45A;
-    if (((int)(unsigned char)*(signed char *)((char *)a1)) != 32) goto L7A45C;
+    if (a1->type != 34) goto L7A45A;
+    if (a1->type != 32) goto L7A45C;
 L7A45A:;
     return;
 L7A45C:;
@@ -514,7 +515,7 @@ L7A478:;
     (*(char (**)[4])&l_1C)++;
     goto L7A46B;
 L7A487:;
-    if (*(int *)((char *)a1 + 31) != *(int *)((char *)l_1C)) goto L7A4A7;
+    if (a1->id != *(int *)((char *)l_1C)) goto L7A4A7;
     object_delete(a1);
     *(int *)((char *)l_1C) = 0;
     return;
@@ -525,8 +526,8 @@ L7A4A7:;
 void func_0007A4B3(void)
 {
     *(int *)D_00195B84 = 0;
-    object_foreach(*(int *)(*(char **)D_00195AC4 + 63), (int)func_0007A3D0);
-    object_foreach_post(*(int *)(*(char **)D_00195AC4 + 63), (int)func_0007A42B);
+    object_foreach(D_00195AC4->children, (int)func_0007A3D0);
+    object_foreach_post(D_00195AC4->children, (int)func_0007A42B);
 }
 
 void save_write_image(void)
@@ -576,17 +577,17 @@ int save_game(int a1, int a2)
     unlink((int)text_rsc_buffer);
     *(int *)save_file_handle = open((int)text_rsc_buffer, 546, 384);
     write(*(int *)save_file_handle, (int)savetree_version, 4);
-    write(*(int *)save_file_handle, (int)(*(char **)player_object + 7), 12);
-    write(*(int *)save_file_handle, (int)(*(char **)D_00195AC4 + 27), 2);
+    write(*(int *)save_file_handle, (int)&player_object->x, 12);
+    write(*(int *)save_file_handle, (int)&D_00195AC4->image, 2);
     write(*(int *)save_file_handle, (int)player_environment, 1);
-    l_18 = ((int)(unsigned short)*(short *)(*(char **)current_location + 41)) * 26;
+    l_18 = current_location->building_count * 26;
     write(*(int *)save_file_handle, (int)&l_18, 4);
-    write(*(int *)save_file_handle, *(int *)(*(char **)current_location + 43), l_18);
+    write(*(int *)save_file_handle, (int)current_location->buildings, l_18);
     l_18 = 0;
     quests_unlink_all(*(int *)D_00195A00);
-    savetree_write_saved(*(int *)(*(char **)D_00195AC4 + 63));
+    savetree_write_saved(D_00195AC4->children);
     write(*(int *)save_file_handle, (int)&l_18, 4);
-    object_foreach_pre(*(int *)(*(char **)nonworld_root + 63), (int)savetree_write_record);
+    object_foreach_pre(nonworld_root->children, (int)savetree_write_record);
     write(*(int *)save_file_handle, (int)&l_18, 4);
     quests_relink_all(*(int *)D_00195A00);
     links_save(*(int *)save_file_handle);
@@ -604,23 +605,23 @@ L7A8A1:;
 
 void func_0007A8BE(void)
 {
-    int l_24;
-    int l_20;
+    struct record *l_24;
+    struct quest *l_20;
     int l_1C;
     int l_18;
 
-    l_24 = *(int *)(*(char **)D_00195A00 + 63);
+    l_24 = (struct record *)*(int *)(*(char **)D_00195A00 + 63);
     l_1C = 0;
     l_18 = 0;
     if (((int)(unsigned char)*(signed char *)current_region) == 31) return;
 L7A8F5:;
     if (l_24 == 0) goto L7A938;
-    if (((int)(unsigned char)*(signed char *)((char *)l_24)) != 14) goto L7A92D;
-    l_20 = l_24 + 71;
-    if (stricmp(l_20 + 6, (int)D_00176934) != 0) goto L7A92D;
+    if (l_24->type != 14) goto L7A92D;
+    l_20 = &l_24->data.quest;
+    if (stricmp(l_20->name, (int)D_00176934) != 0) goto L7A92D;
     l_18++;
 L7A92D:;
-    l_24 = *(int *)((char *)l_24 + 55);
+    l_24 = l_24->next;
     goto L7A8F5;
 L7A938:;
     if (l_18 != 0) goto L7A947;
@@ -731,7 +732,7 @@ L7B4DC:;
 L7B4F0:;
     goto L7B520;
 L7B4F2:;
-    sound_play(203, *(int *)player_object, 100);
+    sound_play(203, (int)player_object, 100);
     l_20 = ((int (*)())(*(int *)(D_00187A98 + (l_28 * 12))))(l_28, a1, l_20, l_24);
 L7B520:;
     if (l_20 != (-1)) goto L7B494;
@@ -955,7 +956,7 @@ void func_0007C432(void)
     *(signed char *)D_00196289 = 1;
     *(int *)quest_debug_data = 0;
     *(int *)D_001A94C4 = -1;
-    if (((int)(unsigned short)(*(short *)(*(char **)game_settings) & 1)) == 0) goto L7C48C;
+    if (((int)(unsigned short)(*(short *)(*(char **)&game_settings) & 1)) == 0) goto L7C48C;
     func_0012A2D0(160, 100, 160, 100);
     goto L7C4A5;
 L7C48C:;
@@ -970,7 +971,7 @@ L7C4A5:;
     *(signed char *)D_001940D7 |= 1;
     *(signed char *)D_001940D5 |= 2;
     *(signed char *)D_001940D8 |= 8;
-    *(int *)current_building = 0;
+    current_building = 0;
     l_18 = ((unsigned)*(int *)game_minutes) % 1440;
     if (l_18 <= 360) goto L7C54B;
     if (l_18 < 1080) goto L7C54D;
@@ -985,7 +986,7 @@ L7C55D:;
     *(int *)D_00199808 = l_1C;
 }
 
-void load_fix_object_cb(int a1)
+void load_fix_object_cb(struct record *a1)
 {
     int l_34;
     int l_30;
@@ -996,45 +997,45 @@ void load_fix_object_cb(int a1)
     int l_1C;
     int l_18;
 {
-    int l_3C;
+    struct record *l_3C;
 
-    if (*(int *)((char *)a1 + 51) == 0) goto L7C5F2;
-    if (*(signed char *)((char *)a1 + 38) == 0) goto L7C5E8;
-    l_3C = object_find_by_id(*(int *)D_001A4FE0, *(int *)((char *)a1 + 51));
-    *(int *)((char *)a1 + 51) = l_3C;
-    if (*(int *)D_001A4FE0 != *(int *)D_00195AC4) goto L7C5E6;
-    if (*(int *)((char *)a1 + 51) != 0) goto L7C5CE;
+    if (a1->twin == 0) goto L7C5F2;
+    if (a1->quest_id == 0) goto L7C5E8;
+    l_3C = object_find_by_id(*(struct record **)D_001A4FE0, (int)a1->twin);
+    a1->twin = l_3C;
+    if (*(int *)D_001A4FE0 != (int)D_00195AC4) goto L7C5E6;
+    if (a1->twin != 0) goto L7C5CE;
     fatal_error((int)D_001769F7);
 L7C5CE:;
-    if (*(int *)(*(char **)((char *)a1 + 51) + 51) != 0) goto L7C5E6;
-    *(int *)(*(char **)((char *)a1 + 51) + 51) = a1;
+    if (a1->twin->twin != 0) goto L7C5E6;
+    a1->twin->twin = (struct record *)a1;
 L7C5E6:;
     goto L7C5F2;
 L7C5E8:;
-    *(int *)((char *)a1 + 51) = 0;
+    a1->twin = 0;
 L7C5F2:;
-    switch (*(unsigned char *)((char *)a1)) {
+    switch (a1->type) {
 case 52:
-    if (a1 == *(int *)(inventory_containers + (((int)(unsigned short)*(short *)((char *)a1 + 27)) << 2))) goto L7C6A0;
+    if (a1 == inventory_containers[a1->image]) goto L7C6A0;
 L7C66F:;
-    if (*(int *)((char *)a1 + 63) == 0) goto L7C69A;
-    object_reparent(*(int *)(inventory_containers + (((int)(unsigned short)*(short *)((char *)a1 + 27)) << 2)), *(int *)((char *)a1 + 63));
+    if (a1->children == 0) goto L7C69A;
+    object_reparent(inventory_containers[a1->image], a1->children);
     goto L7C66F;
 L7C69A:;
-    *(signed char *)((char *)a1) = 0;
+    a1->type = 0;
 L7C6A0:;
     return;
 case 33:
-    if (((int)(unsigned char)*(signed char *)(*(char **)((char *)a1 + 67))) != 52) goto L7C6CB;
-    if (((int)(unsigned short)*(short *)(*(char **)((char *)a1 + 67) + 27)) < 5) goto L7C6CD;
+    if (a1->parent->type != 52) goto L7C6CB;
+    if (a1->parent->image < 5) goto L7C6CD;
 L7C6CB:;
     goto L7C6D3;
 L7C6CD:;
-    *(signed char *)((char *)a1) = 2;
+    a1->type = 2;
 L7C6D3:;
     return;
 case 43:
-    l_30 = a1 + 71;
+    l_30 = (int)RECORD_DATA(a1);
     l_2C = *(int *)((char *)l_30 + 5);
     l_20 = 0;
 L7C6F1:;
@@ -1051,10 +1052,10 @@ L7C711:;
 L7C725:;
     return;
 case 56:
-    l_2C = a1 + 71;
+    l_2C = (int)RECORD_DATA(a1);
     l_20 = 0;
 L7C737:;
-    if (((int)(unsigned short)*(short *)((char *)a1 + 27)) > l_20) goto L7C759;
+    if (a1->image > l_20) goto L7C759;
     goto L7C76D;
 L7C74A:;
     l_20++;
@@ -1068,47 +1069,47 @@ L7C76D:;
     return;
 case 6:
 case 32:
-    l_34 = a1 + 71;
+    l_34 = (int)RECORD_DATA(a1);
     *(int *)((char *)l_34) = 0;
 default:;
 }
 }
 }
 
-void func_0007C78B(int a1)
+void func_0007C78B(struct record *a1)
 {
 
-    switch (*(unsigned char *)((char *)a1)) {
+    switch (a1->type) {
 case 0:
 case 42:
     object_delete(a1);
     return;
 case 9:
-    if (((int)(unsigned char)*(signed char *)(*(char **)((char *)a1 + 67))) == 47) goto L7C7F6;
-    if (((int)(unsigned char)*(signed char *)(*(char **)((char *)a1 + 67))) != 38) goto L7C7F8;
+    if (a1->parent->type == 47) goto L7C7F6;
+    if (a1->parent->type != 38) goto L7C7F8;
 L7C7F6:;
     goto L7C80E;
 L7C7F8:;
-    if (((int)(unsigned char)*(signed char *)(*(char **)((char *)a1 + 67))) != 1) goto L7C883;
+    if (a1->parent->type != 1) goto L7C883;
 L7C80E:;
 {
     int l_20;
-    l_20 = a1 + 71;
-    if (((int)(unsigned short)(*(short *)((char *)a1 + 21) & 8192)) != 0) goto L7C839;
+    l_20 = (int)RECORD_DATA(a1);
+    if ((a1->flags & 8192) != 0) goto L7C839;
     object_delete(a1);
     return;
 L7C839:;
-    if (*(int *)((char *)a1 + 47) != *(int *)player_entity) goto L7C851;
+    if (a1->caster != player_entity) goto L7C851;
     object_delete(a1);
     return;
 L7C851:;
-    if ((((unsigned)*(int *)((char *)a1 + 31)) >> 16) == (((unsigned)*(int *)(*(char **)D_00195AC4 + 31)) >> 16)) goto L7C881;
-    *(int *)((char *)a1 + 31) = object_new_id(((unsigned)*(int *)(*(char **)D_00195AC4 + 31)) >> 16);
+    if ((((unsigned)a1->id) >> 16) == (((unsigned)D_00195AC4->id) >> 16)) goto L7C881;
+    a1->id = object_new_id(((unsigned)D_00195AC4->id) >> 16);
 L7C881:;
     return;
 L7C883:;
-    if ((((unsigned)*(int *)((char *)a1 + 31)) >> 16) == 801) return;
-    *(int *)((char *)a1 + 31) = object_new_id(801);
+    if ((((unsigned)a1->id) >> 16) == 801) return;
+    a1->id = object_new_id(801);
 }
 default:;
 }
@@ -1116,11 +1117,11 @@ default:;
 
 void load_fix_objects(void)
 {
-    *(int *)D_001A4FE0 = *(int *)nonworld_root;
-    object_foreach(*(int *)D_00195AC4, (int)load_fix_object_cb);
-    *(int *)D_001A4FE0 = *(int *)D_00195AC4;
-    object_foreach(*(int *)nonworld_root, (int)load_fix_object_cb);
-    object_foreach_post(*(int *)D_00195AC4, (int)func_0007C78B);
+    *(int *)D_001A4FE0 = (int)nonworld_root;
+    object_foreach(D_00195AC4, (int)load_fix_object_cb);
+    *(int *)D_001A4FE0 = (int)D_00195AC4;
+    object_foreach(nonworld_root, (int)load_fix_object_cb);
+    object_foreach_post(D_00195AC4, (int)func_0007C78B);
 }
 
 void func_0007C908(int a1, int a2, int a3)

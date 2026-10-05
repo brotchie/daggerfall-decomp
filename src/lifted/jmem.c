@@ -1,6 +1,7 @@
 /* jmem.c: functions first lifted from the assembly by tools/lift_all.py (2026-10), now
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
+#include "records.h"
 
 extern char key_down_enter[];
 extern char D_00175AD4[];
@@ -10,7 +11,7 @@ extern char D_00175C79[];
 extern char D_00187CA8[];
 extern char mem_check_level[];
 extern char frame_checkpoint[];
-extern char player_object[];
+extern struct record *player_object;
 extern char window_image[];
 extern char D_0019626F[];
 extern char D_00196272[];
@@ -158,7 +159,7 @@ L6A6D9:;
     *(int *)logbook_show_notes = (*(int *)logbook_first_entry = 0);
     *(signed char *)D_00187CA8 = 0;
     logbook_build_entries();
-    sound_play(237, *(int *)player_object, 100);
+    sound_play(237, (int)player_object, 100);
 L6A72D:;
     return ((((int)(unsigned char)*(signed char *)game_mode) == 14) ? 1 : 0);
 }

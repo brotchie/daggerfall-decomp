@@ -1,14 +1,9 @@
 /* matched by the real Watcom C32 10.0a (-d2): a run of spfx.c from 0x0008A496 to 0x0008A550, kept together for its switch table's alignment */
-struct eff { unsigned char op, arg; };
-struct mob {
-    char pad0[32];
-    short stats[8];             /* 0x20 */
-    char pad30[137 - 48];
-    unsigned char flags[4];     /* 0x89 */
-};
+#include "records.h"
+
 extern unsigned spell_resist_flags[];
-extern int object_delete(char *);
-void spfx_effect_end(struct eff *e, int i, char *a3);
+extern int object_delete(struct record *);
+void spfx_effect_end(struct spell *e, int i, struct record *a3);
 
 int func_0008A496(int a1, int a2, int a3)
 {
@@ -20,117 +15,117 @@ int func_0008A4BD(int a1, int a2, int a3)
     return 0;
 }
 
-void spell_end(char *obj)
+void spell_end(struct record *obj)
 {
-    struct eff *e;
+    struct spell *e;
     int i;
 
-    e = (struct eff *)(obj + 71);
+    e = &obj->data.spell;
     for (i = 0; i < 3; i++) {
-        if (e[i].op == 255)
+        if (e->effects[i].type == 255)
             continue;
-        spfx_effect_end(e, i, *(char **)(obj + 67));
+        spfx_effect_end(e, i, obj->parent);
     }
     object_delete(obj);
 }
 
-void spfx_effect_end(struct eff *e, int i, char *a3)
+void spfx_effect_end(struct spell *e, int i, struct record *a3)
 {
-    struct mob *m;
+    struct character *m;
 
-    m = (struct mob *)(a3 + 71);
-    switch (e[i].op) {
+    m = &a3->data.character;
+    switch (e->effects[i].type) {
     case 0:
-        m->flags[0] &= 254;
+        m->conditions &= ~0x1;
         break;
     case 7:
-        m->stats[e[i].arg] += *(short *)((char *)e + i * 5 + 34);
+        m->attributes[e->effects[i].subtype] += *(short *)&e->magnitudes[i].plus_min;
         break;
     case 8:
-        *(unsigned *)m->flags &= ~spell_resist_flags[e[i].arg];
+        m->conditions &= ~spell_resist_flags[e->effects[i].subtype];
         break;
     case 9:
-        m->stats[e[i].arg] -= *(short *)((char *)(e + i) + 80);
+        m->attributes[e->effects[i].subtype] -= e->cast_magnitudes[i];
         break;
     case 11:
         break;
     case 13:
-        m->flags[0] &= 251;
+        m->conditions &= ~0x4;
         break;
     case 14:
-        m->flags[0] &= 247;
+        m->conditions &= ~0x8;
         break;
     case 15:
-        m->flags[0] &= 239;
+        m->conditions &= ~0x10;
         break;
     case 16:
-        m->flags[0] &= 223;
+        m->conditions &= ~0x20;
         break;
     case 17:
-        m->flags[0] &= 191;
+        m->conditions &= ~0x40;
         break;
     case 18:
-        m->flags[0] &= 127;
+        m->conditions &= ~0x80;
         break;
     case 19:
-        m->flags[1] &= 254;
+        m->conditions &= ~0x100;
         break;
     case 20:
-        m->flags[1] &= 253;
+        m->conditions &= ~0x200;
         break;
     case 21:
-        m->flags[1] &= 251;
+        m->conditions &= ~0x400;
         break;
     case 22:
-        m->flags[1] &= 247;
+        m->conditions &= ~0x800;
         break;
     case 23:
-        m->flags[1] &= 239;
+        m->conditions &= ~0x1000;
         break;
     case 24:
-        m->flags[1] &= 223;
+        m->conditions &= ~0x2000;
         break;
     case 25:
-        m->flags[1] &= 191;
+        m->conditions &= ~0x4000;
         break;
     case 26:
-        m->flags[1] &= 127;
+        m->conditions &= ~0x8000;
         break;
     case 27:
-        m->flags[2] &= 254;
+        m->conditions &= ~0x10000;
         break;
     case 28:
-        m->flags[2] &= 253;
+        m->conditions &= ~0x20000;
         break;
     case 29:
-        m->flags[2] &= 251;
+        m->conditions &= ~0x40000;
         break;
     case 30:
-        m->flags[2] &= 247;
+        m->conditions &= ~0x80000;
         break;
     case 31:
-        m->flags[2] &= 239;
+        m->conditions &= ~0x100000;
         break;
     case 32:
-        m->flags[2] &= 223;
+        m->conditions &= ~0x200000;
         break;
     case 35:
-        m->flags[2] &= 191;
+        m->conditions &= ~0x400000;
         break;
     case 39:
-        m->flags[2] &= 127;
+        m->conditions &= ~0x800000;
         break;
     case 42:
-        m->flags[3] &= 254;
+        m->conditions &= ~0x1000000;
         break;
     case 44:
-        m->flags[3] &= 253;
+        m->conditions &= ~0x2000000;
         break;
     case 45:
-        m->flags[3] &= 251;
+        m->conditions &= ~0x4000000;
         break;
     case 46:
-        m->flags[3] &= 247;
+        m->conditions &= ~0x8000000;
         break;
     }
 }

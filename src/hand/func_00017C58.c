@@ -1,30 +1,20 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x00017C58 */
-struct rec26 {
-    char pad0[18];
-    unsigned short id;          /* 0x12 */
-    char pad14[4];
-    unsigned char kind;         /* 0x18 */
-    char pad19;
-};
-struct hdr {
-    char pad0[41];
-    unsigned short count;       /* 0x29 */
-    struct rec26 *recs;         /* 0x2b */
-};
-extern struct hdr *current_location;
+#include "records.h"
+
+extern struct location *current_location;
 
 int town_has_building(short a1, int a2)
 {
-    struct rec26 *p;
+    struct building *p;
     int i;
 
-    p = current_location->recs;
-    for (i = 0; i < current_location->count; i++, p++) {
+    p = current_location->buildings;
+    for (i = 0; i < current_location->building_count; i++, p++) {
         if (a2 == 0) {
-            if (p->id == a1)
+            if (p->faction_id == a1)
                 return 1;
         } else {
-            if (p->kind == a1)
+            if (p->type == a1)
                 return 1;
         }
     }

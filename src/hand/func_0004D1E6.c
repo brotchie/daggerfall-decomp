@@ -1,11 +1,13 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0004D1E6 */
+#include "records.h"
+
 extern char D_00174FAC[];
 extern char D_00174FB3[];
 extern char D_00174FC0[];
 extern char D_00174FDF[];
 extern char D_00174FEC[];
 extern unsigned char D_001940D5;
-extern char *player_object;
+extern struct record *player_object;
 extern int window_image;
 extern char *D_00195C44;
 extern unsigned char D_0019626F;
@@ -23,7 +25,7 @@ extern unsigned char note_tool;
 extern unsigned char D_001997ED;
 extern int key_action_held(int);
 extern void fatal_error(char *);
-extern int sound_play(int, char *, int);
+extern int sound_play(int, struct record *, int);
 extern int disk_read_file(char *, int);
 extern int disk_open_rw(char *);
 extern int disk_create(char *);

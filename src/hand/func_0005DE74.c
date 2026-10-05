@@ -1,4 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0005DE74 */
+#include "records.h"
+
 #pragma pack(1)
 struct itemdef {
     char name[24];
@@ -14,29 +16,6 @@ struct itemdef {
     short f44;                  /* 44 */
     unsigned short f46;         /* 46 */
 };
-struct item {
-    char name[32];
-    unsigned short type;        /* 32 */
-    unsigned short sub;         /* 34 */
-    int f36;                    /* 36 */
-    short f40;                  /* 40 */
-    short f42;                  /* 42 */
-    short f44;                  /* 44 */
-    short f46;                  /* 46 */
-    unsigned char f48;          /* 48 */
-    unsigned char f49;          /* 49 */
-    unsigned short f50;         /* 50 */
-    short f52;                  /* 52 */
-    unsigned char f54;          /* 54 */
-    unsigned char f55;          /* 55 */
-    unsigned char f56;          /* 56 */
-    int f57;                    /* 57 */
-    short f61;                  /* 61 */
-    short f63;                  /* 63 */
-    unsigned char f65;          /* 65 */
-    unsigned char f66;          /* 66 */
-    char f67[40];               /* 67 */
-};
 #pragma pack()
 extern char D_001758B8[];
 extern char D_001758C0[];
@@ -44,7 +23,7 @@ extern char D_001758C1[];
 extern struct itemdef item_templates[];
 extern unsigned char D_00190CF2;
 extern char D_001911E4[];
-extern char *player_character;
+extern struct character *player_character;
 extern short D_00195F28;
 extern unsigned char D_0019626D;
 extern unsigned char D_0019626E;
@@ -65,7 +44,7 @@ extern void func_000A0ED9(int, char *);
 extern int func_000A18C3(char *);
 extern int mc_sprintf(char *, char *, ...);
 
-#define PFLAGS (*(short *)(player_character + 64))
+#define PFLAGS (player_character->flags)
 
 void item_init_from_template(unsigned short idx, short type, short sub, struct item *it)
 {
@@ -104,70 +83,70 @@ void item_init_from_template(unsigned short idx, short type, short sub, struct i
     }
     def = &item_templates[idx];
     if (def->f46 == 32512)
-        it->sub = 0;
+        it->index = 0;
     mc_strncpy(it->name, def->name, 32, D_001758B8, 68);
-    it->type = type;
-    it->sub = sub;
-    it->f36 = def->f34;
+    it->group = type;
+    it->index = sub;
+    it->value = def->f34;
     if (def->f30 != 0 && (def->f43 & 1) != 0) {
         D_0019626E = def->f30;
-        it->f40 = 0;
+        *(short *)it->pad28 = 0;
     } else {
         D_0019626E = 0;
-        it->f40 = def->f30;
+        *(short *)it->pad28 = def->f30;
     }
-    it->f42 = (unsigned short)def->f43;
-    it->f44 = it->f46 = def->f28;
-    it->f48 = 0;
+    it->item_flags = (unsigned short)def->f43;
+    it->condition = it->max_condition = def->f28;
+    it->pad30 = 0;
     if (def->f46 != 0 && def->f44 == 0)
-        it->f52 = def->f46;
+        it->dropped_image = def->f46;
     if (def->f44 != 0 && def->f46 == 0)
-        it->f50 = def->f44;
+        it->inventory_image = def->f44;
     if (def->f46 != 0)
-        it->f50 = def->f46;
+        it->inventory_image = def->f46;
     if (def->f44 != 0)
-        it->f52 = def->f44;
-    if (((unsigned short)it->f50 & -128) == 31360 && ((unsigned short)PFLAGS & 1) == 0) {
-        it->f50 &= 127;
-        it->f50 |= 31872;
+        it->dropped_image = def->f44;
+    if (((unsigned short)it->inventory_image & -128) == 31360 && ((unsigned short)PFLAGS & 1) == 0) {
+        it->inventory_image &= 127;
+        it->inventory_image |= 31872;
     }
-    it->f54 = it->f55 = 0;
+    it->material = it->armor_type = 0;
     if (type == 1 && (sub == 4 || sub == 5)) {
         if ((rand() & 3) != 0) {
             if (sub == 4)
-                it->f56 = (rand() & 1) + 24;
+                it->color = (rand() & 1) + 24;
             else
-                it->f56 = (rand() & 1) + 26;
+                it->color = (rand() & 1) + 26;
         }
     } else {
-        it->f56 = 18;
+        it->color = 18;
     }
-    it->f57 = def->f24;
-    it->f61 = def->f38;
-    it->f65 = def->f41;
-    it->f66 = def->f42;
-    mc_memset(it->f67, -1, 40, D_001758B8, 118, 40);
+    it->weight = def->f24;
+    it->enchant_points = def->f38;
+    ((unsigned char *)&it->message)[2] = def->f41;
+    ((unsigned char *)&it->message)[3] = def->f42;
+    mc_memset(it->enchantments, -1, 40, D_001758B8, 118, 40);
     D_0019626D = def->f40;
     D_00195F28 = def->f42;
     if (type == 27 && sub == 4)
-        it->f49 = rand() % 20;
+        it->stack_count = rand() % 20;
     if (type == 6 || type == 12 || type == 2) {
         func_0005E636(it);
-        func_0005E5D7(it, *(unsigned char *)(player_character + 67));
+        func_0005E5D7(it, player_character->race);
     }
     if (type == 3)
         func_0005E874(it);
     if (type == 2) {
         func_0005EA8F(it);
-        if (it->sub != 5 && it->sub < 7 && it->f54 == 2)
+        if (it->index != 5 && it->index < 7 && it->material == 2)
             func_0005E874(it);
     }
     if (type == 3 && sub == 18) {
-        it->f49 = rand_range(1, 20);
-        it->f44 = 0;
+        it->stack_count = rand_range(1, 20);
+        it->condition = 0;
     }
     if (type == 7)
         item_init_book(it, sub);
     if (type == 13)
-        it->f63 = rand();
+        *(short *)&it->message = rand();
 }

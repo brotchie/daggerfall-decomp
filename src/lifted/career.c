@@ -1,6 +1,7 @@
 /* career.c: functions first lifted from the assembly by tools/lift_all.py (2026-10), now
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
+#include "records.h"
 
 extern char disk_last_file_size[];
 extern char mouse_buttons[];
@@ -34,8 +35,8 @@ extern char D_00190D66[];
 extern char D_00190D68[];
 extern char D_00190D6A[];
 extern char text_macro_fpc[];
-extern char player_object[];
-extern char player_character[];
+extern struct record *player_object;
+extern struct character *player_character;
 extern char window_image[];
 extern char D_00195C44[];
 extern char D_00196266[];
@@ -50,7 +51,7 @@ extern char career_bio_ask[];
 
 extern int career_answer_effect(int);
 extern int career_nearest_class(void);
-extern int func_00026081(int, int);
+extern int func_00026081(struct record *, int);
 extern int text_rsc_load(int, int, int);
 extern int sound_play(int, int, int);
 extern int disk_read_file(int, int);
@@ -71,7 +72,7 @@ extern int func_0012B136();
 extern int func_0012B2D3();
 extern void msgbox_show_rsc(int, int);
 extern void text_draw_colored(int, int, int, int, unsigned char);
-extern void object_free_later(int);
+extern void object_free_later(struct record *);
 extern void cursor_draw_arrow(void);
 int career_skip_word(int);
 int career_draw_lines(int, int);
@@ -92,7 +93,7 @@ void career_background_summary(int a1, int a2)
     int l_14;
 
     *(signed char *)career_bio_ask = *(signed char *)&a2;
-    mc_memcpy((int)reputation_baseline, (int)&*(signed char *)(*(char **)player_character + 145), 10, (int)D_00170738, 48, 10);
+    mc_memcpy((int)reputation_baseline, (int)(signed char *)&player_character->reputation[0], 10, (int)D_00170738, 48, 10);
     *(signed char *)D_00196266 = rand() % 6;
     *(short *)D_00190D68 = (unsigned short)(unsigned char)*(signed char *)(D_00179FF8 + rand_range(0, 9));
     *(short *)D_00190D6A = 1;
@@ -297,7 +298,7 @@ L24B8E:;
 L24BA5:;
     goto L24BC5;
 L24BA7:;
-    sound_play(203, *(int *)player_object, 100);
+    sound_play(203, (int)player_object, 100);
     *(short *)D_00190D66 = l_18;
 L24BC5:;
     goto L24B3D;
@@ -387,7 +388,7 @@ void career_show_biography(void)
     l_18 = 0;
     *(int *)window_image = disk_read_file((int)D_0017077B, 0);
     *(int *)career_bio_page = (*(int *)career_bio_text = disk_read_file((int)D_0017075D, 0));
-    sound_play(237, *(int *)player_object, 100);
+    sound_play(237, (int)player_object, 100);
     *(int *)D_00196D70 = (int)(*(char **)career_bio_text + *(int *)disk_last_file_size);
     *(int *)career_bio_lines = career_bio_count_lines();
     *(int *)D_00196D68 = 0;
@@ -488,44 +489,44 @@ L25858:;
     return l_1C;
 }
 
-int func_0002586B(int a1)
+int func_0002586B(struct record *a1)
 {
-    int l_20;
-    int l_1C;
+    struct character *l_20;
+    struct item *l_1C;
 
     if (func_00026081(a1, 0) == 0) goto L25896;
     return 0;
 L25896:;
-    l_20 = a1 + 71;
-    if (((int)(unsigned char)*(signed char *)((char *)l_20 + 506)) != 146) goto L258C8;
+    l_20 = &a1->data.character;
+    if (l_20->mobile_id != 146) goto L258C8;
     object_free_later(a1);
     return 1;
 L258C8:;
-    *(signed char *)((char *)a1) = 34;
-    if (((int)(unsigned short)(*(short *)((char *)l_20 + 64) & 64)) == 0) goto L258EE;
-    *(short *)((char *)a1 + 27) = 25487;
+    a1->type = 34;
+    if (((int)(unsigned short)(l_20->flags & 64)) == 0) goto L258EE;
+    a1->image = 25487;
     goto L258F7;
 L258EE:;
-    *(short *)((char *)a1 + 27) = 25488;
+    a1->image = 25488;
 L258F7:;
-    *(short *)((char *)a1 + 19) = (unsigned short)(unsigned char)*(signed char *)((char *)l_20 + 506);
-    *(short *)((char *)a1 + 25) = *(short *)((char *)l_20 + 549);
-    *(int *)((char *)l_20 + 112) = 0;
-    a1 = *(int *)((char *)a1 + 63);
+    *(short *)((char *)a1 + 19) = (unsigned short)l_20->mobile_id;
+    a1->pad19 = *(short *)((char *)l_20 + 549);
+    l_20->target = 0;
+    a1 = a1->children;
 L2592D:;
     if (a1 == 0) goto L2598B;
-    l_1C = a1 + 71;
-    if (*(signed char *)((char *)a1 + 38) != 0) goto L25980;
-    if (((int)(unsigned char)*(signed char *)((char *)a1)) != 2) goto L25965;
-    if (((int)(unsigned short)*(short *)((char *)l_1C + 34)) == 18) goto L25967;
+    l_1C = &a1->data.item;
+    if (a1->quest_id != 0) goto L25980;
+    if (a1->type != 2) goto L25965;
+    if (l_1C->index == 18) goto L25967;
 L25965:;
     goto L25978;
 L25967:;
-    if (((int)(unsigned short)*(short *)((char *)l_1C + 32)) == 3) goto L25980;
+    if (l_1C->group == 3) goto L25980;
 L25978:;
     object_free_later(a1);
 L25980:;
-    a1 = *(int *)((char *)a1 + 55);
+    a1 = a1->next;
     goto L2592D;
 L2598B:;
     return 1;

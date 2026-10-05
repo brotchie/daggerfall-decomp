@@ -1,5 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0003E6B1 */
-struct save { char pad[4]; short num; char name[8]; };
+#include "records.h"
+
 extern char D_00170D55[];       /* __FILE__ */
 extern char D_00170DA2[];
 extern char D_00170DA7[];
@@ -7,7 +8,7 @@ extern char text_buffer[];
 extern char text_rsc_buffer[];
 extern char D_00190FEC;
 extern int D_00195D6C;
-extern struct save *current_quest;
+extern struct quest *current_quest;
 extern int text_rsc_load(int, int, int);
 extern int disk_open_data(char *);
 extern void func_0009DEA7(int);
@@ -16,7 +17,7 @@ extern void mc_memcpy(char *, char *, int, char *, int, int);
 extern int func_000A0ED9(int, char *);
 extern int mc_sprintf(char *, char *, ...);
 
-int func_0003E6B1(struct save *s, short a2, short a3, short a4)
+int func_0003E6B1(struct quest *s, short a2, short a3, short a4)
 {
     short saved;
     int res;
@@ -25,9 +26,9 @@ int func_0003E6B1(struct save *s, short a2, short a3, short a4)
     current_quest = s;
     if (s == 0)
         return 0;
-    if (s->num != 0) {
+    if (s->text_file != 0) {
         func_000A0ED9(545, D_00170D55);
-        mc_sprintf(text_rsc_buffer, D_00170DA2, s->num);
+        mc_sprintf(text_rsc_buffer, D_00170DA2, s->text_file);
     } else {
         mc_memcpy(text_rsc_buffer, s->name, 8, D_00170D55, 547, 2048);
     }

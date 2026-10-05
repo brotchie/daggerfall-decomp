@@ -1,22 +1,23 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x00087F76 */
-struct who { char pad[0x1b]; unsigned short id; };
-struct npc { char pad[0xc]; struct who *who; };
+#include "records.h"
+/* loaded_location: +0 index, +4 door count, +8 doors, +0xC the object header, +0x10 data */
+struct loaded_location { char pad[0xc]; struct record *object; };
 extern char D_00176C94[];       /* __FILE__ */
 extern int D_00187EE4[];
-extern struct who *D_00195AC4;
+extern struct record *D_00195AC4;
 extern int region_dungeon_type_counts[];
 extern int region_dungeon_count;
 extern int D_00196A9C;
-extern void location_load_dungeon(struct npc *, int);
-extern void func_0001E34D(struct npc *, int, int);
-extern void location_load_exterior(struct npc *, unsigned short);
-extern void location_free(struct npc *);
-extern void func_00087D71(struct npc *, int, short);
-extern void location_pick_random_town(struct npc *);
+extern void location_load_dungeon(struct loaded_location *, int);
+extern void func_0001E34D(struct loaded_location *, int, int);
+extern void location_load_exterior(struct loaded_location *, unsigned short);
+extern void location_free(struct loaded_location *);
+extern void func_00087D71(struct loaded_location *, int, short);
+extern void location_pick_random_town(struct loaded_location *);
 extern int rand(void);
 extern void mc_memset(void *, int, int, char *, int, int);
 
-void func_00087F76(struct npc *n, unsigned kind, int a3, int mode)
+void func_00087F76(struct loaded_location *n, unsigned kind, int a3, int mode)
 {
     int unused[3];
     int l_10;
@@ -29,7 +30,7 @@ void func_00087F76(struct npc *n, unsigned kind, int a3, int mode)
     done = 0;
     mc_memset(n, 0, 20, D_00176C94, 1045, 4);
     if (mode == 0) {
-        location_load_exterior(n, D_00195AC4->id);
+        location_load_exterior(n, D_00195AC4->image);
         return;
     }
     while (done == 0) {
@@ -58,7 +59,7 @@ void func_00087F76(struct npc *n, unsigned kind, int a3, int mode)
             break;
         }
         if (mode == 1)
-            done = n->who->id != D_00195AC4->id;
+            done = n->object->image != D_00195AC4->image;
         else
             done++;
     }

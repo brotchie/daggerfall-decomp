@@ -1,8 +1,5 @@
 /* matched by the real Watcom C32 10.0a (-d2): a run of click.c from 0x00077960 to 0x00077B9E, kept together for its switch table's alignment */
-struct pos { char pad[7]; int x; int y; int z; };
-struct town { char pad[34]; unsigned char kind; };
-struct loc { char pad[27]; unsigned short region; };
-struct bld { char pad[18]; unsigned short type; char pad20[4]; unsigned char kind; };
+#include "records.h"
 extern char D_001766F9[];
 extern char D_001767E4[];
 extern char D_001767EE[];
@@ -18,10 +15,10 @@ extern char D_001789E8[];
 extern char D_001789F0[];
 extern unsigned char player_environment;
 extern char D_00187CA8;
-extern struct bld *current_building;
-extern struct pos *player_object;
-extern struct loc *D_00195AC4;
-extern struct town *current_location;
+extern struct building *current_building;
+extern struct record *player_object;
+extern struct record *D_00195AC4;
+extern struct location *current_location;
 extern unsigned int game_minutes;
 extern int trespassing;
 extern unsigned char climate_weathers[];
@@ -44,8 +41,6 @@ extern int location_contains(int, int);
 extern int rand(void);
 extern void srand(int);
 extern char *memchr(char *, int, int);
-struct mob { char pad[137]; int flags; };
-struct ctl { unsigned short f0; };
 extern char *D_0018767C[];
 extern char *D_001876AC[];
 extern char *D_001876E8[];
@@ -61,25 +56,25 @@ extern char *D_00187864[];
 extern char *D_00187878[];
 extern int player_motion_flags;
 extern int D_00195AB0;
-extern struct mob *player_character;
-extern struct ctl *game_settings;
+extern struct character *player_character;
+extern struct settings *game_settings;
 extern char *head_bob_offset;
 extern char in_dungeon_water;
 extern char D_0019628E;
 extern int D_001A4FD0;
 extern int D_001A4FD8;
-extern int func_00076FF2(struct pos *);
-extern int func_0007716B(struct pos *, int, int);
-extern int func_00077412(struct pos *);
-extern int func_000777B8(struct pos *, int, int);
+extern int func_00076FF2(struct record *);
+extern int func_0007716B(struct record *, int, int);
+extern int func_00077412(struct record *);
+extern int func_000777B8(struct record *, int, int);
 
-int spawn_find_point(struct pos *a1, int a2, int a3)
+int spawn_find_point(struct record *a1, int a2, int a3)
 {
     int r;
 
     switch (player_environment) {
     case 1:
-        if (D_00195AC4->region == 0xffff)
+        if (D_00195AC4->image == 0xffff)
             r = func_00076FF2(a1);
         else
             r = func_0007716B(a1, a2, a3);
@@ -98,7 +93,7 @@ int spawn_find_point(struct pos *a1, int a2, int a3)
 
 void head_bob_update(void)
 {
-    if (!(game_settings->f0 & 2) || (player_motion_flags & 0x20) || in_dungeon_water || (player_character->flags & 8)) {
+    if (!(*(unsigned short *)game_settings & 2) || (player_motion_flags & 0x20) || in_dungeon_water || (player_character->conditions & 8)) {
         head_bob_offset = 0;
         return;
     }
@@ -148,7 +143,7 @@ void music_choose_song(void)
             if (p) {
                 music_play(p);
             } else {
-                srand((current_region << 8) ^ D_00195AC4->region);
+                srand((current_region << 8) ^ D_00195AC4->image);
                 music_play(D_001A4FB0[rand() % 15]);
             }
         }
@@ -207,7 +202,7 @@ void music_choose_song(void)
             srand(seed);
             return;
         }
-        switch (current_building->kind) {
+        switch (current_building->type) {
         case 0:
         case 2:
         case 3:
@@ -222,7 +217,7 @@ void music_choose_song(void)
             music_play(D_001A3F5E == 0 ? D_001767E4 : D_001766F9);
             break;
         case 11:
-            if (current_building->type == 40) {
+            if (current_building->faction_id == 40) {
                 if (rand() & 1)
                     music_play(D_001A3F5E == 0 ? D_001767EE : D_001767FA);
                 else
@@ -235,10 +230,10 @@ void music_choose_song(void)
             if (D_00196263) {
                 music_play(D_001A3F5E == 0 ? D_00176823 : D_0017682A);
             } else {
-                p = memchr(D_001789E8, current_building->type, 8);
+                p = memchr(D_001789E8, current_building->faction_id, 8);
                 idx = p - D_001789E8;
                 if (p == 0) {
-                    p = memchr(D_001789F0, current_building->type, 8);
+                    p = memchr(D_001789F0, current_building->faction_id, 8);
                     if (p == 0) {
                         music_play(D_001A3F5E == 0 ? D_00176823 : D_0017682A);
                         break;

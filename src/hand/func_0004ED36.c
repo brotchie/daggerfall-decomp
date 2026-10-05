@@ -1,4 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0004ED36 */
+#include "records.h"
+
 #pragma pack(1)
 struct Npc { short timer; char pad[78]; };
 extern unsigned disk_last_file_size;
@@ -58,7 +60,7 @@ extern char *horse_overlay_image;
 extern char *cart_overlay_image;
 extern int D_00195998;
 extern int D_00195AC8;
-extern char *spell_records;
+extern struct spell *spell_records;
 extern char *D_00195B64;
 extern char *hud_bar_image;
 extern char *hud_mode_icons;
@@ -177,7 +179,7 @@ void init_game_data(void)
     D_00195CD0 = object_foreach_open;
     buttons_rci = disk_read_file(D_00175055, 0);
     icon_image = disk_read_file(D_00175061, 0);
-    spell_records = disk_read_file(D_0017506E, 0);
+    spell_records = (struct spell *)disk_read_file(D_0017506E, 0);
     spell_record_count = disk_last_file_size / 89;
     hud_bar_image = disk_read_file(D_00175079, 0);
     D_00195C7C = disk_read_file(D_00175086, 0);

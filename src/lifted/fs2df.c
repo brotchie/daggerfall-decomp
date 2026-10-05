@@ -1,6 +1,7 @@
 /* fs2df.c: functions first lifted from the assembly by tools/lift_all.py (2026-10), now
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
+#include "records.h"
 
 extern char D_00170AB4[];
 extern char D_00170AEC[];
@@ -55,7 +56,7 @@ L36203:;
     *(signed char *)((char *)a1 + 18) = *(signed char *)((char *)l_1C + 12);
 }
 
-void func_000367E5(int a1, int a2, int a3)
+void func_000367E5(struct record *a1, int a2, int a3)
 {
     int l_18;
     int l_14;

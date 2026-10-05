@@ -1,6 +1,7 @@
 /* region.c: functions first lifted from the assembly by tools/lift_all.py (2026-10), now
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
+#include "records.h"
 
 extern char D_000C2893[];
 extern char D_000C28C4[];
@@ -8,7 +9,7 @@ extern char D_001705F8[];
 extern char climate_categories[];
 extern char D_00187F30[];
 extern char region_event_values[];
-extern char player_object[];
+extern struct record *player_object;
 extern char current_region_data[];
 extern char current_region[];
 extern char D_00196269[];
@@ -58,7 +59,7 @@ int region_update_from_player(void)
 {
     unsigned char l_18;
 
-    l_18 = politic_region_at(*(int *)(*(char **)player_object + 7), *(int *)(*(char **)player_object + 15));
+    l_18 = politic_region_at(player_object->x, player_object->z);
     if ((signed char)l_18 == *(signed char *)current_region) goto L1FFDD;
     region_enter((int)(unsigned char)*(signed char *)current_region, (int)(unsigned char)l_18);
     return 1;
@@ -73,7 +74,7 @@ int climate_category(void)
 
 int climate_update_at_player(void)
 {
-    return (int)(unsigned char)climate_lookup(*(int *)(*(char **)player_object + 7), *(int *)(*(char **)player_object + 15));
+    return (int)(unsigned char)climate_lookup(player_object->x, player_object->z);
 }
 
 unsigned char politic_region_at(int a1, int a2)

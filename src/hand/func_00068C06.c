@@ -1,23 +1,25 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x00068C06 */
+#include "records.h"
+
 #pragma pack(1)
 struct Chan {
     char pad[0xf0];
     int handle;                 /* 0xf0 */
     int pad2;                   /* 0xf4 */
     int len;                    /* 0xf8 */
-    char *sample;               /* 0xfc */
-    char name[12];              /* 0x100 */
+    struct record *source;      /* 0xfc: the object the sound comes from */
+    char pos[12];               /* 0x100: its x, y, z */
 };
 extern int D_0018DD60;
-extern char *player_object;
-extern char *player_class;
+extern struct record *player_object;
+extern struct career *player_class;
 extern char sound_channels[][268];
 extern int nearest_fire;
 extern int D_001A3F2C;
 extern int D_001A3F34;
 extern int D_001A3F38;
 extern char sound_enabled;
-extern void sound_volume_pan(char *, char *, int *, int *, char *);
+extern void sound_volume_pan(char *, char *, int *, int *, struct record *);
 extern void sound_stop_channel(int);
 extern int func_000A1ED5(int, int, int);
 extern int func_000A20BF(int, int, int);
@@ -41,15 +43,15 @@ void sound_update_channels(void)
             CH[i].handle = 0x12345678;
             continue;
         }
-        if (CH[i].sample == 0)
+        if (CH[i].source == 0)
             continue;
-        if (CH[i].sample == (char *)nearest_fire)
+        if (CH[i].source == (struct record *)nearest_fire)
             D_001A3F2C = 320;
-        else if ((int)(unsigned short)(*(unsigned short *)(player_class + 4) & 1) != 0)
+        else if ((int)(unsigned short)(player_class->flags & 1) != 0)
             D_001A3F2C = 1024;
         else
             D_001A3F2C = 768;
-        sound_volume_pan(sound_channels[i] + 256, CH[i].sample + 7, &len, &x, CH[i].sample);
+        sound_volume_pan(sound_channels[i] + 256, (char *)&CH[i].source->x, &len, &x, CH[i].source);
         CH[i].len = len;
         if (len == 0 && i == 3) {
             sound_stop_channel(3);
@@ -58,5 +60,5 @@ void sound_update_channels(void)
         func_000A20BF(D_0018DD60, CH[i].handle, x);
         func_000A1ED5(D_0018DD60, CH[i].handle, (short)len << 16 | (short)len);
     }
-    D_001A3F38 = *(short *)(player_object + 3);
+    D_001A3F38 = player_object->yaw;
 }

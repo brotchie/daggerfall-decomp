@@ -1,4 +1,5 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0001E854 */
+#include "records.h"
 extern char D_00170533[];
 extern char D_001967EC[];
 extern char D_001967F0[];
@@ -18,7 +19,7 @@ struct H { char pad[3]; struct E e[317]; char pad2[17]; char names[10][13]; };
 #pragma pack()
 #define HP (*(struct H **)rmb_block)
 
-void func_0001E854(int a1, int a2)
+void func_0001E854(struct building *a1, int a2)
 {
     int l_18;
     int l_14;
@@ -30,6 +31,6 @@ void func_0001E854(int a1, int a2)
     *(int *)D_001967F4 = func_0014B45B(*(int *)D_001967F8, *(int *)D_001967F0) - 6;
     *(int *)D_001967FC = HP->e[a2].f10;
     if (stricmp(HP->names[a2], D_00170533) != 0) return;
-    *(signed char *)((char *)a1 + 24) = 11;
-    *(short *)((char *)a1 + 18) = 414;
+    a1->type = 11;
+    a1->faction_id = 414;
 }

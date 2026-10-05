@@ -1,4 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0001889E */
+#include "records.h"
+
 extern char *D_00147954;
 extern char D_001703F0[];        /* __FILE__ */
 extern char D_00170431[];
@@ -13,7 +15,7 @@ extern short D_001966A2;
 extern unsigned char D_001966B8;
 extern void talk_list_draw_item(char *, int, int, int, int);
 extern void func_0001839C(void);
-extern char *faction_find(short);
+extern struct faction *faction_find(short);
 extern void mc_strncpy(char *, char *, int, char *, int);
 
 void talk_draw_tell_list(void)
@@ -46,7 +48,7 @@ void talk_draw_tell_list(void)
             talk_list_count++;
             continue;
         }
-        str = faction_find(talk_organisations[i]) + 3;
+        str = faction_find(talk_organisations[i])->name;
         if (talk_selected_row == talk_list_count) {
             color = 244;
             mc_strncpy(talk_key_text[D_001966B8], str, 4, D_001703F0, 1914);

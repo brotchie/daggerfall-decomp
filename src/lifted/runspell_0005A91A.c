@@ -1,38 +1,39 @@
 /* runspell.c: functions first lifted from the assembly by tools/lift_all.py (2026-10), now
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
+#include "records.h"
 
 extern char D_001757F4[];
-extern char player_object[];
-extern char D_00195AC4[];
-extern char spell_records[];
-extern char player_character[];
+extern struct record *player_object;
+extern struct record *D_00195AC4;
+extern struct spell *spell_records;
+extern struct character *player_character;
 
-extern int spell_cost(int, int);
-extern int cast_player_spell(int);
-extern int object_delete(int);
-extern int object_create_child(int, int, int);
+extern int spell_cost(struct spell *, struct character *);
+extern int cast_player_spell(struct record *);
+extern int object_delete(struct record *);
+extern struct record *object_create_child(struct record *, int, int);
 extern int object_new_id(int);
 extern int mc_memcpy();
 
 int cast_item_used_spell(int a1)
 {
     int l_20;
-    int l_1C;
+    struct record *l_1C;
 
     l_20 = 0;
-    l_1C = object_create_child(*(int *)(*(char **)player_object + 67), 0, 89);
+    l_1C = object_create_child(player_object->parent, 0, 89);
 L5A949:;
-    if (*(signed char *)((char *)(int)(*(char **)spell_records + (l_20 * 89)) + 47) == 0) goto L5A973;
-    if (((int)(unsigned char)*(signed char *)((char *)(int)(*(char **)spell_records + (l_20 * 89)) + 73)) == a1) goto L5A97B;
+    if (spell_records[l_20].name[0] == 0) goto L5A973;
+    if (spell_records[l_20].id == a1) goto L5A97B;
 L5A973:;
     l_20++;
     goto L5A949;
 L5A97B:;
-    *(signed char *)((char *)l_1C) = 9;
-    *(int *)((char *)l_1C + 31) = object_new_id(((unsigned)*(int *)(*(char **)D_00195AC4 + 31)) >> 16);
-    mc_memcpy(l_1C + 71, (int)(*(char **)spell_records + (l_20 * 89)), 89, (int)D_001757F4, 103, 4);
-    l_20 = spell_cost(l_1C + 71, *(int *)player_character);
+    l_1C->type = 9;
+    l_1C->id = object_new_id(((unsigned)D_00195AC4->id) >> 16);
+    mc_memcpy(&l_1C->data.spell, &spell_records[l_20], 89, (int)D_001757F4, 103, 4);
+    l_20 = spell_cost(&l_1C->data.spell, player_character);
     if (cast_player_spell(l_1C) == 0) goto L5A9E5;
     object_delete(l_1C);
 L5A9E5:;

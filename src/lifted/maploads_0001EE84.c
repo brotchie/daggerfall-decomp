@@ -1,11 +1,12 @@
 /* maploads.c: functions first lifted from the assembly by tools/lift_all.py (2026-10), now
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
+#include "records.h"
 
 extern char mouse_buttons[];
 extern char D_0017055C[];
 extern char tavern_state[];
-extern char current_building[];
+extern struct building *current_building;
 extern char tavern_building[];
 extern char D_0019626F[];
 extern char D_00196272[];
@@ -36,7 +37,7 @@ L1EECF:;
     *(int *)tavern_menu_image = disk_read_file((int)D_0017055C, 0);
     *(signed char *)game_mode = 20;
     *(signed char *)D_00196272 = 1;
-    *(int *)tavern_building = *(int *)current_building;
+    *(int *)tavern_building = (int)current_building;
 L1EEFF:;
     if (((int)(unsigned char)*(signed char *)game_mode) != 20) goto L1EF14;
     l_20 = 1;

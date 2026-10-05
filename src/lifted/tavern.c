@@ -1,6 +1,7 @@
 /* tavern.c: functions first lifted from the assembly by tools/lift_all.py (2026-10), now
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
+#include "records.h"
 
 extern char mouse_buttons[];
 extern char key_down_esc[];
@@ -18,15 +19,15 @@ extern char D_00190BE4[];
 extern char tavern_state[];
 extern char D_00190D64[];
 extern char D_001940D4[];
-extern char nonworld_root[];
-extern char player_object[];
-extern char D_00195AC4[];
-extern char tavern_building[];
-extern char D_00195AF4[];
+extern struct record *nonworld_root;
+extern struct record *player_object;
+extern struct record *D_00195AC4;
+extern struct building *tavern_building;
+extern struct record *D_00195AF4;
 extern char D_00195B84[];
 extern char inpstr_result[];
-extern char current_location[];
-extern char player_character[];
+extern struct location *current_location;
+extern struct character *player_character;
 extern char game_minutes[];
 extern char D_00195C44[];
 extern char D_00195CE8[];
@@ -36,7 +37,7 @@ extern char D_00196271[];
 extern char D_00196272[];
 extern char game_mode[];
 extern char mouse_buttons_prev[];
-extern char D_00196ABC[];
+extern struct building *D_00196ABC;
 extern char tavern_menu_image[];
 extern char politic_pak[];
 extern char climate_pak[];
@@ -47,13 +48,13 @@ extern int key_action_held(int);
 extern int holiday_today(int, int);
 extern int disk_read_file(int, int);
 extern int guild_is_local_knight(void);
-extern int object_delete(int);
-extern int object_create_child(int, int, int);
-extern int object_find(int, int);
-extern int object_find_by_id(int, int);
+extern int object_delete(struct record *);
+extern struct record *object_create_child(struct record *, int, int);
+extern int object_find(struct record *, int);
+extern int object_find_by_id(struct record *, int);
 extern int trade_adjust_price(int, int);
-extern int marker_find_nth(int, int, int);
-extern int marker_find_random(int, int);
+extern struct record *marker_find_nth(struct record *, int, int);
+extern struct record *marker_find_random(struct record *, int);
 extern int mc_free();
 extern int mc_memcpy();
 extern int func_0012B136();
@@ -63,20 +64,20 @@ extern void msgbox_show_rsc(int, int);
 extern void npc_talk(int);
 extern void picklist_open(int);
 extern void inpstr_begin_number(int);
-extern void object_foreach(int, int);
+extern void object_foreach(struct record *, int);
 extern void func_00097A85(void);
 int tavern_room_rented(void);
 int tavern_room_days_left(void);
-int func_0001FA3A(int);
-int func_0001FBF5(int);
+int func_0001FA3A(struct record *);
+int func_0001FBF5(struct record *);
 void tavern_close(void);
 void tavern_rent(int);
 void tavern_extend_room(int);
-void func_0001F6E2(int);
-void func_0001F7B3(int);
+void func_0001F6E2(struct record *);
+void func_0001F7B3(struct record *);
 void func_0001FAB2(void);
 void func_0001FB3F(void);
-void func_0001FD7C(int);
+void func_0001FD7C(struct record *);
 void func_0001FE4D(void);
 
 void tavern_close(void)
@@ -174,11 +175,11 @@ void tavern_room_pay(void)
 {
     *(signed char *)tavern_state = 0;
     if (((int)(unsigned char)*(signed char *)D_00196271) == 2) return;
-    if (((unsigned)*(int *)(*(char **)player_character + 133)) >= *(int *)D_00195D30) goto L1F372;
+    if (((unsigned)player_character->gold) >= *(int *)D_00195D30) goto L1F372;
     msgbox_show_rsc(454, 1);
     return;
 L1F372:;
-    *(int *)(*(char **)player_character + 133) -= *(int *)D_00195D30;
+    player_character->gold -= *(int *)D_00195D30;
     if (tavern_room_rented() == 0) goto L1F3A0;
     tavern_extend_room(((int)(short)*(short *)D_00190D64) * 1440);
     return;
@@ -188,7 +189,7 @@ L1F3A0:;
 
 void tavern_food_button(void)
 {
-    if (((unsigned)(*(int *)game_minutes - *(int *)(*(char **)player_character + 517))) >= 240) goto L1F3F3;
+    if (((unsigned)(*(int *)game_minutes - player_character->last_meal_time)) >= 240) goto L1F3F3;
     msgbox_show_string((int)D_001705BE, 1);
     return;
 L1F3F3:;
@@ -209,7 +210,7 @@ void tavern_buy_food(int a1)
     l_1C++;
 L1F457:;
     if (l_18 == 1) goto L1F46D;
-    if (((unsigned)*(int *)(*(char **)player_character + 133)) < l_1C) goto L1F46F;
+    if (((unsigned)player_character->gold) < l_1C) goto L1F46F;
 L1F46D:;
     goto L1F480;
 L1F46F:;
@@ -217,13 +218,13 @@ L1F46F:;
     return;
 L1F480:;
     if (l_18 == 1) goto L1F495;
-    *(int *)(*(char **)player_character + 133) -= l_1C;
+    player_character->gold -= l_1C;
 L1F495:;
-    *(short *)(*(char **)player_character + 124) += l_1C * 2;
-    if (*(short *)(*(char **)player_character + 124) <= *(short *)(*(char **)player_character + 126)) goto L1F4CB;
-    *(short *)(*(char **)player_character + 124) = *(short *)(*(char **)player_character + 126);
+    player_character->health += l_1C * 2;
+    if (player_character->health <= player_character->max_health) goto L1F4CB;
+    player_character->health = player_character->max_health;
 L1F4CB:;
-    *(int *)(*(char **)player_character + 517) = *(int *)game_minutes;
+    player_character->last_meal_time = *(int *)game_minutes;
 }
 
 void tavern_talk_button(void)
@@ -234,33 +235,33 @@ void tavern_talk_button(void)
 
 void tavern_go_to_room(void)
 {
-    int l_18;
+    struct record *l_18;
 
-    l_18 = marker_find_nth(*(int *)(*(char **)(*(char **)player_object + 67) + 63), 2, (int)(unsigned char)*(signed char *)(*(char **)tavern_building + 7));
+    l_18 = marker_find_nth(player_object->parent->children, 2, tavern_building->room);
     if (l_18 == 0) return;
-    *(int *)(*(char **)player_object + 7) = *(int *)((char *)l_18 + 7);
-    *(int *)(*(char **)player_object + 11) = *(int *)((char *)l_18 + 11);
-    *(int *)(*(char **)player_object + 15) = *(int *)((char *)l_18 + 15);
+    player_object->x = l_18->x;
+    player_object->y = l_18->y;
+    player_object->z = l_18->z;
 }
 
 void tavern_rent(int a1)
 {
-    int l_18;
+    struct record *l_18;
 
-    l_18 = marker_find_random(*(int *)(*(char **)(*(char **)player_object + 67) + 63), 2);
+    l_18 = marker_find_random(player_object->parent->children, 2);
     if (l_18 == 0) return;
-    *(int *)(*(char **)tavern_building + 2) = *(int *)game_minutes + a1;
-    *(signed char *)(*(char **)tavern_building + 15) &= 248;
-    *(signed char *)(*(char **)tavern_building + 15) |= 2;
-    *(signed char *)(*(char **)tavern_building + 7) = *(signed char *)((char *)l_18 + 23);
+    tavern_building->rent_expires = *(int *)game_minutes + a1;
+    tavern_building->flags &= 248;
+    tavern_building->flags |= 2;
+    tavern_building->room = l_18->owner;
 }
 
 int tavern_room_rented(void)
 {
     int l_1C;
 
-    if (((int)(unsigned char)(*(signed char *)(*(char **)tavern_building + 15) & 2)) == 0) goto L1F62E;
-    if (((unsigned)*(int *)(*(char **)tavern_building + 2)) > *(int *)game_minutes) goto L1F630;
+    if (((int)(unsigned char)(tavern_building->flags & 2)) == 0) goto L1F62E;
+    if (((unsigned)tavern_building->rent_expires) > *(int *)game_minutes) goto L1F630;
 L1F62E:;
     goto L1F639;
 L1F630:;
@@ -274,70 +275,70 @@ L1F640:;
 
 int tavern_room_days_left(void)
 {
-    if (((int)(unsigned char)(*(signed char *)(*(char **)tavern_building + 15) & 2)) != 0) goto L1F67D;
+    if (((int)(unsigned char)(tavern_building->flags & 2)) != 0) goto L1F67D;
     return 0;
 L1F67D:;
     if (tavern_room_rented() != 0) goto L1F68F;
     return 0;
 L1F68F:;
-    return ((unsigned)((*(int *)(*(char **)tavern_building + 2) - *(int *)game_minutes) + 1439)) / 1440;
+    return ((unsigned)((tavern_building->rent_expires - *(int *)game_minutes) + 1439)) / 1440;
 }
 
 void tavern_extend_room(int a1)
 {
-    *(int *)(*(char **)tavern_building + 2) += a1;
+    tavern_building->rent_expires += a1;
 }
 
-void func_0001F6E2(int a1)
+void func_0001F6E2(struct record *a1)
 {
-    int l_18;
+    struct record *l_18;
 
-    if (((int)(unsigned char)*(signed char *)((char *)a1)) != 2) return;
+    if (a1->type != 2) return;
     if (func_0001FBF5(a1) == 0) return;
-    l_18 = object_create_child(*(int *)nonworld_root, 0, 107);
-    *(signed char *)((char *)l_18) = 58;
-    mc_memcpy(l_18 + 7, a1 + 7, 12, (int)D_00170569, 317, 4);
-    *(short *)((char *)l_18 + 27) = *(short *)((char *)a1 + 27);
-    *(int *)((char *)l_18 + 31) = *(int *)((char *)a1 + 31);
-    *(int *)((char *)l_18 + 39) = *(int *)(*(char **)((char *)a1 + 67) + 31);
-    *(int *)((char *)l_18 + 43) = *(int *)D_00190BE4;
-    mc_memcpy(l_18 + 71, a1 + 71, 107, (int)D_00170569, 322, 4);
+    l_18 = object_create_child(nonworld_root, 0, 107);
+    l_18->type = 58;
+    mc_memcpy(&l_18->x, &a1->x, 12, (int)D_00170569, 317, 4);
+    l_18->image = a1->image;
+    l_18->id = a1->id;
+    l_18->parent_id = a1->parent->id;
+    l_18->repair_due = *(int *)D_00190BE4;
+    mc_memcpy(RECORD_DATA(l_18), RECORD_DATA(a1), 107, (int)D_00170569, 322, 4);
 }
 
-void func_0001F7B3(int a1)
+void func_0001F7B3(struct record *a1)
 {
-    int l_18;
+    struct record *l_18;
 
-    if (((int)(unsigned char)*(signed char *)((char *)a1)) != 58) return;
-    if ((((unsigned)*(int *)((char *)a1 + 31)) >> 16) != (((unsigned)*(int *)(*(char **)D_00195AC4 + 31)) >> 16)) return;
-    if ((*(int *)D_00199770 = object_find_by_id(*(int *)D_00195AC4, *(int *)((char *)a1 + 39))) == 0) return;
-    l_18 = object_create_child(*(int *)D_00199770, 0, 107);
-    *(signed char *)((char *)l_18) = 2;
-    *(short *)((char *)l_18 + 27) = *(short *)((char *)a1 + 27);
-    *(int *)((char *)l_18 + 31) = *(int *)((char *)a1 + 31);
-    mc_memcpy(l_18 + 7, a1 + 7, 12, (int)D_00170569, 347, 4);
-    mc_memcpy(l_18 + 71, a1 + 71, 107, (int)D_00170569, 348, 4);
+    if (a1->type != 58) return;
+    if ((((unsigned)a1->id) >> 16) != (((unsigned)D_00195AC4->id) >> 16)) return;
+    if ((*(int *)D_00199770 = object_find_by_id(D_00195AC4, a1->parent_id)) == 0) return;
+    l_18 = object_create_child((struct record *)*(int *)D_00199770, 0, 107);
+    l_18->type = 2;
+    l_18->image = a1->image;
+    l_18->id = a1->id;
+    mc_memcpy(&l_18->x, &a1->x, 12, (int)D_00170569, 347, 4);
+    mc_memcpy(RECORD_DATA(l_18), RECORD_DATA(a1), 107, (int)D_00170569, 348, 4);
     object_delete(a1);
 }
 
 void func_0001F89F(void)
 {
-    int l_18;
+    struct record *l_18;
 
     func_0001FE4D();
-    *(int *)D_00196ABC = *(int *)D_00195C44;
+    D_00196ABC = (struct building *)*(int *)D_00195C44;
     *(int *)D_00195B84 = 0;
     func_0001FB3F();
     func_0001FAB2();
     if (*(int *)D_00195B84 == 0) goto L1F93F;
-    object_delete(*(int *)D_00195AF4);
-    l_18 = object_create_child(*(int *)nonworld_root, 0, *(int *)D_00195B84 * 26);
-    *(signed char *)((char *)l_18) = 57;
-    *(short *)((char *)l_18 + 23) = *(short *)D_00195B84;
-    *(int *)((char *)l_18 + 31) = *(int *)(*(char **)D_00195AC4 + 31);
-    mc_memcpy(l_18 + 71, *(int *)D_00196ABC, *(int *)D_00195B84 * 26, (int)D_00170569, 369, 4);
+    object_delete(D_00195AF4);
+    l_18 = object_create_child(nonworld_root, 0, *(int *)D_00195B84 * 26);
+    l_18->type = 57;
+    l_18->owner = *(short *)D_00195B84;
+    l_18->id = D_00195AC4->id;
+    mc_memcpy(RECORD_DATA(l_18), (int)D_00196ABC, *(int *)D_00195B84 * 26, (int)D_00170569, 369, 4);
 L1F93F:;
-    object_foreach(*(int *)D_00195AC4, (int)func_0001F6E2);
+    object_foreach(D_00195AC4, (int)func_0001F6E2);
 }
 
 void func_0001F958(void)
@@ -346,7 +347,7 @@ void func_0001F958(void)
     int l_18;
 
     func_0001FE4D();
-    *(int *)D_00196ABC = *(int *)D_00195C44;
+    D_00196ABC = (struct building *)*(int *)D_00195C44;
     *(int *)D_00195B84 = 0;
     func_0001FAB2();
     l_1C = 0;
@@ -359,33 +360,33 @@ L1F99B:;
 L1F9A3:;
     l_18 = 0;
 L1F9AA:;
-    if (((int)(unsigned short)*(short *)(*(char **)current_location + 41)) > l_18) goto L1F9C7;
+    if (current_location->building_count > l_18) goto L1F9C7;
     goto L1FA1C;
 L1F9BF:;
     l_18++;
     goto L1F9AA;
 L1F9C7:;
-    if (*(int *)((char *)(int)(*(char **)(*(char **)current_location + 43) + (l_18 * 26)) + 20) != *(int *)((char *)(int)(*(char **)D_00196ABC + (l_1C * 26)) + 20)) goto L1FA1A;
-    mc_memcpy((int)(*(char **)(*(char **)current_location + 43) + (l_18 * 26)), (int)(*(char **)D_00196ABC + (l_1C * 26)), 26, (int)D_00170569, 388, 4);
+    if (current_location->buildings[l_18].id != D_00196ABC[l_1C].id) goto L1FA1A;
+    mc_memcpy((int)&current_location->buildings[l_18], (int)&D_00196ABC[l_1C], 26, (int)D_00170569, 388, 4);
     goto L1FA1C;
 L1FA1A:;
     goto L1F9BF;
 L1FA1C:;
     goto L1F99B;
 L1FA21:;
-    object_foreach(*(int *)nonworld_root, (int)func_0001F7B3);
+    object_foreach(nonworld_root, (int)func_0001F7B3);
 }
 
-int func_0001FA3A(int a1)
+int func_0001FA3A(struct record *a1)
 {
-    if (*(int *)D_00195AF4 == 0) goto L1FA5D;
+    if (D_00195AF4 == 0) goto L1FA5D;
     return 0;
 L1FA5D:;
-    if (((int)(unsigned char)*(signed char *)((char *)a1)) == 57) goto L1FA75;
+    if (a1->type == 57) goto L1FA75;
     return 0;
 L1FA75:;
-    if ((((unsigned)*(int *)((char *)a1 + 31)) >> 16) != (((unsigned)*(int *)(*(char **)D_00195AC4 + 31)) >> 16)) goto L1FA9E;
-    *(int *)D_00195AF4 = a1;
+    if ((((unsigned)a1->id) >> 16) != (((unsigned)D_00195AC4->id) >> 16)) goto L1FA9E;
+    D_00195AF4 = a1;
     return 1;
 L1FA9E:;
     return 0;
@@ -394,11 +395,11 @@ L1FA9E:;
 void func_0001FAB2(void)
 {
     *(int *)D_00195B84 = 0;
-    *(int *)D_00195AF4 = 0;
-    object_find(*(int *)nonworld_root, (int)func_0001FA3A);
-    if (*(int *)D_00195AF4 == 0) return;
-    mc_memcpy((int)(*(char **)D_00196ABC + (*(int *)D_00195B84 * 26)), (int)&*(signed char *)(*(char **)D_00195AF4 + 71), ((int)(unsigned short)*(short *)(*(char **)D_00195AF4 + 23)) * 26, (int)D_00170569, 417, 4);
-    *(int *)D_00195B84 += (int)(unsigned short)*(short *)(*(char **)D_00195AF4 + 23);
+    D_00195AF4 = 0;
+    object_find(nonworld_root, (int)func_0001FA3A);
+    if (D_00195AF4 == 0) return;
+    mc_memcpy((int)&D_00196ABC[*(int *)D_00195B84], (int)RECORD_DATA(D_00195AF4), D_00195AF4->owner * 26, (int)D_00170569, 417, 4);
+    *(int *)D_00195B84 += D_00195AF4->owner;
 }
 
 void func_0001FB3F(void)
@@ -407,97 +408,97 @@ void func_0001FB3F(void)
 
     l_18 = 0;
 L1FB54:;
-    if (((int)(unsigned short)*(short *)(*(char **)current_location + 41)) > l_18) goto L1FB74;
+    if (current_location->building_count > l_18) goto L1FB74;
     return;
 L1FB6C:;
     l_18++;
     goto L1FB54;
 L1FB74:;
-    if (((int)(unsigned char)(*(signed char *)((char *)(int)(*(char **)(*(char **)current_location + 43) + (l_18 * 26)) + 15) & 3)) == 0) goto L1FBAE;
-    if (((unsigned)((int)(unsigned char)*(signed char *)((char *)(int)(*(char **)(*(char **)current_location + 43) + (l_18 * 26)) + 15))) > *(int *)game_minutes) goto L1FBB0;
+    if ((current_location->buildings[l_18].flags & 3) == 0) goto L1FBAE;
+    if (((unsigned)current_location->buildings[l_18].flags) > *(int *)game_minutes) goto L1FBB0;
 L1FBAE:;
     goto L1FBE9;
 L1FBB0:;
-    mc_memcpy((int)(*(char **)D_00196ABC + ((*(int *)D_00195B84)++ * 26)), (int)(*(char **)(*(char **)current_location + 43) + (l_18 * 26)), 26, (int)D_00170569, 428, 4);
+    mc_memcpy((int)&D_00196ABC[(*(int *)D_00195B84)++], (int)&current_location->buildings[l_18], 26, (int)D_00170569, 428, 4);
 L1FBE9:;
     goto L1FB6C;
 }
 
-int func_0001FBF5(int a1)
+int func_0001FBF5(struct record *a1)
 {
     int l_20;
-    int l_1C;
+    struct building *l_1C;
 
-    if (((int)(unsigned char)*(signed char *)(*(char **)((char *)a1 + 67))) == 43) goto L1FC24;
+    if (a1->parent->type == 43) goto L1FC24;
     return 0;
 L1FC24:;
-    if (*(signed char *)((char *)a1 + 38) == 0) goto L1FC39;
+    if (a1->quest_id == 0) goto L1FC39;
     return 0;
 L1FC39:;
-    if ((((unsigned)*(int *)((char *)a1 + 31)) >> 16) != (((unsigned)*(int *)(*(char **)D_00195AC4 + 31)) >> 16)) goto L1FC5D;
+    if ((((unsigned)a1->id) >> 16) != (((unsigned)D_00195AC4->id) >> 16)) goto L1FC5D;
     return 0;
 L1FC5D:;
     l_1C = 0;
     l_20 = 0;
 L1FC6B:;
-    if (((int)(unsigned short)*(short *)(*(char **)current_location + 41)) > l_20) goto L1FC88;
+    if (current_location->building_count > l_20) goto L1FC88;
     goto L1FCB7;
 L1FC80:;
     l_20++;
     goto L1FC6B;
 L1FC88:;
-    if (*(int *)(*(char **)((char *)a1 + 67) + 31) != *(int *)((char *)(int)((l_20 * 26) + *(char **)(*(char **)current_location + 43)) + 20)) goto L1FCB5;
-    l_1C = (l_20 * 26) + *(int *)(*(char **)current_location + 43);
+    if (a1->parent->id != current_location->buildings[l_20].id) goto L1FCB5;
+    l_1C = &current_location->buildings[l_20];
 L1FCB5:;
     goto L1FC80;
 L1FCB7:;
     if (l_1C != 0) goto L1FCC9;
     return 0;
 L1FCC9:;
-    if (((int)(unsigned char)*(signed char *)((char *)l_1C + 24)) == 15) goto L1FCE9;
-    if (((int)(unsigned char)*(signed char *)((char *)l_1C + 24)) != 1) goto L1FCEB;
+    if (l_1C->type == 15) goto L1FCE9;
+    if (l_1C->type != 1) goto L1FCEB;
 L1FCE9:;
     goto L1FCF7;
 L1FCEB:;
     return 0;
 L1FCF7:;
     *(int *)D_00190BE4 = 2147483647;
-    if (((int)(unsigned char)*(signed char *)((char *)l_1C + 24)) != 1) goto L1FD22;
-    if (*(int *)((char *)l_1C + 20) == *(int *)(*(char **)player_character + 116)) goto L1FD24;
+    if (l_1C->type != 1) goto L1FD22;
+    if (l_1C->id == player_character->house) goto L1FD24;
 L1FD22:;
     goto L1FD2D;
 L1FD24:;
     return 1;
 L1FD2D:;
-    *(int *)D_00190BE4 = *(int *)((char *)l_1C + 2);
-    return (((((int)(unsigned char)(*(signed char *)((char *)l_1C + 15) & 2)) != 0) && (((unsigned)*(int *)((char *)l_1C + 2)) > *(int *)game_minutes)) ? 1 : 0);
+    *(int *)D_00190BE4 = l_1C->rent_expires;
+    return (((((int)(unsigned char)(l_1C->flags & 2)) != 0) && (((unsigned)l_1C->rent_expires) > *(int *)game_minutes)) ? 1 : 0);
 }
 
-void func_0001FD7C(int a1)
+void func_0001FD7C(struct record *a1)
 {
     int l_1C;
     int l_18;
 
-    if (((int)(unsigned char)*(signed char *)((char *)a1)) == 57) goto L1FDAB;
-    if (((int)(unsigned char)*(signed char *)((char *)a1)) != 58) goto L1FDAD;
+    if (a1->type == 57) goto L1FDAB;
+    if (a1->type != 58) goto L1FDAD;
 L1FDAB:;
     goto L1FDB2;
 L1FDAD:;
     return;
 L1FDB2:;
-    if (((int)(unsigned char)*(signed char *)((char *)a1)) != 57) goto L1FE2D;
-    *(int *)D_00196ABC = a1 + 71;
-    l_18 = (int)(unsigned short)*(short *)((char *)a1 + 23);
+    if (a1->type != 57) goto L1FE2D;
+    D_00196ABC = (struct building *)RECORD_DATA(a1);
+    l_18 = a1->owner;
     l_1C = 0;
 L1FDE3:;
-    if (((int)(unsigned short)*(short *)((char *)a1 + 23)) > l_1C) goto L1FE05;
+    if (a1->owner > l_1C) goto L1FE05;
     goto L1FE1D;
 L1FDF6:;
     l_1C++;
-    *(int *)D_00196ABC += 26;
+    D_00196ABC++;
     goto L1FDE3;
 L1FE05:;
-    if (((unsigned)*(int *)(*(char **)D_00196ABC + 2)) > *(int *)game_minutes) goto L1FE1B;
+    if (((unsigned)D_00196ABC->rent_expires) > *(int *)game_minutes) goto L1FE1B;
     l_18--;
 L1FE1B:;
     goto L1FDF6;
@@ -507,13 +508,13 @@ L1FE1D:;
 L1FE2B:;
     return;
 L1FE2D:;
-    if (((unsigned)*(int *)((char *)a1 + 43)) > *(int *)game_minutes) return;
+    if (((unsigned)a1->repair_due) > *(int *)game_minutes) return;
     object_delete(a1);
 }
 
 void func_0001FE4D(void)
 {
-    object_foreach(*(int *)nonworld_root, (int)func_0001FD7C);
+    object_foreach(nonworld_root, (int)func_0001FD7C);
 }
 
 void func_0001FE74(void)

@@ -1,4 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x00078B8A */
+#include "records.h"
+
 extern char D_00176844[];
 extern char D_0017685B[];
 extern char text_buffer[];
@@ -10,29 +12,23 @@ extern int archive_read_record(int, int, int);
 extern int func_000A0ED9(int, int);
 extern int mc_sprintf(int, ...);
 
-struct span {
-    int f0;
-    char *start;
-    char *cur;
-};
-
-void monster_reload_anim_cb(unsigned char *a1)
+void monster_reload_anim_cb(struct record *a1)
 {
-    unsigned char *l_28;
-    struct span *l_24;
-    unsigned char *l_20;
+    struct character *l_28;
+    struct monster_anim *l_24;
+    struct career *l_20;
     int l_1C;
     int l_18;
 
-    if (*a1 != 18) return;
-    l_28 = a1 + 71;
-    l_20 = l_28 + 560;
-    l_24 = (struct span *)(l_20 + 74);
-    l_1C = l_24->cur - l_24->start;
+    if (a1->type != 18) return;
+    l_28 = &a1->data.character;
+    l_20 = &l_28->career;
+    l_24 = (struct monster_anim *)((char *)l_20 + 74);
+    l_1C = l_24->anim_script_pos - l_24->anim_script;
     func_000A0ED9(196, (int)D_00176844);
-    mc_sprintf((int)text_buffer, (int)D_0017685B, l_28[503]);
+    mc_sprintf((int)text_buffer, (int)D_0017685B, l_28->ascr_record);
     l_18 = archive_find_record(*(int *)D_00195AC8, (int)text_buffer, 8);
-    ((char **)D_00190704)[l_28[75]] = l_24->start = (char *)archive_read_record(*(int *)D_00195AC8, l_18, 0);
-    if (l_24->cur == 0) return;
-    l_24->cur = l_24->start + l_1C;
+    ((char **)D_00190704)[l_28->anim_slot] = l_24->anim_script = (char *)archive_read_record(*(int *)D_00195AC8, l_18, 0);
+    if (l_24->anim_script_pos == 0) return;
+    l_24->anim_script_pos = l_24->anim_script + l_1C;
 }

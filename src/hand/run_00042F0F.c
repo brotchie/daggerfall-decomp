@@ -1,27 +1,8 @@
 /* matched by the real Watcom C32 10.0a (-d2): a run of keys from 0x425F2 to 0x42F0F, kept together for its switch table's alignment */
+#include "records.h"
+
 struct bits8 {
     unsigned char b0:1, b1:1, b2:1, b3:1, b4:1, b5:1, b6:1, b7:1;
-};
-struct item { char pad0[103]; unsigned short type; };
-struct pc {
-    char pad00[64];
-    unsigned short flags;       /* 0x40 */
-    char pad42[67];
-    int gold;                   /* 0x85 */
-    char pad89[4];
-    short f141;                 /* 0x8d */
-    short f143;                 /* 0x8f */
-    char pad91[222];
-    struct item *equip[32];     /* 0x16f */
-};
-struct obj {
-    unsigned char type;         /* 0x00 */
-    short f1;                   /* 0x01 */
-    short f3;                   /* 0x03 */
-    short f5;                   /* 0x05 */
-    int x;                      /* 0x07 */
-    int y;                      /* 0x0b */
-    int z;                      /* 0x0f */
 };
 extern unsigned char mouse_buttons;
 extern short mouse_x;
@@ -53,13 +34,13 @@ extern int D_001950E8;
 extern int view_look_pitch;
 extern int D_001959BC;
 extern int D_001959C0;
-extern struct obj *camera_object;
-extern struct obj *player_object;
-extern char *D_00195AC4;
+extern struct record *camera_object;
+extern struct record *player_object;
+extern struct record *D_00195AC4;
 extern int cheat_flags;
-extern char *spell_ready_missile;
-extern char *spell_ready_touch;
-extern struct pc *player_character;
+extern struct record *spell_ready_missile;
+extern struct record *spell_ready_touch;
+extern struct character *player_character;
 extern int D_00195D60;
 extern unsigned char mouse_control_mode;
 extern unsigned char view_cursor_active;
@@ -78,7 +59,7 @@ extern int D_001A4A70;
 extern int D_001A4A74;
 extern unsigned char cheat_mode;
 extern void automap_open(void);
-extern void spell_add_skill_uses(char *, int);
+extern void spell_add_skill_uses(struct spell *, int);
 extern void interaction_mode_cycle(int);
 extern int key_action_held(int);
 extern int key_action_pressed(int);
@@ -94,10 +75,10 @@ extern void cheat_return_to_last_position(void);
 extern void saveload_menu(int);
 extern int hud_message_add(char *);
 extern int key_pressed_once(unsigned char);
-extern void object_delete(char *);
-extern void object_set_position(struct obj *, int, int, int, int, int, int);
+extern void object_delete(struct record *);
+extern void object_set_position(struct record *, int, int, int, int, int, int);
 extern void transport_menu(void);
-extern struct obj *marker_find_nth(char *, int, int);
+extern struct record *marker_find_nth(struct record *, int, int);
 extern int travel_map_open(int);
 extern void func_0012B49E(short, short);
 extern void func_00135E90(void);
@@ -125,7 +106,7 @@ void keys_world_actions(void)
     int u2c;
     int u28;
     int saved;
-    struct obj *o;
+    struct record *o;
     int u1c;
     int view;
 
@@ -151,14 +132,14 @@ void keys_world_actions(void)
         automap_open();
     if (key_action_held(30))
         if (spell_ready_missile || spell_ready_touch) {
-            player_character->f141 += D_00195F62;
-            if (player_character->f141 > player_character->f143)
-                player_character->f141 = player_character->f143;
+            player_character->magicka += D_00195F62;
+            if (player_character->magicka > player_character->max_magicka)
+                player_character->magicka = player_character->max_magicka;
             if (spell_ready_missile) {
-                spell_add_skill_uses(spell_ready_missile + 71, -1);
+                spell_add_skill_uses(&spell_ready_missile->data.spell, -1);
                 object_delete(spell_ready_missile);
             } else {
-                spell_add_skill_uses(spell_ready_missile + 71, -1);
+                spell_add_skill_uses(&spell_ready_missile->data.spell, -1);
                 object_delete(spell_ready_touch);
             }
             spell_ready_missile = spell_ready_touch = 0;
@@ -168,8 +149,8 @@ void keys_world_actions(void)
     if (key_action_pressed(12))
         rest_open();
     if (key_action_pressed(34) && D_001940D6.b6 && (D_001A4A70 | D_001A4A74) == 0) {
-        o = (struct obj *)player_character->equip[(weapon_active_hand ^ 1) ? 21 : 19];
-        if (o == 0 || ((struct item *)o)->type == 3) {
+        o = player_character->equipped[(weapon_active_hand ^ 1) ? 21 : 19];
+        if (o == 0 || o->data.item.group == 3) {
             weapon_active_hand ^= 1;
             func_000A0ED9(96, D_00170E38);
             mc_sprintf(text_buffer, D_0018323C, weapon_active_hand ? D_00183240 : D_00183244);
@@ -208,7 +189,7 @@ void keys_world_actions(void)
             view_look_pitch = 32;
             D_001959BC = 0;
             D_001959C0 = 0;
-            player_object->f1 = camera_object->f1 = 0;
+            player_object->angle_x = camera_object->angle_x = 0;
         }
         if (key_action_held(23)) {
             if (!D_001940DA.b6) {
@@ -257,8 +238,8 @@ void keys_world_actions(void)
             o = marker_find_nth(D_00195AC4, 9, D_00199700);
         else
             o = marker_find_nth(D_00195AC4, 16, D_00199700 - D_001950E4);
-        object_set_position(player_object, o->x, o->y, o->z, o->f1, o->f3, o->f5);
-        camera_object->f3 = player_object->f3;
+        object_set_position(player_object, o->x, o->y, o->z, o->angle_x, o->yaw, o->angle_z);
+        camera_object->yaw = player_object->yaw;
         func_00135E90();
         D_001940D5.b1 = 1;
     }
@@ -268,8 +249,8 @@ void keys_world_actions(void)
             o = marker_find_nth(D_00195AC4, 9, D_00199700);
         else
             o = marker_find_nth(D_00195AC4, 16, D_00199700 - D_001950E4);
-        object_set_position(player_object, o->x, o->y, o->z, o->f1, o->f3, o->f5);
-        camera_object->f3 = player_object->f3;
+        object_set_position(player_object, o->x, o->y, o->z, o->angle_x, o->yaw, o->angle_z);
+        camera_object->yaw = player_object->yaw;
         func_00135E90();
         D_001940D5.b1 = 1;
     }

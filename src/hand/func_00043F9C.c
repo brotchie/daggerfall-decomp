@@ -1,4 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x00043F9C */
+#include "records.h"
+
 struct button { short x1, y1, x2, y2; int (*fn)(int); };
 extern char mouse_buttons;
 extern short mouse_x;
@@ -8,14 +10,14 @@ extern char D_00170F2D[];
 extern char D_00170F3A[];
 extern char D_00170F47[];
 extern struct button options_mouse_buttons[];
-extern char *player_object;
+extern struct record *player_object;
 extern int D_00195B5C;
 extern int D_00195B60;
 extern unsigned char mouse_sensitivity_x;
 extern unsigned char mouse_sensitivity_y;
 extern char mouse_buttons_prev;
 extern void options_mouse_draw(int);
-extern int sound_play(int, char *, int);
+extern int sound_play(int, struct record *, int);
 extern int disk_read_file(char *, int);
 extern void cursor_draw_arrow(void);
 extern void mc_free(int, char *, int);

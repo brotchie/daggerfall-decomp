@@ -1,4 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2): a run of jmem.c from 0x0006A0D4 to 0x0006A54B, kept together for its switch table's alignment */
+#include "records.h"
+
 struct blk {                    /* a heap block's header, the data follows */
     int magic;
     struct blk *next;
@@ -6,19 +8,6 @@ struct blk {                    /* a heap block's header, the data follows */
     int size;
     short flags;
 };
-struct ob {
-    unsigned char type;
-    char pad1[30];
-    int f1f;                    /* 31 */
-    char pad23[3];
-    char f26;                   /* 38 */
-    char pad27[12];
-    struct ob *f33;             /* 51 */
-    char pad37[8];
-    int f3f;                    /* 63 */
-};
-struct grp { char pad[24]; short count; };
-struct ent { char pad[16]; struct ob *owner; char pad14[4]; };
 struct msg { int a; short b; char pad[10]; };
 extern char *screen_buffer;
 extern char D_00175AD4[];       /* __FILE__ */
@@ -37,16 +26,16 @@ extern char D_00175C18[];
 extern int mem_check_level;
 extern int frame_checkpoint;
 extern int D_0018DC24;
-extern int nonworld_root;
-extern struct ob *D_00195A00;
-extern int D_00195AC4;
+extern struct record *nonworld_root;
+extern struct record *D_00195A00;
+extern struct record *D_00195AC4;
 extern struct blk *object_heap_blocks;
 extern int object_heap_size;
 extern void func_00010AF6(int);
-extern struct ent *quest_section(struct grp *, int);
+extern struct qbn_place *quest_section(struct quest *, int);
 extern void fatal_error(char *);
-extern void object_foreach(int, void (*)(struct ob *));
-extern int object_find_by_id(int, int);
+extern void object_foreach(struct record *, void (*)(struct record *));
+extern struct record *object_find_by_id(struct record *, int);
 extern int mc_memset();
 extern int func_000A2A2B(void);
 extern int func_000A2A76(struct msg *);
@@ -90,33 +79,33 @@ int mem_pool_release(char *p)
     return size;
 }
 
-void mem_check_quest_object_cb(struct ob *o)
+void mem_check_quest_object_cb(struct record *o)
 {
     int saved;
 
-    if (o->f33 != 0 && o->type != 2) {
-        if (object_find_by_id(D_00195AC4, o->f33->f1f) == 0)
+    if (o->twin != 0 && o->type != 2) {
+        if (object_find_by_id(D_00195AC4, o->twin->id) == 0)
             fatal_error(D_00175B1A);
     }
-    saved = o->f1f;
-    o->f1f = 0;
+    saved = o->id;
+    o->id = 0;
     if (object_find_by_id(nonworld_root, saved) != 0)
         fatal_error(D_00175B39);
-    o->f1f = saved;
+    o->id = saved;
 }
 
-void mem_check_quest_ids_cb(struct ob *o)
+void mem_check_quest_ids_cb(struct record *o)
 {
-    struct ent *e;
-    struct grp *g;
+    struct qbn_place *e;
+    struct quest *g;
     int i;
 
     if (o->type != 14)
         return;
-    g = (struct grp *)((char *)o + 71);
+    g = &o->data.quest;
     e = quest_section(g, 4);
-    for (i = 0; g->count > i; i++, e++) {
-        if (e->owner != 0 && o->f26 != e->owner->f26)
+    for (i = 0; g->section_counts[4] > i; i++, e++) {
+        if (e->object != 0 && o->quest_id != e->object->quest_id)
             fatal_error(D_00175B51);
     }
 }
@@ -136,7 +125,7 @@ void mem_check_heap(int a1)
     if (D_0018DC24 != 0)
         func_000CE8D5(a1);
     object_foreach(nonworld_root, mem_check_quest_object_cb);
-    object_foreach(D_00195A00->f3f, mem_check_quest_ids_cb);
+    object_foreach(D_00195A00->children, mem_check_quest_ids_cb);
     prev = b = object_heap_blocks;
     while (b != 0) {
         if (b->magic != 1768515945) {

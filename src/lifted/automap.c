@@ -1,6 +1,7 @@
 /* automap.c: functions first lifted from the assembly by tools/lift_all.py (2026-10), now
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
+#include "records.h"
 
 extern char D_000C23B8[];
 extern char D_000C23BC[];
@@ -54,14 +55,14 @@ extern char text_macro_fnpc[];
 extern char D_00190E18[];
 extern char player_motion_flags[];
 extern char D_001940E4[];
-extern char player_entity[];
-extern char player_object[];
-extern char D_00195AC4[];
-extern char D_00195AF4[];
-extern char current_location[];
-extern char player_character[];
+extern struct record *player_entity;
+extern struct record *player_object;
+extern struct record *D_00195AC4;
+extern struct record *D_00195AF4;
+extern struct location *current_location;
+extern struct character *player_character;
 extern char game_minutes[];
-extern char game_settings[];
+extern struct settings *game_settings;
 extern char D_00195C44[];
 extern char D_00195CB8[];
 extern char D_00196272[];
@@ -83,23 +84,23 @@ extern char cfg_show_markers[];
 
 extern int engine_pick_object(int, int, int);
 extern int func_000283FD(short, short);
-extern int sound_play(int, int, int);
+extern int sound_play(int, struct record *, int);
 extern int disk_read_file(int, int);
 extern int disk_write_arena2_file(int, int, int);
 extern int disk_open_data(int);
 extern int disk_file_exists(int);
 extern int guild_find_membership_by_kind(unsigned char);
-extern int object_building(int);
+extern struct building *object_building(struct record *);
 extern int automap_draw_object_cb(int);
 extern int location_contains(int, int);
-extern int building_name(int);
+extern int building_name(struct building *);
 extern int inpstr_edit(int, short, short, short, short, short);
-extern int object_free_single(int);
-extern int object_delete(int);
-extern int object_create_child(int, int, int);
-extern int object_find_by_id(int, int);
+extern int object_free_single(struct record *);
+extern struct record *object_delete(struct record *);
+extern struct record *object_create_child(struct record *, int, int);
+extern struct record *object_find_by_id(struct record *, int);
 extern int object_new_id(int);
-extern int marker_find_first(int, int);
+extern struct record *marker_find_first(struct record *, int);
 extern int location_cell_at(int, int);
 extern int rand();
 extern int func_0009DEA7();
@@ -135,44 +136,44 @@ extern int func_00137725();
 extern int func_00144F68();
 extern int func_0014D23C();
 extern void screenshot_poll(void);
-extern void func_00027717(int, int);
+extern void func_00027717(struct record *, int);
 extern void town_map_open(void);
 extern void town_map_scroll(int);
 extern void func_0002829B(int);
-extern void quest_set_state(int, int, int);
-extern void quest_set_arg_state(int, int, int, int);
-extern void qaction_place_foe(int, int);
+extern void quest_set_state(struct quest *, struct qbn_op *, int);
+extern void quest_set_arg_state(struct quest *, struct qbn_op *, int, int);
+extern void qaction_place_foe(struct qbn_op *, int);
 extern void text_draw(int, int, int);
 extern void hud_draw_heading_strip(int);
 extern void text_draw_colored(int, int, int, int, unsigned char);
 extern void world_collect_objects(void);
-extern void building_grant_access(int, unsigned char, int);
-extern void object_foreach(int, int);
+extern void building_grant_access(struct building *, unsigned char, int);
+extern void object_foreach(struct record *, int);
 int automap_move_forward(int);
 int automap_move_back(int);
 int automap_move_left(int);
 int automap_move_right(int);
-int func_00027641(int);
+int func_00027641(struct record *);
 int func_000281AF(void);
 int func_0002839E(int);
 int func_000284DA(int);
 void automap_draw(void);
 void automap_render(void);
 void automap_find_record(void);
-void automap_match_record(int);
+void automap_match_record(struct record *);
 void func_000276B8(void);
 void automap_init_view(void);
 void func_00028210(int);
 void func_0002830F(int);
 void func_00028547(void);
-void town_map_note_building(int, int);
+void town_map_note_building(struct record *, struct building *);
 void automap_draw_block_overview(void);
-void func_00028DDB(int);
+void func_00028DDB(struct record *);
 void func_00028DFD(void);
-void func_00028ED1(int);
+void func_00028ED1(struct record *);
 void automap_restore_seen(void);
-void func_00028F8B(int);
-void func_000298F3(int);
+void func_00028F8B(struct record *);
+void func_000298F3(struct record *);
 #pragma aux func_000A0ED9 parm routine [];
 
 void automap_open(void)
@@ -181,12 +182,12 @@ void automap_open(void)
     int l_28;
     int l_24;
     int l_20;
-    int l_1C;
-    int l_18;
+    struct record *l_1C;
+    struct record *l_18;
 
     l_2C = 0;
     if (((int)(unsigned char)*(signed char *)player_environment) != 1) goto L2693E;
-    if (location_contains(*(int *)(*(char **)player_object + 7), *(int *)(*(char **)player_object + 15)) != 0) goto L26940;
+    if (location_contains(player_object->x, player_object->z) != 0) goto L26940;
 L2693E:;
     goto L2694A;
 L26940:;
@@ -206,9 +207,9 @@ L2694A:;
     *(signed char *)D_00196272 = 1;
     *(int *)text_macro_fpc = disk_read_file((int)D_00170794, 0);
     *(int *)D_00190E18 = disk_read_file((int)D_001707A1, 0);
-    *(int *)D_00190BE4 = *(int *)(*(char **)player_object + 7);
-    *(int *)D_00190BE8 = *(int *)(*(char **)player_object + 11);
-    *(int *)D_00190BEC = *(int *)(*(char **)player_object + 15);
+    *(int *)D_00190BE4 = player_object->x;
+    *(int *)D_00190BE8 = player_object->y;
+    *(int *)D_00190BEC = player_object->z;
     *(short *)D_0014294C = 199;
     func_0012A2D0(160, 84, 160, 85);
     automap_find_record();
@@ -220,34 +221,34 @@ L26A3E:;
     if (((int)(unsigned char)*(signed char *)player_environment) != 2) goto L26B3B;
 L26A4E:;
     if (((int)(unsigned char)*(signed char *)player_environment) != 3) goto L26A97;
-    l_1C = *(int *)D_00195CB8;
+    l_1C = (struct record *)*(int *)D_00195CB8;
 L26A62:;
     if (l_1C == 0) goto L26A77;
-    if (((int)(unsigned char)*(signed char *)((char *)l_1C)) != 47) goto L26A79;
+    if (l_1C->type != 47) goto L26A79;
 L26A77:;
     goto L26A88;
 L26A79:;
-    if (((int)(unsigned char)*(signed char *)((char *)l_1C)) != 1) goto L26A8A;
+    if (l_1C->type != 1) goto L26A8A;
 L26A88:;
     goto L26A95;
 L26A8A:;
-    l_1C = *(int *)((char *)l_1C + 67);
+    l_1C = l_1C->parent;
     goto L26A62;
 L26A95:;
     goto L26AA2;
 L26A97:;
-    l_1C = *(int *)(*(char **)player_object + 67);
+    l_1C = player_object->parent;
 L26AA2:;
     if (l_1C == 0) goto L26B3B;
     l_18 = object_create_child(l_1C, 0, 62);
-    *(short *)((char *)l_18 + 29) = 999;
-    *(short *)((char *)l_18 + 27) = 0;
-    mc_memcpy(l_18 + 1, (int)&*(signed char *)(*(char **)player_object + 1), 18, (int)D_001707AE, 130, 4);
-    *(short *)((char *)l_18 + 3) = 2047 - *(short *)((char *)l_18 + 3);
-    func_000C7F07((int)(short)*(short *)((char *)l_18 + 1), (int)(short)*(short *)((char *)l_18 + 3), (int)(short)*(short *)((char *)l_18 + 5), l_18 + 83);
-    *(signed char *)((char *)l_18) = 6;
-    *(short *)((char *)l_18 + 21) = 128;
-    *(int *)((char *)l_18 + 11) -= 40;
+    l_18->image2 = 999;
+    l_18->image = 0;
+    mc_memcpy(&l_18->angle_x, &player_object->angle_x, 18, (int)D_001707AE, 130, 4);
+    l_18->yaw = 2047 - l_18->yaw;
+    func_000C7F07(l_18->angle_x, l_18->yaw, l_18->angle_z, (int)RECORD_DATA(l_18) + 12);
+    l_18->type = 6;
+    l_18->flags = 128;
+    l_18->y -= 40;
 L26B3B:;
     if (l_2C != 0) goto L26C8D;
     automap_draw();
@@ -296,7 +297,7 @@ L26C2D:;
 L26C4D:;
     goto L26C64;
 L26C4F:;
-    sound_play(203, *(int *)player_object, 100);
+    sound_play(203, player_object, 100);
 L26C64:;
     l_2C = ((int (*)())(*(int *)(D_0017A034 + (l_28 * 12))))(l_28);
 L26C74:;
@@ -326,13 +327,13 @@ L26D00:;
     if (l_18 == 0) goto L26D0E;
     object_free_single(l_18);
 L26D0E:;
-    if (((int)(unsigned short)(*(short *)(*(char **)game_settings) & 1)) == 0) goto L26D3F;
+    if (((int)(unsigned short)(*(short *)(*(char **)&game_settings) & 1)) == 0) goto L26D3F;
     func_0012A2D0(160, 100, 160, 100);
     goto L26D58;
 L26D3F:;
     func_0012A2D0(160, 77, 160, 77);
 L26D58:;
-    object_foreach(*(int *)D_00195AC4, (int)func_00028F8B);
+    object_foreach(D_00195AC4, (int)func_00028F8B);
     func_00028DFD();
     *(signed char *)D_00196272 = *(signed char *)&l_24;
     *(signed char *)cfg_show_markers = *(signed char *)&l_20;
@@ -384,10 +385,10 @@ L26F2D:;
     func_000276B8();
 L26F32:;
     if (*(signed char *)text_buffer == 0) goto L26F4A;
-    func_00027717(*(int *)D_00196DB0, (int)text_buffer);
+    func_00027717((struct record *)*(int *)D_00196DB0, (int)text_buffer);
 L26F4A:;
-    *(int *)D_00196DAC = func_00027641(*(int *)D_00196DB0);
-    sound_play(206, *(int *)player_object, 100);
+    *(int *)D_00196DAC = func_00027641((struct record *)*(int *)D_00196DB0);
+    sound_play(206, player_object, 100);
     return 0;
 }
 
@@ -446,10 +447,10 @@ void automap_render(void)
     func_001374FC((int)&l_28, (int)&l_24, (int)&l_20, (int)D_00136E00);
     func_00136AD8(l_28, l_24, l_20, 28, 0, 8);
     if (((int)(unsigned char)*(signed char *)player_environment) != 3) goto L27182;
-    object_foreach(*(int *)D_00195AC4, (int)automap_draw_object_cb);
+    object_foreach(D_00195AC4, (int)automap_draw_object_cb);
     goto L27197;
 L27182:;
-    object_foreach(*(int *)(*(char **)(*(char **)player_object + 67) + 63), (int)automap_draw_object_cb);
+    object_foreach(player_object->parent->children, (int)automap_draw_object_cb);
 L27197:;
     *(signed char *)player_motion_flags &= 254;
     l_18 = func_0012A870(2);
@@ -569,10 +570,10 @@ L274A6:;
     engine_pick_object((int)(short)*(short *)mouse_x, (int)(short)*(short *)mouse_y, (int)l_2C);
     if ((*(int *)l_2C & 1) == 0) goto L274F7;
     if (((int)(unsigned char)(*(signed char *)mouse_buttons & 2)) == 0) goto L274DE;
-    *(signed char *)(*(char **)((char *)l_2C + 4) + 22) |= 4;
+    (*(struct record **)(l_2C + 4))->flags |= 0x400;
     goto L274F5;
 L274DE:;
-    *(int *)D_00196DAC = func_00027641((*(int *)D_00196DB0 = *(int *)((char *)l_2C + 4)));
+    *(int *)D_00196DAC = func_00027641((struct record *)(*(int *)D_00196DB0 = *(int *)((char *)l_2C + 4)));
 L274F5:;
     goto L27501;
 L274F7:;
@@ -583,33 +584,33 @@ L27501:;
 
 void automap_find_record(void)
 {
-    int l_18;
+    struct record *l_18;
 
-    *(int *)D_00195AF4 = (*(int *)D_00196DA0 = 0);
-    if (*(int *)player_entity == 0) return;
-    object_foreach(*(int *)(*(char **)player_entity + 63), (int)automap_match_record);
-    if (*(int *)D_00195AF4 != 0) goto L275D6;
-    l_18 = object_create_child(*(int *)player_entity, 0, 10240);
-    *(signed char *)((char *)l_18) = 51;
-    *(int *)((char *)l_18 + 31) = object_new_id(((unsigned)*(int *)(*(char **)D_00195AC4 + 31)) >> 16);
+    D_00195AF4 = (struct record *)((*(int *)D_00196DA0 = 0));
+    if (player_entity == 0) return;
+    object_foreach(player_entity->children, (int)automap_match_record);
+    if (D_00195AF4 != 0) goto L275D6;
+    l_18 = object_create_child(player_entity, 0, 10240);
+    l_18->type = 51;
+    l_18->id = object_new_id(D_00195AC4->id >> 16);
     *(int *)((char *)l_18 + 43) = *(int *)game_minutes;
-    *(short *)((char *)l_18 + 27) = (((int)(unsigned short)*(short *)(*(char **)current_location + 37)) + 7) / 8;
-    *(int *)D_00196DB4 = l_18 + 71;
-    *(int *)D_00196DA0 = l_18;
+    *(short *)((char *)l_18 + 27) = (current_location->object_counter + 7) / 8;
+    *(int *)D_00196DB4 = (int)RECORD_DATA(l_18);
+    *(int *)D_00196DA0 = (int)l_18;
     return;
 L275D6:;
-    *(int *)D_00196DB4 = *(int *)D_00195AF4 + 71;
-    *(int *)D_00196DA0 = *(int *)D_00195AF4;
+    *(int *)D_00196DB4 = (int)RECORD_DATA(D_00195AF4);
+    *(int *)D_00196DA0 = (int)D_00195AF4;
 }
 
-void automap_match_record(int a1)
+void automap_match_record(struct record *a1)
 {
-    if (((int)(unsigned char)*(signed char *)((char *)a1)) != 51) return;
-    if ((((unsigned)*(int *)((char *)a1 + 31)) >> 16) != (((unsigned)*(int *)(*(char **)D_00195AC4 + 31)) >> 16)) return;
-    *(int *)D_00195AF4 = a1;
+    if (a1->type != 51) return;
+    if ((a1->id >> 16) != (D_00195AC4->id >> 16)) return;
+    D_00195AF4 = a1;
 }
 
-int func_00027641(int a1)
+int func_00027641(struct record *a1)
 {
     int l_1C;
 
@@ -617,7 +618,7 @@ int func_00027641(int a1)
 L2765A:;
     if (*(signed char *)((char *)l_1C + 2) == 0) goto L276A4;
     *(int *)text_macro_fnpc = l_1C;
-    if (((int)(unsigned short)*(short *)((char *)l_1C)) != (*(int *)((char *)a1 + 31) & 65535)) goto L27691;
+    if (((int)(unsigned short)*(short *)((char *)l_1C)) != ((int)a1->id & 65535)) goto L27691;
     return l_1C + 2;
 L27691:;
     l_1C += func_000A0DF4(l_1C + 2) + 3;
@@ -695,14 +696,14 @@ L278D0:;
 
 void func_000278E4(void)
 {
-    int l_1C;
-    int l_18;
+    struct record *l_1C;
+    struct record *l_18;
 
-    l_1C = *(int *)(*(char **)player_entity + 63);
+    l_1C = player_entity->children;
 L278FD:;
     if (l_1C == 0) return;
-    l_18 = *(int *)((char *)l_1C + 55);
-    if (((int)(unsigned char)*(signed char *)((char *)l_1C)) != 51) goto L27935;
+    l_18 = l_1C->next;
+    if (l_1C->type != 51) goto L27935;
     if (((unsigned)(*(int *)game_minutes - *(int *)((char *)l_1C + 43))) <= 43200) goto L27935;
     object_free_single(l_1C);
 L27935:;
@@ -712,7 +713,7 @@ L27935:;
 
 void func_00027947(void)
 {
-    *(int *)D_00196DA8 = (((int)(unsigned char)*(signed char *)(*(char **)current_location + 32)) * ((int)(unsigned char)*(signed char *)(*(char **)current_location + 33))) << 12;
+    *(int *)D_00196DA8 = (current_location->width * current_location->height) << 12;
     *(int *)D_00196DA4 = mc_malloc(*(int *)D_00196DA8, (int)D_001707AE, 582);
     mc_memset(*(int *)D_00196DA4, 0, *(int *)D_00196DA8, (int)D_001707AE, 583, 4);
 }
@@ -904,7 +905,7 @@ L28791:;
     goto L28716;
 }
 
-void town_map_note_building(int a1, int a2)
+void town_map_note_building(struct record *a1, struct building *a2)
 {
     int l_1C;
     int l_18;
@@ -913,7 +914,7 @@ void town_map_note_building(int a1, int a2)
     l_14 = building_name(a2);
     mc_memset(*(int *)D_00195C44, 0, 50000, (int)D_001707AE, 963, 4);
     func_000A0ED9(964, (int)D_001707AE);
-    mc_sprintf((int)text_buffer, (int)D_001707B8, ((unsigned)*(int *)(*(char **)D_00195AC4 + 31)) >> 16);
+    mc_sprintf((int)text_buffer, (int)D_001707B8, D_00195AC4->id >> 16);
     if (disk_file_exists((int)text_buffer) == 0) goto L28886;
     disk_read_file((int)text_buffer, *(int *)D_00195C44);
     *(int *)(*(char **)D_00195C44) = *(int *)game_minutes;
@@ -923,16 +924,16 @@ void town_map_note_building(int a1, int a2)
 L28886:;
     *(int *)(*(char **)D_00195C44) = *(int *)game_minutes;
 L28893:;
-    l_1C = *(int *)((char *)a1 + 7) - *(int *)(*(char **)D_00195AC4 + 7);
-    l_18 = *(int *)((char *)a1 + 15) - *(int *)(*(char **)D_00195AC4 + 15);
+    l_1C = a1->x - D_00195AC4->x;
+    l_18 = a1->z - D_00195AC4->z;
     l_1C >>= 6;
     l_18 >>= 6;
-    l_18 = ((((int)(unsigned char)*(signed char *)(*(char **)current_location + 33)) << 6) - l_18) - 1;
+    l_18 = ((current_location->height << 6) - l_18) - 1;
     *(short *)D_00190D68 = l_1C;
     *(short *)D_00190D6A = l_18;
     func_0002829B(l_14);
     func_000A0ED9(986, (int)D_001707AE);
-    mc_sprintf((int)text_buffer, (int)D_001707B8, ((unsigned)*(int *)(*(char **)D_00195AC4 + 31)) >> 16);
+    mc_sprintf((int)text_buffer, (int)D_001707B8, D_00195AC4->id >> 16);
     disk_write_arena2_file((int)text_buffer, *(int *)D_00195C44, func_000281AF());
 }
 
@@ -944,10 +945,10 @@ void automap_draw_block_overview(void)
     int l_1C;
     int l_18;
 
-    l_1C = location_cell_at(*(int *)(*(char **)player_object + 7), *(int *)(*(char **)player_object + 15));
-    l_18 = marker_find_first(*(int *)D_00195AC4, 8);
+    l_1C = location_cell_at(player_object->x, player_object->z);
+    l_18 = (int)marker_find_first(D_00195AC4, 8);
     if (l_18 == 0) goto L28AC0;
-    l_18 = location_cell_at(*(int *)((char *)l_18 + 7), *(int *)((char *)l_18 + 15));
+    l_18 = location_cell_at(((struct record *)l_18)->x, ((struct record *)l_18)->z);
 L28AC0:;
     l_28 = 0;
 L28AC7:;
@@ -996,7 +997,7 @@ L28BF2:;
     *(int *)(*(char **)D_00195C44) = *(int *)game_minutes;
     mc_memcpy((int)(*(char **)D_00195C44 + 4), *(int *)D_00196DA0, 10240, (int)D_001707AE, 1055, 4);
     func_000A0ED9(1056, (int)D_001707AE);
-    mc_sprintf((int)text_buffer, (int)D_001707E4, ((unsigned)*(int *)(*(char **)D_00195AC4 + 31)) >> 16);
+    mc_sprintf((int)text_buffer, (int)D_001707E4, D_00195AC4->id >> 16);
     disk_write_arena2_file((int)text_buffer, *(int *)D_00195C44, 10244);
 }
 
@@ -1007,7 +1008,7 @@ void automap_load(void)
     if (((int)(unsigned char)*(signed char *)player_environment) != 3) return;
     mc_memset(*(int *)D_00195C44, 0, 50000, (int)D_001707AE, 1066, 4);
     func_000A0ED9(1067, (int)D_001707AE);
-    mc_sprintf((int)text_buffer, (int)D_001707E4, ((unsigned)*(int *)(*(char **)D_00195AC4 + 31)) >> 16);
+    mc_sprintf((int)text_buffer, (int)D_001707E4, D_00195AC4->id >> 16);
     l_18 = disk_open_data((int)text_buffer);
     if (l_18 == (-1)) return;
     func_000A00CB(l_18, *(int *)D_00195C44, 50000);
@@ -1018,7 +1019,7 @@ void automap_load(void)
 void func_00028D1A(void)
 {
     int l_24;
-    int l_20;
+    struct building *l_20;
     short l_1C;
     short l_18;
 
@@ -1030,46 +1031,46 @@ L28D48:;
     if (guild_find_membership_by_kind(3) == 0) goto L28D5D;
     *(int *)&l_1C = 42;
 L28D5D:;
-    l_20 = *(int *)(*(char **)current_location + 43);
+    l_20 = current_location->buildings;
     l_24 = 0;
 L28D6F:;
-    if (((int)(unsigned short)*(short *)(*(char **)current_location + 41)) > l_24) goto L28D93;
+    if (current_location->building_count > l_24) goto L28D93;
     return;
 L28D84:;
     l_24++;
-    (*(char (**)[26])&l_20)++;
+    l_20++;
     goto L28D6F;
 L28D93:;
-    if (*(unsigned short *)((char *)l_20 + 18) == (short)l_1C) goto L28DB5;
-    if (*(unsigned short *)((char *)l_20 + 18) != (short)l_18) goto L28DCF;
+    if (l_20->faction_id == (short)l_1C) goto L28DB5;
+    if (l_20->faction_id != (short)l_18) goto L28DCF;
 L28DB5:;
-    town_map_note_building(object_find_by_id(*(int *)D_00195AC4, *(int *)((char *)l_20 + 20)), l_20);
+    town_map_note_building(object_find_by_id(D_00195AC4, l_20->id), l_20);
 L28DCF:;
     goto L28D84;
 }
 
-void func_00028DDB(int a1)
+void func_00028DDB(struct record *a1)
 {
-    *(signed char *)((char *)a1 + 22) &= 251;
+    a1->flags &= ~0x400;
 }
 
 void func_00028DFD(void)
 {
-    object_foreach(*(int *)D_00195AC4, (int)func_00028DDB);
+    object_foreach(D_00195AC4, (int)func_00028DDB);
 }
 
 void func_00028EAA(void)
 {
     automap_find_record();
-    *(int *)D_00196DA0 = *(int *)D_00195AF4;
+    *(int *)D_00196DA0 = (int)D_00195AF4;
 }
 
-void func_00028ED1(int a1)
+void func_00028ED1(struct record *a1)
 {
     int l_18;
 
-    if (((int)(unsigned char)*(signed char *)((char *)a1)) == 6) goto L28F00;
-    if (((int)(unsigned char)*(signed char *)((char *)a1)) != 34) goto L28F02;
+    if (a1->type == 6) goto L28F00;
+    if (a1->type != 34) goto L28F02;
 L28F00:;
     goto L28F04;
 L28F02:;
@@ -1077,8 +1078,8 @@ L28F02:;
 L28F04:;
     l_18 = *(int *)D_00196DA0 + 71;
     l_18 += 2048;
-    if ((((int)(unsigned char)*(signed char *)((char *)((((unsigned)(*(int *)((char *)a1 + 31) & 65535)) >> 3) + l_18))) & (1 << ((*(int *)((char *)a1 + 31) & 65535) & 7))) == 0) return;
-    *(signed char *)((char *)a1 + 21) |= 128;
+    if ((((int)(unsigned char)*(signed char *)((char *)((((unsigned)(a1->id & 65535)) >> 3) + l_18))) & (1 << ((a1->id & 65535) & 7))) == 0) return;
+    a1->flags |= 128;
 }
 
 void automap_restore_seen(void)
@@ -1086,56 +1087,56 @@ void automap_restore_seen(void)
     if (*(int *)D_00196DA0 != 0) goto L28F72;
     automap_find_record();
 L28F72:;
-    object_foreach(*(int *)D_00195AC4, (int)func_00028ED1);
+    object_foreach(D_00195AC4, (int)func_00028ED1);
 }
 
-void func_00028F8B(int a1)
+void func_00028F8B(struct record *a1)
 {
-    *(signed char *)((char *)a1 + 21) &= 127;
+    a1->flags &= ~0x80;
 }
 
-int qcond_op05_event_at_place(int a1, int a2)
+int qcond_op05_event_at_place(struct quest *a1, struct qbn_op *a2)
 {
-    int l_1C;
-    int l_18;
+    struct record *l_1C;
+    struct record *l_18;
 
-    l_1C = *(int *)((char *)a2 + 47);
-    if (*(int *)((char *)l_1C + 51) != 0) goto L28FDE;
+    l_1C = a2->args[2].object;
+    if (l_1C->twin != 0) goto L28FDE;
     return 0;
 L28FDE:;
-    l_1C = *(int *)((char *)l_1C + 51);
+    l_1C = l_1C->twin;
 L28FE7:;
     if (l_1C == 0) goto L29020;
-    if (((int)(unsigned char)*(signed char *)((char *)l_1C)) != 43) goto L29011;
-    if (((int)(unsigned short)(*(short *)((char *)l_1C + 21) & 1)) != 0) goto L29013;
+    if (l_1C->type != 43) goto L29011;
+    if (((int)(unsigned short)(l_1C->flags & 1)) != 0) goto L29013;
 L29011:;
     goto L29015;
 L29013:;
     goto L29020;
 L29015:;
-    l_1C = *(int *)((char *)l_1C + 67);
+    l_1C = l_1C->parent;
     goto L28FE7;
 L29020:;
-    if (((int)(unsigned char)*(signed char *)((char *)l_1C)) == 43) goto L2903B;
+    if (l_1C->type == 43) goto L2903B;
     return 0;
 L2903B:;
-    l_18 = *(int *)(*(char **)player_object + 67);
+    l_18 = player_object->parent;
 L29046:;
     if (l_18 == 0) goto L2907F;
-    if (((int)(unsigned char)*(signed char *)((char *)l_18)) != 43) goto L29070;
-    if (((int)(unsigned short)(*(short *)((char *)l_18 + 21) & 1)) != 0) goto L29072;
+    if (l_18->type != 43) goto L29070;
+    if (((int)(unsigned short)(l_18->flags & 1)) != 0) goto L29072;
 L29070:;
     goto L29074;
 L29072:;
     goto L2907F;
 L29074:;
-    l_18 = *(int *)((char *)l_18 + 67);
+    l_18 = l_18->parent;
     goto L29046;
 L2907F:;
-    if (((int)(unsigned char)*(signed char *)((char *)l_18)) == 43) goto L29097;
+    if (l_18->type == 43) goto L29097;
     return 0;
 L29097:;
-    if (*(int *)(*(char **)quest_event_object + 51) != *(int *)((char *)a2 + 32)) goto L290AF;
+    if (*(int *)(*(char **)quest_event_object + 51) != (int)a2->args[1].object) goto L290AF;
     if (l_1C == l_18) goto L290B1;
 L290AF:;
     goto L290CA;
@@ -1146,200 +1147,200 @@ L290CA:;
     return 0;
 }
 
-int qcond_op43_pc_at_place(int a1, int a2)
+int qcond_op43_pc_at_place(struct quest *a1, struct qbn_op *a2)
 {
     int l_20;
-    int l_1C;
-    int l_18;
+    struct record *l_1C;
+    struct record *l_18;
 
-    l_1C = *(int *)((char *)a2 + 47);
+    l_1C = a2->args[2].object;
     if (l_1C != 0) goto L2910B;
     return 0;
 L2910B:;
-    if (*(int *)((char *)l_1C + 51) != 0) goto L29132;
+    if (l_1C->twin != 0) goto L29132;
     quest_set_arg_state(a1, a2, 1, 0);
     return 0;
 L29132:;
-    l_1C = *(int *)((char *)l_1C + 51);
+    l_1C = l_1C->twin;
 L2913B:;
     if (l_1C == 0) goto L29192;
-    if (((int)(unsigned char)*(signed char *)((char *)l_1C)) != 43) goto L29165;
-    if (((int)(unsigned short)(*(short *)((char *)l_1C + 21) & 1)) != 0) goto L29174;
+    if (l_1C->type != 43) goto L29165;
+    if (((int)(unsigned short)(l_1C->flags & 1)) != 0) goto L29174;
 L29165:;
-    if (((int)(unsigned char)*(signed char *)((char *)l_1C)) != 47) goto L29176;
+    if (l_1C->type != 47) goto L29176;
 L29174:;
     goto L29185;
 L29176:;
-    if (((int)(unsigned char)*(signed char *)((char *)l_1C)) != 1) goto L29187;
+    if (l_1C->type != 1) goto L29187;
 L29185:;
     goto L29192;
 L29187:;
-    l_1C = *(int *)((char *)l_1C + 67);
+    l_1C = l_1C->parent;
     goto L2913B;
 L29192:;
-    if (((int)(unsigned char)*(signed char *)((char *)l_1C)) == 43) goto L291B0;
-    if (((int)(unsigned char)*(signed char *)((char *)l_1C)) != 47) goto L291B2;
+    if (l_1C->type == 43) goto L291B0;
+    if (l_1C->type != 47) goto L291B2;
 L291B0:;
     goto L291C1;
 L291B2:;
-    if (((int)(unsigned char)*(signed char *)((char *)l_1C)) != 1) goto L291C3;
+    if (l_1C->type != 1) goto L291C3;
 L291C1:;
     goto L291CF;
 L291C3:;
     return 0;
 L291CF:;
-    l_18 = *(int *)(*(char **)player_object + 67);
+    l_18 = player_object->parent;
 L291DA:;
     if (l_18 == 0) goto L29220;
-    if (((int)(unsigned char)*(signed char *)((char *)l_18)) != 43) goto L29204;
-    if (((int)(unsigned short)(*(short *)((char *)l_18 + 21) & 1)) != 0) goto L29213;
+    if (l_18->type != 43) goto L29204;
+    if (((int)(unsigned short)(l_18->flags & 1)) != 0) goto L29213;
 L29204:;
-    if (((int)(unsigned char)*(signed char *)((char *)l_18)) != 1) goto L29215;
+    if (l_18->type != 1) goto L29215;
 L29213:;
     goto L29220;
 L29215:;
-    l_18 = *(int *)((char *)l_18 + 67);
+    l_18 = l_18->parent;
     goto L291DA;
 L29220:;
-    if (((int)(unsigned char)*(signed char *)((char *)l_18)) == 43) goto L2923E;
-    if (((int)(unsigned char)*(signed char *)((char *)l_18)) != 1) goto L29240;
+    if (l_18->type == 43) goto L2923E;
+    if (l_18->type != 1) goto L29240;
 L2923E:;
     goto L2924C;
 L29240:;
     return 0;
 L2924C:;
-    if (((int)(unsigned char)*(signed char *)((char *)l_1C)) != 47) goto L29264;
-    l_1C = *(int *)((char *)l_1C + 67);
+    if (l_1C->type != 47) goto L29264;
+    l_1C = l_1C->parent;
 L29264:;
-    quest_set_arg_state(a1, a2, 1, ((*(int *)((char *)l_18 + 31) == *(int *)((char *)l_1C + 31)) ? 1 : 0));
-    return ((*(int *)((char *)l_18 + 31) == *(int *)((char *)l_1C + 31)) ? 1 : 0);
+    quest_set_arg_state(a1, a2, 1, ((l_18->id == l_1C->id) ? 1 : 0));
+    return ((l_18->id == l_1C->id) ? 1 : 0);
 }
 
-void quest_op17_grant_building_access(int a1, int a2)
+void quest_op17_grant_building_access(struct quest *a1, struct qbn_op *a2)
 {
-    int l_18;
-    int l_14;
+    struct record *l_18;
+    struct building *l_14;
 
-    l_18 = *(int *)((char *)a2 + 32);
-    if (*(int *)((char *)l_18 + 51) == 0) return;
-    l_14 = object_building(*(int *)((char *)l_18 + 51));
+    l_18 = a2->args[1].object;
+    if (l_18->twin == 0) return;
+    l_14 = object_building(l_18->twin);
     if (l_14 == 0) return;
-    building_grant_access(l_14, (int)(unsigned char)*(signed char *)((char *)a2 + 43), *(int *)game_minutes + *(int *)((char *)a2 + 58));
+    building_grant_access(l_14, (unsigned char)a2->args[2].value, *(int *)game_minutes + a2->args[3].value);
 }
 
-int qcond_op01_item_given_to_npc(int a1, int a2)
+int qcond_op01_item_given_to_npc(struct quest *a1, struct qbn_op *a2)
 {
     int l_24;
-    int l_20;
-    int l_1C;
+    struct record *l_20;
+    struct record *l_1C;
     int l_18;
 
-    l_20 = *(int *)((char *)a2 + 32);
+    l_20 = a2->args[1].object;
     l_1C = l_20;
     if (l_1C != 0) goto L29358;
     return 0;
 L29358:;
-    if (*(int *)((char *)l_1C + 51) != 0) goto L2936D;
+    if (l_1C->twin != 0) goto L2936D;
     return 0;
 L2936D:;
-    l_1C = *(int *)((char *)l_1C + 51);
+    l_1C = l_1C->twin;
 L29376:;
     if (l_1C == 0) goto L29387;
-    if (l_1C != *(int *)player_entity) goto L29389;
+    if (l_1C != player_entity) goto L29389;
 L29387:;
     goto L29394;
 L29389:;
-    l_1C = *(int *)((char *)l_1C + 67);
+    l_1C = l_1C->parent;
     goto L29376;
 L29394:;
-    if (l_1C == *(int *)player_entity) goto L293AB;
+    if (l_1C == player_entity) goto L293AB;
     return 0;
 L293AB:;
-    if (((int)(unsigned char)*(signed char *)(*(char **)((char *)a2 + 47))) != 65) goto L293D2;
-    if (*(short *)(*(char **)quest_event_object2 + 71) == *(short *)(*(char **)((char *)a2 + 47) + 25)) goto L293E2;
+    if (a2->args[2].object->type != 65) goto L293D2;
+    if (*(short *)(*(char **)quest_event_object2 + 71) == *(short *)((char *)a2->args[2].object + 25)) goto L293E2;
 L293D2:;
-    if (*(int *)(*(char **)quest_event_object2 + 51) != *(int *)((char *)a2 + 47)) goto L2942E;
+    if (*(int *)(*(char **)quest_event_object2 + 51) != (int)a2->args[2].object) goto L2942E;
 L293E2:;
     quest_set_state(a1, a2, 1);
-    func_000298F3(*(int *)(*(char **)((char *)a2 + 32) + 51));
-    object_delete(*(int *)(*(char **)((char *)a2 + 32) + 51));
-    *(int *)(*(char **)((char *)a2 + 32) + 51) = 0;
-    *(int *)((char *)a2 + 32) = 0;
+    func_000298F3(a2->args[1].object->twin);
+    object_delete(a2->args[1].object->twin);
+    a2->args[1].object->twin = 0;
+    a2->args[1].object = 0;
     return 1;
 L2942E:;
     return 0;
 }
 
-int qcond_op03_event_object(int a1, int a2)
+int qcond_op03_event_object(struct quest *a1, struct qbn_op *a2)
 {
-    if (*(int *)(*(char **)quest_event_object + 51) != *(int *)((char *)a2 + 32)) goto L2947D;
+    if (*(int *)(*(char **)quest_event_object + 51) != (int)a2->args[1].object) goto L2947D;
     quest_set_state(a1, a2, 1);
     return 1;
 L2947D:;
     return 0;
 }
 
-int qcond_op21_event_same_kind(int a1, int a2)
+int qcond_op21_event_same_kind(struct quest *a1, struct qbn_op *a2)
 {
-    if (*(short *)(*(char **)((char *)a2 + 32) + 29) != *(short *)(*(char **)quest_event_object + 29)) goto L294D2;
+    if ((short)a2->args[1].object->image2 != *(short *)(*(char **)quest_event_object + 29)) goto L294D2;
     quest_set_state(a1, a2, 1);
     return 1;
 L294D2:;
     return 0;
 }
 
-int qcond_op02_event_count(int a1, int a2)
+int qcond_op02_event_count(struct quest *a1, struct qbn_op *a2)
 {
-    int l_18;
+    struct qbn_foe *l_18;
 
-    l_18 = *(int *)((char *)a2 + 22);
-    if (*(short *)(*(char **)((char *)a2 + 32) + 29) != *(short *)(*(char **)quest_event_object + 29)) goto L29558;
-    if ((short)(short)((int)(unsigned char)*(signed char *)((char *)l_18 + 5)) >= *(short *)((char *)a2 + 43)) goto L29558;
+    l_18 = (struct qbn_foe *)a2->args[1].record;
+    if ((short)a2->args[1].object->image2 != *(short *)(*(char **)quest_event_object + 29)) goto L29558;
+    if ((short)(short)((int)(unsigned char)*(signed char *)((char *)l_18 + 5)) >= (short)a2->args[2].value) goto L29558;
     (*(signed char *)((char *)l_18 + 5))++;
-    if ((short)((int)(unsigned char)*(signed char *)((char *)l_18 + 5)) != *(short *)((char *)a2 + 43)) goto L29558;
+    if ((short)((int)(unsigned char)*(signed char *)((char *)l_18 + 5)) != (short)a2->args[2].value) goto L29558;
     quest_set_state(a1, a2, 1);
     return 1;
 L29558:;
     return 0;
 }
 
-void func_0002956B(int a1)
+void func_0002956B(struct record *a1)
 {
-    if (*(int *)((char *)a1 + 51) == 0) return;
-    *(int *)((char *)a1 + 31) = object_new_id(((unsigned)*(int *)(*(char **)D_00195AC4 + 31)) >> 16);
-    *(int *)(*(char **)((char *)a1 + 51) + 51) = 0;
-    *(int *)((char *)a1 + 51) = 0;
+    if (a1->twin == 0) return;
+    a1->id = object_new_id(D_00195AC4->id >> 16);
+    a1->twin->twin = 0;
+    a1->twin = 0;
 }
 
-void quest_op87_respawn(int a1, int a2)
+void quest_op87_respawn(struct quest *a1, struct qbn_op *a2)
 {
-    int l_18;
+    struct qbn_foe *l_18;
     int l_14;
 
-    if (*(int *)((char *)a2 + 73) == 0) return;
-    if (((unsigned)(*(int *)game_minutes - *(int *)((char *)a2 + 83))) < *(int *)((char *)a2 + 43)) return;
-    *(int *)((char *)a2 + 83) = *(int *)game_minutes;
-    l_18 = *(int *)((char *)a2 + 22);
-    if (*(int *)(*(char **)((char *)l_18 + 10) + 51) == 0) goto L296FB;
-    if (((int)(unsigned char)*(signed char *)(*(char **)(*(char **)((char *)l_18 + 10) + 51))) != 34) return;
-    object_delete(*(int *)(*(char **)((char *)l_18 + 10) + 51));
+    if (a2->args[4].value == 0) return;
+    if (((unsigned)(*(int *)game_minutes - a2->last_minutes)) < a2->args[2].value) return;
+    a2->last_minutes = *(int *)game_minutes;
+    l_18 = (struct qbn_foe *)a2->args[1].record;
+    if (l_18->object->twin == 0) goto L296FB;
+    if (l_18->object->twin->type != 34) return;
+    object_delete(l_18->object->twin);
     if (*(signed char *)D_00187CA8 == 0) goto L296FB;
     world_collect_objects();
 L296FB:;
-    if ((rand() % 100) > *(int *)((char *)a2 + 58)) return;
-    if (*(int *)((char *)a2 + 73) == (-1)) goto L29725;
-    (*(int *)((char *)a2 + 73))--;
+    if ((rand() % 100) > a2->args[3].value) return;
+    if (a2->args[4].value == (-1)) goto L29725;
+    a2->args[4].value--;
 L29725:;
     qaction_place_foe(a2, 0);
 }
 
-int qcond_op28_event_person(int a1, int a2)
+int qcond_op28_event_person(struct quest *a1, struct qbn_op *a2)
 {
-    if (((int)(unsigned char)*(signed char *)(*(char **)((char *)a2 + 32))) != 65) goto L29773;
-    if (*(short *)(*(char **)((char *)a2 + 32) + 25) == *(short *)(*(char **)quest_event_object + 71)) goto L2978E;
+    if (a2->args[1].object->type != 65) goto L29773;
+    if (*(short *)((char *)a2->args[1].object + 25) == *(short *)(*(char **)quest_event_object + 71)) goto L2978E;
 L29773:;
-    if (*(int *)(*(char **)quest_event_object + 51) != *(int *)((char *)a2 + 32)) goto L2978C;
-    if (*(int *)((char *)a2 + 13) != (-1)) goto L2978E;
+    if (*(int *)(*(char **)quest_event_object + 51) != (int)a2->args[1].object) goto L2978C;
+    if (a2->args[0].value != (-1)) goto L2978E;
 L2978C:;
     goto L297A7;
 L2978E:;
@@ -1349,11 +1350,11 @@ L297A7:;
     return 0;
 }
 
-int qcond_op70_player_has_items(int a1, int a2)
+int qcond_op70_player_has_items(struct quest *a1, struct qbn_op *a2)
 {
     int l_20;
     int l_1C;
-    int l_18;
+    struct record *l_18;
 
     l_20 = 2;
 L297D4:;
@@ -1363,32 +1364,32 @@ L297DF:;
     l_20++;
     goto L297D4;
 L297E7:;
-    if (*(int *)((char *)((l_20 * 15) + a2) + 13) == (-1)) goto L297DF;
-    l_18 = *(int *)((char *)((l_20 * 15) + a2) + 17);
+    if (a2->args[l_20].value == (-1)) goto L297DF;
+    l_18 = a2->args[l_20].object;
     if (l_18 == 0) goto L29810;
-    if (*(int *)((char *)l_18 + 51) != 0) goto L2982E;
+    if (l_18->twin != 0) goto L2982E;
 L29810:;
     quest_set_arg_state(a1, a2, 1, 0);
     return 0;
 L2982E:;
-    if (l_18 != (-1768515946)) goto L29855;
+    if ((int)l_18 != (-1768515946)) goto L29855;
     quest_set_arg_state(a1, a2, 1, 0);
     return 0;
 L29855:;
-    l_18 = *(int *)((char *)l_18 + 51);
-    if (l_18 != (-1768515946)) goto L29882;
+    l_18 = l_18->twin;
+    if ((int)l_18 != (-1768515946)) goto L29882;
     quest_set_arg_state(a1, a2, 1, 0);
     return 0;
 L29882:;
     if (l_18 == 0) goto L29893;
-    if (l_18 != *(int *)player_entity) goto L29895;
+    if (l_18 != player_entity) goto L29895;
 L29893:;
     goto L298A0;
 L29895:;
-    l_18 = *(int *)((char *)l_18 + 67);
+    l_18 = l_18->parent;
     goto L29882;
 L298A0:;
-    if (l_18 == *(int *)player_entity) goto L298C6;
+    if (l_18 == player_entity) goto L298C6;
     quest_set_arg_state(a1, a2, 1, 0);
     return 0;
 L298C6:;
@@ -1398,7 +1399,7 @@ L298CB:;
     return 1;
 }
 
-void func_000298F3(int a1)
+void func_000298F3(struct record *a1)
 {
     int l_18;
 
@@ -1410,8 +1411,8 @@ L29913:;
     l_18++;
     goto L2990B;
 L2991B:;
-    if (*(int *)(*(char **)player_character + 367 + (l_18 << 2)) != a1) goto L2994C;
-    *(int *)(*(char **)player_character + 367 + (l_18 << 2)) = 0;
+    if (player_character->equipped[l_18] != a1) goto L2994C;
+    player_character->equipped[l_18] = 0;
 L2994C:;
     goto L29913;
 }

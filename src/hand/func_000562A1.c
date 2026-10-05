@@ -1,4 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x000562A1 */
+#include "records.h"
+
 struct pair { short a; short b; };
 extern unsigned char D_0012B508;
 extern short D_0012DA44;
@@ -24,8 +26,8 @@ extern char D_00190D03[];
 extern char D_00190D04[];
 extern char *spellshop_icons;
 extern struct pair itemmaker_slots[];
-extern char *itemmaker_item;
-extern int itemmaker_item_object;
+extern struct item *itemmaker_item;
+extern struct record *itemmaker_item_object;
 extern char D_00199910[];
 extern unsigned char inv_tab;
 extern char *spell_name_by_id(unsigned char);
@@ -33,7 +35,7 @@ extern int itemmaker_points_used(void);
 extern int itemmaker_gold_cost(void);
 extern void text_draw_colored(char *, short, short, short, unsigned char);
 extern int gold_total_alias(void);
-extern int inv_draw_item_cell(int, int, char *);
+extern int inv_draw_item_cell(struct record *, int, char *);
 extern void inv_draw_left_list(char *);
 extern char *func_000A0DD9(int, char *, int);
 extern void func_0012DB50(int);
@@ -51,12 +53,12 @@ void itemmaker_draw(void)
     func_00144F68(175, inv_tab * 9 + 6, 81, 9, spellshop_icons + inv_tab * 729);
     text_draw_colored(func_000A0DD9(gold_total_alias(), text_buffer, 10), 70, 15, 145, 156);
     if (itemmaker_item != 0)
-        text_draw_colored(itemmaker_item, 51, 3, 145, 156);
+        text_draw_colored(itemmaker_item->name, 51, 3, 145, 156);
     if (itemmaker_item != 0)
         text_draw_colored(func_000A0DD9(itemmaker_gold_cost(), text_buffer, 10), 63, 27, 145, 156);
     if (itemmaker_item != 0) {
         func_000A0ED9(161, D_001756A3);
-        mc_sprintf(text_buffer, D_001756AE, itemmaker_points_used(), *(unsigned short *)(itemmaker_item + 61));
+        mc_sprintf(text_buffer, D_001756AE, itemmaker_points_used(), itemmaker_item->enchant_points);
         text_draw_colored(text_buffer, 96, 39, 145, 156);
     }
     inv_draw_left_list(D_00185B54);

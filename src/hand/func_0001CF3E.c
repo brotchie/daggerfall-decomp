@@ -1,10 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0001CF3E */
-struct npc {
-    unsigned char f0;
-    unsigned char face;         /* 0x01 */
-    char pad2[31];
-    short id;                   /* 0x21 */
-};
+#include "records.h"
+
 struct msg {
     short id1;                  /* 0x00 */
     short id2;                  /* 0x02 */
@@ -28,9 +24,9 @@ extern unsigned char D_00196269;
 extern unsigned char D_001962A5;
 extern int rumor_file;
 extern int D_00196708;
-extern struct npc *D_0019670C;
-extern struct npc *D_0019671C;
-extern int faction_player_related(struct npc *);
+extern struct faction *D_0019670C;
+extern struct faction *D_0019671C;
+extern int faction_player_related(struct faction *);
 extern unsigned char func_0001D66C(struct msg *);
 extern void parse_rsc_text(int, int, int);
 extern int rand_range(int, int);
@@ -38,7 +34,7 @@ extern void mc_memset(char *, int, int, char *, int, int);
 extern int write(int, void *, int);
 extern int func_000A0DF4(char *);
 
-void rumor_add_faction(struct npc *a1, struct npc *a2, int a3, unsigned char a4, int a5)
+void rumor_add_faction(struct faction *a1, struct faction *a2, int a3, unsigned char a4, int a5)
 {
     int unused;
     struct msg m;
@@ -59,10 +55,10 @@ void rumor_add_faction(struct npc *a1, struct npc *a2, int a3, unsigned char a4,
     D_00196708++;
     if (a4 != 0)
         D_00196269 = a4;
-    else if (a1 != 0 && a1->face != 255)
-        D_00196269 = a1->face;
-    else if (a2 != 0 && a2->face != 255)
-        D_00196269 = a2->face;
+    else if (a1 != 0 && a1->region != 255)
+        D_00196269 = a1->region;
+    else if (a2 != 0 && a2->region != 255)
+        D_00196269 = a2->region;
     else
         D_00196269 = rand_range(0, 61);
     parse_rsc_text(a5, 0, 0);
