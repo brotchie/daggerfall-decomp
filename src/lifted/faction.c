@@ -17,7 +17,7 @@ extern char D_00195B84[];
 extern struct location *current_location;
 extern struct character *player_character;
 extern int game_minutes;
-extern int D_00195C44;
+extern char D_00195C44[];
 extern char D_001966BC[];
 extern int rumor_file;
 extern int D_00196708;
@@ -609,15 +609,15 @@ int rumor_pick_news(short a1)
     *(int *)((char *)l_40 + 16) = 0;
     *(int *)&l_1C = 0;
     if (disk_file_exists((int)D_001704BB) == 0) return 0;
-    disk_read_file((int)D_001704BB, D_00195C44);
+    disk_read_file((int)D_001704BB, *(int *)D_00195C44);
     if (*(int *)disk_last_file_size == 0) return 0;
-    *(int *)((char *)l_40 + 24) = (int)(*(char **)&D_00195C44 + *(int *)disk_last_file_size);
-    *(int *)&l_20 = D_00195C44;
+    *(int *)((char *)l_40 + 24) = (int)(*(char **)D_00195C44 + *(int *)disk_last_file_size);
+    *(int *)&l_20 = *(int *)D_00195C44;
     *(int *)l_40 = rand_range(1, 100);
     *(int *)((char *)l_40 + 4) = rand_range(1, 100);
     *(int *)((char *)l_40 + 8) = rand_range(1, 100);
     *(int *)((char *)l_40 + 12) = rand_range(1, 100);
-    *(int *)((char *)l_40 + 20) = D_00195C44 + 40000;
+    *(int *)((char *)l_40 + 20) = *(int *)D_00195C44 + 40000;
     while (((unsigned)*(int *)&l_20) < *(int *)((char *)l_40 + 24)) {
         if (func_0001D54B(*(int *)&l_20, (int)(short)a1, 0, *(int *)((char *)l_40 + ((*(int *)&l_1C & 3) << 2))) != 0) {
             *(int *)((char *)(int)(*(char **)((char *)l_40 + 20) + ((*(int *)((char *)l_40 + 16))++ << 2))) = *(int *)&l_20;
@@ -627,8 +627,8 @@ int rumor_pick_news(short a1)
     }
     if (*(int *)((char *)l_40 + 16) == 0) return 0;
     *(int *)&l_20 = *(int *)((char *)((rand_range(0, *(int *)((char *)l_40 + 16) - 1) << 2) + *(int *)((char *)l_40 + 20)));
-    mc_memcpy(D_00195C44, *(int *)&l_20 + 34, *(int *)(*(char **)&l_20 + 26), (int)D_00170464, 1701, 4);
-    return D_00195C44;
+    mc_memcpy(*(int *)D_00195C44, *(int *)&l_20 + 34, *(int *)(*(char **)&l_20 + 26), (int)D_00170464, 1701, 4);
+    return *(int *)D_00195C44;
 }
 
 int func_0001D46A(int a1)
@@ -637,14 +637,14 @@ int func_0001D46A(int a1)
     int l_1C;
 
     if (disk_file_exists((int)D_001704BB) == 0) return 0;
-    disk_read_file((int)D_001704BB, D_00195C44);
+    disk_read_file((int)D_001704BB, *(int *)D_00195C44);
     if (*(int *)disk_last_file_size == 0) return 0;
-    l_1C = (int)(*(char **)&D_00195C44 + *(int *)disk_last_file_size);
-    l_20 = (struct rumor *)D_00195C44;
+    l_1C = (int)(*(char **)D_00195C44 + *(int *)disk_last_file_size);
+    l_20 = (struct rumor *)*(int *)D_00195C44;
     while (((unsigned)l_20) < l_1C) {
         if (((int)(unsigned char)(l_20->flags & 2)) != 0 && l_20->target == a1) {
-            mc_memcpy(D_00195C44, (int)l_20 + 34, l_20->text_length, (int)D_00170464, 1720, 4);
-            return D_00195C44;
+            mc_memcpy(*(int *)D_00195C44, (int)l_20 + 34, l_20->text_length, (int)D_00170464, 1720, 4);
+            return *(int *)D_00195C44;
         }
         l_20 = (struct rumor *)(((int)l_20 + l_20->text_length) + 34);
     }
@@ -687,7 +687,7 @@ void rumor_file_purge(void)
     disk_read_file((int)D_001704BB, D_00147954);
     if (*(int *)disk_last_file_size == 0) return;
     l_28 = (struct rumor *)D_00147954;
-    l_24 = D_00195C44;
+    l_24 = *(int *)D_00195C44;
     l_20 = (int)(*(char **)&D_00147954 + *(int *)disk_last_file_size);
     while (((unsigned)l_28) < l_20) {
         if (((int)(unsigned char)(l_28->flags & 4)) != 0) {
@@ -702,14 +702,14 @@ void rumor_file_purge(void)
                 if (((int)(unsigned char)(l_28->flags & 32)) == 0) {
                     l_18++;
                     l_24 = rumor_copy(l_24, l_28);
-                    if (l_18 > 200) func_0001DA9C((struct rumor *)D_00195C44, l_24);
+                    if (l_18 > 200) func_0001DA9C((struct rumor *)*(int *)D_00195C44, l_24);
                 }
             }
         }
 L1D9F4:;
         l_28 = (struct rumor *)(((int)l_28 + l_28->text_length) + 34);
     }
-    disk_write_arena2_file((int)D_001704BB, D_00195C44, l_24 - D_00195C44);
+    disk_write_arena2_file((int)D_001704BB, *(int *)D_00195C44, l_24 - *(int *)D_00195C44);
 }
 
 int rumor_copy(int a1, struct rumor *a2)

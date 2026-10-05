@@ -24,8 +24,7 @@ int options_open(short a1)
     int l_20;
 
     if (a1 != 0 || (game_mode == 0 && key_pressed_once(1) != 0)) {
-        do {
-        } while (key_down_esc != 0);
+        while (key_down_esc != 0);
         func_0007EE38();
         D_00187CA8 = 0;
         game_mode = 7;

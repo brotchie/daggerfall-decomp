@@ -201,8 +201,7 @@ int spellbook_close(void)
         D_001940D4 &= 251;
         picklist_free(&D_001A9AB8);
     }
-    do {
-    } while (key_down_esc != 0);
+    while (key_down_esc != 0);
     while (mouse_buttons != 0) func_0012B136();
     D_001940D8 &= 253;
     game_mode = 0;
@@ -252,14 +251,14 @@ void spellbook_draw_spell(struct spell *a1)
 
 void spellbook_effect_help(int a1)
 {
-    {
-        int l_1C;
+{
+    int l_1C;
 
-        if (selected_spell->effects[(int)(short)*(short *)&a1].type == 255) return;
-        spell_effect_slot = a1;
-        D_001940D5 |= 1;
-        msgbox_show_rsc((int)(short)(spell_effect_text_index((int)(short)*(short *)&a1) + 1200), 1);
-    }
+    if (selected_spell->effects[(int)(short)*(short *)&a1].type == 255) return;
+    spell_effect_slot = a1;
+    D_001940D5 |= 1;
+    msgbox_show_rsc((int)(short)(spell_effect_text_index((int)(short)*(short *)&a1) + 1200), 1);
+}
 }
 
 void spellbook_effect1_button(void)
@@ -358,7 +357,6 @@ int func_00042380(void)
             if (((int)(short)*(short *)((char *)((l_2C << 2) + l_34) + 67)) == (-1)) break;
             if (((int)(short)*(short *)((char *)((l_2C << 2) + l_34) + 67)) == 3) {
                 switch (*(unsigned short *)((char *)((l_2C << 2) + l_34) + 69)) {
-                    break;
                 case 0:
                 case 1:
                 case 2:

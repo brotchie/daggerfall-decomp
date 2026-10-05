@@ -60,7 +60,6 @@ void inpstr_begin_number(int a1)
 int inpstr_handle_key(unsigned char a1)
 {
     switch ((unsigned char)a1) {
-        goto L8C89D;
     case 13:
         func_0012B3ED();
         return atoi(inpstr_text);
@@ -78,13 +77,13 @@ int inpstr_handle_key(unsigned char a1)
         break;
     case 129:
         if (((unsigned)((int)(short)inpstr_cursor)) < func_000A0DF4(inpstr_text)) {
-            (inpstr_cursor)++;
+            inpstr_cursor++;
         }
         break;
     case 8:
         if (inpstr_cursor != 0) {
             mc_memcpy((int)(*(char **)&inpstr_text + ((int)(short)inpstr_cursor)) - 1, (int)(*(char **)&inpstr_text + ((int)(short)inpstr_cursor)), (int)&*(signed char *)((char *)(func_000A0DF4(inpstr_text) - ((int)(short)inpstr_cursor)) + 1), (int)D_00176E2C, 217, 4);
-            (inpstr_cursor)--;
+            inpstr_cursor--;
         }
         break;
     case 127:
@@ -93,7 +92,6 @@ int inpstr_handle_key(unsigned char a1)
         }
         break;
     default:
-L8C89D:;
         if (((int)(unsigned char)a1) < 128 && ((unsigned)func_000A0DF4(inpstr_text)) < ((int)(short)inpstr_max_length)) {
             if (input_digits_only != 0 && (((int)(unsigned char)a1) < 48 || ((int)(unsigned char)a1) > 57)) {
             } else if (((font_text_width(inpstr_text) + font_char_width((int)(unsigned char)a1)) + ((int)(unsigned short)D_00195F36)) < ((int)(short)D_00142948)) {

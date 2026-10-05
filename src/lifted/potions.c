@@ -212,8 +212,7 @@ int func_0008FC3A(void)
 
 int potionmaker_close(void)
 {
-    do {
-    } while (key_down_esc != 0);
+    while (key_down_esc != 0);
     game_mode = 0;
     if (window_image != 0 && window_image != (-1751672937)) {
         mc_free(window_image, (int)D_00176E94, 359);

@@ -34,10 +34,10 @@ extern int view_look_pitch;
 extern int D_001959BC;
 extern struct record *camera_object;
 extern struct record *player_object;
-extern char *hud_bar_image;
+extern char hud_bar_image[];
 extern int game_minutes;
 extern struct settings *game_settings;
-extern int D_00195C44;
+extern char D_00195C44[];
 extern int D_00195CF4;
 extern int D_00195D48;
 extern signed char climate_weathers[];
@@ -45,8 +45,8 @@ extern signed char D_00196286;
 extern signed char D_0019629B;
 extern int D_001970E0;
 extern int D_001970E4;
-extern int moon0_image;
-extern int moon1_image;
+extern char moon0_image[];
+extern char moon1_image[];
 extern int D_0019857C;
 extern int moon0_phase;
 extern int moon1_phase;
@@ -96,8 +96,8 @@ void sky_init(void)
 
     D_0019629B = 0;
     D_00195D48 = 10000;
-    moon0_image = disk_read_file((int)D_00170A6C, 0);
-    moon1_image = disk_read_file((int)D_00170A79, 0);
+    *(int *)moon0_image = disk_read_file((int)D_00170A6C, 0);
+    *(int *)moon1_image = disk_read_file((int)D_00170A79, 0);
     D_001970E0 = mc_malloc(112640, (int)D_00170A86, 93);
     D_001970E4 = mc_malloc(112640, (int)D_00170A86, 94);
     D_00196286 = 13;
@@ -140,13 +140,13 @@ void sky_free(void)
 {
     int l_18;
 
-    if (moon0_image != 0 && moon0_image != (-1751672937)) {
-        mc_free(moon0_image, (int)D_00170A86, 368);
-        moon0_image = -1751672937;
+    if (*(int *)moon0_image != 0 && *(int *)moon0_image != (-1751672937)) {
+        mc_free(*(int *)moon0_image, (int)D_00170A86, 368);
+        *(int *)moon0_image = -1751672937;
     }
-    if (moon1_image != 0 && moon1_image != (-1751672937)) {
-        mc_free(moon1_image, (int)D_00170A86, 369);
-        moon1_image = -1751672937;
+    if (*(int *)moon1_image != 0 && *(int *)moon1_image != (-1751672937)) {
+        mc_free(*(int *)moon1_image, (int)D_00170A86, 369);
+        *(int *)moon1_image = -1751672937;
     }
     if (D_001970E0 != 0 && D_001970E0 != (-1751672937)) {
         mc_free(D_001970E0, (int)D_00170A86, 370);
@@ -238,9 +238,9 @@ void sky_load_day(int a1)
     l_28 = disk_open_data((int)text_buffer);
     l_24 &= 31;
     lseek(l_28, (int)&*(signed char *)((char *)(l_24 * 776) + 11), 0);
-    func_000A00CB(l_28, D_00195C44, 93);
-    func_000CD33A(D_00195C44, 1, 31);
-    mc_memcpy((int)(D_0012B500 + 3), D_00195C44, 93, (int)D_00170A86, 565, 4);
+    func_000A00CB(l_28, *(int *)D_00195C44, 93);
+    func_000CD33A(*(int *)D_00195C44, 1, 31);
+    mc_memcpy((int)(D_0012B500 + 3), *(int *)D_00195C44, 93, (int)D_00170A86, 565, 4);
     func_000359B4(game_minutes);
     lseek(l_28, (l_24 << 14) + 24832, 0);
     func_000A00CB(l_28, D_00195CF4, 16384);
@@ -263,12 +263,12 @@ void sky_draw_day(int a1, int a2, int a3, int a4)
     int l_C;
 
     D_0019629B = 0;
-    l_14 = ((((int)(unsigned short)(game_settings->view_flags & 1)) != 0) ? 199 : (int)(unsigned short)*(short *)(hud_bar_image + 2));
+    l_14 = ((((int)(unsigned short)(game_settings->view_flags & 1)) != 0) ? 199 : (int)(unsigned short)*(short *)(*(char **)hud_bar_image + 2));
     if (((int)(unsigned char)(climate_weathers[a4] & 127)) == 3 || ((int)(unsigned char)(climate_weathers[a4] & 128)) != 0) {
         mc_memset(screen_buffer, 119, l_14 * 320, (int)D_00170A86, 598, 4);
         return;
     }
-    l_14 = ((((int)(unsigned short)(game_settings->view_flags & 1)) != 0) ? 199 : (int)(unsigned short)*(short *)(hud_bar_image + 2));
+    l_14 = ((((int)(unsigned short)(game_settings->view_flags & 1)) != 0) ? 199 : (int)(unsigned short)*(short *)(*(char **)hud_bar_image + 2));
     l_28 = (139 - a1) << 9;
     if (l_28 < 0) l_28 = 0;
     l_24 = ((camera_object->yaw + D_001959BC) - 705) & 2047;
@@ -330,9 +330,9 @@ void func_00035A64(int a1)
 
 void sky_load_night(void)
 {
-    disk_read_file((int)D_00170A98, D_00195C44);
-    func_000CD33A(D_00195C44 + 11, 1, 31);
-    mc_memcpy((int)D_0012B500 + 3, (int)&*(signed char *)(*(char **)&D_00195C44 + 11), 93, (int)D_00170A86, 671, 4);
+    disk_read_file((int)D_00170A98, *(int *)D_00195C44);
+    func_000CD33A(*(int *)D_00195C44 + 11, 1, 31);
+    mc_memcpy((int)D_0012B500 + 3, (int)&*(signed char *)(*(char **)D_00195C44 + 11), 93, (int)D_00170A86, 671, 4);
     func_000A0ED9(673, (int)D_00170A86);
     mc_sprintf((int)text_buffer, (int)D_00170AA5, (int)(unsigned char)D_0017A3E5[climate_category()]);
     disk_read_file((int)text_buffer, D_001970E0);
@@ -352,7 +352,7 @@ void sky_draw_night(int a1, int a2)
     int l_14;
 
     if (D_0019629B == 0) sky_load_night();
-    l_1C = ((((int)(unsigned short)(game_settings->view_flags & 1)) != 0) ? 199 : (int)(unsigned short)*(short *)(hud_bar_image + 2));
+    l_1C = ((((int)(unsigned short)(game_settings->view_flags & 1)) != 0) ? 199 : (int)(unsigned short)*(short *)(*(char **)hud_bar_image + 2));
     l_30 = (139 - a1) << 9;
     if (l_30 < 0) l_30 = 0;
     l_2C = ((camera_object->yaw + D_001959BC) - 705) & 2047;

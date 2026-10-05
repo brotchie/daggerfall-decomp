@@ -106,14 +106,14 @@ extern struct character *player_character;
 extern struct career *player_class;
 extern int game_minutes;
 extern struct settings *game_settings;
-extern int D_00195C44;
+extern char D_00195C44[];
 extern int D_00195D2C;
 extern int D_00195D30;
 extern int trade_mode;
 extern int inventory_action;
 extern int free_later_count;
 extern int player_death_timer;
-extern char *D_00195DA8;
+extern char D_00195DA8[];
 extern int cfg_magic_repair;
 extern short D_00195F2E;
 extern char D_00195FB1[];
@@ -471,8 +471,7 @@ void inventory_close(void)
 
     if (inv_left_container == wagon_container && trade_mode == 1) inv_select_tab(41);
     if (inv_right_container == wagon_container) inv_wagon_button();
-    do {
-    } while (key_down_esc != 0);
+    while (key_down_esc != 0);
     if (trade_mode == 0) func_00097F6F();
     if (trade_mode == 2 || trade_mode == 4 || trade_mode == 3) {
         l_1C = D_00195B34->children;
@@ -505,8 +504,8 @@ void inventory_close(void)
         inv_right_container->flags |= 0x200;
     }
     if (inv_right_container->type == 33) inv_right_container->flags |= 1;
-    if (((int)(unsigned char)*(signed char *)(D_00195DA8)) == 33 && *(int *)(D_00195DA8 + 63) == 0) {
-        *(signed char *)(D_00195DA8 + 22) |= 2;
+    if (((int)(unsigned char)*(signed char *)(*(char **)D_00195DA8)) == 33 && *(int *)(*(char **)D_00195DA8 + 63) == 0) {
+        *(signed char *)(*(char **)D_00195DA8 + 22) |= 2;
     }
     if (D_00195ADC != 0) ((int (*)())(D_00195ADC))();
     if (inv_temp_pile != 0 && inv_temp_pile->children == 0) object_delete(inv_temp_pile);
@@ -581,9 +580,9 @@ void func_00093BD9(int a1, int a2, int a3)
     l_14 = *(short *)((char *)l_24 + 6);
     func_0007D19B((int)&l_18, (int)&l_14, (int)(short)((*(short *)((char *)((a3 * 12) + a2) + 4) - *(short *)((char *)((a3 * 12) + a2))) - 4), (int)(short)((*(short *)((char *)((a3 * 12) + a2) + 6) - *(short *)((char *)((a3 * 12) + a2) + 2)) - 4));
     for (a3 = 0; ((int)(unsigned short)*(short *)((char *)l_24 + 6)) > a3; a3++) {
-        mc_memcpy((int)(*(char **)&D_00195C44 + (a3 << 8)), (l_24 + 12) + (((int)(unsigned short)*(short *)((char *)l_24 + 4)) * a3), (int)(unsigned short)*(short *)((char *)l_24 + 4), (int)D_0017704C, 787, 4);
+        mc_memcpy((int)(*(char **)D_00195C44 + (a3 << 8)), (l_24 + 12) + (((int)(unsigned short)*(short *)((char *)l_24 + 4)) * a3), (int)(unsigned short)*(short *)((char *)l_24 + 4), (int)D_0017704C, 787, 4);
     }
-    func_000C0700(((int)(short)l_20) - (((int)(short)l_18) >> 1), ((int)(short)l_1C) - (((int)(short)l_14) >> 1), (int)(short)l_18, (int)(short)l_14, (int)(unsigned short)*(short *)((char *)l_24 + 4), (int)(unsigned short)*(short *)((char *)l_24 + 6), 0, D_00195C44);
+    func_000C0700(((int)(short)l_20) - (((int)(short)l_18) >> 1), ((int)(short)l_1C) - (((int)(short)l_14) >> 1), (int)(short)l_18, (int)(short)l_14, (int)(unsigned short)*(short *)((char *)l_24 + 4), (int)(unsigned short)*(short *)((char *)l_24 + 6), 0, *(int *)D_00195C44);
     func_000A0ED9(791, (int)D_0017704C);
     mc_sprintf((int)text_buffer, (int)D_001770C0, macro_kg_weight());
     text_draw_colored((int)text_buffer, (int)(short)(*(short *)((char *)((a3 * 12) + a2)) + 3), (int)(short)(*(short *)((char *)((a3 * 12) + a2) + 2) + 2), 145, 156);
@@ -621,7 +620,6 @@ void inv_click_list_row(int a1, int a2)
 {
     a1 -= a2;
     switch ((unsigned)a1) {
-        break;
     case 0:
         a1 = 4;
         break;
@@ -949,7 +947,7 @@ void inv_item_info(struct record *a1, struct item *a2)
         if (a2->enchantments[0].type == 26) {
             msgbox_show_rsc(1015, 1);
         } else {
-            l_14 = D_00195C44 + 63000;
+            l_14 = *(int *)D_00195C44 + 63000;
             book_read_header(l_14, (int)(unsigned short)(short)a2->message);
             text_macro_book = l_14;
             msgbox_show_rsc(1009, 1);
@@ -1026,7 +1024,7 @@ void inv_list_left_item(struct record *a1, int a2)
     if (((int)(unsigned char)game_mode) == 10) {
         if (l_14->enchantments[0].type != (-1)) return;
     }
-    (D_001AA586)++;
+    D_001AA586++;
 }
 
 void inv_equip_in_slot_pair(struct record *a1, int a2, int a3)
@@ -1816,7 +1814,7 @@ int func_000993CB(int a1)
     int l_1C;
 
     l_20 = 0;
-    l_1C = D_00195C44 + 55000;
+    l_1C = *(int *)D_00195C44 + 55000;
     *(signed char *)((char *)l_1C) = 0;
     while (((int)(signed char)*(signed char *)((char *)(a1 + l_20))) != (-2) && l_20 < 8) {
         func_000A1054(l_1C, ((int)item_templates) + (((int)(short)*(short *)((char *)(int)(*(char **)(D_00185F88 + (((int)(signed char)*(signed char *)((char *)(a1 + l_20) + 10)) << 2)) + (((int)(signed char)*(signed char *)((char *)(a1 + l_20))) * 2)))) * 48), (int)D_0017704C, 3200, 4);

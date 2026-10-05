@@ -32,7 +32,7 @@ extern signed char D_001940D4;
 extern struct record *player_object;
 extern struct record *D_00195AC4;
 extern struct location *current_location;
-extern int D_00195C44;
+extern char D_00195C44[];
 extern signed char current_region;
 extern signed char mouse_buttons_prev;
 extern int region_location_type_counts[];
@@ -41,7 +41,7 @@ extern int D_00196800;
 extern int D_00196808;
 extern char location_exterior[];
 extern int D_00196A28;
-extern char *rmb_block;
+extern char rmb_block[];
 extern char region_dungeon_type_counts[];
 extern char *D_00196A7C;
 extern struct map_location *location_here;
@@ -117,7 +117,7 @@ void region_locations_load_discovered(int a1)
     int l_18;
 
     l_2C = D_00196A9C;
-    l_28 = D_00195C44;
+    l_28 = *(int *)D_00195C44;
     l_18 = mc_malloc(4096, (int)D_001704CC, 57);
     func_000A0ED9(59, (int)D_001704CC);
     mc_sprintf(l_18, (int)D_001704D7, a1);
@@ -148,7 +148,7 @@ void region_locations_save_discovered(int a1)
     int l_18;
 
     l_2C = D_00196A9C;
-    l_28 = D_00195C44;
+    l_28 = *(int *)D_00195C44;
     l_18 = mc_malloc(4096, (int)D_001704CC, 88);
     for (l_1C = 0; l_1C < D_00196A28; l_1C++, l_2C++, l_28++) {
         *(signed char *)((char *)l_28) = rand() & -193;
@@ -159,7 +159,7 @@ void region_locations_save_discovered(int a1)
     mc_sprintf(l_18, (int)D_001704D7, a1);
     l_24 = archive_open((int)cfg_mapsave_file, 0, 1);
     l_20 = archive_find_record(l_24, l_18, 12);
-    archive_write_record(l_24, l_20, D_00195C44);
+    archive_write_record(l_24, l_20, *(int *)D_00195C44);
     archive_close(l_24);
     if (l_18 == 0 || l_18 == (-1751672937)) return;
     mc_free(l_18, (int)D_001704CC, 103);
@@ -195,7 +195,7 @@ void maploads_load_region(int a1)
         (region_location_type_counts[((l_24->x_type_flags << 2) >> 27)])++;
         if (l_24->dungeon_type != 255) {
             (*(int *)(region_dungeon_type_counts + (l_24->dungeon_type << 2)))++;
-            (region_dungeon_count)++;
+            region_dungeon_count++;
         }
     }
     region_locations_load_discovered(a1);
@@ -249,7 +249,7 @@ void location_load_dungeon(struct loaded_location *a1, int a2)
     int l_18;
     int l_14;
 
-    l_14 = D_00195C44;
+    l_14 = *(int *)D_00195C44;
     func_000A0ED9(248, (int)D_001704CC);
     mc_sprintf((int)text_buffer, (int)D_00170500, (int)(unsigned char)current_region);
     l_1C = archive_find_record(maps_bsa, (int)text_buffer, 13);
@@ -276,7 +276,7 @@ void location_load_dungeon_by_id(struct loaded_location *a1, int a2)
     int l_18;
     int l_14;
 
-    l_14 = D_00195C44;
+    l_14 = *(int *)D_00195C44;
     func_000A0ED9(287, (int)D_001704CC);
     mc_sprintf((int)text_buffer, (int)D_00170500, (int)(unsigned char)current_region);
     l_1C = archive_find_record(maps_bsa, (int)text_buffer, 13);
@@ -359,13 +359,13 @@ void rmb_index_records(void)
     int l_1C;
     int l_18;
 
-    l_1C = (int)rmb_block + 6776;
-    for (l_18 = 0; ((int)(unsigned char)*(signed char *)(rmb_block)) > l_18; l_18++) {
-        *(int *)(rmb_block + 1475 + (l_18 << 2)) = l_1C;
-        l_1C += *(int *)(rmb_block + 1603 + (l_18 << 2));
+    l_1C = *(int *)rmb_block + 6776;
+    for (l_18 = 0; ((int)(unsigned char)*(signed char *)(*(char **)rmb_block)) > l_18; l_18++) {
+        *(int *)(*(char **)rmb_block + 1475 + (l_18 << 2)) = l_1C;
+        l_1C += *(int *)(*(char **)rmb_block + 1603 + (l_18 << 2));
     }
-    *(int *)(rmb_block + 1731) = l_1C;
-    *(int *)(rmb_block + 1735) = (int)(*(char **)(rmb_block + 1731) + (((int)(unsigned char)*(signed char *)(rmb_block + 1)) * 66));
+    *(int *)(*(char **)rmb_block + 1731) = l_1C;
+    *(int *)(*(char **)rmb_block + 1735) = (int)(*(char **)(*(char **)rmb_block + 1731) + (((int)(unsigned char)*(signed char *)(*(char **)rmb_block + 1)) * 66));
 }
 
 void func_0001E928(struct record *a1)
@@ -379,69 +379,58 @@ void func_0001E928(struct record *a1)
     int l_1C;
     int l_18;
 
-    l_20 = ((int)(unsigned char)*(signed char *)(rmb_block + 1)) * 66;
-    l_20 += ((int)(unsigned char)*(signed char *)(rmb_block + 2)) * 17;
+    l_20 = ((int)(unsigned char)*(signed char *)(*(char **)rmb_block + 1)) * 66;
+    l_20 += ((int)(unsigned char)*(signed char *)(*(char **)rmb_block + 2)) * 17;
     l_34 = object_create_child(a1, 0, l_20);
     l_34->type = 56;
-    l_34->model_count = (unsigned short)(unsigned char)*(signed char *)(rmb_block + 1);
-    l_34->flat_count = (unsigned short)(unsigned char)*(signed char *)(rmb_block + 2);
+    l_34->model_count = (unsigned short)(unsigned char)*(signed char *)(*(char **)rmb_block + 1);
+    l_34->flat_count = (unsigned short)(unsigned char)*(signed char *)(*(char **)rmb_block + 2);
     l_34->id = D_00195AC4->id;
     l_30 = (int)RECORD_DATA(l_34);
-    l_2C = l_30 + (((int)(unsigned char)*(signed char *)(rmb_block + 1)) * 66);
-    mc_memcpy(l_30, *(int *)(rmb_block + 1731), ((int)(unsigned char)*(signed char *)(rmb_block + 1)) * 66, (int)D_001704CC, 565, 4);
-    mc_memcpy(l_2C, *(int *)(rmb_block + 1735), ((int)(unsigned char)*(signed char *)(rmb_block + 2)) * 17, (int)D_001704CC, 566, 4);
-    for (l_24 = 0; ((int)(unsigned char)*(signed char *)(rmb_block + 1)) > l_24; l_24++, (*(char (**)[66])&l_30)++) {
+    l_2C = l_30 + (((int)(unsigned char)*(signed char *)(*(char **)rmb_block + 1)) * 66);
+    mc_memcpy(l_30, *(int *)(*(char **)rmb_block + 1731), ((int)(unsigned char)*(signed char *)(*(char **)rmb_block + 1)) * 66, (int)D_001704CC, 565, 4);
+    mc_memcpy(l_2C, *(int *)(*(char **)rmb_block + 1735), ((int)(unsigned char)*(signed char *)(*(char **)rmb_block + 2)) * 17, (int)D_001704CC, 566, 4);
+    for (l_24 = 0; ((int)(unsigned char)*(signed char *)(*(char **)rmb_block + 1)) > l_24; l_24++, (*(char (**)[66])&l_30)++) {
         *(int *)((char *)l_30 + 4) = 0;
         *(int *)((char *)l_30 + 36) += block_origin_x;
         *(int *)((char *)l_30 + 44) += block_origin_z;
         *(int *)((char *)l_30 + 40) += func_0014B45B(*(int *)((char *)l_30 + 36), *(int *)((char *)l_30 + 44));
     }
-    l_24 = 0;
-L1EA8C:;
-    if (((int)(unsigned char)*(signed char *)(rmb_block + 2)) > l_24) goto L1EAB2;
-    goto L1EC01;
-L1EAA3:;
-    l_24++;
-    (*(char (**)[17])&l_2C)++;
-    goto L1EA8C;
-L1EAB2:;
-    *(int *)((char *)l_2C) += block_origin_x;
-    *(int *)((char *)l_2C + 8) += block_origin_z;
-    *(int *)((char *)l_2C + 4) += func_0014B45B(*(int *)((char *)l_2C), *(int *)((char *)l_2C + 8));
-    if (*(short *)((char *)l_2C + 14) != 0) {
-        l_34 = rmb_make_flat(a1, (int)(short)*(short *)((char *)l_2C + 12), (int)(short)*(short *)((char *)l_2C + 14), 0);
-        l_34->x = *(int *)((char *)l_2C);
-        l_34->y = *(int *)((char *)l_2C + 4);
-        l_34->z = *(int *)((char *)l_2C + 8);
-        *(short *)((char *)l_2C + 12) = 0;
-        goto L1EBFC;
-    }
-    switch (((int)(unsigned short)*(short *)((char *)l_2C + 12)) >> 7) {
-    case 502:
-    case 503:
-    case 504:
-    case 510:
-        *(short *)((char *)l_2C + 12) = (nature_texture_archive << 7) + (*(short *)((char *)l_2C + 12) & 63);
-        goto L1EBFC;
-    case 210:
-        {
-            int l_40;
-            while ((l_28 = func_00135DE4(((int)(unsigned short)*(short *)((char *)l_2C + 12)) >> 7, (int)(unsigned short)(*(short *)((char *)l_2C + 12) & 49))) == 0) {
-                func_00135E39();
+    for (l_24 = 0; ((int)(unsigned char)*(signed char *)(*(char **)rmb_block + 2)) > l_24; l_24++, (*(char (**)[17])&l_2C)++) {
+        *(int *)((char *)l_2C) += block_origin_x;
+        *(int *)((char *)l_2C + 8) += block_origin_z;
+        *(int *)((char *)l_2C + 4) += func_0014B45B(*(int *)((char *)l_2C), *(int *)((char *)l_2C + 8));
+        if (*(short *)((char *)l_2C + 14) != 0) {
+            l_34 = rmb_make_flat(a1, (int)(short)*(short *)((char *)l_2C + 12), (int)(short)*(short *)((char *)l_2C + 14), 0);
+            l_34->x = *(int *)((char *)l_2C);
+            l_34->y = *(int *)((char *)l_2C + 4);
+            l_34->z = *(int *)((char *)l_2C + 8);
+            *(short *)((char *)l_2C + 12) = 0;
+        } else {
+            {
+                int l_40;
+                switch (((int)(unsigned short)*(short *)((char *)l_2C + 12)) >> 7) {
+                case 502:
+                case 503:
+                case 504:
+                case 510:
+                    *(short *)((char *)l_2C + 12) = (nature_texture_archive << 7) + (*(short *)((char *)l_2C + 12) & 63);
+                    break;
+                case 210:
+                    while ((l_28 = func_00135DE4(((int)(unsigned short)*(short *)((char *)l_2C + 12)) >> 7, (int)(unsigned short)(*(short *)((char *)l_2C + 12) & 49))) == 0) {
+                        func_00135E39();
+                    }
+                    if (((int)(unsigned short)*(short *)((char *)l_28 + 6)) < 255) {
+                        l_40 = (int)(unsigned short)*(short *)((char *)l_28 + 6);
+                    } else {
+                        l_40 = 255;
+                    }
+                    *(signed char *)((char *)l_2C + 16) = *(signed char *)&l_40;
+                }
             }
-            if (((int)(unsigned short)*(short *)((char *)l_28 + 6)) < 255) {
-                l_40 = (int)(unsigned short)*(short *)((char *)l_28 + 6);
-            } else {
-                l_40 = 255;
-            }
-            *(signed char *)((char *)l_2C + 16) = *(signed char *)&l_40;
-        default:
-L1EBFC:;
-            goto L1EAA3;
-L1EC01:;
-            mc_memcpy(RECORD_DATA(a1), (int)&*(signed char *)(rmb_block + 6347), 429, (int)D_001704CC, 607, 4);
         }
     }
+    mc_memcpy(RECORD_DATA(a1), (int)&*(signed char *)(*(char **)rmb_block + 6347), 429, (int)D_001704CC, 607, 4);
 }
 
 void town_load_blocks(void)
@@ -456,10 +445,9 @@ void town_load_blocks(void)
 
     l_30 = current_location->buildings;
     D_00196808 = 0;
-    *(int *)&rmb_block = D_00147954;
+    *(int *)rmb_block = D_00147954;
     blocks_bsa = archive_open((int)D_0017053F, 0, 0);
     switch (current_location->kind) {
-        goto L1ECD0;
     case 0:
         if ((current_location->width * current_location->height) == 64) {
             D_00196800 = 66;
@@ -471,7 +459,6 @@ void town_load_blocks(void)
         D_00196800 = 33;
         break;
     default:
-L1ECD0:;
         D_00196800 = 0;
     }
     for (l_1C = 0; current_location->height > l_1C; l_1C++) {
@@ -483,7 +470,7 @@ L1ECD0:;
             rmb_index_records();
             town_map_add_block(l_20, (int)&*(signed char *)((char *)(current_location->height - l_1C) - 1));
             town_block_apply_ground(block_origin_x, block_origin_z);
-            for (l_24 = 0; ((int)(unsigned char)*(signed char *)(rmb_block)) > l_24; l_24++) {
+            for (l_24 = 0; ((int)(unsigned char)*(signed char *)(*(char **)rmb_block)) > l_24; l_24++) {
                 func_0001E854(l_30, l_24);
                 l_28 = rmb_add_building(l_2C, l_24);
                 if ((l_28->flags & 8) == 0) {

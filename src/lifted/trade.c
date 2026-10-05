@@ -19,7 +19,7 @@ extern int D_0018DD54;
 extern int D_0018DD5C;
 extern signed char text_buffer[];
 extern struct building *current_building;
-extern int D_00195C44;
+extern char D_00195C44[];
 extern signed char msgbox_button_keys;
 extern signed char D_00196034;
 extern signed char D_00196035;
@@ -81,7 +81,7 @@ void trade_counter_offer(void)
     int l_18;
 
     D_0012B508 = 146;
-    l_18 = D_00195C44 + 55000;
+    l_18 = *(int *)D_00195C44 + 55000;
     func_000A0ED9(141, (int)D_00175A30);
     mc_sprintf(l_18, (int)D_00175A6A);
     *(signed char *)((char *)(func_000A0DF4(l_18) + l_18) + 1) = 0;

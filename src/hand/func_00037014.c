@@ -27,7 +27,7 @@ extern int spellshop_icons;
 extern int list_popup_callback;
 extern struct character *player_character;
 extern int window_image;
-extern int D_00195C44;
+extern char D_00195C44[];
 extern short spell_effect_slot;
 extern unsigned char D_00196271;
 extern signed char game_mode;
@@ -93,7 +93,7 @@ void spellmaker_update(void)
     if (!*spellmaker_settings_kind && !D_001940D4.f)
         spellmaker_effect_rows();
     if (D_001940D4.f && (i = spells_list_poll()) > -1)
-        (*(void (**)(int))((char *)&list_popup_callback))((*(unsigned char **)&D_00195C44)[i + 32000]);
+        (*(void (**)(int))((char *)&list_popup_callback))((*(unsigned char **)D_00195C44)[i + 32000]);
     spellmaker_settings_update();
     if (D_0019962C > -1 && *((char *)&D_00196271)) {
         if (D_00196271 == 1) {

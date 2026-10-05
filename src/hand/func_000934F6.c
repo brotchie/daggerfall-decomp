@@ -15,7 +15,7 @@ extern signed char game_mode;
 extern int D_001AA420;
 extern char inv_selected_item[];
 extern char inv_left_container[];
-extern int D_001AA600;
+extern char D_001AA600[];
 struct Rect { short x0, y0, x1, y1; char pad[4]; };
 
 extern void text_draw_colored(char *, short, short, int, unsigned char);
@@ -73,7 +73,7 @@ int inv_draw_item_cell(char *a1, short a2, struct Rect *a3)
         func_00093DCB(380, 7, a3, a2);
     if (U16(a1, 21) & 32)
         func_00093DCB(380, 6, a3, a2);
-    *(char **)&D_00195B80 = *(char **)&D_001AA600 + (*(unsigned char *)(l_38 + 56) << 8);
+    *(char **)&D_00195B80 = *(char **)D_001AA600 + (*(unsigned char *)(l_38 + 56) << 8);
     if (U16(l_38, 32) == 3 && U16(l_38, 34) == 8) {
         l_40++;
         (*(short *)(l_38 + 50))++;
@@ -83,7 +83,7 @@ int inv_draw_item_cell(char *a1, short a2, struct Rect *a3)
     else
         inv_draw_item_image(l_38, a3, a2);
     *(short *)(l_38 + 50) -= l_40;
-    *(char **)&D_00195B80 = *(char **)&D_001AA600;
+    *(char **)&D_00195B80 = *(char **)D_001AA600;
     if (U16(l_38, 32) == 3 && U16(l_38, 34) == 18) {
         func_000A0ED9(723, D_0017704C);
         mc_sprintf(((char *)text_buffer), D_001770B0, *(unsigned char *)(l_38 + 49));

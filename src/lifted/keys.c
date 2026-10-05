@@ -17,7 +17,6 @@ int key_action_pressed(int a1)
 
     if (((int)(unsigned char)*(signed char *)(key_map + a1)) >= 200) {
         switch (*(unsigned char *)(key_map + a1)) {
-            break;
         case 200:
         case 201:
             l_1C = ((((int)(unsigned char)*(signed char *)(key_map + a1)) == 200) ? 0 : 1);

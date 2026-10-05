@@ -6,7 +6,7 @@ extern int screen_buffer;
 extern char D_00175898[];
 extern char D_00185CDC[];
 extern int D_001959FC;
-extern char *hud_bar_image;
+extern char hud_bar_image[];
 extern int hud_mode_icons;
 extern char D_00195B78[];
 extern struct character *player_character;
@@ -47,7 +47,7 @@ void hud_draw(void)
     struct img *l_18;
 
     if ((game_settings->view_flags & 1) == 0) {
-        mc_memcpy(*(char **)&screen_buffer + ((int *)D_00142950)[IMG(((char *)&hud_bar_image))->y], IMG(((char *)&hud_bar_image))->data, IMG(((char *)&hud_bar_image))->size, D_00175898, 124, 4);
+        mc_memcpy(*(char **)&screen_buffer + ((int *)D_00142950)[IMG(hud_bar_image)->y], IMG(hud_bar_image)->data, IMG(hud_bar_image)->size, D_00175898, 124, 4);
         func_00144ED8(131, 154, 47, 22, *(char **)&hud_mode_icons + ((int *)D_00185CDC)[interaction_mode], 0);
         l_1C = hud_portrait_overlay_index();
         if (l_1C != -1) {

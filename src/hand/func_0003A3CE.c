@@ -28,7 +28,7 @@ extern signed char D_001940D5;
 extern struct character *player_character;
 extern struct career *player_class;
 extern int D_00195C40;
-extern int D_00195C44;
+extern char D_00195C44[];
 extern signed char msgbox_button_keys;
 extern signed char D_00196034;
 extern signed char msgbox_button_ids;
@@ -92,13 +92,13 @@ L3A3EC:;
         func_0012B136();
         goto L3A3EC;
     }
-    disk_read_file((int)D_00170B90, D_00195C44);
-    mc_memcpy(screen_buffer, D_00195C44, 64000, (int)D_00170B88, 55, 4);
+    disk_read_file((int)D_00170B90, *(int *)D_00195C44);
+    mc_memcpy(screen_buffer, *(int *)D_00195C44, 64000, (int)D_00170B88, 55, 4);
     mc_memcpy(655360, screen_buffer, 64000, (int)D_00170B88, 56, 4);
     for (l_28 = 0; ((int)(short)*(short *)&l_28) < 768; l_28++) {
-        (*(char **)&D_00195C44)[l_28 + 64000] <<= 2;
+        (*(char **)D_00195C44)[l_28 + 64000] <<= 2;
     }
-    func_000CD33A(D_00195C44 + 64000, 0, 256);
+    func_000CD33A(*(int *)D_00195C44 + 64000, 0, 256);
     D_00147964 &= 254;
 L3A496:;
     while (1) {
@@ -144,16 +144,16 @@ L3A496:;
         player_character->reflexes = 2;
         player_character->mobile_id = 200;
         mc_memset((int)player_class, 0, 74, (int)D_00170B88, 152, 4);
-        disk_read_file((int)D_00170BAD, D_00195C44);
+        disk_read_file((int)D_00170BAD, *(int *)D_00195C44);
         for (l_28 = 0; ((int)(short)*(short *)&l_28) < 768; l_28++) {
-            *(signed char *)((char *)(int)(*(char **)&D_00195C44 + ((int)(short)*(short *)&l_28))) <<= 2;
+            *(signed char *)((char *)(int)(*(char **)D_00195C44 + ((int)(short)*(short *)&l_28))) <<= 2;
         }
-        func_000CD367(D_00195C44);
+        func_000CD367(*(int *)D_00195C44);
         while (((int)D_00196271) != 1) {
-            disk_read_file((int)D_00170BB5, D_00195C44);
-            mc_memcpy(screen_buffer, D_00195C44, 64000, (int)D_00170B88, 161, 4);
+            disk_read_file((int)D_00170BB5, *(int *)D_00195C44);
+            mc_memcpy(screen_buffer, *(int *)D_00195C44, 64000, (int)D_00170B88, 161, 4);
             text_draw_centered_colored((int)D_00170BC2, 160, 16, 145, 156);
-            disk_read_file((int)D_00170BE6, D_00195C44);
+            disk_read_file((int)D_00170BE6, *(int *)D_00195C44);
             D_00147964 &= 254;
             D_001940D4 |= 1;
             l_18 = 255;
@@ -162,7 +162,7 @@ L3A496:;
                     l_18 = wait_key_from_list(0, 0);
                     if (((int)(signed char)l_18) == (-1)) goto L3A3EC;
                 }
-                l_18 = *(signed char *)((char *)(int)(*(char **)&D_00195C44 + (mouse_y * 320 + mouse_x)));
+                l_18 = *(signed char *)((char *)(int)(*(char **)D_00195C44 + (mouse_y * 320 + mouse_x)));
                 if (l_18 == 0) l_18 = 255;
                 if (l_18 > 0) {
                     while (mouse_buttons != 0) func_0012B136();
@@ -171,8 +171,8 @@ L3A496:;
                     D_00196090 = 5;
                     msgbox_button_keys = 21;
                     D_00196034 = 49;
-                    disk_read_file((int)D_00170BB5, D_00195C44);
-                    mc_memcpy(screen_buffer, D_00195C44, 64000, (int)D_00170B88, 186, 4);
+                    disk_read_file((int)D_00170BB5, *(int *)D_00195C44);
+                    mc_memcpy(screen_buffer, *(int *)D_00195C44, 64000, (int)D_00170B88, 186, 4);
                     mouse_buttons = (mouse_buttons_prev = 0);
                     func_0012B136();
                     while (mouse_buttons != 0) func_0012B136();
@@ -188,8 +188,8 @@ L3A496:;
         } else {
             player_character->flags |= 1;
         }
-        disk_read_file((int)D_00170BB5, D_00195C44);
-        mc_memcpy(screen_buffer, D_00195C44, 64000, (int)D_00170B88, 213, 4);
+        disk_read_file((int)D_00170BB5, *(int *)D_00195C44);
+        mc_memcpy(screen_buffer, *(int *)D_00195C44, 64000, (int)D_00170B88, 213, 4);
         l_3C = disk_read_file((int)D_00170BF3, 0);
         func_00144F68(68, 28, 184, 144, l_3C);
         if (l_3C != 0 && l_3C != (-1751672937)) {
@@ -216,18 +216,18 @@ L3A496:;
         }
         if (((int)(short)*(short *)&l_28) == 2) {
 L3AABE:;
-            disk_read_file((int)D_00170BAD, D_00195C44);
+            disk_read_file((int)D_00170BAD, *(int *)D_00195C44);
             for (l_28 = 0; ((int)(short)*(short *)&l_28) < 768; l_28++) {
-                *(signed char *)((char *)(int)(*(char **)&D_00195C44 + ((int)(short)*(short *)&l_28))) <<= 2;
+                *(signed char *)((char *)(int)(*(char **)D_00195C44 + ((int)(short)*(short *)&l_28))) <<= 2;
             }
-            func_000CD367(D_00195C44);
-            disk_read_file((int)D_00170BB5, D_00195C44);
-            mc_memcpy(screen_buffer, D_00195C44, 64000, (int)D_00170B88, 251, 4);
+            func_000CD367(*(int *)D_00195C44);
+            disk_read_file((int)D_00170BB5, *(int *)D_00195C44);
+            mc_memcpy(screen_buffer, *(int *)D_00195C44, 64000, (int)D_00170B88, 251, 4);
             picklist_open((int)D_0017CCFA);
             for (;;) {
                 keys_world_actions();
                 func_0012B136();
-                mc_memcpy(screen_buffer, D_00195C44, 64000, (int)D_00170B88, 258, 4);
+                mc_memcpy(screen_buffer, *(int *)D_00195C44, 64000, (int)D_00170B88, 258, 4);
                 l_28 = picklist_update();
                 if (((int)(short)*(short *)&l_28) > (-1)) {
                     D_00199634 = (int)(short)*(short *)&l_28;
@@ -242,8 +242,8 @@ L3AABE:;
                         disk_read_file((int)text_buffer, (int)player_class);
                         break;
                     }
-                    disk_read_file((int)D_00170BB5, D_00195C44);
-                    mc_memcpy(screen_buffer, D_00195C44, 64000, (int)D_00170B88, 278, 4);
+                    disk_read_file((int)D_00170BB5, *(int *)D_00195C44);
+                    mc_memcpy(screen_buffer, *(int *)D_00195C44, 64000, (int)D_00170B88, 278, 4);
                     picklist_open((int)D_0017CCFA);
                 }
                 D_00147964 &= 254;
@@ -252,14 +252,14 @@ L3AABE:;
             }
         } else {
             if ((D_00199634 = class_questions_run()) < 0) goto L3AABE;
-            disk_read_file((int)D_00170BAD, D_00195C44);
+            disk_read_file((int)D_00170BAD, *(int *)D_00195C44);
             for (l_28 = 0; ((int)(short)*(short *)&l_28) < 768; l_28++) {
-                *(signed char *)((char *)(int)(*(char **)&D_00195C44 + ((int)(short)*(short *)&l_28))) <<= 2;
+                *(signed char *)((char *)(int)(*(char **)D_00195C44 + ((int)(short)*(short *)&l_28))) <<= 2;
             }
-            func_000CD367(D_00195C44);
+            func_000CD367(*(int *)D_00195C44);
         }
-        disk_read_file((int)D_00170BB5, D_00195C44);
-        mc_memcpy(screen_buffer, D_00195C44, 64000, (int)D_00170B88, 299, 4);
+        disk_read_file((int)D_00170BB5, *(int *)D_00195C44);
+        mc_memcpy(screen_buffer, *(int *)D_00195C44, 64000, (int)D_00170B88, 299, 4);
         l_3C = disk_read_file((int)D_00170C0E, 0);
         func_00144F68((int)(unsigned short)*(short *)((char *)l_3C), (int)(unsigned short)*(short *)((char *)l_3C + 2), (int)(unsigned short)*(short *)((char *)l_3C + 4), (int)(unsigned short)*(short *)((char *)l_3C + 6), l_3C + 12);
         if (l_3C != 0 && l_3C != (-1751672937)) {

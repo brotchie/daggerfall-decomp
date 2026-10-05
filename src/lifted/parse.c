@@ -120,13 +120,13 @@ extern struct record *D_00195AC4;
 extern int D_00195ACC;
 extern int text_macro_book;
 extern struct building *tavern_building;
-extern int current_region_data;
+extern char current_region_data[];
 extern int weight_total;
 extern struct location *current_location;
 extern struct character *player_character;
 extern int game_minutes;
-extern int D_00195C44;
-extern char *D_00195D28;
+extern char D_00195C44[];
+extern char D_00195D28[];
 extern int D_00195D2C;
 extern int D_00195D30;
 extern int quest_potential_questor;
@@ -928,7 +928,7 @@ int func_0004827C(void)
 
 int macro_loc_where_building(void)
 {
-    return building_name(*(int *)(D_00195D28 + 18));
+    return building_name(*(int *)(*(char **)D_00195D28 + 18));
 }
 
 int macro_ltn_legal_standing(void)
@@ -1012,7 +1012,7 @@ int func_00048596(void)
     int l_1C;
 
     l_20 = rand();
-    srand((int)(unsigned short)*(short *)(((char *)current_region_data) + 78));
+    srand((int)(unsigned short)*(short *)(*(char **)current_region_data + 78));
     l_1C = name_generate((int)(unsigned char)D_00196267, (int)(unsigned char)(rand() & 1));
     srand(l_20);
     return l_1C;
@@ -1154,18 +1154,18 @@ int func_00048AE3(void)
 {
     int l_1C;
 
-    l_1C = faction_find((int)(short)*(short *)(((char *)current_region_data) + 76));
+    l_1C = faction_find((int)(short)*(short *)(*(char **)current_region_data + 76));
     return l_1C + 3;
 }
 
 int macro_pen_penalty(void)
 {
     if (((int)(signed char)D_00190D16) == 2) {
-        parse_expand(D_00184269, D_00195C44);
+        parse_expand(D_00184269, *(int *)D_00195C44);
     } else {
-        mc_strncpy(D_00195C44, penalty_texts[((int)(signed char)D_00190D16)], 4, (int)D_0017110C, 1182);
+        mc_strncpy(*(int *)D_00195C44, penalty_texts[((int)(signed char)D_00190D16)], 4, (int)D_0017110C, 1182);
     }
-    return D_00195C44;
+    return *(int *)D_00195C44;
 }
 
 int macro_pdg_more_prison_days(void)
@@ -1578,7 +1578,7 @@ int macro_sng_blank(void)
 
 int macro_reg_where_target_region(void)
 {
-    return *(int *)(region_names + (((int)(unsigned char)*(signed char *)(D_00195D28 + 7)) << 2));
+    return *(int *)(region_names + (((int)(unsigned char)*(signed char *)(*(char **)D_00195D28 + 7)) << 2));
 }
 
 int macro_t_ruler_title(void)
@@ -1598,7 +1598,7 @@ int macro_tem_town_temple(void)
 
 int func_00049AE7(void)
 {
-    return (int)faction_find_type_in_region((int)(short)((unsigned short)(unsigned char)*(signed char *)(D_00195D28 + 7)), 13)->child->name;
+    return (int)faction_find_type_in_region((int)(short)((unsigned short)(unsigned char)*(signed char *)(*(char **)D_00195D28 + 7)), 13)->child->name;
 }
 
 int macro_tcn_travel_city(void)
@@ -1802,7 +1802,7 @@ void object_weight_add(struct record *a1)
         for (l_18 = 0; l_18 < 10; l_18++) {
             switch ((unsigned short)l_1C->enchantments[l_18].type) {
             case 11:
-                (weight_total)++;
+                weight_total++;
                 return;
             case 23:
                 l_18 = l_1C->weight << 2;

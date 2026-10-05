@@ -41,7 +41,7 @@ extern int spfx_popup_handler;
 extern char D_00195B84[];
 extern struct character *player_character;
 extern int game_minutes;
-extern int D_00195C44;
+extern char D_00195C44[];
 extern int free_later_count;
 extern short D_00195F62;
 extern signed char current_region;
@@ -110,7 +110,7 @@ void spfx_dispel(struct record *a1, int a2, struct record *a3)
     switch (l_20->effects[a2].subtype) {
     case 0:
         l_10 = 0;
-        l_14 = D_00195C44;
+        l_14 = *(int *)D_00195C44;
         l_18 = player_entity->children;
         while (l_18 != 0) {
             if (l_18->type == 9) {
@@ -673,18 +673,18 @@ void spfx_effect_tick(struct record *a1, struct record *a2, int a3)
 
     l_10 = &a1->data.spell;
     switch (l_10->effects[a3].type) {
-    case 1:
-        spfx_damage(a1, a3, a2);
-        return;
-    case 18:
-        l_10->effects[a3].subtype = 8;
-        spfx_heal(a1, a3, a2);
-        return;
-    case 39:
-        D_001940D6 |= 16;
-        player_character->detect_kind = l_10->effects[a3].subtype;
-    default:;
-    }
+case 1:
+    spfx_damage(a1, a3, a2);
+    return;
+case 18:
+    l_10->effects[a3].subtype = 8;
+    spfx_heal(a1, a3, a2);
+    return;
+case 39:
+    D_001940D6 |= 16;
+    player_character->detect_kind = l_10->effects[a3].subtype;
+default:;
+}
 }
 
 void spfx_walk_effect_records(struct record *a1, int a2)

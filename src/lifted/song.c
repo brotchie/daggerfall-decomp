@@ -20,7 +20,7 @@ extern signed char D_00190D22;
 extern char D_00190D64[];
 extern signed char text_rsc_buffer[];
 extern struct character *player_character;
-extern int D_00195C44;
+extern char D_00195C44[];
 
 extern int rand_range(int, int);
 extern int rand();
@@ -48,7 +48,7 @@ void func_000209F3(int a1)
     func_000A1054((int)text_buffer, (int)text_rsc_buffer, (int)D_001706B6, 44, 160);
     func_000A0ED9(45, (int)D_001706B6);
     mc_sprintf((int)text_rsc_buffer, (int)D_001706BD, (int)text_buffer, l_1C);
-    mc_strncpy(D_00195C44 + 50000, (int)text_rsc_buffer, 4, (int)D_001706B6, 46);
+    mc_strncpy(*(int *)D_00195C44 + 50000, (int)text_rsc_buffer, 4, (int)D_001706B6, 46);
     for (l_1C = 0; l_1C < 26; l_1C++) {
         *(short *)(D_00190D64 + (l_1C * 2)) = rand_range(0, 21) + 900;
     }
@@ -56,10 +56,10 @@ void func_000209F3(int a1)
     l_18 = func_000CE790(*(int *)D_00179EA8, 33, l_1C);
     while (((int)(unsigned char)*(signed char *)((char *)l_18)) != 33) {
         parse_rsc_text((int)(short)D_00190CA2[((int)(unsigned char)*(signed char *)((char *)l_18++))], 0, 0);
-        func_000A1054(D_00195C44 + 50000, (int)text_rsc_buffer, (int)D_001706B6, 56, 4);
-        func_000A1054(D_00195C44 + 50000, (int)D_001706CA, (int)D_001706B6, 57, 4);
+        func_000A1054(*(int *)D_00195C44 + 50000, (int)text_rsc_buffer, (int)D_001706B6, 56, 4);
+        func_000A1054(*(int *)D_00195C44 + 50000, (int)D_001706CA, (int)D_001706B6, 57, 4);
     }
-    func_000A1054(D_00195C44 + 50000, (int)D_001706CD, (int)D_001706B6, 59, 4);
+    func_000A1054(*(int *)D_00195C44 + 50000, (int)D_001706CD, (int)D_001706B6, 59, 4);
 }
 
 void func_00020BBB(int a1)

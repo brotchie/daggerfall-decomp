@@ -17,7 +17,7 @@ extern short D_00195F5A;
 extern signed char player_on_ground;
 extern signed char D_00196296;
 extern int collide_candidate_count;
-extern int D_00196D4C;
+extern char D_00196D4C[];
 extern int D_00196D50;
 extern char collide_flags[];
 extern int func_0002294E(struct record *, int, struct move_request *);
@@ -77,9 +77,9 @@ int collide_move_player(struct record *a1, int a2, struct move_request *a3, int 
     D_00195CD8 = D_00195CD4 = 0;
     D_00196D50 = 0;
     collide_candidate_count = 0;
-    (*(struct vec3 **)&D_00196D4C = (struct vec3 *)D_00179F48)->x = a3->x;
-    (((struct vec3 *)D_00196D4C))->y = a3->y;
-    (((struct vec3 *)D_00196D4C))->z = a3->z;
+    (*(struct vec3 **)D_00196D4C = (struct vec3 *)D_00179F48)->x = a3->x;
+    (*(struct vec3 **)D_00196D4C)->y = a3->y;
+    (*(struct vec3 **)D_00196D4C)->z = a3->z;
     collide_for_each_nearby(a1, (int)func_0002325A);
     if (!((player_character->conditions & 0x8) || collide_candidate_count != 0 || player_environment == 1))
         return FLAGS = 16;

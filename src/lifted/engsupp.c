@@ -14,18 +14,18 @@ extern signed char itemmaker_slot_kinds[];
 extern signed char D_00190CE5;
 extern struct record *player_object;
 extern struct record *D_00195AC4;
-extern char *hud_bar_image;
+extern char hud_bar_image[];
 extern struct settings *game_settings;
-extern char *D_00195C88;
+extern char D_00195C88[];
 extern int D_00195CD0;
-extern char *D_00195D3C;
+extern char D_00195D3C[];
 extern char D_00195D54[];
-extern int D_00195DC0;
+extern char D_00195DC0[];
 extern char D_00196120[];
 extern signed char D_0019629F;
 extern int D_00196478;
 extern int D_0019647C;
-extern char *D_00196484;
+extern char D_00196484[];
 extern int climate_index;
 
 extern int func_00014334(int);
@@ -52,20 +52,20 @@ int engine_pick_object(int a1, int a2, int a3)
 {
     int l_14;
 
-    l_14 = ((((int)(unsigned short)(game_settings->view_flags & 1)) != 0) ? 199 : (int)(unsigned short)*(short *)(hud_bar_image + 2));
+    l_14 = ((((int)(unsigned short)(game_settings->view_flags & 1)) != 0) ? 199 : (int)(unsigned short)*(short *)(*(char **)hud_bar_image + 2));
     if (a2 > l_14) return 0;
     mc_memset(a3, 0, 18, (int)D_001702D4, 38, 4);
-    *(int *)&D_00196484 = a3;
-    if (*(int *)((char *)(*(int *)&D_00195C88 = func_0012A608(a1, a2)) + 4) == 1) return 0;
-    if (*(int *)(D_00195C88 + 4) != 0) {
-        D_0019647C = *(int *)(D_00195C88 + 4);
-        D_00195DC0 = *(int *)(D_00195C88);
+    *(int *)D_00196484 = a3;
+    if (*(int *)((char *)(*(int *)D_00195C88 = func_0012A608(a1, a2)) + 4) == 1) return 0;
+    if (*(int *)(*(char **)D_00195C88 + 4) != 0) {
+        D_0019647C = *(int *)(*(char **)D_00195C88 + 4);
+        *(int *)D_00195DC0 = *(int *)(*(char **)D_00195C88);
         world_for_each_object((int)func_0001410F);
     } else {
-        D_00196478 = (int)D_00195C88;
+        D_00196478 = *(int *)D_00195C88;
         world_for_each_object((int)func_00014334);
     }
-    return *(int *)(D_00196484) & 1;
+    return *(int *)(*(char **)D_00196484) & 1;
 }
 
 int func_00014048(int a1, short a2)
@@ -102,7 +102,7 @@ int func_0001410F(struct record *a1)
     struct block_model *l_20;
     int l_1C;
 
-    if (((struct bf8_0_1 *)(D_00196484))->f != 0) return 0;
+    if (((struct bf8_0_1 *)(*(char **)D_00196484))->f != 0) return 0;
     switch (a1->type) {
     case 43:
         l_24 = &a1->data.block;
@@ -110,11 +110,11 @@ int func_0001410F(struct record *a1)
         for (l_1C = 0; l_24->model_count > l_1C; l_1C++, l_20++) {
             if ((int)&l_20->model == D_0019647C) {
                 *(int *)D_00195D54 = l_1C;
-                *(int *)&D_00195D3C = (int)l_20;
-                *(signed char *)(D_00196484) |= 13;
-                *(int *)(D_00196484 + 4) = (int)a1;
-                *(int *)(D_00196484 + 8) = (int)&*(signed char *)((char *)(l_1C << 8) + func_00014438(D_0019647C, D_00195DC0));
-                *(short *)(D_00196484 + 12) = l_1C;
+                *(int *)D_00195D3C = (int)l_20;
+                *(signed char *)(*(char **)D_00196484) |= 13;
+                *(int *)(*(char **)D_00196484 + 4) = (int)a1;
+                *(int *)(*(char **)D_00196484 + 8) = (int)&*(signed char *)((char *)(l_1C << 8) + func_00014438(D_0019647C, *(int *)D_00195DC0));
+                *(short *)(*(char **)D_00196484 + 12) = l_1C;
                 return 1;
             }
         }
@@ -123,11 +123,11 @@ int func_0001410F(struct record *a1)
         l_20 = (struct block_model *)RECORD_DATA(a1);
         for (l_1C = 0; a1->model_count > l_1C; l_1C++, l_20++) {
             if ((int)&l_20->model == D_0019647C) {
-                *(signed char *)(D_00196484) |= 5;
-                *(int *)(D_00196484 + 4) = (int)a1;
-                *(int *)(D_00196484 + 8) = func_00014438(D_0019647C, D_00195DC0);
-                *(short *)(D_00196484 + 14) = l_20->id;
-                *(short *)(D_00196484 + 16) = l_20->variant;
+                *(signed char *)(*(char **)D_00196484) |= 5;
+                *(int *)(*(char **)D_00196484 + 4) = (int)a1;
+                *(int *)(*(char **)D_00196484 + 8) = func_00014438(D_0019647C, *(int *)D_00195DC0);
+                *(short *)(*(char **)D_00196484 + 14) = l_20->id;
+                *(short *)(*(char **)D_00196484 + 16) = l_20->variant;
                 return 1;
             }
         }
@@ -136,9 +136,9 @@ int func_0001410F(struct record *a1)
     case 32:
         l_28 = (int)RECORD_DATA(a1);
         if (D_0019647C == l_28) {
-            *(signed char *)(D_00196484) |= 5;
-            *(int *)(D_00196484 + 4) = (int)a1;
-            *(int *)(D_00196484 + 8) = func_00014438(l_28, D_00195DC0);
+            *(signed char *)(*(char **)D_00196484) |= 5;
+            *(int *)(*(char **)D_00196484 + 4) = (int)a1;
+            *(int *)(*(char **)D_00196484 + 8) = func_00014438(l_28, *(int *)D_00195DC0);
             return 1;
         }
     }

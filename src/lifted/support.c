@@ -47,7 +47,7 @@ extern int D_00195AB0;
 extern struct record *D_00195AC4;
 extern struct building *tavern_building;
 extern struct record *D_00195AF4;
-extern int picklist_image;
+extern char picklist_image[];
 extern int D_00195B00;
 extern int creature_count;
 extern struct record *guild_npc_object;
@@ -59,7 +59,7 @@ extern struct character *player_character;
 extern int game_minutes;
 extern int hud_message_ptrs[];
 extern int D_00195C3C;
-extern int D_00195C44;
+extern char D_00195C44[];
 extern int D_00195CD0;
 extern int D_00195CF0;
 extern int D_00195D5C;
@@ -314,7 +314,7 @@ void mode_push(void)
 
 void mode_pop(void)
 {
-    (mode_stack_depth)--;
+    mode_stack_depth--;
     D_00196272 = mode_stack[((int)(short)mode_stack_depth) * 2];
     game_mode = D_001A53E9[((int)(short)mode_stack_depth) * 2];
     if (mode_stack_depth != 0) {
@@ -343,11 +343,11 @@ void func_0007D19B(int a1, int a2, short a3, short a4)
 
 void picklist_open_strings(int a1)
 {
-    if (picklist_image == 0) picklist_image = disk_read_file((int)D_00176A1A, 0);
-    D_00195F40 = 160 - (((int)(unsigned short)*(short *)(((char *)picklist_image) + 4)) >> 1);
-    D_00195F3E = 100 - (((int)(unsigned short)*(short *)(((char *)picklist_image) + 6)) >> 1);
-    D_00195F42 = *(short *)(((char *)picklist_image) + 4);
-    D_00195F3C = *(short *)(((char *)picklist_image) + 6);
+    if (*(int *)picklist_image == 0) *(int *)picklist_image = disk_read_file((int)D_00176A1A, 0);
+    D_00195F40 = 160 - (((int)(unsigned short)*(short *)(*(char **)picklist_image + 4)) >> 1);
+    D_00195F3E = 100 - (((int)(unsigned short)*(short *)(*(char **)picklist_image + 6)) >> 1);
+    D_00195F42 = *(short *)(*(char **)picklist_image + 4);
+    D_00195F3C = *(short *)(*(char **)picklist_image + 6);
     picklist_init((int)picklist_control, (int)(short)(D_00195F40 + 25), (int)(short)(D_00195F3E + 26), 140, 73, (int)(short)(D_00195F40 + 179), (int)(short)(D_00195F3E + 11), 8, 9, (int)(short)(D_00195F40 + 179), (int)(short)(D_00195F3E + 109), 8, 9, (int)(short)(D_00195F40 + 179), (int)(short)(D_00195F3E + 22), 9, 83, 146, 146, 244, 114, 0);
     while (*(signed char *)((char *)a1) != 0) {
         picklist_add((int)picklist_control, a1, 0);
@@ -358,11 +358,11 @@ void picklist_open_strings(int a1)
 
 void picklist_open(int a1)
 {
-    if (picklist_image == 0) picklist_image = disk_read_file((int)D_00176A1A, 0);
-    D_00195F40 = 160 - (((int)(unsigned short)*(short *)(((char *)picklist_image) + 4)) >> 1);
-    D_00195F3E = 100 - (((int)(unsigned short)*(short *)(((char *)picklist_image) + 6)) >> 1);
-    D_00195F42 = *(short *)(((char *)picklist_image) + 4);
-    D_00195F3C = *(short *)(((char *)picklist_image) + 6);
+    if (*(int *)picklist_image == 0) *(int *)picklist_image = disk_read_file((int)D_00176A1A, 0);
+    D_00195F40 = 160 - (((int)(unsigned short)*(short *)(*(char **)picklist_image + 4)) >> 1);
+    D_00195F3E = 100 - (((int)(unsigned short)*(short *)(*(char **)picklist_image + 6)) >> 1);
+    D_00195F42 = *(short *)(*(char **)picklist_image + 4);
+    D_00195F3C = *(short *)(*(char **)picklist_image + 6);
     picklist_init((int)picklist_control, (int)(short)(D_00195F40 + 25), (int)(short)(D_00195F3E + 26), 140, 73, (int)(short)(D_00195F40 + 179), (int)(short)(D_00195F3E + 11), 8, 9, (int)(short)(D_00195F40 + 179), (int)(short)(D_00195F3E + 109), 8, 9, (int)(short)(D_00195F40 + 179), (int)(short)(D_00195F3E + 22), 9, 83, 146, 146, 244, 114, 0);
     while (*(int *)((char *)a1) != 0) {
         picklist_add((int)picklist_control, *(int *)((char *)(int)(*(char (**)[4])&a1)++), 0);
@@ -391,7 +391,7 @@ int picklist_frame(int a1)
 
 int picklist_update(void)
 {
-    func_00144F68((int)(short)D_00195F40, (int)(short)D_00195F3E, (int)(short)D_00195F42, (int)(short)D_00195F3C, picklist_image + 12);
+    func_00144F68((int)(short)D_00195F40, (int)(short)D_00195F3E, (int)(short)D_00195F42, (int)(short)D_00195F3C, *(int *)picklist_image + 12);
     return picklist_frame((int)picklist_control);
 }
 
@@ -403,7 +403,7 @@ int rand_range(int a1, int a2)
 void object_free_later(struct record *a1)
 {
     if (a1 == 0) return;
-    *(int *)(free_later_list + ((free_later_count)++ << 2)) = (int)a1;
+    *(int *)(free_later_list + (free_later_count++ << 2)) = (int)a1;
 }
 
 void object_free_pending(void)
@@ -419,7 +419,7 @@ void object_free_pending(void)
 void func_0007D774(int a1, int a2)
 {
     *(int *)(D_001A4FE8 + (D_00195D5C << 3)) = a1;
-    *(int *)(D_001A4FEC + ((D_00195D5C)++ << 3)) = a2;
+    *(int *)(D_001A4FEC + (D_00195D5C++ << 3)) = a2;
 }
 
 void spell_cast_queued_run(void)
@@ -451,9 +451,9 @@ void world_collect_object(struct record *a1)
         }
         return;
     case 18:
-        D_00190504[(creature_count)++] = a1;
+        D_00190504[creature_count++] = a1;
         if (func_0002586B(a1) != 0) {
-            (creature_count)--;
+            creature_count--;
         } else if (((struct bf8_4_1 *)&D_001940D6)->f != 0 && player_character->detect_kind == 1) {
             detect_consider_creature(a1, a1->detect_distance);
         }
@@ -488,7 +488,7 @@ void world_collect_object(struct record *a1)
         }
         return;
     case 53:
-        people_list[(people_count)++] = a1;
+        people_list[people_count++] = a1;
     default:;
     }
 }
@@ -570,7 +570,7 @@ void msgbox_prompt_number(int a1, int a2)
     int l_14;
 
     D_0012B508 = 146;
-    l_14 = D_00195C44 + 55000;
+    l_14 = *(int *)D_00195C44 + 55000;
     func_000A0ED9(610, (int)D_00176A10);
     mc_sprintf(l_14, (int)D_00176A27, a2);
     *(signed char *)((char *)(func_000A0DF4(l_14) + l_14) + 1) = 0;
@@ -1148,11 +1148,11 @@ void arrival_room_messages(void)
     int l_18;
 
     if (D_001A59D4 > 0) {
-        (D_001A59D4)--;
+        D_001A59D4--;
         return;
     }
     if (D_001A59D4 < 0) return;
-    (D_001A59D4)--;
+    D_001A59D4--;
     if (((int)player_environment) == 1 && location_contains(player_object->x, player_object->z) != 0) {
         if (current_location->kind != 4 && current_location->kind <= 9) {
             l_24 = 1;

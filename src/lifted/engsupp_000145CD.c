@@ -45,6 +45,7 @@ short texture_archive_for_climate(int a1, int a2)
             a1 = (((int)(signed char)itemmaker_slot_kinds[0]) * 100) + 68;
         }
         return a1;
+    default:
+        return a1;
     }
-    return a1;
 }

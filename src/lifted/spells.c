@@ -29,13 +29,13 @@ extern signed char D_001940D5;
 extern struct record *player_entity;
 extern struct record *player_object;
 extern char cheat_flags[];
-extern int picklist_image;
+extern char picklist_image[];
 extern struct spell *spell_records;
 extern char guild_npc_object[];
 extern int spellshop_icons;
 extern int list_popup_callback;
 extern int window_image;
-extern int D_00195C44;
+extern char D_00195C44[];
 extern short spell_effect_slot;
 extern short D_00195F3C;
 extern short D_00195F3E;
@@ -107,8 +107,7 @@ void spells_std_append(void);
 
 int spellmaker_exit(void)
 {
-    do {
-    } while (key_down_esc != 0);
+    while (key_down_esc != 0);
     if (((int)(unsigned char)(mouse_buttons & 2)) != 0) {
         if (((struct bf8_0_1 *)&cheat_flags)->f != 0) {
             func_00039F94();
@@ -139,7 +138,7 @@ void spellmaker_enter_name(void)
 {
     int l_18;
 
-    l_18 = D_00195C44 + 55000;
+    l_18 = *(int *)D_00195C44 + 55000;
     func_000A0ED9(744, (int)D_00170B13);
     mc_sprintf(l_18, (int)D_00170B1E, D_0017D1F6);
     *(signed char *)((char *)(func_000A0DF4(l_18) + l_18) + 1) = 0;
@@ -454,7 +453,7 @@ int spells_list_poll(void)
 {
     short l_18;
 
-    func_00144F68((int)(short)D_00195F40, (int)(short)D_00195F3E, (int)(short)D_00195F42, (int)(short)D_00195F3C, picklist_image + 12);
+    func_00144F68((int)(short)D_00195F40, (int)(short)D_00195F3E, (int)(short)D_00195F42, (int)(short)D_00195F3C, *(int *)picklist_image + 12);
     if (key_down_esc != 0) {
         if (((int)spellmaker_pick_subtype_cb) == list_popup_callback) {
             selected_spell->effects[(int)(short)spell_effect_slot].type = 255;
@@ -562,7 +561,7 @@ struct spell *spells_pick_list(void)
     if (l_2C == 0) return 0;
     func_0012DB50(4);
     picklist_open(l_2C);
-    l_28 = ((struct spell *)D_00195C44);
+    l_28 = *(struct spell **)D_00195C44;
     D_001940D4 |= 1;
     for (;;) {
         keys_world_actions();
@@ -594,10 +593,10 @@ int spells_std_name_list(int a1)
     short l_1C;
 
     if (a1 != 0) *(int *)&l_20 = memchr(a1, 255, 1000) - a1;
-    l_30 = D_00195C44 + 20000;
-    l_2C = D_00195C44 + 21000;
-    l_28 = ((struct spell *)D_00195C44);
-    disk_read_file((int)D_00170B69, D_00195C44);
+    l_30 = *(int *)D_00195C44 + 20000;
+    l_2C = *(int *)D_00195C44 + 21000;
+    l_28 = *(struct spell **)D_00195C44;
+    disk_read_file((int)D_00170B69, *(int *)D_00195C44);
     *(int *)&l_18 = 0;
     *(int *)&l_1C = *(int *)&l_18;
     for (; ((int)(short)l_18) < 128; (*(int *)&l_18)++) {
@@ -619,7 +618,7 @@ void func_00039F94(void)
     l_18 = spells_pick_list();
     if (l_18 == 0) return;
     l_18->name[0] = 0;
-    disk_write_arena2_file((int)D_00170B69, D_00195C44, 11392);
+    disk_write_arena2_file((int)D_00170B69, *(int *)D_00195C44, 11392);
 }
 
 void func_00039FD6(void)
@@ -630,7 +629,7 @@ void func_00039FD6(void)
     if (l_18 == 0) return;
     mc_memcpy((int)selected_spell, l_18, 89, (int)D_00170B13, 1654, 4);
     l_18->name[0] = 0;
-    disk_write_arena2_file((int)D_00170B69, D_00195C44, 11392);
+    disk_write_arena2_file((int)D_00170B69, *(int *)D_00195C44, 11392);
 }
 
 void spells_std_append(void)
@@ -638,11 +637,11 @@ void spells_std_append(void)
     struct spell *l_18;
 
     spell_assign_new_id();
-    l_18 = ((struct spell *)D_00195C44);
-    disk_read_file((int)D_00170B69, D_00195C44);
+    l_18 = *(struct spell **)D_00195C44;
+    disk_read_file((int)D_00170B69, *(int *)D_00195C44);
     while (l_18->name[0] != 0) l_18++;
     mc_memcpy(l_18, (int)selected_spell, 89, (int)D_00170B13, 1667, 4);
-    disk_write_arena2_file((int)D_00170B69, D_00195C44, 11392);
+    disk_write_arena2_file((int)D_00170B69, *(int *)D_00195C44, 11392);
     msgbox_show_rsc(1706, 1);
 }
 

@@ -65,10 +65,10 @@ extern char D_00190FE8[];
 extern struct record *player_entity;
 extern struct record *player_object;
 extern char cheat_flags[];
-extern int D_00195B5C;
+extern char D_00195B5C[];
 extern struct character *player_character;
 extern int window_image;
-extern int D_00195C44;
+extern char D_00195C44[];
 extern int D_00195D48;
 extern int D_00195DB0;
 extern signed char current_region;
@@ -82,16 +82,16 @@ extern int D_00196808;
 extern int D_00196A28;
 extern char *D_00196A7C;
 extern struct map_location *D_00196A9C;
-extern char *D_001AA64C;
-extern char *D_001AA650;
-extern char *D_001AA654;
-extern char *D_001AA658;
+extern char D_001AA64C[];
+extern char D_001AA650[];
+extern char D_001AA654[];
+extern char D_001AA658[];
 extern char D_001AA65C[];
 extern int D_001AA660;
 extern int D_001AA664;
-extern int D_001AA668;
+extern char D_001AA668[];
 extern int D_001AA66C;
-extern char *D_001AA670;
+extern char D_001AA670[];
 extern int D_001AA674;
 extern int D_001AA678;
 extern int D_001AA67C;
@@ -186,22 +186,22 @@ void travel_map_update(void)
     travel_draw_buttons();
     if (itemmaker_slot_kinds[0] != 0) {
         if (D_00190CE8 != 0) {
-            func_0009D5AC((int)(*(char **)&screen_buffer + 3840), (int)&*(signed char *)(*(char **)&D_001AA668 + 12), 51200);
+            func_0009D5AC((int)(*(char **)&screen_buffer + 3840), (int)&*(signed char *)(*(char **)D_001AA668 + 12), 51200);
         } else {
-            mc_memcpy((int)(*(char **)&screen_buffer + 3840), (int)&*(signed char *)(*(char **)&D_001AA668 + 12), 51200, (int)D_0017743D, 208, 4);
-            func_00144FB4((int)(unsigned short)*(short *)(D_001AA670), (int)(unsigned short)*(short *)(D_001AA670 + 2), (int)(unsigned short)*(short *)(D_001AA670 + 4), (int)(unsigned short)*(short *)(D_001AA670 + 6), (int)(D_001AA670 + 12));
+            mc_memcpy((int)(*(char **)&screen_buffer + 3840), (int)&*(signed char *)(*(char **)D_001AA668 + 12), 51200, (int)D_0017743D, 208, 4);
+            func_00144FB4((int)(unsigned short)*(short *)(*(char **)D_001AA670), (int)(unsigned short)*(short *)(*(char **)D_001AA670 + 2), (int)(unsigned short)*(short *)(*(char **)D_001AA670 + 4), (int)(unsigned short)*(short *)(*(char **)D_001AA670 + 6), (int)(*(char **)D_001AA670 + 12));
         }
         if (((int)(unsigned char)D_001AA6A4) > 1) {
             if (((int)(unsigned char)(D_001AA6A5 & 1)) == 0) {
-                func_00144F68((int)(unsigned short)*(short *)(D_001AA654), (int)(unsigned short)*(short *)(D_001AA654 + 2), (int)(unsigned short)*(short *)(D_001AA654 + 4), (int)(unsigned short)*(short *)(D_001AA654 + 6), (int)(D_001AA654 + 12));
+                func_00144F68((int)(unsigned short)*(short *)(*(char **)D_001AA654), (int)(unsigned short)*(short *)(*(char **)D_001AA654 + 2), (int)(unsigned short)*(short *)(*(char **)D_001AA654 + 4), (int)(unsigned short)*(short *)(*(char **)D_001AA654 + 6), (int)(*(char **)D_001AA654 + 12));
             } else {
-                func_00144F68((int)(unsigned short)*(short *)(D_001AA658), (int)(unsigned short)*(short *)(D_001AA658 + 2), (int)(unsigned short)*(short *)(D_001AA658 + 4), (int)(unsigned short)*(short *)(D_001AA658 + 6), (int)(D_001AA658 + 12));
+                func_00144F68((int)(unsigned short)*(short *)(*(char **)D_001AA658), (int)(unsigned short)*(short *)(*(char **)D_001AA658 + 2), (int)(unsigned short)*(short *)(*(char **)D_001AA658 + 4), (int)(unsigned short)*(short *)(*(char **)D_001AA658 + 6), (int)(*(char **)D_001AA658 + 12));
             }
             if (((int)(unsigned char)D_001AA6A4) > 2) {
                 if (((int)(unsigned char)(D_001AA6A5 & 2)) == 0) {
-                    func_00144F68((int)(unsigned short)*(short *)(D_001AA64C), (int)(unsigned short)*(short *)(D_001AA64C + 2), (int)(unsigned short)*(short *)(D_001AA64C + 4), (int)(unsigned short)*(short *)(D_001AA64C + 6), (int)(D_001AA64C + 12));
+                    func_00144F68((int)(unsigned short)*(short *)(*(char **)D_001AA64C), (int)(unsigned short)*(short *)(*(char **)D_001AA64C + 2), (int)(unsigned short)*(short *)(*(char **)D_001AA64C + 4), (int)(unsigned short)*(short *)(*(char **)D_001AA64C + 6), (int)(*(char **)D_001AA64C + 12));
                 } else {
-                    func_00144F68((int)(unsigned short)*(short *)(D_001AA650), (int)(unsigned short)*(short *)(D_001AA650 + 2), (int)(unsigned short)*(short *)(D_001AA650 + 4), (int)(unsigned short)*(short *)(D_001AA650 + 6), (int)(D_001AA650 + 12));
+                    func_00144F68((int)(unsigned short)*(short *)(*(char **)D_001AA650), (int)(unsigned short)*(short *)(*(char **)D_001AA650 + 2), (int)(unsigned short)*(short *)(*(char **)D_001AA650 + 4), (int)(unsigned short)*(short *)(*(char **)D_001AA650 + 6), (int)(*(char **)D_001AA650 + 12));
                 }
             }
         }
@@ -237,8 +237,7 @@ void travel_map_update(void)
     }
     if (((int)(unsigned char)game_mode) != 19) return;
     if (D_00190CE7 != 0) {
-        do {
-        } while (key_down_enter != 0);
+        while (key_down_enter != 0);
         key_pressed_once(28);
         D_00190CE7 = 0;
         l_50 = travel_find_location((int)text_rsc_buffer);
@@ -266,8 +265,7 @@ void travel_map_update(void)
             D_00195DB0 = (int)(D_00196A7C + ((travel_selected_location = l_50) << 5)) + 4;
             l_20 = 1132;
             D_001AA694 = (int)(*(char **)((char *)l_20) + 24);
-            do {
-            } while (key_down_enter != 0);
+            while (key_down_enter != 0);
             key_pressed_once(28);
         } else {
             msgbox_show_rsc(13, 1);
@@ -343,29 +341,29 @@ void travel_button_exit(int a1)
         mc_free(D_001AA66C, (int)D_0017743D, 382);
         D_001AA66C = -1751672937;
     }
-    if (D_00195B5C != 0 && D_00195B5C != (-1751672937)) {
-        mc_free(D_00195B5C, (int)D_0017743D, 383);
-        D_00195B5C = -1751672937;
+    if (*(int *)D_00195B5C != 0 && *(int *)D_00195B5C != (-1751672937)) {
+        mc_free(*(int *)D_00195B5C, (int)D_0017743D, 383);
+        *(int *)D_00195B5C = -1751672937;
     }
-    if ((int)D_001AA670 != 0 && (int)D_001AA670 != (-1751672937)) {
-        mc_free((int)D_001AA670, (int)D_0017743D, 384);
-        *(int *)&D_001AA670 = -1751672937;
+    if (*(int *)D_001AA670 != 0 && *(int *)D_001AA670 != (-1751672937)) {
+        mc_free(*(int *)D_001AA670, (int)D_0017743D, 384);
+        *(int *)D_001AA670 = -1751672937;
     }
-    if ((int)D_001AA64C != 0 && (int)D_001AA64C != (-1751672937)) {
-        mc_free((int)D_001AA64C, (int)D_0017743D, 385);
-        *(int *)&D_001AA64C = -1751672937;
+    if (*(int *)D_001AA64C != 0 && *(int *)D_001AA64C != (-1751672937)) {
+        mc_free(*(int *)D_001AA64C, (int)D_0017743D, 385);
+        *(int *)D_001AA64C = -1751672937;
     }
-    if ((int)D_001AA650 != 0 && (int)D_001AA650 != (-1751672937)) {
-        mc_free((int)D_001AA650, (int)D_0017743D, 386);
-        *(int *)&D_001AA650 = -1751672937;
+    if (*(int *)D_001AA650 != 0 && *(int *)D_001AA650 != (-1751672937)) {
+        mc_free(*(int *)D_001AA650, (int)D_0017743D, 386);
+        *(int *)D_001AA650 = -1751672937;
     }
-    if ((int)D_001AA654 != 0 && (int)D_001AA654 != (-1751672937)) {
-        mc_free((int)D_001AA654, (int)D_0017743D, 387);
-        *(int *)&D_001AA654 = -1751672937;
+    if (*(int *)D_001AA654 != 0 && *(int *)D_001AA654 != (-1751672937)) {
+        mc_free(*(int *)D_001AA654, (int)D_0017743D, 387);
+        *(int *)D_001AA654 = -1751672937;
     }
-    if ((int)D_001AA658 != 0 && (int)D_001AA658 != (-1751672937)) {
-        mc_free((int)D_001AA658, (int)D_0017743D, 388);
-        *(int *)&D_001AA658 = -1751672937;
+    if (*(int *)D_001AA658 != 0 && *(int *)D_001AA658 != (-1751672937)) {
+        mc_free(*(int *)D_001AA658, (int)D_0017743D, 388);
+        *(int *)D_001AA658 = -1751672937;
     }
     if (*(int *)D_001AA65C != 0 && *(int *)D_001AA65C != (-1751672937)) {
         mc_free(*(int *)D_001AA65C, (int)D_0017743D, 389);
@@ -375,9 +373,9 @@ void travel_button_exit(int a1)
         mc_free(D_001AA660, (int)D_0017743D, 390);
         D_001AA660 = -1751672937;
     }
-    if (D_001AA668 != 0 && D_001AA668 != (-1751672937)) {
-        mc_free(D_001AA668, (int)D_0017743D, 392);
-        D_001AA668 = -1751672937;
+    if (*(int *)D_001AA668 != 0 && *(int *)D_001AA668 != (-1751672937)) {
+        mc_free(*(int *)D_001AA668, (int)D_0017743D, 392);
+        *(int *)D_001AA668 = -1751672937;
     }
     game_mode = 0;
     D_00196272 = 0;
@@ -433,17 +431,17 @@ void travel_open_region(int a1)
         region_load_location_names(a1);
         travel_load_region_part();
     } else {
-        if (D_001AA668 != 0 && D_001AA668 != (-1751672937)) {
-            mc_free(D_001AA668, (int)D_0017743D, 460);
-            D_001AA668 = -1751672937;
+        if (*(int *)D_001AA668 != 0 && *(int *)D_001AA668 != (-1751672937)) {
+            mc_free(*(int *)D_001AA668, (int)D_0017743D, 460);
+            *(int *)D_001AA668 = -1751672937;
         }
         func_000A0ED9(461, (int)D_0017743D);
         mc_sprintf((int)text_buffer, (int)D_00177446, a1);
-        D_001AA668 = disk_read_file((int)text_buffer, 0);
+        *(int *)D_001AA668 = disk_read_file((int)text_buffer, 0);
         maploads_load_region(a1);
         region_load_location_names(a1);
         l_18 = screen_buffer;
-        screen_buffer = D_001AA668;
+        screen_buffer = *(int *)D_001AA668;
         travel_draw_locations();
         screen_buffer = l_18;
     }
@@ -563,10 +561,10 @@ void travel_button_map(void)
 
 void func_0009BE38(void)
 {
-    if (D_001AA668 != 0) {
-        if (D_001AA668 != 0 && D_001AA668 != (-1751672937)) {
-            mc_free(D_001AA668, (int)D_0017743D, 605);
-            D_001AA668 = -1751672937;
+    if (*(int *)D_001AA668 != 0) {
+        if (*(int *)D_001AA668 != 0 && *(int *)D_001AA668 != (-1751672937)) {
+            mc_free(*(int *)D_001AA668, (int)D_0017743D, 605);
+            *(int *)D_001AA668 = -1751672937;
         }
         *(int *)D_001AA688 = -1;
     }
@@ -628,7 +626,7 @@ void travel_button_find(void)
     sound_play(203, (int)player_object, 110);
     D_0012B508 = 145;
     func_00142790();
-    l_18 = D_00195C44 + 55000;
+    l_18 = *(int *)D_00195C44 + 55000;
     func_000A0ED9(807, (int)D_0017743D);
     mc_sprintf(l_18, (int)D_00177460, D_001846F4);
     *(signed char *)((char *)(func_000A0DF4(l_18) + l_18) + 1) = 0;
@@ -797,7 +795,7 @@ int travel_pixel_time(int a1, int a2)
     l_1C = func_00020057((a1 << 15) + 16384, (int)&*(signed char *)((char *)(a2 << 15) + 16384));
     l_18 = (travel_transport_factor * 102) / 256;
     if (D_00196285 != 0) {
-        (D_001AA674)++;
+        D_001AA674++;
         if (((int)(unsigned short)(*(short *)travel_options & 8)) != 0 || player_character->ship_owned != 0) {
             return 51;
         }
@@ -831,15 +829,15 @@ void travel_load_region_part(void)
 {
     int l_18;
 
-    if (D_001AA668 != 0 && D_001AA668 != (-1751672937)) {
-        mc_free(D_001AA668, (int)D_0017743D, 1119);
-        D_001AA668 = -1751672937;
+    if (*(int *)D_001AA668 != 0 && *(int *)D_001AA668 != (-1751672937)) {
+        mc_free(*(int *)D_001AA668, (int)D_0017743D, 1119);
+        *(int *)D_001AA668 = -1751672937;
     }
     func_000A0ED9(1121, (int)D_0017743D);
     mc_sprintf((int)text_buffer, (int)D_00177493, ((int)(unsigned char)D_001AA6A5) + 97, ((int)(signed char)itemmaker_slot_kinds[0]) - 1);
-    D_001AA668 = disk_read_file((int)text_buffer, 0);
+    *(int *)D_001AA668 = disk_read_file((int)text_buffer, 0);
     l_18 = screen_buffer;
-    screen_buffer = D_001AA668;
+    screen_buffer = *(int *)D_001AA668;
     travel_draw_locations();
     screen_buffer = l_18;
 }
@@ -922,9 +920,9 @@ void travel_draw_buttons(void)
     int l_18;
 
     if (itemmaker_slot_kinds[0] != 0) {
-        func_00144F68(3, 175, 45, 22, D_00195B5C);
+        func_00144F68(3, 175, 45, 22, *(int *)D_00195B5C);
     } else {
-        func_00144F68(3, 186, 45, 11, D_00195B5C + 495);
+        func_00144F68(3, 186, 45, 11, *(int *)D_00195B5C + 495);
     }
     for (l_24 = 0; l_24 < 4; l_24++) {
         l_20 = 1;

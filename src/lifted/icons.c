@@ -35,7 +35,7 @@ extern struct record *player_object;
 extern int D_00195ACC;
 extern struct character *player_character;
 extern struct settings *game_settings;
-extern char *magic_items_image;
+extern char magic_items_image[];
 extern signed char mouse_control_mode;
 extern signed char view_cursor_active;
 extern signed char D_00196272;
@@ -218,7 +218,7 @@ void magic_items_open(void)
     D_00187CA8 = 0;
     D_001940D8 &= 254;
     D_001940D4 |= 32;
-    *(int *)&magic_items_image = disk_read_file((int)D_001758A8, 0);
+    *(int *)magic_items_image = disk_read_file((int)D_001758A8, 0);
     D_00196272 = 1;
     magic_items_saved_screen = mc_malloc(64000, (int)D_00175898, 358);
     mc_memcpy(magic_items_saved_screen, screen_buffer, 64000, (int)D_00175898, 359, 4);
@@ -230,10 +230,9 @@ void magic_items_frame(void)
 
     if (((struct bf8_5_1 *)&D_001940D4)->f == 0) return;
     mc_memcpy(screen_buffer, magic_items_saved_screen, 64000, (int)D_00175898, 368, 4);
-    func_00144F68((int)(unsigned short)*(short *)(magic_items_image), (int)(unsigned short)*(short *)(magic_items_image + 2), (int)(unsigned short)*(short *)(magic_items_image + 4), (int)(unsigned short)*(short *)(magic_items_image + 6), (int)(magic_items_image + 12));
+    func_00144F68((int)(unsigned short)*(short *)(*(char **)magic_items_image), (int)(unsigned short)*(short *)(*(char **)magic_items_image + 2), (int)(unsigned short)*(short *)(*(char **)magic_items_image + 4), (int)(unsigned short)*(short *)(*(char **)magic_items_image + 6), (int)(*(char **)magic_items_image + 12));
     if (key_down_esc != 0 || ((int)(unsigned char)(mouse_buttons & 2)) != 0) {
-        do {
-        } while (key_down_esc != 0);
+        while (key_down_esc != 0);
         while (mouse_buttons != 0) func_0012B136();
         magic_items_close();
         return;
@@ -251,9 +250,9 @@ void magic_items_frame(void)
 void magic_items_close(void)
 {
     D_001940D4 &= 223;
-    if ((int)magic_items_image != 0 && (int)magic_items_image != (-1751672937)) {
-        mc_free((int)magic_items_image, (int)D_00175898, 396);
-        *(int *)&magic_items_image = -1751672937;
+    if (*(int *)magic_items_image != 0 && *(int *)magic_items_image != (-1751672937)) {
+        mc_free(*(int *)magic_items_image, (int)D_00175898, 396);
+        *(int *)magic_items_image = -1751672937;
     }
     picklist_free(&D_001A9AB8);
     D_00196272 = 0;

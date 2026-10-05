@@ -27,15 +27,15 @@ extern struct building *current_building;
 extern struct record *D_00195AF4;
 extern struct record *inv_right_container;
 extern struct record *D_00195B34;
-extern int D_00195B5C;
-extern int D_00195B60;
+extern char D_00195B5C[];
+extern char D_00195B60[];
 extern char D_00195B84[];
 extern struct character *player_character;
 extern int window_image;
 extern struct career *player_class;
 extern int game_minutes;
 extern int D_00195D2C;
-extern char *D_00195DA8;
+extern char D_00195DA8[];
 extern short D_00195F34;
 extern signed char current_region;
 extern signed char msgbox_kind;
@@ -126,13 +126,13 @@ void chargen_free_images(void)
         mc_free(chargen_face_images, (int)D_00176F41, 224);
         chargen_face_images = -1751672937;
     }
-    if (D_00195B60 != 0 && D_00195B60 != (-1751672937)) {
-        mc_free(D_00195B60, (int)D_00176F41, 225);
-        D_00195B60 = -1751672937;
+    if (*(int *)D_00195B60 != 0 && *(int *)D_00195B60 != (-1751672937)) {
+        mc_free(*(int *)D_00195B60, (int)D_00176F41, 225);
+        *(int *)D_00195B60 = -1751672937;
     }
-    if (D_00195B5C != 0 && D_00195B5C != (-1751672937)) {
-        mc_free(D_00195B5C, (int)D_00176F41, 226);
-        D_00195B5C = -1751672937;
+    if (*(int *)D_00195B5C != 0 && *(int *)D_00195B5C != (-1751672937)) {
+        mc_free(*(int *)D_00195B5C, (int)D_00176F41, 226);
+        *(int *)D_00195B5C = -1751672937;
     }
     if (chargen_reflex_image != 0 && chargen_reflex_image != (-1751672937)) {
         mc_free(chargen_reflex_image, (int)D_00176F41, 227);
@@ -365,7 +365,7 @@ void inv_reset_left_list(void)
 
 void inventory_open_container(struct record *a1, int a2, int a3)
 {
-    *(int *)&D_00195DA8 = (int)a1;
+    *(int *)D_00195DA8 = (int)a1;
     inv_right_container = (D_00195B34 = a1);
     if (inventory_open(2, a2, a3) != 0) return;
     object_free_children(a1);

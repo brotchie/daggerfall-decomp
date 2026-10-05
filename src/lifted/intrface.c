@@ -56,7 +56,7 @@ extern struct character *player_character;
 extern int cursor_arrow_image;
 extern struct career *player_class;
 extern int game_minutes;
-extern int D_00195C44;
+extern char D_00195C44[];
 extern struct record *D_00195C70;
 extern int D_00195C74;
 extern struct record *D_00195CB8;
@@ -172,12 +172,12 @@ void intrface_init(void)
 
     cursor_region_images = disk_read_file((int)D_00176A68, 0);
     cursor_arrow_image = disk_read_file((int)D_00176A72, 0);
-    mc_memset(D_00195C44, 0, 256, (int)D_00176A7C, 44, 4);
+    mc_memset(*(int *)D_00195C44, 0, 256, (int)D_00176A7C, 44, 4);
     *(int *)&l_18 = 0;
     for (; ((int)(short)l_18) < 10; (*(int *)&l_18)++) {
-        mc_memcpy((int)(*(char **)&D_00195C44 + (((int)(short)l_18) << 4)), (int)(((char *)cursor_arrow_image) + (((int)(short)l_18) * 10)), 10, (int)D_00176A7C, 46, 4);
+        mc_memcpy((int)(*(char **)D_00195C44 + (((int)(short)l_18) << 4)), (int)(((char *)cursor_arrow_image) + (((int)(short)l_18) * 10)), 10, (int)D_00176A7C, 46, 4);
     }
-    func_0012B45B(D_00195C44, 0, 0);
+    func_0012B45B(*(int *)D_00195C44, 0, 0);
     intrface_set_regions();
     D_00196272 = 0;
 }
@@ -390,7 +390,7 @@ void player_compute_jump_velocity(void)
 {
     jump_velocity = ((player_character->attributes[6] + player_character->attributes[0]) / 2) + 50;
     jump_velocity += (player_character->skills[3].value * jump_velocity) / 100;
-    jump_velocity = -(jump_velocity);
+    jump_velocity = -jump_velocity;
     jump_velocity <<= 8;
 }
 
@@ -486,7 +486,7 @@ void player_movement_update(void)
     int l_20;
 
     if (D_00195DB8 != 0) {
-        (D_00195DB8)--;
+        D_00195DB8--;
         return;
     }
     D_001940D7 &= 223;
@@ -545,7 +545,7 @@ void player_movement_update(void)
     l_58 = 0;
     if (l_5C == 0 && ((int)(unsigned char)mouse_control_mode) == 1 && key_action_held(23) != 0) {
         D_00187CA4 >>= 1;
-        (D_00187CA4)--;
+        D_00187CA4--;
         l_40 >>= 1;
     }
     while (l_58 == 0 && l_40 > 0) {

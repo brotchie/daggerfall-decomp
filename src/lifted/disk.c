@@ -265,7 +265,7 @@ void func_0006D491(int a1)
 {
     mc_strncpy(D_001A49F4, a1, 4, (int)D_00175D00, 295);
     D_001A49F4 += func_000A0DF4(a1) + 1;
-    (D_001A4A08)++;
+    D_001A4A08++;
 }
 
 void file_index_build(void)

@@ -109,17 +109,16 @@ void crash_screen(void)
     func_00143700();
     func_0009DA1C(394, (int)D_00175AD4);
     printf((int)D_00175C2D, frame_checkpoint);
-    do {
-    } while (key_down_enter == 0);
+    while (key_down_enter == 0);
     func_00068B1B();
     func_000A2D9E();
 }
 
 void mem_check_now(int a1)
 {
-    (mem_check_level)++;
+    mem_check_level++;
     mem_check_heap(a1);
-    (mem_check_level)--;
+    mem_check_level--;
 }
 
 int logbook_open(int a1)

@@ -43,7 +43,7 @@ extern signed char D_00196294;
 extern signed char D_0019629B;
 extern signed char D_001962A4;
 extern int D_001A4A24;
-extern int rest_image;
+extern char rest_image[];
 
 extern int tavern_room_rented(void);
 extern int disk_resolve_path(int);
@@ -74,9 +74,9 @@ void rest_close(void)
     int l_18;
 
     if (((int)(unsigned char)game_mode) != 16) return;
-    if (rest_image != 0 && rest_image != (-1751672937)) {
-        mc_free(rest_image, (int)D_001760D6, 271);
-        rest_image = -1751672937;
+    if (*(int *)rest_image != 0 && *(int *)rest_image != (-1751672937)) {
+        mc_free(*(int *)rest_image, (int)D_001760D6, 271);
+        *(int *)rest_image = -1751672937;
     }
     D_00196272 = 0;
     game_mode = 0;

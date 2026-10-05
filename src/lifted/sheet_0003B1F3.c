@@ -15,7 +15,7 @@ extern char D_00190D64[];
 extern short D_00190D8C[];
 extern signed char D_001940D9;
 extern struct record *player_object;
-extern int D_00195B5C;
+extern char D_00195B5C[];
 extern struct character *player_character;
 extern int window_image;
 extern struct career *player_class;
@@ -28,7 +28,7 @@ extern signed char D_0019626C;
 extern unsigned char D_0019626F;
 extern signed char D_00196272;
 extern signed char game_mode;
-extern int D_00199638;
+extern char D_00199638[];
 
 extern int key_action_held(int);
 extern int sound_play(int, struct record *, int);
@@ -49,13 +49,13 @@ int sheet_open(short a1)
     if (a1 != 0 || (game_mode == 0 && key_action_held(36) != 0 && player_death_timer == 0)) {
         game_mode = 3;
         window_image = disk_read_file((int)D_00170C40, 0);
-        D_00199638 = disk_read_file((int)D_00170C4D, 0);
-        D_00195B5C = disk_read_file((int)D_00170C5A, 0);
+        *(int *)D_00199638 = disk_read_file((int)D_00170C4D, 0);
+        *(int *)D_00195B5C = disk_read_file((int)D_00170C5A, 0);
         D_00196272 = 1;
-        D_00195F40 = 160 - (((int)(unsigned short)*(short *)(((char *)D_00199638) + 4)) >> 1);
-        D_00195F3E = 100 - (((int)(unsigned short)*(short *)(((char *)D_00199638) + 6)) >> 1);
-        D_00195F42 = *(short *)(((char *)D_00199638) + 4);
-        D_00195F3C = *(short *)(((char *)D_00199638) + 6);
+        D_00195F40 = 160 - (((int)(unsigned short)*(short *)(*(char **)D_00199638 + 4)) >> 1);
+        D_00195F3E = 100 - (((int)(unsigned short)*(short *)(*(char **)D_00199638 + 6)) >> 1);
+        D_00195F42 = *(short *)(*(char **)D_00199638 + 4);
+        D_00195F3C = *(short *)(*(char **)D_00199638 + 6);
         if (((struct bf8_2_1 *)&D_001940D9)->f != 0) {
             l_20 = (rand_range(player_class->hp_per_level >> 1, player_class->hp_per_level) + (player_character->attributes[4] / 10)) - 5;
             if (l_20 < 1) l_20 = 1;

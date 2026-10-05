@@ -16,7 +16,7 @@ extern struct record *player_entity;
 extern struct record *player_object;
 extern int D_00195AB0;
 extern struct record *spell_ready_missile;
-extern char *hud_bar_image;
+extern char hud_bar_image[];
 extern int D_00195B80;
 extern struct character *player_character;
 extern struct settings *game_settings;
@@ -31,7 +31,7 @@ extern int weapon_hand_cif[];
 extern int D_001A4A60[];
 extern char D_001A4A68[];
 extern int D_001A4A70[];
-extern int D_001AA600;
+extern char D_001AA600[];
 extern void fatigue_add(int);
 extern int weapon_start_swing(int);
 extern void weapon_bow_update(void);
@@ -66,14 +66,14 @@ void weapon_player_update(void)
         return;
     }
     if (*(int *)(D_001A4A30 + (((int)(unsigned char)weapon_active_hand) << 2)) != 0) {
-        D_00195B80 = (int)(*(char **)&D_001AA600 + (((int)(unsigned char)*(signed char *)(*(char **)(D_001A4A30 + (((int)(unsigned char)weapon_active_hand) << 2)) + 127)) << 8));
+        D_00195B80 = (int)(*(char **)D_001AA600 + (((int)(unsigned char)*(signed char *)(*(char **)(D_001A4A30 + (((int)(unsigned char)weapon_active_hand) << 2)) + 127)) << 8));
     }
     if (((struct bf8_6_1 *)&D_001940D6)->f != 0 && D_001A4A70[((int)(unsigned char)weapon_active_hand)] == 0) {
         l_1C = weapon_hand_cif[((int)(unsigned char)weapon_active_hand)];
         if (((int)(unsigned short)(game_settings->view_flags & 1)) != 0) {
             l_20 = 0;
         } else {
-            l_20 = (int)(unsigned short)*(short *)(hud_bar_image + 6);
+            l_20 = (int)(unsigned short)*(short *)(*(char **)hud_bar_image + 6);
         }
         func_000CB473(l_1C, -l_20);
     }
@@ -83,15 +83,15 @@ void weapon_player_update(void)
             D_001A4A50[((int)(unsigned char)weapon_active_hand)] = 0;
         }
         weapon_start_swing((int)(unsigned char)weapon_active_hand);
-        D_00195B80 = D_001AA600;
+        D_00195B80 = *(int *)D_001AA600;
         return;
     }
     if (D_001A4A50[0] > 0) D_001A4A50[0] -= D_00195AB0;
     if (D_001A4A54 > 0) D_001A4A54 -= D_00195AB0;
     if (*(int *)(D_001A4A68 + (((int)(unsigned char)weapon_active_hand) << 2)) != 0) {
-        func_000CB39A(func_000CB381(weapon_hand_cif[((int)(unsigned char)weapon_active_hand)], D_001A4A38[((int)(unsigned char)weapon_active_hand)]), (int)(unsigned char)*(signed char *)((char *)(*(int *)(D_001A4A68 + (((int)(unsigned char)weapon_active_hand) << 2)) + D_001A4A60[((int)(unsigned char)weapon_active_hand)])), ((((int)(unsigned short)(game_settings->view_flags & 1)) != 0) ? 0 : -((int)(unsigned short)*(short *)(hud_bar_image + 6))), (int)(unsigned char)weapon_active_hand);
+        func_000CB39A(func_000CB381(weapon_hand_cif[((int)(unsigned char)weapon_active_hand)], D_001A4A38[((int)(unsigned char)weapon_active_hand)]), (int)(unsigned char)*(signed char *)((char *)(*(int *)(D_001A4A68 + (((int)(unsigned char)weapon_active_hand) << 2)) + D_001A4A60[((int)(unsigned char)weapon_active_hand)])), ((((int)(unsigned short)(game_settings->view_flags & 1)) != 0) ? 0 : -((int)(unsigned short)*(short *)(*(char **)hud_bar_image + 6))), (int)(unsigned char)weapon_active_hand);
     } else {
-        func_000CB39A(func_000CB381(weapon_hand_cif[((int)(unsigned char)weapon_active_hand)], D_001A4A38[((int)(unsigned char)weapon_active_hand)]), 5 - D_001A4A70[((int)(unsigned char)weapon_active_hand)], ((((int)(unsigned short)(game_settings->view_flags & 1)) != 0) ? 0 : -((int)(unsigned short)*(short *)(hud_bar_image + 6))), (int)(unsigned char)weapon_active_hand);
+        func_000CB39A(func_000CB381(weapon_hand_cif[((int)(unsigned char)weapon_active_hand)], D_001A4A38[((int)(unsigned char)weapon_active_hand)]), 5 - D_001A4A70[((int)(unsigned char)weapon_active_hand)], ((((int)(unsigned short)(game_settings->view_flags & 1)) != 0) ? 0 : -((int)(unsigned short)*(short *)(*(char **)hud_bar_image + 6))), (int)(unsigned char)weapon_active_hand);
     }
     if (D_001A4A50[((int)(unsigned char)weapon_active_hand)] <= 0) {
         D_001A4A50[((int)(unsigned char)weapon_active_hand)] = (115 - player_character->attributes[6]) * 3;
@@ -116,5 +116,5 @@ void weapon_player_update(void)
             fatigue_add(-11);
         }
     }
-    D_00195B80 = D_001AA600;
+    D_00195B80 = *(int *)D_001AA600;
 }

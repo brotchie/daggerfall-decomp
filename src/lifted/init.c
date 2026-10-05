@@ -78,12 +78,12 @@ extern struct record *player_object;
 extern struct record *D_00195AC4;
 extern int D_00195AC8;
 extern int D_00195AD0;
-extern int picklist_image;
+extern char picklist_image[];
 extern struct spell *spell_records;
 extern int creature_count;
-extern int current_region_data;
+extern char current_region_data[];
 extern int D_00195B64;
-extern char *hud_bar_image;
+extern char hud_bar_image[];
 extern int hud_mode_icons;
 extern int D_00195B74;
 extern char D_00195B78[];
@@ -94,7 +94,7 @@ extern int window_image;
 extern struct career *player_class;
 extern int game_minutes;
 extern struct settings *game_settings;
-extern int D_00195C44;
+extern char D_00195C44[];
 extern signed char cfg_map_file;
 extern int D_00195C7C;
 extern int D_00195C80;
@@ -293,7 +293,7 @@ void newgame_place_player(void)
         player_environment = 1;
     }
     current_region = cfg_region;
-    current_region_data = ((int)region_event_values) + (((int)(unsigned char)current_region) * 80);
+    *(int *)current_region_data = ((int)region_event_values) + (((int)(unsigned char)current_region) * 80);
     region_enter(0, (int)(unsigned char)current_region);
     dungeon_water_level = 10000;
     if (((int)player_environment) == 1) {
@@ -442,17 +442,17 @@ void shutdown_free_all(void)
         mc_free(hud_mode_icons, (int)D_00175040, 350);
         hud_mode_icons = -1751672937;
     }
-    if ((int)hud_bar_image != 0 && (int)hud_bar_image != (-1751672937)) {
-        mc_free((int)hud_bar_image, (int)D_00175040, 351);
-        *(int *)&hud_bar_image = -1751672937;
+    if (*(int *)hud_bar_image != 0 && *(int *)hud_bar_image != (-1751672937)) {
+        mc_free(*(int *)hud_bar_image, (int)D_00175040, 351);
+        *(int *)hud_bar_image = -1751672937;
     }
-    if (picklist_image != 0 && picklist_image != (-1751672937)) {
-        mc_free(picklist_image, (int)D_00175040, 352);
-        picklist_image = -1751672937;
+    if (*(int *)picklist_image != 0 && *(int *)picklist_image != (-1751672937)) {
+        mc_free(*(int *)picklist_image, (int)D_00175040, 352);
+        *(int *)picklist_image = -1751672937;
     }
-    if (D_00195C44 != 0 && D_00195C44 != (-1751672937)) {
-        mc_free(D_00195C44, (int)D_00175040, 353);
-        D_00195C44 = -1751672937;
+    if (*(int *)D_00195C44 != 0 && *(int *)D_00195C44 != (-1751672937)) {
+        mc_free(*(int *)D_00195C44, (int)D_00175040, 353);
+        *(int *)D_00195C44 = -1751672937;
     }
     if (D_001997F4 != 0 && D_001997F4 != (-1751672937)) {
         mc_free(D_001997F4, (int)D_00175040, 354);
@@ -484,7 +484,7 @@ void init_video(void)
     func_000C9F29();
     func_000CE8A0((int)&D_001997FC, (int)&D_00199800);
     func_00149E00(102400);
-    D_00195C44 = mc_malloc(80780, (int)D_00175040, 382);
+    *(int *)D_00195C44 = mc_malloc(80780, (int)D_00175040, 382);
     file_index_build();
     func_00143600(19, 1);
     func_00142700();

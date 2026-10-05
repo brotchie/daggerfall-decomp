@@ -19,11 +19,12 @@ int door_start_swing(int a1, int a2)
         *(int *)((char *)a1 + 43) = *(int *)1132 | (-1073741824);
     }
     l_20 = 0;
-    do {
-    } while (*(int *)(doors_moving + (l_20++ << 2)) != 0);
+    while (*(int *)(doors_moving + (l_20++ << 2)) != 0);
     l_20--;
     *(int *)(doors_moving + (l_20 << 2)) = a1;
-    if (a2 == 0) sound_play(((((int)player_environment) == 2) ? 362 : 27), a1, 100);
+    if (a2 == 0) {
+        sound_play(((((int)player_environment) == 2) ? 362 : 27), a1, 100);
+    }
     func_00063DDC(0);
     if (D_00196297 != 0) links_trigger(a1, 10);
     return 1;

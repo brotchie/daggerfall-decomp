@@ -29,6 +29,7 @@ void func_0005E37F(short a1, int a2, int a3, struct item *a4)
     case 11:
         item_init_from_template(287, 27, 8, a4);
         return;
+    default:
+        item_init_from_template((int)(unsigned short)*(short *)((char *)(int)(*(char **)(D_00185F88 + (((int)(unsigned short)a1) << 2)) + (l_14 * 2))), (int)(short)a1, (int)(short)*(short *)&l_14, a4);
     }
-    item_init_from_template((int)(unsigned short)*(short *)((char *)(int)(*(char **)(D_00185F88 + (((int)(unsigned short)a1) << 2)) + (l_14 * 2))), (int)(short)a1, (int)(short)*(short *)&l_14, a4);
 }

@@ -11,7 +11,7 @@ extern struct record *player_entity;
 extern struct record *D_00195AC4;
 extern struct spell *spell_records;
 extern struct character *player_character;
-extern int D_00195C44;
+extern char D_00195C44[];
 extern char D_00199D78[];
 extern signed char D_00199D7B[];
 extern signed char D_00199D84[];
@@ -86,8 +86,8 @@ void link_show_text(int a1)
     int l_1C;
     int l_18;
 
-    parse_rsc_text_copy(a1, D_00195C44);
-    l_1C = D_00195C44;
+    parse_rsc_text_copy(a1, *(int *)D_00195C44);
+    l_1C = *(int *)D_00195C44;
     while (*(signed char *)((char *)l_1C) != 0) {
         l_18 = l_1C;
         while (*(signed char *)((char *)l_18) != 0 && ((int)(unsigned char)*(signed char *)((char *)l_18)) != 252 && ((int)(unsigned char)*(signed char *)((char *)l_18)) != 253) {
@@ -152,7 +152,6 @@ void link_start(struct link *a1)
         l_1C = 1132;
         a1->start_tick = *(int *)((char *)l_1C);
         switch (a1->axis - 1) {
-            break;
         case 0:
         case 1:
             a1->start = a1->object->x;
@@ -181,7 +180,6 @@ void link_start(struct link *a1)
             a1->axis = *(signed char *)&l_20;
         }
         switch (a1->axis - 1) {
-            break;
         case 0:
         case 1:
             a1->start = a1->object->angle_x;

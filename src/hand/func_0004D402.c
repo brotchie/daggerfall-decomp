@@ -30,7 +30,7 @@ extern short D_001997B2;
 extern short D_001997B4;
 extern short D_001997B6;
 extern int D_001997C0;
-extern int D_001997C8;
+extern char D_001997C8[];
 extern char note_font[];
 extern char D_001997DE[];
 extern short D_001997E0;
@@ -86,7 +86,7 @@ void func_0004D402(void)
                 note_add_text((int)text_rsc_buffer);
             }
             if (text_rsc_buffer[0] == 0 && ((int)(short)(*(short *)D_001997DE & 32)) != 0) {
-                *(signed char *)(((char *)D_001997C8) + 6) |= 64;
+                *(signed char *)(*(char **)D_001997C8 + 6) |= 64;
                 func_0004EC7A();
             }
             *(signed char *)D_001997DE &= 223;
@@ -136,7 +136,9 @@ void func_0004D402(void)
         }
     }
     D_0012B508 = 146;
-    if (mouse_buttons == 0 || (mouse_buttons != 0 && mouse_buttons_prev != 0)) return;
+    if (mouse_buttons == 0 || (mouse_buttons != 0 && mouse_buttons_prev != 0)) {
+        return;
+    }
     if (key_pressed_once(72) != 0 || key_pressed_once(73) != 0) func_0004E30F();
     if (key_pressed_once(80) != 0 || key_pressed_once(81) != 0) func_0004E360();
     if (((int)(unsigned char)(mouse_buttons & 1)) != 0 && ((int)(short)mouse_y) > 10 && ((int)(short)mouse_y) < 173) {

@@ -144,7 +144,6 @@ L25BFC:;
                 l_30 = object_building(player_object->parent);
                 if (l_30 != 0) {
                     switch (l_30->type) {
-                        goto L25CE0;
                     case 11:
                         l_28 = 40;
                         break;
@@ -162,7 +161,6 @@ L25BFC:;
                         l_28 = 44;
                         break;
                     default:
-L25CE0:;
                         l_28 = 39;
                     }
                 } else {
@@ -170,7 +168,6 @@ L25CE0:;
                     l_28 = climate_category();
                     if (((int)(unsigned char)current_climate) == 232) l_28 = 232;
                     switch ((unsigned)l_28) {
-                        break;
                     case 0:
                         l_28 = 20;
                         break;
@@ -194,7 +191,6 @@ L25CE0:;
                 l_28 = climate_category();
                 if (((int)(unsigned char)current_climate) == 232) l_28 = 232;
                 switch ((unsigned)l_28) {
-                    break;
                 case 0:
                     l_28 = ((D_00199808 != 0) ? 21 : 22);
                     break;
@@ -281,15 +277,15 @@ int func_00026081(struct record *a1, int a2)
             }
             return l_30;
         }
-        switch (a1->trigger_range) {
-        case 0:
-            {
-                int l_4C;
-                int l_48;
-                int l_44;
-                int l_40;
-                int l_3C;
-                int l_38;
+        {
+            int l_4C;
+            int l_48;
+            int l_44;
+            int l_40;
+            int l_3C;
+            int l_38;
+            switch (a1->trigger_range) {
+            case 0:
                 if (l_18 <= 128 && l_1C <= 1024) {
                     l_38 = 1;
                 } else {

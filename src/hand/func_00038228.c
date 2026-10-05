@@ -8,7 +8,7 @@ extern char spell_effect_costs[];
 extern char spell_effect_cost_index[];
 extern char spell_effect_subtype_names[];
 extern int list_popup_callback;
-extern int D_00195C44;
+extern char D_00195C44[];
 extern short spell_effect_slot;
 extern char spell_effect_cost_current[];
 extern short D_00199628;
@@ -43,16 +43,16 @@ void spellmaker_pick_effect_cb(short a1)
     } else {
         char *s;
 
-        s = *(char **)&D_00195C44;
+        s = *(char **)D_00195C44;
         *s = 0;
         j = 0;
         while (*(int *)(spell_effect_subtype_names + a1 * 48 + j * 4) != 0) {
-            *(*(char **)&D_00195C44 + j + 32000) = j;
+            *(*(char **)D_00195C44 + j + 32000) = j;
             mc_strncpy(s, *(int *)(spell_effect_subtype_names + a1 * 48 + j++ * 4), 4, D_00170B13, 1071);
             s = s + func_000A0DF4(s) + 1;
         }
         *s = 0;
         list_popup_callback = (int)spellmaker_pick_subtype_cb;
-        picklist_open_strings(*(char **)&D_00195C44);
+        picklist_open_strings(*(char **)D_00195C44);
     }
 }

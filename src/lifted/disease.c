@@ -109,8 +109,7 @@ void disease_infect(struct record *a1, int a2, int a3, int a4)
     l_C = &l_10->data.disease;
     if (a2 != 0) {
         l_14 = 0;
-        do {
-        } while (((int)(unsigned char)*(signed char *)((char *)(l_14++ + a2))) != 255);
+        while (((int)(unsigned char)*(signed char *)((char *)(l_14++ + a2))) != 255);
         a3 = (int)(unsigned char)*(signed char *)((char *)(int)((char *)a2 + rand_range(0, l_14 - 2)));
     }
     mc_memcpy(l_C, &D_00186A64[a3], 47, (int)D_00175970, 83, 4);
@@ -732,7 +731,6 @@ int enchant_spell_points_condition(int a1)
     int l_1C;
 
     switch ((unsigned)a1) {
-        break;
     case 0:
     case 1:
     case 2:

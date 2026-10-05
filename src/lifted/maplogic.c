@@ -48,8 +48,8 @@ extern struct location *current_location;
 extern struct character *player_character;
 extern struct career *player_class;
 extern int game_minutes;
-extern int D_00195C44;
-extern char *D_00195C88;
+extern char D_00195C44[];
+extern char D_00195C88[];
 extern struct record *D_00195CB8;
 extern int D_00195CF4;
 extern int D_00195D84;
@@ -68,7 +68,7 @@ extern signed char D_001962A3;
 extern char dungeon_blocks[];
 extern signed char D_001967A1;
 extern int D_00196A28;
-extern char *rmb_block;
+extern char rmb_block[];
 extern struct map_location *location_here;
 extern struct loaded_location loaded_location;
 extern struct record *loaded_location_object;
@@ -303,8 +303,8 @@ void dungeon_load(int a1)
     dungeon_roll_monster_tables();
     D_001970C4 = 0;
     disk_read_file((int)D_00176CC0, D_00195CF4);
-    mc_memset(D_00195C44, 0, 93, (int)D_00176C94, 290, 4);
-    func_000CD33A(D_00195C44, 1, 31);
+    mc_memset(*(int *)D_00195C44, 0, 93, (int)D_00176C94, 290, 4);
+    func_000CD33A(*(int *)D_00195C44, 1, 31);
     if (D_00196289 == 0) func_0004C759();
     automap_restore_seen();
     D_001950E4 = marker_count(D_00195AC4, 9);
@@ -322,16 +322,17 @@ void func_00086A71(struct record *a1)
     if (a1->type != 32) return;
     l_18 = object_building(a1);
     switch (l_18->type) {
-    case 11:
-    case 14:
-    case 15:
-        a1->lock_level = 0;
-        a1->flags |= 64;
-        return;
-    }
+case 11:
+case 14:
+case 15:
+    a1->lock_level = 0;
+    a1->flags |= 64;
+    return;
+default:
     if ((rand() % 100) >= 90) return;
     a1->lock_level = 0;
     a1->flags |= 64;
+}
 }
 
 int building_try_enter(struct building *a1)
@@ -428,7 +429,7 @@ void building_exit(void)
     object_free_children((struct record *)D_00196120);
     building_grant_access(l_1C, 0, 0);
     player_to_nearest_marker(player_object->parent->children, 6);
-    func_000C810C((int)D_00195C88);
+    func_000C810C(*(int *)D_00195C88);
     object_reparent(D_00195AC4, player_object);
     if (l_1C->type == 24) player_to_nearest_marker(D_00195AC4, 6);
     position_history_reset();
@@ -455,7 +456,6 @@ void location_pick_random_town(struct loaded_location *a1)
     mc_memset(a1, 0, 20, (int)D_00176C94, 991, 4);
     for (l_20 = 0; l_20 < D_00196A28; l_20++, l_24++) {
         switch ((l_24->x_type_flags << 2) >> 27) {
-            break;
         case 0:
         case 1:
         case 2:
@@ -470,7 +470,6 @@ void location_pick_random_town(struct loaded_location *a1)
     l_24 = D_00196A9C;
     for (l_20 = 0; l_20 < D_00196A28; l_20++, l_24++) {
         switch ((l_24->x_type_flags << 2) >> 27) {
-            break;
         case 0:
         case 1:
         case 2:
@@ -613,8 +612,8 @@ void town_block_apply_ground(int a1, int a2)
     l_28 += (a1 & 32767) >> 8;
     l_2C += (128 - ((a2 & 32767) >> 8)) << 8;
     l_2C += (a1 & 32767) >> 8;
-    l_24 = (int)rmb_block + 1739;
-    l_20 = (int)rmb_block + 1995;
+    l_24 = *(int *)rmb_block + 1739;
+    l_20 = *(int *)rmb_block + 1995;
     for (l_18 = 0; l_18 < l_14; l_18++, l_2C++, l_28++, l_24++, l_20++) {
         if (((int)(unsigned char)*(signed char *)((char *)l_24)) != 255) {
             if (((int)(unsigned char)(*(signed char *)((char *)l_24) & 63)) < 56) {
@@ -652,7 +651,7 @@ void town_map_add_block(int a1, int a2)
     l_18 = 0;
     for (l_24 = a2; l_24 < l_1C; l_24++) {
         for (l_28 = a1; l_28 < l_20; l_28++) {
-            *(signed char *)((char *)(int)(*(char **)&D_00196DA4 + ((l_24 * l_14) + l_28))) = *(signed char *)(rmb_block + 2251 + l_18++);
+            *(signed char *)((char *)(int)(*(char **)&D_00196DA4 + ((l_24 * l_14) + l_28))) = *(signed char *)(*(char **)rmb_block + 2251 + l_18++);
         }
     }
 }

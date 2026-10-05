@@ -22,15 +22,15 @@ extern int D_001959BC;
 extern struct record *camera_object;
 extern struct record *player_object;
 extern int D_00195AB0;
-extern char *hud_bar_image;
+extern char hud_bar_image[];
 extern int game_minutes;
 extern struct settings *game_settings;
 extern int D_00195CF4;
 extern signed char climate_weathers[];
 extern signed char current_region;
 extern signed char D_001962A1;
-extern int moon0_image;
-extern int moon1_image;
+extern char moon0_image[];
+extern char moon1_image[];
 extern int D_0019857C;
 extern char D_001985A8[];
 extern char D_001985B4[];
@@ -97,7 +97,9 @@ void sky_update(void)
         D_001962A1 = l_24->block_special;
         return;
     }
-    if (((int)player_environment) == 1) func_000359B4(game_minutes);
+    if (((int)player_environment) == 1) {
+        func_000359B4(game_minutes);
+    }
     l_58 = ((unsigned)game_minutes) % 1440;
     if (l_58 > 360 && l_58 < 1080) {
         l_78 = 1;
@@ -170,7 +172,7 @@ void sky_update(void)
             sky_draw_day(l_5C, l_4C, D_00199808, l_40);
             return;
         }
-        mc_memset(screen_buffer, (int)(unsigned char)*(signed char *)(((char *)D_00195CF4)), ((((int)(unsigned short)(game_settings->view_flags & 1)) != 0) ? 199 : (int)(unsigned short)*(short *)(hud_bar_image + 2)) * 320, (int)D_00170A86, 251, 4);
+        mc_memset(screen_buffer, (int)(unsigned char)*(signed char *)(((char *)D_00195CF4)), ((((int)(unsigned short)(game_settings->view_flags & 1)) != 0) ? 199 : (int)(unsigned short)*(short *)(*(char **)hud_bar_image + 2)) * 320, (int)D_00170A86, 251, 4);
     } else {
         sky_draw_night(l_5C, l_4C);
     }
@@ -185,16 +187,16 @@ void sky_update(void)
     func_00137486((int)&l_68, (int)&l_64, (int)&l_60, (int)D_00136E00);
     if (l_60 > 100) {
         func_001376C8(l_68, l_64, l_60, (int)&l_54, (int)&l_5C);
-        *(short *)(*(char **)&moon0_image + 6) = (l_54 + D_000CEA30) - (**(unsigned short **)&moon0_image >> 1);
-        *(short *)(*(char **)&moon0_image + 8) = (((int)(short)D_000CEA34) + l_5C) - (((int)(unsigned short)*(short *)(*(char **)&moon0_image + 2)) >> 1);
+        *(short *)(*(char **)moon0_image + 6) = (l_54 + D_000CEA30) - (**(unsigned short **)moon0_image >> 1);
+        *(short *)(*(char **)moon0_image + 8) = (((int)(short)D_000CEA34) + l_5C) - (((int)(unsigned short)*(short *)(*(char **)moon0_image + 2)) >> 1);
         l_20 |= 1;
     }
     mc_memcpy((int)&l_68, (int)D_001985A8, 12, (int)D_00170A86, 281, 4);
     func_00137486((int)&l_68, (int)&l_64, (int)&l_60, (int)D_00136E00);
     if (l_60 > 100) {
         func_001376C8(l_68, l_64, l_60, (int)&l_54, (int)&l_5C);
-        *(short *)(*(char **)&moon1_image + 6) = (l_54 + D_000CEA30) - (**(unsigned short **)&moon1_image >> 1);
-        *(short *)(*(char **)&moon1_image + 8) = (((int)(short)D_000CEA34) + l_5C) - (((int)(unsigned short)*(short *)(*(char **)&moon1_image + 2)) >> 1);
+        *(short *)(*(char **)moon1_image + 6) = (l_54 + D_000CEA30) - (**(unsigned short **)moon1_image >> 1);
+        *(short *)(*(char **)moon1_image + 8) = (((int)(short)D_000CEA34) + l_5C) - (((int)(unsigned short)*(short *)(*(char **)moon1_image + 2)) >> 1);
         l_20 |= 2;
     }
     D_000C23B8 = (camera_object->angle_x + view_look_pitch) & 2047;

@@ -26,7 +26,7 @@ extern struct record *player_object;
 extern struct record *D_00195AC4;
 extern struct location *current_location;
 extern struct settings *game_settings;
-extern int D_00195C44;
+extern char D_00195C44[];
 extern int sound_last_size;
 extern signed char current_region;
 extern signed char current_climate;
@@ -36,9 +36,9 @@ extern int D_001967F8;
 extern char D_001967FC[];
 extern int D_00196800;
 extern int D_00196808;
-extern char *rmb_record_ptr;
+extern char rmb_record_ptr[];
 extern signed char D_001968BB;
-extern char *rmb_block;
+extern char rmb_block[];
 extern struct model_node model_cache_nodes[];
 extern char sound_cache[];
 extern char D_001A8430[];
@@ -123,9 +123,9 @@ struct record *rmb_add_subrecord(struct record *a1)
     int l_1C;
 
     l_1C = 17;
-    l_1C += ((int)(unsigned char)*(signed char *)(rmb_record_ptr)) * 66;
-    l_1C += ((int)(unsigned char)*(signed char *)(rmb_record_ptr + 1)) * 17;
-    l_1C += ((int)(unsigned char)*(signed char *)(rmb_record_ptr + 2)) << 4;
+    l_1C += ((int)(unsigned char)*(signed char *)(*(char **)rmb_record_ptr)) * 66;
+    l_1C += ((int)(unsigned char)*(signed char *)(*(char **)rmb_record_ptr + 1)) * 17;
+    l_1C += ((int)(unsigned char)*(signed char *)(*(char **)rmb_record_ptr + 2)) << 4;
     if (l_1C == 17) return 0;
     l_48 = object_create_child(a1, 0, l_1C);
     l_48->type = 43;
@@ -137,7 +137,7 @@ struct record *rmb_add_subrecord(struct record *a1)
     l_48->id = D_00195AC4->id + ((int)(unsigned short)(current_location->object_counter)++);
     D_001A9438 = l_48->id;
     l_44 = &l_48->data.block;
-    mc_memcpy((int)l_44, (int)rmb_record_ptr, l_1C, (int)D_00176C20, 803, 4);
+    mc_memcpy((int)l_44, *(int *)rmb_record_ptr, l_1C, (int)D_00176C20, 803, 4);
     l_44->models = (struct block_model *)((int)l_44 + 17);
     l_40 = l_44->models;
     l_44->flats = (struct block_flat *)((int)l_40 + (l_44->model_count * 66));
@@ -176,11 +176,11 @@ struct record *rmb_add_subrecord(struct record *a1)
         *(int *)((char *)l_34 + 8) += D_001967F0;
         *(int *)((char *)l_34 + 4) += D_001967F4;
     }
-    l_38 = (int)(rmb_record_ptr + l_1C);
-    l_30 = l_38 + (((int)(unsigned char)*(signed char *)(rmb_record_ptr + 3)) * 17);
+    l_38 = (int)(*(char **)rmb_record_ptr + l_1C);
+    l_30 = l_38 + (((int)(unsigned char)*(signed char *)(*(char **)rmb_record_ptr + 3)) * 17);
     rmb_add_people(a1, l_38);
     rmb_add_doors(a1, l_30);
-    *(int *)&rmb_record_ptr = l_30 + (((int)(unsigned char)*(signed char *)(rmb_record_ptr + 4)) * 19);
+    *(int *)rmb_record_ptr = l_30 + (((int)(unsigned char)*(signed char *)(*(char **)rmb_record_ptr + 4)) * 19);
     return l_48;
 }
 
@@ -219,13 +219,12 @@ struct record *rmb_add_building(struct record *a1, int a2)
     int l_1C;
     struct record *l_18;
 
-    *(int *)&rmb_record_ptr = *(int *)(rmb_block + 1475 + (a2 << 2));
+    *(int *)rmb_record_ptr = *(int *)(*(char **)rmb_block + 1475 + (a2 << 2));
     l_18 = rmb_add_subrecord(a1);
     l_18->flags = 1;
     l_18->image2 = a2;
-    l_20 = (int)(unsigned char)*(signed char *)(rmb_block + 667 + (a2 * 26));
+    l_20 = (int)(unsigned char)*(signed char *)(*(char **)rmb_block + 667 + (a2 * 26));
     switch ((unsigned)l_20) {
-        break;
     case 21:
     case 22:
         l_18->flags |= 8;
@@ -239,7 +238,7 @@ struct record *rmb_add_building(struct record *a1, int a2)
         srand((int)(short)(short)l_18->id);
         l_20 = rand();
         srand(l_1C);
-        if (((int)(unsigned short)*(short *)(rmb_block + 661 + (a2 * 26))) != 42 && ((int)(unsigned short)*(short *)(rmb_block + 661 + (a2 * 26))) != 108) {
+        if (((int)(unsigned short)*(short *)(*(char **)rmb_block + 661 + (a2 * 26))) != 42 && ((int)(unsigned short)*(short *)(*(char **)rmb_block + 661 + (a2 * 26))) != 108) {
             if ((l_20 % 100) <= D_00196800) {
                 l_18->flags |= 8;
                 l_18->image = 65535;
@@ -247,7 +246,7 @@ struct record *rmb_add_building(struct record *a1, int a2)
             }
         }
     }
-    l_18->image = (D_00196808)++;
+    l_18->image = D_00196808++;
     rmb_add_subrecord(l_18);
     func_00084E5E(l_18);
     return l_18;
@@ -323,8 +322,8 @@ int model_load(int a1, int a2)
     }
     if (archive_read_record(arch3d_bsa, l_20, (int)model_cache_nodes[a1].model) == 0) {
         func_000A0ED9(1104, (int)D_00176C20);
-        mc_sprintf(D_00195C44, (int)D_00176C4F, l_20);
-        fatal_error(D_00195C44);
+        mc_sprintf(*(int *)D_00195C44, (int)D_00176C4F, l_20);
+        fatal_error(*(int *)D_00195C44);
     }
     model_heap_free -= (l_1C + 1) & -2;
     return (int)model_cache_nodes[a1].model;
@@ -405,7 +404,7 @@ void model_cache_flush(struct model_node *a1)
 {
     int l_18;
 
-    (D_001A949D)++;
+    D_001A949D++;
     for (l_18 = 1; l_18 < 512; l_18++) {
         if (model_cache_nodes[l_18].key != 0 && (int)model_cache_nodes[l_18].model != 0) {
             func_0008600F((int)model_cache_nodes[l_18].model);
@@ -593,28 +592,28 @@ void flat_animal_sound(int a1, int a2, int a3, int a4, int a5)
     if (rand() > 100) return;
     if (func_000C7FD9(a1, a3, player_object->x, player_object->z) > 768) return;
     switch ((unsigned)a5) {
-        return;
-    case 0:
-    case 1:
-        sound_play_at_point(367, a1, a2, a3, 100);
-        return;
-    case 3:
-    case 4:
-        sound_play_at_point(371, a1, a2, a3, 100);
-        return;
-    case 5:
-    case 6:
-        sound_play_at_point(370, a1, a2, a3, 100);
-        return;
-    case 7:
-    case 8:
-        sound_play_at_point(369, a1, a2, a3, 100);
-        return;
-    case 9:
-    case 10:
-        sound_play_at_point(368, a1, a2, a3, 100);
-    default:;
-    }
+    return;
+case 0:
+case 1:
+    sound_play_at_point(367, a1, a2, a3, 100);
+    return;
+case 3:
+case 4:
+    sound_play_at_point(371, a1, a2, a3, 100);
+    return;
+case 5:
+case 6:
+    sound_play_at_point(370, a1, a2, a3, 100);
+    return;
+case 7:
+case 8:
+    sound_play_at_point(369, a1, a2, a3, 100);
+    return;
+case 9:
+case 10:
+    sound_play_at_point(368, a1, a2, a3, 100);
+default:;
+}
 }
 
 void func_00085EF8(struct record *a1)

@@ -18,11 +18,11 @@ extern char D_001985D8[];
 extern struct link *D_001995E4;
 extern char *D_001995E8;
 extern struct link *D_001995EC;
-extern char *D_001995F0;
-extern char *D_001995F4;
-extern int D_00199600;
-extern char *D_00199604;
-extern int D_0019960C;
+extern char D_001995F0[];
+extern char D_001995F4[];
+extern char D_00199600[];
+extern char D_00199604[];
+extern char D_0019960C[];
 extern int D_00199614;
 extern short D_00199618;
 extern int spellmaker_settings_image;
@@ -45,7 +45,7 @@ void func_000361B7(int a1)
     int l_18;
 
     l_18 = 0;
-    l_1C = (int)(D_001995E8 + *(int *)(D_00199604 + 9020));
+    l_1C = (int)(D_001995E8 + *(int *)(*(char **)D_00199604 + 9020));
     while (((int)(short)*(short *)((char *)l_1C + 4)) != l_18) {
         l_1C = (int)(D_001995E8 + *(int *)((char *)l_1C));
     }
@@ -64,21 +64,21 @@ void func_000367E5(struct record *a1, int a2, int a3)
         l_10 = a2 - (int)D_001995E8;
         switch ((unsigned char)(*(signed char *)((char *)a2 + 20) & 63)) {
         case 1:
-            if (*(int *)((char *)(D_0019960C = (int)(D_001995E8 + *(int *)((char *)a2 + 21))) + 19) < 0) {
-                func_000361B7(D_0019960C);
+            if (*(int *)((char *)(*(int *)D_0019960C = (int)(D_001995E8 + *(int *)((char *)a2 + 21))) + 19) < 0) {
+                func_000361B7(*(int *)D_0019960C);
             }
-            if (*(short *)(((char *)D_0019960C) + 14) != 0) {
-                D_00199600 = (int)(D_001995E8 + *(int *)(((char *)D_0019960C) + 19));
+            if (*(short *)(*(char **)D_0019960C + 14) != 0) {
+                *(int *)D_00199600 = (int)(D_001995E8 + *(int *)(*(char **)D_0019960C + 19));
                 D_00199618 = func_00036A41(l_10);
                 func_00036AA7((int)(unsigned char)(*(signed char *)((char *)a2 + 20) & 63));
             }
             break;
         case 2:
-            *(int *)&D_001995F4 = (int)(D_001995E8 + *(int *)((char *)a2 + 21));
+            *(int *)D_001995F4 = (int)(D_001995E8 + *(int *)((char *)a2 + 21));
             break;
         case 3:
-            if ((*(short *)((char *)(*(int *)&D_001995F0 = (int)(D_001995E8 + *(int *)((char *)a2 + 21))) + 2) != 0 && ((int)(unsigned short)*(short *)(D_001995F0)) != 25482) || (((int)(unsigned short)*(short *)(D_001995F0)) == 25490 && ((int)(unsigned char)*(signed char *)(D_001995F0 + 4)) == 70 && *(int *)(D_001995F0 + 6) == 16747 && ((int)(unsigned char)*(signed char *)(D_001995F0 + 10)) == 5)) {
-                if (((int)(unsigned short)*(short *)(D_001995F0)) != 25488) {
+            if ((*(short *)((char *)(*(int *)D_001995F0 = (int)(D_001995E8 + *(int *)((char *)a2 + 21))) + 2) != 0 && ((int)(unsigned short)*(short *)(*(char **)D_001995F0)) != 25482) || (((int)(unsigned short)*(short *)(*(char **)D_001995F0)) == 25490 && ((int)(unsigned char)*(signed char *)(*(char **)D_001995F0 + 4)) == 70 && *(int *)(*(char **)D_001995F0 + 6) == 16747 && ((int)(unsigned char)*(signed char *)(*(char **)D_001995F0 + 10)) == 5)) {
+                if (((int)(unsigned short)*(short *)(*(char **)D_001995F0)) != 25488) {
                     D_00199618 = func_00036A41(l_10);
                     func_00036AA7((int)(unsigned char)(*(signed char *)((char *)a2 + 20) & 63));
                 }
@@ -105,43 +105,43 @@ void func_00036AA7(int a1)
 
     switch ((unsigned)a1) {
     case 1:
-        func_00036C6F(D_0019960C, D_00199600, 0, 0);
-        l_18 = *(int *)(((char *)D_00199600) + 5);
+        func_00036C6F(*(int *)D_0019960C, *(int *)D_00199600, 0, 0);
+        l_18 = *(int *)(*(char **)D_00199600 + 5);
         break;
     case 2:
-        func_00036C6F(0, 0, 0, (int)(unsigned char)*(signed char *)(D_001995F4 + 3));
-        l_18 = *(int *)(D_001995F4 + 4);
+        func_00036C6F(0, 0, 0, (int)(unsigned char)*(signed char *)(*(char **)D_001995F4 + 3));
+        l_18 = *(int *)(*(char **)D_001995F4 + 4);
         break;
     case 3:
-        func_00036C6F(0, 0, (int)D_001995F0, (int)(unsigned char)*(signed char *)(D_001995F0 + 10));
-        l_18 = *(int *)(D_001995F0 + 6);
+        func_00036C6F(0, 0, *(int *)D_001995F0, (int)(unsigned char)*(signed char *)(*(char **)D_001995F0 + 10));
+        l_18 = *(int *)(*(char **)D_001995F0 + 6);
     }
     while (l_18 > 0) {
         D_00199618 = func_00036A41(l_18);
         l_1C = (int)(D_001995E8 + l_18);
         switch ((unsigned char)(*(signed char *)((char *)l_1C + 20) & 63)) {
         case 1:
-            if (*(int *)((char *)(D_0019960C = (int)(D_001995E8 + *(int *)((char *)l_1C + 21))) + 19) < 0) {
-                func_000361B7(D_0019960C);
+            if (*(int *)((char *)(*(int *)D_0019960C = (int)(D_001995E8 + *(int *)((char *)l_1C + 21))) + 19) < 0) {
+                func_000361B7(*(int *)D_0019960C);
             }
-            D_00199600 = (int)(D_001995E8 + *(int *)(((char *)D_0019960C) + 19));
-            func_00036DC9(D_0019960C, D_00199600, 0, 0);
-            l_18 = *(int *)(((char *)D_00199600) + 5);
+            *(int *)D_00199600 = (int)(D_001995E8 + *(int *)(*(char **)D_0019960C + 19));
+            func_00036DC9(*(int *)D_0019960C, *(int *)D_00199600, 0, 0);
+            l_18 = *(int *)(*(char **)D_00199600 + 5);
             break;
         case 2:
-            func_00036DC9(0, 0, 0, (int)(unsigned char)*(signed char *)((char *)(*(int *)&D_001995F4 = (int)(D_001995E8 + *(int *)((char *)l_1C + 21))) + 3));
-            l_18 = *(int *)(D_001995F4 + 4);
+            func_00036DC9(0, 0, 0, (int)(unsigned char)*(signed char *)((char *)(*(int *)D_001995F4 = (int)(D_001995E8 + *(int *)((char *)l_1C + 21))) + 3));
+            l_18 = *(int *)(*(char **)D_001995F4 + 4);
             break;
         case 3:
-            func_00036DC9(0, 0, (int)D_001995F0, (int)(unsigned char)*(signed char *)((char *)(*(int *)&D_001995F0 = (int)(D_001995E8 + *(int *)((char *)l_1C + 21))) + 10));
-            l_18 = *(int *)(D_001995F0 + 6);
+            func_00036DC9(0, 0, *(int *)D_001995F0, (int)(unsigned char)*(signed char *)((char *)(*(int *)D_001995F0 = (int)(D_001995E8 + *(int *)((char *)l_1C + 21))) + 10));
+            l_18 = *(int *)(*(char **)D_001995F0 + 6);
         }
     }
 }
 
 void func_00036C6F(int a1, int a2, int a3, unsigned char a4)
 {
-    D_001995EC = (D_001995E4 = (struct link *)(((int)D_00199D78) + ((link_count)++ * 39)));
+    D_001995EC = (D_001995E4 = (struct link *)(((int)D_00199D78) + (link_count++ * 39)));
     mc_memset((int)D_001995EC, 0, 39, (int)D_00170AB4, 447, 4);
     D_001995EC->object_id = D_00199618;
     if (a2 != 0) {
@@ -166,7 +166,7 @@ void func_00036C6F(int a1, int a2, int a3, unsigned char a4)
 void func_00036DC9(int a1, int a2, int a3, unsigned char a4)
 {
     D_001995E4->chain_count++;
-    D_001995EC = (struct link *)(((int)D_00199D78) + ((link_count)++ * 39));
+    D_001995EC = (struct link *)(((int)D_00199D78) + (link_count++ * 39));
     mc_memset((int)D_001995EC, 0, 39, (int)D_00170AB4, 490, 4);
     D_001995EC->object_id = D_00199618;
     if (a2 != 0) {

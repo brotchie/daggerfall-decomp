@@ -13,16 +13,16 @@ extern unsigned short _FP_SEG( const volatile void __far * );
 
 void dpmi_get_free_memory(int a1)
 {
-    {
-        char l_40[28];
-        char l_24[12];
+{
+    char l_40[28];
+    char l_24[12];
 
-        mc_memset((int)l_24, 0, 12, (int)D_00177348, 39, 4);
-        *(int *)l_40 = 1280;
-        *(int *)((char *)l_40 + 20) = a1;
-        *(short *)l_24 = _FP_SEG((void *)a1);
-        int386x(49, (int)l_40, (int)l_40, (int)l_24);
-    }
+    mc_memset((int)l_24, 0, 12, (int)D_00177348, 39, 4);
+    *(int *)l_40 = 1280;
+    *(int *)((char *)l_40 + 20) = a1;
+    *(short *)l_24 = _FP_SEG((void *)a1);
+    int386x(49, (int)l_40, (int)l_40, (int)l_24);
+}
 }
 
 int dpmi_lock_region(int a1, int a2)

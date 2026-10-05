@@ -50,9 +50,7 @@ void inv_click_left_item(struct record *a1)
             inv_item_info(inv_selected_item, l_34);
             return;
         case 1:
-            if (trade_mode == 0) goto L94763;
-            if (trade_mode != 1) goto L94793;
-L94763:;
+            if (trade_mode != 0) if (trade_mode != 1) goto L94793;
             if (((int)(unsigned short)(a1->flags & 32)) == 0 || l_34->enchantments[0].type == (-1)) {
                 inv_equip_item(inv_selected_item);
             }

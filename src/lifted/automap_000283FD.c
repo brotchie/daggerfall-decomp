@@ -2,7 +2,7 @@
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
 
-extern int D_00195C44;
+extern char D_00195C44[];
 extern int D_00196D88;
 extern int D_00196D8C;
 
@@ -19,7 +19,7 @@ int func_000283FD(int a1, int a2)
     int l_18;
 
     l_2C = 0;
-    l_1C = D_00195C44 + 4;
+    l_1C = *(int *)D_00195C44 + 4;
     while (*(short *)((char *)l_1C) != 0) {
         l_18 = l_1C;
         l_24 = ((((int)(unsigned short)*(short *)((char *)l_18)) - D_00196D88) * 2) + 10;

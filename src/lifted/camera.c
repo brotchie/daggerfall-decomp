@@ -48,7 +48,7 @@ void screenshot_save_bmp(int a1)
         D_00178A53[((int)(short)l_1C) << 2] = *(signed char *)((char *)((((int)(short)l_1C) * 3) + l_20) + 1) << 2;
         D_00178A54[((int)(short)l_1C) << 2] = *(signed char *)((char *)((((int)(short)l_1C) * 3) + l_20)) << 2;
     }
-    (screenshot_number)++;
+    screenshot_number++;
     unlink(a1);
     *(int *)&l_18 = open(a1, 546, 384);
     if (((int)(short)l_18) != (-1) && l_20 != 0) {

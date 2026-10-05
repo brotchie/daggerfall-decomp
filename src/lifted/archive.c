@@ -11,7 +11,7 @@ extern int lock_text_fail;
 extern int lock_text_open;
 extern struct record *player_object;
 extern struct character *player_character;
-extern int D_00195C44;
+extern char D_00195C44[];
 extern char archive_directories[];
 extern char archive_types[];
 extern char archive_record_counts[];
@@ -103,12 +103,12 @@ int archive_find_record(int a1, int a2, int a3)
     }
     if (((int)(short)*(short *)(archive_types + (a1 * 2))) == 256) {
         func_000A0ED9(105, (int)D_00170150);
-        mc_sprintf(D_00195C44, (int)D_0017015A, a2, ((int)archive_names) + (a1 * 13));
+        mc_sprintf(*(int *)D_00195C44, (int)D_0017015A, a2, ((int)archive_names) + (a1 * 13));
     } else {
         func_000A0ED9(107, (int)D_00170150);
-        mc_sprintf(D_00195C44, (int)D_00170172, a3, ((int)archive_names) + (a1 * 13));
+        mc_sprintf(*(int *)D_00195C44, (int)D_00170172, a3, ((int)archive_names) + (a1 * 13));
     }
-    fatal_error(D_00195C44);
+    fatal_error(*(int *)D_00195C44);
     return 0;
 }
 

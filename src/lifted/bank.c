@@ -48,13 +48,13 @@ extern struct record *bank_accounts;
 extern struct record *player_entity;
 extern struct record *player_object;
 extern struct record *D_00195AC4;
-extern int D_00195B5C;
+extern char D_00195B5C[];
 extern struct location *current_location;
 extern struct character *player_character;
 extern int window_image;
 extern int game_minutes;
 extern struct settings *game_settings;
-extern int D_00195C44;
+extern char D_00195C44[];
 extern int D_00195D30;
 extern signed char climate_weathers[];
 extern short D_00195F36;
@@ -154,7 +154,7 @@ int bank_open(int a1)
         while (mouse_buttons != 0) func_0012B136();
         D_001A41E4 = 0;
         window_image = disk_read_file((int)D_00175C90, 0);
-        D_00195B5C = disk_read_file((int)D_00175C9D, 0);
+        *(int *)D_00195B5C = disk_read_file((int)D_00175C9D, 0);
         D_001A41E8 = disk_read_file((int)D_00175CAA, 0);
         D_001A4140 = disk_read_file((int)D_00175CB7, 0);
         func_0012A2D0(51, 45, 216, 72);
@@ -175,8 +175,7 @@ int bank_open(int a1)
 
 void bank_close(void)
 {
-    do {
-    } while (key_down_esc != 0);
+    while (key_down_esc != 0);
     if (((int)(unsigned short)(game_settings->view_flags & 1)) != 0) {
         func_0012A2D0(160, 100, 160, 100);
     } else {
@@ -190,9 +189,9 @@ void bank_close(void)
         mc_free(window_image, (int)D_00175CC4, 111);
         window_image = -1751672937;
     }
-    if (D_00195B5C != 0 && D_00195B5C != (-1751672937)) {
-        mc_free(D_00195B5C, (int)D_00175CC4, 112);
-        D_00195B5C = -1751672937;
+    if (*(int *)D_00195B5C != 0 && *(int *)D_00195B5C != (-1751672937)) {
+        mc_free(*(int *)D_00195B5C, (int)D_00175CC4, 112);
+        *(int *)D_00195B5C = -1751672937;
     }
     if (D_001A41E8 != 0 && D_001A41E8 != (-1751672937)) {
         mc_free(D_001A41E8, (int)D_00175CC4, 113);
@@ -264,7 +263,7 @@ void bank_add_house_for_sale(struct record *a1)
         if (*(int *)(l_18->model + 12) > l_24) l_24 = *(int *)(l_18->model + 12);
     }
     *(int *)(D_001A3FB4 + (((int)(unsigned char)bank_house_count) * 20)) = l_24 * 5;
-    (bank_house_count)++;
+    bank_house_count++;
 }
 
 void bank_init_ships(void)
@@ -459,7 +458,7 @@ void bank_draw_preview(int a1, int a2)
     } else if (D_001A41E0 > 2000) {
         D_001A41E0 = 2000;
     }
-    D_000C23CC = -(D_001A41E0);
+    D_000C23CC = -D_001A41E0;
     D_000C23B8 = 0;
     D_000C23BC = 0;
     D_000C23C0 = 0;
@@ -636,7 +635,7 @@ int bank_input_amount(void)
 
     l_20 = 0;
     D_0012B508 = 146;
-    l_1C = D_00195C44 + 55000;
+    l_1C = *(int *)D_00195C44 + 55000;
     *(signed char *)((char *)l_1C) = 0;
     *(signed char *)D_00191020 = 0;
     D_00195F36 = 157;

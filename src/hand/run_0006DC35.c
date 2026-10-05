@@ -258,7 +258,6 @@ void guild_service_dispatch(struct record *a1)
         }
     }
     switch ((unsigned)l_2C) {
-        break;
     case 0:
         if (guild_membership != 0) {
             switch (a1->data.person.faction_id) {

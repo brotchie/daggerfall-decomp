@@ -57,7 +57,7 @@ extern int list_popup_callback;
 extern char D_00195B84[];
 extern struct character *player_character;
 extern int window_image;
-extern int D_00195C44;
+extern char D_00195C44[];
 extern char cfg_item_file[];
 extern signed char D_00196272;
 extern signed char game_mode;
@@ -151,8 +151,7 @@ void itemmaker_reset(void)
 
 int itemmaker_close(void)
 {
-    do {
-    } while (key_down_esc != 0);
+    while (key_down_esc != 0);
     D_00187CA8 = 1;
     if ((int)itemmaker_item != 0) inv_store_item((int)itemmaker_item_object);
     game_mode = 0;
@@ -178,7 +177,7 @@ void itemmaker_enter_name(void)
         msgbox_show_rsc(1653, 1);
         return;
     }
-    l_18 = D_00195C44 + 55000;
+    l_18 = *(int *)D_00195C44 + 55000;
     func_000A0ED9(242, (int)D_001756A3);
     mc_sprintf(l_18, (int)D_001756BE, D_0017D1EA);
     *(signed char *)((char *)(func_000A0DF4(l_18) + l_18) + 1) = 0;
@@ -339,8 +338,8 @@ int itemmaker_pick_param_list(int a1)
         itemmaker_show_param_list(spells_std_names_for_ids(D_00185871[a1]), (int)(short)(a1 - 1));
         break;
     case 4:
-        *(int *)D_00190EE4 = D_00195C44 + 20000;
-        D_00190EDC = D_00195C44 + 21000;
+        *(int *)D_00190EE4 = *(int *)D_00195C44 + 20000;
+        D_00190EDC = *(int *)D_00195C44 + 21000;
         *(int *)D_00195B84 = 0;
         object_foreach(player_entity->children, (int)itemmaker_soul_list_cb);
         if (*(int *)D_00195B84 == 0 && ((int)(short)D_00190D68) != 2) {
@@ -398,7 +397,7 @@ void itemmaker_show_list(int a1, int a2)
                 if (((int)(short)*(short *)&a2) == 15 && itemmaker_has_soul_bound() != 0) {
                 } else if (((int)(short)*(short *)&a2) == 21 && itemmaker_has_health_leech() != 0) {
                 } else {
-                    *(signed char *)((char *)(int)(((int)(short)*(short *)&l_14) + *(char **)&D_00195C44) + 64000) = *(signed char *)&l_18;
+                    *(signed char *)((char *)(int)(((int)(short)*(short *)&l_14) + *(char **)D_00195C44) + 64000) = *(signed char *)&l_18;
                     *(int *)(D_00190EE4 + (((int)(short)*(short *)&l_14) << 2)) = *(int *)((char *)a1);
                     l_14++;
                 }
@@ -591,7 +590,7 @@ void func_000585D6(struct record *a1, int a2)
         *(int *)(inv_left_rows + ((((int)(short)D_001AA586) - *(int *)inv_left_scroll) << 2)) = (int)a1;
         inv_draw_item_cell(a1, (int)(short)(D_001AA586 - *(short *)inv_left_scroll), a2);
     }
-    (D_001AA586)++;
+    D_001AA586++;
 }
 
 void itemmaker_list_parent(void)

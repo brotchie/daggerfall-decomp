@@ -18,7 +18,7 @@ extern char D_00190D64[];
 extern char D_00190D66[];
 extern short D_00190D68;
 extern char frame_counter[];
-extern int D_00195C44;
+extern char D_00195C44[];
 extern signed char mouse_buttons_prev;
 extern signed char D_001997B5[];
 extern char class_questions_asked[];
@@ -90,7 +90,7 @@ void class_question_show(int a1)
         text_draw((int)text_buffer, 20, ((int)(short)D_0012DA44) * ((int)(short)*(short *)&l_18));
         (*(short *)&l_18)++;
     }
-    mc_memcpy(D_00195C44, screen_buffer, 64000, (int)D_0017539B, 193, 4);
+    mc_memcpy(*(int *)D_00195C44, screen_buffer, 64000, (int)D_0017539B, 193, 4);
     mc_memcpy(screen_buffer, l_20, 64000, (int)D_0017539B, 194, 4);
     if (l_20 != 0 && l_20 != (-1751672937)) {
         mc_free(l_20, (int)D_0017539B, 195);
@@ -116,14 +116,14 @@ void func_0005175B(int a1, short a2)
 
 void class_question_answer_anim(short a1)
 {
-    {
-        char l_44[44];
+{
+    char l_44[44];
 
-        func_000A1944((int)l_44, 0, 44);
-        *(short *)l_44 = 16;
-        sound_play_ui(18);
-        pflc_play(class_answer_cels[((int)(short)a1)], (int)l_44);
-    }
+    func_000A1944((int)l_44, 0, 44);
+    *(short *)l_44 = 16;
+    sound_play_ui(18);
+    pflc_play(class_answer_cels[((int)(short)a1)], (int)l_44);
+}
 }
 
 int class_question_get_answer(void)
@@ -174,8 +174,8 @@ int class_question_pick_class(void)
     int l_24;
     short l_18;
 
-    disk_read_file((int)D_001753DB, D_00195C44);
-    *(int *)&l_1C = D_00195C44 + 18;
+    disk_read_file((int)D_001753DB, *(int *)D_00195C44);
+    *(int *)&l_1C = *(int *)D_00195C44 + 18;
     l_24 = ((((int)(unsigned char)D_0019981B) << 16) | (((int)(unsigned char)D_0019981A) << 8)) | ((int)(unsigned char)class_answer_counts);
     *(int *)&l_18 = 0;
     for (; ((int)(short)l_18) < 48; (*(int *)&l_18)++) {

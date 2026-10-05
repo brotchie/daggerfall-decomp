@@ -752,7 +752,6 @@ int quest_dispatch_event(struct quest *a1)
     for (l_2C = 0; a1->section_counts[8] > l_2C; l_2C++, l_30++) {
         if (l_30->opcode == quest_event_code) {
             switch (l_30->opcode) {
-                break;
             case 71:
                 if (((int)(short)(l_30->flags & 1)) == 0) {
                     if (quest_event_object->twin != l_30->args[3].object) break;

@@ -83,7 +83,7 @@ extern int D_001967F0;
 extern int D_001967F4;
 extern int D_001967F8;
 extern char D_001967FC[];
-extern char *rmb_record_ptr;
+extern char rmb_record_ptr[];
 extern struct record *D_00196DB0;
 extern char cfg_block_str[];
 extern char cfg_mapsave_file[];
@@ -367,11 +367,7 @@ int automap_draw_object_cb(struct record *a1)
     switch (a1->type) {
     case 34:
         if (cfg_show_markers == 0) break;
-        if (a1->image == 0) goto L840F3;
-        if (a1->image != 65535) goto L840F8;
-L840F3:;
-        break;
-L840F8:;
+        if (a1->image == 0 || a1->image == 65535) break;
         a1->draw_handle = func_00154D00(a1->x, a1->y, a1->z, a1->image, -1, 4, 4129024);
         break;
     case 43:
@@ -436,8 +432,8 @@ void rmb_add_doors(struct record *a1, struct block_door *a2)
     struct record *l_18;
     int l_14;
 
-    if (*(signed char *)(rmb_record_ptr + 4) == 0) return;
-    for (l_14 = 0; ((int)(unsigned char)*(signed char *)(rmb_record_ptr + 4)) > l_14; l_14++, a2++) {
+    if (*(signed char *)(*(char **)rmb_record_ptr + 4) == 0) return;
+    for (l_14 = 0; ((int)(unsigned char)*(signed char *)(*(char **)rmb_record_ptr + 4)) > l_14; l_14++, a2++) {
         l_18 = rmb_make_door(a1, a2->image2, (int)(short)((unsigned short)a2->image), 1);
         func_000C7F07(0, (a2->yaw + *(int *)D_001967FC) % 2048, 0, (int)RECORD_DATA(l_18) + 12);
         l_18->lock_level = (unsigned short)a2->lock_level;
@@ -456,8 +452,8 @@ void rmb_add_people(struct record *a1, struct block_flat *a2)
     struct record *l_18;
     int l_14;
 
-    if (*(signed char *)(rmb_record_ptr + 3) == 0) return;
-    for (l_14 = 0; ((int)(unsigned char)*(signed char *)(rmb_record_ptr + 3)) > l_14; l_14++, a2++) {
+    if (*(signed char *)(*(char **)rmb_record_ptr + 3) == 0) return;
+    for (l_14 = 0; ((int)(unsigned char)*(signed char *)(*(char **)rmb_record_ptr + 3)) > l_14; l_14++, a2++) {
         l_18 = rmb_make_flat(a1, (int)(short)a2->image, (int)(short)a2->faction_id, 0);
         rotate_xz((int)&a2->x, (int)&a2->z, *(int *)D_001967FC);
         a2->x += D_001967F8;

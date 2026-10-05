@@ -26,7 +26,7 @@ extern int D_00195A78;
 extern struct record *player_object;
 extern struct record *D_00195AA8;
 extern struct record *D_00195AC4;
-extern char *hud_bar_image;
+extern char hud_bar_image[];
 extern struct character *player_character;
 extern int game_minutes;
 extern struct settings *game_settings;
@@ -149,10 +149,9 @@ void damage_collapse_exhausted(struct record *a1)
     int l_18;
 
     l_1C = func_000C9F08();
-    mc_memset(655360, 0, ((((int)(unsigned short)(*(short *)((char *)((int)game_settings)) & 1)) != 0) ? 64000 : ((int)(unsigned short)*(short *)(hud_bar_image + 2)) * 320), (int)D_001709E4, 701, 4);
+    mc_memset(655360, 0, ((((int)(unsigned short)(*(short *)((char *)((int)game_settings)) & 1)) != 0) ? 64000 : ((int)(unsigned short)*(short *)(*(char **)hud_bar_image + 2)) * 320), (int)D_001709E4, 701, 4);
     time_pass(20160);
-    do {
-    } while ((func_000C9F08() - l_1C) < 22);
+    while ((func_000C9F08() - l_1C) < 22);
 }
 
 void damage_spawn_splash(struct record *a1, int a2, int a3)

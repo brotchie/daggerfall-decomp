@@ -38,7 +38,7 @@ extern char text_macro_fpc[];
 extern struct record *player_object;
 extern struct character *player_character;
 extern int window_image;
-extern int D_00195C44;
+extern char D_00195C44[];
 extern signed char D_00196266;
 extern signed char mouse_buttons_prev;
 extern int D_00196D68;
@@ -102,9 +102,9 @@ void career_background_summary(int a1, int a2)
     if (a1 == 18) a1 = career_nearest_class();
     func_000A0ED9(59, (int)D_00170738);
     mc_sprintf((int)text_buffer, (int)D_00170741, a1);
-    mc_memset(D_00195C44, 0, 64000, (int)D_00170738, 60, 4);
-    disk_read_file((int)text_buffer, D_00195C44 + 1);
-    *(signed char *)(*(char **)&D_00195C44) = 10;
+    mc_memset(*(int *)D_00195C44, 0, 64000, (int)D_00170738, 60, 4);
+    disk_read_file((int)text_buffer, *(int *)D_00195C44 + 1);
+    *(signed char *)(*(char **)D_00195C44) = 10;
     if (a2 != 0) disk_read_file((int)D_00170750, D_00147954);
     for (l_20 = 0; l_20 < 12; l_20++) {
         if (a2 != 0) {
@@ -151,7 +151,7 @@ void career_find_question(int a1)
     unsigned char l_18;
 
     l_18 = 0;
-    l_1C = D_00195C44;
+    l_1C = *(int *)D_00195C44;
     while (l_18 == 0) {
         l_1C = memchr(l_1C, 10, 2000);
         l_1C++;
@@ -257,9 +257,8 @@ void career_bio_page_down(void)
 
     if ((D_00196D68 + 21) >= career_bio_lines) return;
     for (l_18 = 0; l_18 < 21; l_18++) {
-        do {
-        } while (*(signed char *)((char *)(career_bio_page)++) != 0);
-        (D_00196D68)++;
+        while (*(signed char *)((char *)(career_bio_page)++) != 0);
+        D_00196D68++;
     }
 }
 
@@ -271,7 +270,7 @@ void career_bio_page_up(void)
     for (l_18 = 0; l_18 < 21; l_18++) {
         career_bio_page -= 2;
         while (*(signed char *)(((char *)career_bio_page)) != 0) (career_bio_page)--;
-        (D_00196D68)--;
+        D_00196D68--;
     }
     if (((unsigned)career_bio_page) >= career_bio_text) return;
     career_bio_page = career_bio_text;

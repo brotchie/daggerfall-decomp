@@ -33,7 +33,7 @@ extern signed char D_001940D8;
 extern struct record *logbook_object;
 extern struct record *player_object;
 extern int window_image;
-extern int D_00195C44;
+extern char D_00195C44[];
 extern int D_00195D94;
 extern signed char D_00196272;
 extern signed char game_mode;
@@ -95,8 +95,7 @@ void logbook_update(void)
 int logbook_close(void)
 {
     D_00195D94 = 0;
-    do {
-    } while (key_down_esc != 0);
+    while (key_down_esc != 0);
     if (*(int *)logbook_show_notes != 0) {
         logbook_toggle_notes();
         return 0;
@@ -132,8 +131,7 @@ void logbook_draw_entry(int a1)
             break;
         case 247:
             func_0005A1C8(a1 + 1);
-            do {
-            } while (*(signed char *)((char *)a1++) != 0);
+            while (*(signed char *)((char *)a1++) != 0);
             break;
         case 250:
             D_0012B508 = *(signed char *)((char *)a1 + 1);
@@ -187,14 +185,14 @@ void logbook_prev_page(void)
 {
     if (logbook_first_entry == 0) return;
     sound_play(205, (int)player_object, 100);
-    (logbook_first_entry)--;
+    logbook_first_entry--;
 }
 
 void logbook_next_page(void)
 {
     if ((logbook_entry_count - 1) <= logbook_first_entry) return;
     sound_play(205, (int)player_object, 100);
-    (logbook_first_entry)++;
+    logbook_first_entry++;
 }
 
 void logbook_build_entries(void)
@@ -205,7 +203,7 @@ void logbook_build_entries(void)
     struct quest *l_1C;
     int l_18;
 
-    l_18 = D_00195C44 + 20000;
+    l_18 = *(int *)D_00195C44 + 20000;
     if (*(int *)logbook_show_notes != 0 && disk_file_exists(logbook_notes_file) != 0) {
         logbook_load_notes();
         return;
@@ -230,7 +228,7 @@ void logbook_build_entries(void)
             if (text_rsc_buffer[0] == 0) continue;
             mc_strncpy(l_18, (int)text_rsc_buffer, 4, (int)D_00175C86, 216);
             l_18 += func_000A0DF4(l_18) + 1;
-            (logbook_entry_count)++;
+            logbook_entry_count++;
         }
     }
     *(signed char *)((char *)l_18++) = 0;
@@ -243,12 +241,12 @@ void logbook_load_notes(void)
     int l_1C;
     int l_18;
 
-    l_1C = D_00195C44 + 20000;
+    l_1C = *(int *)D_00195C44 + 20000;
     mc_memset(l_1C, 0, 35000, (int)D_00175C86, 233, 4);
     disk_read_file((int)D_00175C6C, l_1C);
     while (*(signed char *)((char *)l_1C) != 0) {
         l_1C += func_000A0DF4(l_1C) + 1;
-        (logbook_entry_count)++;
+        logbook_entry_count++;
     }
     *(signed char *)((char *)l_1C++) = 0;
     *(signed char *)((char *)l_1C++) = 0;
@@ -263,7 +261,7 @@ void logbook_draw(void)
     D_0014292C = 25;
     *(short *)D_00190D66 = 0;
     func_0012DB50(4);
-    l_18 = func_0006AE87(D_00195C44 + 20000, logbook_first_entry);
+    l_18 = func_0006AE87(*(int *)D_00195C44 + 20000, logbook_first_entry);
     for (l_1C = logbook_first_entry; l_1C < logbook_entry_count; l_1C++) {
         if (((int)(short)D_0014292C) > 160) return;
         logbook_draw_entry(l_18);

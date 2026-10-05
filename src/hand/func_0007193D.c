@@ -24,7 +24,7 @@ extern int creature_count;
 extern char inpstr_result[];
 extern struct character *player_character;
 extern struct career *player_class;
-extern int D_00195C44;
+extern char D_00195C44[];
 extern unsigned char D_0019626F;
 extern signed char game_mode;
 extern signed char mouse_buttons_prev;
@@ -32,7 +32,7 @@ extern signed char D_00196294;
 extern signed char D_00196299;
 extern signed char D_0019629E;
 extern int D_001A4A20;
-extern int rest_image;
+extern char rest_image[];
 extern signed char rest_loitering;
 extern void msgbox_show_string(int, int);
 extern void msgbox_show_rsc(int, int);
@@ -64,7 +64,9 @@ void rest_update(void)
 
     D_0019629E = 0;
     if (((int)(unsigned char)game_mode) != 16) {
-        if (((int)D_0019626F) != 16 || ((int)(unsigned char)game_mode) != 8) return;
+        if (((int)D_0019626F) != 16 || ((int)(unsigned char)game_mode) != 8) {
+            return;
+        }
     }
     func_00143914(0);
     hud_draw();
@@ -86,7 +88,7 @@ void rest_update(void)
         return;
     }
     if (D_00190D1A == 0) {
-        func_00144F68((int)(unsigned short)*(short *)(*(char **)&rest_image), (int)(unsigned short)*(short *)(*(char **)&rest_image + 2), (int)(unsigned short)*(short *)(*(char **)&rest_image + 4), (int)(unsigned short)*(short *)(*(char **)&rest_image + 6), (int)(*(char **)&rest_image + 12));
+        func_00144F68((int)(unsigned short)*(short *)(*(char **)rest_image), (int)(unsigned short)*(short *)(*(char **)rest_image + 2), (int)(unsigned short)*(short *)(*(char **)rest_image + 4), (int)(unsigned short)*(short *)(*(char **)rest_image + 6), (int)(*(char **)rest_image + 12));
         if (mouse_buttons != 0 && mouse_buttons_prev == 0 && point_in_rect((int)(short)mouse_x, (int)(short)mouse_y, 87, 63, 134, 86) != 0) {
             while (mouse_buttons != 0) func_0012B136();
             if (rest_allowed() == 0) {
@@ -95,19 +97,18 @@ void rest_update(void)
             }
             D_001A4A20 = 9;
             D_00190D1A = 1;
-            if (rest_image != 0 && rest_image != (-1751672937)) {
-                mc_free(rest_image, (int)D_001760D6, 165);
-                rest_image = -1751672937;
+            if (*(int *)rest_image != 0 && *(int *)rest_image != (-1751672937)) {
+                mc_free(*(int *)rest_image, (int)D_001760D6, 165);
+                *(int *)rest_image = -1751672937;
             }
-            rest_image = disk_read_file((int)D_001760DD, 0);
-            l_30 = (int)(((char *)D_00195C44) + 55000);
+            *(int *)rest_image = disk_read_file((int)D_001760DD, 0);
+            l_30 = (int)(*(char **)D_00195C44 + 55000);
             func_000A0ED9(168, (int)D_001760D6);
             mc_sprintf(l_30, (int)D_001760EA, D_0017D1FA);
             *(signed char *)((char *)(func_000A0DF4(l_30) + l_30) + 1) = 0;
             inpstr_begin_number(0);
             msgbox_show_string(l_30, 2);
-            do {
-            } while (key_down_enter != 0);
+            while (key_down_enter != 0);
         } else if (mouse_buttons != 0 && mouse_buttons_prev == 0 && point_in_rect((int)(short)mouse_x, (int)(short)mouse_y, 136, 63, 183, 86) != 0) {
             while (mouse_buttons != 0) func_0012B136();
             if (rest_allowed() == 0) {
@@ -116,22 +117,22 @@ void rest_update(void)
             }
             D_001A4A20 = 9;
             D_00190D1A = 3;
-            if (rest_image != 0 && rest_image != (-1751672937)) {
-                mc_free(rest_image, (int)D_001760D6, 184);
-                rest_image = -1751672937;
+            if (*(int *)rest_image != 0 && *(int *)rest_image != (-1751672937)) {
+                mc_free(*(int *)rest_image, (int)D_001760D6, 184);
+                *(int *)rest_image = -1751672937;
             }
-            rest_image = disk_read_file((int)D_0017610F, 0);
+            *(int *)rest_image = disk_read_file((int)D_0017610F, 0);
             D_00190CBC = *(int *)1132;
         } else if (mouse_buttons != 0 && mouse_buttons_prev == 0 && point_in_rect((int)(short)mouse_x, (int)(short)mouse_y, 185, 63, 232, 86) != 0) {
             while (mouse_buttons != 0) func_0012B136();
             D_001A4A20 = 32;
             D_00190D1A = 1;
-            if (rest_image != 0 && rest_image != (-1751672937)) {
-                mc_free(rest_image, (int)D_001760D6, 193);
-                rest_image = -1751672937;
+            if (*(int *)rest_image != 0 && *(int *)rest_image != (-1751672937)) {
+                mc_free(*(int *)rest_image, (int)D_001760D6, 193);
+                *(int *)rest_image = -1751672937;
             }
-            rest_image = disk_read_file((int)D_001760DD, 0);
-            l_30 = (int)(((char *)D_00195C44) + 55000);
+            *(int *)rest_image = disk_read_file((int)D_001760DD, 0);
+            l_30 = (int)(*(char **)D_00195C44 + 55000);
             func_000A0ED9(196, (int)D_001760D6);
             mc_sprintf(l_30, (int)D_0017611C, D_0017D1FE);
             *(signed char *)((char *)(func_000A0DF4(l_30) + l_30) + 1) = 0;
@@ -139,8 +140,7 @@ void rest_update(void)
             msgbox_show_string(l_30, 2);
             rest_loitering = 1;
             D_00196294 = 1;
-            do {
-            } while (key_down_enter != 0);
+            while (key_down_enter != 0);
         }
         return;
     }
@@ -164,7 +164,7 @@ void rest_update(void)
         return;
     }
     if (((int)(signed char)D_00190D1A) == 2) {
-        func_00144F68((int)(unsigned short)*(short *)(*(char **)&rest_image), (int)(unsigned short)*(short *)(*(char **)&rest_image + 2), (int)(unsigned short)*(short *)(*(char **)&rest_image + 4), (int)(unsigned short)*(short *)(*(char **)&rest_image + 6), (int)(*(char **)&rest_image + 12));
+        func_00144F68((int)(unsigned short)*(short *)(*(char **)rest_image), (int)(unsigned short)*(short *)(*(char **)rest_image + 2), (int)(unsigned short)*(short *)(*(char **)rest_image + 4), (int)(unsigned short)*(short *)(*(char **)rest_image + 6), (int)(*(char **)rest_image + 12));
         text_draw_centered_colored(func_000A0DD9((int)(short)D_00190DD0, (int)text_buffer, 10), 118, 62, 146, 156);
         if (mouse_buttons != 0 && mouse_buttons_prev == 0 && point_in_rect((int)(short)mouse_x, (int)(short)mouse_y, 140, 76, 179, 85) != 0) {
             rest_close();
@@ -172,7 +172,7 @@ void rest_update(void)
         if (((unsigned)(*(int *)1132 - D_00190CBC)) > D_001A4A20) {
             time_pass_minutes(60);
             if (rest_loitering == 0) rest_recover(player_entity);
-            (D_00190DD0)--;
+            D_00190DD0--;
             D_00190CBC = *(int *)1132;
         }
         if (D_00190DD0 == 0) {
@@ -182,14 +182,14 @@ void rest_update(void)
         return;
     }
     if (((int)(signed char)D_00190D1A) != 3) return;
-    func_00144F68((int)(unsigned short)*(short *)(*(char **)&rest_image), (int)(unsigned short)*(short *)(*(char **)&rest_image + 2), (int)(unsigned short)*(short *)(*(char **)&rest_image + 4), (int)(unsigned short)*(short *)(*(char **)&rest_image + 6), (int)(*(char **)&rest_image + 12));
+    func_00144F68((int)(unsigned short)*(short *)(*(char **)rest_image), (int)(unsigned short)*(short *)(*(char **)rest_image + 2), (int)(unsigned short)*(short *)(*(char **)rest_image + 4), (int)(unsigned short)*(short *)(*(char **)rest_image + 6), (int)(*(char **)rest_image + 12));
     text_draw_centered_colored(func_000A0DD9((int)(short)D_00190DD0, (int)text_buffer, 10), 118, 62, 146, 156);
     if (mouse_buttons != 0 && mouse_buttons_prev == 0 && point_in_rect((int)(short)mouse_x, (int)(short)mouse_y, 140, 76, 179, 85) != 0) {
         rest_close();
     } else if (((unsigned)(*(int *)1132 - D_00190CBC)) > D_001A4A20) {
         time_pass_minutes(60);
         rest_recover(player_entity);
-        (D_00190DD0)++;
+        D_00190DD0++;
         D_00190CBC = *(int *)1132;
     }
     if (player_character->health != player_character->max_health || (player_character->magicka != player_character->max_magicka && (player_class->flags & 8) == 0) || player_character->fatigue != ((player_character->attributes[0] + player_character->attributes[4]) << 6)) {

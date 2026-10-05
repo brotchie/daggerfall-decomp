@@ -47,7 +47,7 @@ extern struct record *player_object;
 extern char inpstr_result[];
 extern struct character *player_character;
 extern int window_image;
-extern int D_00195C44;
+extern char D_00195C44[];
 extern int trade_mode;
 extern signed char D_00196272;
 extern signed char game_mode;
@@ -144,8 +144,7 @@ void book_update(void)
 
 void book_close(void)
 {
-    do {
-    } while (key_down_esc != 0);
+    while (key_down_esc != 0);
     if (((int)(short)book_file) < 1) return;
     D_001940D8 &= 239;
     func_0009DEA7((int)(short)book_file);
@@ -215,14 +214,14 @@ void book_prev_page(void)
 {
     if (book_page == 0) return;
     sound_play(205, (int)player_object, 100);
-    (book_page)--;
+    book_page--;
 }
 
 void book_next_page(void)
 {
     if (((int)(short)book_page) == (((int)(short)book_page_count) - 1)) return;
     sound_play(205, (int)player_object, 100);
-    (book_page)++;
+    book_page++;
 }
 
 void book_goto_page_prompt(void)
@@ -230,7 +229,7 @@ void book_goto_page_prompt(void)
     int l_18;
 
     D_0012B508 = 146;
-    l_18 = D_00195C44 + 55000;
+    l_18 = *(int *)D_00195C44 + 55000;
     func_000A0ED9(268, (int)D_001757A8);
     mc_sprintf(l_18, (int)D_001757D7, D_0017D1E6);
     *(signed char *)((char *)(func_000A0DF4(l_18) + l_18) + 1) = 0;

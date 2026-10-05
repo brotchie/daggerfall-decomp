@@ -29,7 +29,7 @@ extern char inpstr_result[];
 extern struct location *current_location;
 extern struct character *player_character;
 extern int game_minutes;
-extern int D_00195C44;
+extern char D_00195C44[];
 extern char D_00195CE8[];
 extern int D_00195D30;
 extern signed char current_region;
@@ -85,10 +85,8 @@ void tavern_close(void)
     mouse_buttons = (mouse_buttons_prev = 0);
     func_0012B136();
     while (mouse_buttons != 0) func_0012B136();
-    do {
-    } while (key_action_held(18) != 0);
-    do {
-    } while (key_down_esc != 0);
+    while (key_action_held(18) != 0);
+    while (key_down_esc != 0);
     game_mode = 0;
     if (tavern_menu_image != 0 && tavern_menu_image != (-1751672937)) {
         mc_free(tavern_menu_image, (int)D_00170569, 117);
@@ -107,8 +105,7 @@ void tavern_rent_room(void)
     } else {
         msgbox_show_rsc(5102, 2);
     }
-    do {
-    } while (key_down_enter != 0);
+    while (key_down_enter != 0);
     func_00142790();
 }
 
@@ -296,7 +293,7 @@ void func_0001F89F(void)
     struct record *l_18;
 
     func_0001FE4D();
-    D_00196ABC = (struct building *)D_00195C44;
+    D_00196ABC = (struct building *)*(int *)D_00195C44;
     *(int *)D_00195B84 = 0;
     func_0001FB3F();
     func_0001FAB2();
@@ -317,7 +314,7 @@ void func_0001F958(void)
     int l_18;
 
     func_0001FE4D();
-    D_00196ABC = (struct building *)D_00195C44;
+    D_00196ABC = (struct building *)*(int *)D_00195C44;
     *(int *)D_00195B84 = 0;
     func_0001FAB2();
     for (l_1C = 0; l_1C < *(int *)D_00195B84; l_1C++) {

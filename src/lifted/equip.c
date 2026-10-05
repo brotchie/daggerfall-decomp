@@ -60,7 +60,7 @@ extern struct record *D_00195AC4;
 extern int creature_count;
 extern struct location *current_location;
 extern struct character *player_character;
-extern int D_00195C44;
+extern char D_00195C44[];
 extern int trespassing;
 extern int ai_los_index;
 extern char magic_def_count[];
@@ -141,17 +141,18 @@ void ai_creature_think(struct character *, struct record *, struct record *, int
 void item_make(int a1, int a2, struct item *a3)
 {
     switch ((unsigned)a1) {
-    case 5:
-        item_make_artifact(a3, a2);
-        return;
-    case 4:
-        item_make_magic(a3, a2);
-        return;
-    case 11:
-        item_init_from_template(287, 27, 8, a3);
-        return;
-    }
+case 5:
+    item_make_artifact(a3, a2);
+    return;
+case 4:
+    item_make_magic(a3, a2);
+    return;
+case 11:
+    item_init_from_template(287, 27, 8, a3);
+    return;
+default:
     item_init_from_template((int)(unsigned short)*(short *)((char *)(int)(*(char **)(D_00185F88 + (a1 << 2)) + (a2 * 2))), (int)(short)*(short *)&a1, (int)(short)*(short *)&a2, a3);
+}
 }
 
 void func_0005E5D7(struct item *a1, int a2)
@@ -534,8 +535,8 @@ void func_0005F50B(void)
 
     func_000A0ED9(625, (int)D_001758B8);
     mc_sprintf((int)text_buffer, (int)D_001758E2, (((int)(unsigned short)D_00195DC4) >> 3) + 97);
-    disk_read_file((int)text_buffer, D_00195C44);
-    l_18 = D_00195C44;
+    disk_read_file((int)text_buffer, *(int *)D_00195C44);
+    l_18 = *(int *)D_00195C44;
     l_20 = 0;
     l_1C = (int)(unsigned short)(D_00195DC4 & 7);
     while (l_20 < l_1C) {
@@ -554,12 +555,12 @@ void item_info_painting(struct item *a1)
     D_00195DC4 = rand(srand((int)(unsigned short)(short)a1->message)) % 180;
     l_1C = disk_open_data((int)D_001758EE);
     lseek(l_1C, ((int)(unsigned short)D_00195DC4) * 40, 0);
-    func_000A00CB(l_1C, D_00195C44, 40);
+    func_000A00CB(l_1C, *(int *)D_00195C44, 40);
     func_0009DEA7(l_1C);
-    painting_subject_text = func_0005F6E9(D_00195C44) + 6100;
-    painting_adjective_text = func_0005F6E9(D_00195C44 + 10) + 6200;
-    painting_prefix1_text = func_0005F6E9((int)(((char *)D_00195C44) + 20)) + 6300;
-    painting_prefix2_text = (short)func_0005F6E9((int)(((char *)D_00195C44) + 30)) + 6400;
+    painting_subject_text = func_0005F6E9(*(int *)D_00195C44) + 6100;
+    painting_adjective_text = func_0005F6E9(*(int *)D_00195C44 + 10) + 6200;
+    painting_prefix1_text = func_0005F6E9((int)(*(char **)D_00195C44 + 20)) + 6300;
+    painting_prefix2_text = (short)func_0005F6E9((int)(*(char **)D_00195C44 + 30)) + 6400;
     D_001940D6 |= 32;
     msgbox_show_rsc(250, 1);
     srand(l_18);
@@ -582,7 +583,7 @@ void item_init_book(struct item *a1, int a2)
     int l_14;
 
     a1->message = *(short *)(D_0018E044 + (func_0005F955(a2) << 2));
-    l_1C = D_00195C44;
+    l_1C = *(int *)D_00195C44;
     func_000A0ED9(674, (int)D_001758B8);
     mc_sprintf((int)text_buffer, (int)D_001758F8, (int)(unsigned short)(short)a1->message);
     l_18 = disk_open_data((int)text_buffer);
@@ -1082,7 +1083,7 @@ void ai_update_creatures(void)
     }
     player_entity->yaw = player_object->yaw;
     player_entity->angle_x = player_object->angle_x;
-    D_00190504[(creature_count)++] = player_entity;
+    D_00190504[creature_count++] = player_entity;
     for (l_28 = 0; l_28 < creature_count; l_28++) {
         if ((creature_count - 1) != l_28) func_0002682B(D_00190504[l_28]);
         ai_entities[l_28] = (struct record *)((int)D_00190504[l_28]);
@@ -1100,7 +1101,7 @@ void ai_update_creatures(void)
             }
         }
     }
-    (creature_count)--;
+    creature_count--;
     ai_los_index = (ai_los_index + 1) % creature_count;
     for (l_28 = 0; l_28 < creature_count; l_28++) {
         if (ai_entities[l_28]->type != 18) continue;

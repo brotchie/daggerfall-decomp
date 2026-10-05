@@ -32,6 +32,7 @@ int cast_creature_spell_at(struct record *a1, struct record *a2, struct record *
     case 4:
         cast_creature_missile(a1, a2, a3);
         return 0;
+    default:
+        return 1;
     }
-    return 1;
 }

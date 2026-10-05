@@ -10,7 +10,7 @@ extern signed char climate_categories[];
 extern int D_00187F30[];
 extern signed char region_event_values[];
 extern struct record *player_object;
-extern int current_region_data;
+extern char current_region_data[];
 extern signed char current_region;
 extern signed char D_00196269;
 extern signed char current_climate;
@@ -41,7 +41,7 @@ void region_free_tables(void)
 void region_enter(unsigned char a1, unsigned char a2)
 {
     current_region = a2;
-    current_region_data = ((int)region_event_values) + (((int)(unsigned char)current_region) * 80);
+    *(int *)current_region_data = ((int)region_event_values) + (((int)(unsigned char)current_region) * 80);
     D_00196269 = current_region;
     region_unload();
     func_0001DF7F((int)(unsigned char)a2);

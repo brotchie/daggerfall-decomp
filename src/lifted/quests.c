@@ -28,7 +28,7 @@ extern char D_00195B84[];
 extern char D_00195B85[];
 extern struct character *player_character;
 extern int game_minutes;
-extern int D_00195C44;
+extern char D_00195C44[];
 extern struct record *D_00195D00;
 extern int quest_potential_questor;
 extern short D_00195F68;
@@ -161,7 +161,7 @@ int func_0004C4A0(int a1, int a2)
     int l_1C;
     int l_18;
 
-    l_18 = D_00195C44;
+    l_18 = *(int *)D_00195C44;
     for (l_1C = 0; l_1C < a2; l_1C++) {
         if (stricmp(l_18, a1) == 0) return a2;
         l_18 += func_000A0DF4(l_18) + 1;
@@ -231,7 +231,7 @@ int quest_free_id(void)
     int l_1C;
 
     l_28 = D_00195A00->children;
-    l_20 = D_00195C44;
+    l_20 = *(int *)D_00195C44;
     mc_memset(l_20, 0, 256, (int)D_00174F47, 478, 4);
     while (l_28 != 0) {
         l_24 = &l_28->data.quest;

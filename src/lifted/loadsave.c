@@ -94,7 +94,7 @@ extern char cheat_flags[];
 extern char clothing_gender_group[];
 extern char D_00195B18[];
 extern int D_00195B44;
-extern int D_00195B5C;
+extern char D_00195B5C[];
 extern char D_00195B84[];
 extern int hud_message_expiry[];
 extern struct location *current_location;
@@ -106,7 +106,7 @@ extern int game_minutes;
 extern struct settings *game_settings;
 extern int hud_message_ptrs[];
 extern int D_00195C40;
-extern int D_00195C44;
+extern char D_00195C44[];
 extern char D_00195CDC[];
 extern int D_00195CE0;
 extern int D_00195CE4;
@@ -227,7 +227,7 @@ void savetree_read_records(struct record *a1)
     int l_1C;
     int l_18;
 
-    l_24 = *(struct record **)&D_00195C44;
+    l_24 = *(struct record **)D_00195C44;
     l_18 = func_00079A28(l_24);
     while (l_18 != 0) {
         l_24->prev = 0;
@@ -302,7 +302,6 @@ int savetree_should_save(struct record *a1)
     if (a1->quest_id != 0) return 1;
     if (func_000641CD(a1) != 0) return 1;
     switch (a1->type) {
-        goto L7A00D;
     case 8:
         return a1->flags & 512;
     case 2:
@@ -335,7 +334,6 @@ int savetree_should_save(struct record *a1)
         if (((a1->image & 31) - 2) == 14 || ((a1->image & 31) - 2) == 13) return 1;
         break;
     default:
-L7A00D:;
         return 0;
     }
     return 0;
@@ -380,15 +378,15 @@ void savetree_register_record(struct record *a1)
 void load_relink_object_cb(struct record *a1)
 {
     switch (a1->type) {
-    case 3:
-    case 18:
-    case 44:
-        load_relink_character(a1);
-        return;
-    case 9:
-        a1->caster = object_find_by_id(D_00195AC4, (int)a1->caster);
-    default:;
-    }
+case 3:
+case 18:
+case 44:
+    load_relink_character(a1);
+    return;
+case 9:
+    a1->caster = object_find_by_id(D_00195AC4, (int)a1->caster);
+default:;
+}
 }
 
 void load_relink_all(void)
@@ -443,12 +441,12 @@ void save_unlink_character(struct record *a1)
 void func_0007A3D0(struct record *a1)
 {
     switch (a1->type) {
-    case 18:
-    case 33:
-    case 44:
-        *(int *)((char *)(int)(*(char **)&D_00195C44 + ((*(int *)D_00195B84)++ << 2))) = a1->id;
-    default:;
-    }
+case 18:
+case 33:
+case 44:
+    *(int *)((char *)(int)(*(char **)D_00195C44 + ((*(int *)D_00195B84)++ << 2))) = a1->id;
+default:;
+}
 }
 
 void func_0007A42B(struct record *a1)
@@ -457,7 +455,7 @@ void func_0007A42B(struct record *a1)
     int l_18;
 
     if (a1->type != 34 || a1->type == 32) return;
-    l_1C = D_00195C44;
+    l_1C = *(int *)D_00195C44;
     for (l_18 = 0; l_18 < *(int *)D_00195B84; l_18++, (*(char (**)[4])&l_1C)++) {
         if (a1->id == *(int *)((char *)l_1C)) {
             object_delete(a1);
@@ -579,8 +577,8 @@ void saveload_menu(int a1)
     l_24 = 0;
     l_20 = 0;
     l_18 = (window_image = disk_read_file((int)D_0017697F, 0));
-    D_00195B5C = disk_read_file((int)D_0017698C, 0);
-    mc_memset(D_00195C44, 0, 256, (int)D_00176884, 862, 4);
+    *(int *)D_00195B5C = disk_read_file((int)D_0017698C, 0);
+    mc_memset(*(int *)D_00195C44, 0, 256, (int)D_00176884, 862, 4);
     mc_strncpy((int)text_buffer, (int)D_00176999, 160, (int)D_00176884, 864);
     for (l_28 = 0; l_28 < 6; l_28++) {
         D_001903A8 = *(signed char *)&l_28 + 48;
@@ -593,10 +591,10 @@ void saveload_menu(int a1)
     mc_strncpy((int)text_buffer, (int)D_001769A9, 160, (int)D_00176884, 874);
     for (l_28 = 0; l_28 < 6; l_28++) {
         D_001903A8 = *(signed char *)&l_28 + 48;
-        *(signed char *)((char *)(int)(*(char **)&D_00195C44 + (l_28 << 5))) = 0;
+        *(signed char *)((char *)(int)(*(char **)D_00195C44 + (l_28 << 5))) = 0;
         l_1C = open((int)text_buffer, 512);
         if (l_1C < 1) continue;
-        func_000A00CB(l_1C, (int)(*(char **)&D_00195C44 + (l_28 << 5)), 32);
+        func_000A00CB(l_1C, (int)(*(char **)D_00195C44 + (l_28 << 5)), 32);
         func_0009DEA7(l_1C);
     }
     while (l_2C == 0) {
@@ -629,9 +627,9 @@ void saveload_menu(int a1)
         mc_free(l_18, (int)D_00176884, 924);
         l_18 = -1751672937;
     }
-    if (D_00195B5C == 0 || D_00195B5C == (-1751672937)) return;
-    mc_free(D_00195B5C, (int)D_00176884, 925);
-    D_00195B5C = -1751672937;
+    if (*(int *)D_00195B5C == 0 || *(int *)D_00195B5C == (-1751672937)) return;
+    mc_free(*(int *)D_00195B5C, (int)D_00176884, 925);
+    *(int *)D_00195B5C = -1751672937;
 }
 
 int saveload_click_slot(int a1, int a2, int a3, int a4)
@@ -649,9 +647,9 @@ int saveload_confirm(int a1, int a2, int a3, int a4)
     int l_10;
 
     if (a2 != 0) {
-        mc_strncpy((int)text_rsc_buffer, (int)(*(char **)&D_00195C44 + (a3 << 5)), 2048, (int)D_00176884, 948);
+        mc_strncpy((int)text_rsc_buffer, (int)(*(char **)D_00195C44 + (a3 << 5)), 2048, (int)D_00176884, 948);
         D_0012B508 = 146;
-        l_10 = D_00195C44 + 55000;
+        l_10 = *(int *)D_00195C44 + 55000;
         func_000A0ED9(951, (int)D_00176884);
         mc_sprintf(l_10, (int)D_001769BC, D_001846F8);
         *(signed char *)((char *)(func_000A0DF4(l_10) + l_10) + 1) = 0;
@@ -919,26 +917,26 @@ void func_0007C78B(struct record *a1)
         object_delete(a1);
         return;
     case 9:
-        {
-            int l_20;
-            if (a1->parent->type == 47 || a1->parent->type == 38 || a1->parent->type == 1) {
+        if (a1->parent->type == 47 || a1->parent->type == 38 || a1->parent->type == 1) {
+            {
+                int l_20;
                 l_20 = (int)RECORD_DATA(a1);
-                if ((a1->flags & 8192) == 0) {
-                    object_delete(a1);
-                    return;
-                }
-                if (a1->caster == player_entity) {
-                    object_delete(a1);
-                    return;
-                }
-                if ((((unsigned)a1->id) >> 16) != (((unsigned)D_00195AC4->id) >> 16)) {
-                    a1->id = object_new_id(((unsigned)D_00195AC4->id) >> 16);
-                }
+            }
+            if ((a1->flags & 8192) == 0) {
+                object_delete(a1);
                 return;
             }
-            if ((((unsigned)a1->id) >> 16) == 801) return;
-            a1->id = object_new_id(801);
+            if (a1->caster == player_entity) {
+                object_delete(a1);
+                return;
+            }
+            if ((((unsigned)a1->id) >> 16) != (((unsigned)D_00195AC4->id) >> 16)) {
+                a1->id = object_new_id(((unsigned)D_00195AC4->id) >> 16);
+            }
+            return;
         }
+        if ((((unsigned)a1->id) >> 16) == 801) return;
+        a1->id = object_new_id(801);
     default:;
     }
 }

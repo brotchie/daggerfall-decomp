@@ -332,7 +332,7 @@ void msgbox_update(void)
     }
     if (((int)(unsigned char)msgbox_kind) == 1) {
         if (D_00195F2E != 0) {
-            (D_00195F2E)--;
+            D_00195F2E--;
             if (D_00195F2E == 0) goto L3F47F;
         }
         if (((struct bf8_0_1 *)&D_001940D5)->f != 0 && ((int)(unsigned char)(mouse_buttons & 3)) == 0) {
@@ -529,7 +529,7 @@ int func_0003FDD2(struct record *a1, int a2)
     l_30 = 0;
     l_18 = 75;
     if (creature_count == 0 && a2 < 192 && ((struct bf8_6_1 *)&D_001940D6)->f == 0 && D_0019628E == 0 && D_001996EC < 3 && ((int)(unsigned short)(a1->npc_flags & 32768)) == 0 && player_character->race < 9) {
-        (D_001996EC)++;
+        D_001996EC++;
         a1->image = (a1->image & -128) + 5;
         if ((a1->image >> 7) == 399) a1->image += 10;
         return 1;
@@ -825,9 +825,9 @@ void guards_timer_tick(void)
 {
     if (D_00178A14 < 0) return;
     if (D_00178A14 > 0) {
-        (D_00178A14)--;
+        D_00178A14--;
         return;
     }
-    (D_00178A14)--;
+    D_00178A14--;
     guards_summon(1);
 }

@@ -39,7 +39,7 @@ void func_00013C56(void)
     D_00196470 -= 2;
     l_1C = font_char_width((int)(unsigned char)*(signed char *)(*(char **)&D_00196474));
     if ((-D_00196470) > l_1C) {
-        (D_00196474)++;
+        D_00196474++;
         D_00196470 += l_1C;
     }
     if (*(signed char *)(*(char **)&D_00196474) != 0) return;

@@ -29,10 +29,10 @@ extern struct record *player_entity;
 extern struct record *player_object;
 extern int D_00195AB0;
 extern struct record *D_00195AC4;
-extern char *D_00195AE0;
+extern char D_00195AE0[];
 extern int creature_count;
 extern struct record *spell_ready_missile;
-extern char *hud_bar_image;
+extern char hud_bar_image[];
 extern char D_00195B84[];
 extern struct character *player_character;
 extern struct settings *game_settings;
@@ -206,7 +206,7 @@ void weapon_bow_update(void)
             return;
         }
     }
-    func_000CB39A(weapon_hand_cif[((int)(unsigned char)weapon_active_hand)], (int)(unsigned char)*(signed char *)((char *)(*(int *)(D_001A4A68 + (((int)(unsigned char)weapon_active_hand) << 2)) + D_001A4A60[((int)(unsigned char)weapon_active_hand)])), ((((int)(unsigned short)(game_settings->view_flags & 1)) != 0) ? 0 : -((int)(unsigned short)*(short *)(hud_bar_image + 6))), (int)(unsigned char)weapon_active_hand);
+    func_000CB39A(weapon_hand_cif[((int)(unsigned char)weapon_active_hand)], (int)(unsigned char)*(signed char *)((char *)(*(int *)(D_001A4A68 + (((int)(unsigned char)weapon_active_hand) << 2)) + D_001A4A60[((int)(unsigned char)weapon_active_hand)])), ((((int)(unsigned short)(game_settings->view_flags & 1)) != 0) ? 0 : -((int)(unsigned short)*(short *)(*(char **)hud_bar_image + 6))), (int)(unsigned char)weapon_active_hand);
 }
 
 void weapon_fire_arrow(void)
@@ -241,14 +241,14 @@ void weapon_fire_arrow(void)
 
 void func_00073ADF(struct record *a1)
 {
-    {
-        char l_24[12];
+{
+    char l_24[12];
 
-        mc_memcpy((int)l_24, (char *)a1 + 142, 12, (int)D_0017615C, 426, 12);
-        func_000C2068((int)l_24);
-        a1->missile_yaw = (short)*(int *)l_24 & 2047;
-        a1->angle_z = (short)*(int *)((char *)l_24 + 4) & 2047;
-    }
+    mc_memcpy((int)l_24, (char *)a1 + 142, 12, (int)D_0017615C, 426, 12);
+    func_000C2068((int)l_24);
+    a1->missile_yaw = (short)*(int *)l_24 & 2047;
+    a1->angle_z = (short)*(int *)((char *)l_24 + 4) & 2047;
+}
 }
 
 int weapon_arrow_update(struct record *a1)
@@ -373,7 +373,7 @@ void func_00074024(int a1, struct record *a2)
     int l_14;
 
     l_14 = loaded_location.index;
-    *(int *)&D_00195AE0 = a1;
+    *(int *)D_00195AE0 = a1;
     if ((int)spell_ready_missile != 0) {
         if (spell_ready_missile->data.spell.target == 3) {
             D_00195D5C = 0;

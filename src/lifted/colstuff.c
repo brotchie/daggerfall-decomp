@@ -19,7 +19,7 @@ extern unsigned char D_001940D7;
 extern signed char player_motion_flags;
 extern char frame_counter[];
 extern struct record *player_object;
-extern int D_00195AB4;
+extern char D_00195AB4[];
 extern int vertical_velocity;
 extern struct record *D_00195AC4;
 extern char cheat_flags[];
@@ -36,7 +36,7 @@ extern int D_00195CD8;
 extern int nearest_creature_distance;
 extern int ai_monster_flags;
 extern struct record *nearest_creature;
-extern int D_00195DC0;
+extern char D_00195DC0[];
 extern signed char player_on_ground;
 extern signed char in_dungeon_water;
 extern signed char D_00196296;
@@ -56,8 +56,8 @@ extern int D_00196B34;
 extern int D_00196B38;
 extern int D_00196B3C;
 extern struct record *collide_candidates[];
-extern int D_00196D48;
-extern int D_00196D4C;
+extern char D_00196D48[];
+extern char D_00196D4C[];
 extern int D_00196D50;
 extern char D_00196D54[];
 extern int D_00196D58;
@@ -136,8 +136,8 @@ void func_00021B04(struct record *a1)
             if (((int)(short)(*(short *)collide_flags & 4)) != 0 && ((int)(short)(*(short *)collide_flags & 2)) == 0) {
                 l_34 = (int)&l_2C->model;
                 if (*(int *)((char *)l_34) != 0) {
-                    if ((D_00196D48 = func_0014A300(l_34, (int)D_00196B10, (int)D_00196B28, 0)) != 0 && D_00196D48 != (-1)) {
-                        D_00195DC0 = (int)(*(char **)((char *)l_34) + *(int *)(*(char **)&D_00196D48 + 16));
+                    if ((*(int *)D_00196D48 = func_0014A300(l_34, (int)D_00196B10, (int)D_00196B28, 0)) != 0 && *(int *)D_00196D48 != (-1)) {
+                        *(int *)D_00195DC0 = (int)(*(char **)((char *)l_34) + *(int *)(*(char **)D_00196D48 + 16));
                         *(signed char *)collide_flags |= 2;
                         D_00195C48 = a1;
                     }
@@ -151,8 +151,8 @@ void func_00021B04(struct record *a1)
             if (((int)(short)(*(short *)collide_flags & 4)) != 0 && ((int)(short)(*(short *)collide_flags & 2)) == 0) {
                 l_34 = (int)&l_2C->model;
                 if (*(int *)((char *)l_34) != 0) {
-                    if ((D_00196D48 = func_0014A300(l_34, (int)D_00196B10, (int)D_00196B28, 0)) != 0 && D_00196D48 != (-1)) {
-                        D_00195DC0 = (int)(*(char **)((char *)l_34) + *(int *)(*(char **)&D_00196D48 + 16));
+                    if ((*(int *)D_00196D48 = func_0014A300(l_34, (int)D_00196B10, (int)D_00196B28, 0)) != 0 && *(int *)D_00196D48 != (-1)) {
+                        *(int *)D_00195DC0 = (int)(*(char **)((char *)l_34) + *(int *)(*(char **)D_00196D48 + 16));
                         *(signed char *)collide_flags |= 2;
                         D_00195C48 = a1;
                     }
@@ -167,10 +167,10 @@ void func_00021B04(struct record *a1)
         if (((int)(short)(*(short *)collide_flags & 4)) == 0 || ((int)(short)(*(short *)collide_flags & 2)) != 0) {
             return;
         }
-        if ((D_00196D48 = func_0014A300(l_34, (int)D_00196B10, (int)D_00196B28, 0)) == 0 || D_00196D48 == (-1)) {
+        if ((*(int *)D_00196D48 = func_0014A300(l_34, (int)D_00196B10, (int)D_00196B28, 0)) == 0 || *(int *)D_00196D48 == (-1)) {
             return;
         }
-        D_00195DC0 = (int)(*(char **)((char *)l_34) + *(int *)(*(char **)&D_00196D48 + 16));
+        *(int *)D_00195DC0 = (int)(*(char **)((char *)l_34) + *(int *)(*(char **)D_00196D48 + 16));
         *(signed char *)collide_flags |= 2;
         D_00195C48 = a1;
     default:;
@@ -194,12 +194,12 @@ void func_00021D97(struct record *a1)
         for (l_20 = 0; l_28->model_count > l_20; l_20++, l_24++) {
             l_2C = (int)&l_24->model;
             if (*(int *)((char *)l_2C) != 0) {
-                if ((D_00196D48 = func_0014A300(l_2C, (int)D_00196B10, (int)D_00196B1C, 0)) != 0 && D_00196D48 != (-1)) {
-                    for (l_1C = 0; l_1C < *(int *)(*(char **)&D_00196D48); l_1C++) {
-                        if ((*(int *)D_00190BE4 != 0 && *(int *)(*(char **)&D_00196D48 + 8 + (l_1C * 30)) > D_00196D60) || *(int *)(*(char **)&D_00196D48 + 8 + (l_1C * 30)) < D_00196D60) {
-                            D_00196D60 = *(int *)(*(char **)&D_00196D48 + 8 + (l_1C * 30));
-                            D_00195AB4 = (int)(*(char **)((char *)l_2C) + *(int *)(*(char **)&D_00196D48 + 16 + (l_1C * 30)));
-                            D_00195CD8 = (int)(*(char **)&D_00196D48 + 4 + (l_1C * 30));
+                if ((*(int *)D_00196D48 = func_0014A300(l_2C, (int)D_00196B10, (int)D_00196B1C, 0)) != 0 && *(int *)D_00196D48 != (-1)) {
+                    for (l_1C = 0; l_1C < *(int *)(*(char **)D_00196D48); l_1C++) {
+                        if ((*(int *)D_00190BE4 != 0 && *(int *)(*(char **)D_00196D48 + 8 + (l_1C * 30)) > D_00196D60) || *(int *)(*(char **)D_00196D48 + 8 + (l_1C * 30)) < D_00196D60) {
+                            D_00196D60 = *(int *)(*(char **)D_00196D48 + 8 + (l_1C * 30));
+                            *(int *)D_00195AB4 = (int)(*(char **)((char *)l_2C) + *(int *)(*(char **)D_00196D48 + 16 + (l_1C * 30)));
+                            D_00195CD8 = (int)(*(char **)D_00196D48 + 4 + (l_1C * 30));
                             D_00195CB8 = a1;
                         }
                     }
@@ -213,12 +213,12 @@ void func_00021D97(struct record *a1)
         for (l_20 = 0; a1->model_count > l_20; l_20++, l_24++) {
             l_2C = (int)&l_24->model;
             if (*(int *)((char *)l_2C) != 0) {
-                if ((D_00196D48 = func_0014A300(l_2C, (int)D_00196B10, (int)D_00196B28, 0)) != 0 && D_00196D48 != (-1)) {
-                    for (l_1C = 0; l_1C < *(int *)(*(char **)&D_00196D48); l_1C++) {
-                        if ((*(int *)D_00190BE4 != 0 && *(int *)(*(char **)&D_00196D48 + 8 + (l_1C * 30)) > D_00196D60) || *(int *)(*(char **)&D_00196D48 + 8 + (l_1C * 30)) < D_00196D60) {
-                            D_00196D60 = *(int *)(*(char **)&D_00196D48 + 8 + (l_1C * 30));
-                            D_00195AB4 = (int)(*(char **)((char *)l_2C) + *(int *)(*(char **)&D_00196D48 + 16 + (l_1C * 30)));
-                            D_00195CD8 = (int)(*(char **)&D_00196D48 + 4 + (l_1C * 30));
+                if ((*(int *)D_00196D48 = func_0014A300(l_2C, (int)D_00196B10, (int)D_00196B28, 0)) != 0 && *(int *)D_00196D48 != (-1)) {
+                    for (l_1C = 0; l_1C < *(int *)(*(char **)D_00196D48); l_1C++) {
+                        if ((*(int *)D_00190BE4 != 0 && *(int *)(*(char **)D_00196D48 + 8 + (l_1C * 30)) > D_00196D60) || *(int *)(*(char **)D_00196D48 + 8 + (l_1C * 30)) < D_00196D60) {
+                            D_00196D60 = *(int *)(*(char **)D_00196D48 + 8 + (l_1C * 30));
+                            *(int *)D_00195AB4 = (int)(*(char **)((char *)l_2C) + *(int *)(*(char **)D_00196D48 + 16 + (l_1C * 30)));
+                            D_00195CD8 = (int)(*(char **)D_00196D48 + 4 + (l_1C * 30));
                             D_00195CB8 = a1;
                         }
                     }
@@ -231,14 +231,14 @@ void func_00021D97(struct record *a1)
     case 32:
         l_2C = (int)RECORD_DATA(a1);
         if (*(int *)((char *)l_2C) == 0) return;
-        if ((D_00196D48 = func_0014A300(l_2C, (int)D_00196B10, (int)D_00196B1C, 0)) == 0 || D_00196D48 == (-1)) {
+        if ((*(int *)D_00196D48 = func_0014A300(l_2C, (int)D_00196B10, (int)D_00196B1C, 0)) == 0 || *(int *)D_00196D48 == (-1)) {
             return;
         }
-        for (l_1C = 0; l_1C < *(int *)(*(char **)&D_00196D48); l_1C++) {
-            if ((*(int *)D_00190BE4 != 0 && *(int *)(*(char **)&D_00196D48 + 8 + (l_1C * 30)) > D_00196D60) || *(int *)(*(char **)&D_00196D48 + 8 + (l_1C * 30)) < D_00196D60) {
-                D_00196D60 = *(int *)(*(char **)&D_00196D48 + 8 + (l_1C * 30));
-                D_00195AB4 = (int)(*(char **)((char *)l_2C) + *(int *)(*(char **)&D_00196D48 + 16 + (l_1C * 30)));
-                D_00195CD8 = (int)(*(char **)&D_00196D48 + 4 + (l_1C * 30));
+        for (l_1C = 0; l_1C < *(int *)(*(char **)D_00196D48); l_1C++) {
+            if ((*(int *)D_00190BE4 != 0 && *(int *)(*(char **)D_00196D48 + 8 + (l_1C * 30)) > D_00196D60) || *(int *)(*(char **)D_00196D48 + 8 + (l_1C * 30)) < D_00196D60) {
+                D_00196D60 = *(int *)(*(char **)D_00196D48 + 8 + (l_1C * 30));
+                *(int *)D_00195AB4 = (int)(*(char **)((char *)l_2C) + *(int *)(*(char **)D_00196D48 + 16 + (l_1C * 30)));
+                D_00195CD8 = (int)(*(char **)D_00196D48 + 4 + (l_1C * 30));
                 D_00195CB8 = a1;
             }
         }
@@ -267,10 +267,10 @@ void func_00022174(struct record *a1)
             if (((int)(short)(*(short *)collide_flags & 4)) != 0 && ((int)(short)(*(short *)collide_flags & 2)) == 0) {
                 l_34 = (int)&l_2C->model;
                 if (*(int *)((char *)l_34) != 0) {
-                    if ((D_00196D48 = func_0014AA92(l_34, D_00196D4C, 0)) != 0 && D_00196D48 != (-1)) {
-                        D_00196D50 = D_00196D48;
-                        D_00195DC0 = (int)(*(char **)((char *)l_34) + *(int *)(*(char **)&D_00196D48 + 16));
-                        D_00195CD4 = D_00196D48 + 4;
+                    if ((*(int *)D_00196D48 = func_0014AA92(l_34, *(int *)D_00196D4C, 0)) != 0 && *(int *)D_00196D48 != (-1)) {
+                        D_00196D50 = *(int *)D_00196D48;
+                        *(int *)D_00195DC0 = (int)(*(char **)((char *)l_34) + *(int *)(*(char **)D_00196D48 + 16));
+                        D_00195CD4 = *(int *)D_00196D48 + 4;
                         *(signed char *)collide_flags |= 2;
                         D_00195C48 = a1;
                     }
@@ -284,10 +284,10 @@ void func_00022174(struct record *a1)
             if (((int)(short)(*(short *)collide_flags & 4)) != 0 && ((int)(short)(*(short *)collide_flags & 2)) == 0) {
                 l_34 = (int)&l_2C->model;
                 if (*(int *)((char *)l_34) != 0) {
-                    if ((D_00196D48 = func_0014AA92(l_34, D_00196D4C, 0)) != 0 && D_00196D48 != (-1)) {
-                        D_00196D50 = D_00196D48;
-                        D_00195DC0 = (int)(*(char **)((char *)l_34) + *(int *)(*(char **)&D_00196D48 + 16));
-                        D_00195CD4 = D_00196D48 + 4;
+                    if ((*(int *)D_00196D48 = func_0014AA92(l_34, *(int *)D_00196D4C, 0)) != 0 && *(int *)D_00196D48 != (-1)) {
+                        D_00196D50 = *(int *)D_00196D48;
+                        *(int *)D_00195DC0 = (int)(*(char **)((char *)l_34) + *(int *)(*(char **)D_00196D48 + 16));
+                        D_00195CD4 = *(int *)D_00196D48 + 4;
                         *(signed char *)collide_flags |= 2;
                         D_00195C48 = a1;
                     }
@@ -299,12 +299,10 @@ void func_00022174(struct record *a1)
         if ((a1->flags & 256) != 0) return;
         if (D_00195AF4->type != 18) goto L22468;
         l_20 = &D_00195AF4->data.character;
-        if ((l_20->mobile_id & 128) != 0) goto L2242F;
-        if (((int)(unsigned short)(*(short *)(monster_table_flags + (l_20->race * 29)) & 4)) == 0) goto L22468;
-L2242F:;
-        if (a1->lock_level == 0) goto L2244E;
-        if ((a1->flags & 64) == 0) goto L22468;
-L2244E:;
+        if ((l_20->mobile_id & 128) == 0) {
+            if (((int)(unsigned short)(*(short *)(monster_table_flags + (l_20->race * 29)) & 4)) == 0) goto L22468;
+        }
+        if (a1->lock_level != 0) if ((a1->flags & 64) == 0) goto L22468;
         if (door_start_swing(a1, 0) == 0) goto L22468;
         a1->flags |= 0x100;
         return;
@@ -313,10 +311,10 @@ L22468:;
         l_34 = (int)RECORD_DATA(a1);
         if (*(int *)((char *)l_34) != 0) {
             if (a1->move_frame == *(int *)frame_counter || (((int)(short)(*(short *)collide_flags & 4)) != 0 && ((int)(short)(*(short *)collide_flags & 2)) == 0)) {
-                if ((D_00196D48 = func_0014AA92(l_34, D_00196D4C, 0)) != 0 && D_00196D48 != (-1)) {
-                    D_00196D50 = D_00196D48;
-                    D_00195DC0 = (int)(*(char **)((char *)l_34) + *(int *)(*(char **)&D_00196D48 + 16));
-                    D_00195CD4 = D_00196D48 + 4;
+                if ((*(int *)D_00196D48 = func_0014AA92(l_34, *(int *)D_00196D4C, 0)) != 0 && *(int *)D_00196D48 != (-1)) {
+                    D_00196D50 = *(int *)D_00196D48;
+                    *(int *)D_00195DC0 = (int)(*(char **)((char *)l_34) + *(int *)(*(char **)D_00196D48 + 16));
+                    D_00195CD4 = *(int *)D_00196D48 + 4;
                     *(signed char *)collide_flags |= 2;
                     D_00195C70 = a1;
                     D_00195C48 = a1;
@@ -326,7 +324,7 @@ L22468:;
         return;
     case 18:
         if (D_00195AF4 == a1) return;
-        if ((D_00196D48 = func_0014B1C7(&a1->x, (int)D_00196B10, (int)D_00196B28, a1->image, 4, 0, 0)) == 0 || D_00196D48 == (-1)) {
+        if ((*(int *)D_00196D48 = func_0014B1C7(&a1->x, (int)D_00196B10, (int)D_00196B28, a1->image, 4, 0, 0)) == 0 || *(int *)D_00196D48 == (-1)) {
             return;
         }
         D_00195C48 = a1;
@@ -346,9 +344,9 @@ int func_0002294E(struct record *a1, int a2, struct move_request *a3)
     D_00196297 = 1;
     D_00195C74 = a1->y - 120;
     *(int *)D_00190BE4 = 0;
-    *(int *)((char *)(D_00196D4C = (int)a3->probe)) = a3->x;
-    *(int *)(((char *)D_00196D4C) + 4) = a3->y;
-    *(int *)(((char *)D_00196D4C) + 8) = a3->z;
+    *(int *)((char *)(*(int *)D_00196D4C = (int)a3->probe)) = a3->x;
+    *(int *)(*(char **)D_00196D4C + 4) = a3->y;
+    *(int *)(*(char **)D_00196D4C + 8) = a3->z;
     *(signed char *)collide_flags &= 228;
     D_00195AF4 = a1;
     D_001962A0 = 0;
@@ -417,7 +415,7 @@ int func_0002294E(struct record *a1, int a2, struct move_request *a3)
     }
     if (D_00196D60 < a3->y) {
         D_00196B14 = (D_00196B2C = D_00196D60);
-        *(int *)(((char *)D_00196D4C) + 4) = D_00196B14;
+        *(int *)(*(char **)D_00196D4C + 4) = D_00196B14;
     }
     for (l_14 = 0; l_14 < collide_candidate_count; l_14++) {
         func_00022174(collide_candidates[l_14]);
@@ -503,8 +501,8 @@ void func_0002325A(struct record *a1)
         for (l_24 = 0; l_2C->model_count > l_24; l_24++, l_28++) {
             l_30 = (int)&l_28->model;
             if (*(int *)((char *)l_30) != 0) {
-                if ((D_00196D48 = func_0014AA92(l_30, D_00196D4C, 2)) == 0 && D_00196D48 != (-1)) {
-                    collide_candidates[(collide_candidate_count)++] = a1;
+                if ((*(int *)D_00196D48 = func_0014AA92(l_30, *(int *)D_00196D4C, 2)) == 0 && *(int *)D_00196D48 != (-1)) {
+                    collide_candidates[collide_candidate_count++] = a1;
                     if (collide_candidate_count > 128) fatal_error((int)D_0017071B);
                 }
             }
@@ -515,8 +513,8 @@ void func_0002325A(struct record *a1)
         for (l_24 = 0; a1->model_count > l_24; l_24++, l_28++) {
             l_30 = (int)&l_28->model;
             if (*(int *)((char *)l_30) != 0) {
-                if ((D_00196D48 = func_0014AA92(l_30, D_00196D4C, 2)) == 0 && D_00196D48 != (-1)) {
-                    collide_candidates[(collide_candidate_count)++] = a1;
+                if ((*(int *)D_00196D48 = func_0014AA92(l_30, *(int *)D_00196D4C, 2)) == 0 && *(int *)D_00196D48 != (-1)) {
+                    collide_candidates[collide_candidate_count++] = a1;
                     if (collide_candidate_count > 128) fatal_error((int)D_0017071B);
                 }
             }
@@ -527,10 +525,10 @@ void func_0002325A(struct record *a1)
     case 6:
         l_30 = (int)RECORD_DATA(a1);
         if (*(int *)((char *)l_30) == 0) return;
-        if ((D_00196D48 = func_0014AA92(l_30, D_00196D4C, 2)) != 0 || D_00196D48 == (-1)) {
+        if ((*(int *)D_00196D48 = func_0014AA92(l_30, *(int *)D_00196D4C, 2)) != 0 || *(int *)D_00196D48 == (-1)) {
             return;
         }
-        collide_candidates[(collide_candidate_count)++] = a1;
+        collide_candidates[collide_candidate_count++] = a1;
         if (collide_candidate_count <= 128) return;
         fatal_error((int)D_0017071B);
     default:;
@@ -561,7 +559,7 @@ int func_00023A6A(struct record *a1)
         for (l_24 = 0; l_2C->model_count > l_24; l_24++, l_28++) {
             l_30 = (int)&l_28->model;
             if (*(int *)((char *)l_30) != 0) {
-                if ((D_00196D48 = func_0014A300(l_30, (int)D_00196B10, (int)D_00196B1C, 0)) != 0 && D_00196D48 != (-1)) {
+                if ((*(int *)D_00196D48 = func_0014A300(l_30, (int)D_00196B10, (int)D_00196B1C, 0)) != 0 && *(int *)D_00196D48 != (-1)) {
                     itemmaker_slot_kinds[0] = 1;
                     return 1;
                 }
@@ -573,7 +571,7 @@ int func_00023A6A(struct record *a1)
         for (l_24 = 0; a1->model_count > l_24; l_24++, l_28++) {
             l_30 = (int)&l_28->model;
             if (*(int *)((char *)l_30) != 0) {
-                if ((D_00196D48 = func_0014A300(l_30, (int)D_00196B10, (int)D_00196B1C, 0)) != 0 && D_00196D48 != (-1)) {
+                if ((*(int *)D_00196D48 = func_0014A300(l_30, (int)D_00196B10, (int)D_00196B1C, 0)) != 0 && *(int *)D_00196D48 != (-1)) {
                     itemmaker_slot_kinds[0] = 1;
                     return 1;
                 }
@@ -585,7 +583,7 @@ int func_00023A6A(struct record *a1)
     case 6:
         l_30 = (int)RECORD_DATA(a1);
         if (*(int *)((char *)l_30) != 0) {
-            if ((D_00196D48 = func_0014A300(l_30, (int)D_00196B10, (int)D_00196B1C, 0)) != 0 && D_00196D48 != (-1)) {
+            if ((*(int *)D_00196D48 = func_0014A300(l_30, (int)D_00196B10, (int)D_00196B1C, 0)) != 0 && *(int *)D_00196D48 != (-1)) {
                 itemmaker_slot_kinds[0] = 1;
                 return 1;
             }
@@ -674,9 +672,9 @@ int func_00023FA5(struct record *a1, int a2, struct move_request *a3)
     D_00195C74 = a1->y - 120;
     *(int *)D_00190BE4 = 0;
     l_14 = &a1->data.character;
-    *(int *)((char *)(D_00196D4C = (int)a3->probe)) = a3->x;
-    *(int *)(((char *)D_00196D4C) + 4) = a3->y;
-    *(int *)(((char *)D_00196D4C) + 8) = a3->z;
+    *(int *)((char *)(*(int *)D_00196D4C = (int)a3->probe)) = a3->x;
+    *(int *)(*(char **)D_00196D4C + 4) = a3->y;
+    *(int *)(*(char **)D_00196D4C + 8) = a3->z;
     *(signed char *)collide_flags &= 228;
     D_00195AF4 = a1;
     if (((int)player_environment) == 1) {
@@ -739,7 +737,7 @@ int func_00023FA5(struct record *a1, int a2, struct move_request *a3)
     }
     if (D_00196D60 < a3->y) {
         D_00196B14 = (D_00196B2C = D_00196D60);
-        *(int *)(((char *)D_00196D4C) + 4) = D_00196B14;
+        *(int *)(*(char **)D_00196D4C + 4) = D_00196B14;
     }
     for (l_18 = 0; l_18 < collide_candidate_count; l_18++) {
         func_00022174(collide_candidates[l_18]);

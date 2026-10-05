@@ -63,7 +63,7 @@ extern struct location *current_location;
 extern struct character *player_character;
 extern int game_minutes;
 extern struct settings *game_settings;
-extern int D_00195C44;
+extern char D_00195C44[];
 extern struct record *D_00195CB8;
 extern signed char D_00196272;
 extern signed char mouse_buttons_prev;
@@ -255,8 +255,7 @@ void automap_open(void)
         screenshot_poll();
         func_000CDD81(1);
     }
-    do {
-    } while (key_down_esc != 0);
+    while (key_down_esc != 0);
     if (*(int *)text_macro_fpc != 0 && *(int *)text_macro_fpc != (-1751672937)) {
         mc_free(*(int *)text_macro_fpc, (int)D_001707AE, 168);
         *(int *)text_macro_fpc = -1751672937;
@@ -639,7 +638,7 @@ int func_000281AF(void)
     int l_1C;
 
     l_24 = 0;
-    l_1C = D_00195C44 + 4;
+    l_1C = *(int *)D_00195C44 + 4;
     while (*(signed char *)((char *)l_1C) != 0) {
         l_24 += 5;
         l_20 = func_000A0DF4(l_1C + 4);
@@ -666,14 +665,14 @@ void func_0002830F(int a1)
     int l_1C;
     int l_18;
 
-    l_1C = D_00195C44 + 4;
+    l_1C = *(int *)D_00195C44 + 4;
     while (*(signed char *)((char *)l_1C) != 0 && a1 != 0) {
         l_20 = func_000A0DF4(l_1C + 4);
         l_1C += l_20 + 5;
         a1--;
     }
     l_18 = (func_000A0DF4(l_1C + 4) + l_1C) + 5;
-    mc_memcpy(l_1C, l_18, (D_00195C44 + 49999) - l_18, (int)D_001707AE, 839, 4);
+    mc_memcpy(l_1C, l_18, (*(int *)D_00195C44 + 49999) - l_18, (int)D_001707AE, 839, 4);
 }
 
 int func_0002839E(int a1)
@@ -681,7 +680,7 @@ int func_0002839E(int a1)
     int l_20;
     int l_1C;
 
-    l_1C = D_00195C44 + 4;
+    l_1C = *(int *)D_00195C44 + 4;
     while (*(short *)((char *)l_1C) != 0 && a1 != 0) {
         l_20 = func_000A0DF4(l_1C + 4);
         l_1C += l_20 + 5;
@@ -695,7 +694,7 @@ int func_000284DA(int a1)
     int l_20;
     int l_1C;
 
-    l_1C = D_00195C44 + 4;
+    l_1C = *(int *)D_00195C44 + 4;
     while (*(short *)((char *)l_1C) != 0) {
         if (stricmp(l_1C + 4, a1) == 0) return 1;
         l_20 = func_000A0DF4(l_1C + 4);
@@ -753,7 +752,7 @@ void func_000286F6(void)
     short l_18;
 
     l_20 = 0;
-    l_1C = D_00195C44 + 4;
+    l_1C = *(int *)D_00195C44 + 4;
     while (*(signed char *)((char *)l_1C) != 0) {
         *(int *)&l_18 = l_1C;
         l_28 = ((((int)(unsigned short)*(short *)(*(char **)&l_18)) - D_00196D88) * 2) + 10;
@@ -777,16 +776,16 @@ void town_map_note_building(struct record *a1, struct building *a2)
     int l_14;
 
     l_14 = building_name(a2);
-    mc_memset(D_00195C44, 0, 50000, (int)D_001707AE, 963, 4);
+    mc_memset(*(int *)D_00195C44, 0, 50000, (int)D_001707AE, 963, 4);
     func_000A0ED9(964, (int)D_001707AE);
     mc_sprintf((int)text_buffer, (int)D_001707B8, D_00195AC4->id >> 16);
     if (disk_file_exists((int)text_buffer) != 0) {
-        disk_read_file((int)text_buffer, D_00195C44);
-        *(int *)(*(char **)&D_00195C44) = game_minutes;
-        mc_memcpy(D_00195C44, D_00195C44, 50000, (int)D_001707AE, 970, 4);
+        disk_read_file((int)text_buffer, *(int *)D_00195C44);
+        *(int *)(*(char **)D_00195C44) = game_minutes;
+        mc_memcpy(*(int *)D_00195C44, *(int *)D_00195C44, 50000, (int)D_001707AE, 970, 4);
         if (func_000284DA(l_14) != 0) return;
     } else {
-        *(int *)(*(char **)&D_00195C44) = game_minutes;
+        *(int *)(*(char **)D_00195C44) = game_minutes;
     }
     l_1C = a1->x - D_00195AC4->x;
     l_18 = a1->z - D_00195AC4->z;
@@ -798,7 +797,7 @@ void town_map_note_building(struct record *a1, struct building *a2)
     func_0002829B(l_14);
     func_000A0ED9(986, (int)D_001707AE);
     mc_sprintf((int)text_buffer, (int)D_001707B8, D_00195AC4->id >> 16);
-    disk_write_arena2_file((int)text_buffer, D_00195C44, func_000281AF());
+    disk_write_arena2_file((int)text_buffer, *(int *)D_00195C44, func_000281AF());
 }
 
 void automap_draw_block_overview(void)
@@ -836,11 +835,11 @@ void automap_save(void)
     if (((int)player_environment) != 3 || (int)D_00196DA0 == 0) {
         return;
     }
-    *(int *)(*(char **)&D_00195C44) = game_minutes;
-    mc_memcpy((int)(*(char **)&D_00195C44 + 4), (int)D_00196DA0, 10240, (int)D_001707AE, 1055, 4);
+    *(int *)(*(char **)D_00195C44) = game_minutes;
+    mc_memcpy((int)(*(char **)D_00195C44 + 4), (int)D_00196DA0, 10240, (int)D_001707AE, 1055, 4);
     func_000A0ED9(1056, (int)D_001707AE);
     mc_sprintf((int)text_buffer, (int)D_001707E4, D_00195AC4->id >> 16);
-    disk_write_arena2_file((int)text_buffer, D_00195C44, 10244);
+    disk_write_arena2_file((int)text_buffer, *(int *)D_00195C44, 10244);
 }
 
 void automap_load(void)
@@ -848,12 +847,12 @@ void automap_load(void)
     int l_18;
 
     if (((int)player_environment) != 3) return;
-    mc_memset(D_00195C44, 0, 50000, (int)D_001707AE, 1066, 4);
+    mc_memset(*(int *)D_00195C44, 0, 50000, (int)D_001707AE, 1066, 4);
     func_000A0ED9(1067, (int)D_001707AE);
     mc_sprintf((int)text_buffer, (int)D_001707E4, D_00195AC4->id >> 16);
     l_18 = disk_open_data((int)text_buffer);
     if (l_18 == (-1)) return;
-    func_000A00CB(l_18, D_00195C44, 50000);
+    func_000A00CB(l_18, *(int *)D_00195C44, 50000);
     func_0009DEA7(l_18);
     automap_restore_seen();
 }

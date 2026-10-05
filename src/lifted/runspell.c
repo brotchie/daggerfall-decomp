@@ -46,7 +46,7 @@ extern int creature_count;
 extern struct record *spell_ready_missile;
 extern struct record *spell_ready_touch;
 extern struct record *guild_npc_object;
-extern char *hud_bar_image;
+extern char hud_bar_image[];
 extern struct character *player_character;
 extern struct settings *game_settings;
 extern struct record *D_00195C48;
@@ -581,7 +581,7 @@ void cast_anim_update(void)
         if (((int)(unsigned short)(game_settings->view_flags & 1)) != 0) {
             l_18 = 0;
         } else {
-            l_18 = -((int)(unsigned short)*(short *)(hud_bar_image + 6));
+            l_18 = -((int)(unsigned short)*(short *)(*(char **)hud_bar_image + 6));
         }
         func_000CDB7A(spell_cast_anim_fire[(((int)(short)cast_anim_state) >> 4)], 0, l_18);
         cast_anim_state = 65535;
@@ -590,10 +590,10 @@ void cast_anim_update(void)
     if (((int)(unsigned short)(game_settings->view_flags & 1)) != 0) {
         l_1C = 0;
     } else {
-        l_1C = -((int)(unsigned short)*(short *)(hud_bar_image + 6));
+        l_1C = -((int)(unsigned short)*(short *)(*(char **)hud_bar_image + 6));
     }
     func_000CDB7A(spell_cast_anim_fire[(((int)(short)cast_anim_state) >> 4)], (int)(short)(cast_anim_state & 15), l_1C);
-    (cast_anim_state)++;
+    cast_anim_state++;
 }
 
 int func_0005C9BF(unsigned char a1)
@@ -684,7 +684,7 @@ void spell_hud_draw_icons(void)
                     if (((int)(unsigned short)(game_settings->view_flags & 1)) != 0) {
                         l_44 = 177;
                     } else {
-                        l_44 = ((int)(unsigned short)*(short *)(hud_bar_image + 2)) - 22;
+                        l_44 = ((int)(unsigned short)*(short *)(*(char **)hud_bar_image + 2)) - 22;
                     }
                     l_24 = l_44;
                 } else if (l_34->effects[0].type == 35 && l_34->effects[1].type == 255 && player_character->shield_points == 0) {
@@ -700,7 +700,7 @@ void spell_hud_draw_icons(void)
                 }
                 func_000CD20E(l_28, l_24, l_48);
             }
-            (D_00199D6C)++;
+            D_00199D6C++;
         }
         l_3C = l_3C->next;
     }

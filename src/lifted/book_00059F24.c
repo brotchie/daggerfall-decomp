@@ -9,7 +9,7 @@ extern short D_0014292C;
 extern signed char text_buffer[];
 extern char D_00190D64[];
 extern char D_00190D66[];
-extern int D_00195C44;
+extern char D_00195C44[];
 extern int book_page_offsets;
 extern short book_file;
 
@@ -27,8 +27,8 @@ void book_draw_page(int a1)
 
         func_0012DB50(4);
         lseek((int)(short)book_file, *(int *)((char *)(int)(*(char **)&book_page_offsets + (((int)(short)*(short *)&a1) << 2))), 0);
-        func_000A00CB((int)(short)book_file, D_00195C44, 16000);
-        l_20 = D_00195C44;
+        func_000A00CB((int)(short)book_file, *(int *)D_00195C44, 16000);
+        l_20 = *(int *)D_00195C44;
         D_0012B508 = 145;
         *(short *)D_00190D64 = 0;
         l_18 = D_0012DA44;
@@ -36,15 +36,13 @@ void book_draw_page(int a1)
         D_0014292C = 20;
         while (((int)(unsigned char)*(signed char *)((char *)l_20)) != 246) {
             switch (*(unsigned char *)((char *)l_20)) {
-                goto L5A0F3;
             case 251:
                 D_00142928 = *(short *)((char *)l_20 + 1);
                 l_20 += 3;
                 break;
             case 247:
                 func_0005A1C8(l_20 + 1);
-                do {
-                } while (*(signed char *)((char *)l_20++) != 0);
+                while (*(signed char *)((char *)l_20++) != 0);
                 break;
             case 250:
                 D_0012B508 = *(signed char *)((char *)l_20 + 1);
@@ -74,7 +72,6 @@ void book_draw_page(int a1)
                 l_18 = D_0012DA44;
                 break;
             default:
-L5A0F3:;
                 text_buffer[(int)(short)(*(short *)D_00190D64)++] = *(signed char *)((char *)l_20++);
             }
         }

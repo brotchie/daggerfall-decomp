@@ -53,8 +53,8 @@ extern int key_names[];
 extern char default_key_map[];
 extern signed char D_00187CA8;
 extern struct record *player_object;
-extern int D_00195B5C;
-extern int D_00195B60;
+extern char D_00195B5C[];
+extern char D_00195B60[];
 extern struct settings *game_settings;
 extern signed char mouse_control_mode;
 extern signed char mouse_turn_rate;
@@ -68,7 +68,7 @@ extern unsigned char D_00196271;
 extern signed char D_00196272;
 extern signed char game_mode;
 extern signed char mouse_buttons_prev;
-extern char *D_00199708;
+extern char D_00199708[];
 extern int options_image;
 extern int options_saved_screen;
 
@@ -139,8 +139,7 @@ void options_frame(void)
 
 int options_close(void)
 {
-    do {
-    } while (key_down_esc != 0);
+    while (key_down_esc != 0);
     D_00187CA8 = 1;
     game_mode = 0;
     if (options_image != 0 && options_image != (-1751672937)) {
@@ -310,7 +309,7 @@ void options_controls_draw(int a1, int a2)
 
     mc_memcpy(screen_buffer, a2, 64000, (int)D_00170EE8, 355, 4);
     if (((int)(unsigned char)mouse_control_mode) == 1) {
-        func_00144F68((int)(unsigned short)*(short *)(D_00199708), (int)(unsigned short)*(short *)(D_00199708 + 2), (int)(unsigned short)*(short *)(D_00199708 + 4), (int)(unsigned short)*(short *)(D_00199708 + 6), (int)(D_00199708 + 12));
+        func_00144F68((int)(unsigned short)*(short *)(*(char **)D_00199708), (int)(unsigned short)*(short *)(*(char **)D_00199708 + 2), (int)(unsigned short)*(short *)(*(char **)D_00199708 + 4), (int)(unsigned short)*(short *)(*(char **)D_00199708 + 6), (int)(*(char **)D_00199708 + 12));
     }
     for (l_18 = 0; l_18 < 38; l_18++) {
         if (a1 == l_18) continue;
@@ -334,7 +333,7 @@ void options_controls_screen(void)
 
     l_20 = 0;
     l_18 = disk_read_file((int)D_00170EF2, 0);
-    *(int *)&D_00199708 = disk_read_file((int)D_00170EFF, 0);
+    *(int *)D_00199708 = disk_read_file((int)D_00170EFF, 0);
     while (l_20 == 0) {
         if (key_down_esc != 0 && options_controls_check() != 0) break;
         mouse_buttons_prev = mouse_buttons;
@@ -351,15 +350,14 @@ void options_controls_screen(void)
         }
         func_000CDD81(0);
     }
-    do {
-    } while (key_down_esc != 0);
+    while (key_down_esc != 0);
     if (l_18 != 0 && l_18 != (-1751672937)) {
         mc_free(l_18, (int)D_00170EE8, 401);
         l_18 = -1751672937;
     }
-    if ((int)D_00199708 != 0 && (int)D_00199708 != (-1751672937)) {
-        mc_free((int)D_00199708, (int)D_00170EE8, 402);
-        *(int *)&D_00199708 = -1751672937;
+    if (*(int *)D_00199708 != 0 && *(int *)D_00199708 != (-1751672937)) {
+        mc_free(*(int *)D_00199708, (int)D_00170EE8, 402);
+        *(int *)D_00199708 = -1751672937;
     }
     l_1C = disk_create(D_001788E4);
     mc_memcpy((int)D_00195E82, (int)D_00152A04, 46, (int)D_00170EE8, 405, 4);
@@ -400,16 +398,16 @@ void options_mouse_draw(int a1)
     D_0012B508 = 246;
     func_00144D00((int)(short)((mouse_control_mode == 0) ? 134 : 220), 47, 5, 5);
     for (l_1C = 0; ((int)(unsigned char)mouse_sensitivity_x) > l_1C; l_1C++) {
-        func_00144F68((l_1C * 7) + 139, 108, (int)(unsigned short)*(short *)(*(char **)&D_00195B5C + 4), (int)(unsigned short)*(short *)(*(char **)&D_00195B5C + 6), (int)(*(char **)&D_00195B5C + 12));
+        func_00144F68((l_1C * 7) + 139, 108, (int)(unsigned short)*(short *)(*(char **)D_00195B5C + 4), (int)(unsigned short)*(short *)(*(char **)D_00195B5C + 6), (int)(*(char **)D_00195B5C + 12));
     }
     for (l_1C = 0; ((int)(unsigned char)mouse_sensitivity_y) > l_1C; l_1C++) {
-        func_00144F68((l_1C * 7) + 139, 121, (int)(unsigned short)*(short *)(*(char **)&D_00195B5C + 4), (int)(unsigned short)*(short *)(*(char **)&D_00195B5C + 6), (int)(*(char **)&D_00195B5C + 12));
+        func_00144F68((l_1C * 7) + 139, 121, (int)(unsigned short)*(short *)(*(char **)D_00195B5C + 4), (int)(unsigned short)*(short *)(*(char **)D_00195B5C + 6), (int)(*(char **)D_00195B5C + 12));
     }
     for (l_1C = 0; ((int)(unsigned char)(mouse_turn_rate & 127)) > l_1C; l_1C++) {
-        func_00144F68((l_1C * 7) + 139, 134, (int)(unsigned short)*(short *)(*(char **)&D_00195B5C + 4), (int)(unsigned short)*(short *)(*(char **)&D_00195B5C + 6), (int)(*(char **)&D_00195B5C + 12));
+        func_00144F68((l_1C * 7) + 139, 134, (int)(unsigned short)*(short *)(*(char **)D_00195B5C + 4), (int)(unsigned short)*(short *)(*(char **)D_00195B5C + 6), (int)(*(char **)D_00195B5C + 12));
     }
     if (((int)(unsigned char)(mouse_turn_rate & 128)) == 0) return;
-    func_00144F68((int)(unsigned short)*(short *)(*(char **)&D_00195B60), (int)(unsigned short)*(short *)(*(char **)&D_00195B60 + 2), (int)(unsigned short)*(short *)(*(char **)&D_00195B60 + 4), (int)(unsigned short)*(short *)(*(char **)&D_00195B60 + 6), (int)(*(char **)&D_00195B60 + 12));
+    func_00144F68((int)(unsigned short)*(short *)(*(char **)D_00195B60), (int)(unsigned short)*(short *)(*(char **)D_00195B60 + 2), (int)(unsigned short)*(short *)(*(char **)D_00195B60 + 4), (int)(unsigned short)*(short *)(*(char **)D_00195B60 + 6), (int)(*(char **)D_00195B60 + 12));
 }
 
 int options_mouse_cursor_mode(void)
@@ -469,8 +467,8 @@ int options_joystick_screen(void)
 
     l_20 = 0;
     l_1C = disk_read_file((int)D_00170F54, 0);
-    D_00195B5C = disk_read_file((int)D_00170F61, 0);
-    D_00195B60 = disk_read_file((int)D_00170F6E, 0);
+    *(int *)D_00195B5C = disk_read_file((int)D_00170F61, 0);
+    *(int *)D_00195B60 = disk_read_file((int)D_00170F6E, 0);
     while (l_20 == 0) {
         mouse_buttons_prev = mouse_buttons;
         func_0012B136();
@@ -486,13 +484,13 @@ int options_joystick_screen(void)
         }
         func_000CDD81(0);
     }
-    if (D_00195B60 != 0 && D_00195B60 != (-1751672937)) {
-        mc_free(D_00195B60, (int)D_00170EE8, 580);
-        D_00195B60 = -1751672937;
+    if (*(int *)D_00195B60 != 0 && *(int *)D_00195B60 != (-1751672937)) {
+        mc_free(*(int *)D_00195B60, (int)D_00170EE8, 580);
+        *(int *)D_00195B60 = -1751672937;
     }
-    if (D_00195B5C != 0 && D_00195B5C != (-1751672937)) {
-        mc_free(D_00195B5C, (int)D_00170EE8, 581);
-        D_00195B5C = -1751672937;
+    if (*(int *)D_00195B5C != 0 && *(int *)D_00195B5C != (-1751672937)) {
+        mc_free(*(int *)D_00195B5C, (int)D_00170EE8, 581);
+        *(int *)D_00195B5C = -1751672937;
     }
     if (l_1C != 0 && l_1C != (-1751672937)) {
         mc_free(l_1C, (int)D_00170EE8, 582);
@@ -522,11 +520,11 @@ void options_joystick_draw(int a1, int a2)
     } else {
         l_18 = 2;
     }
-    l_14 = (int)(*(char **)&D_00195B60 + 12);
-    func_000CB34E((((int)(short)*(short *)(options_joystick_buttons + ((l_18 + 2) * 12))) + l_14) - 113, (int)(*(char **)&screen_buffer + ((((int)(short)*(short *)(D_0017BA62 + ((l_18 + 2) * 12))) * 320) + ((int)(short)*(short *)(options_joystick_buttons + ((l_18 + 2) * 12))))), (int)&*(signed char *)((char *)(((int)(short)*(short *)(D_0017BA64 + ((l_18 + 2) * 12))) - ((int)(short)*(short *)(options_joystick_buttons + ((l_18 + 2) * 12)))) + 1), (int)&*(signed char *)((char *)(((int)(short)*(short *)(D_0017BA66 + ((l_18 + 2) * 12))) - ((int)(short)*(short *)(D_0017BA62 + ((l_18 + 2) * 12)))) + 1), (int)(unsigned short)*(short *)(*(char **)&D_00195B60 + 4));
+    l_14 = (int)(*(char **)D_00195B60 + 12);
+    func_000CB34E((((int)(short)*(short *)(options_joystick_buttons + ((l_18 + 2) * 12))) + l_14) - 113, (int)(*(char **)&screen_buffer + ((((int)(short)*(short *)(D_0017BA62 + ((l_18 + 2) * 12))) * 320) + ((int)(short)*(short *)(options_joystick_buttons + ((l_18 + 2) * 12))))), (int)&*(signed char *)((char *)(((int)(short)*(short *)(D_0017BA64 + ((l_18 + 2) * 12))) - ((int)(short)*(short *)(options_joystick_buttons + ((l_18 + 2) * 12)))) + 1), (int)&*(signed char *)((char *)(((int)(short)*(short *)(D_0017BA66 + ((l_18 + 2) * 12))) - ((int)(short)*(short *)(D_0017BA62 + ((l_18 + 2) * 12)))) + 1), (int)(unsigned short)*(short *)(*(char **)D_00195B60 + 4));
     if (a1 == 0) return;
     if (D_00152A20 == 0) if (D_00152A24 == 0) return;
-    l_1C = D_00195B5C;
+    l_1C = *(int *)D_00195B5C;
     l_18 = func_00044B8A();
     if (l_18 == (-1)) return;
     while (l_18 != 0) {

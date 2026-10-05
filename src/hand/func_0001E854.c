@@ -7,7 +7,7 @@ extern int D_001967F4;
 extern int D_001967F8;
 extern char D_001967FC[];
 extern int D_00196804;
-extern char *rmb_block;
+extern char rmb_block[];
 extern int block_origin_x;
 extern int block_origin_z;
 extern int stricmp();
@@ -17,7 +17,7 @@ extern int func_0014B45B();
 struct E { int f0; int f4; int f8; int fc; int f10; };
 struct H { char pad[3]; struct E e[317]; char pad2[17]; char names[10][13]; };
 #pragma pack()
-#define HP (((struct H *)rmb_block))
+#define HP (*(struct H **)rmb_block)
 
 void func_0001E854(struct building *a1, int a2)
 {

@@ -68,7 +68,7 @@ extern struct membership *guild_membership;
 extern short D_001A4A18;
 extern short D_001A4A1A;
 extern signed char D_001A4A1C;
-extern int rest_image;
+extern char rest_image[];
 extern signed char rest_loitering;
 extern char D_001A9AB8[];
 
@@ -296,12 +296,10 @@ int guild_rank_for_skills(int a1)
     l_28 = guild_best_skill((int)&l_20, guild_skill_lists[a1], -1);
     l_24 = guild_best_skill((int)&l_20, guild_skill_lists[a1], l_20);
     l_20 = 0;
-    do {
-    } while (((int)(unsigned char)guild_rank_primary_skill[l_20++]) < l_28);
+    while (((int)(unsigned char)guild_rank_primary_skill[l_20++]) < l_28);
     l_20--;
     l_1C = 0;
-    do {
-    } while (((int)(unsigned char)guild_rank_secondary_skill[l_1C++]) < l_24);
+    while (((int)(unsigned char)guild_rank_secondary_skill[l_1C++]) < l_24);
     l_1C--;
     if (l_20 < l_2C) l_2C = l_20;
     if (l_1C < l_2C) l_2C = l_1C;
@@ -413,8 +411,7 @@ int guild_menu(int a1, int a2, int a3)
         player_movement_update();
         func_000CDD81(1);
         if (key_down_esc != 0) {
-            do {
-            } while (key_down_esc != 0);
+            while (key_down_esc != 0);
             l_18 = 3;
             break;
         }
@@ -529,7 +526,7 @@ void rest_open(void)
     int l_18;
 
     rest_loitering = 0;
-    rest_image = 0;
+    *(int *)rest_image = 0;
     if (player_character->race == 8 && ((unsigned)(game_minutes - player_character->last_kill_time)) > 960) {
         msgbox_show_rsc(36, 1);
         return;
@@ -550,7 +547,7 @@ void rest_open(void)
         msgbox_show_rsc(355, 1);
         return;
     }
-    rest_image = disk_read_file((int)D_001760A4, 0);
+    *(int *)rest_image = disk_read_file((int)D_001760A4, 0);
     game_mode = 16;
     D_00196272 = 1;
     D_00190D1A = 0;

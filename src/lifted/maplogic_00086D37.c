@@ -80,7 +80,7 @@ void location_unload(int a1)
             if ((l_1C - 65536) == D_00187F28) {
                 mc_memcpy((int)player_object, (int)D_00195FB1, 55, (int)D_00176C94, 483, 4);
             } else {
-                (D_00187F2C)++;
+                D_00187F2C++;
             }
             D_00195DB8 = 5;
         }

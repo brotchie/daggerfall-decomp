@@ -26,7 +26,7 @@ extern signed char D_001940D8;
 extern char frame_counter[];
 extern struct record *player_object;
 extern int window_image;
-extern int D_00195C44;
+extern char D_00195C44[];
 extern short D_00195F36;
 extern unsigned short D_00195F38;
 extern signed char D_00196272;
@@ -36,7 +36,7 @@ extern short D_001997B2;
 extern int D_001997BC;
 extern int D_001997C0;
 extern int D_001997C4;
-extern int D_001997C8;
+extern char D_001997C8[];
 extern int D_001997CC;
 extern int D_001997D0;
 extern char note_page[];
@@ -150,7 +150,7 @@ void func_0004DABF(void)
             func_0012DB50((int)(short)((unsigned short)(unsigned char)D_00185201[(int)(unsigned char)*(signed char *)((char *)l_18 + 5)]));
             inpstr_begin_text(l_18 + 11, 79);
             *(signed char *)D_001997DE |= 32;
-            D_001997C8 = l_18;
+            *(int *)D_001997C8 = l_18;
         } else {
             D_00195F36 = (D_001997E6 = mouse_x);
             D_00195F38 = (D_001997E0 = mouse_y);
@@ -188,7 +188,7 @@ void func_0004DD12(void)
     while (*(signed char *)((char *)l_18) != 0) {
         switch (*(unsigned char *)((char *)l_18)) {
         case 1:
-            if (D_001997ED == 0 && (((int)(short)(*(short *)D_001997DE & 32)) == 0 || l_18 != D_001997C8)) {
+            if (D_001997ED == 0 && (((int)(short)(*(short *)D_001997DE & 32)) == 0 || l_18 != *(int *)D_001997C8)) {
                 func_0012DB50((int)(short)((unsigned short)(unsigned char)D_00185201[(int)(unsigned char)*(signed char *)((char *)l_18 + 5)]));
                 if (((int)(unsigned char)(*(signed char *)((char *)l_18 + 6) & 64)) != 0) {
                     D_0012B508 = (*(signed char *)frame_counter & 15) + 240;
@@ -253,7 +253,7 @@ void note_add_text(int a1)
     *(signed char *)((char *)l_18 + 5) = *(signed char *)note_font;
     *(signed char *)((char *)l_18 + 6) = *(signed char *)D_001997DE;
     mc_strncpy(l_18 + 11, a1, 4, (int)D_00174FAC, 381);
-    D_001997C8 = l_18;
+    *(int *)D_001997C8 = l_18;
     l_18 += 91;
     *(signed char *)((char *)l_18) = 0;
 }
@@ -270,7 +270,7 @@ void func_0004E108(void)
 void func_0004E18B(void)
 {
     func_0004E1BC();
-    D_001997C8 = (D_001997D0 = 0);
+    *(int *)D_001997C8 = (D_001997D0 = 0);
 }
 
 void func_0004E1BC(void)
@@ -285,7 +285,7 @@ void note_goto_page_prompt(void)
     int l_18;
 
     D_0012B508 = 146;
-    l_18 = D_00195C44 + 55000;
+    l_18 = *(int *)D_00195C44 + 55000;
     func_000A0ED9(459, (int)D_00174FAC);
     mc_sprintf(l_18, (int)D_00174FF5, D_0017D1E6);
     *(signed char *)((char *)(func_000A0DF4(l_18) + l_18) + 1) = 0;
@@ -296,25 +296,25 @@ void note_goto_page_prompt(void)
 
 void func_0004E2AB(int a1)
 {
-    {
-        int l_20;
-        int l_1C;
+{
+    int l_20;
+    int l_1C;
 
-        l_1C = ((int)(short)*(short *)&a1) * 3640;
-        if (((unsigned)l_1C) > D_001997BC) return;
-        func_0004E108();
-        D_001997E2 = a1;
-        func_0004E1BC();
-        if (D_001997ED != 0) return;
-        sound_play(205, (int)player_object, 100);
-    }
+    l_1C = ((int)(short)*(short *)&a1) * 3640;
+    if (((unsigned)l_1C) > D_001997BC) return;
+    func_0004E108();
+    D_001997E2 = a1;
+    func_0004E1BC();
+    if (D_001997ED != 0) return;
+    sound_play(205, (int)player_object, 100);
+}
 }
 
 void func_0004E30F(void)
 {
     if (D_001997E2 == 0) return;
     func_0004E108();
-    (D_001997E2)--;
+    D_001997E2--;
     func_0004E18B();
     if (D_001997ED != 0) return;
     sound_play(205, (int)player_object, 100);
@@ -327,7 +327,7 @@ void func_0004E360(void)
     *(int *)&l_18 = ((unsigned)lseek((int)(short)D_001997E8, 0, 2)) / 3640;
     func_0004E108();
     if (((int)(short)D_001997E2) < (((int)(short)l_18) - 1)) {
-        (D_001997E2)++;
+        D_001997E2++;
         func_0004E18B();
         if (D_001997ED == 0) sound_play(205, (int)player_object, 100);
         return;
@@ -337,14 +337,14 @@ void func_0004E360(void)
     mc_memset(*(int *)note_page, 0, 3640, (int)D_00174FAC, 507, 4);
     write((int)(short)D_001997E8, *(int *)note_page, 3640);
     D_001997BC = filelength((int)(short)D_001997E8);
-    (D_001997E2)++;
+    D_001997E2++;
     if (D_001997ED != 0) return;
     sound_play(205, (int)player_object, 100);
 }
 
 void note_cycle_tool(void)
 {
-    (note_tool)++;
+    note_tool++;
     note_tool &= 3;
 }
 
@@ -365,8 +365,8 @@ void note_find_prompt(void)
     int l_18;
 
     func_0012DB50(4);
-    D_001997C4 = D_00195C44 + 56000;
-    l_18 = D_00195C44 + 55000;
+    D_001997C4 = *(int *)D_00195C44 + 56000;
+    l_18 = *(int *)D_00195C44 + 55000;
     func_000A0ED9(540, (int)D_00174FAC);
     mc_sprintf(l_18, (int)D_00175010, D_0017D1F2);
     *(signed char *)((char *)(func_000A0DF4(l_18) + l_18) + 1) = 0;
@@ -374,13 +374,13 @@ void note_find_prompt(void)
     mc_memset(D_001997C4, 0, 24, (int)D_00174FAC, 543, 4);
     inpstr_begin_text(D_001997C4, 23);
     *(signed char *)D_001997DE |= 128;
-    D_001997C8 = *(int *)note_page;
+    *(int *)D_001997C8 = *(int *)note_page;
 }
 
 int func_0004E5C7(int a1)
 {
     if (strstr(a1 + 11, D_001997C4) != 0) {
-        D_001997C8 = a1;
+        *(int *)D_001997C8 = a1;
         return 1;
     }
     return 0;
@@ -400,24 +400,24 @@ void note_find(void)
     func_0004E108();
     *(int *)&l_1C = ((unsigned)lseek((int)(short)D_001997E8, 0, 2)) / 3640;
     if (D_001997D0 != 0) {
-        D_001997C8 = D_001997D0;
+        *(int *)D_001997C8 = D_001997D0;
     } else {
-        D_001997C8 = *(int *)note_page;
+        *(int *)D_001997C8 = *(int *)note_page;
     }
     while (D_001997E2 < l_1C) {
         func_0004E1BC();
-        if (func_0004EAF4(D_001997C8, (int)func_0004E5C7, 0) != 0) goto L4E6F9;
-        (D_001997E2)++;
-        D_001997C8 = *(int *)note_page;
+        if (func_0004EAF4(*(int *)D_001997C8, (int)func_0004E5C7, 0) != 0) goto L4E6F9;
+        D_001997E2++;
+        *(int *)D_001997C8 = *(int *)note_page;
     }
     D_001997E2 = *(int *)&l_18;
     func_0004E18B();
     msgbox_show_rsc(1701, 1);
     return;
 L4E6F9:;
-    func_0012B49E((int)(short)*(short *)(((char *)D_001997C8) + 1), (int)(short)*(short *)(((char *)D_001997C8) + 3));
+    func_0012B49E((int)(short)*(short *)(*(char **)D_001997C8 + 1), (int)(short)*(short *)(*(char **)D_001997C8 + 3));
     func_0004E1BC();
-    D_001997D0 = D_001997C8;
+    D_001997D0 = *(int *)D_001997C8;
 }
 
 void func_0004E729(void)
@@ -446,19 +446,19 @@ void func_0004E7B6(void)
 void func_0004E80C(void)
 {
     mc_memcpy(D_001997D8, *(int *)note_page, 3640, (int)D_00174FAC, 622, 4);
-    if (D_001997C8 == 0 || ((int)(unsigned char)*(signed char *)(((char *)D_001997C8))) != 1) {
+    if (*(int *)D_001997C8 == 0 || ((int)(unsigned char)*(signed char *)(*(char **)D_001997C8)) != 1) {
         return;
     }
-    *(signed char *)(((char *)D_001997C8) + 6) ^= 2;
+    *(signed char *)(*(char **)D_001997C8 + 6) ^= 2;
 }
 
 void func_0004E86A(void)
 {
     mc_memcpy(D_001997D8, *(int *)note_page, 3640, (int)D_00174FAC, 629, 4);
-    if (D_001997C8 == 0 || ((int)(unsigned char)*(signed char *)(((char *)D_001997C8))) != 1) {
+    if (*(int *)D_001997C8 == 0 || ((int)(unsigned char)*(signed char *)(*(char **)D_001997C8)) != 1) {
         return;
     }
-    *(signed char *)(((char *)D_001997C8) + 6) ^= 1;
+    *(signed char *)(*(char **)D_001997C8 + 6) ^= 1;
 }
 
 int func_0004E8C8(int a1)

@@ -72,10 +72,10 @@ extern struct record *D_00195A00;
 extern struct character *D_00195A84;
 extern struct building *current_building;
 extern struct record *player_object;
-extern int D_00195AB4;
+extern char D_00195AB4[];
 extern struct record *D_00195AC4;
 extern int D_00195ADC;
-extern char *D_00195AE0;
+extern char D_00195AE0[];
 extern int D_00195AE4;
 extern struct record *D_00195AEC;
 extern struct record *spell_ready_touch;
@@ -83,11 +83,11 @@ extern struct record *guild_npc_object;
 extern struct location *current_location;
 extern struct character *player_character;
 extern int window_image;
-extern int D_00195C44;
+extern char D_00195C44[];
 extern struct record *D_00195CE8;
-extern char *D_00195D3C;
+extern char D_00195D3C[];
 extern char D_00195D54[];
-extern int D_00195DC0;
+extern char D_00195DC0[];
 extern signed char climate_weathers[];
 extern short D_00195F58;
 extern short D_00195F68;
@@ -292,91 +292,87 @@ int click_world_face(int a1)
     if (((int)(unsigned char)*(signed char *)(*(char **)((char *)a1 + 4))) != 6 && ((int)(unsigned char)*(signed char *)(*(char **)((char *)a1 + 4))) != 43 && ((int)(unsigned char)*(signed char *)(*(char **)((char *)a1 + 4))) != 56) {
         return 0;
     }
-    l_20 = ((int)(unsigned short)*(short *)(((char *)D_00195DC0) + 2)) >> 7;
-    l_1C = (int)(unsigned short)(*(short *)(((char *)D_00195DC0) + 2) & 127);
+    l_20 = ((int)(unsigned short)*(short *)(*(char **)D_00195DC0 + 2)) >> 7;
+    l_1C = (int)(unsigned short)(*(short *)(*(char **)D_00195DC0 + 2) & 127);
     if ((l_20 % 100) == 74) l_20 = 74;
-    if (l_24 == 0) goto L748B6;
-    switch ((unsigned)l_20) {
-    case 56:
-    case 331:
-        if (((int)(unsigned short)(player_character->flags & 1536)) != 0) {
-            hud_message_add((int)D_001761A0);
-            goto L748B1;
-        }
-        dungeon_load(-1);
-        automap_load();
-        goto L748B1;
-    case 74:
+    if (l_24 != 0) {
         {
             unsigned char l_2C;
-            if (((int)(unsigned short)(player_character->flags & 1536)) != 0) {
-                hud_message_add((int)D_001761C4);
-                goto L748B1;
-            }
-            if (player_object->parent->type == 1) {
-                if (func_000CE45E((int)D_00187644, (int)(short)l_24->faction_id, 21) != 0) {
-                    l_2C = 1;
-                } else {
-                    l_2C = 0;
+            switch ((unsigned)l_20) {
+            case 56:
+            case 331:
+                if (((int)(unsigned short)(player_character->flags & 1536)) != 0) {
+                    hud_message_add((int)D_001761A0);
+                    break;
                 }
-                D_00196263 = l_2C;
-                town_map_note_building((struct record *)*(int *)((char *)a1 + 4), l_24);
-                building_enter(l_24);
-            } else {
-                building_exit();
-                D_00196263 = 0;
-            }
-            goto L748B1;
-        case 71:
-        case 72:
-        case 81:
-            if (l_20 == 72 && l_1C == 3) {
-                if (building_is_open(l_24) == 0 && lockpick_action_door(l_24, 19, (struct record *)*(int *)((char *)a1 + 4)) != 0) {
-                    func_0005FA0E(14, (struct record *)D_001960D9, l_24->quality, (int)(unsigned short)(player_character->flags & 1));
-                    D_00195AEC = (struct record *)(*(int *)((char *)a1 + 4));
-                    shelf_return_items();
-                    shelf_open_stock((struct record *)*(int *)((char *)a1 + 4), l_24, *(int *)D_00195D54);
+                dungeon_load(-1);
+                automap_load();
+                break;
+            case 74:
+                if (((int)(unsigned short)(player_character->flags & 1536)) != 0) {
+                    hud_message_add((int)D_001761C4);
+                    break;
+                }
+                if (player_object->parent->type == 1) {
+                    if (func_000CE45E((int)D_00187644, (int)(short)l_24->faction_id, 21) != 0) {
+                        l_2C = 1;
+                    } else {
+                        l_2C = 0;
+                    }
+                    D_00196263 = l_2C;
+                    town_map_note_building((struct record *)*(int *)((char *)a1 + 4), l_24);
+                    building_enter(l_24);
+                } else {
+                    building_exit();
+                    D_00196263 = 0;
+                }
+                break;
+            case 71:
+            case 72:
+            case 81:
+                if (l_20 == 72 && l_1C == 3) {
+                    if (building_is_open(l_24) == 0 && lockpick_action_door(l_24, 19, (struct record *)*(int *)((char *)a1 + 4)) != 0) {
+                        func_0005FA0E(14, (struct record *)D_001960D9, l_24->quality, (int)(unsigned short)(player_character->flags & 1));
+                        D_00195AEC = (struct record *)(*(int *)((char *)a1 + 4));
+                        shelf_return_items();
+                        shelf_open_stock((struct record *)*(int *)((char *)a1 + 4), l_24, *(int *)D_00195D54);
+                        return 1;
+                    }
+                } else if (l_1C < 4) {
+                    shelf_open((struct record *)*(int *)((char *)a1 + 4), l_24, *(int *)D_00195D54);
                     return 1;
                 }
-                goto L748B1;
             }
-            if (l_1C >= 4) goto L748B1;
-            shelf_open((struct record *)*(int *)((char *)a1 + 4), l_24, *(int *)D_00195D54);
-            return 1;
-        default:
-L748B1:;
-            goto L74988;
-L748B6:;
         }
-    }
-    switch ((unsigned)l_20) {
-    case 56:
-    case 331:
-        if (((int)(unsigned short)(player_character->flags & 1536)) != 0) {
-            hud_message_add((int)D_001761E8);
+    } else {
+        switch ((unsigned)l_20) {
+        case 56:
+        case 331:
+            if (((int)(unsigned short)(player_character->flags & 1536)) != 0) {
+                hud_message_add((int)D_001761E8);
+                break;
+            }
+            dungeon_load(-1);
+            automap_load();
             break;
-        }
-        dungeon_load(-1);
-        automap_load();
-        break;
-    case 74:
-        hud_message_add((int)D_0017620C);
-        break;
-    case 95:
-        if (wagon_container != 0) {
-            msgbox_yes_no_rsc(38);
-        } else {
-            D_00196271 = 2;
-        }
-        if (((int)D_00196271) == 1) {
-            D_001962B1 = 1;
-            inventory_open(1, 0, 2);
-        } else {
-            automap_save();
-            location_unload(D_00195AC4->image);
+        case 74:
+            hud_message_add((int)D_0017620C);
+            break;
+        case 95:
+            if (wagon_container != 0) {
+                msgbox_yes_no_rsc(38);
+            } else {
+                D_00196271 = 2;
+            }
+            if (((int)D_00196271) == 1) {
+                D_001962B1 = 1;
+                inventory_open(1, 0, 2);
+            } else {
+                automap_save();
+                location_unload(D_00195AC4->image);
+            }
         }
     }
-L74988:;
     return 0;
 }
 
@@ -488,7 +484,7 @@ void shelf_open_books(struct record *a1, struct building *a2, int a3)
     D_00195F58 = a3;
     l_20 = shelf_collect_items(a1, 7, a3);
     if (l_20 == 0 && shelf_shop_stocked(a3) == 0) {
-        *(int *)(stocked_shop_ids + ((stocked_shop_count)++ << 2)) = a3;
+        *(int *)(stocked_shop_ids + (stocked_shop_count++ << 2)) = a3;
         l_20 = a2->quality >> 1;
         if (l_20 == 0) l_20++;
         for (l_24 = 0; l_24 < l_20; l_24++) {
@@ -502,8 +498,8 @@ void shelf_open_books(struct record *a1, struct building *a2, int a3)
         }
     }
     if (a2->type == 10 || a2->type == 11 || a2->type == 14) {
-        l_18 = D_00195C44;
-        l_14 = D_00195C44 + 1000;
+        l_18 = *(int *)D_00195C44;
+        l_14 = *(int *)D_00195C44 + 1000;
         l_10 = l_14;
         l_1C = (struct record *)D_00196118;
         l_24 = 0;
@@ -549,7 +545,7 @@ void shelf_open_stock(struct record *a1, struct building *a2, int a3)
     l_20 = shelf_collect_items(a1, -1, a3);
     l_24 = l_20;
     if (l_20 == 0 && shelf_shop_stocked(a3) == 0) {
-        *(int *)(stocked_shop_ids + ((stocked_shop_count)++ << 2)) = a3;
+        *(int *)(stocked_shop_ids + (stocked_shop_count++ << 2)) = a3;
         func_0005EE0C((struct record *)D_001960D9, a2->type + 32, a2->quality);
         if (a2->type == 0 && rand_range(1, 100) < 25) {
             l_1C = item_add_to_container((struct record *)D_001960D9, 27, 4, 0);
@@ -639,7 +635,6 @@ void npc_click_service(struct record *a1)
             npc_talk(a1);
         } else {
             switch (l_1C->type) {
-                goto L7565F;
             case 11:
             case 14:
                 guild_service_dispatch(a1);
@@ -701,7 +696,6 @@ void npc_click_service(struct record *a1)
                 }
                 break;
             default:
-L7565F:;
                 npc_talk(a1);
             }
         }
@@ -791,8 +785,7 @@ void repair_menu_frame(void)
 
 void repair_menu_close(void)
 {
-    do {
-    } while (key_down_esc != 0);
+    while (key_down_esc != 0);
     while (mouse_buttons != 0) func_0012B136();
     if (window_image != 0 && window_image != (-1751672937)) {
         mc_free(window_image, (int)D_00176198, 891);
@@ -855,8 +848,7 @@ void coven_menu_frame(void)
 
 void coven_menu_close(void)
 {
-    do {
-    } while (key_down_esc != 0);
+    while (key_down_esc != 0);
     while (mouse_buttons != 0) func_0012B136();
     if (window_image != 0 && window_image != (-1751672937)) {
         mc_free(window_image, (int)D_00176198, 957);
@@ -994,7 +986,7 @@ void click_interior_model(int a1, struct record *a2)
             return;
         }
         l_18 = object_building(a2);
-        if (l_18 != 0 && (int)D_00195D3C != 0 && (((int)(unsigned short)*(short *)(D_00195D3C)) == 418 || (((int)(unsigned short)*(short *)(D_00195D3C)) == 410 && func_0001490D(((int)(unsigned char)*(signed char *)(D_00195D3C + 2)) + (((int)(unsigned short)*(short *)(D_00195D3C)) << 7)) != 0)) && (l_14 = func_000612A1()) != 0) {
+        if (l_18 != 0 && *(int *)D_00195D3C != 0 && (((int)(unsigned short)*(short *)(*(char **)D_00195D3C)) == 418 || (((int)(unsigned short)*(short *)(*(char **)D_00195D3C)) == 410 && func_0001490D(((int)(unsigned char)*(signed char *)(*(char **)D_00195D3C + 2)) + (((int)(unsigned short)*(short *)(*(char **)D_00195D3C)) << 7)) != 0)) && (l_14 = func_000612A1()) != 0) {
             if (l_18->id == player_character->house) {
                 D_001940D6 |= 4;
                 inventory_open_container((struct record *)D_00196092, 0, 4);
@@ -1010,12 +1002,12 @@ void click_interior_model(int a1, struct record *a2)
                     inventory_open_container((struct record *)D_00196120, 0, 4);
                 }
             }
-        } else if (l_18 != 0 && (int)D_00195D3C != 0 && ((int)(unsigned short)*(short *)(D_00195D3C)) == 414 && ((int)(unsigned char)*(signed char *)(D_00195D3C + 2)) == 9) {
+        } else if (l_18 != 0 && *(int *)D_00195D3C != 0 && ((int)(unsigned short)*(short *)(*(char **)D_00195D3C)) == 414 && ((int)(unsigned char)*(signed char *)(*(char **)D_00195D3C + 2)) == 9) {
             func_0009A7B8();
         }
         return;
     case 1:
-        if (l_18 != 0 && (int)D_00195D3C != 0 && ((int)(unsigned short)*(short *)(D_00195D3C)) == 414 && ((int)(unsigned char)*(signed char *)(D_00195D3C + 2)) == 9) {
+        if (l_18 != 0 && *(int *)D_00195D3C != 0 && ((int)(unsigned short)*(short *)(*(char **)D_00195D3C)) == 414 && ((int)(unsigned char)*(signed char *)(*(char **)D_00195D3C + 2)) == 9) {
             func_0009A7B8();
             return;
         }
@@ -1104,14 +1096,14 @@ void click_loot_container(int a1, struct record *a2)
 void func_00076503(int a1, struct record *a2)
 {
     switch (interaction_mode) {
-        return;
-    case 0:
-    case 1:
-    case 2:
-    case 3:
-        click_show_building_info(a1, a2);
-    default:;
-    }
+    return;
+case 0:
+case 1:
+case 2:
+case 3:
+    click_show_building_info(a1, a2);
+default:;
+}
 }
 
 void click_show_building_info(int a1, struct record *a2)
@@ -1119,7 +1111,7 @@ void click_show_building_info(int a1, struct record *a2)
     struct building *l_18;
     int l_14;
 
-    if (a2->type == 56 && ((int)(short)*(short *)(D_00195AE0 + 14)) == 417 && ((int)(short)*(short *)(D_00195AE0 + 16)) == 39) {
+    if (a2->type == 56 && ((int)(short)*(short *)(*(char **)D_00195AE0 + 14)) == 417 && ((int)(short)*(short *)(*(char **)D_00195AE0 + 16)) == 39) {
         func_0001D739();
         return;
     }
@@ -1206,8 +1198,7 @@ void service_menu_frame(void)
 void service_menu_close(void)
 {
     while (mouse_buttons != 0) func_0012B136();
-    do {
-    } while (key_down_esc != 0);
+    while (key_down_esc != 0);
     if (window_image != 0 && window_image != (-1751672937)) {
         mc_free(window_image, (int)D_00176198, 1372);
         window_image = -1751672937;
@@ -1287,7 +1278,7 @@ void footstep_sounds(void)
         l_1C = 2;
         break;
     case 3:
-        l_1C = (int)(signed char)*(signed char *)(((char *)D_00195AB4) + 4);
+        l_1C = (int)(signed char)*(signed char *)(*(char **)D_00195AB4 + 4);
         if (l_1C > 4 || l_1C < 0) l_1C = 0;
         l_1C <<= 1;
         if (dungeon_water_level != 10000 && player_object->y > dungeon_water_level && in_dungeon_water == 0) {
@@ -1325,13 +1316,13 @@ void position_history_record(void)
     *(int *)(D_001A4CA4 + (position_history_next * 12)) = player_object->y;
     *(int *)(D_001A4CA8 + (position_history_next * 12)) = player_object->z;
     position_history_next = (position_history_next + 1) % 32;
-    (D_001A4FCC)++;
+    D_001A4FCC++;
     if (player_on_ground == 0) return;
     *(int *)(ground_position_history + (ground_position_history_next * 12)) = player_object->x;
     *(int *)(D_001A4E24 + (ground_position_history_next * 12)) = player_object->y;
     *(int *)(D_001A4E28 + (ground_position_history_next * 12)) = player_object->z;
     ground_position_history_next = (ground_position_history_next + 1) % 32;
-    (D_001A4FD4)++;
+    D_001A4FD4++;
 }
 
 int func_00076E98(struct record *a1)
@@ -1596,7 +1587,7 @@ int func_00078463(void)
 
 void cheat_return_to_last_position(void)
 {
-    (ground_position_history_next)--;
+    ground_position_history_next--;
     if (ground_position_history_next == (-1)) ground_position_history_next = 31;
     player_object->x = *(int *)(ground_position_history + (ground_position_history_next * 12));
     player_object->y = *(int *)(D_001A4E24 + (ground_position_history_next * 12));

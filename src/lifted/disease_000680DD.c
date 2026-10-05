@@ -32,7 +32,6 @@ void item_enchantment_tick(struct item *a1, int a2, int a3)
 
     if (a2 != 3 && *(int *)D_00195B08 == 0) return;
     switch ((unsigned)a2) {
-        break;
     case 3:
         *(int *)D_001A3AA4 = 0;
         enchant_extra_spell_points(a1, a3);

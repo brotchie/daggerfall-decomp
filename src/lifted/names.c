@@ -84,28 +84,27 @@ int name_generate_first(unsigned char a1, unsigned char a2)
 {
     short l_1C;
 
-    switch ((unsigned char)a1) {
-        goto L8BC5E;
-    case 1:
-        namegen_read_part((int)(short)namegen_file, 0);
-        mc_strncpy((int)namegen_part_name, (int)namegen_syllable, 30, (int)D_00176D98, 156);
-        namegen_read_part((int)(short)namegen_file, 1);
-        func_000A1054((int)namegen_part_name, (int)namegen_syllable, (int)D_00176D98, 158, 30);
-        namegen_read_part((int)(short)namegen_file, 2);
-        func_000A1054((int)namegen_part_name, (int)namegen_syllable, (int)D_00176D98, 160, 30);
-        if (a2 == 0 && (rand() % 100) < 75) {
-            namegen_read_part((int)(short)namegen_file, 3);
-            func_000A1054((int)namegen_part_name, (int)namegen_syllable, (int)D_00176D98, 165, 30);
-        }
-        if (a2 != 0) {
-            namegen_read_part((int)(short)namegen_file, 4);
-            func_000A1054((int)namegen_part_name, (int)namegen_syllable, (int)D_00176D98, 171, 30);
-        }
-        goto L8BCD6;
-    case 2:
-        {
-            int l_2C;
-            int l_28;
+    {
+        int l_2C;
+        int l_28;
+        switch ((unsigned char)a1) {
+        case 1:
+            namegen_read_part((int)(short)namegen_file, 0);
+            mc_strncpy((int)namegen_part_name, (int)namegen_syllable, 30, (int)D_00176D98, 156);
+            namegen_read_part((int)(short)namegen_file, 1);
+            func_000A1054((int)namegen_part_name, (int)namegen_syllable, (int)D_00176D98, 158, 30);
+            namegen_read_part((int)(short)namegen_file, 2);
+            func_000A1054((int)namegen_part_name, (int)namegen_syllable, (int)D_00176D98, 160, 30);
+            if (a2 == 0 && (rand() % 100) < 75) {
+                namegen_read_part((int)(short)namegen_file, 3);
+                func_000A1054((int)namegen_part_name, (int)namegen_syllable, (int)D_00176D98, 165, 30);
+            }
+            if (a2 != 0) {
+                namegen_read_part((int)(short)namegen_file, 4);
+                func_000A1054((int)namegen_part_name, (int)namegen_syllable, (int)D_00176D98, 171, 30);
+            }
+            break;
+        case 2:
             if (a2 != 0) {
                 l_28 = 2;
             } else {
@@ -116,7 +115,7 @@ int name_generate_first(unsigned char a1, unsigned char a2)
             mc_strncpy((int)namegen_part_name, (int)namegen_syllable, 30, (int)D_00176D98, 177);
             namegen_read_part((int)(short)namegen_file, (int)(short)(*(int *)&l_1C + 1));
             func_000A1054((int)namegen_part_name, (int)namegen_syllable, (int)D_00176D98, 179, 30);
-            goto L8BCD6;
+            break;
         case 8:
             *(int *)&l_1C = 0;
             namegen_read_part((int)(short)namegen_file, (int)(short)l_1C);
@@ -127,7 +126,7 @@ int name_generate_first(unsigned char a1, unsigned char a2)
             }
             namegen_read_part((int)(short)namegen_file, (int)(short)(*(int *)&l_1C + 2));
             func_000A1054((int)namegen_part_name, (int)namegen_syllable, (int)D_00176D98, 193, 30);
-            goto L8BCD6;
+            break;
         case 9:
             *(int *)&l_1C = 0;
             namegen_read_part((int)(short)namegen_file, (int)(short)l_1C);
@@ -142,7 +141,7 @@ int name_generate_first(unsigned char a1, unsigned char a2)
                 namegen_read_part((int)(short)namegen_file, (int)(short)(*(int *)&l_1C + 3));
                 func_000A1054((int)namegen_part_name, (int)namegen_syllable, (int)D_00176D98, 213, 30);
             }
-            goto L8BCD6;
+            break;
         case 10:
             *(int *)&l_1C = 0;
             if (a2 == 0 && (rand() % 100) < 25) {
@@ -159,9 +158,8 @@ int name_generate_first(unsigned char a1, unsigned char a2)
             func_000A1054((int)namegen_part_name, (int)namegen_syllable, (int)D_00176D98, 235, 30);
             namegen_read_part((int)(short)namegen_file, (int)(short)(*(int *)&l_1C + 2));
             func_000A1054((int)namegen_part_name, (int)namegen_syllable, (int)D_00176D98, 237, 30);
-            goto L8BCD6;
+            break;
         default:
-L8BC5E:;
             if (a2 != 0) {
                 l_2C = 2;
             } else {
@@ -172,9 +170,8 @@ L8BC5E:;
             mc_strncpy((int)namegen_part_name, (int)namegen_syllable, 30, (int)D_00176D98, 242);
             namegen_read_part((int)(short)namegen_file, (int)(short)(*(int *)&l_1C + 1));
             func_000A1054((int)namegen_part_name, (int)namegen_syllable, (int)D_00176D98, 244, 30);
-L8BCD6:;
-            return (int)namegen_part_name;
         }
+        return (int)namegen_part_name;
     }
 }
 
@@ -199,7 +196,6 @@ int building_name(struct building *a1)
     }
     srand(a1->name_seed);
     switch (a1->type) {
-        goto L8C096;
     case 0:
     case 2:
     case 5:
@@ -251,7 +247,6 @@ int building_name(struct building *a1)
         mc_strncpy((int)text_rsc_buffer, (int)D_00176DE7, 2048, (int)D_00176D98, 347);
         break;
     default:
-L8C096:;
         if (a1->faction_id == 108 && guild_find_membership_by_kind(0) != 0) {
             mc_strncpy((int)text_rsc_buffer, (int)D_00176DF1, 2048, (int)D_00176D98, 351);
         } else if (a1->faction_id == 42 && guild_find_membership_by_kind(3) != 0) {
@@ -282,8 +277,7 @@ int str_list_random(int a1)
     int l_1C;
 
     l_1C = 0;
-    do {
-    } while (*(int *)((char *)((l_1C++ << 2) + a1)) != 0);
+    while (*(int *)((char *)((l_1C++ << 2) + a1)) != 0);
     l_1C = rand_range(0, l_1C - 2);
     return *(int *)((char *)((l_1C << 2) + a1));
 }

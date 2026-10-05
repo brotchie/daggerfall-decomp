@@ -448,7 +448,7 @@ struct record *object_find_type(struct record *a1, int a2)
 void object_count_type_cb(struct record *a1)
 {
     if ((short)a1->type != D_001A9B42) return;
-    (D_001A9B3C)++;
+    D_001A9B3C++;
 }
 
 struct record *object_create_in_block(struct record *a1, int a2, int a3, int a4, int a5)
@@ -548,7 +548,7 @@ int object_new_id(int a1)
     int l_1C;
 
     if (D_00187FDC >= 63000) D_00187FDC = 10000;
-    while (object_find_by_id(D_00195AC4, (l_1C = (a1 << 16) + (D_00187FDC)++)) != 0 || object_find_by_id(nonworld_root, l_1C) != 0) {
+    while (object_find_by_id(D_00195AC4, (l_1C = (a1 << 16) + D_00187FDC++)) != 0 || object_find_by_id(nonworld_root, l_1C) != 0) {
     }
     return l_1C;
 }

@@ -50,7 +50,7 @@ extern struct record *player_entity;
 extern struct record *D_00195AC4;
 extern struct spell *spell_records;
 extern char clothing_gender_group[];
-extern int current_region_data;
+extern char current_region_data[];
 extern struct character *player_character;
 extern struct career *player_class;
 extern int game_minutes;
@@ -264,7 +264,7 @@ void kludge_make_test_character(int a1)
     for (l_1C = 0; l_1C < 35; l_1C++) {
         player_character->skills[l_1C].pad4 = player_character->skills[l_1C].value;
     }
-    current_region_data = (int)region_event_values;
+    *(int *)current_region_data = (int)region_event_values;
     l_38 = object_create_child(D_001959E0, 0, 107);
     l_38->image2 = 202;
     l_38->type = 2;

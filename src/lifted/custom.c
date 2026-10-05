@@ -117,7 +117,7 @@ extern int spellshop_icons;
 extern struct character *player_character;
 extern int window_image;
 extern struct career *player_class;
-extern int D_00195C44;
+extern char D_00195C44[];
 extern char classmaker_file[];
 extern unsigned char D_0019626F;
 extern signed char D_00196272;
@@ -274,7 +274,7 @@ void classmaker_run(void)
         mc_memcpy(655360, screen_buffer, 64000, (int)D_00175420, 205, 4);
         l_24 = 1132;
         if (*(int *)D_00190BE4 != *(int *)((char *)l_24)) {
-            (D_00190D74)++;
+            D_00190D74++;
             l_20 = 1132;
             *(int *)D_00190BE4 = *(int *)((char *)l_20);
         }
@@ -732,11 +732,11 @@ int classmaker_special_conflicts(int a1, int a2, int a3)
 
 int career_specials_text(void)
 {
-    *(signed char *)((char *)(D_0019981C = D_00195C44 + 55000)) = 0;
+    *(signed char *)((char *)(D_0019981C = *(int *)D_00195C44 + 55000)) = 0;
     career_advantages_text();
     career_disadvantages_text();
     *(signed char *)((char *)(int)(func_000A0DF4(D_0019981C) + *(char **)&D_0019981C) + 1) = 0;
-    return D_00195C44 + 55000;
+    return *(int *)D_00195C44 + 55000;
 }
 
 void career_advantages_text(void)

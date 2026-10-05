@@ -29,7 +29,7 @@ extern struct record *player_object;
 extern struct record *D_00195AC4;
 extern struct location *current_location;
 extern int game_minutes;
-extern int D_00195C44;
+extern char D_00195C44[];
 extern signed char D_00196272;
 extern signed char mouse_buttons_prev;
 extern int D_00196D88;
@@ -37,7 +37,7 @@ extern int D_00196D8C;
 extern int D_00196D90;
 extern int D_00196D94;
 extern int D_00196D98;
-extern int D_00196D9C;
+extern char D_00196D9C[];
 extern int D_00196DA4;
 extern void screenshot_poll(void);
 extern int automap_move_forward(int);
@@ -97,26 +97,26 @@ void town_map_open(void)
     D_00196D98 = (D_00196D90 = 0);
     D_00196D94 = 0;
     D_00190CE5 = 0;
-    mc_memset(D_00195C44, 0, 50000, (int)D_001707AE, 624, 4);
+    mc_memset(*(int *)D_00195C44, 0, 50000, (int)D_001707AE, 624, 4);
     func_000A0ED9(625, (int)D_001707AE);
     mc_sprintf((int)text_buffer, (int)D_001707B8, D_00195AC4->id >> 16);
     l_18 = disk_open_rw((int)text_buffer);
     if (l_18 != (-1)) {
-        func_000A00CB(l_18, D_00195C44, 50000);
-        *(int *)(*(char **)&D_00195C44) = game_minutes;
+        func_000A00CB(l_18, *(int *)D_00195C44, 50000);
+        *(int *)(*(char **)D_00195C44) = game_minutes;
         lseek(l_18, 0, 0);
-        write(l_18, D_00195C44, 4);
+        write(l_18, *(int *)D_00195C44, 4);
         func_0009DEA7(l_18);
     }
     mouse_buttons = (mouse_buttons_prev = 0);
     l_1C = (int)(unsigned char)D_00196272;
     D_00196272 = 1;
     *(int *)text_macro_fpc = disk_read_file((int)D_00170794, 0);
-    D_00196D9C = disk_read_file((int)D_001707C3, 0);
+    *(int *)D_00196D9C = disk_read_file((int)D_001707C3, 0);
     while (l_24 == 0) {
         func_0012B2EB();
         town_map_draw();
-        func_00144F68((int)(unsigned short)*(short *)(((char *)D_00196D9C)), (int)(unsigned short)*(short *)(((char *)D_00196D9C) + 2), (int)(unsigned short)*(short *)(((char *)D_00196D9C) + 4), (int)(unsigned short)*(short *)(((char *)D_00196D9C) + 6), D_00196D9C + 12);
+        func_00144F68((int)(unsigned short)*(short *)(*(char **)D_00196D9C), (int)(unsigned short)*(short *)(*(char **)D_00196D9C + 2), (int)(unsigned short)*(short *)(*(char **)D_00196D9C + 4), (int)(unsigned short)*(short *)(*(char **)D_00196D9C + 6), *(int *)D_00196D9C + 12);
         func_0012B3ED();
         mouse_buttons_prev = mouse_buttons;
         func_0012B136();
@@ -144,21 +144,20 @@ void town_map_open(void)
         screenshot_poll();
         func_000CDD81(1);
     }
-    do {
-    } while (key_down_esc != 0);
+    while (key_down_esc != 0);
     if (*(int *)text_macro_fpc != 0 && *(int *)text_macro_fpc != (-1751672937)) {
         mc_free(*(int *)text_macro_fpc, (int)D_001707AE, 679);
         *(int *)text_macro_fpc = -1751672937;
     }
-    if (D_00196D9C != 0 && D_00196D9C != (-1751672937)) {
-        mc_free(D_00196D9C, (int)D_001707AE, 680);
-        D_00196D9C = -1751672937;
+    if (*(int *)D_00196D9C != 0 && *(int *)D_00196D9C != (-1751672937)) {
+        mc_free(*(int *)D_00196D9C, (int)D_001707AE, 680);
+        *(int *)D_00196D9C = -1751672937;
     }
     D_00196272 = *(signed char *)&l_1C;
     if (D_00190CE5 == 0) return;
     func_000A0ED9(686, (int)D_001707AE);
     mc_sprintf((int)text_buffer, (int)D_001707B8, D_00195AC4->id >> 16);
-    disk_write_arena2_file((int)text_buffer, D_00195C44, func_000281AF());
+    disk_write_arena2_file((int)text_buffer, *(int *)D_00195C44, func_000281AF());
 }
 
 void town_map_draw(void)
@@ -238,16 +237,16 @@ void town_map_scroll(int a1)
 {
     switch (a1) {
     case 0:
-        (D_00196D90)--;
+        D_00196D90--;
         break;
     case 1:
-        (D_00196D90)++;
+        D_00196D90++;
         break;
     case 2:
-        (D_00196D98)--;
+        D_00196D98--;
         break;
     case 3:
-        (D_00196D98)++;
+        D_00196D98++;
         break;
     }
 }

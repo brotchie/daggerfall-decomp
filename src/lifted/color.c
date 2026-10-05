@@ -18,7 +18,7 @@ extern struct record *D_00195AC4;
 extern struct location *current_location;
 extern int game_minutes;
 extern int D_001AA5FC;
-extern int D_001AA600;
+extern char D_001AA600[];
 extern char doors_moving[];
 
 extern int sound_play(int, int, int);
@@ -37,29 +37,29 @@ void func_00099689(void)
     int l_18;
 
     D_001AA5FC = mc_malloc(8448, (int)D_00177350, 59);
-    D_001AA600 = func_000CE66C(D_001AA5FC, 256);
+    *(int *)D_001AA600 = func_000CE66C(D_001AA5FC, 256);
     for (l_1C = 0; l_1C < 32; l_1C++) {
         for (l_18 = 0; l_18 < 256; l_18++) {
-            *(signed char *)((char *)(int)(*(char **)&D_001AA600 + (l_18 + (l_1C << 8)))) = *(signed char *)&l_18;
+            *(signed char *)((char *)(int)(*(char **)D_001AA600 + (l_18 + (l_1C << 8)))) = *(signed char *)&l_18;
         }
     }
     for (l_1C = 1; l_1C < 16; l_1C++) {
-        func_000CE663((int)(*(char **)&D_001AA600 + (l_1C << 8)) + ((int)(unsigned char)D_001886A8[l_1C * 2]), (int)(unsigned char)D_001886A9[l_1C * 2], 16);
+        func_000CE663((int)(*(char **)D_001AA600 + (l_1C << 8)) + ((int)(unsigned char)D_001886A8[l_1C * 2]), (int)(unsigned char)D_001886A9[l_1C * 2], 16);
     }
-    func_000CE663(D_001AA600 + 6689, 161, 15);
-    func_000CE663(D_001AA600 + 6721, 193, 15);
-    func_000CE663(D_001AA600 + 6945, 97, 15);
-    func_000CE663(D_001AA600 + 6977, 129, 15);
-    func_000CE663(D_001AA600 + 7201, 161, 15);
-    func_000CE663(D_001AA600 + 7220, 84, 2);
-    func_000CE663(D_001AA600 + 7233, 193, 15);
-    *(signed char *)(*(char **)&D_001AA600 + 7421) = 216;
-    func_000CE663(D_001AA600 + 7457, 97, 15);
-    func_000CE663(D_001AA600 + 7476, 84, 2);
-    func_000CE663(D_001AA600 + 7489, 129, 15);
-    *(signed char *)(*(char **)&D_001AA600 + 7677) = 216;
+    func_000CE663(*(int *)D_001AA600 + 6689, 161, 15);
+    func_000CE663(*(int *)D_001AA600 + 6721, 193, 15);
+    func_000CE663(*(int *)D_001AA600 + 6945, 97, 15);
+    func_000CE663(*(int *)D_001AA600 + 6977, 129, 15);
+    func_000CE663(*(int *)D_001AA600 + 7201, 161, 15);
+    func_000CE663(*(int *)D_001AA600 + 7220, 84, 2);
+    func_000CE663(*(int *)D_001AA600 + 7233, 193, 15);
+    *(signed char *)(*(char **)D_001AA600 + 7421) = 216;
+    func_000CE663(*(int *)D_001AA600 + 7457, 97, 15);
+    func_000CE663(*(int *)D_001AA600 + 7476, 84, 2);
+    func_000CE663(*(int *)D_001AA600 + 7489, 129, 15);
+    *(signed char *)(*(char **)D_001AA600 + 7677) = 216;
     for (l_1C = 0; l_1C < 10; l_1C++) {
-        mc_memcpy((int)(*(char **)&D_001AA600 + ((l_1C << 8) + 4096)) + 112, ((int)D_001886D2) + (l_1C << 4), 16, (int)D_00177350, 87, 4);
+        mc_memcpy((int)(*(char **)D_001AA600 + ((l_1C << 8) + 4096)) + 112, ((int)D_001886D2) + (l_1C << 4), 16, (int)D_00177350, 87, 4);
     }
 }
 

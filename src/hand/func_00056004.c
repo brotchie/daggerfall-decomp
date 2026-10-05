@@ -13,7 +13,7 @@ extern signed char D_001940D4;
 extern struct record *player_object;
 extern int list_popup_callback;
 extern int window_image;
-extern int D_00195C44;
+extern char D_00195C44[];
 extern signed char mouse_buttons_prev;
 extern int spells_list_poll(void);
 extern int itemmaker_open(int);
@@ -50,7 +50,7 @@ void itemmaker_update(void)
         while (*((char *)&key_down_esc) != 0) ;
         while (*((char *)&mouse_buttons) != 0) func_0012B136();
         *((char *)&D_0012AC02) = 0;
-        (*(void (**)(int))((char *)&list_popup_callback))((*(unsigned char **)&D_00195C44)[l_20 + 64000]);
+        (*(void (**)(int))((char *)&list_popup_callback))((*(unsigned char **)D_00195C44)[l_20 + 64000]);
         while (*((char *)&mouse_buttons) != 0) func_0012B136();
         *((char *)&D_0012AC02) = 0;
         return;

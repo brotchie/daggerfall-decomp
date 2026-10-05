@@ -245,7 +245,6 @@ int quest_init_resources(struct quest *a1)
 struct record *quest_record_object(int a1, int a2)
 {
     switch ((unsigned)a1) {
-        break;
     case 3:
         return ((struct qbn_person *)a2)->object;
     case 0:
