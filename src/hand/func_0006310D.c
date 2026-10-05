@@ -1,22 +1,24 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0006310D */
-extern char *player_object;
-extern void monster_play_sound(char *, int);
-extern int sound_play(int, char *, int);
+#include "records.h"
+
+extern struct record *player_object;
+extern void monster_play_sound(struct record *, int);
+extern int sound_play(int, struct record *, int);
 extern int rand(void);
 extern int func_000C7FD9(int, int, int, int);
 
-void monster_ambient_sound(char *a1, char *a2)
+void monster_ambient_sound(struct record *a1, struct character *a2)
 {
     int l_24[2];
     int l_14;
 
     if (rand() > 195) return;
-    l_14 = func_000C7FD9(*(int *)(a1 + 7), *(int *)(a1 + 15), *(int *)(player_object + 7), *(int *)(player_object + 15));
+    l_14 = func_000C7FD9(a1->x, a1->z, player_object->x, player_object->z);
     if (l_14 >= 1024) return;
-    if (*(unsigned char *)(a2 + 506) == 146) {
+    if (a2->mobile_id == 146) {
         sound_play(11461, a1, 100);
         return;
     }
-    if (*(unsigned char *)(a2 + 67) >= 43) return;
+    if (a2->race >= 43) return;
     monster_play_sound(a1, l_14);
 }

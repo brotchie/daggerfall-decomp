@@ -1,39 +1,40 @@
 /* inven.c: functions first lifted from the assembly by tools/lift_all.py (2026-10), now
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
+#include "records.h"
 
-extern char player_entity[];
-extern char D_00195AF4[];
+extern struct record *player_entity;
+extern struct record *D_00195AF4;
 
-extern int object_create_child(int, int, int);
-extern int object_find(int, int);
+extern struct record *object_create_child(struct record *, int, int);
+extern int object_find(struct record *, int);
 extern int inv_match_arrows(int);
-extern void item_make(int, int, int);
-extern void inv_store_item(int);
+extern void item_make(int, int, struct item *);
+extern void inv_store_item(struct record *);
 
-void inv_add_arrows(int a1, int a2)
+void inv_add_arrows(struct record *a1, int a2)
 {
-    int l_18;
+    struct record *l_18;
     int l_14;
 
-    *(int *)D_00195AF4 = 0;
-    object_find(*(int *)((char *)a1 + 63), (int)inv_match_arrows);
-    if (*(int *)D_00195AF4 != 0) goto L9744E;
+    D_00195AF4 = 0;
+    object_find(a1->children, (int)inv_match_arrows);
+    if (D_00195AF4 != 0) goto L9744E;
     l_18 = object_create_child(a1, 0, 107);
-    *(int *)D_00195AF4 = l_18;
-    *(signed char *)((char *)l_18) = 2;
-    *(short *)((char *)l_18 + 29) = 998;
-    *(short *)((char *)l_18 + 27) = 0;
-    item_make(3, 18, l_18 + 71);
-    *(signed char *)((char *)l_18 + 120) = *(signed char *)&a2;
-    if (a1 != *(int *)player_entity) goto L9744C;
+    D_00195AF4 = l_18;
+    l_18->type = 2;
+    l_18->image2 = 998;
+    l_18->image = 0;
+    item_make(3, 18, &l_18->data.item);
+    l_18->data.item.stack_count = *(signed char *)&a2;
+    if (a1 != player_entity) goto L9744C;
     inv_store_item(l_18);
 L9744C:;
     return;
 L9744E:;
-    l_14 = a2 + ((int)(unsigned char)*(signed char *)(*(char **)D_00195AF4 + 120));
+    l_14 = a2 + D_00195AF4->data.item.stack_count;
     if (l_14 < 200) goto L97473;
     l_14 = 199;
 L97473:;
-    *(signed char *)(*(char **)D_00195AF4 + 120) = *(signed char *)&l_14;
+    D_00195AF4->data.item.stack_count = *(signed char *)&l_14;
 }

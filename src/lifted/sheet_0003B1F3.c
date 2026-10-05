@@ -3,6 +3,8 @@
  * tables from the start of the file, so moving functions can change the code. */
 
 struct bf8_2_1 { unsigned char _:2; unsigned char f:1; };
+#include "records.h"
+
 extern char D_00170C40[];
 extern char D_00170C4D[];
 extern char D_00170C5A[];
@@ -12,11 +14,11 @@ extern char D_00190BE4[];
 extern char D_00190D64[];
 extern char D_00190D8C[];
 extern char D_001940D9[];
-extern char player_object[];
+extern struct record *player_object;
 extern char D_00195B5C[];
-extern char player_character[];
+extern struct character *player_character;
 extern char window_image[];
-extern char player_class[];
+extern struct career *player_class;
 extern char player_death_timer[];
 extern char D_00195F3C[];
 extern char D_00195F3E[];
@@ -29,7 +31,7 @@ extern char game_mode[];
 extern char D_00199638[];
 
 extern int key_action_held(int);
-extern int sound_play(int, int, int);
+extern int sound_play(int, struct record *, int);
 extern int disk_read_file(int, int);
 extern int rand_range(int, int);
 extern int mc_memcpy();
@@ -70,13 +72,13 @@ L3B26D:;
     *(short *)D_00195F42 = *(short *)(*(char **)D_00199638 + 4);
     *(short *)D_00195F3C = *(short *)(*(char **)D_00199638 + 6);
     if (((struct bf8_2_1 *)&D_001940D9)->f == 0) goto L3B395;
-    l_20 = (rand_range(((int)(unsigned char)*(signed char *)(*(char **)player_class + 52)) >> 1, (int)(unsigned char)*(signed char *)(*(char **)player_class + 52)) + (((int)(short)*(short *)(*(char **)player_character + 40)) / 10)) - 5;
+    l_20 = (rand_range(player_class->hp_per_level >> 1, player_class->hp_per_level) + (player_character->attributes[4] / 10)) - 5;
     if (l_20 >= 1) goto L3B367;
     l_20 = 1;
 L3B367:;
-    *(short *)(*(char **)player_character + 126) += l_20;
-    *(int *)(*(char **)player_character + 92) += l_20;
-    sound_play(364, *(int *)player_object, 100);
+    player_character->max_health += l_20;
+    player_character->max_health_base += l_20;
+    sound_play(364, player_object, 100);
 L3B395:;
     if (((int)(short)a1) != 50) goto L3B3B0;
     *(signed char *)D_001940D9 |= 4;
@@ -86,7 +88,7 @@ L3B3B0:;
     *(short *)D_00190D64 = rand_range(4, 6);
 L3B3C5:;
     *(int *)D_00190BE4 = 0;
-    mc_memcpy((int)D_00190D8C, (int)&*(signed char *)(*(char **)player_character + 48), 16, (int)D_00170C67, 97, 4);
+    mc_memcpy((int)D_00190D8C, (int)(signed char *)&player_character->base_attributes[0], 16, (int)D_00170C67, 97, 4);
     sheet_place_spinner(13);
     *(signed char *)D_0019626C = 0;
     *(signed char *)D_00187CA8 = 0;

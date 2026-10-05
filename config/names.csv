@@ -1107,7 +1107,6 @@ field,character+0x227,faction_id,strong,NPC records: faction id passed to factio
 field,character+0x229,team,candidate,byte: creatures of the same value never target (ai_pick_target) or strike (weapon_melee_strike) each other; summons get 0 (DFU MobileTeams)
 field,character+0x22B,resist_chances,confirmed,"5 bytes by element: elemental resistance chance; exp1b (build/names/scratch/magic/exp1b.py, save_morthag1): Resist frost chance 100 -> [0,100,0,0,0]; spfx_resist_roll saves outright on a roll <= this when the element's spell_resist_flags bit is set"
 field,character+0x230,class,strong,the class (career) record is embedded here: player_class = player_character + 0x230 in save_blades
-field,character+0x2CC,effects_list,candidate,disease_infect links its new 47+71-byte record (type 11) at the head of this list
 field,character+0x30,base_attributes,strong,"permanent attributes: sheet_draw colours an attribute red when +0x20 is below this, another colour when above (STR 50 < 85 went red); level-up points raise both sets; clamped to 100 by raise_skills"
 field,character+0x40,flags,strong,"flag word, for creatures too: lycanthropy infection sets bit 0x10 (fallcall on save_blades); the female bit is unverified (combat and inventory agents)"
 field,character+0x41,transport_flags,strong,"bit 1 riding a horse, bit 2 a cart: transport_choose sets/clears them (FOOT clears both); exp ran the handler"

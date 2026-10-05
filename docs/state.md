@@ -55,7 +55,6 @@ The record is packed: fields sit at odd offsets.
 | +0x81 (byte) | level | confirmed | 21, 13, 20 in three saves, as on their sheets |
 | +0x85 (i32) | gold coins carried | confirmed | +5000 per gold cheat (Ctrl+F9) in two saves. Writing 12345 shows gold 112345 and drops encumbrance by exactly the coins' weight (400 to the kg). The sheet's GOLD adds something else, 100000 in blades and 90400 in morthag1, probably letters of credit |
 | +0x8D, +0x8F (u16) | magicka, current and max | strong | 28 / 160 in morthag1, as on its sheet |
-| +0x2CC | head of a list of attached effect records | candidate | `func_00065937` (disease) links its new type-11 record here when called on the player |
 
 An earlier draft named +0x7C max health. That was wrong: the saves checked were all at full
 health, and a write test settled it.
@@ -431,14 +430,25 @@ The naming agents found these functions filed under the wrong unit:
 - 0x2586B (filed under career.c) turns killed creatures into corpses: mplace.c or the
   monster code.
 
+## Record structs
+
+include/records.h defines the records as C structs: the 71-byte header (`struct record`) with
+a union of the data that follows it (`r->data.character`, `r->data.item`, ...), and the
+character (634 bytes, with the class record `career` inside it), monster, item, spell,
+disease, potion recipe, faction, membership, bank account, map location, location, building,
+pick list and the quest/QBN records. Every size and offset is checked at compile time and by
+`tools/offset_casts.py check`. docs/structs.md has the rules for converting code to them.
+
 ## Calling functions directly
 
 `tools/fallcall.py` calls any function in a live game, from the safe point at the entry of
 the per-frame update. It reports the return value, the functions that ran, the files opened,
 the globals and player fields changed, and the screen if the function drew on it.
 `fallcall.py sweep` does this for many functions, each from a fresh game. Two examples:
-- Calling `func_00065937(entity, 0, 3, 1)` infected the player with disease 3: a new effect
-  record of type 11 was linked at character+0x2CC.
+- Calling `func_00065937(entity, 0, 3, 1)` infected the player with disease 3: a new type-11
+  record was created as a child of the player's entity. An earlier reading put an effects list
+  at character+0x2CC, but that lies past the 634-byte character record: the changed pointer
+  belonged to the next heap object.
 - Calling `func_0002FA97()` played anim0012.vid, the death cutscene.
 
 ## Names in the source
