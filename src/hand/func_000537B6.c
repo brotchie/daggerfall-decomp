@@ -22,29 +22,29 @@ extern int xn_draw_image();
 
 void classmaker_draw_reputations(void)
 {
-    short n;
-    short h;
-    short mid;
+    short i;
+    short width;
+    short centre;
     short total;
-    short m;
+    short height;
 
     xn_mouse_cursor_erase();
     mc_memcpy(screen_buffer, scratch_190df4, 64000, D_00175420, 283, 4);
     xn_draw_image(39, 5, *(unsigned short *)(scratch_190df8 + 4), *(unsigned short *)(scratch_190df8 + 6), scratch_190df8 + 12);
-    h = classmaker_reputation_buttons[0].x1 - classmaker_reputation_buttons[0].x0 + 1;
-    mid = (classmaker_reputation_buttons[0].y0 + classmaker_reputation_buttons[0].y1) >> 1;
-    total = n = 0;
-    for (; n < 5; n++) {
-        m = player_character->reputation[n] * 5;
-        if (player_character->reputation[n] < 0) {
+    width = classmaker_reputation_buttons[0].x1 - classmaker_reputation_buttons[0].x0 + 1;
+    centre = (classmaker_reputation_buttons[0].y0 + classmaker_reputation_buttons[0].y1) >> 1;
+    total = i = 0;
+    for (; i < 5; i++) {
+        height = player_character->reputation[i] * 5;
+        if (player_character->reputation[i] < 0) {
             D_0012B508 = 0xf6;
-            xn_draw_fill_rect(classmaker_reputation_buttons[n].x0, 82, h, -m);
-        } else if (player_character->reputation[n] > 0) {
+            xn_draw_fill_rect(classmaker_reputation_buttons[i].x0, 82, width, -height);
+        } else if (player_character->reputation[i] > 0) {
             D_0012B508 = 0xc5;
-            xn_draw_fill_rect(classmaker_reputation_buttons[n].x0, 81 - m, h, m);
+            xn_draw_fill_rect(classmaker_reputation_buttons[i].x0, 81 - height, width, height);
         }
-        text_draw_centred_coloured(itoa(player_character->reputation[n], ((char *)text_buffer), 10), n * 33 + 58, 149, 145, 141);
-        total += player_character->reputation[n];
+        text_draw_centred_coloured(itoa(player_character->reputation[i], ((char *)text_buffer), 10), i * 33 + 58, 149, 145, 141);
+        total += player_character->reputation[i];
     }
     text_draw_centred_coloured(itoa(-total, ((char *)text_buffer), 10), 105, 179, 145, 141);
     msgbox_update();

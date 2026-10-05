@@ -74,15 +74,15 @@ extern int mc_malloc();
 extern int read();
 extern int strlen();
 extern int mc_set_location(int, int);
-extern int mc_sprintf(int, ...);
+extern int mc_sprintf(char *, ...);
 extern int mc_memcpy();
 extern int xn_font_draw_string();
 extern int xn_draw_image_transparent();
-extern void msgbox_show_string(int, int);
+extern void msgbox_show_string(char *, int);
 extern void book_draw_page(short);
-extern void text_draw_centred(int, int, int);
-extern void text_draw_coloured(int, int, int, int, unsigned char);
-extern void text_draw_centred_coloured(int, int, int, int, unsigned char);
+extern void text_draw_centred(char *, int, int);
+extern void text_draw_coloured(char *, int, int, int, unsigned char);
+extern void text_draw_centred_coloured(char *, int, int, int, unsigned char);
 extern void spfx_effect_end(struct spell *, int, struct record *);
 extern void spfx_effect_tick(struct record *, struct record *, int);
 extern void inpstr_begin_number(int);
@@ -93,10 +93,10 @@ void book_next_page(void);
 void spell_tick_spell(struct record *, struct record *);
 #pragma aux mc_set_location parm routine [];
 
-void book_open(short a1)
+void book_open(short book_id)
 {
     mc_set_location(37, (int)D_001757A8);
-    mc_sprintf((int)text_buffer, (int)D_001757AF, (int)(short)a1);
+    mc_sprintf((char *)text_buffer, (int)D_001757AF, (int)(short)book_id);
     book_file = disk_open_data((int)text_buffer);
     read((int)(short)book_file, (int)book_header, 234);
     read((int)(short)book_file, (int)&book_page_count, 2);
@@ -114,7 +114,7 @@ void book_open(short a1)
 
 void book_update(void)
 {
-    short l_18;
+    short i;
 
     if (((int)(short)book_file) < 1) return;
     D_001940D8 |= 16;
@@ -133,11 +133,11 @@ void book_update(void)
     if (mouse_buttons == 0 || (mouse_buttons != 0 && mouse_buttons_prev != 0)) {
         return;
     }
-    *(int *)&l_18 = 0;
-    for (; ((int)(short)l_18) < 4; (*(int *)&l_18)++) {
-        if (mouse_x > *(short *)(book_buttons + (((int)(short)l_18) * 12)) && mouse_x < *(short *)(D_00185BE8 + (((int)(short)l_18) * 12)) && mouse_y > *(short *)(D_00185BE6 + (((int)(short)l_18) * 12)) && mouse_y < *(short *)(D_00185BEA + (((int)(short)l_18) * 12))) {
+    *(int *)&i = 0;
+    for (; ((int)(short)i) < 4; (*(int *)&i)++) {
+        if (mouse_x > *(short *)(book_buttons + (((int)(short)i) * 12)) && mouse_x < *(short *)(D_00185BE8 + (((int)(short)i) * 12)) && mouse_y > *(short *)(D_00185BE6 + (((int)(short)i) * 12)) && mouse_y < *(short *)(D_00185BEA + (((int)(short)i) * 12))) {
             sound_play(203, (int)player_object, 100);
-            ((int (*)())(*(int *)(D_00185BEC + (((int)(short)l_18) * 12))))();
+            ((int (*)())(*(int *)(D_00185BEC + (((int)(short)i) * 12))))();
         }
     }
 }
@@ -169,30 +169,30 @@ void book_close(void)
 void book_flush_line(void)
 {
     if (*(short *)scratch_190d66 != 0) {
-        text_draw_centred_coloured((int)text_buffer, 160, (int)(short)D_0014292C, (int)(short)((int)(unsigned char)D_0012B508), 156);
+        text_draw_centred_coloured((char *)text_buffer, 160, (int)(short)D_0014292C, (int)(short)((int)(unsigned char)D_0012B508), 156);
     } else {
-        text_draw_coloured((int)text_buffer, (int)(short)D_00142928, (int)(short)D_0014292C, (int)(short)((int)(unsigned char)D_0012B508), 156);
+        text_draw_coloured((char *)text_buffer, (int)(short)D_00142928, (int)(short)D_0014292C, (int)(short)((int)(unsigned char)D_0012B508), 156);
     }
     *(short *)scratch_190d66 = 0;
     *(short *)scratch_190d64 = 0;
     text_buffer[0] = 0;
 }
 
-void func_0005A1C8(int a1)
+void func_0005A1C8(char *name)
 {
     mc_set_location(218, (int)D_001757A8);
-    mc_sprintf((int)text_buffer, (int)D_001757CE, a1);
+    mc_sprintf((char *)text_buffer, (int)D_001757CE, name);
     D_00199C2C[((int)(short)(D_00199D5E)++)] = disk_read_file((int)text_buffer, 0);
 }
 
 void func_0005A230(void)
 {
-    int l_18;
+    int i;
 
-    for (l_18 = 0; ((int)(short)D_00199D5E) > l_18; l_18++) {
-        if (D_00199C2C[l_18] != 0 && D_00199C2C[l_18] != (-1751672937)) {
-            mc_free(D_00199C2C[l_18], (int)D_001757A8, 228);
-            D_00199C2C[l_18] = -1751672937;
+    for (i = 0; ((int)(short)D_00199D5E) > i; i++) {
+        if (D_00199C2C[i] != 0 && D_00199C2C[i] != (-1751672937)) {
+            mc_free(D_00199C2C[i], (int)D_001757A8, 228);
+            D_00199C2C[i] = -1751672937;
         }
     }
     D_00199D5E = 0;
@@ -200,13 +200,13 @@ void func_0005A230(void)
 
 void func_0005A2BE(void)
 {
-    int l_1C;
-    short l_18;
+    char *image;
+    short i;
 
-    *(int *)&l_18 = 0;
-    for (; (short)(short)*(int *)&l_18 < D_00199D5E; (*(int *)&l_18)++) {
-        l_1C = D_00199C2C[((int)(short)l_18)];
-        xn_draw_image_transparent((int)(unsigned short)*(short *)((char *)l_1C), (int)(unsigned short)*(short *)((char *)l_1C + 2), (int)(unsigned short)*(short *)((char *)l_1C + 4), (int)(unsigned short)*(short *)((char *)l_1C + 6), l_1C + 12);
+    *(int *)&i = 0;
+    for (; (short)(short)*(int *)&i < D_00199D5E; (*(int *)&i)++) {
+        image = (char *)D_00199C2C[((int)(short)i)];
+        xn_draw_image_transparent((int)(unsigned short)*(short *)image, (int)(unsigned short)*(short *)(image + 2), (int)(unsigned short)*(short *)(image + 4), (int)(unsigned short)*(short *)(image + 6), image + 12);
     }
 }
 
@@ -226,127 +226,127 @@ void book_next_page(void)
 
 void book_goto_page_prompt(void)
 {
-    int l_18;
+    char *prompt;
 
     D_0012B508 = 146;
-    l_18 = *(int *)scratch_buffer + 55000;
+    prompt = *(char **)scratch_buffer + 55000;
     mc_set_location(268, (int)D_001757A8);
-    mc_sprintf(l_18, (int)D_001757D7, D_0017D1E6);
-    *(signed char *)((char *)(strlen(l_18) + l_18) + 1) = 0;
-    msgbox_show_string(l_18, 2);
+    mc_sprintf(prompt, (int)D_001757D7, D_0017D1E6);
+    *(signed char *)((char *)(strlen(prompt) + prompt) + 1) = 0;
+    msgbox_show_string(prompt, 2);
     inpstr_begin_number(((int)(short)book_page) + 1);
     scratch_190d68 = 4;
 }
 
-int font_char_width(unsigned char a1)
+int font_char_width(unsigned char ch)
 {
-    int l_24;
-    short l_1C;
+    char *glyph;
+    short glyph_index;
 
-    if (((int)(unsigned char)a1) == 32) return (int)(short)font_space_width;
-    *(int *)&l_1C = ((int)(unsigned char)a1) - 33;
-    l_24 = (int)(D_0012DA74 + 6 + (((int)(short)l_1C) << 2));
-    return ((int)(short)*(short *)((char *)l_24)) + ((int)(short)font_char_spacing);
+    if (((int)(unsigned char)ch) == 32) return (int)(short)font_space_width;
+    *(int *)&glyph_index = ((int)(unsigned char)ch) - 33;
+    glyph = D_0012DA74 + 6 + (((int)(short)glyph_index) << 2);
+    return ((int)(short)*(short *)glyph) + ((int)(short)font_char_spacing);
 }
 
-void text_draw_shadow(int a1, short a2, short a3)
+void text_draw_shadow(char *text, short x, short y)
 {
-    unsigned char l_10;
+    unsigned char saved_colour;
 
-    l_10 = D_0012B508;
+    saved_colour = D_0012B508;
     D_0012B508 = text_shadow_colour;
-    xn_font_draw_string((int)(short)(*(int *)&a2 + 1), (int)(short)(*(int *)&a3 + 1), a1);
-    D_0012B508 = l_10;
-    xn_font_draw_string((int)(short)a2, (int)(short)a3, a1);
+    xn_font_draw_string((int)(short)(*(int *)&x + 1), (int)(short)(*(int *)&y + 1), text);
+    D_0012B508 = saved_colour;
+    xn_font_draw_string((int)(short)x, (int)(short)y, text);
 }
 
-void text_draw_centred_shadow(int a1, int a2, int a3)
+void text_draw_centred_shadow(char *text, int x, int y)
 {
-    unsigned char l_10;
+    unsigned char saved_colour;
 
-    l_10 = D_0012B508;
+    saved_colour = D_0012B508;
     D_0012B508 = text_shadow_colour;
-    text_draw_centred(a1, a2 + 1, a3 + 1);
-    D_0012B508 = l_10;
-    text_draw_centred(a1, a2, a3);
+    text_draw_centred(text, x + 1, y + 1);
+    D_0012B508 = saved_colour;
+    text_draw_centred(text, x, y);
 }
 
-void mouse_set_bounds(int a1, int a2, int a3, int a4)
+void mouse_set_bounds(int x_min, int y_min, int x_max, int y_max)
 {
-    mouse_x_min = a1;
-    mouse_x_max = a3;
-    mouse_y_min = a2;
-    mouse_y_max = a4;
+    mouse_x_min = x_min;
+    mouse_x_max = x_max;
+    mouse_y_min = y_min;
+    mouse_y_max = y_max;
 }
 
-void clip_set_rect_size(int a1, int a2, int a3, int a4)
+void clip_set_rect_size(int x, int y, int width, int height)
 {
-    xn_gfx_clip_left = a1;
-    xn_gfx_clip_top = a2;
-    xn_gfx_clip_right = (a1 + a3) - 1;
-    xn_gfx_clip_bottom = (a2 + a4) - 1;
+    xn_gfx_clip_left = x;
+    xn_gfx_clip_top = y;
+    xn_gfx_clip_right = (x + width) - 1;
+    xn_gfx_clip_bottom = (y + height) - 1;
 }
 
-void clip_set_rect(int a1, int a2, int a3, int a4)
+void clip_set_rect(int left, int top, int right, int bottom)
 {
-    xn_gfx_clip_left = a1;
-    xn_gfx_clip_top = a2;
-    xn_gfx_clip_right = a3;
-    xn_gfx_clip_bottom = a4;
+    xn_gfx_clip_left = left;
+    xn_gfx_clip_top = top;
+    xn_gfx_clip_right = right;
+    xn_gfx_clip_bottom = bottom;
 }
 
-void spell_tick(struct record *a1)
+void spell_tick(struct record *object)
 {
-    struct record *l_1C;
-    struct record *l_18;
+    struct record *target;
+    struct record *next;
 
-    if (a1->children == 0) return;
-    if (a1 == player_entity) D_001940D6 &= 239;
-    l_1C = a1;
-    a1 = a1->children;
-    while (a1 != 0) {
-        l_18 = a1->next;
-        switch (a1->type) {
+    if (object->children == 0) return;
+    if (object == player_entity) D_001940D6 &= 239;
+    target = object;
+    object = object->children;
+    while (object != 0) {
+        next = object->next;
+        switch (object->type) {
         case 9:
-            spell_tick_spell(a1, l_1C);
+            spell_tick_spell(object, target);
             break;
         case 19:
-            if (a1->image2-- == 0) object_free_single(a1);
+            if (object->image2-- == 0) object_free_single(object);
         }
-        a1 = l_18;
+        object = next;
     }
 }
 
-void spell_tick_spell(struct record *a1, struct record *a2)
+void spell_tick_spell(struct record *spell_object, struct record *target)
 {
-    int l_20;
-    int l_1C;
-    int l_18;
-    struct spell *l_14;
+    int i;
+    int effect_count;
+    int ended_count;
+    struct spell *spell;
 
-    l_14 = &a1->data.spell;
-    l_20 = 0;
-    l_18 = l_20;
-    l_1C = l_18;
-    for (; l_20 < 3; l_20++) {
-        if (l_14->effects[l_20].type == 255) continue;
-        l_1C++;
-        if (((int)l_14->durations[l_20].base) == (-1)) {
-            if (player_character->equipped[l_14->icon - 200] != 0 && player_character->equipped[l_14->icon - 200]->data.item.enchantments[0].type != (-1)) {
+    spell = &spell_object->data.spell;
+    i = 0;
+    ended_count = i;
+    effect_count = ended_count;
+    for (; i < 3; i++) {
+        if (spell->effects[i].type == 255) continue;
+        effect_count++;
+        if (((int)spell->durations[i].base) == (-1)) {
+            if (player_character->equipped[spell->icon - 200] != 0 && player_character->equipped[spell->icon - 200]->data.item.enchantments[0].type != (-1)) {
                 continue;
             }
-            l_18++;
-            spfx_effect_end(l_14, l_20, a2);
+            ended_count++;
+            spfx_effect_end(spell, i, target);
             continue;
         }
-        if (l_14->cast_durations[l_20] != 0) spfx_effect_tick(a1, a2, l_20);
-        if (l_14->cast_durations[l_20] != 0) {
-            l_14->cast_durations[l_20]--;
+        if (spell->cast_durations[i] != 0) spfx_effect_tick(spell_object, target, i);
+        if (spell->cast_durations[i] != 0) {
+            spell->cast_durations[i]--;
         } else {
-            l_18++;
-            spfx_effect_end(l_14, l_20, a2);
+            ended_count++;
+            spfx_effect_end(spell, i, target);
         }
     }
-    if (l_1C != l_18) return;
-    object_delete(a1);
+    if (effect_count != ended_count) return;
+    object_delete(spell_object);
 }

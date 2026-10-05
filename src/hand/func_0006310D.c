@@ -7,18 +7,18 @@ extern int sound_play(int, struct record *, int);
 extern int rand(void);
 extern int xn_math_approx_dist2d(int, int, int, int);
 
-void monster_ambient_sound(struct record *a1, struct character *a2)
+void monster_ambient_sound(struct record *monster, struct character *monster_char)
 {
-    int l_24[2];
-    int l_14;
+    int unused[2];
+    int dist;
 
     if (rand() > 195) return;
-    l_14 = xn_math_approx_dist2d(a1->x, a1->z, player_object->x, player_object->z);
-    if (l_14 >= 1024) return;
-    if (a2->mobile_id == 146) {
-        sound_play(11461, a1, 100);
+    dist = xn_math_approx_dist2d(monster->x, monster->z, player_object->x, player_object->z);
+    if (dist >= 1024) return;
+    if (monster_char->mobile_id == 146) {
+        sound_play(11461, monster, 100);
         return;
     }
-    if (a2->race >= 43) return;
-    monster_play_sound(a1, l_14);
+    if (monster_char->race >= 43) return;
+    monster_play_sound(monster, dist);
 }

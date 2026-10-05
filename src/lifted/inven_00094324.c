@@ -32,60 +32,60 @@ extern void trade_schedule_repair(void);
 
 void inv_click_paperdoll(void)
 {
-    int l_2C;
-    struct item *l_28;
-    int l_24;
-    int l_20;
-    int l_1C;
-    struct record *l_18;
+    int action;
+    struct item *item;
+    int unused1;
+    int unused2;
+    int slot;
+    struct record *object;
 
-    l_1C = inv_paperdoll_slot_at((int)(short)mouse_x, (int)(short)mouse_y, l_1C);
-    if (l_1C == 0) return;
+    slot = inv_paperdoll_slot_at((int)(short)mouse_x, (int)(short)mouse_y, slot);
+    if (slot == 0) return;
     D_001940D8 |= 8;
-    l_1C += -64;
-    l_18 = (inv_selected_item = player_character->equipped[l_1C]);
+    slot += -64;
+    object = (inv_selected_item = player_character->equipped[slot]);
     scratch_current_object = inv_selected_item;
-    l_28 = &inv_selected_item->data.item;
-    text_macro_item = l_28;
-    l_2C = inventory_action - 1;
-    switch (l_2C) {
+    item = &inv_selected_item->data.item;
+    text_macro_item = item;
+    action = inventory_action - 1;
+    switch (action) {
     case 0:
-        inv_item_info(inv_selected_item, l_28);
+        inv_item_info(inv_selected_item, item);
         return;
     case 1:
         inv_take_item(inv_selected_item);
         return;
     case 2:
         if (trade_mode == 4) {
-            item_remove_equip_effects(inv_selected_item, l_1C);
-            player_character->equipped[l_1C] = 0;
-            l_18->x = player_object->x;
-            l_18->y = player_object->y;
-            l_18->z = player_object->z;
-            l_18->caster = 0;
-            if (l_18->image == 0) l_18->image = l_28->dropped_image;
-            object_reparent(inv_right_container, l_18);
-            l_18->id = object_new_id(0);
+            item_remove_equip_effects(inv_selected_item, slot);
+            player_character->equipped[slot] = 0;
+            object->x = player_object->x;
+            object->y = player_object->y;
+            object->z = player_object->z;
+            object->caster = 0;
+            if (object->image == 0) object->image = item->dropped_image;
+            object_reparent(inv_right_container, object);
+            object->id = object_new_id(0);
             return;
         }
-        if (trade_mode == 3 && l_28->enchantments[0].type != (-1)) {
+        if (trade_mode == 3 && item->enchantments[0].type != (-1)) {
             msgbox_show_rsc(33, 1);
             return;
         }
-        if (trade_mode == 3 && trade_can_repair_item(l_28) == 0) return;
-        item_remove_equip_effects(inv_selected_item, l_1C);
-        player_character->equipped[l_1C] = 0;
-        l_18->x = player_object->x;
-        l_18->y = player_object->y;
-        l_18->z = player_object->z;
-        l_18->caster = 0;
-        if (l_18->image == 0) l_18->image = l_28->dropped_image;
-        object_reparent(inv_right_container, l_18);
-        if (((int)D_00196120) == (int)l_18->parent) l_18->owner = *(short *)picked_model_index;
-        if (l_18->quest_id == 0 && trade_mode == 0) {
-            l_18->id = object_new_id(((unsigned)location_object->id) >> 16);
+        if (trade_mode == 3 && trade_can_repair_item(item) == 0) return;
+        item_remove_equip_effects(inv_selected_item, slot);
+        player_character->equipped[slot] = 0;
+        object->x = player_object->x;
+        object->y = player_object->y;
+        object->z = player_object->z;
+        object->caster = 0;
+        if (object->image == 0) object->image = item->dropped_image;
+        object_reparent(inv_right_container, object);
+        if (((int)D_00196120) == (int)object->parent) object->owner = *(short *)picked_model_index;
+        if (object->quest_id == 0 && trade_mode == 0) {
+            object->id = object_new_id(((unsigned)location_object->id) >> 16);
         }
-        quest_raise_event(5, (int)l_18, 0);
+        quest_raise_event(5, (int)object, 0);
         trade_schedule_repair();
         return;
     case 3:

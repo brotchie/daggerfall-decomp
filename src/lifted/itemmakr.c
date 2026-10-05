@@ -127,7 +127,7 @@ void itemmaker_reset(void);
 void itemmaker_store_item(void);
 void itemmaker_remove_slot(short);
 void itemmaker_soul_list_cb(struct record *);
-void itemmaker_show_list(int, int);
+void itemmaker_show_list(int *, int);
 void itemmaker_consume_soul(void);
 void itemmaker_write_item_file(void);
 void itemmaker_clear_soul_slots(void);
@@ -171,18 +171,18 @@ int itemmaker_close(void)
 
 void itemmaker_enter_name(void)
 {
-    int l_18;
+    char *prompt;
 
     if ((int)itemmaker_item == 0) {
         msgbox_show_rsc(1653, 1);
         return;
     }
-    l_18 = *(int *)scratch_buffer + 55000;
+    prompt = *(char **)scratch_buffer + 55000;
     mc_set_location(242, (int)D_001756A3);
-    mc_sprintf(l_18, (int)D_001756BE, D_0017D1EA);
-    *(signed char *)((char *)(strlen(l_18) + l_18) + 1) = 0;
+    mc_sprintf((int)prompt, (int)D_001756BE, D_0017D1EA);
+    *(strlen(prompt) + prompt + 1) = 0;
     inpstr_begin_text((int)itemmaker_item, 23);
-    msgbox_show_string(l_18, 2);
+    msgbox_show_string((int)prompt, 2);
 }
 
 void itemmaker_powers_click(void)
@@ -192,14 +192,14 @@ void itemmaker_powers_click(void)
 
 void itemmaker_add_powers(void)
 {
-    int l_18;
+    int unused;
 
     if ((int)itemmaker_item == 0) {
         msgbox_show_rsc(1653, 1);
         return;
     }
     list_popup_callback = (int)itemmaker_add_power_cb;
-    itemmaker_show_list((int)enchant_power_names, 0);
+    itemmaker_show_list((int *)enchant_power_names, 0);
 }
 
 void itemmaker_side_effects_click(void)
@@ -207,43 +207,43 @@ void itemmaker_side_effects_click(void)
     itemmaker_remove_slot((int)(short)itemmaker_row_slot(1));
 }
 
-void itemmaker_set_side_effect_param_cb(short a1)
+void itemmaker_set_side_effect_param_cb(short param)
 {
-    short l_1C;
-    short l_18;
+    short exclusion_row;
+    short choice;
 
-    *(int *)&l_18 = *(int *)&a1;
+    *(int *)&choice = *(int *)&param;
     if (*(short *)(itemmaker_slots + (((int)(short)*(short *)scratch_190d64) << 2)) == 0) {
-        *(int *)&l_18 = 0;
-        *(int *)&a1 = (int)(unsigned char)text_rsc_buffer[(int)(short)a1];
-        itemmaker_add_soul_powers((int)(short)a1);
+        *(int *)&choice = 0;
+        *(int *)&param = (int)(unsigned char)text_rsc_buffer[(int)(short)param];
+        itemmaker_add_soul_powers((int)(short)param);
     }
-    *(short *)(D_001998E2 + (((int)(short)*(short *)scratch_190d64) << 2)) = *(int *)&a1;
-    *(int *)&l_1C = (int)(unsigned char)*(signed char *)(D_0018597F + ((int)(short)*(short *)scratch_190d66));
-    if (l_1C == 0) {
-        func_00057147((int)(short)*(short *)scratch_190d64, (int)(short)(*(short *)scratch_190d66 + 15), (int)(short)l_18, -1, -1, -1, -1);
+    *(short *)(D_001998E2 + (((int)(short)*(short *)scratch_190d64) << 2)) = *(int *)&param;
+    *(int *)&exclusion_row = (int)(unsigned char)*(signed char *)(D_0018597F + ((int)(short)*(short *)scratch_190d66));
+    if (exclusion_row == 0) {
+        func_00057147((int)(short)*(short *)scratch_190d64, (int)(short)(*(short *)scratch_190d66 + 15), (int)(short)choice, -1, -1, -1, -1);
         return;
     }
-    (*(int *)&l_1C)--;
-    func_00057147((int)(short)*(short *)scratch_190d64, (int)(short)(*(short *)scratch_190d66 + 15), (int)(short)l_18, (int)(short)((unsigned short)(unsigned char)*(signed char *)(D_00185907 + ((((int)(short)l_1C) * 20) + (((int)(short)l_18) << 2)))), (int)(short)((unsigned short)(unsigned char)*(signed char *)(D_00185908 + ((((int)(short)l_1C) * 20) + (((int)(short)l_18) << 2)))), (int)(short)((unsigned short)(unsigned char)*(signed char *)(D_00185909 + ((((int)(short)l_1C) * 20) + (((int)(short)l_18) << 2)))), (int)(short)((unsigned short)(unsigned char)*(signed char *)(D_0018590A + ((((int)(short)l_1C) * 20) + (((int)(short)l_18) << 2)))));
+    (*(int *)&exclusion_row)--;
+    func_00057147((int)(short)*(short *)scratch_190d64, (int)(short)(*(short *)scratch_190d66 + 15), (int)(short)choice, (int)(short)((unsigned short)(unsigned char)*(signed char *)(D_00185907 + ((((int)(short)exclusion_row) * 20) + (((int)(short)choice) << 2)))), (int)(short)((unsigned short)(unsigned char)*(signed char *)(D_00185908 + ((((int)(short)exclusion_row) * 20) + (((int)(short)choice) << 2)))), (int)(short)((unsigned short)(unsigned char)*(signed char *)(D_00185909 + ((((int)(short)exclusion_row) * 20) + (((int)(short)choice) << 2)))), (int)(short)((unsigned short)(unsigned char)*(signed char *)(D_0018590A + ((((int)(short)exclusion_row) * 20) + (((int)(short)choice) << 2)))));
 }
 
 void itemmaker_add_side_effects(void)
 {
-    int l_18;
+    int unused;
 
     if ((int)itemmaker_item == 0) {
         msgbox_show_rsc(1653, 1);
         return;
     }
     list_popup_callback = (int)itemmaker_add_side_effect_cb;
-    itemmaker_show_list((int)enchant_side_effect_names, 15);
+    itemmaker_show_list((int *)enchant_side_effect_names, 15);
 }
 
 void itemmaker_return_item(void)
 {
-    int l_1C;
-    int l_18;
+    int unused;
+    int unused2;
 
     if ((int)itemmaker_item != 0) inv_store_item((int)itemmaker_item_object);
     itemmaker_item_object = 0;
@@ -253,8 +253,8 @@ void itemmaker_return_item(void)
 
 void itemmaker_enchant(void)
 {
-    int l_1C;
-    int l_18;
+    int slot;
+    int count;
 
     if ((int)itemmaker_item == 0) {
         msgbox_show_rsc(1653, 1);
@@ -272,22 +272,22 @@ void itemmaker_enchant(void)
         gold_spend(itemmaker_gold_cost());
     }
     msgbox_show_rsc(1652, 1);
-    l_18 = 0;
-    for (l_1C = 0; l_1C < 10; l_1C++) {
-        if (((int)(signed char)scratch_190ce4[l_1C]) != (-1)) {
-            itemmaker_item->enchantments[l_18].type = *(short *)(itemmaker_slots + (l_1C << 2));
-            itemmaker_item->enchantments[l_18].param = *(short *)(D_001998E2 + (l_1C << 2));
+    count = 0;
+    for (slot = 0; slot < 10; slot++) {
+        if (((int)(signed char)scratch_190ce4[slot]) != (-1)) {
+            itemmaker_item->enchantments[count].type = *(short *)(itemmaker_slots + (slot << 2));
+            itemmaker_item->enchantments[count].param = *(short *)(D_001998E2 + (slot << 2));
         }
-        if (scratch_190ce4[l_1C] > 0) {
-            itemmaker_item->enchantments[l_18].type += 15;
+        if (scratch_190ce4[slot] > 0) {
+            itemmaker_item->enchantments[count].type += 15;
         }
-        if (scratch_190ce4[l_1C] == 0 && (*(short *)(itemmaker_slots + (l_1C << 2)) == 0 || ((int)(short)*(short *)(itemmaker_slots + (l_1C << 2))) == 1 || ((int)(short)*(short *)(itemmaker_slots + (l_1C << 2))) == 2)) {
-            itemmaker_item->enchantments[l_18].param = (int)(unsigned char)*(signed char *)((char *)(int)(enchant_spell_lists[((int)(short)*(short *)(itemmaker_slots + (l_1C << 2)))] + ((int)(short)*(short *)(D_001998E2 + (l_1C << 2)))));
+        if (scratch_190ce4[slot] == 0 && (*(short *)(itemmaker_slots + (slot << 2)) == 0 || ((int)(short)*(short *)(itemmaker_slots + (slot << 2))) == 1 || ((int)(short)*(short *)(itemmaker_slots + (slot << 2))) == 2)) {
+            itemmaker_item->enchantments[count].param = (int)(unsigned char)*(signed char *)((char *)(int)(enchant_spell_lists[((int)(short)*(short *)(itemmaker_slots + (slot << 2)))] + ((int)(short)*(short *)(D_001998E2 + (slot << 2)))));
         }
-        if (((int)(signed char)scratch_190ce4[l_1C]) != (-1)) l_18++;
+        if (((int)(signed char)scratch_190ce4[slot]) != (-1)) count++;
     }
-    for (; l_18 < 10; l_18++) {
-        itemmaker_item->enchantments[l_18].type = 65535;
+    for (; count < 10; count++) {
+        itemmaker_item->enchantments[count].type = 65535;
     }
     itemmaker_item->item_flags |= 32;
     itemmaker_write_item_file();
@@ -304,38 +304,38 @@ void itemmaker_store_item(void)
     itemmaker_item_object = 0;
 }
 
-void itemmaker_remove_slot(short a1)
+void itemmaker_remove_slot(short slot)
 {
-    if (((int)(short)a1) == (-1) || D_00199910[(int)(short)a1] != 0) return;
-    if (((int)(signed char)scratch_190ce4[(int)(short)a1]) == 1 && *(short *)(itemmaker_slots + (((int)(short)a1) << 2)) == 0) {
+    if (((int)(short)slot) == (-1) || D_00199910[(int)(short)slot] != 0) return;
+    if (((int)(signed char)scratch_190ce4[(int)(short)slot]) == 1 && *(short *)(itemmaker_slots + (((int)(short)slot) << 2)) == 0) {
         itemmaker_clear_soul_slots();
     }
-    mc_memset(((int)D_00199868) + (((int)(short)a1) * 10), -1, 10, (int)D_001756A3, 511, 4);
-    scratch_190ce4[(int)(short)a1] = 255;
-    *(short *)(D_001998E2 + (((int)(short)a1) << 2)) = 0;
+    mc_memset(((int)D_00199868) + (((int)(short)slot) * 10), -1, 10, (int)D_001756A3, 511, 4);
+    scratch_190ce4[(int)(short)slot] = 255;
+    *(short *)(D_001998E2 + (((int)(short)slot) << 2)) = 0;
 }
 
-void itemmaker_soul_list_cb(struct record *a1)
+void itemmaker_soul_list_cb(struct record *soul)
 {
-    int l_18;
+    int next_name;
 
-    if (a1->type != 20 || *(int *)D_00195B84 > 62) return;
-    if (D_00190D63 == a1->soul_creature) scratch_object = a1;
-    text_rsc_buffer[*(int *)D_00195B84] = (signed char)a1->soul_creature;
+    if (soul->type != 20 || *(int *)D_00195B84 > 62) return;
+    if (D_00190D63 == soul->soul_creature) scratch_object = soul;
+    text_rsc_buffer[*(int *)D_00195B84] = (signed char)soul->soul_creature;
     *(int *)(scratch_190ee4 + ((*(int *)D_00195B84)++ << 2)) = D_00190EDC;
-    mc_strncpy(D_00190EDC, *(int *)(monster_names + (a1->soul_creature << 2)), 4, (int)D_001756A3, 526);
-    l_18 = D_00190EDC;
-    l_18 += strlen(*(int *)(monster_names + (a1->soul_creature << 2))) + 1;
-    D_00190EDC = l_18;
+    mc_strncpy(D_00190EDC, *(int *)(monster_names + (soul->soul_creature << 2)), 4, (int)D_001756A3, 526);
+    next_name = D_00190EDC;
+    next_name += strlen(*(int *)(monster_names + (soul->soul_creature << 2))) + 1;
+    D_00190EDC = next_name;
 }
 
-int itemmaker_pick_param_list(int a1)
+int itemmaker_pick_param_list(int list_kind)
 {
-    switch ((unsigned)a1) {
+    switch ((unsigned)list_kind) {
     case 1:
     case 2:
     case 3:
-        itemmaker_show_param_list(spells_std_names_for_ids(D_00185871[a1]), (int)(short)(a1 - 1));
+        itemmaker_show_param_list(spells_std_names_for_ids(D_00185871[list_kind]), (int)(short)(list_kind - 1));
         break;
     case 4:
         *(int *)scratch_190ee4 = *(int *)scratch_buffer + 20000;
@@ -354,92 +354,92 @@ int itemmaker_pick_param_list(int a1)
 
 int itemmaker_free_slot(void)
 {
-    int l_1C;
+    int slot;
 
-    l_1C = 0;
-    while (((int)(signed char)scratch_190ce4[l_1C]) != (-1) && l_1C < 10) {
-        l_1C++;
+    slot = 0;
+    while (((int)(signed char)scratch_190ce4[slot]) != (-1) && slot < 10) {
+        slot++;
     }
-    if (l_1C == 10) return -1;
-    return l_1C;
+    if (slot == 10) return -1;
+    return slot;
 }
 
 int itemmaker_free_slot_count(void)
 {
-    int l_20;
-    int l_1C;
+    int slot;
+    int count;
 
-    l_20 = 0;
-    l_1C = l_20;
-    for (; l_20 < 10; l_20++) {
-        if (((int)(signed char)scratch_190ce4[l_20]) == (-1)) l_1C++;
+    slot = 0;
+    count = slot;
+    for (; slot < 10; slot++) {
+        if (((int)(signed char)scratch_190ce4[slot]) == (-1)) count++;
     }
-    return l_1C;
+    return count;
 }
 
-void itemmaker_show_list(int a1, int a2)
+void itemmaker_show_list(int *names, int type)
 {
-    int l_1C;
-    int l_18;
-    int l_14;
+    int slot;
+    int index;
+    int count;
 
-    l_14 = 0;
-    l_18 = l_14;
-    while (*(int *)((char *)a1) != 0) {
-        for (l_1C = 0; ((int)(short)*(short *)&l_1C) < 10; l_1C++) {
-            if (((short)((unsigned short)(unsigned char)D_00199868[((int)(short)*(short *)&l_1C) * 10]) == *(short *)&a2 && ((int)(unsigned char)D_00199869[((int)(short)*(short *)&l_1C) * 10]) == 255) || ((short)((unsigned short)(unsigned char)D_0019986A[((int)(short)*(short *)&l_1C) * 10]) == *(short *)&a2 && ((int)(unsigned char)D_0019986B[((int)(short)*(short *)&l_1C) * 10]) == 255) || ((short)((unsigned short)(unsigned char)D_0019986C[((int)(short)*(short *)&l_1C) * 10]) == *(short *)&a2 && ((int)(unsigned char)D_0019986D[((int)(short)*(short *)&l_1C) * 10]) == 255) || ((short)((unsigned short)(unsigned char)D_0019986E[((int)(short)*(short *)&l_1C) * 10]) == *(short *)&a2 && ((int)(unsigned char)D_0019986F[((int)(short)*(short *)&l_1C) * 10]) == 255) || ((short)((unsigned short)(unsigned char)D_00199870[((int)(short)*(short *)&l_1C) * 10]) == *(short *)&a2 && ((int)(unsigned char)D_00199871[((int)(short)*(short *)&l_1C) * 10]) == 255)) {
+    count = 0;
+    index = count;
+    while (*names != 0) {
+        for (slot = 0; ((int)(short)*(short *)&slot) < 10; slot++) {
+            if (((short)((unsigned short)(unsigned char)D_00199868[((int)(short)*(short *)&slot) * 10]) == *(short *)&type && ((int)(unsigned char)D_00199869[((int)(short)*(short *)&slot) * 10]) == 255) || ((short)((unsigned short)(unsigned char)D_0019986A[((int)(short)*(short *)&slot) * 10]) == *(short *)&type && ((int)(unsigned char)D_0019986B[((int)(short)*(short *)&slot) * 10]) == 255) || ((short)((unsigned short)(unsigned char)D_0019986C[((int)(short)*(short *)&slot) * 10]) == *(short *)&type && ((int)(unsigned char)D_0019986D[((int)(short)*(short *)&slot) * 10]) == 255) || ((short)((unsigned short)(unsigned char)D_0019986E[((int)(short)*(short *)&slot) * 10]) == *(short *)&type && ((int)(unsigned char)D_0019986F[((int)(short)*(short *)&slot) * 10]) == 255) || ((short)((unsigned short)(unsigned char)D_00199870[((int)(short)*(short *)&slot) * 10]) == *(short *)&type && ((int)(unsigned char)D_00199871[((int)(short)*(short *)&slot) * 10]) == 255)) {
                 goto L576C2;
             }
         }
-        if (itemmaker_item->group != 3 && ((int)(short)*(short *)&a2) == 20) {
-        } else if (itemmaker_power_excluded((int)(short)*(short *)&a2) == 0) {
-            if (((int)(short)*(short *)&a2) != 18 && ((int)(short)*(short *)&a2) != 19) {
-                if (((int)(short)*(short *)&a2) == 15 && itemmaker_has_soul_bound() != 0) {
-                } else if (((int)(short)*(short *)&a2) == 21 && itemmaker_has_health_leech() != 0) {
+        if (itemmaker_item->group != 3 && ((int)(short)*(short *)&type) == 20) {
+        } else if (itemmaker_power_excluded((int)(short)*(short *)&type) == 0) {
+            if (((int)(short)*(short *)&type) != 18 && ((int)(short)*(short *)&type) != 19) {
+                if (((int)(short)*(short *)&type) == 15 && itemmaker_has_soul_bound() != 0) {
+                } else if (((int)(short)*(short *)&type) == 21 && itemmaker_has_health_leech() != 0) {
                 } else {
-                    *(signed char *)((char *)(int)(((int)(short)*(short *)&l_14) + *(char **)scratch_buffer) + 64000) = *(signed char *)&l_18;
-                    *(int *)(scratch_190ee4 + (((int)(short)*(short *)&l_14) << 2)) = *(int *)((char *)a1);
-                    l_14++;
+                    *(signed char *)((char *)(int)(((int)(short)*(short *)&count) + *(char **)scratch_buffer) + 64000) = *(signed char *)&index;
+                    *(int *)(scratch_190ee4 + (((int)(short)*(short *)&count) << 2)) = *names;
+                    count++;
                 }
             }
         }
 L576C2:;
-        (*(char (**)[4])&a1)++;
-        (*(short *)&l_18)++;
-        a2++;
+        names++;
+        (*(short *)&index)++;
+        type++;
     }
-    *(int *)(scratch_190ee4 + (((int)(short)*(short *)&l_14) << 2)) = 0;
+    *(int *)(scratch_190ee4 + (((int)(short)*(short *)&count) << 2)) = 0;
     list_popup_open((int)scratch_190ee4);
 }
 
-int spell_name_by_id(unsigned char a1)
+int spell_name_by_id(unsigned char spell_id)
 {
-    int l_20;
+    int i;
 
-    for (l_20 = 0; l_20 < 128; l_20++) {
-        if (spell_records[l_20].name[0] == 0) continue;
-        if (spell_records[l_20].id == a1) return (int)spell_records[l_20].name;
+    for (i = 0; i < 128; i++) {
+        if (spell_records[i].name[0] == 0) continue;
+        if (spell_records[i].id == spell_id) return (int)spell_records[i].name;
     }
     return (int)D_0017570A;
 }
 
-int enchant_spell_cost(unsigned char a1)
+int enchant_spell_cost(unsigned char spell_id)
 {
-    int l_28;
-    int l_24;
-    int l_2C;
-    short l_1C;
+    int i;
+    int unused;
+    int unused2;
+    short unused3;
 
-    for (l_28 = 0; l_28 < 35; l_28++) {
-        *(short *)(D_001957E9 + (l_28 * 6)) = 50;
+    for (i = 0; i < 35; i++) {
+        *(short *)(D_001957E9 + (i * 6)) = 50;
     }
     D_001957CD = 1;
-    l_28 = 0;
-    l_24 = l_28;
-    for (; l_28 < 128; l_28++) {
-        if (spell_records[l_28].name[0] == 0) continue;
-        if (spell_records[l_28].id == a1) {
-            return spell_cost(&spell_records[l_28], (struct character *)D_0019574C) * 10;
+    i = 0;
+    unused = i;
+    for (; i < 128; i++) {
+        if (spell_records[i].name[0] == 0) continue;
+        if (spell_records[i].id == spell_id) {
+            return spell_cost(&spell_records[i], (struct character *)D_0019574C) * 10;
         }
     }
     return 0;
@@ -447,80 +447,80 @@ int enchant_spell_cost(unsigned char a1)
 
 int itemmaker_points_used(void)
 {
-    int l_28;
-    int l_24;
-    int l_20;
-    int l_1C;
+    int slot;
+    int points;
+    int cost_code;
+    int cost_table;
 
-    l_28 = 0;
-    l_24 = l_28;
-    for (; l_28 < 10; l_28++) {
-        if (((int)(signed char)scratch_190ce4[l_28]) == (-1)) continue;
-        if (D_00199910[l_28] != 0) continue;
-        if (scratch_190ce4[l_28] == 0) {
-            l_1C = (int)enchant_power_costs;
+    slot = 0;
+    points = slot;
+    for (; slot < 10; slot++) {
+        if (((int)(signed char)scratch_190ce4[slot]) == (-1)) continue;
+        if (D_00199910[slot] != 0) continue;
+        if (scratch_190ce4[slot] == 0) {
+            cost_table = (int)enchant_power_costs;
         } else {
-            l_1C = (int)D_001858DB;
+            cost_table = (int)D_001858DB;
         }
-        l_20 = *(int *)((char *)((((int)(short)*(short *)(itemmaker_slots + (l_28 << 2))) << 2) + l_1C));
-        if (l_20 == 0) continue;
-        if (((unsigned)l_20) < 100) {
-            l_24 += enchant_slot_cost(l_20, (int)(unsigned char)*(signed char *)(D_001998E2 + (l_28 << 2)), 1, (int)(short)*(short *)(itemmaker_slots + (l_28 << 2)));
+        cost_code = *(int *)((char *)((((int)(short)*(short *)(itemmaker_slots + (slot << 2))) << 2) + cost_table));
+        if (cost_code == 0) continue;
+        if (((unsigned)cost_code) < 100) {
+            points += enchant_slot_cost(cost_code, (int)(unsigned char)*(signed char *)(D_001998E2 + (slot << 2)), 1, (int)(short)*(short *)(itemmaker_slots + (slot << 2)));
         } else {
-            l_24 += (int)(short)*(short *)((char *)(int)(*(char **)((char *)((((int)(short)*(short *)(itemmaker_slots + (l_28 << 2))) << 2) + l_1C)) + (((int)(short)*(short *)(D_001998E2 + (l_28 << 2))) * 2)));
+            points += (int)(short)*(short *)((char *)(int)(*(char **)((char *)((((int)(short)*(short *)(itemmaker_slots + (slot << 2))) << 2) + cost_table)) + (((int)(short)*(short *)(D_001998E2 + (slot << 2))) * 2)));
         }
     }
-    return l_24;
+    return points;
 }
 
 int itemmaker_gold_cost(void)
 {
-    int l_24;
-    int l_20;
-    int l_1C;
+    int slot;
+    int cost;
+    int cost_code;
 
-    l_24 = 0;
-    l_20 = l_24;
-    for (; l_24 < 10; l_24++) {
-        if (scratch_190ce4[l_24] != 0) continue;
-        l_1C = *(int *)(enchant_power_costs + (((int)(short)*(short *)(itemmaker_slots + (l_24 << 2))) << 2));
-        if (l_1C == 0) continue;
-        if (((unsigned)l_1C) < 100) {
-            l_20 += enchant_slot_cost(l_1C, (int)(unsigned char)*(signed char *)(D_001998E2 + (l_24 << 2)), 0, (int)(short)*(short *)(itemmaker_slots + (l_24 << 2)));
+    slot = 0;
+    cost = slot;
+    for (; slot < 10; slot++) {
+        if (scratch_190ce4[slot] != 0) continue;
+        cost_code = *(int *)(enchant_power_costs + (((int)(short)*(short *)(itemmaker_slots + (slot << 2))) << 2));
+        if (cost_code == 0) continue;
+        if (((unsigned)cost_code) < 100) {
+            cost += enchant_slot_cost(cost_code, (int)(unsigned char)*(signed char *)(D_001998E2 + (slot << 2)), 0, (int)(short)*(short *)(itemmaker_slots + (slot << 2)));
         } else {
-            l_20 += (int)(short)*(short *)((char *)(int)(*(char **)(enchant_power_costs + (((int)(short)*(short *)(itemmaker_slots + (l_24 << 2))) << 2)) + (((int)(short)*(short *)(D_001998E2 + (l_24 << 2))) * 2)));
+            cost += (int)(short)*(short *)((char *)(int)(*(char **)(enchant_power_costs + (((int)(short)*(short *)(itemmaker_slots + (slot << 2))) << 2)) + (((int)(short)*(short *)(D_001998E2 + (slot << 2))) * 2)));
         }
     }
-    return l_20 * 10;
+    return cost * 10;
 }
 
 void itemmaker_consume_soul(void)
 {
-    int l_1C;
-    struct record *l_18;
+    int slot;
+    struct record *gem;
 
-    for (l_1C = 0; l_1C < 10; l_1C++) {
-        if (scratch_190ce4[l_1C] > 0 && *(short *)(itemmaker_slots + (l_1C << 2)) == 0) {
+    for (slot = 0; slot < 10; slot++) {
+        if (scratch_190ce4[slot] > 0 && *(short *)(itemmaker_slots + (slot << 2)) == 0) {
             goto L57E13;
         }
     }
     return;
 L57E13:;
-    D_00190D63 = *(signed char *)(D_001998E2 + (l_1C << 2));
+    D_00190D63 = *(signed char *)(D_001998E2 + (slot << 2));
     *(int *)D_00195B84 = 0;
     object_foreach(player_entity->children, (int)itemmaker_soul_list_cb);
-    l_18 = scratch_object->parent;
+    gem = scratch_object->parent;
     object_delete((int)scratch_object);
-    if (l_18->data.item.enchantments[0].type == 26) return;
-    object_free_single(l_18);
+    if (gem->data.item.enchantments[0].type == 26) return;
+    object_free_single(gem);
 }
 
 int itemmaker_has_soul_bound(void)
 {
-    int l_1C;
+    int slot;
 
-    for (l_1C = 0; l_1C < 10; l_1C++) {
-        if (((int)(signed char)scratch_190ce4[l_1C]) == 1 && *(short *)(itemmaker_slots + (l_1C << 2)) == 0) {
+    for (slot = 0; slot < 10; slot++) {
+        if (((int)(signed char)scratch_190ce4[slot]) == 1 && *(short *)(itemmaker_slots + (slot << 2)) == 0) {
             return 1;
         }
     }
@@ -529,10 +529,10 @@ int itemmaker_has_soul_bound(void)
 
 int itemmaker_has_health_leech(void)
 {
-    int l_1C;
+    int slot;
 
-    for (l_1C = 0; l_1C < 10; l_1C++) {
-        if (((int)(signed char)scratch_190ce4[l_1C]) == 1 && ((int)(short)*(short *)(itemmaker_slots + (l_1C << 2))) == 6) {
+    for (slot = 0; slot < 10; slot++) {
+        if (((int)(signed char)scratch_190ce4[slot]) == 1 && ((int)(short)*(short *)(itemmaker_slots + (slot << 2))) == 6) {
             return 1;
         }
     }
@@ -541,54 +541,54 @@ int itemmaker_has_health_leech(void)
 
 void itemmaker_write_item_file(void)
 {
-    int l_18;
+    int fd;
 
     if (*(signed char *)cfg_item_file == 0) return;
-    l_18 = disk_create((int)cfg_item_file);
-    write(l_18, (int)itemmaker_item, 107);
-    close(l_18);
+    fd = disk_create((int)cfg_item_file);
+    write(fd, (int)itemmaker_item, 107);
+    close(fd);
 }
 
 void itemmaker_clear_soul_slots(void)
 {
-    int l_18;
+    int slot;
 
-    for (l_18 = 0; l_18 < 10; l_18++) {
-        if (D_00199910[l_18] == 0) continue;
-        D_00199910[l_18] = 0;
-        scratch_190ce4[l_18] = 255;
-        *(short *)(itemmaker_slots + (l_18 << 2)) = (*(short *)(D_001998E2 + (l_18 << 2)) = 0);
-        mc_memset(((int)D_00199868) + (l_18 * 10), -1, 10, (int)D_001756A3, 939, 4);
+    for (slot = 0; slot < 10; slot++) {
+        if (D_00199910[slot] == 0) continue;
+        D_00199910[slot] = 0;
+        scratch_190ce4[slot] = 255;
+        *(short *)(itemmaker_slots + (slot << 2)) = (*(short *)(D_001998E2 + (slot << 2)) = 0);
+        mc_memset(((int)D_00199868) + (slot * 10), -1, 10, (int)D_001756A3, 939, 4);
     }
     mc_memset((int)D_001998CC, -1, 20, (int)D_001756A3, 942, 4);
 }
 
-void func_0005852D(int a1)
+void func_0005852D(int cells)
 {
-    struct record *l_18;
+    struct record *item;
 
     inv_left_count = (D_001AA586 = 0);
     mc_memset((int)inv_left_rows, 0, 20, (int)D_001756A3, 951, 20);
     if (inv_left_container != player_entity) {
-        inv_draw_item_cell(inv_left_container, 0, a1);
+        inv_draw_item_cell(inv_left_container, 0, cells);
         D_001AA578 = (int)inv_left_container;
     }
-    l_18 = inv_left_container->children;
-    while (l_18 != 0) {
-        func_000585D6(l_18, a1 + 12);
-        l_18 = l_18->next;
+    item = inv_left_container->children;
+    while (item != 0) {
+        func_000585D6(item, cells + 12);
+        item = item->next;
     }
     inv_left_count = D_001AA586;
 }
 
-void func_000585D6(struct record *a1, int a2)
+void func_000585D6(struct record *item, int cells)
 {
-    int l_14;
+    int unused;
 
-    if (a1->type != 2 || ((int)(unsigned short)(a1->flags & 2)) != 0) return;
+    if (item->type != 2 || ((int)(unsigned short)(item->flags & 2)) != 0) return;
     if (((int)(short)D_001AA586) >= *(int *)inv_left_scroll && ((int)(short)D_001AA586) < (*(int *)inv_left_scroll + 4)) {
-        *(int *)(inv_left_rows + ((((int)(short)D_001AA586) - *(int *)inv_left_scroll) << 2)) = (int)a1;
-        inv_draw_item_cell(a1, (int)(short)(D_001AA586 - *(short *)inv_left_scroll), a2);
+        *(int *)(inv_left_rows + ((((int)(short)D_001AA586) - *(int *)inv_left_scroll) << 2)) = (int)item;
+        inv_draw_item_cell(item, (int)(short)(D_001AA586 - *(short *)inv_left_scroll), cells);
     }
     D_001AA586++;
 }
@@ -599,78 +599,78 @@ void itemmaker_list_parent(void)
     inv_left_container = inv_left_container->parent;
 }
 
-void itemmaker_pick_item(int a1)
+void itemmaker_pick_item(int index)
 {
-    struct record *l_1C;
-    struct item *l_18;
+    struct record *item;
+    struct item *item_data;
 
-    a1 += -9;
-    l_1C = *(struct record **)(inv_left_rows + (a1 << 2));
-    if (l_1C == 0) return;
-    l_18 = &l_1C->data.item;
-    if (l_18->enchantments[0].type != (-1)) {
+    index += -9;
+    item = *(struct record **)(inv_left_rows + (index << 2));
+    if (item == 0) return;
+    item_data = &item->data.item;
+    if (item_data->enchantments[0].type != (-1)) {
         msgbox_show_rsc(1660, 1);
         return;
     }
-    if (l_18->enchant_points == 0) {
+    if (item_data->enchant_points == 0) {
         msgbox_show_rsc(1659, 1);
         return;
     }
-    for (a1 = 0; a1 < 27; a1++) {
-        if (player_character->equipped[a1] == l_1C) player_character->equipped[a1] = 0;
+    for (index = 0; index < 27; index++) {
+        if (player_character->equipped[index] == item) player_character->equipped[index] = 0;
     }
-    itemmaker_item_object = l_1C;
-    *(int *)scratch_190be4 = (int)(unsigned short)*(short *)((char *)(*(int *)&itemmaker_item = (int)l_18) + 61);
+    itemmaker_item_object = item;
+    *(int *)scratch_190be4 = (int)(unsigned short)*(short *)((char *)(*(int *)&itemmaker_item = (int)item_data) + 61);
 }
 
-int enchant_item_value(int a1)
+int enchant_item_value(struct item *item)
 {
-    int l_24;
-    int l_20;
-    int l_1C;
+    int i;
+    int value;
+    int cost_code;
 
-    l_24 = 0;
-    l_20 = l_24;
-    for (; l_24 < 10; l_24++) {
-        if (((int)(short)*(short *)((char *)((l_24 << 2) + a1) + 67)) >= 16) continue;
-        if (((int)(short)*(short *)((char *)((l_24 << 2) + a1) + 67)) == (-1)) continue;
-        l_1C = *(int *)(enchant_power_costs + (((int)(short)*(short *)((char *)((l_24 << 2) + a1) + 67)) << 2));
-        if (l_1C == 0) continue;
-        if (l_1C < 100 && l_1C > 0) {
-            l_20 += enchant_value_slot_cost(l_1C, (int)(unsigned char)*(signed char *)((char *)((l_24 << 2) + a1) + 69), 0, (int)(short)*(short *)((char *)((l_24 << 2) + a1) + 67));
+    i = 0;
+    value = i;
+    for (; i < 10; i++) {
+        if (item->enchantments[i].type >= 16) continue;
+        if (item->enchantments[i].type == (-1)) continue;
+        cost_code = *(int *)(enchant_power_costs + (((int)(short)item->enchantments[i].type) << 2));
+        if (cost_code == 0) continue;
+        if (cost_code < 100 && cost_code > 0) {
+            value += enchant_value_slot_cost(cost_code, (int)(unsigned char)*(signed char *)&item->enchantments[i].param, 0, (int)(short)item->enchantments[i].type);
         } else {
-            l_20 += (int)(short)*(short *)((char *)(int)(*(char **)(enchant_power_costs + (((int)(short)*(short *)((char *)((l_24 << 2) + a1) + 67)) << 2)) + (((int)(short)*(short *)((char *)((l_24 << 2) + a1) + 69)) * 2)));
+            value += (int)(short)*(short *)((char *)(int)(*(char **)(enchant_power_costs + (((int)(short)item->enchantments[i].type) << 2)) + (((int)(short)item->enchantments[i].param) * 2)));
         }
     }
-    return l_20;
+    return value;
 }
 
-int itemmaker_param_excluded(int a1, int a2)
+int itemmaker_param_excluded(int type, int param)
 {
-    int l_18;
+    int slot;
 
     func_00058AF7();
-    if (a1 == 25) {
-        for (l_18 = 0; l_18 < 10; l_18++) {
-            if (((int)(short)*(short *)(itemmaker_slots + (l_18 << 2))) == 25 && ((int)(short)*(short *)(D_001998E2 + (l_18 << 2))) != 5 && a2 == 5) {
+    if (type == 25) {
+        for (slot = 0; slot < 10; slot++) {
+            if (((int)(short)*(short *)(itemmaker_slots + (slot << 2))) == 25 && ((int)(short)*(short *)(D_001998E2 + (slot << 2))) != 5 && param == 5) {
                 goto L58A19;
             }
-            if (((int)(short)*(short *)(itemmaker_slots + (l_18 << 2))) == 25 && ((int)(short)*(short *)(D_001998E2 + (l_18 << 2))) == 5) {
+            if (((int)(short)*(short *)(itemmaker_slots + (slot << 2))) == 25 && ((int)(short)*(short *)(D_001998E2 + (slot << 2))) == 5) {
                 goto L58A19;
             }
-            if (((int)(short)*(short *)(itemmaker_slots + (l_18 << 2))) == 14 && ((int)(short)*(short *)(D_001998E2 + (l_18 << 2))) == a2) {
+            if (((int)(short)*(short *)(itemmaker_slots + (slot << 2))) == 14 && ((int)(short)*(short *)(D_001998E2 + (slot << 2))) == param) {
                 goto L58A19;
             }
         }
-    } else if (a1 == 14) {
-        for (l_18 = 0; l_18 < 10; l_18++) {
-            if (((int)(short)*(short *)(itemmaker_slots + (l_18 << 2))) == 14 && ((int)(short)*(short *)(D_001998E2 + (l_18 << 2))) != 5 && a2 == 5) {
+    } else if (type == 14) {
+        for (slot = 0; slot < 10; slot++) {
+            if (((int)(short)*(short *)(itemmaker_slots + (slot << 2))) == 14 && ((int)(short)*(short *)(D_001998E2 + (slot << 2))) != 5 && param == 5) {
                 goto L58A19;
             }
-            if (((int)(short)*(short *)(itemmaker_slots + (l_18 << 2))) == 14 && ((int)(short)*(short *)(D_001998E2 + (l_18 << 2))) == 5) {
+            if (((int)(short)*(short *)(itemmaker_slots + (slot << 2))) == 14 && ((int)(short)*(short *)(D_001998E2 + (slot << 2))) == 5) {
                 goto L58A19;
             }
-            if (((int)(short)*(short *)(itemmaker_slots + (l_18 << 2))) == 25 && ((int)(short)*(short *)(D_001998E2 + (l_18 << 2))) == a2) {
+            if (((int)(short)*(short *)(itemmaker_slots + (slot << 2))) == 25 && ((int)(short)*(short *)(D_001998E2 + (slot << 2))) == param) {
                 goto L58A19;
             }
         }
@@ -684,56 +684,56 @@ L58A19:;
 
 void func_00058AF7(void)
 {
-    int l_18;
+    int slot;
 
-    for (l_18 = 0; l_18 < 10; l_18++) {
-        if (((int)(short)*(short *)(itemmaker_slots + (l_18 << 2))) == (-1)) continue;
-        if (scratch_190ce4[l_18] > 0) {
-            if (((int)(short)*(short *)(itemmaker_slots + (l_18 << 2))) >= 15) {
-                *(short *)(itemmaker_slots + (l_18 << 2)) -= 15;
+    for (slot = 0; slot < 10; slot++) {
+        if (((int)(short)*(short *)(itemmaker_slots + (slot << 2))) == (-1)) continue;
+        if (scratch_190ce4[slot] > 0) {
+            if (((int)(short)*(short *)(itemmaker_slots + (slot << 2))) >= 15) {
+                *(short *)(itemmaker_slots + (slot << 2)) -= 15;
             } else {
-                *(short *)(itemmaker_slots + (l_18 << 2)) += 15;
+                *(short *)(itemmaker_slots + (slot << 2)) += 15;
             }
         }
     }
 }
 
-int enchant_powers_text(struct item *a1)
+int enchant_powers_text(struct item *item)
 {
-    int l_20;
-    int l_1C;
+    int i;
+    char *out;
 
-    l_20 = 0;
-    l_1C = (int)D_001913E4;
-    if (((int)(unsigned short)(a1->item_flags & 32)) == 0) return (int)D_00175723;
-    for (l_20 = 0; l_20 < 10; l_20++) {
-        if (a1->enchantments[l_20].type == (-1)) continue;
-        if (a1->enchantments[l_20].type < 15) {
+    i = 0;
+    out = D_001913E4;
+    if (((int)(unsigned short)(item->item_flags & 32)) == 0) return (int)D_00175723;
+    for (i = 0; i < 10; i++) {
+        if (item->enchantments[i].type == (-1)) continue;
+        if (item->enchantments[i].type < 15) {
             mc_set_location(1128, (int)D_001756A3);
-            mc_sprintf((int)text_buffer, (int)D_00175734, *(int *)(enchant_power_names + (a1->enchantments[l_20].type << 2)));
-            if (a1->enchantments[l_20].param != (-1)) {
-                if (a1->enchantments[l_20].type < 3) {
-                    func_000A1054((int)text_buffer, spell_name_by_id(a1->enchantments[l_20].param), (int)D_001756A3, 1132, 160);
+            mc_sprintf((int)text_buffer, (int)D_00175734, *(int *)(enchant_power_names + (item->enchantments[i].type << 2)));
+            if (item->enchantments[i].param != (-1)) {
+                if (item->enchantments[i].type < 3) {
+                    func_000A1054((int)text_buffer, spell_name_by_id(item->enchantments[i].param), (int)D_001756A3, 1132, 160);
                 } else {
-                    func_000A1054((int)text_buffer, *(int *)((char *)(int)(*(char **)(enchant_power_params + (a1->enchantments[l_20].type << 2)) + (a1->enchantments[l_20].param << 2))), (int)D_001756A3, 1134, 160);
+                    func_000A1054((int)text_buffer, *(int *)((char *)(int)(*(char **)(enchant_power_params + (item->enchantments[i].type << 2)) + (item->enchantments[i].param << 2))), (int)D_001756A3, 1134, 160);
                 }
             }
         } else {
             mc_set_location(1139, (int)D_001756A3);
-            mc_sprintf((int)text_buffer, (int)D_00175734, *(int *)(D_00180ACE + (a1->enchantments[l_20].type << 2)));
-            if (a1->enchantments[l_20].param != (-1)) {
-                if (a1->enchantments[l_20].type == 15) {
-                    func_000A1054((int)text_buffer, *(int *)(monster_names + (a1->enchantments[l_20].param << 2)), (int)D_001756A3, 1143, 160);
+            mc_sprintf((int)text_buffer, (int)D_00175734, *(int *)(D_00180ACE + (item->enchantments[i].type << 2)));
+            if (item->enchantments[i].param != (-1)) {
+                if (item->enchantments[i].type == 15) {
+                    func_000A1054((int)text_buffer, *(int *)(monster_names + (item->enchantments[i].param << 2)), (int)D_001756A3, 1143, 160);
                 } else {
-                    func_000A1054((int)text_buffer, *(int *)((char *)(int)(*(char **)(D_0018586F + (a1->enchantments[l_20].type << 2)) + (a1->enchantments[l_20].param << 2))), (int)D_001756A3, 1145, 160);
+                    func_000A1054((int)text_buffer, *(int *)((char *)(int)(*(char **)(D_0018586F + (item->enchantments[i].type << 2)) + (item->enchantments[i].param << 2))), (int)D_001756A3, 1145, 160);
                 }
             }
         }
         func_000A1054((int)text_buffer, (int)D_00175738, (int)D_001756A3, 1148, 160);
-        mc_strncpy(l_1C, (int)text_buffer, 4, (int)D_001756A3, 1149);
-        l_1C += strlen(l_1C);
+        mc_strncpy(out, (int)text_buffer, 4, (int)D_001756A3, 1149);
+        out += strlen(out);
     }
-    l_1C++;
-    *(signed char *)((char *)l_1C) = 0;
+    out++;
+    *out = 0;
     return (int)D_001913E4;
 }

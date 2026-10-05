@@ -16,22 +16,22 @@ extern int read(int, void *, int);
 extern int mc_set_location(int, char *);
 extern int mc_sprintf(char *, ...);
 
-char *text_rsc_load(short a1, unsigned short a2, short a3)
+char *text_rsc_load(short id, unsigned short flags, short width)
 {
     short n;
     short i;
     short j;
-    int l_34;
-    unsigned char *l_30;
-    char *l_2C;
-    char *l_28;
+    int size;
+    unsigned char *text;
+    char *wrap_buf;
+    char *expand_buf;
 
     lseek(text_rsc_file, 0, 0);
     read(text_rsc_file, &n, 2);
     read(text_rsc_file, scratch_buffer, n);
     n /= 6;
     for (i = 0; i < n; i++) {
-        if (scratch_buffer[i].id == a1)
+        if (scratch_buffer[i].id == id)
             break;
     }
     if (i >= n) {
@@ -39,21 +39,21 @@ char *text_rsc_load(short a1, unsigned short a2, short a3)
             text_missing_ok = 0;
             return 0;
         }
-        l_30 = mc_malloc(1024, D_00170D55, 65);
+        text = mc_malloc(1024, D_00170D55, 65);
         mc_set_location(66, D_00170D55);
-        mc_sprintf(l_30, D_00170D5C, a1);
-        return l_30;
+        mc_sprintf(text, D_00170D5C, id);
+        return text;
     }
-    l_34 = scratch_buffer[i + 1].off - scratch_buffer[i].off;
+    size = scratch_buffer[i + 1].off - scratch_buffer[i].off;
     lseek(text_rsc_file, scratch_buffer[i].off, 0);
-    l_30 = mc_malloc(l_34 + 16, D_00170D55, 73);
-    l_2C = mc_malloc(l_34 < 4096 ? 8192 : l_34 * 2, D_00170D55, 74);
-    l_28 = mc_malloc(l_34 < 4096 ? 8192 : l_34 * 2, D_00170D55, 75);
-    read(text_rsc_file, l_30, l_34 + 8);
+    text = mc_malloc(size + 16, D_00170D55, 73);
+    wrap_buf = mc_malloc(size < 4096 ? 8192 : size * 2, D_00170D55, 74);
+    expand_buf = mc_malloc(size < 4096 ? 8192 : size * 2, D_00170D55, 75);
+    read(text_rsc_file, text, size + 8);
     j = 0;
     i = 1;
-    while (l_30[j] != 254) {
-        if (l_30[j] == 255 && l_30[j + 1] != 254)
+    while (text[j] != 254) {
+        if (text[j] == 255 && text[j + 1] != 254)
             i++;
         j++;
     }
@@ -63,12 +63,12 @@ char *text_rsc_load(short a1, unsigned short a2, short a3)
         i--;
     j = 0;
     while (i) {
-        while (l_30[j++] != 255)
+        while (text[j++] != 255)
             ;
         i--;
     }
-    while (l_30[j] < 254)
-        l_30[i++] = l_30[j++];
-    l_30[i] = 0;
-    return text_expand_wrap(a2, a3, l_30, l_2C, l_28);
+    while (text[j] < 254)
+        text[i++] = text[j++];
+    text[i] = 0;
+    return text_expand_wrap(flags, width, text, wrap_buf, expand_buf);
 }

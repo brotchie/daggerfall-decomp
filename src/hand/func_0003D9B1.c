@@ -8,9 +8,9 @@ extern void mc_strncpy(char *, char *, int, char *, int);
 
 char *text_expand_wrap(unsigned short flags, short width, char *src, char *buf, char *text)
 {
-    short lC;
+    short unused;
     short in;
-    short w;
+    short line_width;
     short n;
     short done;
     short saved;
@@ -33,7 +33,7 @@ char *text_expand_wrap(unsigned short flags, short width, char *src, char *buf, 
         }
         return text;
     }
-    lC = w = 0;
+    unused = line_width = 0;
     in = 0;
     n = 0;
     done = 0;
@@ -46,14 +46,14 @@ char *text_expand_wrap(unsigned short flags, short width, char *src, char *buf, 
             out[n++] = 0;
             out[n] = 0;
             done = 1;
-            w = 0;
+            line_width = 0;
             break;
         case 253:
             *out = 253;
             out[n++] = 0;
             out += n;
             n = 2;
-            w = 0;
+            line_width = 0;
             if (text[in] == 0) {
                 out[n - 2] = 0;
                 done = 1;
@@ -64,7 +64,7 @@ char *text_expand_wrap(unsigned short flags, short width, char *src, char *buf, 
             out[n++] = 0;
             out += n;
             n = 2;
-            w = 0;
+            line_width = 0;
             break;
         case 251:
             out[n++] = 251;
@@ -83,13 +83,13 @@ char *text_expand_wrap(unsigned short flags, short width, char *src, char *buf, 
             break;
         default:
             out[n++] = text[in - 1];
-            w += font_char_width(text[in - 1]);
-            if (w > width) {
+            line_width += font_char_width(text[in - 1]);
+            if (line_width > width) {
                 out[n++] = 0;
                 *out = 252;
                 out += n;
                 n = 2;
-                w = 0;
+                line_width = 0;
             }
             break;
         }

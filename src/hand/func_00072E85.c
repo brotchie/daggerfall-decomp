@@ -44,9 +44,9 @@ extern int xn_draw_img_masked_remap();
 
 void weapon_player_update(void)
 {
-    int l_20;
-    int l_1C;
-    int l_18;
+    int bar_height;
+    int cif;
+    int unused;
 
     if (D_0019597C[((int)(unsigned char)weapon_active_hand)] != 0) return;
     if ((player_character->conditions & 0x1) != 0) return;
@@ -69,13 +69,13 @@ void weapon_player_update(void)
         D_00195B80 = (int)(*(char **)color_remap_tables + (((int)(unsigned char)*(signed char *)(*(char **)(D_001A4A30 + (((int)(unsigned char)weapon_active_hand) << 2)) + 127)) << 8));
     }
     if (((struct bf8_6_1 *)&D_001940D6)->f != 0 && D_001A4A70[((int)(unsigned char)weapon_active_hand)] == 0) {
-        l_1C = weapon_hand_cif[((int)(unsigned char)weapon_active_hand)];
+        cif = weapon_hand_cif[((int)(unsigned char)weapon_active_hand)];
         if (((int)(unsigned short)(game_settings->view_flags & 1)) != 0) {
-            l_20 = 0;
+            bar_height = 0;
         } else {
-            l_20 = (int)(unsigned short)*(short *)(*(char **)hud_bar_image + 6);
+            bar_height = (int)(unsigned short)*(short *)(*(char **)hud_bar_image + 6);
         }
-        xn_draw_img_masked_remap(l_1C, -l_20);
+        xn_draw_img_masked_remap(cif, -bar_height);
     }
     if (D_001A4A70[((int)(unsigned char)weapon_active_hand)] == 0) {
         D_001A4A50[((int)(unsigned char)weapon_active_hand)] = 1;

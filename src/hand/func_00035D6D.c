@@ -35,21 +35,21 @@ extern int xn_tex_cache_begin_frame();
 extern int mc_set_location(int, char *);
 extern int mc_sprintf(char *, char *, ...);
 
-void dungeon_load_rdb_block(struct rec *r)
+void dungeon_load_rdb_block(struct rec *block)
 {
     int i;
     int j;
-    int *tbl;
-    int n;
-    struct record *o;
-    char *p;
+    int *list_offsets;
+    int record;
+    struct record *rdi_object;
+    char *object_list;
 
-    D_00199608 = r;
+    D_00199608 = block;
     D_001995E8 = scratch_buffer;
     mc_set_location(59, D_00170AB4);
-    mc_sprintf(((char *)text_buffer), D_00170ABC, D_0017A844[r->kind], r->num);
-    n = archive_find_record(blocks_bsa, ((char *)text_buffer), 13);
-    archive_read_record(blocks_bsa, n, D_001995E8);
+    mc_sprintf(((char *)text_buffer), D_00170ABC, D_0017A844[block->kind], block->num);
+    record = archive_find_record(blocks_bsa, ((char *)text_buffer), 13);
+    archive_read_record(blocks_bsa, record, D_001995E8);
     D_001995F8 = 16;
     D_001995FC = 10000;
     D_001962A1 = 0;
@@ -58,37 +58,37 @@ void dungeon_load_rdb_block(struct rec *r)
     for (i = 0; i < 2; i++) {
         for (j = 0; j < 2; j++) {
             D_001995D4[j][i] = object_create_in_block(location_object, 47, 0, 0, i * D_00199604->w + j);
-            D_001995D4[j][i]->image = r->num;
-            D_001995D4[j][i]->x = location_object->x + (j << 10) + (r->x << 11);
-            D_001995D4[j][i]->z = location_object->z + (i << 10) + (r->y << 11);
+            D_001995D4[j][i]->image = block->num;
+            D_001995D4[j][i]->x = location_object->x + (j << 10) + (block->x << 11);
+            D_001995D4[j][i]->z = location_object->z + (i << 10) + (block->y << 11);
         }
     }
-    tbl = (int *)(D_00199604->tbl + D_001995E8);
+    list_offsets = (int *)(D_00199604->tbl + D_001995E8);
     for (i = 0; i < 2; i++) {
         for (j = 0; j < 2; j++) {
-            if (tbl[i * D_00199604->w + j] <= 0)
+            if (list_offsets[i * D_00199604->w + j] <= 0)
                 continue;
             xn_tex_cache_begin_frame();
-            p = tbl[i * D_00199604->w + j] + D_001995E8;
-            rdb_create_objects(D_001995D4[j][i], p, i * D_00199604->w + j);
+            object_list = list_offsets[i * D_00199604->w + j] + D_001995E8;
+            rdb_create_objects(D_001995D4[j][i], object_list, i * D_00199604->w + j);
         }
     }
     for (i = 0; i < 2; i++) {
         for (j = 0; j < 2; j++) {
-            if (tbl[i * D_00199604->w + j] <= 0)
+            if (list_offsets[i * D_00199604->w + j] <= 0)
                 continue;
-            p = tbl[i * D_00199604->w + j] + D_001995E8;
-            rdb_link_actions(D_001995D4[j][i], p, i * D_00199604->w + j);
+            object_list = list_offsets[i * D_00199604->w + j] + D_001995E8;
+            rdb_link_actions(D_001995D4[j][i], object_list, i * D_00199604->w + j);
             *(short *)((char *)D_001995D4[j][i] + 23) = D_001995F8;
             *(short *)((char *)D_001995D4[j][i] + 25) = D_001995FC;
             *(short *)((char *)D_001995D4[j][i] + 19) = (unsigned short)D_001962A1;
         }
     }
-    o = object_create_in_block(D_001995D4[0][0], 60, 512, 0, 0);
+    rdi_object = object_create_in_block(D_001995D4[0][0], 60, 512, 0, 0);
     mc_set_location(107, D_00170AB4);
-    mc_sprintf(((char *)text_buffer), D_00170AC7, D_0017A844[r->kind], r->num);
-    n = archive_find_record(blocks_bsa, ((char *)text_buffer), 13);
-    archive_read_record(blocks_bsa, n, RECORD_DATA(o));
-    o->x = D_001995D4[0][0]->x;
-    o->z = D_001995D4[0][0]->z;
+    mc_sprintf(((char *)text_buffer), D_00170AC7, D_0017A844[block->kind], block->num);
+    record = archive_find_record(blocks_bsa, ((char *)text_buffer), 13);
+    archive_read_record(blocks_bsa, record, RECORD_DATA(rdi_object));
+    rdi_object->x = D_001995D4[0][0]->x;
+    rdi_object->z = D_001995D4[0][0]->z;
 }

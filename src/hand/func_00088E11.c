@@ -7,9 +7,9 @@ extern int D_001A99F4;
 extern void spfx_create_item_cb(int);
 extern void spfx_show_choice_list(int, int);
 
-void spfx_create_item(struct record *a1, int a2, int a3)
+void spfx_create_item(struct record *spell_object, int effect, int target)
 {
     D_001940D8 &= 254;
-    D_001A99F4 = a1->data.spell.cast_durations[a2] + game_minutes;
+    D_001A99F4 = spell_object->data.spell.cast_durations[effect] + game_minutes;
     spfx_show_choice_list((int)D_001832C4, (int)spfx_create_item_cb);
 }

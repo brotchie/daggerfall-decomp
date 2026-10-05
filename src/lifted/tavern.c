@@ -111,8 +111,8 @@ void tavern_rent_room(void)
 
 void tavern_room_offer(void)
 {
-    int l_1C;
-    int l_18;
+    int day;
+    int price;
 
     if ((tavern_room_days_left() + *(int *)inpstr_result) > 350) {
         tavern_state = 0;
@@ -123,11 +123,11 @@ void tavern_room_offer(void)
         tavern_state = 0;
         return;
     }
-    l_1C = (((unsigned)(((unsigned)game_minutes) % 518400)) / 1440) + 1;
-    if (l_1C <= 46 && (((int)(short)*(short *)scratch_190d64) + l_1C) > 46) {
-        l_18 = (((int)(short)*(short *)scratch_190d64) - 1) * 7;
+    day = (((unsigned)(((unsigned)game_minutes) % 518400)) / 1440) + 1;
+    if (day <= 46 && (((int)(short)*(short *)scratch_190d64) + day) > 46) {
+        price = (((int)(short)*(short *)scratch_190d64) - 1) * 7;
     } else {
-        l_18 = ((int)(short)*(short *)scratch_190d64) * 7;
+        price = ((int)(short)*(short *)scratch_190d64) * 7;
     }
     if (guild_is_local_knight() != 0) {
         msgbox_show_string((int)D_00170572, 1);
@@ -139,7 +139,7 @@ void tavern_room_offer(void)
         }
         return;
     }
-    if (l_18 == 0) {
+    if (price == 0) {
         msgbox_show_string((int)D_0017059D, 1);
         tavern_state = 0;
         if (tavern_room_rented() != 0) {
@@ -149,7 +149,7 @@ void tavern_room_offer(void)
         }
         return;
     }
-    trade_adjust_price(l_18, 0);
+    trade_adjust_price(price, 0);
     trade_make_offer();
     tavern_state = 2;
 }
@@ -180,23 +180,23 @@ void tavern_food_button(void)
     D_001940D4 |= 1;
 }
 
-void tavern_buy_food(int a1)
+void tavern_buy_food(int food)
 {
-    int l_1C;
-    int l_18;
+    int price;
+    int holiday;
 
-    l_1C = (int)(unsigned char)tavern_food_prices[a1];
-    l_18 = holiday_today(game_minutes, (int)(unsigned char)current_region);
-    if (l_18 == 37) {
-        l_1C >>= 1;
-        if (l_1C == 0) l_1C++;
+    price = (int)(unsigned char)tavern_food_prices[food];
+    holiday = holiday_today(game_minutes, (int)(unsigned char)current_region);
+    if (holiday == 37) {
+        price >>= 1;
+        if (price == 0) price++;
     }
-    if (l_18 != 1 && ((unsigned)player_character->gold) < l_1C) {
+    if (holiday != 1 && ((unsigned)player_character->gold) < price) {
         msgbox_show_rsc(454, 1);
         return;
     }
-    if (l_18 != 1) player_character->gold -= l_1C;
-    player_character->health += l_1C * 2;
+    if (holiday != 1) player_character->gold -= price;
+    player_character->health += price * 2;
     if (player_character->health > player_character->max_health) {
         player_character->health = player_character->max_health;
     }
@@ -211,37 +211,37 @@ void tavern_talk_button(void)
 
 void tavern_go_to_room(void)
 {
-    struct record *l_18;
+    struct record *marker;
 
-    l_18 = marker_find_nth(player_object->parent->children, 2, tavern_building->room);
-    if (l_18 == 0) return;
-    player_object->x = l_18->x;
-    player_object->y = l_18->y;
-    player_object->z = l_18->z;
+    marker = marker_find_nth(player_object->parent->children, 2, tavern_building->room);
+    if (marker == 0) return;
+    player_object->x = marker->x;
+    player_object->y = marker->y;
+    player_object->z = marker->z;
 }
 
-void tavern_rent(int a1)
+void tavern_rent(int minutes)
 {
-    struct record *l_18;
+    struct record *marker;
 
-    l_18 = marker_find_random(player_object->parent->children, 2);
-    if (l_18 == 0) return;
-    tavern_building->rent_expires = game_minutes + a1;
+    marker = marker_find_random(player_object->parent->children, 2);
+    if (marker == 0) return;
+    tavern_building->rent_expires = game_minutes + minutes;
     tavern_building->flags &= 248;
     tavern_building->flags |= 2;
-    tavern_building->room = l_18->owner;
+    tavern_building->room = marker->owner;
 }
 
 int tavern_room_rented(void)
 {
-    int l_1C;
+    int rented;
 
     if (((int)(unsigned char)(tavern_building->flags & 2)) != 0 && ((unsigned)tavern_building->rent_expires) > game_minutes) {
-        l_1C = 1;
+        rented = 1;
     } else {
-        l_1C = 0;
+        rented = 0;
     }
-    return l_1C;
+    return rented;
 }
 
 int tavern_room_days_left(void)
@@ -251,46 +251,46 @@ int tavern_room_days_left(void)
     return ((unsigned)((tavern_building->rent_expires - game_minutes) + 1439)) / 1440;
 }
 
-void tavern_extend_room(int a1)
+void tavern_extend_room(int minutes)
 {
-    tavern_building->rent_expires += a1;
+    tavern_building->rent_expires += minutes;
 }
 
-void func_0001F6E2(struct record *a1)
+void func_0001F6E2(struct record *object)
 {
-    struct record *l_18;
+    struct record *stored;
 
-    if (a1->type != 2) return;
-    if (func_0001FBF5(a1) == 0) return;
-    l_18 = object_create_child(nonworld_root, 0, 107);
-    l_18->type = 58;
-    mc_memcpy(&l_18->x, &a1->x, 12, (int)D_00170569, 317, 4);
-    l_18->image = a1->image;
-    l_18->id = a1->id;
-    l_18->parent_id = a1->parent->id;
-    l_18->repair_due = *(int *)scratch_190be4;
-    mc_memcpy(RECORD_DATA(l_18), RECORD_DATA(a1), 107, (int)D_00170569, 322, 4);
+    if (object->type != 2) return;
+    if (func_0001FBF5(object) == 0) return;
+    stored = object_create_child(nonworld_root, 0, 107);
+    stored->type = 58;
+    mc_memcpy(&stored->x, &object->x, 12, (int)D_00170569, 317, 4);
+    stored->image = object->image;
+    stored->id = object->id;
+    stored->parent_id = object->parent->id;
+    stored->repair_due = *(int *)scratch_190be4;
+    mc_memcpy(RECORD_DATA(stored), RECORD_DATA(object), 107, (int)D_00170569, 322, 4);
 }
 
-void func_0001F7B3(struct record *a1)
+void func_0001F7B3(struct record *stored)
 {
-    struct record *l_18;
+    struct record *object;
 
-    if (a1->type != 58) return;
-    if ((((unsigned)a1->id) >> 16) != (((unsigned)location_object->id) >> 16)) return;
-    if ((object_found_last = object_find_by_id(location_object, a1->parent_id)) == 0) return;
-    l_18 = object_create_child((struct record *)object_found_last, 0, 107);
-    l_18->type = 2;
-    l_18->image = a1->image;
-    l_18->id = a1->id;
-    mc_memcpy(&l_18->x, &a1->x, 12, (int)D_00170569, 347, 4);
-    mc_memcpy(RECORD_DATA(l_18), RECORD_DATA(a1), 107, (int)D_00170569, 348, 4);
-    object_delete(a1);
+    if (stored->type != 58) return;
+    if ((((unsigned)stored->id) >> 16) != (((unsigned)location_object->id) >> 16)) return;
+    if ((object_found_last = object_find_by_id(location_object, stored->parent_id)) == 0) return;
+    object = object_create_child((struct record *)object_found_last, 0, 107);
+    object->type = 2;
+    object->image = stored->image;
+    object->id = stored->id;
+    mc_memcpy(&object->x, &stored->x, 12, (int)D_00170569, 347, 4);
+    mc_memcpy(RECORD_DATA(object), RECORD_DATA(stored), 107, (int)D_00170569, 348, 4);
+    object_delete(stored);
 }
 
 void func_0001F89F(void)
 {
-    struct record *l_18;
+    struct record *stored;
 
     func_0001FE4D();
     D_00196ABC = (struct building *)*(int *)scratch_buffer;
@@ -299,28 +299,28 @@ void func_0001F89F(void)
     func_0001FAB2();
     if (*(int *)D_00195B84 != 0) {
         object_delete(found_object);
-        l_18 = object_create_child(nonworld_root, 0, *(int *)D_00195B84 * 26);
-        l_18->type = 57;
-        l_18->owner = *(short *)D_00195B84;
-        l_18->id = location_object->id;
-        mc_memcpy(RECORD_DATA(l_18), (int)D_00196ABC, *(int *)D_00195B84 * 26, (int)D_00170569, 369, 4);
+        stored = object_create_child(nonworld_root, 0, *(int *)D_00195B84 * 26);
+        stored->type = 57;
+        stored->owner = *(short *)D_00195B84;
+        stored->id = location_object->id;
+        mc_memcpy(RECORD_DATA(stored), (int)D_00196ABC, *(int *)D_00195B84 * 26, (int)D_00170569, 369, 4);
     }
     object_foreach(location_object, (int)func_0001F6E2);
 }
 
 void func_0001F958(void)
 {
-    int l_1C;
-    int l_18;
+    int i;
+    int j;
 
     func_0001FE4D();
     D_00196ABC = (struct building *)*(int *)scratch_buffer;
     *(int *)D_00195B84 = 0;
     func_0001FAB2();
-    for (l_1C = 0; l_1C < *(int *)D_00195B84; l_1C++) {
-        for (l_18 = 0; current_location->building_count > l_18; l_18++) {
-            if (current_location->buildings[l_18].id == D_00196ABC[l_1C].id) {
-                mc_memcpy((int)&current_location->buildings[l_18], (int)&D_00196ABC[l_1C], 26, (int)D_00170569, 388, 4);
+    for (i = 0; i < *(int *)D_00195B84; i++) {
+        for (j = 0; current_location->building_count > j; j++) {
+            if (current_location->buildings[j].id == D_00196ABC[i].id) {
+                mc_memcpy((int)&current_location->buildings[j], (int)&D_00196ABC[i], 26, (int)D_00170569, 388, 4);
                 break;
             }
         }
@@ -328,12 +328,12 @@ void func_0001F958(void)
     object_foreach(nonworld_root, (int)func_0001F7B3);
 }
 
-int func_0001FA3A(struct record *a1)
+int func_0001FA3A(struct record *object)
 {
     if (found_object != 0) return 0;
-    if (a1->type != 57) return 0;
-    if ((((unsigned)a1->id) >> 16) == (((unsigned)location_object->id) >> 16)) {
-        found_object = a1;
+    if (object->type != 57) return 0;
+    if ((((unsigned)object->id) >> 16) == (((unsigned)location_object->id) >> 16)) {
+        found_object = object;
         return 1;
     }
     return 0;
@@ -351,54 +351,54 @@ void func_0001FAB2(void)
 
 void func_0001FB3F(void)
 {
-    int l_18;
+    int i;
 
-    for (l_18 = 0; current_location->building_count > l_18; l_18++) {
-        if ((current_location->buildings[l_18].flags & 3) != 0 && ((unsigned)current_location->buildings[l_18].flags) > game_minutes) {
-            mc_memcpy((int)&D_00196ABC[(*(int *)D_00195B84)++], (int)&current_location->buildings[l_18], 26, (int)D_00170569, 428, 4);
+    for (i = 0; current_location->building_count > i; i++) {
+        if ((current_location->buildings[i].flags & 3) != 0 && ((unsigned)current_location->buildings[i].flags) > game_minutes) {
+            mc_memcpy((int)&D_00196ABC[(*(int *)D_00195B84)++], (int)&current_location->buildings[i], 26, (int)D_00170569, 428, 4);
         }
     }
 }
 
-int func_0001FBF5(struct record *a1)
+int func_0001FBF5(struct record *object)
 {
-    int l_20;
-    struct building *l_1C;
+    int i;
+    struct building *building;
 
-    if (a1->parent->type != 43) return 0;
-    if (a1->quest_id != 0) return 0;
-    if ((((unsigned)a1->id) >> 16) == (((unsigned)location_object->id) >> 16)) return 0;
-    l_1C = 0;
-    for (l_20 = 0; current_location->building_count > l_20; l_20++) {
-        if (a1->parent->id == current_location->buildings[l_20].id) {
-            l_1C = &current_location->buildings[l_20];
+    if (object->parent->type != 43) return 0;
+    if (object->quest_id != 0) return 0;
+    if ((((unsigned)object->id) >> 16) == (((unsigned)location_object->id) >> 16)) return 0;
+    building = 0;
+    for (i = 0; current_location->building_count > i; i++) {
+        if (object->parent->id == current_location->buildings[i].id) {
+            building = &current_location->buildings[i];
         }
     }
-    if (l_1C == 0) return 0;
-    if (l_1C->type != 15 && l_1C->type != 1) return 0;
+    if (building == 0) return 0;
+    if (building->type != 15 && building->type != 1) return 0;
     *(int *)scratch_190be4 = 2147483647;
-    if (l_1C->type == 1 && l_1C->id == player_character->house) return 1;
-    *(int *)scratch_190be4 = l_1C->rent_expires;
-    return (((((int)(unsigned char)(l_1C->flags & 2)) != 0) && (((unsigned)l_1C->rent_expires) > game_minutes)) ? 1 : 0);
+    if (building->type == 1 && building->id == player_character->house) return 1;
+    *(int *)scratch_190be4 = building->rent_expires;
+    return (((((int)(unsigned char)(building->flags & 2)) != 0) && (((unsigned)building->rent_expires) > game_minutes)) ? 1 : 0);
 }
 
-void func_0001FD7C(struct record *a1)
+void func_0001FD7C(struct record *object)
 {
-    int l_1C;
-    int l_18;
+    int i;
+    int live_count;
 
-    if (a1->type != 57 && a1->type != 58) return;
-    if (a1->type == 57) {
-        D_00196ABC = (struct building *)RECORD_DATA(a1);
-        l_18 = a1->owner;
-        for (l_1C = 0; a1->owner > l_1C; l_1C++, D_00196ABC++) {
-            if (((unsigned)D_00196ABC->rent_expires) <= game_minutes) l_18--;
+    if (object->type != 57 && object->type != 58) return;
+    if (object->type == 57) {
+        D_00196ABC = (struct building *)RECORD_DATA(object);
+        live_count = object->owner;
+        for (i = 0; object->owner > i; i++, D_00196ABC++) {
+            if (((unsigned)D_00196ABC->rent_expires) <= game_minutes) live_count--;
         }
-        if (l_18 == 0) object_delete(a1);
+        if (live_count == 0) object_delete(object);
         return;
     }
-    if (((unsigned)a1->repair_due) > game_minutes) return;
-    object_delete(a1);
+    if (((unsigned)object->repair_due) > game_minutes) return;
+    object_delete(object);
 }
 
 void func_0001FE4D(void)

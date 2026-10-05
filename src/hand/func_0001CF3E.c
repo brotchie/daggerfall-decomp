@@ -21,52 +21,52 @@ extern void mc_memset(char *, int, int, char *, int, int);
 extern int write(int, void *, int);
 extern int strlen(char *);
 
-void rumor_add_faction(struct faction *a1, struct faction *a2, int a3, unsigned char a4, int a5)
+void rumor_add_faction(struct faction *faction1, struct faction *faction2, int kind, unsigned char region, int text_id)
 {
     int unused;
-    struct rumor m;
+    struct rumor rumor;
     int saved;
 
     saved = D_00195B84;
     if (D_001962A5 == 0)
         return;
-    if (a5 != 455 && a5 != 456)
-        if (a3 == 100 && faction_player_related(a1) == 0 && faction_player_related(a2) == 0) {
+    if (text_id != 455 && text_id != 456)
+        if (kind == 100 && faction_player_related(faction1) == 0 && faction_player_related(faction2) == 0) {
             D_00195B84 = saved;
             return;
         }
-    D_0019671C = a1;
-    D_0019670C = a2;
-    scratch_190d16 = a3;
-    scratch_190d17 = a4;
+    D_0019671C = faction1;
+    D_0019670C = faction2;
+    scratch_190d16 = kind;
+    scratch_190d17 = region;
     D_00196708++;
-    if (a4 != 0)
-        D_00196269 = a4;
-    else if (a1 != 0 && a1->region != 255)
-        D_00196269 = a1->region;
-    else if (a2 != 0 && a2->region != 255)
-        D_00196269 = a2->region;
+    if (region != 0)
+        D_00196269 = region;
+    else if (faction1 != 0 && faction1->region != 255)
+        D_00196269 = faction1->region;
+    else if (faction2 != 0 && faction2->region != 255)
+        D_00196269 = faction2->region;
     else
         D_00196269 = rand_range(0, 61);
-    parse_rsc_text(a5, 0, 0);
-    if (a1 != 0)
-        m.faction1 = a1->id;
+    parse_rsc_text(text_id, 0, 0);
+    if (faction1 != 0)
+        rumor.faction1 = faction1->id;
     else
-        m.faction1 = 0;
-    if (a2 != 0)
-        m.faction2 = a2->id;
+        rumor.faction1 = 0;
+    if (faction2 != 0)
+        rumor.faction2 = faction2->id;
     else
-        m.faction2 = 0;
-    m.kind = a3;
-    m.region = a4;
-    m.flags = func_0001D66C(&m);
-    m.quest_id = 0;
-    mc_memset(m.quest_name, 0, 9, D_00170464, 1606, 9);
-    m.message = 0;
-    m.target = 0;
-    m.text_length = strlen(((char *)text_rsc_buffer)) + 1;
-    m.expires = game_minutes + 43140;
-    write(rumor_file, &m, 34);
-    write(rumor_file, ((char *)text_rsc_buffer), m.text_length);
+        rumor.faction2 = 0;
+    rumor.kind = kind;
+    rumor.region = region;
+    rumor.flags = func_0001D66C(&rumor);
+    rumor.quest_id = 0;
+    mc_memset(rumor.quest_name, 0, 9, D_00170464, 1606, 9);
+    rumor.message = 0;
+    rumor.target = 0;
+    rumor.text_length = strlen(((char *)text_rsc_buffer)) + 1;
+    rumor.expires = game_minutes + 43140;
+    write(rumor_file, &rumor, 34);
+    write(rumor_file, ((char *)text_rsc_buffer), rumor.text_length);
     D_00195B84 = saved;
 }

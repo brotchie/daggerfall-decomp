@@ -7,12 +7,12 @@ extern short scratch_190d64;
 extern short chargen_selected_attribute;
 extern struct character *player_character;
 
-void chargen_attribute_arrow(int a1)
+void chargen_attribute_arrow(int button)
 {
     if (*(unsigned *)0x46c - scratch_190be4 < 6)
         return;
     scratch_190be4 = *(unsigned *)0x46c;
-    if (a1 == 30) {
+    if (button == 30) {
         if (scratch_190d64 != 0) {
             if (player_character->attributes[chargen_selected_attribute] == 100)
                 return;

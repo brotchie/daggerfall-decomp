@@ -179,67 +179,67 @@ void region_unload(void)
     location_here = 0;
 }
 
-void location_free(struct loaded_location *a1)
+void location_free(struct loaded_location *location)
 {
-    if (a1->data != 0) {
-        if (a1->data->buildings != 0) {
-            if (a1->data->buildings != 0 && (int)a1->data->buildings != (-1751672937)) {
-                mc_free((int)a1->data->buildings, (int)D_00176C94, 83);
-                a1->data->buildings = (struct building *)-1751672937;
+    if (location->data != 0) {
+        if (location->data->buildings != 0) {
+            if (location->data->buildings != 0 && (int)location->data->buildings != (-1751672937)) {
+                mc_free((int)location->data->buildings, (int)D_00176C94, 83);
+                location->data->buildings = (struct building *)-1751672937;
             }
         }
     }
-    if (a1->object != 0) {
-        if (a1->object != 0 && (int)a1->object != (-1751672937)) {
-            mc_free((int)a1->object, (int)D_00176C94, 86);
-            a1->object = (struct record *)-1751672937;
+    if (location->object != 0) {
+        if (location->object != 0 && (int)location->object != (-1751672937)) {
+            mc_free((int)location->object, (int)D_00176C94, 86);
+            location->object = (struct record *)-1751672937;
         }
     }
-    if (a1->doors != 0) {
-        if (a1->doors != 0 && (int)a1->doors != (-1751672937)) {
-            mc_free((int)a1->doors, (int)D_00176C94, 89);
-            a1->doors = (char *)-1751672937;
+    if (location->doors != 0) {
+        if (location->doors != 0 && (int)location->doors != (-1751672937)) {
+            mc_free((int)location->doors, (int)D_00176C94, 89);
+            location->doors = (char *)-1751672937;
         }
     }
-    mc_memset(a1, 0, 20, (int)D_00176C94, 91, 4);
+    mc_memset(location, 0, 20, (int)D_00176C94, 91, 4);
 }
 
-struct map_location *region_find_location(int a1)
+struct map_location *region_find_location(int map_id)
 {
-    struct map_location *l_28;
-    int l_24;
-    int l_20;
-    int l_1C;
+    struct map_location *location;
+    int low;
+    int high;
+    int mid;
 
-    l_24 = 0;
-    l_20 = region_location_count;
-    l_1C = (l_20 + l_24) >> 1;
-    while (l_20 > l_24) {
-        l_1C = (l_20 + l_24) >> 1;
-        l_28 = (struct map_location *)((char *)region_locations + (l_1C * 17));
-        if ((l_28->map_id & 1048575) == a1) return l_28;
-        if ((l_28->map_id & 1048575) > a1) {
-            l_20 = l_1C - 1;
+    low = 0;
+    high = region_location_count;
+    mid = (high + low) >> 1;
+    while (high > low) {
+        mid = (high + low) >> 1;
+        location = (struct map_location *)((char *)region_locations + (mid * 17));
+        if ((location->map_id & 1048575) == map_id) return location;
+        if ((location->map_id & 1048575) > map_id) {
+            high = mid - 1;
         } else {
-            l_24 = l_1C + 1;
+            low = mid + 1;
         }
     }
-    if ((region_locations[l_24].map_id & 1048575) == a1) {
-        return (struct map_location *)((char *)region_locations + (l_24 * 17));
+    if ((region_locations[low].map_id & 1048575) == map_id) {
+        return (struct map_location *)((char *)region_locations + (low * 17));
     }
     return 0;
 }
 
 void world_update_location(void)
 {
-    int l_1C;
-    int l_18;
+    int unused;
+    int cell;
 
     if (((int)player_environment) > 2) return;
     terrain_update_cells();
-    l_18 = xn_world_cell_at(player_object->x, player_object->z);
-    if (l_18 != terrain_cell_at_player) {
-        terrain_cell_at_player = l_18;
+    cell = xn_world_cell_at(player_object->x, player_object->z);
+    if (cell != terrain_cell_at_player) {
+        terrain_cell_at_player = cell;
         location_unload(location_object->image);
         region_update_from_player();
         climate_update_at_player();
@@ -255,12 +255,12 @@ void world_update_location(void)
     location_unload(location_object->image);
 }
 
-void dungeon_load(int a1)
+void dungeon_load(int dungeon_index)
 {
-    int l_24;
-    int l_20;
-    int l_1C;
-    int l_18;
+    int unused1;
+    int location_id;
+    int i;
+    int unused2;
 
     sound_stop_ambient();
     if (location_object->image == 65535) object_delete_block((int)location_object->children, location_object->id);
@@ -268,19 +268,19 @@ void dungeon_load(int a1)
         player_object->parent_id = player_object->parent->id;
         mc_memcpy((int)saved_player_object, (int)player_object, 55, (int)D_00176C94, 235, 4);
     }
-    l_20 = location_object->id;
+    location_id = location_object->id;
     location_unload(location_object->image);
-    if (a1 == (-1)) {
-        location_load_dungeon_by_id(&loaded_location, l_20);
+    if (dungeon_index == (-1)) {
+        location_load_dungeon_by_id(&loaded_location, location_id);
     } else {
-        location_load_dungeon(&loaded_location, a1);
+        location_load_dungeon(&loaded_location, dungeon_index);
     }
     mc_memcpy((int)location_object, (int)loaded_location_object, 55, (int)D_00176C94, 247, 4);
     mc_memcpy((int)current_location, (int)loaded_location_data, 48, (int)D_00176C94, 248, 4);
     blocks_bsa = archive_open((int)D_00176C9F, 0, 0);
     if ((((unsigned)location_object->id) >> 16) == 50015) D_001967A1 = 254;
-    for (l_1C = 0; ((int)(unsigned char)dungeon_block_count) > l_1C; l_1C++) {
-        dungeon_load_rdb_block(((int)dungeon_blocks) + (l_1C << 2));
+    for (i = 0; ((int)(unsigned char)dungeon_block_count) > i; i++) {
+        dungeon_load_rdb_block(((int)dungeon_blocks) + (i << 2));
     }
     kludge_fix_dungeon_door();
     archive_close(blocks_bsa);
@@ -295,8 +295,8 @@ void dungeon_load(int a1)
     player_object->x = location_object->x;
     player_object->y = location_object->y;
     player_object->z = location_object->z;
-    l_1C = player_to_nearest_marker(location_object->children, 8);
-    if (l_1C == 0) fatal_error((int)D_00176CAA);
+    i = player_to_nearest_marker(location_object->children, 8);
+    if (i == 0) fatal_error((int)D_00176CAA);
     func_00028EAA();
     automap_mark_seen(found_object);
     position_history_reset();
@@ -315,53 +315,53 @@ void dungeon_load(int a1)
     xn_pal_set_range_8bit((int)text_buffer, 255, 1);
 }
 
-void town_door_roll_unlock(struct record *a1)
+void town_door_roll_unlock(struct record *door)
 {
-    struct building *l_18;
+    struct building *building;
 
-    if (a1->type != 32) return;
-    l_18 = object_building(a1);
-    switch (l_18->type) {
+    if (door->type != 32) return;
+    building = object_building(door);
+    switch (building->type) {
 case 11:
 case 14:
 case 15:
-    a1->lock_level = 0;
-    a1->flags |= 64;
+    door->lock_level = 0;
+    door->flags |= 64;
     return;
 default:
     if ((rand() % 100) >= 90) return;
-    a1->lock_level = 0;
-    a1->flags |= 64;
+    door->lock_level = 0;
+    door->flags |= 64;
 }
 }
 
-int building_try_enter(struct building *a1)
+int building_try_enter(struct building *building)
 {
-    struct record *l_24;
-    int l_20;
-    int l_1C;
+    struct record *door;
+    int lock_level;
+    int unused;
 
     if (world_loading != 0) return 1;
-    if (a1->id == player_character->house) return 1;
-    if (a1->type == 24) return 1;
-    if (a1->type < 17 && building_is_open(a1) != 0) return 1;
-    if (a1->type < 17 && (a1->flags & 16) != 0) return 0;
-    if ((a1->flags & 16) != 0) return 1;
-    if (quest_find_site_for_building(a1) != 0 && D_001962A3 != 0) return 1;
+    if (building->id == player_character->house) return 1;
+    if (building->type == 24) return 1;
+    if (building->type < 17 && building_is_open(building) != 0) return 1;
+    if (building->type < 17 && (building->flags & 16) != 0) return 0;
+    if ((building->flags & 16) != 0) return 1;
+    if (quest_find_site_for_building(building) != 0 && D_001962A3 != 0) return 1;
     if ((player_character->conditions & 0x40) != 0) {
         player_character->conditions &= ~0x40;
         return 1;
     }
-    if (a1->faction_id == 108 && guild_find_membership_by_kind(0) != 0) return 1;
-    if (a1->faction_id == 42 && guild_find_membership_by_kind(3) != 0) return 1;
-    if (a1->type >= 17 && a1->type <= 20 && is_daytime != 0 && (a1->id & 65535) % 100 < 50) {
+    if (building->faction_id == 108 && guild_find_membership_by_kind(0) != 0) return 1;
+    if (building->faction_id == 42 && guild_find_membership_by_kind(3) != 0) return 1;
+    if (building->type >= 17 && building->type <= 20 && is_daytime != 0 && (building->id & 65535) % 100 < 50) {
         msgbox_show_rsc(256, 1);
         return 1;
     }
     if (((int)interaction_mode) == 2) {
-        l_20 = (a1->name_seed % 10) + 3;
-        l_24 = object_find_by_id(location_object, a1->id);
-        if (lockpick_action_door(a1, l_20, l_24) != 0) {
+        lock_level = (building->name_seed % 10) + 3;
+        door = object_find_by_id(location_object, building->id);
+        if (lockpick_action_door(building, lock_level, door) != 0) {
             if (people_check_witnesses() != 0 || rand_range(1, 300) < (100 - player_character->skills[16].value)) {
                 crime_current = 1;
                 guards_summon(1);
@@ -369,45 +369,45 @@ int building_try_enter(struct building *a1)
             return 1;
         }
     }
-    lock_show_difficulty((a1->name_seed % 10) + 3);
+    lock_show_difficulty((building->name_seed % 10) + 3);
     return 0;
 }
 
-void building_load_interior(struct building *a1)
+void building_load_interior(struct building *building)
 {
-    struct record *l_18;
+    struct record *interior;
 
-    l_18 = object_find_by_id(location_object, a1->id);
+    interior = object_find_by_id(location_object, building->id);
     object_free_children((struct record *)D_00196120);
-    interior_stock_shelves(l_18->children, a1);
-    if (l_18 == 0) return;
-    if (player_to_nearest_marker(l_18->children, 6) == 0) {
+    interior_stock_shelves(interior->children, building);
+    if (interior == 0) return;
+    if (player_to_nearest_marker(interior->children, 6) == 0) {
         hud_message_add((int)D_00176CDD);
         return;
     }
-    object_reparent(l_18, player_object);
-    building_disable_monster_markers(l_18);
+    object_reparent(interior, player_object);
+    building_disable_monster_markers(interior);
     people_clear();
 }
 
-void building_enter(struct building *a1)
+void building_enter(struct building *building)
 {
-    if (a1 == 0) {
+    if (building == 0) {
         hud_message_add((int)D_00176CFE);
         return;
     }
     D_00195F5E = rand();
-    if (building_try_enter(a1) == 0) return;
-    current_building = a1;
-    D_00195D84 = *(int *)(D_00186503 + (a1->type << 2));
+    if (building_try_enter(building) == 0) return;
+    current_building = building;
+    D_00195D84 = *(int *)(D_00186503 + (building->type << 2));
     object_free_children((struct record *)D_00196120);
-    if (a1->id != player_character->house) {
-        building_grant_access(a1, 5, (int)(((char *)game_minutes) + building_minutes_to_close(a1)));
+    if (building->id != player_character->house) {
+        building_grant_access(building, 5, (int)(((char *)game_minutes) + building_minutes_to_close(building)));
     } else {
-        building_grant_access(a1, 255, game_minutes + 10000000);
+        building_grant_access(building, 255, game_minutes + 10000000);
     }
-    if (a1->type < 14 && a1->type != 1 && a1->type != 3) shop_quality_message(a1);
-    building_load_interior(a1);
+    if (building->type < 14 && building->type != 1 && building->type != 3) shop_quality_message(building);
+    building_load_interior(building);
     sound_stop_ambient();
     position_history_reset();
     player_environment = 2;
@@ -415,23 +415,23 @@ void building_enter(struct building *a1)
     D_00195CB8 = 0;
     D_001A4A1D = 0;
     if (world_loading == 0) building_update_open_state();
-    if (a1->id == D_001A4C94) return;
+    if (building->id == D_001A4C94) return;
     stocked_shop_count = 0;
-    D_001A4C94 = a1->id;
+    D_001A4C94 = building->id;
 }
 
 void building_exit(void)
 {
-    struct building *l_1C;
-    int l_18;
+    struct building *building;
+    int unused;
 
-    l_1C = object_building(player_object->parent);
+    building = object_building(player_object->parent);
     object_free_children((struct record *)D_00196120);
-    building_grant_access(l_1C, 0, 0);
+    building_grant_access(building, 0, 0);
     player_to_nearest_marker(player_object->parent->children, 6);
     func_000C810C(*(int *)D_00195C88);
     object_reparent(location_object, player_object);
-    if (l_1C->type == 24) player_to_nearest_marker(location_object, 6);
+    if (building->type == 24) player_to_nearest_marker(location_object, 6);
     position_history_reset();
     player_environment = 1;
     D_001940D5 |= 2;
@@ -444,368 +444,368 @@ void building_exit(void)
     D_001A41E4 = 0;
 }
 
-void location_pick_random_town(struct loaded_location *a1)
+void location_pick_random_town(struct loaded_location *location)
 {
-    struct map_location *l_24;
-    int l_20;
-    int l_1C;
-    int l_18;
+    struct map_location *map_location;
+    int i;
+    int pick;
+    int town_count;
 
-    l_24 = region_locations;
-    l_18 = 0;
-    mc_memset(a1, 0, 20, (int)D_00176C94, 991, 4);
-    for (l_20 = 0; l_20 < region_location_count; l_20++, l_24++) {
-        switch ((l_24->x_type_flags << 2) >> 27) {
+    map_location = region_locations;
+    town_count = 0;
+    mc_memset(location, 0, 20, (int)D_00176C94, 991, 4);
+    for (i = 0; i < region_location_count; i++, map_location++) {
+        switch ((map_location->x_type_flags << 2) >> 27) {
         case 0:
         case 1:
         case 2:
-            l_18++;
+            town_count++;
         }
     }
-    if (l_18 == 0) {
-        location_free(a1);
+    if (town_count == 0) {
+        location_free(location);
         return;
     }
-    l_1C = (rand() % l_18) + 1;
-    l_24 = region_locations;
-    for (l_20 = 0; l_20 < region_location_count; l_20++, l_24++) {
-        switch ((l_24->x_type_flags << 2) >> 27) {
+    pick = (rand() % town_count) + 1;
+    map_location = region_locations;
+    for (i = 0; i < region_location_count; i++, map_location++) {
+        switch ((map_location->x_type_flags << 2) >> 27) {
         case 0:
         case 1:
         case 2:
-            l_1C--;
+            pick--;
         }
-        if (l_1C == 0) {
-            location_load_exterior(a1, l_20);
+        if (pick == 0) {
+            location_load_exterior(location, i);
             return;
         }
     }
 }
 
-void location_pick_random_undiscovered(struct loaded_location *a1)
+void location_pick_random_undiscovered(struct loaded_location *location)
 {
-    struct map_location *l_20;
-    int l_1C;
-    int l_18;
+    struct map_location *map_location;
+    int i;
+    int count;
 
-    l_20 = region_locations;
-    l_18 = 0;
-    mc_memset(a1, 0, 20, (int)D_00176C94, 1108, 4);
-    for (l_1C = 0; l_1C < region_location_count; l_1C++, l_20++) {
-        if ((l_20->x_type_flags & 0x40000000) == 0 && (l_20->x_type_flags & 0x80000000) == 0) {
-            l_18++;
+    map_location = region_locations;
+    count = 0;
+    mc_memset(location, 0, 20, (int)D_00176C94, 1108, 4);
+    for (i = 0; i < region_location_count; i++, map_location++) {
+        if ((map_location->x_type_flags & 0x40000000) == 0 && (map_location->x_type_flags & 0x80000000) == 0) {
+            count++;
         }
     }
-    if (l_18 == 0) {
-        l_18 = rand() % region_location_count;
-        location_load_exterior(a1, l_1C);
+    if (count == 0) {
+        count = rand() % region_location_count;
+        location_load_exterior(location, i);
         return;
     }
-    l_18 = rand() % l_18;
-    l_20 = region_locations;
-    for (l_1C = 0; l_1C < region_location_count; l_1C++, l_20++) {
-        if ((l_20->x_type_flags & 0x40000000) == 0 && (l_20->x_type_flags & 0x80000000) == 0) {
-            l_18--;
+    count = rand() % count;
+    map_location = region_locations;
+    for (i = 0; i < region_location_count; i++, map_location++) {
+        if ((map_location->x_type_flags & 0x40000000) == 0 && (map_location->x_type_flags & 0x80000000) == 0) {
+            count--;
         }
-        if (l_18 == 0) {
-            location_load_exterior(a1, l_1C);
+        if (count == 0) {
+            location_load_exterior(location, i);
             return;
         }
     }
 }
 
-void location_set_discovered(int a1, int a2)
+void location_set_discovered(int location_index, int discovered)
 {
-    ((struct bf32_30_1 *)((char *)(int)((a1 * 17) + (char *)region_locations) + 4))->f = a2;
+    ((struct bf32_30_1 *)((char *)(int)((location_index * 17) + (char *)region_locations) + 4))->f = discovered;
 }
 
-void location_set_hidden(int a1, int a2)
+void location_set_hidden(int location_index, int hidden)
 {
-    ((struct bf32_31_1 *)((char *)(int)((a1 * 17) + (char *)region_locations) + 4))->f = a2;
+    ((struct bf32_31_1 *)((char *)(int)((location_index * 17) + (char *)region_locations) + 4))->f = hidden;
 }
 
-void location_flatten_terrain(int a1, int a2)
+void location_flatten_terrain(signed char *heights, signed char *flats)
 {
-    int l_34;
-    int l_30;
-    int l_2C;
-    int l_28;
-    int l_24;
-    int l_20;
-    int l_1C;
-    int l_18;
-    int l_14;
+    signed char *cursor;
+    signed char *end;
+    int i;
+    int column;
+    int row;
+    int inset;
+    int width;
+    int height;
+    int level;
 
     if (((struct bf8_1_5 *)((char *)location_here + 7))->f == 0) {
-        l_20 = 1;
-        l_28 = (location_here->x_type_flags & 33554431) + 1536;
-        l_28 = (l_28 & 32767) >> 8;
-        l_24 = ((location_here->z_size & 16777215) + ((((unsigned)location_here->z_size) >> 28) << 12)) - 1537;
-        l_24 = 128 - ((l_24 & 32767) >> 8);
+        inset = 1;
+        column = (location_here->x_type_flags & 33554431) + 1536;
+        column = (column & 32767) >> 8;
+        row = ((location_here->z_size & 16777215) + ((((unsigned)location_here->z_size) >> 28) << 12)) - 1537;
+        row = 128 - ((row & 32767) >> 8);
     } else {
-        l_20 = 2;
-        l_28 = (location_here->x_type_flags & 33554431) + 3584;
-        l_28 = (l_28 & 32767) >> 8;
-        l_24 = ((location_here->z_size & 16777215) + (((((unsigned)location_here->z_size) >> 28) - 1) << 12)) + 511;
-        l_24 = 128 - ((l_24 & 32767) >> 8);
+        inset = 2;
+        column = (location_here->x_type_flags & 33554431) + 3584;
+        column = (column & 32767) >> 8;
+        row = ((location_here->z_size & 16777215) + (((((unsigned)location_here->z_size) >> 28) - 1) << 12)) + 511;
+        row = 128 - ((row & 32767) >> 8);
     }
-    l_34 = a1;
-    l_34 += l_24 << 8;
-    l_34 += l_28;
-    a1 = l_34;
-    a2 += l_24 << 8;
-    a2 += l_28;
-    l_1C = (((((unsigned)(location_here->z_size << 4)) >> 28) - l_20) << 4) + 8;
-    l_18 = (((((unsigned)location_here->z_size) >> 28) - l_20) << 4) + 8;
-    if (((128 - l_28) - 4) < l_1C) l_1C = (128 - l_28) - 4;
-    if (((128 - l_24) - 4) < l_18) l_18 = (128 - l_24) - 4;
-    l_30 = l_34 + (l_18 << 8);
-    l_14 = 0;
-    for (l_2C = 0; l_2C < l_1C; l_2C++, l_34++) {
-        l_14 += (int)(unsigned char)(*(signed char *)((char *)l_34) & 127);
+    cursor = heights;
+    cursor += row << 8;
+    cursor += column;
+    heights = cursor;
+    flats += row << 8;
+    flats += column;
+    width = (((((unsigned)(location_here->z_size << 4)) >> 28) - inset) << 4) + 8;
+    height = (((((unsigned)location_here->z_size) >> 28) - inset) << 4) + 8;
+    if (((128 - column) - 4) < width) width = (128 - column) - 4;
+    if (((128 - row) - 4) < height) height = (128 - row) - 4;
+    end = cursor + (height << 8);
+    level = 0;
+    for (i = 0; i < width; i++, cursor++) {
+        level += (unsigned char)(*cursor & 127);
     }
-    l_34 = a1 + 256;
-    for (l_2C = 0; (l_18 - 2) > l_2C; l_2C++) {
-        l_14 += (int)(unsigned char)(*(signed char *)((char *)l_34) & 127);
-        l_14 += (int)(unsigned char)(*(signed char *)((char *)(l_34 + l_1C) - 1) & 127);
-        l_34 += 256;
+    cursor = heights + 256;
+    for (i = 0; (height - 2) > i; i++) {
+        level += (unsigned char)(*cursor & 127);
+        level += (unsigned char)(*(cursor + width - 1) & 127);
+        cursor += 256;
     }
-    for (l_2C = 0; l_2C < l_1C; l_2C++, l_34++) {
-        l_14 += (int)(unsigned char)(*(signed char *)((char *)l_34) & 127);
+    for (i = 0; i < width; i++, cursor++) {
+        level += (unsigned char)(*cursor & 127);
     }
-    l_14 = ((unsigned)l_14) / ((int)&*(signed char *)((char *)((l_1C * 2) + (l_18 * 2)) - 4));
-    ++l_14;
-    if (((unsigned)l_14) > 127) l_14 = 127;
-    l_34 = a1;
-    while (((unsigned)l_34) < l_30) {
-        mc_memset(l_34, (int)(unsigned char)*(signed char *)&l_14, l_1C, (int)D_00176C94, 1250, 4);
-        mc_memset(a2, 0, l_1C, (int)D_00176C94, 1251, 4);
-        l_34 += 256;
-        a2 += 256;
+    level = ((unsigned)level) / ((width * 2) + (height * 2) - 4);
+    ++level;
+    if (((unsigned)level) > 127) level = 127;
+    cursor = heights;
+    while (cursor < end) {
+        mc_memset(cursor, (int)(unsigned char)*(signed char *)&level, width, (int)D_00176C94, 1250, 4);
+        mc_memset(flats, 0, width, (int)D_00176C94, 1251, 4);
+        cursor += 256;
+        flats += 256;
     }
 }
 
-void town_block_apply_ground(int a1, int a2)
+void town_block_apply_ground(int x, int z)
 {
-    int l_2C;
-    int l_28;
-    int l_24;
-    int l_20;
-    int l_1C;
-    int l_18;
-    int l_14;
+    unsigned char *tile;
+    unsigned char *flat;
+    unsigned char *src_tile;
+    unsigned char *src_flat;
+    int unused;
+    int i;
+    int count;
 
     D_001A94C0 = 4;
-    for (l_18 = 0; l_18 < 4; l_18++) {
-        if (terrain_cell_at_player == xn_world_slot_cells[l_18]) D_001A94C0 = l_18;
+    for (i = 0; i < 4; i++) {
+        if (terrain_cell_at_player == xn_world_slot_cells[i]) D_001A94C0 = i;
     }
     if (D_001A94C0 == 4) return;
-    l_28 = (int)(xn_world_flat_layer + D_00187F30[D_001A94C0]);
-    l_2C = (int)(xn_world_tile_layer + D_00187F30[D_001A94C0]);
-    if ((a2 & 32767) == 1) {
-        a2 += -2;
-        l_14 = 240;
+    flat = (unsigned char *)(xn_world_flat_layer + D_00187F30[D_001A94C0]);
+    tile = (unsigned char *)(xn_world_tile_layer + D_00187F30[D_001A94C0]);
+    if ((z & 32767) == 1) {
+        z += -2;
+        count = 240;
     } else {
-        l_14 = 256;
+        count = 256;
     }
-    l_28 += (128 - ((a2 & 32767) >> 8)) << 8;
-    l_28 += (a1 & 32767) >> 8;
-    l_2C += (128 - ((a2 & 32767) >> 8)) << 8;
-    l_2C += (a1 & 32767) >> 8;
-    l_24 = *(int *)rmb_block + 1739;
-    l_20 = *(int *)rmb_block + 1995;
-    for (l_18 = 0; l_18 < l_14; l_18++, l_2C++, l_28++, l_24++, l_20++) {
-        if (((int)(unsigned char)*(signed char *)((char *)l_24)) != 255) {
-            if (((int)(unsigned char)(*(signed char *)((char *)l_24) & 63)) < 56) {
-                *(signed char *)((char *)l_2C) = *(signed char *)((char *)l_24);
+    flat += (128 - ((z & 32767) >> 8)) << 8;
+    flat += (x & 32767) >> 8;
+    tile += (128 - ((z & 32767) >> 8)) << 8;
+    tile += (x & 32767) >> 8;
+    src_tile = (unsigned char *)(*(char **)rmb_block + 1739);
+    src_flat = (unsigned char *)(*(char **)rmb_block + 1995);
+    for (i = 0; i < count; i++, tile++, flat++, src_tile++, src_flat++) {
+        if (*src_tile != 255) {
+            if ((*src_tile & 63) < 56) {
+                *tile = *src_tile;
             }
         }
-        if (((int)(unsigned char)*(signed char *)((char *)l_20)) != 255) {
-            if ((((int)(unsigned char)*(signed char *)((char *)l_20)) >> 2) < 33) {
-                *(signed char *)((char *)l_28) = *(signed char *)((char *)l_20);
+        if (*src_flat != 255) {
+            if ((*src_flat >> 2) < 33) {
+                *flat = *src_flat;
             }
         } else {
-            *(signed char *)((char *)l_28) &= 3;
+            *flat &= 3;
         }
-        if (((l_18 + 1) % 16) == 0) {
-            l_2C += 240;
-            l_28 += 240;
-        }
-    }
-}
-
-void town_map_add_block(int a1, int a2)
-{
-    int l_28;
-    int l_24;
-    int l_20;
-    int l_1C;
-    int l_18;
-    int l_14;
-
-    l_14 = current_location->width << 6;
-    a1 <<= 6;
-    a2 <<= 6;
-    l_20 = a1 + 64;
-    l_1C = a2 + 64;
-    l_18 = 0;
-    for (l_24 = a2; l_24 < l_1C; l_24++) {
-        for (l_28 = a1; l_28 < l_20; l_28++) {
-            *(signed char *)((char *)(int)(*(char **)&D_00196DA4 + ((l_24 * l_14) + l_28))) = *(signed char *)(*(char **)rmb_block + 2251 + l_18++);
+        if (((i + 1) % 16) == 0) {
+            tile += 240;
+            flat += 240;
         }
     }
 }
 
-struct building *location_find_building(int a1)
+void town_map_add_block(int block_x, int block_y)
 {
-    struct building *l_20;
-    int l_1C;
+    int x;
+    int y;
+    int x_end;
+    int y_end;
+    int src;
+    int map_width;
 
-    l_20 = current_location->buildings;
-    for (l_1C = 0; current_location->building_count > l_1C; l_1C++, l_20++) {
-        if (l_20->id == a1) return l_20;
+    map_width = current_location->width << 6;
+    block_x <<= 6;
+    block_y <<= 6;
+    x_end = block_x + 64;
+    y_end = block_y + 64;
+    src = 0;
+    for (y = block_y; y < y_end; y++) {
+        for (x = block_x; x < x_end; x++) {
+            *(signed char *)((char *)(int)(*(char **)&D_00196DA4 + ((y * map_width) + x))) = *(signed char *)(*(char **)rmb_block + 2251 + src++);
+        }
+    }
+}
+
+struct building *location_find_building(int id)
+{
+    struct building *building;
+    int i;
+
+    building = current_location->buildings;
+    for (i = 0; current_location->building_count > i; i++, building++) {
+        if (building->id == id) return building;
     }
     return 0;
 }
 
-void location_reveal(int a1, int a2)
+void location_reveal(int region, int map_id)
 {
-    struct map_location *l_1C;
-    int l_18;
-    int l_14;
+    struct map_location *map_location;
+    int i;
+    int old_region;
 
-    l_14 = (int)(unsigned char)current_region;
-    maploads_load_region(a1);
-    l_1C = region_locations;
-    for (l_18 = 0; l_18 < region_location_count; l_18++, l_1C++) {
-        if ((l_1C->map_id & 1048575) == a2) {
-            location_set_discovered(l_18, 1);
-            location_set_hidden(l_18, 0);
+    old_region = (int)(unsigned char)current_region;
+    maploads_load_region(region);
+    map_location = region_locations;
+    for (i = 0; i < region_location_count; i++, map_location++) {
+        if ((map_location->map_id & 1048575) == map_id) {
+            location_set_discovered(i, 1);
+            location_set_hidden(i, 0);
             break;
         }
     }
-    maploads_load_region(l_14);
+    maploads_load_region(old_region);
 }
 
-int region_nth_dungeon(int a1)
+int region_nth_dungeon(int n)
 {
-    struct map_location *l_20;
-    int l_1C;
+    struct map_location *map_location;
+    int i;
 
-    l_20 = region_locations;
-    for (l_1C = 0; l_1C < region_location_count; l_1C++, l_20++) {
-        if (l_20->dungeon_type != 255) {
-            a1 += -1;
-            if (a1 < 0) return l_1C;
+    map_location = region_locations;
+    for (i = 0; i < region_location_count; i++, map_location++) {
+        if (map_location->dungeon_type != 255) {
+            n += -1;
+            if (n < 0) return i;
         }
     }
     return -1;
 }
 
-void spfx_create_item_cb(int a1)
+void spfx_create_item_cb(int row)
 {
-    struct record *l_1C;
-    struct item *l_18;
+    struct record *object;
+    struct item *item;
 
-    l_1C = object_create_child(location_object, 0, 107);
-    l_1C->type = 2;
-    l_1C->repair_due = D_001A99F4;
-    l_18 = &l_1C->data.item;
-    if (((int)(short)*(short *)(D_00187F44 + (a1 << 2))) == (-1)) {
-        item_make((int)(unsigned short)*(short *)clothing_gender_group, (int)(short)*(short *)(D_00187F46 + (a1 << 2)), l_18);
+    object = object_create_child(location_object, 0, 107);
+    object->type = 2;
+    object->repair_due = D_001A99F4;
+    item = &object->data.item;
+    if (((int)(short)*(short *)(D_00187F44 + (row << 2))) == (-1)) {
+        item_make((int)(unsigned short)*(short *)clothing_gender_group, (int)(short)*(short *)(D_00187F46 + (row << 2)), item);
     } else {
-        item_make((int)(unsigned short)*(short *)(D_00187F44 + (a1 << 2)), (int)(short)*(short *)(D_00187F46 + (a1 << 2)), l_18);
+        item_make((int)(unsigned short)*(short *)(D_00187F44 + (row << 2)), (int)(short)*(short *)(D_00187F46 + (row << 2)), item);
     }
-    l_1C->data.item.item_flags |= 0x1000;
-    inv_store_item(l_1C);
-    if (l_18->group != 3 || l_18->index != 18) return;
-    inv_merge_arrows(player_entity, l_1C, 1);
+    object->data.item.item_flags |= 0x1000;
+    inv_store_item(object);
+    if (item->group != 3 || item->index != 18) return;
+    inv_merge_arrows(player_entity, object, 1);
 }
 
-int spfx_paralyze(struct record *a1, int a2, struct record *a3)
+int spfx_paralyze(struct record *spell_object, int effect, struct record *target)
 {
-    struct character *l_18;
-    struct spell *l_14;
+    struct character *character;
+    struct spell *spell;
 
-    l_14 = &a1->data.spell;
-    l_18 = &a3->data.character;
-    if (l_18->race == 4) return 0;
-    if (l_18 == player_character && ((int)(unsigned char)(player_class->immunity_flags & 1)) != 0) {
+    spell = &spell_object->data.spell;
+    character = &target->data.character;
+    if (character->race == 4) return 0;
+    if (character == player_character && ((int)(unsigned char)(player_class->immunity_flags & 1)) != 0) {
         return 0;
     }
-    if ((l_18->conditions & 0x1) != 0) return 0;
-    if ((l_18->conditions & 0x8000) != 0) return 0;
-    if (rand_range(1, 100) > l_14->cast_chances[a2]) return 0;
-    l_18->conditions |= 1;
-    if (l_18 == player_character) hud_message_add(D_0018461C);
+    if ((character->conditions & 0x1) != 0) return 0;
+    if ((character->conditions & 0x8000) != 0) return 0;
+    if (rand_range(1, 100) > spell->cast_chances[effect]) return 0;
+    character->conditions |= 1;
+    if (character == player_character) hud_message_add(D_0018461C);
     return 1;
 }
 
-void spfx_continuous_damage(int a1, int a2, int a3)
+void spfx_continuous_damage(int spell_object, int effect, int target)
 {
-    spfx_effect_tick(a1, a3, a2);
+    spfx_effect_tick(spell_object, target, effect);
 }
 
-int spfx_damage(struct record *a1, int a2, struct record *a3)
+int spfx_damage(struct record *spell_object, int effect, struct record *target)
 {
-    struct spell *l_1C;
-    struct character *l_18;
-    int l_14;
+    struct spell *spell;
+    struct character *character;
+    int fatigue;
 
-    l_1C = &a1->data.spell;
-    l_18 = &a3->data.character;
-    switch (l_1C->effects[a2].subtype) {
+    spell = &spell_object->data.spell;
+    character = &target->data.character;
+    switch (spell->effects[effect].subtype) {
     case 0:
-        if (l_18 == player_character && ((struct bf8_6_1 *)&cheat_flags)->f != 0) break;
-        *(short *)D_00195F28 = l_1C->cast_magnitudes[a2];
-        damage_apply(a3, l_1C->cast_magnitudes[a2], 0);
+        if (character == player_character && ((struct bf8_6_1 *)&cheat_flags)->f != 0) break;
+        *(short *)D_00195F28 = spell->cast_magnitudes[effect];
+        damage_apply(target, spell->cast_magnitudes[effect], 0);
         break;
     case 1:
-        *(short *)D_00195F28 = l_1C->cast_magnitudes[a2];
-        l_14 = l_18->fatigue;
-        l_14 -= l_1C->cast_magnitudes[a2];
-        if (l_14 < 0) l_14 = 0;
-        l_18->fatigue = l_14;
+        *(short *)D_00195F28 = spell->cast_magnitudes[effect];
+        fatigue = character->fatigue;
+        fatigue -= spell->cast_magnitudes[effect];
+        if (fatigue < 0) fatigue = 0;
+        character->fatigue = fatigue;
         break;
     case 2:
-        *(short *)D_00195F28 = l_1C->cast_magnitudes[a2];
-        l_18->magicka -= l_1C->cast_magnitudes[a2];
-        if (l_18->magicka < 0) l_18->magicka = 0;
+        *(short *)D_00195F28 = spell->cast_magnitudes[effect];
+        character->magicka -= spell->cast_magnitudes[effect];
+        if (character->magicka < 0) character->magicka = 0;
     }
     return 0;
 }
 
-int spfx_disintegrate(struct record *a1, int a2, struct record *a3)
+int spfx_disintegrate(struct record *spell_object, int effect, struct record *target)
 {
-    struct spell *l_14;
+    struct spell *spell;
 
-    l_14 = &a1->data.spell;
-    if (rand_range(1, 100) > l_14->cast_chances[a2]) {
+    spell = &spell_object->data.spell;
+    if (rand_range(1, 100) > spell->cast_chances[effect]) {
         hud_message_add(D_00185097);
         return 0;
     }
-    damage_creature_death(a3);
+    damage_creature_death(target);
     return 0;
 }
 
-void spfx_dispel_magic_cb(int a1)
+void spfx_dispel_magic_cb(int row)
 {
-    int l_20;
-    int l_1C;
-    struct record *l_18;
+    int level_bonus;
+    int chance;
+    struct record *spell;
 
-    l_18 = *(struct record **)(scratch_190ee4 + (a1 << 2));
-    if (l_18->caster != player_entity) {
-        l_20 = (player_character->level - l_18->caster->data.character.level) * 5;
-        l_1C = l_20 + selected_spell->cast_chances[D_001A99F4];
-        if (l_1C < 5) {
-            l_1C = 5;
-        } else if (l_1C > 95) {
-            l_1C = 95;
+    spell = *(struct record **)(scratch_190ee4 + (row << 2));
+    if (spell->caster != player_entity) {
+        level_bonus = (player_character->level - spell->caster->data.character.level) * 5;
+        chance = level_bonus + selected_spell->cast_chances[D_001A99F4];
+        if (chance < 5) {
+            chance = 5;
+        } else if (chance > 95) {
+            chance = 95;
         }
     }
-    if (l_18->caster == player_entity || rand_range(1, 100) <= l_1C) {
-        spell_end(l_18);
+    if (spell->caster == player_entity || rand_range(1, 100) <= chance) {
+        spell_end(spell);
         hud_message_add((int)D_00176D20);
         return;
     }

@@ -5,21 +5,21 @@
 
 extern int rand_range(int, int);
 
-short flat_table_pick(int a1)
+short flat_table_pick(short *table)
 {
-    int l_20;
-    int l_1C;
+    int record;
+    int i;
 
-    l_20 = rand_range(0, (int)(short)*(short *)((char *)a1 + 2));
+    record = rand_range(0, table[1]);
     for (;;) {
-        for (l_1C = 2; l_1C < 14; l_1C += 2) {
-            if (*(short *)((char *)((l_1C * 2) + a1)) == 0 && *(short *)((char *)((l_1C * 2) + a1) + 2) == 0) {
+        for (i = 2; i < 14; i += 2) {
+            if (table[i] == 0 && table[i + 1] == 0) {
                 break;
             }
-            if (((int)(short)*(short *)((char *)((l_1C * 2) + a1))) <= l_20 && ((int)(short)*(short *)((char *)((l_1C * 2) + a1) + 2)) >= l_20) {
-                return l_20 + (*(short *)((char *)a1) << 7);
+            if (table[i] <= record && table[i + 1] >= record) {
+                return record + (table[0] << 7);
             }
         }
-        l_20 = rand_range(0, (int)(short)*(short *)((char *)a1 + 2));
+        record = rand_range(0, table[1]);
     }
 }

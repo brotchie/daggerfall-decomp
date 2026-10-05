@@ -5,18 +5,18 @@
 
 
 
-struct record *spell_find_on_entity(struct record *a1, int a2, int a3)
+struct record *spell_find_on_entity(struct record *object, int spell_id, int icon)
 {
-    struct spell *l_14;
+    struct spell *spell;
 
-    a1 = a1->children;
-    while (a1 != 0) {
-        if (a1->type == 9) {
-            l_14 = &a1->data.spell;
-            if (a3 != 0 && l_14->id == a2 && l_14->icon == a3) return a1;
-            if (a3 == 0 && l_14->id == a2) return a1;
+    object = object->children;
+    while (object != 0) {
+        if (object->type == 9) {
+            spell = &object->data.spell;
+            if (icon != 0 && spell->id == spell_id && spell->icon == icon) return object;
+            if (icon == 0 && spell->id == spell_id) return object;
         }
-        a1 = a1->next;
+        object = object->next;
     }
     return 0;
 }

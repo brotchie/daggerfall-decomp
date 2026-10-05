@@ -2,23 +2,23 @@
 #include "records.h"
 extern int region_location_count;
 extern struct map_location *region_locations;
-extern void location_load_dungeon(int, int);
+extern void location_load_dungeon(struct loaded_location *, int);
 
-void location_load_nth_dungeon_of_type(int a1, int a2, int a3)
+void location_load_nth_dungeon_of_type(struct loaded_location *location, int dungeon_type, int n)
 {
-    struct map_location *p;
+    struct map_location *map_location;
     int i;
-    int n;
+    int dungeon_index;
 
-    p = region_locations;
-    for (i = n = 0; i < region_location_count; i++, p++) {
-        if (p->dungeon_type == a2) {
-            if (a3-- == 0) {
-                location_load_dungeon(a1, n);
+    map_location = region_locations;
+    for (i = dungeon_index = 0; i < region_location_count; i++, map_location++) {
+        if (map_location->dungeon_type == dungeon_type) {
+            if (n-- == 0) {
+                location_load_dungeon(location, dungeon_index);
                 return;
             }
-            n++;
+            dungeon_index++;
         }
     }
-    location_load_dungeon(a1, 0);
+    location_load_dungeon(location, 0);
 }

@@ -10,44 +10,44 @@ extern int collide_move_object(struct record *, int, struct move *, int);
 extern void damage_apply(struct record *, int, int);
 extern void xn_math_yaw_offset_xz(int, int, int *, int *);
 
-void damage_knockback_move(struct record *a1, struct character *a2)
+void damage_knockback_move(struct record *creature, struct character *creature_char)
 {
     struct move m;
-    int l_30;
-    int l_2C, l_28, l_24, l_20;     /* unused, but they have slots */
-    int l_1C;
-    int l_18;
-    int l_14;
+    int dx;
+    int unused1, unused2, unused3, unused4;     /* unused, but they have slots */
+    int saved_on_ground;
+    int saved_ceiling;
+    int hit_flags;
 
-    l_1C = player_on_ground;
-    l_18 = ceiling_height;
-    if (a2->knockback_speed > 40)
-        a2->knockback_speed = 40;
-    xn_math_yaw_offset_xz(a2->knockback_angle, a2->knockback_speed > 25 ? 25 : a2->knockback_speed, &l_30, &m.dz);
-    m.x = a1->x + l_30;
-    m.y = a1->y;
-    m.z = a1->z + m.dz;
-    m.f12 = a1->angle_x;
-    m.f16 = a1->yaw;
-    m.f20 = a1->angle_z;
+    saved_on_ground = player_on_ground;
+    saved_ceiling = ceiling_height;
+    if (creature_char->knockback_speed > 40)
+        creature_char->knockback_speed = 40;
+    xn_math_yaw_offset_xz(creature_char->knockback_angle, creature_char->knockback_speed > 25 ? 25 : creature_char->knockback_speed, &dx, &m.dz);
+    m.x = creature->x + dx;
+    m.y = creature->y;
+    m.z = creature->z + m.dz;
+    m.f12 = creature->angle_x;
+    m.f16 = creature->yaw;
+    m.f20 = creature->angle_z;
     m.name = D_00187B44;
     m.flags |= 1;
     collide_flags |= 4;
-    collide_move_object(a1, 0, &m, 1);
-    player_on_ground = l_1C;
-    ceiling_height = l_18;
-    l_14 = collide_flags;
-    if (l_14 & 2) {
-        a2->flags &= ~0x20;
-        a2->flags |= 0x800;
-        damage_apply(a1, a2->knockback_speed >> 1, 0);
+    collide_move_object(creature, 0, &m, 1);
+    player_on_ground = saved_on_ground;
+    ceiling_height = saved_ceiling;
+    hit_flags = collide_flags;
+    if (hit_flags & 2) {
+        creature_char->flags &= ~0x20;
+        creature_char->flags |= 0x800;
+        damage_apply(creature, creature_char->knockback_speed >> 1, 0);
     } else {
-        a2->knockback_speed -= 5;
-        if (a2->knockback_speed <= 5) {
-            a2->flags &= ~0x20;
-            a2->flags |= 0x800;
+        creature_char->knockback_speed -= 5;
+        if (creature_char->knockback_speed <= 5) {
+            creature_char->flags &= ~0x20;
+            creature_char->flags |= 0x800;
         }
     }
-    if (a2->flags & 32)
-        a2->action = 16;
+    if (creature_char->flags & 32)
+        creature_char->action = 16;
 }

@@ -7,10 +7,10 @@ extern struct record *detect_target;
 extern char D_00195B84[];
 
 
-void detect_consider_creature(struct record *a1, int a2)
+void detect_consider_creature(struct record *creature, int distance)
 {
-    a1->detect_distance = a2;
-    if (a2 >= *(int *)D_00195B84 || a2 >= 2048) return;
-    detect_target = a1;
-    *(int *)D_00195B84 = a2;
+    creature->detect_distance = distance;
+    if (distance >= *(int *)D_00195B84 || distance >= 2048) return;
+    detect_target = creature;
+    *(int *)D_00195B84 = distance;
 }

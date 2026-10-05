@@ -6,16 +6,16 @@
 extern signed char quest_global_states[];
 
 
-void quest_set_state(struct quest *a1, struct qbn_op *a2, short a3)
+void quest_set_state(struct quest *quest, struct qbn_op *op, short value)
 {
-    struct qbn_state *l_14;
+    struct qbn_state *state;
 
-    if (a2->args[0].value == (-1)) return;
-    l_14 = (struct qbn_state *)a2->args[0].record;
-    if (((int)(unsigned char)(a2->args[0].negate & 1)) != 0) *(int *)&a3 ^= 1;
-    if (l_14->is_global != 0) {
-        quest_global_states[l_14->value] = *(signed char *)&a3;
+    if (op->args[0].value == (-1)) return;
+    state = (struct qbn_state *)op->args[0].record;
+    if (((int)(unsigned char)(op->args[0].negate & 1)) != 0) *(int *)&value ^= 1;
+    if (state->is_global != 0) {
+        quest_global_states[state->value] = *(signed char *)&value;
         return;
     }
-    l_14->value = *(signed char *)&a3;
+    state->value = *(signed char *)&value;
 }

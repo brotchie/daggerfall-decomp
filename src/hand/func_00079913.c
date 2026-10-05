@@ -12,25 +12,25 @@ extern void skill_add_uses(int, int);
 extern int rand_range(int, int);
 extern int spell_active_chance(struct record *, unsigned char, unsigned char);
 
-void monster_pacify_check(struct record *a1)
+void monster_pacify_check(struct record *monster)
 {
-    struct character *m;
+    struct character *monster_char;
     int chance;
-    int sk;
+    int skill;
 
-    m = &a1->data.character;
+    monster_char = &monster->data.character;
     chance = D_001940D6.b6 ? -25 : 10;
-    if (m->race >= 43)
+    if (monster_char->race >= 43)
         chance += player_character->attributes[ATTR_PER] / 5 + player_character->skills[SKILL_ETIQUETTE].value / 10;
     else {
-        sk = monster_language_skill[m->race];
-        if (sk != 0) {
-            chance += player_character->skills[sk].value;
-            skill_add_uses(sk, 1);
+        skill = monster_language_skill[monster_char->race];
+        if (skill != 0) {
+            chance += player_character->skills[skill].value;
+            skill_add_uses(skill, 1);
         }
         chance += spell_active_chance(player_entity, 44, 255);
         chance += player_character->attributes[ATTR_PER] / 5;
     }
     if (rand_range(1, 200) <= chance)
-        m->flags |= 0x8000;
+        monster_char->flags |= 0x8000;
 }

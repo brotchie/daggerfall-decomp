@@ -4,17 +4,17 @@
 extern void quest_timer_update(struct quest *, struct qbn_timer *, int);
 extern void *quest_record(struct quest *, int, int);
 
-void qaction_op12_start_stop_timer(struct quest *a1, struct qbn_op *a2, short a3)
+void qaction_op12_start_stop_timer(struct quest *quest, struct qbn_op *op, short run_flag)
 {
-    struct qbn_timer *p;
+    struct qbn_timer *timer;
 
-    p = quest_record(a1, 6, (short)a2->args[1].value);
-    if (a3 & 64) {
-        if (((short)p->flags & 64) == 0) {
-            quest_timer_update(a1, p, 1);
-            p->flags |= 64;
+    timer = quest_record(quest, 6, (short)op->args[1].value);
+    if (run_flag & 64) {
+        if (((short)timer->flags & 64) == 0) {
+            quest_timer_update(quest, timer, 1);
+            timer->flags |= 64;
         }
     } else {
-        p->flags &= ~64;
+        timer->flags &= ~64;
     }
 }

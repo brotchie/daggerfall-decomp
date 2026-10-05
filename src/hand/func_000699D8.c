@@ -14,21 +14,21 @@ extern char sound_enabled;
 extern int sound_play_sample(int, int, struct msg *, int);
 extern int sound_cache_load(int);
 
-int sound_play_at_point(int a1, int a2, int a3, int a4, int a5)
+int sound_play_at_point(int id, int x, int y, int z, int priority)
 {
-    int h;
-    struct msg m;
-    int n;
+    int sample;
+    struct msg point;
+    int channel;
 
     if (sound_enabled == 0)
         return -1;
-    m.type = 0;
-    m.a = a2;
-    m.b = a3;
-    m.c = a4;
-    h = sound_cache_load(a1);
-    n = sound_play_sample(h, sound_last_size, &m, a5);
-    if (n > -1)
-        D_001A3BE4[n].used = 0;
-    return n;
+    point.type = 0;
+    point.a = x;
+    point.b = y;
+    point.c = z;
+    sample = sound_cache_load(id);
+    channel = sound_play_sample(sample, sound_last_size, &point, priority);
+    if (channel > -1)
+        D_001A3BE4[channel].used = 0;
+    return channel;
 }

@@ -37,71 +37,71 @@ extern void logbook_build_entries(void);
 #pragma aux sosconv "*" parm caller [] value [eax] modify [eax ebx ecx edx];
 #pragma aux (sosconv) crash_screen;
 
-void mem_pool_init(struct mem_pool *a1, int a2)
+void mem_pool_init(struct mem_pool *pool, int size)
 {
-    struct mem_block *l_14;
+    struct mem_block *block;
 
-    mc_memset((int)a1, 0, 4, (int)D_00175AD4, 60, 4);
-    a1->first = (struct mem_block *)mc_malloc(a2, (int)D_00175AD4, 62);
-    l_14 = a1->first;
-    if (l_14 == 0) fatal_error((int)D_00175ADB);
-    a1->size = a2;
-    l_14->size = a2 - 18;
-    l_14->prev = 0;
-    l_14->next = l_14->prev;
-    l_14->flags = 0;
+    mc_memset((int)pool, 0, 4, (int)D_00175AD4, 60, 4);
+    pool->first = (struct mem_block *)mc_malloc(size, (int)D_00175AD4, 62);
+    block = pool->first;
+    if (block == 0) fatal_error((int)D_00175ADB);
+    pool->size = size;
+    block->size = size - 18;
+    block->prev = 0;
+    block->next = block->prev;
+    block->flags = 0;
 }
 
-void mem_pool_free(struct mem_pool *a1)
+void mem_pool_free(struct mem_pool *pool)
 {
-    if (a1->first == 0 || (int)a1->first == (-1751672937)) return;
-    mc_free((int)a1->first, (int)D_00175AD4, 84);
-    a1->first = (struct mem_block *)-1751672937;
+    if (pool->first == 0 || (int)pool->first == (-1751672937)) return;
+    mc_free((int)pool->first, (int)D_00175AD4, 84);
+    pool->first = (struct mem_block *)-1751672937;
 }
 
-int mem_pool_alloc(struct mem_pool *a1, int a2)
+int mem_pool_alloc(struct mem_pool *pool, int size)
 {
-    struct mem_block *l_20;
-    struct mem_block *l_1C;
-    int l_18;
+    struct mem_block *block;
+    struct mem_block *next;
+    int block_size;
 
-    l_18 = (a2 + 1) & -2;
-    l_18 += 18;
-    l_20 = a1->first;
-    while (l_20 != 0) {
-        if ((int)l_20->size < l_18 || ((int)(short)((short)l_20->flags & 1)) != 0) {
-            l_1C = l_20;
-            l_20 = l_20->next;
+    block_size = (size + 1) & -2;
+    block_size += 18;
+    block = pool->first;
+    while (block != 0) {
+        if ((int)block->size < block_size || ((int)(short)((short)block->flags & 1)) != 0) {
+            next = block;
+            block = block->next;
         } else {
             break;
         }
     }
-    if (l_20 == 0) return 0;
-    if ((int)l_20->size != l_18) {
-        l_1C = (struct mem_block *)((int)l_20 + l_18);
-        l_1C->next = l_20->next;
-        l_1C->prev = l_20;
-        l_1C->size = (int)l_20->size - l_18;
-        l_1C->flags = 0;
-        l_1C->magic = 1768515945;
-        if (l_1C->next != 0) l_1C->next->prev = l_1C;
+    if (block == 0) return 0;
+    if ((int)block->size != block_size) {
+        next = (struct mem_block *)((int)block + block_size);
+        next->next = block->next;
+        next->prev = block;
+        next->size = (int)block->size - block_size;
+        next->flags = 0;
+        next->magic = 1768515945;
+        if (next->next != 0) next->next->prev = next;
     } else {
-        l_1C = l_20->next;
-        l_18 += 18;
+        next = block->next;
+        block_size += 18;
     }
-    l_20->next = l_1C;
-    l_20->size = l_18 - 18;
-    l_20->flags |= 1;
-    l_20->magic = 1768515945;
-    return (int)l_20 + 18;
+    block->next = next;
+    block->size = block_size - 18;
+    block->flags |= 1;
+    block->magic = 1768515945;
+    return (int)block + 18;
 }
 
-int mem_block_size(int a1)
+int mem_block_size(char *data)
 {
-    struct mem_block *l_1C;
+    struct mem_block *block;
 
-    l_1C = (struct mem_block *)(a1 - 18);
-    return l_1C->size;
+    block = (struct mem_block *)(data - 18);
+    return block->size;
 }
 
 void crash_screen(void)
@@ -114,19 +114,19 @@ void crash_screen(void)
     func_000A2D9E();
 }
 
-void mem_check_now(int a1)
+void mem_check_now(int checkpoint)
 {
     mem_check_level++;
-    mem_check_heap(a1);
+    mem_check_heap(checkpoint);
     mem_check_level--;
 }
 
-int logbook_open(int a1)
+int logbook_open(int force)
 {
     if (((int)D_0019626F) == 14 && ((int)(unsigned char)game_mode) == 8) {
         return 1;
     }
-    if (a1 != 0 || (game_mode == 0 && key_action_held(24) != 0)) {
+    if (force != 0 || (game_mode == 0 && key_action_held(24) != 0)) {
         game_mode = 14;
         D_00196272 = 1;
         window_image = disk_read_file((int)D_00175C79, 0);

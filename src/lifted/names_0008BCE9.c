@@ -10,8 +10,8 @@ extern int rand();
 extern int lseek();
 extern int read();
 
-void namegen_read_part(short a1, short a2)
+void namegen_read_part(short handle, short part)
 {
-    lseek((int)(short)a1, namegen_part_offsets[((int)(short)a2)] + ((rand() % namegen_part_counts[((int)(short)a2)]) * 10), 0);
-    read((int)(short)a1, (int)namegen_syllable, 10);
+    lseek((int)(short)handle, namegen_part_offsets[((int)(short)part)] + ((rand() % namegen_part_counts[((int)(short)part)]) * 10), 0);
+    read((int)(short)handle, (int)namegen_syllable, 10);
 }

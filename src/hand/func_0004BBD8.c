@@ -6,15 +6,15 @@ extern short quest_event_code;
 extern void quest_dispatch_event(struct quest *);
 extern struct quest *quest_find_by_id(unsigned char);
 
-void quest_raise_event(short a1, struct record *a2, struct record *a3)
+void quest_raise_event(short event, struct record *object, struct record *object2)
 {
-    struct quest *l;
+    struct quest *quest;
 
-    l = quest_find_by_id(a2 ? a2->quest_id : a3->quest_id);
-    if (l == 0)
+    quest = quest_find_by_id(object ? object->quest_id : object2->quest_id);
+    if (quest == 0)
         return;
-    quest_event_code = a1;
-    quest_event_object = a2;
-    quest_event_object2 = a3;
-    quest_dispatch_event(l);
+    quest_event_code = event;
+    quest_event_object = object;
+    quest_event_object2 = object2;
+    quest_dispatch_event(quest);
 }

@@ -5,9 +5,9 @@
 extern int paperdoll_mask;
 
 
-int inv_paperdoll_slot_at(int a1, int a2, int a3)
+int inv_paperdoll_slot_at(int x, int y, int unused)
 {
-    a1 += -41;
-    a2 += -5;
-    return (int)(unsigned char)*(signed char *)((char *)(int)(((char *)paperdoll_mask) + ((a2 * 125) + a1)));
+    x += -41;
+    y += -5;
+    return (int)(unsigned char)*(signed char *)((char *)(int)(((char *)paperdoll_mask) + ((y * 125) + x)));
 }

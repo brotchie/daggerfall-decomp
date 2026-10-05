@@ -12,25 +12,25 @@ extern short player_base_speed;
 extern int rand_range(int, int);
 extern void skill_add_uses(int, int);
 
-int ai_stealth_check(int a1, int a2, int a3, int a4)
+int ai_stealth_check(int monster_type, int detected, int dist, int encountered)
 {
-    int l_14;
-    int l_10;
+    int result;
+    int chance;
 
-    if (a3 > 1024) return 0;
+    if (dist > 1024) return 0;
     if (game_minutes != player_character->last_stealth_check_minutes) {
-        if (a4 != 0) {
+        if (encountered != 0) {
             if ((((int)(short)player_base_speed) >> 1) < player_momentum) return 1;
         }
         if ((((((int)(short)player_base_speed) >> 1) >= player_momentum) ? 1 : 0) != 0 && ((struct bf8_0_1 *)&game_minutes)->f != 0) {
-            return a2;
+            return detected;
         }
         skill_add_uses(16, 1);
         player_character->last_stealth_check_minutes = game_minutes;
-        l_10 = player_character->skills[16].value;
-        l_10 = ((l_10 * a3) / 1024) * 2;
-        l_14 = ((rand_range(1, 100) > l_10) ? 1 : 0);
-        return l_14;
+        chance = player_character->skills[16].value;
+        chance = ((chance * dist) / 1024) * 2;
+        result = ((rand_range(1, 100) > chance) ? 1 : 0);
+        return result;
     }
-    return a2;
+    return detected;
 }

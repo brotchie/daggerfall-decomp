@@ -10,14 +10,14 @@ extern struct st *player_class;
 #pragma aux func_000A166C parm routine [] value [8087];
 extern double func_000A166C(double, double);
 
-int skill_ready_to_advance(int a1, int a2, int a3, int a4)
+int skill_ready_to_advance(int skill_value, int uses, int multiplier, int skill)
 {
-    double d;
+    double needed;
 
-    a2 = ((65536 - ((player_character->f82 - 2) << 13)) * a2) / 65536;
-    d = (double)skill_advance_multipliers[a4] * a1;
-    d = (player_class->f36 * d) * D_00170D11;
-    d = func_000A166C(1.04, (short)player_character->f81) * d;
-    d = ((d * D_00170D19) / D_00170D21) + 1.0;
-    return a2 >= (int)d;
+    uses = ((65536 - ((player_character->f82 - 2) << 13)) * uses) / 65536;
+    needed = (double)skill_advance_multipliers[skill] * skill_value;
+    needed = (player_class->f36 * needed) * D_00170D11;
+    needed = func_000A166C(1.04, (short)player_character->f81) * needed;
+    needed = ((needed * D_00170D19) / D_00170D21) + 1.0;
+    return uses >= (int)needed;
 }

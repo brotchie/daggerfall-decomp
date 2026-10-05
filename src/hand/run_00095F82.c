@@ -76,50 +76,50 @@ extern int mc_set_location(int, char *);
 extern int mc_sprintf(char *, char *, ...);
 void inv_equip_item(char *obj);
 
-void inv_draw_left_list(char *a1)
+void inv_draw_left_list(char *rects)
 {
-    struct node *n;
+    struct node *object;
 
     inv_left_count = D_001AA586 = 0;
     mc_memset(inv_left_rows, 0, 20, D_0017704C, 1627, 20);
     if (inv_left_container->type == 2 && inv_left_container != wagon_container) {
-        inv_draw_item_cell(inv_left_container, 0, a1);
+        inv_draw_item_cell(inv_left_container, 0, rects);
         D_001AA578 = inv_left_container;
     } else if (inv_left_container == wagon_container) {
         inv_draw_container_icon(27, inv_right_icon);
     } else if (game_mode != 4 && D_0019626F != 4 && !((struct flags8 *)&D_001940D8)->b2) {
         return;
     }
-    n = inv_left_container->child;
-    while (n != 0) {
-        inv_list_left_item(n, a1 + 12);
-        n = n->next;
+    object = inv_left_container->child;
+    while (object != 0) {
+        inv_list_left_item(object, rects + 12);
+        object = object->next;
     }
     inv_left_count = D_001AA586;
 }
 
-void inv_draw_right_list(char *a1)
+void inv_draw_right_list(char *rects)
 {
-    struct node *n;
+    struct node *object;
 
     inv_right_count = D_001AA588 = 0;
     mc_memset(inv_right_rows, 0, 20, D_0017704C, 1655, 20);
     if (inv_right_container != inv_right_container_base) {
-        inv_draw_item_cell(inv_right_container, 0, a1);
+        inv_draw_item_cell(inv_right_container, 0, rects);
         D_001AA558 = inv_right_container;
     }
-    n = inv_right_container->child;
-    while (n != 0) {
-        inv_list_right_item(n, a1 + 12);
-        n = n->next;
+    object = inv_right_container->child;
+    while (object != 0) {
+        inv_list_right_item(object, rects + 12);
+        object = object->next;
     }
     inv_right_count = D_001AA588;
 }
 
 void func_00095EDB(void)
 {
-    int l_1C;
-    int l_18;
+    int unused1;
+    int unused2;
 
     D_001AA454 = 0;
     if (xn_str_find_u32(player_character->slots, inv_selected_item, 27) != 0)
@@ -135,72 +135,72 @@ void func_00095EDB(void)
     msgbox_show_string(((char *)text_buffer), 1);
 }
 
-void inv_equip_item(char *obj)
+void inv_equip_item(char *object)
 {
-    struct item *it;
-    unsigned char *tbl;
+    struct item *item;
+    unsigned char *slot_table;
     int unused;
 
-    it = (struct item *)(obj + 71);
-    if (it->type == 3 && it->sub == 18)
+    item = (struct item *)(object + 71);
+    if (item->type == 3 && item->sub == 18)
         return;
-    if (it->type == 15 || it->type == 16 || it->type == 17 || it->type == 18 ||
-        it->type == 19 || it->type == 20 || it->type == 21 || it->type == 22)
+    if (item->type == 15 || item->type == 16 || item->type == 17 || item->type == 18 ||
+        item->type == 19 || item->type == 20 || item->type == 21 || item->type == 22)
         return;
-    if (it->count == 0) {
+    if (item->count == 0) {
         msgbox_show_rsc(29, 1);
         return;
     }
     D_001940D8 |= 8;
-    switch (it->type) {
+    switch (item->type) {
     case 28:
-        switch (it->sub) {
+        switch (item->sub) {
         case 0:
             if (game_mode == 4)
                 sound_play(204, player_object, 100);
-            D_001AA454 += it->value;
-            object_free_single(obj);
+            D_001AA454 += item->value;
+            object_free_single(object);
             break;
         }
         break;
     case 2:
-        if (item_forbidden_for_class(it) != 0)
+        if (item_forbidden_for_class(item) != 0)
             return;
-        switch (it->sub) {
+        switch (item->sub) {
         case 0:
             if (game_mode == 4)
-                sound_play(it->f37 + 231, player_object, 100);
-            inv_equip_in_slot(obj, 18);
+                sound_play(item->f37 + 231, player_object, 100);
+            inv_equip_in_slot(object, 18);
             break;
         case 1:
             if (game_mode == 4)
                 sound_play(233, player_object, 100);
-            inv_equip_in_slot(obj, 20);
+            inv_equip_in_slot(object, 20);
             break;
         case 2:
             if (game_mode == 4)
-                sound_play(it->f37 + 231, player_object, 100);
-            inv_equip_in_slot(obj, 23);
+                sound_play(item->f37 + 231, player_object, 100);
+            inv_equip_in_slot(object, 23);
             break;
         case 3:
             if (game_mode == 4)
-                sound_play(it->f37 + 231, player_object, 100);
-            inv_equip_in_slot(obj, 15);
+                sound_play(item->f37 + 231, player_object, 100);
+            inv_equip_in_slot(object, 15);
             break;
         case 4:
             if (game_mode == 4)
-                sound_play(it->f37 + 231, player_object, 100);
-            inv_equip_in_slot(obj, 13);
+                sound_play(item->f37 + 231, player_object, 100);
+            inv_equip_in_slot(object, 13);
             break;
         case 5:
             if (game_mode == 4)
                 sound_play(233, player_object, 100);
-            inv_equip_in_slot(obj, 12);
+            inv_equip_in_slot(object, 12);
             break;
         case 6:
             if (game_mode == 4)
-                sound_play(it->f37 + 231, player_object, 100);
-            inv_equip_in_slot(obj, 26);
+                sound_play(item->f37 + 231, player_object, 100);
+            inv_equip_in_slot(object, 26);
             break;
         case 7:
         case 8:
@@ -211,105 +211,105 @@ void inv_equip_item(char *obj)
             if (item_is_two_handed(player_character->f1bb) != 0) {
                 item_remove_equip_effects(player_character->f1bb, 19);
                 player_character->f1bb = 0;
-                inv_equip_in_slot(obj, 21);
+                inv_equip_in_slot(object, 21);
                 return;
             }
-            inv_equip_in_slot(obj, 21);
+            inv_equip_in_slot(object, 21);
             break;
         }
         break;
     case 3:
-        if (item_forbidden_for_class(it) != 0)
+        if (item_forbidden_for_class(item) != 0)
             return;
         if (game_mode == 4)
-            sound_play(D_00188208[it->sub], player_object, 100);
-        if (item_is_two_handed(obj) != 0) {
+            sound_play(D_00188208[item->sub], player_object, 100);
+        if (item_is_two_handed(object) != 0) {
             if (item_is_two_handed(player_character->f1bb) != 0) {
-                inv_equip_in_slot(obj, 19);
+                inv_equip_in_slot(object, 19);
                 return;
             }
             if (player_character->f1bb == 0 && player_character->f1c3 == 0) {
-                inv_equip_in_slot(obj, 19);
+                inv_equip_in_slot(object, 19);
                 return;
             }
             if (player_character->f1bb != 0) {
                 if (player_character->f1c3 != 0)
                     inv_unequip_slot(21);
-                inv_equip_in_slot(obj, 19);
+                inv_equip_in_slot(object, 19);
                 return;
             }
             if (player_character->f1c3 != 0) {
                 inv_unequip_slot(21);
-                inv_equip_in_slot(obj, 19);
+                inv_equip_in_slot(object, 19);
                 return;
             }
         } else {
             if (item_is_two_handed(player_character->f1bb) != 0) {
-                inv_equip_in_slot(obj, 19);
+                inv_equip_in_slot(object, 19);
                 return;
             }
-            inv_equip_in_slot_pair(obj, 19, 2);
+            inv_equip_in_slot_pair(object, 19, 2);
         }
         break;
     case 6:
     case 12:
-        if (it->type == 6 && (player_character->flags & 1))
+        if (item->type == 6 && (player_character->flags & 1))
             return;
-        if (it->type == 12 && !(player_character->flags & 1))
+        if (item->type == 12 && !(player_character->flags & 1))
             return;
         if (game_mode == 4)
             sound_play(234, player_object, 100);
-        if (it->type == 12)
-            tbl = D_00186104;
+        if (item->type == 12)
+            slot_table = D_00186104;
         else
-            tbl = D_001860DA;
-        switch (tbl[it->sub]) {
+            slot_table = D_001860DA;
+        switch (slot_table[item->sub]) {
         case 12:
-            inv_equip_in_slot(obj, 12);
+            inv_equip_in_slot(object, 12);
             break;
         case 13:
-            inv_equip_in_slot_pair(obj, 14, 2);
+            inv_equip_in_slot_pair(object, 14, 2);
             break;
         case 17:
-            inv_equip_in_slot(obj, 17);
+            inv_equip_in_slot(object, 17);
             break;
         case 22:
-            inv_equip_in_slot(obj, 24);
+            inv_equip_in_slot(object, 24);
             break;
         case 26:
-            inv_equip_in_slot(obj, 26);
+            inv_equip_in_slot(object, 26);
             break;
         }
         break;
     case 14:
         if (game_mode == 4)
             sound_play(236, player_object, 100);
-        inv_equip_in_slot_pair(obj, 10, 1);
+        inv_equip_in_slot_pair(object, 10, 1);
         break;
     case 25:
         if (game_mode == 4)
             sound_play(236, player_object, 100);
-        switch (it->sub) {
+        switch (item->sub) {
         case 0:
-            inv_equip_in_slot_pair(obj, 0, 1);
+            inv_equip_in_slot_pair(object, 0, 1);
             break;
         case 1:
-            inv_equip_in_slot_pair(obj, 6, 1);
+            inv_equip_in_slot_pair(object, 6, 1);
             break;
         case 2:
-            inv_equip_in_slot_pair(obj, 4, 1);
+            inv_equip_in_slot_pair(object, 4, 1);
             break;
         case 3:
-            inv_equip_in_slot_pair(obj, 2, 1);
+            inv_equip_in_slot_pair(object, 2, 1);
             break;
         case 4:
-            inv_equip_in_slot_pair(obj, 8, 1);
+            inv_equip_in_slot_pair(object, 8, 1);
             break;
         case 5:
-            inv_equip_in_slot_pair(obj, 0, 1);
+            inv_equip_in_slot_pair(object, 0, 1);
             break;
         case 6:
-            inv_equip_in_slot_pair(obj, 2, 1);
+            inv_equip_in_slot_pair(object, 2, 1);
             break;
         }
         break;

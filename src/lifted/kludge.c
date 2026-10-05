@@ -125,36 +125,36 @@ void kludge_find_door_cb(struct record *);
 #pragma aux func_0009DA1C parm routine [];
 #pragma aux mc_set_location parm routine [];
 
-void kludge_print_build(int a1)
+void kludge_print_build(int to_console)
 {
-    int l_1C;
-    int l_18;
+    int fd;
+    int build;
 
     mc_set_location(78, (int)D_00171044);
     mc_sprintf((int)text_buffer, (int)D_0017104D, (int)arena2_path);
-    l_1C = open((int)text_buffer, 512);
-    if (l_1C < 0) {
+    fd = open((int)text_buffer, 512);
+    if (fd < 0) {
         mc_set_location(81, (int)D_00171044);
         mc_sprintf((int)text_buffer, (int)D_0017104D, (int)arena2_cd_path);
-        l_1C = open((int)text_buffer, 512);
-        if (l_1C < 0) return;
+        fd = open((int)text_buffer, 512);
+        if (fd < 0) return;
     }
-    read(l_1C, (int)text_buffer, 80);
-    fprintf((int)D_001903BA, (int)D_0017105A, (int)&l_18);
-    if (a1 != 0) {
+    read(fd, (int)text_buffer, 80);
+    fprintf((int)D_001903BA, (int)D_0017105A, (int)&build);
+    if (to_console != 0) {
         func_0009DA1C(90, (int)D_00171044);
-        printf((int)D_0017105D, l_18);
+        printf((int)D_0017105D, build);
     } else {
         mc_set_location(92, (int)D_00171044);
-        func_000A148C((int)D_00171062, l_18);
+        func_000A148C((int)D_00171062, build);
     }
-    close(l_1C);
+    close(fd);
 }
 
-void kludge_find_creature_cb(struct record *a1)
+void kludge_find_creature_cb(struct record *object)
 {
-    if (a1->type != 18) return;
-    D_00199724 = a1;
+    if (object->type != 18) return;
+    D_00199724 = object;
 }
 
 void kludge_menu_open(void)
@@ -167,14 +167,14 @@ void kludge_menu_open(void)
 
 void kludge_menu_update(void)
 {
-    int l_18;
+    int row;
 
     if (kludge_menu_active == 0) return;
-    if (((struct bf8_2_1 *)&D_001940D4)->f == 0 || (l_18 = list_popup_poll()) <= (-1)) return;
+    if (((struct bf8_2_1 *)&D_001940D4)->f == 0 || (row = list_popup_poll()) <= (-1)) return;
     kludge_menu_active = 0;
     game_mode = 0;
     D_00196272 = 0;
-    xn_spell_kludge_menu_dispatch(l_18);
+    xn_spell_kludge_menu_dispatch(row);
 }
 
 void kludge_show_rumor(void)
@@ -198,41 +198,41 @@ void kludge_advance_level(void)
     sheet_open(1);
 }
 
-void kludge_make_test_character_with_spells(int a1)
+void kludge_make_test_character_with_spells(int full)
 {
-    int l_24;
-    struct record *l_20;
-    int l_1C;
-    short l_18;
+    int unused1;
+    struct record *object;
+    int unused2;
+    short i;
 
-    kludge_make_test_character(a1);
-    *(int *)&l_18 = 0;
-    for (; ((int)(short)l_18) < spell_record_count; (*(int *)&l_18)++) {
-        if (spell_records[(int)(short)l_18].name[0] == 0) continue;
-        l_20 = object_find_item(player_entity->children, 27, 0);
-        l_20 = object_create_child(l_20, 0, 89);
-        l_20->type = 9;
-        l_20->id = object_new_id(100);
-        mc_memcpy(&l_20->data.spell, &spell_records[(short)l_18], 89, (int)D_00171044, 165, 4);
+    kludge_make_test_character(full);
+    *(int *)&i = 0;
+    for (; ((int)(short)i) < spell_record_count; (*(int *)&i)++) {
+        if (spell_records[(int)(short)i].name[0] == 0) continue;
+        object = object_find_item(player_entity->children, 27, 0);
+        object = object_create_child(object, 0, 89);
+        object->type = 9;
+        object->id = object_new_id(100);
+        mc_memcpy(&object->data.spell, &spell_records[(short)i], 89, (int)D_00171044, 165, 4);
     }
 }
 
-void kludge_make_test_character(int a1)
+void kludge_make_test_character(int full)
 {
-    struct record *l_38;
-    int l_34;
-    int l_30;
-    int l_2C;
-    int l_28;
-    int l_24;
-    struct item *l_20;
-    int l_1C;
-    int l_18;
+    struct record *object;
+    int unused1;
+    int unused2;
+    int unused3;
+    int unused4;
+    int unused5;
+    struct item *item;
+    int i;
+    int saved_seed;
 
-    l_18 = rand();
+    saved_seed = rand();
     srand(12345);
     D_001940D9 |= 8;
-    if (cfg_gender != 0 && a1 != 0) player_character->flags = 1;
+    if (cfg_gender != 0 && full != 0) player_character->flags = 1;
     if (((int)(unsigned short)(player_character->flags & 1)) != 0) {
         *(int *)clothing_gender_group = 12;
     } else {
@@ -240,7 +240,7 @@ void kludge_make_test_character(int a1)
     }
     player_character->gold = 5000;
     player_character->level = 2;
-    if (a1 != 0) {
+    if (full != 0) {
         disk_read_file((int)D_00171077, (int)player_class);
         player_class->forbidden_equipment = 0;
         player_class->forbidden_materials = 0;
@@ -248,8 +248,8 @@ void kludge_make_test_character(int a1)
         mc_memcpy(player_character->attributes, (int)D_0017BAE2, 16, (int)D_00171044, 198, 16);
         mc_memcpy(player_character->base_attributes, player_character->attributes, 16, (int)D_00171044, 199, 16);
         player_character->min_metal_to_hit = 0;
-        for (l_1C = 0; l_1C < 35; l_1C++) {
-            player_character->skills[l_1C].value = rand_range(10, 60);
+        for (i = 0; i < 35; i++) {
+            player_character->skills[i].value = rand_range(10, 60);
         }
         player_character->skills[22].value = 30;
         player_character->skills[23].value = 30;
@@ -261,26 +261,26 @@ void kludge_make_test_character(int a1)
     guild_join_dark_brotherhood();
     faction_find(108)->reputation = 99;
     guild_find_membership_by_kind(0)->rank = 9;
-    for (l_1C = 0; l_1C < 35; l_1C++) {
-        player_character->skills[l_1C].pad4 = player_character->skills[l_1C].value;
+    for (i = 0; i < 35; i++) {
+        player_character->skills[i].pad4 = player_character->skills[i].value;
     }
     *(int *)current_region_data = (int)region_event_values;
-    l_38 = object_create_child(D_001959E0, 0, 107);
-    l_38->image2 = 202;
-    l_38->type = 2;
-    l_20 = &l_38->data.item;
-    item_make_in_range((int)(unsigned short)*(short *)clothing_gender_group, 10, 11, l_20);
-    l_38 = object_create_child(D_001959E0, 0, 107);
-    l_38->image2 = 203;
-    l_38->type = 2;
-    l_20 = &l_38->data.item;
-    item_make_in_range((int)(unsigned short)*(short *)clothing_gender_group, 0, 4, l_20);
+    object = object_create_child(D_001959E0, 0, 107);
+    object->image2 = 202;
+    object->type = 2;
+    item = &object->data.item;
+    item_make_in_range((int)(unsigned short)*(short *)clothing_gender_group, 10, 11, item);
+    object = object_create_child(D_001959E0, 0, 107);
+    object->image2 = 203;
+    object->type = 2;
+    item = &object->data.item;
+    item_make_in_range((int)(unsigned short)*(short *)clothing_gender_group, 0, 4, item);
     item_add_to_container(D_001959E0, *(int *)clothing_gender_group, 0, 1);
     item_add_to_container(D_001959E0, *(int *)clothing_gender_group, 17, 1);
     item_add_to_container(D_001959E0, *(int *)clothing_gender_group, 9, 0);
     item_add_to_container(D_001959E0, *(int *)clothing_gender_group, 10, 0);
     item_add_to_container(D_001959E0, 23, 1, 0);
-    l_38 = item_add_to_container(player_entity, 23, 0, 0);
+    object = item_add_to_container(player_entity, 23, 0, 0);
     inv_create_wagon();
     item_add_random_to_container(inventory_containers[0], 2);
     item_add_random_to_container(inventory_containers[0], 2);
@@ -311,53 +311,53 @@ void kludge_make_test_character(int a1)
     item_add_to_container(D_001959E0, 7, 0, 0);
     item_add_to_container(D_001959E0, 7, 0, 0);
     item_add_to_container(D_001959E0, 13, 0, 0);
-    l_38 = object_find_item(player_entity->children, 27, 1);
-    l_38 = object_create_child(l_38, 0, 0);
-    l_38->type = 20;
-    l_38->flags = 3;
-    l_38->image = 31;
-    l_38 = object_find_item(player_entity->children, 27, 2);
-    l_20 = &l_38->data.item;
-    l_20->value = 10000;
-    l_38 = object_create_child(location_object, 0, 107);
-    l_38->type = 2;
-    l_38->flags |= 1;
-    item_make(1, 1, &l_38->data.item);
-    l_38->data.item.value = (int)(unsigned short)*(short *)D_00180B42;
-    inv_store_item(l_38);
-    l_38 = object_create_child(l_38, 0, 109);
-    l_38->type = 31;
-    mc_memcpy(&l_38->data.potion_recipe, (int)potion_recipes, 109, (int)D_00171044, 289, 4);
-    l_38 = object_create_child(D_001959DC, 0, 107);
-    l_38->type = 2;
-    l_20 = &l_38->data.item;
-    item_make_artifact(l_20, 7);
-    l_38 = object_create_child(D_001959DC, 0, 107);
-    l_38->type = 2;
-    l_20 = &l_38->data.item;
-    item_make_artifact(l_20, 8);
-    l_38 = object_create_child(D_001959DC, 0, 107);
-    l_38->type = 2;
-    l_20 = &l_38->data.item;
-    item_make_artifact(l_20, 2);
-    l_38 = object_create_child(D_001959DC, 0, 107);
-    l_38->type = 2;
-    l_20 = &l_38->data.item;
-    item_make_artifact(l_20, 10);
-    l_38 = object_create_child(D_001959DC, 0, 107);
-    l_38->type = 2;
-    l_20 = &l_38->data.item;
-    item_make_artifact(l_20, (int)(unsigned char)cfg_artifact);
+    object = object_find_item(player_entity->children, 27, 1);
+    object = object_create_child(object, 0, 0);
+    object->type = 20;
+    object->flags = 3;
+    object->image = 31;
+    object = object_find_item(player_entity->children, 27, 2);
+    item = &object->data.item;
+    item->value = 10000;
+    object = object_create_child(location_object, 0, 107);
+    object->type = 2;
+    object->flags |= 1;
+    item_make(1, 1, &object->data.item);
+    object->data.item.value = (int)(unsigned short)*(short *)D_00180B42;
+    inv_store_item(object);
+    object = object_create_child(object, 0, 109);
+    object->type = 31;
+    mc_memcpy(&object->data.potion_recipe, (int)potion_recipes, 109, (int)D_00171044, 289, 4);
+    object = object_create_child(D_001959DC, 0, 107);
+    object->type = 2;
+    item = &object->data.item;
+    item_make_artifact(item, 7);
+    object = object_create_child(D_001959DC, 0, 107);
+    object->type = 2;
+    item = &object->data.item;
+    item_make_artifact(item, 8);
+    object = object_create_child(D_001959DC, 0, 107);
+    object->type = 2;
+    item = &object->data.item;
+    item_make_artifact(item, 2);
+    object = object_create_child(D_001959DC, 0, 107);
+    object->type = 2;
+    item = &object->data.item;
+    item_make_artifact(item, 10);
+    object = object_create_child(D_001959DC, 0, 107);
+    object->type = 2;
+    item = &object->data.item;
+    item_make_artifact(item, (int)(unsigned char)cfg_artifact);
     player_refresh_paperdoll();
     D_001940D9 &= 247;
-    srand(l_18);
+    srand(saved_seed);
 }
 
 void starting_equipment_give(void)
 {
-    int l_20;
-    int l_1C;
-    struct record *l_18;
+    int unused1;
+    int unused2;
+    struct record *weapon;
 
     D_001940D9 |= 8;
     if (((int)(unsigned short)(player_character->flags & 1)) != 0) {
@@ -373,13 +373,13 @@ void starting_equipment_give(void)
     item_add_to_container(D_001959E0, *(int *)clothing_gender_group, 24, 1);
     if (((int)(unsigned char)D_0017BABC[D_00199634 * 2]) != 255 && ((int)(unsigned char)D_0017BABC[D_00199634 * 2]) != 254) {
         forced_material = D_0017BABD[D_00199634 * 2] + 1;
-        l_18 = item_add_to_container(inventory_containers[0], 3, (int)(unsigned char)D_0017BABC[D_00199634 * 2], 0);
-        l_18->data.item.color = l_18->data.item.material + 16;
-        l_18->data.item.value = 15;
+        weapon = item_add_to_container(inventory_containers[0], 3, (int)(unsigned char)D_0017BABC[D_00199634 * 2], 0);
+        weapon->data.item.color = weapon->data.item.material + 16;
+        weapon->data.item.value = 15;
     } else if (((int)(unsigned char)D_0017BABC[D_00199634 * 2]) == 254) {
-        l_18 = item_add_to_container(inventory_containers[0], 3, 17, 0);
+        weapon = item_add_to_container(inventory_containers[0], 3, 17, 0);
         forced_material = 1;
-        l_18 = item_add_to_container(inventory_containers[0], 3, 14, 0);
+        weapon = item_add_to_container(inventory_containers[0], 3, 14, 0);
         inv_add_arrows(player_entity, 24);
     }
     item_add_to_container(D_001959DC, 27, 0, 0);
@@ -388,27 +388,27 @@ void starting_equipment_give(void)
     D_001940D9 &= 247;
 }
 
-struct record *item_add_to_container(struct record *a1, int a2, int a3, int a4)
+struct record *item_add_to_container(struct record *container, int group, int item_index, int equip)
 {
-    struct record *l_18;
-    struct record *l_14;
-    struct item *l_10;
+    struct record *object;
+    struct record *bottle;
+    struct item *item;
 
-    l_18 = object_create_child(a1, 0, 107);
-    l_18->type = 2;
-    l_10 = &l_18->data.item;
-    item_make((int)(unsigned short)*(short *)&a2, a3, l_10);
-    if ((l_10->item_flags & 8) != 0) {
-        l_14 = object_create_child(a1, 0, 107);
-        l_14->type = 2;
-        object_reparent(l_14, l_18);
-        l_10 = &l_14->data.item;
-        item_make(1, 1, l_10);
-        if (a4 != 0) inv_equip_item(l_14);
-        return l_14;
+    object = object_create_child(container, 0, 107);
+    object->type = 2;
+    item = &object->data.item;
+    item_make((int)(unsigned short)*(short *)&group, item_index, item);
+    if ((item->item_flags & 8) != 0) {
+        bottle = object_create_child(container, 0, 107);
+        bottle->type = 2;
+        object_reparent(bottle, object);
+        item = &bottle->data.item;
+        item_make(1, 1, item);
+        if (equip != 0) inv_equip_item(bottle);
+        return bottle;
     }
-    if (a4 != 0) inv_equip_item(l_18);
-    return l_18;
+    if (equip != 0) inv_equip_item(object);
+    return object;
 }
 
 void kludge_toggle_world_position(void)
@@ -423,27 +423,27 @@ void kludge_toggle_second_compass(void)
 
 void kludge_pick_pockets(void)
 {
-    struct record *l_1C;
-    int l_18;
+    struct record *creature;
+    int monster_id;
 
     scratch_190ce4[0] = 1;
     player_character->skills[15].value = 80;
-    l_1C = object_create_child(location_object, 0, 659);
-    l_1C->type = 18;
-    l_18 = rand() % 20;
+    creature = object_create_child(location_object, 0, 659);
+    creature->type = 18;
+    monster_id = rand() % 20;
     scratch_190ce4[0] = 2;
-    scratch_190ce5 = *(signed char *)&l_18;
-    monster_init(l_1C, l_18);
+    scratch_190ce5 = *(signed char *)&monster_id;
+    monster_init(creature, monster_id);
     scratch_190ce4[0] = 3;
     mc_set_location(448, (int)D_00171044);
-    mc_sprintf((int)text_buffer, (int)D_00171096, *(int *)(monster_names + (l_18 << 2)));
+    mc_sprintf((int)text_buffer, (int)D_00171096, *(int *)(monster_names + (monster_id << 2)));
     hud_message_add((int)text_buffer);
     scratch_190ce4[0] = 4;
-    pickpocket_attempt(l_1C);
+    pickpocket_attempt(creature);
     scratch_190ce4[0] = 5;
-    object_free_children(l_1C);
+    object_free_children(creature);
     scratch_190ce4[0] = 6;
-    object_free_single(l_1C);
+    object_free_single(creature);
     scratch_190ce4[0] = 7;
 }
 
@@ -456,61 +456,61 @@ void kludge_toggle_quest_debug(void)
 
 void kludge_remove_all_items(void)
 {
-    struct record *l_18;
+    struct record *object;
 
     mc_memset(player_character->equipped, 0, 108, (int)D_00171044, 469, 108);
-    l_18 = player_entity->children;
-    while (l_18 != 0) l_18 = object_delete(l_18);
+    object = player_entity->children;
+    while (object != 0) object = object_delete(object);
 }
 
 void kludge_show_memory(void)
 {
-    int l_24;
-    int l_20;
-    int l_1C;
-    int l_18;
+    int i;
+    int row;
+    int total;
+    int block;
 
     D_0012B508 = 146;
-    l_24 = 0;
-    l_20 = l_24;
-    l_1C = l_20;
-    for (; l_24 < 512; l_24++) {
-        if (xn_tex_archives[l_24] == 0) continue;
-        l_18 = xn_tex_archives[l_24] - 22;
+    i = 0;
+    row = i;
+    total = row;
+    for (; i < 512; i++) {
+        if (xn_tex_archives[i] == 0) continue;
+        block = xn_tex_archives[i] - 22;
         mc_set_location(487, (int)D_00171044);
-        mc_sprintf((int)text_buffer, (int)D_001710BA, *(int *)((char *)l_18 + 8), xn_tex_archives[l_24] + 2);
-        text_draw((int)text_buffer, (l_20 / 25) * 160, (l_20 % 25) << 3);
-        l_20++;
-        l_1C += *(int *)((char *)l_18 + 8);
+        mc_sprintf((int)text_buffer, (int)D_001710BA, *(int *)((char *)block + 8), xn_tex_archives[i] + 2);
+        text_draw((int)text_buffer, (row / 25) * 160, (row % 25) << 3);
+        row++;
+        total += *(int *)((char *)block + 8);
     }
     D_0012B508 = 245;
     mc_set_location(494, (int)D_00171044);
-    mc_sprintf((int)text_buffer, (int)D_001710C3, l_1C);
-    text_draw((int)text_buffer, (l_20 / 25) * 160, (l_20 % 25) << 3);
+    mc_sprintf((int)text_buffer, (int)D_001710C3, total);
+    text_draw((int)text_buffer, (row / 25) * 160, (row % 25) << 3);
 }
 
-int location_find_door(int a1)
+int location_find_door(int id)
 {
-    short l_1C;
-    int l_24;
-    short l_18;
+    short door;
+    int i;
+    short id_low;
 
-    *(int *)&l_18 = a1;
-    *(int *)&l_1C = loaded_location_doors;
-    for (l_24 = 0; l_24 < loaded_location_door_count; l_24++, (*(char (**)[6])&(*(int *)&l_1C))++) {
-        if ((short)*(int *)&l_18 == *(short *)(*(char **)&l_1C + 4)) return *(int *)&l_1C;
+    *(int *)&id_low = id;
+    *(int *)&door = loaded_location_doors;
+    for (i = 0; i < loaded_location_door_count; i++, (*(char (**)[6])&(*(int *)&door))++) {
+        if ((short)*(int *)&id_low == *(short *)(*(char **)&door + 4)) return *(int *)&door;
     }
     return 0;
 }
 
-int class_has_magic_skill(struct career *a1)
+int class_has_magic_skill(struct career *career)
 {
-    int l_20;
-    int l_1C;
+    int i;
+    int j;
 
-    for (l_20 = 0; l_20 < 12; l_20++) {
-        for (l_1C = 0; l_1C < 6; l_1C++) {
-            if ((signed char)a1->skills[l_20] == D_0017BB39[l_1C]) return 1;
+    for (i = 0; i < 12; i++) {
+        for (j = 0; j < 6; j++) {
+            if ((signed char)career->skills[i] == D_0017BB39[j]) return 1;
         }
     }
     return 0;
@@ -518,72 +518,72 @@ int class_has_magic_skill(struct career *a1)
 
 void cheat_raise_reputation(void)
 {
-    struct faction *l_1C;
-    int l_18;
+    struct faction *faction;
+    int i;
 
-    l_1C = factions;
+    faction = factions;
     hud_message_add((int)D_001710D6);
-    for (l_18 = 0; l_18 < faction_count; l_18++, l_1C++) {
-        if (l_1C->reputation <= 90) l_1C->reputation += 10;
+    for (i = 0; i < faction_count; i++, faction++) {
+        if (faction->reputation <= 90) faction->reputation += 10;
     }
     key_down_minus = 0;
 }
 
 void cheat_raise_skills(void)
 {
-    int l_18;
+    int i;
 
     hud_message_add((int)D_001710EB);
-    for (l_18 = 0; l_18 < 35; l_18++) {
-        if (player_character->skills[l_18].value != 100) player_character->skills[l_18].value++;
+    for (i = 0; i < 35; i++) {
+        if (player_character->skills[i].value != 100) player_character->skills[i].value++;
     }
     key_down_equals = 0;
 }
 
-void starting_spells_give(struct record *a1)
+void starting_spells_give(struct record *spellbook)
 {
-    int l_24;
-    int l_20;
-    int l_1C;
-    struct record *l_18;
+    int i;
+    int record_index;
+    int class_id;
+    struct record *spell;
 
-    l_24 = 0;
+    i = 0;
     if (D_00199634 > 6 && D_00199634 != 18) return;
     if (D_00199634 == 18 && class_has_magic_skill(player_class) == 0) return;
     if (D_00199634 == 18) {
-        l_1C = 1;
+        class_id = 1;
     } else {
-        l_1C = D_00199634;
+        class_id = D_00199634;
     }
-    while (((int)(unsigned char)D_0017BB3F[(l_1C * 6) + l_24]) != 255) {
-        l_18 = object_create_child(a1, 0, 89);
-        l_18->type = 9;
-        l_18->id = object_new_id(100);
-        l_20 = 0;
-        while ((signed char)spell_records[l_20].id != D_0017BB3F[(l_1C * 6) + l_24]) {
-            l_20++;
+    while (((int)(unsigned char)D_0017BB3F[(class_id * 6) + i]) != 255) {
+        spell = object_create_child(spellbook, 0, 89);
+        spell->type = 9;
+        spell->id = object_new_id(100);
+        record_index = 0;
+        while ((signed char)spell_records[record_index].id != D_0017BB3F[(class_id * 6) + i]) {
+            record_index++;
         }
-        mc_memcpy(&l_18->data.spell, &spell_records[l_20], 89, (int)D_00171044, 582, 4);
-        l_24++;
+        mc_memcpy(&spell->data.spell, &spell_records[record_index], 89, (int)D_00171044, 582, 4);
+        i++;
     }
 }
 
-void kludge_find_door_cb(struct record *a1)
+void kludge_find_door_cb(struct record *object)
 {
-    int l_18;
+    int distance;
 
-    if (a1->type != 32) return;
-    if (a1->y < (-1300) || a1->y > (-1200)) return;
-    l_18 = xn_math_approx_dist2d(a1->x, a1->z, location_object->x + 664, location_object->z + 2035);
-    if (l_18 >= D_00199718) return;
-    D_00199714 = a1;
-    D_00199718 = l_18;
+    if (object->type != 32) return;
+    if (object->y < (-1300) || object->y > (-1200)) return;
+    distance = xn_math_approx_dist2d(object->x, object->z, location_object->x + 664, location_object->z + 2035);
+    if (distance >= D_00199718) return;
+    D_00199714 = object;
+    D_00199718 = distance;
 }
 
-int kludge_find_door(void)
+struct record *kludge_find_door(void)
 {
     D_00199718 = 50000;
     D_00199714 = 0;
     object_foreach(location_object, (int)kludge_find_door_cb);
-    return (int)D_00199714;
+    return D_00199714;
 }

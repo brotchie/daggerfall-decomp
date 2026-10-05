@@ -11,20 +11,20 @@ extern signed char mouse_buttons_prev;
 extern signed char joystick_button_latch[];
 
 
-int key_action_pressed(int a1)
+int key_action_pressed(int action)
 {
-    int l_1C;
+    int button;
 
-    if (((int)(unsigned char)*(signed char *)(key_map + a1)) >= 200) {
-        switch (*(unsigned char *)(key_map + a1)) {
+    if (((int)(unsigned char)*(signed char *)(key_map + action)) >= 200) {
+        switch (*(unsigned char *)(key_map + action)) {
         case 200:
         case 201:
-            l_1C = ((((int)(unsigned char)*(signed char *)(key_map + a1)) == 200) ? 0 : 1);
-            if (joystick_button1[l_1C] != 0 && joystick_button_latch[l_1C] == 0) {
-                joystick_button_latch[l_1C] = 1;
+            button = ((((int)(unsigned char)*(signed char *)(key_map + action)) == 200) ? 0 : 1);
+            if (joystick_button1[button] != 0 && joystick_button_latch[button] == 0) {
+                joystick_button_latch[button] = 1;
                 return 1;
             }
-            if (joystick_button1[l_1C] == 0) joystick_button_latch[l_1C] = 0;
+            if (joystick_button1[button] == 0) joystick_button_latch[button] = 0;
             return 0;
         case 202:
             return (((((int)(unsigned char)(mouse_buttons & 1)) != 0) && (((int)(unsigned char)(mouse_buttons_prev & 1)) == 0)) ? 1 : 0);
@@ -35,12 +35,12 @@ int key_action_pressed(int a1)
         }
         return 0;
     }
-    if (key_down[(int)(unsigned char)*(signed char *)(key_map + a1)] != 0 && key_was_down[(int)(unsigned char)*(signed char *)(key_map + a1)] == 0) {
-        key_was_down[(int)(unsigned char)*(signed char *)(key_map + a1)] = 1;
+    if (key_down[(int)(unsigned char)*(signed char *)(key_map + action)] != 0 && key_was_down[(int)(unsigned char)*(signed char *)(key_map + action)] == 0) {
+        key_was_down[(int)(unsigned char)*(signed char *)(key_map + action)] = 1;
         return 1;
     }
-    if (key_down[(int)(unsigned char)*(signed char *)(key_map + a1)] == 0) {
-        key_was_down[(int)(unsigned char)*(signed char *)(key_map + a1)] = 0;
+    if (key_down[(int)(unsigned char)*(signed char *)(key_map + action)] == 0) {
+        key_was_down[(int)(unsigned char)*(signed char *)(key_map + action)] = 0;
     }
     return 0;
 }

@@ -46,111 +46,111 @@ extern int mc_set_location(int, char *);
 extern int func_000A29BA(char *);
 extern int func_000A148C(char *, ...);
 
-int mem_pool_release(char *p)
+int mem_pool_release(char *data)
 {
-    struct blk *b;
-    struct blk *n;
+    struct blk *block;
+    struct blk *neighbour;
     int size;
 
-    b = (struct blk *)(p - 18);
-    if (b->magic != 1768515945 || (b->flags & ~1) != 0)
+    block = (struct blk *)(data - 18);
+    if (block->magic != 1768515945 || (block->flags & ~1) != 0)
         fatal_error(D_00175B02);
-    *(unsigned char *)&b->flags &= 254;
-    size = b->size;
-    mc_memset(p, 150, size, D_00175AD4, 182, 4);
-    if (b->next != 0) {
-        if (!(b->next->flags & 1)) {
-            n = b->next;
-            b->size += n->size + 18;
-            b->next = n->next;
-            if (b->next != 0)
-                b->next->prev = b;
+    *(unsigned char *)&block->flags &= 254;
+    size = block->size;
+    mc_memset(data, 150, size, D_00175AD4, 182, 4);
+    if (block->next != 0) {
+        if (!(block->next->flags & 1)) {
+            neighbour = block->next;
+            block->size += neighbour->size + 18;
+            block->next = neighbour->next;
+            if (block->next != 0)
+                block->next->prev = block;
         }
     }
-    if (b->prev != 0) {
-        if (!(b->prev->flags & 1)) {
-            n = b->prev;
-            n->size += b->size + 18;
-            n->next = b->next;
-            if (n->next != 0)
-                n->next->prev = n;
+    if (block->prev != 0) {
+        if (!(block->prev->flags & 1)) {
+            neighbour = block->prev;
+            neighbour->size += block->size + 18;
+            neighbour->next = block->next;
+            if (neighbour->next != 0)
+                neighbour->next->prev = neighbour;
         }
     }
     return size;
 }
 
-void mem_check_quest_object_cb(struct record *o)
+void mem_check_quest_object_cb(struct record *object)
 {
-    int saved;
+    int id;
 
-    if (o->twin != 0 && o->type != 2) {
-        if (object_find_by_id(location_object, o->twin->id) == 0)
+    if (object->twin != 0 && object->type != 2) {
+        if (object_find_by_id(location_object, object->twin->id) == 0)
             fatal_error(D_00175B1A);
     }
-    saved = o->id;
-    o->id = 0;
-    if (object_find_by_id(nonworld_root, saved) != 0)
+    id = object->id;
+    object->id = 0;
+    if (object_find_by_id(nonworld_root, id) != 0)
         fatal_error(D_00175B39);
-    o->id = saved;
+    object->id = id;
 }
 
-void mem_check_quest_ids_cb(struct record *o)
+void mem_check_quest_ids_cb(struct record *object)
 {
-    struct qbn_place *e;
-    struct quest *g;
+    struct qbn_place *place;
+    struct quest *quest;
     int i;
 
-    if (o->type != 14)
+    if (object->type != 14)
         return;
-    g = &o->data.quest;
-    e = quest_section(g, 4);
-    for (i = 0; g->section_counts[4] > i; i++, e++) {
-        if (e->object != 0 && o->quest_id != e->object->quest_id)
+    quest = &object->data.quest;
+    place = quest_section(quest, 4);
+    for (i = 0; quest->section_counts[4] > i; i++, place++) {
+        if (place->object != 0 && object->quest_id != place->object->quest_id)
             fatal_error(D_00175B51);
     }
 }
 
-void mem_check_heap(int a1)
+void mem_check_heap(int checkpoint)
 {
-    struct blk *b;
+    struct blk *block;
     struct blk *prev;
 
-    frame_checkpoint = a1;
+    frame_checkpoint = checkpoint;
     if (mem_check_level == 0)
         return;
     mc_set_location(280, D_00175AD4);
     if (func_000A29BA(screen_buffer) != 0)
         fatal_error(D_00175B63);
-    debug_checkpoint(a1);
+    debug_checkpoint(checkpoint);
     if (engine_running != 0)
-        xn_sys_zero_page_check(a1);
+        xn_sys_zero_page_check(checkpoint);
     object_foreach(nonworld_root, mem_check_quest_object_cb);
     object_foreach(quest_root->children, mem_check_quest_ids_cb);
-    prev = b = object_heap_blocks;
-    while (b != 0) {
-        if (b->magic != 1768515945) {
+    prev = block = object_heap_blocks;
+    while (block != 0) {
+        if (block->magic != 1768515945) {
             mc_set_location(300, D_00175AD4);
             func_000A148C(D_00175B79, ((unsigned char *)prev)[18]);
             fatal_error(D_00175B91);
         }
-        if (b->next != 0 && (char *)b + 18 + b->size != (char *)b->next) {
+        if (block->next != 0 && (char *)block + 18 + block->size != (char *)block->next) {
             mc_set_location(306, D_00175AD4);
-            func_000A148C(D_00175B79, ((unsigned char *)b)[18]);
+            func_000A148C(D_00175B79, ((unsigned char *)block)[18]);
             fatal_error(D_00175BA8);
         }
-        if (b->size == 0 || b->size > object_heap_size) {
+        if (block->size == 0 || block->size > object_heap_size) {
             mc_set_location(312, D_00175AD4);
             func_000A148C(D_00175B79, ((unsigned char *)prev)[18]);
             fatal_error(D_00175BC1);
         }
-        if (b < object_heap_blocks || (int)object_heap_blocks + object_heap_size < (int)b) {
+        if (block < object_heap_blocks || (int)object_heap_blocks + object_heap_size < (int)block) {
             mc_set_location(318, D_00175AD4);
             func_000A148C(D_00175B79, ((unsigned char *)prev)[18]);
             fatal_error(D_00175BDC);
         }
-        prev = b;
-        b = b->next;
-        if (b != 0 && b->prev != prev) {
+        prev = block;
+        block = block->next;
+        if (block != 0 && block->prev != prev) {
             mc_set_location(327, D_00175AD4);
             func_000A148C(D_00175B79, ((unsigned char *)prev)[18]);
             fatal_error(D_00175BFA);
@@ -158,21 +158,21 @@ void mem_check_heap(int a1)
     }
 }
 
-void mem_check_crt_heap(int a1)
+void mem_check_crt_heap(int checkpoint)
 {
-    int r;
-    struct msg m;
+    int status;
+    struct msg info;
 
-    r = 0;
+    status = 0;
     if (mem_check_level == 0)
         return;
     mc_set_location(349, D_00175AD4);
     func_000A2A2B();
-    m.b = 0;
-    m.a = 0;
-    while (r == 0)
-        r = func_000A2A76(&m);
-    switch (r) {
+    info.b = 0;
+    info.a = 0;
+    while (status == 0)
+        status = func_000A2A76(&info);
+    switch (status) {
     case 4:
         break;
     case 1:

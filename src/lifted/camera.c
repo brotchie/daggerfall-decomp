@@ -12,7 +12,7 @@ extern signed char D_00178A54[];
 extern short screenshot_number;
 extern char D_0019645A[];
 
-extern int open(int, ...);
+extern int open(char *, ...);
 extern int close();
 extern int mc_free();
 extern int mc_malloc();
@@ -22,7 +22,7 @@ extern int mc_sprintf(int, ...);
 extern int unlink();
 extern int xn_pal_read_dac();
 extern int xn_kbd_flush();
-void screenshot_save_bmp(int);
+void screenshot_save_bmp(char *);
 #pragma aux mc_set_location parm routine [];
 
 void screenshot_poll(void)
@@ -30,44 +30,44 @@ void screenshot_poll(void)
     if (key_down_backslash == 0) return;
     mc_set_location(44, (int)D_00170194);
     mc_sprintf((int)D_0019645A, (int)D_0017019D, (int)(short)screenshot_number);
-    screenshot_save_bmp((int)D_0019645A);
+    screenshot_save_bmp(D_0019645A);
     while (key_down_backslash != 0) xn_kbd_flush();
 }
 
-void screenshot_save_bmp(int a1)
+void screenshot_save_bmp(char *filename)
 {
-    int l_20;
-    short l_1C;
-    short l_18;
+    int buffer;
+    short i;
+    short fd;
 
-    l_20 = mc_malloc(768, (int)D_00170194, 67);
-    xn_pal_read_dac(l_20);
-    *(int *)&l_1C = 0;
-    for (; ((int)(short)l_1C) < 256; (*(int *)&l_1C)++) {
-        D_00178A52[((int)(short)l_1C) << 2] = *(signed char *)((char *)((((int)(short)l_1C) * 3) + l_20) + 2) << 2;
-        D_00178A53[((int)(short)l_1C) << 2] = *(signed char *)((char *)((((int)(short)l_1C) * 3) + l_20) + 1) << 2;
-        D_00178A54[((int)(short)l_1C) << 2] = *(signed char *)((char *)((((int)(short)l_1C) * 3) + l_20)) << 2;
+    buffer = mc_malloc(768, (int)D_00170194, 67);
+    xn_pal_read_dac(buffer);
+    *(int *)&i = 0;
+    for (; ((int)(short)i) < 256; (*(int *)&i)++) {
+        D_00178A52[((int)(short)i) << 2] = *(signed char *)((char *)((((int)(short)i) * 3) + buffer) + 2) << 2;
+        D_00178A53[((int)(short)i) << 2] = *(signed char *)((char *)((((int)(short)i) * 3) + buffer) + 1) << 2;
+        D_00178A54[((int)(short)i) << 2] = *(signed char *)((char *)((((int)(short)i) * 3) + buffer)) << 2;
     }
     screenshot_number++;
-    unlink(a1);
-    *(int *)&l_18 = open(a1, 546, 384);
-    if (((int)(short)l_18) != (-1) && l_20 != 0) {
-        write((int)(short)l_18, (int)D_00178A1C, 1078);
-        if (l_20 != 0 && l_20 != (-1751672937)) {
-            mc_free(l_20, (int)D_00170194, 82);
-            l_20 = -1751672937;
+    unlink(filename);
+    *(int *)&fd = open(filename, 546, 384);
+    if (((int)(short)fd) != (-1) && buffer != 0) {
+        write((int)(short)fd, (int)D_00178A1C, 1078);
+        if (buffer != 0 && buffer != (-1751672937)) {
+            mc_free(buffer, (int)D_00170194, 82);
+            buffer = -1751672937;
         }
-        l_20 = 655360;
-        l_20 += 63680;
-        *(int *)&l_1C = 0;
-        for (; ((int)(short)l_1C) < 200; (*(int *)&l_1C)++) {
-            write((int)(short)l_18, l_20, 320);
-            l_20 += -320;
+        buffer = 655360;
+        buffer += 63680;
+        *(int *)&i = 0;
+        for (; ((int)(short)i) < 200; (*(int *)&i)++) {
+            write((int)(short)fd, buffer, 320);
+            buffer += -320;
         }
-        close((int)(short)l_18);
+        close((int)(short)fd);
         return;
     }
-    if (l_20 == 0 || l_20 == (-1751672937)) return;
-    mc_free(l_20, (int)D_00170194, 93);
-    l_20 = -1751672937;
+    if (buffer == 0 || buffer == (-1751672937)) return;
+    mc_free(buffer, (int)D_00170194, 93);
+    buffer = -1751672937;
 }

@@ -12,18 +12,18 @@ extern char D_00196271;
 extern void msgbox_show_rsc(int, int);
 extern void xn_mouse_poll_clamped(void);
 
-void msgbox_choice_rsc(short a1, short a2, short a3, short a4, unsigned char a5, unsigned char a6, unsigned char a7)
+void msgbox_choice_rsc(short text_id, short button_1, short button_2, short button_3, unsigned char key_1, unsigned char key_2, unsigned char key_3)
 {
     D_00196271 = 0;
     D_001940D4 |= 1;
     while (mouse_buttons != 0)
         xn_mouse_poll_clamped();
     D_0012B508 = 146;
-    msgbox_button_keys = a5;
-    D_00196034 = a6;
-    D_00196035 = a7;
-    msgbox_button_ids = a2;
-    D_00196090 = a3;
-    D_00196091 = a4;
-    msgbox_show_rsc(a1, 5);
+    msgbox_button_keys = key_1;
+    D_00196034 = key_2;
+    D_00196035 = key_3;
+    msgbox_button_ids = button_1;
+    D_00196090 = button_2;
+    D_00196091 = button_3;
+    msgbox_show_rsc(text_id, 5);
 }

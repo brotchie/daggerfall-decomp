@@ -27,7 +27,7 @@ extern int mc_set_location(int, int);
 extern int mc_sprintf(int, ...);
 extern int func_000A134C();
 extern int xn_draw_image_masked_at_origin();
-extern void pedestrian_place(int);
+extern void pedestrian_place(struct record *);
 extern void guards_summon(int);
 extern void text_draw(int, int, int);
 extern void guild_count_crime(int, unsigned char);
@@ -36,10 +36,10 @@ int people_check_witnesses(void);
 
 void people_clear(void)
 {
-    int l_18;
+    int i;
 
-    for (l_18 = 0; l_18 < people_count; l_18++) {
-        if (people_list[l_18] != 0) object_delete(people_list[l_18]);
+    for (i = 0; i < people_count; i++) {
+        if (people_list[i] != 0) object_delete(people_list[i]);
     }
     people_count = 0;
     mc_memset((int)((char *)people_list), 0, 120, (int)D_00170DC0, 554, 120);
@@ -47,66 +47,66 @@ void people_clear(void)
 
 int people_check_witnesses(void)
 {
-    int l_20;
-    int l_1C;
+    int i;
+    int witness_flags;
 
-    l_1C = 0;
+    witness_flags = 0;
     if (((int)player_environment) == 3) return 0;
-    for (l_20 = 0; l_20 < people_count; l_20++) {
-        if (people_list[l_20] == 0) continue;
-        if (is_guard_sprite(people_list[l_20]) != 0) {
-            l_1C |= collide_line_of_sight(people_list[l_20], player_object) * 2;
+    for (i = 0; i < people_count; i++) {
+        if (people_list[i] == 0) continue;
+        if (is_guard_sprite(people_list[i]) != 0) {
+            witness_flags |= collide_line_of_sight(people_list[i], player_object) * 2;
         } else {
-            l_1C |= collide_line_of_sight(people_list[l_20], player_object);
+            witness_flags |= collide_line_of_sight(people_list[i], player_object);
         }
     }
-    *(signed char *)people_witness_flags = *(signed char *)&l_1C;
-    return l_1C;
+    people_witness_flags[0] = witness_flags;
+    return witness_flags;
 }
 
-void pedestrian_killed(int a1)
+void pedestrian_killed(struct record *pedestrian)
 {
     if (people_check_witnesses() != 0) {
         crime_current = 5;
         guards_summon(1);
     }
-    pedestrian_place(a1);
+    pedestrian_place(pedestrian);
     guild_count_crime(6, 5);
 }
 
 void people_debug_map(void)
 {
-    int l_20;
-    int l_1C;
-    int l_18;
+    int i;
+    int x;
+    int y;
 
     if (game_mode != 0) return;
     if (((int)player_environment) != 1) return;
     xn_draw_image_masked_at_origin(current_location->height << 6, current_location->width << 6, D_00196DA4);
-    for (l_20 = 0; l_20 < people_count; l_20++) {
-        if (people_list[l_20] == 0) continue;
-        l_1C = people_list[l_20]->x - location_object->x;
-        l_18 = people_list[l_20]->z - location_object->z;
-        l_1C >>= 6;
-        l_18 >>= 6;
-        l_18 = ((current_location->height << 6) - l_18) - 1;
-        func_000A134C((int)(short)*(short *)&l_1C, (int)(short)*(short *)&l_18, 145);
+    for (i = 0; i < people_count; i++) {
+        if (people_list[i] == 0) continue;
+        x = people_list[i]->x - location_object->x;
+        y = people_list[i]->z - location_object->z;
+        x >>= 6;
+        y >>= 6;
+        y = ((current_location->height << 6) - y) - 1;
+        func_000A134C((short)x, (short)y, 145);
     }
-    for (l_20 = 0; l_20 < creature_count; l_20++) {
-        l_1C = creature_list[l_20]->x - location_object->x;
-        l_18 = creature_list[l_20]->z - location_object->z;
-        l_1C >>= 6;
-        l_18 >>= 6;
-        l_18 = ((current_location->height << 6) - l_18) - 1;
-        func_000A134C((int)(short)*(short *)&l_1C, (int)(short)*(short *)&l_18, 161);
+    for (i = 0; i < creature_count; i++) {
+        x = creature_list[i]->x - location_object->x;
+        y = creature_list[i]->z - location_object->z;
+        x >>= 6;
+        y >>= 6;
+        y = ((current_location->height << 6) - y) - 1;
+        func_000A134C((short)x, (short)y, 161);
     }
-    l_1C = player_object->x - location_object->x;
-    l_18 = player_object->z - location_object->z;
-    l_1C >>= 6;
-    l_18 >>= 6;
-    l_18 = ((current_location->height << 6) - l_18) - 1;
-    func_000A134C((int)(short)*(short *)&l_1C, (int)(short)*(short *)&l_18, 244);
+    x = player_object->x - location_object->x;
+    y = player_object->z - location_object->z;
+    x >>= 6;
+    y >>= 6;
+    y = ((current_location->height << 6) - y) - 1;
+    func_000A134C((short)x, (short)y, 244);
     mc_set_location(677, (int)D_00170DC0);
-    mc_sprintf((int)text_buffer, (int)D_00170DD6, l_1C, l_18);
+    mc_sprintf((int)text_buffer, (int)D_00170DD6, x, y);
     text_draw((int)text_buffer, 0, (int)&*(signed char *)((char *)(current_location->height << 6) + 2));
 }

@@ -9,7 +9,7 @@ extern signed char text_rsc_buffer[];
 extern char D_00190FEC;
 extern int text_rsc_file;
 extern struct quest *current_quest;
-extern int text_rsc_load(int, int, int);
+extern char *text_rsc_load(int, int, int);
 extern int disk_open_data(char *);
 extern void close(int);
 extern void mc_memcpy(char *, char *, int, char *, int, int);
@@ -17,30 +17,30 @@ extern void mc_memcpy(char *, char *, int, char *, int, int);
 extern int mc_set_location(int, char *);
 extern int mc_sprintf(char *, char *, ...);
 
-int text_qrc_load_for_quest(struct quest *s, short a2, short a3, short a4)
+char *text_qrc_load_for_quest(struct quest *quest, short message_id, short unused, short width)
 {
-    short saved;
-    int res;
+    short saved_file;
+    char *text;
 
-    saved = text_rsc_file;
-    current_quest = s;
-    if (s == 0)
+    saved_file = text_rsc_file;
+    current_quest = quest;
+    if (quest == 0)
         return 0;
-    if (s->text_file != 0) {
+    if (quest->text_file != 0) {
         mc_set_location(545, D_00170D55);
-        mc_sprintf(((char *)text_rsc_buffer), D_00170DA2, s->text_file);
+        mc_sprintf(((char *)text_rsc_buffer), D_00170DA2, quest->text_file);
     } else {
-        mc_memcpy(((char *)text_rsc_buffer), s->name, 8, D_00170D55, 547, 2048);
+        mc_memcpy(((char *)text_rsc_buffer), quest->name, 8, D_00170D55, 547, 2048);
     }
     D_00190FEC = 0;
     mc_set_location(550, D_00170D55);
     mc_sprintf(((char *)text_buffer), D_00170DA7, ((char *)text_rsc_buffer));
     if ((text_rsc_file = disk_open_data(((char *)text_buffer))) > 0) {
-        res = text_rsc_load(a2, 0, a4);
+        text = text_rsc_load(message_id, 0, width);
         close(text_rsc_file);
-        text_rsc_file = saved;
-        return res;
+        text_rsc_file = saved_file;
+        return text;
     }
-    text_rsc_file = saved;
+    text_rsc_file = saved_file;
     return 0;
 }

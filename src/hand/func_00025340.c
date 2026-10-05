@@ -17,35 +17,35 @@ extern int mc_sprintf(char *, char *, ...);
 
 int career_nearest_class(void)
 {
-    int sc[18];
-    struct career *base;
+    int scores[18];
+    struct career *classes;
     int j;
     int k;
     int i;
-    int s;
+    int weight;
 
-    base = scratch_buffer;
-    mc_memset(sc, 0, 72, D_00170738, 397, 72);
+    classes = scratch_buffer;
+    mc_memset(scores, 0, 72, D_00170738, 397, 72);
     for (i = 0; i < 18; i++) {
         mc_set_location(401, D_00170738);
         mc_sprintf(((char *)text_buffer), D_00170765, i);
-        disk_read_file(((char *)text_buffer), &base[i]);
+        disk_read_file(((char *)text_buffer), &classes[i]);
     }
     for (i = 0; i < 12; i++) {
-        s = career_slot_weight(i);
+        weight = career_slot_weight(i);
         for (j = 0; j < 18; j++) {
-            k = memchr((char *)base[j].skills, player_class->skills[i], 12) - (char *)base[j].skills;
+            k = memchr((char *)classes[j].skills, player_class->skills[i], 12) - (char *)classes[j].skills;
             if (k >= 0) {
-                if (career_slot_weight(k) == s)
-                    sc[j] += s;
+                if (career_slot_weight(k) == weight)
+                    scores[j] += weight;
                 else
-                    sc[j] += 3 - abs(career_slot_weight(k) - s);
+                    scores[j] += 3 - abs(career_slot_weight(k) - weight);
             }
         }
     }
     for (j = k = i = 0; i < 18; i++) {
-        if (sc[i] > j) {
-            j = sc[i];
+        if (scores[i] > j) {
+            j = scores[i];
             k = i;
         }
     }

@@ -59,9 +59,9 @@ extern void xn_font_select(int);
 
 void spellmaker_update(void)
 {
-    int l_24;
+    int unused;
     short i;
-    short l_1C;
+    short unused2;
     short v;
 
     if (spellmaker_open(0) == 0) return;

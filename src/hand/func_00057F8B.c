@@ -41,44 +41,44 @@ extern int itemmaker_free_slot(void);
 extern int itemmaker_free_slot_count(void);
 extern char *memchr(char *, int, unsigned);
 
-void itemmaker_add_soul_powers(int a1)
+void itemmaker_add_soul_powers(int soul)
 {
-    int idx;
+    int soul_row;
     int count;
     int i;
     int j;
-    int x;
-    int y;
+    int type;
+    int param;
     int slot;
-    char *p;
+    char *found;
 
-    p = memchr(D_00185AC4, a1, 12);
-    if (p == 0) return;
-    idx = p - D_00185AC4;
+    found = memchr(D_00185AC4, soul, 12);
+    if (found == 0) return;
+    soul_row = found - D_00185AC4;
     for (i = 0; i < 4; i += 2) {
-        if (D_00185A94[idx * 4 + i] == 128) {
+        if (D_00185A94[soul_row * 4 + i] == 128) {
             for (j = 0; j < 5; j++) {
-                p = memchr(D_00185825, (*(unsigned char **)(D_00185AE4 + D_00185A95[idx * 4 + i] * 4))[j], 39);
-                if (p == 0)
+                found = memchr(D_00185825, (*(unsigned char **)(D_00185AE4 + D_00185A95[soul_row * 4 + i] * 4))[j], 39);
+                if (found == 0)
                     continue;
                 D_001998CC[j * 2] = 0;
-                D_001998CD[j * 2] = p - D_00185825;
+                D_001998CD[j * 2] = found - D_00185825;
             }
-        } else if (D_00185A94[idx * 4 + i] == 129) {
+        } else if (D_00185A94[soul_row * 4 + i] == 129) {
             for (j = 0; j < 5; j++) {
-                p = memchr(D_0018584D, (*(unsigned char **)(D_00185AE4 + D_00185A95[idx * 4 + i] * 4))[j], 26);
-                if (p == 0)
+                found = memchr(D_0018584D, (*(unsigned char **)(D_00185AE4 + D_00185A95[soul_row * 4 + i] * 4))[j], 26);
+                if (found == 0)
                     continue;
                 D_001998D6[j * 2] = 1;
-                D_001998D7[j * 2] = p - D_0018584D;
+                D_001998D7[j * 2] = found - D_0018584D;
             }
-        } else if (D_00185A94[idx * 4 + i] == 255)
+        } else if (D_00185A94[soul_row * 4 + i] == 255)
             continue;
-        ((char (*)[10])((char *)D_0019986A))[*(short *)scratch_190d64][i * 2] = ((char *)D_00185A94)[idx * 4 + i];
-        ((char (*)[10])((char *)D_0019986B))[*(short *)scratch_190d64][i * 2] = ((char *)D_00185A95)[idx * 4 + i];
+        ((char (*)[10])((char *)D_0019986A))[*(short *)scratch_190d64][i * 2] = ((char *)D_00185A94)[soul_row * 4 + i];
+        ((char (*)[10])((char *)D_0019986B))[*(short *)scratch_190d64][i * 2] = ((char *)D_00185A95)[soul_row * 4 + i];
     }
     count = 0;
-    while (*(short *)(D_001859A4 + idx * 20 + count * 4) != -1)
+    while (*(short *)(D_001859A4 + soul_row * 20 + count * 4) != -1)
         count++;
     if (count > 5)
         count = 5;
@@ -89,33 +89,33 @@ void itemmaker_add_soul_powers(int a1)
     for (i = 0; i < count; i++) {
         slot = itemmaker_free_slot();
         ((char *)D_00199910)[slot] = 1;
-        *(short *)(itemmaker_slots + slot * 4) = *(short *)(D_001859A4 + idx * 20 + i * 4);
-        *(short *)(D_001998E2 + slot * 4) = *(short *)(D_001859A6 + idx * 20 + i * 4);
-        x = *(short *)(D_001859A4 + idx * 20 + i * 4);
-        y = *(short *)(D_001859A6 + idx * 20 + i * 4);
-        if (*(short *)(D_001859A4 + idx * 20 + i * 4) < 15) {
+        *(short *)(itemmaker_slots + slot * 4) = *(short *)(D_001859A4 + soul_row * 20 + i * 4);
+        *(short *)(D_001998E2 + slot * 4) = *(short *)(D_001859A6 + soul_row * 20 + i * 4);
+        type = *(short *)(D_001859A4 + soul_row * 20 + i * 4);
+        param = *(short *)(D_001859A6 + soul_row * 20 + i * 4);
+        if (*(short *)(D_001859A4 + soul_row * 20 + i * 4) < 15) {
             ((char *)scratch_190ce4)[slot] = 0;
-            j = *(unsigned char *)(D_00185766 + x);
+            j = *(unsigned char *)(D_00185766 + type);
             if (j == 0)
-                func_00057147(slot, x, y, -1, -1, -1, -1);
+                func_00057147(slot, type, param, -1, -1, -1, -1);
             else {
                 j--;
-                func_00057147(slot, x, y, *(unsigned char *)(D_00185716 + j * 20 + y * 4), *(unsigned char *)(D_00185717 + j * 20 + y * 4), *(unsigned char *)(D_00185718 + j * 20 + y * 4), *(unsigned char *)(D_00185719 + j * 20 + y * 4));
+                func_00057147(slot, type, param, *(unsigned char *)(D_00185716 + j * 20 + param * 4), *(unsigned char *)(D_00185717 + j * 20 + param * 4), *(unsigned char *)(D_00185718 + j * 20 + param * 4), *(unsigned char *)(D_00185719 + j * 20 + param * 4));
             }
         } else {
             ((char *)scratch_190ce4)[slot] = 1;
             *(short *)(itemmaker_slots + slot * 4) -= 15;
-            j = *(unsigned char *)(D_0018597F + x);
+            j = *(unsigned char *)(D_0018597F + type);
             if (j == 0)
-                func_00057147(slot, x, y, -1, -1, -1, -1);
+                func_00057147(slot, type, param, -1, -1, -1, -1);
             else {
                 j--;
-                func_00057147(slot, x, y, *(unsigned char *)(D_00185907 + j * 20 + y * 4), *(unsigned char *)(D_00185908 + j * 20 + y * 4), *(unsigned char *)(D_00185909 + j * 20 + y * 4), *(unsigned char *)(D_0018590A + j * 20 + y * 4));
+                func_00057147(slot, type, param, *(unsigned char *)(D_00185907 + j * 20 + param * 4), *(unsigned char *)(D_00185908 + j * 20 + param * 4), *(unsigned char *)(D_00185909 + j * 20 + param * 4), *(unsigned char *)(D_0018590A + j * 20 + param * 4));
             }
         }
-        ((char *)D_0019986E)[slot * 10] = ((char *)D_00185A94)[idx * 4];
-        ((char *)D_0019986F)[slot * 10] = ((char *)D_00185A95)[idx * 4];
-        ((char *)D_00199870)[slot * 10] = D_00185A96[idx * 4];
-        ((char *)D_00199871)[slot * 10] = D_00185A97[idx * 4];
+        ((char *)D_0019986E)[slot * 10] = ((char *)D_00185A94)[soul_row * 4];
+        ((char *)D_0019986F)[slot * 10] = ((char *)D_00185A95)[soul_row * 4];
+        ((char *)D_00199870)[slot * 10] = D_00185A96[soul_row * 4];
+        ((char *)D_00199871)[slot * 10] = D_00185A97[soul_row * 4];
     }
 }

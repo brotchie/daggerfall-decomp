@@ -3,15 +3,15 @@
 
 extern int game_minutes;
 
-int spfx_shield(struct record *a1, int a2, struct record *a3)
+int spfx_shield(struct record *spell, int slot, struct record *target)
 {
-    struct character *e;
-    struct spell *t;
+    struct character *target_char;
+    struct spell *spell_data;
 
-    t = &a1->data.spell;
-    e = &a3->data.character;
-    e->conditions |= 0x400000;
-    e->shield_points = t->cast_magnitudes[a2];
-    e->shield_end_time = t->cast_durations[a2] + game_minutes;
+    spell_data = &spell->data.spell;
+    target_char = &target->data.character;
+    target_char->conditions |= 0x400000;
+    target_char->shield_points = spell_data->cast_magnitudes[slot];
+    target_char->shield_end_time = spell_data->cast_durations[slot] + game_minutes;
     return 1;
 }

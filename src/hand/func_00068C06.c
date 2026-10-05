@@ -29,8 +29,8 @@ extern short func_000A2460(int, int);
 void sound_update_channels(void)
 {
     int i;
-    int len;
-    int x;
+    int volume;
+    int pan;
     int unused;
 
     if (sound_enabled == 0)
@@ -51,14 +51,14 @@ void sound_update_channels(void)
             D_001A3F2C = 1024;
         else
             D_001A3F2C = 768;
-        sound_volume_pan(sound_channels[i] + 256, (char *)&CH[i].source->x, &len, &x, CH[i].source);
-        CH[i].len = len;
-        if (len == 0 && i == 3) {
+        sound_volume_pan(sound_channels[i] + 256, (char *)&CH[i].source->x, &volume, &pan, CH[i].source);
+        CH[i].len = volume;
+        if (volume == 0 && i == 3) {
             sound_stop_channel(3);
             continue;
         }
-        func_000A20BF(D_0018DD60, CH[i].handle, x);
-        func_000A1ED5(D_0018DD60, CH[i].handle, (short)len << 16 | (short)len);
+        func_000A20BF(D_0018DD60, CH[i].handle, pan);
+        func_000A1ED5(D_0018DD60, CH[i].handle, (short)volume << 16 | (short)volume);
     }
     D_001A3F38 = player_object->yaw;
 }

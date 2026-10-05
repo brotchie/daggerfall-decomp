@@ -11,10 +11,10 @@ extern short scratch_190d6a;
 extern short chargen_selected_attribute;
 
 
-void chargen_select_attribute(short a1)
+void chargen_select_attribute(short attribute)
 {
-    chargen_selected_attribute = *(int *)&a1;
-    D_00188186 = (scratch_190d6a = *(short *)(D_0018801E + ((((int)(short)a1) + 20) * 12)) + 1);
+    chargen_selected_attribute = *(int *)&attribute;
+    D_00188186 = (scratch_190d6a = *(short *)(D_0018801E + ((((int)(short)attribute) + 20) * 12)) + 1);
     D_0018818A = scratch_190d6a + 6;
     D_00188192 = scratch_190d6a + 13;
     D_00188196 = scratch_190d6a + 19;

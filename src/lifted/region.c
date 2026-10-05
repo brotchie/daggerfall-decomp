@@ -38,22 +38,22 @@ void region_free_tables(void)
     climate_pak = -1751672937;
 }
 
-void region_enter(unsigned char a1, unsigned char a2)
+void region_enter(unsigned char old_region, unsigned char region)
 {
-    current_region = a2;
+    current_region = region;
     *(int *)current_region_data = ((int)region_event_values) + (((int)(unsigned char)current_region) * 80);
     D_00196269 = current_region;
     region_unload();
-    maploads_enter_region((int)(unsigned char)a2);
+    maploads_enter_region((int)(unsigned char)region);
 }
 
 int region_update_from_player(void)
 {
-    unsigned char l_18;
+    unsigned char region;
 
-    l_18 = politic_region_at(player_object->x, player_object->z);
-    if ((signed char)l_18 != current_region) {
-        region_enter((int)(unsigned char)current_region, (int)(unsigned char)l_18);
+    region = politic_region_at(player_object->x, player_object->z);
+    if ((signed char)region != current_region) {
+        region_enter((int)(unsigned char)current_region, (int)(unsigned char)region);
         return 1;
     }
     return 0;
@@ -69,37 +69,37 @@ int climate_update_at_player(void)
     return (int)(unsigned char)climate_lookup(player_object->x, player_object->z);
 }
 
-unsigned char politic_region_at(int a1, int a2)
+unsigned char politic_region_at(int x, int z)
 {
-    int l_20;
-    int l_1C;
-    unsigned char l_18;
+    int column;
+    int row;
+    unsigned char value;
 
-    l_20 = (a1 >> 15) + 2;
-    l_1C = 499 - (a2 >> 15);
-    if (l_1C < 1) {
-        l_1C = 1;
-    } else if (l_1C > 499) {
-        l_1C = 499;
+    column = (x >> 15) + 2;
+    row = 499 - (z >> 15);
+    if (row < 1) {
+        row = 1;
+    } else if (row > 499) {
+        row = 499;
     }
-    l_18 = pak_lookup(l_20, l_1C, politic_pak);
-    if (((int)(unsigned char)l_18) == 64) return 31;
-    return l_18 & 127;
+    value = pak_lookup(column, row, politic_pak);
+    if (((int)(unsigned char)value) == 64) return 31;
+    return value & 127;
 }
 
-unsigned char climate_lookup(int a1, int a2)
+unsigned char climate_lookup(int x, int z)
 {
-    int l_1C;
-    int l_18;
+    int column;
+    int row;
 
-    l_1C = (a1 >> 15) + 2;
-    l_18 = 499 - (a2 >> 15);
-    if (l_18 < 1) {
-        l_18 = 1;
-    } else if (l_18 > 499) {
-        l_18 = 499;
+    column = (x >> 15) + 2;
+    row = 499 - (z >> 15);
+    if (row < 1) {
+        row = 1;
+    } else if (row > 499) {
+        row = 499;
     }
-    current_climate = pak_lookup(l_1C, l_18, climate_pak);
+    current_climate = pak_lookup(column, row, climate_pak);
     if (((int)(unsigned char)current_climate) == 223) {
         current_climate = 228;
         climate_is_ocean = 1;
@@ -109,35 +109,35 @@ unsigned char climate_lookup(int a1, int a2)
     return climate_categories[(int)(unsigned char)current_climate];
 }
 
-unsigned char pak_lookup(int a1, int a2, int a3)
+unsigned char pak_lookup(int column, int row, int pak)
 {
-    int l_18;
-    int l_14;
+    int base;
+    int run;
 
-    l_18 = a3;
-    l_14 = (int)(*(char **)((char *)((a2 << 2) + l_18)) + a3);
-    a1 -= (int)(short)*(short *)((char *)l_14);
-    while (a1 > 0) {
-        (*(char (**)[3])&l_14)++;
-        a1 -= (int)(short)*(short *)((char *)l_14);
+    base = pak;
+    run = (int)(*(char **)((char *)((row << 2) + base)) + pak);
+    column -= (int)(short)*(short *)((char *)run);
+    while (column > 0) {
+        (*(char (**)[3])&run)++;
+        column -= (int)(short)*(short *)((char *)run);
     }
-    return *(signed char *)((char *)l_14 + 2);
+    return *(signed char *)((char *)run + 2);
 }
 
-unsigned char ground_tile_at(int a1, int a2)
+unsigned char ground_tile_at(int x, int z)
 {
-    int l_24;
-    int l_20;
-    int l_1C;
-    int l_18;
+    signed char *tile;
+    int cell;
+    int unused;
+    int slot;
 
-    l_20 = xn_world_cell_at(a1, a2);
-    for (l_18 = 0; l_18 < 4; l_18++) {
-        if (l_20 == xn_world_slot_cells[l_18]) break;
+    cell = xn_world_cell_at(x, z);
+    for (slot = 0; slot < 4; slot++) {
+        if (cell == xn_world_slot_cells[slot]) break;
     }
-    if (l_18 == 4) return 255;
-    l_24 = (int)(xn_world_tile_layer + D_00187F30[l_18]);
-    l_24 += (127 - ((a2 & 32767) >> 8)) << 8;
-    l_24 += (a1 & 32767) >> 8;
-    return *(signed char *)((char *)l_24) & 63;
+    if (slot == 4) return 255;
+    tile = (signed char *)(xn_world_tile_layer + D_00187F30[slot]);
+    tile += (127 - ((z & 32767) >> 8)) << 8;
+    tile += (x & 32767) >> 8;
+    return *tile & 63;
 }

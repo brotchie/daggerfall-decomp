@@ -3,11 +3,11 @@
  * tables from the start of the file, so moving functions can change the code. */
 
 
-extern int font_text_width(int);
+extern int font_text_width(char *);
 extern int xn_font_draw_string();
 
-void text_draw_centred(int a1, int a2, short a3)
+void text_draw_centred(char *text, int x, short y)
 {
-    a2 -= font_text_width(a1) >> 1;
-    xn_font_draw_string((int)(short)*(short *)&a2, (int)(short)a3, a1);
+    x -= font_text_width(text) >> 1;
+    xn_font_draw_string((int)(short)*(short *)&x, (int)(short)y, text);
 }

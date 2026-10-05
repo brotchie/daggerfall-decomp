@@ -22,51 +22,51 @@ extern int object_delete(unsigned char *);
 extern int inv_match_arrows(int);
 extern int object_find(int, int (*)(int));
 extern void xn_draw_image_transparent(int, int, int, int, char *);
-void inv_draw_scroll_arrow(struct img *p, int a2);
+void inv_draw_scroll_arrow(struct img *image, int arrow);
 
-int inv_take_arrow(int a1)
+int inv_take_arrow(int consume)
 {
-    unsigned char *p;
+    unsigned char *item;
 
     found_object = 0;
     object_find(*(int *)(player_entity + 63), inv_match_arrows);
     if (found_object == 0) return 0;
-    if (a1 == 0) return 1;
-    p = found_object + 71;
-    if (p[49] == 1) {
+    if (consume == 0) return 1;
+    item = found_object + 71;
+    if (item[49] == 1) {
         object_delete(found_object);
         return 1;
     }
-    p[49]--;
+    item[49]--;
     return 1;
 }
 
 void inv_draw_scroll_arrows(void)
 {
-    int l_18;
+    int last;
 
     inv_draw_scroll_arrow(inv_left_scroll != 0 ? D_001AA42C : D_001AA430, 0);
     inv_draw_scroll_arrow(inv_right_scroll != 0 ? D_001AA42C : D_001AA430, 1);
-    l_18 = inv_left_count - 4;
-    inv_draw_scroll_arrow(l_18 > 0 && inv_left_scroll < l_18 ? D_001AA42C : D_001AA430, 2);
-    l_18 = inv_right_count - 4;
-    inv_draw_scroll_arrow(l_18 > 0 && inv_right_scroll < l_18 ? D_001AA42C : D_001AA430, 3);
+    last = inv_left_count - 4;
+    inv_draw_scroll_arrow(last > 0 && inv_left_scroll < last ? D_001AA42C : D_001AA430, 2);
+    last = inv_right_count - 4;
+    inv_draw_scroll_arrow(last > 0 && inv_right_scroll < last ? D_001AA42C : D_001AA430, 3);
 }
 
-void inv_draw_scroll_arrow(struct img *p, int a2)
+void inv_draw_scroll_arrow(struct img *image, int arrow)
 {
-    switch (a2) {
+    switch (arrow) {
     case 0:
-        xn_draw_image_transparent(163, 48, p->h, 20, p->data);
+        xn_draw_image_transparent(163, 48, image->h, 20, image->data);
         break;
     case 1:
-        xn_draw_image_transparent(261, 48, p->h, 20, p->data);
+        xn_draw_image_transparent(261, 48, image->h, 20, image->data);
         break;
     case 2:
-        xn_draw_image_transparent(163, p->f2 + p->f6 - 20, p->h, 20, p->data + p->f10 - p->h * 20);
+        xn_draw_image_transparent(163, image->f2 + image->f6 - 20, image->h, 20, image->data + image->f10 - image->h * 20);
         break;
     case 3:
-        xn_draw_image_transparent(261, p->f2 + p->f6 - 20, p->h, 20, p->data + p->f10 - p->h * 20);
+        xn_draw_image_transparent(261, image->f2 + image->f6 - 20, image->h, 20, image->data + image->f10 - image->h * 20);
         break;
     }
 }

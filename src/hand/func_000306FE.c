@@ -4,19 +4,19 @@
 extern int region_location_count;
 extern struct map_location *region_locations;
 
-void qaction_op19_reveal_location(struct quest *a1, struct qbn_op *a2, int a3)
+void qaction_op19_reveal_location(struct quest *quest, struct qbn_op *op, int unused)
 {
-    struct record *l_1C;
-    struct map_location *p;
-    int n;
+    struct record *place;
+    struct map_location *map_entry;
+    int skip_count;
     int i;
 
-    l_1C = a2->args[1].object;
-    n = l_1C->image;
-    p = region_locations;
-    for (i = 0; i < region_location_count; i++, p++) {
-        if (p->dungeon_type != 255)
-            if (n-- == 0) break;
+    place = op->args[1].object;
+    skip_count = place->image;
+    map_entry = region_locations;
+    for (i = 0; i < region_location_count; i++, map_entry++) {
+        if (map_entry->dungeon_type != 255)
+            if (skip_count-- == 0) break;
     }
-    p->x_type_flags |= 0x40000000;
+    map_entry->x_type_flags |= 0x40000000;
 }

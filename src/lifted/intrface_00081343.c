@@ -10,28 +10,28 @@ extern short steer_col_x1;
 extern short steer_col_x2;
 
 
-int intrface_region_at(int a1, int a2, int a3, int a4)
+int intrface_region_at(int x, int y, int *region_x, int *region_y)
 {
-    int l_10;
+    int region;
 
-    if (((int)(short)steer_row_y1) > a2) {
-        l_10 = 0;
-        *(int *)((char *)a4) = (int)(short)xn_gfx_clip_top;
-    } else if (((int)(short)steer_row_y1) <= a2 && ((int)(short)steer_row_y2) > a2) {
-        l_10 = 3;
-        *(int *)((char *)a4) = (int)(short)steer_row_y1;
+    if (((int)(short)steer_row_y1) > y) {
+        region = 0;
+        *region_y = (int)(short)xn_gfx_clip_top;
+    } else if (((int)(short)steer_row_y1) <= y && ((int)(short)steer_row_y2) > y) {
+        region = 3;
+        *region_y = (int)(short)steer_row_y1;
     } else {
-        l_10 = 6;
-        *(int *)((char *)a4) = (int)(short)steer_row_y2;
+        region = 6;
+        *region_y = (int)(short)steer_row_y2;
     }
-    if (((int)(short)steer_col_x1) > a1) {
-        *(int *)((char *)a3) = (int)(short)xn_gfx_clip_left;
-    } else if (((int)(short)steer_col_x1) <= a1 && ((int)(short)steer_col_x2) > a1) {
-        l_10++;
-        *(int *)((char *)a3) = (int)(short)steer_col_x1;
+    if (((int)(short)steer_col_x1) > x) {
+        *region_x = (int)(short)xn_gfx_clip_left;
+    } else if (((int)(short)steer_col_x1) <= x && ((int)(short)steer_col_x2) > x) {
+        region++;
+        *region_x = (int)(short)steer_col_x1;
     } else {
-        l_10 += 2;
-        *(int *)((char *)a3) = (int)(short)steer_col_x2;
+        region += 2;
+        *region_x = (int)(short)steer_col_x2;
     }
-    return l_10;
+    return region;
 }

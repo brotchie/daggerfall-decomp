@@ -8,53 +8,53 @@ extern int rand_range(int, int);
 extern void spfx_cure_disease(struct record *, struct character *);
 extern struct record *object_free_single(struct record *);
 
-int spfx_cure(struct record *a1, int a2, struct record *a3)
+int spfx_cure(struct record *spell_object, int effect, struct record *target)
 {
-    struct spell *l_28;
-    struct character *l_24;
-    struct record *l_20;
-    int l_1C;
-    struct disease *l_18;
-    int l_14;
+    struct spell *spell;
+    struct character *character;
+    struct record *child;
+    int unused;
+    struct disease *poison;
+    int i;
 
-    l_28 = &a1->data.spell;
-    l_24 = &a3->data.character;
-    if (rand_range(1, 100) > l_28->cast_chances[a2]) {
+    spell = &spell_object->data.spell;
+    character = &target->data.character;
+    if (rand_range(1, 100) > spell->cast_chances[effect]) {
         hud_message_add(D_00185097);
         return 0;
     }
-    switch (l_28->effects[a2].subtype) {
+    switch (spell->effects[effect].subtype) {
     case 0:
-        spfx_cure_disease(a3, l_24);
+        spfx_cure_disease(target, character);
         if (player_character->special_infection_time != 0) {
             player_character->special_infection_time = 0;
             player_character->special_infection = 0;
         }
         break;
     case 1:
-        l_20 = a3->children;
-        while (l_20 != 0) {
-            if (l_20->type == 11) {
-                l_18 = &l_20->data.disease;
-                if (l_18->id > 127) {
-                    for (l_14 = 0; l_14 < 8; l_14++) {
-                        l_24->attributes[l_14] += l_18->drained[l_14];
-                        if (l_24->attributes[l_14] > l_24->base_attributes[l_14])
-                            l_24->attributes[l_14] = l_24->base_attributes[l_14];
+        child = target->children;
+        while (child != 0) {
+            if (child->type == 11) {
+                poison = &child->data.disease;
+                if (poison->id > 127) {
+                    for (i = 0; i < 8; i++) {
+                        character->attributes[i] += poison->drained[i];
+                        if (character->attributes[i] > character->base_attributes[i])
+                            character->attributes[i] = character->base_attributes[i];
                     }
-                    l_20 = object_free_single(l_20);
+                    child = object_free_single(child);
                 } else {
-                    l_20 = l_20->next;
+                    child = child->next;
                 }
             } else {
-                l_20 = l_20->next;
+                child = child->next;
             }
         }
         break;
     case 2:
-        if ((l_24->conditions & 1) == 0) return 0;
-        spell_remove_effect_type(a3, 0);
-        l_24->conditions &= ~1;
+        if ((character->conditions & 1) == 0) return 0;
+        spell_remove_effect_type(target, 0);
+        character->conditions &= ~1;
     case 3:
         break;
     }

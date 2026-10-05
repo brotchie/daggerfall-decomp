@@ -9,21 +9,21 @@ extern void text_draw_centred_coloured(char *, short, short, int, unsigned char)
 extern void xn_draw_image_drop_shadow(int, int, int, int, char *);
 extern char *xn_tex_cache_lookup(int, int, int);
 
-void potionmaker_ingredient_cb(struct record *a1)
+void potionmaker_ingredient_cb(struct record *object)
 {
     struct item *p;
     char *spr;
     short n;
     short unused;
 
-    if (a1->type != 2) return;
+    if (object->type != 2) return;
     for (n = 0; n < 8; n++)
-        if (((struct record **)potion_cauldron)[n] == a1) return;
-    p = &a1->data.item;
+        if (((struct record **)potion_cauldron)[n] == object) return;
+    p = &object->data.item;
     if (p->enchantments[0].type != -1) return;
     if ((p->item_flags & 1) == 0) return;
     if (*(int *)potion_ingredient_count >= 512) return;
-    ((struct record **)potion_ingredients)[*(int *)potion_ingredient_count] = a1;
+    ((struct record **)potion_ingredients)[*(int *)potion_ingredient_count] = object;
     n = *(short *)potion_ingredient_count - *(short *)potion_ingredient_scroll;
     if (*(int *)potion_ingredient_count < *(int *)potion_ingredient_scroll) {
         (*(int *)potion_ingredient_count)++;

@@ -39,13 +39,13 @@ extern void object_delete_block(int, int);
 extern void func_0008EB52(void);
 extern void inv_assign_item_id(int);
 
-void location_unload(int a1)
+void location_unload(int image)
 {
     {
-        int l_20;
-        int l_1C;
+        int unused;
+        int location_id;
 
-        if (((int)(unsigned short)*(short *)&a1) == 65535) return;
+        if (((int)(unsigned short)*(short *)&image) == 65535) return;
         func_0008EB52();
         location_store_objects();
         if (location_object->twin != 0) {
@@ -58,7 +58,7 @@ void location_unload(int a1)
         creature_count = 0;
         mc_memset((int)((char *)creature_list), 0, 512, (int)D_00176C94, 450, 512);
         object_delete_block((int)location_object->children, location_object->id);
-        l_1C = location_object->id;
+        location_id = location_object->id;
         location_object->image = 65535;
         location_object->id = -65535;
         model_cache_flush_count = 1;
@@ -77,14 +77,14 @@ void location_unload(int a1)
             mc_memset((int)terrain_cell_dirty, 0, 16, (int)D_00176C94, 477, 16);
             mc_memset((int)terrain_cell_ids, 0, 16, (int)D_00176C94, 478, 16);
             camera_object->yaw = player_object->yaw;
-            if ((l_1C - 65536) == D_00187F28) {
+            if ((location_id - 65536) == D_00187F28) {
                 mc_memcpy((int)player_object, (int)saved_player_object, 55, (int)D_00176C94, 483, 4);
             } else {
                 D_00187F2C++;
             }
             D_00195DB8 = 5;
         }
-        D_00187F28 = l_1C;
+        D_00187F28 = location_id;
         func_0008EB52();
         sound_stop_ambient();
     }

@@ -22,7 +22,7 @@ extern int mc_free(char *, char *, int);
 extern char *mc_malloc(int, char *, int);
 extern int mc_memcpy(char *, char *, int, char *, int, int);
 
-int travel_route(int x0, int y0, int x1, int y1, int a5)
+int travel_route(int x0, int y0, int x1, int y1, int go)
 {
     int dx;
     int dy;
@@ -86,7 +86,7 @@ int travel_route(int x0, int y0, int x1, int y1, int a5)
             v = v * 300 / 256;
         sum += v;
     }
-    if (!(a5 == 0 || D_001AA6A6 == 100)) {
+    if (!(go == 0 || D_001AA6A6 == 100)) {
         if (D_00190CE8 != 0)
             travel_toggle_zoom();
         if ((int)(unsigned short)(travel_options & 3) == 2)

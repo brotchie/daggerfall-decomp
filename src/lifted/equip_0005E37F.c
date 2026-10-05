@@ -10,26 +10,26 @@ extern void item_init_from_template(unsigned short, short, short, struct item *)
 extern void item_make_magic(struct item *, int);
 extern void item_make_artifact(struct item *, int);
 
-void item_make_in_range(short a1, int a2, int a3, struct item *a4)
+void item_make_in_range(short group, int min_index, int max_index, struct item *item)
 {
-    int l_14;
+    int index;
 
-    if (a2 == a3) {
-        l_14 = a2;
+    if (min_index == max_index) {
+        index = min_index;
     } else {
-        l_14 = rand_range(a2, a3);
+        index = rand_range(min_index, max_index);
     }
-    switch ((unsigned short)*(int *)&a1) {
+    switch ((unsigned short)*(int *)&group) {
     case 5:
-        item_make_artifact(a4, rand_range(a2, a3));
+        item_make_artifact(item, rand_range(min_index, max_index));
         return;
     case 4:
-        item_make_magic(a4, -1);
+        item_make_magic(item, -1);
         return;
     case 11:
-        item_init_from_template(287, 27, 8, a4);
+        item_init_from_template(287, 27, 8, item);
         return;
     default:
-        item_init_from_template((int)(unsigned short)*(short *)((char *)(int)(*(char **)(item_group_templates + (((int)(unsigned short)a1) << 2)) + (l_14 * 2))), (int)(short)a1, (int)(short)*(short *)&l_14, a4);
+        item_init_from_template((int)(unsigned short)*(short *)((char *)(int)(*(char **)(item_group_templates + (((int)(unsigned short)group) << 2)) + (index * 2))), (int)(short)group, (int)(short)*(short *)&index, item);
     }
 }

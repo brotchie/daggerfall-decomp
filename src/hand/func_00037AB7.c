@@ -6,8 +6,8 @@ extern unsigned char D_0017A8B2[];
 
 int func_00037AB7(void)
 {
-    short l_18;
+    short elemental;
 
-    l_18 = D_0017A8B2[selected_spell->effects[0].type] > D_0017A8B2[selected_spell->effects[1].type] ? D_0017A8B2[selected_spell->effects[0].type] : D_0017A8B2[selected_spell->effects[1].type];
-    return D_0017A8B2[selected_spell->effects[2].type] > l_18 ? D_0017A8B2[selected_spell->effects[2].type] : l_18;
+    elemental = D_0017A8B2[selected_spell->effects[0].type] > D_0017A8B2[selected_spell->effects[1].type] ? D_0017A8B2[selected_spell->effects[0].type] : D_0017A8B2[selected_spell->effects[1].type];
+    return D_0017A8B2[selected_spell->effects[2].type] > elemental ? D_0017A8B2[selected_spell->effects[2].type] : elemental;
 }

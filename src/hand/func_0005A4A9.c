@@ -5,27 +5,27 @@ extern short font_space_width;
 extern short font_char_spacing;
 extern struct Font *D_0012DA74;
 
-int font_text_width(char *s)
+int font_text_width(char *text)
 {
-    short w;
+    short width;
     char *p;
-    short c;
-    struct Glyph *g;
-    int n;
+    short glyph_index;
+    struct Glyph *glyph;
+    int char_count;
 
-    w = 0;
-    n = 0;
-    p = s;
+    width = 0;
+    char_count = 0;
+    p = text;
     while (*p != 0) {
         if (*p == ' ') {
-            w += font_space_width;
+            width += font_space_width;
         } else {
-            n++;
-            c = (unsigned char)*p - 33;
-            g = &D_0012DA74->g[c];
-            w += g->w;
+            char_count++;
+            glyph_index = (unsigned char)*p - 33;
+            glyph = &D_0012DA74->g[glyph_index];
+            width += glyph->w;
         }
         p++;
     }
-    return w + font_char_spacing * n;
+    return width + font_char_spacing * char_count;
 }

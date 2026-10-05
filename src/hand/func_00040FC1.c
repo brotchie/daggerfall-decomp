@@ -11,16 +11,16 @@ extern int court_open(unsigned char);
 extern void damage_creature_death(struct record *);
 extern int rand(void);
 
-void crime_guards_or_court(int a1)
+void crime_guards_or_court(int surrendered)
 {
-    int v;
+    int reputation;
 
-    v = region_legal_reputation[current_region].v;
+    reputation = region_legal_reputation[current_region].v;
     player_character->health = 1;
-    if (v < -20 && a1 == 0) {
+    if (reputation < -20 && surrendered == 0) {
         damage_creature_death(player_entity);
-    } else if (v >= -20 && v <= 0) {
-        if ((rand() & 1) && a1 == 0)
+    } else if (reputation >= -20 && reputation <= 0) {
+        if ((rand() & 1) && surrendered == 0)
             damage_creature_death(player_entity);
         else
             court_open(crime_current);

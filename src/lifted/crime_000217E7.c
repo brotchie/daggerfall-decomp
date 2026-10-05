@@ -29,35 +29,35 @@ extern void palette_restore(void);
 extern void text_draw_centred_coloured(int, int, int, int, unsigned char);
 #pragma aux mc_set_location parm routine [];
 
-void prison_serve_sentence(int a1)
+void prison_serve_sentence(int days)
 {
-    int l_1C;
-    int l_18;
+    int day;
+    int image;
 
     D_001962B0 = 1;
     D_001962A4 = 1;
     D_001962A5 = 0;
     D_00196294 = 1;
-    l_18 = disk_read_file((int)D_001706E9, 0);
+    image = disk_read_file((int)D_001706E9, 0);
     mc_memset(655360, 0, 64000, (int)D_001706E1, 384, 4);
-    for (l_1C = 0; l_1C < 768; l_1C++) {
-        *(signed char *)((char *)(l_18 + l_1C) + 64000) <<= 2;
+    for (day = 0; day < 768; day++) {
+        *(signed char *)((char *)(image + day) + 64000) <<= 2;
     }
-    xn_pal_set_range_8bit(l_18 + 64000, 0, 256);
-    for (l_1C = a1; l_1C != 0; l_1C--) {
+    xn_pal_set_range_8bit(image + 64000, 0, 256);
+    for (day = days; day != 0; day--) {
         time_pass(1440);
-        mc_memcpy(screen_buffer, l_18, 64000, (int)D_001706E1, 391, 4);
+        mc_memcpy(screen_buffer, image, 64000, (int)D_001706E1, 391, 4);
         mc_set_location(392, (int)D_001706E1);
-        mc_sprintf((int)text_buffer, (int)D_001706F6, l_1C);
+        mc_sprintf((int)text_buffer, (int)D_001706F6, day);
         text_draw_centred_coloured((int)text_buffer, 156, 165, 190, 219);
         xn_gfx_present_inclusive(0);
     }
     mc_memset(655360, 0, 64000, (int)D_001706E1, 397, 4);
     mc_memset(screen_buffer, 0, 64000, (int)D_001706E1, 398, 4);
     palette_restore();
-    if (l_18 != 0 && l_18 != (-1751672937)) {
-        mc_free(l_18, (int)D_001706E1, 400);
-        l_18 = -1751672937;
+    if (image != 0 && image != (-1751672937)) {
+        mc_free(image, (int)D_001706E1, 400);
+        image = -1751672937;
     }
     D_00196294 = 0;
     D_001962A5 = 1;

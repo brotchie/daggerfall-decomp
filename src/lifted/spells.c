@@ -136,14 +136,14 @@ int spellmaker_close(void)
 
 void spellmaker_enter_name(void)
 {
-    int l_18;
+    int prompt;
 
-    l_18 = *(int *)scratch_buffer + 55000;
+    prompt = *(int *)scratch_buffer + 55000;
     mc_set_location(744, (int)D_00170B13);
-    mc_sprintf(l_18, (int)D_00170B1E, D_0017D1F6);
-    *(signed char *)((char *)(strlen(l_18) + l_18) + 1) = 0;
+    mc_sprintf(prompt, (int)D_00170B1E, D_0017D1F6);
+    *(signed char *)((char *)(strlen(prompt) + prompt) + 1) = 0;
     inpstr_begin_text((int)selected_spell + 47, 24);
-    msgbox_show_string(l_18, 2);
+    msgbox_show_string(prompt, 2);
 }
 
 int spellmaker_element_fire(void)
@@ -265,17 +265,17 @@ int spellmaker_allowed_targets(void)
     return (int)(unsigned char)D_0019962F;
 }
 
-void spellmaker_allowed_targets_cb(unsigned char a1)
+void spellmaker_allowed_targets_cb(unsigned char effect_type)
 {
-    if (((int)(unsigned char)a1) == 255) return;
-    if (((int)(unsigned char)spell_effect_target_class[(int)(unsigned char)a1]) == 2) return;
-    D_0019962F = spell_effect_target_class[(int)(unsigned char)a1];
+    if (((int)(unsigned char)effect_type) == 255) return;
+    if (((int)(unsigned char)spell_effect_target_class[(int)(unsigned char)effect_type]) == 2) return;
+    D_0019962F = spell_effect_target_class[(int)(unsigned char)effect_type];
 }
 
 int spellmaker_buy(void)
 {
-    struct record *l_20;
-    int l_1C;
+    struct record *object;
+    int price;
 
     if (selected_spell->effects[0].type == 255 && selected_spell->effects[1].type == 255 && selected_spell->effects[2].type == 255) {
         return 0;
@@ -293,31 +293,31 @@ int spellmaker_buy(void)
         msgbox_show_rsc(1812, 1);
         return 0;
     }
-    l_1C = (selected_spell->effect_costs[0] + selected_spell->effect_costs[1]) + selected_spell->effect_costs[2];
-    l_1C = (((int)(short)*(short *)(spell_target_cost_factor + (selected_spell->target * 2))) * l_1C) * 2;
-    if (gold_can_afford(l_1C) == 0) {
+    price = (selected_spell->effect_costs[0] + selected_spell->effect_costs[1]) + selected_spell->effect_costs[2];
+    price = (((int)(short)*(short *)(spell_target_cost_factor + (selected_spell->target * 2))) * price) * 2;
+    if (gold_can_afford(price) == 0) {
         msgbox_show_rsc(1702, 1);
         return 0;
     }
-    l_20 = object_find_item(player_entity->children, 27, 0);
-    if (l_20 == 0) {
+    object = object_find_item(player_entity->children, 27, 0);
+    if (object == 0) {
         msgbox_show_string((int)D_00170B4C, 1);
         return 0;
     }
-    if (object_count_type(l_20->children, 9) > 128) {
+    if (object_count_type(object->children, 9) > 128) {
         msgbox_show_rsc(1709, 1);
         return 0;
     }
-    if (l_20 == 0) {
+    if (object == 0) {
         msgbox_show_rsc(1703, 1);
         return 0;
     }
-    gold_spend(l_1C);
+    gold_spend(price);
     spell_assign_new_id();
-    l_20 = object_create_child(l_20, 0, 89);
-    l_20->type = 9;
-    l_20->id = object_new_id(100);
-    mc_memcpy(&l_20->data.spell, (int)selected_spell, 89, (int)D_00170B13, 981, 4);
+    object = object_create_child(object, 0, 89);
+    object->type = 9;
+    object->id = object_new_id(100);
+    mc_memcpy(&object->data.spell, (int)selected_spell, 89, (int)D_00170B13, 981, 4);
     sound_play(206, (int)player_object, 110);
     spellmaker_new();
     msgbox_show_rsc(1705, 1);
@@ -346,83 +346,83 @@ int spellmaker_new(void)
     return 0;
 }
 
-void spellmaker_pick_subtype_cb(int a1)
+void spellmaker_pick_subtype_cb(int subtype)
 {
-    short l_18;
+    short effect_type;
 
-    l_18 = selected_spell->effects[(int)(short)spell_effect_slot].type;
-    mc_memcpy((int)spell_effect_cost_current, ((int)spell_effect_costs) + (((int)(unsigned char)*(signed char *)(spell_effect_cost_index + ((((int)(short)l_18) * 12) + ((int)(short)*(short *)&a1)))) << 3), 8, (int)D_00170B13, 1030, 8);
-    selected_spell->effects[(int)(short)spell_effect_slot].subtype = *(signed char *)&a1;
-    *(signed char *)spellmaker_settings_kind = *(signed char *)(spell_effect_settings + ((((int)(short)l_18) * 12) + ((int)(short)*(short *)&a1)));
+    effect_type = selected_spell->effects[(int)(short)spell_effect_slot].type;
+    mc_memcpy((int)spell_effect_cost_current, ((int)spell_effect_costs) + (((int)(unsigned char)*(signed char *)(spell_effect_cost_index + ((((int)(short)effect_type) * 12) + ((int)(short)*(short *)&subtype)))) << 3), 8, (int)D_00170B13, 1030, 8);
+    selected_spell->effects[(int)(short)spell_effect_slot].subtype = *(signed char *)&subtype;
+    *(signed char *)spellmaker_settings_kind = *(signed char *)(spell_effect_settings + ((((int)(short)effect_type) * 12) + ((int)(short)*(short *)&subtype)));
     D_00199628 = 0;
 }
 
-int spellmaker_find_effect(short a1)
+int spellmaker_find_effect(short effect_type)
 {
-    short l_18;
+    short i;
 
-    *(int *)&l_18 = 0;
-    for (; ((int)(short)l_18) < 3; (*(int *)&l_18)++) {
-        if ((short)((unsigned short)selected_spell->effects[(int)(short)l_18].type) == a1) {
-            return (int)(short)l_18;
+    *(int *)&i = 0;
+    for (; ((int)(short)i) < 3; (*(int *)&i)++) {
+        if ((short)((unsigned short)selected_spell->effects[(int)(short)i].type) == effect_type) {
+            return (int)(short)i;
         }
     }
     return -1;
 }
 
-void spellmaker_duration_base(short a1)
+void spellmaker_duration_base(short delta)
 {
-    spellmaker_adjust_value((int)((char *)selected_spell + 14 + (((int)(short)spell_effect_slot) * 3)), (int)(short)a1, 60, 0);
+    spellmaker_adjust_value((int)((char *)selected_spell + 14 + (((int)(short)spell_effect_slot) * 3)), (int)(short)delta, 60, 0);
 }
 
-void spellmaker_duration_plus(short a1)
+void spellmaker_duration_plus(short delta)
 {
-    spellmaker_adjust_value((int)((char *)selected_spell + 14 + (((int)(short)spell_effect_slot) * 3)) + 1, (int)(short)a1, 60, 0);
+    spellmaker_adjust_value((int)((char *)selected_spell + 14 + (((int)(short)spell_effect_slot) * 3)) + 1, (int)(short)delta, 60, 0);
 }
 
-void spellmaker_duration_per_level(short a1)
+void spellmaker_duration_per_level(short delta)
 {
-    spellmaker_adjust_value((int)((char *)selected_spell + 14 + (((int)(short)spell_effect_slot) * 3)) + 2, (int)(short)a1, 20, 0);
+    spellmaker_adjust_value((int)((char *)selected_spell + 14 + (((int)(short)spell_effect_slot) * 3)) + 2, (int)(short)delta, 20, 0);
 }
 
-void spellmaker_chance_base(short a1)
+void spellmaker_chance_base(short delta)
 {
-    spellmaker_adjust_value((int)((char *)selected_spell + 23 + (((int)(short)spell_effect_slot) * 3)), (int)(short)a1, 100, 0);
+    spellmaker_adjust_value((int)((char *)selected_spell + 23 + (((int)(short)spell_effect_slot) * 3)), (int)(short)delta, 100, 0);
 }
 
-void spellmaker_chance_plus(short a1)
+void spellmaker_chance_plus(short delta)
 {
-    spellmaker_adjust_value((int)((char *)selected_spell + 23 + (((int)(short)spell_effect_slot) * 3)) + 1, (int)(short)a1, 100, 0);
+    spellmaker_adjust_value((int)((char *)selected_spell + 23 + (((int)(short)spell_effect_slot) * 3)) + 1, (int)(short)delta, 100, 0);
 }
 
-void spellmaker_chance_per_level(short a1)
+void spellmaker_chance_per_level(short delta)
 {
-    spellmaker_adjust_value((int)((char *)selected_spell + 23 + (((int)(short)spell_effect_slot) * 3)) + 2, (int)(short)a1, 20, 0);
+    spellmaker_adjust_value((int)((char *)selected_spell + 23 + (((int)(short)spell_effect_slot) * 3)) + 2, (int)(short)delta, 20, 0);
 }
 
-void spellmaker_magnitude_base_min(short a1)
+void spellmaker_magnitude_base_min(short delta)
 {
-    spellmaker_adjust_value((int)((char *)selected_spell + 32 + (((int)(short)spell_effect_slot) * 5)), (int)(short)a1, 100, 1);
+    spellmaker_adjust_value((int)((char *)selected_spell + 32 + (((int)(short)spell_effect_slot) * 5)), (int)(short)delta, 100, 1);
 }
 
-void spellmaker_magnitude_base_max(short a1)
+void spellmaker_magnitude_base_max(short delta)
 {
-    spellmaker_adjust_value((int)((char *)selected_spell + 32 + (((int)(short)spell_effect_slot) * 5)) + 1, (int)(short)a1, 100, -1);
+    spellmaker_adjust_value((int)((char *)selected_spell + 32 + (((int)(short)spell_effect_slot) * 5)) + 1, (int)(short)delta, 100, -1);
 }
 
-void spellmaker_magnitude_plus_min(short a1)
+void spellmaker_magnitude_plus_min(short delta)
 {
-    spellmaker_adjust_value((int)((char *)selected_spell + 32 + (((int)(short)spell_effect_slot) * 5)) + 2, (int)(short)a1, 100, 1);
+    spellmaker_adjust_value((int)((char *)selected_spell + 32 + (((int)(short)spell_effect_slot) * 5)) + 2, (int)(short)delta, 100, 1);
 }
 
-void spellmaker_magnitude_plus_max(short a1)
+void spellmaker_magnitude_plus_max(short delta)
 {
-    spellmaker_adjust_value((int)((char *)selected_spell + 32 + (((int)(short)spell_effect_slot) * 5)) + 3, (int)(short)a1, 100, -1);
+    spellmaker_adjust_value((int)((char *)selected_spell + 32 + (((int)(short)spell_effect_slot) * 5)) + 3, (int)(short)delta, 100, -1);
 }
 
-void spellmaker_magnitude_per_level(short a1)
+void spellmaker_magnitude_per_level(short delta)
 {
-    spellmaker_adjust_value((int)((char *)selected_spell + 32 + (((int)(short)spell_effect_slot) * 5)) + 4, (int)(short)a1, 20, 0);
+    spellmaker_adjust_value((int)((char *)selected_spell + 32 + (((int)(short)spell_effect_slot) * 5)) + 4, (int)(short)delta, 20, 0);
 }
 
 void spellmaker_settings_close(void)
@@ -433,17 +433,17 @@ void spellmaker_settings_close(void)
 
 void spellmaker_effect_rows(void)
 {
-    short l_18;
+    short row;
 
-    *(int *)&l_18 = 0;
-    for (; ((int)(short)l_18) < 3; (*(int *)&l_18)++) {
-        if (selected_spell->effects[(int)(short)l_18].type == 255) continue;
-        if (((int)(unsigned char)(mouse_buttons & 2)) != 0 && mouse_buttons_prev != mouse_buttons && ((int)(short)mouse_y) > ((((int)(short)l_18) << 5) + 30) && ((int)(short)mouse_y) < (((((int)(short)l_18) << 5) + 30) + ((int)(short)font_height))) {
+    *(int *)&row = 0;
+    for (; ((int)(short)row) < 3; (*(int *)&row)++) {
+        if (selected_spell->effects[(int)(short)row].type == 255) continue;
+        if (((int)(unsigned char)(mouse_buttons & 2)) != 0 && mouse_buttons_prev != mouse_buttons && ((int)(short)mouse_y) > ((((int)(short)row) << 5) + 30) && ((int)(short)mouse_y) < (((((int)(short)row) << 5) + 30) + ((int)(short)font_height))) {
             D_001940D5 |= 1;
-            msgbox_show_rsc((int)(short)(spell_effect_text_index((int)(short)l_18) + 1200), 1);
+            msgbox_show_rsc((int)(short)(spell_effect_text_index((int)(short)row) + 1200), 1);
         }
-        if (((int)(unsigned char)(mouse_buttons & 1)) != 0 && mouse_buttons_prev != mouse_buttons && ((int)(short)mouse_y) > ((((int)(short)l_18) << 5) + 30) && ((int)(short)mouse_y) < (((((int)(short)l_18) << 5) + 30) + ((int)(short)font_height))) {
-            D_0019962C = *(int *)&l_18;
+        if (((int)(unsigned char)(mouse_buttons & 1)) != 0 && mouse_buttons_prev != mouse_buttons && ((int)(short)mouse_y) > ((((int)(short)row) << 5) + 30) && ((int)(short)mouse_y) < (((((int)(short)row) << 5) + 30) + ((int)(short)font_height))) {
+            D_0019962C = *(int *)&row;
             msgbox_choice_rsc(1708, 11, 10, 0, 101, 100, 0);
         }
     }
@@ -451,7 +451,7 @@ void spellmaker_effect_rows(void)
 
 int list_popup_poll(void)
 {
-    short l_18;
+    short choice;
 
     xn_draw_image((int)(short)D_00195F40, (int)(short)D_00195F3E, (int)(short)D_00195F42, (int)(short)D_00195F3C, *(int *)list_popup_image + 12);
     if (key_down_esc != 0) {
@@ -462,11 +462,11 @@ int list_popup_poll(void)
         picklist_free((int)list_popup_picklist);
         return -2;
     }
-    *(int *)&l_18 = picklist_poll((int)list_popup_picklist) - 1;
-    if (((int)(short)l_18) > (-1)) {
+    *(int *)&choice = picklist_poll((int)list_popup_picklist) - 1;
+    if (((int)(short)choice) > (-1)) {
         D_001940D4 &= 251;
         picklist_free((int)list_popup_picklist);
-        return (int)(short)l_18;
+        return (int)(short)choice;
     }
     picklist_draw((int)list_popup_picklist, 0);
     return -1;
@@ -474,14 +474,14 @@ int list_popup_poll(void)
 
 int spell_icon_cycle(void)
 {
-    short l_18;
+    short step;
 
     if (((int)(unsigned char)(mouse_buttons & 2)) != 0) {
-        *(int *)&l_18 = -1;
+        *(int *)&step = -1;
     } else {
-        *(int *)&l_18 = 1;
+        *(int *)&step = 1;
     }
-    selected_spell->icon = (selected_spell->icon + ((int)(short)l_18)) % 69;
+    selected_spell->icon = (selected_spell->icon + ((int)(short)step)) % 69;
     return 0;
 }
 
@@ -499,188 +499,188 @@ int spell_icon_prev(void)
 
 void spell_assign_new_id(void)
 {
-    int l_24;
-    int l_20;
-    unsigned char l_18;
-    short l_1C;
+    struct spell *spells;
+    int i;
+    unsigned char id;
+    short is_free;
 
-    *(int *)&l_1C = 0;
-    l_18 = 0;
-    l_24 = (int)spell_records;
-    while (l_1C == 0) {
-        *(int *)&l_1C = 1;
-        for (l_20 = 0; ((int)(short)*(short *)&l_20) < 128; l_20++) {
-            if (*(signed char *)((char *)((((int)(short)*(short *)&l_20) * 89) + l_24) + 47) == 0) continue;
-            if (*(unsigned char *)((char *)((((int)(short)*(short *)&l_20) * 89) + l_24) + 73) == l_18) {
-                l_18++;
-                *(int *)&l_1C = 0;
+    *(int *)&is_free = 0;
+    id = 0;
+    spells = spell_records;
+    while (is_free == 0) {
+        *(int *)&is_free = 1;
+        for (i = 0; ((int)(short)*(short *)&i) < 128; i++) {
+            if (spells[*(short *)&i].name[0] == 0) continue;
+            if (spells[*(short *)&i].id == id) {
+                id++;
+                *(int *)&is_free = 0;
                 break;
             }
         }
-        if (l_1C != 0 && spellbook_has_spell_id((int)(unsigned char)l_18) != 0) {
-            l_18++;
-            *(int *)&l_1C = 0;
+        if (is_free != 0 && spellbook_has_spell_id((int)(unsigned char)id) != 0) {
+            id++;
+            *(int *)&is_free = 0;
         }
     }
-    selected_spell->id = l_18;
+    selected_spell->id = id;
 }
 
-void spellbook_find_id_cb(struct record *a1)
+void spellbook_find_id_cb(struct record *object)
 {
-    if (((int)(unsigned char)(signed char)a1->type) != 9) return;
-    if ((signed char)a1->data.spell.id != D_00199630) return;
-    *(int *)scratch_object = (int)a1;
+    if (((int)(unsigned char)(signed char)object->type) != 9) return;
+    if ((signed char)object->data.spell.id != D_00199630) return;
+    *(int *)scratch_object = (int)object;
 }
 
-int spellbook_has_spell_id(unsigned char a1)
+int spellbook_has_spell_id(unsigned char id)
 {
-    struct record *l_20;
-    int l_24;
+    struct record *spellbook;
+    int found;
 
     *(int *)scratch_object = 0;
-    D_00199630 = a1;
-    l_20 = object_find_item(player_entity->children, 27, 0);
-    object_foreach(l_20->children, (int)spellbook_find_id_cb);
+    D_00199630 = id;
+    spellbook = object_find_item(player_entity->children, 27, 0);
+    object_foreach(spellbook->children, (int)spellbook_find_id_cb);
     if (*(int *)scratch_object != 0) {
-        l_24 = 1;
+        found = 1;
     } else {
-        l_24 = 0;
+        found = 0;
     }
-    return l_24;
+    return found;
 }
 
 struct spell *spells_pick_list(void)
 {
-    short l_20;
-    struct spell *l_28;
-    short l_18;
-    int l_2C;
-    short l_1C;
+    short choice;
+    struct spell *spells;
+    short i;
+    int names;
+    short unused;
 
-    l_2C = spells_std_name_list(0);
-    if (l_2C == 0) return 0;
+    names = spells_std_name_list(0);
+    if (names == 0) return 0;
     xn_font_select(4);
-    list_popup_open(l_2C);
-    l_28 = *(struct spell **)scratch_buffer;
+    list_popup_open(names);
+    spells = *(struct spell **)scratch_buffer;
     D_001940D4 |= 1;
     for (;;) {
         keys_world_actions();
         xn_mouse_poll_clamped();
-        *(int *)&l_20 = list_popup_update();
-        if (((int)(short)l_20) > (-1)) {
-            *(int *)&l_18 = 0;
-            while (l_28[(int)(short)l_18].name[0] == 0) (*(int *)&l_18)++;
-            while (l_20 != 0) {
-                (*(int *)&l_18)++;
-                while (l_28[(int)(short)l_18].name[0] == 0) (*(int *)&l_18)++;
-                (*(int *)&l_20)--;
+        *(int *)&choice = list_popup_update();
+        if (((int)(short)choice) > (-1)) {
+            *(int *)&i = 0;
+            while (spells[(int)(short)i].name[0] == 0) (*(int *)&i)++;
+            while (choice != 0) {
+                (*(int *)&i)++;
+                while (spells[(int)(short)i].name[0] == 0) (*(int *)&i)++;
+                (*(int *)&choice)--;
             }
-            return &l_28[(int)(short)l_18];
+            return &spells[(int)(short)i];
         }
-        if (((int)(short)l_20) == (-2)) return 0;
+        if (((int)(short)choice) == (-2)) return 0;
         xn_mouse_cursor_move((int)(short)mouse_x, (int)(short)mouse_y);
         mc_memcpy(655360, screen_buffer, 64000, (int)D_00170B13, 1560, 4);
     }
 }
 
-int spells_std_name_list(int a1)
+int spells_std_name_list(int ids)
 {
-    int l_30;
-    short l_20;
-    struct spell *l_28;
-    short l_18;
-    int l_2C;
-    short l_1C;
+    int names;
+    short id_count;
+    struct spell *spells;
+    short i;
+    int text;
+    short count;
 
-    if (a1 != 0) *(int *)&l_20 = memchr(a1, 255, 1000) - a1;
-    l_30 = *(int *)scratch_buffer + 20000;
-    l_2C = *(int *)scratch_buffer + 21000;
-    l_28 = *(struct spell **)scratch_buffer;
+    if (ids != 0) *(int *)&id_count = memchr(ids, 255, 1000) - ids;
+    names = *(int *)scratch_buffer + 20000;
+    text = *(int *)scratch_buffer + 21000;
+    spells = *(struct spell **)scratch_buffer;
     disk_read_file((int)D_00170B69, *(int *)scratch_buffer);
-    *(int *)&l_18 = 0;
-    *(int *)&l_1C = *(int *)&l_18;
-    for (; ((int)(short)l_18) < 128; (*(int *)&l_18)++) {
-        if (l_28[(int)(short)l_18].name[0] == 0) continue;
-        if (a1 != 0) if (memchr(a1, l_28[(int)(short)l_18].id, (int)(short)l_20) == 0) continue;
-        mc_strncpy(l_2C, (int)l_28[(int)(short)l_18].name, 4, (int)D_00170B13, 1587);
-        *(int *)((char *)(int)((char *)l_30 + (((int)(short)(*(int *)&l_1C)++) << 2))) = l_2C;
-        l_2C += strlen(l_2C) + 1;
+    *(int *)&i = 0;
+    *(int *)&count = *(int *)&i;
+    for (; ((int)(short)i) < 128; (*(int *)&i)++) {
+        if (spells[(int)(short)i].name[0] == 0) continue;
+        if (ids != 0) if (memchr(ids, spells[(int)(short)i].id, (int)(short)id_count) == 0) continue;
+        mc_strncpy(text, (int)spells[(int)(short)i].name, 4, (int)D_00170B13, 1587);
+        *(int *)((char *)(int)((char *)names + (((int)(short)(*(int *)&count)++) << 2))) = text;
+        text += strlen(text) + 1;
     }
-    *(int *)((char *)((((int)(short)l_1C) << 2) + l_30)) = 0;
-    if (l_1C == 0) return 0;
-    return l_30;
+    *(int *)((char *)((((int)(short)count) << 2) + names)) = 0;
+    if (count == 0) return 0;
+    return names;
 }
 
 void spells_std_delete(void)
 {
-    struct spell *l_18;
+    struct spell *spell;
 
-    l_18 = spells_pick_list();
-    if (l_18 == 0) return;
-    l_18->name[0] = 0;
+    spell = spells_pick_list();
+    if (spell == 0) return;
+    spell->name[0] = 0;
     disk_write_arena2_file((int)D_00170B69, *(int *)scratch_buffer, 11392);
 }
 
 void spells_std_edit(void)
 {
-    struct spell *l_18;
+    struct spell *spell;
 
-    l_18 = spells_pick_list();
-    if (l_18 == 0) return;
-    mc_memcpy((int)selected_spell, l_18, 89, (int)D_00170B13, 1654, 4);
-    l_18->name[0] = 0;
+    spell = spells_pick_list();
+    if (spell == 0) return;
+    mc_memcpy((int)selected_spell, spell, 89, (int)D_00170B13, 1654, 4);
+    spell->name[0] = 0;
     disk_write_arena2_file((int)D_00170B69, *(int *)scratch_buffer, 11392);
 }
 
 void spells_std_append(void)
 {
-    struct spell *l_18;
+    struct spell *spell;
 
     spell_assign_new_id();
-    l_18 = *(struct spell **)scratch_buffer;
+    spell = *(struct spell **)scratch_buffer;
     disk_read_file((int)D_00170B69, *(int *)scratch_buffer);
-    while (l_18->name[0] != 0) l_18++;
-    mc_memcpy(l_18, (int)selected_spell, 89, (int)D_00170B13, 1667, 4);
+    while (spell->name[0] != 0) spell++;
+    mc_memcpy(spell, (int)selected_spell, 89, (int)D_00170B13, 1667, 4);
     disk_write_arena2_file((int)D_00170B69, *(int *)scratch_buffer, 11392);
     msgbox_show_rsc(1706, 1);
 }
 
-int spell_cost(struct spell *a1, struct character *a2)
+int spell_cost(struct spell *spell, struct character *caster)
 {
-    int l_24;
-    int l_20;
-    int l_1C;
-    int l_18;
+    int i;
+    int effect_cost;
+    int total;
+    int saved_slot;
 
-    l_1C = 0;
-    l_18 = (int)(short)spell_effect_slot;
-    selected_spell = a1;
-    for (l_24 = 0; l_24 < 3; l_24++) {
-        if (a1->effects[l_24].type == 255) continue;
-        spell_effect_slot = l_24;
-        if (a1->effects[l_24].subtype != 255) {
-            mc_memcpy((int)spell_effect_cost_current, ((int)spell_effect_costs) + (((int)(unsigned char)*(signed char *)(spell_effect_cost_index + ((a1->effects[l_24].type * 12) + a1->effects[l_24].subtype))) << 3), 8, (int)D_00170B13, 1684, 8);
+    total = 0;
+    saved_slot = (int)(short)spell_effect_slot;
+    selected_spell = spell;
+    for (i = 0; i < 3; i++) {
+        if (spell->effects[i].type == 255) continue;
+        spell_effect_slot = i;
+        if (spell->effects[i].subtype != 255) {
+            mc_memcpy((int)spell_effect_cost_current, ((int)spell_effect_costs) + (((int)(unsigned char)*(signed char *)(spell_effect_cost_index + ((spell->effects[i].type * 12) + spell->effects[i].subtype))) << 3), 8, (int)D_00170B13, 1684, 8);
         } else {
-            mc_memcpy((int)spell_effect_cost_current, ((int)spell_effect_costs) + (((int)(unsigned char)*(signed char *)(spell_effect_cost_index + (a1->effects[l_24].type * 12))) << 3), 8, (int)D_00170B13, 1686, 8);
+            mc_memcpy((int)spell_effect_cost_current, ((int)spell_effect_costs) + (((int)(unsigned char)*(signed char *)(spell_effect_cost_index + (spell->effects[i].type * 12))) << 3), 8, (int)D_00170B13, 1686, 8);
         }
-        if (a1->effects[l_24].type >= 51) l_1C++;
-        l_20 = spell_cost_formula_dispatch(((int)(unsigned char)*(signed char *)(spell_effect_cost_formula + a1->effects[l_24].type)) - 1);
-        l_20 = ((110 - a2->skills[(int)(unsigned char)magic_school_skills[(int)(unsigned char)spell_effect_school[a1->effects[l_24].type]]].value) * l_20) / 100;
-        l_1C += l_20;
+        if (spell->effects[i].type >= 51) total++;
+        effect_cost = spell_cost_formula_dispatch(((int)(unsigned char)*(signed char *)(spell_effect_cost_formula + spell->effects[i].type)) - 1);
+        effect_cost = ((110 - caster->skills[(int)(unsigned char)magic_school_skills[(int)(unsigned char)spell_effect_school[spell->effects[i].type]]].value) * effect_cost) / 100;
+        total += effect_cost;
     }
-    spell_effect_slot = l_18;
-    l_24 = (((int)(short)*(short *)(spell_target_cost_factor + (a1->target * 2))) * l_1C) >> 1;
-    if (l_24 < 5) l_24 = 5;
-    return l_24;
+    spell_effect_slot = saved_slot;
+    i = (((int)(short)*(short *)(spell_target_cost_factor + (spell->target * 2))) * total) >> 1;
+    if (i < 5) i = 5;
+    return i;
 }
 
-void spell_add_skill_uses(struct spell *a1, int a2)
+void spell_add_skill_uses(struct spell *spell, int uses)
 {
-    int l_14;
+    int i;
 
-    for (l_14 = 0; l_14 < 3; l_14++) {
-        if (a1->effects[l_14].type != 255) {
-            skill_add_uses((int)(unsigned char)magic_school_skills[(int)(unsigned char)spell_effect_school[a1->effects[l_14].type]], a2);
+    for (i = 0; i < 3; i++) {
+        if (spell->effects[i].type != 255) {
+            skill_add_uses((int)(unsigned char)magic_school_skills[(int)(unsigned char)spell_effect_school[spell->effects[i].type]], uses);
         }
     }
 }

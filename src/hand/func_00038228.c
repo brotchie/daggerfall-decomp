@@ -22,11 +22,11 @@ extern int mc_strncpy();
 extern int strlen();
 extern int mc_memcpy();
 
-void spellmaker_pick_effect_cb(short a1)
+void spellmaker_pick_effect_cb(short effect_type)
 {
     short j;
 
-    selected_spell->effects[spell_effect_slot = spellmaker_find_effect(255)].type = a1;
+    selected_spell->effects[spell_effect_slot = spellmaker_find_effect(255)].type = effect_type;
     if (func_00037AB7() == 0)
         selected_spell->element = 4;
     j = spellmaker_allowed_targets();
@@ -36,19 +36,19 @@ void spellmaker_pick_effect_cb(short a1)
         if (j == 1 && selected_spell->target == 0)
             (selected_spell->target)++;
     }
-    if (*(int *)(spell_effect_subtype_names + a1 * 48) == 0) {
-        mc_memcpy(spell_effect_cost_current, spell_effect_costs + (*(unsigned char *)(spell_effect_cost_index + a1 * 12) << 3), 8, D_00170B13, 1058, 8);
+    if (*(int *)(spell_effect_subtype_names + effect_type * 48) == 0) {
+        mc_memcpy(spell_effect_cost_current, spell_effect_costs + (*(unsigned char *)(spell_effect_cost_index + effect_type * 12) << 3), 8, D_00170B13, 1058, 8);
         D_00199628 = 0;
-        *(char *)spellmaker_settings_kind = *(char *)(spell_effect_settings + a1 * 12);
+        *(char *)spellmaker_settings_kind = *(char *)(spell_effect_settings + effect_type * 12);
     } else {
         char *s;
 
         s = *(char **)scratch_buffer;
         *s = 0;
         j = 0;
-        while (*(int *)(spell_effect_subtype_names + a1 * 48 + j * 4) != 0) {
+        while (*(int *)(spell_effect_subtype_names + effect_type * 48 + j * 4) != 0) {
             *(*(char **)scratch_buffer + j + 32000) = j;
-            mc_strncpy(s, *(int *)(spell_effect_subtype_names + a1 * 48 + j++ * 4), 4, D_00170B13, 1071);
+            mc_strncpy(s, *(int *)(spell_effect_subtype_names + effect_type * 48 + j++ * 4), 4, D_00170B13, 1071);
             s = s + strlen(s) + 1;
         }
         *s = 0;

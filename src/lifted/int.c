@@ -11,57 +11,57 @@ extern int segread();
 extern unsigned short _FP_SEG( const volatile void __far * );
 #pragma aux _FP_SEG = parm caller [eax dx] value [dx] modify exact [];
 
-void dpmi_get_free_memory(int a1)
+void dpmi_get_free_memory(int info)
 {
 {
-    char l_40[28];
-    char l_24[12];
+    char regs[28];
+    char sregs[12];
 
-    mc_memset((int)l_24, 0, 12, (int)D_00177348, 39, 4);
-    *(int *)l_40 = 1280;
-    *(int *)((char *)l_40 + 20) = a1;
-    *(short *)l_24 = _FP_SEG((void *)a1);
-    int386x(49, (int)l_40, (int)l_40, (int)l_24);
+    mc_memset((int)sregs, 0, 12, (int)D_00177348, 39, 4);
+    *(int *)regs = 1280;
+    *(int *)((char *)regs + 20) = info;
+    *(short *)sregs = _FP_SEG((void *)info);
+    int386x(49, (int)regs, (int)regs, (int)sregs);
 }
 }
 
-int dpmi_lock_region(int a1, int a2)
+int dpmi_lock_region(int address, int size)
 {
-    char l_38[28];
+    char regs[28];
 
-    if (a1 == 0 || a2 == 0) return 0;
-    mc_memset((int)l_38, 0, 28, (int)D_00177348, 66, 4);
-    *(short *)l_38 = 1536;
-    *(short *)((char *)l_38 + 4) = a1 >> 16;
-    *(short *)((char *)l_38 + 8) = a1;
-    *(short *)((char *)l_38 + 16) = a2 >> 16;
-    *(short *)((char *)l_38 + 20) = a2;
-    int386(49, (int)l_38, (int)l_38);
-    return *(int *)((char *)l_38 + 24) & 1;
+    if (address == 0 || size == 0) return 0;
+    mc_memset((int)regs, 0, 28, (int)D_00177348, 66, 4);
+    *(short *)regs = 1536;
+    *(short *)((char *)regs + 4) = address >> 16;
+    *(short *)((char *)regs + 8) = address;
+    *(short *)((char *)regs + 16) = size >> 16;
+    *(short *)((char *)regs + 20) = size;
+    int386(49, (int)regs, (int)regs);
+    return *(int *)((char *)regs + 24) & 1;
 }
 
-int dpmi_unlock_region(int a1, int a2)
+int dpmi_unlock_region(int address, int size)
 {
-    char l_38[28];
+    char regs[28];
 
-    if (a1 == 0 || a2 == 0) return 0;
-    mc_memset((int)l_38, 0, 28, (int)D_00177348, 86, 4);
-    *(short *)l_38 = 1537;
-    *(short *)((char *)l_38 + 4) = a1 >> 16;
-    *(short *)((char *)l_38 + 8) = a1;
-    *(short *)((char *)l_38 + 16) = a2 >> 16;
-    *(short *)((char *)l_38 + 20) = a2;
-    int386(49, (int)l_38, (int)l_38);
-    return *(int *)((char *)l_38 + 24) & 1;
+    if (address == 0 || size == 0) return 0;
+    mc_memset((int)regs, 0, 28, (int)D_00177348, 86, 4);
+    *(short *)regs = 1537;
+    *(short *)((char *)regs + 4) = address >> 16;
+    *(short *)((char *)regs + 8) = address;
+    *(short *)((char *)regs + 16) = size >> 16;
+    *(short *)((char *)regs + 20) = size;
+    int386(49, (int)regs, (int)regs);
+    return *(int *)((char *)regs + 24) & 1;
 }
 
 void causeway_disable_error_dump(void)
 {
-    char l_3C[28];
-    char l_20[12];
+    char regs[28];
+    char sregs[12];
 
-    segread((int)l_20);
-    *(signed char *)((char *)l_3C + 8) = 0;
-    *(short *)l_3C = 65328;
-    int386x(49, (int)l_3C, (int)l_3C, (int)l_20);
+    segread((int)sregs);
+    *(signed char *)((char *)regs + 8) = 0;
+    *(short *)regs = 65328;
+    int386x(49, (int)regs, (int)regs, (int)sregs);
 }

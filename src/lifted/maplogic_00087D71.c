@@ -1,40 +1,41 @@
 /* maplogic.c: functions first lifted from the assembly by tools/lift_all.py (2026-10), now
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
+#include "records.h"
 
 extern char D_00176C94[];
 extern int region_location_count;
-extern char region_locations[];
+extern struct map_location *region_locations;
 
 extern int location_has_service(int, int, int);
 extern int rand();
 extern int mc_memset();
-extern void location_load_exterior(int, int);
-extern void location_free(int);
+extern void location_load_exterior(struct loaded_location *, int);
+extern void location_free(struct loaded_location *);
 
-void location_pick_random_with_service(int a1, int a2, int a3)
+void location_pick_random_with_service(struct loaded_location *location, int kind, int sub_kind)
 {
-    int l_1C;
-    int l_18;
-    int l_14;
-    int l_10;
+    struct map_location *map_location;
+    int i;
+    int count;
+    int pick;
 
-    l_1C = *(int *)region_locations;
-    l_14 = 0;
-    mc_memset(a1, 0, 20, (int)D_00176C94, 952, 4);
-    for (l_18 = 0; l_18 < region_location_count; l_18++, (*(char (**)[17])&l_1C)++) {
-        l_14 += location_has_service(l_1C + 13, a2, a3);
+    map_location = region_locations;
+    count = 0;
+    mc_memset(location, 0, 20, (int)D_00176C94, 952, 4);
+    for (i = 0; i < region_location_count; i++, map_location++) {
+        count += location_has_service((int)&map_location->services, kind, sub_kind);
     }
-    if (l_14 == 0) {
-        location_free(a1);
+    if (count == 0) {
+        location_free(location);
         return;
     }
-    l_1C = *(int *)region_locations;
-    l_10 = (rand() % l_14) + 1;
-    for (l_18 = 0; l_18 < region_location_count; l_18++, (*(char (**)[17])&l_1C)++) {
-        l_10 -= location_has_service(l_1C + 13, a2, a3);
-        if (l_10 == 0) {
-            location_load_exterior(a1, l_18);
+    map_location = region_locations;
+    pick = (rand() % count) + 1;
+    for (i = 0; i < region_location_count; i++, map_location++) {
+        pick -= location_has_service((int)&map_location->services, kind, sub_kind);
+        if (pick == 0) {
+            location_load_exterior(location, i);
             return;
         }
     }

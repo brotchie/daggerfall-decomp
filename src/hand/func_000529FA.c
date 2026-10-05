@@ -9,7 +9,7 @@ extern char D_00175404[];        /* __FILE__ */
 extern void mc_memset(unsigned char *, int, int, char *, int, int);
 extern void mc_memcpy(unsigned char *, unsigned char *, int, char *, int, int);
 
-void flc_decode_lc(unsigned char *a1, struct image *a2)
+void flc_decode_lc(unsigned char *chunk, struct image *image)
 {
     short y;
     short j;
@@ -19,26 +19,26 @@ void flc_decode_lc(unsigned char *a1, struct image *a2)
     unsigned char nruns;
     signed char cnt;
 
-    top = *(short *)a1;
-    h = *(short *)(a1 + 2);
-    a1 += 4;
+    top = *(short *)chunk;
+    h = *(short *)(chunk + 2);
+    chunk += 4;
     for (y = top; y < top + h; y++) {
-        nruns = *a1;
-        a1++;
+        nruns = *chunk;
+        chunk++;
         if (nruns != 0) {
-            col = (short)*a1 & 255;
-            a1++;
+            col = (short)*chunk & 255;
+            chunk++;
             for (j = 0; j < nruns; j++) {
-                cnt = *a1;
-                a1++;
+                cnt = *chunk;
+                chunk++;
                 if (cnt < 0) {
-                    mc_memset(a2->data + a2->pitch * y + col, *a1, -cnt, D_00175404, 492, 4);
+                    mc_memset(image->data + image->pitch * y + col, *chunk, -cnt, D_00175404, 492, 4);
                     col -= cnt;
-                    a1++;
+                    chunk++;
                 } else if (cnt > 0) {
-                    mc_memcpy(a2->data + a2->pitch * y + col, a1, cnt, D_00175404, 498, 4);
+                    mc_memcpy(image->data + image->pitch * y + col, chunk, cnt, D_00175404, 498, 4);
                     col += cnt;
-                    a1 += cnt;
+                    chunk += cnt;
                 }
             }
         }

@@ -8,10 +8,10 @@ extern struct record *found_object;
 extern void guild_match_membership(void);
 extern void object_foreach(struct record *, void (*)(void));
 
-struct membership *guild_find_membership_by_faction(short a1)
+struct membership *guild_find_membership_by_faction(short faction_id)
 {
     found_object = 0;
-    guild_search_faction = a1;
+    guild_search_faction = faction_id;
     scratch_190d20 = 255;
     object_foreach(player_entity->children, guild_match_membership);
     if (found_object == 0)

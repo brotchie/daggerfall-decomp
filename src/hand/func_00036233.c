@@ -43,62 +43,62 @@ extern void xn_model_set_angles(int, int, int, int *);
 extern struct res *xn_tex_cache_lookup(int, int, int);
 extern void xn_tex_cache_flush(void);
 
-void rdb_create_objects(struct record *a1, struct node *a2, int a3)
+void rdb_create_objects(struct record *quarter, struct node *rdb_object, int block_index)
 {
-    int l_30;
-    struct record *obj;
+    int unused1;
+    struct record *object;
     struct sub *sub;
     struct res *res;
-    int l_20;
-    int l_1C;
-    int off;
-    int l_14;
-    int h;
+    int unused2;
+    int unused3;
+    int offset;
+    int unused4;
+    int height;
 
     do {
-        off = (char *)a2 - D_001995E8;
-        switch (a2->kind) {
+        offset = (char *)rdb_object - D_001995E8;
+        switch (rdb_object->kind) {
         case 1:
-            D_0019960C = (struct place *)(D_001995E8 + a2->data);
+            D_0019960C = (struct place *)(D_001995E8 + rdb_object->data);
             if (D_0019960C->f19 <= 0)
                 func_000361B7(D_0019960C);
-            obj = object_create_in_block(a1, 6, 62, 0, a3);
-            rdb_model_id_from_name(obj, D_00199604->name[D_0019960C->f12]);
-            if ((obj->image2 == 703 || obj->image2 == 704) && (D_00199608->dx || D_00199608->dz)) {
-                object_free_single(obj);
-                obj = 0;
+            object = object_create_in_block(quarter, 6, 62, 0, block_index);
+            rdb_model_id_from_name(object, D_00199604->name[D_0019960C->f12]);
+            if ((object->image2 == 703 || object->image2 == 704) && (D_00199608->dx || D_00199608->dz)) {
+                object_free_single(object);
+                object = 0;
                 break;
             }
-            obj->wait_state = 0;
-            xn_model_set_angles(D_0019960C->x, D_0019960C->y, D_0019960C->z, (int *)(RECORD_DATA(obj) + 12));
-            if (obj->image2 == 550) {
-                obj->type = 32;
-                obj->lock_level = D_0017A834[D_0019960C->f14 >> 4];
+            object->wait_state = 0;
+            xn_model_set_angles(D_0019960C->x, D_0019960C->y, D_0019960C->z, (int *)(RECORD_DATA(object) + 12));
+            if (object->image2 == 550) {
+                object->type = 32;
+                object->lock_level = D_0017A834[D_0019960C->f14 >> 4];
             }
             break;
         case 2:
-            D_001995F4 = (struct spot *)(D_001995E8 + a2->data);
-            obj = object_create_in_block(a1, 7, 0, D_001995F4->f0, a3);
-            obj->light_radius = D_001995F4->f8;
+            D_001995F4 = (struct spot *)(D_001995E8 + rdb_object->data);
+            object = object_create_in_block(quarter, 7, 0, D_001995F4->f0, block_index);
+            object->light_radius = D_001995F4->f8;
             break;
         case 3:
-            D_001995F0 = (struct rdb_flat *)(D_001995E8 + a2->data);
+            D_001995F0 = (struct rdb_flat *)(D_001995E8 + rdb_object->data);
             if ((D_001995F0->f0 >> 7) == 199) {
                 switch ((D_001995F0->f0 & 31) - 2) {
                 case 14:
-                    obj = rmb_make_marker(a1, D_001995F0->f0);
-                    obj->trigger_range = D_001995F0->f5;
-                    obj->mobile_id = D_001995F0->f4;
-                    obj->link_flag = D_001995F0->f2;
-                    obj->wait_state = D_001995F0->f10;
+                    object = rmb_make_marker(quarter, D_001995F0->f0);
+                    object->trigger_range = D_001995F0->f5;
+                    object->mobile_id = D_001995F0->f4;
+                    object->link_flag = D_001995F0->f2;
+                    object->wait_state = D_001995F0->f10;
                     break;
                 case 13:
-                    obj = rmb_make_marker(a1, D_001995F0->f0);
-                    obj->trigger_range = D_001995F0->f5;
-                    obj->mobile_id = D_001995F0->f2;
-                    if (obj->mobile_id == 0)
-                        obj->mobile_id = rand_range(1, 6);
-                    obj->wait_state = D_001995F0->f10;
+                    object = rmb_make_marker(quarter, D_001995F0->f0);
+                    object->trigger_range = D_001995F0->f5;
+                    object->mobile_id = D_001995F0->f2;
+                    if (object->mobile_id == 0)
+                        object->mobile_id = rand_range(1, 6);
+                    object->wait_state = D_001995F0->f10;
                     break;
                 case 8:
                     if (D_001995F0->f2 != 0)
@@ -107,44 +107,44 @@ void rdb_create_objects(struct record *a1, struct node *a2, int a3)
                         D_001995FC = -(D_001995F0->f5 << 3);
                     D_001962A1 = D_001995F0->f4;
                     if ((D_00199608->flags & 4) == 0) {
-                        obj = 0;
+                        object = 0;
                         break;
                     }
                 default:
-                    obj = rmb_make_marker(a1, D_001995F0->f0);
+                    object = rmb_make_marker(quarter, D_001995F0->f0);
                     break;
                 }
             } else if (D_001995F0->f10 == 29) {
-                obj = rmb_make_flat(a1, D_001995F0->f0, D_001995F0->f4 + (D_001995F0->f5 << 8), 0);
-                sub = (struct sub *)RECORD_DATA(obj);
+                object = rmb_make_flat(quarter, D_001995F0->f0, D_001995F0->f4 + (D_001995F0->f5 << 8), 0);
+                sub = (struct sub *)RECORD_DATA(object);
                 if (D_001995F0->f2 & 16)
                     sub->f2 |= 32;
                 if (D_001995F0->f2 & 32)
                     sub->f2 |= 16;
                 sub->f0 = (D_001995F0->f5 << 8) + D_001995F0->f4;
             } else {
-                obj = object_create_in_block(a1, 33, 0, D_001995F0->f0, a3);
+                object = object_create_in_block(quarter, 33, 0, D_001995F0->f0, block_index);
             }
             break;
         }
-        if (obj != 0) {
-            D_001985D4[D_00199614].off = off;
-            D_001985D4[D_00199614].id = obj->id;
+        if (object != 0) {
+            D_001985D4[D_00199614].off = offset;
+            D_001985D4[D_00199614].id = object->id;
             if (D_00199614++ > 512)
                 fatal_error(D_00170AD2);
-            obj->x = location_object->x + a2->x + (D_00199608->dx << 11);
-            obj->y = location_object->y + a2->y;
-            obj->z = location_object->z + a2->z + (D_00199608->dz << 11);
-            if (a2->kind == 3) {
-                res = xn_tex_cache_lookup(obj->image >> 7, obj->image & 127, 0);
+            object->x = location_object->x + rdb_object->x + (D_00199608->dx << 11);
+            object->y = location_object->y + rdb_object->y;
+            object->z = location_object->z + rdb_object->z + (D_00199608->dz << 11);
+            if (rdb_object->kind == 3) {
+                res = xn_tex_cache_lookup(object->image >> 7, object->image & 127, 0);
                 if (res == 0) {
                     xn_tex_cache_flush();
-                    res = xn_tex_cache_lookup(obj->image >> 7, obj->image & 127, 0);
+                    res = xn_tex_cache_lookup(object->image >> 7, object->image & 127, 0);
                 }
-                h = res->anim->f6 * (res->anim->f24 + 256) / 256;
-                obj->y += h >> 1;
+                height = res->anim->f6 * (res->anim->f24 + 256) / 256;
+                object->y += height >> 1;
             }
         }
-        a2 = (struct node *)(D_001995E8 + a2->next);
-    } while ((char *)a2 - D_001995E8 > 0);
+        rdb_object = (struct node *)(D_001995E8 + rdb_object->next);
+    } while ((char *)rdb_object - D_001995E8 > 0);
 }

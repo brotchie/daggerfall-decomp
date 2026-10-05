@@ -68,26 +68,26 @@ extern int spawn_point_town(struct record *, int, int);
 extern int spawn_point_building(struct record *);
 extern int spawn_point_dungeon(struct record *, int, int);
 
-int spawn_find_point(struct record *a1, int a2, int a3)
+int spawn_find_point(struct record *object, int min_distance, int max_distance)
 {
     int r;
 
     switch (player_environment) {
     case 1:
         if (location_object->image == 0xffff)
-            r = spawn_point_wilderness(a1);
+            r = spawn_point_wilderness(object);
         else
-            r = spawn_point_town(a1, a2, a3);
+            r = spawn_point_town(object, min_distance, max_distance);
         break;
     case 2:
-        r = spawn_point_building(a1);
+        r = spawn_point_building(object);
         break;
     case 3:
-        r = spawn_point_dungeon(a1, a2, a3);
+        r = spawn_point_dungeon(object, min_distance, max_distance);
         break;
     }
     if (r == 0)
-        a1->x = a1->y = a1->z = 0;
+        object->x = object->y = object->z = 0;
     return r;
 }
 

@@ -4,7 +4,7 @@
 
 
 
-int climb_angle_ok(int a1)
+int climb_angle_ok(int wall_cos)
 {
-    return (((a1 == 0) || ((a1 > 250) && (a1 < 265))) ? 1 : 0);
+    return (((wall_cos == 0) || ((wall_cos > 250) && (wall_cos < 265))) ? 1 : 0);
 }

@@ -11,25 +11,25 @@ struct stream {
     unsigned char f0;
     unsigned char flags;
     char pad2[130];
-    char *start;
-    int len;
+    char *buffer;                   /* +0x84 */
+    int length;                     /* +0x88 */
     char pad8c[16];
-    char *buf;
+    char *item;                     /* +0x9C: the found item's line */
 };
 #pragma pack()
 
-int profile_delete_item(struct stream *s, int a2)
+int profile_delete_item(struct stream *profile, int item)
 {
-    char *p;
-    int n;
+    char *line;
+    int length;
 
-    n = 0;
-    if ((short)profile_find_item(s, a2) == 0) return 0;
-    p = s->buf;
-    while (p[n] != 10) n++;
-    n++;
-    mc_memmove(p, p + n, s->start + s->len - (p + n), D_00170129, 1119, 4);
-    s->len -= n;
-    s->flags |= 128;
+    length = 0;
+    if ((short)profile_find_item(profile, item) == 0) return 0;
+    line = profile->item;
+    while (line[length] != 10) length++;
+    length++;
+    mc_memmove(line, line + length, profile->buffer + profile->length - (line + length), D_00170129, 1119, 4);
+    profile->length -= length;
+    profile->flags |= 128;
     return 1;
 }

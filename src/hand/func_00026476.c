@@ -11,15 +11,15 @@ extern int rand_range(int, int);
 void loan_collectors_update(void)
 {
     int i;
-    struct bank_account *p;
+    struct bank_account *account;
 
     if (player_environment == 3) return;
     if (loan_collectors_next > game_minutes) return;
     loan_collectors_next = game_minutes + rand_range(1400, 1700);
-    p = bank_accounts->data.bank_accounts;
+    account = bank_accounts->data.bank_accounts;
     for (i = 0; i < 62; i++) {
-        if (p->loan_due == 0) continue;
-        if (p->loan_due < game_minutes)
+        if (account->loan_due == 0) continue;
+        if (account->loan_due < game_minutes)
             loan_spawn_collectors();
     }
 }

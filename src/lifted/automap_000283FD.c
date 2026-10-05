@@ -2,34 +2,34 @@
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
 
-extern char scratch_buffer[];
+extern char *scratch_buffer;
 extern int town_map_view_x;
 extern int town_map_view_y;
 
-extern int font_text_width(int);
+extern int font_text_width(char *);
 extern int strlen();
 
-int town_note_at(int a1, int a2)
+int town_note_at(int x, int y)
 {
-    int l_2C;
-    int l_28;
-    int l_24;
-    int l_20;
-    int l_1C;
-    int l_18;
+    int index;
+    int length;
+    int note_x;
+    int note_y;
+    char *note;
+    char *entry;
 
-    l_2C = 0;
-    l_1C = *(int *)scratch_buffer + 4;
-    while (*(short *)((char *)l_1C) != 0) {
-        l_18 = l_1C;
-        l_24 = ((((int)(unsigned short)*(short *)((char *)l_18)) - town_map_view_x) * 2) + 10;
-        l_20 = ((((int)(unsigned short)*(short *)((char *)l_18 + 2)) - town_map_view_y) * 2) + 10;
-        if (a1 >= l_24 && a2 >= l_20 && (font_text_width(l_1C + 4) + l_24) >= a1 && (l_20 + 6) >= a2) {
-            return l_2C + 1;
+    index = 0;
+    note = scratch_buffer + 4;
+    while (*(short *)note != 0) {
+        entry = note;
+        note_x = ((((int)(unsigned short)*(short *)entry) - town_map_view_x) * 2) + 10;
+        note_y = ((((int)(unsigned short)*(short *)(entry + 2)) - town_map_view_y) * 2) + 10;
+        if (x >= note_x && y >= note_y && (font_text_width(note + 4) + note_x) >= x && (note_y + 6) >= y) {
+            return index + 1;
         }
-        l_2C++;
-        l_28 = strlen(l_1C + 4);
-        l_1C += l_28 + 5;
+        index++;
+        length = strlen(note + 4);
+        note += length + 5;
     }
     return 0;
 }

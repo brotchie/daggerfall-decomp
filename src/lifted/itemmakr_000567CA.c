@@ -8,11 +8,11 @@ extern char inv_left_container[];
 extern signed char inv_tab;
 
 
-void itemmaker_select_tab(int a1)
+void itemmaker_select_tab(int tab)
 {
-    a1 += -15;
-    if (*(int *)(inventory_containers + (a1 << 2)) == 0) return;
-    inv_tab = *(signed char *)&a1;
+    tab += -15;
+    if (*(int *)(inventory_containers + (tab << 2)) == 0) return;
+    inv_tab = *(signed char *)&tab;
     *(int *)inv_left_container = *(int *)(inventory_containers + (((int)(unsigned char)inv_tab) << 2));
     *(int *)inv_left_scroll = 0;
 }

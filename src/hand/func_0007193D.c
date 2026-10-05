@@ -58,8 +58,8 @@ extern int mc_sprintf(int, ...);
 
 void rest_update(void)
 {
-    int l_34;
-    int l_30;
+    int max_hours;
+    int prompt;
 
 
     D_0019629E = 0;
@@ -102,12 +102,12 @@ void rest_update(void)
                 *(int *)rest_image = -1751672937;
             }
             *(int *)rest_image = disk_read_file((int)D_001760DD, 0);
-            l_30 = (int)(*(char **)scratch_buffer + 55000);
+            prompt = (int)(*(char **)scratch_buffer + 55000);
             mc_set_location(168, (int)D_001760D6);
-            mc_sprintf(l_30, (int)D_001760EA, D_0017D1FA);
-            *(signed char *)((char *)(strlen(l_30) + l_30) + 1) = 0;
+            mc_sprintf(prompt, (int)D_001760EA, D_0017D1FA);
+            *(signed char *)((char *)(strlen(prompt) + prompt) + 1) = 0;
             inpstr_begin_number(0);
-            msgbox_show_string(l_30, 2);
+            msgbox_show_string(prompt, 2);
             while (key_down_enter != 0);
         } else if (mouse_buttons != 0 && mouse_buttons_prev == 0 && point_in_rect((int)(short)mouse_x, (int)(short)mouse_y, 136, 63, 183, 86) != 0) {
             while (mouse_buttons != 0) xn_mouse_poll_clamped();
@@ -132,12 +132,12 @@ void rest_update(void)
                 *(int *)rest_image = -1751672937;
             }
             *(int *)rest_image = disk_read_file((int)D_001760DD, 0);
-            l_30 = (int)(*(char **)scratch_buffer + 55000);
+            prompt = (int)(*(char **)scratch_buffer + 55000);
             mc_set_location(196, (int)D_001760D6);
-            mc_sprintf(l_30, (int)D_0017611C, D_0017D1FE);
-            *(signed char *)((char *)(strlen(l_30) + l_30) + 1) = 0;
+            mc_sprintf(prompt, (int)D_0017611C, D_0017D1FE);
+            *(signed char *)((char *)(strlen(prompt) + prompt) + 1) = 0;
             inpstr_begin_number(0);
-            msgbox_show_string(l_30, 2);
+            msgbox_show_string(prompt, 2);
             rest_loitering = 1;
             D_00196294 = 1;
             while (key_down_enter != 0);
@@ -147,11 +147,11 @@ void rest_update(void)
     if (((int)(signed char)D_00190D1A) == 1) {
         if (((int)(unsigned char)game_mode) != 8) {
             if (rest_loitering != 0) {
-                l_34 = 3;
+                max_hours = 3;
             } else {
-                l_34 = 99;
+                max_hours = 99;
             }
-            if (*(int *)inpstr_result > l_34) {
+            if (*(int *)inpstr_result > max_hours) {
                 key_down_enter = 0;
                 msgbox_show_rsc((int)(short)((rest_loitering != 0) ? 27 : 26), 1);
                 rest_close();

@@ -18,17 +18,17 @@ extern void mc_memcpy(char *, unsigned char *, int, char *, int, int);
 
 void climate_set_textures(void)
 {
-    int l_1C;
-    int l_18;
+    int climate;
+    int season;
 
     if (region_flats[climate_index].f2[0] > 50)
         region_flats[climate_index].f2[0] = 50;
     mc_memcpy(xn_world_nature_flat_odds, region_flats[climate_index].f2, 129, D_00176C94, 1455, 4);
     ground_texture_archive = climate_texture_sets[climate_index] * 100 + 2;
     nature_texture_archive = region_flats[climate_index].f0;
-    l_1C = climate_category();
-    l_18 = month_seasons[game_minutes % 518400 / 43200];
-    if ((climate_weathers[l_1C] & 127) == 5 || l_18 == 0 && (l_1C == 1 || l_1C == 3 || l_1C == 5)) {
+    climate = climate_category();
+    season = month_seasons[game_minutes % 518400 / 43200];
+    if ((climate_weathers[climate] & 127) == 5 || season == 0 && (climate == 1 || climate == 3 || climate == 5)) {
         ground_texture_archive++;
         nature_texture_archive++;
         return;

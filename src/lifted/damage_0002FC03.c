@@ -8,40 +8,40 @@ extern char monster_category[];
 extern int damage_apply(struct record *, int, int);
 extern void item_damage(struct record *, int);
 
-void damage_namira_reflect(struct record *a1, struct record *a2, int a3)
+void damage_namira_reflect(struct record *attacker, struct record *target, int damage)
 {
-    struct character *l_1C;
-    int l_18;
-    struct item *l_14;
-    struct record *l_10;
+    struct character *ch;
+    int slot;
+    struct item *item_data;
+    struct record *item;
 
-    l_1C = &a2->data.character;
-    for (l_18 = 0; l_18 < 27; l_18++) {
-        if (l_1C->equipped[l_18] == 0) continue;
-        l_14 = &l_1C->equipped[l_18]->data.item;
-        if (l_14->enchantments[0].type == 26 && l_14->enchantments[0].param == 7) {
-            l_10 = l_1C->equipped[l_18];
-            l_1C = &a1->data.character;
-            if (l_1C->race == 2) return;
-            if (l_1C->race >= 43) {
-                item_damage(l_10, a3);
-                damage_apply(a1, a3, 0);
+    ch = &target->data.character;
+    for (slot = 0; slot < 27; slot++) {
+        if (ch->equipped[slot] == 0) continue;
+        item_data = &ch->equipped[slot]->data.item;
+        if (item_data->enchantments[0].type == 26 && item_data->enchantments[0].param == 7) {
+            item = ch->equipped[slot];
+            ch = &attacker->data.character;
+            if (ch->race == 2) return;
+            if (ch->race >= 43) {
+                item_damage(item, damage);
+                damage_apply(attacker, damage, 0);
                 return;
             }
-            switch (*(unsigned char *)(monster_category + l_1C->race)) {
+            switch (*(unsigned char *)(monster_category + ch->race)) {
             case 3:
                 return;
             case 2:
-                item_damage(l_10, a3);
-                damage_apply(a1, a3, 0);
+                item_damage(item, damage);
+                damage_apply(attacker, damage, 0);
                 return;
             case 1:
-                item_damage(l_10, a3 >> 1);
-                damage_apply(a1, a3, 0);
+                item_damage(item, damage >> 1);
+                damage_apply(attacker, damage, 0);
                 return;
             case 0:
-                item_damage(l_10, a3 * 2);
-                damage_apply(a1, a3, 0);
+                item_damage(item, damage * 2);
+                damage_apply(attacker, damage, 0);
                 return;
             }
         }

@@ -8,9 +8,9 @@ extern int profile_get_number(int, ...);
 #pragma aux sosconv "*" parm caller [] value [eax] modify [eax ebx ecx edx];
 #pragma aux (sosconv) profile_get_item_number;
 
-int profile_get_item_number(int a1, int a2, int a3)
+int profile_get_item_number(int profile, char *item, int *number)
 {
-    if ((short)profile_find_item(a1, a2) == 0) return 0;
-    if ((short)profile_get_number(a1, a3) == 0) return 0;
+    if ((short)profile_find_item(profile, item) == 0) return 0;
+    if ((short)profile_get_number(profile, number) == 0) return 0;
     return 1;
 }

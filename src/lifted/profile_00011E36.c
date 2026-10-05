@@ -6,48 +6,48 @@
 #pragma aux sosconv "*" parm caller [] value [eax] modify [eax ebx ecx edx];
 #pragma aux (sosconv) profile_find_item;
 
-int profile_find_item(int a1, int a2)
+int profile_find_item(int profile, char *item)
 {
-    int l_20;
-    int l_1C;
-    int l_18;
-    int l_14;
-    int l_10;
+    char *cursor;
+    char *start;
+    char *name;
+    int offset;
+    int found;
 
-    l_10 = 0;
-    l_20 = *(int *)((char *)a1 + 144);
-    l_14 = *(int *)((char *)a1 + 148);
+    found = 0;
+    cursor = *(char **)((char *)profile + 144);
+    offset = *(int *)((char *)profile + 148);
     do {
-        l_18 = a2;
-        if (*(signed char *)((char *)l_20) == *(signed char *)((char *)l_18)) {
-            l_1C = l_20;
-            l_20++;
-            l_18++;
-            l_14++;
-            while (*(signed char *)((char *)l_20) == *(signed char *)((char *)l_18) && ((unsigned)l_14) < *(int *)((char *)a1 + 136)) {
-                l_20++;
-                l_18++;
-                l_14++;
+        name = item;
+        if (*cursor == *name) {
+            start = cursor;
+            cursor++;
+            name++;
+            offset++;
+            while (*cursor == *name && ((unsigned)offset) < *(int *)((char *)profile + 136)) {
+                cursor++;
+                name++;
+                offset++;
             }
-            if (*(signed char *)((char *)l_18) == 0) {
-                while (((int)(unsigned char)*(signed char *)((char *)l_20)) != 61 && ((int)(unsigned char)*(signed char *)((char *)l_20)) != 13) {
-                    l_20++;
-                    l_14++;
+            if (*name == 0) {
+                while (*cursor != 61 && *cursor != 13) {
+                    cursor++;
+                    offset++;
                 }
-                if (((int)(unsigned char)*(signed char *)((char *)l_20)) == 61) {
-                    l_20++;
-                    l_14++;
-                    *(int *)((char *)a1 + 160) = l_20;
+                if (*cursor == 61) {
+                    cursor++;
+                    offset++;
+                    *(char **)((char *)profile + 160) = cursor;
                 } else {
-                    *(int *)((char *)a1 + 160) = 0;
+                    *(int *)((char *)profile + 160) = 0;
                 }
-                *(int *)((char *)a1 + 156) = l_1C;
-                *(int *)((char *)a1 + 164) = 0;
-                l_10 = 1;
+                *(char **)((char *)profile + 156) = start;
+                *(int *)((char *)profile + 164) = 0;
+                found = 1;
             }
         }
-        l_20++;
-        l_14++;
-    } while (l_10 == 0 && ((unsigned)l_14) < *(int *)((char *)a1 + 136) && ((int)(unsigned char)*(signed char *)((char *)l_20)) != 91);
-    return l_10;
+        cursor++;
+        offset++;
+    } while (found == 0 && ((unsigned)offset) < *(int *)((char *)profile + 136) && *cursor != 91);
+    return found;
 }

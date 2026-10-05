@@ -8,11 +8,11 @@ struct rect { short x0; short y0; short x1; short y1; };
 
 extern void note_text_box(int, struct rect *);
 
-int note_text_hit_cb(int a1)
+int note_text_hit_cb(int entry)
 {
-    int l_20;
+    int unused;
     struct rect r;
 
-    note_text_box(a1, &r);
+    note_text_box(entry, &r);
     return mouse_x > r.x0 && mouse_x < r.x1 && mouse_y > r.y0 && mouse_y < r.y1;
 }

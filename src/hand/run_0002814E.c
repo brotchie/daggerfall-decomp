@@ -79,12 +79,12 @@ struct kb { unsigned char _:3; unsigned char f:1; };
 
 void town_map_open(void)
 {
-    int l_24;
-    int l_20;
-    int l_1C;
-    int l_18;
+    int done;
+    int i;
+    int saved_screen_active;
+    int handle;
 
-    l_24 = 0;
+    done = 0;
     if (((int)player_environment) != 1) return;
     if (location_contains(player_object->x, player_object->z) == 0) {
         hud_message_add(D_0018507F);
@@ -100,20 +100,20 @@ void town_map_open(void)
     mc_memset(*(int *)scratch_buffer, 0, 50000, (int)D_001707AE, 624, 4);
     mc_set_location(625, (int)D_001707AE);
     mc_sprintf((int)text_buffer, (int)D_001707B8, location_object->id >> 16);
-    l_18 = disk_open_rw((int)text_buffer);
-    if (l_18 != (-1)) {
-        read(l_18, *(int *)scratch_buffer, 50000);
+    handle = disk_open_rw((int)text_buffer);
+    if (handle != (-1)) {
+        read(handle, *(int *)scratch_buffer, 50000);
         *(int *)(*(char **)scratch_buffer) = game_minutes;
-        lseek(l_18, 0, 0);
-        write(l_18, *(int *)scratch_buffer, 4);
-        close(l_18);
+        lseek(handle, 0, 0);
+        write(handle, *(int *)scratch_buffer, 4);
+        close(handle);
     }
     mouse_buttons = (mouse_buttons_prev = 0);
-    l_1C = (int)(unsigned char)D_00196272;
+    saved_screen_active = (int)(unsigned char)D_00196272;
     D_00196272 = 1;
     *(int *)scratch_190de4 = disk_read_file((int)D_00170794, 0);
     *(int *)D_00196D9C = disk_read_file((int)D_001707C3, 0);
-    while (l_24 == 0) {
+    while (done == 0) {
         xn_mouse_cursor_erase();
         town_map_draw();
         xn_draw_image((int)(unsigned short)*(short *)(*(char **)D_00196D9C), (int)(unsigned short)*(short *)(*(char **)D_00196D9C + 2), (int)(unsigned short)*(short *)(*(char **)D_00196D9C + 4), (int)(unsigned short)*(short *)(*(char **)D_00196D9C + 6), *(int *)D_00196D9C + 12);
@@ -130,14 +130,14 @@ void town_map_open(void)
         } else if (key_down_down != 0) {
             automap_move_back(1);
         }
-        if (key_down_esc != 0) l_24 = 1;
+        if (key_down_esc != 0) done = 1;
         if (((int)(unsigned char)(mouse_buttons & 3)) != 0) {
-            for (l_20 = 0; l_20 < 6; l_20++) {
-                if (mouse_x > *(short *)(town_map_buttons + (l_20 * 12)) && mouse_x < *(short *)(D_0017A0C0 + (l_20 * 12)) && mouse_y > *(short *)(D_0017A0BE + (l_20 * 12)) && mouse_y < *(short *)(D_0017A0C2 + (l_20 * 12))) {
+            for (i = 0; i < 6; i++) {
+                if (mouse_x > *(short *)(town_map_buttons + (i * 12)) && mouse_x < *(short *)(D_0017A0C0 + (i * 12)) && mouse_y > *(short *)(D_0017A0BE + (i * 12)) && mouse_y < *(short *)(D_0017A0C2 + (i * 12))) {
                     if (((int)(unsigned char)(mouse_buttons & 1)) != 0 && ((int)(unsigned char)(mouse_buttons_prev & 1)) == 0) {
                         sound_play(203, player_object, 100);
                     }
-                    l_24 = ((int (*)())(*(int *)(D_0017A0C4 + (l_20 * 12))))(l_20);
+                    done = ((int (*)())(*(int *)(D_0017A0C4 + (i * 12))))(i);
                 }
             }
         }
@@ -153,7 +153,7 @@ void town_map_open(void)
         mc_free(*(int *)D_00196D9C, (int)D_001707AE, 680);
         *(int *)D_00196D9C = -1751672937;
     }
-    D_00196272 = *(signed char *)&l_1C;
+    D_00196272 = *(signed char *)&saved_screen_active;
     if (scratch_190ce5 == 0) return;
     mc_set_location(686, (int)D_001707AE);
     mc_sprintf((int)text_buffer, (int)D_001707B8, location_object->id >> 16);
@@ -162,80 +162,80 @@ void town_map_open(void)
 
 void town_map_draw(void)
 {
-    int l_44;
-    int l_40;
-    int l_3C;
-    int l_38;
-    int l_34;
-    int l_30;
-    int l_2C;
-    int l_28;
-    int l_24;
-    int l_20;
-    int l_1C;
+    int repeat;
+    int map_height;
+    int map_width;
+    int map_y;
+    int map_x;
+    int player_x;
+    int player_y;
+    int screen_x;
+    int screen_y;
+    int colour;
+    int pixel;
 
     mc_memcpy(screen_buffer, *(int *)scratch_190de4, 64000, D_001707AE, 695, 4);
-    l_30 = player_object->x - location_object->x;
-    l_2C = player_object->z - location_object->z;
-    l_30 >>= 6;
-    l_2C >>= 6;
-    l_2C = (current_location->height << 6) - l_2C - 1;
-    VX = l_30;
-    VY = l_2C;
+    player_x = player_object->x - location_object->x;
+    player_y = player_object->z - location_object->z;
+    player_x >>= 6;
+    player_y >>= 6;
+    player_y = (current_location->height << 6) - player_y - 1;
+    VX = player_x;
+    VY = player_y;
     VX -= 37;
     VY -= 20;
     VX += D_00196D98;
     VY += D_00196D90;
-    l_40 = current_location->height << 6;
-    l_3C = current_location->width << 6;
+    map_height = current_location->height << 6;
+    map_width = current_location->width << 6;
     if (VX < 0) {
         D_00196D98 -= VX;
         VX = 0;
     }
-    if (VX > l_3C - 38) {
-        D_00196D98 -= VX - (l_3C - 38);
+    if (VX > map_width - 38) {
+        D_00196D98 -= VX - (map_width - 38);
     }
     if (VY < 0) {
         D_00196D90 -= VY;
         VY = 0;
     }
-    if (VY > l_40 - 10) {
-        D_00196D90 -= VY - (l_40 - 10);
+    if (VY > map_height - 10) {
+        D_00196D90 -= VY - (map_height - 10);
     }
-    l_24 = 10;
-    l_38 = VY;
-    while (l_24 < 170 && l_38 < l_40) {
-        for (l_44 = 0; l_44 < 2; l_44++) {
-            l_34 = VX;
-            l_28 = 10;
-            while (l_28 < 310 && l_34 < l_3C) {
-                l_1C = MAP[l_3C * l_38 + l_34];
-                if (!(l_1C == 0 || l_1C == 251 || l_1C == 250)) {
-                    l_20 = D_0017A103[MAP[l_3C * l_38 + l_34]];
-                    SCR[l_24 * 320 + l_28] = l_20;
-                    SCR[l_24 * 320 + l_28 + 1] = l_20;
+    screen_y = 10;
+    map_y = VY;
+    while (screen_y < 170 && map_y < map_height) {
+        for (repeat = 0; repeat < 2; repeat++) {
+            map_x = VX;
+            screen_x = 10;
+            while (screen_x < 310 && map_x < map_width) {
+                pixel = MAP[map_width * map_y + map_x];
+                if (!(pixel == 0 || pixel == 251 || pixel == 250)) {
+                    colour = D_0017A103[MAP[map_width * map_y + map_x]];
+                    SCR[screen_y * 320 + screen_x] = colour;
+                    SCR[screen_y * 320 + screen_x + 1] = colour;
                 }
-                l_28 += 2;
-                l_34++;
+                screen_x += 2;
+                map_x++;
             }
-            l_24++;
+            screen_y++;
         }
-        l_38++;
+        map_y++;
     }
     town_map_draw_notes();
     if ((*(struct kb *)0x46c).f == 0) return;
-    l_28 = (l_30 - VX) * 2 + 10;
-    l_24 = (l_2C - VY) * 2 + 10;
-    if (l_24 >= 169) return;
-    func_000A134C(l_28, l_24, 145);
-    func_000A134C(l_28 + 1, l_24, 145);
-    func_000A134C(l_28, l_24 + 1, 145);
-    func_000A134C(l_28 + 1, l_24 + 1, 145);
+    screen_x = (player_x - VX) * 2 + 10;
+    screen_y = (player_y - VY) * 2 + 10;
+    if (screen_y >= 169) return;
+    func_000A134C(screen_x, screen_y, 145);
+    func_000A134C(screen_x + 1, screen_y, 145);
+    func_000A134C(screen_x, screen_y + 1, 145);
+    func_000A134C(screen_x + 1, screen_y + 1, 145);
 }
 
-void town_map_scroll(int a1)
+void town_map_scroll(int direction)
 {
-    switch (a1) {
+    switch (direction) {
     case 0:
         D_00196D90--;
         break;

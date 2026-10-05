@@ -16,18 +16,18 @@ extern struct record *object_create_child(struct record *, int, int);
 extern int object_new_id(int);
 extern int mc_memcpy();
 
-int cast_item_used_spell(int a1)
+int cast_item_used_spell(int spell_id)
 {
-    int l_20;
-    struct record *l_1C;
+    int i;
+    struct record *spell;
 
-    l_20 = 0;
-    l_1C = object_create_child(player_object->parent, 0, 89);
-    while (spell_records[l_20].name[0] == 0 || spell_records[l_20].id != a1) l_20++;
-    l_1C->type = 9;
-    l_1C->id = object_new_id(((unsigned)location_object->id) >> 16);
-    mc_memcpy(&l_1C->data.spell, &spell_records[l_20], 89, (int)D_001757F4, 103, 4);
-    l_20 = spell_cost(&l_1C->data.spell, player_character);
-    if (cast_player_spell(l_1C) != 0) object_delete(l_1C);
-    return l_20;
+    i = 0;
+    spell = object_create_child(player_object->parent, 0, 89);
+    while (spell_records[i].name[0] == 0 || spell_records[i].id != spell_id) i++;
+    spell->type = 9;
+    spell->id = object_new_id(((unsigned)location_object->id) >> 16);
+    mc_memcpy(&spell->data.spell, &spell_records[i], 89, (int)D_001757F4, 103, 4);
+    i = spell_cost(&spell->data.spell, player_character);
+    if (cast_player_spell(spell) != 0) object_delete(spell);
+    return i;
 }

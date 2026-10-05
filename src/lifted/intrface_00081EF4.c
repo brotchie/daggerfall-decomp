@@ -27,22 +27,22 @@ extern short steer_key_region;
 
 extern int xn_input_steer_dispatch();
 
-void intrface_steer(int a1, int a2, int a3, int a4)
+void intrface_steer(int unused, int region, int region_x, int region_y)
 {
-    int l_C;
+    int *bios_ticks;
     {
-        unsigned char l_20;
+        unsigned char moving;
 
         if (((int)(unsigned char)(mouse_buttons & 1)) != 0 || ((int)(short)steer_key_region) != (-1)) {
             if (((int)(short)steer_key_region) == (-1)) {
                 D_001A5AFC = steer_turn_speed_max;
-                steer_weight_right = ((((int)(short)mouse_x) - a3) << 8) / ((int)(short)steer_region_width);
-                steer_weight_down = ((((int)(short)mouse_y) - a4) << 8) / ((int)(short)steer_region_height);
-                steer_weight_left = ((((int)(short)steer_region_width) - (((int)(short)mouse_x) - a3)) << 8) / ((int)(short)steer_region_width);
-                steer_weight_up = ((((int)(short)steer_region_height) - (((int)(short)mouse_y) - a4)) << 8) / ((int)(short)steer_region_height);
+                steer_weight_right = ((((int)(short)mouse_x) - region_x) << 8) / ((int)(short)steer_region_width);
+                steer_weight_down = ((((int)(short)mouse_y) - region_y) << 8) / ((int)(short)steer_region_height);
+                steer_weight_left = ((((int)(short)steer_region_width) - (((int)(short)mouse_x) - region_x)) << 8) / ((int)(short)steer_region_width);
+                steer_weight_up = ((((int)(short)steer_region_height) - (((int)(short)mouse_y) - region_y)) << 8) / ((int)(short)steer_region_height);
             } else {
-                l_C = 1132;
-                if ((D_001A5AFC = *(int *)((char *)l_C) - D_001A5AE8) > steer_turn_speed_max) {
+                bios_ticks = (int *)1132;
+                if ((D_001A5AFC = *bios_ticks - D_001A5AE8) > steer_turn_speed_max) {
                     D_001A5AFC = steer_turn_speed_max;
                 }
             }
@@ -50,17 +50,17 @@ void intrface_steer(int a1, int a2, int a3, int a4)
         move_angle_offset = 0;
         player_speed = player_base_speed;
         if ((player_character->conditions & 0x1) == 0 && ((((int)(unsigned char)mouse_control_mode) != 1 && ((int)(unsigned char)(mouse_buttons & 1)) != 0) || ((int)(short)steer_key_region) != (-1))) {
-            xn_input_steer_dispatch(a2);
+            xn_input_steer_dispatch(region);
         } else {
             player_speed = 0;
             *(int *)turn_this_frame = 0;
             move_angle_offset = 0;
         }
         if (((int)(short)player_speed) > 2) {
-            l_20 = 1;
+            moving = 1;
         } else {
-            l_20 = 0;
+            moving = 0;
         }
-        D_0019628E = l_20;
+        D_0019628E = moving;
     }
 }

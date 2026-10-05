@@ -90,122 +90,122 @@ void disease_become_lycanthrope(int);
 void disease_lycanthrope_shapechange(int);
 void trade_haggle_close(int);
 
-void disease_infect(struct record *a1, int a2, int a3, int a4)
+void disease_infect(struct record *target, unsigned char *disease_list, int disease_id, int no_resist)
 {
-    struct character *l_1C;
-    struct career *l_18;
-    int l_14;
-    struct record *l_10;
-    struct disease *l_C;
+    struct character *target_char;
+    struct career *target_class;
+    int count;
+    struct record *disease;
+    struct disease *disease_data;
 
-    l_1C = &a1->data.character;
-    l_18 = &l_1C->career;
-    if (l_1C == player_character && (player_class->immunity_flags & 64) != 0) return;
-    if (a4 == 0) if (spfx_resist_roll(2, 64, l_1C, l_18, 4, *(int *)bio_modifiers) == 100) return;
-    if (l_1C->level == 1) return;
-    l_10 = object_create_child(a1, 0, 47);
-    l_10->type = 11;
-    l_10->flags = 32771;
-    l_C = &l_10->data.disease;
-    if (a2 != 0) {
-        l_14 = 0;
-        while (((int)(unsigned char)*(signed char *)((char *)(l_14++ + a2))) != 255);
-        a3 = (int)(unsigned char)*(signed char *)((char *)(int)((char *)a2 + rand_range(0, l_14 - 2)));
+    target_char = &target->data.character;
+    target_class = &target_char->career;
+    if (target_char == player_character && (player_class->immunity_flags & 64) != 0) return;
+    if (no_resist == 0) if (spfx_resist_roll(2, 64, target_char, target_class, 4, *(int *)bio_modifiers) == 100) return;
+    if (target_char->level == 1) return;
+    disease = object_create_child(target, 0, 47);
+    disease->type = 11;
+    disease->flags = 32771;
+    disease_data = &disease->data.disease;
+    if (disease_list != 0) {
+        count = 0;
+        while (disease_list[count++] != 255);
+        disease_id = disease_list[rand_range(0, count - 2)];
     }
-    mc_memcpy(l_C, &disease_table[a3], 47, (int)D_00175970, 83, 4);
-    if (l_C->days_left != 255) l_C->days_left = rand_range(l_C->days_left, l_C->stage);
-    l_C->stage = 0;
+    mc_memcpy(disease_data, &disease_table[disease_id], 47, (int)D_00175970, 83, 4);
+    if (disease_data->days_left != 255) disease_data->days_left = rand_range(disease_data->days_left, disease_data->stage);
+    disease_data->stage = 0;
 }
 
-void poison_apply(struct record *a1, int a2, int a3)
+void poison_apply(struct record *target, int poison_id, int no_resist)
 {
-    struct character *l_20;
-    struct career *l_1C;
-    int l_18;
-    struct record *l_14;
-    struct disease *l_10;
+    struct character *target_char;
+    struct career *target_class;
+    int unused;
+    struct record *poison;
+    struct disease *poison_data;
 
-    l_20 = &a1->data.character;
-    l_1C = &l_20->career;
-    if (l_20 == player_character && (player_class->immunity_flags & 4) != 0) return;
-    if (a3 == 0) if (spfx_resist_roll(2, 4, l_20, l_1C, 4, D_0018DDE0) == 100) return;
-    if (l_20->level == 1) return;
-    l_14 = object_create_child(a1, 0, 47);
-    l_14->type = 11;
-    l_14->flags = 32771;
-    l_10 = &l_14->data.disease;
-    l_10->id = *(signed char *)&a2;
-    a2 = (a2 << 2) - 512;
-    l_10->days_left = rand_range((int)(short)D_00186D87[a2], (int)(short)D_00186D89[a2]);
-    l_10->stage = 0;
-    l_10->damage_min = rand_range((int)(short)poison_table[a2], (int)(short)D_00186D85[a2]);
+    target_char = &target->data.character;
+    target_class = &target_char->career;
+    if (target_char == player_character && (player_class->immunity_flags & 4) != 0) return;
+    if (no_resist == 0) if (spfx_resist_roll(2, 4, target_char, target_class, 4, D_0018DDE0) == 100) return;
+    if (target_char->level == 1) return;
+    poison = object_create_child(target, 0, 47);
+    poison->type = 11;
+    poison->flags = 32771;
+    poison_data = &poison->data.disease;
+    poison_data->id = *(signed char *)&poison_id;
+    poison_id = (poison_id << 2) - 512;
+    poison_data->days_left = rand_range((int)(short)D_00186D87[poison_id], (int)(short)D_00186D89[poison_id]);
+    poison_data->stage = 0;
+    poison_data->damage_min = rand_range((int)(short)poison_table[poison_id], (int)(short)D_00186D85[poison_id]);
 }
 
-void poison_init_record(struct disease *a1, int a2)
+void poison_init_record(struct disease *poison, int poison_id)
 {
-    a1->id = *(signed char *)&a2;
-    a2 = (a2 << 2) - 512;
-    a1->days_left = rand_range((int)(short)D_00186D87[a2], (int)(short)D_00186D89[a2]);
-    a1->damage_min = rand_range((int)(short)poison_table[a2], (int)(short)D_00186D85[a2]);
+    poison->id = *(signed char *)&poison_id;
+    poison_id = (poison_id << 2) - 512;
+    poison->days_left = rand_range((int)(short)D_00186D87[poison_id], (int)(short)D_00186D89[poison_id]);
+    poison->damage_min = rand_range((int)(short)poison_table[poison_id], (int)(short)D_00186D85[poison_id]);
 }
 
-int poison_tick(struct disease *a1)
+int poison_tick(struct disease *poison)
 {
-    int l_28;
-    int l_24;
-    int l_20;
-    struct character *l_1C;
+    int amount;
+    int unused;
+    int unused2;
+    struct character *victim;
 
-    if (a1->id < 128) return 1;
-    if (a1->damage_min != 0) {
-        a1->damage_min--;
+    if (poison->id < 128) return 1;
+    if (poison->damage_min != 0) {
+        poison->damage_min--;
         return 1;
     }
-    if (a1->stage == 0) a1->stage = 1;
-    switch ((unsigned char)(a1->id - 128)) {
+    if (poison->stage == 0) poison->stage = 1;
+    switch ((unsigned char)(poison->id - 128)) {
     case 0:
         damage_apply(scratch_current_object, rand_range(2, 12), 0);
         break;
     case 1:
         damage_apply(scratch_current_object, 2, 0);
-        a1->stat_flags[4] = 1;
-        a1->drained[4]++;
+        poison->stat_flags[4] = 1;
+        poison->drained[4]++;
         player_character->attributes[4]--;
         if (player_character->attributes[4] < 1) {
             player_character->attributes[4] = 1;
-            a1->drained[4]--;
+            poison->drained[4]--;
         }
-        a1->stage = 2;
+        poison->stage = 2;
         break;
     case 2:
         damage_apply(scratch_current_object, rand_range(1, 10), 0);
         break;
     case 3:
-        l_28 = rand_range(5, 10);
-        a1->stat_flags[0] = 1;
-        a1->drained[0] += l_28;
-        player_character->attributes[0] -= l_28;
+        amount = rand_range(5, 10);
+        poison->stat_flags[0] = 1;
+        poison->drained[0] += amount;
+        player_character->attributes[0] -= amount;
         if (player_character->attributes[0] < 1) {
             player_character->attributes[0] = 1;
-            a1->drained[0] -= 1 - player_character->attributes[0];
+            poison->drained[0] -= 1 - player_character->attributes[0];
         }
-        l_28 = rand_range(1, 5);
-        a1->stat_flags[3] = 1;
-        a1->drained[3] += l_28;
-        player_character->attributes[3] -= l_28;
+        amount = rand_range(1, 5);
+        poison->stat_flags[3] = 1;
+        poison->drained[3] += amount;
+        player_character->attributes[3] -= amount;
         if (player_character->attributes[3] < 1) {
             player_character->attributes[3] = 1;
-            a1->drained[3] -= 1 - player_character->attributes[3];
+            poison->drained[3] -= 1 - player_character->attributes[3];
         }
-        l_28 = rand_range(1, 5);
-        a1->stat_flags[6] = 1;
-        a1->drained[6] += l_28;
-        player_character->attributes[6] -= l_28;
+        amount = rand_range(1, 5);
+        poison->stat_flags[6] = 1;
+        poison->drained[6] += amount;
+        player_character->attributes[6] -= amount;
         if (player_character->attributes[6] < 1) {
             player_character->attributes[6] = 1;
-            a1->drained[6] -= 1 - player_character->attributes[6];
+            poison->drained[6] -= 1 - player_character->attributes[6];
         }
-        a1->stage = 2;
+        poison->stage = 2;
         break;
     case 4:
         fatigue_add(-rand_range(10, 100));
@@ -214,125 +214,125 @@ int poison_tick(struct disease *a1)
         damage_apply(scratch_current_object, rand_range(1, 30), 0);
         break;
     case 6:
-        l_28 = rand_range(1, 5);
-        a1->stat_flags[2] = 1;
-        a1->drained[2] += l_28;
-        player_character->attributes[2] -= l_28;
+        amount = rand_range(1, 5);
+        poison->stat_flags[2] = 1;
+        poison->drained[2] += amount;
+        player_character->attributes[2] -= amount;
         if (player_character->attributes[2] < 1) {
             player_character->attributes[2] = 1;
-            a1->drained[2] -= 1 - player_character->attributes[2];
+            poison->drained[2] -= 1 - player_character->attributes[2];
         }
-        l_1C = &scratch_current_object->data.character;
-        l_1C->magicka -= rand_range(5, 15);
-        if (l_1C->magicka < 0) l_1C->magicka = 0;
-        a1->stage = 2;
+        victim = &scratch_current_object->data.character;
+        victim->magicka -= rand_range(5, 15);
+        if (victim->magicka < 0) victim->magicka = 0;
+        poison->stage = 2;
         break;
     case 7:
-        l_28 = rand_range(5, 20);
-        a1->stat_flags[2] = 1;
-        a1->drained[2] += l_28;
-        player_character->attributes[2] -= l_28;
+        amount = rand_range(5, 20);
+        poison->stat_flags[2] = 1;
+        poison->drained[2] += amount;
+        player_character->attributes[2] -= amount;
         if (player_character->attributes[2] < 1) {
             player_character->attributes[2] = 1;
-            a1->drained[2] -= 1 - player_character->attributes[2];
+            poison->drained[2] -= 1 - player_character->attributes[2];
         }
-        l_28 = rand_range(10, 20);
-        a1->stat_flags[5] = 1;
-        a1->drained[5] += l_28;
-        player_character->attributes[5] -= l_28;
+        amount = rand_range(10, 20);
+        poison->stat_flags[5] = 1;
+        poison->drained[5] += amount;
+        player_character->attributes[5] -= amount;
         if (player_character->attributes[5] < 1) {
             player_character->attributes[5] = 1;
-            a1->drained[5] -= 1 - player_character->attributes[5];
+            poison->drained[5] -= 1 - player_character->attributes[5];
         }
-        a1->stage = 2;
+        poison->stage = 2;
         break;
     case 8:
         fatigue_add(-rand_range(10, 100));
-        l_28 = rand_range(4, 10);
-        a1->stat_flags[7] = 1;
-        a1->drained[7] -= l_28;
-        player_character->attributes[7] += l_28;
-        a1->stage = 2;
+        amount = rand_range(4, 10);
+        poison->stat_flags[7] = 1;
+        poison->drained[7] -= amount;
+        player_character->attributes[7] += amount;
+        poison->stage = 2;
         break;
     case 9:
-        l_28 = rand_range(10, 30);
-        a1->stat_flags[1] = 1;
-        a1->drained[1] += l_28;
-        player_character->attributes[1] -= l_28;
+        amount = rand_range(10, 30);
+        poison->stat_flags[1] = 1;
+        poison->drained[1] += amount;
+        player_character->attributes[1] -= amount;
         if (player_character->attributes[1] < 1) {
             player_character->attributes[1] = 1;
-            a1->drained[1] -= 1 - player_character->attributes[1];
+            poison->drained[1] -= 1 - player_character->attributes[1];
         }
-        l_28 = rand_range(5, 20);
-        a1->stat_flags[0] = 1;
-        a1->drained[0] -= l_28;
-        player_character->attributes[0] += l_28;
-        a1->stage = 2;
+        amount = rand_range(5, 20);
+        poison->stat_flags[0] = 1;
+        poison->drained[0] -= amount;
+        player_character->attributes[0] += amount;
+        poison->stage = 2;
         break;
     case 10:
         fatigue_add(rand_range(5, 10) << 6);
-        l_28 = rand_range(1, 4);
-        a1->stat_flags[2] = 1;
-        a1->drained[2] += l_28;
-        player_character->attributes[2] -= l_28;
+        amount = rand_range(1, 4);
+        poison->stat_flags[2] = 1;
+        poison->drained[2] += amount;
+        player_character->attributes[2] -= amount;
         if (player_character->attributes[2] < 1) {
             player_character->attributes[2] = 1;
-            a1->drained[2] -= 1 - player_character->attributes[2];
+            poison->drained[2] -= 1 - player_character->attributes[2];
         }
-        a1->stage = 2;
+        poison->stage = 2;
         break;
     case 11:
-        l_1C = &scratch_current_object->data.character;
-        l_1C->magicka += rand_range(5, 10);
-        if (l_1C->magicka > l_1C->max_magicka) l_1C->magicka = l_1C->max_magicka;
-        l_28 = rand_range(1, 5);
-        a1->stat_flags[4] = 1;
-        a1->drained[4] += l_28;
-        player_character->attributes[4] -= l_28;
+        victim = &scratch_current_object->data.character;
+        victim->magicka += rand_range(5, 10);
+        if (victim->magicka > victim->max_magicka) victim->magicka = victim->max_magicka;
+        amount = rand_range(1, 5);
+        poison->stat_flags[4] = 1;
+        poison->drained[4] += amount;
+        player_character->attributes[4] -= amount;
         if (player_character->attributes[4] < 1) {
             player_character->attributes[4] = 1;
-            a1->drained[4] -= 1 - player_character->attributes[4];
+            poison->drained[4] -= 1 - player_character->attributes[4];
         }
-        a1->stage = 2;
+        poison->stage = 2;
     }
     player_ailment_flags |= 1;
     hud_message_add(D_00185083);
-    if (a1->days_left != 0) {
-        a1->days_left--;
-    } else if (a1->stage == 2) {
-        a1->days_left = 254;
-        a1->id = 0;
+    if (poison->days_left != 0) {
+        poison->days_left--;
+    } else if (poison->stage == 2) {
+        poison->days_left = 254;
+        poison->id = 0;
     } else {
         return 0;
     }
     return 1;
 }
 
-void disease_add_vampire_spell(struct record *a1, int a2)
+void disease_add_vampire_spell(struct record *spellbook, int spell_id)
 {
-    struct record *l_1C;
-    struct spell *l_18;
-    int l_14;
+    struct record *spell;
+    struct spell *spell_data;
+    int i;
 
-    l_1C = object_create_child(a1, 0, 89);
-    l_1C->type = 9;
-    l_1C->flags = 3;
-    l_1C->id = object_new_id(a1->id >> 16);
-    l_18 = &l_1C->data.spell;
-    l_14 = 0;
-    while (spell_records[l_14].name[0] == 0 || spell_records[l_14].id != a2) l_14++;
-    mc_memcpy(l_18, &spell_records[l_14], 89, (int)D_00175970, 540, 4);
-    l_18->name[strlen(l_18->name) + 1] = 36;
+    spell = object_create_child(spellbook, 0, 89);
+    spell->type = 9;
+    spell->flags = 3;
+    spell->id = object_new_id(spellbook->id >> 16);
+    spell_data = &spell->data.spell;
+    i = 0;
+    while (spell_records[i].name[0] == 0 || spell_records[i].id != spell_id) i++;
+    mc_memcpy(spell_data, &spell_records[i], 89, (int)D_00175970, 540, 4);
+    spell_data->name[strlen(spell_data->name) + 1] = 36;
 }
 
 void disease_cure_vampirism(void)
 {
-    int l_2C;
-    struct record *l_28;
-    struct record *l_24;
-    struct record *l_20;
-    struct record *l_1C;
-    struct disease *l_18;
+    int i;
+    struct record *vampirism;
+    struct record *saved_class;
+    struct record *next;
+    struct record *child;
+    struct disease *disease;
 
     if (player_character->special_infection_time != 0 && player_character->special_infection == 0) {
         player_character->special_infection_time = 0;
@@ -340,21 +340,21 @@ void disease_cure_vampirism(void)
     }
     if (player_character->race != 8) return;
     player_character->flags &= ~0x4;
-    l_1C = player_entity->children;
-    while (l_1C != 0) {
-        if (l_1C->type == 28) l_24 = l_1C;
-        if (l_1C->type == 11) {
-            l_18 = &l_1C->data.disease;
-            if (l_18->id == 100) {
-                l_28 = l_1C;
-                l_18 = &l_28->data.disease;
+    child = player_entity->children;
+    while (child != 0) {
+        if (child->type == 28) saved_class = child;
+        if (child->type == 11) {
+            disease = &child->data.disease;
+            if (disease->id == 100) {
+                vampirism = child;
+                disease = &vampirism->data.disease;
             }
         }
-        l_1C = l_1C->next;
+        child = child->next;
     }
-    for (l_2C = 0; l_2C < 8; l_2C++) {
-        player_character->attributes[l_2C] -= l_18->drained[l_2C];
-        player_character->base_attributes[l_2C] -= l_18->drained[l_2C];
+    for (i = 0; i < 8; i++) {
+        player_character->attributes[i] -= disease->drained[i];
+        player_character->base_attributes[i] -= disease->drained[i];
     }
     player_character->skills[3].value -= 30;
     player_character->skills[21].value -= 30;
@@ -362,22 +362,22 @@ void disease_cure_vampirism(void)
     player_character->skills[34].value -= 30;
     player_character->skills[18].value -= 30;
     player_character->skills[30].value -= 30;
-    mc_memcpy(player_class, &l_24->data.career, 74, (int)D_00175970, 590, 4);
+    mc_memcpy(player_class, &saved_class->data.career, 74, (int)D_00175970, 590, 4);
     object_foreach(player_entity->children, (int)disease_toggle_memberships_cb);
     player_character->race = player_character->original_race;
     player_character->min_metal_to_hit = 0;
-    l_1C = object_find_item(player_entity->children, 27, 0);
-    if (l_1C == 0) return;
-    l_1C = l_1C->children;
-    while (l_1C != 0) {
-        l_20 = l_1C->next;
-        if (l_1C->data.spell.name[strlen(l_1C->data.spell.name) + 1] == 36) {
-            object_delete(l_1C);
+    child = object_find_item(player_entity->children, 27, 0);
+    if (child == 0) return;
+    child = child->children;
+    while (child != 0) {
+        next = child->next;
+        if (child->data.spell.name[strlen(child->data.spell.name) + 1] == 36) {
+            object_delete(child);
         }
-        l_1C = l_20;
+        child = next;
     }
-    object_delete(l_24);
-    object_delete(l_28);
+    object_delete(saved_class);
+    object_delete(vampirism);
     player_character->max_health = (short)player_character->max_health_base;
     D_001940D8 |= 8;
     paperdoll_draw(0, 0);
@@ -385,7 +385,7 @@ void disease_cure_vampirism(void)
 
 void disease_remove_skill_bonuses(void)
 {
-    int l_18;
+    int unused;
 
     inv_unequip_all_saved();
     if (player_character->race == 8) {
@@ -427,28 +427,28 @@ void disease_restore_skill_bonuses(void)
     player_character->skills[30].value += 30;
 }
 
-void disease_become_lycanthrope(int a1)
+void disease_become_lycanthrope(int kind)
 {
-    struct record *l_34;
-    struct record *l_30;
-    struct record *l_2C;
-    struct spell *l_28;
-    int l_24;
-    int l_20;
-    int l_1C;
-    struct disease *l_18;
+    struct record *saved_class;
+    struct record *spell;
+    struct record *lycanthropy;
+    struct spell *spell_data;
+    int attribute;
+    int excess;
+    int i;
+    struct disease *lycanthropy_data;
     {
-        int l_64;
-        int l_60;
-        int l_5C;
-        int l_58;
-        int l_54;
-        int l_50;
-        int l_4C;
-        int l_48;
-        int l_44;
-        int l_40;
-        int l_3C;
+        int unused;
+        int unused2;
+        int unused3;
+        int unused4;
+        int unused5;
+        int unused6;
+        int unused7;
+        int unused8;
+        int unused9;
+        int unused10;
+        int unused11;
 
         if (player_character->level == 1 || disease_is_lycanthrope() != 0 || player_character->race > 7) {
             return;
@@ -456,37 +456,37 @@ void disease_become_lycanthrope(int a1)
         player_character->special_infection_time = 0;
         player_character->special_infection = 0;
         player_character->flags |= 20;
-        l_2C = object_create_child(player_entity, 0, 47);
-        l_2C->type = 11;
-        l_2C->flags = 32771;
-        l_34 = object_create_child(player_entity, 0, 74);
-        l_34->type = 28;
-        l_34->flags = 3;
-        l_18 = &l_2C->data.disease;
-        l_18->id = *(signed char *)&a1 + 101;
-        mc_memcpy(&l_34->data.career, player_class, 74, (int)D_00175970, 697, 4);
-        for (l_1C = 0; l_1C < 4; l_1C++) {
-            l_24 = (int)(unsigned char)lycanthrope_attributes[l_1C];
-            l_18->drained[l_24] = 40;
-            player_character->attributes[l_24] += 40;
-            player_character->base_attributes[l_24] += 40;
-            l_20 = player_character->base_attributes[l_24] - 100;
-            if (l_20 > 0) {
-                player_character->base_attributes[l_24] -= l_20;
-                player_character->attributes[l_24] -= l_20;
-                l_18->drained[l_24] -= l_20;
+        lycanthropy = object_create_child(player_entity, 0, 47);
+        lycanthropy->type = 11;
+        lycanthropy->flags = 32771;
+        saved_class = object_create_child(player_entity, 0, 74);
+        saved_class->type = 28;
+        saved_class->flags = 3;
+        lycanthropy_data = &lycanthropy->data.disease;
+        lycanthropy_data->id = *(signed char *)&kind + 101;
+        mc_memcpy(&saved_class->data.career, player_class, 74, (int)D_00175970, 697, 4);
+        for (i = 0; i < 4; i++) {
+            attribute = (int)(unsigned char)lycanthrope_attributes[i];
+            lycanthropy_data->drained[attribute] = 40;
+            player_character->attributes[attribute] += 40;
+            player_character->base_attributes[attribute] += 40;
+            excess = player_character->base_attributes[attribute] - 100;
+            if (excess > 0) {
+                player_character->base_attributes[attribute] -= excess;
+                player_character->attributes[attribute] -= excess;
+                lycanthropy_data->drained[attribute] -= excess;
             }
         }
         player_class->immunity_flags |= 64;
-        l_30 = object_create_child(l_34, 0, 89);
-        l_30->type = 9;
-        l_30->flags = 3;
-        l_30->id = object_new_id(l_34->id >> 16);
-        l_28 = &l_30->data.spell;
-        l_1C = 0;
-        while (spell_records[l_1C].name[0] == 0 || spell_records[l_1C].id != 92) l_1C++;
-        mc_memcpy(l_28, &spell_records[l_1C], 89, (int)D_00175970, 725, 4);
-        l_28->effect_costs[0] = (l_28->effect_costs[1] = (l_28->effect_costs[2] = 0));
+        spell = object_create_child(saved_class, 0, 89);
+        spell->type = 9;
+        spell->flags = 3;
+        spell->id = object_new_id(saved_class->id >> 16);
+        spell_data = &spell->data.spell;
+        i = 0;
+        while (spell_records[i].name[0] == 0 || spell_records[i].id != 92) i++;
+        mc_memcpy(spell_data, &spell_records[i], 89, (int)D_00175970, 725, 4);
+        spell_data->effect_costs[0] = (spell_data->effect_costs[1] = (spell_data->effect_costs[2] = 0));
         player_character->skills[17].value += 30;
         player_character->skills[18].value += 30;
         player_character->skills[3].value += 30;
@@ -499,13 +499,13 @@ void disease_become_lycanthrope(int a1)
     }
 }
 
-void disease_lycanthrope_shapechange(int a1)
+void disease_lycanthrope_shapechange(int forced)
 {
-    struct record *l_1C;
-    struct disease *l_18;
+    struct record *child;
+    struct disease *disease;
 
-    l_18 = 0;
-    if (a1 == 0 && player_character->race < 8 && ((unsigned)(game_minutes - player_character->last_shapechange_time)) < 1200) {
+    disease = 0;
+    if (forced == 0 && player_character->race < 8 && ((unsigned)(game_minutes - player_character->last_shapechange_time)) < 1200) {
         if (item_artifact_equipped(3) == 0) {
             msgbox_show_string((int)D_0017597A, 1);
             return;
@@ -513,18 +513,18 @@ void disease_lycanthrope_shapechange(int a1)
     }
     D_001940D8 |= 8;
     player_character->last_shapechange_time = game_minutes;
-    l_1C = player_entity->children;
-    while (l_1C != 0) {
-        if (l_1C->type == 11) {
-            l_18 = &l_1C->data.disease;
-            if (l_18->id == 101 || l_18->id == 102) break;
-            l_18 = 0;
+    child = player_entity->children;
+    while (child != 0) {
+        if (child->type == 11) {
+            disease = &child->data.disease;
+            if (disease->id == 101 || disease->id == 102) break;
+            disease = 0;
         }
-        l_1C = l_1C->next;
+        child = child->next;
     }
-    if (l_18 == 0) return;
+    if (disease == 0) return;
     if (player_character->race < 8) {
-        if (l_18->id == 101) {
+        if (disease->id == 101) {
             player_character->race = 9;
         } else {
             player_character->race = 10;
@@ -558,37 +558,37 @@ void disease_lycanthrope_shapechange(int a1)
 
 int disease_is_lycanthrope(void)
 {
-    int l_24;
-    struct record *l_20;
-    struct disease *l_1C;
+    int result;
+    struct record *child;
+    struct disease *disease;
 
-    l_1C = 0;
-    l_20 = player_entity->children;
-    while (l_20 != 0) {
-        if (l_20->type == 11) {
-            l_1C = &l_20->data.disease;
-            if (l_1C->id == 101 || l_1C->id == 102) break;
-            l_1C = 0;
+    disease = 0;
+    child = player_entity->children;
+    while (child != 0) {
+        if (child->type == 11) {
+            disease = &child->data.disease;
+            if (disease->id == 101 || disease->id == 102) break;
+            disease = 0;
         }
-        l_20 = l_20->next;
+        child = child->next;
     }
-    if (l_1C != 0) {
-        l_24 = 1;
+    if (disease != 0) {
+        result = 1;
     } else {
-        l_24 = 0;
+        result = 0;
     }
-    return l_24;
+    return result;
 }
 
 void disease_cure_lycanthropy(void)
 {
-    int l_30;
-    struct record *l_2C;
-    struct record *l_28;
-    struct record *l_24;
-    struct record *l_20;
-    struct disease *l_1C;
-    struct disease *l_18;
+    int i;
+    struct record *lycanthropy;
+    struct record *saved_class;
+    struct record *next;
+    struct record *child;
+    struct disease *lycanthropy_data;
+    struct disease *disease;
 
     if (player_character->special_infection_time != 0 && player_character->special_infection != 0) {
         player_character->special_infection_time = 0;
@@ -596,21 +596,21 @@ void disease_cure_lycanthropy(void)
     }
     if (disease_is_lycanthrope() == 0) return;
     player_character->flags &= ~0x4;
-    l_20 = player_entity->children;
-    while (l_20 != 0) {
-        if (l_20->type == 28) l_28 = l_20;
-        if (l_20->type == 11) {
-            l_18 = &l_20->data.disease;
-            if (l_18->id == 101 || l_18->id == 102) {
-                l_2C = l_20;
-                l_1C = &l_2C->data.disease;
+    child = player_entity->children;
+    while (child != 0) {
+        if (child->type == 28) saved_class = child;
+        if (child->type == 11) {
+            disease = &child->data.disease;
+            if (disease->id == 101 || disease->id == 102) {
+                lycanthropy = child;
+                lycanthropy_data = &lycanthropy->data.disease;
             }
         }
-        l_20 = l_20->next;
+        child = child->next;
     }
-    for (l_30 = 0; l_30 < 8; l_30++) {
-        player_character->attributes[l_30] -= l_1C->drained[l_30];
-        player_character->base_attributes[l_30] -= l_1C->drained[l_30];
+    for (i = 0; i < 8; i++) {
+        player_character->attributes[i] -= lycanthropy_data->drained[i];
+        player_character->base_attributes[i] -= lycanthropy_data->drained[i];
     }
     player_character->skills[17].value -= 30;
     player_character->skills[18].value -= 30;
@@ -619,17 +619,17 @@ void disease_cure_lycanthropy(void)
     player_character->skills[21].value -= 30;
     player_character->skills[34].value -= 30;
     player_character->skills[30].value -= 30;
-    mc_memcpy(player_class, &l_28->data.career, 74, (int)D_00175970, 874, 4);
-    object_delete(l_28);
-    object_delete(l_2C);
+    mc_memcpy(player_class, &saved_class->data.career, 74, (int)D_00175970, 874, 4);
+    object_delete(saved_class);
+    object_delete(lycanthropy);
     player_character->race = player_character->original_race;
-    l_20 = object_find_item(player_entity->children, 27, 0);
-    if (l_20 == 0) return;
-    l_20 = l_20->children;
-    while (l_20 != 0) {
-        l_24 = l_20->next;
-        if (l_20->data.spell.id == 92) object_delete(l_20);
-        l_20 = l_24;
+    child = object_find_item(player_entity->children, 27, 0);
+    if (child == 0) return;
+    child = child->children;
+    while (child != 0) {
+        next = child->next;
+        if (child->data.spell.id == 92) object_delete(child);
+        child = next;
     }
     D_001940D8 |= 8;
     paperdoll_draw(0, 0);
@@ -638,28 +638,28 @@ void disease_cure_lycanthropy(void)
 
 void disease_lycanthrope_tick(void)
 {
-    int l_20;
-    int l_1C;
-    int l_18;
+    int moon_day;
+    int moon_day_ahead;
+    int new_max_health;
 
-    l_20 = (((unsigned)game_minutes) / 1440) & 31;
-    l_1C = (((unsigned)(game_minutes + 5760)) / 1440) & 31;
+    moon_day = (((unsigned)game_minutes) / 1440) & 31;
+    moon_day_ahead = (((unsigned)(game_minutes + 5760)) / 1440) & 31;
     if (disease_is_lycanthrope() == 0) return;
     if (item_artifact_equipped(3) != 0) return;
     if (((unsigned)(game_minutes - player_character->lycanthrope_kill_time)) > 20160) {
-        l_18 = (game_minutes - player_character->lycanthrope_kill_time) - 20160;
-        if (l_18 > 20160) {
-            l_18 = 4;
+        new_max_health = (game_minutes - player_character->lycanthrope_kill_time) - 20160;
+        if (new_max_health > 20160) {
+            new_max_health = 4;
         } else {
-            l_18 = (((l_18 << 8) / 20160) * player_character->max_health) / 256;
-            if (l_18 < 4) l_18 = 4;
+            new_max_health = (((new_max_health << 8) / 20160) * player_character->max_health) / 256;
+            if (new_max_health < 4) new_max_health = 4;
         }
-        if (player_character->max_health != l_18) hud_message_add((int)D_0017599B);
-        player_character->max_health = l_18;
-        if (player_character->health > l_18) player_character->health = l_18;
+        if (player_character->max_health != new_max_health) hud_message_add((int)D_0017599B);
+        player_character->max_health = new_max_health;
+        if (player_character->health > new_max_health) player_character->health = new_max_health;
     }
     if (player_character->race > 8) return;
-    if (l_20 != 0) if (l_1C != 0) return;
+    if (moon_day != 0) if (moon_day_ahead != 0) return;
     hud_message_add((int)D_001759C5);
     disease_lycanthrope_shapechange(1);
 }
@@ -676,66 +676,66 @@ void disease_special_infection_tick(void)
     disease_become_vampire();
 }
 
-void disease_start_cure_quest(int a1)
+void disease_start_cure_quest(int offer_cure)
 {
     if (player_character->race == 8) {
-        if (a1 != 0 && rand_range(10, 100) < 30) {
+        if (offer_cure != 0 && rand_range(10, 100) < 30) {
             mc_strncpy((int)D_001961F5, (int)D_001759EB, 13, (int)D_00175970, 952);
             return;
         }
-        if (a1 == 0 && player_character->action != 0 && rand_range(1, 100) < 50) {
+        if (offer_cure == 0 && player_character->action != 0 && rand_range(1, 100) < 50) {
             quest_pick_file(80, 0, 48, 66, player_character->level);
             return;
         }
-        if (a1 == 0 && rand_range(1, 100) < 50) {
+        if (offer_cure == 0 && rand_range(1, 100) < 50) {
             quest_pick_file(80, 0, 48, 65, player_character->level);
             if (*(signed char *)D_001961F5 != 0) player_character->action = 1;
         }
         return;
     }
-    if (disease_is_lycanthrope() == 0 || a1 == 0 || rand_range(1, 100) >= 30) return;
+    if (disease_is_lycanthrope() == 0 || offer_cure == 0 || rand_range(1, 100) >= 30) return;
     mc_strncpy((int)D_001961F5, (int)D_001759F8, 13, (int)D_00175970, 971);
 }
 
-void reaction_mod_item_cb(struct record *a1)
+void reaction_mod_item_cb(struct record *item)
 {
-    struct item *l_1C;
-    int l_18;
+    struct item *item_data;
+    int i;
 
-    if (a1->type != 2) return;
-    l_1C = &a1->data.item;
-    if (l_1C->enchantments[0].type == (-1)) return;
-    for (l_18 = 0; l_18 < 10; l_18++) {
-        if (l_1C->enchantments[l_18].type == (-1)) return;
-        if (l_1C->enchantments[l_18].type == 14 && l_1C->enchantments[l_18].param == 5) {
+    if (item->type != 2) return;
+    item_data = &item->data.item;
+    if (item_data->enchantments[0].type == (-1)) return;
+    for (i = 0; i < 10; i++) {
+        if (item_data->enchantments[i].type == (-1)) return;
+        if (item_data->enchantments[i].type == 14 && item_data->enchantments[i].param == 5) {
             *(int *)D_00195B84 += 10;
-        } else if (l_1C->enchantments[l_18].type == 25 && l_1C->enchantments[l_18].param == 5) {
+        } else if (item_data->enchantments[i].type == 25 && item_data->enchantments[i].param == 5) {
             *(int *)D_00195B84 -= 10;
-        } else if (l_1C->enchantments[l_18].type == 14 && (short)scratch_190ce4[0] == l_1C->enchantments[l_18].param) {
+        } else if (item_data->enchantments[i].type == 14 && (short)scratch_190ce4[0] == item_data->enchantments[i].param) {
             *(int *)D_00195B84 += 10;
-        } else if (l_1C->enchantments[l_18].type == 25 && (short)scratch_190ce4[0] == l_1C->enchantments[l_18].param) {
+        } else if (item_data->enchantments[i].type == 25 && (short)scratch_190ce4[0] == item_data->enchantments[i].param) {
             *(int *)D_00195B84 -= 10;
         }
     }
 }
 
-void enchant_extra_spell_points(int a1, int a2)
+void enchant_extra_spell_points(struct item *item, int condition)
 {
-    *(int *)extra_spell_points += enchant_spell_points_condition(a2);
+    *(int *)extra_spell_points += enchant_spell_points_condition(condition);
 }
 
-int enchant_spell_points_condition(int a1)
+int enchant_spell_points_condition(int condition)
 {
-    struct character *l_24;
-    int l_20;
-    int l_1C;
+    struct character *creature;
+    int unused;
+    int i;
 
-    switch ((unsigned)a1) {
+    switch ((unsigned)condition) {
     case 0:
     case 1:
     case 2:
     case 3:
-        if (((int)(unsigned char)*(signed char *)(D_0018320A + calendar_month)) == a1) {
+        if (((int)(unsigned char)*(signed char *)(D_0018320A + calendar_month)) == condition) {
             return 75;
         }
         break;
@@ -751,7 +751,7 @@ int enchant_spell_points_condition(int a1)
         }
         break;
     case 6:
-        a1 += -4;
+        condition += -4;
         if (((int)(unsigned char)D_00195F24) == 16 || ((int)(unsigned char)D_00195F25) == 16) {
             return 75;
         }
@@ -760,11 +760,11 @@ int enchant_spell_points_condition(int a1)
     case 8:
     case 9:
     case 10:
-        a1 += -7;
-        for (l_1C = 0; l_1C < creature_count; l_1C++) {
-            if (xn_math_approx_dist2d(player_entity->x, player_entity->z, creature_list[l_1C]->x, creature_list[l_1C]->z) < 1024) {
-                l_24 = &creature_list[l_1C]->data.character;
-                if (((int)(unsigned char)*(signed char *)(monster_category + l_24->race)) == a1) {
+        condition += -7;
+        for (i = 0; i < creature_count; i++) {
+            if (xn_math_approx_dist2d(player_entity->x, player_entity->z, creature_list[i]->x, creature_list[i]->z) < 1024) {
+                creature = &creature_list[i]->data.character;
+                if (((int)(unsigned char)*(signed char *)(monster_category + creature->race)) == condition) {
                     return 75;
                 }
             }
@@ -773,31 +773,31 @@ int enchant_spell_points_condition(int a1)
     return 0;
 }
 
-int item_artifact_equipped(int a1)
+int item_artifact_equipped(int artifact_id)
 {
-    int l_20;
-    struct item *l_1C;
+    int slot;
+    struct item *item;
 
-    for (l_20 = 0; l_20 < 27; l_20++) {
-        if (player_character->equipped[l_20] == 0) continue;
-        l_1C = &player_character->equipped[l_20]->data.item;
-        if (l_1C->enchantments[0].type == (-1)) continue;
-        if (l_1C->enchantments[0].type == 26 && l_1C->enchantments[0].param == a1) return 1;
+    for (slot = 0; slot < 27; slot++) {
+        if (player_character->equipped[slot] == 0) continue;
+        item = &player_character->equipped[slot]->data.item;
+        if (item->enchantments[0].type == (-1)) continue;
+        if (item->enchantments[0].type == 26 && item->enchantments[0].param == artifact_id) return 1;
     }
     return 0;
 }
 
-void func_00067CA4(int a1, int a2)
+void func_00067CA4(int artifact_id, int damage)
 {
-    int l_18;
-    struct item *l_14;
+    int slot;
+    struct item *item;
 
-    for (l_18 = 0; l_18 < 27; l_18++) {
-        if (player_character->equipped[l_18] == 0) continue;
-        l_14 = &player_character->equipped[l_18]->data.item;
-        if (l_14->enchantments[0].type == (-1)) continue;
-        if (l_14->enchantments[0].type == 26 && l_14->enchantments[0].param == a1) {
-            item_damage(player_character->equipped[l_18], a2);
+    for (slot = 0; slot < 27; slot++) {
+        if (player_character->equipped[slot] == 0) continue;
+        item = &player_character->equipped[slot]->data.item;
+        if (item->enchantments[0].type == (-1)) continue;
+        if (item->enchantments[0].type == 26 && item->enchantments[0].param == artifact_id) {
+            item_damage(player_character->equipped[slot], damage);
             return;
         }
     }
@@ -805,21 +805,21 @@ void func_00067CA4(int a1, int a2)
 
 void effects_tick(void)
 {
-    int l_24;
-    int l_20;
-    int l_1C;
-    struct item *l_18;
+    int i;                          /* first the elapsed minutes, then the equipment slot */
+    int j;                          /* first the saved tick minutes, then the enchantment */
+    int unused;
+    struct item *item;
 
     D_001A3AA8 = 0;
-    l_24 = (*(int *)D_00195B08 = game_minutes - D_00195B44);
+    i = (*(int *)D_00195B08 = game_minutes - D_00195B44);
     if (*(int *)D_00195B08 > 100) {
-        l_24 = (*(int *)D_00195B08 = 0);
+        i = (*(int *)D_00195B08 = 0);
         D_00195B44 = game_minutes;
     }
     *(int *)D_00195B08 >>= 2;
     if (*(int *)D_00195B08 != 0) D_00195B44 = game_minutes;
     scratch_current_object = 0;
-    if (*(int *)D_00195B08 != 0 || l_24 != 0) {
+    if (*(int *)D_00195B08 != 0 || i != 0) {
         if (player_class->regeneration_flags != 0 && *(int *)D_00195B08 != 0) {
             if (((int)(unsigned char)(player_class->regeneration_flags & 4)) != 0 && (in_dungeon_water != 0 || D_001962A0 != 0)) {
                 item_enchantment_tick(0, 5, 0);
@@ -834,7 +834,7 @@ void effects_tick(void)
                 item_enchantment_tick(0, 5, 2);
             }
         }
-        l_20 = *(int *)D_00195B08;
+        j = *(int *)D_00195B08;
         *(int *)D_00195B08 = *(int *)D_00195B08 * 12;
         if (((int)(unsigned short)(player_class->flags & 16)) != 0 && player_in_daylight() != 0) {
             item_enchantment_tick(0, 17, 0);
@@ -842,17 +842,17 @@ void effects_tick(void)
         if (((int)(unsigned short)(player_class->flags & 32)) != 0 && player_in_temple() != 0) {
             item_enchantment_tick(0, 17, 1);
         }
-        *(int *)D_00195B08 = l_20;
+        *(int *)D_00195B08 = j;
     }
-    for (l_24 = 0; l_24 < 27; l_24++) {
-        if (player_character->equipped[l_24] != 0) {
-            l_18 = &player_character->equipped[l_24]->data.item;
-            if (l_18->enchantments[0].type == (-1)) continue;
-            scratch_current_object = player_character->equipped[l_24];
-            l_20 = 0;
-            while (l_20 < 10 && l_18->enchantments[l_20].type != (-1)) {
-                item_enchantment_tick(l_18, l_18->enchantments[l_20].type, l_18->enchantments[l_20].param);
-                l_20++;
+    for (i = 0; i < 27; i++) {
+        if (player_character->equipped[i] != 0) {
+            item = &player_character->equipped[i]->data.item;
+            if (item->enchantments[0].type == (-1)) continue;
+            scratch_current_object = player_character->equipped[i];
+            j = 0;
+            while (j < 10 && item->enchantments[j].type != (-1)) {
+                item_enchantment_tick(item, item->enchantments[j].type, item->enchantments[j].param);
+                j++;
             }
         }
     }
@@ -873,7 +873,7 @@ void effects_tick(void)
 
 void trade_haggle_frame(void)
 {
-    int l_18;
+    int agreed_price;
 
     if (((int)(unsigned char)game_mode) != 13 && ((int)D_0019626F) != 13) {
         return;
@@ -896,25 +896,25 @@ void trade_haggle_frame(void)
         return;
     }
     if (((int)(unsigned char)game_mode) != 13) return;
-    l_18 = trade_haggle_counter(*(int *)inpstr_result);
-    if (l_18 == (-1)) {
+    agreed_price = trade_haggle_counter(*(int *)inpstr_result);
+    if (agreed_price == (-1)) {
         trade_haggle_close(0);
         return;
     }
-    if (l_18 != 0) {
-        trade_haggle_close(l_18);
+    if (agreed_price != 0) {
+        trade_haggle_close(agreed_price);
         return;
     }
     D_00190D63 = 0;
     trade_haggle_show_offer();
 }
 
-void trade_haggle_close(int a1)
+void trade_haggle_close(int price)
 {
-    if (a1 > 0 && ((unsigned)a1) > player_character->gold) {
+    if (price > 0 && ((unsigned)price) > player_character->gold) {
         msgbox_show_rsc(454, 1);
-        a1 = 0;
+        price = 0;
     }
-    trade_haggle_result = a1;
+    trade_haggle_result = price;
     mode_pop();
 }

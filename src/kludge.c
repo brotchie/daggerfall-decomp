@@ -2,13 +2,13 @@
 
 #include "dagger.h"
 
-char *item_add_random_to_container(char *p1, int p2)
+char *item_add_random_to_container(char *container, int group)
 {
-    char *l1;
-    char *l2;
-    l1 = object_create_child(p1, 0, 0x6b);
-    *l1 = 2;
-    l2 = l1 + 0x47;
-    item_make_random((unsigned short)p2, l2);
-    return l1;
+    char *object;
+    char *item;
+    object = object_create_child(container, 0, 0x6b);
+    *object = 2;
+    item = object + 0x47;
+    item_make_random((unsigned short)group, item);
+    return object;
 }

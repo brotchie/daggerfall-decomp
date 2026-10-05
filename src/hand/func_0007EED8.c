@@ -7,12 +7,12 @@ extern int mc_memset();
 
 void func_0007EED8(void)
 {
-    union REGS r;
-    struct SREGS s;
-    int a;
-    int b;
+    union REGS regs;
+    struct SREGS sregs;
+    int unused_1;
+    int unused_2;
 
     if (*((char *)&D_00196281) == 0) return;
-    mc_memset(&s, 0, 12, D_00176A10, 1044, 4);
+    mc_memset(&sregs, 0, 12, D_00176A10, 1044, 4);
     func_0007EF86(0x5301, 0);
 }

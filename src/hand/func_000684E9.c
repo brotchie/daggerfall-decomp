@@ -22,18 +22,18 @@ extern void mode_push(void);
 #pragma aux exp parm routine [] value [8087];
 extern double exp(double);
 
-void trade_haggle_start(int a1, int a2, int a3, int a4)
+void trade_haggle_start(int price, int quantity, struct record *seller, struct record *buyer)
 {
     D_001A3ADC = -1;
-    D_001A3AE4 = a3 + 71;
-    D_001A3AE0 = (struct character *)(a4 + 71);
-    if (a2 > 1) {
+    D_001A3AE4 = (int)&seller->data.character;
+    D_001A3AE0 = &buyer->data.character;
+    if (quantity > 1) {
         /* the original multiplied by a literal (fmul [const]); with the constant as an extern
          * D_ symbol 10.0a would emit fld/fmulp when storing straight to memory, and the
          * (float) conversion (a no-op on the x87 stack) keeps the result in ST(0) instead */
-        D_001A3ABC = (float)(exp(a2 * D_00175A08) * D_00175A10);
+        D_001A3ABC = (float)(exp(quantity * D_00175A08) * D_00175A10);
     }
-    trade_haggle_asking = a1 * a2;
+    trade_haggle_asking = price * quantity;
     trade_haggle_minimum = ((((1.0 - (D_001A3AE0->attributes[5] * D_00175A18)) + (D_001A3AE0->reputation[1] * D_00175A18)) - (D_001A3AE0->skills[21].value * D_00175A20)) - ((21 - current_building->quality) * D_00175A28)) * trade_haggle_asking;
     trade_haggle_step();
     mode_push();

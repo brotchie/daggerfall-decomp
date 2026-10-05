@@ -30,33 +30,33 @@ extern void mc_sprintf(char *, char *, ...);
 
 void faction_load_file(void)
 {
-    struct faction rec;
-    int fh;
+    struct faction parsed;
+    int file;
     int i;
     int found;
     int line;
     int len;
-    int l_34;
-    int l_30;
+    int enemy_count;
+    int ally_count;
     int indent;
     int hash;
     int prev;
-    char *p;
-    int have;
-    struct faction *cur;
+    char *text;
+    int have_record;
+    struct faction *dest;
 
     line = 1;
-    have = 0;
-    l_34 = 0;
-    l_30 = 0;
+    have_record = 0;
+    enemy_count = 0;
+    ally_count = 0;
     indent = 0;
     prev = 0;
     D_00196732 = 0;
-    fh = disk_open_data(D_0017043C);
-    if (fh < 1)
+    file = disk_open_data(D_0017043C);
+    if (file < 1)
         fatal_error(D_00170448);
-    len = read(fh, D_00147954, 90000);
-    close(fh);
+    len = read(file, D_00147954, 90000);
+    close(file);
     for (faction_count = i = 0; i < len; i++)
         if (D_00147954[i] == '#')
             faction_count++;
@@ -66,59 +66,59 @@ void faction_load_file(void)
             factions = (struct faction *)0x97979797;
         }
     }
-    cur = factions = mc_malloc(faction_count * 92, D_00170464, 975);
-    mc_memset(cur, 0, faction_count * 92, D_00170464, 976, 4);
-    mc_memset(&rec, 0, 92, D_00170464, 977, 4);
-    p = D_00147954;
-    p[len] = 0;
-    while (*p != 0) {
-        switch (*p) {
+    dest = factions = mc_malloc(faction_count * 92, D_00170464, 975);
+    mc_memset(dest, 0, faction_count * 92, D_00170464, 976, 4);
+    mc_memset(&parsed, 0, 92, D_00170464, 977, 4);
+    text = D_00147954;
+    text[len] = 0;
+    while (*text != 0) {
+        switch (*text) {
         case 13:
         case ' ':
-            p++;
+            text++;
             break;
         case 10:
             line++;
-            p++;
+            text++;
             indent = 0;
             break;
         case 9:
             indent++;
-            p++;
+            text++;
             break;
         case '#':
-            if (have) {
-                faction_add_record(&rec, prev, cur++);
+            if (have_record) {
+                faction_add_record(&parsed, prev, dest++);
                 prev = indent;
                 indent = 0;
-                mc_memset(&rec, 0, 92, D_00170464, 1012, 4);
-                l_30 = l_34 = 0;
+                mc_memset(&parsed, 0, 92, D_00170464, 1012, 4);
+                ally_count = enemy_count = 0;
             }
-            have = 1;
-            p++;
-            rec.id = atoi(p);
-            while (D_00178630[(unsigned char)(*p + 1)] & 32)
-                p++;
+            have_record = 1;
+            text++;
+            parsed.id = atoi(text);
+            while (D_00178630[(unsigned char)(*text + 1)] & 32)
+                text++;
             break;
         case ';':
-            while (*p != 13 && *p != 10)
-                p++;
+            while (*text != 13 && *text != 10)
+                text++;
             break;
         case ':':
-            p++;
+            text++;
             break;
         default:
             hash = 0;
-            while (*p > ' ' && *p != ':') {
+            while (*text > ' ' && *text != ':') {
                 hash <<= 1;
-                hash += tolower(*p++);
+                hash += tolower(*text++);
             }
             for (found = i = 0; i < 19; i++) {
                 if (faction_keywords[i].hash != hash) continue;
                 found = 1;
-                while (*p <= ' ' || *p == ':')
-                    p++;
-                faction_keywords[i].fn(&rec, &p, &l_30, &l_34);
+                while (*text <= ' ' || *text == ':')
+                    text++;
+                faction_keywords[i].fn(&parsed, &text, &ally_count, &enemy_count);
                 break;
             }
             if (!found) {
@@ -129,7 +129,7 @@ void faction_load_file(void)
             break;
         }
     }
-    if (have)
-        faction_add_record(&rec, prev, cur);
+    if (have_record)
+        faction_add_record(&parsed, prev, dest);
     faction_link_relations(factions);
 }

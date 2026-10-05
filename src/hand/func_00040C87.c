@@ -17,37 +17,37 @@ extern int rand_range(int, int);
 extern int rand(void);
 extern int xn_math_angle_to_point();
 
-void guards_summon(int a1)
+void guards_summon(int now)
 {
     int i;
-    int d;
-    int a;
-    int cnt;
-    int tmp;
+    int angle_to_pedestrian;
+    int angle_diff;
+    int guard_count;
+    int turn_direction;
 
     if (player_environment == 3)
         return;
     if (creature_count > 10)
         return;
-    if (a1 != 0) {
-        for (cnt = i = 0; i < people_count; i++) {
+    if (now != 0) {
+        for (guard_count = i = 0; i < people_count; i++) {
             if (people_list[i] == 0)
                 continue;
             if (is_guard_sprite(people_list[i]) == 0) {
-                d = xn_math_angle_to_point(player_object->x, player_object->z, people_list[i]->x, people_list[i]->z);
-                a = ai_angle_diff(player_object->yaw, d, &tmp);
-                if (a < 600)
+                angle_to_pedestrian = xn_math_angle_to_point(player_object->x, player_object->z, people_list[i]->x, people_list[i]->z);
+                angle_diff = ai_angle_diff(player_object->yaw, angle_to_pedestrian, &turn_direction);
+                if (angle_diff < 600)
                     continue;
             }
             if ((unsigned char)(rand() & 3) == 0 || is_guard_sprite(people_list[i]) != 0) {
-                cnt++;
+                guard_count++;
                 guard_spawn(people_list[i]);
                 pedestrian_place(people_list[i]);
             }
         }
-        if (cnt == 0) {
-            cnt = rand_range(2, 5);
-            for (i = 0; i < cnt; i++)
+        if (guard_count == 0) {
+            guard_count = rand_range(2, 5);
+            for (i = 0; i < guard_count; i++)
                 guard_spawn(0);
         }
         return;

@@ -55,8 +55,8 @@ extern signed char note_silent;
 
 extern int sheet_open(int);
 extern int note_text_hit_cb(int);
-extern int note_page_walk(int, int, int);
-extern int font_text_width(int);
+extern char *note_page_walk(int, int, int);
+extern int font_text_width(char *);
 extern int sound_play(int, int, int);
 extern int close();
 extern int mc_free();
@@ -67,7 +67,7 @@ extern int mc_strncpy();
 extern int write();
 extern int strlen();
 extern int mc_set_location(int, int);
-extern int mc_sprintf(int, ...);
+extern int mc_sprintf(char *, ...);
 extern int mc_memcpy();
 extern int filelength();
 extern int func_000A138E();
@@ -75,26 +75,26 @@ extern int strstr();
 extern int xn_mouse_set_position();
 extern int xn_font_select();
 extern int xn_draw_line_to();
-extern void msgbox_show_string(int, int);
+extern void msgbox_show_string(char *, int);
 extern void msgbox_show_rsc(int, int);
 extern void note_add_line(short, short, short, short);
-extern void text_draw(int, int, int);
-extern void text_draw_centred(int, int, int);
-extern void text_draw_coloured(int, int, int, int, unsigned char);
-extern void text_draw_centred_coloured(int, int, int, int, unsigned char);
+extern void text_draw(char *, int, int);
+extern void text_draw_centred(char *, int, int);
+extern void text_draw_coloured(char *, int, int, int, unsigned char);
+extern void text_draw_centred_coloured(char *, int, int, int, unsigned char);
 extern void inpstr_begin_number(int);
-extern void inpstr_begin_text(int, short);
-int note_find_match_cb(int);
-int note_select_text_cb(int);
-int note_select_line_cb(int);
-int rect_overlap(int, int);
-int note_keep_text_cb(int);
-int note_keep_line_cb(int);
+extern void inpstr_begin_text(char *, short);
+int note_find_match_cb(char *);
+int note_select_text_cb(char *);
+int note_select_line_cb(char *);
+int rect_overlap(char *, char *);
+int note_keep_text_cb(char *);
+int note_keep_line_cb(char *);
 void note_save_page(void);
 void note_reload_page(void);
 void note_load_page(void);
 void note_find(void);
-void note_text_box(int, int);
+void note_text_box(char *, char *);
 void note_delete_selected(void);
 #pragma aux mc_set_location parm routine [];
 
@@ -133,31 +133,31 @@ int note_close(void)
 
 void note_click_page(void)
 {
-    int l_18;
+    char *entry;
 
     if (note_tool == 0 && note_action == 0) {
         D_001940D5 |= 4;
-        l_18 = note_page_walk(*(int *)note_page, (int)note_text_hit_cb, 0);
-        if (l_18 != 0) {
-            if (((int)(unsigned char)(*(signed char *)((char *)l_18 + 6) & 1)) != 0) {
-                text_cursor_x = (note_cursor_x = 160 - (font_text_width(l_18 + 11) >> 1));
-                text_cursor_y = (note_cursor_y = *(short *)((char *)l_18 + 3));
+        entry = note_page_walk(*(int *)note_page, (int)note_text_hit_cb, 0);
+        if (entry != 0) {
+            if (((int)(unsigned char)(*(signed char *)(entry + 6) & 1)) != 0) {
+                text_cursor_x = (note_cursor_x = 160 - (font_text_width(entry + 11) >> 1));
+                text_cursor_y = (note_cursor_y = *(short *)(entry + 3));
             } else {
-                text_cursor_x = (note_cursor_x = *(short *)((char *)l_18 + 1));
-                text_cursor_y = (note_cursor_y = *(short *)((char *)l_18 + 3));
+                text_cursor_x = (note_cursor_x = *(short *)(entry + 1));
+                text_cursor_y = (note_cursor_y = *(short *)(entry + 3));
             }
             note_action = 1;
-            xn_font_select((int)(short)((unsigned short)(unsigned char)D_00185201[(int)(unsigned char)*(signed char *)((char *)l_18 + 5)]));
-            inpstr_begin_text(l_18 + 11, 79);
+            xn_font_select((int)(short)((unsigned short)(unsigned char)D_00185201[(int)(unsigned char)*(signed char *)(entry + 5)]));
+            inpstr_begin_text(entry + 11, 79);
             *(signed char *)note_text_flags |= 32;
-            *(int *)note_selected = l_18;
+            *(int *)note_selected = (int)entry;
         } else {
             text_cursor_x = (note_cursor_x = mouse_x);
             text_cursor_y = (note_cursor_y = mouse_y);
             note_action = 1;
             mc_memset((int)text_rsc_buffer, 0, 81, (int)D_00174FAC, 270, 2048);
             xn_font_select((int)(short)((unsigned short)(unsigned char)D_00185201[(int)(short)*(short *)note_font]));
-            inpstr_begin_text((int)text_rsc_buffer, 79);
+            inpstr_begin_text((char *)text_rsc_buffer, 79);
         }
         return;
     }
@@ -182,55 +182,55 @@ void note_click_page(void)
 
 void note_draw_page(void)
 {
-    int l_18;
+    char *entry;
 
-    l_18 = *(int *)note_page;
-    while (*(signed char *)((char *)l_18) != 0) {
-        switch (*(unsigned char *)((char *)l_18)) {
+    entry = *(char **)note_page;
+    while (*(signed char *)entry != 0) {
+        switch (*(unsigned char *)entry) {
         case 1:
-            if (note_silent == 0 && (((int)(short)(*(short *)note_text_flags & 32)) == 0 || l_18 != *(int *)note_selected)) {
-                xn_font_select((int)(short)((unsigned short)(unsigned char)D_00185201[(int)(unsigned char)*(signed char *)((char *)l_18 + 5)]));
-                if (((int)(unsigned char)(*(signed char *)((char *)l_18 + 6) & 64)) != 0) {
+            if (note_silent == 0 && (((int)(short)(*(short *)note_text_flags & 32)) == 0 || entry != *(int *)note_selected)) {
+                xn_font_select((int)(short)((unsigned short)(unsigned char)D_00185201[(int)(unsigned char)*(signed char *)(entry + 5)]));
+                if (((int)(unsigned char)(*(signed char *)(entry + 6) & 64)) != 0) {
                     D_0012B508 = (*(signed char *)frame_counter & 15) + 240;
                 } else {
-                    D_0012B508 = *(signed char *)((char *)l_18 + 7);
+                    D_0012B508 = *(signed char *)(entry + 7);
                 }
-                if (((int)(unsigned char)(*(signed char *)((char *)l_18 + 6) & 2)) != 0) {
-                    if (((int)(unsigned char)(*(signed char *)((char *)l_18 + 6) & 1)) != 0) {
-                        text_draw_centred_coloured(l_18 + 11, 160, (int)(short)*(short *)((char *)l_18 + 3), (int)(short)((int)(unsigned char)D_0012B508), 156);
+                if (((int)(unsigned char)(*(signed char *)(entry + 6) & 2)) != 0) {
+                    if (((int)(unsigned char)(*(signed char *)(entry + 6) & 1)) != 0) {
+                        text_draw_centred_coloured(entry + 11, 160, (int)(short)*(short *)(entry + 3), (int)(short)((int)(unsigned char)D_0012B508), 156);
                     } else {
-                        text_draw_coloured(l_18 + 11, (int)(short)*(short *)((char *)l_18 + 1), (int)(short)*(short *)((char *)l_18 + 3), (int)(short)((int)(unsigned char)D_0012B508), 156);
+                        text_draw_coloured(entry + 11, (int)(short)*(short *)(entry + 1), (int)(short)*(short *)(entry + 3), (int)(short)((int)(unsigned char)D_0012B508), 156);
                     }
-                } else if (((int)(unsigned char)(*(signed char *)((char *)l_18 + 6) & 1)) != 0) {
-                    text_draw_centred(l_18 + 11, 160, (int)(short)*(short *)((char *)l_18 + 3));
+                } else if (((int)(unsigned char)(*(signed char *)(entry + 6) & 1)) != 0) {
+                    text_draw_centred(entry + 11, 160, (int)(short)*(short *)(entry + 3));
                 } else {
-                    text_draw(l_18 + 11, (int)(short)*(short *)((char *)l_18 + 1), (int)(short)*(short *)((char *)l_18 + 3));
+                    text_draw(entry + 11, (int)(short)*(short *)(entry + 1), (int)(short)*(short *)(entry + 3));
                 }
             }
-            l_18 += 91;
+            entry += 91;
             break;
         case 2:
             if (note_silent != 0) {
-                (*(char (**)[11])&l_18)++;
+                (*(char (**)[11])&entry)++;
             } else {
-                if (((int)(unsigned char)(*(signed char *)((char *)l_18 + 10) & 64)) != 0) {
+                if (((int)(unsigned char)(*(signed char *)(entry + 10) & 64)) != 0) {
                     D_0012B508 = (*(signed char *)frame_counter & 15) + 240;
                 } else {
-                    D_0012B508 = *(signed char *)((char *)l_18 + 9);
+                    D_0012B508 = *(signed char *)(entry + 9);
                 }
-                D_00142928 = *(short *)((char *)l_18 + 1);
-                D_0014292C = *(short *)((char *)l_18 + 3);
-                xn_draw_line_to((int)(short)*(short *)((char *)l_18 + 5), (int)(short)*(short *)((char *)l_18 + 7));
-                (*(char (**)[11])&l_18)++;
+                D_00142928 = *(short *)(entry + 1);
+                D_0014292C = *(short *)(entry + 3);
+                xn_draw_line_to((int)(short)*(short *)(entry + 5), (int)(short)*(short *)(entry + 7));
+                (*(char (**)[11])&entry)++;
             }
         }
     }
-    note_page_free = 3640 - (l_18 - *(short *)note_page);
+    note_page_free = 3640 - ((int)entry - *(short *)note_page);
 }
 
-void note_add_text(int a1)
+void note_add_text(char *text)
 {
-    int l_18;
+    char *entry;
 
     if (((unsigned)((int)(short)note_page_free)) < 91) {
         msgbox_show_rsc(1700, 1);
@@ -238,24 +238,24 @@ void note_add_text(int a1)
     }
     mc_memcpy(note_page_backup, *(int *)note_page, 3640, (int)D_00174FAC, 361, 4);
     D_001940D5 |= 16;
-    l_18 = *(int *)note_page;
-    while (*(signed char *)((char *)l_18) != 0) {
-        if (((int)(unsigned char)*(signed char *)((char *)l_18)) == 1) {
-            l_18 += 91;
+    entry = *(char **)note_page;
+    while (*(signed char *)entry != 0) {
+        if (((int)(unsigned char)*(signed char *)entry) == 1) {
+            entry += 91;
         } else {
-            (*(char (**)[11])&l_18)++;
+            (*(char (**)[11])&entry)++;
         }
     }
-    *(signed char *)((char *)l_18) = 1;
-    *(short *)((char *)l_18 + 1) = note_cursor_x;
-    *(short *)((char *)l_18 + 3) = note_cursor_y;
-    *(signed char *)((char *)l_18 + 7) = *(signed char *)note_colour;
-    *(signed char *)((char *)l_18 + 5) = *(signed char *)note_font;
-    *(signed char *)((char *)l_18 + 6) = *(signed char *)note_text_flags;
-    mc_strncpy(l_18 + 11, a1, 4, (int)D_00174FAC, 381);
-    *(int *)note_selected = l_18;
-    l_18 += 91;
-    *(signed char *)((char *)l_18) = 0;
+    *(signed char *)entry = 1;
+    *(short *)(entry + 1) = note_cursor_x;
+    *(short *)(entry + 3) = note_cursor_y;
+    *(signed char *)(entry + 7) = *(signed char *)note_colour;
+    *(signed char *)(entry + 5) = *(signed char *)note_font;
+    *(signed char *)(entry + 6) = *(signed char *)note_text_flags;
+    mc_strncpy(entry + 11, text, 4, (int)D_00174FAC, 381);
+    *(int *)note_selected = (int)entry;
+    entry += 91;
+    *(signed char *)entry = 0;
 }
 
 void note_save_page(void)
@@ -282,28 +282,28 @@ void note_load_page(void)
 
 void note_goto_page_prompt(void)
 {
-    int l_18;
+    char *prompt;
 
     D_0012B508 = 146;
-    l_18 = *(int *)scratch_buffer + 55000;
+    prompt = *(char **)scratch_buffer + 55000;
     mc_set_location(459, (int)D_00174FAC);
-    mc_sprintf(l_18, (int)D_00174FF5, D_0017D1E6);
-    *(signed char *)((char *)(strlen(l_18) + l_18) + 1) = 0;
-    msgbox_show_string(l_18, 2);
+    mc_sprintf(prompt, (int)D_00174FF5, D_0017D1E6);
+    *(signed char *)((char *)(strlen(prompt) + prompt) + 1) = 0;
+    msgbox_show_string(prompt, 2);
     inpstr_begin_number(((int)(short)note_page_index) + 1);
     note_action = 4;
 }
 
-void note_goto_page(int a1)
+void note_goto_page(int page_index)
 {
 {
-    int l_20;
-    int l_1C;
+    int unused;
+    int offset;
 
-    l_1C = ((int)(short)*(short *)&a1) * 3640;
-    if (((unsigned)l_1C) > note_file_size) return;
+    offset = ((int)(short)*(short *)&page_index) * 3640;
+    if (((unsigned)offset) > note_file_size) return;
     note_save_page();
-    note_page_index = a1;
+    note_page_index = page_index;
     note_load_page();
     if (note_silent != 0) return;
     sound_play(205, (int)player_object, 100);
@@ -322,11 +322,11 @@ void note_prev_page(void)
 
 void note_next_page(void)
 {
-    short l_18;
+    short page_count;
 
-    *(int *)&l_18 = ((unsigned)lseek((int)(short)note_file, 0, 2)) / 3640;
+    *(int *)&page_count = ((unsigned)lseek((int)(short)note_file, 0, 2)) / 3640;
     note_save_page();
-    if (((int)(short)note_page_index) < (((int)(short)l_18) - 1)) {
+    if (((int)(short)note_page_index) < (((int)(short)page_count) - 1)) {
         note_page_index++;
         note_reload_page();
         if (note_silent == 0) sound_play(205, (int)player_object, 100);
@@ -362,25 +362,25 @@ void note_cycle_font(void)
 
 void note_find_prompt(void)
 {
-    int l_18;
+    char *prompt;
 
     xn_font_select(4);
     note_search_text = *(int *)scratch_buffer + 56000;
-    l_18 = *(int *)scratch_buffer + 55000;
+    prompt = *(char **)scratch_buffer + 55000;
     mc_set_location(540, (int)D_00174FAC);
-    mc_sprintf(l_18, (int)D_00175010, D_0017D1F2);
-    *(signed char *)((char *)(strlen(l_18) + l_18) + 1) = 0;
-    msgbox_show_string(l_18, 2);
+    mc_sprintf(prompt, (int)D_00175010, D_0017D1F2);
+    *(signed char *)((char *)(strlen(prompt) + prompt) + 1) = 0;
+    msgbox_show_string(prompt, 2);
     mc_memset(note_search_text, 0, 24, (int)D_00174FAC, 543, 4);
-    inpstr_begin_text(note_search_text, 23);
+    inpstr_begin_text((char *)note_search_text, 23);
     *(signed char *)note_text_flags |= 128;
     *(int *)note_selected = *(int *)note_page;
 }
 
-int note_find_match_cb(int a1)
+int note_find_match_cb(char *entry)
 {
-    if (strstr(a1 + 11, note_search_text) != 0) {
-        *(int *)note_selected = a1;
+    if (strstr(entry + 11, note_search_text) != 0) {
+        *(int *)note_selected = (int)entry;
         return 1;
     }
     return 0;
@@ -388,29 +388,29 @@ int note_find_match_cb(int a1)
 
 void note_find(void)
 {
-    int l_20;
-    short l_1C;
-    short l_18;
+    int unused;
+    short page_count;
+    short start_page;
 
     if (((int)(unsigned char)game_mode) != 9 || ((int)(short)(*(short *)note_text_flags & 128)) == 0 || *(signed char *)(((char *)note_search_text)) == 0) {
         return;
     }
     *(short *)note_text_flags &= 127;
-    l_18 = note_page_index;
+    start_page = note_page_index;
     note_save_page();
-    *(int *)&l_1C = ((unsigned)lseek((int)(short)note_file, 0, 2)) / 3640;
+    *(int *)&page_count = ((unsigned)lseek((int)(short)note_file, 0, 2)) / 3640;
     if (note_search_from != 0) {
         *(int *)note_selected = note_search_from;
     } else {
         *(int *)note_selected = *(int *)note_page;
     }
-    while (note_page_index < l_1C) {
+    while (note_page_index < page_count) {
         note_load_page();
         if (note_page_walk(*(int *)note_selected, (int)note_find_match_cb, 0) != 0) goto L4E6F9;
         note_page_index++;
         *(int *)note_selected = *(int *)note_page;
     }
-    note_page_index = *(int *)&l_18;
+    note_page_index = *(int *)&start_page;
     note_reload_page();
     msgbox_show_rsc(1701, 1);
     return;
@@ -461,62 +461,62 @@ void note_toggle_centre(void)
     *(signed char *)(*(char **)note_selected + 6) ^= 1;
 }
 
-int note_select_text_cb(int a1)
+int note_select_text_cb(char *entry)
 {
     {
-        char l_28[12];
+        char box[12];
 
-        *(signed char *)((char *)a1 + 6) &= 191;
-        note_text_box(a1, (int)l_28);
-        if (rect_overlap((int)&D_001997B0, (int)l_28) != 0) *(signed char *)((char *)a1 + 6) |= 64;
+        *(signed char *)(entry + 6) &= 191;
+        note_text_box(entry, box);
+        if (rect_overlap((char *)&D_001997B0, box) != 0) *(signed char *)(entry + 6) |= 64;
         return 0;
     }
 }
 
-int note_select_line_cb(int a1)
+int note_select_line_cb(char *line)
 {
     {
-        char l_34[12];
-        char l_28[12];
+        char end_box[12];
+        char start_box[12];
 
-        *(signed char *)((char *)a1 + 10) &= 191;
-        *(short *)((char *)l_28 + 4) = *(short *)((char *)a1 + 1);
-        *(short *)l_28 = *(int *)((char *)l_28 + 4);
-        *(short *)((char *)l_28 + 6) = *(short *)((char *)a1 + 3);
-        *(short *)((char *)l_28 + 2) = *(int *)((char *)l_28 + 6);
-        *(short *)((char *)l_34 + 4) = *(short *)((char *)a1 + 5);
-        *(short *)l_34 = *(int *)((char *)l_34 + 4);
-        *(short *)((char *)l_34 + 6) = *(short *)((char *)a1 + 7);
-        *(short *)((char *)l_34 + 2) = *(int *)((char *)l_34 + 6);
-        if (rect_overlap((int)&D_001997B0, (int)l_28) != 0 || rect_overlap((int)&D_001997B0, (int)l_34) != 0) {
-            *(signed char *)((char *)a1 + 10) |= 64;
+        *(signed char *)(line + 10) &= 191;
+        *(short *)((char *)start_box + 4) = *(short *)(line + 1);
+        *(short *)start_box = *(int *)((char *)start_box + 4);
+        *(short *)((char *)start_box + 6) = *(short *)(line + 3);
+        *(short *)((char *)start_box + 2) = *(int *)((char *)start_box + 6);
+        *(short *)((char *)end_box + 4) = *(short *)(line + 5);
+        *(short *)end_box = *(int *)((char *)end_box + 4);
+        *(short *)((char *)end_box + 6) = *(short *)(line + 7);
+        *(short *)((char *)end_box + 2) = *(int *)((char *)end_box + 6);
+        if (rect_overlap((char *)&D_001997B0, start_box) != 0 || rect_overlap((char *)&D_001997B0, end_box) != 0) {
+            *(signed char *)(line + 10) |= 64;
         }
         return 0;
     }
 }
 
-int rect_overlap(int a1, int a2)
+int rect_overlap(char *box_a, char *box_b)
 {
-    if (*(short *)((char *)a2 + 4) < *(short *)((char *)a1)) return 0;
-    if (*(short *)((char *)a2) > *(short *)((char *)a1 + 4)) return 0;
-    if (*(short *)((char *)a2 + 6) < *(short *)((char *)a1 + 2)) return 0;
-    if (*(short *)((char *)a2 + 2) > *(short *)((char *)a1 + 6)) return 0;
+    if (*(short *)(box_b + 4) < *(short *)box_a) return 0;
+    if (*(short *)box_b > *(short *)(box_a + 4)) return 0;
+    if (*(short *)(box_b + 6) < *(short *)(box_a + 2)) return 0;
+    if (*(short *)(box_b + 2) > *(short *)(box_a + 6)) return 0;
     return 1;
 }
 
-void note_text_box(int a1, int a2)
+void note_text_box(char *entry, char *box)
 {
-    int l_14;
+    int width;
 
-    xn_font_select((int)(short)((unsigned short)(unsigned char)D_00185201[(int)(unsigned char)*(signed char *)((char *)a1 + 5)]));
-    l_14 = font_text_width(a1 + 11);
-    *(short *)((char *)a2) = *(short *)((char *)a1 + 1);
-    *(short *)((char *)a2 + 2) = *(short *)((char *)a1 + 3);
-    *(short *)((char *)a2 + 4) = *(short *)((char *)a1 + 1) + l_14;
-    *(short *)((char *)a2 + 6) = *(short *)((char *)a1 + 3) + font_height;
-    if (((int)(unsigned char)(*(signed char *)((char *)a1 + 6) & 1)) == 0) return;
-    *(short *)((char *)a2) = 160 - (((int)(short)*(short *)&l_14) >> 1);
-    *(short *)((char *)a2 + 4) = *(short *)((char *)a2) + l_14;
+    xn_font_select((int)(short)((unsigned short)(unsigned char)D_00185201[(int)(unsigned char)*(signed char *)(entry + 5)]));
+    width = font_text_width(entry + 11);
+    *(short *)box = *(short *)(entry + 1);
+    *(short *)(box + 2) = *(short *)(entry + 3);
+    *(short *)(box + 4) = *(short *)(entry + 1) + width;
+    *(short *)(box + 6) = *(short *)(entry + 3) + font_height;
+    if (((int)(unsigned char)(*(signed char *)(entry + 6) & 1)) == 0) return;
+    *(short *)box = 160 - (((int)(short)*(short *)&width) >> 1);
+    *(short *)(box + 4) = *(short *)box + width;
 }
 
 void note_delete_in_box(void)
@@ -526,18 +526,18 @@ void note_delete_in_box(void)
     note_delete_selected();
 }
 
-int note_keep_text_cb(int a1)
+int note_keep_text_cb(char *entry)
 {
-    if (((int)(unsigned char)(*(signed char *)((char *)a1 + 6) & 64)) != 0) return 0;
-    mc_memcpy(D_001997CC, a1, 91, (int)D_00174FAC, 731, 4);
+    if (((int)(unsigned char)(*(signed char *)(entry + 6) & 64)) != 0) return 0;
+    mc_memcpy(D_001997CC, entry, 91, (int)D_00174FAC, 731, 4);
     D_001997CC = (int)(*(char **)&D_001997CC + 91);
     return 0;
 }
 
-int note_keep_line_cb(int a1)
+int note_keep_line_cb(char *line)
 {
-    if (((int)(unsigned char)(*(signed char *)((char *)a1 + 10) & 64)) != 0) return 0;
-    mc_memcpy(D_001997CC, a1, 11, (int)D_00174FAC, 739, 4);
+    if (((int)(unsigned char)(*(signed char *)(line + 10) & 64)) != 0) return 0;
+    mc_memcpy(D_001997CC, line, 11, (int)D_00174FAC, 739, 4);
     D_001997CC += 11;
     return 0;
 }

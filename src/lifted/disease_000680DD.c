@@ -26,18 +26,18 @@ extern void object_foreach(struct record *, int);
 extern void item_repair_cb(int);
 extern void item_break(struct record *);
 
-void item_enchantment_tick(struct item *a1, int a2, int a3)
+void item_enchantment_tick(struct item *item, int enchant_type, int enchant_param)
 {
-    int l_10;
+    int unused;
 
-    if (a2 != 3 && *(int *)D_00195B08 == 0) return;
-    switch ((unsigned)a2) {
+    if (enchant_type != 3 && *(int *)D_00195B08 == 0) return;
+    switch ((unsigned)enchant_type) {
     case 3:
         *(int *)extra_spell_points = 0;
-        enchant_extra_spell_points(a1, a3);
+        enchant_extra_spell_points(item, enchant_param);
         player_character->max_magicka += *(short *)extra_spell_points;
         D_001A3AA8 += *(int *)extra_spell_points;
-        if (*(int *)extra_spell_points != 0 && a3 >= 7 && a3 <= 10 && player_character->magicka < player_character->max_magicka) {
+        if (*(int *)extra_spell_points != 0 && enchant_param >= 7 && enchant_param <= 10 && player_character->magicka < player_character->max_magicka) {
             player_character->magicka += *(short *)D_00195B08 * 5;
         }
         if (*(int *)D_00195B08 != 0 && ((struct bf8_0_2 *)&game_minutes)->f == 0) {
@@ -45,7 +45,7 @@ void item_enchantment_tick(struct item *a1, int a2, int a3)
         }
         break;
     case 5:
-        switch ((unsigned)a3) {
+        switch ((unsigned)enchant_param) {
         case 1:
             if (player_in_daylight() == 0) return;
             goto L68256;
@@ -62,26 +62,26 @@ L68256:;
         }
         break;
     case 17:
-        if ((a3 == 0 && player_in_daylight() != 0) || (a3 != 0 && player_in_temple() != 0)) {
+        if ((enchant_param == 0 && player_in_daylight() != 0) || (enchant_param != 0 && player_in_temple() != 0)) {
             damage_apply(player_entity, *(int *)D_00195B08, 0);
         }
         break;
     case 16:
-        switch ((unsigned)a3) {
+        switch ((unsigned)enchant_param) {
         case 1:
             if (player_in_daylight() == 0) return;
             break;
         case 2:
             if (player_in_temple() == 0) return;
         }
-        if (a1->condition > *(int *)D_00195B08) {
-            a1->condition -= *(short *)D_00195B08;
+        if (item->condition > *(int *)D_00195B08) {
+            item->condition -= *(short *)D_00195B08;
         } else {
             item_break(scratch_current_object);
         }
         break;
     case 21:
-        switch ((unsigned)a3) {
+        switch ((unsigned)enchant_param) {
         case 1:
             if (*(int *)D_00195B08 != 0 && ((unsigned)(game_minutes - player_character->last_kill_time)) > 1440) {
                 damage_apply(player_entity, *(int *)D_00195B08, 0);
@@ -102,7 +102,7 @@ L68256:;
         item_damage(scratch_current_object, 1);
         break;
     case 6:
-        if (a3 == 0 && nearest_creature_distance < 128 && player_character->health != player_character->max_health) {
+        if (enchant_param == 0 && nearest_creature_distance < 128 && player_character->health != player_character->max_health) {
             damage_apply(*(struct record **)nearest_creature, *(int *)D_00195B08, 0);
             player_character->health += *(short *)D_00195B08;
             if (player_character->health > player_character->max_health) {

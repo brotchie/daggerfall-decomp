@@ -151,7 +151,7 @@ extern struct record *object_create_child(struct record *, struct record *, int)
 extern int marker_count(struct record *, int);
 extern int player_to_nearest_marker(struct record *, int);
 extern int func_0009DA1C(int, int);
-extern int printf(int, ...);
+extern int printf(char *, ...);
 extern int exit();
 extern int open(int, ...);
 extern int close();
@@ -230,8 +230,8 @@ extern void object_heap_shutdown(void);
 extern void object_free_children(struct record *);
 extern void inv_reset_left_list(void);
 extern void dpmi_get_free_memory(int);
-int cfg_skip_blanks(int);
-int cfg_skip_token(int);
+char *cfg_skip_blanks(char *);
+char *cfg_skip_token(char *);
 void player_refresh_paperdoll(void);
 void shutdown_free_all(void);
 void shutdown_video(void);
@@ -247,10 +247,10 @@ void spell_cast_anims_free(void);
 
 void debug_show_mem_used(void)
 {
-    int l_18;
+    struct bf8_0_5 *ticks_addr;
 
-    l_18 = 1132;
-    if (((struct bf8_0_5 *)((char *)l_18))->f == 0) {
+    ticks_addr = (struct bf8_0_5 *)1132;
+    if (ticks_addr->f == 0) {
         dpmi_get_free_memory((int)D_001A3F60);
         D_001A3F9C = D_001A3F90 - (D_001A3F7C << 2);
     }
@@ -283,8 +283,8 @@ void init_world_objects(void)
 
 void newgame_place_player(void)
 {
-    int l_1C;
-    int l_18;
+    int unused;
+    int unused2;
 
     location_object->image = 65535;
     if (((int)(unsigned char)cfg_map_file) == 100) {
@@ -314,8 +314,8 @@ void newgame_place_player(void)
 
 void shutdown_free_all(void)
 {
-    int l_1C;
-    int l_18;
+    int i;
+    int unused;
 
     xn_joy_shutdown();
     xn_render_shutdown();
@@ -323,11 +323,11 @@ void shutdown_free_all(void)
     archive_close(maps_bsa);
     archive_close(dagger_snd);
     archive_close(monster_bsa_handle);
-    for (l_1C = 0; ((int)(short)*(short *)&l_1C) < 127; l_1C++) {
-        if (*(int *)(D_00190704 + (((int)(short)*(short *)&l_1C) << 2)) != 0) {
-            if (*(int *)(D_00190704 + (((int)(short)*(short *)&l_1C) << 2)) != 0 && *(int *)(D_00190704 + (((int)(short)*(short *)&l_1C) << 2)) != (-1751672937)) {
-                mc_free(*(int *)(D_00190704 + (((int)(short)*(short *)&l_1C) << 2)), (int)D_00175040, 314);
-                *(int *)(D_00190704 + (((int)(short)*(short *)&l_1C) << 2)) = -1751672937;
+    for (i = 0; ((int)(short)*(short *)&i) < 127; i++) {
+        if (*(int *)(D_00190704 + (((int)(short)*(short *)&i) << 2)) != 0) {
+            if (*(int *)(D_00190704 + (((int)(short)*(short *)&i) << 2)) != 0 && *(int *)(D_00190704 + (((int)(short)*(short *)&i) << 2)) != (-1751672937)) {
+                mc_free(*(int *)(D_00190704 + (((int)(short)*(short *)&i) << 2)), (int)D_00175040, 314);
+                *(int *)(D_00190704 + (((int)(short)*(short *)&i) << 2)) = -1751672937;
             }
         }
     }
@@ -461,10 +461,10 @@ void shutdown_free_all(void)
     weapon_free_sprites();
     spell_cast_anims_free();
     msgbox_free_borders();
-    for (l_1C = 0; ((int)(short)*(short *)&l_1C) < 5; l_1C++) {
-        if (quest_face_images[((int)(short)*(short *)&l_1C)] != 0 && quest_face_images[((int)(short)*(short *)&l_1C)] != (-1751672937)) {
-            mc_free(quest_face_images[((int)(short)*(short *)&l_1C)], (int)D_00175040, 360);
-            quest_face_images[((int)(short)*(short *)&l_1C)] = -1751672937;
+    for (i = 0; ((int)(short)*(short *)&i) < 5; i++) {
+        if (quest_face_images[((int)(short)*(short *)&i)] != 0 && quest_face_images[((int)(short)*(short *)&i)] != (-1751672937)) {
+            mc_free(quest_face_images[((int)(short)*(short *)&i)], (int)D_00175040, 360);
+            quest_face_images[((int)(short)*(short *)&i)] = -1751672937;
         }
     }
     sky_free();
@@ -476,8 +476,8 @@ void shutdown_free_all(void)
 
 void init_video(void)
 {
-    int l_1C;
-    int l_18;
+    int unused;
+    int unused2;
 
     xn_kbd_numlock_off();
     xn_timer_wait_ticks(18);
@@ -526,7 +526,7 @@ void palette_restore(void)
     D_001940D7 |= 1;
 }
 
-void game_exit(int a1)
+void game_exit(char *message)
 {
     mc_set_location(440, (int)D_00175040);
     func_000A148C((int)D_00175226);
@@ -534,12 +534,12 @@ void game_exit(int a1)
     mem_check_level = 0;
     exiting = 1;
     game_shutdown();
-    if (a1 == 0) {
+    if (message == 0) {
         func_0009DA1C(449, (int)D_00175040);
-        printf((int)D_0017523C);
+        printf(D_0017523C);
     } else {
         func_0009DA1C(451, (int)D_00175040);
-        printf(a1);
+        printf(message);
     }
     kludge_print_build(1);
     mc_set_location(455, (int)D_00175040);
@@ -556,131 +556,131 @@ void game_shutdown(void)
     xn_mem_shutdown();
 }
 
-void fatal_error(int a1)
+void fatal_error(char *message)
 {
     {
-        char l_418[1024];
+        char text[1024];
 
         mem_check_level = 0;
         if (exiting != 0) return;
         if (internal_check_failed != 0) {
             mc_set_location(480, (int)D_00175040);
-            mc_sprintf((int)l_418, (int)D_00175266, internal_check_failed);
+            mc_sprintf((int)text, (int)D_00175266, internal_check_failed);
         } else {
-            mc_strncpy((int)l_418, a1, 1024, (int)D_00175040, 482);
+            mc_strncpy((int)text, message, 1024, (int)D_00175040, 482);
         }
         mc_set_location(484, (int)D_00175040);
         func_000A148C((int)D_00175281, frame_checkpoint);
         mc_set_location(485, (int)D_00175040);
-        func_000A148C((int)D_001752B6, (int)l_418);
+        func_000A148C((int)D_001752B6, (int)text);
         mc_set_location(487, (int)D_00175040);
-        func_000A18C3((int)l_418);
+        func_000A18C3((int)text);
         exiting = 1;
         engine_running = 0;
         mem_check_level = 0;
         game_shutdown();
         func_0009DA1C(495, (int)D_00175040);
-        printf((int)D_001752D2, frame_checkpoint);
+        printf(D_001752D2, frame_checkpoint);
         func_0009DA1C(496, (int)D_00175040);
-        printf((int)D_001752B6, (int)l_418);
+        printf(D_001752B6, text);
         func_0009DA1C(497, (int)D_00175040);
-        printf((int)D_00175307);
+        printf(D_00175307);
         mc_set_location(499, (int)D_00175040);
-        mc_sprintf((int)l_418, (int)D_00175260, (int)arena2_path, (int)D_00175253);
-        unlink((int)l_418);
+        mc_sprintf((int)text, (int)D_00175260, (int)arena2_path, (int)D_00175253);
+        unlink((int)text);
         exit(10);
     }
 }
 
 void newgame_init_player(void)
 {
-    int l_20;
-    struct character *l_1C;
-    struct career *l_18;
+    int level;
+    struct character *character;
+    struct career *career;
 
     player_refresh_paperdoll();
     player_compute_jump_velocity();
     mc_set_location(514, (int)D_00175040);
     mc_sprintf((int)text_buffer, (int)D_00175313, (int)arena2_path);
     disk_copy_file((int)cfg_mapsave_file, (int)text_buffer, (int)arena2_path);
-    l_1C = player_character;
-    l_18 = player_class;
-    l_1C->fatigue = (l_1C->attributes[ATTR_STR] + l_1C->attributes[ATTR_END]) << 6;
-    l_1C->health = l_18->hp_per_level + 25;
-    for (l_20 = 1; l_1C->level > l_20; l_20++) {
-        l_1C->health += rand_range(1, l_18->hp_per_level);
+    character = player_character;
+    career = player_class;
+    character->fatigue = (character->attributes[ATTR_STR] + character->attributes[ATTR_END]) << 6;
+    character->health = career->hp_per_level + 25;
+    for (level = 1; character->level > level; level++) {
+        character->health += rand_range(1, career->hp_per_level);
     }
-    l_1C->max_health_base = (int)(short)(l_1C->max_health = l_1C->health);
-    character_reset_magicka(l_1C, l_18);
-    l_1C->attack_damage[0][0] = 1;
-    l_1C->attack_damage[0][1] = 2;
+    character->max_health_base = (int)(short)(character->max_health = character->health);
+    character_reset_magicka(character, career);
+    character->attack_damage[0][0] = 1;
+    character->attack_damage[0][1] = 2;
     weapon_reload_hand_sprites();
 }
 
-void character_reset_magicka(struct character *a1, struct career *a2)
+void character_reset_magicka(struct character *character, struct career *career)
 {
-    a1->magicka = (a1->max_magicka = (a1->attributes[ATTR_INT] * ((int)(short)D_001788D3[((a2->flags >> 10) & 7)])) / 256);
+    character->magicka = (character->max_magicka = (character->attributes[ATTR_INT] * ((int)(short)D_001788D3[((career->flags >> 10) & 7)])) / 256);
 }
 
-int flats_cfg_find(int a1)
+int flats_cfg_find(int image)
 {
-    int l_1C;
+    int i;
 
-    for (l_1C = 0; l_1C < flats_cfg_count; l_1C++) {
-        if (((int)(unsigned short)*(short *)(flats_cfg + (l_1C * 40))) == a1) {
-            return ((int)flats_cfg) + (l_1C * 40);
+    for (i = 0; i < flats_cfg_count; i++) {
+        if (((int)(unsigned short)*(short *)(flats_cfg + (i * 40))) == image) {
+            return ((int)flats_cfg) + (i * 40);
         }
     }
     return 0;
 }
 
-void cfg_read_line(int a1, int a2)
+void cfg_read_line(char **cursor, char *line)
 {
-    *(int *)((char *)a1) = cfg_skip_blanks(*(int *)((char *)a1));
-    while (((int)(unsigned char)*(signed char *)(*(char **)((char *)a1))) != 13) {
-        *(signed char *)((char *)a2++) = *(signed char *)(*(char **)((char *)a1));
-        (*(int *)((char *)a1))++;
+    *cursor = cfg_skip_blanks(*cursor);
+    while (**cursor != 13) {
+        *line++ = **cursor;
+        (*cursor)++;
         (*(int *)disk_last_file_size)--;
     }
-    *(signed char *)((char *)a2++) = 0;
+    *line++ = 0;
 }
 
-int cfg_read_number(int a1)
+int cfg_read_number(char **cursor)
 {
-    int l_1C;
+    int number;
 
-    *(int *)((char *)a1) = cfg_skip_blanks(*(int *)((char *)a1));
-    if (*(int *)((char *)a1) == 0) return 100000;
-    l_1C = atoi(*(int *)((char *)a1));
-    *(int *)((char *)a1) = cfg_skip_token(*(int *)((char *)a1));
-    return l_1C;
+    *cursor = cfg_skip_blanks(*cursor);
+    if (*cursor == 0) return 100000;
+    number = atoi(*cursor);
+    *cursor = cfg_skip_token(*cursor);
+    return number;
 }
 
-int cfg_skip_blanks(int a1)
+char *cfg_skip_blanks(char *text)
 {
-    while (((int)(unsigned char)*(signed char *)((char *)a1)) <= 32) {
-        a1++;
+    while (*text <= 32) {
+        text++;
         (*(int *)disk_last_file_size)--;
         if (*(int *)disk_last_file_size < 1) return 0;
     }
-    return a1;
+    return text;
 }
 
-int cfg_skip_token(int a1)
+char *cfg_skip_token(char *text)
 {
-    while (((int)(unsigned char)*(signed char *)((char *)a1)) > 32) {
-        a1++;
+    while (*text > 32) {
+        text++;
         (*(int *)disk_last_file_size)--;
     }
-    return a1;
+    return text;
 }
 
-void init_player_records(struct record *a1)
+void init_player_records(struct record *root)
 {
-    int l_1C;
-    int l_18;
+    int unused;
+    int logbook;
 
-    (player_object = object_create_child(a1, 0, 0))->type = 4;
+    (player_object = object_create_child(root, 0, 0))->type = 4;
     player_object->flags = 3;
     player_object->x = 0;
     player_object->y = 0;
@@ -729,24 +729,24 @@ void init_player_records(struct record *a1)
     game_settings->music_volume = 128;
     *(signed char *)((char *)(*(int *)&logbook_object = (int)object_create_child(player_entity, 0, 3008))) = 24;
     logbook_object->flags = 3;
-    l_18 = (int)logbook_object + 71;
+    logbook = (int)logbook_object + 71;
     *(signed char *)((char *)(*(int *)&bank_accounts = (int)object_create_child(player_entity, 0, 806))) = 25;
     bank_accounts->flags = 3;
 }
 
 void update_underwater(void)
 {
-    int l_18;
+    int underwater;
 
     if (dungeon_water_level == 10000) return;
     if ((player_object->y - 76) > dungeon_water_level) {
-        l_18 = 1;
+        underwater = 1;
     } else {
-        l_18 = 0;
+        underwater = 0;
     }
-    if (((int)(unsigned char)player_underwater) == l_18) return;
-    player_underwater = *(signed char *)&l_18;
-    xn_shade_load(l_18, l_18);
+    if (((int)(unsigned char)player_underwater) == underwater) return;
+    player_underwater = *(signed char *)&underwater;
+    xn_shade_load(underwater, underwater);
     xn_shade_keep_colours_0_255();
 }
 
@@ -787,17 +787,17 @@ void spell_cast_anims_free(void)
 
 void update_fog(void)
 {
-    int l_20;
-    int l_1C;
-    int l_18;
+    int is_day;
+    int climate;
+    int minute_of_day;
 
-    l_18 = ((unsigned)game_minutes) % 1440;
-    if (l_18 > 360 && l_18 < 1080) {
-        l_20 = 1;
+    minute_of_day = ((unsigned)game_minutes) % 1440;
+    if (minute_of_day > 360 && minute_of_day < 1080) {
+        is_day = 1;
     } else {
-        l_20 = 0;
+        is_day = 0;
     }
-    daylight = l_20;
+    daylight = is_day;
     if (((int)player_environment) == 1) {
         if (daylight == 0) {
             xn_cam_far_z = ((game_settings->view_flags >> 8) + 129) * 1536;
@@ -806,8 +806,8 @@ void update_fog(void)
             fog_colour = 0;
             return;
         }
-        l_1C = climate_category();
-        if (((int)(unsigned char)(climate_weathers[l_1C] & 127)) == 3 || ((int)(unsigned char)(climate_weathers[l_1C] & 128)) != 0) {
+        climate = climate_category();
+        if (((int)(unsigned char)(climate_weathers[climate] & 127)) == 3 || ((int)(unsigned char)(climate_weathers[climate] & 128)) != 0) {
             xn_cam_far_z = ((game_settings->view_flags >> 8) + 129) * 768;
             xn_fog_table_last = D_00195D18 + 16128;
             xn_shade_set_fog(8);
@@ -835,7 +835,7 @@ void update_fog(void)
 
 void game_reset(void)
 {
-    int l_18;
+    int region;
 
     if (location_object->image != 65535) location_unload(location_object->image);
     object_free_children(nonworld_root);
@@ -852,8 +852,8 @@ void game_reset(void)
     frame_checkpoint = 504;
     faction_load_file();
     frame_checkpoint = 505;
-    for (l_18 = 0; l_18 < 62; l_18++) {
-        *(short *)(region_price_adjustment + (l_18 * 80)) = rand_range(0, 500) + 750;
+    for (region = 0; region < 62; region++) {
+        *(short *)(region_price_adjustment + (region * 80)) = rand_range(0, 500) + 750;
     }
     mc_memset((int)saved_positions, 0, 48, (int)D_00175040, 851, 48);
     mc_memset((int)((char *)creature_list), 0, 512, (int)D_00175040, 852, 512);
@@ -862,17 +862,17 @@ void game_reset(void)
 
 void books_find_path(void)
 {
-    int l_18;
+    int handle;
 
     mc_set_location(860, (int)D_00175040);
     mc_sprintf((int)text_buffer, (int)D_00175365, (int)arena2_path);
-    l_18 = open((int)text_buffer, 512);
-    if (l_18 < 0) {
+    handle = open((int)text_buffer, 512);
+    if (handle < 0) {
         books_path = (int)arena2_cd_path;
         return;
     }
     books_path = (int)arena2_path;
-    close(l_18);
+    close(handle);
 }
 
 void init_link_caster(void)

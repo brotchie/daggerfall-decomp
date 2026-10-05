@@ -27,53 +27,53 @@ extern int mc_sprintf(char *, char *, ...);
 extern int func_000A13DA(char *, int, struct find_t *);
 extern int func_000A13F7(struct find_t *);
 
-int quest_pick_file(unsigned char a1, unsigned char a2, unsigned char a3, unsigned char a4, unsigned char a5)
+int quest_pick_file(unsigned char group_char, unsigned char group_char2, unsigned char second_char, unsigned char membership_char, unsigned char rank)
 {
-    struct find_t ff;
-    int rc;
-    int n;
-    char *p;
+    struct find_t find_data;
+    int status;
+    int file_count;
+    char *entry;
 
-    p = scratch_buffer;
-    n = 0;
+    entry = scratch_buffer;
+    file_count = 0;
     mc_set_location(323, D_00174F47);
     mc_sprintf(((char *)text_buffer), D_00174F69, arena2_cd_path);
-    rc = func_000A13DA(((char *)text_buffer), 0, &ff);
-    while (rc == 0) {
-        if (ff.name[0] != a1 && ff.name[0] != a2)
+    status = func_000A13DA(((char *)text_buffer), 0, &find_data);
+    while (status == 0) {
+        if (find_data.name[0] != group_char && find_data.name[0] != group_char2)
             ;
-        else if (ff.name[1] == a3)
-            if (ff.name[2] == a4)
-                if (ff.name[3] - '0' <= a5)
-                    if ((game_settings->view_flags & 4) && (ff.name[4] == 'X' || ff.name[4] == 'Y'))
+        else if (find_data.name[1] == second_char)
+            if (find_data.name[2] == membership_char)
+                if (find_data.name[3] - '0' <= rank)
+                    if ((game_settings->view_flags & 4) && (find_data.name[4] == 'X' || find_data.name[4] == 'Y'))
                         ;
                     else
-                        n = quest_file_list_add(ff.name, n);
-        rc = func_000A13F7(&ff);
+                        file_count = quest_file_list_add(find_data.name, file_count);
+        status = func_000A13F7(&find_data);
     }
     mc_set_location(338, D_00174F47);
     mc_sprintf(((char *)text_buffer), D_00174F69, arena2_path);
-    rc = func_000A13DA(((char *)text_buffer), 0, &ff);
-    while (rc == 0) {
-        if (ff.name[0] != a1 && ff.name[0] != a2)
+    status = func_000A13DA(((char *)text_buffer), 0, &find_data);
+    while (status == 0) {
+        if (find_data.name[0] != group_char && find_data.name[0] != group_char2)
             ;
-        else if (ff.name[1] == a3)
-            if (ff.name[2] == a4)
-                if (ff.name[3] - '0' <= a5)
-                    if ((game_settings->view_flags & 4) && (ff.name[4] == 'X' || ff.name[4] == 'Y'))
+        else if (find_data.name[1] == second_char)
+            if (find_data.name[2] == membership_char)
+                if (find_data.name[3] - '0' <= rank)
+                    if ((game_settings->view_flags & 4) && (find_data.name[4] == 'X' || find_data.name[4] == 'Y'))
                         ;
                     else
-                        n = quest_file_list_add(ff.name, n);
-        rc = func_000A13F7(&ff);
+                        file_count = quest_file_list_add(find_data.name, file_count);
+        status = func_000A13F7(&find_data);
     }
-    if (n == 0)
+    if (file_count == 0)
         return 0;
-    n = rand_range(0, n - 1);
-    p = scratch_buffer;
-    while (n != 0) {
-        p += strlen(p) + 1;
-        n--;
+    file_count = rand_range(0, file_count - 1);
+    entry = scratch_buffer;
+    while (file_count != 0) {
+        entry += strlen(entry) + 1;
+        file_count--;
     }
-    mc_strncpy(D_001961F5, p, 13, D_00174F47, 365);
+    mc_strncpy(D_001961F5, entry, 13, D_00174F47, 365);
     return 1;
 }

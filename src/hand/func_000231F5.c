@@ -6,17 +6,17 @@ extern void func_0007E815(struct record *, int);
 extern void town_grid_visit_near(struct record *, int);
 extern void object_foreach_open(struct record *, int);
 
-void collide_for_each_nearby(struct record *a1, int a2)
+void collide_for_each_nearby(struct record *object, int callback)
 {
-    int l_18;
-    char l_28[12];
+    int unused1;
+    char unused2[12];
 
     if (player_environment != 3) {
-        if (a1->parent->type != 1)
-            object_foreach_open(a1->parent->children, a2);
+        if (object->parent->type != 1)
+            object_foreach_open(object->parent->children, callback);
         else
-            town_grid_visit_near(a1, a2);
+            town_grid_visit_near(object, callback);
     } else {
-        func_0007E815(a1, a2);
+        func_0007E815(object, callback);
     }
 }

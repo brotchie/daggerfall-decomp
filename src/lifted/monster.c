@@ -75,577 +75,577 @@ int func_00063ED8(struct record *, int);
 void func_0006243B(struct record *, struct record *, int);
 void monster_mark_anim_slot_cb(struct record *);
 
-void func_000622EB(struct record *a1, struct record *a2, int a3, int a4)
+void func_000622EB(struct record *monster, struct record *target, int heading, int turn_dir)
 {
-    struct character *l_10;
-    int l_C;
+    struct character *monster_char;
+    int detour_offset;
 
-    l_10 = &a1->data.character;
-    mc_memcpy((int)D_00196167, a1, 71, (int)D_00175934, 426, 4);
-    if (l_10->detour_steps == 1000) {
-        func_0006243B(a1, a2, a3);
+    monster_char = &monster->data.character;
+    mc_memcpy((int)D_00196167, monster, 71, (int)D_00175934, 426, 4);
+    if (monster_char->detour_steps == 1000) {
+        func_0006243B(monster, target, heading);
         if (((int)(short)(*(short *)collide_flags & 10)) == 0) {
-            l_10->detour_steps = 1000;
+            monster_char->detour_steps = 1000;
             return;
         }
-        l_10->detour_steps = rand_range(4, 12);
+        monster_char->detour_steps = rand_range(4, 12);
     }
-    if (l_10->detour_steps != 0) {
-        l_10->detour_steps--;
+    if (monster_char->detour_steps != 0) {
+        monster_char->detour_steps--;
     } else {
-        if (a4 < 0) {
-            l_C = -512;
+        if (turn_dir < 0) {
+            detour_offset = -512;
         } else {
-            l_C = 512;
+            detour_offset = 512;
         }
-        if (l_10->detour_side != 0) {
-            l_10->detour_yaw = l_C + a1->yaw;
+        if (monster_char->detour_side != 0) {
+            monster_char->detour_yaw = detour_offset + monster->yaw;
         } else {
-            l_10->detour_yaw = a1->yaw - l_C;
+            monster_char->detour_yaw = monster->yaw - detour_offset;
         }
-        l_10->detour_steps = 1000;
-        l_10->detour_side ^= 1;
+        monster_char->detour_steps = 1000;
+        monster_char->detour_side ^= 1;
     }
-    mc_memcpy(a1, (int)D_00196167, 71, (int)D_00175934, 457, 4);
-    func_0006243B(a1, a2, l_10->detour_yaw & 2047);
+    mc_memcpy(monster, (int)D_00196167, 71, (int)D_00175934, 457, 4);
+    func_0006243B(monster, target, monster_char->detour_yaw & 2047);
 }
 
-void func_0006243B(struct record *a1, struct record *a2, int a3)
+void func_0006243B(struct record *monster, struct record *target, int heading)
 {
-    int l_2C;
-    int l_28;
-    int l_24;
-    int l_20;
-    int l_1C;
-    int l_18;
-    int l_14;
-    unsigned char l_10;
+    int saved_velocity;
+    int dx;
+    int dz;
+    int fall_start;
+    int saved_ceiling;
+    int speed;
+    int dy;
+    unsigned char saved_on_ground;
     {
-        char l_80[32];
-        char l_60[40];
+        int move[8];
+        char saved_pos[40];             /* +0: the saved D_00196D54; +36: the monster's character */
 
-        *(int *)((char *)l_60 + 36) = (int)&a1->data.character;
-        l_18 = ((((int)(short)*(short *)(*(char **)((char *)l_60 + 36) + 44)) + 100) * frame_ticks) / 1000;
-        if (*(int *)(*(char **)((char *)l_60 + 36) + 76) != 0) {
-            l_24 = 0;
-            l_28 = l_24;
+        *(int *)((char *)saved_pos + 36) = (int)&monster->data.character;
+        speed = ((((int)(short)*(short *)(*(char **)((char *)saved_pos + 36) + 44)) + 100) * frame_ticks) / 1000;
+        if (*(int *)(*(char **)((char *)saved_pos + 36) + 76) != 0) {
+            dz = 0;
+            dx = dz;
         } else {
-            xn_math_yaw_offset_xz(a3, l_18, (int)&l_28, (int)&l_24);
+            xn_math_yaw_offset_xz(heading, speed, (int)&dx, (int)&dz);
         }
-        *(int *)l_80 = a1->x + l_28;
-        *(int *)((char *)l_80 + 4) = a1->y;
-        *(int *)((char *)l_80 + 8) = a1->z + l_24;
+        move[0] = monster->x + dx;
+        move[1] = monster->y;
+        move[2] = monster->z + dz;
         if (((struct bf8_0_1 *)&ai_monster_flags)->f != 0) {
-            l_14 = *(int *)((char *)l_80 + 4) - (a2->y - 70);
-            if (abs(l_14) > 10) {
-                if (l_14 < 0) {
-                    *(int *)((char *)l_80 + 4) += l_18;
+            dy = move[1] - (target->y - 70);
+            if (abs(dy) > 10) {
+                if (dy < 0) {
+                    move[1] += speed;
                 } else {
-                    *(int *)((char *)l_80 + 4) -= l_18;
+                    move[1] -= speed;
                 }
             }
         }
-        *(int *)((char *)l_80 + 12) = a1->angle_x;
-        *(int *)((char *)l_80 + 16) = a1->yaw;
-        *(int *)((char *)l_80 + 20) = a1->angle_z;
-        l_10 = player_on_ground;
-        l_2C = vertical_velocity;
-        l_1C = ceiling_height;
+        move[3] = monster->angle_x;
+        move[4] = monster->yaw;
+        move[5] = monster->angle_z;
+        saved_on_ground = player_on_ground;
+        saved_velocity = vertical_velocity;
+        saved_ceiling = ceiling_height;
         *(signed char *)collide_flags |= 4;
-        l_20 = (vertical_velocity = *(int *)(*(char **)((char *)l_60 + 36) + 76));
+        fall_start = (vertical_velocity = *(int *)(*(char **)((char *)saved_pos + 36) + 76));
         D_001940D7 |= 128;
-        *(int *)((char *)l_80 + 24) = (int)D_00187B44;
-        if (((int)(unsigned short)(*(short *)(*(char **)((char *)l_60 + 36) + 64) & 2080)) != 0) {
-            *(short *)((char *)l_80 + 28) |= 1;
+        move[6] = (int)D_00187B44;
+        if (((int)(unsigned short)(*(short *)(*(char **)((char *)saved_pos + 36) + 64) & 2080)) != 0) {
+            *(short *)&move[7] |= 1;
         } else {
-            *(short *)((char *)l_80 + 28) &= 65534;
+            *(short *)&move[7] &= 65534;
         }
-        mc_memcpy((int)l_60, (int)D_00196D54, 12, (int)D_00175934, 512, 4);
-        *(int *)D_00196D54 = a1->x;
-        D_00196D58 = a1->y - (vertical_velocity / 256);
-        D_00196D5C = a1->z;
-        if ((*(int *)((char *)l_80 + 4) - 90) < *(int *)(*(char **)((char *)l_60 + 36) + 88)) {
-            *(int *)((char *)l_80 + 4) = *(int *)(*(char **)((char *)l_60 + 36) + 88) + 90;
+        mc_memcpy((int)saved_pos, (int)D_00196D54, 12, (int)D_00175934, 512, 4);
+        *(int *)D_00196D54 = monster->x;
+        D_00196D58 = monster->y - (vertical_velocity / 256);
+        D_00196D5C = monster->z;
+        if ((move[1] - 90) < *(int *)(*(char **)((char *)saved_pos + 36) + 88)) {
+            move[1] = *(int *)(*(char **)((char *)saved_pos + 36) + 88) + 90;
         }
-        collide_move_object(a1, 0, (int)l_80, 0);
-        player_on_ground = l_10;
-        mc_memcpy((int)D_00196D54, (int)l_60, 12, (int)D_00175934, 521, 4);
-        if (*(int *)((char *)l_60 + 36) != (int)player_character) {
-            *(int *)(*(char **)((char *)l_60 + 36) + 88) = ceiling_height;
+        collide_move_object(monster, 0, (int)move, 0);
+        player_on_ground = saved_on_ground;
+        mc_memcpy((int)D_00196D54, (int)saved_pos, 12, (int)D_00175934, 521, 4);
+        if (*(int *)((char *)saved_pos + 36) != (int)player_character) {
+            *(int *)(*(char **)((char *)saved_pos + 36) + 88) = ceiling_height;
         }
         if (((int)(short)(*(short *)collide_flags & 16)) != 0 && ((struct bf8_0_1 *)&ai_monster_flags)->f == 0) {
-            object_apply_gravity(a1, (struct character *)*(int *)((char *)l_60 + 36));
+            object_apply_gravity(monster, (struct character *)*(int *)((char *)saved_pos + 36));
         } else {
             vertical_velocity = 0;
-            *(signed char *)(*(char **)((char *)l_60 + 36) + 65) &= 247;
+            *(signed char *)(*(char **)((char *)saved_pos + 36) + 65) &= 247;
         }
-        if (vertical_velocity == 0 && l_20 != 0) {
-            damage_apply(a1, (int)&*(signed char *)((char *)((l_20 / 256) / 80) - 3), 0);
+        if (vertical_velocity == 0 && fall_start != 0) {
+            damage_apply(monster, (int)&*(signed char *)((char *)((fall_start / 256) / 80) - 3), 0);
         }
-        *(int *)(*(char **)((char *)l_60 + 36) + 76) = vertical_velocity;
-        vertical_velocity = l_2C;
-        ceiling_height = l_1C;
-        if (abs(a1->y - player_object->y) <= 3000) return;
+        *(int *)(*(char **)((char *)saved_pos + 36) + 76) = vertical_velocity;
+        vertical_velocity = saved_velocity;
+        ceiling_height = saved_ceiling;
+        if (abs(monster->y - player_object->y) <= 3000) return;
         D_001940DA |= 128;
-        object_delete(a1);
+        object_delete(monster);
     }
 }
 
-int monster_set_action(struct record *a1, int a2, int a3)
+int monster_set_action(struct record *monster, int angle, int action)
 {
-    struct monster_anim *l_24;
-    int l_20;
-    int l_1C;
-    int l_18;
-    int l_14;
+    struct monster_anim *anim;
+    int facing;
+    int player_angle;
+    int view_yaw;
+    int unused;
 
-    if (a1->data.character.race == 29) return monster_set_action_seducer(a1, a2, a3);
-    if (a1->data.character.race >= 60 && a3 != 0 && a3 != 60 && a3 != 8) return 0;
-    l_24 = &a1->data.monster.anim;
-    l_1C = xn_math_angle_to_point(a1->x, a1->z, player_object->x, player_object->z);
-    l_18 = (a1->yaw + 128) & 2047;
-    l_20 = (l_18 - l_1C) & 2047;
-    l_20 >>= 8;
-    if (l_20 > 4) {
-        l_20 = (int)(unsigned char)anim_mirror_facing[l_20];
-        l_24->anim_flags |= 128;
+    if (monster->data.character.race == 29) return monster_set_action_seducer(monster, angle, action);
+    if (monster->data.character.race >= 60 && action != 0 && action != 60 && action != 8) return 0;
+    anim = &monster->data.monster.anim;
+    player_angle = xn_math_angle_to_point(monster->x, monster->z, player_object->x, player_object->z);
+    view_yaw = (monster->yaw + 128) & 2047;
+    facing = (view_yaw - player_angle) & 2047;
+    facing >>= 8;
+    if (facing > 4) {
+        facing = (int)(unsigned char)anim_mirror_facing[facing];
+        anim->anim_flags |= 128;
     } else {
-        l_24->anim_flags &= 127;
+        anim->anim_flags &= 127;
     }
-    l_24->anim_facing = *(signed char *)&l_20;
-    if (l_24->anim_request != 255) return 0;
+    anim->anim_facing = *(signed char *)&facing;
+    if (anim->anim_request != 255) return 0;
     if (D_00199D74 != 0) return 0;
     D_00199D74 = 1;
-    a1->data.character.action = *(signed char *)&a3;
-    l_24->anim_request = *(signed char *)&a3;
+    monster->data.character.action = *(signed char *)&action;
+    anim->anim_request = *(signed char *)&action;
     return 1;
 }
 
-int monster_set_action_seducer(struct record *a1, int a2, int a3)
+int monster_set_action_seducer(struct record *monster, int angle, int action)
 {
-    struct monster_anim *l_24;
-    struct character *l_20;
-    int l_1C;
-    int l_18;
-    int l_14;
+    struct monster_anim *anim;
+    struct character *monster_char;
+    int facing;
+    int player_angle;
+    int view_yaw;
 
-    l_24 = &a1->data.monster.anim;
-    if (l_24->anim_request == 57) return 0;
-    l_20 = &a1->data.character;
-    l_20->action = *(signed char *)&a3;
-    l_18 = xn_math_angle_to_point(a1->x, a1->z, player_object->x, player_object->z);
-    l_14 = (a1->yaw + 128) & 2047;
-    l_1C = (l_14 - l_18) & 2047;
-    if (((int)(unsigned short)(l_20->flags & 16384)) != 0) {
-        if (a3 == 8 || a3 == 32) {
-            a3 = 56;
-        } else if (a3 == 0) {
-            a3 = 59;
+    anim = &monster->data.monster.anim;
+    if (anim->anim_request == 57) return 0;
+    monster_char = &monster->data.character;
+    monster_char->action = *(signed char *)&action;
+    player_angle = xn_math_angle_to_point(monster->x, monster->z, player_object->x, player_object->z);
+    view_yaw = (monster->yaw + 128) & 2047;
+    facing = (view_yaw - player_angle) & 2047;
+    if (((int)(unsigned short)(monster_char->flags & 16384)) != 0) {
+        if (action == 8 || action == 32) {
+            action = 56;
+        } else if (action == 0) {
+            action = 59;
         }
-        l_1C = 0;
+        facing = 0;
     }
-    l_1C >>= 8;
-    if (l_1C > 4) {
-        l_1C = (int)(unsigned char)anim_mirror_facing[l_1C];
-        l_24->anim_flags |= 128;
+    facing >>= 8;
+    if (facing > 4) {
+        facing = (int)(unsigned char)anim_mirror_facing[facing];
+        anim->anim_flags |= 128;
     } else {
-        l_24->anim_flags &= 127;
+        anim->anim_flags &= 127;
     }
-    if (l_24->anim_request == 8 || l_24->anim_request == 32) return 0;
-    l_24->anim_facing = *(signed char *)&l_1C;
-    l_24->anim_request = *(signed char *)&a3;
+    if (anim->anim_request == 8 || anim->anim_request == 32) return 0;
+    anim->anim_facing = *(signed char *)&facing;
+    anim->anim_request = *(signed char *)&action;
     return 1;
 }
 
-struct record *monster_spell_list(struct record *a1)
+struct record *monster_spell_list(struct record *object)
 {
-    a1 = a1->children;
-    while (a1 != 0) {
-        if (a1->type == 22) return a1->children;
-        a1 = a1->next;
+    object = object->children;
+    while (object != 0) {
+        if (object->type == 22) return object->children;
+        object = object->next;
     }
     return 0;
 }
 
-int ai_pick_ranged_spell(int a1)
+int ai_pick_ranged_spell(int creature_index)
 {
-    struct record *l_2C;
-    struct record *l_28;
-    struct spell *l_24;
-    int l_20;
-    struct character *l_1C;
+    struct record *spell;
+    struct record *first_spell;
+    struct spell *spell_data;
+    int count;
+    struct character *monster_char;
 
-    l_20 = 0;
-    l_1C = &creature_list[a1]->data.character;
-    if ((l_1C->conditions & 0x100) != 0) return 0;
-    l_2C = monster_spell_list(creature_list[a1]);
-    l_28 = l_2C;
-    while (l_2C != 0) {
-        l_24 = &l_2C->data.spell;
-        if (l_24->target == 2 || l_24->target == 4) {
-            *(int *)(scratch_190de4 + (l_20++ << 2)) = (int)l_2C;
+    count = 0;
+    monster_char = &creature_list[creature_index]->data.character;
+    if ((monster_char->conditions & 0x100) != 0) return 0;
+    spell = monster_spell_list(creature_list[creature_index]);
+    first_spell = spell;
+    while (spell != 0) {
+        spell_data = &spell->data.spell;
+        if (spell_data->target == 2 || spell_data->target == 4) {
+            *(int *)(scratch_190de4 + (count++ << 2)) = (int)spell;
         }
-        l_2C = l_2C->next;
+        spell = spell->next;
     }
-    if (l_20 == 0) return 0;
-    l_2C = l_28;
-    l_20 = rand_range(0, l_20 - 1);
-    if (spell_player_has_spell((ai_chosen_spell = (struct record *)*(int *)(scratch_190de4 + (l_20 << 2)))->data.spell.id) != 0) {
+    if (count == 0) return 0;
+    spell = first_spell;
+    count = rand_range(0, count - 1);
+    if (spell_player_has_spell((ai_chosen_spell = (struct record *)*(int *)(scratch_190de4 + (count << 2)))->data.spell.id) != 0) {
         return 0;
     }
     return 1;
 }
 
-int ai_pick_touch_spell(int a1)
+int ai_pick_touch_spell(int creature_index)
 {
-    struct record *l_2C;
-    struct record *l_28;
-    struct spell *l_24;
-    int l_20;
-    struct character *l_1C;
+    struct record *spell;
+    struct record *first_spell;
+    struct spell *spell_data;
+    int count;
+    struct character *monster_char;
 
-    l_20 = 0;
-    l_1C = &creature_list[a1]->data.character;
-    if ((l_1C->conditions & 0x100) != 0) return 0;
-    l_2C = monster_spell_list(creature_list[a1]);
-    l_28 = l_2C;
-    while (l_2C != 0) {
-        l_24 = &l_2C->data.spell;
-        if (l_24->target == 0 || l_24->target == 1) {
-            *(int *)(scratch_190de4 + (l_20++ << 2)) = (int)l_2C;
+    count = 0;
+    monster_char = &creature_list[creature_index]->data.character;
+    if ((monster_char->conditions & 0x100) != 0) return 0;
+    spell = monster_spell_list(creature_list[creature_index]);
+    first_spell = spell;
+    while (spell != 0) {
+        spell_data = &spell->data.spell;
+        if (spell_data->target == 0 || spell_data->target == 1) {
+            *(int *)(scratch_190de4 + (count++ << 2)) = (int)spell;
         }
-        l_2C = l_2C->next;
+        spell = spell->next;
     }
-    if (l_20 == 0) return 0;
-    l_2C = l_28;
-    l_20 = rand_range(0, l_20 - 1);
-    if (spell_player_has_spell((ai_chosen_spell = (struct record *)*(int *)(scratch_190de4 + (l_20 << 2)))->data.spell.id) != 0) {
+    if (count == 0) return 0;
+    spell = first_spell;
+    count = rand_range(0, count - 1);
+    if (spell_player_has_spell((ai_chosen_spell = (struct record *)*(int *)(scratch_190de4 + (count << 2)))->data.spell.id) != 0) {
         return 0;
     }
     return 1;
 }
 
-int func_00062C15(int a1)
+int func_00062C15(int creature_index)
 {
-    struct character *l_1C;
+    struct character *monster_char;
 
-    l_1C = &creature_list[a1]->data.character;
-    if ((l_1C->conditions & 0x100) != 0) return 0;
-    if (spell_player_has_spell((ai_chosen_spell = object_random_child_of_type(creature_list[a1], 9))->data.spell.id) != 0) {
+    monster_char = &creature_list[creature_index]->data.character;
+    if ((monster_char->conditions & 0x100) != 0) return 0;
+    if (spell_player_has_spell((ai_chosen_spell = object_random_child_of_type(creature_list[creature_index], 9))->data.spell.id) != 0) {
         return 0;
     }
     return ((ai_chosen_spell != 0) ? 1 : 0);
 }
 
-int func_00062CB6(int a1)
+int func_00062CB6(int creature_index)
 {
-    struct character *l_1C;
+    struct character *monster_char;
 
-    l_1C = &creature_list[a1]->data.character;
-    if ((l_1C->conditions & 0x100) != 0) return 0;
-    if (spell_player_has_spell((ai_chosen_spell = object_random_child_of_type(creature_list[a1], 9))->data.spell.id) != 0) {
+    monster_char = &creature_list[creature_index]->data.character;
+    if ((monster_char->conditions & 0x100) != 0) return 0;
+    if (spell_player_has_spell((ai_chosen_spell = object_random_child_of_type(creature_list[creature_index], 9))->data.spell.id) != 0) {
         return 0;
     }
     return ((ai_chosen_spell != 0) ? 1 : 0);
 }
 
-int monster_cast_spell(struct record *a1, struct record *a2)
+int monster_cast_spell(struct record *caster, struct record *target)
 {
-    struct record *l_1C;
-    struct character *l_18;
+    struct record *spell;
+    struct character *caster_char;
 
-    l_18 = &a1->data.character;
-    if ((l_18->conditions & 0x100) != 0) return 0;
-    if ((ai_chosen_spell = object_random_child_of_type(a1, 9)) == 0) return 0;
+    caster_char = &caster->data.character;
+    if ((caster_char->conditions & 0x100) != 0) return 0;
+    if ((ai_chosen_spell = object_random_child_of_type(caster, 9)) == 0) return 0;
     if (spell_player_has_spell(ai_chosen_spell->data.spell.id) != 0) return 0;
-    l_1C = object_create_child(a1->parent, 0, 89);
-    l_1C->type = 9;
-    l_1C->id = object_new_id(100);
-    mc_memcpy(&l_1C->data.spell, &ai_chosen_spell->data.spell, 89, (int)D_00175934, 758, 4);
-    cast_creature_spell_at(l_1C, a1, a2);
-    l_18->magicka -= spell_cost(&l_1C->data.spell, l_18);
-    if (l_18->magicka < 0) {
-        l_18->magicka = 0;
-    } else if ((a2->data.character.conditions & 0x400) != 0 && rand_range(1, 100) < (l_18->attributes[1] / 2)) {
-        l_18->magicka = 0;
+    spell = object_create_child(caster->parent, 0, 89);
+    spell->type = 9;
+    spell->id = object_new_id(100);
+    mc_memcpy(&spell->data.spell, &ai_chosen_spell->data.spell, 89, (int)D_00175934, 758, 4);
+    cast_creature_spell_at(spell, caster, target);
+    caster_char->magicka -= spell_cost(&spell->data.spell, caster_char);
+    if (caster_char->magicka < 0) {
+        caster_char->magicka = 0;
+    } else if ((target->data.character.conditions & 0x400) != 0 && rand_range(1, 100) < (caster_char->attributes[1] / 2)) {
+        caster_char->magicka = 0;
     }
     return 1;
 }
 
-void monster_shoot_arrow(int a1, int a2)
+void monster_shoot_arrow(int shooter, int target)
 {
-    sound_play(6, a1, 100);
-    weapon_monster_arrow(a1, a2);
+    sound_play(6, shooter, 100);
+    weapon_monster_arrow(shooter, target);
 }
 
-int ai_angle_diff(int a1, int a2, int *a3)
+int ai_angle_diff(int angle, int target_angle, int *dir)
 {
-    int l_14;
+    int diff;
 
-    a1 &= 2047;
-    a2 &= 2047;
-    l_14 = a2 - a1;
-    if (l_14 == 0) return l_14;
-    if (l_14 > 1024) {
-        *a3 = -1;
-        return a1 + (2048 - a2);
+    angle &= 2047;
+    target_angle &= 2047;
+    diff = target_angle - angle;
+    if (diff == 0) return diff;
+    if (diff > 1024) {
+        *dir = -1;
+        return angle + (2048 - target_angle);
     }
-    if (l_14 > 0 && l_14 <= 1024) {
-        *a3 = 1;
-        return a2 - a1;
+    if (diff > 0 && diff <= 1024) {
+        *dir = 1;
+        return target_angle - angle;
     }
-    if (l_14 < (-1024)) {
-        *a3 = 1;
-        return a2 + (2048 - a1);
+    if (diff < (-1024)) {
+        *dir = 1;
+        return target_angle + (2048 - angle);
     }
-    *a3 = -1;
-    return a1 - a2;
+    *dir = -1;
+    return angle - target_angle;
 }
 
-void monster_mark_anim_slot_cb(struct record *a1)
+void monster_mark_anim_slot_cb(struct record *object)
 {
-    struct character *l_18;
+    struct character *monster_char;
 
-    if (a1->type != 18) return;
-    l_18 = &a1->data.character;
-    text_rsc_buffer[l_18->anim_slot] = 1;
+    if (object->type != 18) return;
+    monster_char = &object->data.character;
+    text_rsc_buffer[monster_char->anim_slot] = 1;
 }
 
 int monster_alloc_anim_slot(void)
 {
-    int l_1C;
+    int slot;
 
     mc_memset((int)text_rsc_buffer, 0, 128, (int)D_00175934, 829, 2048);
     object_foreach(location_object->children, (int)monster_mark_anim_slot_cb);
     object_foreach(nonworld_root->children, (int)monster_mark_anim_slot_cb);
-    for (l_1C = 0; l_1C < 128; l_1C++) {
-        if (text_rsc_buffer[l_1C] == 0 && *(int *)(D_00190704 + (l_1C << 2)) != 0) {
-            if (*(int *)(D_00190704 + (l_1C << 2)) != 0 && *(int *)(D_00190704 + (l_1C << 2)) != (-1751672937)) {
-                mc_free(*(int *)(D_00190704 + (l_1C << 2)), (int)D_00175934, 836);
-                *(int *)(D_00190704 + (l_1C << 2)) = -1751672937;
+    for (slot = 0; slot < 128; slot++) {
+        if (text_rsc_buffer[slot] == 0 && *(int *)(D_00190704 + (slot << 2)) != 0) {
+            if (*(int *)(D_00190704 + (slot << 2)) != 0 && *(int *)(D_00190704 + (slot << 2)) != (-1751672937)) {
+                mc_free(*(int *)(D_00190704 + (slot << 2)), (int)D_00175934, 836);
+                *(int *)(D_00190704 + (slot << 2)) = -1751672937;
             }
         }
     }
-    l_1C = 0;
-    while (text_rsc_buffer[l_1C] != 0) l_1C++;
-    return l_1C;
+    slot = 0;
+    while (text_rsc_buffer[slot] != 0) slot++;
+    return slot;
 }
 
-int monster_sees_invisible(int a1)
+int monster_sees_invisible(int monster_type)
 {
-    return memchr((int)undead_daedra_ids, a1, 14);
+    return memchr((int)undead_daedra_ids, monster_type, 14);
 }
 
-struct record *monster_summon_near_player(int a1)
+struct record *monster_summon_near_player(int monster_type)
 {
-    struct record *l_1C;
+    struct record *monster;
 
-    l_1C = object_create_child(player_object->parent, 0, 659);
-    if (spawn_find_point(l_1C, 96, 300) != 0) {
-        l_1C->type = 18;
-        monster_init(l_1C, a1);
-        l_1C->data.character.team = 0;
-        return l_1C;
+    monster = object_create_child(player_object->parent, 0, 659);
+    if (spawn_find_point(monster, 96, 300) != 0) {
+        monster->type = 18;
+        monster_init(monster, monster_type);
+        monster->data.character.team = 0;
+        return monster;
     }
-    object_free_single(l_1C);
+    object_free_single(monster);
     return 0;
 }
 
-void ai_move_toward_target(struct record *a1, struct character *a2, struct record *a3, int a4, int a5)
+void ai_move_toward_target(struct record *monster, struct character *monster_char, struct record *target, int target_angle, int angle_diff)
 {
-    int l_10;
-    int l_C;
+    int octant;
+    int nav_angle;
 
-    if (((int)(unsigned short)(a2->flags & 384)) != 0 && ((int)(unsigned char)(a2->nav_blocked & 1)) == 0) {
-        a2->nav_turn_count = 12;
-        if (a5 >= 32) {
-            ai_turn_toward(a1, a4);
-        } else if (monster_move_step(a1, a3, a1->yaw) == 0) {
-            if (a2->fall_velocity == 0) {
-                a2->nav_stuck_count++;
-                if (a2->nav_stuck_count > 6) goto L635B1;
+    if (((int)(unsigned short)(monster_char->flags & 384)) != 0 && ((int)(unsigned char)(monster_char->nav_blocked & 1)) == 0) {
+        monster_char->nav_turn_count = 12;
+        if (angle_diff >= 32) {
+            ai_turn_toward(monster, target_angle);
+        } else if (monster_move_step(monster, target, monster->yaw) == 0) {
+            if (monster_char->fall_velocity == 0) {
+                monster_char->nav_stuck_count++;
+                if (monster_char->nav_stuck_count > 6) goto L635B1;
             }
             goto L635C5;
 L635B1:;
-            a2->nav_blocked |= 1;
-            a2->nav_stuck_count = 0;
+            monster_char->nav_blocked |= 1;
+            monster_char->nav_stuck_count = 0;
 L635C5:;
         } else {
-            a2->nav_blocked = 0;
+            monster_char->nav_blocked = 0;
         }
         return;
     }
-    if (((int)(unsigned short)(a2->flags & 256)) != 0 && a2->nav_turn_count == 0) {
-        a2->nav_blocked &= 254;
+    if (((int)(unsigned short)(monster_char->flags & 256)) != 0 && monster_char->nav_turn_count == 0) {
+        monster_char->nav_blocked &= 254;
     }
-    l_10 = func_0006379A(a1, a3);
-    switch (a2->nav_direction) {
+    octant = func_0006379A(monster, target);
+    switch (monster_char->nav_direction) {
     case 2:
-        l_C = D_00186A14[l_10];
+        nav_angle = D_00186A14[octant];
         break;
     case 4:
-        l_C = (D_00186A14[l_10] + 1024) & 2047;
+        nav_angle = (D_00186A14[octant] + 1024) & 2047;
         break;
     case 8:
-        l_C = (D_00186A14[l_10] + 1536) & 2047;
+        nav_angle = (D_00186A14[octant] + 1536) & 2047;
     }
-    if (((int)(unsigned char)(a2->nav_blocked & 1)) == 0) return;
-    if (a5 <= 256 && func_00063ED8(a1, (a4 + 256) / 512) != 0) return;
-    if (ai_turn_toward(a1, l_C) != 0) return;
-    if (a2->nav_turn_count != 0) a2->nav_turn_count--;
-    if ((a2->nav_blocked & a2->nav_direction) != 0) {
-        a2->nav_direction <<= 1;
-        if (((int)(unsigned char)(a2->nav_direction & 16)) != 0) {
-            a2->nav_direction = 2;
-            a2->nav_blocked &= 254;
+    if (((int)(unsigned char)(monster_char->nav_blocked & 1)) == 0) return;
+    if (angle_diff <= 256 && func_00063ED8(monster, (target_angle + 256) / 512) != 0) return;
+    if (ai_turn_toward(monster, nav_angle) != 0) return;
+    if (monster_char->nav_turn_count != 0) monster_char->nav_turn_count--;
+    if ((monster_char->nav_blocked & monster_char->nav_direction) != 0) {
+        monster_char->nav_direction <<= 1;
+        if (((int)(unsigned char)(monster_char->nav_direction & 16)) != 0) {
+            monster_char->nav_direction = 2;
+            monster_char->nav_blocked &= 254;
         }
-        if (((int)(unsigned short)(a2->flags & 128)) != 0) {
-            a2->nav_turn_count = 0;
-            a2->nav_blocked &= 254;
+        if (((int)(unsigned short)(monster_char->flags & 128)) != 0) {
+            monster_char->nav_turn_count = 0;
+            monster_char->nav_blocked &= 254;
         }
         return;
     }
-    if (monster_move_step(a1, a3, a1->yaw) != 0) return;
-    a2->nav_blocked |= a2->nav_direction;
+    if (monster_move_step(monster, target, monster->yaw) != 0) return;
+    monster_char->nav_blocked |= monster_char->nav_direction;
 }
 
-int func_0006379A(struct record *a1, struct record *a2)
+int func_0006379A(struct record *from, struct record *to)
 {
-    int l_20;
-    int l_1C;
-    int l_18;
+    int west;
+    int south;
+    int octant;
 
-    l_20 = 0;
-    l_1C = 0;
-    if (a2->x < a1->x) l_20 = 1;
-    if (a2->z < a1->z) l_1C = 2;
-    if (abs(a2->x - a1->x) > abs(a2->z - a1->z)) {
-        l_18 = 1;
+    west = 0;
+    south = 0;
+    if (to->x < from->x) west = 1;
+    if (to->z < from->z) south = 2;
+    if (abs(to->x - from->x) > abs(to->z - from->z)) {
+        octant = 1;
     } else {
-        l_18 = 0;
+        octant = 0;
     }
-    l_18 += l_1C;
-    if (l_20 != 0) l_18 = 7 - l_18;
-    return l_18;
+    octant += south;
+    if (west != 0) octant = 7 - octant;
+    return octant;
 }
 
 void monster_apply_gravity(void)
 {
-    char l_5C[32];
-    char l_3C[12];
-    int l_30;
-    int l_2C;
-    struct character *l_28;
-    int l_24;
-    int l_20;
-    int l_1C;
-    int l_18;
+    int move[8];
+    char saved_pos[12];
+    int i;
+    int fall_start;
+    struct character *monster_char;
+    int saved_on_ground;
+    int saved_ceiling;
+    int saved_velocity;
+    int damage;
 
-    l_1C = vertical_velocity;
-    l_24 = (int)(unsigned char)player_on_ground;
-    l_20 = ceiling_height;
-    mc_memcpy((int)l_3C, (int)D_00196D54, 12, (int)D_00175934, 1147, 4);
-    for (l_30 = 0; l_30 < creature_count; l_30++) {
-        l_28 = &creature_list[l_30]->data.character;
-        if (((int)(unsigned short)(l_28->flags & 2080)) == 0) {
-            if (l_28->fall_velocity == 0) continue;
+    saved_velocity = vertical_velocity;
+    saved_on_ground = (int)(unsigned char)player_on_ground;
+    saved_ceiling = ceiling_height;
+    mc_memcpy((int)saved_pos, (int)D_00196D54, 12, (int)D_00175934, 1147, 4);
+    for (i = 0; i < creature_count; i++) {
+        monster_char = &creature_list[i]->data.character;
+        if (((int)(unsigned short)(monster_char->flags & 2080)) == 0) {
+            if (monster_char->fall_velocity == 0) continue;
         }
-        l_2C = l_28->fall_velocity;
-        vertical_velocity = l_2C;
-        mc_memcpy((int)D_00196D54, (int)creature_list[l_30] + 7, 12, (int)D_00175934, 1159, 4);
-        *(int *)l_5C = creature_list[l_30]->x;
-        *(int *)((char *)l_5C + 4) = (int)(*(char **)((char *)creature_list[l_30] + 11) + (vertical_velocity / 256));
-        *(int *)((char *)l_5C + 8) = creature_list[l_30]->z;
-        *(int *)((char *)l_5C + 12) = creature_list[l_30]->angle_x;
-        *(int *)((char *)l_5C + 16) = creature_list[l_30]->yaw;
-        *(int *)((char *)l_5C + 20) = creature_list[l_30]->angle_z;
-        if (((int)(unsigned short)(l_28->flags & 2080)) != 0) {
-            *(short *)((char *)l_5C + 28) |= 1;
+        fall_start = monster_char->fall_velocity;
+        vertical_velocity = fall_start;
+        mc_memcpy((int)D_00196D54, (int)creature_list[i] + 7, 12, (int)D_00175934, 1159, 4);
+        move[0] = creature_list[i]->x;
+        move[1] = (int)(*(char **)((char *)creature_list[i] + 11) + (vertical_velocity / 256));
+        move[2] = creature_list[i]->z;
+        move[3] = creature_list[i]->angle_x;
+        move[4] = creature_list[i]->yaw;
+        move[5] = creature_list[i]->angle_z;
+        if (((int)(unsigned short)(monster_char->flags & 2080)) != 0) {
+            *(short *)&move[7] |= 1;
         } else {
-            *(short *)((char *)l_5C + 28) &= 65534;
+            *(short *)&move[7] &= 65534;
         }
-        *(int *)((char *)l_5C + 24) = (int)D_00187B44;
+        move[6] = (int)D_00187B44;
         *(signed char *)collide_flags &= 251;
-        collide_move_object(creature_list[l_30], 0, (int)l_5C, 0);
+        collide_move_object(creature_list[i], 0, (int)move, 0);
         if (((int)(short)(*(short *)collide_flags & 16)) != 0) {
-            object_apply_gravity(creature_list[l_30], l_28);
+            object_apply_gravity(creature_list[i], monster_char);
         } else {
             vertical_velocity = 0;
-            l_28->flags &= ~0x800;
+            monster_char->flags &= ~0x800;
         }
-        if (vertical_velocity == 0 && l_2C != 0) {
-            l_18 = ((l_2C / 256) / 40) - 5;
-            if (l_18 > 0) {
-                l_18 = l_18 * l_18;
-                l_18 = l_18 / 3;
-                damage_apply(creature_list[l_30], l_18, 0);
+        if (vertical_velocity == 0 && fall_start != 0) {
+            damage = ((fall_start / 256) / 40) - 5;
+            if (damage > 0) {
+                damage = damage * damage;
+                damage = damage / 3;
+                damage_apply(creature_list[i], damage, 0);
             }
         }
-        l_28->fall_velocity = vertical_velocity;
+        monster_char->fall_velocity = vertical_velocity;
     }
-    ceiling_height = l_20;
-    player_on_ground = *(signed char *)&l_24;
-    vertical_velocity = l_1C;
-    mc_memcpy((int)D_00196D54, (int)l_3C, 12, (int)D_00175934, 1201, 4);
+    ceiling_height = saved_ceiling;
+    player_on_ground = *(signed char *)&saved_on_ground;
+    vertical_velocity = saved_velocity;
+    mc_memcpy((int)D_00196D54, (int)saved_pos, 12, (int)D_00175934, 1201, 4);
 }
 
-void func_00063DDC(struct record *a1)
+void func_00063DDC(struct record *source)
 {
-    int l_24;
-    int l_20;
-    struct character *l_1C;
-    struct record *l_18;
+    int i;
+    int dist;
+    struct character *monster_char;
+    struct record *monster;
 
-    for (l_24 = 0; l_24 < creature_count; l_24++) {
-        l_18 = creature_list[l_24];
-        l_20 = xn_math_approx_hypot(l_18->y - player_object->y, xn_math_approx_dist2d(l_18->x, l_18->z, player_object->x, player_object->z));
-        l_1C = &creature_list[l_24]->data.character;
-        if (a1 == creature_list[l_24] || ai_stealth_check(l_1C->race, (int)(unsigned short)(l_1C->flags & 256), l_20, (int)(unsigned short)(l_1C->flags & 8)) != 0) {
-            l_1C->flags |= 264;
-            l_1C->give_up_timer = 200;
+    for (i = 0; i < creature_count; i++) {
+        monster = creature_list[i];
+        dist = xn_math_approx_hypot(monster->y - player_object->y, xn_math_approx_dist2d(monster->x, monster->z, player_object->x, player_object->z));
+        monster_char = &creature_list[i]->data.character;
+        if (source == creature_list[i] || ai_stealth_check(monster_char->race, (int)(unsigned short)(monster_char->flags & 256), dist, (int)(unsigned short)(monster_char->flags & 8)) != 0) {
+            monster_char->flags |= 264;
+            monster_char->give_up_timer = 200;
         }
     }
 }
 
-int func_00063ED8(struct record *a1, int a2)
+int func_00063ED8(struct record *monster, int quadrant)
 {
-    int *l_24;
-    int *l_20;
-    int l_1C;
-    struct character *l_18;
+    int *across;
+    int *along;
+    int pos;
+    struct character *monster_char;
 
-    l_18 = &a1->data.character;
-    if (a2 == 0 || a2 == 2) {
-        l_24 = &a1->x;
-        l_20 = &a1->z;
+    monster_char = &monster->data.character;
+    if (quadrant == 0 || quadrant == 2) {
+        across = &monster->x;
+        along = &monster->z;
     } else {
-        l_24 = &a1->z;
-        l_20 = &a1->x;
+        across = &monster->z;
+        along = &monster->x;
     }
-    l_1C = *l_24 & 63;
-    if (l_1C == 0) return 0;
-    if (l_1C < 8) {
-        l_1C = 0;
-        l_18->nav_blocked &= 254;
-    } else if (l_1C < 32) {
-        l_1C += -8;
-    } else if (l_1C > 56) {
-        l_1C = 64;
-        l_18->nav_blocked &= 254;
+    pos = *across & 63;
+    if (pos == 0) return 0;
+    if (pos < 8) {
+        pos = 0;
+        monster_char->nav_blocked &= 254;
+    } else if (pos < 32) {
+        pos += -8;
+    } else if (pos > 56) {
+        pos = 64;
+        monster_char->nav_blocked &= 254;
     } else {
-        l_1C += 8;
+        pos += 8;
     }
-    l_1C += *l_24 & -64;
-    if (a2 == 0 || a2 == 2) return func_00063FCF(a1, l_1C, *l_20);
-    return func_00063FCF(a1, *l_20, l_1C);
+    pos += *across & -64;
+    if (quadrant == 0 || quadrant == 2) return func_00063FCF(monster, pos, *along);
+    return func_00063FCF(monster, *along, pos);
 }
 
-int func_000641CD(int a1)
+int func_000641CD(int id)
 {
-    int l_1C;
+    int i;
 
-    for (l_1C = 0; l_1C < link_count; l_1C++) {
-        if (*(int *)(D_00199D9B + (l_1C * 39)) == a1) return 1;
+    for (i = 0; i < link_count; i++) {
+        if (*(int *)(D_00199D9B + (i * 39)) == id) return 1;
     }
     return 0;
 }

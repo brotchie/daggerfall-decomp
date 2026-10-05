@@ -126,11 +126,11 @@ extern int sound_play_loop(int, struct record *, int);
 extern int disk_read_file(int, int);
 extern int hud_message_add(int);
 extern int rand_range(int, int);
-extern int intrface_region_at(short, short, int, int);
+extern int intrface_region_at(short, short, int *, int *);
 extern int player_try_move(int);
 extern int player_try_move_vertical(int);
 extern int climb_angle_ok(unsigned short);
-extern int hex_digit_value(int);
+extern int hex_digit_value(char *);
 extern int rand();
 extern int mc_free();
 extern int mc_memset();
@@ -156,7 +156,7 @@ extern void player_mouse_look(void);
 extern void intrface_steer(short, int, int, int);
 int intrface_key_region(void);
 int player_climb_probe(void);
-int string_last_char(int);
+char *string_last_char(char *);
 void intrface_set_regions(void);
 void func_0008066F(int);
 void click_activate(int);
@@ -168,14 +168,14 @@ void player_horse_sounds(int);
 
 void intrface_init(void)
 {
-    short l_18;
+    short i;
 
     cursor_region_images = disk_read_file((int)D_00176A68, 0);
     cursor_arrow_image = disk_read_file((int)D_00176A72, 0);
     mc_memset(*(int *)scratch_buffer, 0, 256, (int)D_00176A7C, 44, 4);
-    *(int *)&l_18 = 0;
-    for (; ((int)(short)l_18) < 10; (*(int *)&l_18)++) {
-        mc_memcpy((int)(*(char **)scratch_buffer + (((int)(short)l_18) << 4)), (int)(((char *)cursor_arrow_image) + (((int)(short)l_18) * 10)), 10, (int)D_00176A7C, 46, 4);
+    *(int *)&i = 0;
+    for (; ((int)(short)i) < 10; (*(int *)&i)++) {
+        mc_memcpy((int)(*(char **)scratch_buffer + (((int)(short)i) << 4)), (int)(((char *)cursor_arrow_image) + (((int)(short)i) * 10)), 10, (int)D_00176A7C, 46, 4);
     }
     xn_mouse_set_cursor_image(*(int *)scratch_buffer, 0, 0);
     intrface_set_regions();
@@ -218,31 +218,31 @@ void cursor_restore_background(void)
     xn_draw_image_transparent(cursor_saved_x, cursor_saved_y, 10, 10, (int)cursor_saved_background);
 }
 
-void func_0008066F(int a1)
+void func_0008066F(int distance)
 {
-    int l_24;
-    int l_20;
-    int l_1C;
-    int l_18;
+    int dx;
+    int dz;
+    int yaw;
+    int unused;
 
     D_001940D4 |= 16;
     player_object->yaw &= ~0xF800;
-    l_1C = player_object->yaw;
-    xn_math_yaw_offset_xz(l_1C, a1 << 7, (int)&l_24, (int)&l_20);
-    player_momentum = a1;
-    D_001A5B04 += a1;
-    D_001A5B0C += l_24;
-    D_001A5B10 += l_20;
+    yaw = player_object->yaw;
+    xn_math_yaw_offset_xz(yaw, distance << 7, &dx, &dz);
+    player_momentum = distance;
+    D_001A5B04 += distance;
+    D_001A5B0C += dx;
+    D_001A5B10 += dz;
 }
 
-void func_000806DD(int a1, int a2)
+void func_000806DD(int distance, int yaw_offset)
 {
-    short l_14;
+    short saved_yaw;
 
-    l_14 = player_object->yaw;
-    player_object->yaw += a2;
-    func_0008066F(a1);
-    player_object->yaw = *(int *)&l_14;
+    saved_yaw = player_object->yaw;
+    player_object->yaw += yaw_offset;
+    func_0008066F(distance);
+    player_object->yaw = *(int *)&saved_yaw;
 }
 
 void steer_forward_left(void)
@@ -290,8 +290,8 @@ void steer_turn_right(void)
 
 void steer_slide_left(void)
 {
-    int l_1C;
-    int l_18;
+    int unused;
+    int unused2;
 
     xn_snow_turn_shift = 4;
     player_speed = (((int)(short)player_speed) * ((int)(short)steer_weight_left)) / 256;
@@ -300,8 +300,8 @@ void steer_slide_left(void)
 
 void steer_backward(void)
 {
-    int l_1C;
-    int l_18;
+    int unused;
+    int unused2;
 
     move_angle_offset = 1024;
     player_speed = (((int)(short)player_speed) * ((int)(short)steer_weight_down)) / 256;
@@ -309,34 +309,34 @@ void steer_backward(void)
 
 void steer_slide_right(void)
 {
-    int l_1C;
-    int l_18;
+    int unused;
+    int unused2;
 
     xn_snow_turn_shift = -4;
     move_angle_offset = 512;
     player_speed = (((int)(short)player_speed) * ((int)(short)steer_weight_right)) / 256;
 }
 
-void click_activate(int a1)
+void click_activate(int at_view_centre)
 {
     {
-        char l_2C[20];
+        char pick[20];
 
         if (D_00187CA8 == 0) return;
-        if (a1 == 0) {
+        if (at_view_centre == 0) {
             if (((int)(unsigned char)mouse_control_mode) == 1 && view_cursor_active != 0) {
-                engine_pick_object((int)(short)mouse_x, (int)(short)mouse_y, (int)l_2C);
+                engine_pick_object((int)(short)mouse_x, (int)(short)mouse_y, (int)pick);
             } else {
-                engine_pick_object(((int)(short)mouse_x) + 6, (int)&*(signed char *)((char *)((int)(short)mouse_y) + 6), (int)l_2C);
+                engine_pick_object(((int)(short)mouse_x) + 6, (int)&*(signed char *)((char *)((int)(short)mouse_y) + 6), (int)pick);
             }
         } else {
             mouse_x = xn_cam_centre_x;
             mouse_y = xn_cam_centre_y;
-            engine_pick_object((int)(short)xn_cam_centre_x, (int)(short)xn_cam_centre_y, (int)l_2C);
+            engine_pick_object((int)(short)xn_cam_centre_x, (int)(short)xn_cam_centre_y, (int)pick);
         }
-        if ((*(int *)l_2C & 1) != 0) {
+        if ((*(int *)pick & 1) != 0) {
             if (((int)(unsigned char)mouse_control_mode) == 1) {}
-            click_world_object((int)l_2C, *(int *)((char *)l_2C + 4));
+            click_world_object((int)pick, *(int *)((char *)pick + 4));
             return;
         }
         if ((int)spell_ready_missile == 0) return;
@@ -361,29 +361,29 @@ int intrface_key_region(void)
     return -1;
 }
 
-void object_apply_gravity(struct record *a1, struct character *a2)
+void object_apply_gravity(struct record *object, struct character *character)
 {
-    if (dungeon_water_level != 10000 && a2 == player_character) {
-        if ((a1->y - 50) > dungeon_water_level) {
-            if (in_dungeon_water == 0) sound_play(86, a1, 100);
+    if (dungeon_water_level != 10000 && character == player_character) {
+        if ((object->y - 50) > dungeon_water_level) {
+            if (in_dungeon_water == 0) sound_play(86, object, 100);
             in_dungeon_water = 1;
             vertical_velocity = 0;
             return;
         }
     }
     in_dungeon_water = 0;
-    if ((a2->conditions & 0x8) != 0) return;
-    if (a2 == player_character && ((struct bf8_5_1 *)&player_motion_flags)->f != 0) {
+    if ((character->conditions & 0x8) != 0) return;
+    if (character == player_character && ((struct bf8_5_1 *)&player_motion_flags)->f != 0) {
         vertical_velocity = 0;
         return;
     }
-    if ((a2->conditions & 0x4000) != 0) vertical_velocity = 15360;
-    if ((a1->y - 80) <= ceiling_height && vertical_velocity < 0) {
+    if ((character->conditions & 0x4000) != 0) vertical_velocity = 15360;
+    if ((object->y - 80) <= ceiling_height && vertical_velocity < 0) {
         vertical_velocity = 0;
         return;
     }
     vertical_velocity += (frame_ticks * 100352) / 1000;
-    a1->y += ((vertical_velocity * frame_ticks) / 1000) / 256;
+    object->y += ((vertical_velocity * frame_ticks) / 1000) / 256;
 }
 
 void player_compute_jump_velocity(void)
@@ -394,18 +394,18 @@ void player_compute_jump_velocity(void)
     jump_velocity <<= 8;
 }
 
-void camera_roll_turn(int a1)
+void camera_roll_turn(int target_roll)
 {
     if (D_001A5B34 != 0) return;
-    if (a1 < 0) {
+    if (target_roll < 0) {
         camera_object->angle_z -= 8;
         camera_object->angle_z &= ~0xF800;
-        if (camera_object->angle_z < (a1 + 2047)) camera_object->angle_z = a1 + 2047;
+        if (camera_object->angle_z < (target_roll + 2047)) camera_object->angle_z = target_roll + 2047;
         return;
     }
     camera_object->angle_z += 8;
-    if (camera_object->angle_z <= a1) return;
-    camera_object->angle_z = a1;
+    if (camera_object->angle_z <= target_roll) return;
+    camera_object->angle_z = target_roll;
 }
 
 void camera_roll_recover(void)
@@ -421,31 +421,31 @@ void camera_roll_recover(void)
     camera_object->angle_z = 0;
 }
 
-void player_motion_clear_bit6(int a1)
+void player_motion_clear_bit6(int unused)
 {
     player_motion_flags &= 191;
 }
 
-int vector_yaw(int a1)
+int vector_yaw(int *vector)
 {
-    int l_20;
-    int l_1C;
+    int sine;
+    int yaw;
 
-    l_20 = (*(int *)((char *)a1) << 8) / xn_math_isqrt((*(int *)((char *)a1) * *(int *)((char *)a1)) + (*(int *)((char *)a1 + 8) * *(int *)((char *)a1 + 8)));
-    if (*(int *)((char *)a1) > 0) {
-        l_1C = (l_20 * 511) / 256;
-        if (*(int *)((char *)a1 + 8) < 0) l_1C = (512 - l_1C) + 512;
+    sine = (vector[0] << 8) / xn_math_isqrt((vector[0] * vector[0]) + (vector[2] * vector[2]));
+    if (vector[0] > 0) {
+        yaw = (sine * 511) / 256;
+        if (vector[2] < 0) yaw = (512 - yaw) + 512;
     } else {
-        l_1C = ((l_20 * 511) / 256) + 2047;
-        if (*(int *)((char *)a1 + 8) < 0) l_1C = 1536 - (l_1C - 1536);
+        yaw = ((sine * 511) / 256) + 2047;
+        if (vector[2] < 0) yaw = 1536 - (yaw - 1536);
     }
-    return l_1C & 2047;
+    return yaw & 2047;
 }
 
 void intrface_poll_controls(void)
 {
-    int l_1C;
-    int l_18;
+    int not_turning;
+    int *bios_ticks;
 
     mouse_buttons_prev = mouse_buttons;
     xn_mouse_poll_clamped();
@@ -453,37 +453,37 @@ void intrface_poll_controls(void)
     xn_joy_poll();
     if (((int)(short)(steer_key_region = intrface_key_region())) != (-1)) {
         if (steer_key_region != 0 && ((int)(short)steer_key_region) != 2 && ((int)(short)steer_key_region) != 3 && ((int)(short)steer_key_region) != 5) {
-            l_1C = 1;
+            not_turning = 1;
         } else {
-            l_1C = 0;
+            not_turning = 0;
         }
-        if (l_1C == 0) return;
+        if (not_turning == 0) return;
     }
-    l_18 = 1132;
-    D_001A5AE8 = *(int *)((char *)l_18);
+    bios_ticks = (int *)1132;
+    D_001A5AE8 = *bios_ticks;
 }
 
 void player_movement_update(void)
 {
-    int l_68;
-    int l_64;
-    int l_60;
-    int l_5C;
-    int l_58;
-    int l_54;
-    int l_50;
-    int l_4C;
-    int l_48;
-    int l_44;
-    int l_40;
-    int l_3C;
-    int l_38;
-    int l_34;
-    int l_30;
-    int l_2C;
-    int l_28;
-    int l_24;
-    int l_20;
+    int airborne_test2;
+    int step_size_test;
+    int airborne_test;
+    int airborne;
+    int blocked;
+    int step_size;
+    int step;
+    int region;
+    int region_x;
+    int dy;
+    int distance;
+    int jump_impulse;
+    int prev_velocity;
+    int fall_damage;
+    int start_x;
+    int saved_y;
+    int start_z;
+    int landing_check;
+    int climb_chance;
 
     if (D_00195DB8 != 0) {
         D_00195DB8--;
@@ -495,34 +495,34 @@ void player_movement_update(void)
     intrface_poll_controls();
     D_0019628E = 0;
     if (hud_update() != 0) return;
-    l_4C = intrface_region_at((int)(short)mouse_x, (int)(short)mouse_y, (int)&l_48, (int)&l_44);
-    cursor_draw((int)(short)*(short *)&l_4C);
+    region = intrface_region_at((int)(short)mouse_x, (int)(short)mouse_y, &region_x, &dy);
+    cursor_draw((int)(short)*(short *)&region);
     if (D_00196272 != 0) return;
     if (key_action_held(22) != 0 || (((struct bf8_6_1 *)&D_001940DA)->f != 0 && ((int)(unsigned char)(mouse_buttons & 1)) != 0)) {
         return;
     }
     D_00195CD8 = (D_00195CD4 = 0);
-    l_30 = player_object->x;
-    l_28 = player_object->z;
-    l_38 = vertical_velocity;
+    start_x = player_object->x;
+    start_z = player_object->z;
+    prev_velocity = vertical_velocity;
     if (((int)(short)steer_key_region) != (-1)) {
-        l_4C = (int)(short)steer_key_region;
+        region = (int)(short)steer_key_region;
     }
     if ((player_character->conditions & 0x8) != 0) player_on_ground = 1;
     if (player_on_ground == 0 && in_dungeon_water == 0 && ((struct bf8_5_1 *)&player_motion_flags)->f == 0) {
-        l_60 = 1;
+        airborne_test = 1;
     } else {
-        l_60 = 0;
+        airborne_test = 0;
     }
-    l_5C = l_60;
-    l_24 = l_5C;
-    if (l_5C != 0) {
+    airborne = airborne_test;
+    landing_check = airborne;
+    if (airborne != 0) {
         *(int *)turn_this_frame = 0;
-        l_40 = player_momentum;
+        distance = player_momentum;
     } else {
-        intrface_steer((int)(short)player_base_speed, l_4C, l_48, l_44);
-        l_40 = (int)(short)player_speed;
-        player_momentum = l_40;
+        intrface_steer((int)(short)player_base_speed, region, region_x, dy);
+        distance = (int)(short)player_speed;
+        player_momentum = distance;
     }
     if (((struct bf8_1_1 *)&D_001940D5)->f != 0) {
         D_001940D5 &= 253;
@@ -537,50 +537,50 @@ void player_movement_update(void)
         camera_roll_recover();
     }
     if (((struct bf8_2_1 *)&player_motion_flags)->f != 0) {
-        l_64 = 5;
+        step_size_test = 5;
     } else {
-        l_64 = 10;
+        step_size_test = 10;
     }
-    l_54 = l_64;
-    l_58 = 0;
-    if (l_5C == 0 && ((int)(unsigned char)mouse_control_mode) == 1 && key_action_held(23) != 0) {
+    step_size = step_size_test;
+    blocked = 0;
+    if (airborne == 0 && ((int)(unsigned char)mouse_control_mode) == 1 && key_action_held(23) != 0) {
         player_momentum >>= 1;
         player_momentum--;
-        l_40 >>= 1;
+        distance >>= 1;
     }
-    while (l_58 == 0 && l_40 > 0) {
-        if (l_40 < l_54) {
-            l_50 = l_40;
-            l_40 = 0;
+    while (blocked == 0 && distance > 0) {
+        if (distance < step_size) {
+            step = distance;
+            distance = 0;
         } else {
-            l_40 -= l_54;
-            l_50 = l_54;
+            distance -= step_size;
+            step = step_size;
         }
-        l_58 = player_try_move(l_50);
+        blocked = player_try_move(step);
         if (((int)(short)(*(short *)collide_flags & 16)) == 0 && ((int)(short)(*(short *)collide_flags & 1)) != 0) {
             links_trigger((int)D_00195CB8, 1);
         }
         if (((int)(short)(*(short *)collide_flags & 2)) != 0) links_trigger((int)D_00195C70, 3);
     }
-    if (l_24 != 0 && player_on_ground != 0) l_24 = 1;
-    if (l_40 == 0 && (int)D_00195CB8 != 0 && links_object_motion((int)D_00195CB8) != 0) {
+    if (landing_check != 0 && player_on_ground != 0) landing_check = 1;
+    if (distance == 0 && (int)D_00195CB8 != 0 && links_object_motion((int)D_00195CB8) != 0) {
         player_try_move(0);
     }
-    l_44 = 0;
-    if (((int)(short)(*(short *)collide_flags & 2)) != 0 && D_001A5B30 == 0 && climb_angle_ok((int)(unsigned short)D_00195F5A) != 0 && xn_math_approx_dist2d(player_object->x, player_object->z, l_30, l_28) < 5 && (player_character->conditions & 0x8) == 0 && ((int)(unsigned short)(player_character->flags & 1536)) == 0) {
+    dy = 0;
+    if (((int)(short)(*(short *)collide_flags & 2)) != 0 && D_001A5B30 == 0 && climb_angle_ok((int)(unsigned short)D_00195F5A) != 0 && xn_math_approx_dist2d(player_object->x, player_object->z, start_x, start_z) < 5 && (player_character->conditions & 0x8) == 0 && ((int)(unsigned short)(player_character->flags & 1536)) == 0) {
         if (((unsigned)(*(int *)((char *)1132) - D_001A5AE4)) > 14) {
             if (((struct bf8_5_1 *)&player_motion_flags)->f == 0) {
                 hud_message_add(D_001845C8);
                 skill_add_uses(18, 1);
             }
             player_motion_flags |= 32;
-            l_44 = (-((int)(short)player_speed)) / 3;
+            dy = (-((int)(short)player_speed)) / 3;
             if (((unsigned)(game_minutes - D_001A5B00)) > 1) {
                 skill_add_uses(18, 1);
                 D_001A5B00 = game_minutes;
-                l_20 = player_character->skills[18].value;
-                if (player_character->race == 6) l_20 += 30;
-                if ((player_character->conditions & 0x20000) == 0 && rand_range(1, 100) > 95 && rand_range(1, 100) > l_20) {
+                climb_chance = player_character->skills[18].value;
+                if (player_character->race == 6) climb_chance += 30;
+                if ((player_character->conditions & 0x20000) == 0 && rand_range(1, 100) > 95 && rand_range(1, 100) > climb_chance) {
                     player_motion_flags &= 223;
                     D_001A5B30 = 1;
                 }
@@ -603,56 +603,56 @@ void player_movement_update(void)
     if (((((int)(unsigned char)(mouse_buttons & 3)) == 3 && ((int)(unsigned char)(mouse_buttons_prev & 3)) == 1) || key_action_held(8) != 0) && player_on_ground != 0 && (player_character->conditions & 0x1) == 0 && ((int)(unsigned short)(player_character->flags & 1536)) == 0) {
         skill_add_uses(3, 1);
         if ((player_character->conditions & 0x10000) != 0) {
-            l_3C = jump_velocity * 2;
+            jump_impulse = jump_velocity * 2;
         } else {
-            l_3C = jump_velocity;
+            jump_impulse = jump_velocity;
         }
         if (((int)(unsigned short)(player_class->flags & 2)) != 0) {
-            l_3C = (int)(((char *)jump_velocity) + (jump_velocity >> 1));
+            jump_impulse = (int)(((char *)jump_velocity) + (jump_velocity >> 1));
         }
-        l_44 = -1;
-        vertical_velocity += l_3C;
+        dy = -1;
+        vertical_velocity += jump_impulse;
         D_00195F44 = 1;
         fatigue_add(-11);
-        l_5C = 1;
+        airborne = 1;
         player_on_ground = 0;
         D_00196296 = 1;
     }
-    if (l_24 != 0 && player_on_ground != 0) l_24 = 1;
+    if (landing_check != 0 && player_on_ground != 0) landing_check = 1;
     if (key_action_held(6) != 0 && ((player_character->conditions & 0x8) != 0 || in_dungeon_water != 0) && (player_object->y - 100) > ceiling_height) {
         if (((int)player_environment) != 1 || (collide_height - 1024) <= player_object->y) {
-            l_44 += (frame_ticks * (-80)) / 1000;
+            dy += (frame_ticks * (-80)) / 1000;
         }
     } else if (key_action_held(7) != 0 && ((player_character->conditions & 0x8) != 0 || in_dungeon_water != 0)) {
-        l_44 += (frame_ticks * 80) / 1000;
+        dy += (frame_ticks * 80) / 1000;
     }
     if (in_dungeon_water != 0 && object_weight(player_entity) > 250 && key_action_held(7) == 0 && (player_character->conditions & 1048584) == 0) {
-        l_44 += (frame_ticks * 80) / 1000;
+        dy += (frame_ticks * 80) / 1000;
     }
-    l_2C = player_object->y;
+    saved_y = player_object->y;
     if (player_on_ground == 0 && in_dungeon_water == 0 && ((struct bf8_5_1 *)&player_motion_flags)->f == 0) {
-        l_68 = 1;
+        airborne_test2 = 1;
     } else {
-        l_68 = 0;
+        airborne_test2 = 0;
     }
-    l_5C = l_68;
-    l_24 = l_5C;
-    if (((int)(short)(*(short *)collide_flags & 16)) != 0 || l_5C != 0 || (dungeon_water_level != 10000 && (player_object->y - 50) > dungeon_water_level)) {
-        l_2C = player_object->y;
+    airborne = airborne_test2;
+    landing_check = airborne;
+    if (((int)(short)(*(short *)collide_flags & 16)) != 0 || airborne != 0 || (dungeon_water_level != 10000 && (player_object->y - 50) > dungeon_water_level)) {
+        saved_y = player_object->y;
         object_apply_gravity(player_object, player_character);
-        l_44 += player_object->y - l_2C;
-        player_object->y = l_2C;
+        dy += player_object->y - saved_y;
+        player_object->y = saved_y;
     } else {
         D_001A5B30 = 0;
         vertical_velocity = 0;
     }
-    if (l_24 != 0 && player_on_ground != 0) l_24 = 1;
-    player_try_move_vertical(l_44);
+    if (landing_check != 0 && player_on_ground != 0) landing_check = 1;
+    player_try_move_vertical(dy);
     if (player_on_ground != 0) vertical_velocity = 0;
     if (vertical_velocity < 0 && D_00195F44 != 0 && (player_object->y - 99) < ceiling_height) {
-        player_object->y = l_2C;
+        player_object->y = saved_y;
     }
-    if (l_24 != 0 && player_on_ground != 0) l_24 = 1;
+    if (landing_check != 0 && player_on_ground != 0) landing_check = 1;
     if (D_00195CD8 != 0) {
         D_001A5B30 = 0;
         if (player_on_ground != 0) vertical_velocity = 0;
@@ -663,12 +663,12 @@ void player_movement_update(void)
         mc_memcpy((int)D_00195E4E, D_00195CD4, 30, (int)D_00176A7C, 701, 4);
         D_00195CD4 = (int)D_00195E4E;
     }
-    if (vertical_velocity == 0 && l_38 != 0) {
-        l_34 = ((l_38 / 256) / 40) - 7;
-        if (l_34 > 0) {
-            l_34 = l_34 * l_34;
-            l_34 = l_34 / 2;
-            damage_apply(player_entity, l_34, 0);
+    if (vertical_velocity == 0 && prev_velocity != 0) {
+        fall_damage = ((prev_velocity / 256) / 40) - 7;
+        if (fall_damage > 0) {
+            fall_damage = fall_damage * fall_damage;
+            fall_damage = fall_damage / 2;
+            damage_apply(player_entity, fall_damage, 0);
             sound_play(((((int)player_environment) != 3) ? 360 : 359), player_entity, 100);
         }
     }
@@ -682,7 +682,7 @@ void player_movement_update(void)
             click_activate(0);
         }
     }
-    if (l_24 != 0 && player_on_ground != 0) l_24 = 1;
+    if (landing_check != 0 && player_on_ground != 0) landing_check = 1;
     player_horse_sounds(player_momentum);
     if (dungeon_water_level == 10000 || (player_object->y - 76) <= dungeon_water_level || rand() >= 100) {
         return;
@@ -690,14 +690,14 @@ void player_movement_update(void)
     sound_play(384, player_object, 100);
 }
 
-void player_horse_sounds(int a1)
+void player_horse_sounds(int speed)
 {
-    int l_18;
+    int sound;
 
     if (((int)(unsigned short)(player_character->flags & 1536)) == 0) return;
-    l_18 = (((((int)(short)player_base_speed) - (((int)(short)player_base_speed) >> 2)) < a1) ? 366 : 365);
-    if (((int)(unsigned short)(player_character->flags & 1024)) != 0) l_18 = 372;
-    if (a1 == 0) {
+    sound = (((((int)(short)player_base_speed) - (((int)(short)player_base_speed) >> 2)) < speed) ? 366 : 365);
+    if (((int)(unsigned short)(player_character->flags & 1024)) != 0) sound = 372;
+    if (speed == 0) {
         if (D_001A5AD0 == (-1)) return;
         if (sound_channel_done(D_001A5AD0) != 0) return;
         sound_stop_channel(D_001A5AD0);
@@ -705,12 +705,12 @@ void player_horse_sounds(int a1)
         return;
     }
     if (D_001A5AD0 == (-1)) {
-        D_001A5AD0 = sound_play_loop(l_18, player_object, 100);
-    } else if (l_18 != D_001A5ADC) {
+        D_001A5AD0 = sound_play_loop(sound, player_object, 100);
+    } else if (sound != D_001A5ADC) {
         sound_stop_channel(D_001A5AD0);
-        D_001A5AD0 = sound_play_loop(l_18, player_object, 100);
+        D_001A5AD0 = sound_play_loop(sound, player_object, 100);
     }
-    D_001A5ADC = l_18;
+    D_001A5ADC = sound;
 }
 
 void player_horse_sounds_stop(void)
@@ -721,62 +721,62 @@ void player_horse_sounds_stop(void)
 
 int player_climb_probe(void)
 {
-    int l_28;
-    int l_24;
-    int l_20;
-    int l_1C;
+    int shape;
+    int result;
+    int x;
+    int z;
 
-    xn_math_yaw_offset_xz((player_object->yaw + move_angle_offset) & 2047, 1024, (int)&l_20, (int)&l_1C);
-    l_20 += player_object->x << 5;
-    l_1C += player_object->z << 5;
-    l_20 += D_001A5A64;
-    l_1C += D_001A5A60;
-    D_001A5A64 = l_20 & 31;
-    D_001A5A60 = l_1C & 31;
-    D_00187C86 = l_20 / 32;
+    xn_math_yaw_offset_xz((player_object->yaw + move_angle_offset) & 2047, 1024, &x, &z);
+    x += player_object->x << 5;
+    z += player_object->z << 5;
+    x += D_001A5A64;
+    z += D_001A5A60;
+    D_001A5A64 = x & 31;
+    D_001A5A60 = z & 31;
+    D_00187C86 = x / 32;
     D_00187C8A = player_object->y - 32;
-    D_00187C8E = l_1C / 32;
+    D_00187C8E = z / 32;
     D_00187C92 = player_object->angle_x;
     D_00187C96 = player_object->yaw;
     D_00187C9A = player_object->angle_z;
     if (((struct bf8_2_1 *)&player_motion_flags)->f != 0) {
-        l_28 = (int)D_00187C12;
+        shape = (int)D_00187C12;
     } else {
-        l_28 = (int)D_00187B6E;
+        shape = (int)D_00187B6E;
     }
-    D_00187C9E = l_28;
+    D_00187C9E = shape;
     if (((struct bf8_5_1 *)&player_motion_flags)->f != 0) D_00187C9E = (int)D_00187BB8;
     *(signed char *)collide_flags |= 4;
     player_motion_flags &= 223;
-    l_24 = collide_move_player(player_object, 0, (int)&D_00187C86, 1);
-    return l_24;
+    result = collide_move_player(player_object, 0, (int)&D_00187C86, 1);
+    return result;
 }
 
-int string_last_char(int a1)
+char *string_last_char(char *text)
 {
-    int l_20;
-    int l_1C;
+    char *p;
+    char *last;
 
-    l_20 = a1;
-    l_1C = 0;
-    while (*(signed char *)((char *)l_20) != 0) l_1C = l_20++;
-    return l_1C;
+    p = text;
+    last = 0;
+    while (*p != 0) last = p++;
+    return last;
 }
 
-int parse_hex_string(int a1)
+int parse_hex_string(char *text)
 {
-    int l_24;
-    int l_20;
-    int l_1C;
+    char *p;
+    int value;
+    int place;
 
-    l_1C = 1;
-    l_24 = string_last_char(a1);
-    if (l_24 == 0) return -1;
-    l_20 = hex_digit_value(l_24);
-    while (l_24 != a1) {
-        l_24--;
-        l_1C <<= 4;
-        l_20 += hex_digit_value(l_24) * l_1C;
+    place = 1;
+    p = string_last_char(text);
+    if (p == 0) return -1;
+    value = hex_digit_value(p);
+    while (p != text) {
+        p--;
+        place <<= 4;
+        value += hex_digit_value(p) * place;
     }
-    return l_20;
+    return value;
 }

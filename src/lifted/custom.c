@@ -172,12 +172,12 @@ void career_specials_line(int, int);
 
 void classmaker_run(void)
 {
-    int l_2C;
-    int l_28;
-    int l_24;
-    int l_20;
-    short l_1C;
-    short l_18;
+    int specials_count;
+    int *bios_ticks;
+    int *bios_ticks_now;
+    int *bios_ticks_set;
+    short button_count;
+    short button;
 
     mc_memset((int)player_class + 16, -1, 12, (int)D_00175420, 88, 12);
     player_class->hp_per_level = 8;
@@ -205,8 +205,8 @@ void classmaker_run(void)
     scratch_190df8 = disk_read_file((int)D_00175450, 0);
     D_00190E00 = disk_read_file((int)D_0017545D, 0);
     scratch_190dfc = disk_read_file((int)D_0017546A, 0);
-    l_28 = 1132;
-    *(int *)scratch_190be4 = *(int *)((char *)l_28);
+    bios_ticks = (int *)1132;
+    *(int *)scratch_190be4 = *bios_ticks;
     while (classmaker_done == 0) {
         keys_world_actions();
         mouse_buttons_prev = mouse_buttons;
@@ -229,35 +229,35 @@ void classmaker_run(void)
         if (D_00190D86 != 0) (D_00190D86)--;
         if (*(short *)classmaker_screen == 0) {
             *(int *)&classmaker_current_buttons = (int)classmaker_buttons;
-            *(int *)&l_1C = 28;
+            *(int *)&button_count = 28;
         } else if (((int)(short)*(short *)classmaker_screen) == 1) {
             *(int *)&classmaker_current_buttons = (int)classmaker_reputation_buttons;
-            *(int *)&l_1C = 6;
+            *(int *)&button_count = 6;
         } else {
             *(int *)&classmaker_current_buttons = (int)classmaker_specials_buttons;
             if (((int)(short)(*(short *)classmaker_screen & 16)) != 0) {
-                l_2C = 1;
+                specials_count = 1;
             } else {
-                l_2C = 3;
+                specials_count = 3;
             }
-            *(int *)&l_1C = l_2C;
+            *(int *)&button_count = specials_count;
         }
         if (((int)(unsigned char)game_mode) != 8) {
             if (*(short *)classmaker_screen == 0 && mouse_buttons != 0 && mouse_buttons != mouse_buttons_prev) {
-                *(int *)&l_18 = 0;
-                for (; (short)(short)*(int *)&l_18 < l_1C; (*(int *)&l_18)++) {
-                    if (mouse_x > *(short *)((char *)(int)(classmaker_current_buttons + (((int)(short)l_18) * 12))) && mouse_x < *(short *)(classmaker_current_buttons + 4 + (((int)(short)l_18) * 12)) && mouse_y > *(short *)(classmaker_current_buttons + 2 + (((int)(short)l_18) * 12)) && mouse_y < *(short *)(classmaker_current_buttons + 6 + (((int)(short)l_18) * 12))) {
+                *(int *)&button = 0;
+                for (; (short)(short)*(int *)&button < button_count; (*(int *)&button)++) {
+                    if (mouse_x > *(short *)((char *)(int)(classmaker_current_buttons + (((int)(short)button) * 12))) && mouse_x < *(short *)(classmaker_current_buttons + 4 + (((int)(short)button) * 12)) && mouse_y > *(short *)(classmaker_current_buttons + 2 + (((int)(short)button) * 12)) && mouse_y < *(short *)(classmaker_current_buttons + 6 + (((int)(short)button) * 12))) {
                         sound_play(203, (int)player_object, 100);
-                        ((int (*)())(*(int *)(classmaker_current_buttons + 8 + (((int)(short)l_18) * 12))))();
+                        ((int (*)())(*(int *)(classmaker_current_buttons + 8 + (((int)(short)button) * 12))))();
                         break;
                     }
                 }
             } else if (((int)(unsigned char)(mouse_buttons & 1)) != 0) {
-                *(int *)&l_18 = 0;
-                for (; (short)(short)*(int *)&l_18 < l_1C; (*(int *)&l_18)++) {
-                    if (mouse_x > *(short *)((char *)(int)(classmaker_current_buttons + (((int)(short)l_18) * 12))) && mouse_x < *(short *)(classmaker_current_buttons + 4 + (((int)(short)l_18) * 12)) && mouse_y > *(short *)(classmaker_current_buttons + 2 + (((int)(short)l_18) * 12)) && mouse_y < *(short *)(classmaker_current_buttons + 6 + (((int)(short)l_18) * 12))) {
+                *(int *)&button = 0;
+                for (; (short)(short)*(int *)&button < button_count; (*(int *)&button)++) {
+                    if (mouse_x > *(short *)((char *)(int)(classmaker_current_buttons + (((int)(short)button) * 12))) && mouse_x < *(short *)(classmaker_current_buttons + 4 + (((int)(short)button) * 12)) && mouse_y > *(short *)(classmaker_current_buttons + 2 + (((int)(short)button) * 12)) && mouse_y < *(short *)(classmaker_current_buttons + 6 + (((int)(short)button) * 12))) {
                         sound_play(203, (int)player_object, 100);
-                        ((int (*)())(*(int *)(classmaker_current_buttons + 8 + (((int)(short)l_18) * 12))))();
+                        ((int (*)())(*(int *)(classmaker_current_buttons + 8 + (((int)(short)button) * 12))))();
                         break;
                     }
                 }
@@ -272,11 +272,11 @@ void classmaker_run(void)
         }
         classmaker_update_advancement();
         mc_memcpy(655360, screen_buffer, 64000, (int)D_00175420, 205, 4);
-        l_24 = 1132;
-        if (*(int *)scratch_190be4 != *(int *)((char *)l_24)) {
+        bios_ticks_now = (int *)1132;
+        if (*(int *)scratch_190be4 != *bios_ticks_now) {
             D_00190D74++;
-            l_20 = 1132;
-            *(int *)scratch_190be4 = *(int *)((char *)l_20);
+            bios_ticks_set = (int *)1132;
+            *(int *)scratch_190be4 = *bios_ticks_set;
         }
     }
     D_001940D8 &= 254;
@@ -446,13 +446,13 @@ void classmaker_attribute_luc(void)
 
 void classmaker_attribute_up(void)
 {
-    int l_1C;
-    int l_18;
+    int *bios_ticks;
+    int *bios_ticks_now;
 
-    l_1C = 1132;
-    if (((unsigned)(*(int *)((char *)l_1C) - scratch_190be8)) < 6) return;
-    l_18 = 1132;
-    scratch_190be8 = *(int *)((char *)l_18);
+    bios_ticks = (int *)1132;
+    if (((unsigned)(*bios_ticks - scratch_190be8)) < 6) return;
+    bios_ticks_now = (int *)1132;
+    scratch_190be8 = *bios_ticks_now;
     if (player_class->attributes[(int)(short)chargen_selected_attribute] == 75) return;
     player_class->attributes[(int)(short)chargen_selected_attribute]++;
     (*(short *)scratch_190d64)--;
@@ -460,50 +460,50 @@ void classmaker_attribute_up(void)
 
 void classmaker_attribute_down(void)
 {
-    int l_1C;
-    int l_18;
+    int *bios_ticks;
+    int *bios_ticks_now;
 
-    l_1C = 1132;
-    if (((unsigned)(*(int *)((char *)l_1C) - scratch_190be8)) < 6) return;
-    l_18 = 1132;
-    scratch_190be8 = *(int *)((char *)l_18);
+    bios_ticks = (int *)1132;
+    if (((unsigned)(*bios_ticks - scratch_190be8)) < 6) return;
+    bios_ticks_now = (int *)1132;
+    scratch_190be8 = *bios_ticks_now;
     if (player_class->attributes[(int)(short)chargen_selected_attribute] == 10) return;
     player_class->attributes[(int)(short)chargen_selected_attribute]--;
     (*(short *)scratch_190d64)++;
 }
 
-int classmaker_pick_from_list(int a1, int a2)
+int classmaker_pick_from_list(int names, int background)
 {
-    short l_14;
-    short l_18;
+    short i;
+    short count;
 
-    if (((int)skill_names) == a1) {
-        *(int *)&l_14 = 0;
-        *(int *)&l_18 = *(int *)&l_14;
-        while (*(int *)((char *)((((int)(short)l_14) << 2) + a1)) != 0) {
-            if (classmaker_skill_taken((int)(short)l_14) == 0) {
-                scratch_190ce4[(int)(short)l_18] = *(signed char *)&l_14;
-                *(int *)(scratch_190ee4 + (((int)(short)(*(int *)&l_18)++) << 2)) = *(int *)((char *)(int)((char *)a1 + (((int)(short)l_14) << 2)));
+    if (((int)skill_names) == names) {
+        *(int *)&i = 0;
+        *(int *)&count = *(int *)&i;
+        while (*(int *)((char *)((((int)(short)i) << 2) + names)) != 0) {
+            if (classmaker_skill_taken((int)(short)i) == 0) {
+                scratch_190ce4[(int)(short)count] = *(signed char *)&i;
+                *(int *)(scratch_190ee4 + (((int)(short)(*(int *)&count)++) << 2)) = *(int *)((char *)(int)((char *)names + (((int)(short)i) << 2)));
             }
-            l_14++;
+            i++;
         }
-        *(int *)(scratch_190ee4 + (((int)(short)l_18) << 2)) = 0;
+        *(int *)(scratch_190ee4 + (((int)(short)count) << 2)) = 0;
         list_popup_open((int)scratch_190ee4);
     } else {
-        list_popup_open(a1);
+        list_popup_open(names);
     }
     D_001940D4 &= 254;
     for (;;) {
         keys_world_actions();
         xn_mouse_poll_clamped();
-        mc_memcpy(screen_buffer, a2, 64000, (int)D_00175420, 558, 4);
-        l_14 = list_popup_update();
-        if (((int)(short)l_14) > (-1)) {
+        mc_memcpy(screen_buffer, background, 64000, (int)D_00175420, 558, 4);
+        i = list_popup_update();
+        if (((int)(short)i) > (-1)) {
             while (mouse_buttons != 0) xn_mouse_poll_clamped();
-            if (((int)skill_names) == a1) {
-                return (int)(signed char)scratch_190ce4[(int)(short)l_14];
+            if (((int)skill_names) == names) {
+                return (int)(signed char)scratch_190ce4[(int)(short)i];
             }
-            return (int)(short)l_14;
+            return (int)(short)i;
         }
         xn_mouse_cursor_drawn &= 254;
         xn_mouse_cursor_move((int)(short)mouse_x, (int)(short)mouse_y);
@@ -511,20 +511,20 @@ int classmaker_pick_from_list(int a1, int a2)
     }
 }
 
-void classmaker_set_reputation(int a1)
+void classmaker_set_reputation(int group)
 {
-    int l_1C;
-    int l_18;
+    int unused;
+    int centre;
 
-    l_18 = (((int)(short)*(short *)(D_0018565E + (((int)(short)*(short *)&a1) * 12))) + ((int)(short)*(short *)(D_00185662 + (((int)(short)*(short *)&a1) * 12)))) >> 1;
+    centre = (((int)(short)*(short *)(D_0018565E + (((int)(short)*(short *)&group) * 12))) + ((int)(short)*(short *)(D_00185662 + (((int)(short)*(short *)&group) * 12)))) >> 1;
     if (((int)(short)mouse_y) < 81) {
-        player_character->reputation[(int)(short)*(short *)&a1] = (((int)(short)mouse_y) - 81) / 5;
+        player_character->reputation[(int)(short)*(short *)&group] = (((int)(short)mouse_y) - 81) / 5;
     } else if (((int)(short)mouse_y) > 81) {
-        player_character->reputation[(int)(short)*(short *)&a1] = (((int)(short)mouse_y) - 81) / 5;
+        player_character->reputation[(int)(short)*(short *)&group] = (((int)(short)mouse_y) - 81) / 5;
     } else {
-        player_character->reputation[(int)(short)*(short *)&a1] = 0;
+        player_character->reputation[(int)(short)*(short *)&group] = 0;
     }
-    player_character->reputation[(int)(short)*(short *)&a1] = -player_character->reputation[(int)(short)*(short *)&a1];
+    player_character->reputation[(int)(short)*(short *)&group] = -player_character->reputation[(int)(short)*(short *)&group];
 }
 
 void classmaker_reputation_commoners(void)
@@ -554,15 +554,15 @@ void classmaker_reputation_underworld(void)
 
 void classmaker_reputations_exit(void)
 {
-    int l_1C;
-    short l_18;
+    int i;
+    short total;
 
-    l_1C = 0;
-    l_18 = l_1C;
-    for (; ((int)(short)*(short *)&l_1C) < 5; l_1C++) {
-        l_18 += player_character->reputation[(int)(short)*(short *)&l_1C];
+    i = 0;
+    total = i;
+    for (; ((int)(short)*(short *)&i) < 5; i++) {
+        total += player_character->reputation[(int)(short)*(short *)&i];
     }
-    if (l_18 != 0) {
+    if (total != 0) {
         D_0012B508 = 145;
         msgbox_show_rsc(303, 1);
         return;
@@ -573,18 +573,18 @@ void classmaker_reputations_exit(void)
 
 int classmaker_picklist_wait(void)
 {
-    int l_1C;
+    int picked;
 
     for (;;) {
         keys_world_actions();
         xn_mouse_poll_clamped();
-        l_1C = list_popup_update();
-        if (l_1C > (-1)) {
+        picked = list_popup_update();
+        if (picked > (-1)) {
             while (mouse_buttons != 0) xn_mouse_poll_clamped();
             xn_mouse_cursor_drawn &= 254;
-            return l_1C + 1;
+            return picked + 1;
         }
-        if (l_1C == (-2)) {
+        if (picked == (-2)) {
             xn_mouse_cursor_drawn &= 254;
             return 0;
         }
@@ -593,17 +593,17 @@ int classmaker_picklist_wait(void)
     }
 }
 
-int classmaker_drop_duplicate_special(int a1)
+int classmaker_drop_duplicate_special(int list)
 {
-    int l_24;
-    int l_20;
-    int l_1C;
+    int i;
+    int special;
+    int param;
 
-    l_20 = (int)(unsigned char)classmaker_specials[(a1 * 14) + (((int)(unsigned char)classmaker_special_counts[a1]) * 2)];
-    l_1C = (int)(unsigned char)D_00199821[(a1 * 14) + (((int)(unsigned char)classmaker_special_counts[a1]) * 2)];
-    for (l_24 = 0; ((int)(unsigned char)classmaker_special_counts[a1]) > l_24; l_24++) {
-        if (((int)(unsigned char)classmaker_specials[(a1 * 14) + (l_24 * 2)]) == l_20 && ((int)(unsigned char)D_00199821[(a1 * 14) + (l_24 * 2)]) == l_1C) {
-            (classmaker_special_counts[a1])--;
+    special = (int)(unsigned char)classmaker_specials[(list * 14) + (((int)(unsigned char)classmaker_special_counts[list]) * 2)];
+    param = (int)(unsigned char)D_00199821[(list * 14) + (((int)(unsigned char)classmaker_special_counts[list]) * 2)];
+    for (i = 0; ((int)(unsigned char)classmaker_special_counts[list]) > i; i++) {
+        if (((int)(unsigned char)classmaker_specials[(list * 14) + (i * 2)]) == special && ((int)(unsigned char)D_00199821[(list * 14) + (i * 2)]) == param) {
+            (classmaker_special_counts[list])--;
             return 1;
         }
     }
@@ -626,51 +626,51 @@ void classmaker_specials_add(void)
 
 void classmaker_specials_picked(void)
 {
-    int l_18;
+    int names;
 
     *(signed char *)classmaker_screen &= 239;
     if (((int)(short)*(short *)classmaker_screen) == 2) {
-        l_18 = (int)classmaker_advantage_names;
+        names = (int)classmaker_advantage_names;
     } else {
-        l_18 = (int)classmaker_disadvantage_names;
+        names = (int)classmaker_disadvantage_names;
     }
-    D_00190E0C = l_18;
+    D_00190E0C = names;
     (classmaker_special_counts[(int)(short)classmaker_special_list])++;
 }
 
 int classmaker_update_advancement(void)
 {
-    int l_2C;
-    int l_28;
-    int l_24;
-    short l_18;
-    short l_1C;
+    int disadvantage_cost;
+    int multiplier;
+    int advantage_cost;
+    short i;
+    short hp_cost;
 
-    l_28 = 65536;
-    l_24 = 0;
-    *(int *)&l_18 = 0;
-    for (; (short)(short)((int)(unsigned char)classmaker_special_counts[0]) > l_18; (*(int *)&l_18)++) {
-        l_24 += *(int *)((char *)(int)(classmaker_advantage_costs[((int)(unsigned char)classmaker_specials[((int)(short)l_18) * 2])] + (((int)(unsigned char)D_00199821[((int)(short)l_18) * 2]) << 2)));
+    multiplier = 65536;
+    advantage_cost = 0;
+    *(int *)&i = 0;
+    for (; (short)(short)((int)(unsigned char)classmaker_special_counts[0]) > i; (*(int *)&i)++) {
+        advantage_cost += *(int *)((char *)(int)(classmaker_advantage_costs[((int)(unsigned char)classmaker_specials[((int)(short)i) * 2])] + (((int)(unsigned char)D_00199821[((int)(short)i) * 2]) << 2)));
     }
-    l_2C = 0;
-    *(int *)&l_18 = 0;
-    for (; (short)(short)((int)(unsigned char)D_00190D7F) > l_18; (*(int *)&l_18)++) {
-        l_2C += *(int *)((char *)(int)(classmaker_disadvantage_costs[((int)(unsigned char)D_0019982E[((int)(short)l_18) * 2])] + (((int)(unsigned char)D_0019982F[((int)(short)l_18) * 2]) << 2)));
+    disadvantage_cost = 0;
+    *(int *)&i = 0;
+    for (; (short)(short)((int)(unsigned char)D_00190D7F) > i; (*(int *)&i)++) {
+        disadvantage_cost += *(int *)((char *)(int)(classmaker_disadvantage_costs[((int)(unsigned char)D_0019982E[((int)(short)i) * 2])] + (((int)(unsigned char)D_0019982F[((int)(short)i) * 2]) << 2)));
     }
-    *(int *)&l_1C = (player_class->hp_per_level - 8) * 3277;
-    if (player_class->hp_per_level < 8) *(int *)&l_1C <<= 1;
-    l_28 = (int)(*(char **)&l_1C + ((l_24 + 65536) - l_2C));
-    if (l_28 < 6554) l_28 = 6554;
-    player_class->advancement_multiplier = l_28;
-    if (l_28 > 65536) {
-        scratch_190d68 = 115 - (((l_28 - 65536) * 69) / 262144);
-    } else if (l_28 < 65536) {
-        scratch_190d68 = (((65536 - l_28) * 69) / 65536) + 115;
+    *(int *)&hp_cost = (player_class->hp_per_level - 8) * 3277;
+    if (player_class->hp_per_level < 8) *(int *)&hp_cost <<= 1;
+    multiplier = (int)(*(char **)&hp_cost + ((advantage_cost + 65536) - disadvantage_cost));
+    if (multiplier < 6554) multiplier = 6554;
+    player_class->advancement_multiplier = multiplier;
+    if (multiplier > 65536) {
+        scratch_190d68 = 115 - (((multiplier - 65536) * 69) / 262144);
+    } else if (multiplier < 65536) {
+        scratch_190d68 = (((65536 - multiplier) * 69) / 65536) + 115;
     } else {
         scratch_190d68 = 115;
     }
     if (((int)(short)scratch_190d68) < 46) scratch_190d68 = 46;
-    return l_28;
+    return multiplier;
 }
 
 void classmaker_hp_up(void)
@@ -687,42 +687,42 @@ void classmaker_hp_down(void)
     player_class->hp_per_level--;
 }
 
-int classmaker_skill_taken(short a1)
+int classmaker_skill_taken(short skill)
 {
-    short l_18;
+    short i;
 
-    *(int *)&l_18 = 0;
-    for (; ((int)(short)l_18) < 12; (*(int *)&l_18)++) {
-        if ((short)((unsigned short)player_class->skills[(int)(short)l_18]) == a1) return 1;
+    *(int *)&i = 0;
+    for (; ((int)(short)i) < 12; (*(int *)&i)++) {
+        if ((short)((unsigned short)player_class->skills[(int)(short)i]) == skill) return 1;
     }
     return 0;
 }
 
 void classmaker_save_file(void)
 {
-    int l_18;
+    int file;
 
     if (*(signed char *)classmaker_file == 0) return;
-    l_18 = disk_create((int)classmaker_file);
-    write(l_18, (int)player_class, 74);
-    close(l_18);
+    file = disk_create((int)classmaker_file);
+    write(file, (int)player_class, 74);
+    close(file);
 }
 
-int classmaker_special_conflicts(int a1, int a2, int a3)
+int classmaker_special_conflicts(int list, int special, int param)
 {
-    int l_1C;
-    int l_18;
-    int l_14;
+    int i;
+    int list_index;
+    int count;
 
-    if (a1 == 0 && a2 >= 2) return 0;
-    if (a1 != 0 && a2 != 6 && a2 != 7) return 0;
-    for (l_18 = 0; l_18 < 2; l_18++) {
-        l_14 = (int)(unsigned char)classmaker_special_counts[l_18];
-        for (l_1C = 0; l_1C < l_14; l_1C++) {
-            if (l_18 == 0 && ((int)(unsigned char)classmaker_specials[(l_18 * 14) + (l_1C * 2)]) < 2 && ((int)(unsigned char)D_00199821[(l_18 * 14) + (l_1C * 2)]) == a3) {
+    if (list == 0 && special >= 2) return 0;
+    if (list != 0 && special != 6 && special != 7) return 0;
+    for (list_index = 0; list_index < 2; list_index++) {
+        count = (int)(unsigned char)classmaker_special_counts[list_index];
+        for (i = 0; i < count; i++) {
+            if (list_index == 0 && ((int)(unsigned char)classmaker_specials[(list_index * 14) + (i * 2)]) < 2 && ((int)(unsigned char)D_00199821[(list_index * 14) + (i * 2)]) == param) {
                 return 1;
             }
-            if (l_18 != 0 && (((int)(unsigned char)classmaker_specials[(l_18 * 14) + (l_1C * 2)]) == 6 || ((int)(unsigned char)classmaker_specials[(l_18 * 14) + (l_1C * 2)]) == 7) && ((int)(unsigned char)D_00199821[(l_18 * 14) + (l_1C * 2)]) == a3) {
+            if (list_index != 0 && (((int)(unsigned char)classmaker_specials[(list_index * 14) + (i * 2)]) == 6 || ((int)(unsigned char)classmaker_specials[(list_index * 14) + (i * 2)]) == 7) && ((int)(unsigned char)D_00199821[(list_index * 14) + (i * 2)]) == param) {
                 return 1;
             }
         }
@@ -741,39 +741,39 @@ int career_specials_text(void)
 
 void career_advantages_text(void)
 {
-    int l_18;
+    int i;
 
-    for (l_18 = 0; l_18 < 7; l_18++) {
-        if ((player_class->resistance_flags & (1 << l_18)) != 0) {
-            career_specials_line((int)D_00175477, D_0018087E[l_18]);
+    for (i = 0; i < 7; i++) {
+        if ((player_class->resistance_flags & (1 << i)) != 0) {
+            career_specials_line((int)D_00175477, D_0018087E[i]);
         }
     }
-    for (l_18 = 0; l_18 < 7; l_18++) {
-        if ((player_class->immunity_flags & (1 << l_18)) != 0) {
-            career_specials_line((int)D_00175482, D_0018087E[l_18]);
+    for (i = 0; i < 7; i++) {
+        if ((player_class->immunity_flags & (1 << i)) != 0) {
+            career_specials_line((int)D_00175482, D_0018087E[i]);
         }
     }
     if (((int)(unsigned short)(player_class->flags & 1)) != 0) {
         career_specials_line((int)D_0017548B, 0);
     }
-    for (l_18 = 0; l_18 < 3; l_18++) {
-        if ((player_class->spell_absorption_flags & (1 << l_18)) != 0) {
-            career_specials_line((int)D_00175499, D_0018089E[l_18]);
+    for (i = 0; i < 3; i++) {
+        if ((player_class->spell_absorption_flags & (1 << i)) != 0) {
+            career_specials_line((int)D_00175499, D_0018089E[i]);
         }
     }
-    for (l_18 = 0; l_18 < 3; l_18++) {
-        if ((player_class->rapid_healing_flags & (1 << l_18)) != 0) {
-            career_specials_line((int)D_001754AA, D_001808AE[l_18]);
+    for (i = 0; i < 3; i++) {
+        if ((player_class->rapid_healing_flags & (1 << i)) != 0) {
+            career_specials_line((int)D_001754AA, D_001808AE[i]);
         }
     }
-    for (l_18 = 0; l_18 < 4; l_18++) {
-        if ((player_class->regeneration_flags & (1 << l_18)) != 0) {
-            career_specials_line((int)D_001754B8, D_001808BE[l_18]);
+    for (i = 0; i < 4; i++) {
+        if ((player_class->regeneration_flags & (1 << i)) != 0) {
+            career_specials_line((int)D_001754B8, D_001808BE[i]);
         }
     }
-    for (l_18 = 0; l_18 < 4; l_18++) {
-        if ((player_class->attack_modifier_flags & (1 << l_18)) != 0) {
-            career_specials_line((int)D_001754C3, D_001808D2[l_18]);
+    for (i = 0; i < 4; i++) {
+        if ((player_class->attack_modifier_flags & (1 << i)) != 0) {
+            career_specials_line((int)D_001754C3, D_001808D2[i]);
         }
     }
     if (((int)(unsigned short)(player_class->flags & 2)) != 0) {
@@ -785,91 +785,91 @@ void career_advantages_text(void)
     if (((int)(unsigned short)(player_class->flags & 4)) != 0) {
         career_specials_line((int)D_001754EE, 0);
     }
-    for (l_18 = 0; l_18 < 6; l_18++) {
-        if ((player_class->expert_weapons & (1 << l_18)) != 0) {
-            career_specials_line((int)D_001754FE, D_001808FE[l_18]);
+    for (i = 0; i < 6; i++) {
+        if ((player_class->expert_weapons & (1 << i)) != 0) {
+            career_specials_line((int)D_001754FE, D_001808FE[i]);
         }
     }
 }
 
 void career_disadvantages_text(void)
 {
-    int l_18;
+    int i;
 
     if (((int)(unsigned short)(player_class->flags & 8)) != 0) {
         career_specials_line((int)D_0017550B, 0);
     }
-    for (l_18 = 0; l_18 < 2; l_18++) {
-        if ((player_class->flags & (1 << (l_18 + 4))) != 0) {
-            career_specials_line((int)D_00175530, D_0018096E[l_18]);
+    for (i = 0; i < 2; i++) {
+        if ((player_class->flags & (1 << (i + 4))) != 0) {
+            career_specials_line((int)D_00175530, D_0018096E[i]);
         }
     }
-    for (l_18 = 0; l_18 < 4; l_18++) {
-        if ((player_class->attack_modifier_flags & (1 << (l_18 + 4))) != 0) {
-            career_specials_line((int)D_00175537, D_001808D2[l_18]);
+    for (i = 0; i < 4; i++) {
+        if ((player_class->attack_modifier_flags & (1 << (i + 4))) != 0) {
+            career_specials_line((int)D_00175537, D_001808D2[i]);
         }
     }
-    for (l_18 = 0; l_18 < 2; l_18++) {
-        if ((player_class->flags & (1 << (l_18 + 6))) != 0) {
-            career_specials_line((int)D_0017553E, D_0018097A[l_18]);
+    for (i = 0; i < 2; i++) {
+        if ((player_class->flags & (1 << (i + 6))) != 0) {
+            career_specials_line((int)D_0017553E, D_0018097A[i]);
         }
     }
-    for (l_18 = 0; l_18 < 2; l_18++) {
-        if ((player_class->flags & (1 << (l_18 + 8))) != 0) {
-            career_specials_line((int)D_00175553, D_00180986[l_18]);
+    for (i = 0; i < 2; i++) {
+        if ((player_class->flags & (1 << (i + 8))) != 0) {
+            career_specials_line((int)D_00175553, D_00180986[i]);
         }
     }
-    for (l_18 = 0; l_18 < 6; l_18++) {
-        if ((player_class->forbidden_equipment & (1 << l_18)) != 0) {
-            career_specials_line((int)D_0017556B, D_001808FE[l_18]);
+    for (i = 0; i < 6; i++) {
+        if ((player_class->forbidden_equipment & (1 << i)) != 0) {
+            career_specials_line((int)D_0017556B, D_001808FE[i]);
         }
     }
-    for (l_18 = 0; l_18 < 7; l_18++) {
-        if ((player_class->low_tolerance_flags & (1 << l_18)) != 0) {
-            career_specials_line((int)D_0017557E, D_0018087E[l_18]);
+    for (i = 0; i < 7; i++) {
+        if ((player_class->low_tolerance_flags & (1 << i)) != 0) {
+            career_specials_line((int)D_0017557E, D_0018087E[i]);
         }
     }
-    for (l_18 = 0; l_18 < 7; l_18++) {
-        if ((player_class->critical_weakness_flags & (1 << l_18)) != 0) {
-            career_specials_line((int)D_0017558C, D_0018087E[l_18]);
+    for (i = 0; i < 7; i++) {
+        if ((player_class->critical_weakness_flags & (1 << i)) != 0) {
+            career_specials_line((int)D_0017558C, D_0018087E[i]);
         }
     }
-    for (l_18 = 0; l_18 < 3; l_18++) {
-        if ((player_class->forbidden_equipment & (1 << (l_18 + 6))) != 0) {
-            career_specials_line((int)D_0017559E, D_00180992[l_18]);
+    for (i = 0; i < 3; i++) {
+        if ((player_class->forbidden_equipment & (1 << (i + 6))) != 0) {
+            career_specials_line((int)D_0017559E, D_00180992[i]);
         }
     }
-    for (l_18 = 0; l_18 < 4; l_18++) {
-        if ((player_class->forbidden_equipment & (1 << (l_18 + 9))) != 0) {
-            career_specials_line((int)D_001755B3, D_001809A2[l_18]);
+    for (i = 0; i < 4; i++) {
+        if ((player_class->forbidden_equipment & (1 << (i + 9))) != 0) {
+            career_specials_line((int)D_001755B3, D_001809A2[i]);
         }
     }
-    for (l_18 = 0; l_18 < 10; l_18++) {
-        if ((player_class->forbidden_materials & (1 << l_18)) != 0) {
-            career_specials_line((int)D_001755C9, D_001809B6[l_18]);
+    for (i = 0; i < 10; i++) {
+        if ((player_class->forbidden_materials & (1 << i)) != 0) {
+            career_specials_line((int)D_001755C9, D_001809B6[i]);
         }
     }
 }
 
-void career_specials_line(int a1, int a2)
+void career_specials_line(int label, int detail)
 {
-    if (a2 != 0) {
+    if (detail != 0) {
         mc_set_location(1221, (int)D_00175420);
-        mc_sprintf((int)text_buffer, (int)D_001755DC, a1, a2);
+        mc_sprintf((int)text_buffer, (int)D_001755DC, label, detail);
     } else {
-        mc_strncpy((int)text_buffer, a1, 160, (int)D_00175420, 1223);
+        mc_strncpy((int)text_buffer, label, 160, (int)D_00175420, 1223);
     }
     func_000A1054(D_0019981C, (int)text_buffer, (int)D_00175420, 1225, 4);
     func_000A1054(D_0019981C, (int)D_001755E2, (int)D_00175420, 1226, 4);
 }
 
-int itemmaker_open(int a1)
+int itemmaker_open(int opening)
 {
     if (((int)D_0019626F) == 10 && ((int)(unsigned char)game_mode) == 8) {
         return 1;
     }
-    if (a1 != 0) {
-        scratch_190d68 = a1;
+    if (opening != 0) {
+        scratch_190d68 = opening;
         D_00187CA8 = 0;
         D_001940D8 |= 4;
         game_mode = 10;

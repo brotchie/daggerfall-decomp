@@ -4,6 +4,18 @@
 #include "records.h"
 
 struct bf8_6_1 { unsigned char _:6; unsigned char f:1; };
+
+#pragma pack(1)
+/* a BSA directory entry: type 256 archives name their records, the others number them */
+struct bsa_name_entry {
+    char name[14];
+    int size;                       /* +0x0E */
+};                                  /* +0x12 */
+struct bsa_id_entry {
+    int id;                         /* +0x00 */
+    int size;                       /* +0x04 */
+};                                  /* +0x08 */
+#pragma pack()
 extern char D_00170150[];
 extern char D_0017015A[];
 extern char D_00170172[];
@@ -18,8 +30,8 @@ extern char archive_record_counts[];
 extern char archive_names[];
 
 extern int sound_play(int, struct record *, int);
-extern int disk_open_data(int);
-extern int disk_open_rw(int);
+extern int disk_open_data(char *);
+extern int disk_open_rw(char *);
 extern int hud_message_add(int);
 extern int rand_range(int, int);
 extern int close();
@@ -39,246 +51,246 @@ extern void guild_count_crime(int, unsigned char);
 int lockpick_door(struct record *);
 #pragma aux mc_set_location parm routine [];
 
-int archive_open(int a1, int a2, int a3)
+int archive_open(char *name, int directory, int writable)
 {
-    short l_10;
-    short l_1C;
-    short l_18;
-    short l_14;
+    short record_count;
+    short handle;
+    short dir_size;
+    short type;
 
-    if (a3 != 0) {
+    if (writable != 0) {
         do {
-            *(int *)&l_1C = disk_open_rw(a1);
-        } while (*(int *)&l_1C < 1);
+            *(int *)&handle = disk_open_rw(name);
+        } while (*(int *)&handle < 1);
     } else {
-        *(int *)&l_1C = disk_open_data(a1);
+        *(int *)&handle = disk_open_data(name);
     }
-    if (*(int *)&l_1C < 1) return *(int *)&l_1C;
-    mc_strncpy(((int)archive_names) + (*(int *)&l_1C * 13), a1, 13, (int)D_00170150, 32);
-    read(*(int *)&l_1C, (int)&l_10, 2);
-    read(*(int *)&l_1C, (int)&l_14, 2);
-    if (((int)(short)l_14) == 256) {
-        *(int *)&l_18 = ((int)(short)l_10) * 18;
+    if (*(int *)&handle < 1) return *(int *)&handle;
+    mc_strncpy(((int)archive_names) + (*(int *)&handle * 13), name, 13, (int)D_00170150, 32);
+    read(*(int *)&handle, (int)&record_count, 2);
+    read(*(int *)&handle, (int)&type, 2);
+    if (((int)(short)type) == 256) {
+        *(int *)&dir_size = ((int)(short)record_count) * 18;
     } else {
-        *(int *)&l_18 = ((int)(short)l_10) << 3;
+        *(int *)&dir_size = ((int)(short)record_count) << 3;
     }
-    if (a2 == 0) a2 = mc_malloc(*(int *)&l_18, (int)D_00170150, 42);
-    *(short *)(archive_record_counts + (*(int *)&l_1C * 2)) = *(int *)&l_10;
-    *(int *)(archive_directories + (*(int *)&l_1C << 2)) = a2;
-    *(short *)(archive_types + (*(int *)&l_1C * 2)) = *(int *)&l_14;
-    lseek(*(int *)&l_1C, -*(int *)&l_18, 2);
-    read(*(int *)&l_1C, a2, *(int *)&l_18);
-    return *(int *)&l_1C;
+    if (directory == 0) directory = mc_malloc(*(int *)&dir_size, (int)D_00170150, 42);
+    *(short *)(archive_record_counts + (*(int *)&handle * 2)) = *(int *)&record_count;
+    *(int *)(archive_directories + (*(int *)&handle << 2)) = directory;
+    *(short *)(archive_types + (*(int *)&handle * 2)) = *(int *)&type;
+    lseek(*(int *)&handle, -*(int *)&dir_size, 2);
+    read(*(int *)&handle, directory, *(int *)&dir_size);
+    return *(int *)&handle;
 }
 
-void archive_close(int a1)
+void archive_close(int handle)
 {
-    if (a1 == 0) return;
-    *(short *)(archive_record_counts + (a1 * 2)) = 0;
-    if (*(int *)(archive_directories + (a1 << 2)) != 0 && *(int *)(archive_directories + (a1 << 2)) != (-1751672937)) {
-        mc_free(*(int *)(archive_directories + (a1 << 2)), (int)D_00170150, 67);
-        *(int *)(archive_directories + (a1 << 2)) = -1751672937;
+    if (handle == 0) return;
+    *(short *)(archive_record_counts + (handle * 2)) = 0;
+    if (*(int *)(archive_directories + (handle << 2)) != 0 && *(int *)(archive_directories + (handle << 2)) != (-1751672937)) {
+        mc_free(*(int *)(archive_directories + (handle << 2)), (int)D_00170150, 67);
+        *(int *)(archive_directories + (handle << 2)) = -1751672937;
     }
-    *(int *)(archive_directories + (a1 << 2)) = 0;
-    *(short *)(archive_types + (a1 * 2)) = 0;
-    close(a1);
+    *(int *)(archive_directories + (handle << 2)) = 0;
+    *(short *)(archive_types + (handle * 2)) = 0;
+    close(handle);
 }
 
-int archive_find_record(int a1, int a2, int a3)
+int archive_find_record(int handle, char *name, int key)
 {
-    int l_1C;
-    int l_18;
-    int l_14;
+    struct bsa_name_entry *named_entry;
+    struct bsa_id_entry *entry;
+    int record;
 
-    if (((int)(short)*(short *)(archive_types + (a1 * 2))) == 256) {
-        l_1C = *(int *)(archive_directories + (a1 << 2));
-        for (l_14 = 0; ((int)(short)*(short *)(archive_record_counts + (a1 * 2))) > l_14; l_14++, (*(char (**)[18])&l_1C)++) {
-            if (strnicmp(a2, l_1C, a3) == 0) return l_14;
+    if (((int)(short)*(short *)(archive_types + (handle * 2))) == 256) {
+        named_entry = *(struct bsa_name_entry **)(archive_directories + (handle << 2));
+        for (record = 0; ((int)(short)*(short *)(archive_record_counts + (handle * 2))) > record; record++, named_entry++) {
+            if (strnicmp(name, named_entry->name, key) == 0) return record;
         }
     } else {
-        l_18 = *(int *)(archive_directories + (a1 << 2));
-        for (l_14 = 0; ((int)(short)*(short *)(archive_record_counts + (a1 * 2))) > l_14; l_14++, (*(char (**)[8])&l_18)++) {
-            if (a3 == *(int *)((char *)l_18)) return l_14;
+        entry = *(struct bsa_id_entry **)(archive_directories + (handle << 2));
+        for (record = 0; ((int)(short)*(short *)(archive_record_counts + (handle * 2))) > record; record++, entry++) {
+            if (key == entry->id) return record;
         }
     }
-    if (((int)(short)*(short *)(archive_types + (a1 * 2))) == 256) {
+    if (((int)(short)*(short *)(archive_types + (handle * 2))) == 256) {
         mc_set_location(105, (int)D_00170150);
-        mc_sprintf(*(int *)scratch_buffer, (int)D_0017015A, a2, ((int)archive_names) + (a1 * 13));
+        mc_sprintf(*(int *)scratch_buffer, (int)D_0017015A, name, ((int)archive_names) + (handle * 13));
     } else {
         mc_set_location(107, (int)D_00170150);
-        mc_sprintf(*(int *)scratch_buffer, (int)D_00170172, a3, ((int)archive_names) + (a1 * 13));
+        mc_sprintf(*(int *)scratch_buffer, (int)D_00170172, key, ((int)archive_names) + (handle * 13));
     }
     fatal_error(*(int *)scratch_buffer);
     return 0;
 }
 
-int archive_record_size(int a1, int a2)
+int archive_record_size(int handle, int record)
 {
-    int l_1C;
-    int l_18;
+    struct bsa_name_entry *named_entry;
+    struct bsa_id_entry *entry;
 
-    if (((int)(short)*(short *)(archive_types + (a1 * 2))) == 256) {
-        l_1C = *(int *)(archive_directories + (a1 << 2));
-        l_1C += a2 * 18;
-        return *(int *)((char *)l_1C + 14);
+    if (((int)(short)*(short *)(archive_types + (handle * 2))) == 256) {
+        named_entry = *(struct bsa_name_entry **)(archive_directories + (handle << 2));
+        named_entry += record;
+        return named_entry->size;
     }
-    l_18 = *(int *)(archive_directories + (a1 << 2));
-    l_18 += a2 << 3;
-    return *(int *)((char *)l_18 + 4);
+    entry = *(struct bsa_id_entry **)(archive_directories + (handle << 2));
+    entry += record;
+    return entry->size;
 }
 
-int archive_record_offset(int a1, int a2)
+int archive_record_offset(int handle, int record)
 {
-    int l_24;
-    int l_20;
-    int l_1C;
-    int l_18;
+    struct bsa_name_entry *named_entry;
+    struct bsa_id_entry *entry;
+    int i;
+    int offset;
 
-    l_18 = 4;
-    if (((int)(short)*(short *)(archive_types + (a1 * 2))) == 256) {
-        l_24 = *(int *)(archive_directories + (a1 << 2));
-        for (l_1C = 0; l_1C < a2; l_1C++, (*(char (**)[18])&l_24)++) {
-            l_18 += *(int *)((char *)l_24 + 14);
+    offset = 4;
+    if (((int)(short)*(short *)(archive_types + (handle * 2))) == 256) {
+        named_entry = *(struct bsa_name_entry **)(archive_directories + (handle << 2));
+        for (i = 0; i < record; i++, named_entry++) {
+            offset += named_entry->size;
         }
-        return l_18;
+        return offset;
     }
-    l_20 = *(int *)(archive_directories + (a1 << 2));
-    for (l_1C = 0; l_1C < a2; l_1C++, (*(char (**)[8])&l_20)++) {
-        l_18 += *(int *)((char *)l_20 + 4);
+    entry = *(struct bsa_id_entry **)(archive_directories + (handle << 2));
+    for (i = 0; i < record; i++, entry++) {
+        offset += entry->size;
     }
-    return l_18;
+    return offset;
 }
 
-int archive_read_record(int a1, int a2, int a3)
+int archive_read_record(int handle, int record, int buffer)
 {
-    int l_24;
-    int l_20;
-    int l_1C;
-    int l_18;
-    int l_14;
+    struct bsa_name_entry *named_entry;
+    struct bsa_id_entry *entry;
+    int i;
+    int size;
+    int offset;
 
-    l_14 = 4;
-    if (((int)(short)*(short *)(archive_types + (a1 * 2))) == 256) {
-        l_24 = *(int *)(archive_directories + (a1 << 2));
-        for (l_1C = 0; l_1C < a2; l_1C++, (*(char (**)[18])&l_24)++) {
-            l_14 += *(int *)((char *)l_24 + 14);
+    offset = 4;
+    if (((int)(short)*(short *)(archive_types + (handle * 2))) == 256) {
+        named_entry = *(struct bsa_name_entry **)(archive_directories + (handle << 2));
+        for (i = 0; i < record; i++, named_entry++) {
+            offset += named_entry->size;
         }
-        l_18 = *(int *)((char *)l_24 + 14);
+        size = named_entry->size;
     } else {
-        l_20 = *(int *)(archive_directories + (a1 << 2));
-        for (l_1C = 0; l_1C < a2; l_1C++, (*(char (**)[8])&l_20)++) {
-            l_14 += *(int *)((char *)l_20 + 4);
+        entry = *(struct bsa_id_entry **)(archive_directories + (handle << 2));
+        for (i = 0; i < record; i++, entry++) {
+            offset += entry->size;
         }
-        l_18 = *(int *)((char *)l_20 + 4);
+        size = entry->size;
     }
-    if (a3 == 0) a3 = mc_malloc(l_18, (int)D_00170150, 205);
-    lseek(a1, l_14, 0);
-    read(a1, a3, l_18);
-    return a3;
+    if (buffer == 0) buffer = mc_malloc(size, (int)D_00170150, 205);
+    lseek(handle, offset, 0);
+    read(handle, buffer, size);
+    return buffer;
 }
 
-void archive_write_record(int a1, int a2, int a3)
+void archive_write_record(int handle, int record, int data)
 {
-    int l_20;
-    int l_1C;
-    int l_18;
-    int l_14;
-    int l_10;
+    struct bsa_name_entry *named_entry;
+    struct bsa_id_entry *entry;
+    int i;
+    int size;
+    int offset;
 
-    l_10 = 4;
-    if (((int)(short)*(short *)(archive_types + (a1 * 2))) == 256) {
-        l_20 = *(int *)(archive_directories + (a1 << 2));
-        for (l_18 = 0; l_18 < a2; l_18++, (*(char (**)[18])&l_20)++) {
-            l_10 += *(int *)((char *)l_20 + 14);
+    offset = 4;
+    if (((int)(short)*(short *)(archive_types + (handle * 2))) == 256) {
+        named_entry = *(struct bsa_name_entry **)(archive_directories + (handle << 2));
+        for (i = 0; i < record; i++, named_entry++) {
+            offset += named_entry->size;
         }
-        l_14 = *(int *)((char *)l_20 + 14);
+        size = named_entry->size;
     } else {
-        l_1C = *(int *)(archive_directories + (a1 << 2));
-        for (l_18 = 0; l_18 < a2; l_18++, (*(char (**)[8])&l_1C)++) {
-            l_10 += *(int *)((char *)l_1C + 4);
+        entry = *(struct bsa_id_entry **)(archive_directories + (handle << 2));
+        for (i = 0; i < record; i++, entry++) {
+            offset += entry->size;
         }
-        l_14 = *(int *)((char *)l_1C + 4);
+        size = entry->size;
     }
-    lseek(a1, l_10, 0);
-    write(a1, a3, l_14);
+    lseek(handle, offset, 0);
+    write(handle, data, size);
 }
 
-void lockpick_door_unused(struct record *a1)
+void lockpick_door_unused(struct record *door)
 {
-    int l_18;
+    int result;
 
-    l_18 = lockpick_door(a1);
+    result = lockpick_door(door);
 }
 
-int lockpick_door(struct record *a1)
+int lockpick_door(struct record *door)
 {
-    int l_1C;
+    int chance;
 
-    if (a1->lockpick_skill_tried == player_character->skills[SKILL_LOCKPICKING].value) return 0;
-    if (a1->lock_level >= 20) {
+    if (door->lockpick_skill_tried == player_character->skills[SKILL_LOCKPICKING].value) return 0;
+    if (door->lock_level >= 20) {
         hud_message_add(lock_text_fail);
-        links_trigger(a1, 4);
+        links_trigger(door, 4);
         return 0;
     }
     skill_add_uses(13, 1);
     if ((player_character->conditions & 0x40) != 0) {
-        l_1C = (int)(unsigned char)(signed char)player_character->lock_open_chance;
+        chance = (int)(unsigned char)(signed char)player_character->lock_open_chance;
         player_character->conditions &= ~0x40;
     } else {
-        l_1C = (int)(short)player_character->skills[SKILL_LOCKPICKING].value;
+        chance = (int)(short)player_character->skills[SKILL_LOCKPICKING].value;
     }
-    l_1C += (((int)(unsigned char)(signed char)player_character->level) - a1->lock_level) * 5;
-    if (l_1C < 5) {
-        l_1C = 5;
-    } else if (l_1C > 95) {
-        l_1C = 95;
+    chance += (((int)(unsigned char)(signed char)player_character->level) - door->lock_level) * 5;
+    if (chance < 5) {
+        chance = 5;
+    } else if (chance > 95) {
+        chance = 95;
     }
-    if (rand_range(0, 100) <= l_1C) {
-        a1->flags |= 64;
+    if (rand_range(0, 100) <= chance) {
+        door->flags |= 64;
         hud_message_add(lock_text_open);
-        links_trigger(a1, 7);
-        sound_play(60, a1, 100);
+        links_trigger(door, 7);
+        sound_play(60, door, 100);
         return 1;
     }
     if ((player_character->conditions & 0x40) == 0) {
-        a1->lockpick_skill_tried = player_character->skills[SKILL_LOCKPICKING].value;
+        door->lockpick_skill_tried = player_character->skills[SKILL_LOCKPICKING].value;
     }
     hud_message_add(lock_text_fail);
-    links_trigger(a1, 4);
+    links_trigger(door, 4);
     return 0;
 }
 
-int lockpick_action_door(int a1, int a2, struct record *a3)
+int lockpick_action_door(int action, int lock_level, struct record *door)
 {
-    int l_14;
+    int chance;
 
-    if (((int)(unsigned char)*(signed char *)((char *)a1 + 8)) >= 10) return 1;
-    if (a3->lockpick_skill_tried == player_character->skills[SKILL_LOCKPICKING].value) return 0;
-    if (a2 >= 20) {
+    if (((int)(unsigned char)*(signed char *)((char *)action + 8)) >= 10) return 1;
+    if (door->lockpick_skill_tried == player_character->skills[SKILL_LOCKPICKING].value) return 0;
+    if (lock_level >= 20) {
         hud_message_add(lock_text_fail);
         return 0;
     }
     skill_add_uses(13, 1);
     if ((player_character->conditions & 0x40) != 0) {
-        l_14 = player_character->lock_open_chance;
+        chance = player_character->lock_open_chance;
         player_character->conditions &= ~0x40;
     } else {
-        l_14 = player_character->skills[SKILL_LOCKPICKING].value;
+        chance = player_character->skills[SKILL_LOCKPICKING].value;
     }
-    l_14 -= a2 * 5;
-    if (l_14 < 5) {
-        l_14 = 5;
-    } else if (l_14 > 95) {
-        l_14 = 95;
+    chance -= lock_level * 5;
+    if (chance < 5) {
+        chance = 5;
+    } else if (chance > 95) {
+        chance = 95;
     }
-    if (rand_range(0, 100) <= l_14) {
+    if (rand_range(0, 100) <= chance) {
         hud_message_add(lock_text_open);
         sound_play(60, player_object, 110);
         guild_count_crime(5, 1);
         return 1;
     }
     if ((player_character->conditions & 0x40) == 0) {
-        a3->lockpick_skill_tried = player_character->skills[SKILL_LOCKPICKING].value;
+        door->lockpick_skill_tried = player_character->skills[SKILL_LOCKPICKING].value;
     }
     hud_message_add(lock_text_fail);
     return 0;

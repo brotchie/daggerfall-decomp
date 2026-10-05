@@ -125,7 +125,7 @@ extern void ai_move_toward_target(struct record *, struct character *, struct re
 extern void monster_apply_gravity(void);
 extern void weapon_melee_strike(struct record *);
 extern void item_break(struct record *);
-int pick_random_byte(int);
+int pick_random_byte(unsigned char *);
 int book_pick_random(int);
 int potion_random_recipe(void);
 int ai_pick_target(struct record *, struct character *, int);
@@ -138,943 +138,943 @@ void loot_add_potion(struct record *);
 void ai_creature_think(struct character *, struct record *, struct record *, int);
 #pragma aux mc_set_location parm routine [];
 
-void item_make(int a1, int a2, struct item *a3)
+void item_make(int group, int index, struct item *item)
 {
-    switch ((unsigned)a1) {
+    switch ((unsigned)group) {
 case 5:
-    item_make_artifact(a3, a2);
+    item_make_artifact(item, index);
     return;
 case 4:
-    item_make_magic(a3, a2);
+    item_make_magic(item, index);
     return;
 case 11:
-    item_init_from_template(287, 27, 8, a3);
+    item_init_from_template(287, 27, 8, item);
     return;
 default:
-    item_init_from_template((int)(unsigned short)*(short *)((char *)(int)(*(char **)(item_group_templates + (a1 << 2)) + (a2 * 2))), (int)(short)*(short *)&a1, (int)(short)*(short *)&a2, a3);
+    item_init_from_template((int)(unsigned short)*(short *)((char *)(int)(*(char **)(item_group_templates + (group << 2)) + (index * 2))), (int)(short)*(short *)&group, (int)(short)*(short *)&index, item);
 }
 }
 
-void item_set_race_image(struct item *a1, int a2)
+void item_set_race_image(struct item *item, int race)
 {
-    if (a2 > 7) {
-        a1->inventory_image += ((unsigned short)(unsigned char)D_00186589[player_character->original_race]) << 7;
+    if (race > 7) {
+        item->inventory_image += ((unsigned short)(unsigned char)D_00186589[player_character->original_race]) << 7;
         return;
     }
-    a1->inventory_image += ((unsigned short)(unsigned char)D_00186589[a2]) << 7;
+    item->inventory_image += ((unsigned short)(unsigned char)D_00186589[race]) << 7;
 }
 
-void func_0005E636(struct item *a1)
+void func_0005E636(struct item *item)
 {
-    int l_28;
-    int l_24;
-    int l_20;
-    int l_1C;
-    int l_18;
+    int unused;
+    int variant;
+    int unused2;
+    int extra_index;
+    signed char *style_table;
 
-    switch (a1->group) {
+    switch (item->group) {
     case 12:
-        l_1C = 9;
-        l_18 = (int)D_00185FFC;
+        extra_index = 9;
+        style_table = (signed char *)D_00185FFC;
         break;
     case 6:
-        l_1C = 13;
-        l_18 = (int)D_0018606B;
+        extra_index = 13;
+        style_table = (signed char *)D_0018606B;
         break;
     case 2:
-        a1->inventory_image += rand_range(0, (int)&*(signed char *)((char *)(a1->variants) - 1));
+        item->inventory_image += rand_range(0, (int)&*(signed char *)((char *)(item->variants) - 1));
         return;
     default:
-        l_1C = 0;
+        extra_index = 0;
     }
-    if (a1->variants >= 2) {
-        l_24 = rand_range(0, (int)&*(signed char *)((char *)(a1->variants) - 1));
-        a1->inventory_image += l_24;
+    if (item->variants >= 2) {
+        variant = rand_range(0, (int)&*(signed char *)((char *)(item->variants) - 1));
+        item->inventory_image += variant;
     }
-    item_roll_dye(a1);
-    if (a1->index != l_1C) if (a1->index != (l_1C + 1)) return;
-    a1->inventory_image++;
+    item_roll_dye(item);
+    if (item->index != extra_index) if (item->index != (extra_index + 1)) return;
+    item->inventory_image++;
 }
 
-void item_next_clothing_style(struct item *a1)
+void item_next_clothing_style(struct item *item)
 {
-    int l_20;
-    int l_1C;
-    int l_18;
+    int style;
+    int extra_index;
+    signed char *style_table;
 
-    if (a1->group == 12) {
-        l_18 = (int)D_00185FFC;
-        l_1C = 9;
+    if (item->group == 12) {
+        style_table = (signed char *)D_00185FFC;
+        extra_index = 9;
     } else {
-        l_18 = (int)D_0018606B;
-        l_1C = 13;
+        style_table = (signed char *)D_0018606B;
+        extra_index = 13;
     }
-    l_20 = (int)(unsigned short)(a1->inventory_image & 127);
-    if (*(signed char *)((char *)(l_18 + l_20)) == 0) return;
-    if (*(signed char *)((char *)(l_18 + l_20) + 1) == *(signed char *)((char *)(l_18 + l_20))) {
-        a1->inventory_image++;
+    style = (int)(unsigned short)(item->inventory_image & 127);
+    if (style_table[style] == 0) return;
+    if (style_table[style + 1] == style_table[style]) {
+        item->inventory_image++;
         return;
     }
-    l_20--;
-    while (*(signed char *)((char *)(l_18 + l_20) + 1) == *(signed char *)((char *)(l_18 + l_20))) {
-        l_20--;
-        a1->inventory_image--;
+    style--;
+    while (style_table[style + 1] == style_table[style]) {
+        style--;
+        item->inventory_image--;
     }
-    if (a1->index != l_1C) if (a1->index != (l_1C + 1)) return;
-    a1->inventory_image++;
+    if (item->index != extra_index) if (item->index != (extra_index + 1)) return;
+    item->inventory_image++;
 }
 
-void func_0005E7FC(struct item *a1)
+void func_0005E7FC(struct item *item)
 {
-    int l_20;
-    int l_1C;
-    int l_18;
+    int style;
+    int unused;
+    signed char *style_table;
 
-    if (a1->group == 12) {
-        l_18 = (int)D_00185FFC;
+    if (item->group == 12) {
+        style_table = (signed char *)D_00185FFC;
     } else {
-        l_18 = (int)D_0018606B;
+        style_table = (signed char *)D_0018606B;
     }
-    l_20 = (int)(unsigned short)(a1->inventory_image & 127);
-    l_20--;
-    while (*(signed char *)((char *)(l_18 + l_20) + 1) == *(signed char *)((char *)(l_18 + l_20))) {
-        l_20--;
-        a1->inventory_image--;
+    style = (int)(unsigned short)(item->inventory_image & 127);
+    style--;
+    while (style_table[style + 1] == style_table[style]) {
+        style--;
+        item->inventory_image--;
     }
 }
 
-void item_roll_material(struct item *a1)
+void item_roll_material(struct item *item)
 {
-    int l_28;
-    int l_24;
-    int l_20;
-    int l_1C;
-    int l_18;
+    int roll;
+    int enchanted;
+    int unused;
+    int unused2;
+    int level_mod;
 
-    l_24 = ((a1->enchantments[0].type != (-1)) ? 1 : 0);
-    a1->material = 0;
-    if (a1->group == 3 && a1->index == 18) return;
-    l_28 = rand_range(0, 255);
-    if (l_24 != 0) {
-        l_28 += 60;
-        if (l_28 > 255) l_28 = 255;
+    enchanted = ((item->enchantments[0].type != (-1)) ? 1 : 0);
+    item->material = 0;
+    if (item->group == 3 && item->index == 18) return;
+    roll = rand_range(0, 255);
+    if (enchanted != 0) {
+        roll += 60;
+        if (roll > 255) roll = 255;
     }
-    l_18 = player_character->level - 10;
-    if (l_18 < 0) {
-        l_18 <<= 2;
+    level_mod = player_character->level - 10;
+    if (level_mod < 0) {
+        level_mod <<= 2;
     } else {
-        l_18 <<= 1;
+        level_mod <<= 1;
     }
-    l_28 += l_18;
+    roll += level_mod;
     if (((int)player_environment) == 2) {
-        l_28 -= (14 - current_building->quality) * 2;
+        roll -= (14 - current_building->quality) * 2;
     }
-    if (l_28 < 0) {
-        l_28 = 0;
-    } else if (l_28 > 256) {
-        l_28 = 256;
+    if (roll < 0) {
+        roll = 0;
+    } else if (roll > 256) {
+        roll = 256;
     }
     if (forced_material != 0) {
-        a1->material = forced_material - 1;
+        item->material = forced_material - 1;
         forced_material = 0;
     } else {
-        while (((int)(unsigned char)D_00186591[a1->material]) < l_28) {
-            l_28 -= (int)(unsigned char)D_00186591[a1->material];
-            a1->material++;
+        while (((int)(unsigned char)D_00186591[item->material]) < roll) {
+            roll -= (int)(unsigned char)D_00186591[item->material];
+            item->material++;
         }
     }
-    a1->value = a1->value * (((int)(short)*(short *)(D_001869C0 + (a1->material * 2))) * 3);
-    a1->weight = ((unsigned)(((int)(short)*(short *)(D_001869D4 + (a1->material * 2))) * a1->weight)) >> 2;
-    a1->condition = (a1->max_condition = (a1->max_condition * ((int)(short)*(short *)(D_001869EA + (a1->material * 2)))) >> 2);
-    a1->enchant_points = (a1->enchant_points * ((int)(short)*(short *)(D_001869FE + (a1->material * 2)))) >> 2;
-    a1->color = a1->material + 16;
+    item->value = item->value * (((int)(short)*(short *)(D_001869C0 + (item->material * 2))) * 3);
+    item->weight = ((unsigned)(((int)(short)*(short *)(D_001869D4 + (item->material * 2))) * item->weight)) >> 2;
+    item->condition = (item->max_condition = (item->max_condition * ((int)(short)*(short *)(D_001869EA + (item->material * 2)))) >> 2);
+    item->enchant_points = (item->enchant_points * ((int)(short)*(short *)(D_001869FE + (item->material * 2)))) >> 2;
+    item->color = item->material + 16;
 }
 
-void item_roll_armor_type(struct item *a1)
+void item_roll_armor_type(struct item *item)
 {
-    int l_24;
-    int l_20;
-    int l_1C;
-    int l_18;
+    int type_roll;
+    int image;
+    int roll;
+    int level_mod;
 
-    l_24 = rand_range(1, 100);
-    if (l_24 < 70 && forced_material == 0) {
-        a1->armor_type = 0;
-        a1->weight >>= 1;
-    } else if (l_24 < 90 && forced_material == 0) {
-        a1->armor_type = 1;
+    type_roll = rand_range(1, 100);
+    if (type_roll < 70 && forced_material == 0) {
+        item->armor_type = 0;
+        item->weight >>= 1;
+    } else if (type_roll < 90 && forced_material == 0) {
+        item->armor_type = 1;
     } else {
-        a1->armor_type = 2;
+        item->armor_type = 2;
     }
-    if (a1->armor_type == 2) {
-        l_1C = rand_range(0, 255);
-        if (a1->enchantments[0].type != (-1)) {
-            l_1C += 60;
-            if (l_1C > 255) l_1C = 255;
+    if (item->armor_type == 2) {
+        roll = rand_range(0, 255);
+        if (item->enchantments[0].type != (-1)) {
+            roll += 60;
+            if (roll > 255) roll = 255;
         }
-        l_18 = player_character->level - 10;
-        if (l_18 < 0) {
-            l_18 <<= 2;
+        level_mod = player_character->level - 10;
+        if (level_mod < 0) {
+            level_mod <<= 2;
         } else {
-            l_18 <<= 1;
+            level_mod <<= 1;
         }
-        l_1C += l_18;
+        roll += level_mod;
         if (((int)player_environment) == 2) {
-            l_1C -= (14 - current_building->quality) * 2;
+            roll -= (14 - current_building->quality) * 2;
         }
-        if (l_1C < 0) {
-            l_1C = 0;
-        } else if (l_1C > 256) {
-            l_1C = 256;
+        if (roll < 0) {
+            roll = 0;
+        } else if (roll > 256) {
+            roll = 256;
         }
         if (forced_material != 0) {
-            a1->material = forced_material - 1;
+            item->material = forced_material - 1;
             forced_material = 0;
         } else {
-            while (((int)(unsigned char)D_00186591[a1->material]) < l_1C) {
-                l_1C -= (int)(unsigned char)D_00186591[a1->material];
-                a1->material++;
+            while (((int)(unsigned char)D_00186591[item->material]) < roll) {
+                roll -= (int)(unsigned char)D_00186591[item->material];
+                item->material++;
             }
         }
-        a1->value = a1->value * (((int)(short)*(short *)(D_001869C0 + (a1->material * 2))) * 3);
-        a1->weight = ((unsigned)(((int)(short)*(short *)(D_001869D4 + (a1->material * 2))) * a1->weight)) >> 2;
-        a1->condition = (a1->max_condition = (a1->max_condition * ((int)(short)*(short *)(D_001869EA + (a1->material * 2)))) >> 2);
-        a1->enchant_points = (a1->enchant_points * ((int)(short)*(short *)(D_001869FE + (a1->material * 2)))) >> 2;
-        a1->color = a1->material + 16;
+        item->value = item->value * (((int)(short)*(short *)(D_001869C0 + (item->material * 2))) * 3);
+        item->weight = ((unsigned)(((int)(short)*(short *)(D_001869D4 + (item->material * 2))) * item->weight)) >> 2;
+        item->condition = (item->max_condition = (item->max_condition * ((int)(short)*(short *)(D_001869EA + (item->material * 2)))) >> 2);
+        item->enchant_points = (item->enchant_points * ((int)(short)*(short *)(D_001869FE + (item->material * 2)))) >> 2;
+        item->color = item->material + 16;
     } else {
-        a1->value = a1->value * ((int)&*(signed char *)((char *)(a1->armor_type) + 1));
+        item->value = item->value * ((int)&*(signed char *)((char *)(item->armor_type) + 1));
     }
-    l_20 = armor_image_for_type(a1->armor_type, a1->index);
-    if (l_20 == (-1)) return;
-    a1->inventory_image = l_20 + (a1->inventory_image & -128);
+    image = armor_image_for_type(item->armor_type, item->index);
+    if (image == (-1)) return;
+    item->inventory_image = image + (item->inventory_image & -128);
 }
 
-void item_roll_dye(struct item *a1)
+void item_roll_dye(struct item *item)
 {
-    int l_18;
+    int roll;
 
-    l_18 = rand_range(0, 100);
-    if (l_18 < 25) return;
-    a1->color = rand_range(1, 10);
-    if (a1->group == 6) {
-        if (a1->index == 10 || a1->index == 11) {
-            a1->color = D_0018659B[rand() & 3];
-        } else if (a1->index == 4) {
-            a1->color = D_0018659F[rand() & 3];
+    roll = rand_range(0, 100);
+    if (roll < 25) return;
+    item->color = rand_range(1, 10);
+    if (item->group == 6) {
+        if (item->index == 10 || item->index == 11) {
+            item->color = D_0018659B[rand() & 3];
+        } else if (item->index == 4) {
+            item->color = D_0018659F[rand() & 3];
         }
         return;
     }
-    if (a1->group != 12 || a1->index != 8) return;
-    a1->color = D_0018659B[rand() & 3];
+    if (item->group != 12 || item->index != 8) return;
+    item->color = D_0018659B[rand() & 3];
 }
 
-void shelf_stock_items(struct record *a1, int a2, int a3)
+void shelf_stock_items(struct record *container, int list_index, int quality)
 {
-    int l_30;
-    int l_2C;
-    int l_28;
-    int l_24;
-    int l_20;
-    int l_1C;
-    int l_18;
-    struct item *l_14;
-    struct record *l_10;
+    int chance;
+    int unused;
+    int chance_mod;
+    int index;
+    unsigned char *entry;
+    short *template_ids;
+    char *template;
+    struct item *item_data;
+    struct record *item;
 
-    l_20 = D_00186483[a2];
-    if (l_20 == 0) return;
-    while (((int)(unsigned char)*(signed char *)((char *)l_20)) != 255) {
-        if (((int)(unsigned char)*(signed char *)((char *)l_20)) == 6 && ((int)(unsigned short)(player_character->flags & 1)) != 0) {
-            *(signed char *)((char *)l_20) = 12;
+    entry = (unsigned char *)D_00186483[list_index];
+    if (entry == 0) return;
+    while (*entry != 255) {
+        if (*entry == 6 && ((int)(unsigned short)(player_character->flags & 1)) != 0) {
+            *entry = 12;
         }
-        if (((int)(unsigned char)*(signed char *)((char *)l_20)) == 12 && ((int)(unsigned short)(player_character->flags & 1)) == 0) {
-            *(signed char *)((char *)l_20) = 6;
+        if (*entry == 12 && ((int)(unsigned short)(player_character->flags & 1)) == 0) {
+            *entry = 6;
         }
-        l_1C = *(int *)(item_group_templates + (((int)(unsigned char)*(signed char *)((char *)l_20)) << 2));
-        if (l_1C != 0 && ((int)(unsigned char)*(signed char *)((char *)l_20)) != 8 && ((int)(unsigned char)*(signed char *)((char *)l_20)) != 1) {
-            if (((struct bf8_1_1 *)&D_001940D7)->f != 0 && (((int)(unsigned char)*(signed char *)((char *)l_20)) == 4 || ((int)(unsigned char)*(signed char *)((char *)l_20)) == 5)) {
+        template_ids = *(short **)(item_group_templates + (*entry << 2));
+        if (template_ids != 0 && *entry != 8 && *entry != 1) {
+            if (((struct bf8_1_1 *)&D_001940D7)->f != 0 && (*entry == 4 || *entry == 5)) {
             } else {
-                l_28 = (int)(unsigned char)*(signed char *)((char *)l_20 + 1);
-                l_24 = 0;
-                if (((int)(unsigned char)*(signed char *)((char *)l_20)) == 7) {
-                    shelf_stock_books(a1, a3);
+                chance_mod = entry[1];
+                index = 0;
+                if (*entry == 7) {
+                    shelf_stock_books(container, quality);
                 } else {
-                    while (((int)(short)*(short *)((char *)l_1C)) != (-1)) {
-                        l_18 = ((int)item_templates) + (((int)(short)*(short *)((char *)l_1C)) * 48);
-                        l_30 = (((21 - ((int)(unsigned char)*(signed char *)((char *)l_18 + 40))) * 5) * l_28) / 100;
-                        if (((int)(unsigned char)*(signed char *)((char *)l_18 + 40)) <= a3 && rand_range(1, 100) <= l_30) {
-                            l_10 = object_create_child(a1, 0, 107);
-                            l_10->type = 2;
-                            l_10->x = player_object->x;
-                            l_10->y = player_object->y;
-                            l_10->z = player_object->z;
-                            l_10->image2 = 998;
-                            l_10->id = object_new_id(((unsigned)location_object->id) >> 16);
-                            if (a2 >= 0) l_10->flags |= 32;
-                            l_14 = &l_10->data.item;
-                            item_make((int)(unsigned char)*(signed char *)((char *)l_20), l_24, l_14);
-                            if (l_14->group != 3 || l_14->index != 18) l_10->image2 = 0;
+                    while (*template_ids != (-1)) {
+                        template = item_templates + *template_ids * 48;
+                        chance = (((21 - (unsigned char)template[40]) * 5) * chance_mod) / 100;
+                        if ((unsigned char)template[40] <= quality && rand_range(1, 100) <= chance) {
+                            item = object_create_child(container, 0, 107);
+                            item->type = 2;
+                            item->x = player_object->x;
+                            item->y = player_object->y;
+                            item->z = player_object->z;
+                            item->image2 = 998;
+                            item->id = object_new_id(((unsigned)location_object->id) >> 16);
+                            if (list_index >= 0) item->flags |= 32;
+                            item_data = &item->data.item;
+                            item_make(*entry, index, item_data);
+                            if (item_data->group != 3 || item_data->index != 18) item->image2 = 0;
                         }
-                        (*(char (**)[2])&l_1C)++;
-                        l_24++;
+                        template_ids++;
+                        index++;
                     }
                 }
             }
         }
-        l_20 += 2;
+        entry += 2;
     }
 }
 
-int func_0005F0A0(int a1)
+int func_0005F0A0(int group)
 {
     {
-        int l_20;
+        int result;
 
-        if (a1 == 12 || a1 == 6 || a1 == 2) {
-            l_20 = 1;
+        if (group == 12 || group == 6 || group == 2) {
+            result = 1;
         } else {
-            l_20 = 0;
+            result = 0;
         }
-        return l_20;
+        return result;
     }
 }
 
-void shelf_stock_books(struct record *a1, int a2)
+void shelf_stock_books(struct record *container, int quality)
 {
-    int l_18;
-    struct record *l_14;
+    int i;
+    struct record *book;
 
-    a2 = (a2 + 3) / 5;
-    if (a2 >= 4) a2--;
-    a2++;
-    for (l_18 = 0; l_18 <= a2; l_18++) {
-        l_14 = object_create_child(a1, 0, 107);
-        l_14->type = 2;
-        l_14->x = player_object->x;
-        l_14->y = player_object->y;
-        l_14->z = player_object->z;
-        l_14->id = object_new_id(((unsigned)location_object->id) >> 16);
-        l_14->flags |= 32;
-        item_make(7, a2, &l_14->data.item);
+    quality = (quality + 3) / 5;
+    if (quality >= 4) quality--;
+    quality++;
+    for (i = 0; i <= quality; i++) {
+        book = object_create_child(container, 0, 107);
+        book->type = 2;
+        book->x = player_object->x;
+        book->y = player_object->y;
+        book->z = player_object->z;
+        book->id = object_new_id(((unsigned)location_object->id) >> 16);
+        book->flags |= 32;
+        item_make(7, quality, &book->data.item);
     }
 }
 
-void shop_stock_magic(struct record *a1, int a2, int a3, int a4)
+void shop_stock_magic(struct record *container, int unused, int not_owned, int soul_traps)
 {
-    int l_14;
-    struct record *l_10;
-    int l_C;
+    int i;
+    struct record *item;
+    int unused2;
 
-    if (a3 != 0) a3 = 32;
-    for (l_14 = 0; ((current_building->quality >> 1) + 1) > l_14; l_14++) {
-        l_10 = object_create_child(a1, 0, 107);
-        l_10->type = 2;
-        l_10->id = object_new_id(((unsigned)location_object->id) >> 16);
-        item_make_magic(&l_10->data.item, -1);
-        l_10->x = player_object->x;
-        l_10->y = player_object->y;
-        l_10->z = player_object->z;
-        l_10->flags |= a3;
-        if (a3 != 0) l_10->data.item.item_flags |= 32;
+    if (not_owned != 0) not_owned = 32;
+    for (i = 0; ((current_building->quality >> 1) + 1) > i; i++) {
+        item = object_create_child(container, 0, 107);
+        item->type = 2;
+        item->id = object_new_id(((unsigned)location_object->id) >> 16);
+        item_make_magic(&item->data.item, -1);
+        item->x = player_object->x;
+        item->y = player_object->y;
+        item->z = player_object->z;
+        item->flags |= not_owned;
+        if (not_owned != 0) item->data.item.item_flags |= 32;
     }
-    l_10 = object_create_child(a1, 0, 107);
-    l_10->type = 2;
-    l_10->id = object_new_id(((unsigned)location_object->id) >> 16);
-    l_10->x = player_object->x;
-    l_10->y = player_object->y;
-    l_10->z = player_object->z;
-    l_10->flags |= 32;
-    item_make(27, 0, &l_10->data.item);
-    if (a4 == 0) return;
-    for (l_14 = 0; ((current_building->quality >> 1) + 1) > l_14; l_14++) {
-        l_10 = object_create_child(a1, 0, 107);
-        l_10->type = 2;
-        l_10->id = object_new_id(((unsigned)location_object->id) >> 16);
-        l_10->x = player_object->x;
-        l_10->y = player_object->y;
-        l_10->z = player_object->z;
-        l_10->flags |= 32;
-        item_make(27, 1, &l_10->data.item);
+    item = object_create_child(container, 0, 107);
+    item->type = 2;
+    item->id = object_new_id(((unsigned)location_object->id) >> 16);
+    item->x = player_object->x;
+    item->y = player_object->y;
+    item->z = player_object->z;
+    item->flags |= 32;
+    item_make(27, 0, &item->data.item);
+    if (soul_traps == 0) return;
+    for (i = 0; ((current_building->quality >> 1) + 1) > i; i++) {
+        item = object_create_child(container, 0, 107);
+        item->type = 2;
+        item->id = object_new_id(((unsigned)location_object->id) >> 16);
+        item->x = player_object->x;
+        item->y = player_object->y;
+        item->z = player_object->z;
+        item->flags |= 32;
+        item_make(27, 1, &item->data.item);
         if (rand_range(1, 100) < 25) {
-            soul_trap_add_soul(l_10);
-            l_10->data.item.value = *(int *)(monster_soul_values + (l_10->children->soul_creature << 2)) + 5000;
+            soul_trap_add_soul(item);
+            item->data.item.value = *(int *)(monster_soul_values + (item->children->soul_creature << 2)) + 5000;
         } else {
-            l_10->data.item.value = 5000;
+            item->data.item.value = 5000;
         }
     }
 }
 
-void shop_stock_soul_traps(struct record *a1)
+void shop_stock_soul_traps(struct record *container)
 {
-    int l_20;
-    struct record *l_1C;
-    int l_18;
+    int i;
+    struct record *trap;
+    int unused;
 
-    for (l_20 = 0; ((current_building->quality >> 1) + 1) > l_20; l_20++) {
-        l_1C = object_create_child(a1, 0, 107);
-        l_1C->type = 2;
-        l_1C->id = object_new_id(((unsigned)location_object->id) >> 16);
-        l_1C->x = player_object->x;
-        l_1C->y = player_object->y;
-        l_1C->z = player_object->z;
-        l_1C->flags |= 32;
-        item_make(27, 1, &l_1C->data.item);
+    for (i = 0; ((current_building->quality >> 1) + 1) > i; i++) {
+        trap = object_create_child(container, 0, 107);
+        trap->type = 2;
+        trap->id = object_new_id(((unsigned)location_object->id) >> 16);
+        trap->x = player_object->x;
+        trap->y = player_object->y;
+        trap->z = player_object->z;
+        trap->flags |= 32;
+        item_make(27, 1, &trap->data.item);
         if (rand_range(1, 100) < 25) {
-            soul_trap_add_soul(l_1C);
-            l_1C->data.item.value = *(int *)(monster_soul_values + (l_1C->children->soul_creature << 2)) + 5000;
+            soul_trap_add_soul(trap);
+            trap->data.item.value = *(int *)(monster_soul_values + (trap->children->soul_creature << 2)) + 5000;
         } else {
-            l_1C->data.item.value = 5000;
+            trap->data.item.value = 5000;
         }
     }
 }
 
 void painting_draw(void)
 {
-    int l_20;
-    int l_1C;
-    int l_18;
+    int i;
+    int frame;
+    unsigned char *image;
 
     mc_set_location(625, (int)D_001758B8);
     mc_sprintf((int)text_buffer, (int)D_001758E2, (((int)(unsigned short)D_00195DC4) >> 3) + 97);
     disk_read_file((int)text_buffer, *(int *)scratch_buffer);
-    l_18 = *(int *)scratch_buffer;
-    l_20 = 0;
-    l_1C = (int)(unsigned short)(D_00195DC4 & 7);
-    while (l_20 < l_1C) {
-        l_18 = (((int)(unsigned short)*(short *)((char *)l_18 + 10)) + l_18) + 12;
-        l_20++;
+    image = *(unsigned char **)scratch_buffer;
+    i = 0;
+    frame = (int)(unsigned short)(D_00195DC4 & 7);
+    while (i < frame) {
+        image = *(unsigned short *)(image + 10) + image + 12;
+        i++;
     }
-    xn_draw_image(160 - (((int)(unsigned short)*(short *)((char *)l_18 + 4)) >> 1), 50, (int)(unsigned short)*(short *)((char *)l_18 + 4), (int)(unsigned short)*(short *)((char *)l_18 + 6), l_18 + 12);
+    xn_draw_image(160 - ((*(unsigned short *)(image + 4)) >> 1), 50, *(unsigned short *)(image + 4), *(unsigned short *)(image + 6), image + 12);
 }
 
-void item_info_painting(struct item *a1)
+void item_info_painting(struct item *item)
 {
-    int l_1C;
-    int l_18;
+    int fd;
+    int saved_seed;
 
-    l_18 = rand();
-    D_00195DC4 = rand(srand((int)(unsigned short)(short)a1->message)) % 180;
-    l_1C = disk_open_data((int)D_001758EE);
-    lseek(l_1C, ((int)(unsigned short)D_00195DC4) * 40, 0);
-    read(l_1C, *(int *)scratch_buffer, 40);
-    close(l_1C);
-    painting_subject_text = pick_random_byte(*(int *)scratch_buffer) + 6100;
-    painting_adjective_text = pick_random_byte(*(int *)scratch_buffer + 10) + 6200;
-    painting_prefix1_text = pick_random_byte((int)(*(char **)scratch_buffer + 20)) + 6300;
-    painting_prefix2_text = (short)pick_random_byte((int)(*(char **)scratch_buffer + 30)) + 6400;
+    saved_seed = rand();
+    D_00195DC4 = rand(srand((int)(unsigned short)(short)item->message)) % 180;
+    fd = disk_open_data((int)D_001758EE);
+    lseek(fd, ((int)(unsigned short)D_00195DC4) * 40, 0);
+    read(fd, *(int *)scratch_buffer, 40);
+    close(fd);
+    painting_subject_text = pick_random_byte(*(unsigned char **)scratch_buffer) + 6100;
+    painting_adjective_text = pick_random_byte((unsigned char *)(*(int *)scratch_buffer + 10)) + 6200;
+    painting_prefix1_text = pick_random_byte(*(unsigned char **)scratch_buffer + 20) + 6300;
+    painting_prefix2_text = (short)pick_random_byte(*(unsigned char **)scratch_buffer + 30) + 6400;
     D_001940D6 |= 32;
     msgbox_show_rsc(250, 1);
-    srand(l_18);
+    srand(saved_seed);
 }
 
-int pick_random_byte(int a1)
+int pick_random_byte(unsigned char *list)
 {
-    int l_1C;
+    int count;
 
-    l_1C = 0;
-    while (l_1C < 10 && ((int)(unsigned char)*(signed char *)((char *)(a1 + l_1C))) != 255) l_1C++;
-    if (l_1C == 1) return (int)(unsigned char)*(signed char *)((char *)a1);
-    return (int)(unsigned char)*(signed char *)((char *)(int)((char *)a1 + rand_range(0, l_1C - 1)));
+    count = 0;
+    while (count < 10 && list[count] != 255) count++;
+    if (count == 1) return *list;
+    return list[rand_range(0, count - 1)];
 }
 
-void item_init_book(struct item *a1, int a2)
+void item_init_book(struct item *item, int level)
 {
-    int l_1C;
-    int l_18;
-    int l_14;
+    int *header;
+    int fd;
+    int saved_seed;
 
-    a1->message = *(short *)(book_list + (book_pick_random(a2) << 2));
-    l_1C = *(int *)scratch_buffer;
+    item->message = *(short *)(book_list + (book_pick_random(level) << 2));
+    header = *(int **)scratch_buffer;
     mc_set_location(674, (int)D_001758B8);
-    mc_sprintf((int)text_buffer, (int)D_001758F8, (int)(unsigned short)(short)a1->message);
-    l_18 = disk_open_data((int)text_buffer);
-    read(l_18, l_1C, 234);
-    close(l_18);
-    l_14 = rand();
-    srand(*(int *)((char *)l_1C));
-    a1->value = rand_range(300, 800);
-    srand(l_14);
+    mc_sprintf((int)text_buffer, (int)D_001758F8, (int)(unsigned short)(short)item->message);
+    fd = disk_open_data((int)text_buffer);
+    read(fd, header, 234);
+    close(fd);
+    saved_seed = rand();
+    srand(*header);
+    item->value = rand_range(300, 800);
+    srand(saved_seed);
 }
 
-int book_pick_random(int a1)
+int book_pick_random(int level)
 {
-    int l_24;
-    int l_20;
-    int l_1C;
+    int i;
+    int count;
+    int pick;
 
-    l_24 = 0;
-    l_20 = l_24;
-    for (; ((int)(unsigned short)book_count) > l_24; l_24++) {
-        if (((int)(unsigned short)*(short *)(D_0018E046 + (l_24 << 2))) <= a1) l_20++;
+    i = 0;
+    count = i;
+    for (; ((int)(unsigned short)book_count) > i; i++) {
+        if (((int)(unsigned short)*(short *)(D_0018E046 + (i << 2))) <= level) count++;
     }
-    if (l_20 == 0) l_20 = 1;
-    l_1C = rand() % l_20;
-    l_24 = 0;
-    while (l_1C >= 0) {
-        if (((int)(unsigned short)*(short *)(D_0018E046 + (l_24 << 2))) <= a1) l_1C--;
-        l_24++;
+    if (count == 0) count = 1;
+    pick = rand() % count;
+    i = 0;
+    while (pick >= 0) {
+        if (((int)(unsigned short)*(short *)(D_0018E046 + (i << 2))) <= level) pick--;
+        i++;
     }
-    return l_24 - 1;
+    return i - 1;
 }
 
-int equip_hiding_capacity(int a1)
+int equip_hiding_capacity(int with_armor)
 {
-    int l_24;
-    int l_20;
-    struct item *l_1C;
+    int slot;
+    int capacity;
+    struct item *item;
 
-    l_24 = 0;
-    l_20 = l_24;
-    for (; l_24 < 27; l_24++) {
-        if (player_character->equipped[l_24] == 0) continue;
-        l_1C = &player_character->equipped[l_24]->data.item;
-        if (l_1C->group == 1 && memchr((int)D_00186583, l_1C->index, 6) != 0) {
-            l_20 += 10;
+    slot = 0;
+    capacity = slot;
+    for (; slot < 27; slot++) {
+        if (player_character->equipped[slot] == 0) continue;
+        item = &player_character->equipped[slot]->data.item;
+        if (item->group == 1 && memchr((int)D_00186583, item->index, 6) != 0) {
+            capacity += 10;
             continue;
         }
-        if (l_1C->group == 2 && a1 != 0) {
-            l_20 += (int)(unsigned char)D_00186578[l_1C->index];
-        } else if (l_1C->group == 6 || l_1C->group == 12) {
-            l_20 += (int)(unsigned char)D_0018654F[l_1C->index];
+        if (item->group == 2 && with_armor != 0) {
+            capacity += (int)(unsigned char)D_00186578[item->index];
+        } else if (item->group == 6 || item->group == 12) {
+            capacity += (int)(unsigned char)D_0018654F[item->index];
         }
     }
-    return l_20;
+    return capacity;
 }
 
-void loot_fill_container(struct record *a1)
+void loot_fill_container(struct record *container)
 {
-    int l_20;
-    int l_1C;
-    struct building *l_18;
+    int table;
+    int unused;
+    struct building *building;
 
     if (((int)player_environment) != 1) {
-        l_20 = ((int)(unsigned char)D_001865F2[current_location->kind]) - 1;
-        while (a1->children == 0) {
-            loot_generate(l_20, a1, player_character->level, (int)(unsigned short)(player_character->flags & 1));
+        table = ((int)(unsigned char)D_001865F2[current_location->kind]) - 1;
+        while (container->children == 0) {
+            loot_generate(table, container, player_character->level, (int)(unsigned short)(player_character->flags & 1));
         }
-        if (l_20 < 9 || l_20 > 14) return;
-        if (rand_range(1, 100) <= ((int)(unsigned char)D_00186610[l_20])) {
-            a1 = object_create_child(a1, 0, 107);
-            a1->type = 2;
-            item_make(27, 8, &a1->data.item);
+        if (table < 9 || table > 14) return;
+        if (rand_range(1, 100) <= ((int)(unsigned char)D_00186610[table])) {
+            container = object_create_child(container, 0, 107);
+            container->type = 2;
+            item_make(27, 8, &container->data.item);
         }
-        if (rand_range(1, 100) < 4) loot_add_potion(a1);
-        if (rand_range(1, 100) < 2) item_add_to_container(a1, 27, 4, 0);
+        if (rand_range(1, 100) < 4) loot_add_potion(container);
+        if (rand_range(1, 100) < 2) item_add_to_container(container, 27, 4, 0);
         return;
     }
-    l_18 = object_building(a1);
-    if (l_18 == 0) {
-        l_20 = 0;
+    building = object_building(container);
+    if (building == 0) {
+        table = 0;
     } else {
-        l_20 = l_18->type;
+        table = building->type;
     }
-    while (a1->children == 0) {
-        loot_generate(((int)(unsigned char)D_00186605[l_20]) - 1, a1, player_character->level, (int)(unsigned short)(player_character->flags & 1));
+    while (container->children == 0) {
+        loot_generate(((int)(unsigned char)D_00186605[table]) - 1, container, player_character->level, (int)(unsigned short)(player_character->flags & 1));
     }
 }
 
-void loot_add_gold(struct record *a1, int a2, int a3)
+void loot_add_gold(struct record *container, int min_amount, int max_amount)
 {
-    struct record *l_14;
-    struct item *l_10;
+    struct record *gold;
+    struct item *gold_data;
 
-    l_14 = object_create_child(a1, 0, 107);
-    l_10 = &l_14->data.item;
-    l_14->type = 2;
-    l_14->x = a1->x;
-    l_14->y = a1->y;
-    l_14->z = a1->z;
-    l_10->group = 28;
-    l_10->index = 0;
-    l_10->value = rand_range(a2, a3) * player_character->level;
+    gold = object_create_child(container, 0, 107);
+    gold_data = &gold->data.item;
+    gold->type = 2;
+    gold->x = container->x;
+    gold->y = container->y;
+    gold->z = container->z;
+    gold_data->group = 28;
+    gold_data->index = 0;
+    gold_data->value = rand_range(min_amount, max_amount) * player_character->level;
 }
 
-void loot_add_ingredient(struct record *a1)
+void loot_add_ingredient(struct record *container)
 {
-    struct record *l_18;
+    struct record *item;
 
-    l_18 = object_create_child(a1, 0, 107);
-    l_18->type = 2;
-    l_18->x = a1->x;
-    l_18->y = a1->y;
-    l_18->z = a1->z;
-    item_make_random((int)(unsigned short)((unsigned short)(unsigned char)D_0018661E[rand() % 8]), &l_18->data.item);
+    item = object_create_child(container, 0, 107);
+    item->type = 2;
+    item->x = container->x;
+    item->y = container->y;
+    item->z = container->z;
+    item_make_random((int)(unsigned short)((unsigned short)(unsigned char)D_0018661E[rand() % 8]), &item->data.item);
 }
 
-void loot_add_misc_item(struct record *a1)
+void loot_add_misc_item(struct record *container)
 {
-    struct record *l_18;
+    struct record *item;
 
-    l_18 = object_create_child(a1, 0, 107);
-    l_18->type = 2;
-    l_18->x = a1->x;
-    l_18->y = a1->y;
-    l_18->z = a1->z;
-    item_make_random((int)(unsigned short)((unsigned short)(unsigned char)D_00186626[rand() % 4]), &l_18->data.item);
+    item = object_create_child(container, 0, 107);
+    item->type = 2;
+    item->x = container->x;
+    item->y = container->y;
+    item->z = container->z;
+    item_make_random((int)(unsigned short)((unsigned short)(unsigned char)D_00186626[rand() % 4]), &item->data.item);
 }
 
-void loot_add_item_of_group(struct record *a1, int a2)
+void loot_add_item_of_group(struct record *container, int group)
 {
-    struct record *l_14;
+    struct record *item;
 
-    l_14 = object_create_child(a1, 0, 107);
-    l_14->type = 2;
-    l_14->x = a1->x;
-    l_14->y = a1->y;
-    l_14->z = a1->z;
-    item_make_random((int)(unsigned short)*(short *)&a2, &l_14->data.item);
+    item = object_create_child(container, 0, 107);
+    item->type = 2;
+    item->x = container->x;
+    item->y = container->y;
+    item->z = container->z;
+    item_make_random((int)(unsigned short)*(short *)&group, &item->data.item);
 }
 
-void item_wear_from_hit(struct record *a1, int a2)
+void item_wear_from_hit(struct record *item, int damage)
 {
-    struct item *l_14;
+    struct item *item_data;
 
-    l_14 = &a1->data.item;
-    a2 = ((a2 * 10) + 50) / 100;
-    if (a2 == 0 && rand_range(1, 100) < 20) a2 = 1;
-    if (l_14->condition > a2) {
-        l_14->condition -= a2;
+    item_data = &item->data.item;
+    damage = ((damage * 10) + 50) / 100;
+    if (damage == 0 && rand_range(1, 100) < 20) damage = 1;
+    if (item_data->condition > damage) {
+        item_data->condition -= damage;
         return;
     }
-    item_break(a1);
+    item_break(item);
 }
 
-void item_damage(struct record *a1, int a2)
+void item_damage(struct record *item, int amount)
 {
-    struct item *l_14;
+    struct item *item_data;
 
-    if (a1 == 0) return;
-    l_14 = &a1->data.item;
-    if (l_14->condition > a2) {
-        l_14->condition -= a2;
+    if (item == 0) return;
+    item_data = &item->data.item;
+    if (item_data->condition > amount) {
+        item_data->condition -= amount;
         return;
     }
-    item_break(a1);
+    item_break(item);
 }
 
 void magic_def_load(void)
 {
-    int l_18;
+    int fd;
 
-    l_18 = disk_open_data((int)D_00175927);
-    read(l_18, (int)magic_def_count, 4);
-    magic_def = mc_malloc(filelength(l_18) - 4, (int)D_001758B8, 1201);
-    read(l_18, magic_def, (int)&*(signed char *)((char *)filelength(l_18) - 4));
-    close(l_18);
+    fd = disk_open_data((int)D_00175927);
+    read(fd, (int)magic_def_count, 4);
+    magic_def = mc_malloc(filelength(fd) - 4, (int)D_001758B8, 1201);
+    read(fd, magic_def, (int)&*(signed char *)((char *)filelength(fd) - 4));
+    close(fd);
 }
 
-void shop_generate_stock(struct record *a1, int a2, int a3, int a4, int a5)
+void shop_generate_stock(struct record *container, int variant, int quality, int building_type, int model_index)
 {
-    int l_20;
-    int l_1C;
-    int l_18;
-    int l_14;
-    int l_10;
-    struct record *l_C;
+    char *groups;
+    int pick;
+    int more;
+    int chance;
+    int group_count;
+    struct record *item;
 
-    if (a4 >= 21) return;
-    if (a2 < 2) {
-        l_10 = 3;
-        l_20 = ((int)D_00186639) + (a4 * 3);
-    } else if (a2 < 4) {
-        l_10 = 12;
-        l_20 = ((int)D_00186678) + (a4 * 12);
-    } else if (a2 < 11) {
-        l_10 = 12;
-        l_20 = ((int)D_00186774) + (a4 * 12);
-    } else if (a2 < 15) {
-        l_10 = 5;
-        l_20 = ((int)D_00186870) + (a4 * 5);
+    if (building_type >= 21) return;
+    if (variant < 2) {
+        group_count = 3;
+        groups = D_00186639 + building_type * 3;
+    } else if (variant < 4) {
+        group_count = 12;
+        groups = D_00186678 + building_type * 12;
+    } else if (variant < 11) {
+        group_count = 12;
+        groups = D_00186774 + building_type * 12;
+    } else if (variant < 15) {
+        group_count = 5;
+        groups = D_00186870 + building_type * 5;
     } else {
-        l_10 = 11;
-        l_20 = ((int)D_001868D9) + (a4 * 11);
+        group_count = 11;
+        groups = D_001868D9 + building_type * 11;
     }
-    for (l_1C = 0; l_1C < l_10; l_1C++) {
-        if (*(signed char *)((char *)(l_20 + l_1C)) == 0) break;
+    for (pick = 0; pick < group_count; pick++) {
+        if (groups[pick] == 0) break;
     }
-    l_1C = rand_range(0, l_1C - 1);
-    l_14 = 100;
-    l_18 = 1;
-    while (l_18 != 0) {
-        l_C = object_create_child(a1, 0, 107);
-        l_C->type = 2;
-        l_C->x = player_object->x;
-        l_C->y = player_object->y;
-        l_C->z = player_object->z;
-        l_C->owner = a5;
-        l_C->id = object_new_id(((unsigned)location_object->id) >> 16);
-        if (((int)(unsigned char)*(signed char *)((char *)(l_20 + l_1C))) == 6 || ((int)(unsigned char)*(signed char *)((char *)(l_20 + l_1C))) == 12) {
+    pick = rand_range(0, pick - 1);
+    chance = 100;
+    more = 1;
+    while (more != 0) {
+        item = object_create_child(container, 0, 107);
+        item->type = 2;
+        item->x = player_object->x;
+        item->y = player_object->y;
+        item->z = player_object->z;
+        item->owner = model_index;
+        item->id = object_new_id(((unsigned)location_object->id) >> 16);
+        if ((unsigned char)groups[pick] == 6 || (unsigned char)groups[pick] == 12) {
             if (((int)(unsigned short)(player_character->flags & 1)) == 0) {
-                item_make_random(6, &l_C->data.item);
+                item_make_random(6, &item->data.item);
             } else {
-                item_make_random(12, &l_C->data.item);
+                item_make_random(12, &item->data.item);
             }
-        } else if (((int)(unsigned char)*(signed char *)((char *)(l_20 + l_1C))) == 4) {
-            item_make_magic(&a1->data.item, -1);
-        } else if (((int)(unsigned char)*(signed char *)((char *)(l_20 + l_1C))) == 7) {
-            item_make(7, (a3 + 3) / 5, &l_C->data.item);
+        } else if ((unsigned char)groups[pick] == 4) {
+            item_make_magic(&container->data.item, -1);
+        } else if ((unsigned char)groups[pick] == 7) {
+            item_make(7, (quality + 3) / 5, &item->data.item);
         } else {
-            item_make_random((int)(unsigned short)((unsigned short)(unsigned char)*(signed char *)((char *)(l_20 + l_1C))), &l_C->data.item);
+            item_make_random((int)(unsigned short)((unsigned short)(unsigned char)groups[pick]), &item->data.item);
         }
-        l_14 >>= 1;
-        if ((rand() % 100) > l_14) l_18 = 0;
+        chance >>= 1;
+        if ((rand() % 100) > chance) more = 0;
     }
 }
 
 int func_000612A1(void)
 {
-    struct record *l_20;
-    int l_1C;
+    struct record *item;
+    int count;
 
-    l_1C = 0;
-    l_20 = D_0019615F;
-    while (l_20 != 0) {
-        if (l_20->owner == *(int *)picked_model_index) l_1C++;
-        l_20->x = player_object->x;
-        l_20->y = player_object->y;
-        l_20->z = player_object->z;
-        l_20 = l_20->next;
+    count = 0;
+    item = D_0019615F;
+    while (item != 0) {
+        if (item->owner == *(int *)picked_model_index) count++;
+        item->x = player_object->x;
+        item->y = player_object->y;
+        item->z = player_object->z;
+        item = item->next;
     }
-    return l_1C;
+    return count;
 }
 
-void soul_trap_add_soul(struct record *a1)
+void soul_trap_add_soul(struct record *trap)
 {
-    struct record *l_1C;
-    int l_18;
+    struct record *soul;
+    int creature;
 
-    l_18 = rand_range(0, 42);
-    while (*(int *)(monster_soul_values + (l_18 << 2)) == 0) l_18 = rand_range(0, 42);
-    l_1C = object_create_child(a1, 0, 0);
-    l_1C->flags = 3;
-    l_1C->type = 20;
-    l_1C->soul_creature = l_18;
+    creature = rand_range(0, 42);
+    while (*(int *)(monster_soul_values + (creature << 2)) == 0) creature = rand_range(0, 42);
+    soul = object_create_child(trap, 0, 0);
+    soul->flags = 3;
+    soul->type = 20;
+    soul->soul_creature = creature;
 }
 
-void shop_stock_potions(struct record *a1)
+void shop_stock_potions(struct record *container)
 {
-    int l_24;
-    int l_20;
-    struct record *l_1C;
-    struct item *l_18;
+    int i;
+    int recipe;
+    struct record *item;
+    struct item *item_data;
 
-    for (l_24 = 0; (current_building->quality + 1) > l_24; l_24++) {
-        l_20 = potion_random_recipe();
-        l_1C = object_create_child(a1, 0, 107);
-        l_18 = &l_1C->data.item;
-        l_1C->type = 2;
-        l_1C->flags |= 33;
-        l_1C->x = player_object->x;
-        l_1C->y = player_object->y;
-        l_1C->z = player_object->z;
-        item_make(1, 1, l_18);
-        l_18->value = (int)(unsigned short)*(short *)(D_00180B42 + (l_20 * 109));
-        l_18->stack_count = *(signed char *)&l_20;
-        l_1C = object_create_child(l_1C, 0, 109);
-        l_1C->type = 31;
-        mc_memcpy(&l_1C->data.potion_recipe, ((int)potion_recipes) + (l_20 * 109), 109, (int)D_001758B8, 1330, 4);
+    for (i = 0; (current_building->quality + 1) > i; i++) {
+        recipe = potion_random_recipe();
+        item = object_create_child(container, 0, 107);
+        item_data = &item->data.item;
+        item->type = 2;
+        item->flags |= 33;
+        item->x = player_object->x;
+        item->y = player_object->y;
+        item->z = player_object->z;
+        item_make(1, 1, item_data);
+        item_data->value = (int)(unsigned short)*(short *)(D_00180B42 + (recipe * 109));
+        item_data->stack_count = *(signed char *)&recipe;
+        item = object_create_child(item, 0, 109);
+        item->type = 31;
+        mc_memcpy(&item->data.potion_recipe, ((int)potion_recipes) + (recipe * 109), 109, (int)D_001758B8, 1330, 4);
     }
 }
 
 int potion_random_recipe(void)
 {
-    int l_20;
-    int l_1C;
+    int i;
+    int count;
 
-    l_20 = 0;
-    l_1C = 0;
-    while (*(short *)(D_00180B42 + (l_20++ * 109)) != 0) l_1C++;
-    return rand_range(0, l_1C - 1);
+    i = 0;
+    count = 0;
+    while (*(short *)(D_00180B42 + (i++ * 109)) != 0) count++;
+    return rand_range(0, count - 1);
 }
 
-void loot_add_potion(struct record *a1)
+void loot_add_potion(struct record *container)
 {
-    int l_24;
-    int l_20;
-    struct record *l_1C;
-    struct item *l_18;
+    int unused;
+    int recipe;
+    struct record *item;
+    struct item *item_data;
 
-    l_20 = potion_random_recipe();
-    l_1C = object_create_child(a1, 0, 107);
-    l_18 = &l_1C->data.item;
-    l_1C->type = 2;
-    l_1C->flags |= 1;
-    l_1C->x = player_object->x;
-    l_1C->y = player_object->y;
-    l_1C->z = player_object->z;
-    item_make(1, 1, l_18);
-    l_18->value = (int)(unsigned short)*(short *)(D_00180B42 + (l_20 * 109));
-    l_18->stack_count = *(signed char *)&l_20;
-    l_1C = object_create_child(l_1C, 0, 109);
-    l_1C->type = 31;
-    mc_memcpy(&l_1C->data.potion_recipe, ((int)potion_recipes) + (l_20 * 109), 109, (int)D_001758B8, 1366, 4);
+    recipe = potion_random_recipe();
+    item = object_create_child(container, 0, 107);
+    item_data = &item->data.item;
+    item->type = 2;
+    item->flags |= 1;
+    item->x = player_object->x;
+    item->y = player_object->y;
+    item->z = player_object->z;
+    item_make(1, 1, item_data);
+    item_data->value = (int)(unsigned short)*(short *)(D_00180B42 + (recipe * 109));
+    item_data->stack_count = *(signed char *)&recipe;
+    item = object_create_child(item, 0, 109);
+    item->type = 31;
+    mc_memcpy(&item->data.potion_recipe, ((int)potion_recipes) + (recipe * 109), 109, (int)D_001758B8, 1366, 4);
 }
 
-void ai_creature_think(struct character *a1, struct record *a2, struct record *a3, int a4)
+void ai_creature_think(struct character *monster_char, struct record *monster, struct record *target, int index)
 {
-    int l_24;
-    int l_20;
-    int l_1C;
-    int l_18;
-    int l_14;
-    struct monster_anim *l_10;
-    struct record *l_C;
+    int distance;
+    int target_angle;
+    int angle_delta;
+    int turn_dir;
+    int reach;
+    struct monster_anim *anim;
+    struct record *cell;
 
-    a1->attack_timer -= frame_ticks;
-    if (((unsigned)a1->attack_timer) > 100000) a1->attack_timer = 0;
+    monster_char->attack_timer -= frame_ticks;
+    if (((unsigned)monster_char->attack_timer) > 100000) monster_char->attack_timer = 0;
     if (((int)player_environment) == 3) {
-        l_C = location_cell_at(a2->x, a2->z);
-        if ((int)a2->parent != l_C) object_reparent(l_C, a2);
+        cell = location_cell_at(monster->x, monster->z);
+        if ((int)monster->parent != cell) object_reparent(cell, monster);
     }
     D_00199D74 = 0;
-    ai_monster_flags = (int)(unsigned short)*(short *)(monster_table_flags + (a1->race * 29));
-    a2->yaw &= ~0xF800;
-    monster_ambient_sound(a2, a1);
-    if (((int)(unsigned short)(a1->flags & 16384)) == 0 && a1->race == 29 && a1->health < a1->max_health) {
-        a1->flags |= 0x4000;
-        monster_set_action(a2, 0, 57);
+    ai_monster_flags = (int)(unsigned short)*(short *)(monster_table_flags + (monster_char->race * 29));
+    monster->yaw &= ~0xF800;
+    monster_ambient_sound(monster, monster_char);
+    if (((int)(unsigned short)(monster_char->flags & 16384)) == 0 && monster_char->race == 29 && monster_char->health < monster_char->max_health) {
+        monster_char->flags |= 0x4000;
+        monster_set_action(monster, 0, 57);
         return;
     }
-    l_20 = xn_math_angle_to_point(a2->x, a2->z, a3->x, a3->z);
-    if ((a1->conditions & 0x1) != 0) {
-        monster_set_action(a2, l_20, 48);
+    target_angle = xn_math_angle_to_point(monster->x, monster->z, target->x, target->z);
+    if ((monster_char->conditions & 0x1) != 0) {
+        monster_set_action(monster, target_angle, 48);
         return;
     }
-    if (a3 == player_entity) {
-        l_14 = 90;
+    if (target == player_entity) {
+        reach = 90;
     } else {
-        l_14 = 60;
+        reach = 60;
     }
-    if (a4 == ai_los_index) {
-        if (collide_line_of_sight(a2, a3) != 0) {
-            a1->flags |= 128;
+    if (index == ai_los_index) {
+        if (collide_line_of_sight(monster, target) != 0) {
+            monster_char->flags |= 128;
         } else {
-            a1->flags &= ~0x80;
+            monster_char->flags &= ~0x80;
         }
     }
-    l_1C = ai_angle_diff(a2->yaw, l_20, (int)&l_18);
-    l_24 = xn_math_approx_hypot(a2->y - a3->y, xn_math_approx_dist2d(a2->x, a2->z, a3->x, a3->z));
-    if (a2->wait_state != 0 && trespassing == 0) {
-        monster_set_action(a2, l_20, 48);
+    angle_delta = ai_angle_diff(monster->yaw, target_angle, (int)&turn_dir);
+    distance = xn_math_approx_hypot(monster->y - target->y, xn_math_approx_dist2d(monster->x, monster->z, target->x, target->z));
+    if (monster->wait_state != 0 && trespassing == 0) {
+        monster_set_action(monster, target_angle, 48);
         return;
     }
-    if (((int)(unsigned short)(a1->flags & 32768)) != 0) {
-        if (l_1C >= 128) {
-            monster_set_action(a2, l_20, 0);
-            ai_turn_toward(a2, l_20);
+    if (((int)(unsigned short)(monster_char->flags & 32768)) != 0) {
+        if (angle_delta >= 128) {
+            monster_set_action(monster, target_angle, 0);
+            ai_turn_toward(monster, target_angle);
         } else {
-            monster_set_action(a2, l_20, 48);
+            monster_set_action(monster, target_angle, 48);
         }
         return;
     }
-    l_10 = &a2->data.monster.anim;
-    a1->flags &= ~0x100;
-    if (a3 == player_entity && a1->give_up_timer == 0 && ((l_1C > 512 && ai_stealth_check(a1->race, (int)(unsigned short)(a1->flags & 256), l_24, (int)(unsigned short)(a1->flags & 8)) == 0) || ai_sees_through_illusion(a1->race) == 0)) {
-        monster_set_action(a2, l_20, 48);
+    anim = &monster->data.monster.anim;
+    monster_char->flags &= ~0x100;
+    if (target == player_entity && monster_char->give_up_timer == 0 && ((angle_delta > 512 && ai_stealth_check(monster_char->race, (int)(unsigned short)(monster_char->flags & 256), distance, (int)(unsigned short)(monster_char->flags & 8)) == 0) || ai_sees_through_illusion(monster_char->race) == 0)) {
+        monster_set_action(monster, target_angle, 48);
     } else {
-        a1->flags |= 264;
-        if (a1->give_up_timer == 0) a1->give_up_timer = 200;
-        if ((l_14 << 2) < l_24 && l_24 < 2048 && ((int)(unsigned short)(a1->flags & 128)) != 0) {
-            if (((int)(unsigned short)(*(short *)(monster_table_flags + (a1->race * 29)) & 32)) != 0) {
-                if (l_1C >= 128) {
-                    ai_turn_toward(a2, l_20);
-                    monster_set_action(a2, l_20, 0);
-                } else if (rand() < 1000 && a1->action != 24) {
-                    monster_set_action(a2, l_20, 24);
-                } else if (l_10->anim_request != 24 || l_10->anim_current == 24) {
-                    monster_set_action(a2, l_20, 48);
+        monster_char->flags |= 264;
+        if (monster_char->give_up_timer == 0) monster_char->give_up_timer = 200;
+        if ((reach << 2) < distance && distance < 2048 && ((int)(unsigned short)(monster_char->flags & 128)) != 0) {
+            if (((int)(unsigned short)(*(short *)(monster_table_flags + (monster_char->race * 29)) & 32)) != 0) {
+                if (angle_delta >= 128) {
+                    ai_turn_toward(monster, target_angle);
+                    monster_set_action(monster, target_angle, 0);
+                } else if (rand() < 1000 && monster_char->action != 24) {
+                    monster_set_action(monster, target_angle, 24);
+                } else if (anim->anim_request != 24 || anim->anim_current == 24) {
+                    monster_set_action(monster, target_angle, 48);
                 }
-                if (a1->give_up_timer != 0) a1->give_up_timer--;
-            } else if (l_24 > 256 && a1->magicka != 0 && ai_pick_ranged_spell(a4) != 0) {
-                if (l_1C >= 128) {
-                    ai_turn_toward(a2, l_20);
-                    monster_set_action(a2, l_20, 0);
-                } else if ((rand() % 40) == 0 && monster_cast_spell(a2, a3) != 0) {
-                    monster_set_action(a2, l_20, 32);
+                if (monster_char->give_up_timer != 0) monster_char->give_up_timer--;
+            } else if (distance > 256 && monster_char->magicka != 0 && ai_pick_ranged_spell(index) != 0) {
+                if (angle_delta >= 128) {
+                    ai_turn_toward(monster, target_angle);
+                    monster_set_action(monster, target_angle, 0);
+                } else if ((rand() % 40) == 0 && monster_cast_spell(monster, target) != 0) {
+                    monster_set_action(monster, target_angle, 32);
                 }
             } else {
-                ai_move_toward_target(a2, &a2->data.character, a3, l_20, l_1C);
-                monster_set_action(a2, l_20, 0);
+                ai_move_toward_target(monster, &monster->data.character, target, target_angle, angle_delta);
+                monster_set_action(monster, target_angle, 0);
             }
-        } else if (((int)(unsigned short)(a1->flags & 256)) != 0 && l_24 > l_14) {
-            ai_move_toward_target(a2, &a2->data.character, a3, l_20, l_1C);
-            monster_set_action(a2, l_20, 0);
-        } else if (((int)(unsigned short)(a1->flags & 128)) != 0) {
-            if (l_1C < 128) {
-                if (l_10->anim_request != 8 || l_10->anim_request != 56) {
-                    if (a1->magicka != 0 && a1->attack_timer == 0 && ai_pick_touch_spell(a4) != 0 && monster_cast_spell(a2, a3) != 0) {
-                        monster_set_action(a2, l_20, 32);
-                    } else if ((rand() % a1->attributes[6]) < ((a1->attributes[6] >> 3) + 6) && a1->attack_timer == 0) {
-                        if (monster_set_action(a2, l_20, 8) != 0) {
-                            a1->attack_timer = rand_range(1500, 3000);
-                            a1->attack_timer -= (player_character->level - 10) * 50;
-                            a1->attack_timer += (a1->reflexes - 2) * 450;
-                            if (((unsigned)a1->attack_timer) > 100000) a1->attack_timer = 1500;
+        } else if (((int)(unsigned short)(monster_char->flags & 256)) != 0 && distance > reach) {
+            ai_move_toward_target(monster, &monster->data.character, target, target_angle, angle_delta);
+            monster_set_action(monster, target_angle, 0);
+        } else if (((int)(unsigned short)(monster_char->flags & 128)) != 0) {
+            if (angle_delta < 128) {
+                if (anim->anim_request != 8 || anim->anim_request != 56) {
+                    if (monster_char->magicka != 0 && monster_char->attack_timer == 0 && ai_pick_touch_spell(index) != 0 && monster_cast_spell(monster, target) != 0) {
+                        monster_set_action(monster, target_angle, 32);
+                    } else if ((rand() % monster_char->attributes[6]) < ((monster_char->attributes[6] >> 3) + 6) && monster_char->attack_timer == 0) {
+                        if (monster_set_action(monster, target_angle, 8) != 0) {
+                            monster_char->attack_timer = rand_range(1500, 3000);
+                            monster_char->attack_timer -= (player_character->level - 10) * 50;
+                            monster_char->attack_timer += (monster_char->reflexes - 2) * 450;
+                            if (((unsigned)monster_char->attack_timer) > 100000) monster_char->attack_timer = 1500;
                         }
-                    } else if (((int)(unsigned short)(a1->flags & 16384)) != 0) {
-                        monster_set_action(a2, l_20, 59);
+                    } else if (((int)(unsigned short)(monster_char->flags & 16384)) != 0) {
+                        monster_set_action(monster, target_angle, 59);
                     } else {
-                        monster_set_action(a2, l_20, 48);
+                        monster_set_action(monster, target_angle, 48);
                     }
                 }
             } else {
-                ai_turn_toward(a2, l_20);
-                monster_set_action(a2, l_20, 0);
+                ai_turn_toward(monster, target_angle);
+                monster_set_action(monster, target_angle, 0);
             }
         }
     }
-    if (a1->give_up_timer != 0) a1->give_up_timer--;
+    if (monster_char->give_up_timer != 0) monster_char->give_up_timer--;
     if (((struct bf8_7_1 *)&D_001940DA)->f != 0) {
         D_001940DA &= 127;
         return;
     }
-    if (((int)(unsigned short)(l_10->anim_bits & 2)) == 0) return;
-    l_10->anim_events &= 253;
-    monster_shoot_arrow(a2, a3);
+    if (((int)(unsigned short)(anim->anim_bits & 2)) == 0) return;
+    anim->anim_events &= 253;
+    monster_shoot_arrow(monster, target);
 }
 
-int ai_pick_target(struct record *a1, struct character *a2, int a3)
+int ai_pick_target(struct record *monster, struct character *monster_char, int index)
 {
-    int l_24;
-    int l_20;
-    int l_1C;
-    int l_18;
-    int l_14;
+    int i;
+    int unused;
+    int best_score;
+    int best;
+    int score;
 
-    l_20 = 0;
-    l_24 = 0;
-    l_1C = l_24;
-    for (; l_24 < creature_count; l_24++) {
-        if (a3 == l_24) continue;
-        if ((signed char)a2->team == (signed char)ai_characters[l_24]->team) continue;
-        ai_characters[l_24]->target_score = 0;
-        if ((int)ai_characters[l_24]->target == 0) ai_characters[l_24]->target_score += 5;
-        if (collide_line_of_sight(a1, ai_entities[l_24]) != 0) {
-            ai_characters[l_24]->target_score += 20;
+    unused = 0;
+    i = 0;
+    best_score = i;
+    for (; i < creature_count; i++) {
+        if (index == i) continue;
+        if ((signed char)monster_char->team == (signed char)ai_characters[i]->team) continue;
+        ai_characters[i]->target_score = 0;
+        if ((int)ai_characters[i]->target == 0) ai_characters[i]->target_score += 5;
+        if (collide_line_of_sight(monster, ai_entities[i]) != 0) {
+            ai_characters[i]->target_score += 20;
         }
-        l_14 = xn_math_approx_hypot(a1->y - ai_entities[l_24]->y, xn_math_approx_dist2d(a1->x, a1->z, ai_entities[l_24]->x, ai_entities[l_24]->z));
-        l_14 = l_14 / 128;
-        l_14 = 30 - l_14;
-        if (l_14 < 0) l_14 = 0;
-        ai_characters[l_24]->target_score += *(signed char *)&l_14;
-        if (((int)(unsigned char)(signed char)ai_characters[l_24]->target_score) > l_1C) {
-            l_1C = (int)(unsigned char)(signed char)ai_characters[l_24]->target_score;
-            l_18 = l_24;
+        score = xn_math_approx_hypot(monster->y - ai_entities[i]->y, xn_math_approx_dist2d(monster->x, monster->z, ai_entities[i]->x, ai_entities[i]->z));
+        score = score / 128;
+        score = 30 - score;
+        if (score < 0) score = 0;
+        ai_characters[i]->target_score += *(signed char *)&score;
+        if (((int)(unsigned char)(signed char)ai_characters[i]->target_score) > best_score) {
+            best_score = (int)(unsigned char)(signed char)ai_characters[i]->target_score;
+            best = i;
         }
     }
-    if (l_1C < 8 && ((int)(unsigned short)((short)a2->flags & 2)) != 0) return -1;
-    if (l_1C == 0) return 0;
-    return l_18;
+    if (best_score < 8 && ((int)(unsigned short)((short)monster_char->flags & 2)) != 0) return -1;
+    if (best_score == 0) return 0;
+    return best;
 }
 
 void ai_update_creatures(void)
 {
-    int l_28;
-    int l_24;
-    int l_20;
-    int l_1C;
-    int l_18;
+    int i;
+    int target_index;
+    int removed;
+    struct monster_anim *anim;
+    int bios_ticks;
 
-    l_20 = -1;
+    removed = -1;
     if (D_00187CA8 == 0) return;
     if (creature_count == 0) return;
     if (creature_count == 1 && ((int)(unsigned short)(creature_list[0]->data.character.flags & 2)) != 0) {
@@ -1084,71 +1084,71 @@ void ai_update_creatures(void)
     player_entity->yaw = player_object->yaw;
     player_entity->angle_x = player_object->angle_x;
     creature_list[creature_count++] = player_entity;
-    for (l_28 = 0; l_28 < creature_count; l_28++) {
-        if ((creature_count - 1) != l_28) place_settle_creature(creature_list[l_28]);
-        ai_entities[l_28] = (struct record *)((int)creature_list[l_28]);
-        ai_characters[l_28] = (struct character *)((int)((char *)ai_entities[l_28] + 71));
+    for (i = 0; i < creature_count; i++) {
+        if ((creature_count - 1) != i) place_settle_creature(creature_list[i]);
+        ai_entities[i] = (struct record *)((int)creature_list[i]);
+        ai_characters[i] = (struct character *)((int)((char *)ai_entities[i] + 71));
     }
-    for (l_28 = 0; (creature_count - 1) > l_28; l_28++) {
-        l_18 = 1132;
-        if (ai_characters[l_28]->target == 0 || (ai_characters[l_28]->target != 0 && ((unsigned)(((unsigned)*(int *)((char *)l_18)) % 200)) < 4) || ai_characters[l_28]->target->type == 44 || ai_characters[l_28]->target->type == 34) {
-            l_24 = ai_pick_target(ai_entities[l_28], ai_characters[l_28], l_28);
-            if (l_24 == (-1)) {
-                l_20 = l_28;
+    for (i = 0; (creature_count - 1) > i; i++) {
+        bios_ticks = 1132;
+        if (ai_characters[i]->target == 0 || (ai_characters[i]->target != 0 && ((unsigned)(((unsigned)*(int *)((char *)bios_ticks)) % 200)) < 4) || ai_characters[i]->target->type == 44 || ai_characters[i]->target->type == 34) {
+            target_index = ai_pick_target(ai_entities[i], ai_characters[i], i);
+            if (target_index == (-1)) {
+                removed = i;
             } else {
-                ai_characters[l_28]->target = (struct record *)((int)ai_entities[l_24]);
-                ai_characters[l_24]->target = (struct record *)((int)ai_entities[l_28]);
+                ai_characters[i]->target = (struct record *)((int)ai_entities[target_index]);
+                ai_characters[target_index]->target = (struct record *)((int)ai_entities[i]);
             }
         }
     }
     creature_count--;
     ai_los_index = (ai_los_index + 1) % creature_count;
-    for (l_28 = 0; l_28 < creature_count; l_28++) {
-        if (ai_entities[l_28]->type != 18) continue;
-        monster_ambient_sound(ai_entities[l_28], ai_characters[l_28]);
-        if (((int)(unsigned short)(ai_characters[l_28]->flags & 32)) != 0) {
-            damage_knockback_move(ai_entities[l_28], ai_characters[l_28]);
-            monster_set_action(ai_entities[l_28], 0, 16);
+    for (i = 0; i < creature_count; i++) {
+        if (ai_entities[i]->type != 18) continue;
+        monster_ambient_sound(ai_entities[i], ai_characters[i]);
+        if (((int)(unsigned short)(ai_characters[i]->flags & 32)) != 0) {
+            damage_knockback_move(ai_entities[i], ai_characters[i]);
+            monster_set_action(ai_entities[i], 0, 16);
         } else {
-            if (ai_characters[l_28]->target != 0) {
-                ai_creature_think(ai_characters[l_28], ai_entities[l_28], *(struct record **)((char *)ai_characters[l_28] + 112), l_28);
+            if (ai_characters[i]->target != 0) {
+                ai_creature_think(ai_characters[i], ai_entities[i], ai_characters[i]->target, i);
             }
-            l_1C = (int)ai_entities[l_28] + 705;
-            if (((int)(unsigned short)(*(short *)((char *)l_1C + 16) & 1)) != 0) {
-                *(signed char *)((char *)l_1C + 16) &= 254;
-                weapon_melee_strike(creature_list[l_28]);
+            anim = &ai_entities[i]->data.monster.anim;
+            if ((anim->anim_bits & 1) != 0) {
+                anim->anim_events &= 254;
+                weapon_melee_strike(creature_list[i]);
             }
         }
     }
     monster_apply_gravity();
-    if (l_20 == (-1)) return;
-    object_delete(ai_entities[l_20]);
+    if (removed == (-1)) return;
+    object_delete(ai_entities[removed]);
 }
 
-int ai_turn_toward(struct record *a1, int a2)
+int ai_turn_toward(struct record *monster, int angle)
 {
-    int l_1C;
-    int l_18;
+    int angle_delta;
+    int turn_dir;
 
-    l_1C = ai_angle_diff(a1->yaw, a2, (int)&l_18);
-    if (l_1C < 64) {
-        a1->yaw = a2;
+    angle_delta = ai_angle_diff(monster->yaw, angle, (int)&turn_dir);
+    if (angle_delta < 64) {
+        monster->yaw = angle;
         return 0;
     }
-    a1->yaw += l_18 << 6;
+    monster->yaw += turn_dir << 6;
     return 1;
 }
 
-void func_0006228A(struct record *a1, int a2, int a3)
+void func_0006228A(struct record *monster, int unused, int angle)
 {
-    int l_14;
-    int l_10;
+    int angle_delta;
+    int turn_dir;
 
-    a3 = (a3 + 1024) & 2047;
-    l_14 = ai_angle_diff(a1->yaw, a3, (int)&l_10);
-    if (l_14 < 32) {
-        a1->yaw = a3;
+    angle = (angle + 1024) & 2047;
+    angle_delta = ai_angle_diff(monster->yaw, angle, (int)&turn_dir);
+    if (angle_delta < 32) {
+        monster->yaw = angle;
         return;
     }
-    a1->yaw += l_10 << 5;
+    monster->yaw += turn_dir << 5;
 }

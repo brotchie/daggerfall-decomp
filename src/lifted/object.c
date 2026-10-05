@@ -43,7 +43,7 @@ extern char object_debug_watch_copy[];
 extern char potion_ingredient_scroll[];
 extern char potion_ingredient_count[];
 
-extern int location_find_door(int);
+extern char *location_find_door(int);
 extern int mem_pool_alloc(int, int);
 extern int mem_pool_release(int);
 extern int object_count_type(struct record *, short);
@@ -62,7 +62,7 @@ struct record *object_free_single(struct record *);
 struct record *object_delete(struct record *);
 struct record *object_alloc(struct record *, struct record *, int);
 struct record *object_create_child(struct record *, struct record *, int);
-int object_find(struct record *, int);
+int object_find(struct record *, int (*)());
 int object_find_type_cb(struct record *);
 int object_find_by_id_cb(struct record *);
 struct record *object_find_by_id(struct record *, int);
@@ -76,9 +76,9 @@ void object_set_position(struct record *, int, int, int, int, int, int);
 void object_unlink(struct record *);
 void object_insert_after(struct record *, struct record *);
 void object_add_child(struct record *, struct record *);
-void object_foreach_pre(struct record *, int);
-void object_foreach_post(struct record *, int);
-void object_foreach(struct record *, int);
+void object_foreach_pre(struct record *, void (*)());
+void object_foreach_post(struct record *, void (*)());
+void object_foreach(struct record *, void (*)());
 void object_delete_block_cb(struct record *);
 void func_0008EB25(struct record *);
 void object_delete_quest_cb(struct record *);
@@ -112,509 +112,509 @@ void object_heap_shutdown(void)
     mem_pool_free((int)object_heap);
 }
 
-void object_free_node(struct record *a1)
+void object_free_node(struct record *object)
 {
-    if (a1->twin != 0) a1->twin->twin = 0;
-    object_unlink(a1);
-    object_heap_release(a1);
+    if (object->twin != 0) object->twin->twin = 0;
+    object_unlink(object);
+    object_heap_release(object);
 }
 
-void object_free_children(struct record *a1)
+void object_free_children(struct record *object)
 {
-    if (a1 == 0) return;
-    object_foreach_post(a1->children, (int)object_free_node);
+    if (object == 0) return;
+    object_foreach_post(object->children, object_free_node);
 }
 
-struct record *object_free_single(struct record *a1)
+struct record *object_free_single(struct record *object)
 {
-    struct record *l_1C;
+    struct record *next;
 
-    if (a1 == 0) return 0;
-    l_1C = a1->next;
-    object_free_node(a1);
-    return l_1C;
+    if (object == 0) return 0;
+    next = object->next;
+    object_free_node(object);
+    return next;
 }
 
-struct record *object_delete(struct record *a1)
+struct record *object_delete(struct record *object)
 {
-    struct record *l_1C;
+    struct record *next;
 
-    l_1C = a1->next;
-    if (a1 == 0) return 0;
-    object_free_children(a1);
-    object_free_single(a1);
-    return l_1C;
+    next = object->next;
+    if (object == 0) return 0;
+    object_free_children(object);
+    object_free_single(object);
+    return next;
 }
 
-struct record *object_detach(struct record *a1)
+struct record *object_detach(struct record *object)
 {
-    struct record *l_1C;
+    struct record *parent;
 
-    l_1C = a1->parent;
-    if (a1 == 0) return 0;
-    object_unlink(a1);
-    return l_1C;
+    parent = object->parent;
+    if (object == 0) return 0;
+    object_unlink(object);
+    return parent;
 }
 
-struct record *object_alloc(struct record *a1, struct record *a2, int a3)
+struct record *object_alloc(struct record *after, struct record *source, int data_size)
 {
-    int l_18;
-    struct record *l_14;
+    int size;
+    struct record *object;
 
-    l_18 = a3 + 71;
-    object_heap_free -= l_18 + 18;
-    l_14 = (struct record *)mem_pool_alloc((int)object_heap, l_18);
-    if (l_14 == 0) fatal_error((int)D_00176E70);
-    if (a2 != 0) {
-        mc_memcpy(l_14, a2, 55, (int)D_00176E44, 163, 4);
-        mc_memcpy(&l_14->data, &a2->data, l_18 - 71, (int)D_00176E44, 164, 4);
-        mc_memset(&l_14->next, 0, 16, (int)D_00176E44, 165, 4);
+    size = data_size + 71;
+    object_heap_free -= size + 18;
+    object = (struct record *)mem_pool_alloc((int)object_heap, size);
+    if (object == 0) fatal_error((int)D_00176E70);
+    if (source != 0) {
+        mc_memcpy(object, source, 55, (int)D_00176E44, 163, 4);
+        mc_memcpy(&object->data, &source->data, size - 71, (int)D_00176E44, 164, 4);
+        mc_memset(&object->next, 0, 16, (int)D_00176E44, 165, 4);
     } else {
-        mc_memset(l_14, 0, l_18, (int)D_00176E44, 169, 4);
-        l_14->id = object_new_id(1);
+        mc_memset(object, 0, size, (int)D_00176E44, 169, 4);
+        object->id = object_new_id(1);
     }
-    if (a1 != 0) object_insert_after(a1, l_14);
-    return l_14;
+    if (after != 0) object_insert_after(after, object);
+    return object;
 }
 
-void object_heap_release(struct record *a1)
+void object_heap_release(struct record *object)
 {
-    int l_18;
+    struct mem_block *block;
 
-    l_18 = (int)a1 - 18;
-    object_heap_free += *(int *)((char *)l_18 + 12) + 18;
-    mem_pool_release((int)a1);
+    block = (struct mem_block *)((char *)object - 18);
+    object_heap_free += block->size + 18;
+    mem_pool_release((int)object);
 }
 
-struct record *object_clone(struct record *a1)
+struct record *object_clone(struct record *object)
 {
-    int l_24;
-    struct record *l_20;
-    int l_1C;
+    struct mem_block *block;
+    struct record *clone;
+    int size;
 
-    l_24 = (int)a1 - 18;
-    l_1C = *(int *)((char *)l_24 + 12);
-    l_20 = object_create_child(a1->parent, 0, l_1C - 71);
-    mc_memcpy(l_20, a1, 55, (int)D_00176E44, 203, 4);
-    mc_memcpy(&l_20->data, &a1->data, l_1C - 71, (int)D_00176E44, 204, 4);
-    return l_20;
+    block = (struct mem_block *)((char *)object - 18);
+    size = block->size;
+    clone = object_create_child(object->parent, 0, size - 71);
+    mc_memcpy(clone, object, 55, (int)D_00176E44, 203, 4);
+    mc_memcpy(&clone->data, &object->data, size - 71, (int)D_00176E44, 204, 4);
+    return clone;
 }
 
-struct record *object_create_child(struct record *a1, struct record *a2, int a3)
+struct record *object_create_child(struct record *parent, struct record *source, int data_size)
 {
-    struct record *l_18;
-    struct record *l_14;
+    struct record *child;
+    struct record *sibling;
 
-    l_18 = object_alloc(a1->children, a2, a3);
-    l_18->parent = (struct record *)a1;
-    l_14 = l_18;
-    while (l_14 != 0) {
-        a1->children = (struct record *)l_14;
-        l_14 = l_14->prev;
+    child = object_alloc(parent->children, source, data_size);
+    child->parent = (struct record *)parent;
+    sibling = child;
+    while (sibling != 0) {
+        parent->children = (struct record *)sibling;
+        sibling = sibling->prev;
     }
-    return l_18;
+    return child;
 }
 
-struct record *object_reparent(struct record *a1, struct record *a2)
+struct record *object_reparent(struct record *parent, struct record *object)
 {
-    object_unlink(a2);
-    object_add_child(a1, a2);
-    return a2;
+    object_unlink(object);
+    object_add_child(parent, object);
+    return object;
 }
 
-void object_set_position(struct record *a1, int a2, int a3, int a4, int a5, int a6, int a7)
+void object_set_position(struct record *object, int x, int y, int z, int angle_x, int yaw, int angle_z)
 {
-    int l_C;
+    int unused;
 
-    object_move_old_x = a1->x;
-    object_move_old_y = a1->y;
-    object_move_old_z = a1->z;
-    object_move_old_angles = a1->angle_x;
-    D_001A9B20 = a1->yaw;
-    D_001A9B24 = a1->angle_z;
-    a1->x = a2;
-    a1->y = a3;
-    a1->z = a4;
-    a1->angle_x = a5;
-    a1->yaw = a6;
-    a1->angle_z = a7;
-    object_move_new = a2;
-    D_001A9AF8 = a3;
-    D_001A9AFC = a4;
-    D_001A9B00 = a5;
-    D_001A9B04 = a6;
-    D_001A9B08 = a7;
-    if (a1->type == 43) return;
-    object_foreach(a1->children, (int)object_follow_move_cb);
+    object_move_old_x = object->x;
+    object_move_old_y = object->y;
+    object_move_old_z = object->z;
+    object_move_old_angles = object->angle_x;
+    D_001A9B20 = object->yaw;
+    D_001A9B24 = object->angle_z;
+    object->x = x;
+    object->y = y;
+    object->z = z;
+    object->angle_x = angle_x;
+    object->yaw = yaw;
+    object->angle_z = angle_z;
+    object_move_new = x;
+    D_001A9AF8 = y;
+    D_001A9AFC = z;
+    D_001A9B00 = angle_x;
+    D_001A9B04 = yaw;
+    D_001A9B08 = angle_z;
+    if (object->type == 43) return;
+    object_foreach(object->children, object_follow_move_cb);
 }
 
-void object_move_by(struct record *a1, int a2, int a3, int a4, int a5, int a6, int a7)
+void object_move_by(struct record *object, int dx, int dy, int dz, int d_angle_x, int d_yaw, int d_angle_z)
 {
-    object_set_position(a1, a1->x + a2, a1->y + a3, a1->z + a4, a1->angle_x + a5, a1->yaw + a6, a1->angle_z + a7);
+    object_set_position(object, object->x + dx, object->y + dy, object->z + dz, object->angle_x + d_angle_x, object->yaw + d_yaw, object->angle_z + d_angle_z);
 }
 
-void object_unlink(struct record *a1)
+void object_unlink(struct record *object)
 {
-    if (a1->parent != 0 && a1->parent->children == a1) a1->parent->children = a1->next;
-    if (a1->prev != 0) a1->prev->next = a1->next;
-    if (a1->next != 0) a1->next->prev = a1->prev;
-    a1->next = 0;
-    a1->prev = a1->next;
-    a1->parent = a1->prev;
+    if (object->parent != 0 && object->parent->children == object) object->parent->children = object->next;
+    if (object->prev != 0) object->prev->next = object->next;
+    if (object->next != 0) object->next->prev = object->prev;
+    object->next = 0;
+    object->prev = object->next;
+    object->parent = object->prev;
 }
 
-void object_insert_after(struct record *a1, struct record *a2)
+void object_insert_after(struct record *after, struct record *object)
 {
-    a2->next = a1->next;
-    if (a1->next != 0) a1->next->prev = (struct record *)a2;
-    a1->next = (struct record *)a2;
-    a2->prev = (struct record *)a1;
-    a2->parent = a1->parent;
+    object->next = after->next;
+    if (after->next != 0) after->next->prev = (struct record *)object;
+    after->next = (struct record *)object;
+    object->prev = (struct record *)after;
+    object->parent = after->parent;
 }
 
-void object_add_child(struct record *a1, struct record *a2)
+void object_add_child(struct record *parent, struct record *child)
 {
-    if (a1->children != 0) {
-        object_insert_after(a1->children, a2);
+    if (parent->children != 0) {
+        object_insert_after(parent->children, child);
         return;
     }
-    a1->children = (struct record *)a2;
-    a2->parent = (struct record *)a1;
-    a2->prev = 0;
-    a2->next = a2->prev;
+    parent->children = (struct record *)child;
+    child->parent = (struct record *)parent;
+    child->prev = 0;
+    child->next = child->prev;
 }
 
-void object_swap_siblings(struct record *a1, struct record *a2)
+void object_swap_siblings(struct record *first, struct record *second)
 {
-    struct record *l_18;
-    struct record *l_14;
+    struct record *next;
+    struct record *prev;
 
-    if (a1->next != a2 && a2->next != a1) {
-        l_18 = a2->next;
-        l_14 = a2->prev;
-        if (a1->prev != 0) a1->prev->next = (struct record *)a2;
-        a2->next = a1->next;
-        a2->prev = a1->prev;
-        if (a2->next != 0) a2->next->prev = (struct record *)a2;
-        if (a2->prev != 0) a2->prev->next = (struct record *)a1;
-        a1->next = (struct record *)l_18;
-        a1->prev = (struct record *)l_14;
-        if (a1->next != 0) a1->next->prev = (struct record *)a1;
+    if (first->next != second && second->next != first) {
+        next = second->next;
+        prev = second->prev;
+        if (first->prev != 0) first->prev->next = (struct record *)second;
+        second->next = first->next;
+        second->prev = first->prev;
+        if (second->next != 0) second->next->prev = (struct record *)second;
+        if (second->prev != 0) second->prev->next = (struct record *)first;
+        first->next = (struct record *)next;
+        first->prev = (struct record *)prev;
+        if (first->next != 0) first->next->prev = (struct record *)first;
     } else {
-        if (a2->next == a1) {
-            l_18 = a1;
-            a1 = a2;
-            a2 = l_18;
+        if (second->next == first) {
+            next = first;
+            first = second;
+            second = next;
         }
-        if (a1->prev != 0) a1->prev->next = (struct record *)a2;
-        if (a2->next != 0) a2->next->prev = (struct record *)a1;
-        a2->prev = a1->prev;
-        a1->next = a2->next;
-        a1->prev = (struct record *)a2;
-        a2->next = (struct record *)a1;
+        if (first->prev != 0) first->prev->next = (struct record *)second;
+        if (second->next != 0) second->next->prev = (struct record *)first;
+        second->prev = first->prev;
+        first->next = second->next;
+        first->prev = (struct record *)second;
+        second->next = (struct record *)first;
     }
-    if (a1->prev == 0 && a1->parent != 0) a1->parent->children = (struct record *)a1;
-    if (a2->prev != 0 || a2->parent == 0) return;
-    a2->parent->children = (struct record *)a2;
+    if (first->prev == 0 && first->parent != 0) first->parent->children = (struct record *)first;
+    if (second->prev != 0 || second->parent == 0) return;
+    second->parent->children = (struct record *)second;
 }
 
-void object_foreach_near_player(struct record *a1, int a2, int a3)
+void object_foreach_near_player(struct record *object, void (*callback)(), int max_dist)
 {
-    while (a1 != 0) {
-        if (xn_math_approx_dist2d(a1->x, a1->z, player_object->x, player_object->z) < a3) {
-            ((int (*)())(a2))(a1);
-            if (a1->children != 0 && (a1->flags & 1) == 0) object_foreach_near_player(a1->children, a2, a3);
+    while (object != 0) {
+        if (xn_math_approx_dist2d(object->x, object->z, player_object->x, player_object->z) < max_dist) {
+            callback(object);
+            if (object->children != 0 && (object->flags & 1) == 0) object_foreach_near_player(object->children, callback, max_dist);
         }
-        a1 = a1->next;
+        object = object->next;
     }
 }
 
-void object_foreach_pre(struct record *a1, int a2)
+void object_foreach_pre(struct record *object, void (*callback)())
 {
-    struct record *l_14;
+    struct record *next;
 
-    while (a1 != 0) {
-        l_14 = a1->next;
-        ((int (*)())(a2))(a1);
-        if (a1->children != 0) object_foreach_pre(a1->children, a2);
-        a1 = l_14;
+    while (object != 0) {
+        next = object->next;
+        callback(object);
+        if (object->children != 0) object_foreach_pre(object->children, callback);
+        object = next;
     }
 }
 
-void object_foreach_post(struct record *a1, int a2)
+void object_foreach_post(struct record *object, void (*callback)())
 {
-    struct record *l_14;
+    struct record *next;
 
-    while (a1 != 0) {
-        l_14 = a1->next;
-        if (a1->children != 0) object_foreach_post(a1->children, a2);
-        ((int (*)())(a2))(a1);
-        a1 = l_14;
+    while (object != 0) {
+        next = object->next;
+        if (object->children != 0) object_foreach_post(object->children, callback);
+        callback(object);
+        object = next;
     }
 }
 
-void object_foreach(struct record *a1, int a2)
+void object_foreach(struct record *object, void (*callback)())
 {
-    struct record *l_14;
+    struct record *next;
 
-    while (a1 != 0) {
-        l_14 = a1->next;
-        if (a1->children != 0) object_foreach(a1->children, a2);
-        ((int (*)())(a2))(a1);
-        a1 = l_14;
+    while (object != 0) {
+        next = object->next;
+        if (object->children != 0) object_foreach(object->children, callback);
+        callback(object);
+        object = next;
     }
 }
 
-void object_foreach_skip_player(struct record *a1, int a2)
+void object_foreach_skip_player(struct record *object, void (*callback)())
 {
-    struct record *l_14;
+    struct record *next;
 
-    while (a1 != 0) {
-        l_14 = a1->next;
-        if (a1->children != 0 && a1->type != 4) object_foreach_skip_player(a1->children, a2);
-        ((int (*)())(a2))(a1);
-        a1 = l_14;
+    while (object != 0) {
+        next = object->next;
+        if (object->children != 0 && object->type != 4) object_foreach_skip_player(object->children, callback);
+        callback(object);
+        object = next;
     }
 }
 
-void object_foreach_open(struct record *a1, int a2)
+void object_foreach_open(struct record *object, void (*callback)())
 {
-    while (a1 != 0) {
-        ((int (*)())(a2))(a1);
-        if (a1->children != 0 && (a1->flags & 1) == 0) object_foreach_open(a1->children, a2);
-        a1 = a1->next;
+    while (object != 0) {
+        callback(object);
+        if (object->children != 0 && (object->flags & 1) == 0) object_foreach_open(object->children, callback);
+        object = object->next;
     }
 }
 
-void object_foreach_until(struct record *a1, int a2)
+void object_foreach_until(struct record *object, int (*callback)())
 {
-    struct record *l_14;
+    struct record *next;
 
-    while (a1 != 0) {
-        l_14 = a1->next;
-        if (((int (*)())(a2))(a1) == 0 && a1->children != 0) object_foreach_until(a1->children, a2);
-        a1 = l_14;
+    while (object != 0) {
+        next = object->next;
+        if (callback(object) == 0 && object->children != 0) object_foreach_until(object->children, callback);
+        object = next;
     }
 }
 
-int object_find(struct record *a1, int a2)
+int object_find(struct record *object, int (*callback)())
 {
-    while (a1 != 0) {
-        if (((int (*)())(a2))(a1) != 0) return 1;
-        if (object_find(a1->children, a2) != 0) return 1;
-        a1 = a1->next;
+    while (object != 0) {
+        if (callback(object) != 0) return 1;
+        if (object_find(object->children, callback) != 0) return 1;
+        object = object->next;
     }
     return 0;
 }
 
-int object_find_open(struct record *a1, int a2)
+int object_find_open(struct record *object, int (*callback)())
 {
-    while (a1 != 0) {
-        if (((int (*)())(a2))(a1) != 0) return 1;
-        if (a1->children != 0 && (a1->flags & 1) == 0) {
-            if (object_find(a1->children, a2) != 0) return 1;
+    while (object != 0) {
+        if (callback(object) != 0) return 1;
+        if (object->children != 0 && (object->flags & 1) == 0) {
+            if (object_find(object->children, callback) != 0) return 1;
         }
-        a1 = a1->next;
+        object = object->next;
     }
     return 0;
 }
 
-void object_find_item_cb(struct record *a1)
+void object_find_item_cb(struct record *object)
 {
-    struct item *l_18;
+    struct item *item;
 
-    if (((int)(short)D_001A9B42) == (-1) || a1->type != 2) return;
-    l_18 = &a1->data.item;
-    if (l_18->group != D_001A9B40 || l_18->index != D_001A9B42) return;
+    if (((int)(short)D_001A9B42) == (-1) || object->type != 2) return;
+    item = &object->data.item;
+    if (item->group != D_001A9B40 || item->index != D_001A9B42) return;
     D_001A9B42 = 65535;
-    found_object = a1;
+    found_object = object;
 }
 
-int object_find_type_cb(struct record *a1)
+int object_find_type_cb(struct record *object)
 {
-    if ((short)a1->type != D_001A9B42) return 0;
-    found_object = a1;
+    if ((short)object->type != D_001A9B42) return 0;
+    found_object = object;
     return 1;
 }
 
-struct record *object_find_type(struct record *a1, int a2)
+struct record *object_find_type(struct record *root, int type)
 {
     found_object = 0;
-    D_001A9B42 = a2;
-    object_find(a1, (int)object_find_type_cb);
+    D_001A9B42 = type;
+    object_find(root, object_find_type_cb);
     return found_object;
 }
 
-void object_count_type_cb(struct record *a1)
+void object_count_type_cb(struct record *object)
 {
-    if ((short)a1->type != D_001A9B42) return;
+    if ((short)object->type != D_001A9B42) return;
     object_count_result++;
 }
 
-struct record *object_create_in_block(struct record *a1, int a2, int a3, int a4, int a5)
+struct record *object_create_in_block(struct record *parent, int type, int data_size, int image, int pad13)
 {
-    struct record *l_10;
+    struct record *object;
 
-    if (a1 != 0) {
-        l_10 = object_create_child(a1, 0, a3);
+    if (parent != 0) {
+        object = object_create_child(parent, 0, data_size);
     } else {
-        l_10 = object_alloc(0, 0, a3);
+        object = object_alloc(0, 0, data_size);
     }
-    l_10->type = a2;
-    l_10->image = a4;
-    l_10->pad13 = a5;
-    l_10->id = location_object->id + ((int)(unsigned short)(current_location->object_counter)++);
-    if (l_10->id == (-1016397758)) {
-        mc_memcpy((int)object_debug_watch_copy, l_10, 71, (int)D_00176E44, 634, 4);
-        object_debug_watch = (int)l_10;
+    object->type = type;
+    object->image = image;
+    object->pad13 = pad13;
+    object->id = location_object->id + ((int)(unsigned short)(current_location->object_counter)++);
+    if (object->id == (-1016397758)) {
+        mc_memcpy((int)object_debug_watch_copy, object, 71, (int)D_00176E44, 634, 4);
+        object_debug_watch = (int)object;
     }
-    return l_10;
+    return object;
 }
 
-int object_find_by_id_cb(struct record *a1)
+int object_find_by_id_cb(struct record *object)
 {
-    if (a1->id == object_search_id) object_search_result = a1;
+    if (object->id == object_search_id) object_search_result = object;
     return (int)object_search_result;
 }
 
-struct record *object_find_by_id(struct record *a1, int a2)
+struct record *object_find_by_id(struct record *root, int id)
 {
-    object_search_id = a2;
+    object_search_id = id;
     object_search_result = 0;
-    if (a1 == 0) {
-        object_foreach(location_object, (int)object_find_by_id_cb);
+    if (root == 0) {
+        object_foreach(location_object, (void (*)())object_find_by_id_cb);
         object_found_last = (int)object_search_result;
         if ((int)object_search_result != 0) return object_search_result;
-        object_foreach(nonworld_root, (int)object_find_by_id_cb);
+        object_foreach(nonworld_root, (void (*)())object_find_by_id_cb);
         object_found_last = (int)object_search_result;
         return object_search_result;
     }
-    object_find(a1, (int)object_find_by_id_cb);
+    object_find(root, object_find_by_id_cb);
     return object_search_result;
 }
 
-int object_random_type_cb(struct record *a1)
+int object_random_type_cb(struct record *object)
 {
-    if (a1->type != scratch_190ce4[0]) return 0;
+    if (object->type != scratch_190ce4[0]) return 0;
     if (*(int *)scratch_190be4 == 0) {
-        found_object = a1;
+        found_object = object;
         return 1;
     }
     (*(int *)scratch_190be4)--;
     return 0;
 }
 
-struct record *object_random_child_of_type(struct record *a1, int a2)
+struct record *object_random_child_of_type(struct record *parent, int type)
 {
-    if ((*(int *)scratch_190be4 = object_count_type(a1->children, (int)(short)*(short *)&a2)) == 0) {
+    if ((*(int *)scratch_190be4 = object_count_type(parent->children, (int)(short)*(short *)&type)) == 0) {
         return 0;
     }
     found_object = 0;
     *(int *)scratch_190be4 = rand() % *(int *)scratch_190be4;
-    scratch_190ce4[0] = *(signed char *)&a2;
-    object_find(a1->children, (int)object_random_type_cb);
+    scratch_190ce4[0] = *(signed char *)&type;
+    object_find(parent->children, object_random_type_cb);
     return found_object;
 }
 
-void object_delete_block_cb(struct record *a1)
+void object_delete_block_cb(struct record *object)
 {
-    if ((a1->id & -65536) != object_delete_block_id) return;
-    if (a1->twin != 0) a1->twin->twin = 0;
-    object_free_single(a1);
+    if ((object->id & -65536) != object_delete_block_id) return;
+    if (object->twin != 0) object->twin->twin = 0;
+    object_free_single(object);
 }
 
-void object_delete_block(struct record *a1, int a2)
+void object_delete_block(struct record *root, int block_id)
 {
-    object_delete_block_id = a2 & -65536;
-    object_foreach_post(a1, (int)object_delete_block_cb);
+    object_delete_block_id = block_id & -65536;
+    object_foreach_post(root, object_delete_block_cb);
 }
 
-void func_0008EB25(struct record *a1)
+void func_0008EB25(struct record *object)
 {
-    struct record *l_18;
+    struct record *twin;
 
-    if (a1->twin == 0) return;
-    l_18 = a1->twin;
+    if (object->twin == 0) return;
+    twin = object->twin;
 }
 
 void func_0008EB52(void)
 {
-    object_foreach_pre(location_object, (int)func_0008EB25);
-    object_foreach_pre(nonworld_root, (int)func_0008EB25);
+    object_foreach_pre(location_object, func_0008EB25);
+    object_foreach_pre(nonworld_root, func_0008EB25);
 }
 
-int object_new_id(int a1)
+int object_new_id(int id_high)
 {
-    int l_1C;
+    int id;
 
     if (next_record_id >= 63000) next_record_id = 10000;
-    while (object_find_by_id(location_object, (l_1C = (a1 << 16) + next_record_id++)) != 0 || object_find_by_id(nonworld_root, l_1C) != 0) {
+    while (object_find_by_id(location_object, (id = (id_high << 16) + next_record_id++)) != 0 || object_find_by_id(nonworld_root, id) != 0) {
     }
-    return l_1C;
+    return id;
 }
 
-void object_delete_quest_cb(struct record *a1)
+void object_delete_quest_cb(struct record *object)
 {
-    int l_18;
+    char *door;
 
-    if (a1->quest_id != scratch_190ce4[0]) return;
-    if (a1->type == 8) {
-        if (((int)(unsigned char)(a1->data.person.flags & 128)) != 0) {
-            a1->twin->twin = 0;
-            a1->twin = 0;
-            a1->quest_id = 0;
+    if (object->quest_id != scratch_190ce4[0]) return;
+    if (object->type == 8) {
+        if (((int)(unsigned char)(object->data.person.flags & 128)) != 0) {
+            object->twin->twin = 0;
+            object->twin = 0;
+            object->quest_id = 0;
             return;
         }
     }
-    if (loaded_location_door_count != 0 && (a1->id & -65536) == (location_object->id & -65536)) {
-        l_18 = location_find_door(a1->id);
-        if (l_18 != 0) *(signed char *)((char *)l_18 + 3) &= 15;
+    if (loaded_location_door_count != 0 && (object->id & -65536) == (location_object->id & -65536)) {
+        door = location_find_door(object->id);
+        if (door != 0) door[3] &= 15;
     }
-    unequip_object(a1);
-    object_delete(a1);
+    unequip_object(object);
+    object_delete(object);
 }
 
-void object_delete_quest_objects(struct record *a1, unsigned char a2)
+void object_delete_quest_objects(struct record *root, unsigned char quest_id)
 {
-    scratch_190ce4[0] = a2;
-    object_foreach_post(a1, (int)object_delete_quest_cb);
+    scratch_190ce4[0] = quest_id;
+    object_foreach_post(root, object_delete_quest_cb);
 }
 
-void object_tree_size_cb(struct record *a1)
+void object_tree_size_cb(struct record *object)
 {
-    *(int *)scratch_190be4 += *(int *)((char *)a1 - 6);
+    *(int *)scratch_190be4 += ((struct mem_block *)((char *)object - 18))->size;
 }
 
-int object_tree_size(struct record *a1)
+int object_tree_size(struct record *root)
 {
     *(int *)scratch_190be4 = 0;
-    object_foreach(a1, (int)object_tree_size_cb);
+    object_foreach(root, object_tree_size_cb);
     return *(int *)scratch_190be4;
 }
 
-void object_delete_type_cb(struct record *a1)
+void object_delete_type_cb(struct record *object)
 {
-    if (a1->type != scratch_190ce4[0]) return;
-    object_delete(a1);
+    if (object->type != scratch_190ce4[0]) return;
+    object_delete(object);
 }
 
-void object_delete_type(struct record *a1, unsigned char a2)
+void object_delete_type(struct record *root, unsigned char type)
 {
-    scratch_190ce4[0] = a2;
-    object_foreach_post(a1, (int)object_delete_type_cb);
+    scratch_190ce4[0] = type;
+    object_foreach_post(root, object_delete_type_cb);
 }
 
-int object_find_quest_cb(struct record *a1)
+int object_find_quest_cb(struct record *object)
 {
-    if (a1->quest_id == scratch_190ce4[0]) return (int)(found_object = a1);
+    if (object->quest_id == scratch_190ce4[0]) return (int)(found_object = object);
     return 0;
 }
 
-struct record *object_find_quest(struct record *a1, unsigned char a2)
+struct record *object_find_quest(struct record *root, unsigned char quest_id)
 {
-    scratch_190ce4[0] = a2;
+    scratch_190ce4[0] = quest_id;
     found_object = 0;
-    object_find(a1, (int)object_find_quest_cb);
+    object_find(root, object_find_quest_cb);
     return found_object;
 }
 

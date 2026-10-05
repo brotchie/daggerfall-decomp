@@ -127,609 +127,609 @@ void qaction_op11_remove_topics(struct quest *, struct qbn_op *);
 void qaction_op10_add_topics(struct quest *, struct qbn_op *);
 #pragma aux mc_set_location parm routine [];
 
-void quest_run_opcodes(struct quest *a1)
+void quest_run_opcodes(struct quest *quest)
 {
-    int l_44;
-    struct qbn_op *l_40;
-    int l_3C;
-    int l_38;
-    int l_34;
-    struct qbn_state *l_30;
-    int l_2C;
-    int l_28;
-    int l_24;
-    struct record *l_20;
-    struct faction *l_1C;
-    int l_18;
+    int op_index;
+    struct qbn_op *op;
+    int combined;
+    int text_delta;
+    int ended;
+    struct qbn_state *state;
+    signed char *group_states;
+    signed char *faction_states;
+    int i;
+    struct record *object;
+    struct faction *faction;
+    int path;
     {
-        int l_74;
-        int l_70;
-        int l_6C;
-        int l_68;
-        int l_64;
-        int l_60;
-        int l_5C;
-        int l_58;
-        int l_54;
-        int l_50;
-        int l_4C;
+        int unused1;
+        int unused2;
+        int unused3;
+        int unused4;
+        int unused5;
+        int unused6;
+        int unused7;
+        int unused8;
+        int unused9;
+        int unused10;
+        int unused11;
 
-        l_34 = 0;
-        current_quest = a1;
-        l_40 = quest_section(a1, 8);
-        for (l_44 = 0; a1->section_counts[8] > l_44; l_44++, l_40++) {
-            switch (l_40->opcode) {
+        ended = 0;
+        current_quest = quest;
+        op = quest_section(quest, 8);
+        for (op_index = 0; quest->section_counts[8] > op_index; op_index++, op++) {
+            switch (op->opcode) {
             case 7:
-                if (quest_arg_state(l_40, 0) != 0) {
-                    for (l_24 = 1; l_24 < 5; l_24++) {
-                        l_30 = (struct qbn_state *)l_40->args[l_24].record;
-                        if (l_30 == 0) continue;
-                        if (l_30->is_global != 0) {
-                            quest_global_states[l_30->value] = 0;
+                if (quest_arg_state(op, 0) != 0) {
+                    for (i = 1; i < 5; i++) {
+                        state = (struct qbn_state *)op->args[i].record;
+                        if (state == 0) continue;
+                        if (state->is_global != 0) {
+                            quest_global_states[state->value] = 0;
                         } else {
-                            l_30->value = 0;
+                            state->value = 0;
                         }
                     }
-                    quest_op_done(a1, l_40);
+                    quest_op_done(quest, op);
                 }
                 break;
             case 8:
-                if (((int)(short)(l_40->flags & 1)) == 0 && quest_arg_state(l_40, 0) != 0 && ((int)(unsigned char)current_region) != 31) {
+                if (((int)(short)(op->flags & 1)) == 0 && quest_arg_state(op, 0) != 0 && ((int)(unsigned char)current_region) != 31) {
                     mc_set_location(64, (int)D_001707F0);
-                    mc_sprintf((int)D_001911E4, (int)D_001707F7, rand_range(l_40->args[1].value, l_40->args[2].value));
+                    mc_sprintf((int)D_001911E4, (int)D_001707F7, rand_range(op->args[1].value, op->args[2].value));
                     quest_start((int)D_001911E4);
-                    quest_op_done(a1, l_40);
+                    quest_op_done(quest, op);
                 }
                 break;
             case 10:
-                if (((int)(short)(l_40->flags & 1)) == 0 && quest_arg_state(l_40, 0) != 0) {
-                    qaction_op10_add_topics(a1, l_40);
-                    quest_op_done(a1, l_40);
+                if (((int)(short)(op->flags & 1)) == 0 && quest_arg_state(op, 0) != 0) {
+                    qaction_op10_add_topics(quest, op);
+                    quest_op_done(quest, op);
                 }
                 break;
             case 6:
-                if (quest_arg_state(l_40, 0) != 0 && quest_deliveries_done(a1) != 0 && (((quest_reward_container == 0) || ((quest_reward_container->children == 0))) ? 1 : 0) != 0) {
-                    quest_op_done(a1, l_40);
-                    if (l_34 == 0) {
-                        if (((int)(unsigned char)(a1->flags & 2)) == 0 && a1->faction_id != 0) {
-                            faction_change_reputation(faction_find(a1->faction_id), -2);
+                if (quest_arg_state(op, 0) != 0 && quest_deliveries_done(quest) != 0 && (((quest_reward_container == 0) || ((quest_reward_container->children == 0))) ? 1 : 0) != 0) {
+                    quest_op_done(quest, op);
+                    if (ended == 0) {
+                        if (((int)(unsigned char)(quest->flags & 2)) == 0 && quest->faction_id != 0) {
+                            faction_change_reputation(faction_find(quest->faction_id), -2);
                         }
-                        rumor_add_quest(a1, ((((int)(unsigned char)(a1->flags & 2)) != 0) ? 1007 : 1006), 0, 8);
-                        quest_add_questor_rumor(a1, (int)(unsigned char)(a1->flags & 2));
+                        rumor_add_quest(quest, ((((int)(unsigned char)(quest->flags & 2)) != 0) ? 1007 : 1006), 0, 8);
+                        quest_add_questor_rumor(quest, (int)(unsigned char)(quest->flags & 2));
                         rumor_file_purge();
                     }
-                    quest_end(a1);
-                    l_34 = 1;
-                    l_44 = a1->section_counts[8];
+                    quest_end(quest);
+                    ended = 1;
+                    op_index = quest->section_counts[8];
                 }
                 break;
             case 11:
-                if (((int)(short)(l_40->flags & 1)) == 0 && quest_arg_state(l_40, 0) != 0) {
-                    qaction_op11_remove_topics(a1, l_40);
-                    quest_op_done(a1, l_40);
+                if (((int)(short)(op->flags & 1)) == 0 && quest_arg_state(op, 0) != 0) {
+                    qaction_op11_remove_topics(quest, op);
+                    quest_op_done(quest, op);
                 }
                 break;
             case 12:
-                if (((int)(short)(l_40->flags & 1)) == 0 && quest_arg_state(l_40, 0) != 0) {
-                    qaction_op12_start_stop_timer(a1, l_40, 64);
-                    quest_op_done(a1, l_40);
+                if (((int)(short)(op->flags & 1)) == 0 && quest_arg_state(op, 0) != 0) {
+                    qaction_op12_start_stop_timer(quest, op, 64);
+                    quest_op_done(quest, op);
                 }
                 break;
             case 13:
-                if (quest_arg_state(l_40, 0) != 0) {
-                    qaction_op12_start_stop_timer(a1, l_40, 0);
-                    quest_op_done(a1, l_40);
+                if (quest_arg_state(op, 0) != 0) {
+                    qaction_op12_start_stop_timer(quest, op, 0);
+                    quest_op_done(quest, op);
                 }
                 break;
             case 9:
-                if (quest_arg_state(l_40, 0) != 0) {
-                    qaction_op09_spawn_repeat(a1, l_40);
-                    quest_op_done(a1, l_40);
+                if (quest_arg_state(op, 0) != 0) {
+                    qaction_op09_spawn_repeat(quest, op);
+                    quest_op_done(quest, op);
                 }
                 break;
             case 87:
-                if (quest_arg_state(l_40, 0) != 0) {
-                    qaction_op87_respawn(a1, l_40);
-                    quest_op_done(a1, l_40);
+                if (quest_arg_state(op, 0) != 0) {
+                    qaction_op87_respawn(quest, op);
+                    quest_op_done(quest, op);
                 }
                 break;
             case 4:
-                if (((int)(short)(l_40->flags & 1)) == 0 && quest_arg_state(l_40, 0) != 0) {
+                if (((int)(short)(op->flags & 1)) == 0 && quest_arg_state(op, 0) != 0) {
                     if (((int)(unsigned char)game_mode) == 16) {
                         rest_close();
                         D_0019626F = 0;
                     }
-                    a1->flags |= 2;
-                    quest_op_done(a1, l_40);
+                    quest->flags |= 2;
+                    quest_op_done(quest, op);
                     msgbox_show_quest_text(current_quest, 1004, 1);
-                    qaction_op04_give_reward(a1, l_40);
+                    qaction_op04_give_reward(quest, op);
                 }
                 break;
             case 22:
-                if (((int)(short)(l_40->flags & 1)) == 0 && quest_arg_state(l_40, 0) != 0) {
-                    qaction_place_foe(l_40, (int)l_40->args[2].record);
-                    quest_op_done(a1, l_40);
+                if (((int)(short)(op->flags & 1)) == 0 && quest_arg_state(op, 0) != 0) {
+                    qaction_place_foe(op, (int)op->args[2].record);
+                    quest_op_done(quest, op);
                 }
                 break;
             case 24:
-                if (((int)(short)(l_40->flags & 1)) == 0 && quest_arg_state(l_40, 0) != 0) {
-                    logbook_remove_entry((int)(unsigned char)(signed char)a1->id, l_40->args[1].value);
-                    quest_op_done(a1, l_40);
+                if (((int)(short)(op->flags & 1)) == 0 && quest_arg_state(op, 0) != 0) {
+                    logbook_remove_entry((int)(unsigned char)(signed char)quest->id, op->args[1].value);
+                    quest_op_done(quest, op);
                 }
                 break;
             case 23:
-                if (((int)(short)(l_40->flags & 1)) == 0 && quest_arg_state(l_40, 0) != 0) {
-                    logbook_add_entry((int)(unsigned char)(signed char)a1->id, l_40->args[1].value, l_40->args[2].value);
-                    quest_op_done(a1, l_40);
+                if (((int)(short)(op->flags & 1)) == 0 && quest_arg_state(op, 0) != 0) {
+                    logbook_add_entry((int)(unsigned char)(signed char)quest->id, op->args[1].value, op->args[2].value);
+                    quest_op_done(quest, op);
                 }
                 break;
             case 25:
-                if (quest_arg_state(l_40, 0) != 0) {
-                    if (qaction_op25_countdown(a1, l_40) != 0) quest_op_done(a1, l_40);
+                if (quest_arg_state(op, 0) != 0) {
+                    if (qaction_op25_countdown(quest, op) != 0) quest_op_done(quest, op);
                 }
                 break;
             case 26:
-                if (((int)(short)(l_40->flags & 1)) == 0 && quest_arg_state(l_40, 0) != 0) {
-                    quest_give_item_to_player(l_40->args[1].object);
-                    quest_op_done(a1, l_40);
+                if (((int)(short)(op->flags & 1)) == 0 && quest_arg_state(op, 0) != 0) {
+                    quest_give_item_to_player(op->args[1].object);
+                    quest_op_done(quest, op);
                 }
                 break;
             case 34:
-                if (((int)(short)(l_40->flags & 1)) == 0 && quest_arg_state(l_40, 0) != 0) {
-                    qaction_op34_pick_one_state(a1, l_40);
-                    quest_op_done(a1, l_40);
+                if (((int)(short)(op->flags & 1)) == 0 && quest_arg_state(op, 0) != 0) {
+                    qaction_op34_pick_one_state(quest, op);
+                    quest_op_done(quest, op);
                 }
                 break;
             case 35:
-                if (((int)(short)(l_40->flags & 1)) == 0 && quest_arg_state(l_40, 0) != 0) {
-                    qaction_op35_cycle_state(a1, l_40);
-                    quest_op_done(a1, l_40);
+                if (((int)(short)(op->flags & 1)) == 0 && quest_arg_state(op, 0) != 0) {
+                    qaction_op35_cycle_state(quest, op);
+                    quest_op_done(quest, op);
                 }
                 break;
             case 19:
-                if (((int)(short)(l_40->flags & 1)) == 0 && quest_arg_state(l_40, 0) != 0) {
-                    qaction_op19_reveal_location(a1, l_40, 1);
-                    quest_op_done(a1, l_40);
+                if (((int)(short)(op->flags & 1)) == 0 && quest_arg_state(op, 0) != 0) {
+                    qaction_op19_reveal_location(quest, op, 1);
+                    quest_op_done(quest, op);
                 }
                 break;
             case 20:
-                if (((int)(short)(l_40->flags & 1)) == 0 && quest_arg_state(l_40, 0) != 0) {
-                    qaction_op19_reveal_location(a1, l_40, 0);
-                    quest_op_done(a1, l_40);
+                if (((int)(short)(op->flags & 1)) == 0 && quest_arg_state(op, 0) != 0) {
+                    qaction_op19_reveal_location(quest, op, 0);
+                    quest_op_done(quest, op);
                 }
                 break;
             case 0:
-                if (((int)(short)(l_40->flags & 1)) == 0 && quest_arg_state(l_40, 0) != 0) {
-                    qaction_place_item(a1, l_40);
-                    quest_op_done(a1, l_40);
+                if (((int)(short)(op->flags & 1)) == 0 && quest_arg_state(op, 0) != 0) {
+                    qaction_place_item(quest, op);
+                    quest_op_done(quest, op);
                 }
                 break;
             case 29:
-                if (((int)(short)(l_40->flags & 1)) == 0 && quest_arg_state(l_40, 0) != 0) {
-                    qaction_op29_prompt(a1, l_40);
+                if (((int)(short)(op->flags & 1)) == 0 && quest_arg_state(op, 0) != 0) {
+                    qaction_op29_prompt(quest, op);
                 }
                 break;
             case 16:
-                l_24 = ((unsigned)game_minutes) / 1440;
-                if (l_24 >= l_40->args[1].value && l_24 <= l_40->args[2].value) {
-                    quest_set_state(a1, l_40, 1);
+                i = ((unsigned)game_minutes) / 1440;
+                if (i >= op->args[1].value && i <= op->args[2].value) {
+                    quest_set_state(quest, op, 1);
                 } else {
-                    quest_set_state(a1, l_40, 0);
+                    quest_set_state(quest, op, 0);
                 }
                 break;
             case 17:
-                if (quest_arg_state(l_40, 0) != 0) {
-                    qaction_op17_grant_building_access(a1, l_40);
-                    quest_op_done(a1, l_40);
+                if (quest_arg_state(op, 0) != 0) {
+                    qaction_op17_grant_building_access(quest, op);
+                    quest_op_done(quest, op);
                 }
                 break;
             case 30:
-                if (((int)(short)(l_40->flags & 1)) == 0 && quest_arg_state(l_40, 0) != 0) {
-                    qaction_place_npc(a1, l_40);
-                    quest_op_done(a1, l_40);
+                if (((int)(short)(op->flags & 1)) == 0 && quest_arg_state(op, 0) != 0) {
+                    qaction_place_npc(quest, op);
+                    quest_op_done(quest, op);
                 }
                 break;
             case 31:
-                l_24 = ((unsigned)game_minutes) % 1440;
-                if (l_40->args[1].value < l_40->args[2].value) {
-                    if (l_24 >= l_40->args[1].value && l_24 <= l_40->args[2].value) {
-                        quest_set_state(a1, l_40, 1);
+                i = ((unsigned)game_minutes) % 1440;
+                if (op->args[1].value < op->args[2].value) {
+                    if (i >= op->args[1].value && i <= op->args[2].value) {
+                        quest_set_state(quest, op, 1);
                     } else {
-                        quest_set_state(a1, l_40, 0);
+                        quest_set_state(quest, op, 0);
                     }
-                } else if (l_24 >= l_40->args[1].value && l_24 <= l_40->args[2].value) {
-                    quest_set_state(a1, l_40, 0);
+                } else if (i >= op->args[1].value && i <= op->args[2].value) {
+                    quest_set_state(quest, op, 0);
                 } else {
-                    quest_set_state(a1, l_40, 1);
+                    quest_set_state(quest, op, 1);
                 }
                 break;
             case 33:
-                if (((int)(short)(l_40->flags & 1)) == 0 && quest_arg_state(l_40, 0) != 0) {
-                    qaction_place_foe(l_40, (int)l_40->args[2].record);
-                    quest_op_done(a1, l_40);
+                if (((int)(short)(op->flags & 1)) == 0 && quest_arg_state(op, 0) != 0) {
+                    qaction_place_foe(op, (int)op->args[2].record);
+                    quest_op_done(quest, op);
                 }
                 break;
             case 36:
-                if (((int)(short)(l_40->flags & 1)) == 0 && quest_arg_state(l_40, 0) != 0) {
-                    quest_op_done(a1, l_40);
-                    if (l_40->args[1].object != 0) func_0003077F(l_40->args[1].object, 1);
-                    ((struct qbn_item *)l_40->args[1].record)->object = 0;
+                if (((int)(short)(op->flags & 1)) == 0 && quest_arg_state(op, 0) != 0) {
+                    quest_op_done(quest, op);
+                    if (op->args[1].object != 0) func_0003077F(op->args[1].object, 1);
+                    ((struct qbn_item *)op->args[1].record)->object = 0;
                 }
                 break;
             case 37:
-                if (quest_arg_state(l_40, 0) != 0) {
-                    qaction_op37_repute_exceeds(a1, l_40);
-                    quest_op_done(a1, l_40);
+                if (quest_arg_state(op, 0) != 0) {
+                    qaction_op37_repute_exceeds(quest, op);
+                    quest_op_done(quest, op);
                 }
                 break;
             case 38:
                 break;
             case 39:
-                if (((int)(short)(l_40->flags & 1)) == 0 && quest_arg_state(l_40, 0) != 0) {
-                    qaction_give_item_to_foe(a1, l_40);
-                    quest_op_done(a1, l_40);
+                if (((int)(short)(op->flags & 1)) == 0 && quest_arg_state(op, 0) != 0) {
+                    qaction_give_item_to_foe(quest, op);
+                    quest_op_done(quest, op);
                 }
                 break;
             case 42:
-                if (((int)(short)(l_40->flags & 1)) == 0 && quest_arg_state(l_40, 0) != 0) {
-                    if (rand_range(1, 100) < l_40->args[1].value) {
-                        if (l_40->args[3].value == 32768) {
-                            region_flag_set((int)(unsigned char)current_region, l_40->args[2].value);
-                        } else if (l_40->args[2].value == l_40->args[3].value) {
-                            region_flag_clear((int)(unsigned char)current_region, l_40->args[2].value);
+                if (((int)(short)(op->flags & 1)) == 0 && quest_arg_state(op, 0) != 0) {
+                    if (rand_range(1, 100) < op->args[1].value) {
+                        if (op->args[3].value == 32768) {
+                            region_flag_set((int)(unsigned char)current_region, op->args[2].value);
+                        } else if (op->args[2].value == op->args[3].value) {
+                            region_flag_clear((int)(unsigned char)current_region, op->args[2].value);
                         } else {
-                            region_flag_clear((int)(unsigned char)current_region, l_40->args[2].value);
-                            region_flag_set((int)(unsigned char)current_region, l_40->args[3].value);
+                            region_flag_clear((int)(unsigned char)current_region, op->args[2].value);
+                            region_flag_set((int)(unsigned char)current_region, op->args[3].value);
                         }
-                        quest_op_done(a1, l_40);
+                        quest_op_done(quest, op);
                     }
                 }
                 break;
             case 43:
-                if (quest_arg_state(l_40, 0) != 0 && qcond_op43_pc_at_place(a1, l_40) != 0) {
-                    quest_op_done(a1, l_40);
+                if (quest_arg_state(op, 0) != 0 && qcond_op43_pc_at_place(quest, op) != 0) {
+                    quest_op_done(quest, op);
                 }
                 break;
             case 44:
-                if (((int)(short)(l_40->flags & 1)) == 0 && quest_arg_state(l_40, 0) != 0) {
-                    func_0003077F(l_40->args[1].object, 1);
-                    ((struct qbn_person *)l_40->args[1].record)->object = 0;
-                    quest_op_done(a1, l_40);
+                if (((int)(short)(op->flags & 1)) == 0 && quest_arg_state(op, 0) != 0) {
+                    func_0003077F(op->args[1].object, 1);
+                    ((struct qbn_person *)op->args[1].record)->object = 0;
+                    quest_op_done(quest, op);
                 }
                 break;
             case 45:
-                if (((int)(short)(l_40->flags & 1)) == 0 && quest_arg_state(l_40, 0) != 0) {
-                    func_0004C874(a1, l_40);
-                    quest_op_done(a1, l_40);
+                if (((int)(short)(op->flags & 1)) == 0 && quest_arg_state(op, 0) != 0) {
+                    func_0004C874(quest, op);
+                    quest_op_done(quest, op);
                 }
                 break;
             case 46:
-                if (((int)(short)(l_40->flags & 1)) == 0 && quest_arg_state(l_40, 0) != 0) {
-                    qaction_op46_hide_npc(a1, l_40);
-                    quest_op_done(a1, l_40);
+                if (((int)(short)(op->flags & 1)) == 0 && quest_arg_state(op, 0) != 0) {
+                    qaction_op46_hide_npc(quest, op);
+                    quest_op_done(quest, op);
                 }
                 break;
             case 47:
-                if (((int)(short)(l_40->flags & 1)) == 0 && quest_arg_state(l_40, 0) != 0) {
-                    func_0004C8CF(a1, l_40);
-                    quest_op_done(a1, l_40);
+                if (((int)(short)(op->flags & 1)) == 0 && quest_arg_state(op, 0) != 0) {
+                    func_0004C8CF(quest, op);
+                    quest_op_done(quest, op);
                 }
                 break;
             case 48:
-                if (((int)(short)(l_40->flags & 1)) == 0 && quest_arg_state(l_40, 0) != 0) {
-                    qaction_op48_restore_npc(a1, l_40);
-                    quest_op_done(a1, l_40);
+                if (((int)(short)(op->flags & 1)) == 0 && quest_arg_state(op, 0) != 0) {
+                    qaction_op48_restore_npc(quest, op);
+                    quest_op_done(quest, op);
                 }
                 break;
             case 49:
-                if (((int)(short)(l_40->flags & 1)) == 0 && quest_arg_state(l_40, 0) != 0) {
+                if (((int)(short)(op->flags & 1)) == 0 && quest_arg_state(op, 0) != 0) {
                     spfx_cure_disease((int)player_entity, (int)player_character);
-                    quest_op_done(a1, l_40);
+                    quest_op_done(quest, op);
                 }
                 break;
             case 50:
-                if (((int)(short)(l_40->flags & 1)) == 0 && quest_arg_state(l_40, 0) != 0) {
+                if (((int)(short)(op->flags & 1)) == 0 && quest_arg_state(op, 0) != 0) {
                     mc_set_location(358, (int)D_001707F0);
-                    mc_sprintf((int)text_buffer, (int)D_00170801, l_40->args[1].value);
+                    mc_sprintf((int)text_buffer, (int)D_00170801, op->args[1].value);
                     while (mouse_buttons != 0) xn_mouse_poll_clamped();
-                    l_18 = disk_resolve_path((int)text_buffer);
-                    xn_vid_play(l_18, 0, 0, 1);
+                    path = disk_resolve_path((int)text_buffer);
+                    xn_vid_play(path, 0, 0, 1);
                     mc_memset(655360, 0, 64000, (int)D_001707F0, 362, 4);
                     palette_restore();
                     sky_loaded_frame = 10000;
                     night_sky_loaded = 0;
-                    quest_op_done(a1, l_40);
+                    quest_op_done(quest, op);
                 }
                 break;
             case 51:
-                if (quest_arg_state(l_40, 0) != 0) quest_op_done(a1, l_40);
+                if (quest_arg_state(op, 0) != 0) quest_op_done(quest, op);
                 break;
             case 53:
-                l_3C = 0;
-                for (l_24 = 1; l_24 < 5; l_24++) {
-                    if (l_40->args[l_24].value == (-2)) continue;
-                    if (quest_arg_state(l_40, (int)(short)*(short *)&l_24) != 0) {
-                        l_3C = 1;
+                combined = 0;
+                for (i = 1; i < 5; i++) {
+                    if (op->args[i].value == (-2)) continue;
+                    if (quest_arg_state(op, (int)(short)*(short *)&i) != 0) {
+                        combined = 1;
                         break;
                     }
                 }
-                quest_set_state(a1, l_40, (int)(short)*(short *)&l_3C);
+                quest_set_state(quest, op, (int)(short)*(short *)&combined);
                 break;
             case 52:
-                l_24 = 1;
-                l_3C = l_24;
-                for (; l_24 < 5; l_24++) {
-                    if (l_40->args[l_24].value == (-2)) continue;
-                    if (quest_arg_state(l_40, (int)(short)*(short *)&l_24) == 0) {
-                        l_3C = 0;
+                i = 1;
+                combined = i;
+                for (; i < 5; i++) {
+                    if (op->args[i].value == (-2)) continue;
+                    if (quest_arg_state(op, (int)(short)*(short *)&i) == 0) {
+                        combined = 0;
                         break;
                     }
                 }
-                if (l_3C != 0) quest_set_state(a1, l_40, (int)(short)*(short *)&l_3C);
+                if (combined != 0) quest_set_state(quest, op, (int)(short)*(short *)&combined);
                 break;
             case 54:
-                if (((int)(short)(l_40->flags & 1)) == 0 && quest_arg_state(l_40, 0) != 0) {
-                    func_0003077F(l_40->args[1].object, 0);
-                    ((struct qbn_item *)l_40->args[1].record)->object = 0;
-                    quest_op_done(a1, l_40);
+                if (((int)(short)(op->flags & 1)) == 0 && quest_arg_state(op, 0) != 0) {
+                    func_0003077F(op->args[1].object, 0);
+                    ((struct qbn_item *)op->args[1].record)->object = 0;
+                    quest_op_done(quest, op);
                 }
                 break;
             case 55:
-                if (((int)(short)(l_40->flags & 1)) == 0 && quest_arg_state(l_40, 0) != 0) {
-                    l_20 = l_40->args[1].object;
-                    if (l_20 != 0) {
-                        quest_face_add(l_20, (int)(unsigned char)D_001841E3[(int)(unsigned char)current_region], (int)(unsigned short)(l_20->flags & 4), l_20->id);
+                if (((int)(short)(op->flags & 1)) == 0 && quest_arg_state(op, 0) != 0) {
+                    object = op->args[1].object;
+                    if (object != 0) {
+                        quest_face_add(object, (int)(unsigned char)D_001841E3[(int)(unsigned char)current_region], (int)(unsigned short)(object->flags & 4), object->id);
                     }
-                    quest_op_done(a1, l_40);
+                    quest_op_done(quest, op);
                 }
                 break;
             case 56:
-                if (((int)(short)(l_40->flags & 1)) == 0 && quest_arg_state(l_40, 0) != 0) {
-                    l_20 = l_40->args[1].object;
-                    if (l_20 != 0) quest_face_remove(l_20->id);
-                    quest_op_done(a1, l_40);
+                if (((int)(short)(op->flags & 1)) == 0 && quest_arg_state(op, 0) != 0) {
+                    object = op->args[1].object;
+                    if (object != 0) quest_face_remove(object->id);
+                    quest_op_done(quest, op);
                 }
                 break;
             case 57:
-                if (((int)(short)(l_40->flags & 1)) == 0 && quest_arg_state(l_40, 0) != 0 && qcond_op57_item_used(a1, l_40) != 0) {
-                    quest_op_done(a1, l_40);
+                if (((int)(short)(op->flags & 1)) == 0 && quest_arg_state(op, 0) != 0 && qcond_op57_item_used(quest, op) != 0) {
+                    quest_op_done(quest, op);
                 }
                 break;
             case 58:
-                if (((int)(short)(l_40->flags & 1)) == 0 && quest_arg_state(l_40, 0) != 0) {
+                if (((int)(short)(op->flags & 1)) == 0 && quest_arg_state(op, 0) != 0) {
                     disease_cure_vampirism();
-                    quest_op_done(a1, l_40);
+                    quest_op_done(quest, op);
                 }
                 break;
             case 59:
-                if (((int)(short)(l_40->flags & 1)) == 0 && quest_arg_state(l_40, 0) != 0) {
+                if (((int)(short)(op->flags & 1)) == 0 && quest_arg_state(op, 0) != 0) {
                     disease_cure_lycanthropy();
-                    quest_op_done(a1, l_40);
+                    quest_op_done(quest, op);
                 }
                 break;
             case 60:
-                if (quest_arg_state(l_40, 0) != 0) {
-                    sound_play(l_40->args[1].value, (int)player_object, 110);
-                    quest_op_done(a1, l_40);
+                if (quest_arg_state(op, 0) != 0) {
+                    sound_play(op->args[1].value, (int)player_object, 110);
+                    quest_op_done(quest, op);
                 }
                 break;
             case 61:
-                if (((int)(short)(l_40->flags & 1)) == 0 && quest_arg_state(l_40, 0) != 0) {
-                    l_20 = l_40->args[1].object;
-                    if (l_20 != 0 && l_20->type == 65) {
-                        faction_change_reputation(faction_find(l_20->faction_id), l_40->args[2].value);
-                    } else if (l_20 != 0 && l_20->data.building.faction_id != 0) {
-                        faction_change_reputation(faction_find((int)(short)l_20->data.building.faction_id), l_40->args[2].value);
+                if (((int)(short)(op->flags & 1)) == 0 && quest_arg_state(op, 0) != 0) {
+                    object = op->args[1].object;
+                    if (object != 0 && object->type == 65) {
+                        faction_change_reputation(faction_find(object->faction_id), op->args[2].value);
+                    } else if (object != 0 && object->data.building.faction_id != 0) {
+                        faction_change_reputation(faction_find((int)(short)object->data.building.faction_id), op->args[2].value);
                     }
-                    quest_op_done(a1, l_40);
+                    quest_op_done(quest, op);
                 }
                 break;
             case 62:
-                if (((int)(short)(l_40->flags & 1)) == 0 && quest_arg_state(l_40, 0) != 0) {
-                    if (l_40->args[1].value == 32768) {
-                        region_precipitation_override[((int)(unsigned char)current_region) * 80] = (signed char)l_40->args[2].value;
+                if (((int)(short)(op->flags & 1)) == 0 && quest_arg_state(op, 0) != 0) {
+                    if (op->args[1].value == 32768) {
+                        region_precipitation_override[((int)(unsigned char)current_region) * 80] = (signed char)op->args[2].value;
                     } else {
-                        region_precipitation_override[l_40->args[1].value * 80] = (signed char)l_40->args[2].value;
+                        region_precipitation_override[op->args[1].value * 80] = (signed char)op->args[2].value;
                     }
-                    quest_op_done(a1, l_40);
+                    quest_op_done(quest, op);
                 }
                 break;
             case 63:
-                if (((int)(short)(l_40->flags & 1)) == 0 && quest_arg_state(l_40, 0) != 0) {
-                    l_20 = l_40->args[1].object;
-                    if (l_20 != 0) {
-                        quest_face_add(l_20, (int)(unsigned char)D_001841E3[(int)(unsigned char)current_region], 0, l_20->image2);
+                if (((int)(short)(op->flags & 1)) == 0 && quest_arg_state(op, 0) != 0) {
+                    object = op->args[1].object;
+                    if (object != 0) {
+                        quest_face_add(object, (int)(unsigned char)D_001841E3[(int)(unsigned char)current_region], 0, object->image2);
                     }
-                    quest_op_done(a1, l_40);
+                    quest_op_done(quest, op);
                 }
                 break;
             case 64:
-                if (((int)(short)(l_40->flags & 1)) == 0 && quest_arg_state(l_40, 0) != 0) {
-                    l_20 = l_40->args[1].object;
-                    if (l_20 != 0) quest_face_remove(l_20->id);
-                    quest_op_done(a1, l_40);
+                if (((int)(short)(op->flags & 1)) == 0 && quest_arg_state(op, 0) != 0) {
+                    object = op->args[1].object;
+                    if (object != 0) quest_face_remove(object->id);
+                    quest_op_done(quest, op);
                 }
                 break;
             case 65:
-                if (((int)(short)(l_40->flags & 1)) == 0 && quest_arg_state(l_40, 0) != 0) {
-                    *(short *)(region_legal_reputation + (((int)(unsigned char)current_region) * 80)) += (short)l_40->args[1].value;
+                if (((int)(short)(op->flags & 1)) == 0 && quest_arg_state(op, 0) != 0) {
+                    *(short *)(region_legal_reputation + (((int)(unsigned char)current_region) * 80)) += (short)op->args[1].value;
                     if (((int)(short)*(short *)(region_legal_reputation + (((int)(unsigned char)current_region) * 80))) > 100) {
                         *(short *)(region_legal_reputation + (((int)(unsigned char)current_region) * 80)) = 100;
                     }
                     if (((int)(short)*(short *)(region_legal_reputation + (((int)(unsigned char)current_region) * 80))) < (-100)) {
                         *(short *)(region_legal_reputation + (((int)(unsigned char)current_region) * 80)) = 65436;
                     }
-                    quest_op_done(a1, l_40);
+                    quest_op_done(quest, op);
                 }
                 break;
             case 66:
-                if (((int)(short)(l_40->flags & 1)) == 0 && quest_arg_state(l_40, 0) != 0) {
-                    a1->text_file = (short)l_40->args[1].value;
-                    quest_op_done(a1, l_40);
+                if (((int)(short)(op->flags & 1)) == 0 && quest_arg_state(op, 0) != 0) {
+                    quest->text_file = (short)op->args[1].value;
+                    quest_op_done(quest, op);
                 }
                 break;
             case 67:
-                if (((int)(short)(l_40->flags & 1)) == 0) {
-                    l_2C = l_40->args[0].value + ((int)quest_global_states);
-                    l_28 = l_40->args[1].value + ((int)quest_global_states);
-                    l_24 = 0;
-                    while (l_24 < 8) {
-                        if (*(signed char *)((char *)(l_2C + l_24)) != 0) {
-                            l_38 = l_24 * 19;
+                if (((int)(short)(op->flags & 1)) == 0) {
+                    group_states = op->args[0].value + quest_global_states;
+                    faction_states = op->args[1].value + quest_global_states;
+                    i = 0;
+                    while (i < 8) {
+                        if (group_states[i] != 0) {
+                            text_delta = i * 19;
                             break;
                         }
-                        l_24++;
+                        i++;
                     }
-                    if (l_24 == 8) {
-                        a1->text_file = (short)l_40->args[3].value;
+                    if (i == 8) {
+                        quest->text_file = (short)op->args[3].value;
                         break;
                     }
-                    l_24 = 0;
-                    while (l_24 < 10) {
-                        if (*(signed char *)((char *)(l_28 + l_24)) != 0) {
-                            if (l_24 < 9) {
-                                l_38 = l_24 * 2;
-                            } else if (l_24 == 9) {
-                                l_38 += 19;
+                    i = 0;
+                    while (i < 10) {
+                        if (faction_states[i] != 0) {
+                            if (i < 9) {
+                                text_delta = i * 2;
+                            } else if (i == 9) {
+                                text_delta += 19;
                             }
                             break;
                         }
-                        l_24++;
+                        i++;
                     }
-                    if (l_24 == 10) {
-                        a1->text_file = (short)l_40->args[3].value;
+                    if (i == 10) {
+                        quest->text_file = (short)op->args[3].value;
                         break;
                     }
-                    if (l_24 != 9 && faction_find(D_0017A120[l_24])->reputation >= l_40->args[2].value) {
-                        l_38++;
+                    if (i != 9 && faction_find(D_0017A120[i])->reputation >= op->args[2].value) {
+                        text_delta++;
                     }
-                    a1->text_file += (short)l_40->args[3].value;
+                    quest->text_file += (short)op->args[3].value;
                 }
                 break;
             case 68:
-                if (((int)(short)(l_40->flags & 1)) == 0 && quest_arg_state(l_40, 0) != 0) {
-                    func_00030F63(a1, l_40);
-                    quest_op_done(a1, l_40);
+                if (((int)(short)(op->flags & 1)) == 0 && quest_arg_state(op, 0) != 0) {
+                    func_00030F63(quest, op);
+                    quest_op_done(quest, op);
                 }
                 break;
             case 69:
-                if (((int)(short)(l_40->flags & 1)) == 0 && quest_arg_state(l_40, 0) != 0) {
-                    qaction_op69_cast_spell_on_foe(a1, l_40);
-                    quest_op_done(a1, l_40);
+                if (((int)(short)(op->flags & 1)) == 0 && quest_arg_state(op, 0) != 0) {
+                    qaction_op69_cast_spell_on_foe(quest, op);
+                    quest_op_done(quest, op);
                 }
                 break;
             case 70:
-                if (((int)(short)(l_40->flags & 1)) == 0 && quest_arg_state(l_40, 0) != 0) {
-                    if (qcond_op70_player_has_items(a1, l_40) != 0) quest_op_done(a1, l_40);
+                if (((int)(short)(op->flags & 1)) == 0 && quest_arg_state(op, 0) != 0) {
+                    if (qcond_op70_player_has_items(quest, op) != 0) quest_op_done(quest, op);
                 }
                 break;
             case 72:
-                if (((int)(short)(l_40->flags & 1)) == 0 && quest_arg_state(l_40, 0) != 0) {
-                    disease_infect((int)player_entity, 0, l_40->args[1].value, 1);
-                    quest_op_done(a1, l_40);
+                if (((int)(short)(op->flags & 1)) == 0 && quest_arg_state(op, 0) != 0) {
+                    disease_infect((int)player_entity, 0, op->args[1].value, 1);
+                    quest_op_done(quest, op);
                 }
                 break;
             case 74:
-                if (((int)(short)(l_40->flags & 1)) == 0) {
+                if (((int)(short)(op->flags & 1)) == 0) {
                     if (location_contains(player_object->x, player_object->z) != 0) {
-                        if (current_location->kind >= l_40->args[1].value && current_location->kind <= l_40->args[2].value) {
-                            quest_set_state(a1, l_40, 1);
-                            quest_op_done(a1, l_40);
+                        if (current_location->kind >= op->args[1].value && current_location->kind <= op->args[2].value) {
+                            quest_set_state(quest, op, 1);
+                            quest_op_done(quest, op);
                         }
                     }
                 }
                 break;
             case 27:
-                if (((int)(short)(l_40->flags & 1)) == 0 && quest_arg_state(l_40, 0) != 0) {
-                    location_reveal(l_40->args[2].value, l_40->args[3].value);
-                    quest_op_done(a1, l_40);
+                if (((int)(short)(op->flags & 1)) == 0 && quest_arg_state(op, 0) != 0) {
+                    location_reveal(op->args[2].value, op->args[3].value);
+                    quest_op_done(quest, op);
                 }
                 break;
             case 75:
-                if (quest_arg_state(l_40, 0) != 0) {
-                    *(int *)D_00195984 = (int)l_40->args[1].record;
-                    D_00195988 = (int)l_40->args[2].record;
-                    D_0019598C = (int)l_40->args[3].record;
-                    D_00195990 = (int)l_40->args[4].record;
+                if (quest_arg_state(op, 0) != 0) {
+                    *(int *)D_00195984 = (int)op->args[1].record;
+                    D_00195988 = (int)op->args[2].record;
+                    D_0019598C = (int)op->args[3].record;
+                    D_00195990 = (int)op->args[4].record;
                 }
                 break;
             case 76:
-                if (((int)(short)(l_40->flags & 1)) == 0 && quest_arg_state(l_40, 0) != 0) {
+                if (((int)(short)(op->flags & 1)) == 0 && quest_arg_state(op, 0) != 0) {
                     if (((int)(unsigned char)game_mode) == 19) {
                         travel_button_exit(100);
-                        func_00031658(a1, l_40, 1);
+                        func_00031658(quest, op, 1);
                     } else {
-                        func_00031658(a1, l_40, 0);
+                        func_00031658(quest, op, 0);
                     }
                 }
                 break;
             case 77:
-                quest_set_arg_state(a1, l_40, 0, ((player_character->level >= l_40->args[1].value) ? 1 : 0));
+                quest_set_arg_state(quest, op, 0, ((player_character->level >= op->args[1].value) ? 1 : 0));
                 break;
             case 79:
-                if (quest_arg_state(l_40, 0) == 0) {
+                if (quest_arg_state(op, 0) == 0) {
                     if (D_00196298 != 0) {
                         D_00196298 = 0;
-                        l_1C = faction_find((short)l_40->args[1].value);
-                        if (l_1C->reputation >= l_40->args[2].value) {
-                            quest_set_arg_state(a1, l_40, 0, 1);
+                        faction = faction_find((short)op->args[1].value);
+                        if (faction->reputation >= op->args[2].value) {
+                            quest_set_arg_state(quest, op, 0, 1);
                         }
                     }
                 }
                 break;
             case 80:
-                if (quest_arg_state(l_40, 0) != 0) quest_show_message(a1, l_40->message);
+                if (quest_arg_state(op, 0) != 0) quest_show_message(quest, op->message);
                 break;
             case 81:
-                if (((int)(short)(l_40->flags & 1)) == 0 && quest_arg_state(l_40, 0) != 0) {
-                    if (l_40->args[1].record != 0) {
-                        ((struct qbn_item *)l_40->args[1].record)->flags |= 64;
+                if (((int)(short)(op->flags & 1)) == 0 && quest_arg_state(op, 0) != 0) {
+                    if (op->args[1].record != 0) {
+                        ((struct qbn_item *)op->args[1].record)->flags |= 64;
                     }
-                    if (l_40->args[2].record != 0) {
-                        ((struct qbn_person *)l_40->args[2].record)->flags |= 0x4000;
+                    if (op->args[2].record != 0) {
+                        ((struct qbn_person *)op->args[2].record)->flags |= 0x4000;
                     }
                 }
                 break;
             case 82:
-                if (quest_arg_state(l_40, 0) != 0) {
-                    ((struct qbn_person *)l_40->args[1].record)->flags |= 0x2000;
+                if (quest_arg_state(op, 0) != 0) {
+                    ((struct qbn_person *)op->args[1].record)->flags |= 0x2000;
                 } else {
-                    ((struct qbn_person *)l_40->args[1].record)->flags &= ~0x2000;
+                    ((struct qbn_person *)op->args[1].record)->flags &= ~0x2000;
                 }
                 break;
             case 83:
-                if (((int)(short)(l_40->flags & 1)) == 0 && quest_arg_state(l_40, 0) != 0) {
-                    qaction_op83_teleport_pc(l_40);
+                if (((int)(short)(op->flags & 1)) == 0 && quest_arg_state(op, 0) != 0) {
+                    qaction_op83_teleport_pc(op);
                 }
                 break;
             case 84:
-                if (quest_arg_state(l_40, 0) != 0) {
-                    if (game_minutes != l_40->last_minutes && (((unsigned)game_minutes) % l_40->args[2].value) == 0 && rand_range(1, 100) <= l_40->args[3].value) {
-                        l_40->last_minutes = game_minutes;
-                        sound_play(l_40->args[1].value, (int)player_object, 110);
-                        quest_op_done(a1, l_40);
+                if (quest_arg_state(op, 0) != 0) {
+                    if (game_minutes != op->last_minutes && (((unsigned)game_minutes) % op->args[2].value) == 0 && rand_range(1, 100) <= op->args[3].value) {
+                        op->last_minutes = game_minutes;
+                        sound_play(op->args[1].value, (int)player_object, 110);
+                        quest_op_done(quest, op);
                     }
                 }
                 break;
             case 85:
-                if (((int)(short)(l_40->flags & 1)) == 0 && quest_arg_state(l_40, 0) != 0) {
-                    if (l_40->args[1].object != 0) {
-                        faction_find(l_40->args[1].object->faction_id)->flags |= 0x200;
+                if (((int)(short)(op->flags & 1)) == 0 && quest_arg_state(op, 0) != 0) {
+                    if (op->args[1].object != 0) {
+                        faction_find(op->args[1].object->faction_id)->flags |= 0x200;
                     }
-                    quest_op_done(a1, l_40);
+                    quest_op_done(quest, op);
                 }
                 break;
             case 86:
-                if (((int)(short)(l_40->flags & 1)) == 0 && quest_arg_state(l_40, 0) != 0) {
-                    if (l_40->args[1].object != 0) {
-                        faction_find(l_40->args[1].object->faction_id)->flags &= ~0x200;
+                if (((int)(short)(op->flags & 1)) == 0 && quest_arg_state(op, 0) != 0) {
+                    if (op->args[1].object != 0) {
+                        faction_find(op->args[1].object->faction_id)->flags &= ~0x200;
                     }
-                    quest_op_done(a1, l_40);
+                    quest_op_done(quest, op);
                 }
             }
         }
         *(int *)D_00195984 = (D_00195988 = (D_0019598C = (D_00195990 = 0)));
-        if (l_34 == 0) quest_timers_update(a1);
+        if (ended == 0) quest_timers_update(quest);
         if (quest_reward_container == 0 || quest_reward_container->children == 0 || ((int)(unsigned char)game_mode) == 4) {
             return;
         }
@@ -737,385 +737,385 @@ void quest_run_opcodes(struct quest *a1)
     }
 }
 
-int quest_dispatch_event(struct quest *a1)
+int quest_dispatch_event(struct quest *quest)
 {
-    struct qbn_op *l_30;
-    int l_2C;
-    int l_28;
-    int l_24;
-    int l_20;
-    int l_1C;
+    struct qbn_op *op;
+    int op_index;
+    int fired;
+    int has_person;
+    int unused;
+    struct qbn_person *qbn_person;
 
-    l_30 = quest_section(a1, 8);
-    l_28 = 0;
-    l_24 = 0;
-    for (l_2C = 0; a1->section_counts[8] > l_2C; l_2C++, l_30++) {
-        if (l_30->opcode == quest_event_code) {
-            switch (l_30->opcode) {
+    op = quest_section(quest, 8);
+    fired = 0;
+    has_person = 0;
+    for (op_index = 0; quest->section_counts[8] > op_index; op_index++, op++) {
+        if (op->opcode == quest_event_code) {
+            switch (op->opcode) {
             case 71:
-                if (((int)(short)(l_30->flags & 1)) == 0) {
-                    if (quest_event_object->twin != l_30->args[3].object) break;
-                    if (((unsigned)player_character->gold) >= l_30->args[2].value) {
-                        player_character->gold -= l_30->args[2].value;
-                        quest_set_arg_state(a1, l_30, 0, 1);
-                        quest_set_arg_state(a1, l_30, 1, 0);
-                        l_30->flags |= 1;
-                        quest_op_done(a1, l_30);
-                        l_28 = 1;
-                        l_24 = 1;
-                        l_1C = (int)l_30->args[3].record;
+                if (((int)(short)(op->flags & 1)) == 0) {
+                    if (quest_event_object->twin != op->args[3].object) break;
+                    if (((unsigned)player_character->gold) >= op->args[2].value) {
+                        player_character->gold -= op->args[2].value;
+                        quest_set_arg_state(quest, op, 0, 1);
+                        quest_set_arg_state(quest, op, 1, 0);
+                        op->flags |= 1;
+                        quest_op_done(quest, op);
+                        fired = 1;
+                        has_person = 1;
+                        qbn_person = (struct qbn_person *)op->args[3].record;
                     } else {
-                        quest_set_arg_state(a1, l_30, 0, 0);
-                        quest_set_arg_state(a1, l_30, 1, 1);
+                        quest_set_arg_state(quest, op, 0, 0);
+                        quest_set_arg_state(quest, op, 1, 1);
                     }
                 }
                 break;
             case 28:
-                if (qcond_op28_npc_clicked(a1, l_30) != 0) {
-                    quest_op_done(a1, l_30);
-                    l_28 = 1;
-                    l_24 = 1;
-                    l_1C = (int)l_30->args[1].record;
+                if (qcond_op28_npc_clicked(quest, op) != 0) {
+                    quest_op_done(quest, op);
+                    fired = 1;
+                    has_person = 1;
+                    qbn_person = (struct qbn_person *)op->args[1].record;
                 }
                 break;
             case 3:
-                if (qcond_op03_item_found(a1, l_30) != 0) quest_op_done(a1, l_30);
+                if (qcond_op03_item_found(quest, op) != 0) quest_op_done(quest, op);
                 break;
             case 5:
-                if (qcond_op05_item_dropped_at_place(a1, l_30) != 0) quest_op_done(a1, l_30);
+                if (qcond_op05_item_dropped_at_place(quest, op) != 0) quest_op_done(quest, op);
                 break;
             case 1:
-                if (qcond_op01_item_given_to_npc(a1, l_30) != 0) {
-                    quest_op_done(a1, l_30);
-                    l_28 = 1;
-                    l_24 = 1;
-                    l_1C = (int)l_30->args[2].record;
+                if (qcond_op01_item_given_to_npc(quest, op) != 0) {
+                    quest_op_done(quest, op);
+                    fired = 1;
+                    has_person = 1;
+                    qbn_person = (struct qbn_person *)op->args[2].record;
                 }
                 break;
             case 2:
-                if (qcond_op02_foe_killed(a1, l_30) != 0) quest_op_done(a1, l_30);
+                if (qcond_op02_foe_killed(quest, op) != 0) quest_op_done(quest, op);
                 break;
             case 21:
-                if (qcond_op21_foe_hurt(a1, l_30) != 0) quest_op_done(a1, l_30);
+                if (qcond_op21_foe_hurt(quest, op) != 0) quest_op_done(quest, op);
                 break;
             case 73:
-                if (((int)(short)(l_30->flags & 1)) == 0 && quest_arg_state(l_30, 0) != 0) {
-                    if (quest_event_object->data.spell.id == l_30->args[2].value) {
-                        quest_set_arg_state(a1, l_30, 1, 1);
-                        l_30->flags |= 1;
+                if (((int)(short)(op->flags & 1)) == 0 && quest_arg_state(op, 0) != 0) {
+                    if (quest_event_object->data.spell.id == op->args[2].value) {
+                        quest_set_arg_state(quest, op, 1, 1);
+                        op->flags |= 1;
                     }
                 }
                 break;
             case 78:
-                if (quest_event_object->data.person.faction_id == l_30->args[1].value) {
-                    quest_set_arg_state(a1, l_30, 1, 1);
-                    quest_op_done(a1, l_30);
-                    l_28 = 1;
+                if (quest_event_object->data.person.faction_id == op->args[1].value) {
+                    quest_set_arg_state(quest, op, 1, 1);
+                    quest_op_done(quest, op);
+                    fired = 1;
                 }
             }
         }
     }
-    if (l_24 != 0 && ((int)(short)(*(short *)((char *)l_1C + 2) & 8192)) != 0) return 0;
-    return l_28;
+    if (has_person != 0 && ((short)qbn_person->flags & 8192) != 0) return 0;
+    return fired;
 }
 
 void quest_debug_next(void)
 {
-    struct record *l_20;
-    int l_1C;
-    int l_18;
+    struct record *object;
+    int unused;
+    int found_current;
 
-    l_18 = 0;
-    l_20 = quest_root->children;
-    if (l_20 != 0 && quest_debug_object == 0) {
-        quest_debug_object = (int)l_20;
-        quest_debug_data = (int)&l_20->data.quest;
+    found_current = 0;
+    object = quest_root->children;
+    if (object != 0 && quest_debug_object == 0) {
+        quest_debug_object = (int)object;
+        quest_debug_data = (int)&object->data.quest;
         return;
     }
-    while (l_20 != 0) {
-        if (l_20->type == 14) {
-            if (l_18 != 0) {
-                quest_debug_object = (int)l_20;
-                quest_debug_data = (int)&l_20->data.quest;
+    while (object != 0) {
+        if (object->type == 14) {
+            if (found_current != 0) {
+                quest_debug_object = (int)object;
+                quest_debug_data = (int)&object->data.quest;
                 return;
             }
-            if ((int)l_20 == quest_debug_object) l_18 = 1;
+            if ((int)object == quest_debug_object) found_current = 1;
         }
-        l_20 = l_20->next;
+        object = object->next;
     }
-    if (l_18 == 0) return;
-    l_20 = quest_root->children;
-    quest_debug_object = (int)l_20;
-    quest_debug_data = (int)&l_20->data.quest;
+    if (found_current == 0) return;
+    object = quest_root->children;
+    quest_debug_object = (int)object;
+    quest_debug_data = (int)&object->data.quest;
 }
 
-void quests_unlink_all(struct record *a1)
+void quests_unlink_all(struct record *object)
 {
-    a1 = a1->children;
-    while (a1 != 0) {
-        if (a1->type == 14) quest_unlink_for_save(&a1->data.quest);
-        a1 = a1->next;
-    }
-}
-
-void quests_relink_all(struct record *a1)
-{
-    a1 = a1->children;
-    while (a1 != 0) {
-        if (a1->type == 14) quest_relink_after_load(&a1->data.quest);
-        a1 = a1->next;
+    object = object->children;
+    while (object != 0) {
+        if (object->type == 14) quest_unlink_for_save(&object->data.quest);
+        object = object->next;
     }
 }
 
-void quest_relink_after_load(struct quest *a1)
+void quests_relink_all(struct record *object)
 {
-    struct qbn_op *l_48;
-    struct qbn_arg *l_44;
-    int l_40;
-    struct qbn_text_var *l_3C;
-    struct qbn_place *l_38;
-    struct qbn_person *l_34;
-    struct qbn_item *l_30;
-    struct qbn_foe *l_2C;
-    int l_28;
-    int l_24;
-    int l_20;
-    int l_1C;
-    struct qbn_timer *l_18;
+    object = object->children;
+    while (object != 0) {
+        if (object->type == 14) quest_relink_after_load(&object->data.quest);
+        object = object->next;
+    }
+}
 
-    l_48 = (struct qbn_op *)((int)a1 + a1->section_offsets[8]);
-    for (l_1C = 0; a1->section_counts[8] > l_1C; l_1C++, l_48++) {
-        l_44 = l_48->args;
-        l_48->arg_count = ((int)(unsigned char)*(signed char *)((char *)(int)(*(char **)&qbn_opcode_arg_counts + l_48->opcode))) - 48;
-        for (l_20 = 0; l_48->arg_count > l_20; l_20++, l_44++) {
-            if (l_44->record != 0) l_44->record += (int)a1;
-            if (l_44->object != 0) {
-                l_44->object = (struct record *)object_find_by_id(nonworld_root, (int)l_44->object);
+void quest_relink_after_load(struct quest *quest)
+{
+    struct qbn_op *op;
+    struct qbn_arg *arg;
+    int unused1;
+    struct qbn_text_var *text_var;
+    struct qbn_place *qbn_place;
+    struct qbn_person *qbn_person;
+    struct qbn_item *qbn_item;
+    struct qbn_foe *foe;
+    int unused2;
+    int unused3;
+    int j;
+    int i;
+    struct qbn_timer *timer;
+
+    op = (struct qbn_op *)((int)quest + quest->section_offsets[8]);
+    for (i = 0; quest->section_counts[8] > i; i++, op++) {
+        arg = op->args;
+        op->arg_count = ((int)(unsigned char)*(signed char *)((char *)(int)(*(char **)&qbn_opcode_arg_counts + op->opcode))) - 48;
+        for (j = 0; op->arg_count > j; j++, arg++) {
+            if (arg->record != 0) arg->record += (int)quest;
+            if (arg->object != 0) {
+                arg->object = (struct record *)object_find_by_id(nonworld_root, (int)arg->object);
             }
         }
     }
-    l_34 = (struct qbn_person *)((int)a1 + a1->section_offsets[3]);
-    for (l_1C = 0; a1->section_counts[3] > l_1C; l_1C++, l_34++) {
-        if (l_34->object != 0) {
-            l_34->object = (struct record *)object_find_by_id(nonworld_root, (int)l_34->object);
-            if (l_34->object != 0 && l_34->object->type == 65 && l_34->object->faction_id == 0) {
-                l_34->object->faction_id = l_34->faction_id;
+    qbn_person = (struct qbn_person *)((int)quest + quest->section_offsets[3]);
+    for (i = 0; quest->section_counts[3] > i; i++, qbn_person++) {
+        if (qbn_person->object != 0) {
+            qbn_person->object = (struct record *)object_find_by_id(nonworld_root, (int)qbn_person->object);
+            if (qbn_person->object != 0 && qbn_person->object->type == 65 && qbn_person->object->faction_id == 0) {
+                qbn_person->object->faction_id = qbn_person->faction_id;
             }
         }
     }
-    l_38 = (struct qbn_place *)((int)a1 + a1->section_offsets[4]);
-    for (l_1C = 0; a1->section_counts[4] > l_1C; l_1C++, l_38++) {
-        if (l_38->object != 0) {
-            l_38->object = (struct record *)object_find_by_id(nonworld_root, (int)l_38->object);
-            if (l_38->object == 0) fatal_error((int)D_001708ED);
+    qbn_place = (struct qbn_place *)((int)quest + quest->section_offsets[4]);
+    for (i = 0; quest->section_counts[4] > i; i++, qbn_place++) {
+        if (qbn_place->object != 0) {
+            qbn_place->object = (struct record *)object_find_by_id(nonworld_root, (int)qbn_place->object);
+            if (qbn_place->object == 0) fatal_error((int)D_001708ED);
         }
     }
-    l_30 = (struct qbn_item *)((int)a1 + a1->section_offsets[0]);
-    for (l_1C = 0; a1->section_counts[0] > l_1C; l_1C++, l_30++) {
-        if (l_30->object != 0) {
-            l_30->object = (struct record *)object_find_by_id(nonworld_root, (int)l_30->object);
+    qbn_item = (struct qbn_item *)((int)quest + quest->section_offsets[0]);
+    for (i = 0; quest->section_counts[0] > i; i++, qbn_item++) {
+        if (qbn_item->object != 0) {
+            qbn_item->object = (struct record *)object_find_by_id(nonworld_root, (int)qbn_item->object);
         }
-        if (l_30->object == 0) {
-            l_30->object = (struct record *)object_find_by_id(location_object, (int)l_30->object);
-        }
-    }
-    l_2C = (struct qbn_foe *)((int)a1 + a1->section_offsets[7]);
-    for (l_1C = 0; a1->section_counts[7] > l_1C; l_1C++, l_2C++) {
-        if (l_2C->object != 0) {
-            l_2C->object = (struct record *)object_find_by_id(nonworld_root, (int)l_2C->object);
+        if (qbn_item->object == 0) {
+            qbn_item->object = (struct record *)object_find_by_id(location_object, (int)qbn_item->object);
         }
     }
-    l_18 = (struct qbn_timer *)((int)a1 + a1->section_offsets[6]);
-    for (l_1C = 0; a1->section_counts[6] > l_1C; l_1C++, l_18++) {
-        if (l_18->link1 != 0) l_18->link1 = object_find_by_id(nonworld_root, (int)l_18->link1);
-        if (l_18->link2 != 0) l_18->link2 = object_find_by_id(nonworld_root, (int)l_18->link2);
+    foe = (struct qbn_foe *)((int)quest + quest->section_offsets[7]);
+    for (i = 0; quest->section_counts[7] > i; i++, foe++) {
+        if (foe->object != 0) {
+            foe->object = (struct record *)object_find_by_id(nonworld_root, (int)foe->object);
+        }
     }
-    if (a1->text_offset == 0) return;
-    l_3C = (struct qbn_text_var *)((int)a1 + a1->text_offset);
-    while (l_3C->name[0] != 0) {
-        l_3C->record = quest_record(a1, (int)(short)((unsigned short)l_3C->section), l_3C->index);
-        l_3C++;
+    timer = (struct qbn_timer *)((int)quest + quest->section_offsets[6]);
+    for (i = 0; quest->section_counts[6] > i; i++, timer++) {
+        if (timer->link1 != 0) timer->link1 = object_find_by_id(nonworld_root, (int)timer->link1);
+        if (timer->link2 != 0) timer->link2 = object_find_by_id(nonworld_root, (int)timer->link2);
+    }
+    if (quest->text_offset == 0) return;
+    text_var = (struct qbn_text_var *)((int)quest + quest->text_offset);
+    while (text_var->name[0] != 0) {
+        text_var->record = quest_record(quest, (int)(short)((unsigned short)text_var->section), text_var->index);
+        text_var++;
     }
 }
 
-int quest_event_clicked_faction(unsigned short a1)
+int quest_event_clicked_faction(unsigned short faction_id)
 {
-    struct record *l_2C;
-    struct record *l_28;
-    struct qbn_op *l_30;
-    short l_20;
-    short l_1C;
+    struct record *object;
+    struct record *next;
+    struct qbn_op *op;
+    int op_index;
+    int found;
 
-    *(int *)&l_1C = 0;
-    l_2C = quest_root->children;
-    while (l_2C != 0) {
-        l_28 = l_2C->next;
-        if (l_2C->type == 14) {
-            quest_tick_object = l_2C;
-            current_quest = (struct quest *)((*(int *)&quest_tick_data = (int)&l_2C->data.quest));
-            l_30 = quest_section(current_quest, 8);
-            *(int *)&l_20 = 0;
-            for (; current_quest->section_counts[8] > *(int *)&l_20; (*(int *)&l_20)++, l_30++) {
-                if (l_30->opcode == 78 && ((int)(unsigned short)a1) == l_30->args[1].value) {
-                    quest_set_arg_state(current_quest, l_30, 0, 1);
-                    *(int *)&l_1C = 1;
+    found = 0;
+    object = quest_root->children;
+    while (object != 0) {
+        next = object->next;
+        if (object->type == 14) {
+            quest_tick_object = object;
+            current_quest = (struct quest *)((*(int *)&quest_tick_data = (int)&object->data.quest));
+            op = quest_section(current_quest, 8);
+            op_index = 0;
+            for (; current_quest->section_counts[8] > op_index; op_index++, op++) {
+                if (op->opcode == 78 && ((int)(unsigned short)faction_id) == op->args[1].value) {
+                    quest_set_arg_state(current_quest, op, 0, 1);
+                    found = 1;
                 }
             }
         }
-        l_2C = l_28;
+        object = next;
     }
-    return *(int *)&l_1C;
+    return found;
 }
 
-int quest_place_or_person_object(struct quest *a1, int a2, short a3)
+int quest_place_or_person_object(struct quest *quest, int record_index, short is_person)
 {
-    if (a3 == 0) return *(int *)((char *)quest_record(a1, 4, (int)(short)*(short *)&a2) + 16);
-    return *(int *)((char *)quest_record(a1, 3, (int)(short)*(short *)&a2) + 12);
+    if (is_person == 0) return (int)((struct qbn_place *)quest_record(quest, 4, (int)(short)*(short *)&record_index))->object;
+    return (int)((struct qbn_person *)quest_record(quest, 3, (int)(short)*(short *)&record_index))->object;
 }
 
-void quest_timer_expire(struct quest *a1, struct qbn_timer *a2)
+void quest_timer_expire(struct quest *quest, struct qbn_timer *timer)
 {
-    struct qbn_state *l_1C;
-    int l_18;
-    int l_14;
+    struct qbn_state *state;
+    int state_count;
+    int expired;
 
-    if (((int)(short)(a2->flags & 3)) != 0) {
-        a2->flags |= 128;
-    } else if (((int)(short)(a2->flags & 4)) != 0) {
-        a2->flags ^= 128;
+    if (((int)(short)(timer->flags & 3)) != 0) {
+        timer->flags |= 128;
+    } else if (((int)(short)(timer->flags & 4)) != 0) {
+        timer->flags ^= 128;
     }
-    if (((int)(short)(a2->flags & 8)) != 0) {
-        quest_timer_update(a1, a2, 1);
+    if (((int)(short)(timer->flags & 8)) != 0) {
+        quest_timer_update(quest, timer, 1);
     } else {
-        a2->flags &= ~0x40;
+        timer->flags &= ~0x40;
     }
-    l_18 = a1->section_counts[9];
-    l_1C = quest_record(a1, 9, 0);
-    while (l_18 != 0) {
-        if (l_1C->name_hash == a2->state_hash) {
-            l_14 = (int)(short)(a2->flags & 128);
-            if (l_1C->is_global != 0) {
-                quest_global_states[l_1C->value] = *(signed char *)&l_14;
+    state_count = quest->section_counts[9];
+    state = quest_record(quest, 9, 0);
+    while (state_count != 0) {
+        if (state->name_hash == timer->state_hash) {
+            expired = (int)(short)(timer->flags & 128);
+            if (state->is_global != 0) {
+                quest_global_states[state->value] = *(signed char *)&expired;
             } else {
-                l_1C->value = *(signed char *)&l_14;
+                state->value = *(signed char *)&expired;
             }
             return;
         }
-        l_1C++;
-        l_18--;
+        state++;
+        state_count--;
     }
 }
 
-void quest_timer_clear_state(struct qbn_timer *a1)
+void quest_timer_clear_state(struct qbn_timer *timer)
 {
-    int l_1C;
-    struct qbn_state *l_18;
+    int state_count;
+    struct qbn_state *state;
 
-    l_1C = current_quest->section_counts[9];
-    l_18 = quest_record(current_quest, 9, 0);
-    while (l_1C != 0) {
-        if (l_18->name_hash == a1->state_hash) {
-            if (l_18->is_global != 0) {
-                quest_global_states[l_18->value] = 0;
+    state_count = current_quest->section_counts[9];
+    state = quest_record(current_quest, 9, 0);
+    while (state_count != 0) {
+        if (state->name_hash == timer->state_hash) {
+            if (state->is_global != 0) {
+                quest_global_states[state->value] = 0;
             } else {
-                l_18->value = 0;
+                state->value = 0;
             }
             return;
         }
-        l_18++;
-        l_1C--;
+        state++;
+        state_count--;
     }
 }
 
-int quest_state_from_timer(struct quest *a1, struct qbn_op *a2)
+int quest_state_from_timer(struct quest *quest, struct qbn_op *op)
 {
-    struct qbn_timer *l_20;
-    struct qbn_state *l_1C;
-    short l_14;
+    struct qbn_timer *timer;
+    struct qbn_state *state;
+    short expired;
 
-    if (a2->args[0].value == (-1)) return 0;
-    l_20 = quest_record(a1, 6, (short)a2->args[1].value);
-    l_1C = quest_record(a1, 9, (short)a2->args[0].value);
-    l_14 = l_20->flags & 128;
-    if (l_1C->is_global != 0) {
-        quest_global_states[l_1C->value] = *(signed char *)&l_14;
+    if (op->args[0].value == (-1)) return 0;
+    timer = quest_record(quest, 6, (short)op->args[1].value);
+    state = quest_record(quest, 9, (short)op->args[0].value);
+    expired = timer->flags & 128;
+    if (state->is_global != 0) {
+        quest_global_states[state->value] = *(signed char *)&expired;
     } else {
-        l_1C->value = *(signed char *)&l_14;
+        state->value = *(signed char *)&expired;
     }
-    return (int)(short)l_14;
+    return (int)(short)expired;
 }
 
-int qaction_op25_countdown(struct quest *a1, struct qbn_op *a2)
+int qaction_op25_countdown(struct quest *quest, struct qbn_op *op)
 {
-    struct qbn_arg *l_1C;
-    struct qbn_state *l_18;
+    struct qbn_arg *counter;
+    struct qbn_state *state;
 
-    l_1C = &a2->args[2];
-    l_18 = (struct qbn_state *)a2->args[1].record;
-    if (l_18->is_global != 0) {
-        if (quest_global_states[l_18->value] != 0) return 0;
-    } else if (l_18->value != 0) {
+    counter = &op->args[2];
+    state = (struct qbn_state *)op->args[1].record;
+    if (state->is_global != 0) {
+        if (quest_global_states[state->value] != 0) return 0;
+    } else if (state->value != 0) {
         return 0;
     }
-    if (l_1C->value != 0) l_1C->value--;
-    if (l_1C->value == 0) {
-        if (a2->args[1].value == (-1)) return 1;
-        if (l_18->is_global != 0) {
-            quest_global_states[l_18->value] = 1;
+    if (counter->value != 0) counter->value--;
+    if (counter->value == 0) {
+        if (op->args[1].value == (-1)) return 1;
+        if (state->is_global != 0) {
+            quest_global_states[state->value] = 1;
         } else {
-            l_18->value = 1;
+            state->value = 1;
         }
         return 1;
     }
     return 0;
 }
 
-void qaction_op11_remove_topics(struct quest *a1, struct qbn_op *a2)
+void qaction_op11_remove_topics(struct quest *quest, struct qbn_op *op)
 {
-    int l_20;
-    struct qbn_place *l_1C;
-    struct qbn_person *l_18;
-    struct qbn_item *l_14;
+    int i;
+    struct qbn_place *qbn_place;
+    struct qbn_person *qbn_person;
+    struct qbn_item *qbn_item;
 
-    for (l_20 = 1; l_20 < 4; l_20++) {
-        if (a2->args[l_20].value == (-1)) continue;
-        switch ((unsigned)l_20) {
+    for (i = 1; i < 4; i++) {
+        if (op->args[i].value == (-1)) continue;
+        switch ((unsigned)i) {
         case 1:
-            l_1C = quest_record(a1, 4, (short)a2->args[l_20].value);
-            l_1C->flags |= 128;
+            qbn_place = quest_record(quest, 4, (short)op->args[i].value);
+            qbn_place->flags |= 128;
             break;
         case 2:
-            l_18 = quest_record(a1, 3, (short)a2->args[l_20].value);
-            l_18->flags |= 0x8000;
+            qbn_person = quest_record(quest, 3, (short)op->args[i].value);
+            qbn_person->flags |= 0x8000;
             break;
         case 3:
-            l_14 = quest_record(a1, 0, (short)a2->args[l_20].value);
-            l_14->flags |= 128;
+            qbn_item = quest_record(quest, 0, (short)op->args[i].value);
+            qbn_item->flags |= 128;
         }
     }
 }
 
-void qaction_op10_add_topics(struct quest *a1, struct qbn_op *a2)
+void qaction_op10_add_topics(struct quest *quest, struct qbn_op *op)
 {
-    int l_20;
-    struct qbn_place *l_1C;
-    struct qbn_person *l_18;
-    struct qbn_item *l_14;
+    int i;
+    struct qbn_place *qbn_place;
+    struct qbn_person *qbn_person;
+    struct qbn_item *qbn_item;
 
-    for (l_20 = 1; l_20 < 4; l_20++) {
-        if (a2->args[l_20].value == (-1)) continue;
-        switch ((unsigned)l_20) {
+    for (i = 1; i < 4; i++) {
+        if (op->args[i].value == (-1)) continue;
+        switch ((unsigned)i) {
         case 1:
-            l_1C = quest_record(a1, 4, (short)a2->args[l_20].value);
-            l_1C->flags &= 127;
+            qbn_place = quest_record(quest, 4, (short)op->args[i].value);
+            qbn_place->flags &= 127;
             break;
         case 2:
-            l_18 = quest_record(a1, 3, (short)a2->args[l_20].value);
-            l_18->flags &= ~0x8000;
+            qbn_person = quest_record(quest, 3, (short)op->args[i].value);
+            qbn_person->flags &= ~0x8000;
             break;
         case 3:
-            l_14 = quest_record(a1, 0, (short)a2->args[l_20].value);
-            l_14->flags &= 127;
+            qbn_item = quest_record(quest, 0, (short)op->args[i].value);
+            qbn_item->flags &= 127;
         }
     }
 }

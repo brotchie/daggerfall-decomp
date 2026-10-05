@@ -26,21 +26,21 @@ void marquee_stop(void);
 
 void marquee_update(void)
 {
-    int l_1C;
-    int l_18;
+    int char_width;
+    int count;
 
     if (marquee_text == 0) return;
     D_0012B508 = 146;
-    l_18 = (320 - marquee_x) / 4;
-    if (l_18 > 80) l_18 = 80;
-    mc_memcpy((int)text_buffer, marquee_text, l_18, (int)D_001702CC, 35, 160);
-    text_buffer[l_18] = 0;
+    count = (320 - marquee_x) / 4;
+    if (count > 80) count = 80;
+    mc_memcpy((int)text_buffer, marquee_text, count, (int)D_001702CC, 35, 160);
+    text_buffer[count] = 0;
     text_draw((int)text_buffer, marquee_x, 140);
     marquee_x -= 2;
-    l_1C = font_char_width((int)(unsigned char)*(signed char *)(*(char **)&marquee_text));
-    if ((-marquee_x) > l_1C) {
+    char_width = font_char_width((int)(unsigned char)*(signed char *)(*(char **)&marquee_text));
+    if ((-marquee_x) > char_width) {
         marquee_text++;
-        marquee_x += l_1C;
+        marquee_x += char_width;
     }
     if (*(signed char *)(*(char **)&marquee_text) != 0) return;
     marquee_stop();
@@ -56,26 +56,26 @@ void marquee_stop(void)
     marquee_text = 0;
 }
 
-void region_flag_set(int a1, int a2)
+void region_flag_set(int region, int flag)
 {
-    int l_14;
+    int i;
 
-    if (*(signed char *)(region_event_groups + (a1 * 80) + *(unsigned char *)(region_event_flag_groups + a2)) != 0) {
-        for (l_14 = 0; l_14 < 29; l_14++) {
-            if (*(signed char *)(region_event_flag_groups + a2) == *(signed char *)(region_event_flag_groups + l_14)) {
-                region_event_flags[(a1 * 80) + l_14] = 0;
+    if (*(signed char *)(region_event_groups + (region * 80) + *(unsigned char *)(region_event_flag_groups + flag)) != 0) {
+        for (i = 0; i < 29; i++) {
+            if (*(signed char *)(region_event_flag_groups + flag) == *(signed char *)(region_event_flag_groups + i)) {
+                region_event_flags[(region * 80) + i] = 0;
             }
         }
     }
-    region_event_flags[(a1 * 80) + a2] = 1;
-    *(signed char *)(region_event_groups + (a1 * 80) + *(unsigned char *)(region_event_flag_groups + a2)) = 1;
-    region_event_values[(a1 * 80) + a2] = rand_range((int)(unsigned char)region_event_durations[a2 * 2], (int)(unsigned char)D_00178EB0[a2 * 2]);
-    if (a2 != 18) return;
-    *(short *)(region_persecuted_temple + (a1 * 80)) = *(short *)((char *)faction_random_of_type(1) + 33);
+    region_event_flags[(region * 80) + flag] = 1;
+    *(signed char *)(region_event_groups + (region * 80) + *(unsigned char *)(region_event_flag_groups + flag)) = 1;
+    region_event_values[(region * 80) + flag] = rand_range((int)(unsigned char)region_event_durations[flag * 2], (int)(unsigned char)D_00178EB0[flag * 2]);
+    if (flag != 18) return;
+    *(short *)(region_persecuted_temple + (region * 80)) = *(short *)((char *)faction_random_of_type(1) + 33);
 }
 
-void region_flag_clear(int a1, int a2)
+void region_flag_clear(int region, int flag)
 {
-    region_event_flags[(a1 * 80) + a2] = 0;
-    *(signed char *)(region_event_groups + (a1 * 80) + *(unsigned char *)(region_event_flag_groups + a2)) = 0;
+    region_event_flags[(region * 80) + flag] = 0;
+    *(signed char *)(region_event_groups + (region * 80) + *(unsigned char *)(region_event_flag_groups + flag)) = 0;
 }

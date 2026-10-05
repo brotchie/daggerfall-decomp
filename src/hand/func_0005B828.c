@@ -9,24 +9,24 @@ extern struct spell *spell_find_active_effect(struct record *, int, int *, int *
 extern void spell_end(struct record *);
 extern void spfx_effect_end(struct spell *, int, struct record *);
 
-void spell_break_concealment(struct record *a1)
+void spell_break_concealment(struct record *entity)
 {
-    struct spell *l_24;
-    struct character *l_20;
-    int l_1C;
-    int l_18;
+    struct spell *spell;
+    struct character *entity_char;
+    int chance;
+    int i;
 
-    l_20 = &a1->data.character;
-    if ((l_20->conditions & 0x3004) == 0) return;
-    for (l_18 = 0; l_18 < 3; l_18++) {
-        l_24 = spell_find_active_effect(a1, spell_concealment_effects[l_18].id, &l_1C, &l_1C);
-        if (l_24 == 0) {
-            l_20->conditions &= ~spell_concealment_effects[l_18].mask;
+    entity_char = &entity->data.character;
+    if ((entity_char->conditions & 0x3004) == 0) return;
+    for (i = 0; i < 3; i++) {
+        spell = spell_find_active_effect(entity, spell_concealment_effects[i].id, &chance, &chance);
+        if (spell == 0) {
+            entity_char->conditions &= ~spell_concealment_effects[i].mask;
             continue;
         }
-        if (l_24->effects[spell_effect_slot].subtype == 0) {
-            spfx_effect_end(l_24, spell_effect_slot, a1);
-            if (spell_effect_slot == 0 && l_24->effects[1].type == 255)
+        if (spell->effects[spell_effect_slot].subtype == 0) {
+            spfx_effect_end(spell, spell_effect_slot, entity);
+            if (spell_effect_slot == 0 && spell->effects[1].type == 255)
                 spell_end(scratch_object);
         }
     }

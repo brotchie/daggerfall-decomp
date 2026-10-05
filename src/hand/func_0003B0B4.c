@@ -24,26 +24,26 @@ extern int xn_mouse_poll_clamped();
 extern int xn_mouse_cursor_move();
 extern int xn_gfx_clear();
 
-int chargen_popup_choice(short a1, short a2, short a3, char *a4, unsigned char a5, unsigned char a6)
+int chargen_popup_choice(short text_id, short button1, short button2, char *image, unsigned char key1, unsigned char key2)
 {
     D_00196271 = 0;
     D_001940D4 &= 254;
     while (mouse_buttons != 0)
         xn_mouse_poll_clamped();
     D_0012B508 = 146;
-    msgbox_button_keys = a5;
-    D_00196034 = a6;
-    msgbox_button_ids = a2;
-    D_00196090 = a3;
+    msgbox_button_keys = key1;
+    D_00196034 = key2;
+    msgbox_button_ids = button1;
+    D_00196090 = button2;
     D_00196091 = 0;
-    if (a4 != 0) {
-        disk_read_file(a4, scratch_buffer);
+    if (image != 0) {
+        disk_read_file(image, scratch_buffer);
         mc_memcpy(screen_buffer, scratch_buffer, 64000, D_00170B88, 399, 4);
     } else {
         xn_gfx_clear(0);
     }
     D_001940D5 |= 128;
-    msgbox_show_rsc(a1, 5);
+    msgbox_show_rsc(text_id, 5);
     xn_mouse_cursor_drawn &= 254;
     while (D_00196271 == 0) {
         keys_world_actions();

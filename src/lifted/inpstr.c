@@ -34,10 +34,10 @@ extern int xn_draw_get_rect();
 
 int inpstr_read_key(void)
 {
-    unsigned char l_18;
+    unsigned char key;
 
-    l_18 = xn_kbd_read_key();
-    if (l_18 != 0) return (int)(unsigned char)l_18;
+    key = xn_kbd_read_key();
+    if (key != 0) return (int)(unsigned char)key;
     if (key_down_left != 0) return 128;
     if (key_down_right != 0) return 129;
     if (key_down_home != 0) return 131;
@@ -45,11 +45,11 @@ int inpstr_read_key(void)
     return 0;
 }
 
-void inpstr_begin_number(int a1)
+void inpstr_begin_number(int number)
 {
     xn_kbd_flush();
     input_digits_only = 1;
-    itoa(a1, (int)inpstr_number_text, 10);
+    itoa(number, (int)inpstr_number_text, 10);
     inpstr_text = (int)inpstr_number_text;
     mc_strncpy((int)D_00190B44, inpstr_text, 160, (int)D_00176E2C, 110);
     inpstr_cursor = strlen((int)inpstr_number_text);
@@ -57,9 +57,9 @@ void inpstr_begin_number(int a1)
     D_001A9AB1 = xn_font_current;
 }
 
-int inpstr_handle_key(unsigned char a1)
+int inpstr_handle_key(unsigned char key)
 {
-    switch ((unsigned char)a1) {
+    switch ((unsigned char)key) {
     case 13:
         xn_mouse_cursor_draw();
         return atoi(inpstr_text);
@@ -92,15 +92,15 @@ int inpstr_handle_key(unsigned char a1)
         }
         break;
     default:
-        if (((int)(unsigned char)a1) < 128 && ((unsigned)strlen(inpstr_text)) < ((int)(short)inpstr_max_length)) {
-            if (input_digits_only != 0 && (((int)(unsigned char)a1) < 48 || ((int)(unsigned char)a1) > 57)) {
-            } else if (((font_text_width(inpstr_text) + font_char_width((int)(unsigned char)a1)) + ((int)(unsigned short)text_cursor_x)) < ((int)(short)xn_gfx_clip_right)) {
+        if (((int)(unsigned char)key) < 128 && ((unsigned)strlen(inpstr_text)) < ((int)(short)inpstr_max_length)) {
+            if (input_digits_only != 0 && (((int)(unsigned char)key) < 48 || ((int)(unsigned char)key) > 57)) {
+            } else if (((font_text_width(inpstr_text) + font_char_width((int)(unsigned char)key)) + ((int)(unsigned short)text_cursor_x)) < ((int)(short)xn_gfx_clip_right)) {
                 if (((int)(short)inpstr_cursor) == strlen(inpstr_text)) {
-                    *(signed char *)((char *)(int)(*(char **)&inpstr_text + ((int)(short)(inpstr_cursor)++))) = a1;
+                    *(signed char *)((char *)(int)(*(char **)&inpstr_text + ((int)(short)(inpstr_cursor)++))) = key;
                     *(signed char *)((char *)(int)(*(char **)&inpstr_text + ((int)(short)inpstr_cursor))) = 0;
                 } else {
                     mc_memmove((int)(*(char **)&inpstr_text + ((int)(short)inpstr_cursor)) + 1, (int)(*(char **)&inpstr_text + ((int)(short)inpstr_cursor)), (int)&*(signed char *)((char *)(strlen(inpstr_text) - ((int)(short)inpstr_cursor)) + 1), (int)D_00176E2C, 245, 4);
-                    *(signed char *)((char *)(int)(*(char **)&inpstr_text + ((int)(short)(inpstr_cursor)++))) = a1;
+                    *(signed char *)((char *)(int)(*(char **)&inpstr_text + ((int)(short)(inpstr_cursor)++))) = key;
                 }
             }
         }
@@ -108,21 +108,21 @@ int inpstr_handle_key(unsigned char a1)
     return -2023406815;
 }
 
-int inpstr_text_width(int a1, short a2)
+int inpstr_text_width(char *text, short length)
 {
-    unsigned char l_14;
-    short l_18;
+    unsigned char saved_char;
+    short width;
 
-    l_14 = *(signed char *)((char *)(((int)(short)a2) + a1));
-    *(signed char *)((char *)(((int)(short)a2) + a1)) = 0;
-    *(int *)&l_18 = font_text_width(a1);
-    *(signed char *)((char *)(((int)(short)a2) + a1)) = l_14;
-    return (int)(short)l_18;
+    saved_char = text[length];
+    text[length] = 0;
+    *(int *)&width = font_text_width((int)text);
+    text[length] = saved_char;
+    return width;
 }
 
-void picklist_save_background(struct picklist *a1)
+void picklist_save_background(struct picklist *list)
 {
-    if (a1->framed == 0) return;
-    xn_draw_get_rect(a1->list_rect.x, a1->list_rect.y, a1->list_rect.w, a1->list_rect.h, (int)a1->list_background, 0);
-    xn_draw_get_rect(a1->bar_rect.x, a1->bar_rect.y, a1->bar_rect.w, a1->bar_rect.h, (int)a1->bar_background, 0);
+    if (list->framed == 0) return;
+    xn_draw_get_rect(list->list_rect.x, list->list_rect.y, list->list_rect.w, list->list_rect.h, list->list_background, 0);
+    xn_draw_get_rect(list->bar_rect.x, list->bar_rect.y, list->bar_rect.w, list->bar_rect.h, list->bar_background, 0);
 }

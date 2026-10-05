@@ -5,10 +5,10 @@ extern int xn_gfx_wait_vretrace_end();
 extern int xn_mouse_poll_clamped();
 extern char xn_kbd_read_key();
 
-int wait_frames_or_input(short a1)
+int wait_frames_or_input(short frames)
 {
-    short l_18;
-    while (a1--) {
+    short unused;
+    while (frames--) {
         xn_mouse_poll_clamped();
         if (*((char *)&mouse_buttons) != 0) return 1;
         if (xn_kbd_read_key() != 0) return 1;

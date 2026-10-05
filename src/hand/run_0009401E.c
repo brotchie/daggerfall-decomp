@@ -52,10 +52,10 @@ extern void inv_wagon_button(void);
 
 void inv_scroll_left_down(void)
 {
-    short n;
+    short last;
 
-    n = inv_left_count - 4;
-    if (n > 0 && n > inv_left_scroll)
+    last = inv_left_count - 4;
+    if (last > 0 && last > inv_left_scroll)
         inv_left_scroll++;
 }
 
@@ -68,43 +68,43 @@ void inv_scroll_right_up(void)
 
 void inv_scroll_right_down(void)
 {
-    short n;
+    short last;
 
-    n = inv_right_count - 4;
-    if (n > 0 && n > inv_right_scroll)
+    last = inv_right_count - 4;
+    if (last > 0 && last > inv_right_scroll)
         inv_right_scroll++;
 }
 
-void inv_select_tab(int n)
+void inv_select_tab(int button)
 {
-    n -= 41;
-    if (inventory_containers[n] == 0)
+    button -= 41;
+    if (inventory_containers[button] == 0)
         return;
     if (trade_mode != 0) {
         inv_right_icon = D_001AA5F8;
         inv_wagon_button();
     }
-    inv_tab = n;
+    inv_tab = button;
     inv_left_container = inventory_containers[inv_tab];
     inv_left_scroll = 0;
 }
 
 void inv_click_equip_slot(int slot)
 {
-    char *body;
-    int l_20;
-    int l_1C;
-    struct obj *o;
+    char *item;
+    int unused1;
+    int unused2;
+    struct obj *object;
 
-    o = inv_selected_item = player_character->slots[slot];
-    if (o == 0)
+    object = inv_selected_item = player_character->slots[slot];
+    if (object == 0)
         return;
     scratch_current_object = inv_selected_item;
-    body = (char *)inv_selected_item + 71;
-    text_macro_item = body;
+    item = (char *)inv_selected_item + 71;
+    text_macro_item = item;
     switch (inventory_action) {
     case 1:
-        inv_item_info(inv_selected_item, body);
+        inv_item_info(inv_selected_item, item);
         break;
     case 2:
         inv_take_item(inv_selected_item);
@@ -113,32 +113,32 @@ void inv_click_equip_slot(int slot)
         if (trade_mode == 4) {
             item_remove_equip_effects(inv_selected_item, slot);
             player_character->slots[slot] = 0;
-            o->x = player_object->x;
-            o->y = player_object->y;
-            o->z = player_object->z;
-            o->f2f = 0;
-            if (o->id == 0)
-                o->id = *(short *)(body + 52);
-            object_reparent(inv_right_container, o);
-            o->f1f = object_new_id(0);
+            object->x = player_object->x;
+            object->y = player_object->y;
+            object->z = player_object->z;
+            object->f2f = 0;
+            if (object->id == 0)
+                object->id = *(short *)(item + 52);
+            object_reparent(inv_right_container, object);
+            object->f1f = object_new_id(0);
             break;
         }
-        if (trade_mode == 3 && trade_can_repair_item(body) == 0)
+        if (trade_mode == 3 && trade_can_repair_item(item) == 0)
             break;
         item_remove_equip_effects(inv_selected_item, slot);
         player_character->slots[slot] = 0;
-        o->x = player_object->x;
-        o->y = player_object->y;
-        o->z = player_object->z;
-        o->f2f = 0;
-        if (o->id == 0)
-            o->id = *(short *)(body + 52);
-        if (o->f26 == 0 && trade_mode == 0)
-            object_reparent(inv_right_container, o);
-        if (D_00196120 == o->f43)
-            o->f17 = picked_model_index;
-        o->f1f = object_new_id(0);
-        quest_raise_event(5, o, 0);
+        object->x = player_object->x;
+        object->y = player_object->y;
+        object->z = player_object->z;
+        object->f2f = 0;
+        if (object->id == 0)
+            object->id = *(short *)(item + 52);
+        if (object->f26 == 0 && trade_mode == 0)
+            object_reparent(inv_right_container, object);
+        if (D_00196120 == object->f43)
+            object->f17 = picked_model_index;
+        object->f1f = object_new_id(0);
+        quest_raise_event(5, object, 0);
         trade_schedule_repair();
         break;
     case 4:

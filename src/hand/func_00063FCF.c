@@ -32,7 +32,7 @@ extern int abs();
 extern int mc_memcpy(void *, void *, int, char *, int, int);
 extern int xn_math_approx_dist2d();
 
-int func_00063FCF(struct record *m, int a2, int a3)
+int func_00063FCF(struct record *m, int dest_x, int dest_z)
 {
     struct Hit hit;
     struct Vec unused1;
@@ -51,9 +51,9 @@ int func_00063FCF(struct record *m, int a2, int a3)
 
     sub = &m->data.character;
     mc_memcpy(&pos, &m->x, 12, D_00175934, 1271, 4);
-    hit.a = a2;
+    hit.a = dest_x;
     hit.y = m->y;
-    hit.b = a3;
+    hit.b = dest_z;
     hit.ax = m->angle_x;
     hit.ay = m->yaw;
     hit.az = m->angle_z;

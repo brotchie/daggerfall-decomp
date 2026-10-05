@@ -37,11 +37,11 @@ extern int write(int, char *, int);
 extern void mc_memcpy(char *, char *, int, char *, int, int);
 extern int filelength(int);
 
-int note_open_notebook(short a1)
+int note_open_notebook(short mode)
 {
     if (D_0019626F == 9 && game_mode == 8) return 1;
-    note_silent = (a1 == 100);
-    if (a1 != 0 || (game_mode == 0 && key_action_held(25) != 0)) {
+    note_silent = (mode == 100);
+    if (mode != 0 || (game_mode == 0 && key_action_held(25) != 0)) {
         D_001940D5 |= 8;
         note_search_text = 0;
         note_search_from = 0;

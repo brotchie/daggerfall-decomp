@@ -46,107 +46,107 @@ extern int mc_sprintf(char *, char *, ...);
 
 #define PFLAGS (player_character->flags)
 
-void item_init_from_template(unsigned short idx, short type, short sub, struct item *it)
+void item_init_from_template(unsigned short template_id, short group, short index, struct item *item)
 {
-    struct itemdef *def;
-    unsigned short orig;
+    struct itemdef *template;
+    unsigned short requested_id;
 
-    orig = idx;
-    if (type == 13) {
-        sub = 0;
-        idx = 284;
+    requested_id = template_id;
+    if (group == 13) {
+        index = 0;
+        template_id = 284;
     }
-    if (type == 6 && ((unsigned short)PFLAGS & 1) != 0)
-        type = 12;
-    if (type == 12 && ((unsigned short)PFLAGS & 1) == 0)
-        type = 6;
-    if (type == 4) {
-        item_make_magic(it, -1);
+    if (group == 6 && ((unsigned short)PFLAGS & 1) != 0)
+        group = 12;
+    if (group == 12 && ((unsigned short)PFLAGS & 1) == 0)
+        group = 6;
+    if (group == 4) {
+        item_make_magic(item, -1);
         return;
     }
-    if (type == 9 && (sub < 2 || sub == 4))
-        sub = 2;
-    if (type == 10 && sub == 11)
-        sub = 10;
-    if (type == 7) {
+    if (group == 9 && (index < 2 || index == 4))
+        index = 2;
+    if (group == 10 && index == 11)
+        index = 10;
+    if (group == 7) {
         D_00190CF2++;
-        idx = 277;
-        if (sub > 3)
-            sub = rand_range(0, 3);
+        template_id = 277;
+        if (index > 3)
+            index = rand_range(0, 3);
     }
-    if (idx >= 288) {
+    if (template_id >= 288) {
         mc_set_location(58, D_001758B8);
         func_000A18C3(D_001758C0);
         mc_set_location(59, D_001758B8);
-        mc_sprintf(D_001911E4, D_001758C1, orig, idx);
+        mc_sprintf(D_001911E4, D_001758C1, requested_id, template_id);
         fatal_error(D_001911E4);
     }
-    def = &item_templates[idx];
-    if (def->f46 == 32512)
-        it->index = 0;
-    mc_strncpy(it->name, def->name, 32, D_001758B8, 68);
-    it->group = type;
-    it->index = sub;
-    it->value = def->f34;
-    if (def->f30 != 0 && (def->f43 & 1) != 0) {
-        D_0019626E = def->f30;
-        *(short *)it->pad28 = 0;
+    template = &item_templates[template_id];
+    if (template->f46 == 32512)
+        item->index = 0;
+    mc_strncpy(item->name, template->name, 32, D_001758B8, 68);
+    item->group = group;
+    item->index = index;
+    item->value = template->f34;
+    if (template->f30 != 0 && (template->f43 & 1) != 0) {
+        D_0019626E = template->f30;
+        *(short *)item->pad28 = 0;
     } else {
         D_0019626E = 0;
-        *(short *)it->pad28 = def->f30;
+        *(short *)item->pad28 = template->f30;
     }
-    it->item_flags = (unsigned short)def->f43;
-    it->condition = it->max_condition = def->f28;
-    it->magicka_bonus = 0;
-    if (def->f46 != 0 && def->f44 == 0)
-        it->dropped_image = def->f46;
-    if (def->f44 != 0 && def->f46 == 0)
-        it->inventory_image = def->f44;
-    if (def->f46 != 0)
-        it->inventory_image = def->f46;
-    if (def->f44 != 0)
-        it->dropped_image = def->f44;
-    if (((unsigned short)it->inventory_image & -128) == 31360 && ((unsigned short)PFLAGS & 1) == 0) {
-        it->inventory_image &= 127;
-        it->inventory_image |= 31872;
+    item->item_flags = (unsigned short)template->f43;
+    item->condition = item->max_condition = template->f28;
+    item->magicka_bonus = 0;
+    if (template->f46 != 0 && template->f44 == 0)
+        item->dropped_image = template->f46;
+    if (template->f44 != 0 && template->f46 == 0)
+        item->inventory_image = template->f44;
+    if (template->f46 != 0)
+        item->inventory_image = template->f46;
+    if (template->f44 != 0)
+        item->dropped_image = template->f44;
+    if (((unsigned short)item->inventory_image & -128) == 31360 && ((unsigned short)PFLAGS & 1) == 0) {
+        item->inventory_image &= 127;
+        item->inventory_image |= 31872;
     }
-    it->material = it->armor_type = 0;
-    if (type == 1 && (sub == 4 || sub == 5)) {
+    item->material = item->armor_type = 0;
+    if (group == 1 && (index == 4 || index == 5)) {
         if ((rand() & 3) != 0) {
-            if (sub == 4)
-                it->color = (rand() & 1) + 24;
+            if (index == 4)
+                item->color = (rand() & 1) + 24;
             else
-                it->color = (rand() & 1) + 26;
+                item->color = (rand() & 1) + 26;
         }
     } else {
-        it->color = 18;
+        item->color = 18;
     }
-    it->weight = def->f24;
-    it->enchant_points = def->f38;
-    it->variants = def->f41;
-    it->draw_order = def->f42;
-    mc_memset(it->enchantments, -1, 40, D_001758B8, 118, 40);
-    D_0019626D = def->f40;
-    D_00195F28 = def->f42;
-    if (type == 27 && sub == 4)
-        it->stack_count = rand() % 20;
-    if (type == 6 || type == 12 || type == 2) {
-        func_0005E636(it);
-        item_set_race_image(it, player_character->race);
+    item->weight = template->f24;
+    item->enchant_points = template->f38;
+    item->variants = template->f41;
+    item->draw_order = template->f42;
+    mc_memset(item->enchantments, -1, 40, D_001758B8, 118, 40);
+    D_0019626D = template->f40;
+    D_00195F28 = template->f42;
+    if (group == 27 && index == 4)
+        item->stack_count = rand() % 20;
+    if (group == 6 || group == 12 || group == 2) {
+        func_0005E636(item);
+        item_set_race_image(item, player_character->race);
     }
-    if (type == 3)
-        item_roll_material(it);
-    if (type == 2) {
-        item_roll_armor_type(it);
-        if (it->index != 5 && it->index < 7 && it->material == 2)
-            item_roll_material(it);
+    if (group == 3)
+        item_roll_material(item);
+    if (group == 2) {
+        item_roll_armor_type(item);
+        if (item->index != 5 && item->index < 7 && item->material == 2)
+            item_roll_material(item);
     }
-    if (type == 3 && sub == 18) {
-        it->stack_count = rand_range(1, 20);
-        it->condition = 0;
+    if (group == 3 && index == 18) {
+        item->stack_count = rand_range(1, 20);
+        item->condition = 0;
     }
-    if (type == 7)
-        item_init_book(it, sub);
-    if (type == 13)
-        it->message = rand();
+    if (group == 7)
+        item_init_book(item, index);
+    if (group == 13)
+        item->message = rand();
 }

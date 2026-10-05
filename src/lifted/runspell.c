@@ -7,6 +7,7 @@ struct bf8_1_1 { unsigned char _:1; unsigned char f:1; };
 struct bf8_2_1 { unsigned char _:2; unsigned char f:1; };
 struct bf8_3_1 { unsigned char _:3; unsigned char f:1; };
 struct bf8_7_1 { unsigned char _:7; unsigned char f:1; };
+struct missile_step { int x, y, z; struct record *light; };   /* a step vector, then the missile's light */
 extern short xn_cam_centre_x;
 extern short xn_cam_centre_y;
 extern short mouse_x;
@@ -100,7 +101,7 @@ extern void spell_cast_queue(struct record *, struct record *);
 extern void spell_end(struct record *);
 extern void object_foreach(struct record *, int);
 int spell_resist_check(struct record *, struct record **);
-struct spell *spell_find_active_effect(struct record *, int, int, int);
+struct spell *spell_find_active_effect(struct record *, int, int *, int *);
 int spell_apply_effect(struct record *, int, struct record *);
 void spellbook_find_last_cast_cb(struct record *);
 void spell_compute_values(struct spell *, unsigned short, int);
@@ -109,605 +110,605 @@ void cast_anim_start(int);
 void func_0005CA28(struct record *);
 void spell_lookup_name(struct spell *);
 
-int cast_item_strike_spell(int a1, struct record *a2)
+int cast_item_strike_spell(int spell_id, struct record *target)
 {
-    int l_1C;
-    struct record *l_18;
+    int i;
+    struct record *spell;
 
-    l_1C = 0;
-    l_18 = object_create_child(player_object->parent, 0, 89);
-    while (spell_records[l_1C].name[0] == 0 || spell_records[l_1C].id != a1) l_1C++;
-    l_18->type = 9;
-    l_18->id = object_new_id(((unsigned)location_object->id) >> 16);
-    mc_memcpy(&l_18->data.spell, &spell_records[l_1C], 89, (int)D_001757F4, 121, 4);
-    l_18->data.spell.icon = 250;
-    l_1C = spell_cost(&l_18->data.spell, player_character);
-    if (cast_item_spell_at(l_18, a2) != 0) object_delete(l_18);
-    return l_1C;
+    i = 0;
+    spell = object_create_child(player_object->parent, 0, 89);
+    while (spell_records[i].name[0] == 0 || spell_records[i].id != spell_id) i++;
+    spell->type = 9;
+    spell->id = object_new_id(((unsigned)location_object->id) >> 16);
+    mc_memcpy(&spell->data.spell, &spell_records[i], 89, (int)D_001757F4, 121, 4);
+    spell->data.spell.icon = 250;
+    i = spell_cost(&spell->data.spell, player_character);
+    if (cast_item_spell_at(spell, target) != 0) object_delete(spell);
+    return i;
 }
 
-int cast_creature_spell(struct record *a1, struct record *a2, int a3)
+int cast_creature_spell(struct record *caster, struct record *target, int spell_id)
 {
-    int l_18;
-    struct record *l_14;
+    int i;
+    struct record *spell;
 
-    l_18 = 0;
-    l_14 = object_create_child(location_object, 0, 89);
-    while (spell_records[l_18].name[0] == 0 || spell_records[l_18].id != a3) l_18++;
-    l_14->type = 9;
-    l_14->id = object_new_id(((unsigned)location_object->id) >> 16);
-    l_14->caster = a1;
-    mc_memcpy(&l_14->data.spell, &spell_records[l_18], 89, (int)D_001757F4, 144, 4);
-    if (D_00196292 != 0) l_14->data.spell.icon = 250;
-    l_18 = spell_cost((struct spell *)((char *)l_14 + 89), &a1->data.character);
-    if (cast_creature_spell_at(l_14, a1, a2) != 0) object_delete(l_14);
-    return l_18;
+    i = 0;
+    spell = object_create_child(location_object, 0, 89);
+    while (spell_records[i].name[0] == 0 || spell_records[i].id != spell_id) i++;
+    spell->type = 9;
+    spell->id = object_new_id(((unsigned)location_object->id) >> 16);
+    spell->caster = caster;
+    mc_memcpy(&spell->data.spell, &spell_records[i], 89, (int)D_001757F4, 144, 4);
+    if (D_00196292 != 0) spell->data.spell.icon = 250;
+    i = spell_cost((struct spell *)((char *)spell + 89), &caster->data.character);
+    if (cast_creature_spell_at(spell, caster, target) != 0) object_delete(spell);
+    return i;
 }
 
-void cast_spell_on(struct record *a1, struct record *a2, int a3)
+void cast_spell_on(struct record *spell, struct record *target, int no_save)
 {
-    struct record *l_24;
-    int l_20;
-    int l_1C;
-    int l_18;
-    int l_14;
-    struct spell *l_10;
+    struct record *cast;
+    int slot;
+    int lasting;
+    int extended;
+    int percent;
+    struct spell *spell_data;
 
-    l_18 = 0;
-    if (a1->caster != player_entity && ((struct bf8_7_1 *)&cheat_flags)->f != 0) return;
-    if (a1->caster == player_entity && a2 == player_entity && a1->data.spell.target == 3) return;
+    extended = 0;
+    if (spell->caster != player_entity && ((struct bf8_7_1 *)&cheat_flags)->f != 0) return;
+    if (spell->caster == player_entity && target == player_entity && spell->data.spell.target == 3) return;
     *(short *)D_00195F28 = 512;
-    l_10 = &a1->data.spell;
-    if (l_10->target != 2 && l_10->target != 4) {
-        sound_play((int)(short)*(short *)(spell_cast_sounds + (l_10->element * 2)), player_object, 110);
-        if (a1->caster == player_entity && D_00196291 == 0) {
-            cast_anim_start(l_10->element);
+    spell_data = &spell->data.spell;
+    if (spell_data->target != 2 && spell_data->target != 4) {
+        sound_play((int)(short)*(short *)(spell_cast_sounds + (spell_data->element * 2)), player_object, 110);
+        if (spell->caster == player_entity && D_00196291 == 0) {
+            cast_anim_start(spell_data->element);
         } else {
-            damage_spawn_splash(a1->caster, 3, 3);
+            damage_spawn_splash(spell->caster, 3, 3);
         }
     }
-    if (a3 == 0) {
-        l_14 = spell_resist_check(a1, &a2);
-        if (l_14 == 0) {
+    if (no_save == 0) {
+        percent = spell_resist_check(spell, &target);
+        if (percent == 0) {
             hud_message_add(D_0018509B);
             return;
         }
     } else {
-        l_14 = 100;
+        percent = 100;
     }
-    l_24 = object_clone(a1);
-    l_24->caster = a1->caster;
-    l_24->id = object_new_id(801);
-    l_10 = &l_24->data.spell;
-    spell_compute_values(l_10, l_24->caster->data.character.level, l_14);
-    l_20 = 0;
-    l_1C = l_20;
-    for (; l_20 < 3; l_20++) {
-        if (l_10->effects[l_20].type == 255) continue;
-        if ((l_10->icon < 200 || l_10->icon == 250) && spell_extend_duration(a2, l_10, l_20) != 0) {
-            l_18++;
+    cast = object_clone(spell);
+    cast->caster = spell->caster;
+    cast->id = object_new_id(801);
+    spell_data = &cast->data.spell;
+    spell_compute_values(spell_data, cast->caster->data.character.level, percent);
+    slot = 0;
+    lasting = slot;
+    for (; slot < 3; slot++) {
+        if (spell_data->effects[slot].type == 255) continue;
+        if ((spell_data->icon < 200 || spell_data->icon == 250) && spell_extend_duration(target, spell_data, slot) != 0) {
+            extended++;
         } else {
-            spell_apply_effect(l_24, l_20, a2);
+            spell_apply_effect(cast, slot, target);
         }
-        if (l_10->effects[l_20].type != 255 && ((int)(unsigned char)(*(signed char *)(spell_effect_settings + (l_10->effects[l_20].type * 12)) & 1)) != 0) {
-            l_1C++;
+        if (spell_data->effects[slot].type != 255 && ((int)(unsigned char)(*(signed char *)(spell_effect_settings + (spell_data->effects[slot].type * 12)) & 1)) != 0) {
+            lasting++;
         }
     }
-    l_1C -= l_18;
-    if (l_1C == 0) {
-        object_delete(l_24);
+    lasting -= extended;
+    if (lasting == 0) {
+        object_delete(cast);
         return;
     }
-    object_reparent(a2, l_24);
+    object_reparent(target, cast);
 }
 
-void spellbook_find_last_cast_cb(struct record *a1)
+void spellbook_find_last_cast_cb(struct record *object)
 {
-    if (a1->type != 9) return;
-    if ((short)((unsigned short)a1->data.spell.id) != spell_last_cast_id) return;
-    scratch_object = a1;
+    if (object->type != 9) return;
+    if ((short)((unsigned short)object->data.spell.id) != spell_last_cast_id) return;
+    scratch_object = object;
 }
 
 int cast_recast_last(void)
 {
-    struct record *l_28;
-    struct record *l_24;
-    struct spell *l_20;
-    int l_1C;
+    struct record *found;
+    struct record *cast;
+    struct spell *spell_data;
+    int cost;
 
     if ((int)spell_ready_missile != 0 || (int)spell_ready_touch != 0) {
         hud_message_add((int)D_001757FF);
         return 0;
     }
     if (((int)(short)spell_last_cast_id) == (-1)) return 0;
-    l_28 = object_find_item(player_entity->children, 27, 0);
-    if (l_28 == 0) {
+    found = object_find_item(player_entity->children, 27, 0);
+    if (found == 0) {
         hud_message_add((int)D_00175820);
         return 0;
     }
     scratch_object = 0;
-    object_foreach(l_28->children, (int)spellbook_find_last_cast_cb);
-    l_28 = scratch_object;
-    l_20 = &l_28->data.spell;
-    l_1C = (int)(short)spell_ready_cost;
-    if ((player_character->magicka + spell_points_bonus) < l_1C) {
+    object_foreach(found->children, (int)spellbook_find_last_cast_cb);
+    found = scratch_object;
+    spell_data = &found->data.spell;
+    cost = (int)(short)spell_ready_cost;
+    if ((player_character->magicka + spell_points_bonus) < cost) {
         hud_message_add((int)D_00175837);
         return 0;
     }
-    spell_add_skill_uses(l_20, 1);
+    spell_add_skill_uses(spell_data, 1);
     if (spell_points_bonus != 0) {
-        if (l_1C > spell_points_bonus) {
-            l_1C -= spell_points_bonus;
+        if (cost > spell_points_bonus) {
+            cost -= spell_points_bonus;
             spell_points_bonus = 0;
         } else {
-            spell_points_bonus -= l_1C;
+            spell_points_bonus -= cost;
             spell_ready_cost = 0;
         }
     }
-    player_character->magicka -= l_1C;
-    l_24 = object_create_child(player_object->parent, 0, 89);
-    l_24->type = 9;
-    l_24->id = object_new_id(((unsigned)location_object->id) >> 16);
-    mc_memcpy(&l_24->data.spell, &l_28->data.spell, 89, (int)D_001757F4, 443, 4);
-    if (cast_player_spell(l_24) != 0) object_delete(l_24);
+    player_character->magicka -= cost;
+    cast = object_create_child(player_object->parent, 0, 89);
+    cast->type = 9;
+    cast->id = object_new_id(((unsigned)location_object->id) >> 16);
+    mc_memcpy(&cast->data.spell, &found->data.spell, 89, (int)D_001757F4, 443, 4);
+    if (cast_player_spell(cast) != 0) object_delete(cast);
     return 1;
 }
 
-int spell_resist_check(struct record *a1, struct record **a2)
+int spell_resist_check(struct record *spell, struct record **target)
 {
-    struct character *l_2C;
-    struct career *l_28;
-    int l_24;
-    int l_20;
-    int l_1C;
-    struct spell *l_18;
+    struct character *target_char;
+    struct career *target_class;
+    int unused;
+    int cost;
+    int chance;
+    struct spell *spell_data;
 
-    l_18 = &a1->data.spell;
-    if (l_18->target == 0) return 100;
-    if (a1->caster == *a2 && l_18->target == 3) return 100;
-    l_2C = &(*a2)->data.character;
-    l_28 = &l_2C->career;
-    if (((int)(unsigned char)(l_28->spell_absorption_flags & 7)) != 0 || (l_2C->conditions & 0x200) != 0) {
-        if ((l_2C->conditions & 0x200) != 0 || ((int)(unsigned char)(l_28->spell_absorption_flags & 4)) != 0 || (((int)(unsigned char)(l_28->spell_absorption_flags & 2)) != 0 && player_in_daylight() == 0) || (((int)(unsigned char)(l_28->spell_absorption_flags & 1)) != 0 && player_in_daylight() != 0)) {
-            if ((l_2C->conditions & 0x200) != 0) {
-                if (spell_find_active_effect(*a2, 20, (int)&l_1C, 0) == 0) {
-                    l_1C = l_2C->level + 25;
-                    if (rand_range(1, 100) > l_1C) goto L5B5A7;
+    spell_data = &spell->data.spell;
+    if (spell_data->target == 0) return 100;
+    if (spell->caster == *target && spell_data->target == 3) return 100;
+    target_char = &(*target)->data.character;
+    target_class = &target_char->career;
+    if (((int)(unsigned char)(target_class->spell_absorption_flags & 7)) != 0 || (target_char->conditions & 0x200) != 0) {
+        if ((target_char->conditions & 0x200) != 0 || ((int)(unsigned char)(target_class->spell_absorption_flags & 4)) != 0 || (((int)(unsigned char)(target_class->spell_absorption_flags & 2)) != 0 && player_in_daylight() == 0) || (((int)(unsigned char)(target_class->spell_absorption_flags & 1)) != 0 && player_in_daylight() != 0)) {
+            if ((target_char->conditions & 0x200) != 0) {
+                if (spell_find_active_effect(*target, 20, &chance, 0) == 0) {
+                    chance = target_char->level + 25;
+                    if (rand_range(1, 100) > chance) goto L5B5A7;
                 } else {
-                    if (rand_range(1, 100) > l_1C) goto L5B5A7;
+                    if (rand_range(1, 100) > chance) goto L5B5A7;
                 }
             }
-            l_20 = spell_cost(l_18, l_2C);
-            if ((l_20 + l_2C->magicka) <= l_2C->max_magicka) {
-                l_2C->magicka += l_20;
+            cost = spell_cost(spell_data, target_char);
+            if ((cost + target_char->magicka) <= target_char->max_magicka) {
+                target_char->magicka += cost;
                 hud_message_add((int)D_00175858);
                 return 0;
             }
         }
     }
 L5B5A7:;
-    if ((l_2C->conditions & 0x400) != 0) {
-        spell_find_active_effect(*a2, 21, (int)&l_1C, 0);
-        if (rand_range(1, 100) <= l_1C) {
-            *a2 = a1->caster;
-            l_2C = &(*a2)->data.character;
-            l_28 = &l_2C->career;
+    if ((target_char->conditions & 0x400) != 0) {
+        spell_find_active_effect(*target, 21, &chance, 0);
+        if (rand_range(1, 100) <= chance) {
+            *target = spell->caster;
+            target_char = &(*target)->data.character;
+            target_class = &target_char->career;
             hud_message_add((int)D_0017586C);
         }
     }
-    if ((l_2C->conditions & 0x800) != 0) {
-        spell_find_active_effect(*a2, 22, (int)&l_1C, 0);
-        if (rand_range(1, 100) <= l_1C) {
+    if ((target_char->conditions & 0x800) != 0) {
+        spell_find_active_effect(*target, 22, &chance, 0);
+        if (rand_range(1, 100) <= chance) {
             hud_message_add((int)D_00175881);
             return 0;
         }
     }
-    return spfx_resist_roll(l_18->element, (int)(unsigned char)spell_element_class_bits[l_18->element], l_2C, l_28, 2, (-(a1->caster->data.character.level - l_2C->level)) * 5);
+    return spfx_resist_roll(spell_data->element, (int)(unsigned char)spell_element_class_bits[spell_data->element], target_char, target_class, 2, (-(spell->caster->data.character.level - target_char->level)) * 5);
 }
 
-int spell_base_cost(struct spell *a1, struct character *a2, int a3)
+int spell_base_cost(struct spell *spell, struct character *caster, int unused)
 {
-    int l_1C;
-    int l_18;
-    int l_14;
+    int i;
+    int cost;
+    int total;
 
-    l_1C = 0;
-    l_14 = l_1C;
-    for (; l_1C < 3; l_1C++) {
-        if (a1->effects[l_1C].type == 255) continue;
-        l_18 = a1->effect_costs[l_1C];
-        l_18 = ((110 - a2->skills[(int)(unsigned char)magic_school_skills[(int)(unsigned char)spell_effect_school[a1->effects[l_1C].type]]].value) * l_18) / 100;
-        l_14 += l_18;
+    i = 0;
+    total = i;
+    for (; i < 3; i++) {
+        if (spell->effects[i].type == 255) continue;
+        cost = spell->effect_costs[i];
+        cost = ((110 - caster->skills[(int)(unsigned char)magic_school_skills[(int)(unsigned char)spell_effect_school[spell->effects[i].type]]].value) * cost) / 100;
+        total += cost;
     }
-    return l_14;
+    return total;
 }
 
-struct spell *spell_find_active_effect(struct record *a1, int a2, int a3, int a4)
+struct spell *spell_find_active_effect(struct record *object, int effect_type, int *chance_out, int *magnitude_out)
 {
-    struct spell *l_14;
-    int l_10;
+    struct spell *spell;
+    int slot;
 
-    a1 = a1->children;
-    while (a1 != 0) {
-        if (a1->type == 9) {
-            l_14 = &a1->data.spell;
-            for (l_10 = 0; l_10 < 3; l_10++) {
-                if (l_14->effects[l_10].type == a2) {
-                    if (a3 != 0) *(int *)((char *)a3) = l_14->cast_chances[l_10];
-                    if (a4 != 0) *(int *)((char *)a4) = l_14->cast_magnitudes[l_10];
-                    spell_effect_slot = l_10;
-                    scratch_object = a1;
-                    return l_14;
+    object = object->children;
+    while (object != 0) {
+        if (object->type == 9) {
+            spell = &object->data.spell;
+            for (slot = 0; slot < 3; slot++) {
+                if (spell->effects[slot].type == effect_type) {
+                    if (chance_out != 0) *chance_out = spell->cast_chances[slot];
+                    if (magnitude_out != 0) *magnitude_out = spell->cast_magnitudes[slot];
+                    spell_effect_slot = slot;
+                    scratch_object = object;
+                    return spell;
                 }
             }
         }
-        a1 = a1->next;
+        object = object->next;
     }
     return 0;
 }
 
-int spell_apply_effect(struct record *a1, int a2, struct record *a3)
+int spell_apply_effect(struct record *spell, int slot, struct record *target)
 {
-    struct spell *l_14;
+    struct spell *spell_data;
 
-    l_14 = &a1->data.spell;
-    return spell_effect_dispatch(l_14->effects[a2].type, a1, a2, a3);
+    spell_data = &spell->data.spell;
+    return spell_effect_dispatch(spell_data->effects[slot].type, spell, slot, target);
 }
 
-void spell_compute_values(struct spell *a1, unsigned short a2, int a3)
+void spell_compute_values(struct spell *spell, unsigned short level, int percent)
 {
-    int l_18;
+    int slot;
 
-    if (a1->icon >= 200) *(int *)&a2 = 8;
-    for (l_18 = 0; l_18 < 3; l_18++) {
-        if (a1->effects[l_18].type == 255) continue;
-        if (((int)a1->durations[l_18].base) != (-1)) {
-            if (((int)(unsigned char)(*(signed char *)(spell_effect_settings + (a1->effects[l_18].type * 12)) & 1)) != 0) {
-                a1->cast_durations[l_18] = ((((int)a1->durations[l_18].base) + (((int)a1->durations[l_18].plus) * (((int)(unsigned short)a2) / ((int)a1->durations[l_18].per_level)))) * a3) / 100;
+    if (spell->icon >= 200) *(int *)&level = 8;
+    for (slot = 0; slot < 3; slot++) {
+        if (spell->effects[slot].type == 255) continue;
+        if (((int)spell->durations[slot].base) != (-1)) {
+            if (((int)(unsigned char)(*(signed char *)(spell_effect_settings + (spell->effects[slot].type * 12)) & 1)) != 0) {
+                spell->cast_durations[slot] = ((((int)spell->durations[slot].base) + (((int)spell->durations[slot].plus) * (((int)(unsigned short)level) / ((int)spell->durations[slot].per_level)))) * percent) / 100;
             } else {
-                a1->cast_durations[l_18] = 0;
+                spell->cast_durations[slot] = 0;
             }
         } else {
-            a1->cast_durations[l_18] = 65535;
+            spell->cast_durations[slot] = 65535;
         }
-        if (((int)(unsigned char)(*(signed char *)(spell_effect_settings + (a1->effects[l_18].type * 12)) & 2)) != 0) {
-            a1->cast_chances[l_18] = ((int)a1->chances[l_18].base) + (((int)a1->chances[l_18].plus) * (((int)(unsigned short)a2) / ((int)a1->chances[l_18].per_level)));
+        if (((int)(unsigned char)(*(signed char *)(spell_effect_settings + (spell->effects[slot].type * 12)) & 2)) != 0) {
+            spell->cast_chances[slot] = ((int)spell->chances[slot].base) + (((int)spell->chances[slot].plus) * (((int)(unsigned short)level) / ((int)spell->chances[slot].per_level)));
         }
-        if (((int)(unsigned char)(*(signed char *)(spell_effect_settings + (a1->effects[l_18].type * 12)) & 4)) != 0) {
-            a1->cast_magnitudes[l_18] = (a3 * (rand_range((int)a1->magnitudes[l_18].base_min, (int)a1->magnitudes[l_18].base_max) + ((((int)(unsigned short)a2) / ((int)a1->magnitudes[l_18].per_level)) * rand_range((int)a1->magnitudes[l_18].plus_min, (int)a1->magnitudes[l_18].plus_max)))) / 100;
-            *(short *)&a1->magnitudes[l_18].plus_min = 0;
+        if (((int)(unsigned char)(*(signed char *)(spell_effect_settings + (spell->effects[slot].type * 12)) & 4)) != 0) {
+            spell->cast_magnitudes[slot] = (percent * (rand_range((int)spell->magnitudes[slot].base_min, (int)spell->magnitudes[slot].base_max) + ((((int)(unsigned short)level) / ((int)spell->magnitudes[slot].per_level)) * rand_range((int)spell->magnitudes[slot].plus_min, (int)spell->magnitudes[slot].plus_max)))) / 100;
+            *(short *)&spell->magnitudes[slot].plus_min = 0;
         }
     }
 }
 
-void spell_remove_effect_type(struct record *a1, int a2)
+void spell_remove_effect_type(struct record *object, int effect_type)
 {
-    struct spell *l_18;
-    int l_14;
+    struct spell *spell;
+    int slot;
 
-    a1 = a1->children;
-    while (a1 != 0) {
-        if (a1->type == 9) {
-            l_18 = &a1->data.spell;
-            l_14 = spell_find_effect_type(l_18, a2);
-            if (l_14 != 0) {
-                l_18->effects[l_14].type = 255;
-                if (func_000CE4E0(l_18) != 0) {
-                    object_delete(a1);
+    object = object->children;
+    while (object != 0) {
+        if (object->type == 9) {
+            spell = &object->data.spell;
+            slot = spell_find_effect_type(spell, effect_type);
+            if (slot != 0) {
+                spell->effects[slot].type = 255;
+                if (func_000CE4E0(spell) != 0) {
+                    object_delete(object);
                     return;
                 }
             }
         }
-        a1 = a1->next;
+        object = object->next;
     }
 }
 
-void cast_fire_missile(struct record *a1)
+void cast_fire_missile(struct record *missile)
 {
-    int l_20;
-    struct spell *l_1C;
-    int l_18;
+    int unused;
+    struct spell *spell;
+    int unused2;
     {
-        char l_40[12];
-        char l_34[16];
+        int aim[3];
+        struct missile_step step;
 
-        object_reparent(location_object, a1);
-        *(int *)((char *)l_34 + 12) = (int)object_create_child(a1, 0, 0);
-        *(signed char *)(*(char **)((char *)l_34 + 12)) = 7;
-        *(short *)(*(char **)((char *)l_34 + 12) + 27) = 48;
-        *(short *)(*(char **)((char *)l_34 + 12) + 23) = 64;
-        a1->x = player_object->x;
-        *(int *)(*(char **)((char *)l_34 + 12) + 7) = a1->x;
-        a1->y = player_object->y - 50;
-        *(int *)(*(char **)((char *)l_34 + 12) + 11) = a1->y;
-        a1->z = player_object->z;
-        *(int *)(*(char **)((char *)l_34 + 12) + 15) = a1->z;
-        *(short *)(*(char **)((char *)l_34 + 12) + 1) = 0;
-        *(short *)(*(char **)((char *)l_34 + 12) + 3) = 0;
+        object_reparent(location_object, missile);
+        step.light = object_create_child(missile, 0, 0);
+        step.light->type = 7;
+        step.light->image = 48;
+        step.light->light_radius = 64;
+        missile->x = player_object->x;
+        step.light->x = missile->x;
+        missile->y = player_object->y - 50;
+        step.light->y = missile->y;
+        missile->z = player_object->z;
+        step.light->z = missile->z;
+        step.light->angle_x = 0;
+        step.light->yaw = 0;
         if (D_00153408 != 0) {
-            a1->angle_x = ((camera_object->angle_x + ((((((int)(short)mouse_y) + 6) - ((int)(short)xn_cam_centre_y)) * 307) >> 8)) + D_0015340D) & 2047;
-            a1->yaw = (((((mouse_x + 6) - xn_cam_centre_x) * 2) + camera_object->yaw) + D_00153411) & 2047;
+            missile->angle_x = ((camera_object->angle_x + ((((((int)(short)mouse_y) + 6) - ((int)(short)xn_cam_centre_y)) * 307) >> 8)) + D_0015340D) & 2047;
+            missile->yaw = (((((mouse_x + 6) - xn_cam_centre_x) * 2) + camera_object->yaw) + D_00153411) & 2047;
         } else {
-            a1->angle_x = ((((((((int)(short)mouse_y) + 6) - ((int)(short)xn_cam_centre_y)) * 150) / 100) + camera_object->angle_x) + view_look_pitch) & 2047;
-            a1->yaw = ((camera_object->yaw + ((((((int)(short)mouse_x) + 6) - ((int)(short)xn_cam_centre_x)) * 160) / 100)) + view_look_yaw) & 2047;
+            missile->angle_x = ((((((((int)(short)mouse_y) + 6) - ((int)(short)xn_cam_centre_y)) * 150) / 100) + camera_object->angle_x) + view_look_pitch) & 2047;
+            missile->yaw = ((camera_object->yaw + ((((((int)(short)mouse_x) + 6) - ((int)(short)xn_cam_centre_x)) * 160) / 100)) + view_look_yaw) & 2047;
         }
-        *(short *)(*(char **)((char *)l_34 + 12) + 5) = (a1->angle_z = 0);
-        mc_memset((int)l_40, 0, 12, (int)D_001757F4, 711, 4);
-        xn_math_advance_pitch_yaw(a1->angle_x, a1->yaw, 1024, (int)l_40);
-        *(int *)l_40 += a1->x;
-        *(int *)((char *)l_40 + 4) += a1->y;
-        *(int *)((char *)l_40 + 8) += a1->z;
-        mc_memset((int)l_34, 0, 12, (int)D_001757F4, 717, 4);
-        xn_vec_unit_direction(&a1->x, (int)l_40, (char *)a1 + 118);
-        xn_vec_advance((char *)a1 + 118, 110, (int)l_34);
-        a1->x += *(int *)l_34;
-        a1->y += *(int *)((char *)l_34 + 4);
-        a1->z += *(int *)((char *)l_34 + 8);
-        *(int *)(*(char **)((char *)l_34 + 12) + 7) = a1->x;
-        *(int *)(*(char **)((char *)l_34 + 12) + 11) = a1->y;
-        *(int *)(*(char **)((char *)l_34 + 12) + 15) = a1->z;
-        l_1C = &a1->data.spell;
-        a1->missile_texture = *(short *)(spell_missile_textures + (l_1C->element * 2));
-        a1->flags |= 0x2000;
-        a1->image2 = 0;
-        *(int *)l_34 = (player_object->x + a1->x) / 2;
-        *(int *)((char *)l_34 + 4) = (player_object->y + a1->y) / 2;
-        *(int *)((char *)l_34 + 8) = (player_object->z + a1->z) / 2;
-        if (collide_creature_within(player_object, (int)l_34, 65) != 0) {
-            sound_play((int)(short)*(short *)(spell_impact_sounds + (a1->data.spell.element * 2)), a1, 110);
-            a1->missile_texture |= 1;
-            a1->image2 = 32768;
-            a1->children->light_radius <<= 2;
-            func_0005C856(a1, D_00195C48);
-            if (l_1C->target == 2 || l_1C->target == 4) cast_anim_start(l_1C->element);
+        step.light->angle_z = (missile->angle_z = 0);
+        mc_memset((int)aim, 0, 12, (int)D_001757F4, 711, 4);
+        xn_math_advance_pitch_yaw(missile->angle_x, missile->yaw, 1024, (int)aim);
+        aim[0] += missile->x;
+        aim[1] += missile->y;
+        aim[2] += missile->z;
+        mc_memset((int)&step, 0, 12, (int)D_001757F4, 717, 4);
+        xn_vec_unit_direction(&missile->x, (int)aim, (char *)missile + 118);
+        xn_vec_advance((char *)missile + 118, 110, (int)&step);
+        missile->x += step.x;
+        missile->y += step.y;
+        missile->z += step.z;
+        step.light->x = missile->x;
+        step.light->y = missile->y;
+        step.light->z = missile->z;
+        spell = &missile->data.spell;
+        missile->missile_texture = *(short *)(spell_missile_textures + (spell->element * 2));
+        missile->flags |= 0x2000;
+        missile->image2 = 0;
+        step.x = (player_object->x + missile->x) / 2;
+        step.y = (player_object->y + missile->y) / 2;
+        step.z = (player_object->z + missile->z) / 2;
+        if (collide_creature_within(player_object, (int)&step, 65) != 0) {
+            sound_play((int)(short)*(short *)(spell_impact_sounds + (missile->data.spell.element * 2)), missile, 110);
+            missile->missile_texture |= 1;
+            missile->image2 = 32768;
+            missile->children->light_radius <<= 2;
+            func_0005C856(missile, D_00195C48);
+            if (spell->target == 2 || spell->target == 4) cast_anim_start(spell->element);
             return;
         }
-        spell_missile_update(a1, 1);
-        if (l_1C->target == 2 || l_1C->target == 4) cast_anim_start(l_1C->element);
-        a1->y += 40;
-        if (collide_line_of_sight(player_object, a1) == 0) {
-            a1->y -= 40;
-            sound_play((int)(short)*(short *)(spell_impact_sounds + (l_1C->element * 2)), a1, 110);
-            a1->missile_texture |= 1;
-            a1->image2 = 32768;
-            a1->children->light_radius <<= 2;
-            if (l_1C->target == 2 || l_1C->target == 4) cast_anim_start(l_1C->element);
+        spell_missile_update(missile, 1);
+        if (spell->target == 2 || spell->target == 4) cast_anim_start(spell->element);
+        missile->y += 40;
+        if (collide_line_of_sight(player_object, missile) == 0) {
+            missile->y -= 40;
+            sound_play((int)(short)*(short *)(spell_impact_sounds + (spell->element * 2)), missile, 110);
+            missile->missile_texture |= 1;
+            missile->image2 = 32768;
+            missile->children->light_radius <<= 2;
+            if (spell->target == 2 || spell->target == 4) cast_anim_start(spell->element);
             return;
         }
-        a1->y -= 40;
-        spell_missile_update(a1, 1);
-        if (l_1C->target == 2 || l_1C->target == 4) cast_anim_start(l_1C->element);
-        sound_play((int)(short)*(short *)(spell_cast_sounds + (l_1C->element * 2)), a1, 110);
+        missile->y -= 40;
+        spell_missile_update(missile, 1);
+        if (spell->target == 2 || spell->target == 4) cast_anim_start(spell->element);
+        sound_play((int)(short)*(short *)(spell_cast_sounds + (spell->element * 2)), missile, 110);
     }
 }
 
-void cast_creature_missile(struct record *a1, struct record *a2, struct record *a3)
+void cast_creature_missile(struct record *missile, struct record *caster, struct record *target)
 {
-    struct record *l_28;
-    struct spell *l_10;
-    int l_20;
-    int l_1C;
-    int l_18;
-    int l_14;
-    char l_3C[12];
+    struct record *light;
+    struct spell *spell;
+    int unused1;
+    int unused2;
+    int unused3;
+    int unused4;
+    int midpoint[3];
 
-    object_reparent(location_object, a1);
-    l_28 = object_create_child(a1, 0, 0);
-    l_28->type = 7;
-    l_28->image = 48;
-    l_28->light_radius = 64;
-    a1->x = a2->x;
-    l_28->x = a1->x;
-    a1->y = a2->y - 50;
-    l_28->y = a1->y;
-    a1->z = a2->z;
-    l_28->z = a1->z;
-    l_28->angle_x = 0;
-    a1->angle_x = xn_math_angle_to_point(a2->y, a2->z, a3->y, a3->z);
-    l_28->yaw = 0;
-    a1->yaw = xn_math_angle_to_point(a2->x, a2->z, a3->x, a3->z);
-    l_28->angle_z = (a1->angle_z = 0);
-    xn_math_advance_pitch_yaw(a1->angle_x, a1->yaw, 110, &a1->x);
-    l_28->x = a1->x;
-    l_28->y = a1->y;
-    l_28->z = a1->z;
-    a3->y -= 50;
-    xn_vec_unit_direction(&a1->x, &a3->x, (char *)a1 + 118);
-    a3->y += 50;
-    l_10 = &a1->data.spell;
-    a1->missile_texture = *(short *)(spell_missile_textures + (l_10->element * 2));
-    a1->flags |= 0x2000;
-    a1->image2 = 0;
-    *(int *)l_3C = (a2->x + a1->x) / 2;
-    *(int *)((char *)l_3C + 4) = (a2->y + a1->y) / 2;
-    *(int *)((char *)l_3C + 8) = (a2->z + a1->z) / 2;
-    if (collide_creature_within(a2, (int)l_3C, 65) != 0) {
-        sound_play((int)(short)*(short *)(spell_impact_sounds + (a1->data.spell.element * 2)), a1, 110);
-        a1->missile_texture |= 1;
-        a1->image2 = 32768;
-        a1->children->light_radius <<= 2;
-        func_0005C856(a1, D_00195C48);
+    object_reparent(location_object, missile);
+    light = object_create_child(missile, 0, 0);
+    light->type = 7;
+    light->image = 48;
+    light->light_radius = 64;
+    missile->x = caster->x;
+    light->x = missile->x;
+    missile->y = caster->y - 50;
+    light->y = missile->y;
+    missile->z = caster->z;
+    light->z = missile->z;
+    light->angle_x = 0;
+    missile->angle_x = xn_math_angle_to_point(caster->y, caster->z, target->y, target->z);
+    light->yaw = 0;
+    missile->yaw = xn_math_angle_to_point(caster->x, caster->z, target->x, target->z);
+    light->angle_z = (missile->angle_z = 0);
+    xn_math_advance_pitch_yaw(missile->angle_x, missile->yaw, 110, &missile->x);
+    light->x = missile->x;
+    light->y = missile->y;
+    light->z = missile->z;
+    target->y -= 50;
+    xn_vec_unit_direction(&missile->x, &target->x, (char *)missile + 118);
+    target->y += 50;
+    spell = &missile->data.spell;
+    missile->missile_texture = *(short *)(spell_missile_textures + (spell->element * 2));
+    missile->flags |= 0x2000;
+    missile->image2 = 0;
+    midpoint[0] = (caster->x + missile->x) / 2;
+    midpoint[1] = (caster->y + missile->y) / 2;
+    midpoint[2] = (caster->z + missile->z) / 2;
+    if (collide_creature_within(caster, (int)midpoint, 65) != 0) {
+        sound_play((int)(short)*(short *)(spell_impact_sounds + (missile->data.spell.element * 2)), missile, 110);
+        missile->missile_texture |= 1;
+        missile->image2 = 32768;
+        missile->children->light_radius <<= 2;
+        func_0005C856(missile, D_00195C48);
         return;
     }
-    spell_missile_update(a1, 1);
-    sound_play((int)(short)*(short *)(spell_cast_sounds + (l_10->element * 2)), a1, 110);
+    spell_missile_update(missile, 1);
+    sound_play((int)(short)*(short *)(spell_cast_sounds + (spell->element * 2)), missile, 110);
 }
 
-void spell_area_effect(struct record *a1)
+void spell_area_effect(struct record *spell)
 {
-    int l_20;
-    int l_1C;
-    int l_18;
+    int i;
+    int radius;
+    int unused;
 
-    if (a1->data.spell.target == 2) return;
-    if (a1->data.spell.icon >= 250) {
-        l_1C = 168;
+    if (spell->data.spell.target == 2) return;
+    if (spell->data.spell.icon >= 250) {
+        radius = 168;
     } else {
-        l_1C = (a1->caster->data.character.level << 2) + 64;
+        radius = (spell->caster->data.character.level << 2) + 64;
     }
-    l_1C = l_1C * 3;
-    for (l_20 = 0; l_20 < creature_count; l_20++) {
-        if (xn_math_approx_hypot(a1->y - creature_list[l_20]->y, xn_math_approx_dist2d(a1->x, a1->z, creature_list[l_20]->x, creature_list[l_20]->z)) < l_1C) {
-            if (collide_line_of_sight(a1, creature_list[l_20]) == 0) continue;
-            damage_knockback(creature_list[l_20], l_1C * 30, xn_math_angle_to_point(a1->x, a1->z, creature_list[l_20]->x, creature_list[l_20]->z), l_1C);
-            func_0005C856(a1, creature_list[l_20]);
+    radius = radius * 3;
+    for (i = 0; i < creature_count; i++) {
+        if (xn_math_approx_hypot(spell->y - creature_list[i]->y, xn_math_approx_dist2d(spell->x, spell->z, creature_list[i]->x, creature_list[i]->z)) < radius) {
+            if (collide_line_of_sight(spell, creature_list[i]) == 0) continue;
+            damage_knockback(creature_list[i], radius * 30, xn_math_angle_to_point(spell->x, spell->z, creature_list[i]->x, creature_list[i]->z), radius);
+            func_0005C856(spell, creature_list[i]);
         }
     }
-    if (xn_math_approx_hypot(a1->y - player_object->y, xn_math_approx_dist2d(a1->x, a1->z, player_object->x, player_object->z)) >= l_1C) return;
-    spell_lookup_name(&a1->data.spell);
-    spell_cast_queue(a1, player_entity);
+    if (xn_math_approx_hypot(spell->y - player_object->y, xn_math_approx_dist2d(spell->x, spell->z, player_object->x, player_object->z)) >= radius) return;
+    spell_lookup_name(&spell->data.spell);
+    spell_cast_queue(spell, player_entity);
 }
 
-void func_0005C856(struct record *a1, struct record *a2)
+void func_0005C856(struct record *spell, struct record *target)
 {
-    spell_lookup_name(&a1->data.spell);
-    if (a2->type != 18) return;
-    spell_cast_queue(a1, a2);
+    spell_lookup_name(&spell->data.spell);
+    if (target->type != 18) return;
+    spell_cast_queue(spell, target);
 }
 
-void cast_anim_start(int a1)
+void cast_anim_start(int element)
 {
     if (((int)(short)cast_anim_state) > (-1)) return;
-    cast_anim_state = a1 << 4;
+    cast_anim_state = element << 4;
 }
 
 void cast_anim_update(void)
 {
-    int l_1C;
-    int l_18;
+    int y;
+    int last_y;
 
     if (cast_anim_state < 0) return;
     if (((int)(short)(cast_anim_state & 15)) == 6) {
         if (((int)(unsigned short)(game_settings->view_flags & 1)) != 0) {
-            l_18 = 0;
+            last_y = 0;
         } else {
-            l_18 = -((int)(unsigned short)*(short *)(*(char **)hud_bar_image + 6));
+            last_y = -((int)(unsigned short)*(short *)(*(char **)hud_bar_image + 6));
         }
-        xn_draw_cast_anim_mirrored(spell_cast_anim_fire[(((int)(short)cast_anim_state) >> 4)], 0, l_18);
+        xn_draw_cast_anim_mirrored(spell_cast_anim_fire[(((int)(short)cast_anim_state) >> 4)], 0, last_y);
         cast_anim_state = 65535;
         return;
     }
     if (((int)(unsigned short)(game_settings->view_flags & 1)) != 0) {
-        l_1C = 0;
+        y = 0;
     } else {
-        l_1C = -((int)(unsigned short)*(short *)(*(char **)hud_bar_image + 6));
+        y = -((int)(unsigned short)*(short *)(*(char **)hud_bar_image + 6));
     }
-    xn_draw_cast_anim_mirrored(spell_cast_anim_fire[(((int)(short)cast_anim_state) >> 4)], (int)(short)(cast_anim_state & 15), l_1C);
+    xn_draw_cast_anim_mirrored(spell_cast_anim_fire[(((int)(short)cast_anim_state) >> 4)], (int)(short)(cast_anim_state & 15), y);
     cast_anim_state++;
 }
 
-int spell_player_has_spell(unsigned char a1)
+int spell_player_has_spell(unsigned char spell_id)
 {
-    struct record *l_20;
+    struct record *object;
 
-    l_20 = player_entity->children;
-    while (l_20 != 0) {
-        if (l_20->type == 9 && l_20->data.spell.id == a1) return 1;
-        l_20 = l_20->next;
+    object = player_entity->children;
+    while (object != 0) {
+        if (object->type == 9 && object->data.spell.id == spell_id) return 1;
+        object = object->next;
     }
     return 0;
 }
 
-void func_0005CA28(struct record *a1)
+void func_0005CA28(struct record *object)
 {
-    if (a1->type != 9) return;
-    if ((signed char)D_00199D64->id != (signed char)a1->data.spell.id) return;
-    mc_strncpy((int)D_00199D64 + 47, a1->data.spell.name, 25, (int)D_001757F4, 958);
+    if (object->type != 9) return;
+    if ((signed char)D_00199D64->id != (signed char)object->data.spell.id) return;
+    mc_strncpy((int)D_00199D64 + 47, object->data.spell.name, 25, (int)D_001757F4, 958);
 }
 
-void spell_lookup_name(struct spell *a1)
+void spell_lookup_name(struct spell *spell)
 {
-    int l_1C;
-    struct record *l_18;
+    int i;
+    struct record *spellbook;
 
-    l_1C = 0;
-    while ((signed char)spell_records[l_1C].name[0] == 0 || ((signed char)spell_records[l_1C].id != (signed char)a1->id && l_1C < 128)) {
-        l_1C++;
+    i = 0;
+    while ((signed char)spell_records[i].name[0] == 0 || ((signed char)spell_records[i].id != (signed char)spell->id && i < 128)) {
+        i++;
     }
-    if (l_1C >= 128) {
-        l_18 = object_find_item(player_entity->children, 27, 0);
-        D_00199D64 = a1;
-        object_foreach(l_18->children, (int)func_0005CA28);
+    if (i >= 128) {
+        spellbook = object_find_item(player_entity->children, 27, 0);
+        D_00199D64 = spell;
+        object_foreach(spellbook->children, (int)func_0005CA28);
         return;
     }
-    mc_strncpy(a1->name, (int)(signed char *)&spell_records[l_1C].name[0], 25, (int)D_001757F4, 974);
+    mc_strncpy(spell->name, (int)(signed char *)&spell_records[i].name[0], 25, (int)D_001757F4, 974);
 }
 
 void spell_hud_draw_icons(void)
 {
-    int l_48;
-    int l_44;
-    int l_40;
-    struct record *l_3C;
-    struct record *l_38;
-    struct spell *l_34;
-    int l_30;
-    int l_2C;
-    int l_28;
-    int l_24;
-    int l_20;
-    int l_1C;
-    int l_18;
+    int icon;
+    int tmp_y;
+    int tmp;
+    struct record *object;
+    struct record *next;
+    struct spell *spell;
+    int i;
+    int expiring;
+    int x;
+    int y;
+    int cast_by_other;
+    int columns;
+    unsigned char *bios_ticks;
 
     D_00199D6C = 0;
     if (player_entity->children == 0) return;
-    l_3C = player_entity->children;
+    object = player_entity->children;
     D_00199D71 = 1;
-    while (l_3C != 0) {
-        if (l_3C->type == 9) {
-            if ((int)l_3C->caster != (int)player_entity) {
-                l_40 = 1;
+    while (object != 0) {
+        if (object->type == 9) {
+            if ((int)object->caster != (int)player_entity) {
+                tmp = 1;
             } else {
-                l_40 = 0;
+                tmp = 0;
             }
-            l_20 = l_40;
-            if (l_20 != 0) D_00199D71 = 1;
-            l_34 = &l_3C->data.spell;
-            l_2C = 1;
-            for (l_30 = 0; l_30 < 3; l_30++) {
-                if (l_34->effects[l_30].type != 255 && l_34->cast_durations[l_30] > 1) {
-                    l_2C = 0;
+            cast_by_other = tmp;
+            if (cast_by_other != 0) D_00199D71 = 1;
+            spell = &object->data.spell;
+            expiring = 1;
+            for (i = 0; i < 3; i++) {
+                if (spell->effects[i].type != 255 && spell->cast_durations[i] > 1) {
+                    expiring = 0;
                     break;
                 }
             }
-            if (((int)(unsigned short)(game_settings->view_flags & 1)) != 0 && l_20 != 0) {
-                l_1C = 11;
+            if (((int)(unsigned short)(game_settings->view_flags & 1)) != 0 && cast_by_other != 0) {
+                columns = 11;
             } else {
-                l_1C = 12;
+                columns = 12;
             }
-            l_28 = (int)(unsigned short)D_00185CEC[(D_00199D6C % l_1C)];
-            if (((int)(unsigned short)(game_settings->view_flags & 1)) != 0) l_28 += 35;
-            l_24 = ((D_00199D6C / 12) * 24) + 16;
-            l_18 = 1132;
-            if ((l_2C != 0 && ((struct bf8_3_1 *)((char *)l_18))->f != 0) || l_2C == 0) {
-                if (l_20 != 0) {
+            x = (int)(unsigned short)D_00185CEC[(D_00199D6C % columns)];
+            if (((int)(unsigned short)(game_settings->view_flags & 1)) != 0) x += 35;
+            y = ((D_00199D6C / 12) * 24) + 16;
+            bios_ticks = (unsigned char *)1132;
+            if ((expiring != 0 && ((struct bf8_3_1 *)bios_ticks)->f != 0) || expiring == 0) {
+                if (cast_by_other != 0) {
                     if (((int)(unsigned short)(game_settings->view_flags & 1)) != 0) {
-                        l_44 = 177;
+                        tmp_y = 177;
                     } else {
-                        l_44 = ((int)(unsigned short)*(short *)(*(char **)hud_bar_image + 2)) - 22;
+                        tmp_y = ((int)(unsigned short)*(short *)(*(char **)hud_bar_image + 2)) - 22;
                     }
-                    l_24 = l_44;
-                } else if (l_34->effects[0].type == 35 && l_34->effects[1].type == 255 && player_character->shield_points == 0) {
-                    l_38 = l_3C->next;
-                    spell_end(l_3C);
-                    l_3C = l_38;
+                    y = tmp_y;
+                } else if (spell->effects[0].type == 35 && spell->effects[1].type == 255 && player_character->shield_points == 0) {
+                    next = object->next;
+                    spell_end(object);
+                    object = next;
                     continue;
                 }
-                if (l_34->icon >= 200) {
-                    l_48 = 10;
+                if (spell->icon >= 200) {
+                    icon = 10;
                 } else {
-                    l_48 = l_34->icon;
+                    icon = spell->icon;
                 }
-                xn_draw_spell_icon(l_28, l_24, l_48);
+                xn_draw_spell_icon(x, y, icon);
             }
             D_00199D6C++;
         }
-        l_3C = l_3C->next;
+        object = object->next;
     }
     if (D_00199D6C != 0) return;
-    for (l_30 = 0; l_30 < 8; l_30++) {
-        if (player_character->attributes[l_30] > player_character->base_attributes[l_30]) {
-            player_character->attributes[l_30] = player_character->base_attributes[l_30];
+    for (i = 0; i < 8; i++) {
+        if (player_character->attributes[i] > player_character->base_attributes[i]) {
+            player_character->attributes[i] = player_character->base_attributes[i];
         }
     }
 }

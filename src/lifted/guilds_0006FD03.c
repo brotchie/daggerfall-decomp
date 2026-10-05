@@ -9,9 +9,9 @@ extern signed char D_001940D5;
 extern int spell_effect_text_index(short);
 extern void msgbox_show_rsc(int, int);
 
-void spellshop_show_effect(short a1)
+void spellshop_show_effect(short effect)
 {
-    if (selected_spell->effects[(int)(short)a1].type == 255) return;
+    if (selected_spell->effects[(int)(short)effect].type == 255) return;
     D_001940D5 |= 1;
-    msgbox_show_rsc((int)(short)(spell_effect_text_index((int)(short)a1) + 1200), 1);
+    msgbox_show_rsc((int)(short)(spell_effect_text_index((int)(short)effect) + 1200), 1);
 }

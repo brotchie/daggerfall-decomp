@@ -18,38 +18,38 @@ extern void itemmaker_set_power_param_cb(short);
 extern void func_00057147(short, short, short, short, short, short, short);
 extern void itemmaker_show_param_list(int, short);
 
-void itemmaker_add_power_cb(int a1)
+void itemmaker_add_power_cb(int power)
 {
-    short l_18;
+    short slot;
 
-    *(short *)scratch_190d66 = a1;
-    *(int *)&l_18 = itemmaker_free_slot();
-    *(short *)scratch_190d64 = *(int *)&l_18;
-    if (((int)(short)l_18) == (-1)) {
+    *(short *)scratch_190d66 = power;
+    *(int *)&slot = itemmaker_free_slot();
+    *(short *)scratch_190d64 = *(int *)&slot;
+    if (((int)(short)slot) == (-1)) {
         msgbox_show_rsc(1657, 1);
         return;
     }
-    scratch_190ce4[(int)(short)l_18] = 0;
-    if (*(int *)(enchant_power_params + (((int)(short)*(short *)&a1) << 2)) != 0) {
-        *(short *)(itemmaker_slots + (((int)(short)l_18) << 2)) = a1;
-        if (((unsigned)*(int *)(enchant_power_params + (((int)(short)*(short *)&a1) << 2))) < 5) {
-            if (itemmaker_pick_param_list(*(int *)(enchant_power_params + (((int)(short)*(short *)&a1) << 2))) == 0) {
-                scratch_190ce4[(int)(short)l_18] = 255;
+    scratch_190ce4[(int)(short)slot] = 0;
+    if (*(int *)(enchant_power_params + (((int)(short)*(short *)&power) << 2)) != 0) {
+        *(short *)(itemmaker_slots + (((int)(short)slot) << 2)) = power;
+        if (((unsigned)*(int *)(enchant_power_params + (((int)(short)*(short *)&power) << 2))) < 5) {
+            if (itemmaker_pick_param_list(*(int *)(enchant_power_params + (((int)(short)*(short *)&power) << 2))) == 0) {
+                scratch_190ce4[(int)(short)slot] = 255;
                 return;
             }
         } else {
-            itemmaker_show_param_list(*(int *)(enchant_power_params + (((int)(short)*(short *)&a1) << 2)), (int)(short)*(short *)&a1);
+            itemmaker_show_param_list(*(int *)(enchant_power_params + (((int)(short)*(short *)&power) << 2)), (int)(short)*(short *)&power);
         }
         list_popup_callback = (int)itemmaker_set_power_param_cb;
     } else {
-        if (((int)(short)*(short *)&a1) == 11) {
-            func_00057147((int)(short)l_18, 23, -1, 11, -1, -1, -1);
+        if (((int)(short)*(short *)&power) == 11) {
+            func_00057147((int)(short)slot, 23, -1, 11, -1, -1, -1);
         }
-        if (((int)(short)*(short *)&a1) == 12) {
-            func_00057147((int)(short)l_18, 24, -1, 12, -1, -1, -1);
+        if (((int)(short)*(short *)&power) == 12) {
+            func_00057147((int)(short)slot, 24, -1, 12, -1, -1, -1);
         }
-        *(short *)(itemmaker_slots + (((int)(short)l_18) << 2)) = a1;
-        *(short *)(D_001998E2 + (((int)(short)l_18) << 2)) = 65535;
+        *(short *)(itemmaker_slots + (((int)(short)slot) << 2)) = power;
+        *(short *)(D_001998E2 + (((int)(short)slot) << 2)) = 65535;
     }
     xn_mouse_cursor_drawn &= 254;
 }

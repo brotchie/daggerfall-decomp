@@ -20,7 +20,7 @@ extern struct record *marker_find_nth(struct record *, int, int);
 
 void kludge_fix_dungeon_door(void)
 {
-    struct record *p;
+    struct record *object;
     int i;
 
     for (i = 0; i < dungeon_block_count; i++) {
@@ -28,17 +28,17 @@ void kludge_fix_dungeon_door(void)
             if (dungeon_blocks[i].kind == 1 && dungeon_blocks[i].id == 9) {
                 D_00199720 = marker_find_nth(location_object, 8, 0);
                 D_00199720 = object_find_by_id(location_object, D_00199720->id);
-                p = kludge_find_door();
-                if (p != 0)
-                    object_delete(p);
-                p = object_create_child(D_00199720->parent, 0, 62);
-                p->type = 6;
-                p->image2 = 703;
-                p->image = 0;
-                p->id = object_new_id(location_object->id >> 16);
-                p->x = location_object->x + 664;
-                p->y = location_object->y - 1281;
-                p->z = location_object->z + 2035;
+                object = kludge_find_door();
+                if (object != 0)
+                    object_delete(object);
+                object = object_create_child(D_00199720->parent, 0, 62);
+                object->type = 6;
+                object->image2 = 703;
+                object->image = 0;
+                object->id = object_new_id(location_object->id >> 16);
+                object->x = location_object->x + 664;
+                object->y = location_object->y - 1281;
+                object->z = location_object->z + 2035;
             }
     }
 }

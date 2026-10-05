@@ -6,31 +6,31 @@ extern struct faction *D_0019670C;
 extern struct faction *D_0019671C;
 extern unsigned char faction_subtree_search_r(struct faction *);
 
-int faction_tree_relation(struct faction *a, struct faction *b)
+int faction_tree_relation(struct faction *faction, struct faction *other)
 {
-    struct faction *save;
+    struct faction *original;
 
-    save = a;
-    D_0019671C = b;
-    D_0019670C = a->parent;
+    original = faction;
+    D_0019671C = other;
+    D_0019670C = faction->parent;
     D_00195B84 = 0;
-    if ((unsigned char)(faction_subtree_search_r(b->child) & 1))
+    if ((unsigned char)(faction_subtree_search_r(other->child) & 1))
         return 3;
-    if (a->parent != 0) {
-        a = a->parent->child;
-        while (a != 0) {
-            if (a == b)
+    if (faction->parent != 0) {
+        faction = faction->parent->child;
+        while (faction != 0) {
+            if (faction == other)
                 return 2;
-            a = a->next;
+            faction = faction->next;
         }
     }
-    a = save;
-    if (a->parent != 0) {
-        a = a->parent;
-        while (a != 0) {
-            if (a == b)
+    faction = original;
+    if (faction->parent != 0) {
+        faction = faction->parent;
+        while (faction != 0) {
+            if (faction == other)
                 return 1;
-            a = a->parent;
+            faction = faction->parent;
         }
     }
     return 0;

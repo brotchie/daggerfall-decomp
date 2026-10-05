@@ -151,16 +151,16 @@ extern void inventory_frame(void);
 extern void doors_update(void);
 extern void travel_map_update(void);
 void world_render(void);
-void screen_shake_offset(int, int);
+void screen_shake_offset(int *, int *);
 
 void game_frame(void)
 {
-    int l_2C;
-    int l_28;
-    int l_24;
-    int l_20;
-    int l_1C;
-    int l_18;
+    int reset_container;
+    int unused;
+    int unused2;
+    int elapsed;
+    int *ticks_addr;
+    int unused3;
 
     mem_check_crt_heap(98);
     music_choose_song();
@@ -177,8 +177,8 @@ void game_frame(void)
     if ((int)D_00195A88 != 0 && player_on_ground != 0 && (int)player_object->parent != (int)D_00195A88) {
         object_reparent(D_00195A88, player_object);
     }
-    l_1C = 1132;
-    l_20 = *(int *)((char *)l_1C) - D_0018DC30;
+    ticks_addr = (int *)1132;
+    elapsed = *ticks_addr - D_0018DC30;
     frame_checkpoint = 101;
     links_update();
     frame_checkpoint = 102;
@@ -194,11 +194,11 @@ void game_frame(void)
     D_0012B508 = 146;
     xn_font_select(4);
     if (((int)D_0019626F) != 4 || ((int)(unsigned char)game_mode) != 8) {
-        l_2C = 1;
+        reset_container = 1;
     } else {
-        l_2C = 0;
+        reset_container = 0;
     }
-    if (l_2C != 0 && ((int)(unsigned char)game_mode) != 4) {
+    if (reset_container != 0 && ((int)(unsigned char)game_mode) != 4) {
         inv_right_container = (struct record *)D_001960D9;
         inv_right_container_base = (struct record *)D_001960D9;
     }
@@ -276,17 +276,17 @@ void game_frame(void)
 
 void world_render(void)
 {
-    int l_38;
-    int l_34;
-    int l_30;
-    int l_2C;
-    int l_28;
-    int l_24;
-    int l_20;
-    int l_1C;
-    int l_18;
+    int alive;
+    int eye_height;
+    int unused;
+    int unused2;
+    int unused3;
+    int shake_pitch;
+    int shake_yaw;
+    int incomplete;
+    int retries;
 
-    l_18 = 0;
+    retries = 0;
     if (D_00187CA8 == 0) return;
     model_cache_flush_count = 0;
     doors_update();
@@ -294,22 +294,22 @@ void world_render(void)
         xn_cam_x = player_object->x;
         xn_cam_z = player_object->z;
         if (((struct bf8_2_1 *)&player_motion_flags)->f != 0) {
-            l_34 = 35;
+            eye_height = 35;
         } else {
-            l_34 = 72;
+            eye_height = 72;
         }
-        xn_cam_y = (player_object->y - l_34) - head_bob_offset;
+        xn_cam_y = (player_object->y - eye_height) - head_bob_offset;
         if ((player_character->flags & 1536) != 0) xn_cam_y -= 50;
         if (player_death_timer > 0) {
             xn_cam_y = ((((xn_cam_y - (player_object->y - 20)) * player_death_timer) / 1000) + player_object->y) - 20;
         }
         if (D_001962A0 != 0) {
             if (player_death_timer <= 0) {
-                l_38 = 1;
+                alive = 1;
             } else {
-                l_38 = 0;
+                alive = 0;
             }
-            if (l_38 != 0) goto L10C14;
+            if (alive != 0) goto L10C14;
         }
         goto L10C1B;
 L10C14:;
@@ -329,10 +329,10 @@ L10C1B:;
         if (dungeon_water_level != 10000 && abs(xn_cam_y - dungeon_water_level) < 5) {
             xn_cam_y -= 10;
         }
-        screen_shake_offset((int)&l_24, (int)&l_20);
-        xn_cam_pitch += l_24;
+        screen_shake_offset(&shake_pitch, &shake_yaw);
+        xn_cam_pitch += shake_pitch;
         xn_cam_pitch &= 2047;
-        xn_cam_yaw += l_20;
+        xn_cam_yaw += shake_yaw;
         xn_cam_yaw &= 2047;
         frame_checkpoint = 200;
         xn_tex_cache_begin_frame();
@@ -357,15 +357,15 @@ L10C1B:;
         D_0018DC10 = xn_model_queue_count;
         frame_checkpoint = 205;
         if (((int)player_environment) == 1) {
-            l_1C = xn_render_frame(2);
+            incomplete = xn_render_frame(2);
         } else {
-            l_1C = xn_render_frame(0);
+            incomplete = xn_render_frame(0);
         }
         frame_checkpoint = 206;
         D_0018DC08 = xn_model_queue_count;
-        if (l_1C == 0) if (xn_tex_cache_full == 0) break;
-        ++l_18;
-        if (l_18 != 1) fatal_error((int)D_001700A0);
+        if (incomplete == 0) if (xn_tex_cache_full == 0) break;
+        ++retries;
+        if (retries != 1) fatal_error((int)D_001700A0);
         xn_tex_cache_full = 0;
         xn_tex_cache_flush();
     }
@@ -375,36 +375,36 @@ L10C1B:;
     xn_water_draw();
 }
 
-void screen_shake_offset(int a1, int a2)
+void screen_shake_offset(int *pitch, int *yaw)
 {
-    *(int *)((char *)a1) = 0;
-    *(int *)((char *)a2) = 0;
+    *pitch = 0;
+    *yaw = 0;
     if (screen_shake == 0) {
-        *(int *)((char *)a2) = 0;
-        *(int *)((char *)a1) = *(int *)((char *)a2);
+        *yaw = 0;
+        *pitch = *yaw;
         return;
     }
     screen_shake_timer -= frame_ticks;
     if (screen_shake_timer > 0) {
-        *(int *)((char *)a1) = D_0018DC2C;
-        *(int *)((char *)a2) = D_0018DBF8;
+        *pitch = D_0018DC2C;
+        *yaw = D_0018DBF8;
         return;
     }
     screen_shake_timer = 60;
     screen_shake -= 2;
     screen_shake_angle += 128;
     screen_shake_angle &= 2047;
-    *(int *)((char *)a1) = xn_math_mul_sin(screen_shake, screen_shake_angle);
-    *(int *)((char *)a2) = *(int *)((char *)a1);
-    if (((struct bf8_0_1 *)&screen_shake_signs)->f != 0) *(int *)((char *)a1) = -(*(int *)((char *)a1));
-    if (((struct bf8_1_1 *)&screen_shake_signs)->f != 0) *(int *)((char *)a2) = -(*(int *)((char *)a2));
-    D_0018DC2C = *(int *)((char *)a1);
-    D_0018DBF8 = *(int *)((char *)a2);
+    *pitch = xn_math_mul_sin(screen_shake, screen_shake_angle);
+    *yaw = *pitch;
+    if (((struct bf8_0_1 *)&screen_shake_signs)->f != 0) *pitch = -(*pitch);
+    if (((struct bf8_1_1 *)&screen_shake_signs)->f != 0) *yaw = -(*yaw);
+    D_0018DC2C = *pitch;
+    D_0018DBF8 = *yaw;
 }
 
-void screen_shake_start(int a1)
+void screen_shake_start(int strength)
 {
-    screen_shake = a1 / 2;
+    screen_shake = strength / 2;
     if (((struct bf8_0_1 *)&screen_shake)->f != 0) (screen_shake)++;
     screen_shake_signs = rand();
     screen_shake_angle = 0;

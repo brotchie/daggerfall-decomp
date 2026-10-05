@@ -6,33 +6,33 @@
 #pragma aux sosconv "*" parm caller [] value [eax] modify [eax ebx ecx edx];
 #pragma aux (sosconv) profile_get_string;
 
-int profile_get_string(int a1, int a2, int a3)
+int profile_get_string(int profile, char *value, int size)
 {
-    int l_14;
-    int l_10;
+    char *cursor;
+    int length;
 
-    if (*(int *)((char *)a1 + 164) != 0) {
-        l_14 = *(int *)((char *)a1 + 164);
+    if (*(int *)((char *)profile + 164) != 0) {
+        cursor = *(char **)((char *)profile + 164);
     } else {
-        l_14 = *(int *)((char *)a1 + 160);
+        cursor = *(char **)((char *)profile + 160);
     }
-    if (l_14 == 0) return 0;
-    l_10 = 0;
-    while (((int)(unsigned char)*(signed char *)((char *)l_14)) == 32) l_14++;
-    while (((int)(unsigned char)*(signed char *)((char *)l_14)) != 13 && ((int)(unsigned char)*(signed char *)((char *)l_14)) != 44 && ((unsigned)(a3 - 1)) > l_10) {
-        *(signed char *)((char *)(l_10++ + a2)) = *(signed char *)((char *)l_14++);
+    if (cursor == 0) return 0;
+    length = 0;
+    while (*cursor == 32) cursor++;
+    while (*cursor != 13 && *cursor != 44 && ((unsigned)(size - 1)) > length) {
+        value[length++] = *cursor++;
     }
-    *(signed char *)((char *)(a2 + l_10)) = 0;
-    if ((a3 - 1) == l_10) {
-        while (((int)(unsigned char)*(signed char *)((char *)l_14)) != 13 && ((int)(unsigned char)*(signed char *)((char *)l_14)) != 44) {
-            l_14++;
+    value[length] = 0;
+    if ((size - 1) == length) {
+        while (*cursor != 13 && *cursor != 44) {
+            cursor++;
         }
     }
-    if (((int)(unsigned char)*(signed char *)((char *)l_14)) == 44) {
-        ++l_14;
-        *(int *)((char *)a1 + 164) = l_14;
+    if (*cursor == 44) {
+        ++cursor;
+        *(char **)((char *)profile + 164) = cursor;
     } else {
-        *(int *)((char *)a1 + 164) = l_14;
+        *(char **)((char *)profile + 164) = cursor;
     }
     return 1;
 }

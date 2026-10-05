@@ -25,7 +25,7 @@ extern int file_index_names;
 extern int file_resolver;
 extern int file_index_count;
 
-extern int open(int, ...);
+extern int open(char *, ...);
 extern int close();
 extern int mc_free();
 extern int mc_memset();
@@ -43,252 +43,252 @@ extern int mc_memcpy();
 extern int filelength();
 extern int strchr();
 extern void fatal_error(int);
-extern void file_index_scan(int);
-int disk_write_file(int, int, int);
-int disk_open_data(int);
-int disk_resolve_path(int);
-void file_index_add_dir(int);
+extern void file_index_scan(char *);
+int disk_write_file(char *, int, int);
+int disk_open_data(char *);
+char *disk_resolve_path(char *);
+void file_index_add_dir(char *);
 #pragma aux mc_set_location parm routine [];
 
-int disk_read_file(int a1, int a2)
+int disk_read_file(char *name, int buffer)
 {
-    int l_24;
-    int l_20;
-    int l_1C;
-    int l_18;
+    int data;
+    int handle;
+    int size;
+    int bytes_read;
 
-    l_24 = a2;
-    l_20 = disk_open_data(a1);
-    if (l_20 < 0) {
+    data = buffer;
+    handle = disk_open_data(name);
+    if (handle < 0) {
         mc_set_location(45, (int)D_00175D00);
-        mc_sprintf((int)disk_path, (int)D_00175D07, a1);
+        mc_sprintf((int)disk_path, (int)D_00175D07, name);
         fatal_error((int)disk_path);
     }
-    l_1C = (*(int *)disk_last_file_size = filelength(l_20));
-    if (l_24 == 0) l_24 = mc_malloc(l_1C, (int)D_00175D00, 52);
-    if (l_24 == 0) {
+    size = (*(int *)disk_last_file_size = filelength(handle));
+    if (data == 0) data = mc_malloc(size, (int)D_00175D00, 52);
+    if (data == 0) {
         mc_set_location(56, (int)D_00175D00);
-        mc_sprintf((int)disk_path, (int)D_00175D22, a1);
+        mc_sprintf((int)disk_path, (int)D_00175D22, name);
         fatal_error((int)disk_path);
     }
-    mc_memset(l_24, 0, l_1C, (int)D_00175D00, 60, 4);
-    l_18 = read(l_20, l_24, l_1C);
-    if (l_18 != l_1C) {
+    mc_memset(data, 0, size, (int)D_00175D00, 60, 4);
+    bytes_read = read(handle, data, size);
+    if (bytes_read != size) {
         mc_set_location(65, (int)D_00175D00);
-        mc_sprintf((int)disk_path, (int)D_00175D44, a1);
+        mc_sprintf((int)disk_path, (int)D_00175D44, name);
         fatal_error((int)disk_path);
     }
-    close(l_20);
-    return l_24;
+    close(handle);
+    return data;
 }
 
-int disk_write_file(int a1, int a2, int a3)
+int disk_write_file(char *path, int data, int size)
 {
-    int l_18;
-    int l_14;
+    int handle;
+    int ok;
 
-    unlink(a1);
-    l_18 = open(a1, 546, 384);
-    if (l_18 < 1) return 0;
-    l_14 = ((write(l_18, a2, a3) == a3) ? 1 : 0);
-    close(l_18);
-    return l_14;
+    unlink(path);
+    handle = open(path, 546, 384);
+    if (handle < 1) return 0;
+    ok = ((write(handle, data, size) == size) ? 1 : 0);
+    close(handle);
+    return ok;
 }
 
-int disk_write_arena2_file(int a1, int a2, int a3)
+int disk_write_arena2_file(char *name, int data, int size)
 {
     mc_set_location(107, (int)D_00175D00);
-    mc_sprintf((int)disk_path, (int)D_00175D60, (int)arena2_path, a1);
-    return disk_write_file((int)disk_path, a2, a3);
+    mc_sprintf((int)disk_path, (int)D_00175D60, (int)arena2_path, name);
+    return disk_write_file(disk_path, data, size);
 }
 
-int disk_open_data(int a1)
+int disk_open_data(char *name)
 {
-    a1 = disk_resolve_path(a1);
-    return open(a1, 512);
+    name = disk_resolve_path(name);
+    return open(name, 512);
 }
 
-int disk_open_rw(int a1)
+int disk_open_rw(char *name)
 {
     mc_set_location(135, (int)D_00175D00);
-    mc_sprintf((int)disk_path, (int)D_00175D60, (int)arena2_path, a1);
-    return open((int)disk_path, 514);
+    mc_sprintf((int)disk_path, (int)D_00175D60, (int)arena2_path, name);
+    return open(disk_path, 514);
 }
 
-int disk_create(int a1)
+int disk_create(char *name)
 {
     mc_set_location(149, (int)D_00175D00);
-    mc_sprintf((int)disk_path, (int)D_00175D60, (int)arena2_path, a1);
+    mc_sprintf((int)disk_path, (int)D_00175D60, (int)arena2_path, name);
     unlink((int)disk_path);
-    return open((int)disk_path, 546, 384);
+    return open(disk_path, 546, 384);
 }
 
-int disk_file_exists(int a1)
+int disk_file_exists(char *name)
 {
-    short l_18;
-    char l_7C[92];
+    short handle;
+    char path[92];
 
     mc_set_location(159, (int)D_00175D00);
-    mc_sprintf((int)l_7C, (int)D_00175D60, (int)arena2_path, a1);
-    *(int *)&l_18 = open((int)l_7C, 512);
-    if (l_18 < 0) return 0;
-    close((int)(short)l_18);
+    mc_sprintf((int)path, (int)D_00175D60, (int)arena2_path, name);
+    *(int *)&handle = open(path, 512);
+    if (handle < 0) return 0;
+    close((int)(short)handle);
     return 1;
 }
 
-void disk_copy_file(int a1, int a2, int a3)
+void disk_copy_file(char *name, char *from_dir, char *to_dir)
 {
-    int l_1C;
-    int l_18;
-    int l_14;
-    int l_10;
+    char *path;
+    int src_handle;
+    int dst_handle;
+    int count;
 
-    l_1C = mc_malloc(4096, (int)D_00175D00, 172);
-    if (((int)(unsigned char)*(signed char *)((char *)(strlen(a2) + a2) - 1)) == 92) {
+    path = (char *)mc_malloc(4096, (int)D_00175D00, 172);
+    if (from_dir[strlen(from_dir) - 1] == 92) {
         mc_set_location(176, (int)D_00175D00);
-        mc_sprintf(l_1C, (int)D_00175D60, a2, a1);
+        mc_sprintf((int)path, (int)D_00175D60, from_dir, name);
     } else {
         mc_set_location(178, (int)D_00175D00);
-        mc_sprintf(l_1C, (int)D_00175D65, a2, a1);
+        mc_sprintf((int)path, (int)D_00175D65, from_dir, name);
     }
-    l_18 = open(l_1C, 512);
-    if (l_18 == (-1)) {
-        if (l_1C != 0 && l_1C != (-1751672937)) {
-            mc_free(l_1C, (int)D_00175D00, 184);
-            l_1C = -1751672937;
+    src_handle = open(path, 512);
+    if (src_handle == (-1)) {
+        if (path != 0 && path != (char *)-1751672937) {
+            mc_free(path, (int)D_00175D00, 184);
+            path = (char *)-1751672937;
         }
         return;
     }
-    if (((int)(unsigned char)*(signed char *)((char *)(strlen(a3) + a3) - 1)) == 92) {
+    if (to_dir[strlen(to_dir) - 1] == 92) {
         mc_set_location(189, (int)D_00175D00);
-        mc_sprintf(l_1C, (int)D_00175D60, a3, a1);
+        mc_sprintf((int)path, (int)D_00175D60, to_dir, name);
     } else {
         mc_set_location(191, (int)D_00175D00);
-        mc_sprintf(l_1C, (int)D_00175D65, a3, a1);
+        mc_sprintf((int)path, (int)D_00175D65, to_dir, name);
     }
-    l_14 = open(l_1C, 610, 384);
-    if (l_14 == (-1)) {
-        if (l_1C != 0 && l_1C != (-1751672937)) {
-            mc_free(l_1C, (int)D_00175D00, 197);
-            l_1C = -1751672937;
+    dst_handle = open(path, 610, 384);
+    if (dst_handle == (-1)) {
+        if (path != 0 && path != (char *)-1751672937) {
+            mc_free(path, (int)D_00175D00, 197);
+            path = (char *)-1751672937;
         }
-        close(l_18);
+        close(src_handle);
         return;
     }
-    l_10 = read(l_18, D_00147954, 102400);
-    while (l_10 == 102400) {
-        write(l_14, D_00147954, l_10);
-        l_10 = read(l_18, D_00147954, 102400);
+    count = read(src_handle, D_00147954, 102400);
+    while (count == 102400) {
+        write(dst_handle, D_00147954, count);
+        count = read(src_handle, D_00147954, 102400);
     }
-    write(l_14, D_00147954, l_10);
-    close(l_14);
-    close(l_18);
-    if (l_1C == 0 || l_1C == (-1751672937)) return;
-    mc_free(l_1C, (int)D_00175D00, 213);
-    l_1C = -1751672937;
+    write(dst_handle, D_00147954, count);
+    close(dst_handle);
+    close(src_handle);
+    if (path == 0 || path == (char *)-1751672937) return;
+    mc_free(path, (int)D_00175D00, 213);
+    path = (char *)-1751672937;
 }
 
-int disk_resolve_path(int a1)
+char *disk_resolve_path(char *name)
 {
-    int l_28;
-    int l_24;
-    int l_20;
-    int l_1C;
+    int dir_start;
+    char *entry;
+    int i;
+    int offset;
     {
-        char l_8C[80];
-        char l_3C[16];
+        char dir[80];
+        char prefix[16];
 
-        if (strchr(a1, 92) != 0 && ((int)(unsigned char)*(signed char *)((char *)a1 + 1)) != 58) {
-            l_20 = 0;
-            while (((int)(unsigned char)*(signed char *)((char *)(a1 + l_20))) != 92) {
-                *(signed char *)((char *)l_3C + l_20) = *(signed char *)((char *)(a1 + l_20));
-                l_20++;
+        if (strchr(name, 92) != 0 && name[1] != 58) {
+            i = 0;
+            while (name[i] != 92) {
+                prefix[i] = name[i];
+                i++;
             }
-            *(signed char *)((char *)l_3C + l_20++) = 92;
-            *(signed char *)((char *)l_3C + l_20) = 0;
+            prefix[i++] = 92;
+            prefix[i] = 0;
         } else {
-            *(signed char *)l_3C = 0;
+            prefix[0] = 0;
         }
-        l_24 = a1;
-        a1 += strlen(a1) - 1;
-        while (((int)(unsigned char)*(signed char *)((char *)a1)) != 92 && a1 != l_24) a1--;
-        if (((int)(unsigned char)*(signed char *)((char *)a1)) == 92) a1++;
-        if (strnicmp((strlen(a1) - 3) + a1, (int)D_00175D6B, 3) == 0) {
+        entry = name;
+        name += strlen(name) - 1;
+        while (*name != 92 && name != entry) name--;
+        if (*name == 92) name++;
+        if (strnicmp((strlen(name) - 3) + name, (int)D_00175D6B, 3) == 0) {
             mc_set_location(246, (int)D_00175D00);
-            mc_sprintf((int)disk_path, (int)D_00175D60, (int)arena2_path, a1);
-            return (int)disk_path;
+            mc_sprintf((int)disk_path, (int)D_00175D60, (int)arena2_path, name);
+            return disk_path;
         }
-        if (strnicmp((strlen(a1) - 3) + a1, (int)D_00175D6F, 3) == 0) {
+        if (strnicmp((strlen(name) - 3) + name, (int)D_00175D6F, 3) == 0) {
             mc_set_location(252, (int)D_00175D00);
-            mc_sprintf((int)disk_path, (int)D_00175D60, (int)arena2_path, a1);
-            return (int)disk_path;
+            mc_sprintf((int)disk_path, (int)D_00175D60, (int)arena2_path, name);
+            return disk_path;
         }
-        l_24 = file_index_names;
-        for (l_20 = 0; l_20 < file_index_count; l_20++) {
-            if (stricmp(a1, l_24) == 0) {
-                l_1C = l_24 - file_index_names;
-                *(signed char *)l_8C = 0;
-                l_24 = file_index_dirs;
+        entry = (char *)file_index_names;
+        for (i = 0; i < file_index_count; i++) {
+            if (stricmp(name, entry) == 0) {
+                offset = (int)entry - file_index_names;
+                dir[0] = 0;
+                entry = (char *)file_index_dirs;
                 for (;;) {
-                    l_28 = *(int *)((char *)(strlen(l_24) + l_24) + 1);
-                    if (l_1C < l_28) {
-                        if (*(signed char *)l_8C == 0) {
+                    dir_start = *(int *)(entry + strlen(entry) + 1);
+                    if (offset < dir_start) {
+                        if (dir[0] == 0) {
                             mc_set_location(269, (int)D_00175D00);
-                            mc_sprintf((int)disk_path, (int)D_00175D73, (int)arena2_path, (int)l_8C, a1);
+                            mc_sprintf((int)disk_path, (int)D_00175D73, (int)arena2_path, (int)dir, name);
                         } else {
                             mc_set_location(271, (int)D_00175D00);
-                            mc_sprintf((int)disk_path, (int)D_00175D7A, (int)arena2_path, (int)l_8C, a1);
+                            mc_sprintf((int)disk_path, (int)D_00175D7A, (int)arena2_path, (int)dir, name);
                         }
-                        return (int)disk_path;
+                        return disk_path;
                     }
-                    mc_strncpy((int)l_8C, l_24, 80, (int)D_00175D00, 274);
-                    l_24 += strlen(l_24) + 5;
+                    mc_strncpy((int)dir, entry, 80, (int)D_00175D00, 274);
+                    entry += strlen(entry) + 5;
                 }
             }
-            l_24 += strlen(l_24) + 1;
+            entry += strlen(entry) + 1;
         }
         mc_set_location(281, (int)D_00175D00);
-        mc_sprintf((int)disk_path, (int)D_00175D73, (int)arena2_cd_path, (int)l_3C, a1);
-        return (int)disk_path;
+        mc_sprintf((int)disk_path, (int)D_00175D73, (int)arena2_cd_path, (int)prefix, name);
+        return disk_path;
     }
 }
 
-void file_index_add_dir(int a1)
+void file_index_add_dir(char *name)
 {
-    mc_strncpy(file_index_dirs_end, a1, 4, (int)D_00175D00, 287);
-    file_index_dirs_end += strlen(a1) + 1;
+    mc_strncpy(file_index_dirs_end, name, 4, (int)D_00175D00, 287);
+    file_index_dirs_end += strlen(name) + 1;
     *(int *)(*(char **)&file_index_dirs_end) = file_index_names_end - file_index_names;
     file_index_dirs_end += 4;
 }
 
-void file_index_add_name(int a1)
+void file_index_add_name(char *name)
 {
-    mc_strncpy(file_index_names_end, a1, 4, (int)D_00175D00, 295);
-    file_index_names_end += strlen(a1) + 1;
+    mc_strncpy(file_index_names_end, name, 4, (int)D_00175D00, 295);
+    file_index_names_end += strlen(name) + 1;
     file_index_count++;
 }
 
 void file_index_build(void)
 {
-    int l_1C;
-    int l_18;
+    int copy;
+    int buffer;
 
-    l_18 = mc_malloc(102400, (int)D_00175D00, 303);
+    buffer = mc_malloc(102400, (int)D_00175D00, 303);
     file_index_count = 0;
-    file_index_dirs = (file_index_dirs_end = l_18);
-    file_index_names = (file_index_names_end = l_18 + 1024);
-    file_index_scan((int)arena2_path);
-    file_index_add_dir((int)D_00175D82);
-    l_1C = mc_malloc((file_index_dirs_end - file_index_dirs) + 1, (int)D_00175D00, 311);
-    mc_memcpy(l_1C, file_index_dirs, (file_index_dirs_end - file_index_dirs) + 1, (int)D_00175D00, 312, 4);
-    file_index_dirs = l_1C;
-    l_1C = mc_malloc((file_index_names_end - file_index_names) + 1, (int)D_00175D00, 315);
-    mc_memcpy(l_1C, file_index_names, (int)&*(signed char *)((char *)(file_index_names_end - file_index_names) + 1), (int)D_00175D00, 316, 4);
-    file_index_names = l_1C;
+    file_index_dirs = (file_index_dirs_end = buffer);
+    file_index_names = (file_index_names_end = buffer + 1024);
+    file_index_scan(arena2_path);
+    file_index_add_dir(D_00175D82);
+    copy = mc_malloc((file_index_dirs_end - file_index_dirs) + 1, (int)D_00175D00, 311);
+    mc_memcpy(copy, file_index_dirs, (file_index_dirs_end - file_index_dirs) + 1, (int)D_00175D00, 312, 4);
+    file_index_dirs = copy;
+    copy = mc_malloc((file_index_names_end - file_index_names) + 1, (int)D_00175D00, 315);
+    mc_memcpy(copy, file_index_names, (int)&*(signed char *)((char *)(file_index_names_end - file_index_names) + 1), (int)D_00175D00, 316, 4);
+    file_index_names = copy;
     file_resolver = (int)disk_resolve_path;
-    if (l_18 == 0 || l_18 == (-1751672937)) return;
-    mc_free(l_18, (int)D_00175D00, 320);
-    l_18 = -1751672937;
+    if (buffer == 0 || buffer == (-1751672937)) return;
+    mc_free(buffer, (int)D_00175D00, 320);
+    buffer = -1751672937;
 }
 
 void file_index_free(void)

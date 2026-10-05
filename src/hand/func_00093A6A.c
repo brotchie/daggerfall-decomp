@@ -16,25 +16,25 @@ extern int xn_draw_image_scaled();
 extern char *xn_tex_cache_lookup(int, int, int);
 extern int xn_tex_cache_flush();
 
-void inv_draw_item_image(char *a1, struct rect *a2, int a3)
+void inv_draw_item_image(char *item, struct rect *rects, int cell)
 {
-    short l_14;
-    short l_1C;
-    struct img *l_20;
-    short l_18;
-    char *l_24;
-    short l_10;
+    short width;
+    short centre_x;
+    struct img *image;
+    short centre_y;
+    char *texture;
+    short height;
 
-    l_24 = xn_tex_cache_lookup(*(unsigned short *)(a1 + 50) >> 7, *(unsigned short *)(a1 + 50) & 127, -1);
-    if (l_24 == 0) {
+    texture = xn_tex_cache_lookup(*(unsigned short *)(item + 50) >> 7, *(unsigned short *)(item + 50) & 127, -1);
+    if (texture == 0) {
         xn_tex_cache_flush();
-        l_24 = xn_tex_cache_lookup(*(unsigned short *)(a1 + 50) >> 7, *(unsigned short *)(a1 + 50) & 127, -1);
+        texture = xn_tex_cache_lookup(*(unsigned short *)(item + 50) >> 7, *(unsigned short *)(item + 50) & 127, -1);
     }
-    l_20 = *(struct img **)(l_24 + 12);
-    l_1C = (a2[a3].x0 + a2[a3].x1) >> 1;
-    l_18 = (a2[a3].y0 + a2[a3].y1) >> 1;
-    l_14 = l_20->w;
-    l_10 = l_20->h;
-    size_fit(&l_14, &l_10, a2[a3].x1 - a2[a3].x0 - 4, a2[a3].y1 - a2[a3].y0 - 4);
-    xn_draw_image_scaled(l_1C - (l_14 >> 1), l_18 - (l_10 >> 1), l_14, l_10, l_20->w, l_20->h, l_20->flags | 32768, (char *)l_20 + l_20->offset);
+    image = *(struct img **)(texture + 12);
+    centre_x = (rects[cell].x0 + rects[cell].x1) >> 1;
+    centre_y = (rects[cell].y0 + rects[cell].y1) >> 1;
+    width = image->w;
+    height = image->h;
+    size_fit(&width, &height, rects[cell].x1 - rects[cell].x0 - 4, rects[cell].y1 - rects[cell].y0 - 4);
+    xn_draw_image_scaled(centre_x - (width >> 1), centre_y - (height >> 1), width, height, image->w, image->h, image->flags | 32768, (char *)image + image->offset);
 }

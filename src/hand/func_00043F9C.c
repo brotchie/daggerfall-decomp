@@ -27,27 +27,27 @@ extern void xn_mouse_poll_clamped(void);
 
 int options_mouse_screen(void)
 {
-    int l_24;
-    int l_20;
-    int l_1C;
+    int button;
+    int done;
+    int background;
 
-    l_20 = 0;
-    l_1C = disk_read_file(D_00170F2D, 0);
+    done = 0;
+    background = disk_read_file(D_00170F2D, 0);
     D_00195B5C = disk_read_file(D_00170F3A, 0);
     D_00195B60 = disk_read_file(D_00170F47, 0);
     xn_mouse_get_sensitivity(&mouse_sensitivity_x, &mouse_sensitivity_y);
     mouse_sensitivity_x /= 6;
     mouse_sensitivity_y /= 6;
-    while (l_20 == 0) {
+    while (done == 0) {
         mouse_buttons_prev = mouse_buttons;
         xn_mouse_poll_clamped();
-        options_mouse_draw(l_1C);
+        options_mouse_draw(background);
         cursor_draw_arrow();
         if (mouse_buttons != 0 && mouse_buttons_prev == 0) {
-            for (l_24 = 0; l_24 < 7; l_24++) {
-                if (mouse_x > options_mouse_buttons[l_24].x1 && mouse_x < options_mouse_buttons[l_24].x2 && mouse_y > options_mouse_buttons[l_24].y1 && mouse_y < options_mouse_buttons[l_24].y2) {
+            for (button = 0; button < 7; button++) {
+                if (mouse_x > options_mouse_buttons[button].x1 && mouse_x < options_mouse_buttons[button].x2 && mouse_y > options_mouse_buttons[button].y1 && mouse_y < options_mouse_buttons[button].y2) {
                     sound_play(203, player_object, 100);
-                    l_20 = options_mouse_buttons[l_24].fn(l_24);
+                    done = options_mouse_buttons[button].fn(button);
                 }
             }
         }
@@ -61,9 +61,9 @@ int options_mouse_screen(void)
         mc_free(D_00195B5C, D_00170EE8, 469);
         D_00195B5C = 0x97979797;
     }
-    if (l_1C != 0 && l_1C != 0x97979797) {
-        mc_free(l_1C, D_00170EE8, 470);
-        l_1C = 0x97979797;
+    if (background != 0 && background != 0x97979797) {
+        mc_free(background, D_00170EE8, 470);
+        background = 0x97979797;
     }
     return 0;
 }

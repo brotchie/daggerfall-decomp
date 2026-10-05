@@ -4,20 +4,20 @@
 extern void sound_play(int, struct record *, int);
 extern int rand(void);
 
-void monster_play_sound(struct record *a1, int a2)
+void monster_play_sound(struct record *monster, int dist)
 {
-    struct character *m;
-    int snd;
+    struct character *monster_char;
+    int sound;
 
-    m = &a1->data.character;
-    snd = m->mobile_id * 10 + 10000;
-    if (m->flags & 384) {
-        if (a2 < 128)
-            sound_play(rand() & 3 ? snd + 2 : snd + 1, a1, 100);
+    monster_char = &monster->data.character;
+    sound = monster_char->mobile_id * 10 + 10000;
+    if (monster_char->flags & 384) {
+        if (dist < 128)
+            sound_play(rand() & 3 ? sound + 2 : sound + 1, monster, 100);
         else if (rand() < 32000)
-            sound_play(snd + 1, a1, 100);
+            sound_play(sound + 1, monster, 100);
         else
-            sound_play(snd, a1, 100);
+            sound_play(sound, monster, 100);
     } else
-        sound_play(snd, a1, 100);
+        sound_play(sound, monster, 100);
 }

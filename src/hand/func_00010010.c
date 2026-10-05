@@ -57,17 +57,17 @@ extern void func_0009DBFE(void (*)(void));
 extern void printf(char *, ...);
 extern int open(char *, ...);
 
-int func_00010010(short a1, char **a2)
+int func_00010010(short argc, char **argv)
 {
-    int l_3C;
-    char l_u0;                  /* unused, but they have slots */
-    int l_u1;
-    int l_u2;
-    int l_44;
-    int l_u3;
-    char l_u4;
+    int fps;
+    char unused;                  /* unused, but they have slots */
+    int unused2;
+    int unused3;
+    int n;
+    int unused4;
+    char unused5;
 
-    if (a1 != 2) {
+    if (argc != 2) {
         func_0009DA1C(54, D_00170004);
         printf(D_0017000B);
         exit(-1);
@@ -80,14 +80,14 @@ int func_00010010(short a1, char **a2)
     dpmi_lock_region(func_00010010, 2048000);
     srand(*(int *)0x46c);
     D_0018DC1C = *(int *)0x46c;
-    config_read(a2[1]);
-    l_44 = open(D_00170035, 546, 384);
-    if (l_44 < 0) {
+    config_read(argv[1]);
+    n = open(D_00170035, 546, 384);
+    if (n < 0) {
         func_0009DA1C(75, D_00170004);
         printf(D_00170049);
         exit(-1);
     }
-    close(l_44);
+    close(n);
     mouse_set_bounds(0, 0, 319, 199);
     init_video();
     kludge_print_build(0);
@@ -95,8 +95,8 @@ int func_00010010(short a1, char **a2)
     init_palette();
     quest_init_record_sizes();
     intro_play_logo();
-    for (l_44 = 0; l_44 < 12; l_44++) {
-        D_001962A5 = (l_44 == 11);
+    for (n = 0; n < 12; n++) {
+        D_001962A5 = (n == 11);
         faction_politics_update(1);
         faction_politics_update(2);
     }
@@ -118,7 +118,7 @@ restart:
             goto restart;
         }
         hud_draw_heading_strip(0);
-        l_3C = xn_timer_fps_update();
+        fps = xn_timer_fps_update();
         frame_checkpoint = 2;
         xn_mouse_read_motion(&mouse_motion_x, &mouse_motion_y);
         player_movement_update();

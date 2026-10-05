@@ -33,10 +33,10 @@ struct R { short x0, y0, x1, y1; void (*fn)(int); };
 
 void itemmaker_update(void)
 {
-    short l_24;
-    short l_20;
-    short l_1C;
-    short l_18;
+    short unused;
+    short index;
+    short unused2;
+    short unused3;
 
     if (itemmaker_open(0) == 0) return;
     xn_tex_cache_begin_frame();
@@ -45,26 +45,26 @@ void itemmaker_update(void)
     xn_font_select(4);
     itemmaker_draw();
     xn_font_select(3);
-    l_20 = 0;
-    if (FLAG && (l_20 = list_popup_poll()) > -1) {
+    index = 0;
+    if (FLAG && (index = list_popup_poll()) > -1) {
         while (*((char *)&key_down_esc) != 0) ;
         while (*((char *)&mouse_buttons) != 0) xn_mouse_poll_clamped();
         *((char *)&mouse_double_click) = 0;
-        (*(void (**)(int))((char *)&list_popup_callback))((*(unsigned char **)scratch_buffer)[l_20 + 64000]);
+        (*(void (**)(int))((char *)&list_popup_callback))((*(unsigned char **)scratch_buffer)[index + 64000]);
         while (*((char *)&mouse_buttons) != 0) xn_mouse_poll_clamped();
         *((char *)&mouse_double_click) = 0;
         return;
     }
-    if (l_20 != -2 && *((char *)&key_down_esc) != 0) {
+    if (index != -2 && *((char *)&key_down_esc) != 0) {
         itemmaker_close();
-    } else if (l_20 == -2) {
+    } else if (index == -2) {
         while (*((char *)&key_down_esc) != 0) ;
     }
     if (FLAG || (*((char *)&mouse_buttons) == 0 || (*((char *)&mouse_buttons) != 0 && *((char *)&mouse_buttons_prev) != 0))) return;
-    for (l_20 = 0; l_20 < 20; l_20++) {
-        if (MX > TAB[l_20].x0 && MX < TAB[l_20].x1 && MY > TAB[l_20].y0 && MY < TAB[l_20].y1) {
+    for (index = 0; index < 20; index++) {
+        if (MX > TAB[index].x0 && MX < TAB[index].x1 && MY > TAB[index].y0 && MY < TAB[index].y1) {
             sound_play(203, player_object, 100);
-            TAB[l_20].fn(l_20);
+            TAB[index].fn(index);
         }
     }
 }

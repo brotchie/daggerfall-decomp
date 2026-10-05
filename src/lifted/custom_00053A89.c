@@ -13,18 +13,18 @@ extern int xn_mouse_cursor_erase();
 extern int xn_mouse_cursor_draw();
 extern void inpstr_begin_text(int, short);
 
-void classmaker_input_text(int a1, int a2, int a3)
+void classmaker_input_text(int text, int max_length, int cancel_cb)
 {
-    short l_10;
+    short done;
 
     xn_mouse_cursor_erase();
     text_cursor_x = 100;
     text_cursor_y = 5;
-    inpstr_begin_text(a1, (int)(short)*(short *)&a2);
-    *(int *)&l_10 = 0;
-    while (l_10 == 0) {
-        if (a3 != 0 && ((int (*)())(a3))(0) != 0) return;
-        if (inpstr_update() != 0) *(int *)&l_10 = 1;
+    inpstr_begin_text(text, (int)(short)*(short *)&max_length);
+    *(int *)&done = 0;
+    while (done == 0) {
+        if (cancel_cb != 0 && ((int (*)())(cancel_cb))(0) != 0) return;
+        if (inpstr_update() != 0) *(int *)&done = 1;
         mc_memcpy(655360, screen_buffer, 64000, (int)D_00175420, 364, 4);
     }
     xn_mouse_cursor_draw();

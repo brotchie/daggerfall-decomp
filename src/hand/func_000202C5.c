@@ -41,51 +41,51 @@ extern int mc_sprintf(char *, ...);
 
 #define REGION(o) D_001850D4[D_00179E94[(o)->id]]
 
-void daedra_summon(struct record *a1)
+void daedra_summon(struct record *object)
 {
-    char l_70[44];
-    struct faction *l_40;
-    struct faction *l_3C;
-    char *l_38;
-    int l_34;
-    int l_30;
-    int l_2C;
-    int l_28;
-    unsigned char *l_24;
-    struct person *l_20;
-    unsigned char l_1C;
-    unsigned char l_18;
+    char flc[44];
+    struct faction *guild;
+    struct faction *daedra;
+    char *day_entry;
+    int daedra_id;
+    int chance;
+    int n;
+    int saved_seed;
+    unsigned char *daedra_entry;
+    struct person *person;
+    unsigned char weather;
+    unsigned char quest_letter;
 
-    l_18 = 48;
-    l_20 = &a1->data.person;
-    l_40 = faction_find(l_20->faction_id);
-    while (l_40->parent != 0)
-        l_40 = l_40->parent;
-    if (l_40->id == 40 || l_40->type == 8) {
+    quest_letter = 48;
+    person = &object->data.person;
+    guild = faction_find(person->faction_id);
+    while (guild->parent != 0)
+        guild = guild->parent;
+    if (guild->id == 40 || guild->type == 8) {
     } else {
-        l_40 = l_40->child;
+        guild = guild->child;
     }
-    switch (l_40->id) {
+    switch (guild->id) {
     case 40:
-        l_38 = xn_str_find_u16(D_00179E60, game_minutes % 518400 / 1440, 16);
-        if (l_38 == 0 || D_00179E66 == l_38) {
+        day_entry = xn_str_find_u16(D_00179E60, game_minutes % 518400 / 1440, 16);
+        if (day_entry == 0 || D_00179E66 == day_entry) {
             msgbox_show_rsc(480, 1);
             return;
         }
-        l_34 = (l_38 - D_00179E60) / 2 + 1;
-        l_3C = faction_find(l_34);
-        D_0019671C = l_3C;
-        if (REGION(l_3C) == 56) {
+        daedra_id = (day_entry - D_00179E60) / 2 + 1;
+        daedra = faction_find(daedra_id);
+        D_0019671C = daedra;
+        if (REGION(daedra) == 56) {
             if (game_settings->view_flags & 4) {
                 msgbox_show_rsc(400, 1);
                 return;
             }
-            l_18 = 120;
+            quest_letter = 120;
         }
-        trade_price = (100 - l_40->reputation) * 1000 + 100000;
+        trade_price = (100 - guild->reputation) * 1000 + 100000;
         msgbox_yes_no_rsc(481);
         if (D_00196271 == 2) return;
-        l_30 = 30;
+        chance = 30;
         break;
     case 21:
     case 22:
@@ -103,54 +103,54 @@ void daedra_summon(struct record *a1)
     case 94:
     case 98:
     case 106:
-        l_38 = xn_str_find_u16(D_00179E60, game_minutes % 518400 / 1440, 16);
-        if (l_38 == 0 || D_00179E66 == l_38) {
+        day_entry = xn_str_find_u16(D_00179E60, game_minutes % 518400 / 1440, 16);
+        if (day_entry == 0 || D_00179E66 == day_entry) {
             msgbox_show_rsc(480, 1);
             return;
         }
-        l_34 = (l_38 - D_00179E60) / 2 + 1;
-        for (l_2C = 0; l_2C < 3; l_2C++) {
-            if (l_40->enemies[l_2C] != 0 && l_40->enemies[l_2C]->id == l_34) {
+        daedra_id = (day_entry - D_00179E60) / 2 + 1;
+        for (n = 0; n < 3; n++) {
+            if (guild->enemies[n] != 0 && guild->enemies[n]->id == daedra_id) {
                 msgbox_show_string(D_00170604, 1);
                 return;
             }
         }
-        l_3C = faction_find(l_34);
-        D_0019671C = l_3C;
-        if (REGION(l_3C) == 56) {
+        daedra = faction_find(daedra_id);
+        D_0019671C = daedra;
+        if (REGION(daedra) == 56) {
             if (game_settings->view_flags & 4) {
                 msgbox_show_rsc(400, 1);
                 return;
             }
-            l_18 = 120;
+            quest_letter = 120;
         }
-        trade_price = (100 - l_40->reputation) * 1000 + 100000;
+        trade_price = (100 - guild->reputation) * 1000 + 100000;
         msgbox_yes_no_rsc(481);
         if (D_00196271 == 2) return;
-        l_30 = 30;
+        chance = 30;
         break;
     default:
-        l_28 = rand();
+        saved_seed = rand();
         srand(game_minutes / 1440);
-        l_34 = 4;
-        if (l_40->id != 419) {
-            while (l_34 == 4)
-                l_34 = rand_range(1, 16);
+        daedra_id = 4;
+        if (guild->id != 419) {
+            while (daedra_id == 4)
+                daedra_id = rand_range(1, 16);
         }
-        l_3C = faction_find(l_34);
-        D_0019671C = l_3C;
-        if (REGION(l_3C) == 56) {
+        daedra = faction_find(daedra_id);
+        D_0019671C = daedra;
+        if (REGION(daedra) == 56) {
             if (game_settings->view_flags & 4) {
                 msgbox_show_rsc(400, 1);
                 return;
             }
-            l_18 = 120;
+            quest_letter = 120;
         }
-        trade_price = (100 - l_40->reputation) * 1000 + 100000;
+        trade_price = (100 - guild->reputation) * 1000 + 100000;
         msgbox_yes_no_rsc(481);
         if (D_00196271 == 2) return;
-        l_30 = 30;
-        srand(l_28);
+        chance = 30;
+        srand(saved_seed);
         break;
     }
     if (trade_price < 0)
@@ -161,34 +161,34 @@ void daedra_summon(struct record *a1)
         msgbox_show_rsc(454, 1);
         return;
     }
-    l_1C = climate_weathers[climate_category()];
-    l_2C = 5;
-    if (l_1C == 6)
-        l_2C = 15;
-    if (rand() % 101 <= l_2C) {
-        l_34 = 9;
-        l_3C = faction_find(l_34);
+    weather = climate_weathers[climate_category()];
+    n = 5;
+    if (weather == 6)
+        n = 15;
+    if (rand() % 101 <= n) {
+        daedra_id = 9;
+        daedra = faction_find(daedra_id);
     }
-    l_30 += l_3C->reputation;
-    if (D_00179E7F[l_34] == 100 || l_1C == D_00179E7F[l_34])
-        l_30 += 30;
+    chance += daedra->reputation;
+    if (D_00179E7F[daedra_id] == 100 || weather == D_00179E7F[daedra_id])
+        chance += 30;
     gold_spend(trade_price);
-    if (rand_range(1, 100) > l_30) {
+    if (rand_range(1, 100) > chance) {
         msgbox_show_rsc(484, 1);
         return;
     }
-    if (l_3C->flags & 64) {
-        l_24 = &REGION(l_3C);
-        mc_memset(l_70, 0, 44, D_00170634, 189, 4);
+    if (daedra->flags & 64) {
+        daedra_entry = &REGION(daedra);
+        mc_memset(flc, 0, 44, D_00170634, 189, 4);
         current_quest = 0;
-        flc_play_with_text(D_001850E5[l_24 - D_001850D4], l_70, 482, 0);
-        a1 = monster_summon_near_player(D_00179E90[rand_range(0, 4)]);
-        if (a1 != 0)
-            a1->data.character.team = 1;
+        flc_play_with_text(D_001850E5[daedra_entry - D_001850D4], flc, 482, 0);
+        object = monster_summon_near_player(D_00179E90[rand_range(0, 4)]);
+        if (object != 0)
+            object->data.character.team = 1;
         return;
     }
-    l_3C->flags |= 64;
+    daedra->flags |= 64;
     mc_set_location(200, D_00170634);
-    mc_sprintf(((char *)text_buffer), D_0017063D, REGION(l_3C), l_18);
+    mc_sprintf(((char *)text_buffer), D_0017063D, REGION(daedra), quest_letter);
     mc_strncpy(D_001961F5, ((char *)text_buffer), 13, D_00170634, 201);
 }

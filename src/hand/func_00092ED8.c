@@ -51,39 +51,39 @@ extern int xn_draw_image();
 
 void inventory_draw(void)
 {
-    int sw;
-    struct Rect *r;
+    int mode;
+    struct Rect *rect;
     char *src;
     int y;
     int i;
     int unused1;
     int unused2;
-    int key;
-    int val;
+    int holiday;
+    int shown_total;
     int unused3;
 
     mc_memcpy(screen_buffer, inventory_images, 64000, D_0017704C, 553, 4);
     if (trade_mode != 0)
         xn_draw_image(D_001AA434->x, D_001AA434->y, D_001AA434->w, D_001AA434->h, D_001AA434->data);
-    r = (struct Rect *)(((int)inv_mode_buttons + trade_mode * 84) + inventory_action * 12);
+    rect = (struct Rect *)(((int)inv_mode_buttons + trade_mode * 84) + inventory_action * 12);
     if (trade_mode == 0) {
-        for (y = r->y0; r->y1 >= y; y++)
-            mc_memcpy(r->x0 + (screen_buffer + y * 320), D_001AA420 + y * 320 + r->x0, r->x1 - r->x0 + 1, D_0017704C, 566, 4);
+        for (y = rect->y0; rect->y1 >= y; y++)
+            mc_memcpy(rect->x0 + (screen_buffer + y * 320), D_001AA420 + y * 320 + rect->x0, rect->x1 - rect->x0 + 1, D_0017704C, 566, 4);
     } else {
         src = D_001AA438->data;
-        for (y = r->y0; r->y1 >= y; y++)
-            mc_memcpy(r->x0 + (screen_buffer + y * 320), (r->x0 - (unsigned short)*(short *)D_001AA438) + (src + D_001AA438->w * (y - D_001AA438->y)), r->x1 - r->x0 + 1, D_0017704C, 574, 4);
+        for (y = rect->y0; rect->y1 >= y; y++)
+            mc_memcpy(rect->x0 + (screen_buffer + y * 320), (rect->x0 - (unsigned short)*(short *)D_001AA438) + (src + D_001AA438->w * (y - D_001AA438->y)), rect->x1 - rect->x0 + 1, D_0017704C, 574, 4);
     }
     inv_blit_rect_from_image(inv_tab + 41, D_001AA420);
     paperdoll_draw(-147, 0);
     xn_draw_copy_rect_stride_bytes(D_00195B64 + 1008, screen_buffer + 4209, 111, 184, 125);
     if (trade_mode != 0) {
         xn_draw_image(D_001AA43C->x, D_001AA43C->y, D_001AA43C->w, D_001AA43C->h, D_001AA43C->data);
-        key = holiday_today(game_minutes, current_region);
-        if (key == 43 || ((struct bf8_7_1 *)&player_motion_flags)->f)
-            val = 0;
+        holiday = holiday_today(game_minutes, current_region);
+        if (holiday == 43 || ((struct bf8_7_1 *)&player_motion_flags)->f)
+            shown_total = 0;
         else
-            val = trade_total;
+            shown_total = trade_total;
         text_draw_coloured(itoa(trade_total, ((char *)text_buffer), 10), 77, 15, 145, 156);
         text_draw_coloured(itoa(gold_total_alias(), ((char *)text_buffer), 10), 107, 15, 145, 156);
     }
@@ -99,8 +99,8 @@ void inventory_draw(void)
         inv_draw_container_icon(32, D_001AA5F8);
     else
         inv_draw_container_icon(32, inv_right_icon);
-    sw = trade_mode;
-    switch (sw) {
+    mode = trade_mode;
+    switch (mode) {
     case 0:
         break;
     case 3:

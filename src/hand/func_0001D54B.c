@@ -4,29 +4,29 @@
 extern char current_region;
 extern struct faction *faction_find(short);
 
-int rumor_is_eligible(struct rumor *r, short a2, int a3, int a4)
+int rumor_is_eligible(struct rumor *rumor, short unused_faction, int regional, int roll)
 {
     int unused;
-    struct faction *p1;
-    struct faction *p2;
+    struct faction *faction1;
+    struct faction *faction2;
 
-    p1 = 0;
-    p2 = 0;
-    if (a3 != 0) {
-        if (current_region != (char)r->region)
+    faction1 = 0;
+    faction2 = 0;
+    if (regional != 0) {
+        if (current_region != (char)rumor->region)
             return 0;
-        return (unsigned char)(r->flags & 1);
+        return (unsigned char)(rumor->flags & 1);
     }
-    if ((int)(unsigned char)(r->flags & 12) == 0)
+    if ((int)(unsigned char)(rumor->flags & 12) == 0)
         return 0;
-    if (r->faction1 != 0)
-        p1 = faction_find(r->faction1);
-    if (r->faction2 != 0)
-        p2 = faction_find(r->faction2);
-    if (!(p1 || p2 || r->kind != 100))
+    if (rumor->faction1 != 0)
+        faction1 = faction_find(rumor->faction1);
+    if (rumor->faction2 != 0)
+        faction2 = faction_find(rumor->faction2);
+    if (!(faction1 || faction2 || rumor->kind != 100))
         return 1;
-    if (p1 != 0 && (int)(unsigned short)(p1->flags & 1) != 0 || p2 != 0 && (int)(unsigned short)(p2->flags & 1) != 0) {
-        if (a4 <= 75)
+    if (faction1 != 0 && (int)(unsigned short)(faction1->flags & 1) != 0 || faction2 != 0 && (int)(unsigned short)(faction2->flags & 1) != 0) {
+        if (roll <= 75)
             return 0;
     }
     return 1;

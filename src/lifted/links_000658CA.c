@@ -6,14 +6,14 @@ extern int D_00186A34[];
 extern int D_00186A4C[];
 
 
-int func_000658CA(int a1, int a2)
+int func_000658CA(int id_hundreds, int id_rest)
 {
-    int l_1C;
-    int l_18;
+    int model_id;
+    int i;
 
-    l_1C = a2 + (a1 * 100);
-    for (l_18 = 0; l_18 < 6; l_18++) {
-        if (D_00186A34[l_18] == l_1C) return D_00186A4C[l_18];
+    model_id = id_rest + (id_hundreds * 100);
+    for (i = 0; i < 6; i++) {
+        if (D_00186A34[i] == model_id) return D_00186A4C[i];
     }
     return 0;
 }

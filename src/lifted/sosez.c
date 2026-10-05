@@ -19,7 +19,7 @@ extern int D_001A3F48;
 extern int D_001A3F4C;
 
 extern int dpmi_unlock_region(int, int);
-extern int open(int, ...);
+extern int open(char *, ...);
 extern int close();
 extern int func_0009E281();
 extern int func_0009E61A();
@@ -80,55 +80,55 @@ int sos_shutdown(void)
     return 1;
 }
 
-int sos_load_sample(int a1)
+int sos_load_sample(char *path)
 {
-    int l_20;
-    int l_1C;
-    int l_18;
-    int l_14;
-    int l_10;
+    int handle;
+    int size;
+    int buffer;
+    int sample;
+    int wav;
 
-    l_20 = open(a1, 512);
-    if (l_20 == (-1)) return 0;
-    l_1C = lseek(l_20, 0, 2);
-    lseek(l_20, 0, 0);
-    l_18 = mc_malloc(l_1C + 240, (int)D_001700D5, 302);
-    if (l_18 == 0) {
-        close(l_20);
+    handle = open(path, 512);
+    if (handle == (-1)) return 0;
+    size = lseek(handle, 0, 2);
+    lseek(handle, 0, 0);
+    buffer = mc_malloc(size + 240, (int)D_001700D5, 302);
+    if (buffer == 0) {
+        close(handle);
         return 0;
     }
-    if (read(l_20, l_18 + 240, l_1C) != l_1C) {
-        close(l_20);
-        if (l_18 != 0 && l_18 != (-1751672937)) {
-            mc_free(l_18, (int)D_001700D5, 318);
-            l_18 = -1751672937;
+    if (read(handle, buffer + 240, size) != size) {
+        close(handle);
+        if (buffer != 0 && buffer != (-1751672937)) {
+            mc_free(buffer, (int)D_001700D5, 318);
+            buffer = -1751672937;
         }
         return 0;
     }
-    close(l_20);
-    mc_memset(l_18, 0, 240, (int)D_001700D5, 328, 4);
-    l_14 = l_18;
-    if (strncmp(l_18 + 240, (int)D_00170112, 4) == 0) {
-        l_10 = l_18 + 240;
-        *(int *)((char *)l_14) = l_18 + 284;
-        *(int *)((char *)l_14 + 12) = *(int *)((char *)l_10 + 40) - 44;
-        *(int *)((char *)l_14 + 56) = (int)(short)*(short *)((char *)l_10 + 34);
-        *(int *)((char *)l_14 + 60) = (int)(short)*(short *)((char *)l_10 + 22);
-        if (((int)(short)*(short *)((char *)l_10 + 34)) == 8) {
-            *(int *)((char *)l_14 + 64) = 32768;
+    close(handle);
+    mc_memset(buffer, 0, 240, (int)D_001700D5, 328, 4);
+    sample = buffer;
+    if (strncmp(buffer + 240, (int)D_00170112, 4) == 0) {
+        wav = buffer + 240;
+        *(int *)((char *)sample) = buffer + 284;
+        *(int *)((char *)sample + 12) = *(int *)((char *)wav + 40) - 44;
+        *(int *)((char *)sample + 56) = (int)(short)*(short *)((char *)wav + 34);
+        *(int *)((char *)sample + 60) = (int)(short)*(short *)((char *)wav + 22);
+        if (((int)(short)*(short *)((char *)wav + 34)) == 8) {
+            *(int *)((char *)sample + 64) = 32768;
         } else {
-            *(int *)((char *)l_14 + 64) = 0;
+            *(int *)((char *)sample + 64) = 0;
         }
-        *(int *)((char *)l_14 + 52) = *(int *)((char *)l_10 + 24);
+        *(int *)((char *)sample + 52) = *(int *)((char *)wav + 24);
     } else {
-        *(int *)((char *)l_14) = l_18 + 240;
-        *(int *)((char *)l_14 + 12) = l_1C;
-        *(int *)((char *)l_14 + 56) = 8;
-        *(int *)((char *)l_14 + 60) = 1;
-        *(int *)((char *)l_14 + 64) = 32768;
-        *(int *)((char *)l_14 + 52) = 11025;
+        *(int *)((char *)sample) = buffer + 240;
+        *(int *)((char *)sample + 12) = size;
+        *(int *)((char *)sample + 56) = 8;
+        *(int *)((char *)sample + 60) = 1;
+        *(int *)((char *)sample + 64) = 32768;
+        *(int *)((char *)sample + 52) = 11025;
     }
-    *(int *)((char *)l_14 + 68) = 32768;
-    *(int *)((char *)l_14 + 44) = 2147450879;
-    return l_14;
+    *(int *)((char *)sample + 68) = 32768;
+    *(int *)((char *)sample + 44) = 2147450879;
+    return sample;
 }

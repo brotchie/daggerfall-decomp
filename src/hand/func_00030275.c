@@ -4,7 +4,7 @@
 extern unsigned char quest_global_states[];
 extern int rand(void);
 
-void qaction_op34_pick_one_state(int a1, struct qbn_op *a2)
+void qaction_op34_pick_one_state(struct quest *quest, struct qbn_op *op)
 {
     struct qbn_state *arr[4];
     short i;
@@ -13,8 +13,8 @@ void qaction_op34_pick_one_state(int a1, struct qbn_op *a2)
 
     n = i = 0;
     for (; i < 4; i++) {
-        if (a2->args[i + 1].value != -1 && a2->args[i + 1].value != -2)
-            arr[n++] = (struct qbn_state *)a2->args[i + 1].record;
+        if (op->args[i + 1].value != -1 && op->args[i + 1].value != -2)
+            arr[n++] = (struct qbn_state *)op->args[i + 1].record;
     }
     if (n == 0)
         return;

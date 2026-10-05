@@ -20,7 +20,7 @@ extern int xn_vec_advance(char *, int, struct Vec *);
 extern int xn_math_approx_dist2d();
 extern int xn_math_approx_hypot();
 
-int spell_missile_update(struct record *m, int a2)
+int spell_missile_update(struct record *m, int launch)
 {
     struct Vec pos;
     struct Vec ang;

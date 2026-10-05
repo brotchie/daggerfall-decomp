@@ -64,9 +64,9 @@ extern int xn_draw_line_to();
 
 void note_update(void)
 {
-    int l_20;
-    int l_1C;
-    int l_18;
+    int unused1;
+    int i;
+    int unused2;
 
     if (note_open_notebook(0) == 0) return;
     xn_draw_fullscreen_overlay_shaded(window_image);
@@ -144,9 +144,9 @@ void note_update(void)
     if (((int)(unsigned char)(mouse_buttons & 1)) != 0 && ((int)(short)mouse_y) > 10 && ((int)(short)mouse_y) < 173) {
         note_click_page();
     } else if (note_action == 0 && ((int)(unsigned char)(mouse_buttons & 1)) != 0) {
-        for (l_1C = 0; ((int)(short)*(short *)&l_1C) < 14; l_1C++) {
-            if (mouse_x > *(short *)(note_buttons + (((int)(short)*(short *)&l_1C) * 12)) && mouse_x < *(short *)(D_0018514C + (((int)(short)*(short *)&l_1C) * 12)) && mouse_y > *(short *)(D_0018514A + (((int)(short)*(short *)&l_1C) * 12)) && mouse_y < *(short *)(D_0018514E + (((int)(short)*(short *)&l_1C) * 12))) {
-                ((int (*)())(*(int *)(D_00185150 + (((int)(short)*(short *)&l_1C) * 12))))();
+        for (i = 0; ((int)(short)*(short *)&i) < 14; i++) {
+            if (mouse_x > *(short *)(note_buttons + (((int)(short)*(short *)&i) * 12)) && mouse_x < *(short *)(D_0018514C + (((int)(short)*(short *)&i) * 12)) && mouse_y > *(short *)(D_0018514A + (((int)(short)*(short *)&i) * 12)) && mouse_y < *(short *)(D_0018514E + (((int)(short)*(short *)&i) * 12))) {
+                ((int (*)())(*(int *)(D_00185150 + (((int)(short)*(short *)&i) * 12))))();
             }
         }
     }

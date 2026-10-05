@@ -71,7 +71,7 @@ void fatigue_add(int);
 
 void rest_close(void)
 {
-    int l_18;
+    int path;
 
     if (((int)(unsigned char)game_mode) != 16) return;
     if (*(int *)rest_image != 0 && *(int *)rest_image != (-1751672937)) {
@@ -88,9 +88,9 @@ void rest_close(void)
     if (player_character->special_infection_time != 0 && player_character->special_infection != 0 && ((int)(unsigned short)(player_character->flags & 16)) != 0) {
         player_character->flags &= ~0x10;
         while (mouse_buttons != 0) xn_mouse_poll_clamped();
-        l_18 = disk_resolve_path((int)D_00176141);
+        path = disk_resolve_path((int)D_00176141);
         mc_memset(655360, 0, 64000, (int)D_001760D6, 285, 4);
-        xn_vid_play(l_18, 0, 0, 1);
+        xn_vid_play(path, 0, 0, 1);
         mc_memset(655360, 0, 64000, (int)D_001760D6, 287, 4);
         palette_restore();
         night_sky_loaded = 0;
@@ -98,9 +98,9 @@ void rest_close(void)
     } else if (player_character->special_infection_time != 0 && player_character->special_infection == 0 && ((int)(unsigned short)(player_character->flags & 16)) != 0) {
         player_character->flags &= ~0x10;
         while (mouse_buttons != 0) xn_mouse_poll_clamped();
-        l_18 = disk_resolve_path((int)D_0017614E);
+        path = disk_resolve_path((int)D_0017614E);
         mc_memset(655360, 0, 64000, (int)D_001760D6, 297, 4);
-        xn_vid_play(l_18, 0, 0, 1);
+        xn_vid_play(path, 0, 0, 1);
         mc_memset(655360, 0, 64000, (int)D_001760D6, 299, 4);
         palette_restore();
         night_sky_loaded = 0;
@@ -113,34 +113,34 @@ void rest_close(void)
 
 void fatigue_update(void)
 {
-    int l_18;
+    int delta;
 
     if (((int)(unsigned char)game_mode) == 16 || ((int)(unsigned char)game_mode) == 19) {
         return;
     }
     if (D_0018DDE4 != 0 && ((struct bf8_0_2 *)&frame_counter)->f == 0) return;
-    l_18 = -11;
+    delta = -11;
     if (in_dungeon_water != 0 && player_character->race != 7) {
-        if (rand_range(1, 100) > player_character->skills[17].value) l_18 = -44;
+        if (rand_range(1, 100) > player_character->skills[17].value) delta = -44;
         skill_add_uses(17, 1);
     }
-    if (((struct bf8_4_1 *)&D_001940D9)->f != 0) l_18 = -88;
-    if (((struct bf8_5_1 *)&player_motion_flags)->f != 0) l_18 = -22;
-    fatigue_add(l_18);
+    if (((struct bf8_4_1 *)&D_001940D9)->f != 0) delta = -88;
+    if (((struct bf8_5_1 *)&player_motion_flags)->f != 0) delta = -22;
+    fatigue_add(delta);
 }
 
-void fatigue_add(int a1)
+void fatigue_add(int amount)
 {
-    int l_1C;
-    int l_18;
+    int max_fatigue;
+    int fatigue;
 
     if (player_death_timer != 0) return;
-    l_18 = player_character->fatigue;
-    l_18 += a1;
-    l_1C = (player_character->attributes[0] + player_character->attributes[4]) << 6;
-    if (l_18 > l_1C) l_18 = l_1C;
-    player_character->fatigue = l_18;
-    if (l_18 >= 1) return;
+    fatigue = player_character->fatigue;
+    fatigue += amount;
+    max_fatigue = (player_character->attributes[0] + player_character->attributes[4]) << 6;
+    if (fatigue > max_fatigue) fatigue = max_fatigue;
+    player_character->fatigue = fatigue;
+    if (fatigue >= 1) return;
     D_0012B508 = 146;
     player_character->fatigue = 0;
     if (creature_count != 0) {
@@ -157,40 +157,40 @@ void fatigue_add(int a1)
 
 void breath_update(void)
 {
-    struct membership *l_2C;
-    int l_28;
-    int l_24;
-    int l_20;
-    int l_1C;
-    int l_18;
+    struct membership *membership;
+    int endurance;
+    int bios_clock;
+    int bios_clock2;
+    int bios_clock3;
+    int bios_clock4;
 
-    l_28 = player_character->attributes[4];
+    endurance = player_character->attributes[4];
     if (D_00187CA8 == 0) return;
-    if (l_28 > 100) l_28 = 100;
+    if (endurance > 100) endurance = 100;
     if (((int)(unsigned char)fog_colour) != 107) {
         *(int *)breath_remaining = 0;
-        l_24 = 1132;
-        breath_last_tick = *(int *)((char *)l_24);
+        bios_clock = 1132;
+        breath_last_tick = *(int *)((char *)bios_clock);
         return;
     }
     if ((player_character->conditions & 0x80000) != 0) return;
     if (*(int *)breath_remaining == 0) {
-        if ((*(int *)breath_remaining = l_28 >> 1) > 50) *(int *)breath_remaining = 50;
-        l_2C = guild_find_membership_by_kind(149);
-        if (l_2C != 0) *(int *)breath_remaining += l_2C->rank * 3;
+        if ((*(int *)breath_remaining = endurance >> 1) > 50) *(int *)breath_remaining = 50;
+        membership = guild_find_membership_by_kind(149);
+        if (membership != 0) *(int *)breath_remaining += membership->rank * 3;
     }
-    l_20 = 1132;
-    if (((unsigned)(*(int *)((char *)l_20) - breath_last_tick)) > 18) {
+    bios_clock2 = 1132;
+    if (((unsigned)(*(int *)((char *)bios_clock2) - breath_last_tick)) > 18) {
         (*(int *)breath_remaining)--;
-        l_1C = 1132;
-        if (player_character->race == 7 && ((struct bf8_0_1 *)((char *)l_1C))->f != 0) {
+        bios_clock3 = 1132;
+        if (player_character->race == 7 && ((struct bf8_0_1 *)((char *)bios_clock3))->f != 0) {
             (*(int *)breath_remaining)++;
         }
-        l_18 = 1132;
-        breath_last_tick = *(int *)((char *)l_18);
+        bios_clock4 = 1132;
+        breath_last_tick = *(int *)((char *)bios_clock4);
     }
     D_0012B508 = 145;
-    if (((l_28 >> 3) + 4) > *(int *)breath_remaining) D_0012B508 = 246;
+    if (((endurance >> 3) + 4) > *(int *)breath_remaining) D_0012B508 = 246;
     if (*(int *)breath_remaining != 0) {
         xn_draw_fill_rect(310, (int)(short)(120 - (*(short *)breath_remaining * 2)), 6, (int)(short)(*(short *)breath_remaining * 2));
     }
@@ -238,12 +238,12 @@ int rest_allowed(void)
 
 int rest_room_expired(void)
 {
-    struct building *l_1C;
+    struct building *building;
 
-    l_1C = object_building(player_object);
-    if (l_1C == 0) return 0;
-    if (l_1C->type != 15) return 0;
-    if ((l_1C->flags & 2) != 0 && game_minutes > l_1C->rent_expires) return 1;
+    building = object_building(player_object);
+    if (building == 0) return 0;
+    if (building->type != 15) return 0;
+    if ((building->flags & 2) != 0 && game_minutes > building->rent_expires) return 1;
     return 0;
 }
 

@@ -12,25 +12,25 @@ extern int write();
 #pragma aux sosconv "*" parm caller [] value [eax] modify [eax ebx ecx edx];
 #pragma aux (sosconv) profile_close;
 
-int profile_close(int a1)
+int profile_close(int profile)
 {
-    int l_10;
+    int handle;
 
-    if (((struct bf8_7_1 *)((char *)a1 + 1))->f != 0) {
-        l_10 = open(a1 + 4, 610, 0);
-        if (l_10 == (-1)) {
-            if (*(int *)((char *)a1 + 132) != 0 && *(int *)((char *)a1 + 132) != (-1751672937)) {
-                mc_free(*(int *)((char *)a1 + 132), (int)D_00170129, 171);
-                *(int *)((char *)a1 + 132) = -1751672937;
+    if (((struct bf8_7_1 *)((char *)profile + 1))->f != 0) {
+        handle = open(profile + 4, 610, 0);
+        if (handle == (-1)) {
+            if (*(int *)((char *)profile + 132) != 0 && *(int *)((char *)profile + 132) != (-1751672937)) {
+                mc_free(*(int *)((char *)profile + 132), (int)D_00170129, 171);
+                *(int *)((char *)profile + 132) = -1751672937;
             }
             return 0;
         }
-        write(l_10, *(int *)((char *)a1 + 132), *(int *)((char *)a1 + 136));
-        close(l_10);
+        write(handle, *(int *)((char *)profile + 132), *(int *)((char *)profile + 136));
+        close(handle);
     }
-    if (*(int *)((char *)a1 + 132) != 0 && *(int *)((char *)a1 + 132) != (-1751672937)) {
-        mc_free(*(int *)((char *)a1 + 132), (int)D_00170129, 185);
-        *(int *)((char *)a1 + 132) = -1751672937;
+    if (*(int *)((char *)profile + 132) != 0 && *(int *)((char *)profile + 132) != (-1751672937)) {
+        mc_free(*(int *)((char *)profile + 132), (int)D_00170129, 185);
+        *(int *)((char *)profile + 132) = -1751672937;
     }
     return 1;
 }

@@ -34,41 +34,41 @@ extern void parse_rsc_text(int, int, int);
 extern void object_free_later(struct record *);
 #pragma aux mc_set_location parm routine [];
 
-void song_generate(int a1)
+void song_generate(int skip)
 {
-    int l_1C;
-    int l_18;
+    int n;
+    unsigned char *pattern;
 
-    if (a1 != 0) return;
-    l_1C = rand();
-    srand(l_1C);
+    if (skip != 0) return;
+    n = rand();
+    srand(n);
     parse_rsc_text(850, 0, 0);
     mc_strncpy((int)text_buffer, (int)text_rsc_buffer, 160, (int)D_001706B6, 42);
     parse_rsc_text(851, 0, 0);
     func_000A1054((int)text_buffer, (int)text_rsc_buffer, (int)D_001706B6, 44, 160);
     mc_set_location(45, (int)D_001706B6);
-    mc_sprintf((int)text_rsc_buffer, (int)D_001706BD, (int)text_buffer, l_1C);
+    mc_sprintf((int)text_rsc_buffer, (int)D_001706BD, (int)text_buffer, n);
     mc_strncpy(*(int *)scratch_buffer + 50000, (int)text_rsc_buffer, 4, (int)D_001706B6, 46);
-    for (l_1C = 0; l_1C < 26; l_1C++) {
-        *(short *)(scratch_190d64 + (l_1C * 2)) = rand_range(0, 21) + 900;
+    for (n = 0; n < 26; n++) {
+        *(short *)(scratch_190d64 + (n * 2)) = rand_range(0, 21) + 900;
     }
-    l_1C = rand() % 10;
-    l_18 = xn_str_skip_fields(*(int *)D_00179EA8, 33, l_1C);
-    while (((int)(unsigned char)*(signed char *)((char *)l_18)) != 33) {
-        parse_rsc_text((int)(short)D_00190CA2[((int)(unsigned char)*(signed char *)((char *)l_18++))], 0, 0);
+    n = rand() % 10;
+    pattern = (unsigned char *)xn_str_skip_fields(*(int *)D_00179EA8, 33, n);
+    while (*pattern != 33) {
+        parse_rsc_text((int)(short)D_00190CA2[*pattern++], 0, 0);
         func_000A1054(*(int *)scratch_buffer + 50000, (int)text_rsc_buffer, (int)D_001706B6, 56, 4);
         func_000A1054(*(int *)scratch_buffer + 50000, (int)D_001706CA, (int)D_001706B6, 57, 4);
     }
     func_000A1054(*(int *)scratch_buffer + 50000, (int)D_001706CD, (int)D_001706B6, 59, 4);
 }
 
-void song_init_heroes(int a1)
+void song_init_heroes(int player_hero)
 {
     {
-        int l_1C;
+        int gender;
 
         D_00190D1F = rand() & -255;
-        if (a1 != 0) {
+        if (player_hero != 0) {
             D_00190CD4 = 0;
             scratch_190d20 = (signed char)player_character->flags & 1;
         } else {
@@ -77,18 +77,18 @@ void song_init_heroes(int a1)
         }
         D_00190CD8 = rand();
         if (scratch_190d20 != 0) {
-            l_1C = 0;
+            gender = 0;
         } else {
-            l_1C = 1;
+            gender = 1;
         }
-        D_00190D21 = *(signed char *)&l_1C;
+        D_00190D21 = *(signed char *)&gender;
         D_00190CDC = rand();
         D_00190D22 = 0;
     }
 }
 
-void crime_remove_monster(struct record *a1)
+void crime_remove_monster(struct record *object)
 {
-    if (a1->type != 18) return;
-    object_free_later(a1);
+    if (object->type != 18) return;
+    object_free_later(object);
 }

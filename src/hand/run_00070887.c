@@ -1,7 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2): a run of guilds from 0x00070496 to 0x00070887, kept together for its switch table's alignment */
 #include "records.h"
 
-struct mobile { unsigned char f0; char f1; int f2; };   /* a blessing's data (type 30) */
 extern char D_00175EAA[];        /* __FILE__ */
 extern char D_00176089[];
 extern char D_00176096[];
@@ -17,7 +16,7 @@ extern char D_001961F5[];
 extern struct membership *guild_membership;
 extern void msgbox_show_rsc(short, int);
 extern void shop_stock_soul_traps(int);
-extern int blessing_apply(struct mobile *, int);
+extern int blessing_apply(struct blessing *, int);
 extern void gold_spend(int);
 extern int gold_can_afford(int);
 extern void spfx_cure_disease(int, int);
@@ -64,30 +63,30 @@ void guild_join_thieves_guild(void)
     guild_add_membership(42, 3);
 }
 
-void guild_add_membership(int a1, unsigned char a2)
+void guild_add_membership(int faction_id, unsigned char kind)
 {
 {
-    struct record *l_1C;
+    struct record *object;
 
-    l_1C = object_create_child(player_entity, 0, 13);
-    l_1C->type = 10;
-    l_1C->flags = 3;
-    (guild_membership = &l_1C->data.membership)->faction = a1;
-    guild_membership->kind = a2;
+    object = object_create_child(player_entity, 0, 13);
+    object->type = 10;
+    object->flags = 3;
+    (guild_membership = &object->data.membership)->faction = faction_id;
+    guild_membership->kind = kind;
     guild_membership->rank_time = game_minutes;
     guild_membership->rank = 0;
 }
 }
 
-int guild_confirm_price(int a1)
+int guild_confirm_price(int price)
 {
-    int l_1C;
+    int result;
 
-    trade_total = trade_base_price((trade_total = a1));
+    trade_total = trade_base_price((trade_total = price));
     trade_price = ((trade_price = trade_adjust_price(trade_total, 0)) * trade_price_scale) / 256;
     trade_make_offer();
-    l_1C = trade_settle_offer();
-    return l_1C;
+    result = trade_settle_offer();
+    return result;
 }
 
 void guild_buy_soulgems(void)
@@ -99,100 +98,100 @@ void guild_buy_soulgems(void)
 
 void guild_cure_diseases(void)
 {
-    struct record *l_24;
-    int l_20;
-    int l_1C;
-    struct disease *l_18;
+    struct record *object;
+    int count;
+    int price;
+    struct disease *disease;
 
-    l_20 = 0;
-    l_24 = player_entity->children;
-    while (l_24 != 0) {
-        if (l_24->type == 11) {
-            l_18 = &l_24->data.disease;
-            if (l_18->id < 100) l_20++;
+    count = 0;
+    object = player_entity->children;
+    while (object != 0) {
+        if (object->type == 11) {
+            disease = &object->data.disease;
+            if (disease->id < 100) count++;
         }
-        l_24 = l_24->next;
+        object = object->next;
     }
-    if (player_character->special_infection_time != 0) l_20++;
-    if (l_20 == 0) {
+    if (player_character->special_infection_time != 0) count++;
+    if (count == 0) {
         msgbox_show_rsc(30, 1);
         return;
     }
-    l_1C = l_20 * 250;
+    price = count * 250;
     if (guild_membership->kind == 142) {
-        l_1C = (l_1C * (((10 - guild_membership->rank) << 8) / 10)) / 256;
+        price = (price * (((10 - guild_membership->rank) << 8) / 10)) / 256;
     }
-    l_1C = guild_confirm_price(l_1C);
-    if (l_1C < 1) return;
-    if (gold_can_afford(l_1C) == 0) {
+    price = guild_confirm_price(price);
+    if (price < 1) return;
+    if (gold_can_afford(price) == 0) {
         msgbox_show_rsc(454, 1);
         return;
     }
-    gold_spend(l_1C);
+    gold_spend(price);
     spfx_cure_disease((int)player_entity, (int)player_character);
 }
 
 void guild_buy_blessing(void)
 {
-    struct record *t;
-    int n;
-    int msg;
-    struct mobile *m;
+    struct record *object;
+    int price;
+    int text_id;
+    struct blessing *blessing;
 
-    msg = 0;
-    m = 0;
+    text_id = 0;
+    blessing = 0;
     if (guild_membership->kind == 142)
         return;
-    t = player_entity->children;
-    while (t != 0) {
-        if (t->type == 30) {
+    object = player_entity->children;
+    while (object != 0) {
+        if (object->type == 30) {
             msgbox_show_rsc(454, 1);
             return;
         }
-        t = t->next;
+        object = object->next;
     }
-    n = guild_confirm_price(100);
-    if (n < 1)
+    price = guild_confirm_price(100);
+    if (price < 1)
         return;
-    if (gold_can_afford(n) == 0) {
+    if (gold_can_afford(price) == 0) {
         msgbox_show_rsc(454, 1);
         return;
     }
-    gold_spend(n);
-    t = object_create_child(player_entity, 0, 7);
-    m = (struct mobile *)&t->data;
+    gold_spend(price);
+    object = object_create_child(player_entity, 0, 7);
+    blessing = &object->data.blessing;
     switch (guild_membership->kind) {
     case 143:
-        m->f0 = 14;
-        msg = 705;
+        blessing->target = 14;
+        text_id = 705;
         break;
     case 144:
-        m->f0 = 133;
-        msg = 707;
+        blessing->target = 133;
+        text_id = 707;
         break;
     case 145:
-        m->f0 = 134;
-        msg = 709;
+        blessing->target = 134;
+        text_id = 709;
         break;
     case 146:
-        m->f0 = 129;
-        msg = 710;
+        blessing->target = 129;
+        text_id = 710;
         break;
     case 147:
-        m->f0 = 135;
-        msg = 712;
+        blessing->target = 135;
+        text_id = 712;
         break;
     case 148:
-        m->f0 = 255;
-        msg = 716;
+        blessing->target = 255;
+        text_id = 716;
         break;
     case 149:
-        m->f0 = 132;
-        msg = 717;
+        blessing->target = 132;
+        text_id = 717;
         break;
     }
-    m->f2 = (guild_membership != 0 ? guild_membership->rank + 4 : 4) * 1440 + game_minutes;
-    m->f1 = blessing_apply(m, guild_membership != 0 ? guild_membership->rank + 10 : 8);
-    if (msg != 0)
-        msgbox_show_rsc(msg, 1);
+    blessing->end_time = (guild_membership != 0 ? guild_membership->rank + 4 : 4) * 1440 + game_minutes;
+    blessing->amount = blessing_apply(blessing, guild_membership != 0 ? guild_membership->rank + 10 : 8);
+    if (text_id != 0)
+        msgbox_show_rsc(text_id, 1);
 }

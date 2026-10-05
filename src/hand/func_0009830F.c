@@ -4,45 +4,45 @@ extern unsigned game_minutes;
 
 void trade_schedule_shop_repairs(void)
 {
-    int l_2C;
-    int l_34;
-    int l_30;
-    char *l_1C;
-    int l_28;
-    int l_24;
-    int l_20;
-    double l_3C;
-    char *l_18;
+    int longest_index;
+    int total;
+    int unused;
+    char *object;
+    int index;
+    int longest;
+    int minutes;
+    double scale;
+    char *item;
 
-    l_28 = 0;
-    l_1C = *(char **)(inv_right_container + 63);
-    while (l_1C != 0) {
-        l_18 = l_1C + 71;
-        l_20 = (*(unsigned short *)(l_18 + 46) - *(unsigned short *)(l_18 + 44)) * 1440 / 1000 + 1440;
-        if (l_20 > l_34) {
-            l_34 = l_20;
-            l_2C = l_28;
+    index = 0;
+    object = *(char **)(inv_right_container + 63);
+    while (object != 0) {
+        item = object + 71;
+        minutes = (*(unsigned short *)(item + 46) - *(unsigned short *)(item + 44)) * 1440 / 1000 + 1440;
+        if (minutes > total) {
+            total = minutes;
+            longest_index = index;
         }
-        l_28++;
-        l_1C = *(char **)(l_1C + 55);
+        index++;
+        object = *(char **)(object + 55);
     }
-    l_24 = l_34;
-    l_28 = 0;
-    l_1C = *(char **)(inv_right_container + 63);
-    while (l_1C != 0) {
-        if (l_28 != l_2C) {
-            l_18 = l_1C + 71;
-            l_34 += (*(unsigned short *)(l_18 + 46) - *(unsigned short *)(l_18 + 44)) * 1440 / 1000 + 720;
+    longest = total;
+    index = 0;
+    object = *(char **)(inv_right_container + 63);
+    while (object != 0) {
+        if (index != longest_index) {
+            item = object + 71;
+            total += (*(unsigned short *)(item + 46) - *(unsigned short *)(item + 44)) * 1440 / 1000 + 720;
         }
-        l_28++;
-        l_1C = *(char **)(l_1C + 55);
+        index++;
+        object = *(char **)(object + 55);
     }
-    l_3C = (double)l_34 / l_24;
-    l_1C = *(char **)(inv_right_container + 63);
-    while (l_1C != 0) {
-        l_18 = l_1C + 71;
-        l_20 = (*(unsigned short *)(l_18 + 46) - *(unsigned short *)(l_18 + 44)) * 1440 / 1000 + 1440;
-        *(unsigned *)(l_1C + 43) = game_minutes + (unsigned)(l_20 * l_3C);
-        l_1C = *(char **)(l_1C + 55);
+    scale = (double)total / longest;
+    object = *(char **)(inv_right_container + 63);
+    while (object != 0) {
+        item = object + 71;
+        minutes = (*(unsigned short *)(item + 46) - *(unsigned short *)(item + 44)) * 1440 / 1000 + 1440;
+        *(unsigned *)(object + 43) = game_minutes + (unsigned)(minutes * scale);
+        object = *(char **)(object + 55);
     }
 }

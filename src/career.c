@@ -2,9 +2,9 @@
 
 #include "dagger.h"
 
-int career_slot_weight(int a)
+int career_slot_weight(int slot)
 {
-    if (a > 5) return 1;
-    if (a > 2) return 2;
+    if (slot > 5) return 1;
+    if (slot > 2) return 2;
     return 3;
 }

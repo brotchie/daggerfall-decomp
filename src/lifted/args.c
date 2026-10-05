@@ -138,106 +138,106 @@ extern void func_0007E815(struct record *, int);
 extern void town_grid_visit_near(struct record *, int);
 extern void player_light_draw(void);
 extern void object_foreach_open(struct record *, int);
-void rotate_xz(int, int, int);
+void rotate_xz(int *, int *, int);
 #pragma aux func_0009DA1C parm routine [];
 #pragma aux mc_set_location parm routine [];
 
-void config_read(int a1)
+void config_read(char *path)
 {
-    int l_1C;
-    unsigned char l_18;
+    int file;
+    unsigned char missing;
     {
-        char l_60[32];
-        char l_40[32];
+        char key[32];
+        char value[32];
 
-        l_18 = 0;
+        missing = 0;
         func_0009DA1C(62, (int)D_00176A88);
-        l_1C = fopen(a1, (int)D_00176A8F);
-        if (l_1C != 0) {
-            while (fprintf_2(l_1C, (int)D_00176A91, (int)l_60, (int)l_40) != (-1)) {
-                if (stricmp((int)l_60, (int)D_00176A97) == 0) {
-                    mc_strncpy((int)arena2_path, (int)l_40, 80, (int)D_00176A88, 70);
+        file = fopen(path, (int)D_00176A8F);
+        if (file != 0) {
+            while (fprintf_2(file, (int)D_00176A91, (int)key, (int)value) != (-1)) {
+                if (stricmp((int)key, (int)D_00176A97) == 0) {
+                    mc_strncpy((int)arena2_path, (int)value, 80, (int)D_00176A88, 70);
                     if (((int)(unsigned char)D_001917E3[strlen((int)arena2_path)]) != 92) {
                         func_000A1054((int)arena2_path, (int)D_00176A9C, (int)D_00176A88, 72, 80);
                     }
-                    mc_strncpy((int)cfg_last_path, (int)l_40, 80, (int)D_00176A88, 73);
+                    mc_strncpy((int)cfg_last_path, (int)value, 80, (int)D_00176A88, 73);
                     cfg_flags |= 1;
-                } else if (stricmp((int)l_60, (int)D_00176A9E) == 0) {
-                    mc_strncpy((int)arena2_cd_path, (int)l_40, 80, (int)D_00176A88, 78);
+                } else if (stricmp((int)key, (int)D_00176A9E) == 0) {
+                    mc_strncpy((int)arena2_cd_path, (int)value, 80, (int)D_00176A88, 78);
                     if (((int)(unsigned char)D_00191833[strlen((int)arena2_cd_path)]) != 92) {
                         func_000A1054((int)arena2_cd_path, (int)D_00176A9C, (int)D_00176A88, 80, 80);
                     }
-                    mc_strncpy((int)cfg_last_path, (int)l_40, 80, (int)D_00176A88, 81);
+                    mc_strncpy((int)cfg_last_path, (int)value, 80, (int)D_00176A88, 81);
                     cfg_flags |= 1;
-                } else if (stricmp((int)l_60, (int)D_00176AA5) == 0) {
-                    mc_strncpy(controls_file, (int)l_40, 4, (int)D_00176A88, 86);
-                } else if (stricmp((int)l_60, (int)D_00176AAE) == 0) {
-                    cfg_fade_colour = atoi((int)l_40);
-                } else if (stricmp((int)l_60, (int)D_00176AB8) == 0) {
-                    mc_strncpy((int)&cfg_map_file, (int)l_40, 12, (int)D_00176A88, 94);
+                } else if (stricmp((int)key, (int)D_00176AA5) == 0) {
+                    mc_strncpy(controls_file, (int)value, 4, (int)D_00176A88, 86);
+                } else if (stricmp((int)key, (int)D_00176AAE) == 0) {
+                    cfg_fade_colour = atoi((int)value);
+                } else if (stricmp((int)key, (int)D_00176AB8) == 0) {
+                    mc_strncpy((int)&cfg_map_file, (int)value, 12, (int)D_00176A88, 94);
                     cfg_flags |= 4;
-                } else if (stricmp((int)l_60, (int)D_00176AC0) == 0) {
-                    cfg_faction = atoi((int)l_40);
-                } else if (stricmp((int)l_60, (int)D_00176AC8) == 0) {
-                    cfg_fpu = atoi((int)l_40);
-                } else if (stricmp((int)l_60, (int)D_00176ACC) == 0) {
-                    cfg_start_map = atoi((int)l_40);
-                } else if (stricmp((int)l_60, (int)D_00176AD5) == 0) {
-                    cfg_artifact = atoi((int)l_40);
-                } else if (stricmp((int)l_60, (int)D_00176ADE) == 0) {
-                    cfg_facloop = atoi((int)l_40);
-                } else if (stricmp((int)l_60, (int)D_00176AE6) == 0) {
-                    mc_strncpy((int)classmaker_file, (int)l_40, 20, (int)D_00176A88, 119);
-                } else if (stricmp((int)l_60, (int)D_00176AED) == 0) {
-                    mc_strncpy((int)cfg_item_file, (int)l_40, 20, (int)D_00176A88, 123);
-                } else if (stricmp((int)l_60, (int)D_00176AF2) == 0) {
-                    cfg_gender = atoi((int)l_40);
-                } else if (stricmp((int)l_60, (int)D_00176AF9) == 0) {
-                    cfg_ps2fix = atoi((int)l_40);
-                } else if (stricmp((int)l_60, (int)D_00176B00) == 0) {
-                    cfg_user = atoi((int)l_40);
-                } else if (stricmp((int)l_60, (int)D_00176B05) == 0) {
-                    cfg_region = atoi((int)l_40);
-                } else if (stricmp((int)l_60, (int)D_00176B0C) == 0) {
-                    cfg_debug = atoi((int)l_40);
-                } else if (stricmp((int)l_60, (int)D_00176B12) == 0) {
-                    mc_strncpy((int)cfg_block_str, (int)l_40, 80, (int)D_00176A88, 147);
-                } else if (stricmp((int)l_60, (int)D_00176B1B) == 0) {
-                    cfg_helmet = atoi((int)l_40);
-                } else if (stricmp((int)l_60, (int)D_00176B22) == 0) {
-                    mc_strncpy((int)cfg_mapsave_file, (int)l_40, 80, (int)D_00176A88, 155);
-                } else if (stricmp((int)l_60, (int)D_00176B27) == 0) {
-                    cfg_show_markers = atoi((int)l_40);
-                } else if (stricmp((int)l_60, (int)D_00176B2E) == 0) {
-                    cfg_seed = atoi((int)l_40);
-                } else if (stricmp((int)l_60, (int)D_00176B33) == 0) {
-                    cfg_stereo = atoi((int)l_40);
-                } else if (stricmp((int)l_60, (int)D_00176B3A) == 0) {
-                    object_heap_size = atoi((int)l_40) << 10;
-                } else if (stricmp((int)l_60, (int)D_00176B45) == 0) {
-                    cfg_texture_memory = atoi((int)l_40);
-                } else if (stricmp((int)l_60, (int)D_00176B53) == 0) {
-                    cfg_magic_repair = atoi((int)l_40);
-                } else if (stricmp((int)l_60, (int)D_00176B5F) == 0) {
-                    cheat_mode = atoi((int)l_40);
+                } else if (stricmp((int)key, (int)D_00176AC0) == 0) {
+                    cfg_faction = atoi((int)value);
+                } else if (stricmp((int)key, (int)D_00176AC8) == 0) {
+                    cfg_fpu = atoi((int)value);
+                } else if (stricmp((int)key, (int)D_00176ACC) == 0) {
+                    cfg_start_map = atoi((int)value);
+                } else if (stricmp((int)key, (int)D_00176AD5) == 0) {
+                    cfg_artifact = atoi((int)value);
+                } else if (stricmp((int)key, (int)D_00176ADE) == 0) {
+                    cfg_facloop = atoi((int)value);
+                } else if (stricmp((int)key, (int)D_00176AE6) == 0) {
+                    mc_strncpy((int)classmaker_file, (int)value, 20, (int)D_00176A88, 119);
+                } else if (stricmp((int)key, (int)D_00176AED) == 0) {
+                    mc_strncpy((int)cfg_item_file, (int)value, 20, (int)D_00176A88, 123);
+                } else if (stricmp((int)key, (int)D_00176AF2) == 0) {
+                    cfg_gender = atoi((int)value);
+                } else if (stricmp((int)key, (int)D_00176AF9) == 0) {
+                    cfg_ps2fix = atoi((int)value);
+                } else if (stricmp((int)key, (int)D_00176B00) == 0) {
+                    cfg_user = atoi((int)value);
+                } else if (stricmp((int)key, (int)D_00176B05) == 0) {
+                    cfg_region = atoi((int)value);
+                } else if (stricmp((int)key, (int)D_00176B0C) == 0) {
+                    cfg_debug = atoi((int)value);
+                } else if (stricmp((int)key, (int)D_00176B12) == 0) {
+                    mc_strncpy((int)cfg_block_str, (int)value, 80, (int)D_00176A88, 147);
+                } else if (stricmp((int)key, (int)D_00176B1B) == 0) {
+                    cfg_helmet = atoi((int)value);
+                } else if (stricmp((int)key, (int)D_00176B22) == 0) {
+                    mc_strncpy((int)cfg_mapsave_file, (int)value, 80, (int)D_00176A88, 155);
+                } else if (stricmp((int)key, (int)D_00176B27) == 0) {
+                    cfg_show_markers = atoi((int)value);
+                } else if (stricmp((int)key, (int)D_00176B2E) == 0) {
+                    cfg_seed = atoi((int)value);
+                } else if (stricmp((int)key, (int)D_00176B33) == 0) {
+                    cfg_stereo = atoi((int)value);
+                } else if (stricmp((int)key, (int)D_00176B3A) == 0) {
+                    object_heap_size = atoi((int)value) << 10;
+                } else if (stricmp((int)key, (int)D_00176B45) == 0) {
+                    cfg_texture_memory = atoi((int)value);
+                } else if (stricmp((int)key, (int)D_00176B53) == 0) {
+                    cfg_magic_repair = atoi((int)value);
+                } else if (stricmp((int)key, (int)D_00176B5F) == 0) {
+                    cheat_mode = atoi((int)value);
                 }
             }
             func_0009DA1C(196, (int)D_00176A88);
-            fclose(l_1C);
+            fclose(file);
         }
         if (((int)(unsigned char)(cfg_flags & 1)) == 0) {
             func_0009DA1C(201, (int)D_00176A88);
             printf((int)D_00176B69);
-            l_18 = 1;
+            missing = 1;
         }
         if (((int)(unsigned char)(cfg_flags & 4)) == 0) {
             func_0009DA1C(207, (int)D_00176A88);
             printf((int)D_00176B82);
-            l_18 = 1;
+            missing = 1;
         } else if (((int)(unsigned char)cfg_map_file) == 100) {
             player_environment = 3;
         }
-        if (l_18 != 0) {
+        if (missing != 0) {
             func_0009DA1C(216, (int)D_00176A88);
             printf((int)D_00176B9F);
             exit(5);
@@ -254,13 +254,13 @@ void config_read(int a1)
 
 void world_draw_objects(void)
 {
-    int l_30;
-    int l_2C;
-    int l_28;
-    struct record *l_24;
-    struct record *l_20;
-    struct record *l_1C;
-    unsigned short l_18;
+    int unused;
+    int unused2;
+    int unused3;
+    struct record *next;
+    struct record *block;
+    struct record *children;
+    unsigned short flags;
 
     D_001A949C = climate_weathers[climate_category()];
     model_cache_flush_count = 0;
@@ -280,18 +280,18 @@ void world_draw_objects(void)
         } else {
             town_grid_visit_near(player_object, (int)object_draw_cb);
         }
-        l_20 = location_object->children;
-        while (l_20 != 0) {
-            l_24 = l_20->next;
-            l_1C = l_20->children;
-            l_18 = l_20->flags;
-            if (l_20->type != 38) {
-                object_draw_cb(l_20);
-                if (((int)(unsigned short)(*(int *)&l_18 & 1)) == 0) {
-                    object_foreach_open(l_1C, (int)object_draw_cb);
+        block = location_object->children;
+        while (block != 0) {
+            next = block->next;
+            children = block->children;
+            flags = block->flags;
+            if (block->type != 38) {
+                object_draw_cb(block);
+                if (((int)(unsigned short)(*(int *)&flags & 1)) == 0) {
+                    object_foreach_open(children, (int)object_draw_cb);
                 }
             }
-            l_20 = l_24;
+            block = next;
         }
         if (((int)player_environment) == 1) sky_apply_sunlight();
     } else {
@@ -303,167 +303,167 @@ void world_draw_objects(void)
             }
         }
         func_0007E815(player_object, (int)object_draw_cb);
-        l_20 = location_object->children;
-        while (l_20 != 0) {
-            l_24 = l_20->next;
-            l_1C = l_20->children;
-            l_18 = l_20->flags;
-            if (l_20->type != 47) {
-                object_draw_cb(l_20);
-                if (((int)(unsigned short)(*(int *)&l_18 & 1)) == 0) {
-                    object_foreach_open(l_1C, (int)object_draw_cb);
+        block = location_object->children;
+        while (block != 0) {
+            next = block->next;
+            children = block->children;
+            flags = block->flags;
+            if (block->type != 47) {
+                object_draw_cb(block);
+                if (((int)(unsigned short)(*(int *)&flags & 1)) == 0) {
+                    object_foreach_open(children, (int)object_draw_cb);
                 }
             }
-            l_20 = l_24;
+            block = next;
         }
     }
     spell_cast_queued_run();
     object_free_pending();
 }
 
-void rotate_xz(int a1, int a2, int a3)
+void rotate_xz(int *px, int *pz, int yaw)
 {
-    int l_14;
-    int l_10;
+    int x;
+    int z;
 
-    l_14 = *(int *)((char *)a1);
-    l_10 = *(int *)((char *)a2);
-    a3 &= 2047;
-    *(int *)((char *)a1) = xn_math_fixmul28(l_14, xn_cos_table[a3]) - xn_math_fixmul28(l_10, xn_sin_table[a3]);
-    *(int *)((char *)a2) = xn_math_fixmul28(l_10, xn_cos_table[a3]) + xn_math_fixmul28(l_14, xn_sin_table[a3]);
+    x = *px;
+    z = *pz;
+    yaw &= 2047;
+    *px = xn_math_fixmul28(x, xn_cos_table[yaw]) - xn_math_fixmul28(z, xn_sin_table[yaw]);
+    *pz = xn_math_fixmul28(z, xn_cos_table[yaw]) + xn_math_fixmul28(x, xn_sin_table[yaw]);
 }
 
-int automap_draw_object_cb(struct record *a1)
+int automap_draw_object_cb(struct record *object)
 {
-    int l_40;
-    int l_3C;
-    int l_38;
-    int l_34;
-    int l_30;
-    int l_2C;
-    int l_28;
-    int l_24;
-    int l_20;
-    short l_18;
+    int instance;
+    struct block *block;
+    struct block_flat *flats;
+    struct block_model *model;
+    int unused;
+    int unused2;
+    int i;
+    int unused3;
+    int unused4;
+    short ticks_addr;
 
     if (model_cache_flush_count != 0) return 1;
-    if ((a1->flags & 512) != 0) return 0;
-    if ((a1->flags & 1024) != 0) return 0;
+    if ((object->flags & 512) != 0) return 0;
+    if ((object->flags & 1024) != 0) return 0;
     if (((int)player_environment) != 2) {
-        if (a1->type == 34 && ((a1->image & 31) - 2) == 8) {
+        if (object->type == 34 && ((object->image & 31) - 2) == 8) {
         } else {
-            if ((a1->flags & 128) == 0 && ((struct bf8_4_1 *)&cheat_flags)->f == 0) return 0;
-            if (a1->type != 6 && a1->type != 32) return 0;
-            *(int *)&l_18 = 1132;
-            if ((int)D_00196DB0 == (int)a1 && ((struct bf8_3_1 *)(*(char **)&l_18))->f == 0) {
+            if ((object->flags & 128) == 0 && ((struct bf8_4_1 *)&cheat_flags)->f == 0) return 0;
+            if (object->type != 6 && object->type != 32) return 0;
+            *(int *)&ticks_addr = 1132;
+            if ((int)D_00196DB0 == (int)object && ((struct bf8_3_1 *)(*(char **)&ticks_addr))->f == 0) {
                 return 0;
             }
         }
     }
-    if (abs(a1->y - scratch_190be8) > 700) return 0;
-    if (xn_math_approx_dist2d(a1->x, a1->z, *(int *)scratch_190be4, scratch_190bec) > 2048) return 0;
-    a1->draw_handle = 0;
+    if (abs(object->y - scratch_190be8) > 700) return 0;
+    if (xn_math_approx_dist2d(object->x, object->z, *(int *)scratch_190be4, scratch_190bec) > 2048) return 0;
+    object->draw_handle = 0;
     D_000C5404 = 0;
-    switch (a1->type) {
+    switch (object->type) {
     case 34:
         if (cfg_show_markers == 0) break;
-        if (a1->image == 0 || a1->image == 65535) break;
-        a1->draw_handle = xn_flat_add(a1->x, a1->y, a1->z, a1->image, -1, 4, 4129024);
+        if (object->image == 0 || object->image == 65535) break;
+        object->draw_handle = xn_flat_add(object->x, object->y, object->z, object->image, -1, 4, 4129024);
         break;
     case 43:
-        l_3C = (int)RECORD_DATA(a1);
-        l_34 = *(int *)((char *)l_3C + 5);
-        l_38 = *(int *)((char *)l_3C + 9);
-        for (l_28 = 0; ((int)(unsigned char)*(signed char *)((char *)l_3C)) > l_28; l_28++, (*(char (**)[66])&l_34)++) {
-            if (abs(*(int *)((char *)l_34 + 40) - scratch_190be8) > 100) continue;
-            *(int *)((char *)l_34 + 4) = model_get((int)(unsigned short)*(short *)((char *)l_34), (int)(unsigned char)*(signed char *)((char *)l_34 + 2), (((int)(unsigned char)current_climate) << 2) + ((int)(unsigned char)D_001A949C));
-            if (*(int *)((char *)l_34 + 4) != 0) xn_model_submit(l_34 + 4, 0);
+        block = &object->data.block;
+        model = block->models;
+        flats = block->flats;
+        for (i = 0; block->model_count > i; i++, model++) {
+            if (abs(model->y - scratch_190be8) > 100) continue;
+            model->model = (char *)model_get(model->id, model->variant, (((int)(unsigned char)current_climate) << 2) + ((int)(unsigned char)D_001A949C));
+            if (model->model != 0) xn_model_submit(&model->model, 0);
         }
     case 6:
     case 32:
-        if (a1->image2 == 0) break;
-        l_40 = (int)RECORD_DATA(a1);
-        *(int *)((char *)l_40) = model_get(a1->image2, a1->image, (((int)(unsigned char)current_climate) << 2) + ((int)(unsigned char)D_001A949C));
-        if (*(int *)((char *)l_40) != 0) {
-            *(int *)((char *)l_40 + 32) = a1->x;
-            *(int *)((char *)l_40 + 36) = a1->y;
-            *(int *)((char *)l_40 + 40) = a1->z;
-            if (a1->image2 == 998) {
-                if (weapon_arrow_update(a1) == 0) break;
-                weapon_missile_orient(a1);
-                *(int *)((char *)l_40 + 44) = a1->missile_yaw;
-                *(int *)((char *)l_40 + 48) = a1->angle_z;
-                *(int *)((char *)l_40 + 52) = 0;
-            } else if (a1->link_flag != 255) {
-                xn_model_set_angles_yaw_offset(l_40 + 12, a1->wait_state);
+        if (object->image2 == 0) break;
+        instance = (int)RECORD_DATA(object);
+        *(int *)((char *)instance) = model_get(object->image2, object->image, (((int)(unsigned char)current_climate) << 2) + ((int)(unsigned char)D_001A949C));
+        if (*(int *)((char *)instance) != 0) {
+            *(int *)((char *)instance + 32) = object->x;
+            *(int *)((char *)instance + 36) = object->y;
+            *(int *)((char *)instance + 40) = object->z;
+            if (object->image2 == 998) {
+                if (weapon_arrow_update(object) == 0) break;
+                weapon_missile_orient(object);
+                *(int *)((char *)instance + 44) = object->missile_yaw;
+                *(int *)((char *)instance + 48) = object->angle_z;
+                *(int *)((char *)instance + 52) = 0;
+            } else if (object->link_flag != 255) {
+                xn_model_set_angles_yaw_offset(instance + 12, object->wait_state);
             } else {
-                if (a1->image2 == 610 && a1->image == 32) D_000C5404 = 3;
-                xn_model_compose_angles(l_40 + 12, a1->angle_x, a1->yaw + a1->wait_state, a1->angle_z);
+                if (object->image2 == 610 && object->image == 32) D_000C5404 = 3;
+                xn_model_compose_angles(instance + 12, object->angle_x, object->yaw + object->wait_state, object->angle_z);
             }
-            xn_model_submit(l_40, 0);
+            xn_model_submit(instance, 0);
         }
         break;
     case 56:
-        l_34 = (int)RECORD_DATA(a1);
-        for (l_28 = 0; a1->image > l_28; l_28++, (*(char (**)[66])&l_34)++) {
-            if (abs(*(int *)((char *)l_34 + 40) - scratch_190be8) > 100) continue;
-            *(int *)((char *)l_34 + 4) = model_get((int)(unsigned short)*(short *)((char *)l_34), (int)(unsigned char)*(signed char *)((char *)l_34 + 2), (((int)(unsigned char)current_climate) << 2) + ((int)(unsigned char)D_001A949C));
-            if (*(int *)((char *)l_34 + 4) != 0) xn_model_submit(l_34 + 4, 0);
+        model = (struct block_model *)RECORD_DATA(object);
+        for (i = 0; object->model_count > i; i++, model++) {
+            if (abs(model->y - scratch_190be8) > 100) continue;
+            model->model = (char *)model_get(model->id, model->variant, (((int)(unsigned char)current_climate) << 2) + ((int)(unsigned char)D_001A949C));
+            if (model->model != 0) xn_model_submit(&model->model, 0);
         }
     }
     return 0;
 }
 
-struct record *rmb_make_light(struct record *a1, int a2, int a3)
+struct record *rmb_make_light(struct record *parent, int image, int radius)
 {
-    struct record *l_14;
+    struct record *light;
 
-    l_14 = object_create_child(a1, 0, 0);
-    l_14->type = 7;
-    l_14->image = a2;
-    l_14->light_radius = a3;
-    l_14->pad13 = 8000;
-    l_14->id = location_object->id + ((int)(unsigned short)(current_location->object_counter)++);
-    return l_14;
+    light = object_create_child(parent, 0, 0);
+    light->type = 7;
+    light->image = image;
+    light->light_radius = radius;
+    light->pad13 = 8000;
+    light->id = location_object->id + ((int)(unsigned short)(current_location->object_counter)++);
+    return light;
 }
 
-void rmb_add_doors(struct record *a1, struct block_door *a2)
+void rmb_add_doors(struct record *parent, struct block_door *door)
 {
-    struct record *l_18;
-    int l_14;
+    struct record *object;
+    int i;
 
     if (*(signed char *)(*(char **)rmb_record_ptr + 4) == 0) return;
-    for (l_14 = 0; ((int)(unsigned char)*(signed char *)(*(char **)rmb_record_ptr + 4)) > l_14; l_14++, a2++) {
-        l_18 = rmb_make_door(a1, a2->image2, (int)(short)((unsigned short)a2->image), 1);
-        xn_model_set_angles(0, (a2->yaw + *(int *)rmb_origin_yaw) % 2048, 0, (int)RECORD_DATA(l_18) + 12);
-        l_18->lock_level = (unsigned short)a2->lock_level;
-        rotate_xz((int)&a2->x, (int)&a2->z, *(int *)rmb_origin_yaw);
-        a2->x += rmb_origin_x;
-        l_18->x = a2->x;
-        a2->z += rmb_origin_z;
-        l_18->z = a2->z;
-        a2->y += rmb_origin_y;
-        l_18->y = a2->y;
+    for (i = 0; ((int)(unsigned char)*(signed char *)(*(char **)rmb_record_ptr + 4)) > i; i++, door++) {
+        object = rmb_make_door(parent, door->image2, (int)(short)((unsigned short)door->image), 1);
+        xn_model_set_angles(0, (door->yaw + *(int *)rmb_origin_yaw) % 2048, 0, (int)RECORD_DATA(object) + 12);
+        object->lock_level = (unsigned short)door->lock_level;
+        rotate_xz(&door->x, &door->z, *(int *)rmb_origin_yaw);
+        door->x += rmb_origin_x;
+        object->x = door->x;
+        door->z += rmb_origin_z;
+        object->z = door->z;
+        door->y += rmb_origin_y;
+        object->y = door->y;
     }
 }
 
-void rmb_add_people(struct record *a1, struct block_flat *a2)
+void rmb_add_people(struct record *parent, struct block_flat *person)
 {
-    struct record *l_18;
-    int l_14;
+    struct record *object;
+    int i;
 
     if (*(signed char *)(*(char **)rmb_record_ptr + 3) == 0) return;
-    for (l_14 = 0; ((int)(unsigned char)*(signed char *)(*(char **)rmb_record_ptr + 3)) > l_14; l_14++, a2++) {
-        l_18 = rmb_make_flat(a1, (int)(short)a2->image, (int)(short)a2->faction_id, 0);
-        rotate_xz((int)&a2->x, (int)&a2->z, *(int *)rmb_origin_yaw);
-        a2->x += rmb_origin_x;
-        l_18->x = a2->x;
-        a2->z += rmb_origin_z;
-        l_18->z = a2->z;
-        a2->y += rmb_origin_y;
-        l_18->y = a2->y;
-        if (((int)(unsigned char)(a2->flags & 4)) != 0) l_18->data.person.flags |= 8;
-        if (((int)(unsigned char)(a2->flags & 8)) != 0) l_18->data.person.flags |= 32;
-        if (((int)(unsigned char)(a2->flags & 32)) != 0) l_18->data.person.flags |= 16;
+    for (i = 0; ((int)(unsigned char)*(signed char *)(*(char **)rmb_record_ptr + 3)) > i; i++, person++) {
+        object = rmb_make_flat(parent, (int)(short)person->image, (int)(short)person->faction_id, 0);
+        rotate_xz(&person->x, &person->z, *(int *)rmb_origin_yaw);
+        person->x += rmb_origin_x;
+        object->x = person->x;
+        person->z += rmb_origin_z;
+        object->z = person->z;
+        person->y += rmb_origin_y;
+        object->y = person->y;
+        if (((int)(unsigned char)(person->flags & 4)) != 0) object->data.person.flags |= 8;
+        if (((int)(unsigned char)(person->flags & 8)) != 0) object->data.person.flags |= 32;
+        if (((int)(unsigned char)(person->flags & 32)) != 0) object->data.person.flags |= 16;
     }
 }

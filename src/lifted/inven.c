@@ -272,7 +272,7 @@ int trade_settle_offer(void);
 int trade_base_price(int);
 int trade_pay_spell_points(void);
 int func_00098B91(struct record *);
-int potion_recipe_text(int);
+int potion_recipe_text(signed char *);
 void inventory_load_images(void);
 void inventory_free_images(void);
 void inventory_close(void);
@@ -291,7 +291,7 @@ void inv_read_map_scrap(struct record *);
 void func_00098F1D(struct record *);
 void inv_close_assign_ids(void);
 void inv_track_hand_weapons(int);
-void item_refresh_magic_value_cb(int);
+void item_refresh_magic_value_cb(struct record *);
 void inv_refresh_magic_values(void);
 void trade_mark_in_repair(void);
 #pragma aux mc_set_location parm routine [];
@@ -359,20 +359,20 @@ void inventory_free_images(void)
     D_001AA438 = -1751672937;
 }
 
-int inventory_open(int a1, int a2, int a3)
+int inventory_open(int how, int mode, int icon)
 {
     if (player_death_timer > 0) return 0;
     if (((int)D_0019626F) == 4 && ((int)(unsigned char)game_mode) == 8) {
         return 1;
     }
-    if (a1 != 0 || (game_mode == 0 && key_action_held(37) != 0 && player_death_timer == 0)) {
+    if (how != 0 || (game_mode == 0 && key_action_held(37) != 0 && player_death_timer == 0)) {
         inv_temp_pile = 0;
         if (player_character->race > 8) {
             msgbox_show_string((int)D_00177063, 1);
             return 0;
         }
-        if (a1 == 0) a1 = 1;
-        if (a2 == 0 && a1 == 1) {
+        if (how == 0) how = 1;
+        if (mode == 0 && how == 1) {
             inv_temp_pile = (inv_right_container_base = (inv_right_container = object_create_child(player_object->parent, 0, 0)));
             inv_right_container->type = 33;
             inv_right_container->image = ((unsigned short)(unsigned char)D_00187DAC[rand() % 20]) + 27648;
@@ -382,14 +382,14 @@ int inventory_open(int a1, int a2, int a3)
             inv_right_container->y = player_object->y;
             inv_right_container->z = player_object->z;
             inv_right_container->id = object_new_id(((unsigned)location_object->id) >> 16);
-            a1 = 2;
+            how = 2;
         }
         while (mouse_buttons != 0) xn_mouse_poll_clamped();
         D_00187CA8 = 0;
         game_mode = 4;
         D_00196272 = 1;
-        trade_mode = a2;
-        D_001AA5F8 = (inv_right_icon = *(signed char *)&a3);
+        trade_mode = mode;
+        D_001AA5F8 = (inv_right_icon = *(signed char *)&icon);
         inventory_action = 2;
         trade_total = (trade_price = 0);
         inv_right_scroll = (*(int *)inv_left_scroll = 0);
@@ -404,27 +404,27 @@ int inventory_open(int a1, int a2, int a3)
 
 void inventory_frame(void)
 {
-    int l_20;
-    int l_1C;
-    int l_18;
+    int button;
+    int price;
+    int holiday;
 
     if (inventory_open(0, 0, 2) == 0) return;
     xn_gfx_wait_vretrace_start();
     xn_gfx_wait_vretrace_end();
     xn_tex_cache_begin_frame();
     inventory_draw();
-    l_1C = trade_settle_offer();
-    if (l_1C > 0) {
-        if (trade_mode != 2 && gold_can_afford(l_1C) == 0) {
+    price = trade_settle_offer();
+    if (price > 0) {
+        if (trade_mode != 2 && gold_can_afford(price) == 0) {
             msgbox_show_rsc(454, 1);
         } else if (trade_mode != 2) {
-            l_18 = holiday_today(game_minutes, (int)(unsigned char)current_region);
+            holiday = holiday_today(game_minutes, (int)(unsigned char)current_region);
             if (trade_mode == 4) {
-                if (l_18 != 43 && ((struct bf8_7_1 *)&player_motion_flags)->f == 0) {
-                    gold_spend(l_1C);
+                if (holiday != 43 && ((struct bf8_7_1 *)&player_motion_flags)->f == 0) {
+                    gold_spend(price);
                 }
             } else {
-                gold_spend(l_1C);
+                gold_spend(price);
             }
             if (trade_mode == 4) {
                 trade_mark_identified();
@@ -434,7 +434,7 @@ void inventory_frame(void)
                 trade_mark_in_repair();
             }
         } else {
-            gold_add(l_1C);
+            gold_add(price);
             inv_drop_wagon_if_no_cart();
             object_free_children(inv_right_container);
         }
@@ -445,20 +445,20 @@ void inventory_frame(void)
         return;
     }
     if (((int)(unsigned char)game_mode) != 4) return;
-    for (l_20 = 0; l_20 < 7; l_20++) {
-        if (mouse_x > *(short *)(inv_mode_buttons + ((trade_mode * 84) + (l_20 * 12))) && mouse_x < *(short *)(D_00188285 + ((trade_mode * 84) + (l_20 * 12))) && mouse_y > *(short *)(D_00188283 + ((trade_mode * 84) + (l_20 * 12))) && mouse_y < *(short *)(D_00188287 + ((trade_mode * 84) + (l_20 * 12)))) {
+    for (button = 0; button < 7; button++) {
+        if (mouse_x > *(short *)(inv_mode_buttons + ((trade_mode * 84) + (button * 12))) && mouse_x < *(short *)(D_00188285 + ((trade_mode * 84) + (button * 12))) && mouse_y > *(short *)(D_00188283 + ((trade_mode * 84) + (button * 12))) && mouse_y < *(short *)(D_00188287 + ((trade_mode * 84) + (button * 12)))) {
             sound_play(203, player_object, 100);
-            ((int (*)())(*(int *)(D_00188289 + ((trade_mode * 84) + (l_20 * 12)))))(l_20, 27);
+            ((int (*)())(*(int *)(D_00188289 + ((trade_mode * 84) + (button * 12)))))(button, 27);
             break;
         }
     }
     if (mouse_buttons == 0 || (mouse_buttons != 0 && mouse_buttons_prev != 0)) {
         return;
     }
-    for (l_20 = 0; l_20 < 45; l_20++) {
-        if (mouse_x > *(short *)(inv_buttons + (l_20 * 12)) && mouse_x < *(short *)(D_00188429 + (l_20 * 12)) && mouse_y > *(short *)(D_00188427 + (l_20 * 12)) && mouse_y < *(short *)(D_0018842B + (l_20 * 12))) {
+    for (button = 0; button < 45; button++) {
+        if (mouse_x > *(short *)(inv_buttons + (button * 12)) && mouse_x < *(short *)(D_00188429 + (button * 12)) && mouse_y > *(short *)(D_00188427 + (button * 12)) && mouse_y < *(short *)(D_0018842B + (button * 12))) {
             sound_play(203, player_object, 100);
-            ((int (*)())(*(int *)(D_0018842D + (l_20 * 12))))(l_20, 27);
+            ((int (*)())(*(int *)(D_0018842D + (button * 12))))(button, 27);
             return;
         }
     }
@@ -466,19 +466,19 @@ void inventory_frame(void)
 
 void inventory_close(void)
 {
-    struct record *l_1C;
-    struct record *l_18;
+    struct record *object;
+    struct record *next;
 
     if (inv_left_container == wagon_container && trade_mode == 1) inv_select_tab(41);
     if (inv_right_container == wagon_container) inv_wagon_button();
     while (key_down_esc != 0);
     if (trade_mode == 0) inv_claim_items();
     if (trade_mode == 2 || trade_mode == 4 || trade_mode == 3) {
-        l_1C = inv_right_container_base->children;
-        while (l_1C != 0 && l_1C->type == 2) {
-            l_18 = l_1C->next;
-            if (((int)(unsigned short)(l_1C->flags & 32)) == 0) inv_store_item(l_1C);
-            l_1C = l_18;
+        object = inv_right_container_base->children;
+        while (object != 0 && object->type == 2) {
+            next = object->next;
+            if (((int)(unsigned short)(object->flags & 32)) == 0) inv_store_item(object);
+            object = next;
         }
     }
     D_001962B1 = 0;
@@ -533,81 +533,81 @@ void inventory_close(void)
     quests_suspended = 0;
 }
 
-void inv_draw_container_icon(int a1, int a2)
+void inv_draw_container_icon(int button, int icon)
 {
-    int l_20;
-    int l_1C;
-    int l_18;
-    int l_14;
+    int image;
+    int i;
+    int x;
+    int y;
 
-    l_20 = D_001AA440;
-    l_1C = 0;
-    if (a2 == 1 && ((int)(unsigned short)(game_settings->view_flags & 4)) != 0) a2 = 10;
-    while (l_1C < a2) {
-        l_20 = (((int)(unsigned short)*(short *)((char *)l_20 + 10)) + l_20) + 12;
-        l_1C++;
+    image = D_001AA440;
+    i = 0;
+    if (icon == 1 && ((int)(unsigned short)(game_settings->view_flags & 4)) != 0) icon = 10;
+    while (i < icon) {
+        image = (((int)(unsigned short)*(short *)((char *)image + 10)) + image) + 12;
+        i++;
     }
-    l_18 = ((int)(short)*(short *)(inv_buttons + (a1 * 12))) + ((((int)&*(signed char *)((char *)(((int)(short)*(short *)(D_00188429 + (a1 * 12))) - ((int)(short)*(short *)(inv_buttons + (a1 * 12)))) + 1)) - ((int)(unsigned short)*(short *)((char *)l_20 + 4))) >> 1);
-    l_14 = ((int)(short)*(short *)(D_00188427 + (a1 * 12))) + ((((((int)(short)*(short *)(D_0018842B + (a1 * 12))) - ((int)(short)*(short *)(D_00188427 + (a1 * 12)))) + 1) - ((int)(unsigned short)*(short *)((char *)l_20 + 6))) >> 1);
-    xn_draw_image_transparent(l_18, l_14, (int)(unsigned short)*(short *)((char *)l_20 + 4), (int)(unsigned short)*(short *)((char *)l_20 + 6), l_20 + 12);
-    if (wagon_container == 0 || a2 != 3) return;
+    x = ((int)(short)*(short *)(inv_buttons + (button * 12))) + ((((int)&*(signed char *)((char *)(((int)(short)*(short *)(D_00188429 + (button * 12))) - ((int)(short)*(short *)(inv_buttons + (button * 12)))) + 1)) - ((int)(unsigned short)*(short *)((char *)image + 4))) >> 1);
+    y = ((int)(short)*(short *)(D_00188427 + (button * 12))) + ((((((int)(short)*(short *)(D_0018842B + (button * 12))) - ((int)(short)*(short *)(D_00188427 + (button * 12)))) + 1) - ((int)(unsigned short)*(short *)((char *)image + 6))) >> 1);
+    xn_draw_image_transparent(x, y, (int)(unsigned short)*(short *)((char *)image + 4), (int)(unsigned short)*(short *)((char *)image + 6), image + 12);
+    if (wagon_container == 0 || icon != 3) return;
     D_001962AE = 1;
     scratch_current_object = wagon_container;
     mc_set_location(657, (int)D_0017704C);
     mc_sprintf((int)text_buffer, (int)D_001770A7, macro_kg_weight());
-    text_draw_coloured((int)text_buffer, (int)(short)(l_18 + 1), (int)(short)(l_14 + 1), 145, 156);
+    text_draw_coloured((int)text_buffer, (int)(short)(x + 1), (int)(short)(y + 1), 145, 156);
     D_001962AE = 0;
 }
 
-void func_00093BD9(int a1, int a2, int a3)
+void func_00093BD9(int unused, int buttons, int button)
 {
-    int l_24;
-    short l_20;
-    short l_1C;
-    short l_18;
-    short l_14;
-    short l_10;
+    int image;
+    short centre_x;
+    short centre_y;
+    short width;
+    short height;
+    short i;
 
-    *(int *)&l_20 = (((int)(short)*(short *)((char *)((a3 * 12) + a2))) + ((int)(short)*(short *)((char *)((a3 * 12) + a2) + 4))) >> 1;
-    *(int *)&l_1C = (((int)(short)*(short *)((char *)((a3 * 12) + a2) + 2)) + ((int)(short)*(short *)((char *)((a3 * 12) + a2) + 6))) >> 1;
-    l_24 = D_001AA440;
-    *(int *)&l_10 = 0;
-    while (((int)(short)l_10) < 3) {
-        l_24 = (((int)(unsigned short)*(short *)((char *)l_24 + 10)) + l_24) + 12;
-        (*(int *)&l_10)++;
+    *(int *)&centre_x = (((int)(short)*(short *)((char *)((button * 12) + buttons))) + ((int)(short)*(short *)((char *)((button * 12) + buttons) + 4))) >> 1;
+    *(int *)&centre_y = (((int)(short)*(short *)((char *)((button * 12) + buttons) + 2)) + ((int)(short)*(short *)((char *)((button * 12) + buttons) + 6))) >> 1;
+    image = D_001AA440;
+    *(int *)&i = 0;
+    while (((int)(short)i) < 3) {
+        image = (((int)(unsigned short)*(short *)((char *)image + 10)) + image) + 12;
+        (*(int *)&i)++;
     }
-    l_18 = *(short *)((char *)l_24 + 4);
-    l_14 = *(short *)((char *)l_24 + 6);
-    size_fit((int)&l_18, (int)&l_14, (int)(short)((*(short *)((char *)((a3 * 12) + a2) + 4) - *(short *)((char *)((a3 * 12) + a2))) - 4), (int)(short)((*(short *)((char *)((a3 * 12) + a2) + 6) - *(short *)((char *)((a3 * 12) + a2) + 2)) - 4));
-    for (a3 = 0; ((int)(unsigned short)*(short *)((char *)l_24 + 6)) > a3; a3++) {
-        mc_memcpy((int)(*(char **)scratch_buffer + (a3 << 8)), (l_24 + 12) + (((int)(unsigned short)*(short *)((char *)l_24 + 4)) * a3), (int)(unsigned short)*(short *)((char *)l_24 + 4), (int)D_0017704C, 787, 4);
+    width = *(short *)((char *)image + 4);
+    height = *(short *)((char *)image + 6);
+    size_fit((int)&width, (int)&height, (int)(short)((*(short *)((char *)((button * 12) + buttons) + 4) - *(short *)((char *)((button * 12) + buttons))) - 4), (int)(short)((*(short *)((char *)((button * 12) + buttons) + 6) - *(short *)((char *)((button * 12) + buttons) + 2)) - 4));
+    for (button = 0; ((int)(unsigned short)*(short *)((char *)image + 6)) > button; button++) {
+        mc_memcpy((int)(*(char **)scratch_buffer + (button << 8)), (image + 12) + (((int)(unsigned short)*(short *)((char *)image + 4)) * button), (int)(unsigned short)*(short *)((char *)image + 4), (int)D_0017704C, 787, 4);
     }
-    xn_draw_image_scaled(((int)(short)l_20) - (((int)(short)l_18) >> 1), ((int)(short)l_1C) - (((int)(short)l_14) >> 1), (int)(short)l_18, (int)(short)l_14, (int)(unsigned short)*(short *)((char *)l_24 + 4), (int)(unsigned short)*(short *)((char *)l_24 + 6), 0, *(int *)scratch_buffer);
+    xn_draw_image_scaled(((int)(short)centre_x) - (((int)(short)width) >> 1), ((int)(short)centre_y) - (((int)(short)height) >> 1), (int)(short)width, (int)(short)height, (int)(unsigned short)*(short *)((char *)image + 4), (int)(unsigned short)*(short *)((char *)image + 6), 0, *(int *)scratch_buffer);
     mc_set_location(791, (int)D_0017704C);
     mc_sprintf((int)text_buffer, (int)D_001770C0, macro_kg_weight());
-    text_draw_coloured((int)text_buffer, (int)(short)(*(short *)((char *)((a3 * 12) + a2)) + 3), (int)(short)(*(short *)((char *)((a3 * 12) + a2) + 2) + 2), 145, 156);
+    text_draw_coloured((int)text_buffer, (int)(short)(*(short *)((char *)((button * 12) + buttons)) + 3), (int)(short)(*(short *)((char *)((button * 12) + buttons) + 2) + 2), 145, 156);
 }
 
-void inv_draw_cell_mark(int a1, int a2, int a3, int a4)
+void inv_draw_cell_mark(int archive, int record_index, int buttons, int button)
 {
-    int l_20;
-    int l_1C;
-    int l_18;
-    int l_14;
-    int l_10;
-    int l_C;
+    int texture;
+    int image;
+    int centre_x;
+    int centre_y;
+    int width;
+    int height;
 
-    l_20 = xn_tex_cache_lookup(a1, a2, -1);
-    if (l_20 == 0) {
+    texture = xn_tex_cache_lookup(archive, record_index, -1);
+    if (texture == 0) {
         xn_tex_cache_flush();
-        l_20 = xn_tex_cache_lookup(a1, a2, -1);
+        texture = xn_tex_cache_lookup(archive, record_index, -1);
     }
-    l_1C = *(int *)((char *)l_20 + 12);
-    l_18 = (((int)(short)*(short *)((char *)((a4 * 12) + a3))) + ((int)(short)*(short *)((char *)((a4 * 12) + a3) + 4))) >> 1;
-    l_14 = (((int)(short)*(short *)((char *)((a4 * 12) + a3) + 2)) + ((int)(short)*(short *)((char *)((a4 * 12) + a3) + 6))) >> 1;
-    l_10 = (int)(unsigned short)*(short *)((char *)l_1C + 4);
-    l_C = (int)(unsigned short)*(short *)((char *)l_1C + 6);
-    xn_draw_image_scaled(l_18 - (l_10 >> 1), l_14 - (l_C >> 1), l_10, l_C, (int)(unsigned short)*(short *)((char *)l_1C + 4), (int)(unsigned short)*(short *)((char *)l_1C + 6), (int)(unsigned short)(*(short *)((char *)l_1C + 8) | 32768), l_1C + *(int *)((char *)l_1C + 14));
+    image = *(int *)((char *)texture + 12);
+    centre_x = (((int)(short)*(short *)((char *)((button * 12) + buttons))) + ((int)(short)*(short *)((char *)((button * 12) + buttons) + 4))) >> 1;
+    centre_y = (((int)(short)*(short *)((char *)((button * 12) + buttons) + 2)) + ((int)(short)*(short *)((char *)((button * 12) + buttons) + 6))) >> 1;
+    width = (int)(unsigned short)*(short *)((char *)image + 4);
+    height = (int)(unsigned short)*(short *)((char *)image + 6);
+    xn_draw_image_scaled(centre_x - (width >> 1), centre_y - (height >> 1), width, height, (int)(unsigned short)*(short *)((char *)image + 4), (int)(unsigned short)*(short *)((char *)image + 6), (int)(unsigned short)(*(short *)((char *)image + 8) | 32768), image + *(int *)((char *)image + 14));
 }
 
 void inv_scroll_left_up(void)
@@ -616,109 +616,109 @@ void inv_scroll_left_up(void)
     (*(int *)inv_left_scroll)--;
 }
 
-void inv_click_list_row(int a1, int a2)
+void inv_click_list_row(int row, int first_button)
 {
-    a1 -= a2;
-    switch ((unsigned)a1) {
+    row -= first_button;
+    switch ((unsigned)row) {
     case 0:
-        a1 = 4;
+        row = 4;
         break;
     case 1:
     case 2:
     case 3:
     case 4:
-        a1--;
+        row--;
         break;
     case 5:
-        a1 = 9;
+        row = 9;
         break;
     case 6:
     case 7:
     case 8:
     case 9:
-        a1--;
+        row--;
     }
-    if (a1 < 5 && *(int *)(inv_left_rows + (a1 << 2)) != 0) {
-        inv_click_left_item(*(int *)(inv_left_rows + (a1 << 2)));
+    if (row < 5 && *(int *)(inv_left_rows + (row << 2)) != 0) {
+        inv_click_left_item(*(int *)(inv_left_rows + (row << 2)));
         return;
     }
-    if (a1 <= 4 || a1 >= 10 || D_001AA534[a1] == 0) return;
-    inv_click_right_item(D_001AA534[a1]);
+    if (row <= 4 || row >= 10 || D_001AA534[row] == 0) return;
+    inv_click_right_item(D_001AA534[row]);
 }
 
-int inv_take_item(struct record *a1)
+int inv_take_item(struct record *object)
 {
-    struct item *l_30;
-    int l_2C;
-    struct record **l_28;
-    int l_24;
-    int l_20;
-    int l_1C;
+    struct item *item;
+    int unused;
+    struct record **slot;
+    int weight;
+    int carried;
+    int capacity;
 
-    l_30 = &a1->data.item;
-    if (a1->parent->parent != player_entity) {
+    item = &object->data.item;
+    if (object->parent->parent != player_entity) {
         if (inv_left_container != wagon_container) {
-            if (l_30->group != 23) {
-                l_24 = object_weight(a1);
-                l_20 = object_weight(player_entity);
-                l_1C = carry_capacity() << 2;
-                if ((l_24 + l_20) > l_1C) {
+            if (item->group != 23) {
+                weight = object_weight(object);
+                carried = object_weight(player_entity);
+                capacity = carry_capacity() << 2;
+                if ((weight + carried) > capacity) {
                     msgbox_show_string((int)D_001770CA, 1);
                     return 0;
                 }
             }
         } else {
-            l_24 = object_weight(a1);
+            weight = object_weight(object);
             D_001962AE = 1;
-            l_20 = object_weight(wagon_container);
+            carried = object_weight(wagon_container);
             D_001962AE = 0;
-            if ((l_24 + l_20) > 3000) {
+            if ((weight + carried) > 3000) {
                 msgbox_show_string((int)D_001770EA, 1);
                 return 0;
             }
         }
     }
-    if (l_30->group == 23 && l_30->index == 0) {
-        inv_store_item(a1);
+    if (item->group == 23 && item->index == 0) {
+        inv_store_item(object);
         return 0;
     }
-    if (l_30->group == 27 && l_30->index == 8) {
+    if (item->group == 27 && item->index == 8) {
         inv_read_map_scrap(inv_selected_item);
         return 0;
     }
-    if (a1->type == 54) a1->type = 2;
-    if (l_30->group == 3 && l_30->index == 18) {
-        l_1C = l_30->stack_count;
-        inv_merge_arrows(player_entity, a1, 1);
-        found_object->data.item.condition = l_1C;
+    if (object->type == 54) object->type = 2;
+    if (item->group == 3 && item->index == 18) {
+        capacity = item->stack_count;
+        inv_merge_arrows(player_entity, object, 1);
+        found_object->data.item.condition = capacity;
         return 0;
     }
-    l_28 = (struct record **)xn_str_find_u32(player_character->equipped, (int)inv_selected_item, 27);
-    if (l_28 != 0) {
-        a1 = *l_28;
-        item_remove_equip_effects(a1, ((int)l_28 - (int)player_character->equipped) / 4);
-        *l_28 = 0;
+    slot = (struct record **)xn_str_find_u32(player_character->equipped, (int)inv_selected_item, 27);
+    if (slot != 0) {
+        object = *slot;
+        item_remove_equip_effects(object, ((int)slot - (int)player_character->equipped) / 4);
+        *slot = 0;
         return 0;
     }
     D_001AA454 = 0;
-    a1->id = object_new_id(100);
-    if (a1->twin != 0) a1->twin->id = a1->id;
-    func_00098F1D(a1);
-    l_30 = &a1->data.item;
-    if (l_30->group == 28 && l_30->index == 0) {
-        if (a1 != inv_right_container) D_001AA454 += l_30->value;
-        object_free_single(a1);
+    object->id = object_new_id(100);
+    if (object->twin != 0) object->twin->id = object->id;
+    func_00098F1D(object);
+    item = &object->data.item;
+    if (item->group == 28 && item->index == 0) {
+        if (object != inv_right_container) D_001AA454 += item->value;
+        object_free_single(object);
     } else {
-        a1->caster = 0;
-        quest_raise_event(3, (int)a1, 0);
-        a1->x = player_object->x;
-        a1->y = player_object->y;
-        a1->z = player_object->z;
+        object->caster = 0;
+        quest_raise_event(3, (int)object, 0);
+        object->x = player_object->x;
+        object->y = player_object->y;
+        object->z = player_object->z;
         if (inv_left_container != wagon_container) {
-            inv_store_item(a1);
+            inv_store_item(object);
             return 1;
         }
-        object_reparent(inv_left_container, a1);
+        object_reparent(inv_left_container, object);
         return 0;
     }
     if (D_001AA454 != 0) {
@@ -735,22 +735,22 @@ int inv_take_item(struct record *a1)
 
 void inv_update_hidden_load(void)
 {
-    int l_18;
+    int capacity;
 
-    l_18 = equip_hiding_capacity(1);
+    capacity = equip_hiding_capacity(1);
     *(int *)D_00195B84 = 0;
     object_foreach(player_entity, (int)inv_sum_hidden_weight);
-    player_character->hidden_load_percent = (*(int *)D_00195B84 * 100) / l_18;
+    player_character->hidden_load_percent = (*(int *)D_00195B84 * 100) / capacity;
 }
 
-void inv_unequip_item(struct record *a1)
+void inv_unequip_item(struct record *object)
 {
-    int l_18;
+    int slot;
 
-    for (l_18 = 0; l_18 < 27; l_18++) {
-        if (player_character->equipped[l_18] == a1) {
-            item_remove_equip_effects(a1, l_18);
-            player_character->equipped[l_18] = 0;
+    for (slot = 0; slot < 27; slot++) {
+        if (player_character->equipped[slot] == object) {
+            item_remove_equip_effects(object, slot);
+            player_character->equipped[slot] = 0;
             return;
         }
     }
@@ -758,19 +758,19 @@ void inv_unequip_item(struct record *a1)
 
 void inv_unequip_all_saved(void)
 {
-    struct item *l_1C;
-    int l_18;
+    struct item *item;
+    int slot;
 
     mc_memset((int)D_001AA4CC, 0, 108, (int)D_0017704C, 1274, 108);
     mc_memset((int)D_001AA460, 0, 108, (int)D_0017704C, 1275, 108);
-    for (l_18 = 0; l_18 < 27; l_18++) {
-        if (player_character->equipped[l_18] != 0) {
-            l_1C = &player_character->equipped[l_18]->data.item;
-            if (l_1C->enchantments[0].type != (-1)) {
-                D_001AA4CC[l_18] = (int)player_character->equipped[l_18];
-                *(int *)(D_001AA460 + (l_18 << 2)) = l_1C->condition;
-                l_1C->condition = l_1C->max_condition;
-                inv_unequip_item(player_character->equipped[l_18]);
+    for (slot = 0; slot < 27; slot++) {
+        if (player_character->equipped[slot] != 0) {
+            item = &player_character->equipped[slot]->data.item;
+            if (item->enchantments[0].type != (-1)) {
+                D_001AA4CC[slot] = (int)player_character->equipped[slot];
+                *(int *)(D_001AA460 + (slot << 2)) = item->condition;
+                item->condition = item->max_condition;
+                inv_unequip_item(player_character->equipped[slot]);
             }
         }
     }
@@ -778,81 +778,81 @@ void inv_unequip_all_saved(void)
 
 void inv_reequip_saved(void)
 {
-    struct item *l_1C;
-    int l_18;
+    struct item *item;
+    int slot;
 
-    for (l_18 = 0; l_18 < 27; l_18++) {
-        if (D_001AA4CC[l_18] != 0) {
-            inv_equip_item(D_001AA4CC[l_18]);
-            l_1C = (struct item *)(D_001AA4CC[l_18] + 71);
-            l_1C->condition = *(short *)(D_001AA460 + (l_18 << 2));
+    for (slot = 0; slot < 27; slot++) {
+        if (D_001AA4CC[slot] != 0) {
+            inv_equip_item(D_001AA4CC[slot]);
+            item = (struct item *)(D_001AA4CC[slot] + 71);
+            item->condition = *(short *)(D_001AA460 + (slot << 2));
         }
     }
 }
 
 void inv_use_item(void)
 {
-    struct item *l_30;
-    int l_2C;
-    struct record *l_28;
-    struct record *l_24;
-    int l_20;
-    int l_1C;
-    short l_18;
+    struct item *item;
+    int unused;
+    struct record *object;
+    struct record *monster;
+    int i;
+    int used;
+    short saved_spell;
 
-    l_1C = 0;
-    l_28 = inv_selected_item;
-    l_30 = &inv_selected_item->data.item;
-    if (((int)(unsigned short)(l_28->flags & 32)) != 0) {
+    used = 0;
+    object = inv_selected_item;
+    item = &inv_selected_item->data.item;
+    if (((int)(unsigned short)(object->flags & 32)) != 0) {
         msgbox_show_string((int)D_0017710F, 1);
         return;
     }
-    l_30->item_flags |= 0x200;
-    if (l_28->twin != 0) l_28->twin->data.item.item_flags |= 0x200;
+    item->item_flags |= 0x200;
+    if (object->twin != 0) object->twin->data.item.item_flags |= 0x200;
     D_001940D8 |= 8;
-    if (l_30->enchantments[0].type == 26 && l_30->enchantments[0].param == 3) {
+    if (item->enchantments[0].type == 26 && item->enchantments[0].param == 3) {
         cast_item_used_spell(92);
         item_damage(inv_selected_item, 50);
         return;
     }
-    if (l_30->enchantments[0].type == 26 && l_30->enchantments[0].param == 4) {
+    if (item->enchantments[0].type == 26 && item->enchantments[0].param == 4) {
         if (creature_count == 0) {
             hud_message_add((int)D_00177129);
             return;
         }
         D_0019629D = 1;
-        l_24 = monster_summon_near_player(27);
+        monster = monster_summon_near_player(27);
         D_0019629D = 0;
-        if (l_24 == 0) {
+        if (monster == 0) {
             hud_message_add((int)D_00177147);
             return;
         }
-        l_24->data.character.flags |= 2;
+        monster->data.character.flags |= 2;
         item_damage(inv_selected_item, 100);
         return;
     }
-    if (l_30->enchantments[0].type == 26 && l_30->enchantments[0].param == 8) {
+    if (item->enchantments[0].type == 26 && item->enchantments[0].param == 8) {
         if (creature_count == 0) {
             hud_message_add((int)D_0017716F);
             return;
         }
         D_0019629D = 1;
-        l_24 = monster_summon_near_player(creature_list[0]->data.character.mobile_id);
+        monster = monster_summon_near_player(creature_list[0]->data.character.mobile_id);
         D_0019629D = 0;
-        if (l_24 == 0) {
+        if (monster == 0) {
             hud_message_add((int)D_0017718D);
             return;
         }
-        l_24->data.character.flags |= 2;
+        monster->data.character.flags |= 2;
         item_damage(inv_selected_item, 100);
         return;
     }
-    if (l_30->enchantments[0].type == 26 && l_30->enchantments[0].param == 5) {
+    if (item->enchantments[0].type == 26 && item->enchantments[0].param == 5) {
         sheet_open(50);
         object_delete(inv_selected_item);
         return;
     }
-    if (l_30->enchantments[0].type == 26 && l_30->enchantments[0].param == 9) {
+    if (item->enchantments[0].type == 26 && item->enchantments[0].param == 9) {
         if (inv_selected_item->children != 0) {
             object_delete(inv_selected_item->children);
             msgbox_show_rsc(32, 1);
@@ -861,40 +861,40 @@ void inv_use_item(void)
         }
         return;
     }
-    if (l_30->enchantments[0].type != (-1)) {
-        l_20 = 0;
-        while (l_20 < 10 && l_30->enchantments[l_20].type != (-1)) {
-            if (l_30->enchantments[l_20].type == 0) {
-                *(int *)&l_18 = (int)(short)spell_last_cast_id;
+    if (item->enchantments[0].type != (-1)) {
+        i = 0;
+        while (i < 10 && item->enchantments[i].type != (-1)) {
+            if (item->enchantments[i].type == 0) {
+                *(int *)&saved_spell = (int)(short)spell_last_cast_id;
                 D_0019629A = 1;
-                cast_item_used_spell(l_30->enchantments[l_20].param);
+                cast_item_used_spell(item->enchantments[i].param);
                 D_0019629A = 1;
-                l_1C = 1;
-                spell_last_cast_id = *(int *)&l_18;
+                used = 1;
+                spell_last_cast_id = *(int *)&saved_spell;
                 item_damage(inv_selected_item, 10);
             }
-            if (l_30->enchantments[l_20].type == 21 && l_30->enchantments[l_20].param == 0) {
+            if (item->enchantments[i].type == 21 && item->enchantments[i].param == 0) {
                 damage_apply(player_entity, (int)&*(signed char *)((char *)(player_character->level >> 1) + 1), 0);
                 item_damage(inv_selected_item, 2);
             }
-            l_20++;
+            i++;
         }
     }
-    if (l_30->group == 9 && l_30->index == 5 && (short)l_30->message != 0) {
+    if (item->group == 9 && item->index == 5 && (short)item->message != 0) {
         if (func_00098B91(inv_selected_item) != 0) {
-            msgbox_show_quest_text(current_quest, (int)(short)(short)l_30->message, 1);
+            msgbox_show_quest_text(current_quest, (int)(short)(short)item->message, 1);
         } else {
-            msgbox_show_qrc_text(l_30->name + 10, (int)(unsigned short)(short)l_30->message, 1);
+            msgbox_show_qrc_text(item->name + 10, (int)(unsigned short)(short)item->message, 1);
         }
         return;
     }
-    if (l_30->group == 0) {
-        poison_apply(player_entity, l_30->index + 136, 1);
-        object_delete(l_28);
+    if (item->group == 0) {
+        poison_apply(player_entity, item->index + 136, 1);
+        object_delete(object);
         return;
     }
-    if (l_30->group == 27 && l_30->index == 0) {
-        if (l_28->children == 0) {
+    if (item->group == 27 && item->index == 0) {
+        if (object->children == 0) {
             msgbox_show_rsc(12, 1);
         } else {
             while (mouse_buttons != 0) xn_mouse_poll_clamped();
@@ -904,62 +904,62 @@ void inv_use_item(void)
         }
         return;
     }
-    if (l_30->group == 7) {
+    if (item->group == 7) {
         while (mouse_buttons != 0) xn_mouse_poll_clamped();
         inventory_close();
-        book_open((int)(short)(short)l_30->message);
+        book_open((int)(short)(short)item->message);
         D_001940D8 |= 128;
         return;
     }
-    if (l_30->group == 6 || l_30->group == 12) {
-        item_next_clothing_style(l_30);
+    if (item->group == 6 || item->group == 12) {
+        item_next_clothing_style(item);
         return;
     }
-    if (l_30->group == 1 && l_30->index == 1 && l_28->children != 0 && l_28->children->type == 31) {
-        potion_drink(l_28->children);
-        object_delete(l_28);
+    if (item->group == 1 && item->index == 1 && object->children != 0 && object->children->type == 31) {
+        potion_drink(object->children);
+        object_delete(object);
         return;
     }
-    if (l_1C != 0 || l_28->quest_id != 0) return;
+    if (used != 0 || object->quest_id != 0) return;
     D_00195F2E = 30;
     D_0012B508 = 146;
     msgbox_show_string(D_00184221, 1);
 }
 
-void inv_item_info(struct record *a1, struct item *a2)
+void inv_item_info(struct record *object, struct item *item)
 {
-    int l_14;
+    int header;
 
     D_0012B508 = 146;
-    scratch_current_object = a1;
-    text_macro_item = a2;
-    if (a2->enchantments[0].type == 26 && a2->enchantments[0].param == 9) {
+    scratch_current_object = object;
+    text_macro_item = item;
+    if (item->enchantments[0].type == 26 && item->enchantments[0].param == 9) {
         msgbox_show_rsc(1004, 1);
-    } else if (a2->group == 27 && a2->index == 4) {
-        D_00195ACC = ((int)potion_recipes) + (a2->stack_count * 109);
+    } else if (item->group == 27 && item->index == 4) {
+        D_00195ACC = ((int)potion_recipes) + (item->stack_count * 109);
         msgbox_show_string((int)D_001771B5, 1);
-        msgbox_show_string(potion_recipe_text(D_00195ACC), 1);
-    } else if (a2->group == 27 && a2->index == 6) {
+        msgbox_show_string(potion_recipe_text((signed char *)D_00195ACC), 1);
+    } else if (item->group == 27 && item->index == 6) {
         msgbox_show_rsc(1073, 1);
-    } else if (a2->group == 13) {
-        item_info_painting(a2);
-    } else if (a2->group == 7) {
-        if (a2->enchantments[0].type == 26) {
+    } else if (item->group == 13) {
+        item_info_painting(item);
+    } else if (item->group == 7) {
+        if (item->enchantments[0].type == 26) {
             msgbox_show_rsc(1015, 1);
         } else {
-            l_14 = *(int *)scratch_buffer + 63000;
-            book_read_header(l_14, (int)(unsigned short)(short)a2->message);
-            text_macro_book = l_14;
+            header = *(int *)scratch_buffer + 63000;
+            book_read_header(header, (int)(unsigned short)(short)item->message);
+            text_macro_book = header;
             msgbox_show_rsc(1009, 1);
         }
-    } else if (a2->group == 2) {
+    } else if (item->group == 2) {
         if (((int)(unsigned short)(text_macro_item->item_flags & 2048)) != 0) {
             msgbox_show_rsc(1014, 1);
         } else {
             msgbox_show_rsc(1000, 1);
         }
-    } else if (a2->group == 3) {
-        if (a1->children != 0) {
+    } else if (item->group == 3) {
+        if (object->children != 0) {
             msgbox_show_rsc(1005, 1);
         } else if (text_macro_item->index == 18) {
             msgbox_show_rsc(1011, 1);
@@ -972,106 +972,106 @@ void inv_item_info(struct record *a1, struct item *a2)
         } else {
             msgbox_show_rsc(1001, 1);
         }
-    } else if (a2->group == 1 && a1->children != 0 && a1->children->type == 11) {
+    } else if (item->group == 1 && object->children != 0 && object->children->type == 11) {
         msgbox_show_rsc(1006, 1);
-    } else if (a2->group == 1 && a2->index == 1 && a1->children != 0 && a1->children->type == 31) {
-        D_00195ACC = (int)a1->children + 71;
+    } else if (item->group == 1 && item->index == 1 && object->children != 0 && object->children->type == 31) {
+        D_00195ACC = (int)object->children + 71;
         msgbox_show_rsc(1008, 1);
-    } else if (a2->group == 27 && a2->index == 1) {
+    } else if (item->group == 27 && item->index == 1) {
         msgbox_show_rsc(1004, 1);
-    } else if (a2->group == 27 && a2->index == 2) {
+    } else if (item->group == 27 && item->index == 2) {
         msgbox_show_rsc(1007, 1);
     } else {
         msgbox_show_rsc(1003, 1);
     }
     while (mouse_buttons != 0) xn_mouse_poll_clamped();
     mouse_buttons_prev = 0;
-    if (a2->enchantments[0].type != (-1)) msgbox_show_rsc(1016, 1);
+    if (item->enchantments[0].type != (-1)) msgbox_show_rsc(1016, 1);
     while (mouse_buttons != 0) xn_mouse_poll_clamped();
     mouse_buttons_prev = 0;
 }
 
-void inv_list_left_item(struct record *a1, int a2)
+void inv_list_left_item(struct record *object, int rects)
 {
-    struct item *l_14;
+    struct item *item;
 
-    if ((a1->type != 50 && a1->type != 2) || ((int)(unsigned short)(a1->flags & 2)) != 0) return;
-    l_14 = &a1->data.item;
+    if ((object->type != 50 && object->type != 2) || ((int)(unsigned short)(object->flags & 2)) != 0) return;
+    item = &object->data.item;
     if (guild_membership != 0 && guild_membership->kind == 3) {
-        if (trade_mode == 2 && l_14->enchantments[0].type == (-1)) return;
-        if (((struct bf8_2_1 *)&D_001940D8)->f == 0 && xn_str_find_u32((int)player_character + 367, a1, 27) != 0 && l_14->group != 1) {
+        if (trade_mode == 2 && item->enchantments[0].type == (-1)) return;
+        if (((struct bf8_2_1 *)&D_001940D8)->f == 0 && xn_str_find_u32((int)player_character + 367, object, 27) != 0 && item->group != 1) {
             return;
         }
     } else {
-        if (trade_mode == 2 && trade_shop_takes_group(l_14->group) == 0) return;
-        if (((struct bf8_1_1 *)&D_001940D4)->f != 0 && l_14->condition == l_14->max_condition) {
+        if (trade_mode == 2 && trade_shop_takes_group(item->group) == 0) return;
+        if (((struct bf8_1_1 *)&D_001940D4)->f != 0 && item->condition == item->max_condition) {
             return;
         }
-        if (((struct bf8_1_1 *)&D_001940D4)->f != 0 && l_14->enchantments[0].type != (-1)) return;
-        if ((((int)(unsigned char)game_mode) == 10 || (((int)D_0019626F) == 10 && ((int)(unsigned char)game_mode) == 8)) && (l_14->enchantments[0].type != (-1) || l_14->enchant_points == 0 || (int)itemmaker_item_object == a1 || (l_14->group == 3 && l_14->index == 18) || (l_14->group == 27 && l_14->index == 1) || l_14->group == 23)) {
+        if (((struct bf8_1_1 *)&D_001940D4)->f != 0 && item->enchantments[0].type != (-1)) return;
+        if ((((int)(unsigned char)game_mode) == 10 || (((int)D_0019626F) == 10 && ((int)(unsigned char)game_mode) == 8)) && (item->enchantments[0].type != (-1) || item->enchant_points == 0 || (int)itemmaker_item_object == object || (item->group == 3 && item->index == 18) || (item->group == 27 && item->index == 1) || item->group == 23)) {
             return;
         }
-        if (((struct bf8_2_1 *)&D_001940D8)->f == 0 && xn_str_find_u32((int)player_character + 367, a1, 27) != 0 && l_14->group != 1) {
+        if (((struct bf8_2_1 *)&D_001940D8)->f == 0 && xn_str_find_u32((int)player_character + 367, object, 27) != 0 && item->group != 1) {
             return;
         }
     }
     if (((int)(short)D_001AA586) >= *(int *)inv_left_scroll && ((int)(short)D_001AA586) < (*(int *)inv_left_scroll + 4)) {
-        *(int *)(inv_left_rows + ((((int)(short)D_001AA586) - *(int *)inv_left_scroll) << 2)) = (int)a1;
-        if (a1->type != 50) {
-            inv_draw_item_cell(a1, (int)(short)(D_001AA586 - *(short *)inv_left_scroll), a2);
+        *(int *)(inv_left_rows + ((((int)(short)D_001AA586) - *(int *)inv_left_scroll) << 2)) = (int)object;
+        if (object->type != 50) {
+            inv_draw_item_cell(object, (int)(short)(D_001AA586 - *(short *)inv_left_scroll), rects);
         }
     }
     if (((int)(unsigned char)game_mode) == 10) {
-        if (l_14->enchantments[0].type != (-1)) return;
+        if (item->enchantments[0].type != (-1)) return;
     }
     D_001AA586++;
 }
 
-void inv_equip_in_slot_pair(struct record *a1, int a2, int a3)
+void inv_equip_in_slot_pair(struct record *object, int slot, int step)
 {
-    if (player_character->equipped[a2] != 0) {
-        if (player_character->equipped[a2 + a3] != 0) {
-            inv_equip_in_slot(a1, a2);
+    if (player_character->equipped[slot] != 0) {
+        if (player_character->equipped[slot + step] != 0) {
+            inv_equip_in_slot(object, slot);
         } else {
-            inv_equip_in_slot(a1, a2 + a3);
+            inv_equip_in_slot(object, slot + step);
         }
         return;
     }
-    inv_equip_in_slot(a1, a2);
+    inv_equip_in_slot(object, slot);
 }
 
-void inv_unequip_slot(int a1)
+void inv_unequip_slot(int slot)
 {
-    item_remove_equip_effects(player_character->equipped[a1], a1);
-    player_character->equipped[a1] = 0;
+    item_remove_equip_effects(player_character->equipped[slot], slot);
+    player_character->equipped[slot] = 0;
 }
 
-void inv_equip_in_slot(struct record *a1, int a2)
+void inv_equip_in_slot(struct record *object, int slot)
 {
-    if (player_character->equipped[a2] != 0) {
-        item_remove_equip_effects(player_character->equipped[a2], a2);
-        player_character->equipped[a2] = a1;
-        quest_raise_event(3, (int)a1, 0);
-        item_apply_equip_effects(a1, a2);
+    if (player_character->equipped[slot] != 0) {
+        item_remove_equip_effects(player_character->equipped[slot], slot);
+        player_character->equipped[slot] = object;
+        quest_raise_event(3, (int)object, 0);
+        item_apply_equip_effects(object, slot);
         return;
     }
-    player_character->equipped[a2] = a1;
-    quest_raise_event(3, (int)a1, 0);
-    item_apply_equip_effects(a1, a2);
+    player_character->equipped[slot] = object;
+    quest_raise_event(3, (int)object, 0);
+    item_apply_equip_effects(object, slot);
 }
 
-int item_is_two_handed(struct record *a1)
+int item_is_two_handed(struct record *object)
 {
-    struct item *l_1C;
+    struct item *item;
 
-    if (a1 == 0) return 0;
-    l_1C = &a1->data.item;
-    return ((((int)(unsigned short)(l_1C->item_flags & 4)) == 0) ? 1 : 0);
+    if (object == 0) return 0;
+    item = &object->data.item;
+    return ((((int)(unsigned short)(item->item_flags & 4)) == 0) ? 1 : 0);
 }
 
 void trade_total_buy(void)
 {
-    int l_18;
+    int unused;
 
     D_00190CA8 = 0;
     trade_total = 0;
@@ -1082,56 +1082,56 @@ void trade_total_buy(void)
 
 int trade_total_repair(void)
 {
-    int l_20;
-    int l_1C;
+    int total;
+    int unused;
 
     trade_total = 0;
     object_foreach(inv_right_container->children, (int)trade_add_repair_cost);
     if (trade_total > 0) {
-        l_20 = trade_total;
+        total = trade_total;
     } else {
-        l_20 = 1;
+        total = 1;
     }
-    trade_total = trade_base_price((trade_total = l_20));
+    trade_total = trade_base_price((trade_total = total));
     trade_price = ((trade_price = trade_adjust_price(trade_total, 0)) * trade_price_scale) / 256;
     return trade_total;
 }
 
 void inv_close_return_unpaid(void)
 {
-    int l_18;
+    int slot;
 
     free_later_count = 0;
     object_foreach_pre(player_entity->children, (int)inv_return_unpaid_item);
     if (D_0019628A != 0) {
         object_foreach_pre(player_entity->children, (int)inv_store_cb);
     }
-    for (l_18 = 0; l_18 < 27; l_18++) {
-        if (player_character->equipped[l_18] != 0 && ((int)(unsigned short)(player_character->equipped[l_18]->flags & 32)) != 0) {
-            player_character->equipped[l_18] = 0;
+    for (slot = 0; slot < 27; slot++) {
+        if (player_character->equipped[slot] != 0 && ((int)(unsigned short)(player_character->equipped[slot]->flags & 32)) != 0) {
+            player_character->equipped[slot] = 0;
         }
     }
     object_free_pending();
 }
 
-void item_remove_equip_effects(struct record *a1, int a2)
+void item_remove_equip_effects(struct record *object, int slot)
 {
-    int l_1C;
-    struct item *l_18;
-    int l_14;
+    int i;
+    struct item *item;
+    int spell;
 
-    l_1C = 0;
-    l_18 = &a1->data.item;
-    while (l_1C < 10 && l_18->enchantments[l_1C].type != (-1)) {
-        switch (l_18->enchantments[l_1C].type) {
+    i = 0;
+    item = &object->data.item;
+    while (i < 10 && item->enchantments[i].type != (-1)) {
+        switch (item->enchantments[i].type) {
         case 1:
-            l_14 = spell_find_on_entity((int)player_entity, l_18->enchantments[l_1C].param, a2 + 200);
-            if (l_14 != 0) spell_end(l_14);
+            spell = spell_find_on_entity((int)player_entity, item->enchantments[i].param, slot + 200);
+            if (spell != 0) spell_end(spell);
             break;
         case 3:
-            if (l_18->magicka_bonus != 0) {
-                player_character->magicka -= (unsigned short)l_18->magicka_bonus;
-                player_character->max_magicka -= (unsigned short)l_18->magicka_bonus;
+            if (item->magicka_bonus != 0) {
+                player_character->magicka -= (unsigned short)item->magicka_bonus;
+                player_character->max_magicka -= (unsigned short)item->magicka_bonus;
                 if (player_character->magicka < 0) player_character->magicka = 0;
             }
             break;
@@ -1139,88 +1139,88 @@ void item_remove_equip_effects(struct record *a1, int a2)
             player_character->conditions &= ~0x200;
             break;
         case 10:
-            player_character->skills[l_18->enchantments[l_1C].param].value -= 15;
+            player_character->skills[item->enchantments[i].param].value -= 15;
         }
-        l_1C++;
+        i++;
     }
 }
 
-void item_repair_cb(struct record *a1)
+void item_repair_cb(struct record *object)
 {
-    struct item *l_18;
+    struct item *item;
 
-    if (a1->type != 2) return;
+    if (object->type != 2) return;
     if (*(int *)D_00195B84 == 0) return;
-    l_18 = &a1->data.item;
-    if (l_18->group == 3 && l_18->index == 18) return;
-    if (l_18->enchantments[0].type != (-1) && cfg_magic_repair == 0) return;
-    if (l_18->condition == l_18->max_condition) return;
-    l_18->condition += *(short *)D_00195B84;
-    if (l_18->condition > l_18->max_condition) l_18->condition = l_18->max_condition;
+    item = &object->data.item;
+    if (item->group == 3 && item->index == 18) return;
+    if (item->enchantments[0].type != (-1) && cfg_magic_repair == 0) return;
+    if (item->condition == item->max_condition) return;
+    item->condition += *(short *)D_00195B84;
+    if (item->condition > item->max_condition) item->condition = item->max_condition;
     *(int *)D_00195B84 = 0;
 }
 
-void item_break(struct record *a1)
+void item_break(struct record *object)
 {
-    struct item *l_20;
-    int l_1C;
-    int l_18;
+    struct item *item;
+    int i;
+    int slot;
 
-    l_20 = &a1->data.item;
-    l_18 = -1;
-    text_macro_item = l_20;
-    l_20->condition = 0;
-    inv_store_item(a1);
+    item = &object->data.item;
+    slot = -1;
+    text_macro_item = item;
+    item->condition = 0;
+    inv_store_item(object);
     mc_set_location(2157, (int)D_0017704C);
-    mc_sprintf((int)text_buffer, (int)D_001771C5, l_20->name);
+    mc_sprintf((int)text_buffer, (int)D_001771C5, item->name);
     parse_expand((int)text_buffer, (int)D_00190B44);
     hud_message_add((int)D_00190B44);
-    for (l_1C = 0; l_1C < 27; l_1C++) {
-        if (player_character->equipped[l_1C] == a1) l_18 = l_1C;
+    for (i = 0; i < 27; i++) {
+        if (player_character->equipped[i] == object) slot = i;
     }
-    if (l_20->enchantments[0].type != (-1)) {
-        if (l_18 != (-1)) item_remove_equip_effects(a1, l_18);
-        l_1C = 0;
-        while (l_1C < 10 && l_20->enchantments[l_1C].type != (-1)) {
-            if (l_20->enchantments[l_1C].type == 15) {
+    if (item->enchantments[0].type != (-1)) {
+        if (slot != (-1)) item_remove_equip_effects(object, slot);
+        i = 0;
+        while (i < 10 && item->enchantments[i].type != (-1)) {
+            if (item->enchantments[i].type == 15) {
                 hud_message_add((int)D_001771D3);
-                monster_summon_near_player(l_20->enchantments[l_1C].param)->data.character.team = 1;
+                monster_summon_near_player(item->enchantments[i].param)->data.character.team = 1;
             }
-            l_1C++;
+            i++;
         }
-        object_delete(a1);
+        object_delete(object);
     }
-    if (l_18 != (-1)) player_character->equipped[l_18] = 0;
+    if (slot != (-1)) player_character->equipped[slot] = 0;
     weapon_reload_hand_sprites();
     player_refresh_paperdoll();
 }
 
-void inv_store_item(struct record *a1)
+void inv_store_item(struct record *object)
 {
-    struct item *l_1C;
-    int l_18;
+    struct item *item;
+    int unused;
 
-    a1->id = object_new_id(100);
-    if (a1->twin != 0) a1->twin->id = a1->id;
-    func_00098F1D(a1);
-    a1->caster = 0;
-    l_1C = &a1->data.item;
-    if (l_1C->enchantments[0].type != (-1) || (l_1C->group == 27 && l_1C->index == 0)) {
-        object_reparent(D_001959DC, a1);
+    object->id = object_new_id(100);
+    if (object->twin != 0) object->twin->id = object->id;
+    func_00098F1D(object);
+    object->caster = 0;
+    item = &object->data.item;
+    if (item->enchantments[0].type != (-1) || (item->group == 27 && item->index == 0)) {
+        object_reparent(D_001959DC, object);
         return;
     }
-    object_reparent(inventory_containers[(int)(unsigned char)item_group_tab[l_1C->group]], a1);
+    object_reparent(inventory_containers[(int)(unsigned char)item_group_tab[item->group]], object);
 }
 
-void inv_count_cart_cb(struct record *a1)
+void inv_count_cart_cb(struct record *object)
 {
-    struct item *l_18;
+    struct item *item;
 
-    if (a1->type != 2) return;
-    l_18 = &a1->data.item;
-    if (l_18->group != 23 || l_18->index != 0) return;
+    if (object->type != 2) return;
+    item = &object->data.item;
+    if (item->group != 23 || item->index != 0) return;
     (scratch_190ce4[0])++;
-    scratch_object = a1;
+    scratch_object = object;
 }
 
 void inv_create_wagon(void)
@@ -1240,108 +1240,108 @@ void inv_drop_wagon_if_no_cart(void)
     wagon_container = 0;
 }
 
-void inv_merge_arrows(struct record *a1, struct record *a2, int a3)
+void inv_merge_arrows(struct record *owner, struct record *arrows, int delete_source)
 {
-    struct record *l_14;
-    int l_10;
+    struct record *stack;
+    int count;
 
     found_object = 0;
-    object_find(a1->children, (int)inv_match_arrows);
+    object_find(owner->children, (int)inv_match_arrows);
     if (found_object == 0) {
-        l_14 = object_create_child(a1, 0, 107);
-        found_object = l_14;
-        l_14->type = 2;
-        l_14->image2 = 998;
-        l_14->image = 0;
-        item_make(3, 18, &l_14->data.item);
-        l_14->data.item.stack_count = a2->data.item.stack_count;
-        if (a1 == player_entity) inv_store_item(l_14);
+        stack = object_create_child(owner, 0, 107);
+        found_object = stack;
+        stack->type = 2;
+        stack->image2 = 998;
+        stack->image = 0;
+        item_make(3, 18, &stack->data.item);
+        stack->data.item.stack_count = arrows->data.item.stack_count;
+        if (owner == player_entity) inv_store_item(stack);
     } else {
-        l_10 = found_object->data.item.stack_count + a2->data.item.stack_count;
-        if (l_10 >= 200) l_10 = 199;
-        found_object->data.item.stack_count = *(signed char *)&l_10;
+        count = found_object->data.item.stack_count + arrows->data.item.stack_count;
+        if (count >= 200) count = 199;
+        found_object->data.item.stack_count = *(signed char *)&count;
     }
-    if (a3 == 0) return;
-    object_delete(a2);
+    if (delete_source == 0) return;
+    object_delete(arrows);
 }
 
 int trade_total_sell(void)
 {
-    int l_24;
-    int l_20;
-    int l_1C;
+    struct record *object;
+    struct item *item;
+    int total;
 
-    l_1C = 0;
-    l_24 = (int)inv_right_container_base->children;
-    while (l_24 != 0) {
-        if (((int)(unsigned short)(*(short *)((char *)l_24 + 21) & 32)) == 0) {
-            l_20 = l_24 + 71;
-            l_1C += *(int *)((char *)l_20 + 36);
+    total = 0;
+    object = inv_right_container_base->children;
+    while (object != 0) {
+        if (((int)(unsigned short)(object->flags & 32)) == 0) {
+            item = &object->data.item;
+            total += item->value;
         }
-        l_24 = *(int *)((char *)l_24 + 55);
+        object = object->next;
     }
-    trade_total = trade_base_price(l_1C);
+    trade_total = trade_base_price(total);
     trade_price = trade_adjust_price(trade_total, 1);
     return trade_total;
 }
 
-int trade_region_price(int a1)
+int trade_region_price(int price)
 {
-    a1 = (((int)(unsigned short)*(short *)(region_price_adjustment + (((int)(unsigned char)current_region) * 80))) * a1) / 1000;
-    if (a1 < 0) a1 = 1;
-    return a1;
+    price = (((int)(unsigned short)*(short *)(region_price_adjustment + (((int)(unsigned char)current_region) * 80))) * price) / 1000;
+    if (price < 0) price = 1;
+    return price;
 }
 
-int trade_adjust_price(int a1, int a2)
+int trade_adjust_price(int price, int selling)
 {
-    int l_24;
-    int l_20;
-    int l_1C;
-    int l_18;
+    int skill_quality;
+    int attribute_quality;
+    int skill_factor;
+    int attribute_factor;
 
-    l_24 = ((current_building->quality - 10) * 5) + 50;
-    l_20 = ((current_building->quality - 10) * 5) + 50;
-    if (a2 == 0) {
-        l_1C = ((((l_24 << 8) / 200) + 128) * ((int)&*(signed char *)((char *)(((100 - player_character->skills[14].value) << 8) / 200) + 128))) / 256;
-        l_18 = ((((l_20 << 8) / 200) + 128) * ((int)&*(signed char *)((char *)(((100 - player_character->attributes[5]) << 8) / 200) + 128))) / 256;
-        a1 = (a1 * (((l_1C * 192) / 256) + ((l_18 << 6) / 256))) / 256;
+    skill_quality = ((current_building->quality - 10) * 5) + 50;
+    attribute_quality = ((current_building->quality - 10) * 5) + 50;
+    if (selling == 0) {
+        skill_factor = ((((skill_quality << 8) / 200) + 128) * ((int)&*(signed char *)((char *)(((100 - player_character->skills[14].value) << 8) / 200) + 128))) / 256;
+        attribute_factor = ((((attribute_quality << 8) / 200) + 128) * ((int)&*(signed char *)((char *)(((100 - player_character->attributes[5]) << 8) / 200) + 128))) / 256;
+        price = (price * (((skill_factor * 192) / 256) + ((attribute_factor << 6) / 256))) / 256;
     } else {
-        l_1C = (((((100 - l_24) << 8) / 200) + 128) * ((int)&*(signed char *)((char *)((player_character->skills[14].value << 8) / 200) + 128))) / 256;
-        l_18 = (((((100 - l_20) << 8) / 200) + 128) * ((int)&*(signed char *)((char *)((player_character->attributes[5] << 8) / 200) + 128))) / 256;
-        a1 = (a1 * (((l_1C * 179) / 256) + ((l_18 * 51) / 256))) / 256;
+        skill_factor = (((((100 - skill_quality) << 8) / 200) + 128) * ((int)&*(signed char *)((char *)((player_character->skills[14].value << 8) / 200) + 128))) / 256;
+        attribute_factor = (((((100 - attribute_quality) << 8) / 200) + 128) * ((int)&*(signed char *)((char *)((player_character->attributes[5] << 8) / 200) + 128))) / 256;
+        price = (price * (((skill_factor * 179) / 256) + ((attribute_factor * 51) / 256))) / 256;
     }
-    trade_price = a1;
-    return a1;
+    trade_price = price;
+    return price;
 }
 
 void trade_make_offer(void)
 {
-    int l_1C;
-    int l_18;
+    int text_id;
+    int holiday;
 
     trade_offer_pending = 1;
-    l_18 = holiday_today(game_minutes, (int)(unsigned char)current_region);
-    if ((trade_mode == 4 && l_18 == 43) || ((struct bf8_7_1 *)&player_motion_flags)->f != 0) {
+    holiday = holiday_today(game_minutes, (int)(unsigned char)current_region);
+    if ((trade_mode == 4 && holiday == 43) || ((struct bf8_7_1 *)&player_motion_flags)->f != 0) {
         return;
     }
     if ((trade_total >> 1) > trade_price) {
-        l_1C = 260;
+        text_id = 260;
     } else if ((trade_total - (trade_total >> 2)) > trade_price) {
-        l_1C = 261;
+        text_id = 261;
     } else {
-        l_1C = 262;
+        text_id = 262;
     }
-    if (trade_mode == 2) l_1C += 3;
-    msgbox_yes_no_rsc(l_1C);
+    if (trade_mode == 2) text_id += 3;
+    msgbox_yes_no_rsc(text_id);
 }
 
 int trade_settle_offer(void)
 {
-    int l_1C;
+    int holiday;
 
     if (trade_offer_pending != 0) {
-        l_1C = holiday_today(game_minutes, (int)(unsigned char)current_region);
-        if ((trade_mode == 4 && l_1C == 43) || ((struct bf8_7_1 *)&player_motion_flags)->f != 0) {
+        holiday = holiday_today(game_minutes, (int)(unsigned char)current_region);
+        if ((trade_mode == 4 && holiday == 43) || ((struct bf8_7_1 *)&player_motion_flags)->f != 0) {
             return 1;
         }
         if (((int)(unsigned char)game_mode) == 8) return -1;
@@ -1353,37 +1353,37 @@ int trade_settle_offer(void)
     return 0;
 }
 
-int trade_base_price(int a1)
+int trade_base_price(int price)
 {
-    a1 = trade_region_price(a1);
-    a1 += ((current_building->quality - 10) * a1) / 100;
-    a1 += a1;
-    return a1;
+    price = trade_region_price(price);
+    price += ((current_building->quality - 10) * price) / 100;
+    price += price;
+    return price;
 }
 
-void shop_quality_message(struct building *a1)
+void shop_quality_message(struct building *building)
 {
-    short l_18;
+    short text_id;
 
     D_0012B508 = 146;
-    if (a1->quality <= 3) {
-        *(int *)&l_18 = 270;
-    } else if (a1->quality <= 7) {
-        *(int *)&l_18 = 269;
-    } else if (a1->quality <= 13) {
-        *(int *)&l_18 = 268;
-    } else if (a1->quality <= 17) {
-        *(int *)&l_18 = 267;
+    if (building->quality <= 3) {
+        *(int *)&text_id = 270;
+    } else if (building->quality <= 7) {
+        *(int *)&text_id = 269;
+    } else if (building->quality <= 13) {
+        *(int *)&text_id = 268;
+    } else if (building->quality <= 17) {
+        *(int *)&text_id = 267;
     } else {
-        *(int *)&l_18 = 266;
+        *(int *)&text_id = 266;
     }
-    msgbox_show_rsc((int)(short)l_18, 1);
+    msgbox_show_rsc((int)(short)text_id, 1);
 }
 
 void inv_wagon_button(void)
 {
-    int l_1C;
-    int l_18;
+    int unused1;
+    int unused2;
 
     if (wagon_container == 0) return;
     if (D_001962B1 == 0 && ((int)player_environment) == 3) {
@@ -1433,10 +1433,10 @@ void inv_gold_button(void)
 
 void trade_steal_button(void)
 {
-    int l_18;
+    int chance;
 
-    l_18 = (player_character->skills[15].value - (trade_total / 32)) - (D_00190CA8 / 4);
-    if ((rand() % 101) > l_18) {
+    chance = (player_character->skills[15].value - (trade_total / 32)) - (D_00190CA8 / 4);
+    if ((rand() % 101) > chance) {
         skill_add_uses(16, 1);
         inventory_close();
         crime_current = 13;
@@ -1446,10 +1446,10 @@ void trade_steal_button(void)
     }
     hud_message_add((int)D_00177217);
     object_foreach(player_entity->children, (int)inv_claim_item);
-    for (l_18 = 0; l_18 < 27; l_18++) {
-        if (player_character->equipped[l_18] != 0) {
-            inv_claim_item((int)player_character->equipped[l_18]);
-            inv_store_item(player_character->equipped[l_18]);
+    for (chance = 0; chance < 27; chance++) {
+        if (player_character->equipped[chance] != 0) {
+            inv_claim_item((int)player_character->equipped[chance]);
+            inv_store_item(player_character->equipped[chance]);
         }
     }
     inventory_close();
@@ -1457,12 +1457,12 @@ void trade_steal_button(void)
 
 void inv_claim_items(void)
 {
-    int l_18;
+    int slot;
 
     object_foreach(player_entity->children, (int)inv_claim_item);
-    for (l_18 = 0; l_18 < 27; l_18++) {
-        if (player_character->equipped[l_18] != 0) {
-            inv_claim_item((int)player_character->equipped[l_18]);
+    for (slot = 0; slot < 27; slot++) {
+        if (player_character->equipped[slot] != 0) {
+            inv_claim_item((int)player_character->equipped[slot]);
         }
     }
 }
@@ -1475,8 +1475,8 @@ void trade_buy_button(void)
 
 void trade_clear_button(void)
 {
-    struct record *l_1C;
-    struct record *l_18;
+    struct record *object;
+    struct record *next;
 
     switch (trade_mode) {
         return;
@@ -1486,12 +1486,12 @@ void trade_clear_button(void)
     case 2:
     case 3:
     case 4:
-        l_1C = inv_right_container->children;
-        while (l_1C != 0) {
-            l_18 = l_1C->next;
-            if (l_1C->type == 54) l_1C->type = 2;
-            inv_store_item(l_1C);
-            l_1C = l_18;
+        object = inv_right_container->children;
+        while (object != 0) {
+            next = object->next;
+            if (object->type == 54) object->type = 2;
+            inv_store_item(object);
+            object = next;
         }
     default:;
     }
@@ -1511,37 +1511,37 @@ void trade_repair_button(void)
 
 void trade_identify_button(void)
 {
-    struct record *l_24;
-    struct record *l_20;
-    int l_1C;
-    int l_18;
+    struct record *object;
+    struct record *next;
+    int identified;
+    int count;
 
-    l_1C = 0;
-    l_18 = 0;
+    identified = 0;
+    count = 0;
     if (current_building->type != 11 || current_building->faction_id != 40) {
         if (trade_pay_spell_points() == 0) {
             msgbox_show_string((int)D_0017722B, 1);
             return;
         }
-        l_24 = inv_right_container->children;
-        while (l_24 != 0) {
+        object = inv_right_container->children;
+        while (object != 0) {
             if (trade_pay_spell_points() != 0) {
                 if (player_character->lock_open_chance >= rand_range(1, 100)) {
-                    l_1C++;
-                    l_24->data.item.item_flags |= 32;
+                    identified++;
+                    object->data.item.item_flags |= 32;
                 }
             }
-            l_18++;
-            l_24 = l_24->next;
+            count++;
+            object = object->next;
         }
         mc_set_location(2642, (int)D_0017704C);
-        mc_sprintf((int)text_buffer, key_names[0], l_1C, l_18);
+        mc_sprintf((int)text_buffer, key_names[0], identified, count);
         msgbox_show_string((int)text_buffer, 1);
-        l_24 = inv_right_container->children;
-        while (l_24 != 0) {
-            l_20 = l_24->next;
-            if (((int)(unsigned short)(l_24->data.item.item_flags & 32)) != 0) inv_store_item(l_24);
-            l_24 = l_20;
+        object = inv_right_container->children;
+        while (object != 0) {
+            next = object->next;
+            if (((int)(unsigned short)(object->data.item.item_flags & 32)) != 0) inv_store_item(object);
+            object = next;
         }
         return;
     }
@@ -1550,30 +1550,30 @@ void trade_identify_button(void)
 
 void inv_toggle_hidden(void)
 {
-    int l_20;
-    struct record *l_1C;
-    struct item *l_18;
+    int capacity;
+    struct record *object;
+    struct item *item;
 
     if (inv_selected_item == 0) return;
-    l_1C = inv_selected_item;
-    l_18 = &inv_selected_item->data.item;
-    if (((int)(unsigned short)(l_18->item_flags & 64)) != 0) {
-        l_18->item_flags &= ~0x40;
+    object = inv_selected_item;
+    item = &inv_selected_item->data.item;
+    if (((int)(unsigned short)(item->item_flags & 64)) != 0) {
+        item->item_flags &= ~0x40;
         return;
     }
-    if (xn_str_find_u32(player_character->equipped, (int)l_1C, 27) != 0) {
+    if (xn_str_find_u32(player_character->equipped, (int)object, 27) != 0) {
         msgbox_show_string((int)D_00177255, 1);
         return;
     }
-    l_20 = equip_hiding_capacity(1);
+    capacity = equip_hiding_capacity(1);
     *(int *)D_00195B84 = 0;
     object_foreach(player_entity, (int)inv_sum_hidden_weight);
-    if ((object_weight(l_1C) + *(int *)D_00195B84) > l_20) {
+    if ((object_weight(object) + *(int *)D_00195B84) > capacity) {
         msgbox_show_string((int)D_0017727F, 1);
         return;
     }
     sound_play(235, player_object, 100);
-    l_18->item_flags |= 64;
+    item->item_flags |= 64;
 }
 
 int trade_pay_spell_points(void)
@@ -1585,21 +1585,21 @@ int trade_pay_spell_points(void)
 
 void trade_total_identify(void)
 {
-    int l_1C;
-    int l_18;
+    struct record *object;
+    int unused;
 
     trade_total = 0;
-    l_1C = (int)inv_right_container->children;
-    while (l_1C != 0) {
-        trade_total += ((unsigned)(*(int *)((char *)l_1C + 107) * 25)) >> 8;
-        l_1C = *(int *)((char *)l_1C + 55);
+    object = inv_right_container->children;
+    while (object != 0) {
+        trade_total += (object->data.item.value * 25) >> 8;
+        object = object->next;
     }
     trade_price = trade_total;
 }
 
 void func_00098A15(void)
 {
-    int l_18;
+    int location;
 
     if (((unsigned)(((unsigned)location_object->id) >> 16)) < 1000) {
         map_goto_location(D_001AA540, D_001AA544, D_001AA580, 0);
@@ -1612,81 +1612,81 @@ void func_00098A15(void)
     D_001AA544 = (int)player_environment;
     D_001AA580 = location_object->image;
     if ((((unsigned)player_character->ship_owned) >> 16) == 992) {
-        l_18 = 1;
+        location = 1;
     } else {
-        l_18 = 2;
+        location = 2;
     }
-    map_goto_location(31, 1, l_18, 0);
+    map_goto_location(31, 1, location, 0);
     player_to_nearest_marker((int)location_object, 8);
 }
 
 int func_00098B20(void)
 {
-    int l_24;
-    int l_20;
-    int l_1C;
+    int on_992;
+    int on_993;
+    int result;
 
     if ((((unsigned)location_object->id) >> 16) == 992) {
-        l_24 = 1;
+        on_992 = 1;
     } else {
-        l_24 = 0;
+        on_992 = 0;
     }
-    l_1C = l_24;
+    result = on_992;
     if ((((unsigned)location_object->id) >> 16) == 993) {
-        l_20 = 1;
+        on_993 = 1;
     } else {
-        l_20 = 0;
+        on_993 = 0;
     }
-    l_1C += l_20;
-    return l_1C;
+    result += on_993;
+    return result;
 }
 
-int func_00098B91(struct record *a1)
+int func_00098B91(struct record *object)
 {
-    if (a1->twin != 0 && a1->quest_id != 0) {
-        current_quest = (struct quest *)quest_find_by_id((int)(short)((unsigned short)a1->quest_id));
+    if (object->twin != 0 && object->quest_id != 0) {
+        current_quest = (struct quest *)quest_find_by_id((int)(short)((unsigned short)object->quest_id));
     } else {
         return 0;
     }
     return 1;
 }
 
-void inv_read_map_scrap(struct record *a1)
+void inv_read_map_scrap(struct record *scrap)
 {
     {
-        char l_2C[20];
+        char found[20];
 
-        if (a1 != 0) object_delete(a1);
-        text_macro_map_location = (int)l_2C;
-        location_pick_random_undiscovered((int)l_2C);
+        if (scrap != 0) object_delete(scrap);
+        text_macro_map_location = (int)found;
+        location_pick_random_undiscovered((int)found);
         msgbox_show_rsc(499, 1);
-        location_set_discovered((int)(unsigned short)*(short *)(*(char **)((char *)l_2C + 12) + 27), 1);
-        location_free((int)l_2C);
+        location_set_discovered((int)(unsigned short)*(short *)(*(char **)((char *)found + 12) + 27), 1);
+        location_free((int)found);
     }
 }
 
-int item_forbidden_for_class(struct item *a1)
+int item_forbidden_for_class(struct item *item)
 {
-    if ((player_class->forbidden_materials != 0 || player_class->forbidden_equipment != 0) && (a1->group == 3 || a1->group == 2)) {
-        if (a1->group == 2 && a1->index >= 7 && a1->index <= 10) {
-            if ((player_class->forbidden_equipment & ((1 << (a1->index - 7)) << 9)) != 0) {
+    if ((player_class->forbidden_materials != 0 || player_class->forbidden_equipment != 0) && (item->group == 3 || item->group == 2)) {
+        if (item->group == 2 && item->index >= 7 && item->index <= 10) {
+            if ((player_class->forbidden_equipment & ((1 << (item->index - 7)) << 9)) != 0) {
                 msgbox_show_rsc(1068, 1);
                 return 1;
             }
         }
-        if (a1->group == 2 && a1->index < 7 && (player_class->forbidden_equipment & ((1 << a1->armor_type) << 6)) != 0) {
+        if (item->group == 2 && item->index < 7 && (player_class->forbidden_equipment & ((1 << item->armor_type) << 6)) != 0) {
             msgbox_show_rsc(1068, 1);
             return 1;
         }
-        if (a1->group == 3 && (player_class->forbidden_equipment & ((int)(short)*(short *)(weapon_proficiency_bits + (a1->index * 2)))) != 0) {
+        if (item->group == 3 && (player_class->forbidden_equipment & ((int)(short)*(short *)(weapon_proficiency_bits + (item->index * 2)))) != 0) {
             msgbox_show_rsc(1068, 1);
             return 1;
         }
-        if (a1->group == 3 && (player_class->forbidden_materials & (1 << a1->material)) != 0) {
+        if (item->group == 3 && (player_class->forbidden_materials & (1 << item->material)) != 0) {
             msgbox_show_rsc(1068, 1);
             return 1;
         }
-        if (a1->armor_type == 2 && (player_class->forbidden_materials & (1 << a1->material)) != 0) {
+        if (item->armor_type == 2 && (player_class->forbidden_materials & (1 << item->material)) != 0) {
             msgbox_show_rsc(1068, 1);
             return 1;
         }
@@ -1694,12 +1694,12 @@ int item_forbidden_for_class(struct item *a1)
     return 0;
 }
 
-void func_00098F1D(struct record *a1)
+void func_00098F1D(struct record *object)
 {
-    int l_18;
+    int unused;
 
-    if (a1->twin == 0) return;
-    a1->twin->id = a1->id;
+    if (object->twin == 0) return;
+    object->twin->id = object->id;
 }
 
 void inv_close_assign_ids(void)
@@ -1707,14 +1707,14 @@ void inv_close_assign_ids(void)
     object_foreach(player_entity->children, (int)inv_assign_item_id);
 }
 
-void inv_track_hand_weapons(int a1)
+void inv_track_hand_weapons(int closing)
 {
-    int l_1C;
-    int l_18;
+    int right_delay;
+    int left_delay;
 
-    l_1C = 0;
-    l_18 = 0;
-    if (a1 == 0) {
+    right_delay = 0;
+    left_delay = 0;
+    if (closing == 0) {
         D_001AA44C = 0;
         D_001AA450 = 0;
         if (player_character->equipped[19] != 0) {
@@ -1725,37 +1725,37 @@ void inv_track_hand_weapons(int a1)
         }
     } else {
         if (D_001AA44C != (int)player_character->equipped[19]) {
-            if (D_001AA44C != 0) l_1C += *(int *)(D_0017887F + (D_001AA448 << 2));
+            if (D_001AA44C != 0) right_delay += *(int *)(D_0017887F + (D_001AA448 << 2));
             if (player_character->equipped[19] != 0) {
-                l_1C += *(int *)(D_0017887F + (player_character->equipped[19]->data.item.index << 2));
+                right_delay += *(int *)(D_0017887F + (player_character->equipped[19]->data.item.index << 2));
             }
         }
         if (D_001AA450 != (int)player_character->equipped[21]) {
-            if (D_001AA450 != 0) l_18 += *(int *)(D_0017887F + (D_001AA444 << 2));
+            if (D_001AA450 != 0) left_delay += *(int *)(D_0017887F + (D_001AA444 << 2));
             if (player_character->equipped[21] != 0) {
-                l_18 += *(int *)(D_0017887F + (player_character->equipped[21]->data.item.index << 2));
+                left_delay += *(int *)(D_0017887F + (player_character->equipped[21]->data.item.index << 2));
             }
         }
     }
-    D_0019597C[0] += l_1C;
-    left_hand_ready_delay += l_18;
+    D_0019597C[0] += right_delay;
+    left_hand_ready_delay += left_delay;
 }
 
-void item_refresh_magic_value_cb(int a1)
+void item_refresh_magic_value_cb(struct record *object)
 {
-    int l_1C;
-    int l_18;
+    struct record *parent;
+    struct item *item;
 
-    if (((int)(unsigned char)*(signed char *)((char *)a1)) != 2) return;
-    l_1C = *(int *)((char *)a1 + 67);
-    while (((int)(unsigned char)*(signed char *)((char *)l_1C)) != 52) {
-        if (((int)(unsigned char)*(signed char *)((char *)l_1C)) == 1) return;
-        l_1C = *(int *)((char *)l_1C + 67);
+    if (object->type != 2) return;
+    parent = object->parent;
+    while (parent->type != 52) {
+        if (parent->type == 1) return;
+        parent = parent->parent;
     }
-    if (((int)(unsigned short)*(short *)((char *)l_1C + 27)) > 4) return;
-    l_18 = a1 + 71;
-    if (((int)(short)*(short *)((char *)l_18 + 67)) == (-1)) return;
-    *(int *)((char *)l_18 + 36) = enchant_item_value(l_18);
+    if (parent->pad1B > 4) return;
+    item = &object->data.item;
+    if (item->enchantments[0].type == (-1)) return;
+    item->value = enchant_item_value((int)item);
 }
 
 void inv_refresh_magic_values(void)
@@ -1763,7 +1763,7 @@ void inv_refresh_magic_values(void)
     object_foreach(player_entity->children, (int)item_refresh_magic_value_cb);
 }
 
-int trade_can_repair_item(struct item *a1)
+int trade_can_repair_item(struct item *item)
 {
     if (inv_right_container->children != 0 && current_building->type == 11) {
         msgbox_show_string((int)D_00177300, 1);
@@ -1773,11 +1773,11 @@ int trade_can_repair_item(struct item *a1)
         msgbox_show_string((int)D_00177323, 1);
         return 0;
     }
-    if (a1->group == 3 && a1->index == 18) {
+    if (item->group == 3 && item->index == 18) {
         msgbox_show_rsc(24, 1);
         return 0;
     }
-    if (a1->condition == a1->max_condition) {
+    if (item->condition == item->max_condition) {
         msgbox_show_rsc(24, 1);
         return 0;
     }
@@ -1786,12 +1786,12 @@ int trade_can_repair_item(struct item *a1)
 
 void trade_schedule_repair(void)
 {
-    struct item *l_18;
+    struct item *item;
 
     if (trade_mode != 3) return;
-    l_18 = &inv_selected_item->data.item;
+    item = &inv_selected_item->data.item;
     if (current_building->type == 11) {
-        inv_selected_item->repair_due = (((((l_18->max_condition - l_18->condition) / ((int)&*(signed char *)((char *)(guild_membership->rank) + 1))) * 1440) / 144000) + 1440) + game_minutes;
+        inv_selected_item->repair_due = (((((item->max_condition - item->condition) / ((int)&*(signed char *)((char *)(guild_membership->rank) + 1))) * 1440) / 144000) + 1440) + game_minutes;
         return;
     }
     trade_schedule_shop_repairs();
@@ -1799,28 +1799,28 @@ void trade_schedule_repair(void)
 
 void trade_mark_in_repair(void)
 {
-    int l_18;
+    struct record *object;
 
-    l_18 = (int)inv_right_container->children;
-    while (l_18 != 0) {
-        *(signed char *)((char *)l_18) = 54;
-        l_18 = *(int *)((char *)l_18 + 55);
+    object = inv_right_container->children;
+    while (object != 0) {
+        object->type = 54;
+        object = object->next;
     }
 }
 
-int potion_recipe_text(int a1)
+int potion_recipe_text(signed char *recipe)
 {
-    int l_20;
-    int l_1C;
+    int i;
+    char *text;
 
-    l_20 = 0;
-    l_1C = *(int *)scratch_buffer + 55000;
-    *(signed char *)((char *)l_1C) = 0;
-    while (((int)(signed char)*(signed char *)((char *)(a1 + l_20))) != (-2) && l_20 < 8) {
-        func_000A1054(l_1C, ((int)item_templates) + (((int)(short)*(short *)((char *)(int)(*(char **)(item_group_templates + (((int)(signed char)*(signed char *)((char *)(a1 + l_20) + 10)) << 2)) + (((int)(signed char)*(signed char *)((char *)(a1 + l_20))) * 2)))) * 48), (int)D_0017704C, 3200, 4);
-        func_000A1054(l_1C, (int)D_00177346, (int)D_0017704C, 3201, 4);
-        l_20++;
+    i = 0;
+    text = *(char **)scratch_buffer + 55000;
+    *text = 0;
+    while (recipe[i] != (-2) && i < 8) {
+        func_000A1054((int)text, ((int)item_templates) + (((int)(short)*(short *)((char *)(int)(*(char **)(item_group_templates + (recipe[i + 10] << 2)) + (recipe[i] * 2)))) * 48), (int)D_0017704C, 3200, 4);
+        func_000A1054((int)text, (int)D_00177346, (int)D_0017704C, 3201, 4);
+        i++;
     }
-    *(signed char *)((char *)(strlen(l_1C) + l_1C) + 1) = 0;
-    return l_1C;
+    *(strlen(text) + text + 1) = 0;
+    return (int)text;
 }

@@ -21,43 +21,43 @@ extern void gold_spend(int);
 extern int gold_can_afford(int);
 extern int abs(short);
 
-void blessing_remove(unsigned char *a1)
+void blessing_remove(unsigned char *blessing)
 {
-    if (a1[0] == 255) {
-        region_legal_reputation[a1[6]].value -= a1[1];
+    if (blessing[0] == 255) {
+        region_legal_reputation[blessing[6]].value -= blessing[1];
         return;
     }
-    if (a1[0] & 128) {
-        player_character->attributes[a1[0] & 127] -= a1[1];
+    if (blessing[0] & 128) {
+        player_character->attributes[blessing[0] & 127] -= blessing[1];
         return;
     }
-    player_character->skills[a1[0]].value -= a1[1];
+    player_character->skills[blessing[0]].value -= blessing[1];
 }
 
-int blessing_apply(unsigned char *a1, int a2)
+int blessing_apply(unsigned char *blessing, int amount)
 {
-    int l_18;
+    int applied;
 
-    if (a1[0] == 255) {
-        region_legal_reputation[current_region].value += a2;
+    if (blessing[0] == 255) {
+        region_legal_reputation[current_region].value += amount;
         if (region_legal_reputation[current_region].value > 100) {
-            l_18 = a2 - (region_legal_reputation[current_region].value - 100);
+            applied = amount - (region_legal_reputation[current_region].value - 100);
             region_legal_reputation[current_region].value = 100;
         }
-    } else if (a1[0] & 128) {
-        player_character->attributes[a1[0] & 127] += a2;
-        if (player_character->attributes[a1[0] & 127] > 100) {
-            l_18 = a2 - (player_character->attributes[a1[0] & 127] - 100);
-            player_character->attributes[a1[0] & 127] = 100;
+    } else if (blessing[0] & 128) {
+        player_character->attributes[blessing[0] & 127] += amount;
+        if (player_character->attributes[blessing[0] & 127] > 100) {
+            applied = amount - (player_character->attributes[blessing[0] & 127] - 100);
+            player_character->attributes[blessing[0] & 127] = 100;
         }
     } else {
-        player_character->skills[a1[0]].value += a2;
-        if (player_character->skills[a1[0]].value > 100) {
-            l_18 = a2 - (player_character->skills[a1[0]].value - 100);
-            player_character->skills[a1[0]].value = 100;
+        player_character->skills[blessing[0]].value += amount;
+        if (player_character->skills[blessing[0]].value > 100) {
+            applied = amount - (player_character->skills[blessing[0]].value - 100);
+            player_character->skills[blessing[0]].value = 100;
         }
     }
-    return a2;
+    return amount;
 }
 
 void guild_donate(void)
@@ -90,9 +90,9 @@ void guild_temple_quest(void)
     quest_pick_file(*(D_00187545 - 142 + guild_membership->kind), 67, 48, 67, player_character->level);
 }
 
-int guild_kind_of_faction(struct faction *a1)
+int guild_kind_of_faction(struct faction *faction)
 {
-    switch (a1->id) {
+    switch (faction->id) {
     case 108:
         return 0;
     case 42:

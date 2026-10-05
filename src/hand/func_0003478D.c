@@ -53,158 +53,158 @@ extern int xn_cam_scale_matrix();
 
 void sky_update(void)
 {
-    int l_78;
-    int l_74;
-    int l_70;
-    int l_6C;
-    int l_68;
-    int l_64;
-    int l_60;
-    int l_5C;
-    int l_58;
-    int l_54;
-    int l_50;
-    int l_4C;
-    int l_48;
-    int l_44;
-    int l_40;
-    int l_3C;
-    int l_38;
-    int l_34;
-    int l_30;
-    int l_2C;
-    unsigned char l_1C;
-    struct record *l_24;
-    unsigned char l_20;
-    int l_28;
-    unsigned char l_18;
+    int day;
+    int point_x;
+    int point_y;
+    int point_z;
+    int moon_x;
+    int moon_y;
+    int moon_z;
+    int screen_y;
+    int minutes;
+    int screen_x;
+    int light;
+    int horizon_y;
+    int unused1;
+    int horizon_row;
+    int climate;
+    int target_light;
+    int light_step;
+    int unused2;
+    int unused3;
+    int unused4;
+    unsigned char weather;
+    struct record *cell;
+    unsigned char moons_visible;
+    int unused5;
+    unsigned char sun_placed;
 
-    *(struct s12 *)&l_74 = *(struct s12 *)D_000346B8;
-    l_18 = 0;
+    *(struct s12 *)&point_x = *(struct s12 *)D_000346B8;
+    sun_placed = 0;
     if (D_00187CA8 == 0) return;
     if (((int)player_environment) == 3) {
-        l_24 = location_cell_at(player_object->x, player_object->z);
-        if (player_object->parent != l_24) object_reparent(l_24, player_object);
-        l_3C = l_24->light_level << 8;
-        l_38 = xn_light_ambient;
-        if ((l_3C >> 8) != (l_38 >> 8)) {
-            l_38 = ((l_3C - l_38) * frame_ticks) / 1024;
-            xn_light_ambient += l_38;
+        cell = location_cell_at(player_object->x, player_object->z);
+        if (player_object->parent != cell) object_reparent(cell, player_object);
+        target_light = cell->light_level << 8;
+        light_step = xn_light_ambient;
+        if ((target_light >> 8) != (light_step >> 8)) {
+            light_step = ((target_light - light_step) * frame_ticks) / 1024;
+            xn_light_ambient += light_step;
         } else {
-            xn_light_ambient = l_24->light_level << 8;
+            xn_light_ambient = cell->light_level << 8;
         }
-        dungeon_water_level = l_24->water_level;
-        D_001962A1 = l_24->block_special;
+        dungeon_water_level = cell->water_level;
+        D_001962A1 = cell->block_special;
         return;
     }
     if (((int)player_environment) == 1) {
         sky_set_time_colour(game_minutes);
     }
-    l_58 = ((unsigned)game_minutes) % 1440;
-    if (l_58 > 360 && l_58 < 1080) {
-        l_78 = 1;
+    minutes = ((unsigned)game_minutes) % 1440;
+    if (minutes > 360 && minutes < 1080) {
+        day = 1;
     } else {
-        l_78 = 0;
+        day = 0;
     }
-    daylight = l_78;
+    daylight = day;
     if (((int)player_environment) == 2) {
         if (daylight != 0) {
-            l_58 += -360;
-            if (l_58 < 45) {
-                l_50 = (l_58 * 63) / 45;
-            } else if (l_58 > 675) {
-                l_50 = 63 - (((l_58 - 675) * 63) / 45);
+            minutes += -360;
+            if (minutes < 45) {
+                light = (minutes * 63) / 45;
+            } else if (minutes > 675) {
+                light = 63 - (((minutes - 675) * 63) / 45);
             } else {
-                l_50 = 63;
+                light = 63;
             }
         } else {
-            l_50 = 24;
+            light = 24;
         }
-        l_50 >>= 1;
-        if ((xn_light_ambient = l_50 << 8) < 2560) xn_light_ambient = 2560;
+        light >>= 1;
+        if ((xn_light_ambient = light << 8) < 2560) xn_light_ambient = 2560;
         return;
     }
     if (((int)(unsigned short)(game_settings->view_flags & 1)) != 0) {
-        l_70 = 450;
+        point_y = 450;
     } else {
-        l_70 = 140;
+        point_y = 140;
     }
     xn_cam_pitch = (camera_object->angle_x + view_look_pitch) & 2047;
     xn_cam_yaw = 0;
     xn_cam_roll = 0;
     xn_mat_from_angles(xn_cam_pitch, xn_cam_yaw, xn_cam_roll, (int)xn_cam_rotation);
     xn_cam_scale_matrix((int)xn_cam_rotation, (int)xn_cam_view_matrix);
-    xn_mat_transform_ptr((int)&l_74, (int)&l_70, (int)&l_6C, (int)xn_cam_rotation);
-    xn_cam_project_ptr(l_74, l_70, 3000, (int)&l_54, (int)&l_5C);
-    l_44 = l_5C + 75;
-    if (l_44 < 0) l_44 = 0;
-    if (l_44 > 199) l_44 = 199;
+    xn_mat_transform_ptr((int)&point_x, (int)&point_y, (int)&point_z, (int)xn_cam_rotation);
+    xn_cam_project_ptr(point_x, point_y, 3000, (int)&screen_x, (int)&screen_y);
+    horizon_row = screen_y + 75;
+    if (horizon_row < 0) horizon_row = 0;
+    if (horizon_row > 199) horizon_row = 199;
     if (daylight == 0) xn_light_ambient = 4096;
-    l_4C = l_5C;
+    horizon_y = screen_y;
     sun_light = 0;
-    l_40 = climate_category();
-    l_1C = climate_weathers[l_40];
+    climate = climate_category();
+    weather = climate_weathers[climate];
     if (region_precipitation_override[((int)(unsigned char)current_region) * 80] != 0) {
-        l_1C = region_precipitation_override[((int)(unsigned char)current_region) * 80] - 1;
+        weather = region_precipitation_override[((int)(unsigned char)current_region) * 80] - 1;
     }
-    l_58 += -360;
-    if (l_58 < 45) {
-        l_50 = (l_58 * 63) / 45;
-    } else if (l_58 > 675) {
-        l_50 = 63 - (((l_58 - 675) * 63) / 45);
+    minutes += -360;
+    if (minutes < 45) {
+        light = (minutes * 63) / 45;
+    } else if (minutes > 675) {
+        light = 63 - (((minutes - 675) * 63) / 45);
     } else {
-        l_50 = 63;
+        light = 63;
     }
-    if (daylight == 0) l_50 = 8;
+    if (daylight == 0) light = 8;
     xn_cam_pitch = (camera_object->angle_x + view_look_pitch) & 2047;
     xn_cam_yaw = (camera_object->yaw + view_look_yaw) & 2047;
     xn_cam_roll = 0;
     xn_mat_from_angles(xn_cam_pitch, xn_cam_yaw, xn_cam_roll, (int)xn_cam_rotation);
     xn_cam_scale_matrix((int)xn_cam_rotation, (int)xn_cam_view_matrix);
-    l_18 = 1;
-    sky_sun_direction((int)&sun_direction, 0, l_58);
-    sun_light = l_50;
-    if (((int)(unsigned char)(climate_weathers[l_40] & 127)) == 5) l_50 <<= 1;
-    if ((xn_light_ambient = (l_50 >> 1) << 8) < 2048) xn_light_ambient = 2048;
+    sun_placed = 1;
+    sky_sun_direction((int)&sun_direction, 0, minutes);
+    sun_light = light;
+    if (((int)(unsigned char)(climate_weathers[climate] & 127)) == 5) light <<= 1;
+    if ((xn_light_ambient = (light >> 1) << 8) < 2048) xn_light_ambient = 2048;
     if (daylight != 0) {
-        if (l_5C > (-75)) {
+        if (screen_y > (-75)) {
             sky_load_day(game_minutes);
-            sky_draw_day(l_5C, l_4C, daylight, l_40);
+            sky_draw_day(screen_y, horizon_y, daylight, climate);
             return;
         }
         mc_memset(screen_buffer, (int)(unsigned char)*(signed char *)(((char *)D_00195CF4)), ((((int)(unsigned short)(game_settings->view_flags & 1)) != 0) ? 199 : (int)(unsigned short)*(short *)(*(char **)hud_bar_image + 2)) * 320, (int)D_00170A86, 251, 4);
     } else {
-        sky_draw_night(l_5C, l_4C);
+        sky_draw_night(screen_y, horizon_y);
     }
-    if (l_44 == 0) return;
-    if (daylight == 0 && ((int)(unsigned char)l_1C) > 1) {
+    if (horizon_row == 0) return;
+    if (daylight == 0 && ((int)(unsigned char)weather) > 1) {
         mc_memset(screen_buffer, 223, 64000, (int)D_00170A86, 262, 4);
         sun_light = 0;
         return;
     }
-    l_20 = 0;
-    mc_memcpy((int)&l_68, (int)moon0_direction, 12, (int)D_00170A86, 271, 4);
-    xn_mat_transform_ptr((int)&l_68, (int)&l_64, (int)&l_60, (int)xn_cam_rotation);
-    if (l_60 > 100) {
-        xn_cam_project_ptr(l_68, l_64, l_60, (int)&l_54, (int)&l_5C);
-        *(short *)(*(char **)moon0_image + 6) = (l_54 + xn_cam_centre_x) - (**(unsigned short **)moon0_image >> 1);
-        *(short *)(*(char **)moon0_image + 8) = (((int)(short)xn_cam_centre_y) + l_5C) - (((int)(unsigned short)*(short *)(*(char **)moon0_image + 2)) >> 1);
-        l_20 |= 1;
+    moons_visible = 0;
+    mc_memcpy((int)&moon_x, (int)moon0_direction, 12, (int)D_00170A86, 271, 4);
+    xn_mat_transform_ptr((int)&moon_x, (int)&moon_y, (int)&moon_z, (int)xn_cam_rotation);
+    if (moon_z > 100) {
+        xn_cam_project_ptr(moon_x, moon_y, moon_z, (int)&screen_x, (int)&screen_y);
+        *(short *)(*(char **)moon0_image + 6) = (screen_x + xn_cam_centre_x) - (**(unsigned short **)moon0_image >> 1);
+        *(short *)(*(char **)moon0_image + 8) = (((int)(short)xn_cam_centre_y) + screen_y) - (((int)(unsigned short)*(short *)(*(char **)moon0_image + 2)) >> 1);
+        moons_visible |= 1;
     }
-    mc_memcpy((int)&l_68, (int)moon1_direction, 12, (int)D_00170A86, 281, 4);
-    xn_mat_transform_ptr((int)&l_68, (int)&l_64, (int)&l_60, (int)xn_cam_rotation);
-    if (l_60 > 100) {
-        xn_cam_project_ptr(l_68, l_64, l_60, (int)&l_54, (int)&l_5C);
-        *(short *)(*(char **)moon1_image + 6) = (l_54 + xn_cam_centre_x) - (**(unsigned short **)moon1_image >> 1);
-        *(short *)(*(char **)moon1_image + 8) = (((int)(short)xn_cam_centre_y) + l_5C) - (((int)(unsigned short)*(short *)(*(char **)moon1_image + 2)) >> 1);
-        l_20 |= 2;
+    mc_memcpy((int)&moon_x, (int)moon1_direction, 12, (int)D_00170A86, 281, 4);
+    xn_mat_transform_ptr((int)&moon_x, (int)&moon_y, (int)&moon_z, (int)xn_cam_rotation);
+    if (moon_z > 100) {
+        xn_cam_project_ptr(moon_x, moon_y, moon_z, (int)&screen_x, (int)&screen_y);
+        *(short *)(*(char **)moon1_image + 6) = (screen_x + xn_cam_centre_x) - (**(unsigned short **)moon1_image >> 1);
+        *(short *)(*(char **)moon1_image + 8) = (((int)(short)xn_cam_centre_y) + screen_y) - (((int)(unsigned short)*(short *)(*(char **)moon1_image + 2)) >> 1);
+        moons_visible |= 2;
     }
     xn_cam_pitch = (camera_object->angle_x + view_look_pitch) & 2047;
     xn_cam_yaw = (((((unsigned)((((unsigned)game_minutes) % 518400) * 2047)) / 518400) + (((unsigned)((((unsigned)game_minutes) % 1440) * 2047)) / 1440)) + (camera_object->yaw + view_look_yaw)) & 2047;
     xn_cam_roll = 0;
     xn_mat_from_angles(xn_cam_pitch, xn_cam_yaw, xn_cam_roll, (int)xn_cam_rotation);
     xn_cam_scale_matrix((int)xn_cam_rotation, (int)xn_cam_view_matrix);
-    if (daylight != 0) if (l_50 == 63) {}
+    if (daylight != 0) if (light == 63) {}
     if (daylight != 0) return;
     sun_light = 0;
 }

@@ -52,7 +52,7 @@ extern int door_start_swing(int, int);
 extern int xn_gfx_present_inclusive();
 extern int xn_kbd_flush();
 
-void links_trigger(struct record *a1, int a2)
+void links_trigger(struct record *object, int trigger)
 {
     int i;
     int j;
@@ -62,16 +62,16 @@ void links_trigger(struct record *a1, int a2)
 
     i = 0;
     if (link_count == 0) return;
-    id = a1->id;
+    id = object->id;
     while (i < link_count) {
         if (links[i].trigger != 0 && links[i].object_id == id) {
             if (links[i].trigger < 8 || links[i].trigger > 9) {
-                if (links[i].trigger != a2) return;
+                if (links[i].trigger != trigger) return;
             } else if (links[i].trigger == 8) {
-                if (a2 != 2 && a2 != 3 && a2 != 5 && a2 != 6)
+                if (trigger != 2 && trigger != 3 && trigger != 5 && trigger != 6)
                     return;
             } else {
-                if (a2 != 2 && a2 != 3)
+                if (trigger != 2 && trigger != 3)
                     return;
             }
             p = &links[i];
@@ -114,108 +114,108 @@ void links_update(void)
     }
 }
 
-int link_step(struct link *a1)
+int link_step(struct link *link)
 {
-    int l_40;
-    int l_3C;
-    int l_38;
-    int l_34;
-    int l_30;
-    int l_2C;
+    int offset;
+    int bits;
+    int pos;
+    int damage;
+    int message;
+    struct record *child;
 
-    if (((int)(unsigned char)(a1->flags & 1)) != 0) return 0;
-    if ((a1->action == 18 || a1->action == 20) && ((int)(unsigned char)(a1->axis & 8)) != 0 && ((int)(unsigned char)(a1->flags & 2)) != 0) {
+    if (((int)(unsigned char)(link->flags & 1)) != 0) return 0;
+    if ((link->action == 18 || link->action == 20) && ((int)(unsigned char)(link->axis & 8)) != 0 && ((int)(unsigned char)(link->flags & 2)) != 0) {
         return 0;
     }
-    a1->delta[0] = (a1->delta[1] = (a1->delta[2] = 0));
-    if (((unsigned)(*(int *)((char *)1132) - a1->start_tick)) > a1->duration) {
-        a1->flags |= 1;
-        a1->start_tick = *(int *)((char *)1132) - a1->duration;
-        a1->flags ^= 2;
-        links_set_reverse((int)(short)a1->object_id, a1->flags);
+    link->delta[0] = (link->delta[1] = (link->delta[2] = 0));
+    if (((unsigned)(*(int *)((char *)1132) - link->start_tick)) > link->duration) {
+        link->flags |= 1;
+        link->start_tick = *(int *)((char *)1132) - link->duration;
+        link->flags ^= 2;
+        links_set_reverse((int)(short)link->object_id, link->flags);
     }
-    if (((int)(unsigned char)(a1->flags & 4)) == 0) {
-        if (a1->param != 0 && a1->object != 0) sound_play(a1->param, (int)a1->object, 110);
-        a1->flags |= 4;
+    if (((int)(unsigned char)(link->flags & 4)) == 0) {
+        if (link->param != 0 && link->object != 0) sound_play(link->param, (int)link->object, 110);
+        link->flags |= 4;
     }
-    if (a1->object != 0 && a1->object->type != 32) a1->object->move_frame = *(int *)frame_counter;
+    if (link->object != 0 && link->object->type != 32) link->object->move_frame = *(int *)frame_counter;
     {
-        int l_54;
-        int l_50;
-        switch (a1->action) {
+        int value;
+        int axis;
+        switch (link->action) {
         case 129:
-            a1->combination &= D_001A3A81 | 240;
-            a1->combination |= D_001A3A80;
-            if (((int)(unsigned char)(a1->combination & 15)) != (a1->combination >> 4)) break;
+            link->combination &= D_001A3A81 | 240;
+            link->combination |= D_001A3A80;
+            if (((int)(unsigned char)(link->combination & 15)) != (link->combination >> 4)) break;
         case 1:
-            l_40 = ((*(int *)((char *)1132) - a1->start_tick) * a1->speed) >> 16;
-            switch ((unsigned char)(a1->axis - 1)) {
+            offset = ((*(int *)((char *)1132) - link->start_tick) * link->speed) >> 16;
+            switch ((unsigned char)(link->axis - 1)) {
             case 0:
-                l_38 = l_40 + a1->start;
-                a1->delta[0] = l_38 - (short)a1->object->x;
-                a1->object->x = l_38;
+                pos = offset + link->start;
+                link->delta[0] = pos - (short)link->object->x;
+                link->object->x = pos;
                 break;
             case 1:
-                l_38 = a1->start - l_40;
-                a1->delta[0] = l_38 - (short)a1->object->x;
-                a1->object->x = l_38;
+                pos = link->start - offset;
+                link->delta[0] = pos - (short)link->object->x;
+                link->object->x = pos;
                 break;
             case 2:
-                l_38 = l_40 + a1->start;
-                a1->delta[1] = l_38 - (short)a1->object->y;
-                a1->object->y = l_38;
+                pos = offset + link->start;
+                link->delta[1] = pos - (short)link->object->y;
+                link->object->y = pos;
                 break;
             case 3:
-                l_38 = a1->start - l_40;
-                a1->delta[1] = l_38 - (short)a1->object->y;
-                a1->object->y = l_38;
+                pos = link->start - offset;
+                link->delta[1] = pos - (short)link->object->y;
+                link->object->y = pos;
                 break;
             case 4:
-                l_38 = l_40 + a1->start;
-                a1->delta[2] = l_38 - (short)a1->object->z;
-                a1->object->z = l_38;
+                pos = offset + link->start;
+                link->delta[2] = pos - (short)link->object->z;
+                link->object->z = pos;
                 break;
             case 5:
-                l_38 = a1->start - l_40;
-                a1->delta[2] = l_38 - (short)a1->object->z;
-                a1->object->z = l_38;
+                pos = link->start - offset;
+                link->delta[2] = pos - (short)link->object->z;
+                link->object->z = pos;
             }
-            if (a1->object != 0) {
-                if (a1->object->twin != 0) {
-                    l_2C = (int)a1->object->twin->children;
-                    if (l_2C != 0) {
-                        if (*(int *)((char *)l_2C + 51) != 0) {
-                            mc_memcpy(*(int *)((char *)l_2C + 51) + 7, (int)(signed char *)&a1->object->x, 12, (int)D_00175962, 264, 4);
+            if (link->object != 0) {
+                if (link->object->twin != 0) {
+                    child = link->object->twin->children;
+                    if (child != 0) {
+                        if (child->twin != 0) {
+                            mc_memcpy(&child->twin->x, &link->object->x, 12, (int)D_00175962, 264, 4);
                         }
                     }
                 }
             }
             break;
         case 130:
-            a1->combination &= D_001A3A81 | 240;
-            a1->combination |= D_001A3A80;
-            if (((int)(unsigned char)(a1->combination & 15)) != (a1->combination >> 4)) break;
+            link->combination &= D_001A3A81 | 240;
+            link->combination |= D_001A3A80;
+            if (((int)(unsigned char)(link->combination & 15)) != (link->combination >> 4)) break;
         case 8:
-            l_40 = ((*(int *)((char *)1132) - a1->start_tick) * a1->speed) >> 16;
-            l_50 = a1->axis - 1;
-            switch (l_50) {
+            offset = ((*(int *)((char *)1132) - link->start_tick) * link->speed) >> 16;
+            axis = link->axis - 1;
+            switch (axis) {
             case 0:
-                a1->object->angle_x = (l_40 + (short)a1->start) & 2047;
+                link->object->angle_x = (offset + (short)link->start) & 2047;
                 break;
             case 1:
-                a1->object->angle_x = (short)((short)a1->start - l_40) & 2047;
+                link->object->angle_x = (short)((short)link->start - offset) & 2047;
                 break;
             case 2:
-                a1->object->yaw = (l_40 + (short)a1->start) & 2047;
+                link->object->yaw = (offset + (short)link->start) & 2047;
                 break;
             case 3:
-                a1->object->yaw = (short)((short)a1->start - l_40) & 2047;
+                link->object->yaw = (short)((short)link->start - offset) & 2047;
                 break;
             case 4:
-                a1->object->angle_z = (l_40 + (short)a1->start) & 2047;
+                link->object->angle_z = (offset + (short)link->start) & 2047;
                 break;
             case 5:
-                a1->object->angle_z = (short)((short)a1->start - l_40) & 2047;
+                link->object->angle_z = (short)((short)link->start - offset) & 2047;
             }
             break;
         case 9:
@@ -223,90 +223,90 @@ int link_step(struct link *a1)
             if (D_00195798 <= 0) {
                 D_00195798 = 1000;
                 D_001957CD = player_character->level;
-                for (l_40 = 0; l_40 < 35; l_40++) {
-                    *(short *)(D_001957E9 + (l_40 * 6)) = 50;
+                for (offset = 0; offset < 35; offset++) {
+                    *(short *)(D_001957E9 + (offset * 6)) = 50;
                 }
-                D_00196222 = a1->object->x;
-                D_00196226 = a1->object->y - 40;
-                D_0019622A = a1->object->z;
-                if (link_find_spell(a1->param)->target == 0) {
-                    cast_creature_spell(player_entity, player_entity, a1->param);
+                D_00196222 = link->object->x;
+                D_00196226 = link->object->y - 40;
+                D_0019622A = link->object->z;
+                if (link_find_spell(link->param)->target == 0) {
+                    cast_creature_spell(player_entity, player_entity, link->param);
                 } else {
-                    cast_creature_spell((struct record *)&D_0019621B, player_entity, a1->param);
+                    cast_creature_spell((struct record *)&D_0019621B, player_entity, link->param);
                 }
             }
             break;
         case 10:
             break;
         case 11:
-            msgbox_show_rsc((int)(short)(((unsigned short)a1->param) + 8600), 1);
+            msgbox_show_rsc((int)(short)(((unsigned short)link->param) + 8600), 1);
             break;
         case 12:
             mc_memcpy(D_00147954, 655360, 64000, (int)D_00175962, 315, 4);
             D_001940DA |= 1;
-            link_show_text(a1->param + 5400);
-            l_30 = hud_message_add((int)D_0017596A);
-            *(signed char *)((char *)l_30 + 3) = 0;
+            link_show_text(link->param + 5400);
+            message = hud_message_add((int)D_0017596A);
+            *(signed char *)((char *)message + 3) = 0;
             xn_kbd_flush();
-            inpstr_begin_text(l_30 + 2, 16);
+            inpstr_begin_text(message + 2, 16);
             while (inpstr_update() == 0) {
                 mc_memcpy(screen_buffer, D_00147954, 64000, (int)D_00175962, 324, 4);
                 hud_messages_draw();
                 xn_gfx_present_inclusive(1);
             }
             D_001940DA &= 254;
-            if (link_answer_matches(a1->param + 5656, l_30 + 2) == 0) a1->flags |= 16;
+            if (link_answer_matches(link->param + 5656, message + 2) == 0) link->flags |= 16;
             break;
         case 13:
             break;
         case 14:
-            object_set_position(player_object, *(int *)(*(char **)((char *)a1 + 74) + 7), *(int *)(*(char **)((char *)a1 + 74) + 11), *(int *)(*(char **)((char *)a1 + 74) + 15), player_object->angle_x, player_object->yaw, player_object->angle_z);
+            object_set_position(player_object, *(int *)(*(char **)((char *)link + 74) + 7), *(int *)(*(char **)((char *)link + 74) + 11), *(int *)(*(char **)((char *)link + 74) + 15), player_object->angle_x, player_object->yaw, player_object->angle_z);
             break;
         case 15:
-            a1->object->lock_level = (unsigned short)a1->axis;
+            link->object->lock_level = (unsigned short)link->axis;
             break;
         case 16:
-            if (((int)(unsigned short)(a1->object->flags & 64)) != 0 && door_start_swing((int)a1->object, 0) != 0) {
-                a1->object->flags |= 0x100;
+            if (((int)(unsigned short)(link->object->flags & 64)) != 0 && door_start_swing((int)link->object, 0) != 0) {
+                link->object->flags |= 0x100;
             }
             break;
         case 17:
-            a1->object->flags |= 64;
+            link->object->flags |= 64;
             break;
         case 18:
-            if (door_start_swing((int)a1->object, 0) != 0) a1->object->flags |= 320;
+            if (door_start_swing((int)link->object, 0) != 0) link->object->flags |= 320;
             break;
         case 19:
-            if (((int)(unsigned short)(a1->object->flags & 256)) != 0 && door_start_swing((int)a1->object, 1) != 0) {
-                a1->object->flags &= ~0x100;
+            if (((int)(unsigned short)(link->object->flags & 256)) != 0 && door_start_swing((int)link->object, 1) != 0) {
+                link->object->flags &= ~0x100;
             }
             break;
         case 20:
-            if (((int)(unsigned short)(a1->object->flags & 256)) != 0 && door_start_swing((int)a1->object, 1) != 0) {
-                a1->object->flags &= ~0x100;
+            if (((int)(unsigned short)(link->object->flags & 256)) != 0 && door_start_swing((int)link->object, 1) != 0) {
+                link->object->flags &= ~0x100;
             }
-            a1->object->flags &= ~0x40;
+            link->object->flags &= ~0x40;
             break;
         case 21:
             D_00195798 -= frame_ticks;
             if (D_00195798 <= 0) {
                 D_00195798 = 1000;
-                l_34 = rand_range(a1->param, a1->axis) * player_character->level;
-                if (l_34 == 0) l_34 = player_character->level;
-                damage_apply(player_entity, l_34, 0);
+                damage = rand_range(link->param, link->axis) * player_character->level;
+                if (damage == 0) damage = player_character->level;
+                damage_apply(player_entity, damage, 0);
             }
             break;
         case 22:
-            link_hurt_player(3, a1->axis);
+            link_hurt_player(3, link->axis);
             break;
         case 23:
-            link_hurt_player(0, a1->axis);
+            link_hurt_player(0, link->axis);
             break;
         case 24:
-            link_hurt_player(1, a1->axis);
+            link_hurt_player(1, link->axis);
             break;
         case 25:
-            link_hurt_player(2, a1->axis);
+            link_hurt_player(2, link->axis);
             break;
         case 26:
             D_00195798 -= frame_ticks;
@@ -323,8 +323,8 @@ int link_step(struct link *a1)
             }
             break;
         case 28:
-            if (a1->axis != 0) {
-                player_character->magicka -= (unsigned short)a1->axis;
+            if (link->axis != 0) {
+                player_character->magicka -= (unsigned short)link->axis;
             } else {
                 player_character->magicka--;
             }
@@ -332,27 +332,27 @@ int link_step(struct link *a1)
         case 29:
             break;
         case 30:
-            if (a1->param != 0) sound_play(a1->param, (int)a1->object, 110);
+            if (link->param != 0) sound_play(link->param, (int)link->object, 110);
             break;
         case 31:
-            quest_global_states[a1->axis] = 1;
+            quest_global_states[link->axis] = 1;
             break;
         case 99:
             if (((int)interaction_mode) == 1) {
-                if (a1->param != 0) link_show_text(a1->param + 7700);
+                if (link->param != 0) link_show_text(link->param + 7700);
             } else {
-                D_0019628C = a1->axis;
+                D_0019628C = link->axis;
             }
         }
-        l_3C = a1->axis >> 4;
-        if (l_3C != 0) {
-            D_001A3A81 = ~(*(signed char *)&l_3C);
-            if (((int)(unsigned char)(a1->flags & 2)) != 0) {
-                l_54 = 0;
+        bits = link->axis >> 4;
+        if (bits != 0) {
+            D_001A3A81 = ~(*(signed char *)&bits);
+            if (((int)(unsigned char)(link->flags & 2)) != 0) {
+                value = 0;
             } else {
-                l_54 = l_3C;
+                value = bits;
             }
-            D_001A3A80 = *(signed char *)&l_54;
+            D_001A3A80 = *(signed char *)&value;
         }
         return 1;
     }

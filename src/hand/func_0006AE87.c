@@ -1,11 +1,11 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0006AE87 */
 extern int strlen(char *);
 
-char *str_list_skip(char *a1, int a2)
+char *str_list_skip(char *list, int count)
 {
-    while (a2-- != 0) {
-        a1 += strlen(a1) + 1;
-        if (*a1 == 0) a1++;
+    while (count-- != 0) {
+        list += strlen(list) + 1;
+        if (*list == 0) list++;
     }
-    return a1;
+    return list;
 }

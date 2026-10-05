@@ -37,15 +37,15 @@ extern int func_0009FEE5();
 #pragma aux sosconv "*" parm caller [] value [eax] modify [eax ebx ecx edx];
 #pragma aux (sosconv) sos_init;
 
-int sos_init(int a1, int a2)
+int sos_init(int digi_device, int midi_device)
 {
     D_0018DC3C = 11025;
     D_0018DC7C = 4096;
     func_0009E1A1(65280, 0);
     func_0009E8FF(0, 0);
     func_0009E9C2(0, 0);
-    if (a2 != (-1)) {
-        *(int *)D_0018DD64 = a2;
+    if (midi_device != (-1)) {
+        *(int *)D_0018DD64 = midi_device;
         if (func_0009EC82((int)D_0018DD64, (int)&D_0018DD58) != 0) {
             func_0009F9A7(D_0018DD60, 1, 1);
             func_0009E95B();
@@ -53,15 +53,15 @@ int sos_init(int a1, int a2)
             return 2;
         }
     }
-    if (a1 != (-1)) {
-        D_0018DD3C = a1;
+    if (digi_device != (-1)) {
+        D_0018DD3C = digi_device;
         if (func_0009F4DE((int)D_0018DC38, (int)&D_0018DD60) != 0) {
             func_0009E95B();
             return 1;
         }
     }
-    if (a1 != (-1)) func_0009E2BB(90, D_0018DD40, (int)D_0018DD50);
-    if (a2 == 40962 || (a2 == 40969 && a2 != (-1))) {
+    if (digi_device != (-1)) func_0009E2BB(90, D_0018DD40, (int)D_0018DD50);
+    if (midi_device == 40962 || (midi_device == 40969 && midi_device != (-1))) {
         music_uses_fm = 1;
         if ((sos_melodic_bank = sos_load_file((int)D_001700C0)) == 0) {
             sos_shutdown();

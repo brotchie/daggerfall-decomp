@@ -41,69 +41,69 @@ extern int xn_math_approx_dist2d(int, int, int, int);
 extern int xn_math_approx_hypot(int, int);
 extern int xn_math_angle_to_point(int, int, int, int);
 
-void weapon_melee_strike(struct record *a1)
+void weapon_melee_strike(struct record *attacker)
 {
     struct pick st;
-    int grp;
+    int attacker_team;
     int dist;
     int res;
     int i;
     int r;
-    struct character *m;
-    struct character *om;
+    struct character *attacker_char;
+    struct character *other_char;
     struct record *other;
     struct record *obj;
     int count;
-    struct building *item;
+    struct building *building;
 
-    m = &a1->data.character;
-    grp = m->team;
+    attacker_char = &attacker->data.character;
+    attacker_team = attacker_char->team;
     creature_list[creature_count++] = player_entity;
     for (count = i = 0; i < creature_count; i++) {
         other = creature_list[i];
-        om = &other->data.character;
-        if (om->team == grp)
+        other_char = &other->data.character;
+        if (other_char->team == attacker_team)
             continue;
-        if (other == a1)
+        if (other == attacker)
             continue;
-        dist = xn_math_approx_hypot(a1->y - other->y, xn_math_approx_dist2d(a1->x, a1->z, other->x, other->z));
+        dist = xn_math_approx_hypot(attacker->y - other->y, xn_math_approx_dist2d(attacker->x, attacker->z, other->x, other->z));
         if (dist > 90)
             continue;
         if (dist > 10) {
-            dist = xn_math_angle_to_point(a1->x, a1->z, other->x, other->z);
+            dist = xn_math_angle_to_point(attacker->x, attacker->z, other->x, other->z);
             D_00195ABC = dist;
-            if (a1 == player_entity)
-                res = ai_angle_diff(a1->yaw + view_look_yaw & 2047, dist, &dist);
+            if (attacker == player_entity)
+                res = ai_angle_diff(attacker->yaw + view_look_yaw & 2047, dist, &dist);
             else
-                res = ai_angle_diff(a1->yaw, dist, &dist);
+                res = ai_angle_diff(attacker->yaw, dist, &dist);
         } else
             res = 1;
-        if (res < 200 && collide_line_of_sight(a1, other)) {
-            if (a1 == player_entity) {
+        if (res < 200 && collide_line_of_sight(attacker, other)) {
+            if (attacker == player_entity) {
                 func_00063DDC(other);
-                damage_resolve_attack(a1, other, weapon_active_hand * 2 + 19);
+                damage_resolve_attack(attacker, other, weapon_active_hand * 2 + 19);
                 count++;
             } else
-                damage_resolve_attack(a1, other, 19);
+                damage_resolve_attack(attacker, other, 19);
         }
         if (D_001962B2 != 0) {
             D_001962B2 = 0;
             return;
         }
     }
-    if (count == 0 && a1 == player_entity)
+    if (count == 0 && attacker == player_entity)
         sound_play(damage_miss_sound(player_character->equipped[19 + weapon_active_hand] != 0 ? &player_character->equipped[19 + weapon_active_hand]->data.item : 0, -1), player_object, 110);
-    if (a1 == player_entity && player_environment != 3) {
+    if (attacker == player_entity && player_environment != 3) {
         for (i = 0; i < people_count; i++) {
             if (people_list[i] == 0)
                 continue;
             other = people_list[i];
-            dist = xn_math_approx_hypot(a1->y - other->y, xn_math_approx_dist2d(a1->x, a1->z, other->x, other->z));
+            dist = xn_math_approx_hypot(attacker->y - other->y, xn_math_approx_dist2d(attacker->x, attacker->z, other->x, other->z));
             if (dist > 90)
                 continue;
-            dist = xn_math_angle_to_point(a1->x, a1->z, other->x, other->z);
+            dist = xn_math_angle_to_point(attacker->x, attacker->z, other->x, other->z);
             D_00195ABC = dist;
-            res = ai_angle_diff(a1->yaw + view_look_yaw & 2047, dist, &dist);
+            res = ai_angle_diff(attacker->yaw + view_look_yaw & 2047, dist, &dist);
             if (res < 200) {
                 damage_spawn_splash(people_list[i], 0, -1);
                 pedestrian_killed(people_list[i]);
@@ -111,7 +111,7 @@ void weapon_melee_strike(struct record *a1)
             }
         }
     }
-    if (a1 != player_entity || count != 0)
+    if (attacker != player_entity || count != 0)
         return;
     engine_pick_object(160, 100, &st);
     if ((st.flags & 1) == 0)
@@ -139,11 +139,11 @@ void weapon_melee_strike(struct record *a1)
         if (obj->id >> 16 == 50027 || obj->id >> 16 == 50029 || obj->id >> 16 == 50033)
             monster_wake_all();
     } else if (rand_range(1, 100) < 10) {
-        item = object_building(obj);
-        if (item != 0)
-            item->flags |= 16;
-        town_map_note_building(obj, item);
-        building_enter(item);
+        building = object_building(obj);
+        if (building != 0)
+            building->flags |= 16;
+        town_map_note_building(obj, building);
+        building_enter(building);
     } else if (rand_range(1, 100) > player_character->skills[SKILL_STEALTH].value && (creatures_guard_mix() & 1) == 0) {
         crime_current = 0;
         guards_summon(1);

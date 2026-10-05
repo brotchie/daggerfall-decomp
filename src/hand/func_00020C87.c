@@ -49,73 +49,73 @@ extern int rand(void);
 extern void mc_memcpy(char *, char *, int, char *, int, int);
 extern int xn_gfx_present_inclusive();
 
-int court_open(int n)
+int court_open(int crime)
 {
-    int a;
-    int b;
-    int gold;
+    int penalty;
+    int half_penalty;
+    int fine;
     int i;
-    int cnt;
-    int over;
-    struct membership *item;
+    int steps;
+    int shortfall;
+    struct membership *membership;
 
-    a = 0;
-    b = 0;
+    penalty = 0;
+    half_penalty = 0;
     if (game_mode == 21 || D_0019626F == 21)
         return 1;
-    if (n != 0) {
-        n--;
+    if (crime != 0) {
+        crime--;
         music_play(D_001A4FA0->f4);
         D_0019629C = 1;
-        scratch_190d17 = n;
-        court_reputation_change = crime_reputation_loss[n] >> 1;
+        scratch_190d17 = crime;
+        court_reputation_change = crime_reputation_loss[crime] >> 1;
         if (player_environment == 2)
             map_goto_location(current_region, 1, location_object->image, 0);
         if (region_legal_reputation[current_region].v < 0) {
-            a = -region_legal_reputation[current_region].v;
-            if (a > 75)
-                a = 75;
-            b = -region_legal_reputation[current_region].v / 2;
-            if (b > 75)
-                b = 75;
+            penalty = -region_legal_reputation[current_region].v;
+            if (penalty > 75)
+                penalty = 75;
+            half_penalty = -region_legal_reputation[current_region].v / 2;
+            if (half_penalty > 75)
+                half_penalty = 75;
         }
-        if (rand_range(1, 100) <= b)
+        if (rand_range(1, 100) <= half_penalty)
             scratch_190d16 = 0;
-        else if (rand_range(1, 100) <= a)
+        else if (rand_range(1, 100) <= penalty)
             scratch_190d16 = 0;
         else
             scratch_190d16 = 2;
         if (region_legal_reputation[current_region].v < 0)
-            gold = crime_fine_table[n].base - region_legal_reputation[current_region].v * crime_fine_table[n].mul;
+            fine = crime_fine_table[crime].base - region_legal_reputation[current_region].v * crime_fine_table[crime].mul;
         else
-            gold = crime_fine_table[n].base + region_legal_reputation[current_region].v * crime_fine_table[n].mul;
-        if (crime_fine_table[n].min > gold)
-            gold = crime_fine_table[n].min;
-        else if (crime_fine_table[n].max < gold)
-            gold = crime_fine_table[n].max;
-        cnt = gold / 40;
-        for (gold = i = court_prison_days = 0; i < cnt; i++) {
+            fine = crime_fine_table[crime].base + region_legal_reputation[current_region].v * crime_fine_table[crime].mul;
+        if (crime_fine_table[crime].min > fine)
+            fine = crime_fine_table[crime].min;
+        else if (crime_fine_table[crime].max < fine)
+            fine = crime_fine_table[crime].max;
+        steps = fine / 40;
+        for (fine = i = court_prison_days = 0; i < steps; i++) {
             if (rand() & 1)
-                gold += 40;
+                fine += 40;
             else
                 court_prison_days += 3;
         }
-        if (gold_total() < gold) {
-            over = gold - gold_total();
-            court_prison_days += over / 40;
-            gold -= over;
+        if (gold_total() < fine) {
+            shortfall = fine - gold_total();
+            court_prison_days += shortfall / 40;
+            fine -= shortfall;
         }
         game_mode = 21;
         D_00196272 = 1;
         window_image = disk_read_file(D_001706D4, 0);
         mc_memcpy(screen_buffer, window_image, 64000, D_001706E1, 114, 4);
         xn_gfx_present_inclusive(1);
-        scratch_190cac = gold;
+        scratch_190cac = fine;
         D_00187CA8 = 0;
         D_001940D5 |= 64;
         D_00195F34 = 194;
-        item = guild_find_membership_by_kind(0);
-        if ((scratch_190d17 == 4 || scratch_190d17 == 3) && item != 0 && item->rank >= rand_range(0, 19)) {
+        membership = guild_find_membership_by_kind(0);
+        if ((scratch_190d17 == 4 || scratch_190d17 == 3) && membership != 0 && membership->rank >= rand_range(0, 19)) {
             msgbox_show_rsc(551, 1);
             court_restore_vitals();
             court_reputation_restore();
@@ -126,8 +126,8 @@ int court_open(int n)
             court_close();
             return 0;
         }
-        item = guild_find_membership_by_kind(3);
-        if ((scratch_190d17 <= 2 || scratch_190d17 == 11) && item != 0 && item->rank >= rand_range(0, 19)) {
+        membership = guild_find_membership_by_kind(3);
+        if ((scratch_190d17 <= 2 || scratch_190d17 == 11) && membership != 0 && membership->rank >= rand_range(0, 19)) {
             msgbox_show_rsc(550, 1);
             court_restore_vitals();
             court_reputation_restore();
@@ -141,7 +141,7 @@ int court_open(int n)
         D_00196271 = 0;
         if (court_prison_days == 0)
             msgbox_choice_rsc(8050, 16, 17, 0, 103, 110, 0);
-        else if (gold == 0)
+        else if (fine == 0)
             msgbox_choice_rsc(8050, 16, 17, 0, 103, 110, 0);
         else
             msgbox_choice_rsc(8050, 16, 17, 0, 103, 110, 0);

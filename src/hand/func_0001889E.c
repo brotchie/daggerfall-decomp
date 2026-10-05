@@ -21,8 +21,8 @@ extern void mc_strncpy(char *, char *, int, char *, int);
 void talk_draw_tell_list(void)
 {
     int i;
-    int color;
-    char *str;
+    int colour;
+    char *name;
 
     talk_topics = (short *)(D_00147954 + 16384);
     talk_list_count = 0;
@@ -30,12 +30,12 @@ void talk_draw_tell_list(void)
     talk_topics[0] = talk_topics[1] = talk_topics[2] = 0;
     if (talk_list_count >= talk_list_top && talk_list_count <= talk_list_bottom) {
         if (talk_selected_row == talk_list_count) {
-            color = 244;
+            colour = 244;
             mc_strncpy(talk_key_text[D_001966B8], D_00170431, 4, D_001703F0, 1884);
         } else {
-            color = 145;
+            colour = 145;
         }
-        talk_list_draw_item(D_00170431, 6, (talk_list_count - talk_list_top) * 7 + 71, color, 156);
+        talk_list_draw_item(D_00170431, 6, (talk_list_count - talk_list_top) * 7 + 71, colour, 156);
     }
     talk_list_count++;
     talk_add_quest_info_topics();
@@ -48,14 +48,14 @@ void talk_draw_tell_list(void)
             talk_list_count++;
             continue;
         }
-        str = faction_find(talk_organisations[i])->name;
+        name = faction_find(talk_organisations[i])->name;
         if (talk_selected_row == talk_list_count) {
-            color = 244;
-            mc_strncpy(talk_key_text[D_001966B8], str, 4, D_001703F0, 1914);
+            colour = 244;
+            mc_strncpy(talk_key_text[D_001966B8], name, 4, D_001703F0, 1914);
         } else {
-            color = 145;
+            colour = 145;
         }
-        talk_list_draw_item(str, 6, (talk_list_count - talk_list_top) * 7 + 71, color, 156);
+        talk_list_draw_item(name, 6, (talk_list_count - talk_list_top) * 7 + 71, colour, 156);
         talk_list_count++;
     }
 }

@@ -21,30 +21,30 @@ extern int D_001AA5FC;
 extern char color_remap_tables[];
 extern char doors_moving[];
 
-extern int sound_play(int, int, int);
+extern int sound_play(int, struct record *, int);
 extern int mc_malloc();
 extern int mc_memcpy();
 extern int xn_str_fill_ascending();
 extern int xn_mem_align_up();
 extern int xn_collide_spheres_model();
 extern void object_foreach_post(struct record *, int);
-int door_blocked_by_player(int);
+int door_blocked_by_player(struct record *);
 void building_disable_monster_marker_cb(struct record *);
 
 void color_init_remap_tables(void)
 {
-    int l_1C;
-    int l_18;
+    int table;
+    int colour;
 
     D_001AA5FC = mc_malloc(8448, (int)D_00177350, 59);
     *(int *)color_remap_tables = xn_mem_align_up(D_001AA5FC, 256);
-    for (l_1C = 0; l_1C < 32; l_1C++) {
-        for (l_18 = 0; l_18 < 256; l_18++) {
-            *(signed char *)((char *)(int)(*(char **)color_remap_tables + (l_18 + (l_1C << 8)))) = *(signed char *)&l_18;
+    for (table = 0; table < 32; table++) {
+        for (colour = 0; colour < 256; colour++) {
+            *(signed char *)((char *)(int)(*(char **)color_remap_tables + (colour + (table << 8)))) = *(signed char *)&colour;
         }
     }
-    for (l_1C = 1; l_1C < 16; l_1C++) {
-        xn_str_fill_ascending((int)(*(char **)color_remap_tables + (l_1C << 8)) + ((int)(unsigned char)D_001886A8[l_1C * 2]), (int)(unsigned char)D_001886A9[l_1C * 2], 16);
+    for (table = 1; table < 16; table++) {
+        xn_str_fill_ascending((int)(*(char **)color_remap_tables + (table << 8)) + ((int)(unsigned char)D_001886A8[table * 2]), (int)(unsigned char)D_001886A9[table * 2], 16);
     }
     xn_str_fill_ascending(*(int *)color_remap_tables + 6689, 161, 15);
     xn_str_fill_ascending(*(int *)color_remap_tables + 6721, 193, 15);
@@ -58,107 +58,107 @@ void color_init_remap_tables(void)
     xn_str_fill_ascending(*(int *)color_remap_tables + 7476, 84, 2);
     xn_str_fill_ascending(*(int *)color_remap_tables + 7489, 129, 15);
     *(signed char *)(*(char **)color_remap_tables + 7677) = 216;
-    for (l_1C = 0; l_1C < 10; l_1C++) {
-        mc_memcpy((int)(*(char **)color_remap_tables + ((l_1C << 8) + 4096)) + 112, ((int)D_001886D2) + (l_1C << 4), 16, (int)D_00177350, 87, 4);
+    for (table = 0; table < 10; table++) {
+        mc_memcpy((int)(*(char **)color_remap_tables + ((table << 8) + 4096)) + 112, ((int)D_001886D2) + (table << 4), 16, (int)D_00177350, 87, 4);
     }
 }
 
-int string_hash(int a1)
+int string_hash(char *text)
 {
-    short l_18;
-    short l_1C;
+    short i;
+    short hash;
 
-    *(int *)&l_1C = 0;
-    *(int *)&l_18 = 0;
-    while (*(signed char *)((char *)(((int)(short)l_18) + a1)) != 0) {
-        *(int *)&l_1C <<= 1;
-        *(int *)&l_1C += (int)(unsigned char)*(signed char *)((char *)(((int)(short)l_18) + a1));
-        (*(int *)&l_18)++;
+    *(int *)&hash = 0;
+    *(int *)&i = 0;
+    while (text[i] != 0) {
+        *(int *)&hash <<= 1;
+        *(int *)&hash += (unsigned char)text[i];
+        (*(int *)&i)++;
     }
-    return *(int *)&l_1C;
+    return *(int *)&hash;
 }
 
 void doors_update(void)
 {
-    int l_28;
-    int l_24;
-    int l_20;
-    int l_1C;
-    int l_18;
+    int i;
+    int angle;
+    struct record *door;
+    int *bios_ticks;
+    int *ticks;
 
-    for (l_28 = 0; l_28 < 16; l_28++) {
-        if (*(int *)(doors_moving + (l_28 << 2)) == 0) continue;
-        l_20 = *(int *)(doors_moving + (l_28 << 2));
-        if (((struct bf8_7_1 *)((char *)l_20 + 46))->f == 0 && door_blocked_by_player(l_20) != 0) {
-            l_1C = 1132;
-            *(int *)((char *)l_20 + 43) = *(int *)((char *)l_1C) | (-1073741824);
+    for (i = 0; i < 16; i++) {
+        if (((struct record **)doors_moving)[i] == 0) continue;
+        door = ((struct record **)doors_moving)[i];
+        if (((struct bf8_7_1 *)((char *)door + 46))->f == 0 && door_blocked_by_player(door) != 0) {
+            bios_ticks = (int *)1132;
+            door->door_swing = *bios_ticks | (-1073741824);
         }
-        l_18 = 1132;
-        l_24 = ((*(int *)((char *)l_18) - (*(int *)((char *)l_20 + 43) & 1073741823)) * 22) & 2047;
-        if (l_24 >= 512 || l_24 < 0) {
-            if (l_24 >= 512) {
-                l_24 = 512;
-            } else if (l_24 < 0) {
-                l_24 = 0;
+        ticks = (int *)1132;
+        angle = ((*ticks - (door->door_swing & 1073741823)) * 22) & 2047;
+        if (angle >= 512 || angle < 0) {
+            if (angle >= 512) {
+                angle = 512;
+            } else if (angle < 0) {
+                angle = 0;
             }
-            *(int *)(doors_moving + (l_28 << 2)) = 0;
-            *(signed char *)((char *)l_20 + 46) &= 191;
-            if (((struct bf8_7_1 *)((char *)l_20 + 46))->f == 0) {
-                sound_play(((((int)player_environment) == 2) ? 361 : 26), l_20, 100);
+            ((struct record **)doors_moving)[i] = 0;
+            *(signed char *)((char *)door + 46) &= 191;
+            if (((struct bf8_7_1 *)((char *)door + 46))->f == 0) {
+                sound_play(((((int)player_environment) == 2) ? 361 : 26), door, 100);
             }
         }
-        if (((struct bf8_7_1 *)((char *)l_20 + 46))->f == 0) l_24 = 512 - l_24;
-        *(short *)((char *)l_20 + 36) = l_24;
+        if (((struct bf8_7_1 *)((char *)door + 46))->f == 0) angle = 512 - angle;
+        door->door_angle = angle;
     }
 }
 
-int door_blocked_by_player(int a1)
+int door_blocked_by_player(struct record *door)
 {
-    int l_20;
-    int l_1C;
+    int *model;
+    int hit;
 
     *(int *)D_00187B6E = player_object->x;
     D_00187B72 = player_object->y;
     D_00187B76 = player_object->z;
-    l_20 = a1 + 71;
-    if (*(int *)((char *)l_20) != 0) {
-        l_1C = xn_collide_spheres_model(l_20, (int)D_00187B6E, 0);
-        return (((l_1C != 0) && (l_1C != (-1))) ? 1 : 0);
+    model = (int *)RECORD_DATA(door);
+    if (*model != 0) {
+        hit = xn_collide_spheres_model(model, (int)D_00187B6E, 0);
+        return (((hit != 0) && (hit != (-1))) ? 1 : 0);
     }
     return 0;
 }
 
-struct building *object_find_building(struct record *a1)
+struct building *object_find_building(struct record *object)
 {
-    short l_18;
+    short i;
 
-    a1 = a1->parent;
-    while (a1 != 0 && a1 != location_object) {
-        *(int *)&l_18 = 0;
-        for (; (short)l_18 < current_location->building_count; (*(int *)&l_18)++) {
-            if (current_location->buildings[(int)(short)l_18].id == a1->id) {
-                return &current_location->buildings[(int)(short)l_18];
+    object = object->parent;
+    while (object != 0 && object != location_object) {
+        *(int *)&i = 0;
+        for (; i < current_location->building_count; (*(int *)&i)++) {
+            if (current_location->buildings[i].id == object->id) {
+                return &current_location->buildings[i];
             }
         }
     }
     return 0;
 }
 
-void building_disable_monster_marker_cb(struct record *a1)
+void building_disable_monster_marker_cb(struct record *object)
 {
-    int l_18;
+    int marker_kind;
 
-    if (a1->type != 34) return;
-    l_18 = ((int)(unsigned short)(a1->image & 31)) - 2;
-    if (l_18 != 13) if (l_18 != 14) return;
-    a1->flags |= 0x200;
+    if (object->type != 34) return;
+    marker_kind = ((int)(unsigned short)(object->image & 31)) - 2;
+    if (marker_kind != 13) if (marker_kind != 14) return;
+    object->flags |= 0x200;
 }
 
-void building_disable_monster_markers(struct record *a1)
+void building_disable_monster_markers(struct record *building)
 {
-    int l_18;
+    int minute_of_day;
 
-    l_18 = ((unsigned)game_minutes) % 1440;
-    *(int *)scratch_190be4 = (((l_18 > 360) && (l_18 < 1080)) ? 1 : 0);
-    object_foreach_post(a1->children, (int)building_disable_monster_marker_cb);
+    minute_of_day = ((unsigned)game_minutes) % 1440;
+    *(int *)scratch_190be4 = (((minute_of_day > 360) && (minute_of_day < 1080)) ? 1 : 0);
+    object_foreach_post(building->children, (int)building_disable_monster_marker_cb);
 }

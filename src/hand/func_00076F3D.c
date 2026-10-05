@@ -8,23 +8,23 @@ extern unsigned char player_on_ground;
 extern short collide_flags;
 extern int collide_move_object(struct record *, int, struct move *, int);
 
-int spawn_point_fits(struct record *a1)
+int spawn_point_fits(struct record *object)
 {
-    int l_1C;
-    int l_20;
+    int saved_ceiling;
+    int saved_on_ground;
     struct move m;
 
-    l_20 = player_on_ground;
-    l_1C = ceiling_height;
-    m.x = a1->x;
-    m.y = a1->y;
-    m.z = a1->z;
-    m.f12 = a1->angle_x;
-    m.f16 = a1->yaw;
-    m.f20 = a1->angle_z;
+    saved_on_ground = player_on_ground;
+    saved_ceiling = ceiling_height;
+    m.x = object->x;
+    m.y = object->y;
+    m.z = object->z;
+    m.f12 = object->angle_x;
+    m.f16 = object->yaw;
+    m.f20 = object->angle_z;
     m.name = D_00187B44;
-    collide_move_object(a1, 0, &m, 0);
-    player_on_ground = l_20;
-    ceiling_height = l_1C;
+    collide_move_object(object, 0, &m, 0);
+    player_on_ground = saved_on_ground;
+    ceiling_height = saved_ceiling;
     return (collide_flags & 10) == 0 ? 1 : 0;
 }

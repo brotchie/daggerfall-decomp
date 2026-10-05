@@ -16,23 +16,23 @@ extern int mc_sprintf(int, ...);
 extern int mc_memcpy();
 #pragma aux mc_set_location parm routine [];
 
-void quest_load_text(struct quest *a1, int a2, short a3, int a4)
+void quest_load_text(struct quest *quest, int message_id, short flags, int width)
 {
-    int l_10;
-    char l_2C[16];
+    char *text;
+    char file_name[16];
 
-    current_quest = a1;
-    if (a1->text_file != 0) {
+    current_quest = quest;
+    if (quest->text_file != 0) {
         mc_set_location(2016, (int)D_0017110C);
-        mc_sprintf((int)l_2C, (int)D_001711A4, a1->text_file);
+        mc_sprintf((int)file_name, (int)D_001711A4, quest->text_file);
     } else {
-        mc_memcpy((int)l_2C, a1->name, 8, (int)D_0017110C, 2018, 13);
+        mc_memcpy((int)file_name, quest->name, 8, (int)D_0017110C, 2018, 13);
     }
-    *(signed char *)((char *)l_2C + 8) = 0;
-    l_10 = text_qrc_load((int)l_2C, (int)(short)*(short *)&a2, (int)(short)a3, (int)(short)*(short *)&a4);
-    if (l_10 == 0) return;
-    mc_strncpy((int)text_rsc_buffer, l_10, 2048, (int)D_0017110C, 2022);
-    if (l_10 == 0 || l_10 == (-1751672937)) return;
-    mc_free(l_10, (int)D_0017110C, 2023);
-    l_10 = -1751672937;
+    file_name[8] = 0;
+    text = (char *)text_qrc_load((int)file_name, (int)(short)*(short *)&message_id, (int)(short)flags, (int)(short)*(short *)&width);
+    if (text == 0) return;
+    mc_strncpy((int)text_rsc_buffer, text, 2048, (int)D_0017110C, 2022);
+    if (text == 0 || text == (char *)0x97979797) return;
+    mc_free(text, (int)D_0017110C, 2023);
+    text = (char *)0x97979797;
 }

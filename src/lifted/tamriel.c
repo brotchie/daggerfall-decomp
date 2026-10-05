@@ -121,73 +121,73 @@ void loan_due_penalty(void);
 void quests_run_all(void);
 #pragma aux mc_set_location parm routine [];
 
-int calendar_format_date(int a1, int a2)
+int calendar_format_date(int minutes, int buffer)
 {
-    short l_14;
+    short day;
 
-    *(int *)&l_14 = ((unsigned)(((unsigned)(((unsigned)a1) % 518400)) / 1440)) % 30;
+    *(int *)&day = ((unsigned)(((unsigned)(((unsigned)minutes) % 518400)) / 1440)) % 30;
     mc_set_location(79, (int)D_001711AC);
-    mc_sprintf(a2, D_001830E2, ((int)(short)l_14) + 1, ordinal_suffixes[((((int)(short)l_14) > 3) ? 3 : (int)(short)l_14)], month_names[(((unsigned)(((unsigned)a1) % 518400)) / 43200)]);
-    return a2;
+    mc_sprintf(buffer, D_001830E2, ((int)(short)day) + 1, ordinal_suffixes[((((int)(short)day) > 3) ? 3 : (int)(short)day)], month_names[(((unsigned)(((unsigned)minutes) % 518400)) / 43200)]);
+    return buffer;
 }
 
-void time_pass(int a1)
+void time_pass(int minutes)
 {
-    time_pass_minutes(a1);
+    time_pass_minutes(minutes);
 }
 
 void time_update_realtime(void)
 {
-    int l_24;
-    int l_20;
-    int l_1C;
-    int l_18;
+    int minutes;
+    int old_minutes;
+    int bios_clock;
+    int bios_clock2;
 
     if (((struct bf8_6_1 *)&D_001940D8)->f != 0 || D_00187CA8 == 0) {
-        l_1C = 1132;
-        realtime_clock_tick = *(int *)((char *)l_1C);
+        bios_clock = 1132;
+        realtime_clock_tick = *(int *)((char *)bios_clock);
         return;
     }
-    l_20 = game_minutes;
-    l_18 = 1132;
-    l_24 = ((unsigned)(*(int *)((char *)l_18) - realtime_clock_tick)) / 90;
-    realtime_clock_tick += l_24 * 90;
+    old_minutes = game_minutes;
+    bios_clock2 = 1132;
+    minutes = ((unsigned)(*(int *)((char *)bios_clock2) - realtime_clock_tick)) / 90;
+    realtime_clock_tick += minutes * 90;
     if (((struct bf8_4_1 *)&D_001940D9)->f != 0 && ((int)(unsigned short)(player_character->flags & 1536)) == 0) {
         skill_add_uses(21, 1);
     }
-    if (l_24 == 0) return;
-    time_pass_minutes(l_24);
+    if (minutes == 0) return;
+    time_pass_minutes(minutes);
 }
 
-void time_pass_minutes(int a1)
+void time_pass_minutes(int minutes)
 {
-    int l_30;
-    int l_2C;
-    int l_28;
-    int l_24;
-    int l_20;
-    int l_1C;
-    int l_18;
+    int n;
+    int i;
+    int days;
+    int start_week;
+    int minute_of_day;
+    int start_minutes;
+    int steps;
     {
-        unsigned char l_38;
+        unsigned char day;
 
-        l_1C = game_minutes;
-        l_18 = 0;
-        if (((unsigned)a1) > 200000) a1 = 1;
+        start_minutes = game_minutes;
+        steps = 0;
+        if (((unsigned)minutes) > 200000) minutes = 1;
         player_ailment_flags = 0;
-        l_28 = ((unsigned)game_minutes) / 1440;
-        l_24 = ((unsigned)game_minutes) / 10080;
-        game_minutes += a1;
-        l_20 = ((unsigned)game_minutes) % 1440;
-        if (l_20 > 360 && l_20 < 1080) {
-            l_38 = 1;
+        days = ((unsigned)game_minutes) / 1440;
+        start_week = ((unsigned)game_minutes) / 10080;
+        game_minutes += minutes;
+        minute_of_day = ((unsigned)game_minutes) % 1440;
+        if (minute_of_day > 360 && minute_of_day < 1080) {
+            day = 1;
         } else {
-            l_38 = 0;
+            day = 0;
         }
-        is_daytime = l_38;
-        l_28 = (((unsigned)game_minutes) / 1440) - l_28;
+        is_daytime = day;
+        days = (((unsigned)game_minutes) / 1440) - days;
         frame_checkpoint = 2000;
-        for (l_2C = 0; l_2C < l_28; l_2C++) {
+        for (i = 0; i < days; i++) {
             if (D_001962A4 == 0) {
                 spfx_walk_effect_records(player_entity->children, (int)spfx_disease_daily);
             }
@@ -199,19 +199,19 @@ void time_pass_minutes(int a1)
             automap_expire_records();
         }
         frame_checkpoint = 2004;
-        if (l_28 != 0) automap_purge_old_files();
+        if (days != 0) automap_purge_old_files();
         calendar_update();
         if (player_death_timer < 0) return;
         frame_checkpoint = 2005;
-        for (l_2C = 0; ((unsigned)l_2C) < a1; l_2C++) {
-            l_18++;
-            if (D_001AA698 != 0 && (l_18 & 1023) == 0) travel_show_days_left(a1 - l_2C);
+        for (i = 0; ((unsigned)i) < minutes; i++) {
+            steps++;
+            if (D_001AA698 != 0 && (steps & 1023) == 0) travel_show_days_left(minutes - i);
             frame_checkpoint = 2006;
-            l_30 = (l_1C + l_2C) % 10080;
-            if (l_30 == 0) {
+            n = (start_minutes + i) % 10080;
+            if (n == 0) {
                 faction_politics_update(1);
-                l_30 = (l_1C + l_2C) % 54720;
-                if (l_30 == 0) {
+                n = (start_minutes + i) % 54720;
+                if (n == 0) {
                     frame_checkpoint = 2008;
                     faction_politics_update(2);
                     frame_checkpoint = 2009;
@@ -219,11 +219,11 @@ void time_pass_minutes(int a1)
                     frame_checkpoint = 2010;
                 }
             }
-            if (((l_1C + l_2C) % 1440) == 0) region_update_prices(((l_30 == 0) ? 2 : 0));
-            l_30 = (l_1C + l_2C) % 161280;
-            if (l_30 == 0) reputation_decay();
-            l_30 = (l_1C + l_2C) % 120960;
-            if (l_30 == 0) disease_start_cure_quest(1);
+            if (((start_minutes + i) % 1440) == 0) region_update_prices(((n == 0) ? 2 : 0));
+            n = (start_minutes + i) % 161280;
+            if (n == 0) reputation_decay();
+            n = (start_minutes + i) % 120960;
+            if (n == 0) disease_start_cure_quest(1);
             frame_checkpoint = 2013;
             if (D_001962A4 == 0) {
                 frame_checkpoint = 2017;
@@ -242,10 +242,10 @@ void time_pass_minutes(int a1)
             frame_checkpoint = 2022;
             loan_due_penalty();
             if (player_death_timer < 0) return;
-            for (l_30 = 0; l_30 < creature_count; l_30++) {
-                if ((int)creature_list[l_30] == (-1768515946)) continue;
-                spell_tick(creature_list[l_30]);
-                scratch_current_object = creature_list[l_30];
+            for (n = 0; n < creature_count; n++) {
+                if ((int)creature_list[n] == (-1768515946)) continue;
+                spell_tick(creature_list[n]);
+                scratch_current_object = creature_list[n];
                 spfx_walk_effect_records(scratch_current_object->children, (int)poison_tick);
             }
             if (player_death_timer < 0) return;
@@ -253,8 +253,8 @@ void time_pass_minutes(int a1)
         frame_checkpoint = 2026;
         guild_expire_blessings();
         frame_checkpoint = 2027;
-        for (l_2C = 0; ((unsigned)l_2C) < a1; l_2C++) {
-            encounter_tick(((game_minutes - a1) + l_2C) + 1, 0);
+        for (i = 0; ((unsigned)i) < minutes; i++) {
+            encounter_tick(((game_minutes - minutes) + i) + 1, 0);
         }
         if (((int)(short)*(short *)(region_legal_reputation + (((int)(unsigned char)current_region) * 80))) < (-10) && rand_range(1, 100) < 5 && game_mode == 0) {
             crime_current = 7;
@@ -276,8 +276,8 @@ void time_pass_minutes(int a1)
 
 void calendar_update(void)
 {
-    int l_1C;
-    int l_18;
+    int unused1;
+    int unused2;
 
     calendar_year = (((unsigned)game_minutes) / 518400) + 400;
     calendar_month = ((unsigned)(((unsigned)game_minutes) % 518400)) / 43200;
@@ -290,108 +290,108 @@ void calendar_update(void)
 
 int player_in_daylight(void)
 {
-    int l_20;
-    int l_1C;
+    int result;
+    int minute_of_day;
 
-    l_1C = ((unsigned)game_minutes) % 1440;
-    if (l_1C < 360 || l_1C > 1080) return 0;
+    minute_of_day = ((unsigned)game_minutes) % 1440;
+    if (minute_of_day < 360 || minute_of_day > 1080) return 0;
     if (((int)player_environment) == 1) {
-        l_20 = 1;
+        result = 1;
     } else {
-        l_20 = 0;
+        result = 0;
     }
-    return l_20;
+    return result;
 }
 
 int player_in_temple(void)
 {
-    int l_20;
-    struct building *l_1C;
+    int result;
+    struct building *building;
 
-    l_1C = object_building(player_object->parent);
-    if (l_1C != 0) {
-        if (l_1C->type == 14) {
-            l_20 = 1;
+    building = object_building(player_object->parent);
+    if (building != 0) {
+        if (building->type == 14) {
+            result = 1;
         } else {
-            l_20 = 0;
+            result = 0;
         }
-        return l_20;
+        return result;
     }
     return 0;
 }
 
-void func_0004B25B(struct record *a1)
+void func_0004B25B(struct record *object)
 {
-    if (a1->type != 8) return;
+    if (object->type != 8) return;
     scratch_190ce4[0] = 1;
 }
 
-int building_is_open(struct building *a1)
+int building_is_open(struct building *building)
 {
-    int l_28;
-    struct record *l_24;
-    struct record *l_20;
-    struct membership *l_1C;
+    int hour;
+    struct record *building_object;
+    struct record *block;
+    struct membership *membership;
 
-    l_24 = object_find_by_id(location_object, a1->id);
-    if (a1->faction_id == 108 && guild_find_membership_by_kind(0) != 0) return 1;
-    if (a1->faction_id == 42 && guild_find_membership_by_kind(3) != 0) return 1;
-    if (a1->faction_id == 41 && (l_1C = guild_find_membership_by_kind(2)) != 0 && l_1C->rank >= 6) {
+    building_object = object_find_by_id(location_object, building->id);
+    if (building->faction_id == 108 && guild_find_membership_by_kind(0) != 0) return 1;
+    if (building->faction_id == 42 && guild_find_membership_by_kind(3) != 0) return 1;
+    if (building->faction_id == 41 && (membership = guild_find_membership_by_kind(2)) != 0 && membership->rank >= 6) {
         return 1;
     }
-    if (a1->faction_id == 40 && (l_1C = guild_find_membership_by_kind(1)) != 0 && l_1C->rank >= 6) {
+    if (building->faction_id == 40 && (membership = guild_find_membership_by_kind(1)) != 0 && membership->rank >= 6) {
         return 1;
     }
-    l_20 = player_object->parent;
-    while (l_20 != 0 && l_20->type != 43) l_20 = l_20->parent;
-    if (a1->type >= 17 && a1->type <= 20 && is_daytime != 0 && (a1->id & 65535) % 100 < 50) {
+    block = player_object->parent;
+    while (block != 0 && block->type != 43) block = block->parent;
+    if (building->type >= 17 && building->type <= 20 && is_daytime != 0 && (building->id & 65535) % 100 < 50) {
         return 1;
     }
-    if (a1->type > 16) return 0;
-    l_28 = ((unsigned)(((unsigned)game_minutes) % 1440)) / 60;
-    return (((((int)(unsigned char)building_open_hours[a1->type * 2]) <= l_28) && (((int)(unsigned char)D_0017C5B9[a1->type * 2]) > l_28)) ? 1 : 0);
+    if (building->type > 16) return 0;
+    hour = ((unsigned)(((unsigned)game_minutes) % 1440)) / 60;
+    return (((((int)(unsigned char)building_open_hours[building->type * 2]) <= hour) && (((int)(unsigned char)D_0017C5B9[building->type * 2]) > hour)) ? 1 : 0);
 }
 
-int building_minutes_to_close(struct building *a1)
+int building_minutes_to_close(struct building *building)
 {
-    int l_1C;
+    int hour;
 
-    l_1C = ((unsigned)(((unsigned)game_minutes) % 1440)) / 60;
-    if (((int)(unsigned char)building_open_hours[a1->type * 2]) <= l_1C && ((int)(unsigned char)D_0017C5B9[a1->type * 2]) > l_1C) {
-        return (((int)(unsigned char)D_0017C5B9[a1->type * 2]) * 60) - (((unsigned)game_minutes) % 1440);
+    hour = ((unsigned)(((unsigned)game_minutes) % 1440)) / 60;
+    if (((int)(unsigned char)building_open_hours[building->type * 2]) <= hour && ((int)(unsigned char)D_0017C5B9[building->type * 2]) > hour) {
+        return (((int)(unsigned char)D_0017C5B9[building->type * 2]) * 60) - (((unsigned)game_minutes) % 1440);
     }
     return 0;
 }
 
-void interior_person_show_cb(struct record *a1)
+void interior_person_show_cb(struct record *object)
 {
-    if (a1->type != 8) return;
-    if ((a1->flags & 2048) != 0) return;
-    a1->flags &= ~0x200;
+    if (object->type != 8) return;
+    if ((object->flags & 2048) != 0) return;
+    object->flags &= ~0x200;
 }
 
-void interior_person_hide_cb(struct record *a1)
+void interior_person_hide_cb(struct record *object)
 {
-    if (a1->type != 8) return;
-    if (a1->quest_id != 0) return;
-    a1->flags |= 0x200;
+    if (object->type != 8) return;
+    if (object->quest_id != 0) return;
+    object->flags |= 0x200;
 }
 
 void building_update_open_state(void)
 {
-    int l_1C;
-    struct building *l_18;
+    int show;
+    struct building *building;
 
     if (((int)player_environment) > 2) return;
-    l_18 = object_building(player_object->parent);
-    if (l_18 == 0) return;
-    if (building_is_open(l_18) != 0) {
-        if (l_18->id != player_character->house) {
-            l_1C = 1;
+    building = object_building(player_object->parent);
+    if (building == 0) return;
+    if (building_is_open(building) != 0) {
+        if (building->id != player_character->house) {
+            show = 1;
         } else {
-            l_1C = 0;
+            show = 0;
         }
-        if (l_1C != 0) goto L4B638;
+        if (show != 0) goto L4B638;
     }
     goto L4B64F;
 L4B638:;
@@ -403,69 +403,69 @@ L4B64F:;
 
 void reputation_decay(void)
 {
-    int l_18;
+    int i;
 
     if (D_001962B0 == 0) {
-        for (l_18 = 0; l_18 < 62; l_18++) {
-            if (*(short *)(region_legal_reputation + (l_18 * 80)) > 0) {
-                (*(short *)(region_legal_reputation + (l_18 * 80)))--;
-            } else if (*(short *)(region_legal_reputation + (l_18 * 80)) < 0) {
-                (*(short *)(region_legal_reputation + (l_18 * 80)))++;
+        for (i = 0; i < 62; i++) {
+            if (*(short *)(region_legal_reputation + (i * 80)) > 0) {
+                (*(short *)(region_legal_reputation + (i * 80)))--;
+            } else if (*(short *)(region_legal_reputation + (i * 80)) < 0) {
+                (*(short *)(region_legal_reputation + (i * 80)))++;
             }
         }
     }
-    for (l_18 = 0; l_18 < faction_count; l_18++) {
-        if (factions[l_18].reputation > 100) {
-            factions[l_18].reputation = 100;
-        } else if (factions[l_18].reputation < (-100)) {
-            factions[l_18].reputation = 100;
+    for (i = 0; i < faction_count; i++) {
+        if (factions[i].reputation > 100) {
+            factions[i].reputation = 100;
+        } else if (factions[i].reputation < (-100)) {
+            factions[i].reputation = 100;
         }
-        if (factions[l_18].reputation > 0) {
-            factions[l_18].reputation--;
-        } else if (factions[l_18].reputation < 0) {
-            factions[l_18].reputation++;
+        if (factions[i].reputation > 0) {
+            factions[i].reputation--;
+        } else if (factions[i].reputation < 0) {
+            factions[i].reputation++;
         }
     }
 }
 
 void holiday_announce(void)
 {
-    int l_18;
+    int holiday;
 
-    l_18 = holiday_today(game_minutes, (int)(unsigned char)current_region);
-    if (l_18 == 0) return;
+    holiday = holiday_today(game_minutes, (int)(unsigned char)current_region);
+    if (holiday == 0) return;
     D_0012B508 = 146;
-    msgbox_show_rsc((int)(short)(l_18 + 8349), 1);
+    msgbox_show_rsc((int)(short)(holiday + 8349), 1);
 }
 
-void region_update_prices(int a1)
+void region_update_prices(int mode)
 {
-    int l_20;
-    int l_1C;
-    struct faction *l_18;
+    int region;
+    int chance;
+    struct faction *faction;
 
-    for (l_20 = 0; l_20 < 62; l_20++) {
-        l_18 = faction_find_type_in_region((int)(short)*(short *)&l_20, 7);
-        if (l_18 == 0) continue;
-        l_1C = (faction_find(510)->power - l_18->power) / 5;
-        l_1C = (l_1C + 50) - ((((int)(unsigned short)*(short *)(region_price_adjustment + (l_20 * 80))) - 1000) / 25);
-        if (rand_range(0, 100) < l_1C) {
-            *(short *)(region_price_adjustment + (l_20 * 80)) = (((int)(unsigned short)*(short *)(region_price_adjustment + (l_20 * 80))) * 51) / 50;
+    for (region = 0; region < 62; region++) {
+        faction = faction_find_type_in_region((int)(short)*(short *)&region, 7);
+        if (faction == 0) continue;
+        chance = (faction_find(510)->power - faction->power) / 5;
+        chance = (chance + 50) - ((((int)(unsigned short)*(short *)(region_price_adjustment + (region * 80))) - 1000) / 25);
+        if (rand_range(0, 100) < chance) {
+            *(short *)(region_price_adjustment + (region * 80)) = (((int)(unsigned short)*(short *)(region_price_adjustment + (region * 80))) * 51) / 50;
         } else {
-            *(short *)(region_price_adjustment + (l_20 * 80)) = (((int)(unsigned short)*(short *)(region_price_adjustment + (l_20 * 80))) * 49) / 50;
+            *(short *)(region_price_adjustment + (region * 80)) = (((int)(unsigned short)*(short *)(region_price_adjustment + (region * 80))) * 49) / 50;
         }
-        if (((int)(unsigned short)*(short *)(region_price_adjustment + (l_20 * 80))) > 4000) {
-            *(short *)(region_price_adjustment + (l_20 * 80)) = 4000;
-        } else if (((int)(unsigned short)*(short *)(region_price_adjustment + (l_20 * 80))) < 250) {
-            *(short *)(region_price_adjustment + (l_20 * 80)) = 250;
+        if (((int)(unsigned short)*(short *)(region_price_adjustment + (region * 80))) > 4000) {
+            *(short *)(region_price_adjustment + (region * 80)) = 4000;
+        } else if (((int)(unsigned short)*(short *)(region_price_adjustment + (region * 80))) < 250) {
+            *(short *)(region_price_adjustment + (region * 80)) = 250;
         }
-        if (((int)(unsigned short)*(short *)(region_price_adjustment + (l_20 * 80))) > 2000) {
-            region_flag_set(l_20, 19);
-        } else if (((int)(unsigned short)*(short *)(region_price_adjustment + (l_20 * 80))) < 500) {
-            region_flag_set(l_20, 20);
+        if (((int)(unsigned short)*(short *)(region_price_adjustment + (region * 80))) > 2000) {
+            region_flag_set(region, 19);
+        } else if (((int)(unsigned short)*(short *)(region_price_adjustment + (region * 80))) < 500) {
+            region_flag_set(region, 20);
         } else {
-            region_flag_clear(l_20, 19);
-            region_flag_clear(l_20, 20);
+            region_flag_clear(region, 19);
+            region_flag_clear(region, 20);
         }
     }
 }
@@ -480,14 +480,14 @@ void crime_check_beast_form_in_town(void)
 
 void loan_due_penalty(void)
 {
-    int l_1C;
-    struct bank_account *l_18;
+    int region;
+    struct bank_account *account;
 
-    l_18 = (bank_accounts)->data.bank_accounts;
-    for (l_1C = 0; l_1C < 62; l_1C++) {
-        if (l_18->loan_due == 0) continue;
-        if (l_18->loan_due == game_minutes) {
-            *(short *)(region_legal_reputation + (l_1C * 80)) -= 5;
+    account = (bank_accounts)->data.bank_accounts;
+    for (region = 0; region < 62; region++) {
+        if (account->loan_due == 0) continue;
+        if (account->loan_due == game_minutes) {
+            *(short *)(region_legal_reputation + (region * 80)) -= 5;
         }
     }
 }
@@ -508,57 +508,57 @@ void quest_init_record_sizes(void)
 
 void quests_run_all(void)
 {
-    struct record *l_1C;
-    struct record *l_18;
+    struct record *object;
+    struct record *next;
 
     if (quests_suspended != 0) return;
-    l_1C = quest_root->children;
-    while (l_1C != 0) {
-        l_18 = l_1C->next;
-        if (l_1C->type == 14) {
-            quest_tick_object = l_1C;
-            quest_tick_data = (struct quest *)((int)&l_1C->data.quest);
+    object = quest_root->children;
+    while (object != 0) {
+        next = object->next;
+        if (object->type == 14) {
+            quest_tick_object = object;
+            quest_tick_data = (struct quest *)((int)&object->data.quest);
             if (quest_debug_data == 0) quest_debug_data = (int)quest_tick_data;
             quest_run_opcodes((int)quest_tick_data);
         }
-        l_1C = l_18;
+        object = next;
     }
 }
 
-struct quest *quest_find_by_id(int a1)
+struct quest *quest_find_by_id(int id)
 {
-    struct record *l_20;
-    struct quest *l_1C;
+    struct record *object;
+    struct quest *quest;
 
-    l_20 = quest_root->children;
-    while (l_20 != 0) {
-        if (l_20->type == 14) {
-            l_1C = &l_20->data.quest;
-            if (l_1C->id == a1) {
-                quest_tick_data = l_1C;
-                return l_1C;
+    object = quest_root->children;
+    while (object != 0) {
+        if (object->type == 14) {
+            quest = &object->data.quest;
+            if (quest->id == id) {
+                quest_tick_data = quest;
+                return quest;
             }
         }
-        l_20 = l_20->next;
+        object = object->next;
     }
     return 0;
 }
 
-void quests_raise_event_all(int a1, int a2)
+void quests_raise_event_all(int event, struct record *event_object)
 {
-    struct record *l_18;
-    int l_14;
+    struct record *object;
+    int unused;
 
-    quest_event_code = a1;
-    quest_event_object = (struct record *)a2;
-    l_18 = quest_root->children;
-    while (l_18 != 0) {
-        if (l_18->type == 14) quest_dispatch_event(&l_18->data.quest);
-        l_18 = l_18->next;
+    quest_event_code = event;
+    quest_event_object = event_object;
+    object = quest_root->children;
+    while (object != 0) {
+        if (object->type == 14) quest_dispatch_event(&object->data.quest);
+        object = object->next;
     }
 }
 
-void quest_end(int a1)
+void quest_end(int unused)
 {
     quest_ended_id = current_quest->id;
     quest_faces_remove_quest((int)(unsigned char)(signed char)current_quest->id);

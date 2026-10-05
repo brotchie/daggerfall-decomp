@@ -6,21 +6,21 @@ extern char scratch_buffer[];
 extern signed char D_001962A2;
 extern char D_001962A7;
 
-void health_status_add(struct record *a1)
+void health_status_add(struct record *object)
 {
-    struct disease *l_18;
+    struct disease *disease;
 
-    if (a1->type != 11) return;
-    l_18 = &a1->data.disease;
-    if (l_18->id >= 128 && D_001962A7 == 0 && l_18->stage != 0) {
+    if (object->type != 11) return;
+    disease = &object->data.disease;
+    if (disease->id >= 128 && D_001962A7 == 0 && disease->stage != 0) {
         D_001962A2 = 1;
         (*(char **)scratch_buffer)[*(int *)D_00195B84 + 60000] = 117;
         (*(int *)D_00195B84)++;
         D_001962A7 = 1;
-    } else if (l_18->id < 100) {
+    } else if (disease->id < 100) {
         D_001962A2 = 1;
-        if ((a1->flags & 0x8000) && l_18->stage != 0) {
-            (*(char **)scratch_buffer)[*(int *)D_00195B84 + 60000] = l_18->id + 100;
+        if ((object->flags & 0x8000) && disease->stage != 0) {
+            (*(char **)scratch_buffer)[*(int *)D_00195B84 + 60000] = disease->id + 100;
             (*(int *)D_00195B84)++;
         }
     }

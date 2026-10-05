@@ -28,13 +28,13 @@ extern int move_angle_offset;
 extern int collide_move_player(struct record *, int, struct pos *, int);
 extern int xn_math_yaw_offset_xz();
 
-int player_try_move(int a1)
+int player_try_move(int distance)
 {
     int dx;
     int dz;
-    int r;
+    int result;
 
-    xn_math_yaw_offset_xz((player_object->yaw + move_angle_offset) & 2047, a1 << 5, &dx, &dz);
+    xn_math_yaw_offset_xz((player_object->yaw + move_angle_offset) & 2047, distance << 5, &dx, &dz);
     dx += player_object->x << 5;
     dz += player_object->z << 5;
     dx += D_001A5A64;
@@ -55,10 +55,10 @@ int player_try_move(int a1)
     D_00187C86.name = ((unsigned short)player_character->flags & 1536) != 0 ? D_00187C3C : D_00187C86.name;
     if (player_motion_flags.b5)
         D_00187C86.name = D_00187BB8;
-    if (a1 != 0)
+    if (distance != 0)
         collide_flags |= 4;
     else
         collide_flags &= ~4;
-    r = collide_move_player(player_object, 0, &D_00187C86, 1);
-    return r;
+    result = collide_move_player(player_object, 0, &D_00187C86, 1);
+    return result;
 }

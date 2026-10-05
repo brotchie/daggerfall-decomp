@@ -23,91 +23,91 @@ extern int xn_str_copy_alnum();
 extern void mc_set_location(int, char *);
 extern int mc_sprintf(char *, char *, ...);
 
-void parse_expand(unsigned char *a1, char *a2)
+void parse_expand(unsigned char *src, char *out)
 {
-    unsigned char c;
-    short n;
-    short cnt;
-    short idx;
-    unsigned char lvl;
-    char buf[1024];
-    struct macro *tab;
-    char *s;
+    unsigned char ch;
+    short i;
+    short macro_count;
+    short letter;
+    unsigned char level;
+    char token[1024];
+    struct macro *table;
+    char *text;
     int unused;
-    char *r;
-    int k;
+    char *result;
+    int symbol_hash;
 
-    parse_output = a2;
+    parse_output = out;
     parse_name_seed = rand();
-    while (*a1 != 0) {
-        c = *a1++;
-        if (c == '_' || c == '=') {
-            lvl = c == '=' ? (unsigned char)1 : (unsigned char)0;
-            if (lvl == 0) {
-                while (*a1 == '_') {
-                    lvl += 16;
-                    a1++;
+    while (*src != 0) {
+        ch = *src++;
+        if (ch == '_' || ch == '=') {
+            level = ch == '=' ? (unsigned char)1 : (unsigned char)0;
+            if (level == 0) {
+                while (*src == '_') {
+                    level += 16;
+                    src++;
                 }
             } else {
-                while (*a1 == '=') {
-                    lvl++;
-                    a1++;
+                while (*src == '=') {
+                    level++;
+                    src++;
                 }
             }
-            n = 0;
-            while (!(*a1 == '_' || *a1 == '`'))
-                buf[n++] = *a1++;
-            if (*a1 == '`') {
-                buf[n] = 0;
-                k = string_hash(buf);
-                a1++;
-                n = 0;
-                while (*a1 != '_')
-                    buf[n++] = *a1++;
-                buf[n] = 0;
-                s = quest_symbol_text(k, lvl, string_hash(buf));
+            i = 0;
+            while (!(*src == '_' || *src == '`'))
+                token[i++] = *src++;
+            if (*src == '`') {
+                token[i] = 0;
+                symbol_hash = string_hash(token);
+                src++;
+                i = 0;
+                while (*src != '_')
+                    token[i++] = *src++;
+                token[i] = 0;
+                text = quest_symbol_text(symbol_hash, level, string_hash(token));
             } else {
-                buf[n] = 0;
-                k = string_hash(buf);
-                s = quest_symbol_text(k, lvl, 0);
+                token[i] = 0;
+                symbol_hash = string_hash(token);
+                text = quest_symbol_text(symbol_hash, level, 0);
             }
-            while (*s != 0)
-                *a2++ = *s++;
-            *a2 = 0;
-            a1++;
+            while (*text != 0)
+                *out++ = *text++;
+            *out = 0;
+            src++;
         } else {
-            if (c == '%') {
-                idx = *a1;
-                if (D_00178630[(unsigned char)(idx + 1)] & 0xe0) {
-                    idx += -97;
-                    if (idx < 0)
-                        idx = *a1 - 23;
-                    cnt = macro_letter_counts[idx];
-                    tab = macro_letter_tables[idx];
-                    if (*a1 == 'z') {
-                        mc_memcpy(buf, a1, 3, D_0017110C, 108, 1024);
-                        buf[3] = 0;
-                        a1 += 3;
-                        a1 += parse_read_number(a1);
+            if (ch == '%') {
+                letter = *src;
+                if (D_00178630[(unsigned char)(letter + 1)] & 0xe0) {
+                    letter += -97;
+                    if (letter < 0)
+                        letter = *src - 23;
+                    macro_count = macro_letter_counts[letter];
+                    table = macro_letter_tables[letter];
+                    if (*src == 'z') {
+                        mc_memcpy(token, src, 3, D_0017110C, 108, 1024);
+                        token[3] = 0;
+                        src += 3;
+                        src += parse_read_number(src);
                     } else
-                        a1 += xn_str_copy_alnum(buf, a1);
-                    for (n = 0; n < cnt; n++) {
-                        if (strcmp(&tab[n], buf) == 0) {
-                            r = tab[n].fn();
-                            if (r < (char *)1000) {
+                        src += xn_str_copy_alnum(token, src);
+                    for (i = 0; i < macro_count; i++) {
+                        if (strcmp(&table[i], token) == 0) {
+                            result = table[i].fn();
+                            if (result < (char *)1000) {
                                 mc_set_location(122, D_0017110C);
-                                mc_sprintf(D_001911E4, D_00171114, r, buf);
+                                mc_sprintf(D_001911E4, D_00171114, result, token);
                                 fatal_error(D_001911E4);
                             }
-                            mc_strncpy(a2, r, 4, D_0017110C, 125);
-                            a2 += strlen(a2);
+                            mc_strncpy(out, result, 4, D_0017110C, 125);
+                            out += strlen(out);
                             break;
                         }
                     }
                     goto next;
                 }
             }
-            *a2++ = c;
+            *out++ = ch;
         }
 next:
         if (D_00199738 != 0) {
@@ -115,5 +115,5 @@ next:
             return;
         }
     }
-    *a2 = 0;
+    *out = 0;
 }

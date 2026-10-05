@@ -22,11 +22,11 @@ extern int xn_world_mark_nonplanar_quads();
 void terrain_update_cells(void)
 {
     int i;
-    int cur;
-    struct map_location *saved;
+    int player_cell;
+    struct map_location *saved_location;
 
-    cur = xn_world_cell_at(player_object->x, player_object->z);
-    saved = location_here;
+    player_cell = xn_world_cell_at(player_object->x, player_object->z);
+    saved_location = location_here;
     D_001A94C0 = 4;
     for (i = 0; i < 4; i++) {
         if (terrain_cell_ids[i] != xn_world_slot_cells[i]) {
@@ -34,7 +34,7 @@ void terrain_update_cells(void)
             terrain_cell_dirty[i] = 1;
             D_001A94C0 = i;
             if ((location_here = region_find_location(terrain_cell_ids[i])) != 0) {
-                if (world_loading == 0 && cur == terrain_cell_ids[i]) {
+                if (world_loading == 0 && player_cell == terrain_cell_ids[i]) {
                     switch ((location_here->x_type_flags << 2) >> 27) {
                     case 4:
                     case 7:
@@ -50,5 +50,5 @@ void terrain_update_cells(void)
             xn_world_place_nature_flats(i);
         }
     }
-    location_here = saved;
+    location_here = saved_location;
 }

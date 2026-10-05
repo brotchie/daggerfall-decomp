@@ -66,14 +66,14 @@ extern int rand(void);
 extern void *mc_malloc(int, char *, int);
 extern void xn_font_select(int);
 
-int talk_open(struct record *a1)
+int talk_open(struct record *npc)
 {
-    int err;
-    int msg;
+    int rumor_text;
+    int greeting;
 
     if (D_0019626F == 12 && game_mode == 8)
         return 1;
-    if (a1 != 0) {
+    if (npc != 0) {
         if (talk_npc_faction->social_group == 4 && (people_check_witnesses() & 2)) {
             people_witness_flags &= 2;
             crime_current = 7;
@@ -83,7 +83,7 @@ int talk_open(struct record *a1)
         talk_news_asked = 0;
         D_001966BA = 0;
         talk_prostitute_offer = 0;
-        talk_npc_object = a1;
+        talk_npc_object = npc;
         xn_font_select(4);
         game_mode = 12;
         window_image = disk_read_file(D_001703C9, 0);
@@ -115,11 +115,11 @@ int talk_open(struct record *a1)
         D_001965C8 = rand();
         if (D_00190D10 == 0)
             npc_load_face(talk_npc_object, talk_face_image);
-        err = func_0001D46A(talk_npc_object->id);
+        rumor_text = func_0001D46A(talk_npc_object->id);
         if (talk_npc_own_faction->type == 15 || talk_npc_own_faction->type == 14)
-            msg = talk_npc_own_faction->id;
+            greeting = talk_npc_own_faction->id;
         else
-            msg = talk_npc_faction->id;
+            greeting = talk_npc_faction->id;
         if (talk_npc_own_faction->type == 15 || talk_npc_own_faction->type == 14) {
             if (talk_npc_own_faction->social_group < 5)
                 talk_npc_speech_style = talk_npc_own_faction->social_group;
@@ -136,17 +136,17 @@ int talk_open(struct record *a1)
         else if (talk_npc_speech_style == 0)
             talk_npc_speech_style = 1;
         talk_npc_attitude = talk_roll_attitude();
-        if (err != 0) {
-            talk_say_string(err);
+        if (rumor_text != 0) {
+            talk_say_string(rumor_text);
         } else {
-            msg = talk_faction_greeting(msg);
-            if (msg != 0) {
+            greeting = talk_faction_greeting(greeting);
+            if (greeting != 0) {
                 if (D_001966BA) {
                     talk_close();
-                    msgbox_show_rsc(msg, 1);
+                    msgbox_show_rsc(greeting, 1);
                     return 0;
                 }
-                talk_say_text(msg);
+                talk_say_text(greeting);
             } else if (talk_disposition < 0) {
                 talk_say_text(7206);
             } else if (talk_disposition < 10) {

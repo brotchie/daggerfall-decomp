@@ -5,30 +5,30 @@ extern struct record *location_object;
 extern struct location *current_location;
 extern struct record *object_create_child(struct record *, struct record *, int);
 
-struct record *rmb_make_marker(struct record *a1, int a2)
+struct record *rmb_make_marker(struct record *parent, int image)
 {
-    struct record *l_20;
-    int l_1C;
-    int l_18;
+    struct record *marker;
+    int kind;
+    int data_size;
 
-    l_1C = (a2 & 31) - 2;
-    if (l_1C == 13 || l_1C == 14) {
-        l_18 = 659;
-        l_20 = object_create_child(a1, 0, l_18);
-        l_20->mobile_id = 0;
+    kind = (image & 31) - 2;
+    if (kind == 13 || kind == 14) {
+        data_size = 659;
+        marker = object_create_child(parent, 0, data_size);
+        marker->mobile_id = 0;
     } else {
-        l_20 = object_create_child(a1, 0, 0);
-        l_20->mobile_id = 0;
+        marker = object_create_child(parent, 0, 0);
+        marker->mobile_id = 0;
     }
-    l_20->type = 34;
-    l_20->image2 = 0;
-    l_20->mobile_id = 0;
-    l_20->image = a2;
-    if (l_1C == 9 || l_1C == 16) {
-        l_20->id = location_object->id + current_location->marker_counter++;
+    marker->type = 34;
+    marker->image2 = 0;
+    marker->mobile_id = 0;
+    marker->image = image;
+    if (kind == 9 || kind == 16) {
+        marker->id = location_object->id + current_location->marker_counter++;
     } else {
-        l_20->id = location_object->id + current_location->object_counter++;
+        marker->id = location_object->id + current_location->object_counter++;
     }
-    l_20->flags = 1;
-    return l_20;
+    marker->flags = 1;
+    return marker;
 }

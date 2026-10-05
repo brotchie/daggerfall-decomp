@@ -85,125 +85,125 @@ void career_apply_answer(int);
 void career_bio_draw(void);
 #pragma aux mc_set_location parm routine [];
 
-void career_background_summary(int a1, int a2)
+void career_background_summary(int class_id, int ask)
 {
-    int l_20;
-    int l_1C;
-    int l_18;
-    int l_14;
+    int question;
+    int text;
+    unsigned char *cursor;
+    int start;
 
-    career_bio_ask = *(signed char *)&a2;
+    career_bio_ask = *(signed char *)&ask;
     mc_memcpy((int)&reputation_baseline, (int)(signed char *)&player_character->reputation[0], 10, (int)D_00170738, 48, 10);
     text_macro_imperial = rand() % 6;
     scratch_190d68 = (unsigned short)(unsigned char)D_00179FF8[rand_range(0, 9)];
     scratch_190d6a = 1;
     D_00190C74 = rand();
     *(int *)D_00190C78 = rand();
-    if (a1 == 18) a1 = career_nearest_class();
+    if (class_id == 18) class_id = career_nearest_class();
     mc_set_location(59, (int)D_00170738);
-    mc_sprintf((int)text_buffer, (int)D_00170741, a1);
+    mc_sprintf((int)text_buffer, (int)D_00170741, class_id);
     mc_memset(*(int *)scratch_buffer, 0, 64000, (int)D_00170738, 60, 4);
     disk_read_file((int)text_buffer, *(int *)scratch_buffer + 1);
     *(signed char *)(*(char **)scratch_buffer) = 10;
-    if (a2 != 0) disk_read_file((int)D_00170750, D_00147954);
-    for (l_20 = 0; l_20 < 12; l_20++) {
-        if (a2 != 0) {
+    if (ask != 0) disk_read_file((int)D_00170750, D_00147954);
+    for (question = 0; question < 12; question++) {
+        if (ask != 0) {
             mc_memcpy(screen_buffer, D_00147954, 64000, (int)D_00170738, 69, 4);
             xn_mouse_cursor_drawn &= 254;
         }
-        career_find_question(l_20 + 1);
-        if (a2 != 0) {
+        career_find_question(question + 1);
+        if (ask != 0) {
             career_wait_answer();
         } else {
             career_random_answer();
         }
-        career_apply_answer(l_20);
+        career_apply_answer(question);
     }
-    l_1C = text_rsc_load((int)(short)(a1 + 4116), 0, 0);
-    l_18 = l_1C;
-    l_14 = l_18;
-    while (*(signed char *)((char *)l_18) != 0) {
-        if (((int)(unsigned char)*(signed char *)((char *)l_18)) == 253 || ((int)(unsigned char)*(signed char *)((char *)l_18)) == 252) {
-            *(signed char *)((char *)l_18) = 0;
-        } else if (((int)(unsigned char)*(signed char *)((char *)l_18)) == 251) {
-            *(signed char *)((char *)l_18) = 32;
+    text = text_rsc_load((int)(short)(class_id + 4116), 0, 0);
+    cursor = (unsigned char *)text;
+    start = (int)cursor;
+    while (*cursor != 0) {
+        if (*cursor == 253 || *cursor == 252) {
+            *cursor = 0;
+        } else if (*cursor == 251) {
+            *cursor = 32;
         }
-        l_18++;
+        cursor++;
     }
-    disk_write_arena2_file((int)D_0017075D, l_14, (int)&*(signed char *)((char *)(l_18 - l_14) + 1));
-    if (l_14 != 0 && l_14 != (-1751672937)) {
-        mc_free(l_14, (int)D_00170738, 94);
-        l_14 = -1751672937;
+    disk_write_arena2_file((int)D_0017075D, start, (int)cursor - start + 1);
+    if (start != 0 && start != (-1751672937)) {
+        mc_free(start, (int)D_00170738, 94);
+        start = -1751672937;
     }
     msgbox_show_rsc(35, 1);
 }
 
-int career_skip_word(int a1)
+int career_skip_word(int text)
 {
-    while (((int)(unsigned char)*(signed char *)((char *)a1)) > 32) a1++;
-    while (((int)(unsigned char)*(signed char *)((char *)a1)) <= 32) a1++;
-    return a1;
+    while (((int)(unsigned char)*(signed char *)((char *)text)) > 32) text++;
+    while (((int)(unsigned char)*(signed char *)((char *)text)) <= 32) text++;
+    return text;
 }
 
-void career_find_question(int a1)
+void career_find_question(int number)
 {
-    int l_1C;
-    unsigned char l_18;
+    int line;
+    unsigned char found;
 
-    l_18 = 0;
-    l_1C = *(int *)scratch_buffer;
-    while (l_18 == 0) {
-        l_1C = memchr(l_1C, 10, 2000);
-        l_1C++;
-        if (((int)(unsigned char)(D_00178630[(int)(unsigned char)(*(signed char *)((char *)l_1C) + 1)] & 32)) != 0 && atoi(l_1C) == a1) {
-            career_show_question(l_1C);
-            l_18 = 1;
+    found = 0;
+    line = *(int *)scratch_buffer;
+    while (found == 0) {
+        line = memchr(line, 10, 2000);
+        line++;
+        if (((int)(unsigned char)(D_00178630[(int)(unsigned char)(*(signed char *)((char *)line) + 1)] & 32)) != 0 && atoi(line) == number) {
+            career_show_question(line);
+            found = 1;
         }
     }
 }
 
-void career_show_question(int a1)
+void career_show_question(int text)
 {
-    a1 = career_skip_word(a1);
+    text = career_skip_word(text);
     *(short *)scratch_190d64 = 0;
-    a1 = career_draw_lines(a1, 0);
-    *(int *)scratch_190de4 = a1;
-    while (((int)(unsigned char)(D_00178630[(int)(unsigned char)(*(signed char *)((char *)a1) + 1)] & 32)) == 0 && *(signed char *)((char *)a1) != 0) {
+    text = career_draw_lines(text, 0);
+    *(int *)scratch_190de4 = text;
+    while (((int)(unsigned char)(D_00178630[(int)(unsigned char)(*(signed char *)((char *)text) + 1)] & 32)) == 0 && *(signed char *)((char *)text) != 0) {
         (*(short *)scratch_190d64)++;
-        a1 = career_draw_lines(career_skip_word(a1), 1);
-        while (((int)(unsigned char)(D_00178630[(int)(unsigned char)(*(signed char *)((char *)a1) + 1)] & 224)) == 0 && *(signed char *)((char *)a1) != 0) {
-            a1 = memchr(a1, 10, 2000);
-            a1++;
+        text = career_draw_lines(career_skip_word(text), 1);
+        while (((int)(unsigned char)(D_00178630[(int)(unsigned char)(*(signed char *)((char *)text) + 1)] & 224)) == 0 && *(signed char *)((char *)text) != 0) {
+            text = memchr(text, 10, 2000);
+            text++;
         }
     }
 }
 
-int career_draw_lines(int a1, int a2)
+int career_draw_lines(int text, int one_line)
 {
-    int l_20;
-    int l_1C;
-    int l_18;
+    int line_end;
+    int x;
+    int y;
 
-    l_1C = ((int)(short)*(short *)(career_answer_boxes + (((int)(short)*(short *)scratch_190d64) * 12))) + 21;
-    l_18 = (int)(short)*(short *)(D_00179F76 + (((int)(short)*(short *)scratch_190d64) * 12));
-    if (*(short *)scratch_190d64 != 0) l_18 += 5;
+    x = ((int)(short)*(short *)(career_answer_boxes + (((int)(short)*(short *)scratch_190d64) * 12))) + 21;
+    y = (int)(short)*(short *)(D_00179F76 + (((int)(short)*(short *)scratch_190d64) * 12));
+    if (*(short *)scratch_190d64 != 0) y += 5;
     while (1) {
-        l_20 = memchr(a1, 13, 2000);
-        *(signed char *)((char *)l_20) = 0;
+        line_end = memchr(text, 13, 2000);
+        *(signed char *)((char *)line_end) = 0;
         if (career_bio_ask != 0) {
-            text_draw_coloured(a1, (int)(short)*(short *)&l_1C, (int)(short)*(short *)&l_18, 145, 141);
+            text_draw_coloured(text, (int)(short)*(short *)&x, (int)(short)*(short *)&y, 145, 141);
         }
-        l_18 += 10;
-        *(signed char *)((char *)l_20) = 13;
-        a1 = l_20 + 2;
-        if (a2 != 0 || ((int)(unsigned char)*(signed char *)((char *)a1)) != 9) return a1;
-        while (((int)(unsigned char)*(signed char *)((char *)a1)) == 9) a1++;
+        y += 10;
+        *(signed char *)((char *)line_end) = 13;
+        text = line_end + 2;
+        if (one_line != 0 || ((int)(unsigned char)*(signed char *)((char *)text)) != 9) return text;
+        while (((int)(unsigned char)*(signed char *)((char *)text)) == 9) text++;
     }
 }
 
 void career_wait_answer(void)
 {
-    int l_18;
+    int answer;
 
     *(short *)scratch_190d66 = 65535;
     while (mouse_buttons != 0) xn_mouse_poll_clamped();
@@ -214,10 +214,10 @@ void career_wait_answer(void)
             xn_gfx_present_inclusive(1);
         }
         while (mouse_buttons != 0) xn_mouse_poll_clamped();
-        for (l_18 = 0; ((int)(short)*(short *)scratch_190d64) > l_18; l_18++) {
-            if (mouse_x > *(short *)(career_answer_boxes + ((l_18 + 1) * 12)) && mouse_x < *(short *)(D_00179F78 + ((l_18 + 1) * 12)) && mouse_y > *(short *)(D_00179F76 + ((l_18 + 1) * 12)) && mouse_y < *(short *)(D_00179F7A + ((l_18 + 1) * 12))) {
+        for (answer = 0; ((int)(short)*(short *)scratch_190d64) > answer; answer++) {
+            if (mouse_x > *(short *)(career_answer_boxes + ((answer + 1) * 12)) && mouse_x < *(short *)(D_00179F78 + ((answer + 1) * 12)) && mouse_y > *(short *)(D_00179F76 + ((answer + 1) * 12)) && mouse_y < *(short *)(D_00179F7A + ((answer + 1) * 12))) {
                 sound_play(203, (int)player_object, 100);
-                *(short *)scratch_190d66 = l_18;
+                *(short *)scratch_190d66 = answer;
             }
         }
     }
@@ -228,35 +228,35 @@ void career_random_answer(void)
     *(short *)scratch_190d66 = rand_range(0, ((int)(short)*(short *)scratch_190d64) - 1);
 }
 
-void career_apply_answer(int a1)
+void career_apply_answer(int question)
 {
-    int l_1C;
-    int l_18;
+    int letter;
+    int text;
 
-    scratch_190cac = a1;
-    l_1C = ((int)(short)*(short *)scratch_190d66) + 97;
-    l_18 = xn_str_find_byte_pair(*(int *)scratch_190de4, l_1C + 11776, 2000);
-    l_18 = memchr(l_18, 10, 2000);
-    l_18++;
-    while (((int)(unsigned char)*(signed char *)((char *)l_18)) == 9) {
-        l_18 = career_answer_effect(l_18);
+    scratch_190cac = question;
+    letter = ((int)(short)*(short *)scratch_190d66) + 97;
+    text = xn_str_find_byte_pair(*(int *)scratch_190de4, letter + 11776, 2000);
+    text = memchr(text, 10, 2000);
+    text++;
+    while (((int)(unsigned char)*(signed char *)((char *)text)) == 9) {
+        text = career_answer_effect(text);
     }
 }
 
-void func_000252C7(int a1)
+void func_000252C7(int unused)
 {
 }
 
-void func_000252E2(int a1)
+void func_000252E2(int unused)
 {
 }
 
 void career_bio_page_down(void)
 {
-    int l_18;
+    int i;
 
     if ((D_00196D68 + 21) >= career_bio_lines) return;
-    for (l_18 = 0; l_18 < 21; l_18++) {
+    for (i = 0; i < 21; i++) {
         while (*(signed char *)((char *)(career_bio_page)++) != 0);
         D_00196D68++;
     }
@@ -264,10 +264,10 @@ void career_bio_page_down(void)
 
 void career_bio_page_up(void)
 {
-    int l_18;
+    int i;
 
     if (career_bio_page == career_bio_text) return;
-    for (l_18 = 0; l_18 < 21; l_18++) {
+    for (i = 0; i < 21; i++) {
         career_bio_page -= 2;
         while (*(signed char *)(((char *)career_bio_page)) != 0) (career_bio_page)--;
         D_00196D68--;
@@ -279,25 +279,25 @@ void career_bio_page_up(void)
 
 void career_show_biography(void)
 {
-    int l_1C;
-    int l_18;
+    int button;
+    int done;
 
-    l_18 = 0;
+    done = 0;
     window_image = disk_read_file((int)D_0017077B, 0);
     career_bio_page = (career_bio_text = disk_read_file((int)D_0017075D, 0));
     sound_play(237, (int)player_object, 100);
     D_00196D70 = (int)(*(char **)&career_bio_text + *(int *)disk_last_file_size);
     career_bio_lines = career_bio_count_lines();
     D_00196D68 = 0;
-    while (l_18 == 0) {
+    while (done == 0) {
         career_bio_draw();
         if (((int)(unsigned char)(mouse_buttons & 1)) != 0 && ((int)(unsigned char)(mouse_buttons_prev & 1)) == 0) {
-            for (l_1C = 0; l_1C < 3; l_1C++) {
-                if (mouse_x > *(short *)(career_bio_buttons + (l_1C * 12)) && mouse_x < *(short *)(D_0017A006 + (l_1C * 12)) && mouse_y > *(short *)(D_0017A004 + (l_1C * 12)) && mouse_y < *(short *)(D_0017A008 + (l_1C * 12))) {
-                    if (l_1C == 2) {
-                        l_18 = 1;
+            for (button = 0; button < 3; button++) {
+                if (mouse_x > *(short *)(career_bio_buttons + (button * 12)) && mouse_x < *(short *)(D_0017A006 + (button * 12)) && mouse_y > *(short *)(D_0017A004 + (button * 12)) && mouse_y < *(short *)(D_0017A008 + (button * 12))) {
+                    if (button == 2) {
+                        done = 1;
                     } else {
-                        ((int (*)())(*(int *)(D_0017A00A + (l_1C * 12))))();
+                        ((int (*)())(*(int *)(D_0017A00A + (button * 12))))();
                     }
                 }
             }
@@ -314,16 +314,16 @@ void career_show_biography(void)
 
 void career_bio_draw(void)
 {
-    int l_1C;
-    int l_18;
+    int row;
+    int line;
 
-    l_1C = 0;
-    l_18 = career_bio_page;
+    row = 0;
+    line = career_bio_page;
     mc_memcpy(screen_buffer, window_image, 64000, (int)D_00170738, 515, 4);
-    while (((unsigned)l_18) < D_00196D70 && l_1C < 21) {
-        text_draw_coloured(l_18, 10, (int)(short)((l_1C * 7) + 25), 145, 156);
-        l_18 += strlen(l_18) + 1;
-        l_1C++;
+    while (((unsigned)line) < D_00196D70 && row < 21) {
+        text_draw_coloured(line, 10, (int)(short)((row * 7) + 25), 145, 156);
+        line += strlen(line) + 1;
+        row++;
     }
     cursor_draw_arrow();
     mouse_buttons_prev = mouse_buttons;
@@ -333,45 +333,45 @@ void career_bio_draw(void)
 
 int career_bio_count_lines(void)
 {
-    int l_20;
-    int l_1C;
+    int line;
+    int count;
 
-    l_20 = career_bio_text;
-    l_1C = 0;
-    while (((unsigned)l_20) < D_00196D70) {
-        l_1C++;
-        l_20 += strlen(l_20) + 1;
+    line = career_bio_text;
+    count = 0;
+    while (((unsigned)line) < D_00196D70) {
+        count++;
+        line += strlen(line) + 1;
     }
-    return l_1C;
+    return count;
 }
 
-int monster_despawn_to_marker(struct record *a1)
+int monster_despawn_to_marker(struct record *object)
 {
-    struct character *l_20;
-    struct item *l_1C;
+    struct character *character;
+    struct item *item;
 
-    if (place_marker_in_range(a1, 0) != 0) return 0;
-    l_20 = &a1->data.character;
-    if (l_20->mobile_id == 146) {
-        object_free_later(a1);
+    if (place_marker_in_range(object, 0) != 0) return 0;
+    character = &object->data.character;
+    if (character->mobile_id == 146) {
+        object_free_later(object);
         return 1;
     }
-    a1->type = 34;
-    if (((int)(unsigned short)(l_20->flags & 64)) != 0) {
-        a1->image = 25487;
+    object->type = 34;
+    if (((int)(unsigned short)(character->flags & 64)) != 0) {
+        object->image = 25487;
     } else {
-        a1->image = 25488;
+        object->image = 25488;
     }
-    a1->mobile_id = (unsigned short)l_20->mobile_id;
-    a1->spawn_seed = l_20->spawn_seed;
-    l_20->target = 0;
-    a1 = a1->children;
-    while (a1 != 0) {
-        l_1C = &a1->data.item;
-        if (a1->quest_id == 0) {
-            if (a1->type != 2 || l_1C->index != 18 || l_1C->group != 3) object_free_later(a1);
+    object->mobile_id = (unsigned short)character->mobile_id;
+    object->spawn_seed = character->spawn_seed;
+    character->target = 0;
+    object = object->children;
+    while (object != 0) {
+        item = &object->data.item;
+        if (object->quest_id == 0) {
+            if (object->type != 2 || item->index != 18 || item->group != 3) object_free_later(object);
         }
-        a1 = a1->next;
+        object = object->next;
     }
     return 1;
 }

@@ -5,63 +5,63 @@
 
 extern int rand_range(int, int);
 
-int armor_image_for_type(int a1, int a2)
+int armor_image_for_type(int armor_type, int index)
 {
-    int l_18;
+    int image;
 
-    switch (a2) {
+    switch (index) {
     case 0:
-        if (a1 == 0) {
-            l_18 = 3;
-        } else if (a1 == 1) {
-            l_18 = 7;
+        if (armor_type == 0) {
+            image = 3;
+        } else if (armor_type == 1) {
+            image = 7;
         } else {
-            l_18 = rand_range(4, 6);
+            image = rand_range(4, 6);
         }
         break;
     case 1:
-        if (a1 == 0) {
-            l_18 = 8;
+        if (armor_type == 0) {
+            image = 8;
         } else {
-            l_18 = 9;
+            image = 9;
         }
         break;
     case 2:
-        if (a1 == 0) {
-            l_18 = rand_range(10, 11);
-        } else if (a1 == 1) {
-            l_18 = 16;
+        if (armor_type == 0) {
+            image = rand_range(10, 11);
+        } else if (armor_type == 1) {
+            image = 16;
         } else {
-            l_18 = rand_range(12, 15);
+            image = rand_range(12, 15);
         }
         break;
     case 3:
-        if (a1 == 0) {
-            l_18 = 17;
-        } else if (a1 == 1) {
-            l_18 = 21;
+        if (armor_type == 0) {
+            image = 17;
+        } else if (armor_type == 1) {
+            image = 21;
         } else {
-            l_18 = rand_range(18, 20);
+            image = rand_range(18, 20);
         }
         break;
     case 4:
-        if (a1 == 0) {
-            l_18 = 22;
-        } else if (a1 == 1) {
-            l_18 = 26;
+        if (armor_type == 0) {
+            image = 22;
+        } else if (armor_type == 1) {
+            image = 26;
         } else {
-            l_18 = rand_range(23, 25);
+            image = rand_range(23, 25);
         }
         break;
     case 6:
-        if (a1 == 0) {
-            l_18 = 0;
+        if (armor_type == 0) {
+            image = 0;
         } else {
-            l_18 = 1;
+            image = 1;
         }
         break;
     default:
-        l_18 = -1;
+        image = -1;
     }
-    return l_18;
+    return image;
 }

@@ -5,15 +5,15 @@ extern short scratch_190d68;
 extern short scratch_190d6a;
 extern char *scratch_buffer;
 extern int town_notes_size(void);
-extern void mc_strncpy(char *, int, int, char *, int);
+extern void mc_strncpy(char *, char *, int, char *, int);
 
-void town_note_add(int a1)
+void town_note_add(char *text)
 {
-    int l_18;
+    int offset;
 
     scratch_190ce5 = 1;
-    l_18 = town_notes_size();
-    *(short *)(scratch_buffer + l_18) = scratch_190d68;
-    *(short *)(scratch_buffer + l_18 + 2) = scratch_190d6a;
-    mc_strncpy(scratch_buffer + (l_18 + 4), a1, 4, D_001707AE, 823);
+    offset = town_notes_size();
+    *(short *)(scratch_buffer + offset) = scratch_190d68;
+    *(short *)(scratch_buffer + offset + 2) = scratch_190d6a;
+    mc_strncpy(scratch_buffer + (offset + 4), text, 4, D_001707AE, 823);
 }

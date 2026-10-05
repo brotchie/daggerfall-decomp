@@ -12,11 +12,11 @@ extern char *cursor_region_images;
 extern void cursor_draw_arrow(void);
 extern void xn_draw_image_transparent(int, int, int, int, char *);
 
-void cursor_draw(short a1)
+void cursor_draw(short region)
 {
     char *p;
-    int l_34, l_2C, l_28, l_24, l_20;   /* unused, but they have slots */
-    char l_18;
+    int unused1, unused2, unused3, unused4, unused5;   /* unused, but they have slots */
+    char unused6;
 
     if (D_001940D5.b2) return;
     if (D_00196272 || D_001940D4.b2) {
@@ -29,7 +29,7 @@ void cursor_draw(short a1)
         return;
     }
     p = cursor_region_images;
-    while (a1-- != 0)
+    while (region-- != 0)
         p = p + ((struct rec *)p)->len + 12;
     xn_draw_image_transparent(mouse_x, mouse_y, ((struct rec *)p)->w, ((struct rec *)p)->h, p + 12);
 }

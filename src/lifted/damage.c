@@ -78,64 +78,64 @@ void damage_collapse_exhausted(struct record *);
 void monster_wake_cb(struct record *);
 void quest_prompt_answer(void);
 
-void damage_monster_hit_effects(struct record *a1, struct record *a2)
+void damage_monster_hit_effects(struct record *attacker, struct record *target)
 {
-    struct character *l_1C;
-    struct character *l_18;
-    int l_14;
+    struct character *attacker_char;
+    struct character *target_char;
+    int fatigue;
 
-    l_1C = &a1->data.character;
-    l_18 = &a2->data.character;
-    switch (l_1C->race) {
+    attacker_char = &attacker->data.character;
+    target_char = &target->data.character;
+    switch (attacker_char->race) {
     case 0:
-        if (rand_range(0, 100) <= 5) disease_infect(a2, (int)monster_diseases_plague, 0, 0);
+        if (rand_range(0, 100) <= 5) disease_infect(target, (int)monster_diseases_plague, 0, 0);
         return;
     case 3:
-        if (rand_range(0, 100) <= 2) disease_infect(a2, (int)monster_diseases_bat, 0, 0);
+        if (rand_range(0, 100) <= 2) disease_infect(target, (int)monster_diseases_bat, 0, 0);
         return;
     case 6:
-        if (spell_find_on_entity(a2, 66, 0) == 0) cast_creature_spell(a1, a2, 66);
+        if (spell_find_on_entity(target, 66, 0) == 0) cast_creature_spell(attacker, target, 66);
         return;
     case 9:
-        if (rand() < 400) disease_infect_lycanthropy(a2, 0);
+        if (rand() < 400) disease_infect_lycanthropy(target, 0);
         return;
     case 10:
-        l_14 = l_18->fatigue;
-        l_14 -= rand_range(10, 30) << 6;
-        if (l_14 < 0) l_14 = 0;
-        l_18->fatigue = l_14;
-        if (l_14 == 0) damage_collapse_exhausted(a2);
+        fatigue = target_char->fatigue;
+        fatigue -= rand_range(10, 30) << 6;
+        if (fatigue < 0) fatigue = 0;
+        target_char->fatigue = fatigue;
+        if (fatigue == 0) damage_collapse_exhausted(target);
         return;
     case 14:
-        if (rand() < 400) disease_infect_lycanthropy(a2, 1);
+        if (rand() < 400) disease_infect_lycanthropy(target, 1);
         return;
     case 19:
-        if (rand_range(1, 100) <= 5) disease_infect(a2, (int)monster_diseases_mummy, 0, 0);
+        if (rand_range(1, 100) <= 5) disease_infect(target, (int)monster_diseases_mummy, 0, 0);
         return;
     case 20:
-        if (spell_find_on_entity(a2, 66, 0) == 0) cast_creature_spell(a1, a2, 66);
+        if (spell_find_on_entity(target, 66, 0) == 0) cast_creature_spell(attacker, target, 66);
         return;
     case 28:
     case 30:
         if (rand() < 400) {
-            disease_infect_vampirism(a2);
+            disease_infect_vampirism(target);
             return;
         }
         if (rand_range(1, 100) > 2) return;
-        disease_infect(a2, (int)monster_diseases_plague, 0, 0);
+        disease_infect(target, (int)monster_diseases_plague, 0, 0);
     default:;
     }
 }
 
-void disease_infect_lycanthropy(struct record *a1, int a2)
+void disease_infect_lycanthropy(struct record *target, int kind)
 {
     if (player_character->level == 1 || player_character->race > 7) return;
     player_character->special_infection_time = game_minutes + 4320;
-    player_character->special_infection = a2 + 1;
+    player_character->special_infection = kind + 1;
     player_character->flags |= 16;
 }
 
-void disease_infect_vampirism(struct record *a1)
+void disease_infect_vampirism(struct record *target)
 {
     if (player_character->level == 1 || player_character->race > 7) return;
     player_character->special_infection_time = game_minutes + 4320;
@@ -143,84 +143,84 @@ void disease_infect_vampirism(struct record *a1)
     player_character->flags |= 16;
 }
 
-void damage_collapse_exhausted(struct record *a1)
+void damage_collapse_exhausted(struct record *target)
 {
-    int l_1C;
-    int l_18;
+    int start_ticks;
+    int unused;
 
-    l_1C = xn_timer_bios_ticks();
+    start_ticks = xn_timer_bios_ticks();
     mc_memset(655360, 0, ((((int)(unsigned short)(*(short *)((char *)((int)game_settings)) & 1)) != 0) ? 64000 : ((int)(unsigned short)*(short *)(*(char **)hud_bar_image + 2)) * 320), (int)D_001709E4, 701, 4);
     time_pass(20160);
-    while ((xn_timer_bios_ticks() - l_1C) < 22);
+    while ((xn_timer_bios_ticks() - start_ticks) < 22);
 }
 
-void damage_spawn_splash(struct record *a1, int a2, int a3)
+void damage_spawn_splash(struct record *target, int image_record, int alt_image_record)
 {
-    int l_1C;
-    struct record *l_18;
-    struct character *l_14;
-    short l_10;
+    int angle;
+    struct record *splash;
+    struct character *target_char;
+    char *image;
 
-    l_18 = object_create_child(a1->parent, 0, 0);
-    l_18->id = object_new_id(((unsigned)location_object->id) >> 16);
-    l_18->type = 42;
-    l_18->x = a1->x;
-    *(int *)&l_10 = xn_tex_cache_lookup_image(a1->image >> 7, (int)(unsigned short)(a1->image & 127));
-    l_18->y = a1->y - (((int)(unsigned short)*(short *)(*(char **)&l_10 + 6)) >> 1);
-    if (a1->type == 18) {
-        l_14 = &a1->data.character;
-        if (l_14->race == 1 || l_14->race == 0 || l_14->race == 3) l_18->y += 10;
+    splash = object_create_child(target->parent, 0, 0);
+    splash->id = object_new_id(((unsigned)location_object->id) >> 16);
+    splash->type = 42;
+    splash->x = target->x;
+    image = (char *)xn_tex_cache_lookup_image(target->image >> 7, (int)(unsigned short)(target->image & 127));
+    splash->y = target->y - (((int)(unsigned short)*(short *)(image + 6)) >> 1);
+    if (target->type == 18) {
+        target_char = &target->data.character;
+        if (target_char->race == 1 || target_char->race == 0 || target_char->race == 3) splash->y += 10;
     }
-    l_18->z = a1->z;
-    l_18->image = a2 + (D_00195DA0 << 7);
-    if (a3 != (-1)) {
-        l_14 = &a1->data.character;
-        if (l_14->mobile_id < 128 && *(signed char *)(monster_category + l_14->race) == 0) {
-            l_18->image = a3 + (D_00195DA0 << 7);
+    splash->z = target->z;
+    splash->image = image_record + (D_00195DA0 << 7);
+    if (alt_image_record != (-1)) {
+        target_char = &target->data.character;
+        if (target_char->mobile_id < 128 && *(signed char *)(monster_category + target_char->race) == 0) {
+            splash->image = alt_image_record + (D_00195DA0 << 7);
         }
     }
-    l_1C = xn_math_angle_to_point(a1->x, a1->z, player_object->x, player_object->z);
-    xn_math_advance_pitch_yaw(0, l_1C, 10, &l_18->x);
-    flat_anim_restart(l_18);
+    angle = xn_math_angle_to_point(target->x, target->z, player_object->x, player_object->z);
+    xn_math_advance_pitch_yaw(0, angle, 10, &splash->x);
+    flat_anim_restart(splash);
 }
 
-void func_0002F62C(struct record *a1, int a2, int a3, int a4)
+void func_0002F62C(struct record *target, int force, int angle, int amount)
 {
-    int l_14;
-    int l_10;
-    struct character *l_C;
+    int weight;
+    int unused;
+    struct character *target_char;
 
-    l_14 = object_weight(a1);
-    if (l_14 == 0) return;
-    l_C = &a1->data.character;
-    if (l_C->race < 43 && *(short *)(monster_weights + (l_C->race * 2)) == 0) return;
-    if (l_C->action == 16) return;
-    l_C->knockback_speed = (a4 * (((a2 - l_14) << 8) / (a2 + l_14))) / 256;
-    l_C->knockback_speed = (a2 / l_14) * (a4 - l_C->knockback_speed);
-    if (l_C->knockback_speed < 15) l_C->knockback_speed = 15;
-    l_C->knockback_angle = a3;
-    l_C->flags |= 32;
-    l_C->action = 16;
+    weight = object_weight(target);
+    if (weight == 0) return;
+    target_char = &target->data.character;
+    if (target_char->race < 43 && *(short *)(monster_weights + (target_char->race * 2)) == 0) return;
+    if (target_char->action == 16) return;
+    target_char->knockback_speed = (amount * (((force - weight) << 8) / (force + weight))) / 256;
+    target_char->knockback_speed = (force / weight) * (amount - target_char->knockback_speed);
+    if (target_char->knockback_speed < 15) target_char->knockback_speed = 15;
+    target_char->knockback_angle = angle;
+    target_char->flags |= 32;
+    target_char->action = 16;
 }
 
-void damage_knockback(struct record *a1, int a2, int a3, int a4)
+void damage_knockback(struct record *target, int force, int angle, int amount)
 {
-    int l_18;
-    int l_14;
-    int l_10;
-    struct character *l_C;
+    int weight;
+    int absorbed;
+    int unused;
+    struct character *target_char;
 
-    l_18 = object_weight(a1);
-    if (l_18 == 0) return;
-    l_C = &a1->data.character;
-    if (l_C->race < 43 && *(short *)(monster_weights + (l_C->race * 2)) == 0) return;
-    if (l_C->action == 16) return;
-    l_14 = (a4 * (((a2 - l_18) << 8) / (a2 + l_18))) / 256;
-    l_C->knockback_speed = (a2 / l_18) * (a4 - l_14);
-    if (l_C->knockback_speed < 15) l_C->knockback_speed = 15;
-    l_C->knockback_angle = a3;
-    l_C->flags |= 32;
-    l_C->action = 16;
+    weight = object_weight(target);
+    if (weight == 0) return;
+    target_char = &target->data.character;
+    if (target_char->race < 43 && *(short *)(monster_weights + (target_char->race * 2)) == 0) return;
+    if (target_char->action == 16) return;
+    absorbed = (amount * (((force - weight) << 8) / (force + weight))) / 256;
+    target_char->knockback_speed = (force / weight) * (amount - absorbed);
+    if (target_char->knockback_speed < 15) target_char->knockback_speed = 15;
+    target_char->knockback_angle = angle;
+    target_char->flags |= 32;
+    target_char->action = 16;
 }
 
 void damage_expire_drain_bonuses(void)
@@ -232,42 +232,32 @@ void damage_expire_drain_bonuses(void)
     *(int *)D_00195A08 = 0;
 }
 
-int damage_miss_sound(struct item *a1, int a2)
+int damage_miss_sound(struct item *weapon, int target_id)
 {
-    if (a1 != 0) {
-        if (a2 == (-1) || a2 == 200) {
-            return (int)(short)*(short *)(weapon_swing_sounds + (a1->index * 2));
+    if (weapon != 0) {
+        if (target_id == (-1) || target_id == 200) {
+            return (int)(short)*(short *)(weapon_swing_sounds + (weapon->index * 2));
         }
-        if (memchr((int)monster_parry_ids, a2, 28) != 0) {
+        if (memchr((int)monster_parry_ids, target_id, 28) != 0) {
             if (rand() < 32768) return rand_range(291, 299);
         }
-        return (int)(short)*(short *)(weapon_swing_sounds + (a1->index * 2));
+        return (int)(short)*(short *)(weapon_swing_sounds + (weapon->index * 2));
     }
     return 374;
 }
 
 void play_death_video(void)
 {
-    int l_44;
-    int l_40;
-    int l_3C;
-    int l_38;
-    int l_34;
-    int l_30;
-    int l_2C;
-    int l_28;
-    int l_24;
-    int l_20;
-    int l_1C;
-    int l_18;
+    int unused[11];
+    int path;
 
     xn_pal_fade_to((int)D_00196DC4, 50);
     mc_memset(655360, 0, 64000, (int)D_001709E4, 875, 4);
     mc_memset(screen_buffer, 0, 64000, (int)D_001709E4, 876, 4);
     palette_restore();
-    l_18 = disk_resolve_path((int)D_001709FB);
+    path = disk_resolve_path((int)D_001709FB);
     while (mouse_buttons != 0) xn_mouse_poll_clamped();
-    xn_vid_play(l_18, 0, 0, 1);
+    xn_vid_play(path, 0, 0, 1);
     mc_memset(655360, 0, 64000, (int)D_001709E4, 883, 4);
     mc_memset(screen_buffer, 0, 64000, (int)D_001709E4, 884, 4);
     palette_restore();
@@ -276,10 +266,10 @@ void play_death_video(void)
     while (mouse_buttons != 0) xn_mouse_poll_clamped();
 }
 
-void monster_wake_cb(struct record *a1)
+void monster_wake_cb(struct record *object)
 {
-    if (a1->type != 18 || a1->wait_state != 99) return;
-    a1->wait_state = 0;
+    if (object->type != 18 || object->wait_state != 99) return;
+    object->wait_state = 0;
 }
 
 void monster_wake_all(void)
@@ -289,148 +279,148 @@ void monster_wake_all(void)
     object_foreach(location_object, (int)monster_wake_cb);
 }
 
-void func_0002FD75(struct record *a1)
+void func_0002FD75(struct record *object)
 {
-    struct quest *l_18;
+    struct quest *quest;
 
-    if (a1->type != 14) return;
-    l_18 = &a1->data.quest;
-    quest_run_opcodes(l_18);
+    if (object->type != 14) return;
+    quest = &object->data.quest;
+    quest_run_opcodes(quest);
 }
 
-void func_0002FDB0(struct record *a1)
+void func_0002FDB0(struct record *object)
 {
-    struct quest *l_18;
+    struct quest *quest;
 
-    if (a1->type != 14) return;
-    l_18 = &a1->data.quest;
-    if (l_18->id != D_001997AA) return;
-    quest_tick_data = l_18;
-    quest_event_object = a1;
+    if (object->type != 14) return;
+    quest = &object->data.quest;
+    if (quest->id != D_001997AA) return;
+    quest_tick_data = quest;
+    quest_event_object = object;
 }
 
-void func_0002FE02(struct record *a1)
+void func_0002FE02(struct record *object)
 {
-    if (a1->quest_id == 0 || ((int)(unsigned short)(a1->flags & 32768)) == 0) return;
-    a1->quest_id = 0;
-    a1->flags &= ~0x8000;
+    if (object->quest_id == 0 || ((int)(unsigned short)(object->flags & 32768)) == 0) return;
+    object->quest_id = 0;
+    object->flags &= ~0x8000;
 }
 
-void func_0002FE4B(struct record *a1)
+void func_0002FE4B(struct record *object)
 {
-    short l_18;
+    short foe_id;
 
-    if (a1->type != 18) return;
-    if ((short)((int)(unsigned char)(signed char)a1->quest_id) != current_quest->id) return;
-    l_18 = *(short *)scratch_190d64;
-    if ((short)a1->image2 != l_18) return;
+    if (object->type != 18) return;
+    if ((short)((int)(unsigned char)(signed char)object->quest_id) != current_quest->id) return;
+    foe_id = *(short *)scratch_190d64;
+    if ((short)object->image2 != foe_id) return;
     if (scratch_190ce4[0] != 0) {
-        a1->data.character.flags |= 0x8000;
+        object->data.character.flags |= 0x8000;
         return;
     }
-    a1->data.character.flags &= ~0x8000;
+    object->data.character.flags &= ~0x8000;
 }
 
-void quest_cast_spell_on_foe_cb(struct record *a1)
+void quest_cast_spell_on_foe_cb(struct record *object)
 {
-    if (a1->type != 18) return;
-    if ((short)(a1->quest_id) != current_quest->id) return;
-    if (a1->image2 != *(short *)scratch_190d64) return;
+    if (object->type != 18) return;
+    if ((short)(object->quest_id) != current_quest->id) return;
+    if (object->image2 != *(short *)scratch_190d64) return;
     D_00196291 = 1;
-    cast_spell_on(scratch_current_object, a1, 1);
+    cast_spell_on(scratch_current_object, object, 1);
     D_00196291 = 0;
 }
 
-int quest_travel_minutes(int a1, struct record *a2, struct record *a3)
+int quest_travel_minutes(int quest, struct record *from, struct record *to)
 {
-    if (a2 == 0) return travel_route(player_object->x, player_object->y, a3->x, a3->y, 0) + 2880;
-    return travel_route(a2->x, a2->y, a3->x, a3->y, 0) + 2880;
+    if (from == 0) return travel_route(player_object->x, player_object->y, to->x, to->y, 0) + 2880;
+    return travel_route(from->x, from->y, to->x, to->y, 0) + 2880;
 }
 
-void qaction_op35_cycle_state(struct quest *a1, struct qbn_op *a2)
+void qaction_op35_cycle_state(struct quest *quest, struct qbn_op *op)
 {
-    struct qbn_state *l_30[4];
-    int l_18;
-    short l_14;
+    struct qbn_state *states[4];
+    int count;
+    short i;
 
-    *(int *)&l_14 = 0;
-    l_18 = (int)(short)l_14;
-    for (; ((int)(short)l_14) < 4; (*(int *)&l_14)++) {
-        if (a2->args[((int)(short)l_14) + 1].value != (-1) && a2->args[((int)(short)l_14) + 1].value != (-2)) {
-            l_30[l_18++] = (struct qbn_state *)a2->args[((int)(short)l_14) + 1].record;
+    *(int *)&i = 0;
+    count = (int)(short)i;
+    for (; ((int)(short)i) < 4; (*(int *)&i)++) {
+        if (op->args[((int)(short)i) + 1].value != (-1) && op->args[((int)(short)i) + 1].value != (-2)) {
+            states[count++] = (struct qbn_state *)op->args[((int)(short)i) + 1].record;
         }
     }
-    if (l_18 == 0) return;
-    if (l_18 == 1) {
-        if (l_30[0]->is_global != 0) {
-            quest_global_states[l_30[0]->value] = 1;
+    if (count == 0) return;
+    if (count == 1) {
+        if (states[0]->is_global != 0) {
+            quest_global_states[states[0]->value] = 1;
         } else {
-            l_30[0]->value = 1;
+            states[0]->value = 1;
         }
         return;
     }
-    *(int *)&l_14 = 0;
-    for (; ((int)(short)l_14) < l_18; (*(int *)&l_14)++) {
-        if (l_30[(int)(short)l_14]->is_global != 0) {
-            if (quest_global_states[l_30[(int)(short)l_14]->value] != 0) break;
+    *(int *)&i = 0;
+    for (; ((int)(short)i) < count; (*(int *)&i)++) {
+        if (states[(int)(short)i]->is_global != 0) {
+            if (quest_global_states[states[(int)(short)i]->value] != 0) break;
         } else {
-            if (l_30[(int)(short)l_14]->value != 0) break;
+            if (states[(int)(short)i]->value != 0) break;
         }
     }
-    if (((int)(short)l_14) == l_18) {
-        if (l_30[0]->is_global != 0) {
-            quest_global_states[l_30[0]->value] = 1;
+    if (((int)(short)i) == count) {
+        if (states[0]->is_global != 0) {
+            quest_global_states[states[0]->value] = 1;
         } else {
-            l_30[0]->value = 1;
+            states[0]->value = 1;
         }
         return;
     }
-    if (l_30[(int)(short)l_14]->is_global != 0) {
-        quest_global_states[l_30[(int)(short)l_14]->value] = 0;
+    if (states[(int)(short)i]->is_global != 0) {
+        quest_global_states[states[(int)(short)i]->value] = 0;
     } else {
-        l_30[(int)(short)l_14]->value = 0;
+        states[(int)(short)i]->value = 0;
     }
-    if (l_30[(((int)(short)l_14) + 1) % l_18]->is_global != 0) {
-        quest_global_states[l_30[(((int)(short)l_14) + 1) % l_18]->value] = 1;
+    if (states[(((int)(short)i) + 1) % count]->is_global != 0) {
+        quest_global_states[states[(((int)(short)i) + 1) % count]->value] = 1;
         return;
     }
-    l_30[(((int)(short)l_14) + 1) % l_18]->value = 1;
+    states[(((int)(short)i) + 1) % count]->value = 1;
 }
 
-void qaction_op29_prompt(struct quest *a1, struct qbn_op *a2)
+void qaction_op29_prompt(struct quest *quest, struct qbn_op *op)
 {
     D_001940DA |= 32;
-    quest_prompt_op = a2;
-    quest_prompt_quest = a1;
-    quest_op_done(a1, a2);
-    quest_show_message(a1, a2->args[3].value);
+    quest_prompt_op = op;
+    quest_prompt_quest = quest;
+    quest_op_done(quest, op);
+    quest_show_message(quest, op->args[3].value);
     quest_prompt_answer();
 }
 
 void quest_prompt_answer(void)
 {
-    struct qbn_state *l_18;
+    struct qbn_state *state;
 
     if (((struct bf8_5_1 *)&D_001940DA)->f == 0 || game_mode != 0) return;
-    l_18 = *(struct qbn_state **)((char *)quest_prompt_op + 7 + (((int)D_00196271) * 15));
-    if (l_18->is_global != 0) {
-        quest_global_states[l_18->value] = 1;
+    state = *(struct qbn_state **)((char *)quest_prompt_op + 7 + (((int)D_00196271) * 15));
+    if (state->is_global != 0) {
+        quest_global_states[state->value] = 1;
     } else {
-        l_18->value = 1;
+        state->value = 1;
     }
     D_001940DA &= 223;
 }
 
-void quest_set_arg_state(struct quest *a1, struct qbn_op *a2, int a3, int a4)
+void quest_set_arg_state(struct quest *quest, struct qbn_op *op, int arg_index, int value)
 {
-    struct qbn_state *l_C;
+    struct qbn_state *state;
 
-    if (a2->args[a3].value == (-1)) return;
-    l_C = (struct qbn_state *)a2->args[a3].record;
-    if (((int)(unsigned char)(a2->args[a3].negate & 1)) != 0) a4 ^= 1;
-    if (l_C->is_global != 0) {
-        quest_global_states[l_C->value] = *(signed char *)&a4;
+    if (op->args[arg_index].value == (-1)) return;
+    state = (struct qbn_state *)op->args[arg_index].record;
+    if (((int)(unsigned char)(op->args[arg_index].negate & 1)) != 0) value ^= 1;
+    if (state->is_global != 0) {
+        quest_global_states[state->value] = *(signed char *)&value;
         return;
     }
-    l_C->value = *(signed char *)&a4;
+    state->value = *(signed char *)&value;
 }

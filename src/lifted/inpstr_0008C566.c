@@ -4,7 +4,7 @@
 
 extern char D_00176E2C[];
 extern char D_00190B44[];
-extern int inpstr_text;
+extern char *inpstr_text;
 extern short inpstr_max_length;
 extern short inpstr_cursor;
 extern signed char input_digits_only;
@@ -13,12 +13,12 @@ extern int mc_strncpy();
 extern int strlen();
 extern int xn_kbd_flush();
 
-void inpstr_begin_text(int a1, int a2)
+void inpstr_begin_text(char *text, int max_length)
 {
     xn_kbd_flush();
     input_digits_only = 0;
-    inpstr_text = a1;
-    mc_strncpy((int)D_00190B44, inpstr_text, 160, (int)D_00176E2C, 121);
-    inpstr_cursor = strlen(a1);
-    inpstr_max_length = a2;
+    inpstr_text = text;
+    mc_strncpy(D_00190B44, inpstr_text, 160, D_00176E2C, 121);
+    inpstr_cursor = strlen(text);
+    inpstr_max_length = max_length;
 }

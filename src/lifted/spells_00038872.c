@@ -4,18 +4,18 @@
 
 
 
-void spellmaker_adjust_value(int a1, int a2, int a3, short a4)
+void spellmaker_adjust_value(unsigned char *value, int delta, int limit, short pair_offset)
 {
-    *(signed char *)((char *)a1) += *(signed char *)&a2;
-    if (((int)(unsigned char)*(signed char *)((char *)a1)) < 1) *(signed char *)((char *)a1) = 1;
-    if ((short)((unsigned short)(unsigned char)*(signed char *)((char *)a1)) > *(short *)&a3) {
-        *(signed char *)((char *)a1) = *(signed char *)&a3;
+    *value += *(signed char *)&delta;
+    if (*value < 1) *value = 1;
+    if ((short)*value > *(short *)&limit) {
+        *value = *(signed char *)&limit;
     }
-    if (a4 < 0 && *(unsigned char *)((char *)(((int)(short)a4) + a1)) > *(unsigned char *)((char *)a1)) {
-        *(signed char *)((char *)(((int)(short)a4) + a1)) = *(signed char *)((char *)a1);
+    if (pair_offset < 0 && value[pair_offset] > *value) {
+        value[pair_offset] = *value;
     }
-    if (a4 <= 0 || *(unsigned char *)((char *)(((int)(short)a4) + a1)) >= *(unsigned char *)((char *)a1)) {
+    if (pair_offset <= 0 || value[pair_offset] >= *value) {
         return;
     }
-    *(signed char *)((char *)(((int)(short)a4) + a1)) = *(signed char *)((char *)a1);
+    value[pair_offset] = *value;
 }

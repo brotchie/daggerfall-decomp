@@ -15,49 +15,49 @@ extern void location_pick_random_town(struct loaded_location *);
 extern int rand(void);
 extern void mc_memset(void *, int, int, char *, int, int);
 
-void quest_pick_location(struct loaded_location *n, unsigned kind, int a3, int mode)
+void quest_pick_location(struct loaded_location *location, unsigned kind, int sub_kind, int mode)
 {
     int unused[3];
-    int l_10;
-    int r;
+    int unused1;
+    int pick;
     int done;
-    int l_1C;
+    int unused2;
     int saved;
 
     saved = region_locations;
     done = 0;
-    mc_memset(n, 0, 20, D_00176C94, 1045, 4);
+    mc_memset(location, 0, 20, D_00176C94, 1045, 4);
     if (mode == 0) {
-        location_load_exterior(n, location_object->image);
+        location_load_exterior(location, location_object->image);
         return;
     }
     while (done == 0) {
-        location_free(n);
+        location_free(location);
         switch (kind) {
         case 0:
-            while (a3 == -1 || a3 == 1)
-                a3 = rand() % 21;
-            if (a3 > 16) {
-                location_pick_random_town(n);
+            while (sub_kind == -1 || sub_kind == 1)
+                sub_kind = rand() % 21;
+            if (sub_kind > 16) {
+                location_pick_random_town(location);
             } else {
-                a3 = D_00187EE4[a3];
-                location_pick_random_with_service(n, a3, -1);
+                sub_kind = D_00187EE4[sub_kind];
+                location_pick_random_with_service(location, sub_kind, -1);
             }
             break;
         case 1:
-            if (a3 != -1) {
-                if (region_dungeon_type_counts[a3] != 0) {
-                    r = rand() % region_dungeon_type_counts[a3];
-                    location_load_nth_dungeon_of_type(n, a3, r);
+            if (sub_kind != -1) {
+                if (region_dungeon_type_counts[sub_kind] != 0) {
+                    pick = rand() % region_dungeon_type_counts[sub_kind];
+                    location_load_nth_dungeon_of_type(location, sub_kind, pick);
                     break;
                 }
             }
-            r = rand() % region_dungeon_count;
-            location_load_dungeon(n, r);
+            pick = rand() % region_dungeon_count;
+            location_load_dungeon(location, pick);
             break;
         }
         if (mode == 1)
-            done = n->object->image != location_object->image;
+            done = location->object->image != location_object->image;
         else
             done++;
     }

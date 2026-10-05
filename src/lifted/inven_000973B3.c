@@ -12,25 +12,25 @@ extern int inv_match_arrows(int);
 extern void item_make(int, int, struct item *);
 extern void inv_store_item(struct record *);
 
-void inv_add_arrows(struct record *a1, int a2)
+void inv_add_arrows(struct record *owner, int count)
 {
-    struct record *l_18;
-    int l_14;
+    struct record *stack;
+    int total;
 
     found_object = 0;
-    object_find(a1->children, (int)inv_match_arrows);
+    object_find(owner->children, (int)inv_match_arrows);
     if (found_object == 0) {
-        l_18 = object_create_child(a1, 0, 107);
-        found_object = l_18;
-        l_18->type = 2;
-        l_18->image2 = 998;
-        l_18->image = 0;
-        item_make(3, 18, &l_18->data.item);
-        l_18->data.item.stack_count = *(signed char *)&a2;
-        if (a1 == player_entity) inv_store_item(l_18);
+        stack = object_create_child(owner, 0, 107);
+        found_object = stack;
+        stack->type = 2;
+        stack->image2 = 998;
+        stack->image = 0;
+        item_make(3, 18, &stack->data.item);
+        stack->data.item.stack_count = *(signed char *)&count;
+        if (owner == player_entity) inv_store_item(stack);
         return;
     }
-    l_14 = a2 + found_object->data.item.stack_count;
-    if (l_14 >= 200) l_14 = 199;
-    found_object->data.item.stack_count = *(signed char *)&l_14;
+    total = count + found_object->data.item.stack_count;
+    if (total >= 200) total = 199;
+    found_object->data.item.stack_count = *(signed char *)&total;
 }

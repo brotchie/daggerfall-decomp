@@ -43,93 +43,93 @@ void classmaker_specials_remove(void)
         xn_mouse_poll_clamped();
 }
 
-void classmaker_set_advantage(int a1, int a2)
+void classmaker_set_advantage(int index, int clear)
 {
     int bit;
 
-    bit = classmaker_specials[classmaker_special_list][a1].bit;
-    switch (classmaker_specials[classmaker_special_list][a1].kind) {
+    bit = classmaker_specials[classmaker_special_list][index].bit;
+    switch (classmaker_specials[classmaker_special_list][index].kind) {
     case 0:
-        xn_bits_set_or_clear_u8(&player_class->resistance_flags, 1 << bit, a2);
+        xn_bits_set_or_clear_u8(&player_class->resistance_flags, 1 << bit, clear);
         break;
     case 1:
-        xn_bits_set_or_clear_u8(&player_class->immunity_flags, 1 << bit, a2);
+        xn_bits_set_or_clear_u8(&player_class->immunity_flags, 1 << bit, clear);
         break;
     case 2:
-        xn_bits_set_or_clear_u16(&player_class->flags, 1, a2);
+        xn_bits_set_or_clear_u16(&player_class->flags, 1, clear);
         break;
     case 3:
-        xn_bits_set_or_clear_u8(&player_class->spell_absorption_flags, 1 << bit, a2);
+        xn_bits_set_or_clear_u8(&player_class->spell_absorption_flags, 1 << bit, clear);
         break;
     case 4:
-        xn_bits_set_or_clear_u8(&player_class->rapid_healing_flags, 1 << bit, a2);
+        xn_bits_set_or_clear_u8(&player_class->rapid_healing_flags, 1 << bit, clear);
         break;
     case 5:
-        xn_bits_set_or_clear_u8(&player_class->regeneration_flags, 1 << bit, a2);
+        xn_bits_set_or_clear_u8(&player_class->regeneration_flags, 1 << bit, clear);
         break;
     case 6:
-        xn_bits_set_or_clear_u8(&player_class->attack_modifier_flags, 1 << bit, a2);
+        xn_bits_set_or_clear_u8(&player_class->attack_modifier_flags, 1 << bit, clear);
         break;
     case 7:
-        xn_bits_set_or_clear_u16(&player_class->flags, 2, a2);
+        xn_bits_set_or_clear_u16(&player_class->flags, 2, clear);
         break;
     case 8:
         player_class->flags &= 0xE3FF;
-        if (a2 == 0)
+        if (clear == 0)
             player_class->flags |= bit << 10;
         else
             player_class->flags = 5120;
         break;
     case 9:
-        xn_bits_set_or_clear_u16(&player_class->flags, 4, a2);
+        xn_bits_set_or_clear_u16(&player_class->flags, 4, clear);
         break;
     case 10:
-        xn_bits_set_or_clear_u8(&player_class->expert_weapons, 1 << bit, a2);
+        xn_bits_set_or_clear_u8(&player_class->expert_weapons, 1 << bit, clear);
         break;
     case 11:
-        xn_bits_set_or_clear_u8(&player_class->pad08, 1 << bit, a2);
+        xn_bits_set_or_clear_u8(&player_class->pad08, 1 << bit, clear);
         break;
     }
 }
 
-void classmaker_set_disadvantage(int a1, int a2)
+void classmaker_set_disadvantage(int index, int clear)
 {
     int bit;
 
-    bit = classmaker_specials[classmaker_special_list][a1].bit;
-    switch (classmaker_specials[classmaker_special_list][a1].kind) {
+    bit = classmaker_specials[classmaker_special_list][index].bit;
+    switch (classmaker_specials[classmaker_special_list][index].kind) {
     case 0:
-        xn_bits_set_or_clear_u16(&player_class->flags, 8, a2);
+        xn_bits_set_or_clear_u16(&player_class->flags, 8, clear);
         break;
     case 1:
-        xn_bits_set_or_clear_u16(&player_class->flags, (1 << bit) << 4, a2);
+        xn_bits_set_or_clear_u16(&player_class->flags, (1 << bit) << 4, clear);
         break;
     case 2:
-        xn_bits_set_or_clear_u16(&player_class->attack_modifier_flags, (1 << bit) << 4, a2);
+        xn_bits_set_or_clear_u16(&player_class->attack_modifier_flags, (1 << bit) << 4, clear);
         break;
     case 3:
-        xn_bits_set_or_clear_u16(&player_class->flags, (1 << bit) << 6, a2);
+        xn_bits_set_or_clear_u16(&player_class->flags, (1 << bit) << 6, clear);
         break;
     case 4:
-        xn_bits_set_or_clear_u16(&player_class->flags, (1 << bit) << 8, a2);
+        xn_bits_set_or_clear_u16(&player_class->flags, (1 << bit) << 8, clear);
         break;
     case 5:
-        xn_bits_set_or_clear_u16(&player_class->forbidden_equipment, 1 << bit, a2);
+        xn_bits_set_or_clear_u16(&player_class->forbidden_equipment, 1 << bit, clear);
         break;
     case 6:
-        xn_bits_set_or_clear_u8(&player_class->low_tolerance_flags, 1 << bit, a2);
+        xn_bits_set_or_clear_u8(&player_class->low_tolerance_flags, 1 << bit, clear);
         break;
     case 7:
-        xn_bits_set_or_clear_u8(&player_class->critical_weakness_flags, 1 << bit, a2);
+        xn_bits_set_or_clear_u8(&player_class->critical_weakness_flags, 1 << bit, clear);
         break;
     case 8:
-        xn_bits_set_or_clear_u16(&player_class->forbidden_equipment, (1 << bit) << 6, a2);
+        xn_bits_set_or_clear_u16(&player_class->forbidden_equipment, (1 << bit) << 6, clear);
         break;
     case 9:
-        xn_bits_set_or_clear_u16(&player_class->forbidden_equipment, (1 << bit) << 9, a2);
+        xn_bits_set_or_clear_u16(&player_class->forbidden_equipment, (1 << bit) << 9, clear);
         break;
     case 10:
-        xn_bits_set_or_clear_u16(&player_class->forbidden_materials, 1 << bit, a2);
+        xn_bits_set_or_clear_u16(&player_class->forbidden_materials, 1 << bit, clear);
         break;
     }
 }

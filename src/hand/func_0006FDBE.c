@@ -16,32 +16,32 @@ extern struct record *object_find_item(struct record *, int, int);
 
 int spellshop_build_list(void)
 {
-    int l_30;
-    int l_2C;
-    int l_28;
-    int l_24;
-    int l_20;
-    int l_1C;
+    int unused;
+    int i;
+    int base_chance;
+    int count;
+    int cost;
+    int chance;
 
-    l_24 = 0;
+    count = 0;
     if (object_find_item(player_entity, 27, 0) == 0)
         return 0;
     picklist_init(shared_picklist, 27, 30, 111, 131, 144, 29, 8, 15, 144, 150, 8, 15, 144, 45, 9, 104, 146, 146, 244, 114, 0);
-    l_28 = current_building->quality * 5 + 30;
-    while (l_24 == 0) {
-        for (l_2C = 0; l_2C < spell_record_count; l_2C++) {
-            if (spell_records[l_2C].name[0] == 0) continue;
-            if ((unsigned char)spell_records[l_2C].name[0] == 33) continue;
-            l_20 = spell_cost(&spell_records[l_2C], player_character);
-            while (l_20 > 95)
-                l_20 >>= 1;
-            l_1C = l_28 - l_20;
-            if (l_1C < 5)
-                l_1C = 5;
-            if (rand_range(1, 50) < l_1C) {
-                picklist_add(shared_picklist, spell_records[l_2C].name, 0);
-                scratch_buffer[l_24 + 20000] = l_2C;
-                l_24++;
+    base_chance = current_building->quality * 5 + 30;
+    while (count == 0) {
+        for (i = 0; i < spell_record_count; i++) {
+            if (spell_records[i].name[0] == 0) continue;
+            if ((unsigned char)spell_records[i].name[0] == 33) continue;
+            cost = spell_cost(&spell_records[i], player_character);
+            while (cost > 95)
+                cost >>= 1;
+            chance = base_chance - cost;
+            if (chance < 5)
+                chance = 5;
+            if (rand_range(1, 50) < chance) {
+                picklist_add(shared_picklist, spell_records[i].name, 0);
+                scratch_buffer[count + 20000] = i;
+                count++;
             }
         }
     }

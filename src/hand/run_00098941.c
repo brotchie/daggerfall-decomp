@@ -41,30 +41,30 @@ extern int xn_draw_image();
 
 void trade_mark_identified(void)
 {
-    unsigned char *l_18;
+    unsigned char *object;
 
-    l_18 = *(unsigned char **)(inv_right_container + 63);
-    while (l_18 != 0) {
-        l_18[113] |= 32;
-        l_18 = *(unsigned char **)(l_18 + 55);
+    object = *(unsigned char **)(inv_right_container + 63);
+    while (object != 0) {
+        object[113] |= 32;
+        object = *(unsigned char **)(object + 55);
     }
 }
 
 int trade_can_identify_selected(void)
 {
-    unsigned char *l_24;
-    int l_20;
-    int l_1C;
+    unsigned char *item;
+    int holiday;
+    int price;
 
-    l_24 = inv_selected_item + 71;
-    if (*(short *)(l_24 + 67) != -1) {
-        if (*(unsigned short *)(l_24 + 42) & 32) {
+    item = inv_selected_item + 71;
+    if (*(short *)(item + 67) != -1) {
+        if (*(unsigned short *)(item + 42) & 32) {
             msgbox_show_string(D_001832BC, 1);
             return 0;
         }
-        l_20 = holiday_today(game_minutes, current_region);
-        l_1C = (unsigned)(*(int *)(l_24 + 36) * 25) >> 8;
-        if (l_20 != 43 && gold_can_afford(l_1C) == 0 && ((struct bits8 *)&player_motion_flags)->b7 == 0) {
+        holiday = holiday_today(game_minutes, current_region);
+        price = (unsigned)(*(int *)(item + 36) * 25) >> 8;
+        if (holiday != 43 && gold_can_afford(price) == 0 && ((struct bits8 *)&player_motion_flags)->b7 == 0) {
             msgbox_show_string(D_0017729E, 1);
             return 0;
         }
@@ -76,12 +76,12 @@ int trade_can_identify_selected(void)
 
 void transport_menu(void)
 {
-    int l_20;
-    int l_1C;
-    int l_18;
+    int done;
+    int button;
+    int enabled;
 
-    l_20 = 0;
-    l_18 = 17;
+    done = 0;
+    enabled = 17;
     if (player_environment != 1) {
         hud_message_add(D_001772BC);
         return;
@@ -91,31 +91,31 @@ void transport_menu(void)
     scratch_190d16 = 0;
     travel_find_transport();
     if (func_00098B20() != 0) {
-        l_18 = 24;
+        enabled = 24;
     } else {
         if ((scratch_190d16 & 2) && player_environment == 1)
-            l_18 |= 2;
+            enabled |= 2;
         if ((scratch_190d16 & 1) && player_environment == 1)
-            l_18 |= 4;
+            enabled |= 4;
         if (*(int *)(player_character + 120) != 0 && player_environment != 3)
-            l_18 |= 8;
+            enabled |= 8;
     }
-    while (l_20 == 0) {
+    while (done == 0) {
         mouse_buttons_prev = mouse_buttons;
         xn_mouse_poll_clamped();
         xn_draw_image(*(unsigned short *)D_00195B5C, *(unsigned short *)(D_00195B5C + 2), *(unsigned short *)(D_00195B5C + 4), *(unsigned short *)(D_00195B5C + 6), D_00195B5C + 12);
-        for (l_1C = 0; l_1C < 4; l_1C++) {
-            if (((1 << l_1C) & l_18) == 0)
-                xn_draw_image(transport_buttons[l_1C].x0, transport_buttons[l_1C].y0, *(unsigned short *)(D_00195B60 + 4), 9, D_00195B60 + 12 + l_1C * (*(unsigned short *)(D_00195B60 + 4) * 9));
+        for (button = 0; button < 4; button++) {
+            if (((1 << button) & enabled) == 0)
+                xn_draw_image(transport_buttons[button].x0, transport_buttons[button].y0, *(unsigned short *)(D_00195B60 + 4), 9, D_00195B60 + 12 + button * (*(unsigned short *)(D_00195B60 + 4) * 9));
         }
         cursor_draw_arrow();
         if (mouse_buttons != 0 && mouse_buttons_prev == 0) {
-            for (l_1C = 0; l_1C < 5; l_1C++) {
-                if ((1 << l_1C) & l_18) {
-                    if (mouse_x > transport_buttons[l_1C].x0 && mouse_x < transport_buttons[l_1C].x1 && mouse_y > transport_buttons[l_1C].y0 && mouse_y < transport_buttons[l_1C].y1) {
-                        if (transport_buttons[l_1C].fn != 0)
-                            transport_buttons[l_1C].fn(l_1C);
-                        l_20 = 1;
+            for (button = 0; button < 5; button++) {
+                if ((1 << button) & enabled) {
+                    if (mouse_x > transport_buttons[button].x0 && mouse_x < transport_buttons[button].x1 && mouse_y > transport_buttons[button].y0 && mouse_y < transport_buttons[button].y1) {
+                        if (transport_buttons[button].fn != 0)
+                            transport_buttons[button].fn(button);
+                        done = 1;
                     }
                 }
             }
@@ -132,9 +132,9 @@ void transport_menu(void)
     }
 }
 
-void transport_choose(int a1)
+void transport_choose(int button)
 {
-    switch (a1) {
+    switch (button) {
     case 0:
         player_character[65] &= 249;
         player_horse_sounds_stop();

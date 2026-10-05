@@ -21,11 +21,11 @@ extern int lseek(unsigned short, int, int);
 extern int xn_kbd_wait_all_released();
 extern int xn_mouse_poll_clamped();
 
-int pflc_play(int a1, struct Snd *s)
+int pflc_play(int file_name, struct Snd *s)
 {
     int t0;
 
-    if (flc_open(a1, s) == 0)
+    if (flc_open(file_name, s) == 0)
         return 1;
     s->state = 255;
     while (mouse_buttons != 0)

@@ -4,10 +4,10 @@ struct anim {
     unsigned char flags;
     char pad1;
     unsigned short handle;
-    short a4;
-    short a6;
-    short a8;
-    int a10;
+    short frame_count;
+    short frames_left;
+    short ticks_per_frame;
+    int loop_offset;
     short x;
     short y;
     short w;
@@ -25,61 +25,61 @@ struct hdr {
 };
 struct info {
     char pad0[6];
-    short a6;
-    short w8;
-    short h10;
+    short frames;
+    short width;
+    short height;
     char pad12[4];
-    unsigned size;
+    unsigned speed;
     char pad20[60];
-    int seek;
-    int a84;
+    int frame1_offset;
+    int frame2_offset;
     char pad88[40];
 };
 #pragma pack()
 extern char D_00175404[];
-extern unsigned short disk_open_data(int);
+extern unsigned short disk_open_data(char *);
 extern int mc_memset();
 extern int lseek(int, int, int);
 extern char *mc_malloc(int, char *, int);
 extern int read(int, void *, int);
 
-int flc_open(int a1, struct anim *a2)
+int flc_open(char *name, struct anim *anim)
 {
-    struct info l_A8;
-    struct hdr l_28;
+    struct info header;
+    struct hdr chunk;
 
-    a2->handle = disk_open_data(a1);
-    if (a2->handle < 1)
+    anim->handle = disk_open_data(name);
+    if (anim->handle < 1)
         return 0;
-    read(a2->handle, &l_A8, 128);
-    a2->a4 = l_A8.a6;
-    a2->a8 = l_A8.size / 55 + 1;
-    a2->w = l_A8.w8;
-    a2->h = l_A8.h10;
-    a2->y = a2->x = 0;
-    a2->a10 = l_A8.a84;
-    if (a2->buf0 == 0) {
-        a2->flags |= 1;
-        a2->buf0 = mc_malloc(a2->w * a2->h, D_00175404, 225);
+    read(anim->handle, &header, 128);
+    anim->frame_count = header.frames;
+    anim->ticks_per_frame = header.speed / 55 + 1;
+    anim->w = header.width;
+    anim->h = header.height;
+    anim->y = anim->x = 0;
+    anim->loop_offset = header.frame2_offset;
+    if (anim->buf0 == 0) {
+        anim->flags |= 1;
+        anim->buf0 = mc_malloc(anim->w * anim->h, D_00175404, 225);
     }
-    if (a2->buf1 == 0) {
-        a2->flags |= 2;
-        a2->buf1 = mc_malloc(2050, D_00175404, 231);
+    if (anim->buf1 == 0) {
+        anim->flags |= 2;
+        anim->buf1 = mc_malloc(2050, D_00175404, 231);
     }
-    mc_memset(a2->buf1, 0, 2050, D_00175404, 233, 4);
-    read(a2->handle, &l_28, 10);
-    if ((unsigned short)l_28.x == 0xF100) {
-        read(a2->handle, &l_28, 8);
-        if (l_28.type == 3) {
-            a2->x = l_28.x - (a2->w >> 1);
-            a2->y = l_28.y - (a2->h >> 1);
+    mc_memset(anim->buf1, 0, 2050, D_00175404, 233, 4);
+    read(anim->handle, &chunk, 10);
+    if ((unsigned short)chunk.x == 0xF100) {
+        read(anim->handle, &chunk, 8);
+        if (chunk.type == 3) {
+            anim->x = chunk.x - (anim->w >> 1);
+            anim->y = chunk.y - (anim->h >> 1);
         }
     }
-    lseek(a2->handle, l_A8.seek, 0);
-    a2->a6 = 1;
-    if (a2->buf2 == 0) {
-        a2->flags |= 64;
-        a2->buf2 = mc_malloc(a2->w * a2->h, D_00175404, 255);
+    lseek(anim->handle, header.frame1_offset, 0);
+    anim->frames_left = 1;
+    if (anim->buf2 == 0) {
+        anim->flags |= 64;
+        anim->buf2 = mc_malloc(anim->w * anim->h, D_00175404, 255);
     }
     return 1;
 }

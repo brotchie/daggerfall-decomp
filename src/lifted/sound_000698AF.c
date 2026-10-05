@@ -8,10 +8,10 @@ extern signed char sound_enabled;
 
 extern int func_000A1D3C();
 
-void sound_set_volume(int a1)
+void sound_set_volume(int volume)
 {
     if (sound_enabled == 0) return;
     if (D_0018DD54 == (-1)) return;
-    func_000A1D3C(a1);
-    D_00186DEC = a1;
+    func_000A1D3C(volume);
+    D_00186DEC = volume;
 }

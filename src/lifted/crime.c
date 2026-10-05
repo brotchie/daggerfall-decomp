@@ -57,9 +57,9 @@ void court_restore_vitals(void);
 
 void court_frame(void)
 {
-    int l_20;
-    int l_1C;
-    int l_18;
+    int skill_value;
+    int chance;
+    int unused;
 
     if (court_open(0) == 0) return;
     mc_memcpy(screen_buffer, window_image, 64000, (int)D_001706E1, 172, 4);
@@ -129,18 +129,18 @@ void court_frame(void)
         return;
     case 8:
         if (((int)D_00196271) == 2) {
-            l_20 = player_character->skills[2].value;
+            skill_value = player_character->skills[2].value;
         } else {
-            l_20 = player_character->skills[1].value;
+            skill_value = player_character->skills[1].value;
         }
-        skill_add_uses(l_20, 1);
-        l_1C = ((player_character->attributes[5] + l_20) / 2) + ((int)(short)*(short *)(region_legal_reputation + (((int)(unsigned char)current_region) * 80)));
-        if (l_1C < 5) {
-            l_1C = 5;
-        } else if (l_1C > 95) {
-            l_1C = 95;
+        skill_add_uses(skill_value, 1);
+        chance = ((player_character->attributes[5] + skill_value) / 2) + ((int)(short)*(short *)(region_legal_reputation + (((int)(unsigned char)current_region) * 80)));
+        if (chance < 5) {
+            chance = 5;
+        } else if (chance > 95) {
+            chance = 95;
         }
-        if (rand_range(1, 100) <= l_1C) {
+        if (rand_range(1, 100) <= chance) {
             msgbox_show_rsc(8062, 1);
             court_state = 9;
             return;
@@ -153,11 +153,11 @@ void court_frame(void)
             court_state = 6;
             return;
         }
-        l_1C = rand_range(1, 100);
-        l_1C += (int)(short)*(short *)(region_legal_reputation + (((int)(unsigned char)current_region) * 80));
-        if (l_1C > 75) {
+        chance = rand_range(1, 100);
+        chance += (int)(short)*(short *)(region_legal_reputation + (((int)(unsigned char)current_region) * 80));
+        if (chance > 75) {
             scratch_190cac >>= 1;
-        } else if (l_1C < 25) {
+        } else if (chance < 25) {
             scratch_190cac <<= 1;
         }
         court_state = 2;
@@ -174,31 +174,31 @@ void court_frame(void)
 
 void crime_reputation_penalty(void)
 {
-    int l_18;
+    int faction;
 
     *(short *)(region_legal_reputation + (((int)(unsigned char)current_region) * 80)) -= *(short *)(D_00179EA8 + (((int)(unsigned char)crime_current) << 2));
-    l_18 = faction_find_type_in_region((int)(short)((int)(unsigned char)current_region), 15);
-    faction_change_reputation(l_18, -(*(int *)(D_00179EA8 + (((int)(unsigned char)crime_current) << 2)) >> 1));
+    faction = faction_find_type_in_region((int)(short)((int)(unsigned char)current_region), 15);
+    faction_change_reputation(faction, -(*(int *)(D_00179EA8 + (((int)(unsigned char)crime_current) << 2)) >> 1));
 }
 
 void court_reputation_restore(void)
 {
-    int l_18;
+    int faction;
 
     *(short *)(region_legal_reputation + (((int)(unsigned char)current_region) * 80)) += *(short *)court_reputation_change - 1;
-    l_18 = faction_find_type_in_region((int)(short)((int)(unsigned char)current_region), 15);
-    faction_change_reputation(l_18, (-(*(int *)court_reputation_change - 1)) / 2);
+    faction = faction_find_type_in_region((int)(short)((int)(unsigned char)current_region), 15);
+    faction_change_reputation(faction, (-(*(int *)court_reputation_change - 1)) / 2);
     D_001A4A70[0] = (D_001A4A74 = 0);
     D_001962B2 = 1;
 }
 
 void court_close(void)
 {
-    short l_18;
+    short fatigue;
 
-    *(int *)&l_18 = player_character->fatigue;
+    *(int *)&fatigue = player_character->fatigue;
     time_pass(240);
-    player_character->fatigue = *(int *)&l_18;
+    player_character->fatigue = *(int *)&fatigue;
     D_00187CA8 = 1;
     game_mode = 0;
     D_00196272 = 0;
@@ -212,11 +212,11 @@ void court_close(void)
 
 void court_remove_creatures(void)
 {
-    int l_18;
+    int i;
 
-    for (l_18 = 0; l_18 < creature_count; l_18++) {
-        if ((int)creature_list[l_18] == (int)player_entity) continue;
-        object_delete((int)creature_list[l_18]);
+    for (i = 0; i < creature_count; i++) {
+        if ((int)creature_list[i] == (int)player_entity) continue;
+        object_delete((int)creature_list[i]);
     }
 }
 

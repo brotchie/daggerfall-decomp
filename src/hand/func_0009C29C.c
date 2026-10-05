@@ -24,12 +24,12 @@ extern int xn_math_angle_to_point(int, int, int, int);
 
 void func_0009C29C(void)
 {
-    int l_24;
-    int l_20;
-    int l_1C;
-    int l_18;
+    int unused;
+    int minutes;
+    int saved_fatigue;
+    int direction;
 
-    l_18 = (((xn_math_angle_to_point(player_object->x, player_object->z, region_locations[travel_selected_location].x_type_flags & 0x1ffffff, region_locations[travel_selected_location].z_size & 0xffffff) >> 2) + 32) & 511) >> 6;
+    direction = (((xn_math_angle_to_point(player_object->x, player_object->z, region_locations[travel_selected_location].x_type_flags & 0x1ffffff, region_locations[travel_selected_location].z_size & 0xffffff) >> 2) + 32) & 511) >> 6;
     if ((mouse_buttons & 1) == 0 || (mouse_buttons_prev & 1) != 0)
         return;
     sound_play(203, player_object, 110);
@@ -38,14 +38,14 @@ void func_0009C29C(void)
     quests_suspended = 1;
     D_00196294 = 1;
     D_00187CA8 = 1;
-    l_1C = player_character->fatigue;
-    l_20 = travel_route(player_object->x, player_object->z, D_001AA678, D_001AA67C, 1);
+    saved_fatigue = player_character->fatigue;
+    minutes = travel_route(player_object->x, player_object->z, D_001AA678, D_001AA67C, 1);
     func_0009BE38();
     travel_button_exit(100);
-    if (l_20 != -1)
+    if (minutes != -1)
         map_goto_location(D_001889BC, 1, travel_selected_location, 0);
-    if (l_20 != -1)
-        location_place_player_at_edge(l_18);
+    if (minutes != -1)
+        location_place_player_at_edge(direction);
     quests_suspended = 0;
     D_00196294 = 0;
 }

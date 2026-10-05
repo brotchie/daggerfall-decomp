@@ -75,151 +75,151 @@ void sound_stop_channel(int);
 void music_stop(void);
 void sound_stop_all(void);
 
-void sound_channel_set_source(struct record *a1, int a2)
+void sound_channel_set_source(struct record *object, int channel)
 {
-    *(int *)(D_001A3BE4 + (a2 * 268)) = (int)a1;
-    if (a1 == 0) return;
-    mc_memcpy((((int)sound_channels) + (a2 * 268)) + 256, (int)&a1->x, 12, (int)D_00175ACC, 95, 4);
+    *(int *)(D_001A3BE4 + (channel * 268)) = (int)object;
+    if (object == 0) return;
+    mc_memcpy((((int)sound_channels) + (channel * 268)) + 256, (int)&object->x, 12, (int)D_00175ACC, 95, 4);
 }
 
-void sound_volume_pan(int a1, int a2, int a3, int a4, int a5)
+void sound_volume_pan(int *listener, int *source, int *volume, int *pan, struct record *object)
 {
-    int l_1C;
-    int l_18;
-    int l_14;
-    int l_10;
-    int l_C;
+    int range;
+    int distance;
+    int angle;
+    int offset;
+    int saved_distance;
 
-    mc_memcpy(a1, a2, 12, (int)D_00175ACC, 148, 4);
-    a1 = (int)&player_object->x;
-    l_18 = xn_math_approx_hypot(*(int *)((char *)a1 + 4) - *(int *)((char *)a2 + 4), xn_math_approx_dist2d(*(int *)((char *)a1), *(int *)((char *)a1 + 8), *(int *)((char *)a2), *(int *)((char *)a2 + 8)));
-    l_C = l_18;
-    if (l_18 < 25) {
-        *(int *)((char *)a3) = (((int)(short)game_settings->sound_volume) * 32767) / 128;
-        *(int *)((char *)a4) = 32768;
+    mc_memcpy(listener, source, 12, (int)D_00175ACC, 148, 4);
+    listener = &player_object->x;
+    distance = xn_math_approx_hypot(listener[1] - source[1], xn_math_approx_dist2d(listener[0], listener[2], source[0], source[2]));
+    saved_distance = distance;
+    if (distance < 25) {
+        *volume = (((int)(short)game_settings->sound_volume) * 32767) / 128;
+        *pan = 32768;
         return;
     }
-    l_1C = D_001A3F2C;
-    if (l_18 > l_1C) {
-        *(int *)((char *)a3) = 0;
+    range = D_001A3F2C;
+    if (distance > range) {
+        *volume = 0;
     } else {
-        *(int *)((char *)a3) = 32767 - ((l_18 * 32767) / l_1C);
+        *volume = 32767 - ((distance * 32767) / range);
     }
-    if (*(int *)((char *)a3) > 32767) *(int *)((char *)a3) = 32767;
-    l_14 = xn_math_angle_to_point(*(int *)((char *)a1), *(int *)((char *)a1 + 8), *(int *)((char *)a2), *(int *)((char *)a2 + 8));
-    l_10 = ai_angle_diff(player_object->yaw, l_14, (int)&l_18);
-    if (l_10 > 512) l_10 = 512 - (l_10 - 512);
-    l_10 = (l_10 << 15) / 512;
-    if (cfg_stereo != 0) l_10 = -l_10;
-    if (l_18 > 0) {
-        *(int *)((char *)a4) = l_10 + 32768;
+    if (*volume > 32767) *volume = 32767;
+    angle = xn_math_angle_to_point(listener[0], listener[2], source[0], source[2]);
+    offset = ai_angle_diff(player_object->yaw, angle, (int)&distance);
+    if (offset > 512) offset = 512 - (offset - 512);
+    offset = (offset << 15) / 512;
+    if (cfg_stereo != 0) offset = -offset;
+    if (distance > 0) {
+        *pan = offset + 32768;
     } else {
-        *(int *)((char *)a4) = 32768 - l_10;
+        *pan = 32768 - offset;
     }
-    *(int *)((char *)a3) = (*(int *)((char *)a3) * ((int)(short)game_settings->sound_volume)) / 128;
+    *volume = (*volume * ((int)(short)game_settings->sound_volume)) / 128;
 }
 
-int func_00069281(int a1, int a2)
+int func_00069281(int sample, int length)
 {
-    int l_28;
-    int l_24;
-    int l_20;
-    int l_1C;
-    int l_18;
+    int channel;
+    int volume;
+    int pan;
+    int unused;
+    int loop;
 
-    l_18 = 1;
+    loop = 1;
     if (sound_enabled == 0) return -1;
     if (D_0018DD5C == (-1)) return -1;
-    for (l_28 = 0; l_28 < 3; l_28++) {
-        if (*(int *)(D_001A3BD8 + (l_28 * 268)) == 305419896) break;
-        if ((short)func_000A2460(D_0018DD60, *(int *)(D_001A3BD8 + (l_28 * 268))) != 0) break;
+    for (channel = 0; channel < 3; channel++) {
+        if (*(int *)(D_001A3BD8 + (channel * 268)) == 305419896) break;
+        if ((short)func_000A2460(D_0018DD60, *(int *)(D_001A3BD8 + (channel * 268))) != 0) break;
     }
-    if (l_28 == 3) {
-        for (l_28 = 0; l_28 < 3; l_28++) {
-            if (*(int *)(D_001A3BDC + (l_28 * 268)) < 127) {
-                func_000A2687(D_0018DD60, *(int *)(D_001A3BD8 + (l_28 * 268)));
+    if (channel == 3) {
+        for (channel = 0; channel < 3; channel++) {
+            if (*(int *)(D_001A3BDC + (channel * 268)) < 127) {
+                func_000A2687(D_0018DD60, *(int *)(D_001A3BD8 + (channel * 268)));
                 break;
             }
         }
     }
-    if (l_28 == 3) return -1;
-    l_24 = 32767;
-    l_20 = 32768;
-    mc_memset(((int)sound_channels) + (l_28 * 268), 0, 240, (int)D_00175ACC, 291, 4);
-    *(int *)(D_001A3BDC + (l_28 * 268)) = 127;
-    *(int *)(sound_channels + (l_28 * 268)) = a1;
-    *(int *)(D_001A3AF4 + (l_28 * 268)) = a2;
-    *(int *)(D_001A3B14 + (l_28 * 268)) = ((int)(short)*(short *)&l_24) | (((int)(short)*(short *)&l_24) << 16);
-    *(int *)(D_001A3B1C + (l_28 * 268)) = 11111;
-    *(int *)(D_001A3B28 + (l_28 * 268)) = 32768;
-    *(int *)(D_001A3B2C + (l_28 * 268)) = l_20;
-    *(int *)(D_001A3B18 + (l_28 * 268)) = ((l_18 != 0) ? -1 : 0);
-    *(int *)(D_001A3AF8 + (l_28 * 268)) = a2;
-    *(int *)(D_001A3B20 + (l_28 * 268)) = 8;
-    *(int *)(D_001A3B24 + (l_28 * 268)) = 1;
-    *(int *)(D_001A3BE4 + (l_28 * 268)) = 0;
-    *(int *)(D_001A3BD8 + (l_28 * 268)) = func_000A2504(D_0018DD60, ((int)sound_channels) + (l_28 * 268));
-    return l_28;
+    if (channel == 3) return -1;
+    volume = 32767;
+    pan = 32768;
+    mc_memset(((int)sound_channels) + (channel * 268), 0, 240, (int)D_00175ACC, 291, 4);
+    *(int *)(D_001A3BDC + (channel * 268)) = 127;
+    *(int *)(sound_channels + (channel * 268)) = sample;
+    *(int *)(D_001A3AF4 + (channel * 268)) = length;
+    *(int *)(D_001A3B14 + (channel * 268)) = ((int)(short)*(short *)&volume) | (((int)(short)*(short *)&volume) << 16);
+    *(int *)(D_001A3B1C + (channel * 268)) = 11111;
+    *(int *)(D_001A3B28 + (channel * 268)) = 32768;
+    *(int *)(D_001A3B2C + (channel * 268)) = pan;
+    *(int *)(D_001A3B18 + (channel * 268)) = ((loop != 0) ? -1 : 0);
+    *(int *)(D_001A3AF8 + (channel * 268)) = length;
+    *(int *)(D_001A3B20 + (channel * 268)) = 8;
+    *(int *)(D_001A3B24 + (channel * 268)) = 1;
+    *(int *)(D_001A3BE4 + (channel * 268)) = 0;
+    *(int *)(D_001A3BD8 + (channel * 268)) = func_000A2504(D_0018DD60, ((int)sound_channels) + (channel * 268));
+    return channel;
 }
 
-int sound_play_sample_flat(int a1, int a2)
+int sound_play_sample_flat(int sample, int length)
 {
-    int l_28;
-    int l_24;
-    int l_20;
-    int l_1C;
-    int l_18;
+    int channel;
+    int unused1;
+    int unused2;
+    int unused3;
+    int loop;
 
-    l_18 = 0;
+    loop = 0;
     if (sound_enabled == 0) return -1;
     if (D_0018DD5C == (-1)) return -1;
-    for (l_28 = 0; l_28 < 3; l_28++) {
-        if (*(int *)(D_001A3BD8 + (l_28 * 268)) == 305419896) break;
-        if ((short)func_000A2460(D_0018DD60, *(int *)(D_001A3BD8 + (l_28 * 268))) != 0) break;
+    for (channel = 0; channel < 3; channel++) {
+        if (*(int *)(D_001A3BD8 + (channel * 268)) == 305419896) break;
+        if ((short)func_000A2460(D_0018DD60, *(int *)(D_001A3BD8 + (channel * 268))) != 0) break;
     }
-    if (l_28 == 3) {
-        for (l_28 = 0; l_28 < 3; l_28++) {
-            if (*(int *)(D_001A3BDC + (l_28 * 268)) < 90) {
-                func_000A2687(D_0018DD60, *(int *)(D_001A3BD8 + (l_28 * 268)));
+    if (channel == 3) {
+        for (channel = 0; channel < 3; channel++) {
+            if (*(int *)(D_001A3BDC + (channel * 268)) < 90) {
+                func_000A2687(D_0018DD60, *(int *)(D_001A3BD8 + (channel * 268)));
                 break;
             }
         }
     }
-    if (l_28 == 3) return -1;
-    mc_memset(((int)sound_channels) + (l_28 * 268), 0, 240, (int)D_00175ACC, 336, 4);
-    *(int *)(D_001A3BDC + (l_28 * 268)) = 90;
-    *(int *)(sound_channels + (l_28 * 268)) = a1;
-    *(int *)(D_001A3AF4 + (l_28 * 268)) = a2;
-    *(int *)(D_001A3B14 + (l_28 * 268)) = 2147450879;
-    *(int *)(D_001A3B1C + (l_28 * 268)) = 11025;
-    *(int *)(D_001A3B28 + (l_28 * 268)) = 32768;
-    *(int *)(D_001A3B2C + (l_28 * 268)) = 32768;
-    *(int *)(D_001A3B20 + (l_28 * 268)) = 8;
-    *(int *)(D_001A3B24 + (l_28 * 268)) = 1;
-    *(int *)(D_001A3BE4 + (l_28 * 268)) = 0;
-    *(int *)(D_001A3BD8 + (l_28 * 268)) = func_000A2504(D_0018DD60, ((int)sound_channels) + (l_28 * 268));
-    return l_28;
+    if (channel == 3) return -1;
+    mc_memset(((int)sound_channels) + (channel * 268), 0, 240, (int)D_00175ACC, 336, 4);
+    *(int *)(D_001A3BDC + (channel * 268)) = 90;
+    *(int *)(sound_channels + (channel * 268)) = sample;
+    *(int *)(D_001A3AF4 + (channel * 268)) = length;
+    *(int *)(D_001A3B14 + (channel * 268)) = 2147450879;
+    *(int *)(D_001A3B1C + (channel * 268)) = 11025;
+    *(int *)(D_001A3B28 + (channel * 268)) = 32768;
+    *(int *)(D_001A3B2C + (channel * 268)) = 32768;
+    *(int *)(D_001A3B20 + (channel * 268)) = 8;
+    *(int *)(D_001A3B24 + (channel * 268)) = 1;
+    *(int *)(D_001A3BE4 + (channel * 268)) = 0;
+    *(int *)(D_001A3BD8 + (channel * 268)) = func_000A2504(D_0018DD60, ((int)sound_channels) + (channel * 268));
+    return channel;
 }
 
-void sound_stop_channel(int a1)
+void sound_stop_channel(int channel)
 {
-    if (*(int *)(D_001A3BD8 + (a1 * 268)) == 305419896) return;
-    func_000A2687(D_0018DD60, *(int *)(D_001A3BD8 + (a1 * 268)));
-    *(int *)(D_001A3BD8 + (a1 * 268)) = 305419896;
+    if (*(int *)(D_001A3BD8 + (channel * 268)) == 305419896) return;
+    func_000A2687(D_0018DD60, *(int *)(D_001A3BD8 + (channel * 268)));
+    *(int *)(D_001A3BD8 + (channel * 268)) = 305419896;
 }
 
-int sound_channel_done(int a1)
+int sound_channel_done(int channel)
 {
-    if (*(int *)(D_001A3BD8 + (a1 * 268)) == 305419896) return 1;
-    return (int)(short)func_000A2460(D_0018DD60, *(int *)(D_001A3BD8 + (a1 * 268)));
+    if (*(int *)(D_001A3BD8 + (channel * 268)) == 305419896) return 1;
+    return (int)(short)func_000A2460(D_0018DD60, *(int *)(D_001A3BD8 + (channel * 268)));
 }
 
-void music_play(int a1)
+void music_play(char *name)
 {
     if (sound_enabled == 0) return;
-    if (stricmp((int)music_current, a1) == 0) return;
+    if (stricmp((int)music_current, name) == 0) return;
     music_stop();
-    mc_strncpy((int)music_current, a1, 13, (int)D_00175ACC, 374);
+    mc_strncpy((int)music_current, name, 13, (int)D_00175ACC, 374);
     D_001A3F30 = sos_load_song((int)music_current);
     if (D_0018DC34 != 0) {
         dpmi_lock_region(D_0018DC34, func_000A277F(D_0018DC34));
@@ -256,55 +256,55 @@ void music_update(void)
     func_000A27A0(D_001A3F30);
 }
 
-int sound_play(int a1, struct record *a2, int a3)
+int sound_play(int id, struct record *object, int priority)
 {
-    int l_14;
+    int sample;
 
     if (sound_enabled == 0) return -1;
-    l_14 = sound_cache_load(a1);
-    return sound_play_sample(l_14, sound_last_size, a2, a3);
+    sample = sound_cache_load(id);
+    return sound_play_sample(sample, sound_last_size, object, priority);
 }
 
-int sound_play_ui(int a1)
+int sound_play_ui(int id)
 {
-    int l_1C;
+    int sample;
 
     if (sound_enabled == 0) return -1;
-    l_1C = sound_cache_load(a1);
-    return sound_play_sample_flat(l_1C, sound_last_size);
+    sample = sound_cache_load(id);
+    return sound_play_sample_flat(sample, sound_last_size);
 }
 
-int sound_play_ambient_loop(int a1, struct record *a2, int a3)
+int sound_play_ambient_loop(int id, struct record *object, int priority)
 {
-    int l_14;
+    int sample;
 
     if (sound_enabled == 0) return -1;
-    l_14 = sound_cache_load(a1);
-    return sound_play_sample(l_14, sound_last_size, a2, -1);
+    sample = sound_cache_load(id);
+    return sound_play_sample(sample, sound_last_size, object, -1);
 }
 
-int sound_play_loop(int a1, struct record *a2, int a3)
+int sound_play_loop(int id, struct record *object, int priority)
 {
-    int l_14;
+    int sample;
 
     if (sound_enabled == 0) return -1;
-    l_14 = sound_cache_load(a1);
-    return sound_play_sample(l_14, sound_last_size, a2, -2);
+    sample = sound_cache_load(id);
+    return sound_play_sample(sample, sound_last_size, object, -2);
 }
 
-int sound_timer_add(int a1, int a2)
+int sound_timer_add(int callback, int rate)
 {
-    int l_18;
+    int handle;
 
     if (sound_enabled == 0) return -1;
-    func_0009E2BB(a2, a1, (int)&l_18);
-    return l_18;
+    func_0009E2BB(rate, callback, (int)&handle);
+    return handle;
 }
 
-void sound_timer_remove(int a1)
+void sound_timer_remove(int handle)
 {
     if (sound_enabled == 0) return;
-    func_0009E61A(a1);
+    func_0009E61A(handle);
 }
 
 void sound_update_ambient(void)
@@ -371,14 +371,14 @@ void sound_stop_ambient(void)
 
 void sound_stop_all(void)
 {
-    int l_18;
+    int channel;
 
-    for (l_18 = 0; l_18 < 4; l_18++) {
-        if (*(int *)(D_001A3BD8 + (l_18 * 268)) == 305419896) continue;
-        if ((short)func_000A2460(D_0018DD60, *(int *)(D_001A3BD8 + (l_18 * 268))) == 0) {
-            func_000A2687(D_0018DD60, *(int *)(D_001A3BD8 + (l_18 * 268)));
+    for (channel = 0; channel < 4; channel++) {
+        if (*(int *)(D_001A3BD8 + (channel * 268)) == 305419896) continue;
+        if ((short)func_000A2460(D_0018DD60, *(int *)(D_001A3BD8 + (channel * 268))) == 0) {
+            func_000A2687(D_0018DD60, *(int *)(D_001A3BD8 + (channel * 268)));
         }
-        *(int *)(D_001A3BD8 + (l_18 * 268)) = 305419896;
+        *(int *)(D_001A3BD8 + (channel * 268)) = 305419896;
     }
     D_001A5AD0 = -1;
 }

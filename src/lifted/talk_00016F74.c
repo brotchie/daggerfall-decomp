@@ -7,22 +7,22 @@ extern int talk_question_line_count;
 
 extern void text_draw_coloured(int, int, int, int, unsigned char);
 
-void talk_draw_question(int a1, int a2, int a3, int a4)
+void talk_draw_question(int left, int top, int right, int bottom)
 {
-    int l_14;
-    int l_10;
-    int l_C;
+    int max_lines;
+    int row;
+    int line;
 
-    l_10 = 0;
+    row = 0;
     if (talk_question_line_count == 0) return;
-    l_14 = a4 - (a2 / 7);
-    if (talk_question_line_count < l_14) {
-        l_C = 0;
+    max_lines = bottom - (top / 7);
+    if (talk_question_line_count < max_lines) {
+        line = 0;
     } else {
-        l_C = talk_question_line_count - l_14;
+        line = talk_question_line_count - max_lines;
     }
-    while (l_C < talk_question_line_count) {
-        text_draw_coloured(*(int *)((char *)(int)(talk_question_lines + (l_C++ << 2))), (int)(short)*(short *)&a1, (int)(short)((l_10 * 7) + a2), 145, 156);
-        l_10++;
+    while (line < talk_question_line_count) {
+        text_draw_coloured(*(int *)((char *)(int)(talk_question_lines + (line++ << 2))), (int)(short)*(short *)&left, (int)(short)((row * 7) + top), 145, 156);
+        row++;
     }
 }

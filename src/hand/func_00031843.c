@@ -11,43 +11,43 @@ extern struct faction *faction_find(short);
 extern int quest_dispatch_event(struct quest *);
 extern void *quest_section(struct quest *, int);
 
-int func_00031843(short a1, struct record *a2, struct record *a3)
+int func_00031843(short event_code, struct record *event_object, struct record *event_object2)
 {
-    short id;
+    short faction_id;
     int unused;
-    struct qbn_person *p;
+    struct qbn_person *qbn_person;
     int i;
-    int res;
-    struct record *t;
+    int result;
+    struct record *object;
 
-    res = 0;
+    result = 0;
     if (quests_suspended != 0)
         return 0;
     /* a person's (type 8) data starts with its faction id; a quest NPC (type 65) has it at +0x19 */
-    if (a2->type == 8)
-        id = (short)a2->data.person.faction_id;
-    else if (a3->type == 8)
-        id = (short)a3->data.person.faction_id;
+    if (event_object->type == 8)
+        faction_id = (short)event_object->data.person.faction_id;
+    else if (event_object2->type == 8)
+        faction_id = (short)event_object2->data.person.faction_id;
     else
         return 0;
-    if (faction_find(id)->type != 4)
+    if (faction_find(faction_id)->type != 4)
         return 0;
-    t = quest_root->children;
-    while (t != 0) {
-        if (t->type == 14) {
-            current_quest = &t->data.quest;
-            p = quest_section(current_quest, 3);
-            for (i = 0; i < current_quest->section_counts[3]; p++, i++) {
-                if (p->object->type == 65 && id == (unsigned short)p->object->faction_id) {
-                    quest_event_code = a1;
-                    quest_event_object = a2;
-                    quest_event_object2 = a3;
-                    res |= quest_dispatch_event(current_quest);
+    object = quest_root->children;
+    while (object != 0) {
+        if (object->type == 14) {
+            current_quest = &object->data.quest;
+            qbn_person = quest_section(current_quest, 3);
+            for (i = 0; i < current_quest->section_counts[3]; qbn_person++, i++) {
+                if (qbn_person->object->type == 65 && faction_id == (unsigned short)qbn_person->object->faction_id) {
+                    quest_event_code = event_code;
+                    quest_event_object = event_object;
+                    quest_event_object2 = event_object2;
+                    result |= quest_dispatch_event(current_quest);
                     continue;
                 }
             }
         }
-        t = t->next;
+        object = object->next;
     }
-    return res;
+    return result;
 }

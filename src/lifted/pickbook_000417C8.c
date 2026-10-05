@@ -30,15 +30,15 @@ extern int mc_memcpy();
 extern int xn_font_select();
 extern void hud_status_set(int);
 
-int spellbook_open(short a1)
+int spellbook_open(short force)
 {
-    int l_20;
+    int is_open;
 
     if (((int)D_0019626F) == 5 && ((int)(unsigned char)game_mode) == 8) {
         return 1;
     }
     if (player_death_timer > 0) return 0;
-    if (a1 != 0 || (game_mode == 0 && key_action_held(28) != 0)) {
+    if (force != 0 || (game_mode == 0 && key_action_held(28) != 0)) {
         if (spell_cast_busy != 0) {
             hud_status_set(D_00184876);
             return 0;
@@ -58,9 +58,9 @@ int spellbook_open(short a1)
         sound_play(237, player_object, 100);
     }
     if (((int)(unsigned char)game_mode) == 5) {
-        l_20 = 1;
+        is_open = 1;
     } else {
-        l_20 = 0;
+        is_open = 0;
     }
-    return l_20;
+    return is_open;
 }

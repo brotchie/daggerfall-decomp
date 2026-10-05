@@ -6,50 +6,50 @@
 extern short font_height;
 extern char D_00176E38[];
 
-extern int font_text_width(int);
+extern int font_text_width(char *);
 extern int mc_free();
-extern int strlen();
+extern int strlen(char *);
 
-void picklist_update_thumb(struct picklist *a1)
+void picklist_update_thumb(struct picklist *list)
 {
-    a1->visible_rows = a1->list_rect.h / (((int)(short)font_height) + 1);
-    if (a1->count == 0 || a1->count <= a1->visible_rows) {
-        a1->thumb_height = a1->bar_rect.h - 1;
+    list->visible_rows = list->list_rect.h / (((int)(short)font_height) + 1);
+    if (list->count == 0 || list->count <= list->visible_rows) {
+        list->thumb_height = list->bar_rect.h - 1;
         return;
     }
-    a1->thumb_height = ((a1->bar_rect.h - 2) * a1->visible_rows) / a1->count;
+    list->thumb_height = ((list->bar_rect.h - 2) * list->visible_rows) / list->count;
 }
 
-void picklist_free(struct picklist *a1)
+void picklist_free(struct picklist *list)
 {
-    if (a1->framed != 0) {
-        if (a1->list_background != 0 && (int)a1->list_background != (-1751672937)) {
-            mc_free((int)a1->list_background, (int)D_00176E38, 110);
-            a1->list_background = (char *)-1751672937;
+    if (list->framed != 0) {
+        if (list->list_background != 0 && (int)list->list_background != (-1751672937)) {
+            mc_free((int)list->list_background, (int)D_00176E38, 110);
+            list->list_background = (char *)-1751672937;
         }
-        if (a1->bar_background != 0 && (int)a1->bar_background != (-1751672937)) {
-            mc_free((int)a1->bar_background, (int)D_00176E38, 111);
-            a1->bar_background = (char *)-1751672937;
+        if (list->bar_background != 0 && (int)list->bar_background != (-1751672937)) {
+            mc_free((int)list->bar_background, (int)D_00176E38, 111);
+            list->bar_background = (char *)-1751672937;
         }
     }
-    if (a1->entries != 0 && (int)a1->entries != (-1751672937)) {
-        mc_free((int)a1->entries, (int)D_00176E38, 114);
-        a1->entries = (struct picklist_entry *)-1751672937;
+    if (list->entries != 0 && (int)list->entries != (-1751672937)) {
+        mc_free((int)list->entries, (int)D_00176E38, 114);
+        list->entries = (struct picklist_entry *)-1751672937;
     }
-    a1->framed = 0;
-    a1->count = 0;
+    list->framed = 0;
+    list->count = 0;
 }
 
-void picklist_clip_text(int a1, short a2)
+void picklist_clip_text(char *text, short max_width)
 {
-    while (font_text_width(a1) > ((int)(short)a2)) {
-        *(signed char *)((char *)(strlen(a1) + a1) - 1) = 0;
+    while (font_text_width(text) > max_width) {
+        text[strlen(text) - 1] = 0;
     }
 }
 
-void swap_shorts(int a1, int a2)
+void swap_shorts(short *a, short *b)
 {
-    *(short *)((char *)a1) ^= *(short *)((char *)a2);
-    *(short *)((char *)a2) ^= *(short *)((char *)a1);
-    *(short *)((char *)a1) ^= *(short *)((char *)a2);
+    *a ^= *b;
+    *b ^= *a;
+    *a ^= *b;
 }

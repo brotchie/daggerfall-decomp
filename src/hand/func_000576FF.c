@@ -10,39 +10,39 @@ extern struct cell itemmaker_slots[];
 extern int itemmaker_param_excluded(short, short);
 extern void list_popup_open(int *);
 
-void itemmaker_show_param_list(int *a1, short a2)
+void itemmaker_show_param_list(int *names, short type)
 {
     short i;
-    unsigned short c;
-    short cnt;
-    short k;
-    int sv;
+    unsigned short index;
+    short count;
+    short param;
+    int saved;
 
-    k = c = cnt = 0;
-    while (*a1 != 0) {
+    param = index = count = 0;
+    while (*names != 0) {
         for (i = 0; i < 12; i++) {
-            if (D_00199868[i].p[0].a == a2 && D_00199868[i].p[0].b == k
-                || D_00199868[i].p[1].a == a2 && D_00199868[i].p[1].b == k
-                || D_00199868[i].p[2].a == a2 && D_00199868[i].p[2].b == k
-                || D_00199868[i].p[3].a == a2 && D_00199868[i].p[3].b == k
-                || D_00199868[i].p[4].a == a2 && D_00199868[i].p[4].b == k)
+            if (D_00199868[i].p[0].a == type && D_00199868[i].p[0].b == param
+                || D_00199868[i].p[1].a == type && D_00199868[i].p[1].b == param
+                || D_00199868[i].p[2].a == type && D_00199868[i].p[2].b == param
+                || D_00199868[i].p[3].a == type && D_00199868[i].p[3].b == param
+                || D_00199868[i].p[4].a == type && D_00199868[i].p[4].b == param)
                 goto next;
         }
-        sv = itemmaker_slots[scratch_190d64].v;
+        saved = itemmaker_slots[scratch_190d64].v;
         itemmaker_slots[scratch_190d64].v = 100;
-        if (itemmaker_param_excluded(a2, k) != 0)
-            itemmaker_slots[scratch_190d64].v = sv;
+        if (itemmaker_param_excluded(type, param) != 0)
+            itemmaker_slots[scratch_190d64].v = saved;
         else {
-            itemmaker_slots[scratch_190d64].v = sv;
-            scratch_buffer[cnt + 64000] = c;
-            scratch_190ee4[cnt] = *a1;
-            cnt++;
+            itemmaker_slots[scratch_190d64].v = saved;
+            scratch_buffer[count + 64000] = index;
+            scratch_190ee4[count] = *names;
+            count++;
         }
 next:
-        a1++;
-        c++;
-        k++;
+        names++;
+        index++;
+        param++;
     }
-    scratch_190ee4[cnt] = 0;
+    scratch_190ee4[count] = 0;
     list_popup_open(scratch_190ee4);
 }

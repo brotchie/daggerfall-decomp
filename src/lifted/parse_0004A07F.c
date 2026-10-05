@@ -7,7 +7,7 @@ extern signed char D_00190D1F;
 
 extern int name_generate_seeded(unsigned char, unsigned char, int);
 
-int parse_regional_name(int a1, int a2)
+int parse_regional_name(int seed, int gender)
 {
-    return name_generate_seeded((int)(unsigned char)D_001841E3[(int)(signed char)D_00190D1F], (int)(unsigned char)*(signed char *)&a2, a1);
+    return name_generate_seeded((int)(unsigned char)D_001841E3[(int)(signed char)D_00190D1F], (int)(unsigned char)*(signed char *)&gender, seed);
 }

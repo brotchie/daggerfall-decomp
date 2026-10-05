@@ -79,9 +79,9 @@ extern void inv_merge_arrows(struct record *, struct record *, int);
 
 int chargen_draw(void)
 {
-    int l_24;
-    int l_20;
-    int l_1C;
+    int done;
+    int x_offset;
+    int y_offset;
 
     mouse_buttons_prev = mouse_buttons;
     xn_mouse_poll_clamped();
@@ -91,13 +91,13 @@ int chargen_draw(void)
     if (((int)(unsigned char)(chargen_screen & 8)) != 0) chargen_draw_skills();
     if (((int)(unsigned char)(chargen_screen & 16)) != 0) {
         if (((int)(unsigned char)chargen_screen) == 255) {
-            l_20 = 119;
-            l_1C = -53;
+            x_offset = 119;
+            y_offset = -53;
         } else {
-            l_1C = 0;
-            l_20 = l_1C;
+            y_offset = 0;
+            x_offset = y_offset;
         }
-        xn_draw_image(l_20 + 127, l_1C + ((player_character->reflexes * 9) + 148), 66, 9, (int)(*(char **)&chargen_reflex_image + 12 + (player_character->reflexes * 594)));
+        xn_draw_image(x_offset + 127, y_offset + ((player_character->reflexes * 9) + 148), 66, 9, (int)(*(char **)&chargen_reflex_image + 12 + (player_character->reflexes * 594)));
     }
     if (((int)(unsigned char)(chargen_screen & 16)) != 0 && ((int)(unsigned char)chargen_screen) != 255 && ((int)(unsigned char)msgbox_kind) != 4) {
         msgbox_open_rsc(307, 4);
@@ -112,11 +112,11 @@ int chargen_draw(void)
     xn_mouse_cursor_drawn &= 254;
     xn_mouse_cursor_move((int)(short)mouse_x, (int)(short)mouse_y);
     if (chargen_screen != 0 && mouse_buttons != 0 && ((int)(short)mouse_x) > 263 && ((int)(short)mouse_x) < 301 && ((int)(short)mouse_y) > 172 && ((int)(short)mouse_y) < 193) {
-        l_24 = 1;
+        done = 1;
     } else {
-        l_24 = 0;
+        done = 0;
     }
-    return l_24;
+    return done;
 }
 
 void chargen_free_images(void)
@@ -143,36 +143,36 @@ void chargen_free_images(void)
     window_image = -1751672937;
 }
 
-void chargen_attribute_button(int a1)
+void chargen_attribute_button(int button)
 {
-    chargen_select_attribute((int)(short)(a1 - 20));
+    chargen_select_attribute((int)(short)(button - 20));
 }
 
-void chargen_skill_arrow(int a1)
+void chargen_skill_arrow(int button)
 {
-    int l_28;
-    int l_24;
-    struct character_skill *l_20;
-    int l_1C;
-    int l_18;
+    int group;
+    int slot;
+    struct character_skill *skill;
+    int *bios_ticks;
+    int *bios_ticks_now;
 
-    l_1C = 1132;
-    if (((unsigned)(*(int *)((char *)l_1C) - *(int *)scratch_190be4)) < 6) return;
-    l_18 = 1132;
-    *(int *)scratch_190be4 = *(int *)((char *)l_18);
-    a1 += -14;
-    l_28 = a1 >> 1;
-    if (D_00190DEA[l_28] == 0 && (a1 & 1) != 0) return;
-    l_24 = (int)(short)*(short *)(scratch_190df0 + (l_28 * 2));
-    l_20 = &player_character->skills[player_class->skills[l_24]];
-    if ((unsigned char)l_20->value == scratch_190cee[l_24] && (a1 & 1) == 0) return;
-    if ((a1 & 1) != 0) {
-        (*(signed char *)((char *)l_20))++;
-        (D_00190DEA[l_28])--;
+    bios_ticks = (int *)1132;
+    if (((unsigned)(*bios_ticks - *(int *)scratch_190be4)) < 6) return;
+    bios_ticks_now = (int *)1132;
+    *(int *)scratch_190be4 = *bios_ticks_now;
+    button += -14;
+    group = button >> 1;
+    if (D_00190DEA[group] == 0 && (button & 1) != 0) return;
+    slot = (int)(short)*(short *)(scratch_190df0 + (group * 2));
+    skill = &player_character->skills[player_class->skills[slot]];
+    if ((unsigned char)skill->value == scratch_190cee[slot] && (button & 1) == 0) return;
+    if ((button & 1) != 0) {
+        (*(signed char *)((char *)skill))++;
+        (D_00190DEA[group])--;
         return;
     }
-    (*(signed char *)((char *)l_20))--;
-    (D_00190DEA[l_28])++;
+    (*(signed char *)((char *)skill))--;
+    (D_00190DEA[group])++;
 }
 
 void chargen_face_previous(void)
@@ -191,18 +191,18 @@ void chargen_face_next(void)
 
 void chargen_roll_attributes(void)
 {
-    int l_1C;
-    int l_18;
+    int i;
+    int minimum;
 
     if (mouse_buttons_prev != 0) return;
     if (((int)(unsigned char)chargen_screen) == 255) {
         scratch_190be8 = 1;
         return;
     }
-    for (l_1C = 0; l_1C < 8; l_1C++) {
-        l_18 = player_class->attributes[l_1C];
-        scratch_190ce4[l_1C] = (player_character->attributes[l_1C] = rand_range(l_18, l_18 + 10));
-        if (player_character->attributes[l_1C] > 100) player_character->attributes[l_1C] = 100;
+    for (i = 0; i < 8; i++) {
+        minimum = player_class->attributes[i];
+        scratch_190ce4[i] = (player_character->attributes[i] = rand_range(minimum, minimum + 10));
+        if (player_character->attributes[i] > 100) player_character->attributes[i] = 100;
     }
     *(short *)scratch_190d64 = rand_range(6, 14);
     sound_play_ui(220);
@@ -210,13 +210,13 @@ void chargen_roll_attributes(void)
 
 void chargen_restore_roll(void)
 {
-    int l_18;
+    int i;
 
     if (mouse_buttons_prev != 0) return;
     if (chargen_roll_saved != 0) {
-        for (l_18 = 0; l_18 < 8; l_18++) {
-            player_character->attributes[l_18] = chargen_saved_attributes[l_18];
-            scratch_190ce4[l_18] = *(signed char *)(chargen_saved_minimums + (l_18 * 2));
+        for (i = 0; i < 8; i++) {
+            player_character->attributes[i] = chargen_saved_attributes[i];
+            scratch_190ce4[i] = *(signed char *)(chargen_saved_minimums + (i * 2));
         }
         *(short *)scratch_190d64 = (int)(unsigned char)chargen_saved_points;
     }
@@ -226,135 +226,135 @@ void chargen_restore_roll(void)
 
 void chargen_save_roll(void)
 {
-    int l_18;
+    int i;
 
     if (mouse_buttons_prev != 0) return;
     chargen_roll_saved = 1;
     chargen_saved_points = *(signed char *)scratch_190d64;
-    for (l_18 = 0; l_18 < 8; l_18++) {
-        chargen_saved_attributes[l_18] = player_character->attributes[l_18];
-        *(short *)(chargen_saved_minimums + (l_18 * 2)) = (short)scratch_190ce4[l_18];
+    for (i = 0; i < 8; i++) {
+        chargen_saved_attributes[i] = player_character->attributes[i];
+        *(short *)(chargen_saved_minimums + (i * 2)) = (short)scratch_190ce4[i];
     }
     mouse_buttons_prev = mouse_buttons;
     mouse_buttons = 0;
 }
 
-int inv_match_arrows(struct record *a1)
+int inv_match_arrows(struct record *object)
 {
-    int l_1C;
+    int unused;
 
-    if (a1->type != 2) return 0;
-    if (a1->image2 == 998 && a1->image == 0) {
-        found_object = a1;
+    if (object->type != 2) return 0;
+    if (object->image2 == 998 && object->image == 0) {
+        found_object = object;
         return 1;
     }
     return 0;
 }
 
-void inv_sum_hidden_weight(struct record *a1)
+void inv_sum_hidden_weight(struct record *object)
 {
-    struct item *l_18;
+    struct item *item;
 
-    if (a1->type != 2) return;
-    l_18 = &a1->data.item;
-    if (((int)(unsigned short)(l_18->item_flags & 64)) == 0) return;
-    *(int *)D_00195B84 += l_18->weight;
+    if (object->type != 2) return;
+    item = &object->data.item;
+    if (((int)(unsigned short)(item->item_flags & 64)) == 0) return;
+    *(int *)D_00195B84 += item->weight;
 }
 
-void trade_add_buy_price(struct record *a1)
+void trade_add_buy_price(struct record *object)
 {
-    struct item *l_1C;
-    int l_18;
+    struct item *item;
+    int price;
 
-    if (a1 == 0) return;
-    if (a1->type != 2) return;
-    l_1C = &a1->data.item;
-    if (a1->image2 == 998 && l_1C->group == 3 && l_1C->index == 18 && l_1C->condition == 0) return;
-    D_00190CA8 += object_weight(a1);
-    l_18 = l_1C->value;
-    if (a1->image2 == 998) l_18 = l_1C->value * l_1C->condition;
-    if (a1->image2 != 998 && ((int)(unsigned short)(a1->flags & 32)) == 0) return;
-    if (current_building->type == 13 && holiday_today(game_minutes, (int)(unsigned char)current_region) == 49 && l_1C->group == 3) {
-        trade_total += l_18 >> 1;
+    if (object == 0) return;
+    if (object->type != 2) return;
+    item = &object->data.item;
+    if (object->image2 == 998 && item->group == 3 && item->index == 18 && item->condition == 0) return;
+    D_00190CA8 += object_weight(object);
+    price = item->value;
+    if (object->image2 == 998) price = item->value * item->condition;
+    if (object->image2 != 998 && ((int)(unsigned short)(object->flags & 32)) == 0) return;
+    if (current_building->type == 13 && holiday_today(game_minutes, (int)(unsigned char)current_region) == 49 && item->group == 3) {
+        trade_total += price >> 1;
         return;
     }
     if (current_building->type == 9 && holiday_today(game_minutes, (int)(unsigned char)current_region) == 29) {
-        trade_total += l_18 >> 1;
+        trade_total += price >> 1;
         return;
     }
     if (((struct bf8_7_1 *)&D_001940D6)->f != 0) {
-        trade_total += l_18 >> 1;
+        trade_total += price >> 1;
         return;
     }
-    trade_total += l_18;
+    trade_total += price;
 }
 
-void trade_add_repair_cost(struct record *a1)
+void trade_add_repair_cost(struct record *object)
 {
-    struct item *l_18;
+    struct item *item;
 
-    if (a1->type != 2 || ((int)(unsigned short)(a1->flags & 512)) != 0) return;
-    l_18 = &a1->data.item;
-    if (l_18->enchantments[0].type == (-1)) {
-        trade_total += ((unsigned)(l_18->value * 10)) / 100;
+    if (object->type != 2 || ((int)(unsigned short)(object->flags & 512)) != 0) return;
+    item = &object->data.item;
+    if (item->enchantments[0].type == (-1)) {
+        trade_total += ((unsigned)(item->value * 10)) / 100;
     } else {
-        trade_total += ((unsigned)(l_18->value * 75)) / 100;
+        trade_total += ((unsigned)(item->value * 75)) / 100;
     }
     if (trade_total >= 1) return;
     trade_total = 1;
 }
 
-void inv_return_unpaid_item(struct record *a1)
+void inv_return_unpaid_item(struct record *object)
 {
-    int l_20;
-    int l_1C;
-    struct item *l_18;
+    int slot;
+    int remaining;
+    struct item *item;
 
-    if (a1->type != 2) return;
-    l_18 = &a1->data.item;
-    if (a1->image2 == 998 && l_18->group == 3 && l_18->index == 18 && l_18->condition == 0) return;
-    if (a1->image2 == 998 && l_18->group == 3 && l_18->index == 18) {
-        l_1C = l_18->stack_count - l_18->condition;
-        l_18->stack_count = (signed char)l_18->condition;
-        inv_merge_arrows(inv_right_container, a1, 0);
-        l_18->condition = 0;
-        l_18->stack_count = *(signed char *)&l_1C;
-        if (l_1C == 0) object_free_later(a1);
+    if (object->type != 2) return;
+    item = &object->data.item;
+    if (object->image2 == 998 && item->group == 3 && item->index == 18 && item->condition == 0) return;
+    if (object->image2 == 998 && item->group == 3 && item->index == 18) {
+        remaining = item->stack_count - item->condition;
+        item->stack_count = (signed char)item->condition;
+        inv_merge_arrows(inv_right_container, object, 0);
+        item->condition = 0;
+        item->stack_count = *(signed char *)&remaining;
+        if (remaining == 0) object_free_later(object);
         return;
     }
-    if (((int)(unsigned short)(a1->flags & 32)) == 0) return;
-    object_reparent(inv_right_container, a1);
-    for (l_20 = 0; l_20 < 27; l_20++) {
-        if (player_character->equipped[l_20] == a1) player_character->equipped[l_20] = 0;
+    if (((int)(unsigned short)(object->flags & 32)) == 0) return;
+    object_reparent(inv_right_container, object);
+    for (slot = 0; slot < 27; slot++) {
+        if (player_character->equipped[slot] == object) player_character->equipped[slot] = 0;
     }
     D_001940D8 |= 8;
 }
 
-void inv_store_cb(struct record *a1)
+void inv_store_cb(struct record *object)
 {
-    if (a1->type != 2) return;
-    inv_store_item(a1);
+    if (object->type != 2) return;
+    inv_store_item(object);
 }
 
-void inv_claim_item(struct record *a1)
+void inv_claim_item(struct record *object)
 {
-    struct item *l_18;
+    struct item *item;
 
-    if (a1->type != 2) return;
-    l_18 = &a1->data.item;
-    if (a1->image2 == 998) l_18->condition = 0;
-    if (((int)(unsigned short)(a1->flags & 32)) == 0) return;
-    a1->flags &= ~0x20;
-    if (a1->parent != wagon_container || inv_left_container != wagon_container) inv_store_item(a1);
-    if (l_18->group != 23 || l_18->index != 0) return;
+    if (object->type != 2) return;
+    item = &object->data.item;
+    if (object->image2 == 998) item->condition = 0;
+    if (((int)(unsigned short)(object->flags & 32)) == 0) return;
+    object->flags &= ~0x20;
+    if (object->parent != wagon_container || inv_left_container != wagon_container) inv_store_item(object);
+    if (item->group != 23 || item->index != 0) return;
     inv_create_wagon();
 }
 
-void inv_assign_item_id(struct record *a1)
+void inv_assign_item_id(struct record *object)
 {
-    if (a1->type != 2) return;
-    if ((((unsigned)a1->id) >> 16) == 100) return;
-    a1->id = object_new_id(100);
+    if (object->type != 2) return;
+    if ((((unsigned)object->id) >> 16) == 100) return;
+    object->id = object_new_id(100);
 }
 
 void inv_reset_left_list(void)
@@ -363,10 +363,10 @@ void inv_reset_left_list(void)
     inv_left_container = inventory_containers[0];
 }
 
-void inventory_open_container(struct record *a1, int a2, int a3)
+void inventory_open_container(struct record *container, int mode, int icon)
 {
-    *(int *)D_00195DA8 = (int)a1;
-    inv_right_container = (inv_right_container_base = a1);
-    if (inventory_open(2, a2, a3) != 0) return;
-    object_free_children(a1);
+    *(int *)D_00195DA8 = (int)container;
+    inv_right_container = (inv_right_container_base = container);
+    if (inventory_open(2, mode, icon) != 0) return;
+    object_free_children(container);
 }

@@ -6,14 +6,14 @@ extern signed char is_daytime;
 
 extern int model_cache_find(int);
 
-int model_get(int a1, int a2, int a3)
+int model_get(int id_hundreds, int id_rest, int texture_set)
 {
-    if (a1 == 4 && (a2 == 46 || a2 == 47)) {
+    if (id_hundreds == 4 && (id_rest == 46 || id_rest == 47)) {
         if (is_daytime != 0) {
-            a2 = 46;
+            id_rest = 46;
         } else {
-            a2 = 47;
+            id_rest = 47;
         }
     }
-    return model_cache_find((a2 + (a1 * 100)) + (a3 << 17));
+    return model_cache_find((id_rest + (id_hundreds * 100)) + (texture_set << 17));
 }

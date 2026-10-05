@@ -19,11 +19,11 @@ extern int mc_memcpy();
 extern void logbook_prune_quests(void);
 extern void save_thumbnail_capture(void);
 
-int options_open(short a1)
+int options_open(short force)
 {
-    int l_20;
+    int is_open;
 
-    if (a1 != 0 || (game_mode == 0 && key_pressed_once(1) != 0)) {
+    if (force != 0 || (game_mode == 0 && key_pressed_once(1) != 0)) {
         while (key_down_esc != 0);
         save_thumbnail_capture();
         D_00187CA8 = 0;
@@ -35,9 +35,9 @@ int options_open(short a1)
         logbook_prune_quests();
     }
     if (((int)(unsigned char)game_mode) == 7) {
-        l_20 = 1;
+        is_open = 1;
     } else {
-        l_20 = 0;
+        is_open = 0;
     }
-    return l_20;
+    return is_open;
 }

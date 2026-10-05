@@ -45,21 +45,21 @@ extern int xn_terrain_height_at(int, int);
 extern int mc_set_location(int, char *);
 extern int mc_sprintf(char *, char *, ...);
 
-void town_load(int id)
+void town_load(int location_index)
 {
-    if (location_object->image == id)
+    if (location_object->image == location_index)
         return;
     sound_stop_ambient();
     func_0008EB52();
     if (location_object->image == 65535)
         object_delete_block((int)location_object->children, location_object->id);
-    location_load_exterior(loaded_location, id);
+    location_load_exterior(loaded_location, location_index);
     mc_memcpy(location_object, loaded_location_object, 55, D_00176C94, 365, 4);
     mc_memcpy(current_location, loaded_location_data, 48, D_00176C94, 366, 4);
     location_object->y = xn_terrain_height_at(location_object->x, location_object->z);
     automap_alloc_town_map();
     town_load_blocks();
-    location_set_discovered(id, 1);
+    location_set_discovered(location_index, 1);
     town_grid_build();
     position_history_reset();
     people_clear();

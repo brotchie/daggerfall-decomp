@@ -88,10 +88,10 @@ extern void arch3d_apply_climate_textures(int);
 extern void fatal_error(int);
 extern void mem_pool_init(int, int);
 extern void mem_pool_free(int);
-extern void rotate_xz(int, int, int);
+extern void rotate_xz(int *, int *, int);
 extern void rmb_add_doors(struct record *, int);
 extern void rmb_add_people(struct record *, int);
-extern void rmb_add_editor_marker(struct record *, int);
+extern void rmb_add_editor_marker(struct record *, struct block_flat *);
 extern void object_foreach(struct record *, int);
 struct record *rmb_add_subrecord(struct record *);
 int model_load(int, int);
@@ -107,155 +107,155 @@ void model_unlink_object_cb(struct record *);
 void model_unlink_objects(int);
 #pragma aux mc_set_location parm routine [];
 
-struct record *rmb_add_subrecord(struct record *a1)
+struct record *rmb_add_subrecord(struct record *parent)
 {
-    struct record *l_48;
-    struct block *l_44;
-    struct block_model *l_40;
-    struct block_flat *l_3C;
-    int l_38;
-    int l_34;
-    int l_30;
-    int l_2C;
-    int l_28;
-    int l_24;
-    int l_20;
-    int l_1C;
+    struct record *object;
+    struct block *block;
+    struct block_model *model;
+    struct block_flat *flat;
+    int people;
+    int (*entry)[4];
+    int doors;
+    char *flat_cfg;
+    int i;
+    int unused;
+    int unused2;
+    int size;
 
-    l_1C = 17;
-    l_1C += ((int)(unsigned char)*(signed char *)(*(char **)rmb_record_ptr)) * 66;
-    l_1C += ((int)(unsigned char)*(signed char *)(*(char **)rmb_record_ptr + 1)) * 17;
-    l_1C += ((int)(unsigned char)*(signed char *)(*(char **)rmb_record_ptr + 2)) << 4;
-    if (l_1C == 17) return 0;
-    l_48 = object_create_child(a1, 0, l_1C);
-    l_48->type = 43;
-    l_48->x = rmb_origin_x;
-    l_48->z = rmb_origin_z;
-    l_48->y = rmb_origin_y;
-    l_48->yaw = *(short *)rmb_origin_yaw;
-    l_48->pad13 = 32768;
-    l_48->id = location_object->id + ((int)(unsigned short)(current_location->object_counter)++);
-    D_001A9438 = l_48->id;
-    l_44 = &l_48->data.block;
-    mc_memcpy((int)l_44, *(int *)rmb_record_ptr, l_1C, (int)D_00176C20, 803, 4);
-    l_44->models = (struct block_model *)((int)l_44 + 17);
-    l_40 = l_44->models;
-    l_44->flats = (struct block_flat *)((int)l_40 + (l_44->model_count * 66));
-    l_3C = l_44->flats;
-    l_44->section3 = (char *)((int)l_3C + (l_44->flat_count * 17));
-    l_34 = (int)l_44->section3;
-    for (l_28 = 0; l_44->model_count > l_28; l_28++, l_40++) {
-        rotate_xz((int)&l_40->x, (int)&l_40->z, *(int *)rmb_origin_yaw);
-        l_40->x += rmb_origin_x;
-        l_40->z += rmb_origin_z;
-        l_40->model = 0;
-        if (l_40->y > 0 && l_40->id > 10) {
-            l_40->model = (char *)model_get(l_40->id, l_40->variant, (((int)(unsigned char)current_climate) << 2) + ((int)(unsigned char)D_001A949C));
-            l_40->y = (-l_40->y) - (xn_model_max_y((int)l_40->model) >> 8);
+    size = 17;
+    size += ((int)(unsigned char)*(signed char *)(*(char **)rmb_record_ptr)) * 66;
+    size += ((int)(unsigned char)*(signed char *)(*(char **)rmb_record_ptr + 1)) * 17;
+    size += ((int)(unsigned char)*(signed char *)(*(char **)rmb_record_ptr + 2)) << 4;
+    if (size == 17) return 0;
+    object = object_create_child(parent, 0, size);
+    object->type = 43;
+    object->x = rmb_origin_x;
+    object->z = rmb_origin_z;
+    object->y = rmb_origin_y;
+    object->yaw = *(short *)rmb_origin_yaw;
+    object->pad13 = 32768;
+    object->id = location_object->id + ((int)(unsigned short)(current_location->object_counter)++);
+    D_001A9438 = object->id;
+    block = &object->data.block;
+    mc_memcpy((int)block, *(int *)rmb_record_ptr, size, (int)D_00176C20, 803, 4);
+    block->models = (struct block_model *)((int)block + 17);
+    model = block->models;
+    block->flats = (struct block_flat *)((int)model + (block->model_count * 66));
+    flat = block->flats;
+    block->section3 = (char *)((int)flat + (block->flat_count * 17));
+    entry = (int (*)[4])block->section3;
+    for (i = 0; block->model_count > i; i++, model++) {
+        rotate_xz(&model->x, &model->z, *(int *)rmb_origin_yaw);
+        model->x += rmb_origin_x;
+        model->z += rmb_origin_z;
+        model->model = 0;
+        if (model->y > 0 && model->id > 10) {
+            model->model = (char *)model_get(model->id, model->variant, (((int)(unsigned char)current_climate) << 2) + ((int)(unsigned char)D_001A949C));
+            model->y = (-model->y) - (xn_model_max_y((int)model->model) >> 8);
         }
-        l_40->y += rmb_origin_y;
-        l_40->yaw += *(int *)rmb_origin_yaw;
+        model->y += rmb_origin_y;
+        model->yaw += *(int *)rmb_origin_yaw;
     }
-    for (l_28 = 0; l_44->flat_count > l_28; l_28++, l_3C++) {
-        rotate_xz((int)&l_3C->x, (int)&l_3C->z, *(int *)rmb_origin_yaw);
-        l_3C->x += rmb_origin_x;
-        l_3C->z += rmb_origin_z;
-        l_3C->y += rmb_origin_y;
-        if ((l_3C->image >> 7) == 199) {
-            rmb_add_editor_marker(a1, (int)l_3C);
+    for (i = 0; block->flat_count > i; i++, flat++) {
+        rotate_xz(&flat->x, &flat->z, *(int *)rmb_origin_yaw);
+        flat->x += rmb_origin_x;
+        flat->z += rmb_origin_z;
+        flat->y += rmb_origin_y;
+        if ((flat->image >> 7) == 199) {
+            rmb_add_editor_marker(parent, flat);
         } else {
-            l_2C = flats_cfg_find(l_3C->image);
-            if (((int)(unsigned char)(*(signed char *)((char *)l_2C + 6) & 2)) != 0 && ((int)(unsigned short)(game_settings->view_flags & 4)) != 0) {
-                l_3C->image = 0;
+            flat_cfg = (char *)flats_cfg_find(flat->image);
+            if ((flat_cfg[6] & 2) != 0 && ((int)(unsigned short)(game_settings->view_flags & 4)) != 0) {
+                flat->image = 0;
             }
         }
     }
-    for (l_28 = 0; l_44->section3_count > l_28; l_28++, (*(char (**)[16])&l_34)++) {
-        rotate_xz(l_34, l_34 + 8, *(int *)rmb_origin_yaw);
-        *(int *)((char *)l_34) += rmb_origin_x;
-        *(int *)((char *)l_34 + 8) += rmb_origin_z;
-        *(int *)((char *)l_34 + 4) += rmb_origin_y;
+    for (i = 0; block->section3_count > i; i++, entry++) {
+        rotate_xz(&(*entry)[0], &(*entry)[2], *(int *)rmb_origin_yaw);
+        (*entry)[0] += rmb_origin_x;
+        (*entry)[2] += rmb_origin_z;
+        (*entry)[1] += rmb_origin_y;
     }
-    l_38 = (int)(*(char **)rmb_record_ptr + l_1C);
-    l_30 = l_38 + (((int)(unsigned char)*(signed char *)(*(char **)rmb_record_ptr + 3)) * 17);
-    rmb_add_people(a1, l_38);
-    rmb_add_doors(a1, l_30);
-    *(int *)rmb_record_ptr = l_30 + (((int)(unsigned char)*(signed char *)(*(char **)rmb_record_ptr + 4)) * 19);
-    return l_48;
+    people = (int)(*(char **)rmb_record_ptr + size);
+    doors = people + (((int)(unsigned char)*(signed char *)(*(char **)rmb_record_ptr + 3)) * 17);
+    rmb_add_people(parent, people);
+    rmb_add_doors(parent, doors);
+    *(int *)rmb_record_ptr = doors + (((int)(unsigned char)*(signed char *)(*(char **)rmb_record_ptr + 4)) * 19);
+    return object;
 }
 
-void rmb_set_building_factions(struct record *a1)
+void rmb_set_building_factions(struct record *object)
 {
-    int l_20;
-    struct building *l_1C;
-    int l_18;
+    struct person *person;
+    struct building *building;
+    int unused;
 
-    l_1C = &current_location->buildings[a1->image];
-    if (l_1C->type != 16) {
-        if (l_1C->faction_id == 0) {
-            l_1C->faction_id = *(short *)(D_00187D30 + (((int)(unsigned char)current_region) * 2));
+    building = &current_location->buildings[object->image];
+    if (building->type != 16) {
+        if (building->faction_id == 0) {
+            building->faction_id = *(short *)(D_00187D30 + (((int)(unsigned char)current_region) * 2));
         }
         return;
     }
-    l_1C->faction_id = ((((int)(unsigned char)(location_is_port & 16)) != 0) ? 852 : 242);
-    a1 = a1->children;
-    while (a1 != 0) {
-        if (a1->type == 8) {
-            l_20 = (int)RECORD_DATA(a1);
-            if (*(unsigned short *)((char *)l_20) == *(short *)(D_00187D30 + (((int)(unsigned char)current_region) * 2))) {
-                *(short *)((char *)l_20) = D_00187CB4[((int)(unsigned char)current_region)];
+    building->faction_id = ((((int)(unsigned char)(location_is_port & 16)) != 0) ? 852 : 242);
+    object = object->children;
+    while (object != 0) {
+        if (object->type == 8) {
+            person = &object->data.person;
+            if (person->faction_id == *(short *)(D_00187D30 + (((int)(unsigned char)current_region) * 2))) {
+                person->faction_id = D_00187CB4[((int)(unsigned char)current_region)];
             }
-            if (((int)(unsigned short)*(short *)((char *)l_20)) == 852 && ((int)(unsigned char)(location_is_port & 16)) == 0) {
-                *(short *)((char *)l_20) = 242;
+            if (person->faction_id == 852 && ((int)(unsigned char)(location_is_port & 16)) == 0) {
+                person->faction_id = 242;
             }
         }
-        a1 = a1->next;
+        object = object->next;
     }
 }
 
-struct record *rmb_add_building(struct record *a1, int a2)
+struct record *rmb_add_building(struct record *parent, int building_index)
 {
-    int l_20;
-    int l_1C;
-    struct record *l_18;
+    int value;
+    int saved_seed;
+    struct record *object;
 
-    *(int *)rmb_record_ptr = *(int *)(*(char **)rmb_block + 1475 + (a2 << 2));
-    l_18 = rmb_add_subrecord(a1);
-    l_18->flags = 1;
-    l_18->image2 = a2;
-    l_20 = (int)(unsigned char)*(signed char *)(*(char **)rmb_block + 667 + (a2 * 26));
-    switch ((unsigned)l_20) {
+    *(int *)rmb_record_ptr = *(int *)(*(char **)rmb_block + 1475 + (building_index << 2));
+    object = rmb_add_subrecord(parent);
+    object->flags = 1;
+    object->image2 = building_index;
+    value = (int)(unsigned char)*(signed char *)(*(char **)rmb_block + 667 + (building_index * 26));
+    switch ((unsigned)value) {
     case 21:
     case 22:
-        l_18->flags |= 8;
-        l_18->image = 65535;
-        return l_18;
+        object->flags |= 8;
+        object->image = 65535;
+        return object;
     case 17:
     case 18:
     case 19:
     case 20:
-        l_1C = rand();
-        srand((int)(short)(short)l_18->id);
-        l_20 = rand();
-        srand(l_1C);
-        if (((int)(unsigned short)*(short *)(*(char **)rmb_block + 661 + (a2 * 26))) != 42 && ((int)(unsigned short)*(short *)(*(char **)rmb_block + 661 + (a2 * 26))) != 108) {
-            if ((l_20 % 100) <= town_house_skip_percent) {
-                l_18->flags |= 8;
-                l_18->image = 65535;
-                return l_18;
+        saved_seed = rand();
+        srand((int)(short)(short)object->id);
+        value = rand();
+        srand(saved_seed);
+        if (((int)(unsigned short)*(short *)(*(char **)rmb_block + 661 + (building_index * 26))) != 42 && ((int)(unsigned short)*(short *)(*(char **)rmb_block + 661 + (building_index * 26))) != 108) {
+            if ((value % 100) <= town_house_skip_percent) {
+                object->flags |= 8;
+                object->image = 65535;
+                return object;
             }
         }
     }
-    l_18->image = town_building_counter++;
-    rmb_add_subrecord(l_18);
-    rmb_set_building_factions(l_18);
-    return l_18;
+    object->image = town_building_counter++;
+    rmb_add_subrecord(object);
+    rmb_set_building_factions(object);
+    return object;
 }
 
-void model_heap_init(int a1)
+void model_heap_init(int size)
 {
-    mem_pool_init((int)model_heap, a1);
-    model_heap_free = a1;
+    mem_pool_init((int)model_heap, size);
+    model_heap_free = size;
     (model_cache_root = model_cache_nodes)->key = 50000;
     model_cache_root->last_frame = 0;
 }
@@ -265,421 +265,421 @@ void model_heap_free_all(void)
     mem_pool_free((int)model_heap);
 }
 
-int model_cache_find(int a1)
+int model_cache_find(int key)
 {
-    struct model_node *l_20;
-    struct model_node *l_1C;
+    struct model_node *node;
+    struct model_node *added;
 
-    l_20 = model_cache_root;
+    node = model_cache_root;
     while (1) {
-        if (a1 == l_20->key) {
-            l_20->last_frame = *(int *)frame_counter;
-            return (int)l_20->model;
+        if (key == node->key) {
+            node->last_frame = *(int *)frame_counter;
+            return (int)node->model;
         }
-        if (((unsigned)a1) < l_20->key) {
-            if (l_20->left != 0) {
-                l_20 = l_20->left;
+        if (((unsigned)key) < node->key) {
+            if (node->left != 0) {
+                node = node->left;
             } else {
-                l_20->left = (struct model_node *)model_cache_add(a1);
-                l_1C = l_20->left;
+                node->left = (struct model_node *)model_cache_add(key);
+                added = node->left;
                 break;
             }
-        } else if (l_20->right != 0) {
-            l_20 = l_20->right;
+        } else if (node->right != 0) {
+            node = node->right;
         } else {
-            l_20->right = (struct model_node *)model_cache_add(a1);
-            l_1C = l_20->right;
+            node->right = (struct model_node *)model_cache_add(key);
+            added = node->right;
             break;
         }
     }
-    if (l_1C == 0) return 0;
-    l_1C->last_frame = *(int *)frame_counter;
-    return (int)l_1C->model;
+    if (added == 0) return 0;
+    added->last_frame = *(int *)frame_counter;
+    return (int)added->model;
 }
 
-int model_load(int a1, int a2)
+int model_load(int slot, int key)
 {
-    int l_20;
-    int l_1C;
-    int l_18;
+    int record;
+    int size;
+    int model_id;
 
-    l_18 = a2 & 131071;
-    l_20 = archive_find_record(arch3d_bsa, (int)text_buffer, l_18);
-    l_1C = archive_record_size(arch3d_bsa, l_20);
-    if ((model_cache_nodes[a1].model = (char *)mem_pool_alloc((int)model_heap, l_1C)) == 0) {
+    model_id = key & 131071;
+    record = archive_find_record(arch3d_bsa, (int)text_buffer, model_id);
+    size = archive_record_size(arch3d_bsa, record);
+    if ((model_cache_nodes[slot].model = (char *)mem_pool_alloc((int)model_heap, size)) == 0) {
         if (model_cache_flush_count == 0) {
             model_cache_purge_old(model_cache_root);
-            if ((model_cache_nodes[a1].model = (char *)mem_pool_alloc((int)model_heap, l_1C)) == 0) {
+            if ((model_cache_nodes[slot].model = (char *)mem_pool_alloc((int)model_heap, size)) == 0) {
                 model_cache_flush(model_cache_root);
                 return 0;
             }
         } else {
             model_cache_purge_old(model_cache_root);
-            if ((model_cache_nodes[a1].model = (char *)mem_pool_alloc((int)model_heap, l_1C)) == 0) {
+            if ((model_cache_nodes[slot].model = (char *)mem_pool_alloc((int)model_heap, size)) == 0) {
                 fatal_error((int)D_00176C29);
             }
         }
     }
-    if (archive_read_record(arch3d_bsa, l_20, (int)model_cache_nodes[a1].model) == 0) {
+    if (archive_read_record(arch3d_bsa, record, (int)model_cache_nodes[slot].model) == 0) {
         mc_set_location(1104, (int)D_00176C20);
-        mc_sprintf(*(int *)scratch_buffer, (int)D_00176C4F, l_20);
+        mc_sprintf(*(int *)scratch_buffer, (int)D_00176C4F, record);
         fatal_error(*(int *)scratch_buffer);
     }
-    model_heap_free -= (l_1C + 1) & -2;
-    return (int)model_cache_nodes[a1].model;
+    model_heap_free -= (size + 1) & -2;
+    return (int)model_cache_nodes[slot].model;
 }
 
-int model_cache_add(int a1)
+int model_cache_add(int key)
 {
-    int l_20;
-    int l_1C;
+    int slot;
+    int saved_seed;
     {
-        int l_30;
-        int l_2C;
-        int l_28;
+        int in_use3;
+        int in_use2;
+        int in_use;
 
-        l_20 = 0;
+        slot = 0;
         for (;;) {
-            if (model_cache_nodes[l_20].key != 0 || (int)model_cache_nodes[l_20].left != 0 || (int)model_cache_nodes[l_20].right != 0) {
-                l_28 = 1;
+            if (model_cache_nodes[slot].key != 0 || (int)model_cache_nodes[slot].left != 0 || (int)model_cache_nodes[slot].right != 0) {
+                in_use = 1;
             } else {
-                l_28 = 0;
+                in_use = 0;
             }
-            if (l_28 == 0 || l_20 >= 512) break;
-            l_20++;
+            if (in_use == 0 || slot >= 512) break;
+            slot++;
         }
-        if (l_20 == 512) {
+        if (slot == 512) {
             model_cache_purge_old(model_cache_root);
-            l_20 = 0;
+            slot = 0;
             for (;;) {
-                if (model_cache_nodes[l_20].key != 0 || (int)model_cache_nodes[l_20].left != 0 || (int)model_cache_nodes[l_20].right != 0) {
-                    l_2C = 1;
+                if (model_cache_nodes[slot].key != 0 || (int)model_cache_nodes[slot].left != 0 || (int)model_cache_nodes[slot].right != 0) {
+                    in_use2 = 1;
                 } else {
-                    l_2C = 0;
+                    in_use2 = 0;
                 }
-                if (l_2C == 0 || l_20 >= 512) break;
-                l_20++;
+                if (in_use2 == 0 || slot >= 512) break;
+                slot++;
             }
-            if (l_20 == 512) {
+            if (slot == 512) {
                 model_cache_flush(model_cache_root);
-                l_20 = 0;
+                slot = 0;
                 for (;;) {
-                    if (model_cache_nodes[l_20].key != 0 || (int)model_cache_nodes[l_20].left != 0 || (int)model_cache_nodes[l_20].right != 0) {
-                        l_30 = 1;
+                    if (model_cache_nodes[slot].key != 0 || (int)model_cache_nodes[slot].left != 0 || (int)model_cache_nodes[slot].right != 0) {
+                        in_use3 = 1;
                     } else {
-                        l_30 = 0;
+                        in_use3 = 0;
                     }
-                    if (l_30 == 0 || l_20 >= 512) break;
-                    l_20++;
+                    if (in_use3 == 0 || slot >= 512) break;
+                    slot++;
                 }
-                if (l_20 == 512) fatal_error((int)D_00176C6B);
+                if (slot == 512) fatal_error((int)D_00176C6B);
             }
         }
-        model_cache_nodes[l_20].key = a1;
-        model_cache_nodes[l_20].last_frame = *(int *)frame_counter;
-        model_cache_nodes[l_20].left = (model_cache_nodes[l_20].right = 0);
-        if (model_load(l_20, a1) == 0) return 0;
-        xn_model_prepare((int)model_cache_nodes[l_20].model);
-        l_1C = rand();
-        srand(*(int *)(model_cache_nodes[l_20].model + 12));
-        arch3d_apply_climate_textures((int)model_cache_nodes[l_20].model);
-        srand(l_1C);
-        return (int)&model_cache_nodes[l_20];
+        model_cache_nodes[slot].key = key;
+        model_cache_nodes[slot].last_frame = *(int *)frame_counter;
+        model_cache_nodes[slot].left = (model_cache_nodes[slot].right = 0);
+        if (model_load(slot, key) == 0) return 0;
+        xn_model_prepare((int)model_cache_nodes[slot].model);
+        saved_seed = rand();
+        srand(*(int *)(model_cache_nodes[slot].model + 12));
+        arch3d_apply_climate_textures((int)model_cache_nodes[slot].model);
+        srand(saved_seed);
+        return (int)&model_cache_nodes[slot];
     }
 }
 
-void model_cache_purge_old(struct model_node *a1)
+void model_cache_purge_old(struct model_node *root)
 {
-    int l_18;
+    int age;
 
-    l_18 = 200;
+    age = 200;
     if (model_heap_free > 204800) return;
-    while (l_18 > 2 && model_heap_free < 204800) {
-        model_cache_purge_unused(0, l_18, a1);
-        l_18 >>= 1;
+    while (age > 2 && model_heap_free < 204800) {
+        model_cache_purge_unused(0, age, root);
+        age >>= 1;
     }
 }
 
-void model_cache_flush(struct model_node *a1)
+void model_cache_flush(struct model_node *root)
 {
-    int l_18;
+    int i;
 
     model_cache_flush_count++;
-    for (l_18 = 1; l_18 < 512; l_18++) {
-        if (model_cache_nodes[l_18].key != 0 && (int)model_cache_nodes[l_18].model != 0) {
-            model_unlink_objects((int)model_cache_nodes[l_18].model);
-            model_heap_free += mem_pool_release((int)model_cache_nodes[l_18].model);
+    for (i = 1; i < 512; i++) {
+        if (model_cache_nodes[i].key != 0 && (int)model_cache_nodes[i].model != 0) {
+            model_unlink_objects((int)model_cache_nodes[i].model);
+            model_heap_free += mem_pool_release((int)model_cache_nodes[i].model);
         }
     }
-    a1->left = 0;
-    a1->right = a1->left;
+    root->left = 0;
+    root->right = root->left;
     mc_memset((int)&model_cache_nodes[1], 0, 10220, (int)D_00176C20, 1189, 4);
 }
 
-void model_cache_purge_unused(struct model_node *a1, int a2, struct model_node *a3)
+void model_cache_purge_unused(struct model_node *parent, int age, struct model_node *node)
 {
-    int l_10;
+    int unused;
 
-    if (a3->left != 0) model_cache_purge_unused(a3, a2, a3->left);
-    if (a3->right != 0) model_cache_purge_unused(a3, a2, a3->right);
-    if (((unsigned)(*(int *)frame_counter - a3->last_frame)) >= a2) model_cache_remove_node(a1, a3);
-    if (a1->left != a1->right || a1->left == 0) return;
+    if (node->left != 0) model_cache_purge_unused(node, age, node->left);
+    if (node->right != 0) model_cache_purge_unused(node, age, node->right);
+    if (((unsigned)(*(int *)frame_counter - node->last_frame)) >= age) model_cache_remove_node(parent, node);
+    if (parent->left != parent->right || parent->left == 0) return;
     fatal_error((int)D_00176C80);
 }
 
-void model_cache_remove_node(struct model_node *a1, struct model_node *a2)
+void model_cache_remove_node(struct model_node *parent, struct model_node *node)
 {
-    int l_1C;
-    struct model_node *l_18;
-    struct model_node *l_14;
+    char *model;
+    struct model_node *successor;
+    struct model_node *successor_parent;
 
-    if (a1 == 0) return;
-    if (a2->left == 0) {
-        if (a2->right == 0) {
-            if (a1->right == a2) {
-                a1->right = 0;
+    if (parent == 0) return;
+    if (node->left == 0) {
+        if (node->right == 0) {
+            if (parent->right == node) {
+                parent->right = 0;
             } else {
-                a1->left = 0;
+                parent->left = 0;
             }
-        } else if (a1->right == a2) {
-            a1->right = a2->right;
+        } else if (parent->right == node) {
+            parent->right = node->right;
         } else {
-            a1->left = a2->right;
+            parent->left = node->right;
         }
-        model_unlink_objects((int)a2->model);
-        model_heap_free += mem_pool_release((int)a2->model);
-        a2->model = 0;
-        a2->key = 0;
+        model_unlink_objects((int)node->model);
+        model_heap_free += mem_pool_release((int)node->model);
+        node->model = 0;
+        node->key = 0;
         return;
     }
-    if (a2->right == 0) {
-        if (a1->right == a2) {
-            a1->right = a2->left;
+    if (node->right == 0) {
+        if (parent->right == node) {
+            parent->right = node->left;
         } else {
-            a1->left = a2->left;
+            parent->left = node->left;
         }
-        model_unlink_objects((int)a2->model);
-        model_heap_free += mem_pool_release((int)a2->model);
-        a2->model = 0;
-        a2->key = 0;
+        model_unlink_objects((int)node->model);
+        model_heap_free += mem_pool_release((int)node->model);
+        node->model = 0;
+        node->key = 0;
         return;
     }
-    l_14 = a2;
-    l_18 = a2->right;
-    while (l_18->left != 0) {
-        l_14 = l_18;
-        l_18 = l_18->left;
+    successor_parent = node;
+    successor = node->right;
+    while (successor->left != 0) {
+        successor_parent = successor;
+        successor = successor->left;
     }
-    l_1C = (int)a2->model;
-    a2->model = (char *)((int)l_18->model);
-    a2->last_frame = l_18->last_frame;
-    a2->key = l_18->key;
-    l_18->model = (char *)l_1C;
-    model_cache_remove_node(l_14, l_18);
+    model = node->model;
+    node->model = successor->model;
+    node->last_frame = successor->last_frame;
+    node->key = successor->key;
+    successor->model = model;
+    model_cache_remove_node(successor_parent, successor);
 }
 
-void marker_make_clutter(struct record *a1, struct building *a2)
+void marker_make_clutter(struct record *marker, struct building *building)
 {
-    int l_18;
-    int l_14;
+    int floor_y;
+    int saved_seed;
 
-    l_14 = rand();
-    srand(a1->id & 65535);
-    l_18 = collide_floor_height(a1);
-    if (l_18 != 100000) a1->y = l_18;
-    a1->image = flat_random_clutter((int)player_environment, current_building->type);
-    srand(l_14);
+    saved_seed = rand();
+    srand(marker->id & 65535);
+    floor_y = collide_floor_height(marker);
+    if (floor_y != 100000) marker->y = floor_y;
+    marker->image = flat_random_clutter((int)player_environment, current_building->type);
+    srand(saved_seed);
 }
 
-void marker_make_loot_pile(struct record *a1, struct building *a2)
+void marker_make_loot_pile(struct record *marker, struct building *building)
 {
-    int l_14;
+    int floor_y;
 
-    l_14 = collide_floor_height(a1);
-    if (l_14 != 100000) a1->y = l_14;
+    floor_y = collide_floor_height(marker);
+    if (floor_y != 100000) marker->y = floor_y;
     if (((int)player_environment) != 3) {
-        a1->type = 33;
-        a1->image = *(short *)(D_00187DC0 + (a2->type * 2));
+        marker->type = 33;
+        marker->image = *(short *)(D_00187DC0 + (building->type * 2));
     } else {
-        a1->type = 33;
-        a1->image = ((unsigned short)(unsigned char)D_00187DAC[rand() % 20]) + 27648;
-        a1->pad19 = 1;
+        marker->type = 33;
+        marker->image = ((unsigned short)(unsigned char)D_00187DAC[rand() % 20]) + 27648;
+        marker->pad19 = 1;
     }
-    if (a1->image != 0) if (a1->image != 65535) return;
-    l_14++;
+    if (marker->image != 0) if (marker->image != 65535) return;
+    floor_y++;
 }
 
-int sound_cache_load(int a1)
+int sound_cache_load(int id)
 {
-    int l_28;
-    int l_24;
-    int l_20;
-    int l_1C;
+    int unused;
+    int slot;
+    int size;
+    int record;
 
-    sound_last_id = a1;
-    for (l_24 = 0; l_24 < 256; l_24++) {
-        if (*(int *)(D_001A8430 + (l_24 << 4)) == a1) {
-            sound_last_size = *(int *)(D_001A8434 + (l_24 << 4));
-            return *(int *)(D_001A8438 + (l_24 << 4));
+    sound_last_id = id;
+    for (slot = 0; slot < 256; slot++) {
+        if (*(int *)(D_001A8430 + (slot << 4)) == id) {
+            sound_last_size = *(int *)(D_001A8434 + (slot << 4));
+            return *(int *)(D_001A8438 + (slot << 4));
         }
     }
-    l_24 = 0;
-    while (*(int *)(D_001A8438 + (l_24 << 4)) != 0) l_24++;
-    l_1C = archive_find_record(dagger_snd, (int)D_001910AC, a1);
-    l_20 = archive_record_size(dagger_snd, l_1C);
-    *(int *)(sound_cache + (l_24 << 4)) = *(int *)frame_counter;
-    *(int *)(D_001A8430 + (l_24 << 4)) = a1;
-    *(int *)(D_001A8434 + (l_24 << 4)) = l_20;
-    *(int *)(D_001A8438 + (l_24 << 4)) = mc_malloc(l_20, (int)D_00176C20, 1338);
-    dpmi_lock_region(*(int *)(D_001A8438 + (l_24 << 4)), l_20 + 4096);
-    archive_read_record(dagger_snd, l_1C, *(int *)(D_001A8438 + (l_24 << 4)));
-    sound_cache_bytes += l_20;
+    slot = 0;
+    while (*(int *)(D_001A8438 + (slot << 4)) != 0) slot++;
+    record = archive_find_record(dagger_snd, (int)D_001910AC, id);
+    size = archive_record_size(dagger_snd, record);
+    *(int *)(sound_cache + (slot << 4)) = *(int *)frame_counter;
+    *(int *)(D_001A8430 + (slot << 4)) = id;
+    *(int *)(D_001A8434 + (slot << 4)) = size;
+    *(int *)(D_001A8438 + (slot << 4)) = mc_malloc(size, (int)D_00176C20, 1338);
+    dpmi_lock_region(*(int *)(D_001A8438 + (slot << 4)), size + 4096);
+    archive_read_record(dagger_snd, record, *(int *)(D_001A8438 + (slot << 4)));
+    sound_cache_bytes += size;
     sound_cache_trim();
-    sound_last_size = l_20;
-    return *(int *)(D_001A8438 + (l_24 << 4));
+    sound_last_size = size;
+    return *(int *)(D_001A8438 + (slot << 4));
 }
 
 void sound_cache_trim(void)
 {
-    int l_20;
-    int l_1C;
-    int l_18;
+    int oldest_frame;
+    int oldest;
+    int i;
 
     if (sound_cache_bytes < 393216) return;
     while (sound_cache_bytes > 262144) {
-        l_1C = -1;
-        l_20 = *(int *)frame_counter;
-        for (l_18 = 0; l_18 < 256; l_18++) {
-            if (*(int *)(D_001A8438 + (l_18 << 4)) == 0) continue;
-            if (l_20 > *(int *)(sound_cache + (l_18 << 4))) {
-                l_20 = *(int *)(sound_cache + (l_18 << 4));
-                l_1C = l_18;
+        oldest = -1;
+        oldest_frame = *(int *)frame_counter;
+        for (i = 0; i < 256; i++) {
+            if (*(int *)(D_001A8438 + (i << 4)) == 0) continue;
+            if (oldest_frame > *(int *)(sound_cache + (i << 4))) {
+                oldest_frame = *(int *)(sound_cache + (i << 4));
+                oldest = i;
             }
         }
-        if (l_1C == (-1)) return;
-        dpmi_unlock_region(*(int *)(D_001A8438 + (l_1C << 4)), *(int *)(D_001A8434 + (l_1C << 4)) + 4096);
-        if (*(int *)(D_001A8438 + (l_1C << 4)) != 0 && *(int *)(D_001A8438 + (l_1C << 4)) != (-1751672937)) {
-            mc_free(*(int *)(D_001A8438 + (l_1C << 4)), (int)D_00176C20, 1375);
-            *(int *)(D_001A8438 + (l_1C << 4)) = -1751672937;
+        if (oldest == (-1)) return;
+        dpmi_unlock_region(*(int *)(D_001A8438 + (oldest << 4)), *(int *)(D_001A8434 + (oldest << 4)) + 4096);
+        if (*(int *)(D_001A8438 + (oldest << 4)) != 0 && *(int *)(D_001A8438 + (oldest << 4)) != (-1751672937)) {
+            mc_free(*(int *)(D_001A8438 + (oldest << 4)), (int)D_00176C20, 1375);
+            *(int *)(D_001A8438 + (oldest << 4)) = -1751672937;
         }
-        *(int *)(D_001A8438 + (l_1C << 4)) = 0;
-        *(int *)(D_001A8430 + (l_1C << 4)) = -1;
-        sound_cache_bytes -= *(int *)(D_001A8434 + (l_1C << 4));
+        *(int *)(D_001A8438 + (oldest << 4)) = 0;
+        *(int *)(D_001A8430 + (oldest << 4)) = -1;
+        sound_cache_bytes -= *(int *)(D_001A8434 + (oldest << 4));
     }
 }
 
 void sound_cache_free_all(void)
 {
-    int l_18;
+    int i;
 
-    for (l_18 = 0; l_18 < 256; l_18++) {
-        if (*(int *)(D_001A8438 + (l_18 << 4)) != 0) {
-            dpmi_unlock_region(*(int *)(D_001A8438 + (l_18 << 4)), *(int *)(D_001A8434 + (l_18 << 4)) + 1024);
-            if (*(int *)(D_001A8438 + (l_18 << 4)) != 0 && *(int *)(D_001A8438 + (l_18 << 4)) != (-1751672937)) {
-                mc_free(*(int *)(D_001A8438 + (l_18 << 4)), (int)D_00176C20, 1392);
-                *(int *)(D_001A8438 + (l_18 << 4)) = -1751672937;
+    for (i = 0; i < 256; i++) {
+        if (*(int *)(D_001A8438 + (i << 4)) != 0) {
+            dpmi_unlock_region(*(int *)(D_001A8438 + (i << 4)), *(int *)(D_001A8434 + (i << 4)) + 1024);
+            if (*(int *)(D_001A8438 + (i << 4)) != 0 && *(int *)(D_001A8438 + (i << 4)) != (-1751672937)) {
+                mc_free(*(int *)(D_001A8438 + (i << 4)), (int)D_00176C20, 1392);
+                *(int *)(D_001A8438 + (i << 4)) = -1751672937;
             }
-            *(int *)(D_001A8438 + (l_18 << 4)) = 0;
-            *(int *)(D_001A8430 + (l_18 << 4)) = -1;
+            *(int *)(D_001A8438 + (i << 4)) = 0;
+            *(int *)(D_001A8430 + (i << 4)) = -1;
         }
     }
     sound_cache_bytes = 0;
 }
 
-void flat_animal_sound(int a1, int a2, int a3, int a4, int a5)
+void flat_animal_sound(int x, int y, int z, int archive, int record)
 {
-    if (a4 != 201) return;
+    if (archive != 201) return;
     if (rand() > 100) return;
-    if (xn_math_approx_dist2d(a1, a3, player_object->x, player_object->z) > 768) return;
-    switch ((unsigned)a5) {
+    if (xn_math_approx_dist2d(x, z, player_object->x, player_object->z) > 768) return;
+    switch ((unsigned)record) {
     return;
 case 0:
 case 1:
-    sound_play_at_point(367, a1, a2, a3, 100);
+    sound_play_at_point(367, x, y, z, 100);
     return;
 case 3:
 case 4:
-    sound_play_at_point(371, a1, a2, a3, 100);
+    sound_play_at_point(371, x, y, z, 100);
     return;
 case 5:
 case 6:
-    sound_play_at_point(370, a1, a2, a3, 100);
+    sound_play_at_point(370, x, y, z, 100);
     return;
 case 7:
 case 8:
-    sound_play_at_point(369, a1, a2, a3, 100);
+    sound_play_at_point(369, x, y, z, 100);
     return;
 case 9:
 case 10:
-    sound_play_at_point(368, a1, a2, a3, 100);
+    sound_play_at_point(368, x, y, z, 100);
 default:;
 }
 }
 
-void model_unlink_object_cb(struct record *a1)
+void model_unlink_object_cb(struct record *object)
 {
-    int l_20;
-    int l_1C;
-    int l_18;
+    struct block *block;
+    struct block_model *model;
+    int i;
 
-    switch (a1->type) {
+    switch (object->type) {
     case 6:
     case 32:
-        if (*(int *)((char *)a1 + 71) == *(int *)scratch_190de4) *(int *)((char *)a1 + 71) = 0;
+        if (*(int *)((char *)object + 71) == *(int *)scratch_190de4) *(int *)((char *)object + 71) = 0;
         return;
     case 43:
-        l_20 = (int)RECORD_DATA(a1);
-        l_1C = *(int *)((char *)l_20 + 5);
-        for (l_18 = 0; ((int)(unsigned char)*(signed char *)((char *)l_20)) > l_18; l_18++, (*(char (**)[66])&l_1C)++) {
-            if (*(int *)((char *)l_1C + 4) == *(int *)scratch_190de4) {
-                *(int *)((char *)l_1C + 4) = 0;
+        block = &object->data.block;
+        model = block->models;
+        for (i = 0; block->model_count > i; i++, model++) {
+            if ((int)model->model == *(int *)scratch_190de4) {
+                model->model = 0;
             }
         }
         return;
     case 56:
-        l_1C = (int)RECORD_DATA(a1);
-        for (l_18 = 0; a1->image > l_18; l_18++, (*(char (**)[66])&l_1C)++) {
-            if (*(int *)((char *)l_1C + 4) == *(int *)scratch_190de4) {
-                *(int *)((char *)l_1C + 4) = 0;
+        model = (struct block_model *)RECORD_DATA(object);
+        for (i = 0; object->model_count > i; i++, model++) {
+            if ((int)model->model == *(int *)scratch_190de4) {
+                model->model = 0;
             }
         }
     default:;
     }
 }
 
-void model_unlink_objects(int a1)
+void model_unlink_objects(int model)
 {
-    *(int *)scratch_190de4 = a1;
+    *(int *)scratch_190de4 = model;
     object_foreach(location_object, (int)model_unlink_object_cb);
 }
 
-int flat_random_clutter(int a1, int a2)
+int flat_random_clutter(int environment, int building_type)
 {
-    if (a1 == 3) return flat_table_pick((int)D_00187EC8);
+    if (environment == 3) return flat_table_pick((int)D_00187EC8);
     return flat_table_pick(((int)D_00187DE8) + (rand_range(0, 7) * 28));
 }
 
 void player_light_draw(void)
 {
-    int l_30;
-    int l_2C;
-    int l_28;
-    int l_24;
-    int l_20;
-    int l_1C;
-    int l_18;
+    int intensity;
+    int flicker;
+    int dx;
+    int dz;
+    int jitter_x;
+    int jitter_y;
+    int jitter_z;
 
-    l_2C = xn_rand_noise_2d(player_object->x ^ player_object->z, (xn_anim_ticks / 40) << 6);
-    l_2C >>= 3;
-    l_2C = 256 - l_2C;
-    l_30 = (l_2C * 192) >> 8;
-    l_20 = xn_rand_noise_2d(player_object->x ^ player_object->z, (xn_anim_ticks / 40) << 6);
-    l_20 >>= 3;
-    l_1C = xn_rand_noise_2d(player_object->x + player_object->z, (xn_anim_ticks / 40) << 6);
-    l_1C >>= 3;
-    l_18 = xn_rand_noise_2d(player_object->x - player_object->z, (xn_anim_ticks / 40) << 6);
-    l_18 >>= 3;
-    xn_math_yaw_offset_xz((player_object->yaw + view_look_yaw) & 2047, 192, (int)&l_28, (int)&l_24);
-    xn_light_add((player_object->x + l_28) + (l_20 - 16), (player_object->y - 50) + (l_1C - 16), (player_object->z + l_24) + (l_18 - 16), 50, l_30, 0);
-    xn_flat_add((player_object->x + l_28) + (l_20 - 16), (player_object->y - 50) + (l_1C - 16), (player_object->z + l_24) + (l_18 - 16), 26883, -1, 1, 400);
+    flicker = xn_rand_noise_2d(player_object->x ^ player_object->z, (xn_anim_ticks / 40) << 6);
+    flicker >>= 3;
+    flicker = 256 - flicker;
+    intensity = (flicker * 192) >> 8;
+    jitter_x = xn_rand_noise_2d(player_object->x ^ player_object->z, (xn_anim_ticks / 40) << 6);
+    jitter_x >>= 3;
+    jitter_y = xn_rand_noise_2d(player_object->x + player_object->z, (xn_anim_ticks / 40) << 6);
+    jitter_y >>= 3;
+    jitter_z = xn_rand_noise_2d(player_object->x - player_object->z, (xn_anim_ticks / 40) << 6);
+    jitter_z >>= 3;
+    xn_math_yaw_offset_xz((player_object->yaw + view_look_yaw) & 2047, 192, (int)&dx, (int)&dz);
+    xn_light_add((player_object->x + dx) + (jitter_x - 16), (player_object->y - 50) + (jitter_y - 16), (player_object->z + dz) + (jitter_z - 16), 50, intensity, 0);
+    xn_flat_add((player_object->x + dx) + (jitter_x - 16), (player_object->y - 50) + (jitter_y - 16), (player_object->z + dz) + (jitter_z - 16), 26883, -1, 1, 400);
 }

@@ -12,33 +12,33 @@ extern char *xn_str_copy_line(char *, char *);
 
 void info_popup_update(void)
 {
-    char *p;
+    char *text;
     short i;
-    short n;
+    short line_count;
     short x;
     short y;
-    short w;
+    short max_width;
 
-    n = 0;
+    line_count = 0;
     i = 0;
-    w = 0;
+    max_width = 0;
     if (info_popup_text == 0)
         return;
-    p = info_popup_text;
+    text = info_popup_text;
     do {
-        p = xn_str_copy_line(((char *)text_buffer), p);
+        text = xn_str_copy_line(((char *)text_buffer), text);
         i = font_text_width(((char *)text_buffer));
-        if (i > w)
-            w = i;
-        n++;
-    } while (p[-1] != 0);
-    w = (w + 10) / 2;
-    xn_draw_darken_rect(160 - w, 100 - n * 5 - 5, w * 2, n * 10 + 10);
-    p = info_popup_text;
-    x = 160 - w + 5;
-    y = 100 - n * 5;
-    for (i = 0; i < n; i++, y += 10) {
-        p = xn_str_copy_line(((char *)text_buffer), p);
+        if (i > max_width)
+            max_width = i;
+        line_count++;
+    } while (text[-1] != 0);
+    max_width = (max_width + 10) / 2;
+    xn_draw_darken_rect(160 - max_width, 100 - line_count * 5 - 5, max_width * 2, line_count * 10 + 10);
+    text = info_popup_text;
+    x = 160 - max_width + 5;
+    y = 100 - line_count * 5;
+    for (i = 0; i < line_count; i++, y += 10) {
+        text = xn_str_copy_line(((char *)text_buffer), text);
         text_draw(((char *)text_buffer), x, y);
     }
     if (D_00196272 == 1 && (mouse_buttons & 1) == 0 && (mouse_buttons_prev & 1) != 0) {

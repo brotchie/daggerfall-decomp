@@ -11,32 +11,32 @@ extern int talk_answer_scroll;
 extern int mc_strncpy();
 extern void text_draw_coloured(int, int, int, int, unsigned char);
 
-void talk_draw_answer(int a1, int a2, int a3, int a4)
+void talk_draw_answer(int left, int top, int right, int bottom)
 {
-    int l_20;
-    int l_1C;
-    int l_18;
-    int l_14;
-    int l_10;
-    int l_C;
+    int max_lines;
+    int row;
+    int line;
+    int colour;
+    int indent;
+    int y;
 
-    l_1C = 0;
+    row = 0;
     if (talk_answer_line_count == 0) return;
-    l_20 = a4 - (a2 / 7);
-    l_18 = talk_answer_scroll;
+    max_lines = bottom - (top / 7);
+    line = talk_answer_scroll;
     do {
-        if (l_18 >= talk_answer_line_count) return;
-        mc_strncpy((int)text_rsc_buffer, *(int *)((char *)(int)(talk_answer_lines + (l_18++ << 2))), 2048, (int)D_001703F0, 1192);
+        if (line >= talk_answer_line_count) return;
+        mc_strncpy((int)text_rsc_buffer, *(int *)((char *)(int)(talk_answer_lines + (line++ << 2))), 2048, (int)D_001703F0, 1192);
         if (((int)(unsigned char)(text_rsc_buffer[0] & 128)) != 0) {
-            l_14 = 96;
+            colour = 96;
         } else {
-            l_14 = 145;
+            colour = 145;
         }
         text_rsc_buffer[0] &= 127;
-        l_10 = 0;
-        while (((int)(unsigned char)text_rsc_buffer[l_10]) == 32) l_10++;
-        l_C = a2 + (l_1C * 7);
-        text_draw_coloured(((int)text_rsc_buffer) + l_10, (int)(short)*(short *)&a1, (int)(short)*(short *)&l_C, (int)(short)*(short *)&l_14, 156);
-        l_1C++;
-    } while (l_C < a4);
+        indent = 0;
+        while (((int)(unsigned char)text_rsc_buffer[indent]) == 32) indent++;
+        y = top + (row * 7);
+        text_draw_coloured(((int)text_rsc_buffer) + indent, (int)(short)*(short *)&left, (int)(short)*(short *)&y, (int)(short)*(short *)&colour, 156);
+        row++;
+    } while (y < bottom);
 }

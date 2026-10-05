@@ -26,35 +26,35 @@ extern int mc_memset();
 #pragma aux sosconv "*" parm caller [] value [eax] modify [eax ebx ecx edx];
 #pragma aux (sosconv) sos_read_settings;
 
-int sos_read_settings(int a1)
+int sos_read_settings(char *path)
 {
-    char l_BC[176];
+    char profile[176];
 
     mc_memset((int)D_0018DC38, 0, 268, (int)D_001700D5, 217, 4);
     mc_memset((int)D_0018DD64, 0, 46, (int)D_001700D5, 218, 4);
-    if ((short)profile_open((int)l_BC, a1) == 0) return 0;
-    if ((short)profile_find_section((int)l_BC, (int)D_001700DD) == 0) {
-        profile_close((int)l_BC);
+    if ((short)profile_open((int)profile, path) == 0) return 0;
+    if ((short)profile_find_section((int)profile, (int)D_001700DD) == 0) {
+        profile_close((int)profile);
         return 0;
     }
-    *(int *)((char *)l_BC + 172) = profile_get_item_number((int)l_BC, (int)D_001700E5, (int)&D_0018DD5C);
-    *(int *)((char *)l_BC + 172) = profile_get_item_number((int)l_BC, (int)D_001700EE, (int)D_0018DC94);
-    *(int *)((char *)l_BC + 172) = profile_get_item_number((int)l_BC, (int)D_001700F9, (int)D_0018DC9C);
-    *(int *)((char *)l_BC + 172) = profile_get_item_number((int)l_BC, (int)D_00170103, (int)D_0018DC98);
-    if (*(short *)((char *)l_BC + 172) == 0) {
-        profile_close((int)l_BC);
+    *(int *)((char *)profile + 172) = profile_get_item_number((int)profile, (int)D_001700E5, (int)&D_0018DD5C);
+    *(int *)((char *)profile + 172) = profile_get_item_number((int)profile, (int)D_001700EE, (int)D_0018DC94);
+    *(int *)((char *)profile + 172) = profile_get_item_number((int)profile, (int)D_001700F9, (int)D_0018DC9C);
+    *(int *)((char *)profile + 172) = profile_get_item_number((int)profile, (int)D_00170103, (int)D_0018DC98);
+    if (*(short *)((char *)profile + 172) == 0) {
+        profile_close((int)profile);
         return 0;
     }
-    if ((short)profile_find_section((int)l_BC, (int)D_0017010D) == 0) {
-        profile_close((int)l_BC);
+    if ((short)profile_find_section((int)profile, (int)D_0017010D) == 0) {
+        profile_close((int)profile);
         return 0;
     }
-    *(int *)((char *)l_BC + 172) = profile_get_item_number((int)l_BC, (int)D_001700E5, (int)&D_0018DD54);
-    *(int *)((char *)l_BC + 172) = profile_get_item_number((int)l_BC, (int)D_001700EE, (int)D_0018DD86);
-    if (*(short *)((char *)l_BC + 172) == 0) {
-        profile_close((int)l_BC);
+    *(int *)((char *)profile + 172) = profile_get_item_number((int)profile, (int)D_001700E5, (int)&D_0018DD54);
+    *(int *)((char *)profile + 172) = profile_get_item_number((int)profile, (int)D_001700EE, (int)D_0018DD86);
+    if (*(short *)((char *)profile + 172) == 0) {
+        profile_close((int)profile);
         return 0;
     }
-    profile_close((int)l_BC);
+    profile_close((int)profile);
     return 1;
 }

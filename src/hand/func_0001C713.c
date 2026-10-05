@@ -8,17 +8,17 @@ extern struct record *object_create_child(struct record *, int, int);
 extern void mc_memcpy(void *, void *, int, char *, int, int);
 
 /* a biography person: a type 45+kind record holding a character record and its class */
-unsigned short bio_person_add(struct character *name, struct career *text, int kind)
+unsigned short bio_person_add(struct character *person, struct career *career, int kind)
 {
-    struct record *o;
+    struct record *object;
 
     if (D_001966FC[kind] == 8)
         return 0xffff;
-    o = object_create_child(player_entity, 0, 634);
-    o->type = kind + 45;
-    o->flags |= 3;
-    o->image = D_001966FC[kind]++;
-    mc_memcpy(&o->data.character, name, 560, D_00170464, 1334, 4);
-    mc_memcpy(&o->data.character.career, text, 74, D_00170464, 1335, 4);
-    return o->image;
+    object = object_create_child(player_entity, 0, 634);
+    object->type = kind + 45;
+    object->flags |= 3;
+    object->image = D_001966FC[kind]++;
+    mc_memcpy(&object->data.character, person, 560, D_00170464, 1334, 4);
+    mc_memcpy(&object->data.character.career, career, 74, D_00170464, 1335, 4);
+    return object->image;
 }

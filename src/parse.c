@@ -4,13 +4,13 @@
 
 int macro_bn_biography_name(void)
 {
-    int l1;
-    int l2;
-    l1 = rand();
+    int saved_seed;
+    int name;
+    saved_seed = rand();
     srand(parse_name_seed + 0xd81);
-    l2 = name_generate(player_character[0x43], D_00190C78 & 1);
-    srand(l1);
-    return l2;
+    name = name_generate(player_character[0x43], D_00190C78 & 1);
+    srand(saved_seed);
+    return name;
 }
 
 int macro_fae_player_ally_npc_enemy(void) { return scratch_190df4 + 3; }

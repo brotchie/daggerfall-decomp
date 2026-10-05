@@ -90,28 +90,28 @@ int chargen_screen_loop(int first, int last)
     }
 }
 
-void chargen_reflexes_button(int n)
+void chargen_reflexes_button(int button)
 {
-    player_character->reflexes = n - 35;
+    player_character->reflexes = button - 35;
 }
 
 void chargen_draw_face(void)
 {
     int k;
-    struct uimg *p;
+    struct uimg *image;
 
-    p = chargen_face_images;
+    image = chargen_face_images;
     k = 0;
     while (player_character->face > k) {
-        p = (struct uimg *)(p->len + (char *)p + 12);
+        image = (struct uimg *)(image->len + (char *)image + 12);
         k++;
     }
-    k = p->y + 16 + p->h;
+    k = image->y + 16 + image->h;
     if (k >= 63)
         k = 16 - (k - 63);
     else
         k = 16;
-    xn_draw_image_transparent(p->x + 24, p->y + k, p->w, p->h, p->data);
+    xn_draw_image_transparent(image->x + 24, image->y + k, image->w, image->h, image->data);
 }
 
 void chargen_draw_attributes(void)
@@ -148,16 +148,16 @@ void chargen_draw_attributes(void)
 void chargen_draw_skills(void)
 {
     int i;
-    int k;
+    int skill;
 
     for (i = 0; i < 3; i++) {
         xn_draw_image(203, scratch_190de4[i], *(unsigned short *)(D_00195B60 + 4), *(unsigned short *)(D_00195B60 + 6), D_00195B60 + 12);
         text_draw_centred_coloured(itoa(D_00190DEA[i], ((char *)text_buffer), 10), 221, scratch_190de4[i] + 8 - font_height + 1, 145, 141);
     }
     for (i = 0; i < 12; i++) {
-        k = player_class->skills[i];
-        text_draw_coloured(*(char **)(skill_names + (k << 2)), *(short *)(chargen_buttons + ((i + 2) * 12)) + 2, *(short *)(D_0018801E + ((i + 2) * 12)) + 1, 145, 141);
-        text_draw_centred_coloured(itoa(player_character->skills[k].value, ((char *)text_buffer), 10), 192, *(short *)(D_0018801E + ((i + 2) * 12)) + 1, 145, 141);
+        skill = player_class->skills[i];
+        text_draw_coloured(*(char **)(skill_names + (skill << 2)), *(short *)(chargen_buttons + ((i + 2) * 12)) + 2, *(short *)(D_0018801E + ((i + 2) * 12)) + 1, 145, 141);
+        text_draw_centred_coloured(itoa(player_character->skills[skill].value, ((char *)text_buffer), 10), 192, *(short *)(D_0018801E + ((i + 2) * 12)) + 1, 145, 141);
     }
 }
 
@@ -170,27 +170,27 @@ void chargen_name_button(void)
     classmaker_input_text(player_character, 31, chargen_draw);
 }
 
-void chargen_select_skill(int n)
+void chargen_select_skill(int button)
 {
-    switch (n) {
+    switch (button) {
     case 2:
     case 3:
     case 4:
-        D_001880C6[0].x1 = D_001880C6[0].x0 = scratch_190de4[0] = *(short *)(D_0018801E + n * 12);
+        D_001880C6[0].x1 = D_001880C6[0].x0 = scratch_190de4[0] = *(short *)(D_0018801E + button * 12);
         D_001880C6[0].y1 = D_001880C6[0].y0 = scratch_190de4[0] + 8;
-        scratch_190df0[0] = n - 2;
+        scratch_190df0[0] = button - 2;
         break;
     case 5:
     case 6:
     case 7:
-        D_001880C6[1].x1 = D_001880C6[1].x0 = scratch_190de4[1] = *(short *)(D_0018801E + n * 12);
+        D_001880C6[1].x1 = D_001880C6[1].x0 = scratch_190de4[1] = *(short *)(D_0018801E + button * 12);
         D_001880C6[1].y1 = D_001880C6[1].y0 = scratch_190de4[1] + 8;
-        scratch_190df0[1] = n - 2;
+        scratch_190df0[1] = button - 2;
         break;
     default:
-        D_001880C6[2].x1 = D_001880C6[2].x0 = scratch_190de4[2] = *(short *)(D_0018801E + n * 12);
+        D_001880C6[2].x1 = D_001880C6[2].x0 = scratch_190de4[2] = *(short *)(D_0018801E + button * 12);
         D_001880C6[2].y1 = D_001880C6[2].y0 = scratch_190de4[2] + 8;
-        scratch_190df0[2] = n - 2;
+        scratch_190df0[2] = button - 2;
         break;
     }
 }

@@ -24,19 +24,19 @@ extern int mc_sprintf(char *, char *, ...);
 extern int func_000A13DA(char *, int, struct find_t *);
 extern int func_000A13F7(struct find_t *);
 
-void file_index_scan(char *a1)
+void file_index_scan(char *dir)
 {
     int rc;
     int i;
     char path[80];
     struct find_t ff;
 
-    if (a1[strlen(a1) - 1] != '\\') {
+    if (dir[strlen(dir) - 1] != '\\') {
         mc_set_location(337, D_00175D00);
-        mc_sprintf(path, D_00175D88, a1);
+        mc_sprintf(path, D_00175D88, dir);
     } else {
         mc_set_location(339, D_00175D00);
-        mc_sprintf(path, D_00175D8F, a1);
+        mc_sprintf(path, D_00175D8F, dir);
     }
     rc = func_000A13DA(path, 16, &ff);
     while (rc == 0) {

@@ -13,23 +13,23 @@ extern int mc_memset();
 extern int int386x();
 extern int func_000A2EC5(void __far *, void __far *, unsigned, char *, int, int);
 
-int func_0007EF86(int a1, int a2)
+int func_0007EF86(int ax_value, int bx_value)
 {
-    union REGS r;
-    struct SREGS s;
+    union REGS regs;
+    struct SREGS sregs;
 
-    mc_memset(&s, 0, 12, D_00176A10, 1078, 4);
-    mc_memset(&r, 0, 28, D_00176A10, 1079, 4);
+    mc_memset(&sregs, 0, 12, D_00176A10, 1078, 4);
+    mc_memset(&regs, 0, 28, D_00176A10, 1079, 4);
     mc_memset(D_001A5A1E, 0, 50, D_00176A10, 1080, 4);
-    D_001A5A3A = a1;
-    D_001A5A2E = a2;
+    D_001A5A3A = ax_value;
+    D_001A5A2E = bx_value;
     D_001A5A40 = D_001A5A50;
     D_001A5A32 = 0;
-    r.w.ax = 0x300;
-    r.w.bx = 0x33;
-    s.es = FP_SEG(D_001A5A1E);
-    r.x.edi = (unsigned)D_001A5A1E;
-    int386x(0x31, &r, &r, &s);
+    regs.w.ax = 0x300;
+    regs.w.bx = 0x33;
+    sregs.es = FP_SEG(D_001A5A1E);
+    regs.x.edi = (unsigned)D_001A5A1E;
+    int386x(0x31, &regs, &regs, &sregs);
     func_000A2EC5(D_00195E6C, MK_FP((unsigned short)D_001A5A54, 0), 14, D_00176A10, 1094, 4);
     return D_001A5A3A;
 }

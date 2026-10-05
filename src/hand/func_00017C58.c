@@ -3,18 +3,18 @@
 
 extern struct location *current_location;
 
-int town_has_building(short a1, int a2)
+int town_has_building(short key, int by_type)
 {
-    struct building *p;
+    struct building *building;
     int i;
 
-    p = current_location->buildings;
-    for (i = 0; i < current_location->building_count; i++, p++) {
-        if (a2 == 0) {
-            if (p->faction_id == a1)
+    building = current_location->buildings;
+    for (i = 0; i < current_location->building_count; i++, building++) {
+        if (by_type == 0) {
+            if (building->faction_id == key)
                 return 1;
         } else {
-            if (p->type == a1)
+            if (building->type == key)
                 return 1;
         }
     }

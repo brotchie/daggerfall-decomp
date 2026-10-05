@@ -76,15 +76,15 @@ extern int mc_sprintf(int, ...);
 
 void title_menu(void)
 {
-    char l_u0;                  /* unused, but they have slots */
-    int l_3C;
-    short l_28;
-    char l_u1;
-    signed char l_18;
-    short l_u2;
-    short l_u3;
-    int l_u4;
-    unsigned char l_1C;
+    char unused1;                  /* unused, but they have slots */
+    int image;
+    short choice;
+    char unused2;
+    signed char pick;
+    short unused3;
+    short unused4;
+    int unused5;
+    unsigned char new_game;
 
     while (mouse_buttons != 0) xn_mouse_poll_clamped();
 L3A3EC:;
@@ -95,8 +95,8 @@ L3A3EC:;
     disk_read_file((int)D_00170B90, *(int *)scratch_buffer);
     mc_memcpy(screen_buffer, *(int *)scratch_buffer, 64000, (int)D_00170B88, 55, 4);
     mc_memcpy(655360, screen_buffer, 64000, (int)D_00170B88, 56, 4);
-    for (l_28 = 0; ((int)(short)*(short *)&l_28) < 768; l_28++) {
-        (*(char **)scratch_buffer)[l_28 + 64000] <<= 2;
+    for (choice = 0; ((int)(short)*(short *)&choice) < 768; choice++) {
+        (*(char **)scratch_buffer)[choice + 64000] <<= 2;
     }
     xn_pal_set_range_8bit(*(int *)scratch_buffer + 64000, 0, 256);
     xn_mouse_cursor_drawn &= 254;
@@ -107,18 +107,18 @@ L3A496:;
             goto L3A496;
         }
         D_001940D4 &= 254;
-        l_18 = wait_key_from_list(D_0017B4B0, 3);
-        if (((int)(signed char)l_18) == (-1) || ((int)(signed char)l_18) == 2 || (((int)(signed char)l_18) == (-2) && point_in_rect((int)(short)mouse_x, (int)(short)mouse_y, 125, 145, 165, 158) != 0)) {
+        pick = wait_key_from_list(D_0017B4B0, 3);
+        if (((int)(signed char)pick) == (-1) || ((int)(signed char)pick) == 2 || (((int)(signed char)pick) == (-2) && point_in_rect((int)(short)mouse_x, (int)(short)mouse_y, 125, 145, 165, 158) != 0)) {
             game_exit(0);
         }
-        if (l_18 == 0 || (((int)(signed char)l_18) == (-2) && point_in_rect((int)(short)mouse_x, (int)(short)mouse_y, 72, 46, 217, 58) != 0)) {
+        if (pick == 0 || (((int)(signed char)pick) == (-2) && point_in_rect((int)(short)mouse_x, (int)(short)mouse_y, 72, 46, 217, 58) != 0)) {
             mc_memset(655360, 0, 64000, (int)D_00170B88, 72, 4);
             palette_restore();
             saveload_menu(0);
             if (scratch_190d16 != 0) goto L3A3EC;
             return;
         }
-        if (((int)(signed char)l_18) == 1 || (((int)(signed char)l_18) == (-2) && point_in_rect((int)(short)mouse_x, (int)(short)mouse_y, 74, 100, 217, 112) != 0)) {
+        if (((int)(signed char)pick) == 1 || (((int)(signed char)pick) == (-2) && point_in_rect((int)(short)mouse_x, (int)(short)mouse_y, 74, 100, 217, 112) != 0)) {
             break;
         }
     }
@@ -133,7 +133,7 @@ L3A496:;
     player_character->mobile_id = 200;
     mc_memset((int)player_class, 0, 74, (int)D_00170B88, 126, 4);
     player_character->level = 1;
-    l_1C = 1;
+    new_game = 1;
     automap_delete_files();
     mc_memset(655360, 0, 64000, (int)D_00170B88, 139, 4);
     palette_restore();
@@ -145,8 +145,8 @@ L3A496:;
         player_character->mobile_id = 200;
         mc_memset((int)player_class, 0, 74, (int)D_00170B88, 152, 4);
         disk_read_file((int)D_00170BAD, *(int *)scratch_buffer);
-        for (l_28 = 0; ((int)(short)*(short *)&l_28) < 768; l_28++) {
-            *(signed char *)((char *)(int)(*(char **)scratch_buffer + ((int)(short)*(short *)&l_28))) <<= 2;
+        for (choice = 0; ((int)(short)*(short *)&choice) < 768; choice++) {
+            *(signed char *)((char *)(int)(*(char **)scratch_buffer + ((int)(short)*(short *)&choice))) <<= 2;
         }
         xn_pal_set_all_8bit(*(int *)scratch_buffer);
         while (((int)D_00196271) != 1) {
@@ -156,15 +156,15 @@ L3A496:;
             disk_read_file((int)D_00170BE6, *(int *)scratch_buffer);
             xn_mouse_cursor_drawn &= 254;
             D_001940D4 |= 1;
-            l_18 = 255;
-            while (l_18 < 0) {
-                while (((int)(signed char)l_18) != (-2)) {
-                    l_18 = wait_key_from_list(0, 0);
-                    if (((int)(signed char)l_18) == (-1)) goto L3A3EC;
+            pick = 255;
+            while (pick < 0) {
+                while (((int)(signed char)pick) != (-2)) {
+                    pick = wait_key_from_list(0, 0);
+                    if (((int)(signed char)pick) == (-1)) goto L3A3EC;
                 }
-                l_18 = *(signed char *)((char *)(int)(*(char **)scratch_buffer + (mouse_y * 320 + mouse_x)));
-                if (l_18 == 0) l_18 = 255;
-                if (l_18 > 0) {
+                pick = *(signed char *)((char *)(int)(*(char **)scratch_buffer + (mouse_y * 320 + mouse_x)));
+                if (pick == 0) pick = 255;
+                if (pick > 0) {
                     while (mouse_buttons != 0) xn_mouse_poll_clamped();
                     D_0012B508 = 146;
                     msgbox_button_ids = 4;
@@ -176,12 +176,12 @@ L3A496:;
                     mouse_buttons = (mouse_buttons_prev = 0);
                     xn_mouse_poll_clamped();
                     while (mouse_buttons != 0) xn_mouse_poll_clamped();
-                    sound_play_ui(((int)(signed char)l_18) + 208);
+                    sound_play_ui(((int)(signed char)pick) + 208);
                     D_001940D5 |= 128;
-                    msgbox_show_rsc((int)(short)(((unsigned short)(unsigned char)D_0017B4B7[(int)(signed char)l_18]) + 2000), 5);
+                    msgbox_show_rsc((int)(short)(((unsigned short)(unsigned char)D_0017B4B7[(int)(signed char)pick]) + 2000), 5);
                 }
             }
-            player_character->race = l_18 - 1;
+            player_character->race = pick - 1;
         }
         if (chargen_popup_choice(2200, 7, 8, (int)D_00170BB5, 50, 33) == 0) {
             player_character->flags &= ~0x1;
@@ -190,11 +190,11 @@ L3A496:;
         }
         disk_read_file((int)D_00170BB5, *(int *)scratch_buffer);
         mc_memcpy(screen_buffer, *(int *)scratch_buffer, 64000, (int)D_00170B88, 213, 4);
-        l_3C = disk_read_file((int)D_00170BF3, 0);
-        xn_draw_image(68, 28, 184, 144, l_3C);
-        if (l_3C != 0 && l_3C != (-1751672937)) {
-            mc_free(l_3C, (int)D_00170B88, 217);
-            l_3C = -1751672937;
+        image = disk_read_file((int)D_00170BF3, 0);
+        xn_draw_image(68, 28, 184, 144, image);
+        if (image != 0 && image != (-1751672937)) {
+            mc_free(image, (int)D_00170B88, 217);
+            image = -1751672937;
         }
         while (mouse_buttons != 0) xn_mouse_poll_clamped();
         xn_mouse_cursor_drawn &= 254;
@@ -205,20 +205,20 @@ L3A496:;
             mc_memcpy(655360, screen_buffer, 64000, (int)D_00170B88, 226, 4);
             if (((int)(unsigned char)(mouse_buttons & 1)) != 0) {
                 if (((int)(short)mouse_x) > 68 && ((int)(short)mouse_x) < 251 && ((int)(short)mouse_y) > 60 && ((int)(short)mouse_y) < 111) {
-                    l_28 = 2;
+                    choice = 2;
                     break;
                 }
                 if (((int)(short)mouse_x) > 68 && ((int)(short)mouse_x) < 251 && ((int)(short)mouse_y) > 112 && ((int)(short)mouse_y) < 171) {
-                    l_28 = 1;
+                    choice = 1;
                     break;
                 }
             }
         }
-        if (((int)(short)*(short *)&l_28) == 2) {
+        if (((int)(short)*(short *)&choice) == 2) {
 L3AABE:;
             disk_read_file((int)D_00170BAD, *(int *)scratch_buffer);
-            for (l_28 = 0; ((int)(short)*(short *)&l_28) < 768; l_28++) {
-                *(signed char *)((char *)(int)(*(char **)scratch_buffer + ((int)(short)*(short *)&l_28))) <<= 2;
+            for (choice = 0; ((int)(short)*(short *)&choice) < 768; choice++) {
+                *(signed char *)((char *)(int)(*(char **)scratch_buffer + ((int)(short)*(short *)&choice))) <<= 2;
             }
             xn_pal_set_all_8bit(*(int *)scratch_buffer);
             disk_read_file((int)D_00170BB5, *(int *)scratch_buffer);
@@ -228,17 +228,17 @@ L3AABE:;
                 keys_world_actions();
                 xn_mouse_poll_clamped();
                 mc_memcpy(screen_buffer, *(int *)scratch_buffer, 64000, (int)D_00170B88, 258, 4);
-                l_28 = list_popup_update();
-                if (((int)(short)*(short *)&l_28) > (-1)) {
-                    D_00199634 = (int)(short)*(short *)&l_28;
-                    if (((int)(short)*(short *)&l_28) == 18) {
+                choice = list_popup_update();
+                if (((int)(short)*(short *)&choice) > (-1)) {
+                    D_00199634 = (int)(short)*(short *)&choice;
+                    if (((int)(short)*(short *)&choice) == 18) {
                         classmaker_run();
                         break;
                     }
                     sound_play_ui(217);
-                    if (chargen_popup_choice((int)(short)(l_28 + 2100), 4, 5, (int)D_00170BB5, 21, 49) == 0) {
+                    if (chargen_popup_choice((int)(short)(choice + 2100), 4, 5, (int)D_00170BB5, 21, 49) == 0) {
                         mc_set_location(272, (int)D_00170B88);
-                        mc_sprintf((int)text_buffer, (int)D_00170C00, (int)(short)*(short *)&l_28);
+                        mc_sprintf((int)text_buffer, (int)D_00170C00, (int)(short)*(short *)&choice);
                         disk_read_file((int)text_buffer, (int)player_class);
                         break;
                     }
@@ -253,18 +253,18 @@ L3AABE:;
         } else {
             if ((D_00199634 = class_questions_run()) < 0) goto L3AABE;
             disk_read_file((int)D_00170BAD, *(int *)scratch_buffer);
-            for (l_28 = 0; ((int)(short)*(short *)&l_28) < 768; l_28++) {
-                *(signed char *)((char *)(int)(*(char **)scratch_buffer + ((int)(short)*(short *)&l_28))) <<= 2;
+            for (choice = 0; ((int)(short)*(short *)&choice) < 768; choice++) {
+                *(signed char *)((char *)(int)(*(char **)scratch_buffer + ((int)(short)*(short *)&choice))) <<= 2;
             }
             xn_pal_set_all_8bit(*(int *)scratch_buffer);
         }
         disk_read_file((int)D_00170BB5, *(int *)scratch_buffer);
         mc_memcpy(screen_buffer, *(int *)scratch_buffer, 64000, (int)D_00170B88, 299, 4);
-        l_3C = disk_read_file((int)D_00170C0E, 0);
-        xn_draw_image((int)(unsigned short)*(short *)((char *)l_3C), (int)(unsigned short)*(short *)((char *)l_3C + 2), (int)(unsigned short)*(short *)((char *)l_3C + 4), (int)(unsigned short)*(short *)((char *)l_3C + 6), l_3C + 12);
-        if (l_3C != 0 && l_3C != (-1751672937)) {
-            mc_free(l_3C, (int)D_00170B88, 303);
-            l_3C = -1751672937;
+        image = disk_read_file((int)D_00170C0E, 0);
+        xn_draw_image((int)(unsigned short)*(short *)((char *)image), (int)(unsigned short)*(short *)((char *)image + 2), (int)(unsigned short)*(short *)((char *)image + 4), (int)(unsigned short)*(short *)((char *)image + 6), image + 12);
+        if (image != 0 && image != (-1751672937)) {
+            mc_free(image, (int)D_00170B88, 303);
+            image = -1751672937;
         }
         while (mouse_buttons != 0) xn_mouse_poll_clamped();
         xn_mouse_cursor_drawn &= 254;
@@ -275,17 +275,17 @@ L3AABE:;
             mc_memcpy(655360, screen_buffer, 64000, (int)D_00170B88, 311, 4);
             if (((int)(unsigned char)(mouse_buttons & 1)) != 0) {
                 if (((int)(short)mouse_x) > 76 && ((int)(short)mouse_x) < 243 && ((int)(short)mouse_y) > 58 && ((int)(short)mouse_y) < 111) {
-                    l_28 = 0;
+                    choice = 0;
                     break;
                 }
                 if (((int)(short)mouse_x) > 76 && ((int)(short)mouse_x) < 243 && ((int)(short)mouse_y) > 130 && ((int)(short)mouse_y) < 176) {
-                    l_28 = 1;
+                    choice = 1;
                     break;
                 }
             }
         }
         player_character->gold = 100;
-        career_background_summary(D_00199634, (int)(short)*(short *)&l_28);
+        career_background_summary(D_00199634, (int)(short)*(short *)&choice);
         palette_restore();
     } while (chargen_name_character() != 0);
     mc_memset(655360, 0, 64000, (int)D_00170B88, 335, 4);

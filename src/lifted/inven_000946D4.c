@@ -28,69 +28,69 @@ extern void inv_equip_item(struct record *);
 extern void inv_toggle_hidden(void);
 extern void trade_schedule_repair(void);
 
-void inv_click_left_item(struct record *a1)
+void inv_click_left_item(struct record *object)
 {
-    struct item *l_34;
-    int l_30;
-    int l_2C;
-    int l_28;
-    int l_24;
-    int l_20;
-    int l_1C;
-    int l_18;
+    struct item *item;
+    int unused1;
+    int unused2;
+    int weight;
+    int wagon_weight;
+    int unused3;
+    int unused4;
+    int unused5;
     {
-        int l_3C;
+        int action;
 
-        scratch_current_object = (inv_selected_item = a1);
-        l_34 = &a1->data.item;
-        text_macro_item = l_34;
-        l_3C = inventory_action - 1;
-        switch (l_3C) {
+        scratch_current_object = (inv_selected_item = object);
+        item = &object->data.item;
+        text_macro_item = item;
+        action = inventory_action - 1;
+        switch (action) {
         case 0:
-            inv_item_info(inv_selected_item, l_34);
+            inv_item_info(inv_selected_item, item);
             return;
         case 1:
             if (trade_mode != 0) if (trade_mode != 1) goto L94793;
-            if (((int)(unsigned short)(a1->flags & 32)) == 0 || l_34->enchantments[0].type == (-1)) {
+            if (((int)(unsigned short)(object->flags & 32)) == 0 || item->enchantments[0].type == (-1)) {
                 inv_equip_item(inv_selected_item);
             }
             return;
         case 2:
 L94793:;
-            if (l_34->group == 23 && trade_mode != 2) return;
-            if (l_34->group == 23 && (int)inv_right_container == (int)wagon_container) return;
+            if (item->group == 23 && trade_mode != 2) return;
+            if (item->group == 23 && (int)inv_right_container == (int)wagon_container) return;
             if ((int)inv_right_container == (int)wagon_container) {
-                l_28 = object_weight(a1);
+                weight = object_weight(object);
                 D_001962AE = 1;
-                l_24 = object_weight(wagon_container);
+                wagon_weight = object_weight(wagon_container);
                 D_001962AE = 0;
-                if ((l_28 + l_24) > 3000) return;
+                if ((weight + wagon_weight) > 3000) return;
             }
-            if (trade_mode == 3 && l_34->enchantments[0].type != (-1)) {
+            if (trade_mode == 3 && item->enchantments[0].type != (-1)) {
                 msgbox_show_rsc(33, 1);
                 return;
             }
             if (trade_mode == 4) {
-                a1->x = player_object->x;
-                a1->y = player_object->y;
-                a1->z = player_object->z;
-                a1->caster = 0;
-                if (a1->image == 0) a1->image = l_34->dropped_image;
-                object_reparent(inv_right_container, a1);
-                a1->id = object_new_id(0);
+                object->x = player_object->x;
+                object->y = player_object->y;
+                object->z = player_object->z;
+                object->caster = 0;
+                if (object->image == 0) object->image = item->dropped_image;
+                object_reparent(inv_right_container, object);
+                object->id = object_new_id(0);
                 return;
             }
-            if (trade_mode == 3 && trade_can_repair_item(l_34) == 0) return;
-            a1->x = player_object->x;
-            a1->y = player_object->y;
-            a1->z = player_object->z;
-            a1->caster = 0;
-            if (a1->image == 0) a1->image = l_34->dropped_image;
-            object_reparent(inv_right_container, a1);
-            if (((int)D_00196120) == (int)a1->parent) a1->owner = *(short *)picked_model_index;
-            a1->id = object_new_id(((unsigned)location_object->id) >> 16);
-            if (a1->twin != 0) a1->twin->id = a1->id;
-            quest_raise_event(5, (int)a1, 0);
+            if (trade_mode == 3 && trade_can_repair_item(item) == 0) return;
+            object->x = player_object->x;
+            object->y = player_object->y;
+            object->z = player_object->z;
+            object->caster = 0;
+            if (object->image == 0) object->image = item->dropped_image;
+            object_reparent(inv_right_container, object);
+            if (((int)D_00196120) == (int)object->parent) object->owner = *(short *)picked_model_index;
+            object->id = object_new_id(((unsigned)location_object->id) >> 16);
+            if (object->twin != 0) object->twin->id = object->id;
+            quest_raise_event(5, (int)object, 0);
             trade_schedule_repair();
             return;
         case 3:

@@ -25,129 +25,129 @@ int profile_hex_digit(signed char);
 #pragma aux (sosconv) profile_delete_section;
 #pragma aux (sosconv) profile_add_section;
 
-int profile_get_raw_line(int a1, int a2, int a3)
+int profile_get_raw_line(int profile, char *line, int size)
 {
-    int l_18;
-    int l_14;
-    int l_10;
+    char *cursor;
+    char *end;
+    int length;
 
-    l_18 = *(int *)((char *)a1 + 168);
-    if (l_18 == 0 || ((int)(unsigned char)*(signed char *)((char *)l_18)) == 91 || ((int)(unsigned char)*(signed char *)((char *)l_18)) == 13) {
+    cursor = *(char **)((char *)profile + 168);
+    if (cursor == 0 || *cursor == 91 || *cursor == 13) {
         return 0;
     }
-    l_14 = (int)(*(char **)((char *)a1 + 132) + *(int *)((char *)a1 + 136));
-    l_10 = 0;
-    while (((int)(unsigned char)*(signed char *)((char *)l_18)) == 32) l_18++;
-    while (((int)(unsigned char)*(signed char *)((char *)l_18)) != 13 && ((unsigned)(a3 - 1)) > l_10) {
-        *(signed char *)((char *)(l_10++ + a2)) = *(signed char *)((char *)l_18++);
+    end = *(char **)((char *)profile + 132) + *(int *)((char *)profile + 136);
+    length = 0;
+    while (*cursor == 32) cursor++;
+    while (*cursor != 13 && ((unsigned)(size - 1)) > length) {
+        line[length++] = *cursor++;
     }
-    *(signed char *)((char *)(a2 + l_10)) = 0;
-    l_18 += 2;
-    if (((unsigned)l_18) >= l_14) {
-        *(int *)((char *)a1 + 168) = 0;
+    line[length] = 0;
+    cursor += 2;
+    if (cursor >= end) {
+        *(int *)((char *)profile + 168) = 0;
     } else {
-        *(int *)((char *)a1 + 168) = l_18;
+        *(char **)((char *)profile + 168) = cursor;
     }
     return 1;
 }
 
-int profile_get_yes(int a1, int a2)
+int profile_get_yes(int profile, char *item)
 {
-    char l_2C[32];
+    char value[32];
 
-    if ((short)profile_find_item(a1, a2) == 0) return 0;
-    if ((short)profile_get_string(a1, (int)l_2C, 32) == 0) return 0;
-    if (stricmp((int)l_2C, (int)D_00170133) == 0) return 1;
+    if ((short)profile_find_item(profile, item) == 0) return 0;
+    if ((short)profile_get_string(profile, (int)value, 32) == 0) return 0;
+    if (stricmp((int)value, (int)D_00170133) == 0) return 1;
     return 0;
 }
 
-int profile_get_item_string(int a1, int a2, int a3, int a4)
+int profile_get_item_string(int profile, char *item, char *value, int size)
 {
-    if ((short)profile_find_item(a1, a2) == 0) return 0;
-    if ((short)profile_get_string(a1, a3, a4) == 0) return 0;
+    if ((short)profile_find_item(profile, item) == 0) return 0;
+    if ((short)profile_get_string(profile, value, size) == 0) return 0;
     return 1;
 }
 
-int profile_set_yes_no(int a1, int a2, short a3)
+int profile_set_yes_no(int profile, char *item, short yes)
 {
-    if ((short)profile_find_item(a1, a2) == 0) return 0;
-    if (a3 != 0) {
-        if ((short)profile_set_string(a1, (int)D_00170137) == 0) return 0;
-    } else if ((short)profile_set_string(a1, (int)D_0017013B) == 0) {
+    if ((short)profile_find_item(profile, item) == 0) return 0;
+    if (yes != 0) {
+        if ((short)profile_set_string(profile, (int)D_00170137) == 0) return 0;
+    } else if ((short)profile_set_string(profile, (int)D_0017013B) == 0) {
         return 0;
     }
     return 1;
 }
 
-int profile_delete_section(int a1, int a2)
+int profile_delete_section(int profile, char *section)
 {
-    int l_18;
-    int l_14;
-    int l_10;
+    char *start;
+    char *end;
+    int length;
 
-    if ((short)profile_find_section(a1, a2) == 0) return 0;
-    l_18 = *(int *)((char *)a1 + 152);
-    l_14 = (int)(*(char **)((char *)a1 + 132) + *(int *)((char *)a1 + 136));
-    l_10 = 1;
-    while (((int)(unsigned char)*(signed char *)((char *)(l_18 + l_10))) != 91 && ((unsigned)(l_18 + l_10)) < l_14) {
-        l_10++;
+    if ((short)profile_find_section(profile, section) == 0) return 0;
+    start = *(char **)((char *)profile + 152);
+    end = *(char **)((char *)profile + 132) + *(int *)((char *)profile + 136);
+    length = 1;
+    while (start[length] != 91 && start + length < end) {
+        length++;
     }
-    mc_memmove(l_18, l_18 + l_10, l_14 - (l_18 + l_10), (int)D_00170129, 1179, 4);
-    *(int *)((char *)a1 + 136) -= l_10;
-    *(signed char *)((char *)a1 + 1) |= 128;
+    mc_memmove(start, start + length, end - (start + length), (int)D_00170129, 1179, 4);
+    *(int *)((char *)profile + 136) -= length;
+    *(signed char *)((char *)profile + 1) |= 128;
     return 1;
 }
 
-int profile_add_section(int a1, int a2)
+int profile_add_section(int profile, char *section)
 {
-    int l_14;
-    int l_10;
+    char *cursor;
+    int length;
 
-    if ((short)profile_find_section(a1, a2) != 0) return 0;
-    l_14 = (int)(*(char **)((char *)a1 + 132) + *(int *)((char *)a1 + 136));
-    l_10 = strlen(a2) + 6;
-    if (((unsigned)(*(int *)((char *)a1 + 136) + l_10)) > *(int *)((char *)a1 + 140)) return 0;
-    *(signed char *)((char *)l_14++) = 13;
-    *(signed char *)((char *)l_14++) = 10;
-    *(int *)((char *)a1 + 152) = l_14;
-    *(signed char *)((char *)l_14++) = 91;
-    while (*(signed char *)((char *)a2) != 0) {
-        *(signed char *)((char *)l_14++) = *(signed char *)((char *)a2++);
+    if ((short)profile_find_section(profile, section) != 0) return 0;
+    cursor = *(char **)((char *)profile + 132) + *(int *)((char *)profile + 136);
+    length = strlen(section) + 6;
+    if (((unsigned)(*(int *)((char *)profile + 136) + length)) > *(int *)((char *)profile + 140)) return 0;
+    *cursor++ = 13;
+    *cursor++ = 10;
+    *(char **)((char *)profile + 152) = cursor;
+    *cursor++ = 91;
+    while (*section != 0) {
+        *cursor++ = *section++;
     }
-    *(signed char *)((char *)l_14++) = 93;
-    *(signed char *)((char *)l_14++) = 13;
-    *(signed char *)((char *)l_14++) = 10;
-    *(int *)((char *)a1 + 168) = l_14;
-    *(int *)((char *)a1 + 144) = l_14;
-    *(int *)((char *)a1 + 136) += l_10;
-    *(signed char *)((char *)a1 + 1) |= 128;
+    *cursor++ = 93;
+    *cursor++ = 13;
+    *cursor++ = 10;
+    *(char **)((char *)profile + 168) = cursor;
+    *(char **)((char *)profile + 144) = cursor;
+    *(int *)((char *)profile + 136) += length;
+    *(signed char *)((char *)profile + 1) |= 128;
     return 1;
 }
 
-int profile_hex_to_int(int a1)
+int profile_hex_to_int(char *text)
 {
-    int l_28;
-    int l_24;
-    int l_20;
-    int l_1C;
+    int value;
+    int digits;
+    int unused;
+    int i;
 
-    l_28 = 0;
-    l_24 = strlen(a1);
-    l_1C = 0;
+    value = 0;
+    digits = strlen(text);
+    i = 0;
     do {
-        l_28 += profile_hex_digit((int)(signed char)*(signed char *)((char *)(l_1C++ + a1))) * D_00178848[l_24];
-        l_24--;
-    } while (((unsigned)l_24) > 0);
-    return l_28;
+        value += profile_hex_digit((signed char)text[i++]) * D_00178848[digits];
+        digits--;
+    } while (((unsigned)digits) > 0);
+    return value;
 }
 
-int profile_hex_digit(signed char a1)
+int profile_hex_digit(signed char digit)
 {
-    int l_20;
+    int i;
 
-    for (l_20 = 0; ((unsigned)l_20) < 16; l_20++) {
-        if (((int)(unsigned char)*(signed char *)((char *)(D_00178848[0] + l_20))) == toupper((int)(signed char)a1)) {
-            return l_20;
+    for (i = 0; ((unsigned)i) < 16; i++) {
+        if (((int)(unsigned char)*(signed char *)((char *)(D_00178848[0] + i))) == toupper((int)(signed char)digit)) {
+            return i;
         }
     }
     return -1;

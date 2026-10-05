@@ -5,7 +5,7 @@
 
 extern int xn_font_draw_string();
 
-void text_draw(int a1, short a2, short a3)
+void text_draw(char *text, short x, short y)
 {
-    xn_font_draw_string((int)(short)a2, (int)(short)a3, a1);
+    xn_font_draw_string((int)(short)x, (int)(short)y, text);
 }

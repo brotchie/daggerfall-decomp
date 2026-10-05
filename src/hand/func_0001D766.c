@@ -17,29 +17,29 @@ extern int mc_strncpy();
 extern int write(int, void *, int);
 extern int strlen(char *);
 
-void rumor_add_quest(struct quest *a1, int a2, int a3, int a4)
+void rumor_add_quest(struct quest *quest, int message, int target, int flags)
 {
-    int l_14;
-    int l_10;
-    struct rumor r;
+    int unused;
+    int days;
+    struct rumor rumor;
 
     if (disk_file_exists(D_001704BB) == 0) return;
     text_missing_ok = 1;
     ((char *)text_rsc_buffer)[0] = 0;
-    quest_load_text(a1, a2, 0, 0);
+    quest_load_text(quest, message, 0, 0);
     if (((char *)text_rsc_buffer)[0] == 0) return;
     if ((rumor_file = disk_open_rw(D_001704BB)) < 0) return;
     lseek(rumor_file, 0, 2);
-    l_10 = (a4 & 2) ? 180 : 30;
-    mc_memset(&r, 0, 34, D_00170464, 1808, 4);
-    mc_strncpy(r.quest_name, a1->name, 9, D_00170464, 1809);
-    r.quest_id = a1->id;
-    r.message = a2;
-    r.target = a3;
-    r.flags = a4;
-    r.expires = (unsigned)(game_minutes + l_10 * 1440);
-    r.text_length = strlen(((char *)text_rsc_buffer)) + 1;
-    write(rumor_file, &r, 34);
-    write(rumor_file, ((char *)text_rsc_buffer), r.text_length);
+    days = (flags & 2) ? 180 : 30;
+    mc_memset(&rumor, 0, 34, D_00170464, 1808, 4);
+    mc_strncpy(rumor.quest_name, quest->name, 9, D_00170464, 1809);
+    rumor.quest_id = quest->id;
+    rumor.message = message;
+    rumor.target = target;
+    rumor.flags = flags;
+    rumor.expires = (unsigned)(game_minutes + days * 1440);
+    rumor.text_length = strlen(((char *)text_rsc_buffer)) + 1;
+    write(rumor_file, &rumor, 34);
+    write(rumor_file, ((char *)text_rsc_buffer), rumor.text_length);
     close(rumor_file);
 }

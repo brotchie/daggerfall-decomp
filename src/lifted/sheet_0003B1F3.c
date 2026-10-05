@@ -37,16 +37,16 @@ extern int rand_range(int, int);
 extern int mc_memcpy();
 extern void sheet_place_spinner(int);
 
-int sheet_open(short a1)
+int sheet_open(short opening)
 {
-    int l_20;
-    int l_24;
+    int hp_gain;
+    int result;
 
     if (player_death_timer > 0) return 0;
     if (((int)D_0019626F) == 3 && ((int)(unsigned char)game_mode) == 8) {
         return 1;
     }
-    if (a1 != 0 || (game_mode == 0 && key_action_held(36) != 0 && player_death_timer == 0)) {
+    if (opening != 0 || (game_mode == 0 && key_action_held(36) != 0 && player_death_timer == 0)) {
         game_mode = 3;
         window_image = disk_read_file((int)D_00170C40, 0);
         *(int *)D_00199638 = disk_read_file((int)D_00170C4D, 0);
@@ -57,13 +57,13 @@ int sheet_open(short a1)
         D_00195F42 = *(short *)(*(char **)D_00199638 + 4);
         D_00195F3C = *(short *)(*(char **)D_00199638 + 6);
         if (((struct bf8_2_1 *)&D_001940D9)->f != 0) {
-            l_20 = (rand_range(player_class->hp_per_level >> 1, player_class->hp_per_level) + (player_character->attributes[4] / 10)) - 5;
-            if (l_20 < 1) l_20 = 1;
-            player_character->max_health += l_20;
-            player_character->max_health_base += l_20;
+            hp_gain = (rand_range(player_class->hp_per_level >> 1, player_class->hp_per_level) + (player_character->attributes[4] / 10)) - 5;
+            if (hp_gain < 1) hp_gain = 1;
+            player_character->max_health += hp_gain;
+            player_character->max_health_base += hp_gain;
             sound_play(364, player_object, 100);
         }
-        if (((int)(short)a1) == 50) {
+        if (((int)(short)opening) == 50) {
             D_001940D9 |= 4;
             *(short *)scratch_190d64 = 30;
         } else {
@@ -76,9 +76,9 @@ int sheet_open(short a1)
         D_00187CA8 = 0;
     }
     if (((int)(unsigned char)game_mode) == 3) {
-        l_24 = 1;
+        result = 1;
     } else {
-        l_24 = 0;
+        result = 0;
     }
-    return l_24;
+    return result;
 }

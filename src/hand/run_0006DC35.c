@@ -113,73 +113,73 @@ extern int mc_strncpy();
 extern int mc_set_location(int, int);
 extern int mc_sprintf(int, ...);
 
-void guild_join_or_promote(int a1, int a2)
+void guild_join_or_promote(int guild, int joining)
 {
-    struct record *obj;
+    struct record *object;
     int delta;
-    int r;
-    int orig;
-    int flag;
+    int refusal;
+    int kind;
+    int expelled;
 
-    orig = a1;
-    flag = 0;
-    a1 &= 63;
-    if (guild_membership == 0 && a2 != 0) {
+    kind = guild;
+    expelled = 0;
+    guild &= 63;
+    if (guild_membership == 0 && joining != 0) {
         D_001A4A1D++;
         if (D_001A4A1D != (char)1)
             return;
-        if ((orig & 64) && guild_find_membership_by_bits(64) != 0)
+        if ((kind & 64) && guild_find_membership_by_bits(64) != 0)
             return;
-        if ((orig & 128) && guild_find_membership_by_bits(128) != 0)
+        if ((kind & 128) && guild_find_membership_by_bits(128) != 0)
             return;
-        r = guild_join_check(a1);
-        if (r == 2) {
-            msgbox_show_rsc(guild_messages[a1].busy, 1);
-            return;
-        }
-        if (r == 1) {
-            msgbox_show_rsc(guild_messages[a1].done, 1);
+        refusal = guild_join_check(guild);
+        if (refusal == 2) {
+            msgbox_show_rsc(guild_messages[guild].busy, 1);
             return;
         }
-        msgbox_yes_no_rsc(guild_messages[a1].start);
+        if (refusal == 1) {
+            msgbox_show_rsc(guild_messages[guild].done, 1);
+            return;
+        }
+        msgbox_yes_no_rsc(guild_messages[guild].start);
         if (D_00196271 == 2)
             return;
-        obj = object_create_child(player_entity, 0, 13);
-        obj->type = 10;
-        obj->flags = 3;
-        (guild_membership = &obj->data.membership)->rank = 0;
-        guild_membership->kind = orig;
+        object = object_create_child(player_entity, 0, 13);
+        object->type = 10;
+        object->flags = 3;
+        (guild_membership = &object->data.membership)->rank = 0;
+        guild_membership->kind = kind;
         guild_membership->faction = D_0019671C->id;
         guild_membership->rank_time = game_minutes;
         while (mouse_buttons)
             xn_mouse_poll_clamped();
-        msgbox_show_rsc(guild_messages[a1].level[0], 1);
+        msgbox_show_rsc(guild_messages[guild].level[0], 1);
         return;
     }
     if (guild_membership == 0)
         return;
     if (game_minutes - guild_membership->rank_time <= 40320)
         return;
-    delta = guild_rank_for_skills(a1) - guild_membership->rank;
+    delta = guild_rank_for_skills(guild) - guild_membership->rank;
     if (D_0019671C->reputation < 0) {
         delta = -(guild_membership->rank + 1);
-        flag = 1;
+        expelled = 1;
     }
-    if (delta > 0 || flag != 0) {
+    if (delta > 0 || expelled != 0) {
         guild_membership->rank += delta;
         guild_membership->rank_time = game_minutes;
-        if (a1 == 3 && (guild_membership->rank == 6 || guild_membership->rank == 8))
+        if (guild == 3 && (guild_membership->rank == 6 || guild_membership->rank == 8))
             guild_give_map(0);
-        if (a1 == 0 && guild_membership->rank < 100)
+        if (guild == 0 && guild_membership->rank < 100)
             guild_give_map(1);
         if (guild_membership->rank > 100) {
             msgbox_show_rsc(668, 1);
             guild_find_membership_by_faction(current_building->faction_id);
             if (found_object != 0)
                 object_delete(found_object);
-            if (a1 == 3)
+            if (guild == 3)
                 player_character->thieves_invite_count = 0;
-            if (a1 == 0)
+            if (guild == 0)
                 player_character->brotherhood_invite_count = 0;
             guild_membership = 0;
             return;
@@ -188,79 +188,79 @@ void guild_join_or_promote(int a1, int a2)
             msgbox_show_rsc(667, 1);
             return;
         }
-        msgbox_show_rsc(*(short *)(guild_rank_messages + (a1 * 26 + guild_membership->rank * 2)), 1);
+        msgbox_show_rsc(*(short *)(guild_rank_messages + (guild * 26 + guild_membership->rank * 2)), 1);
     }
 }
 
-void guild_service_dispatch(struct record *a1)
+void guild_service_dispatch(struct record *npc)
 {
-    struct record *l_38;
-    int l_34;
-    int l_30;
-    int l_2C;
-    int l_28;
-    int l_24;
-    int l_20;
-    int l_1C;
-    int l_18;
+    struct record *armor;
+    int unused;
+    int choice;
+    int guild;
+    int is_member;
+    int refusal_text;
+    int not_served;
+    int label;
+    int image;
 
-    l_24 = 0;
-    l_20 = 0;
+    refusal_text = 0;
+    not_served = 0;
     D_001A4A1C = 0;
     object_free_children((int)D_001960D9);
     D_0019671C = faction_find(current_building->faction_id);
     guild_membership = guild_find_membership_by_faction(current_building->faction_id);
-    l_2C = guild_kind_of_faction((int)D_0019671C);
-    scratch_object = a1;
-    guild_join_or_promote(l_2C, 0);
-    D_001A4A1A = ((unsigned)a1->id) >> 16;
-    l_1C = guild_service_label((int)(short)a1->data.person.faction_id);
-    if (l_1C == 0) {
-        npc_talk(a1);
+    guild = guild_kind_of_faction((int)D_0019671C);
+    scratch_object = npc;
+    guild_join_or_promote(guild, 0);
+    D_001A4A1A = ((unsigned)npc->id) >> 16;
+    label = guild_service_label((int)(short)npc->data.person.faction_id);
+    if (label == 0) {
+        npc_talk(npc);
         return;
     }
-    l_28 = ((guild_membership != 0) ? 1 : 0);
+    is_member = ((guild_membership != 0) ? 1 : 0);
     mc_set_location(163, (int)D_00175EAA);
-    mc_sprintf((int)text_buffer, (int)D_00175EB3, l_28 + 48);
-    l_18 = disk_read_file((int)text_buffer, 0);
-    l_30 = guild_menu(l_18, l_28, l_1C);
-    switch (l_30) {
+    mc_sprintf((int)text_buffer, (int)D_00175EB3, is_member + 48);
+    image = disk_read_file((int)text_buffer, 0);
+    choice = guild_menu(image, is_member, label);
+    switch (choice) {
     case 0:
-        guild_join_or_promote(l_2C, 1);
-        if (l_18 != 0 && l_18 != (-1751672937)) {
-            mc_free(l_18, (int)D_00175EAA, 170);
-            l_18 = -1751672937;
+        guild_join_or_promote(guild, 1);
+        if (image != 0 && image != (-1751672937)) {
+            mc_free(image, (int)D_00175EAA, 170);
+            image = -1751672937;
         }
         return;
     case 1:
-        npc_talk(a1);
-        if (l_18 != 0 && l_18 != (-1751672937)) {
-            mc_free(l_18, (int)D_00175EAA, 174);
-            l_18 = -1751672937;
+        npc_talk(npc);
+        if (image != 0 && image != (-1751672937)) {
+            mc_free(image, (int)D_00175EAA, 174);
+            image = -1751672937;
         }
         return;
     case 2:
-        if (l_18 != 0 && l_18 != (-1751672937)) {
-            mc_free(l_18, (int)D_00175EAA, 177);
-            l_18 = -1751672937;
+        if (image != 0 && image != (-1751672937)) {
+            mc_free(image, (int)D_00175EAA, 177);
+            image = -1751672937;
         }
         break;
     case 3:
-        if (l_18 != 0 && l_18 != (-1751672937)) {
-            mc_free(l_18, (int)D_00175EAA, 180);
-            l_18 = -1751672937;
+        if (image != 0 && image != (-1751672937)) {
+            mc_free(image, (int)D_00175EAA, 180);
+            image = -1751672937;
         }
         return;
     default:
-        if (l_18 != 0 && l_18 != (-1751672937)) {
-            mc_free(l_18, (int)D_00175EAA, 183);
-            l_18 = -1751672937;
+        if (image != 0 && image != (-1751672937)) {
+            mc_free(image, (int)D_00175EAA, 183);
+            image = -1751672937;
         }
     }
-    switch ((unsigned)l_2C) {
+    switch ((unsigned)guild) {
     case 0:
         if (guild_membership != 0) {
-            switch (a1->data.person.faction_id) {
+            switch (npc->data.person.faction_id) {
             case 839:
                 training_offer((int)D_00186F37);
                 break;
@@ -268,40 +268,40 @@ void guild_service_dispatch(struct record *a1)
                 if ((guild_membership->rank) >= 1) {
                     guild_buy_potions();
                 } else {
-                    l_24 = 3100;
+                    refusal_text = 3100;
                 }
                 break;
             case 840:
                 if ((guild_membership->rank) >= 3) {
                     potionmaker_open(1);
                 } else {
-                    l_24 = 3100;
+                    refusal_text = 3100;
                 }
                 break;
             case 843:
                 if ((guild_membership->rank) < 5) {
-                    l_24 = 3100;
+                    refusal_text = 3100;
                 } else {
                     guild_buy_soulgems();
                 }
                 break;
             case 842:
                 if ((guild_membership->rank) < 7) {
-                    l_24 = 3100;
+                    refusal_text = 3100;
                 } else {
                     msgbox_show_rsc(402, 1);
-                    npc_talk(a1);
+                    npc_talk(npc);
                 }
                 break;
             case 807:
-                if (a1->quest_id == 0) {
+                if (npc->quest_id == 0) {
                     quest_pick_file(76, 0, 48, 66, guild_membership->rank);
                 } else {
-                    npc_talk(a1);
+                    npc_talk(npc);
                 }
                 break;
             default:
-                npc_talk(a1);
+                npc_talk(npc);
             }
         }
         break;
@@ -311,7 +311,7 @@ void guild_service_dispatch(struct record *a1)
                 player_character->magicka = player_character->max_magicka;
                 msgbox_show_rsc(465, 1);
             }
-            switch (a1->data.person.faction_id) {
+            switch (npc->data.person.faction_id) {
             case 61:
                 training_offer((int)D_00186F5F);
                 break;
@@ -322,44 +322,44 @@ void guild_service_dispatch(struct record *a1)
                 if ((guild_membership->rank) >= 3) {
                     guild_buy_magic_items();
                 } else {
-                    l_24 = 3100;
+                    refusal_text = 3100;
                 }
                 break;
             case 802:
                 if ((guild_membership->rank) >= 5) {
                     itemmaker_open(1);
                 } else {
-                    l_24 = 3100;
+                    refusal_text = 3100;
                 }
                 break;
             case 66:
                 if ((guild_membership->rank) >= 6) {
-                    daedra_summon(a1);
+                    daedra_summon(npc);
                 } else {
-                    l_24 = 3100;
+                    refusal_text = 3100;
                 }
                 break;
             case 62:
                 if ((guild_membership->rank) >= 8) {
                     guild_teleport();
                 } else {
-                    l_24 = 3100;
+                    refusal_text = 3100;
                 }
                 break;
             default:
-                l_20 = 1;
+                not_served = 1;
             }
         } else {
-            l_20 = 1;
+            not_served = 1;
         }
-        if (l_20 != 0) {
-            switch (a1->data.person.faction_id) {
+        if (not_served != 0) {
+            switch (npc->data.person.faction_id) {
             case 60:
                 guild_buy_spells();
                 break;
             case 63:
-                if (a1->quest_id != 0) {
-                    npc_talk(a1);
+                if (npc->quest_id != 0) {
+                    npc_talk(npc);
                 } else if (guild_membership != 0) {
                     quest_pick_file(78, 0, 48, 66, player_character->level);
                 } else {
@@ -379,56 +379,56 @@ void guild_service_dispatch(struct record *a1)
         break;
     case 2:
         if (guild_membership != 0) {
-            switch (a1->data.person.faction_id) {
+            switch (npc->data.person.faction_id) {
             case 849:
                 training_offer((int)D_00186F74);
                 break;
             case 850:
                 trade_price_scale = ((10 - (guild_membership->rank)) << 8) / 10;
-                shop_open_repair(255, a1);
+                shop_open_repair(255, npc);
                 break;
             case 851:
-                if (a1->quest_id == 0) {
+                if (npc->quest_id == 0) {
                     quest_pick_file(77, 0, 48, 66, guild_membership->rank);
                 } else {
-                    npc_talk(a1);
+                    npc_talk(npc);
                 }
                 break;
             default:
-                l_20 = 1;
+                not_served = 1;
             }
         } else {
-            l_20 = 1;
+            not_served = 1;
         }
-        if (l_20 != 0) {
-            if (a1->data.person.faction_id == 851) {
-                if (a1->quest_id == 0) {
+        if (not_served != 0) {
+            if (npc->data.person.faction_id == 851) {
+                if (npc->quest_id == 0) {
                     quest_pick_file(77, 0, 48, 67, guild_membership->rank);
                 } else {
-                    npc_talk(a1);
+                    npc_talk(npc);
                 }
             } else {
-                npc_talk(a1);
+                npc_talk(npc);
             }
         }
         break;
     case 3:
         if (guild_membership == 0) {
         } else {
-            switch ((unsigned short)(a1->data.person.faction_id - 803)) {
+            switch ((unsigned short)(npc->data.person.faction_id - 803)) {
             case 0:
                 training_offer((int)D_00186F4C);
                 break;
             case 1:
-                if (a1->quest_id == 0) {
+                if (npc->quest_id == 0) {
                     quest_pick_file(79, 0, 48, 66, guild_membership->rank);
                 } else {
-                    npc_talk(a1);
+                    npc_talk(npc);
                 }
                 break;
             case 2:
                 if ((guild_membership->rank) < 2) {
-                    l_24 = 3100;
+                    refusal_text = 3100;
                     break;
                 }
                 trade_price_scale = 128;
@@ -437,14 +437,14 @@ void guild_service_dispatch(struct record *a1)
                 break;
             case 3:
                 if ((guild_membership->rank) < 4) {
-                    l_24 = 3100;
+                    refusal_text = 3100;
                     break;
                 }
                 msgbox_show_rsc(402, 1);
-                npc_talk(a1);
+                npc_talk(npc);
                 break;
             default:
-                npc_talk(a1);
+                npc_talk(npc);
             }
         }
         break;
@@ -459,27 +459,27 @@ void guild_service_dispatch(struct record *a1)
     case 76:
     case 77:
         if (guild_membership != 0) {
-            switch (a1->data.person.faction_id) {
+            switch (npc->data.person.faction_id) {
             case 845:
                 if (((1 << (guild_membership->rank)) & guild_membership->armor_received) != 0) {
                     msgbox_show_rsc(461, 1);
                     break;
                 }
                 guild_membership->armor_received |= 1 << (guild_membership->rank);
-                l_38 = object_create_child(a1, 0, 107);
-                l_38->type = 2;
+                armor = object_create_child(npc, 0, 107);
+                armor->type = 2;
                 forced_material = guild_membership->rank - 1;
                 if (((int)(unsigned char)forced_material) > 100) {
                     forced_material = 2;
                 } else if (((int)(unsigned char)forced_material) > 10) {
                     forced_material = 10;
                 }
-                item_make_in_range(2, 0, 6, &l_38->data.item);
-                l_38->data.item.armor_type = 2;
-                l_38->x = player_object->x;
-                l_38->y = player_object->y;
-                l_38->z = player_object->z;
-                inv_store_item(l_38);
+                item_make_in_range(2, 0, 6, &armor->data.item);
+                armor->data.item.armor_type = 2;
+                armor->x = player_object->x;
+                armor->y = player_object->y;
+                armor->z = player_object->z;
+                inv_store_item(armor);
                 msgbox_show_rsc(463, 1);
                 break;
             case 848:
@@ -490,25 +490,25 @@ void guild_service_dispatch(struct record *a1)
                 }
                 object_foreach(location_object, (int)bank_add_house_for_sale);
                 if (bank_house_count == 0) break;
-                l_30 = rand_range(0, (unsigned char)bank_house_count - 1);
-                player_character->house = bank_houses_for_sale[l_30].f12;
-                D_001A41E4 = (struct record *)(bank_houses_for_sale[l_30].p - 71);
-                D_001A41DC = bank_houses_for_sale[l_30].f4;
+                choice = rand_range(0, (unsigned char)bank_house_count - 1);
+                player_character->house = bank_houses_for_sale[choice].f12;
+                D_001A41E4 = (struct record *)(bank_houses_for_sale[choice].p - 71);
+                D_001A41DC = bank_houses_for_sale[choice].f4;
                 msgbox_show_rsc(462, 1);
                 mc_strncpy((int)saved_region_name, *(int *)(region_names + (((int)(unsigned char)current_region) << 2)), 32, (int)D_00175EAA, 413);
                 mc_strncpy((int)saved_location_name, (int)current_location, 32, (int)D_00175EAA, 414);
                 break;
             default:
-                l_20 = 1;
+                not_served = 1;
             }
         } else {
-            l_20 = 1;
+            not_served = 1;
         }
-        if (l_20 != 0) {
-            switch (a1->data.person.faction_id) {
+        if (not_served != 0) {
+            switch (npc->data.person.faction_id) {
             case 846:
-                if (a1->quest_id != 0) {
-                    npc_talk(a1);
+                if (npc->quest_id != 0) {
+                    npc_talk(npc);
                 } else if (guild_membership != 0) {
                     quest_pick_file(66, 0, 48, 66, player_character->level);
                 } else {
@@ -524,44 +524,44 @@ void guild_service_dispatch(struct record *a1)
         if (guild_membership == 0) {
         } else {
             guild_heal();
-            switch ((unsigned short)(a1->data.person.faction_id - 453)) {
+            switch ((unsigned short)(npc->data.person.faction_id - 453)) {
             case 0:
                 if ((guild_membership->rank) >= 1) {
                     guild_buy_potions();
                 } else {
-                    l_24 = 3100;
+                    refusal_text = 3100;
                 }
                 break;
             case 1:
                 if ((guild_membership->rank) >= 4) {
                     potionmaker_open(1);
                 } else {
-                    l_24 = 3100;
+                    refusal_text = 3100;
                 }
                 break;
             case 2:
                 if ((guild_membership->rank) >= 4) {
                     guild_buy_soulgems();
                 } else {
-                    l_24 = 3100;
+                    refusal_text = 3100;
                 }
                 break;
             case 3:
                 if ((guild_membership->rank) >= 7) {
-                    daedra_summon(a1);
+                    daedra_summon(npc);
                 } else {
-                    l_24 = 3100;
+                    refusal_text = 3100;
                 }
                 break;
             default:
-                l_20 = 1;
+                not_served = 1;
             }
             goto L6E949;
         }
-        l_20 = 1;
+        not_served = 1;
 L6E949:;
-        if (l_20 != 0) {
-            switch (a1->data.person.faction_id) {
+        if (not_served != 0) {
+            switch (npc->data.person.faction_id) {
             case 241:
                 training_offer((int)D_00186F88);
                 break;
@@ -582,36 +582,36 @@ L6E949:;
     case 143:
         if (guild_membership != 0) {
             if ((guild_membership->rank) >= 2) guild_heal();
-            switch (a1->data.person.faction_id) {
+            switch (npc->data.person.faction_id) {
             case 462:
                 if ((guild_membership->rank) >= 1) {
                     guild_buy_potions();
                 } else {
-                    l_24 = 3100;
+                    refusal_text = 3100;
                 }
                 break;
             case 463:
                 if ((guild_membership->rank) >= 6) {
                     potionmaker_open(1);
                 } else {
-                    l_24 = 3100;
+                    refusal_text = 3100;
                 }
                 break;
             case 464:
                 if ((guild_membership->rank) >= 8) {
-                    daedra_summon(a1);
+                    daedra_summon(npc);
                 } else {
-                    l_24 = 3100;
+                    refusal_text = 3100;
                 }
                 break;
             default:
-                l_20 = 1;
+                not_served = 1;
             }
         } else {
-            l_20 = 1;
+            not_served = 1;
         }
-        if (l_20 != 0) {
-            switch (a1->data.person.faction_id) {
+        if (not_served != 0) {
+            switch (npc->data.person.faction_id) {
             case 243:
                 training_offer((int)D_00186F9E);
                 break;
@@ -635,36 +635,36 @@ L6E949:;
     case 144:
         if (guild_membership != 0) {
             if ((guild_membership->rank) >= 1) guild_heal();
-            switch (a1->data.person.faction_id) {
+            switch (npc->data.person.faction_id) {
             case 468:
                 if ((guild_membership->rank) >= 2) {
                     guild_buy_potions();
                 } else {
-                    l_24 = 3100;
+                    refusal_text = 3100;
                 }
                 break;
             case 469:
                 if ((guild_membership->rank) >= 5) {
                     potionmaker_open(1);
                 } else {
-                    l_24 = 3100;
+                    refusal_text = 3100;
                 }
                 break;
             case 470:
                 if ((guild_membership->rank) >= 7) {
-                    daedra_summon(a1);
+                    daedra_summon(npc);
                 } else {
-                    l_24 = 3100;
+                    refusal_text = 3100;
                 }
                 break;
             default:
-                l_20 = 1;
+                not_served = 1;
             }
         } else {
-            l_20 = 1;
+            not_served = 1;
         }
-        if (l_20 != 0) {
-            switch (a1->data.person.faction_id) {
+        if (not_served != 0) {
+            switch (npc->data.person.faction_id) {
             case 245:
                 training_offer((int)D_00186FB6);
                 break;
@@ -688,36 +688,36 @@ L6E949:;
     case 145:
         if (guild_membership != 0) {
             if ((guild_membership->rank) >= 1) guild_heal();
-            switch (a1->data.person.faction_id) {
+            switch (npc->data.person.faction_id) {
             case 473:
                 if ((guild_membership->rank) >= 4) {
                     guild_buy_potions();
                 } else {
-                    l_24 = 3100;
+                    refusal_text = 3100;
                 }
                 break;
             case 474:
                 if ((guild_membership->rank) >= 5) {
                     potionmaker_open(1);
                 } else {
-                    l_24 = 3100;
+                    refusal_text = 3100;
                 }
                 break;
             case 475:
                 if ((guild_membership->rank) >= 7) {
-                    daedra_summon(a1);
+                    daedra_summon(npc);
                 } else {
-                    l_24 = 3100;
+                    refusal_text = 3100;
                 }
                 break;
             default:
-                l_20 = 1;
+                not_served = 1;
             }
         } else {
-            l_20 = 1;
+            not_served = 1;
         }
-        if (l_20 != 0) {
-            switch (a1->data.person.faction_id) {
+        if (not_served != 0) {
+            switch (npc->data.person.faction_id) {
             case 247:
                 training_offer((int)D_00186FC9);
                 break;
@@ -741,36 +741,36 @@ L6E949:;
     case 146:
         if (guild_membership != 0) {
             if ((guild_membership->rank) >= 2) guild_heal();
-            switch (a1->data.person.faction_id) {
+            switch (npc->data.person.faction_id) {
             case 480:
                 if ((guild_membership->rank) >= 3) {
                     guild_buy_magic_items();
                 } else {
-                    l_24 = 3100;
+                    refusal_text = 3100;
                 }
                 break;
             case 481:
                 if ((guild_membership->rank) >= 5) {
                     itemmaker_open(1);
                 } else {
-                    l_24 = 3100;
+                    refusal_text = 3100;
                 }
                 break;
             case 482:
                 if ((guild_membership->rank) >= 6) {
-                    daedra_summon(a1);
+                    daedra_summon(npc);
                 } else {
-                    l_24 = 3100;
+                    refusal_text = 3100;
                 }
                 break;
             default:
-                l_20 = 1;
+                not_served = 1;
             }
         } else {
-            l_20 = 1;
+            not_served = 1;
         }
-        if (l_20 != 0) {
-            switch (a1->data.person.faction_id) {
+        if (not_served != 0) {
+            switch (npc->data.person.faction_id) {
             case 249:
                 training_offer((int)D_00186FDB);
                 break;
@@ -794,36 +794,36 @@ L6E949:;
     case 147:
         if (guild_membership != 0) {
             if ((guild_membership->rank) >= 2) guild_heal();
-            switch (a1->data.person.faction_id) {
+            switch (npc->data.person.faction_id) {
             case 485:
                 if ((guild_membership->rank) >= 1) {
                     guild_buy_potions();
                 } else {
-                    l_24 = 3100;
+                    refusal_text = 3100;
                 }
                 break;
             case 487:
                 if ((guild_membership->rank) >= 5) {
                     potionmaker_open(1);
                 } else {
-                    l_24 = 3100;
+                    refusal_text = 3100;
                 }
                 break;
             case 488:
                 if ((guild_membership->rank) >= 7) {
-                    daedra_summon(a1);
+                    daedra_summon(npc);
                 } else {
-                    l_24 = 3100;
+                    refusal_text = 3100;
                 }
                 break;
             default:
-                l_20 = 1;
+                not_served = 1;
             }
         } else {
-            l_20 = 1;
+            not_served = 1;
         }
-        if (l_20 != 0) {
-            switch (a1->data.person.faction_id) {
+        if (not_served != 0) {
+            switch (npc->data.person.faction_id) {
             case 250:
                 training_offer((int)D_00186FEE);
                 break;
@@ -847,36 +847,36 @@ L6E949:;
     case 148:
         if (guild_membership != 0) {
             guild_heal();
-            switch (a1->data.person.faction_id) {
+            switch (npc->data.person.faction_id) {
             case 490:
                 if ((guild_membership->rank) >= 2) {
                     guild_buy_potions();
                 } else {
-                    l_24 = 3100;
+                    refusal_text = 3100;
                 }
                 break;
             case 491:
                 if ((guild_membership->rank) >= 5) {
                     potionmaker_open(1);
                 } else {
-                    l_24 = 3100;
+                    refusal_text = 3100;
                 }
                 break;
             case 492:
                 if ((guild_membership->rank) >= 7) {
-                    daedra_summon(a1);
+                    daedra_summon(npc);
                 } else {
-                    l_24 = 3100;
+                    refusal_text = 3100;
                 }
                 break;
             default:
-                l_20 = 1;
+                not_served = 1;
             }
         } else {
-            l_20 = 1;
+            not_served = 1;
         }
-        if (l_20 != 0) {
-            switch (a1->data.person.faction_id) {
+        if (not_served != 0) {
+            switch (npc->data.person.faction_id) {
             case 252:
                 training_offer((int)D_00187001);
                 break;
@@ -900,36 +900,36 @@ L6E949:;
     case 149:
         if (guild_membership != 0) {
             if ((guild_membership->rank) >= 1) guild_heal();
-            switch (a1->data.person.faction_id) {
+            switch (npc->data.person.faction_id) {
             case 496:
                 if ((guild_membership->rank) >= 3) {
                     guild_buy_spells();
                 } else {
-                    l_24 = 3100;
+                    refusal_text = 3100;
                 }
                 break;
             case 497:
                 if ((guild_membership->rank) >= 6) {
                     spellmaker_open(1);
                 } else {
-                    l_24 = 3100;
+                    refusal_text = 3100;
                 }
                 break;
             case 498:
                 if ((guild_membership->rank) >= 7) {
-                    daedra_summon(a1);
+                    daedra_summon(npc);
                 } else {
-                    l_24 = 3100;
+                    refusal_text = 3100;
                 }
                 break;
             default:
-                l_20 = 1;
+                not_served = 1;
             }
         } else {
-            l_20 = 1;
+            not_served = 1;
         }
-        if (l_20 != 0) {
-            switch (a1->data.person.faction_id) {
+        if (not_served != 0) {
+            switch (npc->data.person.faction_id) {
             case 254:
                 training_offer((int)D_00187017);
                 break;
@@ -950,7 +950,7 @@ L6E949:;
             }
         }
     }
-    if (l_24 != 0) msgbox_show_rsc((int)(short)*(short *)&l_24, 1);
+    if (refusal_text != 0) msgbox_show_rsc((int)(short)*(short *)&refusal_text, 1);
     if (D_001A4A1C == 0 || D_00196118 == 0) return;
     D_001A4A1C = 0;
     inventory_open_container((int)D_001960D9, 0, 6);

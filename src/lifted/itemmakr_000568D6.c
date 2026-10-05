@@ -13,16 +13,16 @@ extern char D_001998E2[];
 
 extern void func_00057147(short, short, short, short, short, short, short);
 
-void itemmaker_set_power_param_cb(int a1)
+void itemmaker_set_power_param_cb(int param)
 {
-    short l_18;
+    short exclusion_row;
 
-    *(short *)(D_001998E2 + (((int)(short)*(short *)scratch_190d64) << 2)) = a1;
-    *(int *)&l_18 = (int)(unsigned char)*(signed char *)(D_00185766 + ((int)(short)*(short *)scratch_190d66));
-    if (l_18 == 0) {
-        func_00057147((int)(short)*(short *)scratch_190d64, (int)(short)*(short *)scratch_190d66, (int)(short)*(short *)&a1, -1, -1, -1, -1);
+    *(short *)(D_001998E2 + (((int)(short)*(short *)scratch_190d64) << 2)) = param;
+    *(int *)&exclusion_row = (int)(unsigned char)*(signed char *)(D_00185766 + ((int)(short)*(short *)scratch_190d66));
+    if (exclusion_row == 0) {
+        func_00057147((int)(short)*(short *)scratch_190d64, (int)(short)*(short *)scratch_190d66, (int)(short)*(short *)&param, -1, -1, -1, -1);
         return;
     }
-    (*(int *)&l_18)--;
-    func_00057147((int)(short)*(short *)scratch_190d64, (int)(short)*(short *)scratch_190d66, (int)(short)*(short *)&a1, (int)(short)((int)(unsigned char)*(signed char *)(D_00185716 + ((((int)(short)l_18) * 20) + (((int)(short)*(short *)&a1) << 2)))), (int)(short)((unsigned short)(unsigned char)*(signed char *)(D_00185717 + ((((int)(short)l_18) * 20) + (((int)(short)*(short *)&a1) << 2)))), (int)(short)((unsigned short)(unsigned char)*(signed char *)(D_00185718 + ((((int)(short)l_18) * 20) + (((int)(short)*(short *)&a1) << 2)))), (int)(short)((unsigned short)(unsigned char)*(signed char *)(D_00185719 + ((((int)(short)l_18) * 20) + (((int)(short)*(short *)&a1) << 2)))));
+    (*(int *)&exclusion_row)--;
+    func_00057147((int)(short)*(short *)scratch_190d64, (int)(short)*(short *)scratch_190d66, (int)(short)*(short *)&param, (int)(short)((int)(unsigned char)*(signed char *)(D_00185716 + ((((int)(short)exclusion_row) * 20) + (((int)(short)*(short *)&param) << 2)))), (int)(short)((unsigned short)(unsigned char)*(signed char *)(D_00185717 + ((((int)(short)exclusion_row) * 20) + (((int)(short)*(short *)&param) << 2)))), (int)(short)((unsigned short)(unsigned char)*(signed char *)(D_00185718 + ((((int)(short)exclusion_row) * 20) + (((int)(short)*(short *)&param) << 2)))), (int)(short)((unsigned short)(unsigned char)*(signed char *)(D_00185719 + ((((int)(short)exclusion_row) * 20) + (((int)(short)*(short *)&param) << 2)))));
 }

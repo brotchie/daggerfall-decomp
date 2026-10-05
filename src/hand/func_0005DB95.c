@@ -17,7 +17,7 @@ extern void mc_memcpy(char *, char *, int, char *, int, int);
 extern int xn_math_angle_to_point();
 extern int xn_draw_image();
 
-void hud_draw_heading_strip(int a1)
+void hud_draw_heading_strip(int on_automap)
 {
     int i;
     int off;
@@ -25,7 +25,7 @@ void hud_draw_heading_strip(int a1)
     int dist;
     int pos;
 
-    if (a1 == 0) {
+    if (on_automap == 0) {
         if ((int)(unsigned short)(game_settings->view_flags & 1) == 0)
             return;
         if (game_mode != 0)

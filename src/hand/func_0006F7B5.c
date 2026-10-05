@@ -26,16 +26,16 @@ extern int xn_draw_image();
 void spellshop_update(void)
 {
     int unused1;
-    struct Img *img;
+    struct Img *image;
     short i;
-    short rc;
+    short picked;
     short unused2;
 
-    img = window_image;
-    xn_draw_image(img->x, img->y, img->w, img->h, img->data);
+    image = window_image;
+    xn_draw_image(image->x, image->y, image->w, image->h, image->data);
     xn_font_select(4);
-    rc = picklist_frame(shared_picklist);
-    if (rc > -1) {
+    picked = picklist_frame(shared_picklist);
+    if (picked > -1) {
         spellshop_close();
         spellshop_buy();
         return;

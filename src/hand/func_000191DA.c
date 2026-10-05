@@ -5,11 +5,11 @@ extern struct faction *D_0019671C;
 extern struct faction *factions;
 extern struct faction *faction_find_type_in_region_r(struct faction *, short, short);
 
-struct faction *faction_find_type_in_region(short a1, short a2)
+struct faction *faction_find_type_in_region(short region, short type)
 {
-    struct faction *r;
+    struct faction *found;
 
     D_0019671C = 0;
-    r = faction_find_type_in_region_r(factions, a1, a2);
-    return r != 0 ? r : D_0019671C;
+    found = faction_find_type_in_region_r(factions, region, type);
+    return found != 0 ? found : D_0019671C;
 }

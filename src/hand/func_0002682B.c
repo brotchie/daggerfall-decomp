@@ -14,31 +14,31 @@ extern int collide_move_object(struct record *, int, char *, int);
 extern void mc_memset(void *, int, int, char *, int, int);
 extern void mc_memcpy(char *, char *, int, char *, int, int);
 
-void place_settle_creature(struct record *a1)
+void place_settle_creature(struct record *creature)
 {
-    int saved2;
-    int saved1;
-    struct desc d;
+    int saved_ceiling;
+    int saved_on_ground;
+    struct desc desc;
 
-    saved1 = player_on_ground;
-    saved2 = ceiling_height;
-    if ((a1->flags & 16) == 0)
+    saved_on_ground = player_on_ground;
+    saved_ceiling = ceiling_height;
+    if ((creature->flags & 16) == 0)
         return;
     {
-        char pos[12];
+        char position[12];
 
         D_001940D7.b5 = 1;
         D_001940D7.b7 = 1;
-        mc_memcpy(pos, (char *)&a1->x, 12, D_00170788, 477, 4);
-        mc_memset(&d, 0, 12, D_00170788, 478, 4);
-        d.str = D_00187B6E;
+        mc_memcpy(position, (char *)&creature->x, 12, D_00170788, 477, 4);
+        mc_memset(&desc, 0, 12, D_00170788, 478, 4);
+        desc.str = D_00187B6E;
         player_motion_flags.b3 = 1;
-        collide_move_object(a1, 0, pos, 0);
+        collide_move_object(creature, 0, position, 0);
         player_motion_flags.b3 = 0;
-        player_on_ground = saved1;
-        ceiling_height = saved2;
+        player_on_ground = saved_on_ground;
+        ceiling_height = saved_ceiling;
         if ((collide_flags & 1) == 0)
             return;
-        a1->flags &= ~16;
+        creature->flags &= ~16;
     }
 }

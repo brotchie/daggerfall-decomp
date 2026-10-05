@@ -11,51 +11,51 @@ extern char D_00190FEC;
 extern int text_rsc_file;
 extern int msgbox_next_page;
 extern struct quest *current_quest;
-extern int text_rsc_load(short, short, short);
-extern void msgbox_render(int, int);
-extern void msgbox_show_more_pages(int);
+extern char *text_rsc_load(short, short, short);
+extern void msgbox_render(char *, char **);
+extern void msgbox_show_more_pages(char **);
 extern int disk_open_data(char *);
 extern void close(int);
-extern void mc_free(int, char *, int);
+extern void mc_free(void *, char *, int);
 extern void mc_memcpy(char *, char *, int, char *, int, int);
 #pragma aux mc_set_location parm routine [];
 extern void mc_set_location(int, char *);
 extern int mc_sprintf(char *, char *, ...);
 
-int msgbox_render_quest_text(struct quest *a1, short a2, int a3, short a4)
+int msgbox_render_quest_text(struct quest *quest, short message_id, char **image, short flags)
 {
-    short saved;
-    int h;
-    int result;
+    short saved_file;
+    char *text;
+    int single_page;
 
-    saved = text_rsc_file;
-    current_quest = a1;
-    if (a1->text_file != 0) {
+    saved_file = text_rsc_file;
+    current_quest = quest;
+    if (quest->text_file != 0) {
         mc_set_location(657, D_00170D55);
-        mc_sprintf(((char *)text_rsc_buffer), D_00170DA2, a1->text_file);
+        mc_sprintf(((char *)text_rsc_buffer), D_00170DA2, quest->text_file);
     } else {
-        mc_memcpy(((char *)text_rsc_buffer), a1->name, 8, D_00170D55, 659, 2048);
+        mc_memcpy(((char *)text_rsc_buffer), quest->name, 8, D_00170D55, 659, 2048);
     }
     D_00190FEC = 0;
     mc_set_location(662, D_00170D55);
     mc_sprintf(((char *)text_buffer), D_00170DA7, ((char *)text_rsc_buffer));
     if ((text_rsc_file = disk_open_data(((char *)text_buffer))) > 0) {
-        h = text_rsc_load(a2, a4 | 0x8002, msgbox_wrap_width);
-        if (h == 0)
+        text = text_rsc_load(message_id, flags | 0x8002, msgbox_wrap_width);
+        if (text == 0)
             return 0;
-        msgbox_render(h, a3);
+        msgbox_render(text, image);
         if (msgbox_next_page != 0) {
-            msgbox_show_more_pages(a3);
-            result = 0;
+            msgbox_show_more_pages(image);
+            single_page = 0;
         } else {
-            result = 1;
+            single_page = 1;
         }
         close(text_rsc_file);
     }
-    if (h != 0 && h != 0x97979797) {
-        mc_free(h, D_00170D55, 685);
-        h = 0x97979797;
+    if (text != 0 && text != (char *)0x97979797) {
+        mc_free(text, D_00170D55, 685);
+        text = (char *)0x97979797;
     }
-    text_rsc_file = saved;
-    return result;
+    text_rsc_file = saved_file;
+    return single_page;
 }

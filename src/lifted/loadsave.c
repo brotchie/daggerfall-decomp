@@ -203,8 +203,8 @@ extern void object_foreach_post(struct record *, int);
 extern void object_foreach(struct record *, int);
 struct record *savetree_attach_record(struct record *, struct record *, int);
 int savetree_should_save(struct record *);
-int save_write_name(int);
-int save_game(int, int);
+int save_write_name(char *);
+int save_game(int, char *);
 int saveload_click_slot(int, int, int, int);
 int saveload_confirm(int, int, int, int);
 void savetree_write_subtree(struct record *);
@@ -220,90 +220,90 @@ void load_fix_object_cb(struct record *);
 void load_fix_ids_cb(struct record *);
 #pragma aux mc_set_location parm routine [];
 
-void savetree_read_records(struct record *a1)
+void savetree_read_records(struct record *root)
 {
-    struct record *l_24;
-    struct record *l_20;
-    int l_1C;
-    int l_18;
+    struct record *record;
+    struct record *object;
+    int id;
+    int size;
 
-    l_24 = *(struct record **)scratch_buffer;
-    l_18 = savetree_read_chunk(l_24);
-    while (l_18 != 0) {
-        l_24->prev = 0;
-        l_24->next = l_24->prev;
-        l_24->parent = l_24->next;
-        l_24->children = l_24->parent;
-        l_20 = savetree_attach_record(a1, l_24, l_18);
-        savetree_register_record(l_20);
-        l_1C = l_20->id;
-        l_18 = savetree_read_chunk(l_24);
+    record = *(struct record **)scratch_buffer;
+    size = savetree_read_chunk(record);
+    while (size != 0) {
+        record->prev = 0;
+        record->next = record->prev;
+        record->parent = record->next;
+        record->children = record->parent;
+        object = savetree_attach_record(root, record, size);
+        savetree_register_record(object);
+        id = object->id;
+        size = savetree_read_chunk(record);
     }
 }
 
-void savetree_write_subtree(struct record *a1)
+void savetree_write_subtree(struct record *object)
 {
-    struct record *l_18;
+    struct record *next;
 
-    l_18 = a1->next;
-    a1->next = 0;
-    object_foreach_pre(a1, (int)savetree_write_record);
-    a1->next = l_18;
+    next = object->next;
+    object->next = 0;
+    object_foreach_pre(object, (int)savetree_write_record);
+    object->next = next;
 }
 
-void savetree_write_saved(struct record *a1)
+void savetree_write_saved(struct record *object)
 {
-    int l_20;
-    int l_1C;
-    int l_18;
+    int unused2;
+    int unused3;
+    int unused;
 
-    l_18 = 0;
-    while (a1 != 0) {
-        if (savetree_should_save(a1) != 0) {
-            savetree_write_subtree(a1);
+    unused = 0;
+    while (object != 0) {
+        if (savetree_should_save(object) != 0) {
+            savetree_write_subtree(object);
         } else {
-            savetree_write_saved(a1->children);
+            savetree_write_saved(object->children);
         }
-        a1 = a1->next;
+        object = object->next;
     }
 }
 
-struct record *savetree_attach_record(struct record *a1, struct record *a2, int a3)
+struct record *savetree_attach_record(struct record *root, struct record *record, int size)
 {
-    struct record *l_18;
-    struct record *l_14;
+    struct record *parent;
+    struct record *object;
 
-    l_18 = object_find_by_id(a1, a2->parent_id);
-    if (l_18 != 0) {
-        l_14 = object_find_by_id(a1, a2->id);
-        if (l_14 != 0 && l_14->type == a2->type && l_14->parent->id == a2->parent_id) {
-            if (l_14->type == 34) {
-                if ((l_14->image & 127) != (a2->image & 127)) {
-                    l_14 = object_create_child(l_18, a2, a3 - 71);
-                    l_14->parent_id = 0;
-                    return l_14;
+    parent = object_find_by_id(root, record->parent_id);
+    if (parent != 0) {
+        object = object_find_by_id(root, record->id);
+        if (object != 0 && object->type == record->type && object->parent->id == record->parent_id) {
+            if (object->type == 34) {
+                if ((object->image & 127) != (record->image & 127)) {
+                    object = object_create_child(parent, record, size - 71);
+                    object->parent_id = 0;
+                    return object;
                 }
             }
-            mc_memcpy(l_14, a2, 55, (int)D_00176884, 217, 4);
-            mc_memcpy(&l_14->data, &a2->data, (int)&*(signed char *)((char *)mem_block_size((int)l_14) - 71), (int)D_00176884, 218, 4);
-            l_14->parent_id = 0;
-            return l_14;
+            mc_memcpy(object, record, 55, (int)D_00176884, 217, 4);
+            mc_memcpy(&object->data, &record->data, (int)&*(signed char *)((char *)mem_block_size((int)object) - 71), (int)D_00176884, 218, 4);
+            object->parent_id = 0;
+            return object;
         }
-        l_14 = object_create_child(l_18, a2, a3 - 71);
-        l_14->parent_id = 0;
-        return l_14;
+        object = object_create_child(parent, record, size - 71);
+        object->parent_id = 0;
+        return object;
     }
     fatal_error((int)D_001768A8);
     return 0;
 }
 
-int savetree_should_save(struct record *a1)
+int savetree_should_save(struct record *object)
 {
-    if (a1->quest_id != 0) return 1;
-    if (func_000641CD(a1) != 0) return 1;
-    switch (a1->type) {
+    if (object->quest_id != 0) return 1;
+    if (func_000641CD(object) != 0) return 1;
+    switch (object->type) {
     case 8:
-        return a1->flags & 512;
+        return object->flags & 512;
     case 2:
     case 3:
     case 4:
@@ -327,11 +327,11 @@ int savetree_should_save(struct record *a1)
     case 54:
         return 1;
     case 33:
-        if (a1->children != 0) return 1;
-        if (a1->pad19 != 0) return 1;
+        if (object->children != 0) return 1;
+        if (object->pad19 != 0) return 1;
         break;
     case 34:
-        if (((a1->image & 31) - 2) == 14 || ((a1->image & 31) - 2) == 13) return 1;
+        if (((object->image & 31) - 2) == 14 || ((object->image & 31) - 2) == 13) return 1;
         break;
     default:
         return 0;
@@ -339,52 +339,52 @@ int savetree_should_save(struct record *a1)
     return 0;
 }
 
-void savetree_register_record(struct record *a1)
+void savetree_register_record(struct record *object)
 {
-    switch (a1->type) {
+    switch (object->type) {
         return;
     case 4:
-        player_object = a1;
+        player_object = object;
         return;
     case 5:
-        camera_object = a1;
+        camera_object = object;
         return;
     case 3:
-        player_class = &(player_character = &(player_entity = a1)->data.character)->career;
+        player_class = &(player_character = &(player_entity = object)->data.character)->career;
         return;
     case 52:
-        if (inventory_containers[a1->image] == 0 || inventory_containers[a1->image]->children == 0) {
-            inventory_containers[a1->image] = a1;
+        if (inventory_containers[object->image] == 0 || inventory_containers[object->image]->children == 0) {
+            inventory_containers[object->image] = object;
         }
         return;
     case 16:
-        quest_root = a1;
+        quest_root = object;
         return;
     case 23:
-        game_settings = (struct settings *)((*(int *)&options_object = (int)a1) + 71);
+        game_settings = (struct settings *)((*(int *)&options_object = (int)object) + 71);
         return;
     case 24:
-        logbook_object = a1;
+        logbook_object = object;
         return;
     case 25:
-        bank_accounts = a1;
+        bank_accounts = object;
         return;
     case 39:
-        nonworld_root = a1;
+        nonworld_root = object;
     default:;
     }
 }
 
-void load_relink_object_cb(struct record *a1)
+void load_relink_object_cb(struct record *object)
 {
-    switch (a1->type) {
+    switch (object->type) {
 case 3:
 case 18:
 case 44:
-    load_relink_character(a1);
+    load_relink_character(object);
     return;
 case 9:
-    a1->caster = object_find_by_id(location_object, (int)a1->caster);
+    object->caster = object_find_by_id(location_object, (int)object->caster);
 default:;
 }
 }
@@ -396,70 +396,70 @@ void load_relink_all(void)
     inv_left_container = inventory_containers[0];
 }
 
-void load_relink_character(struct record *a1)
+void load_relink_character(struct record *object)
 {
-    struct character *l_24;
-    int l_20;
-    int l_1C;
-    int l_18;
+    struct character *character;
+    struct career *career;
+    struct monster_anim *anim;
+    int i;
 
-    l_24 = &a1->data.character;
-    l_20 = (int)&l_24->career;
-    l_1C = l_20 + 74;
-    for (l_18 = 0; l_18 < 27; l_18++) {
-        if (l_24->equipped[l_18] != 0) {
-            l_24->equipped[l_18] = object_find_by_id(location_object, (int)l_24->equipped[l_18]);
+    character = &object->data.character;
+    career = &character->career;
+    anim = (struct monster_anim *)(career + 1);
+    for (i = 0; i < 27; i++) {
+        if (character->equipped[i] != 0) {
+            character->equipped[i] = object_find_by_id(location_object, (int)character->equipped[i]);
         }
     }
-    if (l_24->target != 0) {
-        l_24->target = object_find_by_id(location_object, (int)l_24->target);
-        if (l_24->target == 0) fatal_error((int)D_001768BD);
+    if (character->target != 0) {
+        character->target = object_find_by_id(location_object, (int)character->target);
+        if (character->target == 0) fatal_error((int)D_001768BD);
     }
-    if (a1->type != 18) if (a1->type != 44) return;
-    xn_anim_reset(l_1C);
+    if (object->type != 18) if (object->type != 44) return;
+    xn_anim_reset(anim);
 }
 
-void save_unlink_character(struct record *a1)
+void save_unlink_character(struct record *object)
 {
-    struct character *l_1C;
-    int l_18;
+    struct character *character;
+    int i;
 
-    l_1C = &a1->data.character;
-    for (l_18 = 0; l_18 < 27; l_18++) {
-        if (l_1C->equipped[l_18] != 0) {
-            l_1C->equipped[l_18] = (struct record *)l_1C->equipped[l_18]->id;
+    character = &object->data.character;
+    for (i = 0; i < 27; i++) {
+        if (character->equipped[i] != 0) {
+            character->equipped[i] = (struct record *)character->equipped[i]->id;
         }
     }
-    if (l_1C->target == 0) return;
-    if (object_find_by_id(location_object, l_1C->target->id) != 0) {
-        l_1C->target = (struct record *)l_1C->target->id;
+    if (character->target == 0) return;
+    if (object_find_by_id(location_object, character->target->id) != 0) {
+        character->target = (struct record *)character->target->id;
         return;
     }
-    l_1C->target = 0;
+    character->target = 0;
 }
 
-void load_collect_spawned_ids_cb(struct record *a1)
+void load_collect_spawned_ids_cb(struct record *object)
 {
-    switch (a1->type) {
+    switch (object->type) {
 case 18:
 case 33:
 case 44:
-    *(int *)((char *)(int)(*(char **)scratch_buffer + ((*(int *)D_00195B84)++ << 2))) = a1->id;
+    *(int *)((char *)(int)(*(char **)scratch_buffer + ((*(int *)D_00195B84)++ << 2))) = object->id;
 default:;
 }
 }
 
-void load_drop_spawned_marker_cb(struct record *a1)
+void load_drop_spawned_marker_cb(struct record *object)
 {
-    int l_1C;
-    int l_18;
+    int *ids;
+    int i;
 
-    if (a1->type != 34 || a1->type == 32) return;
-    l_1C = *(int *)scratch_buffer;
-    for (l_18 = 0; l_18 < *(int *)D_00195B84; l_18++, (*(char (**)[4])&l_1C)++) {
-        if (a1->id == *(int *)((char *)l_1C)) {
-            object_delete(a1);
-            *(int *)((char *)l_1C) = 0;
+    if (object->type != 34 || object->type == 32) return;
+    ids = *(int **)scratch_buffer;
+    for (i = 0; i < *(int *)D_00195B84; i++, ids++) {
+        if (object->id == *ids) {
+            object_delete(object);
+            *ids = 0;
             return;
         }
     }
@@ -484,36 +484,36 @@ void save_write_image(void)
     close(save_file_handle);
 }
 
-int save_write_name(int a1)
+int save_write_name(char *name)
 {
     mc_set_location(516, (int)D_00176884);
     mc_sprintf((int)D_001913E4, (int)D_001768DF, (int)text_buffer, (int)D_001768FC);
     unlink((int)D_001913E4);
     save_file_handle = open((int)D_001913E4, 546, 384);
-    write(save_file_handle, a1, 32);
+    write(save_file_handle, name, 32);
     close(save_file_handle);
     return 0;
 }
 
-int save_game(int a1, int a2)
+int save_game(int slot, char *name)
 {
-    int l_18;
+    int size;
 
     mem_check_now(1000);
     mc_set_location(540, (int)D_00176884);
-    mc_sprintf((int)text_buffer, (int)D_00176909, a1);
+    mc_sprintf((int)text_buffer, (int)D_00176909, slot);
     disk_delete_matching((int)text_buffer, (int)D_00176911);
     save_write_image();
-    save_write_name(a2);
-    savevars_write(a1);
+    save_write_name(name);
+    savevars_write(slot);
     region_locations_save_discovered((int)(unsigned char)current_region);
     automap_save();
     mc_set_location(550, (int)D_00176884);
-    mc_sprintf((int)text_buffer, (int)D_00176909, a1);
+    mc_sprintf((int)text_buffer, (int)D_00176909, slot);
     disk_copy_file((int)D_00176915, (int)arena2_path, (int)text_buffer);
     disk_copy_file((int)D_0017691F, (int)arena2_path, (int)text_buffer);
     disk_copy_file((int)cfg_mapsave_file, (int)arena2_path, (int)text_buffer);
-    save_copy_automap_files(a1);
+    save_copy_automap_files(slot);
     mc_set_location(558, (int)D_00176884);
     mc_sprintf((int)text_rsc_buffer, (int)D_001768DF, (int)text_buffer, (int)D_00176927);
     unlink((int)text_rsc_buffer);
@@ -522,15 +522,15 @@ int save_game(int a1, int a2)
     write(save_file_handle, (int)&player_object->x, 12);
     write(save_file_handle, (int)&location_object->image, 2);
     write(save_file_handle, (int)&player_environment, 1);
-    l_18 = current_location->building_count * 26;
-    write(save_file_handle, (int)&l_18, 4);
-    write(save_file_handle, (int)current_location->buildings, l_18);
-    l_18 = 0;
+    size = current_location->building_count * 26;
+    write(save_file_handle, (int)&size, 4);
+    write(save_file_handle, (int)current_location->buildings, size);
+    size = 0;
     quests_unlink_all((int)quest_root);
     savetree_write_saved(location_object->children);
-    write(save_file_handle, (int)&l_18, 4);
+    write(save_file_handle, (int)&size, 4);
     object_foreach_pre(nonworld_root->children, (int)savetree_write_record);
-    write(save_file_handle, (int)&l_18, 4);
+    write(save_file_handle, (int)&size, 4);
     quests_relink_all((int)quest_root);
     links_save(save_file_handle);
     close(save_file_handle);
@@ -543,139 +543,139 @@ int save_game(int a1, int a2)
 
 void load_requeue_s0000021(void)
 {
-    struct record *l_24;
-    struct quest *l_20;
-    int l_1C;
-    int l_18;
+    struct record *object;
+    struct quest *quest;
+    int unused;
+    int count;
 
-    l_24 = quest_root->children;
-    l_1C = 0;
-    l_18 = 0;
+    object = quest_root->children;
+    unused = 0;
+    count = 0;
     if (((int)(unsigned char)current_region) == 31) return;
-    while (l_24 != 0) {
-        if (l_24->type == 14) {
-            l_20 = &l_24->data.quest;
-            if (stricmp(l_20->name, (int)D_00176934) == 0) l_18++;
+    while (object != 0) {
+        if (object->type == 14) {
+            quest = &object->data.quest;
+            if (stricmp(quest->name, (int)D_00176934) == 0) count++;
         }
-        l_24 = l_24->next;
+        object = object->next;
     }
-    if (l_18 != 0 || D_00195303 == 0 || D_0019530D != 0) return;
+    if (count != 0 || D_00195303 == 0 || D_0019530D != 0) return;
     mc_strncpy((int)D_001961F5, (int)D_0017693D, 13, (int)D_00176884, 616);
     D_001952EE = 0;
 }
 
-void saveload_menu(int a1)
+void saveload_menu(int saving)
 {
-    int l_2C;
-    int l_28;
-    int l_24;
-    int l_20;
-    int l_1C;
-    int l_18;
+    int done;
+    int i;
+    int used_slots;
+    int slot;
+    int handle;
+    int window;
 
-    l_2C = 0;
-    l_24 = 0;
-    l_20 = 0;
-    l_18 = (window_image = disk_read_file((int)D_0017697F, 0));
+    done = 0;
+    used_slots = 0;
+    slot = 0;
+    window = (window_image = disk_read_file((int)D_0017697F, 0));
     *(int *)D_00195B5C = disk_read_file((int)D_0017698C, 0);
     mc_memset(*(int *)scratch_buffer, 0, 256, (int)D_00176884, 862, 4);
     mc_strncpy((int)text_buffer, (int)D_00176999, 160, (int)D_00176884, 864);
-    for (l_28 = 0; l_28 < 6; l_28++) {
-        D_001903A8 = *(signed char *)&l_28 + 48;
-        l_1C = open((int)text_buffer, 512);
-        if (l_1C < 1) continue;
-        read(l_1C, (int)(*(char **)&D_00147954 + (l_28 * 4000)), 4000);
-        close(l_1C);
-        l_24 |= 1 << l_28;
+    for (i = 0; i < 6; i++) {
+        D_001903A8 = *(signed char *)&i + 48;
+        handle = open((int)text_buffer, 512);
+        if (handle < 1) continue;
+        read(handle, (int)(*(char **)&D_00147954 + (i * 4000)), 4000);
+        close(handle);
+        used_slots |= 1 << i;
     }
     mc_strncpy((int)text_buffer, (int)D_001769A9, 160, (int)D_00176884, 874);
-    for (l_28 = 0; l_28 < 6; l_28++) {
-        D_001903A8 = *(signed char *)&l_28 + 48;
-        *(signed char *)((char *)(int)(*(char **)scratch_buffer + (l_28 << 5))) = 0;
-        l_1C = open((int)text_buffer, 512);
-        if (l_1C < 1) continue;
-        read(l_1C, (int)(*(char **)scratch_buffer + (l_28 << 5)), 32);
-        close(l_1C);
+    for (i = 0; i < 6; i++) {
+        D_001903A8 = *(signed char *)&i + 48;
+        *(signed char *)((char *)(int)(*(char **)scratch_buffer + (i << 5))) = 0;
+        handle = open((int)text_buffer, 512);
+        if (handle < 1) continue;
+        read(handle, (int)(*(char **)scratch_buffer + (i << 5)), 32);
+        close(handle);
     }
-    while (l_2C == 0) {
+    while (done == 0) {
         if (key_pressed_once(15) != 0) {
-            l_20++;
-            if (l_20 == 6) l_20 = 0;
+            slot++;
+            if (slot == 6) slot = 0;
         }
-        if (key_pressed_once(1) != 0) l_2C = 1;
-        saveload_draw(a1, l_24, l_20);
+        if (key_pressed_once(1) != 0) done = 1;
+        saveload_draw(saving, used_slots, slot);
         mouse_buttons_prev = mouse_buttons;
         xn_mouse_poll_clamped();
         xn_draw_image_transparent((int)(short)mouse_x, (int)(short)mouse_y, 10, 10, cursor_arrow_image);
         if (key_pressed_once(28) != 0) {
             mouse_double_click = 1;
-            l_20 = saveload_click_slot(a1, a1, l_20, l_24);
+            slot = saveload_click_slot(saving, saving, slot, used_slots);
             mouse_double_click = 0;
         } else if (mouse_double_click != 0 || (mouse_buttons != 0 && mouse_buttons_prev == 0)) {
-            for (l_28 = 0; l_28 < 14; l_28++) {
-                if (mouse_x > *(short *)(saveload_buttons + (l_28 * 12)) && mouse_x < *(short *)(D_00187A94 + (l_28 * 12)) && mouse_y > *(short *)(D_00187A92 + (l_28 * 12)) && mouse_y < *(short *)(D_00187A96 + (l_28 * 12))) {
+            for (i = 0; i < 14; i++) {
+                if (mouse_x > *(short *)(saveload_buttons + (i * 12)) && mouse_x < *(short *)(D_00187A94 + (i * 12)) && mouse_y > *(short *)(D_00187A92 + (i * 12)) && mouse_y < *(short *)(D_00187A96 + (i * 12))) {
                     sound_play(203, (int)player_object, 100);
-                    l_20 = ((int (*)())(*(int *)(D_00187A98 + (l_28 * 12))))(l_28, a1, l_20, l_24);
+                    slot = ((int (*)())(*(int *)(D_00187A98 + (i * 12))))(i, saving, slot, used_slots);
                 }
-                if (l_20 == (-1)) break;
+                if (slot == (-1)) break;
             }
         }
         xn_gfx_present_inclusive(1);
-        if (l_20 == (-1)) l_2C = 1;
+        if (slot == (-1)) done = 1;
     }
-    if (l_18 != 0 && l_18 != (-1751672937)) {
-        mc_free(l_18, (int)D_00176884, 924);
-        l_18 = -1751672937;
+    if (window != 0 && window != (-1751672937)) {
+        mc_free(window, (int)D_00176884, 924);
+        window = -1751672937;
     }
     if (*(int *)D_00195B5C == 0 || *(int *)D_00195B5C == (-1751672937)) return;
     mc_free(*(int *)D_00195B5C, (int)D_00176884, 925);
     *(int *)D_00195B5C = -1751672937;
 }
 
-int saveload_click_slot(int a1, int a2, int a3, int a4)
+int saveload_click_slot(int button, int saving, int slot, int used_slots)
 {
     if (mouse_double_click != 0) {
-        saveload_confirm(a1, a2, a3, a4);
+        saveload_confirm(button, saving, slot, used_slots);
         return -1;
     }
-    if (a1 < 6) return a1 % 3;
-    return (a1 % 3) + 3;
+    if (button < 6) return button % 3;
+    return (button % 3) + 3;
 }
 
-int saveload_confirm(int a1, int a2, int a3, int a4)
+int saveload_confirm(int button, int saving, int slot, int used_slots)
 {
-    int l_10;
+    int prompt;
 
-    if (a2 != 0) {
-        mc_strncpy((int)text_rsc_buffer, (int)(*(char **)scratch_buffer + (a3 << 5)), 2048, (int)D_00176884, 948);
+    if (saving != 0) {
+        mc_strncpy((int)text_rsc_buffer, (int)(*(char **)scratch_buffer + (slot << 5)), 2048, (int)D_00176884, 948);
         D_0012B508 = 146;
-        l_10 = *(int *)scratch_buffer + 55000;
+        prompt = *(int *)scratch_buffer + 55000;
         mc_set_location(951, (int)D_00176884);
-        mc_sprintf(l_10, (int)D_001769BC, D_001846F8);
-        *(signed char *)((char *)(strlen(l_10) + l_10) + 1) = 0;
+        mc_sprintf(prompt, (int)D_001769BC, D_001846F8);
+        *(signed char *)((char *)(strlen(prompt) + prompt) + 1) = 0;
         xn_kbd_flush();
         inpstr_begin_text((int)text_rsc_buffer, 31);
         mouse_buttons = (mouse_buttons_prev = 0);
-        msgbox_show_string(l_10, 2);
+        msgbox_show_string(prompt, 2);
         if (((int)(unsigned char)D_0019966C) == 2) return 0;
-        save_game(a3, (int)text_rsc_buffer);
+        save_game(slot, (char *)text_rsc_buffer);
     } else {
-        load_game(a3);
+        load_game(slot);
     }
     scratch_190d16 = 0;
     return -1;
 }
 
-int saveload_exit(int a1, int a2, int a3, int a4)
+int saveload_exit(int button, int saving, int slot, int used_slots)
 {
     scratch_190d16 = 1;
     return -1;
 }
 
-void savevars_read(int a1)
+void savevars_read(int slot)
 {
     mc_set_location(1008, (int)D_00176884);
-    mc_sprintf((int)text_buffer, (int)D_00176909, a1);
+    mc_sprintf((int)text_buffer, (int)D_00176909, slot);
     mc_set_location(1009, (int)D_00176884);
     mc_sprintf((int)text_rsc_buffer, (int)D_001768DF, (int)text_buffer, (int)D_001769EA);
     save_file_handle = open((int)text_rsc_buffer, 512);
@@ -745,7 +745,7 @@ void savevars_read(int a1)
     close(save_file_handle);
 }
 
-void savevars_write(int a1)
+void savevars_write(int slot)
 {
     mc_set_location(1092, (int)D_00176884);
     mc_sprintf((int)text_rsc_buffer, (int)D_001768DF, (int)text_buffer, (int)D_001769EA);
@@ -817,8 +817,8 @@ void savevars_write(int a1)
 
 void load_reset_state(void)
 {
-    int l_1C;
-    int l_18;
+    int is_day;
+    int minute_of_day;
 
     world_loading = 1;
     quest_debug_data = 0;
@@ -838,105 +838,105 @@ void load_reset_state(void)
     D_001940D5 |= 2;
     D_001940D8 |= 8;
     current_building = 0;
-    l_18 = ((unsigned)game_minutes) % 1440;
-    if (l_18 > 360 && l_18 < 1080) {
-        l_1C = 1;
+    minute_of_day = ((unsigned)game_minutes) % 1440;
+    if (minute_of_day > 360 && minute_of_day < 1080) {
+        is_day = 1;
     } else {
-        l_1C = 0;
+        is_day = 0;
     }
-    daylight = l_1C;
+    daylight = is_day;
 }
 
-void load_fix_object_cb(struct record *a1)
+void load_fix_object_cb(struct record *object)
 {
-    int l_34;
-    int l_30;
-    int l_2C;
-    int l_28;
-    int l_24;
-    int l_20;
-    int l_1C;
-    int l_18;
+    char **model_ptr;
+    struct block *block;
+    struct block_model *model;
+    int unused;
+    int unused2;
+    int i;
+    int unused3;
+    int unused4;
     {
-        struct record *l_3C;
+        struct record *twin;
 
-        if (a1->twin != 0) {
-            if (a1->quest_id != 0) {
-                l_3C = object_find_by_id(load_relink_root, (int)a1->twin);
-                a1->twin = l_3C;
+        if (object->twin != 0) {
+            if (object->quest_id != 0) {
+                twin = object_find_by_id(load_relink_root, (int)object->twin);
+                object->twin = twin;
                 if ((int)load_relink_root == (int)location_object) {
-                    if (a1->twin == 0) fatal_error((int)D_001769F7);
-                    if (a1->twin->twin == 0) a1->twin->twin = (struct record *)a1;
+                    if (object->twin == 0) fatal_error((int)D_001769F7);
+                    if (object->twin->twin == 0) object->twin->twin = (struct record *)object;
                 }
             } else {
-                a1->twin = 0;
+                object->twin = 0;
             }
         }
-        switch (a1->type) {
+        switch (object->type) {
         case 52:
-            if (a1 != inventory_containers[a1->image]) {
-                while (a1->children != 0) {
-                    object_reparent(inventory_containers[a1->image], a1->children);
+            if (object != inventory_containers[object->image]) {
+                while (object->children != 0) {
+                    object_reparent(inventory_containers[object->image], object->children);
                 }
-                a1->type = 0;
+                object->type = 0;
             }
             return;
         case 33:
-            if (a1->parent->type == 52 && a1->parent->image < 5) a1->type = 2;
+            if (object->parent->type == 52 && object->parent->image < 5) object->type = 2;
             return;
         case 43:
-            l_30 = (int)RECORD_DATA(a1);
-            l_2C = *(int *)((char *)l_30 + 5);
-            for (l_20 = 0; ((int)(unsigned char)*(signed char *)((char *)l_30)) > l_20; l_20++, (*(char (**)[66])&l_2C)++) {
-                l_34 = l_2C + 4;
-                *(int *)((char *)l_34) = 0;
+            block = &object->data.block;
+            model = block->models;
+            for (i = 0; block->model_count > i; i++, model++) {
+                model_ptr = &model->model;
+                *model_ptr = 0;
             }
             return;
         case 56:
-            l_2C = (int)RECORD_DATA(a1);
-            for (l_20 = 0; a1->image > l_20; l_20++, (*(char (**)[66])&l_2C)++) {
-                l_34 = l_2C + 4;
-                *(int *)((char *)l_34) = 0;
+            model = (struct block_model *)RECORD_DATA(object);
+            for (i = 0; object->model_count > i; i++, model++) {
+                model_ptr = &model->model;
+                *model_ptr = 0;
             }
             return;
         case 6:
         case 32:
-            l_34 = (int)RECORD_DATA(a1);
-            *(int *)((char *)l_34) = 0;
+            model_ptr = (char **)RECORD_DATA(object);
+            *model_ptr = 0;
         default:;
         }
     }
 }
 
-void load_fix_ids_cb(struct record *a1)
+void load_fix_ids_cb(struct record *object)
 {
 
-    switch (a1->type) {
+    switch (object->type) {
     case 0:
     case 42:
-        object_delete(a1);
+        object_delete(object);
         return;
     case 9:
-        if (a1->parent->type == 47 || a1->parent->type == 38 || a1->parent->type == 1) {
+        if (object->parent->type == 47 || object->parent->type == 38 || object->parent->type == 1) {
             {
-                int l_20;
-                l_20 = (int)RECORD_DATA(a1);
+                int spell;
+                spell = (int)RECORD_DATA(object);
             }
-            if ((a1->flags & 8192) == 0) {
-                object_delete(a1);
+            if ((object->flags & 8192) == 0) {
+                object_delete(object);
                 return;
             }
-            if (a1->caster == player_entity) {
-                object_delete(a1);
+            if (object->caster == player_entity) {
+                object_delete(object);
                 return;
             }
-            if ((((unsigned)a1->id) >> 16) != (((unsigned)location_object->id) >> 16)) {
-                a1->id = object_new_id(((unsigned)location_object->id) >> 16);
+            if ((((unsigned)object->id) >> 16) != (((unsigned)location_object->id) >> 16)) {
+                object->id = object_new_id(((unsigned)location_object->id) >> 16);
             }
             return;
         }
-        if ((((unsigned)a1->id) >> 16) == 801) return;
-        a1->id = object_new_id(801);
+        if ((((unsigned)object->id) >> 16) == 801) return;
+        object->id = object_new_id(801);
     default:;
     }
 }
@@ -950,42 +950,42 @@ void load_fix_objects(void)
     object_foreach_post(location_object, (int)load_fix_ids_cb);
 }
 
-void text_draw_centred_black_shadow(int a1, int a2, int a3)
+void text_draw_centred_black_shadow(int text, int x, int y)
 {
-    int l_10;
+    int colour;
 
-    *(short *)&l_10 = (int)(unsigned char)D_0012B508;
+    *(short *)&colour = (int)(unsigned char)D_0012B508;
     D_0012B508 = 0;
-    text_draw_centred(a1, (int)&*(signed char *)((char *)((int)(short)*(short *)&a2) + 1), (int)&*(signed char *)((char *)((int)(short)*(short *)&a3) + 1));
-    D_0012B508 = *(signed char *)&l_10;
-    text_draw_centred(a1, (int)(short)*(short *)&a2, (int)(short)*(short *)&a3);
+    text_draw_centred(text, (int)&*(signed char *)((char *)((int)(short)*(short *)&x) + 1), (int)&*(signed char *)((char *)((int)(short)*(short *)&y) + 1));
+    D_0012B508 = *(signed char *)&colour;
+    text_draw_centred(text, (int)(short)*(short *)&x, (int)(short)*(short *)&y);
 }
 
-void text_draw_colour15_shadow(int a1, int a2, int a3)
+void text_draw_colour15_shadow(int text, int x, int y)
 {
-    int l_10;
+    int colour;
 
-    *(short *)&l_10 = (int)(unsigned char)D_0012B508;
+    *(short *)&colour = (int)(unsigned char)D_0012B508;
     D_0012B508 = 15;
-    text_draw(a1, (int)&*(signed char *)((char *)((int)(short)*(short *)&a2) + 1), (int)&*(signed char *)((char *)((int)(short)*(short *)&a3) + 1));
-    D_0012B508 = *(signed char *)&l_10;
-    text_draw(a1, (int)(short)*(short *)&a2, (int)(short)*(short *)&a3);
+    text_draw(text, (int)&*(signed char *)((char *)((int)(short)*(short *)&x) + 1), (int)&*(signed char *)((char *)((int)(short)*(short *)&y) + 1));
+    D_0012B508 = *(signed char *)&colour;
+    text_draw(text, (int)(short)*(short *)&x, (int)(short)*(short *)&y);
 }
 
-void text_draw_black_shadow(int a1, int a2, int a3)
+void text_draw_black_shadow(int text, int x, int y)
 {
-    int l_10;
+    int colour;
 
-    *(short *)&l_10 = (int)(unsigned char)D_0012B508;
+    *(short *)&colour = (int)(unsigned char)D_0012B508;
     D_0012B508 = 0;
-    text_draw(a1, (int)&*(signed char *)((char *)((int)(short)*(short *)&a2) + 1), (int)&*(signed char *)((char *)((int)(short)*(short *)&a3) + 1));
-    D_0012B508 = *(signed char *)&l_10;
-    text_draw(a1, (int)(short)*(short *)&a2, (int)(short)*(short *)&a3);
+    text_draw(text, (int)&*(signed char *)((char *)((int)(short)*(short *)&x) + 1), (int)&*(signed char *)((char *)((int)(short)*(short *)&y) + 1));
+    D_0012B508 = *(signed char *)&colour;
+    text_draw(text, (int)(short)*(short *)&x, (int)(short)*(short *)&y);
 }
 
-void text_draw_number_in_box(short a1, short a2, short a3, short a4, short a5, short a6, short a7)
+void text_draw_number_in_box(short x0, short y0, short x1, short y1, short number, short colour, short shadow_colour)
 {
-    char l_24[12];
+    char digits[12];
 
-    text_draw_centred_coloured(itoa((int)(short)a5, (int)l_24, 10), (int)(short)((((int)(short)a1) + ((int)(short)a3)) >> 1), (int)(short)(((((int)(short)a2) + ((int)(short)a4)) >> 1) - 2), (int)(short)a6, (int)(short)a7);
+    text_draw_centred_coloured(itoa((int)(short)number, (int)digits, 10), (int)(short)((((int)(short)x0) + ((int)(short)x1)) >> 1), (int)(short)(((((int)(short)y0) + ((int)(short)y1)) >> 1) - 2), (int)(short)colour, (int)(short)shadow_colour);
 }

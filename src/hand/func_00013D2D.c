@@ -9,14 +9,14 @@ extern int marquee_x;
 extern char *marquee_text;
 extern void mc_free(void *, char *, int);
 
-void marquee_start(char *a1)
+void marquee_start(char *text)
 {
     if (marquee_owned_text != 0 && marquee_owned_text != (char *)0x97979797) {
         mc_free(marquee_owned_text, D_001702CC, 52);
         marquee_owned_text = (char *)0x97979797;
     }
-    marquee_owned_text = D_001940DA.b3 ? a1 : 0;
-    marquee_text = a1;
+    marquee_owned_text = D_001940DA.b3 ? text : 0;
+    marquee_text = text;
     marquee_x = 320;
     D_001940DA.b3 = 0;
 }

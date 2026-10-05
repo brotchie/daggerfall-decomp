@@ -37,96 +37,96 @@ extern int xn_draw_image();
 
 void classmaker_specials_screen(void)
 {
-    short n;
-    short a;
-    short b;
+    short index;
+    short special;
+    short param;
     short y;
-    short k;
-    short y0;
-    short y1;
+    short picked;
+    short top;
+    short bottom;
 
     xn_font_select(3);
     if ((short)(classmaker_screen & 15) == 2)
-        n = 2;
+        index = 2;
     else
-        n = 0;
+        index = 0;
     if ((int)(short)(classmaker_screen & 16) != 0)
-        n++;
+        index++;
     xn_mouse_cursor_erase();
     mc_memcpy(screen_buffer, scratch_190df4, 64000, D_00175420, 675, 4);
     xn_draw_image(0, 0, *(unsigned short *)(D_00190E00 + 4), *(unsigned short *)(D_00190E00 + 6), D_00190E00 + 12);
-    if (n == 2 || n == 3)
+    if (index == 2 || index == 3)
         xn_draw_image(0, 0, *(unsigned short *)(scratch_190dfc + 4), *(unsigned short *)(scratch_190dfc + 6), scratch_190dfc + 12);
     if ((int)(short)(classmaker_screen & 16) != 0) {
-        k = classmaker_picklist_wait();
-        if (k == 0) {
+        picked = classmaker_picklist_wait();
+        if (picked == 0) {
             classmaker_special_counts[classmaker_special_list]--;
             classmaker_specials_picked();
             goto done;
         }
-        k--;
-        n = classmaker_special_counts[classmaker_special_list];
-        classmaker_specials[classmaker_special_list][n].a = k;
-        classmaker_specials[classmaker_special_list][n].b = 0;
+        picked--;
+        index = classmaker_special_counts[classmaker_special_list];
+        classmaker_specials[classmaker_special_list][index].a = picked;
+        classmaker_specials[classmaker_special_list][index].b = 0;
         if ((short)(classmaker_screen & 15) == 2)
-            D_00190E0C = classmaker_advantage_sublists[k];
+            D_00190E0C = classmaker_advantage_sublists[picked];
         else
-            D_00190E0C = classmaker_disadvantage_sublists[k];
+            D_00190E0C = classmaker_disadvantage_sublists[picked];
         if (D_00190E0C == 0) {
             if (classmaker_drop_duplicate_special(classmaker_special_list) == 0) {
                 if (classmaker_special_list == 0)
-                    classmaker_set_advantage(n, 0);
+                    classmaker_set_advantage(index, 0);
                 else
-                    classmaker_set_disadvantage(n, 0);
+                    classmaker_set_disadvantage(index, 0);
             }
             classmaker_specials_picked();
             goto done;
         }
         classmaker_specials_add();
-        k = classmaker_picklist_wait();
-        if (k == 0) {
+        picked = classmaker_picklist_wait();
+        if (picked == 0) {
             classmaker_special_counts[classmaker_special_list]--;
             classmaker_specials_picked();
             goto done;
         }
-        k--;
-        n = classmaker_special_counts[classmaker_special_list];
-        classmaker_specials[classmaker_special_list][n].b = k;
-        if (classmaker_special_conflicts(classmaker_special_list, classmaker_specials[classmaker_special_list][n].a, k)) {
+        picked--;
+        index = classmaker_special_counts[classmaker_special_list];
+        classmaker_specials[classmaker_special_list][index].b = picked;
+        if (classmaker_special_conflicts(classmaker_special_list, classmaker_specials[classmaker_special_list][index].a, picked)) {
             classmaker_special_counts[classmaker_special_list]--;
             msgbox_show_rsc(1350, 1);
         } else if (classmaker_drop_duplicate_special(classmaker_special_list) == 0) {
             if (classmaker_special_list == 0)
-                classmaker_set_advantage(n, 0);
+                classmaker_set_advantage(index, 0);
             else
-                classmaker_set_disadvantage(n, 0);
+                classmaker_set_disadvantage(index, 0);
         }
         classmaker_specials_picked();
     } else {
         D_00190D84 = -1;
         y = 36;
-        for (n = 0; classmaker_special_counts[classmaker_special_list] > n; n++, y += font_height * 2) {
-            y0 = y;
+        for (index = 0; classmaker_special_counts[classmaker_special_list] > index; index++, y += font_height * 2) {
+            top = y;
             if (classmaker_screen == 2) {
-                a = classmaker_specials[0][n].a;
-                b = classmaker_specials[0][n].b;
-                text_draw_coloured(classmaker_advantage_names[a], 10, y, 145, 141);
-                if (classmaker_advantage_sublists[a]) {
+                special = classmaker_specials[0][index].a;
+                param = classmaker_specials[0][index].b;
+                text_draw_coloured(classmaker_advantage_names[special], 10, y, 145, 141);
+                if (classmaker_advantage_sublists[special]) {
                     y += font_height;
-                    text_draw_coloured(classmaker_advantage_sublists[a][b], 10, y, 145, 141);
+                    text_draw_coloured(classmaker_advantage_sublists[special][param], 10, y, 145, 141);
                 }
             } else {
-                a = classmaker_specials[1][n].a;
-                b = classmaker_specials[1][n].b;
-                text_draw_coloured(classmaker_disadvantage_names[a], 10, y, 145, 141);
-                if (classmaker_disadvantage_sublists[a]) {
+                special = classmaker_specials[1][index].a;
+                param = classmaker_specials[1][index].b;
+                text_draw_coloured(classmaker_disadvantage_names[special], 10, y, 145, 141);
+                if (classmaker_disadvantage_sublists[special]) {
                     y += font_height;
-                    text_draw_coloured(classmaker_disadvantage_sublists[a][b], 10, y, 145, 141);
+                    text_draw_coloured(classmaker_disadvantage_sublists[special][param], 10, y, 145, 141);
                 }
             }
-            y1 = y + font_height;
-            if (mouse_y >= y0 && mouse_y <= y1)
-                D_00190D84 = n;
+            bottom = y + font_height;
+            if (mouse_y >= top && mouse_y <= bottom)
+                D_00190D84 = index;
         }
     }
 done:

@@ -12,14 +12,14 @@ extern struct character *player_character;
 extern void reaction_mod_item_cb(int);
 extern void object_foreach(struct record *, int);
 
-int player_reaction_mod(int a1)
+int player_reaction_mod(int social_group)
 {
-    signed char l_18;
+    signed char bio_mod;
 
-    scratch_190ce4[0] = *(signed char *)&a1;
+    scratch_190ce4[0] = *(signed char *)&social_group;
     *(int *)D_00195B84 = 0;
     object_foreach(player_entity->children, (int)reaction_mod_item_cb);
-    l_18 = player_character->reputation_mod;
-    *(int *)D_00195B84 += (int)(signed char)l_18;
+    bio_mod = player_character->reputation_mod;
+    *(int *)D_00195B84 += (int)(signed char)bio_mod;
     return *(int *)D_00195B84;
 }

@@ -4,7 +4,7 @@
 
 extern char D_001700D5[];
 
-extern int open(int, ...);
+extern int open(char *, ...);
 extern int close();
 extern int mc_free();
 extern int lseek();
@@ -13,29 +13,29 @@ extern int read();
 #pragma aux sosconv "*" parm caller [] value [eax] modify [eax ebx ecx edx];
 #pragma aux (sosconv) sos_load_file;
 
-int sos_load_file(int a1)
+int sos_load_file(char *path)
 {
-    int l_18;
-    int l_14;
-    int l_10;
+    int buffer;
+    int size;
+    int handle;
 
-    l_10 = open(a1, 512);
-    if (l_10 == (-1)) return 0;
-    l_14 = lseek(l_10, 0, 2);
-    lseek(l_10, 0, 0);
-    l_18 = mc_malloc(l_14, (int)D_001700D5, 441);
-    if (l_18 == 0) {
-        close(l_10);
+    handle = open(path, 512);
+    if (handle == (-1)) return 0;
+    size = lseek(handle, 0, 2);
+    lseek(handle, 0, 0);
+    buffer = mc_malloc(size, (int)D_001700D5, 441);
+    if (buffer == 0) {
+        close(handle);
         return 0;
     }
-    if (read(l_10, l_18, l_14) != l_14) {
-        close(l_10);
-        if (l_18 != 0 && l_18 != (-1751672937)) {
-            mc_free(l_18, (int)D_001700D5, 457);
-            l_18 = -1751672937;
+    if (read(handle, buffer, size) != size) {
+        close(handle);
+        if (buffer != 0 && buffer != (-1751672937)) {
+            mc_free(buffer, (int)D_001700D5, 457);
+            buffer = -1751672937;
         }
         return 0;
     }
-    close(l_10);
-    return l_18;
+    close(handle);
+    return buffer;
 }

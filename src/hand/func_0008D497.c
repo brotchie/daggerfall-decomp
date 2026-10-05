@@ -12,57 +12,57 @@ extern void xn_draw_line_text_colour(int, int, int, int);
 extern void xn_draw_fill_rect(int, int, int, int);
 extern void xn_draw_put_rect(int, int, int, int, char *, int);
 
-void picklist_draw(struct picklist *a1, int a2)
+void picklist_draw(struct picklist *list, int unused)
 {
-    short l_30;
-    short l_2C;
-    char l_88[80];
-    short l_28;
-    short l_24;
-    short l_20;
-    short l_1C;
-    short l_18;
-    unsigned char l_14;
+    short thumb_y;
+    short x;
+    char text[80];
+    short saved_colour;
+    short i;
+    short w;
+    short h;
+    short y;
+    unsigned char line_height;
 
-    l_28 = D_0012B508;
-    l_30 = 0;
-    l_14 = font_height;
-    if (a1->count == 0)
-        l_30 = 0;
+    saved_colour = D_0012B508;
+    thumb_y = 0;
+    line_height = font_height;
+    if (list->count == 0)
+        thumb_y = 0;
     else
-        l_30 = a1->top * a1->bar_rect.h / a1->count;
-    if (a1->framed) {
-        xn_draw_put_rect(a1->list_rect.x, a1->list_rect.y, a1->list_rect.w, a1->list_rect.h, a1->list_background, 0);
-        xn_draw_put_rect(a1->bar_rect.x, a1->bar_rect.y, a1->bar_rect.w, a1->bar_rect.h, a1->bar_background, 0);
+        thumb_y = list->top * list->bar_rect.h / list->count;
+    if (list->framed) {
+        xn_draw_put_rect(list->list_rect.x, list->list_rect.y, list->list_rect.w, list->list_rect.h, list->list_background, 0);
+        xn_draw_put_rect(list->bar_rect.x, list->bar_rect.y, list->bar_rect.w, list->bar_rect.h, list->bar_background, 0);
     }
-    D_0012B508 = a1->colour_thumb;
-    l_2C = a1->bar_rect.x + 2;
-    l_18 = l_30 + (a1->bar_rect.y + 1);
-    l_20 = a1->bar_rect.w - 4;
-    l_1C = a1->thumb_height - 1;
-    if (a1->bar_rect.x != 0)
-        xn_draw_fill_rect(l_2C, l_18, l_20, l_1C);
+    D_0012B508 = list->colour_thumb;
+    x = list->bar_rect.x + 2;
+    y = thumb_y + (list->bar_rect.y + 1);
+    w = list->bar_rect.w - 4;
+    h = list->thumb_height - 1;
+    if (list->bar_rect.x != 0)
+        xn_draw_fill_rect(x, y, w, h);
     D_0012B508 = 123;
-    xn_draw_line_text_colour(l_2C, l_18, l_2C, l_18 + l_1C - 1);
-    xn_draw_line_text_colour(l_2C, l_18 + l_1C - 1, l_2C + l_20 - 1, l_18 + l_1C - 1);
+    xn_draw_line_text_colour(x, y, x, y + h - 1);
+    xn_draw_line_text_colour(x, y + h - 1, x + w - 1, y + h - 1);
     D_0012B508 = 112;
-    xn_draw_line_text_colour(l_2C + l_20 - 1, l_18, l_2C + l_20 - 1, l_18 + l_1C - 2);
-    xn_draw_line_text_colour(l_2C + 1, l_18, l_2C + l_20 - 1, l_18);
-    l_24 = a1->top;
-    l_18 = 1;
-    while (l_24 < a1->count && l_18 < a1->list_rect.h - l_14) {
-        mc_strncpy(l_88, a1->entries[l_24].text, 80, D_00176E38, 236);
-        picklist_clip_text(l_88, a1->list_rect.w);
-        if (l_24 != a1->selected || D_001A9AF3 != 0) {
-            D_0012B508 = l_24 != a1->selected ? 156 : 0;
-            text_draw(l_88, a1->list_rect.x + 2, a1->list_rect.y + l_18 + 1);
+    xn_draw_line_text_colour(x + w - 1, y, x + w - 1, y + h - 2);
+    xn_draw_line_text_colour(x + 1, y, x + w - 1, y);
+    i = list->top;
+    y = 1;
+    while (i < list->count && y < list->list_rect.h - line_height) {
+        mc_strncpy(text, list->entries[i].text, 80, D_00176E38, 236);
+        picklist_clip_text(text, list->list_rect.w);
+        if (i != list->selected || D_001A9AF3 != 0) {
+            D_0012B508 = i != list->selected ? 156 : 0;
+            text_draw(text, list->list_rect.x + 2, list->list_rect.y + y + 1);
         }
-        D_0012B508 = (a1->entries[l_24].flags & 1) ? a1->colour_flagged : a1->colour_normal;
-        if (l_24 == a1->selected)
-            D_0012B508 = a1->colour_selected;
-        text_draw(l_88, a1->list_rect.x + 1, a1->list_rect.y + l_18);
-        l_24++;
-        l_18 += l_14 + 1;
+        D_0012B508 = (list->entries[i].flags & 1) ? list->colour_flagged : list->colour_normal;
+        if (i == list->selected)
+            D_0012B508 = list->colour_selected;
+        text_draw(text, list->list_rect.x + 1, list->list_rect.y + y);
+        i++;
+        y += line_height + 1;
     }
-    D_0012B508 = l_28;
+    D_0012B508 = saved_colour;
 }

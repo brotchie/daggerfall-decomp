@@ -16,50 +16,50 @@ extern int cast_creature_spell(struct record *, struct record *, int);
 extern void item_damage(struct record *, int);
 extern int rand_range(int, int);
 
-void damage_weapon_strike_effects(struct item *a1, struct record *a2, struct record *a3, int a4)
+void damage_weapon_strike_effects(struct item *weapon, struct record *attacker, struct record *target, int damage)
 {
     int i;
-    struct character *m2;
-    struct character *m3;
+    struct character *attacker_character;
+    struct character *target_character;
 
-    if (a1->enchantments[0].type == -1)
+    if (weapon->enchantments[0].type == -1)
         return;
-    m2 = &a2->data.character;
-    m3 = &a3->data.character;
+    attacker_character = &attacker->data.character;
+    target_character = &target->data.character;
     for (i = 0; i < 10; i++) {
-        if (a1->enchantments[i].type == -1)
+        if (weapon->enchantments[i].type == -1)
             return;
-        if (a1->enchantments[i].type == 2) {
+        if (weapon->enchantments[i].type == 2) {
             D_00196292 = 1;
             D_00196291 = 1;
-            if (m2 == player_character) {
-                cast_item_strike_spell(a1->enchantments[i].param, a3);
+            if (attacker_character == player_character) {
+                cast_item_strike_spell(weapon->enchantments[i].param, target);
                 item_damage(scratch_current_object, 10);
             } else {
-                cast_creature_spell(a2, a3, a1->enchantments[i].param);
+                cast_creature_spell(attacker, target, weapon->enchantments[i].param);
                 item_damage(scratch_current_object, 10);
             }
             D_00196291 = 0;
             D_00196292 = 0;
-        } else if (a1->enchantments[i].type == 6 && a1->enchantments[i].param == 1) {
-            item_damage(scratch_current_object, damage_heal(m2, a4 / 2) / 4 + 1);
-        } else if (a1->enchantments[i].type == 26 && a1->enchantments[i].param == 2) {
+        } else if (weapon->enchantments[i].type == 6 && weapon->enchantments[i].param == 1) {
+            item_damage(scratch_current_object, damage_heal(attacker_character, damage / 2) / 4 + 1);
+        } else if (weapon->enchantments[i].type == 26 && weapon->enchantments[i].param == 2) {
             item_damage(scratch_current_object, 2);
             i = rand_range(1, 6);
-            if (m3->magicka > 10) {
-                m3->magicka -= i;
-                if (m3->magicka < 0)
-                    m3->magicka = 0;
+            if (target_character->magicka > 10) {
+                target_character->magicka -= i;
+                if (target_character->magicka < 0)
+                    target_character->magicka = 0;
                 spell_points_bonus += i;
                 i = spell_points_bonus + player_character->magicka;
                 if (player_character->max_magicka < i)
                     spell_points_bonus = player_character->max_magicka - player_character->magicka;
                 if (D_00195A0C == 0)
                     D_00195A0C = game_minutes + 12;
-            } else if (m3->attributes[ATTR_STR] > 10) {
-                m3->attributes[ATTR_STR] -= i;
-                if (m3->attributes[ATTR_STR] < 0)
-                    m3->attributes[ATTR_STR] = 0;
+            } else if (target_character->attributes[ATTR_STR] > 10) {
+                target_character->attributes[ATTR_STR] -= i;
+                if (target_character->attributes[ATTR_STR] < 0)
+                    target_character->attributes[ATTR_STR] = 0;
                 D_00195A08 += i;
                 D_00195A78 = game_minutes + 12;
             }

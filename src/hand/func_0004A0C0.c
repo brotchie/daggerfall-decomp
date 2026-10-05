@@ -6,24 +6,24 @@ extern struct location *current_location;
 extern int rand_range(int, int);
 extern int building_name(struct building *);
 
-int parse_town_building_name(short a1)
+int parse_town_building_name(short building_type)
 {
-    struct building *p;
+    struct building *building;
     short i;
-    short c;
+    short count;
 
-    p = current_location->buildings;
-    for (c = i = 0; i < current_location->building_count; i++, p++)
-        if (p->type == a1) c++;
-    if (c == 0) return text_blank;
-    if (c == 1)
-        c = 0;
+    building = current_location->buildings;
+    for (count = i = 0; i < current_location->building_count; i++, building++)
+        if (building->type == building_type) count++;
+    if (count == 0) return text_blank;
+    if (count == 1)
+        count = 0;
     else
-        c = rand_range(0, c - 1) + 1;
-    p = current_location->buildings;
-    while (c != 0) {
-        while (p->type != a1) p++;
-        c--;
+        count = rand_range(0, count - 1) + 1;
+    building = current_location->buildings;
+    while (count != 0) {
+        while (building->type != building_type) building++;
+        count--;
     }
-    return building_name(p);
+    return building_name(building);
 }

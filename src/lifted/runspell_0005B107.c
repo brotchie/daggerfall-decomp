@@ -9,28 +9,28 @@ extern void damage_spawn_splash(struct record *, int, int);
 extern void cast_spell_on(struct record *, struct record *, int);
 extern void cast_creature_missile(struct record *, struct record *, struct record *);
 
-int cast_creature_spell_at(struct record *a1, struct record *a2, struct record *a3)
+int cast_creature_spell_at(struct record *spell, struct record *caster, struct record *target)
 {
-    struct spell *l_14;
+    struct spell *spell_data;
 
-    l_14 = &a1->data.spell;
-    a1->caster = a2;
-    switch (l_14->target) {
+    spell_data = &spell->data.spell;
+    spell->caster = caster;
+    switch (spell_data->target) {
     case 0:
-        cast_spell_on(a1, a2, 0);
-        if (a2 != player_entity) damage_spawn_splash(a2, 3, 3);
+        cast_spell_on(spell, caster, 0);
+        if (caster != player_entity) damage_spawn_splash(caster, 3, 3);
         return 1;
     case 1:
-        cast_spell_on(a1, a3, 0);
+        cast_spell_on(spell, target, 0);
         return 1;
     case 2:
-        cast_creature_missile(a1, a2, a3);
+        cast_creature_missile(spell, caster, target);
         return 0;
     case 3:
-        cast_spell_on(a1, a3, 0);
+        cast_spell_on(spell, target, 0);
         return 1;
     case 4:
-        cast_creature_missile(a1, a2, a3);
+        cast_creature_missile(spell, caster, target);
         return 0;
     default:
         return 1;

@@ -12,50 +12,50 @@ extern signed char D_00196272;
 extern signed char game_mode;
 extern signed char mouse_buttons_prev;
 extern char msgbox_image[];
-extern int msgbox_saved_screen;
+extern char *msgbox_saved_screen;
 
-extern int text_expand_wrap(unsigned short, short, int, int, int);
+extern char *text_expand_wrap(unsigned short, short, char *, char *, char *);
 extern int mc_free();
-extern int mc_malloc();
+extern char *mc_malloc();
 extern int mc_strncpy();
 extern int strlen();
 extern int mc_memcpy();
 extern int xn_mouse_poll_clamped();
 extern int xn_font_select();
-extern void msgbox_render(int, int);
+extern void msgbox_render(char *, int);
 extern void msgbox_wait(void);
 extern void mode_push(void);
 
-void msgbox_show_string(int a1, short a2)
+void msgbox_show_string(char *text, short kind)
 {
-    int l_24;
-    int l_20;
-    int l_28;
-    int l_18;
-    int l_1C;
+    int flags;
+    int length;
+    char *copy;
+    char *wrap_buf;
+    char *expand_buf;
 
     if (msgbox_kind != 0) return;
-    msgbox_saved_screen = mc_malloc(64000, (int)D_00170D55, 697);
-    mc_memcpy(msgbox_saved_screen, screen_buffer, 64000, (int)D_00170D55, 698, 4);
+    msgbox_saved_screen = mc_malloc(64000, D_00170D55, 697);
+    mc_memcpy(msgbox_saved_screen, screen_buffer, 64000, D_00170D55, 698, 4);
     xn_font_select(4);
-    l_20 = strlen(a1);
-    l_28 = mc_malloc(l_20 + 16, (int)D_00170D55, 702);
-    l_18 = mc_malloc(((l_20 < 4096) ? 8192 : l_20 * 2), (int)D_00170D55, 703);
-    l_1C = mc_malloc(((l_20 < 4096) ? 8192 : l_20 * 2), (int)D_00170D55, 704);
-    mc_strncpy(l_28, a1, 4, (int)D_00170D55, 705);
-    if (((int)(short)a2) == 5) {
-        l_24 = 4;
+    length = strlen(text);
+    copy = mc_malloc(length + 16, D_00170D55, 702);
+    wrap_buf = mc_malloc(((length < 4096) ? 8192 : length * 2), D_00170D55, 703);
+    expand_buf = mc_malloc(((length < 4096) ? 8192 : length * 2), D_00170D55, 704);
+    mc_strncpy(copy, text, 4, D_00170D55, 705);
+    if (kind == 5) {
+        flags = 4;
         D_00196271 = 0;
     } else {
-        l_24 = 0;
+        flags = 0;
     }
-    l_28 = text_expand_wrap((int)(unsigned short)(l_24 | 32770), (int)(short)msgbox_wrap_width, l_28, l_18, l_1C);
-    msgbox_render(l_28, (int)msgbox_image);
-    if (l_28 != 0 && l_28 != (-1751672937)) {
-        mc_free(l_28, (int)D_00170D55, 717);
-        l_28 = -1751672937;
+    copy = text_expand_wrap((int)(unsigned short)(flags | 32770), (int)(short)msgbox_wrap_width, copy, wrap_buf, expand_buf);
+    msgbox_render(copy, (int)msgbox_image);
+    if (copy != 0 && copy != (char *)0x97979797) {
+        mc_free(copy, D_00170D55, 717);
+        copy = (char *)0x97979797;
     }
-    msgbox_kind = *(signed char *)&a2;
+    msgbox_kind = kind;
     mode_push();
     game_mode = 8;
     D_00196272 = 1;

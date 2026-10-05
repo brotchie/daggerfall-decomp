@@ -8,30 +8,30 @@ extern unsigned char **paperdoll_items;
 extern int mc_memmove();
 
 /* item +0x42 (the top byte of `message`) is the paperdoll drawing order here */
-void paperdoll_add_item(struct item *a1, int a2)
+void paperdoll_add_item(struct item *item, int slot)
 {
-    int l_18;
-    int l_14;
+    int pos;
+    int image_file;
 
-    l_18 = 0;
-    if (a1->group == 3) {
-        l_14 = a1->inventory_image >> 7;
-        if (l_14 == 432 || l_14 == 433) {
+    pos = 0;
+    if (item->group == 3) {
+        image_file = item->inventory_image >> 7;
+        if (image_file == 432 || image_file == 433) {
         } else if (player_character->flags & 1) {
-            a1->inventory_image -= 128;
+            item->inventory_image -= 128;
         }
-        if (a2 == 19) {
-            if (a1->item_flags & 4)
-                a1->inventory_image++;
-        } else if (a2 == 21) {
-            if (a1->item_flags & 4)
-                ((unsigned char *)a1)[66] += 5;
+        if (slot == 19) {
+            if (item->item_flags & 4)
+                item->inventory_image++;
+        } else if (slot == 21) {
+            if (item->item_flags & 4)
+                ((unsigned char *)item)[66] += 5;
         }
     }
-    while (paperdoll_items[l_18] != 0 && ((unsigned char *)a1)[66] > paperdoll_items[l_18][66])
-        l_18++;
-    mc_memmove(&paperdoll_slots[l_18 + 1], &paperdoll_slots[l_18], 27, D_0017573C, 201, 4);
-    mc_memmove(&paperdoll_items[l_18 + 1], &paperdoll_items[l_18], 108, D_0017573C, 202, 4);
-    paperdoll_items[l_18] = (unsigned char *)a1;
-    paperdoll_slots[l_18] = a2;
+    while (paperdoll_items[pos] != 0 && ((unsigned char *)item)[66] > paperdoll_items[pos][66])
+        pos++;
+    mc_memmove(&paperdoll_slots[pos + 1], &paperdoll_slots[pos], 27, D_0017573C, 201, 4);
+    mc_memmove(&paperdoll_items[pos + 1], &paperdoll_items[pos], 108, D_0017573C, 202, 4);
+    paperdoll_items[pos] = (unsigned char *)item;
+    paperdoll_slots[pos] = slot;
 }

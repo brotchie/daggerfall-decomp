@@ -74,10 +74,10 @@ struct hotspot {
 void potionmaker_update(void)
 {
     char buf[112];      /* never used: it only sizes the frame */
-    struct img *l_24;
-    struct item *l_20;
-    short l_1C;
-    short l_18;
+    struct img *image;
+    struct item *item;
+    short i;
+    short row;
 
     if (potionmaker_open(0) == 0) return;
     xn_draw_fullscreen_overlay_shaded(window_image);
@@ -88,52 +88,52 @@ void potionmaker_update(void)
     *(int *)potion_ingredient_count = 0;
     mc_memset((int)potion_ingredients, 0, 2048, (int)D_00176E94, 182, 2048);
     object_foreach(player_entity->children, (int)potionmaker_ingredient_cb);
-    for (COUNT = l_1C = 0; l_1C < 8; l_1C++) {
-        if (((int *)potion_cauldron)[l_1C] != 0) {
-            l_20 = &((struct record **)potion_cauldron)[l_1C]->data.item;
-            l_24 = *(struct img **)((char *)xn_tex_cache_lookup(l_20->inventory_image >> 7, l_20->inventory_image & 127, -1) + 12);
-            xn_draw_image_drop_shadow((COUNT & 1) * 56 + 233 - (l_24->w >> 1), (COUNT >> 1) * 38 + 42 - (l_24->h >> 1), l_24->w, l_24->h, (char *)l_24 + l_24->data);
-            text_draw_centred_coloured((int)l_20->name, (short)((COUNT & 1) * 56 + 236), (short)((COUNT >> 1) * 40 + 48), 145, 156);
-            ((short *)D_001A9B9C)[COUNT++] = l_1C;
+    for (COUNT = i = 0; i < 8; i++) {
+        if (((int *)potion_cauldron)[i] != 0) {
+            item = &((struct record **)potion_cauldron)[i]->data.item;
+            image = *(struct img **)((char *)xn_tex_cache_lookup(item->inventory_image >> 7, item->inventory_image & 127, -1) + 12);
+            xn_draw_image_drop_shadow((COUNT & 1) * 56 + 233 - (image->w >> 1), (COUNT >> 1) * 38 + 42 - (image->h >> 1), image->w, image->h, (char *)image + image->data);
+            text_draw_centred_coloured((int)item->name, (short)((COUNT & 1) * 56 + 236), (short)((COUNT >> 1) * 40 + 48), 145, 156);
+            ((short *)D_001A9B9C)[COUNT++] = i;
         }
     }
     if (*(int *)potion_ingredient_count == 0 && D_001AA3E0 == 0 && COUNT == 0) {
         msgbox_show_rsc(34, 1);
         potionmaker_close();
     }
-    if (((struct bf8_2_1 *)&D_001940D4)->f && (l_1C = list_popup_poll()) > -1)
-        potion_make(((struct item **)scratch_190be4)[l_1C]);
+    if (((struct bf8_2_1 *)&D_001940D4)->f && (i = list_popup_poll()) > -1)
+        potion_make(((struct item **)scratch_190be4)[i]);
     if ((char)key_down_esc != 0)
         potionmaker_close();
     if ((char)mouse_buttons == 0 || ((char)mouse_buttons != 0 && (char)mouse_buttons_prev != 0)) return;
-    for (l_1C = 0; l_1C < 5; l_1C++) {
-        if (MOUSE_X > ((struct hotspot *)potionmaker_buttons)[l_1C].x0 && MOUSE_X < ((struct hotspot *)potionmaker_buttons)[l_1C].x1
-         && MOUSE_Y > ((struct hotspot *)potionmaker_buttons)[l_1C].y0 && MOUSE_Y < ((struct hotspot *)potionmaker_buttons)[l_1C].y1) {
+    for (i = 0; i < 5; i++) {
+        if (MOUSE_X > ((struct hotspot *)potionmaker_buttons)[i].x0 && MOUSE_X < ((struct hotspot *)potionmaker_buttons)[i].x1
+         && MOUSE_Y > ((struct hotspot *)potionmaker_buttons)[i].y0 && MOUSE_Y < ((struct hotspot *)potionmaker_buttons)[i].y1) {
             sound_play(203, player_object, 100);
-            ((struct hotspot *)potionmaker_buttons)[l_1C].fn();
+            ((struct hotspot *)potionmaker_buttons)[i].fn();
         }
     }
     if (MOUSE_X > 221 && MOUSE_X < 304 && MOUSE_Y > 30 && MOUSE_Y < 171) {
-        l_1C = (MOUSE_X - 221) % 56;
-        if (l_1C > 27) return;
-        l_1C = (MOUSE_X - 221) / 56;
-        l_18 = (MOUSE_Y - 30) % 38;
-        if (l_18 > 24) return;
-        l_18 = (MOUSE_Y - 30) / 38;
-        l_1C += l_18 + l_18;
-        ((int *)potion_cauldron)[((short *)D_001A9B9C)[l_1C]] = 0;
-        ((unsigned char *)D_001A9BB4)[((short *)D_001A9B9C)[l_1C]] = 254;
+        i = (MOUSE_X - 221) % 56;
+        if (i > 27) return;
+        i = (MOUSE_X - 221) / 56;
+        row = (MOUSE_Y - 30) % 38;
+        if (row > 24) return;
+        row = (MOUSE_Y - 30) / 38;
+        i += row + row;
+        ((int *)potion_cauldron)[((short *)D_001A9B9C)[i]] = 0;
+        ((unsigned char *)D_001A9BB4)[((short *)D_001A9B9C)[i]] = 254;
         return;
     }
     if (MOUSE_X < 16 || MOUSE_X > 155 || MOUSE_Y < 30 || MOUSE_Y > 171) return;
-    l_1C = (MOUSE_X - 16) % 56;
-    if (l_1C > 27) return;
-    l_1C = (MOUSE_X - 16) / 56;
-    l_18 = (MOUSE_Y - 30) % 38;
-    if (l_18 > 27) return;
-    l_18 = (MOUSE_Y - 30) / 38;
-    l_1C += l_18 * 3;
-    l_20 = &((struct record **)potion_ingredients)[l_1C + *(int *)potion_ingredient_scroll]->data.item;
-    if (((int *)potion_ingredients)[l_1C + *(int *)potion_ingredient_scroll] != 0 && COUNT != 8 && potionmaker_in_cauldron(l_20->group, l_20->index) == 0)
-        potionmaker_add_ingredient(l_1C + *(int *)potion_ingredient_scroll);
+    i = (MOUSE_X - 16) % 56;
+    if (i > 27) return;
+    i = (MOUSE_X - 16) / 56;
+    row = (MOUSE_Y - 30) % 38;
+    if (row > 27) return;
+    row = (MOUSE_Y - 30) / 38;
+    i += row * 3;
+    item = &((struct record **)potion_ingredients)[i + *(int *)potion_ingredient_scroll]->data.item;
+    if (((int *)potion_ingredients)[i + *(int *)potion_ingredient_scroll] != 0 && COUNT != 8 && potionmaker_in_cauldron(item->group, item->index) == 0)
+        potionmaker_add_ingredient(i + *(int *)potion_ingredient_scroll);
 }

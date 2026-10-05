@@ -16,7 +16,7 @@ extern int unlink(char *);
 extern int func_000A13DA(char *, int, struct find_t *);
 extern int func_000A13F7(struct find_t *);
 
-void disk_delete_matching(int a1, int a2)
+void disk_delete_matching(char *dir, char *pattern)
 {
     int rc;
     char path[80];
@@ -24,11 +24,11 @@ void disk_delete_matching(int a1, int a2)
     int unused;
 
     mc_set_location(376, D_00175D00);
-    mc_sprintf(path, D_00175D60, a1, a2);
+    mc_sprintf(path, D_00175D60, dir, pattern);
     rc = func_000A13DA(path, 0, &ff);
     while (rc == 0) {
         mc_set_location(380, D_00175D00);
-        mc_sprintf(path, D_00175D60, a1, ff.name);
+        mc_sprintf(path, D_00175D60, dir, ff.name);
         unlink(path);
         rc = func_000A13F7(&ff);
     }

@@ -25,35 +25,35 @@ extern void xn_font_select(int);
 extern void mc_set_location(int, char *);
 extern int mc_sprintf(char *, char *, ...);
 
-void sheet_show_career_skills(short a1, short a2)
+void sheet_show_career_skills(short first, short all_six)
 {
-    char *p;
-    short x;
+    char *text;
+    short unused;
 
     sheet_hth_damage_line = 0;
-    p = scratch_buffer + 55000;
+    text = scratch_buffer + 55000;
     msgbox_wrap_width = 250;
-    *p = 0;
-    sheet_format_skill(p, player_class->skills[a1], skill_raised_recently(player_class->skills[a1]));
-    sheet_format_skill(p, player_class->skills[a1 + 1], skill_raised_recently(player_class->skills[a1 + 1]));
-    sheet_format_skill(p, player_class->skills[a1 + 2], skill_raised_recently(player_class->skills[a1 + 2]));
-    if (a2) {
-        sheet_format_skill(p, player_class->skills[a1 + 3], skill_raised_recently(player_class->skills[a1 + 3]));
-        sheet_format_skill(p, (int)player_class->skills[a1 + 4], skill_raised_recently(player_class->skills[a1 + 4]));
-        sheet_format_skill(p, player_class->skills[a1 + 5], skill_raised_recently(player_class->skills[a1 + 5]));
+    *text = 0;
+    sheet_format_skill(text, player_class->skills[first], skill_raised_recently(player_class->skills[first]));
+    sheet_format_skill(text, player_class->skills[first + 1], skill_raised_recently(player_class->skills[first + 1]));
+    sheet_format_skill(text, player_class->skills[first + 2], skill_raised_recently(player_class->skills[first + 2]));
+    if (all_six) {
+        sheet_format_skill(text, player_class->skills[first + 3], skill_raised_recently(player_class->skills[first + 3]));
+        sheet_format_skill(text, (int)player_class->skills[first + 4], skill_raised_recently(player_class->skills[first + 4]));
+        sheet_format_skill(text, player_class->skills[first + 5], skill_raised_recently(player_class->skills[first + 5]));
     }
     if (sheet_hth_damage_line) {
         mc_set_location(327, D_00170C67);
         mc_sprintf(((char *)text_buffer), D_00170CC0, player_character->skills[30].value / 10 + 1, player_character->skills[30].value / 5 + 1);
         D_001903A5 = 96;
-        func_000A1054(p, ((char *)text_buffer), D_00170C67, 329, 4);
+        func_000A1054(text, ((char *)text_buffer), D_00170C67, 329, 4);
     }
-    p[strlen(p) - 1] = 0;
+    text[strlen(text) - 1] = 0;
     xn_draw_fullscreen_overlay_shaded(window_image);
     paperdoll_draw(0, 0);
     xn_font_select(4);
     sheet_draw();
     xn_gfx_present_inclusive(1);
-    msgbox_show_string(p, 1);
+    msgbox_show_string(text, 1);
     msgbox_wrap_width = 310;
 }

@@ -6,13 +6,13 @@ extern char *automap_notes;
 extern int strlen(char *);
 extern void mc_strncpy(char *, char *, int, char *, int);
 
-void automap_add_note(struct record *a1, char *a2)
+void automap_add_note(struct record *object, char *text)
 {
     char *e;
 
     e = automap_notes;
     while (e[2] != 0)
         e += strlen(e + 2) + 3;
-    *(short *)e = a1->id & 65535;
-    mc_strncpy(e + 2, a2, 4, D_001707AE, 506);
+    *(short *)e = object->id & 65535;
+    mc_strncpy(e + 2, text, 4, D_001707AE, 506);
 }

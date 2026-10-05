@@ -5,16 +5,16 @@
 extern int D_00195D84;
 
 
-int trade_shop_takes_group(int a1)
+int trade_shop_takes_group(int group)
 {
-    int l_1C;
+    int i;
 
-    l_1C = 0;
-    while (((int)(unsigned char)*(signed char *)((char *)(D_00195D84 + l_1C))) != 255) {
-        if (((int)(unsigned char)*(signed char *)((char *)(D_00195D84 + l_1C))) == a1) {
+    i = 0;
+    while (((int)(unsigned char)*(signed char *)((char *)(D_00195D84 + i))) != 255) {
+        if (((int)(unsigned char)*(signed char *)((char *)(D_00195D84 + i))) == group) {
             return 1;
         }
-        l_1C += 2;
+        i += 2;
     }
     return 0;
 }

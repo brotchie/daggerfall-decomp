@@ -8,12 +8,12 @@ extern int game_minutes;
 
 extern int disease_is_lycanthrope(void);
 
-void guild_count_crime(int a1, int a2)
+void guild_count_crime(int crime, int count)
 {
-    if (a1 == 5) {
+    if (crime == 5) {
         if (player_character->thieves_invite_time != 0) return;
         if (player_character->thieves_invite_count == 100) return;
-        player_character->thieves_invite_count += *(signed char *)&a2;
+        player_character->thieves_invite_count += *(signed char *)&count;
         if (player_character->thieves_invite_count >= 6) {
             player_character->thieves_invite_time = game_minutes + 4320;
         }
@@ -25,7 +25,7 @@ void guild_count_crime(int a1, int a2)
     }
     if (player_character->brotherhood_invite_time != 0) return;
     if (player_character->brotherhood_invite_count == 100) return;
-    player_character->brotherhood_invite_count += *(signed char *)&a2;
+    player_character->brotherhood_invite_count += *(signed char *)&count;
     if (player_character->brotherhood_invite_count < 15) return;
     player_character->brotherhood_invite_time = game_minutes + 4320;
 }

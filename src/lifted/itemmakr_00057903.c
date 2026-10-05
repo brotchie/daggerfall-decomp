@@ -9,14 +9,14 @@ extern signed char D_00190D02[];
 
 extern int xn_font_select();
 
-int itemmaker_row_slot(short a1)
+int itemmaker_row_slot(short side)
 {
-    short l_18;
+    short row;
 
     xn_font_select(3);
-    l_18 = mouse_y - 60;
-    if (l_18 < 0) return -1;
-    *(int *)&l_18 = ((int)(short)l_18) / ((int)(short)font_height);
-    if (a1 != 0) return (int)(signed char)D_00190D02[(int)(short)l_18];
-    return (int)(signed char)scratch_190cee[(int)(short)l_18];
+    row = mouse_y - 60;
+    if (row < 0) return -1;
+    *(int *)&row = ((int)(short)row) / ((int)(short)font_height);
+    if (side != 0) return (int)(signed char)D_00190D02[(int)(short)row];
+    return (int)(signed char)scratch_190cee[(int)(short)row];
 }

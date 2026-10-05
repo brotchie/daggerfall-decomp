@@ -45,19 +45,19 @@ extern void poison_init_record(struct disease *, int);
 extern void monster_init(struct record *, int);
 extern void monster_reload_anim_cb(struct record *);
 extern void object_foreach(struct record *, int);
-void monster_give_spells(struct record *, int);
+void monster_give_spells(struct record *, char *);
 void monster_give_equipment(struct record *, struct character *, int);
 void monster_poison_weapon(struct record *);
 
 void monster_reload_anims(void)
 {
-    int l_18;
+    int slot;
 
-    for (l_18 = 0; l_18 < 128; l_18++) {
-        if (*(int *)(D_00190704 + (l_18 << 2)) != 0) {
-            if (*(int *)(D_00190704 + (l_18 << 2)) != 0 && *(int *)(D_00190704 + (l_18 << 2)) != (-1751672937)) {
-                mc_free(*(int *)(D_00190704 + (l_18 << 2)), (int)D_00176844, 211);
-                *(int *)(D_00190704 + (l_18 << 2)) = -1751672937;
+    for (slot = 0; slot < 128; slot++) {
+        if (*(int *)(D_00190704 + (slot << 2)) != 0) {
+            if (*(int *)(D_00190704 + (slot << 2)) != 0 && *(int *)(D_00190704 + (slot << 2)) != (-1751672937)) {
+                mc_free(*(int *)(D_00190704 + (slot << 2)), (int)D_00176844, 211);
+                *(int *)(D_00190704 + (slot << 2)) = -1751672937;
             }
         }
     }
@@ -65,243 +65,243 @@ void monster_reload_anims(void)
     object_foreach(nonworld_root, (int)monster_reload_anim_cb);
 }
 
-int monster_roll_d8_health(int a1, int a2)
+int monster_roll_d8_health(int dice_count, int bonus)
 {
-    int l_1C;
-    int l_18;
+    int i;
+    int total;
 
-    l_1C = 0;
-    l_18 = l_1C;
-    for (; l_1C < a1; l_1C++) {
-        l_18 += rand_range(1, 8);
+    i = 0;
+    total = i;
+    for (; i < dice_count; i++) {
+        total += rand_range(1, 8);
     }
-    return l_18 + a2;
+    return total + bonus;
 }
 
-int monster_roll_class_health(int a1, int a2, int a3)
+int monster_roll_class_health(int hp_per_level, int bonus, int level)
 {
-    int l_18;
-    int l_14;
+    int i;
+    int total;
 
-    l_18 = 0;
-    l_14 = l_18;
-    for (; l_18 < a3; l_18++) {
-        l_14 += rand_range(1, a1);
+    i = 0;
+    total = i;
+    for (; i < level; i++) {
+        total += rand_range(1, hp_per_level);
     }
-    return l_14 + a2;
+    return total + bonus;
 }
 
-void monster_init_gear(struct record *a1)
+void monster_init_gear(struct record *monster)
 {
-    struct character *l_1C;
-    int l_18;
+    struct character *monster_char;
+    int list_index;
 
-    l_1C = &a1->data.character;
-    if (l_1C->race >= 43) {
-        monster_give_equipment(a1, l_1C, rand() & 1);
-        if (((int)(unsigned short)(*(short *)(monster_table_flags + (l_1C->race * 29)) & 2)) != 0) {
-            l_18 = l_1C->level / 3;
-            if (l_18 > 6) l_18 = 6;
-            monster_give_spells(a1, monster_class_spell_lists[l_18]);
+    monster_char = &monster->data.character;
+    if (monster_char->race >= 43) {
+        monster_give_equipment(monster, monster_char, rand() & 1);
+        if (((int)(unsigned short)(*(short *)(monster_table_flags + (monster_char->race * 29)) & 2)) != 0) {
+            list_index = monster_char->level / 3;
+            if (list_index > 6) list_index = 6;
+            monster_give_spells(monster, (char *)monster_class_spell_lists[list_index]);
         }
         return;
     }
-    switch (l_1C->race) {
+    switch (monster_char->race) {
         return;
     case 1:
-        monster_give_spells(a1, (int)monster_spells_imp);
+        monster_give_spells(monster, monster_spells_imp);
         return;
     case 7:
-        monster_give_equipment(a1, l_1C, 0);
+        monster_give_equipment(monster, monster_char, 0);
         return;
     case 8:
-        monster_give_equipment(a1, l_1C, 1);
+        monster_give_equipment(monster, monster_char, 1);
         return;
     case 12:
-        monster_give_equipment(a1, l_1C, 1);
+        monster_give_equipment(monster, monster_char, 1);
         return;
     case 18:
-        monster_give_spells(a1, (int)monster_spells_ghost);
+        monster_give_spells(monster, monster_spells_ghost);
         return;
     case 21:
-        monster_give_equipment(a1, l_1C, 0);
-        monster_give_spells(a1, (int)monster_spells_orc_shaman);
+        monster_give_equipment(monster, monster_char, 0);
+        monster_give_spells(monster, monster_spells_orc_shaman);
         return;
     case 23:
-        monster_give_spells(a1, (int)monster_spells_wraith);
+        monster_give_spells(monster, monster_spells_wraith);
         return;
     case 24:
-        monster_give_equipment(a1, l_1C, 2);
+        monster_give_equipment(monster, monster_char, 2);
         return;
     case 25:
-        monster_give_spells(a1, (int)monster_spells_frost_daedra);
+        monster_give_spells(monster, monster_spells_frost_daedra);
         return;
     case 26:
-        monster_give_spells(a1, (int)monster_spells_fire_daedra);
+        monster_give_spells(monster, monster_spells_fire_daedra);
         return;
     case 27:
-        monster_give_spells(a1, (int)monster_spells_daedroth);
+        monster_give_spells(monster, monster_spells_daedroth);
         return;
     case 28:
-        monster_give_spells(a1, (int)monster_spells_vampire);
+        monster_give_spells(monster, monster_spells_vampire);
         return;
     case 29:
-        monster_give_spells(a1, (int)monster_spells_seducer);
+        monster_give_spells(monster, monster_spells_seducer);
         return;
     case 30:
-        monster_give_spells(a1, (int)monster_spells_vampire_ancient);
+        monster_give_spells(monster, monster_spells_vampire_ancient);
         return;
     case 31:
-        monster_give_spells(a1, (int)monster_spells_daedra_lord);
+        monster_give_spells(monster, monster_spells_daedra_lord);
         return;
     case 32:
-        monster_give_spells(a1, (int)monster_spells_lich);
+        monster_give_spells(monster, monster_spells_lich);
         return;
     case 33:
-        monster_give_spells(a1, (int)monster_spells_ancient_lich);
+        monster_give_spells(monster, monster_spells_ancient_lich);
     default:;
     }
 }
 
-void monster_give_spells(struct record *a1, int a2)
+void monster_give_spells(struct record *monster, char *spell_ids)
 {
-    int l_24;
-    int l_20;
-    struct record *l_1C;
-    struct record *l_18;
-    struct character *l_14;
+    int i;
+    int spell_index;
+    struct record *spellbook;
+    struct record *spell;
+    struct character *monster_char;
 
-    l_24 = 0;
-    l_14 = &a1->data.character;
-    l_14->magicka = (l_14->max_magicka = (((unsigned short)l_14->level) * 10) + 100);
-    l_14->skills[22].value = 80;
-    l_14->skills[23].value = 80;
-    l_14->skills[24].value = 80;
-    l_14->skills[25].value = 80;
-    l_14->skills[26].value = 80;
-    l_14->skills[27].value = 80;
-    l_1C = object_create_child(a1, 0, 0);
-    l_1C->type = 22;
-    l_1C->flags = 3;
-    l_1C->id = object_new_id(((unsigned)a1->id) >> 16);
-    while (((int)(unsigned char)*(signed char *)((char *)(a2 + l_24))) != 255) {
-        l_20 = 0;
-        while ((signed char)spell_records[l_20].id != *(signed char *)((char *)(a2 + l_24))) l_20++;
-        l_18 = object_create_child(l_1C, 0, 89);
-        l_18->type = 9;
-        l_18->flags = 1;
-        l_18->id = object_new_id(((unsigned)a1->id) >> 16);
-        mc_memcpy(&l_18->data.spell, &spell_records[l_20], 89, (int)D_00176844, 370, 4);
-        l_24++;
+    i = 0;
+    monster_char = &monster->data.character;
+    monster_char->magicka = (monster_char->max_magicka = (((unsigned short)monster_char->level) * 10) + 100);
+    monster_char->skills[22].value = 80;
+    monster_char->skills[23].value = 80;
+    monster_char->skills[24].value = 80;
+    monster_char->skills[25].value = 80;
+    monster_char->skills[26].value = 80;
+    monster_char->skills[27].value = 80;
+    spellbook = object_create_child(monster, 0, 0);
+    spellbook->type = 22;
+    spellbook->flags = 3;
+    spellbook->id = object_new_id(((unsigned)monster->id) >> 16);
+    while (((int)(unsigned char)*(signed char *)(spell_ids + i)) != 255) {
+        spell_index = 0;
+        while ((signed char)spell_records[spell_index].id != *(signed char *)(spell_ids + i)) spell_index++;
+        spell = object_create_child(spellbook, 0, 89);
+        spell->type = 9;
+        spell->flags = 1;
+        spell->id = object_new_id(((unsigned)monster->id) >> 16);
+        mc_memcpy(&spell->data.spell, &spell_records[spell_index], 89, (int)D_00176844, 370, 4);
+        i++;
     }
 }
 
-void monster_give_equipment(struct record *a1, struct character *a2, int a3)
+void monster_give_equipment(struct record *monster, struct character *monster_char, int tier)
 {
-    int l_14;
-    int l_10;
+    int poison_chance;
+    int i;
 
-    mc_memset(a2->equipped, 0, 108, (int)D_00176844, 400, 108);
-    switch ((unsigned)a3) {
+    mc_memset(monster_char->equipped, 0, 108, (int)D_00176844, 400, 108);
+    switch ((unsigned)tier) {
     case 0:
-        a2->equipped[19] = monster_make_item(a1, 3, 5, 7, -1, 100);
-        a2->equipped[21] = monster_make_item(a1, 2, 7, 8, -1, 50);
-        if (a2->equipped[21] == 0) a2->equipped[21] = monster_make_item(a1, 3, 0, 3, 2, 50);
-        a2->equipped[12] = monster_make_item(a1, 2, 5, 5, -1, 50);
-        a2->equipped[13] = monster_make_item(a1, 2, 4, 4, -1, 50);
-        a2->equipped[15] = monster_make_item(a1, 2, 3, 3, -1, 50);
-        a2->equipped[18] = monster_make_item(a1, 2, 0, 0, -1, 50);
-        a2->equipped[23] = monster_make_item(a1, 2, 2, 2, -1, 50);
-        a2->equipped[26] = monster_make_item(a1, 2, 6, 6, -1, 50);
-        character_update_armor_values(a1);
+        monster_char->equipped[19] = monster_make_item(monster, 3, 5, 7, -1, 100);
+        monster_char->equipped[21] = monster_make_item(monster, 2, 7, 8, -1, 50);
+        if (monster_char->equipped[21] == 0) monster_char->equipped[21] = monster_make_item(monster, 3, 0, 3, 2, 50);
+        monster_char->equipped[12] = monster_make_item(monster, 2, 5, 5, -1, 50);
+        monster_char->equipped[13] = monster_make_item(monster, 2, 4, 4, -1, 50);
+        monster_char->equipped[15] = monster_make_item(monster, 2, 3, 3, -1, 50);
+        monster_char->equipped[18] = monster_make_item(monster, 2, 0, 0, -1, 50);
+        monster_char->equipped[23] = monster_make_item(monster, 2, 2, 2, -1, 50);
+        monster_char->equipped[26] = monster_make_item(monster, 2, 6, 6, -1, 50);
+        character_update_armor_values(monster);
         break;
     case 1:
-        a2->equipped[19] = monster_make_item(a1, 3, 9, 14, -1, 100);
-        a2->equipped[12] = monster_make_item(a1, 2, 5, 5, -1, 75);
-        a2->equipped[13] = monster_make_item(a1, 2, 4, 4, -1, 75);
-        a2->equipped[15] = monster_make_item(a1, 2, 3, 3, -1, 75);
-        a2->equipped[18] = monster_make_item(a1, 2, 0, 0, -1, 75);
-        a2->equipped[23] = monster_make_item(a1, 2, 2, 2, -1, 75);
-        a2->equipped[26] = monster_make_item(a1, 2, 6, 6, -1, 75);
-        character_update_armor_values(a1);
+        monster_char->equipped[19] = monster_make_item(monster, 3, 9, 14, -1, 100);
+        monster_char->equipped[12] = monster_make_item(monster, 2, 5, 5, -1, 75);
+        monster_char->equipped[13] = monster_make_item(monster, 2, 4, 4, -1, 75);
+        monster_char->equipped[15] = monster_make_item(monster, 2, 3, 3, -1, 75);
+        monster_char->equipped[18] = monster_make_item(monster, 2, 0, 0, -1, 75);
+        monster_char->equipped[23] = monster_make_item(monster, 2, 2, 2, -1, 75);
+        monster_char->equipped[26] = monster_make_item(monster, 2, 6, 6, -1, 75);
+        character_update_armor_values(monster);
         break;
     case 2:
-        a2->equipped[19] = monster_make_item(a1, 3, 9, 14, -1, 100);
-        a2->equipped[12] = monster_make_item(a1, 2, 5, 5, -1, 90);
-        a2->equipped[13] = monster_make_item(a1, 2, 4, 4, -1, 90);
-        a2->equipped[15] = monster_make_item(a1, 2, 3, 3, -1, 90);
-        a2->equipped[18] = monster_make_item(a1, 2, 0, 0, -1, 90);
-        a2->equipped[23] = monster_make_item(a1, 2, 2, 2, -1, 90);
-        a2->equipped[26] = monster_make_item(a1, 2, 6, 6, -1, 90);
-        character_update_armor_values(a1);
+        monster_char->equipped[19] = monster_make_item(monster, 3, 9, 14, -1, 100);
+        monster_char->equipped[12] = monster_make_item(monster, 2, 5, 5, -1, 90);
+        monster_char->equipped[13] = monster_make_item(monster, 2, 4, 4, -1, 90);
+        monster_char->equipped[15] = monster_make_item(monster, 2, 3, 3, -1, 90);
+        monster_char->equipped[18] = monster_make_item(monster, 2, 0, 0, -1, 90);
+        monster_char->equipped[23] = monster_make_item(monster, 2, 2, 2, -1, 90);
+        monster_char->equipped[26] = monster_make_item(monster, 2, 6, 6, -1, 90);
+        character_update_armor_values(monster);
     }
-    for (l_10 = 0; l_10 < 7; l_10++) {
-        if (a2->armor_values[l_10] > 50) a2->armor_values[l_10] = 60;
+    for (i = 0; i < 7; i++) {
+        if (monster_char->armor_values[i] > 50) monster_char->armor_values[i] = 60;
     }
     if (player_character->level < 2) return;
-    if (a2->mobile_id >= 128 && a2->equipped[19] != 0) {
-        if (a2->mobile_id == 139) {
-            l_14 = 60;
+    if (monster_char->mobile_id >= 128 && monster_char->equipped[19] != 0) {
+        if (monster_char->mobile_id == 139) {
+            poison_chance = 60;
         } else {
-            l_14 = 5;
+            poison_chance = 5;
         }
-        if (rand_range(1, 100) < l_14) monster_poison_weapon(a2->equipped[19]);
+        if (rand_range(1, 100) < poison_chance) monster_poison_weapon(monster_char->equipped[19]);
         return;
     }
-    switch (a2->mobile_id) {
+    switch (monster_char->mobile_id) {
     case 7:
     case 8:
     case 12:
         if (rand_range(1, 100) >= 5) return;
-        monster_poison_weapon(a2->equipped[19]);
+        monster_poison_weapon(monster_char->equipped[19]);
     default:;
     }
 }
 
-void monster_poison_weapon(struct record *a1)
+void monster_poison_weapon(struct record *object)
 {
-    a1 = object_create_child(a1, 0, 47);
-    a1->id = object_new_id(((unsigned)a1->parent->id) >> 16);
-    poison_init_record(&a1->data.disease, (int)&*(signed char *)((char *)rand_range(0, 7) + 128));
+    object = object_create_child(object, 0, 47);
+    object->id = object_new_id(((unsigned)object->parent->id) >> 16);
+    poison_init_record(&object->data.disease, (int)&*(signed char *)((char *)rand_range(0, 7) + 128));
 }
 
-void monster_wabbajack(struct record *a1, struct record *a2)
+void monster_wabbajack(struct record *item, struct record *target)
 {
-    int l_18;
-    struct character *l_14;
+    int health_change;
+    struct character *target_char;
 
-    l_14 = &a2->data.character;
-    if (((int)(unsigned short)(l_14->flags & 4096)) != 0) return;
-    l_18 = l_14->max_health;
-    monster_init(a2, (int)(unsigned char)wabbajack_creatures[rand_range(0, 16)]);
-    l_14->flags |= 0x1000;
-    l_18 = l_14->max_health - l_18;
-    if (l_18 >= 0) return;
-    item_damage(a1, l_18);
+    target_char = &target->data.character;
+    if (((int)(unsigned short)(target_char->flags & 4096)) != 0) return;
+    health_change = target_char->max_health;
+    monster_init(target, (int)(unsigned char)wabbajack_creatures[rand_range(0, 16)]);
+    target_char->flags |= 0x1000;
+    health_change = target_char->max_health - health_change;
+    if (health_change >= 0) return;
+    item_damage(item, health_change);
 }
 
-void monster_maybe_give_map(struct record *a1, int a2)
+void monster_maybe_give_map(struct record *monster, int mobile_id)
 {
-    struct record *l_18;
-    struct item *l_14;
+    struct record *item;
+    struct item *item_data;
 
-    if (a2 < 128) {
-        if (rand_range(1, 100) > ((int)(unsigned char)monster_map_chance[a2])) return;
+    if (mobile_id < 128) {
+        if (rand_range(1, 100) > ((int)(unsigned char)monster_map_chance[mobile_id])) return;
     } else {
-        if (rand_range(1, 100) > ((int)(unsigned char)monster_class_map_chance[a2])) return;
+        if (rand_range(1, 100) > ((int)(unsigned char)monster_class_map_chance[mobile_id])) return;
     }
-    l_18 = object_create_child(a1, 0, 107);
-    l_18->type = 2;
-    l_18->id = object_new_id(((unsigned)a1->id) >> 16);
-    l_14 = &l_18->data.item;
-    item_make(27, 8, l_14);
+    item = object_create_child(monster, 0, 107);
+    item->type = 2;
+    item->id = object_new_id(((unsigned)monster->id) >> 16);
+    item_data = &item->data.item;
+    item_make(27, 8, item_data);
 }
 
-int savetree_read_chunk(int a1)
+int savetree_read_chunk(char *buffer)
 {
-    int l_1C;
+    int size;
 
-    read(save_file_handle, (int)&l_1C, 4);
-    read(save_file_handle, a1, l_1C);
-    return l_1C;
+    read(save_file_handle, (int)&size, 4);
+    read(save_file_handle, buffer, size);
+    return size;
 }

@@ -33,7 +33,7 @@ extern signed char D_001940D4;
 extern signed char D_001940D5;
 extern signed char D_001940D6;
 extern signed char D_001940DA;
-extern char location_grid[];
+extern struct record *location_grid[];
 extern struct record *D_001959E0;
 extern struct record *house_container;
 extern struct record *ship_container;
@@ -60,7 +60,7 @@ extern int game_minutes;
 extern int hud_message_ptrs[];
 extern int D_00195C3C;
 extern char scratch_buffer[];
-extern int grid_visit_func;
+extern void (*grid_visit_func)();
 extern int D_00195CF0;
 extern int spell_cast_queue_count;
 extern int free_later_count;
@@ -105,7 +105,7 @@ extern int D_001A59D8;
 extern int D_001A59DC;
 extern int D_001A59E0;
 extern int D_001A59E4;
-extern int info_popup_text;
+extern char *info_popup_text;
 extern short mode_stack_depth;
 extern short D_001A5A54;
 
@@ -118,7 +118,7 @@ extern int spell_missile_update(struct record *, int);
 extern int disk_read_file(int, int);
 extern int location_contains(int, int);
 extern int building_name(struct building *);
-extern int picklist_poll(int);
+extern int picklist_poll(struct picklist *);
 extern int object_free_single(struct record *);
 extern int object_delete(struct record *);
 extern struct record *object_create_child(struct record *, int, int);
@@ -155,22 +155,22 @@ extern void cast_spell_on(int, int, int);
 extern void text_draw_coloured(int, int, int, int, unsigned char);
 extern void text_draw_centred_coloured(int, int, int, int, unsigned char);
 extern void detect_consider_creature(struct record *, unsigned short);
-extern void func_0007E815(struct record *, int);
+extern void func_0007E815(struct record *, void (*)());
 extern void func_0007F0F3(short);
 extern void marker_make_clutter(struct record *, int);
 extern void marker_make_loot_pile(struct record *, int);
 extern void inpstr_begin_number(int);
 extern void picklist_init(int, short, short, int, short, short, short, short, short, short, short, short, short, short, short, short, short, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char);
 extern void picklist_add(int, int, int);
-extern void picklist_free(int);
-extern void picklist_draw(int, int);
+extern void picklist_free(struct picklist *);
+extern void picklist_draw(struct picklist *, int);
 extern void object_free_children(struct record *);
 extern void object_foreach_pre(struct record *, int);
 extern void object_foreach(struct record *, int);
 extern void object_foreach_skip_player(struct record *, int);
 extern void object_foreach_open(struct record *, int);
-int hud_message_add(int);
-int picklist_frame(int);
+int hud_message_add(char *);
+int picklist_frame(struct picklist *);
 struct building *object_building(struct record *);
 int gold_total(void);
 int gold_find_credit_cb(struct record *);
@@ -182,7 +182,7 @@ void object_free_pending(void);
 void spell_cast_queued_run(void);
 void world_collect_object(struct record *);
 void detect_consider(struct record *);
-void town_grid_visit_near(struct record *, int);
+void town_grid_visit_near(struct record *, void (*)());
 void func_0007F093(struct record *);
 void gold_sum_credit_cb(struct record *);
 void gold_make_credit_letter(int);
@@ -196,56 +196,56 @@ void store_repair_item_cb(struct record *);
 void restore_repair_item_cb(struct record *);
 #pragma aux mc_set_location parm routine [];
 
-void hud_status_set(int a1)
+void hud_status_set(char *text)
 {
-    int l_18;
+    int *bios_ticks;
 
-    mc_strncpy((int)hud_status_text, a1, 1440, (int)D_00176A10, 97);
-    l_18 = 1132;
-    hud_status_expiry = *(int *)((char *)l_18) + 36;
+    mc_strncpy(hud_status_text, text, 1440, D_00176A10, 97);
+    bios_ticks = (int *)1132;
+    hud_status_expiry = *bios_ticks + 36;
     D_00195C3C = (int)hud_status_text;
 }
 
-int hud_message_add(int a1)
+int hud_message_add(char *text)
 {
-    int l_2C;
-    int l_28;
-    int l_24;
-    int l_20;
-    short l_18;
+    char *message_text;
+    char *slot_text;
+    int slot;
+    int free_slot;
+    short bios_ticks_addr;
 
-    l_28 = (int)hud_message_text;
-    l_20 = -1;
-    for (l_24 = 0; l_24 < 16; l_24++, l_28 += 80) {
-        if (hud_message_expiry[l_24] == 0) {
-            l_20 = l_24;
-            l_2C = l_28;
+    slot_text = hud_message_text;
+    free_slot = -1;
+    for (slot = 0; slot < 16; slot++, slot_text += 80) {
+        if (hud_message_expiry[slot] == 0) {
+            free_slot = slot;
+            message_text = slot_text;
             break;
         }
     }
-    if (l_20 < 0) return 0;
-    mc_strncpy(l_2C, a1, 4, (int)D_00176A10, 117);
-    *(int *)&l_18 = 1132;
-    hud_message_expiry[l_20] = *(int *)(*(char **)&l_18) + 36;
-    hud_message_ptrs[l_20] = l_2C;
-    return hud_message_ptrs[l_24];
+    if (free_slot < 0) return 0;
+    mc_strncpy(message_text, text, 4, D_00176A10, 117);
+    *(int *)&bios_ticks_addr = 1132;
+    hud_message_expiry[free_slot] = *(int *)(*(char **)&bios_ticks_addr) + 36;
+    hud_message_ptrs[free_slot] = (int)message_text;
+    return hud_message_ptrs[slot];
 }
 
 void hud_messages_draw(void)
 {
-    int l_24;
-    int l_20;
+    int slot;
+    int y;
 
     xn_font_select(4);
-    l_24 = 0;
-    for (l_20 = 2; l_24 < 16; l_24++, l_20 += 9) {
-        if (hud_message_expiry[l_24] != 0) {
+    slot = 0;
+    for (y = 2; slot < 16; slot++, y += 9) {
+        if (hud_message_expiry[slot] != 0) {
             if (((struct bf8_0_1 *)&D_001940DA)->f == 0) {
-                if (((unsigned)*(int *)((char *)1132)) > hud_message_expiry[l_24]) {
-                    hud_message_expiry[l_24] = 0;
+                if (((unsigned)*(int *)((char *)1132)) > hud_message_expiry[slot]) {
+                    hud_message_expiry[slot] = 0;
                 }
             }
-            text_draw_centred_coloured(hud_message_ptrs[l_24], 160, (int)(short)*(short *)&l_20, 145, 156);
+            text_draw_centred_coloured(hud_message_ptrs[slot], 160, (int)(short)*(short *)&y, 145, 156);
         }
     }
     if (hud_status_expiry == 0) return;
@@ -254,36 +254,36 @@ void hud_messages_draw(void)
             hud_status_expiry = 0;
         }
     }
-    text_draw_centred_coloured(D_00195C3C, 160, (int)(short)*(short *)&l_20, 145, 156);
+    text_draw_centred_coloured(D_00195C3C, 160, (int)(short)*(short *)&y, 145, 156);
 }
 
-void info_popup_open(int a1)
+void info_popup_open(char *text)
 {
     D_00196275 = D_00196272;
     D_00196272 = 2;
-    info_popup_text = a1;
+    info_popup_text = text;
 }
 
-int wait_key_from_list(int a1, short a2)
+int wait_key_from_list(signed char *keys, short key_count)
 {
-    unsigned char l_14;
-    short l_18;
+    unsigned char key;
+    short i;
 
     while (mouse_buttons != 0) xn_mouse_poll_clamped();
     while (mouse_buttons == 0) {
         xn_mouse_poll_clamped();
         xn_mouse_cursor_move((int)(short)mouse_x, (int)(short)mouse_y);
-        l_14 = xn_kbd_read_key();
-        if (l_14 != 0) {
-            if (((struct bf8_0_1 *)&D_001940D4)->f != 0 && ((int)(unsigned char)l_14) == 27) {
+        key = xn_kbd_read_key();
+        if (key != 0) {
+            if (((struct bf8_0_1 *)&D_001940D4)->f != 0 && ((int)(unsigned char)key) == 27) {
                 return -1;
             }
-            if (a2 != 0) {
-                l_14 = toupper((int)(unsigned char)l_14);
-                *(int *)&l_18 = 0;
-                for (; (short)(short)*(int *)&l_18 < a2; (*(int *)&l_18)++) {
-                    if ((signed char)l_14 == *(signed char *)((char *)(((int)(short)l_18) + a1))) {
-                        return (int)(short)l_18;
+            if (key_count != 0) {
+                key = toupper((int)(unsigned char)key);
+                *(int *)&i = 0;
+                for (; (short)(short)*(int *)&i < key_count; (*(int *)&i)++) {
+                    if ((signed char)key == keys[(short)i]) {
+                        return (int)(short)i;
                     }
                 }
             }
@@ -293,14 +293,14 @@ int wait_key_from_list(int a1, short a2)
     return -2;
 }
 
-int key_pressed_once(unsigned char a1)
+int key_pressed_once(unsigned char scancode)
 {
-    if (key_down[(int)(unsigned char)a1] != 0 && key_was_down[(int)(unsigned char)a1] == 0) {
-        key_was_down[(int)(unsigned char)a1] = 1;
+    if (key_down[(int)(unsigned char)scancode] != 0 && key_was_down[(int)(unsigned char)scancode] == 0) {
+        key_was_down[(int)(unsigned char)scancode] = 1;
         return 1;
     }
-    if (key_down[(int)(unsigned char)a1] == 0) {
-        key_was_down[(int)(unsigned char)a1] = 0;
+    if (key_down[(int)(unsigned char)scancode] == 0) {
+        key_was_down[(int)(unsigned char)scancode] = 0;
     }
     return 0;
 }
@@ -324,24 +324,24 @@ void mode_pop(void)
     D_0019626F = 255;
 }
 
-void size_fit(int a1, int a2, short a3, short a4)
+void size_fit(short *width, short *height, short max_width, short max_height)
 {
-    short l_10;
-    short l_C;
+    short scale_w;
+    short scale_h;
 
-    if (*(short *)((char *)a1) <= a3 && *(short *)((char *)a2) <= a4) return;
-    *(int *)&l_10 = (((int)(short)a3) << 8) / ((int)(short)*(short *)((char *)a1));
-    *(int *)&l_C = (((int)(short)a4) << 8) / ((int)(short)*(short *)((char *)a2));
-    if ((short)(short)*(int *)&l_C < l_10) {
-        *(short *)((char *)a1) = (((int)(short)*(short *)((char *)a1)) * ((int)(short)l_C)) >> 8;
-        *(short *)((char *)a2) = *(int *)&a4;
+    if (*width <= max_width && *height <= max_height) return;
+    *(int *)&scale_w = (((int)(short)max_width) << 8) / ((int)(short)*width);
+    *(int *)&scale_h = (((int)(short)max_height) << 8) / ((int)(short)*height);
+    if ((short)(short)*(int *)&scale_h < scale_w) {
+        *width = (((int)(short)*width) * ((int)(short)scale_h)) >> 8;
+        *height = *(int *)&max_height;
         return;
     }
-    *(short *)((char *)a2) = (((int)(short)*(short *)((char *)a2)) * ((int)(short)l_10)) >> 8;
-    *(short *)((char *)a1) = *(int *)&a3;
+    *height = (((int)(short)*height) * ((int)(short)scale_w)) >> 8;
+    *width = *(int *)&max_width;
 }
 
-void list_popup_open_strings(int a1)
+void list_popup_open_strings(char *strings)
 {
     if (*(int *)list_popup_image == 0) *(int *)list_popup_image = disk_read_file((int)D_00176A1A, 0);
     D_00195F40 = 160 - (((int)(unsigned short)*(short *)(*(char **)list_popup_image + 4)) >> 1);
@@ -349,14 +349,14 @@ void list_popup_open_strings(int a1)
     D_00195F42 = *(short *)(*(char **)list_popup_image + 4);
     D_00195F3C = *(short *)(*(char **)list_popup_image + 6);
     picklist_init((int)list_popup_picklist, (int)(short)(D_00195F40 + 25), (int)(short)(D_00195F3E + 26), 140, 73, (int)(short)(D_00195F40 + 179), (int)(short)(D_00195F3E + 11), 8, 9, (int)(short)(D_00195F40 + 179), (int)(short)(D_00195F3E + 109), 8, 9, (int)(short)(D_00195F40 + 179), (int)(short)(D_00195F3E + 22), 9, 83, 146, 146, 244, 114, 0);
-    while (*(signed char *)((char *)a1) != 0) {
-        picklist_add((int)list_popup_picklist, a1, 0);
-        a1 += strlen(a1) + 1;
+    while (*strings != 0) {
+        picklist_add((int)list_popup_picklist, (int)strings, 0);
+        strings += strlen(strings) + 1;
     }
     D_001940D4 |= 4;
 }
 
-void list_popup_open(int a1)
+void list_popup_open(char **strings)
 {
     if (*(int *)list_popup_image == 0) *(int *)list_popup_image = disk_read_file((int)D_00176A1A, 0);
     D_00195F40 = 160 - (((int)(unsigned short)*(short *)(*(char **)list_popup_image + 4)) >> 1);
@@ -364,149 +364,149 @@ void list_popup_open(int a1)
     D_00195F42 = *(short *)(*(char **)list_popup_image + 4);
     D_00195F3C = *(short *)(*(char **)list_popup_image + 6);
     picklist_init((int)list_popup_picklist, (int)(short)(D_00195F40 + 25), (int)(short)(D_00195F3E + 26), 140, 73, (int)(short)(D_00195F40 + 179), (int)(short)(D_00195F3E + 11), 8, 9, (int)(short)(D_00195F40 + 179), (int)(short)(D_00195F3E + 109), 8, 9, (int)(short)(D_00195F40 + 179), (int)(short)(D_00195F3E + 22), 9, 83, 146, 146, 244, 114, 0);
-    while (*(int *)((char *)a1) != 0) {
-        picklist_add((int)list_popup_picklist, *(int *)((char *)(int)(*(char (**)[4])&a1)++), 0);
+    while (*strings != 0) {
+        picklist_add((int)list_popup_picklist, (int)*strings++, 0);
     }
     D_001940D4 |= 4;
 }
 
-int picklist_frame(int a1)
+int picklist_frame(struct picklist *picklist)
 {
-    short l_18;
+    short choice;
 
     if (((struct bf8_0_1 *)&D_001940D4)->f != 0 && (key_down_esc != 0 || ((int)(unsigned char)(mouse_buttons & 2)) != 0)) {
         D_001940D4 &= 251;
-        picklist_free(a1);
+        picklist_free(picklist);
         return -2;
     }
-    *(int *)&l_18 = picklist_poll(a1) - 1;
-    if (((int)(short)l_18) > (-1)) {
+    *(int *)&choice = picklist_poll(picklist) - 1;
+    if (((int)(short)choice) > (-1)) {
         D_001940D4 &= 251;
-        picklist_free(a1);
-        return (int)(short)l_18;
+        picklist_free(picklist);
+        return (int)(short)choice;
     }
-    picklist_draw(a1, 0);
+    picklist_draw(picklist, 0);
     return -1;
 }
 
 int list_popup_update(void)
 {
     xn_draw_image((int)(short)D_00195F40, (int)(short)D_00195F3E, (int)(short)D_00195F42, (int)(short)D_00195F3C, *(int *)list_popup_image + 12);
-    return picklist_frame((int)list_popup_picklist);
+    return picklist_frame((struct picklist *)list_popup_picklist);
 }
 
-int rand_range(int a1, int a2)
+int rand_range(int low, int high)
 {
-    return a1 + (rand() % ((a2 - a1) + 1));
+    return low + (rand() % ((high - low) + 1));
 }
 
-void object_free_later(struct record *a1)
+void object_free_later(struct record *object)
 {
-    if (a1 == 0) return;
-    *(int *)(free_later_list + (free_later_count++ << 2)) = (int)a1;
+    if (object == 0) return;
+    *(int *)(free_later_list + (free_later_count++ << 2)) = (int)object;
 }
 
 void object_free_pending(void)
 {
-    int l_18;
+    int i;
 
-    for (l_18 = 0; l_18 < free_later_count; l_18++) {
-        object_delete((struct record *)*(int *)(free_later_list + (l_18 << 2)));
+    for (i = 0; i < free_later_count; i++) {
+        object_delete((struct record *)*(int *)(free_later_list + (i << 2)));
     }
     free_later_count = 0;
 }
 
-void spell_cast_queue(int a1, int a2)
+void spell_cast_queue(struct record *spell, struct record *target)
 {
-    *(int *)(spell_cast_queue_list + (spell_cast_queue_count << 3)) = a1;
-    *(int *)(D_001A4FEC + (spell_cast_queue_count++ << 3)) = a2;
+    *(int *)(spell_cast_queue_list + (spell_cast_queue_count << 3)) = (int)spell;
+    *(int *)(D_001A4FEC + (spell_cast_queue_count++ << 3)) = (int)target;
 }
 
 void spell_cast_queued_run(void)
 {
-    int l_18;
+    int i;
 
-    for (l_18 = 0; l_18 < spell_cast_queue_count; l_18++) {
-        cast_spell_on(*(int *)(spell_cast_queue_list + (l_18 << 3)), *(int *)(D_001A4FEC + (l_18 << 3)), 0);
+    for (i = 0; i < spell_cast_queue_count; i++) {
+        cast_spell_on(*(int *)(spell_cast_queue_list + (i << 3)), *(int *)(D_001A4FEC + (i << 3)), 0);
     }
     spell_cast_queue_count = 0;
 }
 
-void world_collect_object(struct record *a1)
+void world_collect_object(struct record *object)
 {
-    struct item *l_1C;
-    int l_18;
+    struct item *item_data;
+    int distance;
 
-    switch (a1->type) {
+    switch (object->type) {
     case 33:
         if (((struct bf8_4_1 *)&D_001940D6)->f != 0 && player_character->detect_kind == 2) {
-            if ((a1->image >> 7) == 216 || a1->image == 26112) detect_consider(a1);
+            if ((object->image >> 7) == 216 || object->image == 26112) detect_consider(object);
         }
-        if ((a1->image >> 7) == 210 && memchr((int)fire_flat_records, (int)(unsigned short)(a1->image & 127), 8) != 0) {
-            l_18 = xn_math_approx_hypot(player_object->y - a1->y, xn_math_approx_dist2d(player_object->x, player_object->z, a1->x, a1->z));
-            if (l_18 < nearest_fire_distance) {
-                nearest_fire_distance = l_18;
-                nearest_fire = a1;
+        if ((object->image >> 7) == 210 && memchr((int)fire_flat_records, (int)(unsigned short)(object->image & 127), 8) != 0) {
+            distance = xn_math_approx_hypot(player_object->y - object->y, xn_math_approx_dist2d(player_object->x, player_object->z, object->x, object->z));
+            if (distance < nearest_fire_distance) {
+                nearest_fire_distance = distance;
+                nearest_fire = object;
             }
         }
         return;
     case 18:
-        creature_list[creature_count++] = a1;
-        if (monster_despawn_to_marker(a1) != 0) {
+        creature_list[creature_count++] = object;
+        if (monster_despawn_to_marker(object) != 0) {
             creature_count--;
         } else if (((struct bf8_4_1 *)&D_001940D6)->f != 0 && player_character->detect_kind == 1) {
-            detect_consider_creature(a1, a1->detect_distance);
+            detect_consider_creature(object, object->detect_distance);
         }
         return;
     case 2:
-        l_1C = &a1->data.item;
-        if (((struct bf8_4_1 *)&D_001940D6)->f != 0 && player_character->detect_kind == 0 && l_1C->enchantments[0].type != (-1) && a1->parent->parent != player_entity) {
-            detect_consider(a1);
+        item_data = &object->data.item;
+        if (((struct bf8_4_1 *)&D_001940D6)->f != 0 && player_character->detect_kind == 0 && item_data->enchantments[0].type != (-1) && object->parent->parent != player_entity) {
+            detect_consider(object);
         }
         return;
     case 9:
-        if (((int)(unsigned short)(a1->flags & 8192)) != 0) {
-            if (spell_missile_update(a1, 0) != 0) object_free_later(a1);
+        if (((int)(unsigned short)(object->flags & 8192)) != 0) {
+            if (spell_missile_update(object, 0) != 0) object_free_later(object);
         }
         return;
     case 34:
-        switch (((int)(unsigned short)(a1->image & 31)) - 2) {
+        switch (((int)(unsigned short)(object->image & 31)) - 2) {
         case 13:
         case 14:
-            if (a1->spawn_seed == 0) a1->spawn_seed = rand();
-            place_spawn_from_marker(a1);
+            if (object->spawn_seed == 0) object->spawn_seed = rand();
+            place_spawn_from_marker(object);
             break;
         case 18:
             if (((int)player_environment) == 3) {
-                marker_make_clutter(a1, 0);
+                marker_make_clutter(object, 0);
             } else if (((int)player_environment) == 2 && current_building->type >= 17 && current_building->type <= 20) {
-                marker_make_clutter(a1, (int)current_building);
+                marker_make_clutter(object, (int)current_building);
             }
             break;
         case 17:
-            marker_make_loot_pile(a1, ((((int)player_environment) == 2) ? (int)object_building(player_object->parent) : 0));
+            marker_make_loot_pile(object, ((((int)player_environment) == 2) ? (int)object_building(player_object->parent) : 0));
         }
         return;
     case 53:
-        people_list[people_count++] = a1;
+        people_list[people_count++] = object;
     default:;
     }
 }
 
-void detect_consider(struct record *a1)
+void detect_consider(struct record *object)
 {
-    int l_18;
+    int distance;
 
-    l_18 = xn_math_approx_dist2d(player_object->x, player_object->z, a1->x, a1->z);
-    if (l_18 >= *(int *)D_00195B84 || l_18 >= 2048) return;
-    detect_target = a1;
-    *(int *)D_00195B84 = l_18;
+    distance = xn_math_approx_dist2d(player_object->x, player_object->z, object->x, object->z);
+    if (distance >= *(int *)D_00195B84 || distance >= 2048) return;
+    detect_target = object;
+    *(int *)D_00195B84 = distance;
 }
 
 void world_collect_objects(void)
 {
-    struct record *l_1C;
-    struct record *l_18;
+    struct record *object;
+    struct record *next_object;
 
     nearest_fire = 0;
     nearest_fire_distance = 2048;
@@ -517,43 +517,43 @@ void world_collect_objects(void)
     *(int *)D_00195B84 = 100000;
     people_count = (creature_count = 0);
     detect_target = 0;
-    grid_visit_func = (int)object_foreach_pre;
+    grid_visit_func = object_foreach_pre;
     if (((int)player_environment) < 3) {
         if (player_object->parent->type != 1) {
             object_foreach_pre(player_object->parent->children, (int)world_collect_object);
         } else {
-            grid_visit_func = (int)object_foreach_open;
-            town_grid_visit_near(player_object, (int)world_collect_object);
+            grid_visit_func = object_foreach_open;
+            town_grid_visit_near(player_object, world_collect_object);
         }
-        l_1C = location_object->children;
-        while (l_1C != 0) {
-            l_18 = l_1C->next;
-            if (l_1C->type != 38) {
-                if (l_1C->children != 0) {
-                    object_foreach_open(l_1C->children, (int)world_collect_object);
+        object = location_object->children;
+        while (object != 0) {
+            next_object = object->next;
+            if (object->type != 38) {
+                if (object->children != 0) {
+                    object_foreach_open(object->children, (int)world_collect_object);
                 }
-                world_collect_object(l_1C);
+                world_collect_object(object);
             }
-            l_1C = l_18;
+            object = next_object;
         }
     } else {
-        func_0007E815(player_object, (int)world_collect_object);
-        l_1C = location_object->children;
-        while (l_1C != 0) {
-            l_18 = l_1C->next;
-            if (l_1C->type != 47) {
-                object_foreach_open(l_1C->children, (int)world_collect_object);
-                world_collect_object(l_1C);
+        func_0007E815(player_object, world_collect_object);
+        object = location_object->children;
+        while (object != 0) {
+            next_object = object->next;
+            if (object->type != 47) {
+                object_foreach_open(object->children, (int)world_collect_object);
+                world_collect_object(object);
             }
-            l_1C = l_18;
+            object = next_object;
         }
     }
-    grid_visit_func = (int)object_foreach_open;
+    grid_visit_func = object_foreach_open;
     spell_cast_queued_run();
     object_free_pending();
 }
 
-void msgbox_yes_no_quest(short a1)
+void msgbox_yes_no_quest(short message_id)
 {
     D_00196271 = 0;
     msgbox_button_ids = 4;
@@ -562,51 +562,51 @@ void msgbox_yes_no_quest(short a1)
     msgbox_button_keys = 21;
     D_00196034 = 49;
     D_0012B508 = 146;
-    msgbox_show_quest_text(current_quest, (int)(short)a1, 5);
+    msgbox_show_quest_text(current_quest, (int)(short)message_id, 5);
 }
 
-void msgbox_prompt_number(int a1, int a2)
+void msgbox_prompt_number(int number, char *prompt)
 {
-    int l_14;
+    char *text;
 
     D_0012B508 = 146;
-    l_14 = *(int *)scratch_buffer + 55000;
+    text = *(char **)scratch_buffer + 55000;
     mc_set_location(610, (int)D_00176A10);
-    mc_sprintf(l_14, (int)D_00176A27, a2);
-    *(signed char *)((char *)(strlen(l_14) + l_14) + 1) = 0;
-    inpstr_begin_number(a1);
-    msgbox_show_string(l_14, 2);
+    mc_sprintf((int)text, (int)D_00176A27, prompt);
+    text[strlen(text) + 1] = 0;
+    inpstr_begin_number(number);
+    msgbox_show_string((int)text, 2);
 }
 
-void msgbox_prompt_number_rsc(int a1, int a2)
+void msgbox_prompt_number_rsc(int number, int text_id)
 {
-    int l_14;
+    int unused;
 
     D_0012B508 = 146;
-    msgbox_show_rsc((int)(short)*(short *)&a2, 2);
-    inpstr_begin_number(a1);
+    msgbox_show_rsc((int)(short)*(short *)&text_id, 2);
+    inpstr_begin_number(number);
 }
 
-struct building *object_building(struct record *a1)
+struct building *object_building(struct record *object)
 {
-    int l_28;
-    int l_24;
-    int l_20;
-    int l_1C;
+    int unused_1;
+    int unused_2;
+    int unused_3;
+    int unused_4;
 
-    l_28 = 1;
-    if (a1 == 0 || (int)a1 == (-1768515946)) return 0;
-    while (a1 != 0 && a1->type != 1) {
-        if (a1->type == 43 && ((int)(unsigned short)(a1->flags & 1)) != 0) break;
-        a1 = a1->parent;
+    unused_1 = 1;
+    if (object == 0 || (int)object == (-1768515946)) return 0;
+    while (object != 0 && object->type != 1) {
+        if (object->type == 43 && ((int)(unsigned short)(object->flags & 1)) != 0) break;
+        object = object->parent;
     }
-    if (a1 == 0 || a1->type == 1 || a1->image == 65535) return 0;
-    return &current_location->buildings[a1->image];
+    if (object == 0 || object->type == 1 || object->image == 65535) return 0;
+    return &current_location->buildings[object->image];
 }
 
-int objects_within(struct record *a1, struct record *a2, int a3)
+int objects_within(struct record *object, struct record *other, int distance)
 {
-    return ((xn_math_approx_dist2d(a1->x, a1->z, a2->x, a2->z) < a3) ? 1 : 0);
+    return ((xn_math_approx_dist2d(object->x, object->z, other->x, other->z) < distance) ? 1 : 0);
 }
 
 void func_0007E066(void)
@@ -624,100 +624,100 @@ void frame_ticks_update(void)
     D_001A3F40 = 0;
 }
 
-void player_position_save(int a1)
+void player_position_save(int slot)
 {
-    *(int *)(saved_positions + (a1 * 12)) = player_object->x;
-    *(int *)(D_0018DE18 + (a1 * 12)) = player_object->y;
-    *(int *)(D_0018DE1C + (a1 * 12)) = player_object->z;
+    *(int *)(saved_positions + (slot * 12)) = player_object->x;
+    *(int *)(D_0018DE18 + (slot * 12)) = player_object->y;
+    *(int *)(D_0018DE1C + (slot * 12)) = player_object->z;
 }
 
-void player_position_restore(int a1)
+void player_position_restore(int slot)
 {
-    player_object->x = *(int *)(saved_positions + (a1 * 12));
-    player_object->y = *(int *)(D_0018DE18 + (a1 * 12));
-    player_object->z = *(int *)(D_0018DE1C + (a1 * 12));
+    player_object->x = *(int *)(saved_positions + (slot * 12));
+    player_object->y = *(int *)(D_0018DE18 + (slot * 12));
+    player_object->z = *(int *)(D_0018DE1C + (slot * 12));
     D_001940D5 |= 2;
 }
 
-int flat_anim_finished(struct record *a1)
+int flat_anim_finished(struct record *object)
 {
-    int l_1C;
+    char *image;
 
-    l_1C = xn_tex_cache_lookup_image(a1->image >> 7, (int)(unsigned short)(a1->image & 127));
-    if (l_1C == 0) {
+    image = (char *)xn_tex_cache_lookup_image(object->image >> 7, (int)(unsigned short)(object->image & 127));
+    if (image == 0) {
         xn_tex_cache_flush();
-        l_1C = xn_tex_cache_lookup_image(a1->image >> 7, (int)(unsigned short)(a1->image & 127));
+        image = (char *)xn_tex_cache_lookup_image(object->image >> 7, (int)(unsigned short)(object->image & 127));
     }
-    return ((a1->anim_frame >= *(unsigned short *)((char *)l_1C + 20)) ? 1 : 0);
+    return ((object->anim_frame >= *(unsigned short *)(image + 20)) ? 1 : 0);
 }
 
-void flat_anim_step(struct record *a1)
+void flat_anim_step(struct record *object)
 {
-    int l_1C;
-    int l_18;
+    char *image;
+    int elapsed;
 
-    l_1C = xn_tex_cache_lookup_image(a1->image >> 7, (int)(unsigned short)(a1->image & 127));
-    if (l_1C == 0) {
+    image = (char *)xn_tex_cache_lookup_image(object->image >> 7, (int)(unsigned short)(object->image & 127));
+    if (image == 0) {
         xn_tex_cache_flush();
-        l_1C = xn_tex_cache_lookup_image(a1->image >> 7, (int)(unsigned short)(a1->image & 127));
+        image = (char *)xn_tex_cache_lookup_image(object->image >> 7, (int)(unsigned short)(object->image & 127));
     }
-    l_18 = ((xn_anim_ticks >> 5) - a1->anim_time) << 5;
-    if (l_18 < 0 || l_18 > 2000) l_18 = (int)(unsigned short)*(short *)((char *)l_1C + 22);
-    if (((int)(unsigned short)*(short *)((char *)l_1C + 22)) > l_18) return;
-    a1->anim_time = xn_anim_ticks >> 5;
-    a1->anim_frame++;
+    elapsed = ((xn_anim_ticks >> 5) - object->anim_time) << 5;
+    if (elapsed < 0 || elapsed > 2000) elapsed = *(unsigned short *)(image + 22);
+    if (*(unsigned short *)(image + 22) > elapsed) return;
+    object->anim_time = xn_anim_ticks >> 5;
+    object->anim_frame++;
 }
 
-void flat_anim_restart(struct record *a1)
+void flat_anim_restart(struct record *object)
 {
-    a1->anim_time = xn_anim_ticks >> 5;
-    a1->anim_frame = 0;
+    object->anim_time = xn_anim_ticks >> 5;
+    object->anim_frame = 0;
 }
 
-void town_grid_visit_near(struct record *a1, int a2)
+void town_grid_visit_near(struct record *object, void (*callback)())
 {
-    int l_20;
-    int l_1C;
-    int l_18;
-    int l_14;
+    int first_x;
+    int first_z;
+    int x;
+    int z;
 
     if (location_object->image == 65535) return;
-    l_20 = ((a1->x - location_object->x) / 4096) - 1;
-    l_1C = ((a1->z - location_object->z) / 4096) - 1;
-    for (l_18 = l_20; (l_20 + 3) > l_18; l_18++) {
-        for (l_14 = l_1C; (l_1C + 3) > l_14; l_14++) {
-            if (l_18 < 0 || current_location->width <= l_18) continue;
-            if (l_14 < 0 || current_location->height <= l_14) continue;
-            if (*(int *)(location_grid + (((l_14 << 5) + l_18) << 2)) != 0) {
-                ((int (*)())(grid_visit_func))(*(int *)(*(char **)(location_grid + (((l_14 << 5) + l_18) << 2)) + 63), a2);
+    first_x = ((object->x - location_object->x) / 4096) - 1;
+    first_z = ((object->z - location_object->z) / 4096) - 1;
+    for (x = first_x; (first_x + 3) > x; x++) {
+        for (z = first_z; (first_z + 3) > z; z++) {
+            if (x < 0 || current_location->width <= x) continue;
+            if (z < 0 || current_location->height <= z) continue;
+            if (location_grid[(z << 5) + x] != 0) {
+                grid_visit_func(location_grid[(z << 5) + x]->children, callback);
             }
         }
     }
 }
 
-int objects_near_distance_quarter(struct record *a1, struct record *a2)
+int objects_near_distance_quarter(struct record *object, struct record *other)
 {
-    int l_18;
+    int distance;
 
-    l_18 = xn_math_approx_dist2d(a1->x, a1->z, a2->x, a2->z);
-    if (l_18 > 512) return 0;
-    return (l_18 << 7) / 512;
+    distance = xn_math_approx_dist2d(object->x, object->z, other->x, other->z);
+    if (distance > 512) return 0;
+    return (distance << 7) / 512;
 }
 
-void buttons_draw_hover_label(int a1, int a2, int a3, int a4, int a5)
+void buttons_draw_hover_label(int x, int y, int button_count, char *buttons, char **labels)
 {
-    int l_C;
+    int i;
 
-    for (l_C = 0; l_C < a3; l_C++) {
-        if (mouse_x > *(short *)((char *)((l_C * 12) + a4)) && mouse_x < *(short *)((char *)((l_C * 12) + a4) + 4) && mouse_y > *(short *)((char *)((l_C * 12) + a4) + 2) && mouse_y < *(short *)((char *)((l_C * 12) + a4) + 6)) {
-            text_draw_coloured(*(int *)((char *)((l_C << 2) + a5)), (int)(short)*(short *)&a1, (int)(short)*(short *)&a2, 145, 156);
+    for (i = 0; i < button_count; i++) {
+        if (mouse_x > *(short *)((i * 12) + buttons) && mouse_x < *(short *)((i * 12) + buttons + 4) && mouse_y > *(short *)((i * 12) + buttons + 2) && mouse_y < *(short *)((i * 12) + buttons + 6)) {
+            text_draw_coloured((int)labels[i], (int)(short)*(short *)&x, (int)(short)*(short *)&y, 145, 156);
         }
     }
 }
 
-int int_identity(int a1)
+int int_identity(int value)
 {
-    return a1;
+    return value;
 }
 
 int detect_arrow_anim_frame(void)
@@ -730,45 +730,45 @@ int detect_arrow_anim_frame(void)
 
 int icon_cycle_anim_frame(void)
 {
-    int l_20;
-    int l_1C;
+    int *bios_ticks;
+    int *bios_ticks_2;
 
-    l_20 = 1132;
-    if (((unsigned)(*(int *)((char *)l_20) - D_00190C7C)) > 38) {
+    bios_ticks = (int *)1132;
+    if (((unsigned)(*bios_ticks - D_00190C7C)) > 38) {
         D_00190C74 = (D_00190C74 + 1) % 32;
-        l_1C = 1132;
-        D_00190C7C = *(int *)((char *)l_1C);
+        bios_ticks_2 = (int *)1132;
+        D_00190C7C = *bios_ticks_2;
     }
     return D_00190C74;
 }
 
 void save_thumbnail_capture(void)
 {
-    int l_20;
-    int l_1C;
-    int l_18;
+    int x;
+    int y;
+    int out;
 
-    l_18 = 24000;
-    for (l_1C = 0; l_1C < 200; l_1C += 4) {
-        for (l_20 = 0; l_20 < 320; l_20 += 4) {
-            *(signed char *)((char *)(int)(*(char **)&D_00147954 + l_18++)) = *(signed char *)((char *)(int)(*(char **)&screen_buffer + ((l_1C * 320) + l_20)));
+    out = 24000;
+    for (y = 0; y < 200; y += 4) {
+        for (x = 0; x < 320; x += 4) {
+            *(signed char *)((char *)(int)(*(char **)&D_00147954 + out++)) = *(signed char *)((char *)(int)(*(char **)&screen_buffer + ((y * 320) + x)));
         }
     }
 }
 
 int func_0007EEAF(void)
 {
-    int l_44;
-    int l_40;
-    int l_3C;
-    int l_38;
-    int l_34;
-    int l_30;
-    int l_2C;
-    int l_28;
-    int l_24;
-    int l_20;
-    int l_1C;
+    int unused_1;
+    int unused_2;
+    int unused_3;
+    int unused_4;
+    int unused_5;
+    int unused_6;
+    int unused_7;
+    int unused_8;
+    int unused_9;
+    int unused_10;
+    int unused_11;
 
     D_00196281 = 0;
     return 0;
@@ -776,21 +776,21 @@ int func_0007EEAF(void)
 
 void func_0007EF20(void)
 {
-    char l_3C[28];
-    char l_20[12];
+    char regs[28];
+    char sregs[12];
 
     if (D_00196281 == 0) return;
-    mc_memset((int)l_20, 0, 12, (int)D_00176A10, 1064, 4);
-    *(short *)l_3C = 257;
-    *(short *)((char *)l_3C + 12) = D_001A5A54;
-    int386x(49, (int)l_3C, (int)l_3C, (int)l_20);
+    mc_memset((int)sregs, 0, 12, (int)D_00176A10, 1064, 4);
+    *(short *)regs = 257;
+    *(short *)((char *)regs + 12) = D_001A5A54;
+    int386x(49, (int)regs, (int)regs, (int)sregs);
     D_00196281 = 0;
 }
 
-void func_0007F093(struct record *a1)
+void func_0007F093(struct record *object)
 {
-    if (a1->type != 10) return;
-    func_0007F0F3(a1->data.membership.faction);
+    if (object->type != 10) return;
+    func_0007F0F3(object->data.membership.faction);
 }
 
 void func_0007F0C9(void)
@@ -798,31 +798,31 @@ void func_0007F0C9(void)
     object_foreach(player_entity->children, (int)func_0007F093);
 }
 
-void gold_add(int a1)
+void gold_add(int amount)
 {
-    if ((object_weight(player_entity) + (a1 / 100)) > (carry_capacity() << 2)) {
-        gold_make_credit_letter(a1);
+    if ((object_weight(player_entity) + (amount / 100)) > (carry_capacity() << 2)) {
+        gold_make_credit_letter(amount);
         return;
     }
-    player_character->gold += a1;
+    player_character->gold += amount;
 }
 
-void gold_spend(int a1)
+void gold_spend(int amount)
 {
-    struct record *l_18;
+    struct record *credit_letter;
 
-    if (((unsigned)player_character->gold) >= a1) {
-        player_character->gold -= a1;
+    if (((unsigned)player_character->gold) >= amount) {
+        player_character->gold -= amount;
         return;
     }
     found_object = 0;
-    l_18 = gold_find_credit(a1);
-    if (l_18 != 0) {
-        l_18->data.item.value -= a1;
+    credit_letter = gold_find_credit(amount);
+    if (credit_letter != 0) {
+        credit_letter->data.item.value -= amount;
         return;
     }
     free_later_count = 0;
-    *(int *)D_00195B84 = a1;
+    *(int *)D_00195B84 = amount;
     object_find(player_entity->children, (int)gold_spend_credit_cb);
     object_free_pending();
     if (*(int *)D_00195B84 == 0) return;
@@ -831,19 +831,19 @@ void gold_spend(int a1)
     player_character->gold = 0;
 }
 
-int gold_can_afford(int a1)
+int gold_can_afford(int amount)
 {
-    return ((gold_total() >= a1) ? 1 : 0);
+    return ((gold_total() >= amount) ? 1 : 0);
 }
 
-void gold_sum_credit_cb(struct record *a1)
+void gold_sum_credit_cb(struct record *object)
 {
-    struct item *l_18;
+    struct item *item_data;
 
-    if (a1->type != 2) return;
-    l_18 = &a1->data.item;
-    if (l_18->group != 27 || l_18->index != 2) return;
-    *(int *)D_00195B84 += l_18->value;
+    if (object->type != 2) return;
+    item_data = &object->data.item;
+    if (item_data->group != 27 || item_data->index != 2) return;
+    *(int *)D_00195B84 += item_data->value;
 }
 
 int gold_total(void)
@@ -853,51 +853,51 @@ int gold_total(void)
     return *(int *)D_00195B84 + player_character->gold;
 }
 
-int gold_find_credit_cb(struct record *a1)
+int gold_find_credit_cb(struct record *object)
 {
-    struct item *l_1C;
+    struct item *item_data;
 
-    if (a1->type != 2) return 0;
-    l_1C = &a1->data.item;
-    if (l_1C->group == 27 && l_1C->index == 2 && ((unsigned)l_1C->value) >= *(int *)D_00195B84) {
-        found_object = a1;
+    if (object->type != 2) return 0;
+    item_data = &object->data.item;
+    if (item_data->group == 27 && item_data->index == 2 && ((unsigned)item_data->value) >= *(int *)D_00195B84) {
+        found_object = object;
         return 1;
     }
     return 0;
 }
 
-int gold_spend_credit_cb(struct record *a1)
+int gold_spend_credit_cb(struct record *object)
 {
-    struct item *l_1C;
+    struct item *item_data;
 
-    if (a1->type != 2) return 0;
+    if (object->type != 2) return 0;
     if (*(int *)D_00195B84 == 0) return 0;
-    l_1C = &a1->data.item;
-    if (l_1C->group == 27 && l_1C->index == 2) {
-        if (((unsigned)l_1C->value) <= *(int *)D_00195B84) {
-            object_free_later(a1);
-            *(int *)D_00195B84 -= l_1C->value;
+    item_data = &object->data.item;
+    if (item_data->group == 27 && item_data->index == 2) {
+        if (((unsigned)item_data->value) <= *(int *)D_00195B84) {
+            object_free_later(object);
+            *(int *)D_00195B84 -= item_data->value;
         } else {
-            l_1C->value -= *(int *)D_00195B84;
+            item_data->value -= *(int *)D_00195B84;
             *(int *)D_00195B84 = 0;
         }
     }
     return 0;
 }
 
-struct record *gold_find_credit(int a1)
+struct record *gold_find_credit(int amount)
 {
-    *(int *)D_00195B84 = a1;
+    *(int *)D_00195B84 = amount;
     object_find(player_entity->children, (int)gold_find_credit_cb);
     return found_object;
 }
 
-void gold_make_credit_letter(int a1)
+void gold_make_credit_letter(int amount)
 {
-    struct record *l_18;
+    struct record *letter;
 
-    l_18 = item_add_to_container((int)D_001959E0, 27, 2, 0);
-    l_18->data.item.value = a1;
+    letter = item_add_to_container((int)D_001959E0, 27, 2, 0);
+    letter->data.item.value = amount;
 }
 
 int gold_total_alias(void)
@@ -905,21 +905,21 @@ int gold_total_alias(void)
     return gold_total();
 }
 
-int gold_can_carry(int a1)
+int gold_can_carry(int amount)
 {
-    return (((object_weight(player_entity) + (a1 / 100)) <= (carry_capacity() << 2)) ? 1 : 0);
+    return (((object_weight(player_entity) + (amount / 100)) <= (carry_capacity() << 2)) ? 1 : 0);
 }
 
-void gold_delete_credit_cb(struct record *a1)
+void gold_delete_credit_cb(struct record *object)
 {
-    short l_18;
+    struct item *item_data;
 
-    if (a1->type != 2) return;
-    *(int *)&l_18 = (int)RECORD_DATA(a1);
-    if (((int)(unsigned short)*(short *)(*(char **)&l_18 + 32)) != 27 || ((int)(unsigned short)*(short *)(*(char **)&l_18 + 34)) != 2) {
+    if (object->type != 2) return;
+    item_data = &object->data.item;
+    if (item_data->group != 27 || item_data->index != 2) {
         return;
     }
-    object_delete(a1);
+    object_delete(object);
 }
 
 void gold_remove_all(void)
@@ -930,72 +930,72 @@ void gold_remove_all(void)
 
 void func_0007F671(void)
 {
-    int l_18;
+    int *bios_ticks;
 
     D_001A59CC = xn_timer_read_pit();
-    l_18 = 1132;
-    D_001A59DC = *(int *)((char *)l_18);
+    bios_ticks = (int *)1132;
+    D_001A59DC = *bios_ticks;
 }
 
 void func_0007F6A4(void)
 {
-    int l_20;
-    int l_1C;
-    int l_18;
+    int pit_elapsed;
+    int i;
+    int *bios_ticks;
 
     D_001A59E0 = D_001A59CC;
     D_001A59E4 = D_001A59DC;
     D_001A59CC = xn_timer_read_pit();
-    l_18 = 1132;
-    if ((D_001A59DC = *(int *)((char *)l_18)) == D_001A59E4) {
-        l_20 = D_001A59E0 - D_001A59CC;
+    bios_ticks = (int *)1132;
+    if ((D_001A59DC = *bios_ticks) == D_001A59E4) {
+        pit_elapsed = D_001A59E0 - D_001A59CC;
     } else {
-        l_20 = ((65535 - D_001A59CC) + D_001A59E0) + (((D_001A59DC - D_001A59E4) - 1) * 65535);
+        pit_elapsed = ((65535 - D_001A59CC) + D_001A59E0) + (((D_001A59DC - D_001A59E4) - 1) * 65535);
     }
-    if (((unsigned)l_20) < 10000) l_20 = (int)(((char *)D_001A59E0) + (65535 - D_001A59CC));
-    D_001A5408[D_001A59D8] = ((unsigned)(((unsigned)(l_20 * 1000)) / 1193180)) >> 1;
+    if (((unsigned)pit_elapsed) < 10000) pit_elapsed = (int)(((char *)D_001A59E0) + (65535 - D_001A59CC));
+    D_001A5408[D_001A59D8] = ((unsigned)(((unsigned)(pit_elapsed * 1000)) / 1193180)) >> 1;
     if (((unsigned)D_001A5408[D_001A59D8]) > 100) {
         D_001A5408[D_001A59D8] = 100;
     }
     D_001A59D8 = (D_001A59D8 + 1) & 7;
-    for (l_1C = 0; l_1C < 8; l_1C++) {
-        frame_ticks += D_001A5408[l_1C];
+    for (i = 0; i < 8; i++) {
+        frame_ticks += D_001A5408[i];
     }
     frame_ticks >>= 3;
     if (frame_ticks <= 500) return;
     frame_ticks = 500;
 }
 
-void object_match_filters_cb(struct record *a1)
+void object_match_filters_cb(struct record *object)
 {
-    if (D_00196282 != 0 && (signed char)a1->quest_id != D_00196282) {
+    if (D_00196282 != 0 && (signed char)object->quest_id != D_00196282) {
         return;
     }
-    if (D_00195CF0 != 0 && (int)a1->id != D_00195CF0) return;
-    if (D_00195F60 != 0 && (short)a1->image2 != D_00195F60) return;
-    if (D_00196284 != 0 && (signed char)a1->type != D_00196284) {
+    if (D_00195CF0 != 0 && (int)object->id != D_00195CF0) return;
+    if (D_00195F60 != 0 && (short)object->image2 != D_00195F60) return;
+    if (D_00196284 != 0 && (signed char)object->type != D_00196284) {
         return;
     }
-    found_object = a1;
+    found_object = object;
 }
 
 void location_restore_stored(void)
 {
-    struct record *l_1C;
-    struct record *l_18;
+    struct record *stored;
+    struct record *next_stored;
 
     if (((int)player_environment) == 3) return;
     object_foreach_skip_player(repair_container->children, (int)restore_repair_item_cb);
     if (room_storage_container != 0 && room_storage_container->children != 0) {
-        l_1C = room_storage_container->children;
-        while (l_1C != 0) {
-            l_18 = l_1C->next;
-            if (l_1C->type == 64 && ((unsigned)l_1C->building_id) < game_minutes) {
-                object_delete(l_1C);
-            } else if (l_1C->type == 64 && object_find_by_id(location_object, l_1C->building_id) != 0) {
-                mc_memcpy(&current_location->buildings[l_1C->image], RECORD_DATA(l_1C), 26, (int)D_00176A10, 1350, 4);
+        stored = room_storage_container->children;
+        while (stored != 0) {
+            next_stored = stored->next;
+            if (stored->type == 64 && ((unsigned)stored->building_id) < game_minutes) {
+                object_delete(stored);
+            } else if (stored->type == 64 && object_find_by_id(location_object, stored->building_id) != 0) {
+                mc_memcpy(&current_location->buildings[stored->image], RECORD_DATA(stored), 26, (int)D_00176A10, 1350, 4);
             }
-            l_1C = l_18;
+            stored = next_stored;
         }
         object_foreach_skip_player(room_storage_container->children, (int)func_0007FD7E);
     }
@@ -1009,9 +1009,9 @@ void location_restore_stored(void)
 
 void location_store_objects(void)
 {
-    struct record *l_20;
-    struct building *l_1C;
-    int l_18;
+    struct record *stored_room;
+    struct building *building;
+    int building_index;
 
     if (((int)player_environment) == 3) return;
     free_later_count = 0;
@@ -1019,14 +1019,14 @@ void location_store_objects(void)
     if (room_storage_container != 0) {
         scratch_object = room_storage_container;
         object_foreach_skip_player(location_object, (int)func_0007FCBF);
-        l_1C = current_location->buildings;
-        for (l_18 = 0; current_location->building_count > l_18; l_18++, l_1C++) {
-            if (l_1C->type == 15 && ((int)(unsigned char)(l_1C->flags & 2)) != 0 && ((unsigned)l_1C->rent_expires) > game_minutes) {
-                l_20 = object_create_child(room_storage_container, 0, 26);
-                l_20->type = 64;
-                l_20->image = l_18;
-                l_20->building_id = l_1C->id;
-                mc_memcpy(RECORD_DATA(l_20), l_1C, 26, (int)D_00176A10, 1392, 4);
+        building = current_location->buildings;
+        for (building_index = 0; current_location->building_count > building_index; building_index++, building++) {
+            if (building->type == 15 && ((int)(unsigned char)(building->flags & 2)) != 0 && ((unsigned)building->rent_expires) > game_minutes) {
+                stored_room = object_create_child(room_storage_container, 0, 26);
+                stored_room->type = 64;
+                stored_room->image = building_index;
+                stored_room->building_id = building->id;
+                mc_memcpy(RECORD_DATA(stored_room), building, 26, (int)D_00176A10, 1392, 4);
             }
         }
     }
@@ -1052,100 +1052,100 @@ void location_store_objects(void)
     object_free_pending();
 }
 
-void func_0007FCBF(struct record *a1)
+void func_0007FCBF(struct record *object)
 {
-    struct building *l_18;
+    struct building *building;
 
-    if (a1->type != 33 && ((int)(unsigned short)(a1->flags & 4)) == 0) return;
-    l_18 = object_building(a1);
-    if (l_18->type != 15) return;
-    if (((int)(unsigned char)(l_18->flags & 2)) == 0 || ((unsigned)game_minutes) >= l_18->rent_expires) {
+    if (object->type != 33 && ((int)(unsigned short)(object->flags & 4)) == 0) return;
+    building = object_building(object);
+    if (building->type != 15) return;
+    if (((int)(unsigned char)(building->flags & 2)) == 0 || ((unsigned)game_minutes) >= building->rent_expires) {
         return;
     }
-    a1->home_id = l_18->id;
-    a1->repair_due = l_18->rent_expires;
-    object_reparent(scratch_object, a1);
-    a1->type = 58;
-    a1->id = object_new_id(100);
+    object->home_id = building->id;
+    object->repair_due = building->rent_expires;
+    object_reparent(scratch_object, object);
+    object->type = 58;
+    object->id = object_new_id(100);
 }
 
-void func_0007FD7E(struct record *a1)
+void func_0007FD7E(struct record *object)
 {
-    struct record *l_18;
+    struct record *home;
 
-    if (a1->type != 58) return;
-    if (((unsigned)game_minutes) > a1->repair_due) {
-        object_delete(a1);
+    if (object->type != 58) return;
+    if (((unsigned)game_minutes) > object->repair_due) {
+        object_delete(object);
         return;
     }
-    l_18 = object_find_by_id(location_object, a1->home_id);
-    if (l_18 == 0) return;
-    object_reparent(l_18, a1);
-    a1->type = 33;
+    home = object_find_by_id(location_object, object->home_id);
+    if (home == 0) return;
+    object_reparent(home, object);
+    object->type = 33;
 }
 
-void func_0007FDEA(struct record *a1)
+void func_0007FDEA(struct record *object)
 {
-    struct building *l_18;
+    struct building *building;
 
-    if (a1->type != 2 && a1->type != 33) return;
-    if (a1->type == 33 && a1->children == 0) return;
-    if (a1->type == 2 && a1->parent->type == 33) return;
-    l_18 = object_building(a1);
-    a1->home_id = l_18->id;
-    object_reparent(scratch_object, a1);
-    if (a1->type == 33) a1->type = 58;
-    a1->id = object_new_id(100);
+    if (object->type != 2 && object->type != 33) return;
+    if (object->type == 33 && object->children == 0) return;
+    if (object->type == 2 && object->parent->type == 33) return;
+    building = object_building(object);
+    object->home_id = building->id;
+    object_reparent(scratch_object, object);
+    if (object->type == 33) object->type = 58;
+    object->id = object_new_id(100);
 }
 
-void func_0007FEB9(struct record *a1)
+void func_0007FEB9(struct record *object)
 {
-    struct record *l_18;
+    struct record *home;
 
-    if (a1->type != 2 && a1->type != 58) return;
-    if (a1->type == 58 && a1->children == 0) return;
-    if (a1->type == 2 && a1->parent->type == 58) return;
-    l_18 = object_find_by_id(location_object, a1->home_id);
-    if (l_18 != 0) {
-        object_reparent(l_18, a1);
+    if (object->type != 2 && object->type != 58) return;
+    if (object->type == 58 && object->children == 0) return;
+    if (object->type == 2 && object->parent->type == 58) return;
+    home = object_find_by_id(location_object, object->home_id);
+    if (home != 0) {
+        object_reparent(home, object);
     } else {
-        object_reparent(location_object, a1);
+        object_reparent(location_object, object);
     }
-    a1->type = 33;
+    object->type = 33;
 }
 
-void store_repair_item_cb(struct record *a1)
+void store_repair_item_cb(struct record *object)
 {
-    if (a1->type != 54) return;
-    if ((game_minutes - (int)a1->repair_due) > 259200) {
-        object_free_single(a1);
+    if (object->type != 54) return;
+    if ((game_minutes - (int)object->repair_due) > 259200) {
+        object_free_single(object);
         return;
     }
-    a1->home_id = a1->parent->id;
-    a1->id = object_new_id(100);
-    object_reparent(repair_container, a1);
+    object->home_id = object->parent->id;
+    object->id = object_new_id(100);
+    object_reparent(repair_container, object);
 }
 
-void restore_repair_item_cb(struct record *a1)
+void restore_repair_item_cb(struct record *object)
 {
-    struct record *l_18;
+    struct record *home;
 
-    if (a1->type != 54) return;
-    if ((game_minutes - (int)a1->repair_due) > 259200) {
-        object_free_single(a1);
+    if (object->type != 54) return;
+    if ((game_minutes - (int)object->repair_due) > 259200) {
+        object_free_single(object);
         return;
     }
-    l_18 = object_find_by_id(location_object, a1->home_id);
-    if (l_18 == 0) return;
-    object_reparent(l_18, a1);
+    home = object_find_by_id(location_object, object->home_id);
+    if (home == 0) return;
+    object_reparent(home, object);
 }
 
 void arrival_room_messages(void)
 {
-    int l_24;
-    int l_20;
-    struct building *l_1C;
-    int l_18;
+    int in_town;
+    int building_index;
+    struct building *building;
+    int unused;
 
     if (D_001A59D4 > 0) {
         D_001A59D4--;
@@ -1155,24 +1155,24 @@ void arrival_room_messages(void)
     D_001A59D4--;
     if (((int)player_environment) == 1 && location_contains(player_object->x, player_object->z) != 0) {
         if (current_location->kind != 4 && current_location->kind <= 9) {
-            l_24 = 1;
+            in_town = 1;
         } else {
-            l_24 = 0;
+            in_town = 0;
         }
-        if (l_24 != 0) goto L800EB;
+        if (in_town != 0) goto L800EB;
     }
     goto L800F0;
 L800EB:;
     holiday_announce();
 L800F0:;
-    l_1C = current_location->buildings;
-    for (l_20 = 0; current_location->building_count > l_20; l_20++, l_1C++) {
-        if (l_1C->type == 15) {
-            tavern_building = l_1C;
+    building = current_location->buildings;
+    for (building_index = 0; current_location->building_count > building_index; building_index++, building++) {
+        if (building->type == 15) {
+            tavern_building = building;
             if (tavern_room_rented() != 0) {
                 mc_set_location(1570, (int)D_00176A10);
-                mc_sprintf((int)text_buffer, (int)D_00176A42, building_name(l_1C), (((unsigned)(l_1C->rent_expires - game_minutes)) / 60) + 1);
-                hud_message_add((int)text_buffer);
+                mc_sprintf((int)text_buffer, (int)D_00176A42, building_name(building), (((unsigned)(building->rent_expires - game_minutes)) / 60) + 1);
+                hud_message_add(text_buffer);
             }
         }
     }
@@ -1180,27 +1180,27 @@ L800F0:;
 
 int carry_capacity(void)
 {
-    int l_28;
-    int l_24;
-    int l_20;
-    struct item *l_1C;
+    int capacity;
+    int slot;
+    int i;
+    struct item *item_data;
 
-    l_28 = player_character->attributes[0] + (player_character->attributes[0] >> 1);
-    for (l_24 = 0; l_24 < 27; l_24++) {
-        if (player_character->equipped[l_24] == 0) continue;
-        l_1C = &player_character->equipped[l_24]->data.item;
-        l_20 = 0;
-        while (l_20 < 10 && l_1C->enchantments[l_20].type != (-1)) {
-            if (l_1C->enchantments[l_20].type == 7) {
-                if (l_1C->enchantments[l_20].param != 0) {
-                    l_28 = (l_28 * 384) / 256;
+    capacity = player_character->attributes[0] + (player_character->attributes[0] >> 1);
+    for (slot = 0; slot < 27; slot++) {
+        if (player_character->equipped[slot] == 0) continue;
+        item_data = &player_character->equipped[slot]->data.item;
+        i = 0;
+        while (i < 10 && item_data->enchantments[i].type != (-1)) {
+            if (item_data->enchantments[i].type == 7) {
+                if (item_data->enchantments[i].param != 0) {
+                    capacity = (capacity * 384) / 256;
                 } else {
-                    l_28 = (l_28 * 320) / 256;
+                    capacity = (capacity * 320) / 256;
                 }
-                return l_28;
+                return capacity;
             }
-            l_20++;
+            i++;
         }
     }
-    return l_28;
+    return capacity;
 }

@@ -9,18 +9,18 @@ extern struct location *current_location;
 extern struct record *object_find_by_id(struct record *, int);
 extern void town_map_note_building(struct record *, struct building *);
 
-void func_0007F0F3(int a1)
+void func_0007F0F3(int faction_id)
 {
-    int l_20;
-    struct building *l_1C;
-    struct record *l_18;
+    int building_index;
+    struct building *building;
+    struct record *building_object;
 
-    if (a1 == 0) return;
-    l_1C = current_location->buildings;
-    for (l_20 = 0; current_location->building_count > l_20; l_20++, l_1C++) {
-        if (l_1C->faction_id == a1) {
-            l_18 = object_find_by_id(location_object, l_1C->id);
-            if (l_18 != 0) town_map_note_building(l_18, l_1C);
+    if (faction_id == 0) return;
+    building = current_location->buildings;
+    for (building_index = 0; current_location->building_count > building_index; building_index++, building++) {
+        if (building->faction_id == faction_id) {
+            building_object = object_find_by_id(location_object, building->id);
+            if (building_object != 0) town_map_note_building(building_object, building);
         }
     }
 }

@@ -42,79 +42,79 @@ extern int mc_memcpy();
 extern int mc_set_location(int, char *);
 extern int mc_sprintf(char *, ...);
 
-void damage_creature_death(struct record *a1)
+void damage_creature_death(struct record *creature)
 {
-    int l_30;
-    struct character *l_2C;
-    struct record *l_28;
-    struct move l_4C;
-    int l_20;
-    int l_1C;
-    int l_18;
+    int unused;
+    struct character *creature_char;
+    struct record *soul;
+    struct move move;
+    int saved_on_ground;
+    int saved_ceiling;
+    int has_soul_artifact;
 
-    l_2C = &a1->data.character;
-    l_20 = player_on_ground;
-    l_1C = ceiling_height;
-    if (a1 == player_entity) {
+    creature_char = &creature->data.character;
+    saved_on_ground = player_on_ground;
+    saved_ceiling = ceiling_height;
+    if (creature == player_entity) {
         sound_play((player_character->flags & 1) + (player_character->race * 3 + 2) ? 258 : 243, player_object, 100);
         player_death_timer = 1000;
         return;
     }
-    if (l_2C->mobile_id == 146)
+    if (creature_char->mobile_id == 146)
         guild_count_crime(6, 1);
-    found_object = a1;
-    object_foreach(a1->children, damage_drop_at_death_cb);
-    l_28 = a1->children;
-    l_18 = item_artifact_equipped(9);
-    if (l_2C->race < 43) {
-        if (l_18 != 0) goto found;
-        while (l_28 != 0) {
-            if (l_28->type == 19) {
+    found_object = creature;
+    object_foreach(creature->children, damage_drop_at_death_cb);
+    soul = creature->children;
+    has_soul_artifact = item_artifact_equipped(9);
+    if (creature_char->race < 43) {
+        if (has_soul_artifact != 0) goto found;
+        while (soul != 0) {
+            if (soul->type == 19) {
 found:
                 scratch_object = 0;
                 object_foreach(player_entity->children, damage_find_empty_soul_trap_cb);
-                if (scratch_object == 0 && l_28->type == 19) {
+                if (scratch_object == 0 && soul->type == 19) {
                     D_0012B508 = 146;
                     hud_message_add(D_001709A1);
                     hud_message_add(D_001709C6);
                     return;
                 }
                 if (scratch_object != 0) {
-                    if (l_18 == 0 && rand_range(0, 100) > l_28->soul_creature)
+                    if (has_soul_artifact == 0 && rand_range(0, 100) > soul->soul_creature)
                         break;
-                    l_28 = object_create_child(scratch_object, 0, 0);
-                    l_28->flags = 3;
-                    l_28->type = 20;
-                    l_28->soul_creature = l_2C->race;
+                    soul = object_create_child(scratch_object, 0, 0);
+                    soul->flags = 3;
+                    soul->type = 20;
+                    soul->soul_creature = creature_char->race;
                 }
                 break;
             }
-            l_28 = l_28->next;
+            soul = soul->next;
         }
     }
-    if (a1 != player_entity)
-        sound_play(17, a1, 105);
+    if (creature != player_entity)
+        sound_play(17, creature, 105);
     player_character->last_kill_time = game_minutes;
-    quest_raise_event(2, a1, 0);
-    l_2C = &a1->data.character;
+    quest_raise_event(2, creature, 0);
+    creature_char = &creature->data.character;
     mc_set_location(587, D_001709E4);
-    mc_sprintf(((char *)text_buffer), D_001709ED, l_2C->name);
+    mc_sprintf(((char *)text_buffer), D_001709ED, creature_char->name);
     hud_message_add(((char *)text_buffer));
-    a1->type = 44;
-    if (l_2C->mobile_id < 43) {
+    creature->type = 44;
+    if (creature_char->mobile_id < 43) {
         if (*game_settings & 4)
-            a1->image = (D_00195DA0 << 7) + 1;
+            creature->image = (D_00195DA0 << 7) + 1;
         else
-            a1->image = (monster_corpse_textures[l_2C->mobile_id].file << 7) + monster_corpse_textures[l_2C->mobile_id].rec;
+            creature->image = (monster_corpse_textures[creature_char->mobile_id].file << 7) + monster_corpse_textures[creature_char->mobile_id].rec;
     } else {
-        a1->image = (D_00195DA0 << 7) + 1;
+        creature->image = (D_00195DA0 << 7) + 1;
     }
     collide_flags = 0;
     D_001940D7 |= 32;
-    mc_memcpy(&l_4C, &a1->x, 12, D_001709E4, 605, 4);
-    mc_memset(&l_4C.f12, 0, 12, D_001709E4, 606, 4);
-    l_4C.name = D_00187B44;
-    collide_move_object(a1, 0, &l_4C, 0);
-    player_on_ground = l_20;
-    ceiling_height = l_1C;
+    mc_memcpy(&move, &creature->x, 12, D_001709E4, 605, 4);
+    mc_memset(&move.f12, 0, 12, D_001709E4, 606, 4);
+    move.name = D_00187B44;
+    collide_move_object(creature, 0, &move, 0);
+    player_on_ground = saved_on_ground;
+    ceiling_height = saved_ceiling;
 }

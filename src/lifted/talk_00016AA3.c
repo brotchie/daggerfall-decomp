@@ -13,22 +13,22 @@ extern int close();
 extern int lseek();
 extern int read();
 
-void talk_load_face(int a1)
+void talk_load_face(int face)
 {
-    int l_1C;
-    int l_18;
+    int file;
+    int index;
 
     D_00190D10 = 1;
-    if (a1 >= 1000) {
-        l_18 = ((a1 == 1000) ? 0 : 6);
-        l_18 += rand_range(0, 5);
-        l_1C = disk_open_data((int)D_00170404);
-        lseek(l_1C, l_18 << 12, 0);
+    if (face >= 1000) {
+        index = ((face == 1000) ? 0 : 6);
+        index += rand_range(0, 5);
+        file = disk_open_data((int)D_00170404);
+        lseek(file, index << 12, 0);
     } else {
         D_00190D10 = 1;
-        l_1C = disk_open_data((int)D_00170411);
-        lseek(l_1C, a1 << 12, 0);
+        file = disk_open_data((int)D_00170411);
+        lseek(file, face << 12, 0);
     }
-    read(l_1C, talk_face_image, 4096);
-    close(l_1C);
+    read(file, talk_face_image, 4096);
+    close(file);
 }

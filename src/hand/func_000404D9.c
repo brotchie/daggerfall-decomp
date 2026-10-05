@@ -6,18 +6,18 @@ extern int D_00196DA4;
 
 int town_map_area_clear(int x, int y)
 {
-    int r;
-    int w;
-    unsigned char *p;
+    int blocked;
+    int stride;
+    unsigned char *pixel;
 
-    r = 0;
+    blocked = 0;
     x >>= 6;
     y >>= 6;
     y = (current_location->height << 6) - y - 1;
-    w = current_location->height << 6;
-    p = (unsigned char *)(*(char **)&D_00196DA4 + ((current_location->width << 6) * y + x));
-    r = p[0] | p[-1] | p[1];
-    r |= p[-w] | p[-w - 1] | p[-w + 1];
-    r |= p[w] | p[w - 1] | p[w + 1];
-    return (r == 0) ? 1 : 0;
+    stride = current_location->height << 6;
+    pixel = (unsigned char *)(*(char **)&D_00196DA4 + ((current_location->width << 6) * y + x));
+    blocked = pixel[0] | pixel[-1] | pixel[1];
+    blocked |= pixel[-stride] | pixel[-stride - 1] | pixel[-stride + 1];
+    blocked |= pixel[stride] | pixel[stride - 1] | pixel[stride + 1];
+    return (blocked == 0) ? 1 : 0;
 }

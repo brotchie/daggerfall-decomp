@@ -31,11 +31,11 @@ extern int xn_draw_get_rect();
 extern int xn_draw_put_rect();
 extern int xn_draw_image_transparent();
 
-int classmaker_draw(short a1)
+int classmaker_draw(short show_name)
 {
-    short l_24;
-    short l_18;
-    short l_1C;
+    short i;
+    short x;
+    short y_offset;
 
     xn_mouse_cursor_erase();
     mc_memcpy(screen_buffer, scratch_190df4, 64000, (int)D_00175420, 235, 4);
@@ -48,18 +48,18 @@ int classmaker_draw(short a1)
     *(signed char *)scratch_190d66 |= 2;
     xn_draw_image_transparent(44, (int)(short)scratch_190d6a, (int)(unsigned short)*(short *)(*(char **)scratch_190df0 + 4), (int)(unsigned short)*(short *)(*(char **)scratch_190df0 + 6), (int)(*(char **)scratch_190df0 + 12));
     text_draw_centred_coloured(itoa((int)(short)*(short *)scratch_190d64, (int)text_buffer, 10), (int)(short)(((((int)(unsigned short)*(short *)(*(char **)scratch_190df0 + 4)) + 1) >> 1) + 43), (int)(short)((((int)(short)scratch_190d6a) + (((int)(unsigned short)*(short *)(*(char **)scratch_190df0 + 6)) >> 1)) - 3), 145, 141);
-    if (a1 != 0)
+    if (show_name != 0)
         text_draw_coloured((int)player_class->name, 110, 5, 145, 141);
     text_draw_centred_coloured(itoa(player_class->hp_per_level, (int)text_buffer, 10), 287, 55, 145, 141);
     D_0012B508 = 145;
-    for (l_24 = 0; l_24 < 12; l_24++) {
-        if (player_class->skills[l_24] < 35)
-            text_draw_coloured(*(int *)(skill_names + (player_class->skills[l_24] << 2)), (short)(*(short *)(classmaker_buttons + (l_24 + 2) * 12) + 2), (short)(*(short *)(D_001854F6 + (l_24 + 2) * 12) + 1), 145, 141);
+    for (i = 0; i < 12; i++) {
+        if (player_class->skills[i] < 35)
+            text_draw_coloured(*(int *)(skill_names + (player_class->skills[i] << 2)), (short)(*(short *)(classmaker_buttons + (i + 2) * 12) + 2), (short)(*(short *)(D_001854F6 + (i + 2) * 12) + 1), 145, 141);
     }
-    l_18 = (D_001855CC + D_001855D0) >> 1;
-    l_1C = ((D_001855D2 + D_001855CE) >> 1) - D_001855CE + 3;
-    for (l_24 = 0; l_24 < 8; l_24++) {
-        text_draw_centred_coloured(itoa(player_class->attributes[l_24], (int)text_buffer, 10), l_18, (short)(*(short *)(D_001854F6 + (l_24 + 18) * 12) + l_1C), 145, 141);
+    x = (D_001855CC + D_001855D0) >> 1;
+    y_offset = ((D_001855D2 + D_001855CE) >> 1) - D_001855CE + 3;
+    for (i = 0; i < 8; i++) {
+        text_draw_centred_coloured(itoa(player_class->attributes[i], (int)text_buffer, 10), x, (short)(*(short *)(D_001854F6 + (i + 18) * 12) + y_offset), 145, 141);
     }
     msgbox_update();
     xn_mouse_cursor_draw();

@@ -14,29 +14,29 @@ extern void quest_raise_event(int, struct record *, int);
 extern void inventory_open_container(struct record *, int, int);
 extern void inv_store_item(struct record *);
 
-void pick_up_item(struct record *a1)
+void pick_up_item(struct record *object)
 {
-    struct item *l_24;
-    int l_20;
-    int l_1C;
-    int l_18;
+    struct item *item;
+    int weight;
+    int carried_weight;
+    int capacity;
 
-    l_24 = &a1->data.item;
-    if (a1->children != 0 && a1->children->type == 2) {
-        inventory_open_container(a1, 0, 5);
+    item = &object->data.item;
+    if (object->children != 0 && object->children->type == 2) {
+        inventory_open_container(object, 0, 5);
         return;
     }
-    l_20 = object_weight(a1);
-    l_1C = object_weight(player_entity);
-    l_18 = carry_capacity() << 2;
-    if (l_20 > l_18) {
+    weight = object_weight(object);
+    carried_weight = object_weight(player_entity);
+    capacity = carry_capacity() << 2;
+    if (weight > capacity) {
         hud_message_add((int)D_0017629C);
         return;
     }
-    if ((l_20 + l_1C) > l_18) {
+    if ((weight + carried_weight) > capacity) {
         hud_message_add((int)D_001762B5);
         return;
     }
-    quest_raise_event(3, a1, 0);
-    inv_store_item(a1);
+    quest_raise_event(3, object, 0);
+    inv_store_item(object);
 }

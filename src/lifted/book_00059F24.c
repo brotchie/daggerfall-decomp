@@ -17,62 +17,62 @@ extern int lseek();
 extern int read();
 extern int xn_font_select();
 extern void book_flush_line(void);
-extern void func_0005A1C8(int);
+extern void func_0005A1C8(char *);
 
-void book_draw_page(int a1)
+void book_draw_page(int page)
 {
-    short l_18;
+    short line_height;
     {
-        int l_20;
+        char *text;
 
         xn_font_select(4);
-        lseek((int)(short)book_file, *(int *)((char *)(int)(*(char **)&book_page_offsets + (((int)(short)*(short *)&a1) << 2))), 0);
+        lseek((int)(short)book_file, *(int *)((char *)(int)(*(char **)&book_page_offsets + (((int)(short)*(short *)&page) << 2))), 0);
         read((int)(short)book_file, *(int *)scratch_buffer, 16000);
-        l_20 = *(int *)scratch_buffer;
+        text = *(char **)scratch_buffer;
         D_0012B508 = 145;
         *(short *)scratch_190d64 = 0;
-        l_18 = font_height;
+        line_height = font_height;
         D_00142928 = 10;
         D_0014292C = 20;
-        while (((int)(unsigned char)*(signed char *)((char *)l_20)) != 246) {
-            switch (*(unsigned char *)((char *)l_20)) {
+        while (((int)(unsigned char)*(signed char *)text) != 246) {
+            switch (*(unsigned char *)text) {
             case 251:
-                D_00142928 = *(short *)((char *)l_20 + 1);
-                l_20 += 3;
+                D_00142928 = *(short *)(text + 1);
+                text += 3;
                 break;
             case 247:
-                func_0005A1C8(l_20 + 1);
-                while (*(signed char *)((char *)l_20++) != 0);
+                func_0005A1C8(text + 1);
+                while (*(signed char *)(text++) != 0);
                 break;
             case 250:
-                D_0012B508 = *(signed char *)((char *)l_20 + 1);
-                l_20 += 2;
+                D_0012B508 = *(signed char *)(text + 1);
+                text += 2;
                 break;
             case 249:
                 book_flush_line();
-                xn_font_select((int)(short)((unsigned short)(unsigned char)*(signed char *)((char *)l_20 + 1)));
-                l_20 += 2;
-                if ((short)(short)*(int *)&l_18 < font_height) l_18 = font_height;
+                xn_font_select((int)(short)((unsigned short)(unsigned char)*(signed char *)(text + 1)));
+                text += 2;
+                if ((short)(short)*(int *)&line_height < font_height) line_height = font_height;
                 break;
             case 253:
                 *(short *)scratch_190d66 = 1;
-                l_20++;
+                text++;
                 break;
             case 1:
-                l_20++;
+                text++;
                 text_buffer[(int)(short)*(short *)scratch_190d64] = 0;
                 book_flush_line();
                 break;
             case 0:
-                l_20++;
+                text++;
                 text_buffer[(int)(short)*(short *)scratch_190d64] = 0;
                 book_flush_line();
                 D_00142928 = 10;
-                D_0014292C += *(int *)&l_18;
-                l_18 = font_height;
+                D_0014292C += *(int *)&line_height;
+                line_height = font_height;
                 break;
             default:
-                text_buffer[(int)(short)(*(short *)scratch_190d64)++] = *(signed char *)((char *)l_20++);
+                text_buffer[(int)(short)(*(short *)scratch_190d64)++] = *(signed char *)(text++);
             }
         }
         if (text_buffer[0] == 0) return;

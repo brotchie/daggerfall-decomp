@@ -54,109 +54,109 @@ struct vec3 {
     int z;
 };
 
-int collide_move_player(struct record *a1, int a2, struct move_request *a3, int a4)
+int collide_move_player(struct record *object, int unused_arg, struct move_request *request, int unused_arg2)
 {
-    int l_44;
-    int l_40;           /* l_40, l_3C and l_34 are never read: they only shape the frame */
-    int l_3C;
-    struct vec3 l_5C;
-    int l_34;
-    int l_30;
-    int l_2C;
-    int l_28;
-    int l_24;
-    int l_20;
-    int l_1C;
-    int l_18;
-    int l_14;
-    short *l_10;
+    int result;
+    int unused1;           /* unused1-3 are never read: they only shape the frame */
+    int unused2;
+    struct vec3 direction;
+    int unused3;
+    int dx;
+    int dy;
+    int dz;
+    int best;
+    int i;
+    int mindot;
+    int dot;
+    int flags;
+    short *motion;
 
-    l_34 = 0;
+    unused3 = 0;
     *(int *)D_00195CB8 = *(int *)D_00195C70 = 0;
     D_00195F5A = 10000;
     D_00195CD8 = D_00195CD4 = 0;
     D_00196D50 = 0;
     collide_candidate_count = 0;
-    (*(struct vec3 **)D_00196D4C = (struct vec3 *)D_00179F48)->x = a3->x;
-    (*(struct vec3 **)D_00196D4C)->y = a3->y;
-    (*(struct vec3 **)D_00196D4C)->z = a3->z;
-    collide_for_each_nearby(a1, (int)collide_gather_cb);
+    (*(struct vec3 **)D_00196D4C = (struct vec3 *)D_00179F48)->x = request->x;
+    (*(struct vec3 **)D_00196D4C)->y = request->y;
+    (*(struct vec3 **)D_00196D4C)->z = request->z;
+    collide_for_each_nearby(object, (int)collide_gather_cb);
     if (!((player_character->conditions & 0x8) || collide_candidate_count != 0 || player_environment == 1))
         return FLAGS = 16;
-    l_14 = FLAGS;
+    flags = FLAGS;
     player_on_ground = 1;
-    l_44 = collide_step_player(a1, a2, a3);
+    result = collide_step_player(object, unused_arg, request);
     D_001940D7 &= 223;
     if ((char)player_on_ground != 0 && (char)D_00196296 != 0)
         D_00196296 = 0;
-    if (*(int *)D_00195CB8 != 0 && (l_10 = (short *)links_object_motion(*(int *)D_00195CB8)) != 0) {
-        if (l_10[0] != 0 || l_10[2] != 0) {
-            a3->x += l_10[0];
-            a3->y += l_10[1];
-            a3->z += l_10[2];
+    if (*(int *)D_00195CB8 != 0 && (motion = (short *)links_object_motion(*(int *)D_00195CB8)) != 0) {
+        if (motion[0] != 0 || motion[2] != 0) {
+            request->x += motion[0];
+            request->y += motion[1];
+            request->z += motion[2];
             *(unsigned char *)collide_flags |= 4;
-            l_44 = collide_step_player(a1, a2, a3);
+            result = collide_step_player(object, unused_arg, request);
         }
     }
-    if (*(int *)D_00195C70 != 0 && (l_10 = (short *)links_object_motion(*(int *)D_00195C70)) != 0) {
-        a3->x += l_10[0];
-        a3->y += l_10[1];
-        a3->z += l_10[2];
+    if (*(int *)D_00195C70 != 0 && (motion = (short *)links_object_motion(*(int *)D_00195C70)) != 0) {
+        request->x += motion[0];
+        request->y += motion[1];
+        request->z += motion[2];
         *(unsigned char *)collide_flags |= 4;
-        l_44 = collide_step_player(a1, a2, a3);
+        result = collide_step_player(object, unused_arg, request);
     }
     if (*(int *)D_00195CB8 != 0)
         automap_mark_seen(*(int *)D_00195CB8);
     if (*(int *)D_00195C70 != 0)
         automap_mark_seen(*(int *)D_00195C70);
-    if (l_44 & 2)
+    if (result & 2)
         D_00195F5A = 0;
-    if (a1 == player_object && ((struct bf8_5_1 *)&player_motion_flags)->f)
+    if (object == player_object && ((struct bf8_5_1 *)&player_motion_flags)->f)
         return 0;
-    if (!(l_44 & 10) || !(l_14 & 4))
+    if (!(result & 10) || !(flags & 4))
         return 0;
-    l_5C.x = a3->x - a1->x;
-    l_5C.y = a3->y - a1->y;
-    l_5C.z = a3->z - a1->z;
-    xn_vec_normalize_ptr((int)&l_5C);
+    direction.x = request->x - object->x;
+    direction.y = request->y - object->y;
+    direction.z = request->z - object->z;
+    xn_vec_normalize_ptr((int)&direction);
     if (D_00196D50 == 0)
         return 1;
     if (PLANES->count > 1) {
-        l_24 = 0;
-        l_1C = 1000000;
-        for (l_20 = 0; l_20 < PLANES->count; l_20++) {
-            l_18 = l_5C.x * PL[l_20].nx + l_5C.z * PL[l_20].nz;
-            if (l_18 < l_1C) {
-                l_1C = l_18;
-                l_24 = l_20;
+        best = 0;
+        mindot = 1000000;
+        for (i = 0; i < PLANES->count; i++) {
+            dot = direction.x * PL[i].nx + direction.z * PL[i].nz;
+            if (dot < mindot) {
+                mindot = dot;
+                best = i;
             }
         }
     } else {
-        l_1C = l_5C.x * PL[0].nx + l_5C.z * PL[0].nz;
-        l_24 = 0;
+        mindot = direction.x * PL[0].nx + direction.z * PL[0].nz;
+        best = 0;
     }
-    l_30 = (a3->x - a1->x) * PL[l_24].nx;
-    l_2C = (a3->y - a1->y) * PL[l_24].ny;
-    l_28 = (a3->z - a1->z) * PL[l_24].nz;
-    l_30 = l_28 + (l_30 + l_2C);
-    l_2C = l_30 * PL[l_24].ny;
-    l_28 = l_30 * PL[l_24].nz;
-    l_30 = l_30 * PL[l_24].nx;
-    l_30 >>= 8;
-    l_2C >>= 8;
-    l_28 >>= 8;
-    l_30 = (a3->x - a1->x) - (l_30 >> 8);
-    l_2C = (a3->y - a1->y) - (l_2C >> 8);
-    l_28 = (a3->z - a1->z) - (l_28 >> 8);
-    a3->x = a1->x + l_30;
-    a3->y = a1->y + l_2C;
-    a3->z = a1->z + l_28;
-    D_00195F5A = abs(l_1C >> 16);
-    if (l_30 != 0 || l_2C != 0 || l_28 != 0) {
+    dx = (request->x - object->x) * PL[best].nx;
+    dy = (request->y - object->y) * PL[best].ny;
+    dz = (request->z - object->z) * PL[best].nz;
+    dx = dz + (dx + dy);
+    dy = dx * PL[best].ny;
+    dz = dx * PL[best].nz;
+    dx = dx * PL[best].nx;
+    dx >>= 8;
+    dy >>= 8;
+    dz >>= 8;
+    dx = (request->x - object->x) - (dx >> 8);
+    dy = (request->y - object->y) - (dy >> 8);
+    dz = (request->z - object->z) - (dz >> 8);
+    request->x = object->x + dx;
+    request->y = object->y + dy;
+    request->z = object->z + dz;
+    D_00195F5A = abs(mindot >> 16);
+    if (dx != 0 || dy != 0 || dz != 0) {
         D_00195CD8 = D_00195CD4 = 0;
-        l_14 = FLAGS;
+        flags = FLAGS;
         player_on_ground = 1;
-        l_44 = collide_step_player(a1, a2, a3);
+        result = collide_step_player(object, unused_arg, request);
         D_001940D7 &= 223;
         if ((char)player_on_ground != 0 && (char)D_00196296 != 0)
             D_00196296 = 0;
@@ -164,9 +164,9 @@ int collide_move_player(struct record *a1, int a2, struct move_request *a3, int 
             automap_mark_seen(*(int *)D_00195CB8);
         if (*(int *)D_00195C70 != 0)
             automap_mark_seen(*(int *)D_00195C70);
-        if (a1 == player_object && ((struct bf8_4_1 *)&player_motion_flags)->f)
+        if (object == player_object && ((struct bf8_4_1 *)&player_motion_flags)->f)
             return 0;
-        if (!(l_44 & 10) || !(l_14 & 4))
+        if (!(result & 10) || !(flags & 4))
             return 0;
         return 1;
     }

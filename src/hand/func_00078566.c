@@ -36,140 +36,140 @@ extern int xn_tex_cache_flush();
 extern int mc_set_location(int, int);
 extern int mc_sprintf(int, ...);
 
-void monster_init(struct record *a1, int a2)
+void monster_init(struct record *monster, int monster_type)
 {
-    struct character *l_3C;
-    struct career *l_38;
-    struct monster_anim *l_34;
-    int l_30;
-    int l_2C;
-    int l_28;
-    int l_24;
-    int l_20;
-    int l_1C;
-    int l_18;
-    int l_14;
+    struct character *monster_char;
+    struct career *career;
+    struct monster_anim *anim;
+    char *table_row;
+    int texture;
+    int i;
+    int skill_value;
+    int texture_base;
+    int class_index;
+    int type_147;
+    int record_index;
     {
-        int l_48;
+        int ascr;
 
-        l_3C = &a1->data.character;
-        l_38 = &l_3C->career;
-        l_34 = (struct monster_anim *)((char *)l_38 + 74);
-        l_18 = 0;
-        if (a2 == 99 || a2 == 98) a2 = 0;
-        l_3C->mobile_id = *(signed char *)&a2;
-        if (a2 >= 128) {
-            if (a2 == 147) {
-                l_18 = 1;
-                a2 = 144;
-                l_1C = a2 & 127;
+        monster_char = &monster->data.character;
+        career = &monster_char->career;
+        anim = (struct monster_anim *)((char *)career + 74);
+        type_147 = 0;
+        if (monster_type == 99 || monster_type == 98) monster_type = 0;
+        monster_char->mobile_id = *(signed char *)&monster_type;
+        if (monster_type >= 128) {
+            if (monster_type == 147) {
+                type_147 = 1;
+                monster_type = 144;
+                class_index = monster_type & 127;
             } else {
-                l_1C = a2 & 127;
-                a2 = (int)(unsigned char)class_creature_types[l_1C];
+                class_index = monster_type & 127;
+                monster_type = (int)(unsigned char)class_creature_types[class_index];
             }
         }
-        if (a2 >= 43) {
-            if (l_18 != 0) {
-                l_20 = rand_range(0, 4) + 491;
-                a2 = 0;
-            } else if (l_1C == 18) {
-                l_20 = 340;
+        if (monster_type >= 43) {
+            if (type_147 != 0) {
+                texture_base = rand_range(0, 4) + 491;
+                monster_type = 0;
+            } else if (class_index == 18) {
+                texture_base = 340;
             } else {
                 if (D_00196293 == 0) {
-                    a2 += rand() & 1;
+                    monster_type += rand() & 1;
                 } else if (((int)(unsigned char)D_00196293) == 2) {
-                    a2++;
+                    monster_type++;
                 }
-                l_20 = 432;
+                texture_base = 432;
             }
         } else {
-            l_20 = 255;
+            texture_base = 255;
         }
         mc_set_location(73, (int)D_00176844);
-        mc_sprintf((int)text_buffer, (int)D_0017684E, a2 + l_20);
-        l_3C->anim_slot = monster_alloc_anim_slot();
-        l_3C->action = 0;
-        xn_anim_reset(l_34);
-        if (l_18 != 0) {
-            l_3C->ascr_record = 145;
+        mc_sprintf((int)text_buffer, (int)D_0017684E, monster_type + texture_base);
+        monster_char->anim_slot = monster_alloc_anim_slot();
+        monster_char->action = 0;
+        xn_anim_reset(anim);
+        if (type_147 != 0) {
+            monster_char->ascr_record = 145;
         } else {
-            if (a2 >= 43) {
-                l_48 = a2 + 85;
+            if (monster_type >= 43) {
+                ascr = monster_type + 85;
             } else {
-                l_48 = a2;
+                ascr = monster_type;
             }
-            l_3C->ascr_record = *(signed char *)&l_48;
+            monster_char->ascr_record = *(signed char *)&ascr;
         }
         mc_set_location(91, (int)D_00176844);
-        mc_sprintf((int)text_buffer, (int)D_0017685B, l_3C->ascr_record);
-        l_14 = archive_find_record(monster_bsa_handle, (int)text_buffer, 8);
-        *(int *)(D_00190704 + (l_3C->anim_slot << 2)) = (int)(l_34->anim_script = (char *)archive_read_record(monster_bsa_handle, l_14, 0));
-        l_34->anim_request = 0;
+        mc_sprintf((int)text_buffer, (int)D_0017685B, monster_char->ascr_record);
+        record_index = archive_find_record(monster_bsa_handle, (int)text_buffer, 8);
+        *(int *)(D_00190704 + (monster_char->anim_slot << 2)) = (int)(anim->anim_script = (char *)archive_read_record(monster_bsa_handle, record_index, 0));
+        anim->anim_request = 0;
         do {
-            l_2C = xn_tex_cache_lookup(l_20 + a2, 5, 0);
-            if (l_2C == 0) xn_tex_cache_flush();
-        } while (l_2C == 0);
-        l_34->frame_count = *(short *)(*(char **)((char *)l_2C + 12) + 22);
-        l_3C->magicka = (l_3C->max_magicka = 0);
-        if (a2 == 23 || a2 == 18) xn_tex_archive_set_translucent(l_20 + a2);
-        l_30 = ((int)monster_table) + (a2 * 29);
-        if (a2 >= 43) {
+            texture = xn_tex_cache_lookup(texture_base + monster_type, 5, 0);
+            if (texture == 0) xn_tex_cache_flush();
+        } while (texture == 0);
+        anim->frame_count = *(short *)(*(char **)((char *)texture + 12) + 22);
+        monster_char->magicka = (monster_char->max_magicka = 0);
+        if (monster_type == 23 || monster_type == 18) xn_tex_archive_set_translucent(texture_base + monster_type);
+        table_row = monster_table + monster_type * 29;
+        if (monster_type >= 43) {
             mc_set_location(112, (int)D_00176844);
-            mc_sprintf((int)text_buffer, (int)D_00176868, l_1C);
-            disk_read_file((int)text_buffer, (int)l_38);
+            mc_sprintf((int)text_buffer, (int)D_00176868, class_index);
+            disk_read_file((int)text_buffer, (int)career);
         } else {
             mc_set_location(117, (int)D_00176844);
-            mc_sprintf((int)text_buffer, (int)D_00176876, a2);
-            l_14 = archive_find_record(monster_bsa_handle, (int)text_buffer, 8);
-            archive_read_record(monster_bsa_handle, l_14, (int)l_38);
+            mc_sprintf((int)text_buffer, (int)D_00176876, monster_type);
+            record_index = archive_find_record(monster_bsa_handle, (int)text_buffer, 8);
+            archive_read_record(monster_bsa_handle, record_index, (int)career);
         }
-        if (l_18 != 0) {
-            l_3C->flags |= 0x2000;
-            l_3C->race = 55;
+        if (type_147 != 0) {
+            monster_char->flags |= 0x2000;
+            monster_char->race = 55;
         } else {
-            l_3C->flags &= ~0x2000;
-            l_3C->race = *(signed char *)&a2;
+            monster_char->flags &= ~0x2000;
+            monster_char->race = *(signed char *)&monster_type;
         }
-        l_3C->race = *(signed char *)&a2;
-        if (a2 >= 43) {
-            l_3C->level = player_character->level;
-            if (l_3C->mobile_id == 146) l_3C->level += rand_range(3, 6);
-            l_3C->health = (l_3C->max_health = monster_roll_class_health(l_38->hp_per_level, (int)(unsigned char)*(signed char *)((char *)l_30), l_3C->level));
+        monster_char->race = *(signed char *)&monster_type;
+        if (monster_type >= 43) {
+            monster_char->level = player_character->level;
+            if (monster_char->mobile_id == 146) monster_char->level += rand_range(3, 6);
+            monster_char->health = (monster_char->max_health = monster_roll_class_health(career->hp_per_level, (int)(unsigned char)*(signed char *)table_row, monster_char->level));
         } else {
-            l_3C->level = *(signed char *)((char *)l_30 + 28);
-            l_3C->health = (l_3C->max_health = monster_roll_d8_health(l_38->hp_per_level, (int)(unsigned char)*(signed char *)((char *)l_30)));
+            monster_char->level = *(signed char *)(table_row + 28);
+            monster_char->health = (monster_char->max_health = monster_roll_d8_health(career->hp_per_level, (int)(unsigned char)*(signed char *)table_row));
         }
-        mc_memset(l_3C->armor_values, ((int)(unsigned char)*(signed char *)((char *)l_30 + 1)) * 5, 7, (int)D_00176844, 145, 7);
-        l_3C->reputation[0] = (int)(unsigned char)*(signed char *)((char *)l_30 + 2);
-        l_3C->table_flags = *(short *)((char *)l_30 + 4);
-        mc_memcpy(l_3C->attack_damage, l_30 + 6, 10, (int)D_00176844, 148, 20);
-        l_3C->min_metal_to_hit = *(signed char *)((char *)l_30 + 3);
-        mc_memcpy(l_3C->attributes, l_38->attributes, 16, (int)D_00176844, 150, 16);
-        if (*(signed char *)((char *)l_30 + 26) == *(signed char *)((char *)l_30 + 27)) {
-            l_3C->pad22A = *(signed char *)((char *)l_30 + 26);
+        mc_memset(monster_char->armor_values, ((int)(unsigned char)*(signed char *)(table_row + 1)) * 5, 7, (int)D_00176844, 145, 7);
+        monster_char->loot_table = (int)(unsigned char)*(signed char *)(table_row + 2);
+        monster_char->table_flags = *(short *)(table_row + 4);
+        mc_memcpy(monster_char->attack_damage, table_row + 6, 10, (int)D_00176844, 148, 20);
+        monster_char->min_metal_to_hit = *(signed char *)(table_row + 3);
+        mc_memcpy(monster_char->attributes, career->attributes, 16, (int)D_00176844, 150, 16);
+        if (*(signed char *)(table_row + 26) == *(signed char *)(table_row + 27)) {
+            monster_char->pad22A = *(signed char *)(table_row + 26);
         } else {
-            l_3C->pad22A = rand_range((int)(unsigned char)*(signed char *)((char *)l_30 + 26), (int)(unsigned char)*(signed char *)((char *)l_30 + 27));
+            monster_char->pad22A = rand_range((int)(unsigned char)*(signed char *)(table_row + 26), (int)(unsigned char)*(signed char *)(table_row + 27));
         }
-        l_3C->nav_direction = 2;
-        l_3C->nav_blocked = 0;
-        l_3C->nav_turn_count = 12;
-        l_3C->nav_stuck_count = 0;
-        l_3C->pad1F1 = 255;
-        l_3C->give_up_timer = 0;
-        l_24 = (l_3C->level * 5) + 30;
-        if (l_24 > 100) l_24 = 100;
-        for (l_28 = 0; l_28 < 35; l_28++) {
-            l_3C->skills[l_28].value = l_24;
+        monster_char->nav_direction = 2;
+        monster_char->nav_blocked = 0;
+        monster_char->nav_turn_count = 12;
+        monster_char->nav_stuck_count = 0;
+        monster_char->pad1F1 = 255;
+        monster_char->give_up_timer = 0;
+        skill_value = (monster_char->level * 5) + 30;
+        if (skill_value > 100) skill_value = 100;
+        for (i = 0; i < 35; i++) {
+            monster_char->skills[i].value = skill_value;
         }
-        mc_strncpy(l_3C->name, l_38->name, 32, (int)D_00176844, 169);
-        monster_init_gear(a1);
-        monster_maybe_give_map(a1, l_3C->mobile_id);
-        a1->image = (l_20 + a2) << 7;
-        if (*(signed char *)((char *)l_30 + 2) != 0) {
-            loot_generate(((int)(unsigned char)*(signed char *)((char *)l_30 + 2)) - 1, a1, player_character->level, (int)(unsigned short)(player_character->flags & 1));
+        mc_strncpy(monster_char->name, career->name, 32, (int)D_00176844, 169);
+        monster_init_gear(monster);
+        monster_maybe_give_map(monster, monster_char->mobile_id);
+        monster->image = (texture_base + monster_type) << 7;
+        if (*(signed char *)(table_row + 2) != 0) {
+            loot_generate(((int)(unsigned char)*(signed char *)(table_row + 2)) - 1, monster, player_character->level, (int)(unsigned short)(player_character->flags & 1));
         }
-        l_3C->fall_velocity = 0;
-        l_3C->faction_id = 0;
-        monster_set_action(a1, 0, 48);
+        monster_char->fall_velocity = 0;
+        monster_char->faction_id = 0;
+        monster_set_action(monster, 0, 48);
     }
 }

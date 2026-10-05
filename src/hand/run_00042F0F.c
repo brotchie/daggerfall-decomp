@@ -260,26 +260,26 @@ void keys_nop(void)
 {
 }
 
-void interaction_mode_cycle(int a1)
+void interaction_mode_cycle(int step)
 {
-    interaction_mode = (interaction_mode + a1) & 3;
+    interaction_mode = (interaction_mode + step) & 3;
     mc_set_location(231, D_00170E38);
     mc_sprintf(((char *)text_buffer), D_0017D1EE, D_0017D1CA[interaction_mode]);
     hud_status_set(((char *)text_buffer));
 }
 
-void keys_joystick_steer_weights(int a1)
+void keys_joystick_steer_weights(int axis)
 {
-    steer_weight_right = (a1 << 8) / 4096;
-    steer_weight_down = (a1 << 8) / 4096;
-    steer_weight_left = (-a1 << 8) / 4096;
-    steer_weight_up = (-a1 << 8) / 4096;
+    steer_weight_right = (axis << 8) / 4096;
+    steer_weight_down = (axis << 8) / 4096;
+    steer_weight_left = (-axis << 8) / 4096;
+    steer_weight_up = (-axis << 8) / 4096;
 }
 
-int key_action_held(int a1)
+int key_action_held(int action)
 {
-    if (key_map[a1] >= 200) {
-        switch ((unsigned char)(key_map[a1] - 200)) {
+    if (key_map[action] >= 200) {
+        switch ((unsigned char)(key_map[action] - 200)) {
         case 0:
             return joystick_button1;
         case 1:
@@ -306,5 +306,5 @@ int key_action_held(int a1)
             return 0;
         }
     }
-    return key_down[key_map[a1]];
+    return key_down[key_map[action]];
 }

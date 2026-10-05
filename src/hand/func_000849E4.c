@@ -3,24 +3,25 @@
 
 extern struct record *rmb_make_marker(struct record *, int);
 
-void rmb_add_editor_marker(struct record *a1, int a2)
+void rmb_add_editor_marker(struct record *parent, struct block_flat *flat)
 {
-    struct record *l_20;
-    int l_1C;
-    int l_18;
-    int l_14;
+    struct record *marker;
+    int unused;
+    int kind;
+    int unused2;
 
-    l_18 = ((int)(unsigned short)(*(short *)((char *)a2 + 12) & 31)) - 2; switch (l_18) {
+    kind = (flat->image & 31) - 2;
+    switch (kind) {
     case 8:
     case 9:
     case 13:
     case 14:
     case 16:
     case 17:
-        l_20 = rmb_make_marker(a1, (int)(unsigned short)*(short *)((char *)a2 + 12));
-        l_20->x = *(int *)((char *)a2);
-        l_20->z = *(int *)((char *)a2 + 8);
-        l_20->y = *(int *)((char *)a2 + 4);
+        marker = rmb_make_marker(parent, flat->image);
+        marker->x = flat->x;
+        marker->z = flat->z;
+        marker->y = flat->y;
         break;
     case 0: case 1: case 2: case 3: case 4: case 5: case 6: case 7:
     case 10: case 11: case 12: case 15:

@@ -9,18 +9,18 @@ extern struct record *object_create_child(struct record *, int, int);
 extern int object_new_id(int);
 extern void item_make_in_range(unsigned short, int, int, struct item *);
 
-struct record *monster_make_item(struct record *a1, int a2, int a3, int a4, int a5, int a6)
+struct record *monster_make_item(struct record *monster, int group, int index_lo, int index_hi, int excluded_index, int chance)
 {
-    struct record *l_14;
-    struct item *l_10;
+    struct record *item;
+    struct item *item_data;
 
-    if (rand_range(1, 100) > a6) return 0;
-    l_14 = object_create_child(a1, 0, 107);
-    l_14->type = 2;
-    l_14->id = object_new_id(((unsigned)a1->id) >> 16);
-    l_10 = &l_14->data.item;
+    if (rand_range(1, 100) > chance) return 0;
+    item = object_create_child(monster, 0, 107);
+    item->type = 2;
+    item->id = object_new_id(((unsigned)monster->id) >> 16);
+    item_data = &item->data.item;
     do {
-        item_make_in_range((int)(unsigned short)*(short *)&a2, a3, a4, l_10);
-    } while (l_10->index == a5);
-    return l_14;
+        item_make_in_range((int)(unsigned short)*(short *)&group, index_lo, index_hi, item_data);
+    } while (item_data->index == excluded_index);
+    return item;
 }

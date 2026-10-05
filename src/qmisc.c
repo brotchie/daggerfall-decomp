@@ -2,22 +2,22 @@
 
 #include "dagger.h"
 
-void quest_remove_objects(unsigned char a)
+void quest_remove_objects(unsigned char quest_id)
 {
-    object_delete_quest_objects(location_object, a);
-    object_delete_quest_objects(nonworld_root, a);
+    object_delete_quest_objects(location_object, quest_id);
+    object_delete_quest_objects(nonworld_root, quest_id);
 }
 
-int quest_section(char *p1, short p2)
+int quest_section(char *quest, short section)
 {
-    short l;
-    l = ((short *)(p1 + 0x24))[p2];
-    return (int)(p1 + l);
+    short offset;
+    offset = ((short *)(quest + 0x24))[section];
+    return (int)(quest + offset);
 }
 
-int quest_record(char *p1, short p2, short p3)
+int quest_record(char *quest, short section, short record_index)
 {
-    int l;
-    l = quest_section(p1, p2);
-    return l + p3 * qbn_record_sizes[p2];
+    int section_start;
+    section_start = quest_section(quest, section);
+    return section_start + record_index * qbn_record_sizes[section];
 }

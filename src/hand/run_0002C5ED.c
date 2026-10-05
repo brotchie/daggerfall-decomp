@@ -15,94 +15,94 @@ extern struct qbn_timer *quest_section(struct quest *, int);
 extern int rand_range(int, int);
 extern int memchr(char *, int, int);
 
-void quest_timers_update(struct quest *a1)
+void quest_timers_update(struct quest *quest)
 {
     int i;
-    struct qbn_timer *t;
+    struct qbn_timer *timer;
 
-    t = quest_section(a1, 6);
-    for (i = 0; a1->section_counts[6] > i; i++, t++) {
-        if ((short)t->flags & 2) {
-            t->flags &= ~128;
-            quest_timer_clear_state(t);
+    timer = quest_section(quest, 6);
+    for (i = 0; quest->section_counts[6] > i; i++, timer++) {
+        if ((short)timer->flags & 2) {
+            timer->flags &= ~128;
+            quest_timer_clear_state(timer);
         }
-        if ((short)t->flags & 64)
-            quest_timer_update(a1, t, 0);
+        if ((short)timer->flags & 64)
+            quest_timer_update(quest, timer, 0);
     }
 }
 
 void quest_timers_start_all(void)
 {
-    struct qbn_timer *t;
+    struct qbn_timer *timer;
     int i;
 
-    t = quest_section(current_quest, 6);
-    for (i = 0; current_quest->section_counts[6] > i; i++, t++)
-        quest_timer_update(current_quest, t, 1);
+    timer = quest_section(current_quest, 6);
+    for (i = 0; current_quest->section_counts[6] > i; i++, timer++)
+        quest_timer_update(current_quest, timer, 1);
 }
 
-void quest_timer_update(struct quest *a1, struct qbn_timer *a2, short a3)
+void quest_timer_update(struct quest *quest, struct qbn_timer *timer, short start)
 {
-    int l_18;
-    short saved;
+    int unused;
+    short saved_travel_options;
 
-    saved = travel_options;
-    if (a3) {
+    saved_travel_options = travel_options;
+    if (start) {
         travel_options = 537;
-        if (!((short)a2->flags & 1024)) {
-            a2->flags |= 1024;
-            switch (a2->type) {
+        if (!((short)timer->flags & 1024)) {
+            timer->flags |= 1024;
+            switch (timer->type) {
             case 2:
             case 4:
-                a2->link1 = quest_place_or_person_object(a1, a2->link1, (short)a2->flags & 256);
-                a2->link2 = 0;
+                timer->link1 = quest_place_or_person_object(quest, timer->link1, (short)timer->flags & 256);
+                timer->link2 = 0;
                 break;
             case 3:
             case 5:
-                a2->link1 = quest_place_or_person_object(a1, a2->link1, (short)a2->flags & 256);
-                a2->link2 = quest_place_or_person_object(a1, a2->link2, (short)a2->flags & 512);
+                timer->link1 = quest_place_or_person_object(quest, timer->link1, (short)timer->flags & 256);
+                timer->link2 = quest_place_or_person_object(quest, timer->link2, (short)timer->flags & 512);
                 break;
             default:
-                a2->link1 = a2->link2 = 0;
+                timer->link1 = timer->link2 = 0;
                 break;
             }
         }
-        a2->start = game_minutes;
-        switch (a2->type) {
+        timer->start = game_minutes;
+        switch (timer->type) {
         case 0:
-            a2->delay = rand_range(a2->minimum, a2->maximum);
+            timer->delay = rand_range(timer->minimum, timer->maximum);
             break;
         case 1:
-            a2->delay = a2->minimum;
+            timer->delay = timer->minimum;
             break;
         case 2:
-            a2->delay = quest_travel_minutes(a1, 0, a2->link1) * 384 >> 8;
-            if (memchr(D_0017A13C, a2->link1->link_flag, 5))
-                a2->delay += 10080;
+            timer->delay = quest_travel_minutes(quest, 0, timer->link1) * 384 >> 8;
+            if (memchr(D_0017A13C, timer->link1->link_flag, 5))
+                timer->delay += 10080;
             break;
         case 3:
-            a2->delay = quest_travel_minutes(a1, a2->link1, a2->link2) * 384 >> 8;
-            if (memchr(D_0017A13C, a2->link1->link_flag, 5) || memchr(D_0017A13C, a2->link2->link_flag, 5))
-                a2->delay += 10080;
+            timer->delay = quest_travel_minutes(quest, timer->link1, timer->link2) * 384 >> 8;
+            if (memchr(D_0017A13C, timer->link1->link_flag, 5) || memchr(D_0017A13C, timer->link2->link_flag, 5))
+                timer->delay += 10080;
             break;
         case 4:
-            a2->delay = quest_travel_minutes(a1, 0, a2->link1) * 384 >> 8;
-            if (memchr(D_0017A13C, a2->link1->link_flag, 5))
-                a2->delay += 10080;
+            timer->delay = quest_travel_minutes(quest, 0, timer->link1) * 384 >> 8;
+            if (memchr(D_0017A13C, timer->link1->link_flag, 5))
+                timer->delay += 10080;
             break;
         case 5:
-            a2->delay = quest_travel_minutes(a1, 0, a2->link1) * 384 >> 8;
-            a2->delay += quest_travel_minutes(a1, a2->link1, a2->link2) * 384 >> 8;
-            if (memchr(D_0017A13C, a2->link1->link_flag, 5))
-                a2->delay += 10080;
-            if (memchr(D_0017A13C, a2->link2->link_flag, 5))
-                a2->delay += 10080;
+            timer->delay = quest_travel_minutes(quest, 0, timer->link1) * 384 >> 8;
+            timer->delay += quest_travel_minutes(quest, timer->link1, timer->link2) * 384 >> 8;
+            if (memchr(D_0017A13C, timer->link1->link_flag, 5))
+                timer->delay += 10080;
+            if (memchr(D_0017A13C, timer->link2->link_flag, 5))
+                timer->delay += 10080;
             break;
         }
-        if ((short)a2->flags & 16)
-            a2->delay <<= 1;
-        travel_options = saved;
-    } else if (game_minutes - a2->start > a2->delay) {
-        quest_timer_expire(a1, a2);
+        if ((short)timer->flags & 16)
+            timer->delay <<= 1;
+        travel_options = saved_travel_options;
+    } else if (game_minutes - timer->start > timer->delay) {
+        quest_timer_expire(quest, timer);
     }
 }

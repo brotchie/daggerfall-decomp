@@ -2,31 +2,31 @@
 extern char D_00175404[];
 extern void mc_memcpy(unsigned char *, unsigned char *, int, char *, int, int);
 
-void flc_decode_palette(unsigned char *a1, unsigned char *a2, unsigned char a3)
+void flc_decode_palette(unsigned char *palette, unsigned char *chunk, unsigned char to_6bit)
 {
-    short l_1C;
-    short l_18;
-    short l_20;
-    short l_14;
+    short packet_count;
+    short i;
+    short n;
+    short colours;
 
-    l_1C = *(short *)a2;
-    a2 += 2;
-    for (l_18 = 0; l_18 < l_1C; l_18++) {
-        a1 += a2[0] * 3;
-        l_14 = a2[1];
-        a2 += 2;
-        l_14 = l_14 != 0 ? l_14 : 256;
-        if (a3 != 0) {
-            for (l_20 = 0; l_20 < l_14; l_20++, a2 += 3, a1 += 3) {
-                a1[0] = a2[0] >> 2;
-                a1[1] = a2[1] >> 2;
-                a1[2] = a2[2] >> 2;
+    packet_count = *(short *)chunk;
+    chunk += 2;
+    for (i = 0; i < packet_count; i++) {
+        palette += chunk[0] * 3;
+        colours = chunk[1];
+        chunk += 2;
+        colours = colours != 0 ? colours : 256;
+        if (to_6bit != 0) {
+            for (n = 0; n < colours; n++, chunk += 3, palette += 3) {
+                palette[0] = chunk[0] >> 2;
+                palette[1] = chunk[1] >> 2;
+                palette[2] = chunk[2] >> 2;
             }
         } else {
-            l_20 = l_14 * 3;
-            mc_memcpy(a1, a2, l_20, D_00175404, 412, 4);
-            a2 += l_20;
-            a1 += l_20;
+            n = colours * 3;
+            mc_memcpy(palette, chunk, n, D_00175404, 412, 4);
+            chunk += n;
+            palette += n;
         }
     }
 }

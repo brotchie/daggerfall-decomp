@@ -19,64 +19,64 @@ extern void item_make(int, int, struct item *);
 extern void item_make_magic(struct item *, int);
 extern void loot_add_potion(struct record *);
 
-void loot_generate(int a1, struct record *a2, int a3, int a4)
+void loot_generate(int table_index, struct record *container, int level, int female)
 {
-    int l_20;
-    int l_1C;
-    int l_18;
-    int l_14;
-    struct item *l_10;
-    struct record *l_C;
+    int category;
+    int chance;
+    int more;
+    unsigned short *table;
+    struct item *item_data;
+    struct record *item;
 
-    l_14 = D_0018642F[a1];
-    if (*(short *)((char *)l_14) != 0 || *(short *)((char *)l_14 + 2) != 0) {
-        l_C = object_create_child(a2, 0, 107);
-        l_C->type = 2;
-        l_C->x = player_object->x;
-        l_C->y = player_object->y;
-        l_C->z = player_object->z;
-        l_C->id = object_new_id(((unsigned)location_object->id) >> 16);
-        l_10 = &l_C->data.item;
-        item_make(28, 0, l_10);
-        l_10->value = a3 * rand_range((int)(unsigned short)*(short *)((char *)l_14), (int)(unsigned short)*(short *)((char *)l_14 + 2));
+    table = (unsigned short *)D_0018642F[table_index];
+    if (table[0] != 0 || table[1] != 0) {
+        item = object_create_child(container, 0, 107);
+        item->type = 2;
+        item->x = player_object->x;
+        item->y = player_object->y;
+        item->z = player_object->z;
+        item->id = object_new_id(((unsigned)location_object->id) >> 16);
+        item_data = &item->data.item;
+        item_make(28, 0, item_data);
+        item_data->value = level * rand_range(table[0], table[1]);
     }
-    for (l_20 = 2; l_20 < 15; l_20++) {
-        if (l_20 <= 5) {
-            l_1C = a3 * ((int)(unsigned short)*(short *)((char *)((l_20 * 2) + l_14)));
+    for (category = 2; category < 15; category++) {
+        if (category <= 5) {
+            chance = level * table[category];
         } else {
-            l_1C = (int)(unsigned short)*(short *)((char *)((l_20 * 2) + l_14));
+            chance = table[category];
         }
-        if ((rand() % 100) <= l_1C) {
-            l_18 = 1;
-            while (l_18 != 0) {
-                l_C = object_create_child(a2, 0, 107);
-                l_C->type = 2;
-                l_C->x = player_object->x;
-                l_C->y = player_object->y;
-                l_C->z = player_object->z;
-                l_C->image2 = 998;
-                l_C->id = object_new_id(((unsigned)location_object->id) >> 16);
-                if (((int)(unsigned char)D_001861AA[l_20]) == 255) {
+        if ((rand() % 100) <= chance) {
+            more = 1;
+            while (more != 0) {
+                item = object_create_child(container, 0, 107);
+                item->type = 2;
+                item->x = player_object->x;
+                item->y = player_object->y;
+                item->z = player_object->z;
+                item->image2 = 998;
+                item->id = object_new_id(((unsigned)location_object->id) >> 16);
+                if (((int)(unsigned char)D_001861AA[category]) == 255) {
                     if (((int)(unsigned short)(player_character->flags & 1)) == 0) {
-                        item_make_random(6, &l_C->data.item);
+                        item_make_random(6, &item->data.item);
                     } else {
-                        item_make_random(12, &l_C->data.item);
+                        item_make_random(12, &item->data.item);
                     }
-                } else if (((int)(unsigned char)D_001861AA[l_20]) == 4) {
-                    item_make_magic(&l_C->data.item, -1);
-                } else if (((int)(unsigned char)D_001861AA[l_20]) == 7) {
-                    item_make(7, (a3 + 3) / 5, &l_C->data.item);
+                } else if (((int)(unsigned char)D_001861AA[category]) == 4) {
+                    item_make_magic(&item->data.item, -1);
+                } else if (((int)(unsigned char)D_001861AA[category]) == 7) {
+                    item_make(7, (level + 3) / 5, &item->data.item);
                 } else {
-                    item_make_random((int)(unsigned short)((unsigned short)(unsigned char)D_001861AA[l_20]), &l_C->data.item);
+                    item_make_random((int)(unsigned short)((unsigned short)(unsigned char)D_001861AA[category]), &item->data.item);
                 }
-                l_10 = &l_C->data.item;
-                if (l_10->group != 3 || l_10->index != 18) l_C->image2 = 0;
-                l_1C >>= 1;
-                if ((rand() % 100) > l_1C) l_18 = 0;
+                item_data = &item->data.item;
+                if (item_data->group != 3 || item_data->index != 18) item->image2 = 0;
+                chance >>= 1;
+                if ((rand() % 100) > chance) more = 0;
             }
         }
     }
-    if (rand_range(1, 100) < 3) loot_add_potion(a2);
+    if (rand_range(1, 100) < 3) loot_add_potion(container);
     if (rand_range(1, 100) >= 2) return;
-    item_add_to_container(a2, 27, 4, 0);
+    item_add_to_container(container, 27, 4, 0);
 }

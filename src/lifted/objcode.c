@@ -84,36 +84,36 @@ struct record *marker_find_nearest(struct record *, int);
 int location_cell_at(int, int);
 void marker_nearest_cb(struct record *);
 
-int marker_match_cb(struct record *a1)
+int marker_match_cb(struct record *object)
 {
-    struct block *l_2C;
-    struct block_flat *l_28;
-    int l_24;
-    int l_20;
-    int l_1C;
+    struct block *block;
+    struct block_flat *flat;
+    struct block_model *models;
+    int unused;
+    int i;
 
-    switch (a1->type) {
+    switch (object->type) {
     case 34:
-        if ((a1->image >> 7) == 199 && ((a1->image & 31) - 2) == marker_kind) {
+        if ((object->image >> 7) == 199 && ((object->image & 31) - 2) == marker_kind) {
             if (*(int *)D_00195B84 == 0 && marker_best < 0) {
-                mc_memcpy((int)found_marker, a1, 55, (int)D_00177358, 191, 4);
+                mc_memcpy((int)found_marker, object, 55, (int)D_00177358, 191, 4);
                 return 1;
             }
             *(int *)D_00195B84 += marker_best;
         }
         break;
     case 43:
-        l_2C = &a1->data.block;
-        l_28 = l_2C->flats;
-        for (l_1C = 0; l_2C->flat_count > l_1C; l_1C++, l_28++) {
-            if ((l_28->image >> 7) == 199) {
-                if ((((int)(unsigned short)(l_28->image & 31)) - 2) == marker_kind) {
+        block = &object->data.block;
+        flat = block->flats;
+        for (i = 0; block->flat_count > i; i++, flat++) {
+            if ((flat->image >> 7) == 199) {
+                if ((((int)(unsigned short)(flat->image & 31)) - 2) == marker_kind) {
                     if (*(int *)D_00195B84 == 0 && marker_best < 0) {
-                        D_00195F71 = l_28->x;
-                        D_00195F79 = l_28->z;
-                        D_00195F75 = l_28->y;
-                        D_00195F85 = l_28->image;
-                        D_00195F89 = a1->id;
+                        D_00195F71 = flat->x;
+                        D_00195F79 = flat->z;
+                        D_00195F75 = flat->y;
+                        D_00195F85 = flat->image;
+                        D_00195F89 = object->id;
                         *(signed char *)found_marker = 34;
                         return 1;
                     }
@@ -123,17 +123,17 @@ int marker_match_cb(struct record *a1)
         }
         break;
     case 56:
-        l_24 = (int)RECORD_DATA(a1);
-        l_28 = (struct block_flat *)(l_24 + (a1->model_count * 66));
-        for (l_1C = 0; a1->flat_count > l_1C; l_1C++, l_28++) {
-            if ((l_28->image >> 7) == 199) {
-                if ((((int)(unsigned short)(l_28->image & 31)) - 2) == marker_kind) {
+        models = (struct block_model *)RECORD_DATA(object);
+        flat = (struct block_flat *)(models + object->model_count);
+        for (i = 0; object->flat_count > i; i++, flat++) {
+            if ((flat->image >> 7) == 199) {
+                if ((((int)(unsigned short)(flat->image & 31)) - 2) == marker_kind) {
                     if (*(int *)D_00195B84 == 0 && marker_best < 0) {
-                        D_00195F71 = l_28->x;
-                        D_00195F79 = l_28->z;
-                        D_00195F75 = l_28->y;
-                        D_00195F85 = l_28->image;
-                        D_00195F89 = a1->id;
+                        D_00195F71 = flat->x;
+                        D_00195F79 = flat->z;
+                        D_00195F75 = flat->y;
+                        D_00195F85 = flat->image;
+                        D_00195F89 = object->id;
                         *(signed char *)found_marker = 34;
                         return 1;
                     }
@@ -145,108 +145,108 @@ int marker_match_cb(struct record *a1)
     return 0;
 }
 
-struct record *marker_find_first(struct record *a1, int a2)
+struct record *marker_find_first(struct record *root, int kind)
 {
-    marker_kind = a2;
+    marker_kind = kind;
     *(int *)D_00195B84 = 0;
     marker_best = -1;
     mc_memset((int)found_marker, 0, 71, (int)D_00177358, 261, 4);
-    object_find_open(a1, (int)marker_match_cb);
+    object_find_open(root, (int)marker_match_cb);
     if (*(signed char *)found_marker != 0) return (struct record *)found_marker;
     return 0;
 }
 
-struct record *marker_find_nth(struct record *a1, int a2, int a3)
+struct record *marker_find_nth(struct record *root, int kind, int n)
 {
-    int l_14;
+    int cell;
 
-    marker_kind = a2;
-    *(int *)D_00195B84 = a3;
+    marker_kind = kind;
+    *(int *)D_00195B84 = n;
     marker_best = -1;
     mc_memset((int)found_marker, 0, 71, (int)D_00177358, 287, 4);
-    object_find_open(a1, (int)marker_match_cb);
-    l_14 = location_cell_at(D_00195F71, D_00195F79);
-    D_00195F81 = a3;
+    object_find_open(root, (int)marker_match_cb);
+    cell = location_cell_at(D_00195F71, D_00195F79);
+    D_00195F81 = n;
     if (*(signed char *)found_marker != 0) return (struct record *)found_marker;
     return 0;
 }
 
-struct record *marker_find_random(struct record *a1, int a2)
+struct record *marker_find_random(struct record *root, int kind)
 {
-    int l_18;
+    int n;
 
-    marker_kind = a2;
+    marker_kind = kind;
     *(int *)D_00195B84 = 0;
     marker_best = 1;
     mc_memset((int)found_marker, 0, 71, (int)D_00177358, 317, 4);
-    object_find_open(a1, (int)marker_match_cb);
+    object_find_open(root, (int)marker_match_cb);
     if (*(int *)D_00195B84 == 0) return 0;
-    l_18 = (*(int *)D_00195B84 = rand() % *(int *)D_00195B84);
+    n = (*(int *)D_00195B84 = rand() % *(int *)D_00195B84);
     marker_best = -1;
-    object_foreach_open(a1, (int)marker_match_cb);
-    D_00195F81 = l_18;
+    object_foreach_open(root, (int)marker_match_cb);
+    D_00195F81 = n;
     return (struct record *)found_marker;
 }
 
-void marker_nearest_cb(struct record *a1)
+void marker_nearest_cb(struct record *object)
 {
-    struct block *l_28;
-    struct block_flat *l_24;
-    int l_20;
-    int l_1C;
-    int l_18;
+    struct block *block;
+    struct block_flat *flat;
+    struct block_model *models;
+    int dist;
+    int i;
 
-    switch (a1->type) {
+    switch (object->type) {
     case 34:
-        if ((a1->image >> 7) == 199 && ((a1->image & 31) - 2) != marker_kind) return;
-        l_1C = (a1->x - player_object->x) * (a1->x - player_object->x);
-        l_1C += ((a1->y - player_object->y) * (a1->y - player_object->y)) * 2;
-        l_1C += (a1->z - player_object->z) * (a1->z - player_object->z);
-        if (l_1C != 0) l_1C = xn_math_isqrt(l_1C);
-        if (l_1C < marker_best) {
-            found_object = a1;
-            marker_best = l_1C;
-            mc_memcpy((int)found_marker, a1, 55, (int)D_00177358, 363, 4);
+        if ((object->image >> 7) == 199 && ((object->image & 31) - 2) != marker_kind) return;
+        dist = (object->x - player_object->x) * (object->x - player_object->x);
+        dist += ((object->y - player_object->y) * (object->y - player_object->y)) * 2;
+        dist += (object->z - player_object->z) * (object->z - player_object->z);
+        if (dist != 0) dist = xn_math_isqrt(dist);
+        if (dist < marker_best) {
+            found_object = object;
+            marker_best = dist;
+            mc_memcpy((int)found_marker, object, 55, (int)D_00177358, 363, 4);
         }
         return;
     case 43:
-        l_28 = &a1->data.block;
-        l_24 = l_28->flats;
-        for (l_18 = 0; l_28->flat_count > l_18; l_18++, l_24++) {
-            if ((l_24->image >> 7) == 199 && (((int)(unsigned short)(l_24->image & 31)) - 2) == marker_kind) {
-                l_1C = (l_24->x - player_object->x) * (l_24->x - player_object->x);
-                l_1C += ((l_24->y - player_object->y) * (l_24->y - player_object->y)) * 2;
-                l_1C += (l_24->z - player_object->z) * (l_24->z - player_object->z);
-                if (l_1C != 0) l_1C = xn_math_isqrt(l_1C);
-                if (l_1C < marker_best) {
-                    marker_best = l_1C;
+        block = &object->data.block;
+        flat = block->flats;
+        for (i = 0; block->flat_count > i; i++, flat++) {
+            if ((flat->image >> 7) == 199 && (((int)(unsigned short)(flat->image & 31)) - 2) == marker_kind) {
+                dist = (flat->x - player_object->x) * (flat->x - player_object->x);
+                dist += ((flat->y - player_object->y) * (flat->y - player_object->y)) * 2;
+                dist += (flat->z - player_object->z) * (flat->z - player_object->z);
+                if (dist != 0) dist = xn_math_isqrt(dist);
+                if (dist < marker_best) {
+                    marker_best = dist;
                     *(signed char *)found_marker = 34;
-                    D_00195F71 = l_24->x;
-                    D_00195F79 = l_24->z;
-                    D_00195F75 = l_24->y;
-                    D_00195F85 = l_24->image;
-                    D_00195F89 = a1->id;
+                    D_00195F71 = flat->x;
+                    D_00195F79 = flat->z;
+                    D_00195F75 = flat->y;
+                    D_00195F85 = flat->image;
+                    D_00195F89 = object->id;
                 }
             }
         }
         return;
     case 56:
-        l_20 = (int)RECORD_DATA(a1);
-        l_24 = (struct block_flat *)(l_20 + (a1->model_count * 66));
-        for (l_18 = 0; a1->flat_count > l_18; l_18++, l_24++) {
-            if ((l_24->image >> 7) == 199 && (((int)(unsigned short)(l_24->image & 31)) - 2) == marker_kind) {
-                l_1C = (l_24->x - player_object->x) * (l_24->x - player_object->x);
-                l_1C += ((l_24->y - player_object->y) * (l_24->y - player_object->y)) * 2;
-                l_1C += (l_24->z - player_object->z) * (l_24->z - player_object->z);
-                if (l_1C != 0) l_1C = xn_math_isqrt(l_1C);
-                if (l_1C < marker_best) {
-                    marker_best = l_1C;
+        models = (struct block_model *)RECORD_DATA(object);
+        flat = (struct block_flat *)(models + object->model_count);
+        for (i = 0; object->flat_count > i; i++, flat++) {
+            if ((flat->image >> 7) == 199 && (((int)(unsigned short)(flat->image & 31)) - 2) == marker_kind) {
+                dist = (flat->x - player_object->x) * (flat->x - player_object->x);
+                dist += ((flat->y - player_object->y) * (flat->y - player_object->y)) * 2;
+                dist += (flat->z - player_object->z) * (flat->z - player_object->z);
+                if (dist != 0) dist = xn_math_isqrt(dist);
+                if (dist < marker_best) {
+                    marker_best = dist;
                     *(signed char *)found_marker = 34;
-                    D_00195F71 = l_24->x;
-                    D_00195F79 = l_24->z;
-                    D_00195F75 = l_24->y;
-                    D_00195F85 = l_24->image;
-                    D_00195F89 = a1->id;
+                    D_00195F71 = flat->x;
+                    D_00195F79 = flat->z;
+                    D_00195F75 = flat->y;
+                    D_00195F85 = flat->image;
+                    D_00195F89 = object->id;
                 }
             }
         }
@@ -254,32 +254,32 @@ void marker_nearest_cb(struct record *a1)
     }
 }
 
-struct record *marker_find_nearest(struct record *a1, int a2)
+struct record *marker_find_nearest(struct record *root, int kind)
 {
-    marker_kind = a2;
+    marker_kind = kind;
     marker_best = 500000;
     mc_memset((int)found_marker, 0, 71, (int)D_00177358, 432, 4);
-    object_foreach_open(a1, (int)marker_nearest_cb);
+    object_foreach_open(root, (int)marker_nearest_cb);
     if (*(signed char *)found_marker != 0) return (struct record *)found_marker;
     return 0;
 }
 
-int marker_count(struct record *a1, int a2)
+int marker_count(struct record *root, int kind)
 {
-    marker_kind = a2;
+    marker_kind = kind;
     *(int *)D_00195B84 = 0;
     marker_best = 1;
     mc_memset((int)found_marker, 0, 71, (int)D_00177358, 456, 4);
-    object_find_open(a1, (int)marker_match_cb);
+    object_find_open(root, (int)marker_match_cb);
     return *(int *)D_00195B84;
 }
 
-int player_to_nearest_marker(struct record *a1, int a2)
+int player_to_nearest_marker(struct record *root, int kind)
 {
-    struct record *l_18;
+    struct record *marker;
 
-    l_18 = marker_find_nearest(a1, a2);
-    if (l_18 != 0) {
+    marker = marker_find_nearest(root, kind);
+    if (marker != 0) {
         player_object->x = D_00195F71;
         player_object->y = D_00195F75;
         player_object->z = D_00195F79;
@@ -289,12 +289,12 @@ int player_to_nearest_marker(struct record *a1, int a2)
     return 0;
 }
 
-int player_to_random_marker(struct record *a1, int a2)
+int player_to_random_marker(struct record *root, int kind)
 {
-    struct record *l_18;
+    struct record *marker;
 
-    l_18 = marker_find_random(a1, a2);
-    if (l_18 != 0) {
+    marker = marker_find_random(root, kind);
+    if (marker != 0) {
         player_object->x = D_00195F71;
         player_object->y = D_00195F75;
         player_object->z = D_00195F79;
@@ -304,25 +304,25 @@ int player_to_random_marker(struct record *a1, int a2)
     return 0;
 }
 
-int location_cell_at(int a1, int a2)
+int location_cell_at(int x, int z)
 {
-    int l_18;
+    int cell;
 
-    a1 = ((a1 - location_object->x) + location_grid_x) / 1024;
-    a2 = ((a2 - location_object->z) + location_grid_z) / 1024;
-    l_18 = a1 + (a2 << 5);
-    return *(int *)(location_grid + (l_18 << 2));
+    x = ((x - location_object->x) + location_grid_x) / 1024;
+    z = ((z - location_object->z) + location_grid_z) / 1024;
+    cell = x + (z << 5);
+    return *(int *)(location_grid + (cell << 2));
 }
 
-int travel_map_open(int a1)
+int travel_map_open(int mode)
 {
-    short l_18;
+    short ticks_addr;
 
     if (((int)D_0019626F) == 19 && ((int)(unsigned char)game_mode) == 8) {
         return 1;
     }
     if (((int)player_environment) != 1) return 0;
-    if (a1 != 0) {
+    if (mode != 0) {
         if ((player_character->race == 8 || (player_class->flags & 16) != 0) && is_daytime != 0) {
             msgbox_show_string((int)D_00177364, 1);
             return 0;
@@ -337,9 +337,9 @@ int travel_map_open(int a1)
         if (((int)(unsigned short)(*(short *)travel_options & 8)) != 0 && player_character->ship_owned == 0 && gold_can_afford(travel_trip_cost()) == 0) {
             *(signed char *)travel_options ^= 12;
         }
-        D_001AA6A6 = *(signed char *)&a1;
+        D_001AA6A6 = *(signed char *)&mode;
         window_image = disk_read_file((int)D_00177394, 0);
-        if (a1 == 100) {
+        if (mode == 100) {
             D_001AA6A0 = disk_read_file((int)D_001773A1, 0);
         } else {
             D_001AA6A0 = disk_read_file((int)D_001773AE, 0);
@@ -355,8 +355,8 @@ int travel_map_open(int a1)
         *(int *)D_00195B5C = disk_read_file((int)D_00177423, 0);
         disk_read_file((int)D_00177430, *(int *)scratch_buffer);
         xn_pal_set_all_8bit(*(int *)scratch_buffer + 8);
-        *(int *)&l_18 = 1132;
-        scratch_190cac = *(int *)(*(char **)&l_18);
+        *(int *)&ticks_addr = 1132;
+        scratch_190cac = *(int *)(*(char **)&ticks_addr);
         D_001AA6A4 = (D_001AA6A5 = 0);
         scratch_190ce5 = (scratch_190ce4[0] = 0);
         *(int *)D_001AA668 = 0;

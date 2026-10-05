@@ -61,274 +61,274 @@ void place_assign_marker_monster(struct record *);
 void encounter_spawn_hidden(int);
 void encounter_spawn_ahead(int);
 
-int place_spawn_from_marker(struct record *a1)
+int place_spawn_from_marker(struct record *marker)
 {
-    int l_28;
-    int l_24;
-    struct character *l_20;
-    int l_1C;
+    int saved_on_ground;
+    int saved_ceiling;
+    struct character *character;
+    int monster_id;
     {
-        char l_54[12];
-        char l_48[28];
+        char position[12];
+        char scratch[28];
 
-        l_28 = (int)(unsigned char)player_on_ground;
-        l_24 = ceiling_height;
-        if ((a1->flags & 512) != 0) return 0;
-        if (place_marker_in_range(a1, 1) == 0) return 0;
+        saved_on_ground = (int)(unsigned char)player_on_ground;
+        saved_ceiling = ceiling_height;
+        if ((marker->flags & 512) != 0) return 0;
+        if (place_marker_in_range(marker, 1) == 0) return 0;
         if (*(int *)frame_counter < 5) return 0;
-        *(int *)((char *)l_48 + 24) = rand();
-        srand((int)(unsigned short)a1->spawn_seed);
-        *(int *)((char *)l_48 + 20) = (int)a1;
-        l_20 = &(*(struct record **)((char *)l_48 + 20))->data.character;
-        if ((((int)(unsigned short)(*(short *)(*(char **)((char *)l_48 + 20) + 27) & 31)) - 2) == 13) {
-            l_20->flags |= 64;
+        *(int *)((char *)scratch + 24) = rand();
+        srand((int)(unsigned short)marker->spawn_seed);
+        *(int *)((char *)scratch + 20) = (int)marker;
+        character = &(*(struct record **)((char *)scratch + 20))->data.character;
+        if ((((int)(unsigned short)(*(short *)(*(char **)((char *)scratch + 20) + 27) & 31)) - 2) == 13) {
+            character->flags |= 64;
         } else {
-            D_00196293 = a1->link_flag;
+            D_00196293 = marker->link_flag;
         }
-        l_1C = (int)(unsigned short)*(short *)(*(char **)((char *)l_48 + 20) + 19);
-        if ((l_1C & 128) == 0 && ((int)(unsigned short)(*(short *)(monster_table_flags + (l_1C * 29)) & 64)) != 0 && (dungeon_water_level == 10000 || (dungeon_water_level - 20) > *(int *)(*(char **)((char *)l_48 + 20) + 11))) {
+        monster_id = (int)(unsigned short)*(short *)(*(char **)((char *)scratch + 20) + 19);
+        if ((monster_id & 128) == 0 && ((int)(unsigned short)(*(short *)(monster_table_flags + (monster_id * 29)) & 64)) != 0 && (dungeon_water_level == 10000 || (dungeon_water_level - 20) > *(int *)(*(char **)((char *)scratch + 20) + 11))) {
             return 0;
         }
-        if (l_1C == (-1)) {
-            srand(*(int *)((char *)l_48 + 24));
+        if (monster_id == (-1)) {
+            srand(*(int *)((char *)scratch + 24));
             return 0;
         }
-        *(signed char *)(*(char **)((char *)l_48 + 20)) = 18;
-        *(signed char *)(*(char **)((char *)l_48 + 20) + 21) |= 1;
-        monster_init(*(struct record **)((char *)l_48 + 20), l_1C);
-        *(int *)(*(char **)((char *)l_48 + 20) + 11) -= 5;
-        l_20->team = 1;
-        l_20->career_id = *(short *)(*(char **)((char *)l_48 + 20) + 25);
-        l_20->target = 0;
-        monster_pacify_check(*(struct record **)((char *)l_48 + 20));
+        *(signed char *)(*(char **)((char *)scratch + 20)) = 18;
+        *(signed char *)(*(char **)((char *)scratch + 20) + 21) |= 1;
+        monster_init(*(struct record **)((char *)scratch + 20), monster_id);
+        *(int *)(*(char **)((char *)scratch + 20) + 11) -= 5;
+        character->team = 1;
+        character->career_id = *(short *)(*(char **)((char *)scratch + 20) + 25);
+        character->target = 0;
+        monster_pacify_check(*(struct record **)((char *)scratch + 20));
         D_00196293 = 0;
         D_001940D7 |= 32;
         D_001940D7 |= 128;
-        mc_memcpy((int)l_54, *(int *)((char *)l_48 + 20) + 7, 12, (int)D_00170788, 119, 4);
-        mc_memset((int)l_48, 0, 12, (int)D_00170788, 120, 4);
-        *(int *)((char *)l_48 + 12) = (int)D_00187B6E;
+        mc_memcpy((int)position, *(int *)((char *)scratch + 20) + 7, 12, (int)D_00170788, 119, 4);
+        mc_memset((int)scratch, 0, 12, (int)D_00170788, 120, 4);
+        *(int *)((char *)scratch + 12) = (int)D_00187B6E;
         player_motion_flags |= 8;
-        collide_move_object(*(struct record **)((char *)l_48 + 20), 0, (int)l_54, 0);
+        collide_move_object(*(struct record **)((char *)scratch + 20), 0, (int)position, 0);
         player_motion_flags &= 247;
-        player_on_ground = *(signed char *)&l_28;
-        ceiling_height = l_24;
-        srand(*(int *)((char *)l_48 + 24));
-        if (((int)(short)(*(short *)collide_flags & 1)) == 0) a1->flags |= 16;
+        player_on_ground = *(signed char *)&saved_on_ground;
+        ceiling_height = saved_ceiling;
+        srand(*(int *)((char *)scratch + 24));
+        if (((int)(short)(*(short *)collide_flags & 1)) == 0) marker->flags |= 16;
         return 1;
     }
 }
 
-int encounter_pick_monster(int a1)
+int encounter_pick_monster(int underwater)
 {
-    struct building *l_30;
-    int l_2C;
-    int l_28;
-    int l_24;
-    int l_20;
-    int l_1C;
+    struct building *building;
+    int table;
+    int n;
+    int in_town;
+    int low;
+    int high;
 
-    l_28 = -1;
-    l_24 = 0;
+    n = -1;
+    in_town = 0;
 L25BFC:;
     while (1) {
-        l_24 = 0;
-        l_28 = -1;
+        in_town = 0;
+        n = -1;
         if (((int)player_environment) != 3) {
             if ((int)location_here != 0) {
                 if (location_here_contains(player_object->x, player_object->z) != 0) {
-                    l_28 = ((unsigned)(location_here->x_type_flags << 2)) >> 27;
-                    l_24 = 1;
+                    n = ((unsigned)(location_here->x_type_flags << 2)) >> 27;
+                    in_town = 1;
                 }
             }
-            if (l_24 != 0) {
-                l_30 = object_building(player_object->parent);
-                if (l_30 != 0) {
-                    switch (l_30->type) {
+            if (in_town != 0) {
+                building = object_building(player_object->parent);
+                if (building != 0) {
+                    switch (building->type) {
                     case 11:
-                        l_28 = 40;
+                        n = 40;
                         break;
                     case 14:
-                        l_28 = 41;
+                        n = 41;
                         break;
                     case 16:
                     case 17:
-                        l_28 = 42;
+                        n = 42;
                         break;
                     case 18:
-                        l_28 = 43;
+                        n = 43;
                         break;
                     case 19:
-                        l_28 = 44;
+                        n = 44;
                         break;
                     default:
-                        l_28 = 39;
+                        n = 39;
                     }
                 } else {
                     if (daylight != 0) return -1;
-                    l_28 = climate_category();
-                    if (((int)(unsigned char)current_climate) == 232) l_28 = 232;
-                    switch ((unsigned)l_28) {
+                    n = climate_category();
+                    if (((int)(unsigned char)current_climate) == 232) n = 232;
+                    switch ((unsigned)n) {
                     case 0:
-                        l_28 = 20;
+                        n = 20;
                         break;
                     case 1:
-                        l_28 = 23;
+                        n = 23;
                         break;
                     case 2:
-                        l_28 = 26;
+                        n = 26;
                         break;
                     case 4:
-                        l_28 = 29;
+                        n = 29;
                         break;
                     case 5:
-                        l_28 = 32;
+                        n = 32;
                         break;
                     case 232:
-                        l_28 = 35;
+                        n = 35;
                     }
                 }
             } else {
-                l_28 = climate_category();
-                if (((int)(unsigned char)current_climate) == 232) l_28 = 232;
-                switch ((unsigned)l_28) {
+                n = climate_category();
+                if (((int)(unsigned char)current_climate) == 232) n = 232;
+                switch ((unsigned)n) {
                 case 0:
-                    l_28 = ((daylight != 0) ? 21 : 22);
+                    n = ((daylight != 0) ? 21 : 22);
                     break;
                 case 1:
-                    l_28 = ((daylight != 0) ? 24 : 25);
+                    n = ((daylight != 0) ? 24 : 25);
                     break;
                 case 2:
-                    l_28 = ((daylight != 0) ? 27 : 28);
+                    n = ((daylight != 0) ? 27 : 28);
                     break;
                 case 4:
-                    l_28 = ((daylight != 0) ? 30 : 31);
+                    n = ((daylight != 0) ? 30 : 31);
                     break;
                 case 5:
-                    l_28 = ((daylight != 0) ? 33 : 34);
+                    n = ((daylight != 0) ? 33 : 34);
                     break;
                 case 232:
-                    l_28 = ((daylight != 0) ? 36 : 37);
+                    n = ((daylight != 0) ? 36 : 37);
                 }
             }
         } else {
-            l_28 = current_location->kind;
+            n = current_location->kind;
         }
-        if (a1 != 0) l_28 = 19;
-        l_2C = encounter_tables[l_28];
-        l_28 = rand_range(1, 100);
-        if (l_28 <= 80) {
-            l_20 = player_character->level - 3;
-            l_1C = player_character->level + 3;
-        } else if (l_28 <= 95) {
-            l_20 = 0;
-            l_1C = player_character->level + 1;
+        if (underwater != 0) n = 19;
+        table = encounter_tables[n];
+        n = rand_range(1, 100);
+        if (n <= 80) {
+            low = player_character->level - 3;
+            high = player_character->level + 3;
+        } else if (n <= 95) {
+            low = 0;
+            high = player_character->level + 1;
         } else if (player_character->level > 5) {
-            l_20 = 0;
-            l_1C = 19;
+            low = 0;
+            high = 19;
         } else {
-            l_20 = 0;
-            l_1C = player_character->level + 2;
+            low = 0;
+            high = player_character->level + 2;
         }
-        if (l_20 < 0) {
-            l_20 = 0;
-            l_1C = 5;
+        if (low < 0) {
+            low = 0;
+            high = 5;
         }
-        if (l_1C > 19) {
-            l_20 = 14;
-            l_1C = 19;
+        if (high > 19) {
+            low = 14;
+            high = 19;
         }
-        l_28 = rand_range(l_20, l_1C);
-        if ((((int)(unsigned char)*(signed char *)((char *)(l_2C + l_28))) == 29 || ((int)(unsigned char)*(signed char *)((char *)(l_2C + l_28))) == 10 || ((int)(unsigned char)*(signed char *)((char *)(l_2C + l_28))) == 42) && ((int)(unsigned short)(game_settings->view_flags & 4)) != 0) {
+        n = rand_range(low, high);
+        if ((((int)(unsigned char)*(signed char *)((char *)(table + n))) == 29 || ((int)(unsigned char)*(signed char *)((char *)(table + n))) == 10 || ((int)(unsigned char)*(signed char *)((char *)(table + n))) == 42) && ((int)(unsigned short)(game_settings->view_flags & 4)) != 0) {
             goto L25BFC;
         }
-        if (is_daytime == 0 || ((int)player_environment) != 1 || (((int)(unsigned char)*(signed char *)((char *)(l_2C + l_28))) != 18 && ((int)(unsigned char)*(signed char *)((char *)(l_2C + l_28))) != 23)) {
+        if (is_daytime == 0 || ((int)player_environment) != 1 || (((int)(unsigned char)*(signed char *)((char *)(table + n))) != 18 && ((int)(unsigned char)*(signed char *)((char *)(table + n))) != 23)) {
             break;
         }
     }
-    return (int)(unsigned char)*(signed char *)((char *)(l_2C + l_28));
+    return (int)(unsigned char)*(signed char *)((char *)(table + n));
 }
 
-int place_marker_in_range(struct record *a1, int a2)
+int place_marker_in_range(struct record *marker, int mode)
 {
-    int l_20;
-    int l_1C;
-    int l_18;
+    int dy;
+    int distance;
+    int abs_dy;
     {
-        int l_30;
-        int l_2C;
+        int in_range_near;
+        int in_range_wide;
 
-        l_20 = a1->y - player_object->y;
-        l_18 = abs(l_20);
-        l_1C = xn_math_approx_dist2d(a1->x, a1->z, player_object->x, player_object->z);
-        if (((int)player_environment) == 1 && l_1C < 4096) return 1;
-        if (a2 == 0) {
-            if (a1->trigger_range >= 4) {
-                if (l_18 <= 768 && l_1C <= 768) {
-                    l_2C = 1;
+        dy = marker->y - player_object->y;
+        abs_dy = abs(dy);
+        distance = xn_math_approx_dist2d(marker->x, marker->z, player_object->x, player_object->z);
+        if (((int)player_environment) == 1 && distance < 4096) return 1;
+        if (mode == 0) {
+            if (marker->trigger_range >= 4) {
+                if (abs_dy <= 768 && distance <= 768) {
+                    in_range_wide = 1;
                 } else {
-                    l_2C = 0;
+                    in_range_wide = 0;
                 }
-                return l_2C;
+                return in_range_wide;
             }
-            if (l_18 <= 384 && l_1C <= 1024) {
-                l_30 = 1;
+            if (abs_dy <= 384 && distance <= 1024) {
+                in_range_near = 1;
             } else {
-                l_30 = 0;
+                in_range_near = 0;
             }
-            return l_30;
+            return in_range_near;
         }
         {
-            int l_4C;
-            int l_48;
-            int l_44;
-            int l_40;
-            int l_3C;
-            int l_38;
-            switch (a1->trigger_range) {
+            int in_range5;
+            int in_range4;
+            int in_range3;
+            int in_range2;
+            int in_range1;
+            int in_range0;
+            switch (marker->trigger_range) {
             case 0:
-                if (l_18 <= 128 && l_1C <= 1024) {
-                    l_38 = 1;
+                if (abs_dy <= 128 && distance <= 1024) {
+                    in_range0 = 1;
                 } else {
-                    l_38 = 0;
+                    in_range0 = 0;
                 }
-                return l_38;
+                return in_range0;
             case 1:
-                if (l_18 <= 128 && l_1C <= 384) {
-                    l_3C = 1;
+                if (abs_dy <= 128 && distance <= 384) {
+                    in_range1 = 1;
                 } else {
-                    l_3C = 0;
+                    in_range1 = 0;
                 }
-                return l_3C;
+                return in_range1;
             case 2:
-                if (l_18 <= 128 && l_1C <= 640) {
-                    l_40 = 1;
+                if (abs_dy <= 128 && distance <= 640) {
+                    in_range2 = 1;
                 } else {
-                    l_40 = 0;
+                    in_range2 = 0;
                 }
-                return l_40;
+                return in_range2;
             case 3:
-                if (l_18 <= 384 && l_1C <= 768) {
-                    l_44 = 1;
+                if (abs_dy <= 384 && distance <= 768) {
+                    in_range3 = 1;
                 } else {
-                    l_44 = 0;
+                    in_range3 = 0;
                 }
-                return l_44;
+                return in_range3;
             case 4:
-                if (l_20 <= 128 && l_20 >= (-768) && l_1C <= 768) {
-                    l_48 = 1;
+                if (dy <= 128 && dy >= (-768) && distance <= 768) {
+                    in_range4 = 1;
                 } else {
-                    l_48 = 0;
+                    in_range4 = 0;
                 }
-                return l_48;
+                return in_range4;
             case 5:
-                if (l_20 >= (-128) && l_20 <= 768 && l_1C <= 768) {
-                    l_4C = 1;
+                if (dy >= (-128) && dy <= 768 && distance <= 768) {
+                    in_range5 = 1;
                 } else {
-                    l_4C = 0;
+                    in_range5 = 0;
                 }
-                return l_4C;
+                return in_range5;
             case 6:
-                return (((l_18 <= 256) && (l_1C <= 768)) ? 1 : 0);
+                return (((abs_dy <= 256) && (distance <= 768)) ? 1 : 0);
             default:
                 return 0;
             }
@@ -336,67 +336,67 @@ int place_marker_in_range(struct record *a1, int a2)
     }
 }
 
-void place_assign_marker_monster(struct record *a1)
+void place_assign_marker_monster(struct record *marker)
 {
-    struct record *l_1C;
-    short l_18;
+    struct record *block;
+    short water_level;
 
-    if (a1->type != 34 || ((a1->image & 31) - 2) != 13) return;
-    l_1C = a1;
-    while (l_1C->type != 47) l_1C = l_1C->parent;
-    l_18 = l_1C->water_level;
-    if (((int)(short)l_18) < a1->y) {
-        a1->mobile_id = (unsigned short)(unsigned char)dungeon_water_monster_table[a1->mobile_id];
+    if (marker->type != 34 || ((marker->image & 31) - 2) != 13) return;
+    block = marker;
+    while (block->type != 47) block = block->parent;
+    water_level = block->water_level;
+    if (((int)(short)water_level) < marker->y) {
+        marker->mobile_id = (unsigned short)(unsigned char)dungeon_water_monster_table[marker->mobile_id];
         return;
     }
-    a1->mobile_id = (unsigned short)(unsigned char)dungeon_monster_table[a1->mobile_id];
+    marker->mobile_id = (unsigned short)(unsigned char)dungeon_monster_table[marker->mobile_id];
 }
 
 void dungeon_roll_monster_tables(void)
 {
-    int l_1C;
-    int l_18;
+    int i;
+    int saved_seed;
 
-    l_18 = rand();
+    saved_seed = rand();
     srand(((unsigned)location_object->id) >> 16);
-    for (l_1C = 0; l_1C < 256; l_1C++) {
-        dungeon_monster_table[l_1C] = encounter_pick_monster(0);
+    for (i = 0; i < 256; i++) {
+        dungeon_monster_table[i] = encounter_pick_monster(0);
     }
-    for (l_1C = 0; l_1C < 256; l_1C++) {
-        dungeon_water_monster_table[l_1C] = encounter_pick_monster(1);
+    for (i = 0; i < 256; i++) {
+        dungeon_water_monster_table[i] = encounter_pick_monster(1);
     }
     object_foreach(location_object, (int)place_assign_marker_monster);
-    srand(l_18);
+    srand(saved_seed);
 }
 
 void loan_spawn_collectors(void)
 {
-    int l_1C;
-    int l_18;
+    int count;
+    int i;
 
-    l_1C = rand_range(2, 5);
-    for (l_18 = 0; l_18 < l_1C; l_18++) {
+    count = rand_range(2, 5);
+    for (i = 0; i < count; i++) {
         encounter_spawn_hidden((int)(unsigned char)loan_collector_monsters[rand() & 3]);
     }
 }
 
-void encounter_tick(int a1, int a2)
+void encounter_tick(int minutes, int forced)
 {
     if (D_001962A0 != 0) return;
-    if (a2 == 0) {
+    if (forced == 0) {
         if (D_00196294 != 0) return;
-        if ((((unsigned)a1) % 12) != 0) return;
+        if ((((unsigned)minutes) % 12) != 0) return;
     }
     if (((int)player_environment) == 1) {
-        a1 = ((unsigned)a1) % 1440;
+        minutes = ((unsigned)minutes) % 1440;
         if (location_contains(player_object->x, player_object->z) != 0) {
-            if (a2 != 0 || ((unsigned)a1) < 360 || ((unsigned)a1) > 1080) {
-                if (a2 == 0 && rand_range(0, 23) != 0) return;
+            if (forced != 0 || ((unsigned)minutes) < 360 || ((unsigned)minutes) > 1080) {
+                if (forced == 0 && rand_range(0, 23) != 0) return;
                 encounter_spawn_hidden(encounter_pick_monster(0));
             }
         } else {
-            if (a2 == 0) {
-                if (((unsigned)a1) < 360 || ((unsigned)a1) > 1080) {
+            if (forced == 0) {
+                if (((unsigned)minutes) < 360 || ((unsigned)minutes) > 1080) {
                     if (rand_range(0, 23) != 0) return;
                 } else {
                     if (rand_range(0, 35) != 0) return;
@@ -412,38 +412,38 @@ void encounter_tick(int a1, int a2)
     encounter_spawn_hidden((int)(unsigned char)D_001951ED[rand() % 6]);
 }
 
-void encounter_spawn_hidden(int a1)
+void encounter_spawn_hidden(int monster_id)
 {
-    struct record *l_18;
+    struct record *creature;
 
-    if (a1 == (-1)) return;
-    l_18 = object_create_child(location_object, 0, 659);
-    l_18->type = 18;
-    l_18->flags |= 1;
-    l_18->id = object_new_id(((unsigned)location_object->id) >> 16);
-    monster_init(l_18, a1);
-    l_18->data.character.team = 1;
-    if (spawn_find_point(l_18, 384, 768) == 0) {
-        object_delete(l_18);
+    if (monster_id == (-1)) return;
+    creature = object_create_child(location_object, 0, 659);
+    creature->type = 18;
+    creature->flags |= 1;
+    creature->id = object_new_id(((unsigned)location_object->id) >> 16);
+    monster_init(creature, monster_id);
+    creature->data.character.team = 1;
+    if (spawn_find_point(creature, 384, 768) == 0) {
+        object_delete(creature);
         return;
     }
     D_00196299 = 1;
 }
 
-void encounter_spawn_ahead(int a1)
+void encounter_spawn_ahead(int monster_id)
 {
-    struct record *l_18;
+    struct record *creature;
 
-    if (a1 == (-1)) return;
-    l_18 = object_create_child(location_object, 0, 659);
-    l_18->type = 18;
-    l_18->flags |= 1;
-    l_18->id = object_new_id(((unsigned)location_object->id) >> 16);
-    monster_init(l_18, a1);
-    l_18->data.character.team = 1;
-    xn_math_yaw_offset_xz(player_object->yaw, 1024, &l_18->x, &l_18->z);
-    l_18->x += player_object->x;
-    l_18->z += player_object->z;
-    l_18->y = xn_terrain_height_at(l_18->x, l_18->z);
+    if (monster_id == (-1)) return;
+    creature = object_create_child(location_object, 0, 659);
+    creature->type = 18;
+    creature->flags |= 1;
+    creature->id = object_new_id(((unsigned)location_object->id) >> 16);
+    monster_init(creature, monster_id);
+    creature->data.character.team = 1;
+    xn_math_yaw_offset_xz(player_object->yaw, 1024, &creature->x, &creature->z);
+    creature->x += player_object->x;
+    creature->z += player_object->z;
+    creature->y = xn_terrain_height_at(creature->x, creature->z);
     D_00196299 = 1;
 }

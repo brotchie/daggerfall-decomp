@@ -12,31 +12,31 @@ extern void inv_use_item(void);
 extern void inv_item_info(int, int);
 extern void inv_equip_item(int);
 
-void inv_click_right_item(int a1)
+void inv_click_right_item(struct record *object)
 {
-    int l_18;
+    struct item *item;
     {
-        int l_20;
+        int action;
 
-        inv_selected_item = (struct record *)a1;
-        l_18 = a1 + 71;
-        l_20 = inventory_action - 1;
-        switch (l_20) {
+        inv_selected_item = object;
+        item = &object->data.item;
+        action = inventory_action - 1;
+        switch (action) {
         case 0:
-            inv_item_info((int)inv_selected_item, l_18);
+            inv_item_info((int)inv_selected_item, (int)item);
             return;
         case 1:
-            if (inv_selected_item->type == 54 && ((unsigned)game_minutes) < *(int *)((char *)a1 + 43)) {
+            if (inv_selected_item->type == 54 && ((unsigned)game_minutes) < object->repair_due) {
                 return;
             }
-            if (((int)(unsigned short)(*(short *)((char *)a1 + 21) & 32)) != 0 && ((int)(short)*(short *)((char *)l_18 + 67)) != (-1)) {
+            if (((int)(unsigned short)(object->flags & 32)) != 0 && item->enchantments[0].type != (-1)) {
                 inv_take_item((int)inv_selected_item);
             } else if (inv_take_item((int)inv_selected_item) != 0) {
                 inv_equip_item((int)inv_selected_item);
             }
             return;
         case 2:
-            if (inv_selected_item->type == 54 && ((unsigned)game_minutes) < *(int *)((char *)a1 + 43)) {
+            if (inv_selected_item->type == 54 && ((unsigned)game_minutes) < object->repair_due) {
                 return;
             }
             inv_take_item((int)inv_selected_item);

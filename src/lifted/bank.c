@@ -145,12 +145,12 @@ void bank_deposit_letter(struct record *);
 void func_0006CB02(void);
 #pragma aux mc_set_location parm routine [];
 
-int bank_open(int a1)
+int bank_open(int opening)
 {
     if (((int)(unsigned char)game_mode) == 8 && ((int)D_0019626F) == 15) {
         return 1;
     }
-    if (a1 != 0) {
+    if (opening != 0) {
         while (mouse_buttons != 0) xn_mouse_poll_clamped();
         D_001A41E4 = 0;
         window_image = disk_read_file((int)D_00175C90, 0);
@@ -210,9 +210,9 @@ void bank_close(void)
 
 void bank_frame(void)
 {
-    int l_20;
-    int l_1C;
-    int l_18;
+    int i;
+    int first;
+    int last;
 
     if (bank_open(0) == 0) return;
     bank_draw();
@@ -220,49 +220,49 @@ void bank_frame(void)
     if (mouse_buttons == 0 || mouse_buttons_prev != 0) return;
     switch (bank_screen) {
     case 0:
-        l_1C = 0;
-        l_18 = 11;
+        first = 0;
+        last = 11;
         break;
     case 1:
-        l_1C = 11;
-        l_18 = 16;
+        first = 11;
+        last = 16;
         break;
     case 2:
-        l_1C = 16;
-        l_18 = 19;
+        first = 16;
+        last = 19;
     }
-    for (l_20 = l_1C; l_20 < l_18; l_20++) {
-        if (mouse_x > *(short *)(bank_buttons + (l_20 * 12)) && mouse_x < *(short *)(D_00186E28 + (l_20 * 12)) && mouse_y > *(short *)(D_00186E26 + (l_20 * 12)) && mouse_y < *(short *)(D_00186E2A + (l_20 * 12))) {
+    for (i = first; i < last; i++) {
+        if (mouse_x > *(short *)(bank_buttons + (i * 12)) && mouse_x < *(short *)(D_00186E28 + (i * 12)) && mouse_y > *(short *)(D_00186E26 + (i * 12)) && mouse_y < *(short *)(D_00186E2A + (i * 12))) {
             sound_play(203, (int)player_object, 100);
-            ((int (*)())(*(int *)(D_00186E2C + (l_20 * 12))))();
+            ((int (*)())(*(int *)(D_00186E2C + (i * 12))))();
         }
     }
 }
 
-void bank_add_house_for_sale(struct record *a1)
+void bank_add_house_for_sale(struct record *object)
 {
-    int l_28;
-    int l_24;
-    struct building *l_20;
-    struct block *l_1C;
-    struct block_model *l_18;
+    int i;
+    int max_radius;
+    struct building *building;
+    struct block *block;
+    struct block_model *model;
 
-    if (a1->type != 43) return;
-    if (a1->children == 0) return;
+    if (object->type != 43) return;
+    if (object->children == 0) return;
     if (((int)(unsigned char)bank_house_count) == 20) return;
-    l_20 = &current_location->buildings[a1->image];
-    if (a1->id != l_20->id || l_20->type != 1) return;
-    l_1C = (struct block *)(*(int *)(bank_houses_for_sale + (((int)(unsigned char)bank_house_count) * 20)) = (int)RECORD_DATA(a1));
-    l_18 = l_1C->models;
-    *(int *)(D_001A3FB0 + (((int)(unsigned char)bank_house_count) * 20)) = (int)l_20;
-    *(int *)(D_001A3FB8 + (((int)(unsigned char)bank_house_count) * 20)) = a1->id;
-    *(int *)(D_001A3FBC + (((int)(unsigned char)bank_house_count) * 20)) = l_18->yaw;
-    l_24 = 0;
-    for (l_28 = l_24; l_1C->model_count > l_28; l_28++, l_18++) {
-        l_18->model = (char *)model_get(l_18->id, l_18->variant, (((int)(unsigned char)current_climate) << 2) + ((int)(unsigned char)climate_weathers[(int)(unsigned char)current_region]));
-        if (*(int *)(l_18->model + 12) > l_24) l_24 = *(int *)(l_18->model + 12);
+    building = &current_location->buildings[object->image];
+    if (object->id != building->id || building->type != 1) return;
+    block = (struct block *)(*(int *)(bank_houses_for_sale + (((int)(unsigned char)bank_house_count) * 20)) = (int)RECORD_DATA(object));
+    model = block->models;
+    *(int *)(D_001A3FB0 + (((int)(unsigned char)bank_house_count) * 20)) = (int)building;
+    *(int *)(D_001A3FB8 + (((int)(unsigned char)bank_house_count) * 20)) = object->id;
+    *(int *)(D_001A3FBC + (((int)(unsigned char)bank_house_count) * 20)) = model->yaw;
+    max_radius = 0;
+    for (i = max_radius; block->model_count > i; i++, model++) {
+        model->model = (char *)model_get(model->id, model->variant, (((int)(unsigned char)current_climate) << 2) + ((int)(unsigned char)climate_weathers[(int)(unsigned char)current_region]));
+        if (*(int *)(model->model + 12) > max_radius) max_radius = *(int *)(model->model + 12);
     }
-    *(int *)(D_001A3FB4 + (((int)(unsigned char)bank_house_count) * 20)) = l_24 * 5;
+    *(int *)(D_001A3FB4 + (((int)(unsigned char)bank_house_count) * 20)) = max_radius * 5;
     bank_house_count++;
 }
 
@@ -283,46 +283,46 @@ void bank_init_ships(void)
 
 void bank_deposit_gold(void)
 {
-    int l_18;
+    int amount;
 
-    l_18 = bank_input_amount();
-    if (l_18 < 1) return;
-    if (((unsigned)player_character->gold) < l_18) {
+    amount = bank_input_amount();
+    if (amount < 1) return;
+    if (((unsigned)player_character->gold) < amount) {
         msgbox_show_rsc(454, 1);
         return;
     }
-    bank_account->balance += l_18;
-    player_character->gold -= l_18;
+    bank_account->balance += amount;
+    player_character->gold -= amount;
 }
 
 void bank_withdraw_gold(void)
 {
-    int l_18;
+    int amount;
 
     if (bank_account->balance <= 0) return;
-    l_18 = bank_input_amount();
-    if (l_18 < 1) return;
-    if (bank_account->balance < l_18) {
+    amount = bank_input_amount();
+    if (amount < 1) return;
+    if (bank_account->balance < amount) {
         if (bank_confirm(290) == 0) return;
-        l_18 = bank_account->balance;
+        amount = bank_account->balance;
     }
-    if (gold_can_carry(l_18) != 0) {
-        bank_account->balance -= l_18;
-        player_character->gold += l_18;
+    if (gold_can_carry(amount) != 0) {
+        bank_account->balance -= amount;
+        player_character->gold += amount;
         return;
     }
     msgbox_show_string((int)D_00175CD0, 1);
 }
 
-void bank_deposit_letter(struct record *a1)
+void bank_deposit_letter(struct record *object)
 {
-    struct item *l_18;
+    struct item *item;
 
-    if (a1->type != 2) return;
-    l_18 = &a1->data.item;
-    if (l_18->group != 27 || l_18->index != 2) return;
-    bank_account->balance += l_18->value;
-    object_delete(a1);
+    if (object->type != 2) return;
+    item = &object->data.item;
+    if (item->group != 27 || item->index != 2) return;
+    bank_account->balance += item->value;
+    object_delete(object);
 }
 
 void bank_deposit_letters_of_credit(void)
@@ -333,33 +333,33 @@ void bank_deposit_letters_of_credit(void)
 
 void bank_withdraw_letter_of_credit(void)
 {
-    int l_20;
-    int l_1C;
-    struct record *l_18;
+    int fee;
+    int amount;
+    struct record *letter;
 
     if (bank_account->balance <= 0) return;
-    l_1C = bank_input_amount();
-    if (l_1C < 1) return;
-    if (l_1C < 100) {
+    amount = bank_input_amount();
+    if (amount < 1) return;
+    if (amount < 100) {
         msgbox_show_rsc(293, 1);
         return;
     }
-    l_20 = (l_1C / 100) + 1;
-    if ((l_20 + l_1C) > bank_account->balance) {
+    fee = (amount / 100) + 1;
+    if ((fee + amount) > bank_account->balance) {
         msgbox_show_rsc(292, 1);
         return;
     }
-    bank_account->balance -= l_20 + l_1C;
-    l_18 = object_create_child(D_001959E0, 0, 107);
-    l_18->type = 2;
-    l_18->flags = 1;
-    item_make(27, 2, &l_18->data.item);
-    l_18->data.item.value = l_1C;
+    bank_account->balance -= fee + amount;
+    letter = object_create_child(D_001959E0, 0, 107);
+    letter->type = 2;
+    letter->flags = 1;
+    item_make(27, 2, &letter->data.item);
+    letter->data.item.value = amount;
 }
 
 void bank_borrow(void)
 {
-    int l_18;
+    int amount;
 
     if (((int)(unsigned char)(bank_account->flags & 1)) != 0) {
         msgbox_show_rsc(288, 1);
@@ -369,19 +369,19 @@ void bank_borrow(void)
         msgbox_show_rsc(289, 1);
         return;
     }
-    l_18 = bank_input_amount();
-    if (l_18 < 1) return;
-    if (l_18 < 100) {
+    amount = bank_input_amount();
+    if (amount < 1) return;
+    if (amount < 100) {
         msgbox_show_rsc(296, 1);
         return;
     }
-    if ((player_character->level * 50000) < l_18) {
+    if ((player_character->level * 50000) < amount) {
         msgbox_show_rsc(295, 1);
         return;
     }
     bank_account->loan_due = game_minutes + 518400;
-    bank_account->loan_owed = l_18 + ((l_18 * 10) / 100);
-    bank_account->balance += l_18;
+    bank_account->loan_owed = amount + ((amount * 10) / 100);
+    bank_account->balance += amount;
 }
 
 void bank_buy_house(void)
@@ -432,17 +432,17 @@ void bank_sell_ship(void)
     player_character->ship_owned = 0;
 }
 
-void bank_draw_preview(int a1, int a2)
+void bank_draw_preview(int model_count, struct block_model *models)
 {
-    int l_2C;
-    int l_28;
-    int l_24;
-    int l_20;
-    int l_1C;
-    struct block_model *l_18;
-    int l_14;
+    int i;
+    int origin_x;
+    int origin_y;
+    int origin_z;
+    int render_result;
+    struct block_model *model;
+    int *bios_ticks;
 
-    l_18 = (struct block_model *)a2;
+    model = models;
     xn_cam_far_z = 1048576;
     xn_shade_set_fog(-1);
     xn_light_ambient = 16128;
@@ -467,93 +467,93 @@ void bank_draw_preview(int a1, int a2)
     xn_light_reset();
     xn_mat_from_angles(xn_cam_pitch, xn_cam_yaw, xn_cam_roll, (int)xn_cam_rotation);
     xn_cam_scale_matrix((int)xn_cam_rotation, (int)xn_cam_view_matrix);
-    for (l_2C = 0; l_2C < a1; l_2C++, l_18++) {
-        if (l_18->id > 10 && l_18->id != 415) continue;
-        l_28 = l_18->x;
-        l_24 = l_18->y;
-        l_20 = l_18->z;
+    for (i = 0; i < model_count; i++, model++) {
+        if (model->id > 10 && model->id != 415) continue;
+        origin_x = model->x;
+        origin_y = model->y;
+        origin_z = model->z;
     }
-    l_18 = (struct block_model *)a2;
-    for (l_2C = 0; l_2C < a1; l_2C++, l_18++) {
-        l_18->x -= l_28;
-        l_18->y -= l_24;
-        l_18->z -= l_20;
+    model = models;
+    for (i = 0; i < model_count; i++, model++) {
+        model->x -= origin_x;
+        model->y -= origin_y;
+        model->z -= origin_z;
     }
-    l_18 = (struct block_model *)a2;
-    for (l_2C = 0; l_2C < a1; l_2C++, l_18++) {
-        l_18->model = (char *)model_get(l_18->id, l_18->variant, (((int)(unsigned char)current_climate) << 2) + ((int)(unsigned char)climate_weathers[(int)(unsigned char)current_region]));
-        if (l_18->model != 0) {
-            l_14 = 1132;
-            l_18->yaw = ((*(int *)((char *)l_14) & 2047) << 4) & 2047;
-            xn_model_submit((int)&l_18->model, 0);
+    model = models;
+    for (i = 0; i < model_count; i++, model++) {
+        model->model = (char *)model_get(model->id, model->variant, (((int)(unsigned char)current_climate) << 2) + ((int)(unsigned char)climate_weathers[(int)(unsigned char)current_region]));
+        if (model->model != 0) {
+            bios_ticks = (int *)1132;
+            model->yaw = ((*bios_ticks & 2047) << 4) & 2047;
+            xn_model_submit((int)&model->model, 0);
             break;
         }
     }
-    l_1C = xn_render_frame(2);
-    if (l_1C != 0 || xn_tex_cache_full != 0) {
+    render_result = xn_render_frame(2);
+    if (render_result != 0 || xn_tex_cache_full != 0) {
         xn_tex_cache_full = 0;
         xn_tex_cache_flush();
     }
-    l_18 = (struct block_model *)a2;
-    for (l_2C = 0; l_2C < a1; l_2C++, l_18++) {
-        l_18->x += l_28;
-        l_18->y += l_24;
-        l_18->z += l_20;
+    model = models;
+    for (i = 0; i < model_count; i++, model++) {
+        model->x += origin_x;
+        model->y += origin_y;
+        model->z += origin_z;
     }
 }
 
 void bank_draw_house_list(void)
 {
-    int l_20;
-    int l_1C;
-    int l_18;
+    int row;
+    int colour;
+    int arrow_image;
 
-    for (l_20 = *(int *)bank_list_top; (*(int *)bank_list_top + 11) > l_20; l_20++) {
-        if (((int)(unsigned char)bank_selected) == l_20) {
-            l_1C = 246;
+    for (row = *(int *)bank_list_top; (*(int *)bank_list_top + 11) > row; row++) {
+        if (((int)(unsigned char)bank_selected) == row) {
+            colour = 246;
         } else {
-            l_1C = 146;
+            colour = 146;
         }
         mc_set_location(573, (int)D_00175CC4);
-        mc_sprintf((int)text_buffer, (int)D_00175CEF, *(int *)(D_001A3FB4 + (l_20 * 20)));
-        text_draw_coloured((int)text_buffer, 52, (int)(short)(((l_20 - *(short *)bank_list_top) * 7) + 38), (int)(short)*(short *)&l_1C, 156);
+        mc_sprintf((int)text_buffer, (int)D_00175CEF, *(int *)(D_001A3FB4 + (row * 20)));
+        text_draw_coloured((int)text_buffer, 52, (int)(short)(((row - *(short *)bank_list_top) * 7) + 38), (int)(short)*(short *)&colour, 156);
     }
     if (*(int *)bank_list_top != 0) {
-        l_18 = D_001A41E8;
+        arrow_image = D_001A41E8;
     } else {
-        l_18 = D_001A4140;
+        arrow_image = D_001A4140;
     }
-    xn_draw_image_transparent(153, 38, 9, 20, l_18);
+    xn_draw_image_transparent(153, 38, 9, 20, arrow_image);
     if ((*(int *)bank_list_top + 11) < ((int)(unsigned char)bank_house_count)) {
-        l_18 = D_001A41E8;
+        arrow_image = D_001A41E8;
     } else {
-        l_18 = D_001A4140;
+        arrow_image = D_001A4140;
     }
-    xn_draw_image_transparent(153, 102, 9, 16, l_18 + 576);
+    xn_draw_image_transparent(153, 102, 9, 16, arrow_image + 576);
 }
 
 void bank_draw_ship_list(void)
 {
-    int l_1C;
-    short l_18;
+    int row;
+    short colour;
 
-    for (l_1C = 0; ((int)(unsigned char)bank_ship_count) > l_1C; l_1C++) {
-        if (((int)(unsigned char)bank_selected) == l_1C) {
-            *(int *)&l_18 = 246;
+    for (row = 0; ((int)(unsigned char)bank_ship_count) > row; row++) {
+        if (((int)(unsigned char)bank_selected) == row) {
+            *(int *)&colour = 246;
         } else {
-            *(int *)&l_18 = 146;
+            *(int *)&colour = 146;
         }
-        text_draw_coloured(itoa(*(int *)(D_001A418E + (l_1C * 74)), (int)text_rsc_buffer, 10), 52, (int)(short)((l_1C * 7) + 38), (int)(short)l_18, 156);
+        text_draw_coloured(itoa(*(int *)(D_001A418E + (row * 74)), (int)text_rsc_buffer, 10), 52, (int)(short)((row * 7) + 38), (int)(short)colour, 156);
     }
 }
 
 void bank_house_list_click(void)
 {
-    int l_18;
+    int row;
 
-    l_18 = (int)(*(char **)bank_list_top + ((((int)(short)mouse_y) - 38) / 7));
-    if (((int)(unsigned char)bank_house_count) <= l_18) return;
-    bank_selected = *(signed char *)&l_18;
+    row = (int)(*(char **)bank_list_top + ((((int)(short)mouse_y) - 38) / 7));
+    if (((int)(unsigned char)bank_house_count) <= row) return;
+    bank_selected = *(signed char *)&row;
 }
 
 void bank_house_list_up(void)
@@ -571,11 +571,11 @@ void bank_house_list_down(void)
 
 void bank_ship_list_click(void)
 {
-    int l_18;
+    int row;
 
-    l_18 = (((int)(short)mouse_y) - 38) / 7;
-    if (((int)(unsigned char)bank_ship_count) <= l_18) return;
-    bank_selected = *(signed char *)&l_18;
+    row = (((int)(short)mouse_y) - 38) / 7;
+    if (((int)(unsigned char)bank_ship_count) <= row) return;
+    bank_selected = *(signed char *)&row;
 }
 
 void bank_house_bought(void)
@@ -613,9 +613,9 @@ void bank_list_exit(void)
     bank_screen = 0;
 }
 
-int bank_confirm(int a1)
+int bank_confirm(int text_id)
 {
-    msgbox_yes_no_rsc(a1);
+    msgbox_yes_no_rsc(text_id);
     while (1) {
         mouse_buttons_prev = mouse_buttons;
         xn_mouse_poll_clamped();
@@ -630,22 +630,22 @@ int bank_confirm(int a1)
 
 int bank_input_amount(void)
 {
-    int l_20;
-    int l_1C;
+    int done;
+    char *input;
 
-    l_20 = 0;
+    done = 0;
     D_0012B508 = 146;
-    l_1C = *(int *)scratch_buffer + 55000;
-    *(signed char *)((char *)l_1C) = 0;
+    input = *(char **)scratch_buffer + 55000;
+    *input = 0;
     *(signed char *)D_00191020 = 0;
     text_cursor_x = 157;
     text_cursor_y = 152;
     inpstr_begin_text((int)D_00191020, 10);
     xn_kbd_flush();
     mouse_buttons = (mouse_buttons_prev = 0);
-    while (l_20 == 0) {
+    while (done == 0) {
         bank_draw();
-        l_20 = inpstr_update();
+        done = inpstr_update();
         xn_gfx_present_inclusive(1);
     }
     return atoi((int)D_00191020);
@@ -653,9 +653,9 @@ int bank_input_amount(void)
 
 void func_0006CB02(void)
 {
-    int l_18;
+    int i;
 
-    for (l_18 = 0; ((int)(unsigned char)bank_house_count) > l_18; l_18++) {
-        *(int *)(*(char **)(*(char **)(bank_houses_for_sale + (l_18 * 20)) + 5) + 52) = *(int *)(D_001A3FBC + (l_18 * 20));
+    for (i = 0; ((int)(unsigned char)bank_house_count) > i; i++) {
+        *(int *)(*(char **)(*(char **)(bank_houses_for_sale + (i * 20)) + 5) + 52) = *(int *)(D_001A3FBC + (i * 20));
     }
 }

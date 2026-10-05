@@ -7,16 +7,16 @@ extern char monster_soul_values[];
 
 extern int enchant_spell_cost(unsigned char);
 
-int enchant_value_slot_cost(int a1, unsigned char a2, unsigned char a3, int a4)
+int enchant_value_slot_cost(int cost_code, unsigned char param, unsigned char as_points, int power)
 {
-    int l_1C;
+    int cost;
 
-    if (a1 == 99) {
-        l_1C = *(int *)(monster_soul_values + (((int)(unsigned char)a2) << 2));
-        if (a3 != 0) l_1C = l_1C / 100;
-        if (l_1C == 10) l_1C = l_1C * ((int)(unsigned char)a2);
-        return -(l_1C);
+    if (cost_code == 99) {
+        cost = *(int *)(monster_soul_values + (((int)(unsigned char)param) << 2));
+        if (as_points != 0) cost = cost / 100;
+        if (cost == 10) cost = cost * ((int)(unsigned char)param);
+        return -(cost);
     }
-    if (a1 >= 5 && a1 <= 7) return enchant_spell_cost((int)(unsigned char)a2);
-    return (int)(short)enchant_fixed_costs[a1];
+    if (cost_code >= 5 && cost_code <= 7) return enchant_spell_cost((int)(unsigned char)param);
+    return (int)(short)enchant_fixed_costs[cost_code];
 }

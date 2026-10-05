@@ -15,26 +15,26 @@ extern int xn_math_approx_dist2d(int, int, int, int);
 extern int xn_math_approx_hypot(int, int);
 extern int xn_str_find_u32(char *, struct record *, int);
 
-void inv_list_right_item(struct record *a1, int a2)
+void inv_list_right_item(struct record *object, int rects)
 {
-    struct item *s;
+    struct item *item;
 
-    if (a1->type != 2 && a1->type != 54 || (a1->flags & 2))
+    if (object->type != 2 && object->type != 54 || (object->flags & 2))
         return;
-    if (a1->flags & 0x200)
+    if (object->flags & 0x200)
         return;
-    if ((D_001940D6 & 4) && a1->owner != picked_model_index)
+    if ((D_001940D6 & 4) && object->owner != picked_model_index)
         return;
-    if ((!(D_001940D6 & 4) && a1->parent != wagon_container ? 1 : 0) && xn_math_approx_hypot(a1->z - player_object->z, xn_math_approx_dist2d(a1->x, a1->y, player_object->x, player_object->y)) > 160)
+    if ((!(D_001940D6 & 4) && object->parent != wagon_container ? 1 : 0) && xn_math_approx_hypot(object->z - player_object->z, xn_math_approx_dist2d(object->x, object->y, player_object->x, player_object->y)) > 160)
         return;
     if (D_001AA588 >= inv_right_scroll && D_001AA588 < inv_right_scroll + 4) {
-        if (!(D_001940D8 & 4) && xn_str_find_u32((char *)player_character->equipped, a1, 27) != 0) {
-            s = &a1->data.item;
-            if (s->group != 1)
+        if (!(D_001940D8 & 4) && xn_str_find_u32((char *)player_character->equipped, object, 27) != 0) {
+            item = &object->data.item;
+            if (item->group != 1)
                 return;
         }
-        inv_right_rows[D_001AA588 - inv_right_scroll] = a1;
-        inv_draw_item_cell(a1, D_001AA588 - inv_right_scroll, a2);
+        inv_right_rows[D_001AA588 - inv_right_scroll] = object;
+        inv_draw_item_cell(object, D_001AA588 - inv_right_scroll, rects);
     }
     D_001AA588++;
 }

@@ -17,29 +17,29 @@ extern void lseek(int, int, int);
 extern void read(int, char *, int);
 extern short *xn_str_find_u16(short *, short, int);
 
-void npc_load_face(struct record *a1, char *a2)
+void npc_load_face(struct record *npc, char *face)
 {
-    short *p;
-    struct snd *q;
-    int v;
-    int h;
-    short seed;
+    short *found_sprite;
+    struct snd *flat;
+    int offset;
+    int file;
+    short saved_seed;
 
-    seed = rand();
-    srand(a1->id | (a1->id >> 16));
-    p = xn_str_find_u16(D_0017B66D, a1->image >> 7, 24);
-    if (p == 0) {
-        q = flats_cfg_find(a1->image);
-        if (q != 0 && q->len != 0)
-            v = q->len << 12;
+    saved_seed = rand();
+    srand(npc->id | (npc->id >> 16));
+    found_sprite = xn_str_find_u16(D_0017B66D, npc->image >> 7, 24);
+    if (found_sprite == 0) {
+        flat = flats_cfg_find(npc->image);
+        if (flat != 0 && flat->len != 0)
+            offset = flat->len << 12;
         else
-            v = (D_0017B69D[D_0017B667[climate_category()] * 8 + (rand() & 3) + ((text_macro_npc->flags & 1) != 0 ? 4 : 0)] + rand() % 10) << 12;
+            offset = (D_0017B69D[D_0017B667[climate_category()] * 8 + (rand() & 3) + ((text_macro_npc->flags & 1) != 0 ? 4 : 0)] + rand() % 10) << 12;
     } else {
-        v = (D_0017B69D[((int)p - (int)D_0017B66D) / 2] + rand() % 24) << 12;
+        offset = (D_0017B69D[((int)found_sprite - (int)D_0017B66D) / 2] + rand() % 24) << 12;
     }
-    h = disk_open_data(D_00170DC9);
-    lseek(h, v, 0);
-    read(h, a2, 4096);
-    close(h);
-    srand(seed);
+    file = disk_open_data(D_00170DC9);
+    lseek(file, offset, 0);
+    read(file, face, 4096);
+    close(file);
+    srand(saved_seed);
 }

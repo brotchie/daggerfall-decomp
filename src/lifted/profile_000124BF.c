@@ -9,36 +9,36 @@ extern int mc_memmove();
 #pragma aux sosconv "*" parm caller [] value [eax] modify [eax ebx ecx edx];
 #pragma aux (sosconv) profile_set_string;
 
-int profile_set_string(int a1, int a2)
+int profile_set_string(int profile, char *value)
 {
-    int l_20;
-    int l_1C;
-    int l_18;
-    int l_14;
-    int l_10;
+    char *cursor;
+    char *start;
+    int count;
+    int new_length;
+    int old_length;
 
-    l_20 = *(int *)((char *)a1 + 160);
-    if (l_20 == 0) return 0;
-    l_10 = 0;
-    while (((int)(unsigned char)*(signed char *)((char *)l_20)) == 32) l_20++;
-    l_1C = l_20;
-    while (((int)(unsigned char)*(signed char *)((char *)l_20++)) != 13) l_10++;
-    l_14 = strlen(a2);
-    if (((unsigned)l_14) < l_10) {
-        l_18 = ((int)(*(char **)((char *)a1 + 132) + *(int *)((char *)a1 + 136)) - l_1C) - (l_10 - l_14);
-        mc_memmove(l_1C, (l_10 - l_14) + l_1C, l_18, (int)D_00170129, 870, 4);
-        *(int *)((char *)a1 + 136) -= l_10 - l_14;
-    } else if (((unsigned)l_14) > l_10) {
-        if (((unsigned)((l_14 - l_10) + *(int *)((char *)a1 + 136))) > *(int *)((char *)a1 + 140)) {
+    cursor = *(char **)((char *)profile + 160);
+    if (cursor == 0) return 0;
+    old_length = 0;
+    while (*cursor == 32) cursor++;
+    start = cursor;
+    while (*cursor++ != 13) old_length++;
+    new_length = strlen(value);
+    if (((unsigned)new_length) < old_length) {
+        count = (*(char **)((char *)profile + 132) + *(int *)((char *)profile + 136) - start) - (old_length - new_length);
+        mc_memmove(start, (old_length - new_length) + start, count, (int)D_00170129, 870, 4);
+        *(int *)((char *)profile + 136) -= old_length - new_length;
+    } else if (((unsigned)new_length) > old_length) {
+        if (((unsigned)((new_length - old_length) + *(int *)((char *)profile + 136))) > *(int *)((char *)profile + 140)) {
             return 0;
         }
-        l_18 = ((int)(*(char **)((char *)a1 + 132) + *(int *)((char *)a1 + 136)) - l_1C) + (l_14 - l_10);
-        mc_memmove((l_14 - l_10) + l_1C, l_1C, l_18, (int)D_00170129, 888, 4);
-        *(int *)((char *)a1 + 136) += l_14 - l_10;
+        count = (*(char **)((char *)profile + 132) + *(int *)((char *)profile + 136) - start) + (new_length - old_length);
+        mc_memmove((new_length - old_length) + start, start, count, (int)D_00170129, 888, 4);
+        *(int *)((char *)profile + 136) += new_length - old_length;
     }
-    while (*(signed char *)((char *)a2) != 0) {
-        *(signed char *)((char *)l_1C++) = *(signed char *)((char *)a2++);
+    while (*value != 0) {
+        *start++ = *value++;
     }
-    *(signed char *)((char *)a1 + 1) |= 128;
+    *(signed char *)((char *)profile + 1) |= 128;
     return 1;
 }

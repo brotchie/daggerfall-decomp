@@ -35,12 +35,12 @@ extern short func_000A2460(int, int);
 extern int func_000A2504(int, struct voice *);
 extern void func_000A2687(int, int);
 
-int sound_play_sample(int a1, int a2, struct record *a3, int a4)
+int sound_play_sample(int sample, int length, struct record *object, int priority)
 {
     int i;
-    int vol;
-    int x;
-    int u;
+    int volume;
+    int pan;
+    int unused;
     int loop;
 
     loop = 0;
@@ -48,8 +48,8 @@ int sound_play_sample(int a1, int a2, struct record *a3, int a4)
         return -1;
     if (D_0018DD5C == -1)
         return -1;
-    if (a4 == -1) {
-        a4 = 127;
+    if (priority == -1) {
+        priority = 127;
         loop = 1;
         i = 3;
         if (D_001A3EFC != 0x12345678)
@@ -63,13 +63,13 @@ int sound_play_sample(int a1, int a2, struct record *a3, int a4)
                 break;
             }
         }
-        if (a4 == -2) {
-            a4 = 127;
+        if (priority == -2) {
+            priority = 127;
             loop = 1;
         }
         if (i == 3) {
             for (i = 0; i < 3; i++) {
-                if (sound_channels[i].prio < a4) {
+                if (sound_channels[i].prio < priority) {
                     func_000A2687(D_0018DD60, sound_channels[i].handle);
                     break;
                 }
@@ -79,21 +79,21 @@ int sound_play_sample(int a1, int a2, struct record *a3, int a4)
             return -1;
     }
     D_001A3F34 = i;
-    sound_channel_set_source(a3, i);
+    sound_channel_set_source(object, i);
     if (sound_channels[i].source != 0)
-        sound_volume_pan(sound_channels[i].buf, (char *)&sound_channels[i].source->x, &vol, &x, sound_channels[i].source);
+        sound_volume_pan(sound_channels[i].buf, (char *)&sound_channels[i].source->x, &volume, &pan, sound_channels[i].source);
     else
-        sound_volume_pan(sound_channels[i].buf, sound_channels[i].buf, &vol, &x, sound_channels[i].source);
+        sound_volume_pan(sound_channels[i].buf, sound_channels[i].buf, &volume, &pan, sound_channels[i].source);
     mc_memset(&sound_channels[i], 0, 240, D_00175ACC, 246, 4);
-    sound_channels[i].prio = a4;
-    sound_channels[i].sample = a1;
-    sound_channels[i].len = a2;
-    sound_channels[i].volume = (short)vol | ((short)vol << 16);
+    sound_channels[i].prio = priority;
+    sound_channels[i].sample = sample;
+    sound_channels[i].len = length;
+    sound_channels[i].volume = (short)volume | ((short)volume << 16);
     sound_channels[i].rate = 11025;
     sound_channels[i].pan = 32768;
-    sound_channels[i].x = x;
+    sound_channels[i].x = pan;
     sound_channels[i].loop = loop != 0 ? -1 : 0;
-    sound_channels[i].len2 = a2;
+    sound_channels[i].len2 = length;
     sound_channels[i].bits = 8;
     sound_channels[i].chans = 1;
     sound_channels[i].handle = func_000A2504(D_0018DD60, &sound_channels[i]);

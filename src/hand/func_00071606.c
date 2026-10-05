@@ -7,37 +7,37 @@ extern void skill_add_uses(int, int);
 extern int player_in_daylight(void);
 extern void fatigue_add(int);
 
-void rest_recover(struct record *a1)
+void rest_recover(struct record *object)
 {
-    struct character *m;
-    struct career *e;
-    int v;
+    struct character *character;
+    struct career *career;
+    int heal;
 
-    m = &a1->data.character;
-    e = &m->career;
-    if (m->race == 8 && (unsigned)(game_minutes - player_character->last_kill_time) > 960)
+    character = &object->data.character;
+    career = &character->career;
+    if (character->race == 8 && (unsigned)(game_minutes - player_character->last_kill_time) > 960)
         return;
-    v = 60;
-    if (e->rapid_healing_flags != 0) {
-        if (e->rapid_healing_flags & 4)
-            v += 40;
-        else if ((e->rapid_healing_flags & 1) && player_in_daylight() != 0)
-            v += 40;
-        else if ((e->rapid_healing_flags & 2) && player_in_daylight() == 0)
-            v += 40;
+    heal = 60;
+    if (career->rapid_healing_flags != 0) {
+        if (career->rapid_healing_flags & 4)
+            heal += 40;
+        else if ((career->rapid_healing_flags & 1) && player_in_daylight() != 0)
+            heal += 40;
+        else if ((career->rapid_healing_flags & 2) && player_in_daylight() == 0)
+            heal += 40;
     }
-    v += player_character->skills[SKILL_MEDICAL].value;
+    heal += player_character->skills[SKILL_MEDICAL].value;
     skill_add_uses(0, 1);
-    v = m->max_health * v / 1000 + (m->attributes[ATTR_END] - 50) / 10;
-    if (v < 1)
-        v = 1;
-    m->health += v;
-    if (m->health > m->max_health)
-        m->health = m->max_health;
+    heal = character->max_health * heal / 1000 + (character->attributes[ATTR_END] - 50) / 10;
+    if (heal < 1)
+        heal = 1;
+    character->health += heal;
+    if (character->health > character->max_health)
+        character->health = character->max_health;
     fatigue_add((player_character->base_attributes[ATTR_STR] + player_character->base_attributes[ATTR_END]) << 6 >> 3);
-    if (!(e->flags & 8) && m->magicka < m->max_magicka) {
-        m->magicka += m->max_magicka >> 3;
-        if (m->magicka > m->max_magicka)
-            m->magicka = m->max_magicka;
+    if (!(career->flags & 8) && character->magicka < character->max_magicka) {
+        character->magicka += character->max_magicka >> 3;
+        if (character->magicka > character->max_magicka)
+            character->magicka = character->max_magicka;
     }
 }

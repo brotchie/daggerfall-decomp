@@ -13,19 +13,19 @@ extern void msgbox_show_quest_text(struct quest *, short, int);
 extern void msgbox_show_rsc(int, int);
 extern void msgbox_yes_no_quest(short);
 
-void quest_show_message(struct quest *a1, short a2)
+void quest_show_message(struct quest *quest, short message)
 {
     D_0012B508 = 144;
     D_001940D5 &= 254;
     D_00195F2E = 0;
-    if (((int)(short)a2) == (-1)) return;
-    if ((((int)(short)a2) & 32768) != 0) {
-        msgbox_show_rsc((int)(short)((short)*(int *)&a2 & 32767), 1);
+    if (((int)(short)message) == (-1)) return;
+    if ((((int)(short)message) & 32768) != 0) {
+        msgbox_show_rsc((int)(short)((short)*(int *)&message & 32767), 1);
         return;
     }
     if (((struct bf8_5_1 *)&D_001940DA)->f != 0) {
-        msgbox_yes_no_quest((int)(short)a2);
+        msgbox_yes_no_quest((int)(short)message);
         return;
     }
-    msgbox_show_quest_text(a1, (int)(short)a2, 1);
+    msgbox_show_quest_text(quest, (int)(short)message, 1);
 }

@@ -6,39 +6,39 @@
 #pragma aux sosconv "*" parm caller [] value [eax] modify [eax ebx ecx edx];
 #pragma aux (sosconv) profile_find_section;
 
-int profile_find_section(int a1, int a2)
+int profile_find_section(int profile, char *section)
 {
-    int l_20;
-    int l_1C;
-    int l_18;
-    int l_14;
-    int l_10;
+    char *cursor;
+    char *header;
+    char *name;
+    int offset;
+    int found;
 
-    l_10 = 0;
-    l_20 = *(int *)((char *)a1 + 132);
-    l_14 = 0;
+    found = 0;
+    cursor = *(char **)((char *)profile + 132);
+    offset = 0;
     do {
-        if (((int)(unsigned char)*(signed char *)((char *)l_20)) == 91) {
-            l_1C = l_20;
-            l_20++;
-            l_18 = a2;
-            while (*(signed char *)((char *)l_20) == *(signed char *)((char *)l_18) && ((unsigned)l_14) < *(int *)((char *)a1 + 136)) {
-                l_18++;
-                l_20++;
-                l_14++;
+        if (*cursor == 91) {
+            header = cursor;
+            cursor++;
+            name = section;
+            while (*cursor == *name && ((unsigned)offset) < *(int *)((char *)profile + 136)) {
+                name++;
+                cursor++;
+                offset++;
             }
-            if (((int)(unsigned char)*(signed char *)((char *)l_20)) == 93 && *(signed char *)((char *)l_18) == 0) {
-                l_10 = 1;
-                while (((int)(unsigned char)*(signed char *)((char *)l_20)) != 10) l_20++;
-                l_20++;
-                *(int *)((char *)a1 + 168) = l_20;
-                *(int *)((char *)a1 + 144) = l_20;
-                *(int *)((char *)a1 + 148) = l_14;
-                *(int *)((char *)a1 + 152) = l_1C;
+            if (*cursor == 93 && *name == 0) {
+                found = 1;
+                while (*cursor != 10) cursor++;
+                cursor++;
+                *(char **)((char *)profile + 168) = cursor;
+                *(char **)((char *)profile + 144) = cursor;
+                *(int *)((char *)profile + 148) = offset;
+                *(char **)((char *)profile + 152) = header;
             }
         }
-        l_20++;
-        l_14++;
-    } while (l_10 == 0 && ((unsigned)l_14) < *(int *)((char *)a1 + 136));
-    return l_10;
+        cursor++;
+        offset++;
+    } while (found == 0 && ((unsigned)offset) < *(int *)((char *)profile + 136));
+    return found;
 }

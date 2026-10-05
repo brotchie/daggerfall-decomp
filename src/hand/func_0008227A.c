@@ -27,13 +27,13 @@ extern struct character *player_character;
 extern unsigned char collide_flags;
 extern int collide_move_player(struct record *, int, struct place *, int);
 
-int player_try_move_vertical(int a1)
+int player_try_move_vertical(int dy)
 {
-    int l_20;
-    int l_1C;
+    int result;
+    int unused;
 
     D_00187C86.x = player_object->x;
-    D_00187C86.y = player_object->y + a1;
+    D_00187C86.y = player_object->y + dy;
     D_00187C86.z = player_object->z;
     D_00187C86.a = player_object->angle_x;
     D_00187C86.b = player_object->yaw;
@@ -43,6 +43,6 @@ int player_try_move_vertical(int a1)
     if (player_motion_flags.b5)
         D_00187C86.name = D_00187BB8;
     collide_flags &= 251;
-    l_20 = collide_move_player(player_object, 0, &D_00187C86, 1);
-    return l_20;
+    result = collide_move_player(player_object, 0, &D_00187C86, 1);
+    return result;
 }

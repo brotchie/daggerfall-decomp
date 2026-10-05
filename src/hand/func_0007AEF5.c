@@ -20,7 +20,7 @@ extern unsigned func_000A13F7(struct find_t *);                     /* _dos_find
 extern int mc_set_location(int, char *);
 extern int mc_sprintf(char *, char *, ...);
 
-void save_copy_automap_files(int a1)
+void save_copy_automap_files(int slot)
 {
     int r;
     struct find_t f;
@@ -29,7 +29,7 @@ void save_copy_automap_files(int a1)
     mc_sprintf(((char *)text_buffer), D_0017696F, arena2_path);
     r = func_000A13DA(((char *)text_buffer), 0, &f);
     mc_set_location(789, D_00176884);
-    mc_sprintf(((char *)text_buffer), D_00176909, a1);
+    mc_sprintf(((char *)text_buffer), D_00176909, slot);
     while (r == 0) {
         disk_copy_file(f.name, arena2_path, ((char *)text_buffer));
         r = func_000A13F7(&f);
@@ -38,7 +38,7 @@ void save_copy_automap_files(int a1)
     mc_sprintf(((char *)text_buffer), D_00176977, arena2_path);
     r = func_000A13DA(((char *)text_buffer), 0, &f);
     mc_set_location(798, D_00176884);
-    mc_sprintf(((char *)text_buffer), D_00176909, a1);
+    mc_sprintf(((char *)text_buffer), D_00176909, slot);
     while (r == 0) {
         disk_copy_file(f.name, arena2_path, ((char *)text_buffer));
         r = func_000A13F7(&f);

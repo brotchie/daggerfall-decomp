@@ -21,38 +21,38 @@ extern int xn_mouse_poll_clamped();
 
 void func_00054B27(void)
 {
-    short l_24;
-    short l_1C;
-    short l_20;
-    char **l_28;
-    short l_18;
+    short top;
+    short row;
+    short y;
+    char **names;
+    short clicked;
 
-    l_28 = D_00190E0C;
-    l_20 = 30;
-    l_18 = (mouse_buttons != 0 && mouse_buttons != mouse_buttons_prev && mouse_x > 10 && mouse_x < 161) ? 1 : 0;
+    names = D_00190E0C;
+    y = 30;
+    clicked = (mouse_buttons != 0 && mouse_buttons != mouse_buttons_prev && mouse_x > 10 && mouse_x < 161) ? 1 : 0;
     D_00190D7A = -1;
-    l_1C = 0;
-    while (*l_28 != 0) {
-        text_draw_coloured(*l_28, 10, l_20, 145, 141);
-        l_24 = l_20;
-        l_20 += font_height;
-        if (l_18 && mouse_y > l_24 && mouse_y < l_20) {
-            D_00190D7A = l_1C;
+    row = 0;
+    while (*names != 0) {
+        text_draw_coloured(*names, 10, y, 145, 141);
+        top = y;
+        y += font_height;
+        if (clicked && mouse_y > top && mouse_y < y) {
+            D_00190D7A = row;
             while (mouse_buttons != 0)
                 xn_mouse_poll_clamped();
         }
-        l_1C++;
-        l_28++;
+        row++;
+        names++;
     }
-    l_1C = classmaker_special_counts[classmaker_special_list];
-    classmaker_specials[classmaker_special_list][l_1C][D_00190D7C] = D_00190D7A;
+    row = classmaker_special_counts[classmaker_special_list];
+    classmaker_specials[classmaker_special_list][row][D_00190D7C] = D_00190D7A;
     if (D_00190D7C == 0)
-        classmaker_specials[classmaker_special_list][l_1C][1] = 0;
+        classmaker_specials[classmaker_special_list][row][1] = 0;
     if (D_00190D7A != -1 && D_00190D7C != 0) {
         if (classmaker_special_list == 0)
-            classmaker_set_advantage(l_1C, 0);
+            classmaker_set_advantage(row, 0);
         else
-            classmaker_set_disadvantage(l_1C, 0);
+            classmaker_set_disadvantage(row, 0);
         classmaker_specials_picked();
     }
     if ((int)(short)(classmaker_screen & 16) != 0 && D_00190D7A != -1 && (int)(short)(classmaker_screen & 15) == 2) {

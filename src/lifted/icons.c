@@ -79,22 +79,22 @@ void hud_buttons_click(int);
 void magic_items_add_cb(struct record *);
 void magic_items_close(void);
 
-void hud_buttons_click(int a1)
+void hud_buttons_click(int release)
 {
-    int l_18;
+    int button;
 
     if (((int)(unsigned char)mouse_control_mode) == 1 && view_cursor_active == 0) {
         return;
     }
-    for (l_18 = 0; l_18 < 11; l_18++) {
-        if (mouse_x > *(short *)(hud_buttons + (l_18 * 12)) && mouse_x < *(short *)(D_00185C5C + (l_18 * 12)) && mouse_y > *(short *)(D_00185C5A + (l_18 * 12)) && mouse_y < *(short *)(D_00185C5E + (l_18 * 12))) {
-            if (a1 != 0 && ((int)(unsigned char)hud_pressed_button) == l_18) {
+    for (button = 0; button < 11; button++) {
+        if (mouse_x > *(short *)(hud_buttons + (button * 12)) && mouse_x < *(short *)(D_00185C5C + (button * 12)) && mouse_y > *(short *)(D_00185C5A + (button * 12)) && mouse_y < *(short *)(D_00185C5E + (button * 12))) {
+            if (release != 0 && ((int)(unsigned char)hud_pressed_button) == button) {
                 sound_play(203, player_object, 100);
-                ((int (*)())(*(int *)(D_00185C60 + (l_18 * 12))))((int)(unsigned char)mouse_buttons_prev);
+                ((int (*)())(*(int *)(D_00185C60 + (button * 12))))((int)(unsigned char)mouse_buttons_prev);
                 hud_pressed_button = 255;
                 return;
             }
-            if (a1 == 0) hud_pressed_button = *(signed char *)&l_18;
+            if (release == 0) hud_pressed_button = *(signed char *)&button;
         }
     }
 }
@@ -125,13 +125,13 @@ void hud_button_inventory(void)
 
 void hud_toggle_weapon(void)
 {
-    short l_18;
+    short item_data;
 
     D_001940D6 ^= 64;
     if (((struct bf8_6_1 *)&D_001940D6)->f == 0) return;
     if (player_character->equipped[19] == 0) return;
-    *(int *)&l_18 = (int)player_character->equipped[19] + 71;
-    sound_play((int)(short)D_00188208[((int)(unsigned short)*(short *)(*(char **)&l_18 + 34))], player_object, 100);
+    *(int *)&item_data = (int)player_character->equipped[19] + 71;
+    sound_play((int)(short)D_00188208[((int)(unsigned short)*(short *)(*(char **)&item_data + 34))], player_object, 100);
 }
 
 void hud_button_status(void)
@@ -144,9 +144,9 @@ void hud_button_transport(void)
     transport_menu();
 }
 
-void hud_button_map(int a1)
+void hud_button_map(int buttons)
 {
-    if ((a1 & 2) != 0) {
+    if ((buttons & 2) != 0) {
         travel_map_open(1);
         return;
     }
@@ -163,50 +163,50 @@ void hud_button_options(void)
     options_open(1);
 }
 
-void magic_items_add_cb(struct record *a1)
+void magic_items_add_cb(struct record *object)
 {
-    struct item *l_24;
-    int l_20;
-    int l_1C;
-    struct record *l_18;
+    struct item *item;
+    int i;
+    int kind;
+    struct record *parent;
 
-    if (a1->type != 2) return;
-    l_18 = a1->parent;
-    while (l_18 != 0 && xn_str_find_u32((int)((char *)&house_container), l_18, 4) == 0) {
-        l_18 = l_18->parent;
+    if (object->type != 2) return;
+    parent = object->parent;
+    while (parent != 0 && xn_str_find_u32((int)((char *)&house_container), parent, 4) == 0) {
+        parent = parent->parent;
     }
-    if (l_18 != 0) return;
-    if (a1->parent == wagon_container) return;
-    l_24 = &a1->data.item;
-    l_1C = 0;
-    if (l_24->group == 1 && l_24->index == 1 && a1->children != 0 && a1->children->type == 31) {
-        l_1C = 2;
+    if (parent != 0) return;
+    if (object->parent == wagon_container) return;
+    item = &object->data.item;
+    kind = 0;
+    if (item->group == 1 && item->index == 1 && object->children != 0 && object->children->type == 31) {
+        kind = 2;
     } else {
-        if (l_24->enchantments[0].type == (-1)) return;
+        if (item->enchantments[0].type == (-1)) return;
     }
-    if (l_1C == 0) {
-        l_20 = 0;
-        l_1C = l_20;
-        for (; l_20 < 10; l_20++) {
-            if (l_24->enchantments[l_20].type == (-1)) break;
-            if (l_24->enchantments[l_20].type == 0) l_1C = 1;
+    if (kind == 0) {
+        i = 0;
+        kind = i;
+        for (; i < 10; i++) {
+            if (item->enchantments[i].type == (-1)) break;
+            if (item->enchantments[i].type == 0) kind = 1;
         }
     }
-    if (l_1C == 0) return;
-    text_macro_item = l_24;
-    if (l_1C == 2) {
-        D_00195ACC = (int)&a1->children->data.potion_recipe;
+    if (kind == 0) return;
+    text_macro_item = item;
+    if (kind == 2) {
+        D_00195ACC = (int)&object->children->data.potion_recipe;
         parse_expand((int)D_001758A0, (int)D_00190B44);
     } else {
         parse_expand((int)D_001758A4, (int)D_00190B44);
     }
     picklist_add(&shared_picklist, (int)D_00190B44, 0);
-    *(int *)(scratch_190de4 + (((int)(short)(*(short *)scratch_190d64)++) << 2)) = (int)a1;
+    *(int *)(scratch_190de4 + (((int)(short)(*(short *)scratch_190d64)++) << 2)) = (int)object;
 }
 
 void magic_items_open(void)
 {
-    int l_18;
+    int unused;
 
     *(short *)scratch_190d64 = 0;
     picklist_init(&shared_picklist, 100, 159, 166, 34, 88, 159, 8, 15, 88, 179, 8, 59, 0, 0, 1, 1, 146, 146, 244, 114, 0);
@@ -226,7 +226,7 @@ void magic_items_open(void)
 
 void magic_items_frame(void)
 {
-    short l_18;
+    short picked;
 
     if (((struct bf8_5_1 *)&D_001940D4)->f == 0) return;
     mc_memcpy(screen_buffer, magic_items_saved_screen, 64000, (int)D_00175898, 368, 4);
@@ -237,10 +237,10 @@ void magic_items_frame(void)
         magic_items_close();
         return;
     }
-    *(int *)&l_18 = picklist_poll(&shared_picklist) - 1;
-    if (((int)(short)l_18) > (-1)) {
+    *(int *)&picked = picklist_poll(&shared_picklist) - 1;
+    if (((int)(short)picked) > (-1)) {
         magic_items_close();
-        inv_selected_item = (struct record *)(*(int *)(scratch_190de4 + (((int)(short)l_18) << 2)));
+        inv_selected_item = (struct record *)(*(int *)(scratch_190de4 + (((int)(short)picked) << 2)));
         inv_use_item();
         return;
     }

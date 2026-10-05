@@ -78,32 +78,32 @@ void trade_haggle_show_offer(void)
 
 void trade_counter_offer(void)
 {
-    int l_18;
+    char *text;
 
     D_0012B508 = 146;
-    l_18 = *(int *)scratch_buffer + 55000;
+    text = *(char **)scratch_buffer + 55000;
     mc_set_location(141, (int)D_00175A30);
-    mc_sprintf(l_18, (int)D_00175A6A);
-    *(signed char *)((char *)(strlen(l_18) + l_18) + 1) = 0;
-    msgbox_show_string(l_18, 2);
+    mc_sprintf((int)text, (int)D_00175A6A);
+    *(strlen(text) + text + 1) = 0;
+    msgbox_show_string((int)text, 2);
     inpstr_begin_number((int)trade_haggle_asking);
 }
 
-int trade_haggle_counter(int a1)
+int trade_haggle_counter(int offer)
 {
-    if (a1 == D_001A3ADC) return 0;
-    D_001A3ADC = a1;
+    if (offer == D_001A3ADC) return 0;
+    D_001A3ADC = offer;
     D_001A3ACC = trade_haggle_asking - trade_haggle_step_size;
     D_001A3AC4 = trade_haggle_minimum + trade_haggle_step_size;
-    if (D_001A3ACC < D_001A3AC4 && a1 > trade_haggle_minimum) return a1;
-    if (a1 > D_001A3ACC) return a1;
-    if (a1 < trade_haggle_minimum) return -1;
-    if (a1 <= D_001A3AC4 && a1 >= trade_haggle_minimum) return 0;
-    if (a1 < D_001A3ACC && a1 > D_001A3AC4) {
+    if (D_001A3ACC < D_001A3AC4 && offer > trade_haggle_minimum) return offer;
+    if (offer > D_001A3ACC) return offer;
+    if (offer < trade_haggle_minimum) return -1;
+    if (offer <= D_001A3AC4 && offer >= trade_haggle_minimum) return 0;
+    if (offer < D_001A3ACC && offer > D_001A3AC4) {
         trade_haggle_asking -= trade_haggle_step_size;
         trade_haggle_minimum = trade_haggle_step_size + trade_haggle_minimum;
     }
-    if (((int)trade_haggle_asking) == a1) return a1;
+    if (((int)trade_haggle_asking) == offer) return offer;
     trade_haggle_step();
     return 0;
 }
@@ -115,15 +115,15 @@ void trade_haggle_step(void)
 
 int sound_init_music(void)
 {
-    int l_1C;
+    int i;
 
     if ((short)sos_read_settings((int)D_00175AB8) == 0) return 0;
     if (sos_init(D_0018DD5C, D_0018DD54) != 0) return 0;
     D_0018DC64 = 2048;
     func_000A1D3C(127);
     midi_bsa = archive_open((int)D_00175AC3, 0, 0);
-    for (l_1C = 0; l_1C < 4; l_1C++) {
-        *(int *)(D_001A3BD8 + (l_1C * 268)) = 305419896;
+    for (i = 0; i < 4; i++) {
+        *(int *)(D_001A3BD8 + (i * 268)) = 305419896;
     }
     sound_enabled = 1;
     dpmi_lock_region((int)sound_channels, 5168);
@@ -135,14 +135,14 @@ int sound_init_music(void)
 
 void sound_shutdown_music(void)
 {
-    int l_18;
+    int channel;
 
     if (sound_enabled == 0) return;
     sound_timer_remove(D_001A3F3C);
     music_stop();
     archive_close(midi_bsa);
-    for (l_18 = 0; l_18 < 4; l_18++) {
-        sound_stop_channel(l_18);
+    for (channel = 0; channel < 4; channel++) {
+        sound_stop_channel(channel);
     }
     sos_shutdown();
     dpmi_unlock_region((int)sound_channels, 5168);

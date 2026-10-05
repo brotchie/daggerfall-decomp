@@ -31,23 +31,23 @@ extern int xn_draw_image();
 
 void bank_draw(void)
 {
-    int saved;
-    struct Img *img;
+    int saved_minutes;
+    struct Img *image;
 
-    img = window_image;
+    image = window_image;
     mc_memcpy(screen_buffer, bank_saved_screen, 64000, D_00175CC4, 216, 4);
-    xn_draw_image(img->x, img->y, img->w, img->h, img->data);
+    xn_draw_image(image->x, image->y, image->w, image->h, image->data);
     switch (bank_screen) {
     case 0:
         text_draw_coloured(itoa(bank_account->balance, ((char *)text_rsc_buffer), 10), 197, 19, 145, 156);
         text_draw_coloured(itoa(gold_total(), ((char *)text_rsc_buffer), 10), 203, 29, 145, 156);
         if (bank_account->loan_due != 0) {
             text_draw_coloured(itoa(bank_account->loan_owed, ((char *)text_rsc_buffer), 10), 143, 39, 145, 156);
-            saved = game_minutes;
+            saved_minutes = game_minutes;
             game_minutes = bank_account->loan_due;
             parse_expand(D_00175CCB, D_00190B44);
             text_draw_coloured(D_00190B44, 119, 49, 145, 156);
-            game_minutes = saved;
+            game_minutes = saved_minutes;
         }
         break;
     case 1:

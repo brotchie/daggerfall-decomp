@@ -211,11 +211,11 @@ extern void loot_generate(int, struct record *, int, unsigned short);
 extern void loot_fill_container(struct record *);
 extern void guild_service_dispatch(struct record *);
 extern void door_try_open(struct record *, int);
-extern void book_read_header(int, unsigned short);
+extern void book_read_header(char *, unsigned short);
 extern void pick_up_item(struct record *);
 extern void text_draw_centred_coloured(int, int, int, int, unsigned char);
 extern void hud_status_set(int);
-extern void list_popup_open_strings(int);
+extern void list_popup_open_strings(char *);
 extern void msgbox_yes_no_rsc(int);
 extern void dungeon_load(int);
 extern void location_unload(unsigned short);
@@ -258,47 +258,47 @@ void position_history_record(void);
 void spawn_point_occupied_cb(struct record *);
 #pragma aux mc_set_location parm routine [];
 
-void click_describe_item(struct item *a1)
+void click_describe_item(struct item *item)
 {
-    if (strchr(D_00183248, (int)(unsigned char)a1->name[0]) != 0) {
+    if (strchr(D_00183248, (int)(unsigned char)item->name[0]) != 0) {
         mc_set_location(204, (int)D_00176198);
-        mc_sprintf((int)text_buffer, D_0018324C, a1);
+        mc_sprintf((int)text_buffer, D_0018324C, item);
     } else {
         mc_set_location(206, (int)D_00176198);
-        mc_sprintf((int)text_buffer, D_00183250, a1);
+        mc_sprintf((int)text_buffer, D_00183250, item);
     }
     hud_message_add((int)text_buffer);
 }
 
-void click_describe_creature(struct character *a1, struct career *a2)
+void click_describe_creature(struct character *unused, struct career *creature_class)
 {
-    if (strchr(D_00183248, (int)(unsigned char)a2->name[0]) != 0) {
+    if (strchr(D_00183248, (int)(unsigned char)creature_class->name[0]) != 0) {
         mc_set_location(215, (int)D_00176198);
-        mc_sprintf((int)text_buffer, D_0018324C, a2->name);
+        mc_sprintf((int)text_buffer, D_0018324C, creature_class->name);
     } else {
         mc_set_location(217, (int)D_00176198);
-        mc_sprintf((int)text_buffer, D_00183250, a2->name);
+        mc_sprintf((int)text_buffer, D_00183250, creature_class->name);
     }
     hud_message_add((int)text_buffer);
 }
 
-int click_world_face(int a1)
+int click_world_face(int hit)
 {
-    struct building *l_24;
-    int l_20;
-    int l_1C;
+    struct building *building;
+    int archive;
+    int record_index;
 
-    l_24 = object_building((struct record *)*(int *)((char *)a1 + 4));
-    if (((int)(unsigned char)*(signed char *)(*(char **)((char *)a1 + 4))) != 6 && ((int)(unsigned char)*(signed char *)(*(char **)((char *)a1 + 4))) != 43 && ((int)(unsigned char)*(signed char *)(*(char **)((char *)a1 + 4))) != 56) {
+    building = object_building((struct record *)*(int *)((char *)hit + 4));
+    if (((int)(unsigned char)*(signed char *)(*(char **)((char *)hit + 4))) != 6 && ((int)(unsigned char)*(signed char *)(*(char **)((char *)hit + 4))) != 43 && ((int)(unsigned char)*(signed char *)(*(char **)((char *)hit + 4))) != 56) {
         return 0;
     }
-    l_20 = ((int)(unsigned short)*(short *)(*(char **)click_face_texture + 2)) >> 7;
-    l_1C = (int)(unsigned short)(*(short *)(*(char **)click_face_texture + 2) & 127);
-    if ((l_20 % 100) == 74) l_20 = 74;
-    if (l_24 != 0) {
+    archive = ((int)(unsigned short)*(short *)(*(char **)click_face_texture + 2)) >> 7;
+    record_index = (int)(unsigned short)(*(short *)(*(char **)click_face_texture + 2) & 127);
+    if ((archive % 100) == 74) archive = 74;
+    if (building != 0) {
         {
-            unsigned char l_2C;
-            switch ((unsigned)l_20) {
+            unsigned char knightly;
+            switch ((unsigned)archive) {
             case 56:
             case 331:
                 if (((int)(unsigned short)(player_character->flags & 1536)) != 0) {
@@ -314,14 +314,14 @@ int click_world_face(int a1)
                     break;
                 }
                 if (player_object->parent->type == 1) {
-                    if (xn_str_find_u16((int)D_00187644, (int)(short)l_24->faction_id, 21) != 0) {
-                        l_2C = 1;
+                    if (xn_str_find_u16((int)D_00187644, (int)(short)building->faction_id, 21) != 0) {
+                        knightly = 1;
                     } else {
-                        l_2C = 0;
+                        knightly = 0;
                     }
-                    in_knightly_order_hall = l_2C;
-                    town_map_note_building((struct record *)*(int *)((char *)a1 + 4), l_24);
-                    building_enter(l_24);
+                    in_knightly_order_hall = knightly;
+                    town_map_note_building((struct record *)*(int *)((char *)hit + 4), building);
+                    building_enter(building);
                 } else {
                     building_exit();
                     in_knightly_order_hall = 0;
@@ -330,22 +330,22 @@ int click_world_face(int a1)
             case 71:
             case 72:
             case 81:
-                if (l_20 == 72 && l_1C == 3) {
-                    if (building_is_open(l_24) == 0 && lockpick_action_door(l_24, 19, (struct record *)*(int *)((char *)a1 + 4)) != 0) {
-                        loot_generate(14, (struct record *)D_001960D9, l_24->quality, (int)(unsigned short)(player_character->flags & 1));
-                        shelf_object = (struct record *)(*(int *)((char *)a1 + 4));
+                if (archive == 72 && record_index == 3) {
+                    if (building_is_open(building) == 0 && lockpick_action_door(building, 19, (struct record *)*(int *)((char *)hit + 4)) != 0) {
+                        loot_generate(14, (struct record *)D_001960D9, building->quality, (int)(unsigned short)(player_character->flags & 1));
+                        shelf_object = (struct record *)(*(int *)((char *)hit + 4));
                         shelf_return_items();
-                        shelf_open_stock((struct record *)*(int *)((char *)a1 + 4), l_24, *(int *)picked_model_index);
+                        shelf_open_stock((struct record *)*(int *)((char *)hit + 4), building, *(int *)picked_model_index);
                         return 1;
                     }
-                } else if (l_1C < 4) {
-                    shelf_open((struct record *)*(int *)((char *)a1 + 4), l_24, *(int *)picked_model_index);
+                } else if (record_index < 4) {
+                    shelf_open((struct record *)*(int *)((char *)hit + 4), building, *(int *)picked_model_index);
                     return 1;
                 }
             }
         }
     } else {
-        switch ((unsigned)l_20) {
+        switch ((unsigned)archive) {
         case 56:
         case 331:
             if (((int)(unsigned short)(player_character->flags & 1536)) != 0) {
@@ -376,27 +376,27 @@ int click_world_face(int a1)
     return 0;
 }
 
-void shelf_open(struct record *a1, struct building *a2, int a3)
+void shelf_open(struct record *shelf, struct building *shelf_building, int model_index)
 {
-    switch (a2->type) {
+    switch (shelf_building->type) {
         return;
     case 11:
         if (guild_find_membership_by_kind(1) == 0) {
             msgbox_show_string((int)D_0017622D, 1);
             return;
         }
-        shelf_open_books(a1, a2, a3);
+        shelf_open_books(shelf, shelf_building, model_index);
         return;
     case 14:
         if (guild_find_membership_by_bits(128) == 0) {
             msgbox_show_string((int)D_00176255, 1);
             return;
         }
-        shelf_open_books(a1, a2, a3);
+        shelf_open_books(shelf, shelf_building, model_index);
         return;
     case 5:
     case 10:
-        shelf_open_books(a1, a2, a3);
+        shelf_open_books(shelf, shelf_building, model_index);
         return;
     case 0:
     case 2:
@@ -407,167 +407,167 @@ void shelf_open(struct record *a1, struct building *a2, int a3)
     case 9:
     case 12:
     case 13:
-        shelf_open_stock(a1, a2, a3);
+        shelf_open_stock(shelf, shelf_building, model_index);
     default:;
     }
 }
 
-void shelf_book_chosen(int a1)
+void shelf_book_chosen(int row)
 {
     D_00196272 = 0;
-    book_open((int)(short)*(short *)(shelf_book_ids + (a1 * 2)));
+    book_open((int)(short)*(short *)(shelf_book_ids + (row * 2)));
     shelf_return_items();
 }
 
-int shelf_collect_items(struct record *a1, int a2, int a3)
+int shelf_collect_items(struct record *object, int group, int model_index)
 {
-    int l_1C;
-    struct record *l_18;
-    struct item *l_14;
+    int count;
+    struct record *next;
+    struct item *item;
 
-    l_1C = 0;
+    count = 0;
     object_free_children((struct record *)D_001960D9);
-    a1 = a1->children;
-    while (a1 != 0) {
-        l_18 = a1->next;
-        if (a1->type == 36 && a1->shelf_index == a3) {
-            l_14 = &a1->data.item;
-            if (((struct bf8_1_1 *)&D_001940D7)->f != 0 && l_14->enchantments[0].type != (-1)) {
-                a1 = l_18;
+    object = object->children;
+    while (object != 0) {
+        next = object->next;
+        if (object->type == 36 && object->shelf_index == model_index) {
+            item = &object->data.item;
+            if (((struct bf8_1_1 *)&D_001940D7)->f != 0 && item->enchantments[0].type != (-1)) {
+                object = next;
                 continue;
             }
-            if (a2 == (-1) || l_14->group == a2) {
-                l_1C++;
-                a1->flags &= ~0x2;
-                a1->flags |= 32;
-                object_detach(a1);
-                object_reparent((struct record *)D_001960D9, a1);
-                a1->x = player_object->x;
-                a1->y = player_object->y;
-                a1->z = player_object->z;
-                a1->type = 2;
+            if (group == (-1) || item->group == group) {
+                count++;
+                object->flags &= ~0x2;
+                object->flags |= 32;
+                object_detach(object);
+                object_reparent((struct record *)D_001960D9, object);
+                object->x = player_object->x;
+                object->y = player_object->y;
+                object->z = player_object->z;
+                object->type = 2;
             }
         }
-        a1 = l_18;
+        object = next;
     }
-    return l_1C;
+    return count;
 }
 
 void shelf_return_items(void)
 {
-    struct record *l_1C;
-    struct record *l_18;
+    struct record *object;
+    struct record *next;
 
     inventory_close_callback = 0;
-    l_1C = (struct record *)D_00196118;
-    while (l_1C != 0) {
-        l_18 = l_1C->next;
-        l_1C->flags |= 2;
-        object_detach(l_1C);
-        object_reparent(shelf_object, l_1C);
-        l_1C->type = 36;
-        l_1C->shelf_index = shelf_model_index;
-        l_1C = l_18;
+    object = (struct record *)D_00196118;
+    while (object != 0) {
+        next = object->next;
+        object->flags |= 2;
+        object_detach(object);
+        object_reparent(shelf_object, object);
+        object->type = 36;
+        object->shelf_index = shelf_model_index;
+        object = next;
     }
 }
 
-void shelf_open_books(struct record *a1, struct building *a2, int a3)
+void shelf_open_books(struct record *shelf, struct building *shelf_building, int model_index)
 {
-    int l_24;
-    int l_20;
-    struct record *l_1C;
-    int l_18;
-    int l_14;
-    int l_10;
+    int i;
+    int count;
+    struct record *object;
+    char *header;
+    char *text;
+    char *list;
 
-    l_20 = 0;
-    shelf_model_index = a3;
-    l_20 = shelf_collect_items(a1, 7, a3);
-    if (l_20 == 0 && shelf_shop_stocked(a3) == 0) {
-        *(int *)(stocked_shop_ids + (stocked_shop_count++ << 2)) = a3;
-        l_20 = a2->quality >> 1;
-        if (l_20 == 0) l_20++;
-        for (l_24 = 0; l_24 < l_20; l_24++) {
-            l_1C = object_create_child((struct record *)D_001960D9, 0, 107);
-            l_1C->type = 2;
-            l_1C->x = player_object->x;
-            l_1C->y = player_object->y;
-            l_1C->z = player_object->z;
-            l_1C->flags |= 32;
-            item_make(7, a2->quality / 6, &l_1C->data.item);
+    count = 0;
+    shelf_model_index = model_index;
+    count = shelf_collect_items(shelf, 7, model_index);
+    if (count == 0 && shelf_shop_stocked(model_index) == 0) {
+        *(int *)(stocked_shop_ids + (stocked_shop_count++ << 2)) = model_index;
+        count = shelf_building->quality >> 1;
+        if (count == 0) count++;
+        for (i = 0; i < count; i++) {
+            object = object_create_child((struct record *)D_001960D9, 0, 107);
+            object->type = 2;
+            object->x = player_object->x;
+            object->y = player_object->y;
+            object->z = player_object->z;
+            object->flags |= 32;
+            item_make(7, shelf_building->quality / 6, &object->data.item);
         }
     }
-    if (a2->type == 10 || a2->type == 11 || a2->type == 14) {
-        l_18 = *(int *)scratch_buffer;
-        l_14 = *(int *)scratch_buffer + 1000;
-        l_10 = l_14;
-        l_1C = (struct record *)D_00196118;
-        l_24 = 0;
-        while (l_1C != 0) {
-            *(short *)(shelf_book_ids + (l_24 * 2)) = (short)l_1C->data.item.message;
-            book_read_header(l_18, (int)(unsigned short)*(short *)(shelf_book_ids + (l_24++ * 2)));
-            mc_strncpy(l_14, l_18, 4, (int)D_00176198, 479);
-            l_14 += strlen(l_14) + 1;
-            l_1C = l_1C->next;
+    if (shelf_building->type == 10 || shelf_building->type == 11 || shelf_building->type == 14) {
+        header = *(char **)scratch_buffer;
+        text = *(char **)scratch_buffer + 1000;
+        list = text;
+        object = (struct record *)D_00196118;
+        i = 0;
+        while (object != 0) {
+            *(short *)(shelf_book_ids + (i * 2)) = (short)object->data.item.message;
+            book_read_header(header, (int)(unsigned short)*(short *)(shelf_book_ids + (i++ * 2)));
+            mc_strncpy(text, header, 4, (int)D_00176198, 479);
+            text += strlen(text) + 1;
+            object = object->next;
         }
-        *(signed char *)((char *)l_14) = 0;
-        list_popup_open_strings(l_10);
+        *text = 0;
+        list_popup_open_strings(list);
         shelf_list_callback = (int)shelf_book_chosen;
         D_00196272 = 1;
         inventory_close_callback = (int)shelf_return_items;
-        shelf_object = a1;
+        shelf_object = shelf;
         shelf_list_active = 1;
         return;
     }
     inventory_open_container((struct record *)D_001960D9, 1, 4);
     inventory_close_callback = (int)shelf_return_items;
-    shelf_object = a1;
+    shelf_object = shelf;
 }
 
-void shelf_open_stock(struct record *a1, struct building *a2, int a3)
+void shelf_open_stock(struct record *shelf, struct building *shelf_building, int model_index)
 {
-    int l_24;
-    int l_20;
-    struct record *l_1C;
-    int l_18;
-    int l_14;
-    int l_10;
+    int collected_count;
+    int count;
+    struct record *object;
+    int unused;
+    int unused2;
+    int unused3;
 
-    l_20 = 0;
-    shelf_model_index = a3;
-    if (building_is_open(a2) != 0) {
+    count = 0;
+    shelf_model_index = model_index;
+    if (building_is_open(shelf_building) != 0) {
         D_001940D9 |= 2;
         D_001940D7 &= 253;
     } else {
         D_001940D9 &= 253;
         D_001940D7 |= 2;
     }
-    l_20 = shelf_collect_items(a1, -1, a3);
-    l_24 = l_20;
-    if (l_20 == 0 && shelf_shop_stocked(a3) == 0) {
-        *(int *)(stocked_shop_ids + (stocked_shop_count++ << 2)) = a3;
-        shelf_stock_items((struct record *)D_001960D9, a2->type + 32, a2->quality);
-        if (a2->type == 0 && rand_range(1, 100) < 25) {
-            l_1C = item_add_to_container((struct record *)D_001960D9, 27, 4, 0);
+    count = shelf_collect_items(shelf, -1, model_index);
+    collected_count = count;
+    if (count == 0 && shelf_shop_stocked(model_index) == 0) {
+        *(int *)(stocked_shop_ids + (stocked_shop_count++ << 2)) = model_index;
+        shelf_stock_items((struct record *)D_001960D9, shelf_building->type + 32, shelf_building->quality);
+        if (shelf_building->type == 0 && rand_range(1, 100) < 25) {
+            object = item_add_to_container((struct record *)D_001960D9, 27, 4, 0);
         }
     }
-    if (l_24 == 0 && a2->type == 9) {
-        l_1C = object_create_child((struct record *)D_001960D9, 0, 107);
-        l_1C->type = 2;
-        l_1C->flags |= 33;
-        l_1C->id = object_new_id(((unsigned)location_object->id) >> 16);
-        l_1C->x = player_object->x;
-        l_1C->y = player_object->y;
-        l_1C->z = player_object->z;
-        item_make(23, 1, &l_1C->data.item);
-        l_1C = object_create_child((struct record *)D_001960D9, 0, 107);
-        l_1C->type = 2;
-        l_1C->flags |= 33;
-        l_1C->id = object_new_id(((unsigned)location_object->id) >> 16);
-        l_1C->x = player_object->x;
-        l_1C->y = player_object->y;
-        l_1C->z = player_object->z;
-        item_make(23, 0, &l_1C->data.item);
+    if (collected_count == 0 && shelf_building->type == 9) {
+        object = object_create_child((struct record *)D_001960D9, 0, 107);
+        object->type = 2;
+        object->flags |= 33;
+        object->id = object_new_id(((unsigned)location_object->id) >> 16);
+        object->x = player_object->x;
+        object->y = player_object->y;
+        object->z = player_object->z;
+        item_make(23, 1, &object->data.item);
+        object = object_create_child((struct record *)D_001960D9, 0, 107);
+        object->type = 2;
+        object->flags |= 33;
+        object->id = object_new_id(((unsigned)location_object->id) >> 16);
+        object->x = player_object->x;
+        object->y = player_object->y;
+        object->z = player_object->z;
+        item_make(23, 0, &object->data.item);
     }
     if (((struct bf8_1_1 *)&D_001940D9)->f != 0) {
         inventory_open_container((struct record *)D_001960D9, 1, 4);
@@ -575,16 +575,16 @@ void shelf_open_stock(struct record *a1, struct building *a2, int a3)
         inventory_open_container((struct record *)D_001960D9, 0, 4);
     }
     inventory_close_callback = (int)shelf_return_items;
-    shelf_object = a1;
+    shelf_object = shelf;
 }
 
 void shelf_book_list_update(void)
 {
-    int l_18;
+    int row;
 
     if (shelf_list_callback == 0) return;
-    if (((struct bf8_2_1 *)&D_001940D4)->f != 0 && (l_18 = list_popup_poll()) != (-1)) {
-        if (l_18 > (-1)) ((int (*)())(shelf_list_callback))(l_18);
+    if (((struct bf8_2_1 *)&D_001940D4)->f != 0 && (row = list_popup_poll()) != (-1)) {
+        if (row > (-1)) ((int (*)())(shelf_list_callback))(row);
         shelf_list_callback = 0;
         shelf_list_active = 0;
         return;
@@ -594,92 +594,92 @@ void shelf_book_list_update(void)
     shelf_list_active = 0;
 }
 
-void npc_click_service(struct record *a1)
+void npc_click_service(struct record *npc)
 {
-    struct person *l_20;
-    struct building *l_1C;
-    struct faction *l_18;
+    struct person *person;
+    struct building *building;
+    struct faction *faction;
 
-    coven_menu_npc = a1;
-    D_00195CE8 = a1;
-    l_20 = &a1->data.person;
-    D_00195F68 = l_20->faction_id;
-    l_1C = object_building(a1);
-    l_18 = faction_find((int)(short)l_20->faction_id);
-    if (l_18 == 0) {
-        l_18 = faction_find_type_in_region((int)(short)((int)(unsigned char)current_region), 15);
+    coven_menu_npc = npc;
+    D_00195CE8 = npc;
+    person = &npc->data.person;
+    D_00195F68 = person->faction_id;
+    building = object_building(npc);
+    faction = faction_find((int)(short)person->faction_id);
+    if (faction == 0) {
+        faction = faction_find_type_in_region((int)(short)((int)(unsigned char)current_region), 15);
     }
-    if (a1->quest_id == 0) {
-        if (l_20->faction_id == 852 || (l_18->type == 7 && l_18->region != 255)) {
-            if (l_20->faction_id == 852) {
-                l_18 = faction_find_type_in_region((int)(short)((int)(unsigned char)current_region), 7);
-                if (l_18 != 0) l_20->faction_id = l_18->id;
+    if (npc->quest_id == 0) {
+        if (person->faction_id == 852 || (faction->type == 7 && faction->region != 255)) {
+            if (person->faction_id == 852) {
+                faction = faction_find_type_in_region((int)(short)((int)(unsigned char)current_region), 7);
+                if (faction != 0) person->faction_id = faction->id;
             }
-            if (quest_active_for_faction((int)(short)l_18->id) == 0) {
+            if (quest_active_for_faction((int)(short)faction->id) == 0) {
                 quest_pick_file(82, 0, noble_quest_letter(), 67, player_character->level);
                 if (*(signed char *)D_001961F5 != 0) return;
             }
         }
     }
-    if (a1->quest_id == 0 && func_0004CD80((int)l_20) != 0) return;
-    if (l_20->faction_id != 0 && l_20->faction_id != 65535 && faction_find((int)(short)l_20->faction_id)->type == 8) {
+    if (npc->quest_id == 0 && func_0004CD80((int)person) != 0) return;
+    if (person->faction_id != 0 && person->faction_id != 65535 && faction_find((int)(short)person->faction_id)->type == 8) {
         coven_menu_open(1);
         return;
     }
-    if (l_1C != 0) {
-        if ((l_18->id == 42 || (l_18->parent != 0 && l_18->parent->id == 42)) && guild_find_membership_by_kind(3) != 0) {
-            guild_service_dispatch(a1);
-        } else if ((l_18->id == 108 || (l_18->parent != 0 && l_18->parent->id == 108)) && guild_find_membership_by_kind(0) != 0) {
-            guild_service_dispatch(a1);
-        } else if ((l_18->id == 108 || (l_18->parent != 0 && l_18->parent->id == 108)) && guild_find_membership_by_kind(0) == 0) {
-            npc_talk(a1);
+    if (building != 0) {
+        if ((faction->id == 42 || (faction->parent != 0 && faction->parent->id == 42)) && guild_find_membership_by_kind(3) != 0) {
+            guild_service_dispatch(npc);
+        } else if ((faction->id == 108 || (faction->parent != 0 && faction->parent->id == 108)) && guild_find_membership_by_kind(0) != 0) {
+            guild_service_dispatch(npc);
+        } else if ((faction->id == 108 || (faction->parent != 0 && faction->parent->id == 108)) && guild_find_membership_by_kind(0) == 0) {
+            npc_talk(npc);
         } else {
-            switch (l_1C->type) {
+            switch (building->type) {
             case 11:
             case 14:
-                guild_service_dispatch(a1);
+                guild_service_dispatch(npc);
                 break;
             case 15:
-                if (((int)(unsigned char)(l_20->flags & 8)) != 0) {
+                if (((int)(unsigned char)(person->flags & 8)) != 0) {
                     tavern_open(1);
                 } else {
-                    npc_talk(a1);
+                    npc_talk(npc);
                 }
                 break;
             case 3:
                 service_menu_handler = (int)bank_open;
-                service_menu_npc = a1;
-                if (((int)(unsigned char)(l_20->flags & 8)) != 0) {
+                service_menu_npc = npc;
+                if (((int)(unsigned char)(person->flags & 8)) != 0) {
                     service_menu_open((int)D_0017628F);
                 } else {
-                    npc_talk(a1);
+                    npc_talk(npc);
                 }
                 break;
             case 2:
-                if (((int)(unsigned short)(l_20->faction_id & 8)) != 0) {
+                if (((int)(unsigned short)(person->faction_id & 8)) != 0) {
                     repair_menu_kind = 2;
-                    repair_menu_npc = a1;
+                    repair_menu_npc = npc;
                     repair_menu_open(1);
                 } else {
-                    npc_talk(a1);
+                    npc_talk(npc);
                 }
                 break;
             case 13:
-                if (((int)(unsigned char)(l_20->flags & 8)) != 0) {
+                if (((int)(unsigned char)(person->flags & 8)) != 0) {
                     repair_menu_kind = 3;
-                    repair_menu_npc = a1;
+                    repair_menu_npc = npc;
                     repair_menu_open(1);
                 } else {
-                    npc_talk(a1);
+                    npc_talk(npc);
                 }
                 break;
             case 9:
-                if (((int)(unsigned short)(l_20->faction_id & 8)) != 0) {
+                if (((int)(unsigned short)(person->faction_id & 8)) != 0) {
                     repair_menu_kind = 255;
-                    repair_menu_npc = a1;
+                    repair_menu_npc = npc;
                     repair_menu_open(1);
                 } else {
-                    npc_talk(a1);
+                    npc_talk(npc);
                 }
                 break;
             case 0:
@@ -687,74 +687,74 @@ void npc_click_service(struct record *a1)
             case 6:
             case 8:
             case 12:
-                if (((int)(unsigned char)(l_20->flags & 8)) != 0) {
-                    service_menu_npc = a1;
+                if (((int)(unsigned char)(person->flags & 8)) != 0) {
+                    service_menu_npc = npc;
                     service_menu_handler = (int)service_menu_sell;
                     service_menu_open((int)D_00176297);
                 } else {
-                    npc_talk(a1);
+                    npc_talk(npc);
                 }
                 break;
             default:
-                npc_talk(a1);
+                npc_talk(npc);
             }
         }
         return;
     }
-    npc_talk(a1);
+    npc_talk(npc);
 }
 
-void shop_open_repair(int a1, struct record *a2)
+void shop_open_repair(int unused, struct record *npc)
 {
-    struct record *l_14;
+    struct record *first;
 
     D_001940D4 &= 253;
-    l_14 = a2->children;
-    if (l_14 != 0) l_14->flags |= 1;
-    inventory_open_container(a2, 3, 7);
+    first = npc->children;
+    if (first != 0) first->flags |= 1;
+    inventory_open_container(npc, 3, 7);
 }
 
-void npc_talk(struct record *a1)
+void npc_talk(struct record *npc)
 {
-    int l_1C;
-    unsigned short l_18;
+    int handled;
+    unsigned short faction_id;
 
-    text_macro_npc = (struct character *)npc_talk_record_build(a1);
-    l_18 = a1->data.person.faction_id;
-    l_1C = func_00031843(28, a1, 0);
-    l_1C |= func_00031843(1, 0, a1);
-    l_1C |= quest_raise_event(28, a1, 0);
-    l_1C |= quest_raise_event(71, a1, 0);
-    l_1C |= quest_raise_event(1, 0, a1);
-    if (a1->type == 8 && l_18 != 0) l_1C |= quest_event_clicked_faction((int)(unsigned short)l_18);
-    if (l_1C != 0) return;
-    if (a1->type == 8 && a1->quest_id == 0) {
-        if (((int)(unsigned char)(a1->data.person.flags & 128)) != 0) {
-            quest_pick_for_npc(a1);
-            a1->data.person.flags &= 127;
+    text_macro_npc = (struct character *)npc_talk_record_build(npc);
+    faction_id = npc->data.person.faction_id;
+    handled = func_00031843(28, npc, 0);
+    handled |= func_00031843(1, 0, npc);
+    handled |= quest_raise_event(28, npc, 0);
+    handled |= quest_raise_event(71, npc, 0);
+    handled |= quest_raise_event(1, 0, npc);
+    if (npc->type == 8 && faction_id != 0) handled |= quest_event_clicked_faction((int)(unsigned short)faction_id);
+    if (handled != 0) return;
+    if (npc->type == 8 && npc->quest_id == 0) {
+        if (((int)(unsigned char)(npc->data.person.flags & 128)) != 0) {
+            quest_pick_for_npc(npc);
+            npc->data.person.flags &= 127;
             if (*(signed char *)D_001961F5 != 0) return;
         }
     }
-    talk_start(a1);
+    talk_start(npc);
 }
 
-void count_items_cb(struct record *a1)
+void count_items_cb(struct record *object)
 {
-    if (a1->type != 2) return;
+    if (object->type != 2) return;
     (*(int *)scratch_190be4)++;
 }
 
-int object_count_items(struct record *a1)
+int object_count_items(struct record *container)
 {
     *(int *)scratch_190be4 = 0;
-    object_foreach(a1->children, (int)count_items_cb);
+    object_foreach(container->children, (int)count_items_cb);
     return *(int *)scratch_190be4;
 }
 
-int repair_menu_open(int a1)
+int repair_menu_open(int opening)
 {
     if (((int)(unsigned char)game_mode) == 26) return 1;
-    if (a1 != 0) {
+    if (opening != 0) {
         while (mouse_buttons != 0) xn_mouse_poll_clamped();
         window_image = disk_read_file((int)D_001762DD, 0);
         game_mode = 26;
@@ -766,19 +766,19 @@ int repair_menu_open(int a1)
 
 void repair_menu_frame(void)
 {
-    int l_1C;
-    int l_18;
+    char *image;
+    int i;
 
     if (repair_menu_open(0) == 0) return;
-    l_1C = window_image;
-    xn_draw_image((int)(unsigned short)*(short *)((char *)l_1C), (int)(unsigned short)*(short *)((char *)l_1C + 2), (int)(unsigned short)*(short *)((char *)l_1C + 4), (int)(unsigned short)*(short *)((char *)l_1C + 6), l_1C + 12);
+    image = (char *)window_image;
+    xn_draw_image((int)(unsigned short)*(short *)image, (int)(unsigned short)*(short *)(image + 2), (int)(unsigned short)*(short *)(image + 4), (int)(unsigned short)*(short *)(image + 6), image + 12);
     if (key_down_esc != 0) repair_menu_close();
     if (mouse_buttons == 0 || (mouse_buttons != 0 && mouse_buttons_prev != 0)) {
         return;
     }
-    for (l_18 = 0; l_18 < 4; l_18++) {
-        if (mouse_x > *(short *)(repair_menu_buttons + (l_18 * 12)) && mouse_x < *(short *)(D_001875C4 + (l_18 * 12)) && mouse_y > *(short *)(D_001875C2 + (l_18 * 12)) && mouse_y < *(short *)(D_001875C6 + (l_18 * 12))) {
-            ((int (*)())(*(int *)(D_001875C8 + (l_18 * 12))))();
+    for (i = 0; i < 4; i++) {
+        if (mouse_x > *(short *)(repair_menu_buttons + (i * 12)) && mouse_x < *(short *)(D_001875C4 + (i * 12)) && mouse_y > *(short *)(D_001875C2 + (i * 12)) && mouse_y < *(short *)(D_001875C6 + (i * 12))) {
+            ((int (*)())(*(int *)(D_001875C8 + (i * 12))))();
         }
     }
 }
@@ -814,10 +814,10 @@ void repair_menu_sell(void)
     inventory_open_container((struct record *)D_001960D9, 2, 6);
 }
 
-int coven_menu_open(int a1)
+int coven_menu_open(int opening)
 {
     if (((int)(unsigned char)game_mode) == 27) return 1;
-    if (a1 != 0) {
+    if (opening != 0) {
         while (mouse_buttons != 0) xn_mouse_poll_clamped();
         window_image = disk_read_file((int)D_001762EA, 0);
         game_mode = 27;
@@ -829,19 +829,19 @@ int coven_menu_open(int a1)
 
 void coven_menu_frame(void)
 {
-    int l_1C;
-    int l_18;
+    char *image;
+    int i;
 
     if (coven_menu_open(0) == 0) return;
-    l_1C = window_image;
-    xn_draw_image((int)(unsigned short)*(short *)((char *)l_1C), (int)(unsigned short)*(short *)((char *)l_1C + 2), (int)(unsigned short)*(short *)((char *)l_1C + 4), (int)(unsigned short)*(short *)((char *)l_1C + 6), l_1C + 12);
+    image = (char *)window_image;
+    xn_draw_image((int)(unsigned short)*(short *)image, (int)(unsigned short)*(short *)(image + 2), (int)(unsigned short)*(short *)(image + 4), (int)(unsigned short)*(short *)(image + 6), image + 12);
     if (key_down_esc != 0) coven_menu_close();
     if (mouse_buttons == 0 || (mouse_buttons != 0 && mouse_buttons_prev != 0)) {
         return;
     }
-    for (l_18 = 0; l_18 < 4; l_18++) {
-        if (mouse_x > *(short *)(coven_menu_buttons + (l_18 * 12)) && mouse_x < *(short *)(D_001875F4 + (l_18 * 12)) && mouse_y > *(short *)(D_001875F2 + (l_18 * 12)) && mouse_y < *(short *)(D_001875F6 + (l_18 * 12))) {
-            ((int (*)())(*(int *)(D_001875F8 + (l_18 * 12))))();
+    for (i = 0; i < 4; i++) {
+        if (mouse_x > *(short *)(coven_menu_buttons + (i * 12)) && mouse_x < *(short *)(D_001875F4 + (i * 12)) && mouse_y > *(short *)(D_001875F2 + (i * 12)) && mouse_y < *(short *)(D_001875F6 + (i * 12))) {
+            ((int (*)())(*(int *)(D_001875F8 + (i * 12))))();
         }
     }
 }
@@ -870,9 +870,9 @@ void coven_menu_summon(void)
     daedra_summon((int)coven_menu_npc);
 }
 
-void click_item(int a1, struct record *a2)
+void click_item(int unused, struct record *object)
 {
-    struct item *l_14;
+    struct item *item;
 
     switch (interaction_mode) {
         return;
@@ -882,24 +882,24 @@ void click_item(int a1, struct record *a2)
         if (pick_distance > 128) {
             hud_status_set(D_0017CA14);
         } else {
-            pick_up_item(a2);
+            pick_up_item(object);
         }
         return;
     case 1:
-        l_14 = &a2->data.item;
-        click_describe_item(l_14);
+        item = &object->data.item;
+        click_describe_item(item);
     default:;
     }
 }
 
-void click_dungeon_model(int a1, struct record *a2)
+void click_dungeon_model(int hit, struct record *object)
 {
-    click_show_building_info(a1, a2);
+    click_show_building_info(hit, object);
 }
 
-void click_npc(int a1, struct record *a2)
+void click_npc(int unused, struct record *npc)
 {
-    text_macro_npc = (struct character *)npc_talk_record_build(a2);
+    text_macro_npc = (struct character *)npc_talk_record_build(npc);
     switch (interaction_mode) {
         return;
     case 0:
@@ -908,26 +908,26 @@ void click_npc(int a1, struct record *a2)
         if (pick_distance > 256) {
             hud_status_set(D_0017CA14);
         } else {
-            npc_click_service(a2);
+            npc_click_service(npc);
         }
         return;
     case 1:
         mc_set_location(1021, (int)D_00176198);
-        mc_sprintf((int)text_buffer, D_00183254, npc_display_name(a2));
+        mc_sprintf((int)text_buffer, D_00183254, npc_display_name(npc));
         hud_message_add((int)text_buffer);
     default:;
     }
 }
 
-void click_creature(int a1, struct record *a2)
+void click_creature(int unused, struct record *monster)
 {
-    struct character *l_18;
-    struct career *l_14;
+    struct character *character;
+    struct career *creature_class;
 
-    l_18 = &a2->data.character;
-    l_14 = &l_18->career;
+    character = &monster->data.character;
+    creature_class = &character->career;
     if ((int)spell_ready_touch != 0 && pick_distance < 160) {
-        cast_spell_on((int)spell_ready_touch, a2, 0);
+        cast_spell_on((int)spell_ready_touch, monster, 0);
         object_delete((int)spell_ready_touch);
         spell_ready_touch = 0;
     }
@@ -936,19 +936,19 @@ void click_creature(int a1, struct record *a2)
     case 0:
     case 1:
     case 3:
-        click_describe_creature(l_18, l_14);
+        click_describe_creature(character, creature_class);
         return;
     case 2:
         if (pick_distance > 128) {
             hud_status_set(D_0017CA14);
             return;
         }
-        pickpocket_attempt(a2);
+        pickpocket_attempt(monster);
     default:;
     }
 }
 
-void click_door(int a1, struct record *a2)
+void click_door(int unused, struct record *door)
 {
     if (pick_distance > 128) {
         hud_status_set(D_0017CA14);
@@ -957,24 +957,24 @@ void click_door(int a1, struct record *a2)
     switch (interaction_mode) {
         return;
     case 2:
-        door_try_open(a2, 1);
+        door_try_open(door, 1);
         return;
     case 0:
     case 1:
     case 3:
-        door_try_open(a2, 0);
+        door_try_open(door, 0);
     default:;
     }
 }
 
-void click_marker(int a1, int a2)
+void click_marker(int unused, int unused2)
 {
 }
 
-void click_interior_model(int a1, struct record *a2)
+void click_interior_model(int hit, struct record *object)
 {
-    struct building *l_18;
-    int l_14;
+    struct building *building;
+    int stock_count;
 
     switch (interaction_mode) {
         return;
@@ -985,48 +985,48 @@ void click_interior_model(int a1, struct record *a2)
             hud_status_set(D_0017CA14);
             return;
         }
-        l_18 = object_building(a2);
-        if (l_18 != 0 && *(int *)D_00195D3C != 0 && (((int)(unsigned short)*(short *)(*(char **)D_00195D3C)) == 418 || (((int)(unsigned short)*(short *)(*(char **)D_00195D3C)) == 410 && furniture_is_container(((int)(unsigned char)*(signed char *)(*(char **)D_00195D3C + 2)) + (((int)(unsigned short)*(short *)(*(char **)D_00195D3C)) << 7)) != 0)) && (l_14 = func_000612A1()) != 0) {
-            if (l_18->id == player_character->house) {
+        building = object_building(object);
+        if (building != 0 && *(int *)D_00195D3C != 0 && (((int)(unsigned short)*(short *)(*(char **)D_00195D3C)) == 418 || (((int)(unsigned short)*(short *)(*(char **)D_00195D3C)) == 410 && furniture_is_container(((int)(unsigned char)*(signed char *)(*(char **)D_00195D3C + 2)) + (((int)(unsigned short)*(short *)(*(char **)D_00195D3C)) << 7)) != 0)) && (stock_count = func_000612A1()) != 0) {
+            if (building->id == player_character->house) {
                 D_001940D6 |= 4;
                 inventory_open_container((struct record *)D_00196092, 0, 4);
             } else {
                 msgbox_yes_no_rsc(37);
                 if (((int)D_00196271) != 1) return;
-                if (l_14 != 0 && ((int)player_environment) == 2 && rand_range(0, 255) >= (108 - player_character->skills[15].value)) {
+                if (stock_count != 0 && ((int)player_environment) == 2 && rand_range(0, 255) >= (108 - player_character->skills[15].value)) {
                     crime_current = 13;
                     guards_summon(1);
                 }
-                if (l_14 != 0) {
+                if (stock_count != 0) {
                     D_001940D6 |= 4;
                     inventory_open_container((struct record *)D_00196120, 0, 4);
                 }
             }
-        } else if (l_18 != 0 && *(int *)D_00195D3C != 0 && ((int)(unsigned short)*(short *)(*(char **)D_00195D3C)) == 414 && ((int)(unsigned char)*(signed char *)(*(char **)D_00195D3C + 2)) == 9) {
+        } else if (building != 0 && *(int *)D_00195D3C != 0 && ((int)(unsigned short)*(short *)(*(char **)D_00195D3C)) == 414 && ((int)(unsigned char)*(signed char *)(*(char **)D_00195D3C + 2)) == 9) {
             ladder_climb();
         }
         return;
     case 1:
-        if (l_18 != 0 && *(int *)D_00195D3C != 0 && ((int)(unsigned short)*(short *)(*(char **)D_00195D3C)) == 414 && ((int)(unsigned char)*(signed char *)(*(char **)D_00195D3C + 2)) == 9) {
+        if (building != 0 && *(int *)D_00195D3C != 0 && ((int)(unsigned short)*(short *)(*(char **)D_00195D3C)) == 414 && ((int)(unsigned char)*(signed char *)(*(char **)D_00195D3C + 2)) == 9) {
             ladder_climb();
             return;
         }
-        click_show_building_info(a1, a2);
+        click_show_building_info(hit, object);
     default:;
     }
 }
 
-void click_corpse(int a1, struct record *a2)
+void click_corpse(int unused, struct record *corpse)
 {
-    struct character *l_14;
+    struct character *character;
 
     switch (interaction_mode) {
         return;
     case 1:
-        l_14 = &a2->data.character;
-        if (l_14->race < 43) {
+        character = &corpse->data.character;
+        if (character->race < 43) {
             mc_set_location(1153, (int)D_00176198);
-            mc_sprintf((int)text_buffer, D_00184329, *(int *)(monster_names + (l_14->race << 2)));
+            mc_sprintf((int)text_buffer, D_00184329, *(int *)(monster_names + (character->race << 2)));
         } else {
             mc_strncpy((int)text_buffer, D_00185093, 160, (int)D_00176198, 1155);
         }
@@ -1039,8 +1039,8 @@ void click_corpse(int a1, struct record *a2)
             hud_status_set(D_0017CA14);
             return;
         }
-        if (object_count_items(a2) != 0) {
-            inventory_open_container(a2, 0, 1);
+        if (object_count_items(corpse) != 0) {
+            inventory_open_container(corpse, 0, 1);
             return;
         }
         hud_message_add(D_001845CC);
@@ -1048,16 +1048,16 @@ void click_corpse(int a1, struct record *a2)
     }
 }
 
-void click_pedestrian(int a1, struct record *a2)
+void click_pedestrian(int unused, struct record *pedestrian)
 {
     switch (interaction_mode) {
         return;
     case 2:
         if (pick_distance > 128) {
             hud_status_set(D_0017CA14);
-        } else if (((int)(unsigned short)(a2->npc_flags & 16384)) == 0) {
-            a2->npc_flags |= 0x4000;
-            pickpocket_attempt(a2);
+        } else if (((int)(unsigned short)(pedestrian->npc_flags & 16384)) == 0) {
+            pedestrian->npc_flags |= 0x4000;
+            pickpocket_attempt(pedestrian);
         }
         return;
     case 0:
@@ -1067,12 +1067,12 @@ void click_pedestrian(int a1, struct record *a2)
             hud_status_set(D_0017CA14);
             return;
         }
-        npc_talk(a2);
+        npc_talk(pedestrian);
     default:;
     }
 }
 
-void click_loot_container(int a1, struct record *a2)
+void click_loot_container(int unused, struct record *container)
 {
     if (pick_distance > 128) {
         hud_status_set(D_0017CA14);
@@ -1084,16 +1084,16 @@ void click_loot_container(int a1, struct record *a2)
     case 1:
     case 2:
     case 3:
-        if ((a2->image >> 7) != 216) if (a2->image != 26112) return;
-        if (a2->children == 0) loot_fill_container(a2);
-        container_items_to_player(a2);
-        if (a2->children == 0) return;
-        inventory_open_container(a2, 0, 5);
+        if ((container->image >> 7) != 216) if (container->image != 26112) return;
+        if (container->children == 0) loot_fill_container(container);
+        container_items_to_player(container);
+        if (container->children == 0) return;
+        inventory_open_container(container, 0, 5);
     default:;
     }
 }
 
-void click_town_scenery(int a1, struct record *a2)
+void click_town_scenery(int hit, struct record *object)
 {
     switch (interaction_mode) {
     return;
@@ -1101,71 +1101,71 @@ case 0:
 case 1:
 case 2:
 case 3:
-    click_show_building_info(a1, a2);
+    click_show_building_info(hit, object);
 default:;
 }
 }
 
-void click_show_building_info(int a1, struct record *a2)
+void click_show_building_info(int unused, struct record *object)
 {
-    struct building *l_18;
-    int l_14;
+    struct building *building;
+    int unused2;
 
-    if (a2->type == 56 && ((int)(short)*(short *)(*(char **)click_hit + 14)) == 417 && ((int)(short)*(short *)(*(char **)click_hit + 16)) == 39) {
+    if (object->type == 56 && ((int)(short)*(short *)(*(char **)click_hit + 14)) == 417 && ((int)(short)*(short *)(*(char **)click_hit + 16)) == 39) {
         rumor_show_local();
         return;
     }
-    if (a2->parent->type != 38) return;
-    l_18 = object_building(a2);
-    if (l_18 == 0) return;
-    if (l_18->type == 23) return;
-    town_map_note_building(a2, l_18);
-    hud_message_add(building_name(l_18));
-    if (l_18->type == 1 || building_is_open(l_18) != 0 || l_18->type >= 14) return;
+    if (object->parent->type != 38) return;
+    building = object_building(object);
+    if (building == 0) return;
+    if (building->type == 23) return;
+    town_map_note_building(object, building);
+    hud_message_add(building_name(building));
+    if (building->type == 1 || building_is_open(building) != 0 || building->type >= 14) return;
     mc_set_location(1274, (int)D_00176198);
-    mc_sprintf((int)text_buffer, (int)D_001762F7, (int)(unsigned char)building_open_hours[l_18->type * 2], (int)(unsigned char)D_0017C5B9[l_18->type * 2]);
+    mc_sprintf((int)text_buffer, (int)D_001762F7, (int)(unsigned char)building_open_hours[building->type * 2], (int)(unsigned char)D_0017C5B9[building->type * 2]);
     hud_message_add((int)text_buffer);
 }
 
-int quest_active_for_faction(short a1)
+int quest_active_for_faction(short faction_id)
 {
-    struct record *l_20;
+    struct record *quest;
 
-    l_20 = quest_root->children;
-    while (l_20 != 0) {
-        if (l_20->data.quest.faction_id == a1) return 1;
-        l_20 = l_20->next;
+    quest = quest_root->children;
+    while (quest != 0) {
+        if (quest->data.quest.faction_id == faction_id) return 1;
+        quest = quest->next;
     }
     return 0;
 }
 
 int noble_quest_letter(void)
 {
-    int l_20;
-    int l_1C;
+    int count;
+    int i;
 
-    l_20 = 0;
-    for (l_1C = 0; l_1C < 29; l_1C++) {
-        if (region_event_flags[(((int)(unsigned char)current_region) * 80) + l_1C] != 0) {
-            l_20++;
+    count = 0;
+    for (i = 0; i < 29; i++) {
+        if (region_event_flags[(((int)(unsigned char)current_region) * 80) + i] != 0) {
+            count++;
         }
     }
-    if (l_20 == 0 || rand_range(1, 100) < 10) return 0;
-    l_20 = rand_range(0, l_20 - 1);
-    for (l_1C = 0; l_1C < 29; l_1C++) {
-        if (region_event_flags[(((int)(unsigned char)current_region) * 80) + l_1C] != 0) {
-            if (l_20 == 0) return l_1C + 65;
-            l_20--;
+    if (count == 0 || rand_range(1, 100) < 10) return 0;
+    count = rand_range(0, count - 1);
+    for (i = 0; i < 29; i++) {
+        if (region_event_flags[(((int)(unsigned char)current_region) * 80) + i] != 0) {
+            if (count == 0) return i + 65;
+            count--;
         }
     }
     return 0;
 }
 
-int service_menu_open(int a1)
+int service_menu_open(int label)
 {
     if (((int)(unsigned char)game_mode) == 28) return 1;
-    if (a1 != 0) {
-        service_menu_label = a1;
+    if (label != 0) {
+        service_menu_label = label;
         while (mouse_buttons != 0) xn_mouse_poll_clamped();
         window_image = disk_read_file((int)D_00176322, 0);
         game_mode = 28;
@@ -1177,20 +1177,20 @@ int service_menu_open(int a1)
 
 void service_menu_frame(void)
 {
-    int l_1C;
-    int l_18;
+    char *image;
+    int i;
 
     if (service_menu_open(0) == 0) return;
-    l_1C = window_image;
-    xn_draw_image((int)(unsigned short)*(short *)((char *)l_1C), (int)(unsigned short)*(short *)((char *)l_1C + 2), (int)(unsigned short)*(short *)((char *)l_1C + 4), (int)(unsigned short)*(short *)((char *)l_1C + 6), l_1C + 12);
+    image = (char *)window_image;
+    xn_draw_image((int)(unsigned short)*(short *)image, (int)(unsigned short)*(short *)(image + 2), (int)(unsigned short)*(short *)(image + 4), (int)(unsigned short)*(short *)(image + 6), image + 12);
     text_draw_centred_coloured(service_menu_label, 159, 70, 145, 156);
     if (key_down_esc != 0) service_menu_close();
     if (mouse_buttons == 0 || (mouse_buttons != 0 && mouse_buttons_prev != 0)) {
         return;
     }
-    for (l_18 = 0; l_18 < 3; l_18++) {
-        if (mouse_x > *(short *)(service_menu_buttons + (l_18 * 12)) && mouse_x < *(short *)(D_00187624 + (l_18 * 12)) && mouse_y > *(short *)(D_00187622 + (l_18 * 12)) && mouse_y < *(short *)(D_00187626 + (l_18 * 12))) {
-            ((int (*)())(*(int *)(D_00187628 + (l_18 * 12))))();
+    for (i = 0; i < 3; i++) {
+        if (mouse_x > *(short *)(service_menu_buttons + (i * 12)) && mouse_x < *(short *)(D_00187624 + (i * 12)) && mouse_y > *(short *)(D_00187622 + (i * 12)) && mouse_y < *(short *)(D_00187626 + (i * 12))) {
+            ((int (*)())(*(int *)(D_00187628 + (i * 12))))();
         }
     }
 }
@@ -1224,25 +1224,25 @@ void service_menu_sell(void)
     repair_menu_sell();
 }
 
-int shelf_shop_stocked(int a1)
+int shelf_shop_stocked(int model_index)
 {
-    int l_1C;
+    int i;
 
-    for (l_1C = 0; l_1C < stocked_shop_count; l_1C++) {
-        if (*(int *)(stocked_shop_ids + (l_1C << 2)) == a1) return 1;
+    for (i = 0; i < stocked_shop_count; i++) {
+        if (*(int *)(stocked_shop_ids + (i << 2)) == model_index) return 1;
     }
     return 0;
 }
 
-void container_items_to_player(struct record *a1)
+void container_items_to_player(struct record *object)
 {
-    if (a1 == 0) return;
-    a1 = a1->children;
-    while (a1 != 0) {
-        a1->x = player_object->x;
-        a1->y = player_object->y;
-        a1->z = player_object->z;
-        a1 = a1->next;
+    if (object == 0) return;
+    object = object->children;
+    while (object != 0) {
+        object->x = player_object->x;
+        object->y = player_object->y;
+        object->z = player_object->z;
+        object = object->next;
     }
 }
 
@@ -1257,8 +1257,8 @@ void ambient_dungeon_sounds(void)
 
 void footstep_sounds(void)
 {
-    int l_1C;
-    int l_18;
+    int sound_index;
+    int weather;
 
     if (xn_math_approx_dist2d(D_001A4FBC, D_001A4FC4, player_object->x, player_object->z) <= 100 || player_on_ground == 0) {
         return;
@@ -1267,46 +1267,46 @@ void footstep_sounds(void)
     D_001A4FC4 = player_object->z;
     switch (player_environment) {
     case 1:
-        l_18 = (int)(unsigned char)climate_weathers[climate_category()];
-        if ((l_18 & 127) == 5) {
-            l_1C = 6;
+        weather = (int)(unsigned char)climate_weathers[climate_category()];
+        if ((weather & 127) == 5) {
+            sound_index = 6;
         } else {
-            l_1C = 4;
+            sound_index = 4;
         }
         break;
     case 2:
-        l_1C = 2;
+        sound_index = 2;
         break;
     case 3:
-        l_1C = (int)(signed char)*(signed char *)(*(char **)D_00195AB4 + 4);
-        if (l_1C > 4 || l_1C < 0) l_1C = 0;
-        l_1C <<= 1;
+        sound_index = (int)(signed char)*(signed char *)(*(char **)D_00195AB4 + 4);
+        if (sound_index > 4 || sound_index < 0) sound_index = 0;
+        sound_index <<= 1;
         if (dungeon_water_level != 10000 && player_object->y > dungeon_water_level && in_dungeon_water == 0) {
-            l_1C = 8;
+            sound_index = 8;
         }
         if (in_dungeon_water != 0 && ((int)(unsigned char)player_underwater) != 1) {
-            l_1C = 10;
+            sound_index = 10;
         } else {
             if (in_dungeon_water != 0) return;
         }
     }
-    if (D_001962A0 != 0) l_1C = 10;
+    if (D_001962A0 != 0) sound_index = 10;
     position_history_record();
     if (((int)(unsigned short)(player_character->flags & 1536)) != 0) return;
-    if (((struct bf8_6_1 *)&D_001940D7)->f != 0) l_1C++;
+    if (((struct bf8_6_1 *)&D_001940D7)->f != 0) sound_index++;
     D_001940D7 ^= 64;
-    sound_play((int)(unsigned char)footstep_sound_ids[l_1C], player_object, 100);
+    sound_play((int)(unsigned char)footstep_sound_ids[sound_index], player_object, 100);
 }
 
 void position_history_reset(void)
 {
-    int l_18;
+    int i;
 
     D_001A4FCC = (position_history_next = (D_001A4FD4 = (ground_position_history_next = 0)));
-    for (l_18 = 0; l_18 < 32; l_18++) {
-        *(int *)(position_history + (l_18 * 12)) = (*(int *)(ground_position_history + (l_18 * 12)) = player_object->x);
-        *(int *)(D_001A4CA4 + (l_18 * 12)) = (*(int *)(D_001A4E24 + (l_18 * 12)) = player_object->y);
-        *(int *)(D_001A4CA8 + (l_18 * 12)) = (*(int *)(D_001A4E28 + (l_18 * 12)) = player_object->z);
+    for (i = 0; i < 32; i++) {
+        *(int *)(position_history + (i * 12)) = (*(int *)(ground_position_history + (i * 12)) = player_object->x);
+        *(int *)(D_001A4CA4 + (i * 12)) = (*(int *)(D_001A4E24 + (i * 12)) = player_object->y);
+        *(int *)(D_001A4CA8 + (i * 12)) = (*(int *)(D_001A4E28 + (i * 12)) = player_object->z);
     }
 }
 
@@ -1325,230 +1325,230 @@ void position_history_record(void)
     D_001A4FD4++;
 }
 
-int spawn_point_visible(struct record *a1)
+int spawn_point_visible(struct record *object)
 {
-    int l_24;
-    int l_20;
-    int l_1C;
+    int bearing;
+    int angle_diff;
+    int direction;
 
     if (D_0019629D != 0) return 0;
-    if (collide_line_of_sight(player_object, a1) == 0) return 0;
-    l_24 = xn_math_angle_to_point(player_object->x, player_object->z, a1->x, a1->z);
-    l_20 = ai_angle_diff(a1->yaw, l_24, (int)&l_1C);
-    return ((l_20 < 400) ? 1 : 0);
+    if (collide_line_of_sight(player_object, object) == 0) return 0;
+    bearing = xn_math_angle_to_point(player_object->x, player_object->z, object->x, object->z);
+    angle_diff = ai_angle_diff(object->yaw, bearing, (int)&direction);
+    return ((angle_diff < 400) ? 1 : 0);
 }
 
-int spawn_point_wilderness(struct record *a1)
+int spawn_point_wilderness(struct record *object)
 {
-    int l_2C;
-    int l_28;
-    int l_24;
-    int l_20;
-    int l_1C;
+    int yaw;
+    int distance;
+    int dx;
+    int dz;
+    int i;
 
-    l_1C = 0;
-    if (l_1C < 20) {
-        l_2C = ((rand() % 90) + ((int)(short)*(short *)((char *)*(int *)&player_object + 3))) - 45;
-        l_2C &= 2047;
-        l_28 = (rand_range(1, 512) + xn_cam_far_z) - 256;
-        xn_math_yaw_offset_xz(l_2C, l_28, (int)&l_24, (int)&l_20);
-        a1->x = player_object->x + l_24;
-        a1->z = player_object->z + l_20;
-        a1->y = xn_terrain_height_at(a1->x, a1->z);
+    i = 0;
+    if (i < 20) {
+        yaw = ((rand() % 90) + ((int)(short)*(short *)((char *)*(int *)&player_object + 3))) - 45;
+        yaw &= 2047;
+        distance = (rand_range(1, 512) + xn_cam_far_z) - 256;
+        xn_math_yaw_offset_xz(yaw, distance, (int)&dx, (int)&dz);
+        object->x = player_object->x + dx;
+        object->z = player_object->z + dz;
+        object->y = xn_terrain_height_at(object->x, object->z);
         return 1;
     }
-    for (l_1C = 0; l_1C < 50; l_1C++) {
-        xn_math_yaw_offset_xz(rand() % 2048, rand_range(512, 768), (int)&l_24, (int)&l_20);
-        a1->x = player_object->x + l_24;
-        a1->z = player_object->z + l_20;
-        a1->y = xn_terrain_height_at(a1->x, a1->z);
-        if (spawn_point_visible(a1) == 0) return 1;
+    for (i = 0; i < 50; i++) {
+        xn_math_yaw_offset_xz(rand() % 2048, rand_range(512, 768), (int)&dx, (int)&dz);
+        object->x = player_object->x + dx;
+        object->z = player_object->z + dz;
+        object->y = xn_terrain_height_at(object->x, object->z);
+        if (spawn_point_visible(object) == 0) return 1;
     }
     return 0;
 }
 
-int spawn_point_town(struct record *a1, int a2, int a3)
+int spawn_point_town(struct record *object, int min_distance, int max_distance)
 {
-    int l_24;
-    int l_20;
-    int l_1C;
-    int l_18;
-    int l_14;
+    int distance;
+    int dx;
+    int dz;
+    int i;
+    int slot;
 
-    if (a2 == 0) {
-        a2 = 128;
-        a3 = 3096;
+    if (min_distance == 0) {
+        min_distance = 128;
+        max_distance = 3096;
     }
-    for (l_18 = 0; l_18 < 50; l_18++) {
-        xn_math_yaw_offset_xz(rand() % 2048, rand_range(a2, a3), (int)&l_20, (int)&l_1C);
-        a1->x = player_object->x + l_20;
-        a1->z = player_object->z + l_1C;
-        a1->y = xn_terrain_height_at(a1->x, a1->z);
-        if (pedestrian_spawn_spot_ok(a1, a1->x - location_object->x, a1->z - location_object->z) != 0) return 1;
+    for (i = 0; i < 50; i++) {
+        xn_math_yaw_offset_xz(rand() % 2048, rand_range(min_distance, max_distance), (int)&dx, (int)&dz);
+        object->x = player_object->x + dx;
+        object->z = player_object->z + dz;
+        object->y = xn_terrain_height_at(object->x, object->z);
+        if (pedestrian_spawn_spot_ok(object, object->x - location_object->x, object->z - location_object->z) != 0) return 1;
     }
     if (position_history_next < 20) return 0;
-    for (l_18 = 0; l_18 < 20; l_18++) {
-        l_14 = rand() % 32;
-        l_24 = xn_math_approx_dist2d(player_object->x, player_object->z, *(int *)(position_history + (l_14 * 12)), *(int *)(D_001A4CA8 + (l_14 * 12)));
-        if (l_24 > a2 && l_24 < a3) {
-            a1->x = *(int *)(position_history + (l_14 * 12));
-            a1->y = *(int *)(D_001A4CA4 + (l_14 * 12));
-            a1->z = *(int *)(D_001A4CA8 + (l_14 * 12));
-            if (pedestrian_spawn_spot_ok(a1, a1->x, a1->z) != 0) return 1;
+    for (i = 0; i < 20; i++) {
+        slot = rand() % 32;
+        distance = xn_math_approx_dist2d(player_object->x, player_object->z, *(int *)(position_history + (slot * 12)), *(int *)(D_001A4CA8 + (slot * 12)));
+        if (distance > min_distance && distance < max_distance) {
+            object->x = *(int *)(position_history + (slot * 12));
+            object->y = *(int *)(D_001A4CA4 + (slot * 12));
+            object->z = *(int *)(D_001A4CA8 + (slot * 12));
+            if (pedestrian_spawn_spot_ok(object, object->x, object->z) != 0) return 1;
         }
     }
     return 0;
 }
 
-void spawn_point_occupied_cb(struct record *a1)
+void spawn_point_occupied_cb(struct record *object)
 {
-    int l_18;
+    int distance;
 
     if ((int)scratch_object == 0) return;
-    if (a1->type != 18) return;
-    l_18 = xn_math_approx_hypot(scratch_object->y - a1->y, xn_math_approx_dist2d(scratch_object->x, scratch_object->z, a1->x, a1->z));
-    if (l_18 >= 64) return;
+    if (object->type != 18) return;
+    distance = xn_math_approx_hypot(scratch_object->y - object->y, xn_math_approx_dist2d(scratch_object->x, scratch_object->z, object->x, object->z));
+    if (distance >= 64) return;
     scratch_object = 0;
 }
 
-int spawn_point_occupied(struct record *a1)
+int spawn_point_occupied(struct record *object)
 {
-    scratch_object = a1;
+    scratch_object = object;
     object_foreach(location_object, (int)spawn_point_occupied_cb);
     return (((int)scratch_object == 0) ? 1 : 0);
 }
 
-int spawn_point_building(struct record *a1)
+int spawn_point_building(struct record *object)
 {
-    int l_28;
-    int l_24;
-    int l_20;
-    struct record *l_1C;
+    int i;
+    int index;
+    int count;
+    struct record *marker;
 
-    l_20 = marker_count(player_object->parent->children, 6);
-    if (l_20 == 0) return 0;
-    l_24 = rand() % l_20;
-    for (l_28 = 0; l_28 < l_20; l_28++) {
-        l_1C = marker_find_nth(player_object->parent->children, 6, l_24);
-        if (abs(player_object->y - l_1C->y) < 64) {
-            if (xn_math_approx_dist2d(player_object->x, player_object->z, l_1C->x, l_1C->z) > 80) {
-                if (spawn_point_visible(a1) == 0) {
-                    a1->x = l_1C->x;
-                    a1->z = l_1C->z;
-                    a1->y = l_1C->y;
+    count = marker_count(player_object->parent->children, 6);
+    if (count == 0) return 0;
+    index = rand() % count;
+    for (i = 0; i < count; i++) {
+        marker = marker_find_nth(player_object->parent->children, 6, index);
+        if (abs(player_object->y - marker->y) < 64) {
+            if (xn_math_approx_dist2d(player_object->x, player_object->z, marker->x, marker->z) > 80) {
+                if (spawn_point_visible(object) == 0) {
+                    object->x = marker->x;
+                    object->z = marker->z;
+                    object->y = marker->y;
                     return 1;
                 }
             }
         }
-        l_24 = (l_24 + 1) % l_20;
+        index = (index + 1) % count;
     }
-    for (l_28 = 0; l_28 < l_20; l_28++) {
-        l_1C = marker_find_nth(player_object->parent->children, 6, l_24);
-        if (abs(player_object->y - l_1C->y) > 64) {
-            if (xn_math_approx_dist2d(player_object->x, player_object->z, l_1C->x, l_1C->z) > 80) {
-                if (spawn_point_visible(a1) == 0) {
-                    a1->x = l_1C->x;
-                    a1->z = l_1C->z;
-                    a1->y = l_1C->y;
+    for (i = 0; i < count; i++) {
+        marker = marker_find_nth(player_object->parent->children, 6, index);
+        if (abs(player_object->y - marker->y) > 64) {
+            if (xn_math_approx_dist2d(player_object->x, player_object->z, marker->x, marker->z) > 80) {
+                if (spawn_point_visible(object) == 0) {
+                    object->x = marker->x;
+                    object->z = marker->z;
+                    object->y = marker->y;
                     return 1;
                 }
             }
         }
-        l_24 = (l_24 + 1) % l_20;
+        index = (index + 1) % count;
     }
-    l_1C = marker_find_nth(player_object->parent->children, 6, l_24);
-    a1->x = l_1C->x;
-    a1->z = l_1C->z;
-    a1->y = l_1C->y;
+    marker = marker_find_nth(player_object->parent->children, 6, index);
+    object->x = marker->x;
+    object->z = marker->z;
+    object->y = marker->y;
     return 1;
 }
 
-int spawn_point_dungeon_level(struct record *a1, int a2, int a3, int a4)
+int spawn_point_dungeon_level(struct record *object, int level, int min_distance, int max_distance)
 {
-    struct record *l_2C;
-    struct record *l_28;
-    char l_80[72];
-    int l_20;
-    int l_1C;
-    int l_18;
-    int l_14;
-    int l_10;
+    struct record *cell;
+    struct record *grid_object;
+    char point[72];
+    signed char *grid;
+    int unused;
+    int distance;
+    int best_distance;
+    int i;
 
-    if (a2 < 0 || a2 > 8) return 0;
-    l_2C = location_cell_at(player_object->x, player_object->z);
-    l_28 = object_find_type(l_2C, 60);
-    if (l_28 == 0) return 0;
-    l_20 = (int)RECORD_DATA(l_28) + (a2 << 6);
-    l_1C = 0;
-    l_14 = a4;
-    for (l_10 = 0; l_10 < 64; l_10++) {
-        if (*(signed char *)((char *)l_20++) != 0) {
-            *(int *)((char *)l_80 + 7) = (((l_10 % 8) << 8) + l_28->x) + 128;
-            *(int *)((char *)l_80 + 15) = (((l_10 / 8) << 8) + l_28->z) + 128;
-            *(int *)((char *)l_80 + 11) = (-(a2 << 8)) - 80;
-            l_18 = xn_math_approx_dist2d(player_object->x, player_object->z, *(int *)((char *)l_80 + 7), *(int *)((char *)l_80 + 15));
-            if (l_18 < l_14 && l_18 > a3 && spawn_point_visible((struct record *)l_80) == 0) {
-                l_14 = l_18;
-                a1->x = *(int *)((char *)l_80 + 7);
-                a1->z = *(int *)((char *)l_80 + 15);
-                a1->y = *(int *)((char *)l_80 + 11) + 80;
+    if (level < 0 || level > 8) return 0;
+    cell = location_cell_at(player_object->x, player_object->z);
+    grid_object = object_find_type(cell, 60);
+    if (grid_object == 0) return 0;
+    grid = (signed char *)RECORD_DATA(grid_object) + (level << 6);
+    unused = 0;
+    best_distance = max_distance;
+    for (i = 0; i < 64; i++) {
+        if (*grid++ != 0) {
+            *(int *)((char *)point + 7) = (((i % 8) << 8) + grid_object->x) + 128;
+            *(int *)((char *)point + 15) = (((i / 8) << 8) + grid_object->z) + 128;
+            *(int *)((char *)point + 11) = (-(level << 8)) - 80;
+            distance = xn_math_approx_dist2d(player_object->x, player_object->z, *(int *)((char *)point + 7), *(int *)((char *)point + 15));
+            if (distance < best_distance && distance > min_distance && spawn_point_visible((struct record *)point) == 0) {
+                best_distance = distance;
+                object->x = *(int *)((char *)point + 7);
+                object->z = *(int *)((char *)point + 15);
+                object->y = *(int *)((char *)point + 11) + 80;
             }
         }
     }
-    return a1->x;
+    return object->x;
 }
 
-int spawn_point_dungeon(struct record *a1, int a2, int a3)
+int spawn_point_dungeon(struct record *object, int min_distance, int max_distance)
 {
-    int l_20;
-    int l_1C;
-    int l_18;
-    int l_14;
+    int level;
+    int slot;
+    int distance;
+    int i;
 
-    l_20 = (-player_object->y) / 256;
-    if (spawn_point_dungeon_level(a1, l_20, a2, a3) != 0 && spawn_point_occupied(a1) == 0) return 1;
-    for (l_14 = 0; l_14 < 8; l_14++) {
-        if (spawn_point_dungeon_level(a1, l_14, a2, a3) != 0 && spawn_point_occupied(a1) == 0) return 1;
+    level = (-player_object->y) / 256;
+    if (spawn_point_dungeon_level(object, level, min_distance, max_distance) != 0 && spawn_point_occupied(object) == 0) return 1;
+    for (i = 0; i < 8; i++) {
+        if (spawn_point_dungeon_level(object, i, min_distance, max_distance) != 0 && spawn_point_occupied(object) == 0) return 1;
     }
     if (position_history_next < 20) return 0;
-    for (l_14 = 0; l_14 < 20; l_14++) {
-        l_1C = rand() % 32;
-        l_18 = xn_math_approx_dist2d(player_object->x, player_object->z, *(int *)(position_history + (l_1C * 12)), *(int *)(D_001A4CA8 + (l_1C * 12)));
-        if (l_18 > a2 && l_18 < a3) {
-            a1->x = *(int *)(position_history + (l_1C * 12));
-            a1->y = *(int *)(D_001A4CA4 + (l_1C * 12));
-            a1->z = *(int *)(D_001A4CA8 + (l_1C * 12));
-            if (spawn_point_fits(a1) != 0) return 1;
+    for (i = 0; i < 20; i++) {
+        slot = rand() % 32;
+        distance = xn_math_approx_dist2d(player_object->x, player_object->z, *(int *)(position_history + (slot * 12)), *(int *)(D_001A4CA8 + (slot * 12)));
+        if (distance > min_distance && distance < max_distance) {
+            object->x = *(int *)(position_history + (slot * 12));
+            object->y = *(int *)(D_001A4CA4 + (slot * 12));
+            object->z = *(int *)(D_001A4CA8 + (slot * 12));
+            if (spawn_point_fits(object) != 0) return 1;
         }
     }
-    a1->z = 0;
-    a1->y = a1->z;
-    a1->x = a1->y;
+    object->z = 0;
+    object->y = object->z;
+    object->x = object->y;
     return 0;
 }
 
 void ambient_outdoor_sounds(void)
 {
-    int l_20;
-    int l_1C;
-    int l_18;
+    int bad_weather;
+    int in_town;
+    int weather;
 
     if (((int)player_environment) == 1) {
-        l_1C = location_contains(player_object->x, player_object->z);
-        if (l_1C != 0 && current_location->kind == 12 && rand() < 30) {
+        in_town = location_contains(player_object->x, player_object->z);
+        if (in_town != 0 && current_location->kind == 12 && rand() < 30) {
             sound_play(16, player_object, 100);
         }
-        if (l_1C != 0 && current_location->kind == 12 && rand() < 30) {
+        if (in_town != 0 && current_location->kind == 12 && rand() < 30) {
             sound_play(383, player_object, 100);
         }
-        l_18 = (int)(unsigned char)climate_weathers[climate_category()];
-        if (l_18 == 4 || l_18 == 5 || l_18 == 3 || (l_18 & 128) != 0) {
-            l_20 = 1;
+        weather = (int)(unsigned char)climate_weathers[climate_category()];
+        if (weather == 4 || weather == 5 || weather == 3 || (weather & 128) != 0) {
+            bad_weather = 1;
         } else {
-            l_20 = 0;
+            bad_weather = 0;
         }
-        l_18 = l_20;
-        if (daylight != 0 && l_18 == 0 && rand() < 30) {
+        weather = bad_weather;
+        if (daylight != 0 && weather == 0 && rand() < 30) {
             sound_play((rand() & 1) + 300, player_object, 100);
         }
         if (((int)(unsigned short)(player_character->flags & 1536)) != 0 && rand() < 80) {
@@ -1567,19 +1567,19 @@ void ambient_outdoor_sounds(void)
 
 int music_dungeon_song(void)
 {
-    int l_24;
-    int l_20;
-    short l_18;
+    int song;
+    int i;
+    short location_id;
 
-    *(int *)&l_18 = ((unsigned)location_object->id) >> 16;
-    for (l_20 = 0; l_20 < 10; l_20++) {
-        if ((short)*(int *)&l_18 == music_special_dungeon_ids[l_20]) {
+    *(int *)&location_id = ((unsigned)location_object->id) >> 16;
+    for (i = 0; i < 10; i++) {
+        if ((short)*(int *)&location_id == music_special_dungeon_ids[i]) {
             if (music_uses_fm != 0) {
-                l_24 = D_001878AC[l_20];
+                song = D_001878AC[i];
             } else {
-                l_24 = D_001878D4[l_20];
+                song = D_001878D4[i];
             }
-            return l_24;
+            return song;
         }
     }
     return 0;

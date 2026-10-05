@@ -16,38 +16,38 @@ extern int mc_memcpy();
 struct S89 { char p[73]; unsigned char f; char q[15]; };
 struct E4 { short t; short v; };
 
-void item_apply_equip_effects(int a1, int a2)
+void item_apply_equip_effects(int object, int slot)
 {
-    int l_24;
-    int l_20;
-    int l_1C;
-    int l_18;
-    int l_14;
+    int i;
+    int j;
+    int item;
+    int spell_object;
+    int spell;
 
-    l_24 = 0;
-    l_1C = a1 + 71;
-    l_14 = 0;
-    while (l_24 < 10 && ((int)(short)*(short *)((char *)((l_24 << 2) + l_1C) + 67)) != (-1)) {
-        switch (*(unsigned short *)((char *)((l_24 << 2) + l_1C) + 67)) {
+    i = 0;
+    item = object + 71;
+    spell = 0;
+    while (i < 10 && ((int)(short)*(short *)((char *)((i << 2) + item) + 67)) != (-1)) {
+        switch (*(unsigned short *)((char *)((i << 2) + item) + 67)) {
         case 1:
-            l_20 = 0;
-            while ((*(struct S89 **)((char *)&spell_records))[l_20].f != ((struct E4 *)(l_1C + 67))[l_24].v) {
-                l_20++;
+            j = 0;
+            while ((*(struct S89 **)((char *)&spell_records))[j].f != ((struct E4 *)(item + 67))[i].v) {
+                j++;
             }
-            l_18 = object_create_child((int)location_object, 0, 89);
-            *(signed char *)((char *)l_18) = 9;
-            *(short *)((char *)l_18 + 21) = 3;
-            mc_memcpy(l_18 + 71, (int)((char *)spell_records + (l_20 * 89)), 89, (int)D_0017704C, 2092, 4);
-            l_14 = l_18 + 71;
-            *(signed char *)((char *)l_14 + 72) = *(signed char *)&a2 + 200;
-            for (l_20 = 0; l_20 < 3; l_20++) {
-                if (((int)(unsigned char)*(signed char *)((char *)((l_20 * 2) + l_14))) != 255) {
-                    *(signed char *)((char *)((l_20 * 3) + l_14) + 14) = 255;
-                    *(signed char *)((char *)((l_20 * 3) + l_14) + 15) = 0;
-                    *(signed char *)((char *)((l_20 * 3) + l_14) + 16) = 0;
+            spell_object = object_create_child((int)location_object, 0, 89);
+            *(signed char *)((char *)spell_object) = 9;
+            *(short *)((char *)spell_object + 21) = 3;
+            mc_memcpy(spell_object + 71, (int)((char *)spell_records + (j * 89)), 89, (int)D_0017704C, 2092, 4);
+            spell = spell_object + 71;
+            *(signed char *)((char *)spell + 72) = *(signed char *)&slot + 200;
+            for (j = 0; j < 3; j++) {
+                if (((int)(unsigned char)*(signed char *)((char *)((j * 2) + spell))) != 255) {
+                    *(signed char *)((char *)((j * 3) + spell) + 14) = 255;
+                    *(signed char *)((char *)((j * 3) + spell) + 15) = 0;
+                    *(signed char *)((char *)((j * 3) + spell) + 16) = 0;
                 }
             }
-            cast_item_spell_at(l_18);
+            cast_item_spell_at(spell_object);
             break;
         case 5:
             D_00195B44 = game_minutes;
@@ -56,10 +56,10 @@ void item_apply_equip_effects(int a1, int a2)
             player_character->conditions |= 0x200;
             break;
         case 10:
-            player_character->skills[(int)(short)*(short *)((char *)((l_24 << 2) + l_1C) + 69)].value += 15;
+            player_character->skills[(int)(short)*(short *)((char *)((i << 2) + item) + 69)].value += 15;
         }
-        l_24++;
+        i++;
     }
-    if (l_24 == 0 || l_14 == 0) return;
-    item_damage(a1, spell_cost(l_14, (int)player_character));
+    if (i == 0 || spell == 0) return;
+    item_damage(object, spell_cost(spell, (int)player_character));
 }

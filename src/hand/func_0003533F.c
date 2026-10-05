@@ -17,27 +17,27 @@ extern void xn_sky_draw_rain(void);
 
 void weather_draw_precipitation(void)
 {
-    int n;
-    int kind;
-    int old;
+    int climate;
+    int weather;
+    int saved_clip;
 
-    n = climate_category();
+    climate = climate_category();
     if (D_00187CA8 == 0)
         return;
     if (player_environment != 1)
         return;
-    kind = climate_weathers[n];
+    weather = climate_weathers[climate];
     if (region_precipitation_override[current_region].f0 != 0)
-        kind = region_precipitation_override[current_region].f0 - 1;
-    if ((kind & 127) == 5) {
-        old = xn_gfx_clip_bottom;
+        weather = region_precipitation_override[current_region].f0 - 1;
+    if ((weather & 127) == 5) {
+        saved_clip = xn_gfx_clip_bottom;
         xn_gfx_clip_bottom = (game_settings->view_flags & 1) ? 199 : hud_bar_image->f2 - 2;
         xn_sky_draw_snow();
-        xn_gfx_clip_bottom = old;
-    } else if ((kind & 127) == 4) {
-        old = xn_gfx_clip_bottom;
+        xn_gfx_clip_bottom = saved_clip;
+    } else if ((weather & 127) == 4) {
+        saved_clip = xn_gfx_clip_bottom;
         xn_gfx_clip_bottom = (game_settings->view_flags & 1) ? 199 : hud_bar_image->f2 - 2;
         xn_sky_draw_rain();
-        xn_gfx_clip_bottom = old;
+        xn_gfx_clip_bottom = saved_clip;
     }
 }

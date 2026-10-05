@@ -13,38 +13,38 @@ extern struct quest *current_quest;
 
 extern int rand_range(int, int);
 
-void quest_face_add(struct record *a1, int a2, int a3, int a4)
+void quest_face_add(struct record *object, int name_bank, int gender, int object_id)
 {
-    int l_1C;
-    int l_18;
-    int l_14;
-    int l_10;
-    short l_C;
+    int slot;
+    int face_index;
+    int i;
+    char *image;
+    struct character *character;
 
-    if (a1->type == 18) {
-        *(int *)&l_C = (int)&a1->data.character;
-        a3 = ((((int)(unsigned short)(*(short *)(*(char **)&l_C + 64) & 1)) != 0) ? 1 : 0);
-    } else if (a3 != 0) {
-        a3 = 1;
+    if (object->type == 18) {
+        character = &object->data.character;
+        gender = ((((int)(unsigned short)(character->flags & 1)) != 0) ? 1 : 0);
+    } else if (gender != 0) {
+        gender = 1;
     }
-    l_1C = 0;
-    while (*(int *)(quest_faces_object + (l_1C * 10)) != 0 && l_1C < 10) l_1C++;
-    if (l_1C >= 10) return;
-    *(int *)(quest_faces_object + (l_1C * 10)) = a4;
-    *(signed char *)(quest_faces_quest + (l_1C * 10)) = (signed char)current_quest->id;
-    if (a1->type != 18 && a1->data.building.faction_id == 514) {
-        l_18 = a3 + (a2 * 2);
-        quest_faces[l_1C * 10] = (((*(signed char *)&a3 << 7) + (*(signed char *)&a2 << 6)) + *(signed char *)&l_18) | 16;
-        l_10 = D_00195D14;
+    slot = 0;
+    while (*(int *)(quest_faces_object + (slot * 10)) != 0 && slot < 10) slot++;
+    if (slot >= 10) return;
+    *(int *)(quest_faces_object + (slot * 10)) = object_id;
+    *(signed char *)(quest_faces_quest + (slot * 10)) = (signed char)current_quest->id;
+    if (object->type != 18 && object->data.building.faction_id == 514) {
+        face_index = gender + (name_bank * 2);
+        quest_faces[slot * 10] = (((*(signed char *)&gender << 7) + (*(signed char *)&name_bank << 6)) + *(signed char *)&face_index) | 16;
+        image = (char *)D_00195D14;
     } else {
-        quest_faces[l_1C * 10] = ((*(signed char *)&a3 << 7) + (*(signed char *)&a2 << 6)) + rand_range(0, 9);
-        l_10 = quest_face_images[((a3 * 2) + a2)];
+        quest_faces[slot * 10] = ((*(signed char *)&gender << 7) + (*(signed char *)&name_bank << 6)) + rand_range(0, 9);
+        image = (char *)quest_face_images[((gender * 2) + name_bank)];
     }
-    l_14 = 0;
-    l_18 = (int)(unsigned char)(quest_faces[l_1C * 10] & 15);
-    while (l_14 < l_18) {
-        l_10 = (((int)(unsigned short)*(short *)((char *)l_10 + 10)) + l_10) + 12;
-        l_14++;
+    i = 0;
+    face_index = (int)(unsigned char)(quest_faces[slot * 10] & 15);
+    while (i < face_index) {
+        image = (((int)*(unsigned short *)(image + 10)) + image) + 12;
+        i++;
     }
-    *(int *)(quest_faces_image + (l_1C * 10)) = l_10;
+    *(char **)(quest_faces_image + (slot * 10)) = image;
 }

@@ -9,23 +9,23 @@ extern int object_reparent(struct record *, struct record *);
 extern void item_make_random(unsigned short, struct item *);
 extern void item_make(int, int, struct item *);
 
-struct record *kludge_add_random_item(struct record *a1, int a2)
+struct record *kludge_add_random_item(struct record *container, int group)
 {
-    struct record *l_20;
-    struct record *l_1C;
-    struct item *l_18;
+    struct record *object;
+    struct record *bottle;
+    struct item *item;
 
-    l_20 = object_create_child(a1, 0, 107);
-    l_20->type = 2;
-    l_18 = &l_20->data.item;
-    item_make_random((int)(unsigned short)*(short *)&a2, l_18);
-    if ((l_18->item_flags & 8) != 0) {
-        l_1C = object_create_child(a1, 0, 107);
-        l_1C->type = 2;
-        object_reparent(l_1C, l_20);
-        l_18 = &l_1C->data.item;
-        item_make(1, 1, l_18);
-        return l_1C;
+    object = object_create_child(container, 0, 107);
+    object->type = 2;
+    item = &object->data.item;
+    item_make_random((int)(unsigned short)*(short *)&group, item);
+    if ((item->item_flags & 8) != 0) {
+        bottle = object_create_child(container, 0, 107);
+        bottle->type = 2;
+        object_reparent(bottle, object);
+        item = &bottle->data.item;
+        item_make(1, 1, item);
+        return bottle;
     }
-    return l_20;
+    return object;
 }

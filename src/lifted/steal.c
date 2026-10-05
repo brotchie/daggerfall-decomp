@@ -32,29 +32,29 @@ extern void guild_count_crime(int, unsigned char);
 extern void hud_status_set(int);
 #pragma aux mc_set_location parm routine [];
 
-void pickpocket_attempt(struct record *a1)
+void pickpocket_attempt(struct record *target)
 {
-    int l_20;
-    int l_1C;
-    struct character *l_18;
+    int gold;
+    int chance;
+    struct character *victim;
 
-    l_1C = (int)(short)player_character->skills[15].value;
+    chance = (int)(short)player_character->skills[15].value;
     skill_add_uses(15, 1);
-    if (a1->type == 18) {
-        l_18 = &a1->data.character;
-        l_1C += (player_character->level - l_18->level) * 5;
+    if (target->type == 18) {
+        victim = &target->data.character;
+        chance += (player_character->level - victim->level) * 5;
     }
-    if (l_1C < 5) {
-        l_1C = 5;
-    } else if (l_1C > 95) {
-        l_1C = 95;
+    if (chance < 5) {
+        chance = 5;
+    } else if (chance > 95) {
+        chance = 95;
     }
-    if ((rand() % 101) > l_1C) {
-        if (a1->type == 18) monster_wake_all();
+    if ((rand() % 101) > chance) {
+        if (target->type == 18) monster_wake_all();
         hud_message_add(D_0018333C);
         crime_current = 12;
         guards_summon(1);
-        if (a1->type == 53) a1->npc_flags |= 0x8000;
+        if (target->type == 53) target->npc_flags |= 0x8000;
         return;
     }
     if ((rand() % 101) < 33) {
@@ -63,45 +63,45 @@ void pickpocket_attempt(struct record *a1)
     }
     msgbox_wrap_width = 250;
     D_0012B508 = 145;
-    l_20 = (rand() % 5) + 1;
-    player_character->gold += l_20;
+    gold = (rand() % 5) + 1;
+    player_character->gold += gold;
     mc_set_location(155, (int)D_0017018C);
-    mc_sprintf((int)text_buffer, D_00183340, l_20);
+    mc_sprintf((int)text_buffer, D_00183340, gold);
     msgbox_show_string((int)text_buffer, 1);
     guild_count_crime(5, 1);
 }
 
-void lock_show_difficulty(int a1)
+void lock_show_difficulty(int lock_level)
 {
-    int l_18;
+    int chance;
 
-    if (a1 >= 20) {
+    if (lock_level >= 20) {
         hud_status_set(D_0018328C);
         return;
     }
-    l_18 = player_character->skills[13].value - (a1 * 5);
-    if (l_18 < 30) {
+    chance = player_character->skills[13].value - (lock_level * 5);
+    if (chance < 30) {
         hud_status_set(D_00183258);
         return;
     }
-    if (l_18 < 35) {
+    if (chance < 35) {
         hud_status_set(D_0018325C);
         return;
     }
-    if (l_18 < 45) {
+    if (chance < 45) {
         hud_status_set(D_00183260);
         return;
     }
-    hud_status_set(D_00183264[((l_18 - 45) / 5)]);
+    hud_status_set(D_00183264[((chance - 45) / 5)]);
 }
 
-void door_key_match_cb(struct record *a1)
+void door_key_match_cb(struct record *object)
 {
-    struct item *l_18;
+    struct item *item;
 
-    if (a1->type != 2) return;
-    l_18 = &a1->data.item;
-    if (l_18->group != 27 || l_18->index != 3) return;
-    if (l_18->value != *(int *)scratch_190be4 || (short)l_18->message != *(short *)scratch_190be4) return;
-    found_object = a1;
+    if (object->type != 2) return;
+    item = &object->data.item;
+    if (item->group != 27 || item->index != 3) return;
+    if (item->value != *(int *)scratch_190be4 || (short)item->message != *(short *)scratch_190be4) return;
+    found_object = object;
 }

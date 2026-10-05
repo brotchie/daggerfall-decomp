@@ -13,13 +13,13 @@ extern int mc_set_location(int, int);
 extern int mc_sprintf(int, ...);
 #pragma aux mc_set_location parm routine [];
 
-void book_read_header(int a1, int a2)
+void book_read_header(char *header, int book_id)
 {
-    int l_14;
+    int handle;
 
     mc_set_location(586, (int)D_00176198);
-    mc_sprintf((int)text_buffer, (int)D_0017627D, a2);
-    l_14 = disk_open_data((int)text_buffer);
-    read(l_14, a1, 234);
-    close(l_14);
+    mc_sprintf((int)text_buffer, (int)D_0017627D, book_id);
+    handle = disk_open_data((int)text_buffer);
+    read(handle, header, 234);
+    close(handle);
 }

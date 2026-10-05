@@ -112,36 +112,36 @@ struct record *monster_nearest_to_point(int, int, int);
 void weapon_fire_arrow(void);
 #pragma aux mc_set_location parm routine [];
 
-void weapon_load_hand_sprite(struct record *a1, int a2)
+void weapon_load_hand_sprite(struct record *item, int hand)
 {
-    struct item *l_18;
-    int l_14;
+    struct item *item_data;
+    int cif_index;
 
-    if (a1 == 0 || player_character->race > 8) {
+    if (item == 0 || player_character->race > 8) {
 L72941:;
-        *(int *)(D_001A4A68 + (a2 << 2)) = 0;
-        l_14 = ((player_character->race < 9) ? 10 : 11);
-        a1 = 0;
+        *(int *)(D_001A4A68 + (hand << 2)) = 0;
+        cif_index = ((player_character->race < 9) ? 10 : 11);
+        item = 0;
     } else {
-        l_18 = &a1->data.item;
-        if (l_18->group != 3) goto L72941;
-        l_14 = (int)(unsigned char)weapon_cif_by_index[l_18->index];
-        if (l_14 == 9) {
-            *(int *)(D_001A4A68 + (a2 << 2)) = (int)D_001875B7;
+        item_data = &item->data.item;
+        if (item_data->group != 3) goto L72941;
+        cif_index = (int)(unsigned char)weapon_cif_by_index[item_data->index];
+        if (cif_index == 9) {
+            *(int *)(D_001A4A68 + (hand << 2)) = (int)D_001875B7;
         } else {
-            *(int *)(D_001A4A68 + (a2 << 2)) = 0;
+            *(int *)(D_001A4A68 + (hand << 2)) = 0;
         }
-        D_001A4A60[a2] = 0;
+        D_001A4A60[hand] = 0;
     }
-    *(int *)(D_001A4A30 + (a2 << 2)) = (int)a1;
-    if (a1 != 0 && l_18->enchantments[0].type != (-1) && l_18->index != 17 && l_18->index != 16) {
+    *(int *)(D_001A4A30 + (hand << 2)) = (int)item;
+    if (item != 0 && item_data->enchantments[0].type != (-1) && item_data->index != 17 && item_data->index != 16) {
         mc_set_location(85, (int)D_0017615C);
-        mc_sprintf((int)text_buffer, (int)D_00176166, l_14);
+        mc_sprintf((int)text_buffer, (int)D_00176166, cif_index);
     } else {
         mc_set_location(87, (int)D_0017615C);
-        mc_sprintf((int)text_buffer, (int)D_00176175, l_14);
+        mc_sprintf((int)text_buffer, (int)D_00176175, cif_index);
     }
-    weapon_hand_cif[a2] = disk_read_file((int)text_buffer, 0);
+    weapon_hand_cif[hand] = disk_read_file((int)text_buffer, 0);
 }
 
 void weapon_reload_sprites(void)
@@ -150,29 +150,29 @@ void weapon_reload_sprites(void)
     mem_check_crt_heap(704);
 }
 
-int weapon_start_swing(int a1)
+int weapon_start_swing(int hand)
 {
-    short l_1C;
-    int l_24;
-    short l_18;
+    short dx;
+    int motion;
+    short dy;
 
     if (key_action_held(33) == 0) return 0;
-    l_1C = mouse_motion_x;
-    l_18 = mouse_motion_y;
-    l_24 = xn_math_approx_dist2d(0, 0, (int)(short)l_1C, (int)(short)l_18);
-    if (l_24 < 45) return 0;
-    D_001A4A48[a1] = xn_anim_ticks;
-    l_24 = xn_math_angle_to_point(0, 0, (int)(short)l_1C, (int)(short)l_18) >> 7;
-    D_001A4A38[a1] = (int)(unsigned char)weapon_swing_types[l_24];
-    swing_to_hit = swing_to_hit_mods[l_24];
-    swing_damage = swing_damage_mods[l_24];
-    if (((int)(unsigned char)weapon_swing_types[l_24]) == 2 && player_character->equipped[((int)(unsigned char)weapon_active_hand) * 2 + 19] == 0) {
+    dx = mouse_motion_x;
+    dy = mouse_motion_y;
+    motion = xn_math_approx_dist2d(0, 0, (int)(short)dx, (int)(short)dy);
+    if (motion < 45) return 0;
+    D_001A4A48[hand] = xn_anim_ticks;
+    motion = xn_math_angle_to_point(0, 0, (int)(short)dx, (int)(short)dy) >> 7;
+    D_001A4A38[hand] = (int)(unsigned char)weapon_swing_types[motion];
+    swing_to_hit = swing_to_hit_mods[motion];
+    swing_damage = swing_damage_mods[motion];
+    if (((int)(unsigned char)weapon_swing_types[motion]) == 2 && player_character->equipped[((int)(unsigned char)weapon_active_hand) * 2 + 19] == 0) {
         *(int *)(D_001A4A68 + (((int)(unsigned char)weapon_active_hand) << 2)) = (int)D_001875AE;
         D_001A4A60[((int)(unsigned char)weapon_active_hand)] = 0;
     } else {
         *(int *)(D_001A4A68 + (((int)(unsigned char)weapon_active_hand) << 2)) = 0;
     }
-    D_001A4A70[a1] = 5;
+    D_001A4A70[hand] = 5;
     return 1;
 }
 
@@ -211,130 +211,131 @@ void weapon_bow_update(void)
 
 void weapon_fire_arrow(void)
 {
-    char l_24[16];
+    int aim[3];
+    struct record *arrow;
 
     if (inv_take_arrow(1) == 0) {
         hud_message_add((int)D_00176184);
         return;
     }
-    *(int *)((char *)l_24 + 12) = (int)object_create_child(player_object->parent, 0, 107);
-    *(signed char *)(*(char **)((char *)l_24 + 12)) = 2;
-    *(short *)(*(char **)((char *)l_24 + 12) + 29) = 998;
-    *(short *)(*(char **)((char *)l_24 + 12) + 27) = 0;
-    item_make(3, 18, (struct item *)(*(int *)((char *)l_24 + 12) + 71));
-    *(signed char *)(*(char **)((char *)l_24 + 12) + 120) = 1;
-    mc_memset((int)l_24, 0, 12, (int)D_0017615C, 404, 4);
-    xn_math_advance_pitch_yaw(player_object->angle_x, player_object->yaw, 1024, (int)l_24);
-    *(int *)l_24 += player_object->x;
-    *(int *)((char *)l_24 + 4) += player_object->y;
-    *(int *)((char *)l_24 + 8) += player_object->z;
-    xn_vec_unit_direction((int)player_object + 7, (int)l_24, *(int *)((char *)l_24 + 12) + 142);
-    *(int *)(*(char **)((char *)l_24 + 12) + 7) = player_object->x;
-    *(int *)(*(char **)((char *)l_24 + 12) + 11) = player_object->y - 70;
+    arrow = object_create_child(player_object->parent, 0, 107);
+    arrow->type = 2;
+    arrow->image2 = 998;
+    arrow->image = 0;
+    item_make(3, 18, &arrow->data.item);
+    arrow->data.item.stack_count = 1;
+    mc_memset((int)aim, 0, 12, (int)D_0017615C, 404, 4);
+    xn_math_advance_pitch_yaw(player_object->angle_x, player_object->yaw, 1024, (int)aim);
+    aim[0] += player_object->x;
+    aim[1] += player_object->y;
+    aim[2] += player_object->z;
+    xn_vec_unit_direction((int)player_object + 7, (int)aim, (char *)arrow + 142);
+    arrow->x = player_object->x;
+    arrow->y = player_object->y - 70;
     if (((int)(unsigned short)(game_settings->view_flags & 1)) == 0) {
-        *(int *)(*(char **)((char *)l_24 + 12) + 11) -= 10;
+        arrow->y -= 10;
     }
-    *(int *)(*(char **)((char *)l_24 + 12) + 15) = player_object->z;
-    *(short *)(*(char **)((char *)l_24 + 12) + 25) = 1;
-    xn_vec_advance(*(int *)((char *)l_24 + 12) + 142, 160, *(int *)((char *)l_24 + 12) + 7);
+    arrow->z = player_object->z;
+    arrow->from_player = 1;
+    xn_vec_advance((char *)arrow + 142, 160, &arrow->x);
 }
 
-void weapon_missile_orient(struct record *a1)
+void weapon_missile_orient(struct record *arrow)
 {
 {
-    char l_24[12];
+    int angles[3];
 
-    mc_memcpy((int)l_24, (char *)a1 + 142, 12, (int)D_0017615C, 426, 12);
-    func_000C2068((int)l_24);
-    a1->missile_yaw = (short)*(int *)l_24 & 2047;
-    a1->angle_z = (short)*(int *)((char *)l_24 + 4) & 2047;
+    mc_memcpy((int)angles, (char *)arrow + 142, 12, (int)D_0017615C, 426, 12);
+    func_000C2068((int)angles);
+    arrow->missile_yaw = (short)angles[0] & 2047;
+    arrow->angle_z = (short)angles[1] & 2047;
 }
 }
 
-int weapon_arrow_update(struct record *a1)
+int weapon_arrow_update(struct record *arrow)
 {
-    int l_24;
-    int l_20;
-    struct record *l_1C;
+    int hit_flags;
+    int dist;
+    struct record *monster;
     {
-        char l_40[12];
-        char l_34[12];
+        int angles[3];
+        int dest[3];
 
-        l_20 = xn_math_approx_hypot(player_object->y - a1->y, xn_math_approx_dist2d(player_object->x, player_object->z, a1->x, a1->z));
-        if (l_20 > 2048) {
-            object_free_later(a1);
+        dist = xn_math_approx_hypot(player_object->y - arrow->y, xn_math_approx_dist2d(player_object->x, player_object->z, arrow->x, arrow->z));
+        if (dist > 2048) {
+            object_free_later(arrow);
             return 0;
         }
-        *(int *)l_34 = a1->x;
-        *(int *)((char *)l_34 + 4) = a1->y;
-        *(int *)((char *)l_34 + 8) = a1->z;
-        xn_vec_advance((char *)a1 + 142, 40, (int)l_34);
-        *(int *)l_40 = a1->angle_x;
-        *(int *)((char *)l_40 + 4) = a1->yaw;
-        *(int *)((char *)l_40 + 8) = 0;
+        dest[0] = arrow->x;
+        dest[1] = arrow->y;
+        dest[2] = arrow->z;
+        xn_vec_advance((char *)arrow + 142, 40, (int)dest);
+        angles[0] = arrow->angle_x;
+        angles[1] = arrow->yaw;
+        angles[2] = 0;
         *(signed char *)collide_flags |= 4;
-        l_24 = collide_move_missile(a1, (int)l_34, (int)l_40);
-        if (a1->from_player == 0) {
-            l_20 = xn_math_approx_hypot(player_object->y - a1->y, xn_math_approx_dist2d(player_object->x, player_object->z, a1->x, a1->z));
-            if (l_20 < 125) {
+        hit_flags = collide_move_missile(arrow, (int)dest, (int)angles);
+        if (arrow->from_player == 0) {
+            dist = xn_math_approx_hypot(player_object->y - arrow->y, xn_math_approx_dist2d(player_object->x, player_object->z, arrow->x, arrow->z));
+            if (dist < 125) {
                 sound_play(7, player_object, 100);
                 damage_resolve_attack(player_entity, player_entity, 19);
-                inv_merge_arrows(player_entity, a1, 0);
-                object_free_later(a1);
+                inv_merge_arrows(player_entity, arrow, 0);
+                object_free_later(arrow);
                 return 0;
             }
-            if ((l_24 & 10) != 0) {
-                object_free_later(a1);
+            if ((hit_flags & 10) != 0) {
+                object_free_later(arrow);
                 return 0;
             }
         } else {
-            if ((l_24 & 2) != 0) {
+            if ((hit_flags & 2) != 0) {
                 links_trigger(D_00195C48, 5);
-                object_free_later(a1);
+                object_free_later(arrow);
                 return 0;
             }
-            if ((l_24 & 8) != 0 && D_00195C48->type == 18) {
+            if ((hit_flags & 8) != 0 && D_00195C48->type == 18) {
                 sound_play(7, D_00195C48, 100);
                 damage_resolve_attack(player_entity, D_00195C48, 19);
-                inv_merge_arrows(D_00195C48, a1, 0);
-                object_free_later(a1);
+                inv_merge_arrows(D_00195C48, arrow, 0);
+                object_free_later(arrow);
                 return 0;
             }
-            l_1C = monster_nearest_to_point(a1->x, a1->y, a1->z);
-            if (l_1C == 0) {
-                object_free_later(a1);
+            monster = monster_nearest_to_point(arrow->x, arrow->y, arrow->z);
+            if (monster == 0) {
+                object_free_later(arrow);
                 return 0;
             }
             if (*(int *)D_00195B84 > 140) return 1;
-            sound_play(7, l_1C, 100);
-            damage_resolve_attack(player_entity, l_1C, 19);
-            inv_merge_arrows(l_1C, a1, 0);
-            object_free_later(a1);
+            sound_play(7, monster, 100);
+            damage_resolve_attack(player_entity, monster, 19);
+            inv_merge_arrows(monster, arrow, 0);
+            object_free_later(arrow);
             return 0;
         }
         return 1;
     }
 }
 
-void weapon_monster_arrow(struct record *a1, struct record *a2)
+void weapon_monster_arrow(struct record *shooter, struct record *target)
 {
-    struct record *l_14;
+    struct record *arrow;
 
-    l_14 = object_create_child(location_object, 0, 107);
-    l_14->type = 2;
-    l_14->image2 = 998;
-    l_14->image = 0;
-    item_make(3, 18, &l_14->data.item);
-    l_14->data.item.stack_count = 1;
-    xn_vec_unit_direction(&a1->x, &a2->x, (char *)l_14 + 142);
-    l_14->missile_yaw = 0;
-    l_14->angle_z = 0;
-    l_14->x = a1->x;
-    l_14->y = a1->y - 60;
-    l_14->z = a1->z;
-    l_14->from_player = 0;
-    *(int *)((char *)l_14 + 43) = 1;
-    xn_vec_advance((char *)l_14 + 142, 160, &l_14->x);
+    arrow = object_create_child(location_object, 0, 107);
+    arrow->type = 2;
+    arrow->image2 = 998;
+    arrow->image = 0;
+    item_make(3, 18, &arrow->data.item);
+    arrow->data.item.stack_count = 1;
+    xn_vec_unit_direction(&shooter->x, &target->x, (char *)arrow + 142);
+    arrow->missile_yaw = 0;
+    arrow->angle_z = 0;
+    arrow->x = shooter->x;
+    arrow->y = shooter->y - 60;
+    arrow->z = shooter->z;
+    arrow->from_player = 0;
+    *(int *)((char *)arrow + 43) = 1;
+    xn_vec_advance((char *)arrow + 142, 160, &arrow->x);
 }
 
 void weapon_free_sprites(void)
@@ -348,32 +349,32 @@ void weapon_free_sprites(void)
     D_001A4A5C = -1751672937;
 }
 
-struct record *monster_nearest_to_point(int a1, int a2, int a3)
+struct record *monster_nearest_to_point(int x, int y, int z)
 {
-    int l_20;
-    int l_1C;
-    int l_18;
-    int l_14;
+    int i;
+    int best_dist;
+    int best_index;
+    int dist;
 
-    l_1C = 100000;
-    for (l_20 = 0; l_20 < creature_count; l_20++) {
-        l_14 = xn_math_approx_hypot(creature_list[l_20]->y - a2, xn_math_approx_dist2d(creature_list[l_20]->x, creature_list[l_20]->z, a1, a3));
-        if (l_14 < l_1C) {
-            l_1C = l_14;
-            l_18 = l_20;
+    best_dist = 100000;
+    for (i = 0; i < creature_count; i++) {
+        dist = xn_math_approx_hypot(creature_list[i]->y - y, xn_math_approx_dist2d(creature_list[i]->x, creature_list[i]->z, x, z));
+        if (dist < best_dist) {
+            best_dist = dist;
+            best_index = i;
         }
     }
-    *(int *)D_00195B84 = l_1C;
-    if (l_1C == 100000) return 0;
-    return creature_list[l_18];
+    *(int *)D_00195B84 = best_dist;
+    if (best_dist == 100000) return 0;
+    return creature_list[best_index];
 }
 
-void click_world_object(int a1, struct record *a2)
+void click_world_object(int pick, struct record *object)
 {
-    int l_14;
+    int location_index;
 
-    l_14 = loaded_location.index;
-    *(int *)click_hit = a1;
+    location_index = loaded_location.index;
+    *(int *)click_hit = pick;
     if ((int)spell_ready_missile != 0) {
         if (spell_ready_missile->data.spell.target == 3) {
             spell_cast_queue_count = 0;
@@ -388,93 +389,93 @@ void click_world_object(int a1, struct record *a2)
         spell_ready_missile = 0;
         return;
     }
-    if (pick_distance <= 128) links_trigger(a2, 2);
-    if (pick_distance <= 128 && click_world_face(a1) != 0) return;
-    if (l_14 != loaded_location.index) return;
-    switch (a2->type) {
+    if (pick_distance <= 128) links_trigger(object, 2);
+    if (pick_distance <= 128 && click_world_face(pick) != 0) return;
+    if (location_index != loaded_location.index) return;
+    switch (object->type) {
         return;
     case 2:
-        click_item(a1, a2);
+        click_item(pick, object);
         return;
     case 6:
-        click_dungeon_model(a1, a2);
+        click_dungeon_model(pick, object);
         return;
     case 8:
-        click_npc(a1, a2);
+        click_npc(pick, object);
         return;
     case 18:
-        click_creature(a1, a2);
+        click_creature(pick, object);
         return;
     case 32:
-        click_door(a1, a2);
+        click_door(pick, object);
         return;
     case 34:
-        click_marker(a1, a2);
+        click_marker(pick, object);
         return;
     case 43:
-        click_interior_model(a1, a2);
+        click_interior_model(pick, object);
         return;
     case 44:
-        click_corpse(a1, a2);
+        click_corpse(pick, object);
         return;
     case 53:
-        click_pedestrian(a1, a2);
+        click_pedestrian(pick, object);
         return;
     case 33:
-        click_loot_container(a1, a2);
+        click_loot_container(pick, object);
         return;
     case 56:
-        click_town_scenery(a1, a2);
+        click_town_scenery(pick, object);
     default:;
     }
 }
 
-void door_try_open(struct record *a1, int a2)
+void door_try_open(struct record *door, int lockpick)
 {
-    int l_1C;
-    int l_18;
-    struct record *l_14;
+    int unused;
+    int chance;
+    struct record *key;
 
-    if (((int)(unsigned short)(a1->flags & 256)) != 0) {
-        if (door_start_swing(a1, 1) != 0) {
-            a1->flags &= ~0x100;
+    if (((int)(unsigned short)(door->flags & 256)) != 0) {
+        if (door_start_swing(door, 1) != 0) {
+            door->flags &= ~0x100;
             if ((player_character->conditions & 0x20) != 0 && rand_range(1, 100) <= ((int)(unsigned char)(signed char)player_character->lock_open_chance)) {
-                a1->flags &= ~0x40;
-                a1->lock_level = player_character->level;
+                door->flags &= ~0x40;
+                door->lock_level = player_character->level;
             }
         }
         return;
     }
-    if (a1->lock_level == 0 || ((int)(unsigned short)(a1->flags & 64)) != 0) {
+    if (door->lock_level == 0 || ((int)(unsigned short)(door->flags & 64)) != 0) {
         if ((player_character->conditions & 0x20) != 0 && rand_range(1, 100) <= ((int)(unsigned char)(signed char)player_character->lock_open_chance)) {
-            a1->flags &= ~0x40;
-            a1->lock_level = player_character->level;
-        } else if (door_start_swing(a1, 0) != 0) {
-            a1->flags |= 0x100;
+            door->flags &= ~0x40;
+            door->lock_level = player_character->level;
+        } else if (door_start_swing(door, 0) != 0) {
+            door->flags |= 0x100;
         }
         return;
     }
-    if (((int)current_building->id == player_character->house || (((int)player_environment) == 2 && building_is_open((int)current_building) != 0)) && door_start_swing(a1, 0) != 0) {
-        a1->flags |= 0x100;
+    if (((int)current_building->id == player_character->house || (((int)player_environment) == 2 && building_is_open((int)current_building) != 0)) && door_start_swing(door, 0) != 0) {
+        door->flags |= 0x100;
         return;
     }
-    l_14 = door_find_key(player_entity, ((unsigned)a1->id) >> 16, a1->lock_level);
-    if (l_14 == 0) {
-        if (a2 == 0) {
+    key = door_find_key(player_entity, ((unsigned)door->id) >> 16, door->lock_level);
+    if (key == 0) {
+        if (lockpick == 0) {
             if ((player_character->conditions & 0x40) != 0) {
-                l_18 = (int)(unsigned char)(signed char)player_character->lock_open_chance;
+                chance = (int)(unsigned char)(signed char)player_character->lock_open_chance;
                 player_character->conditions &= ~0x40;
-                if (rand_range(1, 100) <= l_18 && door_start_swing(a1, 0) != 0) {
-                    a1->flags |= 320;
+                if (rand_range(1, 100) <= chance && door_start_swing(door, 0) != 0) {
+                    door->flags |= 320;
                 } else {
                     hud_message_add(D_00185097);
                 }
                 return;
             }
-            lock_show_difficulty(a1->lock_level);
+            lock_show_difficulty(door->lock_level);
         } else {
-            if (lockpick_door(a1) != 0) {
-                if (door_start_swing(a1, 0) != 0) a1->flags |= 320;
+            if (lockpick_door(door) != 0) {
+                if (door_start_swing(door, 0) != 0) door->flags |= 320;
             }
             if (people_check_witnesses() != 0 || rand_range(1, 300) < (100 - ((int)(short)player_character->skills[16].value))) {
                 crime_current = 1;
@@ -483,7 +484,7 @@ void door_try_open(struct record *a1, int a2)
         }
         return;
     }
-    if (door_start_swing(a1, 0) == 0) return;
-    object_free_single(l_14);
-    a1->flags |= 320;
+    if (door_start_swing(door, 0) == 0) return;
+    object_free_single(key);
+    door->flags |= 320;
 }
