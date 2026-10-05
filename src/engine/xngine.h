@@ -199,5 +199,13 @@ void xn_int21(xn_regs *r);
 void xn_int2f(xn_regs *r);
 void xn_int31(xn_regs *r);
 void xn_int33(xn_regs *r);
+/* glue.asm takes r in EDX and returns with EAX and EDX changed (the rest restored) */
+#pragma aux xn_int10 parm [edx] modify [eax edx];
+#pragma aux xn_int15 parm [edx] modify [eax edx];
+#pragma aux xn_int16 parm [edx] modify [eax edx];
+#pragma aux xn_int21 parm [edx] modify [eax edx];
+#pragma aux xn_int2f parm [edx] modify [eax edx];
+#pragma aux xn_int31 parm [edx] modify [eax edx];
+#pragma aux xn_int33 parm [edx] modify [eax edx];
 
 #endif

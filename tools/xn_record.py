@@ -64,6 +64,7 @@ import zlib
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import fallemu  # noqa: E402  (first: it picks the Unicorn build)
+import xn_services  # noqa: E402
 from unicorn import UC_HOOK_BLOCK, UC_HOOK_CODE, UC_HOOK_MEM_READ, UcError  # noqa: E402
 
 ROOT = fallemu.ROOT
@@ -95,11 +96,7 @@ def _on_int_bios(self, uc, intno, user, _orig=fallemu.Emu.on_int):
         return _orig(self, uc, intno, user)
     self.io_log.append(("int", intno, self.r("eax")))
     if self.int_replay is not None:
-        regs, writes = self.int_replay.pop(0)
-        for r, v in zip(self.SVC_REGS, regs):
-            self.w(r, v)
-        for lin, data in writes:
-            self.write(lin, data)
+        regs, writes = self.replay_service(intno)
     else:
         self.svc_writes = []
         self.service(uc, intno)
@@ -750,13 +747,14 @@ def replay_run(rec, patch=None, entry=None, top=None):
     # services (DOS, BIOS, the mouse) answer as they did in the recording
     emu.bios_as_service = rec.get("io_version", 1) >= 2
     emu.int_replay = [(e[1], e[2]) for e in rec["io"] if e[0] == "int-ret"]
+    emu.int_replay_regs = xn_services.replay_regs   # only what each service defines
     emu.in_replay = [e[2] for e in rec["io"] if e[0] == "in"]   # and ports read as they were
     try:
         got = call_once(emu, footprint=False, top=top or rec.get("top"))
     except (IndexError, fallemu.Stop) as e:   # asked for more services than recorded; a fault
-        emu.int_replay = emu.in_replay = None
+        emu.int_replay = emu.in_replay = emu.int_replay_regs = None
         return {"stopped": "stopped: %r" % e}
-    emu.int_replay = emu.in_replay = None
+    emu.int_replay = emu.in_replay = emu.int_replay_regs = None
     return got
 
 

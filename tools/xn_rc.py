@@ -20,8 +20,14 @@ asm code by calling its address.
                -> build/xn_readable/image.pkl
   route        the routing table: each converted function's asm entry goes straight to its C;
                or, when its callers need EAX kept (Watcom's code never keeps it), to a stub
-               `push eax; call C; pop eax; ret N`; or (NAME_r defined: several outputs, flags
-               out) to a stub `pushfd; pushad; mov eax, esp; call NAME_r; popad; popfd; ret N`.
+               `push eax; call C; pop eax; ret N` (a result in AL, AH or AX is merged into
+               the kept EAX before the pop: `mov [esp], al`...); or (NAME_r defined: several
+               outputs, flags out) to a stub `pushfd; pushad; mov eax, esp; call NAME_r;
+               popad; popfd; ret N`. An interrupt or exception handler (ABI convention
+               interrupt, asm returning with iretd or retf) goes to a stub (kind isr) that
+               saves every register, loads DS and ES with the data selector the asm's
+               prologue loads (when it does), calls NAME_r(r) or NAME(), restores them and
+               returns as the asm does (iretd / retf).
                Checks each route's declared interface (its #pragma aux, or Watcom's default)
                against the ABI row.
   test         replay records with converted functions routed to C and compare as the
@@ -212,6 +218,78 @@ def keeps_eax(row):
     return (row["clob"] | row["out"]) & xn_abi.RMASK["eax"] != xn_abi.RMASK["eax"]
 
 
+# The keep-eax stub's merge of a result in a part of EAX (the rest kept for the callers):
+# mov [esp], al / mov [esp+1], ah / mov [esp], ax, between the call and the pop.
+EAX_MERGE = {"al": b"\x88\x04\x24", "ah": b"\x88\x64\x24\x01", "ax": b"\x66\x89\x04\x24"}
+
+
+def eax_merge(row):
+    """The part of EAX the row outputs while callers need the rest kept ("al", "ah", "ax"),
+    or None."""
+    import xn_abi
+    part = row["out"] & xn_abi.RMASK["eax"]
+    if not part or not keeps_eax(row):
+        return None
+    for name in ("al", "ah", "ax"):
+        if part == xn_abi.mask_of(name):
+            return name
+    return None
+
+
+_obj2 = None
+
+
+def handler_entry(va):
+    """For an interrupt or exception handler (asm that returns with iretd or retf): (the
+    return opcode, the address of the data selector its prologue loads into DS, or None).
+    The prologue's `mov ax, SEL; mov ds, eax` holds the loader's selector for the data object
+    in its immediate; the route's stub loads DS and ES from there, as the asm would."""
+    global _obj2
+    if _obj2 is None:
+        import xn_link
+        _obj2 = xn_link.Image()
+    code = _obj2.bytes_at(va, 0x200)
+    ret = None
+    # a straight scan: a handler's run-time blocks follow its entry (and are functions of
+    # their own in the map, so its listing alone may not reach the return)
+    import capstone
+    md = capstone.Cs(capstone.CS_ARCH_X86, capstone.CS_MODE_32)
+    for i in md.disasm(code, va):
+        if i.mnemonic in ("iretd", "iret"):
+            ret = b"\xCF"
+            break
+        if i.mnemonic == "retf":
+            ret = b"\xCB"
+            break
+        if i.mnemonic == "ret":
+            break
+    if ret is None:
+        return None, None
+    k = code[:24].find(b"\x66\xB8")
+    sel = None
+    if k >= 0 and code[k + 4:k + 6] == b"\x8E\xD8":
+        sel = va + k + 2
+    return ret, sel
+
+
+def isr_stub(a, target, ret, sel):
+    """An interrupt handler's route: `pushfd; pushad; cld`, with sel: `push ds; push es`,
+    DS = ES = the selector at sel (read through CS: the asm prologue's immediate), then
+    `call target` with EAX pointing at the saved registers (an xn_regs: a glue NAME_r may
+    change them; a plain NAME ignores it), and back: segments, `popad; popfd`, and the asm's
+    own return (iretd, or retf for a DPMI exception handler)."""
+    b = b"\x9C\x60\xFC"
+    if sel is not None:
+        b += b"\x1E\x06" + b"\x2E\x66\xA1" + struct.pack("<I", LOAD + sel)
+        b += b"\x8E\xD8\x8E\xC0" + b"\x8D\x44\x24\x08"
+    else:
+        b += b"\x89\xE0"
+    b += b"\xE8" + struct.pack("<i", target - (a + len(b) + 5))
+    if sel is not None:
+        b += b"\x07\x1F"
+    return b + b"\x61\x9D" + ret
+
+
 def build(flags=None):
     import wcc10
     import xn_cload
@@ -266,7 +344,16 @@ def build(flags=None):
     routes = {}
     for va in sorted(conv):
         c = conv[va]
-        if "glue" in c:
+        ret, sel = handler_entry(va) if va in abi and abi[va]["convention"] == "interrupt" \
+            else (None, None)
+        if ret is not None:
+            # an interrupt or exception handler: its stub saves everything, loads the data
+            # segments the asm loads, and returns as the asm does (iretd / retf)
+            a = pos + len(stubs)
+            b = isr_stub(a, c.get("glue") or c["c"], ret, sel)
+            stubs.extend(b + b"\x90" * (-len(b) % 16))
+            routes[va] = {"to": a, "kind": "isr", "c": c.get("c"), "glue": c.get("glue")}
+        elif "glue" in c:
             a = pos + len(stubs)
             rp = abi[va]["ret_pop"] if va in abi else 0
             b = b"\x9C\x60\x89\xE0\xE8" + struct.pack("<i", c["glue"] - (a + 9)) + b"\x61\x9D"
@@ -277,7 +364,9 @@ def build(flags=None):
             # the callers need EAX kept, and Watcom's code never keeps it: a stub does
             a = pos + len(stubs)
             rp = abi[va]["ret_pop"]
-            b = b"\x50\xE8" + struct.pack("<i", c["c"] - (a + 6)) + b"\x58"
+            merge = eax_merge(abi[va])          # a result in AL, AH or AX: into the kept EAX
+            b = b"\x50\xE8" + struct.pack("<i", c["c"] - (a + 6))
+            b += (EAX_MERGE[merge] if merge else b"") + b"\x58"
             b += b"\xC2" + struct.pack("<H", rp) if rp else b"\xC3"
             stubs.extend(b + b"\x90" * (-len(b) % 16))
             routes[va] = {"to": a, "kind": "keep-eax", "c": c["c"]}
@@ -352,10 +441,11 @@ PRAGMA_RE = re.compile(r"#pragma\s+aux\s+(\w+)\s+(?!=)(.*?);", re.S)
 
 def declared_interfaces():
     """{function name: (parm registers, value register, modify registers, caller/routine)}
-    from the #pragma aux lines of src/engine/*.h and *.c; prototypes without one: Watcom's."""
+    from the #pragma aux lines of src/engine/*.h and *.c (and the XN_RC_SRC folders', which
+    replace files of the same name); prototypes without one: Watcom's."""
     out = {}
     protos = {}
-    for p in sorted(glob.glob(os.path.join(SRC, "*.h"))) + sorted(glob.glob(os.path.join(SRC, "*.c"))):
+    for p in _files("*.h") + _files("*.c"):
         text = re.sub(r"/\*.*?\*/", " ", open(p, errors="replace").read(), flags=re.S)
         text = text.replace("\\\n", " ")
         for m in PRAGMA_RE.finditer(text):
@@ -387,9 +477,11 @@ def check_routes(routes):
         name = funcs.get(va, ("?",))[0]
         if row is None:
             continue
-        if r["kind"] == "glue":
+        if r["kind"] in ("glue", "isr"):
             continue
-        outs = row["out"]
+        # segment registers are not the C's concern: Watcom's code never changes them (the
+        # record test still sees a function whose asm does)
+        outs = row["out"] & ~xn_abi.SEG
         if row["fout"] or bin(outs).count("1") and len(xn_abi.names_of(outs).split()) > 1:
             out.append("%s (%06X): outputs %s%s need a glue function %s_r" % (
                 name, va, row["outputs"], " flags " + row["flags_out"] if row["flags_out"] else "",
@@ -407,8 +499,11 @@ def check_routes(routes):
             pregs = set()
             for g in parm:
                 pregs |= set(g.split())
-            need = set(xn_abi.names_of(row["in"]).split())
-            missing = [g for g in need if g not in pregs and not g.endswith(".u")]
+            need = set(xn_abi.names_of(row["in"] & ~xn_abi.SEG).split())
+            # a part (dl, ax) is covered by its whole register (edx, eax) as a parameter
+            pmask = sum(xn_abi.mask_of(g) for g in pregs if g in xn_abi.NAME)
+            missing = [g for g in need if g not in pregs and not g.endswith(".u") and
+                       not (g in xn_abi.NAME and xn_abi.mask_of(g) & ~pmask == 0)]
             if missing:
                 print("note: %s (%06X): the row's inputs %s are not all parameters (%s): fine "
                       "when the C provably does not need them (say why in its comment)" % (
@@ -419,6 +514,7 @@ def check_routes(routes):
             may = xn_abi.RMASK["eax"] | sum(xn_abi.RMASK[g] for g in xn_abi.WATCOM_ARGS[:min(n, 4)])
         if r["kind"] == "keep-eax":
             may &= ~xn_abi.RMASK["eax"]         # the stub keeps it
+        may &= ~xn_abi.SEG
         bad = may & ~(row["clob"] | row["out"])
         if bad:
             out.append("%s (%06X): may change %s, which callers read (clobber: %s)" % (
@@ -432,7 +528,7 @@ def route_table():
     for va, r in sorted(img.routes.items()):
         print("%06X %-36s %-6s -> %08X%s" % (va, funcs.get(va, ("?",))[0], r["kind"], r["to"],
                                              "  (C %08X)" % r["c"] if r.get("c") and
-                                             r["kind"] == "glue" else ""))
+                                             r["kind"] in ("glue", "isr") else ""))
     problems = check_routes(img.routes)
     for p in problems:
         print("ROUTE", p)
@@ -838,8 +934,8 @@ REG_TYPE = {"eax": "s32", "ax": "s16", "al": "u8", "ah": "u8"}
 def declaration(row, name):
     """(prototype, #pragma aux or "", needs glue) for a function's ABI row."""
     import xn_abi
-    ins = xn_abi.names_of(row["in"] & xn_abi.REGS).split()
-    outs = xn_abi.names_of(row["out"]).split()
+    ins = xn_abi.names_of(row["in"] & xn_abi.GPR).split()
+    outs = xn_abi.names_of(row["out"] & ~xn_abi.SEG).split()
     glue = len(outs) > 1 or bool(row["fout"]) or any(o.endswith(".u") for o in outs) or \
         keeps_eax(row) and row["stack_args"]
     params = []

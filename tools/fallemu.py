@@ -318,6 +318,7 @@ class Emu:
         self.svc_writes = None  # memory a service writes, while recording
         self.exc_reset = False  # a handled CPU exception to forget (clear_exception_state)
         self.int_replay = None  # recorded service results to give instead of running them
+        self.int_replay_regs = None     # (vector, eax) -> registers a replayed service writes
         self.in_replay = None   # recorded port reads, likewise
         self.uc = uc = Uc(UC_ARCH_X86, UC_MODE_32)
         uc.mem_map(0, LOW)
@@ -550,17 +551,31 @@ class Emu:
             return self.service(uc, intno)
         self.io_log.append(("int", intno, self.r("eax")))
         if self.int_replay is not None:     # replaying a record: the service's results
-            regs, writes = self.int_replay.pop(0)
-            for r, v in zip(self.SVC_REGS, regs):
-                self.w(r, v)
-            for lin, data in writes:
-                self.write(lin, data)
+            regs, writes = self.replay_service(intno)
         else:
             self.svc_writes = []
             self.service(uc, intno)
             regs, writes = tuple(self.r(r) for r in self.SVC_REGS), self.svc_writes
             self.svc_writes = None
         self.io_log.append(("int-ret", regs, writes))
+
+    def replay_service(self, intno):
+        """Give a recorded service call's results: the next of int_replay. With
+        int_replay_regs ((vector, eax) -> the register names the service defines, or None
+        for all), only those are written back; the others keep what the replayed code holds
+        (C may hold other stack addresses there than the recorded asm did)."""
+        regs, writes = self.int_replay.pop(0)
+        keep = self.int_replay_regs(intno, self.r("eax")) if self.int_replay_regs else None
+        for r, v in zip(self.SVC_REGS, regs):
+            if keep is None or r in keep:
+                self.w(r, v)
+            elif r == "eflags":
+                m = (0x1 if "CF" in keep else 0) | (0x40 if "ZF" in keep else 0)
+                if m:
+                    self.w(r, (self.r(r) & ~m) | (v & m))
+        for lin, data in writes:
+            self.write(lin, data)
+        return regs, writes
 
     def service(self, uc, intno):
         try:

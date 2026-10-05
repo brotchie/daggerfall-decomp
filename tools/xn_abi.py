@@ -144,6 +144,8 @@ for _r in ("bp", "si", "di"):
     NAME[_f] = (_f, RMASK[_f], VL | VH | VU)
 for _r in ("es", "ds", "fs", "gs"):
     NAME[_r] = (_r, BIT[_r], VL | VH | VU)
+RENDER_FRAME = 0x12A870
+RENDER_FRAME_BLOCKS = (0x12A949, 0x12A94E, 0x12A969, 0x12A975, 0x12A976, 0x12A97C, 0x12A97E)
 SEG_NAMES = {"es", "ds", "fs", "gs", "ss", "cs"}
 VALUE_BITS = {"L": 0xFF, "H": 0xFF00, "U": 0xFFFF0000, "W": 0xFFFF}
 
@@ -224,91 +226,7 @@ def _flag_bits():
 
 FLAG_RD, FLAG_WR = _flag_bits()
 
-# int services: (vector, ah or ax) -> (inputs, outputs always written, outputs maybe written)
-# Only what the engine calls; unknown services use every register.
-_D = "eax ebx ecx edx esi edi"
-SERVICES = {
-    (0x21, "ah", 0x09): ("eax edx", "", "eax"),
-    (0x21, "ah", 0x1A): ("eax edx", "", ""),
-    (0x21, "ah", 0x25): ("eax edx ds", "", ""),
-    (0x21, "ah", 0x2A): ("eax", "eax ecx edx", ""),
-    (0x21, "ah", 0x2C): ("eax", "ecx edx", ""),
-    (0x21, "ah", 0x30): ("eax", "eax", "ebx ecx"),
-    (0x21, "ah", 0x35): ("eax", "ebx es", ""),
-    (0x21, "ah", 0x36): ("eax edx", "eax ebx ecx edx", ""),
-    (0x21, "ah", 0x39): ("eax edx", "", "eax CF"),
-    (0x21, "ah", 0x3A): ("eax edx", "", "eax CF"),
-    (0x21, "ah", 0x3B): ("eax edx", "", "eax CF"),
-    (0x21, "ah", 0x3C): ("eax ecx edx", "eax CF", ""),
-    (0x21, "ah", 0x3D): ("eax edx", "eax CF", ""),
-    (0x21, "ah", 0x3E): ("eax ebx", "CF", "eax"),
-    (0x21, "ah", 0x3F): ("eax ebx ecx edx", "eax CF", ""),
-    (0x21, "ah", 0x40): ("eax ebx ecx edx", "eax CF", ""),
-    (0x21, "ah", 0x41): ("eax edx", "CF", "eax"),
-    (0x21, "ah", 0x42): ("eax ebx ecx edx", "eax edx CF", ""),
-    (0x21, "ah", 0x43): ("eax ecx edx", "CF", "eax ecx"),
-    (0x21, "ah", 0x44): ("eax ebx ecx edx", "CF", "eax edx"),
-    (0x21, "ah", 0x47): ("eax edx esi", "CF", "eax"),
-    (0x21, "ah", 0x48): ("eax ebx", "eax CF", "ebx"),
-    (0x21, "ah", 0x49): ("eax es", "CF", "eax"),
-    (0x21, "ah", 0x4A): ("eax ebx es", "CF", "eax ebx"),
-    (0x21, "ah", 0x4C): ("eax", "", ""),
-    (0x21, "ah", 0x4E): ("eax ecx edx", "eax CF", ""),
-    (0x21, "ah", 0x4F): ("eax", "eax CF", ""),
-    (0x21, "ah", 0x56): ("eax edx edi es", "CF", "eax"),
-    (0x21, "ah", 0x57): ("eax ebx ecx edx", "CF", "eax ecx edx"),
-    (0x31, "ax", 0x0000): ("eax ecx", "eax CF", ""),
-    (0x31, "ax", 0x0001): ("eax ebx", "CF", "eax"),
-    (0x31, "ax", 0x0002): ("eax ebx", "eax CF", ""),
-    (0x31, "ax", 0x0003): ("eax", "eax", ""),
-    (0x31, "ax", 0x0006): ("eax ebx", "ecx edx CF", "eax"),
-    (0x31, "ax", 0x0007): ("eax ebx ecx edx", "CF", "eax"),
-    (0x31, "ax", 0x0008): ("eax ebx ecx edx", "CF", "eax"),
-    (0x31, "ax", 0x0009): ("eax ebx ecx", "CF", "eax"),
-    (0x31, "ax", 0x000B): ("eax ebx edi es", "CF", "eax"),
-    (0x31, "ax", 0x000C): ("eax ebx edi es", "CF", "eax"),
-    (0x31, "ax", 0x0100): ("eax ebx", "eax edx CF", "ebx"),
-    (0x31, "ax", 0x0101): ("eax edx", "CF", "eax"),
-    (0x31, "ax", 0x0200): ("eax ebx", "ecx edx CF", "eax"),
-    (0x31, "ax", 0x0201): ("eax ebx ecx edx", "CF", "eax"),
-    (0x31, "ax", 0x0202): ("eax ebx", "ecx edx CF", "eax"),
-    (0x31, "ax", 0x0203): ("eax ebx ecx edx", "CF", "eax"),
-    (0x31, "ax", 0x0204): ("eax ebx", "ecx edx CF", "eax"),
-    (0x31, "ax", 0x0205): ("eax ebx ecx edx", "CF", "eax"),
-    (0x31, "ax", 0x0300): ("eax ebx ecx edi es", "CF", "eax"),
-    (0x31, "ax", 0x0301): ("eax ebx ecx edi es", "CF", "eax"),
-    (0x31, "ax", 0x0302): ("eax ebx ecx edi es", "CF", "eax"),
-    (0x31, "ax", 0x0500): ("eax edi es", "CF", "eax"),
-    (0x31, "ax", 0x0501): ("eax ebx ecx", "ebx ecx esi edi CF", "eax"),
-    (0x31, "ax", 0x0502): ("eax esi edi", "CF", "eax"),
-    (0x31, "ax", 0x0503): ("eax ebx ecx esi edi", "ebx ecx esi edi CF", "eax"),
-    (0x31, "ax", 0x0600): ("eax ebx ecx esi edi", "CF", "eax"),
-    (0x31, "ax", 0x0601): ("eax ebx ecx esi edi", "CF", "eax"),
-    (0x31, "ax", 0x0800): ("eax ebx ecx esi edi", "ebx ecx CF", "eax"),
-    (0x31, "ax", 0x0801): ("eax ebx ecx", "CF", "eax"),
-    (0x33, "ax", 0x0000): ("eax", "eax ebx", ""),
-    (0x33, "ax", 0x0001): ("eax", "", ""),
-    (0x33, "ax", 0x0002): ("eax", "", ""),
-    (0x33, "ax", 0x0003): ("eax", "ebx ecx edx", ""),
-    (0x33, "ax", 0x0004): ("eax ecx edx", "", ""),
-    (0x33, "ax", 0x0007): ("eax ecx edx", "", ""),
-    (0x33, "ax", 0x0008): ("eax ecx edx", "", ""),
-    (0x33, "ax", 0x000B): ("eax", "ecx edx", ""),
-    (0x33, "ax", 0x000C): ("eax ecx edx es", "", ""),
-    (0x33, "ax", 0x000F): ("eax ecx edx", "", ""),
-    (0x33, "ax", 0x0014): ("eax ecx edx es", "ecx edx es", ""),
-    (0x33, "ax", 0x001A): ("eax ebx ecx edx", "", ""),
-    (0x33, "ax", 0x0024): ("eax", "ebx ecx", ""),
-    (0x10, "ah", 0x00): ("eax", "", "eax"),
-    (0x10, "ah", 0x0F): ("eax", "eax ebx", ""),
-    (0x10, "ax", 0x1012): ("eax ebx ecx edx es", "", ""),
-    (0x10, "ax", 0x1017): ("eax ebx ecx edx es", "", ""),
-    (0x16, "ah", 0x00): ("eax", "eax", ""),
-    (0x16, "ah", 0x01): ("eax", "ZF", "eax"),
-    (0x16, "ah", 0x02): ("eax", "eax", ""),
-    (0x16, "ah", 0x10): ("eax", "eax", ""),
-    (0x16, "ah", 0x11): ("eax", "ZF", "eax"),
-}
+from xn_services import SERVICES  # noqa: E402  (int services: inputs, mustdef, maydef)
 
 
 def service_of(vector, ax):
@@ -753,10 +671,13 @@ class Analysis:
         return out
 
     def summary_of(self, va):
-        if va in self.summ:
-            return self.summ[va]
+        # a game function with a C definition is called by its C prototype: its inputs are its
+        # parameters, whatever its compiled code saves and restores or calls (mem_check_heap,
+        # 0x6A319, calls an engine check whose analysis made every register an input)
         if va in self.game:
             return self.game[va]
+        if va in self.summ:
+            return self.summ[va]
         if self.code.o1[0] <= va < self.code.o1[1]:
             return watcom_summary(va, None, True)       # no C definition: a library routine
         return self.unknown
@@ -1635,6 +1556,12 @@ class Analysis:
                 used[f] |= GPR | self.status_flags(f)   # no caller: every register
             if self.is_handler(f):
                 used[f] |= REGS
+        # xn_render_frame's run-time blocks are pieces of it (docs: build/xn_readable/smc/
+        # render.md): the span routines return into them, and their `popal; ret` returns from
+        # render_frame to the game. What render_frame's callers read is all that is live there.
+        for b in RENDER_FRAME_BLOCKS:
+            if b in used:
+                used[b] = used[RENDER_FRAME]
         for _k in range(20):                # a tail jump returns to its caller's callers
             ch = False
             for g, t in tails:
@@ -1668,6 +1595,8 @@ class Analysis:
         return f in HANDLERS() or bool(self.summ[f].exits & {"iret", "retf"})
 
 
+RENDER_FRAME = 0x12A870
+RENDER_FRAME_BLOCKS = (0x12A949, 0x12A94E, 0x12A969, 0x12A975, 0x12A976, 0x12A97C, 0x12A97E)
 SEG_NAMES = {"es", "ds", "fs", "gs", "ss", "cs"}
 # instructions with effects beyond registers, flags and the stack (a divide may fault)
 IMPURE = {"div", "idiv", "in", "out", "insb", "insw", "insd", "outsb", "outsw", "outsd",
@@ -2349,7 +2278,8 @@ def run_dynamic(kind, funcs=None, all_at_once=False, jobs=None, max_per=0, verbo
     for va, v in sorted(bad.items()):
         print("  %06X %-36s %d/%d  %s" % (va, abi.get(va, {}).get("name", "?"), v[0], v[1],
                                          " | ".join("; ".join(d) for d in v[2][:2])[:400]))
-    out = os.path.join(WORK, "%s.json" % kind)
+    # an agent's runs (XN_RC_OUT set) keep their results apart from the shared ones
+    out = os.path.join(os.environ.get("XN_RC_OUT") or WORK, "%s.json" % kind)
     os.makedirs(WORK, exist_ok=True)
     with open(out, "w") as f:
         json.dump({"stats": {"%06X" % k: v for k, v in stats.items()},
