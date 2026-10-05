@@ -6,23 +6,23 @@ struct pick {
     struct record *obj;         /* 0x0c */
 };
 extern char D_00175970[];        /* __FILE__ */
-extern unsigned char D_00186DE3[];
+extern unsigned char vampire_spells[];
 extern unsigned char D_001940D8;
 extern struct record *player_entity;
-extern struct record *D_00195AC4;
+extern struct record *location_object;
 extern struct character *player_character;
 extern struct career *player_class;
 extern unsigned char current_region;
 extern unsigned char D_00196294;
 extern int region_dungeon_type_counts;
 extern struct faction *faction_find_type_in_region(short, int);
-extern void func_0001E34D(struct pick *, int, int);
+extern void location_load_nth_dungeon_of_type(struct pick *, int, int);
 extern void msgbox_show_rsc(int, int);
 extern void time_pass(int);
 extern void paperdoll_draw(int, int);
 extern void item_make(int, int, struct item *);
 extern void disease_toggle_memberships_cb(struct record *);
-extern void func_00066853(struct record *, unsigned char);
+extern void disease_add_vampire_spell(struct record *, unsigned char);
 extern int disease_is_lycanthrope(void);
 extern void location_free(struct pick *);
 extern void map_goto_location(unsigned char, int, unsigned short, int);
@@ -73,10 +73,10 @@ void disease_become_vampire(void)
     time_pass(30240);
     D_00196294 = saved;
     if (region_dungeon_type_counts != 0) {
-        func_0001E34D(&s, 0, rand() % region_dungeon_type_counts);
+        location_load_nth_dungeon_of_type(&s, 0, rand() % region_dungeon_type_counts);
         map_goto_location(current_region, 3, s.obj->image, 0);
-        if (marker_find_nth(D_00195AC4, 9, 0) != 0)
-            player_to_nearest_marker(D_00195AC4, 9);
+        if (marker_find_nth(location_object, 9, 0) != 0)
+            player_to_nearest_marker(location_object, 9);
         location_free(&s);
     }
     d = faction_find_type_in_region(current_region, 7);
@@ -123,27 +123,27 @@ void disease_become_vampire(void)
     player_character->min_metal_to_hit = 2;
     o2 = object_find_item(player_entity->children, 27, 0);
     if (o2 == 0) {
-        o2 = object_create_child(D_00195AC4, 0, 107);
+        o2 = object_create_child(location_object, 0, 107);
         o2->type = 2;
         o2->flags |= 1;
         item_make(27, 0, &o2->data.item);
         inv_store_item(o2);
     }
     i = 0;
-    while (D_00186DE3[i] != 255)
-        func_00066853(o2, D_00186DE3[i++]);
+    while (vampire_spells[i] != 255)
+        disease_add_vampire_spell(o2, vampire_spells[i++]);
     switch (kind - 150) {
     case 0:
-        func_00066853(o2, 85);
+        disease_add_vampire_spell(o2, 85);
         break;
     case 5:
-        func_00066853(o2, 50);
+        disease_add_vampire_spell(o2, 50);
         break;
     case 4:
-        func_00066853(o2, 10);
+        disease_add_vampire_spell(o2, 10);
         break;
     case 2:
-        func_00066853(o2, 64);
+        disease_add_vampire_spell(o2, 64);
         break;
     case 7:
         p->drained[1] += 20;
@@ -157,20 +157,20 @@ void disease_become_vampire(void)
         }
         break;
     case 6:
-        func_00066853(o2, 17);
+        disease_add_vampire_spell(o2, 17);
         break;
     case 8:
-        func_00066853(o2, 11);
-        func_00066853(o2, 12);
-        func_00066853(o2, 13);
+        disease_add_vampire_spell(o2, 11);
+        disease_add_vampire_spell(o2, 12);
+        disease_add_vampire_spell(o2, 13);
         break;
     case 3:
-        func_00066853(o2, 23);
-        func_00066853(o2, 6);
+        disease_add_vampire_spell(o2, 23);
+        disease_add_vampire_spell(o2, 6);
         break;
     case 1:
-        func_00066853(o2, 20);
-        func_00066853(o2, 33);
+        disease_add_vampire_spell(o2, 20);
+        disease_add_vampire_spell(o2, 33);
         break;
     }
     player_character->vampire_clan = kind;

@@ -4,21 +4,21 @@
 
 #include "records.h"
 
-extern signed char itemmaker_slot_kinds[];
+extern signed char scratch_190ce4[];
 extern struct record *player_entity;
 extern char D_00195B84[];
 extern struct character *player_character;
 
-extern void func_00067875(int);
+extern void reaction_mod_item_cb(int);
 extern void object_foreach(struct record *, int);
 
-int func_000679BB(int a1)
+int player_reaction_mod(int a1)
 {
     signed char l_18;
 
-    itemmaker_slot_kinds[0] = *(signed char *)&a1;
+    scratch_190ce4[0] = *(signed char *)&a1;
     *(int *)D_00195B84 = 0;
-    object_foreach(player_entity->children, (int)func_00067875);
+    object_foreach(player_entity->children, (int)reaction_mod_item_cb);
     l_18 = player_character->reputation_mod;
     *(int *)D_00195B84 += (int)(signed char)l_18;
     return *(int *)D_00195B84;

@@ -9,7 +9,7 @@ extern int D_001A3F98;
 extern int D_001A3F9C;
 extern void dpmi_get_free_memory(char *);
 
-void func_00069E3C(void)
+void dpmi_memory_stats(void)
 {
     dpmi_get_free_memory(D_001A3F60);
     D_001A3F98 = (D_001A3F78 - D_001A3F74) << 2;

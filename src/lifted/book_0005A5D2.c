@@ -4,10 +4,10 @@
 
 
 extern int font_text_width(int);
-extern int func_0012DBCC();
+extern int xn_font_draw_string();
 
 void text_draw_centred(int a1, int a2, short a3)
 {
     a2 -= font_text_width(a1) >> 1;
-    func_0012DBCC((int)(short)*(short *)&a2, (int)(short)a3, a1);
+    xn_font_draw_string((int)(short)*(short *)&a2, (int)(short)a3, a1);
 }

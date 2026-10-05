@@ -3,7 +3,7 @@
 
 extern unsigned char player_environment;
 extern void func_0007E815(struct record *, int);
-extern void func_0007EB0B(struct record *, int);
+extern void town_grid_visit_near(struct record *, int);
 extern void object_foreach_open(struct record *, int);
 
 void collide_for_each_nearby(struct record *a1, int a2)
@@ -15,7 +15,7 @@ void collide_for_each_nearby(struct record *a1, int a2)
         if (a1->parent->type != 1)
             object_foreach_open(a1->parent->children, a2);
         else
-            func_0007EB0B(a1, a2);
+            town_grid_visit_near(a1, a2);
     } else {
         func_0007E815(a1, a2);
     }

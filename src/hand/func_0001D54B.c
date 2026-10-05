@@ -4,7 +4,7 @@
 extern char current_region;
 extern struct faction *faction_find(short);
 
-int func_0001D54B(struct rumor *r, short a2, int a3, int a4)
+int rumor_is_eligible(struct rumor *r, short a2, int a3, int a4)
 {
     int unused;
     struct faction *p1;

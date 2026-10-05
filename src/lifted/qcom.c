@@ -20,43 +20,43 @@ extern int D_00195988;
 extern int D_0019598C;
 extern int D_00195990;
 extern struct record *nonworld_root;
-extern struct record *D_00195A00;
+extern struct record *quest_root;
 extern struct record *player_entity;
 extern struct record *player_object;
-extern struct record *D_00195AC4;
+extern struct record *location_object;
 extern struct location *current_location;
 extern struct character *player_character;
 extern int game_minutes;
-extern struct record *D_00195D00;
-extern int D_00195D48;
+extern struct record *quest_tick_object;
+extern int sky_loaded_frame;
 extern int qbn_opcode_arg_counts;
 extern signed char current_region;
 extern unsigned char D_0019626F;
 extern signed char game_mode;
 extern signed char D_00196298;
-extern signed char D_0019629B;
+extern signed char night_sky_loaded;
 extern int quest_debug_object;
 extern struct quest *current_quest;
-extern struct record *D_00199768;
+extern struct record *quest_reward_container;
 extern int quest_debug_data;
 extern struct record *quest_event_object;
-extern struct quest *D_00199780;
+extern struct quest *quest_tick_data;
 extern short quest_event_code;
 
 extern struct faction *faction_find(short);
-extern int qcond_op05_event_at_place(struct quest *, struct qbn_op *);
+extern int qcond_op05_item_dropped_at_place(struct quest *, struct qbn_op *);
 extern int qcond_op43_pc_at_place(struct quest *, struct qbn_op *);
 extern int qcond_op01_item_given_to_npc(struct quest *, struct qbn_op *);
-extern int qcond_op03_event_object(struct quest *, struct qbn_op *);
-extern int qcond_op21_event_same_kind(struct quest *, struct qbn_op *);
-extern int qcond_op02_event_count(struct quest *, struct qbn_op *);
-extern int qcond_op28_event_person(struct quest *, struct qbn_op *);
+extern int qcond_op03_item_found(struct quest *, struct qbn_op *);
+extern int qcond_op21_foe_hurt(struct quest *, struct qbn_op *);
+extern int qcond_op02_foe_killed(struct quest *, struct qbn_op *);
+extern int qcond_op28_npc_clicked(struct quest *, struct qbn_op *);
 extern int qcond_op70_player_has_items(struct quest *, struct qbn_op *);
 extern int quest_arg_state(struct qbn_op *, int);
 extern void *quest_section(struct quest *, int);
 extern void *quest_record(struct quest *, int, int);
 extern int qcond_op57_item_used(struct quest *, struct qbn_op *);
-extern int func_000317AE(struct quest *);
+extern int quest_deliveries_done(struct quest *);
 extern int quest_start(int);
 extern int sound_play(int, int, int);
 extern int disk_resolve_path(int);
@@ -64,18 +64,18 @@ extern int rand_range(int, int);
 extern int location_contains(int, int);
 extern struct record *object_find_by_id(struct record *, int);
 extern int mc_memset();
-extern int func_000A0ED9(int, int);
+extern int mc_set_location(int, int);
 extern int mc_sprintf(int, ...);
-extern int func_000C1500();
-extern int func_0012B136();
+extern int xn_vid_play();
+extern int xn_mouse_poll_clamped();
 extern void region_flag_set(int, int);
 extern void region_flag_clear(int, int);
 extern void faction_change_reputation(struct faction *, int);
 extern void rumor_add_quest(struct quest *, int, int, int);
 extern void rumor_file_purge(void);
-extern void quest_op17_grant_building_access(struct quest *, struct qbn_op *);
-extern void quest_op09_spawn_repeat(struct quest *, struct qbn_op *);
-extern void quest_op87_respawn(struct quest *, struct qbn_op *);
+extern void qaction_op17_grant_building_access(struct quest *, struct qbn_op *);
+extern void qaction_op09_spawn_repeat(struct quest *, struct qbn_op *);
+extern void qaction_op87_respawn(struct quest *, struct qbn_op *);
 extern void quest_unlink_for_save(struct quest *);
 extern void quest_timers_update(struct quest *);
 extern void quest_timer_update(struct quest *, struct qbn_timer *, int);
@@ -108,7 +108,7 @@ extern void qaction_op46_hide_npc(struct quest *, struct qbn_op *);
 extern void func_0004C874(struct quest *, struct qbn_op *);
 extern void qaction_op48_restore_npc(struct quest *, struct qbn_op *);
 extern void func_0004C8CF(struct quest *, struct qbn_op *);
-extern void func_0004CE24(struct quest *, int);
+extern void quest_add_questor_rumor(struct quest *, int);
 extern void palette_restore(void);
 extern void fatal_error(int);
 extern void disease_infect(int, int, int, int);
@@ -121,11 +121,11 @@ extern void location_reveal(int, int);
 extern void spfx_cure_disease(int, int);
 extern void inventory_open_container(int, int, int);
 extern void travel_button_exit(int);
-int func_0002CC40(struct quest *, struct qbn_op *);
+int qaction_op25_countdown(struct quest *, struct qbn_op *);
 void quest_relink_after_load(struct quest *);
 void qaction_op11_remove_topics(struct quest *, struct qbn_op *);
 void qaction_op10_add_topics(struct quest *, struct qbn_op *);
-#pragma aux func_000A0ED9 parm routine [];
+#pragma aux mc_set_location parm routine [];
 
 void quest_run_opcodes(struct quest *a1)
 {
@@ -175,7 +175,7 @@ void quest_run_opcodes(struct quest *a1)
                 break;
             case 8:
                 if (((int)(short)(l_40->flags & 1)) == 0 && quest_arg_state(l_40, 0) != 0 && ((int)(unsigned char)current_region) != 31) {
-                    func_000A0ED9(64, (int)D_001707F0);
+                    mc_set_location(64, (int)D_001707F0);
                     mc_sprintf((int)D_001911E4, (int)D_001707F7, rand_range(l_40->args[1].value, l_40->args[2].value));
                     quest_start((int)D_001911E4);
                     quest_op_done(a1, l_40);
@@ -188,14 +188,14 @@ void quest_run_opcodes(struct quest *a1)
                 }
                 break;
             case 6:
-                if (quest_arg_state(l_40, 0) != 0 && func_000317AE(a1) != 0 && (((D_00199768 == 0) || ((D_00199768->children == 0))) ? 1 : 0) != 0) {
+                if (quest_arg_state(l_40, 0) != 0 && quest_deliveries_done(a1) != 0 && (((quest_reward_container == 0) || ((quest_reward_container->children == 0))) ? 1 : 0) != 0) {
                     quest_op_done(a1, l_40);
                     if (l_34 == 0) {
                         if (((int)(unsigned char)(a1->flags & 2)) == 0 && a1->faction_id != 0) {
                             faction_change_reputation(faction_find(a1->faction_id), -2);
                         }
                         rumor_add_quest(a1, ((((int)(unsigned char)(a1->flags & 2)) != 0) ? 1007 : 1006), 0, 8);
-                        func_0004CE24(a1, (int)(unsigned char)(a1->flags & 2));
+                        quest_add_questor_rumor(a1, (int)(unsigned char)(a1->flags & 2));
                         rumor_file_purge();
                     }
                     quest_end(a1);
@@ -223,13 +223,13 @@ void quest_run_opcodes(struct quest *a1)
                 break;
             case 9:
                 if (quest_arg_state(l_40, 0) != 0) {
-                    quest_op09_spawn_repeat(a1, l_40);
+                    qaction_op09_spawn_repeat(a1, l_40);
                     quest_op_done(a1, l_40);
                 }
                 break;
             case 87:
                 if (quest_arg_state(l_40, 0) != 0) {
-                    quest_op87_respawn(a1, l_40);
+                    qaction_op87_respawn(a1, l_40);
                     quest_op_done(a1, l_40);
                 }
                 break;
@@ -265,7 +265,7 @@ void quest_run_opcodes(struct quest *a1)
                 break;
             case 25:
                 if (quest_arg_state(l_40, 0) != 0) {
-                    if (func_0002CC40(a1, l_40) != 0) quest_op_done(a1, l_40);
+                    if (qaction_op25_countdown(a1, l_40) != 0) quest_op_done(a1, l_40);
                 }
                 break;
             case 26:
@@ -319,7 +319,7 @@ void quest_run_opcodes(struct quest *a1)
                 break;
             case 17:
                 if (quest_arg_state(l_40, 0) != 0) {
-                    quest_op17_grant_building_access(a1, l_40);
+                    qaction_op17_grant_building_access(a1, l_40);
                     quest_op_done(a1, l_40);
                 }
                 break;
@@ -429,15 +429,15 @@ void quest_run_opcodes(struct quest *a1)
                 break;
             case 50:
                 if (((int)(short)(l_40->flags & 1)) == 0 && quest_arg_state(l_40, 0) != 0) {
-                    func_000A0ED9(358, (int)D_001707F0);
+                    mc_set_location(358, (int)D_001707F0);
                     mc_sprintf((int)text_buffer, (int)D_00170801, l_40->args[1].value);
-                    while (mouse_buttons != 0) func_0012B136();
+                    while (mouse_buttons != 0) xn_mouse_poll_clamped();
                     l_18 = disk_resolve_path((int)text_buffer);
-                    func_000C1500(l_18, 0, 0, 1);
+                    xn_vid_play(l_18, 0, 0, 1);
                     mc_memset(655360, 0, 64000, (int)D_001707F0, 362, 4);
                     palette_restore();
-                    D_00195D48 = 10000;
-                    D_0019629B = 0;
+                    sky_loaded_frame = 10000;
+                    night_sky_loaded = 0;
                     quest_op_done(a1, l_40);
                 }
                 break;
@@ -730,10 +730,10 @@ void quest_run_opcodes(struct quest *a1)
         }
         *(int *)D_00195984 = (D_00195988 = (D_0019598C = (D_00195990 = 0)));
         if (l_34 == 0) quest_timers_update(a1);
-        if (D_00199768 == 0 || D_00199768->children == 0 || ((int)(unsigned char)game_mode) == 4) {
+        if (quest_reward_container == 0 || quest_reward_container->children == 0 || ((int)(unsigned char)game_mode) == 4) {
             return;
         }
-        inventory_open_container((int)D_00199768, 0, 6);
+        inventory_open_container((int)quest_reward_container, 0, 6);
     }
 }
 
@@ -771,7 +771,7 @@ int quest_dispatch_event(struct quest *a1)
                 }
                 break;
             case 28:
-                if (qcond_op28_event_person(a1, l_30) != 0) {
+                if (qcond_op28_npc_clicked(a1, l_30) != 0) {
                     quest_op_done(a1, l_30);
                     l_28 = 1;
                     l_24 = 1;
@@ -779,10 +779,10 @@ int quest_dispatch_event(struct quest *a1)
                 }
                 break;
             case 3:
-                if (qcond_op03_event_object(a1, l_30) != 0) quest_op_done(a1, l_30);
+                if (qcond_op03_item_found(a1, l_30) != 0) quest_op_done(a1, l_30);
                 break;
             case 5:
-                if (qcond_op05_event_at_place(a1, l_30) != 0) quest_op_done(a1, l_30);
+                if (qcond_op05_item_dropped_at_place(a1, l_30) != 0) quest_op_done(a1, l_30);
                 break;
             case 1:
                 if (qcond_op01_item_given_to_npc(a1, l_30) != 0) {
@@ -793,10 +793,10 @@ int quest_dispatch_event(struct quest *a1)
                 }
                 break;
             case 2:
-                if (qcond_op02_event_count(a1, l_30) != 0) quest_op_done(a1, l_30);
+                if (qcond_op02_foe_killed(a1, l_30) != 0) quest_op_done(a1, l_30);
                 break;
             case 21:
-                if (qcond_op21_event_same_kind(a1, l_30) != 0) quest_op_done(a1, l_30);
+                if (qcond_op21_foe_hurt(a1, l_30) != 0) quest_op_done(a1, l_30);
                 break;
             case 73:
                 if (((int)(short)(l_30->flags & 1)) == 0 && quest_arg_state(l_30, 0) != 0) {
@@ -826,7 +826,7 @@ void quest_debug_next(void)
     int l_18;
 
     l_18 = 0;
-    l_20 = D_00195A00->children;
+    l_20 = quest_root->children;
     if (l_20 != 0 && quest_debug_object == 0) {
         quest_debug_object = (int)l_20;
         quest_debug_data = (int)&l_20->data.quest;
@@ -844,7 +844,7 @@ void quest_debug_next(void)
         l_20 = l_20->next;
     }
     if (l_18 == 0) return;
-    l_20 = D_00195A00->children;
+    l_20 = quest_root->children;
     quest_debug_object = (int)l_20;
     quest_debug_data = (int)&l_20->data.quest;
 }
@@ -916,7 +916,7 @@ void quest_relink_after_load(struct quest *a1)
             l_30->object = (struct record *)object_find_by_id(nonworld_root, (int)l_30->object);
         }
         if (l_30->object == 0) {
-            l_30->object = (struct record *)object_find_by_id(D_00195AC4, (int)l_30->object);
+            l_30->object = (struct record *)object_find_by_id(location_object, (int)l_30->object);
         }
     }
     l_2C = (struct qbn_foe *)((int)a1 + a1->section_offsets[7]);
@@ -947,12 +947,12 @@ int quest_event_clicked_faction(unsigned short a1)
     short l_1C;
 
     *(int *)&l_1C = 0;
-    l_2C = D_00195A00->children;
+    l_2C = quest_root->children;
     while (l_2C != 0) {
         l_28 = l_2C->next;
         if (l_2C->type == 14) {
-            D_00195D00 = l_2C;
-            current_quest = (struct quest *)((*(int *)&D_00199780 = (int)&l_2C->data.quest));
+            quest_tick_object = l_2C;
+            current_quest = (struct quest *)((*(int *)&quest_tick_data = (int)&l_2C->data.quest));
             l_30 = quest_section(current_quest, 8);
             *(int *)&l_20 = 0;
             for (; current_quest->section_counts[8] > *(int *)&l_20; (*(int *)&l_20)++, l_30++) {
@@ -967,7 +967,7 @@ int quest_event_clicked_faction(unsigned short a1)
     return *(int *)&l_1C;
 }
 
-int func_0002C96B(struct quest *a1, int a2, short a3)
+int quest_place_or_person_object(struct quest *a1, int a2, short a3)
 {
     if (a3 == 0) return *(int *)((char *)quest_record(a1, 4, (int)(short)*(short *)&a2) + 16);
     return *(int *)((char *)quest_record(a1, 3, (int)(short)*(short *)&a2) + 12);
@@ -1006,7 +1006,7 @@ void quest_timer_expire(struct quest *a1, struct qbn_timer *a2)
     }
 }
 
-void func_0002CAB0(struct qbn_timer *a1)
+void quest_timer_clear_state(struct qbn_timer *a1)
 {
     int l_1C;
     struct qbn_state *l_18;
@@ -1027,7 +1027,7 @@ void func_0002CAB0(struct qbn_timer *a1)
     }
 }
 
-int func_0002CBA6(struct quest *a1, struct qbn_op *a2)
+int quest_state_from_timer(struct quest *a1, struct qbn_op *a2)
 {
     struct qbn_timer *l_20;
     struct qbn_state *l_1C;
@@ -1045,7 +1045,7 @@ int func_0002CBA6(struct quest *a1, struct qbn_op *a2)
     return (int)(short)l_14;
 }
 
-int func_0002CC40(struct quest *a1, struct qbn_op *a2)
+int qaction_op25_countdown(struct quest *a1, struct qbn_op *a2)
 {
     struct qbn_arg *l_1C;
     struct qbn_state *l_18;

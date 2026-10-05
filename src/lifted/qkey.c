@@ -32,20 +32,20 @@ extern signed char body_part_armor_slots[];
 extern char weapon_proficiency_bits[];
 extern int D_0018DDDC;
 extern signed char text_buffer[];
-extern struct record *D_00190504[];
+extern struct record *creature_list[];
 extern char D_00190B44[];
 extern signed char text_rsc_buffer[];
 extern unsigned char D_001940D7;
 extern char D_00195A08[];
-extern struct item *D_00195A80;
+extern struct item *text_macro_item;
 extern struct record *player_entity;
 extern struct record *player_object;
 extern struct record *D_00195AA8;
 extern int D_00195ABC;
 extern char cheat_flags[];
-extern struct record *D_00195AF4;
+extern struct record *found_object;
 extern int creature_count;
-extern struct record *guild_npc_object;
+extern struct record *scratch_object;
 extern struct character *player_character;
 extern struct career *player_class;
 extern signed char current_region;
@@ -53,7 +53,7 @@ extern unsigned char D_00196271;
 extern signed char game_mode;
 extern signed char D_0019628D;
 extern signed char D_0019628E;
-extern signed char D_0019628F;
+extern signed char text_macro_gender;
 extern signed char D_0019629C;
 extern signed char D_001962B2;
 extern struct quest *current_quest;
@@ -70,15 +70,15 @@ extern int disk_open_data(int);
 extern int hud_message_add(int);
 extern int rand_range(int, int);
 extern int spfx_resist_roll(int, int, struct character *, struct career *, int, int);
-extern int func_0008B43B(unsigned char, unsigned char, int);
+extern int name_generate_seeded(unsigned char, unsigned char, int);
 extern int building_name(struct building *);
 extern int object_free_single(struct record *);
 extern int rand();
-extern int func_0009DEA7();
-extern int func_000A00CB();
+extern int close();
+extern int read();
 extern int mc_strncpy();
-extern int func_000A0DD9();
-extern int func_000A0ED9(int, int);
+extern int itoa();
+extern int mc_set_location(int, int);
 extern int mc_sprintf(int, ...);
 extern void crime_reputation_penalty(void);
 extern void damage_weapon_strike_effects(struct item *, struct record *, struct record *, int);
@@ -87,22 +87,22 @@ extern void damage_monster_hit_effects(struct record *, struct record *);
 extern void damage_player_hurt(int);
 extern void damage_spawn_splash(struct record *, int, int);
 extern void damage_knockback(struct record *, int, int, int);
-extern void func_0002FBCC(void);
+extern void monster_wake_all(void);
 extern void damage_namira_reflect(struct record *, struct record *, int);
 extern void skill_add_uses(int, int);
 extern void crime_guards_or_court(int);
 extern void parse_expand(int, int);
 extern void quest_raise_event(int, struct record *, struct record *);
 extern void spell_break_concealment(struct record *);
-extern void func_000601ED(struct record *, int);
+extern void item_wear_from_hit(struct record *, int);
 extern void item_damage(struct record *, int);
-extern void func_00065A8C(struct record *, int, int);
+extern void poison_apply(struct record *, int, int);
 extern void monster_wabbajack(struct record *, struct record *);
 extern void msgbox_yes_no_rsc(int);
 int damage_roll_to_hit(struct character *, struct character *, int, int, int, int);
 int damage_bonus_vs_target(struct item *, struct character *, struct character *);
 int damage_apply(struct record *, int, struct record *);
-#pragma aux func_000A0ED9 parm routine [];
+#pragma aux mc_set_location parm routine [];
 
 int quest_symbol_text(int a1, int a2, int a3)
 {
@@ -134,16 +134,16 @@ int quest_symbol_text(int a1, int a2, int a3)
                 l_40->flags &= 127;
                 l_30 = l_40->object;
                 if (l_30 != 0) {
-                    if ((D_00195A80 = &l_30->data.item)->group == 28 && D_00195A80->index == 0) {
-                        return func_000A0DD9(D_00195A80->value, (int)text_rsc_buffer, 10);
+                    if ((text_macro_item = &l_30->data.item)->group == 28 && text_macro_item->index == 0) {
+                        return itoa(text_macro_item->value, (int)text_rsc_buffer, 10);
                     }
-                    if (D_00195A80->group == 7) {
+                    if (text_macro_item->group == 7) {
                         l_14 = (int)(*(char **)&D_00147954 + 90000);
-                        func_000A0ED9(115, (int)D_001708F0);
-                        mc_sprintf((int)text_buffer, (int)D_001708F7, (int)(unsigned short)(short)D_00195A80->message);
+                        mc_set_location(115, (int)D_001708F0);
+                        mc_sprintf((int)text_buffer, (int)D_001708F7, (int)(unsigned short)(short)text_macro_item->message);
                         l_1C = disk_open_data((int)text_buffer);
-                        func_000A00CB(l_1C, l_14, 234);
-                        func_0009DEA7(l_1C);
+                        read(l_1C, l_14, 234);
+                        close(l_1C);
                         mc_strncpy((int)text_rsc_buffer, l_14, 2048, (int)D_001708F0, 119);
                         return (int)text_rsc_buffer;
                     }
@@ -187,7 +187,7 @@ int quest_symbol_text(int a1, int a2, int a3)
             } else {
                 l_60 = 0;
             }
-            D_0019628F = *(signed char *)&l_60;
+            text_macro_gender = *(signed char *)&l_60;
             if ((a2 & 15) == 1) return flats_cfg_find(l_30->image) + 9;
             if ((a2 & 15) > 1) {
                 if (l_30->faction_id != 0) return (int)faction_find(l_30->faction_id)->name;
@@ -201,7 +201,7 @@ int quest_symbol_text(int a1, int a2, int a3)
                     l_50 = faction_find(l_3C->faction_id);
                     if (l_50->type == 4) return (int)l_50->name;
                 }
-                return func_0008B43B((int)(unsigned char)D_001841E3[l_30->home_region], (int)(unsigned char)((signed char)l_30->flags & 4), l_30->name_seed);
+                return name_generate_seeded((int)(unsigned char)D_001841E3[l_30->home_region], (int)(unsigned char)((signed char)l_30->flags & 4), l_30->name_seed);
             case 16:
                 if ((l_30->id >> 16) == 50015) return (int)D_00170918;
                 if ((l_30->id >> 16) == 50027) return (int)D_00170928;
@@ -225,9 +225,9 @@ L2D3DB:;
                         l_18 = &l_30->data.character;
                         if ((a2 & 15) == 1) {
                             if (l_18->mobile_id >= 128) {
-                                return func_0008B43B((int)(unsigned char)D_001841E3[(int)(unsigned char)current_region], (int)(unsigned char)((signed char)l_18->flags & 1), l_30->name_seed);
+                                return name_generate_seeded((int)(unsigned char)D_001841E3[(int)(unsigned char)current_region], (int)(unsigned char)((signed char)l_18->flags & 1), l_30->name_seed);
                             }
-                            return func_0008B43B((int)(unsigned char)D_0017A144[current_quest->id % 3], 0, l_30->name_seed);
+                            return name_generate_seeded((int)(unsigned char)D_0017A144[current_quest->id % 3], 0, l_30->name_seed);
                         }
                         if (l_18->mobile_id >= 128) {
                             return *(int *)(D_0017CAFA + (l_18->mobile_id << 2));
@@ -250,9 +250,9 @@ L2D3DB:;
             }
             if (current_quest->section_counts[6] > l_24) {
                 if ((a2 & 15) != 0) {
-                    return func_000A0DD9((l_20 + 1439) / 1440, (int)text_rsc_buffer, 10);
+                    return itoa((l_20 + 1439) / 1440, (int)text_rsc_buffer, 10);
                 }
-                return func_000A0DD9(l_20, (int)text_rsc_buffer, 10);
+                return itoa(l_20, (int)text_rsc_buffer, 10);
             }
         }
         return text_blank;
@@ -282,7 +282,7 @@ void damage_resolve_attack(struct record *a1, struct record *a2, int a3)
     if (((int)(unsigned char)game_mode) == 21) return;
     if (a2 != player_entity) {
         for (l_30 = 0; l_30 < creature_count; l_30++) {
-            if (D_00190504[l_30] == a2) {
+            if (creature_list[l_30] == a2) {
                 l_24 = l_30;
                 break;
             }
@@ -409,7 +409,7 @@ void damage_resolve_attack(struct record *a1, struct record *a2, int a3)
         }
         if (l_38 != 0 && l_50->equipped[a3]->children != 0) {
             l_44 = &l_50->equipped[a3]->children->data.disease;
-            func_00065A8C(a2, l_44->id, 0);
+            poison_apply(a2, l_44->id, 0);
             object_free_single(l_50->equipped[a3]->children);
         }
         if (l_38 != 0) {
@@ -417,9 +417,9 @@ void damage_resolve_attack(struct record *a1, struct record *a2, int a3)
             damage_weapon_strike_effects(l_48, a1, a2, l_38);
             if (a1->type == 18) damage_namira_reflect(a1, a2, l_38);
             sound_play(rand_range(0, 4) + 378, a2, 110);
-            if (l_50->equipped[a3] != 0) func_000601ED(l_50->equipped[a3], l_38);
+            if (l_50->equipped[a3] != 0) item_wear_from_hit(l_50->equipped[a3], l_38);
             if (l_4C->equipped[(int)(unsigned char)body_part_armor_slots[l_40]] != 0) {
-                func_000601ED(l_4C->equipped[(int)(unsigned char)body_part_armor_slots[l_40]], l_38);
+                item_wear_from_hit(l_4C->equipped[(int)(unsigned char)body_part_armor_slots[l_40]], l_38);
             }
         }
         return;
@@ -517,7 +517,7 @@ int damage_bonus_vs_target(struct item *a1, struct character *a2, struct charact
     return l_18;
 }
 
-int func_0002E8AE(struct character *a1, int a2)
+int damage_heal(struct character *a1, int a2)
 {
     int l_18;
 
@@ -549,7 +549,7 @@ int damage_apply(struct record *a1, int a2, struct record *a3)
         }
     }
     if (D_001962B2 != 0) return 0;
-    if (a1->wait_state == 99) func_0002FBCC();
+    if (a1->wait_state == 99) monster_wake_all();
     if (a2 <= 0) return 0;
     l_1C = &a1->data.character;
     if (a1 != player_entity) {
@@ -599,24 +599,24 @@ int damage_apply(struct record *a1, int a2, struct record *a3)
     return a2;
 }
 
-void func_0002EBDE(struct record *a1)
+void damage_find_empty_soul_trap_cb(struct record *a1)
 {
     struct item *l_18;
 
     if (a1->type != 2) return;
     l_18 = &a1->data.item;
     if (l_18->enchantments[0].type == 26 && l_18->enchantments[0].param == 9 && a1->children == 0) {
-        guild_npc_object = a1;
+        scratch_object = a1;
         return;
     }
     if (l_18->group != 27 || l_18->index != 1) return;
     if (a1->children != 0) return;
-    guild_npc_object = a1;
+    scratch_object = a1;
 }
 
-void func_0002EC79(struct record *a1)
+void damage_drop_at_death_cb(struct record *a1)
 {
-    a1->x = D_00195AF4->x;
-    a1->y = D_00195AF4->y;
-    a1->z = D_00195AF4->z;
+    a1->x = found_object->x;
+    a1->y = found_object->y;
+    a1->z = found_object->z;
 }

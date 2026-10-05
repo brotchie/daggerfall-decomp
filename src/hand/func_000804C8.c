@@ -10,7 +10,7 @@ extern char view_cursor_active;
 extern char D_00196272;
 extern char *cursor_region_images;
 extern void cursor_draw_arrow(void);
-extern void func_00144FB4(int, int, int, int, char *);
+extern void xn_draw_image_transparent(int, int, int, int, char *);
 
 void cursor_draw(short a1)
 {
@@ -31,5 +31,5 @@ void cursor_draw(short a1)
     p = cursor_region_images;
     while (a1-- != 0)
         p = p + ((struct rec *)p)->len + 12;
-    func_00144FB4(mouse_x, mouse_y, ((struct rec *)p)->w, ((struct rec *)p)->h, p + 12);
+    xn_draw_image_transparent(mouse_x, mouse_y, ((struct rec *)p)->w, ((struct rec *)p)->h, p + 12);
 }

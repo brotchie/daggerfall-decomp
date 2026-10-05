@@ -17,7 +17,7 @@ extern int key_pressed_once(unsigned char);
 extern int mc_malloc();
 extern int mc_memcpy();
 extern void logbook_prune_quests(void);
-extern void func_0007EE38(void);
+extern void save_thumbnail_capture(void);
 
 int options_open(short a1)
 {
@@ -25,7 +25,7 @@ int options_open(short a1)
 
     if (a1 != 0 || (game_mode == 0 && key_pressed_once(1) != 0)) {
         while (key_down_esc != 0);
-        func_0007EE38();
+        save_thumbnail_capture();
         D_00187CA8 = 0;
         game_mode = 7;
         options_image = disk_read_file((int)D_00170EDB, 0);

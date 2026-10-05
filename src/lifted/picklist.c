@@ -3,16 +3,16 @@
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
 
-extern short D_0012DA44;
+extern short font_height;
 extern char D_00176E38[];
 
 extern int font_text_width(int);
 extern int mc_free();
-extern int func_000A0DF4();
+extern int strlen();
 
 void picklist_update_thumb(struct picklist *a1)
 {
-    a1->visible_rows = a1->list_rect.h / (((int)(short)D_0012DA44) + 1);
+    a1->visible_rows = a1->list_rect.h / (((int)(short)font_height) + 1);
     if (a1->count == 0 || a1->count <= a1->visible_rows) {
         a1->thumb_height = a1->bar_rect.h - 1;
         return;
@@ -43,7 +43,7 @@ void picklist_free(struct picklist *a1)
 void picklist_clip_text(int a1, short a2)
 {
     while (font_text_width(a1) > ((int)(short)a2)) {
-        *(signed char *)((char *)(func_000A0DF4(a1) + a1) - 1) = 0;
+        *(signed char *)((char *)(strlen(a1) + a1) - 1) = 0;
     }
 }
 

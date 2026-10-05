@@ -1,7 +1,7 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x000843E0 */
 #include "records.h"
 
-extern struct record *D_00195AC4;
+extern struct record *location_object;
 extern struct location *current_location;
 extern struct record *object_create_child(struct record *, struct record *, int);
 
@@ -15,6 +15,6 @@ struct record *rmb_make_door(struct record *a1, short a2, short a3, int a4)
     l_1C->image2 = a2;
     l_1C->image = a3;
     l_1C->pad13 = 8000;
-    l_1C->id = D_00195AC4->id + current_location->object_counter++;
+    l_1C->id = location_object->id + current_location->object_counter++;
     return l_1C;
 }

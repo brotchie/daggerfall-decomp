@@ -6,7 +6,7 @@ struct bf8_7_1 { unsigned char _:7; unsigned char f:1; };
 extern char D_00170129[];
 
 extern int open(int, ...);
-extern int func_0009DEA7();
+extern int close();
 extern int mc_free();
 extern int write();
 #pragma aux sosconv "*" parm caller [] value [eax] modify [eax ebx ecx edx];
@@ -26,7 +26,7 @@ int profile_close(int a1)
             return 0;
         }
         write(l_10, *(int *)((char *)a1 + 132), *(int *)((char *)a1 + 136));
-        func_0009DEA7(l_10);
+        close(l_10);
     }
     if (*(int *)((char *)a1 + 132) != 0 && *(int *)((char *)a1 + 132) != (-1751672937)) {
         mc_free(*(int *)((char *)a1 + 132), (int)D_00170129, 185);

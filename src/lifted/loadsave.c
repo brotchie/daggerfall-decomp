@@ -4,7 +4,7 @@
 #include "records.h"
 
 extern signed char mouse_buttons;
-extern signed char D_0012AC02;
+extern signed char mouse_double_click;
 extern short mouse_x;
 extern short mouse_y;
 extern signed char D_0012B508;
@@ -34,7 +34,7 @@ extern char D_001769F7[];
 extern unsigned char player_environment;
 extern char travel_options[];
 extern char D_00178A10[];
-extern int D_00178A14;
+extern int guards_timer;
 extern char D_00178A18[];
 extern int D_001846F8;
 extern char saveload_buttons[];
@@ -52,10 +52,10 @@ extern char D_0018DE44[];
 extern signed char region_event_values[];
 extern signed char text_buffer[];
 extern signed char D_001903A8;
-extern signed char D_00190D16;
+extern signed char scratch_190d16;
 extern signed char text_rsc_buffer[];
 extern char D_001913E4[];
-extern char D_001917E4[];
+extern char arena2_path[];
 extern signed char D_001940D4;
 extern signed char D_001940D5;
 extern unsigned char D_001940D7;
@@ -64,8 +64,8 @@ extern signed char quest_global_states[];
 extern signed char D_001952EE;
 extern signed char D_00195303;
 extern signed char D_0019530D;
-extern int D_00195998;
-extern char D_0019599C[];
+extern int last_skill_check_minutes;
+extern char loan_collectors_next[];
 extern int bank_ship_price;
 extern int bank_house_price;
 extern struct record *nonworld_root;
@@ -75,8 +75,8 @@ extern struct record *options_object;
 extern int view_look_pitch;
 extern char D_001959C4[];
 extern struct record *inventory_containers[];
-extern int D_001959FC;
-extern struct record *D_00195A00;
+extern int spell_points_bonus;
+extern struct record *quest_root;
 extern struct record *bank_accounts;
 extern char D_00195A08[];
 extern int D_00195A0C;
@@ -89,10 +89,10 @@ extern struct record *player_entity;
 extern struct record *player_object;
 extern char D_00195AAC[];
 extern int vertical_velocity;
-extern struct record *D_00195AC4;
+extern struct record *location_object;
 extern char cheat_flags[];
 extern char clothing_gender_group[];
-extern char D_00195B18[];
+extern char clothing_gender_offset[];
 extern int D_00195B44;
 extern char D_00195B5C[];
 extern char D_00195B84[];
@@ -105,42 +105,42 @@ extern struct career *player_class;
 extern int game_minutes;
 extern struct settings *game_settings;
 extern int hud_message_ptrs[];
-extern int D_00195C40;
-extern char D_00195C44[];
-extern char D_00195CDC[];
-extern int D_00195CE0;
-extern int D_00195CE4;
-extern int D_00195D48;
+extern int realtime_clock_tick;
+extern char scratch_buffer[];
+extern char breath_remaining[];
+extern int location_grid_x;
+extern int location_grid_z;
+extern int sky_loaded_frame;
 extern signed char climate_weathers[];
-extern short D_00195F62;
-extern char D_00195FB1[];
+extern short spell_ready_cost;
+extern char saved_player_object[];
 extern char D_001961F5[];
-extern signed char D_00196263;
+extern signed char in_knightly_order_hall;
 extern char D_00196265[];
-extern signed char D_00196266;
+extern signed char text_macro_imperial;
 extern signed char current_region;
 extern signed char weapon_active_hand;
 extern signed char mouse_buttons_prev;
 extern signed char player_underwater;
 extern signed char in_dungeon_water;
 extern signed char crime_current;
-extern char D_0019627F[];
-extern signed char D_00196280;
-extern signed char D_00196289;
-extern signed char D_0019629B;
+extern char people_witness_flags[];
+extern signed char is_daytime;
+extern signed char world_loading;
+extern signed char night_sky_loaded;
 extern signed char D_0019966C;
 extern int quest_debug_data;
-extern int D_00199808;
+extern int daylight;
 extern int save_file_handle;
-extern struct record *D_001A4FE0;
+extern struct record *load_relink_root;
 extern int save_version;
 extern char cfg_mapsave_file[];
-extern int D_001A94C4;
+extern int terrain_cell_at_player;
 extern int climate_index;
-extern int D_001A99F8;
-extern int D_001A99FC;
+extern int recall_anchor_location;
+extern int recall_anchor_region;
 extern int D_001A9A00;
-extern int D_001A9A04;
+extern int recall_anchor_environment;
 extern int D_001AA540;
 extern int D_001AA544;
 extern struct record *inv_left_container;
@@ -150,7 +150,7 @@ extern int func_000641CD(struct record *);
 extern int sound_play(int, int, int);
 extern int mem_block_size(int);
 extern int disk_read_file(int, int);
-extern int func_00079A28(struct record *);
+extern int savetree_read_chunk(struct record *);
 extern int savetree_write_record(struct record *);
 extern int load_game(int);
 extern int key_pressed_once(unsigned char);
@@ -160,26 +160,26 @@ extern struct record *object_reparent(struct record *, struct record *);
 extern struct record *object_find_by_id(struct record *, int);
 extern int object_new_id(int);
 extern int open(int, ...);
-extern int func_0009DEA7();
+extern int close();
 extern int mc_free();
 extern int mc_memset();
-extern int func_000A00CB();
+extern int read();
 extern int mc_strncpy();
 extern int write();
-extern int func_000A0DD9();
-extern int func_000A0DF4();
+extern int itoa();
+extern int strlen();
 extern int stricmp();
-extern int func_000A0ED9(int, int);
+extern int mc_set_location(int, int);
 extern int mc_sprintf(int, ...);
 extern int unlink();
 extern int mc_memcpy();
-extern int func_000C010F();
-extern int func_000CDD81();
-extern int func_0012A274();
-extern int func_0012A2D0();
-extern int func_0012B136();
-extern int func_00142790();
-extern int func_00144FB4();
+extern int xn_anim_reset();
+extern int xn_gfx_present_inclusive();
+extern int xn_cam_set_focal();
+extern int xn_cam_set_view_window();
+extern int xn_mouse_poll_clamped();
+extern int xn_kbd_flush();
+extern int xn_draw_image_transparent();
 extern void faction_save(int);
 extern void faction_load(int);
 extern void region_locations_save_discovered(int);
@@ -196,7 +196,7 @@ extern void disk_copy_file(int, int, int);
 extern void disk_delete_matching(int, int);
 extern void save_copy_automap_files(int);
 extern void saveload_draw(int, int, int);
-extern void text_draw_centered_colored();
+extern void text_draw_centred_coloured();
 extern void inpstr_begin_text(int, short);
 extern void object_foreach_pre(struct record *, int);
 extern void object_foreach_post(struct record *, int);
@@ -212,13 +212,13 @@ void savetree_write_saved(struct record *);
 void savetree_register_record(struct record *);
 void load_relink_object_cb(struct record *);
 void load_relink_character(struct record *);
-void func_0007A3D0(struct record *);
-void func_0007A42B(struct record *);
+void load_collect_spawned_ids_cb(struct record *);
+void load_drop_spawned_marker_cb(struct record *);
 void save_write_image(void);
 void savevars_write(int);
 void load_fix_object_cb(struct record *);
-void func_0007C78B(struct record *);
-#pragma aux func_000A0ED9 parm routine [];
+void load_fix_ids_cb(struct record *);
+#pragma aux mc_set_location parm routine [];
 
 void savetree_read_records(struct record *a1)
 {
@@ -227,8 +227,8 @@ void savetree_read_records(struct record *a1)
     int l_1C;
     int l_18;
 
-    l_24 = *(struct record **)D_00195C44;
-    l_18 = func_00079A28(l_24);
+    l_24 = *(struct record **)scratch_buffer;
+    l_18 = savetree_read_chunk(l_24);
     while (l_18 != 0) {
         l_24->prev = 0;
         l_24->next = l_24->prev;
@@ -237,7 +237,7 @@ void savetree_read_records(struct record *a1)
         l_20 = savetree_attach_record(a1, l_24, l_18);
         savetree_register_record(l_20);
         l_1C = l_20->id;
-        l_18 = func_00079A28(l_24);
+        l_18 = savetree_read_chunk(l_24);
     }
 }
 
@@ -358,7 +358,7 @@ void savetree_register_record(struct record *a1)
         }
         return;
     case 16:
-        D_00195A00 = a1;
+        quest_root = a1;
         return;
     case 23:
         game_settings = (struct settings *)((*(int *)&options_object = (int)a1) + 71);
@@ -384,14 +384,14 @@ case 44:
     load_relink_character(a1);
     return;
 case 9:
-    a1->caster = object_find_by_id(D_00195AC4, (int)a1->caster);
+    a1->caster = object_find_by_id(location_object, (int)a1->caster);
 default:;
 }
 }
 
 void load_relink_all(void)
 {
-    object_foreach(D_00195AC4, (int)load_relink_object_cb);
+    object_foreach(location_object, (int)load_relink_object_cb);
     object_foreach(nonworld_root, (int)load_relink_object_cb);
     inv_left_container = inventory_containers[0];
 }
@@ -408,15 +408,15 @@ void load_relink_character(struct record *a1)
     l_1C = l_20 + 74;
     for (l_18 = 0; l_18 < 27; l_18++) {
         if (l_24->equipped[l_18] != 0) {
-            l_24->equipped[l_18] = object_find_by_id(D_00195AC4, (int)l_24->equipped[l_18]);
+            l_24->equipped[l_18] = object_find_by_id(location_object, (int)l_24->equipped[l_18]);
         }
     }
     if (l_24->target != 0) {
-        l_24->target = object_find_by_id(D_00195AC4, (int)l_24->target);
+        l_24->target = object_find_by_id(location_object, (int)l_24->target);
         if (l_24->target == 0) fatal_error((int)D_001768BD);
     }
     if (a1->type != 18) if (a1->type != 44) return;
-    func_000C010F(l_1C);
+    xn_anim_reset(l_1C);
 }
 
 void save_unlink_character(struct record *a1)
@@ -431,31 +431,31 @@ void save_unlink_character(struct record *a1)
         }
     }
     if (l_1C->target == 0) return;
-    if (object_find_by_id(D_00195AC4, l_1C->target->id) != 0) {
+    if (object_find_by_id(location_object, l_1C->target->id) != 0) {
         l_1C->target = (struct record *)l_1C->target->id;
         return;
     }
     l_1C->target = 0;
 }
 
-void func_0007A3D0(struct record *a1)
+void load_collect_spawned_ids_cb(struct record *a1)
 {
     switch (a1->type) {
 case 18:
 case 33:
 case 44:
-    *(int *)((char *)(int)(*(char **)D_00195C44 + ((*(int *)D_00195B84)++ << 2))) = a1->id;
+    *(int *)((char *)(int)(*(char **)scratch_buffer + ((*(int *)D_00195B84)++ << 2))) = a1->id;
 default:;
 }
 }
 
-void func_0007A42B(struct record *a1)
+void load_drop_spawned_marker_cb(struct record *a1)
 {
     int l_1C;
     int l_18;
 
     if (a1->type != 34 || a1->type == 32) return;
-    l_1C = *(int *)D_00195C44;
+    l_1C = *(int *)scratch_buffer;
     for (l_18 = 0; l_18 < *(int *)D_00195B84; l_18++, (*(char (**)[4])&l_1C)++) {
         if (a1->id == *(int *)((char *)l_1C)) {
             object_delete(a1);
@@ -465,33 +465,33 @@ void func_0007A42B(struct record *a1)
     }
 }
 
-void func_0007A4B3(void)
+void load_drop_spawned_markers(void)
 {
     *(int *)D_00195B84 = 0;
-    object_foreach(D_00195AC4->children, (int)func_0007A3D0);
-    object_foreach_post(D_00195AC4->children, (int)func_0007A42B);
+    object_foreach(location_object->children, (int)load_collect_spawned_ids_cb);
+    object_foreach_post(location_object->children, (int)load_drop_spawned_marker_cb);
 }
 
 void save_write_image(void)
 {
-    func_000A0ED9(494, (int)D_00176884);
+    mc_set_location(494, (int)D_00176884);
     mc_sprintf((int)D_001913E4, (int)D_001768DF, (int)text_buffer, (int)D_001768D5);
     unlink((int)D_001913E4);
     if ((save_file_handle = open((int)D_001913E4, 546, 384)) < 0) {
         fatal_error((int)D_001768E4);
     }
     write(save_file_handle, D_00147954 + 24000, 4000);
-    func_0009DEA7(save_file_handle);
+    close(save_file_handle);
 }
 
 int save_write_name(int a1)
 {
-    func_000A0ED9(516, (int)D_00176884);
+    mc_set_location(516, (int)D_00176884);
     mc_sprintf((int)D_001913E4, (int)D_001768DF, (int)text_buffer, (int)D_001768FC);
     unlink((int)D_001913E4);
     save_file_handle = open((int)D_001913E4, 546, 384);
     write(save_file_handle, a1, 32);
-    func_0009DEA7(save_file_handle);
+    close(save_file_handle);
     return 0;
 }
 
@@ -500,7 +500,7 @@ int save_game(int a1, int a2)
     int l_18;
 
     mem_check_now(1000);
-    func_000A0ED9(540, (int)D_00176884);
+    mc_set_location(540, (int)D_00176884);
     mc_sprintf((int)text_buffer, (int)D_00176909, a1);
     disk_delete_matching((int)text_buffer, (int)D_00176911);
     save_write_image();
@@ -508,47 +508,47 @@ int save_game(int a1, int a2)
     savevars_write(a1);
     region_locations_save_discovered((int)(unsigned char)current_region);
     automap_save();
-    func_000A0ED9(550, (int)D_00176884);
+    mc_set_location(550, (int)D_00176884);
     mc_sprintf((int)text_buffer, (int)D_00176909, a1);
-    disk_copy_file((int)D_00176915, (int)D_001917E4, (int)text_buffer);
-    disk_copy_file((int)D_0017691F, (int)D_001917E4, (int)text_buffer);
-    disk_copy_file((int)cfg_mapsave_file, (int)D_001917E4, (int)text_buffer);
+    disk_copy_file((int)D_00176915, (int)arena2_path, (int)text_buffer);
+    disk_copy_file((int)D_0017691F, (int)arena2_path, (int)text_buffer);
+    disk_copy_file((int)cfg_mapsave_file, (int)arena2_path, (int)text_buffer);
     save_copy_automap_files(a1);
-    func_000A0ED9(558, (int)D_00176884);
+    mc_set_location(558, (int)D_00176884);
     mc_sprintf((int)text_rsc_buffer, (int)D_001768DF, (int)text_buffer, (int)D_00176927);
     unlink((int)text_rsc_buffer);
     save_file_handle = open((int)text_rsc_buffer, 546, 384);
     write(save_file_handle, (int)savetree_version, 4);
     write(save_file_handle, (int)&player_object->x, 12);
-    write(save_file_handle, (int)&D_00195AC4->image, 2);
+    write(save_file_handle, (int)&location_object->image, 2);
     write(save_file_handle, (int)&player_environment, 1);
     l_18 = current_location->building_count * 26;
     write(save_file_handle, (int)&l_18, 4);
     write(save_file_handle, (int)current_location->buildings, l_18);
     l_18 = 0;
-    quests_unlink_all((int)D_00195A00);
-    savetree_write_saved(D_00195AC4->children);
+    quests_unlink_all((int)quest_root);
+    savetree_write_saved(location_object->children);
     write(save_file_handle, (int)&l_18, 4);
     object_foreach_pre(nonworld_root->children, (int)savetree_write_record);
     write(save_file_handle, (int)&l_18, 4);
-    quests_relink_all((int)D_00195A00);
+    quests_relink_all((int)quest_root);
     links_save(save_file_handle);
-    func_0009DEA7(save_file_handle);
+    close(save_file_handle);
     mouse_buttons = (mouse_buttons_prev = 0);
-    func_0012B136();
-    while (mouse_buttons != 0) func_0012B136();
+    xn_mouse_poll_clamped();
+    while (mouse_buttons != 0) xn_mouse_poll_clamped();
     mem_check_now(1001);
     return 0;
 }
 
-void func_0007A8BE(void)
+void load_requeue_s0000021(void)
 {
     struct record *l_24;
     struct quest *l_20;
     int l_1C;
     int l_18;
 
-    l_24 = D_00195A00->children;
+    l_24 = quest_root->children;
     l_1C = 0;
     l_18 = 0;
     if (((int)(unsigned char)current_region) == 31) return;
@@ -578,24 +578,24 @@ void saveload_menu(int a1)
     l_20 = 0;
     l_18 = (window_image = disk_read_file((int)D_0017697F, 0));
     *(int *)D_00195B5C = disk_read_file((int)D_0017698C, 0);
-    mc_memset(*(int *)D_00195C44, 0, 256, (int)D_00176884, 862, 4);
+    mc_memset(*(int *)scratch_buffer, 0, 256, (int)D_00176884, 862, 4);
     mc_strncpy((int)text_buffer, (int)D_00176999, 160, (int)D_00176884, 864);
     for (l_28 = 0; l_28 < 6; l_28++) {
         D_001903A8 = *(signed char *)&l_28 + 48;
         l_1C = open((int)text_buffer, 512);
         if (l_1C < 1) continue;
-        func_000A00CB(l_1C, (int)(*(char **)&D_00147954 + (l_28 * 4000)), 4000);
-        func_0009DEA7(l_1C);
+        read(l_1C, (int)(*(char **)&D_00147954 + (l_28 * 4000)), 4000);
+        close(l_1C);
         l_24 |= 1 << l_28;
     }
     mc_strncpy((int)text_buffer, (int)D_001769A9, 160, (int)D_00176884, 874);
     for (l_28 = 0; l_28 < 6; l_28++) {
         D_001903A8 = *(signed char *)&l_28 + 48;
-        *(signed char *)((char *)(int)(*(char **)D_00195C44 + (l_28 << 5))) = 0;
+        *(signed char *)((char *)(int)(*(char **)scratch_buffer + (l_28 << 5))) = 0;
         l_1C = open((int)text_buffer, 512);
         if (l_1C < 1) continue;
-        func_000A00CB(l_1C, (int)(*(char **)D_00195C44 + (l_28 << 5)), 32);
-        func_0009DEA7(l_1C);
+        read(l_1C, (int)(*(char **)scratch_buffer + (l_28 << 5)), 32);
+        close(l_1C);
     }
     while (l_2C == 0) {
         if (key_pressed_once(15) != 0) {
@@ -605,13 +605,13 @@ void saveload_menu(int a1)
         if (key_pressed_once(1) != 0) l_2C = 1;
         saveload_draw(a1, l_24, l_20);
         mouse_buttons_prev = mouse_buttons;
-        func_0012B136();
-        func_00144FB4((int)(short)mouse_x, (int)(short)mouse_y, 10, 10, cursor_arrow_image);
+        xn_mouse_poll_clamped();
+        xn_draw_image_transparent((int)(short)mouse_x, (int)(short)mouse_y, 10, 10, cursor_arrow_image);
         if (key_pressed_once(28) != 0) {
-            D_0012AC02 = 1;
+            mouse_double_click = 1;
             l_20 = saveload_click_slot(a1, a1, l_20, l_24);
-            D_0012AC02 = 0;
-        } else if (D_0012AC02 != 0 || (mouse_buttons != 0 && mouse_buttons_prev == 0)) {
+            mouse_double_click = 0;
+        } else if (mouse_double_click != 0 || (mouse_buttons != 0 && mouse_buttons_prev == 0)) {
             for (l_28 = 0; l_28 < 14; l_28++) {
                 if (mouse_x > *(short *)(saveload_buttons + (l_28 * 12)) && mouse_x < *(short *)(D_00187A94 + (l_28 * 12)) && mouse_y > *(short *)(D_00187A92 + (l_28 * 12)) && mouse_y < *(short *)(D_00187A96 + (l_28 * 12))) {
                     sound_play(203, (int)player_object, 100);
@@ -620,7 +620,7 @@ void saveload_menu(int a1)
                 if (l_20 == (-1)) break;
             }
         }
-        func_000CDD81(1);
+        xn_gfx_present_inclusive(1);
         if (l_20 == (-1)) l_2C = 1;
     }
     if (l_18 != 0 && l_18 != (-1751672937)) {
@@ -634,7 +634,7 @@ void saveload_menu(int a1)
 
 int saveload_click_slot(int a1, int a2, int a3, int a4)
 {
-    if (D_0012AC02 != 0) {
+    if (mouse_double_click != 0) {
         saveload_confirm(a1, a2, a3, a4);
         return -1;
     }
@@ -647,13 +647,13 @@ int saveload_confirm(int a1, int a2, int a3, int a4)
     int l_10;
 
     if (a2 != 0) {
-        mc_strncpy((int)text_rsc_buffer, (int)(*(char **)D_00195C44 + (a3 << 5)), 2048, (int)D_00176884, 948);
+        mc_strncpy((int)text_rsc_buffer, (int)(*(char **)scratch_buffer + (a3 << 5)), 2048, (int)D_00176884, 948);
         D_0012B508 = 146;
-        l_10 = *(int *)D_00195C44 + 55000;
-        func_000A0ED9(951, (int)D_00176884);
+        l_10 = *(int *)scratch_buffer + 55000;
+        mc_set_location(951, (int)D_00176884);
         mc_sprintf(l_10, (int)D_001769BC, D_001846F8);
-        *(signed char *)((char *)(func_000A0DF4(l_10) + l_10) + 1) = 0;
-        func_00142790();
+        *(signed char *)((char *)(strlen(l_10) + l_10) + 1) = 0;
+        xn_kbd_flush();
         inpstr_begin_text((int)text_rsc_buffer, 31);
         mouse_buttons = (mouse_buttons_prev = 0);
         msgbox_show_string(l_10, 2);
@@ -662,129 +662,129 @@ int saveload_confirm(int a1, int a2, int a3, int a4)
     } else {
         load_game(a3);
     }
-    D_00190D16 = 0;
+    scratch_190d16 = 0;
     return -1;
 }
 
 int saveload_exit(int a1, int a2, int a3, int a4)
 {
-    D_00190D16 = 1;
+    scratch_190d16 = 1;
     return -1;
 }
 
 void savevars_read(int a1)
 {
-    func_000A0ED9(1008, (int)D_00176884);
+    mc_set_location(1008, (int)D_00176884);
     mc_sprintf((int)text_buffer, (int)D_00176909, a1);
-    func_000A0ED9(1009, (int)D_00176884);
+    mc_set_location(1009, (int)D_00176884);
     mc_sprintf((int)text_rsc_buffer, (int)D_001768DF, (int)text_buffer, (int)D_001769EA);
     save_file_handle = open((int)text_rsc_buffer, 512);
-    func_000A00CB(save_file_handle, (int)saved_positions, 48);
-    func_000A00CB(save_file_handle, (int)bio_modifiers, 64);
-    func_000A00CB(save_file_handle, (int)&view_look_pitch, 12);
-    func_000A00CB(save_file_handle, (int)&D_00196266, 1);
-    func_000A00CB(save_file_handle, (int)quest_faces, 100);
-    func_000A00CB(save_file_handle, (int)D_001959C4, 20);
-    func_000A00CB(save_file_handle, (int)travel_options, 2);
-    func_000A00CB(save_file_handle, (int)D_0018DE44, 512);
-    func_000A00CB(save_file_handle, (int)D_00196265, 1);
-    func_000A00CB(save_file_handle, (int)D_00195FB1, 71);
-    func_000A00CB(save_file_handle, (int)&D_001959FC, 4);
-    func_000A00CB(save_file_handle, (int)D_00195A08, 4);
-    func_000A00CB(save_file_handle, (int)&D_00195A0C, 4);
-    func_000A00CB(save_file_handle, (int)&D_00195A78, 4);
-    func_000A00CB(save_file_handle, (int)quest_global_states, 64);
-    func_000A00CB(save_file_handle, (int)&D_00195F62, 2);
-    func_000A00CB(save_file_handle, (int)&D_00196280, 1);
-    func_000A00CB(save_file_handle, (int)D_001961F5, 13);
-    func_000A00CB(save_file_handle, (int)D_00178A10, 4);
-    func_000A00CB(save_file_handle, (int)&crime_current, 1);
-    func_000A00CB(save_file_handle, (int)D_0019627F, 1);
-    func_000A00CB(save_file_handle, (int)&player_underwater, 1);
-    func_000A00CB(save_file_handle, (int)&in_dungeon_water, 1);
-    func_000A00CB(save_file_handle, (int)&D_00178A14, 4);
-    func_000A00CB(save_file_handle, (int)D_00195CDC, 4);
-    func_000A00CB(save_file_handle, (int)&D_00195CE0, 4);
-    func_000A00CB(save_file_handle, (int)&D_00195CE4, 4);
-    func_000A00CB(save_file_handle, (int)climate_weathers, 6);
-    func_000A00CB(save_file_handle, (int)&D_001940D4, 8);
-    func_000A00CB(save_file_handle, (int)frame_counter, 4);
-    func_000A00CB(save_file_handle, (int)&game_minutes, 4);
-    func_000A00CB(save_file_handle, (int)&D_00195C40, 4);
-    func_000A00CB(save_file_handle, (int)clothing_gender_group, 4);
-    func_000A00CB(save_file_handle, (int)D_00195B18, 4);
-    func_000A00CB(save_file_handle, (int)&weapon_active_hand, 1);
-    func_000A00CB(save_file_handle, (int)region_event_values, 4960);
-    func_000A00CB(save_file_handle, (int)&current_region, 1);
-    func_000A00CB(save_file_handle, (int)cheat_flags, 4);
-    func_000A00CB(save_file_handle, (int)&vertical_velocity, 4);
-    func_000A00CB(save_file_handle, (int)D_00195AAC, 4);
-    func_000A00CB(save_file_handle, (int)&jump_velocity, 4);
-    func_000A00CB(save_file_handle, (int)D_00178A18, 2);
-    func_000A00CB(save_file_handle, (int)&bank_house_price, 4);
-    func_000A00CB(save_file_handle, (int)&bank_ship_price, 4);
-    func_000A00CB(save_file_handle, (int)saved_location_name, 32);
-    func_000A00CB(save_file_handle, (int)saved_region_name, 32);
-    func_000A00CB(save_file_handle, (int)&D_00196263, 1);
-    func_000A00CB(save_file_handle, (int)D_0019599C, 4);
-    func_000A00CB(save_file_handle, (int)&D_00195998, 4);
-    func_000A00CB(save_file_handle, (int)&climate_index, 4);
-    func_000A00CB(save_file_handle, (int)climate_weathers, 6);
-    func_000A00CB(save_file_handle, (int)&dungeon_water_level, 4);
-    func_000A00CB(save_file_handle, (int)&D_00187F28, 4);
-    func_000A00CB(save_file_handle, (int)&D_001A9A04, 4);
-    func_000A00CB(save_file_handle, (int)&D_001A99F8, 4);
-    func_000A00CB(save_file_handle, (int)&D_001A99FC, 4);
-    func_000A00CB(save_file_handle, (int)&D_001A9A00, 4);
+    read(save_file_handle, (int)saved_positions, 48);
+    read(save_file_handle, (int)bio_modifiers, 64);
+    read(save_file_handle, (int)&view_look_pitch, 12);
+    read(save_file_handle, (int)&text_macro_imperial, 1);
+    read(save_file_handle, (int)quest_faces, 100);
+    read(save_file_handle, (int)D_001959C4, 20);
+    read(save_file_handle, (int)travel_options, 2);
+    read(save_file_handle, (int)D_0018DE44, 512);
+    read(save_file_handle, (int)D_00196265, 1);
+    read(save_file_handle, (int)saved_player_object, 71);
+    read(save_file_handle, (int)&spell_points_bonus, 4);
+    read(save_file_handle, (int)D_00195A08, 4);
+    read(save_file_handle, (int)&D_00195A0C, 4);
+    read(save_file_handle, (int)&D_00195A78, 4);
+    read(save_file_handle, (int)quest_global_states, 64);
+    read(save_file_handle, (int)&spell_ready_cost, 2);
+    read(save_file_handle, (int)&is_daytime, 1);
+    read(save_file_handle, (int)D_001961F5, 13);
+    read(save_file_handle, (int)D_00178A10, 4);
+    read(save_file_handle, (int)&crime_current, 1);
+    read(save_file_handle, (int)people_witness_flags, 1);
+    read(save_file_handle, (int)&player_underwater, 1);
+    read(save_file_handle, (int)&in_dungeon_water, 1);
+    read(save_file_handle, (int)&guards_timer, 4);
+    read(save_file_handle, (int)breath_remaining, 4);
+    read(save_file_handle, (int)&location_grid_x, 4);
+    read(save_file_handle, (int)&location_grid_z, 4);
+    read(save_file_handle, (int)climate_weathers, 6);
+    read(save_file_handle, (int)&D_001940D4, 8);
+    read(save_file_handle, (int)frame_counter, 4);
+    read(save_file_handle, (int)&game_minutes, 4);
+    read(save_file_handle, (int)&realtime_clock_tick, 4);
+    read(save_file_handle, (int)clothing_gender_group, 4);
+    read(save_file_handle, (int)clothing_gender_offset, 4);
+    read(save_file_handle, (int)&weapon_active_hand, 1);
+    read(save_file_handle, (int)region_event_values, 4960);
+    read(save_file_handle, (int)&current_region, 1);
+    read(save_file_handle, (int)cheat_flags, 4);
+    read(save_file_handle, (int)&vertical_velocity, 4);
+    read(save_file_handle, (int)D_00195AAC, 4);
+    read(save_file_handle, (int)&jump_velocity, 4);
+    read(save_file_handle, (int)D_00178A18, 2);
+    read(save_file_handle, (int)&bank_house_price, 4);
+    read(save_file_handle, (int)&bank_ship_price, 4);
+    read(save_file_handle, (int)saved_location_name, 32);
+    read(save_file_handle, (int)saved_region_name, 32);
+    read(save_file_handle, (int)&in_knightly_order_hall, 1);
+    read(save_file_handle, (int)loan_collectors_next, 4);
+    read(save_file_handle, (int)&last_skill_check_minutes, 4);
+    read(save_file_handle, (int)&climate_index, 4);
+    read(save_file_handle, (int)climate_weathers, 6);
+    read(save_file_handle, (int)&dungeon_water_level, 4);
+    read(save_file_handle, (int)&D_00187F28, 4);
+    read(save_file_handle, (int)&recall_anchor_environment, 4);
+    read(save_file_handle, (int)&recall_anchor_location, 4);
+    read(save_file_handle, (int)&recall_anchor_region, 4);
+    read(save_file_handle, (int)&D_001A9A00, 4);
     if (save_version >= 294) {
-        func_000A00CB(save_file_handle, (int)&D_001AA540, 4);
-        func_000A00CB(save_file_handle, (int)&D_001AA544, 4);
-        func_000A00CB(save_file_handle, (int)&D_001AA580, 4);
+        read(save_file_handle, (int)&D_001AA540, 4);
+        read(save_file_handle, (int)&D_001AA544, 4);
+        read(save_file_handle, (int)&D_001AA580, 4);
     }
     faction_load(save_file_handle);
-    func_0009DEA7(save_file_handle);
+    close(save_file_handle);
 }
 
 void savevars_write(int a1)
 {
-    func_000A0ED9(1092, (int)D_00176884);
+    mc_set_location(1092, (int)D_00176884);
     mc_sprintf((int)text_rsc_buffer, (int)D_001768DF, (int)text_buffer, (int)D_001769EA);
     unlink((int)text_rsc_buffer);
     save_file_handle = open((int)text_rsc_buffer, 546, 384);
     write(save_file_handle, (int)saved_positions, 48);
     write(save_file_handle, (int)bio_modifiers, 64);
     write(save_file_handle, (int)&view_look_pitch, 12);
-    write(save_file_handle, (int)&D_00196266, 1);
+    write(save_file_handle, (int)&text_macro_imperial, 1);
     write(save_file_handle, (int)quest_faces, 100);
     write(save_file_handle, (int)D_001959C4, 20);
     write(save_file_handle, (int)travel_options, 2);
     write(save_file_handle, (int)D_0018DE44, 512);
     write(save_file_handle, (int)D_00196265, 1);
-    write(save_file_handle, (int)D_00195FB1, 71);
-    write(save_file_handle, (int)&D_001959FC, 4);
+    write(save_file_handle, (int)saved_player_object, 71);
+    write(save_file_handle, (int)&spell_points_bonus, 4);
     write(save_file_handle, (int)D_00195A08, 4);
     write(save_file_handle, (int)&D_00195A0C, 4);
     write(save_file_handle, (int)&D_00195A78, 4);
     write(save_file_handle, (int)quest_global_states, 64);
-    write(save_file_handle, (int)&D_00195F62, 2);
-    write(save_file_handle, (int)&D_00196280, 1);
+    write(save_file_handle, (int)&spell_ready_cost, 2);
+    write(save_file_handle, (int)&is_daytime, 1);
     write(save_file_handle, (int)D_001961F5, 13);
     write(save_file_handle, (int)D_00178A10, 4);
     write(save_file_handle, (int)&crime_current, 1);
-    write(save_file_handle, (int)D_0019627F, 1);
+    write(save_file_handle, (int)people_witness_flags, 1);
     write(save_file_handle, (int)&player_underwater, 1);
     write(save_file_handle, (int)&in_dungeon_water, 1);
-    write(save_file_handle, (int)&D_00178A14, 4);
-    write(save_file_handle, (int)D_00195CDC, 4);
-    write(save_file_handle, (int)&D_00195CE0, 4);
-    write(save_file_handle, (int)&D_00195CE4, 4);
+    write(save_file_handle, (int)&guards_timer, 4);
+    write(save_file_handle, (int)breath_remaining, 4);
+    write(save_file_handle, (int)&location_grid_x, 4);
+    write(save_file_handle, (int)&location_grid_z, 4);
     write(save_file_handle, (int)climate_weathers, 6);
     write(save_file_handle, (int)&D_001940D4, 8);
     write(save_file_handle, (int)frame_counter, 4);
     write(save_file_handle, (int)&game_minutes, 4);
-    write(save_file_handle, (int)&D_00195C40, 4);
+    write(save_file_handle, (int)&realtime_clock_tick, 4);
     write(save_file_handle, (int)clothing_gender_group, 4);
-    write(save_file_handle, (int)D_00195B18, 4);
+    write(save_file_handle, (int)clothing_gender_offset, 4);
     write(save_file_handle, (int)&weapon_active_hand, 1);
     write(save_file_handle, (int)region_event_values, 4960);
     write(save_file_handle, (int)&current_region, 1);
@@ -797,40 +797,40 @@ void savevars_write(int a1)
     write(save_file_handle, (int)&bank_ship_price, 4);
     write(save_file_handle, (int)saved_location_name, 32);
     write(save_file_handle, (int)saved_region_name, 32);
-    write(save_file_handle, (int)&D_00196263, 1);
-    write(save_file_handle, (int)D_0019599C, 4);
-    write(save_file_handle, (int)&D_00195998, 4);
+    write(save_file_handle, (int)&in_knightly_order_hall, 1);
+    write(save_file_handle, (int)loan_collectors_next, 4);
+    write(save_file_handle, (int)&last_skill_check_minutes, 4);
     write(save_file_handle, (int)&climate_index, 4);
     write(save_file_handle, (int)climate_weathers, 6);
     write(save_file_handle, (int)&dungeon_water_level, 4);
     write(save_file_handle, (int)&D_00187F28, 4);
-    write(save_file_handle, (int)&D_001A9A04, 4);
-    write(save_file_handle, (int)&D_001A99F8, 4);
-    write(save_file_handle, (int)&D_001A99FC, 4);
+    write(save_file_handle, (int)&recall_anchor_environment, 4);
+    write(save_file_handle, (int)&recall_anchor_location, 4);
+    write(save_file_handle, (int)&recall_anchor_region, 4);
     write(save_file_handle, (int)&D_001A9A00, 4);
     write(save_file_handle, (int)&D_001AA540, 4);
     write(save_file_handle, (int)&D_001AA544, 4);
     write(save_file_handle, (int)&D_001AA580, 4);
     faction_save(save_file_handle);
-    func_0009DEA7(save_file_handle);
+    close(save_file_handle);
 }
 
-void func_0007C432(void)
+void load_reset_state(void)
 {
     int l_1C;
     int l_18;
 
-    D_00196289 = 1;
+    world_loading = 1;
     quest_debug_data = 0;
-    D_001A94C4 = -1;
+    terrain_cell_at_player = -1;
     if (((int)(unsigned short)(game_settings->view_flags & 1)) != 0) {
-        func_0012A2D0(160, 100, 160, 100);
+        xn_cam_set_view_window(160, 100, 160, 100);
     } else {
-        func_0012A2D0(160, 77, 160, 77);
+        xn_cam_set_view_window(160, 77, 160, 77);
     }
-    func_0012A274(200, 180);
-    D_00195D48 = 10000;
-    D_0019629B = 0;
+    xn_cam_set_focal(200, 180);
+    sky_loaded_frame = 10000;
+    night_sky_loaded = 0;
     mc_memset((int)hud_message_ptrs, 0, 68, (int)D_00176884, 1188, 68);
     mc_memset((int)hud_message_expiry, 0, 68, (int)D_00176884, 1189, 68);
     D_00195B44 = game_minutes;
@@ -844,7 +844,7 @@ void func_0007C432(void)
     } else {
         l_1C = 0;
     }
-    D_00199808 = l_1C;
+    daylight = l_1C;
 }
 
 void load_fix_object_cb(struct record *a1)
@@ -862,9 +862,9 @@ void load_fix_object_cb(struct record *a1)
 
         if (a1->twin != 0) {
             if (a1->quest_id != 0) {
-                l_3C = object_find_by_id(D_001A4FE0, (int)a1->twin);
+                l_3C = object_find_by_id(load_relink_root, (int)a1->twin);
                 a1->twin = l_3C;
-                if ((int)D_001A4FE0 == (int)D_00195AC4) {
+                if ((int)load_relink_root == (int)location_object) {
                     if (a1->twin == 0) fatal_error((int)D_001769F7);
                     if (a1->twin->twin == 0) a1->twin->twin = (struct record *)a1;
                 }
@@ -908,7 +908,7 @@ void load_fix_object_cb(struct record *a1)
     }
 }
 
-void func_0007C78B(struct record *a1)
+void load_fix_ids_cb(struct record *a1)
 {
 
     switch (a1->type) {
@@ -930,8 +930,8 @@ void func_0007C78B(struct record *a1)
                 object_delete(a1);
                 return;
             }
-            if ((((unsigned)a1->id) >> 16) != (((unsigned)D_00195AC4->id) >> 16)) {
-                a1->id = object_new_id(((unsigned)D_00195AC4->id) >> 16);
+            if ((((unsigned)a1->id) >> 16) != (((unsigned)location_object->id) >> 16)) {
+                a1->id = object_new_id(((unsigned)location_object->id) >> 16);
             }
             return;
         }
@@ -943,14 +943,14 @@ void func_0007C78B(struct record *a1)
 
 void load_fix_objects(void)
 {
-    D_001A4FE0 = nonworld_root;
-    object_foreach(D_00195AC4, (int)load_fix_object_cb);
-    D_001A4FE0 = D_00195AC4;
+    load_relink_root = nonworld_root;
+    object_foreach(location_object, (int)load_fix_object_cb);
+    load_relink_root = location_object;
     object_foreach(nonworld_root, (int)load_fix_object_cb);
-    object_foreach_post(D_00195AC4, (int)func_0007C78B);
+    object_foreach_post(location_object, (int)load_fix_ids_cb);
 }
 
-void func_0007C908(int a1, int a2, int a3)
+void text_draw_centred_black_shadow(int a1, int a2, int a3)
 {
     int l_10;
 
@@ -961,7 +961,7 @@ void func_0007C908(int a1, int a2, int a3)
     text_draw_centred(a1, (int)(short)*(short *)&a2, (int)(short)*(short *)&a3);
 }
 
-void func_0007C965(int a1, int a2, int a3)
+void text_draw_colour15_shadow(int a1, int a2, int a3)
 {
     int l_10;
 
@@ -972,7 +972,7 @@ void func_0007C965(int a1, int a2, int a3)
     text_draw(a1, (int)(short)*(short *)&a2, (int)(short)*(short *)&a3);
 }
 
-void func_0007C9C2(int a1, int a2, int a3)
+void text_draw_black_shadow(int a1, int a2, int a3)
 {
     int l_10;
 
@@ -983,9 +983,9 @@ void func_0007C9C2(int a1, int a2, int a3)
     text_draw(a1, (int)(short)*(short *)&a2, (int)(short)*(short *)&a3);
 }
 
-void func_0007CAEB(short a1, short a2, short a3, short a4, short a5, short a6, short a7)
+void text_draw_number_in_box(short a1, short a2, short a3, short a4, short a5, short a6, short a7)
 {
     char l_24[12];
 
-    text_draw_centered_colored(func_000A0DD9((int)(short)a5, (int)l_24, 10), (int)(short)((((int)(short)a1) + ((int)(short)a3)) >> 1), (int)(short)(((((int)(short)a2) + ((int)(short)a4)) >> 1) - 2), (int)(short)a6, (int)(short)a7);
+    text_draw_centred_coloured(itoa((int)(short)a5, (int)l_24, 10), (int)(short)((((int)(short)a1) + ((int)(short)a3)) >> 1), (int)(short)(((((int)(short)a2) + ((int)(short)a4)) >> 1) - 2), (int)(short)a6, (int)(short)a7);
 }

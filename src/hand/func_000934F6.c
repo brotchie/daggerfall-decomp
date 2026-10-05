@@ -15,17 +15,17 @@ extern signed char game_mode;
 extern int D_001AA420;
 extern char inv_selected_item[];
 extern char inv_left_container[];
-extern char D_001AA600[];
+extern char color_remap_tables[];
 struct Rect { short x0, y0, x1, y1; char pad[4]; };
 
-extern void text_draw_colored(char *, short, short, int, unsigned char);
+extern void text_draw_coloured(char *, short, short, int, unsigned char);
 extern void inv_draw_item_image(char *, struct Rect *, short);
 extern void func_00093BD9(char *, struct Rect *, short);
-extern void func_00093DCB(int, int, struct Rect *, short);
+extern void inv_draw_cell_mark(int, int, struct Rect *, short);
 extern int mc_strncpy();
 extern int mc_memcpy();
-#pragma aux func_000A0ED9 parm routine [];
-extern int func_000A0ED9(int, char *);
+#pragma aux mc_set_location parm routine [];
+extern int mc_set_location(int, char *);
 extern int mc_sprintf(char *, ...);
 
 
@@ -68,12 +68,12 @@ int inv_draw_item_cell(char *a1, short a2, struct Rect *a3)
     }
     if (a1 != *(char **)inv_left_container && a1 != *(char **)inv_right_container && *(short *)(l_38 + 67) != -1
         && MODE != 10 && MODE2 != 10)
-        func_00093DCB(380, 5, a3, a2);
+        inv_draw_cell_mark(380, 5, a3, a2);
     if ((U16(l_38, 42) & 64) && MODE != 10 && MODE2 != 10)
-        func_00093DCB(380, 7, a3, a2);
+        inv_draw_cell_mark(380, 7, a3, a2);
     if (U16(a1, 21) & 32)
-        func_00093DCB(380, 6, a3, a2);
-    *(char **)&D_00195B80 = *(char **)D_001AA600 + (*(unsigned char *)(l_38 + 56) << 8);
+        inv_draw_cell_mark(380, 6, a3, a2);
+    *(char **)&D_00195B80 = *(char **)color_remap_tables + (*(unsigned char *)(l_38 + 56) << 8);
     if (U16(l_38, 32) == 3 && U16(l_38, 34) == 8) {
         l_40++;
         (*(short *)(l_38 + 50))++;
@@ -83,11 +83,11 @@ int inv_draw_item_cell(char *a1, short a2, struct Rect *a3)
     else
         inv_draw_item_image(l_38, a3, a2);
     *(short *)(l_38 + 50) -= l_40;
-    *(char **)&D_00195B80 = *(char **)D_001AA600;
+    *(char **)&D_00195B80 = *(char **)color_remap_tables;
     if (U16(l_38, 32) == 3 && U16(l_38, 34) == 18) {
-        func_000A0ED9(723, D_0017704C);
+        mc_set_location(723, D_0017704C);
         mc_sprintf(((char *)text_buffer), D_001770B0, *(unsigned char *)(l_38 + 49));
-        text_draw_colored(((char *)text_buffer), a3[a2].x0 + 3, a3[a2].y0 + 2, 145, 156);
+        text_draw_coloured(((char *)text_buffer), a3[a2].x0 + 3, a3[a2].y0 + 2, 145, 156);
     }
     if (trade_mode == 3 && *(unsigned char *)a1 == 54) {
         if ((unsigned)game_minutes >= *(unsigned *)(a1 + 43)) {
@@ -96,10 +96,10 @@ int inv_draw_item_cell(char *a1, short a2, struct Rect *a3)
         } else {
             l_28 = (*(unsigned *)(a1 + 43) - (unsigned)game_minutes) / 1440;
             if (l_28 == 0) l_28++;
-            func_000A0ED9(738, D_0017704C);
+            mc_set_location(738, D_0017704C);
             mc_sprintf(((char *)text_buffer), D_001770B8, l_28);
         }
-        text_draw_colored(((char *)text_buffer), a3[a2].x0 + 3, a3[a2].y0 + 2, 145, 156);
+        text_draw_coloured(((char *)text_buffer), a3[a2].x0 + 3, a3[a2].y0 + 2, 145, 156);
     }
     return 1;
 }

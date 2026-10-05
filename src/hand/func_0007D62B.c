@@ -10,14 +10,14 @@ extern unsigned char D_00196090;
 extern unsigned char D_00196091;
 extern char D_00196271;
 extern void msgbox_show_rsc(int, int);
-extern void func_0012B136(void);
+extern void xn_mouse_poll_clamped(void);
 
 void msgbox_choice_rsc(short a1, short a2, short a3, short a4, unsigned char a5, unsigned char a6, unsigned char a7)
 {
     D_00196271 = 0;
     D_001940D4 |= 1;
     while (mouse_buttons != 0)
-        func_0012B136();
+        xn_mouse_poll_clamped();
     D_0012B508 = 146;
     msgbox_button_keys = a5;
     D_00196034 = a6;

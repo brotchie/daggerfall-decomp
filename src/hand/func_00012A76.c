@@ -14,7 +14,7 @@ struct Ini {
     char *wp;                   /* 0x90 */
 };
 extern char D_00170129[];
-extern unsigned func_000A0DF4(char *);
+extern unsigned strlen(char *);
 extern void mc_memmove(char *, char *, unsigned, char *, int, int);
 extern short profile_find_item(struct Ini *, char *);
 extern void profile_set_string(struct Ini *, char *);
@@ -29,7 +29,7 @@ int profile_add_item_string(struct Ini *s, char *key, char *val, int width)
         return 1;
     }
     p = s->wp;
-    len = width + 4 + func_000A0DF4(val);
+    len = width + 4 + strlen(val);
     if (s->used + len > s->cap)
         return 0;
     mc_memmove(p + len, p, s->base + s->used - p, D_00170129, 1324, 4);

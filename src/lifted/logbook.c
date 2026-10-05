@@ -9,7 +9,7 @@ extern signed char mouse_buttons;
 extern short mouse_x;
 extern short mouse_y;
 extern signed char D_0012B508;
-extern short D_0012DA44;
+extern short font_height;
 extern signed char key_down_esc;
 extern short D_00142928;
 extern short D_0014292C;
@@ -26,19 +26,19 @@ extern int logbook_notes_file;
 extern signed char D_00187CA8;
 extern signed char text_buffer[];
 extern char D_00190BE4[];
-extern char D_00190D64[];
-extern char D_00190D66[];
+extern char scratch_190d64[];
+extern char scratch_190d66[];
 extern signed char text_rsc_buffer[];
 extern signed char D_001940D8;
 extern struct record *logbook_object;
 extern struct record *player_object;
 extern int window_image;
-extern char D_00195C44[];
-extern int D_00195D94;
+extern char scratch_buffer[];
+extern int text_macro_city;
 extern signed char D_00196272;
 extern signed char game_mode;
 extern signed char mouse_buttons_prev;
-extern signed char D_00196295;
+extern signed char text_missing_ok;
 extern int logbook_first_entry;
 extern char logbook_show_notes[];
 extern int logbook_entry_count;
@@ -48,21 +48,21 @@ extern struct quest *quest_find_by_id(int);
 extern int font_char_width(unsigned char);
 extern int sound_play(int, int, int);
 extern int logbook_open(int);
-extern int func_0006AE87(int, int);
+extern int str_list_skip(int, int);
 extern int disk_read_file(int, int);
 extern int disk_write_arena2_file(int, int, int);
 extern int disk_open_rw(int);
 extern int disk_create(int);
 extern int disk_file_exists(int);
-extern int func_0009DEA7();
+extern int close();
 extern int mc_free();
 extern int mc_memset();
 extern int lseek();
 extern int mc_strncpy();
 extern int write();
-extern int func_000A0DF4();
+extern int strlen();
 extern int mc_memcpy();
-extern int func_0012DB50();
+extern int xn_font_select();
 extern void quest_load_text(struct quest *, int, int, int);
 extern void book_flush_line(void);
 extern void func_0005A1C8(int);
@@ -72,7 +72,7 @@ void logbook_build_entries(void);
 void logbook_load_notes(void);
 void logbook_draw(void);
 void logbook_toggle_notes(void);
-void func_0006B24F(void);
+void logbook_trim_notes(void);
 
 void logbook_update(void)
 {
@@ -94,7 +94,7 @@ void logbook_update(void)
 
 int logbook_close(void)
 {
-    D_00195D94 = 0;
+    text_macro_city = 0;
     while (key_down_esc != 0);
     if (*(int *)logbook_show_notes != 0) {
         logbook_toggle_notes();
@@ -122,7 +122,7 @@ void logbook_draw_entry(int a1)
     short l_18;
 
     D_0012B508 = 146;
-    l_18 = D_0012DA44;
+    l_18 = font_height;
     while (*(signed char *)((char *)a1) != 0) {
         switch (*(unsigned char *)((char *)a1)) {
         case 251:
@@ -139,45 +139,45 @@ void logbook_draw_entry(int a1)
             break;
         case 249:
             book_flush_line();
-            func_0012DB50((int)(short)((unsigned short)(unsigned char)*(signed char *)((char *)a1 + 1)));
+            xn_font_select((int)(short)((unsigned short)(unsigned char)*(signed char *)((char *)a1 + 1)));
             a1 += 2;
-            if ((short)(short)*(int *)&l_18 < D_0012DA44) l_18 = D_0012DA44;
+            if ((short)(short)*(int *)&l_18 < font_height) l_18 = font_height;
             break;
         case 252:
-            l_18 = D_0012DA44;
+            l_18 = font_height;
             D_00142928 = 30;
             D_0014292C += *(int *)&l_18;
             a1++;
-            text_buffer[(int)(short)*(short *)D_00190D64] = 0;
+            text_buffer[(int)(short)*(short *)scratch_190d64] = 0;
             book_flush_line();
-            *(short *)D_00190D64 = 0;
+            *(short *)scratch_190d64 = 0;
             if (((int)(short)D_0014292C) > 160) goto L6AB05;
             break;
         case 253:
-            l_18 = D_0012DA44;
+            l_18 = font_height;
             D_00142928 = 30;
             D_0014292C += *(int *)&l_18;
             a1++;
-            text_buffer[(int)(short)*(short *)D_00190D64] = 0;
-            *(short *)D_00190D66 = 1;
+            text_buffer[(int)(short)*(short *)scratch_190d64] = 0;
+            *(short *)scratch_190d66 = 1;
             book_flush_line();
-            *(short *)D_00190D64 = 0;
+            *(short *)scratch_190d64 = 0;
             if (((int)(short)D_0014292C) > 160) goto L6AB05;
             break;
         case 1:
             a1++;
-            text_buffer[(int)(short)*(short *)D_00190D64] = 0;
+            text_buffer[(int)(short)*(short *)scratch_190d64] = 0;
             book_flush_line();
             break;
         default:
-            text_buffer[(int)(short)(*(short *)D_00190D64)++] = *(signed char *)((char *)a1++);
+            text_buffer[(int)(short)(*(short *)scratch_190d64)++] = *(signed char *)((char *)a1++);
         }
     }
-    text_buffer[(int)(short)*(short *)D_00190D64] = 0;
+    text_buffer[(int)(short)*(short *)scratch_190d64] = 0;
     book_flush_line();
 L6AB05:;
     D_00142928 = 30;
-    l_18 = D_0012DA44;
+    l_18 = font_height;
     D_0014292C += *(int *)&l_18;
 }
 
@@ -203,12 +203,12 @@ void logbook_build_entries(void)
     struct quest *l_1C;
     int l_18;
 
-    l_18 = *(int *)D_00195C44 + 20000;
+    l_18 = *(int *)scratch_buffer + 20000;
     if (*(int *)logbook_show_notes != 0 && disk_file_exists(logbook_notes_file) != 0) {
         logbook_load_notes();
         return;
     }
-    D_00196295 = 1;
+    text_missing_ok = 1;
     logbook_entry_count = 0;
     l_28 = (int)RECORD_DATA(logbook_object);
     for (l_24 = 0; l_24 < 32; l_24++) {
@@ -221,19 +221,19 @@ void logbook_build_entries(void)
         }
         for (l_20 = 0; l_20 < 10; l_20++) {
             if (*(short *)((char *)(int)((char *)((l_24 * 20) + l_28) + (l_20 * 2)) + 64) == 0) continue;
-            D_00195D94 = (l_28 + 1984) + (l_24 << 5);
+            text_macro_city = (l_28 + 1984) + (l_24 << 5);
             *(int *)D_00190BE4 = *(int *)((char *)((l_28 + (l_24 * 40)) + (l_20 << 2)) + 704);
             text_rsc_buffer[0] = 0;
             quest_load_text(l_1C, (int)(short)*(short *)((char *)(((l_24 * 20) + l_28) + (l_20 * 2)) + 64), 0, 0);
             if (text_rsc_buffer[0] == 0) continue;
             mc_strncpy(l_18, (int)text_rsc_buffer, 4, (int)D_00175C86, 216);
-            l_18 += func_000A0DF4(l_18) + 1;
+            l_18 += strlen(l_18) + 1;
             logbook_entry_count++;
         }
     }
     *(signed char *)((char *)l_18++) = 0;
-    D_00195D94 = 0;
-    D_00196295 = 0;
+    text_macro_city = 0;
+    text_missing_ok = 0;
 }
 
 void logbook_load_notes(void)
@@ -241,11 +241,11 @@ void logbook_load_notes(void)
     int l_1C;
     int l_18;
 
-    l_1C = *(int *)D_00195C44 + 20000;
+    l_1C = *(int *)scratch_buffer + 20000;
     mc_memset(l_1C, 0, 35000, (int)D_00175C86, 233, 4);
     disk_read_file((int)D_00175C6C, l_1C);
     while (*(signed char *)((char *)l_1C) != 0) {
-        l_1C += func_000A0DF4(l_1C) + 1;
+        l_1C += strlen(l_1C) + 1;
         logbook_entry_count++;
     }
     *(signed char *)((char *)l_1C++) = 0;
@@ -259,13 +259,13 @@ void logbook_draw(void)
 
     D_00142928 = 30;
     D_0014292C = 25;
-    *(short *)D_00190D66 = 0;
-    func_0012DB50(4);
-    l_18 = func_0006AE87(*(int *)D_00195C44 + 20000, logbook_first_entry);
+    *(short *)scratch_190d66 = 0;
+    xn_font_select(4);
+    l_18 = str_list_skip(*(int *)scratch_buffer + 20000, logbook_first_entry);
     for (l_1C = logbook_first_entry; l_1C < logbook_entry_count; l_1C++) {
         if (((int)(short)D_0014292C) > 160) return;
         logbook_draw_entry(l_18);
-        l_18 += func_000A0DF4(l_18) + 1;
+        l_18 += strlen(l_18) + 1;
         if (*(signed char *)((char *)l_18) == 0) {
             l_18++;
             D_0014292C += 8;
@@ -312,12 +312,12 @@ void logbook_copy_text(int a1)
     write(l_24, (int)&l_18, 1);
     *(signed char *)&l_18 = 0;
     write(l_24, (int)&l_18, 1);
-    func_0009DEA7(l_24);
+    close(l_24);
     if (l_20 <= 32768) return;
-    func_0006B24F();
+    logbook_trim_notes();
 }
 
-void func_0006B24F(void)
+void logbook_trim_notes(void)
 {
     int l_18;
 

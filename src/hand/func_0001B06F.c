@@ -4,9 +4,9 @@
 extern int D_00195B84;
 extern struct faction *D_0019670C;
 extern struct faction *D_0019671C;
-extern unsigned char func_0001AFD5(struct faction *);
+extern unsigned char faction_subtree_search_r(struct faction *);
 
-int func_0001B06F(struct faction *a, struct faction *b)
+int faction_tree_relation(struct faction *a, struct faction *b)
 {
     struct faction *save;
 
@@ -14,7 +14,7 @@ int func_0001B06F(struct faction *a, struct faction *b)
     D_0019671C = b;
     D_0019670C = a->parent;
     D_00195B84 = 0;
-    if ((unsigned char)(func_0001AFD5(b->child) & 1))
+    if ((unsigned char)(faction_subtree_search_r(b->child) & 1))
         return 3;
     if (a->parent != 0) {
         a = a->parent->child;

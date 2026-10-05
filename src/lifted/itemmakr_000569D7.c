@@ -2,11 +2,11 @@
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
 
-extern signed char D_00147964;
+extern signed char xn_mouse_cursor_drawn;
 extern char enchant_power_params[];
-extern signed char itemmaker_slot_kinds[];
-extern char D_00190D64[];
-extern char D_00190D66[];
+extern signed char scratch_190ce4[];
+extern char scratch_190d64[];
+extern char scratch_190d66[];
 extern int list_popup_callback;
 extern char itemmaker_slots[];
 extern char D_001998E2[];
@@ -22,19 +22,19 @@ void itemmaker_add_power_cb(int a1)
 {
     short l_18;
 
-    *(short *)D_00190D66 = a1;
+    *(short *)scratch_190d66 = a1;
     *(int *)&l_18 = itemmaker_free_slot();
-    *(short *)D_00190D64 = *(int *)&l_18;
+    *(short *)scratch_190d64 = *(int *)&l_18;
     if (((int)(short)l_18) == (-1)) {
         msgbox_show_rsc(1657, 1);
         return;
     }
-    itemmaker_slot_kinds[(int)(short)l_18] = 0;
+    scratch_190ce4[(int)(short)l_18] = 0;
     if (*(int *)(enchant_power_params + (((int)(short)*(short *)&a1) << 2)) != 0) {
         *(short *)(itemmaker_slots + (((int)(short)l_18) << 2)) = a1;
         if (((unsigned)*(int *)(enchant_power_params + (((int)(short)*(short *)&a1) << 2))) < 5) {
             if (itemmaker_pick_param_list(*(int *)(enchant_power_params + (((int)(short)*(short *)&a1) << 2))) == 0) {
-                itemmaker_slot_kinds[(int)(short)l_18] = 255;
+                scratch_190ce4[(int)(short)l_18] = 255;
                 return;
             }
         } else {
@@ -51,5 +51,5 @@ void itemmaker_add_power_cb(int a1)
         *(short *)(itemmaker_slots + (((int)(short)l_18) << 2)) = a1;
         *(short *)(D_001998E2 + (((int)(short)l_18) << 2)) = 65535;
     }
-    D_00147964 &= 254;
+    xn_mouse_cursor_drawn &= 254;
 }

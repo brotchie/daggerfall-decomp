@@ -1,8 +1,8 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x000306FE */
 #include "records.h"
 
-extern int D_00196A28;
-extern struct map_location *D_00196A9C;
+extern int region_location_count;
+extern struct map_location *region_locations;
 
 void qaction_op19_reveal_location(struct quest *a1, struct qbn_op *a2, int a3)
 {
@@ -13,8 +13,8 @@ void qaction_op19_reveal_location(struct quest *a1, struct qbn_op *a2, int a3)
 
     l_1C = a2->args[1].object;
     n = l_1C->image;
-    p = D_00196A9C;
-    for (i = 0; i < D_00196A28; i++, p++) {
+    p = region_locations;
+    for (i = 0; i < region_location_count; i++, p++) {
         if (p->dungeon_type != 255)
             if (n-- == 0) break;
     }

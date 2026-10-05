@@ -37,7 +37,7 @@ extern unsigned char D_001940D8;
 extern struct node *wagon_container;
 extern int player_object;
 extern struct node *inv_right_container;
-extern struct node *D_00195B34;
+extern struct node *inv_right_container_base;
 extern struct pc *player_character;
 extern unsigned char D_0019626F;
 extern unsigned char game_mode;
@@ -65,14 +65,14 @@ extern void inv_list_right_item(struct node *, char *);
 extern void inv_equip_in_slot_pair(char *, int, int);
 extern void inv_unequip_slot(int);
 extern void inv_equip_in_slot(char *, int);
-extern int func_000968F8(char *);
+extern int item_is_two_handed(char *);
 extern void item_remove_equip_effects(char *, int);
 extern void inv_store_item(char *);
 extern int item_forbidden_for_class(struct item *);
 extern void mc_memset(char *, int, int, char *, int, int);
-extern int func_000CE44C();
-#pragma aux func_000A0ED9 parm routine [];
-extern int func_000A0ED9(int, char *);
+extern int xn_str_find_u32();
+#pragma aux mc_set_location parm routine [];
+extern int mc_set_location(int, char *);
 extern int mc_sprintf(char *, char *, ...);
 void inv_equip_item(char *obj);
 
@@ -104,7 +104,7 @@ void inv_draw_right_list(char *a1)
 
     inv_right_count = D_001AA588 = 0;
     mc_memset(inv_right_rows, 0, 20, D_0017704C, 1655, 20);
-    if (inv_right_container != D_00195B34) {
+    if (inv_right_container != inv_right_container_base) {
         inv_draw_item_cell(inv_right_container, 0, a1);
         D_001AA558 = inv_right_container;
     }
@@ -122,7 +122,7 @@ void func_00095EDB(void)
     int l_18;
 
     D_001AA454 = 0;
-    if (func_000CE44C(player_character->slots, inv_selected_item, 27) != 0)
+    if (xn_str_find_u32(player_character->slots, inv_selected_item, 27) != 0)
         return;
     inv_store_item(inv_selected_item);
     inv_equip_item(inv_selected_item);
@@ -130,7 +130,7 @@ void func_00095EDB(void)
         return;
     gold_add(D_001AA454);
     D_0012B508 = 144;
-    func_000A0ED9(1688, D_0017704C);
+    mc_set_location(1688, D_0017704C);
     mc_sprintf(((char *)text_buffer), D_001832A4, D_001AA454);
     msgbox_show_string(((char *)text_buffer), 1);
 }
@@ -208,7 +208,7 @@ void inv_equip_item(char *obj)
         case 10:
             if (game_mode == 4)
                 sound_play(233, player_object, 100);
-            if (func_000968F8(player_character->f1bb) != 0) {
+            if (item_is_two_handed(player_character->f1bb) != 0) {
                 item_remove_equip_effects(player_character->f1bb, 19);
                 player_character->f1bb = 0;
                 inv_equip_in_slot(obj, 21);
@@ -223,8 +223,8 @@ void inv_equip_item(char *obj)
             return;
         if (game_mode == 4)
             sound_play(D_00188208[it->sub], player_object, 100);
-        if (func_000968F8(obj) != 0) {
-            if (func_000968F8(player_character->f1bb) != 0) {
+        if (item_is_two_handed(obj) != 0) {
+            if (item_is_two_handed(player_character->f1bb) != 0) {
                 inv_equip_in_slot(obj, 19);
                 return;
             }
@@ -244,7 +244,7 @@ void inv_equip_item(char *obj)
                 return;
             }
         } else {
-            if (func_000968F8(player_character->f1bb) != 0) {
+            if (item_is_two_handed(player_character->f1bb) != 0) {
                 inv_equip_in_slot(obj, 19);
                 return;
             }

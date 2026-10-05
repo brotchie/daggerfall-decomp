@@ -1,7 +1,7 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x000844FB */
 #include "records.h"
 
-extern struct record *D_00195AC4;
+extern struct record *location_object;
 extern struct location *current_location;
 extern struct record *object_create_child(struct record *, struct record *, int);
 
@@ -25,9 +25,9 @@ struct record *rmb_make_marker(struct record *a1, int a2)
     l_20->mobile_id = 0;
     l_20->image = a2;
     if (l_1C == 9 || l_1C == 16) {
-        l_20->id = D_00195AC4->id + current_location->marker_counter++;
+        l_20->id = location_object->id + current_location->marker_counter++;
     } else {
-        l_20->id = D_00195AC4->id + current_location->object_counter++;
+        l_20->id = location_object->id + current_location->object_counter++;
     }
     l_20->flags = 1;
     return l_20;

@@ -4,10 +4,10 @@
 #include "records.h"
 
 extern signed char quest_faces[];
-extern char D_00195A15[];
-extern char D_00195A16[];
-extern char D_00195A1A[];
-extern int D_00195D04[];
+extern char quest_faces_quest[];
+extern char quest_faces_object[];
+extern char quest_faces_image[];
+extern int quest_face_images[];
 extern int D_00195D14;
 extern struct quest *current_quest;
 
@@ -28,17 +28,17 @@ void quest_face_add(struct record *a1, int a2, int a3, int a4)
         a3 = 1;
     }
     l_1C = 0;
-    while (*(int *)(D_00195A16 + (l_1C * 10)) != 0 && l_1C < 10) l_1C++;
+    while (*(int *)(quest_faces_object + (l_1C * 10)) != 0 && l_1C < 10) l_1C++;
     if (l_1C >= 10) return;
-    *(int *)(D_00195A16 + (l_1C * 10)) = a4;
-    *(signed char *)(D_00195A15 + (l_1C * 10)) = (signed char)current_quest->id;
+    *(int *)(quest_faces_object + (l_1C * 10)) = a4;
+    *(signed char *)(quest_faces_quest + (l_1C * 10)) = (signed char)current_quest->id;
     if (a1->type != 18 && a1->data.building.faction_id == 514) {
         l_18 = a3 + (a2 * 2);
         quest_faces[l_1C * 10] = (((*(signed char *)&a3 << 7) + (*(signed char *)&a2 << 6)) + *(signed char *)&l_18) | 16;
         l_10 = D_00195D14;
     } else {
         quest_faces[l_1C * 10] = ((*(signed char *)&a3 << 7) + (*(signed char *)&a2 << 6)) + rand_range(0, 9);
-        l_10 = D_00195D04[((a3 * 2) + a2)];
+        l_10 = quest_face_images[((a3 * 2) + a2)];
     }
     l_14 = 0;
     l_18 = (int)(unsigned char)(quest_faces[l_1C * 10] & 15);
@@ -46,5 +46,5 @@ void quest_face_add(struct record *a1, int a2, int a3, int a4)
         l_10 = (((int)(unsigned short)*(short *)((char *)l_10 + 10)) + l_10) + 12;
         l_14++;
     }
-    *(int *)(D_00195A1A + (l_1C * 10)) = l_10;
+    *(int *)(quest_faces_image + (l_1C * 10)) = l_10;
 }

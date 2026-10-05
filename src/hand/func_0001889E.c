@@ -14,7 +14,7 @@ extern char talk_key_text[][65];
 extern short D_001966A2;
 extern unsigned char D_001966B8;
 extern void talk_list_draw_item(char *, int, int, int, int);
-extern void func_0001839C(void);
+extern void talk_add_quest_info_topics(void);
 extern struct faction *faction_find(short);
 extern void mc_strncpy(char *, char *, int, char *, int);
 
@@ -38,7 +38,7 @@ void talk_draw_tell_list(void)
         talk_list_draw_item(D_00170431, 6, (talk_list_count - talk_list_top) * 7 + 71, color, 156);
     }
     talk_list_count++;
-    func_0001839C();
+    talk_add_quest_info_topics();
     for (i = 0; i < 34; i++) {
         talk_topics[D_001966A2 * 3] = i > 7 ? i + 861 : i + 860;
         talk_topics[D_001966A2 * 3 + 1] = 0;

@@ -5,11 +5,11 @@
 extern char D_001700D5[];
 
 extern int open(int, ...);
-extern int func_0009DEA7();
+extern int close();
 extern int mc_free();
 extern int lseek();
 extern int mc_malloc();
-extern int func_000A00CB();
+extern int read();
 #pragma aux sosconv "*" parm caller [] value [eax] modify [eax ebx ecx edx];
 #pragma aux (sosconv) sos_load_file;
 
@@ -25,17 +25,17 @@ int sos_load_file(int a1)
     lseek(l_10, 0, 0);
     l_18 = mc_malloc(l_14, (int)D_001700D5, 441);
     if (l_18 == 0) {
-        func_0009DEA7(l_10);
+        close(l_10);
         return 0;
     }
-    if (func_000A00CB(l_10, l_18, l_14) != l_14) {
-        func_0009DEA7(l_10);
+    if (read(l_10, l_18, l_14) != l_14) {
+        close(l_10);
         if (l_18 != 0 && l_18 != (-1751672937)) {
             mc_free(l_18, (int)D_001700D5, 457);
             l_18 = -1751672937;
         }
         return 0;
     }
-    func_0009DEA7(l_10);
+    close(l_10);
     return l_18;
 }

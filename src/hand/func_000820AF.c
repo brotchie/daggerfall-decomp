@@ -26,7 +26,7 @@ extern int D_001A5A60;
 extern int D_001A5A64;
 extern int move_angle_offset;
 extern int collide_move_player(struct record *, int, struct pos *, int);
-extern int func_000CE6E2();
+extern int xn_math_yaw_offset_xz();
 
 int player_try_move(int a1)
 {
@@ -34,7 +34,7 @@ int player_try_move(int a1)
     int dz;
     int r;
 
-    func_000CE6E2((player_object->yaw + move_angle_offset) & 2047, a1 << 5, &dx, &dz);
+    xn_math_yaw_offset_xz((player_object->yaw + move_angle_offset) & 2047, a1 << 5, &dx, &dz);
     dx += player_object->x << 5;
     dz += player_object->z << 5;
     dx += D_001A5A64;

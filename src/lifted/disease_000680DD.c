@@ -13,7 +13,7 @@ extern struct character *player_character;
 extern int game_minutes;
 extern int nearest_creature_distance;
 extern char nearest_creature[];
-extern char D_001A3AA4[];
+extern char extra_spell_points[];
 extern int D_001A3AA8;
 
 extern int damage_apply(struct record *, int, int);
@@ -33,11 +33,11 @@ void item_enchantment_tick(struct item *a1, int a2, int a3)
     if (a2 != 3 && *(int *)D_00195B08 == 0) return;
     switch ((unsigned)a2) {
     case 3:
-        *(int *)D_001A3AA4 = 0;
+        *(int *)extra_spell_points = 0;
         enchant_extra_spell_points(a1, a3);
-        player_character->max_magicka += *(short *)D_001A3AA4;
-        D_001A3AA8 += *(int *)D_001A3AA4;
-        if (*(int *)D_001A3AA4 != 0 && a3 >= 7 && a3 <= 10 && player_character->magicka < player_character->max_magicka) {
+        player_character->max_magicka += *(short *)extra_spell_points;
+        D_001A3AA8 += *(int *)extra_spell_points;
+        if (*(int *)extra_spell_points != 0 && a3 >= 7 && a3 <= 10 && player_character->magicka < player_character->max_magicka) {
             player_character->magicka += *(short *)D_00195B08 * 5;
         }
         if (*(int *)D_00195B08 != 0 && ((struct bf8_0_2 *)&game_minutes)->f == 0) {

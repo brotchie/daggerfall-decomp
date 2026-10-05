@@ -2,15 +2,15 @@
 #include "records.h"
 
 extern unsigned char D_0012B508;
-extern unsigned char D_0012DA44;
+extern unsigned char font_height;
 extern char D_00176E38[];
 extern char D_001A9AF3;
 extern void text_draw(char *, int, int);
 extern void picklist_clip_text(char *, short);
 extern void mc_strncpy(char *, char *, int, char *, int);
-extern void func_000CE4FA(int, int, int, int);
-extern void func_00144D00(int, int, int, int);
-extern void func_00144ED8(int, int, int, int, char *, int);
+extern void xn_draw_line_text_colour(int, int, int, int);
+extern void xn_draw_fill_rect(int, int, int, int);
+extern void xn_draw_put_rect(int, int, int, int, char *, int);
 
 void picklist_draw(struct picklist *a1, int a2)
 {
@@ -26,14 +26,14 @@ void picklist_draw(struct picklist *a1, int a2)
 
     l_28 = D_0012B508;
     l_30 = 0;
-    l_14 = D_0012DA44;
+    l_14 = font_height;
     if (a1->count == 0)
         l_30 = 0;
     else
         l_30 = a1->top * a1->bar_rect.h / a1->count;
     if (a1->framed) {
-        func_00144ED8(a1->list_rect.x, a1->list_rect.y, a1->list_rect.w, a1->list_rect.h, a1->list_background, 0);
-        func_00144ED8(a1->bar_rect.x, a1->bar_rect.y, a1->bar_rect.w, a1->bar_rect.h, a1->bar_background, 0);
+        xn_draw_put_rect(a1->list_rect.x, a1->list_rect.y, a1->list_rect.w, a1->list_rect.h, a1->list_background, 0);
+        xn_draw_put_rect(a1->bar_rect.x, a1->bar_rect.y, a1->bar_rect.w, a1->bar_rect.h, a1->bar_background, 0);
     }
     D_0012B508 = a1->colour_thumb;
     l_2C = a1->bar_rect.x + 2;
@@ -41,13 +41,13 @@ void picklist_draw(struct picklist *a1, int a2)
     l_20 = a1->bar_rect.w - 4;
     l_1C = a1->thumb_height - 1;
     if (a1->bar_rect.x != 0)
-        func_00144D00(l_2C, l_18, l_20, l_1C);
+        xn_draw_fill_rect(l_2C, l_18, l_20, l_1C);
     D_0012B508 = 123;
-    func_000CE4FA(l_2C, l_18, l_2C, l_18 + l_1C - 1);
-    func_000CE4FA(l_2C, l_18 + l_1C - 1, l_2C + l_20 - 1, l_18 + l_1C - 1);
+    xn_draw_line_text_colour(l_2C, l_18, l_2C, l_18 + l_1C - 1);
+    xn_draw_line_text_colour(l_2C, l_18 + l_1C - 1, l_2C + l_20 - 1, l_18 + l_1C - 1);
     D_0012B508 = 112;
-    func_000CE4FA(l_2C + l_20 - 1, l_18, l_2C + l_20 - 1, l_18 + l_1C - 2);
-    func_000CE4FA(l_2C + 1, l_18, l_2C + l_20 - 1, l_18);
+    xn_draw_line_text_colour(l_2C + l_20 - 1, l_18, l_2C + l_20 - 1, l_18 + l_1C - 2);
+    xn_draw_line_text_colour(l_2C + 1, l_18, l_2C + l_20 - 1, l_18);
     l_24 = a1->top;
     l_18 = 1;
     while (l_24 < a1->count && l_18 < a1->list_rect.h - l_14) {

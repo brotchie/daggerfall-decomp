@@ -7,19 +7,19 @@ extern char D_0017627D[];
 extern signed char text_buffer[];
 
 extern int disk_open_data(int);
-extern int func_0009DEA7();
-extern int func_000A00CB();
-extern int func_000A0ED9(int, int);
+extern int close();
+extern int read();
+extern int mc_set_location(int, int);
 extern int mc_sprintf(int, ...);
-#pragma aux func_000A0ED9 parm routine [];
+#pragma aux mc_set_location parm routine [];
 
 void book_read_header(int a1, int a2)
 {
     int l_14;
 
-    func_000A0ED9(586, (int)D_00176198);
+    mc_set_location(586, (int)D_00176198);
     mc_sprintf((int)text_buffer, (int)D_0017627D, a2);
     l_14 = disk_open_data((int)text_buffer);
-    func_000A00CB(l_14, a1, 234);
-    func_0009DEA7(l_14);
+    read(l_14, a1, 234);
+    close(l_14);
 }

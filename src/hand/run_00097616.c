@@ -11,7 +11,7 @@ struct img {
 };
 #pragma pack()
 extern char *player_entity;
-extern unsigned char *D_00195AF4;
+extern unsigned char *found_object;
 extern struct img *D_001AA42C;
 extern struct img *D_001AA430;
 extern int inv_left_scroll;
@@ -21,20 +21,20 @@ extern short inv_left_count;
 extern int object_delete(unsigned char *);
 extern int inv_match_arrows(int);
 extern int object_find(int, int (*)(int));
-extern void func_00144FB4(int, int, int, int, char *);
+extern void xn_draw_image_transparent(int, int, int, int, char *);
 void inv_draw_scroll_arrow(struct img *p, int a2);
 
 int inv_take_arrow(int a1)
 {
     unsigned char *p;
 
-    D_00195AF4 = 0;
+    found_object = 0;
     object_find(*(int *)(player_entity + 63), inv_match_arrows);
-    if (D_00195AF4 == 0) return 0;
+    if (found_object == 0) return 0;
     if (a1 == 0) return 1;
-    p = D_00195AF4 + 71;
+    p = found_object + 71;
     if (p[49] == 1) {
-        object_delete(D_00195AF4);
+        object_delete(found_object);
         return 1;
     }
     p[49]--;
@@ -57,16 +57,16 @@ void inv_draw_scroll_arrow(struct img *p, int a2)
 {
     switch (a2) {
     case 0:
-        func_00144FB4(163, 48, p->h, 20, p->data);
+        xn_draw_image_transparent(163, 48, p->h, 20, p->data);
         break;
     case 1:
-        func_00144FB4(261, 48, p->h, 20, p->data);
+        xn_draw_image_transparent(261, 48, p->h, 20, p->data);
         break;
     case 2:
-        func_00144FB4(163, p->f2 + p->f6 - 20, p->h, 20, p->data + p->f10 - p->h * 20);
+        xn_draw_image_transparent(163, p->f2 + p->f6 - 20, p->h, 20, p->data + p->f10 - p->h * 20);
         break;
     case 3:
-        func_00144FB4(261, p->f2 + p->f6 - 20, p->h, 20, p->data + p->f10 - p->h * 20);
+        xn_draw_image_transparent(261, p->f2 + p->f6 - 20, p->h, 20, p->data + p->f10 - p->h * 20);
         break;
     }
 }

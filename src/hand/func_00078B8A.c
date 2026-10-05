@@ -5,11 +5,11 @@ extern char D_00176844[];
 extern char D_0017685B[];
 extern signed char text_buffer[];
 extern char D_00190704[];
-extern int D_00195AC8;
+extern int monster_bsa_handle;
 extern int archive_find_record(int, int, int);
 extern int archive_read_record(int, int, int);
-#pragma aux func_000A0ED9 parm routine [];
-extern int func_000A0ED9(int, int);
+#pragma aux mc_set_location parm routine [];
+extern int mc_set_location(int, int);
 extern int mc_sprintf(int, ...);
 
 void monster_reload_anim_cb(struct record *a1)
@@ -25,10 +25,10 @@ void monster_reload_anim_cb(struct record *a1)
     l_20 = &l_28->career;
     l_24 = (struct monster_anim *)((char *)l_20 + 74);
     l_1C = l_24->anim_script_pos - l_24->anim_script;
-    func_000A0ED9(196, (int)D_00176844);
+    mc_set_location(196, (int)D_00176844);
     mc_sprintf((int)text_buffer, (int)D_0017685B, l_28->ascr_record);
-    l_18 = archive_find_record(D_00195AC8, (int)text_buffer, 8);
-    ((char **)D_00190704)[l_28->anim_slot] = l_24->anim_script = (char *)archive_read_record(D_00195AC8, l_18, 0);
+    l_18 = archive_find_record(monster_bsa_handle, (int)text_buffer, 8);
+    ((char **)D_00190704)[l_28->anim_slot] = l_24->anim_script = (char *)archive_read_record(monster_bsa_handle, l_18, 0);
     if (l_24->anim_script_pos == 0) return;
     l_24->anim_script_pos = l_24->anim_script + l_1C;
 }

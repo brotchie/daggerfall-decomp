@@ -23,41 +23,41 @@ extern int D_0018463C;
 extern int D_00184640;
 extern int D_00185083;
 extern int D_00185097;
-extern signed char dispel_monster_ids[];
+extern signed char undead_daedra_ids[];
 extern char spell_resist_flags[];
 extern int D_0018DDD8;
 extern char saved_positions[];
 extern int D_0018DE20;
-extern struct record *D_00190504[];
-extern char text_macro_fpc[];
+extern struct record *creature_list[];
+extern char scratch_190de4[];
 extern char D_00190EE4[];
 extern signed char D_001940D4;
 extern signed char D_001940D6;
 extern struct record *player_entity;
 extern struct record *player_object;
-extern struct record *D_00195AC4;
+extern struct record *location_object;
 extern int creature_count;
 extern int spfx_popup_handler;
 extern char D_00195B84[];
 extern struct character *player_character;
 extern int game_minutes;
-extern char D_00195C44[];
+extern char scratch_buffer[];
 extern int free_later_count;
-extern short D_00195F62;
+extern short spell_ready_cost;
 extern signed char current_region;
 extern unsigned char D_00196271;
 extern signed char game_mode;
 extern signed char player_ailment_flags;
 extern int D_001A99F4;
-extern int D_001A99F8;
-extern int D_001A99FC;
+extern int recall_anchor_location;
+extern int recall_anchor_region;
 extern int D_001A9A00;
-extern int D_001A9A04;
+extern int recall_anchor_environment;
 extern char D_001AA458[];
 
 extern struct faction *faction_find(short);
 extern int damage_apply(struct record *, int, int);
-extern int spells_list_poll(void);
+extern int list_popup_poll(void);
 extern int hud_message_add(int);
 extern int rand_range(int, int);
 extern int spfx_damage(struct record *, int, struct record *);
@@ -70,14 +70,14 @@ extern int rand();
 extern int srand();
 extern int mc_memset();
 extern int mc_strncpy();
-extern int func_000A0DF4();
+extern int strlen();
 extern int spell_find_effect_type();
 extern void damage_creature_death(struct record *);
 extern void msgbox_show_rsc(int, int);
 extern void spell_remove_effect_type(struct record *, int);
 extern void fatigue_add(int);
 extern void weapon_reload_hand_sprites(void);
-extern void picklist_open(int);
+extern void list_popup_open(int);
 extern void msgbox_choice_rsc(short, unsigned char, unsigned char, int, unsigned char, unsigned char, unsigned char);
 extern void object_free_later(struct record *);
 extern void object_free_pending(void);
@@ -92,7 +92,7 @@ extern void inv_unequip_all_saved(void);
 extern void inv_reequip_saved(void);
 extern void transport_choose(int);
 int spfx_drain(struct record *, int, struct record *);
-int func_0008B43B(unsigned char, unsigned char, int);
+int name_generate_seeded(unsigned char, unsigned char, int);
 void spfx_dispel_creatures(int, int);
 void spfx_heal(struct record *, int, struct record *);
 void spfx_show_choice_list(int, int);
@@ -110,20 +110,20 @@ void spfx_dispel(struct record *a1, int a2, struct record *a3)
     switch (l_20->effects[a2].subtype) {
     case 0:
         l_10 = 0;
-        l_14 = *(int *)D_00195C44;
+        l_14 = *(int *)scratch_buffer;
         l_18 = player_entity->children;
         while (l_18 != 0) {
             if (l_18->type == 9) {
                 l_1C = &l_18->data.spell;
                 mc_strncpy(l_14, l_1C->name, 4, (int)D_00176D55, 284);
                 *(int *)(D_00190EE4 + (l_10 << 2)) = (int)l_18;
-                *(int *)(text_macro_fpc + (l_10++ << 2)) = l_14;
-                l_14 += func_000A0DF4(l_1C->name) + 1;
+                *(int *)(scratch_190de4 + (l_10++ << 2)) = l_14;
+                l_14 += strlen(l_1C->name) + 1;
             }
             l_18 = l_18->next;
         }
-        *(int *)(text_macro_fpc + (l_10 << 2)) = 0;
-        spfx_show_choice_list((int)text_macro_fpc, (int)spfx_dispel_magic_cb);
+        *(int *)(scratch_190de4 + (l_10 << 2)) = 0;
+        spfx_show_choice_list((int)scratch_190de4, (int)spfx_dispel_magic_cb);
         selected_spell = l_20;
         D_001A99F4 = a2;
         return;
@@ -145,11 +145,11 @@ void spfx_dispel_creatures(int a1, int a2)
     struct character *l_14;
 
     for (l_24 = 0; l_24 < creature_count; l_24++) {
-        l_14 = &D_00190504[l_24]->data.character;
+        l_14 = &creature_list[l_24]->data.character;
         l_20 = 0;
         l_1C = l_20;
         for (; l_20 < 7; l_20++) {
-            if ((signed char)l_14->mobile_id == dispel_monster_ids[(a2 * 7) + l_20]) {
+            if ((signed char)l_14->mobile_id == undead_daedra_ids[(a2 * 7) + l_20]) {
                 l_1C++;
             }
         }
@@ -161,7 +161,7 @@ void spfx_dispel_creatures(int a1, int a2)
             l_18 = 95;
         }
         if (rand_range(1, 100) > l_18) continue;
-        object_delete(D_00190504[l_24]);
+        object_delete(creature_list[l_24]);
     }
 }
 
@@ -471,7 +471,7 @@ int spfx_climbing(struct record *a1, int a2, struct record *a3)
     return 1;
 }
 
-int func_00089ECD(struct record *a1, int a2, struct record *a3)
+int spfx_morph_self(struct record *a1, int a2, struct record *a3)
 {
     struct character *l_18;
     struct spell *l_14;
@@ -505,7 +505,7 @@ int spfx_water_walking(struct record *a1, int a2, struct record *a3)
     return 1;
 }
 
-int func_00089FB6(struct record *a1, int a2, struct record *a3)
+int spfx_diminution(struct record *a1, int a2, struct record *a3)
 {
     struct character *l_14;
 
@@ -547,17 +547,17 @@ int spfx_charm(struct record *a1, int a2, struct record *a3)
     return 1;
 }
 
-int func_0008A189(int a1, int a2, int a3)
+int spfx_telekinesis(int a1, int a2, int a3)
 {
     return 1;
 }
 
-int func_0008A1B0(int a1, int a2, int a3)
+int spfx_astral_travel(int a1, int a2, int a3)
 {
     return 1;
 }
 
-int func_0008A1D7(int a1, int a2, int a3)
+int spfx_etherealness(int a1, int a2, int a3)
 {
     return 1;
 }
@@ -577,21 +577,21 @@ int spfx_identify(struct record *a1, int a2, struct record *a3)
 
     l_14 = &a1->data.spell;
     player_character->lock_open_chance = l_14->cast_chances[a2];
-    player_character->magicka += D_00195F62;
+    player_character->magicka += spell_ready_cost;
     if (player_character->magicka > player_character->max_magicka) {
         player_character->magicka = player_character->max_magicka;
     }
-    *(int *)D_001AA458 = (int)(short)D_00195F62;
+    *(int *)D_001AA458 = (int)(short)spell_ready_cost;
     inventory_open(1, 4, 8);
     return 0;
 }
 
-int func_0008A2E3(int a1, int a2, int a3)
+int spfx_wizard_sight(int a1, int a2, int a3)
 {
     return 1;
 }
 
-int func_0008A30A(struct record *a1, int a2, struct record *a3)
+int spfx_darkness(struct record *a1, int a2, struct record *a3)
 {
     struct character *l_14;
 
@@ -616,7 +616,7 @@ int spfx_comprehend_languages(struct record *a1, int a2, struct record *a3)
     return 1;
 }
 
-int func_0008A3D4(struct record *a1, int a2, struct record *a3)
+int spfx_intensify_fire(struct record *a1, int a2, struct record *a3)
 {
     struct character *l_14;
 
@@ -625,7 +625,7 @@ int func_0008A3D4(struct record *a1, int a2, struct record *a3)
     return 1;
 }
 
-int func_0008A40E(struct record *a1, int a2, struct record *a3)
+int spfx_diminish_fire(struct record *a1, int a2, struct record *a3)
 {
     struct character *l_14;
 
@@ -634,12 +634,12 @@ int func_0008A40E(struct record *a1, int a2, struct record *a3)
     return 1;
 }
 
-int func_0008A448(int a1, int a2, int a3)
+int spfx_wall_of_stone(int a1, int a2, int a3)
 {
     return 0;
 }
 
-int func_0008A46F(int a1, int a2, int a3)
+int spfx_wall_of_fire(int a1, int a2, int a3)
 {
     return 0;
 }
@@ -758,7 +758,7 @@ int func_0008AC0E(struct record *a1, struct record *a2, int a3)
     return ((rand_range(0, 100) < l_14) ? 1 : 0);
 }
 
-int func_0008AC9B(struct disease *a1)
+int spfx_disease_recover(struct disease *a1)
 {
     int l_20;
     int l_1C;
@@ -844,7 +844,7 @@ L8B013:;
 
 void spfx_show_choice_list(int a1, int a2)
 {
-    picklist_open(a1);
+    list_popup_open(a1);
     spfx_popup_handler = a2;
 }
 
@@ -856,9 +856,9 @@ void spfx_popup_update(void)
     D_0012B508 = 146;
     if (spfx_popup_handler == 1 && ((int)(unsigned char)game_mode) != 8) {
         if (((int)D_00196271) == 1) {
-            D_001A9A04 = (int)player_environment;
-            D_001A99F8 = D_00195AC4->image;
-            D_001A99FC = (int)(unsigned char)current_region;
+            recall_anchor_environment = (int)player_environment;
+            recall_anchor_location = location_object->image;
+            recall_anchor_region = (int)(unsigned char)current_region;
             if (((int)player_environment) == 2) {
                 D_001A9A00 = player_object->parent->image;
             } else {
@@ -868,14 +868,14 @@ void spfx_popup_update(void)
         } else if (D_0018DE20 == 0) {
             msgbox_show_rsc(4001, 1);
         } else {
-            map_goto_location(D_001A99FC, D_001A9A04, D_001A99F8, D_001A9A00);
+            map_goto_location(recall_anchor_region, recall_anchor_environment, recall_anchor_location, D_001A9A00);
             player_position_restore(1);
             mc_memset((int)saved_positions, 0, 48, (int)D_00176D55, 1342, 48);
         }
         spfx_popup_handler = 0;
         return;
     }
-    if (((struct bf8_2_1 *)&D_001940D4)->f == 0 || (l_18 = spells_list_poll()) <= (-1)) return;
+    if (((struct bf8_2_1 *)&D_001940D4)->f == 0 || (l_18 = list_popup_poll()) <= (-1)) return;
     ((int (*)())(spfx_popup_handler))(l_18);
     spfx_popup_handler = 0;
 }
@@ -949,7 +949,7 @@ void spfx_expire_created_items(void)
     weapon_reload_hand_sprites();
 }
 
-int func_0008B43B(unsigned char a1, unsigned char a2, int a3)
+int name_generate_seeded(unsigned char a1, unsigned char a2, int a3)
 {
     int l_24;
     int l_20;
@@ -961,7 +961,7 @@ int func_0008B43B(unsigned char a1, unsigned char a2, int a3)
     return l_20;
 }
 
-int func_0008B48B(struct record *a1)
+int npc_display_name(struct record *a1)
 {
     int l_20;
     struct faction *l_1C;
@@ -973,7 +973,7 @@ int func_0008B48B(struct record *a1)
         if (l_1C->type == 4) return (int)l_1C->name;
     }
     if (a1->twin != 0) {
-        return func_0008B43B((int)(unsigned char)D_001841E3[(int)(unsigned char)current_region], (int)(unsigned char)((signed char)a1->flags & 4), a1->name_seed);
+        return name_generate_seeded((int)(unsigned char)D_001841E3[(int)(unsigned char)current_region], (int)(unsigned char)((signed char)a1->flags & 4), a1->name_seed);
     }
-    return func_0008B43B((int)(unsigned char)D_001841E3[(int)(unsigned char)current_region], (int)(unsigned char)(*(signed char *)((char *)l_20 + 2) & 16), a1->id);
+    return name_generate_seeded((int)(unsigned char)D_001841E3[(int)(unsigned char)current_region], (int)(unsigned char)(*(signed char *)((char *)l_20 + 2) & 16), a1->id);
 }

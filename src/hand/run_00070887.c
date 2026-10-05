@@ -10,13 +10,13 @@ extern unsigned char player_environment;
 extern struct record *player_entity;
 extern struct character *player_character;
 extern int game_minutes;
-extern int D_00195D2C;
-extern int D_00195D30;
+extern int trade_total;
+extern int trade_price;
 extern char D_001960D9[];
 extern char D_001961F5[];
 extern struct membership *guild_membership;
 extern void msgbox_show_rsc(short, int);
-extern void func_0005F401(int);
+extern void shop_stock_soul_traps(int);
 extern int blessing_apply(struct mobile *, int);
 extern void gold_spend(int);
 extern int gold_can_afford(int);
@@ -25,9 +25,9 @@ extern void object_free_children(int);
 extern struct record *object_create_child(struct record *, int, int);
 extern void inventory_open_container(int, int, int);
 extern int trade_adjust_price(int, int);
-extern void func_00097A85(void);
-extern int func_00097B2A(void);
-extern int func_00097BD9(int);
+extern void trade_make_offer(void);
+extern int trade_settle_offer(void);
+extern int trade_base_price(int);
 extern int travel_map_open(int);
 extern int mc_strncpy();
 void guild_add_membership(int, unsigned char);
@@ -83,17 +83,17 @@ int guild_confirm_price(int a1)
 {
     int l_1C;
 
-    D_00195D2C = func_00097BD9((D_00195D2C = a1));
-    D_00195D30 = ((D_00195D30 = trade_adjust_price(D_00195D2C, 0)) * trade_price_scale) / 256;
-    func_00097A85();
-    l_1C = func_00097B2A();
+    trade_total = trade_base_price((trade_total = a1));
+    trade_price = ((trade_price = trade_adjust_price(trade_total, 0)) * trade_price_scale) / 256;
+    trade_make_offer();
+    l_1C = trade_settle_offer();
     return l_1C;
 }
 
 void guild_buy_soulgems(void)
 {
     object_free_children((int)D_001960D9);
-    func_0005F401((int)D_001960D9);
+    shop_stock_soul_traps((int)D_001960D9);
     inventory_open_container((int)D_001960D9, 1, 4);
 }
 

@@ -20,13 +20,13 @@ extern int collide_candidate_count;
 extern char D_00196D4C[];
 extern int D_00196D50;
 extern char collide_flags[];
-extern int func_0002294E(struct record *, int, struct move_request *);
+extern int collide_step_player(struct record *, int, struct move_request *);
 extern void collide_for_each_nearby(struct record *, int);
-extern void func_0002325A(int);
+extern void collide_gather_cb(int);
 extern void automap_mark_seen(int);
-extern int func_000657B2(int);
-extern int func_0009DEAC();
-extern int func_0014BDDD();
+extern int links_object_motion(int);
+extern int abs();
+extern int xn_vec_normalize_ptr();
 
 struct plane {
     int f0;
@@ -80,30 +80,30 @@ int collide_move_player(struct record *a1, int a2, struct move_request *a3, int 
     (*(struct vec3 **)D_00196D4C = (struct vec3 *)D_00179F48)->x = a3->x;
     (*(struct vec3 **)D_00196D4C)->y = a3->y;
     (*(struct vec3 **)D_00196D4C)->z = a3->z;
-    collide_for_each_nearby(a1, (int)func_0002325A);
+    collide_for_each_nearby(a1, (int)collide_gather_cb);
     if (!((player_character->conditions & 0x8) || collide_candidate_count != 0 || player_environment == 1))
         return FLAGS = 16;
     l_14 = FLAGS;
     player_on_ground = 1;
-    l_44 = func_0002294E(a1, a2, a3);
+    l_44 = collide_step_player(a1, a2, a3);
     D_001940D7 &= 223;
     if ((char)player_on_ground != 0 && (char)D_00196296 != 0)
         D_00196296 = 0;
-    if (*(int *)D_00195CB8 != 0 && (l_10 = (short *)func_000657B2(*(int *)D_00195CB8)) != 0) {
+    if (*(int *)D_00195CB8 != 0 && (l_10 = (short *)links_object_motion(*(int *)D_00195CB8)) != 0) {
         if (l_10[0] != 0 || l_10[2] != 0) {
             a3->x += l_10[0];
             a3->y += l_10[1];
             a3->z += l_10[2];
             *(unsigned char *)collide_flags |= 4;
-            l_44 = func_0002294E(a1, a2, a3);
+            l_44 = collide_step_player(a1, a2, a3);
         }
     }
-    if (*(int *)D_00195C70 != 0 && (l_10 = (short *)func_000657B2(*(int *)D_00195C70)) != 0) {
+    if (*(int *)D_00195C70 != 0 && (l_10 = (short *)links_object_motion(*(int *)D_00195C70)) != 0) {
         a3->x += l_10[0];
         a3->y += l_10[1];
         a3->z += l_10[2];
         *(unsigned char *)collide_flags |= 4;
-        l_44 = func_0002294E(a1, a2, a3);
+        l_44 = collide_step_player(a1, a2, a3);
     }
     if (*(int *)D_00195CB8 != 0)
         automap_mark_seen(*(int *)D_00195CB8);
@@ -118,7 +118,7 @@ int collide_move_player(struct record *a1, int a2, struct move_request *a3, int 
     l_5C.x = a3->x - a1->x;
     l_5C.y = a3->y - a1->y;
     l_5C.z = a3->z - a1->z;
-    func_0014BDDD((int)&l_5C);
+    xn_vec_normalize_ptr((int)&l_5C);
     if (D_00196D50 == 0)
         return 1;
     if (PLANES->count > 1) {
@@ -151,12 +151,12 @@ int collide_move_player(struct record *a1, int a2, struct move_request *a3, int 
     a3->x = a1->x + l_30;
     a3->y = a1->y + l_2C;
     a3->z = a1->z + l_28;
-    D_00195F5A = func_0009DEAC(l_1C >> 16);
+    D_00195F5A = abs(l_1C >> 16);
     if (l_30 != 0 || l_2C != 0 || l_28 != 0) {
         D_00195CD8 = D_00195CD4 = 0;
         l_14 = FLAGS;
         player_on_ground = 1;
-        l_44 = func_0002294E(a1, a2, a3);
+        l_44 = collide_step_player(a1, a2, a3);
         D_001940D7 &= 223;
         if ((char)player_on_ground != 0 && (char)D_00196296 != 0)
             D_00196296 = 0;

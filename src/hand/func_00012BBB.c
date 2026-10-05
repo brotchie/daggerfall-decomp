@@ -15,8 +15,8 @@ struct stream {
 };
 #pragma pack()
 
-extern char *func_000A0DD9(int, char *, int);
-extern int func_000A0DF4(char *);
+extern char *itoa(int, char *, int);
+extern int strlen(char *);
 extern int mc_memmove();
 extern int profile_find_item(struct stream *, ...);
 extern int profile_set_number(struct stream *, ...);
@@ -35,12 +35,12 @@ int profile_add_item_number(struct stream *s, char *key, int val, int width, int
     if (radix == 16) {
         buf[0] = '0';
         buf[1] = 'x';
-        func_000A0DD9(val, buf + 2, 16);
+        itoa(val, buf + 2, 16);
     } else {
-        func_000A0DD9(val, buf, 10);
+        itoa(val, buf, 10);
     }
     dst = s->pos;
-    n = width + 4 + func_000A0DF4(buf);
+    n = width + 4 + strlen(buf);
     if (s->len + n > s->cap) return 0;
     mc_memmove(dst + n, dst, s->start + s->len - dst, D_00170129, 1436, 4);
     while (*key != 0) {

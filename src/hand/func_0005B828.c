@@ -2,8 +2,8 @@
 #include "records.h"
 
 struct concealment { int id; int mask; };      /* effect id, its conditions bit */
-extern struct concealment D_00185C3F[];
-extern struct record *guild_npc_object;
+extern struct concealment spell_concealment_effects[];
+extern struct record *scratch_object;
 extern short spell_effect_slot;
 extern struct spell *spell_find_active_effect(struct record *, int, int *, int *);
 extern void spell_end(struct record *);
@@ -19,15 +19,15 @@ void spell_break_concealment(struct record *a1)
     l_20 = &a1->data.character;
     if ((l_20->conditions & 0x3004) == 0) return;
     for (l_18 = 0; l_18 < 3; l_18++) {
-        l_24 = spell_find_active_effect(a1, D_00185C3F[l_18].id, &l_1C, &l_1C);
+        l_24 = spell_find_active_effect(a1, spell_concealment_effects[l_18].id, &l_1C, &l_1C);
         if (l_24 == 0) {
-            l_20->conditions &= ~D_00185C3F[l_18].mask;
+            l_20->conditions &= ~spell_concealment_effects[l_18].mask;
             continue;
         }
         if (l_24->effects[spell_effect_slot].subtype == 0) {
             spfx_effect_end(l_24, spell_effect_slot, a1);
             if (spell_effect_slot == 0 && l_24->effects[1].type == 255)
-                spell_end(guild_npc_object);
+                spell_end(scratch_object);
         }
     }
 }

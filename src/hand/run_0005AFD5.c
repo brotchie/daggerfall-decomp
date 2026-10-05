@@ -8,8 +8,8 @@ extern struct record *player_object;
 extern struct record *spell_ready_missile;
 extern struct record *spell_ready_touch;
 extern struct character *player_character;
-extern int D_00195D5C;
-extern int D_00195D60;
+extern int spell_cast_queue_count;
+extern int spell_cast_busy;
 extern char D_0019629A;
 extern void quests_raise_event_all(int, struct record *, int);
 extern void cast_spell_on(struct record *, struct record *, int);
@@ -31,7 +31,7 @@ int cast_player_spell(struct record *a1)
     }
     if (D_0019629A == 0 && (player_character->conditions & 0x100) != 0)
         return 1;
-    D_00195D60 = 130 - player_character->attributes[ATTR_INT] * 50;
+    spell_cast_busy = 130 - player_character->attributes[ATTR_INT] * 50;
     quests_raise_event_all(73, a1, 0);
     switch (l_1C->target) {
     case 0:
@@ -79,7 +79,7 @@ int cast_item_spell_at(struct record *a1, struct record *a2)
         cast_spell_on(a1, a2, 0);
         return 1;
     case 3:
-        D_00195D5C = 0;
+        spell_cast_queue_count = 0;
         a1->x = player_object->x;
         a1->y = player_object->y;
         a1->z = player_object->z;

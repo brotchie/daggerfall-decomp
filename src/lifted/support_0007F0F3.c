@@ -3,7 +3,7 @@
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
 
-extern struct record *D_00195AC4;
+extern struct record *location_object;
 extern struct location *current_location;
 
 extern struct record *object_find_by_id(struct record *, int);
@@ -19,7 +19,7 @@ void func_0007F0F3(int a1)
     l_1C = current_location->buildings;
     for (l_20 = 0; current_location->building_count > l_20; l_20++, l_1C++) {
         if (l_1C->faction_id == a1) {
-            l_18 = object_find_by_id(D_00195AC4, l_1C->id);
+            l_18 = object_find_by_id(location_object, l_1C->id);
             if (l_18 != 0) town_map_note_building(l_18, l_1C);
         }
     }

@@ -12,7 +12,7 @@ extern struct msgs guild_messages[];
 extern char guild_rank_messages[];         /* guild_messages[0].level */
 extern struct building *current_building;
 extern struct record *player_entity;
-extern struct record *D_00195AF4;
+extern struct record *found_object;
 extern struct character *player_character;
 extern unsigned int game_minutes;
 extern unsigned char D_00196271;
@@ -24,11 +24,11 @@ extern int guild_join_check(int);
 extern int guild_rank_for_skills(int);
 extern struct membership *guild_find_membership_by_faction(short);
 extern int guild_find_membership_by_bits(unsigned char);
-extern void func_0007141A(int);
+extern void guild_give_map(int);
 extern void msgbox_yes_no_rsc(short);
 extern void object_delete(struct record *);
 extern struct record *object_create_child(struct record *, int, int);
-extern void func_0012B136(void);
+extern void xn_mouse_poll_clamped(void);
 extern char D_00175EAA[];
 extern char D_00175EB3[];
 extern char D_00175EC1[];
@@ -60,14 +60,14 @@ extern char saved_location_name[];
 extern char saved_region_name[];
 extern signed char text_buffer[];
 extern struct record *player_object;
-extern struct record *D_00195AC4;
-extern struct record *guild_npc_object;
+extern struct record *location_object;
+extern struct record *scratch_object;
 extern struct location *current_location;
 extern struct career *player_class;
 extern char D_001960D9[];
 extern int D_00196118;
 extern signed char current_region;
-extern signed char D_001962AB;
+extern signed char forced_material;
 struct slot { char *p; int f4; int f8; int f12; int f16; };   /* 20 bytes: p is a type-43 record's data */
 extern struct slot bank_houses_for_sale[];
 extern int D_001A41DC;
@@ -82,7 +82,7 @@ extern void training_offer(int);
 extern void msgbox_show_string(int, int);
 extern int quest_pick_file(unsigned char, unsigned char, unsigned char, unsigned char, unsigned char);
 extern int itemmaker_open(int);
-extern void func_0005E37F(unsigned short, int, int, struct item *);
+extern void item_make_in_range(unsigned short, int, int, struct item *);
 extern void bank_add_house_for_sale(struct record *);
 extern int disk_read_file(int, int);
 extern void guild_buy_potions(void);
@@ -109,8 +109,8 @@ extern void inventory_open_container(int, int, int);
 extern void inv_store_item(struct record *);
 extern int mc_free();
 extern int mc_strncpy();
-#pragma aux func_000A0ED9 parm routine [];
-extern int func_000A0ED9(int, int);
+#pragma aux mc_set_location parm routine [];
+extern int mc_set_location(int, int);
 extern int mc_sprintf(int, ...);
 
 void guild_join_or_promote(int a1, int a2)
@@ -152,7 +152,7 @@ void guild_join_or_promote(int a1, int a2)
         guild_membership->faction = D_0019671C->id;
         guild_membership->rank_time = game_minutes;
         while (mouse_buttons)
-            func_0012B136();
+            xn_mouse_poll_clamped();
         msgbox_show_rsc(guild_messages[a1].level[0], 1);
         return;
     }
@@ -169,14 +169,14 @@ void guild_join_or_promote(int a1, int a2)
         guild_membership->rank += delta;
         guild_membership->rank_time = game_minutes;
         if (a1 == 3 && (guild_membership->rank == 6 || guild_membership->rank == 8))
-            func_0007141A(0);
+            guild_give_map(0);
         if (a1 == 0 && guild_membership->rank < 100)
-            func_0007141A(1);
+            guild_give_map(1);
         if (guild_membership->rank > 100) {
             msgbox_show_rsc(668, 1);
             guild_find_membership_by_faction(current_building->faction_id);
-            if (D_00195AF4 != 0)
-                object_delete(D_00195AF4);
+            if (found_object != 0)
+                object_delete(found_object);
             if (a1 == 3)
                 player_character->thieves_invite_count = 0;
             if (a1 == 0)
@@ -211,7 +211,7 @@ void guild_service_dispatch(struct record *a1)
     D_0019671C = faction_find(current_building->faction_id);
     guild_membership = guild_find_membership_by_faction(current_building->faction_id);
     l_2C = guild_kind_of_faction((int)D_0019671C);
-    guild_npc_object = a1;
+    scratch_object = a1;
     guild_join_or_promote(l_2C, 0);
     D_001A4A1A = ((unsigned)a1->id) >> 16;
     l_1C = guild_service_label((int)(short)a1->data.person.faction_id);
@@ -220,7 +220,7 @@ void guild_service_dispatch(struct record *a1)
         return;
     }
     l_28 = ((guild_membership != 0) ? 1 : 0);
-    func_000A0ED9(163, (int)D_00175EAA);
+    mc_set_location(163, (int)D_00175EAA);
     mc_sprintf((int)text_buffer, (int)D_00175EB3, l_28 + 48);
     l_18 = disk_read_file((int)text_buffer, 0);
     l_30 = guild_menu(l_18, l_28, l_1C);
@@ -468,13 +468,13 @@ void guild_service_dispatch(struct record *a1)
                 guild_membership->armor_received |= 1 << (guild_membership->rank);
                 l_38 = object_create_child(a1, 0, 107);
                 l_38->type = 2;
-                D_001962AB = guild_membership->rank - 1;
-                if (((int)(unsigned char)D_001962AB) > 100) {
-                    D_001962AB = 2;
-                } else if (((int)(unsigned char)D_001962AB) > 10) {
-                    D_001962AB = 10;
+                forced_material = guild_membership->rank - 1;
+                if (((int)(unsigned char)forced_material) > 100) {
+                    forced_material = 2;
+                } else if (((int)(unsigned char)forced_material) > 10) {
+                    forced_material = 10;
                 }
-                func_0005E37F(2, 0, 6, &l_38->data.item);
+                item_make_in_range(2, 0, 6, &l_38->data.item);
                 l_38->data.item.armor_type = 2;
                 l_38->x = player_object->x;
                 l_38->y = player_object->y;
@@ -488,7 +488,7 @@ void guild_service_dispatch(struct record *a1)
                     msgbox_show_rsc(460, 1);
                     break;
                 }
-                object_foreach(D_00195AC4, (int)bank_add_house_for_sale);
+                object_foreach(location_object, (int)bank_add_house_for_sale);
                 if (bank_house_count == 0) break;
                 l_30 = rand_range(0, (unsigned char)bank_house_count - 1);
                 player_character->house = bank_houses_for_sale[l_30].f12;

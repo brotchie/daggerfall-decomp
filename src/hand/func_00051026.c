@@ -17,20 +17,20 @@ extern unsigned char key_down_x;
 extern unsigned char key_down_up;
 extern unsigned char key_down_down;
 extern char *screen_buffer;
-extern struct bits8 D_00147964;
+extern struct bits8 xn_mouse_cursor_drawn;
 extern char D_0017539B[];        /* __FILE__ */
 extern char D_001753A6[];
 extern char D_001753B3[];
 extern char D_001753C0[];
 extern char D_001753CD[];
-extern unsigned char D_0018520B[][3];
+extern unsigned char class_answer_kinds[][3];
 extern unsigned char D_00185284[];
 extern unsigned char D_0018528E[];
-extern unsigned char D_00185291[];
+extern unsigned char class_result_ids[];
 extern signed char text_buffer[];
-extern short D_00190D68;
+extern short scratch_190d68;
 extern struct career *player_class;
-extern char *D_00195C44;
+extern char *scratch_buffer;
 extern unsigned char mouse_buttons_prev;
 extern char class_questions_asked[];
 extern unsigned char class_answer_counts[];
@@ -45,15 +45,15 @@ extern int class_question_pick_class(void);
 extern char *disk_read_file(char *, int);
 extern void mc_free(char *, char *, int);
 extern void mc_memset(void *, int, int, char *, int, int);
-#pragma aux func_000A0ED9 parm routine [];
-extern void func_000A0ED9(int, char *);
+#pragma aux mc_set_location parm routine [];
+extern void mc_set_location(int, char *);
 extern int mc_sprintf(char *, char *, ...);
 extern void mc_memcpy(void *, void *, int, char *, int, int);
-extern void func_000CD33A(unsigned char *, int, int);
-extern void func_000CD367(char *);
-extern void func_0012B136(void);
-extern void func_0012B2D3(short, short);
-extern void func_00143914(int);
+extern void xn_pal_set_range_8bit(unsigned char *, int, int);
+extern void xn_pal_set_all_8bit(char *);
+extern void xn_mouse_poll_clamped(void);
+extern void xn_mouse_cursor_move(short, short);
+extern void xn_gfx_clear(int);
 
 int class_questions_run(void)
 {
@@ -70,49 +70,49 @@ int class_questions_run(void)
     mc_memset(class_questions_asked, 0, 10, D_0017539B, 81, 10);
     mc_memset(class_answer_counts, 0, 3, D_0017539B, 82, 3);
     rgb[0] = rgb[1] = rgb[2] = 0;
-    D_00147964.b0 = 0;
-    disk_read_file(D_001753A6, (int)D_00195C44);
+    xn_mouse_cursor_drawn.b0 = 0;
+    disk_read_file(D_001753A6, (int)scratch_buffer);
     for (sel = 0; sel < 768; sel++)
-        (sel + D_00195C44)[64000] <<= 2;
-    func_000CD367(D_00195C44 + 64000);
-    mc_memcpy(screen_buffer, D_00195C44, 64000, D_0017539B, 90, 4);
+        (sel + scratch_buffer)[64000] <<= 2;
+    xn_pal_set_all_8bit(scratch_buffer + 64000);
+    mc_memcpy(screen_buffer, scratch_buffer, 64000, D_0017539B, 90, 4);
     h.a = disk_read_file(D_001753B3, 0);
     h.b = disk_read_file(D_001753C0, 0);
     while (tries-- != 0) {
         done = 0;
-        D_00147964.b0 = 0;
+        xn_mouse_cursor_drawn.b0 = 0;
         class_question_show(&h);
         while (done == 0) {
             if (key_down_ctrl && key_down_x && key_down_lshift)
                 game_exit(0);
             mouse_buttons_prev = mouse_buttons;
-            func_0012B136();
-            func_0012B2D3(mouse_x, mouse_y);
+            xn_mouse_poll_clamped();
+            xn_mouse_cursor_move(mouse_x, mouse_y);
             if ((mouse_buttons & 1) && (mouse_x > 0 && mouse_x < 320 && mouse_y > 120 && mouse_y < 140) || key_down_up)
                 class_question_scroll(&h, -1);
             else if ((mouse_buttons & 1) && (mouse_x > 0 && mouse_x < 320 && mouse_y > 180 && mouse_y < 200) || key_down_down)
                 class_question_scroll(&h, 1);
             sel = class_question_get_answer();
             if (sel != 0) {
-                sel = D_0018520B[D_00190D68 - 1][sel];
+                sel = class_answer_kinds[scratch_190d68 - 1][sel];
                 if (class_answer_counts[sel] < 10)
                     class_answer_counts[sel]++;
                 rgb[2] = D_00185284[class_answer_counts[sel]] << 2;
                 class_question_answer_anim(sel);
-                func_000CD33A(rgb, D_0018528E[sel], 1);
+                xn_pal_set_range_8bit(rgb, D_0018528E[sel], 1);
                 done = 1;
             }
             mc_memcpy((void *)0xa0000, screen_buffer, 64000, D_0017539B, 122, 4);
         }
     }
-    func_00143914(0);
+    xn_gfx_clear(0);
     mc_memcpy((void *)0xa0000, screen_buffer, 64000, D_0017539B, 127, 4);
     palette_restore();
-    sel = D_00185291[class_question_pick_class()];
+    sel = class_result_ids[class_question_pick_class()];
     if (chargen_popup_choice(sel + 2100, 4, 5, 0, 21, 49) != 0)
         sel = -1;
     if (sel != -1) {
-        func_000A0ED9(134, D_0017539B);
+        mc_set_location(134, D_0017539B);
         mc_sprintf(((char *)text_buffer), D_001753CD, sel);
         disk_read_file(((char *)text_buffer), (int)player_class);
     }

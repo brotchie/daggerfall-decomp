@@ -1,7 +1,7 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0005E450 */
 #include "records.h"
 
-extern short *D_00185F88[];
+extern short *item_group_templates[];
 extern void item_init_from_template(unsigned short, short, short, struct item *);
 extern void item_make_magic(struct item *, int);
 extern void item_make_artifact(struct item *, int);
@@ -24,10 +24,10 @@ void item_make_random(unsigned short a1, struct item *a2)
         break;
     default:
         i = 0;
-        while (D_00185F88[a1][i++] != -1)
+        while (item_group_templates[a1][i++] != -1)
             ;
         r = rand_range(0, i - 2);
-        item_init_from_template(D_00185F88[a1][r], a1, r, a2);
+        item_init_from_template(item_group_templates[a1][r], a1, r, a2);
         break;
     }
 }

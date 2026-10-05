@@ -28,7 +28,7 @@ extern struct voice sound_channels[3];
 extern int D_001A3EFC;
 extern int D_001A3F34;
 extern unsigned char sound_enabled;
-extern void func_00068BA8(struct record *, int);
+extern void sound_channel_set_source(struct record *, int);
 extern void sound_volume_pan(char *, char *, int *, int *, struct record *);
 extern void mc_memset(void *, int, int, char *, int, int);
 extern short func_000A2460(int, int);
@@ -79,7 +79,7 @@ int sound_play_sample(int a1, int a2, struct record *a3, int a4)
             return -1;
     }
     D_001A3F34 = i;
-    func_00068BA8(a3, i);
+    sound_channel_set_source(a3, i);
     if (sound_channels[i].source != 0)
         sound_volume_pan(sound_channels[i].buf, (char *)&sound_channels[i].source->x, &vol, &x, sound_channels[i].source);
     else

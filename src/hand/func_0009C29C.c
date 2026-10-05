@@ -10,8 +10,8 @@ extern struct record *player_object;
 extern struct character *player_character;
 extern unsigned char mouse_buttons_prev;
 extern unsigned char D_00196294;
-extern unsigned char D_001962A9;
-extern struct map_location *D_00196A9C;
+extern unsigned char quests_suspended;
+extern struct map_location *region_locations;
 extern int D_001AA678;
 extern int D_001AA67C;
 extern int sound_play(int, struct record *, int);
@@ -20,7 +20,7 @@ extern void map_goto_location(int, int, int, int);
 extern void travel_button_exit(int);
 extern void func_0009BE38(void);
 extern int travel_route(int, int, int, int, int);
-extern int func_000C808D(int, int, int, int);
+extern int xn_math_angle_to_point(int, int, int, int);
 
 void func_0009C29C(void)
 {
@@ -29,13 +29,13 @@ void func_0009C29C(void)
     int l_1C;
     int l_18;
 
-    l_18 = (((func_000C808D(player_object->x, player_object->z, D_00196A9C[travel_selected_location].x_type_flags & 0x1ffffff, D_00196A9C[travel_selected_location].y_size & 0xffffff) >> 2) + 32) & 511) >> 6;
+    l_18 = (((xn_math_angle_to_point(player_object->x, player_object->z, region_locations[travel_selected_location].x_type_flags & 0x1ffffff, region_locations[travel_selected_location].y_size & 0xffffff) >> 2) + 32) & 511) >> 6;
     if ((mouse_buttons & 1) == 0 || (mouse_buttons_prev & 1) != 0)
         return;
     sound_play(203, player_object, 110);
     D_00190CE5 = 0;
     func_0009BE38();
-    D_001962A9 = 1;
+    quests_suspended = 1;
     D_00196294 = 1;
     D_00187CA8 = 1;
     l_1C = player_character->fatigue;
@@ -46,6 +46,6 @@ void func_0009C29C(void)
         map_goto_location(D_001889BC, 1, travel_selected_location, 0);
     if (l_20 != -1)
         location_place_player_at_edge(l_18);
-    D_001962A9 = 0;
+    quests_suspended = 0;
     D_00196294 = 0;
 }

@@ -17,14 +17,14 @@ extern struct bits8 player_motion_flags;
 extern int horse_overlay_image;
 extern int cart_overlay_image;
 extern int D_0019597C;
-extern int D_00195980;
+extern int left_hand_ready_delay;
 extern struct nib frame_counter;
 extern struct record *D_00195A88;
 extern struct record *player_entity;
-extern int D_00195AB0;
+extern int frame_ticks;
 extern int clothing_gender_group;
 extern int creature_count;
-extern int D_00195B18;
+extern int clothing_gender_offset;
 extern struct w6 *hud_bar_image;
 extern struct character *player_character;
 extern struct career *player_class;
@@ -32,10 +32,10 @@ extern unsigned int game_minutes;
 extern struct settings *game_settings;
 extern unsigned int D_00195C4C;
 extern int trespassing;
-extern int D_00195D60;
+extern int spell_cast_busy;
 extern int player_death_timer;
 extern int D_00195D8C;
-extern short D_00195F4E;
+extern short player_base_speed;
 extern unsigned char msgbox_kind;
 extern unsigned char game_mode;
 extern unsigned char in_dungeon_water;
@@ -54,9 +54,9 @@ extern void sound_update_ambient(void);
 extern int hud_message_add(char *);
 extern int building_access_level(int);
 extern int func_0007E441(int);
-extern void func_000CB39A(int, int, int, int);
-extern void func_000CDC99(int);
-extern void func_0012B136(void);
+extern void xn_draw_cif_rle_frame(int, int, int, int);
+extern void xn_tex_archive_set_translucent(int);
+extern void xn_mouse_poll_clamped(void);
 
 void player_frame_update(void)
 {
@@ -109,36 +109,36 @@ void player_frame_update(void)
             rnd = 0;
         else
             rnd = (*(unsigned int *)0x46c >> 1) & 3;
-        func_000CB39A(sound, rnd, (game_settings->view_flags & 1) ? hud_bar_image->f6 : 0, 0);
+        xn_draw_cif_rle_frame(sound, rnd, (game_settings->view_flags & 1) ? hud_bar_image->f6 : 0, 0);
     }
-    D_00195F4E = (speed * D_00195AB0) / 1000;
+    player_base_speed = (speed * frame_ticks) / 1000;
     if (player_character->flags & 1) {
         clothing_gender_group = 12;
-        D_00195B18 = 0;
+        clothing_gender_offset = 0;
     } else {
         clothing_gender_group = 6;
-        D_00195B18 = 512;
+        clothing_gender_offset = 512;
     }
     if ((D_00195C4C = (100 - player_character->attributes[ATTR_SPD]) * 2 + 70) < 70)
         D_00195C4C = 70;
     else if (D_00195C4C > 800)
         D_00195C4C = 800;
-    if (D_00195D60 != 0) {
-        D_00195D60 -= D_00195AB0;
-        if (D_00195D60 < 0)
-            D_00195D60 = 0;
+    if (spell_cast_busy != 0) {
+        spell_cast_busy -= frame_ticks;
+        if (spell_cast_busy < 0)
+            spell_cast_busy = 0;
     }
     if (D_0019597C > 0) {
-        D_0019597C -= D_00195AB0;
+        D_0019597C -= frame_ticks;
         if (D_0019597C <= 0) {
             D_0019597C = 0;
             hud_message_add(D_00170077);
         }
     }
-    if (D_00195980 > 0) {
-        D_00195980 -= D_00195AB0;
-        if (D_00195980 <= 0) {
-            D_00195980 = 0;
+    if (left_hand_ready_delay > 0) {
+        left_hand_ready_delay -= frame_ticks;
+        if (left_hand_ready_delay <= 0) {
+            left_hand_ready_delay = 0;
             hud_message_add(D_0017008C);
         }
     }
@@ -151,22 +151,22 @@ void player_frame_update(void)
     if (player_character->magicka > player_character->max_magicka)
         player_character->magicka = player_character->max_magicka;
     if (player_death_timer > 0) {
-        player_death_timer -= D_00195AB0;
+        player_death_timer -= frame_ticks;
         if (player_death_timer == 0)
             player_death_timer--;
     }
     if (player_death_timer < 0) {
         play_death_video();
         while (mouse_buttons)
-            func_0012B136();
+            xn_mouse_poll_clamped();
     }
     if (D_00195D8C != 0) {
-        D_00195D8C -= D_00195AB0;
+        D_00195D8C -= frame_ticks;
         if (D_00195D8C < 0)
             D_00195D8C = 0;
     }
-    func_000CDC99(273);
-    func_000CDC99(278);
+    xn_tex_archive_set_translucent(273);
+    xn_tex_archive_set_translucent(278);
     if ((player_character->conditions & 0x400000) && player_character->shield_end_time < game_minutes) {
         spell_remove_effect_type(player_entity, 35);
         player_character->conditions &= ~0x400000;

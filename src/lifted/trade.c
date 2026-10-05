@@ -19,7 +19,7 @@ extern int D_0018DD54;
 extern int D_0018DD5C;
 extern signed char text_buffer[];
 extern struct building *current_building;
-extern char D_00195C44[];
+extern char scratch_buffer[];
 extern signed char msgbox_button_keys;
 extern signed char D_00196034;
 extern signed char D_00196035;
@@ -27,11 +27,11 @@ extern signed char msgbox_button_ids;
 extern signed char D_00196090;
 extern signed char D_00196091;
 extern unsigned char D_00196271;
-extern double D_001A3AAC;
+extern double trade_haggle_minimum;
 extern double trade_haggle_asking;
 extern double D_001A3AC4;
 extern double D_001A3ACC;
-extern double D_001A3AD4;
+extern double trade_haggle_step_size;
 extern int D_001A3ADC;
 extern struct character *D_001A3AE0;
 extern char sound_channels[];
@@ -45,21 +45,21 @@ extern int sos_init(int, ...);
 extern int sos_shutdown(void);
 extern int sos_read_settings(int, ...);
 extern int archive_open(int, int, int);
-extern int func_00069B0E(int, int);
+extern int sound_timer_add(int, int);
 extern int dpmi_lock_region(int, int);
 extern int dpmi_unlock_region(int, int);
-extern int func_000A0DF4();
-extern int func_000A0ED9(int, int);
+extern int strlen();
+extern int mc_set_location(int, int);
 extern int mc_sprintf(int, ...);
 extern int func_000A1D3C();
 extern void archive_close(int);
 extern void msgbox_show_string(int, int);
 extern void sound_stop_channel(int);
 extern void music_stop(void);
-extern void func_00069B53(int);
+extern void sound_timer_remove(int);
 extern void inpstr_begin_number(int);
-void func_0006899B(void);
-#pragma aux func_000A0ED9 parm routine [];
+void trade_haggle_step(void);
+#pragma aux mc_set_location parm routine [];
 
 void trade_haggle_show_offer(void)
 {
@@ -71,7 +71,7 @@ void trade_haggle_show_offer(void)
     msgbox_button_keys = 30;
     D_00196034 = 19;
     D_00196035 = 46;
-    func_000A0ED9(131, (int)D_00175A30);
+    mc_set_location(131, (int)D_00175A30);
     mc_sprintf((int)text_buffer, (int)D_00175A38, (int)trade_haggle_asking);
     msgbox_show_string((int)text_buffer, 5);
 }
@@ -81,39 +81,39 @@ void trade_counter_offer(void)
     int l_18;
 
     D_0012B508 = 146;
-    l_18 = *(int *)D_00195C44 + 55000;
-    func_000A0ED9(141, (int)D_00175A30);
+    l_18 = *(int *)scratch_buffer + 55000;
+    mc_set_location(141, (int)D_00175A30);
     mc_sprintf(l_18, (int)D_00175A6A);
-    *(signed char *)((char *)(func_000A0DF4(l_18) + l_18) + 1) = 0;
+    *(signed char *)((char *)(strlen(l_18) + l_18) + 1) = 0;
     msgbox_show_string(l_18, 2);
     inpstr_begin_number((int)trade_haggle_asking);
 }
 
-int func_00068845(int a1)
+int trade_haggle_counter(int a1)
 {
     if (a1 == D_001A3ADC) return 0;
     D_001A3ADC = a1;
-    D_001A3ACC = trade_haggle_asking - D_001A3AD4;
-    D_001A3AC4 = D_001A3AAC + D_001A3AD4;
-    if (D_001A3ACC < D_001A3AC4 && a1 > D_001A3AAC) return a1;
+    D_001A3ACC = trade_haggle_asking - trade_haggle_step_size;
+    D_001A3AC4 = trade_haggle_minimum + trade_haggle_step_size;
+    if (D_001A3ACC < D_001A3AC4 && a1 > trade_haggle_minimum) return a1;
     if (a1 > D_001A3ACC) return a1;
-    if (a1 < D_001A3AAC) return -1;
-    if (a1 <= D_001A3AC4 && a1 >= D_001A3AAC) return 0;
+    if (a1 < trade_haggle_minimum) return -1;
+    if (a1 <= D_001A3AC4 && a1 >= trade_haggle_minimum) return 0;
     if (a1 < D_001A3ACC && a1 > D_001A3AC4) {
-        trade_haggle_asking -= D_001A3AD4;
-        D_001A3AAC = D_001A3AD4 + D_001A3AAC;
+        trade_haggle_asking -= trade_haggle_step_size;
+        trade_haggle_minimum = trade_haggle_step_size + trade_haggle_minimum;
     }
     if (((int)trade_haggle_asking) == a1) return a1;
-    func_0006899B();
+    trade_haggle_step();
     return 0;
 }
 
-void func_0006899B(void)
+void trade_haggle_step(void)
 {
-    D_001A3AD4 = ((((D_00175A9E - ((short)(current_building->quality) * D_00175A96)) + (D_001A3AE0->skills[21].value * D_00175AA6)) + (D_001A3AE0->attributes[5] * D_00175AA6)) + (D_001A3AE0->reputation[1] * D_00175AAE)) * (trade_haggle_asking - D_001A3AAC);
+    trade_haggle_step_size = ((((D_00175A9E - ((short)(current_building->quality) * D_00175A96)) + (D_001A3AE0->skills[21].value * D_00175AA6)) + (D_001A3AE0->attributes[5] * D_00175AA6)) + (D_001A3AE0->reputation[1] * D_00175AAE)) * (trade_haggle_asking - trade_haggle_minimum);
 }
 
-int func_00068A1D(void)
+int sound_init_music(void)
 {
     int l_1C;
 
@@ -129,16 +129,16 @@ int func_00068A1D(void)
     dpmi_lock_region((int)sound_channels, 5168);
     dpmi_lock_region((int)D_000CDDA8, 4096);
     dpmi_lock_region((int)&D_001A3F40, 4096);
-    D_001A3F3C = func_00069B0E((int)D_000CDDA8, 140);
+    D_001A3F3C = sound_timer_add((int)D_000CDDA8, 140);
     return 1;
 }
 
-void func_00068B1B(void)
+void sound_shutdown_music(void)
 {
     int l_18;
 
     if (sound_enabled == 0) return;
-    func_00069B53(D_001A3F3C);
+    sound_timer_remove(D_001A3F3C);
     music_stop();
     archive_close(midi_bsa);
     for (l_18 = 0; l_18 < 4; l_18++) {

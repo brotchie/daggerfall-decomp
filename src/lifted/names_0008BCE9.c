@@ -8,10 +8,10 @@ extern char namegen_syllable[];
 
 extern int rand();
 extern int lseek();
-extern int func_000A00CB();
+extern int read();
 
 void namegen_read_part(short a1, short a2)
 {
     lseek((int)(short)a1, namegen_part_offsets[((int)(short)a2)] + ((rand() % namegen_part_counts[((int)(short)a2)]) * 10), 0);
-    func_000A00CB((int)(short)a1, (int)namegen_syllable, 10);
+    read((int)(short)a1, (int)namegen_syllable, 10);
 }

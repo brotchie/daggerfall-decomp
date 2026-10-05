@@ -25,13 +25,13 @@ extern char D_00175BFA[];
 extern char D_00175C18[];
 extern int mem_check_level;
 extern int frame_checkpoint;
-extern int D_0018DC24;
+extern int engine_running;
 extern struct record *nonworld_root;
-extern struct record *D_00195A00;
-extern struct record *D_00195AC4;
+extern struct record *quest_root;
+extern struct record *location_object;
 extern struct blk *object_heap_blocks;
 extern int object_heap_size;
-extern void func_00010AF6(int);
+extern void debug_checkpoint(int);
 extern struct qbn_place *quest_section(struct quest *, int);
 extern void fatal_error(char *);
 extern void object_foreach(struct record *, void (*)(struct record *));
@@ -39,9 +39,9 @@ extern struct record *object_find_by_id(struct record *, int);
 extern int mc_memset();
 extern int func_000A2A2B(void);
 extern int func_000A2A76(struct msg *);
-extern int func_000CE8D5();
-#pragma aux func_000A0ED9 parm routine [];
-extern int func_000A0ED9(int, char *);
+extern int xn_sys_zero_page_check();
+#pragma aux mc_set_location parm routine [];
+extern int mc_set_location(int, char *);
 #pragma aux func_000A29BA parm routine [];
 extern int func_000A29BA(char *);
 extern int func_000A148C(char *, ...);
@@ -84,7 +84,7 @@ void mem_check_quest_object_cb(struct record *o)
     int saved;
 
     if (o->twin != 0 && o->type != 2) {
-        if (object_find_by_id(D_00195AC4, o->twin->id) == 0)
+        if (object_find_by_id(location_object, o->twin->id) == 0)
             fatal_error(D_00175B1A);
     }
     saved = o->id;
@@ -118,40 +118,40 @@ void mem_check_heap(int a1)
     frame_checkpoint = a1;
     if (mem_check_level == 0)
         return;
-    func_000A0ED9(280, D_00175AD4);
+    mc_set_location(280, D_00175AD4);
     if (func_000A29BA(screen_buffer) != 0)
         fatal_error(D_00175B63);
-    func_00010AF6(a1);
-    if (D_0018DC24 != 0)
-        func_000CE8D5(a1);
+    debug_checkpoint(a1);
+    if (engine_running != 0)
+        xn_sys_zero_page_check(a1);
     object_foreach(nonworld_root, mem_check_quest_object_cb);
-    object_foreach(D_00195A00->children, mem_check_quest_ids_cb);
+    object_foreach(quest_root->children, mem_check_quest_ids_cb);
     prev = b = object_heap_blocks;
     while (b != 0) {
         if (b->magic != 1768515945) {
-            func_000A0ED9(300, D_00175AD4);
+            mc_set_location(300, D_00175AD4);
             func_000A148C(D_00175B79, ((unsigned char *)prev)[18]);
             fatal_error(D_00175B91);
         }
         if (b->next != 0 && (char *)b + 18 + b->size != (char *)b->next) {
-            func_000A0ED9(306, D_00175AD4);
+            mc_set_location(306, D_00175AD4);
             func_000A148C(D_00175B79, ((unsigned char *)b)[18]);
             fatal_error(D_00175BA8);
         }
         if (b->size == 0 || b->size > object_heap_size) {
-            func_000A0ED9(312, D_00175AD4);
+            mc_set_location(312, D_00175AD4);
             func_000A148C(D_00175B79, ((unsigned char *)prev)[18]);
             fatal_error(D_00175BC1);
         }
         if (b < object_heap_blocks || (int)object_heap_blocks + object_heap_size < (int)b) {
-            func_000A0ED9(318, D_00175AD4);
+            mc_set_location(318, D_00175AD4);
             func_000A148C(D_00175B79, ((unsigned char *)prev)[18]);
             fatal_error(D_00175BDC);
         }
         prev = b;
         b = b->next;
         if (b != 0 && b->prev != prev) {
-            func_000A0ED9(327, D_00175AD4);
+            mc_set_location(327, D_00175AD4);
             func_000A148C(D_00175B79, ((unsigned char *)prev)[18]);
             fatal_error(D_00175BFA);
         }
@@ -166,7 +166,7 @@ void mem_check_crt_heap(int a1)
     r = 0;
     if (mem_check_level == 0)
         return;
-    func_000A0ED9(349, D_00175AD4);
+    mc_set_location(349, D_00175AD4);
     func_000A2A2B();
     m.b = 0;
     m.a = 0;

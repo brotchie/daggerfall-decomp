@@ -1,19 +1,19 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0002829B */
 extern char D_001707AE[];
 extern char D_00190CE5;
-extern short D_00190D68;
+extern short scratch_190d68;
 extern short D_00190D6A;
-extern char *D_00195C44;
-extern int func_000281AF(void);
+extern char *scratch_buffer;
+extern int town_notes_size(void);
 extern void mc_strncpy(char *, int, int, char *, int);
 
-void func_0002829B(int a1)
+void town_note_add(int a1)
 {
     int l_18;
 
     D_00190CE5 = 1;
-    l_18 = func_000281AF();
-    *(short *)(D_00195C44 + l_18) = D_00190D68;
-    *(short *)(D_00195C44 + l_18 + 2) = D_00190D6A;
-    mc_strncpy(D_00195C44 + (l_18 + 4), a1, 4, D_001707AE, 823);
+    l_18 = town_notes_size();
+    *(short *)(scratch_buffer + l_18) = scratch_190d68;
+    *(short *)(scratch_buffer + l_18 + 2) = D_00190D6A;
+    mc_strncpy(scratch_buffer + (l_18 + 4), a1, 4, D_001707AE, 823);
 }

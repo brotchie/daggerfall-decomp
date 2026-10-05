@@ -17,17 +17,17 @@ extern unsigned char player_environment;
 extern char D_00187CA8;
 extern struct building *current_building;
 extern struct record *player_object;
-extern struct record *D_00195AC4;
+extern struct record *location_object;
 extern struct location *current_location;
 extern unsigned int game_minutes;
 extern int trespassing;
 extern unsigned char climate_weathers[];
 extern unsigned short D_00195F5E;
-extern char D_00196263;
+extern char in_knightly_order_hall;
 extern unsigned char current_region;
-extern char D_00196280;
+extern char is_daytime;
 extern char D_001962A1;
-extern char D_001A3F5E;
+extern char music_uses_fm;
 extern char **D_001A4FA0;
 extern char **D_001A4FA4;
 extern char **D_001A4FA8;
@@ -36,7 +36,7 @@ extern char **D_001A4FB0;
 extern char **D_001A4FB4;
 extern int climate_category(void);
 extern void music_play(char *);
-extern char *func_00078463(void);
+extern char *music_dungeon_song(void);
 extern int location_contains(int, int);
 extern int rand(void);
 extern void srand(int);
@@ -55,7 +55,7 @@ extern char *D_00187844[];
 extern char *D_00187864[];
 extern char *D_00187878[];
 extern int player_motion_flags;
-extern int D_00195AB0;
+extern int frame_ticks;
 extern struct character *player_character;
 extern struct settings *game_settings;
 extern char *head_bob_offset;
@@ -63,10 +63,10 @@ extern char in_dungeon_water;
 extern char D_0019628E;
 extern int D_001A4FD0;
 extern int D_001A4FD8;
-extern int func_00076FF2(struct record *);
-extern int func_0007716B(struct record *, int, int);
-extern int func_00077412(struct record *);
-extern int func_000777B8(struct record *, int, int);
+extern int spawn_point_wilderness(struct record *);
+extern int spawn_point_town(struct record *, int, int);
+extern int spawn_point_building(struct record *);
+extern int spawn_point_dungeon(struct record *, int, int);
 
 int spawn_find_point(struct record *a1, int a2, int a3)
 {
@@ -74,16 +74,16 @@ int spawn_find_point(struct record *a1, int a2, int a3)
 
     switch (player_environment) {
     case 1:
-        if (D_00195AC4->image == 0xffff)
-            r = func_00076FF2(a1);
+        if (location_object->image == 0xffff)
+            r = spawn_point_wilderness(a1);
         else
-            r = func_0007716B(a1, a2, a3);
+            r = spawn_point_town(a1, a2, a3);
         break;
     case 2:
-        r = func_00077412(a1);
+        r = spawn_point_building(a1);
         break;
     case 3:
-        r = func_000777B8(a1, a2, a3);
+        r = spawn_point_dungeon(a1, a2, a3);
         break;
     }
     if (r == 0)
@@ -98,7 +98,7 @@ void head_bob_update(void)
         return;
     }
     if (D_0019628E)
-        D_001A4FD0 += D_00195AB0;
+        D_001A4FD0 += frame_ticks;
     D_001A4FD0 = D_001A4FD0 % 1000;
     if (D_001A4FD8 >= D_001A4FD0 && !D_0019628E)
         D_001A4FD0 = 0;
@@ -106,9 +106,9 @@ void head_bob_update(void)
     head_bob_offset = D_0018767C[D_001A4FD0 / 100];
 }
 
-void func_00077B03(void)
+void music_select_tables(void)
 {
-    if (D_001A3F5E) {
+    if (music_uses_fm) {
         D_001A4FB0 = D_001877A0;
         D_001A4FA8 = D_001877DC;
         D_001A4FAC = D_00187828;
@@ -139,18 +139,18 @@ void music_choose_song(void)
         if (D_001962A1) {
             music_play(D_001A4FA8[10]);
         } else {
-            p = func_00078463();
+            p = music_dungeon_song();
             if (p) {
                 music_play(p);
             } else {
-                srand((current_region << 8) ^ D_00195AC4->image);
+                srand((current_region << 8) ^ location_object->image);
                 music_play(D_001A4FB0[rand() % 15]);
             }
         }
     } else if (player_environment == 1) {
         climate = climate_category();
         srand(game_minutes / 1440);
-        if (D_00196280 == 0) {
+        if (is_daytime == 0) {
             music_play(D_001A4FA0[rand() % 7]);
         } else if (!location_contains(player_object->x, player_object->z) || (current_location->kind != 4 && current_location->kind <= 9 ? 1 : 0)) {
             switch (climate_weathers[climate]) {
@@ -214,28 +214,28 @@ void music_choose_song(void)
         case 10:
         case 12:
         case 13:
-            music_play(D_001A3F5E == 0 ? D_001767E4 : D_001766F9);
+            music_play(music_uses_fm == 0 ? D_001767E4 : D_001766F9);
             break;
         case 11:
             if (current_building->faction_id == 40) {
                 if (rand() & 1)
-                    music_play(D_001A3F5E == 0 ? D_001767EE : D_001767FA);
+                    music_play(music_uses_fm == 0 ? D_001767EE : D_001767FA);
                 else
-                    music_play(D_001A3F5E == 0 ? D_00176807 : D_001767FA);
+                    music_play(music_uses_fm == 0 ? D_00176807 : D_001767FA);
             } else {
-                music_play(D_001A3F5E == 0 ? D_00176813 : D_0017681A);
+                music_play(music_uses_fm == 0 ? D_00176813 : D_0017681A);
             }
             break;
         case 14:
-            if (D_00196263) {
-                music_play(D_001A3F5E == 0 ? D_00176823 : D_0017682A);
+            if (in_knightly_order_hall) {
+                music_play(music_uses_fm == 0 ? D_00176823 : D_0017682A);
             } else {
                 p = memchr(D_001789E8, current_building->faction_id, 8);
                 idx = p - D_001789E8;
                 if (p == 0) {
                     p = memchr(D_001789F0, current_building->faction_id, 8);
                     if (p == 0) {
-                        music_play(D_001A3F5E == 0 ? D_00176823 : D_0017682A);
+                        music_play(music_uses_fm == 0 ? D_00176823 : D_0017682A);
                         break;
                     }
                     idx = p - D_001789F0;
@@ -250,12 +250,12 @@ void music_choose_song(void)
             /* a random pick from one choice: the code generator folds `% 1` to 0 and drops the
              * then-branch, but its ?: temp keeps the frame slot at [ebp-0x50] */
             if (rand() % 1)
-                music_play(D_001A3F5E == 0 ? D_00176833 : D_0017683A);
+                music_play(music_uses_fm == 0 ? D_00176833 : D_0017683A);
             else
-                music_play(D_001A3F5E == 0 ? D_00176833 : D_0017683A);
+                music_play(music_uses_fm == 0 ? D_00176833 : D_0017683A);
             break;
         default:
-            music_play(D_001A3F5E == 0 ? D_00176813 : D_0017681A);
+            music_play(music_uses_fm == 0 ? D_00176813 : D_0017681A);
             break;
         }
     }

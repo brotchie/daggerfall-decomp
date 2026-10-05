@@ -14,7 +14,7 @@ extern struct record *player_object;
 extern struct settings *game_settings;
 extern int sound_last_size;
 extern signed char climate_weathers[];
-extern signed char D_00196280;
+extern signed char is_daytime;
 extern signed char cfg_stereo;
 extern char sound_channels[];
 extern char D_001A3AF4[];
@@ -66,16 +66,16 @@ extern int func_000A277F();
 extern int func_000A27A0();
 extern int func_000A2857();
 extern int func_000A2941();
-extern int func_000C7FD9();
-extern int func_000C7FF4();
-extern int func_000C808D();
+extern int xn_math_approx_dist2d();
+extern int xn_math_approx_hypot();
+extern int xn_math_angle_to_point();
 int sound_play_sample_flat(int, int);
 int sound_play_ambient_loop(int, struct record *, int);
 void sound_stop_channel(int);
 void music_stop(void);
 void sound_stop_all(void);
 
-void func_00068BA8(struct record *a1, int a2)
+void sound_channel_set_source(struct record *a1, int a2)
 {
     *(int *)(D_001A3BE4 + (a2 * 268)) = (int)a1;
     if (a1 == 0) return;
@@ -92,7 +92,7 @@ void sound_volume_pan(int a1, int a2, int a3, int a4, int a5)
 
     mc_memcpy(a1, a2, 12, (int)D_00175ACC, 148, 4);
     a1 = (int)&player_object->x;
-    l_18 = func_000C7FF4(*(int *)((char *)a1 + 4) - *(int *)((char *)a2 + 4), func_000C7FD9(*(int *)((char *)a1), *(int *)((char *)a1 + 8), *(int *)((char *)a2), *(int *)((char *)a2 + 8)));
+    l_18 = xn_math_approx_hypot(*(int *)((char *)a1 + 4) - *(int *)((char *)a2 + 4), xn_math_approx_dist2d(*(int *)((char *)a1), *(int *)((char *)a1 + 8), *(int *)((char *)a2), *(int *)((char *)a2 + 8)));
     l_C = l_18;
     if (l_18 < 25) {
         *(int *)((char *)a3) = (((int)(short)game_settings->sound_volume) * 32767) / 128;
@@ -106,7 +106,7 @@ void sound_volume_pan(int a1, int a2, int a3, int a4, int a5)
         *(int *)((char *)a3) = 32767 - ((l_18 * 32767) / l_1C);
     }
     if (*(int *)((char *)a3) > 32767) *(int *)((char *)a3) = 32767;
-    l_14 = func_000C808D(*(int *)((char *)a1), *(int *)((char *)a1 + 8), *(int *)((char *)a2), *(int *)((char *)a2 + 8));
+    l_14 = xn_math_angle_to_point(*(int *)((char *)a1), *(int *)((char *)a1 + 8), *(int *)((char *)a2), *(int *)((char *)a2 + 8));
     l_10 = ai_angle_diff(player_object->yaw, l_14, (int)&l_18);
     if (l_10 > 512) l_10 = 512 - (l_10 - 512);
     l_10 = (l_10 << 15) / 512;
@@ -208,7 +208,7 @@ void sound_stop_channel(int a1)
     *(int *)(D_001A3BD8 + (a1 * 268)) = 305419896;
 }
 
-int func_000696F9(int a1)
+int sound_channel_done(int a1)
 {
     if (*(int *)(D_001A3BD8 + (a1 * 268)) == 305419896) return 1;
     return (int)(short)func_000A2460(D_0018DD60, *(int *)(D_001A3BD8 + (a1 * 268)));
@@ -283,7 +283,7 @@ int sound_play_ambient_loop(int a1, struct record *a2, int a3)
     return sound_play_sample(l_14, sound_last_size, a2, -1);
 }
 
-int func_00069AB8(int a1, struct record *a2, int a3)
+int sound_play_loop(int a1, struct record *a2, int a3)
 {
     int l_14;
 
@@ -292,7 +292,7 @@ int func_00069AB8(int a1, struct record *a2, int a3)
     return sound_play_sample(l_14, sound_last_size, a2, -2);
 }
 
-int func_00069B0E(int a1, int a2)
+int sound_timer_add(int a1, int a2)
 {
     int l_18;
 
@@ -301,7 +301,7 @@ int func_00069B0E(int a1, int a2)
     return l_18;
 }
 
-void func_00069B53(int a1)
+void sound_timer_remove(int a1)
 {
     if (sound_enabled == 0) return;
     func_0009E61A(a1);
@@ -322,7 +322,7 @@ void sound_update_ambient(void)
             sound_stop_channel(ambient_rain_channel);
             ambient_rain_channel = 0;
         }
-        if (D_00196280 == 0 && ((int)(unsigned char)climate_weathers[climate_category()]) < 2) {
+        if (is_daytime == 0 && ((int)(unsigned char)climate_weathers[climate_category()]) < 2) {
             if (ambient_crickets_channel == 0) {
                 ambient_crickets_channel = sound_play_ambient_loop(375, player_object, 100);
             }

@@ -5,18 +5,18 @@
 
 extern char D_00170A64[];
 extern char D_00178A10[];
-extern char D_00185F88[];
+extern char item_group_templates[];
 extern char region_price_adjustment[];
 extern signed char D_001940D5;
 extern char D_00195984[];
 extern struct record *nonworld_root;
-extern struct record *D_00195A00;
+extern struct record *quest_root;
 extern struct record *camera_object;
 extern struct record *player_object;
-extern struct record *D_00195AC4;
+extern struct record *location_object;
 extern struct character *player_character;
 extern int game_minutes;
-extern struct record *D_00195D00;
+extern struct record *quest_tick_object;
 extern int qbn_opcode_arg_counts;
 extern signed char current_region;
 extern signed char D_00196299;
@@ -25,7 +25,7 @@ extern int faction_count;
 extern struct faction *factions;
 extern signed char D_001970DC;
 extern struct quest *current_quest;
-extern struct quest *D_00199780;
+extern struct quest *quest_tick_data;
 extern short qbn_record_sizes[];
 extern struct membership *guild_membership;
 
@@ -67,7 +67,7 @@ struct record *quest_init_item(struct qbn_item *a1)
     int l_20;
     struct faction *l_1C;
 
-    l_34 = (int)D_00195AC4 + 71;
+    l_34 = (int)location_object + 71;
     l_1C = 0;
     if ((a1->flags & 2) != 0) {
         if (a1->index == (-1)) {
@@ -107,7 +107,7 @@ struct record *quest_init_item(struct qbn_item *a1)
         if (a1->group < 0) {
             do {
                 a1->group = rand() % 28;
-            } while (*(int *)(D_00185F88 + (a1->group << 2)) == 0);
+            } while (*(int *)(item_group_templates + (a1->group << 2)) == 0);
         }
         l_30 = object_create_child(nonworld_root, 0, 107);
         l_30->type = 2;
@@ -140,7 +140,7 @@ struct record *quest_init_foe(struct qbn_foe *a1)
     struct character *l_1C;
 
     l_24 = object_create_child(nonworld_root, 0, 659);
-    l_20 = (int)D_00195AC4 + 71;
+    l_20 = (int)location_object + 71;
     l_24->type = 18;
     l_24->flags |= 1;
     l_24->repair_due = rand();
@@ -324,7 +324,7 @@ int quest_place_object(struct record *a1, struct qbn_place *a2)
         mc_memcpy(&a1->data, &a2->object->data, 26, (int)D_00170A64, 924, 4);
         a1->data.building.faction_id = *(int *)&l_14;
     }
-    if ((((unsigned)a1->id) >> 16) == (((unsigned)D_00195AC4->id) >> 16)) a1 = func_000310E1(a1, 0);
+    if ((((unsigned)a1->id) >> 16) == (((unsigned)location_object->id) >> 16)) a1 = func_000310E1(a1, 0);
     return a1->id;
 }
 
@@ -382,7 +382,7 @@ void qaction_give_item_to_foe(struct quest *a1, struct qbn_op *a2)
     if (l_14 != 0) {
         l_18 = object_create_child(l_14, 0, 107);
         l_18->type = 2;
-        l_18->id = object_new_id(((unsigned)D_00195AC4->id) >> 16);
+        l_18->id = object_new_id(((unsigned)location_object->id) >> 16);
         l_18->image = l_1C->image;
         l_18->quest_id = (signed char)a1->id;
         l_18->twin = l_1C;
@@ -404,14 +404,14 @@ struct record *quest_find_site_for_building(struct building *a1)
     int l_20;
     int l_1C;
 
-    l_34 = D_00195A00->children;
+    l_34 = quest_root->children;
     while (l_34 != 0) {
         l_30 = l_34->next;
         if (l_34->type == 14) {
-            D_00195D00 = l_34;
-            D_00199780 = (struct quest *)((int)&l_34->data.quest);
-            l_28 = (struct qbn_place *)quest_section(D_00199780, 4);
-            for (l_1C = 0; D_00199780->section_counts[4] > l_1C; l_1C++, l_28++) {
+            quest_tick_object = l_34;
+            quest_tick_data = (struct quest *)((int)&l_34->data.quest);
+            l_28 = (struct qbn_place *)quest_section(quest_tick_data, 4);
+            for (l_1C = 0; quest_tick_data->section_counts[4] > l_1C; l_1C++, l_28++) {
                 l_2C = l_28->object;
                 if ((l_28->flags & 64) != 0) {
                     D_001962A3 = 1;
@@ -420,8 +420,8 @@ struct record *quest_find_site_for_building(struct building *a1)
                 }
                 if (l_2C != 0 && a1->id == l_2C->data.building.id) return l_2C;
             }
-            l_24 = (struct qbn_person *)quest_section(D_00199780, 3);
-            for (l_1C = 0; D_00199780->section_counts[3] > l_1C; l_1C++, l_24++) {
+            l_24 = (struct qbn_person *)quest_section(quest_tick_data, 3);
+            for (l_1C = 0; quest_tick_data->section_counts[3] > l_1C; l_1C++, l_24++) {
                 l_20 = (int)RECORD_DATA(l_24->object);
                 if (((int)(short)(l_24->flags & 16384)) != 0) {
                     D_001962A3 = 1;
@@ -436,7 +436,7 @@ struct record *quest_find_site_for_building(struct building *a1)
     return 0;
 }
 
-int func_0003445C(int a1)
+int pick_random_of_three(int a1)
 {
     int l_20;
     int l_1C;
@@ -449,7 +449,7 @@ int func_0003445C(int a1)
     return *(int *)((char *)((rand_range(0, l_1C - 1) << 2) + a1));
 }
 
-int func_000344D3(void)
+int faction_random_hostile_id(void)
 {
     int l_20;
     int l_1C;
@@ -477,7 +477,7 @@ int quest_object_in_use(int a1)
     struct quest *l_20;
     int l_1C;
 
-    l_2C = D_00195A00->children;
+    l_2C = quest_root->children;
     while (l_2C != 0) {
         if (l_2C->type == 14) {
             l_20 = &l_2C->data.quest;

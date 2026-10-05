@@ -11,9 +11,9 @@ extern struct record *inv_right_rows[];
 extern int inv_right_scroll;
 extern short D_001AA588;
 extern void inv_draw_item_cell(struct record *, short, int);
-extern int func_000C7FD9(int, int, int, int);
-extern int func_000C7FF4(int, int);
-extern int func_000CE44C(char *, struct record *, int);
+extern int xn_math_approx_dist2d(int, int, int, int);
+extern int xn_math_approx_hypot(int, int);
+extern int xn_str_find_u32(char *, struct record *, int);
 
 void inv_list_right_item(struct record *a1, int a2)
 {
@@ -25,10 +25,10 @@ void inv_list_right_item(struct record *a1, int a2)
         return;
     if ((D_001940D6 & 4) && a1->owner != D_00195D54)
         return;
-    if ((!(D_001940D6 & 4) && a1->parent != wagon_container ? 1 : 0) && func_000C7FF4(a1->z - player_object->z, func_000C7FD9(a1->x, a1->y, player_object->x, player_object->y)) > 160)
+    if ((!(D_001940D6 & 4) && a1->parent != wagon_container ? 1 : 0) && xn_math_approx_hypot(a1->z - player_object->z, xn_math_approx_dist2d(a1->x, a1->y, player_object->x, player_object->y)) > 160)
         return;
     if (D_001AA588 >= inv_right_scroll && D_001AA588 < inv_right_scroll + 4) {
-        if (!(D_001940D8 & 4) && func_000CE44C((char *)player_character->equipped, a1, 27) != 0) {
+        if (!(D_001940D8 & 4) && xn_str_find_u32((char *)player_character->equipped, a1, 27) != 0) {
             s = &a1->data.item;
             if (s->group != 1)
                 return;

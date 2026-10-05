@@ -7,20 +7,20 @@ extern struct macro *macro_letter_tables[];
 extern short macro_letter_counts[];
 extern char D_001911E4[];
 extern int parse_name_seed;
-extern char *D_00199730;
+extern char *parse_output;
 extern char D_00199738;
 extern char *quest_symbol_text(int, unsigned char, int);
-extern int func_0004A1A2(unsigned char *);
+extern int parse_read_number(unsigned char *);
 extern void fatal_error(char *);
-extern int func_000998C8(char *);
+extern int string_hash(char *);
 extern int rand(void);
 extern void mc_strncpy(char *, char *, int, char *, int);
-extern int func_000A0DF4(char *);
+extern int strlen(char *);
 extern void mc_memcpy(char *, unsigned char *, int, char *, int, int);
 extern int strcmp(struct macro *, char *);
-extern int func_000CE3FD();
-#pragma aux func_000A0ED9 parm routine [];
-extern void func_000A0ED9(int, char *);
+extern int xn_str_copy_alnum();
+#pragma aux mc_set_location parm routine [];
+extern void mc_set_location(int, char *);
 extern int mc_sprintf(char *, char *, ...);
 
 void parse_expand(unsigned char *a1, char *a2)
@@ -37,7 +37,7 @@ void parse_expand(unsigned char *a1, char *a2)
     char *r;
     int k;
 
-    D_00199730 = a2;
+    parse_output = a2;
     parse_name_seed = rand();
     while (*a1 != 0) {
         c = *a1++;
@@ -59,16 +59,16 @@ void parse_expand(unsigned char *a1, char *a2)
                 buf[n++] = *a1++;
             if (*a1 == '`') {
                 buf[n] = 0;
-                k = func_000998C8(buf);
+                k = string_hash(buf);
                 a1++;
                 n = 0;
                 while (*a1 != '_')
                     buf[n++] = *a1++;
                 buf[n] = 0;
-                s = quest_symbol_text(k, lvl, func_000998C8(buf));
+                s = quest_symbol_text(k, lvl, string_hash(buf));
             } else {
                 buf[n] = 0;
-                k = func_000998C8(buf);
+                k = string_hash(buf);
                 s = quest_symbol_text(k, lvl, 0);
             }
             while (*s != 0)
@@ -88,19 +88,19 @@ void parse_expand(unsigned char *a1, char *a2)
                         mc_memcpy(buf, a1, 3, D_0017110C, 108, 1024);
                         buf[3] = 0;
                         a1 += 3;
-                        a1 += func_0004A1A2(a1);
+                        a1 += parse_read_number(a1);
                     } else
-                        a1 += func_000CE3FD(buf, a1);
+                        a1 += xn_str_copy_alnum(buf, a1);
                     for (n = 0; n < cnt; n++) {
                         if (strcmp(&tab[n], buf) == 0) {
                             r = tab[n].fn();
                             if (r < (char *)1000) {
-                                func_000A0ED9(122, D_0017110C);
+                                mc_set_location(122, D_0017110C);
                                 mc_sprintf(D_001911E4, D_00171114, r, buf);
                                 fatal_error(D_001911E4);
                             }
                             mc_strncpy(a2, r, 4, D_0017110C, 125);
-                            a2 += func_000A0DF4(a2);
+                            a2 += strlen(a2);
                             break;
                         }
                     }

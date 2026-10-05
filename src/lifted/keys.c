@@ -4,11 +4,11 @@
 
 extern signed char mouse_buttons;
 extern signed char key_down[];
-extern signed char D_00152A30[];
+extern signed char joystick_button1[];
 extern signed char key_was_down[];
 extern char key_map[];
 extern signed char mouse_buttons_prev;
-extern signed char D_00199704[];
+extern signed char joystick_button_latch[];
 
 
 int key_action_pressed(int a1)
@@ -20,11 +20,11 @@ int key_action_pressed(int a1)
         case 200:
         case 201:
             l_1C = ((((int)(unsigned char)*(signed char *)(key_map + a1)) == 200) ? 0 : 1);
-            if (D_00152A30[l_1C] != 0 && D_00199704[l_1C] == 0) {
-                D_00199704[l_1C] = 1;
+            if (joystick_button1[l_1C] != 0 && joystick_button_latch[l_1C] == 0) {
+                joystick_button_latch[l_1C] = 1;
                 return 1;
             }
-            if (D_00152A30[l_1C] == 0) D_00199704[l_1C] = 0;
+            if (joystick_button1[l_1C] == 0) joystick_button_latch[l_1C] = 0;
             return 0;
         case 202:
             return (((((int)(unsigned char)(mouse_buttons & 1)) != 0) && (((int)(unsigned char)(mouse_buttons_prev & 1)) == 0)) ? 1 : 0);

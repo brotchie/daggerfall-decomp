@@ -17,19 +17,19 @@ extern signed char D_0018512E[];
 extern signed char body_part_armor_slots[];
 extern signed char text_buffer[];
 extern char D_00190BE4[];
-extern char D_001917E4[];
-extern char D_00191834[];
+extern char arena2_path[];
+extern char arena2_cd_path[];
 extern struct record *nonworld_root;
-extern struct record *D_00195A00;
+extern struct record *quest_root;
 extern struct building *current_building;
-extern struct record *D_00195AC4;
-extern struct record *D_00195AF4;
+extern struct record *location_object;
+extern struct record *found_object;
 extern char D_00195B84[];
 extern char D_00195B85[];
 extern struct character *player_character;
 extern int game_minutes;
-extern char D_00195C44[];
-extern struct record *D_00195D00;
+extern char scratch_buffer[];
+extern struct record *quest_tick_object;
 extern int quest_potential_questor;
 extern short D_00195F68;
 extern char D_001961F5[];
@@ -54,15 +54,15 @@ extern struct record *object_find_by_id(struct record *, int);
 extern int rand();
 extern int srand();
 extern int open(int, ...);
-extern int func_0009DEA7();
+extern int close();
 extern int mc_free();
 extern int mc_memset();
 extern int mc_strncpy();
-extern int func_000A0DF4();
+extern int strlen();
 extern int stricmp();
 extern int toupper();
 extern int strnicmp();
-extern int func_000A0ED9(int, int);
+extern int mc_set_location(int, int);
 extern int mc_sprintf(int, ...);
 extern int mc_memcpy();
 extern int tolower();
@@ -77,17 +77,17 @@ extern void logbook_prune_quests(void);
 extern void object_foreach(struct record *, int);
 extern void object_foreach_open(struct record *, int);
 int quest_start(int);
-int func_0004C526(struct record *);
+int quest_match_person_cb(struct record *);
 int quest_free_id(void);
 int quest_is_active(int);
-int func_0004CF37(struct item *);
-int func_0004CFA7(struct record *, int);
+int item_armor_value(struct item *);
+int armor_value_for_part(struct record *, int);
 void func_0004C588(struct record *);
 void func_0004C759(void);
-void func_0004C8EB(struct record *);
+void quest_mark_giver_cb(struct record *);
 void quest_pick_for_npc(struct record *);
-void func_0004CC14(struct record *);
-#pragma aux func_000A0ED9 parm routine [];
+void quest_count_givers_cb(struct record *);
+#pragma aux mc_set_location parm routine [];
 
 int quest_start(int a1)
 {
@@ -99,19 +99,19 @@ int quest_start(int a1)
     if (*(signed char *)((char *)a1) == 0) return 0;
     if (stricmp(a1, (int)D_00174F5C) == 0) return 0;
     if (quest_is_active(a1) != 0) return 0;
-    func_000A0ED9(172, (int)D_00174F47);
-    mc_sprintf((int)text_buffer, (int)D_00174F57, (int)D_001917E4, a1);
+    mc_set_location(172, (int)D_00174F47);
+    mc_sprintf((int)text_buffer, (int)D_00174F57, (int)arena2_path, a1);
     l_1C = open((int)text_buffer, 512);
     if (l_1C < 0) {
-        func_000A0ED9(177, (int)D_00174F47);
-        mc_sprintf((int)text_buffer, (int)D_00174F57, (int)D_00191834, a1);
+        mc_set_location(177, (int)D_00174F47);
+        mc_sprintf((int)text_buffer, (int)D_00174F57, (int)arena2_cd_path, a1);
         l_1C = open((int)text_buffer, 512);
         if (l_1C < 0) return 0;
     }
-    func_0009DEA7(l_1C);
+    close(l_1C);
     l_20 = disk_read_file(a1, 0);
     logbook_prune_quests();
-    l_28 = object_create_child(D_00195A00, 0, *(int *)disk_last_file_size);
+    l_28 = object_create_child(quest_root, 0, *(int *)disk_last_file_size);
     l_28->type = 14;
     l_28->flags = 3;
     l_24 = &l_28->data.quest;
@@ -131,7 +131,7 @@ int quest_start(int a1)
         l_24->faction_id = 0;
     }
     current_quest = l_24;
-    D_00195D00 = l_28;
+    quest_tick_object = l_28;
     if (quest_init_resources(l_24) == 0) {
         quest_end(l_24);
         msgbox_show_rsc(600, 1);
@@ -156,25 +156,25 @@ void quest_start_pending(void)
     *(signed char *)D_001961F5 = 0;
 }
 
-int func_0004C4A0(int a1, int a2)
+int quest_file_list_add(int a1, int a2)
 {
     int l_1C;
     int l_18;
 
-    l_18 = *(int *)D_00195C44;
+    l_18 = *(int *)scratch_buffer;
     for (l_1C = 0; l_1C < a2; l_1C++) {
         if (stricmp(l_18, a1) == 0) return a2;
-        l_18 += func_000A0DF4(l_18) + 1;
+        l_18 += strlen(l_18) + 1;
     }
     mc_strncpy(l_18, a1, 4, (int)D_00174F47, 383);
     return a2 + 1;
 }
 
-int func_0004C526(struct record *a1)
+int quest_match_person_cb(struct record *a1)
 {
     if (a1->type != 8) return 0;
     if (a1->data.person.faction_id == *(int *)D_00190BE4) {
-        D_00195AF4 = a1;
+        found_object = a1;
         return 1;
     }
     return 0;
@@ -187,25 +187,25 @@ void func_0004C588(struct record *a1)
     if (a1->twin != 0) return;
     if (a1->type == 41 && (((unsigned)a1->id) >> 16) == 800) {
         *(int *)D_00190BE4 = a1->data.building.faction_id;
-        D_00195AF4 = 0;
-        object_find((int)D_00195AC4, (int)func_0004C526);
-        if (D_00195AF4 == 0) return;
-        if (D_00195AF4->twin != 0) {
-            func_000A0ED9(422, (int)D_00174F47);
-            mc_sprintf((int)text_buffer, (int)D_00174F71, (int)(unsigned short)(short)D_00195AF4->image);
+        found_object = 0;
+        object_find((int)location_object, (int)quest_match_person_cb);
+        if (found_object == 0) return;
+        if (found_object->twin != 0) {
+            mc_set_location(422, (int)D_00174F47);
+            mc_sprintf((int)text_buffer, (int)D_00174F71, (int)(unsigned short)(short)found_object->image);
             fatal_error((int)text_buffer);
         }
-        a1->id = D_00195AF4->id;
-        mc_memcpy(&a1->x, &D_00195AF4->x, 12, (int)D_00174F47, 427, 4);
-        D_00195AF4->quest_id = a1->quest_id;
-        a1->twin = D_00195AF4;
-        D_00195AF4->twin = a1;
-        D_00195AF4->data.person.flags |= 128;
+        a1->id = found_object->id;
+        mc_memcpy(&a1->x, &found_object->x, 12, (int)D_00174F47, 427, 4);
+        found_object->quest_id = a1->quest_id;
+        a1->twin = found_object;
+        found_object->twin = a1;
+        found_object->data.person.flags |= 128;
         if (((int)(unsigned short)(a1->flags & 2048)) != 0) a1->flags |= 0x200;
         return;
     }
-    if ((D_00195AC4->id >> 16) != (((unsigned)a1->id) >> 16)) return;
-    l_18 = object_find_by_id(D_00195AC4, a1->id);
+    if ((location_object->id >> 16) != (((unsigned)a1->id) >> 16)) return;
+    l_18 = object_find_by_id(location_object, a1->id);
     if (l_18 == 0 || a1->type != l_18->type) {
         func_000310E1(a1, l_18);
         return;
@@ -230,8 +230,8 @@ int quest_free_id(void)
     int l_20;
     int l_1C;
 
-    l_28 = D_00195A00->children;
-    l_20 = *(int *)D_00195C44;
+    l_28 = quest_root->children;
+    l_20 = *(int *)scratch_buffer;
     mc_memset(l_20, 0, 256, (int)D_00174F47, 478, 4);
     while (l_28 != 0) {
         l_24 = &l_28->data.quest;
@@ -273,7 +273,7 @@ void func_0004C8CF(struct quest *a1, struct qbn_op *a2)
 {
 }
 
-void func_0004C8EB(struct record *a1)
+void quest_mark_giver_cb(struct record *a1)
 {
     struct faction *l_24;
     struct faction *l_20;
@@ -302,22 +302,22 @@ void func_0004C8EB(struct record *a1)
     *(signed char *)((char *)l_1C + 2) |= 128;
 }
 
-void func_0004CA9D(void)
+void quest_mark_givers(void)
 {
     int l_18;
 
     l_18 = rand();
     if (((int)player_environment) == 3) {
-        if ((((unsigned)D_00195AC4->id) >> 16) != 50027 && (((unsigned)D_00195AC4->id) >> 16) != 50029 && (((unsigned)D_00195AC4->id) >> 16) != 50033) {
+        if ((((unsigned)location_object->id) >> 16) != 50027 && (((unsigned)location_object->id) >> 16) != 50029 && (((unsigned)location_object->id) >> 16) != 50033) {
             return;
         }
     }
     srand(((unsigned)game_minutes) / 1440);
-    object_foreach(D_00195AC4, (int)func_0004C8EB);
+    object_foreach(location_object, (int)quest_mark_giver_cb);
     srand(l_18);
 }
 
-int func_0004CB2F(struct record *a1)
+int npc_is_quest_giver(struct record *a1)
 {
     return (int)(unsigned char)(a1->data.person.flags & 128);
 }
@@ -336,7 +336,7 @@ void quest_pick_for_npc(struct record *a1)
     quest_pick_file(65, 75, 48, 67, player_character->level);
 }
 
-void func_0004CC14(struct record *a1)
+void quest_count_givers_cb(struct record *a1)
 {
     if (a1->type != 8 || *(int *)D_00195B84 == 0) return;
     if (((int)(unsigned char)(a1->data.person.flags & 128)) == 0) return;
@@ -346,19 +346,19 @@ void func_0004CC14(struct record *a1)
         (*(int *)D_00195B84)--;
     }
     if (*(int *)D_00195B84 != 0) return;
-    D_00195AF4 = a1;
+    found_object = a1;
 }
 
 int quest_find_potential_questor(void)
 {
     *(int *)D_00195B84 = 32768;
-    object_foreach(D_00195AC4, (int)func_0004CC14);
+    object_foreach(location_object, (int)quest_count_givers_cb);
     if (*(int *)D_00195B84 == 32768) return 0;
     *(int *)D_00195B84 = rand_range(0, (*(int *)D_00195B84 & 32767) - 1) + 1;
-    D_00195AF4 = 0;
-    object_foreach(D_00195AC4, (int)func_0004CC14);
-    quest_potential_questor = (int)D_00195AF4;
-    return (int)D_00195AF4;
+    found_object = 0;
+    object_foreach(location_object, (int)quest_count_givers_cb);
+    quest_potential_questor = (int)found_object;
+    return (int)found_object;
 }
 
 int func_0004CD10(struct record *a1)
@@ -396,7 +396,7 @@ void quest_reward_faction(struct quest *a1)
     faction_change_reputation(l_18, 5);
 }
 
-void func_0004CE24(struct quest *a1, int a2)
+void quest_add_questor_rumor(struct quest *a1, int a2)
 {
     struct qbn_person *l_18;
     int l_14;
@@ -415,7 +415,7 @@ int quest_is_active(int a1)
     struct record *l_20;
     struct quest *l_1C;
 
-    l_20 = D_00195A00->children;
+    l_20 = quest_root->children;
     while (l_20 != 0) {
         if (l_20->type == 14) {
             l_1C = &l_20->data.quest;
@@ -426,7 +426,7 @@ int quest_is_active(int a1)
     return 0;
 }
 
-int func_0004CF37(struct item *a1)
+int item_armor_value(struct item *a1)
 {
     int l_1C;
 
@@ -437,7 +437,7 @@ int func_0004CF37(struct item *a1)
     return l_1C + ((int)(short)*(short *)(D_00185128 + (a1->armor_type * 2)));
 }
 
-int func_0004CFA7(struct record *a1, int a2)
+int armor_value_for_part(struct record *a1, int a2)
 {
     struct character *l_34;
     int l_30;
@@ -452,7 +452,7 @@ int func_0004CFA7(struct record *a1, int a2)
     l_30 = 100;
     l_34 = &a1->data.character;
     if (l_34->equipped[(int)(unsigned char)body_part_armor_slots[a2]] != 0) {
-        l_30 -= func_0004CF37(&l_34->equipped[(int)(unsigned char)body_part_armor_slots[a2]]->data.item);
+        l_30 -= item_armor_value(&l_34->equipped[(int)(unsigned char)body_part_armor_slots[a2]]->data.item);
     }
     l_1C = l_34->equipped[EQUIP_LEFT_HAND];
     if (l_1C != 0) {
@@ -500,6 +500,6 @@ void character_update_armor_values(struct record *a1)
 
     l_18 = &a1->data.character;
     for (l_1C = 0; l_1C < 7; l_1C++) {
-        l_18->armor_values[l_1C] = func_0004CFA7(a1, l_1C);
+        l_18->armor_values[l_1C] = armor_value_for_part(a1, l_1C);
     }
 }

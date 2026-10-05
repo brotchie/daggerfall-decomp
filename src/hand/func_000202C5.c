@@ -14,7 +14,7 @@ extern int D_001850E5[];
 extern signed char text_buffer[];
 extern unsigned game_minutes;
 extern struct settings *game_settings;
-extern int D_00195D30;
+extern int trade_price;
 extern unsigned char climate_weathers[];
 extern char D_001961F5[];
 extern unsigned char D_00196271;
@@ -34,9 +34,9 @@ extern int rand(void);
 extern int srand(int);
 extern int mc_memset();
 extern int mc_strncpy();
-extern char *func_000CE45E(char *, short, int);
-#pragma aux func_000A0ED9 parm routine [];
-extern int func_000A0ED9(int, char *);
+extern char *xn_str_find_u16(char *, short, int);
+#pragma aux mc_set_location parm routine [];
+extern int mc_set_location(int, char *);
 extern int mc_sprintf(char *, ...);
 
 #define REGION(o) D_001850D4[D_00179E94[(o)->id]]
@@ -67,7 +67,7 @@ void daedra_summon(struct record *a1)
     }
     switch (l_40->id) {
     case 40:
-        l_38 = func_000CE45E(D_00179E60, game_minutes % 518400 / 1440, 16);
+        l_38 = xn_str_find_u16(D_00179E60, game_minutes % 518400 / 1440, 16);
         if (l_38 == 0 || D_00179E66 == l_38) {
             msgbox_show_rsc(480, 1);
             return;
@@ -82,7 +82,7 @@ void daedra_summon(struct record *a1)
             }
             l_18 = 120;
         }
-        D_00195D30 = (100 - l_40->reputation) * 1000 + 100000;
+        trade_price = (100 - l_40->reputation) * 1000 + 100000;
         msgbox_yes_no_rsc(481);
         if (D_00196271 == 2) return;
         l_30 = 30;
@@ -103,7 +103,7 @@ void daedra_summon(struct record *a1)
     case 94:
     case 98:
     case 106:
-        l_38 = func_000CE45E(D_00179E60, game_minutes % 518400 / 1440, 16);
+        l_38 = xn_str_find_u16(D_00179E60, game_minutes % 518400 / 1440, 16);
         if (l_38 == 0 || D_00179E66 == l_38) {
             msgbox_show_rsc(480, 1);
             return;
@@ -124,7 +124,7 @@ void daedra_summon(struct record *a1)
             }
             l_18 = 120;
         }
-        D_00195D30 = (100 - l_40->reputation) * 1000 + 100000;
+        trade_price = (100 - l_40->reputation) * 1000 + 100000;
         msgbox_yes_no_rsc(481);
         if (D_00196271 == 2) return;
         l_30 = 30;
@@ -146,18 +146,18 @@ void daedra_summon(struct record *a1)
             }
             l_18 = 120;
         }
-        D_00195D30 = (100 - l_40->reputation) * 1000 + 100000;
+        trade_price = (100 - l_40->reputation) * 1000 + 100000;
         msgbox_yes_no_rsc(481);
         if (D_00196271 == 2) return;
         l_30 = 30;
         srand(l_28);
         break;
     }
-    if (D_00195D30 < 0)
-        D_00195D30 = -D_00195D30;
-    if (D_00195D30 > 200000)
-        D_00195D30 = 200000;
-    if (gold_can_afford(D_00195D30) == 0) {
+    if (trade_price < 0)
+        trade_price = -trade_price;
+    if (trade_price > 200000)
+        trade_price = 200000;
+    if (gold_can_afford(trade_price) == 0) {
         msgbox_show_rsc(454, 1);
         return;
     }
@@ -172,7 +172,7 @@ void daedra_summon(struct record *a1)
     l_30 += l_3C->reputation;
     if (D_00179E7F[l_34] == 100 || l_1C == D_00179E7F[l_34])
         l_30 += 30;
-    gold_spend(D_00195D30);
+    gold_spend(trade_price);
     if (rand_range(1, 100) > l_30) {
         msgbox_show_rsc(484, 1);
         return;
@@ -188,7 +188,7 @@ void daedra_summon(struct record *a1)
         return;
     }
     l_3C->flags |= 64;
-    func_000A0ED9(200, D_00170634);
+    mc_set_location(200, D_00170634);
     mc_sprintf(((char *)text_buffer), D_0017063D, REGION(l_3C), l_18);
     mc_strncpy(D_001961F5, ((char *)text_buffer), 13, D_00170634, 201);
 }

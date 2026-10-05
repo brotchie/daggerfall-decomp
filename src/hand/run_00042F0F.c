@@ -8,8 +8,8 @@ extern unsigned char mouse_buttons;
 extern short mouse_x;
 extern short mouse_y;
 extern unsigned char D_0012B508;
-extern unsigned char D_00142314;
-extern unsigned char D_00142315;
+extern unsigned char key_down_minus;
+extern unsigned char key_down_equals;
 extern unsigned char key_down_ctrl;
 extern unsigned char key_down_lshift;
 extern unsigned char key_down_x;
@@ -32,29 +32,29 @@ extern unsigned char player_motion_flags;
 extern int D_001950E4;
 extern int D_001950E8;
 extern int view_look_pitch;
-extern int D_001959BC;
+extern int view_look_yaw;
 extern int D_001959C0;
 extern struct record *camera_object;
 extern struct record *player_object;
-extern struct record *D_00195AC4;
+extern struct record *location_object;
 extern int cheat_flags;
 extern struct record *spell_ready_missile;
 extern struct record *spell_ready_touch;
 extern struct character *player_character;
-extern int D_00195D60;
+extern int spell_cast_busy;
 extern unsigned char mouse_control_mode;
 extern unsigned char view_cursor_active;
 extern short D_00195F2E;
 extern short D_00195F52;
 extern short D_00195F54;
-extern short D_00195F62;
+extern short spell_ready_cost;
 extern unsigned char weapon_active_hand;
 extern unsigned char D_00196272;
 extern unsigned char game_mode;
 extern unsigned char interaction_mode;
 extern unsigned char in_dungeon_water;
 extern unsigned char D_001962A0;
-extern int D_00199700;
+extern int cheat_marker_index;
 extern int D_001A4A70;
 extern int D_001A4A74;
 extern unsigned char cheat_mode;
@@ -80,10 +80,10 @@ extern void object_set_position(struct record *, int, int, int, int, int, int);
 extern void transport_menu(void);
 extern struct record *marker_find_nth(struct record *, int, int);
 extern int travel_map_open(int);
-extern void func_0012B49E(short, short);
-extern void func_00135E90(void);
-#pragma aux func_000A0ED9 parm routine [];
-extern void func_000A0ED9(int, char *);
+extern void xn_mouse_set_position(short, short);
+extern void xn_tex_cache_begin_frame(void);
+#pragma aux mc_set_location parm routine [];
+extern void mc_set_location(int, char *);
 extern int mc_sprintf(char *, char *, ...);
 extern short steer_weight_down;
 extern short steer_weight_right;
@@ -92,13 +92,13 @@ extern short steer_weight_up;
 extern char *D_0017D1CA[];
 extern char *D_0017D1EE;
 extern unsigned char key_down[];
-extern int D_00152A20;
-extern int D_00152A24;
-extern unsigned char D_00152A30;
-extern unsigned char D_00152A31;
+extern int joystick_x;
+extern int joystick_y;
+extern unsigned char joystick_button1;
+extern unsigned char joystick_button2;
 extern unsigned char key_map[];
 extern void hud_status_set(char *);
-extern void func_00042E8C(int);
+extern void keys_joystick_steer_weights(int);
 
 void keys_world_actions(void)
 {
@@ -121,7 +121,7 @@ void keys_world_actions(void)
     if (key_down_alt && key_pressed_once(87))
         cheat_return_to_last_position();
     if (key_action_pressed(29)) {
-        if (D_00195D60 == 0)
+        if (spell_cast_busy == 0)
             cast_recast_last();
         else
             hud_message_add(D_00184876);
@@ -132,7 +132,7 @@ void keys_world_actions(void)
         automap_open();
     if (key_action_held(30))
         if (spell_ready_missile || spell_ready_touch) {
-            player_character->magicka += D_00195F62;
+            player_character->magicka += spell_ready_cost;
             if (player_character->magicka > player_character->max_magicka)
                 player_character->magicka = player_character->max_magicka;
             if (spell_ready_missile) {
@@ -152,7 +152,7 @@ void keys_world_actions(void)
         o = player_character->equipped[(weapon_active_hand ^ 1) ? 21 : 19];
         if (o == 0 || o->data.item.group == 3) {
             weapon_active_hand ^= 1;
-            func_000A0ED9(96, D_00170E38);
+            mc_set_location(96, D_00170E38);
             mc_sprintf(((char *)text_buffer), D_0018323C, weapon_active_hand ? D_00183240 : D_00183244);
             D_00195F2E = 20;
             D_0012B508 = 146;
@@ -187,7 +187,7 @@ void keys_world_actions(void)
     if (mouse_control_mode == 0) {
         if (key_action_pressed(22) || D_001940DA.b6 && (mouse_buttons & 1)) {
             view_look_pitch = 32;
-            D_001959BC = 0;
+            view_look_yaw = 0;
             D_001959C0 = 0;
             player_object->angle_x = camera_object->angle_x = 0;
         }
@@ -199,12 +199,12 @@ void keys_world_actions(void)
             D_001940DA.b6 = 1;
         } else {
             if (D_001940DA.b6)
-                func_0012B49E(D_00195F54, D_00195F52);
+                xn_mouse_set_position(D_00195F54, D_00195F52);
             D_001940DA.b6 = 0;
         }
     } else {
         view_look_pitch = 0;
-        D_001959BC = 0;
+        view_look_yaw = 0;
         D_001959C0 = 0;
     }
     if (key_action_held(20))
@@ -226,49 +226,49 @@ void keys_world_actions(void)
         player_character->gold += 5000;
     if (cheat_flags != saved)
         hud_message_add(D_00170E3F);
-    if (D_00142314 && cheat_mode)
+    if (key_down_minus && cheat_mode)
         cheat_raise_reputation();
-    if (D_00142315 && cheat_mode)
+    if (key_down_equals && cheat_mode)
         cheat_raise_skills();
     if (key_pressed_once(26) && player_environment == 3 && cheat_mode) {
-        D_00199700 = --D_00199700 % (D_001950E4 + D_001950E8);
-        if (D_00199700 < 0)
-            D_00199700 = D_001950E4 + D_001950E8 - 1;
-        if (D_00199700 < D_001950E4)
-            o = marker_find_nth(D_00195AC4, 9, D_00199700);
+        cheat_marker_index = --cheat_marker_index % (D_001950E4 + D_001950E8);
+        if (cheat_marker_index < 0)
+            cheat_marker_index = D_001950E4 + D_001950E8 - 1;
+        if (cheat_marker_index < D_001950E4)
+            o = marker_find_nth(location_object, 9, cheat_marker_index);
         else
-            o = marker_find_nth(D_00195AC4, 16, D_00199700 - D_001950E4);
+            o = marker_find_nth(location_object, 16, cheat_marker_index - D_001950E4);
         object_set_position(player_object, o->x, o->y, o->z, o->angle_x, o->yaw, o->angle_z);
         camera_object->yaw = player_object->yaw;
-        func_00135E90();
+        xn_tex_cache_begin_frame();
         D_001940D5.b1 = 1;
     }
     if (key_pressed_once(27) && player_environment == 3 && cheat_mode) {
-        D_00199700 = ++D_00199700 % (D_001950E4 + D_001950E8);
-        if (D_00199700 < D_001950E4)
-            o = marker_find_nth(D_00195AC4, 9, D_00199700);
+        cheat_marker_index = ++cheat_marker_index % (D_001950E4 + D_001950E8);
+        if (cheat_marker_index < D_001950E4)
+            o = marker_find_nth(location_object, 9, cheat_marker_index);
         else
-            o = marker_find_nth(D_00195AC4, 16, D_00199700 - D_001950E4);
+            o = marker_find_nth(location_object, 16, cheat_marker_index - D_001950E4);
         object_set_position(player_object, o->x, o->y, o->z, o->angle_x, o->yaw, o->angle_z);
         camera_object->yaw = player_object->yaw;
-        func_00135E90();
+        xn_tex_cache_begin_frame();
         D_001940D5.b1 = 1;
     }
 }
 
-void func_00042E0C(void)
+void keys_nop(void)
 {
 }
 
 void interaction_mode_cycle(int a1)
 {
     interaction_mode = (interaction_mode + a1) & 3;
-    func_000A0ED9(231, D_00170E38);
+    mc_set_location(231, D_00170E38);
     mc_sprintf(((char *)text_buffer), D_0017D1EE, D_0017D1CA[interaction_mode]);
     hud_status_set(((char *)text_buffer));
 }
 
-void func_00042E8C(int a1)
+void keys_joystick_steer_weights(int a1)
 {
     steer_weight_right = (a1 << 8) / 4096;
     steer_weight_down = (a1 << 8) / 4096;
@@ -281,9 +281,9 @@ int key_action_held(int a1)
     if (key_map[a1] >= 200) {
         switch ((unsigned char)(key_map[a1] - 200)) {
         case 0:
-            return D_00152A30;
+            return joystick_button1;
         case 1:
-            return D_00152A31;
+            return joystick_button2;
         case 2:
             return mouse_buttons & 1;
         case 3:
@@ -291,17 +291,17 @@ int key_action_held(int a1)
         case 12:
             return mouse_buttons & 4;
         case 4:
-            func_00042E8C(D_00152A20);
-            return D_00152A20 < 0 ? 1 : 0;
+            keys_joystick_steer_weights(joystick_x);
+            return joystick_x < 0 ? 1 : 0;
         case 5:
-            func_00042E8C(D_00152A20);
-            return D_00152A20 > 0 ? 1 : 0;
+            keys_joystick_steer_weights(joystick_x);
+            return joystick_x > 0 ? 1 : 0;
         case 6:
-            func_00042E8C(D_00152A24);
-            return D_00152A24 < 0 ? 1 : 0;
+            keys_joystick_steer_weights(joystick_y);
+            return joystick_y < 0 ? 1 : 0;
         case 7:
-            func_00042E8C(D_00152A24);
-            return D_00152A24 > 0 ? 1 : 0;
+            keys_joystick_steer_weights(joystick_y);
+            return joystick_y > 0 ? 1 : 0;
         default:
             return 0;
         }

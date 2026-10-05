@@ -14,10 +14,10 @@ extern char D_00177358[];
 extern unsigned char D_001940D5;
 extern struct record *player_object;
 extern struct record *marker_find_nearest(struct record *, int);
-extern int func_0009DEAC(int);
+extern int abs(int);
 extern void mc_memcpy(void *, void *, int, char *, int, int);
 
-void func_0009A7B8(void)
+void ladder_climb(void)
 {
     struct header_copy a;
     struct header_copy b;
@@ -34,7 +34,7 @@ void func_0009A7B8(void)
     q = marker_find_nearest(p->children, 20);
     if (q == 0) return;
     mc_memcpy(&b, q, 71, D_00177358, 525, 4);
-    if (func_0009DEAC(player_object->y - a.y) > func_0009DEAC(player_object->y - b.y)) {
+    if (abs(player_object->y - a.y) > abs(player_object->y - b.y)) {
         player_object->x = a.x;
         player_object->y = a.y;
         player_object->z = a.z;

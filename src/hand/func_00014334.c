@@ -5,15 +5,15 @@ struct sel { int flags; struct record *obj; };
 extern char key_down_alt;
 extern int frame_counter;
 extern int D_00196478;
-extern struct sel *D_00196484;
+extern struct sel *pick_result;
 
-int func_00014334(struct record *a1)
+int pick_sprite_cb(struct record *a1)
 {
     int l_24;
     int l_20;
     int l_1C;
 
-    if (D_00196484->flags & 1)
+    if (pick_result->flags & 1)
         return 0;
     switch (a1->type) {
     case 2:
@@ -26,8 +26,8 @@ int func_00014334(struct record *a1)
         if ((int)a1->caster == D_00196478 && (frame_counter & 0xffff) == (a1->angle_x & 0xffff)) {
             if (key_down_alt && a1->type != 34)
                 return 0;
-            D_00196484->flags |= 3;
-            D_00196484->obj = a1;
+            pick_result->flags |= 3;
+            pick_result->obj = a1;
             return 1;
         }
     default:

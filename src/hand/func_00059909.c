@@ -1,15 +1,15 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x00059909 */
-extern unsigned char *D_00199B4C;
-extern char **D_00199B50;
+extern unsigned char *paperdoll_slots;
+extern char **paperdoll_items;
 extern void paperdoll_draw_item(char *, int, int, int);
 
-void func_00059909(int a1, int a2)
+void paperdoll_draw_items(int a1, int a2)
 {
     int i;
 
     i = 0;
-    while (D_00199B50[i] != 0) {
-        paperdoll_draw_item(D_00199B50[i], a1, a2, D_00199B4C[i] + 64);
+    while (paperdoll_items[i] != 0) {
+        paperdoll_draw_item(paperdoll_items[i], a1, a2, paperdoll_slots[i] + 64);
         i++;
     }
 }

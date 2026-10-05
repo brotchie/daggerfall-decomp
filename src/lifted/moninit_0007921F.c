@@ -7,7 +7,7 @@
 extern int rand_range(int, int);
 extern struct record *object_create_child(struct record *, int, int);
 extern int object_new_id(int);
-extern void func_0005E37F(unsigned short, int, int, struct item *);
+extern void item_make_in_range(unsigned short, int, int, struct item *);
 
 struct record *monster_make_item(struct record *a1, int a2, int a3, int a4, int a5, int a6)
 {
@@ -20,7 +20,7 @@ struct record *monster_make_item(struct record *a1, int a2, int a3, int a4, int 
     l_14->id = object_new_id(((unsigned)a1->id) >> 16);
     l_10 = &l_14->data.item;
     do {
-        func_0005E37F((int)(unsigned short)*(short *)&a2, a3, a4, l_10);
+        item_make_in_range((int)(unsigned short)*(short *)&a2, a3, a4, l_10);
     } while (l_10->index == a5);
     return l_14;
 }

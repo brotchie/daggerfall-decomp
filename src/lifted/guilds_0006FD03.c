@@ -9,7 +9,7 @@ extern signed char D_001940D5;
 extern int spell_effect_text_index(short);
 extern void msgbox_show_rsc(int, int);
 
-void func_0006FD03(short a1)
+void spellshop_show_effect(short a1)
 {
     if (selected_spell->effects[(int)(short)a1].type == 255) return;
     D_001940D5 |= 1;

@@ -2,7 +2,7 @@
 
 #include "dagger.h"
 
-void func_00043978(void) { }
+void options_nop(void) { }
 
 int options_mouse_view_mode(void)
 {

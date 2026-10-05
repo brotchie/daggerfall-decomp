@@ -13,14 +13,14 @@ extern unsigned char player_on_ground;
 extern int collide_candidate_count;
 extern struct vec3 *D_00196D4C;
 extern struct planes *D_00196D50;
-extern int D_00196D60;
+extern int collide_height;
 extern short collide_flags;
 extern void collide_for_each_nearby(struct record *, void (*)(int));
-extern void func_0002325A(int);
+extern void collide_gather_cb(int);
 extern int func_00023FA5(struct record *, int, struct move_request *);
 extern void object_set_position(struct record *, int, int, int, int, int, int);
-extern int func_0014B45B(int, int);
-extern void func_0014BDDD(struct vec3 *);
+extern int xn_terrain_height_at(int, int);
+extern void xn_vec_normalize_ptr(struct vec3 *);
 
 int collide_move_object(struct record *o, int a2, struct move_request *m, int a4)
 {
@@ -47,12 +47,12 @@ int collide_move_object(struct record *o, int a2, struct move_request *m, int a4
     D_00196D4C->x = m->x;
     D_00196D4C->y = m->y;
     D_00196D4C->z = m->z;
-    collide_for_each_nearby(o, func_0002325A);
+    collide_for_each_nearby(o, collide_gather_cb);
     if (player_environment != 1 && collide_candidate_count == 0)
         return 0;
     if (collide_candidate_count == 0 && player_environment == 1) {
-        D_00196D60 = func_0014B45B(o->x, o->z);
-        object_set_position(o, m->x, D_00196D60, m->z, m->angle_x, m->yaw, m->angle_z);
+        collide_height = xn_terrain_height_at(o->x, o->z);
+        object_set_position(o, m->x, collide_height, m->z, m->angle_x, m->yaw, m->angle_z);
         return 0;
     }
     flags = collide_flags;
@@ -66,7 +66,7 @@ int collide_move_object(struct record *o, int a2, struct move_request *m, int a4
     d.x = m->x - o->x;
     d.y = m->y - o->y;
     d.z = m->z - o->z;
-    func_0014BDDD(&d);
+    xn_vec_normalize_ptr(&d);
     if (D_00196D50 == 0)
         return 1;
     if (D_00196D50->count > 1) {

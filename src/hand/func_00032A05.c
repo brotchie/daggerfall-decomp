@@ -6,9 +6,9 @@ struct R6 { unsigned short w0; unsigned short flags; unsigned short w4; };
 #pragma pack()
 extern char D_00170A64[];
 extern struct record *nonworld_root;
-extern struct record *D_00195AC4;
+extern struct record *location_object;
 extern struct location *current_location;
-extern unsigned *D_00195C44;
+extern unsigned *scratch_buffer;
 extern unsigned char current_region;
 extern int loaded_location_door_count;
 extern struct R6 *loaded_location_doors;
@@ -22,7 +22,7 @@ extern struct faction *faction_find_type_in_region(short, short);
 extern int func_000337AD(struct R6 *, struct qbn_place *, struct building *);
 extern int quest_object_in_use(int);
 extern void location_free(short *);
-extern void func_00087F76(short *, unsigned short, short, int);
+extern void quest_pick_location(short *, unsigned short, short, int);
 extern struct record *object_create_child(struct record *, struct record *, int);
 extern int rand();
 extern int mc_strncpy();
@@ -61,7 +61,7 @@ retry:
         a1->scope--;
     if (a1->scope != 0) {
         location_free(&D_001970C8);
-        func_00087F76(&D_001970C8, a1->p1, a1->p2, a1->scope);
+        quest_pick_location(&D_001970C8, a1->p1, a1->p2, a1->scope);
         base = D_001970D0;
         n = D_001970CC;
         l40 = D_001970D4;
@@ -69,10 +69,10 @@ retry:
     } else {
         base = loaded_location_doors;
         n = loaded_location_door_count;
-        l40 = D_00195AC4;
+        l40 = location_object;
         l38 = current_location;
     }
-    list = D_00195C44;
+    list = scratch_buffer;
     count = 0;
     if (a1->p1 == 0) {
         for (count = i = 0, ptr = base; i < n; i++, ptr++) {

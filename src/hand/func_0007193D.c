@@ -24,14 +24,14 @@ extern int creature_count;
 extern char inpstr_result[];
 extern struct character *player_character;
 extern struct career *player_class;
-extern char D_00195C44[];
+extern char scratch_buffer[];
 extern unsigned char D_0019626F;
 extern signed char game_mode;
 extern signed char mouse_buttons_prev;
 extern signed char D_00196294;
 extern signed char D_00196299;
 extern signed char D_0019629E;
-extern int D_001A4A20;
+extern int rest_ticks_per_hour;
 extern char rest_image[];
 extern signed char rest_loitering;
 extern void msgbox_show_string(int, int);
@@ -43,17 +43,17 @@ extern void rest_recover(struct record *);
 extern void rest_close(void);
 extern int rest_allowed(void);
 extern int rest_room_expired(void);
-extern void text_draw_centered_colored(int, int, int, int, unsigned char);
+extern void text_draw_centred_coloured(int, int, int, int, unsigned char);
 extern void inpstr_begin_number(int);
 extern int point_in_rect(short, short, short, short, short, short);
 extern int mc_free();
-extern int func_000A0DD9();
-extern int func_000A0DF4();
-extern int func_0012B136();
-extern int func_00143914();
-extern int func_00144F68();
-#pragma aux func_000A0ED9 parm routine [];
-extern int func_000A0ED9(int, int);
+extern int itoa();
+extern int strlen();
+extern int xn_mouse_poll_clamped();
+extern int xn_gfx_clear();
+extern int xn_draw_image();
+#pragma aux mc_set_location parm routine [];
+extern int mc_set_location(int, int);
 extern int mc_sprintf(int, ...);
 
 void rest_update(void)
@@ -68,7 +68,7 @@ void rest_update(void)
             return;
         }
     }
-    func_00143914(0);
+    xn_gfx_clear(0);
     hud_draw();
     D_0019629E = 1;
     D_0012B508 = 146;
@@ -88,34 +88,34 @@ void rest_update(void)
         return;
     }
     if (D_00190D1A == 0) {
-        func_00144F68((int)(unsigned short)*(short *)(*(char **)rest_image), (int)(unsigned short)*(short *)(*(char **)rest_image + 2), (int)(unsigned short)*(short *)(*(char **)rest_image + 4), (int)(unsigned short)*(short *)(*(char **)rest_image + 6), (int)(*(char **)rest_image + 12));
+        xn_draw_image((int)(unsigned short)*(short *)(*(char **)rest_image), (int)(unsigned short)*(short *)(*(char **)rest_image + 2), (int)(unsigned short)*(short *)(*(char **)rest_image + 4), (int)(unsigned short)*(short *)(*(char **)rest_image + 6), (int)(*(char **)rest_image + 12));
         if (mouse_buttons != 0 && mouse_buttons_prev == 0 && point_in_rect((int)(short)mouse_x, (int)(short)mouse_y, 87, 63, 134, 86) != 0) {
-            while (mouse_buttons != 0) func_0012B136();
+            while (mouse_buttons != 0) xn_mouse_poll_clamped();
             if (rest_allowed() == 0) {
                 rest_close();
                 return;
             }
-            D_001A4A20 = 9;
+            rest_ticks_per_hour = 9;
             D_00190D1A = 1;
             if (*(int *)rest_image != 0 && *(int *)rest_image != (-1751672937)) {
                 mc_free(*(int *)rest_image, (int)D_001760D6, 165);
                 *(int *)rest_image = -1751672937;
             }
             *(int *)rest_image = disk_read_file((int)D_001760DD, 0);
-            l_30 = (int)(*(char **)D_00195C44 + 55000);
-            func_000A0ED9(168, (int)D_001760D6);
+            l_30 = (int)(*(char **)scratch_buffer + 55000);
+            mc_set_location(168, (int)D_001760D6);
             mc_sprintf(l_30, (int)D_001760EA, D_0017D1FA);
-            *(signed char *)((char *)(func_000A0DF4(l_30) + l_30) + 1) = 0;
+            *(signed char *)((char *)(strlen(l_30) + l_30) + 1) = 0;
             inpstr_begin_number(0);
             msgbox_show_string(l_30, 2);
             while (key_down_enter != 0);
         } else if (mouse_buttons != 0 && mouse_buttons_prev == 0 && point_in_rect((int)(short)mouse_x, (int)(short)mouse_y, 136, 63, 183, 86) != 0) {
-            while (mouse_buttons != 0) func_0012B136();
+            while (mouse_buttons != 0) xn_mouse_poll_clamped();
             if (rest_allowed() == 0) {
                 rest_close();
                 return;
             }
-            D_001A4A20 = 9;
+            rest_ticks_per_hour = 9;
             D_00190D1A = 3;
             if (*(int *)rest_image != 0 && *(int *)rest_image != (-1751672937)) {
                 mc_free(*(int *)rest_image, (int)D_001760D6, 184);
@@ -124,18 +124,18 @@ void rest_update(void)
             *(int *)rest_image = disk_read_file((int)D_0017610F, 0);
             D_00190CBC = *(int *)1132;
         } else if (mouse_buttons != 0 && mouse_buttons_prev == 0 && point_in_rect((int)(short)mouse_x, (int)(short)mouse_y, 185, 63, 232, 86) != 0) {
-            while (mouse_buttons != 0) func_0012B136();
-            D_001A4A20 = 32;
+            while (mouse_buttons != 0) xn_mouse_poll_clamped();
+            rest_ticks_per_hour = 32;
             D_00190D1A = 1;
             if (*(int *)rest_image != 0 && *(int *)rest_image != (-1751672937)) {
                 mc_free(*(int *)rest_image, (int)D_001760D6, 193);
                 *(int *)rest_image = -1751672937;
             }
             *(int *)rest_image = disk_read_file((int)D_001760DD, 0);
-            l_30 = (int)(*(char **)D_00195C44 + 55000);
-            func_000A0ED9(196, (int)D_001760D6);
+            l_30 = (int)(*(char **)scratch_buffer + 55000);
+            mc_set_location(196, (int)D_001760D6);
             mc_sprintf(l_30, (int)D_0017611C, D_0017D1FE);
-            *(signed char *)((char *)(func_000A0DF4(l_30) + l_30) + 1) = 0;
+            *(signed char *)((char *)(strlen(l_30) + l_30) + 1) = 0;
             inpstr_begin_number(0);
             msgbox_show_string(l_30, 2);
             rest_loitering = 1;
@@ -164,12 +164,12 @@ void rest_update(void)
         return;
     }
     if (((int)(signed char)D_00190D1A) == 2) {
-        func_00144F68((int)(unsigned short)*(short *)(*(char **)rest_image), (int)(unsigned short)*(short *)(*(char **)rest_image + 2), (int)(unsigned short)*(short *)(*(char **)rest_image + 4), (int)(unsigned short)*(short *)(*(char **)rest_image + 6), (int)(*(char **)rest_image + 12));
-        text_draw_centered_colored(func_000A0DD9((int)(short)D_00190DD0, (int)text_buffer, 10), 118, 62, 146, 156);
+        xn_draw_image((int)(unsigned short)*(short *)(*(char **)rest_image), (int)(unsigned short)*(short *)(*(char **)rest_image + 2), (int)(unsigned short)*(short *)(*(char **)rest_image + 4), (int)(unsigned short)*(short *)(*(char **)rest_image + 6), (int)(*(char **)rest_image + 12));
+        text_draw_centred_coloured(itoa((int)(short)D_00190DD0, (int)text_buffer, 10), 118, 62, 146, 156);
         if (mouse_buttons != 0 && mouse_buttons_prev == 0 && point_in_rect((int)(short)mouse_x, (int)(short)mouse_y, 140, 76, 179, 85) != 0) {
             rest_close();
         }
-        if (((unsigned)(*(int *)1132 - D_00190CBC)) > D_001A4A20) {
+        if (((unsigned)(*(int *)1132 - D_00190CBC)) > rest_ticks_per_hour) {
             time_pass_minutes(60);
             if (rest_loitering == 0) rest_recover(player_entity);
             D_00190DD0--;
@@ -182,11 +182,11 @@ void rest_update(void)
         return;
     }
     if (((int)(signed char)D_00190D1A) != 3) return;
-    func_00144F68((int)(unsigned short)*(short *)(*(char **)rest_image), (int)(unsigned short)*(short *)(*(char **)rest_image + 2), (int)(unsigned short)*(short *)(*(char **)rest_image + 4), (int)(unsigned short)*(short *)(*(char **)rest_image + 6), (int)(*(char **)rest_image + 12));
-    text_draw_centered_colored(func_000A0DD9((int)(short)D_00190DD0, (int)text_buffer, 10), 118, 62, 146, 156);
+    xn_draw_image((int)(unsigned short)*(short *)(*(char **)rest_image), (int)(unsigned short)*(short *)(*(char **)rest_image + 2), (int)(unsigned short)*(short *)(*(char **)rest_image + 4), (int)(unsigned short)*(short *)(*(char **)rest_image + 6), (int)(*(char **)rest_image + 12));
+    text_draw_centred_coloured(itoa((int)(short)D_00190DD0, (int)text_buffer, 10), 118, 62, 146, 156);
     if (mouse_buttons != 0 && mouse_buttons_prev == 0 && point_in_rect((int)(short)mouse_x, (int)(short)mouse_y, 140, 76, 179, 85) != 0) {
         rest_close();
-    } else if (((unsigned)(*(int *)1132 - D_00190CBC)) > D_001A4A20) {
+    } else if (((unsigned)(*(int *)1132 - D_00190CBC)) > rest_ticks_per_hour) {
         time_pass_minutes(60);
         rest_recover(player_entity);
         D_00190DD0++;

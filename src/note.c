@@ -2,4 +2,4 @@
 
 #include "dagger.h"
 
-void func_0004E173(void) { }
+void note_print_stub(void) { }

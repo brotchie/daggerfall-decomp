@@ -14,8 +14,8 @@ extern char D_00170ABC[];
 extern char D_00170AC7[];
 extern unsigned char D_0017A844[];
 extern signed char text_buffer[];
-extern struct record *D_00195AC4;
-extern char *D_00195C44;
+extern struct record *location_object;
+extern char *scratch_buffer;
 extern unsigned char D_001962A1;
 extern int blocks_bsa;
 extern struct record *D_001995D4[2][2];
@@ -28,11 +28,11 @@ extern int D_00199614;
 extern int archive_find_record(int, char *, int);
 extern int archive_read_record(int, int, char *);
 extern void rdb_create_objects(struct record *, char *, int);
-extern void func_000367E5(struct record *, char *, int);
+extern void rdb_link_actions(struct record *, char *, int);
 extern struct record *object_create_in_block(struct record *, unsigned char, int, int, int);
-extern int func_00135E90();
-#pragma aux func_000A0ED9 parm routine [];
-extern int func_000A0ED9(int, char *);
+extern int xn_tex_cache_begin_frame();
+#pragma aux mc_set_location parm routine [];
+extern int mc_set_location(int, char *);
 extern int mc_sprintf(char *, char *, ...);
 
 void dungeon_load_rdb_block(struct rec *r)
@@ -45,8 +45,8 @@ void dungeon_load_rdb_block(struct rec *r)
     char *p;
 
     D_00199608 = r;
-    D_001995E8 = D_00195C44;
-    func_000A0ED9(59, D_00170AB4);
+    D_001995E8 = scratch_buffer;
+    mc_set_location(59, D_00170AB4);
     mc_sprintf(((char *)text_buffer), D_00170ABC, D_0017A844[r->kind], r->num);
     n = archive_find_record(blocks_bsa, ((char *)text_buffer), 13);
     archive_read_record(blocks_bsa, n, D_001995E8);
@@ -57,10 +57,10 @@ void dungeon_load_rdb_block(struct rec *r)
     D_00199604 = (struct hdr *)D_001995E8;
     for (i = 0; i < 2; i++) {
         for (j = 0; j < 2; j++) {
-            D_001995D4[j][i] = object_create_in_block(D_00195AC4, 47, 0, 0, i * D_00199604->w + j);
+            D_001995D4[j][i] = object_create_in_block(location_object, 47, 0, 0, i * D_00199604->w + j);
             D_001995D4[j][i]->image = r->num;
-            D_001995D4[j][i]->x = D_00195AC4->x + (j << 10) + (r->x << 11);
-            D_001995D4[j][i]->z = D_00195AC4->z + (i << 10) + (r->y << 11);
+            D_001995D4[j][i]->x = location_object->x + (j << 10) + (r->x << 11);
+            D_001995D4[j][i]->z = location_object->z + (i << 10) + (r->y << 11);
         }
     }
     tbl = (int *)(D_00199604->tbl + D_001995E8);
@@ -68,7 +68,7 @@ void dungeon_load_rdb_block(struct rec *r)
         for (j = 0; j < 2; j++) {
             if (tbl[i * D_00199604->w + j] <= 0)
                 continue;
-            func_00135E90();
+            xn_tex_cache_begin_frame();
             p = tbl[i * D_00199604->w + j] + D_001995E8;
             rdb_create_objects(D_001995D4[j][i], p, i * D_00199604->w + j);
         }
@@ -78,14 +78,14 @@ void dungeon_load_rdb_block(struct rec *r)
             if (tbl[i * D_00199604->w + j] <= 0)
                 continue;
             p = tbl[i * D_00199604->w + j] + D_001995E8;
-            func_000367E5(D_001995D4[j][i], p, i * D_00199604->w + j);
+            rdb_link_actions(D_001995D4[j][i], p, i * D_00199604->w + j);
             *(short *)((char *)D_001995D4[j][i] + 23) = D_001995F8;
             *(short *)((char *)D_001995D4[j][i] + 25) = D_001995FC;
             *(short *)((char *)D_001995D4[j][i] + 19) = (unsigned short)D_001962A1;
         }
     }
     o = object_create_in_block(D_001995D4[0][0], 60, 512, 0, 0);
-    func_000A0ED9(107, D_00170AB4);
+    mc_set_location(107, D_00170AB4);
     mc_sprintf(((char *)text_buffer), D_00170AC7, D_0017A844[r->kind], r->num);
     n = archive_find_record(blocks_bsa, ((char *)text_buffer), 13);
     archive_read_record(blocks_bsa, n, RECORD_DATA(o));

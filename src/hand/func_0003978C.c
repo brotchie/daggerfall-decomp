@@ -5,7 +5,7 @@ extern struct spell *selected_spell;
 extern short spell_effect_slot;
 extern short spell_effect_cost_current[];
 
-int func_0003978C(void)
+int spell_cost_duration_magnitude_alt(void)
 {
     short cost;
     struct spell *sp;

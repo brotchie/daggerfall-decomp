@@ -13,25 +13,25 @@ extern short screenshot_number;
 extern char D_0019645A[];
 
 extern int open(int, ...);
-extern int func_0009DEA7();
+extern int close();
 extern int mc_free();
 extern int mc_malloc();
 extern int write();
-extern int func_000A0ED9(int, int);
+extern int mc_set_location(int, int);
 extern int mc_sprintf(int, ...);
 extern int unlink();
-extern int func_000CE758();
-extern int func_00142790();
+extern int xn_pal_read_dac();
+extern int xn_kbd_flush();
 void screenshot_save_bmp(int);
-#pragma aux func_000A0ED9 parm routine [];
+#pragma aux mc_set_location parm routine [];
 
 void screenshot_poll(void)
 {
     if (key_down_backslash == 0) return;
-    func_000A0ED9(44, (int)D_00170194);
+    mc_set_location(44, (int)D_00170194);
     mc_sprintf((int)D_0019645A, (int)D_0017019D, (int)(short)screenshot_number);
     screenshot_save_bmp((int)D_0019645A);
-    while (key_down_backslash != 0) func_00142790();
+    while (key_down_backslash != 0) xn_kbd_flush();
 }
 
 void screenshot_save_bmp(int a1)
@@ -41,7 +41,7 @@ void screenshot_save_bmp(int a1)
     short l_18;
 
     l_20 = mc_malloc(768, (int)D_00170194, 67);
-    func_000CE758(l_20);
+    xn_pal_read_dac(l_20);
     *(int *)&l_1C = 0;
     for (; ((int)(short)l_1C) < 256; (*(int *)&l_1C)++) {
         D_00178A52[((int)(short)l_1C) << 2] = *(signed char *)((char *)((((int)(short)l_1C) * 3) + l_20) + 2) << 2;
@@ -64,7 +64,7 @@ void screenshot_save_bmp(int a1)
             write((int)(short)l_18, l_20, 320);
             l_20 += -320;
         }
-        func_0009DEA7((int)(short)l_18);
+        close((int)(short)l_18);
         return;
     }
     if (l_20 == 0 || l_20 == (-1751672937)) return;

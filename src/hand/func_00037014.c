@@ -23,11 +23,11 @@ extern char spell_effect_subtype_names[];
 extern char D_001845D0[];
 extern signed char text_buffer[];
 extern struct record *player_object;
-extern int spellshop_icons;
+extern int magic_window_image;
 extern int list_popup_callback;
 extern struct character *player_character;
 extern int window_image;
-extern char D_00195C44[];
+extern char scratch_buffer[];
 extern short spell_effect_slot;
 extern unsigned char D_00196271;
 extern signed char game_mode;
@@ -36,25 +36,25 @@ extern short D_0019962C;
 extern char spellmaker_settings_kind[];
 extern struct { unsigned char a:2; unsigned char f:1; } D_001940D4;
 extern int spellmaker_open(int);
-extern void spellmaker_exit(void);
+extern void spellmaker_close(void);
 extern void spellmaker_settings_update(void);
 extern void spellmaker_effect_rows(void);
-extern short spells_list_poll(void);
+extern short list_popup_poll(void);
 extern int spell_cost(struct spell *, struct character *);
 extern void text_draw_centred(char *, int, int);
 extern void sound_play(int, struct record *, int);
-extern void text_draw_colored(char *, int, int, int, unsigned char);
-extern void func_0007EC8F(short, short, int, char *, char *);
+extern void text_draw_coloured(char *, int, int, int, unsigned char);
+extern void buttons_draw_hover_label(short, short, int, char *, char *);
 extern int gold_total_alias(void);
 extern void mc_memset(char *, int, int, char *, int, int);
 extern void mc_strncpy(char *, char *, int, char *, int);
-extern char *func_000A0DD9(int, char *, int);
+extern char *itoa(int, char *, int);
 extern void func_000A1054(char *, char *, char *, int, int);
 extern short spell_cost_formula_dispatch(int);
-extern void func_000CB552(int);
-extern void func_000CD20E(int, int, int);
-extern void func_000CE31C(char *, char *, int, int, int);
-extern void func_0012DB50(int);
+extern void xn_draw_fullscreen_overlay_shaded(int);
+extern void xn_draw_spell_icon(int, int, int);
+extern void xn_draw_copy_rect_stride_bytes(char *, char *, int, int, int);
+extern void xn_font_select(int);
 
 
 void spellmaker_update(void)
@@ -65,19 +65,19 @@ void spellmaker_update(void)
     short v;
 
     if (spellmaker_open(0) == 0) return;
-    func_000CB552(window_image);
-    func_0012DB50(4);
+    xn_draw_fullscreen_overlay_shaded(window_image);
+    xn_font_select(4);
     v = selected_spell->effect_costs[0] + selected_spell->effect_costs[1] + selected_spell->effect_costs[2];
     v = v * ((short *)spell_target_cost_factor)[selected_spell->target] >> 1;
-    text_draw_colored(func_000A0DD9(player_character->magicka, ((char *)text_buffer), 10), 43, 149, 145, 156);
-    text_draw_colored(func_000A0DD9(gold_total_alias(), ((char *)text_buffer), 10), 40, 158, 145, 156);
-    text_draw_colored(func_000A0DD9(v << 2, ((char *)text_buffer), 10), 59, 167, 145, 156);
-    text_draw_colored(func_000A0DD9(spell_cost(selected_spell, player_character), ((char *)text_buffer), 10), 70, 176, 145, 156);
-    text_draw_colored(selected_spell->name, 60, 185, 145, 156);
-    func_000CE31C(*(char **)&spellshop_icons + selected_spell->element * 640 + 24, *(char **)&screen_buffer + selected_spell->element * 5120 + 36779, 16, 16, 40);
-    func_000CE31C(*(char **)&spellshop_icons + selected_spell->target * 640, *(char **)&screen_buffer + selected_spell->target * 5120 + 36755, 24, 16, 40);
-    func_000CD20E(288, 94, selected_spell->icon);
-    func_0012DB50(1);
+    text_draw_coloured(itoa(player_character->magicka, ((char *)text_buffer), 10), 43, 149, 145, 156);
+    text_draw_coloured(itoa(gold_total_alias(), ((char *)text_buffer), 10), 40, 158, 145, 156);
+    text_draw_coloured(itoa(v << 2, ((char *)text_buffer), 10), 59, 167, 145, 156);
+    text_draw_coloured(itoa(spell_cost(selected_spell, player_character), ((char *)text_buffer), 10), 70, 176, 145, 156);
+    text_draw_coloured(selected_spell->name, 60, 185, 145, 156);
+    xn_draw_copy_rect_stride_bytes(*(char **)&magic_window_image + selected_spell->element * 640 + 24, *(char **)&screen_buffer + selected_spell->element * 5120 + 36779, 16, 16, 40);
+    xn_draw_copy_rect_stride_bytes(*(char **)&magic_window_image + selected_spell->target * 640, *(char **)&screen_buffer + selected_spell->target * 5120 + 36755, 24, 16, 40);
+    xn_draw_spell_icon(288, 94, selected_spell->icon);
+    xn_font_select(1);
     *((char *)&D_0012B508) = 146;
     for (i = 0; i < 3; i++) {
         if (selected_spell->effects[i].type == 255)
@@ -89,11 +89,11 @@ void spellmaker_update(void)
         }
         text_draw_centred(((char *)text_buffer), 160, (i << 5) + 30);
     }
-    func_0012DB50(4);
+    xn_font_select(4);
     if (!*spellmaker_settings_kind && !D_001940D4.f)
         spellmaker_effect_rows();
-    if (D_001940D4.f && (i = spells_list_poll()) > -1)
-        (*(void (**)(int))((char *)&list_popup_callback))((*(unsigned char **)D_00195C44)[i + 32000]);
+    if (D_001940D4.f && (i = list_popup_poll()) > -1)
+        (*(void (**)(int))((char *)&list_popup_callback))((*(unsigned char **)scratch_buffer)[i + 32000]);
     spellmaker_settings_update();
     if (D_0019962C > -1 && *((char *)&D_00196271)) {
         if (D_00196271 == 1) {
@@ -114,9 +114,9 @@ void spellmaker_update(void)
     if (D_0019962C > -1 && (unsigned char)game_mode != 8)
         D_0019962C = -1;
     if (!*spellmaker_settings_kind && !D_001940D4.f)
-        func_0007EC8F(5, 22, 18, spellmaker_buttons, D_001845D0);
+        buttons_draw_hover_label(5, 22, 18, spellmaker_buttons, D_001845D0);
     if (*((char *)&key_down_esc) && !*spellmaker_settings_kind)
-        spellmaker_exit();
+        spellmaker_close();
     if (!*((char *)&mouse_buttons) || *((char *)&mouse_buttons) && *((char *)&mouse_buttons_prev))
         return;
     if ((unsigned char)game_mode == 2 && !*spellmaker_settings_kind && !D_001940D4.f) {

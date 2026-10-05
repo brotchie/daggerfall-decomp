@@ -24,8 +24,8 @@ extern struct tmpl *magic_def;
 extern int enchant_item_value(struct item *);
 extern void item_make_random(unsigned short, struct item *);
 extern void item_make(unsigned char, unsigned char, struct item *);
-extern void func_0005E874(struct item *);
-extern int func_000602C0(int, unsigned short);
+extern void item_roll_material(struct item *);
+extern int armor_image_for_type(int, unsigned short);
 extern int rand_range(int, int);
 extern void mc_strncpy(void *, char *, int, char *, int);
 
@@ -88,10 +88,10 @@ void item_make_magic(struct item *a1, int a2)
     a1->condition = a1->max_condition = magic_def[i].f55;
     a1->material = magic_def[i].f61;
     if (a1->material == 0 && (a1->group == 2 || a1->group == 3))
-        func_0005E874(a1);
+        item_roll_material(a1);
     if (a1->group == 2) {
         a1->armor_type = 2;
-        r = func_000602C0(2, a1->index);
+        r = armor_image_for_type(2, a1->index);
         if (r != -1)
             a1->inventory_image = r + (a1->inventory_image & -128);
     }

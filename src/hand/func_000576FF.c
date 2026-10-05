@@ -2,13 +2,13 @@
 struct pair { unsigned char a, b; };
 struct row { struct pair p[5]; };
 struct cell { short v; short f2; };
-extern short D_00190D64;
+extern short scratch_190d64;
 extern int D_00190EE4[];
-extern char *D_00195C44;
+extern char *scratch_buffer;
 extern struct row D_00199868[];
 extern struct cell itemmaker_slots[];
 extern int itemmaker_param_excluded(short, short);
-extern void picklist_open(int *);
+extern void list_popup_open(int *);
 
 void itemmaker_show_param_list(int *a1, short a2)
 {
@@ -28,13 +28,13 @@ void itemmaker_show_param_list(int *a1, short a2)
                 || D_00199868[i].p[4].a == a2 && D_00199868[i].p[4].b == k)
                 goto next;
         }
-        sv = itemmaker_slots[D_00190D64].v;
-        itemmaker_slots[D_00190D64].v = 100;
+        sv = itemmaker_slots[scratch_190d64].v;
+        itemmaker_slots[scratch_190d64].v = 100;
         if (itemmaker_param_excluded(a2, k) != 0)
-            itemmaker_slots[D_00190D64].v = sv;
+            itemmaker_slots[scratch_190d64].v = sv;
         else {
-            itemmaker_slots[D_00190D64].v = sv;
-            D_00195C44[cnt + 64000] = c;
+            itemmaker_slots[scratch_190d64].v = sv;
+            scratch_buffer[cnt + 64000] = c;
             D_00190EE4[cnt] = *a1;
             cnt++;
         }
@@ -44,5 +44,5 @@ next:
         k++;
     }
     D_00190EE4[cnt] = 0;
-    picklist_open(D_00190EE4);
+    list_popup_open(D_00190EE4);
 }

@@ -6,7 +6,7 @@
 extern signed char D_001861AA[];
 extern int D_0018642F[];
 extern struct record *player_object;
-extern struct record *D_00195AC4;
+extern struct record *location_object;
 extern struct character *player_character;
 
 extern int item_add_to_container(struct record *, int, int, int);
@@ -17,9 +17,9 @@ extern int rand();
 extern void item_make_random(unsigned short, struct item *);
 extern void item_make(int, int, struct item *);
 extern void item_make_magic(struct item *, int);
-extern void func_000614FB(struct record *);
+extern void loot_add_potion(struct record *);
 
-void func_0005FA0E(int a1, struct record *a2, int a3, int a4)
+void loot_generate(int a1, struct record *a2, int a3, int a4)
 {
     int l_20;
     int l_1C;
@@ -35,7 +35,7 @@ void func_0005FA0E(int a1, struct record *a2, int a3, int a4)
         l_C->x = player_object->x;
         l_C->y = player_object->y;
         l_C->z = player_object->z;
-        l_C->id = object_new_id(((unsigned)D_00195AC4->id) >> 16);
+        l_C->id = object_new_id(((unsigned)location_object->id) >> 16);
         l_10 = &l_C->data.item;
         item_make(28, 0, l_10);
         l_10->value = a3 * rand_range((int)(unsigned short)*(short *)((char *)l_14), (int)(unsigned short)*(short *)((char *)l_14 + 2));
@@ -55,7 +55,7 @@ void func_0005FA0E(int a1, struct record *a2, int a3, int a4)
                 l_C->y = player_object->y;
                 l_C->z = player_object->z;
                 l_C->image2 = 998;
-                l_C->id = object_new_id(((unsigned)D_00195AC4->id) >> 16);
+                l_C->id = object_new_id(((unsigned)location_object->id) >> 16);
                 if (((int)(unsigned char)D_001861AA[l_20]) == 255) {
                     if (((int)(unsigned short)(player_character->flags & 1)) == 0) {
                         item_make_random(6, &l_C->data.item);
@@ -76,7 +76,7 @@ void func_0005FA0E(int a1, struct record *a2, int a3, int a4)
             }
         }
     }
-    if (rand_range(1, 100) < 3) func_000614FB(a2);
+    if (rand_range(1, 100) < 3) loot_add_potion(a2);
     if (rand_range(1, 100) >= 2) return;
     item_add_to_container(a2, 27, 4, 0);
 }

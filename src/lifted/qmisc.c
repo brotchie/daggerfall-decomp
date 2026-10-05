@@ -11,47 +11,47 @@ extern char D_00170A4F[];
 extern unsigned char player_environment;
 extern signed char item_group_tab[];
 extern signed char text_buffer[];
-extern signed char itemmaker_slot_kinds[];
-extern char D_00190D64[];
+extern signed char scratch_190ce4[];
+extern char scratch_190d64[];
 extern signed char D_001940D5;
 extern signed char quest_global_states[];
 extern struct record *inventory_containers[];
 extern struct record *D_001959DC;
-extern struct record *D_00195A00;
+extern struct record *quest_root;
 extern signed char quest_faces[];
-extern char D_00195A15[];
-extern char D_00195A16[];
-extern char D_00195A1A[];
+extern char quest_faces_quest[];
+extern char quest_faces_object[];
+extern char quest_faces_image[];
 extern struct record *camera_object;
 extern struct record *player_entity;
 extern struct record *player_object;
 extern struct record *D_00195AA8;
-extern struct record *D_00195AC4;
+extern struct record *location_object;
 extern struct spell *spell_records;
 extern int creature_count;
 extern struct record *inv_right_container;
 extern struct location *current_location;
 extern struct character *player_character;
 extern int game_minutes;
-extern int D_00195D04[];
+extern int quest_face_images[];
 extern int D_00195D14;
 extern char D_001960D9[];
 extern signed char current_region;
 extern signed char game_mode;
-extern signed char D_00196280;
+extern signed char is_daytime;
 extern signed char D_0019629E;
 extern signed char D_001962A8;
-extern int D_00196A28;
+extern int region_location_count;
 extern int loaded_location_door_count;
-extern struct map_location *D_00196A9C;
-extern struct record *D_00199768;
+extern struct map_location *region_locations;
+extern struct record *quest_reward_container;
 
 extern struct faction *faction_find(short);
 extern int tavern_open(int);
 extern int quest_arg_state(struct qbn_op *, int);
 extern void *quest_section(struct quest *, int);
 extern void *quest_record(struct quest *, int, int);
-extern int func_00045E45(int);
+extern int location_find_door(int);
 extern int flats_cfg_find(int);
 extern int hud_message_add(int);
 extern int rand_range(int, int);
@@ -63,11 +63,11 @@ extern struct record *object_find_by_id(struct record *, int);
 extern int object_new_id(int);
 extern int object_find_quest(struct record *, unsigned char);
 extern int strnicmp();
-extern int func_000A0ED9(int, int);
+extern int mc_set_location(int, int);
 extern int mc_sprintf(int, ...);
 extern int mc_memcpy();
 extern int func_000A148C(int, ...);
-extern int func_00144FB4();
+extern int xn_draw_image_transparent();
 extern void maploads_load_region(int);
 extern void tavern_close(void);
 extern void func_0002FE02(int);
@@ -84,10 +84,10 @@ extern void object_foreach(struct record *, int);
 extern void inv_store_item(struct record *);
 struct record *func_000310E1(struct record *, struct record *);
 void quest_give_item_to_player(struct record *);
-void func_00030DE1(int, int);
+void quest_face_replace_object_id(int, int);
 void quest_faces_remove_quest(unsigned char);
 void quest_op_done(struct quest *, struct qbn_op *);
-#pragma aux func_000A0ED9 parm routine [];
+#pragma aux mc_set_location parm routine [];
 
 void qaction_op04_give_reward(struct quest *a1, struct qbn_op *a2)
 {
@@ -107,9 +107,9 @@ void qaction_op04_give_reward(struct quest *a1, struct qbn_op *a2)
     if (tavern_open(0) != 0) tavern_close();
     quest_reward_faction(a1);
     if (((int)(unsigned char)game_mode) != 4) {
-        object_free_children((*(int *)&D_00199768 = (int)D_001960D9));
+        object_free_children((*(int *)&quest_reward_container = (int)D_001960D9));
     } else {
-        D_00199768 = inv_right_container;
+        quest_reward_container = inv_right_container;
     }
     for (l_18 = 1; l_18 < 5; l_18++) {
         if (a2->args[l_18].value != (-1)) {
@@ -124,12 +124,12 @@ void qaction_op04_give_reward(struct quest *a1, struct qbn_op *a2)
                         break;
                     }
                 }
-                object_reparent(D_00199768, l_20);
+                object_reparent(quest_reward_container, l_20);
                 l_20->x = player_object->x;
                 l_20->y = player_object->y;
                 l_20->z = player_object->z;
             } else {
-                func_000A0ED9(332, (int)D_00170A1A);
+                mc_set_location(332, (int)D_00170A1A);
                 mc_sprintf((int)text_buffer, (int)D_00170A22, (int)a1->name, l_1C->symbol);
                 hud_message_add((int)text_buffer);
             }
@@ -144,8 +144,8 @@ void func_0003077F(struct record *a1, int a2)
 
     if (a1 == 0) return;
     l_18 = a1->twin;
-    if (loaded_location_door_count != 0 && (a1->id & -65536) == (D_00195AC4->id & -65536)) {
-        l_14 = func_00045E45(a1->id);
+    if (loaded_location_door_count != 0 && (a1->id & -65536) == (location_object->id & -65536)) {
+        l_14 = location_find_door(a1->id);
         if (l_14 != 0) *(signed char *)((char *)l_14 + 3) &= 15;
     }
     object_delete(a1);
@@ -207,7 +207,7 @@ void qaction_op37_repute_exceeds(struct quest *a1, struct qbn_op *a2)
     l_1C->value = *(signed char *)&l_18;
 }
 
-void func_00030C10(void)
+void quest_faces_after_load(void)
 {
     int l_24;
     int l_20;
@@ -219,16 +219,16 @@ void func_00030C10(void)
         if (((int)(unsigned char)(quest_faces[l_24 * 10] & 16)) != 0) {
             l_18 = D_00195D14;
         } else {
-            l_18 = D_00195D04[(((int)(unsigned char)quest_faces[l_24 * 10]) >> 6)];
+            l_18 = quest_face_images[(((int)(unsigned char)quest_faces[l_24 * 10]) >> 6)];
         }
         l_20 = (int)(unsigned char)(quest_faces[l_24 * 10] & 15);
         while (l_1C < l_20) {
             l_18 = (((int)(unsigned short)*(short *)((char *)l_18 + 10)) + l_18) + 12;
             l_1C++;
         }
-        *(int *)(D_00195A1A + (l_24 * 10)) = l_18;
-        if (object_find_quest(D_00195A00->children, (int)(unsigned char)*(signed char *)(D_00195A15 + (l_24 * 10))) == 0) {
-            quest_faces_remove_quest((int)(unsigned char)*(signed char *)(D_00195A15 + (l_24 * 10)));
+        *(int *)(quest_faces_image + (l_24 * 10)) = l_18;
+        if (object_find_quest(quest_root->children, (int)(unsigned char)*(signed char *)(quest_faces_quest + (l_24 * 10))) == 0) {
+            quest_faces_remove_quest((int)(unsigned char)*(signed char *)(quest_faces_quest + (l_24 * 10)));
         }
     }
 }
@@ -243,9 +243,9 @@ void quest_faces_draw(void)
     l_20 = 0;
     l_1C = l_20;
     for (; l_20 < 10; l_20++) {
-        if (*(int *)(D_00195A16 + (l_20 * 10)) == 0) continue;
-        l_18 = *(int *)(D_00195A1A + (l_20 * 10));
-        func_00144FB4((l_1C << 5) + 8, 36, (int)(unsigned short)*(short *)((char *)l_18 + 4), (int)(unsigned short)*(short *)((char *)l_18 + 6), l_18 + 12);
+        if (*(int *)(quest_faces_object + (l_20 * 10)) == 0) continue;
+        l_18 = *(int *)(quest_faces_image + (l_20 * 10));
+        xn_draw_image_transparent((l_1C << 5) + 8, 36, (int)(unsigned short)*(short *)((char *)l_18 + 4), (int)(unsigned short)*(short *)((char *)l_18 + 6), l_18 + 12);
         l_1C++;
     }
 }
@@ -255,20 +255,20 @@ void quest_face_remove(int a1)
     int l_18;
 
     for (l_18 = 0; l_18 < 10; l_18++) {
-        if (*(int *)(D_00195A16 + (l_18 * 10)) == a1) {
-            *(int *)(D_00195A16 + (l_18 * 10)) = 0;
+        if (*(int *)(quest_faces_object + (l_18 * 10)) == a1) {
+            *(int *)(quest_faces_object + (l_18 * 10)) = 0;
             return;
         }
     }
 }
 
-void func_00030DE1(int a1, int a2)
+void quest_face_replace_object_id(int a1, int a2)
 {
     int l_14;
 
     for (l_14 = 0; l_14 < 10; l_14++) {
-        if (*(int *)(D_00195A16 + (l_14 * 10)) == a1) {
-            *(int *)(D_00195A16 + (l_14 * 10)) = a2;
+        if (*(int *)(quest_faces_object + (l_14 * 10)) == a1) {
+            *(int *)(quest_faces_object + (l_14 * 10)) = a2;
             return;
         }
     }
@@ -280,9 +280,9 @@ void quest_faces_remove_quest(unsigned char a1)
         int l_1C;
 
         for (l_1C = 0; l_1C < 10; l_1C++) {
-            if (*(int *)(D_00195A16 + (l_1C * 10)) == 0) continue;
-            if (*(unsigned char *)(D_00195A15 + (l_1C * 10)) == a1) {
-                *(int *)(D_00195A16 + (l_1C * 10)) = 0;
+            if (*(int *)(quest_faces_object + (l_1C * 10)) == 0) continue;
+            if (*(unsigned char *)(quest_faces_quest + (l_1C * 10)) == a1) {
+                *(int *)(quest_faces_object + (l_1C * 10)) = 0;
             }
         }
     }
@@ -308,7 +308,7 @@ int qcond_op57_item_used(struct quest *a1, struct qbn_op *a2)
     return 0;
 }
 
-void func_00030F39(void)
+void quest_items_release_on_close(void)
 {
     object_foreach(player_entity->children, (int)func_0002FE02);
 }
@@ -321,15 +321,15 @@ void func_00030F63(struct quest *a1, struct qbn_op *a2)
 
     l_1C = quest_record(a1, 7, (short)a2->args[1].value);
     l_18 = a2->args[1].object;
-    *(short *)D_00190D64 = l_18->image2;
+    *(short *)scratch_190d64 = l_18->image2;
     l_14 = quest_arg_state(a2, 2);
-    itemmaker_slot_kinds[0] = *(signed char *)&l_14;
+    scratch_190ce4[0] = *(signed char *)&l_14;
     if (l_14 != 0) {
         l_18->data.character.flags |= 0x8000;
     } else {
         l_18->data.character.flags &= ~0x8000;
     }
-    object_foreach(D_00195AC4, (int)func_0002FE4B);
+    object_foreach(location_object, (int)func_0002FE4B);
 }
 
 void qaction_op69_cast_spell_on_foe(struct quest *a1, struct qbn_op *a2)
@@ -340,16 +340,16 @@ void qaction_op69_cast_spell_on_foe(struct quest *a1, struct qbn_op *a2)
     struct record *l_14;
 
     l_1C = a2->args[1].object;
-    *(short *)D_00190D64 = l_1C->image2;
+    *(short *)scratch_190d64 = l_1C->image2;
     l_18 = 0;
     while (spell_records[l_18].name[0] == 0 || spell_records[l_18].id != a2->args[2].value) l_18++;
     l_14 = object_create_child(player_object->parent, 0, 89);
     D_00195AA8 = l_14;
     l_14->type = 9;
     l_14->caster = player_entity;
-    l_14->id = object_new_id(((unsigned)D_00195AC4->id) >> 16);
+    l_14->id = object_new_id(((unsigned)location_object->id) >> 16);
     mc_memcpy(&l_14->data.spell, &spell_records[l_18], 89, (int)D_00170A1A, 679, 4);
-    object_foreach(D_00195AC4, (int)quest_cast_spell_on_foe_cb);
+    object_foreach(location_object, (int)quest_cast_spell_on_foe_cb);
     object_delete(l_14);
 }
 
@@ -368,7 +368,7 @@ struct record *func_000310E1(struct record *a1, struct record *a2)
     if (a2 == 0) {
         if (a1->parent->type == 39) return 0;
         a2 = a1->parent;
-        a2 = object_find_by_id(D_00195AC4, a2->id);
+        a2 = object_find_by_id(location_object, a2->id);
         if (a2 == 0) return 0;
     }
     l_18 = a1->id;
@@ -385,10 +385,10 @@ struct record *func_000310E1(struct record *a1, struct record *a2)
         l_34->flags = a1->flags;
         l_34->image = a1->image;
         l_34->image2 = a1->image2;
-        a1->id = object_new_id(((unsigned)D_00195AC4->id) >> 16);
+        a1->id = object_new_id(((unsigned)location_object->id) >> 16);
         l_34->id = a1->id;
         l_34->quest_id = a1->quest_id;
-        func_00030DE1(l_18, a1->id);
+        quest_face_replace_object_id(l_18, a1->id);
         l_34->twin = a1;
         a1->twin = l_34;
         a1 = a1->children;
@@ -402,7 +402,7 @@ struct record *func_000310E1(struct record *a1, struct record *a2)
             l_30->flags = a1->flags;
             l_30->image = a1->image;
             l_30->image2 = a1->image2;
-            a1->id = object_new_id(((unsigned)D_00195AC4->id) >> 16);
+            a1->id = object_new_id(((unsigned)location_object->id) >> 16);
             l_30->id = a1->id;
             l_30->quest_id = a1->quest_id;
             l_30->twin = a1;
@@ -418,24 +418,24 @@ struct record *func_000310E1(struct record *a1, struct record *a2)
             l_34->x = a2->x;
             l_34->y = a2->y;
             l_34->z = a2->z;
-            a1->id = object_new_id(((unsigned)D_00195AC4->id) >> 16);
+            a1->id = object_new_id(((unsigned)location_object->id) >> 16);
             l_34->id = a1->id;
-            func_00030DE1(l_18, a1->id);
+            quest_face_replace_object_id(l_18, a1->id);
             break;
         case 8:
             l_34 = a2;
             l_34->data.person.flags |= 128;
             break;
         case 40:
-            a2 = object_find_by_id(D_00195AC4, a2->id);
+            a2 = object_find_by_id(location_object, a2->id);
             l_34 = object_create_child(a2->parent, 0, 3);
             l_34->type = 8;
             l_34->x = a2->x;
             l_34->y = a2->y;
             l_34->z = a2->z;
-            a1->id = object_new_id(((unsigned)D_00195AC4->id) >> 16);
+            a1->id = object_new_id(((unsigned)location_object->id) >> 16);
             l_34->id = a1->id;
-            func_00030DE1(l_18, a1->id);
+            quest_face_replace_object_id(l_18, a1->id);
             break;
         default:
             return 0;
@@ -447,7 +447,7 @@ struct record *func_000310E1(struct record *a1, struct record *a2)
             *(short *)((char *)l_2C) = a1->data.building.faction_id;
         }
         if (*(short *)((char *)l_2C) == 0) {
-            func_000A0ED9(819, (int)D_00170A1A);
+            mc_set_location(819, (int)D_00170A1A);
             func_000A148C((int)D_00170A4F, 819);
             *(short *)((char *)l_2C) = 510;
         }
@@ -467,7 +467,7 @@ struct record *func_000310E1(struct record *a1, struct record *a2)
         a1->twin = l_34;
         break;
     case 40:
-        l_34 = object_find_by_id(D_00195AC4, a1->id);
+        l_34 = object_find_by_id(location_object, a1->id);
         if (l_34 == 0) return 0;
         l_34->quest_id = a1->quest_id;
         l_34->twin = a1;
@@ -485,8 +485,8 @@ void func_00031658(struct quest *a1, struct qbn_op *a2, int a3)
         if (creature_count != 0) return;
         if (D_001962A8 != 0) return;
         if (game_mode != 0) return;
-        if (player_character->race == 8 && D_00196280 != 0) return;
-        if (player_character->race != 8 && D_00196280 == 0) return;
+        if (player_character->race == 8 && is_daytime != 0) return;
+        if (player_character->race != 8 && is_daytime == 0) return;
         if (((int)player_environment) != 1 || location_contains(player_object->x, player_object->z) == 0) {
             return;
         }
@@ -503,7 +503,7 @@ L3179A:;
     a2->last_minutes = game_minutes;
 }
 
-int func_000317AE(struct quest *a1)
+int quest_deliveries_done(struct quest *a1)
 {
     int l_20;
     struct qbn_op *l_1C;
@@ -532,8 +532,8 @@ void qaction_op83_teleport_pc(struct qbn_op *a1)
     l_1C = a1->args[2].value;
     l_20 = a1->args[3].value;
     maploads_load_region(l_1C);
-    l_2C = D_00196A9C;
-    for (l_24 = 0; l_24 < D_00196A28; l_24++, l_2C++) {
+    l_2C = region_locations;
+    for (l_24 = 0; l_24 < region_location_count; l_24++, l_2C++) {
         if ((l_2C->map_id & 1048575) == l_20) {
             maploads_load_region(l_18);
             map_goto_location(l_1C, 1, l_24, 0);

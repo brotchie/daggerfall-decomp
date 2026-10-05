@@ -20,10 +20,10 @@ extern unsigned char chargen_career_skill_bonus[];
 extern signed char text_buffer[];
 extern int D_00190BE8;
 extern unsigned char D_00190CEE[];
-extern short D_00190D64;
+extern short scratch_190d64;
 extern short chargen_selected_attribute;
 extern short D_00190DEA;
-extern short text_macro_fe;
+extern short scratch_190dec;
 extern short D_00190DEE;
 extern unsigned char D_001940D5;
 extern void *D_00195B5C;
@@ -31,7 +31,7 @@ extern void *D_00195B60;
 extern struct character *player_character;
 extern void *window_image;
 extern struct career *player_class;
-extern int D_00195C44;
+extern int scratch_buffer;
 extern void *chargen_face_images;
 extern void *chargen_reflex_image;
 extern unsigned char chargen_roll_saved;
@@ -49,8 +49,8 @@ extern void chargen_roll_attributes(void);
 extern void chargen_select_attribute(int);
 extern void mc_free(void *, char *, int);
 extern void mc_memcpy(void *, void *, int, char *, int, int);
-#pragma aux func_000A0ED9 parm routine [];
-extern void func_000A0ED9(int, char *);
+#pragma aux mc_set_location parm routine [];
+extern void mc_set_location(int, char *);
 extern int mc_sprintf(char *, char *, ...);
 
 int chargen_name_character(void)
@@ -68,8 +68,8 @@ int chargen_name_character(void)
         D_00190CEE[i] = player_character->skills[player_class->skills[i]].value += chargen_career_skill_bonus[i];
     }
     player_character->level = 1;
-    disk_read_file(D_00176F28, D_00195C44);
-    D_00190DEA = text_macro_fe = D_00190DEE = D_00190D64 = chargen_selected_attribute = 0;
+    disk_read_file(D_00176F28, scratch_buffer);
+    D_00190DEA = scratch_190dec = D_00190DEE = scratch_190d64 = chargen_selected_attribute = 0;
     D_00190BE8 = 0;
     player_character->name[0] = 0;
     D_0012B508 = 146;
@@ -83,7 +83,7 @@ int chargen_name_character(void)
         classmaker_input_text(player_character, 31, chargen_draw);
         FREE(window_image, 114);
     }
-    func_000A0ED9(117, D_00176F41);
+    mc_set_location(117, D_00176F41);
     mc_sprintf(((char *)text_buffer), D_00176F4C, player_character->flags & 1, player_character->race);
     chargen_face_images = disk_read_file(((char *)text_buffer), 0);
     chargen_screen = 2;
@@ -101,7 +101,7 @@ int chargen_name_character(void)
     chargen_screen = 8;
     window_image = disk_read_file(D_00176F82, 0);
     D_00195B60 = disk_read_file(D_00176F8F, 0);
-    D_00190DEA = text_macro_fe = D_00190DEE = 6;
+    D_00190DEA = scratch_190dec = D_00190DEE = 6;
     for (i = 0; i < 12; i++) {
         D_00190CEE[i] = player_character->skills[player_class->skills[i]].value;
     }
@@ -120,7 +120,7 @@ int chargen_name_character(void)
     D_001940D5 |= 32;
     msgbox_update();
     chargen_screen = 255;
-    func_000A0ED9(155, D_00176F41);
+    mc_set_location(155, D_00176F41);
     mc_sprintf(((char *)text_buffer), D_00176F4C, player_character->flags & 1, player_character->race);
     chargen_face_images = disk_read_file(((char *)text_buffer), 0);
     D_00195B60 = disk_read_file(D_00176F8F, 0);

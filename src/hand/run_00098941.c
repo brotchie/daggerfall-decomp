@@ -14,7 +14,7 @@ extern unsigned char player_environment;
 extern char *D_001832B4;
 extern char *D_001832BC;
 extern struct button transport_buttons[];
-extern signed char D_00190D16;
+extern signed char scratch_190d16;
 extern unsigned char player_motion_flags;
 extern unsigned char *inv_right_container;
 extern char *D_00195B5C;
@@ -35,11 +35,11 @@ extern int func_00098B20(void);
 extern void func_00098A15(void);
 extern void travel_find_transport(void);
 extern int mc_free(char *, char *, int);
-extern int func_000CDD81();
-extern int func_0012B136();
-extern int func_00144F68();
+extern int xn_gfx_present_inclusive();
+extern int xn_mouse_poll_clamped();
+extern int xn_draw_image();
 
-void func_00098538(void)
+void trade_mark_identified(void)
 {
     unsigned char *l_18;
 
@@ -50,7 +50,7 @@ void func_00098538(void)
     }
 }
 
-int func_00098573(void)
+int trade_can_identify_selected(void)
 {
     unsigned char *l_24;
     int l_20;
@@ -88,25 +88,25 @@ void transport_menu(void)
     }
     D_00195B5C = disk_read_file(D_001772E6, 0);
     D_00195B60 = disk_read_file(D_001772F3, 0);
-    D_00190D16 = 0;
+    scratch_190d16 = 0;
     travel_find_transport();
     if (func_00098B20() != 0) {
         l_18 = 24;
     } else {
-        if ((D_00190D16 & 2) && player_environment == 1)
+        if ((scratch_190d16 & 2) && player_environment == 1)
             l_18 |= 2;
-        if ((D_00190D16 & 1) && player_environment == 1)
+        if ((scratch_190d16 & 1) && player_environment == 1)
             l_18 |= 4;
         if (*(int *)(player_character + 120) != 0 && player_environment != 3)
             l_18 |= 8;
     }
     while (l_20 == 0) {
         mouse_buttons_prev = mouse_buttons;
-        func_0012B136();
-        func_00144F68(*(unsigned short *)D_00195B5C, *(unsigned short *)(D_00195B5C + 2), *(unsigned short *)(D_00195B5C + 4), *(unsigned short *)(D_00195B5C + 6), D_00195B5C + 12);
+        xn_mouse_poll_clamped();
+        xn_draw_image(*(unsigned short *)D_00195B5C, *(unsigned short *)(D_00195B5C + 2), *(unsigned short *)(D_00195B5C + 4), *(unsigned short *)(D_00195B5C + 6), D_00195B5C + 12);
         for (l_1C = 0; l_1C < 4; l_1C++) {
             if (((1 << l_1C) & l_18) == 0)
-                func_00144F68(transport_buttons[l_1C].x0, transport_buttons[l_1C].y0, *(unsigned short *)(D_00195B60 + 4), 9, D_00195B60 + 12 + l_1C * (*(unsigned short *)(D_00195B60 + 4) * 9));
+                xn_draw_image(transport_buttons[l_1C].x0, transport_buttons[l_1C].y0, *(unsigned short *)(D_00195B60 + 4), 9, D_00195B60 + 12 + l_1C * (*(unsigned short *)(D_00195B60 + 4) * 9));
         }
         cursor_draw_arrow();
         if (mouse_buttons != 0 && mouse_buttons_prev == 0) {
@@ -120,7 +120,7 @@ void transport_menu(void)
                 }
             }
         }
-        func_000CDD81(0);
+        xn_gfx_present_inclusive(0);
     }
     if (D_00195B5C != 0 && D_00195B5C != FREED) {
         mc_free(D_00195B5C, D_0017704C, 2870);
@@ -140,18 +140,18 @@ void transport_choose(int a1)
         player_horse_sounds_stop();
         break;
     case 1:
-        D_00190D16 = 0;
+        scratch_190d16 = 0;
         travel_find_transport();
-        if (D_00190D16 & 2) {
+        if (scratch_190d16 & 2) {
             player_character[65] |= 2;
             player_character[65] &= 251;
             player_motion_flags &= 251;
         }
         break;
     case 2:
-        D_00190D16 = 0;
+        scratch_190d16 = 0;
         travel_find_transport();
-        if (D_00190D16 & 1) {
+        if (scratch_190d16 & 1) {
             player_character[65] |= 4;
             player_character[65] &= 253;
             player_motion_flags &= 251;

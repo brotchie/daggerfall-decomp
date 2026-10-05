@@ -10,12 +10,12 @@ extern char monster_table[];
 extern signed char class_creature_types[];
 extern signed char text_buffer[];
 extern char D_00190704[];
-extern int D_00195AC8;
+extern int monster_bsa_handle;
 extern struct character *player_character;
 extern signed char D_00196293;
 extern int archive_find_record(int, int, int);
 extern int archive_read_record(int, int, int);
-extern void func_0005FA0E(int, struct record *, int, unsigned short);
+extern void loot_generate(int, struct record *, int, unsigned short);
 extern int monster_set_action(struct record *, int, int);
 extern int monster_alloc_anim_slot(void);
 extern int disk_read_file(int, int);
@@ -28,12 +28,12 @@ extern int rand();
 extern int mc_memset();
 extern int mc_strncpy();
 extern int mc_memcpy();
-extern int func_000C010F();
-extern int func_000CDC99();
-extern int func_00135D00();
-extern int func_00135E39();
-#pragma aux func_000A0ED9 parm routine [];
-extern int func_000A0ED9(int, int);
+extern int xn_anim_reset();
+extern int xn_tex_archive_set_translucent();
+extern int xn_tex_cache_lookup();
+extern int xn_tex_cache_flush();
+#pragma aux mc_set_location parm routine [];
+extern int mc_set_location(int, int);
 extern int mc_sprintf(int, ...);
 
 void monster_init(struct record *a1, int a2)
@@ -85,11 +85,11 @@ void monster_init(struct record *a1, int a2)
         } else {
             l_20 = 255;
         }
-        func_000A0ED9(73, (int)D_00176844);
+        mc_set_location(73, (int)D_00176844);
         mc_sprintf((int)text_buffer, (int)D_0017684E, a2 + l_20);
         l_3C->anim_slot = monster_alloc_anim_slot();
         l_3C->action = 0;
-        func_000C010F(l_34);
+        xn_anim_reset(l_34);
         if (l_18 != 0) {
             l_3C->ascr_record = 145;
         } else {
@@ -100,28 +100,28 @@ void monster_init(struct record *a1, int a2)
             }
             l_3C->ascr_record = *(signed char *)&l_48;
         }
-        func_000A0ED9(91, (int)D_00176844);
+        mc_set_location(91, (int)D_00176844);
         mc_sprintf((int)text_buffer, (int)D_0017685B, l_3C->ascr_record);
-        l_14 = archive_find_record(D_00195AC8, (int)text_buffer, 8);
-        *(int *)(D_00190704 + (l_3C->anim_slot << 2)) = (int)(l_34->anim_script = (char *)archive_read_record(D_00195AC8, l_14, 0));
+        l_14 = archive_find_record(monster_bsa_handle, (int)text_buffer, 8);
+        *(int *)(D_00190704 + (l_3C->anim_slot << 2)) = (int)(l_34->anim_script = (char *)archive_read_record(monster_bsa_handle, l_14, 0));
         l_34->anim_request = 0;
         do {
-            l_2C = func_00135D00(l_20 + a2, 5, 0);
-            if (l_2C == 0) func_00135E39();
+            l_2C = xn_tex_cache_lookup(l_20 + a2, 5, 0);
+            if (l_2C == 0) xn_tex_cache_flush();
         } while (l_2C == 0);
         l_34->frame_count = *(short *)(*(char **)((char *)l_2C + 12) + 22);
         l_3C->magicka = (l_3C->max_magicka = 0);
-        if (a2 == 23 || a2 == 18) func_000CDC99(l_20 + a2);
+        if (a2 == 23 || a2 == 18) xn_tex_archive_set_translucent(l_20 + a2);
         l_30 = ((int)monster_table) + (a2 * 29);
         if (a2 >= 43) {
-            func_000A0ED9(112, (int)D_00176844);
+            mc_set_location(112, (int)D_00176844);
             mc_sprintf((int)text_buffer, (int)D_00176868, l_1C);
             disk_read_file((int)text_buffer, (int)l_38);
         } else {
-            func_000A0ED9(117, (int)D_00176844);
+            mc_set_location(117, (int)D_00176844);
             mc_sprintf((int)text_buffer, (int)D_00176876, a2);
-            l_14 = archive_find_record(D_00195AC8, (int)text_buffer, 8);
-            archive_read_record(D_00195AC8, l_14, (int)l_38);
+            l_14 = archive_find_record(monster_bsa_handle, (int)text_buffer, 8);
+            archive_read_record(monster_bsa_handle, l_14, (int)l_38);
         }
         if (l_18 != 0) {
             l_3C->flags |= 0x2000;
@@ -166,7 +166,7 @@ void monster_init(struct record *a1, int a2)
         monster_maybe_give_map(a1, l_3C->mobile_id);
         a1->image = (l_20 + a2) << 7;
         if (*(signed char *)((char *)l_30 + 2) != 0) {
-            func_0005FA0E(((int)(unsigned char)*(signed char *)((char *)l_30 + 2)) - 1, a1, player_character->level, (int)(unsigned short)(player_character->flags & 1));
+            loot_generate(((int)(unsigned char)*(signed char *)((char *)l_30 + 2)) - 1, a1, player_character->level, (int)(unsigned short)(player_character->flags & 1));
         }
         l_3C->fall_velocity = 0;
         l_3C->faction_id = 0;

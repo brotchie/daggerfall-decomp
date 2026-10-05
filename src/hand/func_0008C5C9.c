@@ -1,21 +1,21 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0008C5C9 */
 extern unsigned char D_0012B508;
-extern short D_0012DA44;
+extern short font_height;
 extern short D_00142928;
 extern short D_0014292C;
 extern char D_00176E2C[];
 extern char D_00190B44[];
 extern int inpstr_result;
 extern int inpstr_text;
-extern short D_00195F36;
-extern short D_00195F38;
+extern short text_cursor_x;
+extern short text_cursor_y;
 extern short inpstr_cursor;
 extern void text_draw(int, unsigned short, unsigned short);
 extern unsigned char inpstr_read_key(void);
 extern int inpstr_handle_key(unsigned char);
 extern short inpstr_text_width(int, short);
 extern void mc_strncpy(int, char *, int, char *, int);
-extern void func_001531F0(int, int, int, int);
+extern void xn_draw_line(int, int, int, int);
 
 int inpstr_update(void)
 {
@@ -24,17 +24,17 @@ int inpstr_update(void)
     char y;
 
     D_0012B508 += 5;
-    D_00142928 = inpstr_text_width(inpstr_text, inpstr_cursor) + D_00195F36;
-    D_0014292C = D_00195F38;
+    D_00142928 = inpstr_text_width(inpstr_text, inpstr_cursor) + text_cursor_x;
+    D_0014292C = text_cursor_y;
     {
         int *clk;
 
         clk = (int *)0x46c;
         if (*clk & 4)
-            func_001531F0(D_00142928, D_0014292C, D_00142928, (short)(D_0014292C + D_0012DA44 - 1));
+            xn_draw_line(D_00142928, D_0014292C, D_00142928, (short)(D_0014292C + font_height - 1));
     }
     D_0012B508 -= 5;
-    text_draw(inpstr_text, D_00195F36, D_00195F38);
+    text_draw(inpstr_text, text_cursor_x, text_cursor_y);
     c = inpstr_read_key();
     if (c == 0)
         return 0;

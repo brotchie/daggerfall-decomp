@@ -16,7 +16,7 @@ extern char item_templates[];
 extern char potion_recipes[];
 extern char D_00180B42[];
 extern char monster_table_flags[];
-extern char D_00185F88[];
+extern char item_group_templates[];
 extern char D_00185FFC[];
 extern char D_0018606B[];
 extern int D_00186483[];
@@ -41,12 +41,12 @@ extern char D_001869C0[];
 extern char D_001869D4[];
 extern char D_001869EA[];
 extern char D_001869FE[];
-extern char D_00187966[];
+extern char monster_soul_values[];
 extern signed char D_00187CA8;
-extern char D_0018E044[];
+extern char book_list[];
 extern char D_0018E046[];
 extern signed char text_buffer[];
-extern struct record *D_00190504[];
+extern struct record *creature_list[];
 extern signed char D_001940D6;
 extern unsigned char D_001940D7;
 extern signed char D_001940DA;
@@ -55,12 +55,12 @@ extern struct record *ai_entities[];
 extern struct building *current_building;
 extern struct record *player_entity;
 extern struct record *player_object;
-extern int D_00195AB0;
-extern struct record *D_00195AC4;
+extern int frame_ticks;
+extern struct record *location_object;
 extern int creature_count;
 extern struct location *current_location;
 extern struct character *player_character;
-extern char D_00195C44[];
+extern char scratch_buffer[];
 extern int trespassing;
 extern int ai_los_index;
 extern char magic_def_count[];
@@ -72,16 +72,16 @@ extern short painting_subject_text;
 extern short painting_adjective_text;
 extern short painting_prefix1_text;
 extern short painting_prefix2_text;
-extern short D_00195F22;
+extern short book_count;
 extern struct record *D_0019615F;
-extern signed char D_001962AB;
+extern signed char forced_material;
 extern int D_00199D74;
 
 extern int collide_line_of_sight(struct record *, struct record *);
 extern int item_add_to_container(struct record *, int, int, int);
-extern int func_000602C0(int, unsigned short);
+extern int armor_image_for_type(int, unsigned short);
 extern int monster_set_action(struct record *, int, int);
-extern int func_000629F8(int);
+extern int ai_pick_ranged_spell(int);
 extern int ai_pick_touch_spell(int);
 extern int monster_cast_spell(struct record *, struct record *);
 extern int ai_angle_diff(int, int, int);
@@ -98,25 +98,25 @@ extern int object_new_id(int);
 extern struct record *location_cell_at(int, int);
 extern int rand();
 extern int srand();
-extern int func_0009DEA7();
+extern int close();
 extern int lseek();
 extern int mc_malloc();
-extern int func_000A00CB();
-extern int func_000A0ED9(int, int);
+extern int read();
+extern int mc_set_location(int, int);
 extern int mc_sprintf(int, ...);
 extern int mc_memcpy();
 extern int memchr();
 extern int filelength();
-extern int func_000C7FD9();
-extern int func_000C7FF4();
-extern int func_000C808D();
-extern int func_00144F68();
-extern void func_0002682B(struct record *);
+extern int xn_math_approx_dist2d();
+extern int xn_math_approx_hypot();
+extern int xn_math_angle_to_point();
+extern int xn_draw_image();
+extern void place_settle_creature(struct record *);
 extern void damage_knockback_move(struct record *, struct character *);
 extern void msgbox_show_rsc(int, int);
 extern void item_init_from_template(unsigned short, short, short, struct item *);
 extern void item_make_random(unsigned short, struct item *);
-extern void func_0005FA0E(int, struct record *, int, unsigned short);
+extern void loot_generate(int, struct record *, int, unsigned short);
 extern void item_make_magic(struct item *, int);
 extern void item_make_artifact(struct item *, int);
 extern void monster_shoot_arrow(struct record *, struct record *);
@@ -125,18 +125,18 @@ extern void ai_move_toward_target(struct record *, struct character *, struct re
 extern void monster_apply_gravity(void);
 extern void weapon_melee_strike(struct record *);
 extern void item_break(struct record *);
-int func_0005F6E9(int);
-int func_0005F955(int);
-int func_000614A9(void);
+int pick_random_byte(int);
+int book_pick_random(int);
+int potion_random_recipe(void);
 int ai_pick_target(struct record *, struct character *, int);
 int ai_turn_toward(struct record *, int);
 void item_make(int, int, struct item *);
-void func_0005ED19(struct item *);
-void func_0005F0E8(struct record *, int);
-void func_00061326(struct record *);
-void func_000614FB(struct record *);
+void item_roll_dye(struct item *);
+void shelf_stock_books(struct record *, int);
+void soul_trap_add_soul(struct record *);
+void loot_add_potion(struct record *);
 void ai_creature_think(struct character *, struct record *, struct record *, int);
-#pragma aux func_000A0ED9 parm routine [];
+#pragma aux mc_set_location parm routine [];
 
 void item_make(int a1, int a2, struct item *a3)
 {
@@ -151,11 +151,11 @@ case 11:
     item_init_from_template(287, 27, 8, a3);
     return;
 default:
-    item_init_from_template((int)(unsigned short)*(short *)((char *)(int)(*(char **)(D_00185F88 + (a1 << 2)) + (a2 * 2))), (int)(short)*(short *)&a1, (int)(short)*(short *)&a2, a3);
+    item_init_from_template((int)(unsigned short)*(short *)((char *)(int)(*(char **)(item_group_templates + (a1 << 2)) + (a2 * 2))), (int)(short)*(short *)&a1, (int)(short)*(short *)&a2, a3);
 }
 }
 
-void func_0005E5D7(struct item *a1, int a2)
+void item_set_race_image(struct item *a1, int a2)
 {
     if (a2 > 7) {
         a1->inventory_image += ((unsigned short)(unsigned char)D_00186589[player_character->original_race]) << 7;
@@ -191,12 +191,12 @@ void func_0005E636(struct item *a1)
         l_24 = rand_range(0, (int)&*(signed char *)((char *)(a1->variants) - 1));
         a1->inventory_image += l_24;
     }
-    func_0005ED19(a1);
+    item_roll_dye(a1);
     if (a1->index != l_1C) if (a1->index != (l_1C + 1)) return;
     a1->inventory_image++;
 }
 
-void func_0005E722(struct item *a1)
+void item_next_clothing_style(struct item *a1)
 {
     int l_20;
     int l_1C;
@@ -243,7 +243,7 @@ void func_0005E7FC(struct item *a1)
     }
 }
 
-void func_0005E874(struct item *a1)
+void item_roll_material(struct item *a1)
 {
     int l_28;
     int l_24;
@@ -274,9 +274,9 @@ void func_0005E874(struct item *a1)
     } else if (l_28 > 256) {
         l_28 = 256;
     }
-    if (D_001962AB != 0) {
-        a1->material = D_001962AB - 1;
-        D_001962AB = 0;
+    if (forced_material != 0) {
+        a1->material = forced_material - 1;
+        forced_material = 0;
     } else {
         while (((int)(unsigned char)D_00186591[a1->material]) < l_28) {
             l_28 -= (int)(unsigned char)D_00186591[a1->material];
@@ -290,7 +290,7 @@ void func_0005E874(struct item *a1)
     a1->color = a1->material + 16;
 }
 
-void func_0005EA8F(struct item *a1)
+void item_roll_armor_type(struct item *a1)
 {
     int l_24;
     int l_20;
@@ -298,10 +298,10 @@ void func_0005EA8F(struct item *a1)
     int l_18;
 
     l_24 = rand_range(1, 100);
-    if (l_24 < 70 && D_001962AB == 0) {
+    if (l_24 < 70 && forced_material == 0) {
         a1->armor_type = 0;
         a1->weight >>= 1;
-    } else if (l_24 < 90 && D_001962AB == 0) {
+    } else if (l_24 < 90 && forced_material == 0) {
         a1->armor_type = 1;
     } else {
         a1->armor_type = 2;
@@ -327,9 +327,9 @@ void func_0005EA8F(struct item *a1)
         } else if (l_1C > 256) {
             l_1C = 256;
         }
-        if (D_001962AB != 0) {
-            a1->material = D_001962AB - 1;
-            D_001962AB = 0;
+        if (forced_material != 0) {
+            a1->material = forced_material - 1;
+            forced_material = 0;
         } else {
             while (((int)(unsigned char)D_00186591[a1->material]) < l_1C) {
                 l_1C -= (int)(unsigned char)D_00186591[a1->material];
@@ -344,12 +344,12 @@ void func_0005EA8F(struct item *a1)
     } else {
         a1->value = a1->value * ((int)&*(signed char *)((char *)(a1->armor_type) + 1));
     }
-    l_20 = func_000602C0(a1->armor_type, a1->index);
+    l_20 = armor_image_for_type(a1->armor_type, a1->index);
     if (l_20 == (-1)) return;
     a1->inventory_image = l_20 + (a1->inventory_image & -128);
 }
 
-void func_0005ED19(struct item *a1)
+void item_roll_dye(struct item *a1)
 {
     int l_18;
 
@@ -368,7 +368,7 @@ void func_0005ED19(struct item *a1)
     a1->color = D_0018659B[rand() & 3];
 }
 
-void func_0005EE0C(struct record *a1, int a2, int a3)
+void shelf_stock_items(struct record *a1, int a2, int a3)
 {
     int l_30;
     int l_2C;
@@ -389,14 +389,14 @@ void func_0005EE0C(struct record *a1, int a2, int a3)
         if (((int)(unsigned char)*(signed char *)((char *)l_20)) == 12 && ((int)(unsigned short)(player_character->flags & 1)) == 0) {
             *(signed char *)((char *)l_20) = 6;
         }
-        l_1C = *(int *)(D_00185F88 + (((int)(unsigned char)*(signed char *)((char *)l_20)) << 2));
+        l_1C = *(int *)(item_group_templates + (((int)(unsigned char)*(signed char *)((char *)l_20)) << 2));
         if (l_1C != 0 && ((int)(unsigned char)*(signed char *)((char *)l_20)) != 8 && ((int)(unsigned char)*(signed char *)((char *)l_20)) != 1) {
             if (((struct bf8_1_1 *)&D_001940D7)->f != 0 && (((int)(unsigned char)*(signed char *)((char *)l_20)) == 4 || ((int)(unsigned char)*(signed char *)((char *)l_20)) == 5)) {
             } else {
                 l_28 = (int)(unsigned char)*(signed char *)((char *)l_20 + 1);
                 l_24 = 0;
                 if (((int)(unsigned char)*(signed char *)((char *)l_20)) == 7) {
-                    func_0005F0E8(a1, a3);
+                    shelf_stock_books(a1, a3);
                 } else {
                     while (((int)(short)*(short *)((char *)l_1C)) != (-1)) {
                         l_18 = ((int)item_templates) + (((int)(short)*(short *)((char *)l_1C)) * 48);
@@ -408,7 +408,7 @@ void func_0005EE0C(struct record *a1, int a2, int a3)
                             l_10->y = player_object->y;
                             l_10->z = player_object->z;
                             l_10->image2 = 998;
-                            l_10->id = object_new_id(((unsigned)D_00195AC4->id) >> 16);
+                            l_10->id = object_new_id(((unsigned)location_object->id) >> 16);
                             if (a2 >= 0) l_10->flags |= 32;
                             l_14 = &l_10->data.item;
                             item_make((int)(unsigned char)*(signed char *)((char *)l_20), l_24, l_14);
@@ -438,7 +438,7 @@ int func_0005F0A0(int a1)
     }
 }
 
-void func_0005F0E8(struct record *a1, int a2)
+void shelf_stock_books(struct record *a1, int a2)
 {
     int l_18;
     struct record *l_14;
@@ -452,13 +452,13 @@ void func_0005F0E8(struct record *a1, int a2)
         l_14->x = player_object->x;
         l_14->y = player_object->y;
         l_14->z = player_object->z;
-        l_14->id = object_new_id(((unsigned)D_00195AC4->id) >> 16);
+        l_14->id = object_new_id(((unsigned)location_object->id) >> 16);
         l_14->flags |= 32;
         item_make(7, a2, &l_14->data.item);
     }
 }
 
-void func_0005F1BD(struct record *a1, int a2, int a3, int a4)
+void shop_stock_magic(struct record *a1, int a2, int a3, int a4)
 {
     int l_14;
     struct record *l_10;
@@ -468,7 +468,7 @@ void func_0005F1BD(struct record *a1, int a2, int a3, int a4)
     for (l_14 = 0; ((current_building->quality >> 1) + 1) > l_14; l_14++) {
         l_10 = object_create_child(a1, 0, 107);
         l_10->type = 2;
-        l_10->id = object_new_id(((unsigned)D_00195AC4->id) >> 16);
+        l_10->id = object_new_id(((unsigned)location_object->id) >> 16);
         item_make_magic(&l_10->data.item, -1);
         l_10->x = player_object->x;
         l_10->y = player_object->y;
@@ -478,7 +478,7 @@ void func_0005F1BD(struct record *a1, int a2, int a3, int a4)
     }
     l_10 = object_create_child(a1, 0, 107);
     l_10->type = 2;
-    l_10->id = object_new_id(((unsigned)D_00195AC4->id) >> 16);
+    l_10->id = object_new_id(((unsigned)location_object->id) >> 16);
     l_10->x = player_object->x;
     l_10->y = player_object->y;
     l_10->z = player_object->z;
@@ -488,22 +488,22 @@ void func_0005F1BD(struct record *a1, int a2, int a3, int a4)
     for (l_14 = 0; ((current_building->quality >> 1) + 1) > l_14; l_14++) {
         l_10 = object_create_child(a1, 0, 107);
         l_10->type = 2;
-        l_10->id = object_new_id(((unsigned)D_00195AC4->id) >> 16);
+        l_10->id = object_new_id(((unsigned)location_object->id) >> 16);
         l_10->x = player_object->x;
         l_10->y = player_object->y;
         l_10->z = player_object->z;
         l_10->flags |= 32;
         item_make(27, 1, &l_10->data.item);
         if (rand_range(1, 100) < 25) {
-            func_00061326(l_10);
-            l_10->data.item.value = *(int *)(D_00187966 + (l_10->children->soul_creature << 2)) + 5000;
+            soul_trap_add_soul(l_10);
+            l_10->data.item.value = *(int *)(monster_soul_values + (l_10->children->soul_creature << 2)) + 5000;
         } else {
             l_10->data.item.value = 5000;
         }
     }
 }
 
-void func_0005F401(struct record *a1)
+void shop_stock_soul_traps(struct record *a1)
 {
     int l_20;
     struct record *l_1C;
@@ -512,38 +512,38 @@ void func_0005F401(struct record *a1)
     for (l_20 = 0; ((current_building->quality >> 1) + 1) > l_20; l_20++) {
         l_1C = object_create_child(a1, 0, 107);
         l_1C->type = 2;
-        l_1C->id = object_new_id(((unsigned)D_00195AC4->id) >> 16);
+        l_1C->id = object_new_id(((unsigned)location_object->id) >> 16);
         l_1C->x = player_object->x;
         l_1C->y = player_object->y;
         l_1C->z = player_object->z;
         l_1C->flags |= 32;
         item_make(27, 1, &l_1C->data.item);
         if (rand_range(1, 100) < 25) {
-            func_00061326(l_1C);
-            l_1C->data.item.value = *(int *)(D_00187966 + (l_1C->children->soul_creature << 2)) + 5000;
+            soul_trap_add_soul(l_1C);
+            l_1C->data.item.value = *(int *)(monster_soul_values + (l_1C->children->soul_creature << 2)) + 5000;
         } else {
             l_1C->data.item.value = 5000;
         }
     }
 }
 
-void func_0005F50B(void)
+void painting_draw(void)
 {
     int l_20;
     int l_1C;
     int l_18;
 
-    func_000A0ED9(625, (int)D_001758B8);
+    mc_set_location(625, (int)D_001758B8);
     mc_sprintf((int)text_buffer, (int)D_001758E2, (((int)(unsigned short)D_00195DC4) >> 3) + 97);
-    disk_read_file((int)text_buffer, *(int *)D_00195C44);
-    l_18 = *(int *)D_00195C44;
+    disk_read_file((int)text_buffer, *(int *)scratch_buffer);
+    l_18 = *(int *)scratch_buffer;
     l_20 = 0;
     l_1C = (int)(unsigned short)(D_00195DC4 & 7);
     while (l_20 < l_1C) {
         l_18 = (((int)(unsigned short)*(short *)((char *)l_18 + 10)) + l_18) + 12;
         l_20++;
     }
-    func_00144F68(160 - (((int)(unsigned short)*(short *)((char *)l_18 + 4)) >> 1), 50, (int)(unsigned short)*(short *)((char *)l_18 + 4), (int)(unsigned short)*(short *)((char *)l_18 + 6), l_18 + 12);
+    xn_draw_image(160 - (((int)(unsigned short)*(short *)((char *)l_18 + 4)) >> 1), 50, (int)(unsigned short)*(short *)((char *)l_18 + 4), (int)(unsigned short)*(short *)((char *)l_18 + 6), l_18 + 12);
 }
 
 void item_info_painting(struct item *a1)
@@ -555,18 +555,18 @@ void item_info_painting(struct item *a1)
     D_00195DC4 = rand(srand((int)(unsigned short)(short)a1->message)) % 180;
     l_1C = disk_open_data((int)D_001758EE);
     lseek(l_1C, ((int)(unsigned short)D_00195DC4) * 40, 0);
-    func_000A00CB(l_1C, *(int *)D_00195C44, 40);
-    func_0009DEA7(l_1C);
-    painting_subject_text = func_0005F6E9(*(int *)D_00195C44) + 6100;
-    painting_adjective_text = func_0005F6E9(*(int *)D_00195C44 + 10) + 6200;
-    painting_prefix1_text = func_0005F6E9((int)(*(char **)D_00195C44 + 20)) + 6300;
-    painting_prefix2_text = (short)func_0005F6E9((int)(*(char **)D_00195C44 + 30)) + 6400;
+    read(l_1C, *(int *)scratch_buffer, 40);
+    close(l_1C);
+    painting_subject_text = pick_random_byte(*(int *)scratch_buffer) + 6100;
+    painting_adjective_text = pick_random_byte(*(int *)scratch_buffer + 10) + 6200;
+    painting_prefix1_text = pick_random_byte((int)(*(char **)scratch_buffer + 20)) + 6300;
+    painting_prefix2_text = (short)pick_random_byte((int)(*(char **)scratch_buffer + 30)) + 6400;
     D_001940D6 |= 32;
     msgbox_show_rsc(250, 1);
     srand(l_18);
 }
 
-int func_0005F6E9(int a1)
+int pick_random_byte(int a1)
 {
     int l_1C;
 
@@ -582,20 +582,20 @@ void item_init_book(struct item *a1, int a2)
     int l_18;
     int l_14;
 
-    a1->message = *(short *)(D_0018E044 + (func_0005F955(a2) << 2));
-    l_1C = *(int *)D_00195C44;
-    func_000A0ED9(674, (int)D_001758B8);
+    a1->message = *(short *)(book_list + (book_pick_random(a2) << 2));
+    l_1C = *(int *)scratch_buffer;
+    mc_set_location(674, (int)D_001758B8);
     mc_sprintf((int)text_buffer, (int)D_001758F8, (int)(unsigned short)(short)a1->message);
     l_18 = disk_open_data((int)text_buffer);
-    func_000A00CB(l_18, l_1C, 234);
-    func_0009DEA7(l_18);
+    read(l_18, l_1C, 234);
+    close(l_18);
     l_14 = rand();
     srand(*(int *)((char *)l_1C));
     a1->value = rand_range(300, 800);
     srand(l_14);
 }
 
-int func_0005F955(int a1)
+int book_pick_random(int a1)
 {
     int l_24;
     int l_20;
@@ -603,7 +603,7 @@ int func_0005F955(int a1)
 
     l_24 = 0;
     l_20 = l_24;
-    for (; ((int)(unsigned short)D_00195F22) > l_24; l_24++) {
+    for (; ((int)(unsigned short)book_count) > l_24; l_24++) {
         if (((int)(unsigned short)*(short *)(D_0018E046 + (l_24 << 2))) <= a1) l_20++;
     }
     if (l_20 == 0) l_20 = 1;
@@ -616,7 +616,7 @@ int func_0005F955(int a1)
     return l_24 - 1;
 }
 
-int func_0005FD36(int a1)
+int equip_hiding_capacity(int a1)
 {
     int l_24;
     int l_20;
@@ -640,7 +640,7 @@ int func_0005FD36(int a1)
     return l_20;
 }
 
-void func_0005FE55(struct record *a1)
+void loot_fill_container(struct record *a1)
 {
     int l_20;
     int l_1C;
@@ -649,7 +649,7 @@ void func_0005FE55(struct record *a1)
     if (((int)player_environment) != 1) {
         l_20 = ((int)(unsigned char)D_001865F2[current_location->kind]) - 1;
         while (a1->children == 0) {
-            func_0005FA0E(l_20, a1, player_character->level, (int)(unsigned short)(player_character->flags & 1));
+            loot_generate(l_20, a1, player_character->level, (int)(unsigned short)(player_character->flags & 1));
         }
         if (l_20 < 9 || l_20 > 14) return;
         if (rand_range(1, 100) <= ((int)(unsigned char)D_00186610[l_20])) {
@@ -657,7 +657,7 @@ void func_0005FE55(struct record *a1)
             a1->type = 2;
             item_make(27, 8, &a1->data.item);
         }
-        if (rand_range(1, 100) < 4) func_000614FB(a1);
+        if (rand_range(1, 100) < 4) loot_add_potion(a1);
         if (rand_range(1, 100) < 2) item_add_to_container(a1, 27, 4, 0);
         return;
     }
@@ -668,11 +668,11 @@ void func_0005FE55(struct record *a1)
         l_20 = l_18->type;
     }
     while (a1->children == 0) {
-        func_0005FA0E(((int)(unsigned char)D_00186605[l_20]) - 1, a1, player_character->level, (int)(unsigned short)(player_character->flags & 1));
+        loot_generate(((int)(unsigned char)D_00186605[l_20]) - 1, a1, player_character->level, (int)(unsigned short)(player_character->flags & 1));
     }
 }
 
-void func_0005FFE5(struct record *a1, int a2, int a3)
+void loot_add_gold(struct record *a1, int a2, int a3)
 {
     struct record *l_14;
     struct item *l_10;
@@ -688,7 +688,7 @@ void func_0005FFE5(struct record *a1, int a2, int a3)
     l_10->value = rand_range(a2, a3) * player_character->level;
 }
 
-void func_0006007C(struct record *a1)
+void loot_add_ingredient(struct record *a1)
 {
     struct record *l_18;
 
@@ -700,7 +700,7 @@ void func_0006007C(struct record *a1)
     item_make_random((int)(unsigned short)((unsigned short)(unsigned char)D_0018661E[rand() % 8]), &l_18->data.item);
 }
 
-void func_00060100(struct record *a1)
+void loot_add_misc_item(struct record *a1)
 {
     struct record *l_18;
 
@@ -712,7 +712,7 @@ void func_00060100(struct record *a1)
     item_make_random((int)(unsigned short)((unsigned short)(unsigned char)D_00186626[rand() % 4]), &l_18->data.item);
 }
 
-void func_00060184(struct record *a1, int a2)
+void loot_add_item_of_group(struct record *a1, int a2)
 {
     struct record *l_14;
 
@@ -724,7 +724,7 @@ void func_00060184(struct record *a1, int a2)
     item_make_random((int)(unsigned short)*(short *)&a2, &l_14->data.item);
 }
 
-void func_000601ED(struct record *a1, int a2)
+void item_wear_from_hit(struct record *a1, int a2)
 {
     struct item *l_14;
 
@@ -756,10 +756,10 @@ void magic_def_load(void)
     int l_18;
 
     l_18 = disk_open_data((int)D_00175927);
-    func_000A00CB(l_18, (int)magic_def_count, 4);
+    read(l_18, (int)magic_def_count, 4);
     magic_def = mc_malloc(filelength(l_18) - 4, (int)D_001758B8, 1201);
-    func_000A00CB(l_18, magic_def, (int)&*(signed char *)((char *)filelength(l_18) - 4));
-    func_0009DEA7(l_18);
+    read(l_18, magic_def, (int)&*(signed char *)((char *)filelength(l_18) - 4));
+    close(l_18);
 }
 
 void shop_generate_stock(struct record *a1, int a2, int a3, int a4, int a5)
@@ -801,7 +801,7 @@ void shop_generate_stock(struct record *a1, int a2, int a3, int a4, int a5)
         l_C->y = player_object->y;
         l_C->z = player_object->z;
         l_C->owner = a5;
-        l_C->id = object_new_id(((unsigned)D_00195AC4->id) >> 16);
+        l_C->id = object_new_id(((unsigned)location_object->id) >> 16);
         if (((int)(unsigned char)*(signed char *)((char *)(l_20 + l_1C))) == 6 || ((int)(unsigned char)*(signed char *)((char *)(l_20 + l_1C))) == 12) {
             if (((int)(unsigned short)(player_character->flags & 1)) == 0) {
                 item_make_random(6, &l_C->data.item);
@@ -837,20 +837,20 @@ int func_000612A1(void)
     return l_1C;
 }
 
-void func_00061326(struct record *a1)
+void soul_trap_add_soul(struct record *a1)
 {
     struct record *l_1C;
     int l_18;
 
     l_18 = rand_range(0, 42);
-    while (*(int *)(D_00187966 + (l_18 << 2)) == 0) l_18 = rand_range(0, 42);
+    while (*(int *)(monster_soul_values + (l_18 << 2)) == 0) l_18 = rand_range(0, 42);
     l_1C = object_create_child(a1, 0, 0);
     l_1C->flags = 3;
     l_1C->type = 20;
     l_1C->soul_creature = l_18;
 }
 
-void func_00061398(struct record *a1)
+void shop_stock_potions(struct record *a1)
 {
     int l_24;
     int l_20;
@@ -858,7 +858,7 @@ void func_00061398(struct record *a1)
     struct item *l_18;
 
     for (l_24 = 0; (current_building->quality + 1) > l_24; l_24++) {
-        l_20 = func_000614A9();
+        l_20 = potion_random_recipe();
         l_1C = object_create_child(a1, 0, 107);
         l_18 = &l_1C->data.item;
         l_1C->type = 2;
@@ -875,7 +875,7 @@ void func_00061398(struct record *a1)
     }
 }
 
-int func_000614A9(void)
+int potion_random_recipe(void)
 {
     int l_20;
     int l_1C;
@@ -886,14 +886,14 @@ int func_000614A9(void)
     return rand_range(0, l_1C - 1);
 }
 
-void func_000614FB(struct record *a1)
+void loot_add_potion(struct record *a1)
 {
     int l_24;
     int l_20;
     struct record *l_1C;
     struct item *l_18;
 
-    l_20 = func_000614A9();
+    l_20 = potion_random_recipe();
     l_1C = object_create_child(a1, 0, 107);
     l_18 = &l_1C->data.item;
     l_1C->type = 2;
@@ -919,7 +919,7 @@ void ai_creature_think(struct character *a1, struct record *a2, struct record *a
     struct monster_anim *l_10;
     struct record *l_C;
 
-    a1->attack_timer -= D_00195AB0;
+    a1->attack_timer -= frame_ticks;
     if (((unsigned)a1->attack_timer) > 100000) a1->attack_timer = 0;
     if (((int)player_environment) == 3) {
         l_C = location_cell_at(a2->x, a2->z);
@@ -934,7 +934,7 @@ void ai_creature_think(struct character *a1, struct record *a2, struct record *a
         monster_set_action(a2, 0, 57);
         return;
     }
-    l_20 = func_000C808D(a2->x, a2->z, a3->x, a3->z);
+    l_20 = xn_math_angle_to_point(a2->x, a2->z, a3->x, a3->z);
     if ((a1->conditions & 0x1) != 0) {
         monster_set_action(a2, l_20, 48);
         return;
@@ -952,7 +952,7 @@ void ai_creature_think(struct character *a1, struct record *a2, struct record *a
         }
     }
     l_1C = ai_angle_diff(a2->yaw, l_20, (int)&l_18);
-    l_24 = func_000C7FF4(a2->y - a3->y, func_000C7FD9(a2->x, a2->z, a3->x, a3->z));
+    l_24 = xn_math_approx_hypot(a2->y - a3->y, xn_math_approx_dist2d(a2->x, a2->z, a3->x, a3->z));
     if (a2->wait_state != 0 && trespassing == 0) {
         monster_set_action(a2, l_20, 48);
         return;
@@ -984,7 +984,7 @@ void ai_creature_think(struct character *a1, struct record *a2, struct record *a
                     monster_set_action(a2, l_20, 48);
                 }
                 if (a1->give_up_timer != 0) a1->give_up_timer--;
-            } else if (l_24 > 256 && a1->magicka != 0 && func_000629F8(a4) != 0) {
+            } else if (l_24 > 256 && a1->magicka != 0 && ai_pick_ranged_spell(a4) != 0) {
                 if (l_1C >= 128) {
                     ai_turn_toward(a2, l_20);
                     monster_set_action(a2, l_20, 0);
@@ -1051,7 +1051,7 @@ int ai_pick_target(struct record *a1, struct character *a2, int a3)
         if (collide_line_of_sight(a1, ai_entities[l_24]) != 0) {
             ai_characters[l_24]->target_score += 20;
         }
-        l_14 = func_000C7FF4(a1->y - ai_entities[l_24]->y, func_000C7FD9(a1->x, a1->z, ai_entities[l_24]->x, ai_entities[l_24]->z));
+        l_14 = xn_math_approx_hypot(a1->y - ai_entities[l_24]->y, xn_math_approx_dist2d(a1->x, a1->z, ai_entities[l_24]->x, ai_entities[l_24]->z));
         l_14 = l_14 / 128;
         l_14 = 30 - l_14;
         if (l_14 < 0) l_14 = 0;
@@ -1077,16 +1077,16 @@ void ai_update_creatures(void)
     l_20 = -1;
     if (D_00187CA8 == 0) return;
     if (creature_count == 0) return;
-    if (creature_count == 1 && ((int)(unsigned short)(D_00190504[0]->data.character.flags & 2)) != 0) {
-        object_delete(D_00190504[0]);
+    if (creature_count == 1 && ((int)(unsigned short)(creature_list[0]->data.character.flags & 2)) != 0) {
+        object_delete(creature_list[0]);
         return;
     }
     player_entity->yaw = player_object->yaw;
     player_entity->angle_x = player_object->angle_x;
-    D_00190504[creature_count++] = player_entity;
+    creature_list[creature_count++] = player_entity;
     for (l_28 = 0; l_28 < creature_count; l_28++) {
-        if ((creature_count - 1) != l_28) func_0002682B(D_00190504[l_28]);
-        ai_entities[l_28] = (struct record *)((int)D_00190504[l_28]);
+        if ((creature_count - 1) != l_28) place_settle_creature(creature_list[l_28]);
+        ai_entities[l_28] = (struct record *)((int)creature_list[l_28]);
         ai_characters[l_28] = (struct character *)((int)((char *)ai_entities[l_28] + 71));
     }
     for (l_28 = 0; (creature_count - 1) > l_28; l_28++) {
@@ -1116,7 +1116,7 @@ void ai_update_creatures(void)
             l_1C = (int)ai_entities[l_28] + 705;
             if (((int)(unsigned short)(*(short *)((char *)l_1C + 16) & 1)) != 0) {
                 *(signed char *)((char *)l_1C + 16) &= 254;
-                weapon_melee_strike(D_00190504[l_28]);
+                weapon_melee_strike(creature_list[l_28]);
             }
         }
     }

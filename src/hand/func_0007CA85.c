@@ -3,7 +3,7 @@ extern unsigned char text_shadow_colour;
 extern unsigned char D_0012B508;
 extern void text_draw_centred_shadow(char *, short, short);
 
-void text_draw_centered_colored(char *a1, short a2, short a3, short a4, int a5)
+void text_draw_centred_coloured(char *a1, short a2, short a3, short a4, int a5)
 {
     short l_10;
     short l_C;

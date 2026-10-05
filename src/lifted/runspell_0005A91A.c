@@ -5,7 +5,7 @@
 
 extern char D_001757F4[];
 extern struct record *player_object;
-extern struct record *D_00195AC4;
+extern struct record *location_object;
 extern struct spell *spell_records;
 extern struct character *player_character;
 
@@ -25,7 +25,7 @@ int cast_item_used_spell(int a1)
     l_1C = object_create_child(player_object->parent, 0, 89);
     while (spell_records[l_20].name[0] == 0 || spell_records[l_20].id != a1) l_20++;
     l_1C->type = 9;
-    l_1C->id = object_new_id(((unsigned)D_00195AC4->id) >> 16);
+    l_1C->id = object_new_id(((unsigned)location_object->id) >> 16);
     mc_memcpy(&l_1C->data.spell, &spell_records[l_20], 89, (int)D_001757F4, 103, 4);
     l_20 = spell_cost(&l_1C->data.spell, player_character);
     if (cast_player_spell(l_1C) != 0) object_delete(l_1C);

@@ -1,7 +1,7 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0002E2CF */
 #include "records.h"
 
-extern int D_001959FC;
+extern int spell_points_bonus;
 extern int D_00195A08;
 extern int D_00195A0C;
 extern int D_00195A78;
@@ -10,7 +10,7 @@ extern struct character *player_character;
 extern int game_minutes;
 extern char D_00196291;
 extern char D_00196292;
-extern int func_0002E8AE(struct character *, int);
+extern int damage_heal(struct character *, int);
 extern int cast_item_strike_spell(short, struct record *);
 extern int cast_creature_spell(struct record *, struct record *, int);
 extern void item_damage(struct record *, int);
@@ -42,7 +42,7 @@ void damage_weapon_strike_effects(struct item *a1, struct record *a2, struct rec
             D_00196291 = 0;
             D_00196292 = 0;
         } else if (a1->enchantments[i].type == 6 && a1->enchantments[i].param == 1) {
-            item_damage(D_00195AA8, func_0002E8AE(m2, a4 / 2) / 4 + 1);
+            item_damage(D_00195AA8, damage_heal(m2, a4 / 2) / 4 + 1);
         } else if (a1->enchantments[i].type == 26 && a1->enchantments[i].param == 2) {
             item_damage(D_00195AA8, 2);
             i = rand_range(1, 6);
@@ -50,10 +50,10 @@ void damage_weapon_strike_effects(struct item *a1, struct record *a2, struct rec
                 m3->magicka -= i;
                 if (m3->magicka < 0)
                     m3->magicka = 0;
-                D_001959FC += i;
-                i = D_001959FC + player_character->magicka;
+                spell_points_bonus += i;
+                i = spell_points_bonus + player_character->magicka;
                 if (player_character->max_magicka < i)
-                    D_001959FC = player_character->max_magicka - player_character->magicka;
+                    spell_points_bonus = player_character->max_magicka - player_character->magicka;
                 if (D_00195A0C == 0)
                     D_00195A0C = game_minutes + 12;
             } else if (m3->attributes[ATTR_STR] > 10) {

@@ -13,6 +13,6 @@ int macro_bn_biography_name(void)
     return l2;
 }
 
-int macro_fae_player_ally_npc_enemy(void) { return text_macro_fae + 3; }
+int macro_fae_player_ally_npc_enemy(void) { return scratch_190df4 + 3; }
 
 int macro_pnq_blank(void) { return text_blank; }

@@ -11,10 +11,10 @@ extern struct quest *current_quest;
 extern int text_qrc_load(int, short, short, short);
 extern int mc_free();
 extern int mc_strncpy();
-extern int func_000A0ED9(int, int);
+extern int mc_set_location(int, int);
 extern int mc_sprintf(int, ...);
 extern int mc_memcpy();
-#pragma aux func_000A0ED9 parm routine [];
+#pragma aux mc_set_location parm routine [];
 
 void quest_load_text(struct quest *a1, int a2, short a3, int a4)
 {
@@ -23,7 +23,7 @@ void quest_load_text(struct quest *a1, int a2, short a3, int a4)
 
     current_quest = a1;
     if (a1->text_file != 0) {
-        func_000A0ED9(2016, (int)D_0017110C);
+        mc_set_location(2016, (int)D_0017110C);
         mc_sprintf((int)l_2C, (int)D_001711A4, a1->text_file);
     } else {
         mc_memcpy((int)l_2C, a1->name, 8, (int)D_0017110C, 2018, 13);

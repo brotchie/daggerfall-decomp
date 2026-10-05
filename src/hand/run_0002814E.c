@@ -24,16 +24,16 @@ extern char D_0017A103[];
 extern int D_0018507F;
 extern signed char text_buffer[];
 extern signed char D_00190CE5;
-extern char text_macro_fpc[];
+extern char scratch_190de4[];
 extern struct record *player_object;
-extern struct record *D_00195AC4;
+extern struct record *location_object;
 extern struct location *current_location;
 extern int game_minutes;
-extern char D_00195C44[];
+extern char scratch_buffer[];
 extern signed char D_00196272;
 extern signed char mouse_buttons_prev;
-extern int D_00196D88;
-extern int D_00196D8C;
+extern int town_map_view_x;
+extern int town_map_view_y;
 extern int D_00196D90;
 extern int D_00196D94;
 extern int D_00196D98;
@@ -45,37 +45,37 @@ extern int automap_move_back(int);
 extern int automap_move_left(int);
 extern int automap_move_right(int);
 extern void town_map_draw(void);
-extern int func_000281AF(void);
+extern int town_notes_size(void);
 extern int sound_play(int, struct record *, int);
 extern int disk_read_file(int, int);
 extern int disk_write_arena2_file(int, int, int);
 extern int disk_open_rw(int);
 extern int hud_message_add(int);
 extern int location_contains(int, int);
-extern int func_0009DEA7();
+extern int close();
 extern int mc_free();
 extern int mc_memset();
 extern int lseek();
-extern int func_000A00CB();
+extern int read();
 extern int write();
-extern int func_000CDD81();
-extern int func_0012B136();
-extern int func_0012B2D3();
-extern int func_0012B2EB();
-extern int func_0012B3ED();
-extern int func_00144F68();
-extern int func_000A0ED9(int, int);
+extern int xn_gfx_present_inclusive();
+extern int xn_mouse_poll_clamped();
+extern int xn_mouse_cursor_move();
+extern int xn_mouse_cursor_erase();
+extern int xn_mouse_cursor_draw();
+extern int xn_draw_image();
+extern int mc_set_location(int, int);
 extern int mc_sprintf(int, ...);
-extern void func_000286F6(void);
+extern void town_map_draw_notes(void);
 extern int mc_memcpy();
 extern void func_000A134C(short, short, int);
-#pragma aux func_000A0ED9 parm routine [];
+#pragma aux mc_set_location parm routine [];
 
 struct kb { unsigned char _:3; unsigned char f:1; };
 #define SCR (*(unsigned char **)&screen_buffer)
 #define MAP (*(unsigned char **)&D_00196DA4)
-#define VX (D_00196D88)
-#define VY (D_00196D8C)
+#define VX (town_map_view_x)
+#define VY (town_map_view_y)
 
 void town_map_open(void)
 {
@@ -97,30 +97,30 @@ void town_map_open(void)
     D_00196D98 = (D_00196D90 = 0);
     D_00196D94 = 0;
     D_00190CE5 = 0;
-    mc_memset(*(int *)D_00195C44, 0, 50000, (int)D_001707AE, 624, 4);
-    func_000A0ED9(625, (int)D_001707AE);
-    mc_sprintf((int)text_buffer, (int)D_001707B8, D_00195AC4->id >> 16);
+    mc_memset(*(int *)scratch_buffer, 0, 50000, (int)D_001707AE, 624, 4);
+    mc_set_location(625, (int)D_001707AE);
+    mc_sprintf((int)text_buffer, (int)D_001707B8, location_object->id >> 16);
     l_18 = disk_open_rw((int)text_buffer);
     if (l_18 != (-1)) {
-        func_000A00CB(l_18, *(int *)D_00195C44, 50000);
-        *(int *)(*(char **)D_00195C44) = game_minutes;
+        read(l_18, *(int *)scratch_buffer, 50000);
+        *(int *)(*(char **)scratch_buffer) = game_minutes;
         lseek(l_18, 0, 0);
-        write(l_18, *(int *)D_00195C44, 4);
-        func_0009DEA7(l_18);
+        write(l_18, *(int *)scratch_buffer, 4);
+        close(l_18);
     }
     mouse_buttons = (mouse_buttons_prev = 0);
     l_1C = (int)(unsigned char)D_00196272;
     D_00196272 = 1;
-    *(int *)text_macro_fpc = disk_read_file((int)D_00170794, 0);
+    *(int *)scratch_190de4 = disk_read_file((int)D_00170794, 0);
     *(int *)D_00196D9C = disk_read_file((int)D_001707C3, 0);
     while (l_24 == 0) {
-        func_0012B2EB();
+        xn_mouse_cursor_erase();
         town_map_draw();
-        func_00144F68((int)(unsigned short)*(short *)(*(char **)D_00196D9C), (int)(unsigned short)*(short *)(*(char **)D_00196D9C + 2), (int)(unsigned short)*(short *)(*(char **)D_00196D9C + 4), (int)(unsigned short)*(short *)(*(char **)D_00196D9C + 6), *(int *)D_00196D9C + 12);
-        func_0012B3ED();
+        xn_draw_image((int)(unsigned short)*(short *)(*(char **)D_00196D9C), (int)(unsigned short)*(short *)(*(char **)D_00196D9C + 2), (int)(unsigned short)*(short *)(*(char **)D_00196D9C + 4), (int)(unsigned short)*(short *)(*(char **)D_00196D9C + 6), *(int *)D_00196D9C + 12);
+        xn_mouse_cursor_draw();
         mouse_buttons_prev = mouse_buttons;
-        func_0012B136();
-        func_0012B2D3((int)(short)mouse_x, (int)(short)mouse_y);
+        xn_mouse_poll_clamped();
+        xn_mouse_cursor_move((int)(short)mouse_x, (int)(short)mouse_y);
         if (key_down_left != 0) {
             automap_move_left(2);
         } else if (key_down_right != 0) {
@@ -142,12 +142,12 @@ void town_map_open(void)
             }
         }
         screenshot_poll();
-        func_000CDD81(1);
+        xn_gfx_present_inclusive(1);
     }
     while (key_down_esc != 0);
-    if (*(int *)text_macro_fpc != 0 && *(int *)text_macro_fpc != (-1751672937)) {
-        mc_free(*(int *)text_macro_fpc, (int)D_001707AE, 679);
-        *(int *)text_macro_fpc = -1751672937;
+    if (*(int *)scratch_190de4 != 0 && *(int *)scratch_190de4 != (-1751672937)) {
+        mc_free(*(int *)scratch_190de4, (int)D_001707AE, 679);
+        *(int *)scratch_190de4 = -1751672937;
     }
     if (*(int *)D_00196D9C != 0 && *(int *)D_00196D9C != (-1751672937)) {
         mc_free(*(int *)D_00196D9C, (int)D_001707AE, 680);
@@ -155,9 +155,9 @@ void town_map_open(void)
     }
     D_00196272 = *(signed char *)&l_1C;
     if (D_00190CE5 == 0) return;
-    func_000A0ED9(686, (int)D_001707AE);
-    mc_sprintf((int)text_buffer, (int)D_001707B8, D_00195AC4->id >> 16);
-    disk_write_arena2_file((int)text_buffer, *(int *)D_00195C44, func_000281AF());
+    mc_set_location(686, (int)D_001707AE);
+    mc_sprintf((int)text_buffer, (int)D_001707B8, location_object->id >> 16);
+    disk_write_arena2_file((int)text_buffer, *(int *)scratch_buffer, town_notes_size());
 }
 
 void town_map_draw(void)
@@ -174,9 +174,9 @@ void town_map_draw(void)
     int l_20;
     int l_1C;
 
-    mc_memcpy(screen_buffer, *(int *)text_macro_fpc, 64000, D_001707AE, 695, 4);
-    l_30 = player_object->x - D_00195AC4->x;
-    l_2C = player_object->z - D_00195AC4->z;
+    mc_memcpy(screen_buffer, *(int *)scratch_190de4, 64000, D_001707AE, 695, 4);
+    l_30 = player_object->x - location_object->x;
+    l_2C = player_object->z - location_object->z;
     l_30 >>= 6;
     l_2C >>= 6;
     l_2C = (current_location->height << 6) - l_2C - 1;
@@ -222,7 +222,7 @@ void town_map_draw(void)
         }
         l_38++;
     }
-    func_000286F6();
+    town_map_draw_notes();
     if ((*(struct kb *)0x46c).f == 0) return;
     l_28 = (l_30 - VX) * 2 + 10;
     l_24 = (l_2C - VY) * 2 + 10;

@@ -1,12 +1,12 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x00081096 */
 #include "records.h"
 
-extern int D_000C5400;
+extern int xn_snow_turn_shift;
 extern int D_001940D4;
 extern int D_001940DA;
 extern int player_motion_flags;
 extern int view_look_pitch;
-extern int D_001959BC;
+extern int view_look_yaw;
 extern struct record *camera_object;
 extern struct record *player_object;
 extern struct character *player_character;
@@ -39,9 +39,9 @@ void player_mouse_look(void)
                 player_object->angle_x += dx;
                 player_object->yaw += dy;
                 if (dy > 2)
-                    D_000C5400 = -8;
+                    xn_snow_turn_shift = -8;
                 else if (dy < -2)
-                    D_000C5400 = 8;
+                    xn_snow_turn_shift = 8;
                 if (player_object->angle_x < -256)
                     player_object->angle_x = -256;
                 else if (player_object->angle_x > 256)
@@ -54,14 +54,14 @@ void player_mouse_look(void)
         dy = mouse_motion_x;
         dx = mouse_motion_y;
         view_look_pitch += dx;
-        D_001959BC += dy;
+        view_look_yaw += dy;
         if (view_look_pitch < -256)
             view_look_pitch = -256;
         else if (view_look_pitch > 256)
             view_look_pitch = 256;
-        if (D_001959BC < -512)
-            D_001959BC = -512;
-        else if (D_001959BC > 512)
-            D_001959BC = 512;
+        if (view_look_yaw < -512)
+            view_look_yaw = -512;
+        else if (view_look_yaw > 512)
+            view_look_yaw = 512;
     }
 }

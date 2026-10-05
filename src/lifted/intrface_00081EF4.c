@@ -7,11 +7,11 @@ struct bf8_0_1 { unsigned char f:1; };
 extern signed char mouse_buttons;
 extern short mouse_x;
 extern short mouse_y;
-extern int D_001788CF;
+extern int steer_turn_speed_max;
 extern short player_speed;
 extern struct character *player_character;
 extern signed char mouse_control_mode;
-extern short D_00195F4E;
+extern short player_base_speed;
 extern signed char D_0019628E;
 extern int D_001A5AE8;
 extern char turn_this_frame[];
@@ -25,7 +25,7 @@ extern short steer_weight_left;
 extern short steer_weight_up;
 extern short steer_key_region;
 
-extern int func_000CAE00();
+extern int xn_input_steer_dispatch();
 
 void intrface_steer(int a1, int a2, int a3, int a4)
 {
@@ -35,22 +35,22 @@ void intrface_steer(int a1, int a2, int a3, int a4)
 
         if (((int)(unsigned char)(mouse_buttons & 1)) != 0 || ((int)(short)steer_key_region) != (-1)) {
             if (((int)(short)steer_key_region) == (-1)) {
-                D_001A5AFC = D_001788CF;
+                D_001A5AFC = steer_turn_speed_max;
                 steer_weight_right = ((((int)(short)mouse_x) - a3) << 8) / ((int)(short)steer_region_width);
                 steer_weight_down = ((((int)(short)mouse_y) - a4) << 8) / ((int)(short)steer_region_height);
                 steer_weight_left = ((((int)(short)steer_region_width) - (((int)(short)mouse_x) - a3)) << 8) / ((int)(short)steer_region_width);
                 steer_weight_up = ((((int)(short)steer_region_height) - (((int)(short)mouse_y) - a4)) << 8) / ((int)(short)steer_region_height);
             } else {
                 l_C = 1132;
-                if ((D_001A5AFC = *(int *)((char *)l_C) - D_001A5AE8) > D_001788CF) {
-                    D_001A5AFC = D_001788CF;
+                if ((D_001A5AFC = *(int *)((char *)l_C) - D_001A5AE8) > steer_turn_speed_max) {
+                    D_001A5AFC = steer_turn_speed_max;
                 }
             }
         }
         move_angle_offset = 0;
-        player_speed = D_00195F4E;
+        player_speed = player_base_speed;
         if ((player_character->conditions & 0x1) == 0 && ((((int)(unsigned char)mouse_control_mode) != 1 && ((int)(unsigned char)(mouse_buttons & 1)) != 0) || ((int)(short)steer_key_region) != (-1))) {
-            func_000CAE00(a2);
+            xn_input_steer_dispatch(a2);
         } else {
             player_speed = 0;
             *(int *)turn_this_frame = 0;

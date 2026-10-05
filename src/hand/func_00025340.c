@@ -5,14 +5,14 @@ extern char D_00170738[];        /* __FILE__ */
 extern char D_00170765[];
 extern signed char text_buffer[];
 extern struct career *player_class;
-extern struct career *D_00195C44;     /* scratch_buffer: the 18 classes CLASS00-17.CFG */
+extern struct career *scratch_buffer;     /* scratch_buffer: the 18 classes CLASS00-17.CFG */
 extern int career_slot_weight(int);
 extern int disk_read_file(char *, struct career *);
-extern int func_0009DEAC(int);
+extern int abs(int);
 extern void mc_memset(void *, int, int, char *, int, int);
 extern char *memchr(char *, int, int);
-#pragma aux func_000A0ED9 parm routine [];
-extern void func_000A0ED9(int, char *);
+#pragma aux mc_set_location parm routine [];
+extern void mc_set_location(int, char *);
 extern int mc_sprintf(char *, char *, ...);
 
 int career_nearest_class(void)
@@ -24,10 +24,10 @@ int career_nearest_class(void)
     int i;
     int s;
 
-    base = D_00195C44;
+    base = scratch_buffer;
     mc_memset(sc, 0, 72, D_00170738, 397, 72);
     for (i = 0; i < 18; i++) {
-        func_000A0ED9(401, D_00170738);
+        mc_set_location(401, D_00170738);
         mc_sprintf(((char *)text_buffer), D_00170765, i);
         disk_read_file(((char *)text_buffer), &base[i]);
     }
@@ -39,7 +39,7 @@ int career_nearest_class(void)
                 if (career_slot_weight(k) == s)
                     sc[j] += s;
                 else
-                    sc[j] += 3 - func_0009DEAC(career_slot_weight(k) - s);
+                    sc[j] += 3 - abs(career_slot_weight(k) - s);
             }
         }
     }

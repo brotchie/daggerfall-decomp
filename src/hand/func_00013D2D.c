@@ -3,20 +3,20 @@ struct bits8 {
     unsigned char b0:1, b1:1, b2:1, b3:1, b4:1, b5:1, b6:1, b7:1;
 };
 extern char D_001702CC[];        /* __FILE__ */
-extern char *D_00178E54;
+extern char *marquee_owned_text;
 extern struct bits8 D_001940DA;
-extern int D_00196470;
-extern char *D_00196474;
+extern int marquee_x;
+extern char *marquee_text;
 extern void mc_free(void *, char *, int);
 
-void func_00013D2D(char *a1)
+void marquee_start(char *a1)
 {
-    if (D_00178E54 != 0 && D_00178E54 != (char *)0x97979797) {
-        mc_free(D_00178E54, D_001702CC, 52);
-        D_00178E54 = (char *)0x97979797;
+    if (marquee_owned_text != 0 && marquee_owned_text != (char *)0x97979797) {
+        mc_free(marquee_owned_text, D_001702CC, 52);
+        marquee_owned_text = (char *)0x97979797;
     }
-    D_00178E54 = D_001940DA.b3 ? a1 : 0;
-    D_00196474 = a1;
-    D_00196470 = 320;
+    marquee_owned_text = D_001940DA.b3 ? a1 : 0;
+    marquee_text = a1;
+    marquee_x = 320;
     D_001940DA.b3 = 0;
 }

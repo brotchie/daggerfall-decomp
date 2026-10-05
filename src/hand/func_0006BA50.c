@@ -23,11 +23,11 @@ extern void parse_expand(char *, char *);
 extern void bank_draw_preview(int, void *);
 extern void bank_draw_house_list(void);
 extern void bank_draw_ship_list(void);
-extern void text_draw_colored(char *, short, short, int, unsigned char);
+extern void text_draw_coloured(char *, short, short, int, unsigned char);
 extern int gold_total(void);
-extern char *func_000A0DD9(int, char *, int);
+extern char *itoa(int, char *, int);
 extern void mc_memcpy(char *, char *, int, char *, int, int);
-extern int func_00144F68();
+extern int xn_draw_image();
 
 void bank_draw(void)
 {
@@ -36,27 +36,27 @@ void bank_draw(void)
 
     img = window_image;
     mc_memcpy(screen_buffer, bank_saved_screen, 64000, D_00175CC4, 216, 4);
-    func_00144F68(img->x, img->y, img->w, img->h, img->data);
+    xn_draw_image(img->x, img->y, img->w, img->h, img->data);
     switch (bank_screen) {
     case 0:
-        text_draw_colored(func_000A0DD9(bank_account->balance, ((char *)text_rsc_buffer), 10), 197, 19, 145, 156);
-        text_draw_colored(func_000A0DD9(gold_total(), ((char *)text_rsc_buffer), 10), 203, 29, 145, 156);
+        text_draw_coloured(itoa(bank_account->balance, ((char *)text_rsc_buffer), 10), 197, 19, 145, 156);
+        text_draw_coloured(itoa(gold_total(), ((char *)text_rsc_buffer), 10), 203, 29, 145, 156);
         if (bank_account->loan_due != 0) {
-            text_draw_colored(func_000A0DD9(bank_account->loan_owed, ((char *)text_rsc_buffer), 10), 143, 39, 145, 156);
+            text_draw_coloured(itoa(bank_account->loan_owed, ((char *)text_rsc_buffer), 10), 143, 39, 145, 156);
             saved = game_minutes;
             game_minutes = bank_account->loan_due;
             parse_expand(D_00175CCB, D_00190B44);
-            text_draw_colored(D_00190B44, 119, 49, 145, 156);
+            text_draw_coloured(D_00190B44, 119, 49, 145, 156);
             game_minutes = saved;
         }
         break;
     case 1:
-        func_00144F68(D_00195B5C->x, D_00195B5C->y, D_00195B5C->w, D_00195B5C->h, D_00195B5C->data);
+        xn_draw_image(D_00195B5C->x, D_00195B5C->y, D_00195B5C->w, D_00195B5C->h, D_00195B5C->data);
         bank_draw_house_list();
         bank_draw_preview(bank_houses_for_sale[bank_selected].e->f0, (void *)bank_houses_for_sale[bank_selected].e->f5);
         break;
     case 2:
-        func_00144F68(D_00195B5C->x, D_00195B5C->y, D_00195B5C->w, D_00195B5C->h, D_00195B5C->data);
+        xn_draw_image(D_00195B5C->x, D_00195B5C->y, D_00195B5C->w, D_00195B5C->h, D_00195B5C->data);
         bank_draw_ship_list();
         bank_draw_preview(1, &bank_ships_for_sale[bank_selected]);
         break;

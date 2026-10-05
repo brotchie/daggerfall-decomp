@@ -26,7 +26,7 @@ extern int D_00184872;
 extern signed char text_buffer[];
 extern char D_00190B44[];
 extern signed char text_rsc_buffer[];
-extern struct record *D_00195AC4;
+extern struct record *location_object;
 extern struct character *player_character;
 extern signed char current_region;
 extern int namegen_part_offsets[];
@@ -41,26 +41,26 @@ extern struct record *quest_find_site_for_building(struct building *);
 extern int disk_open_data(int);
 extern int guild_find_membership_by_kind(unsigned char);
 extern int rand_range(int, int);
-extern int func_0008B43B(unsigned char, unsigned char, int);
+extern int name_generate_seeded(unsigned char, unsigned char, int);
 extern int name_generate_surname(unsigned char, unsigned char);
 extern int inpstr_edit(int, short, short, short, short, short);
 extern int rand();
 extern int srand();
-extern int func_0009DEA7();
+extern int close();
 extern int lseek();
-extern int func_000A00CB();
+extern int read();
 extern int mc_strncpy();
-extern int func_000A0ED9(int, int);
+extern int mc_set_location(int, int);
 extern int mc_sprintf(int, ...);
 extern int func_000A1054();
 extern int strchr();
-extern int func_00142790();
+extern int xn_kbd_flush();
 extern void parse_expand(int, int);
 extern void parse_rsc_text(int, int, int);
 extern void namegen_read_part(short, int);
 int name_generate_first(unsigned char, unsigned char);
 int str_list_random(int);
-#pragma aux func_000A0ED9 parm routine [];
+#pragma aux mc_set_location parm routine [];
 
 int name_generate(unsigned char a1, unsigned char a2)
 {
@@ -69,14 +69,14 @@ int name_generate(unsigned char a1, unsigned char a2)
     *(signed char *)namegen_name = 0;
     namegen_file = disk_open_data((int)D_00176D8C);
     lseek((int)(short)namegen_file, ((int)(unsigned char)a1) * 48, 0);
-    func_000A00CB((int)(short)namegen_file, (int)namegen_part_offsets, 48);
+    read((int)(short)namegen_file, (int)namegen_part_offsets, 48);
     mc_strncpy((int)namegen_name, name_generate_first((int)(unsigned char)a1, (int)(unsigned char)a2), 40, (int)D_00176D98, 90);
     l_20 = name_generate_surname((int)(unsigned char)a1, (int)(unsigned char)a2);
     if (*(signed char *)((char *)l_20) != 0) {
         func_000A1054((int)namegen_name, (int)D_00176DA0, (int)D_00176D98, 96, 40);
         func_000A1054((int)namegen_name, l_20, (int)D_00176D98, 97, 40);
     }
-    func_0009DEA7((int)(short)namegen_file);
+    close((int)(short)namegen_file);
     return (int)namegen_name;
 }
 
@@ -206,19 +206,19 @@ int building_name(struct building *a1)
     case 10:
     case 12:
     case 13:
-        func_000A0ED9(308, (int)D_00176D98);
+        mc_set_location(308, (int)D_00176D98);
         mc_sprintf((int)text_buffer, (int)D_00176DB0, str_list_random((int)shop_name_first_words), str_list_random(*(int *)(shop_name_last_words + (a1->type << 2))));
         parse_expand((int)text_buffer, (int)text_rsc_buffer);
         break;
     case 1:
-        if (((D_00195AC4->id & -65536) + a1->id) == player_character->house) {
+        if (((location_object->id & -65536) + a1->id) == player_character->house) {
             mc_strncpy((int)text_rsc_buffer, (int)D_00176DB6, 2048, (int)D_00176D98, 313);
         } else {
             mc_strncpy((int)text_rsc_buffer, (int)D_00176DC2, 2048, (int)D_00176D98, 315);
         }
         break;
     case 3:
-        func_000A0ED9(318, (int)D_00176D98);
+        mc_set_location(318, (int)D_00176D98);
         mc_sprintf((int)text_rsc_buffer, (int)D_00176DD1, *(int *)(region_names + (((int)(unsigned char)current_region) << 2)));
         break;
     case 11:
@@ -236,11 +236,11 @@ int building_name(struct building *a1)
         }
         break;
     case 15:
-        func_000A0ED9(341, (int)D_00176D98);
+        mc_set_location(341, (int)D_00176D98);
         mc_sprintf((int)text_rsc_buffer, (int)D_00176DB0, str_list_random((int)tavern_name_first_words), str_list_random((int)tavern_name_last_words));
         break;
     case 16:
-        func_000A0ED9(344, (int)D_00176D98);
+        mc_set_location(344, (int)D_00176D98);
         mc_sprintf((int)text_rsc_buffer, (int)D_00176DE0);
         break;
     case 23:
@@ -255,13 +255,13 @@ int building_name(struct building *a1)
             l_1C = quest_find_site_for_building(a1);
             if (l_1C != 0) {
                 if (l_1C != 0 && (l_1C->type == 41 || l_1C->type == 8)) {
-                    l_24 = func_0008B43B((int)(unsigned char)D_001841E3[(int)(unsigned char)current_region], (int)(unsigned char)((signed char)l_1C->flags & 4), l_1C->name_seed);
+                    l_24 = name_generate_seeded((int)(unsigned char)D_001841E3[(int)(unsigned char)current_region], (int)(unsigned char)((signed char)l_1C->flags & 4), l_1C->name_seed);
                 } else {
-                    l_24 = func_0008B43B((int)(unsigned char)D_001841E3[(int)(unsigned char)current_region], 0, (((unsigned)a1->id) >> 16) ^ a1->id);
+                    l_24 = name_generate_seeded((int)(unsigned char)D_001841E3[(int)(unsigned char)current_region], 0, (((unsigned)a1->id) >> 16) ^ a1->id);
                 }
                 l_20 = strchr(l_24, 32);
                 if (l_20 != 0) l_24 = l_20 + 1;
-                func_000A0ED9(363, (int)D_00176D98);
+                mc_set_location(363, (int)D_00176D98);
                 mc_sprintf((int)text_rsc_buffer, (int)D_00176E18, l_24);
             } else {
                 mc_strncpy((int)text_rsc_buffer, (int)D_00176DA6, 2048, (int)D_00176D98, 366);
@@ -282,9 +282,9 @@ int str_list_random(int a1)
     return *(int *)((char *)((l_1C << 2) + a1));
 }
 
-void func_0008C286(int a1, short a2, int a3, short a4, short a5, short a6)
+void input_edit_number_box(int a1, short a2, int a3, short a4, short a5, short a6)
 {
-    func_00142790();
+    xn_kbd_flush();
     input_digits_only = 1;
     inpstr_edit(a1, (int)(short)a2, (int)(short)*(short *)&a3, (int)(short)a4, (int)(short)a5, (int)(short)a6);
     input_digits_only = 0;

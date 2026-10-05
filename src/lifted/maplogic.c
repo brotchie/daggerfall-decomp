@@ -9,11 +9,11 @@ struct bf8_0_1 { unsigned char f:1; };
 struct bf8_1_5 { unsigned char _:1; unsigned char f:5; };
 struct bf8_6_1 { unsigned char _:6; unsigned char f:1; };
 struct bf8_7_1 { unsigned char _:7; unsigned char f:1; };
-extern int D_000C2893[];
-extern char *D_000C28C0;
-extern char *D_000C28C4;
+extern int xn_world_slot_cells[];
+extern char *xn_world_flat_layer;
+extern char *xn_world_tile_layer;
 extern int dungeon_water_level;
-extern int D_00136911;
+extern int xn_light_ambient;
 extern char D_00176C94[];
 extern char D_00176C9F[];
 extern char D_00176CAA[];
@@ -40,44 +40,44 @@ extern int D_001950E8;
 extern struct building *current_building;
 extern struct record *player_entity;
 extern struct record *player_object;
-extern struct record *D_00195AC4;
+extern struct record *location_object;
 extern char cheat_flags[];
-extern struct record *D_00195AF4;
+extern struct record *found_object;
 extern char clothing_gender_group[];
 extern struct location *current_location;
 extern struct character *player_character;
 extern struct career *player_class;
 extern int game_minutes;
-extern char D_00195C44[];
+extern char scratch_buffer[];
 extern char D_00195C88[];
 extern struct record *D_00195CB8;
 extern int D_00195CF4;
 extern int D_00195D84;
 extern char D_00195F28[];
 extern short D_00195F5E;
-extern char D_00195FB1[];
+extern char saved_player_object[];
 extern char D_00196120[];
 extern signed char current_region;
 extern unsigned char interaction_mode;
 extern signed char current_climate;
 extern signed char crime_current;
-extern signed char D_00196280;
-extern signed char D_00196289;
+extern signed char is_daytime;
+extern signed char world_loading;
 extern signed char D_0019628C;
 extern signed char D_001962A3;
 extern char dungeon_blocks[];
 extern signed char D_001967A1;
-extern int D_00196A28;
+extern int region_location_count;
 extern char rmb_block[];
 extern struct map_location *location_here;
 extern struct loaded_location loaded_location;
 extern struct record *loaded_location_object;
 extern struct location *loaded_location_data;
-extern struct map_location *D_00196A9C;
+extern struct map_location *region_locations;
 extern int blocks_bsa;
 extern signed char dungeon_block_count;
 extern int D_00196DA4;
-extern signed char D_001970C4;
+extern signed char monsters_woken;
 extern int D_001A41DC;
 extern int D_001A41E4;
 extern struct membership *guild_membership;
@@ -85,7 +85,7 @@ extern signed char D_001A4A1D;
 extern int stocked_shop_count;
 extern int D_001A4C94;
 extern int D_001A94C0;
-extern int D_001A94C4;
+extern int terrain_cell_at_player;
 extern int climate_index;
 extern int D_001A99F4;
 
@@ -95,7 +95,7 @@ extern int region_update_from_player(void);
 extern int climate_update_at_player(void);
 extern int damage_apply(struct record *, int, int);
 extern int quest_find_site_for_building(struct building *);
-extern int func_00041347(void);
+extern int people_check_witnesses(void);
 extern int building_is_open(struct building *);
 extern int building_minutes_to_close(struct building *);
 extern int disk_read_file(int, int);
@@ -113,10 +113,10 @@ extern int rand();
 extern int mc_free();
 extern int mc_memset();
 extern int mc_memcpy();
-extern int func_000C2D81();
+extern int xn_world_cell_at();
 extern int func_000C810C();
-extern int func_000CD33A();
-extern int func_00135E39();
+extern int xn_pal_set_range_8bit();
+extern int xn_tex_cache_flush();
 extern void archive_close(int);
 extern void lock_show_difficulty(int);
 extern void dungeon_choose_textures(void);
@@ -136,17 +136,17 @@ extern void dungeon_load_rdb_block(int);
 extern void msgbox_show_rsc(int, int);
 extern void guards_summon(int);
 extern void people_clear(void);
-extern void func_000461E9(void);
-extern void func_0004B5CF(void);
+extern void kludge_fix_dungeon_door(void);
+extern void building_update_open_state(void);
 extern void func_0004C759(void);
-extern void func_0004CA9D(void);
+extern void quest_mark_givers(void);
 extern void fatal_error(int);
 extern void item_make(int, int, struct item *);
 extern void links_resolve(void);
 extern void sound_stop_ambient(void);
 extern void position_history_reset(void);
 extern void building_grant_access(struct building *, unsigned char, int);
-extern void func_0007E5C2(void);
+extern void dungeon_grid_build(void);
 extern void town_load(int);
 extern void location_unload(unsigned short);
 extern void terrain_update_cells(void);
@@ -154,28 +154,28 @@ extern void climate_set_textures(void);
 extern void spell_end(struct record *);
 extern void spfx_effect_tick(int, int, int);
 extern void object_free_children(struct record *);
-extern void func_0008EAF1(int, int);
+extern void object_delete_block(int, int);
 extern void inv_store_item(struct record *);
 extern void inv_merge_arrows(struct record *, struct record *, int);
 extern void shop_quality_message(struct building *);
-extern void func_00099D0D(struct record *);
+extern void building_disable_monster_markers(struct record *);
 struct map_location *region_find_location(int);
 int building_try_enter(struct building *);
 void location_free(struct loaded_location *);
-void func_000871FA(struct building *);
+void building_load_interior(struct building *);
 void location_set_discovered(int, int);
-void func_0008824A(int, int);
+void location_set_hidden(int, int);
 
 void region_unload(void)
 {
     automap_save();
-    location_unload(D_00195AC4->image);
-    if ((int)D_00196A9C != 0 && (int)D_00196A9C != (-1751672937)) {
-        mc_free((int)D_00196A9C, (int)D_00176C94, 64);
-        D_00196A9C = (struct map_location *)-1751672937;
+    location_unload(location_object->image);
+    if ((int)region_locations != 0 && (int)region_locations != (-1751672937)) {
+        mc_free((int)region_locations, (int)D_00176C94, 64);
+        region_locations = (struct map_location *)-1751672937;
     }
-    D_00196A9C = 0;
-    D_00196A28 = 0;
+    region_locations = 0;
+    region_location_count = 0;
     location_here = 0;
 }
 
@@ -212,11 +212,11 @@ struct map_location *region_find_location(int a1)
     int l_1C;
 
     l_24 = 0;
-    l_20 = D_00196A28;
+    l_20 = region_location_count;
     l_1C = (l_20 + l_24) >> 1;
     while (l_20 > l_24) {
         l_1C = (l_20 + l_24) >> 1;
-        l_28 = (struct map_location *)((char *)D_00196A9C + (l_1C * 17));
+        l_28 = (struct map_location *)((char *)region_locations + (l_1C * 17));
         if ((l_28->map_id & 1048575) == a1) return l_28;
         if ((l_28->map_id & 1048575) > a1) {
             l_20 = l_1C - 1;
@@ -224,8 +224,8 @@ struct map_location *region_find_location(int a1)
             l_24 = l_1C + 1;
         }
     }
-    if ((D_00196A9C[l_24].map_id & 1048575) == a1) {
-        return (struct map_location *)((char *)D_00196A9C + (l_24 * 17));
+    if ((region_locations[l_24].map_id & 1048575) == a1) {
+        return (struct map_location *)((char *)region_locations + (l_24 * 17));
     }
     return 0;
 }
@@ -237,14 +237,14 @@ void world_update_location(void)
 
     if (((int)player_environment) > 2) return;
     terrain_update_cells();
-    l_18 = func_000C2D81(player_object->x, player_object->z);
-    if (l_18 != D_001A94C4) {
-        D_001A94C4 = l_18;
-        location_unload(D_00195AC4->image);
+    l_18 = xn_world_cell_at(player_object->x, player_object->z);
+    if (l_18 != terrain_cell_at_player) {
+        terrain_cell_at_player = l_18;
+        location_unload(location_object->image);
         region_update_from_player();
         climate_update_at_player();
         climate_index = ((int)(unsigned char)current_climate) - 224;
-        location_here = (struct map_location *)((int)region_find_location(D_001A94C4));
+        location_here = (struct map_location *)((int)region_find_location(terrain_cell_at_player));
         climate_set_textures();
     }
     if ((int)location_here == 0) return;
@@ -252,7 +252,7 @@ void world_update_location(void)
         town_load(((unsigned)location_here->map_id) >> 20);
         return;
     }
-    location_unload(D_00195AC4->image);
+    location_unload(location_object->image);
 }
 
 void dungeon_load(int a1)
@@ -263,59 +263,59 @@ void dungeon_load(int a1)
     int l_18;
 
     sound_stop_ambient();
-    if (D_00195AC4->image == 65535) func_0008EAF1((int)D_00195AC4->children, D_00195AC4->id);
-    if (D_00196289 == 0) {
+    if (location_object->image == 65535) object_delete_block((int)location_object->children, location_object->id);
+    if (world_loading == 0) {
         player_object->parent_id = player_object->parent->id;
-        mc_memcpy((int)D_00195FB1, (int)player_object, 55, (int)D_00176C94, 235, 4);
+        mc_memcpy((int)saved_player_object, (int)player_object, 55, (int)D_00176C94, 235, 4);
     }
-    l_20 = D_00195AC4->id;
-    location_unload(D_00195AC4->image);
+    l_20 = location_object->id;
+    location_unload(location_object->image);
     if (a1 == (-1)) {
         location_load_dungeon_by_id(&loaded_location, l_20);
     } else {
         location_load_dungeon(&loaded_location, a1);
     }
-    mc_memcpy((int)D_00195AC4, (int)loaded_location_object, 55, (int)D_00176C94, 247, 4);
+    mc_memcpy((int)location_object, (int)loaded_location_object, 55, (int)D_00176C94, 247, 4);
     mc_memcpy((int)current_location, (int)loaded_location_data, 48, (int)D_00176C94, 248, 4);
     blocks_bsa = archive_open((int)D_00176C9F, 0, 0);
-    if ((((unsigned)D_00195AC4->id) >> 16) == 50015) D_001967A1 = 254;
+    if ((((unsigned)location_object->id) >> 16) == 50015) D_001967A1 = 254;
     for (l_1C = 0; ((int)(unsigned char)dungeon_block_count) > l_1C; l_1C++) {
         dungeon_load_rdb_block(((int)dungeon_blocks) + (l_1C << 2));
     }
-    func_000461E9();
+    kludge_fix_dungeon_door();
     archive_close(blocks_bsa);
     links_resolve();
-    func_0007E5C2();
+    dungeon_grid_build();
     dungeon_choose_textures();
     D_0019628C = 0;
     D_00195CB8 = 0;
     player_environment = 3;
     dungeon_water_level = 10000;
-    func_0004CA9D();
-    player_object->x = D_00195AC4->x;
-    player_object->y = D_00195AC4->y;
-    player_object->z = D_00195AC4->z;
-    l_1C = player_to_nearest_marker(D_00195AC4->children, 8);
+    quest_mark_givers();
+    player_object->x = location_object->x;
+    player_object->y = location_object->y;
+    player_object->z = location_object->z;
+    l_1C = player_to_nearest_marker(location_object->children, 8);
     if (l_1C == 0) fatal_error((int)D_00176CAA);
     func_00028EAA();
-    automap_mark_seen(D_00195AF4);
+    automap_mark_seen(found_object);
     position_history_reset();
     dungeon_roll_monster_tables();
-    D_001970C4 = 0;
+    monsters_woken = 0;
     disk_read_file((int)D_00176CC0, D_00195CF4);
-    mc_memset(*(int *)D_00195C44, 0, 93, (int)D_00176C94, 290, 4);
-    func_000CD33A(*(int *)D_00195C44, 1, 31);
-    if (D_00196289 == 0) func_0004C759();
+    mc_memset(*(int *)scratch_buffer, 0, 93, (int)D_00176C94, 290, 4);
+    xn_pal_set_range_8bit(*(int *)scratch_buffer, 1, 31);
+    if (world_loading == 0) func_0004C759();
     automap_restore_seen();
-    D_001950E4 = marker_count(D_00195AC4, 9);
-    D_001950E8 = marker_count(D_00195AC4, 16);
-    D_00136911 = 0;
-    func_00135E39();
+    D_001950E4 = marker_count(location_object, 9);
+    D_001950E8 = marker_count(location_object, 16);
+    xn_light_ambient = 0;
+    xn_tex_cache_flush();
     text_buffer[0] = (D_001903A5 = (D_001903A6 = 0));
-    func_000CD33A((int)text_buffer, 255, 1);
+    xn_pal_set_range_8bit((int)text_buffer, 255, 1);
 }
 
-void func_00086A71(struct record *a1)
+void town_door_roll_unlock(struct record *a1)
 {
     struct building *l_18;
 
@@ -341,7 +341,7 @@ int building_try_enter(struct building *a1)
     int l_20;
     int l_1C;
 
-    if (D_00196289 != 0) return 1;
+    if (world_loading != 0) return 1;
     if (a1->id == player_character->house) return 1;
     if (a1->type == 24) return 1;
     if (a1->type < 17 && building_is_open(a1) != 0) return 1;
@@ -354,15 +354,15 @@ int building_try_enter(struct building *a1)
     }
     if (a1->faction_id == 108 && guild_find_membership_by_kind(0) != 0) return 1;
     if (a1->faction_id == 42 && guild_find_membership_by_kind(3) != 0) return 1;
-    if (a1->type >= 17 && a1->type <= 20 && D_00196280 != 0 && (a1->id & 65535) % 100 < 50) {
+    if (a1->type >= 17 && a1->type <= 20 && is_daytime != 0 && (a1->id & 65535) % 100 < 50) {
         msgbox_show_rsc(256, 1);
         return 1;
     }
     if (((int)interaction_mode) == 2) {
         l_20 = (a1->name_seed % 10) + 3;
-        l_24 = object_find_by_id(D_00195AC4, a1->id);
+        l_24 = object_find_by_id(location_object, a1->id);
         if (lockpick_action_door(a1, l_20, l_24) != 0) {
-            if (func_00041347() != 0 || rand_range(1, 300) < (100 - player_character->skills[16].value)) {
+            if (people_check_witnesses() != 0 || rand_range(1, 300) < (100 - player_character->skills[16].value)) {
                 crime_current = 1;
                 guards_summon(1);
             }
@@ -373,11 +373,11 @@ int building_try_enter(struct building *a1)
     return 0;
 }
 
-void func_000871FA(struct building *a1)
+void building_load_interior(struct building *a1)
 {
     struct record *l_18;
 
-    l_18 = object_find_by_id(D_00195AC4, a1->id);
+    l_18 = object_find_by_id(location_object, a1->id);
     object_free_children((struct record *)D_00196120);
     interior_stock_shelves(l_18->children, a1);
     if (l_18 == 0) return;
@@ -386,7 +386,7 @@ void func_000871FA(struct building *a1)
         return;
     }
     object_reparent(l_18, player_object);
-    func_00099D0D(l_18);
+    building_disable_monster_markers(l_18);
     people_clear();
 }
 
@@ -407,14 +407,14 @@ void building_enter(struct building *a1)
         building_grant_access(a1, 255, game_minutes + 10000000);
     }
     if (a1->type < 14 && a1->type != 1 && a1->type != 3) shop_quality_message(a1);
-    func_000871FA(a1);
+    building_load_interior(a1);
     sound_stop_ambient();
     position_history_reset();
     player_environment = 2;
     D_001940D5 |= 2;
     D_00195CB8 = 0;
     D_001A4A1D = 0;
-    if (D_00196289 == 0) func_0004B5CF();
+    if (world_loading == 0) building_update_open_state();
     if (a1->id == D_001A4C94) return;
     stocked_shop_count = 0;
     D_001A4C94 = a1->id;
@@ -430,8 +430,8 @@ void building_exit(void)
     building_grant_access(l_1C, 0, 0);
     player_to_nearest_marker(player_object->parent->children, 6);
     func_000C810C(*(int *)D_00195C88);
-    object_reparent(D_00195AC4, player_object);
-    if (l_1C->type == 24) player_to_nearest_marker(D_00195AC4, 6);
+    object_reparent(location_object, player_object);
+    if (l_1C->type == 24) player_to_nearest_marker(location_object, 6);
     position_history_reset();
     player_environment = 1;
     D_001940D5 |= 2;
@@ -451,10 +451,10 @@ void location_pick_random_town(struct loaded_location *a1)
     int l_1C;
     int l_18;
 
-    l_24 = D_00196A9C;
+    l_24 = region_locations;
     l_18 = 0;
     mc_memset(a1, 0, 20, (int)D_00176C94, 991, 4);
-    for (l_20 = 0; l_20 < D_00196A28; l_20++, l_24++) {
+    for (l_20 = 0; l_20 < region_location_count; l_20++, l_24++) {
         switch ((l_24->x_type_flags << 2) >> 27) {
         case 0:
         case 1:
@@ -467,8 +467,8 @@ void location_pick_random_town(struct loaded_location *a1)
         return;
     }
     l_1C = (rand() % l_18) + 1;
-    l_24 = D_00196A9C;
-    for (l_20 = 0; l_20 < D_00196A28; l_20++, l_24++) {
+    l_24 = region_locations;
+    for (l_20 = 0; l_20 < region_location_count; l_20++, l_24++) {
         switch ((l_24->x_type_flags << 2) >> 27) {
         case 0:
         case 1:
@@ -488,22 +488,22 @@ void location_pick_random_undiscovered(struct loaded_location *a1)
     int l_1C;
     int l_18;
 
-    l_20 = D_00196A9C;
+    l_20 = region_locations;
     l_18 = 0;
     mc_memset(a1, 0, 20, (int)D_00176C94, 1108, 4);
-    for (l_1C = 0; l_1C < D_00196A28; l_1C++, l_20++) {
+    for (l_1C = 0; l_1C < region_location_count; l_1C++, l_20++) {
         if ((l_20->x_type_flags & 0x40000000) == 0 && (l_20->x_type_flags & 0x80000000) == 0) {
             l_18++;
         }
     }
     if (l_18 == 0) {
-        l_18 = rand() % D_00196A28;
+        l_18 = rand() % region_location_count;
         location_load_exterior(a1, l_1C);
         return;
     }
     l_18 = rand() % l_18;
-    l_20 = D_00196A9C;
-    for (l_1C = 0; l_1C < D_00196A28; l_1C++, l_20++) {
+    l_20 = region_locations;
+    for (l_1C = 0; l_1C < region_location_count; l_1C++, l_20++) {
         if ((l_20->x_type_flags & 0x40000000) == 0 && (l_20->x_type_flags & 0x80000000) == 0) {
             l_18--;
         }
@@ -516,15 +516,15 @@ void location_pick_random_undiscovered(struct loaded_location *a1)
 
 void location_set_discovered(int a1, int a2)
 {
-    ((struct bf32_30_1 *)((char *)(int)((a1 * 17) + (char *)D_00196A9C) + 4))->f = a2;
+    ((struct bf32_30_1 *)((char *)(int)((a1 * 17) + (char *)region_locations) + 4))->f = a2;
 }
 
-void func_0008824A(int a1, int a2)
+void location_set_hidden(int a1, int a2)
 {
-    ((struct bf32_31_1 *)((char *)(int)((a1 * 17) + (char *)D_00196A9C) + 4))->f = a2;
+    ((struct bf32_31_1 *)((char *)(int)((a1 * 17) + (char *)region_locations) + 4))->f = a2;
 }
 
-void func_00088281(int a1, int a2)
+void location_flatten_terrain(int a1, int a2)
 {
     int l_34;
     int l_30;
@@ -597,11 +597,11 @@ void town_block_apply_ground(int a1, int a2)
 
     D_001A94C0 = 4;
     for (l_18 = 0; l_18 < 4; l_18++) {
-        if (D_001A94C4 == D_000C2893[l_18]) D_001A94C0 = l_18;
+        if (terrain_cell_at_player == xn_world_slot_cells[l_18]) D_001A94C0 = l_18;
     }
     if (D_001A94C0 == 4) return;
-    l_28 = (int)(D_000C28C0 + D_00187F30[D_001A94C0]);
-    l_2C = (int)(D_000C28C4 + D_00187F30[D_001A94C0]);
+    l_28 = (int)(xn_world_flat_layer + D_00187F30[D_001A94C0]);
+    l_2C = (int)(xn_world_tile_layer + D_00187F30[D_001A94C0]);
     if ((a2 & 32767) == 1) {
         a2 += -2;
         l_14 = 240;
@@ -676,11 +676,11 @@ void location_reveal(int a1, int a2)
 
     l_14 = (int)(unsigned char)current_region;
     maploads_load_region(a1);
-    l_1C = D_00196A9C;
-    for (l_18 = 0; l_18 < D_00196A28; l_18++, l_1C++) {
+    l_1C = region_locations;
+    for (l_18 = 0; l_18 < region_location_count; l_18++, l_1C++) {
         if ((l_1C->map_id & 1048575) == a2) {
             location_set_discovered(l_18, 1);
-            func_0008824A(l_18, 0);
+            location_set_hidden(l_18, 0);
             break;
         }
     }
@@ -692,8 +692,8 @@ int region_nth_dungeon(int a1)
     struct map_location *l_20;
     int l_1C;
 
-    l_20 = D_00196A9C;
-    for (l_1C = 0; l_1C < D_00196A28; l_1C++, l_20++) {
+    l_20 = region_locations;
+    for (l_1C = 0; l_1C < region_location_count; l_1C++, l_20++) {
         if (l_20->dungeon_type != 255) {
             a1 += -1;
             if (a1 < 0) return l_1C;
@@ -707,7 +707,7 @@ void spfx_create_item_cb(int a1)
     struct record *l_1C;
     struct item *l_18;
 
-    l_1C = object_create_child(D_00195AC4, 0, 107);
+    l_1C = object_create_child(location_object, 0, 107);
     l_1C->type = 2;
     l_1C->repair_due = D_001A99F4;
     l_18 = &l_1C->data.item;

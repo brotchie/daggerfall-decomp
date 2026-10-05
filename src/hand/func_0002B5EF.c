@@ -2,7 +2,7 @@
 #include "records.h"
 
 extern signed char D_0012B508;
-extern short D_0012DA44;
+extern short font_height;
 extern char D_001707F0[];
 extern char D_0017080E[];
 extern char D_00170813[];
@@ -27,14 +27,14 @@ extern void quest_debug_next(void);
 extern void *quest_section(struct quest *, int);
 extern void text_draw(char *, int, int);
 extern int key_pressed_once(unsigned char);
-extern int func_0012DB50();
-#pragma aux func_000A0ED9 parm routine [];
-extern int func_000A0ED9(int, char *);
+extern int xn_font_select();
+#pragma aux mc_set_location parm routine [];
+extern int mc_set_location(int, char *);
 extern int mc_sprintf(char *, ...);
 
 
 #define COLOR (*(unsigned char *)&D_0012B508)
-#define LINEH (D_0012DA44)
+#define LINEH (font_height)
 #define CUR (*(struct quest **)&quest_debug_data)
 #define NEXTLINE() \
     text_draw(((char *)text_buffer), l_34 >= l_30 ? 160 : 0, l_34 % l_30 * LINEH); \
@@ -71,7 +71,7 @@ void quest_debug_overlay(void)
         quest_debug_next();
     }
     if (quest_debug_object == 0 || CUR == 0) return;
-    func_0012DB50(3);
+    xn_font_select(3);
     l_30 = 200 / LINEH;
     l_34 = 0;
     if (CUR->text_offset) {
@@ -104,12 +104,12 @@ void quest_debug_overlay(void)
                     else
                         l_3C = l_1C->value;
                     if (l_3C) COLOR = 240;
-                    func_000A0ED9(888, D_001707F0);
+                    mc_set_location(888, D_001707F0);
                     mc_sprintf(((char *)text_buffer), D_00170819, l_44, l_3C ? D_0017080E : D_00170813);
                     break;
                 case 6:
                     l_18 = (struct qbn_timer *)l_44->record;
-                    func_000A0ED9(892, D_001707F0);
+                    mc_set_location(892, D_001707F0);
                     mc_sprintf(((char *)text_buffer), D_00170823, l_44, game_minutes - l_18->start, l_18->delay);
                     break;
                 }
@@ -117,10 +117,10 @@ void quest_debug_overlay(void)
                     if (l_40->twin) {
                         l_40 = l_40->twin;
                         COLOR = 240;
-                        func_000A0ED9(904, D_001707F0);
+                        mc_set_location(904, D_001707F0);
                         mc_sprintf(((char *)text_buffer), D_00170832, l_44, l_40->x, l_40->y, l_40->z);
                     } else {
-                        func_000A0ED9(907, D_001707F0);
+                        mc_set_location(907, D_001707F0);
                         mc_sprintf(((char *)text_buffer), D_00170832, l_44, l_40->x, l_40->y, l_40->z);
                     }
                 }
@@ -142,17 +142,17 @@ void quest_debug_overlay(void)
             }
             if (l_3C) COLOR = 240;
             else COLOR = 145;
-            func_000A0ED9(935, D_001707F0);
+            mc_set_location(935, D_001707F0);
             mc_sprintf(((char *)text_buffer), D_00170847, l_38, l_3C ? D_0017080E : D_00170813);
             NEXTLINE();
         }
     }
     COLOR = 112;
-    func_000A0ED9(942, D_001707F0);
+    mc_set_location(942, D_001707F0);
     mc_sprintf(((char *)text_buffer), D_00170856, player_object->x, player_object->y, player_object->z);
     NEXTLINE();
-    func_000A0ED9(945, D_001707F0);
+    mc_set_location(945, D_001707F0);
     mc_sprintf(((char *)text_buffer), D_0017086D, CUR->name);
     text_draw(((char *)text_buffer), l_34 >= l_30 ? 160 : 0, l_34 % l_30 * LINEH);
-    func_0012DB50(4);
+    xn_font_select(4);
 }

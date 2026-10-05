@@ -4,7 +4,7 @@
 
 
 
-short func_0008269B(int a1)
+short hex_digit_value(int a1)
 {
     if (((int)(unsigned char)*(signed char *)((char *)a1)) >= 48 && ((int)(unsigned char)*(signed char *)((char *)a1)) <= 57) {
         return ((unsigned short)(unsigned char)*(signed char *)((char *)a1)) - 48;

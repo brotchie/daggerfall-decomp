@@ -28,18 +28,18 @@ extern short D_00195F28;
 extern unsigned char D_0019626D;
 extern unsigned char D_0019626E;
 extern void fatal_error(char *);
-extern void func_0005E5D7(struct item *, int);
+extern void item_set_race_image(struct item *, int);
 extern void func_0005E636(struct item *);
-extern void func_0005E874(struct item *);
-extern void func_0005EA8F(struct item *);
+extern void item_roll_material(struct item *);
+extern void item_roll_armor_type(struct item *);
 extern void item_init_book(struct item *, short);
 extern void item_make_magic(struct item *, int);
 extern int rand_range(int, int);
 extern int rand(void);
 extern void mc_memset(void *, int, int, char *, int, int);
 extern void mc_strncpy(char *, char *, int, char *, int);
-#pragma aux func_000A0ED9 parm routine [];
-extern void func_000A0ED9(int, char *);
+#pragma aux mc_set_location parm routine [];
+extern void mc_set_location(int, char *);
 #pragma aux func_000A18C3 parm routine [];
 extern int func_000A18C3(char *);
 extern int mc_sprintf(char *, char *, ...);
@@ -75,9 +75,9 @@ void item_init_from_template(unsigned short idx, short type, short sub, struct i
             sub = rand_range(0, 3);
     }
     if (idx >= 288) {
-        func_000A0ED9(58, D_001758B8);
+        mc_set_location(58, D_001758B8);
         func_000A18C3(D_001758C0);
-        func_000A0ED9(59, D_001758B8);
+        mc_set_location(59, D_001758B8);
         mc_sprintf(D_001911E4, D_001758C1, orig, idx);
         fatal_error(D_001911E4);
     }
@@ -132,14 +132,14 @@ void item_init_from_template(unsigned short idx, short type, short sub, struct i
         it->stack_count = rand() % 20;
     if (type == 6 || type == 12 || type == 2) {
         func_0005E636(it);
-        func_0005E5D7(it, player_character->race);
+        item_set_race_image(it, player_character->race);
     }
     if (type == 3)
-        func_0005E874(it);
+        item_roll_material(it);
     if (type == 2) {
-        func_0005EA8F(it);
+        item_roll_armor_type(it);
         if (it->index != 5 && it->index < 7 && it->material == 2)
-            func_0005E874(it);
+            item_roll_material(it);
     }
     if (type == 3 && sub == 18) {
         it->stack_count = rand_range(1, 20);

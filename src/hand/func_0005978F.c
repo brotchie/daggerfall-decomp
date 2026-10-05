@@ -3,12 +3,12 @@
 
 extern char D_0017573C[];
 extern struct character *player_character;
-extern unsigned char *D_00199B4C;
-extern unsigned char **D_00199B50;
+extern unsigned char *paperdoll_slots;
+extern unsigned char **paperdoll_items;
 extern int mc_memmove();
 
 /* item +0x42 (the top byte of `message`) is the paperdoll drawing order here */
-void func_0005978F(struct item *a1, int a2)
+void paperdoll_add_item(struct item *a1, int a2)
 {
     int l_18;
     int l_14;
@@ -28,10 +28,10 @@ void func_0005978F(struct item *a1, int a2)
                 ((unsigned char *)a1)[66] += 5;
         }
     }
-    while (D_00199B50[l_18] != 0 && ((unsigned char *)a1)[66] > D_00199B50[l_18][66])
+    while (paperdoll_items[l_18] != 0 && ((unsigned char *)a1)[66] > paperdoll_items[l_18][66])
         l_18++;
-    mc_memmove(&D_00199B4C[l_18 + 1], &D_00199B4C[l_18], 27, D_0017573C, 201, 4);
-    mc_memmove(&D_00199B50[l_18 + 1], &D_00199B50[l_18], 108, D_0017573C, 202, 4);
-    D_00199B50[l_18] = (unsigned char *)a1;
-    D_00199B4C[l_18] = a2;
+    mc_memmove(&paperdoll_slots[l_18 + 1], &paperdoll_slots[l_18], 27, D_0017573C, 201, 4);
+    mc_memmove(&paperdoll_items[l_18 + 1], &paperdoll_items[l_18], 108, D_0017573C, 202, 4);
+    paperdoll_items[l_18] = (unsigned char *)a1;
+    paperdoll_slots[l_18] = a2;
 }

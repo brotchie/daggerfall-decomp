@@ -18,16 +18,16 @@ extern int frame_checkpoint;
 extern signed char region_punishment_flags[];
 extern char region_legal_reputation[];
 extern char region_price_adjustment[];
-extern struct record *D_00190504[];
-extern signed char itemmaker_slot_kinds[];
+extern struct record *creature_list[];
+extern signed char scratch_190ce4[];
 extern signed char D_001940D8;
 extern signed char D_001940D9;
-extern struct record *D_00195A00;
+extern struct record *quest_root;
 extern struct record *bank_accounts;
 extern struct record *player_entity;
 extern struct record *player_object;
 extern struct record *D_00195AA8;
-extern struct record *D_00195AC4;
+extern struct record *location_object;
 extern int creature_count;
 extern int calendar_year;
 extern int calendar_weekday;
@@ -36,27 +36,27 @@ extern int calendar_minute;
 extern int calendar_hour;
 extern struct character *player_character;
 extern int game_minutes;
-extern int D_00195C40;
-extern struct record *D_00195D00;
+extern int realtime_clock_tick;
+extern struct record *quest_tick_object;
 extern int player_death_timer;
 extern signed char D_00195F24;
 extern signed char D_00195F25;
 extern signed char current_region;
 extern signed char game_mode;
 extern signed char crime_current;
-extern signed char D_00196280;
+extern signed char is_daytime;
 extern signed char player_ailment_flags;
 extern signed char D_00196298;
 extern signed char D_001962A4;
 extern signed char D_001962A5;
-extern signed char D_001962A9;
+extern signed char quests_suspended;
 extern signed char D_001962B0;
 extern int faction_count;
 extern struct faction *factions;
 extern struct quest *current_quest;
 extern int quest_debug_data;
 extern struct record *quest_event_object;
-extern struct quest *D_00199780;
+extern struct quest *quest_tick_data;
 extern int quest_ended_id;
 extern short qbn_record_sizes[];
 extern short D_0019978A;
@@ -81,15 +81,15 @@ extern int rand_range(int, int);
 extern struct building *object_building(struct record *);
 extern int location_here_contains(int, int);
 extern int spfx_disease_daily(int);
-extern int func_0008AC9B(int);
+extern int spfx_disease_recover(int);
 extern struct record *object_find_by_id(struct record *, int);
-extern int func_000A0ED9(int, int);
+extern int mc_set_location(int, int);
 extern int mc_sprintf(int, ...);
 extern void region_flag_set(int, int);
 extern void region_flag_clear(int, int);
 extern void faction_politics_update(int);
 extern void encounter_tick(int, int);
-extern void func_000278E4(void);
+extern void automap_expire_records(void);
 extern void automap_purge_old_files(void);
 extern void quest_run_opcodes(int);
 extern void quest_remove_objects(unsigned char);
@@ -112,21 +112,21 @@ extern void travel_show_days_left(int);
 int building_is_open(struct building *);
 void time_pass_minutes(int);
 void calendar_update(void);
-void func_0004B54F(struct record *);
-void func_0004B595(struct record *);
+void interior_person_show_cb(struct record *);
+void interior_person_hide_cb(struct record *);
 void reputation_decay(void);
 void region_update_prices(int);
-void func_0004B9A1(void);
+void crime_check_beast_form_in_town(void);
 void loan_due_penalty(void);
 void quests_run_all(void);
-#pragma aux func_000A0ED9 parm routine [];
+#pragma aux mc_set_location parm routine [];
 
 int calendar_format_date(int a1, int a2)
 {
     short l_14;
 
     *(int *)&l_14 = ((unsigned)(((unsigned)(((unsigned)a1) % 518400)) / 1440)) % 30;
-    func_000A0ED9(79, (int)D_001711AC);
+    mc_set_location(79, (int)D_001711AC);
     mc_sprintf(a2, D_001830E2, ((int)(short)l_14) + 1, ordinal_suffixes[((((int)(short)l_14) > 3) ? 3 : (int)(short)l_14)], month_names[(((unsigned)(((unsigned)a1) % 518400)) / 43200)]);
     return a2;
 }
@@ -145,13 +145,13 @@ void time_update_realtime(void)
 
     if (((struct bf8_6_1 *)&D_001940D8)->f != 0 || D_00187CA8 == 0) {
         l_1C = 1132;
-        D_00195C40 = *(int *)((char *)l_1C);
+        realtime_clock_tick = *(int *)((char *)l_1C);
         return;
     }
     l_20 = game_minutes;
     l_18 = 1132;
-    l_24 = ((unsigned)(*(int *)((char *)l_18) - D_00195C40)) / 90;
-    D_00195C40 += l_24 * 90;
+    l_24 = ((unsigned)(*(int *)((char *)l_18) - realtime_clock_tick)) / 90;
+    realtime_clock_tick += l_24 * 90;
     if (((struct bf8_4_1 *)&D_001940D9)->f != 0 && ((int)(unsigned short)(player_character->flags & 1536)) == 0) {
         skill_add_uses(21, 1);
     }
@@ -184,7 +184,7 @@ void time_pass_minutes(int a1)
         } else {
             l_38 = 0;
         }
-        D_00196280 = l_38;
+        is_daytime = l_38;
         l_28 = (((unsigned)game_minutes) / 1440) - l_28;
         frame_checkpoint = 2000;
         for (l_2C = 0; l_2C < l_28; l_2C++) {
@@ -196,7 +196,7 @@ void time_pass_minutes(int a1)
             frame_checkpoint = 2002;
             weather_roll();
             frame_checkpoint = 2003;
-            func_000278E4();
+            automap_expire_records();
         }
         frame_checkpoint = 2004;
         if (l_28 != 0) automap_purge_old_files();
@@ -228,7 +228,7 @@ void time_pass_minutes(int a1)
             if (D_001962A4 == 0) {
                 frame_checkpoint = 2017;
                 spell_tick(player_entity);
-                spfx_walk_effect_records(player_entity, (int)func_0008AC9B);
+                spfx_walk_effect_records(player_entity, (int)spfx_disease_recover);
                 D_00195AA8 = player_entity;
                 spfx_walk_effect_records(player_entity->children, (int)poison_tick);
                 fatigue_update();
@@ -237,15 +237,15 @@ void time_pass_minutes(int a1)
             frame_checkpoint = 2019;
             sky_update_moons();
             frame_checkpoint = 2020;
-            func_0004B9A1();
+            crime_check_beast_form_in_town();
             if (D_001962A5 != 0) quests_run_all();
             frame_checkpoint = 2022;
             loan_due_penalty();
             if (player_death_timer < 0) return;
             for (l_30 = 0; l_30 < creature_count; l_30++) {
-                if ((int)D_00190504[l_30] == (-1768515946)) continue;
-                spell_tick(D_00190504[l_30]);
-                D_00195AA8 = D_00190504[l_30];
+                if ((int)creature_list[l_30] == (-1768515946)) continue;
+                spell_tick(creature_list[l_30]);
+                D_00195AA8 = creature_list[l_30];
                 spfx_walk_effect_records(D_00195AA8->children, (int)poison_tick);
             }
             if (player_death_timer < 0) return;
@@ -323,7 +323,7 @@ int player_in_temple(void)
 void func_0004B25B(struct record *a1)
 {
     if (a1->type != 8) return;
-    itemmaker_slot_kinds[0] = 1;
+    scratch_190ce4[0] = 1;
 }
 
 int building_is_open(struct building *a1)
@@ -333,7 +333,7 @@ int building_is_open(struct building *a1)
     struct record *l_20;
     struct membership *l_1C;
 
-    l_24 = object_find_by_id(D_00195AC4, a1->id);
+    l_24 = object_find_by_id(location_object, a1->id);
     if (a1->faction_id == 108 && guild_find_membership_by_kind(0) != 0) return 1;
     if (a1->faction_id == 42 && guild_find_membership_by_kind(3) != 0) return 1;
     if (a1->faction_id == 41 && (l_1C = guild_find_membership_by_kind(2)) != 0 && l_1C->rank >= 6) {
@@ -344,7 +344,7 @@ int building_is_open(struct building *a1)
     }
     l_20 = player_object->parent;
     while (l_20 != 0 && l_20->type != 43) l_20 = l_20->parent;
-    if (a1->type >= 17 && a1->type <= 20 && D_00196280 != 0 && (a1->id & 65535) % 100 < 50) {
+    if (a1->type >= 17 && a1->type <= 20 && is_daytime != 0 && (a1->id & 65535) % 100 < 50) {
         return 1;
     }
     if (a1->type > 16) return 0;
@@ -363,21 +363,21 @@ int building_minutes_to_close(struct building *a1)
     return 0;
 }
 
-void func_0004B54F(struct record *a1)
+void interior_person_show_cb(struct record *a1)
 {
     if (a1->type != 8) return;
     if ((a1->flags & 2048) != 0) return;
     a1->flags &= ~0x200;
 }
 
-void func_0004B595(struct record *a1)
+void interior_person_hide_cb(struct record *a1)
 {
     if (a1->type != 8) return;
     if (a1->quest_id != 0) return;
     a1->flags |= 0x200;
 }
 
-void func_0004B5CF(void)
+void building_update_open_state(void)
 {
     int l_1C;
     struct building *l_18;
@@ -395,10 +395,10 @@ void func_0004B5CF(void)
     }
     goto L4B64F;
 L4B638:;
-    object_foreach(player_object->parent->children, (int)func_0004B54F);
+    object_foreach(player_object->parent->children, (int)interior_person_show_cb);
     return;
 L4B64F:;
-    object_foreach(player_object->parent->children, (int)func_0004B595);
+    object_foreach(player_object->parent->children, (int)interior_person_hide_cb);
 }
 
 void reputation_decay(void)
@@ -470,7 +470,7 @@ void region_update_prices(int a1)
     }
 }
 
-void func_0004B9A1(void)
+void crime_check_beast_form_in_town(void)
 {
     if (player_character->race <= 8 || ((int)player_environment) != 1 || location_here_contains(player_object->x, player_object->z) == 0 || (((unsigned)game_minutes) % 30) != 0) {
         return;
@@ -511,15 +511,15 @@ void quests_run_all(void)
     struct record *l_1C;
     struct record *l_18;
 
-    if (D_001962A9 != 0) return;
-    l_1C = D_00195A00->children;
+    if (quests_suspended != 0) return;
+    l_1C = quest_root->children;
     while (l_1C != 0) {
         l_18 = l_1C->next;
         if (l_1C->type == 14) {
-            D_00195D00 = l_1C;
-            D_00199780 = (struct quest *)((int)&l_1C->data.quest);
-            if (quest_debug_data == 0) quest_debug_data = (int)D_00199780;
-            quest_run_opcodes((int)D_00199780);
+            quest_tick_object = l_1C;
+            quest_tick_data = (struct quest *)((int)&l_1C->data.quest);
+            if (quest_debug_data == 0) quest_debug_data = (int)quest_tick_data;
+            quest_run_opcodes((int)quest_tick_data);
         }
         l_1C = l_18;
     }
@@ -530,12 +530,12 @@ struct quest *quest_find_by_id(int a1)
     struct record *l_20;
     struct quest *l_1C;
 
-    l_20 = D_00195A00->children;
+    l_20 = quest_root->children;
     while (l_20 != 0) {
         if (l_20->type == 14) {
             l_1C = &l_20->data.quest;
             if (l_1C->id == a1) {
-                D_00199780 = l_1C;
+                quest_tick_data = l_1C;
                 return l_1C;
             }
         }
@@ -551,7 +551,7 @@ void quests_raise_event_all(int a1, int a2)
 
     quest_event_code = a1;
     quest_event_object = (struct record *)a2;
-    l_18 = D_00195A00->children;
+    l_18 = quest_root->children;
     while (l_18 != 0) {
         if (l_18->type == 14) quest_dispatch_event(&l_18->data.quest);
         l_18 = l_18->next;

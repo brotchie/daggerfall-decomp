@@ -12,20 +12,20 @@ extern int profile_find_section(int, ...);
 extern int profile_find_item(int, ...);
 extern int profile_get_string(int, ...);
 extern int profile_set_string(int, ...);
-extern int func_000A0DF4();
+extern int strlen();
 extern int mc_memmove();
 extern int stricmp();
 extern int toupper();
 int profile_hex_digit(signed char);
 #pragma aux sosconv "*" parm caller [] value [eax] modify [eax ebx ecx edx];
-#pragma aux (sosconv) func_00012203;
+#pragma aux (sosconv) profile_get_raw_line;
 #pragma aux (sosconv) profile_get_yes;
 #pragma aux (sosconv) profile_get_item_string;
 #pragma aux (sosconv) profile_set_yes_no;
 #pragma aux (sosconv) profile_delete_section;
 #pragma aux (sosconv) profile_add_section;
 
-int func_00012203(int a1, int a2, int a3)
+int profile_get_raw_line(int a1, int a2, int a3)
 {
     int l_18;
     int l_14;
@@ -105,7 +105,7 @@ int profile_add_section(int a1, int a2)
 
     if ((short)profile_find_section(a1, a2) != 0) return 0;
     l_14 = (int)(*(char **)((char *)a1 + 132) + *(int *)((char *)a1 + 136));
-    l_10 = func_000A0DF4(a2) + 6;
+    l_10 = strlen(a2) + 6;
     if (((unsigned)(*(int *)((char *)a1 + 136) + l_10)) > *(int *)((char *)a1 + 140)) return 0;
     *(signed char *)((char *)l_14++) = 13;
     *(signed char *)((char *)l_14++) = 10;
@@ -132,7 +132,7 @@ int profile_hex_to_int(int a1)
     int l_1C;
 
     l_28 = 0;
-    l_24 = func_000A0DF4(a1);
+    l_24 = strlen(a1);
     l_1C = 0;
     do {
         l_28 += profile_hex_digit((int)(signed char)*(signed char *)((char *)(l_1C++ + a1))) * D_00178848[l_24];

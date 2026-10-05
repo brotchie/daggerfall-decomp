@@ -29,11 +29,11 @@ extern int D_001AA3E0;
 extern char potion_ingredient_count[];
 extern int potion_name;
 extern short potion_cauldron_count;
-extern int spells_list_poll(void);
+extern int list_popup_poll(void);
 extern void msgbox_show_rsc(int, int);
 extern int sound_play(int, struct record *, int);
-extern void text_draw_colored(int, int, int, int, unsigned char);
-extern void text_draw_centered_colored(int, int, int, int, unsigned char);
+extern void text_draw_coloured(int, int, int, int, unsigned char);
+extern void text_draw_centred_coloured(int, int, int, int, unsigned char);
 extern void object_foreach(struct record *, int);
 extern int potionmaker_open(int);
 extern void potionmaker_add_ingredient(int);
@@ -42,11 +42,11 @@ extern void potionmaker_ingredient_cb(struct record *);
 extern int potionmaker_close(void);
 extern void potion_make(struct item *);
 extern int mc_memset();
-extern int func_000A0DD9();
-extern int func_000CB552();
-extern int func_000CD1C5();
-extern int func_0012DB50();
-extern int func_00135D00();
+extern int itoa();
+extern int xn_draw_fullscreen_overlay_shaded();
+extern int xn_draw_image_drop_shadow();
+extern int xn_font_select();
+extern int xn_tex_cache_lookup();
 
 struct img {
     short f0;
@@ -80,20 +80,20 @@ void potionmaker_update(void)
     short l_18;
 
     if (potionmaker_open(0) == 0) return;
-    func_000CB552(window_image);
-    func_0012DB50(4);
-    text_draw_colored(potion_name, 31, 185, 145, 156);
-    text_draw_colored(func_000A0DD9(player_character->gold, (int)text_buffer, 10), 235, 185, 145, 156);
-    func_0012DB50(3);
+    xn_draw_fullscreen_overlay_shaded(window_image);
+    xn_font_select(4);
+    text_draw_coloured(potion_name, 31, 185, 145, 156);
+    text_draw_coloured(itoa(player_character->gold, (int)text_buffer, 10), 235, 185, 145, 156);
+    xn_font_select(3);
     *(int *)potion_ingredient_count = 0;
     mc_memset((int)potion_ingredients, 0, 2048, (int)D_00176E94, 182, 2048);
     object_foreach(player_entity->children, (int)potionmaker_ingredient_cb);
     for (COUNT = l_1C = 0; l_1C < 8; l_1C++) {
         if (((int *)potion_cauldron)[l_1C] != 0) {
             l_20 = &((struct record **)potion_cauldron)[l_1C]->data.item;
-            l_24 = *(struct img **)((char *)func_00135D00(l_20->inventory_image >> 7, l_20->inventory_image & 127, -1) + 12);
-            func_000CD1C5((COUNT & 1) * 56 + 233 - (l_24->w >> 1), (COUNT >> 1) * 38 + 42 - (l_24->h >> 1), l_24->w, l_24->h, (char *)l_24 + l_24->data);
-            text_draw_centered_colored((int)l_20->name, (short)((COUNT & 1) * 56 + 236), (short)((COUNT >> 1) * 40 + 48), 145, 156);
+            l_24 = *(struct img **)((char *)xn_tex_cache_lookup(l_20->inventory_image >> 7, l_20->inventory_image & 127, -1) + 12);
+            xn_draw_image_drop_shadow((COUNT & 1) * 56 + 233 - (l_24->w >> 1), (COUNT >> 1) * 38 + 42 - (l_24->h >> 1), l_24->w, l_24->h, (char *)l_24 + l_24->data);
+            text_draw_centred_coloured((int)l_20->name, (short)((COUNT & 1) * 56 + 236), (short)((COUNT >> 1) * 40 + 48), 145, 156);
             ((short *)D_001A9B9C)[COUNT++] = l_1C;
         }
     }
@@ -101,7 +101,7 @@ void potionmaker_update(void)
         msgbox_show_rsc(34, 1);
         potionmaker_close();
     }
-    if (((struct bf8_2_1 *)&D_001940D4)->f && (l_1C = spells_list_poll()) > -1)
+    if (((struct bf8_2_1 *)&D_001940D4)->f && (l_1C = list_popup_poll()) > -1)
         potion_make(((struct item **)D_00190BE4)[l_1C]);
     if ((char)key_down_esc != 0)
         potionmaker_close();

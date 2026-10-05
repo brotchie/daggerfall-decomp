@@ -3,14 +3,14 @@
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
 
-extern char D_00185F88[];
+extern char item_group_templates[];
 
 extern int rand_range(int, int);
 extern void item_init_from_template(unsigned short, short, short, struct item *);
 extern void item_make_magic(struct item *, int);
 extern void item_make_artifact(struct item *, int);
 
-void func_0005E37F(short a1, int a2, int a3, struct item *a4)
+void item_make_in_range(short a1, int a2, int a3, struct item *a4)
 {
     int l_14;
 
@@ -30,6 +30,6 @@ void func_0005E37F(short a1, int a2, int a3, struct item *a4)
         item_init_from_template(287, 27, 8, a4);
         return;
     default:
-        item_init_from_template((int)(unsigned short)*(short *)((char *)(int)(*(char **)(D_00185F88 + (((int)(unsigned short)a1) << 2)) + (l_14 * 2))), (int)(short)a1, (int)(short)*(short *)&l_14, a4);
+        item_init_from_template((int)(unsigned short)*(short *)((char *)(int)(*(char **)(item_group_templates + (((int)(unsigned short)a1) << 2)) + (l_14 * 2))), (int)(short)a1, (int)(short)*(short *)&l_14, a4);
     }
 }

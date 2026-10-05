@@ -7,9 +7,9 @@ extern char D_0017A13C[];
 extern int game_minutes;
 extern struct quest *current_quest;
 extern void quest_timer_update(struct quest *, struct qbn_timer *, short);
-extern struct record *func_0002C96B(struct quest *, struct record *, short);
+extern struct record *quest_place_or_person_object(struct quest *, struct record *, short);
 extern void quest_timer_expire(struct quest *, struct qbn_timer *);
-extern void func_0002CAB0(struct qbn_timer *);
+extern void quest_timer_clear_state(struct qbn_timer *);
 extern unsigned int quest_travel_minutes(struct quest *, struct record *, struct record *);
 extern struct qbn_timer *quest_section(struct quest *, int);
 extern int rand_range(int, int);
@@ -24,7 +24,7 @@ void quest_timers_update(struct quest *a1)
     for (i = 0; a1->section_counts[6] > i; i++, t++) {
         if ((short)t->flags & 2) {
             t->flags &= ~128;
-            func_0002CAB0(t);
+            quest_timer_clear_state(t);
         }
         if ((short)t->flags & 64)
             quest_timer_update(a1, t, 0);
@@ -54,13 +54,13 @@ void quest_timer_update(struct quest *a1, struct qbn_timer *a2, short a3)
             switch (a2->type) {
             case 2:
             case 4:
-                a2->link1 = func_0002C96B(a1, a2->link1, (short)a2->flags & 256);
+                a2->link1 = quest_place_or_person_object(a1, a2->link1, (short)a2->flags & 256);
                 a2->link2 = 0;
                 break;
             case 3:
             case 5:
-                a2->link1 = func_0002C96B(a1, a2->link1, (short)a2->flags & 256);
-                a2->link2 = func_0002C96B(a1, a2->link2, (short)a2->flags & 512);
+                a2->link1 = quest_place_or_person_object(a1, a2->link1, (short)a2->flags & 256);
+                a2->link2 = quest_place_or_person_object(a1, a2->link2, (short)a2->flags & 512);
                 break;
             default:
                 a2->link1 = a2->link2 = 0;

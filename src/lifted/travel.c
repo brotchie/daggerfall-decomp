@@ -11,7 +11,7 @@ extern signed char D_0012B508;
 extern signed char key_down_enter;
 extern short D_00142928;
 extern short D_0014292C;
-extern short D_0014294C;
+extern short xn_gfx_clip_bottom;
 extern int screen_buffer;
 extern char D_0017743D[];
 extern char D_00177446[];
@@ -28,7 +28,7 @@ extern int D_001837E4[];
 extern char region_names[];
 extern int D_001846F4;
 extern signed char D_00187CA8;
-extern signed char D_00188774[];
+extern signed char location_type_dot_colour[];
 extern signed char location_type_category[];
 extern short D_00188790[];
 extern short D_00188798[];
@@ -42,7 +42,7 @@ extern char D_001887F6[];
 extern char D_001887F8[];
 extern char D_001887FA[];
 extern char D_001887FC[];
-extern char D_00188898[];
+extern char region_map_origins[];
 extern char D_0018889A[];
 extern char D_00188994[];
 extern char D_0018899C[];
@@ -53,13 +53,13 @@ extern int D_001889C1;
 extern int terrain_travel_modifiers[];
 extern signed char text_buffer[];
 extern int D_00190CAC;
-extern signed char itemmaker_slot_kinds[];
+extern signed char scratch_190ce4[];
 extern signed char D_00190CE5;
 extern signed char D_00190CE7;
 extern signed char D_00190CE8;
-extern signed char D_00190D16;
-extern char D_00190D64[];
-extern char D_00190D66[];
+extern signed char scratch_190d16;
+extern char scratch_190d64[];
+extern char scratch_190d66[];
 extern signed char text_rsc_buffer[];
 extern char D_00190FE8[];
 extern struct record *player_entity;
@@ -68,20 +68,20 @@ extern char cheat_flags[];
 extern char D_00195B5C[];
 extern struct character *player_character;
 extern int window_image;
-extern char D_00195C44[];
-extern int D_00195D48;
-extern int D_00195DB0;
+extern char scratch_buffer[];
+extern int sky_loaded_frame;
+extern int text_macro_travel_city;
 extern signed char current_region;
 extern unsigned char D_00196271;
 extern signed char D_00196272;
 extern signed char game_mode;
 extern signed char mouse_buttons_prev;
-extern signed char D_00196285;
-extern signed char D_0019629B;
-extern int D_00196808;
-extern int D_00196A28;
+extern signed char climate_is_ocean;
+extern signed char night_sky_loaded;
+extern int town_building_counter;
+extern int region_location_count;
 extern char *D_00196A7C;
-extern struct map_location *D_00196A9C;
+extern struct map_location *region_locations;
 extern char D_001AA64C[];
 extern char D_001AA650[];
 extern char D_001AA654[];
@@ -92,7 +92,7 @@ extern int D_001AA664;
 extern char D_001AA668[];
 extern int D_001AA66C;
 extern char D_001AA670[];
-extern int D_001AA674;
+extern int travel_ocean_pixels;
 extern int D_001AA678;
 extern int D_001AA67C;
 extern int D_001AA680;
@@ -107,7 +107,7 @@ extern signed char D_001AA6A4;
 extern signed char D_001AA6A5;
 extern signed char D_001AA6A6;
 
-extern int func_00020057(int, int);
+extern int climate_at(int, int);
 extern int sound_play(int, int, int);
 extern int disk_read_file(int, int);
 extern int guild_find_membership_by_bits(unsigned char);
@@ -118,29 +118,29 @@ extern int travel_route(int, int, int, int, int);
 extern int mc_free();
 extern int mc_memset();
 extern int mc_strncpy();
-extern int func_000A0DF4();
+extern int strlen();
 extern int stricmp();
 extern int strnicmp();
-extern int func_000A0ED9(int, int);
+extern int mc_set_location(int, int);
 extern int mc_sprintf(int, ...);
 extern int mc_memcpy();
 extern int func_000A134C();
-extern int func_000C7FD9();
-extern int func_000CDD49();
-extern int func_000CDD6C();
-extern int func_000CDD81();
-extern int func_00142790();
-extern int func_00144F68();
-extern int func_00144FB4();
-extern int func_001532B4();
+extern int xn_math_approx_dist2d();
+extern int xn_draw_zoom4x();
+extern int xn_draw_mark_matching();
+extern int xn_gfx_present_inclusive();
+extern int xn_kbd_flush();
+extern int xn_draw_image();
+extern int xn_draw_image_transparent();
+extern int xn_draw_line_to();
 extern void maploads_load_region(int);
 extern void region_load_location_names(int);
-extern void func_0001DFA2(void);
+extern void region_location_names_release(void);
 extern void msgbox_show_string(int, int);
 extern void msgbox_show_rsc(int, int);
 extern void palette_restore(void);
-extern void text_draw_colored(int, int, int, int, unsigned char);
-extern void text_draw_centered_colored(int, int, int, int, unsigned char);
+extern void text_draw_coloured(int, int, int, int, unsigned char);
+extern void text_draw_centred_coloured(int, int, int, int, unsigned char);
 extern void msgbox_yes_no_rsc(int);
 extern void inpstr_begin_text(int, short);
 extern void object_foreach(int, int);
@@ -161,7 +161,7 @@ void travel_load_region_part(void);
 void travel_toggle_zoom(void);
 void func_0009D5AC(int, int, int);
 void travel_draw_buttons(void);
-#pragma aux func_000A0ED9 parm routine [];
+#pragma aux mc_set_location parm routine [];
 
 void travel_map_update(void)
 {
@@ -184,24 +184,24 @@ void travel_map_update(void)
     if (travel_map_open(0) == 0) return;
     mc_memcpy(screen_buffer, window_image, 64000, (int)D_0017743D, 198, 4);
     travel_draw_buttons();
-    if (itemmaker_slot_kinds[0] != 0) {
+    if (scratch_190ce4[0] != 0) {
         if (D_00190CE8 != 0) {
             func_0009D5AC((int)(*(char **)&screen_buffer + 3840), (int)&*(signed char *)(*(char **)D_001AA668 + 12), 51200);
         } else {
             mc_memcpy((int)(*(char **)&screen_buffer + 3840), (int)&*(signed char *)(*(char **)D_001AA668 + 12), 51200, (int)D_0017743D, 208, 4);
-            func_00144FB4((int)(unsigned short)*(short *)(*(char **)D_001AA670), (int)(unsigned short)*(short *)(*(char **)D_001AA670 + 2), (int)(unsigned short)*(short *)(*(char **)D_001AA670 + 4), (int)(unsigned short)*(short *)(*(char **)D_001AA670 + 6), (int)(*(char **)D_001AA670 + 12));
+            xn_draw_image_transparent((int)(unsigned short)*(short *)(*(char **)D_001AA670), (int)(unsigned short)*(short *)(*(char **)D_001AA670 + 2), (int)(unsigned short)*(short *)(*(char **)D_001AA670 + 4), (int)(unsigned short)*(short *)(*(char **)D_001AA670 + 6), (int)(*(char **)D_001AA670 + 12));
         }
         if (((int)(unsigned char)D_001AA6A4) > 1) {
             if (((int)(unsigned char)(D_001AA6A5 & 1)) == 0) {
-                func_00144F68((int)(unsigned short)*(short *)(*(char **)D_001AA654), (int)(unsigned short)*(short *)(*(char **)D_001AA654 + 2), (int)(unsigned short)*(short *)(*(char **)D_001AA654 + 4), (int)(unsigned short)*(short *)(*(char **)D_001AA654 + 6), (int)(*(char **)D_001AA654 + 12));
+                xn_draw_image((int)(unsigned short)*(short *)(*(char **)D_001AA654), (int)(unsigned short)*(short *)(*(char **)D_001AA654 + 2), (int)(unsigned short)*(short *)(*(char **)D_001AA654 + 4), (int)(unsigned short)*(short *)(*(char **)D_001AA654 + 6), (int)(*(char **)D_001AA654 + 12));
             } else {
-                func_00144F68((int)(unsigned short)*(short *)(*(char **)D_001AA658), (int)(unsigned short)*(short *)(*(char **)D_001AA658 + 2), (int)(unsigned short)*(short *)(*(char **)D_001AA658 + 4), (int)(unsigned short)*(short *)(*(char **)D_001AA658 + 6), (int)(*(char **)D_001AA658 + 12));
+                xn_draw_image((int)(unsigned short)*(short *)(*(char **)D_001AA658), (int)(unsigned short)*(short *)(*(char **)D_001AA658 + 2), (int)(unsigned short)*(short *)(*(char **)D_001AA658 + 4), (int)(unsigned short)*(short *)(*(char **)D_001AA658 + 6), (int)(*(char **)D_001AA658 + 12));
             }
             if (((int)(unsigned char)D_001AA6A4) > 2) {
                 if (((int)(unsigned char)(D_001AA6A5 & 2)) == 0) {
-                    func_00144F68((int)(unsigned short)*(short *)(*(char **)D_001AA64C), (int)(unsigned short)*(short *)(*(char **)D_001AA64C + 2), (int)(unsigned short)*(short *)(*(char **)D_001AA64C + 4), (int)(unsigned short)*(short *)(*(char **)D_001AA64C + 6), (int)(*(char **)D_001AA64C + 12));
+                    xn_draw_image((int)(unsigned short)*(short *)(*(char **)D_001AA64C), (int)(unsigned short)*(short *)(*(char **)D_001AA64C + 2), (int)(unsigned short)*(short *)(*(char **)D_001AA64C + 4), (int)(unsigned short)*(short *)(*(char **)D_001AA64C + 6), (int)(*(char **)D_001AA64C + 12));
                 } else {
-                    func_00144F68((int)(unsigned short)*(short *)(*(char **)D_001AA650), (int)(unsigned short)*(short *)(*(char **)D_001AA650 + 2), (int)(unsigned short)*(short *)(*(char **)D_001AA650 + 4), (int)(unsigned short)*(short *)(*(char **)D_001AA650 + 6), (int)(*(char **)D_001AA650 + 12));
+                    xn_draw_image((int)(unsigned short)*(short *)(*(char **)D_001AA650), (int)(unsigned short)*(short *)(*(char **)D_001AA650 + 2), (int)(unsigned short)*(short *)(*(char **)D_001AA650 + 4), (int)(unsigned short)*(short *)(*(char **)D_001AA650 + 6), (int)(*(char **)D_001AA650 + 12));
                 }
             }
         }
@@ -220,16 +220,16 @@ void travel_map_update(void)
             } else {
                 l_28 = 1132;
                 if (((struct bf8_3_1 *)((char *)l_28))->f != 0) {
-                    if (itemmaker_slot_kinds[0] != 0) {
+                    if (scratch_190ce4[0] != 0) {
                         D_0012B508 = 244;
                         D_00142928 = *(short *)D_001AA688;
                         D_0014292C = 12;
-                        func_001532B4((int)(short)*(short *)D_001AA688, 172);
+                        xn_draw_line_to((int)(short)*(short *)D_001AA688, 172);
                         D_00142928 = 0;
                         D_0014292C = *(short *)D_001AA68C;
-                        func_001532B4(320, (int)(short)*(short *)D_001AA68C);
+                        xn_draw_line_to(320, (int)(short)*(short *)D_001AA68C);
                     } else {
-                        func_000CDD6C(D_001AA66C, screen_buffer, ((int)(unsigned char)current_region) + 128, 64000);
+                        xn_draw_mark_matching(D_001AA66C, screen_buffer, ((int)(unsigned char)current_region) + 128, 64000);
                     }
                 }
             }
@@ -242,17 +242,17 @@ void travel_map_update(void)
         D_00190CE7 = 0;
         l_50 = travel_find_location((int)text_rsc_buffer);
         if (l_50 != (-1)) {
-            l_34 = D_00196A9C + l_50;
+            l_34 = region_locations + l_50;
             if (((int)(unsigned char)D_001AA6A4) < 2) {
-                l_44 = ((int)(short)*(short *)(D_00188898 + (((int)(signed char)itemmaker_slot_kinds[0]) << 2))) << 15;
-                l_40 = (499 - ((int)(short)*(short *)(D_0018889A + (((int)(signed char)itemmaker_slot_kinds[0]) << 2)))) << 15;
+                l_44 = ((int)(short)*(short *)(region_map_origins + (((int)(signed char)scratch_190ce4[0]) << 2))) << 15;
+                l_40 = (499 - ((int)(short)*(short *)(D_0018889A + (((int)(signed char)scratch_190ce4[0]) << 2)))) << 15;
             } else {
                 l_44 = ((int)(short)*(short *)((char *)(int)(D_001AA684 + (((int)(unsigned char)D_001AA6A5) << 2)))) << 15;
                 l_40 = (499 - ((int)(short)(((short *)D_001AA684))[((int)(unsigned char)D_001AA6A5) * 2 + 1])) << 15;
             }
             l_4C = ((unsigned)((l_34->x_type_flags & 33554431) - l_44)) >> 15;
             l_48 = ((unsigned)(-((l_34->y_size & 16777215) - l_40))) >> 15;
-            if (((int)(signed char)itemmaker_slot_kinds[0]) == 62 || ((int)(signed char)itemmaker_slot_kinds[0]) == 20) {
+            if (((int)(signed char)scratch_190ce4[0]) == 62 || ((int)(signed char)scratch_190ce4[0]) == 20) {
                 l_4C <<= 2;
                 l_48 <<= 2;
                 l_48 += -6;
@@ -262,7 +262,7 @@ void travel_map_update(void)
             *(int *)D_001AA68C = l_48 + 13;
             l_24 = 1132;
             D_00190CAC = *(int *)((char *)l_24);
-            D_00195DB0 = (int)(D_00196A7C + ((travel_selected_location = l_50) << 5)) + 4;
+            text_macro_travel_city = (int)(D_00196A7C + ((travel_selected_location = l_50) << 5)) + 4;
             l_20 = 1132;
             D_001AA694 = (int)(*(char **)((char *)l_20) + 24);
             while (key_down_enter != 0);
@@ -316,19 +316,19 @@ void travel_button_exit(int a1)
     if (a1 != 100 && (((((int)(unsigned char)(mouse_buttons & 1)) == 0) || ((((int)(unsigned char)(mouse_buttons_prev & 1)) != 0))) ? 1 : 0) != 0) {
         return;
     }
-    if (itemmaker_slot_kinds[0] != 0) {
+    if (scratch_190ce4[0] != 0) {
         func_0009BE38();
         return;
     }
     sound_play(203, (int)player_object, 110);
     mc_memset(screen_buffer, 0, 64000, (int)D_0017743D, 367, 4);
-    func_000CDD81(1);
+    xn_gfx_present_inclusive(1);
     palette_restore();
-    D_00195D48 = 10000;
-    D_0019629B = 0;
+    sky_loaded_frame = 10000;
+    night_sky_loaded = 0;
     D_00187CA8 = 1;
     maploads_load_region((int)(unsigned char)current_region);
-    func_0001DFA2();
+    region_location_names_release();
     if (window_image != 0 && window_image != (-1751672937)) {
         mc_free(window_image, (int)D_0017743D, 380);
         window_image = -1751672937;
@@ -391,40 +391,40 @@ void travel_draw_locations(void)
     int l_1C;
     short l_18;
 
-    l_30 = D_00196A9C;
-    *(int *)&l_18 = (int)(short)D_0014294C;
-    D_0014294C = 160;
+    l_30 = region_locations;
+    *(int *)&l_18 = (int)(short)xn_gfx_clip_bottom;
+    xn_gfx_clip_bottom = 160;
     if (((int)(unsigned char)D_001AA6A4) < 2) {
-        l_2C = ((int)(short)*(short *)(D_00188898 + (((int)(signed char)itemmaker_slot_kinds[0]) << 2))) << 15;
-        l_28 = (499 - ((int)(short)*(short *)(D_0018889A + (((int)(signed char)itemmaker_slot_kinds[0]) << 2)))) << 15;
+        l_2C = ((int)(short)*(short *)(region_map_origins + (((int)(signed char)scratch_190ce4[0]) << 2))) << 15;
+        l_28 = (499 - ((int)(short)*(short *)(D_0018889A + (((int)(signed char)scratch_190ce4[0]) << 2)))) << 15;
     } else {
         l_2C = ((int)(short)*(short *)((char *)(int)(D_001AA684 + (((int)(unsigned char)D_001AA6A5) << 2)))) << 15;
         l_28 = (499 - ((int)(short)(((short *)D_001AA684))[((int)(unsigned char)D_001AA6A5) * 2 + 1])) << 15;
     }
-    for (l_24 = 0; l_24 < D_00196A28; l_24++, l_30++) {
+    for (l_24 = 0; l_24 < region_location_count; l_24++, l_30++) {
         if (((struct bf8_3_1 *)&cheat_flags)->f == 0 && ((l_30->x_type_flags & 0x40000000) == 0 || (l_30->x_type_flags & 0x80000000) != 0)) {
             continue;
         }
         if ((((int)(unsigned char)travel_filter) & (1 << ((int)(unsigned char)location_type_category[((unsigned)(l_30->x_type_flags << 2)) >> 27]))) == 0) continue;
         l_20 = ((unsigned)((l_30->x_type_flags & 33554431) - l_2C)) >> 15;
         l_1C = ((unsigned)(-((l_30->y_size & 16777215) - l_28))) >> 15;
-        if (((int)(signed char)itemmaker_slot_kinds[0]) == 62 || ((int)(signed char)itemmaker_slot_kinds[0]) == 20) {
+        if (((int)(signed char)scratch_190ce4[0]) == 62 || ((int)(signed char)scratch_190ce4[0]) == 20) {
             l_20 <<= 2;
             l_1C <<= 2;
             l_1C += -6;
             l_20 += -2;
         }
-        if (l_20 == 139 && l_1C == 165) (D_00196808)++;
-        func_000A134C((int)(short)(l_20 + 12), (int)(short)(l_1C + 1), (int)(unsigned char)D_00188774[((unsigned)(l_30->x_type_flags << 2)) >> 27]);
+        if (l_20 == 139 && l_1C == 165) (town_building_counter)++;
+        func_000A134C((int)(short)(l_20 + 12), (int)(short)(l_1C + 1), (int)(unsigned char)location_type_dot_colour[((unsigned)(l_30->x_type_flags << 2)) >> 27]);
     }
-    D_0014294C = *(int *)&l_18;
+    xn_gfx_clip_bottom = *(int *)&l_18;
 }
 
 void travel_open_region(int a1)
 {
     int l_18;
 
-    itemmaker_slot_kinds[0] = *(signed char *)&a1 + 1;
+    scratch_190ce4[0] = *(signed char *)&a1 + 1;
     D_001AA6A4 = (D_001AA6A5 = 0);
     if (a1 == 0 || a1 == 1 || a1 == 16) {
         maploads_load_region(a1);
@@ -435,7 +435,7 @@ void travel_open_region(int a1)
             mc_free(*(int *)D_001AA668, (int)D_0017743D, 460);
             *(int *)D_001AA668 = -1751672937;
         }
-        func_000A0ED9(461, (int)D_0017743D);
+        mc_set_location(461, (int)D_0017743D);
         mc_sprintf((int)text_buffer, (int)D_00177446, a1);
         *(int *)D_001AA668 = disk_read_file((int)text_buffer, 0);
         maploads_load_region(a1);
@@ -474,15 +474,15 @@ void travel_mark_player(int a1)
 
     if (((int)(unsigned char)current_region) == a1) {
         if (((int)(unsigned char)D_001AA6A4) < 2) {
-            l_20 = ((int)(short)*(short *)(D_00188898 + (((int)(signed char)itemmaker_slot_kinds[0]) << 2))) << 15;
-            l_1C = (499 - ((int)(short)*(short *)(D_0018889A + (((int)(signed char)itemmaker_slot_kinds[0]) << 2)))) << 15;
+            l_20 = ((int)(short)*(short *)(region_map_origins + (((int)(signed char)scratch_190ce4[0]) << 2))) << 15;
+            l_1C = (499 - ((int)(short)*(short *)(D_0018889A + (((int)(signed char)scratch_190ce4[0]) << 2)))) << 15;
         } else {
             l_20 = ((int)(short)*(short *)((char *)(int)(D_001AA684 + (((int)(unsigned char)D_001AA6A5) << 2)))) << 15;
             l_1C = (499 - ((int)(short)(((short *)D_001AA684))[((int)(unsigned char)D_001AA6A5) * 2 + 1])) << 15;
         }
         l_28 = (player_object->x - l_20) / 32768;
         l_24 = (-(player_object->z - l_1C)) / 32768;
-        if (((int)(signed char)itemmaker_slot_kinds[0]) == 62 || ((int)(signed char)itemmaker_slot_kinds[0]) == 20) {
+        if (((int)(signed char)scratch_190ce4[0]) == 62 || ((int)(signed char)scratch_190ce4[0]) == 20) {
             l_28 <<= 2;
             l_24 <<= 2;
             l_24 += -6;
@@ -504,19 +504,19 @@ void travel_draw_hover_name(void)
     int l_18;
 
     if (((int)(short)mouse_y) > 171) return;
-    if (itemmaker_slot_kinds[0] != 0) {
+    if (scratch_190ce4[0] != 0) {
         l_18 = travel_location_at_cursor();
         if (l_18 != (-1)) {
             if (((struct bf8_3_1 *)&cheat_flags)->f != 0) {
-                if ((((int)(unsigned char)travel_filter) & (1 << ((int)(unsigned char)location_type_category[((unsigned)((D_00196A9C)[l_18].x_type_flags << 2)) >> 27]))) != 0) {
-                    func_000A0ED9(541, (int)D_0017743D);
-                    mc_sprintf((int)text_buffer, (int)D_00177455, D_001837E4[((int)(signed char)itemmaker_slot_kinds[0])], (int)(D_00196A7C + (l_18 << 5)) + 4);
+                if ((((int)(unsigned char)travel_filter) & (1 << ((int)(unsigned char)location_type_category[((unsigned)((region_locations)[l_18].x_type_flags << 2)) >> 27]))) != 0) {
+                    mc_set_location(541, (int)D_0017743D);
+                    mc_sprintf((int)text_buffer, (int)D_00177455, D_001837E4[((int)(signed char)scratch_190ce4[0])], (int)(D_00196A7C + (l_18 << 5)) + 4);
                 } else {
                     mc_strncpy((int)text_buffer, D_001AA664, 160, (int)D_0017743D, 543);
                 }
-            } else if ((((D_00196A9C)[l_18].x_type_flags & 0x40000000) != 0 || ((D_00196A9C)[l_18].x_type_flags & 0x80000000) == 0) && (((int)(unsigned char)travel_filter) & (1 << ((int)(unsigned char)location_type_category[((unsigned)((D_00196A9C)[l_18].x_type_flags << 2)) >> 27]))) != 0) {
-                func_000A0ED9(548, (int)D_0017743D);
-                mc_sprintf((int)text_buffer, (int)D_00177455, D_001837E4[((int)(signed char)itemmaker_slot_kinds[0])], (int)(D_00196A7C + (l_18 << 5)) + 4);
+            } else if ((((region_locations)[l_18].x_type_flags & 0x40000000) != 0 || ((region_locations)[l_18].x_type_flags & 0x80000000) == 0) && (((int)(unsigned char)travel_filter) & (1 << ((int)(unsigned char)location_type_category[((unsigned)((region_locations)[l_18].x_type_flags << 2)) >> 27]))) != 0) {
+                mc_set_location(548, (int)D_0017743D);
+                mc_sprintf((int)text_buffer, (int)D_00177455, D_001837E4[((int)(signed char)scratch_190ce4[0])], (int)(D_00196A7C + (l_18 << 5)) + 4);
             } else {
                 mc_strncpy((int)text_buffer, D_001AA664, 160, (int)D_0017743D, 550);
             }
@@ -527,26 +527,26 @@ void travel_draw_hover_name(void)
     } else {
         l_20 = (int)(unsigned char)*(signed char *)((char *)(int)(*(char **)&D_001AA66C + ((((int)(short)mouse_y) * 320) + ((int)(short)mouse_x))));
         if (l_20 < 128 || l_20 > 191) return;
-        func_000A0ED9(562, (int)D_0017743D);
+        mc_set_location(562, (int)D_0017743D);
         mc_sprintf((int)text_buffer, (int)D_0017745D, D_001835E8[l_20]);
         l_1C = 2;
     }
     if (text_buffer[0] == 0) return;
-    text_draw_centered_colored((int)text_buffer, 160, (int)(short)*(short *)&l_1C, 145, 156);
+    text_draw_centred_coloured((int)text_buffer, 160, (int)(short)*(short *)&l_1C, 145, 156);
 }
 
 void travel_button_map(void)
 {
     int l_18;
 
-    if (((int)(unsigned char)(mouse_buttons & 2)) != 0 && ((int)(unsigned char)(mouse_buttons_prev & 2)) == 0 && itemmaker_slot_kinds[0] != 0) {
+    if (((int)(unsigned char)(mouse_buttons & 2)) != 0 && ((int)(unsigned char)(mouse_buttons_prev & 2)) == 0 && scratch_190ce4[0] != 0) {
         travel_toggle_zoom();
         return;
     }
     if (((int)(unsigned char)(mouse_buttons & 1)) == 0 || ((int)(unsigned char)(mouse_buttons_prev & 1)) != 0) {
         return;
     }
-    if (itemmaker_slot_kinds[0] != 0) {
+    if (scratch_190ce4[0] != 0) {
         travel_open_trip();
         return;
     }
@@ -568,7 +568,7 @@ void func_0009BE38(void)
         }
         *(int *)D_001AA688 = -1;
     }
-    itemmaker_slot_kinds[0] = 0;
+    scratch_190ce4[0] = 0;
     D_00190CE8 = 0;
 }
 
@@ -621,20 +621,20 @@ void travel_button_find(void)
     if (((int)(unsigned char)(mouse_buttons & 1)) == 0 || ((int)(unsigned char)(mouse_buttons_prev & 1)) != 0) {
         return;
     }
-    if (itemmaker_slot_kinds[0] == 0) return;
+    if (scratch_190ce4[0] == 0) return;
     D_00190CE8 = 0;
     sound_play(203, (int)player_object, 110);
     D_0012B508 = 145;
-    func_00142790();
-    l_18 = *(int *)D_00195C44 + 55000;
-    func_000A0ED9(807, (int)D_0017743D);
+    xn_kbd_flush();
+    l_18 = *(int *)scratch_buffer + 55000;
+    mc_set_location(807, (int)D_0017743D);
     mc_sprintf(l_18, (int)D_00177460, D_001846F4);
-    *(signed char *)((char *)(func_000A0DF4(l_18) + l_18) + 1) = 0;
+    *(signed char *)((char *)(strlen(l_18) + l_18) + 1) = 0;
     text_rsc_buffer[0] = 0;
     inpstr_begin_text((int)text_rsc_buffer, 32);
     msgbox_show_string(l_18, 2);
     if (strnicmp((int)D_0017748E, (int)text_rsc_buffer, 4) == 0) {
-        mc_memcpy((int)text_rsc_buffer, (int)D_00190FE8, (int)&*(signed char *)((char *)func_000A0DF4((int)text_rsc_buffer) + 1), (int)D_0017743D, 812, 2048);
+        mc_memcpy((int)text_rsc_buffer, (int)D_00190FE8, (int)&*(signed char *)((char *)strlen((int)text_rsc_buffer) + 1), (int)D_0017743D, 812, 2048);
     }
     D_00190CE7 = 1;
 }
@@ -653,45 +653,45 @@ int travel_location_at_cursor(void)
     int l_20;
     int l_1C;
 
-    l_44 = D_00196A9C;
+    l_44 = region_locations;
     l_28 = 32767;
     if (D_001AA694 != 0) return -1;
     if (((int)(short)mouse_y) > 171) return -1;
     if (D_00190CE8 != 0) {
-        l_20 = (((int)(short)mouse_x) >> 2) + ((int)(short)*(short *)D_00190D64);
-        l_1C = ((((int)(short)mouse_y) - 12) >> 2) + ((int)(short)*(short *)D_00190D66);
+        l_20 = (((int)(short)mouse_x) >> 2) + ((int)(short)*(short *)scratch_190d64);
+        l_1C = ((((int)(short)mouse_y) - 12) >> 2) + ((int)(short)*(short *)scratch_190d66);
     } else {
         l_20 = (int)(short)mouse_x;
         l_1C = ((int)(short)mouse_y) - 12;
     }
     if (((int)(unsigned char)D_001AA6A4) < 2) {
-        l_3C = ((int)(short)*(short *)(D_00188898 + (((int)(signed char)itemmaker_slot_kinds[0]) << 2))) << 15;
-        l_38 = (499 - ((int)(short)*(short *)(D_0018889A + (((int)(signed char)itemmaker_slot_kinds[0]) << 2)))) << 15;
+        l_3C = ((int)(short)*(short *)(region_map_origins + (((int)(signed char)scratch_190ce4[0]) << 2))) << 15;
+        l_38 = (499 - ((int)(short)*(short *)(D_0018889A + (((int)(signed char)scratch_190ce4[0]) << 2)))) << 15;
     } else {
         l_3C = ((int)(short)*(short *)((char *)(int)(D_001AA684 + (((int)(unsigned char)D_001AA6A5) << 2)))) << 15;
         l_38 = (499 - ((int)(short)(((short *)D_001AA684))[((int)(unsigned char)D_001AA6A5) * 2 + 1])) << 15;
     }
-    if (((int)(signed char)itemmaker_slot_kinds[0]) == 62 || ((int)(signed char)itemmaker_slot_kinds[0]) == 20) {
+    if (((int)(signed char)scratch_190ce4[0]) == 62 || ((int)(signed char)scratch_190ce4[0]) == 20) {
         l_20 >>= 2;
         l_1C >>= 2;
         l_1C += 2;
         l_20 += 2;
     }
-    for (l_24 = 0; l_24 < D_00196A28; l_24++, l_44++) {
+    for (l_24 = 0; l_24 < region_location_count; l_24++, l_44++) {
         if ((((int)(unsigned char)travel_filter) & (1 << ((int)(unsigned char)location_type_category[((unsigned)(l_44->x_type_flags << 2)) >> 27]))) == 0) continue;
         if (((struct bf8_3_1 *)&cheat_flags)->f == 0 && ((l_44->x_type_flags & 0x40000000) == 0 || (l_44->x_type_flags & 0x80000000) != 0)) {
             continue;
         }
         l_34 = ((unsigned)((l_44->x_type_flags & 33554431) - l_3C)) >> 15;
         l_30 = ((unsigned)(-((l_44->y_size & 16777215) - l_38))) >> 15;
-        l_2C = func_000C7FD9(l_34, l_30, l_20, l_1C);
+        l_2C = xn_math_approx_dist2d(l_34, l_30, l_20, l_1C);
         if (l_2C < l_28) {
             l_40 = l_44;
             l_28 = l_2C;
         }
         if (l_28 < 2) break;
     }
-    if (l_24 != D_00196A28) {
+    if (l_24 != region_location_count) {
         D_001889C1 = (travel_selected_location = l_24);
         return l_24;
     }
@@ -706,10 +706,10 @@ int travel_find_location(int a1)
     struct map_location *l_20;
     int l_1C;
 
-    l_24 = func_000A0DF4(a1);
-    l_20 = D_00196A9C;
+    l_24 = strlen(a1);
+    l_20 = region_locations;
     if (l_24 == 0) return -1;
-    for (l_28 = 0; l_28 < D_00196A28; l_28++, l_20++) {
+    for (l_28 = 0; l_28 < region_location_count; l_28++, l_20++) {
         if (((struct bf8_3_1 *)&cheat_flags)->f == 0 && ((l_20->x_type_flags & 0x40000000) == 0 || (l_20->x_type_flags & 0x80000000) != 0)) {
             continue;
         }
@@ -717,8 +717,8 @@ int travel_find_location(int a1)
         if (strnicmp((int)D_0017748E, l_1C, 4) == 0) l_1C += 4;
         if (stricmp(a1, l_1C) == 0) return l_28;
     }
-    l_20 = D_00196A9C;
-    for (l_28 = 0; l_28 < D_00196A28; l_28++, l_20++) {
+    l_20 = region_locations;
+    for (l_28 = 0; l_28 < region_location_count; l_28++, l_20++) {
         if (((struct bf8_3_1 *)&cheat_flags)->f == 0 && ((l_20->x_type_flags & 0x40000000) == 0 || (l_20->x_type_flags & 0x80000000) != 0)) {
             continue;
         }
@@ -733,8 +733,8 @@ void travel_open_trip(void)
 {
     if (travel_selected_location == (-1)) return;
     D_00190CE5 = 1;
-    D_001AA678 = (D_00196A9C)[travel_selected_location].x_type_flags & 33554431;
-    D_001AA67C = (D_00196A9C)[travel_selected_location].y_size & 16777215;
+    D_001AA678 = (region_locations)[travel_selected_location].x_type_flags & 33554431;
+    D_001AA67C = (region_locations)[travel_selected_location].y_size & 16777215;
     D_001AA680 = travel_route(player_object->x, player_object->z, D_001AA678, D_001AA67C, 0);
     if (((int)(unsigned short)(*(short *)travel_options & 3)) == 2) {
         D_001AA680 = (D_001AA680 << 7) / 256;
@@ -760,22 +760,22 @@ int func_0009CD32(int a1)
     int l_20;
     int l_1C;
 
-    l_48 = D_00196A9C;
+    l_48 = region_locations;
     l_2C = 32767;
     l_24 = player_object->x / 32768;
     l_20 = player_object->z / 32768;
     if (((int)(unsigned char)D_001AA6A4) < 2) {
-        l_40 = ((int)(short)*(short *)(D_00188898 + (((int)(signed char)itemmaker_slot_kinds[0]) << 2))) << 15;
-        l_3C = (499 - ((int)(short)*(short *)(D_0018889A + (((int)(signed char)itemmaker_slot_kinds[0]) << 2)))) << 15;
+        l_40 = ((int)(short)*(short *)(region_map_origins + (((int)(signed char)scratch_190ce4[0]) << 2))) << 15;
+        l_3C = (499 - ((int)(short)*(short *)(D_0018889A + (((int)(signed char)scratch_190ce4[0]) << 2)))) << 15;
     } else {
         l_40 = ((int)(short)*(short *)((char *)(int)(D_001AA684 + (((int)(unsigned char)D_001AA6A5) << 2)))) << 15;
         l_3C = (499 - ((int)(short)(((short *)D_001AA684))[((int)(unsigned char)D_001AA6A5) * 2 + 1])) << 15;
     }
-    for (l_28 = 0; l_28 < D_00196A28; l_28++) {
+    for (l_28 = 0; l_28 < region_location_count; l_28++) {
         if ((((unsigned)(l_48->x_type_flags << 2)) >> 27) != a1) continue;
         l_38 = ((unsigned)((l_48->x_type_flags & 33554431) - l_40)) >> 15;
         l_34 = ((unsigned)(-((l_48->y_size & 16777215) - l_3C))) >> 15;
-        l_30 = func_000C7FD9(l_38, l_34, l_24, l_20);
+        l_30 = xn_math_approx_dist2d(l_38, l_34, l_24, l_20);
         if (l_30 < l_2C) {
             l_1C = l_28;
             l_44 = l_48;
@@ -792,10 +792,10 @@ int travel_pixel_time(int a1, int a2)
     int l_1C;
     int l_18;
 
-    l_1C = func_00020057((a1 << 15) + 16384, (int)&*(signed char *)((char *)(a2 << 15) + 16384));
+    l_1C = climate_at((a1 << 15) + 16384, (int)&*(signed char *)((char *)(a2 << 15) + 16384));
     l_18 = (travel_transport_factor * 102) / 256;
-    if (D_00196285 != 0) {
-        D_001AA674++;
+    if (climate_is_ocean != 0) {
+        travel_ocean_pixels++;
         if (((int)(unsigned short)(*(short *)travel_options & 8)) != 0 || player_character->ship_owned != 0) {
             return 51;
         }
@@ -811,11 +811,11 @@ void travel_check_transport_item(struct record *a1)
     if (a1->type != 2) return;
     l_18 = &a1->data.item;
     if (l_18->group == 23 && l_18->index == 1) {
-        D_00190D16 |= 2;
+        scratch_190d16 |= 2;
         travel_transport_factor = 128;
     }
     if (l_18->group != 23 || l_18->index != 0) return;
-    D_00190D16 |= 1;
+    scratch_190d16 |= 1;
     travel_transport_factor = 192;
 }
 
@@ -833,8 +833,8 @@ void travel_load_region_part(void)
         mc_free(*(int *)D_001AA668, (int)D_0017743D, 1119);
         *(int *)D_001AA668 = -1751672937;
     }
-    func_000A0ED9(1121, (int)D_0017743D);
-    mc_sprintf((int)text_buffer, (int)D_00177493, ((int)(unsigned char)D_001AA6A5) + 97, ((int)(signed char)itemmaker_slot_kinds[0]) - 1);
+    mc_set_location(1121, (int)D_0017743D);
+    mc_sprintf((int)text_buffer, (int)D_00177493, ((int)(unsigned char)D_001AA6A5) + 97, ((int)(signed char)scratch_190ce4[0]) - 1);
     *(int *)D_001AA668 = disk_read_file((int)text_buffer, 0);
     l_18 = screen_buffer;
     screen_buffer = *(int *)D_001AA668;
@@ -847,7 +847,7 @@ void travel_button_arrows(int a1)
     if (((int)(unsigned char)(mouse_buttons & 1)) == 0 || ((int)(unsigned char)(mouse_buttons_prev & 1)) != 0) {
         return;
     }
-    if (itemmaker_slot_kinds[0] == 0) return;
+    if (scratch_190ce4[0] == 0) return;
     if (((int)(unsigned char)D_001AA6A4) < 2) return;
     if (a1 == 3) {
         if (((int)(unsigned char)D_001AA6A4) > 2) D_001AA6A5 ^= 2;
@@ -861,22 +861,22 @@ void travel_button_arrows(int a1)
 void travel_toggle_zoom(void)
 {
     D_00190CE8 ^= 1;
-    *(short *)D_00190D64 = mouse_x - 40;
-    *(short *)D_00190D66 = mouse_y - 32;
-    if (*(short *)D_00190D64 < 0) *(short *)D_00190D64 = 0;
-    if (*(short *)D_00190D66 < 0) *(short *)D_00190D66 = 0;
-    if ((((int)(short)*(short *)D_00190D64) + 80) > 319) *(short *)D_00190D64 = 239;
-    if ((((int)(short)*(short *)D_00190D66) + 40) <= 148) return;
-    *(short *)D_00190D66 = 108;
+    *(short *)scratch_190d64 = mouse_x - 40;
+    *(short *)scratch_190d66 = mouse_y - 32;
+    if (*(short *)scratch_190d64 < 0) *(short *)scratch_190d64 = 0;
+    if (*(short *)scratch_190d66 < 0) *(short *)scratch_190d66 = 0;
+    if ((((int)(short)*(short *)scratch_190d64) + 80) > 319) *(short *)scratch_190d64 = 239;
+    if ((((int)(short)*(short *)scratch_190d66) + 40) <= 148) return;
+    *(short *)scratch_190d66 = 108;
 }
 
 void func_0009D5AC(int a1, int a2, int a3)
 {
     int l_10;
 
-    a2 = (a2 + (((int)(short)*(short *)D_00190D66) * 320)) + ((int)(short)*(short *)D_00190D64);
+    a2 = (a2 + (((int)(short)*(short *)scratch_190d66) * 320)) + ((int)(short)*(short *)scratch_190d64);
     for (l_10 = 0; l_10 < 40; l_10++) {
-        func_000CDD49((l_10 * 320) + a2, (l_10 * 1280) + a1, 80);
+        xn_draw_zoom4x((l_10 * 320) + a2, (l_10 * 1280) + a1, 80);
     }
 }
 
@@ -888,10 +888,10 @@ int travel_trip_cost(void)
     l_20 = (D_001AA680 + 59) / 60;
     l_1C = 0;
     if (((int)(unsigned short)(*(short *)travel_options & 16)) != 0 && guild_find_membership_by_bits(64) == 0) {
-        l_1C = (((l_20 - D_001AA674) / 24) * 5) + 5;
+        l_1C = (((l_20 - travel_ocean_pixels) / 24) * 5) + 5;
     }
-    if (D_001AA674 != 0 && player_character->ship_owned == 0 && ((int)(unsigned short)(*(short *)travel_options & 8)) != 0 && guild_find_membership_by_bits(64) == 0) {
-        l_1C += ((D_001AA674 / 24) + 1) * 25;
+    if (travel_ocean_pixels != 0 && player_character->ship_owned == 0 && ((int)(unsigned short)(*(short *)travel_options & 8)) != 0 && guild_find_membership_by_bits(64) == 0) {
+        l_1C += ((travel_ocean_pixels / 24) + 1) * 25;
     }
     return l_1C;
 }
@@ -903,7 +903,7 @@ void travel_button_im_at(void)
     if (((int)(unsigned char)(mouse_buttons & 1)) == 0 || ((int)(unsigned char)(mouse_buttons_prev & 1)) != 0) {
         return;
     }
-    if (itemmaker_slot_kinds[0] != 0) {
+    if (scratch_190ce4[0] != 0) {
         travel_mark_player((int)(unsigned char)current_region);
         return;
     }
@@ -919,10 +919,10 @@ void travel_draw_buttons(void)
     int l_1C;
     int l_18;
 
-    if (itemmaker_slot_kinds[0] != 0) {
-        func_00144F68(3, 175, 45, 22, *(int *)D_00195B5C);
+    if (scratch_190ce4[0] != 0) {
+        xn_draw_image(3, 175, 45, 22, *(int *)D_00195B5C);
     } else {
-        func_00144F68(3, 186, 45, 11, *(int *)D_00195B5C + 495);
+        xn_draw_image(3, 186, 45, 11, *(int *)D_00195B5C + 495);
     }
     for (l_24 = 0; l_24 < 4; l_24++) {
         l_20 = 1;
@@ -946,7 +946,7 @@ void travel_button_filter(void)
     if (((int)(unsigned char)(mouse_buttons & 1)) == 0 || ((int)(unsigned char)(mouse_buttons_prev & 1)) != 0) {
         return;
     }
-    if (itemmaker_slot_kinds[0] == 0) return;
+    if (scratch_190ce4[0] == 0) return;
     if (((int)(short)mouse_y) < 186) {
         if (((int)(short)mouse_x) < 149) {
             travel_filter ^= 1;
@@ -958,7 +958,7 @@ void travel_button_filter(void)
     } else {
         travel_filter ^= 8;
     }
-    travel_open_region(((int)(signed char)itemmaker_slot_kinds[0]) - 1);
+    travel_open_region(((int)(signed char)scratch_190ce4[0]) - 1);
 }
 
 int func_0009D960(int a1, int a2)
@@ -969,8 +969,8 @@ int func_0009D960(int a1, int a2)
 void travel_show_days_left(int a1)
 {
     mc_memcpy(screen_buffer, D_001AA690, 64000, (int)D_0017743D, 1259, 4);
-    func_000A0ED9(1260, (int)D_0017743D);
+    mc_set_location(1260, (int)D_0017743D);
     mc_sprintf((int)text_buffer, (int)D_001774A3, ((unsigned)a1) / 1440);
-    text_draw_colored((int)text_buffer, 240, 2, 145, 156);
-    func_000CDD81(1);
+    text_draw_coloured((int)text_buffer, 240, 2, 145, 156);
+    xn_gfx_present_inclusive(1);
 }

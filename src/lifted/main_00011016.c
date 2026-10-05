@@ -19,7 +19,7 @@ extern int D_0018DD58;
 extern int D_0018DD5C;
 extern int D_0018DD60;
 extern char D_0018DD64[];
-extern signed char D_001A3F5E;
+extern signed char music_uses_fm;
 
 extern int sos_shutdown(void);
 extern int sos_load_file(int, ...);
@@ -62,7 +62,7 @@ int sos_init(int a1, int a2)
     }
     if (a1 != (-1)) func_0009E2BB(90, D_0018DD40, (int)D_0018DD50);
     if (a2 == 40962 || (a2 == 40969 && a2 != (-1))) {
-        D_001A3F5E = 1;
+        music_uses_fm = 1;
         if ((sos_melodic_bank = sos_load_file((int)D_001700C0)) == 0) {
             sos_shutdown();
             return 3;

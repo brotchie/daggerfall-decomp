@@ -15,19 +15,19 @@ extern signed char text_buffer[];
 extern unsigned char D_001940D7;
 extern struct record *player_entity;
 extern struct record *player_object;
-extern struct record *D_00195AF4;
-extern struct record *guild_npc_object;
+extern struct record *found_object;
+extern struct record *scratch_object;
 extern struct character *player_character;
 extern int game_minutes;
 extern unsigned short *game_settings;
-extern int D_00195C74;
+extern int ceiling_height;
 extern int player_death_timer;
 extern short D_00195DA0;
 extern unsigned char player_on_ground;
 extern short collide_flags;
 extern int collide_move_object(struct record *, int, struct move *, int);
-extern void func_0002EBDE(struct record *);
-extern void func_0002EC79(struct record *);
+extern void damage_find_empty_soul_trap_cb(struct record *);
+extern void damage_drop_at_death_cb(struct record *);
 extern void quest_raise_event(int, struct record *, int);
 extern int item_artifact_equipped(int);
 extern void sound_play(int, struct record *, int);
@@ -38,8 +38,8 @@ extern struct record *object_create_child(struct record *, int, int);
 extern void object_foreach(struct record *, void (*)(struct record *));
 extern int mc_memset();
 extern int mc_memcpy();
-#pragma aux func_000A0ED9 parm routine [];
-extern int func_000A0ED9(int, char *);
+#pragma aux mc_set_location parm routine [];
+extern int mc_set_location(int, char *);
 extern int mc_sprintf(char *, ...);
 
 void damage_creature_death(struct record *a1)
@@ -54,7 +54,7 @@ void damage_creature_death(struct record *a1)
 
     l_2C = &a1->data.character;
     l_20 = player_on_ground;
-    l_1C = D_00195C74;
+    l_1C = ceiling_height;
     if (a1 == player_entity) {
         sound_play((player_character->flags & 1) + (player_character->race * 3 + 2) ? 258 : 243, player_object, 100);
         player_death_timer = 1000;
@@ -62,8 +62,8 @@ void damage_creature_death(struct record *a1)
     }
     if (l_2C->mobile_id == 146)
         guild_count_crime(6, 1);
-    D_00195AF4 = a1;
-    object_foreach(a1->children, func_0002EC79);
+    found_object = a1;
+    object_foreach(a1->children, damage_drop_at_death_cb);
     l_28 = a1->children;
     l_18 = item_artifact_equipped(9);
     if (l_2C->race < 43) {
@@ -71,18 +71,18 @@ void damage_creature_death(struct record *a1)
         while (l_28 != 0) {
             if (l_28->type == 19) {
 found:
-                guild_npc_object = 0;
-                object_foreach(player_entity->children, func_0002EBDE);
-                if (guild_npc_object == 0 && l_28->type == 19) {
+                scratch_object = 0;
+                object_foreach(player_entity->children, damage_find_empty_soul_trap_cb);
+                if (scratch_object == 0 && l_28->type == 19) {
                     D_0012B508 = 146;
                     hud_message_add(D_001709A1);
                     hud_message_add(D_001709C6);
                     return;
                 }
-                if (guild_npc_object != 0) {
+                if (scratch_object != 0) {
                     if (l_18 == 0 && rand_range(0, 100) > l_28->soul_creature)
                         break;
-                    l_28 = object_create_child(guild_npc_object, 0, 0);
+                    l_28 = object_create_child(scratch_object, 0, 0);
                     l_28->flags = 3;
                     l_28->type = 20;
                     l_28->soul_creature = l_2C->race;
@@ -97,7 +97,7 @@ found:
     player_character->last_kill_time = game_minutes;
     quest_raise_event(2, a1, 0);
     l_2C = &a1->data.character;
-    func_000A0ED9(587, D_001709E4);
+    mc_set_location(587, D_001709E4);
     mc_sprintf(((char *)text_buffer), D_001709ED, l_2C->name);
     hud_message_add(((char *)text_buffer));
     a1->type = 44;
@@ -116,5 +116,5 @@ found:
     l_4C.name = D_00187B44;
     collide_move_object(a1, 0, &l_4C, 0);
     player_on_ground = l_20;
-    D_00195C74 = l_1C;
+    ceiling_height = l_1C;
 }

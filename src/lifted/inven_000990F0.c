@@ -5,7 +5,7 @@
 extern int D_00195D84;
 
 
-int func_000990F0(int a1)
+int trade_shop_takes_group(int a1)
 {
     int l_1C;
 

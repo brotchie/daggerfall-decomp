@@ -12,13 +12,13 @@ extern char *D_00147954;
 extern char D_00176884[];
 extern char D_0017696F[];
 extern char D_00176977[];
-extern char D_001917E4[];
+extern char arena2_path[];
 extern void disk_copy_file(char *, int, char *);
 extern void automap_delete_files(void);
 extern unsigned func_000A13DA(char *, unsigned, struct find_t *);
 extern unsigned func_000A13F7(struct find_t *);
-#pragma aux func_000A0ED9 parm routine [];
-extern int func_000A0ED9(int, char *);
+#pragma aux mc_set_location parm routine [];
+extern int mc_set_location(int, char *);
 extern int mc_sprintf(char *, char *, ...);
 
 void load_copy_automap_files(int a1)
@@ -27,18 +27,18 @@ void load_copy_automap_files(int a1)
     struct find_t f;
 
     automap_delete_files();
-    func_000A0ED9(813, D_00176884);
+    mc_set_location(813, D_00176884);
     mc_sprintf(D_00147954, D_0017696F, a1);
     rc = func_000A13DA(D_00147954, 0, &f);
     while (rc == 0) {
-        disk_copy_file(f.name, a1, D_001917E4);
+        disk_copy_file(f.name, a1, arena2_path);
         rc = func_000A13F7(&f);
     }
-    func_000A0ED9(821, D_00176884);
+    mc_set_location(821, D_00176884);
     mc_sprintf(D_00147954, D_00176977, a1);
     rc = func_000A13DA(D_00147954, 0, &f);
     while (rc == 0) {
-        disk_copy_file(f.name, a1, D_001917E4);
+        disk_copy_file(f.name, a1, arena2_path);
         rc = func_000A13F7(&f);
     }
 }

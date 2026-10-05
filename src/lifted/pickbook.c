@@ -30,32 +30,32 @@ extern int D_00184634;
 extern char monster_category[];
 extern signed char D_00187CA8;
 extern signed char text_buffer[];
-extern struct record *D_00190504[];
-extern char D_00190D64[];
-extern char text_macro_fpc[];
+extern struct record *creature_list[];
+extern char scratch_190d64[];
+extern char scratch_190de4[];
 extern signed char D_001940D4;
 extern signed char D_001940D5;
 extern signed char D_001940D8;
-extern int D_001959FC;
+extern int spell_points_bonus;
 extern struct record *player_entity;
 extern struct record *player_object;
 extern int creature_count;
 extern struct record *spell_ready_missile;
 extern struct record *spell_ready_touch;
-extern int spellshop_icons;
+extern int magic_window_image;
 extern struct character *player_character;
 extern int window_image;
 extern int game_minutes;
 extern int trade_mode;
 extern short spell_effect_slot;
-extern short D_00195F62;
+extern short spell_ready_cost;
 extern signed char msgbox_kind;
 extern signed char D_00196272;
 extern signed char game_mode;
 extern signed char mouse_buttons_prev;
 extern signed char inv_right_icon;
 extern int spellbook_saved_screen;
-extern struct picklist D_001A9AB8;
+extern struct picklist shared_picklist;
 
 extern int spell_effect_text_index(short);
 extern int spell_cost(struct spell *, struct character *);
@@ -72,31 +72,31 @@ extern int object_new_id(int);
 extern int inventory_open(int, int, int);
 extern int mc_free();
 extern int mc_strncpy();
-extern int func_000A0DF4();
-extern int func_000A0ED9(int, int);
+extern int strlen();
+extern int mc_set_location(int, int);
 extern int mc_sprintf(int, ...);
 extern int mc_memcpy();
-extern int func_000CD20E();
-extern int func_000CE31C();
-extern int func_0012B136();
-extern int func_0012DB50();
-extern int func_00144FB4();
+extern int xn_draw_spell_icon();
+extern int xn_draw_copy_rect_stride_bytes();
+extern int xn_mouse_poll_clamped();
+extern int xn_font_select();
+extern int xn_draw_image_transparent();
 extern void spell_add_skill_uses(struct spell *, int);
 extern void msgbox_show_rsc(int, int);
-extern void text_draw_colored(int, int, int, int, unsigned char);
-extern void text_draw_centered_colored(int, int, int, int, unsigned char);
+extern void text_draw_coloured(int, int, int, int, unsigned char);
+extern void text_draw_centred_coloured(int, int, int, int, unsigned char);
 extern void picklist_init(struct picklist *, short, short, int, short, short, short, short, short, short, short, short, short, short, short, short, short, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char);
 extern void picklist_add(struct picklist *, int, int);
 extern void picklist_free(struct picklist *);
-extern void func_0008E152(struct record *, struct record *);
+extern void object_swap_siblings(struct record *, struct record *);
 extern void object_foreach(struct record *, int);
 int spellbook_close(void);
 int spellbook_build_list(void);
-int func_00042380(void);
+int spell_cost_item_percent(void);
 void spellbook_add_spell_cb(struct record *);
 void spellbook_draw_spell(struct spell *);
 void spellbook_effect_help(int);
-#pragma aux func_000A0ED9 parm routine [];
+#pragma aux mc_set_location parm routine [];
 
 void spellbook_add_spell_cb(struct record *a1)
 {
@@ -105,22 +105,22 @@ void spellbook_add_spell_cb(struct record *a1)
 
     if (a1->type != 9) return;
     l_1C = &a1->data.spell;
-    if (((int)(unsigned char)l_1C->name[0]) == 33 || ((int)(unsigned char)l_1C->name[func_000A0DF4(l_1C->name) + 1]) == 36) {
+    if (((int)(unsigned char)l_1C->name[0]) == 33 || ((int)(unsigned char)l_1C->name[strlen(l_1C->name) + 1]) == 36) {
         l_18 = spell_cost(l_1C, player_character);
-        if (((int)(unsigned char)l_1C->name[func_000A0DF4(l_1C->name) + 1]) == 36) {
+        if (((int)(unsigned char)l_1C->name[strlen(l_1C->name) + 1]) == 36) {
             l_18 >>= 2;
-            func_000A0ED9(62, (int)D_00170DE4);
+            mc_set_location(62, (int)D_00170DE4);
             mc_sprintf((int)text_buffer, (int)D_00170DEF, l_18, l_1C->name);
         } else {
-            func_000A0ED9(65, (int)D_00170DE4);
+            mc_set_location(65, (int)D_00170DE4);
             mc_sprintf((int)text_buffer, (int)D_00170DEF, l_18, &l_1C->name[1]);
         }
     } else {
-        func_000A0ED9(68, (int)D_00170DE4);
+        mc_set_location(68, (int)D_00170DE4);
         mc_sprintf((int)text_buffer, (int)D_00170DEF, spell_cost(l_1C, player_character), l_1C->name);
     }
-    picklist_add(&D_001A9AB8, (int)text_buffer, 0);
-    *(int *)(text_macro_fpc + (((int)(short)(*(short *)D_00190D64)++) << 2)) = (int)a1;
+    picklist_add(&shared_picklist, (int)text_buffer, 0);
+    *(int *)(scratch_190de4 + (((int)(short)(*(short *)scratch_190d64)++) << 2)) = (int)a1;
 }
 
 void spellbook_frame(void)
@@ -136,36 +136,36 @@ void spellbook_frame(void)
     if (spellbook_open(0) == 0) return;
     mc_memcpy(screen_buffer, spellbook_saved_screen, 64000, (int)D_00170DE4, 123, 4);
     l_28 = window_image;
-    func_00144FB4((int)(unsigned short)*(short *)((char *)l_28), (int)(unsigned short)*(short *)((char *)l_28 + 2), (int)(unsigned short)*(short *)((char *)l_28 + 4), (int)(unsigned short)*(short *)((char *)l_28 + 6), l_28 + 12);
-    func_000A0ED9(129, (int)D_00170DE4);
+    xn_draw_image_transparent((int)(unsigned short)*(short *)((char *)l_28), (int)(unsigned short)*(short *)((char *)l_28 + 2), (int)(unsigned short)*(short *)((char *)l_28 + 4), (int)(unsigned short)*(short *)((char *)l_28 + 6), l_28 + 12);
+    mc_set_location(129, (int)D_00170DE4);
     mc_sprintf((int)text_buffer, (int)D_00170E11, player_character->magicka, player_character->max_magicka);
-    text_draw_colored((int)text_buffer, 238, 20, 145, 141);
-    func_0012DB50(4);
-    *(int *)&l_1C = picklist_frame(&D_001A9AB8);
+    text_draw_coloured((int)text_buffer, 238, 20, 145, 141);
+    xn_font_select(4);
+    *(int *)&l_1C = picklist_frame(&shared_picklist);
     if (((int)(short)l_1C) > (-1)) {
-        l_30 = (struct record *)*(int *)(text_macro_fpc + (((int)(unsigned short)D_001A9AB8.selected) << 2));
+        l_30 = (struct record *)*(int *)(scratch_190de4 + (((int)(unsigned short)shared_picklist.selected) << 2));
         spellbook_close();
         if ((player_character->conditions & 0x100) != 0) {
             hud_message_add(D_00184634);
         } else if (((struct bf8_7_1 *)&D_001940D4)->f != 0) {
-            l_24 = (spell_cost(&l_30->data.spell, player_character) * func_00042380()) / 100;
+            l_24 = (spell_cost(&l_30->data.spell, player_character) * spell_cost_item_percent()) / 100;
             if (l_30->data.spell.id == 92) l_24 = 0;
-            if (((int)(unsigned char)l_30->data.spell.name[func_000A0DF4(l_30->data.spell.name) + 1]) == 36) {
+            if (((int)(unsigned char)l_30->data.spell.name[strlen(l_30->data.spell.name) + 1]) == 36) {
                 l_24 >>= 2;
             }
-            if ((player_character->magicka + D_001959FC) < l_24) {
+            if ((player_character->magicka + spell_points_bonus) < l_24) {
                 hud_message_add((int)D_00170E17);
                 return;
             }
-            D_00195F62 = l_24;
+            spell_ready_cost = l_24;
             *(int *)&spell_ready_touch = (*(int *)&spell_ready_missile = 0);
-            if (D_001959FC != 0) {
-                if (l_24 > D_001959FC) {
-                    l_24 -= D_001959FC;
-                    D_001959FC = 0;
+            if (spell_points_bonus != 0) {
+                if (l_24 > spell_points_bonus) {
+                    l_24 -= spell_points_bonus;
+                    spell_points_bonus = 0;
                 } else {
-                    D_001959FC -= l_24;
-                    D_00195F62 = 0;
+                    spell_points_bonus -= l_24;
+                    spell_ready_cost = 0;
                 }
             }
             spell_add_skill_uses(&l_30->data.spell, 1);
@@ -178,9 +178,9 @@ void spellbook_frame(void)
         }
         return;
     }
-    spellbook_draw_spell((selected_spell = (struct spell *)(*(int *)(text_macro_fpc + (((int)(unsigned short)D_001A9AB8.selected) << 2)) + 71)));
+    spellbook_draw_spell((selected_spell = (struct spell *)(*(int *)(scratch_190de4 + (((int)(unsigned short)shared_picklist.selected) << 2)) + 71)));
     if (((int)(unsigned char)msgbox_kind) == 2) {
-        mc_strncpy(D_001A9AB8.entries[D_001A9AB8.selected].text, selected_spell->name, 40, (int)D_00170DE4, 193);
+        mc_strncpy(shared_picklist.entries[shared_picklist.selected].text, selected_spell->name, 40, (int)D_00170DE4, 193);
     }
     if (key_down_esc != 0 || ((int)(short)l_1C) == (-2)) spellbook_close();
     if (mouse_buttons == 0 || (mouse_buttons != 0 && mouse_buttons_prev != 0)) {
@@ -199,19 +199,19 @@ int spellbook_close(void)
 {
     if (((struct bf8_2_1 *)&D_001940D4)->f != 0) {
         D_001940D4 &= 251;
-        picklist_free(&D_001A9AB8);
+        picklist_free(&shared_picklist);
     }
     while (key_down_esc != 0);
-    while (mouse_buttons != 0) func_0012B136();
+    while (mouse_buttons != 0) xn_mouse_poll_clamped();
     D_001940D8 &= 253;
     game_mode = 0;
     if (window_image != 0 && window_image != (-1751672937)) {
         mc_free(window_image, (int)D_00170DE4, 222);
         window_image = -1751672937;
     }
-    if (spellshop_icons != 0 && spellshop_icons != (-1751672937)) {
-        mc_free(spellshop_icons, (int)D_00170DE4, 223);
-        spellshop_icons = -1751672937;
+    if (magic_window_image != 0 && magic_window_image != (-1751672937)) {
+        mc_free(magic_window_image, (int)D_00170DE4, 223);
+        magic_window_image = -1751672937;
     }
     if (spellbook_saved_screen != 0 && spellbook_saved_screen != (-1751672937)) {
         mc_free(spellbook_saved_screen, (int)D_00170DE4, 224);
@@ -235,16 +235,16 @@ void spellbook_draw_spell(struct spell *a1)
     short l_18;
 
     D_0012B508 = 145;
-    func_000CD20E(172, 32, a1->icon);
-    func_000CE31C((int)(*(char **)&spellshop_icons + (a1->element * 640)) + 24, (int)(*(char **)&screen_buffer + 10486), 16, 16, 40);
-    func_000CE31C((int)(*(char **)&spellshop_icons + (a1->target * 640)), (int)&*(signed char *)(*(char **)&screen_buffer + 10445), 24, 16, 40);
-    text_draw_colored((int)a1->name, 148, 20, 145, 141);
+    xn_draw_spell_icon(172, 32, a1->icon);
+    xn_draw_copy_rect_stride_bytes((int)(*(char **)&magic_window_image + (a1->element * 640)) + 24, (int)(*(char **)&screen_buffer + 10486), 16, 16, 40);
+    xn_draw_copy_rect_stride_bytes((int)(*(char **)&magic_window_image + (a1->target * 640)), (int)&*(signed char *)(*(char **)&screen_buffer + 10445), 24, 16, 40);
+    text_draw_coloured((int)a1->name, 148, 20, 145, 141);
     *(int *)&l_18 = 0;
     for (; ((int)(short)l_18) < 3; (*(int *)&l_18)++) {
         if ((a1->effects[(int)(short)l_18].type) == 255) continue;
-        text_draw_centered_colored(*(int *)(spell_effect_names + ((a1->effects[(int)(short)l_18].type) << 2)), 219, (int)(short)((*(int *)&l_18 * 38) + 63), 145, 141);
+        text_draw_centred_coloured(*(int *)(spell_effect_names + ((a1->effects[(int)(short)l_18].type) << 2)), 219, (int)(short)((*(int *)&l_18 * 38) + 63), 145, 141);
         if ((a1->effects[(int)(short)l_18].subtype) != 255 && *(int *)(spell_effect_subtype_names + ((a1->effects[(int)(short)l_18].type) * 48) + ((a1->effects[(int)(short)l_18].subtype) << 2)) != 0) {
-            text_draw_centered_colored(*(int *)(spell_effect_subtype_names + ((a1->effects[(int)(short)l_18].type) * 48) + ((a1->effects[(int)(short)l_18].subtype) << 2)), 219, (int)(short)((*(int *)&l_18 * 38) + 75), 145, 141);
+            text_draw_centred_coloured(*(int *)(spell_effect_subtype_names + ((a1->effects[(int)(short)l_18].type) * 48) + ((a1->effects[(int)(short)l_18].subtype) << 2)), 219, (int)(short)((*(int *)&l_18 * 38) + 75), 145, 141);
         }
     }
 }
@@ -280,11 +280,11 @@ int spellbook_build_list(void)
 {
     struct record *l_1C;
 
-    *(short *)D_00190D64 = 0;
+    *(short *)scratch_190d64 = 0;
     l_1C = object_find_item(player_entity, 27, 0);
     if (l_1C == 0) return 0;
     if (l_1C->children == 0 && ((int)(unsigned short)(player_character->flags & 4)) == 0) return 0;
-    picklist_init(&D_001A9AB8, 27, 30, 111, 131, 144, 29, 8, 15, 144, 150, 8, 15, 144, 45, 9, 104, 146, 146, 244, 114, 0);
+    picklist_init(&shared_picklist, 27, 30, 111, 131, 144, 29, 8, 15, 144, 150, 8, 15, 144, 45, 9, 104, 146, 146, 244, 114, 0);
     object_foreach(l_1C->children, (int)spellbook_add_spell_cb);
     if (((int)(unsigned short)(player_character->flags & 4)) != 0) {
         l_1C = player_entity->children;
@@ -296,8 +296,8 @@ int spellbook_build_list(void)
             l_1C = l_1C->next;
         }
     }
-    if (*(short *)D_00190D64 == 0) {
-        picklist_free(&D_001A9AB8);
+    if (*(short *)scratch_190d64 == 0) {
+        picklist_free(&shared_picklist);
         msgbox_show_rsc(12, 1);
         return 0;
     }
@@ -309,7 +309,7 @@ int spellbook_build_list(void)
 void spellbook_delete_button(void)
 {
     object_delete((struct record *)((int)selected_spell - 71));
-    picklist_free(&D_001A9AB8);
+    picklist_free(&shared_picklist);
     if (spellbook_build_list() != 0) return;
     spellbook_close();
 }
@@ -320,8 +320,8 @@ void spellbook_up_button(void)
 
     l_18 = (struct record *)((int)selected_spell - 71);
     if (l_18->prev == 0) return;
-    func_0008E152(l_18, l_18->prev);
-    picklist_free(&D_001A9AB8);
+    object_swap_siblings(l_18, l_18->prev);
+    picklist_free(&shared_picklist);
     spellbook_build_list();
 }
 
@@ -331,12 +331,12 @@ void spellbook_down_button(void)
 
     l_18 = (struct record *)((int)selected_spell - 71);
     if (l_18->next == 0) return;
-    func_0008E152(l_18, l_18->next);
-    picklist_free(&D_001A9AB8);
+    object_swap_siblings(l_18, l_18->next);
+    picklist_free(&shared_picklist);
     spellbook_build_list();
 }
 
-int func_00042380(void)
+int spell_cost_item_percent(void)
 {
     int l_34;
     int l_30;
@@ -379,7 +379,7 @@ int func_00042380(void)
                 case 9:
                 case 10:
                     for (l_24 = 0; l_24 < creature_count; ) {
-                        if (((int)(unsigned char)*(signed char *)(monster_category + D_00190504[l_24]->data.character.race)) == (((int)(short)*(short *)((char *)((l_2C << 2) + l_34) + 69)) - 7)) {
+                        if (((int)(unsigned char)*(signed char *)(monster_category + creature_list[l_24]->data.character.race)) == (((int)(short)*(short *)((char *)((l_2C << 2) + l_34) + 69)) - 7)) {
                             l_28 = 75;
                         }
                     }

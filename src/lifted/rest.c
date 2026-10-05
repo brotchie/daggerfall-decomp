@@ -19,30 +19,30 @@ extern signed char D_00187CA8;
 extern int D_0018DDE4;
 extern signed char D_001940D9;
 extern signed char player_motion_flags;
-extern int D_00195998;
+extern int last_skill_check_minutes;
 extern char frame_counter[];
 extern struct building *current_building;
 extern struct record *player_entity;
 extern struct record *player_object;
-extern struct record *D_00195AC4;
+extern struct record *location_object;
 extern struct building *tavern_building;
 extern int creature_count;
 extern struct location *current_location;
 extern struct character *player_character;
 extern int game_minutes;
-extern char D_00195CDC[];
-extern int D_00195D48;
+extern char breath_remaining[];
+extern int sky_loaded_frame;
 extern int player_death_timer;
 extern unsigned char D_0019626F;
 extern signed char D_00196272;
 extern signed char game_mode;
 extern signed char in_dungeon_water;
 extern signed char crime_current;
-extern signed char D_00196283;
+extern signed char fog_colour;
 extern signed char D_00196294;
-extern signed char D_0019629B;
+extern signed char night_sky_loaded;
 extern signed char D_001962A4;
-extern int D_001A4A24;
+extern int breath_last_tick;
 extern char rest_image[];
 
 extern int tavern_room_rented(void);
@@ -52,9 +52,9 @@ extern int rand_range(int, int);
 extern struct building *object_building(struct record *);
 extern int mc_free();
 extern int mc_memset();
-extern int func_000C1500();
-extern int func_0012B136();
-extern int func_00144D00();
+extern int xn_vid_play();
+extern int xn_mouse_poll_clamped();
+extern int xn_draw_fill_rect();
 extern void tavern_go_to_room(void);
 extern void damage_creature_death(struct record *);
 extern void raise_skills(void);
@@ -83,31 +83,31 @@ void rest_close(void)
     D_0019626F = 16;
     D_00187CA8 = 1;
     D_00196294 = 0;
-    D_0019629B = 0;
-    D_00195D48 = 10000;
+    night_sky_loaded = 0;
+    sky_loaded_frame = 10000;
     if (player_character->special_infection_time != 0 && player_character->special_infection != 0 && ((int)(unsigned short)(player_character->flags & 16)) != 0) {
         player_character->flags &= ~0x10;
-        while (mouse_buttons != 0) func_0012B136();
+        while (mouse_buttons != 0) xn_mouse_poll_clamped();
         l_18 = disk_resolve_path((int)D_00176141);
         mc_memset(655360, 0, 64000, (int)D_001760D6, 285, 4);
-        func_000C1500(l_18, 0, 0, 1);
+        xn_vid_play(l_18, 0, 0, 1);
         mc_memset(655360, 0, 64000, (int)D_001760D6, 287, 4);
         palette_restore();
-        D_0019629B = 0;
-        D_00195D48 = 10000;
+        night_sky_loaded = 0;
+        sky_loaded_frame = 10000;
     } else if (player_character->special_infection_time != 0 && player_character->special_infection == 0 && ((int)(unsigned short)(player_character->flags & 16)) != 0) {
         player_character->flags &= ~0x10;
-        while (mouse_buttons != 0) func_0012B136();
+        while (mouse_buttons != 0) xn_mouse_poll_clamped();
         l_18 = disk_resolve_path((int)D_0017614E);
         mc_memset(655360, 0, 64000, (int)D_001760D6, 297, 4);
-        func_000C1500(l_18, 0, 0, 1);
+        xn_vid_play(l_18, 0, 0, 1);
         mc_memset(655360, 0, 64000, (int)D_001760D6, 299, 4);
         palette_restore();
-        D_0019629B = 0;
-        D_00195D48 = 10000;
+        night_sky_loaded = 0;
+        sky_loaded_frame = 10000;
     }
-    if (((unsigned)(game_minutes - D_00195998)) <= 360) return;
-    D_00195998 = game_minutes;
+    if (((unsigned)(game_minutes - last_skill_check_minutes)) <= 360) return;
+    last_skill_check_minutes = game_minutes;
     raise_skills();
 }
 
@@ -167,45 +167,45 @@ void breath_update(void)
     l_28 = player_character->attributes[4];
     if (D_00187CA8 == 0) return;
     if (l_28 > 100) l_28 = 100;
-    if (((int)(unsigned char)D_00196283) != 107) {
-        *(int *)D_00195CDC = 0;
+    if (((int)(unsigned char)fog_colour) != 107) {
+        *(int *)breath_remaining = 0;
         l_24 = 1132;
-        D_001A4A24 = *(int *)((char *)l_24);
+        breath_last_tick = *(int *)((char *)l_24);
         return;
     }
     if ((player_character->conditions & 0x80000) != 0) return;
-    if (*(int *)D_00195CDC == 0) {
-        if ((*(int *)D_00195CDC = l_28 >> 1) > 50) *(int *)D_00195CDC = 50;
+    if (*(int *)breath_remaining == 0) {
+        if ((*(int *)breath_remaining = l_28 >> 1) > 50) *(int *)breath_remaining = 50;
         l_2C = guild_find_membership_by_kind(149);
-        if (l_2C != 0) *(int *)D_00195CDC += l_2C->rank * 3;
+        if (l_2C != 0) *(int *)breath_remaining += l_2C->rank * 3;
     }
     l_20 = 1132;
-    if (((unsigned)(*(int *)((char *)l_20) - D_001A4A24)) > 18) {
-        (*(int *)D_00195CDC)--;
+    if (((unsigned)(*(int *)((char *)l_20) - breath_last_tick)) > 18) {
+        (*(int *)breath_remaining)--;
         l_1C = 1132;
         if (player_character->race == 7 && ((struct bf8_0_1 *)((char *)l_1C))->f != 0) {
-            (*(int *)D_00195CDC)++;
+            (*(int *)breath_remaining)++;
         }
         l_18 = 1132;
-        D_001A4A24 = *(int *)((char *)l_18);
+        breath_last_tick = *(int *)((char *)l_18);
     }
     D_0012B508 = 145;
-    if (((l_28 >> 3) + 4) > *(int *)D_00195CDC) D_0012B508 = 246;
-    if (*(int *)D_00195CDC != 0) {
-        func_00144D00(310, (int)(short)(120 - (*(short *)D_00195CDC * 2)), 6, (int)(short)(*(short *)D_00195CDC * 2));
+    if (((l_28 >> 3) + 4) > *(int *)breath_remaining) D_0012B508 = 246;
+    if (*(int *)breath_remaining != 0) {
+        xn_draw_fill_rect(310, (int)(short)(120 - (*(short *)breath_remaining * 2)), 6, (int)(short)(*(short *)breath_remaining * 2));
     }
-    if (*(int *)D_00195CDC != 0) return;
+    if (*(int *)breath_remaining != 0) return;
     damage_creature_death(player_entity);
 }
 
 int rest_allowed(void)
 {
-    if (player_character->ship_owned != 0 && ((unsigned)(((unsigned)(int)D_00195AC4->id) >> 16)) < 1000) {
+    if (player_character->ship_owned != 0 && ((unsigned)(((unsigned)(int)location_object->id) >> 16)) < 1000) {
         return 1;
     }
     switch (player_environment) {
     case 1:
-        if (((int)(unsigned short)(short)D_00195AC4->image) == 65535) return 1;
+        if (((int)(unsigned short)(short)location_object->image) == 65535) return 1;
         if (((int)(unsigned char)(signed char)current_location->kind) == 4 || ((int)(unsigned char)(signed char)current_location->kind) == 7 || ((int)(unsigned char)(signed char)current_location->kind) > 9) {
             return 1;
         }

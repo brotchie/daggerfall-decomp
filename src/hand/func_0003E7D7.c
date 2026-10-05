@@ -2,15 +2,15 @@
 extern char D_00170D55[];
 extern char D_00170DA7[];
 extern signed char text_buffer[];
-extern char D_001910E4[];
+extern char qrc_name[];
 extern char D_001910EC[];
-extern int D_00195D6C;
+extern int text_rsc_file;
 extern int text_rsc_load(int, int, int);
 extern int disk_open_data(char *);
-extern void func_0009DEA7(int);
+extern void close(int);
 extern void mc_memcpy(char *, char *, int, char *, int, int);
-#pragma aux func_000A0ED9 parm routine [];
-extern void func_000A0ED9(int, char *);
+#pragma aux mc_set_location parm routine [];
+extern void mc_set_location(int, char *);
 extern int mc_sprintf(char *, ...);
 
 int text_qrc_load(char *a1, short a2, short a3, short a4)
@@ -18,17 +18,17 @@ int text_qrc_load(char *a1, short a2, short a3, short a4)
     short saved;
     int h;
 
-    saved = D_00195D6C;
-    mc_memcpy(D_001910E4, a1, 8, D_00170D55, 568, 2048);
+    saved = text_rsc_file;
+    mc_memcpy(qrc_name, a1, 8, D_00170D55, 568, 2048);
     *D_001910EC = 0;
-    func_000A0ED9(570, D_00170D55);
-    mc_sprintf(((char *)text_buffer), D_00170DA7, D_001910E4);
-    if ((D_00195D6C = disk_open_data(((char *)text_buffer))) > 0) {
+    mc_set_location(570, D_00170D55);
+    mc_sprintf(((char *)text_buffer), D_00170DA7, qrc_name);
+    if ((text_rsc_file = disk_open_data(((char *)text_buffer))) > 0) {
         h = text_rsc_load(a2, 0, a4);
-        func_0009DEA7(D_00195D6C);
-        D_00195D6C = saved;
+        close(text_rsc_file);
+        text_rsc_file = saved;
         return h;
     }
-    D_00195D6C = saved;
+    text_rsc_file = saved;
     return 0;
 }

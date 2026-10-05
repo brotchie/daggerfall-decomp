@@ -9,15 +9,15 @@ extern char D_00179EA8[];
 extern signed char D_00187CA8;
 extern signed char region_punishment_flags[];
 extern char region_legal_reputation[];
-extern struct record *D_00190504[];
+extern struct record *creature_list[];
 extern int D_00190CAC;
-extern signed char D_00190D16;
+extern signed char scratch_190d16;
 extern unsigned char court_state;
 extern short court_prison_days;
-extern short D_00190DCA;
+extern short court_extra_days;
 extern signed char D_001940D5;
 extern struct record *player_entity;
-extern struct record *D_00195AC4;
+extern struct record *location_object;
 extern int creature_count;
 extern struct character *player_character;
 extern int window_image;
@@ -70,11 +70,11 @@ void court_frame(void)
         return;
     case 1:
         if (((int)D_00196271) == 1) {
-            if (D_00190D16 == 0) {
+            if (scratch_190d16 == 0) {
                 court_state = 5;
                 return;
             }
-            if (((int)(signed char)D_00190D16) == 1) {
+            if (((int)(signed char)scratch_190d16) == 1) {
                 court_state = 6;
                 return;
             }
@@ -86,11 +86,11 @@ void court_frame(void)
                 if (court_prison_days != 0) {
                     court_state = 3;
                 } else {
-                    player_to_random_marker((int)D_00195AC4, 8);
+                    player_to_random_marker((int)location_object, 8);
                     court_close();
                 }
             } else {
-                court_prison_days += (D_00190DCA = ((-(gold_total_alias() - D_00190CAC)) / 40) + 1);
+                court_prison_days += (court_extra_days = ((-(gold_total_alias() - D_00190CAC)) / 40) + 1);
                 gold_remove_all();
                 court_reputation_restore();
                 msgbox_show_rsc(8052, 1);
@@ -106,7 +106,7 @@ void court_frame(void)
         court_state = 3;
         return;
     case 3:
-        player_to_random_marker((int)D_00195AC4, 8);
+        player_to_random_marker((int)location_object, 8);
         prison_serve_sentence((int)(short)court_prison_days);
         court_restore_vitals();
         court_reputation_restore();
@@ -115,7 +115,7 @@ void court_frame(void)
     case 5:
         msgbox_show_rsc(8063, 1);
         region_punishment_flags[((int)(unsigned char)current_region) * 80] |= 1;
-        player_to_random_marker((int)D_00195AC4, 8);
+        player_to_random_marker((int)location_object, 8);
         court_state = 100;
         return;
     case 6:
@@ -124,7 +124,7 @@ void court_frame(void)
         court_state = 7;
         return;
     case 7:
-        player_to_random_marker((int)D_00195AC4, 4);
+        player_to_random_marker((int)location_object, 4);
         court_state = 100;
         return;
     case 8:
@@ -145,11 +145,11 @@ void court_frame(void)
             court_state = 9;
             return;
         }
-        if (D_00190D16 == 0) {
+        if (scratch_190d16 == 0) {
             court_state = 5;
             return;
         }
-        if (((int)(signed char)D_00190D16) == 1) {
+        if (((int)(signed char)scratch_190d16) == 1) {
             court_state = 6;
             return;
         }
@@ -163,7 +163,7 @@ void court_frame(void)
         court_state = 2;
         return;
     case 9:
-        player_to_random_marker((int)D_00195AC4, 12);
+        player_to_random_marker((int)location_object, 12);
         court_state = 100;
         return;
     case 100:
@@ -215,8 +215,8 @@ void court_remove_creatures(void)
     int l_18;
 
     for (l_18 = 0; l_18 < creature_count; l_18++) {
-        if ((int)D_00190504[l_18] == (int)player_entity) continue;
-        object_delete((int)D_00190504[l_18]);
+        if ((int)creature_list[l_18] == (int)player_entity) continue;
+        object_delete((int)creature_list[l_18]);
     }
 }
 

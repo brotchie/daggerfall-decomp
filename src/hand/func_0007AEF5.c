@@ -12,12 +12,12 @@ extern char D_00176909[];
 extern char D_0017696F[];
 extern char D_00176977[];
 extern signed char text_buffer[];
-extern char D_001917E4[];
+extern char arena2_path[];
 extern void disk_copy_file(char *, char *, char *);
 extern unsigned func_000A13DA(char *, unsigned, struct find_t *);   /* _dos_findfirst */
 extern unsigned func_000A13F7(struct find_t *);                     /* _dos_findnext */
-#pragma aux func_000A0ED9 parm routine [];
-extern int func_000A0ED9(int, char *);
+#pragma aux mc_set_location parm routine [];
+extern int mc_set_location(int, char *);
 extern int mc_sprintf(char *, char *, ...);
 
 void save_copy_automap_files(int a1)
@@ -25,22 +25,22 @@ void save_copy_automap_files(int a1)
     int r;
     struct find_t f;
 
-    func_000A0ED9(787, D_00176884);
-    mc_sprintf(((char *)text_buffer), D_0017696F, D_001917E4);
+    mc_set_location(787, D_00176884);
+    mc_sprintf(((char *)text_buffer), D_0017696F, arena2_path);
     r = func_000A13DA(((char *)text_buffer), 0, &f);
-    func_000A0ED9(789, D_00176884);
+    mc_set_location(789, D_00176884);
     mc_sprintf(((char *)text_buffer), D_00176909, a1);
     while (r == 0) {
-        disk_copy_file(f.name, D_001917E4, ((char *)text_buffer));
+        disk_copy_file(f.name, arena2_path, ((char *)text_buffer));
         r = func_000A13F7(&f);
     }
-    func_000A0ED9(796, D_00176884);
-    mc_sprintf(((char *)text_buffer), D_00176977, D_001917E4);
+    mc_set_location(796, D_00176884);
+    mc_sprintf(((char *)text_buffer), D_00176977, arena2_path);
     r = func_000A13DA(((char *)text_buffer), 0, &f);
-    func_000A0ED9(798, D_00176884);
+    mc_set_location(798, D_00176884);
     mc_sprintf(((char *)text_buffer), D_00176909, a1);
     while (r == 0) {
-        disk_copy_file(f.name, D_001917E4, ((char *)text_buffer));
+        disk_copy_file(f.name, arena2_path, ((char *)text_buffer));
         r = func_000A13F7(&f);
     }
 }

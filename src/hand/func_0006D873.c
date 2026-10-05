@@ -9,8 +9,8 @@ struct find_t {             /* DOS find buffer */
 };
 extern char D_00175D00[];        /* __FILE__ */
 extern char D_00175D60[];
-#pragma aux func_000A0ED9 parm routine [];
-extern void func_000A0ED9(int, char *);
+#pragma aux mc_set_location parm routine [];
+extern void mc_set_location(int, char *);
 extern int mc_sprintf(char *, char *, ...);
 extern int unlink(char *);
 extern int func_000A13DA(char *, int, struct find_t *);
@@ -23,11 +23,11 @@ void disk_delete_matching(int a1, int a2)
     struct find_t ff;
     int unused;
 
-    func_000A0ED9(376, D_00175D00);
+    mc_set_location(376, D_00175D00);
     mc_sprintf(path, D_00175D60, a1, a2);
     rc = func_000A13DA(path, 0, &ff);
     while (rc == 0) {
-        func_000A0ED9(380, D_00175D00);
+        mc_set_location(380, D_00175D00);
         mc_sprintf(path, D_00175D60, a1, ff.name);
         unlink(path);
         rc = func_000A13F7(&ff);

@@ -3,7 +3,7 @@
 
 struct bf8_2_1 { unsigned char _:2; unsigned char f:1; };
 extern signed char mouse_buttons;
-extern signed char D_0012AC02;
+extern signed char mouse_double_click;
 extern short mouse_x;
 extern short mouse_y;
 extern signed char D_0012B508;
@@ -13,17 +13,17 @@ extern signed char D_001940D4;
 extern struct record *player_object;
 extern int list_popup_callback;
 extern int window_image;
-extern char D_00195C44[];
+extern char scratch_buffer[];
 extern signed char mouse_buttons_prev;
-extern int spells_list_poll(void);
+extern int list_popup_poll(void);
 extern int itemmaker_open(int);
 extern int itemmaker_close(void);
 extern void itemmaker_draw(void);
 extern int sound_play(int, struct record *, int);
-extern int func_000CB552();
-extern int func_0012B136();
-extern int func_0012DB50();
-extern int func_00135E90();
+extern int xn_draw_fullscreen_overlay_shaded();
+extern int xn_mouse_poll_clamped();
+extern int xn_font_select();
+extern int xn_tex_cache_begin_frame();
 
 struct R { short x0, y0, x1, y1; void (*fn)(int); };
 #define TAB ((struct R *)itemmaker_buttons)
@@ -39,20 +39,20 @@ void itemmaker_update(void)
     short l_18;
 
     if (itemmaker_open(0) == 0) return;
-    func_00135E90();
+    xn_tex_cache_begin_frame();
     D_0012B508 = 146;
-    func_000CB552(window_image);
-    func_0012DB50(4);
+    xn_draw_fullscreen_overlay_shaded(window_image);
+    xn_font_select(4);
     itemmaker_draw();
-    func_0012DB50(3);
+    xn_font_select(3);
     l_20 = 0;
-    if (FLAG && (l_20 = spells_list_poll()) > -1) {
+    if (FLAG && (l_20 = list_popup_poll()) > -1) {
         while (*((char *)&key_down_esc) != 0) ;
-        while (*((char *)&mouse_buttons) != 0) func_0012B136();
-        *((char *)&D_0012AC02) = 0;
-        (*(void (**)(int))((char *)&list_popup_callback))((*(unsigned char **)D_00195C44)[l_20 + 64000]);
-        while (*((char *)&mouse_buttons) != 0) func_0012B136();
-        *((char *)&D_0012AC02) = 0;
+        while (*((char *)&mouse_buttons) != 0) xn_mouse_poll_clamped();
+        *((char *)&mouse_double_click) = 0;
+        (*(void (**)(int))((char *)&list_popup_callback))((*(unsigned char **)scratch_buffer)[l_20 + 64000]);
+        while (*((char *)&mouse_buttons) != 0) xn_mouse_poll_clamped();
+        *((char *)&mouse_double_click) = 0;
         return;
     }
     if (l_20 != -2 && *((char *)&key_down_esc) != 0) {

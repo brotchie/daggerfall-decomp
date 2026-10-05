@@ -3,11 +3,11 @@
 #include "dagger.h"
 
 /* between the steal.c and camera.c runs: unit not certain */
-int func_00013A00(char *p1, int p2, int p3)
+int door_find_key(char *p1, int p2, int p3)
 {
-    D_00195AF4 = 0;
+    found_object = 0;
     D_00190BE4 = p2;
     D_00190BE8 = p3;
-    object_foreach(*(int *)(p1 + 0x3f), func_00013981);
-    return D_00195AF4;
+    object_foreach(*(int *)(p1 + 0x3f), door_key_match_cb);
+    return found_object;
 }

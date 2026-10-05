@@ -11,7 +11,7 @@ extern int lock_text_fail;
 extern int lock_text_open;
 extern struct record *player_object;
 extern struct character *player_character;
-extern char D_00195C44[];
+extern char scratch_buffer[];
 extern char archive_directories[];
 extern char archive_types[];
 extern char archive_record_counts[];
@@ -22,22 +22,22 @@ extern int disk_open_data(int);
 extern int disk_open_rw(int);
 extern int hud_message_add(int);
 extern int rand_range(int, int);
-extern int func_0009DEA7();
+extern int close();
 extern int mc_free();
 extern int lseek();
 extern int mc_malloc();
-extern int func_000A00CB();
+extern int read();
 extern int mc_strncpy();
 extern int write();
 extern int strnicmp();
-extern int func_000A0ED9(int, int);
+extern int mc_set_location(int, int);
 extern int mc_sprintf(int, ...);
 extern void skill_add_uses(int, int);
 extern void fatal_error(int);
 extern void links_trigger(struct record *, int);
 extern void guild_count_crime(int, unsigned char);
 int lockpick_door(struct record *);
-#pragma aux func_000A0ED9 parm routine [];
+#pragma aux mc_set_location parm routine [];
 
 int archive_open(int a1, int a2, int a3)
 {
@@ -55,8 +55,8 @@ int archive_open(int a1, int a2, int a3)
     }
     if (*(int *)&l_1C < 1) return *(int *)&l_1C;
     mc_strncpy(((int)archive_names) + (*(int *)&l_1C * 13), a1, 13, (int)D_00170150, 32);
-    func_000A00CB(*(int *)&l_1C, (int)&l_10, 2);
-    func_000A00CB(*(int *)&l_1C, (int)&l_14, 2);
+    read(*(int *)&l_1C, (int)&l_10, 2);
+    read(*(int *)&l_1C, (int)&l_14, 2);
     if (((int)(short)l_14) == 256) {
         *(int *)&l_18 = ((int)(short)l_10) * 18;
     } else {
@@ -67,7 +67,7 @@ int archive_open(int a1, int a2, int a3)
     *(int *)(archive_directories + (*(int *)&l_1C << 2)) = a2;
     *(short *)(archive_types + (*(int *)&l_1C * 2)) = *(int *)&l_14;
     lseek(*(int *)&l_1C, -*(int *)&l_18, 2);
-    func_000A00CB(*(int *)&l_1C, a2, *(int *)&l_18);
+    read(*(int *)&l_1C, a2, *(int *)&l_18);
     return *(int *)&l_1C;
 }
 
@@ -81,7 +81,7 @@ void archive_close(int a1)
     }
     *(int *)(archive_directories + (a1 << 2)) = 0;
     *(short *)(archive_types + (a1 * 2)) = 0;
-    func_0009DEA7(a1);
+    close(a1);
 }
 
 int archive_find_record(int a1, int a2, int a3)
@@ -102,13 +102,13 @@ int archive_find_record(int a1, int a2, int a3)
         }
     }
     if (((int)(short)*(short *)(archive_types + (a1 * 2))) == 256) {
-        func_000A0ED9(105, (int)D_00170150);
-        mc_sprintf(*(int *)D_00195C44, (int)D_0017015A, a2, ((int)archive_names) + (a1 * 13));
+        mc_set_location(105, (int)D_00170150);
+        mc_sprintf(*(int *)scratch_buffer, (int)D_0017015A, a2, ((int)archive_names) + (a1 * 13));
     } else {
-        func_000A0ED9(107, (int)D_00170150);
-        mc_sprintf(*(int *)D_00195C44, (int)D_00170172, a3, ((int)archive_names) + (a1 * 13));
+        mc_set_location(107, (int)D_00170150);
+        mc_sprintf(*(int *)scratch_buffer, (int)D_00170172, a3, ((int)archive_names) + (a1 * 13));
     }
-    fatal_error(*(int *)D_00195C44);
+    fatal_error(*(int *)scratch_buffer);
     return 0;
 }
 
@@ -173,7 +173,7 @@ int archive_read_record(int a1, int a2, int a3)
     }
     if (a3 == 0) a3 = mc_malloc(l_18, (int)D_00170150, 205);
     lseek(a1, l_14, 0);
-    func_000A00CB(a1, a3, l_18);
+    read(a1, a3, l_18);
     return a3;
 }
 
@@ -203,7 +203,7 @@ void archive_write_record(int a1, int a2, int a3)
     write(a1, a3, l_14);
 }
 
-void func_00013438(struct record *a1)
+void lockpick_door_unused(struct record *a1)
 {
     int l_18;
 

@@ -30,13 +30,13 @@ extern unsigned char spellmaker_settings_kind;
 extern int spell_effect_text_index(short);
 extern void msgbox_open_rsc(int, int);
 extern void msgbox_update(void);
-extern void text_draw_colored(char *, short, short, int, unsigned char);
-extern void func_0007CAEB(short, short, short, short, short, short, short);
-extern int func_0009DEAC();
-extern char *func_000A0DD9(int, char *, int);
+extern void text_draw_coloured(char *, short, short, int, unsigned char);
+extern void text_draw_number_in_box(short, short, short, short, short, short, short);
+extern int abs();
+extern char *itoa(int, char *, int);
 extern int spell_cost_formula_dispatch();
-extern int func_000CB552();
-extern int func_0012B49E();
+extern int xn_draw_fullscreen_overlay_shaded();
+extern int xn_mouse_set_position();
 
 void spellmaker_settings_update(void)
 {
@@ -59,7 +59,7 @@ void spellmaker_settings_update(void)
         spellmaker_settings_kind = 0;
         return;
     }
-    func_000CB552(spellmaker_settings_image);
+    xn_draw_fullscreen_overlay_shaded(spellmaker_settings_image);
     msgbox_update();
     if ((int)(unsigned char)(mouse_buttons & 1) != 0 && mouse_buttons != mouse_buttons_prev) {
         for (i = 11; i < 33; i++) {
@@ -92,10 +92,10 @@ void spellmaker_settings_update(void)
         D_00199628 = 0;
     } else if (mouse_buttons == 0 && ((struct bf8_2_1 *)&D_001940D5)->f) {
         ((struct bf8_2_1 *)&D_001940D5)->f = 0;
-        func_0012B49E(D_00195F54, D_00195F52);
+        xn_mouse_set_position(D_00195F54, D_00195F52);
     } else if (((struct bf8_2_1 *)&D_001940D5)->f) {
         D_00199628 -= mouse_motion_y;
-        if (func_0009DEAC(D_00199628) > 30) {
+        if (abs(D_00199628) > 30) {
             if (D_0019962A < 3 && (int)(unsigned char)(spellmaker_settings_kind & 1) != 0
               || D_0019962A < 6 && (int)(unsigned char)(spellmaker_settings_kind & 2) != 0
               || (int)(unsigned char)(spellmaker_settings_kind & 4) != 0)
@@ -106,23 +106,23 @@ void spellmaker_settings_update(void)
 done:
     val = selected_spell->effect_costs[spell_effect_slot];
     val = (110 - player_character->skills[magic_school_skills[spell_effect_school[selected_spell->effects[spell_effect_slot].type]]].value) * val / 100;
-    text_draw_colored(func_000A0DD9(val, ((char *)text_buffer), 10), 275, 119, 145, 156);
+    text_draw_coloured(itoa(val, ((char *)text_buffer), 10), 275, 119, 145, 156);
     if ((int)(unsigned char)(spellmaker_settings_kind & 1) != 0) {
-        func_0007CAEB(64, 94, 87, 109, selected_spell->durations[spell_effect_slot].base, 145, 156);
-        func_0007CAEB(104, 94, 127, 109, selected_spell->durations[spell_effect_slot].plus, 145, 156);
-        func_0007CAEB(160, 94, 183, 109, selected_spell->durations[spell_effect_slot].per_level, 145, 156);
+        text_draw_number_in_box(64, 94, 87, 109, selected_spell->durations[spell_effect_slot].base, 145, 156);
+        text_draw_number_in_box(104, 94, 127, 109, selected_spell->durations[spell_effect_slot].plus, 145, 156);
+        text_draw_number_in_box(160, 94, 183, 109, selected_spell->durations[spell_effect_slot].per_level, 145, 156);
     }
     if ((int)(unsigned char)(spellmaker_settings_kind & 2) != 0) {
-        func_0007CAEB(64, 114, 87, 129, selected_spell->chances[spell_effect_slot].base, 145, 156);
-        func_0007CAEB(104, 114, 127, 129, selected_spell->chances[spell_effect_slot].plus, 145, 156);
-        func_0007CAEB(160, 114, 183, 129, selected_spell->chances[spell_effect_slot].per_level, 145, 156);
+        text_draw_number_in_box(64, 114, 87, 129, selected_spell->chances[spell_effect_slot].base, 145, 156);
+        text_draw_number_in_box(104, 114, 127, 129, selected_spell->chances[spell_effect_slot].plus, 145, 156);
+        text_draw_number_in_box(160, 114, 183, 129, selected_spell->chances[spell_effect_slot].per_level, 145, 156);
     }
     if ((int)(unsigned char)(spellmaker_settings_kind & 4) != 0) {
-        func_0007CAEB(64, 134, 87, 149, selected_spell->magnitudes[spell_effect_slot].base_min, 145, 156);
-        func_0007CAEB(104, 134, 127, 149, selected_spell->magnitudes[spell_effect_slot].base_max, 145, 156);
-        func_0007CAEB(144, 134, 167, 149, selected_spell->magnitudes[spell_effect_slot].plus_min, 145, 156);
-        func_0007CAEB(184, 134, 207, 149, selected_spell->magnitudes[spell_effect_slot].plus_max, 145, 156);
-        func_0007CAEB(240, 134, 263, 149, selected_spell->magnitudes[spell_effect_slot].per_level, 145, 156);
+        text_draw_number_in_box(64, 134, 87, 149, selected_spell->magnitudes[spell_effect_slot].base_min, 145, 156);
+        text_draw_number_in_box(104, 134, 127, 149, selected_spell->magnitudes[spell_effect_slot].base_max, 145, 156);
+        text_draw_number_in_box(144, 134, 167, 149, selected_spell->magnitudes[spell_effect_slot].plus_min, 145, 156);
+        text_draw_number_in_box(184, 134, 207, 149, selected_spell->magnitudes[spell_effect_slot].plus_max, 145, 156);
+        text_draw_number_in_box(240, 134, 263, 149, selected_spell->magnitudes[spell_effect_slot].per_level, 145, 156);
     }
     selected_spell->effect_costs[spell_effect_slot] = spell_cost_formula_dispatch(spell_effect_cost_formula[selected_spell->effects[spell_effect_slot].type] - 1);
 }

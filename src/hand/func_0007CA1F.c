@@ -3,7 +3,7 @@ extern unsigned char text_shadow_colour;
 extern unsigned char D_0012B508;
 extern void text_draw_shadow(char *, short, short);
 
-void text_draw_colored(char *a1, short a2, int a3, int a4, int a5)
+void text_draw_coloured(char *a1, short a2, int a3, int a4, int a5)
 {
     short l1;
     short l2;

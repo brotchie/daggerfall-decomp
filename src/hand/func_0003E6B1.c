@@ -7,40 +7,40 @@ extern char D_00170DA7[];
 extern signed char text_buffer[];
 extern signed char text_rsc_buffer[];
 extern char D_00190FEC;
-extern int D_00195D6C;
+extern int text_rsc_file;
 extern struct quest *current_quest;
 extern int text_rsc_load(int, int, int);
 extern int disk_open_data(char *);
-extern void func_0009DEA7(int);
+extern void close(int);
 extern void mc_memcpy(char *, char *, int, char *, int, int);
-#pragma aux func_000A0ED9 parm routine [];
-extern int func_000A0ED9(int, char *);
+#pragma aux mc_set_location parm routine [];
+extern int mc_set_location(int, char *);
 extern int mc_sprintf(char *, char *, ...);
 
-int func_0003E6B1(struct quest *s, short a2, short a3, short a4)
+int text_qrc_load_for_quest(struct quest *s, short a2, short a3, short a4)
 {
     short saved;
     int res;
 
-    saved = D_00195D6C;
+    saved = text_rsc_file;
     current_quest = s;
     if (s == 0)
         return 0;
     if (s->text_file != 0) {
-        func_000A0ED9(545, D_00170D55);
+        mc_set_location(545, D_00170D55);
         mc_sprintf(((char *)text_rsc_buffer), D_00170DA2, s->text_file);
     } else {
         mc_memcpy(((char *)text_rsc_buffer), s->name, 8, D_00170D55, 547, 2048);
     }
     D_00190FEC = 0;
-    func_000A0ED9(550, D_00170D55);
+    mc_set_location(550, D_00170D55);
     mc_sprintf(((char *)text_buffer), D_00170DA7, ((char *)text_rsc_buffer));
-    if ((D_00195D6C = disk_open_data(((char *)text_buffer))) > 0) {
+    if ((text_rsc_file = disk_open_data(((char *)text_buffer))) > 0) {
         res = text_rsc_load(a2, 0, a4);
-        func_0009DEA7(D_00195D6C);
-        D_00195D6C = saved;
+        close(text_rsc_file);
+        text_rsc_file = saved;
         return res;
     }
-    D_00195D6C = saved;
+    text_rsc_file = saved;
     return 0;
 }

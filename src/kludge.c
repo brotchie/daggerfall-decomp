@@ -2,7 +2,7 @@
 
 #include "dagger.h"
 
-char *func_00045AED(char *p1, int p2)
+char *item_add_random_to_container(char *p1, int p2)
 {
     char *l1;
     char *l2;

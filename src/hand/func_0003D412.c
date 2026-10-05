@@ -4,16 +4,16 @@ struct ent { short id; int off; };
 #pragma pack()
 extern char D_00170D55[];
 extern char D_00170D5C[];
-extern struct ent *D_00195C44;
-extern int D_00195D6C;
-extern char D_00196295;
+extern struct ent *scratch_buffer;
+extern int text_rsc_file;
+extern char text_missing_ok;
 extern char *text_expand_wrap(unsigned short, short, unsigned char *, char *, char *);
 extern int rand(void);
 extern int lseek(int, int, int);
 extern char *mc_malloc(int, char *, int);
-extern int func_000A00CB(int, void *, int);
-#pragma aux func_000A0ED9 parm routine [];
-extern int func_000A0ED9(int, char *);
+extern int read(int, void *, int);
+#pragma aux mc_set_location parm routine [];
+extern int mc_set_location(int, char *);
 extern int mc_sprintf(char *, ...);
 
 char *text_rsc_load(short a1, unsigned short a2, short a3)
@@ -26,30 +26,30 @@ char *text_rsc_load(short a1, unsigned short a2, short a3)
     char *l_2C;
     char *l_28;
 
-    lseek(D_00195D6C, 0, 0);
-    func_000A00CB(D_00195D6C, &n, 2);
-    func_000A00CB(D_00195D6C, D_00195C44, n);
+    lseek(text_rsc_file, 0, 0);
+    read(text_rsc_file, &n, 2);
+    read(text_rsc_file, scratch_buffer, n);
     n /= 6;
     for (i = 0; i < n; i++) {
-        if (D_00195C44[i].id == a1)
+        if (scratch_buffer[i].id == a1)
             break;
     }
     if (i >= n) {
-        if (D_00196295) {
-            D_00196295 = 0;
+        if (text_missing_ok) {
+            text_missing_ok = 0;
             return 0;
         }
         l_30 = mc_malloc(1024, D_00170D55, 65);
-        func_000A0ED9(66, D_00170D55);
+        mc_set_location(66, D_00170D55);
         mc_sprintf(l_30, D_00170D5C, a1);
         return l_30;
     }
-    l_34 = D_00195C44[i + 1].off - D_00195C44[i].off;
-    lseek(D_00195D6C, D_00195C44[i].off, 0);
+    l_34 = scratch_buffer[i + 1].off - scratch_buffer[i].off;
+    lseek(text_rsc_file, scratch_buffer[i].off, 0);
     l_30 = mc_malloc(l_34 + 16, D_00170D55, 73);
     l_2C = mc_malloc(l_34 < 4096 ? 8192 : l_34 * 2, D_00170D55, 74);
     l_28 = mc_malloc(l_34 < 4096 ? 8192 : l_34 * 2, D_00170D55, 75);
-    func_000A00CB(D_00195D6C, l_30, l_34 + 8);
+    read(text_rsc_file, l_30, l_34 + 8);
     j = 0;
     i = 1;
     while (l_30[j] != 254) {

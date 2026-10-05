@@ -6,54 +6,54 @@
 extern char D_00176E44[];
 extern char D_00176E4D[];
 extern char D_00176E70[];
-extern int D_00187FDC;
+extern int next_record_id;
 extern char D_00190BE4[];
-extern signed char itemmaker_slot_kinds[];
+extern signed char scratch_190ce4[];
 extern struct record *nonworld_root;
 extern struct record *player_object;
-extern struct record *D_00195AC4;
-extern struct record *D_00195AF4;
+extern struct record *location_object;
+extern struct record *found_object;
 extern struct location *current_location;
 extern char object_heap[];
 extern int loaded_location_door_count;
-extern int D_00199770;
+extern int object_found_last;
 extern int D_001A3F94;
-extern int D_001A9AF4;
+extern int object_move_new;
 extern int D_001A9AF8;
 extern int D_001A9AFC;
 extern int D_001A9B00;
 extern int D_001A9B04;
 extern int D_001A9B08;
-extern int D_001A9B0C;
-extern int D_001A9B10;
-extern struct record *D_001A9B14;
-extern int D_001A9B18;
-extern int D_001A9B1C;
+extern int object_debug_watch;
+extern int object_delete_block_id;
+extern struct record *object_search_result;
+extern int object_search_id;
+extern int object_move_old_angles;
 extern int D_001A9B20;
 extern int D_001A9B24;
-extern int D_001A9B28;
-extern int D_001A9B2C;
-extern int D_001A9B30;
+extern int object_move_old_z;
+extern int object_move_old_x;
+extern int object_move_old_y;
 extern int object_heap_size;
 extern int object_heap_free;
-extern short D_001A9B3C;
+extern short object_count_result;
 extern short D_001A9B40;
 extern short D_001A9B42;
-extern char D_001A9B44[];
+extern char object_debug_watch_copy[];
 extern char potion_ingredient_scroll[];
 extern char potion_ingredient_count[];
 
-extern int func_00045E45(int);
+extern int location_find_door(int);
 extern int mem_pool_alloc(int, int);
 extern int mem_pool_release(int);
 extern int object_count_type(struct record *, short);
 extern int rand();
 extern int mc_memset();
-extern int func_000A0ED9(int, int);
+extern int mc_set_location(int, int);
 extern int mc_memcpy();
 extern int func_000A148C(int, ...);
-extern int func_000C7FD9();
-extern void func_000298F3(struct record *);
+extern int xn_math_approx_dist2d();
+extern void unequip_object(struct record *);
 extern void fatal_error(int);
 extern void mem_pool_init(int, int);
 extern void mem_pool_free(int);
@@ -79,12 +79,12 @@ void object_add_child(struct record *, struct record *);
 void object_foreach_pre(struct record *, int);
 void object_foreach_post(struct record *, int);
 void object_foreach(struct record *, int);
-void func_0008EAA7(struct record *);
+void object_delete_block_cb(struct record *);
 void func_0008EB25(struct record *);
 void object_delete_quest_cb(struct record *);
 void object_tree_size_cb(struct record *);
-void func_0008ED52(struct record *);
-#pragma aux func_000A0ED9 parm routine [];
+void object_delete_type_cb(struct record *);
+#pragma aux mc_set_location parm routine [];
 
 void object_heap_init(void)
 {
@@ -96,13 +96,13 @@ void object_heap_init(void)
         }
     }
     object_heap_free = object_heap_size;
-    func_000A0ED9(55, (int)D_00176E44);
+    mc_set_location(55, (int)D_00176E44);
     func_000A148C((int)D_00176E4D, object_heap_size);
     mem_pool_init((int)object_heap, object_heap_size);
-    (D_00195AC4 = object_alloc(0, 0, 48))->type = 1;
-    D_00195AC4->image = 65535;
-    D_00195AC4->id = -65535;
-    (current_location = &D_00195AC4->data.location)->buildings = 0;
+    (location_object = object_alloc(0, 0, 48))->type = 1;
+    location_object->image = 65535;
+    location_object->id = -65535;
+    (current_location = &location_object->data.location)->buildings = 0;
     (nonworld_root = object_alloc(0, 0, 0))->type = 39;
     nonworld_root->id = 700;
 }
@@ -146,7 +146,7 @@ struct record *object_delete(struct record *a1)
     return l_1C;
 }
 
-struct record *func_0008DADD(struct record *a1)
+struct record *object_detach(struct record *a1)
 {
     struct record *l_1C;
 
@@ -226,10 +226,10 @@ void object_set_position(struct record *a1, int a2, int a3, int a4, int a5, int 
 {
     int l_C;
 
-    D_001A9B2C = a1->x;
-    D_001A9B30 = a1->y;
-    D_001A9B28 = a1->z;
-    D_001A9B1C = a1->angle_x;
+    object_move_old_x = a1->x;
+    object_move_old_y = a1->y;
+    object_move_old_z = a1->z;
+    object_move_old_angles = a1->angle_x;
     D_001A9B20 = a1->yaw;
     D_001A9B24 = a1->angle_z;
     a1->x = a2;
@@ -238,7 +238,7 @@ void object_set_position(struct record *a1, int a2, int a3, int a4, int a5, int 
     a1->angle_x = a5;
     a1->yaw = a6;
     a1->angle_z = a7;
-    D_001A9AF4 = a2;
+    object_move_new = a2;
     D_001A9AF8 = a3;
     D_001A9AFC = a4;
     D_001A9B00 = a5;
@@ -284,7 +284,7 @@ void object_add_child(struct record *a1, struct record *a2)
     a2->next = a2->prev;
 }
 
-void func_0008E152(struct record *a1, struct record *a2)
+void object_swap_siblings(struct record *a1, struct record *a2)
 {
     struct record *l_18;
     struct record *l_14;
@@ -318,12 +318,12 @@ void func_0008E152(struct record *a1, struct record *a2)
     a2->parent->children = (struct record *)a2;
 }
 
-void func_0008E2CC(struct record *a1, int a2, int a3)
+void object_foreach_near_player(struct record *a1, int a2, int a3)
 {
     while (a1 != 0) {
-        if (func_000C7FD9(a1->x, a1->z, player_object->x, player_object->z) < a3) {
+        if (xn_math_approx_dist2d(a1->x, a1->z, player_object->x, player_object->z) < a3) {
             ((int (*)())(a2))(a1);
-            if (a1->children != 0 && (a1->flags & 1) == 0) func_0008E2CC(a1->children, a2, a3);
+            if (a1->children != 0 && (a1->flags & 1) == 0) object_foreach_near_player(a1->children, a2, a3);
         }
         a1 = a1->next;
     }
@@ -365,13 +365,13 @@ void object_foreach(struct record *a1, int a2)
     }
 }
 
-void func_0008E447(struct record *a1, int a2)
+void object_foreach_skip_player(struct record *a1, int a2)
 {
     struct record *l_14;
 
     while (a1 != 0) {
         l_14 = a1->next;
-        if (a1->children != 0 && a1->type != 4) func_0008E447(a1->children, a2);
+        if (a1->children != 0 && a1->type != 4) object_foreach_skip_player(a1->children, a2);
         ((int (*)())(a2))(a1);
         a1 = l_14;
     }
@@ -386,13 +386,13 @@ void object_foreach_open(struct record *a1, int a2)
     }
 }
 
-void func_0008E509(struct record *a1, int a2)
+void object_foreach_until(struct record *a1, int a2)
 {
     struct record *l_14;
 
     while (a1 != 0) {
         l_14 = a1->next;
-        if (((int (*)())(a2))(a1) == 0 && a1->children != 0) func_0008E509(a1->children, a2);
+        if (((int (*)())(a2))(a1) == 0 && a1->children != 0) object_foreach_until(a1->children, a2);
         a1 = l_14;
     }
 }
@@ -427,28 +427,28 @@ void object_find_item_cb(struct record *a1)
     l_18 = &a1->data.item;
     if (l_18->group != D_001A9B40 || l_18->index != D_001A9B42) return;
     D_001A9B42 = 65535;
-    D_00195AF4 = a1;
+    found_object = a1;
 }
 
 int object_find_type_cb(struct record *a1)
 {
     if ((short)a1->type != D_001A9B42) return 0;
-    D_00195AF4 = a1;
+    found_object = a1;
     return 1;
 }
 
 struct record *object_find_type(struct record *a1, int a2)
 {
-    D_00195AF4 = 0;
+    found_object = 0;
     D_001A9B42 = a2;
     object_find(a1, (int)object_find_type_cb);
-    return D_00195AF4;
+    return found_object;
 }
 
 void object_count_type_cb(struct record *a1)
 {
     if ((short)a1->type != D_001A9B42) return;
-    D_001A9B3C++;
+    object_count_result++;
 }
 
 struct record *object_create_in_block(struct record *a1, int a2, int a3, int a4, int a5)
@@ -463,41 +463,41 @@ struct record *object_create_in_block(struct record *a1, int a2, int a3, int a4,
     l_10->type = a2;
     l_10->image = a4;
     l_10->pad13 = a5;
-    l_10->id = D_00195AC4->id + ((int)(unsigned short)(current_location->object_counter)++);
+    l_10->id = location_object->id + ((int)(unsigned short)(current_location->object_counter)++);
     if (l_10->id == (-1016397758)) {
-        mc_memcpy((int)D_001A9B44, l_10, 71, (int)D_00176E44, 634, 4);
-        D_001A9B0C = (int)l_10;
+        mc_memcpy((int)object_debug_watch_copy, l_10, 71, (int)D_00176E44, 634, 4);
+        object_debug_watch = (int)l_10;
     }
     return l_10;
 }
 
 int object_find_by_id_cb(struct record *a1)
 {
-    if (a1->id == D_001A9B18) D_001A9B14 = a1;
-    return (int)D_001A9B14;
+    if (a1->id == object_search_id) object_search_result = a1;
+    return (int)object_search_result;
 }
 
 struct record *object_find_by_id(struct record *a1, int a2)
 {
-    D_001A9B18 = a2;
-    D_001A9B14 = 0;
+    object_search_id = a2;
+    object_search_result = 0;
     if (a1 == 0) {
-        object_foreach(D_00195AC4, (int)object_find_by_id_cb);
-        D_00199770 = (int)D_001A9B14;
-        if ((int)D_001A9B14 != 0) return D_001A9B14;
+        object_foreach(location_object, (int)object_find_by_id_cb);
+        object_found_last = (int)object_search_result;
+        if ((int)object_search_result != 0) return object_search_result;
         object_foreach(nonworld_root, (int)object_find_by_id_cb);
-        D_00199770 = (int)D_001A9B14;
-        return D_001A9B14;
+        object_found_last = (int)object_search_result;
+        return object_search_result;
     }
     object_find(a1, (int)object_find_by_id_cb);
-    return D_001A9B14;
+    return object_search_result;
 }
 
 int object_random_type_cb(struct record *a1)
 {
-    if (a1->type != itemmaker_slot_kinds[0]) return 0;
+    if (a1->type != scratch_190ce4[0]) return 0;
     if (*(int *)D_00190BE4 == 0) {
-        D_00195AF4 = a1;
+        found_object = a1;
         return 1;
     }
     (*(int *)D_00190BE4)--;
@@ -509,24 +509,24 @@ struct record *object_random_child_of_type(struct record *a1, int a2)
     if ((*(int *)D_00190BE4 = object_count_type(a1->children, (int)(short)*(short *)&a2)) == 0) {
         return 0;
     }
-    D_00195AF4 = 0;
+    found_object = 0;
     *(int *)D_00190BE4 = rand() % *(int *)D_00190BE4;
-    itemmaker_slot_kinds[0] = *(signed char *)&a2;
+    scratch_190ce4[0] = *(signed char *)&a2;
     object_find(a1->children, (int)object_random_type_cb);
-    return D_00195AF4;
+    return found_object;
 }
 
-void func_0008EAA7(struct record *a1)
+void object_delete_block_cb(struct record *a1)
 {
-    if ((a1->id & -65536) != D_001A9B10) return;
+    if ((a1->id & -65536) != object_delete_block_id) return;
     if (a1->twin != 0) a1->twin->twin = 0;
     object_free_single(a1);
 }
 
-void func_0008EAF1(struct record *a1, int a2)
+void object_delete_block(struct record *a1, int a2)
 {
-    D_001A9B10 = a2 & -65536;
-    object_foreach_post(a1, (int)func_0008EAA7);
+    object_delete_block_id = a2 & -65536;
+    object_foreach_post(a1, (int)object_delete_block_cb);
 }
 
 void func_0008EB25(struct record *a1)
@@ -539,7 +539,7 @@ void func_0008EB25(struct record *a1)
 
 void func_0008EB52(void)
 {
-    object_foreach_pre(D_00195AC4, (int)func_0008EB25);
+    object_foreach_pre(location_object, (int)func_0008EB25);
     object_foreach_pre(nonworld_root, (int)func_0008EB25);
 }
 
@@ -547,8 +547,8 @@ int object_new_id(int a1)
 {
     int l_1C;
 
-    if (D_00187FDC >= 63000) D_00187FDC = 10000;
-    while (object_find_by_id(D_00195AC4, (l_1C = (a1 << 16) + D_00187FDC++)) != 0 || object_find_by_id(nonworld_root, l_1C) != 0) {
+    if (next_record_id >= 63000) next_record_id = 10000;
+    while (object_find_by_id(location_object, (l_1C = (a1 << 16) + next_record_id++)) != 0 || object_find_by_id(nonworld_root, l_1C) != 0) {
     }
     return l_1C;
 }
@@ -557,7 +557,7 @@ void object_delete_quest_cb(struct record *a1)
 {
     int l_18;
 
-    if (a1->quest_id != itemmaker_slot_kinds[0]) return;
+    if (a1->quest_id != scratch_190ce4[0]) return;
     if (a1->type == 8) {
         if (((int)(unsigned char)(a1->data.person.flags & 128)) != 0) {
             a1->twin->twin = 0;
@@ -566,17 +566,17 @@ void object_delete_quest_cb(struct record *a1)
             return;
         }
     }
-    if (loaded_location_door_count != 0 && (a1->id & -65536) == (D_00195AC4->id & -65536)) {
-        l_18 = func_00045E45(a1->id);
+    if (loaded_location_door_count != 0 && (a1->id & -65536) == (location_object->id & -65536)) {
+        l_18 = location_find_door(a1->id);
         if (l_18 != 0) *(signed char *)((char *)l_18 + 3) &= 15;
     }
-    func_000298F3(a1);
+    unequip_object(a1);
     object_delete(a1);
 }
 
 void object_delete_quest_objects(struct record *a1, unsigned char a2)
 {
-    itemmaker_slot_kinds[0] = a2;
+    scratch_190ce4[0] = a2;
     object_foreach_post(a1, (int)object_delete_quest_cb);
 }
 
@@ -592,30 +592,30 @@ int object_tree_size(struct record *a1)
     return *(int *)D_00190BE4;
 }
 
-void func_0008ED52(struct record *a1)
+void object_delete_type_cb(struct record *a1)
 {
-    if (a1->type != itemmaker_slot_kinds[0]) return;
+    if (a1->type != scratch_190ce4[0]) return;
     object_delete(a1);
 }
 
-void func_0008ED87(struct record *a1, unsigned char a2)
+void object_delete_type(struct record *a1, unsigned char a2)
 {
-    itemmaker_slot_kinds[0] = a2;
-    object_foreach_post(a1, (int)func_0008ED52);
+    scratch_190ce4[0] = a2;
+    object_foreach_post(a1, (int)object_delete_type_cb);
 }
 
 int object_find_quest_cb(struct record *a1)
 {
-    if (a1->quest_id == itemmaker_slot_kinds[0]) return (int)(D_00195AF4 = a1);
+    if (a1->quest_id == scratch_190ce4[0]) return (int)(found_object = a1);
     return 0;
 }
 
 struct record *object_find_quest(struct record *a1, unsigned char a2)
 {
-    itemmaker_slot_kinds[0] = a2;
-    D_00195AF4 = 0;
+    scratch_190ce4[0] = a2;
+    found_object = 0;
     object_find(a1, (int)object_find_quest_cb);
-    return D_00195AF4;
+    return found_object;
 }
 
 int potionmaker_scroll_up(void)

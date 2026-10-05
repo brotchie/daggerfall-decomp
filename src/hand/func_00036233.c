@@ -19,7 +19,7 @@ struct anim { char pad[6]; unsigned short f6; char pad8[16]; short f24; };
 struct res { char pad[12]; struct anim *anim; };
 extern char D_00170AD2[];
 extern unsigned char D_0017A834[];
-extern struct record *D_00195AC4;
+extern struct record *location_object;
 extern char D_001962A1;
 extern struct pair D_001985D4[];
 extern char *D_001995E8;
@@ -32,16 +32,16 @@ extern struct ofs *D_00199608;
 extern struct place *D_0019960C;
 extern int D_00199614;
 extern void func_000361B7(struct place *);
-extern void func_000369A0(struct record *, char *);
+extern void rdb_model_id_from_name(struct record *, char *);
 extern void fatal_error(char *);
 extern int rand_range(int, int);
 extern struct record *rmb_make_marker(struct record *, int);
 extern struct record *rmb_make_flat(struct record *, short, short, int);
 extern void object_free_single(struct record *);
 extern struct record *object_create_in_block(struct record *, unsigned char, int, int, int);
-extern void func_000C7F07(int, int, int, int *);
-extern struct res *func_00135D00(int, int, int);
-extern void func_00135E39(void);
+extern void xn_model_set_angles(int, int, int, int *);
+extern struct res *xn_tex_cache_lookup(int, int, int);
+extern void xn_tex_cache_flush(void);
 
 void rdb_create_objects(struct record *a1, struct node *a2, int a3)
 {
@@ -63,14 +63,14 @@ void rdb_create_objects(struct record *a1, struct node *a2, int a3)
             if (D_0019960C->f19 <= 0)
                 func_000361B7(D_0019960C);
             obj = object_create_in_block(a1, 6, 62, 0, a3);
-            func_000369A0(obj, D_00199604->name[D_0019960C->f12]);
+            rdb_model_id_from_name(obj, D_00199604->name[D_0019960C->f12]);
             if ((obj->image2 == 703 || obj->image2 == 704) && (D_00199608->dx || D_00199608->dz)) {
                 object_free_single(obj);
                 obj = 0;
                 break;
             }
             obj->wait_state = 0;
-            func_000C7F07(D_0019960C->x, D_0019960C->y, D_0019960C->z, (int *)(RECORD_DATA(obj) + 12));
+            xn_model_set_angles(D_0019960C->x, D_0019960C->y, D_0019960C->z, (int *)(RECORD_DATA(obj) + 12));
             if (obj->image2 == 550) {
                 obj->type = 32;
                 obj->lock_level = D_0017A834[D_0019960C->f14 >> 4];
@@ -132,14 +132,14 @@ void rdb_create_objects(struct record *a1, struct node *a2, int a3)
             D_001985D4[D_00199614].id = obj->id;
             if (D_00199614++ > 512)
                 fatal_error(D_00170AD2);
-            obj->x = D_00195AC4->x + a2->x + (D_00199608->dx << 11);
-            obj->y = D_00195AC4->y + a2->y;
-            obj->z = D_00195AC4->z + a2->z + (D_00199608->dz << 11);
+            obj->x = location_object->x + a2->x + (D_00199608->dx << 11);
+            obj->y = location_object->y + a2->y;
+            obj->z = location_object->z + a2->z + (D_00199608->dz << 11);
             if (a2->kind == 3) {
-                res = func_00135D00(obj->image >> 7, obj->image & 127, 0);
+                res = xn_tex_cache_lookup(obj->image >> 7, obj->image & 127, 0);
                 if (res == 0) {
-                    func_00135E39();
-                    res = func_00135D00(obj->image >> 7, obj->image & 127, 0);
+                    xn_tex_cache_flush();
+                    res = xn_tex_cache_lookup(obj->image >> 7, obj->image & 127, 0);
                 }
                 h = res->anim->f6 * (res->anim->f24 + 256) / 256;
                 obj->y += h >> 1;

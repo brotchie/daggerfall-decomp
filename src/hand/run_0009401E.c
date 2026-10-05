@@ -20,7 +20,7 @@ struct obj {
     short f7b;              /* 0x47 + 52 */
 };
 struct pc { char pad[367]; struct obj *slots[1]; };
-extern char *D_00195A80;
+extern char *text_macro_item;
 extern struct obj *player_object;
 extern struct obj *D_00195AA8;
 extern int inv_right_container;
@@ -38,7 +38,7 @@ extern void inv_use_item(void);
 extern void inv_item_info(struct obj *, char *);
 extern void item_remove_equip_effects(struct obj *, int);
 extern int trade_can_repair_item(char *);
-extern void func_000992FA(void);
+extern void trade_schedule_repair(void);
 extern char *inventory_containers[];
 extern unsigned char inv_right_icon;
 extern int inv_left_scroll;
@@ -101,7 +101,7 @@ void inv_click_equip_slot(int slot)
         return;
     D_00195AA8 = inv_selected_item;
     body = (char *)inv_selected_item + 71;
-    D_00195A80 = body;
+    text_macro_item = body;
     switch (inventory_action) {
     case 1:
         inv_item_info(inv_selected_item, body);
@@ -139,7 +139,7 @@ void inv_click_equip_slot(int slot)
             o->f17 = D_00195D54;
         o->f1f = object_new_id(0);
         quest_raise_event(5, o, 0);
-        func_000992FA();
+        trade_schedule_repair();
         break;
     case 4:
         inv_use_item();

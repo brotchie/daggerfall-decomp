@@ -3,14 +3,14 @@
 
 extern char D_00176884[];        /* __FILE__ */
 extern char D_0017688F[];
-extern char *D_00195C44;
+extern char *scratch_buffer;
 extern int save_file_handle;
 extern void fatal_error(char *);
 extern void save_unlink_character(struct record *);
 extern int write(int, void *, int);
 extern void mc_memcpy(void *, void *, int, char *, int, int);
-#pragma aux func_000A0ED9 parm routine [];
-extern void func_000A0ED9(int, char *);
+#pragma aux mc_set_location parm routine [];
+extern void mc_set_location(int, char *);
 extern int mc_sprintf(void *, char *, ...);
 
 int savetree_write_record(struct record *a1)
@@ -20,12 +20,12 @@ int savetree_write_record(struct record *a1)
     int unused1;
     int unused2;
 
-    buf = (struct record *)D_00195C44;
+    buf = (struct record *)scratch_buffer;
     len = *(int *)((char *)a1 - 6);     /* the heap block's size */
     if (len == 0) {
-        func_000A0ED9(84, D_00176884);
-        mc_sprintf(D_00195C44, D_0017688F);
-        fatal_error(D_00195C44);
+        mc_set_location(84, D_00176884);
+        mc_sprintf(scratch_buffer, D_0017688F);
+        fatal_error(scratch_buffer);
     }
     write(save_file_handle, &len, 4);
     mc_memcpy(buf, a1, len, D_00176884, 90, 4);

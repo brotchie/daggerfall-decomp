@@ -3,12 +3,12 @@
 
 struct move { int x, y, z; int f12, f16, f20; char *name; short flags; char pad[26]; int dz; };
 extern char D_00187B44[];
-extern int D_00195C74;
+extern int ceiling_height;
 extern unsigned char player_on_ground;
 extern short collide_flags;
 extern int collide_move_object(struct record *, int, struct move *, int);
 extern void damage_apply(struct record *, int, int);
-extern void func_000CE6E2(int, int, int *, int *);
+extern void xn_math_yaw_offset_xz(int, int, int *, int *);
 
 void damage_knockback_move(struct record *a1, struct character *a2)
 {
@@ -20,10 +20,10 @@ void damage_knockback_move(struct record *a1, struct character *a2)
     int l_14;
 
     l_1C = player_on_ground;
-    l_18 = D_00195C74;
+    l_18 = ceiling_height;
     if (a2->knockback_speed > 40)
         a2->knockback_speed = 40;
-    func_000CE6E2(a2->knockback_angle, a2->knockback_speed > 25 ? 25 : a2->knockback_speed, &l_30, &m.dz);
+    xn_math_yaw_offset_xz(a2->knockback_angle, a2->knockback_speed > 25 ? 25 : a2->knockback_speed, &l_30, &m.dz);
     m.x = a1->x + l_30;
     m.y = a1->y;
     m.z = a1->z + m.dz;
@@ -35,7 +35,7 @@ void damage_knockback_move(struct record *a1, struct character *a2)
     collide_flags |= 4;
     collide_move_object(a1, 0, &m, 1);
     player_on_ground = l_1C;
-    D_00195C74 = l_18;
+    ceiling_height = l_18;
     l_14 = collide_flags;
     if (l_14 & 2) {
         a2->flags &= ~0x20;

@@ -4,7 +4,7 @@
 #include "records.h"
 
 extern struct record *player_entity;
-extern struct record *D_00195AF4;
+extern struct record *found_object;
 
 extern struct record *object_create_child(struct record *, int, int);
 extern int object_find(struct record *, int);
@@ -17,11 +17,11 @@ void inv_add_arrows(struct record *a1, int a2)
     struct record *l_18;
     int l_14;
 
-    D_00195AF4 = 0;
+    found_object = 0;
     object_find(a1->children, (int)inv_match_arrows);
-    if (D_00195AF4 == 0) {
+    if (found_object == 0) {
         l_18 = object_create_child(a1, 0, 107);
-        D_00195AF4 = l_18;
+        found_object = l_18;
         l_18->type = 2;
         l_18->image2 = 998;
         l_18->image = 0;
@@ -30,7 +30,7 @@ void inv_add_arrows(struct record *a1, int a2)
         if (a1 == player_entity) inv_store_item(l_18);
         return;
     }
-    l_14 = a2 + D_00195AF4->data.item.stack_count;
+    l_14 = a2 + found_object->data.item.stack_count;
     if (l_14 >= 200) l_14 = 199;
-    D_00195AF4->data.item.stack_count = *(signed char *)&l_14;
+    found_object->data.item.stack_count = *(signed char *)&l_14;
 }

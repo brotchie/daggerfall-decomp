@@ -5,17 +5,17 @@ extern char D_00170464[];
 extern char D_001704BB[];
 extern signed char text_rsc_buffer[];
 extern char *game_minutes;
-extern char D_00196295;
+extern char text_missing_ok;
 extern int rumor_file;
 extern void quest_load_text(struct quest *, int, int, int);
 extern int disk_open_rw(char *);
 extern int disk_file_exists(char *);
-extern int func_0009DEA7(int);
+extern int close(int);
 extern int mc_memset();
 extern int lseek(int, int, int);
 extern int mc_strncpy();
 extern int write(int, void *, int);
-extern int func_000A0DF4(char *);
+extern int strlen(char *);
 
 void rumor_add_quest(struct quest *a1, int a2, int a3, int a4)
 {
@@ -24,7 +24,7 @@ void rumor_add_quest(struct quest *a1, int a2, int a3, int a4)
     struct rumor r;
 
     if (disk_file_exists(D_001704BB) == 0) return;
-    D_00196295 = 1;
+    text_missing_ok = 1;
     ((char *)text_rsc_buffer)[0] = 0;
     quest_load_text(a1, a2, 0, 0);
     if (((char *)text_rsc_buffer)[0] == 0) return;
@@ -38,8 +38,8 @@ void rumor_add_quest(struct quest *a1, int a2, int a3, int a4)
     r.target = a3;
     r.flags = a4;
     r.expires = (unsigned)(game_minutes + l_10 * 1440);
-    r.text_length = func_000A0DF4(((char *)text_rsc_buffer)) + 1;
+    r.text_length = strlen(((char *)text_rsc_buffer)) + 1;
     write(rumor_file, &r, 34);
     write(rumor_file, ((char *)text_rsc_buffer), r.text_length);
-    func_0009DEA7(rumor_file);
+    close(rumor_file);
 }

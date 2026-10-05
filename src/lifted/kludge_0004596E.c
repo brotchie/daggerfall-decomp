@@ -9,7 +9,7 @@ extern int object_reparent(struct record *, struct record *);
 extern void item_make_random(unsigned short, struct item *);
 extern void item_make(int, int, struct item *);
 
-struct record *func_0004596E(struct record *a1, int a2)
+struct record *kludge_add_random_item(struct record *a1, int a2)
 {
     struct record *l_20;
     struct record *l_1C;

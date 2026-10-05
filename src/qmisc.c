@@ -4,7 +4,7 @@
 
 void quest_remove_objects(unsigned char a)
 {
-    object_delete_quest_objects(D_00195AC4, a);
+    object_delete_quest_objects(location_object, a);
     object_delete_quest_objects(nonworld_root, a);
 }
 

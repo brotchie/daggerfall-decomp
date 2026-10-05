@@ -5,7 +5,7 @@
 extern char *talk_question_lines;
 extern int talk_question_line_count;
 
-extern void text_draw_colored(int, int, int, int, unsigned char);
+extern void text_draw_coloured(int, int, int, int, unsigned char);
 
 void talk_draw_question(int a1, int a2, int a3, int a4)
 {
@@ -22,7 +22,7 @@ void talk_draw_question(int a1, int a2, int a3, int a4)
         l_C = talk_question_line_count - l_14;
     }
     while (l_C < talk_question_line_count) {
-        text_draw_colored(*(int *)((char *)(int)(talk_question_lines + (l_C++ << 2))), (int)(short)*(short *)&a1, (int)(short)((l_10 * 7) + a2), 145, 156);
+        text_draw_coloured(*(int *)((char *)(int)(talk_question_lines + (l_C++ << 2))), (int)(short)*(short *)&a1, (int)(short)((l_10 * 7) + a2), 145, 156);
         l_10++;
     }
 }

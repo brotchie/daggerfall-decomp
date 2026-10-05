@@ -55,7 +55,7 @@ int dpmi_unlock_region(int a1, int a2)
     return *(int *)((char *)l_38 + 24) & 1;
 }
 
-void func_0009960A(void)
+void causeway_disable_error_dump(void)
 {
     char l_3C[28];
     char l_20[12];

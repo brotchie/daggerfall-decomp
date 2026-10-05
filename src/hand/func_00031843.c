@@ -1,8 +1,8 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x00031843 */
 #include "records.h"
 
-extern struct record *D_00195A00;
-extern char D_001962A9;
+extern struct record *quest_root;
+extern char quests_suspended;
 extern struct quest *current_quest;
 extern struct record *quest_event_object2;
 extern struct record *quest_event_object;
@@ -21,7 +21,7 @@ int func_00031843(short a1, struct record *a2, struct record *a3)
     struct record *t;
 
     res = 0;
-    if (D_001962A9 != 0)
+    if (quests_suspended != 0)
         return 0;
     /* a person's (type 8) data starts with its faction id; a quest NPC (type 65) has it at +0x19 */
     if (a2->type == 8)
@@ -32,7 +32,7 @@ int func_00031843(short a1, struct record *a2, struct record *a3)
         return 0;
     if (faction_find(id)->type != 4)
         return 0;
-    t = D_00195A00->children;
+    t = quest_root->children;
     while (t != 0) {
         if (t->type == 14) {
             current_quest = &t->data.quest;

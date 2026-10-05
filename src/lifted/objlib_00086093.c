@@ -5,7 +5,7 @@
 
 extern int rand_range(int, int);
 
-short func_00086093(int a1)
+short flat_table_pick(int a1)
 {
     int l_20;
     int l_1C;

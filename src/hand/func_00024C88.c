@@ -17,11 +17,11 @@ extern struct dun region_legal_reputation[];
 extern signed char text_buffer[];
 extern int D_00190BE4[];
 extern int D_00190CAC;
-extern short D_00190D68;
+extern short scratch_190d68;
 extern short D_00190D6A;
 extern struct record *player_entity;
 extern struct character *player_character;
-extern char D_001962AB;
+extern char forced_material;
 extern struct faction *faction_find(short);
 extern short bio_person_add(struct character *, char *, int);
 extern unsigned char *career_skip_word(unsigned char *);
@@ -35,8 +35,8 @@ extern void inv_store_item(struct record *);
 extern void inv_merge_arrows(struct record *, struct record *, int);
 extern void mc_memset(void *, int, int, char *, int, int);
 extern int atoi(unsigned char *);
-#pragma aux func_000A0ED9 parm routine [];
-extern void func_000A0ED9(int, char *);
+#pragma aux mc_set_location parm routine [];
+extern void mc_set_location(int, char *);
 extern int mc_sprintf(char *, char *, ...);
 
 unsigned char *career_answer_effect(unsigned char *a1)
@@ -59,7 +59,7 @@ unsigned char *career_answer_effect(unsigned char *a1)
         if (f != 0)
             f->reputation += atoi(career_skip_word(a1));
     } else if (*(unsigned short *)a1 == 0x7272)
-        region_legal_reputation[D_00190D68].f0 += atoi(career_skip_word(a1));
+        region_legal_reputation[scratch_190d68].f0 += atoi(career_skip_word(a1));
     else if (*(unsigned short *)a1 == 0x494D) {
         a1 = career_skip_word(a1);
         if (*a1 == '+')
@@ -96,7 +96,7 @@ unsigned char *career_answer_effect(unsigned char *a1)
         p->career_id = n;    /* the person's class: CLASS%02d.CFG */
         a1 = career_skip_word(a1);
         p->level = atoi(a1);
-        func_000A0ED9(292, D_00170738);
+        mc_set_location(292, D_00170738);
         mc_sprintf(((char *)text_buffer), D_00170765, n);
         disk_read_file(((char *)text_buffer), q);
         if (c == 'E') {
@@ -114,7 +114,7 @@ unsigned char *career_answer_effect(unsigned char *a1)
         o->flags = 1;
         a1 = career_skip_word(a1);
         m = &o->data.item;
-        D_001962AB = atoi(career_skip_word(a1)) + 1;
+        forced_material = atoi(career_skip_word(a1)) + 1;
         item_make(n, atoi(a1), m);
         if (m->group == 3 && m->index == 18) {
             m->stack_count = 1;

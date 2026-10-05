@@ -1,7 +1,7 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0008E6C5 */
 #include "records.h"
 
-extern struct record *D_00195AF4;
+extern struct record *found_object;
 extern short D_001A9B40;
 extern short D_001A9B42;
 extern void object_foreach(struct record *, int);
@@ -13,6 +13,6 @@ struct record *object_find_item(struct record *a1, short a2, short a3)
     D_001A9B40 = a2;
     object_foreach(a1, (int)object_find_item_cb);
     if (D_001A9B42 == -1)
-        return D_00195AF4;
+        return found_object;
     return 0;
 }

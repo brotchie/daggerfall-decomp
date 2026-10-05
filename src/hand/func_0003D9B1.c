@@ -1,6 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0003D9B1 */
 extern char D_00170D55[];       /* __FILE__ */
-extern short D_00199664;
+extern short text_format_flags;
 extern void parse_expand(char *, char *);
 extern int font_char_width(unsigned char);
 extern void mc_free(void *, char *, int);
@@ -16,12 +16,12 @@ char *text_expand_wrap(unsigned short flags, short width, char *src, char *buf, 
     short saved;
     char *out;
 
-    saved = D_00199664 = flags;
+    saved = text_format_flags = flags;
     if (!(flags & 8))
         parse_expand(src, text);
     else
         mc_strncpy(text, src, 4, D_00170D55, 169);
-    D_00199664 = saved;
+    text_format_flags = saved;
     if (src != 0 && src != (char *)0x97979797) {
         mc_free(src, D_00170D55, 173);
         src = (char *)0x97979797;

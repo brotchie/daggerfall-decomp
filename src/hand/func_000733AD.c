@@ -4,14 +4,14 @@
 struct pick { int flags; struct record *obj; int f8; int fc; int f10; };
 struct w2 { unsigned short f0; unsigned short f2; };
 extern unsigned char player_environment;
-extern struct record *D_00190504[];
-extern int D_001959BC;
+extern struct record *creature_list[];
+extern int view_look_yaw;
 extern struct record *player_entity;
 extern struct record *player_object;
 extern int D_00195ABC;
 extern int creature_count;
 extern struct character *player_character;
-extern struct w2 *D_00195DC0;
+extern struct w2 *click_face_texture;
 extern unsigned char weapon_active_hand;
 extern char crime_current;
 extern char D_001962B2;
@@ -23,23 +23,23 @@ extern void town_map_note_building(struct record *, struct building *);
 extern void damage_resolve_attack(struct record *, struct record *, int);
 extern void damage_spawn_splash(struct record *, int, int);
 extern int damage_miss_sound(struct item *, int);
-extern void func_0002FBCC(void);
+extern void monster_wake_all(void);
 extern void skill_add_uses(int, int);
 extern int creatures_guard_mix(void);
 extern void guards_summon(int);
-extern void person_killed(struct record *);
+extern void pedestrian_killed(struct record *);
 extern int ai_angle_diff(int, int, int *);
 extern void func_00063DDC(struct record *);
 extern void links_trigger(struct record *, int);
 extern int sound_play(int, struct record *, int);
-extern void func_0007425E(struct record *, int);
+extern void door_try_open(struct record *, int);
 extern int rand_range(int, int);
 extern struct building *object_building(struct record *);
 extern void building_enter(struct building *);
 extern int door_start_swing(struct record *, int);
-extern int func_000C7FD9(int, int, int, int);
-extern int func_000C7FF4(int, int);
-extern int func_000C808D(int, int, int, int);
+extern int xn_math_approx_dist2d(int, int, int, int);
+extern int xn_math_approx_hypot(int, int);
+extern int xn_math_angle_to_point(int, int, int, int);
 
 void weapon_melee_strike(struct record *a1)
 {
@@ -58,22 +58,22 @@ void weapon_melee_strike(struct record *a1)
 
     m = &a1->data.character;
     grp = m->team;
-    D_00190504[creature_count++] = player_entity;
+    creature_list[creature_count++] = player_entity;
     for (count = i = 0; i < creature_count; i++) {
-        other = D_00190504[i];
+        other = creature_list[i];
         om = &other->data.character;
         if (om->team == grp)
             continue;
         if (other == a1)
             continue;
-        dist = func_000C7FF4(a1->y - other->y, func_000C7FD9(a1->x, a1->z, other->x, other->z));
+        dist = xn_math_approx_hypot(a1->y - other->y, xn_math_approx_dist2d(a1->x, a1->z, other->x, other->z));
         if (dist > 90)
             continue;
         if (dist > 10) {
-            dist = func_000C808D(a1->x, a1->z, other->x, other->z);
+            dist = xn_math_angle_to_point(a1->x, a1->z, other->x, other->z);
             D_00195ABC = dist;
             if (a1 == player_entity)
-                res = ai_angle_diff(a1->yaw + D_001959BC & 2047, dist, &dist);
+                res = ai_angle_diff(a1->yaw + view_look_yaw & 2047, dist, &dist);
             else
                 res = ai_angle_diff(a1->yaw, dist, &dist);
         } else
@@ -98,15 +98,15 @@ void weapon_melee_strike(struct record *a1)
             if (people_list[i] == 0)
                 continue;
             other = people_list[i];
-            dist = func_000C7FF4(a1->y - other->y, func_000C7FD9(a1->x, a1->z, other->x, other->z));
+            dist = xn_math_approx_hypot(a1->y - other->y, xn_math_approx_dist2d(a1->x, a1->z, other->x, other->z));
             if (dist > 90)
                 continue;
-            dist = func_000C808D(a1->x, a1->z, other->x, other->z);
+            dist = xn_math_angle_to_point(a1->x, a1->z, other->x, other->z);
             D_00195ABC = dist;
-            res = ai_angle_diff(a1->yaw + D_001959BC & 2047, dist, &dist);
+            res = ai_angle_diff(a1->yaw + view_look_yaw & 2047, dist, &dist);
             if (res < 200) {
                 damage_spawn_splash(people_list[i], 0, -1);
-                person_killed(people_list[i]);
+                pedestrian_killed(people_list[i]);
                 count++;
             }
         }
@@ -121,14 +121,14 @@ void weapon_melee_strike(struct record *a1)
     if (obj->type != 32 && obj->type != 43)
         return;
     if (obj->type == 43) {
-        r = (D_00195DC0->f2 >> 7) % 100;
+        r = (click_face_texture->f2 >> 7) % 100;
         if (r != 74)
             return;
     }
-    if (obj->type != 43 && func_000C7FD9(obj->x, obj->z, player_object->x, player_object->z) > 100)
+    if (obj->type != 43 && xn_math_approx_dist2d(obj->x, obj->z, player_object->x, player_object->z) > 100)
         return;
     if (obj->type != 43 && (obj->lock_level == 0 || (obj->flags & 320) != 0)) {
-        func_0007425E(obj, 0);
+        door_try_open(obj, 0);
         return;
     }
     if (obj->type != 43) {
@@ -137,7 +137,7 @@ void weapon_melee_strike(struct record *a1)
         if (obj->lock_level <= 19 && rand_range(1, 100) <= 20 - obj->lock_level && door_start_swing(obj, 0))
             obj->flags |= 320;
         if (obj->id >> 16 == 50027 || obj->id >> 16 == 50029 || obj->id >> 16 == 50033)
-            func_0002FBCC();
+            monster_wake_all();
     } else if (rand_range(1, 100) < 10) {
         item = object_building(obj);
         if (item != 0)

@@ -17,15 +17,15 @@ extern void faction_link_relations(struct faction *);
 extern void faction_add_record(struct faction *, int, struct faction *);
 extern void fatal_error(char *);
 extern int disk_open_data(char *);
-extern void func_0009DEA7(int);
+extern void close(int);
 extern void mc_free(struct faction *, char *, int);
 extern void mc_memset(void *, int, int, char *, int, int);
 extern struct faction *mc_malloc(int, char *, int);
-extern int func_000A00CB(int, char *, int);
+extern int read(int, char *, int);
 extern short atoi(char *);
 extern int tolower(int);
-#pragma aux func_000A0ED9 parm routine [];
-extern void func_000A0ED9(int, char *);
+#pragma aux mc_set_location parm routine [];
+extern void mc_set_location(int, char *);
 extern void mc_sprintf(char *, char *, ...);
 
 void faction_load_file(void)
@@ -55,8 +55,8 @@ void faction_load_file(void)
     fh = disk_open_data(D_0017043C);
     if (fh < 1)
         fatal_error(D_00170448);
-    len = func_000A00CB(fh, D_00147954, 90000);
-    func_0009DEA7(fh);
+    len = read(fh, D_00147954, 90000);
+    close(fh);
     for (faction_count = i = 0; i < len; i++)
         if (D_00147954[i] == '#')
             faction_count++;
@@ -122,7 +122,7 @@ void faction_load_file(void)
                 break;
             }
             if (!found) {
-                func_000A0ED9(1049, D_00170464);
+                mc_set_location(1049, D_00170464);
                 mc_sprintf(((char *)text_buffer), D_0017046E, line);
                 fatal_error(((char *)text_buffer));
             }

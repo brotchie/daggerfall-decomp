@@ -5,7 +5,7 @@
 
 extern int rand_range(int, int);
 
-int func_000602C0(int a1, int a2)
+int armor_image_for_type(int a1, int a2)
 {
     int l_18;
 

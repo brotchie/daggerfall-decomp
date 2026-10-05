@@ -2,7 +2,7 @@
 extern char *inv_right_container;
 extern unsigned game_minutes;
 
-void func_0009830F(void)
+void trade_schedule_shop_repairs(void)
 {
     int l_2C;
     int l_34;

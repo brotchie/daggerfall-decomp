@@ -4,7 +4,7 @@
 
 extern char D_00170129[];
 
-extern int func_000A0DF4();
+extern int strlen();
 extern int mc_memmove();
 #pragma aux sosconv "*" parm caller [] value [eax] modify [eax ebx ecx edx];
 #pragma aux (sosconv) profile_set_string;
@@ -23,7 +23,7 @@ int profile_set_string(int a1, int a2)
     while (((int)(unsigned char)*(signed char *)((char *)l_20)) == 32) l_20++;
     l_1C = l_20;
     while (((int)(unsigned char)*(signed char *)((char *)l_20++)) != 13) l_10++;
-    l_14 = func_000A0DF4(a2);
+    l_14 = strlen(a2);
     if (((unsigned)l_14) < l_10) {
         l_18 = ((int)(*(char **)((char *)a1 + 132) + *(int *)((char *)a1 + 136)) - l_1C) - (l_10 - l_14);
         mc_memmove(l_1C, (l_10 - l_14) + l_1C, l_18, (int)D_00170129, 870, 4);

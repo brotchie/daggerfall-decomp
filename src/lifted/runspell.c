@@ -7,8 +7,8 @@ struct bf8_1_1 { unsigned char _:1; unsigned char f:1; };
 struct bf8_2_1 { unsigned char _:2; unsigned char f:1; };
 struct bf8_3_1 { unsigned char _:3; unsigned char f:1; };
 struct bf8_7_1 { unsigned char _:7; unsigned char f:1; };
-extern short D_000CEA30;
-extern short D_000CEA34;
+extern short xn_cam_centre_x;
+extern short xn_cam_centre_y;
 extern short mouse_x;
 extern short mouse_y;
 extern signed char D_00153408;
@@ -32,20 +32,20 @@ extern char spell_impact_sounds[];
 extern signed char magic_school_skills[];
 extern signed char spell_element_class_bits[];
 extern short D_00185CEC[];
-extern struct record *D_00190504[];
+extern struct record *creature_list[];
 extern int view_look_pitch;
-extern int D_001959BC;
-extern int D_001959FC;
+extern int view_look_yaw;
+extern int spell_points_bonus;
 extern struct record *camera_object;
 extern struct record *player_entity;
 extern struct record *player_object;
-extern struct record *D_00195AC4;
+extern struct record *location_object;
 extern char cheat_flags[];
 extern struct spell *spell_records;
 extern int creature_count;
 extern struct record *spell_ready_missile;
 extern struct record *spell_ready_touch;
-extern struct record *guild_npc_object;
+extern struct record *scratch_object;
 extern char hud_bar_image[];
 extern struct character *player_character;
 extern struct settings *game_settings;
@@ -53,7 +53,7 @@ extern struct record *D_00195C48;
 extern int spell_cast_anim_fire[];
 extern char D_00195F28[];
 extern short spell_effect_slot;
-extern short D_00195F62;
+extern short spell_ready_cost;
 extern signed char D_00196291;
 extern signed char D_00196292;
 extern struct spell *D_00199D64;
@@ -61,7 +61,7 @@ extern int D_00199D6C;
 extern signed char D_00199D71;
 
 extern int collide_line_of_sight(struct record *, struct record *);
-extern int func_00023EC2(struct record *, int, int);
+extern int collide_creature_within(struct record *, int, int);
 extern int spell_cost(struct spell *, struct character *);
 extern int player_in_daylight(void);
 extern int cast_player_spell(struct record *);
@@ -82,21 +82,21 @@ extern int object_new_id(int);
 extern int mc_memset();
 extern int mc_strncpy();
 extern int mc_memcpy();
-extern int func_000C2000();
-extern int func_000C2043();
-extern int func_000C7FD9();
-extern int func_000C7FF4();
-extern int func_000C808D();
+extern int xn_vec_unit_direction();
+extern int xn_vec_advance();
+extern int xn_math_approx_dist2d();
+extern int xn_math_approx_hypot();
+extern int xn_math_angle_to_point();
 extern int spell_effect_dispatch();
-extern int func_000CD20E();
-extern int func_000CDB7A();
+extern int xn_draw_spell_icon();
+extern int xn_draw_cast_anim_mirrored();
 extern int spell_find_effect_type();
 extern int func_000CE4E0();
-extern int func_000CE70D();
+extern int xn_math_advance_pitch_yaw();
 extern void damage_spawn_splash(struct record *, int, int);
 extern void damage_knockback(struct record *, int, int, int);
 extern void spell_add_skill_uses(struct spell *, int);
-extern void func_0007D774(struct record *, struct record *);
+extern void spell_cast_queue(struct record *, struct record *);
 extern void spell_end(struct record *);
 extern void object_foreach(struct record *, int);
 int spell_resist_check(struct record *, struct record **);
@@ -107,7 +107,7 @@ void spell_compute_values(struct spell *, unsigned short, int);
 void func_0005C856(struct record *, struct record *);
 void cast_anim_start(int);
 void func_0005CA28(struct record *);
-void func_0005CA87(struct spell *);
+void spell_lookup_name(struct spell *);
 
 int cast_item_strike_spell(int a1, struct record *a2)
 {
@@ -118,7 +118,7 @@ int cast_item_strike_spell(int a1, struct record *a2)
     l_18 = object_create_child(player_object->parent, 0, 89);
     while (spell_records[l_1C].name[0] == 0 || spell_records[l_1C].id != a1) l_1C++;
     l_18->type = 9;
-    l_18->id = object_new_id(((unsigned)D_00195AC4->id) >> 16);
+    l_18->id = object_new_id(((unsigned)location_object->id) >> 16);
     mc_memcpy(&l_18->data.spell, &spell_records[l_1C], 89, (int)D_001757F4, 121, 4);
     l_18->data.spell.icon = 250;
     l_1C = spell_cost(&l_18->data.spell, player_character);
@@ -132,10 +132,10 @@ int cast_creature_spell(struct record *a1, struct record *a2, int a3)
     struct record *l_14;
 
     l_18 = 0;
-    l_14 = object_create_child(D_00195AC4, 0, 89);
+    l_14 = object_create_child(location_object, 0, 89);
     while (spell_records[l_18].name[0] == 0 || spell_records[l_18].id != a3) l_18++;
     l_14->type = 9;
-    l_14->id = object_new_id(((unsigned)D_00195AC4->id) >> 16);
+    l_14->id = object_new_id(((unsigned)location_object->id) >> 16);
     l_14->caster = a1;
     mc_memcpy(&l_14->data.spell, &spell_records[l_18], 89, (int)D_001757F4, 144, 4);
     if (D_00196292 != 0) l_14->data.spell.icon = 250;
@@ -205,7 +205,7 @@ void spellbook_find_last_cast_cb(struct record *a1)
 {
     if (a1->type != 9) return;
     if ((short)((unsigned short)a1->data.spell.id) != spell_last_cast_id) return;
-    guild_npc_object = a1;
+    scratch_object = a1;
 }
 
 int cast_recast_last(void)
@@ -225,29 +225,29 @@ int cast_recast_last(void)
         hud_message_add((int)D_00175820);
         return 0;
     }
-    guild_npc_object = 0;
+    scratch_object = 0;
     object_foreach(l_28->children, (int)spellbook_find_last_cast_cb);
-    l_28 = guild_npc_object;
+    l_28 = scratch_object;
     l_20 = &l_28->data.spell;
-    l_1C = (int)(short)D_00195F62;
-    if ((player_character->magicka + D_001959FC) < l_1C) {
+    l_1C = (int)(short)spell_ready_cost;
+    if ((player_character->magicka + spell_points_bonus) < l_1C) {
         hud_message_add((int)D_00175837);
         return 0;
     }
     spell_add_skill_uses(l_20, 1);
-    if (D_001959FC != 0) {
-        if (l_1C > D_001959FC) {
-            l_1C -= D_001959FC;
-            D_001959FC = 0;
+    if (spell_points_bonus != 0) {
+        if (l_1C > spell_points_bonus) {
+            l_1C -= spell_points_bonus;
+            spell_points_bonus = 0;
         } else {
-            D_001959FC -= l_1C;
-            D_00195F62 = 0;
+            spell_points_bonus -= l_1C;
+            spell_ready_cost = 0;
         }
     }
     player_character->magicka -= l_1C;
     l_24 = object_create_child(player_object->parent, 0, 89);
     l_24->type = 9;
-    l_24->id = object_new_id(((unsigned)D_00195AC4->id) >> 16);
+    l_24->id = object_new_id(((unsigned)location_object->id) >> 16);
     mc_memcpy(&l_24->data.spell, &l_28->data.spell, 89, (int)D_001757F4, 443, 4);
     if (cast_player_spell(l_24) != 0) object_delete(l_24);
     return 1;
@@ -305,7 +305,7 @@ L5B5A7:;
     return spfx_resist_roll(l_18->element, (int)(unsigned char)spell_element_class_bits[l_18->element], l_2C, l_28, 2, (-(a1->caster->data.character.level - l_2C->level)) * 5);
 }
 
-int func_0005B6AE(struct spell *a1, struct character *a2, int a3)
+int spell_base_cost(struct spell *a1, struct character *a2, int a3)
 {
     int l_1C;
     int l_18;
@@ -336,7 +336,7 @@ struct spell *spell_find_active_effect(struct record *a1, int a2, int a3, int a4
                     if (a3 != 0) *(int *)((char *)a3) = l_14->cast_chances[l_10];
                     if (a4 != 0) *(int *)((char *)a4) = l_14->cast_magnitudes[l_10];
                     spell_effect_slot = l_10;
-                    guild_npc_object = a1;
+                    scratch_object = a1;
                     return l_14;
                 }
             }
@@ -411,7 +411,7 @@ void cast_fire_missile(struct record *a1)
         char l_40[12];
         char l_34[16];
 
-        object_reparent(D_00195AC4, a1);
+        object_reparent(location_object, a1);
         *(int *)((char *)l_34 + 12) = (int)object_create_child(a1, 0, 0);
         *(signed char *)(*(char **)((char *)l_34 + 12)) = 7;
         *(short *)(*(char **)((char *)l_34 + 12) + 27) = 48;
@@ -425,21 +425,21 @@ void cast_fire_missile(struct record *a1)
         *(short *)(*(char **)((char *)l_34 + 12) + 1) = 0;
         *(short *)(*(char **)((char *)l_34 + 12) + 3) = 0;
         if (D_00153408 != 0) {
-            a1->angle_x = ((camera_object->angle_x + ((((((int)(short)mouse_y) + 6) - ((int)(short)D_000CEA34)) * 307) >> 8)) + D_0015340D) & 2047;
-            a1->yaw = (((((mouse_x + 6) - D_000CEA30) * 2) + camera_object->yaw) + D_00153411) & 2047;
+            a1->angle_x = ((camera_object->angle_x + ((((((int)(short)mouse_y) + 6) - ((int)(short)xn_cam_centre_y)) * 307) >> 8)) + D_0015340D) & 2047;
+            a1->yaw = (((((mouse_x + 6) - xn_cam_centre_x) * 2) + camera_object->yaw) + D_00153411) & 2047;
         } else {
-            a1->angle_x = ((((((((int)(short)mouse_y) + 6) - ((int)(short)D_000CEA34)) * 150) / 100) + camera_object->angle_x) + view_look_pitch) & 2047;
-            a1->yaw = ((camera_object->yaw + ((((((int)(short)mouse_x) + 6) - ((int)(short)D_000CEA30)) * 160) / 100)) + D_001959BC) & 2047;
+            a1->angle_x = ((((((((int)(short)mouse_y) + 6) - ((int)(short)xn_cam_centre_y)) * 150) / 100) + camera_object->angle_x) + view_look_pitch) & 2047;
+            a1->yaw = ((camera_object->yaw + ((((((int)(short)mouse_x) + 6) - ((int)(short)xn_cam_centre_x)) * 160) / 100)) + view_look_yaw) & 2047;
         }
         *(short *)(*(char **)((char *)l_34 + 12) + 5) = (a1->angle_z = 0);
         mc_memset((int)l_40, 0, 12, (int)D_001757F4, 711, 4);
-        func_000CE70D(a1->angle_x, a1->yaw, 1024, (int)l_40);
+        xn_math_advance_pitch_yaw(a1->angle_x, a1->yaw, 1024, (int)l_40);
         *(int *)l_40 += a1->x;
         *(int *)((char *)l_40 + 4) += a1->y;
         *(int *)((char *)l_40 + 8) += a1->z;
         mc_memset((int)l_34, 0, 12, (int)D_001757F4, 717, 4);
-        func_000C2000(&a1->x, (int)l_40, (char *)a1 + 118);
-        func_000C2043((char *)a1 + 118, 110, (int)l_34);
+        xn_vec_unit_direction(&a1->x, (int)l_40, (char *)a1 + 118);
+        xn_vec_advance((char *)a1 + 118, 110, (int)l_34);
         a1->x += *(int *)l_34;
         a1->y += *(int *)((char *)l_34 + 4);
         a1->z += *(int *)((char *)l_34 + 8);
@@ -453,7 +453,7 @@ void cast_fire_missile(struct record *a1)
         *(int *)l_34 = (player_object->x + a1->x) / 2;
         *(int *)((char *)l_34 + 4) = (player_object->y + a1->y) / 2;
         *(int *)((char *)l_34 + 8) = (player_object->z + a1->z) / 2;
-        if (func_00023EC2(player_object, (int)l_34, 65) != 0) {
+        if (collide_creature_within(player_object, (int)l_34, 65) != 0) {
             sound_play((int)(short)*(short *)(spell_impact_sounds + (a1->data.spell.element * 2)), a1, 110);
             a1->missile_texture |= 1;
             a1->image2 = 32768;
@@ -491,7 +491,7 @@ void cast_creature_missile(struct record *a1, struct record *a2, struct record *
     int l_14;
     char l_3C[12];
 
-    object_reparent(D_00195AC4, a1);
+    object_reparent(location_object, a1);
     l_28 = object_create_child(a1, 0, 0);
     l_28->type = 7;
     l_28->image = 48;
@@ -503,16 +503,16 @@ void cast_creature_missile(struct record *a1, struct record *a2, struct record *
     a1->z = a2->z;
     l_28->z = a1->z;
     l_28->angle_x = 0;
-    a1->angle_x = func_000C808D(a2->y, a2->z, a3->y, a3->z);
+    a1->angle_x = xn_math_angle_to_point(a2->y, a2->z, a3->y, a3->z);
     l_28->yaw = 0;
-    a1->yaw = func_000C808D(a2->x, a2->z, a3->x, a3->z);
+    a1->yaw = xn_math_angle_to_point(a2->x, a2->z, a3->x, a3->z);
     l_28->angle_z = (a1->angle_z = 0);
-    func_000CE70D(a1->angle_x, a1->yaw, 110, &a1->x);
+    xn_math_advance_pitch_yaw(a1->angle_x, a1->yaw, 110, &a1->x);
     l_28->x = a1->x;
     l_28->y = a1->y;
     l_28->z = a1->z;
     a3->y -= 50;
-    func_000C2000(&a1->x, &a3->x, (char *)a1 + 118);
+    xn_vec_unit_direction(&a1->x, &a3->x, (char *)a1 + 118);
     a3->y += 50;
     l_10 = &a1->data.spell;
     a1->missile_texture = *(short *)(spell_missile_textures + (l_10->element * 2));
@@ -521,7 +521,7 @@ void cast_creature_missile(struct record *a1, struct record *a2, struct record *
     *(int *)l_3C = (a2->x + a1->x) / 2;
     *(int *)((char *)l_3C + 4) = (a2->y + a1->y) / 2;
     *(int *)((char *)l_3C + 8) = (a2->z + a1->z) / 2;
-    if (func_00023EC2(a2, (int)l_3C, 65) != 0) {
+    if (collide_creature_within(a2, (int)l_3C, 65) != 0) {
         sound_play((int)(short)*(short *)(spell_impact_sounds + (a1->data.spell.element * 2)), a1, 110);
         a1->missile_texture |= 1;
         a1->image2 = 32768;
@@ -547,22 +547,22 @@ void spell_area_effect(struct record *a1)
     }
     l_1C = l_1C * 3;
     for (l_20 = 0; l_20 < creature_count; l_20++) {
-        if (func_000C7FF4(a1->y - D_00190504[l_20]->y, func_000C7FD9(a1->x, a1->z, D_00190504[l_20]->x, D_00190504[l_20]->z)) < l_1C) {
-            if (collide_line_of_sight(a1, D_00190504[l_20]) == 0) continue;
-            damage_knockback(D_00190504[l_20], l_1C * 30, func_000C808D(a1->x, a1->z, D_00190504[l_20]->x, D_00190504[l_20]->z), l_1C);
-            func_0005C856(a1, D_00190504[l_20]);
+        if (xn_math_approx_hypot(a1->y - creature_list[l_20]->y, xn_math_approx_dist2d(a1->x, a1->z, creature_list[l_20]->x, creature_list[l_20]->z)) < l_1C) {
+            if (collide_line_of_sight(a1, creature_list[l_20]) == 0) continue;
+            damage_knockback(creature_list[l_20], l_1C * 30, xn_math_angle_to_point(a1->x, a1->z, creature_list[l_20]->x, creature_list[l_20]->z), l_1C);
+            func_0005C856(a1, creature_list[l_20]);
         }
     }
-    if (func_000C7FF4(a1->y - player_object->y, func_000C7FD9(a1->x, a1->z, player_object->x, player_object->z)) >= l_1C) return;
-    func_0005CA87(&a1->data.spell);
-    func_0007D774(a1, player_entity);
+    if (xn_math_approx_hypot(a1->y - player_object->y, xn_math_approx_dist2d(a1->x, a1->z, player_object->x, player_object->z)) >= l_1C) return;
+    spell_lookup_name(&a1->data.spell);
+    spell_cast_queue(a1, player_entity);
 }
 
 void func_0005C856(struct record *a1, struct record *a2)
 {
-    func_0005CA87(&a1->data.spell);
+    spell_lookup_name(&a1->data.spell);
     if (a2->type != 18) return;
-    func_0007D774(a1, a2);
+    spell_cast_queue(a1, a2);
 }
 
 void cast_anim_start(int a1)
@@ -583,7 +583,7 @@ void cast_anim_update(void)
         } else {
             l_18 = -((int)(unsigned short)*(short *)(*(char **)hud_bar_image + 6));
         }
-        func_000CDB7A(spell_cast_anim_fire[(((int)(short)cast_anim_state) >> 4)], 0, l_18);
+        xn_draw_cast_anim_mirrored(spell_cast_anim_fire[(((int)(short)cast_anim_state) >> 4)], 0, l_18);
         cast_anim_state = 65535;
         return;
     }
@@ -592,11 +592,11 @@ void cast_anim_update(void)
     } else {
         l_1C = -((int)(unsigned short)*(short *)(*(char **)hud_bar_image + 6));
     }
-    func_000CDB7A(spell_cast_anim_fire[(((int)(short)cast_anim_state) >> 4)], (int)(short)(cast_anim_state & 15), l_1C);
+    xn_draw_cast_anim_mirrored(spell_cast_anim_fire[(((int)(short)cast_anim_state) >> 4)], (int)(short)(cast_anim_state & 15), l_1C);
     cast_anim_state++;
 }
 
-int func_0005C9BF(unsigned char a1)
+int spell_player_has_spell(unsigned char a1)
 {
     struct record *l_20;
 
@@ -615,7 +615,7 @@ void func_0005CA28(struct record *a1)
     mc_strncpy((int)D_00199D64 + 47, a1->data.spell.name, 25, (int)D_001757F4, 958);
 }
 
-void func_0005CA87(struct spell *a1)
+void spell_lookup_name(struct spell *a1)
 {
     int l_1C;
     struct record *l_18;
@@ -698,7 +698,7 @@ void spell_hud_draw_icons(void)
                 } else {
                     l_48 = l_34->icon;
                 }
-                func_000CD20E(l_28, l_24, l_48);
+                xn_draw_spell_icon(l_28, l_24, l_48);
             }
             D_00199D6C++;
         }

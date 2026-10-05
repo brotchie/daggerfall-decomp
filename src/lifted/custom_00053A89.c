@@ -4,22 +4,22 @@
 
 extern int screen_buffer;
 extern char D_00175420[];
-extern short D_00195F36;
-extern unsigned short D_00195F38;
+extern short text_cursor_x;
+extern unsigned short text_cursor_y;
 
 extern int inpstr_update(void);
 extern int mc_memcpy();
-extern int func_0012B2EB();
-extern int func_0012B3ED();
+extern int xn_mouse_cursor_erase();
+extern int xn_mouse_cursor_draw();
 extern void inpstr_begin_text(int, short);
 
 void classmaker_input_text(int a1, int a2, int a3)
 {
     short l_10;
 
-    func_0012B2EB();
-    D_00195F36 = 100;
-    D_00195F38 = 5;
+    xn_mouse_cursor_erase();
+    text_cursor_x = 100;
+    text_cursor_y = 5;
     inpstr_begin_text(a1, (int)(short)*(short *)&a2);
     *(int *)&l_10 = 0;
     while (l_10 == 0) {
@@ -27,5 +27,5 @@ void classmaker_input_text(int a1, int a2, int a3)
         if (inpstr_update() != 0) *(int *)&l_10 = 1;
         mc_memcpy(655360, screen_buffer, 64000, (int)D_00175420, 364, 4);
     }
-    func_0012B3ED();
+    xn_mouse_cursor_draw();
 }

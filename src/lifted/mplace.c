@@ -6,7 +6,7 @@
 extern int dungeon_water_level;
 extern char D_00170788[];
 extern unsigned char player_environment;
-extern signed char D_0017A028[];
+extern signed char loan_collector_monsters[];
 extern int encounter_tables[];
 extern char monster_table_flags[];
 extern char D_00187B6E[];
@@ -17,22 +17,22 @@ extern signed char dungeon_monster_table[];
 extern signed char D_001951ED[];
 extern char frame_counter[];
 extern struct record *player_object;
-extern struct record *D_00195AC4;
+extern struct record *location_object;
 extern struct location *current_location;
 extern struct character *player_character;
 extern struct settings *game_settings;
-extern int D_00195C74;
+extern int ceiling_height;
 extern signed char game_mode;
 extern signed char player_on_ground;
 extern signed char current_climate;
-extern signed char D_00196280;
+extern signed char is_daytime;
 extern signed char D_00196293;
 extern signed char D_00196294;
 extern signed char D_00196299;
 extern signed char D_001962A0;
 extern struct map_location *location_here;
 extern char collide_flags[];
-extern int D_00199808;
+extern int daylight;
 
 extern int climate_category(void);
 extern int collide_move_object(struct record *, int, int, int);
@@ -46,20 +46,20 @@ extern struct record *object_create_child(struct record *, int, int);
 extern int object_new_id(int);
 extern int rand();
 extern int srand();
-extern int func_0009DEAC();
+extern int abs();
 extern int mc_memset();
 extern int mc_memcpy();
-extern int func_000C7FD9();
-extern int func_000CE6E2();
-extern int func_0014B45B();
+extern int xn_math_approx_dist2d();
+extern int xn_math_yaw_offset_xz();
+extern int xn_terrain_height_at();
 extern void monster_init(struct record *, int);
 extern void monster_pacify_check(struct record *);
 extern void object_foreach(struct record *, int);
 int encounter_pick_monster(int);
-int func_00026081(struct record *, int);
-void func_0002631D(struct record *);
-void func_000266C7(int);
-void func_0002675D(int);
+int place_marker_in_range(struct record *, int);
+void place_assign_marker_monster(struct record *);
+void encounter_spawn_hidden(int);
+void encounter_spawn_ahead(int);
 
 int place_spawn_from_marker(struct record *a1)
 {
@@ -72,9 +72,9 @@ int place_spawn_from_marker(struct record *a1)
         char l_48[28];
 
         l_28 = (int)(unsigned char)player_on_ground;
-        l_24 = D_00195C74;
+        l_24 = ceiling_height;
         if ((a1->flags & 512) != 0) return 0;
-        if (func_00026081(a1, 1) == 0) return 0;
+        if (place_marker_in_range(a1, 1) == 0) return 0;
         if (*(int *)frame_counter < 5) return 0;
         *(int *)((char *)l_48 + 24) = rand();
         srand((int)(unsigned short)a1->spawn_seed);
@@ -111,7 +111,7 @@ int place_spawn_from_marker(struct record *a1)
         collide_move_object(*(struct record **)((char *)l_48 + 20), 0, (int)l_54, 0);
         player_motion_flags &= 247;
         player_on_ground = *(signed char *)&l_28;
-        D_00195C74 = l_24;
+        ceiling_height = l_24;
         srand(*(int *)((char *)l_48 + 24));
         if (((int)(short)(*(short *)collide_flags & 1)) == 0) a1->flags |= 16;
         return 1;
@@ -164,7 +164,7 @@ L25BFC:;
                         l_28 = 39;
                     }
                 } else {
-                    if (D_00199808 != 0) return -1;
+                    if (daylight != 0) return -1;
                     l_28 = climate_category();
                     if (((int)(unsigned char)current_climate) == 232) l_28 = 232;
                     switch ((unsigned)l_28) {
@@ -192,22 +192,22 @@ L25BFC:;
                 if (((int)(unsigned char)current_climate) == 232) l_28 = 232;
                 switch ((unsigned)l_28) {
                 case 0:
-                    l_28 = ((D_00199808 != 0) ? 21 : 22);
+                    l_28 = ((daylight != 0) ? 21 : 22);
                     break;
                 case 1:
-                    l_28 = ((D_00199808 != 0) ? 24 : 25);
+                    l_28 = ((daylight != 0) ? 24 : 25);
                     break;
                 case 2:
-                    l_28 = ((D_00199808 != 0) ? 27 : 28);
+                    l_28 = ((daylight != 0) ? 27 : 28);
                     break;
                 case 4:
-                    l_28 = ((D_00199808 != 0) ? 30 : 31);
+                    l_28 = ((daylight != 0) ? 30 : 31);
                     break;
                 case 5:
-                    l_28 = ((D_00199808 != 0) ? 33 : 34);
+                    l_28 = ((daylight != 0) ? 33 : 34);
                     break;
                 case 232:
-                    l_28 = ((D_00199808 != 0) ? 36 : 37);
+                    l_28 = ((daylight != 0) ? 36 : 37);
                 }
             }
         } else {
@@ -241,14 +241,14 @@ L25BFC:;
         if ((((int)(unsigned char)*(signed char *)((char *)(l_2C + l_28))) == 29 || ((int)(unsigned char)*(signed char *)((char *)(l_2C + l_28))) == 10 || ((int)(unsigned char)*(signed char *)((char *)(l_2C + l_28))) == 42) && ((int)(unsigned short)(game_settings->view_flags & 4)) != 0) {
             goto L25BFC;
         }
-        if (D_00196280 == 0 || ((int)player_environment) != 1 || (((int)(unsigned char)*(signed char *)((char *)(l_2C + l_28))) != 18 && ((int)(unsigned char)*(signed char *)((char *)(l_2C + l_28))) != 23)) {
+        if (is_daytime == 0 || ((int)player_environment) != 1 || (((int)(unsigned char)*(signed char *)((char *)(l_2C + l_28))) != 18 && ((int)(unsigned char)*(signed char *)((char *)(l_2C + l_28))) != 23)) {
             break;
         }
     }
     return (int)(unsigned char)*(signed char *)((char *)(l_2C + l_28));
 }
 
-int func_00026081(struct record *a1, int a2)
+int place_marker_in_range(struct record *a1, int a2)
 {
     int l_20;
     int l_1C;
@@ -258,8 +258,8 @@ int func_00026081(struct record *a1, int a2)
         int l_2C;
 
         l_20 = a1->y - player_object->y;
-        l_18 = func_0009DEAC(l_20);
-        l_1C = func_000C7FD9(a1->x, a1->z, player_object->x, player_object->z);
+        l_18 = abs(l_20);
+        l_1C = xn_math_approx_dist2d(a1->x, a1->z, player_object->x, player_object->z);
         if (((int)player_environment) == 1 && l_1C < 4096) return 1;
         if (a2 == 0) {
             if (a1->trigger_range >= 4) {
@@ -336,7 +336,7 @@ int func_00026081(struct record *a1, int a2)
     }
 }
 
-void func_0002631D(struct record *a1)
+void place_assign_marker_monster(struct record *a1)
 {
     struct record *l_1C;
     short l_18;
@@ -358,25 +358,25 @@ void dungeon_roll_monster_tables(void)
     int l_18;
 
     l_18 = rand();
-    srand(((unsigned)D_00195AC4->id) >> 16);
+    srand(((unsigned)location_object->id) >> 16);
     for (l_1C = 0; l_1C < 256; l_1C++) {
         dungeon_monster_table[l_1C] = encounter_pick_monster(0);
     }
     for (l_1C = 0; l_1C < 256; l_1C++) {
         dungeon_water_monster_table[l_1C] = encounter_pick_monster(1);
     }
-    object_foreach(D_00195AC4, (int)func_0002631D);
+    object_foreach(location_object, (int)place_assign_marker_monster);
     srand(l_18);
 }
 
-void func_00026508(void)
+void loan_spawn_collectors(void)
 {
     int l_1C;
     int l_18;
 
     l_1C = rand_range(2, 5);
     for (l_18 = 0; l_18 < l_1C; l_18++) {
-        func_000266C7((int)(unsigned char)D_0017A028[rand() & 3]);
+        encounter_spawn_hidden((int)(unsigned char)loan_collector_monsters[rand() & 3]);
     }
 }
 
@@ -392,7 +392,7 @@ void encounter_tick(int a1, int a2)
         if (location_contains(player_object->x, player_object->z) != 0) {
             if (a2 != 0 || ((unsigned)a1) < 360 || ((unsigned)a1) > 1080) {
                 if (a2 == 0 && rand_range(0, 23) != 0) return;
-                func_000266C7(encounter_pick_monster(0));
+                encounter_spawn_hidden(encounter_pick_monster(0));
             }
         } else {
             if (a2 == 0) {
@@ -402,25 +402,25 @@ void encounter_tick(int a1, int a2)
                     if (rand_range(0, 35) != 0) return;
                 }
             }
-            func_0002675D(encounter_pick_monster(0));
+            encounter_spawn_ahead(encounter_pick_monster(0));
         }
         return;
     }
     if (((int)player_environment) != 3) return;
     if (((int)(unsigned char)game_mode) != 16) return;
     if (rand_range(0, 35) != 0) return;
-    func_000266C7((int)(unsigned char)D_001951ED[rand() % 6]);
+    encounter_spawn_hidden((int)(unsigned char)D_001951ED[rand() % 6]);
 }
 
-void func_000266C7(int a1)
+void encounter_spawn_hidden(int a1)
 {
     struct record *l_18;
 
     if (a1 == (-1)) return;
-    l_18 = object_create_child(D_00195AC4, 0, 659);
+    l_18 = object_create_child(location_object, 0, 659);
     l_18->type = 18;
     l_18->flags |= 1;
-    l_18->id = object_new_id(((unsigned)D_00195AC4->id) >> 16);
+    l_18->id = object_new_id(((unsigned)location_object->id) >> 16);
     monster_init(l_18, a1);
     l_18->data.character.team = 1;
     if (spawn_find_point(l_18, 384, 768) == 0) {
@@ -430,20 +430,20 @@ void func_000266C7(int a1)
     D_00196299 = 1;
 }
 
-void func_0002675D(int a1)
+void encounter_spawn_ahead(int a1)
 {
     struct record *l_18;
 
     if (a1 == (-1)) return;
-    l_18 = object_create_child(D_00195AC4, 0, 659);
+    l_18 = object_create_child(location_object, 0, 659);
     l_18->type = 18;
     l_18->flags |= 1;
-    l_18->id = object_new_id(((unsigned)D_00195AC4->id) >> 16);
+    l_18->id = object_new_id(((unsigned)location_object->id) >> 16);
     monster_init(l_18, a1);
     l_18->data.character.team = 1;
-    func_000CE6E2(player_object->yaw, 1024, &l_18->x, &l_18->z);
+    xn_math_yaw_offset_xz(player_object->yaw, 1024, &l_18->x, &l_18->z);
     l_18->x += player_object->x;
     l_18->z += player_object->z;
-    l_18->y = func_0014B45B(l_18->x, l_18->z);
+    l_18->y = xn_terrain_height_at(l_18->x, l_18->z);
     D_00196299 = 1;
 }

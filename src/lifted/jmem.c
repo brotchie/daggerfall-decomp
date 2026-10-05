@@ -28,9 +28,9 @@ extern int mc_free();
 extern int mc_memset();
 extern int mc_malloc();
 extern int func_000A2D9E();
-extern int func_00143700();
+extern int xn_gfx_restore_mode();
 extern void fatal_error(int);
-extern void func_00068B1B(void);
+extern void sound_shutdown_music(void);
 extern void mem_check_heap(int);
 extern void logbook_build_entries(void);
 #pragma aux func_0009DA1C parm routine [];
@@ -106,11 +106,11 @@ int mem_block_size(int a1)
 
 void crash_screen(void)
 {
-    func_00143700();
+    xn_gfx_restore_mode();
     func_0009DA1C(394, (int)D_00175AD4);
     printf((int)D_00175C2D, frame_checkpoint);
     while (key_down_enter == 0);
-    func_00068B1B();
+    sound_shutdown_music();
     func_000A2D9E();
 }
 

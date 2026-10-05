@@ -2,7 +2,7 @@
 extern char mouse_buttons;
 extern short mouse_x;
 extern short mouse_y;
-extern short D_0012DA44;
+extern short font_height;
 extern char **classmaker_advantage_sublists[];
 extern char **classmaker_disadvantage_sublists[];
 extern short classmaker_screen;
@@ -16,8 +16,8 @@ extern char classmaker_specials[][7][2];
 extern void classmaker_specials_picked(void);
 extern void classmaker_set_advantage(short, int);
 extern void classmaker_set_disadvantage(short, int);
-extern void text_draw_colored(char *, short, short, int, unsigned char);
-extern int func_0012B136();
+extern void text_draw_coloured(char *, short, short, int, unsigned char);
+extern int xn_mouse_poll_clamped();
 
 void func_00054B27(void)
 {
@@ -33,13 +33,13 @@ void func_00054B27(void)
     D_00190D7A = -1;
     l_1C = 0;
     while (*l_28 != 0) {
-        text_draw_colored(*l_28, 10, l_20, 145, 141);
+        text_draw_coloured(*l_28, 10, l_20, 145, 141);
         l_24 = l_20;
-        l_20 += D_0012DA44;
+        l_20 += font_height;
         if (l_18 && mouse_y > l_24 && mouse_y < l_20) {
             D_00190D7A = l_1C;
             while (mouse_buttons != 0)
-                func_0012B136();
+                xn_mouse_poll_clamped();
         }
         l_1C++;
         l_28++;

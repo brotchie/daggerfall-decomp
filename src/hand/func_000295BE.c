@@ -5,7 +5,7 @@ extern int game_minutes;
 extern void qaction_place_foe(struct qbn_op *, int);
 extern int rand(void);
 
-void quest_op09_spawn_repeat(struct quest *a1, struct qbn_op *o)
+void qaction_op09_spawn_repeat(struct quest *a1, struct qbn_op *o)
 {
     struct qbn_foe *s;
     int i;

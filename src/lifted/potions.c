@@ -15,11 +15,11 @@ extern char potion_recipes[];
 extern char D_00180B42[];
 extern signed char D_00180B7D[];
 extern char D_00190BE4[];
-extern char text_macro_fpc[];
+extern char scratch_190de4[];
 extern struct record *D_001959E4;
 extern struct record *player_entity;
 extern struct record *player_object;
-extern struct record *D_00195AC4;
+extern struct record *location_object;
 extern char D_00195B84[];
 extern int window_image;
 extern char D_00195F28[];
@@ -54,7 +54,7 @@ extern int mc_memcpy();
 extern int memchr();
 extern void msgbox_show_string(int, int);
 extern void item_make(int, int, struct item *);
-extern void picklist_open(int);
+extern void list_popup_open(int);
 extern void object_foreach(struct record *, int);
 extern void object_foreach_open(struct record *, int);
 extern void inv_store_item(struct record *);
@@ -62,7 +62,7 @@ int potion_match_recipe(struct potion_recipe *, int, int, int);
 int potion_have_recipe_ingredients(struct item *);
 void potion_recipe_list_cb(struct record *);
 void potionmaker_add_ingredient(int);
-void func_0008FBE8(struct record *);
+void potion_ingredient_cb(struct record *);
 void potion_make(struct item *);
 void potion_load_recipe(struct item *);
 
@@ -75,7 +75,7 @@ void potionmaker_mix(void)
     l_20 = 0;
     while (l_20 < 64 && D_00180B7D[l_20 * 109] != 0) {
         if (potion_match_recipe((struct potion_recipe *)(((int)potion_recipes) + (l_20 * 109)), (int)D_001A9BB4, (int)D_001A9BAC, (int)&l_1C) != 0) {
-            l_18 = object_create_child(D_00195AC4, 0, 107);
+            l_18 = object_create_child(location_object, 0, 107);
             l_18->type = 2;
             l_18->flags |= 1;
             item_make(1, 1, &l_18->data.item);
@@ -97,7 +97,7 @@ void potionmaker_mix(void)
         l_20++;
     }
     if (potion_mix_unknown((int)spellmaker_spell) == 0) return;
-    l_18 = object_create_child(D_00195AC4, 0, 107);
+    l_18 = object_create_child(location_object, 0, 107);
     l_18->type = 2;
     l_18->flags |= 1;
     item_make(1, 1, &l_18->data.item);
@@ -124,7 +124,7 @@ void potion_recipe_list_cb(struct record *a1)
     l_18 = &a1->data.item;
     if (l_18->group != 27 || l_18->index != 4) return;
     *(int *)(D_00190BE4 + (*(int *)D_00195B84 << 2)) = (int)l_18;
-    *(int *)(text_macro_fpc + ((*(int *)D_00195B84)++ << 2)) = (((int)potion_recipes) + (l_18->stack_count * 109)) + 67;
+    *(int *)(scratch_190de4 + ((*(int *)D_00195B84)++ << 2)) = (((int)potion_recipes) + (l_18->stack_count * 109)) + 67;
 }
 
 void potionmaker_recipes(void)
@@ -139,8 +139,8 @@ void potionmaker_recipes(void)
         potion_make(*(struct item **)D_00190BE4);
         return;
     }
-    *(int *)(text_macro_fpc + (*(int *)D_00195B84 << 2)) = 0;
-    picklist_open((int)text_macro_fpc);
+    *(int *)(scratch_190de4 + (*(int *)D_00195B84 << 2)) = 0;
+    list_popup_open((int)scratch_190de4);
     sound_play(205, (int)player_object, 100);
 }
 
@@ -193,7 +193,7 @@ int potionmaker_in_cauldron(int a1, int a2)
     return 0;
 }
 
-void func_0008FBE8(struct record *a1)
+void potion_ingredient_cb(struct record *a1)
 {
     struct item *l_18;
 
@@ -203,10 +203,10 @@ void func_0008FBE8(struct record *a1)
     *(int *)potion_ingredient_count = 1;
 }
 
-int func_0008FC3A(void)
+int potion_have_ingredients(void)
 {
     *(int *)potion_ingredient_count = 0;
-    object_foreach_open(D_001959E4->children, (int)func_0008FBE8);
+    object_foreach_open(D_001959E4->children, (int)potion_ingredient_cb);
     return *(int *)potion_ingredient_count;
 }
 
@@ -264,7 +264,7 @@ int potion_match_recipe(struct potion_recipe *a1, int a2, int a3, int a4)
     return 1;
 }
 
-void func_00090261(int a1, int a2, int a3, int a4)
+void potion_sort_ingredients(int a1, int a2, int a3, int a4)
 {
     int l_14;
     int l_10;
@@ -299,7 +299,7 @@ void potion_drink(struct record *a1)
     struct record *l_1C;
     int l_18;
 
-    l_1C = object_create_child(D_00195AC4, 0, 89);
+    l_1C = object_create_child(location_object, 0, 89);
     l_18 = (int)(unsigned char)D_0019629A;
     l_1C->type = 9;
     l_1C->flags |= 1;

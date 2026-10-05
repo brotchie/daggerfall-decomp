@@ -7,7 +7,7 @@
 struct Vec { int x; int y; int z; };
 extern short spell_impact_sounds[];
 extern struct record *player_object;
-extern int D_00195AB0;
+extern int frame_ticks;
 extern int D_00195B84;
 extern struct record *D_00195C48;
 extern unsigned char collide_flags;
@@ -15,10 +15,10 @@ extern int collide_move_missile(struct record *, struct Vec *, struct Vec *);
 extern void func_0005C856(struct record *, struct record *);
 extern void links_trigger(struct record *, int);
 extern int sound_play(int, struct record *, int);
-extern struct record *func_00073F5D(int, int, int);
-extern int func_000C2043(char *, int, struct Vec *);
-extern int func_000C7FD9();
-extern int func_000C7FF4();
+extern struct record *monster_nearest_to_point(int, int, int);
+extern int xn_vec_advance(char *, int, struct Vec *);
+extern int xn_math_approx_dist2d();
+extern int xn_math_approx_hypot();
 
 int spell_missile_update(struct record *m, int a2)
 {
@@ -30,7 +30,7 @@ int spell_missile_update(struct record *m, int a2)
 
     if ((int)(unsigned short)(m->missile_texture & 1) != 0)
         return m->image2 == 0x8fff ? 1 : 0;
-    dist = func_000C7FF4(player_object->y - m->y, func_000C7FD9(player_object->x, player_object->z, m->x, m->z));
+    dist = xn_math_approx_hypot(player_object->y - m->y, xn_math_approx_dist2d(player_object->x, player_object->z, m->x, m->z));
     if (dist > 2048) {
         m->missile_texture++;
         m->image2 = 0x8000;
@@ -40,7 +40,7 @@ int spell_missile_update(struct record *m, int a2)
     pos.x = m->x;
     pos.y = m->y;
     pos.z = m->z;
-    func_000C2043((char *)m + 118, D_00195AB0 * 400 / 1000, &pos);
+    xn_vec_advance((char *)m + 118, frame_ticks * 400 / 1000, &pos);
     ang.x = m->angle_x;
     ang.y = m->yaw;
     ang.z = 0;
@@ -55,7 +55,7 @@ int spell_missile_update(struct record *m, int a2)
         if ((hit & 8) && m->data.spell.target == 2)
             func_0005C856(m, D_00195C48);
     }
-    obj = func_00073F5D(m->x, m->y, m->z);
+    obj = monster_nearest_to_point(m->x, m->y, m->z);
     if (obj == 0)
         return 0;
     if (D_00195B84 > 120)

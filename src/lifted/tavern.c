@@ -17,21 +17,21 @@ extern char tavern_food_names[];
 extern signed char tavern_food_prices[];
 extern char D_00190BE4[];
 extern signed char tavern_state;
-extern char D_00190D64[];
+extern char scratch_190d64[];
 extern signed char D_001940D4;
 extern struct record *nonworld_root;
 extern struct record *player_object;
-extern struct record *D_00195AC4;
+extern struct record *location_object;
 extern struct building *tavern_building;
-extern struct record *D_00195AF4;
+extern struct record *found_object;
 extern char D_00195B84[];
 extern char inpstr_result[];
 extern struct location *current_location;
 extern struct character *player_character;
 extern int game_minutes;
-extern char D_00195C44[];
+extern char scratch_buffer[];
 extern char D_00195CE8[];
-extern int D_00195D30;
+extern int trade_price;
 extern signed char current_region;
 extern unsigned char D_00196271;
 extern signed char D_00196272;
@@ -41,7 +41,7 @@ extern struct building *D_00196ABC;
 extern int tavern_menu_image;
 extern int politic_pak;
 extern int climate_pak;
-extern int D_00199770;
+extern int object_found_last;
 extern char region_flats[];
 
 extern int key_action_held(int);
@@ -57,15 +57,15 @@ extern struct record *marker_find_nth(struct record *, int, int);
 extern struct record *marker_find_random(struct record *, int);
 extern int mc_free();
 extern int mc_memcpy();
-extern int func_0012B136();
-extern int func_00142790();
+extern int xn_mouse_poll_clamped();
+extern int xn_kbd_flush();
 extern void msgbox_show_string(int, int);
 extern void msgbox_show_rsc(int, int);
 extern void npc_talk(int);
-extern void picklist_open(int);
+extern void list_popup_open(int);
 extern void inpstr_begin_number(int);
 extern void object_foreach(struct record *, int);
-extern void func_00097A85(void);
+extern void trade_make_offer(void);
 int tavern_room_rented(void);
 int tavern_room_days_left(void);
 int func_0001FA3A(struct record *);
@@ -83,8 +83,8 @@ void func_0001FE4D(void);
 void tavern_close(void)
 {
     mouse_buttons = (mouse_buttons_prev = 0);
-    func_0012B136();
-    while (mouse_buttons != 0) func_0012B136();
+    xn_mouse_poll_clamped();
+    while (mouse_buttons != 0) xn_mouse_poll_clamped();
     while (key_action_held(18) != 0);
     while (key_down_esc != 0);
     game_mode = 0;
@@ -97,7 +97,7 @@ void tavern_close(void)
 
 void tavern_rent_room(void)
 {
-    func_00142790();
+    xn_kbd_flush();
     inpstr_begin_number(1);
     tavern_state = 1;
     if (tavern_room_rented() != 0) {
@@ -106,7 +106,7 @@ void tavern_rent_room(void)
         msgbox_show_rsc(5102, 2);
     }
     while (key_down_enter != 0);
-    func_00142790();
+    xn_kbd_flush();
 }
 
 void tavern_room_offer(void)
@@ -119,23 +119,23 @@ void tavern_room_offer(void)
         msgbox_show_rsc(16, 1);
         return;
     }
-    if ((*(short *)D_00190D64 = *(short *)inpstr_result) == 0) {
+    if ((*(short *)scratch_190d64 = *(short *)inpstr_result) == 0) {
         tavern_state = 0;
         return;
     }
     l_1C = (((unsigned)(((unsigned)game_minutes) % 518400)) / 1440) + 1;
-    if (l_1C <= 46 && (((int)(short)*(short *)D_00190D64) + l_1C) > 46) {
-        l_18 = (((int)(short)*(short *)D_00190D64) - 1) * 7;
+    if (l_1C <= 46 && (((int)(short)*(short *)scratch_190d64) + l_1C) > 46) {
+        l_18 = (((int)(short)*(short *)scratch_190d64) - 1) * 7;
     } else {
-        l_18 = ((int)(short)*(short *)D_00190D64) * 7;
+        l_18 = ((int)(short)*(short *)scratch_190d64) * 7;
     }
     if (guild_is_local_knight() != 0) {
         msgbox_show_string((int)D_00170572, 1);
         tavern_state = 0;
         if (tavern_room_rented() != 0) {
-            tavern_extend_room(((int)(short)*(short *)D_00190D64) * 1440);
+            tavern_extend_room(((int)(short)*(short *)scratch_190d64) * 1440);
         } else {
-            tavern_rent(((int)(short)*(short *)D_00190D64) * 1440);
+            tavern_rent(((int)(short)*(short *)scratch_190d64) * 1440);
         }
         return;
     }
@@ -143,14 +143,14 @@ void tavern_room_offer(void)
         msgbox_show_string((int)D_0017059D, 1);
         tavern_state = 0;
         if (tavern_room_rented() != 0) {
-            tavern_extend_room(((int)(short)*(short *)D_00190D64) * 1440);
+            tavern_extend_room(((int)(short)*(short *)scratch_190d64) * 1440);
         } else {
-            tavern_rent(((int)(short)*(short *)D_00190D64) * 1440);
+            tavern_rent(((int)(short)*(short *)scratch_190d64) * 1440);
         }
         return;
     }
     trade_adjust_price(l_18, 0);
-    func_00097A85();
+    trade_make_offer();
     tavern_state = 2;
 }
 
@@ -158,16 +158,16 @@ void tavern_room_pay(void)
 {
     tavern_state = 0;
     if (((int)D_00196271) == 2) return;
-    if (((unsigned)player_character->gold) < D_00195D30) {
+    if (((unsigned)player_character->gold) < trade_price) {
         msgbox_show_rsc(454, 1);
         return;
     }
-    player_character->gold -= D_00195D30;
+    player_character->gold -= trade_price;
     if (tavern_room_rented() != 0) {
-        tavern_extend_room(((int)(short)*(short *)D_00190D64) * 1440);
+        tavern_extend_room(((int)(short)*(short *)scratch_190d64) * 1440);
         return;
     }
-    tavern_rent(((int)(short)*(short *)D_00190D64) * 1440);
+    tavern_rent(((int)(short)*(short *)scratch_190d64) * 1440);
 }
 
 void tavern_food_button(void)
@@ -176,7 +176,7 @@ void tavern_food_button(void)
         msgbox_show_string((int)D_001705BE, 1);
         return;
     }
-    picklist_open((int)tavern_food_names);
+    list_popup_open((int)tavern_food_names);
     D_001940D4 |= 1;
 }
 
@@ -277,9 +277,9 @@ void func_0001F7B3(struct record *a1)
     struct record *l_18;
 
     if (a1->type != 58) return;
-    if ((((unsigned)a1->id) >> 16) != (((unsigned)D_00195AC4->id) >> 16)) return;
-    if ((D_00199770 = object_find_by_id(D_00195AC4, a1->parent_id)) == 0) return;
-    l_18 = object_create_child((struct record *)D_00199770, 0, 107);
+    if ((((unsigned)a1->id) >> 16) != (((unsigned)location_object->id) >> 16)) return;
+    if ((object_found_last = object_find_by_id(location_object, a1->parent_id)) == 0) return;
+    l_18 = object_create_child((struct record *)object_found_last, 0, 107);
     l_18->type = 2;
     l_18->image = a1->image;
     l_18->id = a1->id;
@@ -293,19 +293,19 @@ void func_0001F89F(void)
     struct record *l_18;
 
     func_0001FE4D();
-    D_00196ABC = (struct building *)*(int *)D_00195C44;
+    D_00196ABC = (struct building *)*(int *)scratch_buffer;
     *(int *)D_00195B84 = 0;
     func_0001FB3F();
     func_0001FAB2();
     if (*(int *)D_00195B84 != 0) {
-        object_delete(D_00195AF4);
+        object_delete(found_object);
         l_18 = object_create_child(nonworld_root, 0, *(int *)D_00195B84 * 26);
         l_18->type = 57;
         l_18->owner = *(short *)D_00195B84;
-        l_18->id = D_00195AC4->id;
+        l_18->id = location_object->id;
         mc_memcpy(RECORD_DATA(l_18), (int)D_00196ABC, *(int *)D_00195B84 * 26, (int)D_00170569, 369, 4);
     }
-    object_foreach(D_00195AC4, (int)func_0001F6E2);
+    object_foreach(location_object, (int)func_0001F6E2);
 }
 
 void func_0001F958(void)
@@ -314,7 +314,7 @@ void func_0001F958(void)
     int l_18;
 
     func_0001FE4D();
-    D_00196ABC = (struct building *)*(int *)D_00195C44;
+    D_00196ABC = (struct building *)*(int *)scratch_buffer;
     *(int *)D_00195B84 = 0;
     func_0001FAB2();
     for (l_1C = 0; l_1C < *(int *)D_00195B84; l_1C++) {
@@ -330,10 +330,10 @@ void func_0001F958(void)
 
 int func_0001FA3A(struct record *a1)
 {
-    if (D_00195AF4 != 0) return 0;
+    if (found_object != 0) return 0;
     if (a1->type != 57) return 0;
-    if ((((unsigned)a1->id) >> 16) == (((unsigned)D_00195AC4->id) >> 16)) {
-        D_00195AF4 = a1;
+    if ((((unsigned)a1->id) >> 16) == (((unsigned)location_object->id) >> 16)) {
+        found_object = a1;
         return 1;
     }
     return 0;
@@ -342,11 +342,11 @@ int func_0001FA3A(struct record *a1)
 void func_0001FAB2(void)
 {
     *(int *)D_00195B84 = 0;
-    D_00195AF4 = 0;
+    found_object = 0;
     object_find(nonworld_root, (int)func_0001FA3A);
-    if (D_00195AF4 == 0) return;
-    mc_memcpy((int)&D_00196ABC[*(int *)D_00195B84], (int)RECORD_DATA(D_00195AF4), D_00195AF4->owner * 26, (int)D_00170569, 417, 4);
-    *(int *)D_00195B84 += D_00195AF4->owner;
+    if (found_object == 0) return;
+    mc_memcpy((int)&D_00196ABC[*(int *)D_00195B84], (int)RECORD_DATA(found_object), found_object->owner * 26, (int)D_00170569, 417, 4);
+    *(int *)D_00195B84 += found_object->owner;
 }
 
 void func_0001FB3F(void)
@@ -367,7 +367,7 @@ int func_0001FBF5(struct record *a1)
 
     if (a1->parent->type != 43) return 0;
     if (a1->quest_id != 0) return 0;
-    if ((((unsigned)a1->id) >> 16) == (((unsigned)D_00195AC4->id) >> 16)) return 0;
+    if ((((unsigned)a1->id) >> 16) == (((unsigned)location_object->id) >> 16)) return 0;
     l_1C = 0;
     for (l_20 = 0; current_location->building_count > l_20; l_20++) {
         if (a1->parent->id == current_location->buildings[l_20].id) {
@@ -406,7 +406,7 @@ void func_0001FE4D(void)
     object_foreach(nonworld_root, (int)func_0001FD7C);
 }
 
-void func_0001FE74(void)
+void region_load_tables(void)
 {
     politic_pak = disk_read_file((int)D_001705D4, 0);
     climate_pak = disk_read_file((int)D_001705E0, 0);

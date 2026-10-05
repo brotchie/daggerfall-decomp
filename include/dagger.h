@@ -9,11 +9,11 @@ extern int text_blank;
 extern int D_00190BE4;
 extern int D_00190BE8;
 extern unsigned char D_00190C78;
-extern int text_macro_fae;
+extern int scratch_190df4;
 extern char *nonworld_root;
 extern char *player_object;
-extern char *D_00195AC4;
-extern int D_00195AF4;
+extern char *location_object;
+extern int found_object;
 extern int D_00195B84;
 extern char *player_character;
 extern char mouse_control_mode;
@@ -22,7 +22,7 @@ extern int parse_name_seed;
 extern short qbn_record_sizes[];
 
 /* code */
-extern void func_00013981();
+extern void door_key_match_cb();
 extern int faction_find_r(int, int);
 extern void func_000193DD(int);
 extern unsigned char climate_lookup(int, int);
@@ -35,6 +35,6 @@ extern char *object_find_by_id(char *, int);
 extern void object_delete_quest_objects(char *, int);
 extern int rand(void);
 extern void srand(int);
-extern int func_000C7FD9(int, int, int, int);
+extern int xn_math_approx_dist2d(int, int, int, int);
 
 #endif

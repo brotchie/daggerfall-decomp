@@ -12,16 +12,16 @@ extern struct spell *selected_spell;
 extern struct Box spellshop_buttons[];
 extern struct spell *spell_records;
 extern struct Img *window_image;
-extern unsigned char *D_00195C44;
+extern unsigned char *scratch_buffer;
 extern unsigned char mouse_buttons_prev;
-extern char D_001A9AB8[];
+extern char shared_picklist[];
 extern unsigned short D_001A9AE1;
 extern void spellshop_close(void);
 extern void spellshop_buy(void);
 extern void spellshop_draw_spell(struct spell *);
 extern short picklist_frame(char *);
-extern int func_0012DB50();
-extern int func_00144F68();
+extern int xn_font_select();
+extern int xn_draw_image();
 
 void spellshop_update(void)
 {
@@ -32,15 +32,15 @@ void spellshop_update(void)
     short unused2;
 
     img = window_image;
-    func_00144F68(img->x, img->y, img->w, img->h, img->data);
-    func_0012DB50(4);
-    rc = picklist_frame(D_001A9AB8);
+    xn_draw_image(img->x, img->y, img->w, img->h, img->data);
+    xn_font_select(4);
+    rc = picklist_frame(shared_picklist);
     if (rc > -1) {
         spellshop_close();
         spellshop_buy();
         return;
     }
-    spellshop_draw_spell(selected_spell = &spell_records[D_00195C44[20000 + D_001A9AE1]]);
+    spellshop_draw_spell(selected_spell = &spell_records[scratch_buffer[20000 + D_001A9AE1]]);
     if (key_down_esc != 0) {
         spellshop_close();
         return;

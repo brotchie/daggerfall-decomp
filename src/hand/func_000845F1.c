@@ -2,7 +2,7 @@
 #include "records.h"
 
 extern char D_00187D30[];
-extern struct record *D_00195AC4;
+extern struct record *location_object;
 extern struct location *current_location;
 extern struct settings *game_settings;
 extern signed char current_region;
@@ -29,7 +29,7 @@ struct record *rmb_make_flat(struct record *a1, short a2, short a3, int a4)
             l_1C->type = 33;
             l_1C->pad13 = 8000;
             l_1C->image = a2;
-            l_1C->id = D_00195AC4->id + current_location->object_counter++;
+            l_1C->id = location_object->id + current_location->object_counter++;
             l_20 = flats_cfg_find(a2);
             if ((l_20[6] & 2) && (game_settings->view_flags & 4))
                 l_1C->image = 0;
@@ -38,7 +38,7 @@ struct record *rmb_make_flat(struct record *a1, short a2, short a3, int a4)
     } else {
         l_1C = object_create_child(a1, 0, 3);
         l_1C->type = 8;
-        l_1C->id = D_00195AC4->id + current_location->object_counter++;
+        l_1C->id = location_object->id + current_location->object_counter++;
         l_1C->image = a2;
         l_1C->pad13 = 8000;
         l_20 = flats_cfg_find(a2);

@@ -14,23 +14,23 @@ extern char D_001759F8[];
 extern char D_0018320A[];
 extern char monster_category[];
 extern int D_00185083;
-extern struct disease D_00186A64[];
-extern short D_00186D83[];
+extern struct disease disease_table[];
+extern short poison_table[];
 extern short D_00186D85[];
 extern short D_00186D87[];
 extern short D_00186D89[];
 extern signed char lycanthrope_attributes[];
 extern char bio_modifiers[];
 extern int D_0018DDE0;
-extern struct record *D_00190504[];
-extern signed char itemmaker_slot_kinds[];
+extern struct record *creature_list[];
+extern signed char scratch_190ce4[];
 extern signed char D_00190D63;
 extern signed char D_001940D8;
 extern struct record *player_entity;
 extern struct record *D_00195AA8;
 extern struct spell *spell_records;
 extern char D_00195B08[];
-extern int D_00195B0C;
+extern int trade_haggle_result;
 extern int creature_count;
 extern int calendar_month;
 extern int D_00195B44;
@@ -48,7 +48,7 @@ extern signed char game_mode;
 extern signed char in_dungeon_water;
 extern signed char player_ailment_flags;
 extern signed char D_001962A0;
-extern char D_001A3AA4[];
+extern char extra_spell_points[];
 extern int D_001A3AA8;
 extern double trade_haggle_asking;
 
@@ -56,7 +56,7 @@ extern int damage_apply(struct record *, int, int);
 extern int player_in_daylight(void);
 extern int player_in_temple(void);
 extern int quest_pick_file(unsigned char, unsigned char, unsigned char, unsigned char, unsigned char);
-extern int func_00068845(int);
+extern int trade_haggle_counter(int);
 extern int hud_message_add(int);
 extern int rand_range(int, int);
 extern int spfx_resist_roll(int, int, struct character *, struct career *, int, int);
@@ -65,9 +65,9 @@ extern struct record *object_create_child(struct record *, int, int);
 extern struct record *object_find_item(struct record *, int, int);
 extern int object_new_id(int);
 extern int mc_strncpy();
-extern int func_000A0DF4();
+extern int strlen();
 extern int mc_memcpy();
-extern int func_000C7FD9();
+extern int xn_math_approx_dist2d();
 extern void msgbox_show_string(int, int);
 extern void msgbox_show_rsc(int, int);
 extern void paperdoll_draw(int, int);
@@ -88,7 +88,7 @@ int enchant_spell_points_condition(int);
 int item_artifact_equipped(int);
 void disease_become_lycanthrope(int);
 void disease_lycanthrope_shapechange(int);
-void func_000686DA(int);
+void trade_haggle_close(int);
 
 void disease_infect(struct record *a1, int a2, int a3, int a4)
 {
@@ -112,12 +112,12 @@ void disease_infect(struct record *a1, int a2, int a3, int a4)
         while (((int)(unsigned char)*(signed char *)((char *)(l_14++ + a2))) != 255);
         a3 = (int)(unsigned char)*(signed char *)((char *)(int)((char *)a2 + rand_range(0, l_14 - 2)));
     }
-    mc_memcpy(l_C, &D_00186A64[a3], 47, (int)D_00175970, 83, 4);
+    mc_memcpy(l_C, &disease_table[a3], 47, (int)D_00175970, 83, 4);
     if (l_C->days_left != 255) l_C->days_left = rand_range(l_C->days_left, l_C->stage);
     l_C->stage = 0;
 }
 
-void func_00065A8C(struct record *a1, int a2, int a3)
+void poison_apply(struct record *a1, int a2, int a3)
 {
     struct character *l_20;
     struct career *l_1C;
@@ -138,7 +138,7 @@ void func_00065A8C(struct record *a1, int a2, int a3)
     a2 = (a2 << 2) - 512;
     l_10->days_left = rand_range((int)(short)D_00186D87[a2], (int)(short)D_00186D89[a2]);
     l_10->stage = 0;
-    l_10->damage_min = rand_range((int)(short)D_00186D83[a2], (int)(short)D_00186D85[a2]);
+    l_10->damage_min = rand_range((int)(short)poison_table[a2], (int)(short)D_00186D85[a2]);
 }
 
 void poison_init_record(struct disease *a1, int a2)
@@ -146,7 +146,7 @@ void poison_init_record(struct disease *a1, int a2)
     a1->id = *(signed char *)&a2;
     a2 = (a2 << 2) - 512;
     a1->days_left = rand_range((int)(short)D_00186D87[a2], (int)(short)D_00186D89[a2]);
-    a1->damage_min = rand_range((int)(short)D_00186D83[a2], (int)(short)D_00186D85[a2]);
+    a1->damage_min = rand_range((int)(short)poison_table[a2], (int)(short)D_00186D85[a2]);
 }
 
 int poison_tick(struct disease *a1)
@@ -308,7 +308,7 @@ int poison_tick(struct disease *a1)
     return 1;
 }
 
-void func_00066853(struct record *a1, int a2)
+void disease_add_vampire_spell(struct record *a1, int a2)
 {
     struct record *l_1C;
     struct spell *l_18;
@@ -322,7 +322,7 @@ void func_00066853(struct record *a1, int a2)
     l_14 = 0;
     while (spell_records[l_14].name[0] == 0 || spell_records[l_14].id != a2) l_14++;
     mc_memcpy(l_18, &spell_records[l_14], 89, (int)D_00175970, 540, 4);
-    l_18->name[func_000A0DF4(l_18->name) + 1] = 36;
+    l_18->name[strlen(l_18->name) + 1] = 36;
 }
 
 void disease_cure_vampirism(void)
@@ -371,7 +371,7 @@ void disease_cure_vampirism(void)
     l_1C = l_1C->children;
     while (l_1C != 0) {
         l_20 = l_1C->next;
-        if (l_1C->data.spell.name[func_000A0DF4(l_1C->data.spell.name) + 1] == 36) {
+        if (l_1C->data.spell.name[strlen(l_1C->data.spell.name) + 1] == 36) {
             object_delete(l_1C);
         }
         l_1C = l_20;
@@ -697,7 +697,7 @@ void disease_start_cure_quest(int a1)
     mc_strncpy((int)D_001961F5, (int)D_001759F8, 13, (int)D_00175970, 971);
 }
 
-void func_00067875(struct record *a1)
+void reaction_mod_item_cb(struct record *a1)
 {
     struct item *l_1C;
     int l_18;
@@ -711,9 +711,9 @@ void func_00067875(struct record *a1)
             *(int *)D_00195B84 += 10;
         } else if (l_1C->enchantments[l_18].type == 25 && l_1C->enchantments[l_18].param == 5) {
             *(int *)D_00195B84 -= 10;
-        } else if (l_1C->enchantments[l_18].type == 14 && (short)itemmaker_slot_kinds[0] == l_1C->enchantments[l_18].param) {
+        } else if (l_1C->enchantments[l_18].type == 14 && (short)scratch_190ce4[0] == l_1C->enchantments[l_18].param) {
             *(int *)D_00195B84 += 10;
-        } else if (l_1C->enchantments[l_18].type == 25 && (short)itemmaker_slot_kinds[0] == l_1C->enchantments[l_18].param) {
+        } else if (l_1C->enchantments[l_18].type == 25 && (short)scratch_190ce4[0] == l_1C->enchantments[l_18].param) {
             *(int *)D_00195B84 -= 10;
         }
     }
@@ -721,7 +721,7 @@ void func_00067875(struct record *a1)
 
 void enchant_extra_spell_points(int a1, int a2)
 {
-    *(int *)D_001A3AA4 += enchant_spell_points_condition(a2);
+    *(int *)extra_spell_points += enchant_spell_points_condition(a2);
 }
 
 int enchant_spell_points_condition(int a1)
@@ -762,8 +762,8 @@ int enchant_spell_points_condition(int a1)
     case 10:
         a1 += -7;
         for (l_1C = 0; l_1C < creature_count; l_1C++) {
-            if (func_000C7FD9(player_entity->x, player_entity->z, D_00190504[l_1C]->x, D_00190504[l_1C]->z) < 1024) {
-                l_24 = &D_00190504[l_1C]->data.character;
+            if (xn_math_approx_dist2d(player_entity->x, player_entity->z, creature_list[l_1C]->x, creature_list[l_1C]->z) < 1024) {
+                l_24 = &creature_list[l_1C]->data.character;
                 if (((int)(unsigned char)*(signed char *)(monster_category + l_24->race)) == a1) {
                     return 75;
                 }
@@ -871,7 +871,7 @@ void effects_tick(void)
     D_001A3AA8 = -player_character->max_magicka;
 }
 
-void func_000685EC(void)
+void trade_haggle_frame(void)
 {
     int l_18;
 
@@ -882,11 +882,11 @@ void func_000685EC(void)
     if (D_00190D63 == 0) {
         if ((signed char)D_00196271 == 0) return;
         if (((int)D_00196271) == 1) {
-            func_000686DA((int)trade_haggle_asking);
+            trade_haggle_close((int)trade_haggle_asking);
             return;
         }
         if (((int)D_00196271) == 2) {
-            func_000686DA(0);
+            trade_haggle_close(0);
             return;
         }
         if (((int)D_00196271) == 3) {
@@ -896,25 +896,25 @@ void func_000685EC(void)
         return;
     }
     if (((int)(unsigned char)game_mode) != 13) return;
-    l_18 = func_00068845(*(int *)inpstr_result);
+    l_18 = trade_haggle_counter(*(int *)inpstr_result);
     if (l_18 == (-1)) {
-        func_000686DA(0);
+        trade_haggle_close(0);
         return;
     }
     if (l_18 != 0) {
-        func_000686DA(l_18);
+        trade_haggle_close(l_18);
         return;
     }
     D_00190D63 = 0;
     trade_haggle_show_offer();
 }
 
-void func_000686DA(int a1)
+void trade_haggle_close(int a1)
 {
     if (a1 > 0 && ((unsigned)a1) > player_character->gold) {
         msgbox_show_rsc(454, 1);
         a1 = 0;
     }
-    D_00195B0C = a1;
+    trade_haggle_result = a1;
     mode_pop();
 }

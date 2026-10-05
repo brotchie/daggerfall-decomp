@@ -1,7 +1,7 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0004EAF4 */
 struct e11 { unsigned char type; char rest[10]; };
 
-unsigned char *func_0004EAF4(unsigned char *a1, int (*a2)(unsigned char *), int (*a3)(unsigned char *))
+unsigned char *note_page_walk(unsigned char *a1, int (*a2)(unsigned char *), int (*a3)(unsigned char *))
 {
     char l_a[12];
     char l_b[12];

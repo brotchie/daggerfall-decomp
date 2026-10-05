@@ -10,15 +10,15 @@ extern short inpstr_cursor;
 extern signed char input_digits_only;
 
 extern int mc_strncpy();
-extern int func_000A0DF4();
-extern int func_00142790();
+extern int strlen();
+extern int xn_kbd_flush();
 
 void inpstr_begin_text(int a1, int a2)
 {
-    func_00142790();
+    xn_kbd_flush();
     input_digits_only = 0;
     inpstr_text = a1;
     mc_strncpy((int)D_00190B44, inpstr_text, 160, (int)D_00176E2C, 121);
-    inpstr_cursor = func_000A0DF4(a1);
+    inpstr_cursor = strlen(a1);
     inpstr_max_length = a2;
 }

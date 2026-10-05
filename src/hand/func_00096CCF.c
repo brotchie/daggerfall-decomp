@@ -2,7 +2,7 @@
 #include "records.h"
 
 extern char D_0017704C[];
-extern struct record *D_00195AC4;
+extern struct record *location_object;
 extern struct spell *spell_records;
 extern int D_00195B44;
 extern struct character *player_character;
@@ -34,7 +34,7 @@ void item_apply_equip_effects(int a1, int a2)
             while ((*(struct S89 **)((char *)&spell_records))[l_20].f != ((struct E4 *)(l_1C + 67))[l_24].v) {
                 l_20++;
             }
-            l_18 = object_create_child((int)D_00195AC4, 0, 89);
+            l_18 = object_create_child((int)location_object, 0, 89);
             *(signed char *)((char *)l_18) = 9;
             *(short *)((char *)l_18 + 21) = 3;
             mc_memcpy(l_18 + 71, (int)((char *)spell_records + (l_20 * 89)), 89, (int)D_0017704C, 2092, 4);

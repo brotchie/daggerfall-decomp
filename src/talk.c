@@ -9,8 +9,8 @@ int func_00016507(int a) { return 0; }
 int building_distance(char *p)
 {
     char *l;
-    l = object_find_by_id(D_00195AC4, *(int *)(p + 0x14));
-    return func_000C7FD9(*(int *)(l + 7), *(int *)(l + 0xf),
+    l = object_find_by_id(location_object, *(int *)(p + 0x14));
+    return xn_math_approx_dist2d(*(int *)(l + 7), *(int *)(l + 0xf),
                          *(int *)(player_object + 7), *(int *)(player_object + 0xf));
 }
 

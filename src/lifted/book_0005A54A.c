@@ -3,9 +3,9 @@
  * tables from the start of the file, so moving functions can change the code. */
 
 
-extern int func_0012DBCC();
+extern int xn_font_draw_string();
 
 void text_draw(int a1, short a2, short a3)
 {
-    func_0012DBCC((int)(short)a2, (int)(short)a3, a1);
+    xn_font_draw_string((int)(short)a2, (int)(short)a3, a1);
 }

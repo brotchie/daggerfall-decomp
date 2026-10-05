@@ -7,7 +7,7 @@ extern unsigned short travel_options;
 extern char D_00190CE8;
 extern struct character *player_character;
 extern struct career *player_class;
-extern int D_001AA674;
+extern int travel_ocean_pixels;
 extern char *D_001AA690;
 extern int D_001AA698;
 extern unsigned char D_001AA6A6;
@@ -17,7 +17,7 @@ extern struct membership *guild_find_membership_by_kind(unsigned char);
 extern int travel_pixel_time(int, int);
 extern void travel_find_transport(void);
 extern void travel_toggle_zoom(void);
-extern int func_0009DEAC();
+extern int abs();
 extern int mc_free(char *, char *, int);
 extern char *mc_malloc(int, char *, int);
 extern int mc_memcpy(char *, char *, int, char *, int, int);
@@ -52,8 +52,8 @@ int travel_route(int x0, int y0, int x1, int y1, int a5)
     y1 = y1 / 32768;
     dx = x1 - x0;
     dy = y1 - y0;
-    adx = func_0009DEAC(dx);
-    ady = func_0009DEAC(dy);
+    adx = abs(dx);
+    ady = abs(dy);
     n = adx > ady ? adx : ady;
     if (dx < 0)
         sx = -1;
@@ -64,7 +64,7 @@ int travel_route(int x0, int y0, int x1, int y1, int a5)
     else
         sy = 1;
     travel_find_transport();
-    D_001AA674 = sum = err = i = 0;
+    travel_ocean_pixels = sum = err = i = 0;
     for (; i < n; i++) {
         if (n == adx) {
             x0 += sx;

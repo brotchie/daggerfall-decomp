@@ -1,7 +1,7 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x00054526 */
 struct AB { unsigned char a; unsigned char b; };
 extern short mouse_y;
-extern short D_0012DA44;
+extern short font_height;
 extern int screen_buffer;
 extern char D_00175420[];
 extern char *classmaker_advantage_names[];
@@ -12,8 +12,8 @@ extern short classmaker_screen;
 extern unsigned char classmaker_special_counts[];
 extern short classmaker_special_list;
 extern short D_00190D84;
-extern int text_macro_fae;
-extern char *text_macro_fpa;
+extern int scratch_190df4;
+extern char *scratch_190dfc;
 extern char *D_00190E00;
 extern char **D_00190E0C;
 extern struct AB classmaker_specials[][7];
@@ -28,12 +28,12 @@ extern void classmaker_draw_dagger(void);
 extern void classmaker_set_advantage(short, int);
 extern void classmaker_set_disadvantage(short, int);
 extern int classmaker_special_conflicts(short, int, short);
-extern void text_draw_colored(char *, short, short, int, unsigned char);
+extern void text_draw_coloured(char *, short, short, int, unsigned char);
 extern int mc_memcpy();
-extern int func_0012B2EB();
-extern int func_0012B3ED();
-extern int func_0012DB50();
-extern int func_00144F68();
+extern int xn_mouse_cursor_erase();
+extern int xn_mouse_cursor_draw();
+extern int xn_font_select();
+extern int xn_draw_image();
 
 void classmaker_specials_screen(void)
 {
@@ -45,18 +45,18 @@ void classmaker_specials_screen(void)
     short y0;
     short y1;
 
-    func_0012DB50(3);
+    xn_font_select(3);
     if ((short)(classmaker_screen & 15) == 2)
         n = 2;
     else
         n = 0;
     if ((int)(short)(classmaker_screen & 16) != 0)
         n++;
-    func_0012B2EB();
-    mc_memcpy(screen_buffer, text_macro_fae, 64000, D_00175420, 675, 4);
-    func_00144F68(0, 0, *(unsigned short *)(D_00190E00 + 4), *(unsigned short *)(D_00190E00 + 6), D_00190E00 + 12);
+    xn_mouse_cursor_erase();
+    mc_memcpy(screen_buffer, scratch_190df4, 64000, D_00175420, 675, 4);
+    xn_draw_image(0, 0, *(unsigned short *)(D_00190E00 + 4), *(unsigned short *)(D_00190E00 + 6), D_00190E00 + 12);
     if (n == 2 || n == 3)
-        func_00144F68(0, 0, *(unsigned short *)(text_macro_fpa + 4), *(unsigned short *)(text_macro_fpa + 6), text_macro_fpa + 12);
+        xn_draw_image(0, 0, *(unsigned short *)(scratch_190dfc + 4), *(unsigned short *)(scratch_190dfc + 6), scratch_190dfc + 12);
     if ((int)(short)(classmaker_screen & 16) != 0) {
         k = classmaker_picklist_wait();
         if (k == 0) {
@@ -105,34 +105,34 @@ void classmaker_specials_screen(void)
     } else {
         D_00190D84 = -1;
         y = 36;
-        for (n = 0; classmaker_special_counts[classmaker_special_list] > n; n++, y += D_0012DA44 * 2) {
+        for (n = 0; classmaker_special_counts[classmaker_special_list] > n; n++, y += font_height * 2) {
             y0 = y;
             if (classmaker_screen == 2) {
                 a = classmaker_specials[0][n].a;
                 b = classmaker_specials[0][n].b;
-                text_draw_colored(classmaker_advantage_names[a], 10, y, 145, 141);
+                text_draw_coloured(classmaker_advantage_names[a], 10, y, 145, 141);
                 if (classmaker_advantage_sublists[a]) {
-                    y += D_0012DA44;
-                    text_draw_colored(classmaker_advantage_sublists[a][b], 10, y, 145, 141);
+                    y += font_height;
+                    text_draw_coloured(classmaker_advantage_sublists[a][b], 10, y, 145, 141);
                 }
             } else {
                 a = classmaker_specials[1][n].a;
                 b = classmaker_specials[1][n].b;
-                text_draw_colored(classmaker_disadvantage_names[a], 10, y, 145, 141);
+                text_draw_coloured(classmaker_disadvantage_names[a], 10, y, 145, 141);
                 if (classmaker_disadvantage_sublists[a]) {
-                    y += D_0012DA44;
-                    text_draw_colored(classmaker_disadvantage_sublists[a][b], 10, y, 145, 141);
+                    y += font_height;
+                    text_draw_coloured(classmaker_disadvantage_sublists[a][b], 10, y, 145, 141);
                 }
             }
-            y1 = y + D_0012DA44;
+            y1 = y + font_height;
             if (mouse_y >= y0 && mouse_y <= y1)
                 D_00190D84 = n;
         }
     }
 done:
-    func_0012DB50(4);
+    xn_font_select(4);
     classmaker_update_advancement();
     classmaker_draw_dagger();
     msgbox_update();
-    func_0012B3ED();
+    xn_mouse_cursor_draw();
 }

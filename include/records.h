@@ -197,7 +197,7 @@ struct character {
     unsigned char codeword;                 /* +0x223: macro_dbp_codeword: high nibble the first word,
                                                low nibble the second */
     signed char reputation_mod;             /* +0x224: the biography's "RR" answers add to it;
-                                               func_000679BB adds it to a reputation */
+                                               player_reaction_mod adds it to a reputation */
     union {
         unsigned short career_id;           /* +0x225: biography persons: the class (CLASS%02d.CFG) */
         unsigned short spawn_seed;          /* +0x225: creatures: their marker's spawn seed (header +0x19),
@@ -313,7 +313,7 @@ struct spell {
 };                                  /* +0x59 */
 RECORD_SIZE(spell, 89);
 
-/* ---- diseases and poisons: type 11, 47 bytes (disease.c's table D_00186A64) -------------- */
+/* ---- diseases and poisons: type 11, 47 bytes (disease.c's table disease_table) -------------- */
 
 struct disease {
     unsigned char id;               /* +0x00: < 100 a disease, >= 128 a poison */
@@ -524,7 +524,7 @@ RECORD_SIZE(qbn_state, 8);
 struct qbn_timer {                  /* section 6 */
     short pad00;                    /* +0x00 */
     unsigned short flags;           /* +0x02: 64 running, 128 expired, 0x400 links resolved, 16 doubled,
-                                       256/512 link1/link2 is a person (func_0002CB34 reads it signed) */
+                                       256/512 link1/link2 is a person (qaction_op12_start_stop_timer reads it signed) */
     unsigned char type;             /* +0x04: 0 random, 1 fixed, 2-5 travel time to places/persons */
     int minimum;                    /* +0x05 */
     int maximum;                    /* +0x09 */
@@ -580,8 +580,8 @@ RECORD_SIZE(qbn_place, 24);
 struct qbn_foe {                    /* section 7 */
     char pad00[3];                  /* +0x00 */
     unsigned char type;             /* +0x03: the monster type */
-    unsigned char count;            /* +0x04: a byte (quest_op09_spawn_repeat, func_000295BE) */
-    unsigned char killed;           /* +0x05: counted up by qcond_op02_event_count */
+    unsigned char count;            /* +0x04: a byte (qaction_op09_spawn_repeat, qaction_op09_spawn_repeat) */
+    unsigned char killed;           /* +0x05: counted up by qcond_op02_foe_killed */
     int symbol;                     /* +0x06: the name's hash (quest_symbol_text) */
     struct record *object;          /* +0x0A */
 };                                  /* +0x0E */
@@ -735,13 +735,13 @@ struct record {
         unsigned short light_radius; /* +0x17: lights (7): 64, << 2 on a missile's impact */
         unsigned short missile_yaw; /* +0x17: arrows in flight (2): the heading of the velocity */
         unsigned short flat_count;  /* +0x17: type 56: the 17-byte flats after its models */
-        unsigned short trigger_range; /* +0x17: markers: 0-6 (func_00026081) */
+        unsigned short trigger_range; /* +0x17: markers: 0-6 (place_marker_in_range) */
         unsigned short light_level; /* +0x17: dungeon block quarters (47) (sky_update) */
         unsigned short building_type; /* +0x17: building objects: the building's type */
         unsigned short detect_distance; /* +0x17: creatures: Detect's distance */
         unsigned short anim_frame;  /* +0x17: animated flats: the frame counter */
         unsigned short home_region; /* +0x17: quest NPCs (41, 65): the region (the name set) */
-        unsigned short home_building; /* +0x17: pedestrians (53): a building index (person_place) */
+        unsigned short home_building; /* +0x17: pedestrians (53): a building index (pedestrian_place) */
     };
     union {
         short pad19;                /* +0x19: a new loot pile gets 1 */
@@ -749,7 +749,7 @@ struct record {
         short faction_id;           /* +0x19: quest NPCs (41, 65): qbn_person.faction_id */
         short region;               /* +0x19: quest places (40) */
         unsigned short npc_flags;   /* +0x19: pedestrians (53): 0x4000 female (npc_talk_record_build;
-                                       func_000763C6 sets it before pickpocket_attempt), 0x8000 a
+                                       click_pedestrian sets it before pickpocket_attempt), 0x8000 a
                                        failed pickpocket */
         short water_level;          /* +0x19: dungeon block quarters (47): 10000 none */
         unsigned short spawn_seed;  /* +0x19: markers: the spawn's srand() seed; corpses get it back */

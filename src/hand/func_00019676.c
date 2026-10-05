@@ -26,17 +26,17 @@ extern void region_flag_clear(int, int);
 extern struct faction *faction_find_type_in_region(short, short);
 extern struct faction *faction_find(short);
 extern struct faction *faction_random(void);
-extern int func_0001AC53(struct faction *, struct faction *);
+extern int factions_can_war(struct faction *, struct faction *);
 extern int faction_is_regional_noble(struct faction *);
 extern int faction_has_enemy(struct faction *, struct faction *);
 extern int faction_has_ally(struct faction *, struct faction *);
 extern void faction_add_power(struct faction *, int);
-extern int func_0001AEBE(struct faction *);
-extern int func_0001AEF9(struct faction *, struct faction *);
-extern int func_0001B06F(struct faction *, struct faction *);
-extern int func_0001B144(struct faction *, struct faction *);
+extern int faction_max_child_power(struct faction *);
+extern int faction_shared_relations(struct faction *, struct faction *);
+extern int faction_tree_relation(struct faction *, struct faction *);
+extern int faction_regions_border(struct faction *, struct faction *);
 extern int faction_power(struct faction *);
-extern void func_0001B22E(struct faction *);
+extern void region_reset_war(struct faction *);
 extern int faction_player_related(struct faction *);
 extern void faction_make_alliance(struct faction *, int, struct faction *);
 extern void faction_make_enemies(struct faction *, int, struct faction *);
@@ -86,7 +86,7 @@ void faction_politics_update(int a1)
             faction_add_power(f, 1);
         else
             faction_add_power(f, -1);
-        if (f->power < func_0001AEBE(f))
+        if (f->power < faction_max_child_power(f))
             faction_add_power(f, 1);
         if (a1 == 2) {
             d = f->power / 5;
@@ -96,14 +96,14 @@ void faction_politics_update(int a1)
             }
             for (j = 0; j < 3; j++) {
                 rnd = rand_range(0, 100);
-                if (f->allies[j] && (func_0001AEF9(f, f->allies[j]) + (f->politics_factor + d)) / 5 + 70 < rnd)
+                if (f->allies[j] && (faction_shared_relations(f, f->allies[j]) + (f->politics_factor + d)) / 5 + 70 < rnd)
                     faction_break_alliance(f, j);
             }
             for (j = 0; j < 3; j++) {
-                if (func_0001B144(f, f->enemies[j]))
+                if (faction_regions_border(f, f->enemies[j]))
                     continue;
                 rnd = rand_range(0, 100);
-                if (f->enemies[j] && (func_0001AEF9(f, f->enemies[j]) + (f->politics_factor + d)) / 5 < rnd)
+                if (f->enemies[j] && (faction_shared_relations(f, f->enemies[j]) + (f->politics_factor + d)) / 5 < rnd)
                     faction_make_peace(f, j);
             }
             for (j = 0; j < 3; j++) {
@@ -118,10 +118,10 @@ void faction_politics_update(int a1)
                     continue;
                 if (faction_has_ally(f->enemies[0], g) || faction_has_ally(f->enemies[1], g) || faction_has_ally(f->enemies[2], g))
                     continue;
-                if (func_0001B06F(f, g))
+                if (faction_tree_relation(f, g))
                     continue;
                 rnd = rand_range(0, 100);
-                if ((func_0001AEF9(f, g) + (f->politics_factor + d)) / 5 <= rnd)
+                if ((faction_shared_relations(f, g) + (f->politics_factor + d)) / 5 <= rnd)
                     break;
                 if (f->type == 7 && f->region != 255)
                     rumor_add_faction(f, g, 26, f->region, 1481);
@@ -131,14 +131,14 @@ void faction_politics_update(int a1)
                 break;
             }
             D_00195B84 = 0;
-            if (func_0001AC53(f, f->enemies[0]) || func_0001AC53(f, f->enemies[1]) || func_0001AC53(f, f->enemies[2])) {
+            if (factions_can_war(f, f->enemies[0]) || factions_can_war(f, f->enemies[1]) || factions_can_war(f, f->enemies[2])) {
                 D_00195B84--;
                 if (D_0018F060[f->region].f3 || D_0018F060[f->region].f4) {
-                    func_0001B22E(f);
-                    func_0001B22E(f->enemies[D_00195B84]);
+                    region_reset_war(f);
+                    region_reset_war(f->enemies[D_00195B84]);
                     j = D_00195B84;
                     D_00195B84 = 0;
-                    if (func_0001AC53(f->enemies[0], f) || func_0001AC53(f->enemies[1], f) || func_0001AC53(f->enemies[2], f))
+                    if (factions_can_war(f->enemies[0], f) || factions_can_war(f->enemies[1], f) || factions_can_war(f->enemies[2], f))
                         f->enemies[j]->enemies[D_00195B84 - 1] = 0;
                     f->enemies[j] = 0;
                 } else if (D_0018F060[f->region].f1) {
@@ -192,7 +192,7 @@ void faction_politics_update(int a1)
                     continue;
                 if (faction_has_ally(f->allies[0], g) || faction_has_ally(f->allies[1], g) || faction_has_ally(f->allies[2], g))
                     continue;
-                r = func_0001B06F(f, g);
+                r = faction_tree_relation(f, g);
                 if (r == 1 || r == 3)
                     continue;
                 if (r == 2)
@@ -200,14 +200,14 @@ void faction_politics_update(int a1)
                 else
                     bonus = 0;
                 rnd = rand_range(0, 100);
-                if ((func_0001AEF9(f, g) + (f->politics_factor + d)) / 5 + bonus + 70 >= rnd)
+                if ((faction_shared_relations(f, g) + (f->politics_factor + d)) / 5 + bonus + 70 >= rnd)
                     break;
                 if (f->type == 7 && f->region != 255)
                     rumor_add_faction(f, g, 27, f->region, 1482);
                 if (g->type == 7 && g->region != 255)
                     rumor_add_faction(g, f, 27, g->region, 1482);
                 faction_make_enemies(f, j, g);
-                if (faction_is_regional_noble(f) && faction_is_regional_noble(g) && func_0001B144(f, g)) {
+                if (faction_is_regional_noble(f) && faction_is_regional_noble(g) && faction_regions_border(f, g)) {
                     rumor_add_faction(f, g, 100, 0, 1407);
                     if (f->type == 7 && f->region != 255)
                         rumor_add_faction(f, g, 28, f->region, 1479);

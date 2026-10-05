@@ -41,7 +41,7 @@ extern unsigned short disk_open_data(int);
 extern int mc_memset();
 extern int lseek(int, int, int);
 extern char *mc_malloc(int, char *, int);
-extern int func_000A00CB(int, void *, int);
+extern int read(int, void *, int);
 
 int flc_open(int a1, struct anim *a2)
 {
@@ -51,7 +51,7 @@ int flc_open(int a1, struct anim *a2)
     a2->handle = disk_open_data(a1);
     if (a2->handle < 1)
         return 0;
-    func_000A00CB(a2->handle, &l_A8, 128);
+    read(a2->handle, &l_A8, 128);
     a2->a4 = l_A8.a6;
     a2->a8 = l_A8.size / 55 + 1;
     a2->w = l_A8.w8;
@@ -67,9 +67,9 @@ int flc_open(int a1, struct anim *a2)
         a2->buf1 = mc_malloc(2050, D_00175404, 231);
     }
     mc_memset(a2->buf1, 0, 2050, D_00175404, 233, 4);
-    func_000A00CB(a2->handle, &l_28, 10);
+    read(a2->handle, &l_28, 10);
     if ((unsigned short)l_28.x == 0xF100) {
-        func_000A00CB(a2->handle, &l_28, 8);
+        read(a2->handle, &l_28, 8);
         if (l_28.type == 3) {
             a2->x = l_28.x - (a2->w >> 1);
             a2->y = l_28.y - (a2->h >> 1);

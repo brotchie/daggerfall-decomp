@@ -2,19 +2,19 @@
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
 
-extern signed char D_0017B630[];
+extern signed char msgbox_border_sizes[];
 extern signed char D_0017B631[];
 extern int msgbox_spop_tiles[];
-extern int D_00199658;
-extern short D_00199660;
-extern short D_00199662;
-extern short D_00199666;
+extern int msgbox_border_tiles;
+extern short msgbox_tile_size;
+extern short msgbox_tile_h;
+extern short msgbox_tile_w;
 
 
-void func_0003F630(short a1)
+void msgbox_set_border_style(short a1)
 {
-    D_00199658 = msgbox_spop_tiles[((int)(short)a1)];
-    D_00199666 = (unsigned short)(unsigned char)D_0017B630[((int)(short)a1) * 2];
-    D_00199662 = (unsigned short)(unsigned char)D_0017B631[((int)(short)a1) * 2];
-    D_00199660 = D_00199666 * D_00199662;
+    msgbox_border_tiles = msgbox_spop_tiles[((int)(short)a1)];
+    msgbox_tile_w = (unsigned short)(unsigned char)msgbox_border_sizes[((int)(short)a1) * 2];
+    msgbox_tile_h = (unsigned short)(unsigned char)D_0017B631[((int)(short)a1) * 2];
+    msgbox_tile_size = msgbox_tile_w * msgbox_tile_h;
 }

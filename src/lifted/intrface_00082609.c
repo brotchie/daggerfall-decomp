@@ -4,7 +4,7 @@
 
 
 
-int func_00082609(int a1)
+int climb_angle_ok(int a1)
 {
     return (((a1 == 0) || ((a1 > 250) && (a1 < 265))) ? 1 : 0);
 }

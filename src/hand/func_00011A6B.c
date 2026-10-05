@@ -18,11 +18,11 @@ struct res {                /* a file loaded whole into memory */
     int fa8;
 };
 extern char D_00170129[];        /* __FILE__ */
-extern void func_0009DEA7(int);
+extern void close(int);
 extern void mc_free(void *, char *, int);
 extern int lseek(int, int, int);
 extern void *mc_malloc(int, char *, int);
-extern int func_000A00CB(int, void *, int);
+extern int read(int, void *, int);
 extern void mc_strncpy(char *, char *, int, char *, int);
 extern int open(char *, ...);
 
@@ -38,18 +38,18 @@ int profile_open(struct res *r, char *name)
     r->bufsize = r->size + 1024;
     lseek(fd, 0, 0);
     if ((r->buf = mc_malloc(r->bufsize, D_00170129, 94)) == 0) {
-        func_0009DEA7(fd);
+        close(fd);
         return 0;
     }
-    if (func_000A00CB(fd, r->buf, r->size) != r->size) {
-        func_0009DEA7(fd);
+    if (read(fd, r->buf, r->size) != r->size) {
+        close(fd);
         if (r->buf != 0 && r->buf != (char *)0x97979797) {
             mc_free(r->buf, D_00170129, 110);
             r->buf = (char *)0x97979797;
         }
         return 0;
     }
-    func_0009DEA7(fd);
+    close(fd);
     r->pos = r->buf;
     r->f94 = 0;
     r->fa0 = 0;

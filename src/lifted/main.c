@@ -8,20 +8,20 @@ struct bf8_0_4 { unsigned char f:4; };
 struct bf8_1_1 { unsigned char _:1; unsigned char f:1; };
 struct bf8_2_1 { unsigned char _:2; unsigned char f:1; };
 struct bf8_4_1 { unsigned char _:4; unsigned char f:1; };
-extern int D_000C23B8;
-extern int D_000C23BC;
-extern int D_000C23C0;
-extern int D_000C23C4;
-extern int D_000C23C8;
-extern int D_000C23CC;
-extern short D_000C287D;
-extern short D_000C287F;
+extern int xn_cam_pitch;
+extern int xn_cam_yaw;
+extern int xn_cam_roll;
+extern int xn_cam_x;
+extern int xn_cam_y;
+extern int xn_cam_z;
+extern short xn_world_nature_archive;
+extern short xn_world_ground_archive;
 extern signed char D_0012B508;
 extern int dungeon_water_level;
-extern signed char D_00132F58;
-extern char D_00136E00[];
-extern char D_00136E24[];
-extern int D_0013F76C;
+extern signed char xn_tex_cache_full;
+extern char xn_cam_rotation[];
+extern char xn_cam_view_matrix[];
+extern int xn_model_queue_count;
 extern char D_001700A0[];
 extern int D_001788E8[];
 extern int D_00178968[];
@@ -33,26 +33,26 @@ extern int frame_checkpoint;
 extern int screen_shake;
 extern int D_0018DC08;
 extern int D_0018DC10;
-extern int D_0018DC14;
-extern int D_0018DC18;
-extern int D_0018DC28;
+extern int screen_shake_angle;
+extern int screen_shake_timer;
+extern int screen_shake_signs;
 extern int D_0018DC2C;
 extern int D_0018DC30;
 extern signed char player_motion_flags;
 extern char frame_counter[];
 extern int view_look_pitch;
-extern int D_001959BC;
+extern int view_look_yaw;
 extern struct record *D_00195A88;
 extern struct record *camera_object;
 extern struct record *player_entity;
 extern struct record *player_object;
-extern int D_00195AB0;
+extern int frame_ticks;
 extern struct record *inv_right_container;
-extern struct record *D_00195B34;
+extern struct record *inv_right_container_base;
 extern int hud_message_expiry[];
 extern struct character *player_character;
 extern int hud_message_ptrs[];
-extern int D_00195C74;
+extern int ceiling_height;
 extern int D_00195CEC;
 extern int head_bob_offset;
 extern int player_death_timer;
@@ -62,34 +62,34 @@ extern signed char game_mode;
 extern signed char player_on_ground;
 extern signed char in_dungeon_water;
 extern signed char D_001962A0;
-extern signed char D_001A949D;
+extern signed char model_cache_flush_count;
 extern short ground_texture_archive;
 extern short nature_texture_archive;
 
 extern struct record *object_reparent(struct record *, struct record *);
 extern int rand();
-extern int func_0009DEAC();
-extern int func_000C2E05();
-extern int func_000C9C70();
-extern int func_000CE6D4();
-extern int func_0012A4F0();
-extern int func_0012A870();
-extern int func_0012DB50();
-extern int func_0012F79C();
-extern int func_00135E39();
-extern int func_00135E90();
-extern int func_00136AB4();
-extern int func_00137000();
-extern int func_00137725();
-extern int func_0013E600();
+extern int abs();
+extern int xn_world_update();
+extern int xn_sky_snow_update_speeds();
+extern int xn_math_mul_sin();
+extern int xn_render_begin_frame();
+extern int xn_render_frame();
+extern int xn_font_select();
+extern int xn_water_draw();
+extern int xn_tex_cache_flush();
+extern int xn_tex_cache_begin_frame();
+extern int xn_light_reset();
+extern int xn_mat_from_angles();
+extern int xn_cam_scale_matrix();
+extern int xn_terrain_draw();
 extern void player_frame_update(void);
-extern void func_00013C56(void);
+extern void marquee_update(void);
 extern void talk_update(void);
 extern void tavern_frame(void);
 extern void court_frame(void);
 extern void creatures_find_nearest(void);
 extern void loan_collectors_update(void);
-extern void func_0002F992(void);
+extern void damage_expire_drain_bonuses(void);
 extern void quest_prompt_answer(void);
 extern void quest_faces_draw(void);
 extern void sky_update(void);
@@ -119,7 +119,7 @@ extern void magic_items_frame(void);
 extern void ai_update_creatures(void);
 extern void links_update(void);
 extern void effects_tick(void);
-extern void func_000685EC(void);
+extern void trade_haggle_frame(void);
 extern void sound_update_channels(void);
 extern void music_update(void);
 extern void mem_check_crt_heap(int);
@@ -167,7 +167,7 @@ void game_frame(void)
     if (((struct bf8_0_4 *)&frame_counter)->f == 0) music_update();
     frame_checkpoint = 99;
     frame_ticks_update();
-    func_000C9C70();
+    xn_sky_snow_update_speeds();
     frame_checkpoint = 100;
     update_fog();
     head_bob_update();
@@ -192,7 +192,7 @@ void game_frame(void)
     }
     frame_checkpoint = 107;
     D_0012B508 = 146;
-    func_0012DB50(4);
+    xn_font_select(4);
     if (((int)D_0019626F) != 4 || ((int)(unsigned char)game_mode) != 8) {
         l_2C = 1;
     } else {
@@ -200,7 +200,7 @@ void game_frame(void)
     }
     if (l_2C != 0 && ((int)(unsigned char)game_mode) != 4) {
         inv_right_container = (struct record *)D_001960D9;
-        D_00195B34 = (struct record *)D_001960D9;
+        inv_right_container_base = (struct record *)D_001960D9;
     }
     loan_collectors_update();
     weather_draw_precipitation();
@@ -233,7 +233,7 @@ void game_frame(void)
     frame_checkpoint = 114;
     logbook_update();
     bank_frame();
-    func_000685EC();
+    trade_haggle_frame();
     court_frame();
     levelup_check();
     travel_map_update();
@@ -246,11 +246,11 @@ void game_frame(void)
     magic_items_frame();
     options_frame();
     frame_checkpoint = 115;
-    func_0002F992();
+    damage_expire_drain_bonuses();
     talk_update();
     training_update();
     info_popup_update();
-    func_00013C56();
+    marquee_update();
     frame_checkpoint = 116;
     ambient_dungeon_sounds();
     quest_faces_draw();
@@ -288,20 +288,20 @@ void world_render(void)
 
     l_18 = 0;
     if (D_00187CA8 == 0) return;
-    D_001A949D = 0;
+    model_cache_flush_count = 0;
     doors_update();
     for (;;) {
-        D_000C23C4 = player_object->x;
-        D_000C23CC = player_object->z;
+        xn_cam_x = player_object->x;
+        xn_cam_z = player_object->z;
         if (((struct bf8_2_1 *)&player_motion_flags)->f != 0) {
             l_34 = 35;
         } else {
             l_34 = 72;
         }
-        D_000C23C8 = (player_object->y - l_34) - head_bob_offset;
-        if ((player_character->flags & 1536) != 0) D_000C23C8 -= 50;
+        xn_cam_y = (player_object->y - l_34) - head_bob_offset;
+        if ((player_character->flags & 1536) != 0) xn_cam_y -= 50;
         if (player_death_timer > 0) {
-            D_000C23C8 = ((((D_000C23C8 - (player_object->y - 20)) * player_death_timer) / 1000) + player_object->y) - 20;
+            xn_cam_y = ((((xn_cam_y - (player_object->y - 20)) * player_death_timer) / 1000) + player_object->y) - 20;
         }
         if (D_001962A0 != 0) {
             if (player_death_timer <= 0) {
@@ -313,66 +313,66 @@ void world_render(void)
         }
         goto L10C1B;
 L10C14:;
-        D_000C23C8 += 50;
+        xn_cam_y += 50;
 L10C1B:;
-        D_000C23B8 = (camera_object->angle_x + view_look_pitch) & 2047;
-        D_000C23BC = (camera_object->yaw + D_001959BC) & 2047;
-        D_000C23C0 = camera_object->angle_z;
+        xn_cam_pitch = (camera_object->angle_x + view_look_pitch) & 2047;
+        xn_cam_yaw = (camera_object->yaw + view_look_yaw) & 2047;
+        xn_cam_roll = camera_object->angle_z;
         if (in_dungeon_water != 0 || D_001962A0 != 0) {
-            D_00195CEC += (D_00195AB0 << 11) / 1000;
+            D_00195CEC += (frame_ticks << 11) / 1000;
             D_00195CEC &= 8191;
-            if (in_dungeon_water != 0 && (D_00195C74 + 5) < D_000C23C8) {
-                D_000C23C8 += (D_001788E8[(D_00195CEC >> 8)] * 2) - 3;
+            if (in_dungeon_water != 0 && (ceiling_height + 5) < xn_cam_y) {
+                xn_cam_y += (D_001788E8[(D_00195CEC >> 8)] * 2) - 3;
             }
-            D_000C23C0 += D_00178968[(D_00195CEC >> 8)];
+            xn_cam_roll += D_00178968[(D_00195CEC >> 8)];
         }
-        if (dungeon_water_level != 10000 && func_0009DEAC(D_000C23C8 - dungeon_water_level) < 5) {
-            D_000C23C8 -= 10;
+        if (dungeon_water_level != 10000 && abs(xn_cam_y - dungeon_water_level) < 5) {
+            xn_cam_y -= 10;
         }
         screen_shake_offset((int)&l_24, (int)&l_20);
-        D_000C23B8 += l_24;
-        D_000C23B8 &= 2047;
-        D_000C23BC += l_20;
-        D_000C23BC &= 2047;
+        xn_cam_pitch += l_24;
+        xn_cam_pitch &= 2047;
+        xn_cam_yaw += l_20;
+        xn_cam_yaw &= 2047;
         frame_checkpoint = 200;
-        func_00135E90();
-        func_0012A4F0();
-        func_00136AB4();
-        func_00137000(D_000C23B8, D_000C23BC, D_000C23C0, (int)D_00136E00);
-        func_00137725((int)D_00136E00, (int)D_00136E24);
+        xn_tex_cache_begin_frame();
+        xn_render_begin_frame();
+        xn_light_reset();
+        xn_mat_from_angles(xn_cam_pitch, xn_cam_yaw, xn_cam_roll, (int)xn_cam_rotation);
+        xn_cam_scale_matrix((int)xn_cam_rotation, (int)xn_cam_view_matrix);
         frame_checkpoint = 201;
         world_draw_objects();
         frame_checkpoint = 202;
-        if (D_001A949D != 0) continue;
+        if (model_cache_flush_count != 0) continue;
         if (((int)player_environment) == 1) {
-            func_000C2E05();
+            xn_world_update();
             world_update_location();
-            if (D_001A949D != 0) continue;
-            D_000C287F = ground_texture_archive;
-            D_000C287D = nature_texture_archive;
+            if (model_cache_flush_count != 0) continue;
+            xn_world_ground_archive = ground_texture_archive;
+            xn_world_nature_archive = nature_texture_archive;
             frame_checkpoint = 203;
-            func_0013E600();
+            xn_terrain_draw();
             frame_checkpoint = 204;
         }
-        D_0018DC10 = D_0013F76C;
+        D_0018DC10 = xn_model_queue_count;
         frame_checkpoint = 205;
         if (((int)player_environment) == 1) {
-            l_1C = func_0012A870(2);
+            l_1C = xn_render_frame(2);
         } else {
-            l_1C = func_0012A870(0);
+            l_1C = xn_render_frame(0);
         }
         frame_checkpoint = 206;
-        D_0018DC08 = D_0013F76C;
-        if (l_1C == 0) if (D_00132F58 == 0) break;
+        D_0018DC08 = xn_model_queue_count;
+        if (l_1C == 0) if (xn_tex_cache_full == 0) break;
         ++l_18;
         if (l_18 != 1) fatal_error((int)D_001700A0);
-        D_00132F58 = 0;
-        func_00135E39();
+        xn_tex_cache_full = 0;
+        xn_tex_cache_flush();
     }
-    if (dungeon_water_level == 10000 || D_000C23C8 == dungeon_water_level) {
+    if (dungeon_water_level == 10000 || xn_cam_y == dungeon_water_level) {
         return;
     }
-    func_0012F79C();
+    xn_water_draw();
 }
 
 void screen_shake_offset(int a1, int a2)
@@ -384,20 +384,20 @@ void screen_shake_offset(int a1, int a2)
         *(int *)((char *)a1) = *(int *)((char *)a2);
         return;
     }
-    D_0018DC18 -= D_00195AB0;
-    if (D_0018DC18 > 0) {
+    screen_shake_timer -= frame_ticks;
+    if (screen_shake_timer > 0) {
         *(int *)((char *)a1) = D_0018DC2C;
         *(int *)((char *)a2) = D_0018DBF8;
         return;
     }
-    D_0018DC18 = 60;
+    screen_shake_timer = 60;
     screen_shake -= 2;
-    D_0018DC14 += 128;
-    D_0018DC14 &= 2047;
-    *(int *)((char *)a1) = func_000CE6D4(screen_shake, D_0018DC14);
+    screen_shake_angle += 128;
+    screen_shake_angle &= 2047;
+    *(int *)((char *)a1) = xn_math_mul_sin(screen_shake, screen_shake_angle);
     *(int *)((char *)a2) = *(int *)((char *)a1);
-    if (((struct bf8_0_1 *)&D_0018DC28)->f != 0) *(int *)((char *)a1) = -(*(int *)((char *)a1));
-    if (((struct bf8_1_1 *)&D_0018DC28)->f != 0) *(int *)((char *)a2) = -(*(int *)((char *)a2));
+    if (((struct bf8_0_1 *)&screen_shake_signs)->f != 0) *(int *)((char *)a1) = -(*(int *)((char *)a1));
+    if (((struct bf8_1_1 *)&screen_shake_signs)->f != 0) *(int *)((char *)a2) = -(*(int *)((char *)a2));
     D_0018DC2C = *(int *)((char *)a1);
     D_0018DBF8 = *(int *)((char *)a2);
 }
@@ -406,9 +406,9 @@ void screen_shake_start(int a1)
 {
     screen_shake = a1 / 2;
     if (((struct bf8_0_1 *)&screen_shake)->f != 0) (screen_shake)++;
-    D_0018DC28 = rand();
-    D_0018DC14 = 0;
-    D_0018DC18 = 60;
+    screen_shake_signs = rand();
+    screen_shake_angle = 0;
+    screen_shake_timer = 60;
 }
 
 void screen_shake_stop(void)

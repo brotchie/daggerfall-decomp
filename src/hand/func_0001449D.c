@@ -7,7 +7,7 @@ extern struct record *player_object;
 extern struct P D_00120288;
 extern void object_set_position(struct record *, int, int, int, int, int, int);
 
-void func_0001449D(void)
+void player_move_by_xn_vector(void)
 {
     int l_1C;
     int l_18;

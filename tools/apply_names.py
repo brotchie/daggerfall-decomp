@@ -35,8 +35,12 @@ ADDRESS = re.compile(r"^(func|D)_([0-9A-F]{8})$")
 
 
 def sources():
+    """The C of FALL.EXE's build (src/xngine_c/ is the XnGine translation, generated with the
+    names already: tools/xn_c.py)."""
     out = []
     for d, _sub, files in os.walk(os.path.join(ROOT, "src")):
+        if os.path.relpath(d, os.path.join(ROOT, "src")).split(os.sep)[0] == "xngine_c":
+            continue
         out += [os.path.join(d, f) for f in files if f.endswith(".c")]
     inc = os.path.join(ROOT, "include")
     out += [os.path.join(inc, f) for f in os.listdir(inc) if f.endswith(".h")]
@@ -108,8 +112,9 @@ def main():
         return
     # identifiers the sources use for anything else (address tokens and applied names aside)
     used = set()
+    comments = re.compile(r"/\*.*?\*/|//[^\n]*", re.S)  # a comment can't shadow anything
     for p in files:
-        for tok in IDENT.findall(open(p, encoding="latin-1").read()):
+        for tok in IDENT.findall(comments.sub(" ", open(p, encoding="latin-1").read())):
             if not ADDRESS.match(tok) and tok not in old:
                 used.add(tok)
     want, skipped = wanted(namesmod.load(), used)

@@ -20,7 +20,7 @@ extern unsigned char D_001940D7;
 extern unsigned char D_001940DA;
 extern struct record *player_object;
 extern int vertical_velocity;
-extern int D_00195C74;
+extern int ceiling_height;
 extern char player_on_ground;
 extern struct Vec D_00196D54;
 extern int D_00196D58;
@@ -28,9 +28,9 @@ extern int D_00196D5C;
 extern short collide_flags;
 extern int collide_move_object(struct record *, int, struct Hit *, int);
 extern int object_delete(struct record *);
-extern int func_0009DEAC();
+extern int abs();
 extern int mc_memcpy(void *, void *, int, char *, int, int);
-extern int func_000C7FD9();
+extern int xn_math_approx_dist2d();
 
 int func_00063FCF(struct record *m, int a2, int a3)
 {
@@ -59,7 +59,7 @@ int func_00063FCF(struct record *m, int a2, int a3)
     hit.az = m->angle_z;
     save10 = player_on_ground;
     save14 = vertical_velocity;
-    save28 = D_00195C74;
+    save28 = ceiling_height;
     *(unsigned char *)&collide_flags |= 4;
     h = vertical_velocity = sub->fall_velocity;
     D_001940D7 |= 128;
@@ -76,11 +76,11 @@ int func_00063FCF(struct record *m, int a2, int a3)
         vertical_velocity = 1;
     sub->fall_velocity = vertical_velocity;
     vertical_velocity = save14;
-    D_00195C74 = save28;
-    if (func_0009DEAC(m->y - player_object->y) > 3000) {
+    ceiling_height = save28;
+    if (abs(m->y - player_object->y) > 3000) {
         D_001940DA |= 128;
         object_delete(m);
     }
-    dist = func_000C7FD9(m->x, m->z, pos.x, pos.z);
+    dist = xn_math_approx_dist2d(m->x, m->z, pos.x, pos.z);
     return dist > 2 ? 1 : 0;
 }

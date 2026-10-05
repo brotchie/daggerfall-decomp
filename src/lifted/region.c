@@ -3,8 +3,8 @@
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
 
-extern int D_000C2893[];
-extern char *D_000C28C4;
+extern int xn_world_slot_cells[];
+extern char *xn_world_tile_layer;
 extern char D_001705F8[];
 extern signed char climate_categories[];
 extern int D_00187F30[];
@@ -14,13 +14,13 @@ extern char current_region_data[];
 extern signed char current_region;
 extern signed char D_00196269;
 extern signed char current_climate;
-extern signed char D_00196285;
+extern signed char climate_is_ocean;
 extern int politic_pak;
 extern int climate_pak;
 
 extern int mc_free();
-extern int func_000C2D81();
-extern void func_0001DF7F(int);
+extern int xn_world_cell_at();
+extern void maploads_enter_region(int);
 extern void region_unload(void);
 unsigned char politic_region_at(int, int);
 unsigned char climate_lookup(int, int);
@@ -44,7 +44,7 @@ void region_enter(unsigned char a1, unsigned char a2)
     *(int *)current_region_data = ((int)region_event_values) + (((int)(unsigned char)current_region) * 80);
     D_00196269 = current_region;
     region_unload();
-    func_0001DF7F((int)(unsigned char)a2);
+    maploads_enter_region((int)(unsigned char)a2);
 }
 
 int region_update_from_player(void)
@@ -102,10 +102,10 @@ unsigned char climate_lookup(int a1, int a2)
     current_climate = pak_lookup(l_1C, l_18, climate_pak);
     if (((int)(unsigned char)current_climate) == 223) {
         current_climate = 228;
-        D_00196285 = 1;
+        climate_is_ocean = 1;
         return 3;
     }
-    D_00196285 = 0;
+    climate_is_ocean = 0;
     return climate_categories[(int)(unsigned char)current_climate];
 }
 
@@ -124,19 +124,19 @@ unsigned char pak_lookup(int a1, int a2, int a3)
     return *(signed char *)((char *)l_14 + 2);
 }
 
-unsigned char func_0002021B(int a1, int a2)
+unsigned char ground_tile_at(int a1, int a2)
 {
     int l_24;
     int l_20;
     int l_1C;
     int l_18;
 
-    l_20 = func_000C2D81(a1, a2);
+    l_20 = xn_world_cell_at(a1, a2);
     for (l_18 = 0; l_18 < 4; l_18++) {
-        if (l_20 == D_000C2893[l_18]) break;
+        if (l_20 == xn_world_slot_cells[l_18]) break;
     }
     if (l_18 == 4) return 255;
-    l_24 = (int)(D_000C28C4 + D_00187F30[l_18]);
+    l_24 = (int)(xn_world_tile_layer + D_00187F30[l_18]);
     l_24 += (127 - ((a2 & 32767) >> 8)) << 8;
     l_24 += (a1 & 32767) >> 8;
     return *(signed char *)((char *)l_24) & 63;

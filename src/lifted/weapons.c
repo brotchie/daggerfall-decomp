@@ -7,7 +7,7 @@ struct bf8_5_1 { unsigned char _:5; unsigned char f:1; };
 struct bf8_6_1 { unsigned char _:6; unsigned char f:1; };
 extern int pick_distance;
 extern signed char mouse_buttons;
-extern int D_001343C0;
+extern int xn_anim_ticks;
 extern char D_0017615C[];
 extern char D_00176166[];
 extern char D_00176175[];
@@ -21,15 +21,15 @@ extern short swing_damage_mods[];
 extern char D_001875AE[];
 extern char D_001875B7[];
 extern signed char text_buffer[];
-extern struct record *D_00190504[];
+extern struct record *creature_list[];
 extern signed char D_001940D6;
 extern int D_0019597C[];
 extern struct building *current_building;
 extern struct record *player_entity;
 extern struct record *player_object;
-extern int D_00195AB0;
-extern struct record *D_00195AC4;
-extern char D_00195AE0[];
+extern int frame_ticks;
+extern struct record *location_object;
+extern char click_hit[];
 extern int creature_count;
 extern struct record *spell_ready_missile;
 extern char hud_bar_image[];
@@ -37,7 +37,7 @@ extern char D_00195B84[];
 extern struct character *player_character;
 extern struct settings *game_settings;
 extern struct record *D_00195C48;
-extern int D_00195D5C;
+extern int spell_cast_queue_count;
 extern short mouse_motion_x;
 extern short mouse_motion_y;
 extern signed char weapon_active_hand;
@@ -57,9 +57,9 @@ extern short swing_to_hit;
 extern short swing_damage;
 
 extern int lockpick_door(struct record *);
-extern struct record *func_00013A00(struct record *, int, unsigned short);
+extern struct record *door_find_key(struct record *, int, unsigned short);
 extern int collide_move_missile(struct record *, int, int);
-extern int func_00041347(void);
+extern int people_check_witnesses(void);
 extern int key_action_held(int);
 extern int building_is_open(int);
 extern int sound_play(int, struct record *, int);
@@ -73,17 +73,17 @@ extern int inv_take_arrow(int);
 extern int door_start_swing(struct record *, int);
 extern int mc_free();
 extern int mc_memset();
-extern int func_000A0ED9(int, int);
+extern int mc_set_location(int, int);
 extern int mc_sprintf(int, ...);
 extern int mc_memcpy();
-extern int func_000C2000();
-extern int func_000C2043();
+extern int xn_vec_unit_direction();
+extern int xn_vec_advance();
 extern int func_000C2068();
-extern int func_000C7FD9();
-extern int func_000C7FF4();
-extern int func_000C808D();
-extern int func_000CB39A();
-extern int func_000CE70D();
+extern int xn_math_approx_dist2d();
+extern int xn_math_approx_hypot();
+extern int xn_math_angle_to_point();
+extern int xn_draw_cif_rle_frame();
+extern int xn_math_advance_pitch_yaw();
 extern void lock_show_difficulty(int);
 extern void damage_resolve_attack(struct record *, struct record *, int);
 extern void guards_summon(int);
@@ -95,22 +95,22 @@ extern void mem_check_crt_heap(int);
 extern void fatigue_add(int);
 extern void weapon_reload_hand_sprites(void);
 extern void click_item(int, struct record *);
-extern void func_00075E7B(int, struct record *);
+extern void click_dungeon_model(int, struct record *);
 extern void click_npc(int, struct record *);
 extern void click_creature(int, struct record *);
 extern void click_door(int, struct record *);
-extern void func_0007606C(int, struct record *);
+extern void click_marker(int, struct record *);
 extern void click_interior_model(int, struct record *);
 extern void click_corpse(int, struct record *);
-extern void func_000763C6(int, struct record *);
+extern void click_pedestrian(int, struct record *);
 extern void click_loot_container(int, struct record *);
-extern void func_00076503(int, struct record *);
+extern void click_town_scenery(int, struct record *);
 extern void object_free_later(struct record *);
 extern void spell_cast_queued_run(void);
 extern void inv_merge_arrows(struct record *, struct record *, int);
-struct record *func_00073F5D(int, int, int);
+struct record *monster_nearest_to_point(int, int, int);
 void weapon_fire_arrow(void);
-#pragma aux func_000A0ED9 parm routine [];
+#pragma aux mc_set_location parm routine [];
 
 void weapon_load_hand_sprite(struct record *a1, int a2)
 {
@@ -135,10 +135,10 @@ L72941:;
     }
     *(int *)(D_001A4A30 + (a2 << 2)) = (int)a1;
     if (a1 != 0 && l_18->enchantments[0].type != (-1) && l_18->index != 17 && l_18->index != 16) {
-        func_000A0ED9(85, (int)D_0017615C);
+        mc_set_location(85, (int)D_0017615C);
         mc_sprintf((int)text_buffer, (int)D_00176166, l_14);
     } else {
-        func_000A0ED9(87, (int)D_0017615C);
+        mc_set_location(87, (int)D_0017615C);
         mc_sprintf((int)text_buffer, (int)D_00176175, l_14);
     }
     weapon_hand_cif[a2] = disk_read_file((int)text_buffer, 0);
@@ -159,10 +159,10 @@ int weapon_start_swing(int a1)
     if (key_action_held(33) == 0) return 0;
     l_1C = mouse_motion_x;
     l_18 = mouse_motion_y;
-    l_24 = func_000C7FD9(0, 0, (int)(short)l_1C, (int)(short)l_18);
+    l_24 = xn_math_approx_dist2d(0, 0, (int)(short)l_1C, (int)(short)l_18);
     if (l_24 < 45) return 0;
-    D_001A4A48[a1] = D_001343C0;
-    l_24 = func_000C808D(0, 0, (int)(short)l_1C, (int)(short)l_18) >> 7;
+    D_001A4A48[a1] = xn_anim_ticks;
+    l_24 = xn_math_angle_to_point(0, 0, (int)(short)l_1C, (int)(short)l_18) >> 7;
     D_001A4A38[a1] = (int)(unsigned char)weapon_swing_types[l_24];
     swing_to_hit = swing_to_hit_mods[l_24];
     swing_damage = swing_damage_mods[l_24];
@@ -181,7 +181,7 @@ void weapon_bow_update(void)
     if (((struct bf8_6_1 *)&D_001940D6)->f == 0) return;
     if (D_0019597C[((int)(unsigned char)weapon_active_hand)] != 0) return;
     if (D_001A4A60[((int)(unsigned char)weapon_active_hand)] > 200) {
-        D_001A4A60[((int)(unsigned char)weapon_active_hand)] -= D_00195AB0;
+        D_001A4A60[((int)(unsigned char)weapon_active_hand)] -= frame_ticks;
         if (D_001A4A60[((int)(unsigned char)weapon_active_hand)] < 200) {
             D_001A4A60[((int)(unsigned char)weapon_active_hand)] = 0;
         }
@@ -206,7 +206,7 @@ void weapon_bow_update(void)
             return;
         }
     }
-    func_000CB39A(weapon_hand_cif[((int)(unsigned char)weapon_active_hand)], (int)(unsigned char)*(signed char *)((char *)(*(int *)(D_001A4A68 + (((int)(unsigned char)weapon_active_hand) << 2)) + D_001A4A60[((int)(unsigned char)weapon_active_hand)])), ((((int)(unsigned short)(game_settings->view_flags & 1)) != 0) ? 0 : -((int)(unsigned short)*(short *)(*(char **)hud_bar_image + 6))), (int)(unsigned char)weapon_active_hand);
+    xn_draw_cif_rle_frame(weapon_hand_cif[((int)(unsigned char)weapon_active_hand)], (int)(unsigned char)*(signed char *)((char *)(*(int *)(D_001A4A68 + (((int)(unsigned char)weapon_active_hand) << 2)) + D_001A4A60[((int)(unsigned char)weapon_active_hand)])), ((((int)(unsigned short)(game_settings->view_flags & 1)) != 0) ? 0 : -((int)(unsigned short)*(short *)(*(char **)hud_bar_image + 6))), (int)(unsigned char)weapon_active_hand);
 }
 
 void weapon_fire_arrow(void)
@@ -224,11 +224,11 @@ void weapon_fire_arrow(void)
     item_make(3, 18, (struct item *)(*(int *)((char *)l_24 + 12) + 71));
     *(signed char *)(*(char **)((char *)l_24 + 12) + 120) = 1;
     mc_memset((int)l_24, 0, 12, (int)D_0017615C, 404, 4);
-    func_000CE70D(player_object->angle_x, player_object->yaw, 1024, (int)l_24);
+    xn_math_advance_pitch_yaw(player_object->angle_x, player_object->yaw, 1024, (int)l_24);
     *(int *)l_24 += player_object->x;
     *(int *)((char *)l_24 + 4) += player_object->y;
     *(int *)((char *)l_24 + 8) += player_object->z;
-    func_000C2000((int)player_object + 7, (int)l_24, *(int *)((char *)l_24 + 12) + 142);
+    xn_vec_unit_direction((int)player_object + 7, (int)l_24, *(int *)((char *)l_24 + 12) + 142);
     *(int *)(*(char **)((char *)l_24 + 12) + 7) = player_object->x;
     *(int *)(*(char **)((char *)l_24 + 12) + 11) = player_object->y - 70;
     if (((int)(unsigned short)(game_settings->view_flags & 1)) == 0) {
@@ -236,10 +236,10 @@ void weapon_fire_arrow(void)
     }
     *(int *)(*(char **)((char *)l_24 + 12) + 15) = player_object->z;
     *(short *)(*(char **)((char *)l_24 + 12) + 25) = 1;
-    func_000C2043(*(int *)((char *)l_24 + 12) + 142, 160, *(int *)((char *)l_24 + 12) + 7);
+    xn_vec_advance(*(int *)((char *)l_24 + 12) + 142, 160, *(int *)((char *)l_24 + 12) + 7);
 }
 
-void func_00073ADF(struct record *a1)
+void weapon_missile_orient(struct record *a1)
 {
 {
     char l_24[12];
@@ -260,7 +260,7 @@ int weapon_arrow_update(struct record *a1)
         char l_40[12];
         char l_34[12];
 
-        l_20 = func_000C7FF4(player_object->y - a1->y, func_000C7FD9(player_object->x, player_object->z, a1->x, a1->z));
+        l_20 = xn_math_approx_hypot(player_object->y - a1->y, xn_math_approx_dist2d(player_object->x, player_object->z, a1->x, a1->z));
         if (l_20 > 2048) {
             object_free_later(a1);
             return 0;
@@ -268,14 +268,14 @@ int weapon_arrow_update(struct record *a1)
         *(int *)l_34 = a1->x;
         *(int *)((char *)l_34 + 4) = a1->y;
         *(int *)((char *)l_34 + 8) = a1->z;
-        func_000C2043((char *)a1 + 142, 40, (int)l_34);
+        xn_vec_advance((char *)a1 + 142, 40, (int)l_34);
         *(int *)l_40 = a1->angle_x;
         *(int *)((char *)l_40 + 4) = a1->yaw;
         *(int *)((char *)l_40 + 8) = 0;
         *(signed char *)collide_flags |= 4;
         l_24 = collide_move_missile(a1, (int)l_34, (int)l_40);
         if (a1->from_player == 0) {
-            l_20 = func_000C7FF4(player_object->y - a1->y, func_000C7FD9(player_object->x, player_object->z, a1->x, a1->z));
+            l_20 = xn_math_approx_hypot(player_object->y - a1->y, xn_math_approx_dist2d(player_object->x, player_object->z, a1->x, a1->z));
             if (l_20 < 125) {
                 sound_play(7, player_object, 100);
                 damage_resolve_attack(player_entity, player_entity, 19);
@@ -300,7 +300,7 @@ int weapon_arrow_update(struct record *a1)
                 object_free_later(a1);
                 return 0;
             }
-            l_1C = func_00073F5D(a1->x, a1->y, a1->z);
+            l_1C = monster_nearest_to_point(a1->x, a1->y, a1->z);
             if (l_1C == 0) {
                 object_free_later(a1);
                 return 0;
@@ -320,13 +320,13 @@ void weapon_monster_arrow(struct record *a1, struct record *a2)
 {
     struct record *l_14;
 
-    l_14 = object_create_child(D_00195AC4, 0, 107);
+    l_14 = object_create_child(location_object, 0, 107);
     l_14->type = 2;
     l_14->image2 = 998;
     l_14->image = 0;
     item_make(3, 18, &l_14->data.item);
     l_14->data.item.stack_count = 1;
-    func_000C2000(&a1->x, &a2->x, (char *)l_14 + 142);
+    xn_vec_unit_direction(&a1->x, &a2->x, (char *)l_14 + 142);
     l_14->missile_yaw = 0;
     l_14->angle_z = 0;
     l_14->x = a1->x;
@@ -334,7 +334,7 @@ void weapon_monster_arrow(struct record *a1, struct record *a2)
     l_14->z = a1->z;
     l_14->from_player = 0;
     *(int *)((char *)l_14 + 43) = 1;
-    func_000C2043((char *)l_14 + 142, 160, &l_14->x);
+    xn_vec_advance((char *)l_14 + 142, 160, &l_14->x);
 }
 
 void weapon_free_sprites(void)
@@ -348,7 +348,7 @@ void weapon_free_sprites(void)
     D_001A4A5C = -1751672937;
 }
 
-struct record *func_00073F5D(int a1, int a2, int a3)
+struct record *monster_nearest_to_point(int a1, int a2, int a3)
 {
     int l_20;
     int l_1C;
@@ -357,7 +357,7 @@ struct record *func_00073F5D(int a1, int a2, int a3)
 
     l_1C = 100000;
     for (l_20 = 0; l_20 < creature_count; l_20++) {
-        l_14 = func_000C7FF4(D_00190504[l_20]->y - a2, func_000C7FD9(D_00190504[l_20]->x, D_00190504[l_20]->z, a1, a3));
+        l_14 = xn_math_approx_hypot(creature_list[l_20]->y - a2, xn_math_approx_dist2d(creature_list[l_20]->x, creature_list[l_20]->z, a1, a3));
         if (l_14 < l_1C) {
             l_1C = l_14;
             l_18 = l_20;
@@ -365,18 +365,18 @@ struct record *func_00073F5D(int a1, int a2, int a3)
     }
     *(int *)D_00195B84 = l_1C;
     if (l_1C == 100000) return 0;
-    return D_00190504[l_18];
+    return creature_list[l_18];
 }
 
-void func_00074024(int a1, struct record *a2)
+void click_world_object(int a1, struct record *a2)
 {
     int l_14;
 
     l_14 = loaded_location.index;
-    *(int *)D_00195AE0 = a1;
+    *(int *)click_hit = a1;
     if ((int)spell_ready_missile != 0) {
         if (spell_ready_missile->data.spell.target == 3) {
-            D_00195D5C = 0;
+            spell_cast_queue_count = 0;
             spell_ready_missile->x = player_object->x;
             spell_ready_missile->y = player_object->y;
             spell_ready_missile->z = player_object->z;
@@ -397,7 +397,7 @@ void func_00074024(int a1, struct record *a2)
         click_item(a1, a2);
         return;
     case 6:
-        func_00075E7B(a1, a2);
+        click_dungeon_model(a1, a2);
         return;
     case 8:
         click_npc(a1, a2);
@@ -409,7 +409,7 @@ void func_00074024(int a1, struct record *a2)
         click_door(a1, a2);
         return;
     case 34:
-        func_0007606C(a1, a2);
+        click_marker(a1, a2);
         return;
     case 43:
         click_interior_model(a1, a2);
@@ -418,18 +418,18 @@ void func_00074024(int a1, struct record *a2)
         click_corpse(a1, a2);
         return;
     case 53:
-        func_000763C6(a1, a2);
+        click_pedestrian(a1, a2);
         return;
     case 33:
         click_loot_container(a1, a2);
         return;
     case 56:
-        func_00076503(a1, a2);
+        click_town_scenery(a1, a2);
     default:;
     }
 }
 
-void func_0007425E(struct record *a1, int a2)
+void door_try_open(struct record *a1, int a2)
 {
     int l_1C;
     int l_18;
@@ -458,7 +458,7 @@ void func_0007425E(struct record *a1, int a2)
         a1->flags |= 0x100;
         return;
     }
-    l_14 = func_00013A00(player_entity, ((unsigned)a1->id) >> 16, a1->lock_level);
+    l_14 = door_find_key(player_entity, ((unsigned)a1->id) >> 16, a1->lock_level);
     if (l_14 == 0) {
         if (a2 == 0) {
             if ((player_character->conditions & 0x40) != 0) {
@@ -476,7 +476,7 @@ void func_0007425E(struct record *a1, int a2)
             if (lockpick_door(a1) != 0) {
                 if (door_start_swing(a1, 0) != 0) a1->flags |= 320;
             }
-            if (func_00041347() != 0 || rand_range(1, 300) < (100 - ((int)(short)player_character->skills[16].value))) {
+            if (people_check_witnesses() != 0 || rand_range(1, 300) < (100 - ((int)(short)player_character->skills[16].value))) {
                 crime_current = 1;
                 guards_summon(1);
             }

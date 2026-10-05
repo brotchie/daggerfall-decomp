@@ -11,7 +11,7 @@ extern char D_00170C5A[];
 extern char D_00170C67[];
 extern signed char D_00187CA8;
 extern char D_00190BE4[];
-extern char D_00190D64[];
+extern char scratch_190d64[];
 extern short D_00190D8C[];
 extern signed char D_001940D9;
 extern struct record *player_object;
@@ -65,9 +65,9 @@ int sheet_open(short a1)
         }
         if (((int)(short)a1) == 50) {
             D_001940D9 |= 4;
-            *(short *)D_00190D64 = 30;
+            *(short *)scratch_190d64 = 30;
         } else {
-            *(short *)D_00190D64 = rand_range(4, 6);
+            *(short *)scratch_190d64 = rand_range(4, 6);
         }
         *(int *)D_00190BE4 = 0;
         mc_memcpy((int)D_00190D8C, (int)(signed char *)&player_character->base_attributes[0], 16, (int)D_00170C67, 97, 4);

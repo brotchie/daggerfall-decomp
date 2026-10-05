@@ -23,7 +23,7 @@ extern signed char D_00178630[];
 extern unsigned char player_environment;
 extern struct spell *selected_spell;
 extern int weight_fractions[];
-extern char D_0017C54E[];
+extern char legal_reputation_ranges[];
 extern char D_0017C552[];
 extern int ruler_fates[];
 extern char D_0017C912[];
@@ -37,7 +37,7 @@ extern int ordinal_suffixes[];
 extern char race_names[];
 extern signed char D_0017CC1F[];
 extern char skill_names[];
-extern char *D_0017CEF2[];
+extern char *faction_rank_names[];
 extern char material_names[];
 extern char material_to_hit[];
 extern char weapon_damage_min[];
@@ -72,11 +72,11 @@ extern int text_blank;
 extern int honorifics;
 extern int D_0018508F;
 extern int legal_reputation_names[];
-extern char D_00185F88[];
+extern char item_group_templates[];
 extern char saved_location_name[];
 extern char saved_region_name[];
 extern char region_legal_reputation[];
-extern char D_0018F090[];
+extern char region_persecuted_temple[];
 extern char D_00190BE4[];
 extern int D_00190BEC;
 extern int automap_yaw;
@@ -88,27 +88,27 @@ extern int D_00190CAC;
 extern int D_00190CD4;
 extern int D_00190CD8;
 extern int D_00190CDC;
-extern signed char D_00190D16;
+extern signed char scratch_190d16;
 extern signed char D_00190D17;
-extern signed char D_00190D20;
+extern signed char scratch_190d20;
 extern signed char D_00190D21;
 extern signed char D_00190D22;
 extern short court_prison_days;
-extern short D_00190DCA;
-extern char text_macro_fpc[];
-extern int text_macro_fnpc;
-extern int text_macro_fe;
-extern char text_macro_fa[];
-extern int text_macro_fea;
-extern int text_macro_fpa;
-extern int D_00190EAC;
+extern short court_extra_days;
+extern char scratch_190de4[];
+extern int scratch_190de8;
+extern int scratch_190dec;
+extern char scratch_190df0[];
+extern int scratch_190df8;
+extern int scratch_190dfc;
+extern int text_macro_map_location;
 extern signed char text_rsc_buffer[];
 extern unsigned char D_001940D7;
 extern char text_macro_fcn[];
 extern struct record *wagon_container;
-extern struct record *D_001959EC;
-extern struct item *D_00195A80;
-extern struct character *D_00195A84;
+extern struct record *house_container;
+extern struct item *text_macro_item;
+extern struct character *text_macro_npc;
 extern int D_00195A90;
 extern int D_00195A94;
 extern struct building *current_building;
@@ -116,7 +116,7 @@ extern struct record *player_entity;
 extern struct record *player_object;
 extern struct record *D_00195AA8;
 extern int D_00195AC0;
-extern struct record *D_00195AC4;
+extern struct record *location_object;
 extern int D_00195ACC;
 extern int text_macro_book;
 extern struct building *tavern_building;
@@ -125,27 +125,27 @@ extern int weight_total;
 extern struct location *current_location;
 extern struct character *player_character;
 extern int game_minutes;
-extern char D_00195C44[];
+extern char scratch_buffer[];
 extern char D_00195D28[];
-extern int D_00195D2C;
-extern int D_00195D30;
+extern int trade_total;
+extern int trade_price;
 extern int quest_potential_questor;
-extern char D_00195D6C[];
-extern int D_00195D78;
-extern int D_00195D94;
-extern int D_00195DB0;
+extern char text_rsc_file[];
+extern int text_rsc_main_file;
+extern int text_macro_city;
+extern int text_macro_travel_city;
 extern short painting_subject_text;
 extern short painting_adjective_text;
 extern short painting_prefix1_text;
 extern short painting_prefix2_text;
 extern short spell_effect_slot;
 extern short text_macro_n_text;
-extern signed char D_00196266;
+extern signed char text_macro_imperial;
 extern signed char D_00196267;
 extern signed char current_region;
 extern signed char D_00196269;
 extern signed char D_0019626C;
-extern signed char D_0019628F;
+extern signed char text_macro_gender;
 extern signed char D_001962AE;
 extern char talk_key_text[];
 extern char D_00196661[];
@@ -160,9 +160,9 @@ extern short D_00196D7E;
 extern short D_00196D80;
 extern short D_00196D82;
 extern short D_00196D84;
-extern int D_00199640;
+extern int text_macro_skill;
 extern int parse_name_seed;
-extern int D_00199734;
+extern int parse_number;
 extern struct membership *guild_membership;
 
 extern int talk_macro_hint(int);
@@ -170,18 +170,18 @@ extern int talk_macro_1com(void);
 extern struct faction *faction_find_type_in_region(int, short);
 extern int faction_find(short);
 extern int text_rsc_load(int, int, int);
-extern int func_0004A07F(int, signed char);
+extern int parse_regional_name(int, signed char);
 extern int parse_town_building_name(short);
 extern int calendar_format_date(int, int);
-extern int func_0004CF37(int);
+extern int item_armor_value(int);
 extern int flats_cfg_find(int);
 extern int enchant_powers_text(int);
 extern struct membership *guild_find_membership_by_bits(unsigned char);
 extern int rand_range(int, int);
 extern int object_building(int);
 extern int carry_capacity(void);
-extern int func_0008B43B(unsigned char, unsigned char, int);
-extern int func_0008B48B(int);
+extern int name_generate_seeded(unsigned char, unsigned char, int);
+extern int npc_display_name(int);
 extern int name_generate(unsigned char, unsigned char);
 extern int building_name(int);
 extern int rand();
@@ -190,14 +190,14 @@ extern int mc_free();
 extern int mc_strncpy();
 extern int atoi();
 extern int utoa();
-extern int func_000A0DD9();
-extern int func_000A0DF4();
-extern int func_000A0ED9(int, int);
+extern int itoa();
+extern int strlen();
+extern int mc_set_location(int, int);
 extern int mc_sprintf(int, ...);
 extern int strchr();
-extern int func_000C808D();
-extern int func_000CE3E3();
-extern int func_000CE44C();
+extern int xn_math_angle_to_point();
+extern int xn_str_copy_word();
+extern int xn_str_find_u32();
 extern void parse_expand(int, int);
 extern void object_foreach(struct record *, int);
 int macro_dat_date(void);
@@ -208,58 +208,58 @@ int parse_bio_answer_text(int);
 int parse_signed_itoa(int, int, int);
 int object_weight(struct record *);
 int parse_stub_zero(int);
-int func_0004A8DB(int, int);
+int holiday_index(int, int);
 int holiday_name(int, int);
 void object_weight_add(struct record *);
 void parse_item_name(struct item *, int);
 void parse_rsc_text(int, int, int);
-#pragma aux func_000A0ED9 parm routine [];
+#pragma aux mc_set_location parm routine [];
 
-int func_000466C6(void)
+int macro_fal_faction_name(void)
 {
     return (int)D_00196724->name;
 }
 
 int macro_a_price(void)
 {
-    return func_000A0DD9(D_00195D30, (int)text_rsc_buffer, 10);
+    return itoa(trade_price, (int)text_rsc_buffer, 10);
 }
 
 int macro_agi_agility(void)
 {
-    return func_000A0DD9(player_character->attributes[3], (int)text_rsc_buffer, 10);
+    return itoa(player_character->attributes[3], (int)text_rsc_buffer, 10);
 }
 
-int func_00046754(void)
+int macro_ap_other_province(void)
 {
     return D_0017D042[((int)(unsigned char)(D_00196267 ^ 1))];
 }
 
 int macro_arm_item_name(void)
 {
-    if (D_00195A80->enchantments[0].type == (-1)) return (int)D_00195A80;
-    parse_item_name(D_00195A80, (int)text_rsc_buffer);
+    if (text_macro_item->enchantments[0].type == (-1)) return (int)text_macro_item;
+    parse_item_name(text_macro_item, (int)text_rsc_buffer);
     return (int)text_rsc_buffer;
 }
 
 int macro_ach_chance_per_level(void)
 {
-    return func_000A0DD9((int)selected_spell->chances[(int)(short)spell_effect_slot].plus, (int)text_rsc_buffer, 10);
+    return itoa((int)selected_spell->chances[(int)(short)spell_effect_slot].plus, (int)text_rsc_buffer, 10);
 }
 
 int macro_adr_duration_per_level(void)
 {
-    return func_000A0DD9((int)selected_spell->durations[(int)(short)spell_effect_slot].plus, (int)text_rsc_buffer, 10);
+    return itoa((int)selected_spell->durations[(int)(short)spell_effect_slot].plus, (int)text_rsc_buffer, 10);
 }
 
 int macro_1am_magnitude_per_level_min(void)
 {
-    return func_000A0DD9((int)selected_spell->magnitudes[(int)(short)spell_effect_slot].plus_min, (int)text_rsc_buffer, 10);
+    return itoa((int)selected_spell->magnitudes[(int)(short)spell_effect_slot].plus_min, (int)text_rsc_buffer, 10);
 }
 
 int macro_2am_magnitude_per_level_max(void)
 {
-    return func_000A0DD9((int)selected_spell->magnitudes[(int)(short)spell_effect_slot].plus_max, (int)text_rsc_buffer, 10);
+    return itoa((int)selected_spell->magnitudes[(int)(short)spell_effect_slot].plus_max, (int)text_rsc_buffer, 10);
 }
 
 int macro_ark_attribute_rating(void)
@@ -282,12 +282,12 @@ int macro_an_artist_name(void)
     return name_generate((int)(unsigned char)(rand() & 7), (int)(unsigned char)(rand() & 1));
 }
 
-int func_000469B4(void)
+int macro_alc_faction_name(void)
 {
     return (int)D_00196728->name;
 }
 
-int func_000469DA(void)
+int macro_alf_faction_name(void)
 {
     return (int)D_00196728->name;
 }
@@ -296,13 +296,13 @@ int macro_mod_armor_modifier(void)
 {
     int l_1C;
 
-    if (D_00195A80->index >= 7) {
-        return parse_signed_itoa(D_00195A80->index - 6, (int)text_rsc_buffer, 10);
+    if (text_macro_item->index >= 7) {
+        return parse_signed_itoa(text_macro_item->index - 6, (int)text_rsc_buffer, 10);
     }
-    return parse_signed_itoa(func_0004CF37((int)D_00195A80) / 10, (int)text_rsc_buffer, 10);
+    return parse_signed_itoa(item_armor_value((int)text_macro_item) / 10, (int)text_rsc_buffer, 10);
 }
 
-int func_00046A7F(void)
+int macro_brd_regional_name(void)
 {
     int l_24;
     int l_20;
@@ -318,22 +318,22 @@ int func_00046A7F(void)
 
 int macro_bch_base_chance(void)
 {
-    return func_000A0DD9((int)selected_spell->chances[(int)(short)spell_effect_slot].base, (int)text_rsc_buffer, 10);
+    return itoa((int)selected_spell->chances[(int)(short)spell_effect_slot].base, (int)text_rsc_buffer, 10);
 }
 
 int macro_bdr_base_duration(void)
 {
-    return func_000A0DD9((int)selected_spell->durations[(int)(short)spell_effect_slot].base, (int)text_rsc_buffer, 10);
+    return itoa((int)selected_spell->durations[(int)(short)spell_effect_slot].base, (int)text_rsc_buffer, 10);
 }
 
 int macro_1bm_base_magnitude_min(void)
 {
-    return func_000A0DD9((int)selected_spell->magnitudes[(int)(short)spell_effect_slot].base_min, (int)text_rsc_buffer, 10);
+    return itoa((int)selected_spell->magnitudes[(int)(short)spell_effect_slot].base_min, (int)text_rsc_buffer, 10);
 }
 
 int macro_2bm_base_magnitude_max(void)
 {
-    return func_000A0DD9((int)selected_spell->magnitudes[(int)(short)spell_effect_slot].base_max, (int)text_rsc_buffer, 10);
+    return itoa((int)selected_spell->magnitudes[(int)(short)spell_effect_slot].base_max, (int)text_rsc_buffer, 10);
 }
 
 int macro_bt_book_title(void)
@@ -348,8 +348,8 @@ int macro_ba_book_author(void)
 
 int macro_cn_city_name(void)
 {
-    if (D_00195D94 != 0) return D_00195D94;
-    if (D_00195AC4->image != 65535) return (int)current_location;
+    if (text_macro_city != 0) return text_macro_city;
+    if (location_object->image != 65535) return (int)current_location;
     return *(int *)(region_names + (((int)(unsigned char)current_region) << 2));
 }
 
@@ -365,30 +365,30 @@ int macro_ct_location_type(void)
 
 int macro_clc_chance_levels(void)
 {
-    return func_000A0DD9((int)selected_spell->chances[(int)(short)spell_effect_slot].per_level, (int)text_rsc_buffer, 10);
+    return itoa((int)selected_spell->chances[(int)(short)spell_effect_slot].per_level, (int)text_rsc_buffer, 10);
 }
 
 int macro_cld_duration_levels(void)
 {
-    return func_000A0DD9((int)selected_spell->durations[(int)(short)spell_effect_slot].per_level, (int)text_rsc_buffer, 10);
+    return itoa((int)selected_spell->durations[(int)(short)spell_effect_slot].per_level, (int)text_rsc_buffer, 10);
 }
 
 int macro_clm_magnitude_levels(void)
 {
-    return func_000A0DD9((int)selected_spell->magnitudes[(int)(short)spell_effect_slot].per_level, (int)text_rsc_buffer, 10);
+    return itoa((int)selected_spell->magnitudes[(int)(short)spell_effect_slot].per_level, (int)text_rsc_buffer, 10);
 }
 
-int func_00046E42(void)
+int macro_cti_item_value_tenth(void)
 {
-    return func_000A0DD9(((unsigned)D_00195A80->value) / 10, (int)text_rsc_buffer, 10);
+    return itoa(((unsigned)text_macro_item->value) / 10, (int)text_rsc_buffer, 10);
 }
 
-int func_00046E82(void)
+int macro_cne_faction_name(void)
 {
     return (int)D_00196728->name;
 }
 
-int func_00046EA8(void)
+int macro_cnr_faction_name(void)
 {
     return (int)D_00196720->name;
 }
@@ -413,7 +413,7 @@ int macro_dae_daedra_name(void)
     return (int)D_0019671C->name;
 }
 
-int func_00046F78(void)
+int macro_dnc_regional_name(void)
 {
     int l_24;
     int l_20;
@@ -434,10 +434,10 @@ int macro_dam_damage_modifier(void)
 
 int macro_dwr_room_hours_left(void)
 {
-    return func_000A0DD9(((unsigned)(tavern_building->rent_expires - game_minutes)) / 60, (int)text_rsc_buffer, 10);
+    return itoa(((unsigned)(tavern_building->rent_expires - game_minutes)) / 60, (int)text_rsc_buffer, 10);
 }
 
-int func_00047094(void)
+int macro_dpr_other_random_province(void)
 {
     int l_1C;
 
@@ -448,7 +448,7 @@ int func_00047094(void)
 
 int macro_di_direction(void)
 {
-    return direction_names[((((func_000C808D(player_object->x, player_object->z, D_00195A90, D_00195A94) >> 2) + 32) & 511) >> 6)];
+    return direction_names[((((xn_math_angle_to_point(player_object->x, player_object->z, D_00195A90, D_00195A94) >> 2) + 32) & 511) >> 6)];
 }
 
 int macro_du_blank(void)
@@ -473,17 +473,17 @@ int macro_dat_date(void)
     } else {
         l_1C = l_28;
     }
-    func_000A0ED9(431, (int)D_0017110C);
+    mc_set_location(431, (int)D_0017110C);
     mc_sprintf((int)text_rsc_buffer, (int)D_00171134, day_names[l_2C], l_28 + 1, ordinal_suffixes[l_1C], month_names[l_24]);
     return (int)text_rsc_buffer;
 }
 
 int macro_dip_days_in_prison(void)
 {
-    return func_000A0DD9((int)(short)court_prison_days, (int)text_rsc_buffer, 10);
+    return itoa((int)(short)court_prison_days, (int)text_rsc_buffer, 10);
 }
 
-int func_00047271(void)
+int macro_dbl_brotherhood_building(void)
 {
     int l_1C;
 
@@ -499,32 +499,32 @@ int func_00047271(void)
 
 int macro_dbp_codeword(void)
 {
-    func_000A0ED9(454, (int)D_0017110C);
+    mc_set_location(454, (int)D_0017110C);
     mc_sprintf((int)text_rsc_buffer, (int)D_0017114E, codeword_first_words[(player_character->codeword >> 4)], codeword_second_words[((int)(unsigned char)(player_character->codeword & 15))]);
     return (int)text_rsc_buffer;
 }
 
-int func_00047373(void)
+int macro_dtr_days_left(void)
 {
-    return func_000A0DD9(((unsigned)((D_00195AA8->repair_due - game_minutes) + 1439)) / 1440, (int)text_rsc_buffer, 10);
+    return itoa(((unsigned)((D_00195AA8->repair_due - game_minutes) + 1439)) / 1440, (int)text_rsc_buffer, 10);
 }
 
-int func_000473BE(void)
+int macro_da_trade_total(void)
 {
-    return func_000A0DD9(D_00195D2C, (int)text_rsc_buffer, 10);
+    return itoa(trade_total, (int)text_rsc_buffer, 10);
 }
 
 int macro_enc_max_encumbrance(void)
 {
-    return func_000A0DD9(carry_capacity(), (int)text_rsc_buffer, 10);
+    return itoa(carry_capacity(), (int)text_rsc_buffer, 10);
 }
 
 int macro_end_endurance(void)
 {
-    return func_000A0DD9(player_character->attributes[4], (int)text_rsc_buffer, 10);
+    return itoa(player_character->attributes[4], (int)text_rsc_buffer, 10);
 }
 
-int func_00047458(void)
+int macro_enf_faction_name(void)
 {
     return (int)D_00196728->name;
 }
@@ -574,23 +574,23 @@ int macro_fn2_female_name2(void)
     return l_1C;
 }
 
-int func_000475C9(void)
+int macro_fln_faction_child_name(void)
 {
     if (D_00196720->child != 0) return (int)D_00196720->child->name;
     return text_blank;
 }
 
-int func_00047607(void)
+int macro_foe_faction_name(void)
 {
     return (int)D_00196728->name;
 }
 
-int func_0004762D(void)
+int macro_fxn_faction_name(void)
 {
     return (int)D_00196720->name;
 }
 
-int func_00047653(void)
+int macro_fac1_key_text(void)
 {
     return (int)talk_key_text;
 }
@@ -643,47 +643,47 @@ int macro_fcn_building_town(void)
 
 int macro_fpc_player_faction(void)
 {
-    return *(int *)text_macro_fpc + 3;
+    return *(int *)scratch_190de4 + 3;
 }
 
 int macro_fnpc_npc_faction(void)
 {
-    return text_macro_fnpc + 3;
+    return scratch_190de8 + 3;
 }
 
 int macro_fe_shared_enemy(void)
 {
-    return text_macro_fe + 3;
+    return scratch_190dec + 3;
 }
 
 int macro_fa_shared_ally(void)
 {
-    return *(int *)text_macro_fa + 3;
+    return *(int *)scratch_190df0 + 3;
 }
 
 int macro_fea_player_enemy_npc_ally(void)
 {
-    return text_macro_fea + 3;
+    return scratch_190df8 + 3;
 }
 
 int macro_fpa_shared_faction(void)
 {
-    return text_macro_fpa + 3;
+    return scratch_190dfc + 3;
 }
 
 int macro_g_pronoun_he(void)
 {
-    return pronoun_he[((int)(unsigned char)D_0019628F)];
+    return pronoun_he[((int)(unsigned char)text_macro_gender)];
 }
 
 int macro_g2_pronoun_him(void)
 {
-    return pronoun_him[((int)(unsigned char)D_0019628F)];
+    return pronoun_him[((int)(unsigned char)text_macro_gender)];
 }
 
 int macro_g3_pronoun_his(void)
 {
-    return pronoun_his[((int)(unsigned char)D_0019628F)];
+    return pronoun_his[((int)(unsigned char)text_macro_gender)];
 }
 
 int macro_gii_gold_carried(void)
@@ -693,7 +693,7 @@ int macro_gii_gold_carried(void)
 
 int macro_gtp_fine(void)
 {
-    return func_000A0DD9(D_00190CAC, (int)text_rsc_buffer, 10);
+    return itoa(D_00190CAC, (int)text_rsc_buffer, 10);
 }
 
 int macro_gdd_temple_god(void)
@@ -718,7 +718,7 @@ int macro_god_local_god(void)
     return text_blank;
 }
 
-int func_00047B2F(void)
+int parse_unused_biography_name(void)
 {
     int l_20;
     int l_1C;
@@ -739,7 +739,7 @@ int macro_tim_time(void)
     l_24 = ((unsigned)game_minutes) % 1440;
     l_20 = l_24 / 60;
     l_1C = l_24 % 60;
-    func_000A0ED9(728, (int)D_0017110C);
+    mc_set_location(728, (int)D_0017110C);
     mc_sprintf((int)text_rsc_buffer, (int)D_00171154, l_20, l_1C);
     return (int)text_rsc_buffer;
 }
@@ -760,7 +760,7 @@ int macro_hod_holiday_description(void)
 {
     int l_1C;
 
-    l_1C = func_0004A8DB(game_minutes, (int)(unsigned char)current_region);
+    l_1C = holiday_index(game_minutes, (int)(unsigned char)current_region);
     parse_rsc_text(l_1C + 8350, 0, 0);
     return (int)text_rsc_buffer;
 }
@@ -796,9 +796,9 @@ int macro_hnt2_hint2(void)
     return l_1C;
 }
 
-int func_00047DD1(void)
+int macro_hip_hours_in_prison(void)
 {
-    return func_000A0DD9(((int)(short)court_prison_days) * 24, (int)text_rsc_buffer, 10);
+    return itoa(((int)(short)court_prison_days) * 24, (int)text_rsc_buffer, 10);
 }
 
 int macro_hpn_home_province(void)
@@ -829,17 +829,17 @@ int macro_hnr_honorific(void)
 
 int macro_int_intelligence(void)
 {
-    return func_000A0DD9(player_character->attributes[1], (int)text_rsc_buffer, 10);
+    return itoa(player_character->attributes[1], (int)text_rsc_buffer, 10);
 }
 
 int macro_imp_imperial_name(void)
 {
-    return imperial_names[((int)(unsigned char)D_00196266)];
+    return imperial_names[((int)(unsigned char)text_macro_imperial)];
 }
 
-int func_00047F72(void)
+int macro_itr_item_name_raw(void)
 {
-    return (int)D_00195A80;
+    return (int)text_macro_item;
 }
 
 int macro_kg_weight(void)
@@ -848,10 +848,10 @@ int macro_kg_weight(void)
 
     l_1C = object_weight(D_00195AA8);
     if ((l_1C & 3) != 0) {
-        func_000A0ED9(847, (int)D_0017110C);
+        mc_set_location(847, (int)D_0017110C);
         mc_sprintf((int)text_rsc_buffer, (int)D_0017116D, l_1C >> 2, weight_fractions[(l_1C & 3)]);
     } else {
-        func_000A0ED9(849, (int)D_0017110C);
+        mc_set_location(849, (int)D_0017110C);
         mc_sprintf((int)text_rsc_buffer, (int)D_00171173, l_1C >> 2);
     }
     return (int)text_rsc_buffer;
@@ -864,7 +864,7 @@ int macro_pow_blank(void)
 
 int macro_wth_worth(void)
 {
-    return func_000A0DD9(D_00195A80->value, (int)text_rsc_buffer, 10);
+    return itoa(text_macro_item->value, (int)text_rsc_buffer, 10);
 }
 
 int macro_jok_joke(void)
@@ -893,25 +893,25 @@ int macro_key2_topic2(void)
     return (int)D_00196661;
 }
 
-int func_00048160(void)
+int macro_lp_local_province(void)
 {
     return D_0017D042[((int)(unsigned char)D_00196267)];
 }
 
 int macro_luc_luck(void)
 {
-    return func_000A0DD9(player_character->attributes[7], (int)text_rsc_buffer, 10);
+    return itoa(player_character->attributes[7], (int)text_rsc_buffer, 10);
 }
 
-int func_000481C4(void)
+int macro_la_number(void)
 {
-    return func_000A0DD9(D_00190BEC, (int)text_rsc_buffer, 10);
+    return itoa(D_00190BEC, (int)text_rsc_buffer, 10);
 }
 
 int macro_lev_guild_rank(void)
 {
     if ((int)guild_membership != 0) {
-        return *(int *)((char *)(int)(D_0017CEF2[((int)(unsigned char)(guild_membership->kind & 63))] + (guild_membership->rank << 2)));
+        return *(int *)((char *)(int)(faction_rank_names[((int)(unsigned char)(guild_membership->kind & 63))] + (guild_membership->rank << 2)));
     }
     return macro_pcn_player_name();
 }
@@ -921,7 +921,7 @@ int macro_lt1_faction1_ruler_title(void)
     return parse_faction_ruler_title(D_0019671C);
 }
 
-int func_0004827C(void)
+int macro_lt2_faction2_ruler_title(void)
 {
     return parse_faction_ruler_title(D_0019670C);
 }
@@ -943,7 +943,7 @@ int macro_ltn_legal_standing(void)
     } else if (l_20 > 100) {
         l_20 = 100;
     }
-    while (l_20 < *(int *)(D_0017C54E + (l_1C << 3)) || l_20 > *(int *)(D_0017C552 + (l_1C << 3))) {
+    while (l_20 < *(int *)(legal_reputation_ranges + (l_1C << 3)) || l_20 > *(int *)(D_0017C552 + (l_1C << 3))) {
         l_1C++;
     }
     return legal_reputation_names[l_1C];
@@ -951,29 +951,29 @@ int macro_ltn_legal_standing(void)
 
 int macro_mad_magic_resist(void)
 {
-    return func_000A0DD9(player_character->attributes[2] / 10, (int)text_rsc_buffer, 10);
+    return itoa(player_character->attributes[2] / 10, (int)text_rsc_buffer, 10);
 }
 
 int macro_mat_material(void)
 {
-    if (D_00195A80->group == 2 && (D_00195A80->index >= 7 || D_00195A80->index == 5)) {
+    if (text_macro_item->group == 2 && (text_macro_item->index >= 7 || text_macro_item->index == 5)) {
         return (int)D_00171177;
     }
-    if (D_00195A80->group == 2 && D_00195A80->armor_type != 2) {
-        return *(int *)(armor_type_names + (D_00195A80->armor_type << 2));
+    if (text_macro_item->group == 2 && text_macro_item->armor_type != 2) {
+        return *(int *)(armor_type_names + (text_macro_item->armor_type << 2));
     }
-    return *(int *)(material_names + (D_00195A80->material << 2));
+    return *(int *)(material_names + (text_macro_item->material << 2));
 }
 
-int func_0004845B(void)
+int macro_mit_item_name_raw(void)
 {
-    return (int)D_00195A80;
+    return (int)text_macro_item;
 }
 
 int macro_it_item_name(void)
 {
-    if (D_00195A80->enchantments[0].type == (-1)) return (int)D_00195A80;
-    parse_item_name(D_00195A80, (int)text_rsc_buffer);
+    if (text_macro_item->enchantments[0].type == (-1)) return (int)text_macro_item;
+    parse_item_name(text_macro_item, (int)text_rsc_buffer);
     return (int)text_rsc_buffer;
 }
 
@@ -1006,7 +1006,7 @@ int macro_mn2_male_name2(void)
     return l_1C;
 }
 
-int func_00048596(void)
+int macro_mwz_name(void)
 {
     int l_20;
     int l_1C;
@@ -1020,24 +1020,24 @@ int func_00048596(void)
 
 int macro_ml_max_loan(void)
 {
-    return func_000A0DD9(player_character->level * 50000, (int)text_rsc_buffer, 10);
+    return itoa(player_character->level * 50000, (int)text_rsc_buffer, 10);
 }
 
 int macro_map_map_location(void)
 {
     int l_1C;
 
-    l_1C = D_00190EAC;
+    l_1C = text_macro_map_location;
     return *(int *)((char *)l_1C + 16);
 }
 
 int macro_mpw_magic_powers(void)
 {
-    if (((int)(unsigned short)(D_00195A80->item_flags & 2048)) != 0) {
-        parse_rsc_text(D_00195A80->enchantments[9].param + 8700, 0, 0);
+    if (((int)(unsigned short)(text_macro_item->item_flags & 2048)) != 0) {
+        parse_rsc_text(text_macro_item->enchantments[9].param + 8700, 0, 0);
         return (int)text_rsc_buffer;
     }
-    return enchant_powers_text((int)D_00195A80);
+    return enchant_powers_text((int)text_macro_item);
 }
 
 int macro_nh_holiday_name(void)
@@ -1047,7 +1047,7 @@ int macro_nh_holiday_name(void)
 
 int macro_nhd_holiday_date(void)
 {
-    return calendar_format_date(((int)(short)holiday_days[func_0004A8DB(game_minutes, (int)(unsigned char)current_region)]) * 1440, (int)text_rsc_buffer);
+    return calendar_format_date(((int)(short)holiday_days[holiday_index(game_minutes, (int)(unsigned char)current_region)]) * 1440, (int)text_rsc_buffer);
 }
 
 int macro_nt_nearby_tavern(void)
@@ -1067,7 +1067,7 @@ int macro_n_npc_name(void)
         return (int)text_rsc_buffer;
     }
     if (((struct bf8_2_1 *)&D_001940D7)->f != 0) return name_generate(8, 0);
-    if ((int)D_00195A84 != 0) return (int)D_00195A84;
+    if ((int)text_macro_npc != 0) return (int)text_macro_npc;
     return name_generate((int)(unsigned char)D_001841E3[(int)(unsigned char)current_region], (int)(unsigned char)(rand() & 1));
 }
 
@@ -1076,7 +1076,7 @@ int macro_nrn_regional_noble(void)
     return macro_fl1_faction1_leader();
 }
 
-int func_0004883F(void)
+int macro_fop_faction_name(void)
 {
     return (int)D_00196714->name;
 }
@@ -1128,12 +1128,12 @@ int macro_pcf_player_first_name(void)
 
 int macro_per_personality(void)
 {
-    return func_000A0DD9(player_character->attributes[5], (int)text_rsc_buffer, 10);
+    return itoa(player_character->attributes[5], (int)text_rsc_buffer, 10);
 }
 
 int macro_po_potion_name(void)
 {
-    func_000A0ED9(1157, (int)D_0017110C);
+    mc_set_location(1157, (int)D_0017110C);
     mc_sprintf((int)text_rsc_buffer, (int)D_00171178, D_00195ACC + 67);
     return (int)text_rsc_buffer;
 }
@@ -1150,7 +1150,7 @@ int macro_pp2_painting_prefix2(void)
     return (int)text_rsc_buffer;
 }
 
-int func_00048AE3(void)
+int macro_prg_persecuted_temple(void)
 {
     int l_1C;
 
@@ -1160,17 +1160,17 @@ int func_00048AE3(void)
 
 int macro_pen_penalty(void)
 {
-    if (((int)(signed char)D_00190D16) == 2) {
-        parse_expand(D_00184269, *(int *)D_00195C44);
+    if (((int)(signed char)scratch_190d16) == 2) {
+        parse_expand(D_00184269, *(int *)scratch_buffer);
     } else {
-        mc_strncpy(*(int *)D_00195C44, penalty_texts[((int)(signed char)D_00190D16)], 4, (int)D_0017110C, 1182);
+        mc_strncpy(*(int *)scratch_buffer, penalty_texts[((int)(signed char)scratch_190d16)], 4, (int)D_0017110C, 1182);
     }
-    return *(int *)D_00195C44;
+    return *(int *)scratch_buffer;
 }
 
 int macro_pdg_more_prison_days(void)
 {
-    return func_000A0DD9((int)(short)D_00190DCA, (int)text_rsc_buffer, 10);
+    return itoa((int)(short)court_extra_days, (int)text_rsc_buffer, 10);
 }
 
 int macro_prn_prison_name(void)
@@ -1183,7 +1183,7 @@ int macro_prn_prison_name(void)
 
 int macro_pqn_questor_name(void)
 {
-    return func_0008B48B(quest_potential_questor);
+    return npc_display_name(quest_potential_questor);
 }
 
 int macro_pqp_questor_place(void)
@@ -1219,14 +1219,14 @@ int macro_pn_blank(void)
     return text_blank;
 }
 
-int func_00048D21(void)
+int macro_prg2_persecuted_temple(void)
 {
-    return faction_find((int)(short)*(short *)(D_0018F090 + (D_0019671C->region * 80))) + 3;
+    return faction_find((int)(short)*(short *)(region_persecuted_temple + (D_0019671C->region * 80))) + 3;
 }
 
-int macro_ptm_region_enemy_faction(void)
+int macro_ptm_persecuted_temple(void)
 {
-    return faction_find((int)(short)*(short *)(D_0018F090 + (D_0019671C->region * 80))) + 3;
+    return faction_find((int)(short)*(short *)(region_persecuted_temple + (D_0019671C->region * 80))) + 3;
 }
 
 int macro_qua_condition(void)
@@ -1235,8 +1235,8 @@ int macro_qua_condition(void)
     unsigned char l_18;
 
     l_18 = 0;
-    if (D_00195A80->max_condition != 0) {
-        l_1C = (D_00195A80->condition * 100) / D_00195A80->max_condition;
+    if (text_macro_item->max_condition != 0) {
+        l_1C = (text_macro_item->condition * 100) / text_macro_item->max_condition;
     } else {
         l_1C = 0;
     }
@@ -1486,7 +1486,7 @@ int macro_rn_ruler_name(void)
     l_1C = faction_find_type_in_region((int)(short)((int)(unsigned char)current_region), 7);
     if (l_1C->child != 0 && l_1C->child->type == 4) return (int)l_1C->child->name;
     l_1C = faction_find_type_in_region((int)(short)((int)(unsigned char)current_region), 14);
-    return func_0008B43B((int)(unsigned char)D_001841E3[(int)(unsigned char)current_region], (int)(unsigned char)(l_1C->region & 1), l_1C->seed & 65535);
+    return name_generate_seeded((int)(unsigned char)D_001841E3[(int)(unsigned char)current_region], (int)(unsigned char)(l_1C->region & 1), l_1C->seed & 65535);
 }
 
 int macro_r1_commoners_change(void)
@@ -1526,22 +1526,22 @@ int macro_r5_underworld_change(void)
 
 int macro_spc_magicka(void)
 {
-    return func_000A0DD9(player_character->magicka, (int)text_rsc_buffer, 10);
+    return itoa(player_character->magicka, (int)text_rsc_buffer, 10);
 }
 
 int macro_spt_max_magicka(void)
 {
-    return func_000A0DD9(player_character->max_magicka, (int)text_rsc_buffer, 10);
+    return itoa(player_character->max_magicka, (int)text_rsc_buffer, 10);
 }
 
 int macro_spd_speed(void)
 {
-    return func_000A0DD9(player_character->attributes[6], (int)text_rsc_buffer, 10);
+    return itoa(player_character->attributes[6], (int)text_rsc_buffer, 10);
 }
 
 int macro_str_strength(void)
 {
-    return func_000A0DD9(player_character->attributes[0], (int)text_rsc_buffer, 10);
+    return itoa(player_character->attributes[0], (int)text_rsc_buffer, 10);
 }
 
 int macro_sub_painting_subject(void)
@@ -1550,24 +1550,24 @@ int macro_sub_painting_subject(void)
     return (int)text_rsc_buffer;
 }
 
-int func_0004992E(void)
+int macro_fac2_key2_text(void)
 {
     return (int)D_00196661;
 }
 
-int func_00049950(void)
+int parse_unused_price_text(void)
 {
-    return func_000A0DD9(D_00195D30, (int)text_rsc_buffer, 10);
+    return itoa(trade_price, (int)text_rsc_buffer, 10);
 }
 
 int macro_ski_skill_name(void)
 {
-    return *(int *)(skill_names + (D_00199640 << 2));
+    return *(int *)(skill_names + (text_macro_skill << 2));
 }
 
 int macro_oth_oath(void)
 {
-    parse_rsc_text(D_00195A84->race + 201, 0, 0);
+    parse_rsc_text(text_macro_npc->race + 201, 0, 0);
     return (int)text_rsc_buffer;
 }
 
@@ -1603,7 +1603,7 @@ int func_00049AE7(void)
 
 int macro_tcn_travel_city(void)
 {
-    return D_00195DB0;
+    return text_macro_travel_city;
 }
 
 int macro_vam_vampire_clan(void)
@@ -1613,7 +1613,7 @@ int macro_vam_vampire_clan(void)
 
 int macro_wil_willpower(void)
 {
-    return func_000A0DD9(player_character->attributes[2], (int)text_rsc_buffer, 10);
+    return itoa(player_character->attributes[2], (int)text_rsc_buffer, 10);
 }
 
 int macro_wdm_weapon_damage(void)
@@ -1623,21 +1623,21 @@ int macro_wdm_weapon_damage(void)
     int l_20;
     int l_1C;
 
-    l_28 = D_00195A80->index;
-    l_24 = ((int)(short)*(short *)(material_to_hit + (D_00195A80->material * 2))) / 5;
+    l_28 = text_macro_item->index;
+    l_24 = ((int)(short)*(short *)(material_to_hit + (text_macro_item->material * 2))) / 5;
     l_20 = l_24 + ((int)(short)*(short *)(weapon_damage_min + (l_28 << 2)));
     l_1C = l_24 + ((int)(short)*(short *)(weapon_damage_max + (l_28 << 2)));
     if (l_20 < 0) l_20 = 0;
     if (l_1C < 0) l_1C = 0;
-    func_000A0ED9(1687, (int)D_0017110C);
+    mc_set_location(1687, (int)D_0017110C);
     mc_sprintf((int)text_rsc_buffer, (int)D_0017119C, l_20, l_1C);
     return (int)text_rsc_buffer;
 }
 
 int macro_wep_weapon_name(void)
 {
-    if (D_00195A80->enchantments[0].type == (-1)) return (int)D_00195A80;
-    parse_item_name(D_00195A80, (int)text_rsc_buffer);
+    if (text_macro_item->enchantments[0].type == (-1)) return (int)text_macro_item;
+    parse_item_name(text_macro_item, (int)text_rsc_buffer);
     return (int)text_rsc_buffer;
 }
 
@@ -1650,86 +1650,86 @@ int macro_wpn_poison(void)
     return *(int *)(D_00182F92 + (l_1C->id << 2));
 }
 
-int func_00049D0C(void)
+int macro_12m_number(void)
 {
-    return func_000A0DD9(automap_yaw, (int)text_rsc_buffer, 10);
+    return itoa(automap_yaw, (int)text_rsc_buffer, 10);
 }
 
-int func_00049D3E(void)
+int macro_12f_number(void)
 {
-    return func_000A0DD9(D_00190BF8, (int)text_rsc_buffer, 10);
+    return itoa(D_00190BF8, (int)text_rsc_buffer, 10);
 }
 
-int func_00049D70(void)
+int macro_36m_number(void)
 {
-    return func_000A0DD9(D_00190BFC, (int)text_rsc_buffer, 10);
+    return itoa(D_00190BFC, (int)text_rsc_buffer, 10);
 }
 
-int func_00049DA2(void)
+int macro_36f_number(void)
 {
-    return func_000A0DD9(D_00190C00, (int)text_rsc_buffer, 10);
+    return itoa(D_00190C00, (int)text_rsc_buffer, 10);
 }
 
-int func_00049DD4(void)
+int macro_1hn_hero1_name(void)
 {
     if (D_00190CD4 == 0) {
-        func_000CE3E3((int)text_rsc_buffer, (int)player_character);
+        xn_str_copy_word((int)text_rsc_buffer, (int)player_character);
         return (int)text_rsc_buffer;
     }
-    return func_0004A07F(D_00190CD4, (int)(signed char)D_00190D20);
+    return parse_regional_name(D_00190CD4, (int)(signed char)scratch_190d20);
 }
 
-int func_00049E25(void)
+int macro_1g1_hero1_he(void)
 {
-    return pronoun_he[((int)(signed char)D_00190D20)];
+    return pronoun_he[((int)(signed char)scratch_190d20)];
 }
 
-int func_00049E53(void)
+int macro_1g2_hero1_him(void)
 {
-    return pronoun_him[((int)(signed char)D_00190D20)];
+    return pronoun_him[((int)(signed char)scratch_190d20)];
 }
 
-int func_00049E81(void)
+int macro_1g3_hero1_his(void)
 {
-    return pronoun_his[((int)(signed char)D_00190D20)];
+    return pronoun_his[((int)(signed char)scratch_190d20)];
 }
 
-int func_00049EAF(void)
+int macro_2hn_hero2_name(void)
 {
-    return func_0004A07F(D_00190CD8, (int)(signed char)D_00190D21);
+    return parse_regional_name(D_00190CD8, (int)(signed char)D_00190D21);
 }
 
-int func_00049EDE(void)
+int macro_2g1_hero2_he(void)
 {
     return pronoun_he[((int)(signed char)D_00190D21)];
 }
 
-int func_00049F0C(void)
+int macro_2g2_hero2_him(void)
 {
     return pronoun_him[((int)(signed char)D_00190D21)];
 }
 
-int func_00049F3A(void)
+int macro_2g3_hero2_his(void)
 {
     return pronoun_his[((int)(signed char)D_00190D21)];
 }
 
-int func_00049F68(void)
+int macro_3hn_hero3_name(void)
 {
-    return func_0004A07F(D_00190CDC, (int)(signed char)D_00190D22);
+    return parse_regional_name(D_00190CDC, (int)(signed char)D_00190D22);
 }
 
-int func_00049F97(void)
+int macro_3g1_hero3_he(void)
 {
     return pronoun_he[((int)(signed char)D_00190D22)];
 }
 
-int func_00049FC5(void)
+int macro_3g2_hero3_him(void)
 {
     return pronoun_him[((int)(signed char)D_00190D22)];
 }
 
-int func_00049FF3(void)
+int macro_3g3_hero3_his(void)
 {
     return pronoun_his[((int)(signed char)D_00190D22)];
 }
@@ -1745,7 +1745,7 @@ int parse_bio_answer_text(int a1)
     return (int)text_rsc_buffer;
 }
 
-int func_0004A1A2(int a1)
+int parse_read_number(int a1)
 {
     int l_24;
     int l_20;
@@ -1763,7 +1763,7 @@ int func_0004A1A2(int a1)
             l_20++;
         }
         *(signed char *)((char *)l_20) = 0;
-        D_00199734 = atoi((int)l_50);
+        parse_number = atoi((int)l_50);
         return l_1C;
     }
 }
@@ -1772,9 +1772,9 @@ int parse_signed_itoa(int a1, int a2, int a3)
 {
     if (a1 > 0) {
         *(signed char *)((char *)a2) = 43;
-        func_000A0DD9(a1, a2 + 1, a3);
+        itoa(a1, a2 + 1, a3);
     } else {
-        func_000A0DD9(a1, a2, a3);
+        itoa(a1, a2, a3);
     }
     return a2;
 }
@@ -1789,7 +1789,7 @@ void object_weight_add(struct record *a1)
     l_1C = &a1->data.item;
     if (l_1C->group == 23) return;
     l_20 = a1->parent;
-    while (l_20 != 0 && func_000CE44C((int)((char *)&D_001959EC), (int)l_20, 4) == 0) {
+    while (l_20 != 0 && xn_str_find_u32((int)((char *)&house_container), (int)l_20, 4) == 0) {
         l_20 = l_20->parent;
     }
     if (l_20 != 0) return;
@@ -1857,13 +1857,13 @@ void parse_item_name(struct item *a1, int a2)
         return;
     }
     if (((int)(unsigned short)(a1->item_flags & 32)) == 0) {
-        mc_strncpy((int)text_rsc_buffer, ((int)item_templates) + (((int)(short)*(short *)((char *)(int)(*(char **)(D_00185F88 + (a1->group << 2)) + (a1->index * 2)))) * 48), 2048, (int)D_0017110C, 1973);
+        mc_strncpy((int)text_rsc_buffer, ((int)item_templates) + (((int)(short)*(short *)((char *)(int)(*(char **)(item_group_templates + (a1->group << 2)) + (a1->index * 2)))) * 48), 2048, (int)D_0017110C, 1973);
         return;
     }
     while (a1->name[l_14] != 0) {
         if (((int)(unsigned char)a1->name[l_14]) == 37) {
-            mc_strncpy(a2, ((int)item_templates) + (((int)(short)*(short *)((char *)(int)(*(char **)(D_00185F88 + (a1->group << 2)) + (a1->index * 2)))) * 48), 4, (int)D_0017110C, 1981);
-            a2 += func_000A0DF4(a2);
+            mc_strncpy(a2, ((int)item_templates) + (((int)(short)*(short *)((char *)(int)(*(char **)(item_group_templates + (a1->group << 2)) + (a1->index * 2)))) * 48), 4, (int)D_0017110C, 1981);
+            a2 += strlen(a2);
             l_14 += 3;
         } else {
             *(signed char *)((char *)a2++) = a1->name[l_14];
@@ -1878,15 +1878,15 @@ void parse_rsc_text(int a1, int a2, int a3)
     int l_14;
     short l_10;
 
-    l_10 = *(short *)D_00195D6C;
-    *(int *)D_00195D6C = D_00195D78;
+    l_10 = *(short *)text_rsc_file;
+    *(int *)text_rsc_file = text_rsc_main_file;
     l_14 = text_rsc_load((int)(short)*(short *)&a1, (int)(short)*(short *)&a2, (int)(short)*(short *)&a3);
     mc_strncpy((int)text_rsc_buffer, l_14, 2048, (int)D_0017110C, 2003);
     if (l_14 != 0 && l_14 != (-1751672937)) {
         mc_free(l_14, (int)D_0017110C, 2004);
         l_14 = -1751672937;
     }
-    *(int *)D_00195D6C = (int)(short)l_10;
+    *(int *)text_rsc_file = (int)(short)l_10;
 }
 
 void parse_rsc_text_copy(int a1, int a2)
@@ -1894,15 +1894,15 @@ void parse_rsc_text_copy(int a1, int a2)
     int l_18;
     short l_14;
 
-    l_14 = *(short *)D_00195D6C;
-    *(int *)D_00195D6C = D_00195D78;
+    l_14 = *(short *)text_rsc_file;
+    *(int *)text_rsc_file = text_rsc_main_file;
     l_18 = text_rsc_load((int)(short)*(short *)&a1, 0, 0);
     mc_strncpy(a2, l_18, 4, (int)D_0017110C, 2034);
     if (l_18 != 0 && l_18 != (-1751672937)) {
         mc_free(l_18, (int)D_0017110C, 2035);
         l_18 = -1751672937;
     }
-    *(int *)D_00195D6C = (int)(short)l_14;
+    *(int *)text_rsc_file = (int)(short)l_14;
 }
 
 int parse_stub_zero(int a1)
@@ -1910,7 +1910,7 @@ int parse_stub_zero(int a1)
     return 0;
 }
 
-int func_0004A8DB(int a1, int a2)
+int holiday_index(int a1, int a2)
 {
     short l_14;
     short l_18;
@@ -1948,5 +1948,5 @@ int holiday_today(int a1, int a2)
 
 int holiday_name(int a1, int a2)
 {
-    return holiday_names[func_0004A8DB(a1, a2)];
+    return holiday_names[holiday_index(a1, a2)];
 }

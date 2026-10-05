@@ -2,8 +2,8 @@
 #include "records.h"
 
 extern unsigned D_00190BE4;
-extern signed char itemmaker_slot_kinds[];
-extern short D_00190D64;
+extern signed char scratch_190ce4[];
+extern short scratch_190d64;
 extern short chargen_selected_attribute;
 extern struct character *player_character;
 
@@ -13,18 +13,18 @@ void chargen_attribute_arrow(int a1)
         return;
     D_00190BE4 = *(unsigned *)0x46c;
     if (a1 == 30) {
-        if (D_00190D64 != 0) {
+        if (scratch_190d64 != 0) {
             if (player_character->attributes[chargen_selected_attribute] == 100)
                 return;
-            D_00190D64--;
+            scratch_190d64--;
             player_character->attributes[chargen_selected_attribute]++;
         }
         return;
     }
-    if (player_character->attributes[chargen_selected_attribute] <= itemmaker_slot_kinds[chargen_selected_attribute])
+    if (player_character->attributes[chargen_selected_attribute] <= scratch_190ce4[chargen_selected_attribute])
         return;
     if (player_character->attributes[chargen_selected_attribute] == 10)
         return;
-    D_00190D64++;
+    scratch_190d64++;
     player_character->attributes[chargen_selected_attribute]--;
 }

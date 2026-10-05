@@ -11,10 +11,10 @@ struct entry {
 extern char D_0017531A[];
 extern signed char text_buffer[];
 extern struct entry flats_cfg[];
-extern int D_00195C44;
+extern int scratch_buffer;
 extern int flats_cfg_count;
-extern void func_00050540(int *, char *);
-extern int func_000505A3(int *);
+extern void cfg_read_line(int *, char *);
+extern int cfg_read_number(int *);
 extern int disk_read_file(char *, int);
 
 void flats_cfg_load(void)
@@ -23,16 +23,16 @@ void flats_cfg_load(void)
     int a;
     int b;
 
-    fh = disk_read_file(D_0017531A, D_00195C44);
+    fh = disk_read_file(D_0017531A, scratch_buffer);
     flats_cfg_count = 0;
     for (;;) {
-        a = func_000505A3(&fh);
+        a = cfg_read_number(&fh);
         if (a == 100000)
             return;
-        b = func_000505A3(&fh);
+        b = cfg_read_number(&fh);
         flats_cfg[flats_cfg_count].id = (a << 7) | b;
-        func_00050540(&fh, flats_cfg[flats_cfg_count].name);
-        func_00050540(&fh, ((char *)text_buffer));
+        cfg_read_line(&fh, flats_cfg[flats_cfg_count].name);
+        cfg_read_line(&fh, ((char *)text_buffer));
         if (((char *)text_buffer)[0] == '?') {
             flats_cfg[flats_cfg_count].flags |= 2;
             a = 1;
@@ -41,9 +41,9 @@ void flats_cfg_load(void)
         }
         if (((char *)text_buffer)[a] == '2')
             flats_cfg[flats_cfg_count].flags |= 1;
-        flats_cfg[flats_cfg_count].f7 = func_000505A3(&fh);
-        flats_cfg[flats_cfg_count].f8 = func_000505A3(&fh);
-        flats_cfg[flats_cfg_count].f4 = func_000505A3(&fh);
+        flats_cfg[flats_cfg_count].f7 = cfg_read_number(&fh);
+        flats_cfg[flats_cfg_count].f8 = cfg_read_number(&fh);
+        flats_cfg[flats_cfg_count].f4 = cfg_read_number(&fh);
         flats_cfg_count++;
     }
 }

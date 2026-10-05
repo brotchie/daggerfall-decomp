@@ -22,14 +22,14 @@ extern char D_00185C60[];
 extern signed char D_00187CA8;
 extern short D_00188208[];
 extern char D_00190B44[];
-extern char D_00190D64[];
-extern char text_macro_fpc[];
+extern char scratch_190d64[];
+extern char scratch_190de4[];
 extern signed char D_001940D4;
 extern signed char D_001940D6;
 extern signed char D_001940D8;
 extern struct record *wagon_container;
-extern struct record *D_001959EC;
-extern struct item *D_00195A80;
+extern struct record *house_container;
+extern struct item *text_macro_item;
 extern struct record *player_entity;
 extern struct record *player_object;
 extern int D_00195ACC;
@@ -45,7 +45,7 @@ extern int magic_items_saved_screen;
 extern signed char hud_pressed_button;
 extern signed char D_00199D71;
 extern short steer_key_region;
-extern struct picklist D_001A9AB8;
+extern struct picklist shared_picklist;
 extern struct record *inv_selected_item;
 
 extern int sheet_open(int);
@@ -59,9 +59,9 @@ extern int travel_map_open(int);
 extern int mc_free();
 extern int mc_malloc();
 extern int mc_memcpy();
-extern int func_000CE44C();
-extern int func_0012B136();
-extern int func_00144F68();
+extern int xn_str_find_u32();
+extern int xn_mouse_poll_clamped();
+extern int xn_draw_image();
 extern void automap_open(void);
 extern void status_show(int);
 extern void interaction_mode_cycle(int);
@@ -172,7 +172,7 @@ void magic_items_add_cb(struct record *a1)
 
     if (a1->type != 2) return;
     l_18 = a1->parent;
-    while (l_18 != 0 && func_000CE44C((int)((char *)&D_001959EC), l_18, 4) == 0) {
+    while (l_18 != 0 && xn_str_find_u32((int)((char *)&house_container), l_18, 4) == 0) {
         l_18 = l_18->parent;
     }
     if (l_18 != 0) return;
@@ -193,26 +193,26 @@ void magic_items_add_cb(struct record *a1)
         }
     }
     if (l_1C == 0) return;
-    D_00195A80 = l_24;
+    text_macro_item = l_24;
     if (l_1C == 2) {
         D_00195ACC = (int)&a1->children->data.potion_recipe;
         parse_expand((int)D_001758A0, (int)D_00190B44);
     } else {
         parse_expand((int)D_001758A4, (int)D_00190B44);
     }
-    picklist_add(&D_001A9AB8, (int)D_00190B44, 0);
-    *(int *)(text_macro_fpc + (((int)(short)(*(short *)D_00190D64)++) << 2)) = (int)a1;
+    picklist_add(&shared_picklist, (int)D_00190B44, 0);
+    *(int *)(scratch_190de4 + (((int)(short)(*(short *)scratch_190d64)++) << 2)) = (int)a1;
 }
 
 void magic_items_open(void)
 {
     int l_18;
 
-    *(short *)D_00190D64 = 0;
-    picklist_init(&D_001A9AB8, 100, 159, 166, 34, 88, 159, 8, 15, 88, 179, 8, 59, 0, 0, 1, 1, 146, 146, 244, 114, 0);
+    *(short *)scratch_190d64 = 0;
+    picklist_init(&shared_picklist, 100, 159, 166, 34, 88, 159, 8, 15, 88, 179, 8, 59, 0, 0, 1, 1, 146, 146, 244, 114, 0);
     object_foreach(player_entity->children, (int)magic_items_add_cb);
-    if (*(short *)D_00190D64 == 0) {
-        picklist_free(&D_001A9AB8);
+    if (*(short *)scratch_190d64 == 0) {
+        picklist_free(&shared_picklist);
         return;
     }
     D_00187CA8 = 0;
@@ -230,21 +230,21 @@ void magic_items_frame(void)
 
     if (((struct bf8_5_1 *)&D_001940D4)->f == 0) return;
     mc_memcpy(screen_buffer, magic_items_saved_screen, 64000, (int)D_00175898, 368, 4);
-    func_00144F68((int)(unsigned short)*(short *)(*(char **)magic_items_image), (int)(unsigned short)*(short *)(*(char **)magic_items_image + 2), (int)(unsigned short)*(short *)(*(char **)magic_items_image + 4), (int)(unsigned short)*(short *)(*(char **)magic_items_image + 6), (int)(*(char **)magic_items_image + 12));
+    xn_draw_image((int)(unsigned short)*(short *)(*(char **)magic_items_image), (int)(unsigned short)*(short *)(*(char **)magic_items_image + 2), (int)(unsigned short)*(short *)(*(char **)magic_items_image + 4), (int)(unsigned short)*(short *)(*(char **)magic_items_image + 6), (int)(*(char **)magic_items_image + 12));
     if (key_down_esc != 0 || ((int)(unsigned char)(mouse_buttons & 2)) != 0) {
         while (key_down_esc != 0);
-        while (mouse_buttons != 0) func_0012B136();
+        while (mouse_buttons != 0) xn_mouse_poll_clamped();
         magic_items_close();
         return;
     }
-    *(int *)&l_18 = picklist_poll(&D_001A9AB8) - 1;
+    *(int *)&l_18 = picklist_poll(&shared_picklist) - 1;
     if (((int)(short)l_18) > (-1)) {
         magic_items_close();
-        inv_selected_item = (struct record *)(*(int *)(text_macro_fpc + (((int)(short)l_18) << 2)));
+        inv_selected_item = (struct record *)(*(int *)(scratch_190de4 + (((int)(short)l_18) << 2)));
         inv_use_item();
         return;
     }
-    picklist_draw(&D_001A9AB8, 0);
+    picklist_draw(&shared_picklist, 0);
 }
 
 void magic_items_close(void)
@@ -254,7 +254,7 @@ void magic_items_close(void)
         mc_free(*(int *)magic_items_image, (int)D_00175898, 396);
         *(int *)magic_items_image = -1751672937;
     }
-    picklist_free(&D_001A9AB8);
+    picklist_free(&shared_picklist);
     D_00196272 = 0;
     D_00187CA8 = 1;
     if (magic_items_saved_screen == 0 || magic_items_saved_screen == (-1751672937)) {

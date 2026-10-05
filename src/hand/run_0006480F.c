@@ -1,12 +1,12 @@
 /* matched by the real Watcom C32 10.0a (-d2): a run of links.c from 0x00064589 to 0x0006480F, kept together for its switch table's alignment */
 #include "records.h"
 
-extern struct link D_00199D78[];
+extern struct link links[];
 extern struct link *active_links[];
 extern int link_count;
 extern int active_link_count;
 extern void link_start(struct link *);
-extern int func_000CE44C(struct link **, struct link *, int);
+extern int xn_str_find_u32(struct link **, struct link *, int);
 extern char D_00175962[];
 extern int link_step(struct link *);
 extern int mc_memcpy();
@@ -21,7 +21,7 @@ extern char D_001957E9[];
 extern char frame_counter[];
 extern struct record *player_entity;
 extern struct record *player_object;
-extern int D_00195AB0;
+extern int frame_ticks;
 extern struct character *player_character;
 extern signed char D_0019621B;
 extern int D_00196222;
@@ -37,10 +37,10 @@ extern int cast_creature_spell(struct record *, struct record *, int);
 extern void link_show_text(int);
 extern int link_answer_matches(int, int);
 extern void link_hurt_player(int, int);
-extern void func_00065748(short, unsigned char);
-extern struct spell *func_00065864(int);
+extern void links_set_reverse(short, unsigned char);
+extern struct spell *link_find_spell(int);
 extern void disease_infect(struct record *, int, int, int);
-extern void func_00065A8C(struct record *, int, int);
+extern void poison_apply(struct record *, int, int);
 extern int sound_play(int, int, int);
 extern int hud_message_add(int);
 extern void hud_messages_draw(void);
@@ -49,8 +49,8 @@ extern void inpstr_begin_text(int, short);
 extern int inpstr_update(void);
 extern void object_set_position(struct record *, int, int, int, int, int, int);
 extern int door_start_swing(int, int);
-extern int func_000CDD81();
-extern int func_00142790();
+extern int xn_gfx_present_inclusive();
+extern int xn_kbd_flush();
 
 void links_trigger(struct record *a1, int a2)
 {
@@ -64,18 +64,18 @@ void links_trigger(struct record *a1, int a2)
     if (link_count == 0) return;
     id = a1->id;
     while (i < link_count) {
-        if (D_00199D78[i].trigger != 0 && D_00199D78[i].object_id == id) {
-            if (D_00199D78[i].trigger < 8 || D_00199D78[i].trigger > 9) {
-                if (D_00199D78[i].trigger != a2) return;
-            } else if (D_00199D78[i].trigger == 8) {
+        if (links[i].trigger != 0 && links[i].object_id == id) {
+            if (links[i].trigger < 8 || links[i].trigger > 9) {
+                if (links[i].trigger != a2) return;
+            } else if (links[i].trigger == 8) {
                 if (a2 != 2 && a2 != 3 && a2 != 5 && a2 != 6)
                     return;
             } else {
                 if (a2 != 2 && a2 != 3)
                     return;
             }
-            p = &D_00199D78[i];
-            if (func_000CE44C(active_links, p, active_link_count) != 0) return;
+            p = &links[i];
+            if (xn_str_find_u32(active_links, p, active_link_count) != 0) return;
             active_links[active_link_count++] = p;
             n = p->chain_count + 1;
             for (j = 0; j < n; j++, p++)
@@ -132,7 +132,7 @@ int link_step(struct link *a1)
         a1->flags |= 1;
         a1->start_tick = *(int *)((char *)1132) - a1->duration;
         a1->flags ^= 2;
-        func_00065748((int)(short)a1->object_id, a1->flags);
+        links_set_reverse((int)(short)a1->object_id, a1->flags);
     }
     if (((int)(unsigned char)(a1->flags & 4)) == 0) {
         if (a1->param != 0 && a1->object != 0) sound_play(a1->param, (int)a1->object, 110);
@@ -219,7 +219,7 @@ int link_step(struct link *a1)
             }
             break;
         case 9:
-            D_00195798 -= D_00195AB0;
+            D_00195798 -= frame_ticks;
             if (D_00195798 <= 0) {
                 D_00195798 = 1000;
                 D_001957CD = player_character->level;
@@ -229,7 +229,7 @@ int link_step(struct link *a1)
                 D_00196222 = a1->object->x;
                 D_00196226 = a1->object->y - 40;
                 D_0019622A = a1->object->z;
-                if (func_00065864(a1->param)->target == 0) {
+                if (link_find_spell(a1->param)->target == 0) {
                     cast_creature_spell(player_entity, player_entity, a1->param);
                 } else {
                     cast_creature_spell((struct record *)&D_0019621B, player_entity, a1->param);
@@ -247,12 +247,12 @@ int link_step(struct link *a1)
             link_show_text(a1->param + 5400);
             l_30 = hud_message_add((int)D_0017596A);
             *(signed char *)((char *)l_30 + 3) = 0;
-            func_00142790();
+            xn_kbd_flush();
             inpstr_begin_text(l_30 + 2, 16);
             while (inpstr_update() == 0) {
                 mc_memcpy(screen_buffer, D_00147954, 64000, (int)D_00175962, 324, 4);
                 hud_messages_draw();
-                func_000CDD81(1);
+                xn_gfx_present_inclusive(1);
             }
             D_001940DA &= 254;
             if (link_answer_matches(a1->param + 5656, l_30 + 2) == 0) a1->flags |= 16;
@@ -288,7 +288,7 @@ int link_step(struct link *a1)
             a1->object->flags &= ~0x40;
             break;
         case 21:
-            D_00195798 -= D_00195AB0;
+            D_00195798 -= frame_ticks;
             if (D_00195798 <= 0) {
                 D_00195798 = 1000;
                 l_34 = rand_range(a1->param, a1->axis) * player_character->level;
@@ -309,14 +309,14 @@ int link_step(struct link *a1)
             link_hurt_player(2, a1->axis);
             break;
         case 26:
-            D_00195798 -= D_00195AB0;
+            D_00195798 -= frame_ticks;
             if (D_00195798 <= 0) {
                 D_00195798 = 1000;
-                func_00065A8C(player_entity, (int)&*(signed char *)((char *)rand_range(0, 11) + 128), 0);
+                poison_apply(player_entity, (int)&*(signed char *)((char *)rand_range(0, 11) + 128), 0);
             }
             break;
         case 27:
-            D_00195798 -= D_00195AB0;
+            D_00195798 -= frame_ticks;
             if (D_00195798 <= 0) {
                 D_00195798 = 1000;
                 disease_infect(player_entity, 0, rand_range(0, 16), 0);

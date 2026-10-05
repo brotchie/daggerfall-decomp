@@ -17,8 +17,8 @@ extern void mc_memset(void *, int, int, char *, int, int);
 extern void *mc_malloc(int, char *, int);
 extern void mc_strncpy(char *, char *, int, char *, int);
 extern void mc_memcpy(char *, char *, int, char *, int, int);
-extern void func_0012B136(void);
-extern void func_0012DB50(int);
+extern void xn_mouse_poll_clamped(void);
+extern void xn_font_select(int);
 
 void msgbox_show_qrc_text(char *a1, short a2, short a3)
 {
@@ -31,7 +31,7 @@ void msgbox_show_qrc_text(char *a1, short a2, short a3)
     mc_memcpy(msgbox_saved_screen, screen_buffer, 64000, D_00170D55, 766, 4);
     mc_memset(&s, 0, 60, D_00170D55, 768, 4);
     mc_strncpy(s.name, a1, 9, D_00170D55, 769);
-    func_0012DB50(4);
+    xn_font_select(4);
     if (a3 == 5) {
         D_00196271 = 0;
         rc = msgbox_render_quest_text(&s, a2, msgbox_image, 4);
@@ -44,6 +44,6 @@ void msgbox_show_qrc_text(char *a1, short a2, short a3)
     game_mode = 8;
     D_00196272 = 1;
     mouse_buttons_prev = mouse_buttons;
-    func_0012B136();
+    xn_mouse_poll_clamped();
     msgbox_wait();
 }

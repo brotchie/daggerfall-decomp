@@ -6,13 +6,13 @@ extern short mouse_y;
 struct rect { short x0; short y0; short x1; short y1; };
 #pragma pack()
 
-extern void func_0004EA3C(int, struct rect *);
+extern void note_text_box(int, struct rect *);
 
-int func_0004DA4A(int a1)
+int note_text_hit_cb(int a1)
 {
     int l_20;
     struct rect r;
 
-    func_0004EA3C(a1, &r);
+    note_text_box(a1, &r);
     return mouse_x > r.x0 && mouse_x < r.x1 && mouse_y > r.y0 && mouse_y < r.y1;
 }

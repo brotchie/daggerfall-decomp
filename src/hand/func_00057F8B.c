@@ -20,8 +20,8 @@ extern char D_00185A96[];
 extern char D_00185A97[];
 extern char D_00185AC4[];
 extern char D_00185AE4[];
-extern signed char itemmaker_slot_kinds[];
-extern char D_00190D64[];
+extern signed char scratch_190ce4[];
+extern char scratch_190d64[];
 extern signed char D_0019986A[];
 extern signed char D_0019986B[];
 extern signed char D_0019986E[];
@@ -74,8 +74,8 @@ void itemmaker_add_soul_powers(int a1)
             }
         } else if (D_00185A94[idx * 4 + i] == 255)
             continue;
-        ((char (*)[10])((char *)D_0019986A))[*(short *)D_00190D64][i * 2] = ((char *)D_00185A94)[idx * 4 + i];
-        ((char (*)[10])((char *)D_0019986B))[*(short *)D_00190D64][i * 2] = ((char *)D_00185A95)[idx * 4 + i];
+        ((char (*)[10])((char *)D_0019986A))[*(short *)scratch_190d64][i * 2] = ((char *)D_00185A94)[idx * 4 + i];
+        ((char (*)[10])((char *)D_0019986B))[*(short *)scratch_190d64][i * 2] = ((char *)D_00185A95)[idx * 4 + i];
     }
     count = 0;
     while (*(short *)(D_001859A4 + idx * 20 + count * 4) != -1)
@@ -94,7 +94,7 @@ void itemmaker_add_soul_powers(int a1)
         x = *(short *)(D_001859A4 + idx * 20 + i * 4);
         y = *(short *)(D_001859A6 + idx * 20 + i * 4);
         if (*(short *)(D_001859A4 + idx * 20 + i * 4) < 15) {
-            ((char *)itemmaker_slot_kinds)[slot] = 0;
+            ((char *)scratch_190ce4)[slot] = 0;
             j = *(unsigned char *)(D_00185766 + x);
             if (j == 0)
                 func_00057147(slot, x, y, -1, -1, -1, -1);
@@ -103,7 +103,7 @@ void itemmaker_add_soul_powers(int a1)
                 func_00057147(slot, x, y, *(unsigned char *)(D_00185716 + j * 20 + y * 4), *(unsigned char *)(D_00185717 + j * 20 + y * 4), *(unsigned char *)(D_00185718 + j * 20 + y * 4), *(unsigned char *)(D_00185719 + j * 20 + y * 4));
             }
         } else {
-            ((char *)itemmaker_slot_kinds)[slot] = 1;
+            ((char *)scratch_190ce4)[slot] = 1;
             *(short *)(itemmaker_slots + slot * 4) -= 15;
             j = *(unsigned char *)(D_0018597F + x);
             if (j == 0)

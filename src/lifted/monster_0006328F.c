@@ -4,10 +4,10 @@
 #include "records.h"
 
 struct bf8_0_1 { unsigned char f:1; };
-extern int D_00187CA4;
+extern int player_momentum;
 extern struct character *player_character;
 extern int game_minutes;
-extern short D_00195F4E;
+extern short player_base_speed;
 
 extern int rand_range(int, int);
 extern void skill_add_uses(int, int);
@@ -20,9 +20,9 @@ int ai_stealth_check(int a1, int a2, int a3, int a4)
     if (a3 > 1024) return 0;
     if (game_minutes != player_character->last_stealth_check_minutes) {
         if (a4 != 0) {
-            if ((((int)(short)D_00195F4E) >> 1) < D_00187CA4) return 1;
+            if ((((int)(short)player_base_speed) >> 1) < player_momentum) return 1;
         }
-        if ((((((int)(short)D_00195F4E) >> 1) >= D_00187CA4) ? 1 : 0) != 0 && ((struct bf8_0_1 *)&game_minutes)->f != 0) {
+        if ((((((int)(short)player_base_speed) >> 1) >= player_momentum) ? 1 : 0) != 0 && ((struct bf8_0_1 *)&game_minutes)->f != 0) {
             return a2;
         }
         skill_add_uses(16, 1);

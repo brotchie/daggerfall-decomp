@@ -4,8 +4,8 @@
 #include "records.h"
 
 extern signed char mouse_buttons;
-extern signed char D_0014231D;
-extern signed char D_00142339;
+extern signed char key_down_y;
+extern signed char key_down_n;
 extern int screen_buffer;
 extern char D_00175404[];
 extern char D_0017540B[];
@@ -15,38 +15,38 @@ extern signed char mouse_buttons_prev;
 extern struct quest *current_quest;
 
 extern int flc_open(int, int);
-extern int func_0009DEA7();
+extern int close();
 extern int mc_free();
 extern int mc_memset();
 extern int lseek();
-extern int func_000A00CB();
-extern int func_000A0DF4();
-extern int func_000A0ED9(int, int);
+extern int read();
+extern int strlen();
+extern int mc_set_location(int, int);
 extern int mc_sprintf(int, ...);
 extern int mc_memcpy();
-extern int func_000CD33A();
-extern int func_0012B136();
-extern int func_0012D887();
-extern int func_00144F68();
-extern int func_00144FB4();
+extern int xn_pal_set_range_8bit();
+extern int xn_mouse_poll_clamped();
+extern int xn_pal_get();
+extern int xn_draw_image();
+extern int xn_draw_image_transparent();
 extern void parse_rsc_text(int, int, int);
 extern void quest_load_text(struct quest *, int, int, int);
 extern void fatal_error(int);
 extern void flc_decode_palette(int, int, unsigned char);
 extern void flc_decode_lc(int, int);
 extern void flc_decode_ss2(int, int);
-extern void text_draw_centered_colored(int, int, int, int, unsigned char);
+extern void text_draw_centred_coloured(int, int, int, int, unsigned char);
 int flc_next_frame(int);
 int flc_draw_text_page(int);
 void flc_close(int);
 void flc_read_frame(int);
 void flc_decode_brun(int, int);
-#pragma aux func_000A0ED9 parm routine [];
+#pragma aux mc_set_location parm routine [];
 
-void func_00051CF9(int a1)
+void flc_show_frame(int a1)
 {
     if (((int)(short)*(short *)((char *)a1 + 18)) != 320 || ((int)(short)*(short *)((char *)a1 + 20)) != 200) {
-        func_00144FB4((int)(short)*(short *)((char *)a1 + 14), (int)(short)*(short *)((char *)a1 + 16), (int)(short)*(short *)((char *)a1 + 18), (int)(short)*(short *)((char *)a1 + 20), *(int *)((char *)a1 + 30));
+        xn_draw_image_transparent((int)(short)*(short *)((char *)a1 + 14), (int)(short)*(short *)((char *)a1 + 16), (int)(short)*(short *)((char *)a1 + 18), (int)(short)*(short *)((char *)a1 + 20), *(int *)((char *)a1 + 30));
         mc_memcpy(655360, screen_buffer, 64000, (int)D_00175404, 113, 4);
         return;
     }
@@ -70,7 +70,7 @@ int flc_play_with_text(int a1, int a2, int a3, int a4)
     l_18 = 0;
     mc_memset(a2, 0, 44, (int)D_00175404, 127, 4);
     if (flc_open(a1, a2) == 0) {
-        func_000A0ED9(131, (int)D_00175404);
+        mc_set_location(131, (int)D_00175404);
         mc_sprintf((int)text_buffer, (int)D_0017540B, a1);
         fatal_error((int)text_buffer);
     }
@@ -103,13 +103,13 @@ int flc_play_with_text(int a1, int a2, int a3, int a4)
             }
             do {
                 mouse_buttons_prev = mouse_buttons;
-                func_0012B136();
+                xn_mouse_poll_clamped();
                 if (l_20 == 0 && a4 != 0) {
-                    if (D_0014231D != 0) {
+                    if (key_down_y != 0) {
                         flc_close(a2);
                         return 1;
                     }
-                    if (D_00142339 != 0) {
+                    if (key_down_n != 0) {
                         flc_close(a2);
                         return 2;
                     }
@@ -157,7 +157,7 @@ void flc_close(int a1)
             *(int *)((char *)a1 + 30) = -1751672937;
         }
     }
-    func_0009DEA7((int)(unsigned short)*(short *)((char *)a1 + 2));
+    close((int)(unsigned short)*(short *)((char *)a1 + 2));
 }
 
 int flc_next_frame(int a1)
@@ -173,7 +173,7 @@ int flc_next_frame(int a1)
     }
     if (((int)(unsigned short)(*(short *)((char *)a1) & 8)) != 0 && ((int)(unsigned short)(*(short *)((char *)a1) & 16)) == 0) {
         *(signed char *)((char *)a1) &= 247;
-        func_000CD33A(*(int *)((char *)a1 + 26), 0, 256);
+        xn_pal_set_range_8bit(*(int *)((char *)a1 + 26), 0, 256);
     }
     return 0;
 }
@@ -188,23 +188,23 @@ void flc_read_frame(int a1)
 
         l_20 = *(short *)((char *)a1 + 2);
         for (;;) {
-            func_000A00CB((int)(unsigned short)l_20, (int)l_2C, 6);
+            read((int)(unsigned short)l_20, (int)l_2C, 6);
             if (((int)(unsigned short)*(short *)((char *)l_2C + 4)) == 61946) break;
             lseek((int)(unsigned short)l_20, (int)(*(char **)l_2C - 6), 1);
         }
-        func_000A00CB((int)(unsigned short)l_20, (int)&l_18, 2);
+        read((int)(unsigned short)l_20, (int)&l_18, 2);
         lseek((int)(unsigned short)l_20, 8, 1);
         *(int *)&l_1C = 0;
         for (; (unsigned short)l_1C < (short)l_18; (*(int *)&l_1C)++) {
-            func_000A00CB((int)(unsigned short)l_20, (int)l_2C, 6);
+            read((int)(unsigned short)l_20, (int)l_2C, 6);
             *(int *)l_2C += -6;
             switch ((unsigned short)*(int *)((char *)l_2C + 4)) {
             case 4:
                 if (((int)(unsigned short)(*(short *)((char *)a1) & 16)) != 0) {
                     lseek((int)(unsigned short)l_20, (int)(unsigned short)*(short *)l_2C, 1);
                 } else {
-                    func_0012D887((int)(*(char **)((char *)a1 + 26) + 768));
-                    func_000A00CB((int)(unsigned short)l_20, (int)(*(char **)((char *)a1 + 26) + 768), (int)(unsigned short)*(short *)l_2C);
+                    xn_pal_get((int)(*(char **)((char *)a1 + 26) + 768));
+                    read((int)(unsigned short)l_20, (int)(*(char **)((char *)a1 + 26) + 768), (int)(unsigned short)*(short *)l_2C);
                     flc_decode_palette(*(int *)((char *)a1 + 26), (int)&*(signed char *)(*(char **)((char *)a1 + 26) + 768), 0);
                     *(signed char *)((char *)a1) |= 8;
                 }
@@ -213,8 +213,8 @@ void flc_read_frame(int a1)
                 if (((int)(unsigned short)(*(short *)((char *)a1) & 16)) != 0) {
                     lseek((int)(unsigned short)l_20, (int)(unsigned short)*(short *)l_2C, 1);
                 } else {
-                    func_0012D887((int)(*(char **)((char *)a1 + 26) + 768));
-                    func_000A00CB((int)(unsigned short)l_20, (int)(*(char **)((char *)a1 + 26) + 768), (int)(unsigned short)*(short *)l_2C);
+                    xn_pal_get((int)(*(char **)((char *)a1 + 26) + 768));
+                    read((int)(unsigned short)l_20, (int)(*(char **)((char *)a1 + 26) + 768), (int)(unsigned short)*(short *)l_2C);
                     flc_decode_palette(*(int *)((char *)a1 + 26), (int)&*(signed char *)(*(char **)((char *)a1 + 26) + 768), 0);
                     *(signed char *)((char *)a1) |= 8;
                 }
@@ -224,28 +224,28 @@ void flc_read_frame(int a1)
                 break;
             case 16:
                 if (((int)(unsigned short)(*(short *)((char *)a1) & 128)) == 0) {
-                    func_000A00CB((int)(unsigned short)l_20, screen_buffer, (int)(unsigned short)*(short *)l_2C);
+                    read((int)(unsigned short)l_20, screen_buffer, (int)(unsigned short)*(short *)l_2C);
                 } else {
-                    func_000A00CB((int)(unsigned short)l_20, *(int *)((char *)a1 + 30), (int)(unsigned short)*(short *)l_2C);
+                    read((int)(unsigned short)l_20, *(int *)((char *)a1 + 30), (int)(unsigned short)*(short *)l_2C);
                 }
                 break;
             case 15:
-                func_000A00CB((int)(unsigned short)l_20, *(int *)((char *)a1 + 22), (int)(unsigned short)*(short *)l_2C);
+                read((int)(unsigned short)l_20, *(int *)((char *)a1 + 22), (int)(unsigned short)*(short *)l_2C);
                 flc_decode_brun(*(int *)((char *)a1 + 22), a1);
                 break;
             case 12:
-                func_000A00CB((int)(unsigned short)l_20, *(int *)((char *)a1 + 22), (int)(unsigned short)*(short *)l_2C);
+                read((int)(unsigned short)l_20, *(int *)((char *)a1 + 22), (int)(unsigned short)*(short *)l_2C);
                 flc_decode_lc(*(int *)((char *)a1 + 22), a1);
                 break;
             case 7:
-                func_000A00CB((int)(unsigned short)l_20, *(int *)((char *)a1 + 22), (int)(unsigned short)*(short *)l_2C);
+                read((int)(unsigned short)l_20, *(int *)((char *)a1 + 22), (int)(unsigned short)*(short *)l_2C);
                 flc_decode_ss2(*(int *)((char *)a1 + 22), a1);
                 break;
             default:
                 lseek((int)(unsigned short)l_20, *(int *)l_2C, 1);
             }
         }
-        func_00144F68((int)(short)*(short *)((char *)a1 + 14), (int)(short)*(short *)((char *)a1 + 16), (int)(short)*(short *)((char *)a1 + 18), (int)(short)*(short *)((char *)a1 + 20), *(int *)((char *)a1 + 30));
+        xn_draw_image((int)(short)*(short *)((char *)a1 + 14), (int)(short)*(short *)((char *)a1 + 16), (int)(short)*(short *)((char *)a1 + 18), (int)(short)*(short *)((char *)a1 + 20), *(int *)((char *)a1 + 30));
     }
 }
 
@@ -281,10 +281,10 @@ int flc_draw_text_page(int a1)
     l_1C = 0;
     l_20 = 150;
     while (*(signed char *)((char *)a1) != 0 && l_1C < 4) {
-        text_draw_centered_colored(a1, 160, (int)(short)*(short *)&l_20, 145, 156);
+        text_draw_centred_coloured(a1, 160, (int)(short)*(short *)&l_20, 145, 156);
         l_20 += 10;
         l_1C++;
-        a1 += func_000A0DF4(a1) + 1;
+        a1 += strlen(a1) + 1;
     }
     if (*(signed char *)((char *)a1) != 0) return a1;
     return 0;

@@ -5,7 +5,7 @@ extern struct record *player_object;
 extern void monster_play_sound(struct record *, int);
 extern int sound_play(int, struct record *, int);
 extern int rand(void);
-extern int func_000C7FD9(int, int, int, int);
+extern int xn_math_approx_dist2d(int, int, int, int);
 
 void monster_ambient_sound(struct record *a1, struct character *a2)
 {
@@ -13,7 +13,7 @@ void monster_ambient_sound(struct record *a1, struct character *a2)
     int l_14;
 
     if (rand() > 195) return;
-    l_14 = func_000C7FD9(a1->x, a1->z, player_object->x, player_object->z);
+    l_14 = xn_math_approx_dist2d(a1->x, a1->z, player_object->x, player_object->z);
     if (l_14 >= 1024) return;
     if (a2->mobile_id == 146) {
         sound_play(11461, a1, 100);

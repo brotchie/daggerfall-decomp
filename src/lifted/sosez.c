@@ -20,7 +20,7 @@ extern int D_001A3F4C;
 
 extern int dpmi_unlock_region(int, int);
 extern int open(int, ...);
-extern int func_0009DEA7();
+extern int close();
 extern int func_0009E281();
 extern int func_0009E61A();
 extern int func_0009E95B();
@@ -31,11 +31,11 @@ extern int mc_free();
 extern int mc_memset();
 extern int lseek();
 extern int mc_malloc();
-extern int func_000A00CB();
+extern int read();
 extern int strncmp();
 #pragma aux sosconv "*" parm caller [] value [eax] modify [eax ebx ecx edx];
 #pragma aux (sosconv) sos_shutdown;
-#pragma aux (sosconv) func_0001167F;
+#pragma aux (sosconv) sos_load_sample;
 
 int sos_shutdown(void)
 {
@@ -80,7 +80,7 @@ int sos_shutdown(void)
     return 1;
 }
 
-int func_0001167F(int a1)
+int sos_load_sample(int a1)
 {
     int l_20;
     int l_1C;
@@ -94,18 +94,18 @@ int func_0001167F(int a1)
     lseek(l_20, 0, 0);
     l_18 = mc_malloc(l_1C + 240, (int)D_001700D5, 302);
     if (l_18 == 0) {
-        func_0009DEA7(l_20);
+        close(l_20);
         return 0;
     }
-    if (func_000A00CB(l_20, l_18 + 240, l_1C) != l_1C) {
-        func_0009DEA7(l_20);
+    if (read(l_20, l_18 + 240, l_1C) != l_1C) {
+        close(l_20);
         if (l_18 != 0 && l_18 != (-1751672937)) {
             mc_free(l_18, (int)D_001700D5, 318);
             l_18 = -1751672937;
         }
         return 0;
     }
-    func_0009DEA7(l_20);
+    close(l_20);
     mc_memset(l_18, 0, 240, (int)D_001700D5, 328, 4);
     l_14 = l_18;
     if (strncmp(l_18 + 240, (int)D_00170112, 4) == 0) {

@@ -9,7 +9,7 @@ extern signed char text_buffer[];
 extern char D_001968BA;
 extern unsigned char location_block_indexes[];
 extern unsigned char location_block_numbers[];
-extern struct bits D_0019693D[];
+extern struct bits location_block_letters[];
 extern int rmb_block;
 extern int blocks_bsa;
 extern char cfg_block_str[];
@@ -17,9 +17,9 @@ extern char cfg_debug;
 extern int archive_find_record(int, char *, int);
 extern void archive_read_record(int, int, int);
 extern void mc_strncpy(char *, char *, int, char *, int);
-extern char *func_000A0DD9(int, char *, int);
-#pragma aux func_000A0ED9 parm routine [];
-extern void func_000A0ED9(int, char *);
+extern char *itoa(int, char *, int);
+#pragma aux mc_set_location parm routine [];
+extern void mc_set_location(int, char *);
 extern void mc_sprintf(char *, char *, ...);
 
 void town_block_load_rmb(int a1)
@@ -30,14 +30,14 @@ void town_block_load_rmb(int a1)
     char l_18[4];
 
     l_24 = location_block_indexes[a1];
-    if (D_0019693D[a1].b4)
+    if (location_block_letters[a1].b4)
         rmb_name_templates[l_24].c4 = D_001968BA;
     else
         rmb_name_templates[l_24].c4 = 'A';
-    rmb_name_templates[l_24].c5 = D_00179E10[D_0019693D[a1].b5];
-    func_000A0DD9(location_block_numbers[a1], l_18, 10);
+    rmb_name_templates[l_24].c5 = D_00179E10[location_block_letters[a1].b5];
+    itoa(location_block_numbers[a1], l_18, 10);
     if (l_24 == 13 || l_24 == 14) {
-        rmb_name_templates[l_24].c6 = D_0019693D[a1].lo + 'A';
+        rmb_name_templates[l_24].c6 = location_block_letters[a1].lo + 'A';
         rmb_name_templates[l_24].c7 = l_18[0];
     } else if (location_block_numbers[a1] < 10) {
         rmb_name_templates[l_24].c6 = '0';
@@ -47,7 +47,7 @@ void town_block_load_rmb(int a1)
         rmb_name_templates[l_24].c7 = l_18[1];
     }
     if (cfg_debug == 0) {
-        func_000A0ED9(476, D_001704CC);
+        mc_set_location(476, D_001704CC);
         mc_sprintf(((char *)text_buffer), D_00170530, &rmb_name_templates[l_24]);
     } else {
         mc_strncpy(((char *)text_buffer), cfg_block_str, 160, D_001704CC, 478);

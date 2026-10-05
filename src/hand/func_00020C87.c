@@ -13,12 +13,12 @@ extern struct shop crime_fine_table[];
 extern char D_00187CA8;
 extern struct row region_legal_reputation[];
 extern int D_00190CAC;
-extern char D_00190D16;
+extern char scratch_190d16;
 extern signed char D_00190D17;
 extern char court_state;
 extern short court_prison_days;
 extern unsigned char D_001940D5;
-extern struct record *D_00195AC4;
+extern struct record *location_object;
 extern int creature_count;
 extern char *window_image;
 extern int free_later_count;
@@ -47,7 +47,7 @@ extern void map_goto_location(int, int, int, int);
 extern void object_foreach(struct record *, void (*)(int));
 extern int rand(void);
 extern void mc_memcpy(char *, char *, int, char *, int, int);
-extern int func_000CDD81();
+extern int xn_gfx_present_inclusive();
 
 int court_open(int n)
 {
@@ -70,7 +70,7 @@ int court_open(int n)
         D_00190D17 = n;
         court_reputation_change = crime_reputation_loss[n] >> 1;
         if (player_environment == 2)
-            map_goto_location(current_region, 1, D_00195AC4->image, 0);
+            map_goto_location(current_region, 1, location_object->image, 0);
         if (region_legal_reputation[current_region].v < 0) {
             a = -region_legal_reputation[current_region].v;
             if (a > 75)
@@ -80,11 +80,11 @@ int court_open(int n)
                 b = 75;
         }
         if (rand_range(1, 100) <= b)
-            D_00190D16 = 0;
+            scratch_190d16 = 0;
         else if (rand_range(1, 100) <= a)
-            D_00190D16 = 0;
+            scratch_190d16 = 0;
         else
-            D_00190D16 = 2;
+            scratch_190d16 = 2;
         if (region_legal_reputation[current_region].v < 0)
             gold = crime_fine_table[n].base - region_legal_reputation[current_region].v * crime_fine_table[n].mul;
         else
@@ -109,7 +109,7 @@ int court_open(int n)
         D_00196272 = 1;
         window_image = disk_read_file(D_001706D4, 0);
         mc_memcpy(screen_buffer, window_image, 64000, D_001706E1, 114, 4);
-        func_000CDD81(1);
+        xn_gfx_present_inclusive(1);
         D_00190CAC = gold;
         D_00187CA8 = 0;
         D_001940D5 |= 64;
@@ -120,7 +120,7 @@ int court_open(int n)
             court_restore_vitals();
             court_reputation_restore();
             free_later_count = 0;
-            object_foreach(D_00195AC4, crime_remove_monster);
+            object_foreach(location_object, crime_remove_monster);
             object_free_pending();
             creature_count = 0;
             court_close();
@@ -132,7 +132,7 @@ int court_open(int n)
             court_restore_vitals();
             court_reputation_restore();
             free_later_count = 0;
-            object_foreach(D_00195AC4, crime_remove_monster);
+            object_foreach(location_object, crime_remove_monster);
             object_free_pending();
             creature_count = 0;
             court_close();

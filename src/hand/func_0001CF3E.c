@@ -2,7 +2,7 @@
 #include "records.h"
 
 extern char D_00170464[];        /* __FILE__ */
-extern unsigned char D_00190D16;
+extern unsigned char scratch_190d16;
 extern unsigned char D_00190D17;
 extern signed char text_rsc_buffer[];
 extern int D_00195B84;
@@ -19,7 +19,7 @@ extern void parse_rsc_text(int, int, int);
 extern int rand_range(int, int);
 extern void mc_memset(char *, int, int, char *, int, int);
 extern int write(int, void *, int);
-extern int func_000A0DF4(char *);
+extern int strlen(char *);
 
 void rumor_add_faction(struct faction *a1, struct faction *a2, int a3, unsigned char a4, int a5)
 {
@@ -37,7 +37,7 @@ void rumor_add_faction(struct faction *a1, struct faction *a2, int a3, unsigned 
         }
     D_0019671C = a1;
     D_0019670C = a2;
-    D_00190D16 = a3;
+    scratch_190d16 = a3;
     D_00190D17 = a4;
     D_00196708++;
     if (a4 != 0)
@@ -64,7 +64,7 @@ void rumor_add_faction(struct faction *a1, struct faction *a2, int a3, unsigned 
     mc_memset(m.quest_name, 0, 9, D_00170464, 1606, 9);
     m.message = 0;
     m.target = 0;
-    m.text_length = func_000A0DF4(((char *)text_rsc_buffer)) + 1;
+    m.text_length = strlen(((char *)text_rsc_buffer)) + 1;
     m.expires = game_minutes + 43140;
     write(rumor_file, &m, 34);
     write(rumor_file, ((char *)text_rsc_buffer), m.text_length);

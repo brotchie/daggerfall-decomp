@@ -5,12 +5,12 @@ extern unsigned spell_resist_flags[];
 extern int object_delete(struct record *);
 void spfx_effect_end(struct spell *e, int i, struct record *a3);
 
-int func_0008A496(int a1, int a2, int a3)
+int spfx_wall_of_frost(int a1, int a2, int a3)
 {
     return 0;
 }
 
-int func_0008A4BD(int a1, int a2, int a3)
+int spfx_wall_of_poison(int a1, int a2, int a3)
 {
     return 0;
 }

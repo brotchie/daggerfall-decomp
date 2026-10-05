@@ -6,7 +6,7 @@ extern short D_0017B66D[][2][4];
 extern int climate_category(void);
 extern int rand(void);
 
-void person_pick_sprite(struct record *a1)
+void pedestrian_pick_sprite(struct record *a1)
 {
     int kind;
     int flip;

@@ -21,9 +21,9 @@ extern int sound_play(int, struct record *, int);
 extern int disk_read_file(char *, int);
 extern void cursor_draw_arrow(void);
 extern void mc_free(int, char *, int);
-extern void func_000CDD81(int);
-extern void func_000CE8A0(unsigned char *, unsigned char *);
-extern void func_0012B136(void);
+extern void xn_gfx_present_inclusive(int);
+extern void xn_mouse_get_sensitivity(unsigned char *, unsigned char *);
+extern void xn_mouse_poll_clamped(void);
 
 int options_mouse_screen(void)
 {
@@ -35,12 +35,12 @@ int options_mouse_screen(void)
     l_1C = disk_read_file(D_00170F2D, 0);
     D_00195B5C = disk_read_file(D_00170F3A, 0);
     D_00195B60 = disk_read_file(D_00170F47, 0);
-    func_000CE8A0(&mouse_sensitivity_x, &mouse_sensitivity_y);
+    xn_mouse_get_sensitivity(&mouse_sensitivity_x, &mouse_sensitivity_y);
     mouse_sensitivity_x /= 6;
     mouse_sensitivity_y /= 6;
     while (l_20 == 0) {
         mouse_buttons_prev = mouse_buttons;
-        func_0012B136();
+        xn_mouse_poll_clamped();
         options_mouse_draw(l_1C);
         cursor_draw_arrow();
         if (mouse_buttons != 0 && mouse_buttons_prev == 0) {
@@ -51,7 +51,7 @@ int options_mouse_screen(void)
                 }
             }
         }
-        func_000CDD81(0);
+        xn_gfx_present_inclusive(0);
     }
     if (D_00195B60 != 0 && D_00195B60 != 0x97979797) {
         mc_free(D_00195B60, D_00170EE8, 468);

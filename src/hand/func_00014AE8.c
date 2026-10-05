@@ -9,14 +9,14 @@ extern char D_00187CA8;
 extern char D_00190D0F;
 extern char D_00190D10;
 extern int window_image;
-extern char *D_00195C44;
+extern char *scratch_buffer;
 extern char *D_00195D28;
 extern int talk_disposition;
 extern unsigned char D_0019626F;
 extern unsigned char D_00196272;
 extern unsigned char game_mode;
 extern unsigned char crime_current;
-extern unsigned char D_0019627F;
+extern unsigned char people_witness_flags;
 extern void *talk_saved_screen;
 extern struct faction *talk_npc_own_faction;
 extern struct faction *talk_npc_faction;
@@ -59,12 +59,12 @@ extern int talk_roll_attitude(void);
 extern int func_0001D46A(int);
 extern void msgbox_show_rsc(short, int);
 extern void guards_summon(int);
-extern void person_load_face(struct record *, int);
-extern int func_00041347(void);
+extern void npc_load_face(struct record *, int);
+extern int people_check_witnesses(void);
 extern int disk_read_file(char *, int);
 extern int rand(void);
 extern void *mc_malloc(int, char *, int);
-extern void func_0012DB50(int);
+extern void xn_font_select(int);
 
 int talk_open(struct record *a1)
 {
@@ -74,8 +74,8 @@ int talk_open(struct record *a1)
     if (D_0019626F == 12 && game_mode == 8)
         return 1;
     if (a1 != 0) {
-        if (talk_npc_faction->social_group == 4 && (func_00041347() & 2)) {
-            D_0019627F &= 2;
+        if (talk_npc_faction->social_group == 4 && (people_check_witnesses() & 2)) {
+            people_witness_flags &= 2;
             crime_current = 7;
             guards_summon(0);
             return 0;
@@ -84,7 +84,7 @@ int talk_open(struct record *a1)
         D_001966BA = 0;
         talk_prostitute_offer = 0;
         talk_npc_object = a1;
-        func_0012DB50(4);
+        xn_font_select(4);
         game_mode = 12;
         window_image = disk_read_file(D_001703C9, 0);
         D_001965E4 = disk_read_file(D_001703D6, 0);
@@ -104,7 +104,7 @@ int talk_open(struct record *a1)
         D_001966AC = 0;
         talk_attitude_cache = D_001965D0 = D_001965D4 = 0;
         D_00195D28 = D_001965FC;
-        talk_place_topics = D_00195C44 + 64768;
+        talk_place_topics = scratch_buffer + 64768;
         func_00018339();
         talk_showing_categories = 1;
         talk_build_place_topics();
@@ -114,7 +114,7 @@ int talk_open(struct record *a1)
         talk_init_text();
         D_001965C8 = rand();
         if (D_00190D10 == 0)
-            person_load_face(talk_npc_object, talk_face_image);
+            npc_load_face(talk_npc_object, talk_face_image);
         err = func_0001D46A(talk_npc_object->id);
         if (talk_npc_own_faction->type == 15 || talk_npc_own_faction->type == 14)
             msg = talk_npc_own_faction->id;

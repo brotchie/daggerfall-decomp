@@ -15,32 +15,32 @@ extern char weapon_swing_sounds[];
 extern char monster_parry_ids[];
 extern char monster_weights[];
 extern char monster_category[];
-extern signed char itemmaker_slot_kinds[];
-extern char D_00190D64[];
+extern signed char scratch_190ce4[];
+extern char scratch_190d64[];
 extern signed char D_001940DA;
 extern signed char quest_global_states[];
-extern int D_001959FC;
+extern int spell_points_bonus;
 extern char D_00195A08[];
 extern int D_00195A0C;
 extern int D_00195A78;
 extern struct record *player_object;
 extern struct record *D_00195AA8;
-extern struct record *D_00195AC4;
+extern struct record *location_object;
 extern char hud_bar_image[];
 extern struct character *player_character;
 extern int game_minutes;
 extern struct settings *game_settings;
-extern int D_00195D48;
+extern int sky_loaded_frame;
 extern short D_00195DA0;
 extern unsigned char D_00196271;
 extern signed char game_mode;
 extern signed char D_00196291;
-extern signed char D_0019629B;
+extern signed char night_sky_loaded;
 extern char D_00196DC4[];
-extern signed char D_001970C4;
+extern signed char monsters_woken;
 extern struct quest *current_quest;
 extern struct record *quest_event_object;
-extern struct quest *D_00199780;
+extern struct quest *quest_tick_data;
 extern struct qbn_op *quest_prompt_op;
 extern struct quest *quest_prompt_quest;
 extern short D_001997AA;
@@ -56,13 +56,13 @@ extern int travel_route(int, int, int, int, int);
 extern int rand();
 extern int mc_memset();
 extern int memchr();
-extern int func_000C1500();
-extern int func_000C808D();
-extern int func_000C9F08();
-extern int func_000CE70D();
-extern int func_0012B136();
-extern int func_0012D8BD();
-extern int func_00135DE4();
+extern int xn_vid_play();
+extern int xn_math_angle_to_point();
+extern int xn_timer_bios_ticks();
+extern int xn_math_advance_pitch_yaw();
+extern int xn_mouse_poll_clamped();
+extern int xn_pal_fade_to();
+extern int xn_tex_cache_lookup_image();
 extern void quest_run_opcodes(struct quest *);
 extern void quest_show_message(struct quest *, int);
 extern void quest_op_done(struct quest *, struct qbn_op *);
@@ -70,12 +70,12 @@ extern void time_pass(int);
 extern void palette_restore(void);
 extern void cast_spell_on(struct record *, struct record *, int);
 extern void disease_infect(struct record *, int, int, int);
-extern void func_0007E31C(struct record *);
+extern void flat_anim_restart(struct record *);
 extern void object_foreach(struct record *, int);
 void disease_infect_lycanthropy(struct record *, int);
 void disease_infect_vampirism(struct record *);
 void damage_collapse_exhausted(struct record *);
-void func_0002FB8B(struct record *);
+void monster_wake_cb(struct record *);
 void quest_prompt_answer(void);
 
 void damage_monster_hit_effects(struct record *a1, struct record *a2)
@@ -148,10 +148,10 @@ void damage_collapse_exhausted(struct record *a1)
     int l_1C;
     int l_18;
 
-    l_1C = func_000C9F08();
+    l_1C = xn_timer_bios_ticks();
     mc_memset(655360, 0, ((((int)(unsigned short)(*(short *)((char *)((int)game_settings)) & 1)) != 0) ? 64000 : ((int)(unsigned short)*(short *)(*(char **)hud_bar_image + 2)) * 320), (int)D_001709E4, 701, 4);
     time_pass(20160);
-    while ((func_000C9F08() - l_1C) < 22);
+    while ((xn_timer_bios_ticks() - l_1C) < 22);
 }
 
 void damage_spawn_splash(struct record *a1, int a2, int a3)
@@ -162,10 +162,10 @@ void damage_spawn_splash(struct record *a1, int a2, int a3)
     short l_10;
 
     l_18 = object_create_child(a1->parent, 0, 0);
-    l_18->id = object_new_id(((unsigned)D_00195AC4->id) >> 16);
+    l_18->id = object_new_id(((unsigned)location_object->id) >> 16);
     l_18->type = 42;
     l_18->x = a1->x;
-    *(int *)&l_10 = func_00135DE4(a1->image >> 7, (int)(unsigned short)(a1->image & 127));
+    *(int *)&l_10 = xn_tex_cache_lookup_image(a1->image >> 7, (int)(unsigned short)(a1->image & 127));
     l_18->y = a1->y - (((int)(unsigned short)*(short *)(*(char **)&l_10 + 6)) >> 1);
     if (a1->type == 18) {
         l_14 = &a1->data.character;
@@ -179,9 +179,9 @@ void damage_spawn_splash(struct record *a1, int a2, int a3)
             l_18->image = a3 + (D_00195DA0 << 7);
         }
     }
-    l_1C = func_000C808D(a1->x, a1->z, player_object->x, player_object->z);
-    func_000CE70D(0, l_1C, 10, &l_18->x);
-    func_0007E31C(l_18);
+    l_1C = xn_math_angle_to_point(a1->x, a1->z, player_object->x, player_object->z);
+    xn_math_advance_pitch_yaw(0, l_1C, 10, &l_18->x);
+    flat_anim_restart(l_18);
 }
 
 void func_0002F62C(struct record *a1, int a2, int a3, int a4)
@@ -223,10 +223,10 @@ void damage_knockback(struct record *a1, int a2, int a3, int a4)
     l_C->action = 16;
 }
 
-void func_0002F992(void)
+void damage_expire_drain_bonuses(void)
 {
     if (D_00195A0C != 0 && ((unsigned)game_minutes) > D_00195A0C) {
-        D_001959FC = 0;
+        spell_points_bonus = 0;
     }
     if (D_00195A78 == 0 || ((unsigned)game_minutes) <= D_00195A78) return;
     *(int *)D_00195A08 = 0;
@@ -261,32 +261,32 @@ void play_death_video(void)
     int l_1C;
     int l_18;
 
-    func_0012D8BD((int)D_00196DC4, 50);
+    xn_pal_fade_to((int)D_00196DC4, 50);
     mc_memset(655360, 0, 64000, (int)D_001709E4, 875, 4);
     mc_memset(screen_buffer, 0, 64000, (int)D_001709E4, 876, 4);
     palette_restore();
     l_18 = disk_resolve_path((int)D_001709FB);
-    while (mouse_buttons != 0) func_0012B136();
-    func_000C1500(l_18, 0, 0, 1);
+    while (mouse_buttons != 0) xn_mouse_poll_clamped();
+    xn_vid_play(l_18, 0, 0, 1);
     mc_memset(655360, 0, 64000, (int)D_001709E4, 883, 4);
     mc_memset(screen_buffer, 0, 64000, (int)D_001709E4, 884, 4);
     palette_restore();
-    D_00195D48 = 10000;
-    D_0019629B = 0;
-    while (mouse_buttons != 0) func_0012B136();
+    sky_loaded_frame = 10000;
+    night_sky_loaded = 0;
+    while (mouse_buttons != 0) xn_mouse_poll_clamped();
 }
 
-void func_0002FB8B(struct record *a1)
+void monster_wake_cb(struct record *a1)
 {
     if (a1->type != 18 || a1->wait_state != 99) return;
     a1->wait_state = 0;
 }
 
-void func_0002FBCC(void)
+void monster_wake_all(void)
 {
-    if (D_001970C4 != 0) return;
-    D_001970C4 = 1;
-    object_foreach(D_00195AC4, (int)func_0002FB8B);
+    if (monsters_woken != 0) return;
+    monsters_woken = 1;
+    object_foreach(location_object, (int)monster_wake_cb);
 }
 
 void func_0002FD75(struct record *a1)
@@ -305,7 +305,7 @@ void func_0002FDB0(struct record *a1)
     if (a1->type != 14) return;
     l_18 = &a1->data.quest;
     if (l_18->id != D_001997AA) return;
-    D_00199780 = l_18;
+    quest_tick_data = l_18;
     quest_event_object = a1;
 }
 
@@ -322,9 +322,9 @@ void func_0002FE4B(struct record *a1)
 
     if (a1->type != 18) return;
     if ((short)((int)(unsigned char)(signed char)a1->quest_id) != current_quest->id) return;
-    l_18 = *(short *)D_00190D64;
+    l_18 = *(short *)scratch_190d64;
     if ((short)a1->image2 != l_18) return;
-    if (itemmaker_slot_kinds[0] != 0) {
+    if (scratch_190ce4[0] != 0) {
         a1->data.character.flags |= 0x8000;
         return;
     }
@@ -335,7 +335,7 @@ void quest_cast_spell_on_foe_cb(struct record *a1)
 {
     if (a1->type != 18) return;
     if ((short)(a1->quest_id) != current_quest->id) return;
-    if (a1->image2 != *(short *)D_00190D64) return;
+    if (a1->image2 != *(short *)scratch_190d64) return;
     D_00196291 = 1;
     cast_spell_on(D_00195AA8, a1, 1);
     D_00196291 = 0;

@@ -16,7 +16,7 @@ extern int wagon_container;
 extern char *D_00195B64;
 extern struct Ply *player_character;
 extern int game_minutes;
-extern int D_00195D2C;
+extern int trade_total;
 extern int trade_mode;
 extern int inventory_action;
 extern unsigned char current_region;
@@ -31,23 +31,23 @@ extern unsigned char D_001AA5F8;
 extern unsigned char inv_tab;
 extern int holiday_today(int, int);
 extern void paperdoll_draw(int, int);
-extern void text_draw_colored(char *, short, short, int, unsigned char);
+extern void text_draw_coloured(char *, short, short, int, unsigned char);
 extern int gold_total_alias(void);
 extern void inv_blit_rect_from_image(int, char *);
 extern void inv_draw_container_icon(int, int);
 extern int inv_draw_item_cell(int, short, char *);
 extern void inv_draw_left_list(char *);
 extern void inv_draw_right_list(char *);
-extern void func_00096997(void);
-extern int func_00096A14(void);
+extern void trade_total_buy(void);
+extern int trade_total_repair(void);
 extern void inv_draw_scroll_arrows(void);
-extern int func_00097764(void);
-extern void func_000984E0(void);
+extern int trade_total_sell(void);
+extern void trade_total_identify(void);
 extern void inv_draw_armor_values(void);
-extern char *func_000A0DD9(int, char *, int);
+extern char *itoa(int, char *, int);
 extern void mc_memcpy(char *, char *, int, char *, int, int);
-extern int func_000CE31C();
-extern int func_00144F68();
+extern int xn_draw_copy_rect_stride_bytes();
+extern int xn_draw_image();
 
 void inventory_draw(void)
 {
@@ -64,7 +64,7 @@ void inventory_draw(void)
 
     mc_memcpy(screen_buffer, inventory_images, 64000, D_0017704C, 553, 4);
     if (trade_mode != 0)
-        func_00144F68(D_001AA434->x, D_001AA434->y, D_001AA434->w, D_001AA434->h, D_001AA434->data);
+        xn_draw_image(D_001AA434->x, D_001AA434->y, D_001AA434->w, D_001AA434->h, D_001AA434->data);
     r = (struct Rect *)(((int)inv_mode_buttons + trade_mode * 84) + inventory_action * 12);
     if (trade_mode == 0) {
         for (y = r->y0; r->y1 >= y; y++)
@@ -76,16 +76,16 @@ void inventory_draw(void)
     }
     inv_blit_rect_from_image(inv_tab + 41, D_001AA420);
     paperdoll_draw(-147, 0);
-    func_000CE31C(D_00195B64 + 1008, screen_buffer + 4209, 111, 184, 125);
+    xn_draw_copy_rect_stride_bytes(D_00195B64 + 1008, screen_buffer + 4209, 111, 184, 125);
     if (trade_mode != 0) {
-        func_00144F68(D_001AA43C->x, D_001AA43C->y, D_001AA43C->w, D_001AA43C->h, D_001AA43C->data);
+        xn_draw_image(D_001AA43C->x, D_001AA43C->y, D_001AA43C->w, D_001AA43C->h, D_001AA43C->data);
         key = holiday_today(game_minutes, current_region);
         if (key == 43 || ((struct bf8_7_1 *)&player_motion_flags)->f)
             val = 0;
         else
-            val = D_00195D2C;
-        text_draw_colored(func_000A0DD9(D_00195D2C, ((char *)text_buffer), 10), 77, 15, 145, 156);
-        text_draw_colored(func_000A0DD9(gold_total_alias(), ((char *)text_buffer), 10), 107, 15, 145, 156);
+            val = trade_total;
+        text_draw_coloured(itoa(trade_total, ((char *)text_buffer), 10), 77, 15, 145, 156);
+        text_draw_coloured(itoa(gold_total_alias(), ((char *)text_buffer), 10), 107, 15, 145, 156);
     }
     inv_draw_armor_values();
     inv_draw_left_list(D_00188569);
@@ -104,16 +104,16 @@ void inventory_draw(void)
     case 0:
         break;
     case 3:
-        func_00096A14();
+        trade_total_repair();
         break;
     case 1:
-        func_00096997();
+        trade_total_buy();
         break;
     case 2:
-        func_00097764();
+        trade_total_sell();
         break;
     case 4:
-        func_000984E0();
+        trade_total_identify();
         break;
     }
 }

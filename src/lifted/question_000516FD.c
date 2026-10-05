@@ -2,18 +2,18 @@
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
 
-extern char D_00190D64[];
-extern char D_00195C44[];
+extern char scratch_190d64[];
+extern char scratch_buffer[];
 
-extern int func_0012B2EB();
-extern int func_0012B3ED();
-extern int func_00144FB4();
-extern void func_0005175B(int, short);
+extern int xn_mouse_cursor_erase();
+extern int xn_mouse_cursor_draw();
+extern int xn_draw_image_transparent();
+extern void class_question_scroll_step(int, short);
 
 void class_question_scroll(int a1, short a2)
 {
-    func_0012B2EB();
-    func_0005175B(a1, (int)(short)a2);
-    func_00144FB4(0, 135, 320, 48, (int)(*(char **)D_00195C44 + (((int)(short)*(short *)D_00190D64) * 320)));
-    func_0012B3ED();
+    xn_mouse_cursor_erase();
+    class_question_scroll_step(a1, (int)(short)a2);
+    xn_draw_image_transparent(0, 135, 320, 48, (int)(*(char **)scratch_buffer + (((int)(short)*(short *)scratch_190d64) * 320)));
+    xn_mouse_cursor_draw();
 }

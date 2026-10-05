@@ -13,12 +13,12 @@ extern char D_00175D8F[];
 extern char D_00175D95[];
 extern char D_00175D97[];
 extern char D_00175D9A[];
-extern void func_0006D430(char *);
-extern void func_0006D491(char *);
+extern void file_index_add_dir(char *);
+extern void file_index_add_name(char *);
 extern void mc_strncpy(char *, char *, int, char *, int);
-#pragma aux func_000A0ED9 parm routine [];
-extern void func_000A0ED9(int, char *);
-extern int func_000A0DF4(char *);
+#pragma aux mc_set_location parm routine [];
+extern void mc_set_location(int, char *);
+extern int strlen(char *);
 extern int stricmp(char *, char *);
 extern int mc_sprintf(char *, char *, ...);
 extern int func_000A13DA(char *, int, struct find_t *);
@@ -31,17 +31,17 @@ void file_index_scan(char *a1)
     char path[80];
     struct find_t ff;
 
-    if (a1[func_000A0DF4(a1) - 1] != '\\') {
-        func_000A0ED9(337, D_00175D00);
+    if (a1[strlen(a1) - 1] != '\\') {
+        mc_set_location(337, D_00175D00);
         mc_sprintf(path, D_00175D88, a1);
     } else {
-        func_000A0ED9(339, D_00175D00);
+        mc_set_location(339, D_00175D00);
         mc_sprintf(path, D_00175D8F, a1);
     }
     rc = func_000A13DA(path, 16, &ff);
     while (rc == 0) {
         if ((ff.attrib & 16) == 0)
-            func_0006D491(ff.name);
+            file_index_add_name(ff.name);
         rc = func_000A13F7(&ff);
     }
     rc = func_000A13DA(path, 16, &ff);
@@ -51,10 +51,10 @@ void file_index_scan(char *a1)
                 rc = func_000A13F7(&ff);
                 continue;
             }
-            func_0006D430(ff.name);
-            mc_strncpy(&path[func_000A0DF4(path) - 3], ff.name, 4, D_00175D00, 359);
+            file_index_add_dir(ff.name);
+            mc_strncpy(&path[strlen(path) - 3], ff.name, 4, D_00175D00, 359);
             file_index_scan(path);
-            i = func_000A0DF4(path) - 1;
+            i = strlen(path) - 1;
             while (i != 0 && path[i] != '\\')
                 i--;
             mc_strncpy(path + i, D_00175D9A, 4, D_00175D00, 363);

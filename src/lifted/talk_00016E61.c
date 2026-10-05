@@ -9,7 +9,7 @@ extern int talk_answer_line_count;
 extern int talk_answer_scroll;
 
 extern int mc_strncpy();
-extern void text_draw_colored(int, int, int, int, unsigned char);
+extern void text_draw_coloured(int, int, int, int, unsigned char);
 
 void talk_draw_answer(int a1, int a2, int a3, int a4)
 {
@@ -36,7 +36,7 @@ void talk_draw_answer(int a1, int a2, int a3, int a4)
         l_10 = 0;
         while (((int)(unsigned char)text_rsc_buffer[l_10]) == 32) l_10++;
         l_C = a2 + (l_1C * 7);
-        text_draw_colored(((int)text_rsc_buffer) + l_10, (int)(short)*(short *)&a1, (int)(short)*(short *)&l_C, (int)(short)*(short *)&l_14, 156);
+        text_draw_coloured(((int)text_rsc_buffer) + l_10, (int)(short)*(short *)&a1, (int)(short)*(short *)&l_C, (int)(short)*(short *)&l_14, 156);
         l_1C++;
     } while (l_C < a4);
 }

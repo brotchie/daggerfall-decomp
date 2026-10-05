@@ -3,7 +3,7 @@
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
 
-extern int D_001343C0;
+extern int xn_anim_ticks;
 extern char D_00176C20[];
 extern char D_00176C29[];
 extern char D_00176C4F[];
@@ -17,27 +17,27 @@ extern char D_00187DC0[];
 extern char D_00187DE8[];
 extern char D_00187EC8[];
 extern signed char text_buffer[];
-extern char text_macro_fpc[];
+extern char scratch_190de4[];
 extern char D_001910AC[];
 extern char frame_counter[];
-extern int D_001959BC;
+extern int view_look_yaw;
 extern struct building *current_building;
 extern struct record *player_object;
-extern struct record *D_00195AC4;
+extern struct record *location_object;
 extern struct location *current_location;
 extern struct settings *game_settings;
-extern char D_00195C44[];
+extern char scratch_buffer[];
 extern int sound_last_size;
 extern signed char current_region;
 extern signed char current_climate;
-extern int D_001967F0;
-extern int D_001967F4;
-extern int D_001967F8;
-extern char D_001967FC[];
-extern int D_00196800;
-extern int D_00196808;
+extern int rmb_origin_z;
+extern int rmb_origin_y;
+extern int rmb_origin_x;
+extern char rmb_origin_yaw[];
+extern int town_house_skip_percent;
+extern int town_building_counter;
 extern char rmb_record_ptr[];
-extern signed char D_001968BB;
+extern signed char location_is_port;
 extern char rmb_block[];
 extern struct model_node model_cache_nodes[];
 extern char sound_cache[];
@@ -48,24 +48,24 @@ extern int model_heap_free;
 extern struct model_node *model_cache_root;
 extern int sound_cache_bytes;
 extern int D_001A9438;
-extern int D_001A9440;
+extern int sound_last_id;
 extern int arch3d_bsa;
 extern int dagger_snd;
 extern char model_heap[];
 extern signed char D_001A949C;
-extern signed char D_001A949D;
+extern signed char model_cache_flush_count;
 
 extern int archive_find_record(int, int, int);
 extern int archive_record_size(int, int);
 extern int archive_read_record(int, int, int);
-extern int func_0002455D(struct record *);
+extern int collide_floor_height(struct record *);
 extern int flats_cfg_find(int);
 extern int sound_play_at_point(int, int, int, int, int);
 extern int mem_pool_alloc(int, int);
 extern int mem_pool_release(int);
 extern int rand_range(int, int);
 extern int model_get(unsigned short, int, int);
-extern int func_00086093(int);
+extern int flat_table_pick(int);
 extern struct record *object_create_child(struct record *, struct record *, int);
 extern int dpmi_lock_region(int, int);
 extern int dpmi_unlock_region(int, int);
@@ -74,16 +74,16 @@ extern int srand();
 extern int mc_free();
 extern int mc_memset();
 extern int mc_malloc();
-extern int func_000A0ED9(int, int);
+extern int mc_set_location(int, int);
 extern int mc_sprintf(int, ...);
 extern int mc_memcpy();
-extern int func_000C5280();
-extern int func_000C7FD9();
-extern int func_000CE6E2();
-extern int func_000CE808();
-extern int func_00136AD8();
-extern int func_0013FE15();
-extern int func_00154D00();
+extern int xn_rand_noise_2d();
+extern int xn_math_approx_dist2d();
+extern int xn_math_yaw_offset_xz();
+extern int xn_model_max_y();
+extern int xn_light_add();
+extern int xn_model_prepare();
+extern int xn_flat_add();
 extern void arch3d_apply_climate_textures(int);
 extern void fatal_error(int);
 extern void mem_pool_init(int, int);
@@ -96,16 +96,16 @@ extern void object_foreach(struct record *, int);
 struct record *rmb_add_subrecord(struct record *);
 int model_load(int, int);
 int model_cache_add(int);
-int func_00086041(int, int);
-void func_00084E5E(struct record *);
+int flat_random_clutter(int, int);
+void rmb_set_building_factions(struct record *);
 void model_cache_purge_old(struct model_node *);
 void model_cache_flush(struct model_node *);
 void model_cache_purge_unused(struct model_node *, int, struct model_node *);
 void model_cache_remove_node(struct model_node *, struct model_node *);
 void sound_cache_trim(void);
-void func_00085EF8(struct record *);
-void func_0008600F(int);
-#pragma aux func_000A0ED9 parm routine [];
+void model_unlink_object_cb(struct record *);
+void model_unlink_objects(int);
+#pragma aux mc_set_location parm routine [];
 
 struct record *rmb_add_subrecord(struct record *a1)
 {
@@ -129,12 +129,12 @@ struct record *rmb_add_subrecord(struct record *a1)
     if (l_1C == 17) return 0;
     l_48 = object_create_child(a1, 0, l_1C);
     l_48->type = 43;
-    l_48->x = D_001967F8;
-    l_48->z = D_001967F0;
-    l_48->y = D_001967F4;
-    l_48->yaw = *(short *)D_001967FC;
+    l_48->x = rmb_origin_x;
+    l_48->z = rmb_origin_z;
+    l_48->y = rmb_origin_y;
+    l_48->yaw = *(short *)rmb_origin_yaw;
     l_48->pad13 = 32768;
-    l_48->id = D_00195AC4->id + ((int)(unsigned short)(current_location->object_counter)++);
+    l_48->id = location_object->id + ((int)(unsigned short)(current_location->object_counter)++);
     D_001A9438 = l_48->id;
     l_44 = &l_48->data.block;
     mc_memcpy((int)l_44, *(int *)rmb_record_ptr, l_1C, (int)D_00176C20, 803, 4);
@@ -145,22 +145,22 @@ struct record *rmb_add_subrecord(struct record *a1)
     l_44->section3 = (char *)((int)l_3C + (l_44->flat_count * 17));
     l_34 = (int)l_44->section3;
     for (l_28 = 0; l_44->model_count > l_28; l_28++, l_40++) {
-        rotate_xz((int)&l_40->x, (int)&l_40->z, *(int *)D_001967FC);
-        l_40->x += D_001967F8;
-        l_40->z += D_001967F0;
+        rotate_xz((int)&l_40->x, (int)&l_40->z, *(int *)rmb_origin_yaw);
+        l_40->x += rmb_origin_x;
+        l_40->z += rmb_origin_z;
         l_40->model = 0;
         if (l_40->y > 0 && l_40->id > 10) {
             l_40->model = (char *)model_get(l_40->id, l_40->variant, (((int)(unsigned char)current_climate) << 2) + ((int)(unsigned char)D_001A949C));
-            l_40->y = (-l_40->y) - (func_000CE808((int)l_40->model) >> 8);
+            l_40->y = (-l_40->y) - (xn_model_max_y((int)l_40->model) >> 8);
         }
-        l_40->y += D_001967F4;
-        l_40->yaw += *(int *)D_001967FC;
+        l_40->y += rmb_origin_y;
+        l_40->yaw += *(int *)rmb_origin_yaw;
     }
     for (l_28 = 0; l_44->flat_count > l_28; l_28++, l_3C++) {
-        rotate_xz((int)&l_3C->x, (int)&l_3C->z, *(int *)D_001967FC);
-        l_3C->x += D_001967F8;
-        l_3C->z += D_001967F0;
-        l_3C->y += D_001967F4;
+        rotate_xz((int)&l_3C->x, (int)&l_3C->z, *(int *)rmb_origin_yaw);
+        l_3C->x += rmb_origin_x;
+        l_3C->z += rmb_origin_z;
+        l_3C->y += rmb_origin_y;
         if ((l_3C->image >> 7) == 199) {
             rmb_add_editor_marker(a1, (int)l_3C);
         } else {
@@ -171,10 +171,10 @@ struct record *rmb_add_subrecord(struct record *a1)
         }
     }
     for (l_28 = 0; l_44->section3_count > l_28; l_28++, (*(char (**)[16])&l_34)++) {
-        rotate_xz(l_34, l_34 + 8, *(int *)D_001967FC);
-        *(int *)((char *)l_34) += D_001967F8;
-        *(int *)((char *)l_34 + 8) += D_001967F0;
-        *(int *)((char *)l_34 + 4) += D_001967F4;
+        rotate_xz(l_34, l_34 + 8, *(int *)rmb_origin_yaw);
+        *(int *)((char *)l_34) += rmb_origin_x;
+        *(int *)((char *)l_34 + 8) += rmb_origin_z;
+        *(int *)((char *)l_34 + 4) += rmb_origin_y;
     }
     l_38 = (int)(*(char **)rmb_record_ptr + l_1C);
     l_30 = l_38 + (((int)(unsigned char)*(signed char *)(*(char **)rmb_record_ptr + 3)) * 17);
@@ -184,7 +184,7 @@ struct record *rmb_add_subrecord(struct record *a1)
     return l_48;
 }
 
-void func_00084E5E(struct record *a1)
+void rmb_set_building_factions(struct record *a1)
 {
     int l_20;
     struct building *l_1C;
@@ -197,7 +197,7 @@ void func_00084E5E(struct record *a1)
         }
         return;
     }
-    l_1C->faction_id = ((((int)(unsigned char)(D_001968BB & 16)) != 0) ? 852 : 242);
+    l_1C->faction_id = ((((int)(unsigned char)(location_is_port & 16)) != 0) ? 852 : 242);
     a1 = a1->children;
     while (a1 != 0) {
         if (a1->type == 8) {
@@ -205,7 +205,7 @@ void func_00084E5E(struct record *a1)
             if (*(unsigned short *)((char *)l_20) == *(short *)(D_00187D30 + (((int)(unsigned char)current_region) * 2))) {
                 *(short *)((char *)l_20) = D_00187CB4[((int)(unsigned char)current_region)];
             }
-            if (((int)(unsigned short)*(short *)((char *)l_20)) == 852 && ((int)(unsigned char)(D_001968BB & 16)) == 0) {
+            if (((int)(unsigned short)*(short *)((char *)l_20)) == 852 && ((int)(unsigned char)(location_is_port & 16)) == 0) {
                 *(short *)((char *)l_20) = 242;
             }
         }
@@ -239,16 +239,16 @@ struct record *rmb_add_building(struct record *a1, int a2)
         l_20 = rand();
         srand(l_1C);
         if (((int)(unsigned short)*(short *)(*(char **)rmb_block + 661 + (a2 * 26))) != 42 && ((int)(unsigned short)*(short *)(*(char **)rmb_block + 661 + (a2 * 26))) != 108) {
-            if ((l_20 % 100) <= D_00196800) {
+            if ((l_20 % 100) <= town_house_skip_percent) {
                 l_18->flags |= 8;
                 l_18->image = 65535;
                 return l_18;
             }
         }
     }
-    l_18->image = D_00196808++;
+    l_18->image = town_building_counter++;
     rmb_add_subrecord(l_18);
-    func_00084E5E(l_18);
+    rmb_set_building_factions(l_18);
     return l_18;
 }
 
@@ -307,7 +307,7 @@ int model_load(int a1, int a2)
     l_20 = archive_find_record(arch3d_bsa, (int)text_buffer, l_18);
     l_1C = archive_record_size(arch3d_bsa, l_20);
     if ((model_cache_nodes[a1].model = (char *)mem_pool_alloc((int)model_heap, l_1C)) == 0) {
-        if (D_001A949D == 0) {
+        if (model_cache_flush_count == 0) {
             model_cache_purge_old(model_cache_root);
             if ((model_cache_nodes[a1].model = (char *)mem_pool_alloc((int)model_heap, l_1C)) == 0) {
                 model_cache_flush(model_cache_root);
@@ -321,9 +321,9 @@ int model_load(int a1, int a2)
         }
     }
     if (archive_read_record(arch3d_bsa, l_20, (int)model_cache_nodes[a1].model) == 0) {
-        func_000A0ED9(1104, (int)D_00176C20);
-        mc_sprintf(*(int *)D_00195C44, (int)D_00176C4F, l_20);
-        fatal_error(*(int *)D_00195C44);
+        mc_set_location(1104, (int)D_00176C20);
+        mc_sprintf(*(int *)scratch_buffer, (int)D_00176C4F, l_20);
+        fatal_error(*(int *)scratch_buffer);
     }
     model_heap_free -= (l_1C + 1) & -2;
     return (int)model_cache_nodes[a1].model;
@@ -379,7 +379,7 @@ int model_cache_add(int a1)
         model_cache_nodes[l_20].last_frame = *(int *)frame_counter;
         model_cache_nodes[l_20].left = (model_cache_nodes[l_20].right = 0);
         if (model_load(l_20, a1) == 0) return 0;
-        func_0013FE15((int)model_cache_nodes[l_20].model);
+        xn_model_prepare((int)model_cache_nodes[l_20].model);
         l_1C = rand();
         srand(*(int *)(model_cache_nodes[l_20].model + 12));
         arch3d_apply_climate_textures((int)model_cache_nodes[l_20].model);
@@ -404,10 +404,10 @@ void model_cache_flush(struct model_node *a1)
 {
     int l_18;
 
-    D_001A949D++;
+    model_cache_flush_count++;
     for (l_18 = 1; l_18 < 512; l_18++) {
         if (model_cache_nodes[l_18].key != 0 && (int)model_cache_nodes[l_18].model != 0) {
-            func_0008600F((int)model_cache_nodes[l_18].model);
+            model_unlink_objects((int)model_cache_nodes[l_18].model);
             model_heap_free += mem_pool_release((int)model_cache_nodes[l_18].model);
         }
     }
@@ -446,7 +446,7 @@ void model_cache_remove_node(struct model_node *a1, struct model_node *a2)
         } else {
             a1->left = a2->right;
         }
-        func_0008600F((int)a2->model);
+        model_unlink_objects((int)a2->model);
         model_heap_free += mem_pool_release((int)a2->model);
         a2->model = 0;
         a2->key = 0;
@@ -458,7 +458,7 @@ void model_cache_remove_node(struct model_node *a1, struct model_node *a2)
         } else {
             a1->left = a2->left;
         }
-        func_0008600F((int)a2->model);
+        model_unlink_objects((int)a2->model);
         model_heap_free += mem_pool_release((int)a2->model);
         a2->model = 0;
         a2->key = 0;
@@ -478,24 +478,24 @@ void model_cache_remove_node(struct model_node *a1, struct model_node *a2)
     model_cache_remove_node(l_14, l_18);
 }
 
-void func_0008591A(struct record *a1, struct building *a2)
+void marker_make_clutter(struct record *a1, struct building *a2)
 {
     int l_18;
     int l_14;
 
     l_14 = rand();
     srand(a1->id & 65535);
-    l_18 = func_0002455D(a1);
+    l_18 = collide_floor_height(a1);
     if (l_18 != 100000) a1->y = l_18;
-    a1->image = func_00086041((int)player_environment, current_building->type);
+    a1->image = flat_random_clutter((int)player_environment, current_building->type);
     srand(l_14);
 }
 
-void func_00085992(struct record *a1, struct building *a2)
+void marker_make_loot_pile(struct record *a1, struct building *a2)
 {
     int l_14;
 
-    l_14 = func_0002455D(a1);
+    l_14 = collide_floor_height(a1);
     if (l_14 != 100000) a1->y = l_14;
     if (((int)player_environment) != 3) {
         a1->type = 33;
@@ -516,7 +516,7 @@ int sound_cache_load(int a1)
     int l_20;
     int l_1C;
 
-    D_001A9440 = a1;
+    sound_last_id = a1;
     for (l_24 = 0; l_24 < 256; l_24++) {
         if (*(int *)(D_001A8430 + (l_24 << 4)) == a1) {
             sound_last_size = *(int *)(D_001A8434 + (l_24 << 4));
@@ -590,7 +590,7 @@ void flat_animal_sound(int a1, int a2, int a3, int a4, int a5)
 {
     if (a4 != 201) return;
     if (rand() > 100) return;
-    if (func_000C7FD9(a1, a3, player_object->x, player_object->z) > 768) return;
+    if (xn_math_approx_dist2d(a1, a3, player_object->x, player_object->z) > 768) return;
     switch ((unsigned)a5) {
     return;
 case 0:
@@ -616,7 +616,7 @@ default:;
 }
 }
 
-void func_00085EF8(struct record *a1)
+void model_unlink_object_cb(struct record *a1)
 {
     int l_20;
     int l_1C;
@@ -625,13 +625,13 @@ void func_00085EF8(struct record *a1)
     switch (a1->type) {
     case 6:
     case 32:
-        if (*(int *)((char *)a1 + 71) == *(int *)text_macro_fpc) *(int *)((char *)a1 + 71) = 0;
+        if (*(int *)((char *)a1 + 71) == *(int *)scratch_190de4) *(int *)((char *)a1 + 71) = 0;
         return;
     case 43:
         l_20 = (int)RECORD_DATA(a1);
         l_1C = *(int *)((char *)l_20 + 5);
         for (l_18 = 0; ((int)(unsigned char)*(signed char *)((char *)l_20)) > l_18; l_18++, (*(char (**)[66])&l_1C)++) {
-            if (*(int *)((char *)l_1C + 4) == *(int *)text_macro_fpc) {
+            if (*(int *)((char *)l_1C + 4) == *(int *)scratch_190de4) {
                 *(int *)((char *)l_1C + 4) = 0;
             }
         }
@@ -639,7 +639,7 @@ void func_00085EF8(struct record *a1)
     case 56:
         l_1C = (int)RECORD_DATA(a1);
         for (l_18 = 0; a1->image > l_18; l_18++, (*(char (**)[66])&l_1C)++) {
-            if (*(int *)((char *)l_1C + 4) == *(int *)text_macro_fpc) {
+            if (*(int *)((char *)l_1C + 4) == *(int *)scratch_190de4) {
                 *(int *)((char *)l_1C + 4) = 0;
             }
         }
@@ -647,19 +647,19 @@ void func_00085EF8(struct record *a1)
     }
 }
 
-void func_0008600F(int a1)
+void model_unlink_objects(int a1)
 {
-    *(int *)text_macro_fpc = a1;
-    object_foreach(D_00195AC4, (int)func_00085EF8);
+    *(int *)scratch_190de4 = a1;
+    object_foreach(location_object, (int)model_unlink_object_cb);
 }
 
-int func_00086041(int a1, int a2)
+int flat_random_clutter(int a1, int a2)
 {
-    if (a1 == 3) return func_00086093((int)D_00187EC8);
-    return func_00086093(((int)D_00187DE8) + (rand_range(0, 7) * 28));
+    if (a1 == 3) return flat_table_pick((int)D_00187EC8);
+    return flat_table_pick(((int)D_00187DE8) + (rand_range(0, 7) * 28));
 }
 
-void func_00086149(void)
+void player_light_draw(void)
 {
     int l_30;
     int l_2C;
@@ -669,17 +669,17 @@ void func_00086149(void)
     int l_1C;
     int l_18;
 
-    l_2C = func_000C5280(player_object->x ^ player_object->z, (D_001343C0 / 40) << 6);
+    l_2C = xn_rand_noise_2d(player_object->x ^ player_object->z, (xn_anim_ticks / 40) << 6);
     l_2C >>= 3;
     l_2C = 256 - l_2C;
     l_30 = (l_2C * 192) >> 8;
-    l_20 = func_000C5280(player_object->x ^ player_object->z, (D_001343C0 / 40) << 6);
+    l_20 = xn_rand_noise_2d(player_object->x ^ player_object->z, (xn_anim_ticks / 40) << 6);
     l_20 >>= 3;
-    l_1C = func_000C5280(player_object->x + player_object->z, (D_001343C0 / 40) << 6);
+    l_1C = xn_rand_noise_2d(player_object->x + player_object->z, (xn_anim_ticks / 40) << 6);
     l_1C >>= 3;
-    l_18 = func_000C5280(player_object->x - player_object->z, (D_001343C0 / 40) << 6);
+    l_18 = xn_rand_noise_2d(player_object->x - player_object->z, (xn_anim_ticks / 40) << 6);
     l_18 >>= 3;
-    func_000CE6E2((player_object->yaw + D_001959BC) & 2047, 192, (int)&l_28, (int)&l_24);
-    func_00136AD8((player_object->x + l_28) + (l_20 - 16), (player_object->y - 50) + (l_1C - 16), (player_object->z + l_24) + (l_18 - 16), 50, l_30, 0);
-    func_00154D00((player_object->x + l_28) + (l_20 - 16), (player_object->y - 50) + (l_1C - 16), (player_object->z + l_24) + (l_18 - 16), 26883, -1, 1, 400);
+    xn_math_yaw_offset_xz((player_object->yaw + view_look_yaw) & 2047, 192, (int)&l_28, (int)&l_24);
+    xn_light_add((player_object->x + l_28) + (l_20 - 16), (player_object->y - 50) + (l_1C - 16), (player_object->z + l_24) + (l_18 - 16), 50, l_30, 0);
+    xn_flat_add((player_object->x + l_28) + (l_20 - 16), (player_object->y - 50) + (l_1C - 16), (player_object->z + l_24) + (l_18 - 16), 26883, -1, 1, 400);
 }

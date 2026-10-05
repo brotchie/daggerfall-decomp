@@ -6,26 +6,26 @@
 struct bf8_0_1 { unsigned char f:1; };
 struct bf8_2_1 { unsigned char _:2; unsigned char f:1; };
 extern char D_00175934[];
-extern signed char D_0017B62F[];
+extern signed char anim_mirror_facing[];
 extern int D_00186A14[];
 extern char D_00187B44[];
-extern signed char dispel_monster_ids[];
-extern struct record *D_00190504[];
+extern signed char undead_daedra_ids[];
+extern struct record *creature_list[];
 extern char D_00190704[];
-extern char text_macro_fpc[];
+extern char scratch_190de4[];
 extern signed char text_rsc_buffer[];
 extern unsigned char D_001940D7;
 extern signed char D_001940DA;
 extern struct record *nonworld_root;
 extern struct record *player_object;
-extern int D_00195AB0;
+extern int frame_ticks;
 extern int vertical_velocity;
-extern struct record *D_00195AC4;
-extern struct record *D_00195AD8;
+extern struct record *location_object;
+extern struct record *ai_chosen_spell;
 extern int creature_count;
 extern struct character *player_character;
 extern struct record *D_00195C70;
-extern int D_00195C74;
+extern int ceiling_height;
 extern struct record *D_00195CB8;
 extern int ai_monster_flags;
 extern char D_00196167[];
@@ -42,7 +42,7 @@ extern int collide_move_object(struct record *, int, int, int);
 extern int damage_apply(struct record *, int, int);
 extern int spell_cost(struct spell *, struct character *);
 extern int cast_creature_spell_at(struct record *, struct record *, struct record *);
-extern int func_0005C9BF(unsigned char);
+extern int spell_player_has_spell(unsigned char);
 extern int ai_turn_toward(struct record *, int);
 extern int ai_stealth_check(int, unsigned short, int, unsigned short);
 extern int monster_move_step(struct record *, struct record *, short);
@@ -55,21 +55,21 @@ extern int object_delete(struct record *);
 extern struct record *object_create_child(struct record *, int, int);
 extern struct record *object_random_child_of_type(struct record *, int);
 extern int object_new_id(int);
-extern int func_0009DEAC();
+extern int abs();
 extern int mc_free();
 extern int mc_memset();
 extern int mc_memcpy();
 extern int memchr();
-extern int func_000C7FD9();
-extern int func_000C7FF4();
-extern int func_000C808D();
-extern int func_000CE6E2();
+extern int xn_math_approx_dist2d();
+extern int xn_math_approx_hypot();
+extern int xn_math_angle_to_point();
+extern int xn_math_yaw_offset_xz();
 extern void weapon_monster_arrow(int, int);
 extern void monster_init(struct record *, int);
 extern void object_apply_gravity(struct record *, struct character *);
 extern void object_foreach(struct record *, int);
 int monster_set_action_seducer(struct record *, int, int);
-struct record *func_0006299F(struct record *);
+struct record *monster_spell_list(struct record *);
 int func_0006379A(struct record *, struct record *);
 int func_00063ED8(struct record *, int);
 void func_0006243B(struct record *, struct record *, int);
@@ -125,19 +125,19 @@ void func_0006243B(struct record *a1, struct record *a2, int a3)
         char l_60[40];
 
         *(int *)((char *)l_60 + 36) = (int)&a1->data.character;
-        l_18 = ((((int)(short)*(short *)(*(char **)((char *)l_60 + 36) + 44)) + 100) * D_00195AB0) / 1000;
+        l_18 = ((((int)(short)*(short *)(*(char **)((char *)l_60 + 36) + 44)) + 100) * frame_ticks) / 1000;
         if (*(int *)(*(char **)((char *)l_60 + 36) + 76) != 0) {
             l_24 = 0;
             l_28 = l_24;
         } else {
-            func_000CE6E2(a3, l_18, (int)&l_28, (int)&l_24);
+            xn_math_yaw_offset_xz(a3, l_18, (int)&l_28, (int)&l_24);
         }
         *(int *)l_80 = a1->x + l_28;
         *(int *)((char *)l_80 + 4) = a1->y;
         *(int *)((char *)l_80 + 8) = a1->z + l_24;
         if (((struct bf8_0_1 *)&ai_monster_flags)->f != 0) {
             l_14 = *(int *)((char *)l_80 + 4) - (a2->y - 70);
-            if (func_0009DEAC(l_14) > 10) {
+            if (abs(l_14) > 10) {
                 if (l_14 < 0) {
                     *(int *)((char *)l_80 + 4) += l_18;
                 } else {
@@ -150,7 +150,7 @@ void func_0006243B(struct record *a1, struct record *a2, int a3)
         *(int *)((char *)l_80 + 20) = a1->angle_z;
         l_10 = player_on_ground;
         l_2C = vertical_velocity;
-        l_1C = D_00195C74;
+        l_1C = ceiling_height;
         *(signed char *)collide_flags |= 4;
         l_20 = (vertical_velocity = *(int *)(*(char **)((char *)l_60 + 36) + 76));
         D_001940D7 |= 128;
@@ -171,7 +171,7 @@ void func_0006243B(struct record *a1, struct record *a2, int a3)
         player_on_ground = l_10;
         mc_memcpy((int)D_00196D54, (int)l_60, 12, (int)D_00175934, 521, 4);
         if (*(int *)((char *)l_60 + 36) != (int)player_character) {
-            *(int *)(*(char **)((char *)l_60 + 36) + 88) = D_00195C74;
+            *(int *)(*(char **)((char *)l_60 + 36) + 88) = ceiling_height;
         }
         if (((int)(short)(*(short *)collide_flags & 16)) != 0 && ((struct bf8_0_1 *)&ai_monster_flags)->f == 0) {
             object_apply_gravity(a1, (struct character *)*(int *)((char *)l_60 + 36));
@@ -184,8 +184,8 @@ void func_0006243B(struct record *a1, struct record *a2, int a3)
         }
         *(int *)(*(char **)((char *)l_60 + 36) + 76) = vertical_velocity;
         vertical_velocity = l_2C;
-        D_00195C74 = l_1C;
-        if (func_0009DEAC(a1->y - player_object->y) <= 3000) return;
+        ceiling_height = l_1C;
+        if (abs(a1->y - player_object->y) <= 3000) return;
         D_001940DA |= 128;
         object_delete(a1);
     }
@@ -202,12 +202,12 @@ int monster_set_action(struct record *a1, int a2, int a3)
     if (a1->data.character.race == 29) return monster_set_action_seducer(a1, a2, a3);
     if (a1->data.character.race >= 60 && a3 != 0 && a3 != 60 && a3 != 8) return 0;
     l_24 = &a1->data.monster.anim;
-    l_1C = func_000C808D(a1->x, a1->z, player_object->x, player_object->z);
+    l_1C = xn_math_angle_to_point(a1->x, a1->z, player_object->x, player_object->z);
     l_18 = (a1->yaw + 128) & 2047;
     l_20 = (l_18 - l_1C) & 2047;
     l_20 >>= 8;
     if (l_20 > 4) {
-        l_20 = (int)(unsigned char)D_0017B62F[l_20];
+        l_20 = (int)(unsigned char)anim_mirror_facing[l_20];
         l_24->anim_flags |= 128;
     } else {
         l_24->anim_flags &= 127;
@@ -233,7 +233,7 @@ int monster_set_action_seducer(struct record *a1, int a2, int a3)
     if (l_24->anim_request == 57) return 0;
     l_20 = &a1->data.character;
     l_20->action = *(signed char *)&a3;
-    l_18 = func_000C808D(a1->x, a1->z, player_object->x, player_object->z);
+    l_18 = xn_math_angle_to_point(a1->x, a1->z, player_object->x, player_object->z);
     l_14 = (a1->yaw + 128) & 2047;
     l_1C = (l_14 - l_18) & 2047;
     if (((int)(unsigned short)(l_20->flags & 16384)) != 0) {
@@ -246,7 +246,7 @@ int monster_set_action_seducer(struct record *a1, int a2, int a3)
     }
     l_1C >>= 8;
     if (l_1C > 4) {
-        l_1C = (int)(unsigned char)D_0017B62F[l_1C];
+        l_1C = (int)(unsigned char)anim_mirror_facing[l_1C];
         l_24->anim_flags |= 128;
     } else {
         l_24->anim_flags &= 127;
@@ -257,7 +257,7 @@ int monster_set_action_seducer(struct record *a1, int a2, int a3)
     return 1;
 }
 
-struct record *func_0006299F(struct record *a1)
+struct record *monster_spell_list(struct record *a1)
 {
     a1 = a1->children;
     while (a1 != 0) {
@@ -267,7 +267,7 @@ struct record *func_0006299F(struct record *a1)
     return 0;
 }
 
-int func_000629F8(int a1)
+int ai_pick_ranged_spell(int a1)
 {
     struct record *l_2C;
     struct record *l_28;
@@ -276,21 +276,21 @@ int func_000629F8(int a1)
     struct character *l_1C;
 
     l_20 = 0;
-    l_1C = &D_00190504[a1]->data.character;
+    l_1C = &creature_list[a1]->data.character;
     if ((l_1C->conditions & 0x100) != 0) return 0;
-    l_2C = func_0006299F(D_00190504[a1]);
+    l_2C = monster_spell_list(creature_list[a1]);
     l_28 = l_2C;
     while (l_2C != 0) {
         l_24 = &l_2C->data.spell;
         if (l_24->target == 2 || l_24->target == 4) {
-            *(int *)(text_macro_fpc + (l_20++ << 2)) = (int)l_2C;
+            *(int *)(scratch_190de4 + (l_20++ << 2)) = (int)l_2C;
         }
         l_2C = l_2C->next;
     }
     if (l_20 == 0) return 0;
     l_2C = l_28;
     l_20 = rand_range(0, l_20 - 1);
-    if (func_0005C9BF((D_00195AD8 = (struct record *)*(int *)(text_macro_fpc + (l_20 << 2)))->data.spell.id) != 0) {
+    if (spell_player_has_spell((ai_chosen_spell = (struct record *)*(int *)(scratch_190de4 + (l_20 << 2)))->data.spell.id) != 0) {
         return 0;
     }
     return 1;
@@ -305,21 +305,21 @@ int ai_pick_touch_spell(int a1)
     struct character *l_1C;
 
     l_20 = 0;
-    l_1C = &D_00190504[a1]->data.character;
+    l_1C = &creature_list[a1]->data.character;
     if ((l_1C->conditions & 0x100) != 0) return 0;
-    l_2C = func_0006299F(D_00190504[a1]);
+    l_2C = monster_spell_list(creature_list[a1]);
     l_28 = l_2C;
     while (l_2C != 0) {
         l_24 = &l_2C->data.spell;
         if (l_24->target == 0 || l_24->target == 1) {
-            *(int *)(text_macro_fpc + (l_20++ << 2)) = (int)l_2C;
+            *(int *)(scratch_190de4 + (l_20++ << 2)) = (int)l_2C;
         }
         l_2C = l_2C->next;
     }
     if (l_20 == 0) return 0;
     l_2C = l_28;
     l_20 = rand_range(0, l_20 - 1);
-    if (func_0005C9BF((D_00195AD8 = (struct record *)*(int *)(text_macro_fpc + (l_20 << 2)))->data.spell.id) != 0) {
+    if (spell_player_has_spell((ai_chosen_spell = (struct record *)*(int *)(scratch_190de4 + (l_20 << 2)))->data.spell.id) != 0) {
         return 0;
     }
     return 1;
@@ -329,24 +329,24 @@ int func_00062C15(int a1)
 {
     struct character *l_1C;
 
-    l_1C = &D_00190504[a1]->data.character;
+    l_1C = &creature_list[a1]->data.character;
     if ((l_1C->conditions & 0x100) != 0) return 0;
-    if (func_0005C9BF((D_00195AD8 = object_random_child_of_type(D_00190504[a1], 9))->data.spell.id) != 0) {
+    if (spell_player_has_spell((ai_chosen_spell = object_random_child_of_type(creature_list[a1], 9))->data.spell.id) != 0) {
         return 0;
     }
-    return ((D_00195AD8 != 0) ? 1 : 0);
+    return ((ai_chosen_spell != 0) ? 1 : 0);
 }
 
 int func_00062CB6(int a1)
 {
     struct character *l_1C;
 
-    l_1C = &D_00190504[a1]->data.character;
+    l_1C = &creature_list[a1]->data.character;
     if ((l_1C->conditions & 0x100) != 0) return 0;
-    if (func_0005C9BF((D_00195AD8 = object_random_child_of_type(D_00190504[a1], 9))->data.spell.id) != 0) {
+    if (spell_player_has_spell((ai_chosen_spell = object_random_child_of_type(creature_list[a1], 9))->data.spell.id) != 0) {
         return 0;
     }
-    return ((D_00195AD8 != 0) ? 1 : 0);
+    return ((ai_chosen_spell != 0) ? 1 : 0);
 }
 
 int monster_cast_spell(struct record *a1, struct record *a2)
@@ -356,12 +356,12 @@ int monster_cast_spell(struct record *a1, struct record *a2)
 
     l_18 = &a1->data.character;
     if ((l_18->conditions & 0x100) != 0) return 0;
-    if ((D_00195AD8 = object_random_child_of_type(a1, 9)) == 0) return 0;
-    if (func_0005C9BF(D_00195AD8->data.spell.id) != 0) return 0;
+    if ((ai_chosen_spell = object_random_child_of_type(a1, 9)) == 0) return 0;
+    if (spell_player_has_spell(ai_chosen_spell->data.spell.id) != 0) return 0;
     l_1C = object_create_child(a1->parent, 0, 89);
     l_1C->type = 9;
     l_1C->id = object_new_id(100);
-    mc_memcpy(&l_1C->data.spell, &D_00195AD8->data.spell, 89, (int)D_00175934, 758, 4);
+    mc_memcpy(&l_1C->data.spell, &ai_chosen_spell->data.spell, 89, (int)D_00175934, 758, 4);
     cast_creature_spell_at(l_1C, a1, a2);
     l_18->magicka -= spell_cost(&l_1C->data.spell, l_18);
     if (l_18->magicka < 0) {
@@ -416,7 +416,7 @@ int monster_alloc_anim_slot(void)
     int l_1C;
 
     mc_memset((int)text_rsc_buffer, 0, 128, (int)D_00175934, 829, 2048);
-    object_foreach(D_00195AC4->children, (int)monster_mark_anim_slot_cb);
+    object_foreach(location_object->children, (int)monster_mark_anim_slot_cb);
     object_foreach(nonworld_root->children, (int)monster_mark_anim_slot_cb);
     for (l_1C = 0; l_1C < 128; l_1C++) {
         if (text_rsc_buffer[l_1C] == 0 && *(int *)(D_00190704 + (l_1C << 2)) != 0) {
@@ -433,7 +433,7 @@ int monster_alloc_anim_slot(void)
 
 int monster_sees_invisible(int a1)
 {
-    return memchr((int)dispel_monster_ids, a1, 14);
+    return memchr((int)undead_daedra_ids, a1, 14);
 }
 
 struct record *monster_summon_near_player(int a1)
@@ -519,7 +519,7 @@ int func_0006379A(struct record *a1, struct record *a2)
     l_1C = 0;
     if (a2->x < a1->x) l_20 = 1;
     if (a2->z < a1->z) l_1C = 2;
-    if (func_0009DEAC(a2->x - a1->x) > func_0009DEAC(a2->z - a1->z)) {
+    if (abs(a2->x - a1->x) > abs(a2->z - a1->z)) {
         l_18 = 1;
     } else {
         l_18 = 0;
@@ -543,22 +543,22 @@ void monster_apply_gravity(void)
 
     l_1C = vertical_velocity;
     l_24 = (int)(unsigned char)player_on_ground;
-    l_20 = D_00195C74;
+    l_20 = ceiling_height;
     mc_memcpy((int)l_3C, (int)D_00196D54, 12, (int)D_00175934, 1147, 4);
     for (l_30 = 0; l_30 < creature_count; l_30++) {
-        l_28 = &D_00190504[l_30]->data.character;
+        l_28 = &creature_list[l_30]->data.character;
         if (((int)(unsigned short)(l_28->flags & 2080)) == 0) {
             if (l_28->fall_velocity == 0) continue;
         }
         l_2C = l_28->fall_velocity;
         vertical_velocity = l_2C;
-        mc_memcpy((int)D_00196D54, (int)D_00190504[l_30] + 7, 12, (int)D_00175934, 1159, 4);
-        *(int *)l_5C = D_00190504[l_30]->x;
-        *(int *)((char *)l_5C + 4) = (int)(*(char **)((char *)D_00190504[l_30] + 11) + (vertical_velocity / 256));
-        *(int *)((char *)l_5C + 8) = D_00190504[l_30]->z;
-        *(int *)((char *)l_5C + 12) = D_00190504[l_30]->angle_x;
-        *(int *)((char *)l_5C + 16) = D_00190504[l_30]->yaw;
-        *(int *)((char *)l_5C + 20) = D_00190504[l_30]->angle_z;
+        mc_memcpy((int)D_00196D54, (int)creature_list[l_30] + 7, 12, (int)D_00175934, 1159, 4);
+        *(int *)l_5C = creature_list[l_30]->x;
+        *(int *)((char *)l_5C + 4) = (int)(*(char **)((char *)creature_list[l_30] + 11) + (vertical_velocity / 256));
+        *(int *)((char *)l_5C + 8) = creature_list[l_30]->z;
+        *(int *)((char *)l_5C + 12) = creature_list[l_30]->angle_x;
+        *(int *)((char *)l_5C + 16) = creature_list[l_30]->yaw;
+        *(int *)((char *)l_5C + 20) = creature_list[l_30]->angle_z;
         if (((int)(unsigned short)(l_28->flags & 2080)) != 0) {
             *(short *)((char *)l_5C + 28) |= 1;
         } else {
@@ -566,9 +566,9 @@ void monster_apply_gravity(void)
         }
         *(int *)((char *)l_5C + 24) = (int)D_00187B44;
         *(signed char *)collide_flags &= 251;
-        collide_move_object(D_00190504[l_30], 0, (int)l_5C, 0);
+        collide_move_object(creature_list[l_30], 0, (int)l_5C, 0);
         if (((int)(short)(*(short *)collide_flags & 16)) != 0) {
-            object_apply_gravity(D_00190504[l_30], l_28);
+            object_apply_gravity(creature_list[l_30], l_28);
         } else {
             vertical_velocity = 0;
             l_28->flags &= ~0x800;
@@ -578,12 +578,12 @@ void monster_apply_gravity(void)
             if (l_18 > 0) {
                 l_18 = l_18 * l_18;
                 l_18 = l_18 / 3;
-                damage_apply(D_00190504[l_30], l_18, 0);
+                damage_apply(creature_list[l_30], l_18, 0);
             }
         }
         l_28->fall_velocity = vertical_velocity;
     }
-    D_00195C74 = l_20;
+    ceiling_height = l_20;
     player_on_ground = *(signed char *)&l_24;
     vertical_velocity = l_1C;
     mc_memcpy((int)D_00196D54, (int)l_3C, 12, (int)D_00175934, 1201, 4);
@@ -597,10 +597,10 @@ void func_00063DDC(struct record *a1)
     struct record *l_18;
 
     for (l_24 = 0; l_24 < creature_count; l_24++) {
-        l_18 = D_00190504[l_24];
-        l_20 = func_000C7FF4(l_18->y - player_object->y, func_000C7FD9(l_18->x, l_18->z, player_object->x, player_object->z));
-        l_1C = &D_00190504[l_24]->data.character;
-        if (a1 == D_00190504[l_24] || ai_stealth_check(l_1C->race, (int)(unsigned short)(l_1C->flags & 256), l_20, (int)(unsigned short)(l_1C->flags & 8)) != 0) {
+        l_18 = creature_list[l_24];
+        l_20 = xn_math_approx_hypot(l_18->y - player_object->y, xn_math_approx_dist2d(l_18->x, l_18->z, player_object->x, player_object->z));
+        l_1C = &creature_list[l_24]->data.character;
+        if (a1 == creature_list[l_24] || ai_stealth_check(l_1C->race, (int)(unsigned short)(l_1C->flags & 256), l_20, (int)(unsigned short)(l_1C->flags & 8)) != 0) {
             l_1C->flags |= 264;
             l_1C->give_up_timer = 200;
         }

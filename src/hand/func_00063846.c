@@ -18,20 +18,20 @@ extern int D_00187CA9;
 extern unsigned char D_001940D7;
 extern unsigned char D_001940DA;
 extern struct record *player_object;
-extern int D_00195AB0;
+extern int frame_ticks;
 extern int vertical_velocity;
 extern struct character *player_character;
-extern int D_00195C74;
+extern int ceiling_height;
 extern struct bits8 ai_monster_flags;
 extern unsigned char player_on_ground;
 extern struct vec3 D_00196D54;
 extern short collide_flags;
 extern int collide_move_object(struct record *, int, struct move *, int);
 extern void object_delete(struct record *);
-extern int func_0009DEAC(int);
+extern int abs(int);
 extern void mc_memcpy(void *, void *, int, char *, int, int);
-extern int func_000C7FD9(int, int, int, int);
-extern void func_000CE6E2(int, int, int *, int *);
+extern int xn_math_approx_dist2d(int, int, int, int);
+extern void xn_math_yaw_offset_xz(int, int, int *, int *);
 
 int monster_move_step(struct record *o, struct record *target, int angle)
 {
@@ -52,17 +52,17 @@ int monster_move_step(struct record *o, struct record *target, int angle)
 
     p = &o->data.character;
     mc_memcpy(&oldpos, &o->x, 12, D_00175934, 1070, 4);
-    speed = D_00195AB0 * (p->attributes[ATTR_SPD] - 50 + D_00187CA9) / 1000;
+    speed = frame_ticks * (p->attributes[ATTR_SPD] - 50 + D_00187CA9) / 1000;
     if (p->fall_velocity != 0)
         dx = dz = 0;
     else
-        func_000CE6E2(angle, speed, &dx, &dz);
+        xn_math_yaw_offset_xz(angle, speed, &dx, &dz);
     mv.x = o->x + dx;
     mv.y = o->y;
     mv.z = o->z + dz;
     if (ai_monster_flags.b0) {
         dy = mv.y - (target->y - 45);
-        if (func_0009DEAC(dy) > 10) {
+        if (abs(dy) > 10) {
             dx = mv.y;
             if (dy < 0)
                 mv.y += speed;
@@ -77,7 +77,7 @@ int monster_move_step(struct record *o, struct record *target, int angle)
     mv.f20 = o->angle_z;
     saved277 = player_on_ground;
     saved_ab8 = vertical_velocity;
-    saved_c74 = D_00195C74;
+    saved_c74 = ceiling_height;
     collide_flags |= 4;
     r = (vertical_velocity = p->fall_velocity);
     D_001940D7 |= 128;
@@ -91,16 +91,16 @@ int monster_move_step(struct record *o, struct record *target, int angle)
     player_on_ground = saved277;
     mc_memcpy(&D_00196D54, &saved, 12, D_00175934, 1121, 4);
     if (p != player_character)
-        p->floor_y = D_00195C74;
+        p->floor_y = ceiling_height;
     if ((collide_flags & (short)16) != 0 && !ai_monster_flags.b0)
         vertical_velocity = 1;
     p->fall_velocity = vertical_velocity;
     vertical_velocity = saved_ab8;
-    D_00195C74 = saved_c74;
-    if (func_0009DEAC(o->y - player_object->y) > 4000) {
+    ceiling_height = saved_c74;
+    if (abs(o->y - player_object->y) > 4000) {
         D_001940DA |= 128;
         object_delete(o);
     }
-    dist = func_000C7FD9(o->x, o->z, oldpos.x, oldpos.z);
+    dist = xn_math_approx_dist2d(o->x, o->z, oldpos.x, oldpos.z);
     return dist > 2;
 }

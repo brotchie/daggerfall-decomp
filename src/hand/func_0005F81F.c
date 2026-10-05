@@ -14,20 +14,20 @@ extern char D_001758B8[];        /* __FILE__ */
 extern char D_0017590A[];
 extern char D_00175913[];
 extern char D_0017591E[];
-extern struct slot D_0018E044[];
+extern struct slot book_list[];
 extern signed char text_buffer[];
 extern struct flags16 *game_settings;
-extern struct savehdr *D_00195C44;
+extern struct savehdr *scratch_buffer;
 extern char *books_path;
-extern unsigned short D_00195F22;
+extern unsigned short book_count;
 extern int disk_open_data(char *);
-extern void func_0009DEA7(int);
-extern int func_000A00CB(int, void *, int);
+extern void close(int);
+extern int read(int, void *, int);
 extern int atoi(char *);
 extern int func_000A13DA(char *, int, struct find_t *);
 extern int func_000A13F7(struct find_t *);
-#pragma aux func_000A0ED9 parm routine [];
-extern void func_000A0ED9(int, char *);
+#pragma aux mc_set_location parm routine [];
+extern void mc_set_location(int, char *);
 extern int mc_sprintf(char *, char *, ...);
 
 void books_scan(void)
@@ -37,20 +37,20 @@ void books_scan(void)
     struct find_t ff;
     struct savehdr *buf;
 
-    D_00195F22 = 0;
-    buf = D_00195C44;
-    func_000A0ED9(694, D_001758B8);
+    book_count = 0;
+    buf = scratch_buffer;
+    mc_set_location(694, D_001758B8);
     mc_sprintf(((char *)text_buffer), D_00175913, books_path, D_0017590A);
     rc = func_000A13DA(((char *)text_buffer), 0, &ff);
     while (rc == 0) {
-        D_0018E044[D_00195F22].id = atoi(ff.name + 3);
-        func_000A0ED9(699, D_001758B8);
+        book_list[book_count].id = atoi(ff.name + 3);
+        mc_set_location(699, D_001758B8);
         mc_sprintf(((char *)text_buffer), D_0017591E, ff.name);
         fd = disk_open_data(((char *)text_buffer));
-        func_000A00CB(fd, buf, 234);
-        func_0009DEA7(fd);
+        read(fd, buf, 234);
+        close(fd);
         if (buf->f128 == 0 || (game_settings->f0 & 4) == 0)
-            D_0018E044[D_00195F22++].f2 = buf->f228 - 1;
+            book_list[book_count++].f2 = buf->f228 - 1;
         rc = func_000A13F7(&ff);
     }
 }

@@ -5,7 +5,7 @@ extern char D_00170AB4[];
 extern int atoi(char *);
 extern void func_000A14E8(char *, char *, int, char *, int, int);
 
-void func_000369A0(struct record *a1, char *a2)
+void rdb_model_id_from_name(struct record *a1, char *a2)
 {
     int x;
     char buf[12];

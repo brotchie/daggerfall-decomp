@@ -8,7 +8,7 @@ extern char D_00170AEC[];
 extern char D_00170AF9[];
 extern char D_00170B06[];
 extern signed char D_001940D8;
-extern int spellshop_icons;
+extern int magic_window_image;
 extern int window_image;
 extern unsigned char D_0019626F;
 extern signed char D_00196272;
@@ -26,18 +26,18 @@ extern char D_0019960C[];
 extern int D_00199614;
 extern short D_00199618;
 extern int spellmaker_settings_image;
-extern char D_00199D78[];
+extern char links[];
 extern int link_count;
 
 extern int spellmaker_new(void);
 extern int disk_read_file(int, int);
 extern int mc_memset();
-short func_00036A41(int);
+short rdb_object_id_by_offset(int);
 void func_000361B7(int);
-void func_00036AA7(int);
-void func_00036C6F(int, int, int, unsigned char);
-void func_00036DC9(int, int, int, unsigned char);
-void func_00036F18(struct link *);
+void rdb_build_action_chain(int);
+void action_record_add(int, int, int, unsigned char);
+void action_record_add_chained(int, int, int, unsigned char);
+void action_axis_to_translation(struct link *);
 
 void func_000361B7(int a1)
 {
@@ -54,7 +54,7 @@ void func_000361B7(int a1)
     *(signed char *)((char *)a1 + 18) = *(signed char *)((char *)l_1C + 12);
 }
 
-void func_000367E5(struct record *a1, int a2, int a3)
+void rdb_link_actions(struct record *a1, int a2, int a3)
 {
     int l_18;
     int l_14;
@@ -69,8 +69,8 @@ void func_000367E5(struct record *a1, int a2, int a3)
             }
             if (*(short *)(*(char **)D_0019960C + 14) != 0) {
                 *(int *)D_00199600 = (int)(D_001995E8 + *(int *)(*(char **)D_0019960C + 19));
-                D_00199618 = func_00036A41(l_10);
-                func_00036AA7((int)(unsigned char)(*(signed char *)((char *)a2 + 20) & 63));
+                D_00199618 = rdb_object_id_by_offset(l_10);
+                rdb_build_action_chain((int)(unsigned char)(*(signed char *)((char *)a2 + 20) & 63));
             }
             break;
         case 2:
@@ -79,8 +79,8 @@ void func_000367E5(struct record *a1, int a2, int a3)
         case 3:
             if ((*(short *)((char *)(*(int *)D_001995F0 = (int)(D_001995E8 + *(int *)((char *)a2 + 21))) + 2) != 0 && ((int)(unsigned short)*(short *)(*(char **)D_001995F0)) != 25482) || (((int)(unsigned short)*(short *)(*(char **)D_001995F0)) == 25490 && ((int)(unsigned char)*(signed char *)(*(char **)D_001995F0 + 4)) == 70 && *(int *)(*(char **)D_001995F0 + 6) == 16747 && ((int)(unsigned char)*(signed char *)(*(char **)D_001995F0 + 10)) == 5)) {
                 if (((int)(unsigned short)*(short *)(*(char **)D_001995F0)) != 25488) {
-                    D_00199618 = func_00036A41(l_10);
-                    func_00036AA7((int)(unsigned char)(*(signed char *)((char *)a2 + 20) & 63));
+                    D_00199618 = rdb_object_id_by_offset(l_10);
+                    rdb_build_action_chain((int)(unsigned char)(*(signed char *)((char *)a2 + 20) & 63));
                 }
             }
         }
@@ -88,7 +88,7 @@ void func_000367E5(struct record *a1, int a2, int a3)
     } while ((a2 - (int)D_001995E8) > 0);
 }
 
-short func_00036A41(int a1)
+short rdb_object_id_by_offset(int a1)
 {
     int l_1C;
 
@@ -98,26 +98,26 @@ short func_00036A41(int a1)
     return 0;
 }
 
-void func_00036AA7(int a1)
+void rdb_build_action_chain(int a1)
 {
     int l_1C;
     int l_18;
 
     switch ((unsigned)a1) {
     case 1:
-        func_00036C6F(*(int *)D_0019960C, *(int *)D_00199600, 0, 0);
+        action_record_add(*(int *)D_0019960C, *(int *)D_00199600, 0, 0);
         l_18 = *(int *)(*(char **)D_00199600 + 5);
         break;
     case 2:
-        func_00036C6F(0, 0, 0, (int)(unsigned char)*(signed char *)(*(char **)D_001995F4 + 3));
+        action_record_add(0, 0, 0, (int)(unsigned char)*(signed char *)(*(char **)D_001995F4 + 3));
         l_18 = *(int *)(*(char **)D_001995F4 + 4);
         break;
     case 3:
-        func_00036C6F(0, 0, *(int *)D_001995F0, (int)(unsigned char)*(signed char *)(*(char **)D_001995F0 + 10));
+        action_record_add(0, 0, *(int *)D_001995F0, (int)(unsigned char)*(signed char *)(*(char **)D_001995F0 + 10));
         l_18 = *(int *)(*(char **)D_001995F0 + 6);
     }
     while (l_18 > 0) {
-        D_00199618 = func_00036A41(l_18);
+        D_00199618 = rdb_object_id_by_offset(l_18);
         l_1C = (int)(D_001995E8 + l_18);
         switch ((unsigned char)(*(signed char *)((char *)l_1C + 20) & 63)) {
         case 1:
@@ -125,23 +125,23 @@ void func_00036AA7(int a1)
                 func_000361B7(*(int *)D_0019960C);
             }
             *(int *)D_00199600 = (int)(D_001995E8 + *(int *)(*(char **)D_0019960C + 19));
-            func_00036DC9(*(int *)D_0019960C, *(int *)D_00199600, 0, 0);
+            action_record_add_chained(*(int *)D_0019960C, *(int *)D_00199600, 0, 0);
             l_18 = *(int *)(*(char **)D_00199600 + 5);
             break;
         case 2:
-            func_00036DC9(0, 0, 0, (int)(unsigned char)*(signed char *)((char *)(*(int *)D_001995F4 = (int)(D_001995E8 + *(int *)((char *)l_1C + 21))) + 3));
+            action_record_add_chained(0, 0, 0, (int)(unsigned char)*(signed char *)((char *)(*(int *)D_001995F4 = (int)(D_001995E8 + *(int *)((char *)l_1C + 21))) + 3));
             l_18 = *(int *)(*(char **)D_001995F4 + 4);
             break;
         case 3:
-            func_00036DC9(0, 0, *(int *)D_001995F0, (int)(unsigned char)*(signed char *)((char *)(*(int *)D_001995F0 = (int)(D_001995E8 + *(int *)((char *)l_1C + 21))) + 10));
+            action_record_add_chained(0, 0, *(int *)D_001995F0, (int)(unsigned char)*(signed char *)((char *)(*(int *)D_001995F0 = (int)(D_001995E8 + *(int *)((char *)l_1C + 21))) + 10));
             l_18 = *(int *)(*(char **)D_001995F0 + 6);
         }
     }
 }
 
-void func_00036C6F(int a1, int a2, int a3, unsigned char a4)
+void action_record_add(int a1, int a2, int a3, unsigned char a4)
 {
-    D_001995EC = (D_001995E4 = (struct link *)(((int)D_00199D78) + (link_count++ * 39)));
+    D_001995EC = (D_001995E4 = (struct link *)(((int)links) + (link_count++ * 39)));
     mc_memset((int)D_001995EC, 0, 39, (int)D_00170AB4, 447, 4);
     D_001995EC->object_id = D_00199618;
     if (a2 != 0) {
@@ -159,14 +159,14 @@ void func_00036C6F(int a1, int a2, int a3, unsigned char a4)
     } else {
         D_001995EC->action = a4;
     }
-    if (D_001995EC->action > 1 && D_001995EC->action < 8) func_00036F18(D_001995EC);
+    if (D_001995EC->action > 1 && D_001995EC->action < 8) action_axis_to_translation(D_001995EC);
     D_001995EC->chain_count = 0;
 }
 
-void func_00036DC9(int a1, int a2, int a3, unsigned char a4)
+void action_record_add_chained(int a1, int a2, int a3, unsigned char a4)
 {
     D_001995E4->chain_count++;
-    D_001995EC = (struct link *)(((int)D_00199D78) + (link_count++ * 39));
+    D_001995EC = (struct link *)(((int)links) + (link_count++ * 39));
     mc_memset((int)D_001995EC, 0, 39, (int)D_00170AB4, 490, 4);
     D_001995EC->object_id = D_00199618;
     if (a2 != 0) {
@@ -185,10 +185,10 @@ void func_00036DC9(int a1, int a2, int a3, unsigned char a4)
         D_001995EC->action = a4;
     }
     if (D_001995EC->action <= 1 || D_001995EC->action >= 8) return;
-    func_00036F18(D_001995EC);
+    action_axis_to_translation(D_001995EC);
 }
 
-void func_00036F18(struct link *a1)
+void action_axis_to_translation(struct link *a1)
 {
     a1->magnitude = a1->axis << 3;
     a1->axis = ((a1->action - 2) ^ 1) + 1;
@@ -202,7 +202,7 @@ int spellmaker_open(int a1)
     if (a1 != 0) {
         game_mode = 2;
         window_image = disk_read_file((int)D_00170AEC, 0);
-        spellshop_icons = disk_read_file((int)D_00170AF9, 0);
+        magic_window_image = disk_read_file((int)D_00170AF9, 0);
         spellmaker_settings_image = disk_read_file((int)D_00170B06, 0);
         D_00196272 = 1;
         D_001940D8 |= 1;

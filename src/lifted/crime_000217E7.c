@@ -7,9 +7,9 @@ extern char D_001706E1[];
 extern char D_001706E9[];
 extern char D_001706F6[];
 extern signed char text_buffer[];
-extern int D_00195D48;
+extern int sky_loaded_frame;
 extern signed char D_00196294;
-extern signed char D_0019629B;
+extern signed char night_sky_loaded;
 extern signed char D_001962A4;
 extern signed char D_001962A5;
 extern signed char D_001962B0;
@@ -17,17 +17,17 @@ extern signed char D_001962B0;
 extern int disk_read_file(int, int);
 extern int mc_free();
 extern int mc_memset();
-extern int func_000A0ED9(int, int);
+extern int mc_set_location(int, int);
 extern int mc_sprintf(int, ...);
 extern int mc_memcpy();
-extern int func_000CD33A();
-extern int func_000CDD81();
+extern int xn_pal_set_range_8bit();
+extern int xn_gfx_present_inclusive();
 extern void screen_shake_stop(void);
 extern void court_restore_vitals(void);
 extern void time_pass(int);
 extern void palette_restore(void);
-extern void text_draw_centered_colored(int, int, int, int, unsigned char);
-#pragma aux func_000A0ED9 parm routine [];
+extern void text_draw_centred_coloured(int, int, int, int, unsigned char);
+#pragma aux mc_set_location parm routine [];
 
 void prison_serve_sentence(int a1)
 {
@@ -43,14 +43,14 @@ void prison_serve_sentence(int a1)
     for (l_1C = 0; l_1C < 768; l_1C++) {
         *(signed char *)((char *)(l_18 + l_1C) + 64000) <<= 2;
     }
-    func_000CD33A(l_18 + 64000, 0, 256);
+    xn_pal_set_range_8bit(l_18 + 64000, 0, 256);
     for (l_1C = a1; l_1C != 0; l_1C--) {
         time_pass(1440);
         mc_memcpy(screen_buffer, l_18, 64000, (int)D_001706E1, 391, 4);
-        func_000A0ED9(392, (int)D_001706E1);
+        mc_set_location(392, (int)D_001706E1);
         mc_sprintf((int)text_buffer, (int)D_001706F6, l_1C);
-        text_draw_centered_colored((int)text_buffer, 156, 165, 190, 219);
-        func_000CDD81(0);
+        text_draw_centred_coloured((int)text_buffer, 156, 165, 190, 219);
+        xn_gfx_present_inclusive(0);
     }
     mc_memset(655360, 0, 64000, (int)D_001706E1, 397, 4);
     mc_memset(screen_buffer, 0, 64000, (int)D_001706E1, 398, 4);
@@ -62,8 +62,8 @@ void prison_serve_sentence(int a1)
     D_00196294 = 0;
     D_001962A5 = 1;
     D_001962B0 = 0;
-    D_00195D48 = 10000;
-    D_0019629B = 0;
+    sky_loaded_frame = 10000;
+    night_sky_loaded = 0;
     D_001962A4 = 0;
     screen_shake_stop();
     court_restore_vitals();

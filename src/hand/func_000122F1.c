@@ -17,8 +17,8 @@ struct res {                /* a file loaded whole into memory */
     char *next;             /* 0xa4 */
 };
 extern char D_00170129[];        /* __FILE__ */
-extern char *func_000A0DD9(int, signed char *, int);       /* itoa */
-extern unsigned func_000A0DF4(signed char *);              /* strlen */
+extern char *itoa(int, signed char *, int);       /* itoa */
+extern unsigned strlen(signed char *);              /* strlen */
 extern void mc_memmove(char *, char *, int, char *, int, int);
 
 int profile_set_number(struct res *r, int value)
@@ -42,10 +42,10 @@ int profile_set_number(struct res *r, int value)
         buf[n++] = *p++;
     buf[n] = 0;
     if (buf[1] == 'x')
-        func_000A0DD9(value, buf + 2, 16);
+        itoa(value, buf + 2, 16);
     else
-        func_000A0DD9(value, buf, 10);
-    len = func_000A0DF4(buf);
+        itoa(value, buf, 10);
+    len = strlen(buf);
     if (len < n) {
         cnt = (r->buf + r->size) - q - (n - len);
         mc_memmove(q, q + (n - len), cnt, D_00170129, 768, 4);

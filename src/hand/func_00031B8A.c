@@ -10,9 +10,9 @@ extern unsigned char D_0017A25C[];
 extern short D_0017A270[];
 extern struct record *nonworld_root;
 extern struct record *player_object;
-extern struct record *D_00195AC4;
+extern struct record *location_object;
 extern struct location *current_location;
-extern char *D_00195C44;
+extern char *scratch_buffer;
 extern struct record *D_00195CE8;
 extern unsigned char current_region;
 extern int loaded_location_door_count;
@@ -30,8 +30,8 @@ extern struct faction *faction_find(short);
 extern struct faction *faction_random_of_type(unsigned char);
 extern struct qbn_person *quest_record(struct quest *, int, int);
 extern int func_000339B2(struct Ent6 *, struct qbn_person *, struct building *, int);
-extern struct faction *func_0003445C(struct faction **);
-extern int func_000344D3(void);
+extern struct faction *pick_random_of_three(struct faction **);
+extern int faction_random_hostile_id(void);
 extern int quest_object_in_use(int);
 extern struct Kind *flats_cfg_find(unsigned short);
 extern int rand_range(int, int);
@@ -143,7 +143,7 @@ int quest_init_person(struct qbn_person *r)
         r->kind = -1;
     }
     if (!(r->kind != -4 || r->faction_id != 10000)) {
-        i = func_000344D3();
+        i = faction_random_hostile_id();
         if (i == 0) {
             r->kind = -6;
         } else {
@@ -177,7 +177,7 @@ int quest_init_person(struct qbn_person *r)
         case 3:
             np = faction_find(it->data.building.faction_id);
             if (np != 0) {
-                np = func_0003445C(np->enemies);
+                np = pick_random_of_three(np->enemies);
             } else {
                 r->object = 0;
                 r->kind = -5;
@@ -193,7 +193,7 @@ int quest_init_person(struct qbn_person *r)
         case 4:
             np = faction_find(it->data.building.faction_id);
             if (np != 0) {
-                np = func_0003445C(np->allies);
+                np = pick_random_of_three(np->allies);
             } else {
                 r->object = 0;
                 r->kind = -5;
@@ -215,7 +215,7 @@ retry:
     if ((int)(short)(r->flags & 0xff) == 0) {
         list = loaded_location_doors;
         n = loaded_location_door_count;
-        src = D_00195AC4;
+        src = location_object;
         rec = current_location;
     } else {
         location_free(D_001970C8);
@@ -225,7 +225,7 @@ retry:
         src = D_001970D4;
         rec = D_001970D8;
     }
-    buf = (int *)D_00195C44;
+    buf = (int *)scratch_buffer;
     found = 0;
     any = 0;
     if ((int)(short)(r->flags & 0x600) != 0)

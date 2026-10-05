@@ -9,8 +9,8 @@ struct ent {                    /* 39 bytes */
 };
 struct dict { char pad[31]; char *base; };
 extern char D_00175940[];
-extern struct dict *D_00195AC4;
-extern struct ent D_00199D78[];
+extern struct dict *location_object;
+extern struct ent links[];
 extern int link_count;
 extern char D_001A3A80;
 extern char D_001A3A81;
@@ -24,12 +24,12 @@ void links_resolve(void)
 
     if (link_count >= 1024)
         fatal_error(D_00175940);
-    for (e = D_00199D78, end = D_00199D78 + link_count; e < end; e++) {
+    for (e = links, end = links + link_count; e < end; e++) {
         if (e->f2 == 6)
             e->f2 = 2;
         if (e->f3 == 108)
             e->f3 = 100;
-        e->o = object_find_by_id(D_00195AC4, (char *)((int)D_00195AC4->base + e->id - 1));
+        e->o = object_find_by_id(location_object, (char *)((int)location_object->base + e->id - 1));
         if (e->o != 0)
             e->o->f35 = 255;
     }

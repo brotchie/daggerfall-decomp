@@ -9,7 +9,7 @@ extern unsigned char D_001A9B8C[];
 extern unsigned char D_001A9B94[];
 extern unsigned char D_001A9BAC[];
 extern short potion_cauldron_count;
-extern void func_00090261(unsigned char *, unsigned char *, unsigned char *, int);
+extern void potion_sort_ingredients(unsigned char *, unsigned char *, unsigned char *, int);
 extern void mc_strncpy(char *, char *, int, char *, int);
 extern void mc_memcpy(void *, void *, int, char *, int, int);
 
@@ -27,7 +27,7 @@ int potion_mix_unknown(struct spell *sp)
     mc_memcpy(x, D_001A9B8C, potion_cauldron_count, D_00176E94, 410, 8);
     mc_memcpy(y, D_001A9BAC, potion_cauldron_count, D_00176E94, 411, 8);
     mc_memcpy(z, D_001A9B94, potion_cauldron_count, D_00176E94, 412, 8);
-    func_00090261(x, y, z, potion_cauldron_count);
+    potion_sort_ingredients(x, y, z, potion_cauldron_count);
     n = potion_cauldron_count;
     for (i = 0; n - 1 > i; i++) {
         if (x[i] == x[i + 1]) {
@@ -39,7 +39,7 @@ int potion_mix_unknown(struct spell *sp)
             n--;
         }
     }
-    func_00090261(y, x, z, n);
+    potion_sort_ingredients(y, x, z, n);
     sum = 0;
     if (n > 3) {
         for (i = 3; i < n; i++)

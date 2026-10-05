@@ -14,7 +14,7 @@ extern signed char game_mode;
 extern int tavern_menu_image;
 
 extern int disk_read_file(int, int);
-extern int func_0012B136();
+extern int xn_mouse_poll_clamped();
 
 int tavern_open(short a1)
 {
@@ -24,7 +24,7 @@ int tavern_open(short a1)
         return 1;
     }
     if (a1 != 0) {
-        while (mouse_buttons != 0) func_0012B136();
+        while (mouse_buttons != 0) xn_mouse_poll_clamped();
         tavern_state = 0;
         tavern_menu_image = disk_read_file((int)D_0017055C, 0);
         game_mode = 20;

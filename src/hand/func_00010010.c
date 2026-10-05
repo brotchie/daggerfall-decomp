@@ -1,5 +1,5 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x00010010 */
-extern int D_0012AA04;
+extern int xn_timer_fps;
 extern unsigned char text_shadow_colour;
 extern char D_00170004[];
 extern char D_0017000B[];
@@ -8,12 +8,12 @@ extern char D_00170049[];
 extern int frame_checkpoint;
 extern int D_0018DC0C;
 extern int D_0018DC1C;
-extern int D_0018DC24;
+extern int engine_running;
 extern int frame_counter;
 extern int player_death_timer;
 extern short mouse_motion_x;
 extern short mouse_motion_y;
-extern unsigned char D_00196283;
+extern unsigned char fog_colour;
 extern unsigned char D_001962A5;
 extern void game_frame(void);
 extern void screenshot_poll(void);
@@ -27,27 +27,27 @@ extern void time_pass(int);
 extern void quest_init_record_sizes(void);
 extern void init_game_data(void);
 extern void init_video(void);
-extern void func_0004FF11(void);
+extern void init_palette(void);
 extern void game_reset(void);
 extern void mouse_set_bounds(int, int, int, int);
 extern void hud_draw_heading_strip(int);
-extern void func_00069E3C(void);
+extern void dpmi_memory_stats(void);
 extern void crash_screen(void);
 extern void player_movement_update(void);
 extern void config_read(char *);
 extern void dpmi_lock_region(void *, int);
-extern void func_0009960A(void);
+extern void causeway_disable_error_dump(void);
 extern void exit(int);
 extern void func_0009DBF9(void);
 extern void srand(int);
-extern void func_0009DEA7(int);
-extern void func_000C0520(void);
-extern void func_000C7F00(void);
-extern void func_000CDD81(int);
-extern int func_000CE7BB(void);
-extern void func_000CE8C4(void);
-extern void func_0012A254(int);
-extern void func_0012B47E(short *, short *);
+extern void close(int);
+extern void xn_sys_install_crit_error_handler(void);
+extern void xn_sys_yield(void);
+extern void xn_gfx_present_inclusive(int);
+extern int xn_timer_fps_update(void);
+extern void xn_sys_zero_page_save(void);
+extern void xn_render_set_mode(int);
+extern void xn_mouse_read_motion(short *, short *);
 #pragma aux func_0009DA1C parm routine [];
 extern void func_0009DA1C(int, char *);
 #pragma aux func_0009DB3F parm routine [];
@@ -72,11 +72,11 @@ int func_00010010(short a1, char **a2)
         printf(D_0017000B);
         exit(-1);
     }
-    func_00069E3C();
+    dpmi_memory_stats();
     func_0009DB3F(crash_screen);
     func_0009DBFE(func_0009DBF9);
-    func_0009960A();
-    func_000C0520();
+    causeway_disable_error_dump();
+    xn_sys_install_crit_error_handler();
     dpmi_lock_region(func_00010010, 2048000);
     srand(*(int *)0x46c);
     D_0018DC1C = *(int *)0x46c;
@@ -87,12 +87,12 @@ int func_00010010(short a1, char **a2)
         printf(D_00170049);
         exit(-1);
     }
-    func_0009DEA7(l_44);
+    close(l_44);
     mouse_set_bounds(0, 0, 319, 199);
     init_video();
     kludge_print_build(0);
     init_game_data();
-    func_0004FF11();
+    init_palette();
     quest_init_record_sizes();
     intro_play_logo();
     for (l_44 = 0; l_44 < 12; l_44++) {
@@ -104,10 +104,10 @@ restart:
     title_menu();
     D_0018DC0C = *(int *)0x46c + 18;
     time_pass(1);
-    D_0012AA04 = 23;
-    func_0012A254(8);
-    func_000CE8C4();
-    D_0018DC24 = 1;
+    xn_timer_fps = 23;
+    xn_render_set_mode(8);
+    xn_sys_zero_page_save();
+    engine_running = 1;
     for (;;) {
         frame_checkpoint = 0;
         game_frame();
@@ -118,18 +118,18 @@ restart:
             goto restart;
         }
         hud_draw_heading_strip(0);
-        l_3C = func_000CE7BB();
+        l_3C = xn_timer_fps_update();
         frame_checkpoint = 2;
-        func_0012B47E(&mouse_motion_x, &mouse_motion_y);
+        xn_mouse_read_motion(&mouse_motion_x, &mouse_motion_y);
         player_movement_update();
         keys_world_actions();
         quest_debug_overlay();
         frame_checkpoint = 3;
-        text_shadow_colour = D_00196283;
-        func_000CDD81(1);
+        text_shadow_colour = fog_colour;
+        xn_gfx_present_inclusive(1);
         screenshot_poll();
         frame_counter++;
-        func_000C7F00();
+        xn_sys_yield();
     }
     return 0;
 }

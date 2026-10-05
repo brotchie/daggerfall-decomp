@@ -15,7 +15,7 @@ extern short D_00199B43;
 extern struct faction *faction_find_type_in_region(int, short);
 extern int faction_find(short);
 extern int flats_cfg_find(int);
-extern int func_0008B48B(struct record *);
+extern int npc_display_name(struct record *);
 extern int rand();
 extern int srand();
 extern int mc_memset();
@@ -53,7 +53,7 @@ int npc_talk_record_build(struct record *a1)
     if (l_1C != 0 && l_1C->type == 4) {
         mc_strncpy((int)npc_record_buffer, (int)l_1C->name, 32, (int)D_0017573C, 245);
     } else {
-        mc_strncpy((int)npc_record_buffer, func_0008B48B(a1), 32, (int)D_0017573C, 247);
+        mc_strncpy((int)npc_record_buffer, npc_display_name(a1), 32, (int)D_0017573C, 247);
     }
     srand(a1->id);
     for (l_28 = 1; l_28 < 5; l_28++) {

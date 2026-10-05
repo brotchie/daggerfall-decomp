@@ -2,10 +2,10 @@
 #include "records.h"
 
 extern unsigned char player_environment;
-extern unsigned D_0019599C;
+extern unsigned loan_collectors_next;
 extern struct record *bank_accounts;
 extern unsigned game_minutes;
-extern void func_00026508(void);
+extern void loan_spawn_collectors(void);
 extern int rand_range(int, int);
 
 void loan_collectors_update(void)
@@ -14,12 +14,12 @@ void loan_collectors_update(void)
     struct bank_account *p;
 
     if (player_environment == 3) return;
-    if (D_0019599C > game_minutes) return;
-    D_0019599C = game_minutes + rand_range(1400, 1700);
+    if (loan_collectors_next > game_minutes) return;
+    loan_collectors_next = game_minutes + rand_range(1400, 1700);
     p = bank_accounts->data.bank_accounts;
     for (i = 0; i < 62; i++) {
         if (p->loan_due == 0) continue;
         if (p->loan_due < game_minutes)
-            func_00026508();
+            loan_spawn_collectors();
     }
 }

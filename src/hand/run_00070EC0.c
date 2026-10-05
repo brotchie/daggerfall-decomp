@@ -7,7 +7,7 @@ extern int D_00185077;
 extern unsigned char *D_00187545;
 extern struct rep region_legal_reputation[];
 extern int inpstr_result;
-extern struct record *guild_npc_object;
+extern struct record *scratch_object;
 extern struct character *player_character;
 extern unsigned char current_region;
 extern struct faction *D_0019671C;
@@ -19,7 +19,7 @@ extern int rand_range(int, int);
 extern void msgbox_prompt_number(int, int);
 extern void gold_spend(int);
 extern int gold_can_afford(int);
-extern int func_0009DEAC(short);
+extern int abs(short);
 
 void blessing_remove(unsigned char *a1)
 {
@@ -72,15 +72,15 @@ void guild_donate(void)
         return;
     }
     gold_spend(inpstr_result);
-    if (rand_range(1, 100) <= inpstr_result * 2 / (func_0009DEAC(D_0019671C->reputation) + 1))
+    if (rand_range(1, 100) <= inpstr_result * 2 / (abs(D_0019671C->reputation) + 1))
         D_0019671C->reputation++;
     msgbox_show_rsc(703, 1);
 }
 
 void guild_temple_quest(void)
 {
-    if (guild_npc_object->quest_id != 0) {
-        npc_talk(guild_npc_object);
+    if (scratch_object->quest_id != 0) {
+        npc_talk(scratch_object);
         return;
     }
     if (guild_membership != 0) {

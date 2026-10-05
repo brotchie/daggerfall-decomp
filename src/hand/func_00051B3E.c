@@ -12,14 +12,14 @@ struct Snd {
     unsigned char loops;        /* 0x2b */
 };
 extern unsigned char mouse_buttons;
-extern char D_00142307;
-extern void func_00051CF9(struct Snd *);
+extern char xn_kbd_last_scancode;
+extern void flc_show_frame(struct Snd *);
 extern int flc_open(int, struct Snd *);
 extern void flc_close(struct Snd *);
 extern int flc_next_frame(struct Snd *);
 extern int lseek(unsigned short, int, int);
-extern int func_000CE92C();
-extern int func_0012B136();
+extern int xn_kbd_wait_all_released();
+extern int xn_mouse_poll_clamped();
 
 int pflc_play(int a1, struct Snd *s)
 {
@@ -29,8 +29,8 @@ int pflc_play(int a1, struct Snd *s)
         return 1;
     s->state = 255;
     while (mouse_buttons != 0)
-        func_0012B136();
-    func_000CE92C();
+        xn_mouse_poll_clamped();
+    xn_kbd_wait_all_released();
     if (s->step > 256)
         s->step -= 16;
     for (;;) {
@@ -41,13 +41,13 @@ int pflc_play(int a1, struct Snd *s)
             t0 = *(int *)0x46c;
             if (flc_next_frame(s) != 0)
                 break;
-            func_00051CF9(s);
-            func_0012B136();
-            if (D_00142307 != 0 || (int)(unsigned char)(mouse_buttons & 3) != 0)
+            flc_show_frame(s);
+            xn_mouse_poll_clamped();
+            if (xn_kbd_last_scancode != 0 || (int)(unsigned char)(mouse_buttons & 3) != 0)
                 goto out;
             while (*(int *)0x46c - t0 < s->delay) {
-                func_0012B136();
-                if (D_00142307 != 0 || (int)(unsigned char)(mouse_buttons & 3) != 0)
+                xn_mouse_poll_clamped();
+                if (xn_kbd_last_scancode != 0 || (int)(unsigned char)(mouse_buttons & 3) != 0)
                     goto out;
             }
         }
@@ -64,10 +64,10 @@ int pflc_play(int a1, struct Snd *s)
 stop:
     s->state = 255;
     flc_close(s);
-    func_000CE92C();
+    xn_kbd_wait_all_released();
     return 0;
 out:
     flc_close(s);
-    func_000CE92C();
+    xn_kbd_wait_all_released();
     return 1;
 }

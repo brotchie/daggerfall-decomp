@@ -19,12 +19,12 @@ extern char monster_spells_daedra_lord[];
 extern char monster_spells_lich[];
 extern char monster_spells_ancient_lich[];
 extern int monster_class_spell_lists[];
-extern signed char D_001879CE[];
+extern signed char monster_class_map_chance[];
 extern signed char wabbajack_creatures[];
 extern signed char monster_map_chance[];
 extern char D_00190704[];
 extern struct record *nonworld_root;
-extern struct record *D_00195AC4;
+extern struct record *location_object;
 extern struct spell *spell_records;
 extern struct character *player_character;
 extern int save_file_handle;
@@ -36,7 +36,7 @@ extern int object_new_id(int);
 extern int rand();
 extern int mc_free();
 extern int mc_memset();
-extern int func_000A00CB();
+extern int read();
 extern int mc_memcpy();
 extern void character_update_armor_values(struct record *);
 extern void item_make(int, int, struct item *);
@@ -61,7 +61,7 @@ void monster_reload_anims(void)
             }
         }
     }
-    object_foreach(D_00195AC4, (int)monster_reload_anim_cb);
+    object_foreach(location_object, (int)monster_reload_anim_cb);
     object_foreach(nonworld_root, (int)monster_reload_anim_cb);
 }
 
@@ -288,7 +288,7 @@ void monster_maybe_give_map(struct record *a1, int a2)
     if (a2 < 128) {
         if (rand_range(1, 100) > ((int)(unsigned char)monster_map_chance[a2])) return;
     } else {
-        if (rand_range(1, 100) > ((int)(unsigned char)D_001879CE[a2])) return;
+        if (rand_range(1, 100) > ((int)(unsigned char)monster_class_map_chance[a2])) return;
     }
     l_18 = object_create_child(a1, 0, 107);
     l_18->type = 2;
@@ -297,11 +297,11 @@ void monster_maybe_give_map(struct record *a1, int a2)
     item_make(27, 8, l_14);
 }
 
-int func_00079A28(int a1)
+int savetree_read_chunk(int a1)
 {
     int l_1C;
 
-    func_000A00CB(save_file_handle, (int)&l_1C, 4);
-    func_000A00CB(save_file_handle, a1, l_1C);
+    read(save_file_handle, (int)&l_1C, 4);
+    read(save_file_handle, a1, l_1C);
     return l_1C;
 }
