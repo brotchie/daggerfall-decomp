@@ -1,16 +1,32 @@
-# Natural C: structured control flow and typed globals
+# Natural C
 
-The lifter wrote every function's control flow as gotos (`if (c) goto L;`, `goto L;`, `L:;`)
-and every global as `extern char g[];` read through casts (`*(int *)g`). Phase 3 turns both
-into ordinary C with two batch tools, and every function still compiles with Watcom C32 10.0a
-to FALL.EXE's bytes:
+The lifter wrote every function's control flow as gotos (`if (c) goto L;`, `goto L;`, `L:;`),
+every global as `extern char g[];` read through casts (`*(int *)g`), every local and parameter
+by its frame slot (`l_1C`, `a1`) and every record access as an offset cast. Phase 3 turned
+that into ordinary C. Every function still compiles with Watcom C32 10.0a to FALL.EXE's bytes:
 
 - **tools/structure.py** rewrites the gotos as if / else / `&&` / `||` / while / do-while /
   for / `for (;;)` / break / continue, and ends switches where they end.
 - **tools/type_globals.py** declares the globals with their types (`extern int g;`,
   `extern short g[];`) and drops the casts.
+- **Local and parameter names**: six agents named every `l_XX` and `aN` by what it holds, and
+  retyped the ones holding records or strings (below).
+- **Record structs**: include/records.h, include/structs.h and tools/offset_casts.py
+  (docs/structs.md).
+- **tools/protos.py** makes each file's declarations of a function agree with its definition
+  (below).
 
-## Status
+## Phase 3 in numbers
+
+| | before phase 3 | now |
+|---|---|---|
+| `goto`s / labels | 11,969 / 10,611 | 71 / 34 |
+| `l_XX` locals and `aN` parameters | 29,964 | 0 |
+| record offset casts (`offset_casts.py count`) | ~7,900 | 231 |
+| file-local struct definitions | 305 (struct pass start) | 72 |
+| declarations that disagree with the definition | 959 | 316 |
+
+## Structuring and typed globals
 
 Measured on src/lifted (164 files) and src/hand (249 files) as of commit 2f19d5b, with
 `tools/build-and-verify.sh` BUILD OK on the result:
@@ -294,3 +310,51 @@ A global that breaks a function is put back in that file only.
 Hand files declare some globals with types of their own (`extern unsigned char game_mode;`
 in a hand file, `signed char` from the lifted uses). `census --list` shows these as "also
 declared"; two translation units disagreeing on a byte's signedness changes no code.
+
+## Local and parameter names
+
+Six agents (by subsystem: magic and combat, economy and society, quests and text, objects,
+UI, world) renamed every lifter placeholder with a function-scoped rename tool. The tool
+refuses a name that is a global, a function, a typedef or already used in the function, and
+never touches members, strings or comments. Each file was then checked with tools/wcc10.py.
+Renames never change code; type changes can, so each retyping was compiled and kept only
+when it matched:
+
+- locals and parameters that hold records became `struct record *` and the like;
+- strings became `char *`;
+- the casts that made unnecessary were dropped.
+
+Locals stay in their declared order (Watcom's frame layout follows it). Unused ones keep their
+slots as `unused`, `unused2`... Two kinds of placeholder were kept on purpose:
+- `*(int *)&short_local` reads, which the code depends on;
+- pointers still held in an int because no struct exists for them yet.
+
+## Declarations: tools/protos.py
+
+Each file declares the functions it calls, as they were typed when lifted
+(`extern int faction_find(short);`). Once the definition is typed, the old declarations
+disagree. Every file compiles on its own, so nothing breaks, but the C says two things.
+
+- `protos.py census` lists the declarations that disagree with their definition.
+- `protos.py run --in-place -j 8` rewrites each one as the definition's prototype:
+  - A pointer the declaration has and the definition lacks (where the definition still says
+    `int`) is kept.
+  - At call sites, `(int)` casts on single-name arguments at the positions that became
+    pointers are dropped: `disk_read_file((int)D_00170794, 0)` becomes
+    `disk_read_file(D_00170794, 0)`.
+  - A file keeps a change only when Watcom 10.0a still compiles all its functions to
+    FALL.EXE's bytes, with no more warnings than before. More warnings mean a caller passes
+    another type.
+- `protos.py unify --in-place` handles the functions still disagreeing. It searches the types
+  their definition and declarations use, position by position, for one prototype under which
+  every file matches, the definition's file included:
+  - pointer-typed candidates are tried first;
+  - a definition's pointer is never turned back into an integer.
+
+On 2026-10-05: 959 disagreeing declarations; `run` fixed 627 and `unify` 10 functions; 316
+are left. Those are load-bearing: the callers' code was compiled against other types than the
+definition's. text_draw_coloured is the common case: its callers' declarations say
+`unsigned char` for the colour, and with that prototype Watcom loads the constant through a
+register before pushing it (`mov eax, 0x9c; push eax`). With the definition's `int` it would
+push the constant directly (`push 0x9c`). The original source evidently had disagreeing
+declarations too. `protos.py census` lists them.
