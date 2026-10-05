@@ -3,14 +3,14 @@
 
 extern unsigned spell_resist_flags[];
 extern int object_delete(struct record *);
-void spfx_effect_end(struct spell *e, int i, struct record *a3);
+void spfx_effect_end(struct spell *e, int i, struct record *target);
 
-int spfx_wall_of_frost(int a1, int a2, int a3)
+int spfx_wall_of_frost(int spell_object, int effect, int target)
 {
     return 0;
 }
 
-int spfx_wall_of_poison(int a1, int a2, int a3)
+int spfx_wall_of_poison(int spell_object, int effect, int target)
 {
     return 0;
 }
@@ -29,11 +29,11 @@ void spell_end(struct record *obj)
     object_delete(obj);
 }
 
-void spfx_effect_end(struct spell *e, int i, struct record *a3)
+void spfx_effect_end(struct spell *e, int i, struct record *target)
 {
     struct character *m;
 
-    m = &a3->data.character;
+    m = &target->data.character;
     switch (e->effects[i].type) {
     case 0:
         m->conditions &= ~0x1;

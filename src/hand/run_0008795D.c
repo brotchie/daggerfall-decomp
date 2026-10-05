@@ -28,9 +28,9 @@ extern int mc_memset();
 extern int xn_world_reload();
 extern int xn_terrain_height_at(int, int);
 
-void location_place_player_at_edge(unsigned a1)
+void location_place_player_at_edge(unsigned edge)
 {
-    switch (a1) {
+    switch (edge) {
     case 0:
     case 1:
         player_object->x = location_object->x + (current_location->width << 11);
@@ -61,26 +61,26 @@ void location_place_player_at_edge(unsigned a1)
     player_object->y = xn_terrain_height_at(player_object->x, player_object->z);
 }
 
-void map_goto_location(int a1, int a2, int a3, int a4)
+void map_goto_location(int region, int environment, int location, int building)
 {
-    struct record *l_C;
+    struct record *old_parent;
 
-    l_C = player_object->parent;
-    if (current_region == a1 && player_environment == a2 && location_object->image == a3) {
+    old_parent = player_object->parent;
+    if (current_region == region && player_environment == environment && location_object->image == location) {
         if (player_environment == 2)
-            building_enter(&current_location->buildings[a4]);
+            building_enter(&current_location->buildings[building]);
         else
             player_to_nearest_marker(location_object, 8);
         return;
     }
     location_unload(location_object->image);
-    player_environment = a2;
-    if (current_region != a1)
-        region_enter(current_region, a1);
+    player_environment = environment;
+    if (current_region != region)
+        region_enter(current_region, region);
     switch (player_environment) {
     case 1:
-        xn_cam_x = player_object->x = region_locations[a3].x_type_flags & 33554431;
-        xn_cam_z = player_object->z = region_locations[a3].z_size & 16777215;
+        xn_cam_x = player_object->x = region_locations[location].x_type_flags & 33554431;
+        xn_cam_z = player_object->z = region_locations[location].z_size & 16777215;
         xn_world_reload();
         mc_memset(terrain_cell_dirty, 0, 16, D_00176C94, 783, 16);
         mc_memset(terrain_cell_ids, 0, 16, D_00176C94, 784, 16);
@@ -93,71 +93,71 @@ void map_goto_location(int a1, int a2, int a3, int a4)
         player_object->y = xn_cam_y;
         break;
     case 2:
-        xn_cam_x = player_object->x = region_locations[a3].x_type_flags & 33554431;
-        xn_cam_z = player_object->z = region_locations[a3].z_size & 16777215;
+        xn_cam_x = player_object->x = region_locations[location].x_type_flags & 33554431;
+        xn_cam_z = player_object->z = region_locations[location].z_size & 16777215;
         xn_world_reload();
         mc_memset(terrain_cell_dirty, 0, 16, D_00176C94, 803, 16);
         mc_memset(terrain_cell_ids, 0, 16, D_00176C94, 804, 16);
         world_update_location();
         world_loading++;
-        building_enter(&current_location->buildings[a4]);
+        building_enter(&current_location->buildings[building]);
         world_loading--;
         break;
     case 3:
-        dungeon_load(a3);
+        dungeon_load(location);
         automap_load();
     }
     D_001940D5 |= 2;
 }
 
-int location_has_service(struct flags *a1, int a2, int a3)
+int location_has_service(struct flags *flags, int service, int subtype)
 {
-    switch (a2) {
+    switch (service) {
     case 0:
-        return a1->f[1].b0;
+        return flags->f[1].b0;
     case 3:
-        return a1->f[1].b1;
+        return flags->f[1].b1;
     case 5:
-        return a1->f[1].b3;
+        return flags->f[1].b3;
     case 6:
-        return a1->f[1].b4;
+        return flags->f[1].b4;
     case 7:
-        return a1->f[1].b5;
+        return flags->f[1].b5;
     case 8:
-        return a1->f[1].b6;
+        return flags->f[1].b6;
     case 10:
-        return a1->f[1].b7;
+        return flags->f[1].b7;
     case 11:
-        return a1->f[2].b0;
+        return flags->f[2].b0;
     case 13:
     case 14:
-        switch (a3) {
+        switch (subtype) {
         case -1:
-            return *(unsigned char *)a1 > 0 ? 1 : 0;
+            return *(unsigned char *)flags > 0 ? 1 : 0;
         case 0:
         case 26:
-            return a1->f[0].b0;
+            return flags->f[0].b0;
         case 1:
         case 21:
-            return a1->f[0].b1;
+            return flags->f[0].b1;
         case 2:
         case 29:
-            return a1->f[0].b2;
+            return flags->f[0].b2;
         case 3:
         case 27:
-            return a1->f[0].b3;
+            return flags->f[0].b3;
         case 4:
         case 35:
-            return a1->f[0].b4;
+            return flags->f[0].b4;
         case 5:
         case 24:
-            return a1->f[0].b5;
+            return flags->f[0].b5;
         case 6:
         case 33:
-            return a1->f[0].b6;
+            return flags->f[0].b6;
         case 7:
         case 22:
-            return a1->f[0].b7;
+            return flags->f[0].b7;
         }
         break;
     case 25:
@@ -171,21 +171,21 @@ int location_has_service(struct flags *a1, int a2, int a3)
     case 33:
     case 34:
     case 35:
-        return a1->f[2].b1;
+        return flags->f[2].b1;
     case 36:
-        return a1->f[2].b2;
+        return flags->f[2].b2;
     case 37:
-        return a1->f[2].b3;
+        return flags->f[2].b3;
     case 38:
-        return a1->f[2].b4;
+        return flags->f[2].b4;
     case 39:
-        return a1->f[2].b5;
+        return flags->f[2].b5;
     case 15:
-        return a1->f[2].b7;
+        return flags->f[2].b7;
     case 12:
-        return a1->f[2].b6;
+        return flags->f[2].b6;
     case 1:
-        return a1->f[3].b0;
+        return flags->f[3].b0;
     }
     return 0;
 }

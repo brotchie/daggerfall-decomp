@@ -3,16 +3,16 @@ extern unsigned char text_shadow_colour;
 extern unsigned char D_0012B508;
 extern void text_draw_shadow(char *, short, short);
 
-void text_draw_coloured(char *a1, short a2, int a3, int a4, int a5)
+void text_draw_coloured(char *text, short x, int y, int colour, int shadow)
 {
-    short l1;
-    short l2;
+    short old_colour;
+    short old_shadow;
 
-    l1 = D_0012B508;
-    l2 = text_shadow_colour;
-    D_0012B508 = a4;
-    text_shadow_colour = a5;
-    text_draw_shadow(a1, a2, a3);
-    D_0012B508 = l1;
-    text_shadow_colour = l2;
+    old_colour = D_0012B508;
+    old_shadow = text_shadow_colour;
+    D_0012B508 = colour;
+    text_shadow_colour = shadow;
+    text_draw_shadow(text, x, y);
+    D_0012B508 = old_colour;
+    text_shadow_colour = old_shadow;
 }

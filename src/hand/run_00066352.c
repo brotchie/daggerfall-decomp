@@ -36,14 +36,14 @@ extern void player_to_nearest_marker(struct record *, int);
 extern int rand(void);
 extern void mc_memcpy(void *, void *, int, char *, int, int);
 
-void disease_toggle_memberships_cb(struct record *a1)
+void disease_toggle_memberships_cb(struct record *obj)
 {
-    if (a1->type == 10) {
-        a1->type = 29;
+    if (obj->type == 10) {
+        obj->type = 29;
         return;
     }
-    if (a1->type == 29)
-        a1->type = 10;
+    if (obj->type == 29)
+        obj->type = 10;
 }
 
 void disease_become_vampire(void)

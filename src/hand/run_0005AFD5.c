@@ -18,72 +18,72 @@ extern void disease_lycanthrope_shapechange(int);
 extern int hud_message_add(char *);
 extern void spell_cast_queued_run(void);
 
-int cast_player_spell(struct record *a1)
+int cast_player_spell(struct record *spell_object)
 {
-    struct spell *l_1C;
+    struct spell *spell;
 
-    l_1C = &a1->data.spell;
-    a1->caster = player_entity;
-    spell_last_cast_id = l_1C->id;
-    if (l_1C->id == 92) {
+    spell = &spell_object->data.spell;
+    spell_object->caster = player_entity;
+    spell_last_cast_id = spell->id;
+    if (spell->id == 92) {
         disease_lycanthrope_shapechange(0);
         return 1;
     }
     if (D_0019629A == 0 && (player_character->conditions & 0x100) != 0)
         return 1;
     spell_cast_busy = 130 - player_character->attributes[ATTR_INT] * 50;
-    quests_raise_event_all(73, a1, 0);
-    switch (l_1C->target) {
+    quests_raise_event_all(73, spell_object, 0);
+    switch (spell->target) {
     case 0:
-        cast_spell_on(a1, player_entity, 0);
+        cast_spell_on(spell_object, player_entity, 0);
         return 1;
     case 1:
         hud_message_add(D_001842D5);
-        spell_ready_touch = a1;
+        spell_ready_touch = spell_object;
         return 0;
     case 2:
         hud_message_add(D_001842D5);
-        spell_ready_missile = a1;
+        spell_ready_missile = spell_object;
         return 0;
     case 3:
         hud_message_add(D_001842D5);
-        spell_ready_missile = a1;
+        spell_ready_missile = spell_object;
         return 0;
     case 4:
         hud_message_add(D_001842D5);
-        spell_ready_missile = a1;
+        spell_ready_missile = spell_object;
         return 0;
     default:
         return 1;
     }
 }
 
-int cast_item_spell_at(struct record *a1, struct record *a2)
+int cast_item_spell_at(struct record *spell_object, struct record *target)
 {
-    struct spell *l_18;
+    struct spell *spell;
 
-    l_18 = &a1->data.spell;
-    a1->caster = player_entity;
-    if (l_18->id == 92) {
+    spell = &spell_object->data.spell;
+    spell_object->caster = player_entity;
+    if (spell->id == 92) {
         disease_lycanthrope_shapechange(0);
         return 1;
     }
-    switch (l_18->target) {
+    switch (spell->target) {
     case 0:
-        cast_spell_on(a1, player_entity, 0);
+        cast_spell_on(spell_object, player_entity, 0);
         return 1;
     case 1:
-        cast_spell_on(a1, a2, 0);
+        cast_spell_on(spell_object, target, 0);
         return 1;
     case 2:
-        cast_spell_on(a1, a2, 0);
+        cast_spell_on(spell_object, target, 0);
         return 1;
     case 3:
         spell_cast_queue_count = 0;
-        a1->x = player_object->x;
-        a1->y = player_object->y;
-        a1->z = player_object->z;
-        spell_area_effect(a1);
+        spell_object->x = player_object->x;
+        spell_object->y = player_object->y;
+        spell_object->z = player_object->z;
+        spell_area_effect(spell_object);
         spell_cast_queued_run();
         return 1;
     case 4:
