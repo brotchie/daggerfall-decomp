@@ -99,7 +99,7 @@ extern short D_00190D86;
 extern char scratch_190de4[];
 extern int scratch_190de8;
 extern int scratch_190dec;
-extern char scratch_190df0[];
+extern struct image *scratch_190df0;
 extern int scratch_190df4;
 extern int scratch_190df8;
 extern int scratch_190dfc;
@@ -198,8 +198,8 @@ void classmaker_run(void)
     scratch_190dec = disk_read_file(D_00175436, 0);
     *(int *)scratch_190de4 = mc_malloc(5520, (int)D_00175420, 109);
     xn_draw_get_rect(219, 46, 40, 138, *(int *)scratch_190de4, 0);
-    *(int *)scratch_190df0 = disk_read_file(D_00175443, 0);
-    scratch_190de8 = mc_malloc(((int)(unsigned short)*(short *)(*(char **)scratch_190df0 + 4)) * ((int)(unsigned short)*(short *)(*(char **)scratch_190df0 + 6)), (int)D_00175420, 113);
+    scratch_190df0 = (struct image *)disk_read_file(D_00175443, 0);
+    scratch_190de8 = mc_malloc(scratch_190df0->width * scratch_190df0->height, (int)D_00175420, 113);
     scratch_190df8 = disk_read_file(D_00175450, 0);
     D_00190E00 = disk_read_file(D_0017545D, 0);
     scratch_190dfc = disk_read_file(D_0017546A, 0);
@@ -281,7 +281,7 @@ void classmaker_run(void)
     mc_free(*(int *)scratch_190de4, (int)D_00175420, 217);
     mc_free(scratch_190dec, (int)D_00175420, 218);
     mc_free(scratch_190de8, (int)D_00175420, 219);
-    mc_free(*(int *)scratch_190df0, (int)D_00175420, 220);
+    mc_free((int)scratch_190df0, (int)D_00175420, 220);
     mc_free(scratch_190df4, (int)D_00175420, 221);
     mc_free(scratch_190df8, (int)D_00175420, 222);
     mc_free(scratch_190dfc, (int)D_00175420, 223);

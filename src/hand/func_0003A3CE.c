@@ -297,6 +297,6 @@ L3AABE:;
     mc_memset(655360, 0, 64000, (int)D_00170B88, 343, 4);
     palette_restore();
     newgame_place_player();
-    realtime_clock_tick = *(int *)((char *)1132);
+    realtime_clock_tick = BIOS_TICKS;
     quests_start_initial();
 }

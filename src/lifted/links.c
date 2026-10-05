@@ -12,10 +12,7 @@ extern struct record *location_object;
 extern struct spell *spell_records;
 extern struct character *player_character;
 extern char scratch_buffer[];
-extern char links[];
-extern signed char D_00199D7B[];
-extern signed char D_00199D84[];
-extern char D_00199D9B[];
+extern struct link links[];
 extern int active_links[];
 extern int link_count;
 extern int active_link_count;
@@ -66,11 +63,11 @@ void links_load(int handle)
     read(handle, (int)&link_count, 4);
     read(handle, (int)links, link_count * 39);
     for (i = 0; i < link_count; i++) {
-        if (((int)(unsigned char)D_00199D7B[i * 39]) == 108) {
-            D_00199D7B[i * 39] = 100;
+        if (links[i].param == 108) {
+            links[i].param = 100;
         }
-        if (*(int *)(D_00199D9B + (i * 39)) != 0) {
-            *(int *)(D_00199D9B + (i * 39)) = (int)object_find_by_id(location_object, *(int *)(D_00199D9B + (i * 39)));
+        if (links[i].object != 0) {
+            links[i].object = object_find_by_id(location_object, (int)links[i].object);
         }
     }
     read(handle, (int)&active_link_count, 4);
@@ -209,9 +206,9 @@ void links_set_reverse(short object_id, int flags)
     int i;
 
     for (i = 0; i < link_count; i++) {
-        if (*(unsigned short *)(links + (i * 39)) == (short)object_id) {
-            D_00199D84[i * 39] &= 253;
-            D_00199D84[i * 39] |= *(signed char *)&flags & 2;
+        if (links[i].object_id == (short)object_id) {
+            links[i].flags &= 253;
+            links[i].flags |= *(signed char *)&flags & 2;
         }
     }
 }

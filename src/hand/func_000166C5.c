@@ -7,7 +7,7 @@ extern int D_00195A90;
 extern int D_00195A94;
 extern struct record *player_object;
 extern struct record *location_object;
-extern char D_00195D28[];
+extern struct talk_where *D_00195D28;
 extern char D_00196488[];
 extern short *talk_topics;
 extern struct faction *talk_npc_own_faction;
@@ -36,17 +36,17 @@ int talk_hint_text_id(int variant)
     unused1 = 0;
     if ((unsigned char)talk_topic_tab == 3) {}
     if (D_001965DC == 2) {
-        if (*(short *)(*(char **)D_00195D28 + 4) == 0) {
-            if (*(int *)(*(char **)D_00195D28 + 18) == 0) {
+        if (D_00195D28->pad04 == 0) {
+            if (D_00195D28->building == 0) {
                 if (talk_find_regional(*(unsigned char *)(D_00196488 + *(int *)talk_selected_row)) != 0)
                     return 10;
                 return 11;
             }
-            building_object = object_find_by_id(location_object, *(int *)(*(char **)(*(char **)D_00195D28 + 18) + 20));
+            building_object = object_find_by_id(location_object, D_00195D28->building->id);
             D_00195A90 = building_object->x;
             D_00195A94 = building_object->z;
             if (player_environment == 1 && (xn_math_approx_dist2d(building_object->x, building_object->z, player_object->x, player_object->z) < 2048 || rand_range(1, 100) <= 25)) {
-                town_map_note_building(building_object, *(int *)(*(char **)D_00195D28 + 18));
+                town_map_note_building(building_object, (int)D_00195D28->building);
                 return 7332;
             }
             return 7333;

@@ -25,7 +25,7 @@ extern struct record *player_object;
 extern struct record *location_object;
 extern struct location *current_location;
 extern int game_minutes;
-extern char scratch_buffer[];
+extern char *scratch_buffer;
 extern signed char D_00196272;
 extern signed char mouse_buttons_prev;
 extern int town_map_view_x;
@@ -93,15 +93,15 @@ void town_map_open(void)
     D_00196D98 = (D_00196D90 = 0);
     D_00196D94 = 0;
     scratch_190ce5 = 0;
-    mc_memset(*(int *)scratch_buffer, 0, 50000, (int)D_001707AE, 624, 4);
+    mc_memset((int)scratch_buffer, 0, 50000, (int)D_001707AE, 624, 4);
     mc_set_location(625, (int)D_001707AE);
     mc_sprintf((int)text_buffer, (int)D_001707B8, location_object->id >> 16);
     handle = disk_open_rw(text_buffer);
     if (handle != (-1)) {
-        read(handle, *(int *)scratch_buffer, 50000);
-        *(int *)(*(char **)scratch_buffer) = game_minutes;
+        read(handle, (int)scratch_buffer, 50000);
+        *(int *)scratch_buffer = game_minutes;   /* the notes file starts with the time it was saved */
         lseek(handle, 0, 0);
-        write(handle, *(int *)scratch_buffer, 4);
+        write(handle, (int)scratch_buffer, 4);
         close(handle);
     }
     mouse_buttons = (mouse_buttons_prev = 0);
@@ -153,7 +153,7 @@ void town_map_open(void)
     if (scratch_190ce5 == 0) return;
     mc_set_location(686, (int)D_001707AE);
     mc_sprintf((int)text_buffer, (int)D_001707B8, location_object->id >> 16);
-    disk_write_arena2_file(text_buffer, *(int *)scratch_buffer, town_notes_size());
+    disk_write_arena2_file(text_buffer, (int)scratch_buffer, town_notes_size());
 }
 
 void town_map_draw(void)

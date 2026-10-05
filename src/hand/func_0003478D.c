@@ -15,7 +15,7 @@ extern int screen_buffer;
 extern char D_00170A86[];
 extern unsigned char player_environment;
 extern signed char D_00187CA8;
-extern signed char region_precipitation_override[];
+extern struct region regions[];
 extern int view_look_pitch;
 extern int view_look_yaw;
 extern struct record *camera_object;
@@ -143,8 +143,8 @@ void sky_update(void)
     sun_light = 0;
     climate = climate_category();
     weather = climate_weathers[climate];
-    if (region_precipitation_override[((int)(unsigned char)current_region) * 80] != 0) {
-        weather = region_precipitation_override[((int)(unsigned char)current_region) * 80] - 1;
+    if (regions[(unsigned char)current_region].precipitation_override != 0) {
+        weather = regions[(unsigned char)current_region].precipitation_override - 1;
     }
     minutes += -360;
     if (minutes < 45) {

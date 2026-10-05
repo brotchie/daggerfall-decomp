@@ -557,7 +557,7 @@ void player_movement_update(void)
     }
     dy = 0;
     if (((int)(short)(*(short *)collide_flags & 2)) != 0 && D_001A5B30 == 0 && climb_angle_ok((int)(unsigned short)D_00195F5A) != 0 && xn_math_approx_dist2d(player_object->x, player_object->z, start_x, start_z) < 5 && (player_character->conditions & 0x8) == 0 && ((int)(unsigned short)(player_character->flags & 1536)) == 0) {
-        if (((unsigned)(*(int *)((char *)1132) - D_001A5AE4)) > 14) {
+        if (((unsigned)(BIOS_TICKS - D_001A5AE4)) > 14) {
             if (((struct bf8_5_1 *)&player_motion_flags)->f == 0) {
                 hud_message_add(D_001845C8);
                 skill_add_uses(18, 1);
@@ -579,7 +579,7 @@ void player_movement_update(void)
         if (((struct bf8_5_1 *)&player_motion_flags)->f != 0 && D_001A5B30 == 0 && ((int)(short)(*(short *)collide_flags & 2)) == 0) {
             if (player_climb_probe() == 0) player_motion_flags &= 223;
         }
-        D_001A5AE4 = *(int *)((char *)1132);
+        D_001A5AE4 = BIOS_TICKS;
         D_001A5B00 = game_minutes;
     }
     if (((struct bf8_5_1 *)&player_motion_flags)->f != 0 || (player_character->conditions & 0x8) != 0) {

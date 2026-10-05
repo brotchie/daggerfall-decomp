@@ -8,9 +8,9 @@ extern char *xn_world_tile_layer;
 extern char D_001705F8[];
 extern signed char climate_categories[];
 extern int D_00187F30[];
-extern signed char regions[];
+extern struct region regions[];
 extern struct record *player_object;
-extern char current_region_data[];
+extern struct region *current_region_data;
 extern signed char current_region;
 extern signed char D_00196269;
 extern signed char current_climate;
@@ -41,7 +41,7 @@ void region_free_tables(void)
 void region_enter(unsigned char old_region, unsigned char region)
 {
     current_region = region;
-    *(int *)current_region_data = ((int)regions) + (((int)(unsigned char)current_region) * 80);
+    current_region_data = &regions[(unsigned char)current_region];
     D_00196269 = current_region;
     region_unload();
     maploads_enter_region((int)(unsigned char)region);
@@ -112,16 +112,16 @@ unsigned char climate_lookup(int x, int z)
 unsigned char pak_lookup(int column, int row, int pak)
 {
     int base;
-    int run;
+    struct pak_run *run;
 
     base = pak;
-    run = (int)(*(char **)((char *)((row << 2) + base)) + pak);
-    column -= (int)(short)*(short *)((char *)run);
+    run = (struct pak_run *)(((char **)base)[row] + pak);
+    column -= run->count;
     while (column > 0) {
-        (*(char (**)[3])&run)++;
-        column -= (int)(short)*(short *)((char *)run);
+        run++;
+        column -= run->count;
     }
-    return *(signed char *)((char *)run + 2);
+    return run->value;
 }
 
 unsigned char ground_tile_at(int x, int z)

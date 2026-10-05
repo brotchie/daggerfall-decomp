@@ -46,14 +46,7 @@ extern int talk_category_names[];
 extern int talk_regional_names[];
 extern char region_neighbours[];
 extern signed char D_00187CA8;
-extern signed char regions[];
-extern signed char D_0018F045[];
-extern signed char D_0018F046[];
-extern signed char region_event_flags[];
-extern signed char D_0018F062[];
-extern signed char D_0018F063[];
-extern signed char D_0018F064[];
-extern signed char region_event_groups[];
+extern struct region regions[];
 extern signed char text_buffer[];
 extern char scratch_190be4[];
 extern signed char D_00190D0F;
@@ -72,7 +65,7 @@ extern struct character *player_character;
 extern int window_image;
 extern struct settings *game_settings;
 extern struct record *quest_tick_object;
-extern char D_00195D28[];
+extern struct talk_where *D_00195D28;
 extern int talk_disposition;
 extern int talk_prostitute_price;
 extern short text_macro_n_text;
@@ -93,7 +86,7 @@ extern char *talk_answer_lines;
 extern int talk_saved_screen;
 extern struct faction *talk_npc_own_faction;
 extern struct faction *talk_npc_faction;
-extern char *talk_place_topics;
+extern struct talk_place_topic *talk_place_topics;
 extern struct character *talk_npc_record;
 extern int D_001965A0;
 extern int talk_npc_speech_style;
@@ -200,8 +193,8 @@ extern void logbook_copy_text(int);
 extern void text_draw_coloured();
 extern void text_draw_centred_coloured(int, int, int, int, unsigned char);
 extern void msgbox_yes_no_rsc(int);
-extern void location_free(int);
-extern void location_pick_random_with_service(int, int, short);
+extern void location_free(struct loaded_location *);
+extern void location_pick_random_with_service(struct loaded_location *, int, int);
 int talk_ask_news(void);
 int func_000164AB(void);
 int func_000164CD(void);
@@ -225,7 +218,7 @@ void talk_list_scroll_up(void);
 void talk_list_scroll_down(void);
 void talk_say_text(int);
 void talk_draw_face(void);
-void talk_wrap_text(int, int, int, int, int);
+void talk_wrap_text(signed char *, int, int, int, int);
 void talk_log_question(void);
 void talk_add_line(int);
 void talk_clear_question(void);
@@ -335,7 +328,7 @@ void talk_draw(void)
         parse_rsc_text(((int)(unsigned char)talk_tone) + 7212, 0, 0);
         D_00190D0F = 1;
         mc_strncpy((int)(((char *)D_00147954) + 90000), (int)text_rsc_buffer, 4, (int)D_001703F0, 433);
-        talk_wrap_text((int)(((char *)D_00147954) + 90000), 134, 10, 245, 45);
+        talk_wrap_text((signed char *)(((char *)D_00147954) + 90000), 134, 10, 245, 45);
         D_00190D0F = 0;
     } else {
         switch ((unsigned char)talk_question_mode) {
@@ -348,7 +341,7 @@ void talk_draw(void)
                 parse_rsc_text(((int)(unsigned char)talk_tone) + 7225, 0, 0);
                 D_00190D0F = 1;
                 mc_strncpy((int)(((char *)D_00147954) + 90000), (int)text_rsc_buffer, 4, (int)D_001703F0, 448);
-                talk_wrap_text((int)(((char *)D_00147954) + 90000), 134, 10, 245, 45);
+                talk_wrap_text((signed char *)(((char *)D_00147954) + 90000), 134, 10, 245, 45);
                 D_00190D0F = 0;
             }
             break;
@@ -361,7 +354,7 @@ void talk_draw(void)
             }
             D_00190D0F = 1;
             mc_strncpy((int)(((char *)D_00147954) + 90000), (int)text_rsc_buffer, 4, (int)D_001703F0, 461);
-            talk_wrap_text((int)(((char *)D_00147954) + 90000), 134, 10, 245, 45);
+            talk_wrap_text((signed char *)(((char *)D_00147954) + 90000), 134, 10, 245, 45);
             D_00190D0F = 0;
         }
     }
@@ -504,21 +497,21 @@ void talk_prepare_where_answer(void)
     talk_npc_knows = talk_roll_knows();
     D_001965DC = 2;
     if ((unsigned char)talk_topic_tab > 0) {
-        *(int *)(*(char **)D_00195D28 + 18) = *(int *)((char *)(int)((*(int *)talk_selected_row * 19) + talk_place_topics) + 3);
-        *(short *)(*(char **)D_00195D28 + 4) = 0;
+        D_00195D28->building = talk_place_topics[*(int *)talk_selected_row].building;
+        D_00195D28->pad04 = 0;
         return;
     }
     if (((int)(unsigned char)talk_location_category) == 14) {
-        *(signed char *)(*(char **)D_00195D28 + 16) = 5;
-        *(signed char *)(*(char **)D_00195D28 + 7) = current_region;
-        *(int *)(*(char **)D_00195D28 + 18) = 0;
-        *(short *)(*(char **)D_00195D28 + 4) = 0;
+        D_00195D28->kind = 5;
+        D_00195D28->region = current_region;
+        D_00195D28->building = 0;
+        D_00195D28->pad04 = 0;
         return;
     }
-    *(signed char *)(*(char **)D_00195D28 + 16) = 5;
-    *(signed char *)(*(char **)D_00195D28 + 7) = current_region;
-    *(int *)(*(char **)D_00195D28 + 18) = *(int *)(talk_place_topics + 3 + (((int)(unsigned char)D_001964B0[*(int *)talk_selected_row]) * 19));
-    *(short *)(*(char **)D_00195D28 + 4) = 0;
+    D_00195D28->kind = 5;
+    D_00195D28->region = current_region;
+    D_00195D28->building = talk_place_topics[(unsigned char)D_001964B0[*(int *)talk_selected_row]].building;
+    D_00195D28->pad04 = 0;
 }
 
 void talk_button_tell_me_about(void)
@@ -543,7 +536,7 @@ int talk_ask_news(void)
     mc_strncpy(D_00147954 + 90000, news, 4, (int)D_001703F0, 699);
     D_001966BB = 1;
     mc_strncpy(D_00147954 + 95000, news, 4, (int)D_001703F0, 701);
-    talk_wrap_text(D_00147954 + 90000, 190, 66, 302, 191);
+    talk_wrap_text((signed char *)(D_00147954 + 90000), 190, 66, 302, 191);
     return 1;
 }
 
@@ -754,7 +747,7 @@ void talk_say_text(int text_id)
     mc_strncpy(D_00147954 + 90000, (int)text_rsc_buffer, 4, (int)D_001703F0, 934);
     D_001966BB = 1;
     mc_strncpy(D_00147954 + 95000, (int)text_rsc_buffer, 4, (int)D_001703F0, 936);
-    talk_wrap_text(D_00147954 + 90000, 190, 66, 302, 191);
+    talk_wrap_text((signed char *)(D_00147954 + 90000), 190, 66, 302, 191);
 }
 
 void talk_say_string(int text)
@@ -762,7 +755,7 @@ void talk_say_string(int text)
     mc_strncpy(D_00147954 + 90000, text, 4, (int)D_001703F0, 942);
     D_001966BB = 1;
     mc_strncpy(D_00147954 + 95000, text, 4, (int)D_001703F0, 944);
-    talk_wrap_text(D_00147954 + 90000, 190, 66, 302, 191);
+    talk_wrap_text((signed char *)(D_00147954 + 90000), 190, 66, 302, 191);
 }
 
 int talk_macro_hint(int variant)
@@ -825,7 +818,7 @@ void talk_draw_face(void)
     xn_draw_image(119, 65, 64, 64, talk_face_image);
 }
 
-void talk_wrap_text(int text, int left, int top, int right, int bottom)
+void talk_wrap_text(signed char *text, int left, int top, int right, int bottom)
 {
     int word_width;
     int line_width;
@@ -835,8 +828,8 @@ void talk_wrap_text(int text, int left, int top, int right, int bottom)
     if (D_00190D0F == 0 && talk_answer_line_count != 0) {
         talk_add_line((int)D_0017041B);
     }
-    while (*(signed char *)((char *)text) != 0) {
-        word_width = talk_next_word((signed char **)&text);
+    while (*text != 0) {
+        word_width = talk_next_word(&text);
         if (((line_width + word_width) + left) < right) {
             func_000A1054((int)text_rsc_buffer, (int)text_buffer, (int)D_001703F0, 1108, 2048);
             line_width += word_width;
@@ -941,12 +934,12 @@ void talk_draw_place_list(void)
             talk_draw_regional_list();
         } else {
             for (i = 0; i < talk_place_topic_count; i++) {
-                if (*(signed char *)((char *)(int)(talk_place_topics + (i * 19))) != talk_location_category) continue;
+                if (talk_place_topics[i].category != talk_location_category) continue;
                 if (talk_list_count < talk_list_top || talk_list_count > talk_list_bottom) {
                     talk_list_count++;
                     continue;
                 }
-                name = building_name(*(int *)((char *)(int)((i * 19) + talk_place_topics) + 3));
+                name = building_name((int)talk_place_topics[i].building);
                 if (*(int *)talk_selected_row == talk_list_count) {
                     colour = 244;
                     mc_strncpy(((int)talk_key_text) + (((int)(unsigned char)D_001966B8) * 65), name, 4, (int)D_001703F0, 1300);
@@ -1036,22 +1029,22 @@ void talk_add_quest_topics(int section)
                     building = object_building(place_object);
                     if (building->type < 17 && building->type != 1) {
                         for (j = 0; j < talk_place_topic_count; j++) {
-                            if (*(int *)((char *)(int)(talk_place_topics + (j * 19)) + 3) == (int)building) {
-                                *(signed char *)((char *)(int)(talk_place_topics + (talk_place_topic_count * 19)) + 2) = (signed char)quest_tick_data->id;
-                                *(short *)((char *)(int)(talk_place_topics + (talk_place_topic_count * 19)) + 15) = place->messages[0];
-                                *(short *)((char *)(int)(talk_place_topics + (talk_place_topic_count++ * 19)) + 17) = place->messages[1];
+                            if (talk_place_topics[j].building == building) {
+                                talk_place_topics[talk_place_topic_count].quest = (signed char)quest_tick_data->id;
+                                talk_place_topics[talk_place_topic_count].messages[0] = place->messages[0];
+                                talk_place_topics[talk_place_topic_count++].messages[1] = place->messages[1];
                             }
                         }
                         continue;
                     }
                     talk_list_draw_item(name, 6, ((talk_list_count - talk_list_top) * 7) + 71, colour, 156);
-                    *(signed char *)((char *)(int)(talk_place_topics + (talk_place_topic_count * 19))) = building_category(building);
-                    *(int *)((char *)(int)(talk_place_topics + (talk_place_topic_count * 19)) + 11) = building_distance(building);
-                    *(int *)((char *)(int)(talk_place_topics + (talk_place_topic_count * 19)) + 3) = (int)building;
-                    *(signed char *)((char *)(int)(talk_place_topics + (talk_place_topic_count * 19)) + 1) = 1;
-                    *(signed char *)((char *)(int)(talk_place_topics + (talk_place_topic_count * 19)) + 2) = (signed char)quest_tick_data->id;
-                    *(short *)((char *)(int)(talk_place_topics + (talk_place_topic_count * 19)) + 15) = place->messages[0];
-                    *(short *)((char *)(int)(talk_place_topics + (talk_place_topic_count++ * 19)) + 17) = place->messages[1];
+                    talk_place_topics[talk_place_topic_count].category = building_category(building);
+                    talk_place_topics[talk_place_topic_count].distance = building_distance(building);
+                    talk_place_topics[talk_place_topic_count].building = building;
+                    talk_place_topics[talk_place_topic_count].kind = 1;
+                    talk_place_topics[talk_place_topic_count].quest = (signed char)quest_tick_data->id;
+                    talk_place_topics[talk_place_topic_count].messages[0] = place->messages[0];
+                    talk_place_topics[talk_place_topic_count++].messages[1] = place->messages[1];
                 }
                 goto L17A4C;
 L1776B:;
@@ -1072,11 +1065,11 @@ L1776B:;
                         colour = 145;
                     }
                     talk_list_draw_item(name, 6, (int)&*(signed char *)((char *)((talk_list_count - talk_list_top) * 7) + 71), colour, 156);
-                    *(int *)((char *)(int)(talk_place_topics + (talk_list_count * 19)) + 3) = (int)object_building(person->object->twin);
-                    *(signed char *)((char *)(int)(talk_place_topics + (talk_list_count * 19)) + 1) = 2;
-                    *(signed char *)((char *)(int)(talk_place_topics + (talk_list_count * 19)) + 2) = (signed char)quest_tick_data->id;
-                    *(short *)((char *)(int)(talk_place_topics + (talk_list_count * 19)) + 15) = person->messages[0];
-                    *(short *)((char *)(int)(talk_place_topics + (talk_list_count++ * 19)) + 17) = person->messages[1];
+                    talk_place_topics[talk_list_count].building = object_building(person->object->twin);
+                    talk_place_topics[talk_list_count].kind = 2;
+                    talk_place_topics[talk_list_count].quest = (signed char)quest_tick_data->id;
+                    talk_place_topics[talk_list_count].messages[0] = person->messages[0];
+                    talk_place_topics[talk_list_count++].messages[1] = person->messages[1];
                 }
                 goto L17A4C;
 L1790A:;
@@ -1095,10 +1088,10 @@ L1790A:;
                         colour = 145;
                     }
                     talk_list_draw_item(name, 6, (int)&*(signed char *)((char *)((talk_list_count - talk_list_top) * 7) + 71), colour, 156);
-                    *(signed char *)((char *)(int)(talk_place_topics + (talk_list_count * 19)) + 1) = 3;
-                    *(signed char *)((char *)(int)(talk_place_topics + (talk_list_count * 19)) + 2) = (signed char)quest_tick_data->id;
-                    *(short *)((char *)(int)(talk_place_topics + (talk_list_count * 19)) + 15) = item->messages[0];
-                    *(short *)((char *)(int)(talk_place_topics + (talk_list_count++ * 19)) + 17) = item->messages[1];
+                    talk_place_topics[talk_list_count].kind = 3;
+                    talk_place_topics[talk_list_count].quest = (signed char)quest_tick_data->id;
+                    talk_place_topics[talk_list_count].messages[0] = item->messages[0];
+                    talk_place_topics[talk_list_count++].messages[1] = item->messages[1];
                 }
             }
         }
@@ -1181,19 +1174,19 @@ void talk_add_regional_item(int index)
 int talk_find_regional(int index)
 {
     {
-        char found[20];
+        struct loaded_location found;
 
-        location_pick_random_with_service((int)found, (int)(short)D_00179CC8[index], (int)(short)talk_regional_ids[index]);
-        if (*(int *)((char *)found + 12) == 0) return 0;
-        mc_strncpy((int)text_macro_fcn, *(int *)((char *)found + 16), 32, (int)D_001703F0, 1610);
-        location_free((int)found);
+        location_pick_random_with_service(&found, (int)(short)D_00179CC8[index], (int)(short)talk_regional_ids[index]);
+        if (found.object == 0) return 0;
+        mc_strncpy((int)text_macro_fcn, (int)found.data->name, 32, (int)D_001703F0, 1610);
+        location_free(&found);
         return 1;
     }
 }
 
 void talk_build_place_topics(void)
 {
-    char swap[20];
+    struct talk_place_topic swap;
     int i;
     int last;
     int swapped;
@@ -1210,34 +1203,34 @@ void talk_build_place_topics(void)
         if (building->type >= 17 || building->type == 1) continue;
         found = memchr((int)talk_category_building_types, building->type, 13);
         if (found != 0) {
-            *(signed char *)((char *)(int)(talk_place_topics + (talk_place_topic_count * 19))) = found - ((int)talk_category_building_types);
-            *(signed char *)((char *)(int)(talk_place_topics + (talk_place_topic_count * 19)) + 1) = 0;
-            *(int *)((char *)(int)(talk_place_topics + (talk_place_topic_count * 19)) + 11) = building_distance(building);
-            *(int *)((char *)(int)(talk_place_topics + (talk_place_topic_count++ * 19)) + 3) = (int)building;
+            talk_place_topics[talk_place_topic_count].category = found - ((int)talk_category_building_types);
+            talk_place_topics[talk_place_topic_count].kind = 0;
+            talk_place_topics[talk_place_topic_count].distance = building_distance(building);
+            talk_place_topics[talk_place_topic_count++].building = building;
         } else {
-            *(signed char *)((char *)(int)(talk_place_topics + (talk_place_topic_count * 19))) = 13;
-            *(signed char *)((char *)(int)(talk_place_topics + (talk_place_topic_count * 19)) + 1) = 0;
-            *(int *)((char *)(int)(talk_place_topics + (talk_place_topic_count * 19)) + 11) = building_distance(building);
-            *(int *)((char *)(int)(talk_place_topics + (talk_place_topic_count++ * 19)) + 3) = (int)building;
+            talk_place_topics[talk_place_topic_count].category = 13;
+            talk_place_topics[talk_place_topic_count].kind = 0;
+            talk_place_topics[talk_place_topic_count].distance = building_distance(building);
+            talk_place_topics[talk_place_topic_count++].building = building;
         }
     }
     talk_add_quest_topics(4);
-    *(signed char *)((char *)(int)(talk_place_topics + (talk_place_topic_count * 19))) = 14;
-    *(signed char *)((char *)(int)(talk_place_topics + (talk_place_topic_count * 19)) + 1) = 0;
-    *(int *)((char *)(int)(talk_place_topics + (talk_place_topic_count++ * 19)) + 3) = 0;
+    talk_place_topics[talk_place_topic_count].category = 14;
+    talk_place_topics[talk_place_topic_count].kind = 0;
+    talk_place_topics[talk_place_topic_count++].building = 0;
     swapped = 1;
     last = talk_place_topic_count - 2;
     if (last < 2) return;
     while (swapped != 0) {
         swapped = 0;
         for (i = 0; i < last; i++) {
-            distance = *(int *)((char *)(int)(talk_place_topics + (i * 19)) + 11);
-            next_distance = *(int *)((char *)(int)(talk_place_topics + ((i + 1) * 19)) + 11);
+            distance = talk_place_topics[i].distance;
+            next_distance = talk_place_topics[i + 1].distance;
             if (next_distance < distance) {
                 swapped = 1;
-                mc_memcpy((int)swap, (int)(talk_place_topics + (i * 19)), 19, (int)D_001703F0, 1678, 4);
-                mc_memcpy((int)(talk_place_topics + (i * 19)), (int)(talk_place_topics + ((i + 1) * 19)), 19, (int)D_001703F0, 1679, 4);
-                mc_memcpy((int)(talk_place_topics + ((i + 1) * 19)), (int)swap, 19, (int)D_001703F0, 1680, 4);
+                mc_memcpy((int)&swap, (int)&talk_place_topics[i], 19, (int)D_001703F0, 1678, 4);
+                mc_memcpy((int)&talk_place_topics[i], (int)&talk_place_topics[i + 1], 19, (int)D_001703F0, 1679, 4);
+                mc_memcpy((int)&talk_place_topics[i + 1], (int)&swap, 19, (int)D_001703F0, 1680, 4);
             }
         }
         last--;
@@ -1722,30 +1715,30 @@ int faction_power(struct faction *faction)
 void region_reset_war(struct faction *faction)
 {
     if (faction->type != 7 || faction->region == 255) return;
-    region_event_groups[faction->region * 80] = 0;
-    regions[faction->region * 80] = 0;
-    region_event_flags[faction->region * 80] = 0;
-    D_0018F062[faction->region * 80] = 0;
-    D_0018F063[faction->region * 80] = 0;
-    D_0018F064[faction->region * 80] = 0;
+    regions[faction->region].groups[0] = 0;
+    regions[faction->region].values[0] = 0;
+    regions[faction->region].flags[0] = 0;
+    regions[faction->region].flags[1] = 0;
+    regions[faction->region].flags[2] = 0;
+    regions[faction->region].flags[3] = 0;
 }
 
 void func_0001B2ED(struct faction *faction)
 {
     if (faction->type != 7 || faction->region == 255) return;
-    region_event_groups[faction->region * 80] = 1;
-    D_0018F045[faction->region * 80] = 255;
-    D_0018F062[faction->region * 80] = 1;
+    regions[faction->region].groups[0] = 1;
+    regions[faction->region].values[1] = 255;
+    regions[faction->region].flags[1] = 1;
 }
 
 void func_0001B36A(struct faction *faction, int index)
 {
     if (faction->type != 7 || faction->region == 255) return;
-    regions[faction->region * 80] = 0;
-    D_0018F045[faction->region * 80] = 0;
-    D_0018F046[(faction->region * 80) + index] = 0;
-    D_0018F063[(faction->region * 80) + index] = 1;
-    region_event_groups[faction->region * 80] = 1;
+    regions[faction->region].values[0] = 0;
+    regions[faction->region].values[1] = 0;
+    regions[faction->region].values[index + 2] = 0;
+    regions[faction->region].flags[index + 2] = 1;
+    regions[faction->region].groups[0] = 1;
 }
 
 void faction_add_reputation(struct faction *faction, int amount)

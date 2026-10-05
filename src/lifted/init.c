@@ -42,8 +42,7 @@ extern int mem_check_level;
 extern int frame_checkpoint;
 extern int engine_running;
 extern char saved_positions[];
-extern signed char regions[];
-extern char region_price_adjustment[];
+extern struct region regions[];
 extern signed char text_buffer[];
 extern struct record *creature_list[];
 extern char D_00190704[];
@@ -81,7 +80,7 @@ extern int D_00195AD0;
 extern struct image *list_popup_image;
 extern struct spell *spell_records;
 extern int creature_count;
-extern char current_region_data[];
+extern struct region *current_region_data;
 extern int D_00195B64;
 extern struct image *hud_bar_image;
 extern int hud_mode_icons;
@@ -293,7 +292,7 @@ void newgame_place_player(void)
         player_environment = 1;
     }
     current_region = cfg_region;
-    *(int *)current_region_data = ((int)regions) + (((int)(unsigned char)current_region) * 80);
+    current_region_data = &regions[(unsigned char)current_region];
     region_enter(0, (int)(unsigned char)current_region);
     dungeon_water_level = 10000;
     if (((int)player_environment) == 1) {
@@ -853,7 +852,7 @@ void game_reset(void)
     faction_load_file();
     frame_checkpoint = 505;
     for (region = 0; region < 62; region++) {
-        *(short *)(region_price_adjustment + (region * 80)) = rand_range(0, 500) + 750;
+        regions[region].price_adjustment = rand_range(0, 500) + 750;
     }
     mc_memset((int)saved_positions, 0, 48, (int)D_00175040, 851, 48);
     mc_memset((int)((char *)creature_list), 0, 512, (int)D_00175040, 852, 512);

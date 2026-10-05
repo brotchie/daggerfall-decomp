@@ -38,7 +38,7 @@ extern int town_house_skip_percent;
 extern int town_building_counter;
 extern struct block *rmb_record_ptr;
 extern signed char location_is_port;
-extern char rmb_block[];
+extern struct rmb_file *rmb_block;
 extern struct model_node model_cache_nodes[];
 extern struct sound_cache_entry sound_cache[];
 extern int model_heap_free;
@@ -81,7 +81,7 @@ extern int xn_model_max_y();
 extern int xn_light_add();
 extern int xn_model_prepare();
 extern int xn_flat_add();
-extern void arch3d_apply_climate_textures(int);
+extern void arch3d_apply_climate_textures(struct arch3d_header *);
 extern void fatal_error(int);
 extern void mem_pool_init(int, int);
 extern void mem_pool_free(int);
@@ -216,11 +216,11 @@ struct record *rmb_add_building(struct record *parent, int building_index)
     int saved_seed;
     struct record *object;
 
-    rmb_record_ptr = (struct block *)(*(int *)(*(char **)rmb_block + 1475 + (building_index << 2)));
+    rmb_record_ptr = rmb_block->block_data[building_index];
     object = rmb_add_subrecord(parent);
     object->flags = 1;
     object->image2 = building_index;
-    value = (int)(unsigned char)*(signed char *)(*(char **)rmb_block + 667 + (building_index * 26));
+    value = rmb_block->buildings[building_index].type;
     switch ((unsigned)value) {
     case 21:
     case 22:
@@ -235,7 +235,7 @@ struct record *rmb_add_building(struct record *parent, int building_index)
         srand((int)(short)(short)object->id);
         value = rand();
         srand(saved_seed);
-        if (((int)(unsigned short)*(short *)(*(char **)rmb_block + 661 + (building_index * 26))) != 42 && ((int)(unsigned short)*(short *)(*(char **)rmb_block + 661 + (building_index * 26))) != 108) {
+        if (rmb_block->buildings[building_index].faction_id != 42 && rmb_block->buildings[building_index].faction_id != 108) {
             if ((value % 100) <= town_house_skip_percent) {
                 object->flags |= 8;
                 object->image = 65535;
@@ -379,7 +379,7 @@ int model_cache_add(int key)
         xn_model_prepare((int)model_cache_nodes[slot].model);
         saved_seed = rand();
         srand(*(int *)(model_cache_nodes[slot].model + 12));
-        arch3d_apply_climate_textures((int)model_cache_nodes[slot].model);
+        arch3d_apply_climate_textures((struct arch3d_header *)model_cache_nodes[slot].model);
         srand(saved_seed);
         return (int)&model_cache_nodes[slot];
     }
@@ -622,7 +622,7 @@ void model_unlink_object_cb(struct record *object)
     switch (object->type) {
     case 6:
     case 32:
-        if (*(int *)((char *)object + 71) == *(int *)scratch_190de4) *(int *)((char *)object + 71) = 0;
+        if ((int)object->data.instance.model == *(int *)scratch_190de4) object->data.instance.model = 0;
         return;
     case 43:
         block = &object->data.block;

@@ -3,12 +3,12 @@
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
 
+extern struct region regions[];
+extern char region_legal_reputation[];  /* court_frame: regions[].legal_reputation evaluates in another order */
 extern int screen_buffer;
 extern char D_001706E1[];
 extern char D_00179EA8[];
 extern signed char D_00187CA8;
-extern signed char region_punishment_flags[];
-extern char region_legal_reputation[];
 extern struct record *creature_list[];
 extern int scratch_190cac;
 extern signed char scratch_190d16;
@@ -114,13 +114,13 @@ void court_frame(void)
         return;
     case 5:
         msgbox_show_rsc(8063, 1);
-        region_punishment_flags[((int)(unsigned char)current_region) * 80] |= 1;
+        regions[(unsigned char)current_region].punishment_flags |= 1;
         player_to_random_marker(location_object, 8);
         court_state = 100;
         return;
     case 6:
         msgbox_show_rsc(8060, 1);
-        region_punishment_flags[((int)(unsigned char)current_region) * 80] |= 2;
+        regions[(unsigned char)current_region].punishment_flags |= 2;
         court_state = 7;
         return;
     case 7:
@@ -154,7 +154,7 @@ void court_frame(void)
             return;
         }
         chance = rand_range(1, 100);
-        chance += (int)(short)*(short *)(region_legal_reputation + (((int)(unsigned char)current_region) * 80));
+        chance += regions[(unsigned char)current_region].legal_reputation;
         if (chance > 75) {
             scratch_190cac >>= 1;
         } else if (chance < 25) {
@@ -176,7 +176,7 @@ void crime_reputation_penalty(void)
 {
     int faction;
 
-    *(short *)(region_legal_reputation + (((int)(unsigned char)current_region) * 80)) -= *(short *)(D_00179EA8 + (((int)(unsigned char)crime_current) << 2));
+    regions[(unsigned char)current_region].legal_reputation -= *(short *)(D_00179EA8 + (((int)(unsigned char)crime_current) << 2));
     faction = faction_find_type_in_region((int)(short)((int)(unsigned char)current_region), 15);
     faction_change_reputation(faction, -(*(int *)(D_00179EA8 + (((int)(unsigned char)crime_current) << 2)) >> 1));
 }
@@ -185,7 +185,7 @@ void court_reputation_restore(void)
 {
     int faction;
 
-    *(short *)(region_legal_reputation + (((int)(unsigned char)current_region) * 80)) += *(short *)court_reputation_change - 1;
+    regions[(unsigned char)current_region].legal_reputation += *(short *)court_reputation_change - 1;
     faction = faction_find_type_in_region((int)(short)((int)(unsigned char)current_region), 15);
     faction_change_reputation(faction, (-(*(int *)court_reputation_change - 1)) / 2);
     D_001A4A70[0] = (D_001A4A74 = 0);

@@ -17,7 +17,7 @@ extern signed char scratch_190ce4[];
 extern signed char scratch_190cee[];
 extern char scratch_190d64[];
 extern short D_00190DEA[];
-extern char scratch_190df0[];
+extern short scratch_190df0[];
 extern signed char D_001940D5;
 extern signed char D_001940D6;
 extern signed char D_001940D8;
@@ -163,15 +163,15 @@ void chargen_skill_arrow(int button)
     button += -14;
     group = button >> 1;
     if (D_00190DEA[group] == 0 && (button & 1) != 0) return;
-    slot = (int)(short)*(short *)(scratch_190df0 + (group * 2));
+    slot = scratch_190df0[group];
     skill = &player_character->skills[player_class->skills[slot]];
     if ((unsigned char)skill->value == scratch_190cee[slot] && (button & 1) == 0) return;
     if ((button & 1) != 0) {
-        (*(signed char *)((char *)skill))++;
+        (*(signed char *)&skill->value)++;
         (D_00190DEA[group])--;
         return;
     }
-    (*(signed char *)((char *)skill))--;
+    (*(signed char *)&skill->value)--;
     (D_00190DEA[group])++;
 }
 

@@ -155,18 +155,18 @@ void breath_update(void)
 {
     struct membership *membership;
     int endurance;
-    int bios_clock;
-    int bios_clock2;
-    int bios_clock3;
-    int bios_clock4;
+    int *bios_clock;
+    int *bios_clock2;
+    int *bios_clock3;
+    int *bios_clock4;
 
     endurance = player_character->attributes[4];
     if (D_00187CA8 == 0) return;
     if (endurance > 100) endurance = 100;
     if (((int)(unsigned char)fog_colour) != 107) {
         *(int *)breath_remaining = 0;
-        bios_clock = 1132;
-        breath_last_tick = *(int *)((char *)bios_clock);
+        bios_clock = (int *)1132;
+        breath_last_tick = *bios_clock;
         return;
     }
     if ((player_character->conditions & 0x80000) != 0) return;
@@ -175,15 +175,15 @@ void breath_update(void)
         membership = guild_find_membership_by_kind(149);
         if (membership != 0) *(int *)breath_remaining += membership->rank * 3;
     }
-    bios_clock2 = 1132;
-    if (((unsigned)(*(int *)((char *)bios_clock2) - breath_last_tick)) > 18) {
+    bios_clock2 = (int *)1132;
+    if (((unsigned)(*bios_clock2 - breath_last_tick)) > 18) {
         (*(int *)breath_remaining)--;
-        bios_clock3 = 1132;
-        if (player_character->race == 7 && ((struct bf8_0_1 *)((char *)bios_clock3))->f != 0) {
+        bios_clock3 = (int *)1132;
+        if (player_character->race == 7 && ((struct bf8_0_1 *)bios_clock3)->f != 0) {
             (*(int *)breath_remaining)++;
         }
-        bios_clock4 = 1132;
-        breath_last_tick = *(int *)((char *)bios_clock4);
+        bios_clock4 = (int *)1132;
+        breath_last_tick = *bios_clock4;
     }
     D_0012B508 = 145;
     if (((endurance >> 3) + 4) > *(int *)breath_remaining) D_0012B508 = 246;

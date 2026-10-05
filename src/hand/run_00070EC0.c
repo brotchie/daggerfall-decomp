@@ -1,11 +1,10 @@
 /* matched by the real Watcom C32 10.0a (-d2): a run of guilds from 0x70AFA to 0x70EC0, kept together for its switch table's alignment */
 #include "records.h"
 
-struct rep { short value; char pad[78]; };
 extern unsigned char key_down_enter;
 extern int D_00185077;
 extern unsigned char *D_00187545;
-extern struct rep region_legal_reputation[];
+extern struct region regions[];
 extern int inpstr_result;
 extern struct record *scratch_object;
 extern struct character *player_character;
@@ -24,7 +23,7 @@ extern int abs(short);
 void blessing_remove(struct blessing *blessing)
 {
     if (blessing->target == 255) {
-        region_legal_reputation[blessing->region].value -= blessing->amount;
+        regions[blessing->region].legal_reputation -= blessing->amount;
         return;
     }
     if (blessing->target & 128) {
@@ -39,10 +38,10 @@ int blessing_apply(struct blessing *blessing, int amount)
     int applied;
 
     if (blessing->target == 255) {
-        region_legal_reputation[current_region].value += amount;
-        if (region_legal_reputation[current_region].value > 100) {
-            applied = amount - (region_legal_reputation[current_region].value - 100);
-            region_legal_reputation[current_region].value = 100;
+        regions[current_region].legal_reputation += amount;
+        if (regions[current_region].legal_reputation > 100) {
+            applied = amount - (regions[current_region].legal_reputation - 100);
+            regions[current_region].legal_reputation = 100;
         }
     } else if (blessing->target & 128) {
         player_character->attributes[blessing->target & 127] += amount;

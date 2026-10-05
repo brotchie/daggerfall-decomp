@@ -4,6 +4,7 @@
 #include "records.h"
 #include "bitfield.h"
 
+extern struct region regions[];
 extern char D_0017110C[];
 extern char D_00171134[];
 extern char D_00171146[];
@@ -75,8 +76,6 @@ extern int legal_reputation_names[];
 extern char item_group_templates[];
 extern char saved_location_name[];
 extern char saved_region_name[];
-extern char region_legal_reputation[];
-extern char region_persecuted_temple[];
 extern char scratch_190be4[];
 extern int scratch_190bec;
 extern int automap_yaw;
@@ -120,13 +119,13 @@ extern struct record *location_object;
 extern int D_00195ACC;
 extern int text_macro_book;
 extern struct building *tavern_building;
-extern char current_region_data[];
+extern struct region *current_region_data;
 extern int weight_total;
 extern struct location *current_location;
 extern struct character *player_character;
 extern int game_minutes;
 extern char scratch_buffer[];
-extern char D_00195D28[];
+extern struct talk_where *D_00195D28;
 extern int trade_total;
 extern int trade_price;
 extern int quest_potential_questor;
@@ -928,7 +927,7 @@ int macro_lt2_faction2_ruler_title(void)
 
 int macro_loc_where_building(void)
 {
-    return building_name(*(int *)(*(char **)D_00195D28 + 18));
+    return building_name((int)D_00195D28->building);
 }
 
 int macro_ltn_legal_standing(void)
@@ -936,7 +935,7 @@ int macro_ltn_legal_standing(void)
     int reputation;
     int standing;
 
-    reputation = (int)(short)*(short *)(region_legal_reputation + (((int)(unsigned char)current_region) * 80));
+    reputation = regions[(unsigned char)current_region].legal_reputation;
     standing = 0;
     if (reputation < (-100)) {
         reputation = -100;
@@ -1012,7 +1011,7 @@ int macro_mwz_name(void)
     int name;
 
     saved_seed = rand();
-    srand((int)(unsigned short)*(short *)(*(char **)current_region_data + 78));
+    srand(current_region_data->price_adjustment);
     name = name_generate((int)(unsigned char)D_00196267, (int)(unsigned char)(rand() & 1));
     srand(saved_seed);
     return name;
@@ -1154,7 +1153,7 @@ int macro_prg_persecuted_temple(void)
 {
     struct faction *temple;
 
-    temple = (struct faction *)faction_find((int)(short)*(short *)(*(char **)current_region_data + 76));
+    temple = (struct faction *)faction_find(current_region_data->persecuted_temple);
     return (int)temple->name;
 }
 
@@ -1221,12 +1220,12 @@ int macro_pn_blank(void)
 
 int macro_prg2_persecuted_temple(void)
 {
-    return faction_find((int)(short)*(short *)(region_persecuted_temple + (D_0019671C->region * 80))) + 3;
+    return faction_find(regions[D_0019671C->region].persecuted_temple) + 3;
 }
 
 int macro_ptm_persecuted_temple(void)
 {
-    return faction_find((int)(short)*(short *)(region_persecuted_temple + (D_0019671C->region * 80))) + 3;
+    return faction_find(regions[D_0019671C->region].persecuted_temple) + 3;
 }
 
 int macro_qua_condition(void)
@@ -1578,7 +1577,7 @@ int macro_sng_blank(void)
 
 int macro_reg_where_target_region(void)
 {
-    return *(int *)(region_names + (((int)(unsigned char)*(signed char *)(*(char **)D_00195D28 + 7)) << 2));
+    return *(int *)(region_names + (D_00195D28->region << 2));
 }
 
 int macro_t_ruler_title(void)
@@ -1598,7 +1597,7 @@ int macro_tem_town_temple(void)
 
 int func_00049AE7(void)
 {
-    return (int)faction_find_type_in_region((int)(short)((unsigned short)(unsigned char)*(signed char *)(*(char **)D_00195D28 + 7)), 13)->child->name;
+    return (int)faction_find_type_in_region(D_00195D28->region, 13)->child->name;
 }
 
 int macro_tcn_travel_city(void)

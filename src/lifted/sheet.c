@@ -351,11 +351,11 @@ int skill_raised_recently(int skill)
 
 void sheet_button_history(void)
 {
-    int text;
+    char *text;
 
-    text = career_specials_text();
+    text = (char *)career_specials_text();
     while (mouse_buttons != 0) xn_mouse_poll_clamped();
-    if (*(signed char *)((char *)text) != 0) msgbox_show_string(text, 1);
+    if (*text != 0) msgbox_show_string((int)text, 1);
     while (mouse_buttons != 0) xn_mouse_poll_clamped();
     if (window_image != 0 && window_image != (-1751672937)) {
         mc_free(window_image, (int)D_00170C67, 428);

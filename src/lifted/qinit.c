@@ -3,10 +3,10 @@
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
 
+extern struct region regions[];
 extern char D_00170A64[];
 extern char D_00178A10[];
 extern char item_group_templates[];
-extern char region_price_adjustment[];
 extern signed char D_001940D5;
 extern char D_00195984[];
 extern struct record *nonworld_root;
@@ -87,7 +87,7 @@ struct record *quest_init_item(struct qbn_item *qbn_item)
             } else {
                 power = 50;
             }
-            gold_amount = ((power + 50) * ((((int)&*(signed char *)((char *)(((int)(unsigned short)*(short *)(region_price_adjustment + (((int)(unsigned char)current_region) * 80))) / 2) + 500)) * rand_range(level * 150, level * 200)) / 1000)) / 100;
+            gold_amount = ((power + 50) * ((((int)&*(signed char *)((char *)(regions[(unsigned char)current_region].price_adjustment / 2) + 500)) * rand_range(level * 150, level * 200)) / 1000)) / 100;
         } else {
             gold_amount = rand_range(qbn_item->index, qbn_item->group);
         }

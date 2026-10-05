@@ -4,6 +4,7 @@
 #include "records.h"
 #include "bitfield.h"
 
+extern struct region regions[];
 extern int xn_cam_far_z;
 extern int pick_distance;
 extern signed char mouse_buttons;
@@ -44,7 +45,6 @@ extern signed char footstep_sound_ids[];
 extern short music_special_dungeon_ids[];
 extern int D_001878AC[];
 extern int D_001878D4[];
-extern signed char region_event_flags[];
 extern signed char text_buffer[];
 extern char shelf_book_ids[];
 extern char scratch_190be4[];
@@ -58,7 +58,7 @@ extern struct record *quest_root;
 extern struct character *text_macro_npc;
 extern struct building *current_building;
 extern struct record *player_object;
-extern char D_00195AB4[];
+extern struct arch3d_plane *collide_floor_plane;
 extern struct record *location_object;
 extern int inventory_close_callback;
 extern struct pick_result *click_hit;
@@ -73,7 +73,7 @@ extern char scratch_buffer[];
 extern struct record *D_00195CE8;
 extern struct block_model *D_00195D3C;
 extern char picked_model_index[];
-extern char click_face_texture[];
+extern struct arch3d_plane *click_face_texture;
 extern signed char climate_weathers[];
 extern short shelf_model_index;
 extern short D_00195F68;
@@ -278,8 +278,8 @@ int click_world_face(struct pick_result *hit)
     if (hit->object->type != 6 && hit->object->type != 43 && hit->object->type != 56) {
         return 0;
     }
-    archive = ((int)(unsigned short)*(short *)(*(char **)click_face_texture + 2)) >> 7;
-    record_index = (int)(unsigned short)(*(short *)(*(char **)click_face_texture + 2) & 127);
+    archive = click_face_texture->texture >> 7;
+    record_index = click_face_texture->texture & 127;
     if ((archive % 100) == 74) archive = 74;
     if (building != 0) {
         {
@@ -1132,14 +1132,14 @@ int noble_quest_letter(void)
 
     count = 0;
     for (i = 0; i < 29; i++) {
-        if (region_event_flags[(((int)(unsigned char)current_region) * 80) + i] != 0) {
+        if (regions[(unsigned char)current_region].flags[i] != 0) {
             count++;
         }
     }
     if (count == 0 || rand_range(1, 100) < 10) return 0;
     count = rand_range(0, count - 1);
     for (i = 0; i < 29; i++) {
-        if (region_event_flags[(((int)(unsigned char)current_region) * 80) + i] != 0) {
+        if (regions[(unsigned char)current_region].flags[i] != 0) {
             if (count == 0) return i + 65;
             count--;
         }
@@ -1264,7 +1264,7 @@ void footstep_sounds(void)
         sound_index = 2;
         break;
     case 3:
-        sound_index = (int)(signed char)*(signed char *)(*(char **)D_00195AB4 + 4);
+        sound_index = collide_floor_plane->floor_sound;
         if (sound_index > 4 || sound_index < 0) sound_index = 0;
         sound_index <<= 1;
         if (dungeon_water_level != 10000 && player_object->y > dungeon_water_level && in_dungeon_water == 0) {
@@ -1469,15 +1469,15 @@ int spawn_point_dungeon_level(struct record *object, int level, int min_distance
     best_distance = max_distance;
     for (i = 0; i < 64; i++) {
         if (*grid++ != 0) {
-            *(int *)((char *)point + 7) = (((i % 8) << 8) + grid_object->x) + 128;
-            *(int *)((char *)point + 15) = (((i / 8) << 8) + grid_object->z) + 128;
-            *(int *)((char *)point + 11) = (-(level << 8)) - 80;
-            distance = xn_math_approx_dist2d(player_object->x, player_object->z, *(int *)((char *)point + 7), *(int *)((char *)point + 15));
+            ((struct record *)point)->x = (((i % 8) << 8) + grid_object->x) + 128;
+            ((struct record *)point)->z = (((i / 8) << 8) + grid_object->z) + 128;
+            ((struct record *)point)->y = (-(level << 8)) - 80;
+            distance = xn_math_approx_dist2d(player_object->x, player_object->z, ((struct record *)point)->x, ((struct record *)point)->z);
             if (distance < best_distance && distance > min_distance && spawn_point_visible((struct record *)point) == 0) {
                 best_distance = distance;
-                object->x = *(int *)((char *)point + 7);
-                object->z = *(int *)((char *)point + 15);
-                object->y = *(int *)((char *)point + 11) + 80;
+                object->x = ((struct record *)point)->x;
+                object->z = ((struct record *)point)->z;
+                object->y = ((struct record *)point)->y + 80;
             }
         }
     }

@@ -16,11 +16,11 @@ extern struct record *player_object;
 extern struct record *location_object;
 extern struct image *hud_bar_image;
 extern struct settings *game_settings;
-extern char D_00195C88[];
+extern struct xn_pick_hit *pick_hit;
 extern int grid_visit_func;
 extern struct block_model *D_00195D3C;
 extern char picked_model_index[];
-extern char click_face_texture[];
+extern struct arch3d_plane *click_face_texture;
 extern char D_00196120[];
 extern signed char D_0019629F;
 extern int D_00196478;
@@ -42,54 +42,54 @@ extern void shop_generate_stock(int, int, int, int, int);
 extern void func_0007E815(struct record *, int);
 extern void town_grid_visit_near(struct record *, int);
 extern void object_foreach_open(struct record *, void (*)());
-int arch3d_plane_at(int, short);
+struct arch3d_plane *arch3d_plane_at(int, short);
 int pick_model_cb(struct record *);
-int arch3d_plane_index(int, int);
+int arch3d_plane_index(int, struct arch3d_plane *);
 int furniture_is_container(int);
 void world_for_each_object(int);
 
-int engine_pick_object(int x, int y, int result)
+int engine_pick_object(int x, int y, struct pick_result *result)
 {
     int view_bottom;
 
     view_bottom = ((((int)(unsigned short)(game_settings->view_flags & 1)) != 0) ? 199 : hud_bar_image->y);
     if (y > view_bottom) return 0;
-    mc_memset(result, 0, 18, (int)D_001702D4, 38, 4);
-    pick_result = (struct pick_result *)result;
-    if (*(int *)((char *)(*(int *)D_00195C88 = xn_render_pick(x, y)) + 4) == 1) return 0;
-    if (*(int *)(*(char **)D_00195C88 + 4) != 0) {
-        D_0019647C = *(int *)(*(char **)D_00195C88 + 4);
-        *(int *)click_face_texture = *(int *)(*(char **)D_00195C88);
+    mc_memset((int)result, 0, 18, (int)D_001702D4, 38, 4);
+    pick_result = result;
+    if ((pick_hit = (struct xn_pick_hit *)xn_render_pick(x, y))->model == 1) return 0;
+    if (pick_hit->model != 0) {
+        D_0019647C = pick_hit->model;
+        click_face_texture = pick_hit->plane;
         world_for_each_object((int)pick_model_cb);
     } else {
-        D_00196478 = *(int *)D_00195C88;
+        D_00196478 = (int)pick_hit;
         world_for_each_object((int)pick_sprite_cb);
     }
     return pick_result->flags & 1;
 }
 
-int arch3d_plane_point_at(int plane, short i)
+int arch3d_plane_point_at(struct arch3d_plane *plane, short i)
 {
     short point;
 
-    *(int *)&point = plane + 8;
-    if ((short)((unsigned short)(unsigned char)*(signed char *)((char *)plane)) <= i) return 0;
+    *(int *)&point = (int)plane->points;
+    if ((short)plane->point_count <= i) return 0;
     *(int *)&point += ((int)(short)i) << 3;
     return *(int *)&point;
 }
 
-int arch3d_plane_at(int model, short plane_index)
+struct arch3d_plane *arch3d_plane_at(int model, short plane_index)
 {
-    int arch3d;
-    int plane;
+    struct arch3d_header *arch3d;
+    struct arch3d_plane *plane;
     short i;
 
-    arch3d = *(int *)((char *)model);
+    arch3d = *(struct arch3d_header **)model;
     *(int *)&i = 0;
-    if (((int)(short)plane_index) >= *(int *)((char *)arch3d + 8)) return 0;
-    plane = arch3d + *(int *)((char *)arch3d + 60);
+    if (plane_index >= arch3d->plane_count) return 0;
+    plane = (struct arch3d_plane *)((char *)arch3d + arch3d->plane_list_offset);
     while ((short)(short)*(int *)&i < plane_index) {
-        plane += (((int)(unsigned char)*(signed char *)((char *)plane)) << 3) + 8;
+        plane = (struct arch3d_plane *)((char *)plane + ((plane->point_count << 3) + 8));
         (*(int *)&i)++;
     }
     return plane;
@@ -113,7 +113,7 @@ int pick_model_cb(struct record *object)
                 D_00195D3C = block_model;
                 pick_result->flags |= 13;
                 pick_result->object = object;
-                pick_result->plane = (i << 8) + arch3d_plane_index(D_0019647C, *(int *)click_face_texture);
+                pick_result->plane = (i << 8) + arch3d_plane_index(D_0019647C, click_face_texture);
                 pick_result->block_model_index = i;
                 return 1;
             }
@@ -125,7 +125,7 @@ int pick_model_cb(struct record *object)
             if ((int)&block_model->model == D_0019647C) {
                 pick_result->flags |= 5;
                 pick_result->object = object;
-                pick_result->plane = arch3d_plane_index(D_0019647C, *(int *)click_face_texture);
+                pick_result->plane = arch3d_plane_index(D_0019647C, click_face_texture);
                 pick_result->model_id = block_model->id;
                 pick_result->variant = block_model->variant;
                 return 1;
@@ -138,38 +138,38 @@ int pick_model_cb(struct record *object)
         if (D_0019647C == model) {
             pick_result->flags |= 5;
             pick_result->object = object;
-            pick_result->plane = arch3d_plane_index(model, *(int *)click_face_texture);
+            pick_result->plane = arch3d_plane_index(model, click_face_texture);
             return 1;
         }
     }
     return 0;
 }
 
-int arch3d_plane_index(int model, int plane)
+int arch3d_plane_index(int model, struct arch3d_plane *plane)
 {
-    int candidate;
+    struct arch3d_plane *candidate;
     int i;
 
-    for (i = 0; i < *(int *)(*(char **)((char *)model) + 8); i++) {
+    for (i = 0; i < (*(struct arch3d_header **)model)->plane_count; i++) {
         candidate = arch3d_plane_at(model, (int)(short)*(short *)&i);
         if (candidate == plane) return i;
     }
     return -1;
 }
 
-void arch3d_apply_climate_textures(int arch3d)
+void arch3d_apply_climate_textures(struct arch3d_header *arch3d)
 {
-    int plane;
-    int cursor;
+    struct arch3d_plane *plane;
+    struct arch3d_plane *cursor;
     int i;
 
     scratch_190ce5 = climate_category();
     scratch_190ce4[0] = climate_texture_sets[climate_index];
-    cursor = arch3d + *(int *)((char *)arch3d + 60);
-    for (i = 0; i < *(int *)((char *)arch3d + 8); i++) {
+    cursor = (struct arch3d_plane *)((char *)arch3d + arch3d->plane_list_offset);
+    for (i = 0; i < arch3d->plane_count; i++) {
         plane = cursor;
-        *(short *)((char *)plane + 2) = (*(short *)((char *)plane + 2) & 127) | (texture_archive_for_climate(((int)(unsigned short)*(short *)((char *)plane + 2)) >> 7, (int)(unsigned short)(*(short *)((char *)plane + 2) & 127)) << 7);
-        cursor += (((int)(unsigned char)*(signed char *)((char *)cursor)) << 3) + 8;
+        plane->texture = (plane->texture & 127) | (texture_archive_for_climate(plane->texture >> 7, plane->texture & 127) << 7);
+        cursor = (struct arch3d_plane *)((char *)cursor + ((cursor->point_count << 3) + 8));
     }
 }
 

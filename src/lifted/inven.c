@@ -4,6 +4,7 @@
 #include "records.h"
 #include "bitfield.h"
 
+extern struct region regions[];
 extern signed char mouse_buttons;
 extern short mouse_x;
 extern short mouse_y;
@@ -57,7 +58,6 @@ extern signed char item_group_tab[];
 extern struct rect inv_mode_buttons[][7];   /* 5 trade modes */
 extern struct rect inv_buttons[];
 extern char weapon_proficiency_bits[];
-extern char region_price_adjustment[];
 extern signed char text_buffer[];
 extern struct record *creature_list[];
 extern char D_00190B44[];
@@ -229,9 +229,9 @@ extern void object_free_pending(void);
 extern void msgbox_yes_no_rsc(int);
 extern void gold_add(int);
 extern void gold_spend(int);
-extern void location_free(int);
+extern void location_free(struct loaded_location *);
 extern void map_goto_location(int, int, int, int);
-extern void location_pick_random_undiscovered(int);
+extern void location_pick_random_undiscovered(struct loaded_location *);
 extern void location_set_discovered(int, int);
 extern void spell_end(int);
 extern void inpstr_begin_number(int);
@@ -1276,7 +1276,7 @@ int trade_total_sell(void)
 
 int trade_region_price(int price)
 {
-    price = (((int)(unsigned short)*(short *)(region_price_adjustment + (((int)(unsigned char)current_region) * 80))) * price) / 1000;
+    price = (regions[(unsigned char)current_region].price_adjustment * price) / 1000;
     if (price < 0) price = 1;
     return price;
 }
@@ -1643,14 +1643,14 @@ int func_00098B91(struct record *object)
 void inv_read_map_scrap(struct record *scrap)
 {
     {
-        char found[20];
+        struct loaded_location found;
 
         if (scrap != 0) object_delete(scrap);
-        text_macro_map_location = (int)found;
-        location_pick_random_undiscovered((int)found);
+        text_macro_map_location = (int)&found;
+        location_pick_random_undiscovered(&found);
         msgbox_show_rsc(499, 1);
-        location_set_discovered((int)(unsigned short)*(short *)(*(char **)((char *)found + 12) + 27), 1);
-        location_free((int)found);
+        location_set_discovered(found.object->location_index, 1);
+        location_free(&found);
     }
 }
 

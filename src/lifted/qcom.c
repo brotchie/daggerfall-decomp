@@ -3,6 +3,7 @@
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
 
+extern struct region regions[];
 extern signed char mouse_buttons;
 extern char D_001707F0[];
 extern char D_001707F7[];
@@ -10,8 +11,6 @@ extern char D_00170801[];
 extern char D_001708ED[];
 extern short D_0017A120[];
 extern signed char D_001841E3[];
-extern signed char region_precipitation_override[];
-extern char region_legal_reputation[];
 extern signed char text_buffer[];
 extern char D_001911E4[];
 extern signed char quest_global_states[];
@@ -527,9 +526,9 @@ void quest_run_opcodes(struct quest *quest)
             case 62:
                 if (((int)(short)(op->flags & 1)) == 0 && quest_arg_state(op, 0) != 0) {
                     if (op->args[1].value == 32768) {
-                        region_precipitation_override[((int)(unsigned char)current_region) * 80] = (signed char)op->args[2].value;
+                        regions[(unsigned char)current_region].precipitation_override = (signed char)op->args[2].value;
                     } else {
-                        region_precipitation_override[op->args[1].value * 80] = (signed char)op->args[2].value;
+                        regions[op->args[1].value].precipitation_override = (signed char)op->args[2].value;
                     }
                     quest_op_done(quest, op);
                 }
@@ -552,12 +551,12 @@ void quest_run_opcodes(struct quest *quest)
                 break;
             case 65:
                 if (((int)(short)(op->flags & 1)) == 0 && quest_arg_state(op, 0) != 0) {
-                    *(short *)(region_legal_reputation + (((int)(unsigned char)current_region) * 80)) += (short)op->args[1].value;
-                    if (((int)(short)*(short *)(region_legal_reputation + (((int)(unsigned char)current_region) * 80))) > 100) {
-                        *(short *)(region_legal_reputation + (((int)(unsigned char)current_region) * 80)) = 100;
+                    regions[(unsigned char)current_region].legal_reputation += (short)op->args[1].value;
+                    if (regions[(unsigned char)current_region].legal_reputation > 100) {
+                        regions[(unsigned char)current_region].legal_reputation = 100;
                     }
-                    if (((int)(short)*(short *)(region_legal_reputation + (((int)(unsigned char)current_region) * 80))) < (-100)) {
-                        *(short *)(region_legal_reputation + (((int)(unsigned char)current_region) * 80)) = 65436;
+                    if (regions[(unsigned char)current_region].legal_reputation < (-100)) {
+                        regions[(unsigned char)current_region].legal_reputation = -100;
                     }
                     quest_op_done(quest, op);
                 }

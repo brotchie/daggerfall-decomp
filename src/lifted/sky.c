@@ -332,7 +332,7 @@ void sky_load_night(void)
 {
     disk_read_file(D_00170A98, *(int *)scratch_buffer);
     xn_pal_set_range_8bit(*(int *)scratch_buffer + 11, 1, 31);
-    mc_memcpy((int)xn_pal_current + 3, (int)&*(signed char *)(*(char **)scratch_buffer + 11), 93, (int)D_00170A86, 671, 4);
+    mc_memcpy((int)xn_pal_current + 3, (int)(*(char **)scratch_buffer + 11), 93, (int)D_00170A86, 671, 4);
     mc_set_location(673, (int)D_00170A86);
     mc_sprintf((int)text_buffer, (int)D_00170AA5, (int)(unsigned char)D_0017A3E5[climate_category()]);
     disk_read_file(text_buffer, sky_image_a);

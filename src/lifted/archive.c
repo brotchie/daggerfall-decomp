@@ -249,11 +249,11 @@ int lockpick_door(struct record *door)
     return 0;
 }
 
-int lockpick_action_door(int action, int lock_level, struct record *door)
+int lockpick_action_door(struct building *building, int lock_level, struct record *door)
 {
     int chance;
 
-    if (((int)(unsigned char)*(signed char *)((char *)action + 8)) >= 10) return 1;
+    if (building->access_level >= 10) return 1;
     if (door->lockpick_skill_tried == player_character->skills[SKILL_LOCKPICKING].value) return 0;
     if (lock_level >= 20) {
         hud_message_add(lock_text_fail);

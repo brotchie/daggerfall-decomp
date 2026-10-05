@@ -9,10 +9,7 @@ extern int marquee_owned_text;
 extern char region_event_flag_groups[];
 extern signed char region_event_durations[];
 extern signed char D_00178EB0[];
-extern signed char regions[];
-extern signed char region_event_flags[];
-extern char region_event_groups[];
-extern char region_persecuted_temple[];
+extern struct region regions[];
 extern signed char text_buffer[];
 extern int marquee_x;
 extern int marquee_text;
@@ -61,22 +58,22 @@ void region_flag_set(int region, int flag)
 {
     int i;
 
-    if (*(signed char *)(region_event_groups + (region * 80) + *(unsigned char *)(region_event_flag_groups + flag)) != 0) {
+    if (regions[region].groups[region_event_flag_groups[flag]] != 0) {
         for (i = 0; i < 29; i++) {
-            if (*(signed char *)(region_event_flag_groups + flag) == *(signed char *)(region_event_flag_groups + i)) {
-                region_event_flags[(region * 80) + i] = 0;
+            if ((signed char)region_event_flag_groups[flag] == (signed char)region_event_flag_groups[i]) {
+                regions[region].flags[i] = 0;
             }
         }
     }
-    region_event_flags[(region * 80) + flag] = 1;
-    *(signed char *)(region_event_groups + (region * 80) + *(unsigned char *)(region_event_flag_groups + flag)) = 1;
-    regions[(region * 80) + flag] = rand_range((int)(unsigned char)region_event_durations[flag * 2], (int)(unsigned char)D_00178EB0[flag * 2]);
+    regions[region].flags[flag] = 1;
+    regions[region].groups[region_event_flag_groups[flag]] = 1;
+    regions[region].values[flag] = rand_range((int)(unsigned char)region_event_durations[flag * 2], (int)(unsigned char)D_00178EB0[flag * 2]);
     if (flag != 18) return;
-    *(short *)(region_persecuted_temple + (region * 80)) = *(short *)((char *)faction_random_of_type(1) + 33);
+    regions[region].persecuted_temple = faction_random_of_type(1)->id;
 }
 
 void region_flag_clear(int region, int flag)
 {
-    region_event_flags[(region * 80) + flag] = 0;
-    *(signed char *)(region_event_groups + (region * 80) + *(unsigned char *)(region_event_flag_groups + flag)) = 0;
+    regions[region].flags[flag] = 0;
+    regions[region].groups[region_event_flag_groups[flag]] = 0;
 }

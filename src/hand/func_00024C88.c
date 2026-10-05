@@ -1,7 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x00024C88 */
 #include "records.h"
 
-struct dun { short f0; char pad[78]; };
 extern char *D_00147954;
 extern char D_00170738[];        /* __FILE__ */
 extern char D_00170765[];
@@ -13,7 +12,7 @@ extern int D_0018DDD8;
 extern int D_0018DDDC;
 extern int D_0018DDE0;
 extern int D_0018DDE4;
-extern struct dun region_legal_reputation[];
+extern struct region regions[];
 extern signed char text_buffer[];
 extern int scratch_190be4[];
 extern int scratch_190cac;
@@ -59,7 +58,7 @@ unsigned char *career_answer_effect(unsigned char *text)
         if (faction != 0)
             faction->reputation += atoi(career_skip_word(text));
     } else if (*(unsigned short *)text == 0x7272)
-        region_legal_reputation[scratch_190d68].f0 += atoi(career_skip_word(text));
+        regions[scratch_190d68].legal_reputation += atoi(career_skip_word(text));
     else if (*(unsigned short *)text == 0x494D) {
         text = career_skip_word(text);
         if (*text == '+')

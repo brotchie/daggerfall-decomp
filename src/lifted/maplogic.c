@@ -44,7 +44,7 @@ extern struct character *player_character;
 extern struct career *player_class;
 extern int game_minutes;
 extern char scratch_buffer[];
-extern char D_00195C88[];
+extern struct xn_pick_hit *pick_hit;
 extern struct record *D_00195CB8;
 extern int D_00195CF4;
 extern int D_00195D84;
@@ -60,10 +60,10 @@ extern signed char is_daytime;
 extern signed char world_loading;
 extern signed char D_0019628C;
 extern signed char D_001962A3;
-extern char dungeon_blocks[];
+extern struct dungeon_block dungeon_blocks[];
 extern signed char D_001967A1;
 extern int region_location_count;
-extern char rmb_block[];
+extern struct rmb_file *rmb_block;
 extern struct map_location *location_here;
 extern struct loaded_location loaded_location;
 extern struct record *loaded_location_object;
@@ -127,7 +127,7 @@ extern void automap_mark_seen(struct record *);
 extern void func_00028EAA(void);
 extern void automap_restore_seen(void);
 extern void damage_creature_death(struct record *);
-extern void dungeon_load_rdb_block(int);
+extern void dungeon_load_rdb_block(struct dungeon_block *);
 extern void msgbox_show_rsc(int, int);
 extern void guards_summon(int);
 extern void people_clear(void);
@@ -275,7 +275,7 @@ void dungeon_load(int dungeon_index)
     blocks_bsa = archive_open(D_00176C9F, 0, 0);
     if ((((unsigned)location_object->id) >> 16) == 50015) D_001967A1 = 254;
     for (i = 0; ((int)(unsigned char)dungeon_block_count) > i; i++) {
-        dungeon_load_rdb_block(((int)dungeon_blocks) + (i << 2));
+        dungeon_load_rdb_block(&dungeon_blocks[i]);
     }
     kludge_fix_dungeon_door();
     archive_close(blocks_bsa);
@@ -424,7 +424,7 @@ void building_exit(void)
     object_free_children((struct record *)D_00196120);
     building_grant_access(building, 0, 0);
     player_to_nearest_marker(player_object->parent->children, 6);
-    func_000C810C(*(int *)D_00195C88);
+    func_000C810C((int)pick_hit);
     object_reparent(location_object, player_object);
     if (building->type == 24) player_to_nearest_marker(location_object, 6);
     position_history_reset();
@@ -607,8 +607,8 @@ void town_block_apply_ground(int x, int z)
     flat += (x & 32767) >> 8;
     tile += (128 - ((z & 32767) >> 8)) << 8;
     tile += (x & 32767) >> 8;
-    src_tile = (unsigned char *)(*(char **)rmb_block + 1739);
-    src_flat = (unsigned char *)(*(char **)rmb_block + 1995);
+    src_tile = rmb_block->ground_tiles;
+    src_flat = rmb_block->ground_scenery;
     for (i = 0; i < count; i++, tile++, flat++, src_tile++, src_flat++) {
         if (*src_tile != 255) {
             if ((*src_tile & 63) < 56) {
@@ -646,7 +646,7 @@ void town_map_add_block(int block_x, int block_y)
     src = 0;
     for (y = block_y; y < y_end; y++) {
         for (x = block_x; x < x_end; x++) {
-            *(signed char *)((char *)(int)(*(char **)&D_00196DA4 + ((y * map_width) + x))) = *(signed char *)(*(char **)rmb_block + 2251 + src++);
+            *(signed char *)((char *)(int)(*(char **)&D_00196DA4 + ((y * map_width) + x))) = rmb_block->automap[src++];
         }
     }
 }

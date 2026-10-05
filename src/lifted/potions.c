@@ -163,18 +163,22 @@ void potionmaker_add_ingredient(int index)
 {
     struct record *ingredient;
     {
-        char item_buf[112];
+        struct {
+            struct item item;       /* +0x00 */
+            char pad6B;             /* +0x6B */
+            int slot;               /* +0x6C: the free cauldron slot */
+        } item_buf;
 
-        *(int *)((char *)item_buf + 108) = 0;
-        while ((int)potion_cauldron[*(int *)((char *)item_buf + 108)] != 0) {
-            (*(int *)((char *)item_buf + 108))++;
+        item_buf.slot = 0;
+        while ((int)potion_cauldron[item_buf.slot] != 0) {
+            item_buf.slot++;
         }
-        ingredient = (struct record *)(*(int *)((char *)potion_cauldron + (*(int *)((char *)item_buf + 108) << 2)) = (int)potion_ingredients[index]);
-        item_make(ingredient->data.item.group, ingredient->data.item.index, (struct item *)item_buf);
-        D_001A9BB4[*(int *)((char *)item_buf + 108)] = *(signed char *)((char *)item_buf + 65);
-        D_001A9BAC[*(int *)((char *)item_buf + 108)] = D_0019626D;
-        D_001A9B8C[*(int *)((char *)item_buf + 108)] = *(signed char *)D_00195F28;
-        D_001A9B94[*(int *)((char *)item_buf + 108)] = D_0019626E;
+        ingredient = potion_cauldron[item_buf.slot] = potion_ingredients[index];
+        item_make(ingredient->data.item.group, ingredient->data.item.index, &item_buf.item);
+        D_001A9BB4[item_buf.slot] = item_buf.item.variants;
+        D_001A9BAC[item_buf.slot] = D_0019626D;
+        D_001A9B8C[item_buf.slot] = *(signed char *)D_00195F28;
+        D_001A9B94[item_buf.slot] = D_0019626E;
     }
 }
 
@@ -228,8 +232,8 @@ int potion_match_recipe(struct potion_recipe *recipe, signed char *cauldron_ids,
     int unmatched;
     int potency;
     int unused;
-    char item_buf[108];
-    int found;
+    struct item item_buf;
+    char *found;
     char recipe_ids[8];
 
     i = 0;
@@ -237,22 +241,22 @@ int potion_match_recipe(struct potion_recipe *recipe, signed char *cauldron_ids,
     unmatched = *value_out;
     for (; i < 8; i++) {
         if (recipe->ingredient_indices[i] != (-2)) {
-            item_make((int)(unsigned short)(short)recipe->ingredient_groups[i], (int)(signed char)recipe->ingredient_indices[i], (struct item *)item_buf);
-            *(signed char *)((char *)recipe_ids + i) = *(signed char *)((char *)item_buf + 65);
+            item_make((int)(unsigned short)(short)recipe->ingredient_groups[i], (int)(signed char)recipe->ingredient_indices[i], &item_buf);
+            recipe_ids[i] = item_buf.variants;
             *value_out += (int)(unsigned char)D_0019626D;
             unmatched++;
         } else {
-            *(signed char *)((char *)recipe_ids + i) = 255;
+            recipe_ids[i] = 255;
         }
     }
     i = 0;
     potency = i;
     for (; i < 8; i++) {
         if (((int)(unsigned char)cauldron_ids[i]) == 254) continue;
-        found = memchr((int)recipe_ids, (int)(unsigned char)cauldron_ids[i], 8);
+        found = (char *)memchr((int)recipe_ids, (int)(unsigned char)cauldron_ids[i], 8);
         if (found != 0) {
             potency += (int)(unsigned char)potencies[i];
-            *(signed char *)((char *)found) = 255;
+            *found = 255;
             unmatched--;
         } else {
             potency -= (int)(unsigned char)potencies[i];

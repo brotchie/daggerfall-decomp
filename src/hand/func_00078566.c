@@ -30,7 +30,7 @@ extern int mc_strncpy();
 extern int mc_memcpy();
 extern int xn_anim_reset();
 extern int xn_tex_archive_set_translucent();
-extern int xn_tex_cache_lookup();
+extern struct tex_cache_entry *xn_tex_cache_lookup(int, int, int);
 extern int xn_tex_cache_flush();
 #pragma aux mc_set_location parm routine [];
 extern int mc_set_location(int, int);
@@ -42,7 +42,7 @@ void monster_init(struct record *monster, int monster_type)
     struct career *career;
     struct monster_anim *anim;
     struct monster_template *table_row;
-    int texture;
+    struct tex_cache_entry *texture;
     int i;
     int skill_value;
     int texture_base;
@@ -109,7 +109,7 @@ void monster_init(struct record *monster, int monster_type)
             texture = xn_tex_cache_lookup(texture_base + monster_type, 5, 0);
             if (texture == 0) xn_tex_cache_flush();
         } while (texture == 0);
-        anim->frame_count = *(short *)(*(char **)((char *)texture + 12) + 22);
+        anim->frame_count = texture->image->frame_time;
         monster_char->magicka = (monster_char->max_magicka = 0);
         if (monster_type == 23 || monster_type == 18) xn_tex_archive_set_translucent(texture_base + monster_type);
         table_row = &monster_table[monster_type];

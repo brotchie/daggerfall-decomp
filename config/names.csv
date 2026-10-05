@@ -922,6 +922,7 @@ global,0x00195AA0,player_entity,confirmed,"pointer to the player's creature enti
 global,0x00195AA4,player_object,confirmed,pointer to the player's world object: x/y/z ints at +7/+11/+15 move the player (fallplay tp); it is player_entity's parent (+0x43)
 global,0x00195AA8,scratch_current_object,strong,"shared by unrelated units (consistency pass, build/names/audit/consistency.md section 5): a 'current object': the poisoned creature, the enchanted item, the wagon, and %kg, %wpn, %hs"
 global,0x00195AB0,frame_ticks,strong,"time of the last frame in milliseconds (frame_ticks_update: timer interrupts * 1828/256, cap 100): timers count down by it, movement is speed*frame_ticks/1000. audit: build/names/scratch/audit_euw/B/exp_run.py clock/walk (save_tlalac_s): 21, 28 or 35 from frame to frame (3-5 interrupts of the ~140 Hz timer), 14-35 in the 18 saves"
+global,0x00195AB4,collide_floor_plane,strong,struct arch3d_plane *: the plane collide_vertical_cb found (with collide_height); footstep_sounds reads its floor_sound in dungeons
 global,0x00195AB8,vertical_velocity,confirmed,"fall speed: gravity adds to it, fall damage from it (sounds 359/360); -8379 just after the jump in exp_steer.py"
 global,0x00195ABC,attack_angle,candidate,code reading (damage code); not tested. Keep: code only (weapon_melee_strike -> damage_resolve_attack -> damage_knockback)
 global,0x00195AC4,location_object,confirmed,"root object of the loaded location or dungeon: +0x1B its location index, +0x1F high word the id in the at%05d.amf/.atf names; children walked for seen marks; audit: build/names/scratch/audit_euw/C/s1_survey.py: its location index equals location_here's index (416 Ipscart Rock, 394 Crossing, 6 Sentinel) and its x/z the map_location's; build/names/scratch/audit_euw/C/s4_load.py: map_goto_location(21,1,2,0) made it index 2 (Charmarket) with 4 type-38 block children"
@@ -986,6 +987,7 @@ global,0x00195C70,moving_model,candidate,the moving model being collided (collis
 global,0x00195C74,ceiling_height,confirmed,"y (downwards) an object's head may rise to: the model surface found 60-120 units above its feet by the collision steps' upward scan when rising, levitating or in water (collide_step_player/collide_step_object), else y-120; for a creature in water the water level; object_apply_gravity stops upward velocity at y-80 above it, floating up stops at y-100; saved/restored around test moves; audit: build/names/scratch/audit_euw/A/ceiling.py: levitating up in save_blades it stayed y-120 until the player reached y -1276, where it held -1376 (the ceiling) and the player stopped 100 below it; the floor is collide_height. Old name floor_height (monster+0x9F floor_y stores the same value)"
 global,0x00195C78,trespassing,strong,"int: the main loop's trespass test (interior restriction - building access > 0, or dungeon flag): crime 2 or 3 and guards"
 global,0x00195C7C,hud_vital_bar_images,confirmed,"3 image pointers: main03i0.img, main04i0.img, main05i0.img (init_game_data), the health, fatigue and magicka bars hud_draw draws in part; audit: build/names/scratch/audit_euw/C/s3_engine.py save_morthag1: after hud_draw the screen at x 49/57/65 rows 161-192 held these images' rows: all 32 for full health, 30 and 5 for the partly empty fatigue and magicka"
+global,0x00195C88,pick_hit,strong,struct xn_pick_hit *: xn_render_pick's result (engine_pick_object); func_000C810C takes it in maplogic.c
 global,0x00195C90,flats_cfg_count,strong,number of flats_cfg records
 global,0x00195C94,classmaker_file,strong,"custom class file name from the command line ('custom NAME', args.c 82A63): classmaker_run loads the class from it, classmaker_save_file writes it"
 global,0x00195CB0,ai_los_index,strong,"round-robin AI index: only that creature re-tests line of sight (23C72) this frame, setting/clearing character+0x40 bit 7; ai_update_creatures advances it mod creature_count"
@@ -1127,6 +1129,8 @@ global,0x00196354,archive_names,strong,13-byte file name per archive handle (arc
 global,0x00196458,screenshot_number,confirmed,n of PICS\SCR%d.BMP; screenshot_save_bmp raised it 0 -> 1 (exp3)
 global,0x00196470,marquee_x,strong,"build/names/scratch/audit_tq/exp_quest.py save_tlalac_s: 320 at start, -2 a frame"
 global,0x00196474,marquee_text,strong,build/names/scratch/audit_tq/exp_quest.py save_tlalac_s: the text marquee_show_rsc gave; 0 when stopped or run out
+global,0x00196478,pick_hit_flat,candidate,engine_pick_object: the flat hit; pick_sprite_cb compares it with the objects' draw handles
+global,0x0019647C,pick_hit_model,candidate,engine_pick_object: the hit polygon's model slot; pick_model_cb compares it with &block_model->model / &instance.model
 global,0x00196484,pick_result,confirmed,"pointer to engine_pick_object's 18-byte result (its third argument): +0 flags (1 hit, 2 sprite, 4 model, 8 block model), +4 object, +8 plane index, +12 block model index, +14 model id, +16 variant; audit: build/names/scratch/audit_euw/C/s3_engine.py save_morthag1: during 20 picks it held the buffer passed in, and the callbacks wrote flags 0D (type-43 block, plane 16), 05 (type-56 object, model 437 variant 50) into it"
 global,0x00196488,talk_regional_rows,candidate,row -> regional group index. Keep: code only (talk lists)
 global,0x001964B0,talk_place_rows,candidate,row -> talk_place_topics index for the place list. Keep: code only (talk lists)
@@ -1161,6 +1165,7 @@ global,0x001965EC,talk_face_image,strong,"4096-byte 64x64 portrait from faces.ci
 global,0x001965F0,talk_list_bottom,strong,last visible topic row = top+13
 global,0x001965F4,talk_list_top,strong,first visible topic row (scroll arrows)
 global,0x001965F8,talk_mode_image,candidate,"talk03i0.img, drawn over the mode buttons. Keep: code only; the image name comes from the code's string"
+global,0x001965FC,talk_where,candidate,struct talk_where: what talk_where_target points at (talk_open sets it)
 global,0x00196612,talk_category_rows,candidate,row -> category for the category list. Keep: code only (talk_draw_categories)
 global,0x00196620,talk_key_text,strong,the %key text macro returns it (parse.c 4811C); %key2 is +65 (parse.c 4813E): the selected topic's name
 global,0x001966A2,talk_topic_count,candidate,"entries in talk_topics. Keep: code only (talk_draw_tell_list, talk_add_quest_topics)"
@@ -1268,7 +1273,19 @@ global,0x00198588,moon1_phase,confirmed,"sky_update_moons: (day + 4) & 31 (7, ex
 global,0x001985A8,moon1_direction,strong,"x/y/z of moon 1 on its 3500-minute orbit; audit: build/names/scratch/audit_euw/D/exp_misc.py save_gash: equal to sky_orbit_direction(-1000, minutes % 3500, 3500) = (-8063, 1451, -1000); z is -1000 in every save"
 global,0x001985B4,moon0_direction,strong,"x/y/z of moon 0 on its 2500-minute orbit (sky_update_moons); audit: build/names/scratch/audit_euw/D/exp_misc.py save_gash: equal to sky_orbit_direction(1000, minutes % 2500, 2500) = (-7941, 2015, 1000); z is 1000 in every save"
 global,0x001985C8,sun_direction,strong,"x/y/z of the sun (sky_sun_direction); sky_apply_sunlight uses it; audit: build/names/scratch/audit_euw/D/exp_misc.py save_gash (12:30): (1152, -8110, 0) = sky_sun_direction 390 minutes after 06:00; survey.py: 0 in dungeon saves, y near -8100 (up) at midday, +8111 at 22:47"
+global,0x001985D4,rdb_object_ids,strong,"struct rdb_object_id[512]: RDB object file offset -> record id (rdb_create_objects, rdb_object_id_by_offset)"
 global,0x001995D4,block_quarters,candidate,"the dungeon block quarters, a 2x2 array (consistency pass and struct notes)"
+global,0x001995E8,rdb_data,strong,"char *: the RDB file being loaded (scratch_buffer, dungeon_load_rdb_block); every RDB offset is added to it"
+global,0x001995F0,rdb_flat_resource,strong,struct rdb_flat *: the current flat resource
+global,0x001995F4,rdb_light_resource,strong,struct rdb_light *: the current light resource
+global,0x001995F8,rdb_light_level,candidate,"dungeon_load_rdb_block sets 16, editor marker 199.10 overrides it; stored into each quarter's light_level (+0x17)"
+global,0x001995FC,rdb_water_level,candidate,"10000 (none) by default, -(flat sound_index << 3) from marker 199.10; stored into each quarter's water_level (+0x19)"
+global,0x00199600,rdb_action_resource,strong,struct rdb_action *: the current model's action (rdb_build_action_chain)
+global,0x00199604,rdb_loaded_file,strong,"struct rdb_file *: the same buffer as rdb_data, read as the header (width, object_root_offset, model_references)"
+global,0x00199608,rdb_dungeon_block,strong,struct dungeon_block *: the block dungeon_load_rdb_block is loading (rdb_create_objects reads x/z and is_starting)
+global,0x0019960C,rdb_model_resource,strong,struct rdb_model *: the current model resource (fs2df.c)
+global,0x00199614,rdb_object_id_count,strong,entries in rdb_object_ids ('Object count exceeded.' past 512)
+global,0x00199618,rdb_link_object_id,strong,the object id action_record_add(_chained) gives the link records (rdb_object_id_by_offset's result)
 global,0x0019961C,spell_effect_cost_current,strong,"the 8-byte cost record (4 shorts) of the effect being costed, copied from spell_effect_costs; read by spell_cost_formulas"
 global,0x00199624,spellmaker_settings_image,strong,"mask05i0.img (spellmaker_open): the effect settings panel drawn by spellmaker_settings_update, freed by spellmaker_exit"
 global,0x0019962C,spellmaker_alter_row,candidate,"short: effect row waiting for the ""alter the spell?"" answer (-1 none): yes edits it, no deletes the effect. Keep: code only (spell maker)"
@@ -1567,6 +1584,23 @@ global,0x001AA69C,travel_transport_factor,strong,"256 on foot, 192 with a cart, 
 global,0x001AA6A4,travel_map_parts,candidate,"number of parts of the region map: 2 for region 0, 4 for 1 and 16, else 0. Keep: code only (travel map parts)"
 global,0x001AA6A5,travel_map_part,candidate,bit 0 / bit 1: which horizontal / vertical part of a multi-part region map is shown (travel_button_arrows). Keep: code only (travel map parts)
 global,0x001AA6A6,travel_map_mode,candidate,"how the map was opened (objcode func_0009A993): 1 the W key, 100 teleport (tele00i0.img, guilds.c): mode 100 skips the clock and shows YES/NO. Keep: code only (travel_map_open)"
+field,arch3d_header+0x00,version,strong,"DFU Arch3dFile FileHeader Version (""v2.7"")"
+field,arch3d_header+0x04,point_count,strong,DFU PointCount
+field,arch3d_header+0x08,plane_count,strong,DFU PlaneCount; arch3d_plane_at / arch3d_plane_index / arch3d_apply_climate_textures
+field,arch3d_header+0x0C,radius,strong,DFU Radius
+field,arch3d_header+0x18,plane_data_offset,strong,DFU PlaneDataOffset
+field,arch3d_header+0x1C,object_data_offset,strong,DFU ObjectDataOffset
+field,arch3d_header+0x20,object_data_count,strong,DFU ObjectDataCount
+field,arch3d_header+0x30,point_list_offset,strong,DFU PointListOffset
+field,arch3d_header+0x34,normal_list_offset,strong,DFU NormalListOffset
+field,arch3d_header+0x3C,plane_list_offset,strong,DFU PlaneListOffset; the planes from the start of the header
+field,arch3d_plane+0x00,point_count,strong,DFU PlaneHeader PlanePointCount; the next plane is 8 + 8 * count bytes on
+field,arch3d_plane+0x02,texture,strong,"DFU Texture (archive<<7 | record): arch3d_apply_climate_textures, click_world_face"
+field,arch3d_plane+0x04,floor_sound,candidate,DFU Unknown2's low byte: footstep_sounds reads it (0-4) from the floor plane in dungeons
+field,arch3d_plane+0x08,points,strong,DFU PlanePoints
+field,arch3d_plane_point+0x00,point_offset,strong,DFU PlanePoint PointOffset
+field,arch3d_plane_point+0x04,u,strong,DFU U
+field,arch3d_plane_point+0x06,v,strong,DFU V
 field,automap+0x000,notes,strong,"2048 bytes of notes: u16 object id (record_id low word), string; automap = data of the player's type-51 object (automap_record). New: exp_misc: automap_add_note/find_note/delete_note read and wrote exactly this layout through automap_notes"
 field,automap+0x800,seen_bits,candidate,"bit per object id set by automap_mark_seen, applied by automap_restore_seen (automap_restore_seen_one reads data+0x800); code only. Reading a save's type-51 record after exploring would settle it"
 field,bank_account+0x00,balance,confirmed,i32 gold in the account; experiments: deposit/withdraw/letters/loan/house/ship all moved it
@@ -1699,6 +1733,9 @@ field,disease+0x1D,stage,strong,"s16: 0 incubating, 1 symptoms begun (poison_tic
 field,disease+0x1F,drained,strong,8 x s16 attribute points taken so far. New: Daggerfall Unity totaldamageSTR.. at 0x1F; exp_mord: spfx_disease_recover gave one point back per call and decremented it
 field,door+0x17,lock_level,strong,u16 lock of a door object (type 32): lockpick_door refuses 20 and more and rolls (level - lock)*5; RMB door records give it (objlib 847BC copies byte +17); link action 15 sets it
 field,door+0x19,lockpick_skill_tried,strong,u16 the Lockpicking value at the last failed attempt: lockpick_door gives up at once while the skill is unchanged
+field,dungeon_block+0x00,x,strong,DFU DungeonBlock X (sbyte); dungeon_load_rdb_block: quarter x += x << 11
+field,dungeon_block+0x01,z,strong,DFU Z (sbyte)
+field,dungeon_block+0x02,number,strong,DFU BlockNumberStartIndexBitfield bits 0-9 (BlockNumber): the %c%07d.RDB number
 field,faction+0x00,type,strong,"byte: 2 group, 4 individual, 7 noble, 9 temple, 14 courts, 15 people (faction.txt types); talk walks up to 2/7/9"
 field,faction+0x01,region,strong,"byte region index, 255 = none; compared with current_region"
 field,faction+0x02,ruler,strong,byte from FACTION.TXT 'ruler' (faction_parse_ruler)
@@ -1918,6 +1955,8 @@ field,object+0x3B,prev,strong,pointer to the previous sibling: object_unlink and
 field,object+0x3F,children,confirmed,pointer to the first child (containers -> items); walked in save_tlalac_s
 field,object+0x43,parent,confirmed,pointer to the parent: items -> their tab container -> player_entity -> player_object (player_entity+0x43 = player_object in save_tlalac_s; +0x40 is misaligned there)
 field,object+0x47,data,strong,"the record's data (records.h record.data, a union by type) follows the 71-byte header: player_character = player_entity + 0x47; was record_data"
+field,pak_run+0x00,count,strong,"DFU PakFile row run length (u16, read signed); pak_lookup"
+field,pak_run+0x02,value,strong,DFU PakFile run value (u8); pak_lookup returns it
 field,person+0x00,faction_id,strong,u16 (records.h struct person): npc_click_service and guild_service_dispatch pick the service by it; npc_talk passes it to quest_event_clicked_faction; rmb_make_flat sets it (UI and objects struct agents)
 field,person+0x02,flags,strong,"build/names/scratch/audit_tq/exp_inside.py (save_wereboar, save_mord): bit 7 = the quest-giver mark quest_mark_givers reproduces (11 of 277 in save_wereboar); npc_is_quest_giver returns it"
 field,pick_result+0x00,flags,confirmed,"int: 1 hit, 2 sprite, 4 model, 8 block model (names.csv pick_result global)"
@@ -2023,12 +2062,88 @@ field,quest_face+0x01,quest_id,strong,u8 (names.csv quest_faces_quest is this fi
 field,quest_face+0x02,object_id,strong,"int: the person or foe, 0 a free slot (quest_faces_object)"
 field,quest_face+0x06,image,strong,struct image *: the face (quest_faces_image)
 field,quest_npc+0x1A,location_name,strong,char[32]: the quest NPC's town (func_00031B8A copies current_location->name; quest_symbol_text returns it); type-41 data is 58 bytes
+field,rdb_action+0x00,axis,strong,DFU RdbActionResource Axis; link axis
+field,rdb_action+0x01,duration,strong,DFU Duration; link duration
+field,rdb_action+0x03,magnitude,strong,DFU Magnitude; link magnitude
+field,rdb_action+0x05,next_object_offset,strong,DFU NextObjectOffset; rdb_build_action_chain follows it
+field,rdb_action+0x09,action,strong,DFU Flags (RdbActionFlags): link action
+field,rdb_file+0x0000,unknown1,strong,DFU RdbBlockHeader Unknown1
+field,rdb_file+0x0004,width,strong,DFU RdbBlockHeader Width; dungeon_load_rdb_block indexes the object roots by i * width + j
+field,rdb_file+0x0008,height,strong,DFU RdbBlockHeader Height
+field,rdb_file+0x000C,object_root_offset,strong,DFU ObjectRootOffset; dungeon_load_rdb_block: the int offsets of the 2x2 object lists
+field,rdb_file+0x0010,unknown2,strong,DFU RdbBlockHeader Unknown2
+field,rdb_file+0x0014,model_references,strong,"DFU ModelReferenceList[750] (struct rdb_model_reference, 8 bytes); rdb_create_objects passes [model_index] to rdb_model_id_from_name"
+field,rdb_file+0x1784,model_data,strong,DFU ModelDataList[750] (u32)
+field,rdb_file+0x233C,object_header,strong,DFU RdbObjectHeader (512 bytes); func_000361B7 reads its unknown_offset (+9020)
+field,rdb_flat+0x00,image,strong,DFU RdbFlatResource TextureBitfield (archive<<7 | record); 199 editor markers
+field,rdb_flat+0x02,flags,strong,"DFU Flags (u16): link trigger (low byte); markers' creature / link flag; NPC gender bits 16, 32"
+field,rdb_flat+0x04,magnitude,strong,DFU Magnitude: link axis; markers' mobile id; NPC faction low byte
+field,rdb_flat+0x05,sound_index,strong,DFU SoundIndex: link param; markers' trigger range; NPC faction high byte
+field,rdb_flat+0x06,next_object_offset,strong,DFU NextObjectOffset; rdb_build_action_chain
+field,rdb_flat+0x0A,action,strong,DFU Action; 29 an NPC (rdb_create_objects)
+field,rdb_light+0x00,image,strong,DFU RdbLightResource Unknown1 (low half): rdb_create_objects passes it as the light object's image
+field,rdb_light+0x03,action,candidate,Unknown1's high byte: rdb_build_action_chain passes it as the action when a chain reaches a light
+field,rdb_light+0x04,next_object_offset,candidate,DFU Unknown2: rdb_build_action_chain follows it as the next object
+field,rdb_light+0x08,radius,strong,DFU Radius; rdb_create_objects: light_radius
+field,rdb_model+0x00,x_rotation,strong,DFU RdbModelResource XRotation; xn_model_set_angles
+field,rdb_model+0x04,y_rotation,strong,DFU YRotation
+field,rdb_model+0x08,z_rotation,strong,DFU ZRotation
+field,rdb_model+0x0C,model_index,strong,DFU ModelIndex (read signed)
+field,rdb_model+0x0E,trigger_flag_starting_lock,strong,"DFU TriggerFlag_StartingLock (u32), read as a short: the link's trigger (low byte, action_record_add), doors' lock (>> 4, rdb_create_objects), nonzero = has an action (rdb_link_actions)"
+field,rdb_model+0x12,sound_index,strong,DFU SoundIndex; action_record_add's link param
+field,rdb_model+0x13,action_offset,strong,DFU ActionOffset; <= 0 calls func_000361B7 (rdb_model_find_action)
+field,rdb_model_reference+0x00,model_id,strong,DFU RdbModelReference ModelId (5 chars); rdb_model_id_from_name parses digits 1-3 and 4-5
+field,rdb_model_reference+0x05,description,strong,DFU Description (3 chars)
+field,rdb_object+0x00,next,strong,DFU RdbObject Next; rdb_create_objects/rdb_link_actions walk the list while > 0
+field,rdb_object+0x04,previous,strong,DFU Previous
+field,rdb_object+0x08,x,strong,DFU XPos; rdb_create_objects adds it to the quarter's position
+field,rdb_object+0x0C,y,strong,DFU YPos
+field,rdb_object+0x10,z,strong,DFU ZPos
+field,rdb_object+0x14,type,strong,"DFU Type (RdbResourceTypes 1 model, 2 light, 3 flat): the code reads the low 6 bits (a bitfield, as rdb_create_objects needs)"
+field,rdb_object+0x15,resource_offset,strong,DFU ResourceOffset
+field,rdb_object_header+0x000,unknown_offset,strong,DFU UnknownOffset: 'offset to linked list of unknown purpose'; func_000361B7 walks it (struct rdb_unknown_entry)
+field,rdb_object_header+0x010,length,strong,DFU Length
+field,rdb_object_header+0x034,dagr,strong,"DFU Dagr: ""DAGR"""
+field,rdb_object_id+0x00,offset,strong,D_001985D4[512]: rdb_create_objects stores each RDB object's file offset; rdb_object_id_by_offset searches it
+field,rdb_object_id+0x04,id,strong,the record id made for it (rdb_object_id_by_offset returns it as a short)
+field,rdb_unknown_entry+0x00,next,strong,func_000361B7: entry = rdb + next
+field,rdb_unknown_entry+0x04,key,candidate,func_000361B7 walks to the entry whose short +4 equals its key (always 0)
+field,rdb_unknown_entry+0x06,action_offset,strong,func_000361B7 copies it to rdb_model.action_offset
+field,rdb_unknown_entry+0x0A,trigger_flag_starting_lock,strong,func_000361B7 copies the short to rdb_model +0x0E
+field,rdb_unknown_entry+0x0C,sound_index,strong,func_000361B7 copies the byte to rdb_model +0x12
 field,rect+0x00,x0,confirmed,"short: every button table's {x0,y0,x1,y1,handler} (names.csv button tables); also note_text_box's boxes"
 field,rect+0x02,y0,confirmed,short
 field,rect+0x04,x1,confirmed,short
 field,rect+0x06,y1,confirmed,short
 field,rect+0x08,handler,confirmed,function pointer the menus call with the button index (or nothing); boxes leave it: the 12-byte boxes of note_select_line_cb/note_text_hit_cb only match at 12 bytes
+field,region+0x00,values,confirmed,29 bytes (DFU RegionDataRecord Values): region_flag_set's random countdowns (was region_event_values)
+field,region+0x1D,flags,confirmed,29 flags (DFU Flags; region_event_flags)
+field,region+0x3A,groups,confirmed,14 group flags (DFU Flags2; region_event_groups)
+field,region+0x48,precipitation_override,strong,DFU PrecipitationOverride (region_precipitation_override)
 field,region+0x49,punishment_flags,strong,"byte in the 80-byte region record at 0x18F044 (the global region_punishment_flags is this byte for region 0): bit 0 banished (TEXT 8063), bit 1 sentenced to death (8060); time_pass_minutes rolls guards on bit 0. Was crime_flags. audit: DFU SaveVars.ReadRegionData reads SeverePunishmentFlags at record +0x49 (29 values, 29 flags, 14 flags2, precipitation override, then this); renamed to match DFU and the global (the consistency pass made the same rename)"
+field,region+0x4A,legal_reputation,strong,DFU LegalRep (region_legal_reputation)
+field,region+0x4C,persecuted_temple,strong,DFU IDOfPersecutedTemple (region_persecuted_temple)
+field,region+0x4E,price_adjustment,confirmed,DFU PriceAdjustment (region_price_adjustment)
+field,rmb_block_position+0x00,unknown1,strong,DFU RmbFldBlockPositions Unknown1 (u32); town_block_place_building copies it to D_00196804
+field,rmb_block_position+0x04,unknown2,strong,DFU RmbFldBlockPositions Unknown2 (u32); town_block_place_building copies it to D_001967EC
+field,rmb_block_position+0x08,x,strong,DFU XPos; town_block_place_building: rmb_origin_x = block_origin_x + x
+field,rmb_block_position+0x0C,z,strong,DFU ZPos; rmb_origin_z = block_origin_z - z
+field,rmb_block_position+0x10,yaw,strong,DFU YRotation (i32); copied to rmb_origin_yaw
+field,rmb_file+0x0000,block_data_count,strong,"DFU RmbFldHeader NumBlockDataRecords (u8); rmb_index_records and town_load_blocks loop over it, one exterior+interior subrecord pair per building"
+field,rmb_file+0x0001,misc_model_count,strong,DFU NumMisc3dObjectRecords; town_block_create_misc_objects copies count x 66 bytes
+field,rmb_file+0x0002,misc_flat_count,strong,DFU NumMiscFlatObjectRecords; town_block_create_misc_objects copies count x 17 bytes
+field,rmb_file+0x0003,positions,strong,"DFU BlockPositions[32] (struct rmb_block_position, 20 bytes); town_block_place_building"
+field,rmb_file+0x0283,buildings,strong,"DFU BuildingDataList[32] (struct building, 26 bytes); rmb_add_building reads .type (+0x29B) and .faction_id (+0x295)"
+field,rmb_file+0x05C3,block_data,strong,DFU Section2UnknownData (32 u32): rmb_index_records stores each building's subrecord address there (struct block *); rmb_add_building reads it into rmb_record_ptr
+field,rmb_file+0x0643,block_data_sizes,strong,DFU BlockDataSizes[32]; rmb_index_records adds them to step through the subrecords
+field,rmb_file+0x06C3,misc_models,strong,DFU GroundData.Header bytes 0-3: rmb_index_records stores the misc 3D objects' address (after the subrecords) there; town_block_create_misc_objects copies from it
+field,rmb_file+0x06C7,misc_flats,strong,GroundData.Header bytes 4-7: rmb_index_records stores misc_models + misc_model_count * 66 there
+field,rmb_file+0x06CB,ground_tiles,strong,DFU GroundTiles 16x16 bytes; town_block_apply_ground (+1739)
+field,rmb_file+0x07CB,ground_scenery,strong,DFU GroundScenery 16x16 bytes; town_block_apply_ground (+1995)
+field,rmb_file+0x08CB,automap,strong,DFU AutoMapData 64x64; town_map_add_block (+2251)
+field,rmb_file+0x18CB,name,strong,DFU Name (13 chars); town_block_create_misc_objects copies the 429 bytes of names to the type-38 object's data
+field,rmb_file+0x18D8,other_names,strong,"DFU OtherNames[32][13]; town_block_place_building compares a building's with a string (type 11, faction 414)"
+field,rmb_file+0x1A78,data,strong,the block data records follow the 6776-byte header (rmb_index_records: cursor = rmb_block + 6776)
 field,rumor+0x00,faction1,strong,"s16 first faction id (rumor_add_faction, rumor_is_eligible)"
 field,rumor+0x02,faction2,strong,s16 second faction id
 field,rumor+0x04,kind,strong,"i32 politics event kind, 100 = not a politics rumour"
@@ -2079,6 +2194,17 @@ field,spell+0x49,id,strong,"spell id (SPELLS.STD index field): 82 Orc Strength, 
 field,spell+0x4A,cast_durations,confirmed,"3 x u16 rounds left, computed at cast (spell_compute_values), counted down by spell_tick (0xFFFF permanent); exp1b (build/names/scratch/magic/exp1b.py, save_morthag1): Orc Strength cast at level 13 had 18"
 field,spell+0x50,cast_magnitudes,confirmed,"3 x u16 magnitude rolled at cast; exp1b (build/names/scratch/magic/exp1b.py, save_morthag1): Orc Strength had 20 and STR went 80 -> 100"
 field,spell+0x56,cast_chances,strong,"3 x u8 chance % computed at cast; handlers roll 1-100 against it (Paralyze, Disintegrate, Silence...)"
+field,talk_place_topic+0x00,category,strong,"index in talk_category_building_types, 13 other, 14 region (talk_build_place_topics); talk lists filter on talk_location_category"
+field,talk_place_topic+0x01,kind,strong,"0 building, 1 quest place, 2 quest person, 3 quest item (names.csv talk_place_topics)"
+field,talk_place_topic+0x02,quest,strong,the quest id (quest_tick_data->id) for kinds 1-3
+field,talk_place_topic+0x03,building,strong,the building (object_building for persons); talk_prepare_where_answer copies it to talk_where.building
+field,talk_place_topic+0x0B,distance,strong,building_distance; talk_build_place_topics sorts by it
+field,talk_place_topic+0x0F,messages,strong,the quest place/person/item's two messages
+field,talk_where+0x04,pad04,candidate,talk_prepare_where_answer clears the short; talk_hint_text_id answers with the building only when it is 0
+field,talk_where+0x07,region,strong,talk_prepare_where_answer = current_region; %reg macros (macro_reg_where_target_region)
+field,talk_where+0x10,kind,candidate,talk_prepare_where_answer sets 5 for a place in the region
+field,talk_where+0x12,building,strong,"the where-is topic's building (talk_place_topic.building); %loc, talk_hint_text_id (object id +0x14)"
+field,tex_cache_entry+0x0C,image,strong,"the decoded frame's struct texture_header (monster_init reads frame_time, rdb_create_objects height and x_scale)"
 field,text_rsc_entry+0x00,id,strong,short: text_rsc_load searches the TEXT.RSC index for it
 field,text_rsc_entry+0x02,offset,strong,int file offset of the text; the next entry's offset ends it (text_rsc_load_variant)
 field,texture_header+0x04,width,strong,"u16 (inv_draw_cell_mark, inv_draw_item_image, paperdoll_draw_item, town_block_create_misc_objects)"
@@ -2091,6 +2217,8 @@ field,wav_header+0x16,channels,strong,short: sos_load_sample copies it to the sa
 field,wav_header+0x18,rate,strong,int samples per second: sos_load_sample copies it to the sample's rate
 field,wav_header+0x22,bits,strong,"short bits per sample: sos_load_sample copies it, 8 -> format 0x8000"
 field,wav_header+0x28,data_size,strong,int: sos_load_sample sets the sample's length to data_size - 44
+field,xn_pick_hit+0x00,plane,strong,engine_pick_object copies it to click_face_texture
+field,xn_pick_hit+0x04,model,strong,"engine_pick_object: 1 nothing, 0 a flat (the record is the flat's draw handle), else the hit model's slot (pick_model_cb compares &instance.model)"
 field,xz_step+0x00,dx,strong,short: D_0017B657[yaw >> 9]: the pedestrians' look-ahead (pedestrian_can_stand_at)
 field,xz_step+0x02,dz,strong,short
 func,0x00010010,main,strong,"entry from the C runtime with (argc, argv); setup, then the endless frame loop that calls game_frame and bumps frame_counter"

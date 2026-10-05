@@ -2,7 +2,6 @@
 #include "records.h"
 
 #pragma pack(1)
-struct Npc { short timer; char pad[78]; };
 extern unsigned disk_last_file_size;
 extern char *xn_shade_translucent_table;
 extern char *xn_water_tint_table;
@@ -48,7 +47,7 @@ extern char D_001751DF[];
 extern char *controls_file;
 extern char default_key_map[];
 extern int cfg_texture_memory;
-extern struct Npc region_price_adjustment[];
+extern struct region regions[];
 extern signed char text_buffer[];
 extern char *hud_compass_image;
 extern char *D_00190908;
@@ -259,7 +258,7 @@ void init_game_data(void)
     unlink(D_001751AF);
     faction_load_file();
     for (i = 0; i < 62; i++)
-        region_price_adjustment[i].timer = rand_range(0, 500) + 750;
+        regions[i].price_adjustment = rand_range(0, 500) + 750;
     if (sound_init_music() == 0)
         flag = 1;
     xn_water_init();

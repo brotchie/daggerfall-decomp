@@ -172,6 +172,15 @@ GLOBAL_TYPES = {
     "rmb_record_ptr": "block",          # the RMB subrecord being read: its header is a block's
     "D_00196D48": "collide_hits",       # colstuff.c: XnGine's last collision result
     "D_00196D4C": "collide_probe",      # the probe being tested (move_request.probe)
+    # phase 3 final: the block files (records.h)
+    "rmb_block": "rmb_file",            # the RMB file being loaded (town_block_load_rmb)
+    "D_00199604": "rdb_file",           # the RDB file being loaded (dungeon_load_rdb_block)
+    "D_0019960C": "rdb_model",          # fs2df.c: the current model resource
+    "D_00199600": "rdb_action",         # its action
+    "D_001995F4": "rdb_light",          # the current light resource
+    "D_001995F0": "rdb_flat",           # the current flat resource
+    "D_00199608": "dungeon_block",      # the dungeon block being loaded
+    "current_region_data": "region",    # &regions[current_region] (region_enter)
     # arrays of record pointers
     "inventory_containers[]": "record",
     "D_00190504[]": "record",           # the creatures (creature_count of them)

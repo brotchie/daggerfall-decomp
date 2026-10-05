@@ -16,7 +16,7 @@ extern unsigned char D_001940D7;
 extern signed char player_motion_flags;
 extern char frame_counter[];
 extern struct record *player_object;
-extern char D_00195AB4[];
+extern struct arch3d_plane *collide_floor_plane;
 extern int vertical_velocity;
 extern struct record *location_object;
 extern char cheat_flags[];
@@ -33,7 +33,7 @@ extern int D_00195CD8;
 extern int nearest_creature_distance;
 extern int ai_monster_flags;
 extern struct record *nearest_creature;
-extern char click_face_texture[];
+extern struct arch3d_plane *click_face_texture;
 extern signed char player_on_ground;
 extern signed char in_dungeon_water;
 extern signed char D_00196296;
@@ -134,7 +134,7 @@ void collide_segment_model_cb(struct record *object)
                 model = &block_model->model;
                 if (*model != 0) {
                     if ((*(int *)&D_00196D48 = xn_collide_segment_model(model, (int)D_00196B10, (int)D_00196B28, 0)) != 0 && (int)D_00196D48 != (-1)) {
-                        *(int *)click_face_texture = (int)(*model + D_00196D48->hits[0].face);
+                        click_face_texture = (struct arch3d_plane *)(*model + D_00196D48->hits[0].face);
                         *(signed char *)collide_flags |= 2;
                         D_00195C48 = object;
                     }
@@ -149,7 +149,7 @@ void collide_segment_model_cb(struct record *object)
                 model = &block_model->model;
                 if (*model != 0) {
                     if ((*(int *)&D_00196D48 = xn_collide_segment_model(model, (int)D_00196B10, (int)D_00196B28, 0)) != 0 && (int)D_00196D48 != (-1)) {
-                        *(int *)click_face_texture = (int)(*model + D_00196D48->hits[0].face);
+                        click_face_texture = (struct arch3d_plane *)(*model + D_00196D48->hits[0].face);
                         *(signed char *)collide_flags |= 2;
                         D_00195C48 = object;
                     }
@@ -167,7 +167,7 @@ void collide_segment_model_cb(struct record *object)
         if ((*(int *)&D_00196D48 = xn_collide_segment_model(model, (int)D_00196B10, (int)D_00196B28, 0)) == 0 || (int)D_00196D48 == (-1)) {
             return;
         }
-        *(int *)click_face_texture = (int)(*model + D_00196D48->hits[0].face);
+        click_face_texture = (struct arch3d_plane *)(*model + D_00196D48->hits[0].face);
         *(signed char *)collide_flags |= 2;
         D_00195C48 = object;
     default:;
@@ -195,7 +195,7 @@ void collide_vertical_cb(struct record *object)
                     for (j = 0; j < D_00196D48->count; j++) {
                         if ((*(int *)scratch_190be4 != 0 && D_00196D48->hits[j].y > collide_height) || D_00196D48->hits[j].y < collide_height) {
                             collide_height = D_00196D48->hits[j].y;
-                            *(int *)D_00195AB4 = (int)(*model + D_00196D48->hits[j].face);
+                            collide_floor_plane = (struct arch3d_plane *)(*model + D_00196D48->hits[j].face);
                             D_00195CD8 = (int)&D_00196D48->hits[j];
                             D_00195CB8 = object;
                         }
@@ -214,7 +214,7 @@ void collide_vertical_cb(struct record *object)
                     for (j = 0; j < D_00196D48->count; j++) {
                         if ((*(int *)scratch_190be4 != 0 && D_00196D48->hits[j].y > collide_height) || D_00196D48->hits[j].y < collide_height) {
                             collide_height = D_00196D48->hits[j].y;
-                            *(int *)D_00195AB4 = (int)(*model + D_00196D48->hits[j].face);
+                            collide_floor_plane = (struct arch3d_plane *)(*model + D_00196D48->hits[j].face);
                             D_00195CD8 = (int)&D_00196D48->hits[j];
                             D_00195CB8 = object;
                         }
@@ -234,7 +234,7 @@ void collide_vertical_cb(struct record *object)
         for (j = 0; j < D_00196D48->count; j++) {
             if ((*(int *)scratch_190be4 != 0 && D_00196D48->hits[j].y > collide_height) || D_00196D48->hits[j].y < collide_height) {
                 collide_height = D_00196D48->hits[j].y;
-                *(int *)D_00195AB4 = (int)(*model + D_00196D48->hits[j].face);
+                collide_floor_plane = (struct arch3d_plane *)(*model + D_00196D48->hits[j].face);
                 D_00195CD8 = (int)&D_00196D48->hits[j];
                 D_00195CB8 = object;
             }
@@ -266,7 +266,7 @@ void func_00022174(struct record *object)
                 if (*model != 0) {
                     if ((*(int *)&D_00196D48 = xn_collide_spheres_model(model, (int)D_00196D4C, 0)) != 0 && (int)D_00196D48 != (-1)) {
                         D_00196D50 = (int)D_00196D48;
-                        *(int *)click_face_texture = (int)(*model + D_00196D48->hits[0].face);
+                        click_face_texture = (struct arch3d_plane *)(*model + D_00196D48->hits[0].face);
                         D_00195CD4 = (int)D_00196D48->hits;
                         *(signed char *)collide_flags |= 2;
                         D_00195C48 = object;
@@ -283,7 +283,7 @@ void func_00022174(struct record *object)
                 if (*model != 0) {
                     if ((*(int *)&D_00196D48 = xn_collide_spheres_model(model, (int)D_00196D4C, 0)) != 0 && (int)D_00196D48 != (-1)) {
                         D_00196D50 = (int)D_00196D48;
-                        *(int *)click_face_texture = (int)(*model + D_00196D48->hits[0].face);
+                        click_face_texture = (struct arch3d_plane *)(*model + D_00196D48->hits[0].face);
                         D_00195CD4 = (int)D_00196D48->hits;
                         *(signed char *)collide_flags |= 2;
                         D_00195C48 = object;
@@ -310,7 +310,7 @@ L22468:;
             if (object->move_frame == *(int *)frame_counter || (((int)(short)(*(short *)collide_flags & 4)) != 0 && ((int)(short)(*(short *)collide_flags & 2)) == 0)) {
                 if ((*(int *)&D_00196D48 = xn_collide_spheres_model(model, (int)D_00196D4C, 0)) != 0 && (int)D_00196D48 != (-1)) {
                     D_00196D50 = (int)D_00196D48;
-                    *(int *)click_face_texture = (int)(*model + D_00196D48->hits[0].face);
+                    click_face_texture = (struct arch3d_plane *)(*model + D_00196D48->hits[0].face);
                     D_00195CD4 = (int)D_00196D48->hits;
                     *(signed char *)collide_flags |= 2;
                     D_00195C70 = object;

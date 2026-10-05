@@ -30,12 +30,12 @@ extern char scratch_buffer[];
 extern signed char current_region;
 extern signed char mouse_buttons_prev;
 extern int region_location_type_counts[];
-extern char dungeon_blocks[];
+extern struct dungeon_block dungeon_blocks[];
 extern int town_house_skip_percent;
 extern int town_building_counter;
 extern char location_exterior[];
 extern int region_location_count;
-extern char rmb_block[];
+extern struct rmb_file *rmb_block;
 extern char region_dungeon_type_counts[];
 extern char *D_00196A7C;
 extern struct map_location *location_here;
@@ -353,13 +353,13 @@ void rmb_index_records(void)
     int cursor;
     int i;
 
-    cursor = *(int *)rmb_block + 6776;
-    for (i = 0; ((int)(unsigned char)*(signed char *)(*(char **)rmb_block)) > i; i++) {
-        *(int *)(*(char **)rmb_block + 1475 + (i << 2)) = cursor;
-        cursor += *(int *)(*(char **)rmb_block + 1603 + (i << 2));
+    cursor = (int)rmb_block->data;
+    for (i = 0; rmb_block->block_data_count > i; i++) {
+        rmb_block->block_data[i] = (struct block *)cursor;
+        cursor += rmb_block->block_data_sizes[i];
     }
-    *(int *)(*(char **)rmb_block + 1731) = cursor;
-    *(int *)(*(char **)rmb_block + 1735) = (int)(*(char **)(*(char **)rmb_block + 1731) + (((int)(unsigned char)*(signed char *)(*(char **)rmb_block + 1)) * 66));
+    rmb_block->misc_models = (struct block_model *)cursor;
+    rmb_block->misc_flats = (struct block_flat *)(rmb_block->misc_models + rmb_block->misc_model_count);
 }
 
 void town_block_create_misc_objects(struct record *block_object)
@@ -373,24 +373,24 @@ void town_block_create_misc_objects(struct record *block_object)
     int unused1;
     int unused2;
 
-    size = ((int)(unsigned char)*(signed char *)(*(char **)rmb_block + 1)) * 66;
-    size += ((int)(unsigned char)*(signed char *)(*(char **)rmb_block + 2)) * 17;
+    size = rmb_block->misc_model_count * 66;
+    size += rmb_block->misc_flat_count * 17;
     object = object_create_child(block_object, 0, size);
     object->type = 56;
-    object->model_count = (unsigned short)(unsigned char)*(signed char *)(*(char **)rmb_block + 1);
-    object->flat_count = (unsigned short)(unsigned char)*(signed char *)(*(char **)rmb_block + 2);
+    object->model_count = rmb_block->misc_model_count;
+    object->flat_count = rmb_block->misc_flat_count;
     object->id = location_object->id;
     model = (struct block_model *)RECORD_DATA(object);
-    flat = (struct block_flat *)((char *)model + (((int)(unsigned char)*(signed char *)(*(char **)rmb_block + 1)) * 66));
-    mc_memcpy(model, *(int *)(*(char **)rmb_block + 1731), ((int)(unsigned char)*(signed char *)(*(char **)rmb_block + 1)) * 66, (int)D_001704CC, 565, 4);
-    mc_memcpy(flat, *(int *)(*(char **)rmb_block + 1735), ((int)(unsigned char)*(signed char *)(*(char **)rmb_block + 2)) * 17, (int)D_001704CC, 566, 4);
-    for (i = 0; ((int)(unsigned char)*(signed char *)(*(char **)rmb_block + 1)) > i; i++, model++) {
+    flat = (struct block_flat *)(model + rmb_block->misc_model_count);
+    mc_memcpy(model, (int)rmb_block->misc_models, rmb_block->misc_model_count * 66, (int)D_001704CC, 565, 4);
+    mc_memcpy(flat, (int)rmb_block->misc_flats, rmb_block->misc_flat_count * 17, (int)D_001704CC, 566, 4);
+    for (i = 0; rmb_block->misc_model_count > i; i++, model++) {
         model->model = 0;
         model->x += block_origin_x;
         model->z += block_origin_z;
         model->y += xn_terrain_height_at(model->x, model->z);
     }
-    for (i = 0; ((int)(unsigned char)*(signed char *)(*(char **)rmb_block + 2)) > i; i++, flat++) {
+    for (i = 0; rmb_block->misc_flat_count > i; i++, flat++) {
         flat->x += block_origin_x;
         flat->z += block_origin_z;
         flat->y += xn_terrain_height_at(flat->x, flat->z);
@@ -424,7 +424,7 @@ void town_block_create_misc_objects(struct record *block_object)
             }
         }
     }
-    mc_memcpy(RECORD_DATA(block_object), (int)&*(signed char *)(*(char **)rmb_block + 6347), 429, (int)D_001704CC, 607, 4);
+    mc_memcpy(RECORD_DATA(block_object), (int)rmb_block->name, 429, (int)D_001704CC, 607, 4);
 }
 
 void town_load_blocks(void)
@@ -439,7 +439,7 @@ void town_load_blocks(void)
 
     building = current_location->buildings;
     town_building_counter = 0;
-    *(int *)rmb_block = D_00147954;
+    rmb_block = (struct rmb_file *)D_00147954;
     blocks_bsa = archive_open(D_0017053F, 0, 0);
     switch (current_location->kind) {
     case 0:
@@ -464,7 +464,7 @@ void town_load_blocks(void)
             rmb_index_records();
             town_map_add_block(block_x, (int)&*(signed char *)((char *)(current_location->height - block_z) - 1));
             town_block_apply_ground(block_origin_x, block_origin_z);
-            for (i = 0; ((int)(unsigned char)*(signed char *)(*(char **)rmb_block)) > i; i++) {
+            for (i = 0; rmb_block->block_data_count > i; i++) {
                 town_block_place_building(building, i);
                 building_object = rmb_add_building(block_object, i);
                 if ((building_object->flags & 8) == 0) {

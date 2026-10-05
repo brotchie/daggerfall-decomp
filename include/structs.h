@@ -22,6 +22,9 @@
 
 struct record;
 
+/* the BIOS tick count (18.2 a second) in the BIOS data area, 0040:006C */
+#define BIOS_TICKS (*(int *)0x46C)
+
 /* ---- the engine -------------------------------------------------------------------------- */
 
 /* a point or a vector in world units (1/40 m): a record's x, y, z, the collision probe's
@@ -78,6 +81,60 @@ struct collide_hits {
     int count;                      /* +0x00 */
     struct collide_hit hits[1];     /* +0x04: count of them */
 };
+
+/* a 3D model (ARCH3D.BSA) as model_load keeps it: the file's header (DFU Arch3dFile
+ * FileHeader, 64 bytes; the version is "v2.7"), then the data its offsets point at, from the
+ * start of the header. A model instance or a block model holds a pointer to it (their `model`),
+ * and the pick and collision code pass the address of that pointer (arch3d_plane_at) */
+struct arch3d_header {
+    char version[4];                /* +0x00 */
+    int point_count;                /* +0x04 */
+    int plane_count;                /* +0x08 */
+    int radius;                     /* +0x0C */
+    char null_value1[8];            /* +0x10 */
+    int plane_data_offset;          /* +0x18 */
+    int object_data_offset;         /* +0x1C */
+    int object_data_count;          /* +0x20 */
+    int unknown2;                   /* +0x24 */
+    char null_value2[8];            /* +0x28 */
+    int point_list_offset;          /* +0x30 */
+    int normal_list_offset;         /* +0x34 */
+    int unknown3;                   /* +0x38 */
+    int plane_list_offset;          /* +0x3C: the planes, one after the other */
+};                                  /* +0x40 */
+RECORD_SIZE(arch3d_header, 64);
+
+/* a point of a model's plane (DFU Arch3dFile PlanePoint) */
+struct arch3d_plane_point {
+    int point_offset;               /* +0x00 */
+    short u;                        /* +0x04 */
+    short v;                        /* +0x06 */
+};                                  /* +0x08 */
+RECORD_SIZE(arch3d_plane_point, 8);
+
+/* a plane (face) of a model (DFU Arch3dFile PlaneHeader, then its points): the face the pick
+ * or the collision code hit is click_face_texture */
+struct arch3d_plane {
+    unsigned char point_count;      /* +0x00: DFU PlanePointCount */
+    unsigned char unknown1;         /* +0x01 */
+    unsigned short texture;         /* +0x02: archive<<7 | record (arch3d_apply_climate_textures maps
+                                       the archive by climate; click_world_face) */
+    signed char floor_sound;        /* +0x04: DFU Unknown2's low byte: in a dungeon, the footstep
+                                       sound (0-4) of the floor plane (footstep_sounds) */
+    char pad05[3];                  /* +0x05 */
+    struct arch3d_plane_point points[1]; /* +0x08: point_count of them */
+};
+RECORD_OFFSET(arch3d_plane, points, 8);
+
+/* what xn_render_pick returns for the point under the cursor (engine_pick_object keeps it in
+ * pick_hit): the record of a drawn polygon, or of a flat (whose address is then the flat's
+ * draw handle, pick_sprite_cb); the first 8 bytes */
+struct xn_pick_hit {
+    struct arch3d_plane *plane;     /* +0x00: a polygon's plane (click_face_texture) */
+    int model;                      /* +0x04: a polygon's: the address of its model pointer (pick_model_cb
+                                       compares &instance.model); 0 a flat, 1 nothing to pick */
+};                                  /* +0x08 */
+RECORD_SIZE(xn_pick_hit, 8);
 
 /* ---- files ------------------------------------------------------------------------------ */
 
@@ -163,6 +220,14 @@ struct texture_header {
 };                                  /* +0x1C */
 RECORD_SIZE(texture_header, 28);
 
+/* a TEXTURE.nnn record's entry in XnGine's texture cache, as xn_tex_cache_lookup returns it
+ * (the first 16 bytes) */
+struct tex_cache_entry {
+    char pad00[12];                 /* +0x00 */
+    struct texture_header *image;   /* +0x0C: the decoded frame (its header, then the pixels) */
+};                                  /* +0x10 */
+RECORD_SIZE(tex_cache_entry, 16);
+
 /* a BSA archive's directory entry: type-256 archives name their records, the others number them */
 struct bsa_name_entry {
     char name[14];                  /* +0x00 */
@@ -175,6 +240,14 @@ struct bsa_id_entry {
     int size;                       /* +0x04 */
 };                                  /* +0x08 */
 RECORD_SIZE(bsa_id_entry, 8);
+
+/* a run of a row of a PAK file (CLIMATE.PAK, POLITIC.PAK; DFU PakFile): `count` map cells of
+ * `value`; the file starts with each row's offset (pak_lookup) */
+struct pak_run {
+    short count;                    /* +0x00 */
+    unsigned char value;            /* +0x02 */
+};                                  /* +0x03 */
+RECORD_SIZE(pak_run, 3);
 
 /* an entry of TEXT.RSC's index (text_rsc_load: a u16 index size, then these) */
 struct text_rsc_entry {
@@ -246,6 +319,38 @@ struct rect {
 };                                  /* +0x0C */
 RECORD_SIZE(rect, 12);
 
+/* a where-is topic of the talk window (talk_place_topics, in scratch_buffer; talk_place_topic_count
+ * of them): talk_build_place_topics lists the town's buildings by distance, the quest code adds
+ * its places, persons and items */
+struct talk_place_topic {
+    signed char category;           /* +0x00: the building's type's index in talk_category_building_types,
+                                       13 other buildings, 14 the region */
+    unsigned char kind;             /* +0x01: 0 a building, 1 a quest place, 2 a quest person, 3 a quest
+                                       item */
+    unsigned char quest;            /* +0x02: the quest's id (kinds 1-3) */
+    struct building *building;      /* +0x03: 0 none */
+    char pad07[4];                  /* +0x07 */
+    int distance;                   /* +0x0B: building_distance */
+    short messages[2];              /* +0x0F: the quest resource's messages (kinds 1-3) */
+};                                  /* +0x13 */
+RECORD_SIZE(talk_place_topic, 19);
+
+/* what the player asked an NPC where to find (D_001965FC; talk_where_target points at it):
+ * talk_prepare_where_answer fills it, talk_hint_text_id and the %loc, %reg macros read it */
+struct talk_where {
+    char pad00[4];                  /* +0x00 */
+    short pad04;                    /* +0x04: talk_prepare_where_answer clears it; talk_hint_text_id
+                                       answers with the building only when it is 0 */
+    char pad06;                     /* +0x06 */
+    unsigned char region;           /* +0x07: the region asked about (%reg) */
+    char pad08[8];                  /* +0x08 */
+    unsigned char kind;             /* +0x10: 5 for a place in the region (talk_prepare_where_answer) */
+    char pad11;                     /* +0x11 */
+    struct building *building;      /* +0x12: the building asked about (a where-is topic's), 0 none
+                                       (%loc) */
+};
+RECORD_OFFSET(talk_where, building, 0x12);
+
 /* what engine_pick_object finds under a screen point (the global pick_result points to the
  * caller's; the click handlers get it) */
 struct pick_result {
@@ -303,6 +408,43 @@ struct flat_cfg {
     char name[31];                  /* +0x09 */
 };                                  /* +0x28 */
 RECORD_SIZE(flat_cfg, 40);
+
+/* a region's state (regions[62], saved in SAVEVARS.DAT; current_region_data points at the current
+ * region's, region_enter; DFU PlayerEntity.RegionDataRecord) */
+struct region {
+    unsigned char values[29];       /* +0x00: DFU Values: a set event flag's countdown (region_flag_set:
+                                       random(min, max) from region_event_durations) */
+    unsigned char flags[29];        /* +0x1D: DFU Flags (RegionDataFlags): the events; 0 WarBeginning,
+                                       1 WarOngoing, 2 WarWon, 3 WarLost (region_reset_war) */
+    unsigned char groups[14];       /* +0x3A: DFU Flags2: a group is set while one of its flags is
+                                       (region_event_flag_groups) */
+    unsigned char precipitation_override; /* +0x48: the weather + 1 forced for the region, 0 none
+                                       (sky_update, weather_draw_precipitation) */
+    unsigned char punishment_flags; /* +0x49: DFU SeverePunishmentFlags: 1 banished, 2 death sentence */
+    short legal_reputation;         /* +0x4A: DFU LegalRep */
+    short persecuted_temple;        /* +0x4C: DFU IDOfPersecutedTemple: a god's faction id (%prg, %ptm) */
+    unsigned short price_adjustment; /* +0x4E: DFU PriceAdjustment: 1000 normal, 250-4000 */
+};                                  /* +0x50 */
+RECORD_SIZE(region, 80);
+
+/* a block of the dungeon being loaded (dungeon_blocks[32], from MAPS; DFU DungeonBlock):
+ * dungeon_load_rdb_block loads its RDB file (rdb_dungeon_block points at it meanwhile) */
+struct dungeon_block {
+    signed char x;                  /* +0x00: in blocks */
+    signed char z;                  /* +0x01 */
+    unsigned short number:10;       /* +0x02: DFU BlockNumber: the RDB file's number */
+    unsigned short is_starting:1;   /*        DFU IsStartingBlock */
+    unsigned short index:3;         /*        DFU BlockIndex: the file's letter ('NWLSBM', D_0017A844) */
+};                                  /* +0x04 */
+RECORD_SIZE(dungeon_block, 4);
+
+/* the objects made for an RDB block's objects (rdb_object_ids[512], rdb_object_id_count of them;
+ * rdb_create_objects): rdb_object_id_by_offset gives the links their objects' ids */
+struct rdb_object_id {
+    int offset;                     /* +0x00: the RDB object's, from the start of the file */
+    int id;                         /* +0x04: the object's record id */
+};                                  /* +0x08 */
+RECORD_SIZE(rdb_object_id, 8);
 
 /* a door of the location being loaded (loaded_location.doors, from MAPS) */
 struct location_door {

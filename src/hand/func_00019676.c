@@ -1,20 +1,10 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x00019676 */
 #include "records.h"
 
-struct gstate {
-    char f0;
-    char f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12;
-    char pad13[6];
-    char f19, f20, f21;
-    char pad22[8];
-    char f30[18];
-    short f48;
-    char pad50[30];
-};
 extern unsigned char D_00178E59;
 extern unsigned char D_00178E5F;
 extern int D_0017C912[];
-extern struct gstate D_0018F060[];
+extern struct region regions[];
 extern int D_00195B84;
 extern char current_region;
 extern char D_00196269;
@@ -90,9 +80,9 @@ void faction_politics_update(int mode)
             faction_add_power(faction, 1);
         if (mode == 2) {
             power_bonus = faction->power / 5;
-            if (faction_is_regional_noble(faction) && D_0018F060[faction->region].f1) {
-                D_0018F060[faction->region].f1 = 0;
-                D_0018F060[faction->region].f2 = 1;
+            if (faction_is_regional_noble(faction) && regions[faction->region].flags[0]) {
+                regions[faction->region].flags[0] = 0;
+                regions[faction->region].flags[1] = 1;
             }
             for (j = 0; j < 3; j++) {
                 roll = rand_range(0, 100);
@@ -133,7 +123,7 @@ void faction_politics_update(int mode)
             D_00195B84 = 0;
             if (factions_can_war(faction, faction->enemies[0]) || factions_can_war(faction, faction->enemies[1]) || factions_can_war(faction, faction->enemies[2])) {
                 D_00195B84--;
-                if (D_0018F060[faction->region].f3 || D_0018F060[faction->region].f4) {
+                if (regions[faction->region].flags[2] || regions[faction->region].flags[3]) {
                     region_reset_war(faction);
                     region_reset_war(faction->enemies[D_00195B84]);
                     j = D_00195B84;
@@ -141,13 +131,13 @@ void faction_politics_update(int mode)
                     if (factions_can_war(faction->enemies[0], faction) || factions_can_war(faction->enemies[1], faction) || factions_can_war(faction->enemies[2], faction))
                         faction->enemies[j]->enemies[D_00195B84 - 1] = 0;
                     faction->enemies[j] = 0;
-                } else if (D_0018F060[faction->region].f1) {
+                } else if (regions[faction->region].flags[0]) {
                     other = faction->enemies[D_00195B84];
                     rumor_add_faction(faction, other, 0, faction->region, 1479);
                     rumor_add_faction(other, faction, 0, other->region, 1479);
                     region_flag_set(faction->region, 1);
                     region_flag_set(other->region, 1);
-                } else if (D_0018F060[faction->region].f2) {
+                } else if (regions[faction->region].flags[1]) {
                     if (rand_range(1, 100) <= 5) {
                         region_flag_clear(faction->region, 1);
                         region_flag_clear(faction->enemies[D_00195B84]->region, 1);
@@ -230,14 +220,14 @@ void faction_politics_update(int mode)
             if (faction->region == 255 || faction->type != 7)
                 continue;
             ally_power = (faction_power(faction->allies[0]) + faction_power(faction->allies[1]) + faction_power(faction->allies[2])) / 10;
-            if (D_0018F060[faction->region].f10) {
+            if (regions[faction->region].flags[9]) {
                 region_flag_clear(faction->region, 9);
-            } else if (D_0018F060[faction->region].f9) {
+            } else if (regions[faction->region].flags[8]) {
                 if ((unsigned)rand_range(0, 100) < ally_power + faction->politics_factor / 5 + faction->power / 5) {
                     rumor_add_faction(faction, 0, 7, faction->region, 1477);
                     region_flag_set(faction->region, 9);
                 }
-            } else if (D_0018F060[faction->region].f8) {
+            } else if (regions[faction->region].flags[7]) {
                 rumor_add_faction(faction, 0, 7, faction->region, 1477);
                 region_flag_set(faction->region, 8);
             } else if (rand_range(1, 100) <= 2) {
@@ -250,9 +240,9 @@ void faction_politics_update(int mode)
                 other = faction_find(D_0017C912[faction->region]);
             else
                 other = 0;
-            if (D_0018F060[faction->region].f7) {
+            if (regions[faction->region].flags[6]) {
                 region_flag_clear(faction->region, 6);
-            } else if (D_0018F060[faction->region].f6) {
+            } else if (regions[faction->region].flags[5]) {
                 if (other)
                     other->power--;
                 faction->power--;
@@ -260,7 +250,7 @@ void faction_politics_update(int mode)
                     rumor_add_faction(faction, 0, 4, faction->region, 1478);
                     region_flag_set(faction->region, 6);
                 }
-            } else if (D_0018F060[faction->region].f5) {
+            } else if (regions[faction->region].flags[4]) {
                 if (other)
                     other->power--;
                 faction->power--;
@@ -277,11 +267,11 @@ void faction_politics_update(int mode)
             }
             if (D_0017C912[faction->region]) {
                 other = faction_find(D_0017C912[faction->region]);
-                if (D_0018F060[faction->region].f19)
+                if (regions[faction->region].flags[18])
                     other->power--;
                 if (rand_range(0, 100) < (other->power - faction->power + 5) / 5) {
                     if (other->power < faction->power * 2) {
-                        D_0018F060[faction->region].f48 = other->id;
+                        regions[faction->region].persecuted_temple = other->id;
                         rumor_add_faction(faction, 0, 18, faction->region, 1476);
                         region_flag_set(faction->region, 18);
                         other->power--;
@@ -294,7 +284,7 @@ void faction_politics_update(int mode)
             } else {
                 region_flag_clear(faction->region, 18);
             }
-            if (D_0018F060[faction->region].f12)
+            if (regions[faction->region].flags[11])
                 faction->power--;
             j = (faction_find(42)->power + faction_find(108)->power) / 2;
             if (rand_range(0, 100) < (j - faction->power + 5) / 5) {
@@ -304,7 +294,7 @@ void faction_politics_update(int mode)
             } else {
                 region_flag_clear(faction->region, 11);
             }
-            if (D_0018F060[faction->region].f11)
+            if (regions[faction->region].flags[10])
                 faction_add_power(faction_find_type_in_region(faction->region, 8), -1);
             other = faction_find_type_in_region(faction->region, 8);
             if (other) {
@@ -322,27 +312,27 @@ void faction_politics_update(int mode)
     }
     if (mode == 2) {
         for (j = i = 0; i < 62; i++)
-            if (D_0018F060[i].f12)
+            if (regions[i].flags[11])
                 j++;
         faction_add_power(faction_find(42), j - 1);
         faction_add_power(faction_find(108), j - 1);
         for (j = i = 0; i < 62; i++)
-            if (D_0018F060[i].f20)
+            if (regions[i].flags[19])
                 j++;
         if (j >= 3)
             faction_add_power(faction_find(510), 1);
         for (j = i = 0; i < 62; i++)
-            if (D_0018F060[i].f21)
+            if (regions[i].flags[20])
                 j++;
         if (j >= 3)
             faction_add_power(faction_find(510), -1);
         for (j = i = 0; i < 62; i++)
-            if (D_0018F060[i].f30[D_00178E5F])
+            if (regions[i].groups[D_00178E5F])
                 j++;
         if (j >= 3)
             faction_add_power(faction_find(510), -1);
         for (j = i = 0; i < 62; i++)
-            if (D_0018F060[i].f30[D_00178E59])
+            if (regions[i].groups[D_00178E59])
                 j++;
         if (j >= 3)
             faction_add_power(faction_find(510), 1);

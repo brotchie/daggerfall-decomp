@@ -13,148 +13,147 @@ extern int window_image;
 extern unsigned char D_0019626F;
 extern signed char D_00196272;
 extern signed char game_mode;
-extern char D_001985D4[];
-extern char D_001985D8[];
+extern struct rdb_object_id rdb_object_ids[];
 extern struct link *D_001995E4;
-extern char *D_001995E8;
+extern char *rdb_data;
 extern struct link *D_001995EC;
-extern char D_001995F0[];
-extern char D_001995F4[];
-extern char D_00199600[];
-extern char D_00199604[];
-extern char D_0019960C[];
-extern int D_00199614;
-extern short D_00199618;
+extern struct rdb_flat *rdb_flat_resource;
+extern struct rdb_light *rdb_light_resource;
+extern struct rdb_action *rdb_action_resource;
+extern struct rdb_file *rdb_loaded_file;
+extern struct rdb_model *rdb_model_resource;
+extern int rdb_object_id_count;
+extern short rdb_link_object_id;
 extern int spellmaker_settings_image;
-extern char links[];
+extern struct link links[];
 extern int link_count;
 
 extern int spellmaker_new(void);
 extern int disk_read_file(char *, int);
 extern int mc_memset();
 short rdb_object_id_by_offset(int);
-void func_000361B7(int);
+void func_000361B7(struct rdb_model *);
 void rdb_build_action_chain(int);
-void action_record_add(int, int, int, unsigned char);
-void action_record_add_chained(int, int, int, unsigned char);
+void action_record_add(struct rdb_model *, struct rdb_action *, struct rdb_flat *, unsigned char);
+void action_record_add_chained(struct rdb_model *, struct rdb_action *, struct rdb_flat *, unsigned char);
 void action_axis_to_translation(struct link *);
 
-void func_000361B7(int model)
+void func_000361B7(struct rdb_model *model)
 {
-    int entry;
+    struct rdb_unknown_entry *entry;
     int key;
 
     key = 0;
-    entry = (int)(D_001995E8 + *(int *)(*(char **)D_00199604 + 9020));
-    while (((int)(short)*(short *)((char *)entry + 4)) != key) {
-        entry = (int)(D_001995E8 + *(int *)((char *)entry));
+    entry = (struct rdb_unknown_entry *)(rdb_data + rdb_loaded_file->object_header.unknown_offset);
+    while (entry->key != key) {
+        entry = (struct rdb_unknown_entry *)(rdb_data + entry->next);
     }
-    *(int *)((char *)model + 19) = *(int *)((char *)entry + 6);
-    *(short *)((char *)model + 14) = *(short *)((char *)entry + 10);
-    *(signed char *)((char *)model + 18) = *(signed char *)((char *)entry + 12);
+    model->action_offset = entry->action_offset;
+    model->trigger_flag_starting_lock = entry->trigger_flag_starting_lock;
+    model->sound_index = entry->sound_index;
 }
 
-void rdb_link_actions(struct record *quarter, int rdb_object, int block_index)
+void rdb_link_actions(struct record *quarter, struct rdb_object *rdb_object, int block_index)
 {
     int unused1;
     int unused2;
     int offset;
 
     do {
-        offset = rdb_object - (int)D_001995E8;
-        switch ((unsigned char)(*(signed char *)((char *)rdb_object + 20) & 63)) {
+        offset = (char *)rdb_object - rdb_data;
+        switch (rdb_object->type) {
         case 1:
-            if (*(int *)((char *)(*(int *)D_0019960C = (int)(D_001995E8 + *(int *)((char *)rdb_object + 21))) + 19) < 0) {
-                func_000361B7(*(int *)D_0019960C);
+            if ((rdb_model_resource = (struct rdb_model *)(rdb_data + rdb_object->resource_offset))->action_offset < 0) {
+                func_000361B7(rdb_model_resource);
             }
-            if (*(short *)(*(char **)D_0019960C + 14) != 0) {
-                *(int *)D_00199600 = (int)(D_001995E8 + *(int *)(*(char **)D_0019960C + 19));
-                D_00199618 = rdb_object_id_by_offset(offset);
-                rdb_build_action_chain((int)(unsigned char)(*(signed char *)((char *)rdb_object + 20) & 63));
+            if (rdb_model_resource->trigger_flag_starting_lock != 0) {
+                rdb_action_resource = (struct rdb_action *)(rdb_data + rdb_model_resource->action_offset);
+                rdb_link_object_id = rdb_object_id_by_offset(offset);
+                rdb_build_action_chain(rdb_object->type);
             }
             break;
         case 2:
-            *(int *)D_001995F4 = (int)(D_001995E8 + *(int *)((char *)rdb_object + 21));
+            rdb_light_resource = (struct rdb_light *)(rdb_data + rdb_object->resource_offset);
             break;
         case 3:
-            if ((*(short *)((char *)(*(int *)D_001995F0 = (int)(D_001995E8 + *(int *)((char *)rdb_object + 21))) + 2) != 0 && ((int)(unsigned short)*(short *)(*(char **)D_001995F0)) != 25482) || (((int)(unsigned short)*(short *)(*(char **)D_001995F0)) == 25490 && ((int)(unsigned char)*(signed char *)(*(char **)D_001995F0 + 4)) == 70 && *(int *)(*(char **)D_001995F0 + 6) == 16747 && ((int)(unsigned char)*(signed char *)(*(char **)D_001995F0 + 10)) == 5)) {
-                if (((int)(unsigned short)*(short *)(*(char **)D_001995F0)) != 25488) {
-                    D_00199618 = rdb_object_id_by_offset(offset);
-                    rdb_build_action_chain((int)(unsigned char)(*(signed char *)((char *)rdb_object + 20) & 63));
+            if (((rdb_flat_resource = (struct rdb_flat *)(rdb_data + rdb_object->resource_offset))->flags != 0 && rdb_flat_resource->image != 25482) || (rdb_flat_resource->image == 25490 && rdb_flat_resource->magnitude == 70 && rdb_flat_resource->next_object_offset == 16747 && rdb_flat_resource->action == 5)) {
+                if (rdb_flat_resource->image != 25488) {
+                    rdb_link_object_id = rdb_object_id_by_offset(offset);
+                    rdb_build_action_chain(rdb_object->type);
                 }
             }
         }
-        rdb_object = (int)(D_001995E8 + *(int *)((char *)rdb_object));
-    } while ((rdb_object - (int)D_001995E8) > 0);
+        rdb_object = (struct rdb_object *)(rdb_data + rdb_object->next);
+    } while (((char *)rdb_object - rdb_data) > 0);
 }
 
 short rdb_object_id_by_offset(int offset)
 {
     int i;
 
-    for (i = 0; i < D_00199614; i++) {
-        if (*(int *)(D_001985D4 + (i << 3)) == offset) return *(short *)(D_001985D8 + (i << 3));
+    for (i = 0; i < rdb_object_id_count; i++) {
+        if (rdb_object_ids[i].offset == offset) return rdb_object_ids[i].id;
     }
     return 0;
 }
 
 void rdb_build_action_chain(int resource_type)
 {
-    int rdb_object;
+    struct rdb_object *rdb_object;
     int offset;
 
     switch ((unsigned)resource_type) {
     case 1:
-        action_record_add(*(int *)D_0019960C, *(int *)D_00199600, 0, 0);
-        offset = *(int *)(*(char **)D_00199600 + 5);
+        action_record_add(rdb_model_resource, rdb_action_resource, 0, 0);
+        offset = rdb_action_resource->next_object_offset;
         break;
     case 2:
-        action_record_add(0, 0, 0, (int)(unsigned char)*(signed char *)(*(char **)D_001995F4 + 3));
-        offset = *(int *)(*(char **)D_001995F4 + 4);
+        action_record_add(0, 0, 0, rdb_light_resource->action);
+        offset = rdb_light_resource->next_object_offset;
         break;
     case 3:
-        action_record_add(0, 0, *(int *)D_001995F0, (int)(unsigned char)*(signed char *)(*(char **)D_001995F0 + 10));
-        offset = *(int *)(*(char **)D_001995F0 + 6);
+        action_record_add(0, 0, rdb_flat_resource, rdb_flat_resource->action);
+        offset = rdb_flat_resource->next_object_offset;
     }
     while (offset > 0) {
-        D_00199618 = rdb_object_id_by_offset(offset);
-        rdb_object = (int)(D_001995E8 + offset);
-        switch ((unsigned char)(*(signed char *)((char *)rdb_object + 20) & 63)) {
+        rdb_link_object_id = rdb_object_id_by_offset(offset);
+        rdb_object = (struct rdb_object *)(rdb_data + offset);
+        switch (rdb_object->type) {
         case 1:
-            if (*(int *)((char *)(*(int *)D_0019960C = (int)(D_001995E8 + *(int *)((char *)rdb_object + 21))) + 19) < 0) {
-                func_000361B7(*(int *)D_0019960C);
+            if ((rdb_model_resource = (struct rdb_model *)(rdb_data + rdb_object->resource_offset))->action_offset < 0) {
+                func_000361B7(rdb_model_resource);
             }
-            *(int *)D_00199600 = (int)(D_001995E8 + *(int *)(*(char **)D_0019960C + 19));
-            action_record_add_chained(*(int *)D_0019960C, *(int *)D_00199600, 0, 0);
-            offset = *(int *)(*(char **)D_00199600 + 5);
+            rdb_action_resource = (struct rdb_action *)(rdb_data + rdb_model_resource->action_offset);
+            action_record_add_chained(rdb_model_resource, rdb_action_resource, 0, 0);
+            offset = rdb_action_resource->next_object_offset;
             break;
         case 2:
-            action_record_add_chained(0, 0, 0, (int)(unsigned char)*(signed char *)((char *)(*(int *)D_001995F4 = (int)(D_001995E8 + *(int *)((char *)rdb_object + 21))) + 3));
-            offset = *(int *)(*(char **)D_001995F4 + 4);
+            action_record_add_chained(0, 0, 0, (rdb_light_resource = (struct rdb_light *)(rdb_data + rdb_object->resource_offset))->action);
+            offset = rdb_light_resource->next_object_offset;
             break;
         case 3:
-            action_record_add_chained(0, 0, *(int *)D_001995F0, (int)(unsigned char)*(signed char *)((char *)(*(int *)D_001995F0 = (int)(D_001995E8 + *(int *)((char *)rdb_object + 21))) + 10));
-            offset = *(int *)(*(char **)D_001995F0 + 6);
+            action_record_add_chained(0, 0, rdb_flat_resource, (rdb_flat_resource = (struct rdb_flat *)(rdb_data + rdb_object->resource_offset))->action);
+            offset = rdb_flat_resource->next_object_offset;
         }
     }
 }
 
-void action_record_add(int model, int model_action, int flat, unsigned char action)
+void action_record_add(struct rdb_model *model, struct rdb_action *model_action, struct rdb_flat *flat, unsigned char action)
 {
-    D_001995EC = (D_001995E4 = (struct link *)(((int)links) + (link_count++ * 39)));
+    D_001995EC = (D_001995E4 = &links[link_count++]);
     mc_memset((int)D_001995EC, 0, 39, (int)D_00170AB4, 447, 4);
-    D_001995EC->object_id = D_00199618;
+    D_001995EC->object_id = rdb_link_object_id;
     if (model_action != 0) {
-        D_001995EC->trigger = *(signed char *)((char *)model + 14);
-        D_001995EC->param = *(signed char *)((char *)model + 18);
-        D_001995EC->axis = *(signed char *)((char *)model_action);
-        D_001995EC->duration = *(short *)((char *)model_action + 1);
-        D_001995EC->magnitude = *(short *)((char *)model_action + 3);
-        D_001995EC->action = *(signed char *)((char *)model_action + 9);
+        D_001995EC->trigger = model->trigger_flag_starting_lock;
+        D_001995EC->param = model->sound_index;
+        D_001995EC->axis = model_action->axis;
+        D_001995EC->duration = model_action->duration;
+        D_001995EC->magnitude = model_action->magnitude;
+        D_001995EC->action = model_action->action;
     } else if (flat != 0) {
-        D_001995EC->trigger = *(signed char *)((char *)flat + 2);
-        D_001995EC->param = *(signed char *)((char *)flat + 5);
-        D_001995EC->axis = *(signed char *)((char *)flat + 4);
+        D_001995EC->trigger = flat->flags;
+        D_001995EC->param = flat->sound_index;
+        D_001995EC->axis = flat->magnitude;
         D_001995EC->action = action;
     } else {
         D_001995EC->action = action;
@@ -163,23 +162,23 @@ void action_record_add(int model, int model_action, int flat, unsigned char acti
     D_001995EC->chain_count = 0;
 }
 
-void action_record_add_chained(int model, int model_action, int flat, unsigned char action)
+void action_record_add_chained(struct rdb_model *model, struct rdb_action *model_action, struct rdb_flat *flat, unsigned char action)
 {
     D_001995E4->chain_count++;
-    D_001995EC = (struct link *)(((int)links) + (link_count++ * 39));
+    D_001995EC = &links[link_count++];
     mc_memset((int)D_001995EC, 0, 39, (int)D_00170AB4, 490, 4);
-    D_001995EC->object_id = D_00199618;
+    D_001995EC->object_id = rdb_link_object_id;
     if (model_action != 0) {
-        D_001995EC->trigger = *(signed char *)((char *)model + 14);
-        D_001995EC->param = *(signed char *)((char *)model + 18);
-        D_001995EC->axis = *(signed char *)((char *)model_action);
-        D_001995EC->duration = *(short *)((char *)model_action + 1);
-        D_001995EC->magnitude = *(short *)((char *)model_action + 3);
-        D_001995EC->action = *(signed char *)((char *)model_action + 9);
+        D_001995EC->trigger = model->trigger_flag_starting_lock;
+        D_001995EC->param = model->sound_index;
+        D_001995EC->axis = model_action->axis;
+        D_001995EC->duration = model_action->duration;
+        D_001995EC->magnitude = model_action->magnitude;
+        D_001995EC->action = model_action->action;
     } else if (flat != 0) {
-        D_001995EC->trigger = *(signed char *)((char *)flat + 2);
-        D_001995EC->param = *(signed char *)((char *)flat + 5);
-        D_001995EC->axis = *(signed char *)((char *)flat + 4);
+        D_001995EC->trigger = flat->flags;
+        D_001995EC->param = flat->sound_index;
+        D_001995EC->axis = flat->magnitude;
         D_001995EC->action = action;
     } else {
         D_001995EC->action = action;

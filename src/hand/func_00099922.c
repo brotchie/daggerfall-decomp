@@ -4,7 +4,7 @@
 
 extern unsigned char player_environment;
 extern signed char D_00196297;
-extern char doors_moving[];
+extern struct record *doors_moving[];
 extern void func_00063DDC(struct record *);
 extern void links_trigger(struct record *, int);
 extern int sound_play(int, struct record *, int);
@@ -20,9 +20,9 @@ int door_start_swing(struct record *door, int close)
         door->door_swing = *(int *)1132 | (-1073741824);
     }
     i = 0;
-    while (((struct record **)doors_moving)[i++] != 0);
+    while (doors_moving[i++] != 0);
     i--;
-    ((struct record **)doors_moving)[i] = door;
+    doors_moving[i] = door;
     if (close == 0) {
         sound_play(((((int)player_environment) == 2) ? 362 : 27), door, 100);
     }

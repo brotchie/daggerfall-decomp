@@ -16,8 +16,8 @@ extern struct record *location_object;
 extern struct location *current_location;
 extern int game_minutes;
 extern int D_001AA5FC;
-extern char color_remap_tables[];
-extern char doors_moving[];
+extern unsigned char *color_remap_tables;    /* 32 tables of 256 */
+extern struct record *doors_moving[];
 
 extern int sound_play(int, struct record *, int);
 extern int mc_malloc();
@@ -35,29 +35,29 @@ void color_init_remap_tables(void)
     int colour;
 
     D_001AA5FC = mc_malloc(8448, (int)D_00177350, 59);
-    *(int *)color_remap_tables = xn_mem_align_up(D_001AA5FC, 256);
+    color_remap_tables = (unsigned char *)xn_mem_align_up(D_001AA5FC, 256);
     for (table = 0; table < 32; table++) {
         for (colour = 0; colour < 256; colour++) {
-            *(signed char *)((char *)(int)(*(char **)color_remap_tables + (colour + (table << 8)))) = *(signed char *)&colour;
+            color_remap_tables[colour + (table << 8)] = *(signed char *)&colour;
         }
     }
     for (table = 1; table < 16; table++) {
-        xn_str_fill_ascending((int)(*(char **)color_remap_tables + (table << 8)) + ((int)(unsigned char)D_001886A8[table * 2]), (int)(unsigned char)D_001886A9[table * 2], 16);
+        xn_str_fill_ascending((int)(color_remap_tables + (table << 8)) + ((int)(unsigned char)D_001886A8[table * 2]), (int)(unsigned char)D_001886A9[table * 2], 16);
     }
-    xn_str_fill_ascending(*(int *)color_remap_tables + 6689, 161, 15);
-    xn_str_fill_ascending(*(int *)color_remap_tables + 6721, 193, 15);
-    xn_str_fill_ascending(*(int *)color_remap_tables + 6945, 97, 15);
-    xn_str_fill_ascending(*(int *)color_remap_tables + 6977, 129, 15);
-    xn_str_fill_ascending(*(int *)color_remap_tables + 7201, 161, 15);
-    xn_str_fill_ascending(*(int *)color_remap_tables + 7220, 84, 2);
-    xn_str_fill_ascending(*(int *)color_remap_tables + 7233, 193, 15);
-    *(signed char *)(*(char **)color_remap_tables + 7421) = 216;
-    xn_str_fill_ascending(*(int *)color_remap_tables + 7457, 97, 15);
-    xn_str_fill_ascending(*(int *)color_remap_tables + 7476, 84, 2);
-    xn_str_fill_ascending(*(int *)color_remap_tables + 7489, 129, 15);
-    *(signed char *)(*(char **)color_remap_tables + 7677) = 216;
+    xn_str_fill_ascending((int)color_remap_tables + 6689, 161, 15);
+    xn_str_fill_ascending((int)color_remap_tables + 6721, 193, 15);
+    xn_str_fill_ascending((int)color_remap_tables + 6945, 97, 15);
+    xn_str_fill_ascending((int)color_remap_tables + 6977, 129, 15);
+    xn_str_fill_ascending((int)color_remap_tables + 7201, 161, 15);
+    xn_str_fill_ascending((int)color_remap_tables + 7220, 84, 2);
+    xn_str_fill_ascending((int)color_remap_tables + 7233, 193, 15);
+    color_remap_tables[7421] = 216;
+    xn_str_fill_ascending((int)color_remap_tables + 7457, 97, 15);
+    xn_str_fill_ascending((int)color_remap_tables + 7476, 84, 2);
+    xn_str_fill_ascending((int)color_remap_tables + 7489, 129, 15);
+    color_remap_tables[7677] = 216;
     for (table = 0; table < 10; table++) {
-        mc_memcpy((int)(*(char **)color_remap_tables + ((table << 8) + 4096)) + 112, ((int)D_001886D2) + (table << 4), 16, (int)D_00177350, 87, 4);
+        mc_memcpy((int)(color_remap_tables + ((table << 8) + 4096)) + 112, ((int)D_001886D2) + (table << 4), 16, (int)D_00177350, 87, 4);
     }
 }
 
@@ -85,9 +85,9 @@ void doors_update(void)
     int *ticks;
 
     for (i = 0; i < 16; i++) {
-        if (((struct record **)doors_moving)[i] == 0) continue;
-        door = ((struct record **)doors_moving)[i];
-        if (((struct bf8_7_1 *)((char *)door + 46))->f == 0 && door_blocked_by_player(door) != 0) {
+        if (doors_moving[i] == 0) continue;
+        door = doors_moving[i];
+        if ((door->door_swing & 0x80000000) == 0 && door_blocked_by_player(door) != 0) {
             bios_ticks = (int *)1132;
             door->door_swing = *bios_ticks | (-1073741824);
         }
@@ -99,13 +99,13 @@ void doors_update(void)
             } else if (angle < 0) {
                 angle = 0;
             }
-            ((struct record **)doors_moving)[i] = 0;
-            *(signed char *)((char *)door + 46) &= 191;
-            if (((struct bf8_7_1 *)((char *)door + 46))->f == 0) {
+            doors_moving[i] = 0;
+            door->door_swing &= ~0x40000000;
+            if ((door->door_swing & 0x80000000) == 0) {
                 sound_play(((((int)player_environment) == 2) ? 361 : 26), door, 100);
             }
         }
-        if (((struct bf8_7_1 *)((char *)door + 46))->f == 0) angle = 512 - angle;
+        if ((door->door_swing & 0x80000000) == 0) angle = 512 - angle;
         door->door_angle = angle;
     }
 }

@@ -4,6 +4,7 @@
 #include "records.h"
 #include "bitfield.h"
 
+extern struct region regions[];
 extern signed char D_0012B508;
 extern char D_001711AC[];
 extern unsigned char player_environment;
@@ -14,9 +15,6 @@ extern int ordinal_suffixes[];
 extern int D_001830E2;
 extern signed char D_00187CA8;
 extern int frame_checkpoint;
-extern signed char region_punishment_flags[];
-extern char region_legal_reputation[];
-extern char region_price_adjustment[];
 extern struct record *creature_list[];
 extern signed char scratch_190ce4[];
 extern signed char D_001940D8;
@@ -139,17 +137,17 @@ void time_update_realtime(void)
 {
     int minutes;
     int old_minutes;
-    int bios_clock;
-    int bios_clock2;
+    int *bios_clock;
+    int *bios_clock2;
 
     if (((struct bf8_6_1 *)&D_001940D8)->f != 0 || D_00187CA8 == 0) {
-        bios_clock = 1132;
-        realtime_clock_tick = *(int *)((char *)bios_clock);
+        bios_clock = (int *)1132;
+        realtime_clock_tick = *bios_clock;
         return;
     }
     old_minutes = game_minutes;
-    bios_clock2 = 1132;
-    minutes = ((unsigned)(*(int *)((char *)bios_clock2) - realtime_clock_tick)) / 90;
+    bios_clock2 = (int *)1132;
+    minutes = ((unsigned)(*bios_clock2 - realtime_clock_tick)) / 90;
     realtime_clock_tick += minutes * 90;
     if (((struct bf8_4_1 *)&D_001940D9)->f != 0 && ((int)(unsigned short)(player_character->flags & 1536)) == 0) {
         skill_add_uses(21, 1);
@@ -255,11 +253,11 @@ void time_pass_minutes(int minutes)
         for (i = 0; ((unsigned)i) < minutes; i++) {
             encounter_tick(((game_minutes - minutes) + i) + 1, 0);
         }
-        if (((int)(short)*(short *)(region_legal_reputation + (((int)(unsigned char)current_region) * 80))) < (-10) && rand_range(1, 100) < 5 && game_mode == 0) {
+        if (regions[(unsigned char)current_region].legal_reputation < (-10) && rand_range(1, 100) < 5 && game_mode == 0) {
             crime_current = 7;
             guards_summon(0);
         }
-        if (((int)(unsigned char)(region_punishment_flags[((int)(unsigned char)current_region) * 80] & 1)) != 0 && rand_range(1, 100) < 10 && game_mode == 0) {
+        if (((int)(unsigned char)(regions[(unsigned char)current_region].punishment_flags & 1)) != 0 && rand_range(1, 100) < 10 && game_mode == 0) {
             crime_current = 7;
             guards_summon(0);
         }
@@ -406,10 +404,10 @@ void reputation_decay(void)
 
     if (D_001962B0 == 0) {
         for (i = 0; i < 62; i++) {
-            if (*(short *)(region_legal_reputation + (i * 80)) > 0) {
-                (*(short *)(region_legal_reputation + (i * 80)))--;
-            } else if (*(short *)(region_legal_reputation + (i * 80)) < 0) {
-                (*(short *)(region_legal_reputation + (i * 80)))++;
+            if (regions[i].legal_reputation > 0) {
+                (regions[i].legal_reputation)--;
+            } else if (regions[i].legal_reputation < 0) {
+                (regions[i].legal_reputation)++;
             }
         }
     }
@@ -447,20 +445,20 @@ void region_update_prices(int mode)
         faction = faction_find_type_in_region((int)(short)*(short *)&region, 7);
         if (faction == 0) continue;
         chance = (faction_find(510)->power - faction->power) / 5;
-        chance = (chance + 50) - ((((int)(unsigned short)*(short *)(region_price_adjustment + (region * 80))) - 1000) / 25);
+        chance = (chance + 50) - ((regions[region].price_adjustment - 1000) / 25);
         if (rand_range(0, 100) < chance) {
-            *(short *)(region_price_adjustment + (region * 80)) = (((int)(unsigned short)*(short *)(region_price_adjustment + (region * 80))) * 51) / 50;
+            regions[region].price_adjustment = (regions[region].price_adjustment * 51) / 50;
         } else {
-            *(short *)(region_price_adjustment + (region * 80)) = (((int)(unsigned short)*(short *)(region_price_adjustment + (region * 80))) * 49) / 50;
+            regions[region].price_adjustment = (regions[region].price_adjustment * 49) / 50;
         }
-        if (((int)(unsigned short)*(short *)(region_price_adjustment + (region * 80))) > 4000) {
-            *(short *)(region_price_adjustment + (region * 80)) = 4000;
-        } else if (((int)(unsigned short)*(short *)(region_price_adjustment + (region * 80))) < 250) {
-            *(short *)(region_price_adjustment + (region * 80)) = 250;
+        if (regions[region].price_adjustment > 4000) {
+            regions[region].price_adjustment = 4000;
+        } else if (regions[region].price_adjustment < 250) {
+            regions[region].price_adjustment = 250;
         }
-        if (((int)(unsigned short)*(short *)(region_price_adjustment + (region * 80))) > 2000) {
+        if (regions[region].price_adjustment > 2000) {
             region_flag_set(region, 19);
-        } else if (((int)(unsigned short)*(short *)(region_price_adjustment + (region * 80))) < 500) {
+        } else if (regions[region].price_adjustment < 500) {
             region_flag_set(region, 20);
         } else {
             region_flag_clear(region, 19);
@@ -486,7 +484,7 @@ void loan_due_penalty(void)
     for (region = 0; region < 62; region++) {
         if (account->loan_due == 0) continue;
         if (account->loan_due == game_minutes) {
-            *(short *)(region_legal_reputation + (region * 80)) -= 5;
+            regions[region].legal_reputation -= 5;
         }
     }
 }

@@ -37,7 +37,7 @@ extern int note_search_text;
 extern union note_entry *note_selected;
 extern int D_001997CC;
 extern int note_search_from;
-extern char note_page[];
+extern union note_entry *note_page;
 extern int note_page_backup;
 extern char note_font[];
 extern char note_text_flags[];
@@ -99,9 +99,9 @@ void note_delete_selected(void);
 int note_close(void)
 {
     note_save_page();
-    if (*(int *)note_page != 0 && *(int *)note_page != (-1751672937)) {
-        mc_free(*(int *)note_page, (int)D_00174FAC, 206);
-        *(int *)note_page = -1751672937;
+    if ((int)note_page != 0 && (int)note_page != (-1751672937)) {
+        mc_free((int)note_page, (int)D_00174FAC, 206);
+        note_page = (union note_entry *)-1751672937;
     }
     if (note_rci != 0 && note_rci != (-1751672937)) {
         mc_free(note_rci, (int)D_00174FAC, 207);
@@ -135,7 +135,7 @@ void note_click_page(void)
 
     if (note_tool == 0 && note_action == 0) {
         D_001940D5 |= 4;
-        entry = (struct note_text *)note_page_walk(*(int *)note_page, (int)note_text_hit_cb, 0);
+        entry = (struct note_text *)note_page_walk((int)note_page, (int)note_text_hit_cb, 0);
         if (entry != 0) {
             if ((entry->flags & 1) != 0) {
                 text_cursor_x = (note_cursor_x = 160 - (font_text_width(entry->text) >> 1));
@@ -182,7 +182,7 @@ void note_draw_page(void)
 {
     char *entry;
 
-    entry = *(char **)note_page;
+    entry = (char *)note_page;
     while (*(signed char *)entry != 0) {
         switch (*(unsigned char *)entry) {
         case 1:
@@ -223,7 +223,7 @@ void note_draw_page(void)
             }
         }
     }
-    note_page_free = 3640 - ((int)entry - *(short *)note_page);
+    note_page_free = 3640 - ((int)entry - *(short *)&note_page);
 }
 
 void note_add_text(char *text)
@@ -234,9 +234,9 @@ void note_add_text(char *text)
         msgbox_show_rsc(1700, 1);
         return;
     }
-    mc_memcpy(note_page_backup, *(int *)note_page, 3640, (int)D_00174FAC, 361, 4);
+    mc_memcpy(note_page_backup, (int)note_page, 3640, (int)D_00174FAC, 361, 4);
     D_001940D5 |= 16;
-    entry = *(char **)note_page;
+    entry = (char *)note_page;
     while (*(signed char *)entry != 0) {
         if (((int)(unsigned char)*(signed char *)entry) == 1) {
             entry += 91;
@@ -261,7 +261,7 @@ void note_save_page(void)
     if (((struct bf8_4_1 *)&D_001940D5)->f == 0) return;
     D_001940D5 &= 239;
     lseek((int)(short)note_file, ((int)(short)note_page_index) * 3640, 0);
-    write((int)(short)note_file, *(int *)note_page, 3640);
+    write((int)(short)note_file, (int)note_page, 3640);
     note_file_size = filelength((int)(short)note_file);
 }
 
@@ -274,8 +274,8 @@ void note_reload_page(void)
 void note_load_page(void)
 {
     lseek((int)(short)note_file, ((int)(short)note_page_index) * 3640, 0);
-    read((int)(short)note_file, *(int *)note_page, 3640);
-    mc_memcpy(note_page_backup, *(int *)note_page, 3640, (int)D_00174FAC, 450, 4);
+    read((int)(short)note_file, (int)note_page, 3640);
+    mc_memcpy(note_page_backup, (int)note_page, 3640, (int)D_00174FAC, 450, 4);
 }
 
 void note_goto_page_prompt(void)
@@ -330,10 +330,10 @@ void note_next_page(void)
         if (note_silent == 0) sound_play(205, player_object, 100);
         return;
     }
-    if (*(signed char *)(*(char **)note_page) == 0) return;
+    if (note_page->kind == 0) return;
     lseek((int)(short)note_file, 0, 2);
-    mc_memset(*(int *)note_page, 0, 3640, (int)D_00174FAC, 507, 4);
-    write((int)(short)note_file, *(int *)note_page, 3640);
+    mc_memset((int)note_page, 0, 3640, (int)D_00174FAC, 507, 4);
+    write((int)(short)note_file, (int)note_page, 3640);
     note_file_size = filelength((int)(short)note_file);
     note_page_index++;
     if (note_silent != 0) return;
@@ -372,7 +372,7 @@ void note_find_prompt(void)
     mc_memset(note_search_text, 0, 24, (int)D_00174FAC, 543, 4);
     inpstr_begin_text((char *)note_search_text, 23);
     *(signed char *)note_text_flags |= 128;
-    note_selected = *(union note_entry **)note_page;
+    note_selected = note_page;
 }
 
 int note_find_match_cb(struct note_text *entry)
@@ -400,13 +400,13 @@ void note_find(void)
     if (note_search_from != 0) {
         note_selected = (union note_entry *)note_search_from;
     } else {
-        note_selected = *(union note_entry **)note_page;
+        note_selected = note_page;
     }
     while (note_page_index < page_count) {
         note_load_page();
         if (note_page_walk((int)note_selected, (int)note_find_match_cb, 0) != 0) goto L4E6F9;
         note_page_index++;
-        note_selected = *(union note_entry **)note_page;
+        note_selected = note_page;
     }
     note_page_index = *(int *)&start_page;
     note_reload_page();
@@ -432,18 +432,18 @@ void note_find_next(void)
 
 void note_undo(void)
 {
-    mc_memcpy(*(int *)note_page, note_page_backup, 3640, (int)D_00174FAC, 611, 4);
+    mc_memcpy((int)note_page, note_page_backup, 3640, (int)D_00174FAC, 611, 4);
 }
 
 void note_clear_page(void)
 {
-    mc_memcpy(note_page_backup, *(int *)note_page, 3640, (int)D_00174FAC, 616, 4);
-    mc_memset(*(int *)note_page, 0, 3640, (int)D_00174FAC, 617, 4);
+    mc_memcpy(note_page_backup, (int)note_page, 3640, (int)D_00174FAC, 616, 4);
+    mc_memset((int)note_page, 0, 3640, (int)D_00174FAC, 617, 4);
 }
 
 void note_toggle_shadow(void)
 {
-    mc_memcpy(note_page_backup, *(int *)note_page, 3640, (int)D_00174FAC, 622, 4);
+    mc_memcpy(note_page_backup, (int)note_page, 3640, (int)D_00174FAC, 622, 4);
     if (note_selected == 0 || note_selected->kind != 1) {
         return;
     }
@@ -452,7 +452,7 @@ void note_toggle_shadow(void)
 
 void note_toggle_centre(void)
 {
-    mc_memcpy(note_page_backup, *(int *)note_page, 3640, (int)D_00174FAC, 629, 4);
+    mc_memcpy(note_page_backup, (int)note_page, 3640, (int)D_00174FAC, 629, 4);
     if (note_selected == 0 || note_selected->kind != 1) {
         return;
     }
@@ -515,8 +515,8 @@ void note_text_box(struct note_text *entry, struct rect *box)
 
 void note_delete_in_box(void)
 {
-    D_001997CC = *(int *)note_page;
-    note_page_walk(*(int *)note_page, (int)note_select_text_cb, (int)note_select_line_cb);
+    D_001997CC = (int)note_page;
+    note_page_walk((int)note_page, (int)note_select_text_cb, (int)note_select_line_cb);
     note_delete_selected();
 }
 
@@ -538,6 +538,6 @@ int note_keep_line_cb(struct note_line *line)
 
 void note_delete_selected(void)
 {
-    note_page_walk(*(int *)note_page, (int)note_keep_text_cb, (int)note_keep_line_cb);
+    note_page_walk((int)note_page, (int)note_keep_text_cb, (int)note_keep_line_cb);
     *(signed char *)(*(char **)&D_001997CC) = 0;
 }

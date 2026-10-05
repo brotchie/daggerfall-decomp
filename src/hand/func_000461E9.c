@@ -1,14 +1,7 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x000461E9 */
 #include "records.h"
-struct flag4 {
-    unsigned char a;
-    unsigned char b;
-    unsigned short id:10;
-    unsigned short f10:1;
-    unsigned short kind:3;
-};
 extern struct record *location_object;
-extern struct flag4 dungeon_blocks[];
+extern struct dungeon_block dungeon_blocks[];
 extern unsigned char dungeon_block_count;
 extern struct record *D_00199720;
 extern struct record *kludge_find_door(void);
@@ -24,8 +17,8 @@ void kludge_fix_dungeon_door(void)
     int i;
 
     for (i = 0; i < dungeon_block_count; i++) {
-        if (dungeon_blocks[i].a == 0 && dungeon_blocks[i].b == 0)
-            if (dungeon_blocks[i].kind == 1 && dungeon_blocks[i].id == 9) {
+        if (dungeon_blocks[i].x == 0 && dungeon_blocks[i].z == 0)
+            if (dungeon_blocks[i].index == 1 && dungeon_blocks[i].number == 9) {
                 D_00199720 = marker_find_nth(location_object, 8, 0);
                 D_00199720 = object_find_by_id(location_object, D_00199720->id);
                 object = kludge_find_door();

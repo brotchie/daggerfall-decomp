@@ -45,7 +45,7 @@ extern char saved_region_name[];
 extern char bio_modifiers[];
 extern char saved_positions[];
 extern char D_0018DE44[];
-extern signed char regions[];
+extern struct region regions[];
 extern signed char text_buffer[];
 extern signed char D_001903A8;
 extern signed char scratch_190d16;

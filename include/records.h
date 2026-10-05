@@ -661,45 +661,58 @@ struct automap {
 };                                  /* +0x2800 */
 RECORD_SIZE(automap, 10240);
 
-/* ---- RMB blocks (the data of a type-43 object) ----------------------------------------- */
+/* ---- RMB and RDB blocks (BLOCKS.BSA; Daggerfall Unity's BlocksFile and DFBlock) ---------- */
+
+/* An RMB file (a town block) is a header (struct rmb_file), then one subrecord pair per
+ * building (exterior, interior: struct block's counts, then the lists), then the block's misc
+ * 3D objects and flats. A type-43 object's data is a copy of one subrecord (rmb_add_subrecord).
+ * An RDB file (a dungeon block) is struct rdb_file, then object lists of struct rdb_object
+ * whose resources (rdb_model, rdb_light, rdb_flat, rdb_action) are found by offsets from the
+ * start of the file. */
 
 /* a 3D object of an RMB block, 66 bytes (DFU RmbBlock3dObjectRecord) */
 struct block_model {
-    unsigned short id;              /* +0x00: model id (418/410 shelves); <= 10 none */
-    unsigned char variant;          /* +0x02: model_get's second argument; the shelf kind */
+    unsigned short id;              /* +0x00: model id (418/410 shelves); <= 10 none (DFU ObjectId1) */
+    unsigned char variant;          /* +0x02: model_get's second argument; the shelf kind (DFU
+                                       ObjectId2: the model is id * 100 + variant) */
     unsigned char kind;             /* +0x03: DFU ObjectType */
-    char *model;                    /* +0x04: the loaded model (model_get), 0 none */
-    char pad08[28];                 /* +0x08 */
+    char *model;                    /* +0x04: the loaded model (model_get), 0 none (DFU Unknown1) */
+    char pad08[28];                 /* +0x08: DFU Unknown2, Unknown3, NullValue1 (8 bytes), XPos1,
+                                       YPos1, ZPos1 */
     int x;                          /* +0x24: made absolute by rmb_add_subrecord */
     int y;                          /* +0x28 */
     int z;                          /* +0x2C */
-    char pad30[4];                  /* +0x30 */
-    int yaw;                        /* +0x34: the block's yaw is added */
-    char pad38[10];                 /* +0x38 */
+    char pad30[4];                  /* +0x30: DFU NullValue2 */
+    int yaw;                        /* +0x34: the block's yaw is added (DFU YRotation, a short, and
+                                       Unknown4) */
+    char pad38[10];                 /* +0x38: DFU NullValue3, Unknown5, NullValue4 */
 };                                  /* +0x42 */
 RECORD_SIZE(block_model, 66);
 
-/* a flat of an RMB block, 17 bytes (DFU RmbBlockFlatObjectRecord); people use the same layout */
+/* a flat of an RMB block, 17 bytes (DFU RmbBlockFlatObjectRecord); people use the same layout
+ * (DFU RmbBlockPeopleRecord) */
 struct block_flat {
     int x;                          /* +0x00: made absolute by rmb_add_subrecord */
     int y;                          /* +0x04 */
     int z;                          /* +0x08 */
-    unsigned short image;           /* +0x0C: archive<<7 | record; 199<<7 editor markers */
-    unsigned short faction_id;      /* +0x0E */
-    unsigned char flags;            /* +0x10 */
+    unsigned short image;           /* +0x0C: archive<<7 | record (DFU TextureBitfield); 199<<7
+                                       editor markers */
+    unsigned short faction_id;      /* +0x0E: DFU FactionID */
+    unsigned char flags;            /* +0x10: DFU Flags */
 };                                  /* +0x11 */
 RECORD_SIZE(block_flat, 17);
 
-/* a door of an RMB block, 19 bytes (rmb_add_doors, after the people) */
+/* a door of an RMB block, 19 bytes (DFU RmbBlockDoorRecord; rmb_add_doors, after the people) */
 struct block_door {
     int x;                          /* +0x00 */
     int y;                          /* +0x04 */
     int z;                          /* +0x08 */
-    short yaw;                      /* +0x0C: the block's yaw is added */
+    short yaw;                      /* +0x0C: the block's yaw is added (DFU YRotation) */
     short image2;                   /* +0x0E: the door object's image2 and image: model id */
-    unsigned char image;            /* +0x10:   image2 * 100 + image */
-    unsigned char lock_level;       /* +0x11 */
-    unsigned char pad12;            /* +0x12 */
+    unsigned char image;            /* +0x10:   image2 * 100 + image (DFU OpenRotation and
+                                       DoorModelIndex) */
+    unsigned char lock_level;       /* +0x11: DFU Unknown */
+    unsigned char pad12;            /* +0x12: DFU NullValue1 */
 };                                  /* +0x13 */
 RECORD_SIZE(block_door, 19);
 
@@ -710,12 +723,14 @@ struct block_section3 {
     int y;                          /* +0x04 */
     int z;                          /* +0x08 */
     int data;                       /* +0x0C: func_0007E441 takes byte 0 (or 1, mode 2) of the
-                                       nearest one's */
+                                       nearest one's (DFU Unknown1, Unknown2, Unknown3) */
 };                                  /* +0x10 */
 RECORD_SIZE(block_section3, 16);
 
 /* the data of a type-43 object: an RMB subrecord's counts and lists (rmb_add_subrecord copies
- * the header and the three lists, then points the pointers at the copies) */
+ * the header and the three lists, then points the pointers at the copies). In the file it is
+ * DFU's RmbBlockHeader: the five counts, then six unknown shorts where the copy has the
+ * pointers. */
 struct block {
     unsigned char model_count;      /* +0x00: struct block_model */
     unsigned char flat_count;       /* +0x01: struct block_flat */
@@ -727,6 +742,155 @@ struct block {
     struct block_section3 *section3; /* +0x0D */
 };                                  /* +0x11 */
 RECORD_SIZE(block, 17);
+
+/* where a building's subrecords go in an RMB block (DFU RmbFldBlockPositions, 20 bytes;
+ * town_block_place_building) */
+struct rmb_block_position {
+    int unknown1;                   /* +0x00: town_block_place_building keeps it in D_00196804 */
+    int unknown2;                   /* +0x04: and this in D_001967EC */
+    int x;                          /* +0x08: from the block's corner */
+    int z;                          /* +0x0C */
+    int yaw;                        /* +0x10: DFU YRotation */
+};                                  /* +0x14 */
+RECORD_SIZE(rmb_block_position, 20);
+
+/* an RMB file (DFU RmbFldHeader, then the block data): town_block_load_rmb reads it from
+ * BLOCKS.BSA into the buffer rmb_block points to, and rmb_index_records keeps pointers in two
+ * of its unknown areas */
+struct rmb_file {
+    unsigned char block_data_count; /* +0x0000: DFU NumBlockDataRecords: the buildings, each an
+                                       exterior and an interior subrecord */
+    unsigned char misc_model_count; /* +0x0001: DFU NumMisc3dObjectRecords */
+    unsigned char misc_flat_count;  /* +0x0002: DFU NumMiscFlatObjectRecords */
+    struct rmb_block_position positions[32]; /* +0x0003: DFU BlockPositions */
+    struct building buildings[32];  /* +0x0283: DFU BuildingDataList */
+    struct block *block_data[32];   /* +0x05C3: DFU Section2UnknownData: rmb_index_records points
+                                       it at each building's subrecords */
+    int block_data_sizes[32];       /* +0x0643: DFU BlockDataSizes */
+    struct block_model *misc_models; /* +0x06C3: DFU GroundData's 8-byte header: rmb_index_records
+                                       points these at the misc 3D objects and flats */
+    struct block_flat *misc_flats;  /* +0x06C7 */
+    unsigned char ground_tiles[256]; /* +0x06CB: DFU GroundTiles, 16 x 16 (town_block_apply_ground) */
+    unsigned char ground_scenery[256]; /* +0x07CB: DFU GroundScenery, 16 x 16 */
+    unsigned char automap[4096];    /* +0x08CB: DFU AutoMapData, 64 x 64 (town_map_add_block) */
+    char name[13];                  /* +0x18CB: DFU Name; the 429 bytes of names are copied to
+                                       the town block object's (38) data */
+    char other_names[32][13];       /* +0x18D8: DFU OtherNames, by building */
+    char data[1];                   /* +0x1A78: the subrecords, then the misc objects */
+};
+RECORD_OFFSET(rmb_file, data, 0x1A78);
+
+/* a model name of an RDB file (DFU RdbModelReference, 8 bytes: "55000DOR"; rdb_model_id_from_name
+ * reads the digits) */
+struct rdb_model_reference {
+    char model_id[5];               /* +0x00 */
+    char description[3];            /* +0x05 */
+};                                  /* +0x08 */
+RECORD_SIZE(rdb_model_reference, 8);
+
+/* an RDB file's object section header (DFU RdbObjectHeader, 512 bytes) */
+struct rdb_object_header {
+    int unknown_offset;             /* +0x000: DFU UnknownOffset: a list of struct rdb_unknown_entry */
+    int unknown1;                   /* +0x004 */
+    int unknown2;                   /* +0x008 */
+    int unknown3;                   /* +0x00C */
+    int length;                     /* +0x010: of the RDB record */
+    char unknown4[32];              /* +0x014 */
+    char dagr[4];                   /* +0x034: "DAGR" */
+    char unknown5[456];             /* +0x038 */
+};                                  /* +0x200 */
+RECORD_SIZE(rdb_object_header, 512);
+
+/* the head of an RDB file (DFU RdbBlockHeader, the model lists and RdbObjectHeader):
+ * dungeon_load_rdb_block reads the file into scratch_buffer (rdb_data, rdb_loaded_file) */
+struct rdb_file {
+    int unknown1;                   /* +0x0000 */
+    int width;                      /* +0x0004: of the object root grid */
+    int height;                     /* +0x0008 */
+    int object_root_offset;         /* +0x000C: width x height offsets of object lists (0 none) */
+    int unknown2;                   /* +0x0010 */
+    struct rdb_model_reference model_references[750]; /* +0x0014: rdb_model.model_index */
+    unsigned int model_data[750];   /* +0x1784: DFU ModelDataList */
+    struct rdb_object_header object_header; /* +0x233C */
+};                                  /* +0x253C */
+RECORD_SIZE(rdb_file, 9532);
+
+/* an entry of the list at rdb_object_header.unknown_offset (DFU does not read it): for a
+ * model whose action_offset is negative, rdb_model_find_action takes the action offset,
+ * trigger and sound of the entry whose key is 0 */
+struct rdb_unknown_entry {
+    int next;                       /* +0x00: offset from the start of the file */
+    short key;                      /* +0x04 */
+    int action_offset;              /* +0x06 */
+    short trigger_flag_starting_lock; /* +0x0A */
+    unsigned char sound_index;      /* +0x0C */
+};                                  /* +0x0D */
+RECORD_SIZE(rdb_unknown_entry, 13);
+
+/* an object of an RDB object list (DFU RdbObject, 25 bytes) */
+struct rdb_object {
+    int next;                       /* +0x00: offset from the start of the file; 0 or less ends */
+    int previous;                   /* +0x04 */
+    int x;                          /* +0x08: from the block's corner */
+    int y;                          /* +0x0C */
+    int z;                          /* +0x10 */
+    unsigned char type:6;           /* +0x14: DFU Type (RdbResourceTypes): 1 model (struct
+                                       rdb_model), 2 light (rdb_light), 3 flat (rdb_flat) */
+    unsigned char type_bits:2;      /*        the code masks them off */
+    int resource_offset;            /* +0x15 */
+};                                  /* +0x19 */
+RECORD_SIZE(rdb_object, 25);
+
+/* an RDB model resource (DFU RdbModelResource, 23 bytes) */
+struct rdb_model {
+    int x_rotation;                 /* +0x00 */
+    int y_rotation;                 /* +0x04 */
+    int z_rotation;                 /* +0x08 */
+    short model_index;              /* +0x0C: into rdb_file.model_references */
+    short trigger_flag_starting_lock; /* +0x0E: the low half of DFU's u32: the link's trigger (low
+                                       byte); doors: the lock (>> 4) */
+    short pad10;                    /* +0x10: its high half */
+    unsigned char sound_index;      /* +0x12: the link's param */
+    int action_offset;              /* +0x13: its struct rdb_action, 0 none; negative:
+                                       rdb_model_find_action */
+};                                  /* +0x17 */
+RECORD_SIZE(rdb_model, 23);
+
+/* a model's action (DFU RdbActionResource, 10 bytes): a link record (struct link) */
+struct rdb_action {
+    unsigned char axis;             /* +0x00 */
+    unsigned short duration;        /* +0x01 */
+    unsigned short magnitude;       /* +0x03 */
+    int next_object_offset;         /* +0x05: the object it activates next, 0 or less none */
+    unsigned char action;           /* +0x09: DFU Flags (RdbActionFlags) */
+};                                  /* +0x0A */
+RECORD_SIZE(rdb_action, 10);
+
+/* an RDB light resource (DFU RdbLightResource, 10 bytes); in an action chain the code reads an
+ * action at +0x03 and the next object at +0x04 (rdb_build_action_chain) */
+struct rdb_light {
+    short image;                    /* +0x00: DFU Unknown1's low half: the light object's image */
+    char pad02;                     /* +0x02 */
+    unsigned char action;           /* +0x03: Unknown1's high byte */
+    int next_object_offset;         /* +0x04: DFU Unknown2 */
+    short radius;                   /* +0x08 */
+};                                  /* +0x0A */
+RECORD_SIZE(rdb_light, 10);
+
+/* an RDB flat resource (DFU RdbFlatResource, 11 bytes) */
+struct rdb_flat {
+    unsigned short image;           /* +0x00: archive<<7 | record (DFU TextureBitfield); 199<<7
+                                       editor markers */
+    short flags;                    /* +0x02: DFU Flags: the link's trigger (low byte); markers: the
+                                       creature or the link flag; NPCs: 16, 32 the gender bits */
+    unsigned char magnitude;        /* +0x04: the link's axis; markers: the creature; NPCs: the
+                                       faction's low byte */
+    unsigned char sound_index;      /* +0x05: the link's param; markers: the trigger range; NPCs:
+                                       the faction's high byte */
+    int next_object_offset;         /* +0x06: in an action chain */
+    unsigned char action;           /* +0x0A: DFU Action; 29 an NPC */
+};                                  /* +0x0B */
+RECORD_SIZE(rdb_flat, 11);
 
 /* ---- the record --------------------------------------------------------------------------- */
 

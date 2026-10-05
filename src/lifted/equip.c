@@ -1070,7 +1070,7 @@ void ai_update_creatures(void)
     int target_index;
     int removed;
     struct monster_anim *anim;
-    int bios_ticks;
+    int *bios_ticks;
 
     removed = -1;
     if (D_00187CA8 == 0) return;
@@ -1088,8 +1088,8 @@ void ai_update_creatures(void)
         ai_characters[i] = (struct character *)((int)((char *)ai_entities[i] + 71));
     }
     for (i = 0; (creature_count - 1) > i; i++) {
-        bios_ticks = 1132;
-        if (ai_characters[i]->target == 0 || (ai_characters[i]->target != 0 && ((unsigned)(((unsigned)*(int *)((char *)bios_ticks)) % 200)) < 4) || ai_characters[i]->target->type == 44 || ai_characters[i]->target->type == 34) {
+        bios_ticks = (int *)1132;
+        if (ai_characters[i]->target == 0 || (ai_characters[i]->target != 0 && ((unsigned)(((unsigned)*bios_ticks) % 200)) < 4) || ai_characters[i]->target->type == 44 || ai_characters[i]->target->type == 34) {
             target_index = ai_pick_target(ai_entities[i], ai_characters[i], i);
             if (target_index == (-1)) {
                 removed = i;

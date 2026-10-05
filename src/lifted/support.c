@@ -240,7 +240,7 @@ void hud_messages_draw(void)
     for (y = 2; slot < 16; slot++, y += 9) {
         if (hud_message_expiry[slot] != 0) {
             if (((struct bf8_0_1 *)&D_001940DA)->f == 0) {
-                if (((unsigned)*(int *)((char *)1132)) > hud_message_expiry[slot]) {
+                if (((unsigned)BIOS_TICKS) > hud_message_expiry[slot]) {
                     hud_message_expiry[slot] = 0;
                 }
             }
@@ -249,7 +249,7 @@ void hud_messages_draw(void)
     }
     if (hud_status_expiry == 0) return;
     if (((struct bf8_0_1 *)&D_001940DA)->f == 0) {
-        if (((unsigned)*(int *)((char *)1132)) > hud_status_expiry) {
+        if (((unsigned)BIOS_TICKS) > hud_status_expiry) {
             hud_status_expiry = 0;
         }
     }

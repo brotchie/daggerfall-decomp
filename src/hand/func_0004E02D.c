@@ -3,7 +3,7 @@
 extern char D_00174FAC[];
 extern char note_colour;
 extern unsigned char D_001940D5;
-extern struct note_line *note_page;
+extern union note_entry *note_page;
 extern int note_page_backup;
 extern short note_page_free;
 extern void msgbox_show_rsc(int, int);
@@ -19,7 +19,7 @@ void note_add_line(short x0, short y0, short x1, short y1)
     }
     mc_memcpy(note_page_backup, note_page, 3640, D_00174FAC, 399, 4);
     D_001940D5 |= 16;
-    entry = note_page;
+    entry = &note_page->line;
     while (entry->kind != 0) {
         if (entry->kind == 1)
             entry = (struct note_line *)((char *)entry + 91);

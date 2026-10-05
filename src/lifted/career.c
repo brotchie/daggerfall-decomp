@@ -15,7 +15,7 @@ extern char D_00170741[];
 extern char D_00170750[];
 extern char D_0017075D[];
 extern char D_0017077B[];
-extern signed char D_00178630[];
+extern unsigned char D_00178630[];   /* _IsTable */
 extern struct rect career_answer_boxes[];
 extern signed char D_00179FF8[];
 extern struct rect career_bio_buttons[];
@@ -31,7 +31,7 @@ extern char scratch_190de4[];
 extern struct record *player_object;
 extern struct character *player_character;
 extern int window_image;
-extern char scratch_buffer[];
+extern char *scratch_buffer;
 extern signed char text_macro_imperial;
 extern signed char mouse_buttons_prev;
 extern int D_00196D68;
@@ -42,7 +42,7 @@ extern int career_bio_page;
 extern short reputation_baseline;
 extern signed char career_bio_ask;
 
-extern int career_answer_effect(int);
+extern unsigned char *career_answer_effect(unsigned char *);
 extern int career_nearest_class(void);
 extern int place_marker_in_range(struct record *, int);
 extern int text_rsc_load(int, int, int);
@@ -67,11 +67,11 @@ extern void msgbox_show_rsc(int, int);
 extern void text_draw_coloured(int, int, int, int, unsigned char);
 extern void object_free_later(struct record *);
 extern void cursor_draw_arrow(void);
-int career_skip_word(int);
-int career_draw_lines(int, int);
+unsigned char *career_skip_word(unsigned char *);
+unsigned char *career_draw_lines(unsigned char *, int);
 int career_bio_count_lines(void);
 void career_find_question(int);
-void career_show_question(int);
+void career_show_question(unsigned char *);
 void career_wait_answer(void);
 void career_random_answer(void);
 void career_apply_answer(int);
@@ -95,9 +95,9 @@ void career_background_summary(int class_id, int ask)
     if (class_id == 18) class_id = career_nearest_class();
     mc_set_location(59, (int)D_00170738);
     mc_sprintf((int)text_buffer, (int)D_00170741, class_id);
-    mc_memset(*(int *)scratch_buffer, 0, 64000, (int)D_00170738, 60, 4);
-    disk_read_file(text_buffer, *(int *)scratch_buffer + 1);
-    *(signed char *)(*(char **)scratch_buffer) = 10;
+    mc_memset((int)scratch_buffer, 0, 64000, (int)D_00170738, 60, 4);
+    disk_read_file(text_buffer, (int)scratch_buffer + 1);
+    *scratch_buffer = 10;
     if (ask != 0) disk_read_file(D_00170750, D_00147954);
     for (question = 0; question < 12; question++) {
         if (ask != 0) {
@@ -131,49 +131,49 @@ void career_background_summary(int class_id, int ask)
     msgbox_show_rsc(35, 1);
 }
 
-int career_skip_word(int text)
+unsigned char *career_skip_word(unsigned char *text)
 {
-    while (((int)(unsigned char)*(signed char *)((char *)text)) > 32) text++;
-    while (((int)(unsigned char)*(signed char *)((char *)text)) <= 32) text++;
+    while (*text > 32) text++;
+    while (*text <= 32) text++;
     return text;
 }
 
 void career_find_question(int number)
 {
-    int line;
+    unsigned char *line;
     unsigned char found;
 
     found = 0;
-    line = *(int *)scratch_buffer;
+    line = (unsigned char *)scratch_buffer;
     while (found == 0) {
-        line = memchr(line, 10, 2000);
+        line = (unsigned char *)memchr(line, 10, 2000);
         line++;
-        if (((int)(unsigned char)(D_00178630[(int)(unsigned char)(*(signed char *)((char *)line) + 1)] & 32)) != 0 && atoi(line) == number) {
+        if ((D_00178630[(unsigned char)((signed char)*line + 1)] & 32) != 0 && atoi(line) == number) {
             career_show_question(line);
             found = 1;
         }
     }
 }
 
-void career_show_question(int text)
+void career_show_question(unsigned char *text)
 {
     text = career_skip_word(text);
     *(short *)scratch_190d64 = 0;
     text = career_draw_lines(text, 0);
-    *(int *)scratch_190de4 = text;
-    while (((int)(unsigned char)(D_00178630[(int)(unsigned char)(*(signed char *)((char *)text) + 1)] & 32)) == 0 && *(signed char *)((char *)text) != 0) {
+    *(unsigned char **)scratch_190de4 = text;
+    while ((D_00178630[(unsigned char)((signed char)*text + 1)] & 32) == 0 && *text != 0) {
         (*(short *)scratch_190d64)++;
         text = career_draw_lines(career_skip_word(text), 1);
-        while (((int)(unsigned char)(D_00178630[(int)(unsigned char)(*(signed char *)((char *)text) + 1)] & 224)) == 0 && *(signed char *)((char *)text) != 0) {
-            text = memchr(text, 10, 2000);
+        while ((D_00178630[(unsigned char)((signed char)*text + 1)] & 224) == 0 && *text != 0) {
+            text = (unsigned char *)memchr(text, 10, 2000);
             text++;
         }
     }
 }
 
-int career_draw_lines(int text, int one_line)
+unsigned char *career_draw_lines(unsigned char *text, int one_line)
 {
-    int line_end;
+    unsigned char *line_end;
     int x;
     int y;
 
@@ -181,16 +181,16 @@ int career_draw_lines(int text, int one_line)
     y = career_answer_boxes[(int)(short)*(short *)scratch_190d64].y0;
     if (*(short *)scratch_190d64 != 0) y += 5;
     while (1) {
-        line_end = memchr(text, 13, 2000);
-        *(signed char *)((char *)line_end) = 0;
+        line_end = (unsigned char *)memchr(text, 13, 2000);
+        *line_end = 0;
         if (career_bio_ask != 0) {
-            text_draw_coloured(text, (int)(short)*(short *)&x, (int)(short)*(short *)&y, 145, 141);
+            text_draw_coloured((int)text, (int)(short)*(short *)&x, (int)(short)*(short *)&y, 145, 141);
         }
         y += 10;
-        *(signed char *)((char *)line_end) = 13;
+        *line_end = 13;
         text = line_end + 2;
-        if (one_line != 0 || ((int)(unsigned char)*(signed char *)((char *)text)) != 9) return text;
-        while (((int)(unsigned char)*(signed char *)((char *)text)) == 9) text++;
+        if (one_line != 0 || *text != 9) return text;
+        while (*text == 9) text++;
     }
 }
 
@@ -224,14 +224,14 @@ void career_random_answer(void)
 void career_apply_answer(int question)
 {
     int letter;
-    int text;
+    unsigned char *text;
 
     scratch_190cac = question;
     letter = ((int)(short)*(short *)scratch_190d66) + 97;
-    text = xn_str_find_byte_pair(*(int *)scratch_190de4, letter + 11776, 2000);
-    text = memchr(text, 10, 2000);
+    text = (unsigned char *)xn_str_find_byte_pair(*(int *)scratch_190de4, letter + 11776, 2000);
+    text = (unsigned char *)memchr(text, 10, 2000);
     text++;
-    while (((int)(unsigned char)*(signed char *)((char *)text)) == 9) {
+    while (*text == 9) {
         text = career_answer_effect(text);
     }
 }

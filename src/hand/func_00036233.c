@@ -1,37 +1,21 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x00036233 */
 #include "records.h"
 
-struct node {
-    int next;
-    char pad4[4];
-    int x, y, z;
-    unsigned char kind:6;
-    int data;
-};
-struct place { int x, y, z; short f12; short f14; char pad16[3]; int f19; };
-struct spot { short f0; char pad2[6]; short f8; };
-struct rdb_flat { unsigned short f0; short f2; unsigned char f4; unsigned char f5; char pad6[4]; unsigned char f10; };
-struct sub { unsigned short f0; unsigned char f2; };
-struct ofs { signed char dx; signed char dz; char pad2; int flags; };
-struct names { char pad[20]; char name[1][8]; };
-struct pair { int off; int id; };
-struct anim { char pad[6]; unsigned short f6; char pad8[16]; short f24; };
-struct res { char pad[12]; struct anim *anim; };
 extern char D_00170AD2[];
 extern unsigned char D_0017A834[];
 extern struct record *location_object;
 extern char D_001962A1;
-extern struct pair D_001985D4[];
-extern char *D_001995E8;
-extern struct rdb_flat *D_001995F0;
-extern struct spot *D_001995F4;
+extern struct rdb_object_id rdb_object_ids[];
+extern char *rdb_data;
+extern struct rdb_flat *rdb_flat_resource;
+extern struct rdb_light *rdb_light_resource;
 extern int D_001995F8;
 extern int D_001995FC;
-extern struct names *D_00199604;
-extern struct ofs *D_00199608;
-extern struct place *D_0019960C;
-extern int D_00199614;
-extern void func_000361B7(struct place *);
+extern struct rdb_file *rdb_loaded_file;
+extern struct dungeon_block *rdb_dungeon_block;
+extern struct rdb_model *rdb_model_resource;
+extern int rdb_object_id_count;
+extern void func_000361B7(struct rdb_model *);
 extern void rdb_model_id_from_name(struct record *, char *);
 extern void fatal_error(char *);
 extern int rand_range(int, int);
@@ -40,15 +24,15 @@ extern struct record *rmb_make_flat(struct record *, short, short, int);
 extern struct record *object_free_single(struct record *);
 extern struct record *object_create_in_block(struct record *, int, int, int, int);
 extern void xn_model_set_angles(int, int, int, int *);
-extern struct res *xn_tex_cache_lookup(int, int, int);
+extern struct tex_cache_entry *xn_tex_cache_lookup(int, int, int);
 extern void xn_tex_cache_flush(void);
 
-void rdb_create_objects(struct record *quarter, struct node *rdb_object, int block_index)
+void rdb_create_objects(struct record *quarter, struct rdb_object *rdb_object, int block_index)
 {
     int unused1;
     struct record *object;
-    struct sub *sub;
-    struct res *res;
+    struct person *person;
+    struct tex_cache_entry *res;
     int unused2;
     int unused3;
     int offset;
@@ -56,95 +40,95 @@ void rdb_create_objects(struct record *quarter, struct node *rdb_object, int blo
     int height;
 
     do {
-        offset = (char *)rdb_object - D_001995E8;
-        switch (rdb_object->kind) {
+        offset = (char *)rdb_object - rdb_data;
+        switch (rdb_object->type) {
         case 1:
-            D_0019960C = (struct place *)(D_001995E8 + rdb_object->data);
-            if (D_0019960C->f19 <= 0)
-                func_000361B7(D_0019960C);
+            rdb_model_resource = (struct rdb_model *)(rdb_data + rdb_object->resource_offset);
+            if (rdb_model_resource->action_offset <= 0)
+                func_000361B7(rdb_model_resource);
             object = object_create_in_block(quarter, 6, 62, 0, block_index);
-            rdb_model_id_from_name(object, D_00199604->name[D_0019960C->f12]);
-            if ((object->image2 == 703 || object->image2 == 704) && (D_00199608->dx || D_00199608->dz)) {
+            rdb_model_id_from_name(object, rdb_loaded_file->model_references[rdb_model_resource->model_index].model_id);
+            if ((object->image2 == 703 || object->image2 == 704) && (rdb_dungeon_block->x || rdb_dungeon_block->z)) {
                 object_free_single(object);
                 object = 0;
                 break;
             }
             object->wait_state = 0;
-            xn_model_set_angles(D_0019960C->x, D_0019960C->y, D_0019960C->z, (int *)(RECORD_DATA(object) + 12));
+            xn_model_set_angles(rdb_model_resource->x_rotation, rdb_model_resource->y_rotation, rdb_model_resource->z_rotation, (int *)object->data.instance.angles);
             if (object->image2 == 550) {
                 object->type = 32;
-                object->lock_level = D_0017A834[D_0019960C->f14 >> 4];
+                object->lock_level = D_0017A834[rdb_model_resource->trigger_flag_starting_lock >> 4];
             }
             break;
         case 2:
-            D_001995F4 = (struct spot *)(D_001995E8 + rdb_object->data);
-            object = object_create_in_block(quarter, 7, 0, D_001995F4->f0, block_index);
-            object->light_radius = D_001995F4->f8;
+            rdb_light_resource = (struct rdb_light *)(rdb_data + rdb_object->resource_offset);
+            object = object_create_in_block(quarter, 7, 0, rdb_light_resource->image, block_index);
+            object->light_radius = rdb_light_resource->radius;
             break;
         case 3:
-            D_001995F0 = (struct rdb_flat *)(D_001995E8 + rdb_object->data);
-            if ((D_001995F0->f0 >> 7) == 199) {
-                switch ((D_001995F0->f0 & 31) - 2) {
+            rdb_flat_resource = (struct rdb_flat *)(rdb_data + rdb_object->resource_offset);
+            if ((rdb_flat_resource->image >> 7) == 199) {
+                switch ((rdb_flat_resource->image & 31) - 2) {
                 case 14:
-                    object = rmb_make_marker(quarter, D_001995F0->f0);
-                    object->trigger_range = D_001995F0->f5;
-                    object->mobile_id = D_001995F0->f4;
-                    object->link_flag = D_001995F0->f2;
-                    object->wait_state = D_001995F0->f10;
+                    object = rmb_make_marker(quarter, rdb_flat_resource->image);
+                    object->trigger_range = rdb_flat_resource->sound_index;
+                    object->mobile_id = rdb_flat_resource->magnitude;
+                    object->link_flag = rdb_flat_resource->flags;
+                    object->wait_state = rdb_flat_resource->action;
                     break;
                 case 13:
-                    object = rmb_make_marker(quarter, D_001995F0->f0);
-                    object->trigger_range = D_001995F0->f5;
-                    object->mobile_id = D_001995F0->f2;
+                    object = rmb_make_marker(quarter, rdb_flat_resource->image);
+                    object->trigger_range = rdb_flat_resource->sound_index;
+                    object->mobile_id = rdb_flat_resource->flags;
                     if (object->mobile_id == 0)
                         object->mobile_id = rand_range(1, 6);
-                    object->wait_state = D_001995F0->f10;
+                    object->wait_state = rdb_flat_resource->action;
                     break;
                 case 8:
-                    if (D_001995F0->f2 != 0)
-                        D_001995F8 = D_001995F0->f2;
-                    if (D_001995F0->f5 != 0)
-                        D_001995FC = -(D_001995F0->f5 << 3);
-                    D_001962A1 = D_001995F0->f4;
-                    if ((D_00199608->flags & 4) == 0) {
+                    if (rdb_flat_resource->flags != 0)
+                        D_001995F8 = rdb_flat_resource->flags;
+                    if (rdb_flat_resource->sound_index != 0)
+                        D_001995FC = -(rdb_flat_resource->sound_index << 3);
+                    D_001962A1 = rdb_flat_resource->magnitude;
+                    if (rdb_dungeon_block->is_starting == 0) {
                         object = 0;
                         break;
                     }
                 default:
-                    object = rmb_make_marker(quarter, D_001995F0->f0);
+                    object = rmb_make_marker(quarter, rdb_flat_resource->image);
                     break;
                 }
-            } else if (D_001995F0->f10 == 29) {
-                object = rmb_make_flat(quarter, D_001995F0->f0, D_001995F0->f4 + (D_001995F0->f5 << 8), 0);
-                sub = (struct sub *)RECORD_DATA(object);
-                if (D_001995F0->f2 & 16)
-                    sub->f2 |= 32;
-                if (D_001995F0->f2 & 32)
-                    sub->f2 |= 16;
-                sub->f0 = (D_001995F0->f5 << 8) + D_001995F0->f4;
+            } else if (rdb_flat_resource->action == 29) {
+                object = rmb_make_flat(quarter, rdb_flat_resource->image, rdb_flat_resource->magnitude + (rdb_flat_resource->sound_index << 8), 0);
+                person = &object->data.person;
+                if (rdb_flat_resource->flags & 16)
+                    person->flags |= 32;
+                if (rdb_flat_resource->flags & 32)
+                    person->flags |= 16;
+                person->faction_id = (rdb_flat_resource->sound_index << 8) + rdb_flat_resource->magnitude;
             } else {
-                object = object_create_in_block(quarter, 33, 0, D_001995F0->f0, block_index);
+                object = object_create_in_block(quarter, 33, 0, rdb_flat_resource->image, block_index);
             }
             break;
         }
         if (object != 0) {
-            D_001985D4[D_00199614].off = offset;
-            D_001985D4[D_00199614].id = object->id;
-            if (D_00199614++ > 512)
+            rdb_object_ids[rdb_object_id_count].offset = offset;
+            rdb_object_ids[rdb_object_id_count].id = object->id;
+            if (rdb_object_id_count++ > 512)
                 fatal_error(D_00170AD2);
-            object->x = location_object->x + rdb_object->x + (D_00199608->dx << 11);
+            object->x = location_object->x + rdb_object->x + (rdb_dungeon_block->x << 11);
             object->y = location_object->y + rdb_object->y;
-            object->z = location_object->z + rdb_object->z + (D_00199608->dz << 11);
-            if (rdb_object->kind == 3) {
+            object->z = location_object->z + rdb_object->z + (rdb_dungeon_block->z << 11);
+            if (rdb_object->type == 3) {
                 res = xn_tex_cache_lookup(object->image >> 7, object->image & 127, 0);
                 if (res == 0) {
                     xn_tex_cache_flush();
                     res = xn_tex_cache_lookup(object->image >> 7, object->image & 127, 0);
                 }
-                height = res->anim->f6 * (res->anim->f24 + 256) / 256;
+                height = res->image->height * (res->image->x_scale + 256) / 256;
                 object->y += height >> 1;
             }
         }
-        rdb_object = (struct node *)(D_001995E8 + rdb_object->next);
-    } while ((char *)rdb_object - D_001995E8 > 0);
+        rdb_object = (struct rdb_object *)(rdb_data + rdb_object->next);
+    } while ((char *)rdb_object - rdb_data > 0);
 }

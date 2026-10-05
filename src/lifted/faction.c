@@ -603,31 +603,36 @@ int rumor_collect_local(void)
 int rumor_pick_news(short faction_id)
 {
     short rumor;
-    char state[28];
+    struct {
+        int rolls[4];               /* +0x00: rumor_is_eligible's roll, by index & 3 */
+        int count;                  /* +0x10 */
+        int *found;                 /* +0x14: the eligible rumors */
+        int end;                    /* +0x18 */
+    } state;
     short index;
 
-    *(int *)((char *)state + 16) = 0;
+    state.count = 0;
     *(int *)&index = 0;
     if (disk_file_exists(D_001704BB) == 0) return 0;
     disk_read_file(D_001704BB, *(int *)scratch_buffer);
     if (*(int *)disk_last_file_size == 0) return 0;
-    *(int *)((char *)state + 24) = (int)(*(char **)scratch_buffer + *(int *)disk_last_file_size);
+    state.end = (int)(*(char **)scratch_buffer + *(int *)disk_last_file_size);
     *(int *)&rumor = *(int *)scratch_buffer;
-    *(int *)state = rand_range(1, 100);
-    *(int *)((char *)state + 4) = rand_range(1, 100);
-    *(int *)((char *)state + 8) = rand_range(1, 100);
-    *(int *)((char *)state + 12) = rand_range(1, 100);
-    *(int *)((char *)state + 20) = *(int *)scratch_buffer + 40000;
-    while (((unsigned)*(int *)&rumor) < *(int *)((char *)state + 24)) {
-        if (rumor_is_eligible(*(int *)&rumor, (int)(short)faction_id, 0, *(int *)((char *)state + ((*(int *)&index & 3) << 2))) != 0) {
-            *(int *)((char *)(int)(*(char **)((char *)state + 20) + ((*(int *)((char *)state + 16))++ << 2))) = *(int *)&rumor;
+    state.rolls[0] = rand_range(1, 100);
+    state.rolls[1] = rand_range(1, 100);
+    state.rolls[2] = rand_range(1, 100);
+    state.rolls[3] = rand_range(1, 100);
+    state.found = (int *)(*(int *)scratch_buffer + 40000);
+    while (((unsigned)*(int *)&rumor) < state.end) {
+        if (rumor_is_eligible(*(int *)&rumor, (int)(short)faction_id, 0, state.rolls[*(int *)&index & 3]) != 0) {
+            state.found[state.count++] = *(int *)&rumor;
         }
-        *(int *)&rumor = (*(int *)&rumor + *(int *)(*(char **)&rumor + 26)) + 34;
+        *(int *)&rumor = (*(int *)&rumor + (*(struct rumor **)&rumor)->text_length) + 34;
         (*(int *)&index)++;
     }
-    if (*(int *)((char *)state + 16) == 0) return 0;
-    *(int *)&rumor = *(int *)((char *)((rand_range(0, *(int *)((char *)state + 16) - 1) << 2) + *(int *)((char *)state + 20)));
-    mc_memcpy(*(int *)scratch_buffer, *(int *)&rumor + 34, *(int *)(*(char **)&rumor + 26), (int)D_00170464, 1701, 4);
+    if (state.count == 0) return 0;
+    *(int *)&rumor = state.found[rand_range(0, state.count - 1)];
+    mc_memcpy(*(int *)scratch_buffer, *(int *)&rumor + 34, (*(struct rumor **)&rumor)->text_length, (int)D_00170464, 1701, 4);
     return *(int *)scratch_buffer;
 }
 

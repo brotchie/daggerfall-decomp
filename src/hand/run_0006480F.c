@@ -128,9 +128,9 @@ int link_step(struct link *link)
         return 0;
     }
     link->delta[0] = (link->delta[1] = (link->delta[2] = 0));
-    if (((unsigned)(*(int *)((char *)1132) - link->start_tick)) > link->duration) {
+    if (((unsigned)(BIOS_TICKS - link->start_tick)) > link->duration) {
         link->flags |= 1;
-        link->start_tick = *(int *)((char *)1132) - link->duration;
+        link->start_tick = BIOS_TICKS - link->duration;
         link->flags ^= 2;
         links_set_reverse((int)(short)link->object_id, link->flags);
     }
@@ -148,7 +148,7 @@ int link_step(struct link *link)
             link->combination |= D_001A3A80;
             if (((int)(unsigned char)(link->combination & 15)) != (link->combination >> 4)) break;
         case 1:
-            offset = ((*(int *)((char *)1132) - link->start_tick) * link->speed) >> 16;
+            offset = ((BIOS_TICKS - link->start_tick) * link->speed) >> 16;
             switch ((unsigned char)(link->axis - 1)) {
             case 0:
                 pos = offset + link->start;
@@ -196,7 +196,7 @@ int link_step(struct link *link)
             link->combination |= D_001A3A80;
             if (((int)(unsigned char)(link->combination & 15)) != (link->combination >> 4)) break;
         case 8:
-            offset = ((*(int *)((char *)1132) - link->start_tick) * link->speed) >> 16;
+            offset = ((BIOS_TICKS - link->start_tick) * link->speed) >> 16;
             axis = link->axis - 1;
             switch (axis) {
             case 0:
@@ -246,7 +246,7 @@ int link_step(struct link *link)
             D_001940DA |= 1;
             link_show_text(link->param + 5400);
             message = hud_message_add(D_0017596A);
-            *(signed char *)((char *)message + 3) = 0;
+            ((char *)message)[3] = 0;
             xn_kbd_flush();
             inpstr_begin_text(message + 2, 16);
             while (inpstr_update() == 0) {
@@ -260,7 +260,7 @@ int link_step(struct link *link)
         case 13:
             break;
         case 14:
-            object_set_position(player_object, *(int *)(*(char **)((char *)link + 74) + 7), *(int *)(*(char **)((char *)link + 74) + 11), *(int *)(*(char **)((char *)link + 74) + 15), player_object->angle_x, player_object->yaw, player_object->angle_z);
+            object_set_position(player_object, link[1].object->x, link[1].object->y, link[1].object->z, player_object->angle_x, player_object->yaw, player_object->angle_z);
             break;
         case 15:
             link->object->lock_level = (unsigned short)link->axis;

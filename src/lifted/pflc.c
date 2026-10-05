@@ -184,37 +184,42 @@ void flc_read_frame(struct flc_player *anim)
     unsigned short i;
     short chunk_count;
     {
-        char chunk[8];
+        struct {
+            int size;               /* +0x00: the chunk's, header included */
+            unsigned short type;    /* +0x04: 0xF1FA a frame; 4, 11 palettes, 13 black, 16 copy,
+                                       15 BRUN, 12 LC, 7 SS2 */
+            short pad06;            /* +0x06 */
+        } chunk;
 
         handle = anim->handle;
         for (;;) {
-            read((int)(unsigned short)handle, (int)chunk, 6);
-            if (((int)(unsigned short)*(short *)((char *)chunk + 4)) == 61946) break;
-            lseek((int)(unsigned short)handle, (int)(*(char **)chunk - 6), 1);
+            read((int)(unsigned short)handle, (int)&chunk, 6);
+            if (chunk.type == 61946) break;
+            lseek((int)(unsigned short)handle, chunk.size - 6, 1);
         }
         read((int)(unsigned short)handle, (int)&chunk_count, 2);
         lseek((int)(unsigned short)handle, 8, 1);
         *(int *)&i = 0;
         for (; (unsigned short)i < (short)chunk_count; (*(int *)&i)++) {
-            read((int)(unsigned short)handle, (int)chunk, 6);
-            *(int *)chunk += -6;
-            switch ((unsigned short)*(int *)((char *)chunk + 4)) {
+            read((int)(unsigned short)handle, (int)&chunk, 6);
+            chunk.size += -6;
+            switch (chunk.type) {
             case 4:
                 if ((anim->flags & 16) != 0) {
-                    lseek((int)(unsigned short)handle, (int)(unsigned short)*(short *)chunk, 1);
+                    lseek((int)(unsigned short)handle, (unsigned short)chunk.size, 1);
                 } else {
                     xn_pal_get(anim->palette + 768);
-                    read((int)(unsigned short)handle, anim->palette + 768, (int)(unsigned short)*(short *)chunk);
+                    read((int)(unsigned short)handle, anim->palette + 768, (unsigned short)chunk.size);
                     flc_decode_palette(anim->palette, anim->palette + 768, 0);
                     *(signed char *)&anim->flags |= 8;
                 }
                 break;
             case 11:
                 if ((anim->flags & 16) != 0) {
-                    lseek((int)(unsigned short)handle, (int)(unsigned short)*(short *)chunk, 1);
+                    lseek((int)(unsigned short)handle, (unsigned short)chunk.size, 1);
                 } else {
                     xn_pal_get(anim->palette + 768);
-                    read((int)(unsigned short)handle, anim->palette + 768, (int)(unsigned short)*(short *)chunk);
+                    read((int)(unsigned short)handle, anim->palette + 768, (unsigned short)chunk.size);
                     flc_decode_palette(anim->palette, anim->palette + 768, 0);
                     *(signed char *)&anim->flags |= 8;
                 }
@@ -224,25 +229,25 @@ void flc_read_frame(struct flc_player *anim)
                 break;
             case 16:
                 if ((anim->flags & 128) == 0) {
-                    read((int)(unsigned short)handle, screen_buffer, (int)(unsigned short)*(short *)chunk);
+                    read((int)(unsigned short)handle, screen_buffer, (unsigned short)chunk.size);
                 } else {
-                    read((int)(unsigned short)handle, anim->image, (int)(unsigned short)*(short *)chunk);
+                    read((int)(unsigned short)handle, anim->image, (unsigned short)chunk.size);
                 }
                 break;
             case 15:
-                read((int)(unsigned short)handle, anim->chunk, (int)(unsigned short)*(short *)chunk);
+                read((int)(unsigned short)handle, anim->chunk, (unsigned short)chunk.size);
                 flc_decode_brun(anim->chunk, anim);
                 break;
             case 12:
-                read((int)(unsigned short)handle, anim->chunk, (int)(unsigned short)*(short *)chunk);
+                read((int)(unsigned short)handle, anim->chunk, (unsigned short)chunk.size);
                 flc_decode_lc(anim->chunk, anim);
                 break;
             case 7:
-                read((int)(unsigned short)handle, anim->chunk, (int)(unsigned short)*(short *)chunk);
+                read((int)(unsigned short)handle, anim->chunk, (unsigned short)chunk.size);
                 flc_decode_ss2(anim->chunk, anim);
                 break;
             default:
-                lseek((int)(unsigned short)handle, *(int *)chunk, 1);
+                lseek((int)(unsigned short)handle, chunk.size, 1);
             }
         }
         xn_draw_image(anim->x, anim->y, anim->width, anim->height, anim->image);

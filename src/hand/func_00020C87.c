@@ -1,7 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x00020C87 */
 #include "records.h"
 
-struct row { short v; char pad[78]; };
 struct shop { unsigned char mul; char pad1; short base; short min; short max; };
 struct res { int f0; int f4; };
 extern char *screen_buffer;
@@ -11,7 +10,7 @@ extern unsigned char player_environment;
 extern int crime_reputation_loss[];
 extern struct shop crime_fine_table[];
 extern char D_00187CA8;
-extern struct row region_legal_reputation[];
+extern struct region regions[];
 extern int scratch_190cac;
 extern char scratch_190d16;
 extern signed char scratch_190d17;
@@ -71,11 +70,11 @@ int court_open(int crime)
         court_reputation_change = crime_reputation_loss[crime] >> 1;
         if (player_environment == 2)
             map_goto_location(current_region, 1, location_object->image, 0);
-        if (region_legal_reputation[current_region].v < 0) {
-            penalty = -region_legal_reputation[current_region].v;
+        if (regions[current_region].legal_reputation < 0) {
+            penalty = -regions[current_region].legal_reputation;
             if (penalty > 75)
                 penalty = 75;
-            half_penalty = -region_legal_reputation[current_region].v / 2;
+            half_penalty = -regions[current_region].legal_reputation / 2;
             if (half_penalty > 75)
                 half_penalty = 75;
         }
@@ -85,10 +84,10 @@ int court_open(int crime)
             scratch_190d16 = 0;
         else
             scratch_190d16 = 2;
-        if (region_legal_reputation[current_region].v < 0)
-            fine = crime_fine_table[crime].base - region_legal_reputation[current_region].v * crime_fine_table[crime].mul;
+        if (regions[current_region].legal_reputation < 0)
+            fine = crime_fine_table[crime].base - regions[current_region].legal_reputation * crime_fine_table[crime].mul;
         else
-            fine = crime_fine_table[crime].base + region_legal_reputation[current_region].v * crime_fine_table[crime].mul;
+            fine = crime_fine_table[crime].base + regions[current_region].legal_reputation * crime_fine_table[crime].mul;
         if (crime_fine_table[crime].min > fine)
             fine = crime_fine_table[crime].min;
         else if (crime_fine_table[crime].max < fine)
