@@ -706,7 +706,6 @@ def collect_sites(s, structs, prefer=()):
     import bisect
     sites, skipped = [], []
     bare = re.compile(r"(&)?\*\((" + TYPES + r") ?\*\)&?(\w+)\b(?!\s*\()")
-    outer = re.compile(r"\*\((?:" + TYPES + r") \*\)\((?:\(char \*\))?$")
     gfix = None
     if glob:
         gfix = re.compile(r"(\*\((?:" + TYPES + r") ?\*\))(" + "|".join(map(re.escape, glob)) + r")\b(?!\s*\()")
@@ -1033,7 +1032,6 @@ def settle(s, sites, ver, tmp, log):
     broken = [f for f, ok in base.items() if not ok]
     if broken:
         log("baseline (every cast raw) already fails: %s" % ", ".join(broken))
-    good = {f: list(raw) for f in funcs}    # a known-good choice per function (its own sites)
 
     def combine(over=None):
         """The settled choice, with function f's sites from `over` = (f, choice)."""
