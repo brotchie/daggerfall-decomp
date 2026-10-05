@@ -6,204 +6,204 @@ struct bf8_0_2 { unsigned char f:2; };
 struct bf8_3_1 { unsigned char _:3; unsigned char f:1; };
 struct bf8_4_1 { unsigned char _:4; unsigned char f:1; };
 struct bf8_5_1 { unsigned char _:5; unsigned char f:1; };
-extern char D_0012AC00[];
+extern char mouse_buttons[];
 extern char D_0012B508[];
 extern char D_001760D6[];
 extern char D_00176141[];
 extern char D_0017614E[];
-extern char D_001789FA[];
+extern char player_environment[];
 extern char D_00185087[];
 extern char D_00187CA8[];
 extern char D_0018DDE4[];
 extern char D_001940D9[];
-extern char D_001940DB[];
+extern char player_motion_flags[];
 extern char D_00195998[];
-extern char D_001959AC[];
-extern char D_00195A9C[];
-extern char D_00195AA0[];
-extern char D_00195AA4[];
+extern char frame_counter[];
+extern char current_building[];
+extern char player_entity[];
+extern char player_object[];
 extern char D_00195AC4[];
-extern char D_00195AF0[];
-extern char D_00195B14[];
-extern char D_00195BDC[];
-extern char D_00195BE0[];
-extern char D_00195BF4[];
+extern char tavern_building[];
+extern char creature_count[];
+extern char current_location[];
+extern char player_character[];
+extern char game_minutes[];
 extern char D_00195CDC[];
 extern char D_00195D48[];
-extern char D_00195D7C[];
+extern char player_death_timer[];
 extern char D_0019626F[];
 extern char D_00196272[];
-extern char D_00196274[];
-extern char D_0019627D[];
-extern char D_0019627E[];
+extern char game_mode[];
+extern char in_dungeon_water[];
+extern char crime_current[];
 extern char D_00196283[];
 extern char D_00196294[];
 extern char D_0019629B[];
 extern char D_001962A4[];
 extern char D_001A4A24[];
-extern char D_001A4A28[];
+extern char rest_image[];
 
-extern int func_0001F5FD(void);
-extern int func_0006D13E(int);
-extern int func_000702A0(unsigned char);
-extern int func_0007D6AE(int, int);
-extern int func_0007DF35(int);
+extern int tavern_room_rented(void);
+extern int disk_resolve_path(int);
+extern int guild_find_membership_by_kind(unsigned char);
+extern int rand_range(int, int);
+extern int object_building(int);
 extern int func_000A0024();
 extern int func_000A0040();
 extern int func_000C1500();
 extern int func_0012B136();
 extern int func_00144D00();
-extern void func_0001F525(void);
-extern void func_0002ECBE(int);
-extern void func_0003CCA3(void);
-extern void func_0003D01C(int, int);
-extern void func_0003EC2A(int, int);
-extern void func_0003F09F(int, int);
-extern void func_00040C87(int);
-extern void func_0004AC01(int);
-extern void func_0004FF2E(void);
-extern void func_00071606(int);
-extern void func_00072916(int, int);
-extern void func_00073EDB(void);
-void func_0007242F(int);
+extern void tavern_go_to_room(void);
+extern void damage_creature_death(int);
+extern void raise_skills(void);
+extern void skill_add_uses(int, int);
+extern void msgbox_show_string(int, int);
+extern void msgbox_show_rsc(int, int);
+extern void guards_summon(int);
+extern void time_pass_minutes(int);
+extern void palette_restore(void);
+extern void rest_recover(int);
+extern void weapon_load_hand_sprite(int, int);
+extern void weapon_free_sprites(void);
+void fatigue_add(int);
 
-void func_0007212B(void)
+void rest_close(void)
 {
     int l_18;
 
-    if (((int)(unsigned char)*(signed char *)D_00196274) != 16) return;
-    if (*(int *)D_001A4A28 == 0) goto L7215E;
-    if (*(int *)D_001A4A28 != (-1751672937)) goto L72160;
+    if (((int)(unsigned char)*(signed char *)game_mode) != 16) return;
+    if (*(int *)rest_image == 0) goto L7215E;
+    if (*(int *)rest_image != (-1751672937)) goto L72160;
 L7215E:;
     goto L7217E;
 L72160:;
-    func_000A0024(*(int *)D_001A4A28, (int)D_001760D6, 271);
-    *(int *)D_001A4A28 = -1751672937;
+    func_000A0024(*(int *)rest_image, (int)D_001760D6, 271);
+    *(int *)rest_image = -1751672937;
 L7217E:;
     *(signed char *)D_00196272 = 0;
-    *(signed char *)D_00196274 = 0;
+    *(signed char *)game_mode = 0;
     *(signed char *)D_0019626F = 16;
     *(signed char *)D_00187CA8 = 1;
     *(signed char *)D_00196294 = 0;
     *(signed char *)D_0019629B = 0;
     *(int *)D_00195D48 = 10000;
-    if (*(int *)(*(char **)D_00195BE0 + 499) == 0) goto L721CC;
-    if (*(short *)(*(char **)D_00195BE0 + 108) != 0) goto L721CE;
+    if (*(int *)(*(char **)player_character + 499) == 0) goto L721CC;
+    if (*(short *)(*(char **)player_character + 108) != 0) goto L721CE;
 L721CC:;
     goto L721E5;
 L721CE:;
-    if (((int)(unsigned short)(*(short *)(*(char **)D_00195BE0 + 64) & 16)) != 0) goto L721EA;
+    if (((int)(unsigned short)(*(short *)(*(char **)player_character + 64) & 16)) != 0) goto L721EA;
 L721E5:;
     goto L72276;
 L721EA:;
-    *(signed char *)(*(char **)D_00195BE0 + 64) &= 239;
+    *(signed char *)(*(char **)player_character + 64) &= 239;
 L721F3:;
-    if (*(signed char *)D_0012AC00 == 0) goto L72203;
+    if (*(signed char *)mouse_buttons == 0) goto L72203;
     func_0012B136();
     goto L721F3;
 L72203:;
-    l_18 = func_0006D13E((int)D_00176141);
+    l_18 = disk_resolve_path((int)D_00176141);
     func_000A0040(655360, 0, 64000, (int)D_001760D6, 285, 4);
     func_000C1500(l_18, 0, 0, 1);
     func_000A0040(655360, 0, 64000, (int)D_001760D6, 287, 4);
-    func_0004FF2E();
+    palette_restore();
     *(signed char *)D_0019629B = 0;
     *(int *)D_00195D48 = 10000;
     goto L72335;
 L72276:;
-    if (*(int *)(*(char **)D_00195BE0 + 499) == 0) goto L72290;
-    if (*(short *)(*(char **)D_00195BE0 + 108) == 0) goto L72292;
+    if (*(int *)(*(char **)player_character + 499) == 0) goto L72290;
+    if (*(short *)(*(char **)player_character + 108) == 0) goto L72292;
 L72290:;
     goto L722A9;
 L72292:;
-    if (((int)(unsigned short)(*(short *)(*(char **)D_00195BE0 + 64) & 16)) != 0) goto L722AE;
+    if (((int)(unsigned short)(*(short *)(*(char **)player_character + 64) & 16)) != 0) goto L722AE;
 L722A9:;
     goto L72335;
 L722AE:;
-    *(signed char *)(*(char **)D_00195BE0 + 64) &= 239;
+    *(signed char *)(*(char **)player_character + 64) &= 239;
 L722B7:;
-    if (*(signed char *)D_0012AC00 == 0) goto L722C7;
+    if (*(signed char *)mouse_buttons == 0) goto L722C7;
     func_0012B136();
     goto L722B7;
 L722C7:;
-    l_18 = func_0006D13E((int)D_0017614E);
+    l_18 = disk_resolve_path((int)D_0017614E);
     func_000A0040(655360, 0, 64000, (int)D_001760D6, 297, 4);
     func_000C1500(l_18, 0, 0, 1);
     func_000A0040(655360, 0, 64000, (int)D_001760D6, 299, 4);
-    func_0004FF2E();
+    palette_restore();
     *(signed char *)D_0019629B = 0;
     *(int *)D_00195D48 = 10000;
 L72335:;
-    if (((unsigned)(*(int *)D_00195BF4 - *(int *)D_00195998)) <= 360) return;
-    *(int *)D_00195998 = *(int *)D_00195BF4;
-    func_0003CCA3();
+    if (((unsigned)(*(int *)game_minutes - *(int *)D_00195998)) <= 360) return;
+    *(int *)D_00195998 = *(int *)game_minutes;
+    raise_skills();
 }
 
-void func_00072360(void)
+void fatigue_update(void)
 {
     int l_18;
 
-    if (((int)(unsigned char)*(signed char *)D_00196274) == 16) goto L72386;
-    if (((int)(unsigned char)*(signed char *)D_00196274) != 19) goto L7238B;
+    if (((int)(unsigned char)*(signed char *)game_mode) == 16) goto L72386;
+    if (((int)(unsigned char)*(signed char *)game_mode) != 19) goto L7238B;
 L72386:;
     return;
 L7238B:;
     if (*(int *)D_0018DDE4 == 0) goto L7239D;
-    if (((struct bf8_0_2 *)&D_001959AC)->f == 0) goto L7239F;
+    if (((struct bf8_0_2 *)&frame_counter)->f == 0) goto L7239F;
 L7239D:;
     goto L723A4;
 L7239F:;
     return;
 L723A4:;
     l_18 = -11;
-    if (*(signed char *)D_0019627D == 0) goto L723C6;
-    if (((int)(unsigned char)*(signed char *)(*(char **)D_00195BE0 + 67)) != 7) goto L723C8;
+    if (*(signed char *)in_dungeon_water == 0) goto L723C6;
+    if (((int)(unsigned char)*(signed char *)(*(char **)player_character + 67)) != 7) goto L723C8;
 L723C6:;
     goto L723FD;
 L723C8:;
-    if (func_0007D6AE(1, 100) <= ((int)(short)*(short *)(*(char **)D_00195BE0 + 259))) goto L723EE;
+    if (rand_range(1, 100) <= ((int)(short)*(short *)(*(char **)player_character + 259))) goto L723EE;
     l_18 = -44;
 L723EE:;
-    func_0003D01C(17, 1);
+    skill_add_uses(17, 1);
 L723FD:;
     if (((struct bf8_4_1 *)&D_001940D9)->f == 0) goto L7240D;
     l_18 = -88;
 L7240D:;
-    if (((struct bf8_5_1 *)&D_001940DB)->f == 0) goto L7241D;
+    if (((struct bf8_5_1 *)&player_motion_flags)->f == 0) goto L7241D;
     l_18 = -22;
 L7241D:;
-    func_0007242F(l_18);
+    fatigue_add(l_18);
 }
 
-void func_0007242F(int a1)
+void fatigue_add(int a1)
 {
     int l_1C;
     int l_18;
 
-    if (*(int *)D_00195D7C != 0) return;
-    l_18 = (int)(unsigned short)*(short *)(*(char **)D_00195BE0 + 155);
+    if (*(int *)player_death_timer != 0) return;
+    l_18 = (int)(unsigned short)*(short *)(*(char **)player_character + 155);
     l_18 += a1;
-    l_1C = (((int)(short)*(short *)(*(char **)D_00195BE0 + 32)) + ((int)(short)*(short *)(*(char **)D_00195BE0 + 40))) << 6;
+    l_1C = (((int)(short)*(short *)(*(char **)player_character + 32)) + ((int)(short)*(short *)(*(char **)player_character + 40))) << 6;
     if (l_18 <= l_1C) goto L7248D;
     l_18 = l_1C;
 L7248D:;
-    *(short *)(*(char **)D_00195BE0 + 155) = l_18;
+    *(short *)(*(char **)player_character + 155) = l_18;
     if (l_18 >= 1) return;
     *(signed char *)D_0012B508 = 146;
-    *(short *)(*(char **)D_00195BE0 + 155) = 0;
-    if (*(int *)D_00195B14 == 0) goto L724DC;
-    func_0003F09F(1072, 1);
-    func_0002ECBE(*(int *)D_00195AA0);
+    *(short *)(*(char **)player_character + 155) = 0;
+    if (*(int *)creature_count == 0) goto L724DC;
+    msgbox_show_rsc(1072, 1);
+    damage_creature_death(*(int *)player_entity);
     return;
 L724DC:;
-    func_0003F09F(1071, 1);
+    msgbox_show_rsc(1071, 1);
     *(signed char *)D_001962A4 = 1;
-    func_0004AC01(60);
-    func_00071606(*(int *)D_00195AA0);
+    time_pass_minutes(60);
+    rest_recover(*(int *)player_entity);
     *(signed char *)D_001962A4 = 0;
 }
 
-void func_00072517(void)
+void breath_update(void)
 {
     int l_2C;
     int l_28;
@@ -212,7 +212,7 @@ void func_00072517(void)
     int l_1C;
     int l_18;
 
-    l_28 = (int)(short)*(short *)(*(char **)D_00195BE0 + 40);
+    l_28 = (int)(short)*(short *)(*(char **)player_character + 40);
     if (*(signed char *)D_00187CA8 == 0) return;
     if (l_28 <= 100) goto L7254B;
     l_28 = 100;
@@ -223,12 +223,12 @@ L7254B:;
     *(int *)D_001A4A24 = *(int *)((char *)l_24);
     return;
 L72577:;
-    if (((struct bf8_3_1 *)(*(char **)D_00195BE0 + 139))->f != 0) return;
+    if (((struct bf8_3_1 *)(*(char **)player_character + 139))->f != 0) return;
     if (*(int *)D_00195CDC != 0) goto L725D5;
     if ((*(int *)D_00195CDC = l_28 >> 1) <= 50) goto L725AF;
     *(int *)D_00195CDC = 50;
 L725AF:;
-    l_2C = func_000702A0(149);
+    l_2C = guild_find_membership_by_kind(149);
     if (l_2C == 0) goto L725D5;
     *(int *)D_00195CDC += ((int)(unsigned char)*(signed char *)((char *)l_2C)) * 3;
 L725D5:;
@@ -236,7 +236,7 @@ L725D5:;
     if (((unsigned)(*(int *)((char *)l_20) - *(int *)D_001A4A24)) <= 18) goto L7262C;
     (*(int *)D_00195CDC)--;
     l_1C = 1132;
-    if (((int)(unsigned char)*(signed char *)(*(char **)D_00195BE0 + 67)) != 7) goto L72613;
+    if (((int)(unsigned char)*(signed char *)(*(char **)player_character + 67)) != 7) goto L72613;
     if (((struct bf8_0_1 *)((char *)l_1C))->f != 0) goto L72615;
 L72613:;
     goto L7261B;
@@ -254,57 +254,57 @@ L7264B:;
     func_00144D00(310, (int)(short)(120 - (*(short *)D_00195CDC * 2)), 6, (int)(short)(*(short *)D_00195CDC * 2));
 L72682:;
     if (*(int *)D_00195CDC != 0) return;
-    func_0002ECBE(*(int *)D_00195AA0);
+    damage_creature_death(*(int *)player_entity);
 }
 
-int func_0007269F(void)
+int rest_allowed(void)
 {
-    if (*(int *)(*(char **)D_00195BE0 + 120) == 0) goto L726CA;
+    if (*(int *)(*(char **)player_character + 120) == 0) goto L726CA;
     if (((unsigned)(((unsigned)*(int *)(*(char **)D_00195AC4 + 31)) >> 16)) < 1000) goto L726CC;
 L726CA:;
     goto L726D8;
 L726CC:;
     return 1;
 L726D8:;
-    switch (*(unsigned char *)D_001789FA) {
+    switch (*(unsigned char *)player_environment) {
 case 1:
     if (((int)(unsigned short)*(short *)(*(char **)D_00195AC4 + 27)) != 65535) goto L72721;
     return 1;
 L72721:;
-    if (((int)(unsigned char)*(signed char *)(*(char **)D_00195BDC + 34)) == 4) goto L72745;
-    if (((int)(unsigned char)*(signed char *)(*(char **)D_00195BDC + 34)) != 7) goto L72747;
+    if (((int)(unsigned char)*(signed char *)(*(char **)current_location + 34)) == 4) goto L72745;
+    if (((int)(unsigned char)*(signed char *)(*(char **)current_location + 34)) != 7) goto L72747;
 L72745:;
     goto L72759;
 L72747:;
-    if (((int)(unsigned char)*(signed char *)(*(char **)D_00195BDC + 34)) <= 9) goto L72765;
+    if (((int)(unsigned char)*(signed char *)(*(char **)current_location + 34)) <= 9) goto L72765;
 L72759:;
     return 1;
 L72765:;
-    *(signed char *)D_0019627E = 8;
-    func_00040C87(1);
-    func_0003F09F(17, 1);
+    *(signed char *)crime_current = 8;
+    guards_summon(1);
+    msgbox_show_rsc(17, 1);
     return 0;
 case 2:
-    if (((int)(unsigned char)*(signed char *)(*(char **)D_00195A9C + 24)) != 15) goto L727DF;
-    *(int *)D_00195AF0 = *(int *)D_00195A9C;
-    if (func_0001F5FD() != 0) goto L727D1;
-    func_0003EC2A(*(int *)D_00185087, 1);
+    if (((int)(unsigned char)*(signed char *)(*(char **)current_building + 24)) != 15) goto L727DF;
+    *(int *)tavern_building = *(int *)current_building;
+    if (tavern_room_rented() != 0) goto L727D1;
+    msgbox_show_string(*(int *)D_00185087, 1);
     return 0;
 L727D1:;
-    func_0001F525();
+    tavern_go_to_room();
     return 1;
 L727DF:;
-    if (((int)(unsigned short)*(short *)(*(char **)D_00195A9C + 18)) != 41) goto L72800;
-    if (func_000702A0(2) != 0) goto L72802;
+    if (((int)(unsigned short)*(short *)(*(char **)current_building + 18)) != 41) goto L72800;
+    if (guild_find_membership_by_kind(2) != 0) goto L72802;
 L72800:;
     goto L72810;
 L72802:;
-    func_0001F525();
+    tavern_go_to_room();
     return 1;
 L72810:;
-    if (*(int *)(*(char **)D_00195A9C + 20) == *(int *)(*(char **)D_00195BE0 + 116)) goto L7283D;
-    *(signed char *)D_0019627E = 8;
-    func_00040C87(1);
+    if (*(int *)(*(char **)current_building + 20) == *(int *)(*(char **)player_character + 116)) goto L7283D;
+    *(signed char *)crime_current = 8;
+    guards_summon(1);
     return 0;
 default:
 L7283D:;
@@ -312,11 +312,11 @@ L7283D:;
 }
 }
 
-int func_00072851(void)
+int rest_room_expired(void)
 {
     int l_1C;
 
-    l_1C = func_0007DF35(*(int *)D_00195AA4);
+    l_1C = object_building(*(int *)player_object);
     if (l_1C != 0) goto L7287B;
     return 0;
 L7287B:;
@@ -324,7 +324,7 @@ L7287B:;
     return 0;
 L72894:;
     if (((int)(unsigned char)(*(signed char *)((char *)l_1C + 15) & 2)) == 0) goto L728B3;
-    if (((unsigned)*(int *)D_00195BF4) > *(int *)((char *)l_1C + 2)) goto L728B5;
+    if (((unsigned)*(int *)game_minutes) > *(int *)((char *)l_1C + 2)) goto L728B5;
 L728B3:;
     goto L728BE;
 L728B5:;
@@ -333,9 +333,9 @@ L728BE:;
     return 0;
 }
 
-void func_000728D2(void)
+void weapon_reload_hand_sprites(void)
 {
-    func_00073EDB();
-    func_00072916(*(int *)(*(char **)D_00195BE0 + 451), 1);
-    func_00072916(*(int *)(*(char **)D_00195BE0 + 443), 0);
+    weapon_free_sprites();
+    weapon_load_hand_sprite(*(int *)(*(char **)player_character + 451), 1);
+    weapon_load_hand_sprite(*(int *)(*(char **)player_character + 443), 0);
 }

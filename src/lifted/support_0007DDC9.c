@@ -2,23 +2,23 @@
  * do not edit: move a function to src/support.c to work on it by hand) */
 
 extern char D_0012B508[];
-extern char D_00196033[];
+extern char msgbox_button_keys[];
 extern char D_00196034[];
-extern char D_0019608F[];
+extern char msgbox_button_ids[];
 extern char D_00196090[];
 extern char D_00196091[];
 extern char D_00196271[];
 
-extern void func_0003F09F(int, int);
+extern void msgbox_show_rsc(int, int);
 
-void func_0007DDC9(short a1)
+void msgbox_yes_no_rsc(short a1)
 {
     *(signed char *)D_00196271 = 0;
-    *(signed char *)D_0019608F = 4;
+    *(signed char *)msgbox_button_ids = 4;
     *(signed char *)D_00196090 = 5;
     *(signed char *)D_00196091 = 0;
-    *(signed char *)D_00196033 = 21;
+    *(signed char *)msgbox_button_keys = 21;
     *(signed char *)D_00196034 = 49;
     *(signed char *)D_0012B508 = 146;
-    func_0003F09F((int)(short)a1, 5);
+    msgbox_show_rsc((int)(short)a1, 5);
 }

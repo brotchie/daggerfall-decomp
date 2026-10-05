@@ -6,9 +6,9 @@ extern char D_00170129[];
 extern int func_000A0DF4();
 extern int func_000A0E0D();
 #pragma aux sosconv "*" parm caller [] value [eax] modify [eax ebx ecx edx];
-#pragma aux (sosconv) func_000124BF;
+#pragma aux (sosconv) profile_set_string;
 
-int func_000124BF(int a1, int a2)
+int profile_set_string(int a1, int a2)
 {
     int l_20;
     int l_1C;

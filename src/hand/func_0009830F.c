@@ -1,6 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0009830F */
-extern char *D_00195B20;
-extern unsigned D_00195BF4;
+extern char *inv_right_container;
+extern unsigned game_minutes;
 
 void func_0009830F(void)
 {
@@ -15,7 +15,7 @@ void func_0009830F(void)
     char *l_18;
 
     l_28 = 0;
-    l_1C = *(char **)(D_00195B20 + 63);
+    l_1C = *(char **)(inv_right_container + 63);
     while (l_1C != 0) {
         l_18 = l_1C + 71;
         l_20 = (*(unsigned short *)(l_18 + 46) - *(unsigned short *)(l_18 + 44)) * 1440 / 1000 + 1440;
@@ -28,7 +28,7 @@ void func_0009830F(void)
     }
     l_24 = l_34;
     l_28 = 0;
-    l_1C = *(char **)(D_00195B20 + 63);
+    l_1C = *(char **)(inv_right_container + 63);
     while (l_1C != 0) {
         if (l_28 != l_2C) {
             l_18 = l_1C + 71;
@@ -38,11 +38,11 @@ void func_0009830F(void)
         l_1C = *(char **)(l_1C + 55);
     }
     l_3C = (double)l_34 / l_24;
-    l_1C = *(char **)(D_00195B20 + 63);
+    l_1C = *(char **)(inv_right_container + 63);
     while (l_1C != 0) {
         l_18 = l_1C + 71;
         l_20 = (*(unsigned short *)(l_18 + 46) - *(unsigned short *)(l_18 + 44)) * 1440 / 1000 + 1440;
-        *(unsigned *)(l_1C + 43) = D_00195BF4 + (unsigned)(l_20 * l_3C);
+        *(unsigned *)(l_1C + 43) = game_minutes + (unsigned)(l_20 * l_3C);
         l_1C = *(char **)(l_1C + 55);
     }
 }

@@ -3,16 +3,16 @@
 
 extern char D_0017629C[];
 extern char D_001762B5[];
-extern char D_00195AA0[];
+extern char player_entity[];
 
-extern int func_0004A3EC(int);
-extern int func_0007CBA1(int);
-extern int func_000801A4(void);
-extern void func_0004BBD8(int, int, int);
-extern void func_000922F6(int, int, int);
-extern void func_00097101(int);
+extern int object_weight(int);
+extern int hud_message_add(int);
+extern int carry_capacity(void);
+extern void quest_raise_event(int, int, int);
+extern void inventory_open_container(int, int, int);
+extern void inv_store_item(int);
 
-void func_00075839(int a1)
+void pick_up_item(int a1)
 {
     int l_24;
     int l_20;
@@ -25,20 +25,20 @@ void func_00075839(int a1)
 L7586E:;
     goto L75881;
 L75870:;
-    func_000922F6(a1, 0, 5);
+    inventory_open_container(a1, 0, 5);
     return;
 L75881:;
-    l_20 = func_0004A3EC(a1);
-    l_1C = func_0004A3EC(*(int *)D_00195AA0);
-    l_18 = func_000801A4() << 2;
+    l_20 = object_weight(a1);
+    l_1C = object_weight(*(int *)player_entity);
+    l_18 = carry_capacity() << 2;
     if (l_20 <= l_18) goto L758B8;
-    func_0007CBA1((int)D_0017629C);
+    hud_message_add((int)D_0017629C);
     return;
 L758B8:;
     if ((l_20 + l_1C) <= l_18) goto L758CF;
-    func_0007CBA1((int)D_001762B5);
+    hud_message_add((int)D_001762B5);
     return;
 L758CF:;
-    func_0004BBD8(3, a1, 0);
-    func_00097101(a1);
+    quest_raise_event(3, a1, 0);
+    inv_store_item(a1);
 }

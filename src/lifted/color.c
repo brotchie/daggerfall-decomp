@@ -3,7 +3,7 @@
 
 struct bf8_7_1 { unsigned char _:7; unsigned char f:1; };
 extern char D_00177350[];
-extern char D_001789FA[];
+extern char player_environment[];
 extern char D_00187B6E[];
 extern char D_00187B72[];
 extern char D_00187B76[];
@@ -11,21 +11,21 @@ extern char D_001886A8[];
 extern char D_001886A9[];
 extern char D_001886D2[];
 extern char D_00190BE4[];
-extern char D_00195AA4[];
+extern char player_object[];
 extern char D_00195AC4[];
-extern char D_00195BDC[];
-extern char D_00195BF4[];
+extern char current_location[];
+extern char game_minutes[];
 extern char D_001AA5FC[];
 extern char D_001AA600[];
-extern char D_001AA604[];
+extern char doors_moving[];
 
-extern int func_00069938(int, int, int);
+extern int sound_play(int, int, int);
 extern int func_000A00AF();
 extern int func_000A1023();
 extern int func_000CE663();
 extern int func_000CE66C();
 extern int func_0014AA92();
-extern void func_0008E3A7(int, int);
+extern void object_foreach_post(int, int);
 int func_00099B86(int);
 void func_00099CB9(int);
 
@@ -109,7 +109,7 @@ L9990F:;
     return *(int *)&l_1C;
 }
 
-void func_00099A37(void)
+void doors_update(void)
 {
     int l_28;
     int l_24;
@@ -125,8 +125,8 @@ L99A57:;
     l_28++;
     goto L99A4C;
 L99A5F:;
-    if (*(int *)(D_001AA604 + (l_28 << 2)) == 0) goto L99A57;
-    l_20 = *(int *)(D_001AA604 + (l_28 << 2));
+    if (*(int *)(doors_moving + (l_28 << 2)) == 0) goto L99A57;
+    l_20 = *(int *)(doors_moving + (l_28 << 2));
     if (((struct bf8_7_1 *)((char *)l_20 + 46))->f != 0) goto L99A92;
     if (func_00099B86(l_20) != 0) goto L99A94;
 L99A92:;
@@ -147,10 +147,10 @@ L99AF5:;
     if (l_24 >= 0) goto L99B02;
     l_24 = 0;
 L99B02:;
-    *(int *)(D_001AA604 + (l_28 << 2)) = 0;
+    *(int *)(doors_moving + (l_28 << 2)) = 0;
     *(signed char *)((char *)l_20 + 46) &= 191;
     if (((struct bf8_7_1 *)((char *)l_20 + 46))->f != 0) goto L99B59;
-    func_00069938(((((int)(unsigned char)*(signed char *)D_001789FA) == 2) ? 361 : 26), l_20, 100);
+    sound_play(((((int)(unsigned char)*(signed char *)player_environment) == 2) ? 361 : 26), l_20, 100);
 L99B59:;
     if (((struct bf8_7_1 *)((char *)l_20 + 46))->f != 0) goto L99B6D;
     l_24 = 512 - l_24;
@@ -164,9 +164,9 @@ int func_00099B86(int a1)
     int l_20;
     int l_1C;
 
-    *(int *)D_00187B6E = *(int *)(*(char **)D_00195AA4 + 7);
-    *(int *)D_00187B72 = *(int *)(*(char **)D_00195AA4 + 11);
-    *(int *)D_00187B76 = *(int *)(*(char **)D_00195AA4 + 15);
+    *(int *)D_00187B6E = *(int *)(*(char **)player_object + 7);
+    *(int *)D_00187B72 = *(int *)(*(char **)player_object + 11);
+    *(int *)D_00187B76 = *(int *)(*(char **)player_object + 15);
     l_20 = a1 + 71;
     if (*(int *)((char *)l_20) == 0) goto L99C07;
     l_1C = func_0014AA92(l_20, (int)D_00187B6E, 0);
@@ -188,14 +188,14 @@ L99C46:;
 L99C48:;
     *(int *)&l_18 = 0;
 L99C4F:;
-    if ((short)l_18 < *(unsigned short *)(*(char **)D_00195BDC + 41)) goto L99C6F;
+    if ((short)l_18 < *(unsigned short *)(*(char **)current_location + 41)) goto L99C6F;
     goto L99CA3;
 L99C67:;
     (*(int *)&l_18)++;
     goto L99C4F;
 L99C6F:;
-    if (*(int *)((char *)(int)((((int)(short)l_18) * 26) + *(char **)(*(char **)D_00195BDC + 43)) + 20) != *(int *)((char *)a1 + 31)) goto L99CA1;
-    return *(int *)(*(char **)D_00195BDC + 43) + (((int)(short)l_18) * 26);
+    if (*(int *)((char *)(int)((((int)(short)l_18) * 26) + *(char **)(*(char **)current_location + 43)) + 20) != *(int *)((char *)a1 + 31)) goto L99CA1;
+    return *(int *)(*(char **)current_location + 43) + (((int)(short)l_18) * 26);
 L99CA1:;
     goto L99C67;
 L99CA3:;
@@ -220,7 +220,7 @@ void func_00099D0D(int a1)
 {
     int l_18;
 
-    l_18 = ((unsigned)*(int *)D_00195BF4) % 1440;
+    l_18 = ((unsigned)*(int *)game_minutes) % 1440;
     *(int *)D_00190BE4 = (((l_18 > 360) && (l_18 < 1080)) ? 1 : 0);
-    func_0008E3A7(*(int *)((char *)a1 + 63), (int)func_00099CB9);
+    object_foreach_post(*(int *)((char *)a1 + 63), (int)func_00099CB9);
 }

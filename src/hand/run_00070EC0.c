@@ -1,94 +1,94 @@
 /* matched by the real Watcom C32 10.0a (-d2): a run of guilds from 0x70AFA to 0x70EC0, kept together for its switch table's alignment */
 struct rep { short value; char pad[78]; };
-extern unsigned char D_00142324;
+extern unsigned char key_down_enter;
 extern int D_00185077;
 extern unsigned char *D_00187545;
-extern struct rep D_0018F08E[];
-extern int D_00195B8C;
-extern unsigned char *D_00195B50;
-extern unsigned char *D_00195BE0;
-extern unsigned char D_00196268;
+extern struct rep region_legal_reputation[];
+extern int inpstr_result;
+extern unsigned char *guild_npc_object;
+extern unsigned char *player_character;
+extern unsigned char current_region;
 extern unsigned char *D_0019671C;
-extern unsigned char *D_001A4A14;
-extern void func_0003F09F(int, int);
-extern int func_0004C274(unsigned char, unsigned char, unsigned char, unsigned char, unsigned char);
-extern void func_000756C6(unsigned char *);
-extern int func_0007D6AE(int, int);
-extern void func_0007DE82(int, int);
-extern void func_0007F1E3(int);
-extern int func_0007F2A8(int);
+extern unsigned char *guild_membership;
+extern void msgbox_show_rsc(int, int);
+extern int quest_pick_file(unsigned char, unsigned char, unsigned char, unsigned char, unsigned char);
+extern void npc_talk(unsigned char *);
+extern int rand_range(int, int);
+extern void msgbox_prompt_number(int, int);
+extern void gold_spend(int);
+extern int gold_can_afford(int);
 extern int func_0009DEAC(short);
 
-void func_00070AFA(unsigned char *a1)
+void blessing_remove(unsigned char *a1)
 {
     if (a1[0] == 255) {
-        D_0018F08E[a1[6]].value -= a1[1];
+        region_legal_reputation[a1[6]].value -= a1[1];
         return;
     }
     if (a1[0] & 128) {
-        *(short *)(D_00195BE0 + 32 + (a1[0] & 127) * 2) -= a1[1];
+        *(short *)(player_character + 32 + (a1[0] & 127) * 2) -= a1[1];
         return;
     }
-    *(short *)(D_00195BE0 + 157 + a1[0] * 6) -= a1[1];
+    *(short *)(player_character + 157 + a1[0] * 6) -= a1[1];
 }
 
-int func_00070B9C(unsigned char *a1, int a2)
+int blessing_apply(unsigned char *a1, int a2)
 {
     int l_18;
 
     if (a1[0] == 255) {
-        D_0018F08E[D_00196268].value += a2;
-        if (D_0018F08E[D_00196268].value > 100) {
-            l_18 = a2 - (D_0018F08E[D_00196268].value - 100);
-            D_0018F08E[D_00196268].value = 100;
+        region_legal_reputation[current_region].value += a2;
+        if (region_legal_reputation[current_region].value > 100) {
+            l_18 = a2 - (region_legal_reputation[current_region].value - 100);
+            region_legal_reputation[current_region].value = 100;
         }
     } else if (a1[0] & 128) {
-        *(short *)(D_00195BE0 + 32 + (a1[0] & 127) * 2) += a2;
-        if (*(short *)(D_00195BE0 + 32 + (a1[0] & 127) * 2) > 100) {
-            l_18 = a2 - (*(short *)(D_00195BE0 + 32 + (a1[0] & 127) * 2) - 100);
-            *(short *)(D_00195BE0 + 32 + (a1[0] & 127) * 2) = 100;
+        *(short *)(player_character + 32 + (a1[0] & 127) * 2) += a2;
+        if (*(short *)(player_character + 32 + (a1[0] & 127) * 2) > 100) {
+            l_18 = a2 - (*(short *)(player_character + 32 + (a1[0] & 127) * 2) - 100);
+            *(short *)(player_character + 32 + (a1[0] & 127) * 2) = 100;
         }
     } else {
-        *(short *)(D_00195BE0 + 157 + a1[0] * 6) += a2;
-        if (*(short *)(D_00195BE0 + 157 + a1[0] * 6) > 100) {
-            l_18 = a2 - (*(short *)(D_00195BE0 + 157 + a1[0] * 6) - 100);
-            *(short *)(D_00195BE0 + 157 + a1[0] * 6) = 100;
+        *(short *)(player_character + 157 + a1[0] * 6) += a2;
+        if (*(short *)(player_character + 157 + a1[0] * 6) > 100) {
+            l_18 = a2 - (*(short *)(player_character + 157 + a1[0] * 6) - 100);
+            *(short *)(player_character + 157 + a1[0] * 6) = 100;
         }
     }
     return a2;
 }
 
-void func_00070D48(void)
+void guild_donate(void)
 {
-    func_0007DE82(1000, D_00185077);
-    while (D_00142324 != 0)
+    msgbox_prompt_number(1000, D_00185077);
+    while (key_down_enter != 0)
         ;
-    if (D_00195B8C < 1)
+    if (inpstr_result < 1)
         return;
-    if (func_0007F2A8(D_00195B8C) == 0) {
-        func_0003F09F(702, 1);
+    if (gold_can_afford(inpstr_result) == 0) {
+        msgbox_show_rsc(702, 1);
         return;
     }
-    func_0007F1E3(D_00195B8C);
-    if (func_0007D6AE(1, 100) <= D_00195B8C * 2 / (func_0009DEAC(*(short *)(D_0019671C + 29)) + 1))
+    gold_spend(inpstr_result);
+    if (rand_range(1, 100) <= inpstr_result * 2 / (func_0009DEAC(*(short *)(D_0019671C + 29)) + 1))
         (*(short *)(D_0019671C + 29))++;
-    func_0003F09F(703, 1);
+    msgbox_show_rsc(703, 1);
 }
 
-void func_00070DFD(void)
+void guild_temple_quest(void)
 {
-    if (D_00195B50[38] != 0) {
-        func_000756C6(D_00195B50);
+    if (guild_npc_object[38] != 0) {
+        npc_talk(guild_npc_object);
         return;
     }
-    if (D_001A4A14 != 0) {
-        func_0004C274(*(D_00187545 - 142 + D_001A4A14[2]), 67, 48, 66, D_001A4A14[0]);
+    if (guild_membership != 0) {
+        quest_pick_file(*(D_00187545 - 142 + guild_membership[2]), 67, 48, 66, guild_membership[0]);
         return;
     }
-    func_0004C274(*(D_00187545 - 142 + D_001A4A14[2]), 67, 48, 67, D_00195BE0[129]);
+    quest_pick_file(*(D_00187545 - 142 + guild_membership[2]), 67, 48, 67, player_character[129]);
 }
 
-int func_00070EC0(unsigned char *a1)
+int guild_kind_of_faction(unsigned char *a1)
 {
     switch (*(unsigned short *)(a1 + 33)) {
     case 108:

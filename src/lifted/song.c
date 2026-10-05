@@ -6,7 +6,7 @@ extern char D_001706BD[];
 extern char D_001706CA[];
 extern char D_001706CD[];
 extern char D_00179EA8[];
-extern char D_001903A4[];
+extern char text_buffer[];
 extern char D_00190CA2[];
 extern char D_00190CD4[];
 extern char D_00190CD8[];
@@ -16,11 +16,11 @@ extern char D_00190D20[];
 extern char D_00190D21[];
 extern char D_00190D22[];
 extern char D_00190D64[];
-extern char D_00190FE4[];
-extern char D_00195BE0[];
+extern char text_rsc_buffer[];
+extern char player_character[];
 extern char D_00195C44[];
 
-extern int func_0007D6AE(int, int);
+extern int rand_range(int, int);
 extern int func_0009DC25();
 extern int func_0009DC49();
 extern int func_000A0AD9();
@@ -28,8 +28,8 @@ extern int func_000A0ED9(int, int);
 extern int func_000A0F5C(int, ...);
 extern int func_000A1054();
 extern int func_000CE790();
-extern void func_0004A6B5(int, int, int);
-extern void func_0007D6EA(int);
+extern void parse_rsc_text(int, int, int);
+extern void object_free_later(int);
 #pragma aux func_000A0ED9 parm routine [];
 
 void func_000209F3(int a1)
@@ -40,13 +40,13 @@ void func_000209F3(int a1)
     if (a1 != 0) return;
     l_1C = func_0009DC25();
     func_0009DC49(l_1C);
-    func_0004A6B5(850, 0, 0);
-    func_000A0AD9((int)D_001903A4, (int)D_00190FE4, 160, (int)D_001706B6, 42);
-    func_0004A6B5(851, 0, 0);
-    func_000A1054((int)D_001903A4, (int)D_00190FE4, (int)D_001706B6, 44, 160);
+    parse_rsc_text(850, 0, 0);
+    func_000A0AD9((int)text_buffer, (int)text_rsc_buffer, 160, (int)D_001706B6, 42);
+    parse_rsc_text(851, 0, 0);
+    func_000A1054((int)text_buffer, (int)text_rsc_buffer, (int)D_001706B6, 44, 160);
     func_000A0ED9(45, (int)D_001706B6);
-    func_000A0F5C((int)D_00190FE4, (int)D_001706BD, (int)D_001903A4, l_1C);
-    func_000A0AD9(*(int *)D_00195C44 + 50000, (int)D_00190FE4, 4, (int)D_001706B6, 46);
+    func_000A0F5C((int)text_rsc_buffer, (int)D_001706BD, (int)text_buffer, l_1C);
+    func_000A0AD9(*(int *)D_00195C44 + 50000, (int)text_rsc_buffer, 4, (int)D_001706B6, 46);
     l_1C = 0;
 L20AC5:;
     if (l_1C < 26) goto L20AD5;
@@ -55,15 +55,15 @@ L20ACD:;
     l_1C++;
     goto L20AC5;
 L20AD5:;
-    *(short *)(D_00190D64 + (l_1C * 2)) = func_0007D6AE(0, 21) + 900;
+    *(short *)(D_00190D64 + (l_1C * 2)) = rand_range(0, 21) + 900;
     goto L20ACD;
 L20AF6:;
     l_1C = func_0009DC25() % 10;
     l_18 = func_000CE790(*(int *)D_00179EA8, 33, l_1C);
 L20B21:;
     if (((int)(unsigned char)*(signed char *)((char *)l_18)) == 33) goto L20B91;
-    func_0004A6B5((int)(short)*(short *)(D_00190CA2 + (((int)(unsigned char)*(signed char *)((char *)l_18++)) * 2)), 0, 0);
-    func_000A1054(*(int *)D_00195C44 + 50000, (int)D_00190FE4, (int)D_001706B6, 56, 4);
+    parse_rsc_text((int)(short)*(short *)(D_00190CA2 + (((int)(unsigned char)*(signed char *)((char *)l_18++)) * 2)), 0, 0);
+    func_000A1054(*(int *)D_00195C44 + 50000, (int)text_rsc_buffer, (int)D_001706B6, 56, 4);
     func_000A1054(*(int *)D_00195C44 + 50000, (int)D_001706CA, (int)D_001706B6, 57, 4);
     goto L20B21;
 L20B91:;
@@ -78,7 +78,7 @@ void func_00020BBB(int a1)
     *(signed char *)D_00190D1F = func_0009DC25() & -255;
     if (a1 == 0) goto L20BF9;
     *(int *)D_00190CD4 = 0;
-    *(signed char *)D_00190D20 = *(signed char *)(*(char **)D_00195BE0 + 64) & 1;
+    *(signed char *)D_00190D20 = *(signed char *)(*(char **)player_character + 64) & 1;
     goto L20C0F;
 L20BF9:;
     *(int *)D_00190CD4 = func_0009DC25();
@@ -97,8 +97,8 @@ L20C32:;
 }
 }
 
-void func_00020C55(int a1)
+void crime_remove_monster(int a1)
 {
     if (((int)(unsigned char)*(signed char *)((char *)a1)) != 18) return;
-    func_0007D6EA(a1);
+    object_free_later(a1);
 }

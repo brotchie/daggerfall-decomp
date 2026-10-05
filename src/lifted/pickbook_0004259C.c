@@ -2,21 +2,21 @@
  * do not edit: move a function to src/pickbook.c to work on it by hand) */
 
 extern char D_0012B508[];
-extern char D_00196274[];
+extern char game_mode[];
 
-extern int func_00042F0F(int);
-extern void func_0003C4DE(void);
-extern void func_0003F09F(int, int);
+extern int key_action_held(int);
+extern void show_health_status(void);
+extern void msgbox_show_rsc(int, int);
 
-void func_0004259C(short a1)
+void status_show(short a1)
 {
     if (a1 != 0) goto L425CD;
-    if (*(signed char *)D_00196274 != 0) goto L425CB;
-    if (func_00042F0F(35) != 0) goto L425CD;
+    if (*(signed char *)game_mode != 0) goto L425CB;
+    if (key_action_held(35) != 0) goto L425CD;
 L425CB:;
     return;
 L425CD:;
     *(signed char *)D_0012B508 = 146;
-    func_0003F09F(22, 1);
-    func_0003C4DE();
+    msgbox_show_rsc(22, 1);
+    show_health_status();
 }

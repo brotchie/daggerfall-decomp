@@ -15,12 +15,12 @@ struct list {
 #pragma pack()
 extern char D_00176E38[];
 extern struct bits8 D_001940D8;
-extern void func_0008CC33(struct list *);
+extern void picklist_update_thumb(struct list *);
 extern void func_000A0AD9(char *, char *, int, char *, int);
 extern void func_000A0E0D(void *, void *, int, char *, int, int);
 extern int func_000A0E3B(char *, char *);
 
-void func_0008CCC8(struct list *l, char *name, short val)
+void picklist_add(struct list *l, char *name, short val)
 {
     int unused;
     short i;
@@ -51,5 +51,5 @@ void func_0008CCC8(struct list *l, char *name, short val)
     }
 done:
     l->count++;
-    func_0008CC33(l);
+    picklist_update_thumb(l);
 }

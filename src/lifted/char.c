@@ -3,23 +3,23 @@
 
 extern char D_0017573C[];
 extern char D_001841E3[];
-extern char D_00196268[];
-extern char D_0019991C[];
+extern char current_region[];
+extern char npc_record_buffer[];
 extern char D_0019995C[];
 extern char D_0019995F[];
 extern char D_001999AD[];
 extern char D_00199B43[];
 
-extern int func_000191DA(int, short);
-extern int func_000192EE(short);
-extern int func_000504D8(int);
+extern int faction_find_type_in_region(int, short);
+extern int faction_find(short);
+extern int flats_cfg_find(int);
 extern int func_0008B48B(int);
 extern int func_0009DC25();
 extern int func_0009DC49();
 extern int func_000A0040();
 extern int func_000A0AD9();
 
-int func_00059973(int a1)
+int npc_talk_record_build(int a1)
 {
     int l_2C;
     int l_28;
@@ -28,9 +28,9 @@ int func_00059973(int a1)
     int l_1C;
 
     l_24 = func_0009DC25();
-    l_20 = func_000504D8((int)(unsigned short)*(short *)((char *)a1 + 27));
+    l_20 = flats_cfg_find((int)(unsigned short)*(short *)((char *)a1 + 27));
     l_2C = a1 + 71;
-    func_000A0040((int)D_0019991C, 0, 560, (int)D_0017573C, 226, 4);
+    func_000A0040((int)npc_record_buffer, 0, 560, (int)D_0017573C, 226, 4);
     if (((int)(unsigned char)*(signed char *)((char *)a1)) != 53) goto L59A0D;
     *(short *)D_0019995C = ((int)(unsigned short)*(short *)D_0019995C) | ((((int)(unsigned short)(*(short *)((char *)a1 + 25) & 16384)) != 0) ? 1 : 0);
     goto L59A4F;
@@ -50,26 +50,26 @@ L59A46:;
 L59A48:;
     *(signed char *)D_0019995C |= 1;
 L59A4F:;
-    *(signed char *)D_0019995F = *(signed char *)(D_001841E3 + ((int)(unsigned char)*(signed char *)D_00196268));
+    *(signed char *)D_0019995F = *(signed char *)(D_001841E3 + ((int)(unsigned char)*(signed char *)current_region));
     if (((int)(unsigned char)*(signed char *)((char *)a1)) != 8) goto L59A7E;
     *(short *)D_00199B43 = *(short *)((char *)l_2C);
     goto L59A9A;
 L59A7E:;
-    *(short *)D_00199B43 = *(short *)((char *)func_000191DA((int)(short)((int)(unsigned char)*(signed char *)D_00196268), 15) + 33);
+    *(short *)D_00199B43 = *(short *)((char *)faction_find_type_in_region((int)(short)((int)(unsigned char)*(signed char *)current_region), 15) + 33);
 L59A9A:;
     if (*(short *)D_00199B43 != 0) goto L59AC0;
-    *(short *)D_00199B43 = *(short *)((char *)func_000191DA((int)(short)((int)(unsigned char)*(signed char *)D_00196268), 15) + 33);
+    *(short *)D_00199B43 = *(short *)((char *)faction_find_type_in_region((int)(short)((int)(unsigned char)*(signed char *)current_region), 15) + 33);
 L59AC0:;
-    l_1C = func_000192EE((int)(short)*(short *)D_00199B43);
+    l_1C = faction_find((int)(short)*(short *)D_00199B43);
     if (l_1C == 0) goto L59AE4;
     if (((int)(unsigned char)*(signed char *)((char *)l_1C)) == 4) goto L59AE6;
 L59AE4:;
     goto L59B07;
 L59AE6:;
-    func_000A0AD9((int)D_0019991C, l_1C + 3, 32, (int)D_0017573C, 245);
+    func_000A0AD9((int)npc_record_buffer, l_1C + 3, 32, (int)D_0017573C, 245);
     goto L59B2A;
 L59B07:;
-    func_000A0AD9((int)D_0019991C, func_0008B48B(a1), 32, (int)D_0017573C, 247);
+    func_000A0AD9((int)npc_record_buffer, func_0008B48B(a1), 32, (int)D_0017573C, 247);
 L59B2A:;
     func_0009DC49(*(int *)((char *)a1 + 31));
     l_28 = 1;
@@ -84,5 +84,5 @@ L59B4C:;
     goto L59B44;
 L59B5F:;
     func_0009DC49(l_24);
-    return (int)D_0019991C;
+    return (int)npc_record_buffer;
 }

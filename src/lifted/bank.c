@@ -8,18 +8,18 @@ extern char D_000C23C4[];
 extern char D_000C23C8[];
 extern char D_000C23CC[];
 extern char D_000CEA24[];
-extern char D_0012AC00[];
-extern char D_0012AC04[];
-extern char D_0012AC06[];
+extern char mouse_buttons[];
+extern char mouse_x[];
+extern char mouse_y[];
 extern char D_0012B508[];
 extern char D_00132F58[];
 extern char D_00136911[];
 extern char D_00136E00[];
 extern char D_00136E24[];
-extern char D_00142309[];
+extern char key_down_esc[];
 extern char D_00142314[];
 extern char D_00142315[];
-extern char D_00143550[];
+extern char screen_buffer[];
 extern char D_00175C90[];
 extern char D_00175C9D[];
 extern char D_00175CAA[];
@@ -27,53 +27,53 @@ extern char D_00175CB7[];
 extern char D_00175CC4[];
 extern char D_00175CD0[];
 extern char D_00175CEF[];
-extern char D_001837E8[];
-extern char D_00186E24[];
+extern char region_names[];
+extern char bank_buttons[];
 extern char D_00186E26[];
 extern char D_00186E28[];
 extern char D_00186E2A[];
 extern char D_00186E2C[];
 extern char D_00187CA8[];
-extern char D_0018DD94[];
-extern char D_0018DDB4[];
-extern char D_001903A4[];
-extern char D_00190FE4[];
+extern char saved_location_name[];
+extern char saved_region_name[];
+extern char text_buffer[];
+extern char text_rsc_buffer[];
 extern char D_00191020[];
-extern char D_001959A0[];
-extern char D_001959A4[];
+extern char bank_ship_price[];
+extern char bank_house_price[];
 extern char D_001959E0[];
-extern char D_00195A04[];
-extern char D_00195AA0[];
-extern char D_00195AA4[];
+extern char bank_accounts[];
+extern char player_entity[];
+extern char player_object[];
 extern char D_00195AC4[];
 extern char D_00195B5C[];
-extern char D_00195BDC[];
-extern char D_00195BE0[];
-extern char D_00195BE8[];
-extern char D_00195BF4[];
-extern char D_00195BF8[];
+extern char current_location[];
+extern char player_character[];
+extern char window_image[];
+extern char game_minutes[];
+extern char game_settings[];
 extern char D_00195C44[];
 extern char D_00195D30[];
-extern char D_00195E2A[];
+extern char climate_weathers[];
 extern char D_00195F36[];
 extern char D_00195F38[];
-extern char D_00196268[];
+extern char current_region[];
 extern char D_0019626F[];
 extern char D_00196271[];
 extern char D_00196272[];
-extern char D_00196274[];
-extern char D_00196279[];
-extern char D_0019627B[];
+extern char game_mode[];
+extern char mouse_buttons_prev[];
+extern char current_climate[];
 extern char D_001968BB[];
-extern char D_001A3FAC[];
+extern char bank_houses_for_sale[];
 extern char D_001A3FB0[];
 extern char D_001A3FB4[];
 extern char D_001A3FB8[];
 extern char D_001A3FBC[];
-extern char D_001A413C[];
+extern char bank_list_top[];
 extern char D_001A4140[];
-extern char D_001A4144[];
-extern char D_001A4148[];
+extern char bank_saved_screen[];
+extern char bank_ships_for_sale[];
 extern char D_001A414A[];
 extern char D_001A414C[];
 extern char D_001A418A[];
@@ -87,19 +87,19 @@ extern char D_001A41DC[];
 extern char D_001A41E0[];
 extern char D_001A41E4[];
 extern char D_001A41E8[];
-extern char D_001A41EC[];
-extern char D_001A41F0[];
-extern char D_001A41F1[];
-extern char D_001A41F2[];
-extern char D_001A41F3[];
+extern char bank_account[];
+extern char bank_ship_count[];
+extern char bank_screen[];
+extern char bank_selected[];
+extern char bank_house_count[];
 
-extern int func_00069938(int, int, int);
-extern int func_0006CB53(int, int);
-extern int func_0007F57B(int);
-extern int func_0008523E(unsigned short, int, int);
-extern int func_0008C5C9(void);
-extern int func_0008DA91(int);
-extern int func_0008DCE3(int, int, int);
+extern int sound_play(int, int, int);
+extern int disk_read_file(int, int);
+extern int gold_can_carry(int);
+extern int model_get(unsigned short, int, int);
+extern int inpstr_update(void);
+extern int object_delete(int);
+extern int object_create_child(int, int, int);
 extern int func_000A0024();
 extern int func_000A0040();
 extern int func_000A00AF();
@@ -123,29 +123,29 @@ extern int func_001401D4();
 extern int func_00142790();
 extern int func_00144FB4();
 extern int func_0014D23C();
-extern void func_0003EC2A(int, int);
-extern void func_0003F09F(int, int);
-extern void func_0003F358(void);
-extern void func_0005E540(int, int, int);
-extern void func_0006BA50(void);
-extern void func_0007CA1F(int, int, int, int, unsigned char);
-extern void func_0007DDC9(int);
-extern void func_0008059B(void);
-extern void func_0008C566(int, short);
-extern void func_0008E3F7(int, int);
-int func_0006B376(int);
-int func_0006C9E2(int);
-int func_0006CA5C(void);
-void func_0006B510(void);
-void func_0006B7EE(int);
-void func_0006B987(void);
-void func_0006BDB8(int);
+extern void msgbox_show_string(int, int);
+extern void msgbox_show_rsc(int, int);
+extern void msgbox_update(void);
+extern void item_make(int, int, int);
+extern void bank_draw(void);
+extern void text_draw_colored(int, int, int, int, unsigned char);
+extern void msgbox_yes_no_rsc(int);
+extern void cursor_draw_arrow(void);
+extern void inpstr_begin_text(int, short);
+extern void object_foreach(int, int);
+int bank_open(int);
+int bank_confirm(int);
+int bank_input_amount(void);
+void bank_close(void);
+void bank_add_house_for_sale(int);
+void bank_init_ships(void);
+void bank_deposit_letter(int);
 void func_0006CB02(void);
 #pragma aux func_000A0ED9 parm routine [];
 
-int func_0006B376(int a1)
+int bank_open(int a1)
 {
-    if (((int)(unsigned char)*(signed char *)D_00196274) != 8) goto L6B39F;
+    if (((int)(unsigned char)*(signed char *)game_mode) != 8) goto L6B39F;
     if (((int)(unsigned char)*(signed char *)D_0019626F) == 15) goto L6B3A1;
 L6B39F:;
     goto L6B3AD;
@@ -154,56 +154,56 @@ L6B3A1:;
 L6B3AD:;
     if (a1 == 0) goto L6B4E1;
 L6B3B7:;
-    if (*(signed char *)D_0012AC00 == 0) goto L6B3C7;
+    if (*(signed char *)mouse_buttons == 0) goto L6B3C7;
     func_0012B136();
     goto L6B3B7;
 L6B3C7:;
     *(int *)D_001A41E4 = 0;
-    *(int *)D_00195BE8 = func_0006CB53((int)D_00175C90, 0);
-    *(int *)D_00195B5C = func_0006CB53((int)D_00175C9D, 0);
-    *(int *)D_001A41E8 = func_0006CB53((int)D_00175CAA, 0);
-    *(int *)D_001A4140 = func_0006CB53((int)D_00175CB7, 0);
+    *(int *)window_image = disk_read_file((int)D_00175C90, 0);
+    *(int *)D_00195B5C = disk_read_file((int)D_00175C9D, 0);
+    *(int *)D_001A41E8 = disk_read_file((int)D_00175CAA, 0);
+    *(int *)D_001A4140 = disk_read_file((int)D_00175CB7, 0);
     func_0012A2D0(51, 45, 216, 72);
     *(signed char *)D_00196272 = 1;
-    *(signed char *)D_00196274 = 15;
+    *(signed char *)game_mode = 15;
     *(signed char *)D_00187CA8 = 0;
-    *(signed char *)D_001A41F3 = (*(signed char *)D_001A41F0 = (*(signed char *)D_001A41F1 = (*(signed char *)D_001A41F2 = 0)));
-    *(int *)D_001A413C = 0;
+    *(signed char *)bank_house_count = (*(signed char *)bank_ship_count = (*(signed char *)bank_screen = (*(signed char *)bank_selected = 0)));
+    *(int *)bank_list_top = 0;
     *(int *)D_001A41E0 = 1500;
-    *(int *)D_001A4144 = func_000A00AF(64000, (int)D_00175CC4, 89);
-    func_000A1023(*(int *)D_001A4144, *(int *)D_00143550, 64000, (int)D_00175CC4, 90, 4);
-    *(int *)D_001A41EC = (int)(*(char **)D_00195A04 + 71 + (((int)(unsigned char)*(signed char *)D_00196268) * 13));
-    func_0008E3F7(*(int *)D_00195AC4, (int)func_0006B7EE);
-    func_0006B987();
+    *(int *)bank_saved_screen = func_000A00AF(64000, (int)D_00175CC4, 89);
+    func_000A1023(*(int *)bank_saved_screen, *(int *)screen_buffer, 64000, (int)D_00175CC4, 90, 4);
+    *(int *)bank_account = (int)(*(char **)bank_accounts + 71 + (((int)(unsigned char)*(signed char *)current_region) * 13));
+    object_foreach(*(int *)D_00195AC4, (int)bank_add_house_for_sale);
+    bank_init_ships();
 L6B4E1:;
-    return ((((int)(unsigned char)*(signed char *)D_00196274) == 15) ? 1 : 0);
+    return ((((int)(unsigned char)*(signed char *)game_mode) == 15) ? 1 : 0);
 }
 
-void func_0006B510(void)
+void bank_close(void)
 {
 L6B51E:;
-    if (*(signed char *)D_00142309 != 0) goto L6B51E;
-    if (((int)(unsigned short)(*(short *)(*(char **)D_00195BF8) & 1)) == 0) goto L6B558;
+    if (*(signed char *)key_down_esc != 0) goto L6B51E;
+    if (((int)(unsigned short)(*(short *)(*(char **)game_settings) & 1)) == 0) goto L6B558;
     func_0012A2D0(160, 100, 160, 100);
     goto L6B571;
 L6B558:;
     func_0012A2D0(160, 77, 160, 77);
 L6B571:;
-    if (*(int *)D_001A4144 == 0) goto L6B586;
-    if (*(int *)D_001A4144 != (-1751672937)) goto L6B588;
+    if (*(int *)bank_saved_screen == 0) goto L6B586;
+    if (*(int *)bank_saved_screen != (-1751672937)) goto L6B588;
 L6B586:;
     goto L6B5A6;
 L6B588:;
-    func_000A0024(*(int *)D_001A4144, (int)D_00175CC4, 110);
-    *(int *)D_001A4144 = -1751672937;
+    func_000A0024(*(int *)bank_saved_screen, (int)D_00175CC4, 110);
+    *(int *)bank_saved_screen = -1751672937;
 L6B5A6:;
-    if (*(int *)D_00195BE8 == 0) goto L6B5BB;
-    if (*(int *)D_00195BE8 != (-1751672937)) goto L6B5BD;
+    if (*(int *)window_image == 0) goto L6B5BB;
+    if (*(int *)window_image != (-1751672937)) goto L6B5BD;
 L6B5BB:;
     goto L6B5DB;
 L6B5BD:;
-    func_000A0024(*(int *)D_00195BE8, (int)D_00175CC4, 111);
-    *(int *)D_00195BE8 = -1751672937;
+    func_000A0024(*(int *)window_image, (int)D_00175CC4, 111);
+    *(int *)window_image = -1751672937;
 L6B5DB:;
     if (*(int *)D_00195B5C == 0) goto L6B5F0;
     if (*(int *)D_00195B5C != (-1751672937)) goto L6B5F2;
@@ -229,30 +229,30 @@ L6B65C:;
     func_000A0024(*(int *)D_001A4140, (int)D_00175CC4, 114);
     *(int *)D_001A4140 = -1751672937;
 L6B67A:;
-    func_000A0040((int)D_00190FE4, 0, 2048, (int)D_00175CC4, 116, 2048);
+    func_000A0040((int)text_rsc_buffer, 0, 2048, (int)D_00175CC4, 116, 2048);
     func_0006CB02();
-    *(signed char *)D_00196274 = 0;
+    *(signed char *)game_mode = 0;
     *(signed char *)D_00196272 = 0;
     *(signed char *)D_00187CA8 = 1;
 }
 
-void func_0006B6BB(void)
+void bank_frame(void)
 {
     int l_20;
     int l_1C;
     int l_18;
 
-    if (func_0006B376(0) == 0) return;
-    func_0006BA50();
-    if (*(signed char *)D_00142309 == 0) goto L6B6EB;
-    func_0006B510();
+    if (bank_open(0) == 0) return;
+    bank_draw();
+    if (*(signed char *)key_down_esc == 0) goto L6B6EB;
+    bank_close();
 L6B6EB:;
-    if (*(signed char *)D_0012AC00 == 0) goto L6B6FD;
-    if (*(signed char *)D_00196279 == 0) goto L6B702;
+    if (*(signed char *)mouse_buttons == 0) goto L6B6FD;
+    if (*(signed char *)mouse_buttons_prev == 0) goto L6B702;
 L6B6FD:;
     return;
 L6B702:;
-    switch (*(unsigned char *)D_001A41F1) {
+    switch (*(unsigned char *)bank_screen) {
 case 0:
     l_1C = 0;
     l_18 = 11;
@@ -274,27 +274,27 @@ L6B765:;
     l_20++;
     goto L6B758;
 L6B76D:;
-    if (*(short *)D_0012AC04 <= *(short *)(D_00186E24 + (l_20 * 12))) goto L6B795;
-    if (*(short *)D_0012AC04 < *(short *)(D_00186E28 + (l_20 * 12))) goto L6B797;
+    if (*(short *)mouse_x <= *(short *)(bank_buttons + (l_20 * 12))) goto L6B795;
+    if (*(short *)mouse_x < *(short *)(D_00186E28 + (l_20 * 12))) goto L6B797;
 L6B795:;
     goto L6B7AB;
 L6B797:;
-    if (*(short *)D_0012AC06 > *(short *)(D_00186E26 + (l_20 * 12))) goto L6B7AD;
+    if (*(short *)mouse_y > *(short *)(D_00186E26 + (l_20 * 12))) goto L6B7AD;
 L6B7AB:;
     goto L6B7C1;
 L6B7AD:;
-    if (*(short *)D_0012AC06 < *(short *)(D_00186E2A + (l_20 * 12))) goto L6B7C3;
+    if (*(short *)mouse_y < *(short *)(D_00186E2A + (l_20 * 12))) goto L6B7C3;
 L6B7C1:;
     goto L6B7E2;
 L6B7C3:;
-    func_00069938(203, *(int *)D_00195AA4, 100);
+    sound_play(203, *(int *)player_object, 100);
     ((int (*)())(*(int *)(D_00186E2C + (l_20 * 12))))();
 L6B7E2:;
     goto L6B765;
 }
 }
 
-void func_0006B7EE(int a1)
+void bank_add_house_for_sale(int a1)
 {
     int l_28;
     int l_24;
@@ -304,18 +304,18 @@ void func_0006B7EE(int a1)
 
     if (((int)(unsigned char)*(signed char *)((char *)a1)) != 43) return;
     if (*(int *)((char *)a1 + 63) == 0) return;
-    if (((int)(unsigned char)*(signed char *)D_001A41F3) == 20) return;
-    l_20 = (int)(*(char **)(*(char **)D_00195BDC + 43) + (((int)(unsigned short)*(short *)((char *)a1 + 27)) * 26));
+    if (((int)(unsigned char)*(signed char *)bank_house_count) == 20) return;
+    l_20 = (int)(*(char **)(*(char **)current_location + 43) + (((int)(unsigned short)*(short *)((char *)a1 + 27)) * 26));
     if (*(int *)((char *)a1 + 31) != *(int *)((char *)l_20 + 20)) goto L6B869;
     if (((int)(unsigned char)*(signed char *)((char *)l_20 + 24)) == 1) goto L6B86E;
 L6B869:;
     return;
 L6B86E:;
-    l_1C = (*(int *)(D_001A3FAC + (((int)(unsigned char)*(signed char *)D_001A41F3) * 20)) = a1 + 71);
+    l_1C = (*(int *)(bank_houses_for_sale + (((int)(unsigned char)*(signed char *)bank_house_count) * 20)) = a1 + 71);
     l_18 = *(int *)((char *)l_1C + 5);
-    *(int *)(D_001A3FB0 + (((int)(unsigned char)*(signed char *)D_001A41F3) * 20)) = l_20;
-    *(int *)(D_001A3FB8 + (((int)(unsigned char)*(signed char *)D_001A41F3) * 20)) = *(int *)((char *)a1 + 31);
-    *(int *)(D_001A3FBC + (((int)(unsigned char)*(signed char *)D_001A41F3) * 20)) = *(int *)((char *)l_18 + 52);
+    *(int *)(D_001A3FB0 + (((int)(unsigned char)*(signed char *)bank_house_count) * 20)) = l_20;
+    *(int *)(D_001A3FB8 + (((int)(unsigned char)*(signed char *)bank_house_count) * 20)) = *(int *)((char *)a1 + 31);
+    *(int *)(D_001A3FBC + (((int)(unsigned char)*(signed char *)bank_house_count) * 20)) = *(int *)((char *)l_18 + 52);
     l_24 = 0;
     l_28 = l_24;
 L6B8E6:;
@@ -326,65 +326,65 @@ L6B8F7:;
     (*(char (**)[66])&l_18)++;
     goto L6B8E6;
 L6B906:;
-    *(int *)((char *)l_18 + 4) = func_0008523E((int)(unsigned short)*(short *)((char *)l_18), (int)(unsigned char)*(signed char *)((char *)l_18 + 2), (((int)(unsigned char)*(signed char *)D_0019627B) << 2) + ((int)(unsigned char)*(signed char *)(D_00195E2A + ((int)(unsigned char)*(signed char *)D_00196268))));
+    *(int *)((char *)l_18 + 4) = model_get((int)(unsigned short)*(short *)((char *)l_18), (int)(unsigned char)*(signed char *)((char *)l_18 + 2), (((int)(unsigned char)*(signed char *)current_climate) << 2) + ((int)(unsigned char)*(signed char *)(climate_weathers + ((int)(unsigned char)*(signed char *)current_region))));
     if (*(int *)(*(char **)((char *)l_18 + 4) + 12) <= l_24) goto L6B95F;
     l_24 = *(int *)(*(char **)((char *)l_18 + 4) + 12);
 L6B95F:;
     goto L6B8F7;
 L6B961:;
-    *(int *)(D_001A3FB4 + (((int)(unsigned char)*(signed char *)D_001A41F3) * 20)) = l_24 * 5;
-    (*(signed char *)D_001A41F3)++;
+    *(int *)(D_001A3FB4 + (((int)(unsigned char)*(signed char *)bank_house_count) * 20)) = l_24 * 5;
+    (*(signed char *)bank_house_count)++;
 }
 
-void func_0006B987(void)
+void bank_init_ships(void)
 {
-    *(short *)D_001A4148 = 415;
+    *(short *)bank_ships_for_sale = 415;
     *(signed char *)D_001A414A = 6;
-    *(int *)D_001A414C = func_0008523E(415, 6, ((int)(unsigned char)*(signed char *)(D_00195E2A + ((int)(unsigned char)*(signed char *)D_00196268))) + (((int)(unsigned char)*(signed char *)D_0019627B) << 2));
+    *(int *)D_001A414C = model_get(415, 6, ((int)(unsigned char)*(signed char *)(climate_weathers + ((int)(unsigned char)*(signed char *)current_region))) + (((int)(unsigned char)*(signed char *)current_climate) << 2));
     *(int *)D_001A418A = 65011713;
     *(int *)D_001A418E = 100000;
     *(short *)D_001A4192 = 415;
     *(signed char *)D_001A4194 = 11;
-    *(int *)D_001A4196 = func_0008523E(415, 8, (((int)(unsigned char)*(signed char *)D_0019627B) << 2) + ((int)(unsigned char)*(signed char *)(D_00195E2A + ((int)(unsigned char)*(signed char *)D_00196268))));
+    *(int *)D_001A4196 = model_get(415, 8, (((int)(unsigned char)*(signed char *)current_climate) << 2) + ((int)(unsigned char)*(signed char *)(climate_weathers + ((int)(unsigned char)*(signed char *)current_region))));
     *(int *)D_001A41D4 = 65077249;
     *(int *)D_001A41D8 = 200000;
-    *(signed char *)D_001A41F0 = 2;
+    *(signed char *)bank_ship_count = 2;
 }
 
-void func_0006BCCC(void)
+void bank_deposit_gold(void)
 {
     int l_18;
 
-    l_18 = func_0006CA5C();
+    l_18 = bank_input_amount();
     if (l_18 < 1) return;
-    if (((unsigned)*(int *)(*(char **)D_00195BE0 + 133)) >= l_18) goto L6BD09;
-    func_0003F09F(454, 1);
+    if (((unsigned)*(int *)(*(char **)player_character + 133)) >= l_18) goto L6BD09;
+    msgbox_show_rsc(454, 1);
     return;
 L6BD09:;
-    *(int *)(*(char **)D_001A41EC) += l_18;
-    *(int *)(*(char **)D_00195BE0 + 133) -= l_18;
+    *(int *)(*(char **)bank_account) += l_18;
+    *(int *)(*(char **)player_character + 133) -= l_18;
 }
 
-void func_0006BD2D(void)
+void bank_withdraw_gold(void)
 {
     int l_18;
 
-    if (*(int *)(*(char **)D_001A41EC) <= 0) return;
-    l_18 = func_0006CA5C();
+    if (*(int *)(*(char **)bank_account) <= 0) return;
+    l_18 = bank_input_amount();
     if (l_18 < 1) return;
-    if (*(int *)(*(char **)D_001A41EC) >= l_18) goto L6BD77;
-    if (func_0006C9E2(290) == 0) return;
-    l_18 = *(int *)(*(char **)D_001A41EC);
+    if (*(int *)(*(char **)bank_account) >= l_18) goto L6BD77;
+    if (bank_confirm(290) == 0) return;
+    l_18 = *(int *)(*(char **)bank_account);
 L6BD77:;
-    if (func_0007F57B(l_18) == 0) goto L6BD9F;
-    *(int *)(*(char **)D_001A41EC) -= l_18;
-    *(int *)(*(char **)D_00195BE0 + 133) += l_18;
+    if (gold_can_carry(l_18) == 0) goto L6BD9F;
+    *(int *)(*(char **)bank_account) -= l_18;
+    *(int *)(*(char **)player_character + 133) += l_18;
     return;
 L6BD9F:;
-    func_0003EC2A((int)D_00175CD0, 1);
+    msgbox_show_string((int)D_00175CD0, 1);
 }
 
-void func_0006BDB8(int a1)
+void bank_deposit_letter(int a1)
 {
     int l_18;
 
@@ -395,118 +395,118 @@ void func_0006BDB8(int a1)
 L6BE03:;
     return;
 L6BE05:;
-    *(int *)(*(char **)D_001A41EC) += *(int *)((char *)l_18 + 36);
-    func_0008DA91(a1);
+    *(int *)(*(char **)bank_account) += *(int *)((char *)l_18 + 36);
+    object_delete(a1);
 }
 
-void func_0006BE24(void)
+void bank_deposit_letters_of_credit(void)
 {
-    if (func_0006C9E2(291) == 0) return;
-    func_0008E3F7(*(int *)(*(char **)D_00195AA0 + 63), (int)func_0006BDB8);
+    if (bank_confirm(291) == 0) return;
+    object_foreach(*(int *)(*(char **)player_entity + 63), (int)bank_deposit_letter);
 }
 
-void func_0006BE5C(void)
+void bank_withdraw_letter_of_credit(void)
 {
     int l_20;
     int l_1C;
     int l_18;
 
-    if (*(int *)(*(char **)D_001A41EC) <= 0) return;
-    l_1C = func_0006CA5C();
+    if (*(int *)(*(char **)bank_account) <= 0) return;
+    l_1C = bank_input_amount();
     if (l_1C < 1) return;
     if (l_1C >= 100) goto L6BEA4;
-    func_0003F09F(293, 1);
+    msgbox_show_rsc(293, 1);
     return;
 L6BEA4:;
     l_20 = (l_1C / 100) + 1;
-    if ((l_20 + l_1C) <= *(int *)(*(char **)D_001A41EC)) goto L6BED8;
-    func_0003F09F(292, 1);
+    if ((l_20 + l_1C) <= *(int *)(*(char **)bank_account)) goto L6BED8;
+    msgbox_show_rsc(292, 1);
     return;
 L6BED8:;
-    *(int *)(*(char **)D_001A41EC) -= l_20 + l_1C;
-    l_18 = func_0008DCE3(*(int *)D_001959E0, 0, 107);
+    *(int *)(*(char **)bank_account) -= l_20 + l_1C;
+    l_18 = object_create_child(*(int *)D_001959E0, 0, 107);
     *(signed char *)((char *)l_18) = 2;
     *(short *)((char *)l_18 + 21) = 1;
-    func_0005E540(27, 2, l_18 + 71);
+    item_make(27, 2, l_18 + 71);
     *(int *)((char *)l_18 + 107) = l_1C;
 }
 
-void func_0006C008(void)
+void bank_borrow(void)
 {
     int l_18;
 
-    if (((int)(unsigned char)(*(signed char *)(*(char **)D_001A41EC + 12) & 1)) == 0) goto L6C03D;
-    func_0003F09F(288, 1);
+    if (((int)(unsigned char)(*(signed char *)(*(char **)bank_account + 12) & 1)) == 0) goto L6C03D;
+    msgbox_show_rsc(288, 1);
     return;
 L6C03D:;
-    if (*(int *)(*(char **)D_001A41EC + 8) == 0) goto L6C05C;
-    func_0003F09F(289, 1);
+    if (*(int *)(*(char **)bank_account + 8) == 0) goto L6C05C;
+    msgbox_show_rsc(289, 1);
     return;
 L6C05C:;
-    l_18 = func_0006CA5C();
+    l_18 = bank_input_amount();
     if (l_18 < 1) return;
     if (l_18 >= 100) goto L6C085;
-    func_0003F09F(296, 1);
+    msgbox_show_rsc(296, 1);
     return;
 L6C085:;
-    if ((((int)(unsigned char)*(signed char *)(*(char **)D_00195BE0 + 129)) * 50000) >= l_18) goto L6C0B1;
-    func_0003F09F(295, 1);
+    if ((((int)(unsigned char)*(signed char *)(*(char **)player_character + 129)) * 50000) >= l_18) goto L6C0B1;
+    msgbox_show_rsc(295, 1);
     return;
 L6C0B1:;
-    *(int *)(*(char **)D_001A41EC + 8) = *(int *)D_00195BF4 + 518400;
-    *(int *)(*(char **)D_001A41EC + 4) = l_18 + ((l_18 * 10) / 100);
-    *(int *)(*(char **)D_001A41EC) += l_18;
+    *(int *)(*(char **)bank_account + 8) = *(int *)game_minutes + 518400;
+    *(int *)(*(char **)bank_account + 4) = l_18 + ((l_18 * 10) / 100);
+    *(int *)(*(char **)bank_account) += l_18;
 }
 
-void func_0006C0F7(void)
+void bank_buy_house(void)
 {
-    if (*(signed char *)D_001A41F3 != 0) goto L6C11F;
-    func_0003F09F(287, 1);
+    if (*(signed char *)bank_house_count != 0) goto L6C11F;
+    msgbox_show_rsc(287, 1);
     return;
 L6C11F:;
-    if (*(int *)(*(char **)D_00195BE0 + 116) == 0) goto L6C13B;
-    func_0003F09F(286, 1);
+    if (*(int *)(*(char **)player_character + 116) == 0) goto L6C13B;
+    msgbox_show_rsc(286, 1);
     return;
 L6C13B:;
-    *(signed char *)D_001A41F1 = 1;
-    *(signed char *)D_001A41F2 = 0;
+    *(signed char *)bank_screen = 1;
+    *(signed char *)bank_selected = 0;
 }
 
-void func_0006C153(void)
+void bank_sell_house(void)
 {
-    if (*(int *)(*(char **)D_00195BE0 + 116) == 0) return;
-    *(int *)D_00195D30 = *(int *)D_001959A4 - ((*(int *)D_001959A4 * 15) / 100);
-    if (func_0006C9E2(298) == 0) return;
-    *(int *)(*(char **)D_001A41EC) += *(int *)D_00195D30;
-    *(int *)D_001959A4 = 0;
-    *(int *)(*(char **)D_00195BE0 + 116) = 0;
+    if (*(int *)(*(char **)player_character + 116) == 0) return;
+    *(int *)D_00195D30 = *(int *)bank_house_price - ((*(int *)bank_house_price * 15) / 100);
+    if (bank_confirm(298) == 0) return;
+    *(int *)(*(char **)bank_account) += *(int *)D_00195D30;
+    *(int *)bank_house_price = 0;
+    *(int *)(*(char **)player_character + 116) = 0;
 }
 
-void func_0006C1C9(void)
+void bank_buy_ship(void)
 {
-    if (*(int *)(*(char **)D_00195BE0 + 120) == 0) goto L6C1F3;
-    func_0003F09F(284, 1);
+    if (*(int *)(*(char **)player_character + 120) == 0) goto L6C1F3;
+    msgbox_show_rsc(284, 1);
     return;
 L6C1F3:;
     if (*(signed char *)D_001968BB != 0) goto L6C20D;
-    func_0003F09F(285, 1);
+    msgbox_show_rsc(285, 1);
     return;
 L6C20D:;
-    *(signed char *)D_001A41F1 = 2;
-    *(signed char *)D_001A41F2 = 0;
+    *(signed char *)bank_screen = 2;
+    *(signed char *)bank_selected = 0;
 }
 
-void func_0006C225(void)
+void bank_sell_ship(void)
 {
-    if (*(int *)(*(char **)D_00195BE0 + 120) == 0) return;
-    *(int *)D_00195D30 = *(int *)D_001959A0 - ((*(int *)D_001959A0 * 15) / 100);
-    if (func_0006C9E2(299) == 0) return;
-    *(int *)(*(char **)D_001A41EC) += *(int *)D_00195D30;
-    *(int *)D_001959A0 = 0;
-    *(int *)(*(char **)D_00195BE0 + 120) = 0;
+    if (*(int *)(*(char **)player_character + 120) == 0) return;
+    *(int *)D_00195D30 = *(int *)bank_ship_price - ((*(int *)bank_ship_price * 15) / 100);
+    if (bank_confirm(299) == 0) return;
+    *(int *)(*(char **)bank_account) += *(int *)D_00195D30;
+    *(int *)bank_ship_price = 0;
+    *(int *)(*(char **)player_character + 120) = 0;
 }
 
-void func_0006C29B(int a1, int a2)
+void bank_draw_preview(int a1, int a2)
 {
     int l_2C;
     int l_28;
@@ -591,7 +591,7 @@ L6C45A:;
     (*(char (**)[66])&l_18)++;
     goto L6C44D;
 L6C469:;
-    *(int *)((char *)l_18 + 4) = func_0008523E((int)(unsigned short)*(short *)((char *)l_18), (int)(unsigned char)*(signed char *)((char *)l_18 + 2), (((int)(unsigned char)*(signed char *)D_0019627B) << 2) + ((int)(unsigned char)*(signed char *)(D_00195E2A + ((int)(unsigned char)*(signed char *)D_00196268))));
+    *(int *)((char *)l_18 + 4) = model_get((int)(unsigned short)*(short *)((char *)l_18), (int)(unsigned char)*(signed char *)((char *)l_18 + 2), (((int)(unsigned char)*(signed char *)current_climate) << 2) + ((int)(unsigned char)*(signed char *)(climate_weathers + ((int)(unsigned char)*(signed char *)current_region))));
     if (*(int *)((char *)l_18 + 4) == 0) goto L6C4E2;
     l_14 = 1132;
     *(int *)((char *)l_18 + 52) = ((*(int *)((char *)l_14) & 2047) << 4) & 2047;
@@ -623,39 +623,39 @@ L6C535:;
     goto L6C526;
 }
 
-void func_0006C55B(void)
+void bank_draw_house_list(void)
 {
     int l_20;
     int l_1C;
     int l_18;
 
-    l_20 = *(int *)D_001A413C;
+    l_20 = *(int *)bank_list_top;
 L6C571:;
-    if ((*(int *)D_001A413C + 11) > l_20) goto L6C58B;
+    if ((*(int *)bank_list_top + 11) > l_20) goto L6C58B;
     goto L6C608;
 L6C583:;
     l_20++;
     goto L6C571;
 L6C58B:;
-    if (((int)(unsigned char)*(signed char *)D_001A41F2) != l_20) goto L6C5A0;
+    if (((int)(unsigned char)*(signed char *)bank_selected) != l_20) goto L6C5A0;
     l_1C = 246;
     goto L6C5A7;
 L6C5A0:;
     l_1C = 146;
 L6C5A7:;
     func_000A0ED9(573, (int)D_00175CC4);
-    func_000A0F5C((int)D_001903A4, (int)D_00175CEF, *(int *)(D_001A3FB4 + (l_20 * 20)));
-    func_0007CA1F((int)D_001903A4, 52, (int)(short)(((l_20 - *(short *)D_001A413C) * 7) + 38), (int)(short)*(short *)&l_1C, 156);
+    func_000A0F5C((int)text_buffer, (int)D_00175CEF, *(int *)(D_001A3FB4 + (l_20 * 20)));
+    text_draw_colored((int)text_buffer, 52, (int)(short)(((l_20 - *(short *)bank_list_top) * 7) + 38), (int)(short)*(short *)&l_1C, 156);
     goto L6C583;
 L6C608:;
-    if (*(int *)D_001A413C == 0) goto L6C61B;
+    if (*(int *)bank_list_top == 0) goto L6C61B;
     l_18 = *(int *)D_001A41E8;
     goto L6C623;
 L6C61B:;
     l_18 = *(int *)D_001A4140;
 L6C623:;
     func_00144FB4(153, 38, 9, 20, l_18);
-    if ((*(int *)D_001A413C + 11) >= ((int)(unsigned char)*(signed char *)D_001A41F3)) goto L6C65E;
+    if ((*(int *)bank_list_top + 11) >= ((int)(unsigned char)*(signed char *)bank_house_count)) goto L6C65E;
     l_18 = *(int *)D_001A41E8;
     goto L6C666;
 L6C65E:;
@@ -664,104 +664,104 @@ L6C666:;
     func_00144FB4(153, 102, 9, 16, l_18 + 576);
 }
 
-void func_0006C692(void)
+void bank_draw_ship_list(void)
 {
     int l_1C;
     short l_18;
 
     l_1C = 0;
 L6C6A7:;
-    if (((int)(unsigned char)*(signed char *)D_001A41F0) > l_1C) goto L6C6BD;
+    if (((int)(unsigned char)*(signed char *)bank_ship_count) > l_1C) goto L6C6BD;
     return;
 L6C6B5:;
     l_1C++;
     goto L6C6A7;
 L6C6BD:;
-    if (((int)(unsigned char)*(signed char *)D_001A41F2) != l_1C) goto L6C6D2;
+    if (((int)(unsigned char)*(signed char *)bank_selected) != l_1C) goto L6C6D2;
     *(int *)&l_18 = 246;
     goto L6C6D9;
 L6C6D2:;
     *(int *)&l_18 = 146;
 L6C6D9:;
-    func_0007CA1F(func_000A0DD9(*(int *)(D_001A418E + (l_1C * 74)), (int)D_00190FE4, 10), 52, (int)(short)((l_1C * 7) + 38), (int)(short)l_18, 156);
+    text_draw_colored(func_000A0DD9(*(int *)(D_001A418E + (l_1C * 74)), (int)text_rsc_buffer, 10), 52, (int)(short)((l_1C * 7) + 38), (int)(short)l_18, 156);
     goto L6C6B5;
 }
 
-void func_0006C722(void)
+void bank_house_list_click(void)
 {
     int l_18;
 
-    l_18 = (int)(*(char **)D_001A413C + ((((int)(short)*(short *)D_0012AC06) - 38) / 7));
-    if (((int)(unsigned char)*(signed char *)D_001A41F3) <= l_18) return;
-    *(signed char *)D_001A41F2 = *(signed char *)&l_18;
+    l_18 = (int)(*(char **)bank_list_top + ((((int)(short)*(short *)mouse_y) - 38) / 7));
+    if (((int)(unsigned char)*(signed char *)bank_house_count) <= l_18) return;
+    *(signed char *)bank_selected = *(signed char *)&l_18;
 }
 
-void func_0006C76F(void)
+void bank_house_list_up(void)
 {
-    if (*(int *)D_001A413C == 0) return;
-    (*(int *)D_001A413C)--;
+    if (*(int *)bank_list_top == 0) return;
+    (*(int *)bank_list_top)--;
 }
 
-void func_0006C796(void)
+void bank_house_list_down(void)
 {
-    if (((int)(unsigned char)*(signed char *)D_001A41F3) <= 11) return;
-    if ((((int)(unsigned char)*(signed char *)D_001A41F3) - 11) <= *(int *)D_001A413C) return;
-    (*(int *)D_001A413C)++;
+    if (((int)(unsigned char)*(signed char *)bank_house_count) <= 11) return;
+    if ((((int)(unsigned char)*(signed char *)bank_house_count) - 11) <= *(int *)bank_list_top) return;
+    (*(int *)bank_list_top)++;
 }
 
-void func_0006C7D2(void)
+void bank_ship_list_click(void)
 {
     int l_18;
 
-    l_18 = (((int)(short)*(short *)D_0012AC06) - 38) / 7;
-    if (((int)(unsigned char)*(signed char *)D_001A41F0) <= l_18) return;
-    *(signed char *)D_001A41F2 = *(signed char *)&l_18;
+    l_18 = (((int)(short)*(short *)mouse_y) - 38) / 7;
+    if (((int)(unsigned char)*(signed char *)bank_ship_count) <= l_18) return;
+    *(signed char *)bank_selected = *(signed char *)&l_18;
 }
 
-void func_0006C818(void)
+void bank_house_bought(void)
 {
-    if (*(int *)(*(char **)D_001A41EC) >= *(int *)(D_001A3FB4 + (((int)(unsigned char)*(signed char *)D_001A41F2) * 20))) goto L6C854;
-    func_0003F09F(454, 1);
+    if (*(int *)(*(char **)bank_account) >= *(int *)(D_001A3FB4 + (((int)(unsigned char)*(signed char *)bank_selected) * 20))) goto L6C854;
+    msgbox_show_rsc(454, 1);
     return;
 L6C854:;
-    *(int *)D_001959A4 = *(int *)(D_001A3FB4 + (((int)(unsigned char)*(signed char *)D_001A41F2) * 20));
-    *(int *)(*(char **)D_001A41EC) -= *(int *)D_001959A4;
-    *(int *)(*(char **)D_00195BE0 + 116) = *(int *)(D_001A3FB8 + (((int)(unsigned char)*(signed char *)D_001A41F2) * 20));
-    *(int *)D_001A41E4 = (int)(*(char **)(D_001A3FAC + (((int)(unsigned char)*(signed char *)D_001A41F2) * 20)) - 71);
-    *(int *)D_001A41DC = *(int *)(D_001A3FB0 + (((int)(unsigned char)*(signed char *)D_001A41F2) * 20));
-    func_0003F09F(282, 1);
-    func_000A0AD9((int)D_0018DDB4, *(int *)(D_001837E8 + (((int)(unsigned char)*(signed char *)D_00196268) << 2)), 32, (int)D_00175CC4, 647);
-    func_000A0AD9((int)D_0018DD94, *(int *)D_00195BDC, 32, (int)D_00175CC4, 648);
-    *(signed char *)D_001A41F1 = 0;
+    *(int *)bank_house_price = *(int *)(D_001A3FB4 + (((int)(unsigned char)*(signed char *)bank_selected) * 20));
+    *(int *)(*(char **)bank_account) -= *(int *)bank_house_price;
+    *(int *)(*(char **)player_character + 116) = *(int *)(D_001A3FB8 + (((int)(unsigned char)*(signed char *)bank_selected) * 20));
+    *(int *)D_001A41E4 = (int)(*(char **)(bank_houses_for_sale + (((int)(unsigned char)*(signed char *)bank_selected) * 20)) - 71);
+    *(int *)D_001A41DC = *(int *)(D_001A3FB0 + (((int)(unsigned char)*(signed char *)bank_selected) * 20));
+    msgbox_show_rsc(282, 1);
+    func_000A0AD9((int)saved_region_name, *(int *)(region_names + (((int)(unsigned char)*(signed char *)current_region) << 2)), 32, (int)D_00175CC4, 647);
+    func_000A0AD9((int)saved_location_name, *(int *)current_location, 32, (int)D_00175CC4, 648);
+    *(signed char *)bank_screen = 0;
 }
 
-void func_0006C924(void)
+void bank_ship_bought(void)
 {
-    if (*(int *)(*(char **)D_001A41EC) >= *(int *)(D_001A418E + (((int)(unsigned char)*(signed char *)D_001A41F2) * 74))) goto L6C95D;
-    func_0003F09F(454, 1);
+    if (*(int *)(*(char **)bank_account) >= *(int *)(D_001A418E + (((int)(unsigned char)*(signed char *)bank_selected) * 74))) goto L6C95D;
+    msgbox_show_rsc(454, 1);
     return;
 L6C95D:;
-    *(int *)(*(char **)D_001A41EC) -= *(int *)(D_001A418E + (((int)(unsigned char)*(signed char *)D_001A41F2) * 74));
-    *(int *)D_001959A0 = *(int *)(D_001A418E + (((int)(unsigned char)*(signed char *)D_001A41F2) * 74));
-    *(int *)(*(char **)D_00195BE0 + 120) = *(int *)(D_001A418A + (((int)(unsigned char)*(signed char *)D_001A41F2) * 74));
-    func_0003F09F(283, 1);
-    *(signed char *)D_001A41F1 = 0;
+    *(int *)(*(char **)bank_account) -= *(int *)(D_001A418E + (((int)(unsigned char)*(signed char *)bank_selected) * 74));
+    *(int *)bank_ship_price = *(int *)(D_001A418E + (((int)(unsigned char)*(signed char *)bank_selected) * 74));
+    *(int *)(*(char **)player_character + 120) = *(int *)(D_001A418A + (((int)(unsigned char)*(signed char *)bank_selected) * 74));
+    msgbox_show_rsc(283, 1);
+    *(signed char *)bank_screen = 0;
 }
 
-void func_0006C9C3(void)
+void bank_list_exit(void)
 {
-    *(signed char *)D_001A41F1 = 0;
+    *(signed char *)bank_screen = 0;
 }
 
-int func_0006C9E2(int a1)
+int bank_confirm(int a1)
 {
-    func_0007DDC9(a1);
+    msgbox_yes_no_rsc(a1);
 L6C9FB:;
-    *(signed char *)D_00196279 = *(signed char *)D_0012AC00;
+    *(signed char *)mouse_buttons_prev = *(signed char *)mouse_buttons;
     func_0012B136();
-    func_0006BA50();
-    func_0003F358();
-    func_0008059B();
+    bank_draw();
+    msgbox_update();
+    cursor_draw_arrow();
     func_000CDD81(1);
     if (((int)(unsigned char)*(signed char *)D_00196271) != 1) goto L6CA38;
     return 1;
@@ -772,7 +772,7 @@ L6CA4D:;
     goto L6C9FB;
 }
 
-int func_0006CA5C(void)
+int bank_input_amount(void)
 {
     int l_20;
     int l_1C;
@@ -784,13 +784,13 @@ int func_0006CA5C(void)
     *(signed char *)D_00191020 = 0;
     *(short *)D_00195F36 = 157;
     *(short *)D_00195F38 = 152;
-    func_0008C566((int)D_00191020, 10);
+    inpstr_begin_text((int)D_00191020, 10);
     func_00142790();
-    *(signed char *)D_0012AC00 = (*(signed char *)D_00196279 = 0);
+    *(signed char *)mouse_buttons = (*(signed char *)mouse_buttons_prev = 0);
 L6CAC9:;
     if (l_20 != 0) goto L6CAE8;
-    func_0006BA50();
-    l_20 = func_0008C5C9();
+    bank_draw();
+    l_20 = inpstr_update();
     func_000CDD81(1);
     goto L6CAC9;
 L6CAE8:;
@@ -803,12 +803,12 @@ void func_0006CB02(void)
 
     l_18 = 0;
 L6CB17:;
-    if (((int)(unsigned char)*(signed char *)D_001A41F3) > l_18) goto L6CB2D;
+    if (((int)(unsigned char)*(signed char *)bank_house_count) > l_18) goto L6CB2D;
     return;
 L6CB25:;
     l_18++;
     goto L6CB17;
 L6CB2D:;
-    *(int *)(*(char **)(*(char **)(D_001A3FAC + (l_18 * 20)) + 5) + 52) = *(int *)(D_001A3FBC + (l_18 * 20));
+    *(int *)(*(char **)(*(char **)(bank_houses_for_sale + (l_18 * 20)) + 5) + 52) = *(int *)(D_001A3FBC + (l_18 * 20));
     goto L6CB25;
 }

@@ -7,12 +7,12 @@ extern char D_0018818A[];
 extern char D_00188192[];
 extern char D_00188196[];
 extern char D_00190D6A[];
-extern char D_00190D70[];
+extern char chargen_selected_attribute[];
 
 
-void func_00091B80(short a1)
+void chargen_select_attribute(short a1)
 {
-    *(short *)D_00190D70 = *(int *)&a1;
+    *(short *)chargen_selected_attribute = *(int *)&a1;
     *(short *)D_00188186 = (*(short *)D_00190D6A = *(short *)(D_0018801E + ((((int)(short)a1) + 20) * 12)) + 1);
     *(short *)D_0018818A = *(short *)D_00190D6A + 6;
     *(short *)D_00188192 = *(short *)D_00190D6A + 13;

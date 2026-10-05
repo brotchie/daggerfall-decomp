@@ -3,21 +3,21 @@
 
 extern char D_00176E2C[];
 extern char D_00190B44[];
-extern char D_00195B94[];
-extern char D_001A9AAC[];
-extern char D_001A9AAE[];
-extern char D_001A9AB0[];
+extern char inpstr_text[];
+extern char inpstr_max_length[];
+extern char inpstr_cursor[];
+extern char input_digits_only[];
 
 extern int func_000A0AD9();
 extern int func_000A0DF4();
 extern int func_00142790();
 
-void func_0008C566(int a1, int a2)
+void inpstr_begin_text(int a1, int a2)
 {
     func_00142790();
-    *(signed char *)D_001A9AB0 = 0;
-    *(int *)D_00195B94 = a1;
-    func_000A0AD9((int)D_00190B44, *(int *)D_00195B94, 160, (int)D_00176E2C, 121);
-    *(short *)D_001A9AAE = func_000A0DF4(a1);
-    *(short *)D_001A9AAC = a2;
+    *(signed char *)input_digits_only = 0;
+    *(int *)inpstr_text = a1;
+    func_000A0AD9((int)D_00190B44, *(int *)inpstr_text, 160, (int)D_00176E2C, 121);
+    *(short *)inpstr_cursor = func_000A0DF4(a1);
+    *(short *)inpstr_max_length = a2;
 }

@@ -3,22 +3,22 @@
 
 extern char D_00176198[];
 extern char D_0017627D[];
-extern char D_001903A4[];
+extern char text_buffer[];
 
-extern int func_0006CD6E(int);
+extern int disk_open_data(int);
 extern int func_0009DEA7();
 extern int func_000A00CB();
 extern int func_000A0ED9(int, int);
 extern int func_000A0F5C(int, ...);
 #pragma aux func_000A0ED9 parm routine [];
 
-void func_00075172(int a1, int a2)
+void book_read_header(int a1, int a2)
 {
     int l_14;
 
     func_000A0ED9(586, (int)D_00176198);
-    func_000A0F5C((int)D_001903A4, (int)D_0017627D, a2);
-    l_14 = func_0006CD6E((int)D_001903A4);
+    func_000A0F5C((int)text_buffer, (int)D_0017627D, a2);
+    l_14 = disk_open_data((int)text_buffer);
     func_000A00CB(l_14, a1, 234);
     func_0009DEA7(l_14);
 }

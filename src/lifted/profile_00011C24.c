@@ -9,9 +9,9 @@ extern int func_0009DEA7();
 extern int func_000A0024();
 extern int func_000A0B42();
 #pragma aux sosconv "*" parm caller [] value [eax] modify [eax ebx ecx edx];
-#pragma aux (sosconv) func_00011C24;
+#pragma aux (sosconv) profile_close;
 
-int func_00011C24(int a1)
+int profile_close(int a1)
 {
     int l_10;
 

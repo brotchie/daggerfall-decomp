@@ -1,31 +1,31 @@
 /* matched by the real Watcom C32 10.0a (-d2): func_0007E815 has a switch table, which 10.0a
  * aligns to 4 bytes from the start of the code segment, so it is compiled with the run of its
- * unit's functions from func_0007E350 (the nearest one at a multiple of 4) */
+ * unit's functions from building_access_level (the nearest one at a multiple of 4) */
 struct obj { char pad[7]; int x; int y; int z; char pad2[44]; int f63; };
 extern char D_00176A10[];
 extern char D_001940E4[];
 extern struct obj *D_00194064[];
-extern struct obj *D_001940E0[];
+extern struct obj *cart_overlay_image[];
 extern struct obj *D_001940E8[];
 extern struct obj *D_00194164[];
 extern struct obj *D_00194168[];
-extern char D_00195AA4[];
+extern char player_object[];
 extern char D_00195AC4[];
-extern char D_00195BF4[];
+extern char game_minutes[];
 extern void (*D_00195CD0)(int, int);
 extern char D_00195CE0[];
 extern char D_00195CE4[];
-extern unsigned char *func_0007DF35(int);
+extern unsigned char *object_building(int);
 extern int func_000A0040();
 extern int func_000C7FD9();
 extern int func_000C7FF4();
 
-int func_0007E350(int a1)
+int building_access_level(int a1)
 {
     int l_1C;
 
     if (a1 != 0) goto L7E376;
-    l_1C = (int)func_0007DF35(*(int *)D_00195AA4);
+    l_1C = (int)object_building(*(int *)player_object);
     goto L7E37C;
 L7E376:;
     l_1C = a1;
@@ -34,7 +34,7 @@ L7E37C:;
     return 0;
 L7E38B:;
     if (((int)(unsigned char)(*(signed char *)((char *)l_1C + 15) & 1)) == 0) goto L7E3AA;
-    if (((unsigned)*(int *)((char *)l_1C + 2)) > *(int *)D_00195BF4) goto L7E3AC;
+    if (((unsigned)*(int *)((char *)l_1C + 2)) > *(int *)game_minutes) goto L7E3AC;
 L7E3AA:;
     goto L7E3B9;
 L7E3AC:;
@@ -43,11 +43,11 @@ L7E3B9:;
     return 0;
 }
 
-void func_0007E3CD(unsigned char *a1, unsigned char a2, int a3)
+void building_grant_access(unsigned char *a1, unsigned char a2, int a3)
 {
     unsigned char *l_18;
 
-    l_18 = a1 ? a1 : func_0007DF35(*(int *)D_00195AA4);
+    l_18 = a1 ? a1 : object_building(*(int *)player_object);
     if (a1 == 0) return;
     if (a1[24] == 15) return;
     l_18[8] = a2;
@@ -70,7 +70,7 @@ int func_0007E441(int a1)
     int l_20;
     int l_1C;
 
-    l_3C = *(int *)(*(char **)D_00195AA4 + 67);
+    l_3C = *(int *)(*(char **)player_object + 67);
 L7E45D:;
     if (((int)(unsigned char)*(signed char *)((char *)l_3C)) == 1) goto L7E481;
     if (((int)(unsigned short)(*(short *)((char *)l_3C + 21) & 1)) == 0) goto L7E483;
@@ -83,9 +83,9 @@ L7E48E:;
     if (((int)(unsigned char)*(signed char *)((char *)l_3C)) == 43) goto L7E4A9;
     return 0;
 L7E4A9:;
-    l_38 = *(int *)(*(char **)D_00195AA4 + 7) - *(int *)((char *)l_3C + 7);
-    l_34 = *(int *)(*(char **)D_00195AA4 + 11) - *(int *)((char *)l_3C + 11);
-    l_30 = *(int *)(*(char **)D_00195AA4 + 15) - *(int *)((char *)l_3C + 15);
+    l_38 = *(int *)(*(char **)player_object + 7) - *(int *)((char *)l_3C + 7);
+    l_34 = *(int *)(*(char **)player_object + 11) - *(int *)((char *)l_3C + 11);
+    l_30 = *(int *)(*(char **)player_object + 15) - *(int *)((char *)l_3C + 15);
     l_1C = ((a1 == 2) ? 8 : 0);
     l_3C = *(int *)((char *)l_3C + 63);
 L7E501:;
@@ -207,8 +207,8 @@ void func_0007E815(struct obj *a1, int a2)
         D_00195CD0(D_00194168[l_18]->f63, a2);
     switch (l_1C) {
     case 0:
-        if (l_14 != 0 && D_001940E0[l_14] != 0)
-            D_00195CD0(D_001940E0[l_14]->f63, a2);
+        if (l_14 != 0 && cart_overlay_image[l_14] != 0)
+            D_00195CD0(cart_overlay_image[l_14]->f63, a2);
         if (l_14 > 31 && D_00194064[l_14] != 0)
             D_00195CD0(D_00194064[l_14]->f63, a2);
         break;
@@ -219,8 +219,8 @@ void func_0007E815(struct obj *a1, int a2)
             D_00195CD0(D_00194064[l_14]->f63, a2);
         break;
     case 2:
-        if ((l_14 & 31) != 0 && D_001940E0[l_14] != 0)
-            D_00195CD0(D_001940E0[l_14]->f63, a2);
+        if ((l_14 & 31) != 0 && cart_overlay_image[l_14] != 0)
+            D_00195CD0(cart_overlay_image[l_14]->f63, a2);
         if (l_14 < 992 && D_00194164[l_14] != 0)
             D_00195CD0(D_00194164[l_14]->f63, a2);
         break;

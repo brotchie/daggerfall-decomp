@@ -2,23 +2,23 @@
  * do not edit: move a function to src/inpstr.c to work on it by hand) */
 
 extern char D_0012DA50[];
-extern char D_0014234F[];
-extern char D_00142353[];
-extern char D_00142355[];
-extern char D_00142357[];
+extern char key_down_home[];
+extern char key_down_left[];
+extern char key_down_right[];
+extern char key_down_end[];
 extern char D_00142948[];
 extern char D_00176E2C[];
 extern char D_00190B44[];
-extern char D_00195B94[];
+extern char inpstr_text[];
 extern char D_00195F36[];
 extern char D_001A9AA0[];
-extern char D_001A9AAC[];
-extern char D_001A9AAE[];
-extern char D_001A9AB0[];
+extern char inpstr_max_length[];
+extern char inpstr_cursor[];
+extern char input_digits_only[];
 extern char D_001A9AB1[];
 
-extern int func_0005A442(unsigned char);
-extern int func_0005A4A9(int);
+extern int font_char_width(unsigned char);
+extern int font_text_width(int);
 extern int func_000A0AD9();
 extern int func_000A0D13();
 extern int func_000A0DD9();
@@ -30,7 +30,7 @@ extern int func_00142790();
 extern int func_001427A8();
 extern int func_00144E84();
 
-int func_0008C462(void)
+int inpstr_read_key(void)
 {
     unsigned char l_18;
 
@@ -38,78 +38,78 @@ int func_0008C462(void)
     if (l_18 == 0) goto L8C488;
     return (int)(unsigned char)l_18;
 L8C488:;
-    if (*(signed char *)D_00142353 == 0) goto L8C49A;
+    if (*(signed char *)key_down_left == 0) goto L8C49A;
     return 128;
 L8C49A:;
-    if (*(signed char *)D_00142355 == 0) goto L8C4AC;
+    if (*(signed char *)key_down_right == 0) goto L8C4AC;
     return 129;
 L8C4AC:;
-    if (*(signed char *)D_0014234F == 0) goto L8C4BE;
+    if (*(signed char *)key_down_home == 0) goto L8C4BE;
     return 131;
 L8C4BE:;
-    if (*(signed char *)D_00142357 == 0) goto L8C4D0;
+    if (*(signed char *)key_down_end == 0) goto L8C4D0;
     return 130;
 L8C4D0:;
     return 0;
 }
 
-void func_0008C4E4(int a1)
+void inpstr_begin_number(int a1)
 {
     func_00142790();
-    *(signed char *)D_001A9AB0 = 1;
+    *(signed char *)input_digits_only = 1;
     func_000A0DD9(a1, (int)D_001A9AA0, 10);
-    *(int *)D_00195B94 = (int)D_001A9AA0;
-    func_000A0AD9((int)D_00190B44, *(int *)D_00195B94, 160, (int)D_00176E2C, 110);
-    *(short *)D_001A9AAE = func_000A0DF4((int)D_001A9AA0);
-    *(short *)D_001A9AAC = 8;
+    *(int *)inpstr_text = (int)D_001A9AA0;
+    func_000A0AD9((int)D_00190B44, *(int *)inpstr_text, 160, (int)D_00176E2C, 110);
+    *(short *)inpstr_cursor = func_000A0DF4((int)D_001A9AA0);
+    *(short *)inpstr_max_length = 8;
     *(signed char *)D_001A9AB1 = *(signed char *)D_0012DA50;
 }
 
-int func_0008C6E9(unsigned char a1)
+int inpstr_handle_key(unsigned char a1)
 {
     switch ((unsigned char)a1) {
     goto L8C89D;
 case 13:
     func_0012B3ED();
-    return func_000A0D13(*(int *)D_00195B94);
+    return func_000A0D13(*(int *)inpstr_text);
 case 131:
-    *(short *)D_001A9AAE = 0;
+    *(short *)inpstr_cursor = 0;
     goto L8C9BE;
 case 130:
-    *(short *)D_001A9AAE = func_000A0DF4(*(int *)D_00195B94);
+    *(short *)inpstr_cursor = func_000A0DF4(*(int *)inpstr_text);
     goto L8C9BE;
 case 27:
     func_0012B3ED();
     return 32768;
 case 128:
-    if (*(short *)D_001A9AAE == 0) goto L8C7BA;
-    (*(short *)D_001A9AAE)--;
+    if (*(short *)inpstr_cursor == 0) goto L8C7BA;
+    (*(short *)inpstr_cursor)--;
 L8C7BA:;
     goto L8C9BE;
 case 129:
-    if (((unsigned)((int)(short)*(short *)D_001A9AAE)) >= func_000A0DF4(*(int *)D_00195B94)) goto L8C7DB;
-    (*(short *)D_001A9AAE)++;
+    if (((unsigned)((int)(short)*(short *)inpstr_cursor)) >= func_000A0DF4(*(int *)inpstr_text)) goto L8C7DB;
+    (*(short *)inpstr_cursor)++;
 L8C7DB:;
     goto L8C9BE;
 case 8:
-    if (*(short *)D_001A9AAE == 0) goto L8C836;
-    func_000A1023((int)(*(char **)D_00195B94 + ((int)(short)*(short *)D_001A9AAE)) - 1, (int)(*(char **)D_00195B94 + ((int)(short)*(short *)D_001A9AAE)), (int)&*(signed char *)((char *)(func_000A0DF4(*(int *)D_00195B94) - ((int)(short)*(short *)D_001A9AAE)) + 1), (int)D_00176E2C, 217, 4);
-    (*(short *)D_001A9AAE)--;
+    if (*(short *)inpstr_cursor == 0) goto L8C836;
+    func_000A1023((int)(*(char **)inpstr_text + ((int)(short)*(short *)inpstr_cursor)) - 1, (int)(*(char **)inpstr_text + ((int)(short)*(short *)inpstr_cursor)), (int)&*(signed char *)((char *)(func_000A0DF4(*(int *)inpstr_text) - ((int)(short)*(short *)inpstr_cursor)) + 1), (int)D_00176E2C, 217, 4);
+    (*(short *)inpstr_cursor)--;
 L8C836:;
     goto L8C9BE;
 case 127:
-    if (((unsigned)((int)(short)*(short *)D_001A9AAE)) >= func_000A0DF4(*(int *)D_00195B94)) goto L8C898;
-    func_000A1023((int)(*(char **)D_00195B94 + ((int)(short)*(short *)D_001A9AAE)), (int)&*(signed char *)((char *)(int)(*(char **)D_00195B94 + ((int)(short)*(short *)D_001A9AAE)) + 1), (int)&*(signed char *)((char *)(func_000A0DF4(*(int *)D_00195B94) - ((int)(short)*(short *)D_001A9AAE)) + 1), (int)D_00176E2C, 226, 4);
+    if (((unsigned)((int)(short)*(short *)inpstr_cursor)) >= func_000A0DF4(*(int *)inpstr_text)) goto L8C898;
+    func_000A1023((int)(*(char **)inpstr_text + ((int)(short)*(short *)inpstr_cursor)), (int)&*(signed char *)((char *)(int)(*(char **)inpstr_text + ((int)(short)*(short *)inpstr_cursor)) + 1), (int)&*(signed char *)((char *)(func_000A0DF4(*(int *)inpstr_text) - ((int)(short)*(short *)inpstr_cursor)) + 1), (int)D_00176E2C, 226, 4);
 L8C898:;
     goto L8C9BE;
 default:
 L8C89D:;
     if (((int)(unsigned char)a1) >= 128) goto L8C8BE;
-    if (((unsigned)func_000A0DF4(*(int *)D_00195B94)) < ((int)(short)*(short *)D_001A9AAC)) goto L8C8C3;
+    if (((unsigned)func_000A0DF4(*(int *)inpstr_text)) < ((int)(short)*(short *)inpstr_max_length)) goto L8C8C3;
 L8C8BE:;
     goto L8C9BE;
 L8C8C3:;
-    if (*(signed char *)D_001A9AB0 == 0) goto L8C8E2;
+    if (*(signed char *)input_digits_only == 0) goto L8C8E2;
     if (((int)(unsigned char)a1) < 48) goto L8C8E0;
     if (((int)(unsigned char)a1) <= 57) goto L8C8E2;
 L8C8E0:;
@@ -119,32 +119,32 @@ L8C8E2:;
 L8C8E4:;
     goto L8C9BE;
 L8C8E9:;
-    if (((func_0005A4A9(*(int *)D_00195B94) + func_0005A442((int)(unsigned char)a1)) + ((int)(unsigned short)*(short *)D_00195F36)) >= ((int)(short)*(short *)D_00142948)) goto L8C9BE;
-    if (((int)(short)*(short *)D_001A9AAE) != func_000A0DF4(*(int *)D_00195B94)) goto L8C95D;
-    *(signed char *)((char *)(int)(*(char **)D_00195B94 + ((int)(short)(*(short *)D_001A9AAE)++))) = a1;
-    *(signed char *)((char *)(int)(*(char **)D_00195B94 + ((int)(short)*(short *)D_001A9AAE))) = 0;
+    if (((font_text_width(*(int *)inpstr_text) + font_char_width((int)(unsigned char)a1)) + ((int)(unsigned short)*(short *)D_00195F36)) >= ((int)(short)*(short *)D_00142948)) goto L8C9BE;
+    if (((int)(short)*(short *)inpstr_cursor) != func_000A0DF4(*(int *)inpstr_text)) goto L8C95D;
+    *(signed char *)((char *)(int)(*(char **)inpstr_text + ((int)(short)(*(short *)inpstr_cursor)++))) = a1;
+    *(signed char *)((char *)(int)(*(char **)inpstr_text + ((int)(short)*(short *)inpstr_cursor))) = 0;
     goto L8C9BE;
 L8C95D:;
-    func_000A0E0D((int)(*(char **)D_00195B94 + ((int)(short)*(short *)D_001A9AAE)) + 1, (int)(*(char **)D_00195B94 + ((int)(short)*(short *)D_001A9AAE)), (int)&*(signed char *)((char *)(func_000A0DF4(*(int *)D_00195B94) - ((int)(short)*(short *)D_001A9AAE)) + 1), (int)D_00176E2C, 245, 4);
-    *(signed char *)((char *)(int)(*(char **)D_00195B94 + ((int)(short)(*(short *)D_001A9AAE)++))) = a1;
+    func_000A0E0D((int)(*(char **)inpstr_text + ((int)(short)*(short *)inpstr_cursor)) + 1, (int)(*(char **)inpstr_text + ((int)(short)*(short *)inpstr_cursor)), (int)&*(signed char *)((char *)(func_000A0DF4(*(int *)inpstr_text) - ((int)(short)*(short *)inpstr_cursor)) + 1), (int)D_00176E2C, 245, 4);
+    *(signed char *)((char *)(int)(*(char **)inpstr_text + ((int)(short)(*(short *)inpstr_cursor)++))) = a1;
 L8C9BE:;
     return -2023406815;
 }
 }
 
-int func_0008C9D2(int a1, short a2)
+int inpstr_text_width(int a1, short a2)
 {
     unsigned char l_14;
     short l_18;
 
     l_14 = *(signed char *)((char *)(((int)(short)a2) + a1));
     *(signed char *)((char *)(((int)(short)a2) + a1)) = 0;
-    *(int *)&l_18 = func_0005A4A9(a1);
+    *(int *)&l_18 = font_text_width(a1);
     *(signed char *)((char *)(((int)(short)a2) + a1)) = l_14;
     return (int)(short)l_18;
 }
 
-void func_0008CA25(int a1)
+void picklist_save_background(int a1)
 {
     if (*(signed char *)((char *)a1) == 0) return;
     func_00144E84((int)(short)*(short *)((char *)a1 + 5), (int)(short)*(short *)((char *)a1 + 7), (int)(short)*(short *)((char *)a1 + 9), (int)(short)*(short *)((char *)a1 + 11), *(int *)((char *)a1 + 51), 0);

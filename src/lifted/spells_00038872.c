@@ -3,7 +3,7 @@
 
 
 
-void func_00038872(int a1, int a2, int a3, short a4)
+void spellmaker_adjust_value(int a1, int a2, int a3, short a4)
 {
     *(signed char *)((char *)a1) += *(signed char *)&a2;
     if (((int)(unsigned char)*(signed char *)((char *)a1)) >= 1) goto L388A7;

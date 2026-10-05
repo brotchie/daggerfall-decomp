@@ -99,7 +99,7 @@ def stack_convention(va):
     pat = re.compile(r"#pragma aux func_%08X parm routine \[\]" % va)
     for p in glob.glob(os.path.join(ROOT, "src", "**", "*.c"), recursive=True):
         with open(p, errors="replace") as f:
-            if pat.search(f.read()):
+            if pat.search(namesmod.canonical(f.read())):
                 return True
     return False
 
@@ -176,7 +176,7 @@ def prototypes():
     out, stackp = {}, set()
     defn = re.compile(r"^[A-Za-z_][\w \*]*?\bfunc_([0-9A-F]{8})\s*\(([^;]*)\)\s*$")
     for p in glob.glob(os.path.join(ROOT, "src", "**", "*.c"), recursive=True):
-        for line in open(p, errors="replace"):
+        for line in namesmod.canonical(open(p, errors="replace").read()).splitlines(True):
             m = re.match(r"#pragma aux func_([0-9A-F]{8}) parm routine \[\]", line)
             if m:
                 stackp.add(int(m.group(1), 16))

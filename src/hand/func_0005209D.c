@@ -37,18 +37,18 @@ struct info {
 };
 #pragma pack()
 extern char D_00175404[];
-extern unsigned short func_0006CD6E(int);
+extern unsigned short disk_open_data(int);
 extern int func_000A0040();
 extern int func_000A006E(int, int, int);
 extern char *func_000A00AF(int, char *, int);
 extern int func_000A00CB(int, void *, int);
 
-int func_0005209D(int a1, struct anim *a2)
+int flc_open(int a1, struct anim *a2)
 {
     struct info l_A8;
     struct hdr l_28;
 
-    a2->handle = func_0006CD6E(a1);
+    a2->handle = disk_open_data(a1);
     if (a2->handle < 1)
         return 0;
     func_000A00CB(a2->handle, &l_A8, 128);

@@ -5,26 +5,26 @@ extern short D_00142928;
 extern short D_0014292C;
 extern char D_00176E2C[];
 extern char D_00190B44[];
-extern int D_00195B8C;
-extern int D_00195B94;
+extern int inpstr_result;
+extern int inpstr_text;
 extern short D_00195F36;
 extern short D_00195F38;
-extern short D_001A9AAE;
-extern void func_0005A54A(int, unsigned short, unsigned short);
-extern unsigned char func_0008C462(void);
-extern int func_0008C6E9(unsigned char);
-extern short func_0008C9D2(int, short);
+extern short inpstr_cursor;
+extern void text_draw(int, unsigned short, unsigned short);
+extern unsigned char inpstr_read_key(void);
+extern int inpstr_handle_key(unsigned char);
+extern short inpstr_text_width(int, short);
 extern void func_000A0AD9(int, char *, int, char *, int);
 extern void func_001531F0(int, int, int, int);
 
-int func_0008C5C9(void)
+int inpstr_update(void)
 {
     unsigned char c;
     char x;
     char y;
 
     D_0012B508 += 5;
-    D_00142928 = func_0008C9D2(D_00195B94, D_001A9AAE) + D_00195F36;
+    D_00142928 = inpstr_text_width(inpstr_text, inpstr_cursor) + D_00195F36;
     D_0014292C = D_00195F38;
     {
         int *clk;
@@ -34,21 +34,21 @@ int func_0008C5C9(void)
             func_001531F0(D_00142928, D_0014292C, D_00142928, (short)(D_0014292C + D_0012DA44 - 1));
     }
     D_0012B508 -= 5;
-    func_0005A54A(D_00195B94, D_00195F36, D_00195F38);
-    c = func_0008C462();
+    text_draw(inpstr_text, D_00195F36, D_00195F38);
+    c = inpstr_read_key();
     if (c == 0)
         return 0;
     {
         int r;
 
-        r = func_0008C6E9(c);
+        r = inpstr_handle_key(c);
         if (r == 0x87654321)
             return 0;
         if (r == 0x8000) {
-            func_000A0AD9(D_00195B94, D_00190B44, 4, D_00176E2C, 157);
+            func_000A0AD9(inpstr_text, D_00190B44, 4, D_00176E2C, 157);
             return 2;
         }
-        D_00195B8C = r;
+        inpstr_result = r;
         return 1;
     }
 }

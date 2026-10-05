@@ -2,7 +2,7 @@
 struct item { short f0; unsigned short flags; };
 struct cond { short f0; short flags; short type; short value; };
 extern char D_001970DD;
-extern unsigned char *func_000192EE(short);
+extern unsigned char *faction_find(short);
 
 int func_000339B2(struct item *a1, struct cond *a2, unsigned char *a3, int a4)
 {
@@ -33,11 +33,11 @@ int func_000339B2(struct item *a1, struct cond *a2, unsigned char *a3, int a4)
             return 1;
         if (a2->type == -1)
             return 0;
-        if (a2->type == -2 && *func_000192EE(a1->flags & 0x3FF) == a2->value)
+        if (a2->type == -2 && *faction_find(a1->flags & 0x3FF) == a2->value)
             return 1;
         if (a2->type == -2)
             return 0;
-        l_10 = func_000192EE(*(short *)(a3 + 18));
+        l_10 = faction_find(*(short *)(a3 + 18));
         return *l_10 == a2->value ? 1 : 0;
     }
     if ((a1->flags & 0x2000) == 0)
@@ -70,10 +70,10 @@ int func_000339B2(struct item *a1, struct cond *a2, unsigned char *a3, int a4)
         return 1;
     if (a2->type == -1)
         return 0;
-    if (a2->type == -2 && *func_000192EE(a1->flags & 0x3FF) == a2->value)
+    if (a2->type == -2 && *faction_find(a1->flags & 0x3FF) == a2->value)
         return 1;
     if (a2->type == -2)
         return 0;
-    l_10 = func_000192EE(a1->flags & 0x3FF);
+    l_10 = faction_find(a1->flags & 0x3FF);
     return *l_10 == a2->value ? 1 : 0;
 }

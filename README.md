@@ -98,6 +98,7 @@ tools/build-and-verify.sh
 | `tools/asset_ids.py` | static asset evidence, no emulator: the TEXT.RSC records and sounds each function asks for by constant id (with the text or sound name), the screen button tables `{x0,y0,x1,y1,handler}` and the text-macro tables |
 | `tools/assets.py` | readers for the game's data files: BSA and DAGGER.SND records, TEXT.RSC text, TEXTURE archives, sound names (`config/sound_clips.csv`, from Daggerfall Unity) |
 | `tools/libmatch.py` | names the library region's Watcom runtime functions by matching them, relocations masked, against Watcom C32 10.0a's own libraries (extracted from the 10.0a CD into third_party/) |
+| `tools/apply_names.py` | puts the confirmed and strong names from config/names.csv into src/ and include/, recording them in config/symbols.txt for the build (re-runnable; `revert` puts addresses back; run it again after promote_lifted.py) |
 | `tools/names.py` | config/names.csv: names for functions, globals and record fields, each with a confidence and its evidence (check, merge, show, annotate) |
 | `tools/fallstate.py` | experiments that find game state in memory: screens, interaction modes, values read off the screen, counters that move in step |
 | `tools/memwatch.py` | memory watchdog: kills this repo's emulator processes, largest first, before the machine runs out of memory (the multi-worker tools start it themselves) |

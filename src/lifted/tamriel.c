@@ -5,58 +5,58 @@ struct bf8_4_1 { unsigned char _:4; unsigned char f:1; };
 struct bf8_6_1 { unsigned char _:6; unsigned char f:1; };
 extern char D_0012B508[];
 extern char D_001711AC[];
-extern char D_001789FA[];
-extern char D_0017C5B8[];
+extern char player_environment[];
+extern char building_open_hours[];
 extern char D_0017C5B9[];
-extern char D_0017CB97[];
-extern char D_0017CBE3[];
+extern char month_names[];
+extern char ordinal_suffixes[];
 extern char D_001830E2[];
 extern char D_00187CA8[];
-extern char D_0018DBFC[];
-extern char D_0018F08D[];
-extern char D_0018F08E[];
-extern char D_0018F092[];
+extern char frame_checkpoint[];
+extern char region_punishment_flags[];
+extern char region_legal_reputation[];
+extern char region_price_adjustment[];
 extern char D_00190504[];
-extern char D_00190CE4[];
+extern char itemmaker_slot_kinds[];
 extern char D_001940D8[];
 extern char D_001940D9[];
 extern char D_00195A00[];
-extern char D_00195A04[];
-extern char D_00195AA0[];
-extern char D_00195AA4[];
+extern char bank_accounts[];
+extern char player_entity[];
+extern char player_object[];
 extern char D_00195AA8[];
 extern char D_00195AC4[];
-extern char D_00195B14[];
-extern char D_00195B24[];
-extern char D_00195B28[];
-extern char D_00195B38[];
-extern char D_00195B3C[];
-extern char D_00195B4C[];
-extern char D_00195BE0[];
-extern char D_00195BF4[];
+extern char creature_count[];
+extern char calendar_year[];
+extern char calendar_weekday[];
+extern char calendar_month[];
+extern char calendar_minute[];
+extern char calendar_hour[];
+extern char player_character[];
+extern char game_minutes[];
 extern char D_00195C40[];
 extern char D_00195D00[];
-extern char D_00195D7C[];
+extern char player_death_timer[];
 extern char D_00195F24[];
 extern char D_00195F25[];
-extern char D_00196268[];
-extern char D_00196274[];
-extern char D_0019627E[];
+extern char current_region[];
+extern char game_mode[];
+extern char crime_current[];
 extern char D_00196280[];
-extern char D_00196290[];
+extern char player_ailment_flags[];
 extern char D_00196298[];
 extern char D_001962A4[];
 extern char D_001962A5[];
 extern char D_001962A9[];
 extern char D_001962B0[];
-extern char D_00196710[];
-extern char D_0019672C[];
-extern char D_00199764[];
-extern char D_0019976C[];
-extern char D_00199778[];
+extern char faction_count[];
+extern char factions[];
+extern char current_quest[];
+extern char quest_debug_data[];
+extern char quest_event_object[];
 extern char D_00199780[];
-extern char D_00199784[];
-extern char D_00199788[];
+extern char quest_ended_id[];
+extern char qbn_record_sizes[];
 extern char D_0019978A[];
 extern char D_0019978C[];
 extern char D_0019978E[];
@@ -66,75 +66,75 @@ extern char D_00199794[];
 extern char D_00199796[];
 extern char D_00199798[];
 extern char D_0019979A[];
-extern char D_001997AC[];
+extern char quest_event_code[];
 extern char D_001AA698[];
 
-extern int func_000191DA(int, short);
-extern int func_000192EE(short);
-extern int func_0002B26B(int);
-extern int func_0004A98C(int, int);
-extern int func_00065C38(int);
-extern int func_000702A0(unsigned char);
-extern int func_0007D6AE(int, int);
-extern int func_0007DF35(int);
-extern int func_00086560(int, int);
-extern int func_0008AA11(int);
+extern int faction_find_type_in_region(int, short);
+extern int faction_find(short);
+extern int quest_dispatch_event(int);
+extern int holiday_today(int, int);
+extern int poison_tick(int);
+extern int guild_find_membership_by_kind(unsigned char);
+extern int rand_range(int, int);
+extern int object_building(int);
+extern int location_here_contains(int, int);
+extern int spfx_disease_daily(int);
 extern int func_0008AC9B(int);
-extern int func_0008E925(int, int);
+extern int object_find_by_id(int, int);
 extern int func_000A0ED9(int, int);
 extern int func_000A0F5C(int, ...);
-extern void func_00013E17(int, int);
-extern void func_00013F06(int, int);
-extern void func_00019676(int);
-extern void func_00026565(int, int);
+extern void region_flag_set(int, int);
+extern void region_flag_clear(int, int);
+extern void faction_politics_update(int);
+extern void encounter_tick(int, int);
 extern void func_000278E4(void);
-extern void func_00028940(void);
-extern void func_00029958(int);
-extern void func_0003081B(unsigned char);
-extern void func_00030E34(unsigned char);
-extern void func_00034F3F(void);
-extern void func_0003522C(void);
-extern void func_0003D01C(int, int);
-extern void func_0003F09F(int, int);
-extern void func_00040C87(int);
-extern void func_0005A72F(int);
-extern void func_00067550(void);
-extern void func_000676A4(void);
-extern void func_0006770E(int);
-extern void func_00070A8E(void);
-extern void func_00072360(void);
-extern void func_0008A9A3(int, int);
-extern void func_0008B3EA(void);
-extern void func_0008E3F7(int, int);
-extern void func_0009D986(int);
-int func_0004B28C(int);
-void func_0004AC01(int);
-void func_0004B0C3(void);
+extern void automap_purge_old_files(void);
+extern void quest_run_opcodes(int);
+extern void quest_remove_objects(unsigned char);
+extern void quest_faces_remove_quest(unsigned char);
+extern void sky_update_moons(void);
+extern void weather_roll(void);
+extern void skill_add_uses(int, int);
+extern void msgbox_show_rsc(int, int);
+extern void guards_summon(int);
+extern void spell_tick(int);
+extern void disease_lycanthrope_tick(void);
+extern void disease_special_infection_tick(void);
+extern void disease_start_cure_quest(int);
+extern void guild_expire_blessings(void);
+extern void fatigue_update(void);
+extern void spfx_walk_effect_records(int, int);
+extern void spfx_expire_created_items(void);
+extern void object_foreach(int, int);
+extern void travel_show_days_left(int);
+int building_is_open(int);
+void time_pass_minutes(int);
+void calendar_update(void);
 void func_0004B54F(int);
 void func_0004B595(int);
-void func_0004B66E(void);
-void func_0004B7E3(int);
+void reputation_decay(void);
+void region_update_prices(int);
 void func_0004B9A1(void);
-void func_0004BA0F(void);
-void func_0004BAE2(void);
+void loan_due_penalty(void);
+void quests_run_all(void);
 #pragma aux func_000A0ED9 parm routine [];
 
-int func_0004AA7D(int a1, int a2)
+int calendar_format_date(int a1, int a2)
 {
     short l_14;
 
     *(int *)&l_14 = ((unsigned)(((unsigned)(((unsigned)a1) % 518400)) / 1440)) % 30;
     func_000A0ED9(79, (int)D_001711AC);
-    func_000A0F5C(a2, *(int *)D_001830E2, ((int)(short)l_14) + 1, *(int *)(D_0017CBE3 + (((((int)(short)l_14) > 3) ? 3 : (int)(short)l_14) << 2)), *(int *)(D_0017CB97 + ((((unsigned)(((unsigned)a1) % 518400)) / 43200) << 2)));
+    func_000A0F5C(a2, *(int *)D_001830E2, ((int)(short)l_14) + 1, *(int *)(ordinal_suffixes + (((((int)(short)l_14) > 3) ? 3 : (int)(short)l_14) << 2)), *(int *)(month_names + ((((unsigned)(((unsigned)a1) % 518400)) / 43200) << 2)));
     return a2;
 }
 
-void func_0004AB2F(int a1)
+void time_pass(int a1)
 {
-    func_0004AC01(a1);
+    time_pass_minutes(a1);
 }
 
-void func_0004AB52(void)
+void time_update_realtime(void)
 {
     int l_24;
     int l_20;
@@ -148,22 +148,22 @@ L4AB72:;
     *(int *)D_00195C40 = *(int *)((char *)l_1C);
     return;
 L4AB88:;
-    l_20 = *(int *)D_00195BF4;
+    l_20 = *(int *)game_minutes;
     l_18 = 1132;
     l_24 = ((unsigned)(*(int *)((char *)l_18) - *(int *)D_00195C40)) / 90;
     *(int *)D_00195C40 += l_24 * 90;
     if (((struct bf8_4_1 *)&D_001940D9)->f == 0) goto L4ABD8;
-    if (((int)(unsigned short)(*(short *)(*(char **)D_00195BE0 + 64) & 1536)) == 0) goto L4ABDA;
+    if (((int)(unsigned short)(*(short *)(*(char **)player_character + 64) & 1536)) == 0) goto L4ABDA;
 L4ABD8:;
     goto L4ABE9;
 L4ABDA:;
-    func_0003D01C(21, 1);
+    skill_add_uses(21, 1);
 L4ABE9:;
     if (l_24 == 0) return;
-    func_0004AC01(l_24);
+    time_pass_minutes(l_24);
 }
 
-void func_0004AC01(int a1)
+void time_pass_minutes(int a1)
 {
     int l_30;
     int l_2C;
@@ -175,16 +175,16 @@ void func_0004AC01(int a1)
 {
     unsigned char l_38;
 
-    l_1C = *(int *)D_00195BF4;
+    l_1C = *(int *)game_minutes;
     l_18 = 0;
     if (((unsigned)a1) <= 200000) goto L4AC31;
     a1 = 1;
 L4AC31:;
-    *(signed char *)D_00196290 = 0;
-    l_28 = ((unsigned)*(int *)D_00195BF4) / 1440;
-    l_24 = ((unsigned)*(int *)D_00195BF4) / 10080;
-    *(int *)D_00195BF4 += a1;
-    l_20 = ((unsigned)*(int *)D_00195BF4) % 1440;
+    *(signed char *)player_ailment_flags = 0;
+    l_28 = ((unsigned)*(int *)game_minutes) / 1440;
+    l_24 = ((unsigned)*(int *)game_minutes) / 10080;
+    *(int *)game_minutes += a1;
+    l_20 = ((unsigned)*(int *)game_minutes) % 1440;
     if (l_20 <= 360) goto L4AC86;
     if (l_20 < 1080) goto L4AC88;
 L4AC86:;
@@ -196,8 +196,8 @@ L4AC8E:;
     l_38 = 0;
 L4AC92:;
     *(signed char *)D_00196280 = l_38;
-    l_28 = (((unsigned)*(int *)D_00195BF4) / 1440) - l_28;
-    *(int *)D_0018DBFC = 2000;
+    l_28 = (((unsigned)*(int *)game_minutes) / 1440) - l_28;
+    *(int *)frame_checkpoint = 2000;
     l_2C = 0;
 L4ACBF:;
     if (l_2C < l_28) goto L4ACD1;
@@ -207,23 +207,23 @@ L4ACC9:;
     goto L4ACBF;
 L4ACD1:;
     if (*(signed char *)D_001962A4 != 0) goto L4ACEC;
-    func_0008A9A3(*(int *)(*(char **)D_00195AA0 + 63), (int)func_0008AA11);
+    spfx_walk_effect_records(*(int *)(*(char **)player_entity + 63), (int)spfx_disease_daily);
 L4ACEC:;
-    *(int *)D_0018DBFC = 2001;
-    if (*(int *)D_00195D7C < 0) return;
-    *(int *)D_0018DBFC = 2002;
-    func_0003522C();
-    *(int *)D_0018DBFC = 2003;
+    *(int *)frame_checkpoint = 2001;
+    if (*(int *)player_death_timer < 0) return;
+    *(int *)frame_checkpoint = 2002;
+    weather_roll();
+    *(int *)frame_checkpoint = 2003;
     func_000278E4();
     goto L4ACC9;
 L4AD23:;
-    *(int *)D_0018DBFC = 2004;
+    *(int *)frame_checkpoint = 2004;
     if (l_28 == 0) goto L4AD38;
-    func_00028940();
+    automap_purge_old_files();
 L4AD38:;
-    func_0004B0C3();
-    if (*(int *)D_00195D7C < 0) return;
-    *(int *)D_0018DBFC = 2005;
+    calendar_update();
+    if (*(int *)player_death_timer < 0) return;
+    *(int *)frame_checkpoint = 2005;
     l_2C = 0;
 L4AD5B:;
     if (((unsigned)l_2C) < a1) goto L4AD70;
@@ -238,71 +238,71 @@ L4AD70:;
 L4AD88:;
     goto L4AD95;
 L4AD8A:;
-    func_0009D986(a1 - l_2C);
+    travel_show_days_left(a1 - l_2C);
 L4AD95:;
-    *(int *)D_0018DBFC = 2006;
+    *(int *)frame_checkpoint = 2006;
     l_30 = (l_1C + l_2C) % 10080;
     if (l_30 != 0) goto L4AE0E;
-    func_00019676(1);
+    faction_politics_update(1);
     l_30 = (l_1C + l_2C) % 54720;
     if (l_30 != 0) goto L4AE0E;
-    *(int *)D_0018DBFC = 2008;
-    func_00019676(2);
-    *(int *)D_0018DBFC = 2009;
-    func_0006770E(0);
-    *(int *)D_0018DBFC = 2010;
+    *(int *)frame_checkpoint = 2008;
+    faction_politics_update(2);
+    *(int *)frame_checkpoint = 2009;
+    disease_start_cure_quest(0);
+    *(int *)frame_checkpoint = 2010;
 L4AE0E:;
     if (((l_1C + l_2C) % 1440) != 0) goto L4AE42;
-    func_0004B7E3(((l_30 == 0) ? 2 : 0));
+    region_update_prices(((l_30 == 0) ? 2 : 0));
 L4AE42:;
     l_30 = (l_1C + l_2C) % 161280;
     if (l_30 != 0) goto L4AE62;
-    func_0004B66E();
+    reputation_decay();
 L4AE62:;
     l_30 = (l_1C + l_2C) % 120960;
     if (l_30 != 0) goto L4AE87;
-    func_0006770E(1);
+    disease_start_cure_quest(1);
 L4AE87:;
-    *(int *)D_0018DBFC = 2013;
+    *(int *)frame_checkpoint = 2013;
     if (*(signed char *)D_001962A4 != 0) goto L4AEE8;
-    *(int *)D_0018DBFC = 2017;
-    func_0005A72F(*(int *)D_00195AA0);
-    func_0008A9A3(*(int *)D_00195AA0, (int)func_0008AC9B);
-    *(int *)D_00195AA8 = *(int *)D_00195AA0;
-    func_0008A9A3(*(int *)(*(char **)D_00195AA0 + 63), (int)func_00065C38);
-    func_00072360();
-    *(int *)D_0018DBFC = 2018;
+    *(int *)frame_checkpoint = 2017;
+    spell_tick(*(int *)player_entity);
+    spfx_walk_effect_records(*(int *)player_entity, (int)func_0008AC9B);
+    *(int *)D_00195AA8 = *(int *)player_entity;
+    spfx_walk_effect_records(*(int *)(*(char **)player_entity + 63), (int)poison_tick);
+    fatigue_update();
+    *(int *)frame_checkpoint = 2018;
 L4AEE8:;
-    *(int *)D_0018DBFC = 2019;
-    func_00034F3F();
-    *(int *)D_0018DBFC = 2020;
+    *(int *)frame_checkpoint = 2019;
+    sky_update_moons();
+    *(int *)frame_checkpoint = 2020;
     func_0004B9A1();
     if (*(signed char *)D_001962A5 == 0) goto L4AF14;
-    func_0004BAE2();
+    quests_run_all();
 L4AF14:;
-    *(int *)D_0018DBFC = 2022;
-    func_0004BA0F();
-    if (*(int *)D_00195D7C < 0) return;
+    *(int *)frame_checkpoint = 2022;
+    loan_due_penalty();
+    if (*(int *)player_death_timer < 0) return;
     l_30 = 0;
 L4AF37:;
-    if (l_30 < *(int *)D_00195B14) goto L4AF4C;
+    if (l_30 < *(int *)creature_count) goto L4AF4C;
     goto L4AF94;
 L4AF44:;
     l_30++;
     goto L4AF37;
 L4AF4C:;
     if (*(int *)(D_00190504 + (l_30 << 2)) == (-1768515946)) goto L4AF44;
-    func_0005A72F(*(int *)(D_00190504 + (l_30 << 2)));
+    spell_tick(*(int *)(D_00190504 + (l_30 << 2)));
     *(int *)D_00195AA8 = *(int *)(D_00190504 + (l_30 << 2));
-    func_0008A9A3(*(int *)(*(char **)D_00195AA8 + 63), (int)func_00065C38);
+    spfx_walk_effect_records(*(int *)(*(char **)D_00195AA8 + 63), (int)poison_tick);
     goto L4AF44;
 L4AF94:;
-    if (*(int *)D_00195D7C < 0) return;
+    if (*(int *)player_death_timer < 0) return;
     goto L4AD68;
 L4AFA6:;
-    *(int *)D_0018DBFC = 2026;
-    func_00070A8E();
-    *(int *)D_0018DBFC = 2027;
+    *(int *)frame_checkpoint = 2026;
+    guild_expire_blessings();
+    *(int *)frame_checkpoint = 2027;
     l_2C = 0;
 L4AFC6:;
     if (((unsigned)l_2C) < a1) goto L4AFD8;
@@ -311,71 +311,71 @@ L4AFD0:;
     l_2C++;
     goto L4AFC6;
 L4AFD8:;
-    func_00026565(((*(int *)D_00195BF4 - a1) + l_2C) + 1, 0);
+    encounter_tick(((*(int *)game_minutes - a1) + l_2C) + 1, 0);
     goto L4AFD0;
 L4AFED:;
-    if (((int)(short)*(short *)(D_0018F08E + (((int)(unsigned char)*(signed char *)D_00196268) * 80))) >= (-10)) goto L4B017;
-    if (func_0007D6AE(1, 100) < 5) goto L4B019;
+    if (((int)(short)*(short *)(region_legal_reputation + (((int)(unsigned char)*(signed char *)current_region) * 80))) >= (-10)) goto L4B017;
+    if (rand_range(1, 100) < 5) goto L4B019;
 L4B017:;
     goto L4B022;
 L4B019:;
-    if (*(signed char *)D_00196274 == 0) goto L4B024;
+    if (*(signed char *)game_mode == 0) goto L4B024;
 L4B022:;
     goto L4B032;
 L4B024:;
-    *(signed char *)D_0019627E = 7;
-    func_00040C87(0);
+    *(signed char *)crime_current = 7;
+    guards_summon(0);
 L4B032:;
-    if (((int)(unsigned char)(*(signed char *)(D_0018F08D + (((int)(unsigned char)*(signed char *)D_00196268) * 80)) & 1)) == 0) goto L4B061;
-    if (func_0007D6AE(1, 100) < 10) goto L4B063;
+    if (((int)(unsigned char)(*(signed char *)(region_punishment_flags + (((int)(unsigned char)*(signed char *)current_region) * 80)) & 1)) == 0) goto L4B061;
+    if (rand_range(1, 100) < 10) goto L4B063;
 L4B061:;
     goto L4B06C;
 L4B063:;
-    if (*(signed char *)D_00196274 == 0) goto L4B06E;
+    if (*(signed char *)game_mode == 0) goto L4B06E;
 L4B06C:;
     goto L4B07C;
 L4B06E:;
-    *(signed char *)D_0019627E = 7;
-    func_00040C87(0);
+    *(signed char *)crime_current = 7;
+    guards_summon(0);
 L4B07C:;
-    *(int *)D_0018DBFC = 2028;
-    func_00067550();
-    *(int *)D_0018DBFC = 2029;
+    *(int *)frame_checkpoint = 2028;
+    disease_lycanthrope_tick();
+    *(int *)frame_checkpoint = 2029;
     if (*(signed char *)D_001962A4 != 0) goto L4B0A3;
-    func_000676A4();
+    disease_special_infection_tick();
 L4B0A3:;
-    func_0008B3EA();
+    spfx_expire_created_items();
     *(signed char *)D_00196298 = 1;
-    *(int *)D_0018DBFC = 2030;
+    *(int *)frame_checkpoint = 2030;
 }
 }
 
-void func_0004B0C3(void)
+void calendar_update(void)
 {
     int l_1C;
     int l_18;
 
-    *(int *)D_00195B24 = (((unsigned)*(int *)D_00195BF4) / 518400) + 400;
-    *(int *)D_00195B38 = ((unsigned)(((unsigned)*(int *)D_00195BF4) % 518400)) / 43200;
-    *(int *)D_00195B28 = ((unsigned)(((unsigned)*(int *)D_00195BF4) / 1440)) % 7;
-    *(int *)D_00195B4C = ((unsigned)(((unsigned)*(int *)D_00195BF4) / 60)) % 24;
-    *(int *)D_00195B3C = ((unsigned)*(int *)D_00195BF4) % 60;
-    *(signed char *)D_00195F24 = ((unsigned)(((unsigned)*(int *)D_00195BF4) / 1440)) % 22;
-    *(signed char *)D_00195F25 = (((unsigned)*(int *)D_00195BF4) / 1440) & 15;
+    *(int *)calendar_year = (((unsigned)*(int *)game_minutes) / 518400) + 400;
+    *(int *)calendar_month = ((unsigned)(((unsigned)*(int *)game_minutes) % 518400)) / 43200;
+    *(int *)calendar_weekday = ((unsigned)(((unsigned)*(int *)game_minutes) / 1440)) % 7;
+    *(int *)calendar_hour = ((unsigned)(((unsigned)*(int *)game_minutes) / 60)) % 24;
+    *(int *)calendar_minute = ((unsigned)*(int *)game_minutes) % 60;
+    *(signed char *)D_00195F24 = ((unsigned)(((unsigned)*(int *)game_minutes) / 1440)) % 22;
+    *(signed char *)D_00195F25 = (((unsigned)*(int *)game_minutes) / 1440) & 15;
 }
 
-int func_0004B192(void)
+int player_in_daylight(void)
 {
     int l_20;
     int l_1C;
 
-    l_1C = ((unsigned)*(int *)D_00195BF4) % 1440;
+    l_1C = ((unsigned)*(int *)game_minutes) % 1440;
     if (l_1C < 360) goto L4B1C3;
     if (l_1C <= 1080) goto L4B1CC;
 L4B1C3:;
     return 0;
 L4B1CC:;
-    if (((int)(unsigned char)*(signed char *)D_001789FA) != 1) goto L4B1E1;
+    if (((int)(unsigned char)*(signed char *)player_environment) != 1) goto L4B1E1;
     l_20 = 1;
     goto L4B1E8;
 L4B1E1:;
@@ -384,12 +384,12 @@ L4B1E8:;
     return l_20;
 }
 
-int func_0004B1FB(void)
+int player_in_temple(void)
 {
     int l_20;
     int l_1C;
 
-    l_1C = func_0007DF35(*(int *)(*(char **)D_00195AA4 + 67));
+    l_1C = object_building(*(int *)(*(char **)player_object + 67));
     if (l_1C == 0) goto L4B247;
     if (((int)(unsigned char)*(signed char *)((char *)l_1C + 24)) != 14) goto L4B238;
     l_20 = 1;
@@ -405,33 +405,33 @@ L4B247:;
 void func_0004B25B(int a1)
 {
     if (((int)(unsigned char)*(signed char *)((char *)a1)) != 8) return;
-    *(signed char *)D_00190CE4 = 1;
+    *(signed char *)itemmaker_slot_kinds = 1;
 }
 
-int func_0004B28C(int a1)
+int building_is_open(int a1)
 {
     int l_28;
     int l_24;
     int l_20;
     int l_1C;
 
-    l_24 = func_0008E925(*(int *)D_00195AC4, *(int *)((char *)a1 + 20));
+    l_24 = object_find_by_id(*(int *)D_00195AC4, *(int *)((char *)a1 + 20));
     if (((int)(unsigned short)*(short *)((char *)a1 + 18)) != 108) goto L4B2CC;
-    if (func_000702A0(0) != 0) goto L4B2CE;
+    if (guild_find_membership_by_kind(0) != 0) goto L4B2CE;
 L4B2CC:;
     goto L4B2DA;
 L4B2CE:;
     return 1;
 L4B2DA:;
     if (((int)(unsigned short)*(short *)((char *)a1 + 18)) != 42) goto L4B2F9;
-    if (func_000702A0(3) != 0) goto L4B2FB;
+    if (guild_find_membership_by_kind(3) != 0) goto L4B2FB;
 L4B2F9:;
     goto L4B307;
 L4B2FB:;
     return 1;
 L4B307:;
     if (((int)(unsigned short)*(short *)((char *)a1 + 18)) != 41) goto L4B32B;
-    l_1C = func_000702A0(2);
+    l_1C = guild_find_membership_by_kind(2);
     if (l_1C != 0) goto L4B32D;
 L4B32B:;
     goto L4B33C;
@@ -443,7 +443,7 @@ L4B33E:;
     return 1;
 L4B34A:;
     if (((int)(unsigned short)*(short *)((char *)a1 + 18)) != 40) goto L4B36E;
-    l_1C = func_000702A0(1);
+    l_1C = guild_find_membership_by_kind(1);
     if (l_1C != 0) goto L4B370;
 L4B36E:;
     goto L4B37F;
@@ -454,7 +454,7 @@ L4B37F:;
 L4B381:;
     return 1;
 L4B38D:;
-    l_20 = *(int *)(*(char **)D_00195AA4 + 67);
+    l_20 = *(int *)(*(char **)player_object + 67);
 L4B398:;
     if (l_20 == 0) goto L4B3AD;
     if (((int)(unsigned char)*(signed char *)((char *)l_20)) != 43) goto L4B3AF;
@@ -482,21 +482,21 @@ L4B40E:;
     if (((int)(unsigned char)*(signed char *)((char *)a1 + 24)) <= 16) goto L4B427;
     return 0;
 L4B427:;
-    l_28 = ((unsigned)(((unsigned)*(int *)D_00195BF4) % 1440)) / 60;
-    return (((((int)(unsigned char)*(signed char *)(D_0017C5B8 + (((int)(unsigned char)*(signed char *)((char *)a1 + 24)) * 2))) <= l_28) && (((int)(unsigned char)*(signed char *)(D_0017C5B9 + (((int)(unsigned char)*(signed char *)((char *)a1 + 24)) * 2))) > l_28)) ? 1 : 0);
+    l_28 = ((unsigned)(((unsigned)*(int *)game_minutes) % 1440)) / 60;
+    return (((((int)(unsigned char)*(signed char *)(building_open_hours + (((int)(unsigned char)*(signed char *)((char *)a1 + 24)) * 2))) <= l_28) && (((int)(unsigned char)*(signed char *)(D_0017C5B9 + (((int)(unsigned char)*(signed char *)((char *)a1 + 24)) * 2))) > l_28)) ? 1 : 0);
 }
 
-int func_0004B4A2(int a1)
+int building_minutes_to_close(int a1)
 {
     int l_1C;
 
-    l_1C = ((unsigned)(((unsigned)*(int *)D_00195BF4) % 1440)) / 60;
-    if (((int)(unsigned char)*(signed char *)(D_0017C5B8 + (((int)(unsigned char)*(signed char *)((char *)a1 + 24)) * 2))) > l_1C) goto L4B509;
+    l_1C = ((unsigned)(((unsigned)*(int *)game_minutes) % 1440)) / 60;
+    if (((int)(unsigned char)*(signed char *)(building_open_hours + (((int)(unsigned char)*(signed char *)((char *)a1 + 24)) * 2))) > l_1C) goto L4B509;
     if (((int)(unsigned char)*(signed char *)(D_0017C5B9 + (((int)(unsigned char)*(signed char *)((char *)a1 + 24)) * 2))) > l_1C) goto L4B50B;
 L4B509:;
     goto L4B53B;
 L4B50B:;
-    return (((int)(unsigned char)*(signed char *)(D_0017C5B9 + (((int)(unsigned char)*(signed char *)((char *)a1 + 24)) * 2))) * 60) - (((unsigned)*(int *)D_00195BF4) % 1440);
+    return (((int)(unsigned char)*(signed char *)(D_0017C5B9 + (((int)(unsigned char)*(signed char *)((char *)a1 + 24)) * 2))) * 60) - (((unsigned)*(int *)game_minutes) % 1440);
 L4B53B:;
     return 0;
 }
@@ -520,11 +520,11 @@ void func_0004B5CF(void)
     int l_1C;
     int l_18;
 
-    if (((int)(unsigned char)*(signed char *)D_001789FA) > 2) return;
-    l_18 = func_0007DF35(*(int *)(*(char **)D_00195AA4 + 67));
+    if (((int)(unsigned char)*(signed char *)player_environment) > 2) return;
+    l_18 = object_building(*(int *)(*(char **)player_object + 67));
     if (l_18 == 0) return;
-    if (func_0004B28C(l_18) == 0) goto L4B636;
-    if (*(int *)((char *)l_18 + 20) == *(int *)(*(char **)D_00195BE0 + 116)) goto L4B629;
+    if (building_is_open(l_18) == 0) goto L4B636;
+    if (*(int *)((char *)l_18 + 20) == *(int *)(*(char **)player_character + 116)) goto L4B629;
     l_1C = 1;
     goto L4B630;
 L4B629:;
@@ -534,13 +534,13 @@ L4B630:;
 L4B636:;
     goto L4B64F;
 L4B638:;
-    func_0008E3F7(*(int *)(*(char **)(*(char **)D_00195AA4 + 67) + 63), (int)func_0004B54F);
+    object_foreach(*(int *)(*(char **)(*(char **)player_object + 67) + 63), (int)func_0004B54F);
     return;
 L4B64F:;
-    func_0008E3F7(*(int *)(*(char **)(*(char **)D_00195AA4 + 67) + 63), (int)func_0004B595);
+    object_foreach(*(int *)(*(char **)(*(char **)player_object + 67) + 63), (int)func_0004B595);
 }
 
-void func_0004B66E(void)
+void reputation_decay(void)
 {
     int l_18;
 
@@ -553,51 +553,51 @@ L4B694:;
     l_18++;
     goto L4B68C;
 L4B69C:;
-    if (*(short *)(D_0018F08E + (l_18 * 80)) <= 0) goto L4B6B7;
-    (*(short *)(D_0018F08E + (l_18 * 80)))--;
+    if (*(short *)(region_legal_reputation + (l_18 * 80)) <= 0) goto L4B6B7;
+    (*(short *)(region_legal_reputation + (l_18 * 80)))--;
     goto L4B6D0;
 L4B6B7:;
-    if (*(short *)(D_0018F08E + (l_18 * 80)) >= 0) goto L4B6D0;
-    (*(short *)(D_0018F08E + (l_18 * 80)))++;
+    if (*(short *)(region_legal_reputation + (l_18 * 80)) >= 0) goto L4B6D0;
+    (*(short *)(region_legal_reputation + (l_18 * 80)))++;
 L4B6D0:;
     goto L4B694;
 L4B6D2:;
     l_18 = 0;
 L4B6D9:;
-    if (l_18 < *(int *)D_00196710) goto L4B6F1;
+    if (l_18 < *(int *)faction_count) goto L4B6F1;
     return;
 L4B6E9:;
     l_18++;
     goto L4B6D9;
 L4B6F1:;
-    if (((int)(short)*(short *)((char *)(int)(*(char **)D_0019672C + (l_18 * 92)) + 29)) <= 100) goto L4B719;
-    *(short *)((char *)(int)(*(char **)D_0019672C + (l_18 * 92)) + 29) = 100;
+    if (((int)(short)*(short *)((char *)(int)(*(char **)factions + (l_18 * 92)) + 29)) <= 100) goto L4B719;
+    *(short *)((char *)(int)(*(char **)factions + (l_18 * 92)) + 29) = 100;
     goto L4B73F;
 L4B719:;
-    if (((int)(short)*(short *)((char *)(int)(*(char **)D_0019672C + (l_18 * 92)) + 29)) >= (-100)) goto L4B73F;
-    *(short *)((char *)(int)(*(char **)D_0019672C + (l_18 * 92)) + 29) = 100;
+    if (((int)(short)*(short *)((char *)(int)(*(char **)factions + (l_18 * 92)) + 29)) >= (-100)) goto L4B73F;
+    *(short *)((char *)(int)(*(char **)factions + (l_18 * 92)) + 29) = 100;
 L4B73F:;
-    if (*(short *)((char *)(int)(*(char **)D_0019672C + (l_18 * 92)) + 29) <= 0) goto L4B764;
-    (*(short *)((char *)(int)(*(char **)D_0019672C + (l_18 * 92)) + 29))--;
+    if (*(short *)((char *)(int)(*(char **)factions + (l_18 * 92)) + 29) <= 0) goto L4B764;
+    (*(short *)((char *)(int)(*(char **)factions + (l_18 * 92)) + 29))--;
     goto L4B787;
 L4B764:;
-    if (*(short *)((char *)(int)(*(char **)D_0019672C + (l_18 * 92)) + 29) >= 0) goto L4B787;
-    (*(short *)((char *)(int)(*(char **)D_0019672C + (l_18 * 92)) + 29))++;
+    if (*(short *)((char *)(int)(*(char **)factions + (l_18 * 92)) + 29) >= 0) goto L4B787;
+    (*(short *)((char *)(int)(*(char **)factions + (l_18 * 92)) + 29))++;
 L4B787:;
     goto L4B6E9;
 }
 
-void func_0004B796(void)
+void holiday_announce(void)
 {
     int l_18;
 
-    l_18 = func_0004A98C(*(int *)D_00195BF4, (int)(unsigned char)*(signed char *)D_00196268);
+    l_18 = holiday_today(*(int *)game_minutes, (int)(unsigned char)*(signed char *)current_region);
     if (l_18 == 0) return;
     *(signed char *)D_0012B508 = 146;
-    func_0003F09F((int)(short)(l_18 + 8349), 1);
+    msgbox_show_rsc((int)(short)(l_18 + 8349), 1);
 }
 
-void func_0004B7E3(int a1)
+void region_update_prices(int a1)
 {
     int l_20;
     int l_1C;
@@ -611,61 +611,61 @@ L4B806:;
     l_20++;
     goto L4B7FB;
 L4B80E:;
-    l_18 = func_000191DA((int)(short)*(short *)&l_20, 7);
+    l_18 = faction_find_type_in_region((int)(short)*(short *)&l_20, 7);
     if (l_18 == 0) goto L4B806;
-    l_1C = (((int)(short)*(short *)((char *)func_000192EE(510) + 31)) - ((int)(short)*(short *)((char *)l_18 + 31))) / 5;
-    l_1C = (l_1C + 50) - ((((int)(unsigned short)*(short *)(D_0018F092 + (l_20 * 80))) - 1000) / 25);
-    if (func_0007D6AE(0, 100) >= l_1C) goto L4B8B5;
-    *(short *)(D_0018F092 + (l_20 * 80)) = (((int)(unsigned short)*(short *)(D_0018F092 + (l_20 * 80))) * 51) / 50;
+    l_1C = (((int)(short)*(short *)((char *)faction_find(510) + 31)) - ((int)(short)*(short *)((char *)l_18 + 31))) / 5;
+    l_1C = (l_1C + 50) - ((((int)(unsigned short)*(short *)(region_price_adjustment + (l_20 * 80))) - 1000) / 25);
+    if (rand_range(0, 100) >= l_1C) goto L4B8B5;
+    *(short *)(region_price_adjustment + (l_20 * 80)) = (((int)(unsigned short)*(short *)(region_price_adjustment + (l_20 * 80))) * 51) / 50;
     goto L4B8E2;
 L4B8B5:;
-    *(short *)(D_0018F092 + (l_20 * 80)) = (((int)(unsigned short)*(short *)(D_0018F092 + (l_20 * 80))) * 49) / 50;
+    *(short *)(region_price_adjustment + (l_20 * 80)) = (((int)(unsigned short)*(short *)(region_price_adjustment + (l_20 * 80))) * 49) / 50;
 L4B8E2:;
-    if (((int)(unsigned short)*(short *)(D_0018F092 + (l_20 * 80))) <= 4000) goto L4B908;
-    *(short *)(D_0018F092 + (l_20 * 80)) = 4000;
+    if (((int)(unsigned short)*(short *)(region_price_adjustment + (l_20 * 80))) <= 4000) goto L4B908;
+    *(short *)(region_price_adjustment + (l_20 * 80)) = 4000;
     goto L4B92C;
 L4B908:;
-    if (((int)(unsigned short)*(short *)(D_0018F092 + (l_20 * 80))) >= 250) goto L4B92C;
-    *(short *)(D_0018F092 + (l_20 * 80)) = 250;
+    if (((int)(unsigned short)*(short *)(region_price_adjustment + (l_20 * 80))) >= 250) goto L4B92C;
+    *(short *)(region_price_adjustment + (l_20 * 80)) = 250;
 L4B92C:;
-    if (((int)(unsigned short)*(short *)(D_0018F092 + (l_20 * 80))) <= 2000) goto L4B952;
-    func_00013E17(l_20, 19);
+    if (((int)(unsigned short)*(short *)(region_price_adjustment + (l_20 * 80))) <= 2000) goto L4B952;
+    region_flag_set(l_20, 19);
     goto L4B992;
 L4B952:;
-    if (((int)(unsigned short)*(short *)(D_0018F092 + (l_20 * 80))) >= 500) goto L4B978;
-    func_00013E17(l_20, 20);
+    if (((int)(unsigned short)*(short *)(region_price_adjustment + (l_20 * 80))) >= 500) goto L4B978;
+    region_flag_set(l_20, 20);
     goto L4B992;
 L4B978:;
-    func_00013F06(l_20, 19);
-    func_00013F06(l_20, 20);
+    region_flag_clear(l_20, 19);
+    region_flag_clear(l_20, 20);
 L4B992:;
     goto L4B806;
 }
 
 void func_0004B9A1(void)
 {
-    if (((int)(unsigned char)*(signed char *)(*(char **)D_00195BE0 + 67)) <= 8) goto L4B9CD;
-    if (((int)(unsigned char)*(signed char *)D_001789FA) == 1) goto L4B9CF;
+    if (((int)(unsigned char)*(signed char *)(*(char **)player_character + 67)) <= 8) goto L4B9CD;
+    if (((int)(unsigned char)*(signed char *)player_environment) == 1) goto L4B9CF;
 L4B9CD:;
     goto L4B9E8;
 L4B9CF:;
-    if (func_00086560(*(int *)(*(char **)D_00195AA4 + 7), *(int *)(*(char **)D_00195AA4 + 15)) != 0) goto L4B9EA;
+    if (location_here_contains(*(int *)(*(char **)player_object + 7), *(int *)(*(char **)player_object + 15)) != 0) goto L4B9EA;
 L4B9E8:;
     goto L4B9FC;
 L4B9EA:;
-    if ((((unsigned)*(int *)D_00195BF4) % 30) == 0) goto L4B9FE;
+    if ((((unsigned)*(int *)game_minutes) % 30) == 0) goto L4B9FE;
 L4B9FC:;
     return;
 L4B9FE:;
-    func_00040C87(0);
+    guards_summon(0);
 }
 
-void func_0004BA0F(void)
+void loan_due_penalty(void)
 {
     int l_1C;
     int l_18;
 
-    l_18 = *(int *)D_00195A04 + 71;
+    l_18 = *(int *)bank_accounts + 71;
     l_1C = 0;
 L4BA2F:;
     if (l_1C < 62) goto L4BA3F;
@@ -675,15 +675,15 @@ L4BA37:;
     goto L4BA2F;
 L4BA3F:;
     if (*(int *)((char *)l_18 + 8) == 0) goto L4BA37;
-    if (*(int *)((char *)l_18 + 8) != *(int *)D_00195BF4) goto L4BA62;
-    *(short *)(D_0018F08E + (l_1C * 80)) -= 5;
+    if (*(int *)((char *)l_18 + 8) != *(int *)game_minutes) goto L4BA62;
+    *(short *)(region_legal_reputation + (l_1C * 80)) -= 5;
 L4BA62:;
     goto L4BA37;
 }
 
-void func_0004BA70(void)
+void quest_init_record_sizes(void)
 {
-    *(short *)D_00199788 = 19;
+    *(short *)qbn_record_sizes = 19;
     *(short *)D_0019978A = 94;
     *(short *)D_0019978C = 34;
     *(short *)D_0019978E = 20;
@@ -695,7 +695,7 @@ void func_0004BA70(void)
     *(short *)D_0019979A = 8;
 }
 
-void func_0004BAE2(void)
+void quests_run_all(void)
 {
     int l_1C;
     int l_18;
@@ -708,16 +708,16 @@ L4BB04:;
     if (((int)(unsigned char)*(signed char *)((char *)l_1C)) != 14) goto L4BB52;
     *(int *)D_00195D00 = l_1C;
     *(int *)D_00199780 = l_1C + 71;
-    if (*(int *)D_0019976C != 0) goto L4BB48;
-    *(int *)D_0019976C = *(int *)D_00199780;
+    if (*(int *)quest_debug_data != 0) goto L4BB48;
+    *(int *)quest_debug_data = *(int *)D_00199780;
 L4BB48:;
-    func_00029958(*(int *)D_00199780);
+    quest_run_opcodes(*(int *)D_00199780);
 L4BB52:;
     l_1C = l_18;
     goto L4BB04;
 }
 
-int func_0004BB64(int a1)
+int quest_find_by_id(int a1)
 {
     int l_20;
     int l_1C;
@@ -737,27 +737,27 @@ L4BBC4:;
     return 0;
 }
 
-void func_0004BC43(int a1, int a2)
+void quests_raise_event_all(int a1, int a2)
 {
     int l_18;
     int l_14;
 
-    *(short *)D_001997AC = a1;
-    *(int *)D_00199778 = a2;
+    *(short *)quest_event_code = a1;
+    *(int *)quest_event_object = a2;
     l_18 = *(int *)(*(char **)D_00195A00 + 63);
 L4BC72:;
     if (l_18 == 0) return;
     if (((int)(unsigned char)*(signed char *)((char *)l_18)) != 14) goto L4BC92;
-    func_0002B26B(l_18 + 71);
+    quest_dispatch_event(l_18 + 71);
 L4BC92:;
     l_18 = *(int *)((char *)l_18 + 55);
     goto L4BC72;
 }
 
-void func_0004BCA6(int a1)
+void quest_end(int a1)
 {
-    *(int *)D_00199784 = (int)(short)*(short *)(*(char **)D_00199764);
-    func_00030E34((int)(unsigned char)*(signed char *)(*(char **)D_00199764));
-    func_0003081B((int)(unsigned char)*(signed char *)(*(char **)D_00199764));
-    *(int *)D_0019976C = 0;
+    *(int *)quest_ended_id = (int)(short)*(short *)(*(char **)current_quest);
+    quest_faces_remove_quest((int)(unsigned char)*(signed char *)(*(char **)current_quest));
+    quest_remove_objects((int)(unsigned char)*(signed char *)(*(char **)current_quest));
+    *(int *)quest_debug_data = 0;
 }

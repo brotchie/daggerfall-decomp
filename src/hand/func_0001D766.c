@@ -13,13 +13,13 @@ struct rec {
 #pragma pack()
 extern char D_00170464[];
 extern char D_001704BB[];
-extern char D_00190FE4[];
-extern char *D_00195BF4;
+extern char text_rsc_buffer[];
+extern char *game_minutes;
 extern char D_00196295;
-extern int D_00196704;
-extern void func_0004A748(char *, int, int, int);
-extern int func_0006CDAB(char *);
-extern int func_0006CE7E(char *);
+extern int rumor_file;
+extern void quest_load_text(char *, int, int, int);
+extern int disk_open_rw(char *);
+extern int disk_file_exists(char *);
 extern int func_0009DEA7(int);
 extern int func_000A0040();
 extern int func_000A006E(int, int, int);
@@ -27,19 +27,19 @@ extern int func_000A0AD9();
 extern int func_000A0B42(int, void *, int);
 extern int func_000A0DF4(char *);
 
-void func_0001D766(char *a1, int a2, int a3, int a4)
+void rumor_add_quest(char *a1, int a2, int a3, int a4)
 {
     int l_14;
     int l_10;
     struct rec r;
 
-    if (func_0006CE7E(D_001704BB) == 0) return;
+    if (disk_file_exists(D_001704BB) == 0) return;
     D_00196295 = 1;
-    D_00190FE4[0] = 0;
-    func_0004A748(a1, a2, 0, 0);
-    if (D_00190FE4[0] == 0) return;
-    if ((D_00196704 = func_0006CDAB(D_001704BB)) < 0) return;
-    func_000A006E(D_00196704, 0, 2);
+    text_rsc_buffer[0] = 0;
+    quest_load_text(a1, a2, 0, 0);
+    if (text_rsc_buffer[0] == 0) return;
+    if ((rumor_file = disk_open_rw(D_001704BB)) < 0) return;
+    func_000A006E(rumor_file, 0, 2);
     l_10 = (a4 & 2) ? 180 : 30;
     func_000A0040(&r, 0, 34, D_00170464, 1808, 4);
     func_000A0AD9(r.name, a1 + 6, 9, D_00170464, 1809);
@@ -47,9 +47,9 @@ void func_0001D766(char *a1, int a2, int a3, int a4)
     r.a2 = a2;
     r.a3 = a3;
     r.flags = a4;
-    r.ptr = D_00195BF4 + l_10 * 1440;
-    r.len = func_000A0DF4(D_00190FE4) + 1;
-    func_000A0B42(D_00196704, &r, 34);
-    func_000A0B42(D_00196704, D_00190FE4, r.len);
-    func_0009DEA7(D_00196704);
+    r.ptr = game_minutes + l_10 * 1440;
+    r.len = func_000A0DF4(text_rsc_buffer) + 1;
+    func_000A0B42(rumor_file, &r, 34);
+    func_000A0B42(rumor_file, text_rsc_buffer, r.len);
+    func_0009DEA7(rumor_file);
 }

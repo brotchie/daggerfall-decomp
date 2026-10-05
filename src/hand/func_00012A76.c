@@ -1,9 +1,9 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x00012A76 */
 #pragma pack(1)
 #pragma aux sosconv "*" parm caller [] value [eax] modify [eax ebx ecx edx];
-#pragma aux (sosconv) func_00012A76;
-#pragma aux (sosconv) func_00011E36;
-#pragma aux (sosconv) func_000124BF;
+#pragma aux (sosconv) profile_add_item_string;
+#pragma aux (sosconv) profile_find_item;
+#pragma aux (sosconv) profile_set_string;
 struct Ini {
     char pad0;
     unsigned char flags;        /* 0x01 */
@@ -16,16 +16,16 @@ struct Ini {
 extern char D_00170129[];
 extern unsigned func_000A0DF4(char *);
 extern void func_000A0E0D(char *, char *, unsigned, char *, int, int);
-extern short func_00011E36(struct Ini *, char *);
-extern void func_000124BF(struct Ini *, char *);
+extern short profile_find_item(struct Ini *, char *);
+extern void profile_set_string(struct Ini *, char *);
 
-int func_00012A76(struct Ini *s, char *key, char *val, int width)
+int profile_add_item_string(struct Ini *s, char *key, char *val, int width)
 {
     char *p;
     unsigned len;
 
-    if (func_00011E36(s, key) != 0) {
-        func_000124BF(s, val);
+    if (profile_find_item(s, key) != 0) {
+        profile_set_string(s, val);
         return 1;
     }
     p = s->wp;

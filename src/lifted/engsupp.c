@@ -3,17 +3,17 @@
 
 struct bf8_0_1 { unsigned char f:1; };
 extern char D_001702D4[];
-extern char D_001789FA[];
+extern char player_environment[];
 extern char D_00179954[];
 extern char D_0017995C[];
 extern char D_00179966[];
-extern char D_0017CA0A[];
-extern char D_00190CE4[];
+extern char climate_texture_sets[];
+extern char itemmaker_slot_kinds[];
 extern char D_00190CE5[];
-extern char D_00195AA4[];
+extern char player_object[];
 extern char D_00195AC4[];
-extern char D_00195B68[];
-extern char D_00195BF8[];
+extern char hud_bar_image[];
+extern char game_settings[];
 extern char D_00195C88[];
 extern char D_00195CD0[];
 extern char D_00195D3C[];
@@ -24,33 +24,33 @@ extern char D_0019629F[];
 extern char D_00196478[];
 extern char D_0019647C[];
 extern char D_00196484[];
-extern char D_001A94C8[];
+extern char climate_index[];
 
 extern int func_00014334(int);
-extern int func_000145CD(int, unsigned short);
-extern int func_0001FFF1(void);
-extern int func_0007D6AE(int, int);
-extern int func_0008E55F(int, int);
+extern int texture_archive_for_climate(int, unsigned short);
+extern int climate_category(void);
+extern int rand_range(int, int);
+extern int object_find(int, int);
 extern int func_0009DC25();
 extern int func_0009DC49();
 extern int func_000A0040();
 extern int func_000A1023();
 extern int func_0012A608();
-extern void func_0006103A(int, int, int, int, int);
+extern void shop_generate_stock(int, int, int, int, int);
 extern void func_0007E815(int, int);
 extern void func_0007EB0B(int, int);
-extern void func_0008E4A8(int, int);
+extern void object_foreach_open(int, int);
 int func_00014096(int, short);
 int func_0001410F(int);
 int func_00014438(int, int);
 int func_0001490D(int);
-void func_0001497D(int);
+void world_for_each_object(int);
 
-int func_00013F4B(int a1, int a2, int a3)
+int engine_pick_object(int a1, int a2, int a3)
 {
     int l_14;
 
-    l_14 = ((((int)(unsigned short)(*(short *)(*(char **)D_00195BF8) & 1)) != 0) ? 199 : (int)(unsigned short)*(short *)(*(char **)D_00195B68 + 2));
+    l_14 = ((((int)(unsigned short)(*(short *)(*(char **)game_settings) & 1)) != 0) ? 199 : (int)(unsigned short)*(short *)(*(char **)hud_bar_image + 2));
     if (a2 <= l_14) goto L13FA8;
     return 0;
 L13FA8:;
@@ -62,11 +62,11 @@ L13FEC:;
     if (*(int *)(*(char **)D_00195C88 + 4) == 0) goto L1401C;
     *(int *)D_0019647C = *(int *)(*(char **)D_00195C88 + 4);
     *(int *)D_00195DC0 = *(int *)(*(char **)D_00195C88);
-    func_0001497D((int)func_0001410F);
+    world_for_each_object((int)func_0001410F);
     goto L14030;
 L1401C:;
     *(int *)D_00196478 = *(int *)D_00195C88;
-    func_0001497D((int)func_00014334);
+    world_for_each_object((int)func_00014334);
 L14030:;
     return *(int *)(*(char **)D_00196484) & 1;
 }
@@ -197,14 +197,14 @@ L1448A:;
     return -1;
 }
 
-void func_00014518(int a1)
+void arch3d_apply_climate_textures(int a1)
 {
     int l_20;
     int l_1C;
     int l_18;
 
-    *(signed char *)D_00190CE5 = func_0001FFF1();
-    *(signed char *)D_00190CE4 = *(signed char *)(D_0017CA0A + *(int *)D_001A94C8);
+    *(signed char *)D_00190CE5 = climate_category();
+    *(signed char *)itemmaker_slot_kinds = *(signed char *)(climate_texture_sets + *(int *)climate_index);
     l_1C = a1 + *(int *)((char *)a1 + 60);
     l_18 = 0;
 L14556:;
@@ -215,12 +215,12 @@ L14563:;
     goto L14556;
 L1456B:;
     l_20 = l_1C;
-    *(short *)((char *)l_20 + 2) = (*(short *)((char *)l_20 + 2) & 127) | (func_000145CD(((int)(unsigned short)*(short *)((char *)l_20 + 2)) >> 7, (int)(unsigned short)(*(short *)((char *)l_20 + 2) & 127)) << 7);
+    *(short *)((char *)l_20 + 2) = (*(short *)((char *)l_20 + 2) & 127) | (texture_archive_for_climate(((int)(unsigned short)*(short *)((char *)l_20 + 2)) >> 7, (int)(unsigned short)(*(short *)((char *)l_20 + 2) & 127)) << 7);
     l_1C += (((int)(unsigned char)*(signed char *)((char *)l_1C)) << 3) + 8;
     goto L14563;
 }
 
-void func_0001478F(void)
+void dungeon_choose_textures(void)
 {
     int l_24;
     int l_20;
@@ -229,7 +229,7 @@ void func_0001478F(void)
 
     l_18 = func_0009DC25();
     func_0009DC49(((unsigned)*(int *)(*(char **)D_00195AC4 + 31)) >> 16);
-    l_1C = (int)(unsigned char)*(signed char *)(D_0017CA0A + func_0001FFF1());
+    l_1C = (int)(unsigned char)*(signed char *)(climate_texture_sets + climate_category());
     if (l_1C == 1) return;
     func_000A1023((int)D_00179966, (int)D_0017995C, 10, (int)D_001702D4, 279, 10);
     l_24 = 0;
@@ -240,7 +240,7 @@ L14800:;
     l_24++;
     goto L147F8;
 L14808:;
-    l_20 = func_0007D6AE(0, 4);
+    l_20 = rand_range(0, 4);
     if (l_20 != 2) goto L14821;
     l_20 += 2;
 L14821:;
@@ -251,7 +251,7 @@ L14841:;
     func_0009DC49(l_18);
 }
 
-void func_00014853(int a1, int a2)
+void interior_stock_shelves(int a1, int a2)
 {
     int l_1C;
     int l_18;
@@ -274,7 +274,7 @@ L148A2:;
 L148DA:;
     goto L14902;
 L148DC:;
-    func_0006103A((int)D_00196120, (int)(unsigned char)*(signed char *)((char *)l_18 + 2), (int)(unsigned char)*(signed char *)((char *)a2 + 25), (int)(unsigned char)*(signed char *)((char *)a2 + 24), l_14);
+    shop_generate_stock((int)D_00196120, (int)(unsigned char)*(signed char *)((char *)l_18 + 2), (int)(unsigned char)*(signed char *)((char *)a2 + 25), (int)(unsigned char)*(signed char *)((char *)a2 + 24), l_14);
 L14902:;
     goto L14893;
 }
@@ -319,20 +319,20 @@ L1496A:;
 }
 }
 
-void func_0001497D(int a1)
+void world_for_each_object(int a1)
 {
     int l_24;
     int l_20;
     int l_1C;
     unsigned short l_18;
 
-    *(int *)D_00195CD0 = (int)func_0008E55F;
-    if (((int)(unsigned char)*(signed char *)D_001789FA) >= 3) goto L14A49;
-    if (((int)(unsigned char)*(signed char *)(*(char **)(*(char **)D_00195AA4 + 67))) == 1) goto L149D1;
-    func_0008E55F(*(int *)(*(char **)(*(char **)D_00195AA4 + 67) + 63), a1);
+    *(int *)D_00195CD0 = (int)object_find;
+    if (((int)(unsigned char)*(signed char *)player_environment) >= 3) goto L14A49;
+    if (((int)(unsigned char)*(signed char *)(*(char **)(*(char **)player_object + 67))) == 1) goto L149D1;
+    object_find(*(int *)(*(char **)(*(char **)player_object + 67) + 63), a1);
     goto L149DE;
 L149D1:;
-    func_0007EB0B(*(int *)D_00195AA4, a1);
+    func_0007EB0B(*(int *)player_object, a1);
 L149DE:;
     l_24 = *(int *)(*(char **)D_00195AC4 + 63);
 L149E9:;
@@ -343,7 +343,7 @@ L149E9:;
     if (((int)(unsigned char)*(signed char *)((char *)l_24)) == 38) goto L14A3C;
     ((int (*)())(a1))(l_24);
     if (((int)(unsigned short)(*(int *)&l_18 & 1)) != 0) goto L14A3C;
-    func_0008E55F(l_1C, a1);
+    object_find(l_1C, a1);
 L14A3C:;
     l_24 = l_20;
     goto L149E9;
@@ -351,10 +351,10 @@ L14A44:;
     goto L14AD4;
 L14A49:;
     if (*(signed char *)D_0019629F == 0) goto L14A61;
-    func_0008E55F(*(int *)D_00195AC4, a1);
+    object_find(*(int *)D_00195AC4, a1);
     goto L14A6E;
 L14A61:;
-    func_0007E815(*(int *)D_00195AA4, a1);
+    func_0007E815(*(int *)player_object, a1);
 L14A6E:;
     l_24 = *(int *)(*(char **)D_00195AC4 + 63);
 L14A79:;
@@ -365,10 +365,10 @@ L14A79:;
     if (((int)(unsigned char)*(signed char *)((char *)l_24)) == 47) goto L14ACC;
     ((int (*)())(a1))(l_24);
     if (((int)(unsigned short)(*(int *)&l_18 & 1)) != 0) goto L14ACC;
-    func_0008E55F(l_1C, a1);
+    object_find(l_1C, a1);
 L14ACC:;
     l_24 = l_20;
     goto L14A79;
 L14AD4:;
-    *(int *)D_00195CD0 = (int)func_0008E4A8;
+    *(int *)D_00195CD0 = (int)object_foreach_open;
 }

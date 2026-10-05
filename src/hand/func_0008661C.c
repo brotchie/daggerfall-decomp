@@ -13,13 +13,13 @@ struct map {
     unsigned char h;            /* 0x21 */
 };
 extern struct obj *D_00195AC4;
-extern struct map *D_00195BDC;
+extern struct map *current_location;
 
-int func_0008661C(int a1, int a2)
+int location_contains(int a1, int a2)
 {
     if (D_00195AC4->id != 0xffff)
-        if (a1 > D_00195AC4->x && D_00195AC4->x + (D_00195BDC->w << 12) > a1)
-            if (a2 > D_00195AC4->y && D_00195AC4->y + (D_00195BDC->h << 12) > a2)
+        if (a1 > D_00195AC4->x && D_00195AC4->x + (current_location->w << 12) > a1)
+            if (a2 > D_00195AC4->y && D_00195AC4->y + (current_location->h << 12) > a2)
                 return 1;
     return 0;
 }

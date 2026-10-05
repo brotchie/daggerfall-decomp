@@ -1,51 +1,51 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x00043F9C */
 struct button { short x1, y1, x2, y2; int (*fn)(int); };
-extern char D_0012AC00;
-extern short D_0012AC04;
-extern short D_0012AC06;
+extern char mouse_buttons;
+extern short mouse_x;
+extern short mouse_y;
 extern char D_00170EE8[];
 extern char D_00170F2D[];
 extern char D_00170F3A[];
 extern char D_00170F47[];
-extern struct button D_0017BA0C[];
-extern char *D_00195AA4;
+extern struct button options_mouse_buttons[];
+extern char *player_object;
 extern int D_00195B5C;
 extern int D_00195B60;
-extern unsigned char D_00195E7C;
-extern unsigned char D_00195E7D;
-extern char D_00196279;
-extern void func_000441B6(int);
-extern int func_00069938(int, char *, int);
-extern int func_0006CB53(char *, int);
-extern void func_0008059B(void);
+extern unsigned char mouse_sensitivity_x;
+extern unsigned char mouse_sensitivity_y;
+extern char mouse_buttons_prev;
+extern void options_mouse_draw(int);
+extern int sound_play(int, char *, int);
+extern int disk_read_file(char *, int);
+extern void cursor_draw_arrow(void);
 extern void func_000A0024(int, char *, int);
 extern void func_000CDD81(int);
 extern void func_000CE8A0(unsigned char *, unsigned char *);
 extern void func_0012B136(void);
 
-int func_00043F9C(void)
+int options_mouse_screen(void)
 {
     int l_24;
     int l_20;
     int l_1C;
 
     l_20 = 0;
-    l_1C = func_0006CB53(D_00170F2D, 0);
-    D_00195B5C = func_0006CB53(D_00170F3A, 0);
-    D_00195B60 = func_0006CB53(D_00170F47, 0);
-    func_000CE8A0(&D_00195E7C, &D_00195E7D);
-    D_00195E7C /= 6;
-    D_00195E7D /= 6;
+    l_1C = disk_read_file(D_00170F2D, 0);
+    D_00195B5C = disk_read_file(D_00170F3A, 0);
+    D_00195B60 = disk_read_file(D_00170F47, 0);
+    func_000CE8A0(&mouse_sensitivity_x, &mouse_sensitivity_y);
+    mouse_sensitivity_x /= 6;
+    mouse_sensitivity_y /= 6;
     while (l_20 == 0) {
-        D_00196279 = D_0012AC00;
+        mouse_buttons_prev = mouse_buttons;
         func_0012B136();
-        func_000441B6(l_1C);
-        func_0008059B();
-        if (D_0012AC00 != 0 && D_00196279 == 0) {
+        options_mouse_draw(l_1C);
+        cursor_draw_arrow();
+        if (mouse_buttons != 0 && mouse_buttons_prev == 0) {
             for (l_24 = 0; l_24 < 7; l_24++) {
-                if (D_0012AC04 > D_0017BA0C[l_24].x1 && D_0012AC04 < D_0017BA0C[l_24].x2 && D_0012AC06 > D_0017BA0C[l_24].y1 && D_0012AC06 < D_0017BA0C[l_24].y2) {
-                    func_00069938(203, D_00195AA4, 100);
-                    l_20 = D_0017BA0C[l_24].fn(l_24);
+                if (mouse_x > options_mouse_buttons[l_24].x1 && mouse_x < options_mouse_buttons[l_24].x2 && mouse_y > options_mouse_buttons[l_24].y1 && mouse_y < options_mouse_buttons[l_24].y2) {
+                    sound_play(203, player_object, 100);
+                    l_20 = options_mouse_buttons[l_24].fn(l_24);
                 }
             }
         }

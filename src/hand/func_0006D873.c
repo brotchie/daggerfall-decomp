@@ -16,7 +16,7 @@ extern int func_000A1004(char *);
 extern int func_000A13DA(char *, int, struct find_t *);
 extern int func_000A13F7(struct find_t *);
 
-void func_0006D873(int a1, int a2)
+void disk_delete_matching(int a1, int a2)
 {
     int rc;
     char path[80];

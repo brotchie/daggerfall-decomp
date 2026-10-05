@@ -10,7 +10,7 @@ extern void func_000CE483(unsigned char *, unsigned short, int);   /* fill with 
 extern void func_000A1023(unsigned char *, unsigned char *, int, char *, int, int); /* copy */
 
 /* decode an FLC DELTA_FLC (word-oriented delta) chunk into f->buf */
-void func_00052B50(unsigned char *src, struct flc *f)
+void flc_decode_ss2(unsigned char *src, struct flc *f)
 {
     short line;
     short done;

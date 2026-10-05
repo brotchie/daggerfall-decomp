@@ -2,38 +2,38 @@
  * do not edit: move a function to src/runspell.c to work on it by hand) */
 
 extern char D_001757F4[];
-extern char D_00195AA4[];
+extern char player_object[];
 extern char D_00195AC4[];
-extern char D_00195B04[];
-extern char D_00195BE0[];
+extern char spell_records[];
+extern char player_character[];
 
-extern int func_0003A0C0(int, int);
-extern int func_0005AE5F(int);
-extern int func_0008DA91(int);
-extern int func_0008DCE3(int, int, int);
-extern int func_0008EB88(int);
+extern int spell_cost(int, int);
+extern int cast_player_spell(int);
+extern int object_delete(int);
+extern int object_create_child(int, int, int);
+extern int object_new_id(int);
 extern int func_000A1023();
 
-int func_0005A91A(int a1)
+int cast_item_used_spell(int a1)
 {
     int l_20;
     int l_1C;
 
     l_20 = 0;
-    l_1C = func_0008DCE3(*(int *)(*(char **)D_00195AA4 + 67), 0, 89);
+    l_1C = object_create_child(*(int *)(*(char **)player_object + 67), 0, 89);
 L5A949:;
-    if (*(signed char *)((char *)(int)(*(char **)D_00195B04 + (l_20 * 89)) + 47) == 0) goto L5A973;
-    if (((int)(unsigned char)*(signed char *)((char *)(int)(*(char **)D_00195B04 + (l_20 * 89)) + 73)) == a1) goto L5A97B;
+    if (*(signed char *)((char *)(int)(*(char **)spell_records + (l_20 * 89)) + 47) == 0) goto L5A973;
+    if (((int)(unsigned char)*(signed char *)((char *)(int)(*(char **)spell_records + (l_20 * 89)) + 73)) == a1) goto L5A97B;
 L5A973:;
     l_20++;
     goto L5A949;
 L5A97B:;
     *(signed char *)((char *)l_1C) = 9;
-    *(int *)((char *)l_1C + 31) = func_0008EB88(((unsigned)*(int *)(*(char **)D_00195AC4 + 31)) >> 16);
-    func_000A1023(l_1C + 71, (int)(*(char **)D_00195B04 + (l_20 * 89)), 89, (int)D_001757F4, 103, 4);
-    l_20 = func_0003A0C0(l_1C + 71, *(int *)D_00195BE0);
-    if (func_0005AE5F(l_1C) == 0) goto L5A9E5;
-    func_0008DA91(l_1C);
+    *(int *)((char *)l_1C + 31) = object_new_id(((unsigned)*(int *)(*(char **)D_00195AC4 + 31)) >> 16);
+    func_000A1023(l_1C + 71, (int)(*(char **)spell_records + (l_20 * 89)), 89, (int)D_001757F4, 103, 4);
+    l_20 = spell_cost(l_1C + 71, *(int *)player_character);
+    if (cast_player_spell(l_1C) == 0) goto L5A9E5;
+    object_delete(l_1C);
 L5A9E5:;
     return l_20;
 }

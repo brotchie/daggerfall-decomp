@@ -5,12 +5,12 @@ struct bf8_1_1 { unsigned char _:1; unsigned char f:1; };
 struct bf8_2_1 { unsigned char _:2; unsigned char f:1; };
 struct bf8_6_1 { unsigned char _:6; unsigned char f:1; };
 extern char D_000CEA24[];
-extern char D_00120290[];
-extern char D_0012AC00[];
-extern char D_0012AC04[];
-extern char D_0012AC06[];
-extern char D_0012DE00[];
-extern char D_00142309[];
+extern char pick_distance[];
+extern char mouse_buttons[];
+extern char mouse_x[];
+extern char mouse_y[];
+extern char dungeon_water_level[];
+extern char key_down_esc[];
 extern char D_00176198[];
 extern char D_001761A0[];
 extern char D_001761C4[];
@@ -24,11 +24,11 @@ extern char D_001762DD[];
 extern char D_001762EA[];
 extern char D_001762F7[];
 extern char D_00176322[];
-extern char D_001789FA[];
-extern char D_0017C5B8[];
+extern char player_environment[];
+extern char building_open_hours[];
 extern char D_0017C5B9[];
 extern char D_0017CA14[];
-extern char D_001830E6[];
+extern char monster_names[];
 extern char D_00183248[];
 extern char D_0018324C[];
 extern char D_00183250[];
@@ -36,28 +36,28 @@ extern char D_00183254[];
 extern char D_00184329[];
 extern char D_001845CC[];
 extern char D_00185093[];
-extern char D_001875C0[];
+extern char repair_menu_buttons[];
 extern char D_001875C2[];
 extern char D_001875C4[];
 extern char D_001875C6[];
 extern char D_001875C8[];
-extern char D_001875F0[];
+extern char coven_menu_buttons[];
 extern char D_001875F2[];
 extern char D_001875F4[];
 extern char D_001875F6[];
 extern char D_001875F8[];
-extern char D_00187620[];
+extern char service_menu_buttons[];
 extern char D_00187622[];
 extern char D_00187624[];
 extern char D_00187626[];
 extern char D_00187628[];
 extern char D_00187644[];
-extern char D_00187670[];
+extern char footstep_sound_ids[];
 extern char D_00187894[];
 extern char D_001878AC[];
 extern char D_001878D4[];
-extern char D_0018F061[];
-extern char D_001903A4[];
+extern char region_event_flags[];
+extern char text_buffer[];
 extern char D_00190444[];
 extern char D_00190BE4[];
 extern char D_001940D4[];
@@ -65,28 +65,28 @@ extern char D_001940D5[];
 extern char D_001940D6[];
 extern char D_001940D7[];
 extern char D_001940D9[];
-extern char D_001959E8[];
+extern char wagon_container[];
 extern char D_00195A00[];
 extern char D_00195A84[];
-extern char D_00195A9C[];
-extern char D_00195AA4[];
+extern char current_building[];
+extern char player_object[];
 extern char D_00195AB4[];
 extern char D_00195AC4[];
 extern char D_00195ADC[];
 extern char D_00195AE0[];
 extern char D_00195AE4[];
 extern char D_00195AEC[];
-extern char D_00195B48[];
-extern char D_00195B50[];
-extern char D_00195BDC[];
-extern char D_00195BE0[];
-extern char D_00195BE8[];
+extern char spell_ready_touch[];
+extern char guild_npc_object[];
+extern char current_location[];
+extern char player_character[];
+extern char window_image[];
 extern char D_00195C44[];
 extern char D_00195CE8[];
 extern char D_00195D3C[];
 extern char D_00195D54[];
 extern char D_00195DC0[];
-extern char D_00195E2A[];
+extern char climate_weathers[];
 extern char D_00195F58[];
 extern char D_00195F68[];
 extern char D_00196092[];
@@ -95,86 +95,86 @@ extern char D_00196118[];
 extern char D_00196120[];
 extern char D_001961F5[];
 extern char D_00196263[];
-extern char D_00196268[];
+extern char current_region[];
 extern char D_00196271[];
 extern char D_00196272[];
-extern char D_00196274[];
-extern char D_00196276[];
-extern char D_00196277[];
-extern char D_00196279[];
-extern char D_0019627C[];
-extern char D_0019627D[];
-extern char D_0019627E[];
+extern char game_mode[];
+extern char interaction_mode[];
+extern char player_on_ground[];
+extern char mouse_buttons_prev[];
+extern char player_underwater[];
+extern char in_dungeon_water[];
+extern char crime_current[];
 extern char D_0019629D[];
 extern char D_001962A0[];
 extern char D_001962A1[];
 extern char D_001962B1[];
 extern char D_00199808[];
 extern char D_001A3F5E[];
-extern char D_001A4B80[];
-extern char D_001A4C80[];
-extern char D_001A4C84[];
-extern char D_001A4C88[];
-extern char D_001A4C8C[];
-extern char D_001A4C90[];
-extern char D_001A4C98[];
+extern char stocked_shop_ids[];
+extern char service_menu_label[];
+extern char service_menu_npc[];
+extern char coven_menu_npc[];
+extern char stocked_shop_count[];
+extern char repair_menu_npc[];
+extern char service_menu_handler[];
 extern char D_001A4C9C[];
 extern char D_001A4C9D[];
-extern char D_001A4CA0[];
+extern char position_history[];
 extern char D_001A4CA4[];
 extern char D_001A4CA8[];
-extern char D_001A4E20[];
+extern char ground_position_history[];
 extern char D_001A4E24[];
 extern char D_001A4E28[];
-extern char D_001A4FB8[];
+extern char position_history_next[];
 extern char D_001A4FBC[];
 extern char D_001A4FC4[];
-extern char D_001A4FC8[];
+extern char ground_position_history_next[];
 extern char D_001A4FCC[];
 extern char D_001A4FD4[];
 
-extern int func_000135E6(int, int, int);
+extern int lockpick_action_door(int, int, int);
 extern int func_0001490D(int);
-extern int func_000191DA(int, short);
-extern int func_000192EE(short);
-extern int func_0001EE84(int);
-extern int func_0001FFF1(void);
-extern int func_00023C72(int, int);
-extern int func_0002C406(unsigned short);
+extern int faction_find_type_in_region(int, short);
+extern int faction_find(short);
+extern int tavern_open(int);
+extern int climate_category(void);
+extern int collide_line_of_sight(int, int);
+extern int quest_event_clicked_faction(unsigned short);
 extern int func_00031843(int, int, int);
-extern int func_000392AD(void);
+extern int spells_list_poll(void);
 extern int func_0004083A(int, int, int);
-extern int func_00045A1D(int, int, int, int);
-extern int func_0004B28C(int);
-extern int func_0004BBD8();
-extern int func_0004C274();
+extern int item_add_to_container(int, int, int, int);
+extern int building_is_open(int);
+extern int quest_raise_event();
+extern int quest_pick_file();
 extern int func_0004CD80(int);
-extern int func_00059973(int);
+extern int npc_talk_record_build(int);
 extern int func_000612A1(void);
-extern int func_00062EF7(int, int, int);
-extern int func_00069938(int, int, int);
-extern int func_000699D8(int, int, int, int, int);
-extern int func_0006B376(int);
-extern int func_0006CB53(int, int);
-extern int func_000702A0(unsigned char);
-extern int func_00070308(unsigned char);
+extern int ai_angle_diff(int, int, int);
+extern int sound_play(int, int, int);
+extern int sound_play_at_point(int, int, int, int, int);
+extern int bank_open(int);
+extern int disk_read_file(int, int);
+extern int guild_find_membership_by_kind(unsigned char);
+extern int guild_find_membership_by_bits(unsigned char);
 extern int func_00076F3D(int);
-extern int func_0007CBA1(int);
-extern int func_0007D6AE(int, int);
-extern int func_0007DF35(int);
-extern int func_0008661C(int, int);
+extern int hud_message_add(int);
+extern int rand_range(int, int);
+extern int object_building(int);
+extern int location_contains(int, int);
 extern int func_0008B48B(int);
-extern int func_0008BD50(int);
-extern int func_0008DA91(int);
+extern int building_name(int);
+extern int object_delete(int);
 extern int func_0008DADD(int);
-extern int func_0008DCE3(int, int, int);
-extern int func_0008DD46(int, int);
-extern int func_0008E767(int, int);
-extern int func_0008EB88(int);
-extern int func_000926AD(int, int, int);
-extern int func_0009A0A0(int, int, int);
-extern int func_0009A663(int, int);
-extern int func_0009A915(int, int);
+extern int object_create_child(int, int, int);
+extern int object_reparent(int, int);
+extern int object_find_type(int, int);
+extern int object_new_id(int);
+extern int inventory_open(int, int, int);
+extern int marker_find_nth(int, int, int);
+extern int marker_count(int, int);
+extern int location_cell_at(int, int);
 extern int func_0009DC25();
 extern int func_0009DEAC();
 extern int func_000A0024();
@@ -191,104 +191,104 @@ extern int func_000CE6E2();
 extern int func_0012B136();
 extern int func_00144F68();
 extern int func_0014B45B();
-extern void func_0001374D(int);
-extern void func_00015674(int);
+extern void pickpocket_attempt(int);
+extern void talk_start(int);
 extern void func_0001D739(void);
-extern void func_000202C5(int);
-extern void func_000287BD(int, int);
-extern void func_00028BCD(void);
-extern void func_00028C72(void);
-extern void func_0003EC2A(int, int);
-extern void func_00040C87(int);
-extern void func_0004CB5D(int);
-extern void func_00059B7B(short);
-extern void func_0005ABE6(int, int, int);
-extern void func_0005E540(int, int, int);
+extern void daedra_summon(int);
+extern void town_map_note_building(int, int);
+extern void automap_save(void);
+extern void automap_load(void);
+extern void msgbox_show_string(int, int);
+extern void guards_summon(int);
+extern void quest_pick_for_npc(int);
+extern void book_open(short);
+extern void cast_spell_on(int, int, int);
+extern void item_make(int, int, int);
 extern void func_0005EE0C(int, int, int);
 extern void func_0005FA0E(int, int, int, unsigned short);
 extern void func_0005FE55(int);
-extern void func_0006DC35(int);
+extern void guild_service_dispatch(int);
 extern void func_0007425E(int, int);
-extern void func_00075172(int, unsigned short);
-extern void func_00075839(int);
-extern void func_0007CA85(int, int, int, int, unsigned char);
-extern void func_0007CB4F(int);
-extern void func_0007D24F(int);
-extern void func_0007DDC9(int);
-extern void func_00086794(int);
-extern void func_00086D37(unsigned short);
-extern void func_00087281(int);
-extern void func_000873DE(void);
-extern void func_0008DA1C(int);
-extern void func_0008E3F7(int, int);
-extern void func_000922F6(int, int, int);
+extern void book_read_header(int, unsigned short);
+extern void pick_up_item(int);
+extern void text_draw_centered_colored(int, int, int, int, unsigned char);
+extern void hud_status_set(int);
+extern void picklist_open_strings(int);
+extern void msgbox_yes_no_rsc(int);
+extern void dungeon_load(int);
+extern void location_unload(unsigned short);
+extern void building_enter(int);
+extern void building_exit(void);
+extern void object_free_children(int);
+extern void object_foreach(int, int);
+extern void inventory_open_container(int, int, int);
 extern void func_0009A7B8(void);
-int func_00074AF2(int, int, int);
-int func_000757F9(int);
-int func_000758F0(int);
-int func_00075B7A(int);
-int func_0007667A(short);
+int shelf_collect_items(int, int, int);
+int object_count_items(int);
+int repair_menu_open(int);
+int coven_menu_open(int);
+int quest_active_for_faction(short);
 int func_000766D1(void);
-int func_000767A6(int);
-int func_00076A32(int);
+int service_menu_open(int);
+int shelf_shop_stocked(int);
 int func_00076E98(int);
 int func_000773BE(int);
 int func_00077639(int, int, int, int);
-void func_000744FD(int);
-void func_00074589(int, int);
-void func_0007499C(int, int, int);
-void func_00074ABA(int);
-void func_00074C10(void);
-void func_00074C81(int, int, int);
-void func_00074ECA(int, int, int);
-void func_000751DB(int);
-void func_0007567B(int, int);
-void func_000756C6(int);
+void click_describe_item(int);
+void click_describe_creature(int, int);
+void shelf_open(int, int, int);
+void shelf_book_chosen(int);
+void shelf_return_items(void);
+void shelf_open_books(int, int, int);
+void shelf_open_stock(int, int, int);
+void npc_click_service(int);
+void shop_open_repair(int, int);
+void npc_talk(int);
 void func_000757C9(int);
-void func_00075A75(void);
-void func_00075B3F(void);
-void func_00075CFF(void);
-void func_0007653C(int, int);
-void func_00076952(void);
-void func_00076A15(void);
+void repair_menu_close(void);
+void repair_menu_sell(void);
+void coven_menu_close(void);
+void click_show_building_info(int, int);
+void service_menu_close(void);
+void service_menu_sell(void);
 void func_00076A8F(int);
-void func_00076DB9(void);
+void position_history_record(void);
 void func_00077340(int);
 #pragma aux func_000A0ED9 parm routine [];
 
-void func_000744FD(int a1)
+void click_describe_item(int a1)
 {
     if (func_000A17C1(*(int *)D_00183248, (int)(unsigned char)*(signed char *)((char *)a1)) == 0) goto L7454D;
     func_000A0ED9(204, (int)D_00176198);
-    func_000A0F5C((int)D_001903A4, *(int *)D_0018324C, a1);
+    func_000A0F5C((int)text_buffer, *(int *)D_0018324C, a1);
     goto L74575;
 L7454D:;
     func_000A0ED9(206, (int)D_00176198);
-    func_000A0F5C((int)D_001903A4, *(int *)D_00183250, a1);
+    func_000A0F5C((int)text_buffer, *(int *)D_00183250, a1);
 L74575:;
-    func_0007CBA1((int)D_001903A4);
+    hud_message_add((int)text_buffer);
 }
 
-void func_00074589(int a1, int a2)
+void click_describe_creature(int a1, int a2)
 {
     if (func_000A17C1(*(int *)D_00183248, (int)(unsigned char)*(signed char *)((char *)a2 + 28)) == 0) goto L745DF;
     func_000A0ED9(215, (int)D_00176198);
-    func_000A0F5C((int)D_001903A4, *(int *)D_0018324C, a2 + 28);
+    func_000A0F5C((int)text_buffer, *(int *)D_0018324C, a2 + 28);
     goto L7460A;
 L745DF:;
     func_000A0ED9(217, (int)D_00176198);
-    func_000A0F5C((int)D_001903A4, *(int *)D_00183250, a2 + 28);
+    func_000A0F5C((int)text_buffer, *(int *)D_00183250, a2 + 28);
 L7460A:;
-    func_0007CBA1((int)D_001903A4);
+    hud_message_add((int)text_buffer);
 }
 
-int func_0007461D(int a1)
+int click_world_face(int a1)
 {
     int l_24;
     int l_20;
     int l_1C;
 
-    l_24 = func_0007DF35(*(int *)((char *)a1 + 4));
+    l_24 = object_building(*(int *)((char *)a1 + 4));
     if (((int)(unsigned char)*(signed char *)(*(char **)((char *)a1 + 4))) == 6) goto L74660;
     if (((int)(unsigned char)*(signed char *)(*(char **)((char *)a1 + 4))) != 43) goto L74662;
 L74660:;
@@ -309,19 +309,19 @@ L746C8:;
     switch ((unsigned)l_20) {
 case 56:
 case 331:
-    if (((int)(unsigned short)(*(short *)(*(char **)D_00195BE0 + 64) & 1536)) == 0) goto L74756;
-    func_0007CBA1((int)D_001761A0);
+    if (((int)(unsigned short)(*(short *)(*(char **)player_character + 64) & 1536)) == 0) goto L74756;
+    hud_message_add((int)D_001761A0);
     goto L748B1;
 L74756:;
-    func_00086794(-1);
-    func_00028C72();
+    dungeon_load(-1);
+    automap_load();
     goto L748B1;
 case 74:
-    if (((int)(unsigned short)(*(short *)(*(char **)D_00195BE0 + 64) & 1536)) == 0) goto L74790;
-    func_0007CBA1((int)D_001761C4);
+    if (((int)(unsigned short)(*(short *)(*(char **)player_character + 64) & 1536)) == 0) goto L74790;
+    hud_message_add((int)D_001761C4);
     goto L748B1;
 L74790:;
-    if (((int)(unsigned char)*(signed char *)(*(char **)(*(char **)D_00195AA4 + 67))) != 1) goto L747E8;
+    if (((int)(unsigned char)*(signed char *)(*(char **)(*(char **)player_object + 67))) != 1) goto L747E8;
     if (func_000CE45E((int)D_00187644, (int)(short)*(short *)((char *)l_24 + 18), 21) == 0) goto L747C4;
 {
     unsigned char l_2C;
@@ -331,11 +331,11 @@ L747C4:;
     l_2C = 0;
 L747C8:;
     *(signed char *)D_00196263 = l_2C;
-    func_000287BD(*(int *)((char *)a1 + 4), l_24);
-    func_00087281(l_24);
+    town_map_note_building(*(int *)((char *)a1 + 4), l_24);
+    building_enter(l_24);
     goto L747F4;
 L747E8:;
-    func_000873DE();
+    building_exit();
     *(signed char *)D_00196263 = 0;
 L747F4:;
     goto L748B1;
@@ -347,21 +347,21 @@ case 81:
 L74805:;
     goto L7488B;
 L7480A:;
-    if (func_0004B28C(l_24) != 0) goto L7482D;
-    if (func_000135E6(l_24, 19, *(int *)((char *)a1 + 4)) != 0) goto L7482F;
+    if (building_is_open(l_24) != 0) goto L7482D;
+    if (lockpick_action_door(l_24, 19, *(int *)((char *)a1 + 4)) != 0) goto L7482F;
 L7482D:;
     goto L74889;
 L7482F:;
-    func_0005FA0E(14, (int)D_001960D9, (int)(unsigned char)*(signed char *)((char *)l_24 + 25), (int)(unsigned short)(*(short *)(*(char **)D_00195BE0 + 64) & 1));
+    func_0005FA0E(14, (int)D_001960D9, (int)(unsigned char)*(signed char *)((char *)l_24 + 25), (int)(unsigned short)(*(short *)(*(char **)player_character + 64) & 1));
     *(int *)D_00195AEC = *(int *)((char *)a1 + 4);
-    func_00074C10();
-    func_00074ECA(*(int *)((char *)a1 + 4), l_24, *(int *)D_00195D54);
+    shelf_return_items();
+    shelf_open_stock(*(int *)((char *)a1 + 4), l_24, *(int *)D_00195D54);
     return 1;
 L74889:;
     goto L748B1;
 L7488B:;
     if (l_1C >= 4) goto L748B1;
-    func_0007499C(*(int *)((char *)a1 + 4), l_24, *(int *)D_00195D54);
+    shelf_open(*(int *)((char *)a1 + 4), l_24, *(int *)D_00195D54);
     return 1;
 default:
 L748B1:;
@@ -372,57 +372,57 @@ L748B6:;
     switch ((unsigned)l_20) {
 case 56:
 case 331:
-    if (((int)(unsigned short)(*(short *)(*(char **)D_00195BE0 + 64) & 1536)) == 0) goto L74911;
-    func_0007CBA1((int)D_001761E8);
+    if (((int)(unsigned short)(*(short *)(*(char **)player_character + 64) & 1536)) == 0) goto L74911;
+    hud_message_add((int)D_001761E8);
     goto L74988;
 L74911:;
-    func_00086794(-1);
-    func_00028C72();
+    dungeon_load(-1);
+    automap_load();
     goto L74988;
 case 74:
-    func_0007CBA1((int)D_0017620C);
+    hud_message_add((int)D_0017620C);
     goto L74988;
 case 95:
-    if (*(int *)D_001959E8 == 0) goto L74943;
-    func_0007DDC9(38);
+    if (*(int *)wagon_container == 0) goto L74943;
+    msgbox_yes_no_rsc(38);
     goto L7494A;
 L74943:;
     *(signed char *)D_00196271 = 2;
 L7494A:;
     if (((int)(unsigned char)*(signed char *)D_00196271) != 1) goto L74970;
     *(signed char *)D_001962B1 = 1;
-    func_000926AD(1, 0, 2);
+    inventory_open(1, 0, 2);
     goto L74988;
 L74970:;
-    func_00028BCD();
-    func_00086D37((int)(unsigned short)*(short *)(*(char **)D_00195AC4 + 27));
+    automap_save();
+    location_unload((int)(unsigned short)*(short *)(*(char **)D_00195AC4 + 27));
 default:
 L74988:;
     return 0;
 }
 }
 
-void func_0007499C(int a1, int a2, int a3)
+void shelf_open(int a1, int a2, int a3)
 {
     switch (*(unsigned char *)((char *)a2 + 24)) {
     return;
 case 11:
-    if (func_000702A0(1) != 0) goto L74A55;
-    func_0003EC2A((int)D_0017622D, 1);
+    if (guild_find_membership_by_kind(1) != 0) goto L74A55;
+    msgbox_show_string((int)D_0017622D, 1);
     return;
 L74A55:;
-    func_00074C81(a1, a2, a3);
+    shelf_open_books(a1, a2, a3);
     return;
 case 14:
-    if (func_00070308(128) != 0) goto L74A84;
-    func_0003EC2A((int)D_00176255, 1);
+    if (guild_find_membership_by_bits(128) != 0) goto L74A84;
+    msgbox_show_string((int)D_00176255, 1);
     return;
 L74A84:;
-    func_00074C81(a1, a2, a3);
+    shelf_open_books(a1, a2, a3);
     return;
 case 5:
 case 10:
-    func_00074C81(a1, a2, a3);
+    shelf_open_books(a1, a2, a3);
     return;
 case 0:
 case 2:
@@ -433,26 +433,26 @@ case 8:
 case 9:
 case 12:
 case 13:
-    func_00074ECA(a1, a2, a3);
+    shelf_open_stock(a1, a2, a3);
 default:;
 }
 }
 
-void func_00074ABA(int a1)
+void shelf_book_chosen(int a1)
 {
     *(signed char *)D_00196272 = 0;
-    func_00059B7B((int)(short)*(short *)(D_00190444 + (a1 * 2)));
-    func_00074C10();
+    book_open((int)(short)*(short *)(D_00190444 + (a1 * 2)));
+    shelf_return_items();
 }
 
-int func_00074AF2(int a1, int a2, int a3)
+int shelf_collect_items(int a1, int a2, int a3)
 {
     int l_1C;
     int l_18;
     int l_14;
 
     l_1C = 0;
-    func_0008DA1C((int)D_001960D9);
+    object_free_children((int)D_001960D9);
     a1 = *(int *)((char *)a1 + 63);
 L74B21:;
     if (a1 == 0) goto L74BFF;
@@ -478,10 +478,10 @@ L74B9B:;
     *(signed char *)((char *)a1 + 21) &= 253;
     *(signed char *)((char *)a1 + 21) |= 32;
     func_0008DADD(a1);
-    func_0008DD46((int)D_001960D9, a1);
-    *(int *)((char *)a1 + 7) = *(int *)(*(char **)D_00195AA4 + 7);
-    *(int *)((char *)a1 + 11) = *(int *)(*(char **)D_00195AA4 + 11);
-    *(int *)((char *)a1 + 15) = *(int *)(*(char **)D_00195AA4 + 15);
+    object_reparent((int)D_001960D9, a1);
+    *(int *)((char *)a1 + 7) = *(int *)(*(char **)player_object + 7);
+    *(int *)((char *)a1 + 11) = *(int *)(*(char **)player_object + 11);
+    *(int *)((char *)a1 + 15) = *(int *)(*(char **)player_object + 15);
     *(signed char *)((char *)a1) = 2;
 L74BF4:;
     a1 = l_18;
@@ -491,7 +491,7 @@ L74BFF:;
     return l_1C;
 }
 
-void func_00074C10(void)
+void shelf_return_items(void)
 {
     int l_1C;
     int l_18;
@@ -503,14 +503,14 @@ L74C30:;
     l_18 = *(int *)((char *)l_1C + 55);
     *(signed char *)((char *)l_1C + 21) |= 2;
     func_0008DADD(l_1C);
-    func_0008DD46(*(int *)D_00195AEC, l_1C);
+    object_reparent(*(int *)D_00195AEC, l_1C);
     *(signed char *)((char *)l_1C) = 36;
     *(short *)((char *)l_1C + 27) = *(short *)D_00195F58;
     l_1C = l_18;
     goto L74C30;
 }
 
-void func_00074C81(int a1, int a2, int a3)
+void shelf_open_books(int a1, int a2, int a3)
 {
     int l_24;
     int l_20;
@@ -521,13 +521,13 @@ void func_00074C81(int a1, int a2, int a3)
 
     l_20 = 0;
     *(short *)D_00195F58 = a3;
-    l_20 = func_00074AF2(a1, 7, a3);
+    l_20 = shelf_collect_items(a1, 7, a3);
     if (l_20 != 0) goto L74CCB;
-    if (func_00076A32(a3) == 0) goto L74CD0;
+    if (shelf_shop_stocked(a3) == 0) goto L74CD0;
 L74CCB:;
     goto L74D9C;
 L74CD0:;
-    *(int *)(D_001A4B80 + ((*(int *)D_001A4C8C)++ << 2)) = a3;
+    *(int *)(stocked_shop_ids + ((*(int *)stocked_shop_count)++ << 2)) = a3;
     l_20 = ((int)(unsigned char)*(signed char *)((char *)a2 + 25)) >> 1;
     if (l_20 != 0) goto L74D04;
     l_20++;
@@ -540,13 +540,13 @@ L74D18:;
     l_24++;
     goto L74D0B;
 L74D20:;
-    l_1C = func_0008DCE3((int)D_001960D9, 0, 107);
+    l_1C = object_create_child((int)D_001960D9, 0, 107);
     *(signed char *)((char *)l_1C) = 2;
-    *(int *)((char *)l_1C + 7) = *(int *)(*(char **)D_00195AA4 + 7);
-    *(int *)((char *)l_1C + 11) = *(int *)(*(char **)D_00195AA4 + 11);
-    *(int *)((char *)l_1C + 15) = *(int *)(*(char **)D_00195AA4 + 15);
+    *(int *)((char *)l_1C + 7) = *(int *)(*(char **)player_object + 7);
+    *(int *)((char *)l_1C + 11) = *(int *)(*(char **)player_object + 11);
+    *(int *)((char *)l_1C + 15) = *(int *)(*(char **)player_object + 15);
     *(signed char *)((char *)l_1C + 21) |= 32;
-    func_0005E540(7, ((int)(unsigned char)*(signed char *)((char *)a2 + 25)) / 6, l_1C + 71);
+    item_make(7, ((int)(unsigned char)*(signed char *)((char *)a2 + 25)) / 6, l_1C + 71);
     goto L74D18;
 L74D9C:;
     if (((int)(unsigned char)*(signed char *)((char *)a2 + 24)) == 10) goto L74DBC;
@@ -564,27 +564,27 @@ L74DD2:;
 L74DFC:;
     if (l_1C == 0) goto L74E62;
     *(short *)(D_00190444 + (l_24 * 2)) = *(short *)((char *)l_1C + 134);
-    func_00075172(l_18, (int)(unsigned short)*(short *)(D_00190444 + (l_24++ * 2)));
+    book_read_header(l_18, (int)(unsigned short)*(short *)(D_00190444 + (l_24++ * 2)));
     func_000A0AD9(l_14, l_18, 4, (int)D_00176198, 479);
     l_14 += func_000A0DF4(l_14) + 1;
     l_1C = *(int *)((char *)l_1C + 55);
     goto L74DFC;
 L74E62:;
     *(signed char *)((char *)l_14) = 0;
-    func_0007D24F(l_10);
-    *(int *)D_00195AE4 = (int)func_00074ABA;
+    picklist_open_strings(l_10);
+    *(int *)D_00195AE4 = (int)shelf_book_chosen;
     *(signed char *)D_00196272 = 1;
-    *(int *)D_00195ADC = (int)func_00074C10;
+    *(int *)D_00195ADC = (int)shelf_return_items;
     *(int *)D_00195AEC = a1;
     *(signed char *)D_001A4C9C = 1;
     return;
 L74E9C:;
-    func_000922F6((int)D_001960D9, 1, 4);
-    *(int *)D_00195ADC = (int)func_00074C10;
+    inventory_open_container((int)D_001960D9, 1, 4);
+    *(int *)D_00195ADC = (int)shelf_return_items;
     *(int *)D_00195AEC = a1;
 }
 
-void func_00074ECA(int a1, int a2, int a3)
+void shelf_open_stock(int a1, int a2, int a3)
 {
     int l_24;
     int l_20;
@@ -595,7 +595,7 @@ void func_00074ECA(int a1, int a2, int a3)
 
     l_20 = 0;
     *(short *)D_00195F58 = a3;
-    if (func_0004B28C(a2) == 0) goto L74F0B;
+    if (building_is_open(a2) == 0) goto L74F0B;
     *(signed char *)D_001940D9 |= 2;
     *(signed char *)D_001940D7 &= 253;
     goto L74F19;
@@ -603,61 +603,61 @@ L74F0B:;
     *(signed char *)D_001940D9 &= 253;
     *(signed char *)D_001940D7 |= 2;
 L74F19:;
-    l_20 = func_00074AF2(a1, -1, a3);
+    l_20 = shelf_collect_items(a1, -1, a3);
     l_24 = l_20;
     if (l_20 != 0) goto L74F44;
-    if (func_00076A32(a3) == 0) goto L74F46;
+    if (shelf_shop_stocked(a3) == 0) goto L74F46;
 L74F44:;
     goto L74FB3;
 L74F46:;
-    *(int *)(D_001A4B80 + ((*(int *)D_001A4C8C)++ << 2)) = a3;
+    *(int *)(stocked_shop_ids + ((*(int *)stocked_shop_count)++ << 2)) = a3;
     func_0005EE0C((int)D_001960D9, ((int)(unsigned char)*(signed char *)((char *)a2 + 24)) + 32, (int)(unsigned char)*(signed char *)((char *)a2 + 25));
     if (*(signed char *)((char *)a2 + 24) != 0) goto L74F98;
-    if (func_0007D6AE(1, 100) < 25) goto L74F9A;
+    if (rand_range(1, 100) < 25) goto L74F9A;
 L74F98:;
     goto L74FB3;
 L74F9A:;
-    l_1C = func_00045A1D((int)D_001960D9, 27, 4, 0);
+    l_1C = item_add_to_container((int)D_001960D9, 27, 4, 0);
 L74FB3:;
     if (l_24 != 0) goto L74FC9;
     if (((int)(unsigned char)*(signed char *)((char *)a2 + 24)) == 9) goto L74FCE;
 L74FC9:;
     goto L750B7;
 L74FCE:;
-    l_1C = func_0008DCE3((int)D_001960D9, 0, 107);
+    l_1C = object_create_child((int)D_001960D9, 0, 107);
     *(signed char *)((char *)l_1C) = 2;
     *(signed char *)((char *)l_1C + 21) |= 33;
-    *(int *)((char *)l_1C + 31) = func_0008EB88(((unsigned)*(int *)(*(char **)D_00195AC4 + 31)) >> 16);
-    *(int *)((char *)l_1C + 7) = *(int *)(*(char **)D_00195AA4 + 7);
-    *(int *)((char *)l_1C + 11) = *(int *)(*(char **)D_00195AA4 + 11);
-    *(int *)((char *)l_1C + 15) = *(int *)(*(char **)D_00195AA4 + 15);
-    func_0005E540(23, 1, l_1C + 71);
-    l_1C = func_0008DCE3((int)D_001960D9, 0, 107);
+    *(int *)((char *)l_1C + 31) = object_new_id(((unsigned)*(int *)(*(char **)D_00195AC4 + 31)) >> 16);
+    *(int *)((char *)l_1C + 7) = *(int *)(*(char **)player_object + 7);
+    *(int *)((char *)l_1C + 11) = *(int *)(*(char **)player_object + 11);
+    *(int *)((char *)l_1C + 15) = *(int *)(*(char **)player_object + 15);
+    item_make(23, 1, l_1C + 71);
+    l_1C = object_create_child((int)D_001960D9, 0, 107);
     *(signed char *)((char *)l_1C) = 2;
     *(signed char *)((char *)l_1C + 21) |= 33;
-    *(int *)((char *)l_1C + 31) = func_0008EB88(((unsigned)*(int *)(*(char **)D_00195AC4 + 31)) >> 16);
-    *(int *)((char *)l_1C + 7) = *(int *)(*(char **)D_00195AA4 + 7);
-    *(int *)((char *)l_1C + 11) = *(int *)(*(char **)D_00195AA4 + 11);
-    *(int *)((char *)l_1C + 15) = *(int *)(*(char **)D_00195AA4 + 15);
-    func_0005E540(23, 0, l_1C + 71);
+    *(int *)((char *)l_1C + 31) = object_new_id(((unsigned)*(int *)(*(char **)D_00195AC4 + 31)) >> 16);
+    *(int *)((char *)l_1C + 7) = *(int *)(*(char **)player_object + 7);
+    *(int *)((char *)l_1C + 11) = *(int *)(*(char **)player_object + 11);
+    *(int *)((char *)l_1C + 15) = *(int *)(*(char **)player_object + 15);
+    item_make(23, 0, l_1C + 71);
 L750B7:;
     if (((struct bf8_1_1 *)&D_001940D9)->f == 0) goto L750D6;
-    func_000922F6((int)D_001960D9, 1, 4);
+    inventory_open_container((int)D_001960D9, 1, 4);
     goto L750E7;
 L750D6:;
-    func_000922F6((int)D_001960D9, 0, 4);
+    inventory_open_container((int)D_001960D9, 0, 4);
 L750E7:;
-    *(int *)D_00195ADC = (int)func_00074C10;
+    *(int *)D_00195ADC = (int)shelf_return_items;
     *(int *)D_00195AEC = a1;
 }
 
-void func_00075101(void)
+void shelf_book_list_update(void)
 {
     int l_18;
 
     if (*(int *)D_00195AE4 == 0) return;
     if (((struct bf8_2_1 *)&D_001940D4)->f == 0) goto L7512F;
-    l_18 = func_000392AD();
+    l_18 = spells_list_poll();
     if (l_18 != (-1)) goto L75131;
 L7512F:;
     goto L75153;
@@ -670,24 +670,24 @@ L75140:;
     return;
 L75153:;
     if (*(signed char *)D_001A4C9C == 0) return;
-    func_00074C10();
+    shelf_return_items();
     *(signed char *)D_001A4C9C = 0;
 }
 
-void func_000751DB(int a1)
+void npc_click_service(int a1)
 {
     int l_20;
     int l_1C;
     int l_18;
 
-    *(int *)D_001A4C88 = a1;
+    *(int *)coven_menu_npc = a1;
     *(int *)D_00195CE8 = a1;
     l_20 = a1 + 71;
     *(short *)D_00195F68 = *(short *)((char *)l_20);
-    l_1C = func_0007DF35(a1);
-    l_18 = func_000192EE((int)(short)*(short *)((char *)l_20));
+    l_1C = object_building(a1);
+    l_18 = faction_find((int)(short)*(short *)((char *)l_20));
     if (l_18 != 0) goto L75245;
-    l_18 = func_000191DA((int)(short)((int)(unsigned char)*(signed char *)D_00196268), 15);
+    l_18 = faction_find_type_in_region((int)(short)((int)(unsigned char)*(signed char *)current_region), 15);
 L75245:;
     if (*(signed char *)((char *)a1 + 38) != 0) goto L7530A;
     if (((int)(unsigned short)*(short *)((char *)l_20)) == 852) goto L7528A;
@@ -697,12 +697,12 @@ L75285:;
     goto L7530A;
 L7528A:;
     if (((int)(unsigned short)*(short *)((char *)l_20)) != 852) goto L752C4;
-    l_18 = func_000191DA((int)(short)((int)(unsigned char)*(signed char *)D_00196268), 7);
+    l_18 = faction_find_type_in_region((int)(short)((int)(unsigned char)*(signed char *)current_region), 7);
     if (l_18 == 0) goto L752C4;
     *(short *)((char *)l_20) = *(short *)((char *)l_18 + 33);
 L752C4:;
-    if (func_0007667A((int)(short)*(short *)((char *)l_18 + 33)) != 0) goto L7530A;
-    func_0004C274(82, 0, func_000766D1(), 67, (int)(unsigned char)*(signed char *)(*(char **)D_00195BE0 + 129));
+    if (quest_active_for_faction((int)(short)*(short *)((char *)l_18 + 33)) != 0) goto L7530A;
+    quest_pick_file(82, 0, func_000766D1(), 67, (int)(unsigned char)*(signed char *)(*(char **)player_character + 129));
     if (*(signed char *)D_001961F5 != 0) return;
 L7530A:;
     if (*(signed char *)((char *)a1 + 38) != 0) goto L7531F;
@@ -717,11 +717,11 @@ L75326:;
 L75341:;
     goto L7535A;
 L75343:;
-    if (((int)(unsigned char)*(signed char *)((char *)func_000192EE((int)(short)*(short *)((char *)l_20)))) == 8) goto L7535C;
+    if (((int)(unsigned char)*(signed char *)((char *)faction_find((int)(short)*(short *)((char *)l_20)))) == 8) goto L7535C;
 L7535A:;
     goto L7536B;
 L7535C:;
-    func_00075B7A(1);
+    coven_menu_open(1);
     return;
 L7536B:;
     if (l_1C == 0) goto L75669;
@@ -731,11 +731,11 @@ L7536B:;
 L753A3:;
     goto L753B3;
 L753A5:;
-    if (func_000702A0(3) != 0) goto L753B5;
+    if (guild_find_membership_by_kind(3) != 0) goto L753B5;
 L753B3:;
     goto L753C2;
 L753B5:;
-    func_0006DC35(a1);
+    guild_service_dispatch(a1);
     goto L75667;
 L753C2:;
     if (((int)(unsigned short)*(short *)((char *)l_18 + 33)) == 108) goto L753F2;
@@ -744,11 +744,11 @@ L753C2:;
 L753F0:;
     goto L753FD;
 L753F2:;
-    if (func_000702A0(0) != 0) goto L753FF;
+    if (guild_find_membership_by_kind(0) != 0) goto L753FF;
 L753FD:;
     goto L7540C;
 L753FF:;
-    func_0006DC35(a1);
+    guild_service_dispatch(a1);
     goto L75667;
 L7540C:;
     if (((int)(unsigned short)*(short *)((char *)l_18 + 33)) == 108) goto L7543C;
@@ -757,65 +757,65 @@ L7540C:;
 L7543A:;
     goto L75447;
 L7543C:;
-    if (func_000702A0(0) == 0) goto L75449;
+    if (guild_find_membership_by_kind(0) == 0) goto L75449;
 L75447:;
     goto L75456;
 L75449:;
-    func_000756C6(a1);
+    npc_talk(a1);
     goto L75667;
 L75456:;
     switch (*(unsigned char *)((char *)l_1C + 24)) {
     goto L7565F;
 case 11:
 case 14:
-    func_0006DC35(a1);
+    guild_service_dispatch(a1);
     goto L75667;
 case 15:
     if (((int)(unsigned char)(*(signed char *)((char *)l_20 + 2) & 8)) == 0) goto L7552F;
-    func_0001EE84(1);
+    tavern_open(1);
     goto L75537;
 L7552F:;
-    func_000756C6(a1);
+    npc_talk(a1);
 L75537:;
     goto L75667;
 case 3:
-    *(int *)D_001A4C98 = (int)func_0006B376;
-    *(int *)D_001A4C84 = a1;
+    *(int *)service_menu_handler = (int)bank_open;
+    *(int *)service_menu_npc = a1;
     if (((int)(unsigned char)(*(signed char *)((char *)l_20 + 2) & 8)) == 0) goto L7556B;
-    func_000767A6((int)D_0017628F);
+    service_menu_open((int)D_0017628F);
     goto L75573;
 L7556B:;
-    func_000756C6(a1);
+    npc_talk(a1);
 L75573:;
     goto L75667;
 case 2:
     if (((int)(unsigned short)(*(short *)((char *)l_20) & 8)) == 0) goto L755A7;
     *(signed char *)D_001A4C9D = 2;
-    *(int *)D_001A4C90 = a1;
-    func_000758F0(1);
+    *(int *)repair_menu_npc = a1;
+    repair_menu_open(1);
     goto L755AF;
 L755A7:;
-    func_000756C6(a1);
+    npc_talk(a1);
 L755AF:;
     goto L75667;
 case 13:
     if (((int)(unsigned char)(*(signed char *)((char *)l_20 + 2) & 8)) == 0) goto L755E0;
     *(signed char *)D_001A4C9D = 3;
-    *(int *)D_001A4C90 = a1;
-    func_000758F0(1);
+    *(int *)repair_menu_npc = a1;
+    repair_menu_open(1);
     goto L755E8;
 L755E0:;
-    func_000756C6(a1);
+    npc_talk(a1);
 L755E8:;
     goto L75667;
 case 9:
     if (((int)(unsigned short)(*(short *)((char *)l_20) & 8)) == 0) goto L7561C;
     *(signed char *)D_001A4C9D = 255;
-    *(int *)D_001A4C90 = a1;
-    func_000758F0(1);
+    *(int *)repair_menu_npc = a1;
+    repair_menu_open(1);
     goto L75624;
 L7561C:;
-    func_000756C6(a1);
+    npc_talk(a1);
 L75624:;
     goto L75667;
 case 0:
@@ -824,25 +824,25 @@ case 6:
 case 8:
 case 12:
     if (((int)(unsigned char)(*(signed char *)((char *)l_20 + 2) & 8)) == 0) goto L75655;
-    *(int *)D_001A4C84 = a1;
-    *(int *)D_001A4C98 = (int)func_00076A15;
-    func_000767A6((int)D_00176297);
+    *(int *)service_menu_npc = a1;
+    *(int *)service_menu_handler = (int)service_menu_sell;
+    service_menu_open((int)D_00176297);
     goto L7565D;
 L75655:;
-    func_000756C6(a1);
+    npc_talk(a1);
 L7565D:;
     goto L75667;
 default:
 L7565F:;
-    func_000756C6(a1);
+    npc_talk(a1);
 L75667:;
     return;
 L75669:;
-    func_000756C6(a1);
+    npc_talk(a1);
 }
 }
 
-void func_0007567B(int a1, int a2)
+void shop_open_repair(int a1, int a2)
 {
     int l_14;
 
@@ -851,27 +851,27 @@ void func_0007567B(int a1, int a2)
     if (l_14 == 0) goto L756AB;
     *(signed char *)((char *)l_14 + 21) |= 1;
 L756AB:;
-    func_000922F6(a2, 3, 7);
+    inventory_open_container(a2, 3, 7);
 }
 
-void func_000756C6(int a1)
+void npc_talk(int a1)
 {
     int l_1C;
     unsigned short l_18;
 
-    *(int *)D_00195A84 = func_00059973(a1);
+    *(int *)D_00195A84 = npc_talk_record_build(a1);
     l_18 = *(short *)((char *)a1 + 71);
     l_1C = func_00031843(28, a1, 0);
     l_1C |= func_00031843(1, 0, a1);
-    l_1C |= func_0004BBD8(28, a1, 0);
-    l_1C |= func_0004BBD8(71, a1, 0);
-    l_1C |= func_0004BBD8(1, 0, a1);
+    l_1C |= quest_raise_event(28, a1, 0);
+    l_1C |= quest_raise_event(71, a1, 0);
+    l_1C |= quest_raise_event(1, 0, a1);
     if (((int)(unsigned char)*(signed char *)((char *)a1)) != 8) goto L7575E;
     if (l_18 != 0) goto L75760;
 L7575E:;
     goto L7576E;
 L75760:;
-    l_1C |= func_0002C406((int)(unsigned short)l_18);
+    l_1C |= quest_event_clicked_faction((int)(unsigned short)l_18);
 L7576E:;
     if (l_1C != 0) return;
     if (((int)(unsigned char)*(signed char *)((char *)a1)) != 8) goto L7578C;
@@ -880,11 +880,11 @@ L7578C:;
     goto L757B7;
 L7578E:;
     if (((int)(unsigned char)(*(signed char *)((char *)a1 + 73) & 128)) == 0) goto L757B7;
-    func_0004CB5D(a1);
+    quest_pick_for_npc(a1);
     *(signed char *)((char *)a1 + 73) &= 127;
     if (*(signed char *)D_001961F5 != 0) return;
 L757B7:;
-    func_00015674(a1);
+    talk_start(a1);
 }
 
 void func_000757C9(int a1)
@@ -893,46 +893,46 @@ void func_000757C9(int a1)
     (*(int *)D_00190BE4)++;
 }
 
-int func_000757F9(int a1)
+int object_count_items(int a1)
 {
     *(int *)D_00190BE4 = 0;
-    func_0008E3F7(*(int *)((char *)a1 + 63), (int)func_000757C9);
+    object_foreach(*(int *)((char *)a1 + 63), (int)func_000757C9);
     return *(int *)D_00190BE4;
 }
 
-int func_000758F0(int a1)
+int repair_menu_open(int a1)
 {
-    if (((int)(unsigned char)*(signed char *)D_00196274) != 26) goto L75916;
+    if (((int)(unsigned char)*(signed char *)game_mode) != 26) goto L75916;
     return 1;
 L75916:;
     if (a1 == 0) goto L75954;
 L7591C:;
-    if (*(signed char *)D_0012AC00 == 0) goto L7592C;
+    if (*(signed char *)mouse_buttons == 0) goto L7592C;
     func_0012B136();
     goto L7591C;
 L7592C:;
-    *(int *)D_00195BE8 = func_0006CB53((int)D_001762DD, 0);
-    *(signed char *)D_00196274 = 26;
+    *(int *)window_image = disk_read_file((int)D_001762DD, 0);
+    *(signed char *)game_mode = 26;
     *(signed char *)D_00196272 = 1;
     return 1;
 L75954:;
     return 0;
 }
 
-void func_00075968(void)
+void repair_menu_frame(void)
 {
     int l_1C;
     int l_18;
 
-    if (func_000758F0(0) == 0) return;
-    l_1C = *(int *)D_00195BE8;
+    if (repair_menu_open(0) == 0) return;
+    l_1C = *(int *)window_image;
     func_00144F68((int)(unsigned short)*(short *)((char *)l_1C), (int)(unsigned short)*(short *)((char *)l_1C + 2), (int)(unsigned short)*(short *)((char *)l_1C + 4), (int)(unsigned short)*(short *)((char *)l_1C + 6), l_1C + 12);
-    if (*(signed char *)D_00142309 == 0) goto L759CD;
-    func_00075A75();
+    if (*(signed char *)key_down_esc == 0) goto L759CD;
+    repair_menu_close();
 L759CD:;
-    if (*(signed char *)D_0012AC00 == 0) goto L759EA;
-    if (*(signed char *)D_0012AC00 == 0) goto L759E8;
-    if (*(signed char *)D_00196279 != 0) goto L759EA;
+    if (*(signed char *)mouse_buttons == 0) goto L759EA;
+    if (*(signed char *)mouse_buttons == 0) goto L759E8;
+    if (*(signed char *)mouse_buttons_prev != 0) goto L759EA;
 L759E8:;
     goto L759EF;
 L759EA:;
@@ -946,16 +946,16 @@ L75A01:;
     l_18++;
     goto L759F6;
 L75A09:;
-    if (*(short *)D_0012AC04 <= *(short *)(D_001875C0 + (l_18 * 12))) goto L75A31;
-    if (*(short *)D_0012AC04 < *(short *)(D_001875C4 + (l_18 * 12))) goto L75A33;
+    if (*(short *)mouse_x <= *(short *)(repair_menu_buttons + (l_18 * 12))) goto L75A31;
+    if (*(short *)mouse_x < *(short *)(D_001875C4 + (l_18 * 12))) goto L75A33;
 L75A31:;
     goto L75A47;
 L75A33:;
-    if (*(short *)D_0012AC06 > *(short *)(D_001875C2 + (l_18 * 12))) goto L75A49;
+    if (*(short *)mouse_y > *(short *)(D_001875C2 + (l_18 * 12))) goto L75A49;
 L75A47:;
     goto L75A5D;
 L75A49:;
-    if (*(short *)D_0012AC06 < *(short *)(D_001875C6 + (l_18 * 12))) goto L75A5F;
+    if (*(short *)mouse_y < *(short *)(D_001875C6 + (l_18 * 12))) goto L75A5F;
 L75A5D:;
     goto L75A69;
 L75A5F:;
@@ -964,79 +964,79 @@ L75A69:;
     goto L75A01;
 }
 
-void func_00075A75(void)
+void repair_menu_close(void)
 {
 L75A83:;
-    if (*(signed char *)D_00142309 != 0) goto L75A83;
+    if (*(signed char *)key_down_esc != 0) goto L75A83;
 L75A8C:;
-    if (*(signed char *)D_0012AC00 == 0) goto L75A9C;
+    if (*(signed char *)mouse_buttons == 0) goto L75A9C;
     func_0012B136();
     goto L75A8C;
 L75A9C:;
-    if (*(int *)D_00195BE8 == 0) goto L75AB1;
-    if (*(int *)D_00195BE8 != (-1751672937)) goto L75AB3;
+    if (*(int *)window_image == 0) goto L75AB1;
+    if (*(int *)window_image != (-1751672937)) goto L75AB3;
 L75AB1:;
     goto L75AD1;
 L75AB3:;
-    func_000A0024(*(int *)D_00195BE8, (int)D_00176198, 891);
-    *(int *)D_00195BE8 = -1751672937;
+    func_000A0024(*(int *)window_image, (int)D_00176198, 891);
+    *(int *)window_image = -1751672937;
 L75AD1:;
-    *(signed char *)D_00196274 = 0;
+    *(signed char *)game_mode = 0;
     *(signed char *)D_00196272 = 0;
 }
 
-void func_00075AE9(void)
+void repair_menu_repair(void)
 {
-    func_00075A75();
-    func_0007567B((int)(unsigned char)*(signed char *)D_001A4C9D, *(int *)D_001A4C90);
+    repair_menu_close();
+    shop_open_repair((int)(unsigned char)*(signed char *)D_001A4C9D, *(int *)repair_menu_npc);
 }
 
-void func_00075B18(void)
+void repair_menu_talk(void)
 {
-    func_00075A75();
-    func_000756C6(*(int *)D_001A4C90);
+    repair_menu_close();
+    npc_talk(*(int *)repair_menu_npc);
 }
 
-void func_00075B3F(void)
+void repair_menu_sell(void)
 {
-    func_00075A75();
-    func_0008DA1C((int)D_001960D9);
-    func_000922F6((int)D_001960D9, 2, 6);
+    repair_menu_close();
+    object_free_children((int)D_001960D9);
+    inventory_open_container((int)D_001960D9, 2, 6);
 }
 
-int func_00075B7A(int a1)
+int coven_menu_open(int a1)
 {
-    if (((int)(unsigned char)*(signed char *)D_00196274) != 27) goto L75BA0;
+    if (((int)(unsigned char)*(signed char *)game_mode) != 27) goto L75BA0;
     return 1;
 L75BA0:;
     if (a1 == 0) goto L75BDE;
 L75BA6:;
-    if (*(signed char *)D_0012AC00 == 0) goto L75BB6;
+    if (*(signed char *)mouse_buttons == 0) goto L75BB6;
     func_0012B136();
     goto L75BA6;
 L75BB6:;
-    *(int *)D_00195BE8 = func_0006CB53((int)D_001762EA, 0);
-    *(signed char *)D_00196274 = 27;
+    *(int *)window_image = disk_read_file((int)D_001762EA, 0);
+    *(signed char *)game_mode = 27;
     *(signed char *)D_00196272 = 1;
     return 1;
 L75BDE:;
     return 0;
 }
 
-void func_00075BF2(void)
+void coven_menu_frame(void)
 {
     int l_1C;
     int l_18;
 
-    if (func_00075B7A(0) == 0) return;
-    l_1C = *(int *)D_00195BE8;
+    if (coven_menu_open(0) == 0) return;
+    l_1C = *(int *)window_image;
     func_00144F68((int)(unsigned short)*(short *)((char *)l_1C), (int)(unsigned short)*(short *)((char *)l_1C + 2), (int)(unsigned short)*(short *)((char *)l_1C + 4), (int)(unsigned short)*(short *)((char *)l_1C + 6), l_1C + 12);
-    if (*(signed char *)D_00142309 == 0) goto L75C57;
-    func_00075CFF();
+    if (*(signed char *)key_down_esc == 0) goto L75C57;
+    coven_menu_close();
 L75C57:;
-    if (*(signed char *)D_0012AC00 == 0) goto L75C74;
-    if (*(signed char *)D_0012AC00 == 0) goto L75C72;
-    if (*(signed char *)D_00196279 != 0) goto L75C74;
+    if (*(signed char *)mouse_buttons == 0) goto L75C74;
+    if (*(signed char *)mouse_buttons == 0) goto L75C72;
+    if (*(signed char *)mouse_buttons_prev != 0) goto L75C74;
 L75C72:;
     goto L75C79;
 L75C74:;
@@ -1050,16 +1050,16 @@ L75C8B:;
     l_18++;
     goto L75C80;
 L75C93:;
-    if (*(short *)D_0012AC04 <= *(short *)(D_001875F0 + (l_18 * 12))) goto L75CBB;
-    if (*(short *)D_0012AC04 < *(short *)(D_001875F4 + (l_18 * 12))) goto L75CBD;
+    if (*(short *)mouse_x <= *(short *)(coven_menu_buttons + (l_18 * 12))) goto L75CBB;
+    if (*(short *)mouse_x < *(short *)(D_001875F4 + (l_18 * 12))) goto L75CBD;
 L75CBB:;
     goto L75CD1;
 L75CBD:;
-    if (*(short *)D_0012AC06 > *(short *)(D_001875F2 + (l_18 * 12))) goto L75CD3;
+    if (*(short *)mouse_y > *(short *)(D_001875F2 + (l_18 * 12))) goto L75CD3;
 L75CD1:;
     goto L75CE7;
 L75CD3:;
-    if (*(short *)D_0012AC06 < *(short *)(D_001875F6 + (l_18 * 12))) goto L75CE9;
+    if (*(short *)mouse_y < *(short *)(D_001875F6 + (l_18 * 12))) goto L75CE9;
 L75CE7:;
     goto L75CF3;
 L75CE9:;
@@ -1068,130 +1068,130 @@ L75CF3:;
     goto L75C8B;
 }
 
-void func_00075CFF(void)
+void coven_menu_close(void)
 {
 L75D0D:;
-    if (*(signed char *)D_00142309 != 0) goto L75D0D;
+    if (*(signed char *)key_down_esc != 0) goto L75D0D;
 L75D16:;
-    if (*(signed char *)D_0012AC00 == 0) goto L75D26;
+    if (*(signed char *)mouse_buttons == 0) goto L75D26;
     func_0012B136();
     goto L75D16;
 L75D26:;
-    if (*(int *)D_00195BE8 == 0) goto L75D3B;
-    if (*(int *)D_00195BE8 != (-1751672937)) goto L75D3D;
+    if (*(int *)window_image == 0) goto L75D3B;
+    if (*(int *)window_image != (-1751672937)) goto L75D3D;
 L75D3B:;
     goto L75D5B;
 L75D3D:;
-    func_000A0024(*(int *)D_00195BE8, (int)D_00176198, 957);
-    *(int *)D_00195BE8 = -1751672937;
+    func_000A0024(*(int *)window_image, (int)D_00176198, 957);
+    *(int *)window_image = -1751672937;
 L75D5B:;
-    *(signed char *)D_00196274 = 0;
+    *(signed char *)game_mode = 0;
     *(signed char *)D_00196272 = 0;
 }
 
-void func_00075D73(void)
+void coven_menu_talk(void)
 {
-    func_00075CFF();
-    func_000756C6(*(int *)D_001A4C88);
+    coven_menu_close();
+    npc_talk(*(int *)coven_menu_npc);
 }
 
-void func_00075D9A(void)
+void coven_menu_summon(void)
 {
-    func_00075CFF();
-    func_000202C5(*(int *)D_001A4C88);
+    coven_menu_close();
+    daedra_summon(*(int *)coven_menu_npc);
 }
 
-void func_00075E08(int a1, int a2)
+void click_item(int a1, int a2)
 {
     int l_14;
 
-    switch (*(unsigned char *)D_00196276) {
+    switch (*(unsigned char *)interaction_mode) {
     return;
 case 0:
 case 2:
 case 3:
-    if (*(int *)D_00120290 <= 128) goto L75E57;
-    func_0007CB4F(*(int *)D_0017CA14);
+    if (*(int *)pick_distance <= 128) goto L75E57;
+    hud_status_set(*(int *)D_0017CA14);
     goto L75E5F;
 L75E57:;
-    func_00075839(a2);
+    pick_up_item(a2);
 L75E5F:;
     return;
 case 1:
     l_14 = a2 + 71;
-    func_000744FD(l_14);
+    click_describe_item(l_14);
 default:;
 }
 }
 
 void func_00075E7B(int a1, int a2)
 {
-    func_0007653C(a1, a2);
+    click_show_building_info(a1, a2);
 }
 
-void func_00075EA2(int a1, int a2)
+void click_npc(int a1, int a2)
 {
-    *(int *)D_00195A84 = func_00059973(a2);
-    switch (*(unsigned char *)D_00196276) {
+    *(int *)D_00195A84 = npc_talk_record_build(a2);
+    switch (*(unsigned char *)interaction_mode) {
     return;
 case 0:
 case 2:
 case 3:
-    if (*(int *)D_00120290 <= 256) goto L75EFE;
-    func_0007CB4F(*(int *)D_0017CA14);
+    if (*(int *)pick_distance <= 256) goto L75EFE;
+    hud_status_set(*(int *)D_0017CA14);
     goto L75F06;
 L75EFE:;
-    func_000751DB(a2);
+    npc_click_service(a2);
 L75F06:;
     return;
 case 1:
     func_000A0ED9(1021, (int)D_00176198);
-    func_000A0F5C((int)D_001903A4, *(int *)D_00183254, func_0008B48B(a2));
-    func_0007CBA1((int)D_001903A4);
+    func_000A0F5C((int)text_buffer, *(int *)D_00183254, func_0008B48B(a2));
+    hud_message_add((int)text_buffer);
 default:;
 }
 }
 
-void func_00075F48(int a1, int a2)
+void click_creature(int a1, int a2)
 {
     int l_18;
     int l_14;
 
     l_18 = a2 + 71;
     l_14 = l_18 + 560;
-    if (*(int *)D_00195B48 == 0) goto L75F84;
-    if (*(int *)D_00120290 < 160) goto L75F86;
+    if (*(int *)spell_ready_touch == 0) goto L75F84;
+    if (*(int *)pick_distance < 160) goto L75F86;
 L75F84:;
     goto L75FA9;
 L75F86:;
-    func_0005ABE6(*(int *)D_00195B48, a2, 0);
-    func_0008DA91(*(int *)D_00195B48);
-    *(int *)D_00195B48 = 0;
+    cast_spell_on(*(int *)spell_ready_touch, a2, 0);
+    object_delete(*(int *)spell_ready_touch);
+    *(int *)spell_ready_touch = 0;
 L75FA9:;
-    switch (*(unsigned char *)D_00196276) {
+    switch (*(unsigned char *)interaction_mode) {
     return;
 case 0:
 case 1:
 case 3:
-    func_00074589(l_18, l_14);
+    click_describe_creature(l_18, l_14);
     return;
 case 2:
-    if (*(int *)D_00120290 <= 128) goto L75FEE;
-    func_0007CB4F(*(int *)D_0017CA14);
+    if (*(int *)pick_distance <= 128) goto L75FEE;
+    hud_status_set(*(int *)D_0017CA14);
     return;
 L75FEE:;
-    func_0001374D(a2);
+    pickpocket_attempt(a2);
 default:;
 }
 }
 
-void func_00075FFF(int a1, int a2)
+void click_door(int a1, int a2)
 {
-    if (*(int *)D_00120290 <= 128) goto L7602A;
-    func_0007CB4F(*(int *)D_0017CA14);
+    if (*(int *)pick_distance <= 128) goto L7602A;
+    hud_status_set(*(int *)D_0017CA14);
     return;
 L7602A:;
-    switch (*(unsigned char *)D_00196276) {
+    switch (*(unsigned char *)interaction_mode) {
     return;
 case 2:
     func_0007425E(a2, 1);
@@ -1208,21 +1208,21 @@ void func_0007606C(int a1, int a2)
 {
 }
 
-void func_00076088(int a1, int a2)
+void click_interior_model(int a1, int a2)
 {
     int l_18;
     int l_14;
 
-    switch (*(unsigned char *)D_00196276) {
+    switch (*(unsigned char *)interaction_mode) {
     return;
 case 0:
 case 2:
 case 3:
-    if (*(int *)D_00120290 <= 128) goto L760E8;
-    func_0007CB4F(*(int *)D_0017CA14);
+    if (*(int *)pick_distance <= 128) goto L760E8;
+    hud_status_set(*(int *)D_0017CA14);
     return;
 L760E8:;
-    l_18 = func_0007DF35(a2);
+    l_18 = object_building(a2);
     if (l_18 == 0) goto L76102;
     if (*(int *)D_00195D3C != 0) goto L76104;
 L76102:;
@@ -1243,28 +1243,28 @@ L76157:;
 L76165:;
     goto L7621E;
 L7616A:;
-    if (*(int *)((char *)l_18 + 20) != *(int *)(*(char **)D_00195BE0 + 116)) goto L76198;
+    if (*(int *)((char *)l_18 + 20) != *(int *)(*(char **)player_character + 116)) goto L76198;
     *(signed char *)D_001940D6 |= 4;
-    func_000922F6((int)D_00196092, 0, 4);
+    inventory_open_container((int)D_00196092, 0, 4);
     goto L7621C;
 L76198:;
-    func_0007DDC9(37);
+    msgbox_yes_no_rsc(37);
     if (((int)(unsigned char)*(signed char *)D_00196271) != 1) return;
     if (l_14 == 0) goto L761C4;
-    if (((int)(unsigned char)*(signed char *)D_001789FA) == 2) goto L761C6;
+    if (((int)(unsigned char)*(signed char *)player_environment) == 2) goto L761C6;
 L761C4:;
     goto L761EB;
 L761C6:;
-    if (func_0007D6AE(0, 255) >= (108 - ((int)(short)*(short *)(*(char **)D_00195BE0 + 247)))) goto L761ED;
+    if (rand_range(0, 255) >= (108 - ((int)(short)*(short *)(*(char **)player_character + 247)))) goto L761ED;
 L761EB:;
     goto L761FE;
 L761ED:;
-    *(signed char *)D_0019627E = 13;
-    func_00040C87(1);
+    *(signed char *)crime_current = 13;
+    guards_summon(1);
 L761FE:;
     if (l_14 == 0) goto L7621C;
     *(signed char *)D_001940D6 |= 4;
-    func_000922F6((int)D_00196120, 0, 4);
+    inventory_open_container((int)D_00196120, 0, 4);
 L7621C:;
     goto L7625E;
 L7621E:;
@@ -1301,77 +1301,77 @@ L7629B:;
     func_0009A7B8();
     return;
 L762A2:;
-    func_0007653C(a1, a2);
+    click_show_building_info(a1, a2);
 default:;
 }
 }
 
-void func_000762B6(int a1, int a2)
+void click_corpse(int a1, int a2)
 {
     int l_14;
 
-    switch (*(unsigned char *)D_00196276) {
+    switch (*(unsigned char *)interaction_mode) {
     return;
 case 1:
     l_14 = a2 + 71;
     if (((int)(unsigned char)*(signed char *)((char *)l_14 + 67)) >= 43) goto L76353;
     func_000A0ED9(1153, (int)D_00176198);
-    func_000A0F5C((int)D_001903A4, *(int *)D_00184329, *(int *)(D_001830E6 + (((int)(unsigned char)*(signed char *)((char *)l_14 + 67)) << 2)));
+    func_000A0F5C((int)text_buffer, *(int *)D_00184329, *(int *)(monster_names + (((int)(unsigned char)*(signed char *)((char *)l_14 + 67)) << 2)));
     goto L76372;
 L76353:;
-    func_000A0AD9((int)D_001903A4, *(int *)D_00185093, 160, (int)D_00176198, 1155);
+    func_000A0AD9((int)text_buffer, *(int *)D_00185093, 160, (int)D_00176198, 1155);
 L76372:;
-    func_0007CBA1((int)D_001903A4);
+    hud_message_add((int)text_buffer);
     return;
 case 0:
 case 2:
 case 3:
-    if (*(int *)D_00120290 <= 150) goto L76396;
-    func_0007CB4F(*(int *)D_0017CA14);
+    if (*(int *)pick_distance <= 150) goto L76396;
+    hud_status_set(*(int *)D_0017CA14);
     return;
 L76396:;
-    if (func_000757F9(a2) == 0) goto L763B3;
-    func_000922F6(a2, 0, 1);
+    if (object_count_items(a2) == 0) goto L763B3;
+    inventory_open_container(a2, 0, 1);
     return;
 L763B3:;
-    func_0007CBA1(*(int *)D_001845CC);
+    hud_message_add(*(int *)D_001845CC);
 default:;
 }
 }
 
 void func_000763C6(int a1, int a2)
 {
-    switch (*(unsigned char *)D_00196276) {
+    switch (*(unsigned char *)interaction_mode) {
     return;
 case 2:
-    if (*(int *)D_00120290 <= 128) goto L76411;
-    func_0007CB4F(*(int *)D_0017CA14);
+    if (*(int *)pick_distance <= 128) goto L76411;
+    hud_status_set(*(int *)D_0017CA14);
     goto L76435;
 L76411:;
     if (((int)(unsigned short)(*(short *)((char *)a2 + 25) & 16384)) != 0) goto L76435;
     *(signed char *)((char *)a2 + 26) |= 64;
-    func_0001374D(a2);
+    pickpocket_attempt(a2);
 L76435:;
     return;
 case 0:
 case 1:
 case 3:
-    if (*(int *)D_00120290 <= 256) goto L7644F;
-    func_0007CB4F(*(int *)D_0017CA14);
+    if (*(int *)pick_distance <= 256) goto L7644F;
+    hud_status_set(*(int *)D_0017CA14);
     return;
 L7644F:;
-    func_000756C6(a2);
+    npc_talk(a2);
 default:;
 }
 }
 
-void func_00076460(int a1, int a2)
+void click_loot_container(int a1, int a2)
 {
-    if (*(int *)D_00120290 <= 128) goto L7648E;
-    func_0007CB4F(*(int *)D_0017CA14);
+    if (*(int *)pick_distance <= 128) goto L7648E;
+    hud_status_set(*(int *)D_0017CA14);
     return;
 L7648E:;
-    switch (*(unsigned char *)D_00196276) {
+    switch (*(unsigned char *)interaction_mode) {
     return;
 case 0:
 case 1:
@@ -1385,25 +1385,25 @@ L764C9:;
 L764DA:;
     func_00076A8F(a2);
     if (*(int *)((char *)a2 + 63) == 0) return;
-    func_000922F6(a2, 0, 5);
+    inventory_open_container(a2, 0, 5);
 default:;
 }
 }
 
 void func_00076503(int a1, int a2)
 {
-    switch (*(unsigned char *)D_00196276) {
+    switch (*(unsigned char *)interaction_mode) {
     return;
 case 0:
 case 1:
 case 2:
 case 3:
-    func_0007653C(a1, a2);
+    click_show_building_info(a1, a2);
 default:;
 }
 }
 
-void func_0007653C(int a1, int a2)
+void click_show_building_info(int a1, int a2)
 {
     int l_18;
     int l_14;
@@ -1421,13 +1421,13 @@ L76580:;
     return;
 L7658A:;
     if (((int)(unsigned char)*(signed char *)(*(char **)((char *)a2 + 67))) != 38) return;
-    l_18 = func_0007DF35(a2);
+    l_18 = object_building(a2);
     if (l_18 == 0) return;
     if (((int)(unsigned char)*(signed char *)((char *)l_18 + 24)) == 23) return;
-    func_000287BD(a2, l_18);
-    func_0007CBA1(func_0008BD50(l_18));
+    town_map_note_building(a2, l_18);
+    hud_message_add(building_name(l_18));
     if (((int)(unsigned char)*(signed char *)((char *)l_18 + 24)) == 1) goto L765FD;
-    if (func_0004B28C(l_18) == 0) goto L765FF;
+    if (building_is_open(l_18) == 0) goto L765FF;
 L765FD:;
     goto L7660F;
 L765FF:;
@@ -1436,11 +1436,11 @@ L7660F:;
     return;
 L76611:;
     func_000A0ED9(1274, (int)D_00176198);
-    func_000A0F5C((int)D_001903A4, (int)D_001762F7, (int)(unsigned char)*(signed char *)(D_0017C5B8 + (((int)(unsigned char)*(signed char *)((char *)l_18 + 24)) * 2)), (int)(unsigned char)*(signed char *)(D_0017C5B9 + (((int)(unsigned char)*(signed char *)((char *)l_18 + 24)) * 2)));
-    func_0007CBA1((int)D_001903A4);
+    func_000A0F5C((int)text_buffer, (int)D_001762F7, (int)(unsigned char)*(signed char *)(building_open_hours + (((int)(unsigned char)*(signed char *)((char *)l_18 + 24)) * 2)), (int)(unsigned char)*(signed char *)(D_0017C5B9 + (((int)(unsigned char)*(signed char *)((char *)l_18 + 24)) * 2)));
+    hud_message_add((int)text_buffer);
 }
 
-int func_0007667A(short a1)
+int quest_active_for_faction(short a1)
 {
     int l_20;
 
@@ -1470,17 +1470,17 @@ L766F5:;
     l_1C++;
     goto L766ED;
 L766FD:;
-    if (*(signed char *)(D_0018F061 + ((((int)(unsigned char)*(signed char *)D_00196268) * 80) + l_1C)) == 0) goto L76719;
+    if (*(signed char *)(region_event_flags + ((((int)(unsigned char)*(signed char *)current_region) * 80) + l_1C)) == 0) goto L76719;
     l_20++;
 L76719:;
     goto L766F5;
 L7671B:;
     if (l_20 == 0) goto L76735;
-    if (func_0007D6AE(1, 100) >= 10) goto L7673E;
+    if (rand_range(1, 100) >= 10) goto L7673E;
 L76735:;
     return 0;
 L7673E:;
-    l_20 = func_0007D6AE(0, l_20 - 1);
+    l_20 = rand_range(0, l_20 - 1);
     l_1C = 0;
 L76753:;
     if (l_1C < 29) goto L76763;
@@ -1489,7 +1489,7 @@ L7675B:;
     l_1C++;
     goto L76753;
 L76763:;
-    if (*(signed char *)(D_0018F061 + ((((int)(unsigned char)*(signed char *)D_00196268) * 80) + l_1C)) == 0) goto L76790;
+    if (*(signed char *)(region_event_flags + ((((int)(unsigned char)*(signed char *)current_region) * 80) + l_1C)) == 0) goto L76790;
     if (l_20 != 0) goto L7678A;
     return l_1C + 65;
 L7678A:;
@@ -1500,41 +1500,41 @@ L76792:;
     return 0;
 }
 
-int func_000767A6(int a1)
+int service_menu_open(int a1)
 {
-    if (((int)(unsigned char)*(signed char *)D_00196274) != 28) goto L767CC;
+    if (((int)(unsigned char)*(signed char *)game_mode) != 28) goto L767CC;
     return 1;
 L767CC:;
     if (a1 == 0) goto L76812;
-    *(int *)D_001A4C80 = a1;
+    *(int *)service_menu_label = a1;
 L767DA:;
-    if (*(signed char *)D_0012AC00 == 0) goto L767EA;
+    if (*(signed char *)mouse_buttons == 0) goto L767EA;
     func_0012B136();
     goto L767DA;
 L767EA:;
-    *(int *)D_00195BE8 = func_0006CB53((int)D_00176322, 0);
-    *(signed char *)D_00196274 = 28;
+    *(int *)window_image = disk_read_file((int)D_00176322, 0);
+    *(signed char *)game_mode = 28;
     *(signed char *)D_00196272 = 1;
     return 1;
 L76812:;
     return 0;
 }
 
-void func_00076826(void)
+void service_menu_frame(void)
 {
     int l_1C;
     int l_18;
 
-    if (func_000767A6(0) == 0) return;
-    l_1C = *(int *)D_00195BE8;
+    if (service_menu_open(0) == 0) return;
+    l_1C = *(int *)window_image;
     func_00144F68((int)(unsigned short)*(short *)((char *)l_1C), (int)(unsigned short)*(short *)((char *)l_1C + 2), (int)(unsigned short)*(short *)((char *)l_1C + 4), (int)(unsigned short)*(short *)((char *)l_1C + 6), l_1C + 12);
-    func_0007CA85(*(int *)D_001A4C80, 159, 70, 145, 156);
-    if (*(signed char *)D_00142309 == 0) goto L768AA;
-    func_00076952();
+    text_draw_centered_colored(*(int *)service_menu_label, 159, 70, 145, 156);
+    if (*(signed char *)key_down_esc == 0) goto L768AA;
+    service_menu_close();
 L768AA:;
-    if (*(signed char *)D_0012AC00 == 0) goto L768C7;
-    if (*(signed char *)D_0012AC00 == 0) goto L768C5;
-    if (*(signed char *)D_00196279 != 0) goto L768C7;
+    if (*(signed char *)mouse_buttons == 0) goto L768C7;
+    if (*(signed char *)mouse_buttons == 0) goto L768C5;
+    if (*(signed char *)mouse_buttons_prev != 0) goto L768C7;
 L768C5:;
     goto L768CC;
 L768C7:;
@@ -1548,16 +1548,16 @@ L768DE:;
     l_18++;
     goto L768D3;
 L768E6:;
-    if (*(short *)D_0012AC04 <= *(short *)(D_00187620 + (l_18 * 12))) goto L7690E;
-    if (*(short *)D_0012AC04 < *(short *)(D_00187624 + (l_18 * 12))) goto L76910;
+    if (*(short *)mouse_x <= *(short *)(service_menu_buttons + (l_18 * 12))) goto L7690E;
+    if (*(short *)mouse_x < *(short *)(D_00187624 + (l_18 * 12))) goto L76910;
 L7690E:;
     goto L76924;
 L76910:;
-    if (*(short *)D_0012AC06 > *(short *)(D_00187622 + (l_18 * 12))) goto L76926;
+    if (*(short *)mouse_y > *(short *)(D_00187622 + (l_18 * 12))) goto L76926;
 L76924:;
     goto L7693A;
 L76926:;
-    if (*(short *)D_0012AC06 < *(short *)(D_00187626 + (l_18 * 12))) goto L7693C;
+    if (*(short *)mouse_y < *(short *)(D_00187626 + (l_18 * 12))) goto L7693C;
 L7693A:;
     goto L76946;
 L7693C:;
@@ -1566,56 +1566,56 @@ L76946:;
     goto L768DE;
 }
 
-void func_00076952(void)
+void service_menu_close(void)
 {
 L76960:;
-    if (*(signed char *)D_0012AC00 == 0) goto L76970;
+    if (*(signed char *)mouse_buttons == 0) goto L76970;
     func_0012B136();
     goto L76960;
 L76970:;
-    if (*(signed char *)D_00142309 != 0) goto L76970;
-    if (*(int *)D_00195BE8 == 0) goto L7698E;
-    if (*(int *)D_00195BE8 != (-1751672937)) goto L76990;
+    if (*(signed char *)key_down_esc != 0) goto L76970;
+    if (*(int *)window_image == 0) goto L7698E;
+    if (*(int *)window_image != (-1751672937)) goto L76990;
 L7698E:;
     goto L769AE;
 L76990:;
-    func_000A0024(*(int *)D_00195BE8, (int)D_00176198, 1372);
-    *(int *)D_00195BE8 = -1751672937;
+    func_000A0024(*(int *)window_image, (int)D_00176198, 1372);
+    *(int *)window_image = -1751672937;
 L769AE:;
-    *(signed char *)D_00196274 = 0;
+    *(signed char *)game_mode = 0;
     *(signed char *)D_00196272 = 0;
 }
 
-void func_000769C6(void)
+void service_menu_talk(void)
 {
-    func_00076952();
-    func_000756C6(*(int *)D_001A4C84);
+    service_menu_close();
+    npc_talk(*(int *)service_menu_npc);
 }
 
-void func_000769ED(void)
+void service_menu_service(void)
 {
-    func_00076952();
-    ((int (*)())(*(int *)D_001A4C98))(1);
+    service_menu_close();
+    ((int (*)())(*(int *)service_menu_handler))(1);
 }
 
-void func_00076A15(void)
+void service_menu_sell(void)
 {
-    func_00075B3F();
+    repair_menu_sell();
 }
 
-int func_00076A32(int a1)
+int shelf_shop_stocked(int a1)
 {
     int l_1C;
 
     l_1C = 0;
 L76A4A:;
-    if (l_1C < *(int *)D_001A4C8C) goto L76A5F;
+    if (l_1C < *(int *)stocked_shop_count) goto L76A5F;
     goto L76A7B;
 L76A57:;
     l_1C++;
     goto L76A4A;
 L76A5F:;
-    if (*(int *)(D_001A4B80 + (l_1C << 2)) != a1) goto L76A79;
+    if (*(int *)(stocked_shop_ids + (l_1C << 2)) != a1) goto L76A79;
     return 1;
 L76A79:;
     goto L76A57;
@@ -1629,39 +1629,39 @@ void func_00076A8F(int a1)
     a1 = *(int *)((char *)a1 + 63);
 L76AAF:;
     if (a1 == 0) return;
-    *(int *)((char *)a1 + 7) = *(int *)(*(char **)D_00195AA4 + 7);
-    *(int *)((char *)a1 + 11) = *(int *)(*(char **)D_00195AA4 + 11);
-    *(int *)((char *)a1 + 15) = *(int *)(*(char **)D_00195AA4 + 15);
+    *(int *)((char *)a1 + 7) = *(int *)(*(char **)player_object + 7);
+    *(int *)((char *)a1 + 11) = *(int *)(*(char **)player_object + 11);
+    *(int *)((char *)a1 + 15) = *(int *)(*(char **)player_object + 15);
     a1 = *(int *)((char *)a1 + 55);
     goto L76AAF;
 }
 
-void func_00076AF4(void)
+void ambient_dungeon_sounds(void)
 {
-    if (((int)(unsigned char)*(signed char *)D_001789FA) != 3) goto L76B17;
+    if (((int)(unsigned char)*(signed char *)player_environment) != 3) goto L76B17;
     if (*(signed char *)D_001962A1 == 0) goto L76B19;
 L76B17:;
     return;
 L76B19:;
     if (func_0009DC25() >= 20) return;
-    func_00069938(func_0007D6AE(0, 14) + 329, *(int *)D_00195AA4, 100);
+    sound_play(rand_range(0, 14) + 329, *(int *)player_object, 100);
 }
 
-void func_00076B50(void)
+void footstep_sounds(void)
 {
     int l_1C;
     int l_18;
 
-    if (func_000C7FD9(*(int *)D_001A4FBC, *(int *)D_001A4FC4, *(int *)(*(char **)D_00195AA4 + 7), *(int *)(*(char **)D_00195AA4 + 15)) <= 100) goto L76B8C;
-    if (*(signed char *)D_00196277 != 0) goto L76B91;
+    if (func_000C7FD9(*(int *)D_001A4FBC, *(int *)D_001A4FC4, *(int *)(*(char **)player_object + 7), *(int *)(*(char **)player_object + 15)) <= 100) goto L76B8C;
+    if (*(signed char *)player_on_ground != 0) goto L76B91;
 L76B8C:;
     return;
 L76B91:;
-    *(int *)D_001A4FBC = *(int *)(*(char **)D_00195AA4 + 7);
-    *(int *)D_001A4FC4 = *(int *)(*(char **)D_00195AA4 + 15);
-    switch (*(unsigned char *)D_001789FA) {
+    *(int *)D_001A4FBC = *(int *)(*(char **)player_object + 7);
+    *(int *)D_001A4FC4 = *(int *)(*(char **)player_object + 15);
+    switch (*(unsigned char *)player_environment) {
 case 1:
-    l_18 = (int)(unsigned char)*(signed char *)(D_00195E2A + func_0001FFF1());
+    l_18 = (int)(unsigned char)*(signed char *)(climate_weathers + climate_category());
     if ((l_18 & 127) != 5) goto L76BFA;
     l_1C = 6;
     goto L76C01;
@@ -1680,46 +1680,46 @@ L76C2A:;
     l_1C = 0;
 L76C31:;
     l_1C <<= 1;
-    if (*(int *)D_0012DE00 == 10000) goto L76C50;
-    if (*(int *)(*(char **)D_00195AA4 + 11) > *(int *)D_0012DE00) goto L76C52;
+    if (*(int *)dungeon_water_level == 10000) goto L76C50;
+    if (*(int *)(*(char **)player_object + 11) > *(int *)dungeon_water_level) goto L76C52;
 L76C50:;
     goto L76C5B;
 L76C52:;
-    if (*(signed char *)D_0019627D == 0) goto L76C5D;
+    if (*(signed char *)in_dungeon_water == 0) goto L76C5D;
 L76C5B:;
     goto L76C64;
 L76C5D:;
     l_1C = 8;
 L76C64:;
-    if (*(signed char *)D_0019627D == 0) goto L76C79;
-    if (((int)(unsigned char)*(signed char *)D_0019627C) != 1) goto L76C7B;
+    if (*(signed char *)in_dungeon_water == 0) goto L76C79;
+    if (((int)(unsigned char)*(signed char *)player_underwater) != 1) goto L76C7B;
 L76C79:;
     goto L76C84;
 L76C7B:;
     l_1C = 10;
     goto L76C8D;
 L76C84:;
-    if (*(signed char *)D_0019627D != 0) return;
+    if (*(signed char *)in_dungeon_water != 0) return;
 default:
 L76C8D:;
     if (*(signed char *)D_001962A0 == 0) goto L76C9D;
     l_1C = 10;
 L76C9D:;
-    func_00076DB9();
-    if (((int)(unsigned short)(*(short *)(*(char **)D_00195BE0 + 64) & 1536)) != 0) return;
+    position_history_record();
+    if (((int)(unsigned short)(*(short *)(*(char **)player_character + 64) & 1536)) != 0) return;
     if (((struct bf8_6_1 *)&D_001940D7)->f == 0) goto L76CC8;
     l_1C++;
 L76CC8:;
     *(signed char *)D_001940D7 ^= 64;
-    func_00069938((int)(unsigned char)*(signed char *)(D_00187670 + l_1C), *(int *)D_00195AA4, 100);
+    sound_play((int)(unsigned char)*(signed char *)(footstep_sound_ids + l_1C), *(int *)player_object, 100);
 }
 }
 
-void func_00076CF7(void)
+void position_history_reset(void)
 {
     int l_18;
 
-    *(int *)D_001A4FCC = (*(int *)D_001A4FB8 = (*(int *)D_001A4FD4 = (*(int *)D_001A4FC8 = 0)));
+    *(int *)D_001A4FCC = (*(int *)position_history_next = (*(int *)D_001A4FD4 = (*(int *)ground_position_history_next = 0)));
     l_18 = 0;
 L76D34:;
     if (l_18 < 32) goto L76D44;
@@ -1728,24 +1728,24 @@ L76D3C:;
     l_18++;
     goto L76D34;
 L76D44:;
-    *(int *)(D_001A4CA0 + (l_18 * 12)) = (*(int *)(D_001A4E20 + (l_18 * 12)) = *(int *)(*(char **)D_00195AA4 + 7));
-    *(int *)(D_001A4CA4 + (l_18 * 12)) = (*(int *)(D_001A4E24 + (l_18 * 12)) = *(int *)(*(char **)D_00195AA4 + 11));
-    *(int *)(D_001A4CA8 + (l_18 * 12)) = (*(int *)(D_001A4E28 + (l_18 * 12)) = *(int *)(*(char **)D_00195AA4 + 15));
+    *(int *)(position_history + (l_18 * 12)) = (*(int *)(ground_position_history + (l_18 * 12)) = *(int *)(*(char **)player_object + 7));
+    *(int *)(D_001A4CA4 + (l_18 * 12)) = (*(int *)(D_001A4E24 + (l_18 * 12)) = *(int *)(*(char **)player_object + 11));
+    *(int *)(D_001A4CA8 + (l_18 * 12)) = (*(int *)(D_001A4E28 + (l_18 * 12)) = *(int *)(*(char **)player_object + 15));
     goto L76D3C;
 }
 
-void func_00076DB9(void)
+void position_history_record(void)
 {
-    *(int *)(D_001A4CA0 + (*(int *)D_001A4FB8 * 12)) = *(int *)(*(char **)D_00195AA4 + 7);
-    *(int *)(D_001A4CA4 + (*(int *)D_001A4FB8 * 12)) = *(int *)(*(char **)D_00195AA4 + 11);
-    *(int *)(D_001A4CA8 + (*(int *)D_001A4FB8 * 12)) = *(int *)(*(char **)D_00195AA4 + 15);
-    *(int *)D_001A4FB8 = (*(int *)D_001A4FB8 + 1) % 32;
+    *(int *)(position_history + (*(int *)position_history_next * 12)) = *(int *)(*(char **)player_object + 7);
+    *(int *)(D_001A4CA4 + (*(int *)position_history_next * 12)) = *(int *)(*(char **)player_object + 11);
+    *(int *)(D_001A4CA8 + (*(int *)position_history_next * 12)) = *(int *)(*(char **)player_object + 15);
+    *(int *)position_history_next = (*(int *)position_history_next + 1) % 32;
     (*(int *)D_001A4FCC)++;
-    if (*(signed char *)D_00196277 == 0) return;
-    *(int *)(D_001A4E20 + (*(int *)D_001A4FC8 * 12)) = *(int *)(*(char **)D_00195AA4 + 7);
-    *(int *)(D_001A4E24 + (*(int *)D_001A4FC8 * 12)) = *(int *)(*(char **)D_00195AA4 + 11);
-    *(int *)(D_001A4E28 + (*(int *)D_001A4FC8 * 12)) = *(int *)(*(char **)D_00195AA4 + 15);
-    *(int *)D_001A4FC8 = (*(int *)D_001A4FC8 + 1) % 32;
+    if (*(signed char *)player_on_ground == 0) return;
+    *(int *)(ground_position_history + (*(int *)ground_position_history_next * 12)) = *(int *)(*(char **)player_object + 7);
+    *(int *)(D_001A4E24 + (*(int *)ground_position_history_next * 12)) = *(int *)(*(char **)player_object + 11);
+    *(int *)(D_001A4E28 + (*(int *)ground_position_history_next * 12)) = *(int *)(*(char **)player_object + 15);
+    *(int *)ground_position_history_next = (*(int *)ground_position_history_next + 1) % 32;
     (*(int *)D_001A4FD4)++;
 }
 
@@ -1758,11 +1758,11 @@ int func_00076E98(int a1)
     if (*(signed char *)D_0019629D == 0) goto L76EBE;
     return 0;
 L76EBE:;
-    if (func_00023C72(*(int *)D_00195AA4, a1) != 0) goto L76ED8;
+    if (collide_line_of_sight(*(int *)player_object, a1) != 0) goto L76ED8;
     return 0;
 L76ED8:;
-    l_24 = func_000C808D(*(int *)(*(char **)D_00195AA4 + 7), *(int *)(*(char **)D_00195AA4 + 15), *(int *)((char *)a1 + 7), *(int *)((char *)a1 + 15));
-    l_20 = func_00062EF7((int)(short)*(short *)((char *)a1 + 3), l_24, (int)&l_1C);
+    l_24 = func_000C808D(*(int *)(*(char **)player_object + 7), *(int *)(*(char **)player_object + 15), *(int *)((char *)a1 + 7), *(int *)((char *)a1 + 15));
+    l_20 = ai_angle_diff((int)(short)*(short *)((char *)a1 + 3), l_24, (int)&l_1C);
     return ((l_20 < 400) ? 1 : 0);
 }
 
@@ -1776,12 +1776,12 @@ int func_00076FF2(int a1)
 
     l_1C = 0;
     if (l_1C >= 20) goto L770B4;
-    l_2C = ((func_0009DC25() % 90) + ((int)(short)*(short *)((char *)*(int *)D_00195AA4 + 3))) - 45;
+    l_2C = ((func_0009DC25() % 90) + ((int)(short)*(short *)((char *)*(int *)player_object + 3))) - 45;
     l_2C &= 2047;
-    l_28 = (func_0007D6AE(1, 512) + *(int *)D_000CEA24) - 256;
+    l_28 = (rand_range(1, 512) + *(int *)D_000CEA24) - 256;
     func_000CE6E2(l_2C, l_28, (int)&l_24, (int)&l_20);
-    *(int *)((char *)a1 + 7) = *(int *)(*(char **)D_00195AA4 + 7) + l_24;
-    *(int *)((char *)a1 + 15) = *(int *)(*(char **)D_00195AA4 + 15) + l_20;
+    *(int *)((char *)a1 + 7) = *(int *)(*(char **)player_object + 7) + l_24;
+    *(int *)((char *)a1 + 15) = *(int *)(*(char **)player_object + 15) + l_20;
     *(int *)((char *)a1 + 11) = func_0014B45B(*(int *)((char *)a1 + 7), *(int *)((char *)a1 + 15));
     return 1;
 L770B4:;
@@ -1793,9 +1793,9 @@ L770C6:;
     l_1C++;
     goto L770BB;
 L770CE:;
-    func_000CE6E2(func_0009DC25() % 2048, func_0007D6AE(512, 768), (int)&l_24, (int)&l_20);
-    *(int *)((char *)a1 + 7) = *(int *)(*(char **)D_00195AA4 + 7) + l_24;
-    *(int *)((char *)a1 + 15) = *(int *)(*(char **)D_00195AA4 + 15) + l_20;
+    func_000CE6E2(func_0009DC25() % 2048, rand_range(512, 768), (int)&l_24, (int)&l_20);
+    *(int *)((char *)a1 + 7) = *(int *)(*(char **)player_object + 7) + l_24;
+    *(int *)((char *)a1 + 15) = *(int *)(*(char **)player_object + 15) + l_20;
     *(int *)((char *)a1 + 11) = func_0014B45B(*(int *)((char *)a1 + 7), *(int *)((char *)a1 + 15));
     if (func_00076E98(a1) != 0) goto L77152;
     return 1;
@@ -1825,16 +1825,16 @@ L771A6:;
     l_18++;
     goto L7719B;
 L771AE:;
-    func_000CE6E2(func_0009DC25() % 2048, func_0007D6AE(a2, a3), (int)&l_20, (int)&l_1C);
-    *(int *)((char *)a1 + 7) = *(int *)(*(char **)D_00195AA4 + 7) + l_20;
-    *(int *)((char *)a1 + 15) = *(int *)(*(char **)D_00195AA4 + 15) + l_1C;
+    func_000CE6E2(func_0009DC25() % 2048, rand_range(a2, a3), (int)&l_20, (int)&l_1C);
+    *(int *)((char *)a1 + 7) = *(int *)(*(char **)player_object + 7) + l_20;
+    *(int *)((char *)a1 + 15) = *(int *)(*(char **)player_object + 15) + l_1C;
     *(int *)((char *)a1 + 11) = func_0014B45B(*(int *)((char *)a1 + 7), *(int *)((char *)a1 + 15));
     if (func_0004083A(a1, *(int *)((char *)a1 + 7) - *(int *)(*(char **)D_00195AC4 + 7), *(int *)((char *)a1 + 15) - *(int *)(*(char **)D_00195AC4 + 15)) == 0) goto L77250;
     return 1;
 L77250:;
     goto L771A6;
 L77255:;
-    if (*(int *)D_001A4FB8 >= 20) goto L7726A;
+    if (*(int *)position_history_next >= 20) goto L7726A;
     return 0;
 L7726A:;
     l_18 = 0;
@@ -1846,13 +1846,13 @@ L7727C:;
     goto L77271;
 L77284:;
     l_14 = func_0009DC25() % 32;
-    l_24 = func_000C7FD9(*(int *)(*(char **)D_00195AA4 + 7), *(int *)(*(char **)D_00195AA4 + 15), *(int *)(D_001A4CA0 + (l_14 * 12)), *(int *)(D_001A4CA8 + (l_14 * 12)));
+    l_24 = func_000C7FD9(*(int *)(*(char **)player_object + 7), *(int *)(*(char **)player_object + 15), *(int *)(position_history + (l_14 * 12)), *(int *)(D_001A4CA8 + (l_14 * 12)));
     if (l_24 <= a2) goto L772D6;
     if (l_24 < a3) goto L772D8;
 L772D6:;
     goto L77329;
 L772D8:;
-    *(int *)((char *)a1 + 7) = *(int *)(D_001A4CA0 + (l_14 * 12));
+    *(int *)((char *)a1 + 7) = *(int *)(position_history + (l_14 * 12));
     *(int *)((char *)a1 + 11) = *(int *)(D_001A4CA4 + (l_14 * 12));
     *(int *)((char *)a1 + 15) = *(int *)(D_001A4CA8 + (l_14 * 12));
     if (func_0004083A(a1, *(int *)((char *)a1 + 7), *(int *)((char *)a1 + 15)) == 0) goto L77329;
@@ -1867,18 +1867,18 @@ void func_00077340(int a1)
 {
     int l_18;
 
-    if (*(int *)D_00195B50 == 0) return;
+    if (*(int *)guild_npc_object == 0) return;
     if (((int)(unsigned char)*(signed char *)((char *)a1)) != 18) return;
-    l_18 = func_000C7FF4(*(int *)(*(char **)D_00195B50 + 11) - *(int *)((char *)a1 + 11), func_000C7FD9(*(int *)(*(char **)D_00195B50 + 7), *(int *)(*(char **)D_00195B50 + 15), *(int *)((char *)a1 + 7), *(int *)((char *)a1 + 15)));
+    l_18 = func_000C7FF4(*(int *)(*(char **)guild_npc_object + 11) - *(int *)((char *)a1 + 11), func_000C7FD9(*(int *)(*(char **)guild_npc_object + 7), *(int *)(*(char **)guild_npc_object + 15), *(int *)((char *)a1 + 7), *(int *)((char *)a1 + 15)));
     if (l_18 >= 64) return;
-    *(int *)D_00195B50 = 0;
+    *(int *)guild_npc_object = 0;
 }
 
 int func_000773BE(int a1)
 {
-    *(int *)D_00195B50 = a1;
-    func_0008E3F7(*(int *)D_00195AC4, (int)func_00077340);
-    return ((*(int *)D_00195B50 == 0) ? 1 : 0);
+    *(int *)guild_npc_object = a1;
+    object_foreach(*(int *)D_00195AC4, (int)func_00077340);
+    return ((*(int *)guild_npc_object == 0) ? 1 : 0);
 }
 
 int func_00077412(int a1)
@@ -1888,7 +1888,7 @@ int func_00077412(int a1)
     int l_20;
     int l_1C;
 
-    l_20 = func_0009A663(*(int *)(*(char **)(*(char **)D_00195AA4 + 67) + 63), 6);
+    l_20 = marker_count(*(int *)(*(char **)(*(char **)player_object + 67) + 63), 6);
     if (l_20 != 0) goto L7744D;
     return 0;
 L7744D:;
@@ -1901,9 +1901,9 @@ L77473:;
     l_28++;
     goto L77466;
 L7747B:;
-    l_1C = func_0009A0A0(*(int *)(*(char **)(*(char **)D_00195AA4 + 67) + 63), 6, l_24);
-    if (func_0009DEAC(*(int *)(*(char **)D_00195AA4 + 11) - *(int *)((char *)l_1C + 11)) >= 64) goto L77510;
-    if (func_000C7FD9(*(int *)(*(char **)D_00195AA4 + 7), *(int *)(*(char **)D_00195AA4 + 15), *(int *)((char *)l_1C + 7), *(int *)((char *)l_1C + 15)) <= 80) goto L77510;
+    l_1C = marker_find_nth(*(int *)(*(char **)(*(char **)player_object + 67) + 63), 6, l_24);
+    if (func_0009DEAC(*(int *)(*(char **)player_object + 11) - *(int *)((char *)l_1C + 11)) >= 64) goto L77510;
+    if (func_000C7FD9(*(int *)(*(char **)player_object + 7), *(int *)(*(char **)player_object + 15), *(int *)((char *)l_1C + 7), *(int *)((char *)l_1C + 15)) <= 80) goto L77510;
     if (func_00076E98(a1) != 0) goto L77510;
     *(int *)((char *)a1 + 7) = *(int *)((char *)l_1C + 7);
     *(int *)((char *)a1 + 15) = *(int *)((char *)l_1C + 15);
@@ -1921,9 +1921,9 @@ L77538:;
     l_28++;
     goto L7752B;
 L77540:;
-    l_1C = func_0009A0A0(*(int *)(*(char **)(*(char **)D_00195AA4 + 67) + 63), 6, l_24);
-    if (func_0009DEAC(*(int *)(*(char **)D_00195AA4 + 11) - *(int *)((char *)l_1C + 11)) <= 64) goto L775D2;
-    if (func_000C7FD9(*(int *)(*(char **)D_00195AA4 + 7), *(int *)(*(char **)D_00195AA4 + 15), *(int *)((char *)l_1C + 7), *(int *)((char *)l_1C + 15)) <= 80) goto L775D2;
+    l_1C = marker_find_nth(*(int *)(*(char **)(*(char **)player_object + 67) + 63), 6, l_24);
+    if (func_0009DEAC(*(int *)(*(char **)player_object + 11) - *(int *)((char *)l_1C + 11)) <= 64) goto L775D2;
+    if (func_000C7FD9(*(int *)(*(char **)player_object + 7), *(int *)(*(char **)player_object + 15), *(int *)((char *)l_1C + 7), *(int *)((char *)l_1C + 15)) <= 80) goto L775D2;
     if (func_00076E98(a1) != 0) goto L775D2;
     *(int *)((char *)a1 + 7) = *(int *)((char *)l_1C + 7);
     *(int *)((char *)a1 + 15) = *(int *)((char *)l_1C + 15);
@@ -1933,7 +1933,7 @@ L775D2:;
     l_24 = (l_24 + 1) % l_20;
     goto L77538;
 L775E6:;
-    l_1C = func_0009A0A0(*(int *)(*(char **)(*(char **)D_00195AA4 + 67) + 63), 6, l_24);
+    l_1C = marker_find_nth(*(int *)(*(char **)(*(char **)player_object + 67) + 63), 6, l_24);
     *(int *)((char *)a1 + 7) = *(int *)((char *)l_1C + 7);
     *(int *)((char *)a1 + 15) = *(int *)((char *)l_1C + 15);
     *(int *)((char *)a1 + 11) = *(int *)((char *)l_1C + 11);
@@ -1956,8 +1956,8 @@ int func_00077639(int a1, int a2, int a3, int a4)
 L7765C:;
     return 0;
 L77668:;
-    l_2C = func_0009A915(*(int *)(*(char **)D_00195AA4 + 7), *(int *)(*(char **)D_00195AA4 + 15));
-    l_28 = func_0008E767(l_2C, 60);
+    l_2C = location_cell_at(*(int *)(*(char **)player_object + 7), *(int *)(*(char **)player_object + 15));
+    l_28 = object_find_type(l_2C, 60);
     if (l_28 != 0) goto L776A2;
     return 0;
 L776A2:;
@@ -1976,7 +1976,7 @@ L776DA:;
     *(int *)((char *)l_80 + 7) = (((l_10 % 8) << 8) + *(int *)((char *)l_28 + 7)) + 128;
     *(int *)((char *)l_80 + 15) = (((l_10 / 8) << 8) + *(int *)((char *)l_28 + 15)) + 128;
     *(int *)((char *)l_80 + 11) = (-(a2 << 8)) - 80;
-    l_18 = func_000C7FD9(*(int *)(*(char **)D_00195AA4 + 7), *(int *)(*(char **)D_00195AA4 + 15), *(int *)((char *)l_80 + 7), *(int *)((char *)l_80 + 15));
+    l_18 = func_000C7FD9(*(int *)(*(char **)player_object + 7), *(int *)(*(char **)player_object + 15), *(int *)((char *)l_80 + 7), *(int *)((char *)l_80 + 15));
     if (l_18 >= l_14) goto L7776C;
     if (l_18 > a3) goto L7776E;
 L7776C:;
@@ -2003,7 +2003,7 @@ int func_000777B8(int a1, int a2, int a3)
     int l_18;
     int l_14;
 
-    l_20 = (-*(int *)(*(char **)D_00195AA4 + 11)) / 256;
+    l_20 = (-*(int *)(*(char **)player_object + 11)) / 256;
     if (func_00077639(a1, l_20, a2, a3) == 0) goto L77809;
     if (func_000773BE(a1) == 0) goto L7780B;
 L77809:;
@@ -2028,7 +2028,7 @@ L77851:;
 L7785D:;
     goto L77826;
 L7785F:;
-    if (*(int *)D_001A4FB8 >= 20) goto L77874;
+    if (*(int *)position_history_next >= 20) goto L77874;
     return 0;
 L77874:;
     l_14 = 0;
@@ -2040,13 +2040,13 @@ L77886:;
     goto L7787B;
 L7788E:;
     l_1C = func_0009DC25() % 32;
-    l_18 = func_000C7FD9(*(int *)(*(char **)D_00195AA4 + 7), *(int *)(*(char **)D_00195AA4 + 15), *(int *)(D_001A4CA0 + (l_1C * 12)), *(int *)(D_001A4CA8 + (l_1C * 12)));
+    l_18 = func_000C7FD9(*(int *)(*(char **)player_object + 7), *(int *)(*(char **)player_object + 15), *(int *)(position_history + (l_1C * 12)), *(int *)(D_001A4CA8 + (l_1C * 12)));
     if (l_18 <= a2) goto L778E0;
     if (l_18 < a3) goto L778E2;
 L778E0:;
     goto L77927;
 L778E2:;
-    *(int *)((char *)a1 + 7) = *(int *)(D_001A4CA0 + (l_1C * 12));
+    *(int *)((char *)a1 + 7) = *(int *)(position_history + (l_1C * 12));
     *(int *)((char *)a1 + 11) = *(int *)(D_001A4CA4 + (l_1C * 12));
     *(int *)((char *)a1 + 15) = *(int *)(D_001A4CA8 + (l_1C * 12));
     if (func_00076F3D(a1) == 0) goto L77927;
@@ -2060,16 +2060,16 @@ L7792C:;
     return 0;
 }
 
-void func_00078235(void)
+void ambient_outdoor_sounds(void)
 {
     int l_20;
     int l_1C;
     int l_18;
 
-    if (((int)(unsigned char)*(signed char *)D_001789FA) != 1) goto L7839F;
-    l_1C = func_0008661C(*(int *)(*(char **)D_00195AA4 + 7), *(int *)(*(char **)D_00195AA4 + 15));
+    if (((int)(unsigned char)*(signed char *)player_environment) != 1) goto L7839F;
+    l_1C = location_contains(*(int *)(*(char **)player_object + 7), *(int *)(*(char **)player_object + 15));
     if (l_1C == 0) goto L78283;
-    if (((int)(unsigned char)*(signed char *)(*(char **)D_00195BDC + 34)) == 12) goto L78285;
+    if (((int)(unsigned char)*(signed char *)(*(char **)current_location + 34)) == 12) goto L78285;
 L78283:;
     goto L7828F;
 L78285:;
@@ -2077,10 +2077,10 @@ L78285:;
 L7828F:;
     goto L782A6;
 L78291:;
-    func_00069938(16, *(int *)D_00195AA4, 100);
+    sound_play(16, *(int *)player_object, 100);
 L782A6:;
     if (l_1C == 0) goto L782BE;
-    if (((int)(unsigned char)*(signed char *)(*(char **)D_00195BDC + 34)) == 12) goto L782C0;
+    if (((int)(unsigned char)*(signed char *)(*(char **)current_location + 34)) == 12) goto L782C0;
 L782BE:;
     goto L782CA;
 L782C0:;
@@ -2088,9 +2088,9 @@ L782C0:;
 L782CA:;
     goto L782E1;
 L782CC:;
-    func_00069938(383, *(int *)D_00195AA4, 100);
+    sound_play(383, *(int *)player_object, 100);
 L782E1:;
-    l_18 = (int)(unsigned char)*(signed char *)(D_00195E2A + func_0001FFF1());
+    l_18 = (int)(unsigned char)*(signed char *)(climate_weathers + climate_category());
     if (l_18 == 4) goto L782FF;
     if (l_18 != 5) goto L78301;
 L782FF:;
@@ -2117,41 +2117,41 @@ L78339:;
 L78343:;
     goto L78362;
 L78345:;
-    func_00069938((func_0009DC25() & 1) + 300, *(int *)D_00195AA4, 100);
+    sound_play((func_0009DC25() & 1) + 300, *(int *)player_object, 100);
 L78362:;
-    if (((int)(unsigned short)(*(short *)(*(char **)D_00195BE0 + 64) & 1536)) == 0) goto L78383;
+    if (((int)(unsigned short)(*(short *)(*(char **)player_character + 64) & 1536)) == 0) goto L78383;
     if (func_0009DC25() < 80) goto L78385;
 L78383:;
     goto L7839A;
 L78385:;
-    func_00069938(367, *(int *)D_00195AA4, 100);
+    sound_play(367, *(int *)player_object, 100);
 L7839A:;
     goto L78426;
 L7839F:;
-    if (((int)(unsigned char)*(signed char *)D_001789FA) != 3) goto L783E7;
-    if (*(int *)D_0012DE00 == 10000) goto L783C1;
+    if (((int)(unsigned char)*(signed char *)player_environment) != 3) goto L783E7;
+    if (*(int *)dungeon_water_level == 10000) goto L783C1;
     if (func_0009DC25() < 50) goto L783C3;
 L783C1:;
     goto L783E5;
 L783C3:;
-    func_000699D8(302, *(int *)(*(char **)D_00195AA4 + 7), *(int *)D_0012DE00, *(int *)(*(char **)D_00195AA4 + 15), 100);
+    sound_play_at_point(302, *(int *)(*(char **)player_object + 7), *(int *)dungeon_water_level, *(int *)(*(char **)player_object + 15), 100);
 L783E5:;
     goto L78426;
 L783E7:;
-    if (((int)(unsigned char)*(signed char *)D_001789FA) != 2) goto L78426;
-    if (((int)(unsigned char)*(signed char *)(*(char **)D_00195A9C + 24)) != 5) goto L7840F;
+    if (((int)(unsigned char)*(signed char *)player_environment) != 2) goto L78426;
+    if (((int)(unsigned char)*(signed char *)(*(char **)current_building + 24)) != 5) goto L7840F;
     if (func_0009DC25() < 100) goto L78411;
 L7840F:;
     goto L78426;
 L78411:;
-    func_00069938(376, *(int *)D_00195AA4, 100);
+    sound_play(376, *(int *)player_object, 100);
 L78426:;
-    if (((int)(unsigned char)*(signed char *)(*(char **)D_00195BE0 + 67)) <= 8) goto L78442;
+    if (((int)(unsigned char)*(signed char *)(*(char **)player_character + 67)) <= 8) goto L78442;
     if (func_0009DC25() < 50) goto L78444;
 L78442:;
     return;
 L78444:;
-    func_00069938(10090, *(int *)D_00195AA4, 100);
+    sound_play(10090, *(int *)player_object, 100);
 }
 
 int func_00078463(void)
@@ -2183,14 +2183,14 @@ L784DA:;
     return 0;
 }
 
-void func_000784EE(void)
+void cheat_return_to_last_position(void)
 {
-    (*(int *)D_001A4FC8)--;
-    if (*(int *)D_001A4FC8 != (-1)) goto L78515;
-    *(int *)D_001A4FC8 = 31;
+    (*(int *)ground_position_history_next)--;
+    if (*(int *)ground_position_history_next != (-1)) goto L78515;
+    *(int *)ground_position_history_next = 31;
 L78515:;
-    *(int *)(*(char **)D_00195AA4 + 7) = *(int *)(D_001A4E20 + (*(int *)D_001A4FC8 * 12));
-    *(int *)(*(char **)D_00195AA4 + 11) = *(int *)(D_001A4E24 + (*(int *)D_001A4FC8 * 12));
-    *(int *)(*(char **)D_00195AA4 + 15) = *(int *)(D_001A4E28 + (*(int *)D_001A4FC8 * 12));
+    *(int *)(*(char **)player_object + 7) = *(int *)(ground_position_history + (*(int *)ground_position_history_next * 12));
+    *(int *)(*(char **)player_object + 11) = *(int *)(D_001A4E24 + (*(int *)ground_position_history_next * 12));
+    *(int *)(*(char **)player_object + 15) = *(int *)(D_001A4E28 + (*(int *)ground_position_history_next * 12));
     *(signed char *)D_001940D5 |= 2;
 }

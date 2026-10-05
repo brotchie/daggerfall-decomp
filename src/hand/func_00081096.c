@@ -4,61 +4,61 @@ struct cam { char pad; short yaw; short pitch; };
 extern int D_000C5400;
 extern int D_001940D4;
 extern int D_001940DA;
-extern int D_001940DB;
-extern int D_001959B8;
+extern int player_motion_flags;
+extern int view_look_pitch;
 extern int D_001959BC;
-extern struct cam *D_00195A98;
-extern struct cam *D_00195AA4;
-extern struct mob *D_00195BE0;
-extern unsigned char D_00195E7A;
-extern char D_00195E7B;
-extern char D_00195E7F;
-extern short D_00195F64;
-extern short D_00195F66;
-extern char D_00196274;
-extern char D_00196277;
-extern char D_0019627D;
-extern int func_00042F0F(int);
+extern struct cam *camera_object;
+extern struct cam *player_object;
+extern struct mob *player_character;
+extern unsigned char mouse_control_mode;
+extern char mouse_turn_rate;
+extern char view_cursor_active;
+extern short mouse_motion_x;
+extern short mouse_motion_y;
+extern char game_mode;
+extern char player_on_ground;
+extern char in_dungeon_water;
+extern int key_action_held(int);
 extern void func_0007EED8(void);
 
-void func_00081096(void)
+void player_mouse_look(void)
 {
     short dy;
     short dx;
 
-    if (D_00196274 || (D_001940D4 & 0x24))
+    if (game_mode || (D_001940D4 & 0x24))
         return;
-    if (D_00195E7A == 1) {
-        if (!D_00195E7F && !func_00042F0F(33)) {
+    if (mouse_control_mode == 1) {
+        if (!view_cursor_active && !key_action_held(33)) {
             func_0007EED8();
-            if (!D_00196274 && (D_00196277 || D_0019627D || (D_001940DB & 0x20) || (D_00195BE0->flags & 8) ? 1 : 0)) {
-                dy = D_00195F64;
-                dx = D_00195F66;
-                if ((unsigned char)D_00195E7B & 0x80)
+            if (!game_mode && (player_on_ground || in_dungeon_water || (player_motion_flags & 0x20) || (player_character->flags & 8) ? 1 : 0)) {
+                dy = mouse_motion_x;
+                dx = mouse_motion_y;
+                if ((unsigned char)mouse_turn_rate & 0x80)
                     dx = -dx;
-                D_00195AA4->yaw += dx;
-                D_00195AA4->pitch += dy;
+                player_object->yaw += dx;
+                player_object->pitch += dy;
                 if (dy > 2)
                     D_000C5400 = -8;
                 else if (dy < -2)
                     D_000C5400 = 8;
-                if (D_00195AA4->yaw < -256)
-                    D_00195AA4->yaw = -256;
-                else if (D_00195AA4->yaw > 256)
-                    D_00195AA4->yaw = 256;
-                D_00195A98->yaw = D_00195AA4->yaw;
-                D_00195A98->pitch = D_00195AA4->pitch;
+                if (player_object->yaw < -256)
+                    player_object->yaw = -256;
+                else if (player_object->yaw > 256)
+                    player_object->yaw = 256;
+                camera_object->yaw = player_object->yaw;
+                camera_object->pitch = player_object->pitch;
             }
         }
     } else if (D_001940DA & 0x40) {
-        dy = D_00195F64;
-        dx = D_00195F66;
-        D_001959B8 += dx;
+        dy = mouse_motion_x;
+        dx = mouse_motion_y;
+        view_look_pitch += dx;
         D_001959BC += dy;
-        if (D_001959B8 < -256)
-            D_001959B8 = -256;
-        else if (D_001959B8 > 256)
-            D_001959B8 = 256;
+        if (view_look_pitch < -256)
+            view_look_pitch = -256;
+        else if (view_look_pitch > 256)
+            view_look_pitch = 256;
         if (D_001959BC < -512)
             D_001959BC = -512;
         else if (D_001959BC > 512)

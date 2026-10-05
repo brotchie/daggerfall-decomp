@@ -2,57 +2,57 @@
  * do not edit: move a function to src/intrface.c to work on it by hand) */
 
 struct bf8_0_1 { unsigned char f:1; };
-extern char D_0012AC00[];
-extern char D_0012AC04[];
-extern char D_0012AC06[];
+extern char mouse_buttons[];
+extern char mouse_x[];
+extern char mouse_y[];
 extern char D_001788CF[];
-extern char D_00178A01[];
-extern char D_00195BE0[];
-extern char D_00195E7A[];
+extern char player_speed[];
+extern char player_character[];
+extern char mouse_control_mode[];
 extern char D_00195F4E[];
 extern char D_0019628E[];
 extern char D_001A5AE8[];
-extern char D_001A5AF4[];
+extern char turn_this_frame[];
 extern char D_001A5AFC[];
-extern char D_001A5B08[];
-extern char D_001A5B24[];
-extern char D_001A5B26[];
-extern char D_001A5B28[];
-extern char D_001A5B2A[];
-extern char D_001A5B2C[];
-extern char D_001A5B2E[];
-extern char D_001A5B32[];
+extern char move_angle_offset[];
+extern char steer_weight_down[];
+extern char steer_weight_right[];
+extern char steer_region_width[];
+extern char steer_region_height[];
+extern char steer_weight_left[];
+extern char steer_weight_up[];
+extern char steer_key_region[];
 
 extern int func_000CAE00();
 
-void func_00081EF4(int a1, int a2, int a3, int a4)
+void intrface_steer(int a1, int a2, int a3, int a4)
 {
     int l_C;
 {
     unsigned char l_20;
 
-    if (((int)(unsigned char)(*(signed char *)D_0012AC00 & 1)) != 0) goto L81F2B;
-    if (((int)(short)*(short *)D_001A5B32) == (-1)) goto L82013;
+    if (((int)(unsigned char)(*(signed char *)mouse_buttons & 1)) != 0) goto L81F2B;
+    if (((int)(short)*(short *)steer_key_region) == (-1)) goto L82013;
 L81F2B:;
-    if (((int)(short)*(short *)D_001A5B32) != (-1)) goto L81FE5;
+    if (((int)(short)*(short *)steer_key_region) != (-1)) goto L81FE5;
     *(int *)D_001A5AFC = *(int *)D_001788CF;
-    *(short *)D_001A5B26 = ((((int)(short)*(short *)D_0012AC04) - a3) << 8) / ((int)(short)*(short *)D_001A5B28);
-    *(short *)D_001A5B24 = ((((int)(short)*(short *)D_0012AC06) - a4) << 8) / ((int)(short)*(short *)D_001A5B2A);
-    *(short *)D_001A5B2C = ((((int)(short)*(short *)D_001A5B28) - (((int)(short)*(short *)D_0012AC04) - a3)) << 8) / ((int)(short)*(short *)D_001A5B28);
-    *(short *)D_001A5B2E = ((((int)(short)*(short *)D_001A5B2A) - (((int)(short)*(short *)D_0012AC06) - a4)) << 8) / ((int)(short)*(short *)D_001A5B2A);
+    *(short *)steer_weight_right = ((((int)(short)*(short *)mouse_x) - a3) << 8) / ((int)(short)*(short *)steer_region_width);
+    *(short *)steer_weight_down = ((((int)(short)*(short *)mouse_y) - a4) << 8) / ((int)(short)*(short *)steer_region_height);
+    *(short *)steer_weight_left = ((((int)(short)*(short *)steer_region_width) - (((int)(short)*(short *)mouse_x) - a3)) << 8) / ((int)(short)*(short *)steer_region_width);
+    *(short *)steer_weight_up = ((((int)(short)*(short *)steer_region_height) - (((int)(short)*(short *)mouse_y) - a4)) << 8) / ((int)(short)*(short *)steer_region_height);
     goto L82013;
 L81FE5:;
     l_C = 1132;
     if ((*(int *)D_001A5AFC = *(int *)((char *)l_C) - *(int *)D_001A5AE8) <= *(int *)D_001788CF) goto L82013;
     *(int *)D_001A5AFC = *(int *)D_001788CF;
 L82013:;
-    *(int *)D_001A5B08 = 0;
-    *(short *)D_00178A01 = *(short *)D_00195F4E;
-    if (((struct bf8_0_1 *)(*(char **)D_00195BE0 + 137))->f != 0) goto L82061;
-    if (((int)(unsigned char)*(signed char *)D_00195E7A) == 1) goto L82053;
-    if (((int)(unsigned char)(*(signed char *)D_0012AC00 & 1)) != 0) goto L8205F;
+    *(int *)move_angle_offset = 0;
+    *(short *)player_speed = *(short *)D_00195F4E;
+    if (((struct bf8_0_1 *)(*(char **)player_character + 137))->f != 0) goto L82061;
+    if (((int)(unsigned char)*(signed char *)mouse_control_mode) == 1) goto L82053;
+    if (((int)(unsigned char)(*(signed char *)mouse_buttons & 1)) != 0) goto L8205F;
 L82053:;
-    if (((int)(short)*(short *)D_001A5B32) == (-1)) goto L82061;
+    if (((int)(short)*(short *)steer_key_region) == (-1)) goto L82061;
 L8205F:;
     goto L82063;
 L82061:;
@@ -61,11 +61,11 @@ L82063:;
     func_000CAE00(a2);
     goto L8208A;
 L8206D:;
-    *(short *)D_00178A01 = 0;
-    *(int *)D_001A5AF4 = 0;
-    *(int *)D_001A5B08 = 0;
+    *(short *)player_speed = 0;
+    *(int *)turn_this_frame = 0;
+    *(int *)move_angle_offset = 0;
 L8208A:;
-    if (((int)(short)*(short *)D_00178A01) <= 2) goto L8209C;
+    if (((int)(short)*(short *)player_speed) <= 2) goto L8209C;
     l_20 = 1;
     goto L820A0;
 L8209C:;

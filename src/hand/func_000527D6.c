@@ -2,7 +2,7 @@
 extern char D_00175404[];
 extern void func_000A1023(unsigned char *, unsigned char *, int, char *, int, int);
 
-void func_000527D6(unsigned char *a1, unsigned char *a2, unsigned char a3)
+void flc_decode_palette(unsigned char *a1, unsigned char *a2, unsigned char a3)
 {
     short l_1C;
     short l_18;

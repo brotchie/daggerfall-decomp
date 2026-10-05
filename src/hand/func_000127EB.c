@@ -1,10 +1,10 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x000127EB */
 #pragma aux sosconv "*" parm caller [] value [eax] modify [eax ebx ecx edx];
-#pragma aux (sosconv) func_000127EB;
+#pragma aux (sosconv) profile_delete_item;
 extern char D_00170129[];
 extern int func_000A0E0D();
 struct stream;
-extern int func_00011E36(struct stream *, ...);
+extern int profile_find_item(struct stream *, ...);
 
 #pragma pack(1)
 struct stream {
@@ -18,13 +18,13 @@ struct stream {
 };
 #pragma pack()
 
-int func_000127EB(struct stream *s, int a2)
+int profile_delete_item(struct stream *s, int a2)
 {
     char *p;
     int n;
 
     n = 0;
-    if ((short)func_00011E36(s, a2) == 0) return 0;
+    if ((short)profile_find_item(s, a2) == 0) return 0;
     p = s->buf;
     while (p[n] != 10) n++;
     n++;

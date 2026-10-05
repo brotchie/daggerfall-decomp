@@ -49,17 +49,17 @@ extern struct place *D_0019960C;
 extern int D_00199614;
 extern void func_000361B7(struct place *);
 extern void func_000369A0(struct obj *, char *);
-extern void func_00050069(char *);
-extern int func_0007D6AE(int, int);
-extern struct obj *func_000844FB(int, int);
-extern struct obj *func_000845F1(int, short, short, int);
-extern void func_0008DA4D(struct obj *);
-extern struct obj *func_0008E828(int, unsigned char, int, int, int);
+extern void fatal_error(char *);
+extern int rand_range(int, int);
+extern struct obj *rmb_make_marker(int, int);
+extern struct obj *rmb_make_flat(int, short, short, int);
+extern void object_free_single(struct obj *);
+extern struct obj *object_create_in_block(int, unsigned char, int, int, int);
 extern void func_000C7F07(int, int, int, int *);
 extern struct res *func_00135D00(int, int, int);
 extern void func_00135E39(void);
 
-void func_00036233(int a1, struct node *a2, int a3)
+void rdb_create_objects(int a1, struct node *a2, int a3)
 {
     int l_30;
     struct obj *obj;
@@ -78,10 +78,10 @@ void func_00036233(int a1, struct node *a2, int a3)
             D_0019960C = (struct place *)(D_001995E8 + a2->data);
             if (D_0019960C->f19 <= 0)
                 func_000361B7(D_0019960C);
-            obj = func_0008E828(a1, 6, 62, 0, a3);
+            obj = object_create_in_block(a1, 6, 62, 0, a3);
             func_000369A0(obj, D_00199604->name[D_0019960C->f12]);
             if ((obj->f29 == 703 || obj->f29 == 704) && (D_00199608->dx || D_00199608->dz)) {
-                func_0008DA4D(obj);
+                object_free_single(obj);
                 obj = 0;
                 break;
             }
@@ -94,7 +94,7 @@ void func_00036233(int a1, struct node *a2, int a3)
             break;
         case 2:
             D_001995F4 = (struct spot *)(D_001995E8 + a2->data);
-            obj = func_0008E828(a1, 7, 0, D_001995F4->f0, a3);
+            obj = object_create_in_block(a1, 7, 0, D_001995F4->f0, a3);
             obj->f23 = D_001995F4->f8;
             break;
         case 3:
@@ -102,18 +102,18 @@ void func_00036233(int a1, struct node *a2, int a3)
             if ((D_001995F0->f0 >> 7) == 199) {
                 switch ((D_001995F0->f0 & 31) - 2) {
                 case 14:
-                    obj = func_000844FB(a1, D_001995F0->f0);
+                    obj = rmb_make_marker(a1, D_001995F0->f0);
                     obj->f23 = D_001995F0->f5;
                     obj->f19 = D_001995F0->f4;
                     obj->f35 = D_001995F0->f2;
                     obj->f36 = D_001995F0->f10;
                     break;
                 case 13:
-                    obj = func_000844FB(a1, D_001995F0->f0);
+                    obj = rmb_make_marker(a1, D_001995F0->f0);
                     obj->f23 = D_001995F0->f5;
                     obj->f19 = D_001995F0->f2;
                     if (obj->f19 == 0)
-                        obj->f19 = func_0007D6AE(1, 6);
+                        obj->f19 = rand_range(1, 6);
                     obj->f36 = D_001995F0->f10;
                     break;
                 case 8:
@@ -127,11 +127,11 @@ void func_00036233(int a1, struct node *a2, int a3)
                         break;
                     }
                 default:
-                    obj = func_000844FB(a1, D_001995F0->f0);
+                    obj = rmb_make_marker(a1, D_001995F0->f0);
                     break;
                 }
             } else if (D_001995F0->f10 == 29) {
-                obj = func_000845F1(a1, D_001995F0->f0, D_001995F0->f4 + (D_001995F0->f5 << 8), 0);
+                obj = rmb_make_flat(a1, D_001995F0->f0, D_001995F0->f4 + (D_001995F0->f5 << 8), 0);
                 sub = &obj->sub;
                 if (D_001995F0->f2 & 16)
                     sub->f2 |= 32;
@@ -139,7 +139,7 @@ void func_00036233(int a1, struct node *a2, int a3)
                     sub->f2 |= 16;
                 sub->f0 = (D_001995F0->f5 << 8) + D_001995F0->f4;
             } else {
-                obj = func_0008E828(a1, 33, 0, D_001995F0->f0, a3);
+                obj = object_create_in_block(a1, 33, 0, D_001995F0->f0, a3);
             }
             break;
         }
@@ -147,7 +147,7 @@ void func_00036233(int a1, struct node *a2, int a3)
             D_001985D4[D_00199614].off = off;
             D_001985D4[D_00199614].id = obj->f31;
             if (D_00199614++ > 512)
-                func_00050069(D_00170AD2);
+                fatal_error(D_00170AD2);
             obj->x = D_00195AC4->x + a2->x + (D_00199608->dx << 11);
             obj->y = D_00195AC4->y + a2->y;
             obj->z = D_00195AC4->z + a2->z + (D_00199608->dz << 11);

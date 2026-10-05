@@ -3,9 +3,9 @@
 
 extern char D_00196280[];
 
-extern int func_00085163(int);
+extern int model_cache_find(int);
 
-int func_0008523E(int a1, int a2, int a3)
+int model_get(int a1, int a2, int a3)
 {
     if (a1 != 4) goto L85267;
     if (a2 == 46) goto L85265;
@@ -21,5 +21,5 @@ L85269:;
 L8527B:;
     a2 = 47;
 L85282:;
-    return func_00085163((a2 + (a1 * 100)) + (a3 << 17));
+    return model_cache_find((a2 + (a1 * 100)) + (a3 << 17));
 }

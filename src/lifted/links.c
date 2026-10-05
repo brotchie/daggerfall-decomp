@@ -3,50 +3,50 @@
 
 extern char D_00147954[];
 extern char D_00175962[];
-extern char D_00190FE4[];
+extern char text_rsc_buffer[];
 extern char D_00190FE5[];
-extern char D_00195AA0[];
+extern char player_entity[];
 extern char D_00195AC4[];
-extern char D_00195B04[];
-extern char D_00195BE0[];
+extern char spell_records[];
+extern char player_character[];
 extern char D_00195C44[];
 extern char D_00199D78[];
 extern char D_00199D7B[];
 extern char D_00199D84[];
 extern char D_00199D9B[];
-extern char D_001A3978[];
-extern char D_001A3A78[];
-extern char D_001A3A7C[];
+extern char active_links[];
+extern char link_count[];
+extern char active_link_count[];
 
 extern int func_000658CA(unsigned short, unsigned short);
-extern int func_0007CBA1(int);
-extern int func_00089035(int, int, int);
-extern int func_0008DA91(int);
-extern int func_0008DCE3(int, int, int);
-extern int func_0008E925(int, int);
+extern int hud_message_add(int);
+extern int spfx_damage(int, int, int);
+extern int object_delete(int);
+extern int object_create_child(int, int, int);
+extern int object_find_by_id(int, int);
 extern int func_000A00CB();
 extern int func_000A0B42();
 extern int func_000A0DF4();
 extern int func_000A0E3B();
 extern int func_000A1023();
 extern int func_000CE77F();
-extern void func_0004A6B5(int, int, int);
-extern void func_0004A82A(int, int);
+extern void parse_rsc_text(int, int, int);
+extern void parse_rsc_text_copy(int, int);
 
-void func_00064337(int a1)
+void links_save(int a1)
 {
     int l_20;
     int l_1C;
     int l_18;
 
-    if (*(int *)D_001A3A7C >= 0) goto L6435B;
-    *(int *)D_001A3A7C = 0;
+    if (*(int *)active_link_count >= 0) goto L6435B;
+    *(int *)active_link_count = 0;
 L6435B:;
-    func_000A1023(*(int *)D_00147954, (int)D_00199D78, *(int *)D_001A3A78 * 39, (int)D_00175962, 78, 4);
+    func_000A1023(*(int *)D_00147954, (int)D_00199D78, *(int *)link_count * 39, (int)D_00175962, 78, 4);
     l_1C = *(int *)D_00147954;
     l_20 = 0;
 L64389:;
-    if (l_20 < *(int *)D_001A3A78) goto L6439E;
+    if (l_20 < *(int *)link_count) goto L6439E;
     goto L643C4;
 L64396:;
     l_20++;
@@ -57,33 +57,33 @@ L6439E:;
 L643C2:;
     goto L64396;
 L643C4:;
-    func_000A0B42(a1, (int)D_001A3A78, 4);
-    func_000A0B42(a1, l_1C, *(int *)D_001A3A78 * 39);
-    func_000A0B42(a1, (int)D_001A3A7C, 4);
+    func_000A0B42(a1, (int)link_count, 4);
+    func_000A0B42(a1, l_1C, *(int *)link_count * 39);
+    func_000A0B42(a1, (int)active_link_count, 4);
     l_18 = *(int *)D_00147954;
     l_20 = 0;
 L64409:;
-    if (l_20 < *(int *)D_001A3A7C) goto L6441E;
+    if (l_20 < *(int *)active_link_count) goto L6441E;
     goto L64449;
 L64416:;
     l_20++;
     goto L64409;
 L6441E:;
-    *(int *)((char *)((l_20 << 2) + l_18)) = ((unsigned)(*(int *)(D_001A3978 + (l_20 << 2)) - ((int)D_00199D78))) / 39;
+    *(int *)((char *)((l_20 << 2) + l_18)) = ((unsigned)(*(int *)(active_links + (l_20 << 2)) - ((int)D_00199D78))) / 39;
     goto L64416;
 L64449:;
-    func_000A0B42(a1, l_18, *(int *)D_001A3A7C << 2);
+    func_000A0B42(a1, l_18, *(int *)active_link_count << 2);
 }
 
-void func_00064467(int a1)
+void links_load(int a1)
 {
     int l_18;
 
-    func_000A00CB(a1, (int)D_001A3A78, 4);
-    func_000A00CB(a1, (int)D_00199D78, *(int *)D_001A3A78 * 39);
+    func_000A00CB(a1, (int)link_count, 4);
+    func_000A00CB(a1, (int)D_00199D78, *(int *)link_count * 39);
     l_18 = 0;
 L644A5:;
-    if (l_18 < *(int *)D_001A3A78) goto L644BA;
+    if (l_18 < *(int *)link_count) goto L644BA;
     goto L64506;
 L644B2:;
     l_18++;
@@ -93,33 +93,33 @@ L644BA:;
     *(signed char *)(D_00199D7B + (l_18 * 39)) = 100;
 L644D9:;
     if (*(int *)(D_00199D9B + (l_18 * 39)) == 0) goto L64504;
-    *(int *)(D_00199D9B + (l_18 * 39)) = func_0008E925(*(int *)D_00195AC4, *(int *)(D_00199D9B + (l_18 * 39)));
+    *(int *)(D_00199D9B + (l_18 * 39)) = object_find_by_id(*(int *)D_00195AC4, *(int *)(D_00199D9B + (l_18 * 39)));
 L64504:;
     goto L644B2;
 L64506:;
-    func_000A00CB(a1, (int)D_001A3A7C, 4);
-    if (*(int *)D_001A3A7C >= 0) goto L6452B;
-    *(int *)D_001A3A7C = 0;
+    func_000A00CB(a1, (int)active_link_count, 4);
+    if (*(int *)active_link_count >= 0) goto L6452B;
+    *(int *)active_link_count = 0;
 L6452B:;
-    func_000A00CB(a1, (int)D_001A3978, *(int *)D_001A3A7C << 2);
+    func_000A00CB(a1, (int)active_links, *(int *)active_link_count << 2);
     l_18 = 0;
 L64548:;
-    if (l_18 < *(int *)D_001A3A7C) goto L6455D;
+    if (l_18 < *(int *)active_link_count) goto L6455D;
     return;
 L64555:;
     l_18++;
     goto L64548;
 L6455D:;
-    *(int *)(D_001A3978 + (l_18 << 2)) = ((int)D_00199D78) + (*(int *)(D_001A3978 + (l_18 << 2)) * 39);
+    *(int *)(active_links + (l_18 << 2)) = ((int)D_00199D78) + (*(int *)(active_links + (l_18 << 2)) * 39);
     goto L64555;
 }
 
-void func_0006530C(int a1)
+void link_show_text(int a1)
 {
     int l_1C;
     int l_18;
 
-    func_0004A82A(a1, *(int *)D_00195C44);
+    parse_rsc_text_copy(a1, *(int *)D_00195C44);
     l_1C = *(int *)D_00195C44;
 L65333:;
     if (*(signed char *)((char *)l_1C) == 0) return;
@@ -138,18 +138,18 @@ L6536F:;
     goto L65341;
 L65377:;
     *(signed char *)((char *)l_18) = 0;
-    func_0007CBA1(l_1C);
+    hud_message_add(l_1C);
     l_1C = l_18 + 1;
     goto L65333;
 }
 
-int func_00065398(int a1, int a2)
+int link_answer_matches(int a1, int a2)
 {
     int l_1C;
     int l_18;
 
-    func_0004A6B5(a1, 0, 0);
-    l_18 = func_000A0DF4((int)D_00190FE4);
+    parse_rsc_text(a1, 0, 0);
+    l_18 = func_000A0DF4((int)text_rsc_buffer);
     l_1C = 1;
 L653CB:;
     if (l_1C < l_18) goto L653DD;
@@ -158,41 +158,41 @@ L653D5:;
     l_1C++;
     goto L653CB;
 L653DD:;
-    if (((int)(unsigned char)*(signed char *)(D_00190FE4 + l_1C)) == 44) goto L65403;
-    if (((int)(unsigned char)*(signed char *)(D_00190FE4 + l_1C)) != 34) goto L6540D;
+    if (((int)(unsigned char)*(signed char *)(text_rsc_buffer + l_1C)) == 44) goto L65403;
+    if (((int)(unsigned char)*(signed char *)(text_rsc_buffer + l_1C)) != 34) goto L6540D;
 L65403:;
-    *(signed char *)(D_00190FE4 + l_1C) = 0;
+    *(signed char *)(text_rsc_buffer + l_1C) = 0;
 L6540D:;
     goto L653D5;
 L6540F:;
     *(signed char *)(D_00190FE5 + l_1C) = 0;
     l_1C = 1;
 L65420:;
-    if (*(signed char *)(D_00190FE4 + l_1C) == 0) goto L6545C;
-    if (func_000A0E3B(((int)D_00190FE4) + l_1C, a2) != 0) goto L65449;
+    if (*(signed char *)(text_rsc_buffer + l_1C) == 0) goto L6545C;
+    if (func_000A0E3B(((int)text_rsc_buffer) + l_1C, a2) != 0) goto L65449;
     return 1;
 L65449:;
-    l_1C += func_000A0DF4(((int)D_00190FE4) + l_1C) + 1;
+    l_1C += func_000A0DF4(((int)text_rsc_buffer) + l_1C) + 1;
     goto L65420;
 L6545C:;
     return 0;
 }
 
-void func_0006546F(int a1, int a2)
+void link_hurt_player(int a1, int a2)
 {
     int l_18;
     int l_14;
 
-    l_18 = func_0008DCE3(*(int *)D_00195AC4, 0, 89);
+    l_18 = object_create_child(*(int *)D_00195AC4, 0, 89);
     l_14 = l_18 + 71;
-    *(short *)((char *)l_14 + 80) = a2 * ((unsigned short)(unsigned char)*(signed char *)(*(char **)D_00195BE0 + 129));
+    *(short *)((char *)l_14 + 80) = a2 * ((unsigned short)(unsigned char)*(signed char *)(*(char **)player_character + 129));
     *(signed char *)((char *)l_14 + 1) = 0;
     *(signed char *)((char *)l_14 + 6) = *(signed char *)&a1;
-    func_00089035(l_18, 0, *(int *)D_00195AA0);
-    func_0008DA91(l_18);
+    spfx_damage(l_18, 0, *(int *)player_entity);
+    object_delete(l_18);
 }
 
-void func_000654EA(int a1)
+void link_start(int a1)
 {
     int l_20;
     int l_1C;
@@ -287,7 +287,7 @@ void func_00065748(short a1, int a2)
 
     l_18 = 0;
 L65762:;
-    if (l_18 < *(int *)D_001A3A78) goto L65777;
+    if (l_18 < *(int *)link_count) goto L65777;
     return;
 L6576F:;
     l_18++;
@@ -309,13 +309,13 @@ int func_000657B2(int a1)
 
     l_28 = 0;
 L657CA:;
-    if (l_28 < *(int *)D_001A3A7C) goto L657E2;
+    if (l_28 < *(int *)active_link_count) goto L657E2;
     goto L65850;
 L657DA:;
     l_28++;
     goto L657CA;
 L657E2:;
-    l_1C = *(int *)(D_001A3978 + (l_28 << 2));
+    l_1C = *(int *)(active_links + (l_28 << 2));
     l_24 = ((int)(unsigned char)*(signed char *)((char *)l_1C + 10)) + 1;
     l_20 = 0;
 L65807:;
@@ -346,11 +346,11 @@ int func_00065864(int a1)
 
     l_1C = 0;
 L6587C:;
-    if (*(signed char *)((char *)(int)(*(char **)D_00195B04 + (l_1C * 89)) + 47) == 0) goto L658A6;
-    if (((int)(unsigned char)*(signed char *)((char *)(int)(*(char **)D_00195B04 + (l_1C * 89)) + 73)) == a1) goto L658AE;
+    if (*(signed char *)((char *)(int)(*(char **)spell_records + (l_1C * 89)) + 47) == 0) goto L658A6;
+    if (((int)(unsigned char)*(signed char *)((char *)(int)(*(char **)spell_records + (l_1C * 89)) + 73)) == a1) goto L658AE;
 L658A6:;
     l_1C++;
     goto L6587C;
 L658AE:;
-    return (int)(*(char **)D_00195B04 + (l_1C * 89));
+    return (int)(*(char **)spell_records + (l_1C * 89));
 }

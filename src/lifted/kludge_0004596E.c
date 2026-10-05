@@ -2,10 +2,10 @@
  * do not edit: move a function to src/kludge.c to work on it by hand) */
 
 
-extern int func_0008DCE3(int, int, int);
-extern int func_0008DD46(int, int);
-extern void func_0005E450(unsigned short, int);
-extern void func_0005E540(int, int, int);
+extern int object_create_child(int, int, int);
+extern int object_reparent(int, int);
+extern void item_make_random(unsigned short, int);
+extern void item_make(int, int, int);
 
 int func_0004596E(int a1, int a2)
 {
@@ -13,16 +13,16 @@ int func_0004596E(int a1, int a2)
     int l_1C;
     int l_18;
 
-    l_20 = func_0008DCE3(a1, 0, 107);
+    l_20 = object_create_child(a1, 0, 107);
     *(signed char *)((char *)l_20) = 2;
     l_18 = l_20 + 71;
-    func_0005E450((int)(unsigned short)*(short *)&a2, l_18);
+    item_make_random((int)(unsigned short)*(short *)&a2, l_18);
     if (((int)(unsigned short)(*(short *)((char *)l_18 + 42) & 8)) == 0) goto L45A0B;
-    l_1C = func_0008DCE3(a1, 0, 107);
+    l_1C = object_create_child(a1, 0, 107);
     *(signed char *)((char *)l_1C) = 2;
-    func_0008DD46(l_1C, l_20);
+    object_reparent(l_1C, l_20);
     l_18 = l_1C + 71;
-    func_0005E540(1, 1, l_18);
+    item_make(1, 1, l_18);
     return l_1C;
 L45A0B:;
     return l_20;

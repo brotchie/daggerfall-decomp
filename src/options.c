@@ -4,8 +4,8 @@
 
 void func_00043978(void) { }
 
-int func_000443F2(void)
+int options_mouse_view_mode(void)
 {
-    D_00195E7A = 1;
+    mouse_control_mode = 1;
     return 0;
 }

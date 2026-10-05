@@ -4,78 +4,78 @@
 extern char D_000C2893[];
 extern char D_000C28C4[];
 extern char D_001705F8[];
-extern char D_00179D74[];
+extern char climate_categories[];
 extern char D_00187F30[];
-extern char D_0018F044[];
-extern char D_00195AA4[];
-extern char D_00195B30[];
-extern char D_00196268[];
+extern char region_event_values[];
+extern char player_object[];
+extern char current_region_data[];
+extern char current_region[];
 extern char D_00196269[];
-extern char D_0019627B[];
+extern char current_climate[];
 extern char D_00196285[];
-extern char D_00196B00[];
-extern char D_00196B04[];
+extern char politic_pak[];
+extern char climate_pak[];
 
 extern int func_000A0024();
 extern int func_000C2D81();
 extern void func_0001DF7F(int);
-extern void func_00086314(void);
-unsigned char func_00020089(int, int);
-unsigned char func_0002010F(int, int);
-unsigned char func_000201B8(int, int, int);
-void func_0001FF3F(unsigned char, unsigned char);
+extern void region_unload(void);
+unsigned char politic_region_at(int, int);
+unsigned char climate_lookup(int, int);
+unsigned char pak_lookup(int, int, int);
+void region_enter(unsigned char, unsigned char);
 
-void func_0001FEBD(void)
+void region_free_tables(void)
 {
-    if (*(int *)D_00196B00 == 0) goto L1FEE0;
-    if (*(int *)D_00196B00 != (-1751672937)) goto L1FEE2;
+    if (*(int *)politic_pak == 0) goto L1FEE0;
+    if (*(int *)politic_pak != (-1751672937)) goto L1FEE2;
 L1FEE0:;
     goto L1FF00;
 L1FEE2:;
-    func_000A0024(*(int *)D_00196B00, (int)D_001705F8, 33);
-    *(int *)D_00196B00 = -1751672937;
+    func_000A0024(*(int *)politic_pak, (int)D_001705F8, 33);
+    *(int *)politic_pak = -1751672937;
 L1FF00:;
-    if (*(int *)D_00196B04 == 0) goto L1FF15;
-    if (*(int *)D_00196B04 != (-1751672937)) goto L1FF17;
+    if (*(int *)climate_pak == 0) goto L1FF15;
+    if (*(int *)climate_pak != (-1751672937)) goto L1FF17;
 L1FF15:;
     return;
 L1FF17:;
-    func_000A0024(*(int *)D_00196B04, (int)D_001705F8, 34);
-    *(int *)D_00196B04 = -1751672937;
+    func_000A0024(*(int *)climate_pak, (int)D_001705F8, 34);
+    *(int *)climate_pak = -1751672937;
 }
 
-void func_0001FF3F(unsigned char a1, unsigned char a2)
+void region_enter(unsigned char a1, unsigned char a2)
 {
-    *(signed char *)D_00196268 = a2;
-    *(int *)D_00195B30 = ((int)D_0018F044) + (((int)(unsigned char)*(signed char *)D_00196268) * 80);
-    *(signed char *)D_00196269 = *(signed char *)D_00196268;
-    func_00086314();
+    *(signed char *)current_region = a2;
+    *(int *)current_region_data = ((int)region_event_values) + (((int)(unsigned char)*(signed char *)current_region) * 80);
+    *(signed char *)D_00196269 = *(signed char *)current_region;
+    region_unload();
     func_0001DF7F((int)(unsigned char)a2);
 }
 
-int func_0001FF92(void)
+int region_update_from_player(void)
 {
     unsigned char l_18;
 
-    l_18 = func_00020089(*(int *)(*(char **)D_00195AA4 + 7), *(int *)(*(char **)D_00195AA4 + 15));
-    if ((signed char)l_18 == *(signed char *)D_00196268) goto L1FFDD;
-    func_0001FF3F((int)(unsigned char)*(signed char *)D_00196268, (int)(unsigned char)l_18);
+    l_18 = politic_region_at(*(int *)(*(char **)player_object + 7), *(int *)(*(char **)player_object + 15));
+    if ((signed char)l_18 == *(signed char *)current_region) goto L1FFDD;
+    region_enter((int)(unsigned char)*(signed char *)current_region, (int)(unsigned char)l_18);
     return 1;
 L1FFDD:;
     return 0;
 }
 
-int func_0001FFF1(void)
+int climate_category(void)
 {
-    return (int)(unsigned char)*(signed char *)(D_00179D74 + ((int)(unsigned char)*(signed char *)D_0019627B));
+    return (int)(unsigned char)*(signed char *)(climate_categories + ((int)(unsigned char)*(signed char *)current_climate));
 }
 
-int func_0002001F(void)
+int climate_update_at_player(void)
 {
-    return (int)(unsigned char)func_0002010F(*(int *)(*(char **)D_00195AA4 + 7), *(int *)(*(char **)D_00195AA4 + 15));
+    return (int)(unsigned char)climate_lookup(*(int *)(*(char **)player_object + 7), *(int *)(*(char **)player_object + 15));
 }
 
-unsigned char func_00020089(int a1, int a2)
+unsigned char politic_region_at(int a1, int a2)
 {
     int l_20;
     int l_1C;
@@ -90,14 +90,14 @@ L200C7:;
     if (l_1C <= 499) goto L200D7;
     l_1C = 499;
 L200D7:;
-    l_18 = func_000201B8(l_20, l_1C, *(int *)D_00196B00);
+    l_18 = pak_lookup(l_20, l_1C, *(int *)politic_pak);
     if (((int)(unsigned char)l_18) != 64) goto L200FB;
     return 31;
 L200FB:;
     return l_18 & 127;
 }
 
-unsigned char func_0002010F(int a1, int a2)
+unsigned char climate_lookup(int a1, int a2)
 {
     int l_1C;
     int l_18;
@@ -111,17 +111,17 @@ L2014D:;
     if (l_18 <= 499) goto L2015D;
     l_18 = 499;
 L2015D:;
-    *(signed char *)D_0019627B = func_000201B8(l_1C, l_18, *(int *)D_00196B04);
-    if (((int)(unsigned char)*(signed char *)D_0019627B) != 223) goto L20195;
-    *(signed char *)D_0019627B = 228;
+    *(signed char *)current_climate = pak_lookup(l_1C, l_18, *(int *)climate_pak);
+    if (((int)(unsigned char)*(signed char *)current_climate) != 223) goto L20195;
+    *(signed char *)current_climate = 228;
     *(signed char *)D_00196285 = 1;
     return 3;
 L20195:;
     *(signed char *)D_00196285 = 0;
-    return *(signed char *)(D_00179D74 + ((int)(unsigned char)*(signed char *)D_0019627B));
+    return *(signed char *)(climate_categories + ((int)(unsigned char)*(signed char *)current_climate));
 }
 
-unsigned char func_000201B8(int a1, int a2, int a3)
+unsigned char pak_lookup(int a1, int a2, int a3)
 {
     int l_18;
     int l_14;

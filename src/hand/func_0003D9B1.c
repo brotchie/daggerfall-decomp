@@ -1,12 +1,12 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0003D9B1 */
 extern char D_00170D55[];       /* __FILE__ */
 extern short D_00199664;
-extern void func_0004633F(char *, char *);
-extern int func_0005A442(unsigned char);
+extern void parse_expand(char *, char *);
+extern int font_char_width(unsigned char);
 extern void func_000A0024(void *, char *, int);
 extern void func_000A0AD9(char *, char *, int, char *, int);
 
-char *func_0003D9B1(unsigned short flags, short width, char *src, char *buf, char *text)
+char *text_expand_wrap(unsigned short flags, short width, char *src, char *buf, char *text)
 {
     short lC;
     short in;
@@ -18,7 +18,7 @@ char *func_0003D9B1(unsigned short flags, short width, char *src, char *buf, cha
 
     saved = D_00199664 = flags;
     if (!(flags & 8))
-        func_0004633F(src, text);
+        parse_expand(src, text);
     else
         func_000A0AD9(text, src, 4, D_00170D55, 169);
     D_00199664 = saved;
@@ -83,7 +83,7 @@ char *func_0003D9B1(unsigned short flags, short width, char *src, char *buf, cha
             break;
         default:
             out[n++] = text[in - 1];
-            w += func_0005A442(text[in - 1]);
+            w += font_char_width(text[in - 1]);
             if (w > width) {
                 out[n++] = 0;
                 *out = 252;

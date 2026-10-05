@@ -3,20 +3,20 @@
 
 struct bf8_1_1 { unsigned char _:1; unsigned char f:1; };
 struct bf8_2_1 { unsigned char _:2; unsigned char f:1; };
-extern char D_0012AC00[];
+extern char mouse_buttons[];
 extern char D_0012AC02[];
-extern char D_0012AC04[];
-extern char D_0012AC06[];
+extern char mouse_x[];
+extern char mouse_y[];
 extern char D_0012B508[];
-extern char D_00142309[];
-extern char D_00142324[];
-extern char D_00142350[];
-extern char D_00142351[];
-extern char D_00142358[];
-extern char D_00142359[];
+extern char key_down_esc[];
+extern char key_down_enter[];
+extern char key_down_up[];
+extern char key_down_pgup[];
+extern char key_down_down[];
+extern char key_down_pgdn[];
 extern char D_00142940[];
 extern char D_00142948[];
-extern char D_00143550[];
+extern char screen_buffer[];
 extern char D_00147954[];
 extern char D_001703F0[];
 extern char D_001703F7[];
@@ -24,156 +24,156 @@ extern char D_0017041B[];
 extern char D_0017041C[];
 extern char D_0017042A[];
 extern char D_00178630[];
-extern char D_001789FA[];
-extern char D_001799AC[];
+extern char player_environment[];
+extern char talk_faction_greetings[];
 extern char D_001799AE[];
 extern char D_001799B0[];
 extern char D_001799E2[];
 extern char D_001799F2[];
-extern char D_00179A42[];
-extern char D_00179A7E[];
-extern char D_00179ACC[];
+extern char talk_where_answers[];
+extern char talk_tell_answers[];
+extern char talk_creature_language[];
 extern char D_00179ACE[];
-extern char D_00179B78[];
+extern char talk_buttons[];
 extern char D_00179B7A[];
 extern char D_00179B7C[];
 extern char D_00179B7E[];
 extern char D_00179B80[];
-extern char D_00179C7C[];
-extern char D_00179C88[];
-extern char D_00179C8E[];
+extern char talk_greeting_texts[];
+extern char talk_ack_texts[];
+extern char talk_regional_ids[];
 extern char D_00179CC8[];
 extern char D_00179CFA[];
-extern char D_00179D0C[];
-extern char D_00179D19[];
-extern char D_0017C5DC[];
+extern char talk_category_building_types[];
+extern char talk_category_names[];
+extern char talk_regional_names[];
 extern char D_0017C668[];
 extern char D_00187CA8[];
-extern char D_0018F044[];
+extern char region_event_values[];
 extern char D_0018F045[];
 extern char D_0018F046[];
-extern char D_0018F061[];
+extern char region_event_flags[];
 extern char D_0018F062[];
 extern char D_0018F063[];
 extern char D_0018F064[];
-extern char D_0018F07E[];
-extern char D_001903A4[];
+extern char region_event_groups[];
+extern char text_buffer[];
 extern char D_00190BE4[];
 extern char D_00190D0F[];
 extern char D_00190D10[];
 extern char D_00190D11[];
-extern char D_00190FE4[];
+extern char text_rsc_buffer[];
 extern char D_00191016[];
 extern char D_001940D4[];
-extern char D_0019572C[];
+extern char text_macro_fcn[];
 extern char D_00195A00[];
 extern char D_00195A84[];
-extern char D_00195AA4[];
+extern char player_object[];
 extern char D_00195B84[];
-extern char D_00195BDC[];
-extern char D_00195BE0[];
-extern char D_00195BE8[];
-extern char D_00195BF8[];
+extern char current_location[];
+extern char player_character[];
+extern char window_image[];
+extern char game_settings[];
 extern char D_00195D00[];
 extern char D_00195D28[];
-extern char D_00195D34[];
-extern char D_00195D58[];
-extern char D_00195F5C[];
-extern char D_00196268[];
+extern char talk_disposition[];
+extern char talk_prostitute_price[];
+extern char text_macro_n_text[];
+extern char current_region[];
 extern char D_00196271[];
 extern char D_00196272[];
-extern char D_00196274[];
-extern char D_00196279[];
+extern char game_mode[];
+extern char mouse_buttons_prev[];
 extern char D_00196488[];
 extern char D_001964B0[];
-extern char D_00196570[];
-extern char D_00196574[];
+extern char talk_question_lines[];
+extern char talk_place_topic_count[];
 extern char D_00196578[];
-extern char D_0019657C[];
+extern char talk_topics[];
 extern char D_00196580[];
-extern char D_00196584[];
-extern char D_00196588[];
-extern char D_0019658C[];
-extern char D_00196590[];
-extern char D_00196594[];
-extern char D_00196598[];
-extern char D_0019659C[];
+extern char talk_text_pool_next[];
+extern char talk_answer_lines[];
+extern char talk_saved_screen[];
+extern char talk_npc_own_faction[];
+extern char talk_npc_faction[];
+extern char talk_place_topics[];
+extern char talk_npc_record[];
 extern char D_001965A0[];
-extern char D_001965A4[];
-extern char D_001965A8[];
+extern char talk_npc_speech_style[];
+extern char talk_answer_line_count[];
 extern char D_001965AC[];
-extern char D_001965B4[];
-extern char D_001965B8[];
-extern char D_001965BC[];
-extern char D_001965C0[];
+extern char talk_answer_scroll[];
+extern char talk_list_count[];
+extern char talk_npc_attitude[];
+extern char talk_npc_knows[];
 extern char D_001965C4[];
 extern char D_001965C8[];
-extern char D_001965CC[];
+extern char talk_attitude_cache[];
 extern char D_001965D4[];
-extern char D_001965D8[];
+extern char talk_question_line_count[];
 extern char D_001965DC[];
-extern char D_001965E0[];
+extern char talk_npc_object[];
 extern char D_001965E4[];
-extern char D_001965E8[];
-extern char D_001965EC[];
-extern char D_001965F0[];
-extern char D_001965F4[];
+extern char talk_selected_row[];
+extern char talk_face_image[];
+extern char talk_list_bottom[];
+extern char talk_list_top[];
 extern char D_001965F8[];
 extern char D_00196612[];
-extern char D_00196620[];
+extern char talk_key_text[];
 extern char D_001966A2[];
 extern char D_001966A4[];
 extern char D_001966A6[];
-extern char D_001966A8[];
-extern char D_001966AA[];
+extern char talk_language_skill[];
+extern char talk_flags[];
 extern char D_001966AC[];
-extern char D_001966AE[];
-extern char D_001966B0[];
-extern char D_001966B1[];
-extern char D_001966B2[];
-extern char D_001966B3[];
-extern char D_001966B4[];
-extern char D_001966B5[];
-extern char D_001966B6[];
+extern char talk_question_mode[];
+extern char talk_showing_categories[];
+extern char talk_topic_tab[];
+extern char talk_tone[];
+extern char talk_redraw[];
+extern char talk_news_asked[];
+extern char talk_location_category[];
+extern char talk_prostitute_state[];
 extern char D_001966B7[];
 extern char D_001966B8[];
-extern char D_001966B9[];
+extern char talk_prostitute_offer[];
 extern char D_001966BA[];
 extern char D_001966BB[];
 extern char D_0019670C[];
-extern char D_00196710[];
+extern char faction_count[];
 extern char D_0019671C[];
-extern char D_0019672C[];
-extern char D_00199764[];
+extern char factions[];
+extern char current_quest[];
 extern char D_00199780[];
 
-extern int func_00014AE8(int);
-extern int func_000166C5(int);
-extern int func_00017C58(short, int);
-extern int func_0001811D(int);
-extern int func_00018BDC(short);
-extern int func_000192EE(short);
-extern int func_0001D2F0(short);
-extern int func_0002CE9E(int, int, int);
-extern int func_000309E8(int, int);
-extern int func_000342E3(int);
-extern int func_0004A044(int);
-extern int func_0004BB64(int);
-extern int func_0004CC82(void);
-extern int func_00059973(int);
-extern int func_0005A442(unsigned char);
-extern int func_0005A4A9(int);
+extern int talk_open(int);
+extern int talk_hint_text_id(int);
+extern int town_has_building(short, int);
+extern int building_distance(int);
+extern int talk_faction_relation(short);
+extern int faction_find(short);
+extern int rumor_pick_news(short);
+extern int quest_symbol_text(int, int, int);
+extern int quest_section(int, int);
+extern int quest_find_site_for_building(int);
+extern int parse_bio_answer_text(int);
+extern int quest_find_by_id(int);
+extern int quest_find_potential_questor(void);
+extern int npc_talk_record_build(int);
+extern int font_char_width(unsigned char);
+extern int font_text_width(int);
 extern int func_000679BB(unsigned char);
-extern int func_00067C04(int);
-extern int func_00069938(int, int, int);
-extern int func_00070308(unsigned char);
-extern int func_000713B3(void);
-extern int func_0007CBA1(int);
-extern int func_0007D068(unsigned char);
-extern int func_0007D6AE(int, int);
-extern int func_0007DF35(int);
+extern int item_artifact_equipped(int);
+extern int sound_play(int, int, int);
+extern int guild_find_membership_by_bits(unsigned char);
+extern int guild_local_temple_rank(void);
+extern int hud_message_add(int);
+extern int key_pressed_once(unsigned char);
+extern int rand_range(int, int);
+extern int object_building(int);
 extern int func_0008B48B(int);
-extern int func_0008BD50(int);
+extern int building_name(int);
 extern int func_0009DC25();
 extern int func_0009DC49();
 extern int func_000A0024();
@@ -190,85 +190,85 @@ extern int func_0012B136();
 extern int func_00144D00();
 extern int func_00144F68();
 extern void func_000164EF(void);
-extern void func_00016AA3(unsigned short);
-extern void func_00016E61(short, int, int, int);
-extern void func_00016F74(short, int, int, int);
-extern void func_0001889E(void);
-extern void func_0003D01C(int, int);
-extern void func_0003F09F(int, int);
-extern void func_0004A6B5(int, int, int);
-extern void func_0004A748(int, int, int, int);
-extern void func_0004AB2F(int);
-extern void func_0006B130(int);
-extern void func_0007CA1F();
-extern void func_0007CA85(int, int, int, int, unsigned char);
-extern void func_0007DDC9(int);
-extern void func_00086397(int);
+extern void talk_load_face(unsigned short);
+extern void talk_draw_answer(short, int, int, int);
+extern void talk_draw_question(short, int, int, int);
+extern void talk_draw_tell_list(void);
+extern void skill_add_uses(int, int);
+extern void msgbox_show_rsc(int, int);
+extern void parse_rsc_text(int, int, int);
+extern void quest_load_text(int, int, int, int);
+extern void time_pass(int);
+extern void logbook_copy_text(int);
+extern void text_draw_colored();
+extern void text_draw_centered_colored(int, int, int, int, unsigned char);
+extern void msgbox_yes_no_rsc(int);
+extern void location_free(int);
 extern void func_00087D71(int, int, short);
-int func_00015D47(void);
+int talk_ask_news(void);
 int func_000164AB(void);
 int func_000164CD(void);
 int func_000169D4(int);
-int func_00016DA8(int);
-int func_00017021(void);
-int func_0001822D(int);
-int func_000182C6(int);
-int func_00018F7C(void);
-int func_00019067(void);
-int func_000194C0(int);
-int func_00019532(int, unsigned char);
-int func_0001ACCA(int);
-int func_0001AD21(int, int);
-int func_0001AD97(int, int);
+int talk_next_word(int);
+int talk_alloc_line(void);
+int building_category(int);
+int town_has_category(int);
+int talk_roll_knows(void);
+int talk_roll_attitude(void);
+int faction_nth_r(int);
+int faction_nth_of_type_r(int, unsigned char);
+int faction_is_regional_noble(int);
+int faction_has_enemy(int, int);
+int faction_has_ally(int, int);
 int func_0001B144(int, int);
-void func_00015176(void);
-void func_00015C18(void);
-void func_00015F4E(void);
-void func_000160D0(void);
-void func_0001612F(void);
-void func_0001652C(int);
-void func_00016B5A(void);
-void func_00016B91(int, int, int, int, int);
-void func_00016C87(void);
-void func_00016CF2(int);
-void func_0001710E(void);
-void func_00017179(void);
-void func_00017348(int);
-void func_000174C3(int);
-void func_00017A61(int, int, int, int, int);
-void func_00017B98(void);
-void func_00017CEF(int);
-void func_00018172(void);
-void func_000195C4(int, unsigned char);
+void talk_draw(void);
+void talk_prepare_where_answer(void);
+void talk_close(void);
+void talk_list_scroll_up(void);
+void talk_list_scroll_down(void);
+void talk_say_text(int);
+void talk_draw_face(void);
+void talk_wrap_text(int, int, int, int, int);
+void talk_log_question(void);
+void talk_add_line(int);
+void talk_clear_question(void);
+void talk_draw_place_list(void);
+void talk_list_click(int);
+void talk_add_quest_topics(int);
+void talk_list_draw_item(int, int, int, int, int);
+void talk_draw_regional_list(void);
+void talk_add_regional_item(int);
+void talk_draw_categories(void);
+void faction_count_of_type_r(int, unsigned char);
 void func_0001AE63(int);
-void func_0001B418(int, int);
+void faction_add_reputation(int, int);
 void func_0001B554(int, int, int);
 void func_0001B5BE(int, int);
 #pragma aux func_000A0ED9 parm routine [];
 
-void func_00014EA8(void)
+void talk_update(void)
 {
     int l_18;
 
-    if (func_00014AE8(0) == 0) return;
-    if (*(signed char *)D_001966B3 != 0) goto L14EF1;
-    func_000A1023(*(int *)D_00143550, *(int *)D_0019658C, 64000, (int)D_001703F0, 324, 4);
+    if (talk_open(0) == 0) return;
+    if (*(signed char *)talk_redraw != 0) goto L14EF1;
+    func_000A1023(*(int *)screen_buffer, *(int *)talk_saved_screen, 64000, (int)D_001703F0, 324, 4);
     goto L14F12;
 L14EF1:;
-    func_000A1023(*(int *)D_00143550, *(int *)D_00195BE8, 64000, (int)D_001703F0, 326, 4);
+    func_000A1023(*(int *)screen_buffer, *(int *)window_image, 64000, (int)D_001703F0, 326, 4);
 L14F12:;
-    if (*(signed char *)D_001966B3 == 0) goto L14F20;
-    func_00015176();
+    if (*(signed char *)talk_redraw == 0) goto L14F20;
+    talk_draw();
 L14F20:;
-    if (*(signed char *)D_00142350 == 0) goto L14F33;
-    func_000160D0();
+    if (*(signed char *)key_down_up == 0) goto L14F33;
+    talk_list_scroll_up();
     goto L14F93;
 L14F33:;
-    if (*(signed char *)D_00142358 == 0) goto L14F43;
-    func_0001612F();
+    if (*(signed char *)key_down_down == 0) goto L14F43;
+    talk_list_scroll_down();
     goto L14F93;
 L14F43:;
-    if (*(signed char *)D_00142351 == 0) goto L14F6C;
+    if (*(signed char *)key_down_pgup == 0) goto L14F6C;
     l_18 = 0;
 L14F53:;
     if (l_18 < 10) goto L14F63;
@@ -277,12 +277,12 @@ L14F5B:;
     l_18++;
     goto L14F53;
 L14F63:;
-    func_000160D0();
+    talk_list_scroll_up();
     goto L14F5B;
 L14F6A:;
     goto L14F93;
 L14F6C:;
-    if (*(signed char *)D_00142359 == 0) goto L14F93;
+    if (*(signed char *)key_down_pgdn == 0) goto L14F93;
     l_18 = 0;
 L14F7C:;
     if (l_18 < 10) goto L14F8C;
@@ -291,35 +291,35 @@ L14F84:;
     l_18++;
     goto L14F7C;
 L14F8C:;
-    func_0001612F();
+    talk_list_scroll_down();
     goto L14F84;
 L14F93:;
-    if (*(signed char *)D_001966B1 != 0) goto L14FA5;
-    if (*(signed char *)D_001966B0 != 0) goto L14FAE;
+    if (*(signed char *)talk_topic_tab != 0) goto L14FA5;
+    if (*(signed char *)talk_showing_categories != 0) goto L14FAE;
 L14FA5:;
-    if (*(signed char *)D_001966B1 == 0) goto L14FB7;
+    if (*(signed char *)talk_topic_tab == 0) goto L14FB7;
 L14FAE:;
-    if (*(signed char *)D_00142309 != 0) goto L14FB9;
+    if (*(signed char *)key_down_esc != 0) goto L14FB9;
 L14FB7:;
     goto L14FBE;
 L14FB9:;
-    func_00015F4E();
+    talk_close();
 L14FBE:;
-    if (*(signed char *)D_00142309 == 0) goto L14FDE;
-    *(signed char *)D_001966B3 = 1;
+    if (*(signed char *)key_down_esc == 0) goto L14FDE;
+    *(signed char *)talk_redraw = 1;
 L14FCE:;
-    if (*(signed char *)D_00142309 != 0) goto L14FCE;
-    *(signed char *)D_001966B0 = 1;
+    if (*(signed char *)key_down_esc != 0) goto L14FCE;
+    *(signed char *)talk_showing_categories = 1;
 L14FDE:;
     if (((struct bf8_2_1 *)&D_001940D4)->f != 0) goto L15018;
-    if (*(signed char *)D_0012AC00 == 0) goto L15004;
-    if (*(signed char *)D_0012AC00 == 0) goto L15002;
-    if (*(signed char *)D_00196279 != 0) goto L15004;
+    if (*(signed char *)mouse_buttons == 0) goto L15004;
+    if (*(signed char *)mouse_buttons == 0) goto L15002;
+    if (*(signed char *)mouse_buttons_prev != 0) goto L15004;
 L15002:;
     goto L15016;
 L15004:;
-    if (*(signed char *)D_00142324 != 0) goto L15016;
-    if (*(signed char *)D_00142309 == 0) goto L15018;
+    if (*(signed char *)key_down_enter != 0) goto L15016;
+    if (*(signed char *)key_down_esc == 0) goto L15018;
 L15016:;
     goto L1501D;
 L15018:;
@@ -334,20 +334,20 @@ L1503C:;
     l_18++;
     goto L15031;
 L15044:;
-    if (*(short *)D_0012AC04 <= *(short *)(D_00179B78 + (l_18 * 12))) goto L1506C;
-    if (*(short *)D_0012AC04 < *(short *)(D_00179B7C + (l_18 * 12))) goto L1506E;
+    if (*(short *)mouse_x <= *(short *)(talk_buttons + (l_18 * 12))) goto L1506C;
+    if (*(short *)mouse_x < *(short *)(D_00179B7C + (l_18 * 12))) goto L1506E;
 L1506C:;
     goto L15082;
 L1506E:;
-    if (*(short *)D_0012AC06 > *(short *)(D_00179B7A + (l_18 * 12))) goto L15084;
+    if (*(short *)mouse_y > *(short *)(D_00179B7A + (l_18 * 12))) goto L15084;
 L15082:;
     goto L15098;
 L15084:;
-    if (*(short *)D_0012AC06 < *(short *)(D_00179B7E + (l_18 * 12))) goto L1509A;
+    if (*(short *)mouse_y < *(short *)(D_00179B7E + (l_18 * 12))) goto L1509A;
 L15098:;
     goto L150BC;
 L1509A:;
-    func_00069938(203, *(int *)D_00195AA4, 110);
+    sound_play(203, *(int *)player_object, 110);
     ((int (*)())(*(int *)(D_00179B80 + (l_18 * 12))))(l_18);
 L150BC:;
     goto L1503C;
@@ -362,29 +362,29 @@ L150D8:;
     l_18++;
     goto L150CD;
 L150E0:;
-    if (*(short *)D_0012AC04 <= *(short *)(D_00179B78 + (l_18 * 12))) goto L15108;
-    if (*(short *)D_0012AC04 < *(short *)(D_00179B7C + (l_18 * 12))) goto L1510A;
+    if (*(short *)mouse_x <= *(short *)(talk_buttons + (l_18 * 12))) goto L15108;
+    if (*(short *)mouse_x < *(short *)(D_00179B7C + (l_18 * 12))) goto L1510A;
 L15108:;
     goto L1511E;
 L1510A:;
-    if (*(short *)D_0012AC06 > *(short *)(D_00179B7A + (l_18 * 12))) goto L15120;
+    if (*(short *)mouse_y > *(short *)(D_00179B7A + (l_18 * 12))) goto L15120;
 L1511E:;
     goto L15134;
 L15120:;
-    if (*(short *)D_0012AC06 < *(short *)(D_00179B7E + (l_18 * 12))) goto L15136;
+    if (*(short *)mouse_y < *(short *)(D_00179B7E + (l_18 * 12))) goto L15136;
 L15134:;
     goto L15167;
 L15136:;
-    if (*(signed char *)D_0012AC00 != 0) goto L15145;
+    if (*(signed char *)mouse_buttons != 0) goto L15145;
     if (l_18 != 15) goto L15167;
 L15145:;
-    func_00069938(203, *(int *)D_00195AA4, 110);
+    sound_play(203, *(int *)player_object, 110);
     ((int (*)())(*(int *)(D_00179B80 + (l_18 * 12))))(l_18);
 L15167:;
     goto L150D8;
 }
 
-void func_00015176(void)
+void talk_draw(void)
 {
     int l_28;
     int l_24;
@@ -394,109 +394,109 @@ void func_00015176(void)
 
     l_1C = func_0009DC25();
     func_0009DC49(*(int *)D_001965C8);
-    if (((int)(unsigned char)*(signed char *)(*(char **)D_00196590)) != 4) goto L151CB;
-    func_0007CA85((int)(*(char **)D_00196590 + 3), 213, 53, 145, 156);
+    if (((int)(unsigned char)*(signed char *)(*(char **)talk_npc_own_faction)) != 4) goto L151CB;
+    text_draw_centered_colored((int)(*(char **)talk_npc_own_faction + 3), 213, 53, 145, 156);
     goto L151EF;
 L151CB:;
-    func_0007CA85(func_0008B48B(*(int *)D_001965E0), 213, 53, 145, 156);
+    text_draw_centered_colored(func_0008B48B(*(int *)talk_npc_object), 213, 53, 145, 156);
 L151EF:;
-    func_00016B5A();
-    func_00016E61(190, 66, 302, 184);
-    func_0001710E();
+    talk_draw_face();
+    talk_draw_answer(190, 66, 302, 184);
+    talk_clear_question();
     *(int *)D_00196578 = 0;
     *(signed char *)D_0012B508 = 244;
-    func_00144D00((int)(short)*(short *)(D_00179B78 + ((((int)(unsigned char)*(signed char *)D_001966B2) + 6) * 12)), (int)(short)*(short *)(D_00179B7A + ((((int)(unsigned char)*(signed char *)D_001966B2) + 6) * 12)), (int)(short)((*(short *)(D_00179B7C + ((((int)(unsigned char)*(signed char *)D_001966B2) + 6) * 12)) - *(short *)(D_00179B78 + ((((int)(unsigned char)*(signed char *)D_001966B2) + 6) * 12))) + 1), (int)(short)((*(short *)(D_00179B7E + ((((int)(unsigned char)*(signed char *)D_001966B2) + 6) * 12)) - *(short *)(D_00179B7A + ((((int)(unsigned char)*(signed char *)D_001966B2) + 6) * 12))) + 1));
+    func_00144D00((int)(short)*(short *)(talk_buttons + ((((int)(unsigned char)*(signed char *)talk_tone) + 6) * 12)), (int)(short)*(short *)(D_00179B7A + ((((int)(unsigned char)*(signed char *)talk_tone) + 6) * 12)), (int)(short)((*(short *)(D_00179B7C + ((((int)(unsigned char)*(signed char *)talk_tone) + 6) * 12)) - *(short *)(talk_buttons + ((((int)(unsigned char)*(signed char *)talk_tone) + 6) * 12))) + 1), (int)(short)((*(short *)(D_00179B7E + ((((int)(unsigned char)*(signed char *)talk_tone) + 6) * 12)) - *(short *)(D_00179B7A + ((((int)(unsigned char)*(signed char *)talk_tone) + 6) * 12))) + 1));
     func_00144F68(4, 26, 107, 40, *(int *)D_001965E4);
-    if (*(signed char *)D_001966AE == 0) goto L15375;
-    l_20 = ((int)(short)*(short *)(D_00179B7A + ((((int)(unsigned char)*(signed char *)D_001966B1) + 2) * 12))) * 320;
+    if (*(signed char *)talk_question_mode == 0) goto L15375;
+    l_20 = ((int)(short)*(short *)(D_00179B7A + ((((int)(unsigned char)*(signed char *)talk_topic_tab) + 2) * 12))) * 320;
 L152F7:;
-    if ((((int)(short)*(short *)(D_00179B7E + ((((int)(unsigned char)*(signed char *)D_001966B1) + 2) * 12))) * 320) >= l_20) goto L15321;
+    if ((((int)(short)*(short *)(D_00179B7E + ((((int)(unsigned char)*(signed char *)talk_topic_tab) + 2) * 12))) * 320) >= l_20) goto L15321;
     goto L15375;
 L15318:;
     l_20 += 320;
     goto L152F7;
 L15321:;
-    func_000A1023(((int)(short)*(short *)(D_00179B78 + ((((int)(unsigned char)*(signed char *)D_001966B1) + 2) * 12))) + (*(int *)D_00143550 + l_20), (*(int *)D_00195BE8 + l_20) + ((int)(short)*(short *)(D_00179B78 + ((((int)(unsigned char)*(signed char *)D_001966B1) + 2) * 12))), 107, (int)D_001703F0, 417, 4);
+    func_000A1023(((int)(short)*(short *)(talk_buttons + ((((int)(unsigned char)*(signed char *)talk_topic_tab) + 2) * 12))) + (*(int *)screen_buffer + l_20), (*(int *)window_image + l_20) + ((int)(short)*(short *)(talk_buttons + ((((int)(unsigned char)*(signed char *)talk_topic_tab) + 2) * 12))), 107, (int)D_001703F0, 417, 4);
     goto L15318;
 L15375:;
-    l_28 = ((int)(unsigned char)*(signed char *)D_001966AE) * 1070;
-    l_20 = ((int)(short)*(short *)(D_00179B7A + (((int)(unsigned char)*(signed char *)D_001966AE) * 12))) * 320;
+    l_28 = ((int)(unsigned char)*(signed char *)talk_question_mode) * 1070;
+    l_20 = ((int)(short)*(short *)(D_00179B7A + (((int)(unsigned char)*(signed char *)talk_question_mode) * 12))) * 320;
 L1539F:;
-    if ((((int)(short)*(short *)(D_00179B7E + (((int)(unsigned char)*(signed char *)D_001966AE) * 12))) * 320) >= l_20) goto L153CA;
+    if ((((int)(short)*(short *)(D_00179B7E + (((int)(unsigned char)*(signed char *)talk_question_mode) * 12))) * 320) >= l_20) goto L153CA;
     goto L15406;
 L153BD:;
     l_20 += 320;
     l_28 += 107;
     goto L1539F;
 L153CA:;
-    func_000A1023(((int)(short)*(short *)(D_00179B78 + (((int)(unsigned char)*(signed char *)D_001966AE) * 12))) + (*(int *)D_00143550 + l_20), *(int *)D_001965F8 + l_28, 107, (int)D_001703F0, 423, 4);
+    func_000A1023(((int)(short)*(short *)(talk_buttons + (((int)(unsigned char)*(signed char *)talk_question_mode) * 12))) + (*(int *)screen_buffer + l_20), *(int *)D_001965F8 + l_28, 107, (int)D_001703F0, 423, 4);
     goto L153BD;
 L15406:;
     *(signed char *)D_001966B7 = 1;
-    if (((int)(unsigned char)*(signed char *)D_001966B1) != 3) goto L154B4;
-    func_0004A6B5(7211, 0, 0);
-    func_000A0AD9((int)D_00196620, (int)D_00190FE4, 4, (int)D_001703F0, 430);
-    func_0004A6B5(((int)(unsigned char)*(signed char *)D_001966B2) + 7212, 0, 0);
+    if (((int)(unsigned char)*(signed char *)talk_topic_tab) != 3) goto L154B4;
+    parse_rsc_text(7211, 0, 0);
+    func_000A0AD9((int)talk_key_text, (int)text_rsc_buffer, 4, (int)D_001703F0, 430);
+    parse_rsc_text(((int)(unsigned char)*(signed char *)talk_tone) + 7212, 0, 0);
     *(signed char *)D_00190D0F = 1;
-    func_000A0AD9((int)(*(char **)D_00147954 + 90000), (int)D_00190FE4, 4, (int)D_001703F0, 433);
-    func_00016B91((int)(*(char **)D_00147954 + 90000), 134, 10, 245, 45);
+    func_000A0AD9((int)(*(char **)D_00147954 + 90000), (int)text_rsc_buffer, 4, (int)D_001703F0, 433);
+    talk_wrap_text((int)(*(char **)D_00147954 + 90000), 134, 10, 245, 45);
     *(signed char *)D_00190D0F = 0;
     goto L15621;
 L154B4:;
-    switch (*(unsigned char *)D_001966AE) {
+    switch (*(unsigned char *)talk_question_mode) {
     goto L15621;
 case 1:
-    if (*(signed char *)D_001966B0 == 0) goto L154E8;
-    if (*(signed char *)D_001966B1 == 0) goto L154EA;
+    if (*(signed char *)talk_showing_categories == 0) goto L154E8;
+    if (*(signed char *)talk_topic_tab == 0) goto L154EA;
 L154E8:;
     goto L154F1;
 L154EA:;
-    func_00018172();
+    talk_draw_categories();
     goto L15569;
 L154F1:;
-    func_00017179();
-    if (*(int *)D_001965B8 == 0) goto L15621;
-    func_0004A6B5(((int)(unsigned char)*(signed char *)D_001966B2) + 7225, 0, 0);
+    talk_draw_place_list();
+    if (*(int *)talk_list_count == 0) goto L15621;
+    parse_rsc_text(((int)(unsigned char)*(signed char *)talk_tone) + 7225, 0, 0);
     *(signed char *)D_00190D0F = 1;
-    func_000A0AD9((int)(*(char **)D_00147954 + 90000), (int)D_00190FE4, 4, (int)D_001703F0, 448);
-    func_00016B91((int)(*(char **)D_00147954 + 90000), 134, 10, 245, 45);
+    func_000A0AD9((int)(*(char **)D_00147954 + 90000), (int)text_rsc_buffer, 4, (int)D_001703F0, 448);
+    talk_wrap_text((int)(*(char **)D_00147954 + 90000), 134, 10, 245, 45);
     *(signed char *)D_00190D0F = 0;
 L15569:;
     goto L15621;
 case 0:
-    func_0001889E();
-    if (*(short *)((char *)(int)(*(char **)D_0019657C + (*(int *)D_001965E8 * 6))) != 0) goto L155A2;
-    if ((*(short **)D_0019657C)[*(int *)D_001965E8 * 3 + 1] == 0) goto L155A4;
+    talk_draw_tell_list();
+    if (*(short *)((char *)(int)(*(char **)talk_topics + (*(int *)talk_selected_row * 6))) != 0) goto L155A2;
+    if ((*(short **)talk_topics)[*(int *)talk_selected_row * 3 + 1] == 0) goto L155A4;
 L155A2:;
     goto L155BB;
 L155A4:;
-    func_0004A6B5(((int)(unsigned char)*(signed char *)D_001966B2) + 7231, 0, 0);
+    parse_rsc_text(((int)(unsigned char)*(signed char *)talk_tone) + 7231, 0, 0);
     goto L155D0;
 L155BB:;
-    func_0004A6B5(((int)(unsigned char)*(signed char *)D_001966B2) + 7212, 0, 0);
+    parse_rsc_text(((int)(unsigned char)*(signed char *)talk_tone) + 7212, 0, 0);
 L155D0:;
     *(signed char *)D_00190D0F = 1;
-    func_000A0AD9((int)(*(char **)D_00147954 + 90000), (int)D_00190FE4, 4, (int)D_001703F0, 461);
-    func_00016B91((int)(*(char **)D_00147954 + 90000), 134, 10, 245, 45);
+    func_000A0AD9((int)(*(char **)D_00147954 + 90000), (int)text_rsc_buffer, 4, (int)D_001703F0, 461);
+    talk_wrap_text((int)(*(char **)D_00147954 + 90000), 134, 10, 245, 45);
     *(signed char *)D_00190D0F = 0;
 default:
 L15621:;
-    func_00016F74(125, 10, 245, 45);
-    func_000A1023(*(int *)D_0019658C, *(int *)D_00143550, 64000, (int)D_001703F0, 469, 4);
-    *(signed char *)D_001966B3 = 0;
+    talk_draw_question(125, 10, 245, 45);
+    func_000A1023(*(int *)talk_saved_screen, *(int *)screen_buffer, 64000, (int)D_001703F0, 469, 4);
+    *(signed char *)talk_redraw = 0;
     func_0009DC49(l_1C);
 }
 }
 
-void func_00015674(int a1)
+void talk_start(int a1)
 {
     int l_18;
 
-    *(int *)D_001965EC = 0;
+    *(int *)talk_face_image = 0;
     *(signed char *)D_00190D10 = 0;
-    *(int *)D_001965E0 = a1;
+    *(int *)talk_npc_object = a1;
     if (((int)(unsigned short)(*(short *)((char *)a1 + 25) & 32768)) == 0) goto L156C7;
-    func_0003F09F(7205, 1);
+    msgbox_show_rsc(7205, 1);
     return;
 L156C7:;
     if (((int)(unsigned char)*(signed char *)((char *)a1)) == 8) goto L156E5;
@@ -508,7 +508,7 @@ L156E7:;
 L156F6:;
     goto L1570C;
 L156F8:;
-    func_0003F09F(7204, 1);
+    msgbox_show_rsc(7204, 1);
     return;
 L1570C:;
     if (((int)(unsigned char)*(signed char *)((char *)a1)) != 53) goto L15730;
@@ -516,36 +516,36 @@ L1570C:;
 L15730:;
     goto L15741;
 L15732:;
-    func_0007CBA1((int)D_001703F7);
+    hud_message_add((int)D_001703F7);
     return;
 L15741:;
-    *(short *)D_001966AA = 0;
+    *(short *)talk_flags = 0;
     if (((int)(unsigned char)*(signed char *)((char *)a1)) == 8) goto L15768;
     if (((int)(unsigned char)*(signed char *)((char *)a1)) != 53) goto L15781;
 L15768:;
-    *(int *)D_0019659C = func_00059973(a1);
-    *(signed char *)D_001966AA &= 254;
+    *(int *)talk_npc_record = npc_talk_record_build(a1);
+    *(signed char *)talk_flags &= 254;
     goto L15811;
 L15781:;
-    if (((int)(unsigned char)*(signed char *)((char *)(*(int *)D_0019659C = a1 + 71) + 67)) >= 43) goto L157A5;
-    *(signed char *)D_001966AA |= 1;
+    if (((int)(unsigned char)*(signed char *)((char *)(*(int *)talk_npc_record = a1 + 71) + 67)) >= 43) goto L157A5;
+    *(signed char *)talk_flags |= 1;
 L157A5:;
-    *(short *)D_001966A8 = *(short *)(D_00179ACC + (((int)(unsigned char)*(signed char *)(*(char **)D_0019659C + 67)) << 2));
-    *(short *)D_001966A6 = *(short *)(D_00179ACE + (((int)(unsigned char)*(signed char *)(*(char **)D_0019659C + 67)) << 2));
-    if (*(short *)D_001966A8 != 0) goto L157FD;
-    func_0003F09F(7204, 1);
+    *(short *)talk_language_skill = *(short *)(talk_creature_language + (((int)(unsigned char)*(signed char *)(*(char **)talk_npc_record + 67)) << 2));
+    *(short *)D_001966A6 = *(short *)(D_00179ACE + (((int)(unsigned char)*(signed char *)(*(char **)talk_npc_record + 67)) << 2));
+    if (*(short *)talk_language_skill != 0) goto L157FD;
+    msgbox_show_rsc(7204, 1);
     return;
 L157FD:;
-    if (((int)(unsigned short)*(short *)D_001966A8) != 1) goto L15811;
-    *(signed char *)D_001966AA &= 254;
+    if (((int)(unsigned short)*(short *)talk_language_skill) != 1) goto L15811;
+    *(signed char *)talk_flags &= 254;
 L15811:;
-    *(int *)D_00195A84 = *(int *)D_0019659C;
-    *(int *)D_00196594 = func_000192EE((int)(short)*(short *)(*(char **)D_0019659C + 551));
-    *(int *)D_001965EC = func_000A00AF(4096, (int)D_001703F0, 530);
-    if (((int)(unsigned char)*(signed char *)(*(char **)D_00196594)) != 4) goto L1586F;
-    func_00016AA3((int)(unsigned short)*(short *)(*(char **)D_00196594 + 51));
+    *(int *)D_00195A84 = *(int *)talk_npc_record;
+    *(int *)talk_npc_faction = faction_find((int)(short)*(short *)(*(char **)talk_npc_record + 551));
+    *(int *)talk_face_image = func_000A00AF(4096, (int)D_001703F0, 530);
+    if (((int)(unsigned char)*(signed char *)(*(char **)talk_npc_faction)) != 4) goto L1586F;
+    talk_load_face((int)(unsigned short)*(short *)(*(char **)talk_npc_faction + 51));
 L1586F:;
-    l_18 = *(int *)D_00196594;
+    l_18 = *(int *)talk_npc_faction;
 L15877:;
     if (l_18 == 0) goto L158B9;
     if (((int)(unsigned char)*(signed char *)((char *)l_18)) == 2) goto L1589B;
@@ -560,38 +560,38 @@ L158AE:;
     l_18 = *(int *)((char *)l_18 + 88);
     goto L15877;
 L158B9:;
-    *(int *)D_00196590 = *(int *)D_00196594;
+    *(int *)talk_npc_own_faction = *(int *)talk_npc_faction;
     if (l_18 == 0) goto L158D1;
-    *(int *)D_00196594 = l_18;
+    *(int *)talk_npc_faction = l_18;
 L158D1:;
-    *(int *)D_00195D34 = (int)(short)*(short *)(*(char **)D_00196594 + 29);
-    *(int *)D_00195D34 += func_000713B3();
-    if (((int)(unsigned char)*(signed char *)(*(char **)D_00196594 + 54)) >= 5) goto L1593A;
-    *(int *)D_00195D34 += (int)(short)*(short *)(*(char **)D_00195BE0 + 145 + (((int)(unsigned char)*(signed char *)(*(char **)D_00196594 + 54)) * 2));
-    *(int *)D_00195D34 += func_000679BB((int)(unsigned char)*(signed char *)(*(char **)D_00196594 + 54));
+    *(int *)talk_disposition = (int)(short)*(short *)(*(char **)talk_npc_faction + 29);
+    *(int *)talk_disposition += guild_local_temple_rank();
+    if (((int)(unsigned char)*(signed char *)(*(char **)talk_npc_faction + 54)) >= 5) goto L1593A;
+    *(int *)talk_disposition += (int)(short)*(short *)(*(char **)player_character + 145 + (((int)(unsigned char)*(signed char *)(*(char **)talk_npc_faction + 54)) * 2));
+    *(int *)talk_disposition += func_000679BB((int)(unsigned char)*(signed char *)(*(char **)talk_npc_faction + 54));
     goto L1594A;
 L1593A:;
-    *(int *)D_00195D34 += func_000679BB(100);
+    *(int *)talk_disposition += func_000679BB(100);
 L1594A:;
-    if (func_00067C04(0) == 0) goto L15971;
-    *(int *)D_00195D34 += ((int)(short)*(short *)(*(char **)D_00195BE0 + 42)) / 5;
+    if (item_artifact_equipped(0) == 0) goto L15971;
+    *(int *)talk_disposition += ((int)(short)*(short *)(*(char **)player_character + 42)) / 5;
 L15971:;
-    if (*(int *)D_00195D34 >= (-20)) goto L159C3;
-    func_0003F09F(7205, 1);
-    if (*(int *)D_001965EC == 0) goto L1599E;
-    if (*(int *)D_001965EC != (-1751672937)) goto L159A0;
+    if (*(int *)talk_disposition >= (-20)) goto L159C3;
+    msgbox_show_rsc(7205, 1);
+    if (*(int *)talk_face_image == 0) goto L1599E;
+    if (*(int *)talk_face_image != (-1751672937)) goto L159A0;
 L1599E:;
     goto L159BE;
 L159A0:;
-    func_000A0024(*(int *)D_001965EC, (int)D_001703F0, 562);
-    *(int *)D_001965EC = -1751672937;
+    func_000A0024(*(int *)talk_face_image, (int)D_001703F0, 562);
+    *(int *)talk_face_image = -1751672937;
 L159BE:;
     return;
 L159C3:;
-    *(signed char *)D_001966B9 = 0;
-    if (((int)(short)*(short *)(*(char **)D_0019659C + 551)) != 512) goto L15A3C;
-    if ((((int)(unsigned short)(*(short *)(*(char **)D_00195BE0 + 64) & 1)) ^ ((int)(unsigned short)(*(short *)(*(char **)D_0019659C + 64) & 1))) == 0) goto L15A1F;
-    if (((int)(unsigned short)(*(short *)(*(char **)D_00195BF8) & 4)) == 0) goto L15A21;
+    *(signed char *)talk_prostitute_offer = 0;
+    if (((int)(short)*(short *)(*(char **)talk_npc_record + 551)) != 512) goto L15A3C;
+    if ((((int)(unsigned short)(*(short *)(*(char **)player_character + 64) & 1)) ^ ((int)(unsigned short)(*(short *)(*(char **)talk_npc_record + 64) & 1))) == 0) goto L15A1F;
+    if (((int)(unsigned short)(*(short *)(*(char **)game_settings) & 4)) == 0) goto L15A21;
 L15A1F:;
     goto L15A2A;
 L15A21:;
@@ -599,197 +599,197 @@ L15A21:;
 L15A2A:;
     goto L15A3C;
 L15A2C:;
-    *(signed char *)D_001966B9 = 1;
-    *(signed char *)D_001966B6 = 0;
+    *(signed char *)talk_prostitute_offer = 1;
+    *(signed char *)talk_prostitute_state = 0;
     return;
 L15A3C:;
-    func_00014AE8(*(int *)D_001965E0);
+    talk_open(*(int *)talk_npc_object);
 }
 
-int func_00015A50(void)
+int talk_prostitute_update(void)
 {
 __dagger_tbl15A60:;
-    switch (*(unsigned char *)D_001966B9) {
+    switch (*(unsigned char *)talk_prostitute_offer) {
 case 1:
-    switch (*(unsigned char *)D_001966B6) {
+    switch (*(unsigned char *)talk_prostitute_state) {
 case 0:
-    func_0007DDC9(7200);
-    *(signed char *)D_001966B6 = 1;
+    msgbox_yes_no_rsc(7200);
+    *(signed char *)talk_prostitute_state = 1;
     goto L15BB3;
 case 1:
     if (((int)(unsigned char)*(signed char *)D_00196271) != 2) goto L15AD1;
-    func_00014AE8(*(int *)D_001965E0);
+    talk_open(*(int *)talk_npc_object);
     goto L15B1A;
 L15AD1:;
-    if ((*(int *)D_00195D58 = func_0007D6AE(50, 75) - *(int *)D_00195D34) <= 0) goto L15B09;
-    func_0007DDC9(7202);
-    *(signed char *)D_001966B6 = 3;
+    if ((*(int *)talk_prostitute_price = rand_range(50, 75) - *(int *)talk_disposition) <= 0) goto L15B09;
+    msgbox_yes_no_rsc(7202);
+    *(signed char *)talk_prostitute_state = 3;
     goto L15B1A;
 L15B09:;
-    func_0007DDC9(7201);
-    *(signed char *)D_001966B6 = 2;
+    msgbox_yes_no_rsc(7201);
+    *(signed char *)talk_prostitute_state = 2;
 L15B1A:;
     goto L15BB3;
 case 3:
     if (((int)(unsigned char)*(signed char *)D_00196271) != 1) goto L15B7E;
-    *(int *)(*(char **)D_00195BE0 + 133) -= *(int *)D_00195D58;
-    if (((unsigned)(*(int *)(*(char **)D_00195BE0 + 133) + *(int *)D_00195D58)) >= *(int *)D_00195D58) goto L15B7E;
-    *(int *)(*(char **)D_00195BE0 + 133) += *(int *)D_00195D58;
-    func_0003F09F(7203, 1);
-    *(signed char *)D_001966B9 = 0;
+    *(int *)(*(char **)player_character + 133) -= *(int *)talk_prostitute_price;
+    if (((unsigned)(*(int *)(*(char **)player_character + 133) + *(int *)talk_prostitute_price)) >= *(int *)talk_prostitute_price) goto L15B7E;
+    *(int *)(*(char **)player_character + 133) += *(int *)talk_prostitute_price;
+    msgbox_show_rsc(7203, 1);
+    *(signed char *)talk_prostitute_offer = 0;
     goto L15BB3;
 case 2:
 L15B7E:;
     if (((int)(unsigned char)*(signed char *)D_00196271) != 2) goto L15B96;
-    func_00014AE8(*(int *)D_001965E0);
+    talk_open(*(int *)talk_npc_object);
     goto L15BB3;
 L15B96:;
     func_000164EF();
-    func_0004AB2F((int)(short)*(short *)(*(char **)D_00195BE0 + 40));
-    func_00014AE8(*(int *)D_001965E0);
+    time_pass((int)(short)*(short *)(*(char **)player_character + 40));
+    talk_open(*(int *)talk_npc_object);
 }
 default:
 L15BB3:;
-    return (int)(unsigned char)*(signed char *)D_001966B9;
+    return (int)(unsigned char)*(signed char *)talk_prostitute_offer;
 }
 }
 
-void func_00015BCA(void)
+void talk_button_where_is(void)
 {
-    *(int *)D_001965F4 = 0;
-    *(int *)D_001965F0 = 13;
+    *(int *)talk_list_top = 0;
+    *(int *)talk_list_bottom = 13;
     *(int *)D_00196580 = 0;
-    *(int *)D_001965E8 = 1;
-    *(signed char *)D_001966AE = 1;
-    *(signed char *)D_001966B3 = 1;
+    *(int *)talk_selected_row = 1;
+    *(signed char *)talk_question_mode = 1;
+    *(signed char *)talk_redraw = 1;
 }
 
-void func_00015C18(void)
+void talk_prepare_where_answer(void)
 {
-    *(int *)D_001965C0 = func_00018F7C();
+    *(int *)talk_npc_knows = talk_roll_knows();
     *(int *)D_001965DC = 2;
-    if (*(unsigned char *)D_001966B1 <= 0) goto L15C6E;
-    *(int *)(*(char **)D_00195D28 + 18) = *(int *)((char *)(int)((*(int *)D_001965E8 * 19) + *(char **)D_00196598) + 3);
+    if (*(unsigned char *)talk_topic_tab <= 0) goto L15C6E;
+    *(int *)(*(char **)D_00195D28 + 18) = *(int *)((char *)(int)((*(int *)talk_selected_row * 19) + *(char **)talk_place_topics) + 3);
     *(short *)(*(char **)D_00195D28 + 4) = 0;
     return;
 L15C6E:;
-    if (((int)(unsigned char)*(signed char *)D_001966B5) != 14) goto L15CAA;
+    if (((int)(unsigned char)*(signed char *)talk_location_category) != 14) goto L15CAA;
     *(signed char *)(*(char **)D_00195D28 + 16) = 5;
-    *(signed char *)(*(char **)D_00195D28 + 7) = *(signed char *)D_00196268;
+    *(signed char *)(*(char **)D_00195D28 + 7) = *(signed char *)current_region;
     *(int *)(*(char **)D_00195D28 + 18) = 0;
     *(short *)(*(char **)D_00195D28 + 4) = 0;
     return;
 L15CAA:;
     *(signed char *)(*(char **)D_00195D28 + 16) = 5;
-    *(signed char *)(*(char **)D_00195D28 + 7) = *(signed char *)D_00196268;
-    *(int *)(*(char **)D_00195D28 + 18) = *(int *)(*(char **)D_00196598 + 3 + (((int)(unsigned char)*(signed char *)(D_001964B0 + *(int *)D_001965E8)) * 19));
+    *(signed char *)(*(char **)D_00195D28 + 7) = *(signed char *)current_region;
+    *(int *)(*(char **)D_00195D28 + 18) = *(int *)(*(char **)talk_place_topics + 3 + (((int)(unsigned char)*(signed char *)(D_001964B0 + *(int *)talk_selected_row)) * 19));
     *(short *)(*(char **)D_00195D28 + 4) = 0;
 }
 
-void func_00015CF9(void)
+void talk_button_tell_me_about(void)
 {
-    *(int *)D_001965F4 = 0;
-    *(int *)D_001965F0 = 13;
+    *(int *)talk_list_top = 0;
+    *(int *)talk_list_bottom = 13;
     *(int *)D_00196580 = 0;
-    *(int *)D_001965E8 = 0;
-    *(signed char *)D_001966AE = 0;
-    *(signed char *)D_001966B3 = 1;
+    *(int *)talk_selected_row = 0;
+    *(signed char *)talk_question_mode = 0;
+    *(signed char *)talk_redraw = 1;
 }
 
-int func_00015D47(void)
+int talk_ask_news(void)
 {
     int l_1C;
 
-    *(int *)D_001965C0 = func_00018F7C();
+    *(int *)talk_npc_knows = talk_roll_knows();
     *(int *)D_001965DC = 3;
-    if (*(int *)D_001965E8 == 0) goto L15D7E;
+    if (*(int *)talk_selected_row == 0) goto L15D7E;
     return 0;
 L15D7E:;
-    l_1C = func_0001D2F0((int)(short)*(short *)(*(char **)D_00196594 + 33));
+    l_1C = rumor_pick_news((int)(short)*(short *)(*(char **)talk_npc_faction + 33));
     if (l_1C != 0) goto L15D9E;
     return 0;
 L15D9E:;
     func_000A0AD9(*(int *)D_00147954 + 90000, l_1C, 4, (int)D_001703F0, 699);
     *(signed char *)D_001966BB = 1;
     func_000A0AD9(*(int *)D_00147954 + 95000, l_1C, 4, (int)D_001703F0, 701);
-    func_00016B91(*(int *)D_00147954 + 90000, 190, 66, 302, 191);
+    talk_wrap_text(*(int *)D_00147954 + 90000, 190, 66, 302, 191);
     return 1;
 }
 
-void func_00015E1E(void)
+void talk_tab_location(void)
 {
-    *(int *)D_001965E8 = 1;
+    *(int *)talk_selected_row = 1;
     *(int *)D_00196580 = 0;
-    *(signed char *)D_001966B1 = 0;
-    *(signed char *)D_001966B3 = 1;
+    *(signed char *)talk_topic_tab = 0;
+    *(signed char *)talk_redraw = 1;
 }
 
-void func_00015E58(void)
-{
-    *(int *)D_00196580 = 0;
-    *(signed char *)D_001966B1 = 1;
-    *(signed char *)D_001966B3 = 1;
-}
-
-void func_00015E88(void)
+void talk_tab_people(void)
 {
     *(int *)D_00196580 = 0;
-    *(signed char *)D_001966B1 = 2;
-    *(signed char *)D_001966B3 = 1;
+    *(signed char *)talk_topic_tab = 1;
+    *(signed char *)talk_redraw = 1;
 }
 
-void func_00015EB8(void)
+void talk_tab_things(void)
 {
     *(int *)D_00196580 = 0;
-    *(signed char *)D_001966B1 = 3;
-    *(signed char *)D_001966B3 = 1;
+    *(signed char *)talk_topic_tab = 2;
+    *(signed char *)talk_redraw = 1;
 }
 
-void func_00015EE8(int a1)
+void talk_tab_work(void)
 {
-    *(signed char *)D_001966B2 = *(signed char *)&a1 - 6;
-    *(int *)D_001965BC = func_00019067();
-    *(signed char *)D_001966B3 = 1;
+    *(int *)D_00196580 = 0;
+    *(signed char *)talk_topic_tab = 3;
+    *(signed char *)talk_redraw = 1;
 }
 
-void func_00015F1E(void)
+void talk_button_tone(int a1)
+{
+    *(signed char *)talk_tone = *(signed char *)&a1 - 6;
+    *(int *)talk_npc_attitude = talk_roll_attitude();
+    *(signed char *)talk_redraw = 1;
+}
+
+void talk_button_copy_to_logbook(void)
 {
     if (*(signed char *)D_001966BB == 0) return;
-    func_0006B130(*(int *)D_00147954 + 95000);
+    logbook_copy_text(*(int *)D_00147954 + 95000);
 }
 
-void func_00015F4E(void)
+void talk_close(void)
 {
     int l_18;
 
 L15F5C:;
-    if (*(signed char *)D_00142309 != 0) goto L15F5C;
+    if (*(signed char *)key_down_esc != 0) goto L15F5C;
 L15F65:;
-    if (*(signed char *)D_0012AC00 == 0) goto L15F75;
+    if (*(signed char *)mouse_buttons == 0) goto L15F75;
     func_0012B136();
     goto L15F65;
 L15F75:;
     if (*(signed char *)D_001966BA == 0) goto L15FA1;
-    *(signed char *)(*(char **)D_001965E0 + 26) |= 128;
-    if (((int)(unsigned char)*(signed char *)(*(char **)D_001965E0)) != 53) goto L15FA1;
-    *(signed char *)(*(char **)D_001965E0 + 29) |= 1;
+    *(signed char *)(*(char **)talk_npc_object + 26) |= 128;
+    if (((int)(unsigned char)*(signed char *)(*(char **)talk_npc_object)) != 53) goto L15FA1;
+    *(signed char *)(*(char **)talk_npc_object + 29) |= 1;
 L15FA1:;
-    if (*(int *)D_001965EC == 0) goto L15FB6;
-    if (*(int *)D_001965EC != (-1751672937)) goto L15FB8;
+    if (*(int *)talk_face_image == 0) goto L15FB6;
+    if (*(int *)talk_face_image != (-1751672937)) goto L15FB8;
 L15FB6:;
     goto L15FD6;
 L15FB8:;
-    func_000A0024(*(int *)D_001965EC, (int)D_001703F0, 760);
-    *(int *)D_001965EC = -1751672937;
+    func_000A0024(*(int *)talk_face_image, (int)D_001703F0, 760);
+    *(int *)talk_face_image = -1751672937;
 L15FD6:;
     *(signed char *)D_00190D10 = 0;
-    if (*(int *)D_00195BE8 == 0) goto L15FF2;
-    if (*(int *)D_00195BE8 != (-1751672937)) goto L15FF4;
+    if (*(int *)window_image == 0) goto L15FF2;
+    if (*(int *)window_image != (-1751672937)) goto L15FF4;
 L15FF2:;
     goto L16012;
 L15FF4:;
-    func_000A0024(*(int *)D_00195BE8, (int)D_001703F0, 762);
-    *(int *)D_00195BE8 = -1751672937;
+    func_000A0024(*(int *)window_image, (int)D_001703F0, 762);
+    *(int *)window_image = -1751672937;
 L16012:;
     if (*(int *)D_001965E4 == 0) goto L16027;
     if (*(int *)D_001965E4 != (-1751672937)) goto L16029;
@@ -799,13 +799,13 @@ L16029:;
     func_000A0024(*(int *)D_001965E4, (int)D_001703F0, 763);
     *(int *)D_001965E4 = -1751672937;
 L16047:;
-    if (*(int *)D_0019658C == 0) goto L1605C;
-    if (*(int *)D_0019658C != (-1751672937)) goto L1605E;
+    if (*(int *)talk_saved_screen == 0) goto L1605C;
+    if (*(int *)talk_saved_screen != (-1751672937)) goto L1605E;
 L1605C:;
     goto L1607C;
 L1605E:;
-    func_000A0024(*(int *)D_0019658C, (int)D_001703F0, 764);
-    *(int *)D_0019658C = -1751672937;
+    func_000A0024(*(int *)talk_saved_screen, (int)D_001703F0, 764);
+    *(int *)talk_saved_screen = -1751672937;
 L1607C:;
     if (*(int *)D_001965F8 == 0) goto L16091;
     if (*(int *)D_001965F8 != (-1751672937)) goto L16093;
@@ -815,171 +815,171 @@ L16093:;
     func_000A0024(*(int *)D_001965F8, (int)D_001703F0, 765);
     *(int *)D_001965F8 = -1751672937;
 L160B1:;
-    *(signed char *)D_00196274 = 0;
+    *(signed char *)game_mode = 0;
     *(signed char *)D_00196272 = 0;
     *(signed char *)D_00187CA8 = 1;
 }
 
-void func_000160D0(void)
+void talk_list_scroll_up(void)
 {
-    if (*(signed char *)D_001966B1 != 0) goto L160F3;
-    if (((int)(unsigned char)*(signed char *)D_001966AE) == 1) goto L160F5;
+    if (*(signed char *)talk_topic_tab != 0) goto L160F3;
+    if (((int)(unsigned char)*(signed char *)talk_question_mode) == 1) goto L160F5;
 L160F3:;
     goto L160FE;
 L160F5:;
-    if (*(signed char *)D_001966B0 != 0) goto L16100;
+    if (*(signed char *)talk_showing_categories != 0) goto L16100;
 L160FE:;
     goto L16102;
 L16100:;
     return;
 L16102:;
-    if (*(int *)D_001965F4 == 0) return;
-    (*(int *)D_001965F4)--;
-    *(int *)D_001965F0 = *(int *)D_001965F4 + 13;
-    *(signed char *)D_001966B3 = 1;
+    if (*(int *)talk_list_top == 0) return;
+    (*(int *)talk_list_top)--;
+    *(int *)talk_list_bottom = *(int *)talk_list_top + 13;
+    *(signed char *)talk_redraw = 1;
 }
 
-void func_0001612F(void)
+void talk_list_scroll_down(void)
 {
-    if (*(signed char *)D_001966B1 != 0) goto L16152;
-    if (((int)(unsigned char)*(signed char *)D_001966AE) == 1) goto L16154;
+    if (*(signed char *)talk_topic_tab != 0) goto L16152;
+    if (((int)(unsigned char)*(signed char *)talk_question_mode) == 1) goto L16154;
 L16152:;
     goto L1615D;
 L16154:;
-    if (*(signed char *)D_001966B0 != 0) goto L1615F;
+    if (*(signed char *)talk_showing_categories != 0) goto L1615F;
 L1615D:;
     goto L16161;
 L1615F:;
     return;
 L16161:;
-    if (*(int *)D_001965F0 >= *(int *)D_001965B8) return;
-    (*(int *)D_001965F4)++;
-    *(int *)D_001965F0 = *(int *)D_001965F4 + 13;
-    *(signed char *)D_001966B3 = 1;
+    if (*(int *)talk_list_bottom >= *(int *)talk_list_count) return;
+    (*(int *)talk_list_top)++;
+    *(int *)talk_list_bottom = *(int *)talk_list_top + 13;
+    *(signed char *)talk_redraw = 1;
 }
 
 void func_00016192(void)
 {
     if (*(int *)D_00196580 >= 0) return;
     *(int *)D_00196580 += 4;
-    *(signed char *)D_001966B3 = 1;
+    *(signed char *)talk_redraw = 1;
 }
 
 void func_000161C1(void)
 {
     if (((*(int *)D_00196578 + 6) + *(int *)D_00196580) <= 100) return;
     *(int *)D_00196580 -= 4;
-    *(signed char *)D_001966B3 = 1;
+    *(signed char *)talk_redraw = 1;
 }
 
-void func_000161FA(void)
+void talk_answer_scroll_up(void)
 {
-    if (*(int *)D_001965B4 == 0) goto L16217;
-    (*(int *)D_001965B4)--;
+    if (*(int *)talk_answer_scroll == 0) goto L16217;
+    (*(int *)talk_answer_scroll)--;
 L16217:;
-    *(signed char *)D_001966B3 = 1;
+    *(signed char *)talk_redraw = 1;
 }
 
-void func_00016228(void)
+void talk_answer_scroll_down(void)
 {
-    if ((*(int *)D_001965A8 - 18) <= *(int *)D_001965B4) goto L1624C;
-    (*(int *)D_001965B4)++;
+    if ((*(int *)talk_answer_line_count - 18) <= *(int *)talk_answer_scroll) goto L1624C;
+    (*(int *)talk_answer_scroll)++;
 L1624C:;
-    *(signed char *)D_001966B3 = 1;
+    *(signed char *)talk_redraw = 1;
 }
 
-void func_0001625D(void)
+void talk_button_okay(void)
 {
     if (func_000164AB() != 0) return;
-    if (*(signed char *)D_001966AE == 0) goto L1628A;
-    if (*(signed char *)D_001966B1 == 0) goto L1628C;
+    if (*(signed char *)talk_question_mode == 0) goto L1628A;
+    if (*(signed char *)talk_topic_tab == 0) goto L1628C;
 L1628A:;
     goto L16295;
 L1628C:;
-    if (*(signed char *)D_001966B0 != 0) goto L16297;
+    if (*(signed char *)talk_showing_categories != 0) goto L16297;
 L16295:;
     goto L162A6;
 L16297:;
-    func_00017348(100);
+    talk_list_click(100);
     return;
 L162A6:;
-    if (*(signed char *)D_001966AE == 0) goto L162B8;
-    if (*(signed char *)D_001966B1 == 0) goto L162BA;
+    if (*(signed char *)talk_question_mode == 0) goto L162B8;
+    if (*(signed char *)talk_topic_tab == 0) goto L162BA;
 L162B8:;
     goto L162C3;
 L162BA:;
-    if (*(signed char *)D_001966B0 != 0) goto L162CC;
+    if (*(signed char *)talk_showing_categories != 0) goto L162CC;
 L162C3:;
     if (*(signed char *)D_001966B7 != 0) goto L162D1;
 L162CC:;
     return;
 L162D1:;
     *(int *)D_001965C8 = func_0009DC25();
-    *(signed char *)D_001966B3 = 1;
+    *(signed char *)talk_redraw = 1;
     *(short *)D_001966A4 = 0;
-    func_00016C87();
-    switch (*(unsigned char *)D_001966AE) {
+    talk_log_question();
+    switch (*(unsigned char *)talk_question_mode) {
     goto L16387;
 case 1:
-    func_00015C18();
+    talk_prepare_where_answer();
     goto L16387;
 case 0:
-    if (*(signed char *)D_001966B4 == 0) goto L16337;
-    func_0001652C(1457);
-    *(signed char *)D_001966AA &= 253;
+    if (*(signed char *)talk_news_asked == 0) goto L16337;
+    talk_say_text(1457);
+    *(signed char *)talk_flags &= 253;
     return;
 L16337:;
-    if (((int)(unsigned short)*(short *)(*(char **)D_00196590 + 33)) == 806) goto L16361;
-    if (((int)(unsigned short)*(short *)(*(char **)D_00196590 + 33)) != 842) goto L16363;
+    if (((int)(unsigned short)*(short *)(*(char **)talk_npc_own_faction + 33)) == 806) goto L16361;
+    if (((int)(unsigned short)*(short *)(*(char **)talk_npc_own_faction + 33)) != 842) goto L16363;
 L16361:;
     goto L1636A;
 L16363:;
-    *(signed char *)D_001966B4 = 1;
+    *(signed char *)talk_news_asked = 1;
 L1636A:;
-    if (func_00015D47() == 0) goto L16387;
-    *(signed char *)D_001966AA &= 253;
-    if (*(int *)D_001965E8 == 0) return;
+    if (talk_ask_news() == 0) goto L16387;
+    *(signed char *)talk_flags &= 253;
+    if (*(int *)talk_selected_row == 0) return;
 default:
 L16387:;
-    *(signed char *)D_001966AA &= 253;
-    if (((int)(unsigned char)*(signed char *)D_001966B1) != 3) goto L163F7;
-    if (((int)(unsigned char)*(signed char *)D_001789FA) == 3) goto L163AF;
-    if (func_0004CC82() != 0) goto L163BE;
+    *(signed char *)talk_flags &= 253;
+    if (((int)(unsigned char)*(signed char *)talk_topic_tab) != 3) goto L163F7;
+    if (((int)(unsigned char)*(signed char *)player_environment) == 3) goto L163AF;
+    if (quest_find_potential_questor() != 0) goto L163BE;
 L163AF:;
-    func_0001652C(8078);
+    talk_say_text(8078);
     return;
 L163BE:;
-    if (*(int *)D_001965BC != 0) goto L163D3;
-    func_0001652C(8075);
+    if (*(int *)talk_npc_attitude != 0) goto L163D3;
+    talk_say_text(8075);
     goto L163F2;
 L163D3:;
-    if (*(int *)D_001965BC != 1) goto L163E8;
-    func_0001652C(8076);
+    if (*(int *)talk_npc_attitude != 1) goto L163E8;
+    talk_say_text(8076);
     goto L163F2;
 L163E8:;
-    func_0001652C(8077);
+    talk_say_text(8077);
 L163F2:;
     return;
 L163F7:;
-    if (*(signed char *)D_001966AE != 0) goto L16428;
-    func_0001652C((int)(short)*(short *)(D_00179A7E + (((*(int *)D_001965C0 * 30) + (*(int *)D_001965A4 * 6)) + (*(int *)D_001965BC * 2))));
+    if (*(signed char *)talk_question_mode != 0) goto L16428;
+    talk_say_text((int)(short)*(short *)(talk_tell_answers + (((*(int *)talk_npc_knows * 30) + (*(int *)talk_npc_speech_style * 6)) + (*(int *)talk_npc_attitude * 2))));
     return;
 L16428:;
-    if (((int)(unsigned char)*(signed char *)D_001966AE) != 1) goto L16440;
-    if (((int)(unsigned char)*(signed char *)D_001966B5) == 14) goto L16442;
+    if (((int)(unsigned char)*(signed char *)talk_question_mode) != 1) goto L16440;
+    if (((int)(unsigned char)*(signed char *)talk_location_category) == 14) goto L16442;
 L16440:;
     goto L1644E;
 L16442:;
-    func_0001652C(28);
+    talk_say_text(28);
     return;
 L1644E:;
-    func_0001652C((int)(short)*(short *)(D_00179A42 + (((*(int *)D_001965C0 * 30) + (*(int *)D_001965A4 * 6)) + (*(int *)D_001965BC * 2))));
+    talk_say_text((int)(short)*(short *)(talk_where_answers + (((*(int *)talk_npc_knows * 30) + (*(int *)talk_npc_speech_style * 6)) + (*(int *)talk_npc_attitude * 2))));
 }
 }
 
 void func_0001647E(int a1)
 {
-    func_0001652C(*(int *)((char *)((*(int *)D_001965DC << 2) + a1)));
+    talk_say_text(*(int *)((char *)((*(int *)D_001965DC << 2) + a1)));
 }
 
 int func_000164AB(void)
@@ -992,36 +992,36 @@ int func_000164CD(void)
     return 1;
 }
 
-void func_0001652C(int a1)
+void talk_say_text(int a1)
 {
-    func_0004A6B5(a1, 0, 0);
-    func_000A0AD9(*(int *)D_00147954 + 90000, (int)D_00190FE4, 4, (int)D_001703F0, 934);
+    parse_rsc_text(a1, 0, 0);
+    func_000A0AD9(*(int *)D_00147954 + 90000, (int)text_rsc_buffer, 4, (int)D_001703F0, 934);
     *(signed char *)D_001966BB = 1;
-    func_000A0AD9(*(int *)D_00147954 + 95000, (int)D_00190FE4, 4, (int)D_001703F0, 936);
-    func_00016B91(*(int *)D_00147954 + 90000, 190, 66, 302, 191);
+    func_000A0AD9(*(int *)D_00147954 + 95000, (int)text_rsc_buffer, 4, (int)D_001703F0, 936);
+    talk_wrap_text(*(int *)D_00147954 + 90000, 190, 66, 302, 191);
 }
 
-void func_000165C3(int a1)
+void talk_say_string(int a1)
 {
     func_000A0AD9(*(int *)D_00147954 + 90000, a1, 4, (int)D_001703F0, 942);
     *(signed char *)D_001966BB = 1;
     func_000A0AD9(*(int *)D_00147954 + 95000, a1, 4, (int)D_001703F0, 944);
-    func_00016B91(*(int *)D_00147954 + 90000, 190, 66, 302, 191);
+    talk_wrap_text(*(int *)D_00147954 + 90000, 190, 66, 302, 191);
 }
 
-int func_0001664A(int a1)
+int talk_macro_hint(int a1)
 {
     int l_1C;
 
-    l_1C = func_000166C5(a1);
+    l_1C = talk_hint_text_id(a1);
     if ((l_1C & 32768) == 0) goto L166A5;
-    *(int *)D_00199764 = (*(int *)D_00199780 = func_0004BB64((int)(short)(short)*(signed char *)D_00190D11));
-    func_0004A748(*(int *)D_00199764, l_1C & 32767, 0, 0);
+    *(int *)current_quest = (*(int *)D_00199780 = quest_find_by_id((int)(short)(short)*(signed char *)D_00190D11));
+    quest_load_text(*(int *)current_quest, l_1C & 32767, 0, 0);
     goto L166B1;
 L166A5:;
-    func_0004A6B5(l_1C, 0, 0);
+    parse_rsc_text(l_1C, 0, 0);
 L166B1:;
-    return (int)D_00190FE4;
+    return (int)text_rsc_buffer;
 }
 
 void func_00016907(int a1, int a2)
@@ -1034,15 +1034,15 @@ void func_00016907(int a1, int a2)
 L16928:;
     if (*(signed char *)((char *)a1) == 0) return;
     if (((int)(unsigned char)(*(signed char *)(D_00178630 + ((int)(unsigned char)(*(signed char *)((char *)a1) + 1))) & 192)) == 0) goto L1696B;
-    *(signed char *)(D_001903A4 + l_18++) = *(signed char *)((char *)a1);
+    *(signed char *)(text_buffer + l_18++) = *(signed char *)((char *)a1);
     l_14 = 1;
     goto L169C6;
 L1696B:;
     if (l_14 == 0) goto L169B6;
-    *(signed char *)(D_001903A4 + l_18) = 0;
+    *(signed char *)(text_buffer + l_18) = 0;
     l_14 = 0;
     l_18 = l_14;
-    func_000A0AD9(a2, func_000169D4((int)D_001903A4), 4, (int)D_001703F0, 1038);
+    func_000A0AD9(a2, func_000169D4((int)text_buffer), 4, (int)D_001703F0, 1038);
     a2 += func_000A0DF4(a2);
 L169B6:;
     *(signed char *)((char *)a2++) = *(signed char *)((char *)a1++);
@@ -1055,11 +1055,11 @@ int func_000169D4(int a1)
     int l_20;
     int l_1C;
 
-    *(short *)(*(char **)D_00195BE0 + 159 + (((int)(unsigned short)*(short *)D_001966A8) * 6)) = 1;
-    if (func_0007D6AE(1, 100) > ((int)(short)*(short *)(*(char **)D_00195BE0 + 157 + (((int)(unsigned short)*(short *)D_001966A8) * 6)))) goto L16A36;
+    *(short *)(*(char **)player_character + 159 + (((int)(unsigned short)*(short *)talk_language_skill) * 6)) = 1;
+    if (rand_range(1, 100) > ((int)(short)*(short *)(*(char **)player_character + 157 + (((int)(unsigned short)*(short *)talk_language_skill) * 6)))) goto L16A36;
     return a1;
 L16A36:;
-    l_20 = func_0007D6AE(2, 4);
+    l_20 = rand_range(2, 4);
     *(signed char *)D_00191016 = 0;
     l_1C = 0;
 L16A56:;
@@ -1069,82 +1069,82 @@ L16A60:;
     l_1C++;
     goto L16A56;
 L16A68:;
-    func_000A1054((int)D_00191016, func_0004A044((int)(unsigned short)*(short *)D_001966A6), (int)D_001703F0, 1059, 4);
+    func_000A1054((int)D_00191016, parse_bio_answer_text((int)(unsigned short)*(short *)D_001966A6), (int)D_001703F0, 1059, 4);
     goto L16A60;
 L16A8F:;
     return (int)D_00191016;
 }
 
-void func_00016B5A(void)
+void talk_draw_face(void)
 {
-    func_00144F68(119, 65, 64, 64, *(int *)D_001965EC);
+    func_00144F68(119, 65, 64, 64, *(int *)talk_face_image);
 }
 
-void func_00016B91(int a1, int a2, int a3, int a4, int a5)
+void talk_wrap_text(int a1, int a2, int a3, int a4, int a5)
 {
     int l_10;
     int l_C;
 
     l_C = 0;
-    *(signed char *)D_00190FE4 = 0;
+    *(signed char *)text_rsc_buffer = 0;
     if (*(signed char *)D_00190D0F != 0) goto L16BC8;
-    if (*(int *)D_001965A8 != 0) goto L16BCA;
+    if (*(int *)talk_answer_line_count != 0) goto L16BCA;
 L16BC8:;
     goto L16BD4;
 L16BCA:;
-    func_00016CF2((int)D_0017041B);
+    talk_add_line((int)D_0017041B);
 L16BD4:;
     if (*(signed char *)((char *)a1) == 0) goto L16C4B;
-    l_10 = func_00016DA8((int)&a1);
+    l_10 = talk_next_word((int)&a1);
     if (((l_C + l_10) + a2) >= a4) goto L16C1B;
-    func_000A1054((int)D_00190FE4, (int)D_001903A4, (int)D_001703F0, 1108, 2048);
+    func_000A1054((int)text_rsc_buffer, (int)text_buffer, (int)D_001703F0, 1108, 2048);
     l_C += l_10;
     goto L16C49;
 L16C1B:;
-    func_00016CF2((int)D_00190FE4);
-    func_000A0AD9((int)D_00190FE4, (int)D_001903A4, 2048, (int)D_001703F0, 1114);
+    talk_add_line((int)text_rsc_buffer);
+    func_000A0AD9((int)text_rsc_buffer, (int)text_buffer, 2048, (int)D_001703F0, 1114);
     l_C = l_10;
 L16C49:;
     goto L16BD4;
 L16C4B:;
-    func_00016CF2((int)D_00190FE4);
+    talk_add_line((int)text_rsc_buffer);
     if (*(signed char *)D_00190D0F != 0) return;
-    if ((*(int *)D_001965B4 = *(int *)D_001965A8 - 18) >= 0) return;
-    *(int *)D_001965B4 = 0;
+    if ((*(int *)talk_answer_scroll = *(int *)talk_answer_line_count - 18) >= 0) return;
+    *(int *)talk_answer_scroll = 0;
 }
 
-void func_00016C87(void)
+void talk_log_question(void)
 {
     int l_18;
 
-    func_00016CF2((int)D_0017041B);
+    talk_add_line((int)D_0017041B);
     l_18 = 0;
 L16CA6:;
-    if (l_18 < *(int *)D_001965D8) goto L16CBB;
+    if (l_18 < *(int *)talk_question_line_count) goto L16CBB;
     goto L16CE3;
 L16CB3:;
     l_18++;
     goto L16CA6;
 L16CBB:;
-    *(signed char *)(*(char **)((char *)(int)(*(char **)D_00196570 + (l_18 << 2)))) |= 128;
-    func_00016CF2(*(int *)((char *)(int)(*(char **)D_00196570 + (l_18 << 2))));
+    *(signed char *)(*(char **)((char *)(int)(*(char **)talk_question_lines + (l_18 << 2)))) |= 128;
+    talk_add_line(*(int *)((char *)(int)(*(char **)talk_question_lines + (l_18 << 2))));
     goto L16CB3;
 L16CE3:;
-    func_0001710E();
+    talk_clear_question();
 }
 
-void func_00016CF2(int a1)
+void talk_add_line(int a1)
 {
     if (*(signed char *)D_00190D0F == 0) goto L16D56;
-    *(int *)((char *)(int)(*(char **)D_00196570 + (*(int *)D_001965D8 << 2))) = func_00017021();
-    func_000A0AD9(*(int *)((char *)(int)(*(char **)D_00196570 + ((*(int *)D_001965D8)++ << 2))), a1, 4, (int)D_001703F0, 1148);
+    *(int *)((char *)(int)(*(char **)talk_question_lines + (*(int *)talk_question_line_count << 2))) = talk_alloc_line();
+    func_000A0AD9(*(int *)((char *)(int)(*(char **)talk_question_lines + ((*(int *)talk_question_line_count)++ << 2))), a1, 4, (int)D_001703F0, 1148);
     return;
 L16D56:;
-    *(int *)((char *)(int)(*(char **)D_00196588 + (*(int *)D_001965A8 << 2))) = func_00017021();
-    func_000A0AD9(*(int *)((char *)(int)(*(char **)D_00196588 + ((*(int *)D_001965A8)++ << 2))), a1, 4, (int)D_001703F0, 1153);
+    *(int *)((char *)(int)(*(char **)talk_answer_lines + (*(int *)talk_answer_line_count << 2))) = talk_alloc_line();
+    func_000A0AD9(*(int *)((char *)(int)(*(char **)talk_answer_lines + ((*(int *)talk_answer_line_count)++ << 2))), a1, 4, (int)D_001703F0, 1153);
 }
 
-int func_00016DA8(int a1)
+int talk_next_word(int a1)
 {
     int l_20;
     int l_1C;
@@ -1153,8 +1153,8 @@ int func_00016DA8(int a1)
     l_1C = 0;
 L16DC7:;
     if (((int)(unsigned char)*(signed char *)(*(char **)((char *)a1))) <= 32) goto L16E06;
-    *(signed char *)(D_001903A4 + l_1C++) = *(signed char *)(*(char **)((char *)a1));
-    l_20 += func_0005A442((int)(unsigned char)*(signed char *)(*(char **)((char *)a1)));
+    *(signed char *)(text_buffer + l_1C++) = *(signed char *)(*(char **)((char *)a1));
+    l_20 += font_char_width((int)(unsigned char)*(signed char *)(*(char **)((char *)a1)));
     (*(int *)((char *)a1))++;
     goto L16DC7;
 L16E06:;
@@ -1163,21 +1163,21 @@ L16E06:;
 L16E16:;
     goto L16E44;
 L16E18:;
-    *(signed char *)(D_001903A4 + l_1C++) = *(signed char *)(*(char **)((char *)a1));
-    l_20 += func_0005A442((int)(unsigned char)*(signed char *)(*(char **)((char *)a1)));
+    *(signed char *)(text_buffer + l_1C++) = *(signed char *)(*(char **)((char *)a1));
+    l_20 += font_char_width((int)(unsigned char)*(signed char *)(*(char **)((char *)a1)));
     (*(int *)((char *)a1))++;
 L16E44:;
-    *(signed char *)(D_001903A4 + l_1C) = 0;
+    *(signed char *)(text_buffer + l_1C) = 0;
     return l_20;
 }
 
-int func_00017021(void)
+int talk_alloc_line(void)
 {
-    *(int *)D_00196584 += func_000A0DF4(*(int *)D_00196584) + 1;
-    return *(int *)D_00196584;
+    *(int *)talk_text_pool_next += func_000A0DF4(*(int *)talk_text_pool_next) + 1;
+    return *(int *)talk_text_pool_next;
 }
 
-void func_00017055(void)
+void talk_init_text(void)
 {
     if (*(int *)D_001965A0 != 0) goto L17085;
     *(int *)D_001965A0 = func_000A00AF(20480, (int)D_001703F0, 1238);
@@ -1187,23 +1187,23 @@ L17085:;
 L170A7:;
     func_000A0040(*(int *)D_001965A0, 0, 20480, (int)D_001703F0, 1243, 4);
     func_000A0040(*(int *)D_001965C4, 0, 20480, (int)D_001703F0, 1244, 4);
-    *(int *)D_00196584 = *(int *)D_001965A0;
-    *(int *)D_00196588 = *(int *)D_001965C4;
-    *(int *)D_001965A8 = 0;
-    func_0001710E();
+    *(int *)talk_text_pool_next = *(int *)D_001965A0;
+    *(int *)talk_answer_lines = *(int *)D_001965C4;
+    *(int *)talk_answer_line_count = 0;
+    talk_clear_question();
 }
 
-void func_0001710E(void)
+void talk_clear_question(void)
 {
     if (*(int *)D_001965AC != 0) goto L1713E;
     *(int *)D_001965AC = func_000A00AF(20480, (int)D_001703F0, 1257);
 L1713E:;
     func_000A0040(*(int *)D_001965AC, 0, 20480, (int)D_001703F0, 1259, 4);
-    *(int *)D_00196570 = *(int *)D_001965AC;
-    *(int *)D_001965D8 = 0;
+    *(int *)talk_question_lines = *(int *)D_001965AC;
+    *(int *)talk_question_line_count = 0;
 }
 
-void func_00017179(void)
+void talk_draw_place_list(void)
 {
     int l_24;
     int l_20;
@@ -1212,129 +1212,129 @@ void func_00017179(void)
 
     l_1C = (int)(short)*(short *)D_00142948;
     *(short *)D_00142948 = 100;
-    *(int *)D_001965B8 = 0;
-    if (*(signed char *)D_001966B1 != 0) goto L17307;
-    if (*(int *)D_001965B8 < *(int *)D_001965F4) goto L171CB;
-    if (*(int *)D_001965B8 <= *(int *)D_001965F0) goto L171CD;
+    *(int *)talk_list_count = 0;
+    if (*(signed char *)talk_topic_tab != 0) goto L17307;
+    if (*(int *)talk_list_count < *(int *)talk_list_top) goto L171CB;
+    if (*(int *)talk_list_count <= *(int *)talk_list_bottom) goto L171CD;
 L171CB:;
     goto L171F7;
 L171CD:;
-    func_00017A61((int)D_0017041C, 6, (int)&*(signed char *)((char *)((*(int *)D_001965B8 - *(int *)D_001965F4) * 7) + 71), 96, 156);
+    talk_list_draw_item((int)D_0017041C, 6, (int)&*(signed char *)((char *)((*(int *)talk_list_count - *(int *)talk_list_top) * 7) + 71), 96, 156);
 L171F7:;
-    (*(int *)D_001965B8)++;
-    if (((int)(unsigned char)*(signed char *)D_001966B5) != 14) goto L17213;
-    func_00017B98();
+    (*(int *)talk_list_count)++;
+    if (((int)(unsigned char)*(signed char *)talk_location_category) != 14) goto L17213;
+    talk_draw_regional_list();
     goto L17305;
 L17213:;
     l_24 = 0;
 L1721A:;
-    if (l_24 < *(int *)D_00196574) goto L17232;
+    if (l_24 < *(int *)talk_place_topic_count) goto L17232;
     goto L17305;
 L1722A:;
     l_24++;
     goto L1721A;
 L17232:;
-    if (*(signed char *)((char *)(int)(*(char **)D_00196598 + (l_24 * 19))) != *(signed char *)D_001966B5) goto L1722A;
-    if (*(int *)D_001965B8 < *(int *)D_001965F4) goto L17261;
-    if (*(int *)D_001965B8 <= *(int *)D_001965F0) goto L17269;
+    if (*(signed char *)((char *)(int)(*(char **)talk_place_topics + (l_24 * 19))) != *(signed char *)talk_location_category) goto L1722A;
+    if (*(int *)talk_list_count < *(int *)talk_list_top) goto L17261;
+    if (*(int *)talk_list_count <= *(int *)talk_list_bottom) goto L17269;
 L17261:;
-    (*(int *)D_001965B8)++;
+    (*(int *)talk_list_count)++;
     goto L1722A;
 L17269:;
-    l_18 = func_0008BD50(*(int *)((char *)(int)((l_24 * 19) + *(char **)D_00196598) + 3));
-    if (*(int *)D_001965E8 != *(int *)D_001965B8) goto L172BE;
+    l_18 = building_name(*(int *)((char *)(int)((l_24 * 19) + *(char **)talk_place_topics) + 3));
+    if (*(int *)talk_selected_row != *(int *)talk_list_count) goto L172BE;
     l_20 = 244;
-    func_000A0AD9(((int)D_00196620) + (((int)(unsigned char)*(signed char *)D_001966B8) * 65), l_18, 4, (int)D_001703F0, 1300);
+    func_000A0AD9(((int)talk_key_text) + (((int)(unsigned char)*(signed char *)D_001966B8) * 65), l_18, 4, (int)D_001703F0, 1300);
     goto L172C5;
 L172BE:;
     l_20 = 145;
 L172C5:;
-    func_00017A61(l_18, 6, (int)&*(signed char *)((char *)((*(int *)D_001965B8 - *(int *)D_001965F4) * 7) + 71), l_20, 156);
-    *(signed char *)(D_001964B0 + (*(int *)D_001965B8)++) = *(signed char *)&l_24;
+    talk_list_draw_item(l_18, 6, (int)&*(signed char *)((char *)((*(int *)talk_list_count - *(int *)talk_list_top) * 7) + 71), l_20, 156);
+    *(signed char *)(D_001964B0 + (*(int *)talk_list_count)++) = *(signed char *)&l_24;
     goto L1722A;
 L17305:;
     goto L17335;
 L17307:;
-    if (((int)(unsigned char)*(signed char *)D_001966B1) != 1) goto L1731F;
-    func_000174C3(5);
+    if (((int)(unsigned char)*(signed char *)talk_topic_tab) != 1) goto L1731F;
+    talk_add_quest_topics(5);
     goto L17335;
 L1731F:;
-    if (((int)(unsigned char)*(signed char *)D_001966B1) != 2) goto L17335;
-    func_000174C3(6);
+    if (((int)(unsigned char)*(signed char *)talk_topic_tab) != 2) goto L17335;
+    talk_add_quest_topics(6);
 L17335:;
     *(short *)D_00142948 = l_1C;
 }
 
-void func_00017348(int a1)
+void talk_list_click(int a1)
 {
     int l_18;
 
     if (a1 != 100) goto L17368;
-    if (*(signed char *)D_001966B1 == 0) goto L1736A;
+    if (*(signed char *)talk_topic_tab == 0) goto L1736A;
 L17368:;
     goto L17376;
 L1736A:;
-    if (((int)(unsigned char)*(signed char *)D_001966AE) == 1) goto L17378;
+    if (((int)(unsigned char)*(signed char *)talk_question_mode) == 1) goto L17378;
 L17376:;
     goto L17381;
 L17378:;
-    if (*(signed char *)D_001966B0 != 0) goto L17383;
+    if (*(signed char *)talk_showing_categories != 0) goto L17383;
 L17381:;
     goto L173AA;
 L17383:;
-    *(signed char *)D_001966B5 = *(signed char *)D_001965E8;
-    *(signed char *)D_001966B0 = 0;
-    *(int *)D_001965E8 = 1;
-    *(signed char *)D_001966B3 = 1;
+    *(signed char *)talk_location_category = *(signed char *)talk_selected_row;
+    *(signed char *)talk_showing_categories = 0;
+    *(int *)talk_selected_row = 1;
+    *(signed char *)talk_redraw = 1;
     return;
 L173AA:;
-    l_18 = (int)(*(char **)D_001965F4 + ((((int)(short)*(short *)D_0012AC06) - 71) / 7));
-    if (l_18 >= *(int *)D_001965B8) return;
-    if (*(signed char *)D_001966B1 != 0) goto L173EF;
-    if (((int)(unsigned char)*(signed char *)D_001966AE) == 1) goto L173F4;
+    l_18 = (int)(*(char **)talk_list_top + ((((int)(short)*(short *)mouse_y) - 71) / 7));
+    if (l_18 >= *(int *)talk_list_count) return;
+    if (*(signed char *)talk_topic_tab != 0) goto L173EF;
+    if (((int)(unsigned char)*(signed char *)talk_question_mode) == 1) goto L173F4;
 L173EF:;
     goto L174AA;
 L173F4:;
-    if (*(signed char *)D_001966B0 == 0) goto L1744D;
+    if (*(signed char *)talk_showing_categories == 0) goto L1744D;
     if (*(signed char *)D_0012AC02 != 0) goto L17414;
-    if (func_0007D068(28) == 0) goto L17435;
+    if (key_pressed_once(28) == 0) goto L17435;
 L17414:;
-    *(signed char *)D_001966B5 = *(signed char *)(D_00196612 + l_18);
-    *(signed char *)D_001966B0 = 0;
-    *(int *)D_001965E8 = 1;
+    *(signed char *)talk_location_category = *(signed char *)(D_00196612 + l_18);
+    *(signed char *)talk_showing_categories = 0;
+    *(int *)talk_selected_row = 1;
     goto L17448;
 L17435:;
-    *(int *)D_001965E8 = (int)(unsigned char)*(signed char *)(D_00196612 + l_18);
+    *(int *)talk_selected_row = (int)(unsigned char)*(signed char *)(D_00196612 + l_18);
 L17448:;
     goto L174A8;
 L1744D:;
-    if (func_0007D068(1) != 0) goto L1747C;
+    if (key_pressed_once(1) != 0) goto L1747C;
     if (l_18 != 0) goto L1747A;
     if (*(signed char *)D_0012AC02 != 0) goto L17478;
-    if (func_0007D068(28) == 0) goto L1747A;
+    if (key_pressed_once(28) == 0) goto L1747A;
 L17478:;
     goto L1747C;
 L1747A:;
     goto L1748E;
 L1747C:;
-    if (*(signed char *)D_00142309 != 0) goto L1747C;
-    *(signed char *)D_001966B0 = 1;
+    if (*(signed char *)key_down_esc != 0) goto L1747C;
+    *(signed char *)talk_showing_categories = 1;
     goto L174A8;
 L1748E:;
     if (l_18 == 0) goto L1749E;
-    *(int *)D_001965E8 = l_18;
+    *(int *)talk_selected_row = l_18;
     goto L174A8;
 L1749E:;
-    *(int *)D_001965E8 = 1;
+    *(int *)talk_selected_row = 1;
 L174A8:;
     goto L174B2;
 L174AA:;
-    *(int *)D_001965E8 = l_18;
+    *(int *)talk_selected_row = l_18;
 L174B2:;
-    *(signed char *)D_001966B3 = 1;
+    *(signed char *)talk_redraw = 1;
 }
 
-void func_000174C3(int a1)
+void talk_add_quest_topics(int a1)
 {
     int l_40;
     int l_3C;
@@ -1354,14 +1354,14 @@ L174DF:;
     l_3C = *(int *)((char *)l_40 + 55);
     if (((int)(unsigned char)*(signed char *)((char *)l_40)) != 14) goto L17A4C;
     *(int *)D_00195D00 = l_40;
-    *(int *)D_00199764 = (*(int *)D_00199780 = l_40 + 71);
+    *(int *)current_quest = (*(int *)D_00199780 = l_40 + 71);
     if (((unsigned)a1) < 5) goto L17541;
     if (((unsigned)a1) <= 5) goto L1776B;
     if (a1 == 6) goto L1790A;
     goto L17A4C;
 L17541:;
     if (a1 != 4) goto L17A4C;
-    l_34 = func_000309E8(*(int *)D_00199780, 4);
+    l_34 = quest_section(*(int *)D_00199780, 4);
     l_24 = 0;
 L17564:;
     if (((int)(short)*(short *)(*(char **)D_00199780 + 24)) > l_24) goto L17586;
@@ -1375,8 +1375,8 @@ L17586:;
     if (((int)(unsigned char)(*(signed char *)((char *)l_34 + 2) & 128)) != 0) goto L17577;
     l_38 = *(int *)(*(char **)((char *)l_34 + 16) + 51);
     if (((int)(unsigned char)*(signed char *)((char *)l_38)) == 1) goto L17577;
-    l_28 = func_0002CE9E(*(int *)((char *)l_34 + 12), 0, 0);
-    l_18 = func_0007DF35(l_38);
+    l_28 = quest_symbol_text(*(int *)((char *)l_34 + 12), 0, 0);
+    l_18 = object_building(l_38);
     if (((int)(unsigned char)*(signed char *)((char *)l_18 + 24)) >= 17) goto L175FB;
     if (((int)(unsigned char)*(signed char *)((char *)l_18 + 24)) != 1) goto L17600;
 L175FB:;
@@ -1384,34 +1384,34 @@ L175FB:;
 L17600:;
     l_1C = 0;
 L17607:;
-    if (l_1C < *(int *)D_00196574) goto L1761C;
+    if (l_1C < *(int *)talk_place_topic_count) goto L1761C;
     goto L17685;
 L17614:;
     l_1C++;
     goto L17607;
 L1761C:;
-    if (*(int *)((char *)(int)(*(char **)D_00196598 + (l_1C * 19)) + 3) != l_18) goto L17683;
-    *(signed char *)((char *)(int)(*(char **)D_00196598 + (*(int *)D_00196574 * 19)) + 2) = *(signed char *)(*(char **)D_00199780);
-    *(short *)((char *)(int)(*(char **)D_00196598 + (*(int *)D_00196574 * 19)) + 15) = *(short *)((char *)l_34 + 20);
-    *(short *)((char *)(int)(*(char **)D_00196598 + ((*(int *)D_00196574)++ * 19)) + 17) = *(short *)((char *)l_34 + 22);
+    if (*(int *)((char *)(int)(*(char **)talk_place_topics + (l_1C * 19)) + 3) != l_18) goto L17683;
+    *(signed char *)((char *)(int)(*(char **)talk_place_topics + (*(int *)talk_place_topic_count * 19)) + 2) = *(signed char *)(*(char **)D_00199780);
+    *(short *)((char *)(int)(*(char **)talk_place_topics + (*(int *)talk_place_topic_count * 19)) + 15) = *(short *)((char *)l_34 + 20);
+    *(short *)((char *)(int)(*(char **)talk_place_topics + ((*(int *)talk_place_topic_count)++ * 19)) + 17) = *(short *)((char *)l_34 + 22);
 L17683:;
     goto L17614;
 L17685:;
     goto L17577;
 L1768A:;
-    func_00017A61(l_28, 6, ((*(int *)D_001965B8 - *(int *)D_001965F4) * 7) + 71, l_20, 156);
-    *(signed char *)((char *)(int)(*(char **)D_00196598 + (*(int *)D_00196574 * 19))) = func_0001822D(l_18);
-    *(int *)((char *)(int)(*(char **)D_00196598 + (*(int *)D_00196574 * 19)) + 11) = func_0001811D(l_18);
-    *(int *)((char *)(int)(*(char **)D_00196598 + (*(int *)D_00196574 * 19)) + 3) = l_18;
-    *(signed char *)((char *)(int)(*(char **)D_00196598 + (*(int *)D_00196574 * 19)) + 1) = 1;
-    *(signed char *)((char *)(int)(*(char **)D_00196598 + (*(int *)D_00196574 * 19)) + 2) = *(signed char *)(*(char **)D_00199780);
-    *(short *)((char *)(int)(*(char **)D_00196598 + (*(int *)D_00196574 * 19)) + 15) = *(short *)((char *)l_34 + 20);
-    *(short *)((char *)(int)(*(char **)D_00196598 + ((*(int *)D_00196574)++ * 19)) + 17) = *(short *)((char *)l_34 + 22);
+    talk_list_draw_item(l_28, 6, ((*(int *)talk_list_count - *(int *)talk_list_top) * 7) + 71, l_20, 156);
+    *(signed char *)((char *)(int)(*(char **)talk_place_topics + (*(int *)talk_place_topic_count * 19))) = building_category(l_18);
+    *(int *)((char *)(int)(*(char **)talk_place_topics + (*(int *)talk_place_topic_count * 19)) + 11) = building_distance(l_18);
+    *(int *)((char *)(int)(*(char **)talk_place_topics + (*(int *)talk_place_topic_count * 19)) + 3) = l_18;
+    *(signed char *)((char *)(int)(*(char **)talk_place_topics + (*(int *)talk_place_topic_count * 19)) + 1) = 1;
+    *(signed char *)((char *)(int)(*(char **)talk_place_topics + (*(int *)talk_place_topic_count * 19)) + 2) = *(signed char *)(*(char **)D_00199780);
+    *(short *)((char *)(int)(*(char **)talk_place_topics + (*(int *)talk_place_topic_count * 19)) + 15) = *(short *)((char *)l_34 + 20);
+    *(short *)((char *)(int)(*(char **)talk_place_topics + ((*(int *)talk_place_topic_count)++ * 19)) + 17) = *(short *)((char *)l_34 + 22);
     goto L17577;
 L17766:;
     goto L17A4C;
 L1776B:;
-    l_30 = func_000309E8(*(int *)D_00199780, 3);
+    l_30 = quest_section(*(int *)D_00199780, 3);
     l_24 = 0;
 L17784:;
     if (((int)(short)*(short *)(*(char **)D_00199780 + 22)) > l_24) goto L177A6;
@@ -1426,28 +1426,28 @@ L177A6:;
 L177BB:;
     goto L17797;
 L177BD:;
-    if (*(int *)(*(char **)((char *)l_30 + 12) + 51) == *(int *)D_001965E0) goto L17797;
+    if (*(int *)(*(char **)((char *)l_30 + 12) + 51) == *(int *)talk_npc_object) goto L17797;
     if ((((int)(short)*(short *)((char *)l_30 + 2)) & 32768) != 0) goto L17797;
-    l_28 = func_0002CE9E(*(int *)((char *)l_30 + 8), 0, 0);
-    if (*(int *)D_001965B8 < *(int *)D_001965F4) goto L17806;
-    if (*(int *)D_001965B8 <= *(int *)D_001965F0) goto L1780E;
+    l_28 = quest_symbol_text(*(int *)((char *)l_30 + 8), 0, 0);
+    if (*(int *)talk_list_count < *(int *)talk_list_top) goto L17806;
+    if (*(int *)talk_list_count <= *(int *)talk_list_bottom) goto L1780E;
 L17806:;
-    (*(int *)D_001965B8)++;
+    (*(int *)talk_list_count)++;
     goto L17797;
 L1780E:;
-    if (*(int *)D_001965E8 != *(int *)D_001965B8) goto L1784C;
+    if (*(int *)talk_selected_row != *(int *)talk_list_count) goto L1784C;
     l_20 = 244;
-    func_000A0AD9(((int)D_00196620) + (((int)(unsigned char)*(signed char *)D_001966B8) * 65), l_28, 4, (int)D_001703F0, 1448);
+    func_000A0AD9(((int)talk_key_text) + (((int)(unsigned char)*(signed char *)D_001966B8) * 65), l_28, 4, (int)D_001703F0, 1448);
     goto L17853;
 L1784C:;
     l_20 = 145;
 L17853:;
-    func_00017A61(l_28, 6, (int)&*(signed char *)((char *)((*(int *)D_001965B8 - *(int *)D_001965F4) * 7) + 71), l_20, 156);
-    *(int *)((char *)(int)(*(char **)D_00196598 + (*(int *)D_001965B8 * 19)) + 3) = func_0007DF35(*(int *)(*(char **)((char *)l_30 + 12) + 51));
-    *(signed char *)((char *)(int)(*(char **)D_00196598 + (*(int *)D_001965B8 * 19)) + 1) = 2;
-    *(signed char *)((char *)(int)(*(char **)D_00196598 + (*(int *)D_001965B8 * 19)) + 2) = *(signed char *)(*(char **)D_00199780);
-    *(short *)((char *)(int)(*(char **)D_00196598 + (*(int *)D_001965B8 * 19)) + 15) = *(short *)((char *)l_30 + 16);
-    *(short *)((char *)(int)(*(char **)D_00196598 + ((*(int *)D_001965B8)++ * 19)) + 17) = *(short *)((char *)l_30 + 18);
+    talk_list_draw_item(l_28, 6, (int)&*(signed char *)((char *)((*(int *)talk_list_count - *(int *)talk_list_top) * 7) + 71), l_20, 156);
+    *(int *)((char *)(int)(*(char **)talk_place_topics + (*(int *)talk_list_count * 19)) + 3) = object_building(*(int *)(*(char **)((char *)l_30 + 12) + 51));
+    *(signed char *)((char *)(int)(*(char **)talk_place_topics + (*(int *)talk_list_count * 19)) + 1) = 2;
+    *(signed char *)((char *)(int)(*(char **)talk_place_topics + (*(int *)talk_list_count * 19)) + 2) = *(signed char *)(*(char **)D_00199780);
+    *(short *)((char *)(int)(*(char **)talk_place_topics + (*(int *)talk_list_count * 19)) + 15) = *(short *)((char *)l_30 + 16);
+    *(short *)((char *)(int)(*(char **)talk_place_topics + ((*(int *)talk_list_count)++ * 19)) + 17) = *(short *)((char *)l_30 + 18);
     goto L17797;
 L17905:;
     goto L17A4C;
@@ -1462,32 +1462,32 @@ L17922:;
     goto L1790F;
 L17931:;
     if (((int)(unsigned char)(*(signed char *)((char *)l_2C + 2) & 128)) != 0) goto L17922;
-    l_28 = func_0002CE9E(*(int *)((char *)l_2C + 7), 0, 0);
-    if (*(int *)D_001965B8 < *(int *)D_001965F4) goto L1796E;
-    if (*(int *)D_001965B8 <= *(int *)D_001965F0) goto L17976;
+    l_28 = quest_symbol_text(*(int *)((char *)l_2C + 7), 0, 0);
+    if (*(int *)talk_list_count < *(int *)talk_list_top) goto L1796E;
+    if (*(int *)talk_list_count <= *(int *)talk_list_bottom) goto L17976;
 L1796E:;
-    (*(int *)D_001965B8)++;
+    (*(int *)talk_list_count)++;
     goto L17922;
 L17976:;
-    if (*(int *)D_001965E8 != *(int *)D_001965B8) goto L179B4;
+    if (*(int *)talk_selected_row != *(int *)talk_list_count) goto L179B4;
     l_20 = 244;
-    func_000A0AD9(((int)D_00196620) + (((int)(unsigned char)*(signed char *)D_001966B8) * 65), l_28, 4, (int)D_001703F0, 1477);
+    func_000A0AD9(((int)talk_key_text) + (((int)(unsigned char)*(signed char *)D_001966B8) * 65), l_28, 4, (int)D_001703F0, 1477);
     goto L179BB;
 L179B4:;
     l_20 = 145;
 L179BB:;
-    func_00017A61(l_28, 6, (int)&*(signed char *)((char *)((*(int *)D_001965B8 - *(int *)D_001965F4) * 7) + 71), l_20, 156);
-    *(signed char *)((char *)(int)(*(char **)D_00196598 + (*(int *)D_001965B8 * 19)) + 1) = 3;
-    *(signed char *)((char *)(int)(*(char **)D_00196598 + (*(int *)D_001965B8 * 19)) + 2) = *(signed char *)(*(char **)D_00199780);
-    *(short *)((char *)(int)(*(char **)D_00196598 + (*(int *)D_001965B8 * 19)) + 15) = *(short *)((char *)l_2C + 15);
-    *(short *)((char *)(int)(*(char **)D_00196598 + ((*(int *)D_001965B8)++ * 19)) + 17) = *(short *)((char *)l_2C + 17);
+    talk_list_draw_item(l_28, 6, (int)&*(signed char *)((char *)((*(int *)talk_list_count - *(int *)talk_list_top) * 7) + 71), l_20, 156);
+    *(signed char *)((char *)(int)(*(char **)talk_place_topics + (*(int *)talk_list_count * 19)) + 1) = 3;
+    *(signed char *)((char *)(int)(*(char **)talk_place_topics + (*(int *)talk_list_count * 19)) + 2) = *(signed char *)(*(char **)D_00199780);
+    *(short *)((char *)(int)(*(char **)talk_place_topics + (*(int *)talk_list_count * 19)) + 15) = *(short *)((char *)l_2C + 15);
+    *(short *)((char *)(int)(*(char **)talk_place_topics + ((*(int *)talk_list_count)++ * 19)) + 17) = *(short *)((char *)l_2C + 17);
     goto L17922;
 L17A4C:;
     l_40 = l_3C;
     goto L174DF;
 }
 
-void func_00017A61(int a1, int a2, int a3, int a4, int a5)
+void talk_list_draw_item(int a1, int a2, int a3, int a4, int a5)
 {
     int l_14;
     short l_10;
@@ -1497,8 +1497,8 @@ void func_00017A61(int a1, int a2, int a3, int a4, int a5)
     *(short *)D_00142940 = 6;
     *(int *)&l_C = (int)(short)*(short *)D_00142948;
     *(short *)D_00142948 = 100;
-    func_0007CA1F(a1, (int)(short)(a2 + *(short *)D_00196580), (int)(short)*(short *)&a3, (int)(short)*(short *)&a4, (int)(short)*(short *)&a5);
-    l_14 = func_0005A4A9(a1);
+    text_draw_colored(a1, (int)(short)(a2 + *(short *)D_00196580), (int)(short)*(short *)&a3, (int)(short)*(short *)&a4, (int)(short)*(short *)&a5);
+    l_14 = font_text_width(a1);
     if (l_14 <= *(int *)D_00196578) goto L17ADE;
     *(int *)D_00196578 = l_14;
 L17ADE:;
@@ -1506,22 +1506,22 @@ L17ADE:;
     *(short *)D_00142948 = *(int *)&l_C;
 }
 
-int func_00017AF9(void)
+int talk_macro_1com(void)
 {
-    if (((int)(unsigned short)(*(short *)D_001966AA & 2)) == 0) goto L17B66;
-    if (*(int *)D_00195D34 > 0) goto L17B3B;
-    *(short *)D_00195F5C = *(short *)(D_00179C7C + (((int)(unsigned char)*(signed char *)D_001966B2) << 2));
+    if (((int)(unsigned short)(*(short *)talk_flags & 2)) == 0) goto L17B66;
+    if (*(int *)talk_disposition > 0) goto L17B3B;
+    *(short *)text_macro_n_text = *(short *)(talk_greeting_texts + (((int)(unsigned char)*(signed char *)talk_tone) << 2));
 L17B3B:;
-    func_0004A6B5((int)(unsigned short)((short *)D_00179C7C)[((int)(unsigned char)*(signed char *)D_001966B2) * 2 + 1], 0, 0);
-    *(short *)D_00195F5C = 0;
+    parse_rsc_text((int)(unsigned short)((short *)talk_greeting_texts)[((int)(unsigned char)*(signed char *)talk_tone) * 2 + 1], 0, 0);
+    *(short *)text_macro_n_text = 0;
     goto L17B84;
 L17B66:;
-    func_0004A6B5((int)(unsigned short)*(short *)(D_00179C88 + (((int)(unsigned char)*(signed char *)D_001966B2) * 2)), 0, 0);
+    parse_rsc_text((int)(unsigned short)*(short *)(talk_ack_texts + (((int)(unsigned char)*(signed char *)talk_tone) * 2)), 0, 0);
 L17B84:;
-    return (int)D_00190FE4;
+    return (int)text_rsc_buffer;
 }
 
-void func_00017B98(void)
+void talk_draw_regional_list(void)
 {
     int l_18;
 
@@ -1538,63 +1538,63 @@ L17BC0:;
 L17BCC:;
     goto L17C00;
 L17BCE:;
-    if (*(signed char *)D_00196268 != *(signed char *)(D_00179CFA + l_18)) goto L17BB8;
-    if (func_00017C58((int)(short)*(short *)(D_00179C8E + (l_18 * 2)), 0) != 0) goto L17BFE;
-    func_00017CEF(l_18);
+    if (*(signed char *)current_region != *(signed char *)(D_00179CFA + l_18)) goto L17BB8;
+    if (town_has_building((int)(short)*(short *)(talk_regional_ids + (l_18 * 2)), 0) != 0) goto L17BFE;
+    talk_add_regional_item(l_18);
 L17BFE:;
     goto L17C49;
 L17C00:;
     if (l_18 >= 20) goto L17C27;
-    if (func_00017C58((int)(short)*(short *)(D_00179C8E + (l_18 * 2)), 0) != 0) goto L17C25;
-    func_00017CEF(l_18);
+    if (town_has_building((int)(short)*(short *)(talk_regional_ids + (l_18 * 2)), 0) != 0) goto L17C25;
+    talk_add_regional_item(l_18);
 L17C25:;
     goto L17C49;
 L17C27:;
-    if (func_00017C58((int)(short)*(short *)(D_00179C8E + (l_18 * 2)), 1) != 0) goto L17C49;
-    func_00017CEF(l_18);
+    if (town_has_building((int)(short)*(short *)(talk_regional_ids + (l_18 * 2)), 1) != 0) goto L17C49;
+    talk_add_regional_item(l_18);
 L17C49:;
     goto L17BB8;
 }
 
-void func_00017CEF(int a1)
+void talk_add_regional_item(int a1)
 {
     int l_18;
 
-    if (*(int *)D_001965B8 < *(int *)D_001965F4) goto L17D1A;
-    if (*(int *)D_001965B8 <= *(int *)D_001965F0) goto L17D25;
+    if (*(int *)talk_list_count < *(int *)talk_list_top) goto L17D1A;
+    if (*(int *)talk_list_count <= *(int *)talk_list_bottom) goto L17D25;
 L17D1A:;
-    (*(int *)D_001965B8)++;
+    (*(int *)talk_list_count)++;
     return;
 L17D25:;
     func_000A0ED9(1590, (int)D_001703F0);
-    func_000A0F5C((int)D_001903A4, (int)D_0017042A, *(int *)(D_0017C5DC + (a1 << 2)));
-    if (*(int *)D_001965E8 != *(int *)D_001965B8) goto L17D95;
+    func_000A0F5C((int)text_buffer, (int)D_0017042A, *(int *)(talk_regional_names + (a1 << 2)));
+    if (*(int *)talk_selected_row != *(int *)talk_list_count) goto L17D95;
     l_18 = 244;
-    func_000A0AD9(((int)D_00196620) + (((int)(unsigned char)*(signed char *)D_001966B8) * 65), (int)D_001903A4, 4, (int)D_001703F0, 1595);
+    func_000A0AD9(((int)talk_key_text) + (((int)(unsigned char)*(signed char *)D_001966B8) * 65), (int)text_buffer, 4, (int)D_001703F0, 1595);
     goto L17D9C;
 L17D95:;
     l_18 = 145;
 L17D9C:;
-    func_00017A61((int)D_001903A4, 6, (int)&*(signed char *)((char *)((*(int *)D_001965B8 - *(int *)D_001965F4) * 7) + 71), l_18, 156);
-    *(signed char *)(D_00196488 + (*(int *)D_001965B8)++) = *(signed char *)&a1;
+    talk_list_draw_item((int)text_buffer, 6, (int)&*(signed char *)((char *)((*(int *)talk_list_count - *(int *)talk_list_top) * 7) + 71), l_18, 156);
+    *(signed char *)(D_00196488 + (*(int *)talk_list_count)++) = *(signed char *)&a1;
 }
 
-int func_00017DE3(int a1)
+int talk_find_regional(int a1)
 {
 {
     char l_30[20];
 
-    func_00087D71((int)l_30, (int)(short)*(short *)(D_00179CC8 + (a1 * 2)), (int)(short)*(short *)(D_00179C8E + (a1 * 2)));
+    func_00087D71((int)l_30, (int)(short)*(short *)(D_00179CC8 + (a1 * 2)), (int)(short)*(short *)(talk_regional_ids + (a1 * 2)));
     if (*(int *)((char *)l_30 + 12) != 0) goto L17E23;
     return 0;
 L17E23:;
-    func_000A0AD9((int)D_0019572C, *(int *)((char *)l_30 + 16), 32, (int)D_001703F0, 1610);
-    func_00086397((int)l_30);
+    func_000A0AD9((int)text_macro_fcn, *(int *)((char *)l_30 + 16), 32, (int)D_001703F0, 1610);
+    location_free((int)l_30);
     return 1;
 }
 }
 
-void func_00017E5B(void)
+void talk_build_place_topics(void)
 {
     char l_4C[20];
     int l_38;
@@ -1607,11 +1607,11 @@ void func_00017E5B(void)
     int l_1C;
     int l_18;
 
-    l_20 = *(int *)(*(char **)D_00195BDC + 43);
-    *(int *)D_00196574 = 0;
+    l_20 = *(int *)(*(char **)current_location + 43);
+    *(int *)talk_place_topic_count = 0;
     l_38 = 0;
 L17E85:;
-    if (((int)(unsigned short)*(short *)(*(char **)D_00195BDC + 41)) > l_38) goto L17EAC;
+    if (((int)(unsigned short)*(short *)(*(char **)current_location + 41)) > l_38) goto L17EAC;
     goto L17FB8;
 L17E9D:;
     l_38++;
@@ -1623,27 +1623,27 @@ L17EAC:;
 L17ECC:;
     goto L17E9D;
 L17ECE:;
-    l_1C = func_000A1079((int)D_00179D0C, (int)(unsigned char)*(signed char *)((char *)l_20 + 24), 13);
+    l_1C = func_000A1079((int)talk_category_building_types, (int)(unsigned char)*(signed char *)((char *)l_20 + 24), 13);
     if (l_1C == 0) goto L17F58;
-    *(signed char *)((char *)(int)(*(char **)D_00196598 + (*(int *)D_00196574 * 19))) = l_1C - ((int)D_00179D0C);
-    *(signed char *)((char *)(int)(*(char **)D_00196598 + (*(int *)D_00196574 * 19)) + 1) = 0;
-    *(int *)((char *)(int)(*(char **)D_00196598 + (*(int *)D_00196574 * 19)) + 11) = func_0001811D(l_20);
-    *(int *)((char *)(int)(*(char **)D_00196598 + ((*(int *)D_00196574)++ * 19)) + 3) = l_20;
+    *(signed char *)((char *)(int)(*(char **)talk_place_topics + (*(int *)talk_place_topic_count * 19))) = l_1C - ((int)talk_category_building_types);
+    *(signed char *)((char *)(int)(*(char **)talk_place_topics + (*(int *)talk_place_topic_count * 19)) + 1) = 0;
+    *(int *)((char *)(int)(*(char **)talk_place_topics + (*(int *)talk_place_topic_count * 19)) + 11) = building_distance(l_20);
+    *(int *)((char *)(int)(*(char **)talk_place_topics + ((*(int *)talk_place_topic_count)++ * 19)) + 3) = l_20;
     goto L17FB3;
 L17F58:;
-    *(signed char *)((char *)(int)(*(char **)D_00196598 + (*(int *)D_00196574 * 19))) = 13;
-    *(signed char *)((char *)(int)(*(char **)D_00196598 + (*(int *)D_00196574 * 19)) + 1) = 0;
-    *(int *)((char *)(int)(*(char **)D_00196598 + (*(int *)D_00196574 * 19)) + 11) = func_0001811D(l_20);
-    *(int *)((char *)(int)(*(char **)D_00196598 + ((*(int *)D_00196574)++ * 19)) + 3) = l_20;
+    *(signed char *)((char *)(int)(*(char **)talk_place_topics + (*(int *)talk_place_topic_count * 19))) = 13;
+    *(signed char *)((char *)(int)(*(char **)talk_place_topics + (*(int *)talk_place_topic_count * 19)) + 1) = 0;
+    *(int *)((char *)(int)(*(char **)talk_place_topics + (*(int *)talk_place_topic_count * 19)) + 11) = building_distance(l_20);
+    *(int *)((char *)(int)(*(char **)talk_place_topics + ((*(int *)talk_place_topic_count)++ * 19)) + 3) = l_20;
 L17FB3:;
     goto L17E9D;
 L17FB8:;
-    func_000174C3(4);
-    *(signed char *)((char *)(int)(*(char **)D_00196598 + (*(int *)D_00196574 * 19))) = 14;
-    *(signed char *)((char *)(int)(*(char **)D_00196598 + (*(int *)D_00196574 * 19)) + 1) = 0;
-    *(int *)((char *)(int)(*(char **)D_00196598 + ((*(int *)D_00196574)++ * 19)) + 3) = 0;
+    talk_add_quest_topics(4);
+    *(signed char *)((char *)(int)(*(char **)talk_place_topics + (*(int *)talk_place_topic_count * 19))) = 14;
+    *(signed char *)((char *)(int)(*(char **)talk_place_topics + (*(int *)talk_place_topic_count * 19)) + 1) = 0;
+    *(int *)((char *)(int)(*(char **)talk_place_topics + ((*(int *)talk_place_topic_count)++ * 19)) + 3) = 0;
     l_30 = 1;
-    l_34 = *(int *)D_00196574 - 2;
+    l_34 = *(int *)talk_place_topic_count - 2;
     if (l_34 < 2) return;
 L1801F:;
     if (l_30 == 0) return;
@@ -1656,13 +1656,13 @@ L18044:;
     l_38++;
     goto L18037;
 L1804C:;
-    l_18 = *(int *)((char *)(int)(*(char **)D_00196598 + (l_38 * 19)) + 11);
-    l_28 = *(int *)((char *)(int)(*(char **)D_00196598 + ((l_38 + 1) * 19)) + 11);
+    l_18 = *(int *)((char *)(int)(*(char **)talk_place_topics + (l_38 * 19)) + 11);
+    l_28 = *(int *)((char *)(int)(*(char **)talk_place_topics + ((l_38 + 1) * 19)) + 11);
     if (l_28 >= l_18) goto L18103;
     l_30 = 1;
-    func_000A1023((int)l_4C, (int)(*(char **)D_00196598 + (l_38 * 19)), 19, (int)D_001703F0, 1678, 4);
-    func_000A1023((int)(*(char **)D_00196598 + (l_38 * 19)), (int)(*(char **)D_00196598 + ((l_38 + 1) * 19)), 19, (int)D_001703F0, 1679, 4);
-    func_000A1023((int)(*(char **)D_00196598 + ((l_38 + 1) * 19)), (int)l_4C, 19, (int)D_001703F0, 1680, 4);
+    func_000A1023((int)l_4C, (int)(*(char **)talk_place_topics + (l_38 * 19)), 19, (int)D_001703F0, 1678, 4);
+    func_000A1023((int)(*(char **)talk_place_topics + (l_38 * 19)), (int)(*(char **)talk_place_topics + ((l_38 + 1) * 19)), 19, (int)D_001703F0, 1679, 4);
+    func_000A1023((int)(*(char **)talk_place_topics + ((l_38 + 1) * 19)), (int)l_4C, 19, (int)D_001703F0, 1680, 4);
 L18103:;
     goto L18044;
 L18108:;
@@ -1670,13 +1670,13 @@ L18108:;
     goto L1801F;
 }
 
-void func_00018172(void)
+void talk_draw_categories(void)
 {
     int l_1C;
     int l_18;
 
-    *(int *)D_001965B8 = 0;
-    if (*(signed char *)D_001966B0 == 0) return;
+    *(int *)talk_list_count = 0;
+    if (*(signed char *)talk_showing_categories == 0) return;
     l_1C = 0;
 L1819E:;
     if (l_1C < 15) goto L181B1;
@@ -1685,22 +1685,22 @@ L181A9:;
     l_1C++;
     goto L1819E;
 L181B1:;
-    if (func_000182C6(l_1C) != 0) goto L181C3;
+    if (town_has_category(l_1C) != 0) goto L181C3;
     if (l_1C != 14) goto L18221;
 L181C3:;
-    if (*(int *)D_001965E8 != l_1C) goto L181D6;
+    if (*(int *)talk_selected_row != l_1C) goto L181D6;
     l_18 = 244;
     goto L181DD;
 L181D6:;
     l_18 = 145;
 L181DD:;
-    func_00017A61(*(int *)(D_00179D19 + (l_1C << 2)), 6, (int)&*(signed char *)((char *)((*(int *)D_001965B8 - *(int *)D_001965F4) * 7) + 71), l_18, 156);
-    *(signed char *)(D_00196612 + (*(int *)D_001965B8)++) = *(signed char *)&l_1C;
+    talk_list_draw_item(*(int *)(talk_category_names + (l_1C << 2)), 6, (int)&*(signed char *)((char *)((*(int *)talk_list_count - *(int *)talk_list_top) * 7) + 71), l_18, 156);
+    *(signed char *)(D_00196612 + (*(int *)talk_list_count)++) = *(signed char *)&l_1C;
 L18221:;
     goto L181A9;
 }
 
-int func_0001822D(int a1)
+int building_category(int a1)
 {
     int l_1C;
 
@@ -1709,11 +1709,11 @@ int func_0001822D(int a1)
 L1825E:;
     goto L18298;
 L18260:;
-    l_1C = func_000A1079((int)D_00179D0C, (int)(unsigned char)*(signed char *)((char *)a1 + 24), 13);
+    l_1C = func_000A1079((int)talk_category_building_types, (int)(unsigned char)*(signed char *)((char *)a1 + 24), 13);
     if (l_1C != 0) goto L18289;
     return 13;
 L18289:;
-    return l_1C - ((int)D_00179D0C);
+    return l_1C - ((int)talk_category_building_types);
 L18298:;
     if (((int)(unsigned char)(*(signed char *)((char *)a1 + 15) & 8)) == 0) goto L182B2;
     return 13;
@@ -1721,22 +1721,22 @@ L182B2:;
     return -1;
 }
 
-int func_000182C6(int a1)
+int town_has_category(int a1)
 {
     int l_20;
     int l_1C;
 
-    l_1C = *(int *)(*(char **)D_00195BDC + 43);
+    l_1C = *(int *)(*(char **)current_location + 43);
     l_20 = 0;
 L182E9:;
-    if (((int)(unsigned short)*(short *)(*(char **)D_00195BDC + 41)) > l_20) goto L1830D;
+    if (((int)(unsigned short)*(short *)(*(char **)current_location + 41)) > l_20) goto L1830D;
     goto L18325;
 L182FE:;
     l_20++;
     (*(char (**)[26])&l_1C)++;
     goto L182E9;
 L1830D:;
-    if (func_0001822D(l_1C) != a1) goto L18323;
+    if (building_category(l_1C) != a1) goto L18323;
     return 1;
 L18323:;
     goto L182FE;
@@ -1749,17 +1749,17 @@ void func_00018339(void)
     int l_1C;
     int l_18;
 
-    l_18 = *(int *)(*(char **)D_00195BDC + 43);
+    l_18 = *(int *)(*(char **)current_location + 43);
     l_1C = 0;
 L18359:;
-    if (((int)(unsigned short)*(short *)(*(char **)D_00195BDC + 41)) > l_1C) goto L1837D;
+    if (((int)(unsigned short)*(short *)(*(char **)current_location + 41)) > l_1C) goto L1837D;
     return;
 L1836E:;
     l_1C++;
     (*(char (**)[26])&l_18)++;
     goto L18359;
 L1837D:;
-    if (func_000342E3(l_18) == 0) goto L18390;
+    if (quest_find_site_for_building(l_18) == 0) goto L18390;
     *(signed char *)((char *)l_18 + 15) |= 8;
 L18390:;
     goto L1836E;
@@ -1783,8 +1783,8 @@ L183B5:;
     l_34 = *(int *)((char *)l_38 + 55);
     if (((int)(unsigned char)*(signed char *)((char *)l_38)) != 14) goto L18889;
     *(int *)D_00195D00 = l_38;
-    *(int *)D_00199764 = (*(int *)D_00199780 = l_38 + 71);
-    l_30 = func_000309E8(*(int *)D_00199780, 4);
+    *(int *)current_quest = (*(int *)D_00199780 = l_38 + 71);
+    l_30 = quest_section(*(int *)D_00199780, 4);
     l_20 = 0;
 L18411:;
     if (((int)(short)*(short *)(*(char **)D_00199780 + 24)) > l_20) goto L18433;
@@ -1802,29 +1802,29 @@ L18449:;
     goto L18424;
 L1844B:;
     if (((int)(unsigned char)(*(signed char *)((char *)l_30 + 2) & 128)) != 0) goto L18424;
-    *(short *)((char *)(int)(*(char **)D_0019657C + (((int)(short)*(short *)D_001966A2) * 6))) = *(short *)((char *)l_30 + 20);
-    (*(short **)D_0019657C)[((int)(short)*(short *)D_001966A2) * 3 + 1] = *(short *)((char *)l_30 + 22);
-    (*(short **)D_0019657C)[((int)(short)*(short *)D_001966A2) * 3 + 2] = *(short *)(*(char **)D_00199780);
+    *(short *)((char *)(int)(*(char **)talk_topics + (((int)(short)*(short *)D_001966A2) * 6))) = *(short *)((char *)l_30 + 20);
+    (*(short **)talk_topics)[((int)(short)*(short *)D_001966A2) * 3 + 1] = *(short *)((char *)l_30 + 22);
+    (*(short **)talk_topics)[((int)(short)*(short *)D_001966A2) * 3 + 2] = *(short *)(*(char **)D_00199780);
     (*(short *)D_001966A2)++;
-    if (*(int *)D_001965B8 < *(int *)D_001965F4) goto L184D9;
-    if (*(int *)D_001965B8 <= *(int *)D_001965F0) goto L184E4;
+    if (*(int *)talk_list_count < *(int *)talk_list_top) goto L184D9;
+    if (*(int *)talk_list_count <= *(int *)talk_list_bottom) goto L184E4;
 L184D9:;
-    (*(int *)D_001965B8)++;
+    (*(int *)talk_list_count)++;
     goto L18424;
 L184E4:;
-    l_24 = func_0002CE9E(*(int *)((char *)l_30 + 12), 0, 0);
-    if (*(int *)D_001965E8 != *(int *)D_001965B8) goto L18534;
+    l_24 = quest_symbol_text(*(int *)((char *)l_30 + 12), 0, 0);
+    if (*(int *)talk_selected_row != *(int *)talk_list_count) goto L18534;
     l_1C = 244;
-    func_000A0AD9(((int)D_00196620) + (((int)(unsigned char)*(signed char *)D_001966B8) * 65), l_24, 4, (int)D_001703F0, 1790);
+    func_000A0AD9(((int)talk_key_text) + (((int)(unsigned char)*(signed char *)D_001966B8) * 65), l_24, 4, (int)D_001703F0, 1790);
     goto L1853B;
 L18534:;
     l_1C = 145;
 L1853B:;
-    func_00017A61(l_24, 6, (int)&*(signed char *)((char *)((*(int *)D_001965B8 - *(int *)D_001965F4) * 7) + 71), l_1C, 156);
-    (*(int *)D_001965B8)++;
+    talk_list_draw_item(l_24, 6, (int)&*(signed char *)((char *)((*(int *)talk_list_count - *(int *)talk_list_top) * 7) + 71), l_1C, 156);
+    (*(int *)talk_list_count)++;
     goto L18424;
 L1856C:;
-    l_2C = func_000309E8(*(int *)D_00199780, 3);
+    l_2C = quest_section(*(int *)D_00199780, 3);
     l_20 = 0;
 L18585:;
     if (((int)(short)*(short *)(*(char **)D_00199780 + 22)) > l_20) goto L185A7;
@@ -1843,35 +1843,35 @@ L185BD:;
 L185BF:;
     if ((((int)(short)*(short *)((char *)l_2C + 2)) & 32768) != 0) goto L18598;
     if (*(int *)(*(char **)((char *)l_2C + 12) + 51) == 0) goto L185E8;
-    if (*(int *)(*(char **)((char *)l_2C + 12) + 51) == *(int *)D_001965E0) goto L185EA;
+    if (*(int *)(*(char **)((char *)l_2C + 12) + 51) == *(int *)talk_npc_object) goto L185EA;
 L185E8:;
     goto L185EC;
 L185EA:;
     goto L18598;
 L185EC:;
-    *(short *)((char *)(int)(*(char **)D_0019657C + (((int)(short)*(short *)D_001966A2) * 6))) = *(short *)((char *)l_2C + 16);
-    (*(short **)D_0019657C)[((int)(short)*(short *)D_001966A2) * 3 + 1] = *(short *)((char *)l_2C + 18);
-    (*(short **)D_0019657C)[((int)(short)*(short *)D_001966A2) * 3 + 2] = *(short *)(*(char **)D_00199780);
+    *(short *)((char *)(int)(*(char **)talk_topics + (((int)(short)*(short *)D_001966A2) * 6))) = *(short *)((char *)l_2C + 16);
+    (*(short **)talk_topics)[((int)(short)*(short *)D_001966A2) * 3 + 1] = *(short *)((char *)l_2C + 18);
+    (*(short **)talk_topics)[((int)(short)*(short *)D_001966A2) * 3 + 2] = *(short *)(*(char **)D_00199780);
     (*(short *)D_001966A2)++;
-    if (*(int *)D_001965B8 < *(int *)D_001965F4) goto L18669;
-    if (*(int *)D_001965B8 <= *(int *)D_001965F0) goto L18674;
+    if (*(int *)talk_list_count < *(int *)talk_list_top) goto L18669;
+    if (*(int *)talk_list_count <= *(int *)talk_list_bottom) goto L18674;
 L18669:;
-    (*(int *)D_001965B8)++;
+    (*(int *)talk_list_count)++;
     goto L18598;
 L18674:;
-    l_24 = func_0002CE9E(*(int *)((char *)l_2C + 8), 0, 0);
-    if (*(int *)D_001965E8 != *(int *)D_001965B8) goto L186C4;
+    l_24 = quest_symbol_text(*(int *)((char *)l_2C + 8), 0, 0);
+    if (*(int *)talk_selected_row != *(int *)talk_list_count) goto L186C4;
     l_1C = 244;
-    func_000A0AD9(((int)D_00196620) + (((int)(unsigned char)*(signed char *)D_001966B8) * 65), l_24, 4, (int)D_001703F0, 1821);
+    func_000A0AD9(((int)talk_key_text) + (((int)(unsigned char)*(signed char *)D_001966B8) * 65), l_24, 4, (int)D_001703F0, 1821);
     goto L186CB;
 L186C4:;
     l_1C = 145;
 L186CB:;
-    func_00017A61(l_24, 6, (int)&*(signed char *)((char *)((*(int *)D_001965B8 - *(int *)D_001965F4) * 7) + 71), l_1C, 156);
-    (*(int *)D_001965B8)++;
+    talk_list_draw_item(l_24, 6, (int)&*(signed char *)((char *)((*(int *)talk_list_count - *(int *)talk_list_top) * 7) + 71), l_1C, 156);
+    (*(int *)talk_list_count)++;
     goto L18598;
 L186FC:;
-    l_28 = func_000309E8(*(int *)D_00199780, 0);
+    l_28 = quest_section(*(int *)D_00199780, 0);
     l_20 = 0;
 L18712:;
     if (((int)(short)*(short *)(*(char **)D_00199780 + 16)) > l_20) goto L18734;
@@ -1896,56 +1896,56 @@ L18775:;
 L18777:;
     goto L18725;
 L18779:;
-    *(short *)((char *)(int)(*(char **)D_0019657C + (((int)(short)*(short *)D_001966A2) * 6))) = *(short *)((char *)l_28 + 15);
-    (*(short **)D_0019657C)[((int)(short)*(short *)D_001966A2) * 3 + 1] = *(short *)((char *)l_28 + 17);
-    (*(short **)D_0019657C)[((int)(short)*(short *)D_001966A2) * 3 + 2] = *(short *)(*(char **)D_00199780);
+    *(short *)((char *)(int)(*(char **)talk_topics + (((int)(short)*(short *)D_001966A2) * 6))) = *(short *)((char *)l_28 + 15);
+    (*(short **)talk_topics)[((int)(short)*(short *)D_001966A2) * 3 + 1] = *(short *)((char *)l_28 + 17);
+    (*(short **)talk_topics)[((int)(short)*(short *)D_001966A2) * 3 + 2] = *(short *)(*(char **)D_00199780);
     (*(short *)D_001966A2)++;
-    if (*(int *)D_001965B8 < *(int *)D_001965F4) goto L187F6;
-    if (*(int *)D_001965B8 <= *(int *)D_001965F0) goto L18801;
+    if (*(int *)talk_list_count < *(int *)talk_list_top) goto L187F6;
+    if (*(int *)talk_list_count <= *(int *)talk_list_bottom) goto L18801;
 L187F6:;
-    (*(int *)D_001965B8)++;
+    (*(int *)talk_list_count)++;
     goto L18725;
 L18801:;
-    l_24 = func_0002CE9E(*(int *)((char *)l_28 + 7), 0, 0);
-    if (*(int *)D_001965E8 != *(int *)D_001965B8) goto L18851;
+    l_24 = quest_symbol_text(*(int *)((char *)l_28 + 7), 0, 0);
+    if (*(int *)talk_selected_row != *(int *)talk_list_count) goto L18851;
     l_1C = 244;
-    func_000A0AD9(((int)D_00196620) + (((int)(unsigned char)*(signed char *)D_001966B8) * 65), l_24, 4, (int)D_001703F0, 1852);
+    func_000A0AD9(((int)talk_key_text) + (((int)(unsigned char)*(signed char *)D_001966B8) * 65), l_24, 4, (int)D_001703F0, 1852);
     goto L18858;
 L18851:;
     l_1C = 145;
 L18858:;
-    func_00017A61(l_24, 6, (int)&*(signed char *)((char *)((*(int *)D_001965B8 - *(int *)D_001965F4) * 7) + 71), l_1C, 156);
-    (*(int *)D_001965B8)++;
+    talk_list_draw_item(l_24, 6, (int)&*(signed char *)((char *)((*(int *)talk_list_count - *(int *)talk_list_top) * 7) + 71), l_1C, 156);
+    (*(int *)talk_list_count)++;
     goto L18725;
 L18889:;
     l_38 = l_34;
     goto L183B5;
 }
 
-int func_00018ACE(short a1)
+int talk_faction_greeting(short a1)
 {
     int l_24;
     int l_28;
     short l_1C;
 
-    *(int *)&l_1C = func_000192EE((int)(short)a1);
+    *(int *)&l_1C = faction_find((int)(short)a1);
     if (((int)(unsigned char)*(signed char *)(*(char **)&l_1C)) == 15) goto L18B09;
     if (((int)(unsigned char)*(signed char *)(*(char **)&l_1C)) != 14) goto L18B15;
 L18B09:;
     return 0;
 L18B15:;
-    l_24 = func_00018BDC((int)(short)a1);
+    l_24 = talk_faction_relation((int)(short)a1);
     *(short *)D_001966AC += *(short *)(*(char **)&l_1C + 29);
     if (((int)(unsigned char)*(signed char *)(*(char **)&l_1C + 54)) >= 5) goto L18B62;
-    *(short *)D_001966AC += *(short *)(*(char **)D_00195BE0 + 145 + (((int)(unsigned char)*(signed char *)(*(char **)&l_1C + 54)) * 2));
+    *(short *)D_001966AC += *(short *)(*(char **)player_character + 145 + (((int)(unsigned char)*(signed char *)(*(char **)&l_1C + 54)) * 2));
 L18B62:;
-    l_28 = func_0007D6AE(0, 15) - 10;
+    l_28 = rand_range(0, 15) - 10;
     if (((int)(short)*(short *)D_001966AC) < l_28) goto L18B8C;
     if (((int)(short)*(short *)(*(char **)&l_1C + 29)) >= 30) goto L18B8E;
 L18B8C:;
     goto L18B9E;
 L18B8E:;
-    return (int)(short)*(short *)(D_001799AC + (l_24 * 6));
+    return (int)(short)*(short *)(talk_faction_greetings + (l_24 * 6));
 L18B9E:;
     if (((int)(short)*(short *)D_001966AC) < l_28) goto L18BBA;
     return (int)(short)*(short *)(D_001799AE + (l_24 * 6));
@@ -1954,7 +1954,7 @@ L18BBA:;
     return (int)(short)*(short *)(D_001799B0 + (l_24 * 6));
 }
 
-int func_00018F7C(void)
+int talk_roll_knows(void)
 {
     int l_28;
     int l_24;
@@ -1962,14 +1962,14 @@ int func_00018F7C(void)
     int l_1C;
 
     l_1C = func_0009DC25();
-    if (((int)(unsigned short)*(short *)(*(char **)D_00196590 + 33)) == 806) goto L18FBC;
-    if (((int)(unsigned short)*(short *)(*(char **)D_00196590 + 33)) != 842) goto L18FC8;
+    if (((int)(unsigned short)*(short *)(*(char **)talk_npc_own_faction + 33)) == 806) goto L18FBC;
+    if (((int)(unsigned short)*(short *)(*(char **)talk_npc_own_faction + 33)) != 842) goto L18FC8;
 L18FBC:;
     return 1;
 L18FC8:;
-    l_24 = ((1 - ((int)(unsigned char)*(signed char *)D_001966AE)) << 2) + ((int)(unsigned char)*(signed char *)D_001966B1);
-    func_0009DC49(((*(int *)(*(char **)D_001965E0 + 31) ^ (((unsigned)*(int *)(*(char **)D_001965E0 + 31)) >> 16)) + l_24) + *(int *)D_001965E8);
-    if (func_0007D6AE(1, 20) > (((int)(short)*(short *)(D_001799F2 + ((l_24 * 10) + (*(int *)D_001965A4 * 2)))) + 10)) goto L1903F;
+    l_24 = ((1 - ((int)(unsigned char)*(signed char *)talk_question_mode)) << 2) + ((int)(unsigned char)*(signed char *)talk_topic_tab);
+    func_0009DC49(((*(int *)(*(char **)talk_npc_object + 31) ^ (((unsigned)*(int *)(*(char **)talk_npc_object + 31)) >> 16)) + l_24) + *(int *)talk_selected_row);
+    if (rand_range(1, 20) > (((int)(short)*(short *)(D_001799F2 + ((l_24 * 10) + (*(int *)talk_npc_speech_style * 2)))) + 10)) goto L1903F;
     l_28 = 1;
     goto L19046;
 L1903F:;
@@ -1980,40 +1980,40 @@ L19046:;
     return l_20;
 }
 
-int func_00019067(void)
+int talk_roll_attitude(void)
 {
     int l_20;
     int l_1C;
 
     l_20 = 0;
-    if (*(signed char *)D_001966B2 != 0) goto L190C6;
-    if (func_0007D6AE(1, 100) >= ((int)(short)*(short *)(*(char **)D_00195BE0 + 163))) goto L190AA;
+    if (*(signed char *)talk_tone != 0) goto L190C6;
+    if (rand_range(1, 100) >= ((int)(short)*(short *)(*(char **)player_character + 163))) goto L190AA;
     l_20 += 10;
     goto L190AE;
 L190AA:;
     l_20 += -5;
 L190AE:;
-    if (*(int *)D_001965CC != 0) goto L190C6;
-    func_0003D01C(1, 1);
+    if (*(int *)talk_attitude_cache != 0) goto L190C6;
+    skill_add_uses(1, 1);
 L190C6:;
-    if (((int)(unsigned char)*(signed char *)D_001966B2) != 2) goto L19113;
-    if (func_0007D6AE(1, 100) >= ((int)(short)*(short *)(*(char **)D_00195BE0 + 169))) goto L190F7;
+    if (((int)(unsigned char)*(signed char *)talk_tone) != 2) goto L19113;
+    if (rand_range(1, 100) >= ((int)(short)*(short *)(*(char **)player_character + 169))) goto L190F7;
     l_20 += 10;
     goto L190FB;
 L190F7:;
     l_20 += -5;
 L190FB:;
     if (*(int *)D_001965D4 != 0) goto L19113;
-    func_0003D01C(2, 1);
+    skill_add_uses(2, 1);
 L19113:;
-    l_20 += (int)(short)*(short *)(D_001799E2 + ((((1 - ((int)(unsigned char)*(signed char *)D_001966AE)) << 2) + ((int)(unsigned char)*(signed char *)D_001966B1)) * 2));
-    l_20 += ((int)(short)*(short *)(*(char **)D_00195BE0 + 42)) / 5;
-    l_1C = func_0007D6AE(0, 20);
-    if (*(int *)(D_001965CC + (((int)(unsigned char)*(signed char *)D_001966B2) << 2)) == 0) goto L1918D;
-    l_20 = *(int *)(D_001965CC + (((int)(unsigned char)*(signed char *)D_001966B2) << 2));
+    l_20 += (int)(short)*(short *)(D_001799E2 + ((((1 - ((int)(unsigned char)*(signed char *)talk_question_mode)) << 2) + ((int)(unsigned char)*(signed char *)talk_topic_tab)) * 2));
+    l_20 += ((int)(short)*(short *)(*(char **)player_character + 42)) / 5;
+    l_1C = rand_range(0, 20);
+    if (*(int *)(talk_attitude_cache + (((int)(unsigned char)*(signed char *)talk_tone) << 2)) == 0) goto L1918D;
+    l_20 = *(int *)(talk_attitude_cache + (((int)(unsigned char)*(signed char *)talk_tone) << 2));
     goto L191A1;
 L1918D:;
-    *(int *)(D_001965CC + (((int)(unsigned char)*(signed char *)D_001966B2) << 2)) = l_20;
+    *(int *)(talk_attitude_cache + (((int)(unsigned char)*(signed char *)talk_tone) << 2)) = l_20;
 L191A1:;
     if (l_20 >= l_1C) goto L191B2;
     return 0;
@@ -2024,7 +2024,7 @@ L191C6:;
     return 1;
 }
 
-int func_00019234(int a1, short a2, short a3)
+int faction_find_type_in_region_r(int a1, short a2, short a3)
 {
     int l_1C;
 
@@ -2046,7 +2046,7 @@ L19299:;
     return a1;
 L192A1:;
     if (*(int *)((char *)a1 + 84) == 0) goto L192CE;
-    l_1C = func_00019234(*(int *)((char *)a1 + 84), (int)(short)a2, (int)(short)a3);
+    l_1C = faction_find_type_in_region_r(*(int *)((char *)a1 + 84), (int)(short)a2, (int)(short)a3);
     if (l_1C == 0) goto L192CE;
     return l_1C;
 L192CE:;
@@ -2056,7 +2056,7 @@ L192DC:;
     return 0;
 }
 
-int func_00019323(int a1, short a2)
+int faction_find_r(int a1, short a2)
 {
     short l_18;
 
@@ -2066,7 +2066,7 @@ L19336:;
     return a1;
 L19355:;
     if (*(int *)((char *)a1 + 84) == 0) goto L1937E;
-    *(int *)&l_18 = func_00019323(*(int *)((char *)a1 + 84), (int)(short)a2);
+    *(int *)&l_18 = faction_find_r(*(int *)((char *)a1 + 84), (int)(short)a2);
     if (*(int *)&l_18 == 0) goto L1937E;
     return *(int *)&l_18;
 L1937E:;
@@ -2109,13 +2109,13 @@ L1946D:;
     goto L193EE;
 }
 
-int func_00019485(void)
+int faction_random(void)
 {
-    *(int *)D_00195B84 = func_0007D6AE(0, *(int *)D_00196710 - 1);
-    return func_000194C0(*(int *)D_0019672C);
+    *(int *)D_00195B84 = rand_range(0, *(int *)faction_count - 1);
+    return faction_nth_r(*(int *)factions);
 }
 
-int func_000194C0(int a1)
+int faction_nth_r(int a1)
 {
     int l_1C;
 
@@ -2126,7 +2126,7 @@ L194D1:;
 L194E8:;
     (*(int *)D_00195B84)--;
     if (*(int *)((char *)a1 + 84) == 0) goto L19513;
-    l_1C = func_000194C0(*(int *)((char *)a1 + 84));
+    l_1C = faction_nth_r(*(int *)((char *)a1 + 84));
     if (l_1C == 0) goto L19513;
     return l_1C;
 L19513:;
@@ -2136,7 +2136,7 @@ L1951E:;
     return 0;
 }
 
-int func_00019532(int a1, unsigned char a2)
+int faction_nth_of_type_r(int a1, unsigned char a2)
 {
     short l_18;
 
@@ -2150,7 +2150,7 @@ L19564:;
     return a1;
 L1956C:;
     if (*(int *)((char *)a1 + 84) == 0) goto L19596;
-    *(int *)&l_18 = func_00019532(*(int *)((char *)a1 + 84), (int)(unsigned char)a2);
+    *(int *)&l_18 = faction_nth_of_type_r(*(int *)((char *)a1 + 84), (int)(unsigned char)a2);
     if (*(int *)&l_18 == 0) goto L19596;
     return *(int *)&l_18;
 L19596:;
@@ -2163,7 +2163,7 @@ L195B1:;
     return 0;
 }
 
-void func_000195C4(int a1, unsigned char a2)
+void faction_count_of_type_r(int a1, unsigned char a2)
 {
     int l_18;
 
@@ -2173,18 +2173,18 @@ L195D7:;
     (*(int *)D_00195B84)++;
 L195ED:;
     if (*(int *)((char *)a1 + 84) == 0) goto L19606;
-    func_000195C4(*(int *)((char *)a1 + 84), (int)(unsigned char)a2);
+    faction_count_of_type_r(*(int *)((char *)a1 + 84), (int)(unsigned char)a2);
 L19606:;
     a1 = *(int *)((char *)a1 + 80);
     goto L195D7;
 }
 
-int func_0001961A(unsigned char a1)
+int faction_random_of_type(unsigned char a1)
 {
     *(int *)D_00195B84 = 0;
-    func_000195C4(*(int *)D_0019672C, (int)(unsigned char)a1);
-    *(int *)D_00195B84 = func_0007D6AE(0, *(int *)D_00195B84 - 1);
-    return func_00019532(*(int *)D_0019672C, (int)(unsigned char)a1);
+    faction_count_of_type_r(*(int *)factions, (int)(unsigned char)a1);
+    *(int *)D_00195B84 = rand_range(0, *(int *)D_00195B84 - 1);
+    return faction_nth_of_type_r(*(int *)factions, (int)(unsigned char)a1);
 }
 
 int func_0001AC53(int a1, int a2)
@@ -2193,12 +2193,12 @@ int func_0001AC53(int a1, int a2)
     int l_20;
 
     (*(int *)D_00195B84)++;
-    if (func_0001ACCA(a1) == 0) goto L1AC84;
-    if (func_0001ACCA(a2) != 0) goto L1AC86;
+    if (faction_is_regional_noble(a1) == 0) goto L1AC84;
+    if (faction_is_regional_noble(a2) != 0) goto L1AC86;
 L1AC84:;
     goto L1AC95;
 L1AC86:;
-    if (func_0001AD21(a1, a2) != 0) goto L1AC97;
+    if (faction_has_enemy(a1, a2) != 0) goto L1AC97;
 L1AC95:;
     goto L1ACA6;
 L1AC97:;
@@ -2215,12 +2215,12 @@ L1ACB8:;
 }
 }
 
-int func_0001ACCA(int a1)
+int faction_is_regional_noble(int a1)
 {
     return (((((int)(unsigned char)*(signed char *)((char *)a1)) == 7) && (((int)(unsigned char)*(signed char *)((char *)a1 + 1)) != 255)) ? 1 : 0);
 }
 
-int func_0001AD21(int a1, int a2)
+int faction_has_enemy(int a1, int a2)
 {
 {
     int l_20;
@@ -2247,7 +2247,7 @@ L1AD85:;
 }
 }
 
-int func_0001AD97(int a1, int a2)
+int faction_has_ally(int a1, int a2)
 {
 {
     int l_20;
@@ -2274,7 +2274,7 @@ L1ADFB:;
 }
 }
 
-void func_0001AE0D(int a1, int a2)
+void faction_add_power(int a1, int a2)
 {
     if (a1 == 0) return;
     *(short *)((char *)a1 + 31) += a2;
@@ -2330,7 +2330,7 @@ L1AF39:;
     l_1C++;
     goto L1AF31;
 L1AF41:;
-    if (func_0001AD97(*(int *)((char *)((l_20 << 2) + a1) + 56), *(int *)((char *)((l_1C << 2) + a2) + 56)) == 0) goto L1AF66;
+    if (faction_has_ally(*(int *)((char *)((l_20 << 2) + a1) + 56), *(int *)((char *)((l_1C << 2) + a2) + 56)) == 0) goto L1AF66;
     l_18 += 3;
 L1AF66:;
     goto L1AF39;
@@ -2353,7 +2353,7 @@ L1AF90:;
     l_1C++;
     goto L1AF88;
 L1AF98:;
-    if (func_0001AD21(*(int *)((char *)((l_20 << 2) + a1) + 68), *(int *)((char *)((l_1C << 2) + a2) + 68)) == 0) goto L1AFBD;
+    if (faction_has_enemy(*(int *)((char *)((l_20 << 2) + a1) + 68), *(int *)((char *)((l_1C << 2) + a2) + 68)) == 0) goto L1AFBD;
     l_18 += 3;
 L1AFBD:;
     goto L1AF90;
@@ -2426,7 +2426,7 @@ L1B1E4:;
     return 0;
 }
 
-int func_0001B1F7(int a1)
+int faction_power(int a1)
 {
     if (a1 == 0) goto L1B21A;
     return (int)(short)*(short *)((char *)a1 + 31);
@@ -2441,9 +2441,9 @@ void func_0001B22E(int a1)
 L1B260:;
     return;
 L1B265:;
-    *(signed char *)(D_0018F07E + (((int)(unsigned char)*(signed char *)((char *)a1 + 1)) * 80)) = 0;
-    *(signed char *)(D_0018F044 + (((int)(unsigned char)*(signed char *)((char *)a1 + 1)) * 80)) = 0;
-    *(signed char *)(D_0018F061 + (((int)(unsigned char)*(signed char *)((char *)a1 + 1)) * 80)) = 0;
+    *(signed char *)(region_event_groups + (((int)(unsigned char)*(signed char *)((char *)a1 + 1)) * 80)) = 0;
+    *(signed char *)(region_event_values + (((int)(unsigned char)*(signed char *)((char *)a1 + 1)) * 80)) = 0;
+    *(signed char *)(region_event_flags + (((int)(unsigned char)*(signed char *)((char *)a1 + 1)) * 80)) = 0;
     *(signed char *)(D_0018F062 + (((int)(unsigned char)*(signed char *)((char *)a1 + 1)) * 80)) = 0;
     *(signed char *)(D_0018F063 + (((int)(unsigned char)*(signed char *)((char *)a1 + 1)) * 80)) = 0;
     *(signed char *)(D_0018F064 + (((int)(unsigned char)*(signed char *)((char *)a1 + 1)) * 80)) = 0;
@@ -2456,7 +2456,7 @@ void func_0001B2ED(int a1)
 L1B31F:;
     return;
 L1B321:;
-    *(signed char *)(D_0018F07E + (((int)(unsigned char)*(signed char *)((char *)a1 + 1)) * 80)) = 1;
+    *(signed char *)(region_event_groups + (((int)(unsigned char)*(signed char *)((char *)a1 + 1)) * 80)) = 1;
     *(signed char *)(D_0018F045 + (((int)(unsigned char)*(signed char *)((char *)a1 + 1)) * 80)) = 255;
     *(signed char *)(D_0018F062 + (((int)(unsigned char)*(signed char *)((char *)a1 + 1)) * 80)) = 1;
 }
@@ -2468,14 +2468,14 @@ void func_0001B36A(int a1, int a2)
 L1B39E:;
     return;
 L1B3A0:;
-    *(signed char *)(D_0018F044 + (((int)(unsigned char)*(signed char *)((char *)a1 + 1)) * 80)) = 0;
+    *(signed char *)(region_event_values + (((int)(unsigned char)*(signed char *)((char *)a1 + 1)) * 80)) = 0;
     *(signed char *)(D_0018F045 + (((int)(unsigned char)*(signed char *)((char *)a1 + 1)) * 80)) = 0;
     *(signed char *)(D_0018F046 + ((((int)(unsigned char)*(signed char *)((char *)a1 + 1)) * 80) + a2)) = 0;
     *(signed char *)(D_0018F063 + ((((int)(unsigned char)*(signed char *)((char *)a1 + 1)) * 80) + a2)) = 1;
-    *(signed char *)(D_0018F07E + (((int)(unsigned char)*(signed char *)((char *)a1 + 1)) * 80)) = 1;
+    *(signed char *)(region_event_groups + (((int)(unsigned char)*(signed char *)((char *)a1 + 1)) * 80)) = 1;
 }
 
-void func_0001B418(int a1, int a2)
+void faction_add_reputation(int a1, int a2)
 {
     if (a1 == 0) return;
     *(short *)((char *)a1 + 29) += a2;
@@ -2487,7 +2487,7 @@ L1B452:;
     *(short *)((char *)a1 + 29) = 65436;
 }
 
-void func_0001B470(int a1, int a2)
+void faction_change_reputation(int a1, int a2)
 {
     int l_1C;
     int l_18;
@@ -2495,9 +2495,9 @@ void func_0001B470(int a1, int a2)
 
     if (a1 == 0) return;
     if (((int)(unsigned short)*(short *)((char *)a1 + 33)) != 240) goto L1B4C2;
-    l_14 = func_00070308(128);
+    l_14 = guild_find_membership_by_bits(128);
     if (l_14 == 0) goto L1B4C2;
-    a1 = func_000192EE((int)(short)*(short *)((char *)l_14 + 3));
+    a1 = faction_find((int)(short)*(short *)((char *)l_14 + 3));
 L1B4C2:;
     func_0001B5BE(a1, a2);
     l_1C = 0;
@@ -2509,7 +2509,7 @@ L1B4DC:;
     goto L1B4D4;
 L1B4E4:;
     if (*(int *)((char *)((l_1C << 2) + a1) + 56) == 0) goto L1B509;
-    func_0001B418(*(int *)((char *)((l_1C << 2) + a1) + 56), a2 >> 1);
+    faction_add_reputation(*(int *)((char *)((l_1C << 2) + a1) + 56), a2 >> 1);
 L1B509:;
     goto L1B4DC;
 L1B50B:;
@@ -2522,7 +2522,7 @@ L1B51A:;
     goto L1B512;
 L1B522:;
     if (*(int *)((char *)((l_1C << 2) + a1) + 68) == 0) goto L1B549;
-    func_0001B418(*(int *)((char *)((l_1C << 2) + a1) + 68), -(a2 >> 1));
+    faction_add_reputation(*(int *)((char *)((l_1C << 2) + a1) + 68), -(a2 >> 1));
 L1B549:;
     goto L1B51A;
 }
@@ -2532,10 +2532,10 @@ void func_0001B554(int a1, int a2, int a3)
 L1B569:;
     if (a1 == 0) return;
     if (a1 != a2) goto L1B584;
-    func_0001B418(a1, a3);
+    faction_add_reputation(a1, a3);
     goto L1B591;
 L1B584:;
-    func_0001B418(a1, a3 >> 1);
+    faction_add_reputation(a1, a3 >> 1);
 L1B591:;
     if (*(int *)((char *)a1 + 84) == 0) goto L1B5AB;
     func_0001B554(*(int *)((char *)a1 + 84), a2, a3);
@@ -2553,7 +2553,7 @@ void func_0001B5BE(int a1, int a2)
 L1B5D7:;
     if (*(int *)((char *)a1 + 88) == 0) goto L1B609;
     if (((int)(unsigned short)*(short *)((char *)a1 + 33)) != 108) goto L1B5FE;
-    func_0001B418(a1, a2);
+    faction_add_reputation(a1, a2);
     goto L1B609;
 L1B5FE:;
     a1 = *(int *)((char *)a1 + 88);
@@ -2564,16 +2564,16 @@ L1B609:;
 L1B625:;
     goto L1B632;
 L1B627:;
-    func_0001B418(a1, a2);
+    faction_add_reputation(a1, a2);
 L1B632:;
     if (((int)(unsigned short)*(short *)((char *)a1 + 33)) != 844) goto L1B683;
-    func_0001B418(a1, a2);
-    l_14 = func_00070308(64);
+    faction_add_reputation(a1, a2);
+    l_14 = guild_find_membership_by_bits(64);
     if (l_14 == 0) goto L1B672;
-    a1 = func_000192EE((int)(short)*(short *)((char *)l_14 + 3));
+    a1 = faction_find((int)(short)*(short *)((char *)l_14 + 3));
 L1B672:;
     if (a1 == 0) goto L1B683;
-    func_0001B418(a1, a2);
+    faction_add_reputation(a1, a2);
 L1B683:;
     func_0001B554(*(int *)((char *)a1 + 84), l_18, a2);
 }

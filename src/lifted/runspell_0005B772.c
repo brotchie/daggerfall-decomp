@@ -3,7 +3,7 @@
 
 
 
-int func_0005B772(int a1, int a2, int a3)
+int spell_find_on_entity(int a1, int a2, int a3)
 {
     int l_14;
 

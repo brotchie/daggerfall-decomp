@@ -8,9 +8,9 @@ struct ent {
     char pad8c[0x219 - 0x8c];
     int f219;
 };
-extern int D_00195BF4;
+extern int game_minutes;
 
-int func_0008A113(char *a1, int a2, char *a3)
+int spfx_shield(char *a1, int a2, char *a3)
 {
     struct ent *e;
     struct tbl *t;
@@ -19,6 +19,6 @@ int func_0008A113(char *a1, int a2, char *a3)
     e = (struct ent *)(a3 + 71);
     e->f8b |= 64;
     e->f219 = t->f50[a2];
-    e->f64 = t->f4a[a2] + D_00195BF4;
+    e->f64 = t->f4a[a2] + game_minutes;
     return 1;
 }

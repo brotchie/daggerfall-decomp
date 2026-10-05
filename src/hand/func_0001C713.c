@@ -10,18 +10,18 @@ struct obj {
     char text[74];              /* 0x277 */
 };
 extern char D_00170464[];       /* __FILE__ */
-extern int D_00195AA0;
+extern int player_entity;
 extern int D_001966FC[];
-extern struct obj *func_0008DCE3(int, int, int);
+extern struct obj *object_create_child(int, int, int);
 extern void func_000A1023(char *, char *, int, char *, int, int);
 
-unsigned short func_0001C713(char *name, char *text, int kind)
+unsigned short bio_person_add(char *name, char *text, int kind)
 {
     struct obj *o;
 
     if (D_001966FC[kind] == 8)
         return 0xffff;
-    o = func_0008DCE3(D_00195AA0, 0, 634);
+    o = object_create_child(player_entity, 0, 634);
     o->type = kind + 45;
     o->flags |= 3;
     o->id = D_001966FC[kind]++;

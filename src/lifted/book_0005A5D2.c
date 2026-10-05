@@ -2,11 +2,11 @@
  * do not edit: move a function to src/book.c to work on it by hand) */
 
 
-extern int func_0005A4A9(int);
+extern int font_text_width(int);
 extern int func_0012DBCC();
 
-void func_0005A5D2(int a1, int a2, short a3)
+void text_draw_centred(int a1, int a2, short a3)
 {
-    a2 -= func_0005A4A9(a1) >> 1;
+    a2 -= font_text_width(a1) >> 1;
     func_0012DBCC((int)(short)*(short *)&a2, (int)(short)a3, a1);
 }

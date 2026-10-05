@@ -34,30 +34,30 @@ struct T {
     struct O *obj;          /* 0x10 */
 };
 extern char D_00170A64[];
-extern char *D_001959A8;
+extern char *nonworld_root;
 extern struct O *D_00195AC4;
-extern struct L *D_00195BDC;
+extern struct L *current_location;
 extern unsigned *D_00195C44;
-extern unsigned char D_00196268;
-extern int D_00196A8C;
-extern struct R6 *D_00196A90;
+extern unsigned char current_region;
+extern int loaded_location_door_count;
+extern struct R6 *loaded_location_doors;
 extern short D_001970C8;
 extern int D_001970CC;
 extern struct R6 *D_001970D0;
 extern struct O *D_001970D4;
 extern struct L *D_001970D8;
-extern char *D_00199764;
-extern char *func_000191DA(short, short);
+extern char *current_quest;
+extern char *faction_find_type_in_region(short, short);
 extern int func_000337AD(struct R6 *, struct T *, char *);
-extern int func_000345A5(int);
-extern void func_00086397(short *);
+extern int quest_object_in_use(int);
+extern void location_free(short *);
 extern void func_00087F76(short *, unsigned short, short, int);
-extern struct O *func_0008DCE3(char *, int, int);
+extern struct O *object_create_child(char *, int, int);
 extern int func_0009DC25();
 extern int func_000A0AD9();
 extern int func_000A1023();
 
-int func_00032A05(struct T *a1)
+int quest_init_place(struct T *a1)
 {
     struct R6 *base;
     struct R6 *ptr;
@@ -76,30 +76,30 @@ int func_00032A05(struct T *a1)
 retry:
     if (a1->cnt == 0) {
         a1->cnt = 10;
-        obj = func_0008DCE3(D_001959A8, 0, 26);
+        obj = object_create_child(nonworld_root, 0, 26);
         obj->type = 40;
         a1->obj = obj;
         obj->pos = (a1->w4 << 16) | (unsigned short)(a1->s6 & 0xffff);
         obj->pos2 = obj->pos;
         obj->w15 = 0x202;
-        obj->w17 = *(short *)D_00199764;
-        obj->c26 = *D_00199764;
+        obj->w17 = *(short *)current_quest;
+        obj->c26 = *current_quest;
         return 1;
     }
     if (a1->cnt > 0)
         a1->cnt--;
     if (a1->cnt != 0) {
-        func_00086397(&D_001970C8);
+        location_free(&D_001970C8);
         func_00087F76(&D_001970C8, a1->w4, a1->s6, a1->cnt);
         base = D_001970D0;
         n = D_001970CC;
         l40 = D_001970D4;
         l38 = D_001970D8;
     } else {
-        base = D_00196A90;
-        n = D_00196A8C;
+        base = loaded_location_doors;
+        n = loaded_location_door_count;
         l40 = D_00195AC4;
-        l38 = D_00195BDC;
+        l38 = current_location;
     }
     list = D_00195C44;
     count = 0;
@@ -134,18 +134,18 @@ retry:
     if (count == 0)
         return 0;
     i = func_0009DC25() % count;
-    if (func_000345A5((l40->pos & 0xffff0000) + (list[i] & 0xffff)))
+    if (quest_object_in_use((l40->pos & 0xffff0000) + (list[i] & 0xffff)))
         goto retry;
-    obj = func_0008DCE3(D_001959A8, 0, 58);
+    obj = object_create_child(nonworld_root, 0, 58);
     obj->type = 40;
     obj->w15 = 0x202;
     obj->w1b = D_001970C8;
-    obj->w17 = *(short *)D_00199764;
+    obj->w17 = *(short *)current_quest;
     obj->pos = (l40->pos & 0xffff0000) + (list[i] & 0xffff);
     obj->pos2 = obj->pos;
-    obj->c26 = *D_00199764;
+    obj->c26 = *current_quest;
     obj->c23 = D_001970D8->c22;
-    obj->w19 = (unsigned short)D_00196268;
+    obj->w19 = (unsigned short)current_region;
     a1->obj = obj;
     obj->i7 = l40->i7;
     obj->ib = l40->ib;
@@ -156,10 +156,10 @@ retry:
         obj->w1d = 0xffff;
     p = &obj->sub;
     if (p->w12 == 0)
-        p->w12 = *(short *)(func_000191DA(D_00196268, 15) + 33);
+        p->w12 = *(short *)(faction_find_type_in_region(current_region, 15) + 33);
     if (a1->w4 != 1)
         func_000A1023(p, l38->recs + (list[i] >> 16) * 26, 26, D_00170A64, 483, 4);
     func_000A0AD9((char *)p + 26, l38, 4, D_00170A64, 485);
-    func_00086397(&D_001970C8);
+    location_free(&D_001970C8);
     return 1;
 }

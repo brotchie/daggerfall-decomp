@@ -2,7 +2,7 @@
  * do not edit: move a function to src/equip.c to work on it by hand) */
 
 
-extern int func_0007D6AE(int, int);
+extern int rand_range(int, int);
 
 int func_000602C0(int a1, int a2)
 {
@@ -19,7 +19,7 @@ L6031A:;
     l_18 = 7;
     goto L6033B;
 L60329:;
-    l_18 = func_0007D6AE(4, 6);
+    l_18 = rand_range(4, 6);
 L6033B:;
     goto L6041E;
 case 1:
@@ -32,14 +32,14 @@ L60356:;
     goto L6041E;
 case 2:
     if (a1 != 0) goto L60375;
-    l_18 = func_0007D6AE(10, 11);
+    l_18 = rand_range(10, 11);
     goto L60396;
 L60375:;
     if (a1 != 1) goto L60384;
     l_18 = 16;
     goto L60396;
 L60384:;
-    l_18 = func_0007D6AE(12, 15);
+    l_18 = rand_range(12, 15);
 L60396:;
     goto L6041E;
 case 3:
@@ -51,7 +51,7 @@ L603AA:;
     l_18 = 21;
     goto L603CB;
 L603B9:;
-    l_18 = func_0007D6AE(18, 20);
+    l_18 = rand_range(18, 20);
 L603CB:;
     goto L6041E;
 case 4:
@@ -63,7 +63,7 @@ L603DC:;
     l_18 = 26;
     goto L603FD;
 L603EB:;
-    l_18 = func_0007D6AE(23, 25);
+    l_18 = rand_range(23, 25);
 L603FD:;
     goto L6041E;
 case 6:

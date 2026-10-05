@@ -3,20 +3,20 @@
 struct Img { unsigned short x; unsigned short y; unsigned short w; unsigned short h; char pad[4]; char data[1]; };
 struct Obj { char pad0[3]; short angle; char pad1[2]; int x; int y; int z; };
 extern int D_000C23BC;
-extern char *D_00143550;
+extern char *screen_buffer;
 extern char D_00175898[];
-extern struct Obj *D_00195A7C;
-extern struct Obj *D_00195AA4;
-extern unsigned short *D_00195BF8;
-extern char *D_00195D88;
-extern struct Img *D_00195D9C;
-extern char D_00196274;
-extern int func_00062EF7(int, int, int *);
+extern struct Obj *detect_target;
+extern struct Obj *player_object;
+extern unsigned short *game_settings;
+extern char *compass_image;
+extern struct Img *compass_box_image;
+extern char game_mode;
+extern int ai_angle_diff(int, int, int *);
 extern void func_000A1023(char *, char *, int, char *, int, int);
 extern int func_000C808D();
 extern int func_00144F68();
 
-void func_0005DB95(int a1)
+void hud_draw_heading_strip(int a1)
 {
     int i;
     int off;
@@ -25,30 +25,30 @@ void func_0005DB95(int a1)
     int pos;
 
     if (a1 == 0) {
-        if ((int)(unsigned short)(*D_00195BF8 & 1) == 0)
+        if ((int)(unsigned short)(*game_settings & 1) == 0)
             return;
-        if (D_00196274 != 0)
+        if (game_mode != 0)
             return;
-        func_00144F68(D_00195D9C->x, D_00195D9C->y, D_00195D9C->w, D_00195D9C->h, D_00195D9C->data);
-        off = ((short)(D_00195AA4->angle & 0x7ff) << 5) / 256;
+        func_00144F68(compass_box_image->x, compass_box_image->y, compass_box_image->w, compass_box_image->h, compass_box_image->data);
+        off = ((short)(player_object->angle & 0x7ff) << 5) / 256;
         for (i = 185; i <= 197; i++)
-            func_000A1023(D_00143550 + (i * 320 + 253), (i - 185) * 322 + (D_00195D88 + off), 65, D_00175898, 440, 4);
-        if (D_00195A7C != 0) {
-            dir = func_00062EF7(D_00195AA4->angle, func_000C808D(D_00195AA4->x, D_00195AA4->z, D_00195A7C->x, D_00195A7C->z), &dist);
+            func_000A1023(screen_buffer + (i * 320 + 253), (i - 185) * 322 + (compass_image + off), 65, D_00175898, 440, 4);
+        if (detect_target != 0) {
+            dir = ai_angle_diff(player_object->angle, func_000C808D(player_object->x, player_object->z, detect_target->x, detect_target->z), &dist);
             dir = (dir << 5) / 256;
             if (dir > 32)
                 dir = 32;
             pos = dir * dist + 57885;
-            D_00143550[pos - 2] = D_00143550[pos - 1] = D_00143550[pos] = D_00143550[pos + 1] = D_00143550[pos + 2] = 245;
+            screen_buffer[pos - 2] = screen_buffer[pos - 1] = screen_buffer[pos] = screen_buffer[pos + 1] = screen_buffer[pos + 2] = 245;
             pos += 320;
-            D_00143550[pos - 1] = D_00143550[pos] = D_00143550[pos + 1] = 245;
+            screen_buffer[pos - 1] = screen_buffer[pos] = screen_buffer[pos + 1] = 245;
             pos += 320;
-            D_00143550[pos] = 245;
+            screen_buffer[pos] = 245;
         }
         return;
     }
-    func_00144F68(D_00195D9C->x - 250, D_00195D9C->y - 11, D_00195D9C->w, D_00195D9C->h, D_00195D9C->data);
+    func_00144F68(compass_box_image->x - 250, compass_box_image->y - 11, compass_box_image->w, compass_box_image->h, compass_box_image->data);
     off = ((D_000C23BC & 2047) << 5) / 256;
     for (i = 174; i <= 186; i++)
-        func_000A1023(D_00143550 + (i * 320 + 3), (i - 174) * 322 + (D_00195D88 + off), 65, D_00175898, 460, 4);
+        func_000A1023(screen_buffer + (i * 320 + 3), (i - 174) * 322 + (compass_image + off), 65, D_00175898, 460, 4);
 }

@@ -15,34 +15,34 @@ extern char D_00176DE7[];
 extern char D_00176DF1[];
 extern char D_00176E06[];
 extern char D_00176E18[];
-extern char D_00183344[];
-extern char D_0018337C[];
-extern char D_001835E4[];
-extern char D_00183678[];
-extern char D_001837E8[];
+extern char shop_name_last_words[];
+extern char shop_name_first_words[];
+extern char tavern_name_first_words[];
+extern char tavern_name_last_words[];
+extern char region_names[];
 extern char D_001841E3[];
 extern char D_00184872[];
-extern char D_001903A4[];
+extern char text_buffer[];
 extern char D_00190B44[];
-extern char D_00190FE4[];
+extern char text_rsc_buffer[];
 extern char D_00195AC4[];
-extern char D_00195BE0[];
-extern char D_00196268[];
-extern char D_001A9A08[];
-extern char D_001A9A38[];
-extern char D_001A9A60[];
-extern char D_001A9A7E[];
-extern char D_001A9A9C[];
-extern char D_001A9AB0[];
+extern char player_character[];
+extern char current_region[];
+extern char namegen_part_offsets[];
+extern char namegen_name[];
+extern char namegen_part_name[];
+extern char namegen_syllable[];
+extern char namegen_file[];
+extern char input_digits_only[];
 
-extern int func_000192EE(short);
-extern int func_000342E3(int);
-extern int func_0006CD6E(int);
-extern int func_000702A0(unsigned char);
-extern int func_0007D6AE(int, int);
+extern int faction_find(short);
+extern int quest_find_site_for_building(int);
+extern int disk_open_data(int);
+extern int guild_find_membership_by_kind(unsigned char);
+extern int rand_range(int, int);
 extern int func_0008B43B(unsigned char, unsigned char, int);
-extern int func_0008B65C(unsigned char, unsigned char);
-extern int func_0008C2D7(int, short, short, short, short, short);
+extern int name_generate_surname(unsigned char, unsigned char);
+extern int inpstr_edit(int, short, short, short, short, short);
 extern int func_0009DC25();
 extern int func_0009DC49();
 extern int func_0009DEA7();
@@ -54,55 +54,55 @@ extern int func_000A0F5C(int, ...);
 extern int func_000A1054();
 extern int func_000A17C1();
 extern int func_00142790();
-extern void func_0004633F(int, int);
-extern void func_0004A6B5(int, int, int);
-extern void func_0008BCE9(short, int);
-int func_0008B79D(unsigned char, unsigned char);
-int func_0008C232(int);
+extern void parse_expand(int, int);
+extern void parse_rsc_text(int, int, int);
+extern void namegen_read_part(short, int);
+int name_generate_first(unsigned char, unsigned char);
+int str_list_random(int);
 #pragma aux func_000A0ED9 parm routine [];
 
-int func_0008B572(unsigned char a1, unsigned char a2)
+int name_generate(unsigned char a1, unsigned char a2)
 {
     int l_20;
 
-    *(signed char *)D_001A9A38 = 0;
-    *(short *)D_001A9A9C = func_0006CD6E((int)D_00176D8C);
-    func_000A006E((int)(short)*(short *)D_001A9A9C, ((int)(unsigned char)a1) * 48, 0);
-    func_000A00CB((int)(short)*(short *)D_001A9A9C, (int)D_001A9A08, 48);
-    func_000A0AD9((int)D_001A9A38, func_0008B79D((int)(unsigned char)a1, (int)(unsigned char)a2), 40, (int)D_00176D98, 90);
-    l_20 = func_0008B65C((int)(unsigned char)a1, (int)(unsigned char)a2);
+    *(signed char *)namegen_name = 0;
+    *(short *)namegen_file = disk_open_data((int)D_00176D8C);
+    func_000A006E((int)(short)*(short *)namegen_file, ((int)(unsigned char)a1) * 48, 0);
+    func_000A00CB((int)(short)*(short *)namegen_file, (int)namegen_part_offsets, 48);
+    func_000A0AD9((int)namegen_name, name_generate_first((int)(unsigned char)a1, (int)(unsigned char)a2), 40, (int)D_00176D98, 90);
+    l_20 = name_generate_surname((int)(unsigned char)a1, (int)(unsigned char)a2);
     if (*(signed char *)((char *)l_20) == 0) goto L8B63D;
-    func_000A1054((int)D_001A9A38, (int)D_00176DA0, (int)D_00176D98, 96, 40);
-    func_000A1054((int)D_001A9A38, l_20, (int)D_00176D98, 97, 40);
+    func_000A1054((int)namegen_name, (int)D_00176DA0, (int)D_00176D98, 96, 40);
+    func_000A1054((int)namegen_name, l_20, (int)D_00176D98, 97, 40);
 L8B63D:;
-    func_0009DEA7((int)(short)*(short *)D_001A9A9C);
-    return (int)D_001A9A38;
+    func_0009DEA7((int)(short)*(short *)namegen_file);
+    return (int)namegen_name;
 }
 
-int func_0008B79D(unsigned char a1, unsigned char a2)
+int name_generate_first(unsigned char a1, unsigned char a2)
 {
     short l_1C;
 
     switch ((unsigned char)a1) {
     goto L8BC5E;
 case 1:
-    func_0008BCE9((int)(short)*(short *)D_001A9A9C, 0);
-    func_000A0AD9((int)D_001A9A60, (int)D_001A9A7E, 30, (int)D_00176D98, 156);
-    func_0008BCE9((int)(short)*(short *)D_001A9A9C, 1);
-    func_000A1054((int)D_001A9A60, (int)D_001A9A7E, (int)D_00176D98, 158, 30);
-    func_0008BCE9((int)(short)*(short *)D_001A9A9C, 2);
-    func_000A1054((int)D_001A9A60, (int)D_001A9A7E, (int)D_00176D98, 160, 30);
+    namegen_read_part((int)(short)*(short *)namegen_file, 0);
+    func_000A0AD9((int)namegen_part_name, (int)namegen_syllable, 30, (int)D_00176D98, 156);
+    namegen_read_part((int)(short)*(short *)namegen_file, 1);
+    func_000A1054((int)namegen_part_name, (int)namegen_syllable, (int)D_00176D98, 158, 30);
+    namegen_read_part((int)(short)*(short *)namegen_file, 2);
+    func_000A1054((int)namegen_part_name, (int)namegen_syllable, (int)D_00176D98, 160, 30);
     if (a2 != 0) goto L8B8A6;
     if ((func_0009DC25() % 100) < 75) goto L8B8A8;
 L8B8A6:;
     goto L8B8D4;
 L8B8A8:;
-    func_0008BCE9((int)(short)*(short *)D_001A9A9C, 3);
-    func_000A1054((int)D_001A9A60, (int)D_001A9A7E, (int)D_00176D98, 165, 30);
+    namegen_read_part((int)(short)*(short *)namegen_file, 3);
+    func_000A1054((int)namegen_part_name, (int)namegen_syllable, (int)D_00176D98, 165, 30);
 L8B8D4:;
     if (a2 == 0) goto L8B906;
-    func_0008BCE9((int)(short)*(short *)D_001A9A9C, 4);
-    func_000A1054((int)D_001A9A60, (int)D_001A9A7E, (int)D_00176D98, 171, 30);
+    namegen_read_part((int)(short)*(short *)namegen_file, 4);
+    func_000A1054((int)namegen_part_name, (int)namegen_syllable, (int)D_00176D98, 171, 30);
 L8B906:;
     goto L8BCD6;
 case 2:
@@ -116,35 +116,35 @@ L8B91A:;
     l_28 = 0;
 L8B921:;
     *(int *)&l_1C = l_28;
-    func_0008BCE9((int)(short)*(short *)D_001A9A9C, (int)(short)l_1C);
-    func_000A0AD9((int)D_001A9A60, (int)D_001A9A7E, 30, (int)D_00176D98, 177);
-    func_0008BCE9((int)(short)*(short *)D_001A9A9C, (int)(short)(*(int *)&l_1C + 1));
-    func_000A1054((int)D_001A9A60, (int)D_001A9A7E, (int)D_00176D98, 179, 30);
+    namegen_read_part((int)(short)*(short *)namegen_file, (int)(short)l_1C);
+    func_000A0AD9((int)namegen_part_name, (int)namegen_syllable, 30, (int)D_00176D98, 177);
+    namegen_read_part((int)(short)*(short *)namegen_file, (int)(short)(*(int *)&l_1C + 1));
+    func_000A1054((int)namegen_part_name, (int)namegen_syllable, (int)D_00176D98, 179, 30);
     goto L8BCD6;
 case 8:
     *(int *)&l_1C = 0;
-    func_0008BCE9((int)(short)*(short *)D_001A9A9C, (int)(short)l_1C);
-    func_000A0AD9((int)D_001A9A60, (int)D_001A9A7E, 30, (int)D_00176D98, 184);
+    namegen_read_part((int)(short)*(short *)namegen_file, (int)(short)l_1C);
+    func_000A0AD9((int)namegen_part_name, (int)namegen_syllable, 30, (int)D_00176D98, 184);
     if ((func_0009DC25() % 50) >= 25) goto L8BA03;
-    func_0008BCE9((int)(short)*(short *)D_001A9A9C, (int)(short)(*(int *)&l_1C + 1));
-    func_000A1054((int)D_001A9A60, (int)D_001A9A7E, (int)D_00176D98, 189, 30);
+    namegen_read_part((int)(short)*(short *)namegen_file, (int)(short)(*(int *)&l_1C + 1));
+    func_000A1054((int)namegen_part_name, (int)namegen_syllable, (int)D_00176D98, 189, 30);
 L8BA03:;
-    func_0008BCE9((int)(short)*(short *)D_001A9A9C, (int)(short)(*(int *)&l_1C + 2));
-    func_000A1054((int)D_001A9A60, (int)D_001A9A7E, (int)D_00176D98, 193, 30);
+    namegen_read_part((int)(short)*(short *)namegen_file, (int)(short)(*(int *)&l_1C + 2));
+    func_000A1054((int)namegen_part_name, (int)namegen_syllable, (int)D_00176D98, 193, 30);
     goto L8BCD6;
 case 9:
     *(int *)&l_1C = 0;
-    func_0008BCE9((int)(short)*(short *)D_001A9A9C, (int)(short)l_1C);
-    func_000A0AD9((int)D_001A9A60, (int)D_001A9A7E, 30, (int)D_00176D98, 199);
+    namegen_read_part((int)(short)*(short *)namegen_file, (int)(short)l_1C);
+    func_000A0AD9((int)namegen_part_name, (int)namegen_syllable, 30, (int)D_00176D98, 199);
     if ((func_0009DC25() % 50) >= 25) goto L8BAB5;
-    func_0008BCE9((int)(short)*(short *)D_001A9A9C, (int)(short)(*(int *)&l_1C + 1));
-    func_000A1054((int)D_001A9A60, (int)D_001A9A7E, (int)D_00176D98, 204, 30);
+    namegen_read_part((int)(short)*(short *)namegen_file, (int)(short)(*(int *)&l_1C + 1));
+    func_000A1054((int)namegen_part_name, (int)namegen_syllable, (int)D_00176D98, 204, 30);
 L8BAB5:;
-    func_0008BCE9((int)(short)*(short *)D_001A9A9C, (int)(short)(*(int *)&l_1C + 2));
-    func_000A1054((int)D_001A9A60, (int)D_001A9A7E, (int)D_00176D98, 208, 30);
+    namegen_read_part((int)(short)*(short *)namegen_file, (int)(short)(*(int *)&l_1C + 2));
+    func_000A1054((int)namegen_part_name, (int)namegen_syllable, (int)D_00176D98, 208, 30);
     if (a2 == 0) goto L8BB1F;
-    func_0008BCE9((int)(short)*(short *)D_001A9A9C, (int)(short)(*(int *)&l_1C + 3));
-    func_000A1054((int)D_001A9A60, (int)D_001A9A7E, (int)D_00176D98, 213, 30);
+    namegen_read_part((int)(short)*(short *)namegen_file, (int)(short)(*(int *)&l_1C + 3));
+    func_000A1054((int)namegen_part_name, (int)namegen_syllable, (int)D_00176D98, 213, 30);
 L8BB1F:;
     goto L8BCD6;
 case 10:
@@ -154,20 +154,20 @@ case 10:
 L8BB49:;
     goto L8BBCB;
 L8BB4E:;
-    func_0008BCE9((int)(short)*(short *)D_001A9A9C, (int)(short)(*(int *)&l_1C + 3));
-    func_000A0AD9((int)D_001A9A60, (int)D_001A9A7E, 30, (int)D_00176D98, 223);
-    func_000A1054((int)D_001A9A60, (int)D_00176DA0, (int)D_00176D98, 224, 30);
-    func_0008BCE9((int)(short)*(short *)D_001A9A9C, (int)(short)l_1C);
-    func_000A1054((int)D_001A9A60, (int)D_001A9A7E, (int)D_00176D98, 226, 30);
+    namegen_read_part((int)(short)*(short *)namegen_file, (int)(short)(*(int *)&l_1C + 3));
+    func_000A0AD9((int)namegen_part_name, (int)namegen_syllable, 30, (int)D_00176D98, 223);
+    func_000A1054((int)namegen_part_name, (int)D_00176DA0, (int)D_00176D98, 224, 30);
+    namegen_read_part((int)(short)*(short *)namegen_file, (int)(short)l_1C);
+    func_000A1054((int)namegen_part_name, (int)namegen_syllable, (int)D_00176D98, 226, 30);
     goto L8BBF9;
 L8BBCB:;
-    func_0008BCE9((int)(short)*(short *)D_001A9A9C, (int)(short)l_1C);
-    func_000A0AD9((int)D_001A9A60, (int)D_001A9A7E, 30, (int)D_00176D98, 231);
+    namegen_read_part((int)(short)*(short *)namegen_file, (int)(short)l_1C);
+    func_000A0AD9((int)namegen_part_name, (int)namegen_syllable, 30, (int)D_00176D98, 231);
 L8BBF9:;
-    func_0008BCE9((int)(short)*(short *)D_001A9A9C, (int)(short)(*(int *)&l_1C + 1));
-    func_000A1054((int)D_001A9A60, (int)D_001A9A7E, (int)D_00176D98, 235, 30);
-    func_0008BCE9((int)(short)*(short *)D_001A9A9C, (int)(short)(*(int *)&l_1C + 2));
-    func_000A1054((int)D_001A9A60, (int)D_001A9A7E, (int)D_00176D98, 237, 30);
+    namegen_read_part((int)(short)*(short *)namegen_file, (int)(short)(*(int *)&l_1C + 1));
+    func_000A1054((int)namegen_part_name, (int)namegen_syllable, (int)D_00176D98, 235, 30);
+    namegen_read_part((int)(short)*(short *)namegen_file, (int)(short)(*(int *)&l_1C + 2));
+    func_000A1054((int)namegen_part_name, (int)namegen_syllable, (int)D_00176D98, 237, 30);
     goto L8BCD6;
 default:
 L8BC5E:;
@@ -178,17 +178,17 @@ L8BC6D:;
     l_2C = 0;
 L8BC74:;
     *(int *)&l_1C = l_2C;
-    func_0008BCE9((int)(short)*(short *)D_001A9A9C, (int)(short)l_1C);
-    func_000A0AD9((int)D_001A9A60, (int)D_001A9A7E, 30, (int)D_00176D98, 242);
-    func_0008BCE9((int)(short)*(short *)D_001A9A9C, (int)(short)(*(int *)&l_1C + 1));
-    func_000A1054((int)D_001A9A60, (int)D_001A9A7E, (int)D_00176D98, 244, 30);
+    namegen_read_part((int)(short)*(short *)namegen_file, (int)(short)l_1C);
+    func_000A0AD9((int)namegen_part_name, (int)namegen_syllable, 30, (int)D_00176D98, 242);
+    namegen_read_part((int)(short)*(short *)namegen_file, (int)(short)(*(int *)&l_1C + 1));
+    func_000A1054((int)namegen_part_name, (int)namegen_syllable, (int)D_00176D98, 244, 30);
 L8BCD6:;
-    return (int)D_001A9A60;
+    return (int)namegen_part_name;
 }
 }
 }
 
-int func_0008BD50(int a1)
+int building_name(int a1)
 {
     int l_30;
     int l_2C;
@@ -201,13 +201,13 @@ int func_0008BD50(int a1)
     return (int)D_00176DA6;
 L8BD73:;
     l_30 = func_0009DC25();
-    if (*(int *)((char *)a1 + 20) != *(int *)(*(char **)D_00195BE0 + 116)) goto L8BDA7;
-    func_0004633F(*(int *)D_00184872, (int)D_00190B44);
+    if (*(int *)((char *)a1 + 20) != *(int *)(*(char **)player_character + 116)) goto L8BDA7;
+    parse_expand(*(int *)D_00184872, (int)D_00190B44);
     return (int)D_00190B44;
 L8BDA7:;
     if (((int)(unsigned short)(*(short *)((char *)a1) & 32768)) == 0) goto L8BDDE;
-    func_0004A6B5((int)(unsigned short)((struct bf16_0_15 *)((char *)a1))->f, 0, 0);
-    return (int)D_00190FE4;
+    parse_rsc_text((int)(unsigned short)((struct bf16_0_15 *)((char *)a1))->f, 0, 0);
+    return (int)text_rsc_buffer;
 L8BDDE:;
     func_0009DC49((int)(unsigned short)*(short *)((char *)a1));
     switch (*(unsigned char *)((char *)a1 + 24)) {
@@ -223,67 +223,67 @@ case 10:
 case 12:
 case 13:
     func_000A0ED9(308, (int)D_00176D98);
-    func_000A0F5C((int)D_001903A4, (int)D_00176DB0, func_0008C232((int)D_0018337C), func_0008C232(*(int *)(D_00183344 + (((int)(unsigned char)*(signed char *)((char *)a1 + 24)) << 2))));
-    func_0004633F((int)D_001903A4, (int)D_00190FE4);
+    func_000A0F5C((int)text_buffer, (int)D_00176DB0, str_list_random((int)shop_name_first_words), str_list_random(*(int *)(shop_name_last_words + (((int)(unsigned char)*(signed char *)((char *)a1 + 24)) << 2))));
+    parse_expand((int)text_buffer, (int)text_rsc_buffer);
     goto L8C216;
 case 1:
-    if (((*(int *)(*(char **)D_00195AC4 + 31) & -65536) + *(int *)((char *)a1 + 20)) != *(int *)(*(char **)D_00195BE0 + 116)) goto L8BF10;
-    func_000A0AD9((int)D_00190FE4, (int)D_00176DB6, 2048, (int)D_00176D98, 313);
+    if (((*(int *)(*(char **)D_00195AC4 + 31) & -65536) + *(int *)((char *)a1 + 20)) != *(int *)(*(char **)player_character + 116)) goto L8BF10;
+    func_000A0AD9((int)text_rsc_buffer, (int)D_00176DB6, 2048, (int)D_00176D98, 313);
     goto L8BF2E;
 L8BF10:;
-    func_000A0AD9((int)D_00190FE4, (int)D_00176DC2, 2048, (int)D_00176D98, 315);
+    func_000A0AD9((int)text_rsc_buffer, (int)D_00176DC2, 2048, (int)D_00176D98, 315);
 L8BF2E:;
     goto L8C216;
 case 3:
     func_000A0ED9(318, (int)D_00176D98);
-    func_000A0F5C((int)D_00190FE4, (int)D_00176DD1, *(int *)(D_001837E8 + (((int)(unsigned char)*(signed char *)D_00196268) << 2)));
+    func_000A0F5C((int)text_rsc_buffer, (int)D_00176DD1, *(int *)(region_names + (((int)(unsigned char)*(signed char *)current_region) << 2)));
     goto L8C216;
 case 11:
-    l_28 = func_000192EE((int)(short)*(short *)((char *)a1 + 18));
+    l_28 = faction_find((int)(short)*(short *)((char *)a1 + 18));
     if (l_28 == 0) goto L8BFA0;
-    func_000A0AD9((int)D_00190FE4, l_28 + 3, 2048, (int)D_00176D98, 323);
+    func_000A0AD9((int)text_rsc_buffer, l_28 + 3, 2048, (int)D_00176D98, 323);
 L8BFA0:;
     goto L8C216;
 case 14:
-    l_28 = func_000192EE((int)(short)*(short *)((char *)a1 + 18));
+    l_28 = faction_find((int)(short)*(short *)((char *)a1 + 18));
     if (*(int *)((char *)l_28 + 84) == 0) goto L8BFE1;
-    func_000A0AD9((int)D_00190FE4, (int)&*(signed char *)(*(char **)((char *)l_28 + 84) + 3), 2048, (int)D_00176D98, 332);
+    func_000A0AD9((int)text_rsc_buffer, (int)&*(signed char *)(*(char **)((char *)l_28 + 84) + 3), 2048, (int)D_00176D98, 332);
     goto L8C006;
 L8BFE1:;
     if (l_28 == 0) goto L8C006;
-    func_000A0AD9((int)D_00190FE4, l_28 + 3, 2048, (int)D_00176D98, 334);
+    func_000A0AD9((int)text_rsc_buffer, l_28 + 3, 2048, (int)D_00176D98, 334);
 L8C006:;
     goto L8C216;
 case 15:
     func_000A0ED9(341, (int)D_00176D98);
-    func_000A0F5C((int)D_00190FE4, (int)D_00176DB0, func_0008C232((int)D_001835E4), func_0008C232((int)D_00183678));
+    func_000A0F5C((int)text_rsc_buffer, (int)D_00176DB0, str_list_random((int)tavern_name_first_words), str_list_random((int)tavern_name_last_words));
     goto L8C216;
 case 16:
     func_000A0ED9(344, (int)D_00176D98);
-    func_000A0F5C((int)D_00190FE4, (int)D_00176DE0);
+    func_000A0F5C((int)text_rsc_buffer, (int)D_00176DE0);
     goto L8C216;
 case 23:
-    func_000A0AD9((int)D_00190FE4, (int)D_00176DE7, 2048, (int)D_00176D98, 347);
+    func_000A0AD9((int)text_rsc_buffer, (int)D_00176DE7, 2048, (int)D_00176D98, 347);
     goto L8C216;
 default:
 L8C096:;
     if (((int)(unsigned short)*(short *)((char *)a1 + 18)) != 108) goto L8C0B2;
-    if (func_000702A0(0) != 0) goto L8C0B4;
+    if (guild_find_membership_by_kind(0) != 0) goto L8C0B4;
 L8C0B2:;
     goto L8C0D7;
 L8C0B4:;
-    func_000A0AD9((int)D_00190FE4, (int)D_00176DF1, 2048, (int)D_00176D98, 351);
+    func_000A0AD9((int)text_rsc_buffer, (int)D_00176DF1, 2048, (int)D_00176D98, 351);
     goto L8C216;
 L8C0D7:;
     if (((int)(unsigned short)*(short *)((char *)a1 + 18)) != 42) goto L8C0F6;
-    if (func_000702A0(3) != 0) goto L8C0F8;
+    if (guild_find_membership_by_kind(3) != 0) goto L8C0F8;
 L8C0F6:;
     goto L8C11B;
 L8C0F8:;
-    func_000A0AD9((int)D_00190FE4, (int)D_00176E06, 2048, (int)D_00176D98, 353);
+    func_000A0AD9((int)text_rsc_buffer, (int)D_00176E06, 2048, (int)D_00176D98, 353);
     goto L8C216;
 L8C11B:;
-    l_1C = func_000342E3(a1);
+    l_1C = quest_find_site_for_building(a1);
     if (l_1C == 0) goto L8C1F8;
     if (l_1C == 0) goto L8C156;
     if (((int)(unsigned char)*(signed char *)((char *)l_1C)) == 41) goto L8C154;
@@ -293,41 +293,41 @@ L8C154:;
 L8C156:;
     goto L8C186;
 L8C158:;
-    l_24 = func_0008B43B((int)(unsigned char)*(signed char *)(D_001841E3 + ((int)(unsigned char)*(signed char *)D_00196268)), (int)(unsigned char)(*(signed char *)((char *)l_1C + 21) & 4), *(int *)((char *)l_1C + 43));
+    l_24 = func_0008B43B((int)(unsigned char)*(signed char *)(D_001841E3 + ((int)(unsigned char)*(signed char *)current_region)), (int)(unsigned char)(*(signed char *)((char *)l_1C + 21) & 4), *(int *)((char *)l_1C + 43));
     goto L8C1B1;
 L8C186:;
-    l_24 = func_0008B43B((int)(unsigned char)*(signed char *)(D_001841E3 + ((int)(unsigned char)*(signed char *)D_00196268)), 0, (((unsigned)*(int *)((char *)a1 + 20)) >> 16) ^ *(int *)((char *)a1 + 20));
+    l_24 = func_0008B43B((int)(unsigned char)*(signed char *)(D_001841E3 + ((int)(unsigned char)*(signed char *)current_region)), 0, (((unsigned)*(int *)((char *)a1 + 20)) >> 16) ^ *(int *)((char *)a1 + 20));
 L8C1B1:;
     l_20 = func_000A17C1(l_24, 32);
     if (l_20 == 0) goto L8C1CE;
     l_24 = l_20 + 1;
 L8C1CE:;
     func_000A0ED9(363, (int)D_00176D98);
-    func_000A0F5C((int)D_00190FE4, (int)D_00176E18, l_24);
+    func_000A0F5C((int)text_rsc_buffer, (int)D_00176E18, l_24);
     goto L8C216;
 L8C1F8:;
-    func_000A0AD9((int)D_00190FE4, (int)D_00176DA6, 2048, (int)D_00176D98, 366);
+    func_000A0AD9((int)text_rsc_buffer, (int)D_00176DA6, 2048, (int)D_00176D98, 366);
 L8C216:;
     func_0009DC49(l_30);
-    return (int)D_00190FE4;
+    return (int)text_rsc_buffer;
 }
 }
 
-int func_0008C232(int a1)
+int str_list_random(int a1)
 {
     int l_1C;
 
     l_1C = 0;
 L8C24A:;
     if (*(int *)((char *)((l_1C++ << 2) + a1)) != 0) goto L8C24A;
-    l_1C = func_0007D6AE(0, l_1C - 2);
+    l_1C = rand_range(0, l_1C - 2);
     return *(int *)((char *)((l_1C << 2) + a1));
 }
 
 void func_0008C286(int a1, short a2, int a3, short a4, short a5, short a6)
 {
     func_00142790();
-    *(signed char *)D_001A9AB0 = 1;
-    func_0008C2D7(a1, (int)(short)a2, (int)(short)*(short *)&a3, (int)(short)a4, (int)(short)a5, (int)(short)a6);
-    *(signed char *)D_001A9AB0 = 0;
+    *(signed char *)input_digits_only = 1;
+    inpstr_edit(a1, (int)(short)a2, (int)(short)*(short *)&a3, (int)(short)a4, (int)(short)a5, (int)(short)a6);
+    *(signed char *)input_digits_only = 0;
 }

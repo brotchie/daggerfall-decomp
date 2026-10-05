@@ -1,20 +1,20 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x00096CCF */
 extern char D_0017704C[];
 extern char D_00195AC4[];
-extern char D_00195B04[];
+extern char spell_records[];
 extern char D_00195B44[];
-extern char D_00195BE0[];
-extern char D_00195BF4[];
-extern int func_0003A0C0(int, int);
-extern int func_0005AFD5();
-extern void func_00060270(int, int);
-extern int func_0008DCE3(int, int, int);
+extern char player_character[];
+extern char game_minutes[];
+extern int spell_cost(int, int);
+extern int cast_item_spell_at();
+extern void item_damage(int, int);
+extern int object_create_child(int, int, int);
 extern int func_000A1023();
 
 struct S89 { char p[73]; unsigned char f; char q[15]; };
 struct E4 { short t; short v; };
 
-void func_00096CCF(int a1, int a2)
+void item_apply_equip_effects(int a1, int a2)
 {
     int l_24;
     int l_20;
@@ -35,14 +35,14 @@ L96D16:;
 case 1:
     l_20 = 0;
 L96D71:;
-    if ((*(struct S89 **)D_00195B04)[l_20].f == ((struct E4 *)(l_1C + 67))[l_24].v) goto L96D98;
+    if ((*(struct S89 **)spell_records)[l_20].f == ((struct E4 *)(l_1C + 67))[l_24].v) goto L96D98;
     l_20++;
     goto L96D71;
 L96D98:;
-    l_18 = func_0008DCE3(*(int *)D_00195AC4, 0, 89);
+    l_18 = object_create_child(*(int *)D_00195AC4, 0, 89);
     *(signed char *)((char *)l_18) = 9;
     *(short *)((char *)l_18 + 21) = 3;
-    func_000A1023(l_18 + 71, (int)(*(char **)D_00195B04 + (l_20 * 89)), 89, (int)D_0017704C, 2092, 4);
+    func_000A1023(l_18 + 71, (int)(*(char **)spell_records + (l_20 * 89)), 89, (int)D_0017704C, 2092, 4);
     l_14 = l_18 + 71;
     *(signed char *)((char *)l_14 + 72) = *(signed char *)&a2 + 200;
     l_20 = 0;
@@ -60,16 +60,16 @@ L96E0D:;
 L96E4A:;
     goto L96E05;
 L96E4C:;
-    func_0005AFD5(l_18);
+    cast_item_spell_at(l_18);
     goto L96E90;
 case 5:
-    *(int *)D_00195B44 = *(int *)D_00195BF4;
+    *(int *)D_00195B44 = *(int *)game_minutes;
     goto L96E90;
 case 9:
-    *(signed char *)(*(char **)D_00195BE0 + 138) |= 2;
+    *(signed char *)(*(char **)player_character + 138) |= 2;
     goto L96E90;
 case 10:
-    *(short *)(*(char **)D_00195BE0 + 157 + (((int)(short)*(short *)((char *)((l_24 << 2) + l_1C) + 69)) * 6)) += 15;
+    *(short *)(*(char **)player_character + 157 + (((int)(short)*(short *)((char *)((l_24 << 2) + l_1C) + 69)) * 6)) += 15;
 default:
 L96E90:;
     l_24++;
@@ -80,6 +80,6 @@ L96E9B:;
 L96EA7:;
     return;
 L96EA9:;
-    func_00060270(a1, func_0003A0C0(l_14, *(int *)D_00195BE0));
+    item_damage(a1, spell_cost(l_14, *(int *)player_character));
 }
 }

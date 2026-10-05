@@ -15,13 +15,13 @@ struct actor { unsigned char type; char pad[70]; short id; };
 struct level { char pad[63]; struct thing *first; };
 extern struct level *D_00195A00;
 extern char D_001962A9;
-extern struct mobile *D_00199764;
-extern struct actor *D_00199774;
-extern struct actor *D_00199778;
-extern short D_001997AC;
-extern unsigned char *func_000192EE(short);
-extern int func_0002B26B(struct mobile *);
-extern struct rec *func_000309E8(struct mobile *, int);
+extern struct mobile *current_quest;
+extern struct actor *quest_event_object2;
+extern struct actor *quest_event_object;
+extern short quest_event_code;
+extern unsigned char *faction_find(short);
+extern int quest_dispatch_event(struct mobile *);
+extern struct rec *quest_section(struct mobile *, int);
 
 int func_00031843(short a1, struct actor *a2, struct actor *a3)
 {
@@ -41,19 +41,19 @@ int func_00031843(short a1, struct actor *a2, struct actor *a3)
         id = a3->id;
     else
         return 0;
-    if (*func_000192EE(id) != 4)
+    if (*faction_find(id) != 4)
         return 0;
     t = D_00195A00->first;
     while (t != 0) {
         if (t->type == 14) {
-            D_00199764 = &t->mob;
-            p = func_000309E8(D_00199764, 3);
-            for (i = 0; i < D_00199764->count; p++, i++) {
+            current_quest = &t->mob;
+            p = quest_section(current_quest, 3);
+            for (i = 0; i < current_quest->count; p++, i++) {
                 if (p->ref->type == 65 && id == p->ref->id) {
-                    D_001997AC = a1;
-                    D_00199778 = a2;
-                    D_00199774 = a3;
-                    res |= func_0002B26B(D_00199764);
+                    quest_event_code = a1;
+                    quest_event_object = a2;
+                    quest_event_object2 = a3;
+                    res |= quest_dispatch_event(current_quest);
                     continue;
                 }
             }

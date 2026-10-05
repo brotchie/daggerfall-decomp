@@ -21,128 +21,128 @@ struct obj {
 };
 struct pc { char pad[367]; struct obj *slots[1]; };
 extern char *D_00195A80;
-extern struct obj *D_00195AA4;
+extern struct obj *player_object;
 extern struct obj *D_00195AA8;
-extern int D_00195B20;
-extern struct pc *D_00195BE0;
-extern int D_00195D38;
-extern int D_00195D44;
+extern int inv_right_container;
+extern struct pc *player_character;
+extern int trade_mode;
+extern int inventory_action;
 extern short D_00195D54;
 extern char D_00196120[];
-extern struct obj *D_001AA55C;
-extern void func_0004BBD8(int, struct obj *, int);
-extern int func_0008DD46(int, struct obj *);
-extern int func_0008EB88(int);
-extern int func_000949AA(struct obj *);
-extern void func_00094FA8(void);
-extern void func_000954DD(struct obj *, char *);
-extern void func_00096B77(struct obj *, int);
-extern int func_00099211(char *);
+extern struct obj *inv_selected_item;
+extern void quest_raise_event(int, struct obj *, int);
+extern int object_reparent(int, struct obj *);
+extern int object_new_id(int);
+extern int inv_take_item(struct obj *);
+extern void inv_use_item(void);
+extern void inv_item_info(struct obj *, char *);
+extern void item_remove_equip_effects(struct obj *, int);
+extern int trade_can_repair_item(char *);
 extern void func_000992FA(void);
-extern char *D_001959D8[];
-extern unsigned char D_00196288;
-extern int D_001AA560;
-extern int D_001AA564;
-extern char *D_001AA57C;
-extern short D_001AA584;
-extern short D_001AA58A;
+extern char *inventory_containers[];
+extern unsigned char inv_right_icon;
+extern int inv_left_scroll;
+extern int inv_right_scroll;
+extern char *inv_left_container;
+extern short inv_right_count;
+extern short inv_left_count;
 extern unsigned char D_001AA5F8;
-extern unsigned char D_001AA5F9;
-extern void func_00097CC9(void);
+extern unsigned char inv_tab;
+extern void inv_wagon_button(void);
 
-void func_00093F0C(void)
+void inv_scroll_left_down(void)
 {
     short n;
 
-    n = D_001AA58A - 4;
-    if (n > 0 && n > D_001AA560)
-        D_001AA560++;
+    n = inv_left_count - 4;
+    if (n > 0 && n > inv_left_scroll)
+        inv_left_scroll++;
 }
 
-void func_00093F4B(void)
+void inv_scroll_right_up(void)
 {
-    if (D_001AA564 == 0)
+    if (inv_right_scroll == 0)
         return;
-    D_001AA564--;
+    inv_right_scroll--;
 }
 
-void func_00093F72(void)
+void inv_scroll_right_down(void)
 {
     short n;
 
-    n = D_001AA584 - 4;
-    if (n > 0 && n > D_001AA564)
-        D_001AA564++;
+    n = inv_right_count - 4;
+    if (n > 0 && n > inv_right_scroll)
+        inv_right_scroll++;
 }
 
-void func_00093FB1(int n)
+void inv_select_tab(int n)
 {
     n -= 41;
-    if (D_001959D8[n] == 0)
+    if (inventory_containers[n] == 0)
         return;
-    if (D_00195D38 != 0) {
-        D_00196288 = D_001AA5F8;
-        func_00097CC9();
+    if (trade_mode != 0) {
+        inv_right_icon = D_001AA5F8;
+        inv_wagon_button();
     }
-    D_001AA5F9 = n;
-    D_001AA57C = D_001959D8[D_001AA5F9];
-    D_001AA560 = 0;
+    inv_tab = n;
+    inv_left_container = inventory_containers[inv_tab];
+    inv_left_scroll = 0;
 }
 
-void func_0009401E(int slot)
+void inv_click_equip_slot(int slot)
 {
     char *body;
     int l_20;
     int l_1C;
     struct obj *o;
 
-    o = D_001AA55C = D_00195BE0->slots[slot];
+    o = inv_selected_item = player_character->slots[slot];
     if (o == 0)
         return;
-    D_00195AA8 = D_001AA55C;
-    body = (char *)D_001AA55C + 71;
+    D_00195AA8 = inv_selected_item;
+    body = (char *)inv_selected_item + 71;
     D_00195A80 = body;
-    switch (D_00195D44) {
+    switch (inventory_action) {
     case 1:
-        func_000954DD(D_001AA55C, body);
+        inv_item_info(inv_selected_item, body);
         break;
     case 2:
-        func_000949AA(D_001AA55C);
+        inv_take_item(inv_selected_item);
         break;
     case 3:
-        if (D_00195D38 == 4) {
-            func_00096B77(D_001AA55C, slot);
-            D_00195BE0->slots[slot] = 0;
-            o->x = D_00195AA4->x;
-            o->y = D_00195AA4->y;
-            o->z = D_00195AA4->z;
+        if (trade_mode == 4) {
+            item_remove_equip_effects(inv_selected_item, slot);
+            player_character->slots[slot] = 0;
+            o->x = player_object->x;
+            o->y = player_object->y;
+            o->z = player_object->z;
             o->f2f = 0;
             if (o->id == 0)
                 o->id = *(short *)(body + 52);
-            func_0008DD46(D_00195B20, o);
-            o->f1f = func_0008EB88(0);
+            object_reparent(inv_right_container, o);
+            o->f1f = object_new_id(0);
             break;
         }
-        if (D_00195D38 == 3 && func_00099211(body) == 0)
+        if (trade_mode == 3 && trade_can_repair_item(body) == 0)
             break;
-        func_00096B77(D_001AA55C, slot);
-        D_00195BE0->slots[slot] = 0;
-        o->x = D_00195AA4->x;
-        o->y = D_00195AA4->y;
-        o->z = D_00195AA4->z;
+        item_remove_equip_effects(inv_selected_item, slot);
+        player_character->slots[slot] = 0;
+        o->x = player_object->x;
+        o->y = player_object->y;
+        o->z = player_object->z;
         o->f2f = 0;
         if (o->id == 0)
             o->id = *(short *)(body + 52);
-        if (o->f26 == 0 && D_00195D38 == 0)
-            func_0008DD46(D_00195B20, o);
+        if (o->f26 == 0 && trade_mode == 0)
+            object_reparent(inv_right_container, o);
         if (D_00196120 == o->f43)
             o->f17 = D_00195D54;
-        o->f1f = func_0008EB88(0);
-        func_0004BBD8(5, o, 0);
+        o->f1f = object_new_id(0);
+        quest_raise_event(5, o, 0);
         func_000992FA();
         break;
     case 4:
-        func_00094FA8();
+        inv_use_item();
         break;
     }
 }

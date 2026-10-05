@@ -4,11 +4,11 @@
 struct bf8_2_1 { unsigned char _:2; unsigned char f:1; };
 struct bf8_6_1 { unsigned char _:6; unsigned char f:1; };
 struct bf8_7_1 { unsigned char _:7; unsigned char f:1; };
-extern char D_0012AC00[];
-extern char D_0012AC04[];
-extern char D_0012AC06[];
+extern char mouse_buttons[];
+extern char mouse_x[];
+extern char mouse_y[];
 extern char D_0012B508[];
-extern char D_00142309[];
+extern char key_down_esc[];
 extern char D_00147954[];
 extern char D_001704CC[];
 extern char D_001704D7[];
@@ -19,55 +19,55 @@ extern char D_0017050E[];
 extern char D_00170522[];
 extern char D_0017053F[];
 extern char D_0017054A[];
-extern char D_00179E24[];
+extern char tavern_buttons[];
 extern char D_00179E26[];
 extern char D_00179E28[];
 extern char D_00179E2A[];
 extern char D_00179E2C[];
-extern char D_001903A4[];
-extern char D_00190D23[];
+extern char text_buffer[];
+extern char tavern_state[];
 extern char D_001940D4[];
-extern char D_00195AA4[];
+extern char player_object[];
 extern char D_00195AC4[];
-extern char D_00195BDC[];
+extern char current_location[];
 extern char D_00195C44[];
-extern char D_00196268[];
-extern char D_00196279[];
-extern char D_00196734[];
-extern char D_0019676C[];
+extern char current_region[];
+extern char mouse_buttons_prev[];
+extern char region_location_type_counts[];
+extern char dungeon_blocks[];
 extern char D_00196800[];
 extern char D_00196808[];
-extern char D_0019688C[];
+extern char location_exterior[];
 extern char D_00196A28[];
-extern char D_00196A2C[];
-extern char D_00196A30[];
+extern char rmb_block[];
+extern char region_dungeon_type_counts[];
 extern char D_00196A7C[];
-extern char D_00196A80[];
-extern char D_00196A84[];
-extern char D_00196A88[];
+extern char location_here[];
+extern char region_dungeon_count[];
+extern char loaded_location[];
 extern char D_00196A9C[];
-extern char D_00196AA0[];
-extern char D_00196AA4[];
-extern char D_00196AA8[];
-extern char D_00196AAC[];
+extern char blocks_bsa[];
+extern char block_origin_x[];
+extern char block_origin_z[];
+extern char maps_bsa[];
 extern char D_00196AB0[];
 extern char D_00196ABA[];
-extern char D_00196AC0[];
-extern char D_001A5B88[];
-extern char D_001A94D0[];
+extern char tavern_menu_image[];
+extern char cfg_mapsave_file[];
+extern char nature_texture_archive[];
 
-extern int func_00012E04(int, int, int);
-extern int func_00012FCE(int, int, int);
-extern int func_00013131(int, int);
-extern int func_000131A5(int, int);
-extern int func_00013260(int, int, int);
-extern int func_0001EE84(int);
-extern int func_00069938(int, int, int);
-extern int func_0007D5D9(void);
-extern int func_000845F1(int, short, short, int);
-extern int func_00084F8F(int, int);
-extern int func_0008649F(int);
-extern int func_0008DCE3(int, int, int);
+extern int archive_open(int, int, int);
+extern int archive_find_record(int, int, int);
+extern int archive_record_size(int, int);
+extern int archive_record_offset(int, int);
+extern int archive_read_record(int, int, int);
+extern int tavern_open(int);
+extern int sound_play(int, int, int);
+extern int picklist_update(void);
+extern int rmb_make_flat(int, short, short, int);
+extern int rmb_add_building(int, int);
+extern int region_find_location(int);
+extern int object_create_child(int, int, int);
 extern int func_00097B2A(void);
 extern int func_0009DC25();
 extern int func_000A0024();
@@ -84,28 +84,28 @@ extern int func_00135DE4();
 extern int func_00135E39();
 extern int func_00144F68();
 extern int func_0014B45B();
-extern void func_00012F27(int);
-extern void func_0001335E(int, int, int);
-extern void func_0001E614(int);
+extern void archive_close(int);
+extern void archive_write_record(int, int, int);
+extern void town_block_load_rmb(int);
 extern void func_0001E854(int, int);
-extern void func_0001F0C5(void);
-extern void func_0001F1C2(void);
-extern void func_0001F32D(void);
-extern void func_0001F40E(int);
-extern void func_00050069(int);
-extern void func_00088551(int, int);
-extern void func_000888C2(int, int);
+extern void tavern_close(void);
+extern void tavern_room_offer(void);
+extern void tavern_room_pay(void);
+extern void tavern_buy_food(int);
+extern void fatal_error(int);
+extern void town_block_apply_ground(int, int);
+extern void town_map_add_block(int, int);
 int func_0001E576(void);
-void func_0001DAED(int);
-void func_0001DC12(int);
-void func_0001DD39(int);
-void func_0001DFCD(int, int);
-void func_0001E3D3(int, int);
-void func_0001E7A8(void);
+void region_locations_load_discovered(int);
+void region_locations_save_discovered(int);
+void maploads_load_region(int);
+void location_read_record(int, int);
+void location_load_exterior(int, int);
+void rmb_index_records(void);
 void func_0001E928(int);
 #pragma aux func_000A0ED9 parm routine [];
 
-void func_0001DAED(int a1)
+void region_locations_load_discovered(int a1)
 {
     int l_2C;
     int l_28;
@@ -119,10 +119,10 @@ void func_0001DAED(int a1)
     l_18 = func_000A00AF(4096, (int)D_001704CC, 57);
     func_000A0ED9(59, (int)D_001704CC);
     func_000A0F5C(l_18, (int)D_001704D7, a1);
-    l_24 = func_00012E04((int)D_001A5B88, 0, 1);
-    l_20 = func_00012FCE(l_24, l_18, 12);
-    func_00013260(l_24, l_20, l_28);
-    func_00012F27(l_24);
+    l_24 = archive_open((int)cfg_mapsave_file, 0, 1);
+    l_20 = archive_find_record(l_24, l_18, 12);
+    archive_read_record(l_24, l_20, l_28);
+    archive_close(l_24);
     l_1C = 0;
 L1DB8C:;
     if (l_1C < *(int *)D_00196A28) goto L1DBAE;
@@ -150,7 +150,7 @@ L1DBEF:;
     l_18 = -1751672937;
 }
 
-void func_0001DC12(int a1)
+void region_locations_save_discovered(int a1)
 {
     int l_2C;
     int l_28;
@@ -183,10 +183,10 @@ L1DCA0:;
 L1DCA2:;
     func_000A0ED9(97, (int)D_001704CC);
     func_000A0F5C(l_18, (int)D_001704D7, a1);
-    l_24 = func_00012E04((int)D_001A5B88, 0, 1);
-    l_20 = func_00012FCE(l_24, l_18, 12);
-    func_0001335E(l_24, l_20, *(int *)D_00195C44);
-    func_00012F27(l_24);
+    l_24 = archive_open((int)cfg_mapsave_file, 0, 1);
+    l_20 = archive_find_record(l_24, l_18, 12);
+    archive_write_record(l_24, l_20, *(int *)D_00195C44);
+    archive_close(l_24);
     if (l_18 == 0) goto L1DD14;
     if (l_18 != (-1751672937)) goto L1DD16;
 L1DD14:;
@@ -196,7 +196,7 @@ L1DD16:;
     l_18 = -1751672937;
 }
 
-void func_0001DD39(int a1)
+void maploads_load_region(int a1)
 {
     int l_24;
     int l_20;
@@ -204,7 +204,7 @@ void func_0001DD39(int a1)
     int l_18;
 
     if (*(int *)D_00196A9C == 0) goto L1DD95;
-    func_0001DC12((int)(unsigned short)*(short *)D_00196ABA);
+    region_locations_save_discovered((int)(unsigned short)*(short *)D_00196ABA);
     if (*(int *)D_00196A9C == 0) goto L1DD75;
     if (*(int *)D_00196A9C != (-1751672937)) goto L1DD77;
 L1DD75:;
@@ -215,15 +215,15 @@ L1DD77:;
 L1DD95:;
     *(short *)D_00196ABA = a1;
     func_000A0ED9(127, (int)D_001704CC);
-    func_000A0F5C((int)D_001903A4, (int)D_001704E4, a1);
-    l_20 = func_00012FCE(*(int *)D_00196AAC, (int)D_001903A4, 13);
-    l_1C = func_00013131(*(int *)D_00196AAC, l_20);
+    func_000A0F5C((int)text_buffer, (int)D_001704E4, a1);
+    l_20 = archive_find_record(*(int *)maps_bsa, (int)text_buffer, 13);
+    l_1C = archive_record_size(*(int *)maps_bsa, l_20);
     *(int *)D_00196A28 = ((unsigned)l_1C) / 17;
     l_24 = (*(int *)D_00196A9C = func_000A00AF(l_1C, (int)D_001704CC, 133));
-    func_00013260(*(int *)D_00196AAC, l_20, *(int *)D_00196A9C);
-    func_000A0040((int)D_00196734, 0, 56, (int)D_001704CC, 137, 56);
-    func_000A0040((int)D_00196A30, 0, 76, (int)D_001704CC, 138, 76);
-    *(int *)D_00196A84 = 0;
+    archive_read_record(*(int *)maps_bsa, l_20, *(int *)D_00196A9C);
+    func_000A0040((int)region_location_type_counts, 0, 56, (int)D_001704CC, 137, 56);
+    func_000A0040((int)region_dungeon_type_counts, 0, 76, (int)D_001704CC, 138, 76);
+    *(int *)region_dungeon_count = 0;
     l_18 = 0;
 L1DE78:;
     if (l_18 < *(int *)D_00196A28) goto L1DE94;
@@ -233,18 +233,18 @@ L1DE85:;
     (*(char (**)[17])&l_24)++;
     goto L1DE78;
 L1DE94:;
-    (*(int *)(D_00196734 + ((((unsigned)(*(int *)((char *)l_24 + 4) << 2)) >> 27) << 2)))++;
+    (*(int *)(region_location_type_counts + ((((unsigned)(*(int *)((char *)l_24 + 4) << 2)) >> 27) << 2)))++;
     if (((int)(unsigned char)*(signed char *)((char *)l_24 + 12)) == 255) goto L1DED5;
-    (*(int *)(D_00196A30 + (((int)(unsigned char)*(signed char *)((char *)l_24 + 12)) << 2)))++;
-    (*(int *)D_00196A84)++;
+    (*(int *)(region_dungeon_type_counts + (((int)(unsigned char)*(signed char *)((char *)l_24 + 12)) << 2)))++;
+    (*(int *)region_dungeon_count)++;
 L1DED5:;
     goto L1DE85;
 L1DED7:;
-    func_0001DAED(a1);
-    *(int *)D_00196A80 = func_0008649F(func_000C2D81(*(int *)(*(char **)D_00195AA4 + 7), *(int *)(*(char **)D_00195AA4 + 15)));
+    region_locations_load_discovered(a1);
+    *(int *)location_here = region_find_location(func_000C2D81(*(int *)(*(char **)player_object + 7), *(int *)(*(char **)player_object + 15)));
 }
 
-void func_0001DF08(int a1)
+void region_load_location_names(int a1)
 {
     int l_24;
     int l_20;
@@ -252,15 +252,15 @@ void func_0001DF08(int a1)
     int l_18;
 
     func_000A0ED9(170, (int)D_001704CC);
-    func_000A0F5C((int)D_001903A4, (int)D_001704F2, a1);
+    func_000A0F5C((int)text_buffer, (int)D_001704F2, a1);
     *(int *)D_00196A7C = *(int *)D_00147954;
-    l_24 = func_00012FCE(*(int *)D_00196AAC, (int)D_001903A4, 13);
-    func_00013260(*(int *)D_00196AAC, l_24, *(int *)D_00147954);
+    l_24 = archive_find_record(*(int *)maps_bsa, (int)text_buffer, 13);
+    archive_read_record(*(int *)maps_bsa, l_24, *(int *)D_00147954);
 }
 
 void func_0001DF7F(int a1)
 {
-    func_0001DD39(a1);
+    maploads_load_region(a1);
 }
 
 void func_0001DFA2(void)
@@ -269,7 +269,7 @@ void func_0001DFA2(void)
     *(int *)D_00196A7C = 0;
 }
 
-void func_0001DFCD(int a1, int a2)
+void location_read_record(int a1, int a2)
 {
     int l_14;
 
@@ -284,7 +284,7 @@ void func_0001DFCD(int a1, int a2)
     func_000A00CB(a2, *(int *)(*(char **)((char *)a1 + 16) + 43), ((int)(unsigned short)*(short *)(*(char **)((char *)a1 + 16) + 41)) * 26);
 }
 
-void func_0001E0C6(int a1, int a2)
+void location_load_dungeon(int a1, int a2)
 {
     int l_20;
     int l_1C;
@@ -293,24 +293,24 @@ void func_0001E0C6(int a1, int a2)
 
     l_14 = *(int *)D_00195C44;
     func_000A0ED9(248, (int)D_001704CC);
-    func_000A0F5C((int)D_001903A4, (int)D_00170500, (int)(unsigned char)*(signed char *)D_00196268);
-    l_1C = func_00012FCE(*(int *)D_00196AAC, (int)D_001903A4, 13);
-    l_18 = func_000131A5(*(int *)D_00196AAC, l_1C);
-    func_000A006E(*(int *)D_00196AAC, l_18, 0);
-    func_000A00CB(*(int *)D_00196AAC, (int)&l_20, 4);
-    func_000A00CB(*(int *)D_00196AAC, l_14, l_20 << 3);
+    func_000A0F5C((int)text_buffer, (int)D_00170500, (int)(unsigned char)*(signed char *)current_region);
+    l_1C = archive_find_record(*(int *)maps_bsa, (int)text_buffer, 13);
+    l_18 = archive_record_offset(*(int *)maps_bsa, l_1C);
+    func_000A006E(*(int *)maps_bsa, l_18, 0);
+    func_000A00CB(*(int *)maps_bsa, (int)&l_20, 4);
+    func_000A00CB(*(int *)maps_bsa, l_14, l_20 << 3);
     l_18 = *(int *)((char *)((a2 << 3) + l_14));
-    func_000A006E(*(int *)D_00196AAC, l_18, 1);
+    func_000A006E(*(int *)maps_bsa, l_18, 1);
     *(int *)((char *)a1) = a2;
-    func_0001DFCD(a1, *(int *)D_00196AAC);
-    if (((int)D_00196A88) != a1) return;
+    location_read_record(a1, *(int *)maps_bsa);
+    if (((int)loaded_location) != a1) return;
     *(short *)(*(char **)((char *)a1 + 16) + 37) = 2;
     *(short *)(*(char **)((char *)a1 + 16) + 39) = 64000;
-    func_000A00CB(*(int *)D_00196AAC, (int)D_00196AB0, 10);
-    func_000A00CB(*(int *)D_00196AAC, (int)D_0019676C, 128);
+    func_000A00CB(*(int *)maps_bsa, (int)D_00196AB0, 10);
+    func_000A00CB(*(int *)maps_bsa, (int)dungeon_blocks, 128);
 }
 
-void func_0001E1F1(int a1, int a2)
+void location_load_dungeon_by_id(int a1, int a2)
 {
     int l_24;
     int l_20;
@@ -320,12 +320,12 @@ void func_0001E1F1(int a1, int a2)
 
     l_14 = *(int *)D_00195C44;
     func_000A0ED9(287, (int)D_001704CC);
-    func_000A0F5C((int)D_001903A4, (int)D_00170500, (int)(unsigned char)*(signed char *)D_00196268);
-    l_1C = func_00012FCE(*(int *)D_00196AAC, (int)D_001903A4, 13);
-    l_18 = func_000131A5(*(int *)D_00196AAC, l_1C);
-    func_000A006E(*(int *)D_00196AAC, l_18, 0);
-    func_000A00CB(*(int *)D_00196AAC, (int)&l_24, 4);
-    func_000A00CB(*(int *)D_00196AAC, l_14, l_24 << 3);
+    func_000A0F5C((int)text_buffer, (int)D_00170500, (int)(unsigned char)*(signed char *)current_region);
+    l_1C = archive_find_record(*(int *)maps_bsa, (int)text_buffer, 13);
+    l_18 = archive_record_offset(*(int *)maps_bsa, l_1C);
+    func_000A006E(*(int *)maps_bsa, l_18, 0);
+    func_000A00CB(*(int *)maps_bsa, (int)&l_24, 4);
+    func_000A00CB(*(int *)maps_bsa, l_14, l_24 << 3);
     l_20 = 0;
 L1E29A:;
     if (l_20 < l_24) goto L1E2B3;
@@ -338,19 +338,19 @@ L1E2B3:;
     if (*(int *)((char *)l_14 + 4) != a2) goto L1E2A4;
 L1E2BE:;
     if (l_20 != l_24) goto L1E2D0;
-    func_00050069((int)D_0017050E);
+    fatal_error((int)D_0017050E);
 L1E2D0:;
-    func_000A006E(*(int *)D_00196AAC, *(int *)((char *)l_14), 1);
+    func_000A006E(*(int *)maps_bsa, *(int *)((char *)l_14), 1);
     *(int *)((char *)a1) = l_20;
-    func_0001DFCD(a1, *(int *)D_00196AAC);
-    if (((int)D_00196A88) != a1) return;
+    location_read_record(a1, *(int *)maps_bsa);
+    if (((int)loaded_location) != a1) return;
     *(short *)(*(char **)((char *)a1 + 16) + 37) = 2;
     *(short *)(*(char **)((char *)a1 + 16) + 39) = 64000;
-    func_000A00CB(*(int *)D_00196AAC, (int)D_00196AB0, 10);
-    func_000A00CB(*(int *)D_00196AAC, (int)D_0019676C, 128);
+    func_000A00CB(*(int *)maps_bsa, (int)D_00196AB0, 10);
+    func_000A00CB(*(int *)maps_bsa, (int)dungeon_blocks, 128);
 }
 
-void func_0001E3D3(int a1, int a2)
+void location_load_exterior(int a1, int a2)
 {
     int l_24;
     int l_20;
@@ -359,20 +359,20 @@ void func_0001E3D3(int a1, int a2)
     int l_14;
 
     func_000A0ED9(361, (int)D_001704CC);
-    func_000A0F5C((int)D_001903A4, (int)D_00170522, (int)(unsigned char)*(signed char *)D_00196268);
-    l_20 = func_00012FCE(*(int *)D_00196AAC, (int)D_001903A4, 13);
-    l_1C = func_000131A5(*(int *)D_00196AAC, l_20);
-    func_000A006E(*(int *)D_00196AAC, (a2 << 2) + l_1C, 0);
-    func_000A00CB(*(int *)D_00196AAC, (int)&l_14, 4);
-    func_000A006E(*(int *)D_00196AAC, l_14 + ((*(int *)D_00196A28 << 2) + l_1C), 0);
+    func_000A0F5C((int)text_buffer, (int)D_00170522, (int)(unsigned char)*(signed char *)current_region);
+    l_20 = archive_find_record(*(int *)maps_bsa, (int)text_buffer, 13);
+    l_1C = archive_record_offset(*(int *)maps_bsa, l_20);
+    func_000A006E(*(int *)maps_bsa, (a2 << 2) + l_1C, 0);
+    func_000A00CB(*(int *)maps_bsa, (int)&l_14, 4);
+    func_000A006E(*(int *)maps_bsa, l_14 + ((*(int *)D_00196A28 << 2) + l_1C), 0);
     *(int *)((char *)a1) = a2;
-    func_0001DFCD(a1, *(int *)D_00196AAC);
-    if (((int)D_00196A88) != a1) return;
+    location_read_record(a1, *(int *)maps_bsa);
+    if (((int)loaded_location) != a1) return;
     l_18 = ((int)(unsigned char)*(signed char *)(*(char **)((char *)a1 + 16) + 32)) * ((int)(unsigned char)*(signed char *)(*(char **)((char *)a1 + 16) + 33));
     *(short *)(*(char **)((char *)a1 + 16) + 37) = 2;
     *(short *)(*(char **)((char *)a1 + 16) + 39) = 64000;
-    func_000A00CB(*(int *)D_00196AAC, (int)D_0019688C, 412);
-    func_000A00CB(*(int *)D_00196AAC, (int)&l_24, 4);
+    func_000A00CB(*(int *)maps_bsa, (int)location_exterior, 412);
+    func_000A00CB(*(int *)maps_bsa, (int)&l_24, 4);
 }
 
 void func_0001E502(int a1, int a2, int a3)
@@ -392,7 +392,7 @@ L1E533:;
 L1E542:;
     if ((((unsigned)(*(int *)((char *)l_14 + 4) << 2)) >> 27) != a2) goto L1E56C;
     if (a3 != 0) goto L1E566;
-    func_0001E3D3(a1, l_10);
+    location_load_exterior(a1, l_10);
     return;
 L1E566:;
     a3--;
@@ -404,36 +404,36 @@ int func_0001E576(void)
 {
     int l_1C;
 
-    l_1C = func_0008DCE3(*(int *)D_00195AC4, 0, 429);
+    l_1C = object_create_child(*(int *)D_00195AC4, 0, 429);
     *(signed char *)((char *)l_1C) = 38;
-    *(int *)((char *)l_1C + 7) = *(int *)D_00196AA4;
-    *(int *)((char *)l_1C + 11) = func_0014B45B(*(int *)D_00196AA4, *(int *)D_00196AA8) - 8;
-    *(int *)((char *)l_1C + 15) = *(int *)D_00196AA8 - 4096;
+    *(int *)((char *)l_1C + 7) = *(int *)block_origin_x;
+    *(int *)((char *)l_1C + 11) = func_0014B45B(*(int *)block_origin_x, *(int *)block_origin_z) - 8;
+    *(int *)((char *)l_1C + 15) = *(int *)block_origin_z - 4096;
     *(short *)((char *)l_1C + 19) = 32768;
-    *(int *)((char *)l_1C + 31) = *(int *)(*(char **)D_00195AC4 + 31) + ((int)(unsigned short)(*(short *)(*(char **)D_00195BDC + 37))++);
+    *(int *)((char *)l_1C + 31) = *(int *)(*(char **)D_00195AC4 + 31) + ((int)(unsigned short)(*(short *)(*(char **)current_location + 37))++);
     return l_1C;
 }
 
-void func_0001E7A8(void)
+void rmb_index_records(void)
 {
     int l_1C;
     int l_18;
 
-    l_1C = *(int *)D_00196A2C + 6776;
+    l_1C = *(int *)rmb_block + 6776;
     l_18 = 0;
 L1E7CA:;
-    if (((int)(unsigned char)*(signed char *)(*(char **)D_00196A2C)) > l_18) goto L1E7E5;
+    if (((int)(unsigned char)*(signed char *)(*(char **)rmb_block)) > l_18) goto L1E7E5;
     goto L1E813;
 L1E7DD:;
     l_18++;
     goto L1E7CA;
 L1E7E5:;
-    *(int *)(*(char **)D_00196A2C + 1475 + (l_18 << 2)) = l_1C;
-    l_1C += *(int *)(*(char **)D_00196A2C + 1603 + (l_18 << 2));
+    *(int *)(*(char **)rmb_block + 1475 + (l_18 << 2)) = l_1C;
+    l_1C += *(int *)(*(char **)rmb_block + 1603 + (l_18 << 2));
     goto L1E7DD;
 L1E813:;
-    *(int *)(*(char **)D_00196A2C + 1731) = l_1C;
-    *(int *)(*(char **)D_00196A2C + 1735) = (int)(*(char **)(*(char **)D_00196A2C + 1731) + (((int)(unsigned char)*(signed char *)(*(char **)D_00196A2C + 1)) * 66));
+    *(int *)(*(char **)rmb_block + 1731) = l_1C;
+    *(int *)(*(char **)rmb_block + 1735) = (int)(*(char **)(*(char **)rmb_block + 1731) + (((int)(unsigned char)*(signed char *)(*(char **)rmb_block + 1)) * 66));
 }
 
 void func_0001E928(int a1)
@@ -447,20 +447,20 @@ void func_0001E928(int a1)
     int l_1C;
     int l_18;
 
-    l_20 = ((int)(unsigned char)*(signed char *)(*(char **)D_00196A2C + 1)) * 66;
-    l_20 += ((int)(unsigned char)*(signed char *)(*(char **)D_00196A2C + 2)) * 17;
-    l_34 = func_0008DCE3(a1, 0, l_20);
+    l_20 = ((int)(unsigned char)*(signed char *)(*(char **)rmb_block + 1)) * 66;
+    l_20 += ((int)(unsigned char)*(signed char *)(*(char **)rmb_block + 2)) * 17;
+    l_34 = object_create_child(a1, 0, l_20);
     *(signed char *)((char *)l_34) = 56;
-    *(short *)((char *)l_34 + 27) = (unsigned short)(unsigned char)*(signed char *)(*(char **)D_00196A2C + 1);
-    *(short *)((char *)l_34 + 23) = (unsigned short)(unsigned char)*(signed char *)(*(char **)D_00196A2C + 2);
+    *(short *)((char *)l_34 + 27) = (unsigned short)(unsigned char)*(signed char *)(*(char **)rmb_block + 1);
+    *(short *)((char *)l_34 + 23) = (unsigned short)(unsigned char)*(signed char *)(*(char **)rmb_block + 2);
     *(int *)((char *)l_34 + 31) = *(int *)(*(char **)D_00195AC4 + 31);
     l_30 = l_34 + 71;
-    l_2C = l_30 + (((int)(unsigned char)*(signed char *)(*(char **)D_00196A2C + 1)) * 66);
-    func_000A1023(l_30, *(int *)(*(char **)D_00196A2C + 1731), ((int)(unsigned char)*(signed char *)(*(char **)D_00196A2C + 1)) * 66, (int)D_001704CC, 565, 4);
-    func_000A1023(l_2C, *(int *)(*(char **)D_00196A2C + 1735), ((int)(unsigned char)*(signed char *)(*(char **)D_00196A2C + 2)) * 17, (int)D_001704CC, 566, 4);
+    l_2C = l_30 + (((int)(unsigned char)*(signed char *)(*(char **)rmb_block + 1)) * 66);
+    func_000A1023(l_30, *(int *)(*(char **)rmb_block + 1731), ((int)(unsigned char)*(signed char *)(*(char **)rmb_block + 1)) * 66, (int)D_001704CC, 565, 4);
+    func_000A1023(l_2C, *(int *)(*(char **)rmb_block + 1735), ((int)(unsigned char)*(signed char *)(*(char **)rmb_block + 2)) * 17, (int)D_001704CC, 566, 4);
     l_24 = 0;
 L1EA25:;
-    if (((int)(unsigned char)*(signed char *)(*(char **)D_00196A2C + 1)) > l_24) goto L1EA48;
+    if (((int)(unsigned char)*(signed char *)(*(char **)rmb_block + 1)) > l_24) goto L1EA48;
     goto L1EA85;
 L1EA39:;
     l_24++;
@@ -468,25 +468,25 @@ L1EA39:;
     goto L1EA25;
 L1EA48:;
     *(int *)((char *)l_30 + 4) = 0;
-    *(int *)((char *)l_30 + 36) += *(int *)D_00196AA4;
-    *(int *)((char *)l_30 + 44) += *(int *)D_00196AA8;
+    *(int *)((char *)l_30 + 36) += *(int *)block_origin_x;
+    *(int *)((char *)l_30 + 44) += *(int *)block_origin_z;
     *(int *)((char *)l_30 + 40) += func_0014B45B(*(int *)((char *)l_30 + 36), *(int *)((char *)l_30 + 44));
     goto L1EA39;
 L1EA85:;
     l_24 = 0;
 L1EA8C:;
-    if (((int)(unsigned char)*(signed char *)(*(char **)D_00196A2C + 2)) > l_24) goto L1EAB2;
+    if (((int)(unsigned char)*(signed char *)(*(char **)rmb_block + 2)) > l_24) goto L1EAB2;
     goto L1EC01;
 L1EAA3:;
     l_24++;
     (*(char (**)[17])&l_2C)++;
     goto L1EA8C;
 L1EAB2:;
-    *(int *)((char *)l_2C) += *(int *)D_00196AA4;
-    *(int *)((char *)l_2C + 8) += *(int *)D_00196AA8;
+    *(int *)((char *)l_2C) += *(int *)block_origin_x;
+    *(int *)((char *)l_2C + 8) += *(int *)block_origin_z;
     *(int *)((char *)l_2C + 4) += func_0014B45B(*(int *)((char *)l_2C), *(int *)((char *)l_2C + 8));
     if (*(short *)((char *)l_2C + 14) == 0) goto L1EB37;
-    l_34 = func_000845F1(a1, (int)(short)*(short *)((char *)l_2C + 12), (int)(short)*(short *)((char *)l_2C + 14), 0);
+    l_34 = rmb_make_flat(a1, (int)(short)*(short *)((char *)l_2C + 12), (int)(short)*(short *)((char *)l_2C + 14), 0);
     *(int *)((char *)l_34 + 7) = *(int *)((char *)l_2C);
     *(int *)((char *)l_34 + 11) = *(int *)((char *)l_2C + 4);
     *(int *)((char *)l_34 + 15) = *(int *)((char *)l_2C + 8);
@@ -498,7 +498,7 @@ case 502:
 case 503:
 case 504:
 case 510:
-    *(short *)((char *)l_2C + 12) = (*(short *)D_001A94D0 << 7) + (*(short *)((char *)l_2C + 12) & 63);
+    *(short *)((char *)l_2C + 12) = (*(short *)nature_texture_archive << 7) + (*(short *)((char *)l_2C + 12) & 63);
     goto L1EBFC;
 case 210:
 L1EB96:;
@@ -520,12 +520,12 @@ default:
 L1EBFC:;
     goto L1EAA3;
 L1EC01:;
-    func_000A1023(a1 + 71, (int)&*(signed char *)(*(char **)D_00196A2C + 6347), 429, (int)D_001704CC, 607, 4);
+    func_000A1023(a1 + 71, (int)&*(signed char *)(*(char **)rmb_block + 6347), 429, (int)D_001704CC, 607, 4);
 }
 }
 }
 
-void func_0001EC32(void)
+void town_load_blocks(void)
 {
     int l_30;
     int l_2C;
@@ -535,14 +535,14 @@ void func_0001EC32(void)
     int l_1C;
     int l_18;
 
-    l_30 = *(int *)(*(char **)D_00195BDC + 43);
+    l_30 = *(int *)(*(char **)current_location + 43);
     *(int *)D_00196808 = 0;
-    *(int *)D_00196A2C = *(int *)D_00147954;
-    *(int *)D_00196AA0 = func_00012E04((int)D_0017053F, 0, 0);
-    switch (*(unsigned char *)(*(char **)D_00195BDC + 34)) {
+    *(int *)rmb_block = *(int *)D_00147954;
+    *(int *)blocks_bsa = archive_open((int)D_0017053F, 0, 0);
+    switch (*(unsigned char *)(*(char **)current_location + 34)) {
     goto L1ECD0;
 case 0:
-    if ((((int)(unsigned char)*(signed char *)(*(char **)D_00195BDC + 32)) * ((int)(unsigned char)*(signed char *)(*(char **)D_00195BDC + 33))) != 64) goto L1ECB8;
+    if ((((int)(unsigned char)*(signed char *)(*(char **)current_location + 32)) * ((int)(unsigned char)*(signed char *)(*(char **)current_location + 33))) != 64) goto L1ECB8;
     *(int *)D_00196800 = 66;
     goto L1ECC2;
 L1ECB8:;
@@ -558,7 +558,7 @@ L1ECD0:;
 L1ECDA:;
     l_1C = 0;
 L1ECE1:;
-    if (((int)(unsigned char)*(signed char *)(*(char **)D_00195BDC + 33)) > l_1C) goto L1ED00;
+    if (((int)(unsigned char)*(signed char *)(*(char **)current_location + 33)) > l_1C) goto L1ED00;
     goto L1EE6E;
 L1ECF8:;
     l_1C++;
@@ -566,36 +566,36 @@ L1ECF8:;
 L1ED00:;
     l_20 = 0;
 L1ED07:;
-    if (((int)(unsigned char)*(signed char *)(*(char **)D_00195BDC + 32)) > l_20) goto L1ED26;
+    if (((int)(unsigned char)*(signed char *)(*(char **)current_location + 32)) > l_20) goto L1ED26;
     goto L1EE69;
 L1ED1E:;
     l_20++;
     goto L1ED07;
 L1ED26:;
-    *(int *)D_00196AA4 = *(int *)(*(char **)D_00195AC4 + 7) + (l_20 << 12);
-    *(int *)D_00196AA8 = *(int *)(*(char **)D_00195AC4 + 15) + ((l_1C + 1) << 12);
+    *(int *)block_origin_x = *(int *)(*(char **)D_00195AC4 + 7) + (l_20 << 12);
+    *(int *)block_origin_z = *(int *)(*(char **)D_00195AC4 + 15) + ((l_1C + 1) << 12);
     l_2C = func_0001E576();
-    func_0001E614((((int)(unsigned char)*(signed char *)(*(char **)D_00195BDC + 32)) * l_1C) + l_20);
-    func_0001E7A8();
-    func_000888C2(l_20, (int)&*(signed char *)((char *)(((int)(unsigned char)*(signed char *)(*(char **)D_00195BDC + 33)) - l_1C) - 1));
-    func_00088551(*(int *)D_00196AA4, *(int *)D_00196AA8);
+    town_block_load_rmb((((int)(unsigned char)*(signed char *)(*(char **)current_location + 32)) * l_1C) + l_20);
+    rmb_index_records();
+    town_map_add_block(l_20, (int)&*(signed char *)((char *)(((int)(unsigned char)*(signed char *)(*(char **)current_location + 33)) - l_1C) - 1));
+    town_block_apply_ground(*(int *)block_origin_x, *(int *)block_origin_z);
     l_24 = 0;
 L1EDAC:;
-    if (((int)(unsigned char)*(signed char *)(*(char **)D_00196A2C)) > l_24) goto L1EDCA;
+    if (((int)(unsigned char)*(signed char *)(*(char **)rmb_block)) > l_24) goto L1EDCA;
     goto L1EE5C;
 L1EDC2:;
     l_24++;
     goto L1EDAC;
 L1EDCA:;
     func_0001E854(l_30, l_24);
-    l_28 = func_00084F8F(l_2C, l_24);
+    l_28 = rmb_add_building(l_2C, l_24);
     if (((int)(unsigned short)(*(short *)((char *)l_28 + 21) & 8)) != 0) goto L1EE3B;
-    if (*(int *)((char *)l_28 + 31) != *(int *)(*(char **)(*(char **)D_00195BDC + 43) + 20 + (((int)(unsigned short)*(short *)((char *)l_28 + 27)) * 26))) goto L1EE31;
+    if (*(int *)((char *)l_28 + 31) != *(int *)(*(char **)(*(char **)current_location + 43) + 20 + (((int)(unsigned short)*(short *)((char *)l_28 + 27)) * 26))) goto L1EE31;
     *(short *)((char *)l_28 + 23) = (unsigned short)(unsigned char)*(signed char *)((char *)l_30 + 24);
     (*(char (**)[26])&l_30)++;
     goto L1EE3B;
 L1EE31:;
-    func_00050069((int)D_0017054A);
+    fatal_error((int)D_0017054A);
 L1EE3B:;
     if (((int)(unsigned short)(*(short *)((char *)l_28 + 21) & 8)) == 0) goto L1EE57;
     *(signed char *)((char *)l_28 + 21) &= 247;
@@ -607,45 +607,45 @@ L1EE5C:;
 L1EE69:;
     goto L1ECF8;
 L1EE6E:;
-    func_00012F27(*(int *)D_00196AA0);
+    archive_close(*(int *)blocks_bsa);
 }
 }
 
-void func_0001EF2E(void)
+void tavern_frame(void)
 {
     int l_20;
     int l_1C;
     int l_18;
 
-    if (func_0001EE84(0) == 0) return;
+    if (tavern_open(0) == 0) return;
     func_0012DB50(4);
     *(signed char *)D_0012B508 = 146;
     if (((struct bf8_2_1 *)&D_001940D4)->f == 0) goto L1EF73;
-    l_1C = func_0007D5D9();
+    l_1C = picklist_update();
     if (l_1C > (-1)) goto L1EF75;
 L1EF73:;
     goto L1EF7D;
 L1EF75:;
-    func_0001F40E(l_1C);
+    tavern_buy_food(l_1C);
 L1EF7D:;
     if (((struct bf8_2_1 *)&D_001940D4)->f != 0) return;
-    if (((int)(signed char)*(signed char *)D_00190D23) != 1) goto L1EFA0;
-    func_0001F1C2();
+    if (((int)(signed char)*(signed char *)tavern_state) != 1) goto L1EFA0;
+    tavern_room_offer();
     return;
 L1EFA0:;
-    if (((int)(signed char)*(signed char *)D_00190D23) != 2) goto L1EFB6;
-    func_0001F32D();
+    if (((int)(signed char)*(signed char *)tavern_state) != 2) goto L1EFB6;
+    tavern_room_pay();
     return;
 L1EFB6:;
     func_00097B2A();
-    l_18 = *(int *)D_00196AC0;
+    l_18 = *(int *)tavern_menu_image;
     func_00144F68((int)(unsigned short)*(short *)((char *)l_18), (int)(unsigned short)*(short *)((char *)l_18 + 2), (int)(unsigned short)*(short *)((char *)l_18 + 4), (int)(unsigned short)*(short *)((char *)l_18 + 6), l_18 + 12);
-    if (*(signed char *)D_00142309 == 0) goto L1F003;
-    func_0001F0C5();
+    if (*(signed char *)key_down_esc == 0) goto L1F003;
+    tavern_close();
 L1F003:;
-    if (*(signed char *)D_0012AC00 == 0) goto L1F020;
-    if (*(signed char *)D_0012AC00 == 0) goto L1F01E;
-    if (*(signed char *)D_00196279 != 0) goto L1F020;
+    if (*(signed char *)mouse_buttons == 0) goto L1F020;
+    if (*(signed char *)mouse_buttons == 0) goto L1F01E;
+    if (*(signed char *)mouse_buttons_prev != 0) goto L1F020;
 L1F01E:;
     goto L1F025;
 L1F020:;
@@ -659,20 +659,20 @@ L1F037:;
     l_20++;
     goto L1F02C;
 L1F03F:;
-    if (*(short *)D_0012AC04 <= *(short *)(D_00179E24 + (l_20 * 12))) goto L1F067;
-    if (*(short *)D_0012AC04 < *(short *)(D_00179E28 + (l_20 * 12))) goto L1F069;
+    if (*(short *)mouse_x <= *(short *)(tavern_buttons + (l_20 * 12))) goto L1F067;
+    if (*(short *)mouse_x < *(short *)(D_00179E28 + (l_20 * 12))) goto L1F069;
 L1F067:;
     goto L1F07D;
 L1F069:;
-    if (*(short *)D_0012AC06 > *(short *)(D_00179E26 + (l_20 * 12))) goto L1F07F;
+    if (*(short *)mouse_y > *(short *)(D_00179E26 + (l_20 * 12))) goto L1F07F;
 L1F07D:;
     goto L1F093;
 L1F07F:;
-    if (*(short *)D_0012AC06 < *(short *)(D_00179E2A + (l_20 * 12))) goto L1F095;
+    if (*(short *)mouse_y < *(short *)(D_00179E2A + (l_20 * 12))) goto L1F095;
 L1F093:;
     goto L1F0B6;
 L1F095:;
-    func_00069938(203, *(int *)D_00195AA4, 110);
+    sound_play(203, *(int *)player_object, 110);
     ((int (*)())(*(int *)(D_00179E2C + (l_20 * 12))))();
     return;
 L1F0B6:;

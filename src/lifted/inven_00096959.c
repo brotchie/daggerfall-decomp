@@ -4,7 +4,7 @@
 extern char D_00195B74[];
 
 
-int func_00096959(int a1, int a2, int a3)
+int inv_paperdoll_slot_at(int a1, int a2, int a3)
 {
     a1 += -41;
     a2 += -5;

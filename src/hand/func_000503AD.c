@@ -9,41 +9,41 @@ struct entry {
     char name[31];              /* 0x09 */
 };
 extern char D_0017531A[];
-extern char D_001903A4[];
-extern struct entry D_001918D4[];
+extern char text_buffer[];
+extern struct entry flats_cfg[];
 extern int D_00195C44;
-extern int D_00195C90;
+extern int flats_cfg_count;
 extern void func_00050540(int *, char *);
 extern int func_000505A3(int *);
-extern int func_0006CB53(char *, int);
+extern int disk_read_file(char *, int);
 
-void func_000503AD(void)
+void flats_cfg_load(void)
 {
     int fh;
     int a;
     int b;
 
-    fh = func_0006CB53(D_0017531A, D_00195C44);
-    D_00195C90 = 0;
+    fh = disk_read_file(D_0017531A, D_00195C44);
+    flats_cfg_count = 0;
     for (;;) {
         a = func_000505A3(&fh);
         if (a == 100000)
             return;
         b = func_000505A3(&fh);
-        D_001918D4[D_00195C90].id = (a << 7) | b;
-        func_00050540(&fh, D_001918D4[D_00195C90].name);
-        func_00050540(&fh, D_001903A4);
-        if (D_001903A4[0] == '?') {
-            D_001918D4[D_00195C90].flags |= 2;
+        flats_cfg[flats_cfg_count].id = (a << 7) | b;
+        func_00050540(&fh, flats_cfg[flats_cfg_count].name);
+        func_00050540(&fh, text_buffer);
+        if (text_buffer[0] == '?') {
+            flats_cfg[flats_cfg_count].flags |= 2;
             a = 1;
         } else {
             a = 0;
         }
-        if (D_001903A4[a] == '2')
-            D_001918D4[D_00195C90].flags |= 1;
-        D_001918D4[D_00195C90].f7 = func_000505A3(&fh);
-        D_001918D4[D_00195C90].f8 = func_000505A3(&fh);
-        D_001918D4[D_00195C90].f4 = func_000505A3(&fh);
-        D_00195C90++;
+        if (text_buffer[a] == '2')
+            flats_cfg[flats_cfg_count].flags |= 1;
+        flats_cfg[flats_cfg_count].f7 = func_000505A3(&fh);
+        flats_cfg[flats_cfg_count].f8 = func_000505A3(&fh);
+        flats_cfg[flats_cfg_count].f4 = func_000505A3(&fh);
+        flats_cfg_count++;
     }
 }

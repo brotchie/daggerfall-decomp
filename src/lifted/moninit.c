@@ -2,52 +2,52 @@
  * do not edit: move a function to src/moninit.c to work on it by hand) */
 
 extern char D_00176844[];
-extern char D_0018487E[];
-extern char D_00187914[];
-extern char D_00187919[];
-extern char D_0018791B[];
-extern char D_00187921[];
-extern char D_00187924[];
-extern char D_00187927[];
-extern char D_0018792A[];
-extern char D_0018792E[];
-extern char D_00187930[];
-extern char D_00187933[];
-extern char D_00187936[];
-extern char D_0018793C[];
-extern char D_00187942[];
-extern char D_0018794A[];
+extern char monster_table_flags[];
+extern char monster_spells_imp[];
+extern char monster_spells_ghost[];
+extern char monster_spells_orc_shaman[];
+extern char monster_spells_wraith[];
+extern char monster_spells_frost_daedra[];
+extern char monster_spells_fire_daedra[];
+extern char monster_spells_daedroth[];
+extern char monster_spells_vampire[];
+extern char monster_spells_seducer[];
+extern char monster_spells_vampire_ancient[];
+extern char monster_spells_daedra_lord[];
+extern char monster_spells_lich[];
+extern char monster_spells_ancient_lich[];
+extern char monster_class_spell_lists[];
 extern char D_001879CE[];
-extern char D_00187A12[];
-extern char D_00187A23[];
+extern char wabbajack_creatures[];
+extern char monster_map_chance[];
 extern char D_00190704[];
-extern char D_001959A8[];
+extern char nonworld_root[];
 extern char D_00195AC4[];
-extern char D_00195B04[];
-extern char D_00195BE0[];
-extern char D_001A4A0C[];
+extern char spell_records[];
+extern char player_character[];
+extern char save_file_handle[];
 
-extern int func_0007921F(int, unsigned short, int, int, int, int);
-extern int func_0007D6AE(int, int);
-extern int func_0008DCE3(int, int, int);
-extern int func_0008EB88(int);
+extern int monster_make_item(int, unsigned short, int, int, int, int);
+extern int rand_range(int, int);
+extern int object_create_child(int, int, int);
+extern int object_new_id(int);
 extern int func_0009DC25();
 extern int func_000A0024();
 extern int func_000A0040();
 extern int func_000A00CB();
 extern int func_000A1023();
-extern void func_0004D195(int);
-extern void func_0005E540(int, int, int);
-extern void func_00060270(int, int);
-extern void func_00065BBA(int, int);
-extern void func_00078566(int, int);
-extern void func_00078B8A(int);
-extern void func_0008E3F7(int, int);
-void func_0007909F(int, int);
-void func_000792C1(int, int, int);
-void func_0007977F(int);
+extern void character_update_armor_values(int);
+extern void item_make(int, int, int);
+extern void item_damage(int, int);
+extern void poison_init_record(int, int);
+extern void monster_init(int, int);
+extern void monster_reload_anim_cb(int);
+extern void object_foreach(int, int);
+void monster_give_spells(int, int);
+void monster_give_equipment(int, int, int);
+void monster_poison_weapon(int);
 
-void func_00078C79(void)
+void monster_reload_anims(void)
 {
     int l_18;
 
@@ -70,11 +70,11 @@ L78CD3:;
 L78CFE:;
     goto L78C99;
 L78D00:;
-    func_0008E3F7(*(int *)D_00195AC4, (int)func_00078B8A);
-    func_0008E3F7(*(int *)D_001959A8, (int)func_00078B8A);
+    object_foreach(*(int *)D_00195AC4, (int)monster_reload_anim_cb);
+    object_foreach(*(int *)nonworld_root, (int)monster_reload_anim_cb);
 }
 
-int func_00078D28(int a1, int a2)
+int monster_roll_d8_health(int a1, int a2)
 {
     int l_1C;
     int l_18;
@@ -88,13 +88,13 @@ L78D52:;
     l_1C++;
     goto L78D48;
 L78D5A:;
-    l_18 += func_0007D6AE(1, 8);
+    l_18 += rand_range(1, 8);
     goto L78D52;
 L78D6E:;
     return l_18 + a2;
 }
 
-int func_00078D83(int a1, int a2, int a3)
+int monster_roll_class_health(int a1, int a2, int a3)
 {
     int l_18;
     int l_14;
@@ -108,87 +108,87 @@ L78DAF:;
     l_18++;
     goto L78DA5;
 L78DB7:;
-    l_14 += func_0007D6AE(1, a1);
+    l_14 += rand_range(1, a1);
     goto L78DAF;
 L78DC9:;
     return l_14 + a2;
 }
 
-void func_00078DDD(int a1)
+void monster_init_gear(int a1)
 {
     int l_1C;
     int l_18;
 
     l_1C = a1 + 71;
     if (((int)(unsigned char)*(signed char *)((char *)l_1C + 67)) < 43) goto L78E87;
-    func_000792C1(a1, l_1C, func_0009DC25() & 1);
-    if (((int)(unsigned short)(*(short *)(D_0018487E + (((int)(unsigned char)*(signed char *)((char *)l_1C + 67)) * 29)) & 2)) == 0) goto L78E82;
+    monster_give_equipment(a1, l_1C, func_0009DC25() & 1);
+    if (((int)(unsigned short)(*(short *)(monster_table_flags + (((int)(unsigned char)*(signed char *)((char *)l_1C + 67)) * 29)) & 2)) == 0) goto L78E82;
     l_18 = ((int)(unsigned char)*(signed char *)((char *)l_1C + 129)) / 3;
     if (l_18 <= 6) goto L78E6E;
     l_18 = 6;
 L78E6E:;
-    func_0007909F(a1, *(int *)(D_0018794A + (l_18 << 2)));
+    monster_give_spells(a1, *(int *)(monster_class_spell_lists + (l_18 << 2)));
 L78E82:;
     return;
 L78E87:;
     switch (*(unsigned char *)((char *)l_1C + 67)) {
     return;
 case 1:
-    func_0007909F(a1, (int)D_00187914);
+    monster_give_spells(a1, (int)monster_spells_imp);
     return;
 case 7:
-    func_000792C1(a1, l_1C, 0);
+    monster_give_equipment(a1, l_1C, 0);
     return;
 case 8:
-    func_000792C1(a1, l_1C, 1);
+    monster_give_equipment(a1, l_1C, 1);
     return;
 case 12:
-    func_000792C1(a1, l_1C, 1);
+    monster_give_equipment(a1, l_1C, 1);
     return;
 case 18:
-    func_0007909F(a1, (int)D_00187919);
+    monster_give_spells(a1, (int)monster_spells_ghost);
     return;
 case 21:
-    func_000792C1(a1, l_1C, 0);
-    func_0007909F(a1, (int)D_0018791B);
+    monster_give_equipment(a1, l_1C, 0);
+    monster_give_spells(a1, (int)monster_spells_orc_shaman);
     return;
 case 23:
-    func_0007909F(a1, (int)D_00187921);
+    monster_give_spells(a1, (int)monster_spells_wraith);
     return;
 case 24:
-    func_000792C1(a1, l_1C, 2);
+    monster_give_equipment(a1, l_1C, 2);
     return;
 case 25:
-    func_0007909F(a1, (int)D_00187924);
+    monster_give_spells(a1, (int)monster_spells_frost_daedra);
     return;
 case 26:
-    func_0007909F(a1, (int)D_00187927);
+    monster_give_spells(a1, (int)monster_spells_fire_daedra);
     return;
 case 27:
-    func_0007909F(a1, (int)D_0018792A);
+    monster_give_spells(a1, (int)monster_spells_daedroth);
     return;
 case 28:
-    func_0007909F(a1, (int)D_0018792E);
+    monster_give_spells(a1, (int)monster_spells_vampire);
     return;
 case 29:
-    func_0007909F(a1, (int)D_00187930);
+    monster_give_spells(a1, (int)monster_spells_seducer);
     return;
 case 30:
-    func_0007909F(a1, (int)D_00187933);
+    monster_give_spells(a1, (int)monster_spells_vampire_ancient);
     return;
 case 31:
-    func_0007909F(a1, (int)D_00187936);
+    monster_give_spells(a1, (int)monster_spells_daedra_lord);
     return;
 case 32:
-    func_0007909F(a1, (int)D_0018793C);
+    monster_give_spells(a1, (int)monster_spells_lich);
     return;
 case 33:
-    func_0007909F(a1, (int)D_00187942);
+    monster_give_spells(a1, (int)monster_spells_ancient_lich);
 default:;
 }
 }
 
-void func_0007909F(int a1, int a2)
+void monster_give_spells(int a1, int a2)
 {
     int l_24;
     int l_20;
@@ -205,28 +205,28 @@ void func_0007909F(int a1, int a2)
     *(short *)((char *)l_14 + 307) = 80;
     *(short *)((char *)l_14 + 313) = 80;
     *(short *)((char *)l_14 + 319) = 80;
-    l_1C = func_0008DCE3(a1, 0, 0);
+    l_1C = object_create_child(a1, 0, 0);
     *(signed char *)((char *)l_1C) = 22;
     *(short *)((char *)l_1C + 21) = 3;
-    *(int *)((char *)l_1C + 31) = func_0008EB88(((unsigned)*(int *)((char *)a1 + 31)) >> 16);
+    *(int *)((char *)l_1C + 31) = object_new_id(((unsigned)*(int *)((char *)a1 + 31)) >> 16);
 L7916D:;
     if (((int)(unsigned char)*(signed char *)((char *)(a2 + l_24))) == 255) return;
     l_20 = 0;
 L7918C:;
-    if (*(signed char *)((char *)(int)((l_20 * 89) + *(char **)D_00195B04) + 73) == *(signed char *)((char *)(a2 + l_24))) goto L791AD;
+    if (*(signed char *)((char *)(int)((l_20 * 89) + *(char **)spell_records) + 73) == *(signed char *)((char *)(a2 + l_24))) goto L791AD;
     l_20++;
     goto L7918C;
 L791AD:;
-    l_18 = func_0008DCE3(l_1C, 0, 89);
+    l_18 = object_create_child(l_1C, 0, 89);
     *(signed char *)((char *)l_18) = 9;
     *(short *)((char *)l_18 + 21) = 1;
-    *(int *)((char *)l_18 + 31) = func_0008EB88(((unsigned)*(int *)((char *)a1 + 31)) >> 16);
-    func_000A1023(l_18 + 71, (int)(*(char **)D_00195B04 + (l_20 * 89)), 89, (int)D_00176844, 370, 4);
+    *(int *)((char *)l_18 + 31) = object_new_id(((unsigned)*(int *)((char *)a1 + 31)) >> 16);
+    func_000A1023(l_18 + 71, (int)(*(char **)spell_records + (l_20 * 89)), 89, (int)D_00176844, 370, 4);
     l_24++;
     goto L7916D;
 }
 
-void func_000792C1(int a1, int a2, int a3)
+void monster_give_equipment(int a1, int a2, int a3)
 {
     int l_14;
     int l_10;
@@ -234,38 +234,38 @@ void func_000792C1(int a1, int a2, int a3)
     func_000A0040(a2 + 367, 0, 108, (int)D_00176844, 400, 108);
     switch ((unsigned)a3) {
 case 0:
-    *(int *)((char *)a2 + 443) = func_0007921F(a1, 3, 5, 7, -1, 100);
-    *(int *)((char *)a2 + 451) = func_0007921F(a1, 2, 7, 8, -1, 50);
+    *(int *)((char *)a2 + 443) = monster_make_item(a1, 3, 5, 7, -1, 100);
+    *(int *)((char *)a2 + 451) = monster_make_item(a1, 2, 7, 8, -1, 50);
     if (*(int *)((char *)a2 + 451) != 0) goto L7939A;
-    *(int *)((char *)a2 + 451) = func_0007921F(a1, 3, 0, 3, 2, 50);
+    *(int *)((char *)a2 + 451) = monster_make_item(a1, 3, 0, 3, 2, 50);
 L7939A:;
-    *(int *)((char *)a2 + 415) = func_0007921F(a1, 2, 5, 5, -1, 50);
-    *(int *)((char *)a2 + 419) = func_0007921F(a1, 2, 4, 4, -1, 50);
-    *(int *)((char *)a2 + 427) = func_0007921F(a1, 2, 3, 3, -1, 50);
-    *(int *)((char *)a2 + 439) = func_0007921F(a1, 2, 0, 0, -1, 50);
-    *(int *)((char *)a2 + 459) = func_0007921F(a1, 2, 2, 2, -1, 50);
-    *(int *)((char *)a2 + 471) = func_0007921F(a1, 2, 6, 6, -1, 50);
-    func_0004D195(a1);
+    *(int *)((char *)a2 + 415) = monster_make_item(a1, 2, 5, 5, -1, 50);
+    *(int *)((char *)a2 + 419) = monster_make_item(a1, 2, 4, 4, -1, 50);
+    *(int *)((char *)a2 + 427) = monster_make_item(a1, 2, 3, 3, -1, 50);
+    *(int *)((char *)a2 + 439) = monster_make_item(a1, 2, 0, 0, -1, 50);
+    *(int *)((char *)a2 + 459) = monster_make_item(a1, 2, 2, 2, -1, 50);
+    *(int *)((char *)a2 + 471) = monster_make_item(a1, 2, 6, 6, -1, 50);
+    character_update_armor_values(a1);
     goto L7967C;
 case 1:
-    *(int *)((char *)a2 + 443) = func_0007921F(a1, 3, 9, 14, -1, 100);
-    *(int *)((char *)a2 + 415) = func_0007921F(a1, 2, 5, 5, -1, 75);
-    *(int *)((char *)a2 + 419) = func_0007921F(a1, 2, 4, 4, -1, 75);
-    *(int *)((char *)a2 + 427) = func_0007921F(a1, 2, 3, 3, -1, 75);
-    *(int *)((char *)a2 + 439) = func_0007921F(a1, 2, 0, 0, -1, 75);
-    *(int *)((char *)a2 + 459) = func_0007921F(a1, 2, 2, 2, -1, 75);
-    *(int *)((char *)a2 + 471) = func_0007921F(a1, 2, 6, 6, -1, 75);
-    func_0004D195(a1);
+    *(int *)((char *)a2 + 443) = monster_make_item(a1, 3, 9, 14, -1, 100);
+    *(int *)((char *)a2 + 415) = monster_make_item(a1, 2, 5, 5, -1, 75);
+    *(int *)((char *)a2 + 419) = monster_make_item(a1, 2, 4, 4, -1, 75);
+    *(int *)((char *)a2 + 427) = monster_make_item(a1, 2, 3, 3, -1, 75);
+    *(int *)((char *)a2 + 439) = monster_make_item(a1, 2, 0, 0, -1, 75);
+    *(int *)((char *)a2 + 459) = monster_make_item(a1, 2, 2, 2, -1, 75);
+    *(int *)((char *)a2 + 471) = monster_make_item(a1, 2, 6, 6, -1, 75);
+    character_update_armor_values(a1);
     goto L7967C;
 case 2:
-    *(int *)((char *)a2 + 443) = func_0007921F(a1, 3, 9, 14, -1, 100);
-    *(int *)((char *)a2 + 415) = func_0007921F(a1, 2, 5, 5, -1, 90);
-    *(int *)((char *)a2 + 419) = func_0007921F(a1, 2, 4, 4, -1, 90);
-    *(int *)((char *)a2 + 427) = func_0007921F(a1, 2, 3, 3, -1, 90);
-    *(int *)((char *)a2 + 439) = func_0007921F(a1, 2, 0, 0, -1, 90);
-    *(int *)((char *)a2 + 459) = func_0007921F(a1, 2, 2, 2, -1, 90);
-    *(int *)((char *)a2 + 471) = func_0007921F(a1, 2, 6, 6, -1, 90);
-    func_0004D195(a1);
+    *(int *)((char *)a2 + 443) = monster_make_item(a1, 3, 9, 14, -1, 100);
+    *(int *)((char *)a2 + 415) = monster_make_item(a1, 2, 5, 5, -1, 90);
+    *(int *)((char *)a2 + 419) = monster_make_item(a1, 2, 4, 4, -1, 90);
+    *(int *)((char *)a2 + 427) = monster_make_item(a1, 2, 3, 3, -1, 90);
+    *(int *)((char *)a2 + 439) = monster_make_item(a1, 2, 0, 0, -1, 90);
+    *(int *)((char *)a2 + 459) = monster_make_item(a1, 2, 2, 2, -1, 90);
+    *(int *)((char *)a2 + 471) = monster_make_item(a1, 2, 6, 6, -1, 90);
+    character_update_armor_values(a1);
 default:
 L7967C:;
     l_10 = 0;
@@ -281,7 +281,7 @@ L79693:;
 L796AC:;
     goto L7968B;
 L796AE:;
-    if (((int)(unsigned char)*(signed char *)(*(char **)D_00195BE0 + 129)) < 2) return;
+    if (((int)(unsigned char)*(signed char *)(*(char **)player_character + 129)) < 2) return;
     if (((int)(unsigned char)*(signed char *)((char *)a2 + 506)) < 128) goto L796E8;
     if (*(int *)((char *)a2 + 443) != 0) goto L796EA;
 L796E8:;
@@ -293,8 +293,8 @@ L796EA:;
 L79708:;
     l_14 = 5;
 L7970F:;
-    if (func_0007D6AE(1, 100) >= l_14) goto L79731;
-    func_0007977F(*(int *)((char *)a2 + 443));
+    if (rand_range(1, 100) >= l_14) goto L79731;
+    monster_poison_weapon(*(int *)((char *)a2 + 443));
 L79731:;
     return;
 L79733:;
@@ -303,20 +303,20 @@ L79733:;
 case 7:
 case 8:
 case 12:
-    if (func_0007D6AE(1, 100) >= 5) return;
-    func_0007977F(*(int *)((char *)a2 + 443));
+    if (rand_range(1, 100) >= 5) return;
+    monster_poison_weapon(*(int *)((char *)a2 + 443));
 default:;
 }
 }
 
-void func_0007977F(int a1)
+void monster_poison_weapon(int a1)
 {
-    a1 = func_0008DCE3(a1, 0, 47);
-    *(int *)((char *)a1 + 31) = func_0008EB88(((unsigned)*(int *)(*(char **)((char *)a1 + 67) + 31)) >> 16);
-    func_00065BBA(a1 + 71, (int)&*(signed char *)((char *)func_0007D6AE(0, 7) + 128));
+    a1 = object_create_child(a1, 0, 47);
+    *(int *)((char *)a1 + 31) = object_new_id(((unsigned)*(int *)(*(char **)((char *)a1 + 67) + 31)) >> 16);
+    poison_init_record(a1 + 71, (int)&*(signed char *)((char *)rand_range(0, 7) + 128));
 }
 
-void func_000797E2(int a1, int a2)
+void monster_wabbajack(int a1, int a2)
 {
     int l_18;
     int l_14;
@@ -324,36 +324,36 @@ void func_000797E2(int a1, int a2)
     l_14 = a2 + 71;
     if (((int)(unsigned short)(*(short *)((char *)l_14 + 64) & 4096)) != 0) return;
     l_18 = (int)(short)*(short *)((char *)l_14 + 126);
-    func_00078566(a2, (int)(unsigned char)*(signed char *)(D_00187A12 + func_0007D6AE(0, 16)));
+    monster_init(a2, (int)(unsigned char)*(signed char *)(wabbajack_creatures + rand_range(0, 16)));
     *(signed char *)((char *)l_14 + 65) |= 16;
     l_18 = ((int)(short)*(short *)((char *)l_14 + 126)) - l_18;
     if (l_18 >= 0) return;
-    func_00060270(a1, l_18);
+    item_damage(a1, l_18);
 }
 
-void func_00079867(int a1, int a2)
+void monster_maybe_give_map(int a1, int a2)
 {
     int l_18;
     int l_14;
 
     if (a2 >= 128) goto L798A3;
-    if (func_0007D6AE(1, 100) > ((int)(unsigned char)*(signed char *)(D_00187A23 + a2))) return;
+    if (rand_range(1, 100) > ((int)(unsigned char)*(signed char *)(monster_map_chance + a2))) return;
     goto L798C1;
 L798A3:;
-    if (func_0007D6AE(1, 100) > ((int)(unsigned char)*(signed char *)(D_001879CE + a2))) return;
+    if (rand_range(1, 100) > ((int)(unsigned char)*(signed char *)(D_001879CE + a2))) return;
 L798C1:;
-    l_18 = func_0008DCE3(a1, 0, 107);
+    l_18 = object_create_child(a1, 0, 107);
     *(signed char *)((char *)l_18) = 2;
-    *(int *)((char *)l_18 + 31) = func_0008EB88(((unsigned)*(int *)((char *)a1 + 31)) >> 16);
+    *(int *)((char *)l_18 + 31) = object_new_id(((unsigned)*(int *)((char *)a1 + 31)) >> 16);
     l_14 = l_18 + 71;
-    func_0005E540(27, 8, l_14);
+    item_make(27, 8, l_14);
 }
 
 int func_00079A28(int a1)
 {
     int l_1C;
 
-    func_000A00CB(*(int *)D_001A4A0C, (int)&l_1C, 4);
-    func_000A00CB(*(int *)D_001A4A0C, a1, l_1C);
+    func_000A00CB(*(int *)save_file_handle, (int)&l_1C, 4);
+    func_000A00CB(*(int *)save_file_handle, a1, l_1C);
     return l_1C;
 }

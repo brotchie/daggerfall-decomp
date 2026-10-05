@@ -50,6 +50,26 @@ def by_address(rows=None):
     return out
 
 
+_BACK = None
+
+
+def canonical(text):
+    """Source text with the names tools/apply_names.py applied (config/symbols.txt) put back
+    in their address form (func_XXXXXXXX, D_XXXXXXXX), for tools that read sources by address."""
+    global _BACK
+    if _BACK is None:
+        _BACK = {}
+        p = os.path.join(ROOT, "config", "symbols.txt")
+        if os.path.exists(p):
+            for line in open(p):
+                m = re.match(r"\s*(\w+)\s*=\s*0x([0-9A-Fa-f]+)\s*;\s*(func|global)?", line)
+                if m:
+                    _BACK[m.group(1)] = ("D_%08X" if m.group(3) == "global" else "func_%08X") % int(m.group(2), 16)
+    if not _BACK:
+        return text
+    return re.sub(r"\b[A-Za-z_][A-Za-z0-9_]*\b", lambda m: _BACK.get(m.group(0), m.group(0)), text)
+
+
 def check(rows):
     funcs = set()
     with open(os.path.join(ROOT, "config", "functions.csv"), newline="") as f:

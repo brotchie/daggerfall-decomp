@@ -3,9 +3,9 @@
 
 
 #pragma aux sosconv "*" parm caller [] value [eax] modify [eax ebx ecx edx];
-#pragma aux (sosconv) func_000120EB;
+#pragma aux (sosconv) profile_get_string;
 
-int func_000120EB(int a1, int a2, int a3)
+int profile_get_string(int a1, int a2, int a3)
 {
     int l_14;
     int l_10;

@@ -6,11 +6,11 @@ extern short D_00190D64;
 extern int D_00190EE4[];
 extern char *D_00195C44;
 extern struct row D_00199868[];
-extern struct cell D_001998E0[];
-extern int func_00058890(short, short);
-extern void func_0007D3CA(int *);
+extern struct cell itemmaker_slots[];
+extern int itemmaker_param_excluded(short, short);
+extern void picklist_open(int *);
 
-void func_000576FF(int *a1, short a2)
+void itemmaker_show_param_list(int *a1, short a2)
 {
     short i;
     unsigned short c;
@@ -28,12 +28,12 @@ void func_000576FF(int *a1, short a2)
                 || D_00199868[i].p[4].a == a2 && D_00199868[i].p[4].b == k)
                 goto next;
         }
-        sv = D_001998E0[D_00190D64].v;
-        D_001998E0[D_00190D64].v = 100;
-        if (func_00058890(a2, k) != 0)
-            D_001998E0[D_00190D64].v = sv;
+        sv = itemmaker_slots[D_00190D64].v;
+        itemmaker_slots[D_00190D64].v = 100;
+        if (itemmaker_param_excluded(a2, k) != 0)
+            itemmaker_slots[D_00190D64].v = sv;
         else {
-            D_001998E0[D_00190D64].v = sv;
+            itemmaker_slots[D_00190D64].v = sv;
             D_00195C44[cnt + 64000] = c;
             D_00190EE4[cnt] = *a1;
             cnt++;
@@ -44,5 +44,5 @@ next:
         k++;
     }
     D_00190EE4[cnt] = 0;
-    func_0007D3CA(D_00190EE4);
+    picklist_open(D_00190EE4);
 }

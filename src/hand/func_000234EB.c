@@ -2,27 +2,27 @@
 struct bf8_3_1 { unsigned char _:3; unsigned char f:1; };
 struct bf8_4_1 { unsigned char _:4; unsigned char f:1; };
 struct bf8_5_1 { unsigned char _:5; unsigned char f:1; };
-extern char D_001789FA[];
+extern char player_environment[];
 extern char D_00179F48[];
 extern char D_001940D7[];
-extern char D_001940DB[];
-extern char D_00195AA4[];
-extern char D_00195BE0[];
+extern char player_motion_flags[];
+extern char player_object[];
+extern char player_character[];
 extern char D_00195C70[];
 extern char D_00195CB8[];
 extern char D_00195CD4[];
 extern char D_00195CD8[];
 extern char D_00195F5A[];
-extern char D_00196277[];
+extern char player_on_ground[];
 extern char D_00196296[];
-extern char D_00196B0C[];
+extern char collide_candidate_count[];
 extern char D_00196D4C[];
 extern char D_00196D50[];
-extern char D_00196D64[];
+extern char collide_flags[];
 extern int func_0002294E(int, int, int);
-extern void func_000231F5(int, int);
+extern void collide_for_each_nearby(int, int);
 extern void func_0002325A(int);
-extern void func_00028E24(int);
+extern void automap_mark_seen(int);
 extern int func_000657B2(int);
 extern int func_0009DEAC();
 extern int func_0014BDDD();
@@ -45,8 +45,8 @@ struct planes {
 
 #define PLANES (*(struct planes **)D_00196D50)
 #define PL (PLANES->p)
-#define PLAYER (*(char **)D_00195BE0)
-#define FLAGS (*(short *)D_00196D64)
+#define PLAYER (*(char **)player_character)
+#define FLAGS (*(short *)collide_flags)
 
 struct vec3 {
     int x;
@@ -59,7 +59,7 @@ struct obj {
     struct vec3 pos;
 };
 
-int func_000234EB(struct obj *a1, int a2, struct vec3 *a3, int a4)
+int collide_move_player(struct obj *a1, int a2, struct vec3 *a3, int a4)
 {
     int l_44;
     int l_40;           /* l_40, l_3C and l_34 are never read: they only shape the frame */
@@ -81,25 +81,25 @@ int func_000234EB(struct obj *a1, int a2, struct vec3 *a3, int a4)
     *(short *)D_00195F5A = 10000;
     *(int *)D_00195CD8 = *(int *)D_00195CD4 = 0;
     *(int *)D_00196D50 = 0;
-    *(int *)D_00196B0C = 0;
+    *(int *)collide_candidate_count = 0;
     (*(struct vec3 **)D_00196D4C = (struct vec3 *)D_00179F48)->x = a3->x;
     (*(struct vec3 **)D_00196D4C)->y = a3->y;
     (*(struct vec3 **)D_00196D4C)->z = a3->z;
-    func_000231F5((int)a1, (int)func_0002325A);
-    if (!(((struct bf8_3_1 *)(PLAYER + 137))->f || *(int *)D_00196B0C != 0 || *(unsigned char *)D_001789FA == 1))
+    collide_for_each_nearby((int)a1, (int)func_0002325A);
+    if (!(((struct bf8_3_1 *)(PLAYER + 137))->f || *(int *)collide_candidate_count != 0 || *(unsigned char *)player_environment == 1))
         return FLAGS = 16;
     l_14 = FLAGS;
-    *(char *)D_00196277 = 1;
+    *(char *)player_on_ground = 1;
     l_44 = func_0002294E((int)a1, a2, (int)a3);
     *(unsigned char *)D_001940D7 &= 223;
-    if (*(char *)D_00196277 != 0 && *(char *)D_00196296 != 0)
+    if (*(char *)player_on_ground != 0 && *(char *)D_00196296 != 0)
         *(char *)D_00196296 = 0;
     if (*(int *)D_00195CB8 != 0 && (l_10 = (short *)func_000657B2(*(int *)D_00195CB8)) != 0) {
         if (l_10[0] != 0 || l_10[2] != 0) {
             a3->x += l_10[0];
             a3->y += l_10[1];
             a3->z += l_10[2];
-            *(unsigned char *)D_00196D64 |= 4;
+            *(unsigned char *)collide_flags |= 4;
             l_44 = func_0002294E((int)a1, a2, (int)a3);
         }
     }
@@ -107,16 +107,16 @@ int func_000234EB(struct obj *a1, int a2, struct vec3 *a3, int a4)
         a3->x += l_10[0];
         a3->y += l_10[1];
         a3->z += l_10[2];
-        *(unsigned char *)D_00196D64 |= 4;
+        *(unsigned char *)collide_flags |= 4;
         l_44 = func_0002294E((int)a1, a2, (int)a3);
     }
     if (*(int *)D_00195CB8 != 0)
-        func_00028E24(*(int *)D_00195CB8);
+        automap_mark_seen(*(int *)D_00195CB8);
     if (*(int *)D_00195C70 != 0)
-        func_00028E24(*(int *)D_00195C70);
+        automap_mark_seen(*(int *)D_00195C70);
     if (l_44 & 2)
         *(short *)D_00195F5A = 0;
-    if ((int)a1 == *(int *)D_00195AA4 && ((struct bf8_5_1 *)&D_001940DB)->f)
+    if ((int)a1 == *(int *)player_object && ((struct bf8_5_1 *)&player_motion_flags)->f)
         return 0;
     if (!(l_44 & 10) || !(l_14 & 4))
         return 0;
@@ -160,16 +160,16 @@ int func_000234EB(struct obj *a1, int a2, struct vec3 *a3, int a4)
     if (l_30 != 0 || l_2C != 0 || l_28 != 0) {
         *(int *)D_00195CD8 = *(int *)D_00195CD4 = 0;
         l_14 = FLAGS;
-        *(char *)D_00196277 = 1;
+        *(char *)player_on_ground = 1;
         l_44 = func_0002294E((int)a1, a2, (int)a3);
         *(unsigned char *)D_001940D7 &= 223;
-        if (*(char *)D_00196277 != 0 && *(char *)D_00196296 != 0)
+        if (*(char *)player_on_ground != 0 && *(char *)D_00196296 != 0)
             *(char *)D_00196296 = 0;
         if (*(int *)D_00195CB8 != 0)
-            func_00028E24(*(int *)D_00195CB8);
+            automap_mark_seen(*(int *)D_00195CB8);
         if (*(int *)D_00195C70 != 0)
-            func_00028E24(*(int *)D_00195C70);
-        if ((int)a1 == *(int *)D_00195AA4 && ((struct bf8_4_1 *)&D_001940DB)->f)
+            automap_mark_seen(*(int *)D_00195C70);
+        if ((int)a1 == *(int *)player_object && ((struct bf8_4_1 *)&player_motion_flags)->f)
             return 0;
         if (!(l_44 & 10) || !(l_14 & 4))
             return 0;

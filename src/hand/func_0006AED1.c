@@ -6,15 +6,15 @@ struct log {
     char text[32][32];
 };
 extern char D_00175C86[];
-extern char *D_001959B0;
-extern char *D_00195BDC;
-extern int D_00195BF4;
-extern int func_0004BB64(short);
-extern void func_0006B2E2(void);
+extern char *logbook_object;
+extern char *current_location;
+extern int game_minutes;
+extern int quest_find_by_id(short);
+extern void logbook_prune_quests(void);
 extern void func_000A0040(void *, int, int, char *, int, int);
 extern void func_000A0AD9(char *, char *, int, char *, int);
 
-void func_0006AED1(unsigned char a1, int a2, int a3)
+void logbook_add_entry(unsigned char a1, int a2, int a3)
 {
     struct log *p;
     int i;
@@ -22,13 +22,13 @@ void func_0006AED1(unsigned char a1, int a2, int a3)
     int fresh;
     int r;
 
-    p = (struct log *)(D_001959B0 + 71);
+    p = (struct log *)(logbook_object + 71);
     slot = -1;
     fresh = 1;
-    func_0006B2E2();
+    logbook_prune_quests();
     for (i = 0; i < 32; i++) {
         if (p->id[i] != 0) {
-            r = func_0004BB64(p->id[i]);
+            r = quest_find_by_id(p->id[i]);
             if (r == 0) {
                 p->id[i] = 0;
                 func_000A0040(p->val[i], 0, 20, D_00175C86, 301, 20);
@@ -50,6 +50,6 @@ void func_0006AED1(unsigned char a1, int a2, int a3)
     if (a3 > 9)
         a3 %= 10;
     p->val[slot][a3] = a2;
-    p->time[slot][a3] = D_00195BF4;
-    func_000A0AD9(p->text[slot], D_00195BDC, 32, D_00175C86, 325);
+    p->time[slot][a3] = game_minutes;
+    func_000A0AD9(p->text[slot], current_location, 32, D_00175C86, 325);
 }

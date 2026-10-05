@@ -14,9 +14,9 @@ struct spell {
     struct spell_dur dur[3];        /* 23 */
     struct spell_mag mag[3];        /* 32 */
 };
-extern struct spell *D_00178A0A;
-extern short D_00195F30;
-extern short D_0019961C[];
+extern struct spell *selected_spell;
+extern short spell_effect_slot;
+extern short spell_effect_cost_current[];
 
 int func_0003978C(void)
 {
@@ -24,11 +24,11 @@ int func_0003978C(void)
     struct spell *sp;
     short e;
 
-    e = D_00195F30;
-    sp = D_00178A0A;
-    cost = ((sp->mag[e].base_max + sp->mag[e].base_min) >> 1) * D_0019961C[2];
-    cost += ((sp->mag[e].plus_min + sp->mag[e].plus_max) >> 1) * (D_0019961C[3] / sp->mag[e].per_level);
-    cost += sp->chance[e].base * D_0019961C[0];
-    cost += sp->chance[e].plus * D_0019961C[1] / sp->chance[e].per_level;
+    e = spell_effect_slot;
+    sp = selected_spell;
+    cost = ((sp->mag[e].base_max + sp->mag[e].base_min) >> 1) * spell_effect_cost_current[2];
+    cost += ((sp->mag[e].plus_min + sp->mag[e].plus_max) >> 1) * (spell_effect_cost_current[3] / sp->mag[e].per_level);
+    cost += sp->chance[e].base * spell_effect_cost_current[0];
+    cost += sp->chance[e].plus * spell_effect_cost_current[1] / sp->chance[e].per_level;
     return cost;
 }

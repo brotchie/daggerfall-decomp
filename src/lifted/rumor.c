@@ -4,23 +4,23 @@
 extern char D_0012B508[];
 extern char D_001702CC[];
 extern char D_00178E54[];
-extern char D_00178E58[];
-extern char D_00178EAF[];
+extern char region_event_flag_groups[];
+extern char region_event_durations[];
 extern char D_00178EB0[];
-extern char D_0018F044[];
-extern char D_0018F061[];
-extern char D_0018F07E[];
+extern char region_event_values[];
+extern char region_event_flags[];
+extern char region_event_groups[];
 extern char D_0018F090[];
-extern char D_001903A4[];
+extern char text_buffer[];
 extern char D_00196470[];
 extern char D_00196474[];
 
-extern int func_0001961A(unsigned char);
-extern int func_0005A442(unsigned char);
-extern int func_0007D6AE(int, int);
+extern int faction_random_of_type(unsigned char);
+extern int font_char_width(unsigned char);
+extern int rand_range(int, int);
 extern int func_000A0024();
 extern int func_000A1023();
-extern void func_0005A54A(int, int, int);
+extern void text_draw(int, int, int);
 void func_00013DB6(void);
 
 void func_00013C56(void)
@@ -34,11 +34,11 @@ void func_00013C56(void)
     if (l_18 <= 80) goto L13CA0;
     l_18 = 80;
 L13CA0:;
-    func_000A1023((int)D_001903A4, *(int *)D_00196474, l_18, (int)D_001702CC, 35, 160);
-    *(signed char *)(D_001903A4 + l_18) = 0;
-    func_0005A54A((int)D_001903A4, *(int *)D_00196470, 140);
+    func_000A1023((int)text_buffer, *(int *)D_00196474, l_18, (int)D_001702CC, 35, 160);
+    *(signed char *)(text_buffer + l_18) = 0;
+    text_draw((int)text_buffer, *(int *)D_00196470, 140);
     *(int *)D_00196470 -= 2;
-    l_1C = func_0005A442((int)(unsigned char)*(signed char *)(*(char **)D_00196474));
+    l_1C = font_char_width((int)(unsigned char)*(signed char *)(*(char **)D_00196474));
     if ((-*(int *)D_00196470) <= l_1C) goto L13D14;
     (*(int *)D_00196474)++;
     *(int *)D_00196470 += l_1C;
@@ -61,11 +61,11 @@ L13DF9:;
     *(int *)D_00196474 = 0;
 }
 
-void func_00013E17(int a1, int a2)
+void region_flag_set(int a1, int a2)
 {
     int l_14;
 
-    if (*(signed char *)(D_0018F07E + (a1 * 80) + *(unsigned char *)(D_00178E58 + a2)) == 0) goto L13E82;
+    if (*(signed char *)(region_event_groups + (a1 * 80) + *(unsigned char *)(region_event_flag_groups + a2)) == 0) goto L13E82;
     l_14 = 0;
 L13E4E:;
     if (l_14 < 29) goto L13E5E;
@@ -74,20 +74,20 @@ L13E56:;
     l_14++;
     goto L13E4E;
 L13E5E:;
-    if (*(signed char *)(D_00178E58 + a2) != *(signed char *)(D_00178E58 + l_14)) goto L13E80;
-    *(signed char *)(D_0018F061 + ((a1 * 80) + l_14)) = 0;
+    if (*(signed char *)(region_event_flag_groups + a2) != *(signed char *)(region_event_flag_groups + l_14)) goto L13E80;
+    *(signed char *)(region_event_flags + ((a1 * 80) + l_14)) = 0;
 L13E80:;
     goto L13E56;
 L13E82:;
-    *(signed char *)(D_0018F061 + ((a1 * 80) + a2)) = 1;
-    *(signed char *)(D_0018F07E + (a1 * 80) + *(unsigned char *)(D_00178E58 + a2)) = 1;
-    *(signed char *)(D_0018F044 + ((a1 * 80) + a2)) = func_0007D6AE((int)(unsigned char)*(signed char *)(D_00178EAF + (a2 * 2)), (int)(unsigned char)*(signed char *)(D_00178EB0 + (a2 * 2)));
+    *(signed char *)(region_event_flags + ((a1 * 80) + a2)) = 1;
+    *(signed char *)(region_event_groups + (a1 * 80) + *(unsigned char *)(region_event_flag_groups + a2)) = 1;
+    *(signed char *)(region_event_values + ((a1 * 80) + a2)) = rand_range((int)(unsigned char)*(signed char *)(region_event_durations + (a2 * 2)), (int)(unsigned char)*(signed char *)(D_00178EB0 + (a2 * 2)));
     if (a2 != 18) return;
-    *(short *)(D_0018F090 + (a1 * 80)) = *(short *)((char *)func_0001961A(1) + 33);
+    *(short *)(D_0018F090 + (a1 * 80)) = *(short *)((char *)faction_random_of_type(1) + 33);
 }
 
-void func_00013F06(int a1, int a2)
+void region_flag_clear(int a1, int a2)
 {
-    *(signed char *)(D_0018F061 + ((a1 * 80) + a2)) = 0;
-    *(signed char *)(D_0018F07E + (a1 * 80) + *(unsigned char *)(D_00178E58 + a2)) = 0;
+    *(signed char *)(region_event_flags + ((a1 * 80) + a2)) = 0;
+    *(signed char *)(region_event_groups + (a1 * 80) + *(unsigned char *)(region_event_flag_groups + a2)) = 0;
 }

@@ -4,7 +4,7 @@ extern char D_00170D55[];
 extern char D_00170D7F[];
 extern struct entry *D_00195C44;
 extern int D_00195D6C;
-extern int func_0003D9B1(unsigned short, short, unsigned char *, char *, char *);
+extern int text_expand_wrap(unsigned short, short, unsigned char *, char *, char *);
 extern void func_000A006E(int, int, int);
 extern void *func_000A00AF(int, char *, int);
 extern int func_000A00CB(int, void *, int);
@@ -12,7 +12,7 @@ extern int func_000A00CB(int, void *, int);
 extern void func_000A0ED9(int, char *);
 extern int func_000A0F5C(char *, char *, ...);
 
-int func_0003D6FF(short a1, unsigned short a2, short a3, int a4)
+int text_rsc_load_variant(short a1, unsigned short a2, short a3, int a4)
 {
     short n;
     short i;
@@ -59,5 +59,5 @@ int func_0003D6FF(short a1, unsigned short a2, short a3, int a4)
     while (buf[k] < 0xfe)
         buf[i++] = buf[k++];
     buf[i] = 0;
-    return func_0003D9B1(a2, a3, buf, b2, b3);
+    return text_expand_wrap(a2, a3, buf, b2, b3);
 }

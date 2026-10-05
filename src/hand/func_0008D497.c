@@ -20,14 +20,14 @@ extern unsigned char D_0012B508;
 extern unsigned char D_0012DA44;
 extern char D_00176E38[];
 extern char D_001A9AF3;
-extern void func_0005A54A(char *, int, int);
-extern void func_0008D45A(char *, short);
+extern void text_draw(char *, int, int);
+extern void picklist_clip_text(char *, short);
 extern void func_000A0AD9(char *, char *, int, char *, int);
 extern void func_000CE4FA(int, int, int, int);
 extern void func_00144D00(int, int, int, int);
 extern void func_00144ED8(int, int, int, int, int, int);
 
-void func_0008D497(struct listbox *a1, int a2)
+void picklist_draw(struct listbox *a1, int a2)
 {
     short l_30;
     short l_2C;
@@ -67,15 +67,15 @@ void func_0008D497(struct listbox *a1, int a2)
     l_18 = 1;
     while (l_24 < a1->count && l_18 < a1->h - l_14) {
         func_000A0AD9(l_88, a1->items[l_24].name, 80, D_00176E38, 236);
-        func_0008D45A(l_88, a1->w);
+        picklist_clip_text(l_88, a1->w);
         if (l_24 != a1->sel || D_001A9AF3 != 0) {
             D_0012B508 = l_24 != a1->sel ? 156 : 0;
-            func_0005A54A(l_88, a1->x + 2, a1->y + l_18 + 1);
+            text_draw(l_88, a1->x + 2, a1->y + l_18 + 1);
         }
         D_0012B508 = (a1->items[l_24].flags & 1) ? a1->c2 : a1->c1;
         if (l_24 == a1->sel)
             D_0012B508 = a1->c3;
-        func_0005A54A(l_88, a1->x + 1, a1->y + l_18);
+        text_draw(l_88, a1->x + 1, a1->y + l_18);
         l_24++;
         l_18 += l_14 + 1;
     }

@@ -7,22 +7,22 @@ extern char D_00170137[];
 extern char D_0017013B[];
 extern char D_00178848[];
 
-extern int func_00011D1B(int, ...);
-extern int func_00011E36(int, ...);
-extern int func_000120EB(int, ...);
-extern int func_000124BF(int, ...);
+extern int profile_find_section(int, ...);
+extern int profile_find_item(int, ...);
+extern int profile_get_string(int, ...);
+extern int profile_set_string(int, ...);
 extern int func_000A0DF4();
 extern int func_000A0E0D();
 extern int func_000A0E3B();
 extern int func_000A0E74();
-int func_00012DA5(signed char);
+int profile_hex_digit(signed char);
 #pragma aux sosconv "*" parm caller [] value [eax] modify [eax ebx ecx edx];
 #pragma aux (sosconv) func_00012203;
-#pragma aux (sosconv) func_00012640;
-#pragma aux (sosconv) func_0001270C;
-#pragma aux (sosconv) func_00012768;
-#pragma aux (sosconv) func_000128A2;
-#pragma aux (sosconv) func_0001296A;
+#pragma aux (sosconv) profile_get_yes;
+#pragma aux (sosconv) profile_get_item_string;
+#pragma aux (sosconv) profile_set_yes_no;
+#pragma aux (sosconv) profile_delete_section;
+#pragma aux (sosconv) profile_add_section;
 
 int func_00012203(int a1, int a2, int a3)
 {
@@ -66,14 +66,14 @@ L122E0:;
     return 1;
 }
 
-int func_00012640(int a1, int a2)
+int profile_get_yes(int a1, int a2)
 {
     char l_2C[32];
 
-    if ((short)func_00011E36(a1, a2) != 0) goto L12669;
+    if ((short)profile_find_item(a1, a2) != 0) goto L12669;
     return 0;
 L12669:;
-    if ((short)func_000120EB(a1, (int)l_2C, 32) != 0) goto L12689;
+    if ((short)profile_get_string(a1, (int)l_2C, 32) != 0) goto L12689;
     return 0;
 L12689:;
     if (func_000A0E3B((int)l_2C, (int)D_00170133) != 0) goto L126A3;
@@ -82,41 +82,41 @@ L126A3:;
     return 0;
 }
 
-int func_0001270C(int a1, int a2, int a3, int a4)
+int profile_get_item_string(int a1, int a2, int a3, int a4)
 {
-    if ((short)func_00011E36(a1, a2) != 0) goto L12735;
+    if ((short)profile_find_item(a1, a2) != 0) goto L12735;
     return 0;
 L12735:;
-    if ((short)func_000120EB(a1, a3, a4) != 0) goto L12757;
+    if ((short)profile_get_string(a1, a3, a4) != 0) goto L12757;
     return 0;
 L12757:;
     return 1;
 }
 
-int func_00012768(int a1, int a2, short a3)
+int profile_set_yes_no(int a1, int a2, short a3)
 {
-    if ((short)func_00011E36(a1, a2) != 0) goto L12791;
+    if ((short)profile_find_item(a1, a2) != 0) goto L12791;
     return 0;
 L12791:;
     if (a3 == 0) goto L127BA;
-    if ((short)func_000124BF(a1, (int)D_00170137) != 0) goto L127B8;
+    if ((short)profile_set_string(a1, (int)D_00170137) != 0) goto L127B8;
     return 0;
 L127B8:;
     goto L127DA;
 L127BA:;
-    if ((short)func_000124BF(a1, (int)D_0017013B) != 0) goto L127DA;
+    if ((short)profile_set_string(a1, (int)D_0017013B) != 0) goto L127DA;
     return 0;
 L127DA:;
     return 1;
 }
 
-int func_000128A2(int a1, int a2)
+int profile_delete_section(int a1, int a2)
 {
     int l_18;
     int l_14;
     int l_10;
 
-    if ((short)func_00011D1B(a1, a2) != 0) goto L128CE;
+    if ((short)profile_find_section(a1, a2) != 0) goto L128CE;
     return 0;
 L128CE:;
     l_18 = *(int *)((char *)a1 + 152);
@@ -137,12 +137,12 @@ L1291F:;
     return 1;
 }
 
-int func_0001296A(int a1, int a2)
+int profile_add_section(int a1, int a2)
 {
     int l_14;
     int l_10;
 
-    if ((short)func_00011D1B(a1, a2) == 0) goto L12996;
+    if ((short)profile_find_section(a1, a2) == 0) goto L12996;
     return 0;
 L12996:;
     l_14 = (int)(*(char **)((char *)a1 + 132) + *(int *)((char *)a1 + 136));
@@ -169,7 +169,7 @@ L12A1F:;
     return 1;
 }
 
-int func_00012D3B(int a1)
+int profile_hex_to_int(int a1)
 {
     int l_28;
     int l_24;
@@ -180,13 +180,13 @@ int func_00012D3B(int a1)
     l_24 = func_000A0DF4(a1);
     l_1C = 0;
 L12D65:;
-    l_28 += func_00012DA5((int)(signed char)*(signed char *)((char *)(l_1C++ + a1))) * *(int *)(D_00178848 + (l_24 << 2));
+    l_28 += profile_hex_digit((int)(signed char)*(signed char *)((char *)(l_1C++ + a1))) * *(int *)(D_00178848 + (l_24 << 2));
     l_24--;
     if (((unsigned)l_24) > 0) goto L12D65;
     return l_28;
 }
 
-int func_00012DA5(signed char a1)
+int profile_hex_digit(signed char a1)
 {
     int l_20;
 

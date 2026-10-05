@@ -10,23 +10,23 @@ struct ev {
 extern char D_00174FAC[];
 extern char D_001851FF;
 extern unsigned char D_001940D5;
-extern struct ev *D_001997D4;
+extern struct ev *note_page;
 extern int D_001997D8;
-extern short D_001997E4;
-extern void func_0003F09F(int, int);
+extern short note_page_free;
+extern void msgbox_show_rsc(int, int);
 extern int func_000A1023();
 
-void func_0004E02D(short a1, short a2, short a3, short a4)
+void note_add_line(short a1, short a2, short a3, short a4)
 {
     struct ev *l_1C;
 
-    if ((unsigned)D_001997E4 < 11) {
-        func_0003F09F(1700, 1);
+    if ((unsigned)note_page_free < 11) {
+        msgbox_show_rsc(1700, 1);
         return;
     }
-    func_000A1023(D_001997D8, D_001997D4, 3640, D_00174FAC, 399, 4);
+    func_000A1023(D_001997D8, note_page, 3640, D_00174FAC, 399, 4);
     D_001940D5 |= 16;
-    l_1C = D_001997D4;
+    l_1C = note_page;
     while (l_1C->type != 0) {
         if (l_1C->type == 1)
             l_1C = (struct ev *)((char *)l_1C + 91);

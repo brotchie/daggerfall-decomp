@@ -6,9 +6,9 @@ struct mob {
     char pad30[137 - 48];
     unsigned char flags[4];     /* 0x89 */
 };
-extern unsigned D_00187FC6[];
-extern int func_0008DA91(char *);
-void func_0008A550(struct eff *e, int i, char *a3);
+extern unsigned spell_resist_flags[];
+extern int object_delete(char *);
+void spfx_effect_end(struct eff *e, int i, char *a3);
 
 int func_0008A496(int a1, int a2, int a3)
 {
@@ -20,7 +20,7 @@ int func_0008A4BD(int a1, int a2, int a3)
     return 0;
 }
 
-void func_0008A4E4(char *obj)
+void spell_end(char *obj)
 {
     struct eff *e;
     int i;
@@ -29,12 +29,12 @@ void func_0008A4E4(char *obj)
     for (i = 0; i < 3; i++) {
         if (e[i].op == 255)
             continue;
-        func_0008A550(e, i, *(char **)(obj + 67));
+        spfx_effect_end(e, i, *(char **)(obj + 67));
     }
-    func_0008DA91(obj);
+    object_delete(obj);
 }
 
-void func_0008A550(struct eff *e, int i, char *a3)
+void spfx_effect_end(struct eff *e, int i, char *a3)
 {
     struct mob *m;
 
@@ -47,7 +47,7 @@ void func_0008A550(struct eff *e, int i, char *a3)
         m->stats[e[i].arg] += *(short *)((char *)e + i * 5 + 34);
         break;
     case 8:
-        *(unsigned *)m->flags &= ~D_00187FC6[e[i].arg];
+        *(unsigned *)m->flags &= ~spell_resist_flags[e[i].arg];
         break;
     case 9:
         m->stats[e[i].arg] -= *(short *)((char *)(e + i) + 80);

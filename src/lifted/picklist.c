@@ -4,11 +4,11 @@
 extern char D_0012DA44[];
 extern char D_00176E38[];
 
-extern int func_0005A4A9(int);
+extern int font_text_width(int);
 extern int func_000A0024();
 extern int func_000A0DF4();
 
-void func_0008CC33(int a1)
+void picklist_update_thumb(int a1)
 {
     *(short *)((char *)a1 + 43) = ((int)(short)*(short *)((char *)a1 + 11)) / (((int)(short)*(short *)D_0012DA44) + 1);
     if (*(short *)((char *)a1 + 37) == 0) goto L8CC7B;
@@ -20,7 +20,7 @@ L8CC8C:;
     *(short *)((char *)a1 + 45) = ((((int)(short)*(short *)((char *)a1 + 35)) - 2) * ((int)(unsigned short)*(short *)((char *)a1 + 43))) / ((int)(unsigned short)*(short *)((char *)a1 + 37));
 }
 
-void func_0008CF0E(int a1)
+void picklist_free(int a1)
 {
     if (*(signed char *)((char *)a1) == 0) goto L8CF97;
     if (*(int *)((char *)a1 + 51) == 0) goto L8CF40;
@@ -51,15 +51,15 @@ L8CFCD:;
     *(short *)((char *)a1 + 37) = 0;
 }
 
-void func_0008D45A(int a1, short a2)
+void picklist_clip_text(int a1, short a2)
 {
 L8D46D:;
-    if (func_0005A4A9(a1) <= ((int)(short)a2)) return;
+    if (font_text_width(a1) <= ((int)(short)a2)) return;
     *(signed char *)((char *)(func_000A0DF4(a1) + a1) - 1) = 0;
     goto L8D46D;
 }
 
-void func_0008D88B(int a1, int a2)
+void swap_shorts(int a1, int a2)
 {
     *(short *)((char *)a1) ^= *(short *)((char *)a2);
     *(short *)((char *)a2) ^= *(short *)((char *)a1);

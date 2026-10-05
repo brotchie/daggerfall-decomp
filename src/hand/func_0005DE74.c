@@ -41,21 +41,21 @@ struct item {
 extern char D_001758B8[];
 extern char D_001758C0[];
 extern char D_001758C1[];
-extern struct itemdef D_0017D22A[];
+extern struct itemdef item_templates[];
 extern unsigned char D_00190CF2;
 extern char D_001911E4[];
-extern char *D_00195BE0;
+extern char *player_character;
 extern short D_00195F28;
 extern unsigned char D_0019626D;
 extern unsigned char D_0019626E;
-extern void func_00050069(char *);
+extern void fatal_error(char *);
 extern void func_0005E5D7(struct item *, int);
 extern void func_0005E636(struct item *);
 extern void func_0005E874(struct item *);
 extern void func_0005EA8F(struct item *);
-extern void func_0005F75B(struct item *, short);
-extern void func_00060430(struct item *, int);
-extern int func_0007D6AE(int, int);
+extern void item_init_book(struct item *, short);
+extern void item_make_magic(struct item *, int);
+extern int rand_range(int, int);
 extern int func_0009DC25(void);
 extern void func_000A0040(void *, int, int, char *, int, int);
 extern void func_000A0AD9(char *, char *, int, char *, int);
@@ -65,9 +65,9 @@ extern void func_000A0ED9(int, char *);
 extern int func_000A18C3(char *);
 extern int func_000A0F5C(char *, char *, ...);
 
-#define PFLAGS (*(short *)(D_00195BE0 + 64))
+#define PFLAGS (*(short *)(player_character + 64))
 
-void func_0005DE74(unsigned short idx, short type, short sub, struct item *it)
+void item_init_from_template(unsigned short idx, short type, short sub, struct item *it)
 {
     struct itemdef *def;
     unsigned short orig;
@@ -82,7 +82,7 @@ void func_0005DE74(unsigned short idx, short type, short sub, struct item *it)
     if (type == 12 && ((unsigned short)PFLAGS & 1) == 0)
         type = 6;
     if (type == 4) {
-        func_00060430(it, -1);
+        item_make_magic(it, -1);
         return;
     }
     if (type == 9 && (sub < 2 || sub == 4))
@@ -93,16 +93,16 @@ void func_0005DE74(unsigned short idx, short type, short sub, struct item *it)
         D_00190CF2++;
         idx = 277;
         if (sub > 3)
-            sub = func_0007D6AE(0, 3);
+            sub = rand_range(0, 3);
     }
     if (idx >= 288) {
         func_000A0ED9(58, D_001758B8);
         func_000A18C3(D_001758C0);
         func_000A0ED9(59, D_001758B8);
         func_000A0F5C(D_001911E4, D_001758C1, orig, idx);
-        func_00050069(D_001911E4);
+        fatal_error(D_001911E4);
     }
-    def = &D_0017D22A[idx];
+    def = &item_templates[idx];
     if (def->f46 == 32512)
         it->sub = 0;
     func_000A0AD9(it->name, def->name, 32, D_001758B8, 68);
@@ -153,7 +153,7 @@ void func_0005DE74(unsigned short idx, short type, short sub, struct item *it)
         it->f49 = func_0009DC25() % 20;
     if (type == 6 || type == 12 || type == 2) {
         func_0005E636(it);
-        func_0005E5D7(it, *(unsigned char *)(D_00195BE0 + 67));
+        func_0005E5D7(it, *(unsigned char *)(player_character + 67));
     }
     if (type == 3)
         func_0005E874(it);
@@ -163,11 +163,11 @@ void func_0005DE74(unsigned short idx, short type, short sub, struct item *it)
             func_0005E874(it);
     }
     if (type == 3 && sub == 18) {
-        it->f49 = func_0007D6AE(1, 20);
+        it->f49 = rand_range(1, 20);
         it->f44 = 0;
     }
     if (type == 7)
-        func_0005F75B(it, sub);
+        item_init_book(it, sub);
     if (type == 13)
         it->f63 = func_0009DC25();
 }

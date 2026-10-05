@@ -11,25 +11,25 @@ struct dict { char pad[31]; char *base; };
 extern char D_00175940[];
 extern struct dict *D_00195AC4;
 extern struct ent D_00199D78[];
-extern int D_001A3A78;
+extern int link_count;
 extern char D_001A3A80;
 extern char D_001A3A81;
-extern void func_00050069(char *);
-extern struct obj *func_0008E925(struct dict *, char *);
+extern void fatal_error(char *);
+extern struct obj *object_find_by_id(struct dict *, char *);
 
-void func_00064228(void)
+void links_resolve(void)
 {
     struct ent *e;
     struct ent *end;
 
-    if (D_001A3A78 >= 1024)
-        func_00050069(D_00175940);
-    for (e = D_00199D78, end = D_00199D78 + D_001A3A78; e < end; e++) {
+    if (link_count >= 1024)
+        fatal_error(D_00175940);
+    for (e = D_00199D78, end = D_00199D78 + link_count; e < end; e++) {
         if (e->f2 == 6)
             e->f2 = 2;
         if (e->f3 == 108)
             e->f3 = 100;
-        e->o = func_0008E925(D_00195AC4, (char *)((int)D_00195AC4->base + e->id - 1));
+        e->o = object_find_by_id(D_00195AC4, (char *)((int)D_00195AC4->base + e->id - 1));
         if (e->o != 0)
             e->o->f35 = 255;
     }

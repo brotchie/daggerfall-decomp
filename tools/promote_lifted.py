@@ -21,6 +21,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from units import load_units, unit_of  # noqa: E402
+import names as namesmod  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 LIFT = os.path.join(ROOT, "build", "lift")
@@ -41,7 +42,7 @@ def main():
     hand = set()
     for path in glob.glob(os.path.join(ROOT, "src", "*.c")) + \
             glob.glob(os.path.join(ROOT, "src", "hand", "*.c")):
-        hand |= set(DEF.findall(open(path).read()))
+        hand |= set(DEF.findall(namesmod.canonical(open(path).read())))
     with open(os.path.join(LIFT, "report.csv"), newline="") as f:
         ok = [r["func"] for r in csv.DictReader(f) if r["status"] == "ok"]
     ok = [n for n in ok if n not in hand]

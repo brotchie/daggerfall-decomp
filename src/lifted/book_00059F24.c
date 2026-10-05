@@ -5,28 +5,28 @@ extern char D_0012B508[];
 extern char D_0012DA44[];
 extern char D_00142928[];
 extern char D_0014292C[];
-extern char D_001903A4[];
+extern char text_buffer[];
 extern char D_00190D64[];
 extern char D_00190D66[];
 extern char D_00195C44[];
-extern char D_00199C6C[];
-extern char D_00199D5A[];
+extern char book_page_offsets[];
+extern char book_file[];
 
 extern int func_000A006E();
 extern int func_000A00CB();
 extern int func_0012DB50();
-extern void func_0005A13D(void);
+extern void book_flush_line(void);
 extern void func_0005A1C8(int);
 
-void func_00059F24(int a1)
+void book_draw_page(int a1)
 {
     short l_18;
 {
     int l_20;
 
     func_0012DB50(4);
-    func_000A006E((int)(short)*(short *)D_00199D5A, *(int *)((char *)(int)(*(char **)D_00199C6C + (((int)(short)*(short *)&a1) << 2))), 0);
-    func_000A00CB((int)(short)*(short *)D_00199D5A, *(int *)D_00195C44, 16000);
+    func_000A006E((int)(short)*(short *)book_file, *(int *)((char *)(int)(*(char **)book_page_offsets + (((int)(short)*(short *)&a1) << 2))), 0);
+    func_000A00CB((int)(short)*(short *)book_file, *(int *)D_00195C44, 16000);
     l_20 = *(int *)D_00195C44;
     *(signed char *)D_0012B508 = 145;
     *(short *)D_00190D64 = 0;
@@ -51,7 +51,7 @@ case 250:
     l_20 += 2;
     goto L5A112;
 case 249:
-    func_0005A13D();
+    book_flush_line();
     func_0012DB50((int)(short)((unsigned short)(unsigned char)*(signed char *)((char *)l_20 + 1)));
     l_20 += 2;
     if ((short)(short)*(int *)&l_18 >= *(short *)D_0012DA44) goto L5A08B;
@@ -64,26 +64,26 @@ case 253:
     goto L5A112;
 case 1:
     l_20++;
-    *(signed char *)(D_001903A4 + ((int)(short)*(short *)D_00190D64)) = 0;
-    func_0005A13D();
+    *(signed char *)(text_buffer + ((int)(short)*(short *)D_00190D64)) = 0;
+    book_flush_line();
     goto L5A112;
 case 0:
     l_20++;
-    *(signed char *)(D_001903A4 + ((int)(short)*(short *)D_00190D64)) = 0;
-    func_0005A13D();
+    *(signed char *)(text_buffer + ((int)(short)*(short *)D_00190D64)) = 0;
+    book_flush_line();
     *(short *)D_00142928 = 10;
     *(short *)D_0014292C += *(int *)&l_18;
     l_18 = *(short *)D_0012DA44;
     goto L5A112;
 default:
 L5A0F3:;
-    *(signed char *)(D_001903A4 + ((int)(short)(*(short *)D_00190D64)++)) = *(signed char *)((char *)l_20++);
+    *(signed char *)(text_buffer + ((int)(short)(*(short *)D_00190D64)++)) = *(signed char *)((char *)l_20++);
 L5A112:;
     goto L59FA8;
 L5A117:;
-    if (*(signed char *)D_001903A4 == 0) return;
-    *(signed char *)(D_001903A4 + ((int)(short)*(short *)D_00190D64)) = 0;
-    func_0005A13D();
+    if (*(signed char *)text_buffer == 0) return;
+    *(signed char *)(text_buffer + ((int)(short)*(short *)D_00190D64)) = 0;
+    book_flush_line();
 }
 }
 }

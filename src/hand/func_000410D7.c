@@ -9,15 +9,15 @@ struct mob {
 };
 extern unsigned char D_0017B667[];
 extern short D_0017B66D[][2][4];
-extern int func_0001FFF1(void);
+extern int climate_category(void);
 extern int func_0009DC25(void);
 
-void func_000410D7(struct mob *a1)
+void person_pick_sprite(struct mob *a1)
 {
     int kind;
     int flip;
 
-    kind = func_0001FFF1();
+    kind = climate_category();
     flip = func_0009DC25() & 1;
     if ((func_0009DC25() & 31) == 0) {
         a1->f27 = 51072;

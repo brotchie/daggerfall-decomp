@@ -2,6 +2,6 @@
 
 #include "dagger.h"
 
-void func_0007F87E(void) { }
+void diminution_stub(void) { }
 
 void func_0007F896(void) { }

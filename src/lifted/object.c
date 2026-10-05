@@ -6,14 +6,14 @@ extern char D_00176E4D[];
 extern char D_00176E70[];
 extern char D_00187FDC[];
 extern char D_00190BE4[];
-extern char D_00190CE4[];
-extern char D_001959A8[];
-extern char D_00195AA4[];
+extern char itemmaker_slot_kinds[];
+extern char nonworld_root[];
+extern char player_object[];
 extern char D_00195AC4[];
 extern char D_00195AF4[];
-extern char D_00195BDC[];
-extern char D_00195E18[];
-extern char D_00196A8C[];
+extern char current_location[];
+extern char object_heap[];
+extern char loaded_location_door_count[];
 extern char D_00199770[];
 extern char D_001A3F94[];
 extern char D_001A9AF4[];
@@ -32,19 +32,19 @@ extern char D_001A9B24[];
 extern char D_001A9B28[];
 extern char D_001A9B2C[];
 extern char D_001A9B30[];
-extern char D_001A9B34[];
-extern char D_001A9B38[];
+extern char object_heap_size[];
+extern char object_heap_free[];
 extern char D_001A9B3C[];
 extern char D_001A9B40[];
 extern char D_001A9B42[];
 extern char D_001A9B44[];
-extern char D_001AA3DC[];
-extern char D_001AA3E4[];
+extern char potion_ingredient_scroll[];
+extern char potion_ingredient_count[];
 
 extern int func_00045E45(int);
-extern int func_00069F8A(int, int);
-extern int func_0006A0D4(int);
-extern int func_0008E7E0(int, short);
+extern int mem_pool_alloc(int, int);
+extern int mem_pool_release(int);
+extern int object_count_type(int, short);
 extern int func_0009DC25();
 extern int func_000A0040();
 extern int func_000A0ED9(int, int);
@@ -52,80 +52,80 @@ extern int func_000A1023();
 extern int func_000A148C(int, ...);
 extern int func_000C7FD9();
 extern void func_000298F3(int);
-extern void func_00050069(int);
-extern void func_00069E9E(int, int);
-extern void func_00069F39(int);
-extern void func_0008DD7E(int);
-int func_0008DA4D(int);
-int func_0008DA91(int);
-int func_0008DB21(int, int, int);
-int func_0008DCE3(int, int, int);
-int func_0008E55F(int, int);
-int func_0008E721(int);
-int func_0008E8E9(int);
-int func_0008E925(int, int);
-int func_0008E9C0(int);
-int func_0008EB88(int);
-int func_0008EDB8(int);
-void func_0008D9DB(int);
-void func_0008DA1C(int);
-void func_0008DC1D(int);
-void func_0008DEB4(int, int, int, int, int, int, int);
-void func_0008E005(int);
-void func_0008E09A(int, int);
-void func_0008E0F5(int, int);
-void func_0008E357(int, int);
-void func_0008E3A7(int, int);
-void func_0008E3F7(int, int);
+extern void fatal_error(int);
+extern void mem_pool_init(int, int);
+extern void mem_pool_free(int);
+extern void object_follow_move_cb(int);
+int object_free_single(int);
+int object_delete(int);
+int object_alloc(int, int, int);
+int object_create_child(int, int, int);
+int object_find(int, int);
+int object_find_type_cb(int);
+int object_find_by_id_cb(int);
+int object_find_by_id(int, int);
+int object_random_type_cb(int);
+int object_new_id(int);
+int object_find_quest_cb(int);
+void object_free_node(int);
+void object_free_children(int);
+void object_heap_release(int);
+void object_set_position(int, int, int, int, int, int, int);
+void object_unlink(int);
+void object_insert_after(int, int);
+void object_add_child(int, int);
+void object_foreach_pre(int, int);
+void object_foreach_post(int, int);
+void object_foreach(int, int);
 void func_0008EAA7(int);
 void func_0008EB25(int);
-void func_0008EBFD(int);
-void func_0008ECEE(int);
+void object_delete_quest_cb(int);
+void object_tree_size_cb(int);
 void func_0008ED52(int);
 #pragma aux func_000A0ED9 parm routine [];
 
-void func_0008D8CC(void)
+void object_heap_init(void)
 {
-    if (*(int *)D_001A9B34 != 0) goto L8D905;
+    if (*(int *)object_heap_size != 0) goto L8D905;
     if (*(int *)D_001A3F94 >= 13000) goto L8D8FB;
-    *(int *)D_001A9B34 = 1280000;
+    *(int *)object_heap_size = 1280000;
     goto L8D905;
 L8D8FB:;
-    *(int *)D_001A9B34 = 2048000;
+    *(int *)object_heap_size = 2048000;
 L8D905:;
-    *(int *)D_001A9B38 = *(int *)D_001A9B34;
+    *(int *)object_heap_free = *(int *)object_heap_size;
     func_000A0ED9(55, (int)D_00176E44);
-    func_000A148C((int)D_00176E4D, *(int *)D_001A9B34);
-    func_00069E9E((int)D_00195E18, *(int *)D_001A9B34);
-    *(signed char *)((char *)(*(int *)D_00195AC4 = func_0008DB21(0, 0, 48))) = 1;
+    func_000A148C((int)D_00176E4D, *(int *)object_heap_size);
+    mem_pool_init((int)object_heap, *(int *)object_heap_size);
+    *(signed char *)((char *)(*(int *)D_00195AC4 = object_alloc(0, 0, 48))) = 1;
     *(short *)(*(char **)D_00195AC4 + 27) = 65535;
     *(int *)(*(char **)D_00195AC4 + 31) = -65535;
-    *(int *)((char *)(*(int *)D_00195BDC = *(int *)D_00195AC4 + 71) + 43) = 0;
-    *(signed char *)((char *)(*(int *)D_001959A8 = func_0008DB21(0, 0, 0))) = 39;
-    *(int *)(*(char **)D_001959A8 + 31) = 700;
+    *(int *)((char *)(*(int *)current_location = *(int *)D_00195AC4 + 71) + 43) = 0;
+    *(signed char *)((char *)(*(int *)nonworld_root = object_alloc(0, 0, 0))) = 39;
+    *(int *)(*(char **)nonworld_root + 31) = 700;
 }
 
-void func_0008D9B9(void)
+void object_heap_shutdown(void)
 {
-    func_00069F39((int)D_00195E18);
+    mem_pool_free((int)object_heap);
 }
 
-void func_0008D9DB(int a1)
+void object_free_node(int a1)
 {
     if (*(int *)((char *)a1 + 51) == 0) goto L8DA02;
     *(int *)(*(char **)((char *)a1 + 51) + 51) = 0;
 L8DA02:;
-    func_0008E005(a1);
-    func_0008DC1D(a1);
+    object_unlink(a1);
+    object_heap_release(a1);
 }
 
-void func_0008DA1C(int a1)
+void object_free_children(int a1)
 {
     if (a1 == 0) return;
-    func_0008E3A7(*(int *)((char *)a1 + 63), (int)func_0008D9DB);
+    object_foreach_post(*(int *)((char *)a1 + 63), (int)object_free_node);
 }
 
-int func_0008DA4D(int a1)
+int object_free_single(int a1)
 {
     int l_1C;
 
@@ -133,11 +133,11 @@ int func_0008DA4D(int a1)
     return 0;
 L8DA6D:;
     l_1C = *(int *)((char *)a1 + 55);
-    func_0008D9DB(a1);
+    object_free_node(a1);
     return l_1C;
 }
 
-int func_0008DA91(int a1)
+int object_delete(int a1)
 {
     int l_1C;
 
@@ -145,8 +145,8 @@ int func_0008DA91(int a1)
     if (a1 != 0) goto L8DABA;
     return 0;
 L8DABA:;
-    func_0008DA1C(a1);
-    func_0008DA4D(a1);
+    object_free_children(a1);
+    object_free_single(a1);
     return l_1C;
 }
 
@@ -158,20 +158,20 @@ int func_0008DADD(int a1)
     if (a1 != 0) goto L8DB06;
     return 0;
 L8DB06:;
-    func_0008E005(a1);
+    object_unlink(a1);
     return l_1C;
 }
 
-int func_0008DB21(int a1, int a2, int a3)
+int object_alloc(int a1, int a2, int a3)
 {
     int l_18;
     int l_14;
 
     l_18 = a3 + 71;
-    *(int *)D_001A9B38 -= l_18 + 18;
-    l_14 = func_00069F8A((int)D_00195E18, l_18);
+    *(int *)object_heap_free -= l_18 + 18;
+    l_14 = mem_pool_alloc((int)object_heap, l_18);
     if (l_14 != 0) goto L8DB6B;
-    func_00050069((int)D_00176E70);
+    fatal_error((int)D_00176E70);
 L8DB6B:;
     if (a2 == 0) goto L8DBD0;
     func_000A1023(l_14, a2, 55, (int)D_00176E44, 163, 4);
@@ -180,24 +180,24 @@ L8DB6B:;
     goto L8DBFB;
 L8DBD0:;
     func_000A0040(l_14, 0, l_18, (int)D_00176E44, 169, 4);
-    *(int *)((char *)l_14 + 31) = func_0008EB88(1);
+    *(int *)((char *)l_14 + 31) = object_new_id(1);
 L8DBFB:;
     if (a1 == 0) goto L8DC0C;
-    func_0008E09A(a1, l_14);
+    object_insert_after(a1, l_14);
 L8DC0C:;
     return l_14;
 }
 
-void func_0008DC1D(int a1)
+void object_heap_release(int a1)
 {
     int l_18;
 
     l_18 = a1 - 18;
-    *(int *)D_001A9B38 += *(int *)((char *)l_18 + 12) + 18;
-    func_0006A0D4(a1);
+    *(int *)object_heap_free += *(int *)((char *)l_18 + 12) + 18;
+    mem_pool_release(a1);
 }
 
-int func_0008DC58(int a1)
+int object_clone(int a1)
 {
     int l_24;
     int l_20;
@@ -205,18 +205,18 @@ int func_0008DC58(int a1)
 
     l_24 = a1 - 18;
     l_1C = *(int *)((char *)l_24 + 12);
-    l_20 = func_0008DCE3(*(int *)((char *)a1 + 67), 0, l_1C - 71);
+    l_20 = object_create_child(*(int *)((char *)a1 + 67), 0, l_1C - 71);
     func_000A1023(l_20, a1, 55, (int)D_00176E44, 203, 4);
     func_000A1023(l_20 + 71, a1 + 71, l_1C - 71, (int)D_00176E44, 204, 4);
     return l_20;
 }
 
-int func_0008DCE3(int a1, int a2, int a3)
+int object_create_child(int a1, int a2, int a3)
 {
     int l_18;
     int l_14;
 
-    l_18 = func_0008DB21(*(int *)((char *)a1 + 63), a2, a3);
+    l_18 = object_alloc(*(int *)((char *)a1 + 63), a2, a3);
     *(int *)((char *)l_18 + 67) = a1;
     l_14 = l_18;
 L8DD1B:;
@@ -228,14 +228,14 @@ L8DD35:;
     return l_18;
 }
 
-int func_0008DD46(int a1, int a2)
+int object_reparent(int a1, int a2)
 {
-    func_0008E005(a2);
-    func_0008E0F5(a1, a2);
+    object_unlink(a2);
+    object_add_child(a1, a2);
     return a2;
 }
 
-void func_0008DEB4(int a1, int a2, int a3, int a4, int a5, int a6, int a7)
+void object_set_position(int a1, int a2, int a3, int a4, int a5, int a6, int a7)
 {
     int l_C;
 
@@ -258,15 +258,15 @@ void func_0008DEB4(int a1, int a2, int a3, int a4, int a5, int a6, int a7)
     *(int *)D_001A9B04 = a6;
     *(int *)D_001A9B08 = a7;
     if (((int)(unsigned char)*(signed char *)((char *)a1)) == 43) return;
-    func_0008E3F7(*(int *)((char *)a1 + 63), (int)func_0008DD7E);
+    object_foreach(*(int *)((char *)a1 + 63), (int)object_follow_move_cb);
 }
 
-void func_0008DFA1(int a1, int a2, int a3, int a4, int a5, int a6, int a7)
+void object_move_by(int a1, int a2, int a3, int a4, int a5, int a6, int a7)
 {
-    func_0008DEB4(a1, *(int *)((char *)a1 + 7) + a2, *(int *)((char *)a1 + 11) + a3, *(int *)((char *)a1 + 15) + a4, ((int)(short)*(short *)((char *)a1 + 1)) + a5, ((int)(short)*(short *)((char *)a1 + 3)) + a6, ((int)(short)*(short *)((char *)a1 + 5)) + a7);
+    object_set_position(a1, *(int *)((char *)a1 + 7) + a2, *(int *)((char *)a1 + 11) + a3, *(int *)((char *)a1 + 15) + a4, ((int)(short)*(short *)((char *)a1 + 1)) + a5, ((int)(short)*(short *)((char *)a1 + 3)) + a6, ((int)(short)*(short *)((char *)a1 + 5)) + a7);
 }
 
-void func_0008E005(int a1)
+void object_unlink(int a1)
 {
     if (*(int *)((char *)a1 + 67) == 0) goto L8E02D;
     if (*(int *)(*(char **)((char *)a1 + 67) + 63) == a1) goto L8E02F;
@@ -286,7 +286,7 @@ L8E06E:;
     *(int *)((char *)a1 + 67) = *(int *)((char *)a1 + 59);
 }
 
-void func_0008E09A(int a1, int a2)
+void object_insert_after(int a1, int a2)
 {
     *(int *)((char *)a2 + 55) = *(int *)((char *)a1 + 55);
     if (*(int *)((char *)a1 + 55) == 0) goto L8E0CE;
@@ -297,10 +297,10 @@ L8E0CE:;
     *(int *)((char *)a2 + 67) = *(int *)((char *)a1 + 67);
 }
 
-void func_0008E0F5(int a1, int a2)
+void object_add_child(int a1, int a2)
 {
     if (*(int *)((char *)a1 + 63) == 0) goto L8E121;
-    func_0008E09A(*(int *)((char *)a1 + 63), a2);
+    object_insert_after(*(int *)((char *)a1 + 63), a2);
     return;
 L8E121:;
     *(int *)((char *)a1 + 63) = a2;
@@ -374,7 +374,7 @@ void func_0008E2CC(int a1, int a2, int a3)
 {
 L8E2E1:;
     if (a1 == 0) return;
-    if (func_000C7FD9(*(int *)((char *)a1 + 7), *(int *)((char *)a1 + 15), *(int *)(*(char **)D_00195AA4 + 7), *(int *)(*(char **)D_00195AA4 + 15)) >= a3) goto L8E344;
+    if (func_000C7FD9(*(int *)((char *)a1 + 7), *(int *)((char *)a1 + 15), *(int *)(*(char **)player_object + 7), *(int *)(*(char **)player_object + 15)) >= a3) goto L8E344;
     ((int (*)())(a2))(a1);
     if (*(int *)((char *)a1 + 63) == 0) goto L8E331;
     if (((int)(unsigned short)(*(short *)((char *)a1 + 21) & 1)) == 0) goto L8E333;
@@ -387,7 +387,7 @@ L8E344:;
     goto L8E2E1;
 }
 
-void func_0008E357(int a1, int a2)
+void object_foreach_pre(int a1, int a2)
 {
     int l_14;
 
@@ -396,13 +396,13 @@ L8E36A:;
     l_14 = *(int *)((char *)a1 + 55);
     ((int (*)())(a2))(a1);
     if (*(int *)((char *)a1 + 63) == 0) goto L8E396;
-    func_0008E357(*(int *)((char *)a1 + 63), a2);
+    object_foreach_pre(*(int *)((char *)a1 + 63), a2);
 L8E396:;
     a1 = l_14;
     goto L8E36A;
 }
 
-void func_0008E3A7(int a1, int a2)
+void object_foreach_post(int a1, int a2)
 {
     int l_14;
 
@@ -410,14 +410,14 @@ L8E3BA:;
     if (a1 == 0) return;
     l_14 = *(int *)((char *)a1 + 55);
     if (*(int *)((char *)a1 + 63) == 0) goto L8E3E0;
-    func_0008E3A7(*(int *)((char *)a1 + 63), a2);
+    object_foreach_post(*(int *)((char *)a1 + 63), a2);
 L8E3E0:;
     ((int (*)())(a2))(a1);
     a1 = l_14;
     goto L8E3BA;
 }
 
-void func_0008E3F7(int a1, int a2)
+void object_foreach(int a1, int a2)
 {
     int l_14;
 
@@ -425,7 +425,7 @@ L8E40A:;
     if (a1 == 0) return;
     l_14 = *(int *)((char *)a1 + 55);
     if (*(int *)((char *)a1 + 63) == 0) goto L8E430;
-    func_0008E3F7(*(int *)((char *)a1 + 63), a2);
+    object_foreach(*(int *)((char *)a1 + 63), a2);
 L8E430:;
     ((int (*)())(a2))(a1);
     a1 = l_14;
@@ -451,7 +451,7 @@ L8E491:;
     goto L8E45A;
 }
 
-void func_0008E4A8(int a1, int a2)
+void object_foreach_open(int a1, int a2)
 {
 L8E4BB:;
     if (a1 == 0) return;
@@ -461,7 +461,7 @@ L8E4BB:;
 L8E4E5:;
     goto L8E4F5;
 L8E4E7:;
-    func_0008E4A8(*(int *)((char *)a1 + 63), a2);
+    object_foreach_open(*(int *)((char *)a1 + 63), a2);
 L8E4F5:;
     a1 = *(int *)((char *)a1 + 55);
     goto L8E4BB;
@@ -485,14 +485,14 @@ L8E54E:;
     goto L8E51C;
 }
 
-int func_0008E55F(int a1, int a2)
+int object_find(int a1, int a2)
 {
 L8E572:;
     if (a1 == 0) goto L8E5B1;
     if (((int (*)())(a2))(a1) == 0) goto L8E58B;
     return 1;
 L8E58B:;
-    if (func_0008E55F(*(int *)((char *)a1 + 63), a2) == 0) goto L8E5A6;
+    if (object_find(*(int *)((char *)a1 + 63), a2) == 0) goto L8E5A6;
     return 1;
 L8E5A6:;
     a1 = *(int *)((char *)a1 + 55);
@@ -501,7 +501,7 @@ L8E5B1:;
     return 0;
 }
 
-int func_0008E5C4(int a1, int a2)
+int object_find_open(int a1, int a2)
 {
 L8E5D7:;
     if (a1 == 0) goto L8E636;
@@ -513,7 +513,7 @@ L8E5F0:;
 L8E60E:;
     goto L8E62B;
 L8E610:;
-    if (func_0008E55F(*(int *)((char *)a1 + 63), a2) == 0) goto L8E62B;
+    if (object_find(*(int *)((char *)a1 + 63), a2) == 0) goto L8E62B;
     return 1;
 L8E62B:;
     a1 = *(int *)((char *)a1 + 55);
@@ -522,7 +522,7 @@ L8E636:;
     return 0;
 }
 
-void func_0008E649(int a1)
+void object_find_item_cb(int a1)
 {
     int l_18;
 
@@ -541,7 +541,7 @@ L8E6AA:;
     *(int *)D_00195AF4 = a1;
 }
 
-int func_0008E721(int a1)
+int object_find_type_cb(int a1)
 {
     if ((short)((unsigned short)(unsigned char)*(signed char *)((char *)a1)) == *(short *)D_001A9B42) goto L8E74B;
     return 0;
@@ -550,34 +550,34 @@ L8E74B:;
     return 1;
 }
 
-int func_0008E767(int a1, int a2)
+int object_find_type(int a1, int a2)
 {
     *(int *)D_00195AF4 = 0;
     *(short *)D_001A9B42 = a2;
-    func_0008E55F(a1, (int)func_0008E721);
+    object_find(a1, (int)object_find_type_cb);
     return *(int *)D_00195AF4;
 }
 
-void func_0008E7AE(int a1)
+void object_count_type_cb(int a1)
 {
     if ((short)((unsigned short)(unsigned char)*(signed char *)((char *)a1)) != *(short *)D_001A9B42) return;
     (*(short *)D_001A9B3C)++;
 }
 
-int func_0008E828(int a1, int a2, int a3, int a4, int a5)
+int object_create_in_block(int a1, int a2, int a3, int a4, int a5)
 {
     int l_10;
 
     if (a1 == 0) goto L8E857;
-    l_10 = func_0008DCE3(a1, 0, a3);
+    l_10 = object_create_child(a1, 0, a3);
     goto L8E866;
 L8E857:;
-    l_10 = func_0008DB21(0, 0, a3);
+    l_10 = object_alloc(0, 0, a3);
 L8E866:;
     *(signed char *)((char *)l_10) = *(signed char *)&a2;
     *(short *)((char *)l_10 + 27) = a4;
     *(short *)((char *)l_10 + 19) = a5;
-    *(int *)((char *)l_10 + 31) = *(int *)(*(char **)D_00195AC4 + 31) + ((int)(unsigned short)(*(short *)(*(char **)D_00195BDC + 37))++);
+    *(int *)((char *)l_10 + 31) = *(int *)(*(char **)D_00195AC4 + 31) + ((int)(unsigned short)(*(short *)(*(char **)current_location + 37))++);
     if (*(int *)((char *)l_10 + 31) != (-1016397758)) goto L8E8D7;
     func_000A1023((int)D_001A9B44, l_10, 71, (int)D_00176E44, 634, 4);
     *(int *)D_001A9B0C = l_10;
@@ -585,7 +585,7 @@ L8E8D7:;
     return l_10;
 }
 
-int func_0008E8E9(int a1)
+int object_find_by_id_cb(int a1)
 {
     if (*(int *)((char *)a1 + 31) != *(int *)D_001A9B18) goto L8E910;
     *(int *)D_001A9B14 = a1;
@@ -593,27 +593,27 @@ L8E910:;
     return *(int *)D_001A9B14;
 }
 
-int func_0008E925(int a1, int a2)
+int object_find_by_id(int a1, int a2)
 {
     *(int *)D_001A9B18 = a2;
     *(int *)D_001A9B14 = 0;
     if (a1 != 0) goto L8E99F;
-    func_0008E3F7(*(int *)D_00195AC4, (int)func_0008E8E9);
+    object_foreach(*(int *)D_00195AC4, (int)object_find_by_id_cb);
     *(int *)D_00199770 = *(int *)D_001A9B14;
     if (*(int *)D_001A9B14 == 0) goto L8E97C;
     return *(int *)D_001A9B14;
 L8E97C:;
-    func_0008E3F7(*(int *)D_001959A8, (int)func_0008E8E9);
+    object_foreach(*(int *)nonworld_root, (int)object_find_by_id_cb);
     *(int *)D_00199770 = *(int *)D_001A9B14;
     return *(int *)D_001A9B14;
 L8E99F:;
-    func_0008E55F(a1, (int)func_0008E8E9);
+    object_find(a1, (int)object_find_by_id_cb);
     return *(int *)D_001A9B14;
 }
 
-int func_0008E9C0(int a1)
+int object_random_type_cb(int a1)
 {
-    if (*(unsigned char *)((char *)a1) == *(signed char *)D_00190CE4) goto L8E9EC;
+    if (*(unsigned char *)((char *)a1) == *(signed char *)itemmaker_slot_kinds) goto L8E9EC;
     return 0;
 L8E9EC:;
     if (*(int *)D_00190BE4 != 0) goto L8EA06;
@@ -624,15 +624,15 @@ L8EA06:;
     return 0;
 }
 
-int func_0008EA20(int a1, int a2)
+int object_random_child_of_type(int a1, int a2)
 {
-    if ((*(int *)D_00190BE4 = func_0008E7E0(*(int *)((char *)a1 + 63), (int)(short)*(short *)&a2)) != 0) goto L8EA59;
+    if ((*(int *)D_00190BE4 = object_count_type(*(int *)((char *)a1 + 63), (int)(short)*(short *)&a2)) != 0) goto L8EA59;
     return 0;
 L8EA59:;
     *(int *)D_00195AF4 = 0;
     *(int *)D_00190BE4 = func_0009DC25() % *(int *)D_00190BE4;
-    *(signed char *)D_00190CE4 = *(signed char *)&a2;
-    func_0008E55F(*(int *)((char *)a1 + 63), (int)func_0008E9C0);
+    *(signed char *)itemmaker_slot_kinds = *(signed char *)&a2;
+    object_find(*(int *)((char *)a1 + 63), (int)object_random_type_cb);
     return *(int *)D_00195AF4;
 }
 
@@ -642,13 +642,13 @@ void func_0008EAA7(int a1)
     if (*(int *)((char *)a1 + 51) == 0) goto L8EADF;
     *(int *)(*(char **)((char *)a1 + 51) + 51) = 0;
 L8EADF:;
-    func_0008DA4D(a1);
+    object_free_single(a1);
 }
 
 void func_0008EAF1(int a1, int a2)
 {
     *(int *)D_001A9B10 = a2 & -65536;
-    func_0008E3A7(a1, (int)func_0008EAA7);
+    object_foreach_post(a1, (int)func_0008EAA7);
 }
 
 void func_0008EB25(int a1)
@@ -661,11 +661,11 @@ void func_0008EB25(int a1)
 
 void func_0008EB52(void)
 {
-    func_0008E357(*(int *)D_00195AC4, (int)func_0008EB25);
-    func_0008E357(*(int *)D_001959A8, (int)func_0008EB25);
+    object_foreach_pre(*(int *)D_00195AC4, (int)func_0008EB25);
+    object_foreach_pre(*(int *)nonworld_root, (int)func_0008EB25);
 }
 
-int func_0008EB88(int a1)
+int object_new_id(int a1)
 {
     int l_1C;
 
@@ -673,19 +673,19 @@ int func_0008EB88(int a1)
     *(int *)D_00187FDC = 10000;
 L8EBAF:;
     l_1C = (a1 << 16) + (*(int *)D_00187FDC)++;
-    if (func_0008E925(*(int *)D_00195AC4, l_1C) != 0) goto L8EBE8;
-    if (func_0008E925(*(int *)D_001959A8, l_1C) == 0) goto L8EBEA;
+    if (object_find_by_id(*(int *)D_00195AC4, l_1C) != 0) goto L8EBE8;
+    if (object_find_by_id(*(int *)nonworld_root, l_1C) == 0) goto L8EBEA;
 L8EBE8:;
     goto L8EBAF;
 L8EBEA:;
     return l_1C;
 }
 
-void func_0008EBFD(int a1)
+void object_delete_quest_cb(int a1)
 {
     int l_18;
 
-    if (*(unsigned char *)((char *)a1 + 38) != *(signed char *)D_00190CE4) return;
+    if (*(unsigned char *)((char *)a1 + 38) != *(signed char *)itemmaker_slot_kinds) return;
     if (((int)(unsigned char)*(signed char *)((char *)a1)) != 8) goto L8EC65;
     if (((int)(unsigned char)(*(signed char *)((char *)a1 + 73) & 128)) == 0) goto L8EC65;
     *(int *)(*(char **)((char *)a1 + 51) + 51) = 0;
@@ -693,7 +693,7 @@ void func_0008EBFD(int a1)
     *(signed char *)((char *)a1 + 38) = 0;
     return;
 L8EC65:;
-    if (*(int *)D_00196A8C == 0) goto L8EC86;
+    if (*(int *)loaded_location_door_count == 0) goto L8EC86;
     if ((*(int *)((char *)a1 + 31) & -65536) == (*(int *)(*(char **)D_00195AC4 + 31) & -65536)) goto L8EC88;
 L8EC86:;
     goto L8ECA3;
@@ -703,68 +703,68 @@ L8EC88:;
     *(signed char *)((char *)l_18 + 3) &= 15;
 L8ECA3:;
     func_000298F3(a1);
-    func_0008DA91(a1);
+    object_delete(a1);
 }
 
-void func_0008ECBD(int a1, unsigned char a2)
+void object_delete_quest_objects(int a1, unsigned char a2)
 {
-    *(signed char *)D_00190CE4 = a2;
-    func_0008E3A7(a1, (int)func_0008EBFD);
+    *(signed char *)itemmaker_slot_kinds = a2;
+    object_foreach_post(a1, (int)object_delete_quest_cb);
 }
 
-void func_0008ECEE(int a1)
+void object_tree_size_cb(int a1)
 {
     *(int *)D_00190BE4 += *(int *)((char *)a1 - 6);
 }
 
-int func_0008ED15(int a1)
+int object_tree_size(int a1)
 {
     *(int *)D_00190BE4 = 0;
-    func_0008E3F7(a1, (int)func_0008ECEE);
+    object_foreach(a1, (int)object_tree_size_cb);
     return *(int *)D_00190BE4;
 }
 
 void func_0008ED52(int a1)
 {
-    if (*(unsigned char *)((char *)a1) != *(signed char *)D_00190CE4) return;
-    func_0008DA91(a1);
+    if (*(unsigned char *)((char *)a1) != *(signed char *)itemmaker_slot_kinds) return;
+    object_delete(a1);
 }
 
 void func_0008ED87(int a1, unsigned char a2)
 {
-    *(signed char *)D_00190CE4 = a2;
-    func_0008E3A7(a1, (int)func_0008ED52);
+    *(signed char *)itemmaker_slot_kinds = a2;
+    object_foreach_post(a1, (int)func_0008ED52);
 }
 
-int func_0008EDB8(int a1)
+int object_find_quest_cb(int a1)
 {
-    if (*(unsigned char *)((char *)a1 + 38) != *(signed char *)D_00190CE4) goto L8EDEE;
+    if (*(unsigned char *)((char *)a1 + 38) != *(signed char *)itemmaker_slot_kinds) goto L8EDEE;
     return (*(int *)D_00195AF4 = a1);
 L8EDEE:;
     return 0;
 }
 
-int func_0008EE02(int a1, unsigned char a2)
+int object_find_quest(int a1, unsigned char a2)
 {
-    *(signed char *)D_00190CE4 = a2;
+    *(signed char *)itemmaker_slot_kinds = a2;
     *(int *)D_00195AF4 = 0;
-    func_0008E55F(a1, (int)func_0008EDB8);
+    object_find(a1, (int)object_find_quest_cb);
     return *(int *)D_00195AF4;
 }
 
-int func_0008EE48(void)
+int potionmaker_scroll_up(void)
 {
-    if (*(int *)D_001AA3DC == 0) goto L8EE66;
-    *(int *)D_001AA3DC -= 3;
+    if (*(int *)potion_ingredient_scroll == 0) goto L8EE66;
+    *(int *)potion_ingredient_scroll -= 3;
 L8EE66:;
     return 0;
 }
 
-int func_0008EE7A(void)
+int potionmaker_scroll_down(void)
 {
-    if ((*(int *)D_001AA3E4 - *(int *)D_001AA3DC) > 12) goto L8EEA1;
+    if ((*(int *)potion_ingredient_count - *(int *)potion_ingredient_scroll) > 12) goto L8EEA1;
     return 0;
 L8EEA1:;
-    *(int *)D_001AA3DC += 3;
+    *(int *)potion_ingredient_scroll += 3;
     return 0;
 }

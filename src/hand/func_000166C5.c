@@ -1,26 +1,26 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x000166C5 */
-extern char D_001789FA[];
+extern char player_environment[];
 extern char D_00190D11[];
 extern char D_00195A90[];
 extern char D_00195A94[];
-extern char D_00195AA4[];
+extern char player_object[];
 extern char D_00195AC4[];
 extern char D_00195D28[];
 extern char D_00196488[];
-extern char D_0019657C[];
-extern char D_00196590[];
+extern char talk_topics[];
+extern char talk_npc_own_faction[];
 extern char D_001965DC[];
-extern char D_001965E8[];
-extern char D_001966B1[];
-extern char D_001966B4[];
-extern int func_00017DE3(int);
-extern void func_000287BD(char *, int);
-extern int func_0007D6AE(int, int);
-extern char *func_0008E925(int, int);
+extern char talk_selected_row[];
+extern char talk_topic_tab[];
+extern char talk_news_asked[];
+extern int talk_find_regional(int);
+extern void town_map_note_building(char *, int);
+extern int rand_range(int, int);
+extern char *object_find_by_id(int, int);
 extern int func_000C7FD9();
 
 
-int func_000166C5(int a1)
+int talk_hint_text_id(int a1)
 {
     int l_38;
     int l_34;
@@ -32,36 +32,36 @@ int func_000166C5(int a1)
     char *l_1C;
 
     l_38 = 0;
-    if (*(unsigned char *)D_001966B1 == 3) {}
+    if (*(unsigned char *)talk_topic_tab == 3) {}
     if (*(int *)D_001965DC == 2) {
         if (*(short *)(*(char **)D_00195D28 + 4) == 0) {
             if (*(int *)(*(char **)D_00195D28 + 18) == 0) {
-                if (func_00017DE3(*(unsigned char *)(D_00196488 + *(int *)D_001965E8)) != 0)
+                if (talk_find_regional(*(unsigned char *)(D_00196488 + *(int *)talk_selected_row)) != 0)
                     return 10;
                 return 11;
             }
-            l_1C = func_0008E925(*(int *)D_00195AC4, *(int *)(*(char **)(*(char **)D_00195D28 + 18) + 20));
+            l_1C = object_find_by_id(*(int *)D_00195AC4, *(int *)(*(char **)(*(char **)D_00195D28 + 18) + 20));
             *(int *)D_00195A90 = *(int *)(l_1C + 7);
             *(int *)D_00195A94 = *(int *)(l_1C + 15);
-            if (*(unsigned char *)D_001789FA == 1 && (func_000C7FD9(*(int *)(l_1C + 7), *(int *)(l_1C + 15), *(int *)(*(char **)D_00195AA4 + 7), *(int *)(*(char **)D_00195AA4 + 15)) < 2048 || func_0007D6AE(1, 100) <= 25)) {
-                func_000287BD(l_1C, *(int *)(*(char **)D_00195D28 + 18));
+            if (*(unsigned char *)player_environment == 1 && (func_000C7FD9(*(int *)(l_1C + 7), *(int *)(l_1C + 15), *(int *)(*(char **)player_object + 7), *(int *)(*(char **)player_object + 15)) < 2048 || rand_range(1, 100) <= 25)) {
+                town_map_note_building(l_1C, *(int *)(*(char **)D_00195D28 + 18));
                 return 7332;
             }
             return 7333;
         }
     } else {
-        if (*(unsigned short *)(*(char **)D_00196590 + 33) != 806 && *(unsigned short *)(*(char **)D_00196590 + 33) != 842)
-            *(char *)D_001966B4 = 1;
-        if ((*(short **)D_0019657C)[*(int *)D_001965E8 * 3 + 2] != 0) {
-            *(char *)D_00190D11 = (*(short **)D_0019657C)[*(int *)D_001965E8 * 3 + 2];
+        if (*(unsigned short *)(*(char **)talk_npc_own_faction + 33) != 806 && *(unsigned short *)(*(char **)talk_npc_own_faction + 33) != 842)
+            *(char *)talk_news_asked = 1;
+        if ((*(short **)talk_topics)[*(int *)talk_selected_row * 3 + 2] != 0) {
+            *(char *)D_00190D11 = (*(short **)talk_topics)[*(int *)talk_selected_row * 3 + 2];
             l_30 = 32768;
         } else
             l_30 = 0;
-        if (a1 != 0 && (*(short **)D_0019657C)[*(int *)D_001965E8 * 3 + 1] != 0)
-            return l_30 | (*(short **)D_0019657C)[*(int *)D_001965E8 * 3 + 1];
-        if ((*(short **)D_0019657C)[*(int *)D_001965E8 * 3] != 0)
-            return l_30 | (*(short **)D_0019657C)[*(int *)D_001965E8 * 3];
-        return l_30 | (*(short **)D_0019657C)[*(int *)D_001965E8 * 3 + 1];
+        if (a1 != 0 && (*(short **)talk_topics)[*(int *)talk_selected_row * 3 + 1] != 0)
+            return l_30 | (*(short **)talk_topics)[*(int *)talk_selected_row * 3 + 1];
+        if ((*(short **)talk_topics)[*(int *)talk_selected_row * 3] != 0)
+            return l_30 | (*(short **)talk_topics)[*(int *)talk_selected_row * 3];
+        return l_30 | (*(short **)talk_topics)[*(int *)talk_selected_row * 3 + 1];
     }
     return 100;
 }

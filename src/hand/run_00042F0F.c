@@ -23,103 +23,103 @@ struct obj {
     int y;                      /* 0x0b */
     int z;                      /* 0x0f */
 };
-extern unsigned char D_0012AC00;
-extern short D_0012AC04;
-extern short D_0012AC06;
+extern unsigned char mouse_buttons;
+extern short mouse_x;
+extern short mouse_y;
 extern unsigned char D_0012B508;
 extern unsigned char D_00142314;
 extern unsigned char D_00142315;
-extern unsigned char D_00142325;
-extern unsigned char D_00142332;
-extern unsigned char D_00142335;
-extern unsigned char D_00142338;
-extern unsigned char D_00142340;
+extern unsigned char key_down_ctrl;
+extern unsigned char key_down_lshift;
+extern unsigned char key_down_x;
+extern unsigned char key_down_b;
+extern unsigned char key_down_alt;
 extern char D_00170E38[];        /* __FILE__ */
 extern char D_00170E3F[];
-extern unsigned char D_001789FA;
+extern unsigned char player_environment;
 extern char *D_0018323C;
 extern char *D_00183240;
 extern char *D_00183244;
 extern char *D_00184876;
 extern short D_00187CA9;
-extern char D_001903A4[];
+extern char text_buffer[];
 extern struct bits8 D_001940D5;
 extern struct bits8 D_001940D6;
 extern struct bits8 D_001940D9;
 extern struct bits8 D_001940DA;
-extern unsigned char D_001940DB;
+extern unsigned char player_motion_flags;
 extern int D_001950E4;
 extern int D_001950E8;
-extern int D_001959B8;
+extern int view_look_pitch;
 extern int D_001959BC;
 extern int D_001959C0;
-extern struct obj *D_00195A98;
-extern struct obj *D_00195AA4;
+extern struct obj *camera_object;
+extern struct obj *player_object;
 extern char *D_00195AC4;
-extern int D_00195AE8;
-extern char *D_00195B40;
-extern char *D_00195B48;
-extern struct pc *D_00195BE0;
+extern int cheat_flags;
+extern char *spell_ready_missile;
+extern char *spell_ready_touch;
+extern struct pc *player_character;
 extern int D_00195D60;
-extern unsigned char D_00195E7A;
-extern unsigned char D_00195E7F;
+extern unsigned char mouse_control_mode;
+extern unsigned char view_cursor_active;
 extern short D_00195F2E;
 extern short D_00195F52;
 extern short D_00195F54;
 extern short D_00195F62;
-extern unsigned char D_0019626A;
+extern unsigned char weapon_active_hand;
 extern unsigned char D_00196272;
-extern unsigned char D_00196274;
-extern unsigned char D_00196276;
-extern unsigned char D_0019627D;
+extern unsigned char game_mode;
+extern unsigned char interaction_mode;
+extern unsigned char in_dungeon_water;
 extern unsigned char D_001962A0;
 extern int D_00199700;
 extern int D_001A4A70;
 extern int D_001A4A74;
-extern unsigned char D_001A5C27;
-extern void func_00026904(void);
-extern void func_0003A2AD(char *, int);
-extern void func_00042E24(int);
-extern int func_00042F0F(int);
-extern int func_000430CD(int);
-extern void func_000438DF(void);
-extern void func_00045F25(void);
-extern void func_00045F8F(void);
-extern void func_0004FF57(int);
-extern int func_0005B24C(void);
-extern void func_0005D486(void);
-extern void func_0005D74A(void);
-extern void func_000717EC(void);
-extern void func_000784EE(void);
-extern void func_0007B222(int);
-extern int func_0007CBA1(char *);
-extern int func_0007D068(unsigned char);
-extern void func_0008DA91(char *);
-extern void func_0008DEB4(struct obj *, int, int, int, int, int, int);
-extern void func_00098651(void);
-extern struct obj *func_0009A0A0(char *, int, int);
-extern int func_0009A993(int);
+extern unsigned char cheat_mode;
+extern void automap_open(void);
+extern void spell_add_skill_uses(char *, int);
+extern void interaction_mode_cycle(int);
+extern int key_action_held(int);
+extern int key_action_pressed(int);
+extern void options_toggle_full_screen(void);
+extern void cheat_raise_reputation(void);
+extern void cheat_raise_skills(void);
+extern void game_exit(int);
+extern int cast_recast_last(void);
+extern void hud_toggle_weapon(void);
+extern void magic_items_open(void);
+extern void rest_open(void);
+extern void cheat_return_to_last_position(void);
+extern void saveload_menu(int);
+extern int hud_message_add(char *);
+extern int key_pressed_once(unsigned char);
+extern void object_delete(char *);
+extern void object_set_position(struct obj *, int, int, int, int, int, int);
+extern void transport_menu(void);
+extern struct obj *marker_find_nth(char *, int, int);
+extern int travel_map_open(int);
 extern void func_0012B49E(short, short);
 extern void func_00135E90(void);
 #pragma aux func_000A0ED9 parm routine [];
 extern void func_000A0ED9(int, char *);
 extern int func_000A0F5C(char *, char *, ...);
-extern short D_001A5B24;
-extern short D_001A5B26;
-extern short D_001A5B2C;
-extern short D_001A5B2E;
+extern short steer_weight_down;
+extern short steer_weight_right;
+extern short steer_weight_left;
+extern short steer_weight_up;
 extern char *D_0017D1CA[];
 extern char *D_0017D1EE;
-extern unsigned char D_00142308[];
+extern unsigned char key_down[];
 extern int D_00152A20;
 extern int D_00152A24;
 extern unsigned char D_00152A30;
 extern unsigned char D_00152A31;
-extern unsigned char D_00195EB0[];
-extern void func_0007CB4F(char *);
+extern unsigned char key_map[];
+extern void hud_status_set(char *);
 extern void func_00042E8C(int);
 
-void func_000425F2(void)
+void keys_world_actions(void)
 {
     int u30;
     int u2c;
@@ -129,91 +129,91 @@ void func_000425F2(void)
     int u1c;
     int view;
 
-    if (D_00142325 && D_00142335 && D_00142332)
-        func_0004FF57(0);
-    if (D_00142325 && D_00142338)
-        func_0007B222(1);
+    if (key_down_ctrl && key_down_x && key_down_lshift)
+        game_exit(0);
+    if (key_down_ctrl && key_down_b)
+        saveload_menu(1);
     if (D_00196272)
         return;
-    if (D_00196274)
+    if (game_mode)
         return;
-    if (D_00142340 && func_0007D068(87))
-        func_000784EE();
-    if (func_000430CD(29)) {
+    if (key_down_alt && key_pressed_once(87))
+        cheat_return_to_last_position();
+    if (key_action_pressed(29)) {
         if (D_00195D60 == 0)
-            func_0005B24C();
+            cast_recast_last();
         else
-            func_0007CBA1(D_00184876);
+            hud_message_add(D_00184876);
     }
-    if (func_00042F0F(27))
-        func_0009A993(1);
-    if (func_00042F0F(26))
-        func_00026904();
-    if (func_00042F0F(30))
-        if (D_00195B40 || D_00195B48) {
-            D_00195BE0->f141 += D_00195F62;
-            if (D_00195BE0->f141 > D_00195BE0->f143)
-                D_00195BE0->f141 = D_00195BE0->f143;
-            if (D_00195B40) {
-                func_0003A2AD(D_00195B40 + 71, -1);
-                func_0008DA91(D_00195B40);
+    if (key_action_held(27))
+        travel_map_open(1);
+    if (key_action_held(26))
+        automap_open();
+    if (key_action_held(30))
+        if (spell_ready_missile || spell_ready_touch) {
+            player_character->f141 += D_00195F62;
+            if (player_character->f141 > player_character->f143)
+                player_character->f141 = player_character->f143;
+            if (spell_ready_missile) {
+                spell_add_skill_uses(spell_ready_missile + 71, -1);
+                object_delete(spell_ready_missile);
             } else {
-                func_0003A2AD(D_00195B40 + 71, -1);
-                func_0008DA91(D_00195B48);
+                spell_add_skill_uses(spell_ready_missile + 71, -1);
+                object_delete(spell_ready_touch);
             }
-            D_00195B40 = D_00195B48 = 0;
+            spell_ready_missile = spell_ready_touch = 0;
         }
-    if (func_000430CD(32))
-        func_0005D486();
-    if (func_000430CD(12))
-        func_000717EC();
-    if (func_000430CD(34) && D_001940D6.b6 && (D_001A4A70 | D_001A4A74) == 0) {
-        o = (struct obj *)D_00195BE0->equip[(D_0019626A ^ 1) ? 21 : 19];
+    if (key_action_pressed(32))
+        hud_toggle_weapon();
+    if (key_action_pressed(12))
+        rest_open();
+    if (key_action_pressed(34) && D_001940D6.b6 && (D_001A4A70 | D_001A4A74) == 0) {
+        o = (struct obj *)player_character->equip[(weapon_active_hand ^ 1) ? 21 : 19];
         if (o == 0 || ((struct item *)o)->type == 3) {
-            D_0019626A ^= 1;
+            weapon_active_hand ^= 1;
             func_000A0ED9(96, D_00170E38);
-            func_000A0F5C(D_001903A4, D_0018323C, D_0019626A ? D_00183240 : D_00183244);
+            func_000A0F5C(text_buffer, D_0018323C, weapon_active_hand ? D_00183240 : D_00183244);
             D_00195F2E = 20;
             D_0012B508 = 146;
-            func_0007CBA1(D_001903A4);
+            hud_message_add(text_buffer);
         }
     }
-    if (func_0007D068(68))
-        func_000438DF();
-    view = D_00196276;
-    if (func_00042F0F(14))
-        D_00196276 = 2;
-    if (func_00042F0F(15))
-        D_00196276 = 0;
-    if (func_00042F0F(16))
-        D_00196276 = 1;
-    if (func_00042F0F(17))
-        D_00196276 = 3;
-    if (D_00196276 != view)
-        func_00042E24(0);
-    if (func_00042F0F(11) && (D_00195BE0->flags & 1536) == 0 && !D_0019627D && !D_001962A0)
+    if (key_pressed_once(68))
+        options_toggle_full_screen();
+    view = interaction_mode;
+    if (key_action_held(14))
+        interaction_mode = 2;
+    if (key_action_held(15))
+        interaction_mode = 0;
+    if (key_action_held(16))
+        interaction_mode = 1;
+    if (key_action_held(17))
+        interaction_mode = 3;
+    if (interaction_mode != view)
+        interaction_mode_cycle(0);
+    if (key_action_held(11) && (player_character->flags & 1536) == 0 && !in_dungeon_water && !D_001962A0)
         D_001940D9.b4 = 1;
     else
         D_001940D9.b4 = 0;
-    if (func_00042F0F(31))
-        func_0005D74A();
-    if (func_000430CD(19))
-        D_00195E7F ^= 1;
-    if (func_00042F0F(13))
-        func_00098651();
-    if (func_0007D068(2) && D_001A5C27)
+    if (key_action_held(31))
+        magic_items_open();
+    if (key_action_pressed(19))
+        view_cursor_active ^= 1;
+    if (key_action_held(13))
+        transport_menu();
+    if (key_pressed_once(2) && cheat_mode)
         D_00187CA9 ^= 1300;
-    if (D_00195E7A == 0) {
-        if (func_000430CD(22) || D_001940DA.b6 && (D_0012AC00 & 1)) {
-            D_001959B8 = 32;
+    if (mouse_control_mode == 0) {
+        if (key_action_pressed(22) || D_001940DA.b6 && (mouse_buttons & 1)) {
+            view_look_pitch = 32;
             D_001959BC = 0;
             D_001959C0 = 0;
-            D_00195AA4->f1 = D_00195A98->f1 = 0;
+            player_object->f1 = camera_object->f1 = 0;
         }
-        if (func_00042F0F(23)) {
+        if (key_action_held(23)) {
             if (!D_001940DA.b6) {
-                D_00195F54 = D_0012AC04;
-                D_00195F52 = D_0012AC06;
+                D_00195F54 = mouse_x;
+                D_00195F52 = mouse_y;
             }
             D_001940DA.b6 = 1;
         } else {
@@ -222,54 +222,54 @@ void func_000425F2(void)
             D_001940DA.b6 = 0;
         }
     } else {
-        D_001959B8 = 0;
+        view_look_pitch = 0;
         D_001959BC = 0;
         D_001959C0 = 0;
     }
-    if (func_00042F0F(20))
-        D_001959B8 -= 32;
-    else if (func_00042F0F(21))
-        D_001959B8 += 32;
-    if (D_001959B8 < -256)
-        D_001959B8 = -256;
-    else if (D_001959B8 > 256)
-        D_001959B8 = 256;
-    if ((D_00195BE0->flags & 1536) == 0 && func_000430CD(9) && !D_001962A0)
-        D_001940DB ^= 4;
-    saved = D_00195AE8;
-    if (D_00142325 && func_0007D068(59))
-        D_00195AE8 ^= 8;
-    if (D_00142325 && func_0007D068(62) && D_001A5C27)
-        D_00195AE8 ^= 64;
-    if (D_00142325 && func_0007D068(67) && D_001A5C27)
-        D_00195BE0->gold += 5000;
-    if (D_00195AE8 != saved)
-        func_0007CBA1(D_00170E3F);
-    if (D_00142314 && D_001A5C27)
-        func_00045F25();
-    if (D_00142315 && D_001A5C27)
-        func_00045F8F();
-    if (func_0007D068(26) && D_001789FA == 3 && D_001A5C27) {
+    if (key_action_held(20))
+        view_look_pitch -= 32;
+    else if (key_action_held(21))
+        view_look_pitch += 32;
+    if (view_look_pitch < -256)
+        view_look_pitch = -256;
+    else if (view_look_pitch > 256)
+        view_look_pitch = 256;
+    if ((player_character->flags & 1536) == 0 && key_action_pressed(9) && !D_001962A0)
+        player_motion_flags ^= 4;
+    saved = cheat_flags;
+    if (key_down_ctrl && key_pressed_once(59))
+        cheat_flags ^= 8;
+    if (key_down_ctrl && key_pressed_once(62) && cheat_mode)
+        cheat_flags ^= 64;
+    if (key_down_ctrl && key_pressed_once(67) && cheat_mode)
+        player_character->gold += 5000;
+    if (cheat_flags != saved)
+        hud_message_add(D_00170E3F);
+    if (D_00142314 && cheat_mode)
+        cheat_raise_reputation();
+    if (D_00142315 && cheat_mode)
+        cheat_raise_skills();
+    if (key_pressed_once(26) && player_environment == 3 && cheat_mode) {
         D_00199700 = --D_00199700 % (D_001950E4 + D_001950E8);
         if (D_00199700 < 0)
             D_00199700 = D_001950E4 + D_001950E8 - 1;
         if (D_00199700 < D_001950E4)
-            o = func_0009A0A0(D_00195AC4, 9, D_00199700);
+            o = marker_find_nth(D_00195AC4, 9, D_00199700);
         else
-            o = func_0009A0A0(D_00195AC4, 16, D_00199700 - D_001950E4);
-        func_0008DEB4(D_00195AA4, o->x, o->y, o->z, o->f1, o->f3, o->f5);
-        D_00195A98->f3 = D_00195AA4->f3;
+            o = marker_find_nth(D_00195AC4, 16, D_00199700 - D_001950E4);
+        object_set_position(player_object, o->x, o->y, o->z, o->f1, o->f3, o->f5);
+        camera_object->f3 = player_object->f3;
         func_00135E90();
         D_001940D5.b1 = 1;
     }
-    if (func_0007D068(27) && D_001789FA == 3 && D_001A5C27) {
+    if (key_pressed_once(27) && player_environment == 3 && cheat_mode) {
         D_00199700 = ++D_00199700 % (D_001950E4 + D_001950E8);
         if (D_00199700 < D_001950E4)
-            o = func_0009A0A0(D_00195AC4, 9, D_00199700);
+            o = marker_find_nth(D_00195AC4, 9, D_00199700);
         else
-            o = func_0009A0A0(D_00195AC4, 16, D_00199700 - D_001950E4);
-        func_0008DEB4(D_00195AA4, o->x, o->y, o->z, o->f1, o->f3, o->f5);
-        D_00195A98->f3 = D_00195AA4->f3;
+            o = marker_find_nth(D_00195AC4, 16, D_00199700 - D_001950E4);
+        object_set_position(player_object, o->x, o->y, o->z, o->f1, o->f3, o->f5);
+        camera_object->f3 = player_object->f3;
         func_00135E90();
         D_001940D5.b1 = 1;
     }
@@ -279,36 +279,36 @@ void func_00042E0C(void)
 {
 }
 
-void func_00042E24(int a1)
+void interaction_mode_cycle(int a1)
 {
-    D_00196276 = (D_00196276 + a1) & 3;
+    interaction_mode = (interaction_mode + a1) & 3;
     func_000A0ED9(231, D_00170E38);
-    func_000A0F5C(D_001903A4, D_0017D1EE, D_0017D1CA[D_00196276]);
-    func_0007CB4F(D_001903A4);
+    func_000A0F5C(text_buffer, D_0017D1EE, D_0017D1CA[interaction_mode]);
+    hud_status_set(text_buffer);
 }
 
 void func_00042E8C(int a1)
 {
-    D_001A5B26 = (a1 << 8) / 4096;
-    D_001A5B24 = (a1 << 8) / 4096;
-    D_001A5B2C = (-a1 << 8) / 4096;
-    D_001A5B2E = (-a1 << 8) / 4096;
+    steer_weight_right = (a1 << 8) / 4096;
+    steer_weight_down = (a1 << 8) / 4096;
+    steer_weight_left = (-a1 << 8) / 4096;
+    steer_weight_up = (-a1 << 8) / 4096;
 }
 
-int func_00042F0F(int a1)
+int key_action_held(int a1)
 {
-    if (D_00195EB0[a1] >= 200) {
-        switch ((unsigned char)(D_00195EB0[a1] - 200)) {
+    if (key_map[a1] >= 200) {
+        switch ((unsigned char)(key_map[a1] - 200)) {
         case 0:
             return D_00152A30;
         case 1:
             return D_00152A31;
         case 2:
-            return D_0012AC00 & 1;
+            return mouse_buttons & 1;
         case 3:
-            return D_0012AC00 & 2;
+            return mouse_buttons & 2;
         case 12:
-            return D_0012AC00 & 4;
+            return mouse_buttons & 4;
         case 4:
             func_00042E8C(D_00152A20);
             return D_00152A20 < 0 ? 1 : 0;
@@ -325,5 +325,5 @@ int func_00042F0F(int a1)
             return 0;
         }
     }
-    return D_00142308[D_00195EB0[a1]];
+    return key_down[key_map[a1]];
 }

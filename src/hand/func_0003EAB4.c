@@ -4,16 +4,16 @@ extern char D_00170D55[];
 extern char D_00170DA2[];
 extern char D_00170DA7[];
 extern short D_00178A08;
-extern char D_001903A4[];
-extern char D_00190FE4[];
+extern char text_buffer[];
+extern char text_rsc_buffer[];
 extern char D_00190FEC;
 extern int D_00195D6C;
-extern int D_00199650;
-extern struct save *D_00199764;
-extern int func_0003D412(short, short, short);
-extern void func_0003DCF4(int, int);
-extern void func_0003E942(int);
-extern int func_0006CD6E(char *);
+extern int msgbox_next_page;
+extern struct save *current_quest;
+extern int text_rsc_load(short, short, short);
+extern void msgbox_render(int, int);
+extern void msgbox_show_more_pages(int);
+extern int disk_open_data(char *);
 extern void func_0009DEA7(int);
 extern void func_000A0024(int, char *, int);
 extern void func_000A1023(char *, char *, int, char *, int, int);
@@ -21,30 +21,30 @@ extern void func_000A1023(char *, char *, int, char *, int, int);
 extern void func_000A0ED9(int, char *);
 extern int func_000A0F5C(char *, char *, ...);
 
-int func_0003EAB4(struct save *a1, short a2, int a3, short a4)
+int msgbox_render_quest_text(struct save *a1, short a2, int a3, short a4)
 {
     short saved;
     int h;
     int result;
 
     saved = D_00195D6C;
-    D_00199764 = a1;
+    current_quest = a1;
     if (a1->slot != 0) {
         func_000A0ED9(657, D_00170D55);
-        func_000A0F5C(D_00190FE4, D_00170DA2, a1->slot);
+        func_000A0F5C(text_rsc_buffer, D_00170DA2, a1->slot);
     } else {
-        func_000A1023(D_00190FE4, a1->name, 8, D_00170D55, 659, 2048);
+        func_000A1023(text_rsc_buffer, a1->name, 8, D_00170D55, 659, 2048);
     }
     D_00190FEC = 0;
     func_000A0ED9(662, D_00170D55);
-    func_000A0F5C(D_001903A4, D_00170DA7, D_00190FE4);
-    if ((D_00195D6C = func_0006CD6E(D_001903A4)) > 0) {
-        h = func_0003D412(a2, a4 | 0x8002, D_00178A08);
+    func_000A0F5C(text_buffer, D_00170DA7, text_rsc_buffer);
+    if ((D_00195D6C = disk_open_data(text_buffer)) > 0) {
+        h = text_rsc_load(a2, a4 | 0x8002, D_00178A08);
         if (h == 0)
             return 0;
-        func_0003DCF4(h, a3);
-        if (D_00199650 != 0) {
-            func_0003E942(a3);
+        msgbox_render(h, a3);
+        if (msgbox_next_page != 0) {
+            msgbox_show_more_pages(a3);
             result = 0;
         } else {
             result = 1;

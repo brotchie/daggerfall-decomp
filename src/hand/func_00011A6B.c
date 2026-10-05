@@ -1,6 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x00011A6B */
 #pragma aux sosconv "*" parm caller [] value [eax] modify [eax ebx ecx edx];
-#pragma aux (sosconv) func_00011A6B;
+#pragma aux (sosconv) profile_open;
 struct res {                /* a file loaded whole into memory */
     unsigned char flags0;
     unsigned char flags1;
@@ -26,7 +26,7 @@ extern int func_000A00CB(int, void *, int);
 extern void func_000A0AD9(char *, char *, int, char *, int);
 extern int func_0009DC59(char *, ...);
 
-int func_00011A6B(struct res *r, char *name)
+int profile_open(struct res *r, char *name)
 {
     int fd;
 

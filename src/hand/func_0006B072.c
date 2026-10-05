@@ -4,15 +4,15 @@ struct tab {
     short id[32];
     struct slot s[32];
 };
-extern char *D_001959B0;
+extern char *logbook_object;
 
-void func_0006B072(unsigned char a1, int a2)
+void logbook_remove_entry(unsigned char a1, int a2)
 {
     struct tab *p;
     int i;
     int found;
 
-    p = (struct tab *)(D_001959B0 + 71);
+    p = (struct tab *)(logbook_object + 71);
     found = -1;
     for (i = 0; i < 32; i++) {
         if (a1 == p->id[i]) {

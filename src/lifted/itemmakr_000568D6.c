@@ -12,7 +12,7 @@ extern char D_001998E2[];
 
 extern void func_00057147(short, short, short, short, short, short, short);
 
-void func_000568D6(int a1)
+void itemmaker_set_power_param_cb(int a1)
 {
     short l_18;
 

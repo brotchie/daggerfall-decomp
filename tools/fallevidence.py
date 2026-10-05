@@ -268,12 +268,13 @@ DEF = re.compile(r"^[A-Za-z_][\w \*]*?\b(func_[0-9A-F]{8})\s*\(([^;]*)$")
 
 def static():
     """{va: {"calls": set, "globals": set}} from every C file of the game."""
+    import names as namesmod
     out = {}
     files = glob.glob(os.path.join(ROOT, "src", "*.c")) + glob.glob(os.path.join(ROOT, "src", "lifted", "*.c")) + \
         glob.glob(os.path.join(ROOT, "src", "hand", "*.c"))
     for p in files:
         cur = None
-        for line in open(p, errors="replace"):
+        for line in namesmod.canonical(open(p, errors="replace").read()).splitlines(True):
             m = DEF.match(line)
             if m and not line.startswith("extern"):
                 cur = int(m.group(1)[5:], 16)

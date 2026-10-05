@@ -15,16 +15,16 @@ struct thing {
 extern char D_00176884[];        /* __FILE__ */
 extern char D_0017688F[];
 extern struct thing *D_00195C44;
-extern int D_001A4A0C;
-extern void func_00050069(struct thing *);
-extern void func_0007A325(struct thing *);
+extern int save_file_handle;
+extern void fatal_error(struct thing *);
+extern void save_unlink_character(struct thing *);
 extern int func_000A0B42(int, void *, int);
 extern void func_000A1023(void *, void *, int, char *, int, int);
 #pragma aux func_000A0ED9 parm routine [];
 extern void func_000A0ED9(int, char *);
 extern int func_000A0F5C(void *, char *, ...);
 
-int func_00079A6E(struct thing *a1)
+int savetree_write_record(struct thing *a1)
 {
     struct thing *buf;
     int len;
@@ -36,9 +36,9 @@ int func_00079A6E(struct thing *a1)
     if (len == 0) {
         func_000A0ED9(84, D_00176884);
         func_000A0F5C(D_00195C44, D_0017688F);
-        func_00050069(D_00195C44);
+        fatal_error(D_00195C44);
     }
-    func_000A0B42(D_001A4A0C, &len, 4);
+    func_000A0B42(save_file_handle, &len, 4);
     func_000A1023(buf, a1, len, D_00176884, 90, 4);
     if (buf->f51 != 0) {
         if (buf->f38 != 0)
@@ -50,7 +50,7 @@ int func_00079A6E(struct thing *a1)
     case 3:
     case 18:
     case 44:
-        func_0007A325(buf);
+        save_unlink_character(buf);
         break;
     case 9:
         if (a1->f67->type == 3 || a1->f67->type == 18)
@@ -61,5 +61,5 @@ int func_00079A6E(struct thing *a1)
         *(int *)&buf->f67 = a1->f67->type;
         buf->f39 = a1->f67->id;
     }
-    return func_000A0B42(D_001A4A0C, buf, len) != len ? 1 : 0;
+    return func_000A0B42(save_file_handle, buf, len) != len ? 1 : 0;
 }

@@ -31,6 +31,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import assets  # noqa: E402
+import names  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(ROOT, "build", "assets")
@@ -88,7 +89,7 @@ def functions():
     """{va: (parameter names, [(callee va, [argument text])])} for every function in src/."""
     out = {}
     for p in sorted(glob.glob(os.path.join(ROOT, "src", "**", "*.c"), recursive=True)):
-        text = _clean(open(p, errors="replace").read())
+        text = _clean(names.canonical(open(p, errors="replace").read()))
         defs = []
         for m in DEF.finditer(text):
             o = m.end() - 1

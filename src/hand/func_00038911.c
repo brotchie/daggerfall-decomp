@@ -12,125 +12,125 @@ struct P {
 struct Box { short x0; short y0; short x1; short y1; void (*fn)(); };
 struct E6 { short s; char pad[4]; };
 struct C { char pad[0x9d]; struct E6 e[1]; };
-extern unsigned char D_0012AC00;
-extern short D_0012AC04;
-extern short D_0012AC06;
-extern struct P *D_00178A0A;
-extern unsigned char D_0017A84C[];
-extern unsigned char D_0017B202[];
-extern struct Box D_0017B317[];
-extern unsigned char D_00185C34[];
-extern char D_001903A4[];
+extern unsigned char mouse_buttons;
+extern short mouse_x;
+extern short mouse_y;
+extern struct P *selected_spell;
+extern unsigned char spell_effect_school[];
+extern unsigned char spell_effect_cost_formula[];
+extern struct Box spellmaker_setting_buttons[];
+extern unsigned char magic_school_skills[];
+extern char text_buffer[];
 extern unsigned char D_001940D5;
-extern struct C *D_00195BE0;
-extern short D_00195F30;
+extern struct C *player_character;
+extern short spell_effect_slot;
 extern short D_00195F34;
 extern short D_00195F52;
 extern short D_00195F54;
-extern short D_00195F66;
-extern unsigned char D_00196270;
-extern char D_00196274;
-extern unsigned char D_00196279;
-extern int D_00199624;
+extern short mouse_motion_y;
+extern unsigned char msgbox_kind;
+extern char game_mode;
+extern unsigned char mouse_buttons_prev;
+extern int spellmaker_settings_image;
 extern short D_00199628;
 extern short D_0019962A;
-extern unsigned char D_0019962E;
-extern int func_00039224(short);
-extern void func_0003F181(int, int);
-extern void func_0003F358(void);
-extern void func_0007CA1F(char *, short, short, int, unsigned char);
+extern unsigned char spellmaker_settings_kind;
+extern int spell_effect_text_index(short);
+extern void msgbox_open_rsc(int, int);
+extern void msgbox_update(void);
+extern void text_draw_colored(char *, short, short, int, unsigned char);
 extern void func_0007CAEB(short, short, short, short, short, short, short);
 extern int func_0009DEAC();
 extern char *func_000A0DD9(int, char *, int);
-extern int func_000CAE07();
+extern int spell_cost_formula_dispatch();
 extern int func_000CB552();
 extern int func_0012B49E();
 
-void func_00038911(void)
+void spellmaker_settings_update(void)
 {
     int val;
     int r;
     short i;
 
-    if (D_0019962E == 0)
+    if (spellmaker_settings_kind == 0)
         return;
-    if (D_00196270 != 4) {
-        func_0003F181(func_00039224(D_00195F30) + 1500, 4);
-        D_00196274 = 2;
+    if (msgbox_kind != 4) {
+        msgbox_open_rsc(spell_effect_text_index(spell_effect_slot) + 1500, 4);
+        game_mode = 2;
         D_001940D5 |= 64;
         D_00195F34 = 88;
     }
-    if ((int)(unsigned char)(D_0012AC00 & 1) != 0 && D_00196279 != D_0012AC00 && D_0012AC04 > 281
-      && D_0012AC04 < 304 && D_0012AC06 > 94 && D_0012AC06 < 109) {
+    if ((int)(unsigned char)(mouse_buttons & 1) != 0 && mouse_buttons_prev != mouse_buttons && mouse_x > 281
+      && mouse_x < 304 && mouse_y > 94 && mouse_y < 109) {
         D_001940D5 |= 32;
-        func_0003F358();
-        D_0019962E = 0;
+        msgbox_update();
+        spellmaker_settings_kind = 0;
         return;
     }
-    func_000CB552(D_00199624);
-    func_0003F358();
-    if ((int)(unsigned char)(D_0012AC00 & 1) != 0 && D_0012AC00 != D_00196279) {
+    func_000CB552(spellmaker_settings_image);
+    msgbox_update();
+    if ((int)(unsigned char)(mouse_buttons & 1) != 0 && mouse_buttons != mouse_buttons_prev) {
         for (i = 11; i < 33; i++) {
-            if (D_0012AC04 > D_0017B317[i].x0 && D_0012AC04 < D_0017B317[i].x1
-              && D_0012AC06 > D_0017B317[i].y0 && D_0012AC06 < D_0017B317[i].y1) {
+            if (mouse_x > spellmaker_setting_buttons[i].x0 && mouse_x < spellmaker_setting_buttons[i].x1
+              && mouse_y > spellmaker_setting_buttons[i].y0 && mouse_y < spellmaker_setting_buttons[i].y1) {
                 if (i < 22)
-                    D_00195F66 = 1;
+                    mouse_motion_y = 1;
                 else
-                    D_00195F66 = -1;
+                    mouse_motion_y = -1;
                 r = i % 11;
-                if (r < 3 && (int)(unsigned char)(D_0019962E & 1) != 0
-                  || r < 6 && (int)(unsigned char)(D_0019962E & 2) != 0
-                  || (int)(unsigned char)(D_0019962E & 4) != 0)
-                    D_0017B317[i % 11].fn(D_00195F66);
+                if (r < 3 && (int)(unsigned char)(spellmaker_settings_kind & 1) != 0
+                  || r < 6 && (int)(unsigned char)(spellmaker_settings_kind & 2) != 0
+                  || (int)(unsigned char)(spellmaker_settings_kind & 4) != 0)
+                    spellmaker_setting_buttons[i % 11].fn(mouse_motion_y);
                 goto done;
             }
         }
-        D_00195F66 = i = 0;
+        mouse_motion_y = i = 0;
         for (; i < 11; i++) {
-            if (D_0012AC04 > D_0017B317[i].x0 && D_0012AC04 < D_0017B317[i].x1
-              && D_0012AC06 > D_0017B317[i].y0 && D_0012AC06 < D_0017B317[i].y1)
-                D_00195F66 = i + 1;
+            if (mouse_x > spellmaker_setting_buttons[i].x0 && mouse_x < spellmaker_setting_buttons[i].x1
+              && mouse_y > spellmaker_setting_buttons[i].y0 && mouse_y < spellmaker_setting_buttons[i].y1)
+                mouse_motion_y = i + 1;
         }
-        if (D_00195F66 == 0)
+        if (mouse_motion_y == 0)
             goto done;
-        D_0019962A = D_00195F66 - 1;
+        D_0019962A = mouse_motion_y - 1;
         ((struct bf8_2_1 *)&D_001940D5)->f = 1;
-        D_00195F54 = D_0012AC04;
-        D_00195F52 = D_0012AC06;
+        D_00195F54 = mouse_x;
+        D_00195F52 = mouse_y;
         D_00199628 = 0;
-    } else if (D_0012AC00 == 0 && ((struct bf8_2_1 *)&D_001940D5)->f) {
+    } else if (mouse_buttons == 0 && ((struct bf8_2_1 *)&D_001940D5)->f) {
         ((struct bf8_2_1 *)&D_001940D5)->f = 0;
         func_0012B49E(D_00195F54, D_00195F52);
     } else if (((struct bf8_2_1 *)&D_001940D5)->f) {
-        D_00199628 -= D_00195F66;
+        D_00199628 -= mouse_motion_y;
         if (func_0009DEAC(D_00199628) > 30) {
-            if (D_0019962A < 3 && (int)(unsigned char)(D_0019962E & 1) != 0
-              || D_0019962A < 6 && (int)(unsigned char)(D_0019962E & 2) != 0
-              || (int)(unsigned char)(D_0019962E & 4) != 0)
-                D_0017B317[D_0019962A].fn(D_00199628 / 30);
+            if (D_0019962A < 3 && (int)(unsigned char)(spellmaker_settings_kind & 1) != 0
+              || D_0019962A < 6 && (int)(unsigned char)(spellmaker_settings_kind & 2) != 0
+              || (int)(unsigned char)(spellmaker_settings_kind & 4) != 0)
+                spellmaker_setting_buttons[D_0019962A].fn(D_00199628 / 30);
             D_00199628 = 0;
         }
     }
 done:
-    val = D_00178A0A->v[D_00195F30];
-    val = (110 - D_00195BE0->e[D_00185C34[D_0017A84C[D_00178A0A->e[D_00195F30].type]]].s) * val / 100;
-    func_0007CA1F(func_000A0DD9(val, D_001903A4, 10), 275, 119, 145, 156);
-    if ((int)(unsigned char)(D_0019962E & 1) != 0) {
-        func_0007CAEB(64, 94, 87, 109, D_00178A0A->a[D_00195F30][0], 145, 156);
-        func_0007CAEB(104, 94, 127, 109, D_00178A0A->a[D_00195F30][1], 145, 156);
-        func_0007CAEB(160, 94, 183, 109, D_00178A0A->a[D_00195F30][2], 145, 156);
+    val = selected_spell->v[spell_effect_slot];
+    val = (110 - player_character->e[magic_school_skills[spell_effect_school[selected_spell->e[spell_effect_slot].type]]].s) * val / 100;
+    text_draw_colored(func_000A0DD9(val, text_buffer, 10), 275, 119, 145, 156);
+    if ((int)(unsigned char)(spellmaker_settings_kind & 1) != 0) {
+        func_0007CAEB(64, 94, 87, 109, selected_spell->a[spell_effect_slot][0], 145, 156);
+        func_0007CAEB(104, 94, 127, 109, selected_spell->a[spell_effect_slot][1], 145, 156);
+        func_0007CAEB(160, 94, 183, 109, selected_spell->a[spell_effect_slot][2], 145, 156);
     }
-    if ((int)(unsigned char)(D_0019962E & 2) != 0) {
-        func_0007CAEB(64, 114, 87, 129, D_00178A0A->b[D_00195F30][0], 145, 156);
-        func_0007CAEB(104, 114, 127, 129, D_00178A0A->b[D_00195F30][1], 145, 156);
-        func_0007CAEB(160, 114, 183, 129, D_00178A0A->b[D_00195F30][2], 145, 156);
+    if ((int)(unsigned char)(spellmaker_settings_kind & 2) != 0) {
+        func_0007CAEB(64, 114, 87, 129, selected_spell->b[spell_effect_slot][0], 145, 156);
+        func_0007CAEB(104, 114, 127, 129, selected_spell->b[spell_effect_slot][1], 145, 156);
+        func_0007CAEB(160, 114, 183, 129, selected_spell->b[spell_effect_slot][2], 145, 156);
     }
-    if ((int)(unsigned char)(D_0019962E & 4) != 0) {
-        func_0007CAEB(64, 134, 87, 149, D_00178A0A->c[D_00195F30][0], 145, 156);
-        func_0007CAEB(104, 134, 127, 149, D_00178A0A->c[D_00195F30][1], 145, 156);
-        func_0007CAEB(144, 134, 167, 149, D_00178A0A->c[D_00195F30][2], 145, 156);
-        func_0007CAEB(184, 134, 207, 149, D_00178A0A->c[D_00195F30][3], 145, 156);
-        func_0007CAEB(240, 134, 263, 149, D_00178A0A->c[D_00195F30][4], 145, 156);
+    if ((int)(unsigned char)(spellmaker_settings_kind & 4) != 0) {
+        func_0007CAEB(64, 134, 87, 149, selected_spell->c[spell_effect_slot][0], 145, 156);
+        func_0007CAEB(104, 134, 127, 149, selected_spell->c[spell_effect_slot][1], 145, 156);
+        func_0007CAEB(144, 134, 167, 149, selected_spell->c[spell_effect_slot][2], 145, 156);
+        func_0007CAEB(184, 134, 207, 149, selected_spell->c[spell_effect_slot][3], 145, 156);
+        func_0007CAEB(240, 134, 263, 149, selected_spell->c[spell_effect_slot][4], 145, 156);
     }
-    D_00178A0A->v[D_00195F30] = func_000CAE07(D_0017B202[D_00178A0A->e[D_00195F30].type] - 1);
+    selected_spell->v[spell_effect_slot] = spell_cost_formula_dispatch(spell_effect_cost_formula[selected_spell->e[spell_effect_slot].type] - 1);
 }

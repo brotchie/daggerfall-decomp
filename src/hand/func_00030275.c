@@ -14,10 +14,10 @@ struct grp {
     char pad0[2];
     struct rec r[5];
 };
-extern unsigned char D_001952EC[];
+extern unsigned char quest_global_states[];
 extern int func_0009DC25(void);
 
-void func_00030275(int a1, struct grp *a2)
+void qaction_op34_pick_one_state(int a1, struct grp *a2)
 {
     struct item *arr[4];
     short i;
@@ -35,7 +35,7 @@ void func_00030275(int a1, struct grp *a2)
     for (i = 0; i < n; i++) {
         if (i == pick) {
             if (arr[i]->global != 0)
-                D_001952EC[arr[i]->state] = i == pick;
+                quest_global_states[arr[i]->state] = i == pick;
             else
                 arr[i]->state = i == pick;
         }

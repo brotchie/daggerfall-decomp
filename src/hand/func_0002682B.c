@@ -5,11 +5,11 @@ struct desc { char pad[12]; char *str; char pad16[4]; };
 extern char D_00170788[];
 extern char D_00187B6E[];
 extern struct bits8 D_001940D7;
-extern struct bits8 D_001940DB;
+extern struct bits8 player_motion_flags;
 extern int D_00195C74;
-extern unsigned char D_00196277;
-extern short D_00196D64;
-extern int func_0002257C(struct item *, int, char *, int);
+extern unsigned char player_on_ground;
+extern short collide_flags;
+extern int collide_move_object(struct item *, int, char *, int);
 extern void func_000A0040(void *, int, int, char *, int, int);
 extern void func_000A1023(char *, char *, int, char *, int, int);
 
@@ -19,7 +19,7 @@ void func_0002682B(struct item *a1)
     int saved1;
     struct desc d;
 
-    saved1 = D_00196277;
+    saved1 = player_on_ground;
     saved2 = D_00195C74;
     if ((a1->flags & 16) == 0)
         return;
@@ -31,12 +31,12 @@ void func_0002682B(struct item *a1)
         func_000A1023(name, a1->name, 12, D_00170788, 477, 4);
         func_000A0040(&d, 0, 12, D_00170788, 478, 4);
         d.str = D_00187B6E;
-        D_001940DB.b3 = 1;
-        func_0002257C(a1, 0, name, 0);
-        D_001940DB.b3 = 0;
-        D_00196277 = saved1;
+        player_motion_flags.b3 = 1;
+        collide_move_object(a1, 0, name, 0);
+        player_motion_flags.b3 = 0;
+        player_on_ground = saved1;
         D_00195C74 = saved2;
-        if ((D_00196D64 & 1) == 0)
+        if ((collide_flags & 1) == 0)
             return;
         a1->flags &= ~16;
     }

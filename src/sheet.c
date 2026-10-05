@@ -2,4 +2,4 @@
 
 #include "dagger.h"
 
-void func_0003C522(void) { }
+void sheet_button_fatigue(void) { }

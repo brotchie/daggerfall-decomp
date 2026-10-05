@@ -1,6 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0005978F */
 extern char D_0017573C[];
-extern char *D_00195BE0;
+extern char *player_character;
 extern unsigned char *D_00199B4C;
 extern unsigned char **D_00199B50;
 extern int func_000A0E0D();
@@ -14,7 +14,7 @@ void func_0005978F(unsigned char *a1, int a2)
     if (*(unsigned short *)(a1 + 32) == 3) {
         l_14 = *(unsigned short *)(a1 + 50) >> 7;
         if (l_14 == 432 || l_14 == 433) {
-        } else if (*(unsigned short *)(D_00195BE0 + 64) & 1) {
+        } else if (*(unsigned short *)(player_character + 64) & 1) {
             *(short *)(a1 + 50) -= 128;
         }
         if (a2 == 19) {

@@ -7,7 +7,7 @@ extern char D_000C23C0[];
 extern char D_0012B500[];
 extern char D_00136E00[];
 extern char D_00136E24[];
-extern char D_00143550[];
+extern char screen_buffer[];
 extern char D_00147954[];
 extern char D_00150200[];
 extern char D_00150A00[];
@@ -17,47 +17,47 @@ extern char D_00170A86[];
 extern char D_00170A8C[];
 extern char D_00170A98[];
 extern char D_00170AA5[];
-extern char D_0017A288[];
+extern char month_seasons[];
 extern char D_0017A294[];
 extern char D_0017A295[];
 extern char D_0017A296[];
-extern char D_0017A2F4[];
+extern char weather_chances[];
 extern char D_0017A39C[];
 extern char D_0017A3D8[];
 extern char D_0017A3DF[];
 extern char D_0017A3E5[];
 extern char D_0017A3EB[];
-extern char D_001903A4[];
-extern char D_001959B8[];
+extern char text_buffer[];
+extern char view_look_pitch[];
 extern char D_001959BC[];
-extern char D_00195A98[];
-extern char D_00195AA4[];
-extern char D_00195B68[];
-extern char D_00195BF4[];
-extern char D_00195BF8[];
+extern char camera_object[];
+extern char player_object[];
+extern char hud_bar_image[];
+extern char game_minutes[];
+extern char game_settings[];
 extern char D_00195C44[];
 extern char D_00195CF4[];
 extern char D_00195D48[];
-extern char D_00195E2A[];
+extern char climate_weathers[];
 extern char D_00196286[];
 extern char D_0019629B[];
 extern char D_001970E0[];
 extern char D_001970E4[];
-extern char D_00198500[];
-extern char D_00198504[];
+extern char moon0_image[];
+extern char moon1_image[];
 extern char D_0019857C[];
-extern char D_00198580[];
-extern char D_00198588[];
+extern char moon0_phase[];
+extern char moon1_phase[];
 extern char D_001985A8[];
 extern char D_001985B4[];
 extern char D_001985C8[];
 extern char D_001985CC[];
 extern char D_001985D0[];
 
-extern int func_0001FFF1(void);
-extern int func_0006CB53(int, int);
-extern int func_0006CD6E(int);
-extern int func_0007D6AE(int, int);
+extern int climate_category(void);
+extern int disk_read_file(int, int);
+extern int disk_open_data(int);
+extern int rand_range(int, int);
 extern int func_0009DC25();
 extern int func_0009DC49();
 extern int func_0009DEA7();
@@ -79,11 +79,11 @@ extern int func_00137725();
 extern int func_0014BDDD();
 void func_000351B6(int, int, int, int);
 void func_000359B4(int);
-void func_00035A7F(void);
+void sky_load_night(void);
 void func_00035CE5(int);
 #pragma aux func_000A0ED9 parm routine [];
 
-void func_000346C4(void)
+void sky_init(void)
 {
     int l_2C;
     int l_28;
@@ -94,8 +94,8 @@ void func_000346C4(void)
 
     *(signed char *)D_0019629B = 0;
     *(int *)D_00195D48 = 10000;
-    *(int *)D_00198500 = func_0006CB53((int)D_00170A6C, 0);
-    *(int *)D_00198504 = func_0006CB53((int)D_00170A79, 0);
+    *(int *)moon0_image = disk_read_file((int)D_00170A6C, 0);
+    *(int *)moon1_image = disk_read_file((int)D_00170A79, 0);
     *(int *)D_001970E0 = func_000A00AF(112640, (int)D_00170A86, 93);
     *(int *)D_001970E4 = func_000A00AF(112640, (int)D_00170A86, 94);
     *(signed char *)D_00196286 = 13;
@@ -122,45 +122,45 @@ void func_00034EC1(void)
     int l_18;
 
     if (*(int *)D_0019857C == 0) return;
-    l_20 = *(int *)(*(char **)D_00195AA4 + 7) + *(int *)D_001985C8;
-    l_1C = *(int *)(*(char **)D_00195AA4 + 11) + *(int *)D_001985CC;
-    l_18 = *(int *)(*(char **)D_00195AA4 + 15) + *(int *)D_001985D0;
+    l_20 = *(int *)(*(char **)player_object + 7) + *(int *)D_001985C8;
+    l_1C = *(int *)(*(char **)player_object + 11) + *(int *)D_001985CC;
+    l_18 = *(int *)(*(char **)player_object + 15) + *(int *)D_001985D0;
     func_0014BDDD((int)&l_20, (int)&l_1C, (int)&l_18);
     func_00136AD8(-l_20, l_1C, -l_18, *(int *)D_0019857C, 0, 8);
 }
 
-void func_00034F3F(void)
+void sky_update_moons(void)
 {
-    *(int *)D_000C23B8 = (((int)(short)*(short *)(*(char **)D_00195A98 + 1)) + *(int *)D_001959B8) & 2047;
-    *(int *)D_000C23BC = (((int)(short)*(short *)(*(char **)D_00195A98 + 3)) + *(int *)D_001959BC) & 2047;
+    *(int *)D_000C23B8 = (((int)(short)*(short *)(*(char **)camera_object + 1)) + *(int *)view_look_pitch) & 2047;
+    *(int *)D_000C23BC = (((int)(short)*(short *)(*(char **)camera_object + 3)) + *(int *)D_001959BC) & 2047;
     *(int *)D_000C23C0 = 0;
     func_00137000(*(int *)D_000C23B8, *(int *)D_000C23BC, *(int *)D_000C23C0, (int)D_00136E00);
     func_00137725((int)D_00136E00, (int)D_00136E24);
-    func_000351B6((int)D_001985B4, 1000, ((unsigned)*(int *)D_00195BF4) % 2500, 2500);
-    *(int *)D_00198580 = (((unsigned)*(int *)D_00195BF4) / 1440) & 31;
-    func_000351B6((int)D_001985A8, -1000, ((unsigned)*(int *)D_00195BF4) % 3500, 3500);
-    *(int *)D_00198588 = (((unsigned)(*(int *)D_00195BF4 + 5760)) / 1440) & 31;
+    func_000351B6((int)D_001985B4, 1000, ((unsigned)*(int *)game_minutes) % 2500, 2500);
+    *(int *)moon0_phase = (((unsigned)*(int *)game_minutes) / 1440) & 31;
+    func_000351B6((int)D_001985A8, -1000, ((unsigned)*(int *)game_minutes) % 3500, 3500);
+    *(int *)moon1_phase = (((unsigned)(*(int *)game_minutes + 5760)) / 1440) & 31;
 }
 
-void func_0003503D(void)
+void sky_free(void)
 {
     int l_18;
 
-    if (*(int *)D_00198500 == 0) goto L35060;
-    if (*(int *)D_00198500 != (-1751672937)) goto L35062;
+    if (*(int *)moon0_image == 0) goto L35060;
+    if (*(int *)moon0_image != (-1751672937)) goto L35062;
 L35060:;
     goto L35080;
 L35062:;
-    func_000A0024(*(int *)D_00198500, (int)D_00170A86, 368);
-    *(int *)D_00198500 = -1751672937;
+    func_000A0024(*(int *)moon0_image, (int)D_00170A86, 368);
+    *(int *)moon0_image = -1751672937;
 L35080:;
-    if (*(int *)D_00198504 == 0) goto L35095;
-    if (*(int *)D_00198504 != (-1751672937)) goto L35097;
+    if (*(int *)moon1_image == 0) goto L35095;
+    if (*(int *)moon1_image != (-1751672937)) goto L35097;
 L35095:;
     goto L350B5;
 L35097:;
-    func_000A0024(*(int *)D_00198504, (int)D_00170A86, 369);
-    *(int *)D_00198504 = -1751672937;
+    func_000A0024(*(int *)moon1_image, (int)D_00170A86, 369);
+    *(int *)moon1_image = -1751672937;
 L350B5:;
     if (*(int *)D_001970E0 == 0) goto L350CA;
     if (*(int *)D_001970E0 != (-1751672937)) goto L350CC;
@@ -199,7 +199,7 @@ void func_000351B6(int a1, int a2, int a3, int a4)
     *(int *)((char *)a1 + 4) = -(func_000C8167(8192, *(int *)(D_00150200 + (l_C << 2))));
 }
 
-void func_0003522C(void)
+void weather_roll(void)
 {
     int l_30;
     int l_2C;
@@ -210,8 +210,8 @@ void func_0003522C(void)
     int l_18;
 
     l_1C = 0;
-    l_18 = (int)(unsigned char)*(signed char *)(D_00195E2A + func_0001FFF1());
-    l_2C = (int)(unsigned char)*(signed char *)(D_0017A288 + (((unsigned)(((unsigned)*(int *)D_00195BF4) % 518400)) / 43200));
+    l_18 = (int)(unsigned char)*(signed char *)(climate_weathers + climate_category());
+    l_2C = (int)(unsigned char)*(signed char *)(month_seasons + (((unsigned)(((unsigned)*(int *)game_minutes) % 518400)) / 43200));
     l_30 = 0;
 L35280:;
     if (l_30 < 6) goto L35293;
@@ -220,11 +220,11 @@ L3528B:;
     l_30++;
     goto L35280;
 L35293:;
-    l_28 = func_0007D6AE(0, 99);
+    l_28 = rand_range(0, 99);
     l_24 = 0;
 L352A9:;
     if (l_28 <= (-1)) goto L352D1;
-    l_28 -= (int)(unsigned char)*(signed char *)(D_0017A2F4 + (((l_2C * 42) + (l_30 * 7)) + l_24++));
+    l_28 -= (int)(unsigned char)*(signed char *)(weather_chances + (((l_2C * 42) + (l_30 * 7)) + l_24++));
     goto L352A9;
 L352D1:;
     l_24--;
@@ -232,24 +232,24 @@ L352D1:;
     l_24 = 6;
 L352E4:;
     if (l_24 != 4) goto L352FB;
-    if (func_0007D6AE(0, 100) <= 15) goto L352FD;
+    if (rand_range(0, 100) <= 15) goto L352FD;
 L352FB:;
     goto L35304;
 L352FD:;
     l_24 |= 128;
 L35304:;
     if (l_24 != 5) goto L3531B;
-    if (func_0007D6AE(0, 100) <= 10) goto L3531D;
+    if (rand_range(0, 100) <= 10) goto L3531D;
 L3531B:;
     goto L35324;
 L3531D:;
     l_24 |= 128;
 L35324:;
-    *(signed char *)(D_00195E2A + l_30) = *(signed char *)&l_24;
+    *(signed char *)(climate_weathers + l_30) = *(signed char *)&l_24;
     goto L3528B;
 }
 
-void func_00035476(int a1)
+void sky_load_day(int a1)
 {
     int l_28;
     int l_24;
@@ -280,28 +280,28 @@ L354DB:;
 L354F4:;
     l_24 = (-(a1 - 1080)) >> 2;
 L35504:;
-    l_18 = func_0001FFF1();
-    l_1C = (int)(unsigned char)*(signed char *)(D_00195E2A + l_18);
+    l_18 = climate_category();
+    l_1C = (int)(unsigned char)*(signed char *)(climate_weathers + l_18);
     if ((l_1C & 127) == 3) goto L3552E;
     if ((l_1C & 128) == 0) goto L35533;
 L3552E:;
     return;
 L35533:;
     l_20 = func_0009DC25();
-    func_0009DC49(((unsigned)*(int *)D_00195BF4) / 1440);
-    l_24 += ((int)(unsigned char)*(signed char *)(D_0017A39C + (func_0007D6AE(0, 2) + ((((int)(unsigned char)*(signed char *)(D_0017A3D8 + ((int)(unsigned char)*(signed char *)(D_00195E2A + l_18)))) * 3) + (((int)(unsigned char)*(signed char *)(D_0017A3DF + l_18)) * 15))))) << 5;
+    func_0009DC49(((unsigned)*(int *)game_minutes) / 1440);
+    l_24 += ((int)(unsigned char)*(signed char *)(D_0017A39C + (rand_range(0, 2) + ((((int)(unsigned char)*(signed char *)(D_0017A3D8 + ((int)(unsigned char)*(signed char *)(climate_weathers + l_18)))) * 3) + (((int)(unsigned char)*(signed char *)(D_0017A3DF + l_18)) * 15))))) << 5;
     func_0009DC49(l_20);
     if (l_24 == *(int *)D_00195D48) return;
     *(int *)D_00195D48 = l_24;
     func_000A0ED9(558, (int)D_00170A86);
-    func_000A0F5C((int)D_001903A4, (int)D_00170A8C, l_24 >> 5);
-    l_28 = func_0006CD6E((int)D_001903A4);
+    func_000A0F5C((int)text_buffer, (int)D_00170A8C, l_24 >> 5);
+    l_28 = disk_open_data((int)text_buffer);
     l_24 &= 31;
     func_000A006E(l_28, (int)&*(signed char *)((char *)(l_24 * 776) + 11), 0);
     func_000A00CB(l_28, *(int *)D_00195C44, 93);
     func_000CD33A(*(int *)D_00195C44, 1, 31);
     func_000A1023((int)(*(char **)D_0012B500 + 3), *(int *)D_00195C44, 93, (int)D_00170A86, 565, 4);
-    func_000359B4(*(int *)D_00195BF4);
+    func_000359B4(*(int *)game_minutes);
     func_000A006E(l_28, (l_24 << 14) + 24832, 0);
     func_000A00CB(l_28, *(int *)D_00195CF4, 16384);
     func_000A006E(l_28, (int)&*(signed char *)((char *)(l_24 * 112640) + 549120), 0);
@@ -311,7 +311,7 @@ L35533:;
     func_0009DEA7(l_28);
 }
 
-void func_000356EF(int a1, int a2, int a3, int a4)
+void sky_draw_day(int a1, int a2, int a3, int a4)
 {
     int l_28;
     int l_24;
@@ -323,22 +323,22 @@ void func_000356EF(int a1, int a2, int a3, int a4)
     int l_C;
 
     *(signed char *)D_0019629B = 0;
-    l_14 = ((((int)(unsigned short)(*(short *)(*(char **)D_00195BF8) & 1)) != 0) ? 199 : (int)(unsigned short)*(short *)(*(char **)D_00195B68 + 2));
-    if (((int)(unsigned char)(*(signed char *)(D_00195E2A + a4) & 127)) == 3) goto L3576A;
-    if (((int)(unsigned char)(*(signed char *)(D_00195E2A + a4) & 128)) == 0) goto L35791;
+    l_14 = ((((int)(unsigned short)(*(short *)(*(char **)game_settings) & 1)) != 0) ? 199 : (int)(unsigned short)*(short *)(*(char **)hud_bar_image + 2));
+    if (((int)(unsigned char)(*(signed char *)(climate_weathers + a4) & 127)) == 3) goto L3576A;
+    if (((int)(unsigned char)(*(signed char *)(climate_weathers + a4) & 128)) == 0) goto L35791;
 L3576A:;
-    func_000A0040(*(int *)D_00143550, 119, l_14 * 320, (int)D_00170A86, 598, 4);
+    func_000A0040(*(int *)screen_buffer, 119, l_14 * 320, (int)D_00170A86, 598, 4);
     return;
 L35791:;
-    l_14 = ((((int)(unsigned short)(*(short *)(*(char **)D_00195BF8) & 1)) != 0) ? 199 : (int)(unsigned short)*(short *)(*(char **)D_00195B68 + 2));
+    l_14 = ((((int)(unsigned short)(*(short *)(*(char **)game_settings) & 1)) != 0) ? 199 : (int)(unsigned short)*(short *)(*(char **)hud_bar_image + 2));
     l_28 = (139 - a1) << 9;
     if (l_28 >= 0) goto L357E0;
     l_28 = 0;
 L357E0:;
-    l_24 = ((((int)(short)*(short *)(*(char **)D_00195A98 + 3)) + *(int *)D_001959BC) - 705) & 2047;
+    l_24 = ((((int)(short)*(short *)(*(char **)camera_object + 3)) + *(int *)D_001959BC) - 705) & 2047;
     l_18 = l_24 / 512;
     l_24 = l_24 % 512;
-    if (((unsigned)(((unsigned)*(int *)D_00195BF4) % 1440)) >= 720) goto L35845;
+    if (((unsigned)(((unsigned)*(int *)game_minutes) % 1440)) >= 720) goto L35845;
     l_1C = 0;
     goto L3584C;
 L35845:;
@@ -378,7 +378,7 @@ L35956:;
     func_000A0040((int)(*(char **)D_00147954 + (l_10 * 320)), (int)(unsigned char)*(signed char *)(*(char **)D_001970E0 + 109058), 320, (int)D_00170A86, 636, 4);
     goto L3594E;
 L3598A:;
-    func_000A1023(*(int *)D_00143550, *(int *)D_00147954, l_14 * 320, (int)D_00170A86, 638, 4);
+    func_000A1023(*(int *)screen_buffer, *(int *)D_00147954, l_14 * 320, (int)D_00170A86, 638, 4);
 }
 
 void func_000359B4(int a1)
@@ -415,19 +415,19 @@ void func_00035A64(int a1)
 {
 }
 
-void func_00035A7F(void)
+void sky_load_night(void)
 {
-    func_0006CB53((int)D_00170A98, *(int *)D_00195C44);
+    disk_read_file((int)D_00170A98, *(int *)D_00195C44);
     func_000CD33A(*(int *)D_00195C44 + 11, 1, 31);
     func_000A1023(*(int *)D_0012B500 + 3, (int)&*(signed char *)(*(char **)D_00195C44 + 11), 93, (int)D_00170A86, 671, 4);
     func_000A0ED9(673, (int)D_00170A86);
-    func_000A0F5C((int)D_001903A4, (int)D_00170AA5, (int)(unsigned char)*(signed char *)(D_0017A3E5 + func_0001FFF1()));
-    func_0006CB53((int)D_001903A4, *(int *)D_001970E0);
+    func_000A0F5C((int)text_buffer, (int)D_00170AA5, (int)(unsigned char)*(signed char *)(D_0017A3E5 + climate_category()));
+    disk_read_file((int)text_buffer, *(int *)D_001970E0);
     func_00035CE5(*(int *)D_001970E0);
     *(signed char *)D_0019629B = 1;
 }
 
-void func_00035B3A(int a1, int a2)
+void sky_draw_night(int a1, int a2)
 {
     int l_30;
     int l_2C;
@@ -439,14 +439,14 @@ void func_00035B3A(int a1, int a2)
     int l_14;
 
     if (*(signed char *)D_0019629B != 0) goto L35B5B;
-    func_00035A7F();
+    sky_load_night();
 L35B5B:;
-    l_1C = ((((int)(unsigned short)(*(short *)(*(char **)D_00195BF8) & 1)) != 0) ? 199 : (int)(unsigned short)*(short *)(*(char **)D_00195B68 + 2));
+    l_1C = ((((int)(unsigned short)(*(short *)(*(char **)game_settings) & 1)) != 0) ? 199 : (int)(unsigned short)*(short *)(*(char **)hud_bar_image + 2));
     l_30 = (139 - a1) << 9;
     if (l_30 >= 0) goto L35BAA;
     l_30 = 0;
 L35BAA:;
-    l_2C = ((((int)(short)*(short *)(*(char **)D_00195A98 + 3)) + *(int *)D_001959BC) - 705) & 2047;
+    l_2C = ((((int)(short)*(short *)(*(char **)camera_object + 3)) + *(int *)D_001959BC) - 705) & 2047;
     l_20 = l_2C / 512;
     l_2C = l_2C % 512;
     a1 += 75;
@@ -473,7 +473,7 @@ L35C8D:;
     func_000A0040((int)(*(char **)D_00147954 + (l_18 * 320)), 15, 320, (int)D_00170A86, 713, 4);
     goto L35C85;
 L35CB9:;
-    func_000A1023(*(int *)D_00143550, *(int *)D_00147954, l_1C * 320, (int)D_00170A86, 715, 4);
+    func_000A1023(*(int *)screen_buffer, *(int *)D_00147954, l_1C * 320, (int)D_00170A86, 715, 4);
 }
 
 void func_00035CE5(int a1)
@@ -490,8 +490,8 @@ L35D08:;
     l_20++;
     goto L35CFD;
 L35D10:;
-    l_1C = func_0007D6AE(0, 511);
-    l_18 = func_0007D6AE(0, 199) << 9;
+    l_1C = rand_range(0, 511);
+    l_18 = rand_range(0, 199) << 9;
     if (((int)(unsigned char)*(signed char *)((char *)((l_1C + l_18) + a1))) < 16) goto L35D08;
     *(signed char *)((char *)((l_1C + l_18) + a1)) = *(signed char *)(D_0017A3EB + (func_0009DC25() & 15));
     goto L35D08;

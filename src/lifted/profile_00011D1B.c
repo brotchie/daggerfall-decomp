@@ -3,9 +3,9 @@
 
 
 #pragma aux sosconv "*" parm caller [] value [eax] modify [eax ebx ecx edx];
-#pragma aux (sosconv) func_00011D1B;
+#pragma aux (sosconv) profile_find_section;
 
-int func_00011D1B(int a1, int a2)
+int profile_find_section(int a1, int a2)
 {
     int l_20;
     int l_1C;

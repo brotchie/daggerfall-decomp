@@ -11,15 +11,15 @@ struct spell {
     char pad[32];
     struct spell_mag mag[3];
 };
-extern struct spell *D_00178A0A;    /* current spell */
-extern short D_00195F30;            /* current effect */
-extern short D_0019961C[];          /* cost factors */
+extern struct spell *selected_spell;    /* current spell */
+extern short spell_effect_slot;            /* current effect */
+extern short spell_effect_cost_current[];          /* cost factors */
 
-int func_000396C0(void)
+int spell_cost_magnitude(void)
 {
     short cost;
 
-    cost = (D_00178A0A->mag[D_00195F30].base_min + D_00178A0A->mag[D_00195F30].base_max) / 2 * D_0019961C[0];
-    cost += ((D_00178A0A->mag[D_00195F30].plus_min + D_00178A0A->mag[D_00195F30].plus_max) / 2 / D_00178A0A->mag[D_00195F30].per_level) * D_0019961C[1];
+    cost = (selected_spell->mag[spell_effect_slot].base_min + selected_spell->mag[spell_effect_slot].base_max) / 2 * spell_effect_cost_current[0];
+    cost += ((selected_spell->mag[spell_effect_slot].plus_min + selected_spell->mag[spell_effect_slot].plus_max) / 2 / selected_spell->mag[spell_effect_slot].per_level) * spell_effect_cost_current[1];
     return cost;
 }

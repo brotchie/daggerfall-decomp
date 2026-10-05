@@ -5,7 +5,7 @@ extern short D_0012DA40;
 extern short D_0012DA48;
 extern struct Font *D_0012DA74;
 
-int func_0005A4A9(char *s)
+int font_text_width(char *s)
 {
     short w;
     char *p;

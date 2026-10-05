@@ -22,7 +22,7 @@ extern unsigned func_000A13F7(struct find_t *);
 extern void func_000A0ED9(int, char *);
 extern int func_000A0F5C(char *, char *, ...);
 
-void func_0007B0FC(void)
+void automap_delete_files(void)
 {
     struct find_t ff;
     unsigned rc;

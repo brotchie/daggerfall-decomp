@@ -20,7 +20,7 @@ extern char D_00185A96[];
 extern char D_00185A97[];
 extern char D_00185AC4[];
 extern char D_00185AE4[];
-extern char D_00190CE4[];
+extern char itemmaker_slot_kinds[];
 extern char D_00190D64[];
 extern char D_0019986A[];
 extern char D_0019986B[];
@@ -32,16 +32,16 @@ extern char D_001998CC[];
 extern char D_001998CD[];
 extern char D_001998D6[];
 extern char D_001998D7[];
-extern char D_001998E0[];
+extern char itemmaker_slots[];
 extern char D_001998E2[];
 extern char D_00199910[];
-extern void func_0003EC2A(char *, int);
+extern void msgbox_show_string(char *, int);
 extern void func_00057147(short, short, short, short, short, short, short);
-extern int func_0005742F(void);
-extern int func_00057485(void);
+extern int itemmaker_free_slot(void);
+extern int itemmaker_free_slot_count(void);
 extern char *func_000A1079(char *, int, unsigned);
 
-void func_00057F8B(int a1)
+void itemmaker_add_soul_powers(int a1)
 {
     int idx;
     int count;
@@ -82,19 +82,19 @@ void func_00057F8B(int a1)
         count++;
     if (count > 5)
         count = 5;
-    if (func_00057485() < count) {
-        func_0003EC2A(D_00175710, 1);
+    if (itemmaker_free_slot_count() < count) {
+        msgbox_show_string(D_00175710, 1);
         return;
     }
     for (i = 0; i < count; i++) {
-        slot = func_0005742F();
+        slot = itemmaker_free_slot();
         D_00199910[slot] = 1;
-        *(short *)(D_001998E0 + slot * 4) = *(short *)(D_001859A4 + idx * 20 + i * 4);
+        *(short *)(itemmaker_slots + slot * 4) = *(short *)(D_001859A4 + idx * 20 + i * 4);
         *(short *)(D_001998E2 + slot * 4) = *(short *)(D_001859A6 + idx * 20 + i * 4);
         x = *(short *)(D_001859A4 + idx * 20 + i * 4);
         y = *(short *)(D_001859A6 + idx * 20 + i * 4);
         if (*(short *)(D_001859A4 + idx * 20 + i * 4) < 15) {
-            D_00190CE4[slot] = 0;
+            itemmaker_slot_kinds[slot] = 0;
             j = *(unsigned char *)(D_00185766 + x);
             if (j == 0)
                 func_00057147(slot, x, y, -1, -1, -1, -1);
@@ -103,8 +103,8 @@ void func_00057F8B(int a1)
                 func_00057147(slot, x, y, *(unsigned char *)(D_00185716 + j * 20 + y * 4), *(unsigned char *)(D_00185717 + j * 20 + y * 4), *(unsigned char *)(D_00185718 + j * 20 + y * 4), *(unsigned char *)(D_00185719 + j * 20 + y * 4));
             }
         } else {
-            D_00190CE4[slot] = 1;
-            *(short *)(D_001998E0 + slot * 4) -= 15;
+            itemmaker_slot_kinds[slot] = 1;
+            *(short *)(itemmaker_slots + slot * 4) -= 15;
             j = *(unsigned char *)(D_0018597F + x);
             if (j == 0)
                 func_00057147(slot, x, y, -1, -1, -1, -1);

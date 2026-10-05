@@ -2,70 +2,70 @@
  * do not edit: move a function to src/book.c to work on it by hand) */
 
 struct bf8_7_1 { unsigned char _:7; unsigned char f:1; };
-extern char D_0012AC00[];
-extern char D_0012AC04[];
-extern char D_0012AC06[];
-extern char D_0012AF34[];
-extern char D_0012AF36[];
-extern char D_0012AF38[];
-extern char D_0012AF3A[];
-extern char D_0012B504[];
+extern char mouse_buttons[];
+extern char mouse_x[];
+extern char mouse_y[];
+extern char mouse_x_min[];
+extern char mouse_x_max[];
+extern char mouse_y_min[];
+extern char mouse_y_max[];
+extern char text_shadow_colour[];
 extern char D_0012B508[];
 extern char D_0012DA40[];
 extern char D_0012DA48[];
 extern char D_0012DA74[];
-extern char D_00142309[];
+extern char key_down_esc[];
 extern char D_00142928[];
 extern char D_0014292C[];
 extern char D_00142940[];
 extern char D_00142944[];
 extern char D_00142948[];
 extern char D_0014294C[];
-extern char D_00143550[];
+extern char screen_buffer[];
 extern char D_001757A8[];
 extern char D_001757AF[];
 extern char D_001757C1[];
 extern char D_001757CE[];
 extern char D_001757D7[];
 extern char D_0017D1E6[];
-extern char D_00185BE4[];
+extern char book_buttons[];
 extern char D_00185BE6[];
 extern char D_00185BE8[];
 extern char D_00185BEA[];
 extern char D_00185BEC[];
 extern char D_00187CA8[];
-extern char D_001903A4[];
+extern char text_buffer[];
 extern char D_00190D64[];
 extern char D_00190D66[];
 extern char D_00190D68[];
 extern char D_001940D6[];
 extern char D_001940D8[];
-extern char D_00195AA0[];
-extern char D_00195AA4[];
-extern char D_00195B8C[];
-extern char D_00195BE0[];
-extern char D_00195BE8[];
+extern char player_entity[];
+extern char player_object[];
+extern char inpstr_result[];
+extern char player_character[];
+extern char window_image[];
 extern char D_00195C44[];
-extern char D_00195D38[];
+extern char trade_mode[];
 extern char D_00196272[];
-extern char D_00196274[];
-extern char D_00196279[];
-extern char D_00196288[];
+extern char game_mode[];
+extern char mouse_buttons_prev[];
+extern char inv_right_icon[];
 extern char D_00199C2C[];
-extern char D_00199C6C[];
-extern char D_00199C70[];
-extern char D_00199D5A[];
-extern char D_00199D5C[];
+extern char book_page_offsets[];
+extern char book_header[];
+extern char book_file[];
+extern char book_page[];
 extern char D_00199D5E[];
-extern char D_00199D60[];
+extern char book_page_count[];
 
-extern int func_00069938(int, int, int);
-extern int func_0006CB53(int, int);
-extern int func_0006CD6E(int);
-extern int func_0007D068(unsigned char);
-extern int func_0008DA4D(int);
-extern int func_0008DA91(int);
-extern int func_000926AD(int, int, int);
+extern int sound_play(int, int, int);
+extern int disk_read_file(int, int);
+extern int disk_open_data(int);
+extern int key_pressed_once(unsigned char);
+extern int object_free_single(int);
+extern int object_delete(int);
+extern int inventory_open(int, int, int);
 extern int func_0009DEA7();
 extern int func_000A0024();
 extern int func_000A00AF();
@@ -76,70 +76,70 @@ extern int func_000A0F5C(int, ...);
 extern int func_000A1023();
 extern int func_0012DBCC();
 extern int func_00144FB4();
-extern void func_0003EC2A(int, int);
-extern void func_00059F24(short);
-extern void func_0005A5D2(int, int, int);
-extern void func_0007CA1F(int, int, int, int, unsigned char);
-extern void func_0007CA85(int, int, int, int, unsigned char);
-extern void func_0008A550(int, int, int);
-extern void func_0008A90C(int, int, int);
-extern void func_0008C4E4(int);
-void func_00059E2B(void);
+extern void msgbox_show_string(int, int);
+extern void book_draw_page(short);
+extern void text_draw_centred(int, int, int);
+extern void text_draw_colored(int, int, int, int, unsigned char);
+extern void text_draw_centered_colored(int, int, int, int, unsigned char);
+extern void spfx_effect_end(int, int, int);
+extern void spfx_effect_tick(int, int, int);
+extern void inpstr_begin_number(int);
+void book_close(void);
 void func_0005A230(void);
-void func_0005A337(void);
-void func_0005A375(void);
-void func_0005A7D5(int, int);
+void book_prev_page(void);
+void book_next_page(void);
+void spell_tick_spell(int, int);
 #pragma aux func_000A0ED9 parm routine [];
 
-void func_00059B7B(short a1)
+void book_open(short a1)
 {
     func_000A0ED9(37, (int)D_001757A8);
-    func_000A0F5C((int)D_001903A4, (int)D_001757AF, (int)(short)a1);
-    *(short *)D_00199D5A = func_0006CD6E((int)D_001903A4);
-    func_000A00CB((int)(short)*(short *)D_00199D5A, (int)D_00199C70, 234);
-    func_000A00CB((int)(short)*(short *)D_00199D5A, (int)D_00199D60, 2);
-    *(int *)D_00199C6C = func_000A00AF(((int)(short)*(short *)D_00199D60) << 2, (int)D_001757A8, 43);
-    func_000A00CB((int)(short)*(short *)D_00199D5A, *(int *)D_00199C6C, ((int)(short)*(short *)D_00199D60) << 2);
-    *(int *)D_00195BE8 = func_0006CB53((int)D_001757C1, 0);
+    func_000A0F5C((int)text_buffer, (int)D_001757AF, (int)(short)a1);
+    *(short *)book_file = disk_open_data((int)text_buffer);
+    func_000A00CB((int)(short)*(short *)book_file, (int)book_header, 234);
+    func_000A00CB((int)(short)*(short *)book_file, (int)book_page_count, 2);
+    *(int *)book_page_offsets = func_000A00AF(((int)(short)*(short *)book_page_count) << 2, (int)D_001757A8, 43);
+    func_000A00CB((int)(short)*(short *)book_file, *(int *)book_page_offsets, ((int)(short)*(short *)book_page_count) << 2);
+    *(int *)window_image = disk_read_file((int)D_001757C1, 0);
     func_0005A230();
-    *(short *)D_00199D5C = 0;
+    *(short *)book_page = 0;
     *(short *)D_00190D68 = 0;
-    *(signed char *)D_00196274 = 11;
+    *(signed char *)game_mode = 11;
     *(signed char *)D_00196272 = 1;
     *(signed char *)D_00187CA8 = 0;
-    func_00069938(237, *(int *)D_00195AA4, 100);
+    sound_play(237, *(int *)player_object, 100);
 }
 
-void func_00059C84(void)
+void book_update(void)
 {
     short l_18;
 
-    if (((int)(short)*(short *)D_00199D5A) < 1) return;
+    if (((int)(short)*(short *)book_file) < 1) return;
     *(signed char *)D_001940D8 |= 16;
-    func_000A1023(*(int *)D_00143550, *(int *)D_00195BE8, 64000, (int)D_001757A8, 65, 4);
-    func_00059F24((int)(short)*(short *)D_00199D5C);
+    func_000A1023(*(int *)screen_buffer, *(int *)window_image, 64000, (int)D_001757A8, 65, 4);
+    book_draw_page((int)(short)*(short *)book_page);
     if (*(short *)D_00190D68 == 0) goto L59CE9;
-    if (((int)(unsigned char)*(signed char *)D_00196274) != 8) goto L59CEB;
+    if (((int)(unsigned char)*(signed char *)game_mode) != 8) goto L59CEB;
 L59CE9:;
     goto L59D25;
 L59CEB:;
     *(short *)D_00190D68 = 0;
-    if (((int)(short)*(short *)D_00199D60) < *(int *)D_00195B8C) goto L59D25;
-    func_00069938(205, *(int *)D_00195AA4, 100);
-    *(short *)D_00199D5C = *(short *)D_00195B8C - 1;
+    if (((int)(short)*(short *)book_page_count) < *(int *)inpstr_result) goto L59D25;
+    sound_play(205, *(int *)player_object, 100);
+    *(short *)book_page = *(short *)inpstr_result - 1;
 L59D25:;
-    if (*(signed char *)D_00142309 == 0) goto L59D33;
-    func_00059E2B();
+    if (*(signed char *)key_down_esc == 0) goto L59D33;
+    book_close();
 L59D33:;
-    if (func_0007D068(73) == 0) goto L59D46;
-    func_0005A337();
+    if (key_pressed_once(73) == 0) goto L59D46;
+    book_prev_page();
 L59D46:;
-    if (func_0007D068(81) == 0) goto L59D59;
-    func_0005A375();
+    if (key_pressed_once(81) == 0) goto L59D59;
+    book_next_page();
 L59D59:;
-    if (*(signed char *)D_0012AC00 == 0) goto L59D76;
-    if (*(signed char *)D_0012AC00 == 0) goto L59D74;
-    if (*(signed char *)D_00196279 != 0) goto L59D76;
+    if (*(signed char *)mouse_buttons == 0) goto L59D76;
+    if (*(signed char *)mouse_buttons == 0) goto L59D74;
+    if (*(signed char *)mouse_buttons_prev != 0) goto L59D76;
 L59D74:;
     goto L59D7B;
 L59D76:;
@@ -153,76 +153,76 @@ L59D90:;
     (*(int *)&l_18)++;
     goto L59D82;
 L59D98:;
-    if (*(short *)D_0012AC04 <= *(short *)(D_00185BE4 + (((int)(short)l_18) * 12))) goto L59DC6;
-    if (*(short *)D_0012AC04 < *(short *)(D_00185BE8 + (((int)(short)l_18) * 12))) goto L59DC8;
+    if (*(short *)mouse_x <= *(short *)(book_buttons + (((int)(short)l_18) * 12))) goto L59DC6;
+    if (*(short *)mouse_x < *(short *)(D_00185BE8 + (((int)(short)l_18) * 12))) goto L59DC8;
 L59DC6:;
     goto L59DDF;
 L59DC8:;
-    if (*(short *)D_0012AC06 > *(short *)(D_00185BE6 + (((int)(short)l_18) * 12))) goto L59DE1;
+    if (*(short *)mouse_y > *(short *)(D_00185BE6 + (((int)(short)l_18) * 12))) goto L59DE1;
 L59DDF:;
     goto L59DF8;
 L59DE1:;
-    if (*(short *)D_0012AC06 < *(short *)(D_00185BEA + (((int)(short)l_18) * 12))) goto L59DFA;
+    if (*(short *)mouse_y < *(short *)(D_00185BEA + (((int)(short)l_18) * 12))) goto L59DFA;
 L59DF8:;
     goto L59E1C;
 L59DFA:;
-    func_00069938(203, *(int *)D_00195AA4, 100);
+    sound_play(203, *(int *)player_object, 100);
     ((int (*)())(*(int *)(D_00185BEC + (((int)(short)l_18) * 12))))();
 L59E1C:;
     goto L59D90;
 }
 
-void func_00059E2B(void)
+void book_close(void)
 {
 L59E39:;
-    if (*(signed char *)D_00142309 != 0) goto L59E39;
-    if (((int)(short)*(short *)D_00199D5A) < 1) return;
+    if (*(signed char *)key_down_esc != 0) goto L59E39;
+    if (((int)(short)*(short *)book_file) < 1) return;
     *(signed char *)D_001940D8 &= 239;
-    func_0009DEA7((int)(short)*(short *)D_00199D5A);
-    if (*(int *)D_00195BE8 == 0) goto L59E7A;
-    if (*(int *)D_00195BE8 != (-1751672937)) goto L59E7C;
+    func_0009DEA7((int)(short)*(short *)book_file);
+    if (*(int *)window_image == 0) goto L59E7A;
+    if (*(int *)window_image != (-1751672937)) goto L59E7C;
 L59E7A:;
     goto L59E9A;
 L59E7C:;
-    func_000A0024(*(int *)D_00195BE8, (int)D_001757A8, 101);
-    *(int *)D_00195BE8 = -1751672937;
+    func_000A0024(*(int *)window_image, (int)D_001757A8, 101);
+    *(int *)window_image = -1751672937;
 L59E9A:;
-    if (*(int *)D_00199C6C == 0) goto L59EAF;
-    if (*(int *)D_00199C6C != (-1751672937)) goto L59EB1;
+    if (*(int *)book_page_offsets == 0) goto L59EAF;
+    if (*(int *)book_page_offsets != (-1751672937)) goto L59EB1;
 L59EAF:;
     goto L59ECF;
 L59EB1:;
-    func_000A0024(*(int *)D_00199C6C, (int)D_001757A8, 102);
-    *(int *)D_00199C6C = -1751672937;
+    func_000A0024(*(int *)book_page_offsets, (int)D_001757A8, 102);
+    *(int *)book_page_offsets = -1751672937;
 L59ECF:;
     func_0005A230();
-    *(short *)D_00199D5A = 0;
-    *(signed char *)D_00196274 = 0;
+    *(short *)book_file = 0;
+    *(signed char *)game_mode = 0;
     *(signed char *)D_00196272 = 0;
     *(signed char *)D_00187CA8 = 1;
     if (((struct bf8_7_1 *)&D_001940D8)->f == 0) return;
     *(signed char *)D_001940D8 &= 127;
-    func_000926AD(2, *(int *)D_00195D38, (int)(unsigned char)*(signed char *)D_00196288);
+    inventory_open(2, *(int *)trade_mode, (int)(unsigned char)*(signed char *)inv_right_icon);
 }
 
-void func_0005A13D(void)
+void book_flush_line(void)
 {
     if (*(short *)D_00190D66 == 0) goto L5A17D;
-    func_0007CA85((int)D_001903A4, 160, (int)(short)*(short *)D_0014292C, (int)(short)((int)(unsigned char)*(signed char *)D_0012B508), 156);
+    text_draw_centered_colored((int)text_buffer, 160, (int)(short)*(short *)D_0014292C, (int)(short)((int)(unsigned char)*(signed char *)D_0012B508), 156);
     goto L5A1A5;
 L5A17D:;
-    func_0007CA1F((int)D_001903A4, (int)(short)*(short *)D_00142928, (int)(short)*(short *)D_0014292C, (int)(short)((int)(unsigned char)*(signed char *)D_0012B508), 156);
+    text_draw_colored((int)text_buffer, (int)(short)*(short *)D_00142928, (int)(short)*(short *)D_0014292C, (int)(short)((int)(unsigned char)*(signed char *)D_0012B508), 156);
 L5A1A5:;
     *(short *)D_00190D66 = 0;
     *(short *)D_00190D64 = 0;
-    *(signed char *)D_001903A4 = 0;
+    *(signed char *)text_buffer = 0;
 }
 
 void func_0005A1C8(int a1)
 {
     func_000A0ED9(218, (int)D_001757A8);
-    func_000A0F5C((int)D_001903A4, (int)D_001757CE, a1);
-    *(int *)(D_00199C2C + (((int)(short)(*(short *)D_00199D5E)++) << 2)) = func_0006CB53((int)D_001903A4, 0);
+    func_000A0F5C((int)text_buffer, (int)D_001757CE, a1);
+    *(int *)(D_00199C2C + (((int)(short)(*(short *)D_00199D5E)++) << 2)) = disk_read_file((int)text_buffer, 0);
 }
 
 void func_0005A230(void)
@@ -268,21 +268,21 @@ L5A2E9:;
     goto L5A2E1;
 }
 
-void func_0005A337(void)
+void book_prev_page(void)
 {
-    if (*(short *)D_00199D5C == 0) return;
-    func_00069938(205, *(int *)D_00195AA4, 100);
-    (*(short *)D_00199D5C)--;
+    if (*(short *)book_page == 0) return;
+    sound_play(205, *(int *)player_object, 100);
+    (*(short *)book_page)--;
 }
 
-void func_0005A375(void)
+void book_next_page(void)
 {
-    if (((int)(short)*(short *)D_00199D5C) == (((int)(short)*(short *)D_00199D60) - 1)) return;
-    func_00069938(205, *(int *)D_00195AA4, 100);
-    (*(short *)D_00199D5C)++;
+    if (((int)(short)*(short *)book_page) == (((int)(short)*(short *)book_page_count) - 1)) return;
+    sound_play(205, *(int *)player_object, 100);
+    (*(short *)book_page)++;
 }
 
-void func_0005A3BC(void)
+void book_goto_page_prompt(void)
 {
     int l_18;
 
@@ -291,12 +291,12 @@ void func_0005A3BC(void)
     func_000A0ED9(268, (int)D_001757A8);
     func_000A0F5C(l_18, (int)D_001757D7, *(int *)D_0017D1E6);
     *(signed char *)((char *)(func_000A0DF4(l_18) + l_18) + 1) = 0;
-    func_0003EC2A(l_18, 2);
-    func_0008C4E4(((int)(short)*(short *)D_00199D5C) + 1);
+    msgbox_show_string(l_18, 2);
+    inpstr_begin_number(((int)(short)*(short *)book_page) + 1);
     *(short *)D_00190D68 = 4;
 }
 
-int func_0005A442(unsigned char a1)
+int font_char_width(unsigned char a1)
 {
     int l_24;
     short l_1C;
@@ -309,34 +309,34 @@ L5A469:;
     return ((int)(short)*(short *)((char *)l_24)) + ((int)(short)*(short *)D_0012DA48);
 }
 
-void func_0005A577(int a1, short a2, short a3)
+void text_draw_shadow(int a1, short a2, short a3)
 {
     unsigned char l_10;
 
     l_10 = *(signed char *)D_0012B508;
-    *(signed char *)D_0012B508 = *(signed char *)D_0012B504;
+    *(signed char *)D_0012B508 = *(signed char *)text_shadow_colour;
     func_0012DBCC((int)(short)(*(int *)&a2 + 1), (int)(short)(*(int *)&a3 + 1), a1);
     *(signed char *)D_0012B508 = l_10;
     func_0012DBCC((int)(short)a2, (int)(short)a3, a1);
 }
 
-void func_0005A60C(int a1, int a2, int a3)
+void text_draw_centred_shadow(int a1, int a2, int a3)
 {
     unsigned char l_10;
 
     l_10 = *(signed char *)D_0012B508;
-    *(signed char *)D_0012B508 = *(signed char *)D_0012B504;
-    func_0005A5D2(a1, a2 + 1, a3 + 1);
+    *(signed char *)D_0012B508 = *(signed char *)text_shadow_colour;
+    text_draw_centred(a1, a2 + 1, a3 + 1);
     *(signed char *)D_0012B508 = l_10;
-    func_0005A5D2(a1, a2, a3);
+    text_draw_centred(a1, a2, a3);
 }
 
-void func_0005A661(int a1, int a2, int a3, int a4)
+void mouse_set_bounds(int a1, int a2, int a3, int a4)
 {
-    *(short *)D_0012AF34 = a1;
-    *(short *)D_0012AF36 = a3;
-    *(short *)D_0012AF38 = a2;
-    *(short *)D_0012AF3A = a4;
+    *(short *)mouse_x_min = a1;
+    *(short *)mouse_x_max = a3;
+    *(short *)mouse_y_min = a2;
+    *(short *)mouse_y_max = a4;
 }
 
 void func_0005A6A3(int a1, int a2, int a3, int a4)
@@ -355,13 +355,13 @@ void func_0005A6ED(int a1, int a2, int a3, int a4)
     *(short *)D_0014294C = a4;
 }
 
-void func_0005A72F(int a1)
+void spell_tick(int a1)
 {
     int l_1C;
     int l_18;
 
     if (*(int *)((char *)a1 + 63) == 0) return;
-    if (a1 != *(int *)D_00195AA0) goto L5A75F;
+    if (a1 != *(int *)player_entity) goto L5A75F;
     *(signed char *)D_001940D6 &= 239;
 L5A75F:;
     l_1C = a1;
@@ -371,11 +371,11 @@ L5A76E:;
     l_18 = *(int *)((char *)a1 + 55);
     switch (*(unsigned char *)((char *)a1)) {
 case 9:
-    func_0005A7D5(a1, l_1C);
+    spell_tick_spell(a1, l_1C);
     goto L5A7C3;
 case 19:
     if ((*(short *)((char *)a1 + 29))-- != 0) goto L5A7C3;
-    func_0008DA4D(a1);
+    object_free_single(a1);
 default:
 L5A7C3:;
     a1 = l_18;
@@ -383,7 +383,7 @@ L5A7C3:;
 }
 }
 
-void func_0005A7D5(int a1, int a2)
+void spell_tick_spell(int a1, int a2)
 {
     int l_20;
     int l_1C;
@@ -404,29 +404,29 @@ L5A817:;
     if (((int)(unsigned char)*(signed char *)((char *)((l_20 * 2) + l_14))) == 255) goto L5A80F;
     l_1C++;
     if (((int)(signed char)*(signed char *)((char *)((l_20 * 3) + l_14) + 14)) != (-1)) goto L5A8AE;
-    if (*(int *)(*(char **)D_00195BE0 - 433 + (((int)(unsigned char)*(signed char *)((char *)l_14 + 72)) << 2)) == 0) goto L5A88E;
-    if (((int)(short)*(short *)(*(char **)(*(char **)D_00195BE0 - 433 + (((int)(unsigned char)*(signed char *)((char *)l_14 + 72)) << 2)) + 138)) != (-1)) goto L5A890;
+    if (*(int *)(*(char **)player_character - 433 + (((int)(unsigned char)*(signed char *)((char *)l_14 + 72)) << 2)) == 0) goto L5A88E;
+    if (((int)(short)*(short *)(*(char **)(*(char **)player_character - 433 + (((int)(unsigned char)*(signed char *)((char *)l_14 + 72)) << 2)) + 138)) != (-1)) goto L5A890;
 L5A88E:;
     goto L5A895;
 L5A890:;
     goto L5A80F;
 L5A895:;
     l_18++;
-    func_0008A550(l_14, l_20, a2);
+    spfx_effect_end(l_14, l_20, a2);
     goto L5A80F;
 L5A8AE:;
     if (*(short *)((char *)((l_20 * 2) + l_14) + 74) == 0) goto L5A8CB;
-    func_0008A90C(a1, a2, l_20);
+    spfx_effect_tick(a1, a2, l_20);
 L5A8CB:;
     if (*(short *)((char *)((l_20 * 2) + l_14) + 74) == 0) goto L5A8E8;
     (*(short *)((char *)((l_20 * 2) + l_14) + 74))--;
     goto L5A8FC;
 L5A8E8:;
     l_18++;
-    func_0008A550(l_14, l_20, a2);
+    spfx_effect_end(l_14, l_20, a2);
 L5A8FC:;
     goto L5A80F;
 L5A901:;
     if (l_1C != l_18) return;
-    func_0008DA91(a1);
+    object_delete(a1);
 }

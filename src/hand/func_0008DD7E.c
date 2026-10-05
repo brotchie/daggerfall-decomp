@@ -18,9 +18,9 @@ extern short D_001A9B24;
 extern int D_001A9B28;
 extern int D_001A9B2C;
 extern int D_001A9B30;
-extern void func_0008302D(int *, int *, int);
+extern void rotate_xz(int *, int *, int);
 
-void func_0008DD7E(struct obj *a1)
+void object_follow_move_cb(struct obj *a1)
 {
     int l_20;
     int dx;
@@ -35,7 +35,7 @@ void func_0008DD7E(struct obj *a1)
     a1->az = D_001A9B08 + (a1->az - D_001A9B24) & 2047;
     dx = a1->x - D_001A9B2C;
     dz = a1->z - D_001A9B28;
-    func_0008302D(&dx, &dz, a1->ay);
+    rotate_xz(&dx, &dz, a1->ay);
     a1->x = D_001A9AF4 + dx;
     a1->y = D_001A9AF8 + (a1->y - D_001A9B30);
     a1->z = D_001A9AFC + dz;

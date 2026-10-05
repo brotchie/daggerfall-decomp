@@ -13,19 +13,19 @@ struct obj {
 };
 extern int D_001940D6;
 extern int D_001940D8;
-extern int D_001959E8;
-extern struct obj *D_00195AA4;
-extern char *D_00195BE0;
+extern int wagon_container;
+extern struct obj *player_object;
+extern char *player_character;
 extern int D_00195D54;
-extern struct obj *D_001AA548[];
-extern int D_001AA564;
+extern struct obj *inv_right_rows[];
+extern int inv_right_scroll;
 extern short D_001AA588;
-extern void func_000934F6(struct obj *, short, int);
+extern void inv_draw_item_cell(struct obj *, short, int);
 extern int func_000C7FD9(int, int, int, int);
 extern int func_000C7FF4(int, int);
 extern int func_000CE44C(char *, struct obj *, int);
 
-void func_00095B81(struct obj *a1, int a2)
+void inv_list_right_item(struct obj *a1, int a2)
 {
     struct sub *s;
 
@@ -35,16 +35,16 @@ void func_00095B81(struct obj *a1, int a2)
         return;
     if ((D_001940D6 & 4) && a1->owner != D_00195D54)
         return;
-    if ((!(D_001940D6 & 4) && a1->parent != D_001959E8 ? 1 : 0) && func_000C7FF4(a1->z - D_00195AA4->z, func_000C7FD9(a1->x, a1->y, D_00195AA4->x, D_00195AA4->y)) > 160)
+    if ((!(D_001940D6 & 4) && a1->parent != wagon_container ? 1 : 0) && func_000C7FF4(a1->z - player_object->z, func_000C7FD9(a1->x, a1->y, player_object->x, player_object->y)) > 160)
         return;
-    if (D_001AA588 >= D_001AA564 && D_001AA588 < D_001AA564 + 4) {
-        if (!(D_001940D8 & 4) && func_000CE44C(D_00195BE0 + 367, a1, 27) != 0) {
+    if (D_001AA588 >= inv_right_scroll && D_001AA588 < inv_right_scroll + 4) {
+        if (!(D_001940D8 & 4) && func_000CE44C(player_character + 367, a1, 27) != 0) {
             s = &a1->sub;
             if (s->state != 1)
                 return;
         }
-        D_001AA548[D_001AA588 - D_001AA564] = a1;
-        func_000934F6(a1, D_001AA588 - D_001AA564, a2);
+        inv_right_rows[D_001AA588 - inv_right_scroll] = a1;
+        inv_draw_item_cell(a1, D_001AA588 - inv_right_scroll, a2);
     }
     D_001AA588++;
 }

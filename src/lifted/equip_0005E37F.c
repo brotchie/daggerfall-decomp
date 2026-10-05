@@ -3,10 +3,10 @@
 
 extern char D_00185F88[];
 
-extern int func_0007D6AE(int, int);
-extern void func_0005DE74(unsigned short, short, short, int);
-extern void func_00060430(int, int);
-extern void func_0006077F(int, int);
+extern int rand_range(int, int);
+extern void item_init_from_template(unsigned short, short, short, int);
+extern void item_make_magic(int, int);
+extern void item_make_artifact(int, int);
 
 void func_0005E37F(short a1, int a2, int a3, int a4)
 {
@@ -16,19 +16,19 @@ void func_0005E37F(short a1, int a2, int a3, int a4)
     l_14 = a2;
     goto L5E3B4;
 L5E3A6:;
-    l_14 = func_0007D6AE(a2, a3);
+    l_14 = rand_range(a2, a3);
 L5E3B4:;
     switch ((unsigned short)*(int *)&a1) {
 case 5:
-    func_0006077F(a4, func_0007D6AE(a2, a3));
+    item_make_artifact(a4, rand_range(a2, a3));
     return;
 case 4:
-    func_00060430(a4, -1);
+    item_make_magic(a4, -1);
     return;
 case 11:
-    func_0005DE74(287, 27, 8, a4);
+    item_init_from_template(287, 27, 8, a4);
     return;
 default:
-    func_0005DE74((int)(unsigned short)*(short *)((char *)(int)(*(char **)(D_00185F88 + (((int)(unsigned short)a1) << 2)) + (l_14 * 2))), (int)(short)a1, (int)(short)*(short *)&l_14, a4);
+    item_init_from_template((int)(unsigned short)*(short *)((char *)(int)(*(char **)(D_00185F88 + (((int)(unsigned short)a1) << 2)) + (l_14 * 2))), (int)(short)a1, (int)(short)*(short *)&l_14, a4);
 }
 }

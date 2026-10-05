@@ -7,8 +7,8 @@ struct bf8_3_1 { unsigned char _:3; unsigned char f:1; };
 struct bf8_7_1 { unsigned char _:7; unsigned char f:1; };
 extern char D_000CEA30[];
 extern char D_000CEA34[];
-extern char D_0012AC04[];
-extern char D_0012AC06[];
+extern char mouse_x[];
+extern char mouse_y[];
 extern char D_00153408[];
 extern char D_0015340D[];
 extern char D_00153411[];
@@ -19,38 +19,38 @@ extern char D_00175837[];
 extern char D_00175858[];
 extern char D_0017586C[];
 extern char D_00175881[];
-extern char D_001789F8[];
-extern char D_0017A84C[];
-extern char D_0017A94B[];
+extern char cast_anim_state[];
+extern char spell_effect_school[];
+extern char spell_effect_settings[];
 extern char D_0018509B[];
-extern char D_00185C14[];
-extern char D_00185C16[];
-extern char D_00185C20[];
-extern char D_00185C2A[];
-extern char D_00185C34[];
-extern char D_00185C3A[];
+extern char spell_last_cast_id[];
+extern char spell_missile_textures[];
+extern char spell_cast_sounds[];
+extern char spell_impact_sounds[];
+extern char magic_school_skills[];
+extern char spell_element_class_bits[];
 extern char D_00185CEC[];
 extern char D_00190504[];
-extern char D_001959B8[];
+extern char view_look_pitch[];
 extern char D_001959BC[];
 extern char D_001959FC[];
-extern char D_00195A98[];
-extern char D_00195AA0[];
-extern char D_00195AA4[];
+extern char camera_object[];
+extern char player_entity[];
+extern char player_object[];
 extern char D_00195AC4[];
-extern char D_00195AE8[];
-extern char D_00195B04[];
-extern char D_00195B14[];
-extern char D_00195B40[];
-extern char D_00195B48[];
-extern char D_00195B50[];
-extern char D_00195B68[];
-extern char D_00195BE0[];
-extern char D_00195BF8[];
+extern char cheat_flags[];
+extern char spell_records[];
+extern char creature_count[];
+extern char spell_ready_missile[];
+extern char spell_ready_touch[];
+extern char guild_npc_object[];
+extern char hud_bar_image[];
+extern char player_character[];
+extern char game_settings[];
 extern char D_00195C48[];
-extern char D_00195CBC[];
+extern char spell_cast_anim_fire[];
 extern char D_00195F28[];
-extern char D_00195F30[];
+extern char spell_effect_slot[];
 extern char D_00195F62[];
 extern char D_00196291[];
 extern char D_00196292[];
@@ -58,25 +58,25 @@ extern char D_00199D64[];
 extern char D_00199D6C[];
 extern char D_00199D71[];
 
-extern int func_00023C72(int, int);
+extern int collide_line_of_sight(int, int);
 extern int func_00023EC2(int, int, int);
-extern int func_0003A0C0(int, int);
-extern int func_0004B192(void);
-extern int func_0005AE5F(int);
-extern int func_0005AFD5(int, int);
-extern int func_0005B107(int, int, int);
-extern int func_0005C448(int, int);
-extern int func_00069938(int, int, int);
-extern int func_0007CBA1(int);
-extern int func_0007D6AE(int, int);
-extern int func_0008ADC3(int, int, int, int, int, int);
-extern int func_0008B1CC(int, int, int);
-extern int func_0008DA91(int);
-extern int func_0008DC58(int);
-extern int func_0008DCE3(int, int, int);
-extern int func_0008DD46(int, int);
-extern int func_0008E6C5(int, int, int);
-extern int func_0008EB88(int);
+extern int spell_cost(int, int);
+extern int player_in_daylight(void);
+extern int cast_player_spell(int);
+extern int cast_item_spell_at(int, int);
+extern int cast_creature_spell_at(int, int, int);
+extern int spell_missile_update(int, int);
+extern int sound_play(int, int, int);
+extern int hud_message_add(int);
+extern int rand_range(int, int);
+extern int spfx_resist_roll(int, int, int, int, int, int);
+extern int spell_extend_duration(int, int, int);
+extern int object_delete(int);
+extern int object_clone(int);
+extern int object_create_child(int, int, int);
+extern int object_reparent(int, int);
+extern int object_find_item(int, int, int);
+extern int object_new_id(int);
 extern int func_000A0040();
 extern int func_000A0AD9();
 extern int func_000A1023();
@@ -85,82 +85,82 @@ extern int func_000C2043();
 extern int func_000C7FD9();
 extern int func_000C7FF4();
 extern int func_000C808D();
-extern int func_000CAE0E();
+extern int spell_effect_dispatch();
 extern int func_000CD20E();
 extern int func_000CDB7A();
-extern int func_000CE4C4();
+extern int spell_find_effect_type();
 extern int func_000CE4E0();
 extern int func_000CE70D();
-extern void func_0002F490(int, int, int);
-extern void func_0002F72F(int, int, int, int);
-extern void func_0003A2AD(int, int);
+extern void damage_spawn_splash(int, int, int);
+extern void damage_knockback(int, int, int, int);
+extern void spell_add_skill_uses(int, int);
 extern void func_0007D774(int, int);
-extern void func_0008A4E4(int);
-extern void func_0008E3F7(int, int);
-int func_0005B408(int, int);
-int func_0005B905(int, int, int, int);
-int func_0005B9DF(int, int, int);
-void func_0005B206(int);
-void func_0005BA28(int, unsigned short, int);
+extern void spell_end(int);
+extern void object_foreach(int, int);
+int spell_resist_check(int, int);
+int spell_find_active_effect(int, int, int, int);
+int spell_apply_effect(int, int, int);
+void spellbook_find_last_cast_cb(int);
+void spell_compute_values(int, unsigned short, int);
 void func_0005C856(int, int);
-void func_0005C897(int);
+void cast_anim_start(int);
 void func_0005CA28(int);
 void func_0005CA87(int);
 
-int func_0005A9F8(int a1, int a2)
+int cast_item_strike_spell(int a1, int a2)
 {
     int l_1C;
     int l_18;
 
     l_1C = 0;
-    l_18 = func_0008DCE3(*(int *)(*(char **)D_00195AA4 + 67), 0, 89);
+    l_18 = object_create_child(*(int *)(*(char **)player_object + 67), 0, 89);
 L5AA29:;
-    if (*(signed char *)((char *)(int)(*(char **)D_00195B04 + (l_1C * 89)) + 47) == 0) goto L5AA53;
-    if (((int)(unsigned char)*(signed char *)((char *)(int)(*(char **)D_00195B04 + (l_1C * 89)) + 73)) == a1) goto L5AA5B;
+    if (*(signed char *)((char *)(int)(*(char **)spell_records + (l_1C * 89)) + 47) == 0) goto L5AA53;
+    if (((int)(unsigned char)*(signed char *)((char *)(int)(*(char **)spell_records + (l_1C * 89)) + 73)) == a1) goto L5AA5B;
 L5AA53:;
     l_1C++;
     goto L5AA29;
 L5AA5B:;
     *(signed char *)((char *)l_18) = 9;
-    *(int *)((char *)l_18 + 31) = func_0008EB88(((unsigned)*(int *)(*(char **)D_00195AC4 + 31)) >> 16);
-    func_000A1023(l_18 + 71, (int)(*(char **)D_00195B04 + (l_1C * 89)), 89, (int)D_001757F4, 121, 4);
+    *(int *)((char *)l_18 + 31) = object_new_id(((unsigned)*(int *)(*(char **)D_00195AC4 + 31)) >> 16);
+    func_000A1023(l_18 + 71, (int)(*(char **)spell_records + (l_1C * 89)), 89, (int)D_001757F4, 121, 4);
     *(signed char *)((char *)l_18 + 143) = 250;
-    l_1C = func_0003A0C0(l_18 + 71, *(int *)D_00195BE0);
-    if (func_0005AFD5(l_18, a2) == 0) goto L5AAD2;
-    func_0008DA91(l_18);
+    l_1C = spell_cost(l_18 + 71, *(int *)player_character);
+    if (cast_item_spell_at(l_18, a2) == 0) goto L5AAD2;
+    object_delete(l_18);
 L5AAD2:;
     return l_1C;
 }
 
-int func_0005AAE4(int a1, int a2, int a3)
+int cast_creature_spell(int a1, int a2, int a3)
 {
     int l_18;
     int l_14;
 
     l_18 = 0;
-    l_14 = func_0008DCE3(*(int *)D_00195AC4, 0, 89);
+    l_14 = object_create_child(*(int *)D_00195AC4, 0, 89);
 L5AB14:;
-    if (*(signed char *)((char *)(int)(*(char **)D_00195B04 + (l_18 * 89)) + 47) == 0) goto L5AB3E;
-    if (((int)(unsigned char)*(signed char *)((char *)(int)(*(char **)D_00195B04 + (l_18 * 89)) + 73)) == a3) goto L5AB46;
+    if (*(signed char *)((char *)(int)(*(char **)spell_records + (l_18 * 89)) + 47) == 0) goto L5AB3E;
+    if (((int)(unsigned char)*(signed char *)((char *)(int)(*(char **)spell_records + (l_18 * 89)) + 73)) == a3) goto L5AB46;
 L5AB3E:;
     l_18++;
     goto L5AB14;
 L5AB46:;
     *(signed char *)((char *)l_14) = 9;
-    *(int *)((char *)l_14 + 31) = func_0008EB88(((unsigned)*(int *)(*(char **)D_00195AC4 + 31)) >> 16);
+    *(int *)((char *)l_14 + 31) = object_new_id(((unsigned)*(int *)(*(char **)D_00195AC4 + 31)) >> 16);
     *(int *)((char *)l_14 + 47) = a1;
-    func_000A1023(l_14 + 71, (int)(*(char **)D_00195B04 + (l_18 * 89)), 89, (int)D_001757F4, 144, 4);
+    func_000A1023(l_14 + 71, (int)(*(char **)spell_records + (l_18 * 89)), 89, (int)D_001757F4, 144, 4);
     if (*(signed char *)D_00196292 == 0) goto L5ABA7;
     *(signed char *)((char *)l_14 + 143) = 250;
 L5ABA7:;
-    l_18 = func_0003A0C0(l_14 + 89, a1 + 71);
-    if (func_0005B107(l_14, a1, a2) == 0) goto L5ABD5;
-    func_0008DA91(l_14);
+    l_18 = spell_cost(l_14 + 89, a1 + 71);
+    if (cast_creature_spell_at(l_14, a1, a2) == 0) goto L5ABD5;
+    object_delete(l_14);
 L5ABD5:;
     return l_18;
 }
 
-void func_0005ABE6(int a1, int a2, int a3)
+void cast_spell_on(int a1, int a2, int a3)
 {
     int l_24;
     int l_20;
@@ -170,15 +170,15 @@ void func_0005ABE6(int a1, int a2, int a3)
     int l_10;
 
     l_18 = 0;
-    if (*(int *)((char *)a1 + 47) == *(int *)D_00195AA0) goto L5AC19;
-    if (((struct bf8_7_1 *)&D_00195AE8)->f != 0) goto L5AC1B;
+    if (*(int *)((char *)a1 + 47) == *(int *)player_entity) goto L5AC19;
+    if (((struct bf8_7_1 *)&cheat_flags)->f != 0) goto L5AC1B;
 L5AC19:;
     goto L5AC20;
 L5AC1B:;
     return;
 L5AC20:;
-    if (*(int *)((char *)a1 + 47) != *(int *)D_00195AA0) goto L5AC39;
-    if (a2 == *(int *)D_00195AA0) goto L5AC3B;
+    if (*(int *)((char *)a1 + 47) != *(int *)player_entity) goto L5AC39;
+    if (a2 == *(int *)player_entity) goto L5AC3B;
 L5AC39:;
     goto L5AC4B;
 L5AC3B:;
@@ -195,32 +195,32 @@ L5AC52:;
 L5AC84:;
     goto L5ACEA;
 L5AC86:;
-    func_00069938((int)(short)*(short *)(D_00185C20 + (((int)(unsigned char)*(signed char *)((char *)l_10 + 6)) * 2)), *(int *)D_00195AA4, 110);
-    if (*(int *)((char *)a1 + 47) != *(int *)D_00195AA0) goto L5ACC1;
+    sound_play((int)(short)*(short *)(spell_cast_sounds + (((int)(unsigned char)*(signed char *)((char *)l_10 + 6)) * 2)), *(int *)player_object, 110);
+    if (*(int *)((char *)a1 + 47) != *(int *)player_entity) goto L5ACC1;
     if (*(signed char *)D_00196291 == 0) goto L5ACC3;
 L5ACC1:;
     goto L5ACD5;
 L5ACC3:;
-    func_0005C897((int)(unsigned char)*(signed char *)((char *)l_10 + 6));
+    cast_anim_start((int)(unsigned char)*(signed char *)((char *)l_10 + 6));
     goto L5ACEA;
 L5ACD5:;
-    func_0002F490(*(int *)((char *)a1 + 47), 3, 3);
+    damage_spawn_splash(*(int *)((char *)a1 + 47), 3, 3);
 L5ACEA:;
     if (a3 != 0) goto L5AD15;
-    l_14 = func_0005B408(a1, (int)&a2);
+    l_14 = spell_resist_check(a1, (int)&a2);
     if (l_14 != 0) goto L5AD13;
-    func_0007CBA1(*(int *)D_0018509B);
+    hud_message_add(*(int *)D_0018509B);
     return;
 L5AD13:;
     goto L5AD1C;
 L5AD15:;
     l_14 = 100;
 L5AD1C:;
-    l_24 = func_0008DC58(a1);
+    l_24 = object_clone(a1);
     *(int *)((char *)l_24 + 47) = *(int *)((char *)a1 + 47);
-    *(int *)((char *)l_24 + 31) = func_0008EB88(801);
+    *(int *)((char *)l_24 + 31) = object_new_id(801);
     l_10 = l_24 + 71;
-    func_0005BA28(l_10, (int)(unsigned short)((unsigned short)(unsigned char)*(signed char *)(*(char **)((char *)l_24 + 47) + 200)), l_14);
+    spell_compute_values(l_10, (int)(unsigned short)((unsigned short)(unsigned char)*(signed char *)(*(char **)((char *)l_24 + 47) + 200)), l_14);
     l_20 = 0;
     l_1C = l_20;
 L5AD79:;
@@ -234,17 +234,17 @@ L5AD8C:;
     if (((int)(unsigned char)*(signed char *)((char *)l_10 + 72)) < 200) goto L5ADC6;
     if (((int)(unsigned char)*(signed char *)((char *)l_10 + 72)) != 250) goto L5ADD8;
 L5ADC6:;
-    if (func_0008B1CC(a2, l_10, l_20) != 0) goto L5ADDA;
+    if (spell_extend_duration(a2, l_10, l_20) != 0) goto L5ADDA;
 L5ADD8:;
     goto L5ADE2;
 L5ADDA:;
     l_18++;
     goto L5ADF0;
 L5ADE2:;
-    func_0005B9DF(l_24, l_20, a2);
+    spell_apply_effect(l_24, l_20, a2);
 L5ADF0:;
     if (((int)(unsigned char)*(signed char *)((char *)((l_20 * 2) + l_10))) == 255) goto L5AE29;
-    if (((int)(unsigned char)(*(signed char *)(D_0017A94B + (((int)(unsigned char)*(signed char *)((char *)((l_20 * 2) + l_10))) * 12)) & 1)) != 0) goto L5AE2B;
+    if (((int)(unsigned char)(*(signed char *)(spell_effect_settings + (((int)(unsigned char)*(signed char *)((char *)((l_20 * 2) + l_10))) * 12)) & 1)) != 0) goto L5AE2B;
 L5AE29:;
     goto L5AE31;
 L5AE2B:;
@@ -254,50 +254,50 @@ L5AE31:;
 L5AE36:;
     l_1C -= l_18;
     if (l_1C != 0) goto L5AE4C;
-    func_0008DA91(l_24);
+    object_delete(l_24);
     return;
 L5AE4C:;
-    func_0008DD46(a2, l_24);
+    object_reparent(a2, l_24);
 }
 
-void func_0005B206(int a1)
+void spellbook_find_last_cast_cb(int a1)
 {
     if (((int)(unsigned char)*(signed char *)((char *)a1)) != 9) return;
-    if ((short)((unsigned short)(unsigned char)*(signed char *)((char *)a1 + 144)) != *(short *)D_00185C14) return;
-    *(int *)D_00195B50 = a1;
+    if ((short)((unsigned short)(unsigned char)*(signed char *)((char *)a1 + 144)) != *(short *)spell_last_cast_id) return;
+    *(int *)guild_npc_object = a1;
 }
 
-int func_0005B24C(void)
+int cast_recast_last(void)
 {
     int l_28;
     int l_24;
     int l_20;
     int l_1C;
 
-    if (*(int *)D_00195B40 != 0) goto L5B26C;
-    if (*(int *)D_00195B48 == 0) goto L5B282;
+    if (*(int *)spell_ready_missile != 0) goto L5B26C;
+    if (*(int *)spell_ready_touch == 0) goto L5B282;
 L5B26C:;
-    func_0007CBA1((int)D_001757FF);
+    hud_message_add((int)D_001757FF);
     return 0;
 L5B282:;
-    if (((int)(short)*(short *)D_00185C14) != (-1)) goto L5B29A;
+    if (((int)(short)*(short *)spell_last_cast_id) != (-1)) goto L5B29A;
     return 0;
 L5B29A:;
-    l_28 = func_0008E6C5(*(int *)(*(char **)D_00195AA0 + 63), 27, 0);
+    l_28 = object_find_item(*(int *)(*(char **)player_entity + 63), 27, 0);
     if (l_28 != 0) goto L5B2CD;
-    func_0007CBA1((int)D_00175820);
+    hud_message_add((int)D_00175820);
     return 0;
 L5B2CD:;
-    *(int *)D_00195B50 = 0;
-    func_0008E3F7(*(int *)((char *)l_28 + 63), (int)func_0005B206);
-    l_28 = *(int *)D_00195B50;
+    *(int *)guild_npc_object = 0;
+    object_foreach(*(int *)((char *)l_28 + 63), (int)spellbook_find_last_cast_cb);
+    l_28 = *(int *)guild_npc_object;
     l_20 = l_28 + 71;
     l_1C = (int)(short)*(short *)D_00195F62;
-    if ((((int)(short)*(short *)(*(char **)D_00195BE0 + 141)) + *(int *)D_001959FC) >= l_1C) goto L5B32F;
-    func_0007CBA1((int)D_00175837);
+    if ((((int)(short)*(short *)(*(char **)player_character + 141)) + *(int *)D_001959FC) >= l_1C) goto L5B32F;
+    hud_message_add((int)D_00175837);
     return 0;
 L5B32F:;
-    func_0003A2AD(l_20, 1);
+    spell_add_skill_uses(l_20, 1);
     if (*(int *)D_001959FC == 0) goto L5B376;
     if (l_1C <= *(int *)D_001959FC) goto L5B364;
     l_1C -= *(int *)D_001959FC;
@@ -307,18 +307,18 @@ L5B364:;
     *(int *)D_001959FC -= l_1C;
     *(short *)D_00195F62 = 0;
 L5B376:;
-    *(short *)(*(char **)D_00195BE0 + 141) -= l_1C;
-    l_24 = func_0008DCE3(*(int *)(*(char **)D_00195AA4 + 67), 0, 89);
+    *(short *)(*(char **)player_character + 141) -= l_1C;
+    l_24 = object_create_child(*(int *)(*(char **)player_object + 67), 0, 89);
     *(signed char *)((char *)l_24) = 9;
-    *(int *)((char *)l_24 + 31) = func_0008EB88(((unsigned)*(int *)(*(char **)D_00195AC4 + 31)) >> 16);
+    *(int *)((char *)l_24 + 31) = object_new_id(((unsigned)*(int *)(*(char **)D_00195AC4 + 31)) >> 16);
     func_000A1023(l_24 + 71, l_28 + 71, 89, (int)D_001757F4, 443, 4);
-    if (func_0005AE5F(l_24) == 0) goto L5B3F4;
-    func_0008DA91(l_24);
+    if (cast_player_spell(l_24) == 0) goto L5B3F4;
+    object_delete(l_24);
 L5B3F4:;
     return 1;
 }
 
-int func_0005B408(int a1, int a2)
+int spell_resist_check(int a1, int a2)
 {
     int l_2C;
     int l_28;
@@ -349,46 +349,46 @@ L5B4B8:;
     goto L5B4D6;
 L5B4BA:;
     if (((int)(unsigned char)(*(signed char *)((char *)l_28 + 9) & 2)) == 0) goto L5B4D4;
-    if (func_0004B192() == 0) goto L5B4D6;
+    if (player_in_daylight() == 0) goto L5B4D6;
 L5B4D4:;
     goto L5B4D8;
 L5B4D6:;
     goto L5B4F7;
 L5B4D8:;
     if (((int)(unsigned char)(*(signed char *)((char *)l_28 + 9) & 1)) == 0) goto L5B4F2;
-    if (func_0004B192() != 0) goto L5B4F7;
+    if (player_in_daylight() != 0) goto L5B4F7;
 L5B4F2:;
     goto L5B5A7;
 L5B4F7:;
     if (((struct bf8_1_1 *)((char *)l_2C + 138))->f == 0) goto L5B559;
-    if (func_0005B905(*(int *)((char *)a2), 20, (int)&l_1C, 0) != 0) goto L5B545;
+    if (spell_find_active_effect(*(int *)((char *)a2), 20, (int)&l_1C, 0) != 0) goto L5B545;
     l_1C = ((int)(unsigned char)*(signed char *)((char *)l_2C + 129)) + 25;
-    if (func_0007D6AE(1, 100) > l_1C) goto L5B5A7;
+    if (rand_range(1, 100) > l_1C) goto L5B5A7;
     goto L5B559;
 L5B545:;
-    if (func_0007D6AE(1, 100) > l_1C) goto L5B5A7;
+    if (rand_range(1, 100) > l_1C) goto L5B5A7;
 L5B559:;
-    l_20 = func_0003A0C0(l_18, l_2C);
+    l_20 = spell_cost(l_18, l_2C);
     if ((l_20 + ((int)(short)*(short *)((char *)l_2C + 141))) > ((int)(short)*(short *)((char *)l_2C + 143))) goto L5B5A7;
     *(short *)((char *)l_2C + 141) += l_20;
-    func_0007CBA1((int)D_00175858);
+    hud_message_add((int)D_00175858);
     return 0;
 L5B5A7:;
     if (((struct bf8_2_1 *)((char *)l_2C + 138))->f == 0) goto L5B606;
-    func_0005B905(*(int *)((char *)a2), 21, (int)&l_1C, 0);
-    if (func_0007D6AE(1, 100) > l_1C) goto L5B606;
+    spell_find_active_effect(*(int *)((char *)a2), 21, (int)&l_1C, 0);
+    if (rand_range(1, 100) > l_1C) goto L5B606;
     *(int *)((char *)a2) = *(int *)((char *)a1 + 47);
     l_2C = *(int *)((char *)a2) + 71;
     l_28 = l_2C + 560;
-    func_0007CBA1((int)D_0017586C);
+    hud_message_add((int)D_0017586C);
 L5B606:;
     if (((struct bf8_3_1 *)((char *)l_2C + 138))->f == 0) goto L5B64D;
-    func_0005B905(*(int *)((char *)a2), 22, (int)&l_1C, 0);
-    if (func_0007D6AE(1, 100) > l_1C) goto L5B64D;
-    func_0007CBA1((int)D_00175881);
+    spell_find_active_effect(*(int *)((char *)a2), 22, (int)&l_1C, 0);
+    if (rand_range(1, 100) > l_1C) goto L5B64D;
+    hud_message_add((int)D_00175881);
     return 0;
 L5B64D:;
-    return func_0008ADC3((int)(unsigned char)*(signed char *)((char *)l_18 + 6), (int)(unsigned char)*(signed char *)(D_00185C3A + ((int)(unsigned char)*(signed char *)((char *)l_18 + 6))), l_2C, l_28, 2, (-(((int)(unsigned char)*(signed char *)(*(char **)((char *)a1 + 47) + 200)) - ((int)(unsigned char)*(signed char *)((char *)l_2C + 129)))) * 5);
+    return spfx_resist_roll((int)(unsigned char)*(signed char *)((char *)l_18 + 6), (int)(unsigned char)*(signed char *)(spell_element_class_bits + ((int)(unsigned char)*(signed char *)((char *)l_18 + 6))), l_2C, l_28, 2, (-(((int)(unsigned char)*(signed char *)(*(char **)((char *)a1 + 47) + 200)) - ((int)(unsigned char)*(signed char *)((char *)l_2C + 129)))) * 5);
 }
 
 int func_0005B6AE(int a1, int a2, int a3)
@@ -408,14 +408,14 @@ L5B6DB:;
 L5B6E3:;
     if (((int)(unsigned char)*(signed char *)((char *)((l_1C * 2) + a1))) == 255) goto L5B6DB;
     l_18 = (int)(unsigned short)*(short *)((char *)((l_1C * 2) + a1) + 8);
-    l_18 = ((110 - ((int)(short)*(short *)((char *)((((int)(unsigned char)*(signed char *)(D_00185C34 + ((int)(unsigned char)*(signed char *)(D_0017A84C + ((int)(unsigned char)*(signed char *)((char *)((l_1C * 2) + a1))))))) * 6) + a2) + 157))) * l_18) / 100;
+    l_18 = ((110 - ((int)(short)*(short *)((char *)((((int)(unsigned char)*(signed char *)(magic_school_skills + ((int)(unsigned char)*(signed char *)(spell_effect_school + ((int)(unsigned char)*(signed char *)((char *)((l_1C * 2) + a1))))))) * 6) + a2) + 157))) * l_18) / 100;
     l_14 += l_18;
     goto L5B6DB;
 L5B761:;
     return l_14;
 }
 
-int func_0005B905(int a1, int a2, int a3, int a4)
+int spell_find_active_effect(int a1, int a2, int a3, int a4)
 {
     int l_14;
     int l_10;
@@ -440,8 +440,8 @@ L5B98C:;
     if (a4 == 0) goto L5B9A5;
     *(int *)((char *)a4) = (int)(unsigned short)*(short *)((char *)((l_10 * 2) + l_14) + 80);
 L5B9A5:;
-    *(short *)D_00195F30 = l_10;
-    *(int *)D_00195B50 = a1;
+    *(short *)spell_effect_slot = l_10;
+    *(int *)guild_npc_object = a1;
     return l_14;
 L5B9BE:;
     goto L5B95A;
@@ -452,15 +452,15 @@ L5B9CE:;
     return 0;
 }
 
-int func_0005B9DF(int a1, int a2, int a3)
+int spell_apply_effect(int a1, int a2, int a3)
 {
     int l_14;
 
     l_14 = a1 + 71;
-    return func_000CAE0E((int)(unsigned char)*(signed char *)((char *)((a2 * 2) + l_14)), a1, a2, a3);
+    return spell_effect_dispatch((int)(unsigned char)*(signed char *)((char *)((a2 * 2) + l_14)), a1, a2, a3);
 }
 
-void func_0005BA28(int a1, unsigned short a2, int a3)
+void spell_compute_values(int a1, unsigned short a2, int a3)
 {
     int l_18;
 
@@ -477,7 +477,7 @@ L5BA68:;
 L5BA70:;
     if (((int)(unsigned char)*(signed char *)((char *)((l_18 * 2) + a1))) == 255) goto L5BA68;
     if (((int)(signed char)*(signed char *)((char *)((l_18 * 3) + a1) + 14)) == (-1)) goto L5BB26;
-    if (((int)(unsigned char)(*(signed char *)(D_0017A94B + (((int)(unsigned char)*(signed char *)((char *)((l_18 * 2) + a1))) * 12)) & 1)) == 0) goto L5BB16;
+    if (((int)(unsigned char)(*(signed char *)(spell_effect_settings + (((int)(unsigned char)*(signed char *)((char *)((l_18 * 2) + a1))) * 12)) & 1)) == 0) goto L5BB16;
     *(short *)((char *)((l_18 * 2) + a1) + 74) = ((((int)(signed char)*(signed char *)((char *)((l_18 * 3) + a1) + 14)) + (((int)(signed char)*(signed char *)((char *)((l_18 * 3) + a1) + 15)) * (((int)(unsigned short)a2) / ((int)(signed char)*(signed char *)((char *)((l_18 * 3) + a1) + 16))))) * a3) / 100;
     goto L5BB24;
 L5BB16:;
@@ -487,17 +487,17 @@ L5BB24:;
 L5BB26:;
     *(short *)((char *)((l_18 * 2) + a1) + 74) = 65535;
 L5BB34:;
-    if (((int)(unsigned char)(*(signed char *)(D_0017A94B + (((int)(unsigned char)*(signed char *)((char *)((l_18 * 2) + a1))) * 12)) & 2)) == 0) goto L5BB99;
+    if (((int)(unsigned char)(*(signed char *)(spell_effect_settings + (((int)(unsigned char)*(signed char *)((char *)((l_18 * 2) + a1))) * 12)) & 2)) == 0) goto L5BB99;
     *(signed char *)((char *)(a1 + l_18) + 86) = ((int)(signed char)*(signed char *)((char *)((l_18 * 3) + a1) + 23)) + (((int)(signed char)*(signed char *)((char *)((l_18 * 3) + a1) + 24)) * (((int)(unsigned short)a2) / ((int)(signed char)*(signed char *)((char *)((l_18 * 3) + a1) + 25))));
 L5BB99:;
-    if (((int)(unsigned char)(*(signed char *)(D_0017A94B + (((int)(unsigned char)*(signed char *)((char *)((l_18 * 2) + a1))) * 12)) & 4)) == 0) goto L5BC4E;
-    *(short *)((char *)((l_18 * 2) + a1) + 80) = (a3 * (func_0007D6AE((int)(signed char)*(signed char *)((char *)((l_18 * 5) + a1) + 32), (int)(signed char)*(signed char *)((char *)((l_18 * 5) + a1) + 33)) + ((((int)(unsigned short)a2) / ((int)(signed char)*(signed char *)((char *)((l_18 * 5) + a1) + 36))) * func_0007D6AE((int)(signed char)*(signed char *)((char *)((l_18 * 5) + a1) + 34), (int)(signed char)*(signed char *)((char *)((l_18 * 5) + a1) + 35))))) / 100;
+    if (((int)(unsigned char)(*(signed char *)(spell_effect_settings + (((int)(unsigned char)*(signed char *)((char *)((l_18 * 2) + a1))) * 12)) & 4)) == 0) goto L5BC4E;
+    *(short *)((char *)((l_18 * 2) + a1) + 80) = (a3 * (rand_range((int)(signed char)*(signed char *)((char *)((l_18 * 5) + a1) + 32), (int)(signed char)*(signed char *)((char *)((l_18 * 5) + a1) + 33)) + ((((int)(unsigned short)a2) / ((int)(signed char)*(signed char *)((char *)((l_18 * 5) + a1) + 36))) * rand_range((int)(signed char)*(signed char *)((char *)((l_18 * 5) + a1) + 34), (int)(signed char)*(signed char *)((char *)((l_18 * 5) + a1) + 35))))) / 100;
     *(short *)((char *)((l_18 * 5) + a1) + 34) = 0;
 L5BC4E:;
     goto L5BA68;
 }
 
-void func_0005BC5B(int a1, int a2)
+void spell_remove_effect_type(int a1, int a2)
 {
     int l_18;
     int l_14;
@@ -507,18 +507,18 @@ L5BC77:;
     if (a1 == 0) return;
     if (((int)(unsigned char)*(signed char *)((char *)a1)) != 9) goto L5BCCA;
     l_18 = a1 + 71;
-    l_14 = func_000CE4C4(l_18, a2);
+    l_14 = spell_find_effect_type(l_18, a2);
     if (l_14 == 0) goto L5BCCA;
     *(signed char *)((char *)((l_14 * 2) + l_18)) = 255;
     if (func_000CE4E0(l_18) == 0) goto L5BCCA;
-    func_0008DA91(a1);
+    object_delete(a1);
     return;
 L5BCCA:;
     a1 = *(int *)((char *)a1 + 55);
     goto L5BC77;
 }
 
-void func_0005BCDE(int a1)
+void cast_fire_missile(int a1)
 {
     int l_20;
     int l_1C;
@@ -527,26 +527,26 @@ void func_0005BCDE(int a1)
     char l_40[12];
     char l_34[16];
 
-    func_0008DD46(*(int *)D_00195AC4, a1);
-    *(int *)((char *)l_34 + 12) = func_0008DCE3(a1, 0, 0);
+    object_reparent(*(int *)D_00195AC4, a1);
+    *(int *)((char *)l_34 + 12) = object_create_child(a1, 0, 0);
     *(signed char *)(*(char **)((char *)l_34 + 12)) = 7;
     *(short *)(*(char **)((char *)l_34 + 12) + 27) = 48;
     *(short *)(*(char **)((char *)l_34 + 12) + 23) = 64;
-    *(int *)((char *)a1 + 7) = *(int *)(*(char **)D_00195AA4 + 7);
+    *(int *)((char *)a1 + 7) = *(int *)(*(char **)player_object + 7);
     *(int *)(*(char **)((char *)l_34 + 12) + 7) = *(int *)((char *)a1 + 7);
-    *(int *)((char *)a1 + 11) = *(int *)(*(char **)D_00195AA4 + 11) - 50;
+    *(int *)((char *)a1 + 11) = *(int *)(*(char **)player_object + 11) - 50;
     *(int *)(*(char **)((char *)l_34 + 12) + 11) = *(int *)((char *)a1 + 11);
-    *(int *)((char *)a1 + 15) = *(int *)(*(char **)D_00195AA4 + 15);
+    *(int *)((char *)a1 + 15) = *(int *)(*(char **)player_object + 15);
     *(int *)(*(char **)((char *)l_34 + 12) + 15) = *(int *)((char *)a1 + 15);
     *(short *)(*(char **)((char *)l_34 + 12) + 1) = 0;
     *(short *)(*(char **)((char *)l_34 + 12) + 3) = 0;
     if (*(signed char *)D_00153408 == 0) goto L5BE03;
-    *(short *)((char *)a1 + 1) = ((((int)(short)*(short *)(*(char **)D_00195A98 + 1)) + ((((((int)(short)*(short *)D_0012AC06) + 6) - ((int)(short)*(short *)D_000CEA34)) * 307) >> 8)) + *(int *)D_0015340D) & 2047;
-    *(short *)((char *)a1 + 3) = (((((*(short *)D_0012AC04 + 6) - *(short *)D_000CEA30) * 2) + *(short *)(*(char **)D_00195A98 + 3)) + *(short *)D_00153411) & 2047;
+    *(short *)((char *)a1 + 1) = ((((int)(short)*(short *)(*(char **)camera_object + 1)) + ((((((int)(short)*(short *)mouse_y) + 6) - ((int)(short)*(short *)D_000CEA34)) * 307) >> 8)) + *(int *)D_0015340D) & 2047;
+    *(short *)((char *)a1 + 3) = (((((*(short *)mouse_x + 6) - *(short *)D_000CEA30) * 2) + *(short *)(*(char **)camera_object + 3)) + *(short *)D_00153411) & 2047;
     goto L5BE89;
 L5BE03:;
-    *(short *)((char *)a1 + 1) = ((((((((int)(short)*(short *)D_0012AC06) + 6) - ((int)(short)*(short *)D_000CEA34)) * 150) / 100) + ((int)(short)*(short *)(*(char **)D_00195A98 + 1))) + *(int *)D_001959B8) & 2047;
-    *(short *)((char *)a1 + 3) = ((((int)(short)*(short *)(*(char **)D_00195A98 + 3)) + ((((((int)(short)*(short *)D_0012AC04) + 6) - ((int)(short)*(short *)D_000CEA30)) * 160) / 100)) + *(int *)D_001959BC) & 2047;
+    *(short *)((char *)a1 + 1) = ((((((((int)(short)*(short *)mouse_y) + 6) - ((int)(short)*(short *)D_000CEA34)) * 150) / 100) + ((int)(short)*(short *)(*(char **)camera_object + 1))) + *(int *)view_look_pitch) & 2047;
+    *(short *)((char *)a1 + 3) = ((((int)(short)*(short *)(*(char **)camera_object + 3)) + ((((((int)(short)*(short *)mouse_x) + 6) - ((int)(short)*(short *)D_000CEA30)) * 160) / 100)) + *(int *)D_001959BC) & 2047;
 L5BE89:;
     *(short *)(*(char **)((char *)l_34 + 12) + 5) = (*(short *)((char *)a1 + 5) = 0);
     func_000A0040((int)l_40, 0, 12, (int)D_001757F4, 711, 4);
@@ -564,14 +564,14 @@ L5BE89:;
     *(int *)(*(char **)((char *)l_34 + 12) + 11) = *(int *)((char *)a1 + 11);
     *(int *)(*(char **)((char *)l_34 + 12) + 15) = *(int *)((char *)a1 + 15);
     l_1C = a1 + 71;
-    *(short *)((char *)a1 + 23) = *(short *)(D_00185C16 + (((int)(unsigned char)*(signed char *)((char *)l_1C + 6)) * 2));
+    *(short *)((char *)a1 + 23) = *(short *)(spell_missile_textures + (((int)(unsigned char)*(signed char *)((char *)l_1C + 6)) * 2));
     *(signed char *)((char *)a1 + 22) |= 32;
     *(short *)((char *)a1 + 29) = 0;
-    *(int *)l_34 = (*(int *)(*(char **)D_00195AA4 + 7) + *(int *)((char *)a1 + 7)) / 2;
-    *(int *)((char *)l_34 + 4) = (*(int *)(*(char **)D_00195AA4 + 11) + *(int *)((char *)a1 + 11)) / 2;
-    *(int *)((char *)l_34 + 8) = (*(int *)(*(char **)D_00195AA4 + 15) + *(int *)((char *)a1 + 15)) / 2;
-    if (func_00023EC2(*(int *)D_00195AA4, (int)l_34, 65) == 0) goto L5C08D;
-    func_00069938((int)(short)*(short *)(D_00185C2A + (((int)(unsigned char)*(signed char *)((char *)a1 + 77)) * 2)), a1, 110);
+    *(int *)l_34 = (*(int *)(*(char **)player_object + 7) + *(int *)((char *)a1 + 7)) / 2;
+    *(int *)((char *)l_34 + 4) = (*(int *)(*(char **)player_object + 11) + *(int *)((char *)a1 + 11)) / 2;
+    *(int *)((char *)l_34 + 8) = (*(int *)(*(char **)player_object + 15) + *(int *)((char *)a1 + 15)) / 2;
+    if (func_00023EC2(*(int *)player_object, (int)l_34, 65) == 0) goto L5C08D;
+    sound_play((int)(short)*(short *)(spell_impact_sounds + (((int)(unsigned char)*(signed char *)((char *)a1 + 77)) * 2)), a1, 110);
     *(signed char *)((char *)a1 + 23) |= 1;
     *(short *)((char *)a1 + 29) = 32768;
     *(short *)(*(char **)((char *)a1 + 63) + 23) <<= 2;
@@ -579,42 +579,42 @@ L5BE89:;
     if (((int)(unsigned char)*(signed char *)((char *)l_1C + 7)) == 2) goto L5C078;
     if (((int)(unsigned char)*(signed char *)((char *)l_1C + 7)) != 4) goto L5C088;
 L5C078:;
-    func_0005C897((int)(unsigned char)*(signed char *)((char *)l_1C + 6));
+    cast_anim_start((int)(unsigned char)*(signed char *)((char *)l_1C + 6));
 L5C088:;
     return;
 L5C08D:;
-    func_0005C448(a1, 1);
+    spell_missile_update(a1, 1);
     if (((int)(unsigned char)*(signed char *)((char *)l_1C + 7)) == 2) goto L5C0BA;
     if (((int)(unsigned char)*(signed char *)((char *)l_1C + 7)) != 4) goto L5C0CA;
 L5C0BA:;
-    func_0005C897((int)(unsigned char)*(signed char *)((char *)l_1C + 6));
+    cast_anim_start((int)(unsigned char)*(signed char *)((char *)l_1C + 6));
 L5C0CA:;
     *(int *)((char *)a1 + 11) += 40;
-    if (func_00023C72(*(int *)D_00195AA4, a1) != 0) goto L5C15B;
+    if (collide_line_of_sight(*(int *)player_object, a1) != 0) goto L5C15B;
     *(int *)((char *)a1 + 11) -= 40;
-    func_00069938((int)(short)*(short *)(D_00185C2A + (((int)(unsigned char)*(signed char *)((char *)l_1C + 6)) * 2)), a1, 110);
+    sound_play((int)(short)*(short *)(spell_impact_sounds + (((int)(unsigned char)*(signed char *)((char *)l_1C + 6)) * 2)), a1, 110);
     *(signed char *)((char *)a1 + 23) |= 1;
     *(short *)((char *)a1 + 29) = 32768;
     *(short *)(*(char **)((char *)a1 + 63) + 23) <<= 2;
     if (((int)(unsigned char)*(signed char *)((char *)l_1C + 7)) == 2) goto L5C149;
     if (((int)(unsigned char)*(signed char *)((char *)l_1C + 7)) != 4) goto L5C159;
 L5C149:;
-    func_0005C897((int)(unsigned char)*(signed char *)((char *)l_1C + 6));
+    cast_anim_start((int)(unsigned char)*(signed char *)((char *)l_1C + 6));
 L5C159:;
     return;
 L5C15B:;
     *(int *)((char *)a1 + 11) -= 40;
-    func_0005C448(a1, 1);
+    spell_missile_update(a1, 1);
     if (((int)(unsigned char)*(signed char *)((char *)l_1C + 7)) == 2) goto L5C18F;
     if (((int)(unsigned char)*(signed char *)((char *)l_1C + 7)) != 4) goto L5C19F;
 L5C18F:;
-    func_0005C897((int)(unsigned char)*(signed char *)((char *)l_1C + 6));
+    cast_anim_start((int)(unsigned char)*(signed char *)((char *)l_1C + 6));
 L5C19F:;
-    func_00069938((int)(short)*(short *)(D_00185C20 + (((int)(unsigned char)*(signed char *)((char *)l_1C + 6)) * 2)), a1, 110);
+    sound_play((int)(short)*(short *)(spell_cast_sounds + (((int)(unsigned char)*(signed char *)((char *)l_1C + 6)) * 2)), a1, 110);
 }
 }
 
-void func_0005C1CA(int a1, int a2, int a3)
+void cast_creature_missile(int a1, int a2, int a3)
 {
     int l_28;
     int l_10;
@@ -624,8 +624,8 @@ void func_0005C1CA(int a1, int a2, int a3)
     int l_14;
     char l_3C[12];
 
-    func_0008DD46(*(int *)D_00195AC4, a1);
-    l_28 = func_0008DCE3(a1, 0, 0);
+    object_reparent(*(int *)D_00195AC4, a1);
+    l_28 = object_create_child(a1, 0, 0);
     *(signed char *)((char *)l_28) = 7;
     *(short *)((char *)l_28 + 27) = 48;
     *(short *)((char *)l_28 + 23) = 64;
@@ -648,25 +648,25 @@ void func_0005C1CA(int a1, int a2, int a3)
     func_000C2000(a1 + 7, a3 + 7, a1 + 118);
     *(int *)((char *)a3 + 11) += 50;
     l_10 = a1 + 71;
-    *(short *)((char *)a1 + 23) = *(short *)(D_00185C16 + (((int)(unsigned char)*(signed char *)((char *)l_10 + 6)) * 2));
+    *(short *)((char *)a1 + 23) = *(short *)(spell_missile_textures + (((int)(unsigned char)*(signed char *)((char *)l_10 + 6)) * 2));
     *(signed char *)((char *)a1 + 22) |= 32;
     *(short *)((char *)a1 + 29) = 0;
     *(int *)l_3C = (*(int *)((char *)a2 + 7) + *(int *)((char *)a1 + 7)) / 2;
     *(int *)((char *)l_3C + 4) = (*(int *)((char *)a2 + 11) + *(int *)((char *)a1 + 11)) / 2;
     *(int *)((char *)l_3C + 8) = (*(int *)((char *)a2 + 15) + *(int *)((char *)a1 + 15)) / 2;
     if (func_00023EC2(a2, (int)l_3C, 65) == 0) goto L5C412;
-    func_00069938((int)(short)*(short *)(D_00185C2A + (((int)(unsigned char)*(signed char *)((char *)a1 + 77)) * 2)), a1, 110);
+    sound_play((int)(short)*(short *)(spell_impact_sounds + (((int)(unsigned char)*(signed char *)((char *)a1 + 77)) * 2)), a1, 110);
     *(signed char *)((char *)a1 + 23) |= 1;
     *(short *)((char *)a1 + 29) = 32768;
     *(short *)(*(char **)((char *)a1 + 63) + 23) <<= 2;
     func_0005C856(a1, *(int *)D_00195C48);
     return;
 L5C412:;
-    func_0005C448(a1, 1);
-    func_00069938((int)(short)*(short *)(D_00185C20 + (((int)(unsigned char)*(signed char *)((char *)l_10 + 6)) * 2)), a1, 110);
+    spell_missile_update(a1, 1);
+    sound_play((int)(short)*(short *)(spell_cast_sounds + (((int)(unsigned char)*(signed char *)((char *)l_10 + 6)) * 2)), a1, 110);
 }
 
-void func_0005C6A2(int a1)
+void spell_area_effect(int a1)
 {
     int l_20;
     int l_1C;
@@ -682,22 +682,22 @@ L5C6FF:;
     l_1C = l_1C * 3;
     l_20 = 0;
 L5C70F:;
-    if (l_20 < *(int *)D_00195B14) goto L5C727;
+    if (l_20 < *(int *)creature_count) goto L5C727;
     goto L5C7F5;
 L5C71F:;
     l_20++;
     goto L5C70F;
 L5C727:;
     if (func_000C7FF4(*(int *)((char *)a1 + 11) - *(int *)(*(char **)(D_00190504 + (l_20 << 2)) + 11), func_000C7FD9(*(int *)((char *)a1 + 7), *(int *)((char *)a1 + 15), *(int *)(*(char **)(D_00190504 + (l_20 << 2)) + 7), *(int *)(*(char **)(D_00190504 + (l_20 << 2)) + 15))) >= l_1C) goto L5C7F0;
-    if (func_00023C72(a1, *(int *)(D_00190504 + (l_20 << 2))) == 0) goto L5C71F;
-    func_0002F72F(*(int *)(D_00190504 + (l_20 << 2)), l_1C * 30, func_000C808D(*(int *)((char *)a1 + 7), *(int *)((char *)a1 + 15), *(int *)(*(char **)(D_00190504 + (l_20 << 2)) + 7), *(int *)(*(char **)(D_00190504 + (l_20 << 2)) + 15)), l_1C);
+    if (collide_line_of_sight(a1, *(int *)(D_00190504 + (l_20 << 2))) == 0) goto L5C71F;
+    damage_knockback(*(int *)(D_00190504 + (l_20 << 2)), l_1C * 30, func_000C808D(*(int *)((char *)a1 + 7), *(int *)((char *)a1 + 15), *(int *)(*(char **)(D_00190504 + (l_20 << 2)) + 7), *(int *)(*(char **)(D_00190504 + (l_20 << 2)) + 15)), l_1C);
     func_0005C856(a1, *(int *)(D_00190504 + (l_20 << 2)));
 L5C7F0:;
     goto L5C71F;
 L5C7F5:;
-    if (func_000C7FF4(*(int *)((char *)a1 + 11) - *(int *)(*(char **)D_00195AA4 + 11), func_000C7FD9(*(int *)((char *)a1 + 7), *(int *)((char *)a1 + 15), *(int *)(*(char **)D_00195AA4 + 7), *(int *)(*(char **)D_00195AA4 + 15))) >= l_1C) return;
+    if (func_000C7FF4(*(int *)((char *)a1 + 11) - *(int *)(*(char **)player_object + 11), func_000C7FD9(*(int *)((char *)a1 + 7), *(int *)((char *)a1 + 15), *(int *)(*(char **)player_object + 7), *(int *)(*(char **)player_object + 15))) >= l_1C) return;
     func_0005CA87(a1 + 71);
-    func_0007D774(a1, *(int *)D_00195AA0);
+    func_0007D774(a1, *(int *)player_entity);
 }
 
 void func_0005C856(int a1, int a2)
@@ -707,44 +707,44 @@ void func_0005C856(int a1, int a2)
     func_0007D774(a1, a2);
 }
 
-void func_0005C897(int a1)
+void cast_anim_start(int a1)
 {
-    if (((int)(short)*(short *)D_001789F8) > (-1)) return;
-    *(short *)D_001789F8 = a1 << 4;
+    if (((int)(short)*(short *)cast_anim_state) > (-1)) return;
+    *(short *)cast_anim_state = a1 << 4;
 }
 
-void func_0005C8CA(void)
+void cast_anim_update(void)
 {
     int l_1C;
     int l_18;
 
-    if (*(short *)D_001789F8 < 0) return;
-    if (((int)(short)(*(short *)D_001789F8 & 15)) != 6) goto L5C952;
-    if (((int)(unsigned short)(*(short *)(*(char **)D_00195BF8) & 1)) == 0) goto L5C916;
+    if (*(short *)cast_anim_state < 0) return;
+    if (((int)(short)(*(short *)cast_anim_state & 15)) != 6) goto L5C952;
+    if (((int)(unsigned short)(*(short *)(*(char **)game_settings) & 1)) == 0) goto L5C916;
     l_18 = 0;
     goto L5C92A;
 L5C916:;
-    l_18 = -((int)(unsigned short)*(short *)(*(char **)D_00195B68 + 6));
+    l_18 = -((int)(unsigned short)*(short *)(*(char **)hud_bar_image + 6));
 L5C92A:;
-    func_000CDB7A(*(int *)(D_00195CBC + ((((int)(short)*(short *)D_001789F8) >> 4) << 2)), 0, l_18);
-    *(short *)D_001789F8 = 65535;
+    func_000CDB7A(*(int *)(spell_cast_anim_fire + ((((int)(short)*(short *)cast_anim_state) >> 4) << 2)), 0, l_18);
+    *(short *)cast_anim_state = 65535;
     return;
 L5C952:;
-    if (((int)(unsigned short)(*(short *)(*(char **)D_00195BF8) & 1)) == 0) goto L5C971;
+    if (((int)(unsigned short)(*(short *)(*(char **)game_settings) & 1)) == 0) goto L5C971;
     l_1C = 0;
     goto L5C985;
 L5C971:;
-    l_1C = -((int)(unsigned short)*(short *)(*(char **)D_00195B68 + 6));
+    l_1C = -((int)(unsigned short)*(short *)(*(char **)hud_bar_image + 6));
 L5C985:;
-    func_000CDB7A(*(int *)(D_00195CBC + ((((int)(short)*(short *)D_001789F8) >> 4) << 2)), (int)(short)(*(short *)D_001789F8 & 15), l_1C);
-    (*(short *)D_001789F8)++;
+    func_000CDB7A(*(int *)(spell_cast_anim_fire + ((((int)(short)*(short *)cast_anim_state) >> 4) << 2)), (int)(short)(*(short *)cast_anim_state & 15), l_1C);
+    (*(short *)cast_anim_state)++;
 }
 
 int func_0005C9BF(unsigned char a1)
 {
     int l_20;
 
-    l_20 = *(int *)(*(char **)D_00195AA0 + 63);
+    l_20 = *(int *)(*(char **)player_entity + 63);
 L5C9DB:;
     if (l_20 == 0) goto L5CA14;
     if (((int)(unsigned char)*(signed char *)((char *)l_20)) != 9) goto L5C9FE;
@@ -774,8 +774,8 @@ void func_0005CA87(int a1)
 
     l_1C = 0;
 L5CA9F:;
-    if (*(signed char *)((char *)(int)(*(char **)D_00195B04 + (l_1C * 89)) + 47) == 0) goto L5CAD2;
-    if (*(signed char *)((char *)(int)(*(char **)D_00195B04 + (l_1C * 89)) + 73) == *(signed char *)((char *)a1 + 73)) goto L5CAD0;
+    if (*(signed char *)((char *)(int)(*(char **)spell_records + (l_1C * 89)) + 47) == 0) goto L5CAD2;
+    if (*(signed char *)((char *)(int)(*(char **)spell_records + (l_1C * 89)) + 73) == *(signed char *)((char *)a1 + 73)) goto L5CAD0;
     if (l_1C < 128) goto L5CAD2;
 L5CAD0:;
     goto L5CADA;
@@ -784,15 +784,15 @@ L5CAD2:;
     goto L5CA9F;
 L5CADA:;
     if (l_1C < 128) goto L5CB14;
-    l_18 = func_0008E6C5(*(int *)(*(char **)D_00195AA0 + 63), 27, 0);
+    l_18 = object_find_item(*(int *)(*(char **)player_entity + 63), 27, 0);
     *(int *)D_00199D64 = a1;
-    func_0008E3F7(*(int *)((char *)l_18 + 63), (int)func_0005CA28);
+    object_foreach(*(int *)((char *)l_18 + 63), (int)func_0005CA28);
     return;
 L5CB14:;
-    func_000A0AD9(a1 + 47, (int)&*(signed char *)((char *)(int)(*(char **)D_00195B04 + (l_1C * 89)) + 47), 25, (int)D_001757F4, 974);
+    func_000A0AD9(a1 + 47, (int)&*(signed char *)((char *)(int)(*(char **)spell_records + (l_1C * 89)) + 47), 25, (int)D_001757F4, 974);
 }
 
-void func_0005CB47(void)
+void spell_hud_draw_icons(void)
 {
     int l_48;
     int l_44;
@@ -809,13 +809,13 @@ void func_0005CB47(void)
     int l_18;
 
     *(int *)D_00199D6C = 0;
-    if (*(int *)(*(char **)D_00195AA0 + 63) == 0) return;
-    l_3C = *(int *)(*(char **)D_00195AA0 + 63);
+    if (*(int *)(*(char **)player_entity + 63) == 0) return;
+    l_3C = *(int *)(*(char **)player_entity + 63);
     *(signed char *)D_00199D71 = 1;
 L5CB80:;
     if (l_3C == 0) goto L5CDA7;
     if (((int)(unsigned char)*(signed char *)((char *)l_3C)) != 9) goto L5CD99;
-    if (*(int *)((char *)l_3C + 47) == *(int *)D_00195AA0) goto L5CBB4;
+    if (*(int *)((char *)l_3C + 47) == *(int *)player_entity) goto L5CBB4;
     l_40 = 1;
     goto L5CBBB;
 L5CBB4:;
@@ -845,7 +845,7 @@ L5CC23:;
 L5CC2C:;
     goto L5CBED;
 L5CC2E:;
-    if (((int)(unsigned short)(*(short *)(*(char **)D_00195BF8) & 1)) == 0) goto L5CC4A;
+    if (((int)(unsigned short)(*(short *)(*(char **)game_settings) & 1)) == 0) goto L5CC4A;
     if (l_20 != 0) goto L5CC4C;
 L5CC4A:;
     goto L5CC55;
@@ -856,7 +856,7 @@ L5CC55:;
     l_1C = 12;
 L5CC5C:;
     l_28 = (int)(unsigned short)*(short *)(D_00185CEC + ((*(int *)D_00199D6C % l_1C) * 2));
-    if (((int)(unsigned short)(*(short *)(*(char **)D_00195BF8) & 1)) == 0) goto L5CC95;
+    if (((int)(unsigned short)(*(short *)(*(char **)game_settings) & 1)) == 0) goto L5CC95;
     l_28 += 35;
 L5CC95:;
     l_24 = ((*(int *)D_00199D6C / 12) * 24) + 16;
@@ -867,11 +867,11 @@ L5CCC8:;
     if (l_2C != 0) goto L5CD93;
 L5CCD2:;
     if (l_20 == 0) goto L5CD13;
-    if (((int)(unsigned short)(*(short *)(*(char **)D_00195BF8) & 1)) == 0) goto L5CCF7;
+    if (((int)(unsigned short)(*(short *)(*(char **)game_settings) & 1)) == 0) goto L5CCF7;
     l_44 = 177;
     goto L5CD0B;
 L5CCF7:;
-    l_44 = ((int)(unsigned short)*(short *)(*(char **)D_00195B68 + 2)) - 22;
+    l_44 = ((int)(unsigned short)*(short *)(*(char **)hud_bar_image + 2)) - 22;
 L5CD0B:;
     l_24 = l_44;
     goto L5CD5F;
@@ -881,12 +881,12 @@ L5CD13:;
 L5CD34:;
     goto L5CD44;
 L5CD36:;
-    if (*(int *)(*(char **)D_00195BE0 + 537) == 0) goto L5CD46;
+    if (*(int *)(*(char **)player_character + 537) == 0) goto L5CD46;
 L5CD44:;
     goto L5CD5F;
 L5CD46:;
     l_38 = *(int *)((char *)l_3C + 55);
-    func_0008A4E4(l_3C);
+    spell_end(l_3C);
     l_3C = l_38;
     goto L5CDA2;
 L5CD5F:;
@@ -913,8 +913,8 @@ L5CDBF:;
     l_30++;
     goto L5CDB7;
 L5CDC7:;
-    if (*(short *)(*(char **)D_00195BE0 + 32 + (l_30 * 2)) <= *(short *)(*(char **)D_00195BE0 + 48 + (l_30 * 2))) goto L5CE0B;
-    *(short *)(*(char **)D_00195BE0 + 32 + (l_30 * 2)) = *(short *)(*(char **)D_00195BE0 + 48 + (l_30 * 2));
+    if (*(short *)(*(char **)player_character + 32 + (l_30 * 2)) <= *(short *)(*(char **)player_character + 48 + (l_30 * 2))) goto L5CE0B;
+    *(short *)(*(char **)player_character + 32 + (l_30 * 2)) = *(short *)(*(char **)player_character + 48 + (l_30 * 2));
 L5CE0B:;
     goto L5CDBF;
 }

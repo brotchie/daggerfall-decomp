@@ -14,28 +14,28 @@ struct Ply {
     char pad4[155 - 145];
     unsigned short e;           /* 155 */
 };
-extern char *D_00143550;
+extern char *screen_buffer;
 extern char D_0017743D[];
-extern unsigned short D_00178A0E;
+extern unsigned short travel_options;
 extern char D_00190CE8;
-extern struct Ply *D_00195BE0;
-extern char *D_00195BEC;
+extern struct Ply *player_character;
+extern char *player_class;
 extern int D_001AA674;
 extern char *D_001AA690;
 extern int D_001AA698;
 extern unsigned char D_001AA6A6;
-extern int func_0002001F(void);
-extern void func_0004AB2F(int);
-extern unsigned char *func_000702A0(unsigned char);
-extern int func_0009D242(int, int);
-extern void func_0009D39E(void);
-extern void func_0009D515(void);
+extern int climate_update_at_player(void);
+extern void time_pass(int);
+extern unsigned char *guild_find_membership_by_kind(unsigned char);
+extern int travel_pixel_time(int, int);
+extern void travel_find_transport(void);
+extern void travel_toggle_zoom(void);
 extern int func_0009DEAC();
 extern int func_000A0024(char *, char *, int);
 extern char *func_000A00AF(int, char *, int);
 extern int func_000A1023(char *, char *, int, char *, int, int);
 
-int func_0009CEC4(int x0, int y0, int x1, int y1, int a5)
+int travel_route(int x0, int y0, int x1, int y1, int a5)
 {
     int dx;
     int dy;
@@ -56,9 +56,9 @@ int func_0009CEC4(int x0, int y0, int x1, int y1, int a5)
     flag = 0;
     if (D_001AA698 != 0) {
         D_001AA690 = func_000A00AF(64000, D_0017743D, 984);
-        func_000A1023(D_001AA690, D_00143550, 64000, D_0017743D, 985, 4);
+        func_000A1023(D_001AA690, screen_buffer, 64000, D_0017743D, 985, 4);
     }
-    save = D_00195BE0->e;
+    save = player_character->e;
     x0 = x0 / 32768;
     y0 = y0 / 32768;
     x1 = x1 / 32768;
@@ -76,7 +76,7 @@ int func_0009CEC4(int x0, int y0, int x1, int y1, int a5)
         sy = -1;
     else
         sy = 1;
-    func_0009D39E();
+    travel_find_transport();
     D_001AA674 = sum = err = i = 0;
     for (; i < n; i++) {
         if (n == adx) {
@@ -94,27 +94,27 @@ int func_0009CEC4(int x0, int y0, int x1, int y1, int a5)
                 x0 += sx;
             }
         }
-        v = func_0009D242(x0, y0);
-        if ((int)(unsigned short)(D_00178A0E & 32) != 0)
+        v = travel_pixel_time(x0, y0);
+        if ((int)(unsigned short)(travel_options & 32) != 0)
             v = v * 300 / 256;
         sum += v;
     }
     if (!(a5 == 0 || D_001AA6A6 == 100)) {
         if (D_00190CE8 != 0)
-            func_0009D515();
-        if ((int)(unsigned short)(D_00178A0E & 3) == 2)
+            travel_toggle_zoom();
+        if ((int)(unsigned short)(travel_options & 3) == 2)
             sum = (sum << 7) / 256;
-        func_0004AB2F(sum);
-        if ((int)(unsigned short)(D_00178A0E & 3) == 2) {
-            D_00195BE0->e = save;
+        time_pass(sum);
+        if ((int)(unsigned short)(travel_options & 3) == 2) {
+            player_character->e = save;
         } else {
-            D_00195BE0->e = (D_00195BE0->a + D_00195BE0->b) << 6;
-            D_00195BE0->c = D_00195BE0->c2;
-            if ((int)(unsigned short)(*(unsigned short *)(D_00195BEC + 4) & 8) == 0)
-                D_00195BE0->d = D_00195BE0->d2;
+            player_character->e = (player_character->a + player_character->b) << 6;
+            player_character->c = player_character->c2;
+            if ((int)(unsigned short)(*(unsigned short *)(player_class + 4) & 8) == 0)
+                player_character->d = player_character->d2;
         }
     } else {
-        func_0002001F();
+        climate_update_at_player();
     }
     if (D_001AA698 != 0) {
         if (!(D_001AA690 == 0 || D_001AA690 == (char *)0x97979797)) {
@@ -122,7 +122,7 @@ int func_0009CEC4(int x0, int y0, int x1, int y1, int a5)
             D_001AA690 = (char *)0x97979797;
         }
     }
-    p = func_000702A0(145);
+    p = guild_find_membership_by_kind(145);
     if (p != 0)
         return sum * (((95 - *p) << 8) / 100) / 256;
     return sum;

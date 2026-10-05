@@ -9,7 +9,7 @@ extern char D_00175404[];        /* __FILE__ */
 extern void func_000A0040(unsigned char *, int, int, char *, int, int);
 extern void func_000A1023(unsigned char *, unsigned char *, int, char *, int, int);
 
-void func_000529FA(unsigned char *a1, struct image *a2)
+void flc_decode_lc(unsigned char *a1, struct image *a2)
 {
     short y;
     short j;

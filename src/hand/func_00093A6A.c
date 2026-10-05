@@ -16,7 +16,7 @@ extern int func_000C0700();
 extern char *func_00135D00(int, int, int);
 extern int func_00135E39();
 
-void func_00093A6A(char *a1, struct rect *a2, int a3)
+void inv_draw_item_image(char *a1, struct rect *a2, int a3)
 {
     short l_14;
     short l_1C;

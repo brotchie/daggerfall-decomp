@@ -5,34 +5,34 @@
 #define DAGGER_H
 
 /* data */
-extern int D_0018467C;
+extern int text_blank;
 extern int D_00190BE4;
 extern int D_00190BE8;
 extern unsigned char D_00190C78;
-extern int D_00190DF4;
-extern char *D_001959A8;
-extern char *D_00195AA4;
+extern int text_macro_fae;
+extern char *nonworld_root;
+extern char *player_object;
 extern char *D_00195AC4;
 extern int D_00195AF4;
 extern int D_00195B84;
-extern char *D_00195BE0;
-extern char D_00195E7A;
-extern int D_0019672C;
-extern int D_0019972C;
-extern short D_00199788[];
+extern char *player_character;
+extern char mouse_control_mode;
+extern int factions;
+extern int parse_name_seed;
+extern short qbn_record_sizes[];
 
 /* code */
 extern void func_00013981();
-extern int func_00019323(int, int);
+extern int faction_find_r(int, int);
 extern void func_000193DD(int);
-extern unsigned char func_0002010F(int, int);
-extern int func_000309E8(char *, short);
-extern void func_0005E450(unsigned short, char *);
-extern int func_0008B572(unsigned char, unsigned char);
-extern char *func_0008DCE3(char *, int, int);
-extern void func_0008E3F7(int, void (*)());
-extern char *func_0008E925(char *, int);
-extern void func_0008ECBD(char *, int);
+extern unsigned char climate_lookup(int, int);
+extern int quest_section(char *, short);
+extern void item_make_random(unsigned short, char *);
+extern int name_generate(unsigned char, unsigned char);
+extern char *object_create_child(char *, int, int);
+extern void object_foreach(int, void (*)());
+extern char *object_find_by_id(char *, int);
+extern void object_delete_quest_objects(char *, int);
 extern int func_0009DC25(void);
 extern void func_0009DC49(int);
 extern int func_000C7FD9(int, int, int, int);

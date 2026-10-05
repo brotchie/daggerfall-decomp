@@ -2,53 +2,53 @@
  * do not edit: move a function to src/quests.c to work on it by hand) */
 
 struct bf8_7_1 { unsigned char _:7; unsigned char f:1; };
-extern char D_000C0BA8[];
+extern char disk_last_file_size[];
 extern char D_00174F47[];
 extern char D_00174F57[];
 extern char D_00174F5C[];
 extern char D_00174F71[];
 extern char D_00174F8F[];
-extern char D_001789FA[];
-extern char D_0017CF72[];
+extern char player_environment[];
+extern char material_to_hit[];
 extern char D_00185128[];
 extern char D_0018512E[];
-extern char D_0018513E[];
-extern char D_001903A4[];
+extern char body_part_armor_slots[];
+extern char text_buffer[];
 extern char D_00190BE4[];
 extern char D_001917E4[];
 extern char D_00191834[];
-extern char D_001959A8[];
+extern char nonworld_root[];
 extern char D_00195A00[];
-extern char D_00195A9C[];
+extern char current_building[];
 extern char D_00195AC4[];
 extern char D_00195AF4[];
 extern char D_00195B84[];
 extern char D_00195B85[];
-extern char D_00195BE0[];
-extern char D_00195BF4[];
+extern char player_character[];
+extern char game_minutes[];
 extern char D_00195C44[];
 extern char D_00195D00[];
-extern char D_00195D50[];
+extern char quest_potential_questor[];
 extern char D_00195F68[];
 extern char D_001961F5[];
 extern char D_00196282[];
-extern char D_00199764[];
-extern char D_0019976C[];
+extern char current_quest[];
+extern char quest_debug_data[];
 extern char D_001997AE[];
 extern char D_001A5BE4[];
 
-extern int func_000192EE(short);
-extern int func_000309E8(int, int);
+extern int faction_find(short);
+extern int quest_section(int, int);
 extern int func_000310E1(int, int);
-extern int func_000332F7(int);
-extern int func_0004C075(int);
-extern int func_0004C274(unsigned char, unsigned char, unsigned char, unsigned char, unsigned char);
-extern int func_0006CB53(int, int);
-extern int func_0007D6AE(int, int);
-extern int func_0007DF35(int);
-extern int func_0008DCE3(int, int, int);
-extern int func_0008E55F(int, int);
-extern int func_0008E925(int, int);
+extern int quest_init_resources(int);
+extern int quest_offer_prompt(int);
+extern int quest_pick_file(unsigned char, unsigned char, unsigned char, unsigned char, unsigned char);
+extern int disk_read_file(int, int);
+extern int rand_range(int, int);
+extern int object_building(int);
+extern int object_create_child(int, int, int);
+extern int object_find(int, int);
+extern int object_find_by_id(int, int);
 extern int func_0009DC25();
 extern int func_0009DC49();
 extern int func_0009DC59(int, ...);
@@ -65,29 +65,29 @@ extern int func_000A0F5C(int, ...);
 extern int func_000A1023();
 extern int func_000A1097();
 extern int func_000A14E8();
-extern void func_0001B470(int, int);
-extern void func_0001D766(int, int, int, int);
-extern void func_0002C589(void);
-extern void func_0003F09F(int, int);
-extern void func_0004BCA6(int);
-extern void func_00050069(int);
-extern void func_0006B2E2(void);
-extern void func_0008E3F7(int, int);
-extern void func_0008E4A8(int, int);
-int func_0004BDB7(int);
+extern void faction_change_reputation(int, int);
+extern void rumor_add_quest(int, int, int, int);
+extern void quest_timers_start_all(void);
+extern void msgbox_show_rsc(int, int);
+extern void quest_end(int);
+extern void fatal_error(int);
+extern void logbook_prune_quests(void);
+extern void object_foreach(int, int);
+extern void object_foreach_open(int, int);
+int quest_start(int);
 int func_0004C526(int);
-int func_0004C787(void);
-int func_0004CEBE(int);
+int quest_free_id(void);
+int quest_is_active(int);
 int func_0004CF37(int);
 int func_0004CFA7(int, int);
 void func_0004C588(int);
 void func_0004C759(void);
 void func_0004C8EB(int);
-void func_0004CB5D(int);
+void quest_pick_for_npc(int);
 void func_0004CC14(int);
 #pragma aux func_000A0ED9 parm routine [];
 
-int func_0004BDB7(int a1)
+int quest_start(int a1)
 {
     int l_28;
     int l_24;
@@ -100,27 +100,27 @@ L4BDDC:;
     if (func_000A0E3B(a1, (int)D_00174F5C) != 0) goto L4BDF9;
     return 0;
 L4BDF9:;
-    if (func_0004CEBE(a1) == 0) goto L4BE11;
+    if (quest_is_active(a1) == 0) goto L4BE11;
     return 0;
 L4BE11:;
     func_000A0ED9(172, (int)D_00174F47);
-    func_000A0F5C((int)D_001903A4, (int)D_00174F57, (int)D_001917E4, a1);
-    l_1C = func_0009DC59((int)D_001903A4, 512);
+    func_000A0F5C((int)text_buffer, (int)D_00174F57, (int)D_001917E4, a1);
+    l_1C = func_0009DC59((int)text_buffer, 512);
     if (l_1C >= 0) goto L4BEB1;
     func_000A0ED9(177, (int)D_00174F47);
-    func_000A0F5C((int)D_001903A4, (int)D_00174F57, (int)D_00191834, a1);
-    l_1C = func_0009DC59((int)D_001903A4, 512);
+    func_000A0F5C((int)text_buffer, (int)D_00174F57, (int)D_00191834, a1);
+    l_1C = func_0009DC59((int)text_buffer, 512);
     if (l_1C >= 0) goto L4BEB1;
     return 0;
 L4BEB1:;
     func_0009DEA7(l_1C);
-    l_20 = func_0006CB53(a1, 0);
-    func_0006B2E2();
-    l_28 = func_0008DCE3(*(int *)D_00195A00, 0, *(int *)D_000C0BA8);
+    l_20 = disk_read_file(a1, 0);
+    logbook_prune_quests();
+    l_28 = object_create_child(*(int *)D_00195A00, 0, *(int *)disk_last_file_size);
     *(signed char *)((char *)l_28) = 14;
     *(short *)((char *)l_28 + 21) = 3;
     l_24 = l_28 + 71;
-    func_000A1023(l_24, l_20, (int)(short)*(short *)D_000C0BA8, (int)D_00174F47, 193, 4);
+    func_000A1023(l_24, l_20, (int)(short)*(short *)disk_last_file_size, (int)D_00174F47, 193, 4);
     if (l_20 == 0) goto L4BF25;
     if (l_20 != (-1751672937)) goto L4BF27;
 L4BF25:;
@@ -129,10 +129,10 @@ L4BF27:;
     func_000A0024(l_20, (int)D_00174F47, 194);
     l_20 = -1751672937;
 L4BF40:;
-    *(signed char *)((char *)l_28 + 38) = (*(short *)((char *)l_24) = func_0004C787());
+    *(signed char *)((char *)l_28 + 38) = (*(short *)((char *)l_24) = quest_free_id());
     func_000A14E8(l_24 + 6, a1, 8, (int)D_00174F47, 197, 9);
     if (((int)(short)*(short *)D_00195F68) != 240) goto L4BF95;
-    *(short *)D_00195F68 = *(short *)(*(char **)D_00195A9C + 18);
+    *(short *)D_00195F68 = *(short *)(*(char **)current_building + 18);
 L4BF95:;
     if (func_000A0E74((int)(unsigned char)*(signed char *)((char *)l_24 + 11)) != 89) goto L4BFBA;
     *(short *)((char *)l_24 + 2) = *(short *)D_00195F68;
@@ -140,33 +140,33 @@ L4BF95:;
 L4BFBA:;
     *(short *)((char *)l_24 + 2) = 0;
 L4BFC3:;
-    *(int *)D_00199764 = l_24;
+    *(int *)current_quest = l_24;
     *(int *)D_00195D00 = l_28;
-    if (func_000332F7(l_24) != 0) goto L4BFFF;
-    func_0004BCA6(l_24);
-    func_0003F09F(600, 1);
+    if (quest_init_resources(l_24) != 0) goto L4BFFF;
+    quest_end(l_24);
+    msgbox_show_rsc(600, 1);
     return 0;
 L4BFFF:;
-    func_0002C589();
+    quest_timers_start_all();
     if (func_000A1097((int)(unsigned char)*(signed char *)((char *)l_24 + 6)) == 115) goto L4C025;
-    if (func_0004C075(l_24) == 0) goto L4C027;
+    if (quest_offer_prompt(l_24) == 0) goto L4C027;
 L4C025:;
     goto L4C038;
 L4C027:;
-    func_0004BCA6(l_24);
+    quest_end(l_24);
     return 0;
 L4C038:;
-    func_0006B2E2();
+    logbook_prune_quests();
     func_0004C759();
-    *(int *)D_0019976C = *(int *)D_00199764;
-    func_0001D766(*(int *)D_00199764, 1005, 0, 4);
+    *(int *)quest_debug_data = *(int *)current_quest;
+    rumor_add_quest(*(int *)current_quest, 1005, 0, 4);
     return l_24;
 }
 
-void func_0004C242(void)
+void quest_start_pending(void)
 {
     if (*(signed char *)D_001961F5 == 0) return;
-    func_0004BDB7((int)D_001961F5);
+    quest_start((int)D_001961F5);
     *(signed char *)D_001961F5 = 0;
 }
 
@@ -218,12 +218,12 @@ L4C5C5:;
 L4C5CA:;
     *(int *)D_00190BE4 = (int)(unsigned short)*(short *)((char *)a1 + 89);
     *(int *)D_00195AF4 = 0;
-    func_0008E55F(*(int *)D_00195AC4, (int)func_0004C526);
+    object_find(*(int *)D_00195AC4, (int)func_0004C526);
     if (*(int *)D_00195AF4 == 0) return;
     if (*(int *)(*(char **)D_00195AF4 + 51) == 0) goto L4C649;
     func_000A0ED9(422, (int)D_00174F47);
-    func_000A0F5C((int)D_001903A4, (int)D_00174F71, (int)(unsigned short)*(short *)(*(char **)D_00195AF4 + 27));
-    func_00050069((int)D_001903A4);
+    func_000A0F5C((int)text_buffer, (int)D_00174F71, (int)(unsigned short)*(short *)(*(char **)D_00195AF4 + 27));
+    fatal_error((int)text_buffer);
 L4C649:;
     *(int *)((char *)a1 + 31) = *(int *)(*(char **)D_00195AF4 + 31);
     func_000A1023(a1 + 7, (int)&*(signed char *)(*(char **)D_00195AF4 + 7), 12, (int)D_00174F47, 427, 4);
@@ -237,7 +237,7 @@ L4C6C6:;
     return;
 L4C6CB:;
     if ((((unsigned)*(int *)((char *)*(int *)D_00195AC4 + 31)) >> 16) != (((unsigned)*(int *)((char *)a1 + 31)) >> 16)) return;
-    l_18 = func_0008E925(*(int *)D_00195AC4, *(int *)((char *)a1 + 31));
+    l_18 = object_find_by_id(*(int *)D_00195AC4, *(int *)((char *)a1 + 31));
     if (l_18 == 0) goto L4C708;
     if (*(signed char *)((char *)a1) == *(signed char *)((char *)l_18)) goto L4C715;
 L4C708:;
@@ -254,10 +254,10 @@ L4C715:;
 void func_0004C759(void)
 {
     *(signed char *)D_00196282 = 0;
-    func_0008E4A8(*(int *)D_001959A8, (int)func_0004C588);
+    object_foreach_open(*(int *)nonworld_root, (int)func_0004C588);
 }
 
-int func_0004C787(void)
+int quest_free_id(void)
 {
     int l_28;
     int l_24;
@@ -287,11 +287,11 @@ L4C802:;
 L4C815:;
     goto L4C7FA;
 L4C817:;
-    func_00050069((int)D_00174F8F);
+    fatal_error((int)D_00174F8F);
     return 0;
 }
 
-void func_0004C835(int a1, int a2)
+void qaction_op46_hide_npc(int a1, int a2)
 {
     int l_14;
 
@@ -305,7 +305,7 @@ void func_0004C874(int a1, int a2)
 {
 }
 
-void func_0004C890(int a1, int a2)
+void qaction_op48_restore_npc(int a1, int a2)
 {
     int l_14;
 
@@ -327,7 +327,7 @@ void func_0004C8EB(int a1)
     int l_18;
 
     if (((int)(unsigned char)*(signed char *)((char *)a1)) != 8) return;
-    l_18 = func_0007DF35(a1);
+    l_18 = object_building(a1);
     if (l_18 == 0) goto L4C930;
     if (((int)(unsigned char)*(signed char *)((char *)l_18 + 24)) == 11) goto L4C932;
 L4C930:;
@@ -342,7 +342,7 @@ L4C94D:;
 L4C94F:;
     return;
 L4C954:;
-    if (((int)(unsigned char)*(signed char *)D_001789FA) == 3) goto L4C98D;
+    if (((int)(unsigned char)*(signed char *)player_environment) == 3) goto L4C98D;
     if (l_18 == 0) goto L4C976;
     if (((int)(unsigned char)*(signed char *)((char *)l_18 + 24)) < 16) goto L4C978;
 L4C976:;
@@ -354,7 +354,7 @@ L4C988:;
 L4C98D:;
     l_1C = a1 + 71;
     if (*(short *)((char *)l_1C) == 0) return;
-    l_24 = func_000192EE((int)(short)*(short *)((char *)l_1C));
+    l_24 = faction_find((int)(short)*(short *)((char *)l_1C));
     l_20 = l_24;
 L4C9B7:;
     if (*(int *)((char *)l_20 + 88) == 0) goto L4C9CB;
@@ -399,7 +399,7 @@ void func_0004CA9D(void)
     int l_18;
 
     l_18 = func_0009DC25();
-    if (((int)(unsigned char)*(signed char *)D_001789FA) != 3) goto L4CAFB;
+    if (((int)(unsigned char)*(signed char *)player_environment) != 3) goto L4CAFB;
     if ((((unsigned)*(int *)(*(char **)D_00195AC4 + 31)) >> 16) == 50027) goto L4CAE3;
     if ((((unsigned)*(int *)(*(char **)D_00195AC4 + 31)) >> 16) != 50029) goto L4CAE5;
 L4CAE3:;
@@ -411,8 +411,8 @@ L4CAF7:;
 L4CAF9:;
     return;
 L4CAFB:;
-    func_0009DC49(((unsigned)*(int *)D_00195BF4) / 1440);
-    func_0008E3F7(*(int *)D_00195AC4, (int)func_0004C8EB);
+    func_0009DC49(((unsigned)*(int *)game_minutes) / 1440);
+    object_foreach(*(int *)D_00195AC4, (int)func_0004C8EB);
     func_0009DC49(l_18);
 }
 
@@ -421,22 +421,22 @@ int func_0004CB2F(int a1)
     return (int)(unsigned char)(*(signed char *)((char *)a1 + 73) & 128);
 }
 
-void func_0004CB5D(int a1)
+void quest_pick_for_npc(int a1)
 {
     int l_18;
 
     if (a1 == 0) return;
-    l_18 = func_000192EE((int)(short)*(short *)((char *)a1 + 71));
+    l_18 = faction_find((int)(short)*(short *)((char *)a1 + 71));
     if (((int)(unsigned char)*(signed char *)((char *)l_18)) != 4) goto L4CBA9;
     if (((int)(unsigned short)*(short *)((char *)l_18 + 33)) != 407) goto L4CBAB;
 L4CBA9:;
     goto L4CBD4;
 L4CBAB:;
-    func_0004C274(82, 0, 48, 67, (int)(unsigned char)*(signed char *)(*(char **)D_00195BE0 + 129));
+    quest_pick_file(82, 0, 48, 67, (int)(unsigned char)*(signed char *)(*(char **)player_character + 129));
     return;
 L4CBD4:;
-    if (((int)(unsigned char)*(signed char *)D_001789FA) == 3) return;
-    func_0004C274(65, 75, 48, 67, (int)(unsigned char)*(signed char *)(*(char **)D_00195BE0 + 129));
+    if (((int)(unsigned char)*(signed char *)player_environment) == 3) return;
+    quest_pick_file(65, 75, 48, 67, (int)(unsigned char)*(signed char *)(*(char **)player_character + 129));
 }
 
 void func_0004CC14(int a1)
@@ -457,17 +457,17 @@ L4CC67:;
     *(int *)D_00195AF4 = a1;
 }
 
-int func_0004CC82(void)
+int quest_find_potential_questor(void)
 {
     *(int *)D_00195B84 = 32768;
-    func_0008E3F7(*(int *)D_00195AC4, (int)func_0004CC14);
+    object_foreach(*(int *)D_00195AC4, (int)func_0004CC14);
     if (*(int *)D_00195B84 != 32768) goto L4CCBE;
     return 0;
 L4CCBE:;
-    *(int *)D_00195B84 = func_0007D6AE(0, (*(int *)D_00195B84 & 32767) - 1) + 1;
+    *(int *)D_00195B84 = rand_range(0, (*(int *)D_00195B84 & 32767) - 1) + 1;
     *(int *)D_00195AF4 = 0;
-    func_0008E3F7(*(int *)D_00195AC4, (int)func_0004CC14);
-    *(int *)D_00195D50 = *(int *)D_00195AF4;
+    object_foreach(*(int *)D_00195AC4, (int)func_0004CC14);
+    *(int *)quest_potential_questor = *(int *)D_00195AF4;
     return *(int *)D_00195AF4;
 }
 
@@ -478,10 +478,10 @@ int func_0004CD10(int a1)
     l_1C = func_0009DC25();
     func_0009DC49(*(int *)((char *)a1 + 31));
     *(signed char *)D_001961F5 = 0;
-    func_0004CB5D(a1);
+    quest_pick_for_npc(a1);
     func_0009DC49(l_1C);
     if (*(signed char *)D_001961F5 == 0) goto L4CD6C;
-    *(int *)D_00195D50 = a1;
+    *(int *)quest_potential_questor = a1;
     *(signed char *)D_001961F5 = 0;
     return 1;
 L4CD6C:;
@@ -497,17 +497,17 @@ L4CDA3:;
     return 0;
 L4CDBE:;
     *(signed char *)D_001997AE = 1;
-    func_0004BDB7((int)D_001A5BE4);
+    quest_start((int)D_001A5BE4);
     return 1;
 }
 
-void func_0004CDE3(int a1)
+void quest_reward_faction(int a1)
 {
     int l_18;
 
     if (*(short *)((char *)a1 + 2) == 0) return;
-    l_18 = func_000192EE((int)(short)*(short *)((char *)a1 + 2));
-    func_0001B470(l_18, 5);
+    l_18 = faction_find((int)(short)*(short *)((char *)a1 + 2));
+    faction_change_reputation(l_18, 5);
 }
 
 void func_0004CE24(int a1, int a2)
@@ -515,7 +515,7 @@ void func_0004CE24(int a1, int a2)
     int l_18;
     int l_14;
 
-    l_18 = func_000309E8(a1, 3);
+    l_18 = quest_section(a1, 3);
     l_14 = 0;
 L4CE4E:;
     if (((int)(short)*(short *)((char *)a1 + 22)) > l_14) goto L4CE6B;
@@ -526,13 +526,13 @@ L4CE5C:;
     goto L4CE4E;
 L4CE6B:;
     if (((int)(short)*(short *)((char *)l_18 + 4)) != 21) goto L4CEB3;
-    func_0001D766(a1, ((a2 != 0) ? 1008 : 1009), *(int *)(*(char **)((char *)l_18 + 12) + 31), 2);
+    rumor_add_quest(a1, ((a2 != 0) ? 1008 : 1009), *(int *)(*(char **)((char *)l_18 + 12) + 31), 2);
     return;
 L4CEB3:;
     goto L4CE5C;
 }
 
-int func_0004CEBE(int a1)
+int quest_is_active(int a1)
 {
     int l_20;
     int l_1C;
@@ -557,7 +557,7 @@ int func_0004CF37(int a1)
 
     l_1C = 0;
     if (((int)(unsigned char)*(signed char *)((char *)a1 + 55)) != 2) goto L4CF7E;
-    return (((int)(short)*(short *)(D_0017CF72 + (((int)(unsigned char)*(signed char *)((char *)a1 + 54)) * 2))) + l_1C) + 45;
+    return (((int)(short)*(short *)(material_to_hit + (((int)(unsigned char)*(signed char *)((char *)a1 + 54)) * 2))) + l_1C) + 45;
 L4CF7E:;
     return l_1C + ((int)(short)*(short *)(D_00185128 + (((int)(unsigned char)*(signed char *)((char *)a1 + 55)) * 2)));
 }
@@ -576,8 +576,8 @@ int func_0004CFA7(int a1, int a2)
     l_20 = 0;
     l_30 = 100;
     l_34 = a1 + 71;
-    if (*(int *)((char *)((((int)(unsigned char)*(signed char *)(D_0018513E + a2)) << 2) + l_34) + 367) == 0) goto L4D013;
-    l_30 -= func_0004CF37(*(int *)((char *)((((int)(unsigned char)*(signed char *)(D_0018513E + a2)) << 2) + l_34) + 367) + 71);
+    if (*(int *)((char *)((((int)(unsigned char)*(signed char *)(body_part_armor_slots + a2)) << 2) + l_34) + 367) == 0) goto L4D013;
+    l_30 -= func_0004CF37(*(int *)((char *)((((int)(unsigned char)*(signed char *)(body_part_armor_slots + a2)) << 2) + l_34) + 367) + 71);
 L4D013:;
     l_1C = *(int *)((char *)l_34 + 451);
     if (l_1C == 0) goto L4D0A1;
@@ -644,7 +644,7 @@ L4D183:;
     return l_30;
 }
 
-void func_0004D195(int a1)
+void character_update_armor_values(int a1)
 {
     int l_1C;
     int l_18;

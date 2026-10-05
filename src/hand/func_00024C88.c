@@ -43,38 +43,38 @@ extern char D_00170765[];
 extern char D_00170773[];
 extern char D_00170777[];
 extern unsigned char D_00178630[];   /* _IsTable */
-extern int D_0018DDD4;
+extern int bio_modifiers;
 extern int D_0018DDD8;
 extern int D_0018DDDC;
 extern int D_0018DDE0;
 extern int D_0018DDE4;
-extern struct dun D_0018F08E[];
-extern char D_001903A4[];
+extern struct dun region_legal_reputation[];
+extern char text_buffer[];
 extern int D_00190BE4[];
 extern int D_00190CAC;
 extern short D_00190D68;
 extern short D_00190D6A;
-extern struct thing *D_00195AA0;
-extern struct player *D_00195BE0;
+extern struct thing *player_entity;
+extern struct player *player_character;
 extern char D_001962AB;
-extern struct faction *func_000192EE(short);
-extern short func_0001C713(struct npc *, char *, int);
-extern unsigned char *func_0002482A(unsigned char *);
+extern struct faction *faction_find(short);
+extern short bio_person_add(struct npc *, char *, int);
+extern unsigned char *career_skip_word(unsigned char *);
 extern void func_000252C7(int);
 extern void func_000252E2(int);
-extern void func_0004633F(char *, struct npc *);
-extern void func_0005E540(unsigned short, int, struct mobile *);
-extern int func_0006CB53(char *, char *);
-extern struct thing *func_0008DCE3(struct thing *, int, int);
-extern void func_00097101(struct thing *);
-extern void func_000972C7(struct thing *, struct thing *, int);
+extern void parse_expand(char *, struct npc *);
+extern void item_make(unsigned short, int, struct mobile *);
+extern int disk_read_file(char *, char *);
+extern struct thing *object_create_child(struct thing *, int, int);
+extern void inv_store_item(struct thing *);
+extern void inv_merge_arrows(struct thing *, struct thing *, int);
 extern void func_000A0040(void *, int, int, char *, int, int);
 extern int func_000A0D13(unsigned char *);
 #pragma aux func_000A0ED9 parm routine [];
 extern void func_000A0ED9(int, char *);
 extern int func_000A0F5C(char *, char *, ...);
 
-unsigned char *func_00024C88(unsigned char *a1)
+unsigned char *career_answer_effect(unsigned char *a1)
 {
     int n;
     struct thing *o;
@@ -87,75 +87,75 @@ unsigned char *func_00024C88(unsigned char *a1)
     while (*a1 <= 32)
         a1++;
     if (*(unsigned short *)a1 == 0x5047)
-        D_00195BE0->gold += func_000A0D13(func_0002482A(a1));
+        player_character->gold += func_000A0D13(career_skip_word(a1));
     else if (*(unsigned short *)a1 == 0x6672) {
         a1 += 2;
-        f = func_000192EE(func_000A0D13(a1));
+        f = faction_find(func_000A0D13(a1));
         if (f != 0)
-            f->rep += func_000A0D13(func_0002482A(a1));
+            f->rep += func_000A0D13(career_skip_word(a1));
     } else if (*(unsigned short *)a1 == 0x7272)
-        D_0018F08E[D_00190D68].f0 += func_000A0D13(func_0002482A(a1));
+        region_legal_reputation[D_00190D68].f0 += func_000A0D13(career_skip_word(a1));
     else if (*(unsigned short *)a1 == 0x494D) {
-        a1 = func_0002482A(a1);
+        a1 = career_skip_word(a1);
         if (*a1 == '+')
             func_000252C7(func_000A0D13(a1));
         else
             func_000252E2(func_000A0D13(a1));
     } else if (*(unsigned short *)a1 == 0x5252)
-        D_00195BE0->f548 += func_000A0D13(func_0002482A(a1));
+        player_character->f548 += func_000A0D13(career_skip_word(a1));
     else if (*(unsigned short *)a1 == 0x4452)
-        D_0018DDD4 += func_000A0D13(func_0002482A(a1));
+        bio_modifiers += func_000A0D13(career_skip_word(a1));
     else if (*(unsigned short *)a1 == 0x524D)
-        D_0018DDD8 += func_000A0D13(func_0002482A(a1));
+        D_0018DDD8 += func_000A0D13(career_skip_word(a1));
     else if (*(unsigned short *)a1 == 0x4854)
-        D_0018DDDC += func_000A0D13(func_0002482A(a1));
+        D_0018DDDC += func_000A0D13(career_skip_word(a1));
     else if (*(unsigned short *)a1 == 0x5052)
-        D_0018DDE0 += func_000A0D13(func_0002482A(a1));
+        D_0018DDE0 += func_000A0D13(career_skip_word(a1));
     else if (*(unsigned short *)a1 == 0x5446)
-        D_0018DDE4 += func_000A0D13(func_0002482A(a1));
+        D_0018DDE4 += func_000A0D13(career_skip_word(a1));
     else if (*(unsigned short *)a1 == 0x4541 || *(unsigned short *)a1 == 0x4641 || *(unsigned short *)a1 == 0x4F41) {
         c = a1[1];
         p = (struct npc *)(D_00147954 + 70000);
         q = D_00147954 + 75000;
         func_000A0040(p, 0, 560, D_00170738, 279, 4);
         func_000A0040(q, 0, 74, D_00170738, 280, 4);
-        a1 = func_0002482A(a1);
+        a1 = career_skip_word(a1);
         if (*a1 == 'F')
             p->flags |= 1;
         else if (*a1 == 'O')
-            p->flags |= (D_00195BE0->flags & 1) ^ 1;
-        a1 = func_0002482A(a1);
+            p->flags |= (player_character->flags & 1) ^ 1;
+        a1 = career_skip_word(a1);
         p->f67 = func_000A0D13(a1);
-        a1 = func_0002482A(a1);
+        a1 = career_skip_word(a1);
         n = func_000A0D13(a1);
         p->f549 = n;
-        a1 = func_0002482A(a1);
+        a1 = career_skip_word(a1);
         p->f129 = func_000A0D13(a1);
         func_000A0ED9(292, D_00170738);
-        func_000A0F5C(D_001903A4, D_00170765, n);
-        func_0006CB53(D_001903A4, q);
+        func_000A0F5C(text_buffer, D_00170765, n);
+        disk_read_file(text_buffer, q);
         if (c == 'E') {
-            func_0004633F(D_00170773, p);
-            func_0001C713(p, q, 0);
+            parse_expand(D_00170773, p);
+            bio_person_add(p, q, 0);
         } else {
-            func_0004633F(D_00170777, p);
-            func_0001C713(p, q, 1);
+            parse_expand(D_00170777, p);
+            bio_person_add(p, q, 1);
         }
     } else if (*(unsigned short *)a1 == 0x5449) {
-        a1 = func_0002482A(a1);
+        a1 = career_skip_word(a1);
         n = func_000A0D13(a1);
-        o = func_0008DCE3(D_00195AA0, 0, 107);
+        o = object_create_child(player_entity, 0, 107);
         o->type = 2;
         o->f21 = 1;
-        a1 = func_0002482A(a1);
+        a1 = career_skip_word(a1);
         m = &o->mob;
-        D_001962AB = func_000A0D13(func_0002482A(a1)) + 1;
-        func_0005E540(n, func_000A0D13(a1), m);
+        D_001962AB = func_000A0D13(career_skip_word(a1)) + 1;
+        item_make(n, func_000A0D13(a1), m);
         if (m->f32 == 3 && m->f34 == 18) {
             m->f49 = 1;
-            func_000972C7(D_00195AA0, o, 1);
+            inv_merge_arrows(player_entity, o, 1);
         } else
-            func_00097101(o);
+            inv_store_item(o);
     } else if (*a1 == '&')
         D_00190D6A = 0;
     else if (*a1 == '#')
@@ -168,10 +168,10 @@ unsigned char *func_00024C88(unsigned char *a1)
         n = func_000A0D13(a1);
         if (n >= 35)
             n = 0;
-        D_00195BE0->skills[n].v += func_000A0D13(func_0002482A(a1));
+        player_character->skills[n].v += func_000A0D13(career_skip_word(a1));
     } else if (*a1 == 'r' && D_00178630[(unsigned char)(a1[1] + 1)] & 0x20) {
         n = func_000A0D13(a1 + 1);
-        D_00195BE0->f145[n] += func_000A0D13(func_0002482A(a1));
+        player_character->f145[n] += func_000A0D13(career_skip_word(a1));
     }
     while (*a1 != '\n')
         a1++;

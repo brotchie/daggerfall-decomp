@@ -3,13 +3,13 @@
 
 extern char D_00186DEC[];
 extern char D_0018DD54[];
-extern char D_001A3F5D[];
+extern char sound_enabled[];
 
 extern int func_000A1D3C();
 
-void func_000698AF(int a1)
+void sound_set_volume(int a1)
 {
-    if (*(signed char *)D_001A3F5D == 0) return;
+    if (*(signed char *)sound_enabled == 0) return;
     if (*(int *)D_0018DD54 == (-1)) return;
     func_000A1D3C(a1);
     *(int *)D_00186DEC = a1;

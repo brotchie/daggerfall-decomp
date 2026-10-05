@@ -1,7 +1,7 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x000849E4 */
-extern int func_000844FB(int, int);
+extern int rmb_make_marker(int, int);
 
-void func_000849E4(int a1, int a2)
+void rmb_add_editor_marker(int a1, int a2)
 {
     int l_20;
     int l_1C;
@@ -15,7 +15,7 @@ void func_000849E4(int a1, int a2)
     case 14:
     case 16:
     case 17:
-        l_20 = func_000844FB(a1, (int)(unsigned short)*(short *)((char *)a2 + 12));
+        l_20 = rmb_make_marker(a1, (int)(unsigned short)*(short *)((char *)a2 + 12));
         *(int *)((char *)l_20 + 7) = *(int *)((char *)a2);
         *(int *)((char *)l_20 + 15) = *(int *)((char *)a2 + 8);
         *(int *)((char *)l_20 + 11) = *(int *)((char *)a2 + 4);

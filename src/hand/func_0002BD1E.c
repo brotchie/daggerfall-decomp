@@ -4,10 +4,10 @@ extern char D_0017088A[];
 extern char D_0017089B[];
 extern char D_001708B7[];
 extern char D_001708D1[];
-extern char D_001959A8[];
-extern char D_00195DA4[];
-extern void func_00050069(char *);
-extern int func_0008E925(int, char *);
+extern char nonworld_root[];
+extern char qbn_opcode_arg_counts[];
+extern void fatal_error(char *);
+extern int object_find_by_id(int, char *);
 
 #pragma pack(1)
 struct Obj { char pad[31]; char *next; char pad2[3]; unsigned char owner; };
@@ -28,11 +28,11 @@ struct Hdr {
 
 #define FIX(o, msg) \
     if (o) { \
-        if ((short)o->owner != a1->id) func_00050069(msg); \
+        if ((short)o->owner != a1->id) fatal_error(msg); \
         o = (struct Obj *)o->next; \
     }
 
-void func_0002BD1E(struct Hdr *a1)
+void quest_unlink_for_save(struct Hdr *a1)
 {
     struct E87 *l_48;
     struct E15 *l_44;
@@ -51,7 +51,7 @@ void func_0002BD1E(struct Hdr *a1)
     l_48 = (struct E87 *)((char *)a1 + a1->off87);
     for (l_1C = 0; l_1C < a1->n87; l_1C++, l_48++) {
         l_44 = l_48->e;
-        l_48->n = (*(unsigned char **)D_00195DA4)[l_48->kind] - '0';
+        l_48->n = (*(unsigned char **)qbn_opcode_arg_counts)[l_48->kind] - '0';
         for (l_20 = 0; l_20 < l_48->n; l_20++, l_44++) {
             if (l_44->base) l_44->base -= (int)a1;
             if (l_44->obj) l_44->obj = (struct Obj *)l_44->obj->next;
@@ -64,13 +64,13 @@ void func_0002BD1E(struct Hdr *a1)
     l_38 = (struct E24 *)((char *)a1 + a1->off24);
     for (l_1C = 0; l_1C < a1->n24; l_1C++, l_38++) {
         if (l_38->obj) {
-            if ((short)l_38->obj->owner != a1->id) func_00050069(D_0017088A);
+            if ((short)l_38->obj->owner != a1->id) fatal_error(D_0017088A);
             l_38->obj = (struct Obj *)l_38->obj->next;
-            if (func_0008E925(*(int *)D_001959A8, (char *)l_38->obj) == 0) func_00050069(D_0017089B);
-            if (l_38->obj == 0) func_00050069(D_001708B7);
+            if (object_find_by_id(*(int *)nonworld_root, (char *)l_38->obj) == 0) fatal_error(D_0017089B);
+            if (l_38->obj == 0) fatal_error(D_001708B7);
             if (l_38->type == 10) {
                 if (((l_38->lo & 0xffff) | (l_38->hi << 16)) != (int)l_38->obj)
-                    func_00050069(D_001708D1);
+                    fatal_error(D_001708D1);
             }
         }
     }

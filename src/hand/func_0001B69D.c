@@ -7,15 +7,15 @@ extern char D_00170448[];
 extern char D_00170464[];
 extern char D_0017046E[];
 extern unsigned char D_00178630[];
-extern struct cmd D_00179D9C[];
-extern char D_001903A4[];
-extern int D_00196710;
-extern struct rec *D_0019672C;
+extern struct cmd faction_keywords[];
+extern char text_buffer[];
+extern int faction_count;
+extern struct rec *factions;
 extern unsigned char D_00196732;
-extern void func_0001BAB4(struct rec *);
-extern void func_0001BBE2(struct rec *, int, struct rec *);
-extern void func_00050069(char *);
-extern int func_0006CD6E(char *);
+extern void faction_link_relations(struct rec *);
+extern void faction_add_record(struct rec *, int, struct rec *);
+extern void fatal_error(char *);
+extern int disk_open_data(char *);
 extern void func_0009DEA7(int);
 extern void func_000A0024(struct rec *, char *, int);
 extern void func_000A0040(void *, int, int, char *, int, int);
@@ -27,7 +27,7 @@ extern int func_000A1097(int);
 extern void func_000A0ED9(int, char *);
 extern void func_000A0F5C(char *, char *, ...);
 
-void func_0001B69D(void)
+void faction_load_file(void)
 {
     struct rec rec;
     int fh;
@@ -51,22 +51,22 @@ void func_0001B69D(void)
     indent = 0;
     prev = 0;
     D_00196732 = 0;
-    fh = func_0006CD6E(D_0017043C);
+    fh = disk_open_data(D_0017043C);
     if (fh < 1)
-        func_00050069(D_00170448);
+        fatal_error(D_00170448);
     len = func_000A00CB(fh, D_00147954, 90000);
     func_0009DEA7(fh);
-    for (D_00196710 = i = 0; i < len; i++)
+    for (faction_count = i = 0; i < len; i++)
         if (D_00147954[i] == '#')
-            D_00196710++;
-    if (D_0019672C != 0) {
-        if (D_0019672C != 0 && D_0019672C != (struct rec *)0x97979797) {
-            func_000A0024(D_0019672C, D_00170464, 973);
-            D_0019672C = (struct rec *)0x97979797;
+            faction_count++;
+    if (factions != 0) {
+        if (factions != 0 && factions != (struct rec *)0x97979797) {
+            func_000A0024(factions, D_00170464, 973);
+            factions = (struct rec *)0x97979797;
         }
     }
-    cur = D_0019672C = func_000A00AF(D_00196710 * 92, D_00170464, 975);
-    func_000A0040(cur, 0, D_00196710 * 92, D_00170464, 976, 4);
+    cur = factions = func_000A00AF(faction_count * 92, D_00170464, 975);
+    func_000A0040(cur, 0, faction_count * 92, D_00170464, 976, 4);
     func_000A0040(&rec, 0, 92, D_00170464, 977, 4);
     p = D_00147954;
     p[len] = 0;
@@ -87,7 +87,7 @@ void func_0001B69D(void)
             break;
         case '#':
             if (have) {
-                func_0001BBE2(&rec, prev, cur++);
+                faction_add_record(&rec, prev, cur++);
                 prev = indent;
                 indent = 0;
                 func_000A0040(&rec, 0, 92, D_00170464, 1012, 4);
@@ -113,22 +113,22 @@ void func_0001B69D(void)
                 hash += func_000A1097(*p++);
             }
             for (found = i = 0; i < 19; i++) {
-                if (D_00179D9C[i].hash != hash) continue;
+                if (faction_keywords[i].hash != hash) continue;
                 found = 1;
                 while (*p <= ' ' || *p == ':')
                     p++;
-                D_00179D9C[i].fn(&rec, &p, &l_30, &l_34);
+                faction_keywords[i].fn(&rec, &p, &l_30, &l_34);
                 break;
             }
             if (!found) {
                 func_000A0ED9(1049, D_00170464);
-                func_000A0F5C(D_001903A4, D_0017046E, line);
-                func_00050069(D_001903A4);
+                func_000A0F5C(text_buffer, D_0017046E, line);
+                fatal_error(text_buffer);
             }
             break;
         }
     }
     if (have)
-        func_0001BBE2(&rec, prev, cur);
-    func_0001BAB4(D_0019672C);
+        faction_add_record(&rec, prev, cur);
+    faction_link_relations(factions);
 }

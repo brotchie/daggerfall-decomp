@@ -7,11 +7,11 @@ extern int D_001A3F90;
 extern int D_001A3F94;
 extern int D_001A3F98;
 extern int D_001A3F9C;
-extern void func_00099490(char *);
+extern void dpmi_get_free_memory(char *);
 
 void func_00069E3C(void)
 {
-    func_00099490(D_001A3F60);
+    dpmi_get_free_memory(D_001A3F60);
     D_001A3F98 = (D_001A3F78 - D_001A3F74) << 2;
     D_001A3F90 = (D_001A3F7C << 2) + D_001A3F98;
     D_001A3F94 = D_001A3F78 << 2;

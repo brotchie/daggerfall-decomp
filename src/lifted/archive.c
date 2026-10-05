@@ -5,21 +5,21 @@ struct bf8_6_1 { unsigned char _:6; unsigned char f:1; };
 extern char D_00170150[];
 extern char D_0017015A[];
 extern char D_00170172[];
-extern char D_00183294[];
-extern char D_00183298[];
-extern char D_00195AA4[];
-extern char D_00195BE0[];
+extern char lock_text_fail[];
+extern char lock_text_open[];
+extern char player_object[];
+extern char player_character[];
 extern char D_00195C44[];
-extern char D_001962B4[];
-extern char D_00196304[];
-extern char D_0019632C[];
-extern char D_00196354[];
+extern char archive_directories[];
+extern char archive_types[];
+extern char archive_record_counts[];
+extern char archive_names[];
 
-extern int func_00069938(int, int, int);
-extern int func_0006CD6E(int);
-extern int func_0006CDAB(int);
-extern int func_0007CBA1(int);
-extern int func_0007D6AE(int, int);
+extern int sound_play(int, int, int);
+extern int disk_open_data(int);
+extern int disk_open_rw(int);
+extern int hud_message_add(int);
+extern int rand_range(int, int);
 extern int func_0009DEA7();
 extern int func_000A0024();
 extern int func_000A006E();
@@ -30,14 +30,14 @@ extern int func_000A0B42();
 extern int func_000A0E82();
 extern int func_000A0ED9(int, int);
 extern int func_000A0F5C(int, ...);
-extern void func_0003D01C(int, int);
-extern void func_00050069(int);
-extern void func_00064589(int, int);
-extern void func_00070370(int, unsigned char);
-int func_0001345E(int);
+extern void skill_add_uses(int, int);
+extern void fatal_error(int);
+extern void links_trigger(int, int);
+extern void guild_count_crime(int, unsigned char);
+int lockpick_door(int);
 #pragma aux func_000A0ED9 parm routine [];
 
-int func_00012E04(int a1, int a2, int a3)
+int archive_open(int a1, int a2, int a3)
 {
     short l_10;
     short l_1C;
@@ -46,16 +46,16 @@ int func_00012E04(int a1, int a2, int a3)
 
     if (a3 == 0) goto L12E32;
 L12E1F:;
-    *(int *)&l_1C = func_0006CDAB(a1);
+    *(int *)&l_1C = disk_open_rw(a1);
     if (*(int *)&l_1C < 1) goto L12E1F;
     goto L12E3D;
 L12E32:;
-    *(int *)&l_1C = func_0006CD6E(a1);
+    *(int *)&l_1C = disk_open_data(a1);
 L12E3D:;
     if (*(int *)&l_1C >= 1) goto L12E4E;
     return *(int *)&l_1C;
 L12E4E:;
-    func_000A0AD9(((int)D_00196354) + (*(int *)&l_1C * 13), a1, 13, (int)D_00170150, 32);
+    func_000A0AD9(((int)archive_names) + (*(int *)&l_1C * 13), a1, 13, (int)D_00170150, 32);
     func_000A00CB(*(int *)&l_1C, (int)&l_10, 2);
     func_000A00CB(*(int *)&l_1C, (int)&l_14, 2);
     if (((int)(short)l_14) != 256) goto L12EA4;
@@ -67,42 +67,42 @@ L12EAE:;
     if (a2 != 0) goto L12EC9;
     a2 = func_000A00AF(*(int *)&l_18, (int)D_00170150, 42);
 L12EC9:;
-    *(short *)(D_0019632C + (*(int *)&l_1C * 2)) = *(int *)&l_10;
-    *(int *)(D_001962B4 + (*(int *)&l_1C << 2)) = a2;
-    *(short *)(D_00196304 + (*(int *)&l_1C * 2)) = *(int *)&l_14;
+    *(short *)(archive_record_counts + (*(int *)&l_1C * 2)) = *(int *)&l_10;
+    *(int *)(archive_directories + (*(int *)&l_1C << 2)) = a2;
+    *(short *)(archive_types + (*(int *)&l_1C * 2)) = *(int *)&l_14;
     func_000A006E(*(int *)&l_1C, -*(int *)&l_18, 2);
     func_000A00CB(*(int *)&l_1C, a2, *(int *)&l_18);
     return *(int *)&l_1C;
 }
 
-void func_00012F27(int a1)
+void archive_close(int a1)
 {
     if (a1 == 0) return;
-    *(short *)(D_0019632C + (a1 * 2)) = 0;
-    if (*(int *)(D_001962B4 + (a1 << 2)) == 0) goto L12F71;
-    if (*(int *)(D_001962B4 + (a1 << 2)) != (-1751672937)) goto L12F73;
+    *(short *)(archive_record_counts + (a1 * 2)) = 0;
+    if (*(int *)(archive_directories + (a1 << 2)) == 0) goto L12F71;
+    if (*(int *)(archive_directories + (a1 << 2)) != (-1751672937)) goto L12F73;
 L12F71:;
     goto L12F9E;
 L12F73:;
-    func_000A0024(*(int *)(D_001962B4 + (a1 << 2)), (int)D_00170150, 67);
-    *(int *)(D_001962B4 + (a1 << 2)) = -1751672937;
+    func_000A0024(*(int *)(archive_directories + (a1 << 2)), (int)D_00170150, 67);
+    *(int *)(archive_directories + (a1 << 2)) = -1751672937;
 L12F9E:;
-    *(int *)(D_001962B4 + (a1 << 2)) = 0;
-    *(short *)(D_00196304 + (a1 * 2)) = 0;
+    *(int *)(archive_directories + (a1 << 2)) = 0;
+    *(short *)(archive_types + (a1 * 2)) = 0;
     func_0009DEA7(a1);
 }
 
-int func_00012FCE(int a1, int a2, int a3)
+int archive_find_record(int a1, int a2, int a3)
 {
     int l_1C;
     int l_18;
     int l_14;
 
-    if (((int)(short)*(short *)(D_00196304 + (a1 * 2))) != 256) goto L1304F;
-    l_1C = *(int *)(D_001962B4 + (a1 << 2));
+    if (((int)(short)*(short *)(archive_types + (a1 * 2))) != 256) goto L1304F;
+    l_1C = *(int *)(archive_directories + (a1 << 2));
     l_14 = 0;
 L1300C:;
-    if (((int)(short)*(short *)(D_0019632C + (a1 * 2))) > l_14) goto L1302E;
+    if (((int)(short)*(short *)(archive_record_counts + (a1 * 2))) > l_14) goto L1302E;
     goto L1304D;
 L1301F:;
     l_14++;
@@ -116,10 +116,10 @@ L1304B:;
 L1304D:;
     goto L1309E;
 L1304F:;
-    l_18 = *(int *)(D_001962B4 + (a1 << 2));
+    l_18 = *(int *)(archive_directories + (a1 << 2));
     l_14 = 0;
 L13065:;
-    if (((int)(short)*(short *)(D_0019632C + (a1 * 2))) > l_14) goto L13087;
+    if (((int)(short)*(short *)(archive_record_counts + (a1 * 2))) > l_14) goto L13087;
     goto L1309E;
 L13078:;
     l_14++;
@@ -131,34 +131,34 @@ L13087:;
 L1309C:;
     goto L13078;
 L1309E:;
-    if (((int)(short)*(short *)(D_00196304 + (a1 * 2))) != 256) goto L130E4;
+    if (((int)(short)*(short *)(archive_types + (a1 * 2))) != 256) goto L130E4;
     func_000A0ED9(105, (int)D_00170150);
-    func_000A0F5C(*(int *)D_00195C44, (int)D_0017015A, a2, ((int)D_00196354) + (a1 * 13));
+    func_000A0F5C(*(int *)D_00195C44, (int)D_0017015A, a2, ((int)archive_names) + (a1 * 13));
     goto L13115;
 L130E4:;
     func_000A0ED9(107, (int)D_00170150);
-    func_000A0F5C(*(int *)D_00195C44, (int)D_00170172, a3, ((int)D_00196354) + (a1 * 13));
+    func_000A0F5C(*(int *)D_00195C44, (int)D_00170172, a3, ((int)archive_names) + (a1 * 13));
 L13115:;
-    func_00050069(*(int *)D_00195C44);
+    fatal_error(*(int *)D_00195C44);
     return 0;
 }
 
-int func_00013131(int a1, int a2)
+int archive_record_size(int a1, int a2)
 {
     int l_1C;
     int l_18;
 
-    if (((int)(short)*(short *)(D_00196304 + (a1 * 2))) != 256) goto L13178;
-    l_1C = *(int *)(D_001962B4 + (a1 << 2));
+    if (((int)(short)*(short *)(archive_types + (a1 * 2))) != 256) goto L13178;
+    l_1C = *(int *)(archive_directories + (a1 << 2));
     l_1C += a2 * 18;
     return *(int *)((char *)l_1C + 14);
 L13178:;
-    l_18 = *(int *)(D_001962B4 + (a1 << 2));
+    l_18 = *(int *)(archive_directories + (a1 << 2));
     l_18 += a2 << 3;
     return *(int *)((char *)l_18 + 4);
 }
 
-int func_000131A5(int a1, int a2)
+int archive_record_offset(int a1, int a2)
 {
     int l_24;
     int l_20;
@@ -166,8 +166,8 @@ int func_000131A5(int a1, int a2)
     int l_18;
 
     l_18 = 4;
-    if (((int)(short)*(short *)(D_00196304 + (a1 * 2))) != 256) goto L13214;
-    l_24 = *(int *)(D_001962B4 + (a1 << 2));
+    if (((int)(short)*(short *)(archive_types + (a1 * 2))) != 256) goto L13214;
+    l_24 = *(int *)(archive_directories + (a1 << 2));
     l_1C = 0;
 L131E8:;
     if (l_1C < a2) goto L13201;
@@ -182,7 +182,7 @@ L13201:;
 L1320C:;
     return l_18;
 L13214:;
-    l_20 = *(int *)(D_001962B4 + (a1 << 2));
+    l_20 = *(int *)(archive_directories + (a1 << 2));
     l_1C = 0;
 L1322A:;
     if (l_1C < a2) goto L13243;
@@ -198,7 +198,7 @@ L1324E:;
     return l_18;
 }
 
-int func_00013260(int a1, int a2, int a3)
+int archive_read_record(int a1, int a2, int a3)
 {
     int l_24;
     int l_20;
@@ -207,8 +207,8 @@ int func_00013260(int a1, int a2, int a3)
     int l_14;
 
     l_14 = 4;
-    if (((int)(short)*(short *)(D_00196304 + (a1 * 2))) != 256) goto L132D4;
-    l_24 = *(int *)(D_001962B4 + (a1 << 2));
+    if (((int)(short)*(short *)(archive_types + (a1 * 2))) != 256) goto L132D4;
+    l_24 = *(int *)(archive_directories + (a1 << 2));
     l_1C = 0;
 L132A5:;
     if (l_1C < a2) goto L132BE;
@@ -224,7 +224,7 @@ L132C9:;
     l_18 = *(int *)((char *)l_24 + 14);
     goto L13317;
 L132D4:;
-    l_20 = *(int *)(D_001962B4 + (a1 << 2));
+    l_20 = *(int *)(archive_directories + (a1 << 2));
     l_1C = 0;
 L132EA:;
     if (l_1C < a2) goto L13303;
@@ -247,7 +247,7 @@ L13332:;
     return a3;
 }
 
-void func_0001335E(int a1, int a2, int a3)
+void archive_write_record(int a1, int a2, int a3)
 {
     int l_20;
     int l_1C;
@@ -256,8 +256,8 @@ void func_0001335E(int a1, int a2, int a3)
     int l_10;
 
     l_10 = 4;
-    if (((int)(short)*(short *)(D_00196304 + (a1 * 2))) != 256) goto L133D2;
-    l_20 = *(int *)(D_001962B4 + (a1 << 2));
+    if (((int)(short)*(short *)(archive_types + (a1 * 2))) != 256) goto L133D2;
+    l_20 = *(int *)(archive_directories + (a1 << 2));
     l_18 = 0;
 L133A3:;
     if (l_18 < a2) goto L133BC;
@@ -273,7 +273,7 @@ L133C7:;
     l_14 = *(int *)((char *)l_20 + 14);
     goto L13415;
 L133D2:;
-    l_1C = *(int *)(D_001962B4 + (a1 << 2));
+    l_1C = *(int *)(archive_directories + (a1 << 2));
     l_18 = 0;
 L133E8:;
     if (l_18 < a2) goto L13401;
@@ -296,30 +296,30 @@ void func_00013438(int a1)
 {
     int l_18;
 
-    l_18 = func_0001345E(a1);
+    l_18 = lockpick_door(a1);
 }
 
-int func_0001345E(int a1)
+int lockpick_door(int a1)
 {
     int l_1C;
 
-    if (*(unsigned short *)((char *)a1 + 25) != *(short *)(*(char **)D_00195BE0 + 235)) goto L13494;
+    if (*(unsigned short *)((char *)a1 + 25) != *(short *)(*(char **)player_character + 235)) goto L13494;
     return 0;
 L13494:;
     if (((int)(unsigned short)*(short *)((char *)a1 + 23)) < 20) goto L134C8;
-    func_0007CBA1(*(int *)D_00183294);
-    func_00064589(a1, 4);
+    hud_message_add(*(int *)lock_text_fail);
+    links_trigger(a1, 4);
     return 0;
 L134C8:;
-    func_0003D01C(13, 1);
-    if (((struct bf8_6_1 *)(*(char **)D_00195BE0 + 137))->f == 0) goto L13504;
-    l_1C = (int)(unsigned char)*(signed char *)(*(char **)D_00195BE0 + 542);
-    *(signed char *)(*(char **)D_00195BE0 + 137) &= 191;
+    skill_add_uses(13, 1);
+    if (((struct bf8_6_1 *)(*(char **)player_character + 137))->f == 0) goto L13504;
+    l_1C = (int)(unsigned char)*(signed char *)(*(char **)player_character + 542);
+    *(signed char *)(*(char **)player_character + 137) &= 191;
     goto L13513;
 L13504:;
-    l_1C = (int)(short)*(short *)(*(char **)D_00195BE0 + 235);
+    l_1C = (int)(short)*(short *)(*(char **)player_character + 235);
 L13513:;
-    l_1C += (((int)(unsigned char)*(signed char *)((char *)*(int *)D_00195BE0 + 129)) - ((int)(unsigned short)*(short *)((char *)a1 + 23))) * 5;
+    l_1C += (((int)(unsigned char)*(signed char *)((char *)*(int *)player_character + 129)) - ((int)(unsigned short)*(short *)((char *)a1 + 23))) * 5;
     if (l_1C >= 5) goto L13543;
     l_1C = 5;
     goto L13550;
@@ -327,42 +327,42 @@ L13543:;
     if (l_1C <= 95) goto L13550;
     l_1C = 95;
 L13550:;
-    if (func_0007D6AE(0, 100) > l_1C) goto L1359A;
+    if (rand_range(0, 100) > l_1C) goto L1359A;
     *(signed char *)((char *)a1 + 21) |= 64;
-    func_0007CBA1(*(int *)D_00183298);
-    func_00064589(a1, 7);
-    func_00069938(60, a1, 100);
+    hud_message_add(*(int *)lock_text_open);
+    links_trigger(a1, 7);
+    sound_play(60, a1, 100);
     return 1;
 L1359A:;
-    if (((struct bf8_6_1 *)(*(char **)D_00195BE0 + 137))->f != 0) goto L135BB;
-    *(short *)((char *)a1 + 25) = *(short *)(*(char **)D_00195BE0 + 235);
+    if (((struct bf8_6_1 *)(*(char **)player_character + 137))->f != 0) goto L135BB;
+    *(short *)((char *)a1 + 25) = *(short *)(*(char **)player_character + 235);
 L135BB:;
-    func_0007CBA1(*(int *)D_00183294);
-    func_00064589(a1, 4);
+    hud_message_add(*(int *)lock_text_fail);
+    links_trigger(a1, 4);
     return 0;
 }
 
-int func_000135E6(int a1, int a2, int a3)
+int lockpick_action_door(int a1, int a2, int a3)
 {
     int l_14;
 
     if (((int)(unsigned char)*(signed char *)((char *)a1 + 8)) < 10) goto L13617;
     return 1;
 L13617:;
-    if (*(unsigned short *)((char *)a3 + 25) != *(short *)(*(char **)D_00195BE0 + 235)) goto L1363C;
+    if (*(unsigned short *)((char *)a3 + 25) != *(short *)(*(char **)player_character + 235)) goto L1363C;
     return 0;
 L1363C:;
     if (a2 < 20) goto L13658;
-    func_0007CBA1(*(int *)D_00183294);
+    hud_message_add(*(int *)lock_text_fail);
     return 0;
 L13658:;
-    func_0003D01C(13, 1);
-    if (((struct bf8_6_1 *)(*(char **)D_00195BE0 + 137))->f == 0) goto L13694;
-    l_14 = (int)(unsigned char)*(signed char *)(*(char **)D_00195BE0 + 542);
-    *(signed char *)(*(char **)D_00195BE0 + 137) &= 191;
+    skill_add_uses(13, 1);
+    if (((struct bf8_6_1 *)(*(char **)player_character + 137))->f == 0) goto L13694;
+    l_14 = (int)(unsigned char)*(signed char *)(*(char **)player_character + 542);
+    *(signed char *)(*(char **)player_character + 137) &= 191;
     goto L136A3;
 L13694:;
-    l_14 = (int)(short)*(short *)(*(char **)D_00195BE0 + 235);
+    l_14 = (int)(short)*(short *)(*(char **)player_character + 235);
 L136A3:;
     l_14 -= a2 * 5;
     if (l_14 >= 5) goto L136BB;
@@ -372,15 +372,15 @@ L136BB:;
     if (l_14 <= 95) goto L136C8;
     l_14 = 95;
 L136C8:;
-    if (func_0007D6AE(0, 100) > l_14) goto L13710;
-    func_0007CBA1(*(int *)D_00183298);
-    func_00069938(60, *(int *)D_00195AA4, 110);
-    func_00070370(5, 1);
+    if (rand_range(0, 100) > l_14) goto L13710;
+    hud_message_add(*(int *)lock_text_open);
+    sound_play(60, *(int *)player_object, 110);
+    guild_count_crime(5, 1);
     return 1;
 L13710:;
-    if (((struct bf8_6_1 *)(*(char **)D_00195BE0 + 137))->f != 0) goto L13731;
-    *(short *)((char *)a3 + 25) = *(short *)(*(char **)D_00195BE0 + 235);
+    if (((struct bf8_6_1 *)(*(char **)player_character + 137))->f != 0) goto L13731;
+    *(short *)((char *)a3 + 25) = *(short *)(*(char **)player_character + 235);
 L13731:;
-    func_0007CBA1(*(int *)D_00183294);
+    hud_message_add(*(int *)lock_text_fail);
     return 0;
 }

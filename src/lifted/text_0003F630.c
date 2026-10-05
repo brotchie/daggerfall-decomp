@@ -3,7 +3,7 @@
 
 extern char D_0017B630[];
 extern char D_0017B631[];
-extern char D_00199648[];
+extern char msgbox_spop_tiles[];
 extern char D_00199658[];
 extern char D_00199660[];
 extern char D_00199662[];
@@ -12,7 +12,7 @@ extern char D_00199666[];
 
 void func_0003F630(short a1)
 {
-    *(int *)D_00199658 = *(int *)(D_00199648 + (((int)(short)a1) << 2));
+    *(int *)D_00199658 = *(int *)(msgbox_spop_tiles + (((int)(short)a1) << 2));
     *(short *)D_00199666 = (unsigned short)(unsigned char)*(signed char *)(D_0017B630 + (((int)(short)a1) * 2));
     *(short *)D_00199662 = (unsigned short)(unsigned char)*(signed char *)(D_0017B631 + (((int)(short)a1) * 2));
     *(short *)D_00199660 = *(short *)D_00199666 * *(short *)D_00199662;

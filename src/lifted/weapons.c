@@ -3,72 +3,72 @@
 
 struct bf8_5_1 { unsigned char _:5; unsigned char f:1; };
 struct bf8_6_1 { unsigned char _:6; unsigned char f:1; };
-extern char D_00120290[];
-extern char D_0012AC00[];
+extern char pick_distance[];
+extern char mouse_buttons[];
 extern char D_001343C0[];
 extern char D_0017615C[];
 extern char D_00176166[];
 extern char D_00176175[];
 extern char D_00176184[];
-extern char D_001789FA[];
+extern char player_environment[];
 extern char D_00185097[];
-extern char D_0018754C[];
-extern char D_0018755E[];
-extern char D_0018756E[];
-extern char D_0018758E[];
+extern char weapon_cif_by_index[];
+extern char weapon_swing_types[];
+extern char swing_to_hit_mods[];
+extern char swing_damage_mods[];
 extern char D_001875AE[];
 extern char D_001875B7[];
-extern char D_001903A4[];
+extern char text_buffer[];
 extern char D_00190504[];
 extern char D_001940D6[];
 extern char D_0019597C[];
-extern char D_00195A9C[];
-extern char D_00195AA0[];
-extern char D_00195AA4[];
+extern char current_building[];
+extern char player_entity[];
+extern char player_object[];
 extern char D_00195AB0[];
 extern char D_00195AC4[];
 extern char D_00195AE0[];
-extern char D_00195B14[];
-extern char D_00195B40[];
-extern char D_00195B68[];
+extern char creature_count[];
+extern char spell_ready_missile[];
+extern char hud_bar_image[];
 extern char D_00195B84[];
-extern char D_00195BE0[];
-extern char D_00195BF8[];
+extern char player_character[];
+extern char game_settings[];
 extern char D_00195C48[];
 extern char D_00195D5C[];
-extern char D_00195F64[];
-extern char D_00195F66[];
-extern char D_0019626A[];
-extern char D_00196279[];
-extern char D_0019627E[];
-extern char D_00196A88[];
-extern char D_00196D64[];
+extern char mouse_motion_x[];
+extern char mouse_motion_y[];
+extern char weapon_active_hand[];
+extern char mouse_buttons_prev[];
+extern char crime_current[];
+extern char loaded_location[];
+extern char collide_flags[];
 extern char D_001A4A30[];
 extern char D_001A4A38[];
 extern char D_001A4A48[];
-extern char D_001A4A58[];
+extern char weapon_hand_cif[];
 extern char D_001A4A5C[];
 extern char D_001A4A60[];
 extern char D_001A4A68[];
 extern char D_001A4A70[];
-extern char D_001A4B7A[];
-extern char D_001A4B7C[];
+extern char swing_to_hit[];
+extern char swing_damage[];
 
-extern int func_0001345E(int);
+extern int lockpick_door(int);
 extern int func_00013A00(int, int, unsigned short);
-extern int func_000219B8(int, int, int);
+extern int collide_move_missile(int, int, int);
 extern int func_00041347(void);
-extern int func_00042F0F(int);
-extern int func_0004B28C(int);
-extern int func_00069938(int, int, int);
-extern int func_0006CB53(int, int);
-extern int func_0007461D(int);
-extern int func_0007CBA1(int);
-extern int func_0007D6AE(int, int);
-extern int func_0008DA4D(int);
-extern int func_0008DCE3(int, int, int);
-extern int func_00097488(int);
-extern int func_00099922(int, int);
+extern int key_action_held(int);
+extern int building_is_open(int);
+extern int sound_play(int, int, int);
+extern int disk_read_file(int, int);
+extern int click_world_face(int);
+extern int hud_message_add(int);
+extern int rand_range(int, int);
+extern int object_free_single(int);
+extern int object_create_child(int, int, int);
+extern int inv_take_arrow(int);
+extern int door_start_swing(int, int);
 extern int func_000A0024();
 extern int func_000A0040();
 extern int func_000A0ED9(int, int);
@@ -82,50 +82,50 @@ extern int func_000C7FF4();
 extern int func_000C808D();
 extern int func_000CB39A();
 extern int func_000CE70D();
-extern void func_000138E4(int);
-extern void func_0002D62F(int, int, int);
-extern void func_00040C87(int);
-extern void func_0005BCDE(int);
-extern void func_0005C6A2(int);
-extern void func_0005E540(int, int, int);
-extern void func_00064589(int, int);
-extern void func_0006A54B(int);
-extern void func_0007242F(int);
-extern void func_000728D2(void);
-extern void func_00075E08(int, int);
+extern void lock_show_difficulty(int);
+extern void damage_resolve_attack(int, int, int);
+extern void guards_summon(int);
+extern void cast_fire_missile(int);
+extern void spell_area_effect(int);
+extern void item_make(int, int, int);
+extern void links_trigger(int, int);
+extern void mem_check_crt_heap(int);
+extern void fatigue_add(int);
+extern void weapon_reload_hand_sprites(void);
+extern void click_item(int, int);
 extern void func_00075E7B(int, int);
-extern void func_00075EA2(int, int);
-extern void func_00075F48(int, int);
-extern void func_00075FFF(int, int);
+extern void click_npc(int, int);
+extern void click_creature(int, int);
+extern void click_door(int, int);
 extern void func_0007606C(int, int);
-extern void func_00076088(int, int);
-extern void func_000762B6(int, int);
+extern void click_interior_model(int, int);
+extern void click_corpse(int, int);
 extern void func_000763C6(int, int);
-extern void func_00076460(int, int);
+extern void click_loot_container(int, int);
 extern void func_00076503(int, int);
-extern void func_0007D6EA(int);
-extern void func_0007D7BA(void);
-extern void func_000972C7(int, int, int);
+extern void object_free_later(int);
+extern void spell_cast_queued_run(void);
+extern void inv_merge_arrows(int, int, int);
 int func_00073F5D(int, int, int);
-void func_00073980(void);
+void weapon_fire_arrow(void);
 #pragma aux func_000A0ED9 parm routine [];
 
-void func_00072916(int a1, int a2)
+void weapon_load_hand_sprite(int a1, int a2)
 {
     int l_18;
     int l_14;
 
     if (a1 == 0) goto L72941;
-    if (((int)(unsigned char)*(signed char *)(*(char **)D_00195BE0 + 67)) <= 8) goto L72982;
+    if (((int)(unsigned char)*(signed char *)(*(char **)player_character + 67)) <= 8) goto L72982;
 L72941:;
     *(int *)(D_001A4A68 + (a2 << 2)) = 0;
-    l_14 = ((((int)(unsigned char)*(signed char *)(*(char **)D_00195BE0 + 67)) < 9) ? 10 : 11);
+    l_14 = ((((int)(unsigned char)*(signed char *)(*(char **)player_character + 67)) < 9) ? 10 : 11);
     a1 = 0;
     goto L729E8;
 L72982:;
     l_18 = a1 + 71;
     if (((int)(unsigned short)*(short *)((char *)l_18 + 32)) != 3) goto L72941;
-    l_14 = (int)(unsigned char)*(signed char *)(D_0018754C + ((int)(unsigned short)*(short *)((char *)l_18 + 34)));
+    l_14 = (int)(unsigned char)*(signed char *)(weapon_cif_by_index + ((int)(unsigned short)*(short *)((char *)l_18 + 34)));
     if (l_14 != 9) goto L729C8;
     *(int *)(D_001A4A68 + (a2 << 2)) = (int)D_001875B7;
     goto L729D8;
@@ -149,119 +149,119 @@ L72A2F:;
     goto L72A58;
 L72A31:;
     func_000A0ED9(85, (int)D_0017615C);
-    func_000A0F5C((int)D_001903A4, (int)D_00176166, l_14);
+    func_000A0F5C((int)text_buffer, (int)D_00176166, l_14);
     goto L72A7D;
 L72A58:;
     func_000A0ED9(87, (int)D_0017615C);
-    func_000A0F5C((int)D_001903A4, (int)D_00176175, l_14);
+    func_000A0F5C((int)text_buffer, (int)D_00176175, l_14);
 L72A7D:;
-    *(int *)(D_001A4A58 + (a2 << 2)) = func_0006CB53((int)D_001903A4, 0);
+    *(int *)(weapon_hand_cif + (a2 << 2)) = disk_read_file((int)text_buffer, 0);
 }
 
-void func_00072AA0(void)
+void weapon_reload_sprites(void)
 {
-    func_000728D2();
-    func_0006A54B(704);
+    weapon_reload_hand_sprites();
+    mem_check_crt_heap(704);
 }
 
-int func_00072AC7(int a1)
+int weapon_start_swing(int a1)
 {
     short l_1C;
     int l_24;
     short l_18;
 
-    if (func_00042F0F(33) != 0) goto L72AF2;
+    if (key_action_held(33) != 0) goto L72AF2;
     return 0;
 L72AF2:;
-    l_1C = *(short *)D_00195F64;
-    l_18 = *(short *)D_00195F66;
+    l_1C = *(short *)mouse_motion_x;
+    l_18 = *(short *)mouse_motion_y;
     l_24 = func_000C7FD9(0, 0, (int)(short)l_1C, (int)(short)l_18);
     if (l_24 >= 45) goto L72B2A;
     return 0;
 L72B2A:;
     *(int *)(D_001A4A48 + (a1 << 2)) = *(int *)D_001343C0;
     l_24 = func_000C808D(0, 0, (int)(short)l_1C, (int)(short)l_18) >> 7;
-    *(int *)(D_001A4A38 + (a1 << 2)) = (int)(unsigned char)*(signed char *)(D_0018755E + l_24);
-    *(short *)D_001A4B7A = *(short *)(D_0018756E + (l_24 * 2));
-    *(short *)D_001A4B7C = *(short *)(D_0018758E + (l_24 * 2));
-    if (((int)(unsigned char)*(signed char *)(D_0018755E + l_24)) != 2) goto L72BBF;
-    if (*(int *)(*(char **)D_00195BE0 + 443 + ((((int)(unsigned char)*(signed char *)D_0019626A) * 2) << 2)) == 0) goto L72BC1;
+    *(int *)(D_001A4A38 + (a1 << 2)) = (int)(unsigned char)*(signed char *)(weapon_swing_types + l_24);
+    *(short *)swing_to_hit = *(short *)(swing_to_hit_mods + (l_24 * 2));
+    *(short *)swing_damage = *(short *)(swing_damage_mods + (l_24 * 2));
+    if (((int)(unsigned char)*(signed char *)(weapon_swing_types + l_24)) != 2) goto L72BBF;
+    if (*(int *)(*(char **)player_character + 443 + ((((int)(unsigned char)*(signed char *)weapon_active_hand) * 2) << 2)) == 0) goto L72BC1;
 L72BBF:;
     goto L72BEB;
 L72BC1:;
-    *(int *)(D_001A4A68 + (((int)(unsigned char)*(signed char *)D_0019626A) << 2)) = (int)D_001875AE;
-    *(int *)(D_001A4A60 + (((int)(unsigned char)*(signed char *)D_0019626A) << 2)) = 0;
+    *(int *)(D_001A4A68 + (((int)(unsigned char)*(signed char *)weapon_active_hand) << 2)) = (int)D_001875AE;
+    *(int *)(D_001A4A60 + (((int)(unsigned char)*(signed char *)weapon_active_hand) << 2)) = 0;
     goto L72BFF;
 L72BEB:;
-    *(int *)(D_001A4A68 + (((int)(unsigned char)*(signed char *)D_0019626A) << 2)) = 0;
+    *(int *)(D_001A4A68 + (((int)(unsigned char)*(signed char *)weapon_active_hand) << 2)) = 0;
 L72BFF:;
     *(int *)(D_001A4A70 + (a1 << 2)) = 5;
     return 1;
 }
 
-void func_00072C23(void)
+void weapon_bow_update(void)
 {
     if (((struct bf8_6_1 *)&D_001940D6)->f == 0) return;
-    if (*(int *)(D_0019597C + (((int)(unsigned char)*(signed char *)D_0019626A) << 2)) != 0) return;
-    if (*(int *)(D_001A4A60 + (((int)(unsigned char)*(signed char *)D_0019626A) << 2)) <= 200) goto L72CB0;
-    *(int *)(D_001A4A60 + (((int)(unsigned char)*(signed char *)D_0019626A) << 2)) -= *(int *)D_00195AB0;
-    if (*(int *)(D_001A4A60 + (((int)(unsigned char)*(signed char *)D_0019626A) << 2)) >= 200) goto L72CAB;
-    *(int *)(D_001A4A60 + (((int)(unsigned char)*(signed char *)D_0019626A) << 2)) = 0;
+    if (*(int *)(D_0019597C + (((int)(unsigned char)*(signed char *)weapon_active_hand) << 2)) != 0) return;
+    if (*(int *)(D_001A4A60 + (((int)(unsigned char)*(signed char *)weapon_active_hand) << 2)) <= 200) goto L72CB0;
+    *(int *)(D_001A4A60 + (((int)(unsigned char)*(signed char *)weapon_active_hand) << 2)) -= *(int *)D_00195AB0;
+    if (*(int *)(D_001A4A60 + (((int)(unsigned char)*(signed char *)weapon_active_hand) << 2)) >= 200) goto L72CAB;
+    *(int *)(D_001A4A60 + (((int)(unsigned char)*(signed char *)weapon_active_hand) << 2)) = 0;
 L72CAB:;
     return;
 L72CB0:;
-    if (*(int *)(D_001A4A60 + (((int)(unsigned char)*(signed char *)D_0019626A) << 2)) != 200) goto L72CDA;
-    *(int *)(D_001A4A60 + (((int)(unsigned char)*(signed char *)D_0019626A) << 2)) = 0;
+    if (*(int *)(D_001A4A60 + (((int)(unsigned char)*(signed char *)weapon_active_hand) << 2)) != 200) goto L72CDA;
+    *(int *)(D_001A4A60 + (((int)(unsigned char)*(signed char *)weapon_active_hand) << 2)) = 0;
 L72CDA:;
-    if (((int)(unsigned char)*(signed char *)((char *)(int)(*(char **)(D_001A4A68 + (((int)(unsigned char)*(signed char *)D_0019626A) << 2)) + *(int *)(D_001A4A60 + (((int)(unsigned char)*(signed char *)D_0019626A) << 2))))) != 3) goto L72D55;
-    if (((int)(unsigned char)(*(signed char *)D_00196279 & 2)) != 0) goto L72D29;
-    if (((int)(unsigned char)(*(signed char *)D_0012AC00 & 2)) != 0) goto L72D2B;
+    if (((int)(unsigned char)*(signed char *)((char *)(int)(*(char **)(D_001A4A68 + (((int)(unsigned char)*(signed char *)weapon_active_hand) << 2)) + *(int *)(D_001A4A60 + (((int)(unsigned char)*(signed char *)weapon_active_hand) << 2))))) != 3) goto L72D55;
+    if (((int)(unsigned char)(*(signed char *)mouse_buttons_prev & 2)) != 0) goto L72D29;
+    if (((int)(unsigned char)(*(signed char *)mouse_buttons & 2)) != 0) goto L72D2B;
 L72D29:;
     goto L72D50;
 L72D2B:;
-    func_00069938(6, *(int *)D_00195AA4, 100);
-    (*(int *)(D_001A4A60 + (((int)(unsigned char)*(signed char *)D_0019626A) << 2)))++;
+    sound_play(6, *(int *)player_object, 100);
+    (*(int *)(D_001A4A60 + (((int)(unsigned char)*(signed char *)weapon_active_hand) << 2)))++;
 L72D50:;
     goto L72DFE;
 L72D55:;
-    (*(int *)(D_001A4A60 + (((int)(unsigned char)*(signed char *)D_0019626A) << 2)))++;
-    if (((int)(unsigned char)*(signed char *)((char *)(*(int *)(D_001A4A68 + (((int)(unsigned char)*(signed char *)D_0019626A) << 2)) + *(int *)(D_001A4A60 + (((int)(unsigned char)*(signed char *)D_0019626A) << 2))))) != 5) goto L72DA1;
-    func_00073980();
-    func_0007242F(-11);
+    (*(int *)(D_001A4A60 + (((int)(unsigned char)*(signed char *)weapon_active_hand) << 2)))++;
+    if (((int)(unsigned char)*(signed char *)((char *)(*(int *)(D_001A4A68 + (((int)(unsigned char)*(signed char *)weapon_active_hand) << 2)) + *(int *)(D_001A4A60 + (((int)(unsigned char)*(signed char *)weapon_active_hand) << 2))))) != 5) goto L72DA1;
+    weapon_fire_arrow();
+    fatigue_add(-11);
 L72DA1:;
-    if (((int)(unsigned char)*(signed char *)((char *)(int)(*(char **)(D_001A4A68 + (((int)(unsigned char)*(signed char *)D_0019626A) << 2)) + *(int *)(D_001A4A60 + (((int)(unsigned char)*(signed char *)D_0019626A) << 2))))) != 7) goto L72DFE;
-    *(int *)(D_001A4A60 + (((int)(unsigned char)*(signed char *)D_0019626A) << 2)) = ((100 - ((int)(short)*(short *)(*(char **)D_00195BE0 + 44))) * 10) + 1000;
+    if (((int)(unsigned char)*(signed char *)((char *)(int)(*(char **)(D_001A4A68 + (((int)(unsigned char)*(signed char *)weapon_active_hand) << 2)) + *(int *)(D_001A4A60 + (((int)(unsigned char)*(signed char *)weapon_active_hand) << 2))))) != 7) goto L72DFE;
+    *(int *)(D_001A4A60 + (((int)(unsigned char)*(signed char *)weapon_active_hand) << 2)) = ((100 - ((int)(short)*(short *)(*(char **)player_character + 44))) * 10) + 1000;
     return;
 L72DFE:;
-    func_000CB39A(*(int *)(D_001A4A58 + (((int)(unsigned char)*(signed char *)D_0019626A) << 2)), (int)(unsigned char)*(signed char *)((char *)(*(int *)(D_001A4A68 + (((int)(unsigned char)*(signed char *)D_0019626A) << 2)) + *(int *)(D_001A4A60 + (((int)(unsigned char)*(signed char *)D_0019626A) << 2)))), ((((int)(unsigned short)(*(short *)(*(char **)D_00195BF8) & 1)) != 0) ? 0 : -((int)(unsigned short)*(short *)(*(char **)D_00195B68 + 6))), (int)(unsigned char)*(signed char *)D_0019626A);
+    func_000CB39A(*(int *)(weapon_hand_cif + (((int)(unsigned char)*(signed char *)weapon_active_hand) << 2)), (int)(unsigned char)*(signed char *)((char *)(*(int *)(D_001A4A68 + (((int)(unsigned char)*(signed char *)weapon_active_hand) << 2)) + *(int *)(D_001A4A60 + (((int)(unsigned char)*(signed char *)weapon_active_hand) << 2)))), ((((int)(unsigned short)(*(short *)(*(char **)game_settings) & 1)) != 0) ? 0 : -((int)(unsigned short)*(short *)(*(char **)hud_bar_image + 6))), (int)(unsigned char)*(signed char *)weapon_active_hand);
 }
 
-void func_00073980(void)
+void weapon_fire_arrow(void)
 {
     char l_24[16];
 
-    if (func_00097488(1) != 0) goto L739AB;
-    func_0007CBA1((int)D_00176184);
+    if (inv_take_arrow(1) != 0) goto L739AB;
+    hud_message_add((int)D_00176184);
     return;
 L739AB:;
-    *(int *)((char *)l_24 + 12) = func_0008DCE3(*(int *)(*(char **)D_00195AA4 + 67), 0, 107);
+    *(int *)((char *)l_24 + 12) = object_create_child(*(int *)(*(char **)player_object + 67), 0, 107);
     *(signed char *)(*(char **)((char *)l_24 + 12)) = 2;
     *(short *)(*(char **)((char *)l_24 + 12) + 29) = 998;
     *(short *)(*(char **)((char *)l_24 + 12) + 27) = 0;
-    func_0005E540(3, 18, *(int *)((char *)l_24 + 12) + 71);
+    item_make(3, 18, *(int *)((char *)l_24 + 12) + 71);
     *(signed char *)(*(char **)((char *)l_24 + 12) + 120) = 1;
     func_000A0040((int)l_24, 0, 12, (int)D_0017615C, 404, 4);
-    func_000CE70D((int)(short)*(short *)(*(char **)D_00195AA4 + 1), (int)(short)*(short *)(*(char **)D_00195AA4 + 3), 1024, (int)l_24);
-    *(int *)l_24 += *(int *)(*(char **)D_00195AA4 + 7);
-    *(int *)((char *)l_24 + 4) += *(int *)(*(char **)D_00195AA4 + 11);
-    *(int *)((char *)l_24 + 8) += *(int *)(*(char **)D_00195AA4 + 15);
-    func_000C2000(*(int *)D_00195AA4 + 7, (int)l_24, *(int *)((char *)l_24 + 12) + 142);
-    *(int *)(*(char **)((char *)l_24 + 12) + 7) = *(int *)(*(char **)D_00195AA4 + 7);
-    *(int *)(*(char **)((char *)l_24 + 12) + 11) = *(int *)(*(char **)D_00195AA4 + 11) - 70;
-    if (((int)(unsigned short)(*(short *)(*(char **)D_00195BF8) & 1)) != 0) goto L73AA6;
+    func_000CE70D((int)(short)*(short *)(*(char **)player_object + 1), (int)(short)*(short *)(*(char **)player_object + 3), 1024, (int)l_24);
+    *(int *)l_24 += *(int *)(*(char **)player_object + 7);
+    *(int *)((char *)l_24 + 4) += *(int *)(*(char **)player_object + 11);
+    *(int *)((char *)l_24 + 8) += *(int *)(*(char **)player_object + 15);
+    func_000C2000(*(int *)player_object + 7, (int)l_24, *(int *)((char *)l_24 + 12) + 142);
+    *(int *)(*(char **)((char *)l_24 + 12) + 7) = *(int *)(*(char **)player_object + 7);
+    *(int *)(*(char **)((char *)l_24 + 12) + 11) = *(int *)(*(char **)player_object + 11) - 70;
+    if (((int)(unsigned short)(*(short *)(*(char **)game_settings) & 1)) != 0) goto L73AA6;
     *(int *)(*(char **)((char *)l_24 + 12) + 11) -= 10;
 L73AA6:;
-    *(int *)(*(char **)((char *)l_24 + 12) + 15) = *(int *)(*(char **)D_00195AA4 + 15);
+    *(int *)(*(char **)((char *)l_24 + 12) + 15) = *(int *)(*(char **)player_object + 15);
     *(short *)(*(char **)((char *)l_24 + 12) + 25) = 1;
     func_000C2043(*(int *)((char *)l_24 + 12) + 142, 160, *(int *)((char *)l_24 + 12) + 7);
 }
@@ -278,7 +278,7 @@ void func_00073ADF(int a1)
 }
 }
 
-int func_00073B3E(int a1)
+int weapon_arrow_update(int a1)
 {
     int l_24;
     int l_20;
@@ -287,9 +287,9 @@ int func_00073B3E(int a1)
     char l_40[12];
     char l_34[12];
 
-    l_20 = func_000C7FF4(*(int *)(*(char **)D_00195AA4 + 11) - *(int *)((char *)a1 + 11), func_000C7FD9(*(int *)(*(char **)D_00195AA4 + 7), *(int *)(*(char **)D_00195AA4 + 15), *(int *)((char *)a1 + 7), *(int *)((char *)a1 + 15)));
+    l_20 = func_000C7FF4(*(int *)(*(char **)player_object + 11) - *(int *)((char *)a1 + 11), func_000C7FD9(*(int *)(*(char **)player_object + 7), *(int *)(*(char **)player_object + 15), *(int *)((char *)a1 + 7), *(int *)((char *)a1 + 15)));
     if (l_20 <= 2048) goto L73BA7;
-    func_0007D6EA(a1);
+    object_free_later(a1);
     return 0;
 L73BA7:;
     *(int *)l_34 = *(int *)((char *)a1 + 7);
@@ -299,26 +299,26 @@ L73BA7:;
     *(int *)l_40 = (int)(short)*(short *)((char *)a1 + 1);
     *(int *)((char *)l_40 + 4) = (int)(short)*(short *)((char *)a1 + 3);
     *(int *)((char *)l_40 + 8) = 0;
-    *(signed char *)D_00196D64 |= 4;
-    l_24 = func_000219B8(a1, (int)l_34, (int)l_40);
+    *(signed char *)collide_flags |= 4;
+    l_24 = collide_move_missile(a1, (int)l_34, (int)l_40);
     if (*(short *)((char *)a1 + 25) != 0) goto L73CC8;
-    l_20 = func_000C7FF4(*(int *)(*(char **)D_00195AA4 + 11) - *(int *)((char *)a1 + 11), func_000C7FD9(*(int *)(*(char **)D_00195AA4 + 7), *(int *)(*(char **)D_00195AA4 + 15), *(int *)((char *)a1 + 7), *(int *)((char *)a1 + 15)));
+    l_20 = func_000C7FF4(*(int *)(*(char **)player_object + 11) - *(int *)((char *)a1 + 11), func_000C7FD9(*(int *)(*(char **)player_object + 7), *(int *)(*(char **)player_object + 15), *(int *)((char *)a1 + 7), *(int *)((char *)a1 + 15)));
     if (l_20 >= 125) goto L73CA6;
-    func_00069938(7, *(int *)D_00195AA4, 100);
-    func_0002D62F(*(int *)D_00195AA0, *(int *)D_00195AA0, 19);
-    func_000972C7(*(int *)D_00195AA0, a1, 0);
-    func_0007D6EA(a1);
+    sound_play(7, *(int *)player_object, 100);
+    damage_resolve_attack(*(int *)player_entity, *(int *)player_entity, 19);
+    inv_merge_arrows(*(int *)player_entity, a1, 0);
+    object_free_later(a1);
     return 0;
 L73CA6:;
     if ((l_24 & 10) == 0) goto L73CC3;
-    func_0007D6EA(a1);
+    object_free_later(a1);
     return 0;
 L73CC3:;
     goto L73DE5;
 L73CC8:;
     if ((l_24 & 2) == 0) goto L73CF4;
-    func_00064589(*(int *)D_00195C48, 5);
-    func_0007D6EA(a1);
+    links_trigger(*(int *)D_00195C48, 5);
+    object_free_later(a1);
     return 0;
 L73CF4:;
     if ((l_24 & 8) == 0) goto L73D0E;
@@ -326,39 +326,39 @@ L73CF4:;
 L73D0E:;
     goto L73D5D;
 L73D10:;
-    func_00069938(7, *(int *)D_00195C48, 100);
-    func_0002D62F(*(int *)D_00195AA0, *(int *)D_00195C48, 19);
-    func_000972C7(*(int *)D_00195C48, a1, 0);
-    func_0007D6EA(a1);
+    sound_play(7, *(int *)D_00195C48, 100);
+    damage_resolve_attack(*(int *)player_entity, *(int *)D_00195C48, 19);
+    inv_merge_arrows(*(int *)D_00195C48, a1, 0);
+    object_free_later(a1);
     return 0;
 L73D5D:;
     l_1C = func_00073F5D(*(int *)((char *)a1 + 7), *(int *)((char *)a1 + 11), *(int *)((char *)a1 + 15));
     if (l_1C != 0) goto L73D8E;
-    func_0007D6EA(a1);
+    object_free_later(a1);
     return 0;
 L73D8E:;
     if (*(int *)D_00195B84 <= 140) goto L73DA3;
     return 1;
 L73DA3:;
-    func_00069938(7, l_1C, 100);
-    func_0002D62F(*(int *)D_00195AA0, l_1C, 19);
-    func_000972C7(l_1C, a1, 0);
-    func_0007D6EA(a1);
+    sound_play(7, l_1C, 100);
+    damage_resolve_attack(*(int *)player_entity, l_1C, 19);
+    inv_merge_arrows(l_1C, a1, 0);
+    object_free_later(a1);
     return 0;
 L73DE5:;
     return 1;
 }
 }
 
-void func_00073DF9(int a1, int a2)
+void weapon_monster_arrow(int a1, int a2)
 {
     int l_14;
 
-    l_14 = func_0008DCE3(*(int *)D_00195AC4, 0, 107);
+    l_14 = object_create_child(*(int *)D_00195AC4, 0, 107);
     *(signed char *)((char *)l_14) = 2;
     *(short *)((char *)l_14 + 29) = 998;
     *(short *)((char *)l_14 + 27) = 0;
-    func_0005E540(3, 18, l_14 + 71);
+    item_make(3, 18, l_14 + 71);
     *(signed char *)((char *)l_14 + 120) = 1;
     func_000C2000(a1 + 7, a2 + 7, l_14 + 142);
     *(short *)((char *)l_14 + 23) = 0;
@@ -371,15 +371,15 @@ void func_00073DF9(int a1, int a2)
     func_000C2043(l_14 + 142, 160, l_14 + 7);
 }
 
-void func_00073EDB(void)
+void weapon_free_sprites(void)
 {
-    if (*(int *)D_001A4A58 == 0) goto L73EFE;
-    if (*(int *)D_001A4A58 != (-1751672937)) goto L73F00;
+    if (*(int *)weapon_hand_cif == 0) goto L73EFE;
+    if (*(int *)weapon_hand_cif != (-1751672937)) goto L73F00;
 L73EFE:;
     goto L73F1E;
 L73F00:;
-    func_000A0024(*(int *)D_001A4A58, (int)D_0017615C, 542);
-    *(int *)D_001A4A58 = -1751672937;
+    func_000A0024(*(int *)weapon_hand_cif, (int)D_0017615C, 542);
+    *(int *)weapon_hand_cif = -1751672937;
 L73F1E:;
     if (*(int *)D_001A4A5C == 0) goto L73F33;
     if (*(int *)D_001A4A5C != (-1751672937)) goto L73F35;
@@ -400,7 +400,7 @@ int func_00073F5D(int a1, int a2, int a3)
     l_1C = 100000;
     l_20 = 0;
 L73F80:;
-    if (l_20 < *(int *)D_00195B14) goto L73F95;
+    if (l_20 < *(int *)creature_count) goto L73F95;
     goto L73FF0;
 L73F8D:;
     l_20++;
@@ -424,65 +424,65 @@ void func_00074024(int a1, int a2)
 {
     int l_14;
 
-    l_14 = *(int *)D_00196A88;
+    l_14 = *(int *)loaded_location;
     *(int *)D_00195AE0 = a1;
-    if (*(int *)D_00195B40 == 0) goto L740CD;
-    if (((int)(unsigned char)*(signed char *)(*(char **)D_00195B40 + 78)) != 3) goto L740B4;
+    if (*(int *)spell_ready_missile == 0) goto L740CD;
+    if (((int)(unsigned char)*(signed char *)(*(char **)spell_ready_missile + 78)) != 3) goto L740B4;
     *(int *)D_00195D5C = 0;
-    *(int *)(*(char **)D_00195B40 + 7) = *(int *)(*(char **)D_00195AA4 + 7);
-    *(int *)(*(char **)D_00195B40 + 11) = *(int *)(*(char **)D_00195AA4 + 11);
-    *(int *)(*(char **)D_00195B40 + 15) = *(int *)(*(char **)D_00195AA4 + 15);
-    func_0005C6A2(*(int *)D_00195B40);
-    func_0007D7BA();
+    *(int *)(*(char **)spell_ready_missile + 7) = *(int *)(*(char **)player_object + 7);
+    *(int *)(*(char **)spell_ready_missile + 11) = *(int *)(*(char **)player_object + 11);
+    *(int *)(*(char **)spell_ready_missile + 15) = *(int *)(*(char **)player_object + 15);
+    spell_area_effect(*(int *)spell_ready_missile);
+    spell_cast_queued_run();
     goto L740BE;
 L740B4:;
-    func_0005BCDE(*(int *)D_00195B40);
+    cast_fire_missile(*(int *)spell_ready_missile);
 L740BE:;
-    *(int *)D_00195B40 = 0;
+    *(int *)spell_ready_missile = 0;
     return;
 L740CD:;
-    if (*(int *)D_00120290 > 128) goto L740E6;
-    func_00064589(a2, 2);
+    if (*(int *)pick_distance > 128) goto L740E6;
+    links_trigger(a2, 2);
 L740E6:;
-    if (*(int *)D_00120290 > 128) goto L740FE;
-    if (func_0007461D(a1) != 0) goto L74100;
+    if (*(int *)pick_distance > 128) goto L740FE;
+    if (click_world_face(a1) != 0) goto L74100;
 L740FE:;
     goto L74105;
 L74100:;
     return;
 L74105:;
-    if (l_14 != *(int *)D_00196A88) return;
+    if (l_14 != *(int *)loaded_location) return;
     switch (*(unsigned char *)((char *)a2)) {
     return;
 case 2:
-    func_00075E08(a1, a2);
+    click_item(a1, a2);
     return;
 case 6:
     func_00075E7B(a1, a2);
     return;
 case 8:
-    func_00075EA2(a1, a2);
+    click_npc(a1, a2);
     return;
 case 18:
-    func_00075F48(a1, a2);
+    click_creature(a1, a2);
     return;
 case 32:
-    func_00075FFF(a1, a2);
+    click_door(a1, a2);
     return;
 case 34:
     func_0007606C(a1, a2);
     return;
 case 43:
-    func_00076088(a1, a2);
+    click_interior_model(a1, a2);
     return;
 case 44:
-    func_000762B6(a1, a2);
+    click_corpse(a1, a2);
     return;
 case 53:
     func_000763C6(a1, a2);
     return;
 case 33:
-    func_00076460(a1, a2);
+    click_loot_container(a1, a2);
     return;
 case 56:
     func_00076503(a1, a2);
@@ -497,82 +497,82 @@ void func_0007425E(int a1, int a2)
     int l_14;
 
     if (((int)(unsigned short)(*(short *)((char *)a1 + 21) & 256)) == 0) goto L742EE;
-    if (func_00099922(a1, 1) == 0) goto L742E9;
+    if (door_start_swing(a1, 1) == 0) goto L742E9;
     *(signed char *)((char *)a1 + 22) &= 254;
-    if (((struct bf8_5_1 *)(*(char **)D_00195BE0 + 137))->f == 0) goto L742CC;
-    if (func_0007D6AE(1, 100) <= ((int)(unsigned char)*(signed char *)(*(char **)D_00195BE0 + 542))) goto L742CE;
+    if (((struct bf8_5_1 *)(*(char **)player_character + 137))->f == 0) goto L742CC;
+    if (rand_range(1, 100) <= ((int)(unsigned char)*(signed char *)(*(char **)player_character + 542))) goto L742CE;
 L742CC:;
     goto L742E9;
 L742CE:;
     *(signed char *)((char *)a1 + 21) &= 191;
-    *(short *)((char *)a1 + 23) = (unsigned short)(unsigned char)*(signed char *)(*(char **)D_00195BE0 + 129);
+    *(short *)((char *)a1 + 23) = (unsigned short)(unsigned char)*(signed char *)(*(char **)player_character + 129);
 L742E9:;
     return;
 L742EE:;
     if (*(short *)((char *)a1 + 23) == 0) goto L7430D;
     if (((int)(unsigned short)(*(short *)((char *)a1 + 21) & 64)) == 0) goto L74374;
 L7430D:;
-    if (((struct bf8_5_1 *)(*(char **)D_00195BE0 + 137))->f == 0) goto L7433B;
-    if (func_0007D6AE(1, 100) <= ((int)(unsigned char)*(signed char *)(*(char **)D_00195BE0 + 542))) goto L7433D;
+    if (((struct bf8_5_1 *)(*(char **)player_character + 137))->f == 0) goto L7433B;
+    if (rand_range(1, 100) <= ((int)(unsigned char)*(signed char *)(*(char **)player_character + 542))) goto L7433D;
 L7433B:;
     goto L7435A;
 L7433D:;
     *(signed char *)((char *)a1 + 21) &= 191;
-    *(short *)((char *)a1 + 23) = (unsigned short)(unsigned char)*(signed char *)(*(char **)D_00195BE0 + 129);
+    *(short *)((char *)a1 + 23) = (unsigned short)(unsigned char)*(signed char *)(*(char **)player_character + 129);
     goto L7436F;
 L7435A:;
-    if (func_00099922(a1, 0) == 0) goto L7436F;
+    if (door_start_swing(a1, 0) == 0) goto L7436F;
     *(signed char *)((char *)a1 + 22) |= 1;
 L7436F:;
     return;
 L74374:;
-    if (*(int *)(*(char **)D_00195A9C + 20) == *(int *)(*(char **)D_00195BE0 + 116)) goto L743A3;
-    if (((int)(unsigned char)*(signed char *)D_001789FA) != 2) goto L743A1;
-    if (func_0004B28C(*(int *)D_00195A9C) != 0) goto L743A3;
+    if (*(int *)(*(char **)current_building + 20) == *(int *)(*(char **)player_character + 116)) goto L743A3;
+    if (((int)(unsigned char)*(signed char *)player_environment) != 2) goto L743A1;
+    if (building_is_open(*(int *)current_building) != 0) goto L743A3;
 L743A1:;
     goto L743B1;
 L743A3:;
-    if (func_00099922(a1, 0) != 0) goto L743B3;
+    if (door_start_swing(a1, 0) != 0) goto L743B3;
 L743B1:;
     goto L743BF;
 L743B3:;
     *(signed char *)((char *)a1 + 22) |= 1;
     return;
 L743BF:;
-    l_14 = func_00013A00(*(int *)D_00195AA0, ((unsigned)*(int *)((char *)a1 + 31)) >> 16, (int)(unsigned short)*(short *)((char *)a1 + 23));
+    l_14 = func_00013A00(*(int *)player_entity, ((unsigned)*(int *)((char *)a1 + 31)) >> 16, (int)(unsigned short)*(short *)((char *)a1 + 23));
     if (l_14 != 0) goto L744D5;
     if (a2 != 0) goto L7446E;
-    if (((struct bf8_6_1 *)(*(char **)D_00195BE0 + 137))->f == 0) goto L7445B;
-    l_18 = (int)(unsigned char)*(signed char *)(*(char **)D_00195BE0 + 542);
-    *(signed char *)(*(char **)D_00195BE0 + 137) &= 191;
-    if (func_0007D6AE(1, 100) > l_18) goto L7443F;
-    if (func_00099922(a1, 0) != 0) goto L74441;
+    if (((struct bf8_6_1 *)(*(char **)player_character + 137))->f == 0) goto L7445B;
+    l_18 = (int)(unsigned char)*(signed char *)(*(char **)player_character + 542);
+    *(signed char *)(*(char **)player_character + 137) &= 191;
+    if (rand_range(1, 100) > l_18) goto L7443F;
+    if (door_start_swing(a1, 0) != 0) goto L74441;
 L7443F:;
     goto L7444C;
 L74441:;
     *(short *)((char *)a1 + 21) |= 320;
     goto L74456;
 L7444C:;
-    func_0007CBA1(*(int *)D_00185097);
+    hud_message_add(*(int *)D_00185097);
 L74456:;
     return;
 L7445B:;
-    func_000138E4((int)(unsigned short)*(short *)((char *)a1 + 23));
+    lock_show_difficulty((int)(unsigned short)*(short *)((char *)a1 + 23));
     goto L744D3;
 L7446E:;
-    if (func_0001345E(a1) == 0) goto L74491;
-    if (func_00099922(a1, 0) == 0) goto L74491;
+    if (lockpick_door(a1) == 0) goto L74491;
+    if (door_start_swing(a1, 0) == 0) goto L74491;
     *(short *)((char *)a1 + 21) |= 320;
 L74491:;
     if (func_00041347() != 0) goto L744C2;
-    if (func_0007D6AE(1, 300) >= (100 - ((int)(short)*(short *)(*(char **)D_00195BE0 + 253)))) goto L744D3;
+    if (rand_range(1, 300) >= (100 - ((int)(short)*(short *)(*(char **)player_character + 253)))) goto L744D3;
 L744C2:;
-    *(signed char *)D_0019627E = 1;
-    func_00040C87(1);
+    *(signed char *)crime_current = 1;
+    guards_summon(1);
 L744D3:;
     return;
 L744D5:;
-    if (func_00099922(a1, 0) == 0) return;
-    func_0008DA4D(l_14);
+    if (door_start_swing(a1, 0) == 0) return;
+    object_free_single(l_14);
     *(short *)((char *)a1 + 21) |= 320;
 }

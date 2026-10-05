@@ -21,24 +21,24 @@ struct msg {
 extern char D_00170464[];        /* __FILE__ */
 extern unsigned char D_00190D16;
 extern unsigned char D_00190D17;
-extern char D_00190FE4[];
+extern char text_rsc_buffer[];
 extern int D_00195B84;
-extern int D_00195BF4;
+extern int game_minutes;
 extern unsigned char D_00196269;
 extern unsigned char D_001962A5;
-extern int D_00196704;
+extern int rumor_file;
 extern int D_00196708;
 extern struct npc *D_0019670C;
 extern struct npc *D_0019671C;
-extern int func_0001CBBD(struct npc *);
+extern int faction_player_related(struct npc *);
 extern unsigned char func_0001D66C(struct msg *);
-extern void func_0004A6B5(int, int, int);
-extern int func_0007D6AE(int, int);
+extern void parse_rsc_text(int, int, int);
+extern int rand_range(int, int);
 extern void func_000A0040(char *, int, int, char *, int, int);
 extern int func_000A0B42(int, void *, int);
 extern int func_000A0DF4(char *);
 
-void func_0001CF3E(struct npc *a1, struct npc *a2, int a3, unsigned char a4, int a5)
+void rumor_add_faction(struct npc *a1, struct npc *a2, int a3, unsigned char a4, int a5)
 {
     int unused;
     struct msg m;
@@ -48,7 +48,7 @@ void func_0001CF3E(struct npc *a1, struct npc *a2, int a3, unsigned char a4, int
     if (D_001962A5 == 0)
         return;
     if (a5 != 455 && a5 != 456)
-        if (a3 == 100 && func_0001CBBD(a1) == 0 && func_0001CBBD(a2) == 0) {
+        if (a3 == 100 && faction_player_related(a1) == 0 && faction_player_related(a2) == 0) {
             D_00195B84 = saved;
             return;
         }
@@ -64,8 +64,8 @@ void func_0001CF3E(struct npc *a1, struct npc *a2, int a3, unsigned char a4, int
     else if (a2 != 0 && a2->face != 255)
         D_00196269 = a2->face;
     else
-        D_00196269 = func_0007D6AE(0, 61);
-    func_0004A6B5(a5, 0, 0);
+        D_00196269 = rand_range(0, 61);
+    parse_rsc_text(a5, 0, 0);
     if (a1 != 0)
         m.id1 = a1->id;
     else
@@ -81,9 +81,9 @@ void func_0001CF3E(struct npc *a1, struct npc *a2, int a3, unsigned char a4, int
     func_000A0040(m.name, 0, 9, D_00170464, 1606, 9);
     m.f20 = 0;
     m.f22 = 0;
-    m.len = func_000A0DF4(D_00190FE4) + 1;
-    m.time = D_00195BF4 + 43140;
-    func_000A0B42(D_00196704, &m, 34);
-    func_000A0B42(D_00196704, D_00190FE4, m.len);
+    m.len = func_000A0DF4(text_rsc_buffer) + 1;
+    m.time = game_minutes + 43140;
+    func_000A0B42(rumor_file, &m, 34);
+    func_000A0B42(rumor_file, text_rsc_buffer, m.len);
     D_00195B84 = saved;
 }

@@ -441,6 +441,20 @@ the globals and player fields changed, and the screen if the function drew on it
   record of type 11 was linked at character+0x2CC.
 - Calling `func_0002FA97()` played anim0012.vid, the death cutscene.
 
+## Names in the source
+
+`tools/apply_names.py` writes the confirmed and strong names into src/ and include/, so the
+code reads `player_character`, `object_create_child` and `rand_range` instead of
+`D_00195BE0`, `func_0008DCE3` and `func_0007D6AE`. Each name goes into config/symbols.txt,
+which the matching build uses to check named functions and resolve named globals. The build
+stays byte-identical: the names are checked by the same test as the code.
+- Candidates stay as addresses.
+- Library functions stay as addresses for now; their names would meet the C library's
+  headers.
+- A name the sources already use for something else is left out.
+- Tools that read the sources by address go through `names.canonical()`.
+- After a re-lift (promote_lifted.py), run apply_names.py again.
+
 ## How to add to this
 
 `tools/fallstate.py` runs the experiments:

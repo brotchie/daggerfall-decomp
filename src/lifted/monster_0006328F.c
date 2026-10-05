@@ -3,14 +3,14 @@
 
 struct bf8_0_1 { unsigned char f:1; };
 extern char D_00187CA4[];
-extern char D_00195BE0[];
-extern char D_00195BF4[];
+extern char player_character[];
+extern char game_minutes[];
 extern char D_00195F4E[];
 
-extern int func_0007D6AE(int, int);
-extern void func_0003D01C(int, int);
+extern int rand_range(int, int);
+extern void skill_add_uses(int, int);
 
-int func_0006328F(int a1, int a2, int a3, int a4)
+int ai_stealth_check(int a1, int a2, int a3, int a4)
 {
     int l_14;
     int l_10;
@@ -18,23 +18,23 @@ int func_0006328F(int a1, int a2, int a3, int a4)
     if (a3 <= 1024) goto L632BB;
     return 0;
 L632BB:;
-    if (*(int *)D_00195BF4 == *(int *)(*(char **)D_00195BE0 + 525)) goto L633AC;
+    if (*(int *)game_minutes == *(int *)(*(char **)player_character + 525)) goto L633AC;
     if (a4 == 0) goto L632F5;
     if ((((int)(short)*(short *)D_00195F4E) >> 1) >= *(int *)D_00187CA4) goto L632F5;
     return 1;
 L632F5:;
     if ((((((int)(short)*(short *)D_00195F4E) >> 1) >= *(int *)D_00187CA4) ? 1 : 0) == 0) goto L63325;
-    if (((struct bf8_0_1 *)&D_00195BF4)->f != 0) goto L63327;
+    if (((struct bf8_0_1 *)&game_minutes)->f != 0) goto L63327;
 L63325:;
     goto L63332;
 L63327:;
     return a2;
 L63332:;
-    func_0003D01C(16, 1);
-    *(int *)(*(char **)D_00195BE0 + 525) = *(int *)D_00195BF4;
-    l_10 = (int)(short)*(short *)(*(char **)D_00195BE0 + 253);
+    skill_add_uses(16, 1);
+    *(int *)(*(char **)player_character + 525) = *(int *)game_minutes;
+    l_10 = (int)(short)*(short *)(*(char **)player_character + 253);
     l_10 = ((l_10 * a3) / 1024) * 2;
-    l_14 = ((func_0007D6AE(1, 100) > l_10) ? 1 : 0);
+    l_14 = ((rand_range(1, 100) > l_10) ? 1 : 0);
     return l_14;
 L633AC:;
     return a2;

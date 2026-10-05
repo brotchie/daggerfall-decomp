@@ -11,36 +11,36 @@ extern char D_00183264[];
 extern char D_0018328C[];
 extern char D_0018333C[];
 extern char D_00183340[];
-extern char D_001903A4[];
+extern char text_buffer[];
 extern char D_00190BE4[];
 extern char D_00195AF4[];
-extern char D_00195BE0[];
-extern char D_0019627E[];
+extern char player_character[];
+extern char crime_current[];
 
-extern int func_0007CBA1(int);
+extern int hud_message_add(int);
 extern int func_0009DC25();
 extern int func_000A0ED9(int, int);
 extern int func_000A0F5C(int, ...);
 extern void func_0002FBCC(void);
-extern void func_0003D01C(int, int);
-extern void func_0003EC2A(int, int);
-extern void func_0003F09F(int, int);
-extern void func_00040C87(int);
-extern void func_00070370(int, unsigned char);
-extern void func_0007CB4F(int);
+extern void skill_add_uses(int, int);
+extern void msgbox_show_string(int, int);
+extern void msgbox_show_rsc(int, int);
+extern void guards_summon(int);
+extern void guild_count_crime(int, unsigned char);
+extern void hud_status_set(int);
 #pragma aux func_000A0ED9 parm routine [];
 
-void func_0001374D(int a1)
+void pickpocket_attempt(int a1)
 {
     int l_20;
     int l_1C;
     int l_18;
 
-    l_1C = (int)(short)*(short *)(*(char **)D_00195BE0 + 247);
-    func_0003D01C(15, 1);
+    l_1C = (int)(short)*(short *)(*(char **)player_character + 247);
+    skill_add_uses(15, 1);
     if (((int)(unsigned char)*(signed char *)((char *)a1)) != 18) goto L137B7;
     l_18 = a1 + 71;
-    l_1C += (((int)(unsigned char)*(signed char *)((char *)*(int *)D_00195BE0 + 129)) - ((int)(unsigned char)*(signed char *)((char *)l_18 + 129))) * 5;
+    l_1C += (((int)(unsigned char)*(signed char *)((char *)*(int *)player_character + 129)) - ((int)(unsigned char)*(signed char *)((char *)l_18 + 129))) * 5;
 L137B7:;
     if (l_1C >= 5) goto L137C6;
     l_1C = 5;
@@ -53,50 +53,50 @@ L137D3:;
     if (((int)(unsigned char)*(signed char *)((char *)a1)) != 18) goto L137FF;
     func_0002FBCC();
 L137FF:;
-    func_0007CBA1(*(int *)D_0018333C);
-    *(signed char *)D_0019627E = 12;
-    func_00040C87(1);
+    hud_message_add(*(int *)D_0018333C);
+    *(signed char *)crime_current = 12;
+    guards_summon(1);
     if (((int)(unsigned char)*(signed char *)((char *)a1)) != 53) goto L13830;
     *(signed char *)((char *)a1 + 26) |= 128;
 L13830:;
     return;
 L13835:;
     if ((func_0009DC25() % 101) >= 33) goto L1385E;
-    func_0003F09F(8999, 1);
+    msgbox_show_rsc(8999, 1);
     return;
 L1385E:;
     *(short *)D_00178A08 = 250;
     *(signed char *)D_0012B508 = 145;
     l_20 = (func_0009DC25() % 5) + 1;
-    *(int *)(*(char **)D_00195BE0 + 133) += l_20;
+    *(int *)(*(char **)player_character + 133) += l_20;
     func_000A0ED9(155, (int)D_0017018C);
-    func_000A0F5C((int)D_001903A4, *(int *)D_00183340, l_20);
-    func_0003EC2A((int)D_001903A4, 1);
-    func_00070370(5, 1);
+    func_000A0F5C((int)text_buffer, *(int *)D_00183340, l_20);
+    msgbox_show_string((int)text_buffer, 1);
+    guild_count_crime(5, 1);
 }
 
-void func_000138E4(int a1)
+void lock_show_difficulty(int a1)
 {
     int l_18;
 
     if (a1 < 20) goto L1390A;
-    func_0007CB4F(*(int *)D_0018328C);
+    hud_status_set(*(int *)D_0018328C);
     return;
 L1390A:;
-    l_18 = ((int)(short)*(short *)(*(char **)D_00195BE0 + 235)) - (a1 * 5);
+    l_18 = ((int)(short)*(short *)(*(char **)player_character + 235)) - (a1 * 5);
     if (l_18 >= 30) goto L13933;
-    func_0007CB4F(*(int *)D_00183258);
+    hud_status_set(*(int *)D_00183258);
     return;
 L13933:;
     if (l_18 >= 35) goto L13945;
-    func_0007CB4F(*(int *)D_0018325C);
+    hud_status_set(*(int *)D_0018325C);
     return;
 L13945:;
     if (l_18 >= 45) goto L13957;
-    func_0007CB4F(*(int *)D_00183260);
+    hud_status_set(*(int *)D_00183260);
     return;
 L13957:;
-    func_0007CB4F(*(int *)(D_00183264 + (((l_18 - 45) / 5) << 2)));
+    hud_status_set(*(int *)(D_00183264 + (((l_18 - 45) / 5) << 2)));
 }
 
 void func_00013981(int a1)

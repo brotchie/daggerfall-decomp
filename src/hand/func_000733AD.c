@@ -20,45 +20,45 @@ struct item { char pad0[15]; unsigned char flags; };
 struct pick { int flags; struct thing *obj; int f8; int fc; int f10; };
 struct player { char pad0[253]; short f253; char pad0ff[188]; struct thing *f443[1]; };
 struct w2 { unsigned short f0; unsigned short f2; };
-extern unsigned char D_001789FA;
+extern unsigned char player_environment;
 extern struct thing *D_00190504[];
 extern int D_001959BC;
-extern struct thing *D_00195AA0;
-extern struct thing *D_00195AA4;
+extern struct thing *player_entity;
+extern struct thing *player_object;
 extern int D_00195ABC;
-extern int D_00195B14;
-extern struct player *D_00195BE0;
+extern int creature_count;
+extern struct player *player_character;
 extern struct w2 *D_00195DC0;
-extern unsigned char D_0019626A;
-extern char D_0019627E;
+extern unsigned char weapon_active_hand;
+extern char crime_current;
 extern char D_001962B2;
-extern struct thing *D_00199670[];
-extern int D_001996F4;
-extern void func_00013F4B(int, int, struct pick *);
-extern int func_00023C72(struct thing *, struct thing *);
-extern void func_000287BD(struct thing *, struct item *);
-extern void func_0002D62F(struct thing *, struct thing *, int);
-extern void func_0002F490(struct thing *, int, int);
-extern int func_0002F9EE(struct mobile *, int);
+extern struct thing *people_list[];
+extern int people_count;
+extern void engine_pick_object(int, int, struct pick *);
+extern int collide_line_of_sight(struct thing *, struct thing *);
+extern void town_map_note_building(struct thing *, struct item *);
+extern void damage_resolve_attack(struct thing *, struct thing *, int);
+extern void damage_spawn_splash(struct thing *, int, int);
+extern int damage_miss_sound(struct mobile *, int);
 extern void func_0002FBCC(void);
-extern void func_0003D01C(int, int);
-extern int func_00040BCD(void);
-extern void func_00040C87(int);
-extern void func_00041409(struct thing *);
-extern int func_00062EF7(int, int, int *);
+extern void skill_add_uses(int, int);
+extern int creatures_guard_mix(void);
+extern void guards_summon(int);
+extern void person_killed(struct thing *);
+extern int ai_angle_diff(int, int, int *);
 extern void func_00063DDC(struct thing *);
-extern void func_00064589(struct thing *, int);
-extern int func_00069938(int, struct thing *, int);
+extern void links_trigger(struct thing *, int);
+extern int sound_play(int, struct thing *, int);
 extern void func_0007425E(struct thing *, int);
-extern int func_0007D6AE(int, int);
-extern struct item *func_0007DF35(struct thing *);
-extern void func_00087281(struct item *);
-extern int func_00099922(struct thing *, int);
+extern int rand_range(int, int);
+extern struct item *object_building(struct thing *);
+extern void building_enter(struct item *);
+extern int door_start_swing(struct thing *, int);
 extern int func_000C7FD9(int, int, int, int);
 extern int func_000C7FF4(int, int);
 extern int func_000C808D(int, int, int, int);
 
-void func_000733AD(struct thing *a1)
+void weapon_melee_strike(struct thing *a1)
 {
     struct pick st;
     int grp;
@@ -75,8 +75,8 @@ void func_000733AD(struct thing *a1)
 
     m = &a1->mob;
     grp = m->group;
-    D_00190504[D_00195B14++] = D_00195AA0;
-    for (count = i = 0; i < D_00195B14; i++) {
+    D_00190504[creature_count++] = player_entity;
+    for (count = i = 0; i < creature_count; i++) {
         other = D_00190504[i];
         om = &other->mob;
         if (om->group == grp)
@@ -89,52 +89,52 @@ void func_000733AD(struct thing *a1)
         if (dist > 10) {
             dist = func_000C808D(a1->x, a1->z, other->x, other->z);
             D_00195ABC = dist;
-            if (a1 == D_00195AA0)
-                res = func_00062EF7(a1->angle + D_001959BC & 2047, dist, &dist);
+            if (a1 == player_entity)
+                res = ai_angle_diff(a1->angle + D_001959BC & 2047, dist, &dist);
             else
-                res = func_00062EF7(a1->angle, dist, &dist);
+                res = ai_angle_diff(a1->angle, dist, &dist);
         } else
             res = 1;
-        if (res < 200 && func_00023C72(a1, other)) {
-            if (a1 == D_00195AA0) {
+        if (res < 200 && collide_line_of_sight(a1, other)) {
+            if (a1 == player_entity) {
                 func_00063DDC(other);
-                func_0002D62F(a1, other, D_0019626A * 2 + 19);
+                damage_resolve_attack(a1, other, weapon_active_hand * 2 + 19);
                 count++;
             } else
-                func_0002D62F(a1, other, 19);
+                damage_resolve_attack(a1, other, 19);
         }
         if (D_001962B2 != 0) {
             D_001962B2 = 0;
             return;
         }
     }
-    if (count == 0 && a1 == D_00195AA0)
-        func_00069938(func_0002F9EE(D_00195BE0->f443[D_0019626A] != 0 ? &D_00195BE0->f443[D_0019626A]->mob : 0, -1), D_00195AA4, 110);
-    if (a1 == D_00195AA0 && D_001789FA != 3) {
-        for (i = 0; i < D_001996F4; i++) {
-            if (D_00199670[i] == 0)
+    if (count == 0 && a1 == player_entity)
+        sound_play(damage_miss_sound(player_character->f443[weapon_active_hand] != 0 ? &player_character->f443[weapon_active_hand]->mob : 0, -1), player_object, 110);
+    if (a1 == player_entity && player_environment != 3) {
+        for (i = 0; i < people_count; i++) {
+            if (people_list[i] == 0)
                 continue;
-            other = D_00199670[i];
+            other = people_list[i];
             dist = func_000C7FF4(a1->y - other->y, func_000C7FD9(a1->x, a1->z, other->x, other->z));
             if (dist > 90)
                 continue;
             dist = func_000C808D(a1->x, a1->z, other->x, other->z);
             D_00195ABC = dist;
-            res = func_00062EF7(a1->angle + D_001959BC & 2047, dist, &dist);
+            res = ai_angle_diff(a1->angle + D_001959BC & 2047, dist, &dist);
             if (res < 200) {
-                func_0002F490(D_00199670[i], 0, -1);
-                func_00041409(D_00199670[i]);
+                damage_spawn_splash(people_list[i], 0, -1);
+                person_killed(people_list[i]);
                 count++;
             }
         }
     }
-    if (a1 != D_00195AA0 || count != 0)
+    if (a1 != player_entity || count != 0)
         return;
-    func_00013F4B(160, 100, &st);
+    engine_pick_object(160, 100, &st);
     if ((st.flags & 1) == 0)
         return;
     obj = st.obj;
-    func_00064589(obj, 5);
+    links_trigger(obj, 5);
     if (obj->type != 32 && obj->type != 43)
         return;
     if (obj->type == 43) {
@@ -142,28 +142,28 @@ void func_000733AD(struct thing *a1)
         if (r != 74)
             return;
     }
-    if (obj->type != 43 && func_000C7FD9(obj->x, obj->z, D_00195AA4->x, D_00195AA4->z) > 100)
+    if (obj->type != 43 && func_000C7FD9(obj->x, obj->z, player_object->x, player_object->z) > 100)
         return;
     if (obj->type != 43 && (obj->f23 == 0 || (obj->flags & 320) != 0)) {
         func_0007425E(obj, 0);
         return;
     }
     if (obj->type != 43) {
-        func_0003D01C(16, 1);
+        skill_add_uses(16, 1);
         func_00063DDC(0);
-        if (obj->f23 <= 19 && func_0007D6AE(1, 100) <= 20 - obj->f23 && func_00099922(obj, 0))
+        if (obj->f23 <= 19 && rand_range(1, 100) <= 20 - obj->f23 && door_start_swing(obj, 0))
             obj->flags |= 320;
         if (obj->f31 >> 16 == 50027 || obj->f31 >> 16 == 50029 || obj->f31 >> 16 == 50033)
             func_0002FBCC();
-    } else if (func_0007D6AE(1, 100) < 10) {
-        item = func_0007DF35(obj);
+    } else if (rand_range(1, 100) < 10) {
+        item = object_building(obj);
         if (item != 0)
             item->flags |= 16;
-        func_000287BD(obj, item);
-        func_00087281(item);
-    } else if (func_0007D6AE(1, 100) > D_00195BE0->f253 && (func_00040BCD() & 1) == 0) {
-        D_0019627E = 0;
-        func_00040C87(1);
+        town_map_note_building(obj, item);
+        building_enter(item);
+    } else if (rand_range(1, 100) > player_character->f253 && (creatures_guard_mix() & 1) == 0) {
+        crime_current = 0;
+        guards_summon(1);
     }
-    func_00069938(9, obj, 100);
+    sound_play(9, obj, 100);
 }

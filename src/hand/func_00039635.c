@@ -4,15 +4,15 @@ struct spell {
     char pad[23];
     struct dur dur[3];
 };
-extern struct spell *D_00178A0A;
-extern short D_00195F30;
-extern short D_0019961C[];
+extern struct spell *selected_spell;
+extern short spell_effect_slot;
+extern short spell_effect_cost_current[];
 
-int func_00039635(void)
+int spell_cost_chance(void)
 {
     short cost;
 
-    cost = D_0019961C[0] * D_00178A0A->dur[D_00195F30].base;
-    cost += (D_00178A0A->dur[D_00195F30].plus / D_00178A0A->dur[D_00195F30].per_level) * D_0019961C[1];
+    cost = spell_effect_cost_current[0] * selected_spell->dur[spell_effect_slot].base;
+    cost += (selected_spell->dur[spell_effect_slot].plus / selected_spell->dur[spell_effect_slot].per_level) * spell_effect_cost_current[1];
     return cost;
 }

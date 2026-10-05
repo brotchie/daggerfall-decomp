@@ -7,7 +7,7 @@ extern char D_00170D5C[];
 extern struct ent *D_00195C44;
 extern int D_00195D6C;
 extern char D_00196295;
-extern char *func_0003D9B1(unsigned short, short, unsigned char *, char *, char *);
+extern char *text_expand_wrap(unsigned short, short, unsigned char *, char *, char *);
 extern int func_0009DC25(void);
 extern int func_000A006E(int, int, int);
 extern char *func_000A00AF(int, char *, int);
@@ -16,7 +16,7 @@ extern int func_000A00CB(int, void *, int);
 extern int func_000A0ED9(int, char *);
 extern int func_000A0F5C(char *, ...);
 
-char *func_0003D412(short a1, unsigned short a2, short a3)
+char *text_rsc_load(short a1, unsigned short a2, short a3)
 {
     short n;
     short i;
@@ -70,5 +70,5 @@ char *func_0003D412(short a1, unsigned short a2, short a3)
     while (l_30[j] < 254)
         l_30[i++] = l_30[j++];
     l_30[i] = 0;
-    return func_0003D9B1(a2, a3, l_30, l_2C, l_28);
+    return text_expand_wrap(a2, a3, l_30, l_2C, l_28);
 }

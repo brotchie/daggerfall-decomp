@@ -6,17 +6,17 @@ struct spell {
     struct spell_chance chance[3];
     struct spell_dur dur[3];
 };
-extern struct spell *D_00178A0A;
-extern short D_00195F30;
-extern short D_0019961C[4];
+extern struct spell *selected_spell;
+extern short spell_effect_slot;
+extern short spell_effect_cost_current[4];
 
-int func_0003937B(void)
+int spell_cost_duration_chance(void)
 {
     short cost;
 
-    cost = D_0019961C[0] * D_00178A0A->chance[D_00195F30].base;
-    cost += (D_00178A0A->chance[D_00195F30].plus / D_00178A0A->chance[D_00195F30].per_level) * D_0019961C[1];
-    cost += D_00178A0A->dur[D_00195F30].base * D_0019961C[2];
-    cost += (D_00178A0A->dur[D_00195F30].plus / D_00178A0A->dur[D_00195F30].per_level) * D_0019961C[3];
+    cost = spell_effect_cost_current[0] * selected_spell->chance[spell_effect_slot].base;
+    cost += (selected_spell->chance[spell_effect_slot].plus / selected_spell->chance[spell_effect_slot].per_level) * spell_effect_cost_current[1];
+    cost += selected_spell->dur[spell_effect_slot].base * spell_effect_cost_current[2];
+    cost += (selected_spell->dur[spell_effect_slot].plus / selected_spell->dur[spell_effect_slot].per_level) * spell_effect_cost_current[3];
     return cost;
 }

@@ -9,7 +9,7 @@ extern int func_0012B3ED();
 extern int func_00144FB4();
 extern void func_0005175B(int, short);
 
-void func_000516FD(int a1, short a2)
+void class_question_scroll(int a1, short a2)
 {
     func_0012B2EB();
     func_0005175B(a1, (int)(short)a2);

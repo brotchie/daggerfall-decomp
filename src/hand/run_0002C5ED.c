@@ -13,53 +13,53 @@ struct task {
     char pad29[4];
 };
 struct quest { char pad[28]; short ntasks; };
-extern short D_00178A0E;
+extern short travel_options;
 extern char D_0017A13C[];
-extern int D_00195BF4;
-extern struct quest *D_00199764;
-extern void func_0002C5ED(struct quest *, struct task *, short);
+extern int game_minutes;
+extern struct quest *current_quest;
+extern void quest_timer_update(struct quest *, struct task *, short);
 extern struct actor *func_0002C96B(struct quest *, struct actor *, short);
-extern void func_0002C9C2(struct quest *, struct task *);
+extern void quest_timer_expire(struct quest *, struct task *);
 extern void func_0002CAB0(struct task *);
-extern unsigned int func_0002FF2C(struct quest *, struct actor *, struct actor *);
-extern struct task *func_000309E8(struct quest *, int);
-extern int func_0007D6AE(int, int);
+extern unsigned int quest_travel_minutes(struct quest *, struct actor *, struct actor *);
+extern struct task *quest_section(struct quest *, int);
+extern int rand_range(int, int);
 extern int func_000A1079(char *, int, int);
 
-void func_0002C4FA(struct quest *a1)
+void quest_timers_update(struct quest *a1)
 {
     int i;
     struct task *t;
 
-    t = func_000309E8(a1, 6);
+    t = quest_section(a1, 6);
     for (i = 0; a1->ntasks > i; i++, t++) {
         if (t->flags & 2) {
             t->flags &= ~128;
             func_0002CAB0(t);
         }
         if (t->flags & 64)
-            func_0002C5ED(a1, t, 0);
+            quest_timer_update(a1, t, 0);
     }
 }
 
-void func_0002C589(void)
+void quest_timers_start_all(void)
 {
     struct task *t;
     int i;
 
-    t = func_000309E8(D_00199764, 6);
-    for (i = 0; D_00199764->ntasks > i; i++, t++)
-        func_0002C5ED(D_00199764, t, 1);
+    t = quest_section(current_quest, 6);
+    for (i = 0; current_quest->ntasks > i; i++, t++)
+        quest_timer_update(current_quest, t, 1);
 }
 
-void func_0002C5ED(struct quest *a1, struct task *a2, short a3)
+void quest_timer_update(struct quest *a1, struct task *a2, short a3)
 {
     int l_18;
     short saved;
 
-    saved = D_00178A0E;
+    saved = travel_options;
     if (a3) {
-        D_00178A0E = 537;
+        travel_options = 537;
         if (!(a2->flags & 1024)) {
             a2->flags |= 1024;
             switch (a2->type) {
@@ -78,32 +78,32 @@ void func_0002C5ED(struct quest *a1, struct task *a2, short a3)
                 break;
             }
         }
-        a2->start = D_00195BF4;
+        a2->start = game_minutes;
         switch (a2->type) {
         case 0:
-            a2->delay = func_0007D6AE(a2->arg1, a2->arg2);
+            a2->delay = rand_range(a2->arg1, a2->arg2);
             break;
         case 1:
             a2->delay = a2->arg1;
             break;
         case 2:
-            a2->delay = func_0002FF2C(a1, 0, a2->who) * 384 >> 8;
+            a2->delay = quest_travel_minutes(a1, 0, a2->who) * 384 >> 8;
             if (func_000A1079(D_0017A13C, a2->who->kind, 5))
                 a2->delay += 10080;
             break;
         case 3:
-            a2->delay = func_0002FF2C(a1, a2->who, a2->whom) * 384 >> 8;
+            a2->delay = quest_travel_minutes(a1, a2->who, a2->whom) * 384 >> 8;
             if (func_000A1079(D_0017A13C, a2->who->kind, 5) || func_000A1079(D_0017A13C, a2->whom->kind, 5))
                 a2->delay += 10080;
             break;
         case 4:
-            a2->delay = func_0002FF2C(a1, 0, a2->who) * 384 >> 8;
+            a2->delay = quest_travel_minutes(a1, 0, a2->who) * 384 >> 8;
             if (func_000A1079(D_0017A13C, a2->who->kind, 5))
                 a2->delay += 10080;
             break;
         case 5:
-            a2->delay = func_0002FF2C(a1, 0, a2->who) * 384 >> 8;
-            a2->delay += func_0002FF2C(a1, a2->who, a2->whom) * 384 >> 8;
+            a2->delay = quest_travel_minutes(a1, 0, a2->who) * 384 >> 8;
+            a2->delay += quest_travel_minutes(a1, a2->who, a2->whom) * 384 >> 8;
             if (func_000A1079(D_0017A13C, a2->who->kind, 5))
                 a2->delay += 10080;
             if (func_000A1079(D_0017A13C, a2->whom->kind, 5))
@@ -112,8 +112,8 @@ void func_0002C5ED(struct quest *a1, struct task *a2, short a3)
         }
         if (a2->flags & 16)
             a2->delay <<= 1;
-        D_00178A0E = saved;
-    } else if (D_00195BF4 - a2->start > a2->delay) {
-        func_0002C9C2(a1, a2);
+        travel_options = saved;
+    } else if (game_minutes - a2->start > a2->delay) {
+        quest_timer_expire(a1, a2);
     }
 }

@@ -11,20 +11,20 @@ extern char D_00170847[];
 extern char D_00170856[];
 extern char D_0017086D[];
 extern char D_0017A134[];
-extern char D_001903A4[];
-extern char D_001952EC[];
-extern char D_00195AA4[];
-extern char D_00195BF4[];
-extern char D_00196274[];
-extern char D_00196DBC[];
+extern char text_buffer[];
+extern char quest_global_states[];
+extern char player_object[];
+extern char game_minutes[];
+extern char game_mode[];
+extern char quest_debug_object[];
 extern char D_00196DC0[];
 extern char D_00196DC1[];
-extern char D_0019976C[];
-extern char D_001A5C27[];
-extern void func_0002BBBC(void);
-extern char *func_000309E8(char *, int);
-extern void func_0005A54A(char *, int, int);
-extern int func_0007D068(unsigned char);
+extern char quest_debug_data[];
+extern char cheat_mode[];
+extern void quest_debug_next(void);
+extern char *quest_section(char *, int);
+extern void text_draw(char *, int, int);
+extern int key_pressed_once(unsigned char);
 extern int func_0012DB50();
 #pragma aux func_000A0ED9 parm routine [];
 extern int func_000A0ED9(int, char *);
@@ -37,12 +37,12 @@ struct Ent { char name[20]; unsigned char type; char pad[2]; char *data; };
 
 #define COLOR (*(unsigned char *)D_0012B508)
 #define LINEH (*(short *)D_0012DA44)
-#define CUR (*(char **)D_0019976C)
+#define CUR (*(char **)quest_debug_data)
 #define NEXTLINE() \
-    func_0005A54A(D_001903A4, l_34 >= l_30 ? 160 : 0, l_34 % l_30 * LINEH); \
+    text_draw(text_buffer, l_34 >= l_30 ? 160 : 0, l_34 % l_30 * LINEH); \
     l_34++
 
-void func_0002B5EF(void)
+void quest_debug_overlay(void)
 {
     struct Ent *l_44;
     char *l_40;
@@ -57,22 +57,22 @@ void func_0002B5EF(void)
     struct Rec *l_1C;
     char *l_18;
 
-    if (*D_001A5C27 == 0) return;
-    if (*(unsigned char *)D_00196274 == 4) return;
-    if (func_0007D068(39)) {
+    if (*cheat_mode == 0) return;
+    if (*(unsigned char *)game_mode == 4) return;
+    if (key_pressed_once(39)) {
         *(unsigned char *)D_00196DC0 = (*(unsigned char *)D_00196DC0 + 1) % 6;
         *D_00196DC1 = D_0017A134[*(unsigned char *)D_00196DC0];
     }
-    if (func_0007D068(40)) func_0002BBBC();
-    if (func_0007D068(67)) {
-        if (*(int *)D_00196DBC) {
-            *(int *)D_00196DBC = 0;
+    if (key_pressed_once(40)) quest_debug_next();
+    if (key_pressed_once(67)) {
+        if (*(int *)quest_debug_object) {
+            *(int *)quest_debug_object = 0;
             CUR = 0;
             return;
         }
-        func_0002BBBC();
+        quest_debug_next();
     }
-    if (*(int *)D_00196DBC == 0 || CUR == 0) return;
+    if (*(int *)quest_debug_object == 0 || CUR == 0) return;
     func_0012DB50(3);
     l_30 = 200 / LINEH;
     l_34 = 0;
@@ -102,17 +102,17 @@ void func_0002B5EF(void)
                 case 9:
                     l_1C = (struct Rec *)l_44->data;
                     if (l_1C->flag)
-                        l_3C = ((unsigned char *)D_001952EC)[l_1C->idx];
+                        l_3C = ((unsigned char *)quest_global_states)[l_1C->idx];
                     else
                         l_3C = l_1C->idx;
                     if (l_3C) COLOR = 240;
                     func_000A0ED9(888, D_001707F0);
-                    func_000A0F5C(D_001903A4, D_00170819, l_44, l_3C ? D_0017080E : D_00170813);
+                    func_000A0F5C(text_buffer, D_00170819, l_44, l_3C ? D_0017080E : D_00170813);
                     break;
                 case 6:
                     l_18 = l_44->data;
                     func_000A0ED9(892, D_001707F0);
-                    func_000A0F5C(D_001903A4, D_00170823, l_44, *(int *)D_00195BF4 - *(int *)(l_18 + 13), *(int *)(l_18 + 17));
+                    func_000A0F5C(text_buffer, D_00170823, l_44, *(int *)game_minutes - *(int *)(l_18 + 13), *(int *)(l_18 + 17));
                     break;
                 }
                 if (l_40) {
@@ -120,10 +120,10 @@ void func_0002B5EF(void)
                         l_40 = *(char **)(l_40 + 51);
                         COLOR = 240;
                         func_000A0ED9(904, D_001707F0);
-                        func_000A0F5C(D_001903A4, D_00170832, l_44, *(int *)(l_40 + 7), *(int *)(l_40 + 11), *(int *)(l_40 + 15));
+                        func_000A0F5C(text_buffer, D_00170832, l_44, *(int *)(l_40 + 7), *(int *)(l_40 + 11), *(int *)(l_40 + 15));
                     } else {
                         func_000A0ED9(907, D_001707F0);
-                        func_000A0F5C(D_001903A4, D_00170832, l_44, *(int *)(l_40 + 7), *(int *)(l_40 + 11), *(int *)(l_40 + 15));
+                        func_000A0F5C(text_buffer, D_00170832, l_44, *(int *)(l_40 + 7), *(int *)(l_40 + 11), *(int *)(l_40 + 15));
                     }
                 }
                 NEXTLINE();
@@ -133,10 +133,10 @@ void func_0002B5EF(void)
     } else {
         int l_58;
 
-        l_1C = (struct Rec *)func_000309E8(CUR, 9);
+        l_1C = (struct Rec *)quest_section(CUR, 9);
         for (l_58 = 0; l_58 < *(short *)(CUR + 34); l_58++, l_1C++) {
             if (l_1C->flag) {
-                l_3C = ((unsigned char *)D_001952EC)[l_1C->idx];
+                l_3C = ((unsigned char *)quest_global_states)[l_1C->idx];
                 l_38 = l_1C->idx;
             } else {
                 l_38 = l_1C->val;
@@ -145,16 +145,16 @@ void func_0002B5EF(void)
             if (l_3C) COLOR = 240;
             else COLOR = 145;
             func_000A0ED9(935, D_001707F0);
-            func_000A0F5C(D_001903A4, D_00170847, l_38, l_3C ? D_0017080E : D_00170813);
+            func_000A0F5C(text_buffer, D_00170847, l_38, l_3C ? D_0017080E : D_00170813);
             NEXTLINE();
         }
     }
     COLOR = 112;
     func_000A0ED9(942, D_001707F0);
-    func_000A0F5C(D_001903A4, D_00170856, *(int *)(*(char **)D_00195AA4 + 7), *(int *)(*(char **)D_00195AA4 + 11), *(int *)(*(char **)D_00195AA4 + 15));
+    func_000A0F5C(text_buffer, D_00170856, *(int *)(*(char **)player_object + 7), *(int *)(*(char **)player_object + 11), *(int *)(*(char **)player_object + 15));
     NEXTLINE();
     func_000A0ED9(945, D_001707F0);
-    func_000A0F5C(D_001903A4, D_0017086D, CUR + 6);
-    func_0005A54A(D_001903A4, l_34 >= l_30 ? 160 : 0, l_34 % l_30 * LINEH);
+    func_000A0F5C(text_buffer, D_0017086D, CUR + 6);
+    text_draw(text_buffer, l_34 >= l_30 ? 160 : 0, l_34 % l_30 * LINEH);
     func_0012DB50(4);
 }

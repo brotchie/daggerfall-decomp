@@ -16,17 +16,17 @@ struct spell {
 #pragma pack()
 extern char D_00176E94[];
 extern char D_00176EEC[];
-extern unsigned char D_0017A94B[][12];
+extern unsigned char spell_effect_settings[][12];
 extern unsigned char D_0017B1CF[];
 extern unsigned char D_001A9B8C[];
 extern unsigned char D_001A9B94[];
 extern unsigned char D_001A9BAC[];
-extern short D_001AA3EC;
+extern short potion_cauldron_count;
 extern void func_00090261(unsigned char *, unsigned char *, unsigned char *, int);
 extern void func_000A0AD9(char *, char *, int, char *, int);
 extern void func_000A1023(void *, void *, int, char *, int, int);
 
-int func_0008FE48(struct spell *sp)
+int potion_mix_unknown(struct spell *sp)
 {
     unsigned char w[8];
     unsigned char c;
@@ -37,11 +37,11 @@ int func_0008FE48(struct spell *sp)
     unsigned char z[8];
     int n;
 
-    func_000A1023(x, D_001A9B8C, D_001AA3EC, D_00176E94, 410, 8);
-    func_000A1023(y, D_001A9BAC, D_001AA3EC, D_00176E94, 411, 8);
-    func_000A1023(z, D_001A9B94, D_001AA3EC, D_00176E94, 412, 8);
-    func_00090261(x, y, z, D_001AA3EC);
-    n = D_001AA3EC;
+    func_000A1023(x, D_001A9B8C, potion_cauldron_count, D_00176E94, 410, 8);
+    func_000A1023(y, D_001A9BAC, potion_cauldron_count, D_00176E94, 411, 8);
+    func_000A1023(z, D_001A9B94, potion_cauldron_count, D_00176E94, 412, 8);
+    func_00090261(x, y, z, potion_cauldron_count);
+    n = potion_cauldron_count;
     for (i = 0; n - 1 > i; i++) {
         if (x[i] == x[i + 1]) {
             w[i] = D_0017B1CF[x[i]];
@@ -88,7 +88,7 @@ int func_0008FE48(struct spell *sp)
     func_000A0AD9(sp->name, D_00176EEC, 25, D_00176E94, 482);
     sp->eff[0].type = sp->eff[1].type = sp->eff[2].type = 255;
     for (i = 0; i < n; i++) {
-        c = D_0017A94B[x[i]][z[i]];
+        c = spell_effect_settings[x[i]][z[i]];
         sp->eff[i].type = x[i];
         sp->eff[i].sub = z[i];
         if (c & 1)

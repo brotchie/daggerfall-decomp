@@ -3,22 +3,22 @@
 
 extern char D_001700D5[];
 extern char D_0018DC34[];
-extern char D_001A3F44[];
+extern char midi_bsa[];
 extern char D_001A3F48[];
 extern char D_001A3F4C[];
 
-extern int func_00012FCE(int, int, int);
-extern int func_00013131(int, int);
-extern int func_00013260(int, int, int);
-extern int func_000994F0(int, int);
+extern int archive_find_record(int, int, int);
+extern int archive_record_size(int, int);
+extern int archive_read_record(int, int, int);
+extern int dpmi_lock_region(int, int);
 extern int func_000A0024();
 extern int func_000A0040();
 extern int func_000A00AF();
 extern int func_000A021C();
 #pragma aux sosconv "*" parm caller [] value [eax] modify [eax ebx ecx edx];
-#pragma aux (sosconv) func_00011870;
+#pragma aux (sosconv) sos_load_song;
 
-int func_00011870(int a1)
+int sos_load_song(int a1)
 {
     int l_28;
     int l_24;
@@ -28,14 +28,14 @@ int func_00011870(int a1)
     int l_14;
     int l_10;
 
-    l_14 = func_00012FCE(*(int *)D_001A3F44, a1, 13);
-    l_10 = func_00013131(*(int *)D_001A3F44, l_14);
+    l_14 = archive_find_record(*(int *)midi_bsa, a1, 13);
+    l_10 = archive_record_size(*(int *)midi_bsa, l_14);
     l_1C = l_10;
     l_20 = func_000A00AF(l_1C + 32, (int)D_001700D5, 385);
     if (l_20 != 0) goto L118D0;
     return 0;
 L118D0:;
-    func_00013260(*(int *)D_001A3F44, l_14, l_20 + 32);
+    archive_read_record(*(int *)midi_bsa, l_14, l_20 + 32);
     l_28 = l_20;
     func_000A0040(l_28, 0, 32, (int)D_001700D5, 397, 4);
     *(int *)((char *)l_28) = l_20 + 32;
@@ -52,6 +52,6 @@ L11948:;
 L11951:;
     *(int *)D_0018DC34 = l_20;
     *(int *)D_001A3F48 = l_20;
-    func_000994F0(l_20, (*(int *)D_001A3F4C = l_1C + 32));
+    dpmi_lock_region(l_20, (*(int *)D_001A3F4C = l_1C + 32));
     return l_24;
 }

@@ -8,26 +8,26 @@ struct msg {
     char pad13[53];
 };
 struct slot { int used; char pad[264]; };
-extern int D_00195CB4;
+extern int sound_last_size;
 extern struct slot D_001A3BE4[];
-extern char D_001A3F5D;
-extern int func_00068F5E(int, int, struct msg *, int);
-extern int func_00085A51(int);
+extern char sound_enabled;
+extern int sound_play_sample(int, int, struct msg *, int);
+extern int sound_cache_load(int);
 
-int func_000699D8(int a1, int a2, int a3, int a4, int a5)
+int sound_play_at_point(int a1, int a2, int a3, int a4, int a5)
 {
     int h;
     struct msg m;
     int n;
 
-    if (D_001A3F5D == 0)
+    if (sound_enabled == 0)
         return -1;
     m.type = 0;
     m.a = a2;
     m.b = a3;
     m.c = a4;
-    h = func_00085A51(a1);
-    n = func_00068F5E(h, D_00195CB4, &m, a5);
+    h = sound_cache_load(a1);
+    n = sound_play_sample(h, sound_last_size, &m, a5);
     if (n > -1)
         D_001A3BE4[n].used = 0;
     return n;

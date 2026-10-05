@@ -2,16 +2,16 @@
 #pragma pack(1)
 struct S { char c0; short s1; short s3; short s5; int x7; int x11; int x15; };
 struct P { int x; int y; int z; };
-extern struct S *D_00195AA4;
+extern struct S *player_object;
 extern struct P D_00120288;
-extern void func_0008DEB4(struct S *, int, int, int, int, int, int);
+extern void object_set_position(struct S *, int, int, int, int, int, int);
 
 void func_0001449D(void)
 {
     int l_1C;
     int l_18;
 
-    l_1C = D_00195AA4->x7 + (D_00120288.x >> 9);
-    l_18 = D_00195AA4->x15 + (D_00120288.z >> 9);
-    func_0008DEB4(D_00195AA4, l_1C, D_00195AA4->x11, l_18, D_00195AA4->s1, D_00195AA4->s3, D_00195AA4->s5);
+    l_1C = player_object->x7 + (D_00120288.x >> 9);
+    l_18 = player_object->x15 + (D_00120288.z >> 9);
+    object_set_position(player_object, l_1C, player_object->x11, l_18, player_object->s1, player_object->s3, player_object->s5);
 }

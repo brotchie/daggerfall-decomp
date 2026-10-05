@@ -2,22 +2,22 @@
 #pragma pack(1)
 struct Obj { char pad0[3]; short angle; char pad1[2]; int x; int y; int z; };
 extern int D_0012AA04;
-extern unsigned char D_001789FA;
+extern unsigned char player_environment;
 extern int D_00178A14;
-extern struct Obj *D_00195AA4;
-extern int D_00195B14;
+extern struct Obj *player_object;
+extern int creature_count;
 extern unsigned char D_0019627F;
-extern struct Obj *D_00199670[];
-extern int D_001996F4;
-extern void func_000401F1(struct Obj *);
-extern int func_00040B83(struct Obj *);
-extern void func_00040E9D(struct Obj *);
-extern int func_00062EF7(int, int, int *);
-extern int func_0007D6AE(int, int);
+extern struct Obj *people_list[];
+extern int people_count;
+extern void person_place(struct Obj *);
+extern int is_guard_sprite(struct Obj *);
+extern void guard_spawn(struct Obj *);
+extern int ai_angle_diff(int, int, int *);
+extern int rand_range(int, int);
 extern int func_0009DC25(void);
 extern int func_000C808D();
 
-void func_00040C87(int a1)
+void guards_summon(int a1)
 {
     int i;
     int d;
@@ -25,44 +25,44 @@ void func_00040C87(int a1)
     int cnt;
     int tmp;
 
-    if (D_001789FA == 3)
+    if (player_environment == 3)
         return;
-    if (D_00195B14 > 10)
+    if (creature_count > 10)
         return;
     if (a1 != 0) {
-        for (cnt = i = 0; i < D_001996F4; i++) {
-            if (D_00199670[i] == 0)
+        for (cnt = i = 0; i < people_count; i++) {
+            if (people_list[i] == 0)
                 continue;
-            if (func_00040B83(D_00199670[i]) == 0) {
-                d = func_000C808D(D_00195AA4->x, D_00195AA4->z, D_00199670[i]->x, D_00199670[i]->z);
-                a = func_00062EF7(D_00195AA4->angle, d, &tmp);
+            if (is_guard_sprite(people_list[i]) == 0) {
+                d = func_000C808D(player_object->x, player_object->z, people_list[i]->x, people_list[i]->z);
+                a = ai_angle_diff(player_object->angle, d, &tmp);
                 if (a < 600)
                     continue;
             }
-            if ((unsigned char)(func_0009DC25() & 3) == 0 || func_00040B83(D_00199670[i]) != 0) {
+            if ((unsigned char)(func_0009DC25() & 3) == 0 || is_guard_sprite(people_list[i]) != 0) {
                 cnt++;
-                func_00040E9D(D_00199670[i]);
-                func_000401F1(D_00199670[i]);
+                guard_spawn(people_list[i]);
+                person_place(people_list[i]);
             }
         }
         if (cnt == 0) {
-            cnt = func_0007D6AE(2, 5);
+            cnt = rand_range(2, 5);
             for (i = 0; i < cnt; i++)
-                func_00040E9D(0);
+                guard_spawn(0);
         }
         return;
     }
     if ((int)(unsigned char)(D_0019627F & 2) != 0) {
-        for (i = 0; i < D_001996F4; i++) {
-            if (D_00199670[i] == 0)
+        for (i = 0; i < people_count; i++) {
+            if (people_list[i] == 0)
                 continue;
-            if (func_00040B83(D_00199670[i]) != 0) {
-                func_00040E9D(D_00199670[i]);
-                func_000401F1(D_00199670[i]);
+            if (is_guard_sprite(people_list[i]) != 0) {
+                guard_spawn(people_list[i]);
+                person_place(people_list[i]);
             }
         }
         return;
     }
     if ((int)(unsigned char)(D_0019627F & 1) != 0)
-        D_00178A14 = func_0007D6AE(5, 10) * D_0012AA04;
+        D_00178A14 = rand_range(5, 10) * D_0012AA04;
 }

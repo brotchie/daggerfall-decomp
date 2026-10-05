@@ -1,21 +1,21 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0005CE17 */
 extern char D_00142950[];
-extern char D_00143550[];
+extern char screen_buffer[];
 extern char D_00175898[];
 extern char D_00185CDC[];
 extern char D_001959FC[];
-extern char D_00195B68[];
-extern char D_00195B6C[];
+extern char hud_bar_image[];
+extern char hud_mode_icons[];
 extern char D_00195B78[];
-extern char D_00195BE0[];
-extern char D_00195BF8[];
+extern char player_character[];
+extern char game_settings[];
 extern char D_00195C7C[];
 extern char D_00195C80[];
 extern char D_00195C84[];
 extern char D_00195D74[];
-extern char D_00196276[];
-extern void func_0005D151(void);
-extern int func_0005DB02(void);
+extern char interaction_mode[];
+extern void hud_draw_compass(void);
+extern int hud_portrait_overlay_index(void);
 extern int func_000A1023();
 extern int func_00144ED8();
 extern int func_00144F68();
@@ -33,9 +33,9 @@ struct img {
 
 #define IMG(g) (*(struct img **)(g))
 #define BARS ((struct img **)D_00195C7C)
-#define PLAYER (*(char **)D_00195BE0)
+#define PLAYER (*(char **)player_character)
 
-void func_0005CE17(void)
+void hud_draw(void)
 {
     unsigned l_30;
     int l_2C;
@@ -45,10 +45,10 @@ void func_0005CE17(void)
     int l_1C;
     struct img *l_18;
 
-    if ((**(unsigned short **)D_00195BF8 & 1) == 0) {
-        func_000A1023(*(char **)D_00143550 + ((int *)D_00142950)[IMG(D_00195B68)->y], IMG(D_00195B68)->data, IMG(D_00195B68)->size, D_00175898, 124, 4);
-        func_00144ED8(131, 154, 47, 22, *(char **)D_00195B6C + ((int *)D_00185CDC)[*(unsigned char *)D_00196276], 0);
-        l_1C = func_0005DB02();
+    if ((**(unsigned short **)game_settings & 1) == 0) {
+        func_000A1023(*(char **)screen_buffer + ((int *)D_00142950)[IMG(hud_bar_image)->y], IMG(hud_bar_image)->data, IMG(hud_bar_image)->size, D_00175898, 124, 4);
+        func_00144ED8(131, 154, 47, 22, *(char **)hud_mode_icons + ((int *)D_00185CDC)[*(unsigned char *)interaction_mode], 0);
+        l_1C = hud_portrait_overlay_index();
         if (l_1C != -1) {
             l_18 = *(struct img **)D_00195D74;
             while (l_1C != 0) {
@@ -60,7 +60,7 @@ void func_0005CE17(void)
         l_2C = 23 - IMG(D_00195B78)->w / 2;
         l_28 = 176 - IMG(D_00195B78)->h / 2;
         func_00144FB4(l_2C, l_28, IMG(D_00195B78)->w, IMG(D_00195B78)->h, IMG(D_00195B78)->data);
-        func_0005D151();
+        hud_draw_compass();
         l_20 = 0;
     } else {
         l_20 = -40;

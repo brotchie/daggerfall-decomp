@@ -10,7 +10,7 @@ extern int func_000A3327();
 extern unsigned short _FP_SEG( const volatile void __far * );
 #pragma aux _FP_SEG = parm caller [eax dx] value [dx] modify exact [];
 
-void func_00099490(int a1)
+void dpmi_get_free_memory(int a1)
 {
 {
     char l_40[28];
@@ -24,7 +24,7 @@ void func_00099490(int a1)
 }
 }
 
-int func_000994F0(int a1, int a2)
+int dpmi_lock_region(int a1, int a2)
 {
     char l_38[28];
 
@@ -43,7 +43,7 @@ L99518:;
     return *(int *)((char *)l_38 + 24) & 1;
 }
 
-int func_0009957D(int a1, int a2)
+int dpmi_unlock_region(int a1, int a2)
 {
     char l_38[28];
 

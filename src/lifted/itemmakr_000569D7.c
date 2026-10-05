@@ -2,45 +2,45 @@
  * do not edit: move a function to src/itemmakr.c to work on it by hand) */
 
 extern char D_00147964[];
-extern char D_001857A1[];
-extern char D_00190CE4[];
+extern char enchant_power_params[];
+extern char itemmaker_slot_kinds[];
 extern char D_00190D64[];
 extern char D_00190D66[];
-extern char D_00195B7C[];
-extern char D_001998E0[];
+extern char list_popup_callback[];
+extern char itemmaker_slots[];
 extern char D_001998E2[];
 
-extern int func_00057342(int);
-extern int func_0005742F(void);
-extern void func_0003F09F(int, int);
-extern void func_000568D6(short);
+extern int itemmaker_pick_param_list(int);
+extern int itemmaker_free_slot(void);
+extern void msgbox_show_rsc(int, int);
+extern void itemmaker_set_power_param_cb(short);
 extern void func_00057147(short, short, short, short, short, short, short);
-extern void func_000576FF(int, short);
+extern void itemmaker_show_param_list(int, short);
 
-void func_000569D7(int a1)
+void itemmaker_add_power_cb(int a1)
 {
     short l_18;
 
     *(short *)D_00190D66 = a1;
-    *(int *)&l_18 = func_0005742F();
+    *(int *)&l_18 = itemmaker_free_slot();
     *(short *)D_00190D64 = *(int *)&l_18;
     if (((int)(short)l_18) != (-1)) goto L56A1F;
-    func_0003F09F(1657, 1);
+    msgbox_show_rsc(1657, 1);
     return;
 L56A1F:;
-    *(signed char *)(D_00190CE4 + ((int)(short)l_18)) = 0;
-    if (*(int *)(D_001857A1 + (((int)(short)*(short *)&a1) << 2)) == 0) goto L56AA8;
-    *(short *)(D_001998E0 + (((int)(short)l_18) << 2)) = a1;
-    if (((unsigned)*(int *)(D_001857A1 + (((int)(short)*(short *)&a1) << 2))) >= 5) goto L56A83;
-    if (func_00057342(*(int *)(D_001857A1 + (((int)(short)*(short *)&a1) << 2))) != 0) goto L56A81;
-    *(signed char *)(D_00190CE4 + ((int)(short)l_18)) = 255;
+    *(signed char *)(itemmaker_slot_kinds + ((int)(short)l_18)) = 0;
+    if (*(int *)(enchant_power_params + (((int)(short)*(short *)&a1) << 2)) == 0) goto L56AA8;
+    *(short *)(itemmaker_slots + (((int)(short)l_18) << 2)) = a1;
+    if (((unsigned)*(int *)(enchant_power_params + (((int)(short)*(short *)&a1) << 2))) >= 5) goto L56A83;
+    if (itemmaker_pick_param_list(*(int *)(enchant_power_params + (((int)(short)*(short *)&a1) << 2))) != 0) goto L56A81;
+    *(signed char *)(itemmaker_slot_kinds + ((int)(short)l_18)) = 255;
     return;
 L56A81:;
     goto L56A99;
 L56A83:;
-    func_000576FF(*(int *)(D_001857A1 + (((int)(short)*(short *)&a1) << 2)), (int)(short)*(short *)&a1);
+    itemmaker_show_param_list(*(int *)(enchant_power_params + (((int)(short)*(short *)&a1) << 2)), (int)(short)*(short *)&a1);
 L56A99:;
-    *(int *)D_00195B7C = (int)func_000568D6;
+    *(int *)list_popup_callback = (int)itemmaker_set_power_param_cb;
     goto L56B2F;
 L56AA8:;
     if (((int)(short)*(short *)&a1) != 11) goto L56ADB;
@@ -49,7 +49,7 @@ L56ADB:;
     if (((int)(short)*(short *)&a1) != 12) goto L56B0E;
     func_00057147((int)(short)l_18, 24, -1, 12, -1, -1, -1);
 L56B0E:;
-    *(short *)(D_001998E0 + (((int)(short)l_18) << 2)) = a1;
+    *(short *)(itemmaker_slots + (((int)(short)l_18) << 2)) = a1;
     *(short *)(D_001998E2 + (((int)(short)l_18) << 2)) = 65535;
 L56B2F:;
     *(signed char *)D_00147964 &= 254;

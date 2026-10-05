@@ -2,17 +2,17 @@
  * do not edit: move a function to src/profile.c to work on it by hand) */
 
 
-extern int func_00011E36(int, ...);
-extern int func_00011F93(int, ...);
+extern int profile_find_item(int, ...);
+extern int profile_get_number(int, ...);
 #pragma aux sosconv "*" parm caller [] value [eax] modify [eax ebx ecx edx];
-#pragma aux (sosconv) func_000126B4;
+#pragma aux (sosconv) profile_get_item_number;
 
-int func_000126B4(int a1, int a2, int a3)
+int profile_get_item_number(int a1, int a2, int a3)
 {
-    if ((short)func_00011E36(a1, a2) != 0) goto L126DD;
+    if ((short)profile_find_item(a1, a2) != 0) goto L126DD;
     return 0;
 L126DD:;
-    if ((short)func_00011F93(a1, a3) != 0) goto L126FB;
+    if ((short)profile_get_number(a1, a3) != 0) goto L126FB;
     return 0;
 L126FB:;
     return 1;

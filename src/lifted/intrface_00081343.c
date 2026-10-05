@@ -3,48 +3,48 @@
 
 extern char D_00142940[];
 extern char D_00142944[];
-extern char D_001A5B1C[];
-extern char D_001A5B1E[];
-extern char D_001A5B20[];
-extern char D_001A5B22[];
+extern char steer_row_y1[];
+extern char steer_row_y2[];
+extern char steer_col_x1[];
+extern char steer_col_x2[];
 
 
-int func_00081343(int a1, int a2, int a3, int a4)
+int intrface_region_at(int a1, int a2, int a3, int a4)
 {
     int l_10;
 
-    if (((int)(short)*(short *)D_001A5B1C) <= a2) goto L8137B;
+    if (((int)(short)*(short *)steer_row_y1) <= a2) goto L8137B;
     l_10 = 0;
     *(int *)((char *)a4) = (int)(short)*(short *)D_00142944;
     goto L813BD;
 L8137B:;
-    if (((int)(short)*(short *)D_001A5B1C) > a2) goto L81393;
-    if (((int)(short)*(short *)D_001A5B1E) > a2) goto L81395;
+    if (((int)(short)*(short *)steer_row_y1) > a2) goto L81393;
+    if (((int)(short)*(short *)steer_row_y2) > a2) goto L81395;
 L81393:;
     goto L813AA;
 L81395:;
     l_10 = 3;
-    *(int *)((char *)a4) = (int)(short)*(short *)D_001A5B1C;
+    *(int *)((char *)a4) = (int)(short)*(short *)steer_row_y1;
     goto L813BD;
 L813AA:;
     l_10 = 6;
-    *(int *)((char *)a4) = (int)(short)*(short *)D_001A5B1E;
+    *(int *)((char *)a4) = (int)(short)*(short *)steer_row_y2;
 L813BD:;
-    if (((int)(short)*(short *)D_001A5B20) <= a1) goto L813D7;
+    if (((int)(short)*(short *)steer_col_x1) <= a1) goto L813D7;
     *(int *)((char *)a3) = (int)(short)*(short *)D_00142940;
     goto L81415;
 L813D7:;
-    if (((int)(short)*(short *)D_001A5B20) > a1) goto L813EF;
-    if (((int)(short)*(short *)D_001A5B22) > a1) goto L813F1;
+    if (((int)(short)*(short *)steer_col_x1) > a1) goto L813EF;
+    if (((int)(short)*(short *)steer_col_x2) > a1) goto L813F1;
 L813EF:;
     goto L81405;
 L813F1:;
     l_10++;
-    *(int *)((char *)a3) = (int)(short)*(short *)D_001A5B20;
+    *(int *)((char *)a3) = (int)(short)*(short *)steer_col_x1;
     goto L81415;
 L81405:;
     l_10 += 2;
-    *(int *)((char *)a3) = (int)(short)*(short *)D_001A5B22;
+    *(int *)((char *)a3) = (int)(short)*(short *)steer_col_x2;
 L81415:;
     return l_10;
 }

@@ -8,8 +8,8 @@ extern char D_00196A9C[];
 extern int func_0008795D(int, int, int);
 extern int func_0009DC25();
 extern int func_000A0040();
-extern void func_0001E3D3(int, int);
-extern void func_00086397(int);
+extern void location_load_exterior(int, int);
+extern void location_free(int);
 
 void func_00087D71(int a1, int a2, int a3)
 {
@@ -34,7 +34,7 @@ L87DD3:;
     goto L87DC4;
 L87DE9:;
     if (l_14 != 0) goto L87DF9;
-    func_00086397(a1);
+    location_free(a1);
     return;
 L87DF9:;
     l_1C = *(int *)D_00196A9C;
@@ -50,7 +50,7 @@ L87E28:;
 L87E37:;
     l_10 -= func_0008795D(l_1C + 13, a2, a3);
     if (l_10 != 0) goto L87E5E;
-    func_0001E3D3(a1, l_18);
+    location_load_exterior(a1, l_18);
     return;
 L87E5E:;
     goto L87E28;

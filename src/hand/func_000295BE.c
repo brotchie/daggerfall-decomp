@@ -13,25 +13,25 @@ struct Obj {
     char pad4[0x53 - 0x4d];
     int last;                   /* 0x53 */
 };
-extern int D_00195BF4;
-extern void func_00033764(struct Obj *, int);
+extern int game_minutes;
+extern void qaction_place_foe(struct Obj *, int);
 extern int func_0009DC25(void);
 
-void func_000295BE(int a1, struct Obj *o)
+void quest_op09_spawn_repeat(int a1, struct Obj *o)
 {
     struct Sub *s;
     int i;
 
     if (o->charges == 0)
         return;
-    if (D_00195BF4 - o->last < o->interval)
+    if (game_minutes - o->last < o->interval)
         return;
-    o->last = D_00195BF4;
+    o->last = game_minutes;
     if (func_0009DC25() % 100 > o->chance)
         return;
     if (o->charges != -1)
         o->charges--;
     s = o->sub;
     for (i = 0; i < s->count; i++)
-        func_00033764(o, 0);
+        qaction_place_foe(o, 0);
 }

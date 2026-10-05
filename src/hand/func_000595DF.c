@@ -9,7 +9,7 @@ extern int func_000CD291();
 extern int func_00135D00();
 extern int func_00135E39();
 
-void func_000595DF(int a1, int a2, int a3, int a4)
+void paperdoll_draw_item(int a1, int a2, int a3, int a4)
 {
     int l_2C;
     int l_28;

@@ -2,132 +2,132 @@
 #pragma pack(1)
 struct slot { unsigned char kind; unsigned char bit; };
 #pragma pack()
-extern unsigned char D_0012AC00;
+extern unsigned char mouse_buttons;
 extern char D_00175420[];
-extern signed char D_00190D7E[];
+extern signed char classmaker_special_counts[];
 extern short D_00190D68;
-extern short D_00190D82;
+extern short classmaker_special_list;
 extern short D_00190D84;
-extern int D_00190DE4;
-extern unsigned short *D_00190DEC;
-extern char *D_00195BEC;
-extern struct slot D_00199820[][7];
+extern int text_macro_fpc;
+extern unsigned short *text_macro_fe;
+extern char *player_class;
+extern struct slot classmaker_specials[][7];
 extern void func_000A1023(void *, void *, int, char *, int, int);
 extern int func_0012B136();
 extern void func_000CE4A9(char *, int, int);
 extern void func_000CE4B5(char *, int, int);
 extern int func_00144F68();
 extern int func_00144FB4();
-void func_000551B1(int, int);
-void func_000553B2(int, int);
+void classmaker_set_advantage(int, int);
+void classmaker_set_disadvantage(int, int);
 
-void func_0005506F(void)
+void classmaker_draw_dagger(void)
 {
-    func_00144F68(219, 46, 40, 138, D_00190DE4);
-    func_00144FB4(219, D_00190D68, D_00190DEC[2], D_00190DEC[3], (char *)D_00190DEC + 12);
+    func_00144F68(219, 46, 40, 138, text_macro_fpc);
+    func_00144FB4(219, D_00190D68, text_macro_fe[2], text_macro_fe[3], (char *)text_macro_fe + 12);
 }
 
-void func_000550D6(void)
+void classmaker_specials_remove(void)
 {
     if (D_00190D84 == -1) return;
-    if (D_00190D82 == 0)
-        func_000551B1(D_00190D84, 1);
+    if (classmaker_special_list == 0)
+        classmaker_set_advantage(D_00190D84, 1);
     else
-        func_000553B2(D_00190D84, 1);
+        classmaker_set_disadvantage(D_00190D84, 1);
     if (D_00190D84 != 6)
-        func_000A1023(&D_00199820[D_00190D82][D_00190D84], &D_00199820[D_00190D82][D_00190D84 + 1], (6 - D_00190D84) * 2, D_00175420, 952, 4);
-    D_00190D7E[D_00190D82]--;
-    while (D_0012AC00 != 0)
+        func_000A1023(&classmaker_specials[classmaker_special_list][D_00190D84], &classmaker_specials[classmaker_special_list][D_00190D84 + 1], (6 - D_00190D84) * 2, D_00175420, 952, 4);
+    classmaker_special_counts[classmaker_special_list]--;
+    while (mouse_buttons != 0)
         func_0012B136();
 }
 
-void func_000551B1(int a1, int a2)
+void classmaker_set_advantage(int a1, int a2)
 {
     int bit;
 
-    bit = D_00199820[D_00190D82][a1].bit;
-    switch (D_00199820[D_00190D82][a1].kind) {
+    bit = classmaker_specials[classmaker_special_list][a1].bit;
+    switch (classmaker_specials[classmaker_special_list][a1].kind) {
     case 0:
-        func_000CE4A9(D_00195BEC, 1 << bit, a2);
+        func_000CE4A9(player_class, 1 << bit, a2);
         break;
     case 1:
-        func_000CE4A9(D_00195BEC + 1, 1 << bit, a2);
+        func_000CE4A9(player_class + 1, 1 << bit, a2);
         break;
     case 2:
-        func_000CE4B5(D_00195BEC + 4, 1, a2);
+        func_000CE4B5(player_class + 4, 1, a2);
         break;
     case 3:
-        func_000CE4A9(D_00195BEC + 9, 1 << bit, a2);
+        func_000CE4A9(player_class + 9, 1 << bit, a2);
         break;
     case 4:
-        func_000CE4A9(D_00195BEC + 6, 1 << bit, a2);
+        func_000CE4A9(player_class + 6, 1 << bit, a2);
         break;
     case 5:
-        func_000CE4A9(D_00195BEC + 7, 1 << bit, a2);
+        func_000CE4A9(player_class + 7, 1 << bit, a2);
         break;
     case 6:
-        func_000CE4A9(D_00195BEC + 10, 1 << bit, a2);
+        func_000CE4A9(player_class + 10, 1 << bit, a2);
         break;
     case 7:
-        func_000CE4B5(D_00195BEC + 4, 2, a2);
+        func_000CE4B5(player_class + 4, 2, a2);
         break;
     case 8:
-        D_00195BEC[5] &= 227;
+        player_class[5] &= 227;
         if (a2 == 0)
-            *(short *)(D_00195BEC + 4) |= bit << 10;
+            *(short *)(player_class + 4) |= bit << 10;
         else
-            *(short *)(D_00195BEC + 4) = 5120;
+            *(short *)(player_class + 4) = 5120;
         break;
     case 9:
-        func_000CE4B5(D_00195BEC + 4, 4, a2);
+        func_000CE4B5(player_class + 4, 4, a2);
         break;
     case 10:
-        func_000CE4A9(D_00195BEC + 13, 1 << bit, a2);
+        func_000CE4A9(player_class + 13, 1 << bit, a2);
         break;
     case 11:
-        func_000CE4A9(D_00195BEC + 8, 1 << bit, a2);
+        func_000CE4A9(player_class + 8, 1 << bit, a2);
         break;
     }
 }
 
-void func_000553B2(int a1, int a2)
+void classmaker_set_disadvantage(int a1, int a2)
 {
     int bit;
 
-    bit = D_00199820[D_00190D82][a1].bit;
-    switch (D_00199820[D_00190D82][a1].kind) {
+    bit = classmaker_specials[classmaker_special_list][a1].bit;
+    switch (classmaker_specials[classmaker_special_list][a1].kind) {
     case 0:
-        func_000CE4B5(D_00195BEC + 4, 8, a2);
+        func_000CE4B5(player_class + 4, 8, a2);
         break;
     case 1:
-        func_000CE4B5(D_00195BEC + 4, (1 << bit) << 4, a2);
+        func_000CE4B5(player_class + 4, (1 << bit) << 4, a2);
         break;
     case 2:
-        func_000CE4B5(D_00195BEC + 10, (1 << bit) << 4, a2);
+        func_000CE4B5(player_class + 10, (1 << bit) << 4, a2);
         break;
     case 3:
-        func_000CE4B5(D_00195BEC + 4, (1 << bit) << 6, a2);
+        func_000CE4B5(player_class + 4, (1 << bit) << 6, a2);
         break;
     case 4:
-        func_000CE4B5(D_00195BEC + 4, (1 << bit) << 8, a2);
+        func_000CE4B5(player_class + 4, (1 << bit) << 8, a2);
         break;
     case 5:
-        func_000CE4B5(D_00195BEC + 14, 1 << bit, a2);
+        func_000CE4B5(player_class + 14, 1 << bit, a2);
         break;
     case 6:
-        func_000CE4A9(D_00195BEC + 2, 1 << bit, a2);
+        func_000CE4A9(player_class + 2, 1 << bit, a2);
         break;
     case 7:
-        func_000CE4A9(D_00195BEC + 3, 1 << bit, a2);
+        func_000CE4A9(player_class + 3, 1 << bit, a2);
         break;
     case 8:
-        func_000CE4B5(D_00195BEC + 14, (1 << bit) << 6, a2);
+        func_000CE4B5(player_class + 14, (1 << bit) << 6, a2);
         break;
     case 9:
-        func_000CE4B5(D_00195BEC + 14, (1 << bit) << 9, a2);
+        func_000CE4B5(player_class + 14, (1 << bit) << 9, a2);
         break;
     case 10:
-        func_000CE4B5(D_00195BEC + 11, 1 << bit, a2);
+        func_000CE4B5(player_class + 11, 1 << bit, a2);
         break;
     }
 }

@@ -5,7 +5,7 @@ struct ent { char pad0[7]; unsigned char flags; char pad8[4]; unsigned char kind
 extern int D_00196A28;
 extern struct ent *D_00196A9C;
 
-void func_000306FE(int a1, int a2, int a3)
+void qaction_op19_reveal_location(int a1, int a2, int a3)
 {
     int l_1C;
     struct ent *p;

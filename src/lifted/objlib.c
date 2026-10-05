@@ -7,71 +7,71 @@ extern char D_00176C29[];
 extern char D_00176C4F[];
 extern char D_00176C6B[];
 extern char D_00176C80[];
-extern char D_001789FA[];
+extern char player_environment[];
 extern char D_00187CB4[];
 extern char D_00187D30[];
 extern char D_00187DAC[];
 extern char D_00187DC0[];
 extern char D_00187DE8[];
 extern char D_00187EC8[];
-extern char D_001903A4[];
-extern char D_00190DE4[];
+extern char text_buffer[];
+extern char text_macro_fpc[];
 extern char D_001910AC[];
-extern char D_001959AC[];
+extern char frame_counter[];
 extern char D_001959BC[];
-extern char D_00195A9C[];
-extern char D_00195AA4[];
+extern char current_building[];
+extern char player_object[];
 extern char D_00195AC4[];
-extern char D_00195BDC[];
-extern char D_00195BF8[];
+extern char current_location[];
+extern char game_settings[];
 extern char D_00195C44[];
-extern char D_00195CB4[];
-extern char D_00196268[];
-extern char D_0019627B[];
+extern char sound_last_size[];
+extern char current_region[];
+extern char current_climate[];
 extern char D_001967F0[];
 extern char D_001967F4[];
 extern char D_001967F8[];
 extern char D_001967FC[];
 extern char D_00196800[];
 extern char D_00196808[];
-extern char D_00196888[];
+extern char rmb_record_ptr[];
 extern char D_001968BB[];
-extern char D_00196A2C[];
-extern char D_001A5C2C[];
+extern char rmb_block[];
+extern char model_cache_nodes[];
 extern char D_001A5C30[];
 extern char D_001A5C34[];
 extern char D_001A5C38[];
 extern char D_001A5C3C[];
 extern char D_001A5C40[];
-extern char D_001A842C[];
+extern char sound_cache[];
 extern char D_001A8430[];
 extern char D_001A8434[];
 extern char D_001A8438[];
-extern char D_001A942C[];
-extern char D_001A9430[];
-extern char D_001A9434[];
+extern char model_heap_free[];
+extern char model_cache_root[];
+extern char sound_cache_bytes[];
 extern char D_001A9438[];
 extern char D_001A9440[];
-extern char D_001A9444[];
-extern char D_001A9448[];
-extern char D_001A944C[];
+extern char arch3d_bsa[];
+extern char dagger_snd[];
+extern char model_heap[];
 extern char D_001A949C[];
 extern char D_001A949D[];
 
-extern int func_00012FCE(int, int, int);
-extern int func_00013131(int, int);
-extern int func_00013260(int, int, int);
+extern int archive_find_record(int, int, int);
+extern int archive_record_size(int, int);
+extern int archive_read_record(int, int, int);
 extern int func_0002455D(int);
-extern int func_000504D8(int);
-extern int func_000699D8(int, int, int, int, int);
-extern int func_00069F8A(int, int);
-extern int func_0006A0D4(int);
-extern int func_0007D6AE(int, int);
-extern int func_0008523E(unsigned short, int, int);
+extern int flats_cfg_find(int);
+extern int sound_play_at_point(int, int, int, int, int);
+extern int mem_pool_alloc(int, int);
+extern int mem_pool_release(int);
+extern int rand_range(int, int);
+extern int model_get(unsigned short, int, int);
 extern int func_00086093(int);
-extern int func_0008DCE3(int, int, int);
-extern int func_000994F0(int, int);
-extern int func_0009957D(int, int);
+extern int object_create_child(int, int, int);
+extern int dpmi_lock_region(int, int);
+extern int dpmi_unlock_region(int, int);
 extern int func_0009DC25();
 extern int func_0009DC49();
 extern int func_000A0024();
@@ -87,30 +87,30 @@ extern int func_000CE808();
 extern int func_00136AD8();
 extern int func_0013FE15();
 extern int func_00154D00();
-extern void func_00014518(int);
-extern void func_00050069(int);
-extern void func_00069E9E(int, int);
-extern void func_00069F39(int);
-extern void func_0008302D(int, int, int);
-extern void func_000847BC(int, int);
-extern void func_000848CA(int, int);
-extern void func_000849E4(int, int);
-extern void func_0008E3F7(int, int);
-int func_00084A7C(int);
-int func_000852A6(int, int);
-int func_00085407(int);
+extern void arch3d_apply_climate_textures(int);
+extern void fatal_error(int);
+extern void mem_pool_init(int, int);
+extern void mem_pool_free(int);
+extern void rotate_xz(int, int, int);
+extern void rmb_add_doors(int, int);
+extern void rmb_add_people(int, int);
+extern void rmb_add_editor_marker(int, int);
+extern void object_foreach(int, int);
+int rmb_add_subrecord(int);
+int model_load(int, int);
+int model_cache_add(int);
 int func_00086041(int, int);
 void func_00084E5E(int);
-void func_00085612(int);
-void func_00085666(int);
-void func_00085714(int, int, int);
-void func_0008579F(int, int);
-void func_00085BB2(void);
+void model_cache_purge_old(int);
+void model_cache_flush(int);
+void model_cache_purge_unused(int, int, int);
+void model_cache_remove_node(int, int);
+void sound_cache_trim(void);
 void func_00085EF8(int);
 void func_0008600F(int);
 #pragma aux func_000A0ED9 parm routine [];
 
-int func_00084A7C(int a1)
+int rmb_add_subrecord(int a1)
 {
     int l_48;
     int l_44;
@@ -126,23 +126,23 @@ int func_00084A7C(int a1)
     int l_1C;
 
     l_1C = 17;
-    l_1C += ((int)(unsigned char)*(signed char *)(*(char **)D_00196888)) * 66;
-    l_1C += ((int)(unsigned char)*(signed char *)(*(char **)D_00196888 + 1)) * 17;
-    l_1C += ((int)(unsigned char)*(signed char *)(*(char **)D_00196888 + 2)) << 4;
+    l_1C += ((int)(unsigned char)*(signed char *)(*(char **)rmb_record_ptr)) * 66;
+    l_1C += ((int)(unsigned char)*(signed char *)(*(char **)rmb_record_ptr + 1)) * 17;
+    l_1C += ((int)(unsigned char)*(signed char *)(*(char **)rmb_record_ptr + 2)) << 4;
     if (l_1C != 17) goto L84ADE;
     return 0;
 L84ADE:;
-    l_48 = func_0008DCE3(a1, 0, l_1C);
+    l_48 = object_create_child(a1, 0, l_1C);
     *(signed char *)((char *)l_48) = 43;
     *(int *)((char *)l_48 + 7) = *(int *)D_001967F8;
     *(int *)((char *)l_48 + 15) = *(int *)D_001967F0;
     *(int *)((char *)l_48 + 11) = *(int *)D_001967F4;
     *(short *)((char *)l_48 + 3) = *(short *)D_001967FC;
     *(short *)((char *)l_48 + 19) = 32768;
-    *(int *)((char *)l_48 + 31) = *(int *)(*(char **)D_00195AC4 + 31) + ((int)(unsigned short)(*(short *)(*(char **)D_00195BDC + 37))++);
+    *(int *)((char *)l_48 + 31) = *(int *)(*(char **)D_00195AC4 + 31) + ((int)(unsigned short)(*(short *)(*(char **)current_location + 37))++);
     *(int *)D_001A9438 = *(int *)((char *)l_48 + 31);
     l_44 = l_48 + 71;
-    func_000A1023(l_44, *(int *)D_00196888, l_1C, (int)D_00176C20, 803, 4);
+    func_000A1023(l_44, *(int *)rmb_record_ptr, l_1C, (int)D_00176C20, 803, 4);
     *(int *)((char *)l_44 + 5) = l_44 + 17;
     l_40 = *(int *)((char *)l_44 + 5);
     *(int *)((char *)l_44 + 9) = l_40 + (((int)(unsigned char)*(signed char *)((char *)l_44)) * 66);
@@ -158,7 +158,7 @@ L84BF0:;
     (*(char (**)[66])&l_40)++;
     goto L84BDC;
 L84BFF:;
-    func_0008302D(l_40 + 36, l_40 + 44, *(int *)D_001967FC);
+    rotate_xz(l_40 + 36, l_40 + 44, *(int *)D_001967FC);
     *(int *)((char *)l_40 + 36) += *(int *)D_001967F8;
     *(int *)((char *)l_40 + 44) += *(int *)D_001967F0;
     *(int *)((char *)l_40 + 4) = 0;
@@ -167,7 +167,7 @@ L84BFF:;
 L84C51:;
     goto L84CA7;
 L84C53:;
-    *(int *)((char *)l_40 + 4) = func_0008523E((int)(unsigned short)*(short *)((char *)l_40), (int)(unsigned char)*(signed char *)((char *)l_40 + 2), (((int)(unsigned char)*(signed char *)D_0019627B) << 2) + ((int)(unsigned char)*(signed char *)D_001A949C));
+    *(int *)((char *)l_40 + 4) = model_get((int)(unsigned short)*(short *)((char *)l_40), (int)(unsigned char)*(signed char *)((char *)l_40 + 2), (((int)(unsigned char)*(signed char *)current_climate) << 2) + ((int)(unsigned char)*(signed char *)D_001A949C));
     *(int *)((char *)l_40 + 40) = (-*(int *)((char *)l_40 + 40)) - (func_000CE808(*(int *)((char *)l_40 + 4)) >> 8);
 L84CA7:;
     *(int *)((char *)l_40 + 40) += *(int *)D_001967F4;
@@ -183,17 +183,17 @@ L84CE0:;
     (*(char (**)[17])&l_3C)++;
     goto L84CCB;
 L84CEF:;
-    func_0008302D(l_3C, l_3C + 8, *(int *)D_001967FC);
+    rotate_xz(l_3C, l_3C + 8, *(int *)D_001967FC);
     *(int *)((char *)l_3C) += *(int *)D_001967F8;
     *(int *)((char *)l_3C + 8) += *(int *)D_001967F0;
     *(int *)((char *)l_3C + 4) += *(int *)D_001967F4;
     if ((((int)(unsigned short)*(short *)((char *)l_3C + 12)) >> 7) != 199) goto L84D49;
-    func_000849E4(a1, l_3C);
+    rmb_add_editor_marker(a1, l_3C);
     goto L84D8F;
 L84D49:;
-    l_2C = func_000504D8((int)(unsigned short)*(short *)((char *)l_3C + 12));
+    l_2C = flats_cfg_find((int)(unsigned short)*(short *)((char *)l_3C + 12));
     if (((int)(unsigned char)(*(signed char *)((char *)l_2C + 6) & 2)) == 0) goto L84D84;
-    if (((int)(unsigned short)(*(short *)(*(char **)D_00195BF8) & 4)) != 0) goto L84D86;
+    if (((int)(unsigned short)(*(short *)(*(char **)game_settings) & 4)) != 0) goto L84D86;
 L84D84:;
     goto L84D8F;
 L84D86:;
@@ -210,17 +210,17 @@ L84DAD:;
     (*(char (**)[16])&l_34)++;
     goto L84D9B;
 L84DBC:;
-    func_0008302D(l_34, l_34 + 8, *(int *)D_001967FC);
+    rotate_xz(l_34, l_34 + 8, *(int *)D_001967FC);
     *(int *)((char *)l_34) += *(int *)D_001967F8;
     *(int *)((char *)l_34 + 8) += *(int *)D_001967F0;
     *(int *)((char *)l_34 + 4) += *(int *)D_001967F4;
     goto L84DAD;
 L84DF5:;
-    l_38 = (int)(*(char **)D_00196888 + l_1C);
-    l_30 = l_38 + (((int)(unsigned char)*(signed char *)(*(char **)D_00196888 + 3)) * 17);
-    func_000848CA(a1, l_38);
-    func_000847BC(a1, l_30);
-    *(int *)D_00196888 = l_30 + (((int)(unsigned char)*(signed char *)(*(char **)D_00196888 + 4)) * 19);
+    l_38 = (int)(*(char **)rmb_record_ptr + l_1C);
+    l_30 = l_38 + (((int)(unsigned char)*(signed char *)(*(char **)rmb_record_ptr + 3)) * 17);
+    rmb_add_people(a1, l_38);
+    rmb_add_doors(a1, l_30);
+    *(int *)rmb_record_ptr = l_30 + (((int)(unsigned char)*(signed char *)(*(char **)rmb_record_ptr + 4)) * 19);
     return l_48;
 }
 
@@ -230,10 +230,10 @@ void func_00084E5E(int a1)
     int l_1C;
     int l_18;
 
-    l_1C = (int)(*(char **)(*(char **)D_00195BDC + 43) + (((int)(unsigned short)*(short *)((char *)a1 + 27)) * 26));
+    l_1C = (int)(*(char **)(*(char **)current_location + 43) + (((int)(unsigned short)*(short *)((char *)a1 + 27)) * 26));
     if (((int)(unsigned char)*(signed char *)((char *)l_1C + 24)) == 16) goto L84EC1;
     if (*(short *)((char *)l_1C + 18) != 0) goto L84EBC;
-    *(short *)((char *)l_1C + 18) = *(short *)(D_00187D30 + (((int)(unsigned char)*(signed char *)D_00196268) * 2));
+    *(short *)((char *)l_1C + 18) = *(short *)(D_00187D30 + (((int)(unsigned char)*(signed char *)current_region) * 2));
 L84EBC:;
     return;
 L84EC1:;
@@ -243,8 +243,8 @@ L84EF4:;
     if (a1 == 0) return;
     if (((int)(unsigned char)*(signed char *)((char *)a1)) != 8) goto L84F77;
     l_20 = a1 + 71;
-    if (*(unsigned short *)((char *)l_20) != *(short *)(D_00187D30 + (((int)(unsigned char)*(signed char *)D_00196268) * 2))) goto L84F4B;
-    *(short *)((char *)l_20) = *(short *)(D_00187CB4 + (((int)(unsigned char)*(signed char *)D_00196268) * 2));
+    if (*(unsigned short *)((char *)l_20) != *(short *)(D_00187D30 + (((int)(unsigned char)*(signed char *)current_region) * 2))) goto L84F4B;
+    *(short *)((char *)l_20) = *(short *)(D_00187CB4 + (((int)(unsigned char)*(signed char *)current_region) * 2));
 L84F4B:;
     if (((int)(unsigned short)*(short *)((char *)l_20)) != 852) goto L84F6D;
     if (((int)(unsigned char)(*(signed char *)D_001968BB & 16)) == 0) goto L84F6F;
@@ -257,17 +257,17 @@ L84F77:;
     goto L84EF4;
 }
 
-int func_00084F8F(int a1, int a2)
+int rmb_add_building(int a1, int a2)
 {
     int l_20;
     int l_1C;
     int l_18;
 
-    *(int *)D_00196888 = *(int *)(*(char **)D_00196A2C + 1475 + (a2 << 2));
-    l_18 = func_00084A7C(a1);
+    *(int *)rmb_record_ptr = *(int *)(*(char **)rmb_block + 1475 + (a2 << 2));
+    l_18 = rmb_add_subrecord(a1);
     *(short *)((char *)l_18 + 21) = 1;
     *(short *)((char *)l_18 + 29) = a2;
-    l_20 = (int)(unsigned char)*(signed char *)(*(char **)D_00196A2C + 667 + (a2 * 26));
+    l_20 = (int)(unsigned char)*(signed char *)(*(char **)rmb_block + 667 + (a2 * 26));
     switch ((unsigned)l_20) {
     goto L850BA;
 case 21:
@@ -283,8 +283,8 @@ case 20:
     func_0009DC49((int)(short)*(short *)((char *)l_18 + 31));
     l_20 = func_0009DC25();
     func_0009DC49(l_1C);
-    if (((int)(unsigned short)*(short *)(*(char **)D_00196A2C + 661 + (a2 * 26))) == 42) goto L85088;
-    if (((int)(unsigned short)*(short *)(*(char **)D_00196A2C + 661 + (a2 * 26))) != 108) goto L8508A;
+    if (((int)(unsigned short)*(short *)(*(char **)rmb_block + 661 + (a2 * 26))) == 42) goto L85088;
+    if (((int)(unsigned short)*(short *)(*(char **)rmb_block + 661 + (a2 * 26))) != 108) goto L8508A;
 L85088:;
     goto L850BA;
 L8508A:;
@@ -295,34 +295,34 @@ L8508A:;
 default:
 L850BA:;
     *(short *)((char *)l_18 + 27) = (*(int *)D_00196808)++;
-    func_00084A7C(l_18);
+    rmb_add_subrecord(l_18);
     func_00084E5E(l_18);
     return l_18;
 }
 }
 
-void func_000850EF(int a1)
+void model_heap_init(int a1)
 {
-    func_00069E9E((int)D_001A944C, a1);
-    *(int *)D_001A942C = a1;
-    *(int *)((char *)(*(int *)D_001A9430 = (int)D_001A5C2C) + 12) = 50000;
-    *(int *)(*(char **)D_001A9430 + 8) = 0;
+    mem_pool_init((int)model_heap, a1);
+    *(int *)model_heap_free = a1;
+    *(int *)((char *)(*(int *)model_cache_root = (int)model_cache_nodes) + 12) = 50000;
+    *(int *)(*(char **)model_cache_root + 8) = 0;
 }
 
-void func_00085141(void)
+void model_heap_free_all(void)
 {
-    func_00069F39((int)D_001A944C);
+    mem_pool_free((int)model_heap);
 }
 
-int func_00085163(int a1)
+int model_cache_find(int a1)
 {
     int l_20;
     int l_1C;
 
-    l_20 = *(int *)D_001A9430;
+    l_20 = *(int *)model_cache_root;
 L8517C:;
     if (a1 != *(int *)((char *)l_20 + 12)) goto L851A1;
-    *(int *)((char *)l_20 + 8) = *(int *)D_001959AC;
+    *(int *)((char *)l_20 + 8) = *(int *)frame_counter;
     return *(int *)((char *)l_20 + 16);
 L851A1:;
     if (((unsigned)a1) >= *(int *)((char *)l_20 + 12)) goto L851D9;
@@ -330,7 +330,7 @@ L851A1:;
     l_20 = *(int *)((char *)l_20);
     goto L851D7;
 L851BE:;
-    *(int *)((char *)l_20) = func_00085407(a1);
+    *(int *)((char *)l_20) = model_cache_add(a1);
     l_1C = *(int *)((char *)l_20);
     goto L8520D;
 L851D7:;
@@ -340,7 +340,7 @@ L851D9:;
     l_20 = *(int *)((char *)l_20 + 4);
     goto L85208;
 L851ED:;
-    *(int *)((char *)l_20 + 4) = func_00085407(a1);
+    *(int *)((char *)l_20 + 4) = model_cache_add(a1);
     l_1C = *(int *)((char *)l_20 + 4);
     goto L8520D;
 L85208:;
@@ -349,42 +349,42 @@ L8520D:;
     if (l_1C != 0) goto L8521C;
     return 0;
 L8521C:;
-    *(int *)((char *)l_1C + 8) = *(int *)D_001959AC;
+    *(int *)((char *)l_1C + 8) = *(int *)frame_counter;
     return *(int *)((char *)l_1C + 16);
 }
 
-int func_000852A6(int a1, int a2)
+int model_load(int a1, int a2)
 {
     int l_20;
     int l_1C;
     int l_18;
 
     l_18 = a2 & 131071;
-    l_20 = func_00012FCE(*(int *)D_001A9444, (int)D_001903A4, l_18);
-    l_1C = func_00013131(*(int *)D_001A9444, l_20);
-    if ((*(int *)(D_001A5C3C + (a1 * 20)) = func_00069F8A((int)D_001A944C, l_1C)) != 0) goto L85395;
+    l_20 = archive_find_record(*(int *)arch3d_bsa, (int)text_buffer, l_18);
+    l_1C = archive_record_size(*(int *)arch3d_bsa, l_20);
+    if ((*(int *)(D_001A5C3C + (a1 * 20)) = mem_pool_alloc((int)model_heap, l_1C)) != 0) goto L85395;
     if (*(signed char *)D_001A949D != 0) goto L8535E;
-    func_00085612(*(int *)D_001A9430);
-    if ((*(int *)(D_001A5C3C + (a1 * 20)) = func_00069F8A((int)D_001A944C, l_1C)) != 0) goto L8535C;
-    func_00085666(*(int *)D_001A9430);
+    model_cache_purge_old(*(int *)model_cache_root);
+    if ((*(int *)(D_001A5C3C + (a1 * 20)) = mem_pool_alloc((int)model_heap, l_1C)) != 0) goto L8535C;
+    model_cache_flush(*(int *)model_cache_root);
     return 0;
 L8535C:;
     goto L85395;
 L8535E:;
-    func_00085612(*(int *)D_001A9430);
-    if ((*(int *)(D_001A5C3C + (a1 * 20)) = func_00069F8A((int)D_001A944C, l_1C)) != 0) goto L85395;
-    func_00050069((int)D_00176C29);
+    model_cache_purge_old(*(int *)model_cache_root);
+    if ((*(int *)(D_001A5C3C + (a1 * 20)) = mem_pool_alloc((int)model_heap, l_1C)) != 0) goto L85395;
+    fatal_error((int)D_00176C29);
 L85395:;
-    if (func_00013260(*(int *)D_001A9444, l_20, *(int *)(D_001A5C3C + (a1 * 20))) != 0) goto L853E2;
+    if (archive_read_record(*(int *)arch3d_bsa, l_20, *(int *)(D_001A5C3C + (a1 * 20))) != 0) goto L853E2;
     func_000A0ED9(1104, (int)D_00176C20);
     func_000A0F5C(*(int *)D_00195C44, (int)D_00176C4F, l_20);
-    func_00050069(*(int *)D_00195C44);
+    fatal_error(*(int *)D_00195C44);
 L853E2:;
-    *(int *)D_001A942C -= (l_1C + 1) & -2;
+    *(int *)model_heap_free -= (l_1C + 1) & -2;
     return *(int *)(D_001A5C3C + (a1 * 20));
 }
 
-int func_00085407(int a1)
+int model_cache_add(int a1)
 {
     int l_20;
     int l_1C;
@@ -396,7 +396,7 @@ int func_00085407(int a1)
     l_20 = 0;
 L8541F:;
     if (*(int *)(D_001A5C38 + (l_20 * 20)) != 0) goto L85439;
-    if (*(int *)(D_001A5C2C + (l_20 * 20)) == 0) goto L8543B;
+    if (*(int *)(model_cache_nodes + (l_20 * 20)) == 0) goto L8543B;
 L85439:;
     goto L85448;
 L8543B:;
@@ -416,11 +416,11 @@ L85469:;
     goto L8541F;
 L85471:;
     if (l_20 != 512) goto L85564;
-    func_00085612(*(int *)D_001A9430);
+    model_cache_purge_old(*(int *)model_cache_root);
     l_20 = 0;
 L8548F:;
     if (*(int *)(D_001A5C38 + (l_20 * 20)) != 0) goto L854A9;
-    if (*(int *)(D_001A5C2C + (l_20 * 20)) == 0) goto L854AB;
+    if (*(int *)(model_cache_nodes + (l_20 * 20)) == 0) goto L854AB;
 L854A9:;
     goto L854B8;
 L854AB:;
@@ -440,11 +440,11 @@ L854D9:;
     goto L8548F;
 L854E1:;
     if (l_20 != 512) goto L85564;
-    func_00085666(*(int *)D_001A9430);
+    model_cache_flush(*(int *)model_cache_root);
     l_20 = 0;
 L854FF:;
     if (*(int *)(D_001A5C38 + (l_20 * 20)) != 0) goto L85519;
-    if (*(int *)(D_001A5C2C + (l_20 * 20)) == 0) goto L8551B;
+    if (*(int *)(model_cache_nodes + (l_20 * 20)) == 0) goto L8551B;
 L85519:;
     goto L85528;
 L8551B:;
@@ -464,41 +464,41 @@ L85549:;
     goto L854FF;
 L85551:;
     if (l_20 != 512) goto L85564;
-    func_00050069((int)D_00176C6B);
+    fatal_error((int)D_00176C6B);
 L85564:;
     *(int *)(D_001A5C38 + (l_20 * 20)) = a1;
-    *(int *)(D_001A5C34 + (l_20 * 20)) = *(int *)D_001959AC;
-    *(int *)(D_001A5C2C + (l_20 * 20)) = (*(int *)(D_001A5C30 + (l_20 * 20)) = 0);
-    if (func_000852A6(l_20, a1) != 0) goto L855B7;
+    *(int *)(D_001A5C34 + (l_20 * 20)) = *(int *)frame_counter;
+    *(int *)(model_cache_nodes + (l_20 * 20)) = (*(int *)(D_001A5C30 + (l_20 * 20)) = 0);
+    if (model_load(l_20, a1) != 0) goto L855B7;
     return 0;
 L855B7:;
     func_0013FE15(*(int *)(D_001A5C3C + (l_20 * 20)));
     l_1C = func_0009DC25();
     func_0009DC49(*(int *)(*(char **)(D_001A5C3C + (l_20 * 20)) + 12));
-    func_00014518(*(int *)(D_001A5C3C + (l_20 * 20)));
+    arch3d_apply_climate_textures(*(int *)(D_001A5C3C + (l_20 * 20)));
     func_0009DC49(l_1C);
-    return ((int)D_001A5C2C) + (l_20 * 20);
+    return ((int)model_cache_nodes) + (l_20 * 20);
 }
 }
 
-void func_00085612(int a1)
+void model_cache_purge_old(int a1)
 {
     int l_18;
 
     l_18 = 200;
-    if (*(int *)D_001A942C > 204800) return;
+    if (*(int *)model_heap_free > 204800) return;
 L85636:;
     if (l_18 <= 2) goto L85648;
-    if (*(int *)D_001A942C < 204800) goto L8564A;
+    if (*(int *)model_heap_free < 204800) goto L8564A;
 L85648:;
     return;
 L8564A:;
-    func_00085714(0, l_18, a1);
+    model_cache_purge_unused(0, l_18, a1);
     l_18 >>= 1;
     goto L85636;
 }
 
-void func_00085666(int a1)
+void model_cache_flush(int a1)
 {
     int l_18;
 
@@ -517,7 +517,7 @@ L856B1:;
     goto L856D7;
 L856B3:;
     func_0008600F(*(int *)(D_001A5C3C + (l_18 * 20)));
-    *(int *)D_001A942C += func_0006A0D4(*(int *)(D_001A5C3C + (l_18 * 20)));
+    *(int *)model_heap_free += mem_pool_release(*(int *)(D_001A5C3C + (l_18 * 20)));
 L856D7:;
     goto L8568F;
 L856D9:;
@@ -526,28 +526,28 @@ L856D9:;
     func_000A0040((int)D_001A5C40, 0, 10220, (int)D_00176C20, 1189, 4);
 }
 
-void func_00085714(int a1, int a2, int a3)
+void model_cache_purge_unused(int a1, int a2, int a3)
 {
     int l_10;
 
     if (*(int *)((char *)a3) == 0) goto L85741;
-    func_00085714(a3, a2, *(int *)((char *)a3));
+    model_cache_purge_unused(a3, a2, *(int *)((char *)a3));
 L85741:;
     if (*(int *)((char *)a3 + 4) == 0) goto L8575B;
-    func_00085714(a3, a2, *(int *)((char *)a3 + 4));
+    model_cache_purge_unused(a3, a2, *(int *)((char *)a3 + 4));
 L8575B:;
-    if (((unsigned)(*(int *)D_001959AC - *(int *)((char *)a3 + 8))) < a2) goto L85776;
-    func_0008579F(a1, a3);
+    if (((unsigned)(*(int *)frame_counter - *(int *)((char *)a3 + 8))) < a2) goto L85776;
+    model_cache_remove_node(a1, a3);
 L85776:;
     if (*(int *)((char *)a1) != *(int *)((char *)a1 + 4)) goto L8578B;
     if (*(int *)((char *)a1) != 0) goto L8578D;
 L8578B:;
     return;
 L8578D:;
-    func_00050069((int)D_00176C80);
+    fatal_error((int)D_00176C80);
 }
 
-void func_0008579F(int a1, int a2)
+void model_cache_remove_node(int a1, int a2)
 {
     int l_1C;
     int l_18;
@@ -571,7 +571,7 @@ L8580C:;
     *(int *)((char *)a1) = *(int *)((char *)a2 + 4);
 L85817:;
     func_0008600F(*(int *)((char *)a2 + 16));
-    *(int *)D_001A942C += func_0006A0D4(*(int *)((char *)a2 + 16));
+    *(int *)model_heap_free += mem_pool_release(*(int *)((char *)a2 + 16));
     *(int *)((char *)a2 + 16) = 0;
     *(int *)((char *)a2 + 12) = 0;
     return;
@@ -584,7 +584,7 @@ L8586D:;
     *(int *)((char *)a1) = *(int *)((char *)a2);
 L85877:;
     func_0008600F(*(int *)((char *)a2 + 16));
-    *(int *)D_001A942C += func_0006A0D4(*(int *)((char *)a2 + 16));
+    *(int *)model_heap_free += mem_pool_release(*(int *)((char *)a2 + 16));
     *(int *)((char *)a2 + 16) = 0;
     *(int *)((char *)a2 + 12) = 0;
     return;
@@ -602,7 +602,7 @@ L858D0:;
     *(int *)((char *)a2 + 8) = *(int *)((char *)l_18 + 8);
     *(int *)((char *)a2 + 12) = *(int *)((char *)l_18 + 12);
     *(int *)((char *)l_18 + 16) = l_1C;
-    func_0008579F(l_14, l_18);
+    model_cache_remove_node(l_14, l_18);
 }
 
 void func_0008591A(int a1, int a2)
@@ -616,7 +616,7 @@ void func_0008591A(int a1, int a2)
     if (l_18 == 100000) goto L85962;
     *(int *)((char *)a1 + 11) = l_18;
 L85962:;
-    *(short *)((char *)a1 + 27) = func_00086041((int)(unsigned char)*(signed char *)D_001789FA, (int)(unsigned char)*(signed char *)(*(char **)D_00195A9C + 24));
+    *(short *)((char *)a1 + 27) = func_00086041((int)(unsigned char)*(signed char *)player_environment, (int)(unsigned char)*(signed char *)(*(char **)current_building + 24));
     func_0009DC49(l_14);
 }
 
@@ -628,7 +628,7 @@ void func_00085992(int a1, int a2)
     if (l_14 == 100000) goto L859C2;
     *(int *)((char *)a1 + 11) = l_14;
 L859C2:;
-    if (((int)(unsigned char)*(signed char *)D_001789FA) == 3) goto L859F1;
+    if (((int)(unsigned char)*(signed char *)player_environment) == 3) goto L859F1;
     *(signed char *)((char *)a1) = 33;
     *(short *)((char *)a1 + 27) = *(short *)(D_00187DC0 + (((int)(unsigned char)*(signed char *)((char *)a2 + 24)) * 2));
     goto L85A25;
@@ -643,7 +643,7 @@ L85A42:;
     l_14++;
 }
 
-int func_00085A51(int a1)
+int sound_cache_load(int a1)
 {
     int l_28;
     int l_24;
@@ -660,7 +660,7 @@ L85A7C:;
     goto L85A71;
 L85A84:;
     if (*(int *)(D_001A8430 + (l_24 << 4)) != a1) goto L85ABA;
-    *(int *)D_00195CB4 = *(int *)(D_001A8434 + (l_24 << 4));
+    *(int *)sound_last_size = *(int *)(D_001A8434 + (l_24 << 4));
     return *(int *)(D_001A8438 + (l_24 << 4));
 L85ABA:;
     goto L85A7C;
@@ -671,31 +671,31 @@ L85AC3:;
     l_24++;
     goto L85AC3;
 L85ADA:;
-    l_1C = func_00012FCE(*(int *)D_001A9448, (int)D_001910AC, a1);
-    l_20 = func_00013131(*(int *)D_001A9448, l_1C);
-    *(int *)(D_001A842C + (l_24 << 4)) = *(int *)D_001959AC;
+    l_1C = archive_find_record(*(int *)dagger_snd, (int)D_001910AC, a1);
+    l_20 = archive_record_size(*(int *)dagger_snd, l_1C);
+    *(int *)(sound_cache + (l_24 << 4)) = *(int *)frame_counter;
     *(int *)(D_001A8430 + (l_24 << 4)) = a1;
     *(int *)(D_001A8434 + (l_24 << 4)) = l_20;
     *(int *)(D_001A8438 + (l_24 << 4)) = func_000A00AF(l_20, (int)D_00176C20, 1338);
-    func_000994F0(*(int *)(D_001A8438 + (l_24 << 4)), l_20 + 4096);
-    func_00013260(*(int *)D_001A9448, l_1C, *(int *)(D_001A8438 + (l_24 << 4)));
-    *(int *)D_001A9434 += l_20;
-    func_00085BB2();
-    *(int *)D_00195CB4 = l_20;
+    dpmi_lock_region(*(int *)(D_001A8438 + (l_24 << 4)), l_20 + 4096);
+    archive_read_record(*(int *)dagger_snd, l_1C, *(int *)(D_001A8438 + (l_24 << 4)));
+    *(int *)sound_cache_bytes += l_20;
+    sound_cache_trim();
+    *(int *)sound_last_size = l_20;
     return *(int *)(D_001A8438 + (l_24 << 4));
 }
 
-void func_00085BB2(void)
+void sound_cache_trim(void)
 {
     int l_20;
     int l_1C;
     int l_18;
 
-    if (*(int *)D_001A9434 < 393216) return;
+    if (*(int *)sound_cache_bytes < 393216) return;
 L85BD0:;
-    if (*(int *)D_001A9434 <= 262144) return;
+    if (*(int *)sound_cache_bytes <= 262144) return;
     l_1C = -1;
-    l_20 = *(int *)D_001959AC;
+    l_20 = *(int *)frame_counter;
     l_18 = 0;
 L85BF6:;
     if (l_18 < 256) goto L85C09;
@@ -705,14 +705,14 @@ L85C01:;
     goto L85BF6;
 L85C09:;
     if (*(int *)(D_001A8438 + (l_18 << 4)) == 0) goto L85C01;
-    if (l_20 <= *(int *)(D_001A842C + (l_18 << 4))) goto L85C3E;
-    l_20 = *(int *)(D_001A842C + (l_18 << 4));
+    if (l_20 <= *(int *)(sound_cache + (l_18 << 4))) goto L85C3E;
+    l_20 = *(int *)(sound_cache + (l_18 << 4));
     l_1C = l_18;
 L85C3E:;
     goto L85C01;
 L85C40:;
     if (l_1C == (-1)) return;
-    func_0009957D(*(int *)(D_001A8438 + (l_1C << 4)), *(int *)(D_001A8434 + (l_1C << 4)) + 4096);
+    dpmi_unlock_region(*(int *)(D_001A8438 + (l_1C << 4)), *(int *)(D_001A8434 + (l_1C << 4)) + 4096);
     if (*(int *)(D_001A8438 + (l_1C << 4)) == 0) goto L85C8E;
     if (*(int *)(D_001A8438 + (l_1C << 4)) != (-1751672937)) goto L85C90;
 L85C8E:;
@@ -723,11 +723,11 @@ L85C90:;
 L85CBB:;
     *(int *)(D_001A8438 + (l_1C << 4)) = 0;
     *(int *)(D_001A8430 + (l_1C << 4)) = -1;
-    *(int *)D_001A9434 -= *(int *)(D_001A8434 + (l_1C << 4));
+    *(int *)sound_cache_bytes -= *(int *)(D_001A8434 + (l_1C << 4));
     goto L85BD0;
 }
 
-void func_00085CFC(void)
+void sound_cache_free_all(void)
 {
     int l_18;
 
@@ -740,7 +740,7 @@ L85D1F:;
     goto L85D11;
 L85D27:;
     if (*(int *)(D_001A8438 + (l_18 << 4)) == 0) goto L85DCB;
-    func_0009957D(*(int *)(D_001A8438 + (l_18 << 4)), *(int *)(D_001A8434 + (l_18 << 4)) + 1024);
+    dpmi_unlock_region(*(int *)(D_001A8438 + (l_18 << 4)), *(int *)(D_001A8434 + (l_18 << 4)) + 1024);
     if (*(int *)(D_001A8438 + (l_18 << 4)) == 0) goto L85D7E;
     if (*(int *)(D_001A8438 + (l_18 << 4)) != (-1751672937)) goto L85D80;
 L85D7E:;
@@ -754,35 +754,35 @@ L85DAB:;
 L85DCB:;
     goto L85D1F;
 L85DD0:;
-    *(int *)D_001A9434 = 0;
+    *(int *)sound_cache_bytes = 0;
 }
 
-void func_00085DE4(int a1, int a2, int a3, int a4, int a5)
+void flat_animal_sound(int a1, int a2, int a3, int a4, int a5)
 {
     if (a4 != 201) return;
     if (func_0009DC25() > 100) return;
-    if (func_000C7FD9(a1, a3, *(int *)(*(char **)D_00195AA4 + 7), *(int *)(*(char **)D_00195AA4 + 15)) > 768) return;
+    if (func_000C7FD9(a1, a3, *(int *)(*(char **)player_object + 7), *(int *)(*(char **)player_object + 15)) > 768) return;
     switch ((unsigned)a5) {
     return;
 case 0:
 case 1:
-    func_000699D8(367, a1, a2, a3, 100);
+    sound_play_at_point(367, a1, a2, a3, 100);
     return;
 case 3:
 case 4:
-    func_000699D8(371, a1, a2, a3, 100);
+    sound_play_at_point(371, a1, a2, a3, 100);
     return;
 case 5:
 case 6:
-    func_000699D8(370, a1, a2, a3, 100);
+    sound_play_at_point(370, a1, a2, a3, 100);
     return;
 case 7:
 case 8:
-    func_000699D8(369, a1, a2, a3, 100);
+    sound_play_at_point(369, a1, a2, a3, 100);
     return;
 case 9:
 case 10:
-    func_000699D8(368, a1, a2, a3, 100);
+    sound_play_at_point(368, a1, a2, a3, 100);
 default:;
 }
 }
@@ -796,7 +796,7 @@ void func_00085EF8(int a1)
     switch (*(unsigned char *)((char *)a1)) {
 case 6:
 case 32:
-    if (*(int *)((char *)a1 + 71) != *(int *)D_00190DE4) goto L85F5F;
+    if (*(int *)((char *)a1 + 71) != *(int *)text_macro_fpc) goto L85F5F;
     *(int *)((char *)a1 + 71) = 0;
 L85F5F:;
     return;
@@ -812,7 +812,7 @@ L85F8E:;
     (*(char (**)[66])&l_1C)++;
     goto L85F7D;
 L85F9D:;
-    if (*(int *)((char *)l_1C + 4) != *(int *)D_00190DE4) goto L85FB5;
+    if (*(int *)((char *)l_1C + 4) != *(int *)text_macro_fpc) goto L85FB5;
     *(int *)((char *)l_1C + 4) = 0;
 L85FB5:;
     goto L85F8E;
@@ -829,7 +829,7 @@ L85FDC:;
     (*(char (**)[66])&l_1C)++;
     goto L85FC9;
 L85FEB:;
-    if (*(int *)((char *)l_1C + 4) != *(int *)D_00190DE4) goto L86003;
+    if (*(int *)((char *)l_1C + 4) != *(int *)text_macro_fpc) goto L86003;
     *(int *)((char *)l_1C + 4) = 0;
 L86003:;
     goto L85FDC;
@@ -839,8 +839,8 @@ default:;
 
 void func_0008600F(int a1)
 {
-    *(int *)D_00190DE4 = a1;
-    func_0008E3F7(*(int *)D_00195AC4, (int)func_00085EF8);
+    *(int *)text_macro_fpc = a1;
+    object_foreach(*(int *)D_00195AC4, (int)func_00085EF8);
 }
 
 int func_00086041(int a1, int a2)
@@ -848,7 +848,7 @@ int func_00086041(int a1, int a2)
     if (a1 != 3) goto L86069;
     return func_00086093((int)D_00187EC8);
 L86069:;
-    return func_00086093(((int)D_00187DE8) + (func_0007D6AE(0, 7) * 28));
+    return func_00086093(((int)D_00187DE8) + (rand_range(0, 7) * 28));
 }
 
 void func_00086149(void)
@@ -861,17 +861,17 @@ void func_00086149(void)
     int l_1C;
     int l_18;
 
-    l_2C = func_000C5280(*(int *)(*(char **)D_00195AA4 + 7) ^ *(int *)(*(char **)D_00195AA4 + 15), (*(int *)D_001343C0 / 40) << 6);
+    l_2C = func_000C5280(*(int *)(*(char **)player_object + 7) ^ *(int *)(*(char **)player_object + 15), (*(int *)D_001343C0 / 40) << 6);
     l_2C >>= 3;
     l_2C = 256 - l_2C;
     l_30 = (l_2C * 192) >> 8;
-    l_20 = func_000C5280(*(int *)(*(char **)D_00195AA4 + 7) ^ *(int *)(*(char **)D_00195AA4 + 15), (*(int *)D_001343C0 / 40) << 6);
+    l_20 = func_000C5280(*(int *)(*(char **)player_object + 7) ^ *(int *)(*(char **)player_object + 15), (*(int *)D_001343C0 / 40) << 6);
     l_20 >>= 3;
-    l_1C = func_000C5280(*(int *)(*(char **)D_00195AA4 + 7) + *(int *)(*(char **)D_00195AA4 + 15), (*(int *)D_001343C0 / 40) << 6);
+    l_1C = func_000C5280(*(int *)(*(char **)player_object + 7) + *(int *)(*(char **)player_object + 15), (*(int *)D_001343C0 / 40) << 6);
     l_1C >>= 3;
-    l_18 = func_000C5280(*(int *)(*(char **)D_00195AA4 + 7) - *(int *)(*(char **)D_00195AA4 + 15), (*(int *)D_001343C0 / 40) << 6);
+    l_18 = func_000C5280(*(int *)(*(char **)player_object + 7) - *(int *)(*(char **)player_object + 15), (*(int *)D_001343C0 / 40) << 6);
     l_18 >>= 3;
-    func_000CE6E2((((int)(short)*(short *)(*(char **)D_00195AA4 + 3)) + *(int *)D_001959BC) & 2047, 192, (int)&l_28, (int)&l_24);
-    func_00136AD8((*(int *)(*(char **)D_00195AA4 + 7) + l_28) + (l_20 - 16), (*(int *)(*(char **)D_00195AA4 + 11) - 50) + (l_1C - 16), (*(int *)(*(char **)D_00195AA4 + 15) + l_24) + (l_18 - 16), 50, l_30, 0);
-    func_00154D00((*(int *)(*(char **)D_00195AA4 + 7) + l_28) + (l_20 - 16), (*(int *)(*(char **)D_00195AA4 + 11) - 50) + (l_1C - 16), (*(int *)(*(char **)D_00195AA4 + 15) + l_24) + (l_18 - 16), 26883, -1, 1, 400);
+    func_000CE6E2((((int)(short)*(short *)(*(char **)player_object + 3)) + *(int *)D_001959BC) & 2047, 192, (int)&l_28, (int)&l_24);
+    func_00136AD8((*(int *)(*(char **)player_object + 7) + l_28) + (l_20 - 16), (*(int *)(*(char **)player_object + 11) - 50) + (l_1C - 16), (*(int *)(*(char **)player_object + 15) + l_24) + (l_18 - 16), 50, l_30, 0);
+    func_00154D00((*(int *)(*(char **)player_object + 7) + l_28) + (l_20 - 16), (*(int *)(*(char **)player_object + 11) - 50) + (l_1C - 16), (*(int *)(*(char **)player_object + 15) + l_24) + (l_18 - 16), 26883, -1, 1, 400);
 }

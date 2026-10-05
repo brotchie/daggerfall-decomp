@@ -4,25 +4,25 @@ struct move { int x, y, z; int f12, f16, f20; };
 struct obj { char pad[7]; struct vec3 pos; };   /* 10.0a packs structs (-zp1) */
 struct plane { char pad[16]; int nx, ny, nz; char pad2[2]; };
 struct planes { int count; struct plane p[1]; };
-extern unsigned char D_001789FA;
+extern unsigned char player_environment;
 extern struct vec3 D_00179F48;
 extern unsigned char D_001940D7;
 extern int D_00195C70;
 extern int D_00195CB8;
-extern unsigned char D_00196277;
-extern int D_00196B0C;
+extern unsigned char player_on_ground;
+extern int collide_candidate_count;
 extern struct vec3 *D_00196D4C;
 extern struct planes *D_00196D50;
 extern int D_00196D60;
-extern short D_00196D64;
-extern void func_000231F5(struct obj *, void (*)(int));
+extern short collide_flags;
+extern void collide_for_each_nearby(struct obj *, void (*)(int));
 extern void func_0002325A(int);
 extern int func_00023FA5(struct obj *, int, struct move *);
-extern void func_0008DEB4(struct obj *, int, int, int, int, int, int);
+extern void object_set_position(struct obj *, int, int, int, int, int, int);
 extern int func_0014B45B(int, int);
 extern void func_0014BDDD(struct vec3 *);
 
-int func_0002257C(struct obj *o, int a2, struct move *m, int a4)
+int collide_move_object(struct obj *o, int a2, struct move *m, int a4)
 {
     int result;
     int unused40;           /* never used, but it has a stack slot */
@@ -42,21 +42,21 @@ int func_0002257C(struct obj *o, int a2, struct move *m, int a4)
     saved_cb8 = D_00195CB8;
     saved_c70 = D_00195C70;
     D_00196D50 = 0;
-    D_00196B0C = 0;
+    collide_candidate_count = 0;
     D_00196D4C = &D_00179F48;
     D_00196D4C->x = m->x;
     D_00196D4C->y = m->y;
     D_00196D4C->z = m->z;
-    func_000231F5(o, func_0002325A);
-    if (D_001789FA != 1 && D_00196B0C == 0)
+    collide_for_each_nearby(o, func_0002325A);
+    if (player_environment != 1 && collide_candidate_count == 0)
         return 0;
-    if (D_00196B0C == 0 && D_001789FA == 1) {
+    if (collide_candidate_count == 0 && player_environment == 1) {
         D_00196D60 = func_0014B45B(o->pos.x, o->pos.z);
-        func_0008DEB4(o, m->x, D_00196D60, m->z, m->f12, m->f16, m->f20);
+        object_set_position(o, m->x, D_00196D60, m->z, m->f12, m->f16, m->f20);
         return 0;
     }
-    flags = D_00196D64;
-    D_00196277 = 1;
+    flags = collide_flags;
+    player_on_ground = 1;
     result = func_00023FA5(o, a2, m);
     D_001940D7 &= 223;
     D_00195CB8 = saved_cb8;
@@ -99,8 +99,8 @@ int func_0002257C(struct obj *o, int a2, struct move *m, int a4)
     m->x = o->pos.x + dx;
     m->y = o->pos.y + dy;
     m->z = o->pos.z + dz;
-    flags = D_00196D64;
-    D_00196277 = 1;
+    flags = collide_flags;
+    player_on_ground = 1;
     result = func_00023FA5(o, a2, m);
     D_00195CB8 = saved_cb8;
     D_00195C70 = saved_c70;

@@ -51,35 +51,35 @@ struct pc {
 extern char D_00175970[];        /* __FILE__ */
 extern unsigned char D_00186DE3[];
 extern unsigned char D_001940D8;
-extern struct obj *D_00195AA0;
+extern struct obj *player_entity;
 extern struct obj *D_00195AC4;
-extern struct pc *D_00195BE0;
-extern unsigned char *D_00195BEC;
-extern unsigned char D_00196268;
+extern struct pc *player_character;
+extern unsigned char *player_class;
+extern unsigned char current_region;
 extern unsigned char D_00196294;
-extern int D_00196A30;
-extern struct dis *func_000191DA(short, int);
+extern int region_dungeon_type_counts;
+extern struct dis *faction_find_type_in_region(short, int);
 extern void func_0001E34D(struct pick *, int, int);
-extern void func_0003F09F(int, int);
-extern void func_0004AB2F(int);
-extern void func_00058E15(int, int);
-extern void func_0005E540(int, int, unsigned char *);
-extern void func_0006630B(struct obj *);
+extern void msgbox_show_rsc(int, int);
+extern void time_pass(int);
+extern void paperdoll_draw(int, int);
+extern void item_make(int, int, unsigned char *);
+extern void disease_toggle_memberships_cb(struct obj *);
 extern void func_00066853(struct obj *, unsigned char);
-extern int func_00067270(void);
-extern void func_00086397(struct pick *);
-extern void func_000876AD(unsigned char, int, unsigned short, int);
-extern void func_0008AF3E(struct obj *, struct pc *);
-extern struct obj *func_0008DCE3(struct obj *, int, int);
-extern void func_0008E3F7(struct obj *, void (*)(struct obj *));
-extern struct obj *func_0008E6C5(struct obj *, short, short);
-extern void func_00097101(struct obj *);
-extern int func_0009A0A0(struct obj *, int, int);
-extern void func_0009A6D0(struct obj *, int);
+extern int disease_is_lycanthrope(void);
+extern void location_free(struct pick *);
+extern void map_goto_location(unsigned char, int, unsigned short, int);
+extern void spfx_cure_disease(struct obj *, struct pc *);
+extern struct obj *object_create_child(struct obj *, int, int);
+extern void object_foreach(struct obj *, void (*)(struct obj *));
+extern struct obj *object_find_item(struct obj *, short, short);
+extern void inv_store_item(struct obj *);
+extern int marker_find_nth(struct obj *, int, int);
+extern void player_to_nearest_marker(struct obj *, int);
 extern int func_0009DC25(void);
 extern void func_000A1023(void *, void *, int, char *, int, int);
 
-void func_0006630B(struct obj *a1)
+void disease_toggle_memberships_cb(struct obj *a1)
 {
     if (a1->type == 10) {
         a1->type = 29;
@@ -89,7 +89,7 @@ void func_0006630B(struct obj *a1)
         a1->type = 10;
 }
 
-void func_00066352(void)
+void disease_become_vampire(void)
 {
     struct pick s;
     int u48;
@@ -106,71 +106,71 @@ void func_00066352(void)
     struct dis *d;
     int excess;
 
-    if (D_00195BE0->f67 > 7 || func_00067270() != 0)
+    if (player_character->f67 > 7 || disease_is_lycanthrope() != 0)
         return;
-    D_00195BE0->f499 = 0;
-    D_00195BE0->f108 = 0;
-    func_0003F09F(401, 1);
+    player_character->f499 = 0;
+    player_character->f108 = 0;
+    msgbox_show_rsc(401, 1);
     saved = D_00196294;
     D_00196294 = 1;
-    func_0004AB2F(30240);
+    time_pass(30240);
     D_00196294 = saved;
-    if (D_00196A30 != 0) {
-        func_0001E34D(&s, 0, func_0009DC25() % D_00196A30);
-        func_000876AD(D_00196268, 3, s.obj->f27, 0);
-        if (func_0009A0A0(D_00195AC4, 9, 0) != 0)
-            func_0009A6D0(D_00195AC4, 9);
-        func_00086397(&s);
+    if (region_dungeon_type_counts != 0) {
+        func_0001E34D(&s, 0, func_0009DC25() % region_dungeon_type_counts);
+        map_goto_location(current_region, 3, s.obj->f27, 0);
+        if (marker_find_nth(D_00195AC4, 9, 0) != 0)
+            player_to_nearest_marker(D_00195AC4, 9);
+        location_free(&s);
     }
-    d = func_000191DA(D_00196268, 7);
+    d = faction_find_type_in_region(current_region, 7);
     if (d != 0)
         kind = d->kind;
     else
         kind = 153;
     D_001940D8 |= 8;
-    D_00195BE0->f64 |= 20;
-    o1 = func_0008DCE3(D_00195AA0, 0, 47);
+    player_character->f64 |= 20;
+    o1 = object_create_child(player_entity, 0, 47);
     o1->type = 11;
     o1->flags = 0x8003;
-    o2 = func_0008DCE3(D_00195AA0, 0, 74);
+    o2 = object_create_child(player_entity, 0, 74);
     o2->type = 28;
     o2->flags = 3;
     p = (struct item *)o1->data;
     p->cond = 100;
-    func_000A1023(o2->data, D_00195BEC, 74, D_00175970, 407, 4);
+    func_000A1023(o2->data, player_class, 74, D_00175970, 407, 4);
     for (i = 0; i < 8; i++) {
         if (i == 1)
             continue;
         p->stats[i] = 20;
-        D_00195BE0->stats[i] += 20;
-        D_00195BE0->maxstats[i] += 20;
-        excess = D_00195BE0->maxstats[i] - 100;
+        player_character->stats[i] += 20;
+        player_character->maxstats[i] += 20;
+        excess = player_character->maxstats[i] - 100;
         if (excess > 0) {
-            D_00195BE0->maxstats[i] -= excess;
-            D_00195BE0->stats[i] -= excess;
+            player_character->maxstats[i] -= excess;
+            player_character->stats[i] -= excess;
             p->stats[i] -= excess;
         }
     }
-    D_00195BE0->f175 += 30;
-    D_00195BE0->f283 += 30;
-    D_00195BE0->f253 += 30;
-    D_00195BE0->f361 += 30;
-    D_00195BE0->f265 += 30;
-    D_00195BE0->f337 += 30;
-    D_00195BEC[1] |= 0x41;
-    D_00195BEC[4] |= 0x30;
-    func_0008AF3E(D_00195AA0, D_00195BE0);
-    func_0008E3F7(D_00195AA0->list, func_0006630B);
-    D_00195BE0->f498 = D_00195BE0->f67;
-    D_00195BE0->f67 = 8;
-    D_00195BE0->f66 = 2;
-    o2 = func_0008E6C5(D_00195AA0->list, 27, 0);
+    player_character->f175 += 30;
+    player_character->f283 += 30;
+    player_character->f253 += 30;
+    player_character->f361 += 30;
+    player_character->f265 += 30;
+    player_character->f337 += 30;
+    player_class[1] |= 0x41;
+    player_class[4] |= 0x30;
+    spfx_cure_disease(player_entity, player_character);
+    object_foreach(player_entity->list, disease_toggle_memberships_cb);
+    player_character->f498 = player_character->f67;
+    player_character->f67 = 8;
+    player_character->f66 = 2;
+    o2 = object_find_item(player_entity->list, 27, 0);
     if (o2 == 0) {
-        o2 = func_0008DCE3(D_00195AC4, 0, 107);
+        o2 = object_create_child(D_00195AC4, 0, 107);
         o2->type = 2;
         o2->flags |= 1;
-        func_0005E540(27, 0, o2->data);
-        func_00097101(o2);
+        item_make(27, 0, o2->data);
+        inv_store_item(o2);
     }
     i = 0;
     while (D_00186DE3[i] != 255)
@@ -190,12 +190,12 @@ void func_00066352(void)
         break;
     case 7:
         p->stats[1] += 20;
-        D_00195BE0->stats[1] += 20;
-        D_00195BE0->maxstats[1] += 20;
-        excess = D_00195BE0->maxstats[i] - 100;
+        player_character->stats[1] += 20;
+        player_character->maxstats[1] += 20;
+        excess = player_character->maxstats[i] - 100;
         if (excess > 0) {
-            D_00195BE0->maxstats[1] -= excess;
-            D_00195BE0->stats[1] -= excess;
+            player_character->maxstats[1] -= excess;
+            player_character->stats[1] -= excess;
             p->stats[1] -= excess;
         }
         break;
@@ -216,6 +216,6 @@ void func_00066352(void)
         func_00066853(o2, 33);
         break;
     }
-    D_00195BE0->f541 = kind;
-    func_00058E15(0, 0);
+    player_character->f541 = kind;
+    paperdoll_draw(0, 0);
 }

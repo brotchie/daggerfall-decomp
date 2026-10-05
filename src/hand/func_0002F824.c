@@ -2,13 +2,13 @@
 struct move { int x, y, z; int f12, f16, f20; char *name; short flags; char pad[26]; int dz; };
 extern char D_00187B44[];
 extern int D_00195C74;
-extern unsigned char D_00196277;
-extern short D_00196D64;
-extern int func_0002257C(char *, int, struct move *, int);
-extern void func_0002E914(char *, int, int);
+extern unsigned char player_on_ground;
+extern short collide_flags;
+extern int collide_move_object(char *, int, struct move *, int);
+extern void damage_apply(char *, int, int);
 extern void func_000CE6E2(int, int, int *, int *);
 
-void func_0002F824(char *a1, char *a2)
+void damage_knockback_move(char *a1, char *a2)
 {
     struct move m;
     int l_30;
@@ -17,7 +17,7 @@ void func_0002F824(char *a1, char *a2)
     int l_18;
     int l_14;
 
-    l_1C = D_00196277;
+    l_1C = player_on_ground;
     l_18 = D_00195C74;
     if (*(short *)(a2 + 110) > 40)
         *(short *)(a2 + 110) = 40;
@@ -30,15 +30,15 @@ void func_0002F824(char *a1, char *a2)
     m.f20 = *(short *)(a1 + 5);
     m.name = D_00187B44;
     m.flags |= 1;
-    D_00196D64 |= 4;
-    func_0002257C(a1, 0, &m, 1);
-    D_00196277 = l_1C;
+    collide_flags |= 4;
+    collide_move_object(a1, 0, &m, 1);
+    player_on_ground = l_1C;
     D_00195C74 = l_18;
-    l_14 = D_00196D64;
+    l_14 = collide_flags;
     if (l_14 & 2) {
         a2[64] &= 223;
         a2[65] |= 8;
-        func_0002E914(a1, *(short *)(a2 + 110) >> 1, 0);
+        damage_apply(a1, *(short *)(a2 + 110) >> 1, 0);
     } else {
         *(short *)(a2 + 110) -= 5;
         if (*(short *)(a2 + 110) <= 5) {

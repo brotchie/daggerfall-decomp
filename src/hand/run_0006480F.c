@@ -11,57 +11,57 @@ struct link {
 };
 #pragma pack()
 extern struct link D_00199D78[];
-extern struct link *D_001A3978[];
-extern int D_001A3A78;
-extern int D_001A3A7C;
-extern void func_000654EA(struct link *);
+extern struct link *active_links[];
+extern int link_count;
+extern int active_link_count;
+extern void link_start(struct link *);
 extern int func_000CE44C(struct link **, struct link *, int);
 extern char D_00175962[];
-extern int func_0006480F(int);
+extern int link_step(int);
 extern int func_000A1023();
-extern char D_00143550[];
+extern char screen_buffer[];
 extern char D_00147954[];
 extern char D_0017596A[];
 extern char D_001940DA[];
-extern char D_001952EC[];
+extern char quest_global_states[];
 extern char D_00195798[];
 extern char D_001957CD[];
 extern char D_001957E9[];
-extern char D_001959AC[];
-extern char D_00195AA0[];
-extern char D_00195AA4[];
+extern char frame_counter[];
+extern char player_entity[];
+extern char player_object[];
 extern char D_00195AB0[];
-extern char D_00195BE0[];
+extern char player_character[];
 extern char D_0019621B[];
 extern char D_00196222[];
 extern char D_00196226[];
 extern char D_0019622A[];
-extern char D_00196276[];
+extern char interaction_mode[];
 extern char D_0019628C[];
 extern char D_001A3A80[];
 extern char D_001A3A81[];
-extern int func_0002E914(int, int, int);
-extern void func_0003F09F(int, int);
-extern int func_0005AAE4(int, int, int);
-extern void func_0006530C(int);
-extern int func_00065398(int, int);
-extern void func_0006546F(int, int);
+extern int damage_apply(int, int, int);
+extern void msgbox_show_rsc(int, int);
+extern int cast_creature_spell(int, int, int);
+extern void link_show_text(int);
+extern int link_answer_matches(int, int);
+extern void link_hurt_player(int, int);
 extern void func_00065748(short, unsigned char);
 extern int func_00065864(int);
-extern void func_00065937(int, int, int, int);
+extern void disease_infect(int, int, int, int);
 extern void func_00065A8C(int, int, int);
-extern int func_00069938(int, int, int);
-extern int func_0007CBA1(int);
-extern void func_0007CC66(void);
-extern int func_0007D6AE(int, int);
-extern void func_0008C566(int, short);
-extern int func_0008C5C9(void);
-extern void func_0008DEB4(int, int, int, int, int, int, int);
-extern int func_00099922(int, int);
+extern int sound_play(int, int, int);
+extern int hud_message_add(int);
+extern void hud_messages_draw(void);
+extern int rand_range(int, int);
+extern void inpstr_begin_text(int, short);
+extern int inpstr_update(void);
+extern void object_set_position(int, int, int, int, int, int, int);
+extern int door_start_swing(int, int);
 extern int func_000CDD81();
 extern int func_00142790();
 
-void func_00064589(int a1, int a2)
+void links_trigger(int a1, int a2)
 {
     int i;
     int j;
@@ -70,9 +70,9 @@ void func_00064589(int a1, int a2)
     short id;
 
     i = 0;
-    if (D_001A3A78 == 0) return;
+    if (link_count == 0) return;
     id = *(short *)((char *)a1 + 31);
-    while (i < D_001A3A78) {
+    while (i < link_count) {
         if (D_00199D78[i].type != 0 && D_00199D78[i].id == id) {
             if (D_00199D78[i].type < 8 || D_00199D78[i].type > 9) {
                 if (D_00199D78[i].type != a2) return;
@@ -84,17 +84,17 @@ void func_00064589(int a1, int a2)
                     return;
             }
             p = &D_00199D78[i];
-            if (func_000CE44C(D_001A3978, p, D_001A3A7C) != 0) return;
-            D_001A3978[D_001A3A7C++] = p;
+            if (func_000CE44C(active_links, p, active_link_count) != 0) return;
+            active_links[active_link_count++] = p;
             n = p->count + 1;
             for (j = 0; j < n; j++, p++)
-                func_000654EA(p);
+                link_start(p);
         }
         i++;
     }
 }
 
-void func_00064708(void)
+void links_update(void)
 {
     int i;
     int n;
@@ -102,12 +102,12 @@ void func_00064708(void)
     int sum;
     struct link *p;
 
-    for (i = 0; i < D_001A3A7C; i++) {
-        p = D_001A3978[i];
+    for (i = 0; i < active_link_count; i++) {
+        p = active_links[i];
         n = p->count + 1;
         sum = j = 0;
         for (; j < n; j++, p++) {
-            sum += func_0006480F((int)p);
+            sum += link_step((int)p);
             if ((p->flags & 16) != 0) {
                 sum = 0;
                 p->flags &= 239;
@@ -115,15 +115,15 @@ void func_00064708(void)
             }
         }
         if (sum == 0) {
-            if (D_001A3A7C - 1 > i)
-                func_000A1023(&D_001A3978[i], &D_001A3978[i + 1], (D_001A3A7C - i) * 4 - 4, D_00175962, 187, 4);
-            D_001A3A7C--;
+            if (active_link_count - 1 > i)
+                func_000A1023(&active_links[i], &active_links[i + 1], (active_link_count - i) * 4 - 4, D_00175962, 187, 4);
+            active_link_count--;
             i--;
         }
     }
 }
 
-int func_0006480F(int a1)
+int link_step(int a1)
 {
     int l_40;
     int l_3C;
@@ -161,7 +161,7 @@ L6490F:;
 L64932:;
     goto L6494F;
 L64934:;
-    func_00069938((int)(unsigned char)*(signed char *)((char *)a1 + 3), *(int *)((char *)a1 + 35), 110);
+    sound_play((int)(unsigned char)*(signed char *)((char *)a1 + 3), *(int *)((char *)a1 + 35), 110);
 L6494F:;
     *(signed char *)((char *)a1 + 12) |= 4;
 L64956:;
@@ -170,7 +170,7 @@ L64956:;
 L64971:;
     goto L64A1D;
 L64976:;
-    *(int *)(*(char **)((char *)a1 + 35) + 43) = *(int *)D_001959AC;
+    *(int *)(*(char **)((char *)a1 + 35) + 43) = *(int *)frame_counter;
 L64A1D:;
     switch (*(unsigned char *)((char *)a1 + 9)) {
 case 129:
@@ -256,7 +256,7 @@ case 9:
     *(int *)D_00195798 -= *(int *)D_00195AB0;
     if (*(int *)D_00195798 > 0) goto L64E69;
     *(int *)D_00195798 = 1000;
-    *(signed char *)D_001957CD = *(signed char *)(*(char **)D_00195BE0 + 129);
+    *(signed char *)D_001957CD = *(signed char *)(*(char **)player_character + 129);
     l_40 = 0;
 L64DD5:;
     if (l_40 < 35) goto L64DE5;
@@ -272,48 +272,48 @@ L64DF4:;
     *(int *)D_00196226 = *(int *)(*(char **)((char *)a1 + 35) + 11) - 40;
     *(int *)D_0019622A = *(int *)(*(char **)((char *)a1 + 35) + 15);
     if (*(signed char *)((char *)func_00065864((int)(unsigned char)*(signed char *)((char *)a1 + 3)) + 7) != 0) goto L64E51;
-    func_0005AAE4(*(int *)D_00195AA0, *(int *)D_00195AA0, (int)(unsigned char)*(signed char *)((char *)a1 + 3));
+    cast_creature_spell(*(int *)player_entity, *(int *)player_entity, (int)(unsigned char)*(signed char *)((char *)a1 + 3));
     goto L64E69;
 L64E51:;
-    func_0005AAE4((int)D_0019621B, *(int *)D_00195AA0, (int)(unsigned char)*(signed char *)((char *)a1 + 3));
+    cast_creature_spell((int)D_0019621B, *(int *)player_entity, (int)(unsigned char)*(signed char *)((char *)a1 + 3));
 L64E69:;
     goto L652AB;
 case 10:
     goto L652AB;
 case 11:
-    func_0003F09F((int)(short)(((unsigned short)(unsigned char)*(signed char *)((char *)a1 + 3)) + 8600), 1);
+    msgbox_show_rsc((int)(short)(((unsigned short)(unsigned char)*(signed char *)((char *)a1 + 3)) + 8600), 1);
     goto L652AB;
 case 12:
     func_000A1023(*(int *)D_00147954, 655360, 64000, (int)D_00175962, 315, 4);
     *(signed char *)D_001940DA |= 1;
-    func_0006530C(((int)(unsigned char)*(signed char *)((char *)a1 + 3)) + 5400);
-    l_30 = func_0007CBA1((int)D_0017596A);
+    link_show_text(((int)(unsigned char)*(signed char *)((char *)a1 + 3)) + 5400);
+    l_30 = hud_message_add((int)D_0017596A);
     *(signed char *)((char *)l_30 + 3) = 0;
     func_00142790();
-    func_0008C566(l_30 + 2, 16);
+    inpstr_begin_text(l_30 + 2, 16);
 L64EF5:;
-    if (func_0008C5C9() != 0) goto L64F30;
-    func_000A1023(*(int *)D_00143550, *(int *)D_00147954, 64000, (int)D_00175962, 324, 4);
-    func_0007CC66();
+    if (inpstr_update() != 0) goto L64F30;
+    func_000A1023(*(int *)screen_buffer, *(int *)D_00147954, 64000, (int)D_00175962, 324, 4);
+    hud_messages_draw();
     func_000CDD81(1);
     goto L64EF5;
 L64F30:;
     *(signed char *)D_001940DA &= 254;
-    if (func_00065398(((int)(unsigned char)*(signed char *)((char *)a1 + 3)) + 5656, l_30 + 2) != 0) goto L64F5D;
+    if (link_answer_matches(((int)(unsigned char)*(signed char *)((char *)a1 + 3)) + 5656, l_30 + 2) != 0) goto L64F5D;
     *(signed char *)((char *)a1 + 12) |= 16;
 L64F5D:;
     goto L652AB;
 case 13:
     goto L652AB;
 case 14:
-    func_0008DEB4(*(int *)D_00195AA4, *(int *)(*(char **)((char *)a1 + 74) + 7), *(int *)(*(char **)((char *)a1 + 74) + 11), *(int *)(*(char **)((char *)a1 + 74) + 15), (int)(short)*(short *)(*(char **)D_00195AA4 + 1), (int)(short)*(short *)(*(char **)D_00195AA4 + 3), (int)(short)*(short *)(*(char **)D_00195AA4 + 5));
+    object_set_position(*(int *)player_object, *(int *)(*(char **)((char *)a1 + 74) + 7), *(int *)(*(char **)((char *)a1 + 74) + 11), *(int *)(*(char **)((char *)a1 + 74) + 15), (int)(short)*(short *)(*(char **)player_object + 1), (int)(short)*(short *)(*(char **)player_object + 3), (int)(short)*(short *)(*(char **)player_object + 5));
     goto L652AB;
 case 15:
     *(short *)(*(char **)((char *)a1 + 35) + 23) = (unsigned short)(unsigned char)*(signed char *)((char *)a1 + 4);
     goto L652AB;
 case 16:
     if (((int)(unsigned short)(*(short *)(*(char **)((char *)a1 + 35) + 21) & 64)) == 0) goto L64FEF;
-    if (func_00099922(*(int *)((char *)a1 + 35), 0) != 0) goto L64FF1;
+    if (door_start_swing(*(int *)((char *)a1 + 35), 0) != 0) goto L64FF1;
 L64FEF:;
     goto L64FFB;
 L64FF1:;
@@ -324,13 +324,13 @@ case 17:
     *(signed char *)(*(char **)((char *)a1 + 35) + 21) |= 64;
     goto L652AB;
 case 18:
-    if (func_00099922(*(int *)((char *)a1 + 35), 0) == 0) goto L6502C;
+    if (door_start_swing(*(int *)((char *)a1 + 35), 0) == 0) goto L6502C;
     *(short *)(*(char **)((char *)a1 + 35) + 21) |= 320;
 L6502C:;
     goto L652AB;
 case 19:
     if (((int)(unsigned short)(*(short *)(*(char **)((char *)a1 + 35) + 21) & 256)) == 0) goto L6505D;
-    if (func_00099922(*(int *)((char *)a1 + 35), 1) != 0) goto L6505F;
+    if (door_start_swing(*(int *)((char *)a1 + 35), 1) != 0) goto L6505F;
 L6505D:;
     goto L65069;
 L6505F:;
@@ -339,7 +339,7 @@ L65069:;
     goto L652AB;
 case 20:
     if (((int)(unsigned short)(*(short *)(*(char **)((char *)a1 + 35) + 21) & 256)) == 0) goto L6509A;
-    if (func_00099922(*(int *)((char *)a1 + 35), 1) != 0) goto L6509C;
+    if (door_start_swing(*(int *)((char *)a1 + 35), 1) != 0) goto L6509C;
 L6509A:;
     goto L650A6;
 L6509C:;
@@ -351,61 +351,61 @@ case 21:
     *(int *)D_00195798 -= *(int *)D_00195AB0;
     if (*(int *)D_00195798 > 0) goto L65124;
     *(int *)D_00195798 = 1000;
-    l_34 = func_0007D6AE((int)(unsigned char)*(signed char *)((char *)a1 + 3), (int)(unsigned char)*(signed char *)((char *)a1 + 4)) * ((int)(unsigned char)*(signed char *)(*(char **)D_00195BE0 + 129));
+    l_34 = rand_range((int)(unsigned char)*(signed char *)((char *)a1 + 3), (int)(unsigned char)*(signed char *)((char *)a1 + 4)) * ((int)(unsigned char)*(signed char *)(*(char **)player_character + 129));
     if (l_34 != 0) goto L65115;
-    l_34 = (int)(unsigned char)*(signed char *)(*(char **)D_00195BE0 + 129);
+    l_34 = (int)(unsigned char)*(signed char *)(*(char **)player_character + 129);
 L65115:;
-    func_0002E914(*(int *)D_00195AA0, l_34, 0);
+    damage_apply(*(int *)player_entity, l_34, 0);
 L65124:;
     goto L652AB;
 case 22:
-    func_0006546F(3, (int)(unsigned char)*(signed char *)((char *)a1 + 4));
+    link_hurt_player(3, (int)(unsigned char)*(signed char *)((char *)a1 + 4));
     goto L652AB;
 case 23:
-    func_0006546F(0, (int)(unsigned char)*(signed char *)((char *)a1 + 4));
+    link_hurt_player(0, (int)(unsigned char)*(signed char *)((char *)a1 + 4));
     goto L652AB;
 case 24:
-    func_0006546F(1, (int)(unsigned char)*(signed char *)((char *)a1 + 4));
+    link_hurt_player(1, (int)(unsigned char)*(signed char *)((char *)a1 + 4));
     goto L652AB;
 case 25:
-    func_0006546F(2, (int)(unsigned char)*(signed char *)((char *)a1 + 4));
+    link_hurt_player(2, (int)(unsigned char)*(signed char *)((char *)a1 + 4));
     goto L652AB;
 case 26:
     *(int *)D_00195798 -= *(int *)D_00195AB0;
     if (*(int *)D_00195798 > 0) goto L651BE;
     *(int *)D_00195798 = 1000;
-    func_00065A8C(*(int *)D_00195AA0, (int)&*(signed char *)((char *)func_0007D6AE(0, 11) + 128), 0);
+    func_00065A8C(*(int *)player_entity, (int)&*(signed char *)((char *)rand_range(0, 11) + 128), 0);
 L651BE:;
     goto L652AB;
 case 27:
     *(int *)D_00195798 -= *(int *)D_00195AB0;
     if (*(int *)D_00195798 > 0) goto L65200;
     *(int *)D_00195798 = 1000;
-    func_00065937(*(int *)D_00195AA0, 0, func_0007D6AE(0, 16), 0);
+    disease_infect(*(int *)player_entity, 0, rand_range(0, 16), 0);
 L65200:;
     goto L652AB;
 case 28:
     if (*(signed char *)((char *)a1 + 4) == 0) goto L65224;
-    *(short *)(*(char **)D_00195BE0 + 141) -= (unsigned short)(unsigned char)*(signed char *)((char *)a1 + 4);
+    *(short *)(*(char **)player_character + 141) -= (unsigned short)(unsigned char)*(signed char *)((char *)a1 + 4);
     goto L65230;
 L65224:;
-    (*(short *)(*(char **)D_00195BE0 + 141))--;
+    (*(short *)(*(char **)player_character + 141))--;
 L65230:;
     goto L652AB;
 case 29:
     goto L652AB;
 case 30:
     if (*(signed char *)((char *)a1 + 3) == 0) goto L6525E;
-    func_00069938((int)(unsigned char)*(signed char *)((char *)a1 + 3), *(int *)((char *)a1 + 35), 110);
+    sound_play((int)(unsigned char)*(signed char *)((char *)a1 + 3), *(int *)((char *)a1 + 35), 110);
 L6525E:;
     goto L652AB;
 case 31:
-    *(signed char *)(D_001952EC + ((int)(unsigned char)*(signed char *)((char *)a1 + 4))) = 1;
+    *(signed char *)(quest_global_states + ((int)(unsigned char)*(signed char *)((char *)a1 + 4))) = 1;
     goto L652AB;
 case 99:
-    if (((int)(unsigned char)*(signed char *)D_00196276) != 1) goto L652A0;
+    if (((int)(unsigned char)*(signed char *)interaction_mode) != 1) goto L652A0;
     if (*(signed char *)((char *)a1 + 3) == 0) goto L6529E;
-    func_0006530C(((int)(unsigned char)*(signed char *)((char *)a1 + 3)) + 7700);
+    link_show_text(((int)(unsigned char)*(signed char *)((char *)a1 + 3)) + 7700);
 L6529E:;
     goto L652AB;
 L652A0:;

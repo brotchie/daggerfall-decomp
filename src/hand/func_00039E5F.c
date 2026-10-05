@@ -9,12 +9,12 @@ struct Ent {
 extern char D_00170B13[];
 extern char D_00170B69[];
 extern char *D_00195C44;
-extern void func_0006CB53(char *, char *);
+extern void disk_read_file(char *, char *);
 extern void func_000A0AD9(char *, char *, int, char *, int);
 extern int func_000A0DF4(char *);
 extern char *func_000A1079(char *, int, int);
 
-char **func_00039E5F(char *keys)
+char **spells_std_names_for_ids(char *keys)
 {
     char **list;
     char *str;
@@ -28,7 +28,7 @@ char **func_00039E5F(char *keys)
     list = (char **)(D_00195C44 + 20000);
     str = D_00195C44 + 21000;
     tbl = (struct Ent *)D_00195C44;
-    func_0006CB53(D_00170B69, D_00195C44);
+    disk_read_file(D_00170B69, D_00195C44);
     for (cnt = i = 0; i < n; i++) {
         j = 0;
         while (j < 128) {

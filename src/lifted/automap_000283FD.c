@@ -5,7 +5,7 @@ extern char D_00195C44[];
 extern char D_00196D88[];
 extern char D_00196D8C[];
 
-extern int func_0005A4A9(int);
+extern int font_text_width(int);
 extern int func_000A0DF4();
 
 int func_000283FD(int a1, int a2)
@@ -29,7 +29,7 @@ L28422:;
 L28478:;
     goto L2848D;
 L2847A:;
-    if ((func_0005A4A9(l_1C + 4) + l_24) >= a1) goto L2848F;
+    if ((font_text_width(l_1C + 4) + l_24) >= a1) goto L2848F;
 L2848D:;
     goto L2849A;
 L2848F:;

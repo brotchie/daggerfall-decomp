@@ -1,29 +1,29 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x00040FC1 */
 struct row { short v; char pad[78]; };
 struct ent { char pad[0x7c]; short f7c; };
-extern struct row D_0018F08E[];
-extern int D_00195AA0;
-extern struct ent *D_00195BE0;
-extern unsigned char D_00196268;
-extern unsigned char D_0019627E;
-extern int func_00020C87(unsigned char);
-extern void func_0002ECBE(int);
+extern struct row region_legal_reputation[];
+extern int player_entity;
+extern struct ent *player_character;
+extern unsigned char current_region;
+extern unsigned char crime_current;
+extern int court_open(unsigned char);
+extern void damage_creature_death(int);
 extern int func_0009DC25(void);
 
-void func_00040FC1(int a1)
+void crime_guards_or_court(int a1)
 {
     int v;
 
-    v = D_0018F08E[D_00196268].v;
-    D_00195BE0->f7c = 1;
+    v = region_legal_reputation[current_region].v;
+    player_character->f7c = 1;
     if (v < -20 && a1 == 0) {
-        func_0002ECBE(D_00195AA0);
+        damage_creature_death(player_entity);
     } else if (v >= -20 && v <= 0) {
         if ((func_0009DC25() & 1) && a1 == 0)
-            func_0002ECBE(D_00195AA0);
+            damage_creature_death(player_entity);
         else
-            func_00020C87(D_0019627E);
+            court_open(crime_current);
     } else {
-        func_00020C87(D_0019627E);
+        court_open(crime_current);
     }
 }

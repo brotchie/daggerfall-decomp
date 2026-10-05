@@ -10,9 +10,9 @@ extern int func_000A006E();
 extern int func_000A00AF();
 extern int func_000A00CB();
 #pragma aux sosconv "*" parm caller [] value [eax] modify [eax ebx ecx edx];
-#pragma aux (sosconv) func_0001198A;
+#pragma aux (sosconv) sos_load_file;
 
-int func_0001198A(int a1)
+int sos_load_file(int a1)
 {
     int l_18;
     int l_14;

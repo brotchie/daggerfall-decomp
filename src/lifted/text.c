@@ -6,21 +6,21 @@ struct bf8_0_4 { unsigned char f:4; };
 struct bf8_5_1 { unsigned char _:5; unsigned char f:1; };
 struct bf8_6_1 { unsigned char _:6; unsigned char f:1; };
 extern char D_000CEA24[];
-extern char D_0012AC00[];
-extern char D_0012AC04[];
-extern char D_0012AC06[];
+extern char mouse_buttons[];
+extern char mouse_x[];
+extern char mouse_y[];
 extern char D_0012B508[];
-extern char D_00142308[];
-extern char D_00142309[];
-extern char D_00142325[];
-extern char D_00142332[];
-extern char D_00142335[];
-extern char D_00143550[];
+extern char key_down[];
+extern char key_down_esc[];
+extern char key_down_ctrl[];
+extern char key_down_lshift[];
+extern char key_down_x[];
+extern char screen_buffer[];
 extern char D_00147954[];
 extern char D_00170D55[];
 extern char D_00170DAE[];
 extern char D_00170DB7[];
-extern char D_001789FA[];
+extern char player_environment[];
 extern char D_00178A14[];
 extern char D_0017B62F[];
 extern char D_0017B64F[];
@@ -32,69 +32,69 @@ extern char D_001940D4[];
 extern char D_001940D5[];
 extern char D_001940D6[];
 extern char D_001940DA[];
-extern char D_001959AC[];
-extern char D_00195AA4[];
+extern char frame_counter[];
+extern char player_object[];
 extern char D_00195AA8[];
 extern char D_00195AB0[];
 extern char D_00195AC4[];
-extern char D_00195B14[];
-extern char D_00195B90[];
-extern char D_00195BDC[];
-extern char D_00195BE0[];
+extern char creature_count[];
+extern char buttons_rci[];
+extern char current_location[];
+extern char player_character[];
 extern char D_00195C40[];
-extern char D_00195E2A[];
+extern char climate_weathers[];
 extern char D_00195F2E[];
 extern char D_00195F34[];
 extern char D_00195F38[];
-extern char D_00196033[];
+extern char msgbox_button_keys[];
 extern char D_00196034[];
 extern char D_00196035[];
-extern char D_0019608F[];
+extern char msgbox_button_ids[];
 extern char D_00196090[];
 extern char D_00196091[];
-extern char D_00196268[];
-extern char D_00196270[];
+extern char current_region[];
+extern char msgbox_kind[];
 extern char D_00196271[];
 extern char D_00196272[];
-extern char D_00196274[];
-extern char D_00196279[];
+extern char game_mode[];
+extern char mouse_buttons_prev[];
 extern char D_0019628E[];
 extern char D_00196DA4[];
-extern char D_00199648[];
-extern char D_0019964C[];
-extern char D_00199650[];
-extern char D_00199654[];
-extern char D_0019965C[];
+extern char msgbox_spop_tiles[];
+extern char msgbox_mpop_tiles[];
+extern char msgbox_next_page[];
+extern char msgbox_image[];
+extern char msgbox_saved_screen[];
 extern char D_00199668[];
 extern char D_0019966A[];
 extern char D_0019966C[];
-extern char D_00199670[];
+extern char people_list[];
 extern char D_001996E8[];
 extern char D_001996EC[];
-extern char D_001996F0[];
-extern char D_001996F4[];
-extern char D_00199764[];
+extern char people_spawn_range[];
+extern char people_count[];
+extern char current_quest[];
 extern char D_00199808[];
 
-extern int func_000191DA(int, short);
-extern int func_0001FFF1(void);
+extern int faction_find_type_in_region(int, short);
+extern int climate_category(void);
 extern int func_00023DE0(int, int);
-extern int func_0003D412(int, int, int);
+extern int text_rsc_load(int, int, int);
 extern int func_0003E6B1(int, short, int, short);
-extern int func_0003E8A8(short, int, int);
-extern int func_0003EAB4(int, short, int, int);
+extern int msgbox_render_rsc(short, int, int);
+extern int msgbox_render_quest_text(int, short, int, int);
 extern int func_000404D9(int, int);
-extern int func_00062EF7(int, int, int);
-extern int func_00069938(int, int, int);
-extern int func_0006CB53(int, int);
-extern int func_00077960(int, int, int);
-extern int func_0007D068(unsigned char);
-extern int func_0007D6AE(int, int);
-extern int func_0008661C(int, int);
-extern int func_0008C5C9(void);
-extern int func_0008DA91(int);
-extern int func_0008DCE3(int, int, int);
-extern int func_0008EB88(int);
+extern int ai_angle_diff(int, int, int);
+extern int sound_play(int, int, int);
+extern int disk_read_file(int, int);
+extern int spawn_find_point(int, int, int);
+extern int key_pressed_once(unsigned char);
+extern int rand_range(int, int);
+extern int location_contains(int, int);
+extern int inpstr_update(void);
+extern int object_delete(int);
+extern int object_create_child(int, int, int);
+extern int object_new_id(int);
 extern int func_0009DC25();
 extern int func_0009DEAC();
 extern int func_000A0024();
@@ -111,29 +111,29 @@ extern int func_00144FB4();
 extern int func_0014B45B();
 extern unsigned char func_0002021B(int, int);
 extern void func_00013D2D(int);
-extern void func_0003DCF4(int, int);
+extern void msgbox_render(int, int);
 extern void func_0003F630(int);
-extern void func_00040C87(int);
-extern void func_000410D7(int);
-extern void func_000425F2(void);
-extern void func_0004FF57(int);
+extern void guards_summon(int);
+extern void person_pick_sprite(int);
+extern void keys_world_actions(void);
+extern void game_exit(int);
 extern void func_0006987B(void);
-extern void func_00078566(int, int);
-extern void func_0007D0DA(void);
-extern void func_0007D12D(void);
+extern void monster_init(int, int);
+extern void mode_push(void);
+extern void mode_pop(void);
 extern void func_00080637(void);
-extern void func_00081425(void);
-int func_0003F89F(short, short);
+extern void player_movement_update(void);
+int msgbox_button_at(short, short);
 int func_0003FDD2(int, int);
-int func_0004037E(void);
+int people_max_count(void);
 int func_000406DC(int, int);
 int func_00040794(int, int);
 int func_0004083A(int, int, int);
 int func_00040983(int, int);
-void func_0003F25E(void);
-void func_0003F358(void);
-void func_0003F557(void);
-void func_000401F1(int);
+void msgbox_wait(void);
+void msgbox_update(void);
+void msgbox_close(void);
+void person_place(int);
 void func_000405EB(void);
 
 void func_0003E653(int a1, int a2)
@@ -156,88 +156,88 @@ L3E69B:;
     *(signed char *)((char *)l_14 + 1) = 0;
 }
 
-void func_0003E942(int a1)
+void msgbox_show_more_pages(int a1)
 {
 L3E953:;
-    if (*(int *)D_00199650 == 0) goto L3EA3A;
-    func_000A1023(*(int *)D_00147954, *(int *)D_00143550, 64000, (int)D_00170D55, 607, 4);
-    *(signed char *)D_00196270 = 1;
-    func_0007D0DA();
-    *(signed char *)D_00196274 = 8;
+    if (*(int *)msgbox_next_page == 0) goto L3EA3A;
+    func_000A1023(*(int *)D_00147954, *(int *)screen_buffer, 64000, (int)D_00170D55, 607, 4);
+    *(signed char *)msgbox_kind = 1;
+    mode_push();
+    *(signed char *)game_mode = 8;
     *(signed char *)D_00196272 = 1;
 L3E99B:;
-    if (*(signed char *)D_0012AC00 == 0) goto L3E9AB;
+    if (*(signed char *)mouse_buttons == 0) goto L3E9AB;
     func_0012B136();
     goto L3E99B;
 L3E9AB:;
-    *(signed char *)D_0012AC00 = (*(signed char *)D_00196279 = 0);
+    *(signed char *)mouse_buttons = (*(signed char *)mouse_buttons_prev = 0);
 L3E9BC:;
-    if (((int)(unsigned char)*(signed char *)D_00196274) != 8) goto L3EA01;
-    func_000A1023(*(int *)D_00143550, *(int *)D_00147954, 64000, (int)D_00170D55, 618, 4);
-    func_000425F2();
-    func_0003F358();
-    func_00081425();
+    if (((int)(unsigned char)*(signed char *)game_mode) != 8) goto L3EA01;
+    func_000A1023(*(int *)screen_buffer, *(int *)D_00147954, 64000, (int)D_00170D55, 618, 4);
+    keys_world_actions();
+    msgbox_update();
+    player_movement_update();
     func_000CDD81(0);
     goto L3E9BC;
 L3EA01:;
-    if (*(int *)D_00199650 == 0) goto L3EA35;
+    if (*(int *)msgbox_next_page == 0) goto L3EA35;
     *(signed char *)D_0012B508 = 146;
-    func_0003DCF4(*(int *)D_00199650, a1);
+    msgbox_render(*(int *)msgbox_next_page, a1);
 L3EA1E:;
-    if (*(signed char *)D_0012AC00 == 0) goto L3EA2E;
+    if (*(signed char *)mouse_buttons == 0) goto L3EA2E;
     func_0012B136();
     goto L3EA1E;
 L3EA2E:;
-    *(signed char *)D_00196279 = 0;
+    *(signed char *)mouse_buttons_prev = 0;
 L3EA35:;
     goto L3E953;
 L3EA3A:;
-    *(signed char *)D_00196270 = 1;
-    func_0007D0DA();
-    *(signed char *)D_00196274 = 8;
+    *(signed char *)msgbox_kind = 1;
+    mode_push();
+    *(signed char *)game_mode = 8;
     *(signed char *)D_00196272 = 1;
-    *(signed char *)D_0012AC00 = (*(signed char *)D_00196279 = 0);
+    *(signed char *)mouse_buttons = (*(signed char *)mouse_buttons_prev = 0);
 L3EA65:;
-    if (((int)(unsigned char)*(signed char *)D_00196274) != 8) return;
-    func_000A1023(*(int *)D_00143550, *(int *)D_00147954, 64000, (int)D_00170D55, 641, 4);
-    func_000425F2();
-    func_0003F358();
-    func_00081425();
+    if (((int)(unsigned char)*(signed char *)game_mode) != 8) return;
+    func_000A1023(*(int *)screen_buffer, *(int *)D_00147954, 64000, (int)D_00170D55, 641, 4);
+    keys_world_actions();
+    msgbox_update();
+    player_movement_update();
     func_000CDD81(0);
     goto L3EA65;
 }
 
-void func_0003EDF4(int a1, short a2, int a3)
+void msgbox_show_quest_text(int a1, short a2, int a3)
 {
     int l_18;
 
-    if (*(signed char *)D_00196270 != 0) return;
-    *(int *)D_00199764 = a1;
-    *(int *)D_0019965C = func_000A00AF(64000, (int)D_00170D55, 735);
-    func_000A1023(*(int *)D_0019965C, *(int *)D_00143550, 64000, (int)D_00170D55, 736, 4);
+    if (*(signed char *)msgbox_kind != 0) return;
+    *(int *)current_quest = a1;
+    *(int *)msgbox_saved_screen = func_000A00AF(64000, (int)D_00170D55, 735);
+    func_000A1023(*(int *)msgbox_saved_screen, *(int *)screen_buffer, 64000, (int)D_00170D55, 736, 4);
     func_0012DB50(4);
     if (((int)(short)*(short *)&a3) != 5) goto L3EE8D;
     *(signed char *)D_00196271 = 0;
-    l_18 = func_0003EAB4(a1, (int)(short)a2, (int)D_00199654, 4);
+    l_18 = msgbox_render_quest_text(a1, (int)(short)a2, (int)msgbox_image, 4);
     goto L3EEA3;
 L3EE8D:;
-    l_18 = func_0003EAB4(a1, (int)(short)a2, (int)D_00199654, 0);
+    l_18 = msgbox_render_quest_text(a1, (int)(short)a2, (int)msgbox_image, 0);
 L3EEA3:;
     if (l_18 == 0) return;
-    *(signed char *)D_00196270 = *(signed char *)&a3;
-    func_0007D0DA();
-    *(signed char *)D_00196274 = 8;
+    *(signed char *)msgbox_kind = *(signed char *)&a3;
+    mode_push();
+    *(signed char *)game_mode = 8;
     *(signed char *)D_00196272 = 1;
-    *(signed char *)D_00196279 = *(signed char *)D_0012AC00;
+    *(signed char *)mouse_buttons_prev = *(signed char *)mouse_buttons;
     func_0012B136();
-    func_0003F25E();
+    msgbox_wait();
 }
 
 void func_0003EFF9(int a1, short a2)
 {
     int l_18;
 
-    *(int *)D_00199764 = a1;
+    *(int *)current_quest = a1;
     l_18 = func_0003E6B1(a1, (int)(short)a2, 0, 280);
     if (l_18 == 0) goto L3F038;
     if (*(signed char *)((char *)l_18) != 0) goto L3F03A;
@@ -253,7 +253,7 @@ void func_0003F052(short a1)
 {
     int l_1C;
 
-    l_1C = func_0003D412((int)(short)a1, 0, 280);
+    l_1C = text_rsc_load((int)(short)a1, 0, 280);
     if (l_1C == 0) goto L3F084;
     if (*(signed char *)((char *)l_1C) != 0) goto L3F086;
 L3F084:;
@@ -264,109 +264,109 @@ L3F086:;
 }
 }
 
-void func_0003F09F(int a1, int a2)
+void msgbox_show_rsc(int a1, int a2)
 {
 {
     int l_1C;
 
-    if (*(signed char *)D_00196270 != 0) return;
+    if (*(signed char *)msgbox_kind != 0) return;
     func_00080637();
-    *(int *)D_0019965C = func_000A00AF(64000, (int)D_00170D55, 824);
-    func_000A1023(*(int *)D_0019965C, *(int *)D_00143550, 64000, (int)D_00170D55, 825, 4);
+    *(int *)msgbox_saved_screen = func_000A00AF(64000, (int)D_00170D55, 824);
+    func_000A1023(*(int *)msgbox_saved_screen, *(int *)screen_buffer, 64000, (int)D_00170D55, 825, 4);
     func_0012DB50(4);
     if (((int)(short)*(short *)&a2) != 5) goto L3F130;
     *(signed char *)D_00196271 = 0;
-    l_1C = func_0003E8A8((int)(short)*(short *)&a1, (int)D_00199654, 4);
+    l_1C = msgbox_render_rsc((int)(short)*(short *)&a1, (int)msgbox_image, 4);
     goto L3F143;
 L3F130:;
-    l_1C = func_0003E8A8((int)(short)*(short *)&a1, (int)D_00199654, 0);
+    l_1C = msgbox_render_rsc((int)(short)*(short *)&a1, (int)msgbox_image, 0);
 L3F143:;
     if (l_1C == 0) return;
-    *(signed char *)D_00196270 = *(signed char *)&a2;
-    func_0007D0DA();
-    *(signed char *)D_00196274 = 8;
+    *(signed char *)msgbox_kind = *(signed char *)&a2;
+    mode_push();
+    *(signed char *)game_mode = 8;
     *(signed char *)D_00196272 = 1;
-    *(signed char *)D_00196279 = *(signed char *)D_0012AC00;
+    *(signed char *)mouse_buttons_prev = *(signed char *)mouse_buttons;
     func_0012B136();
-    func_0003F25E();
+    msgbox_wait();
 }
 }
 
-void func_0003F181(int a1, int a2)
+void msgbox_open_rsc(int a1, int a2)
 {
 {
     int l_1C;
 
-    if (*(signed char *)D_00196270 != 0) return;
+    if (*(signed char *)msgbox_kind != 0) return;
     func_00080637();
-    *(int *)D_0019965C = func_000A00AF(64000, (int)D_00170D55, 854);
-    func_000A1023(*(int *)D_0019965C, *(int *)D_00143550, 64000, (int)D_00170D55, 855, 4);
+    *(int *)msgbox_saved_screen = func_000A00AF(64000, (int)D_00170D55, 854);
+    func_000A1023(*(int *)msgbox_saved_screen, *(int *)screen_buffer, 64000, (int)D_00170D55, 855, 4);
     func_0012DB50(4);
     if (((int)(short)*(short *)&a2) != 5) goto L3F212;
     *(signed char *)D_00196271 = 0;
-    l_1C = func_0003E8A8((int)(short)*(short *)&a1, (int)D_00199654, 4);
+    l_1C = msgbox_render_rsc((int)(short)*(short *)&a1, (int)msgbox_image, 4);
     goto L3F225;
 L3F212:;
-    l_1C = func_0003E8A8((int)(short)*(short *)&a1, (int)D_00199654, 0);
+    l_1C = msgbox_render_rsc((int)(short)*(short *)&a1, (int)msgbox_image, 0);
 L3F225:;
     if (l_1C == 0) return;
-    *(signed char *)D_00196270 = *(signed char *)&a2;
-    func_0007D0DA();
-    *(signed char *)D_00196274 = 8;
+    *(signed char *)msgbox_kind = *(signed char *)&a2;
+    mode_push();
+    *(signed char *)game_mode = 8;
     *(signed char *)D_00196272 = 1;
-    *(signed char *)D_00196279 = *(signed char *)D_0012AC00;
+    *(signed char *)mouse_buttons_prev = *(signed char *)mouse_buttons;
     func_0012B136();
 }
 }
 
-void func_0003F25E(void)
+void msgbox_wait(void)
 {
     int l_18;
 
-    *(signed char *)D_0012AC00 = (*(signed char *)D_00196279 = 1);
+    *(signed char *)mouse_buttons = (*(signed char *)mouse_buttons_prev = 1);
 L3F27D:;
-    if (((int)(unsigned char)*(signed char *)D_00196274) != 8) goto L3F2F8;
-    func_000A1023(*(int *)D_00143550, *(int *)D_0019965C, 64000, (int)D_00170D55, 882, 4);
-    if (*(signed char *)D_00142325 == 0) goto L3F2C0;
-    if (*(signed char *)D_00142335 != 0) goto L3F2C2;
+    if (((int)(unsigned char)*(signed char *)game_mode) != 8) goto L3F2F8;
+    func_000A1023(*(int *)screen_buffer, *(int *)msgbox_saved_screen, 64000, (int)D_00170D55, 882, 4);
+    if (*(signed char *)key_down_ctrl == 0) goto L3F2C0;
+    if (*(signed char *)key_down_x != 0) goto L3F2C2;
 L3F2C0:;
     goto L3F2CB;
 L3F2C2:;
-    if (*(signed char *)D_00142332 != 0) goto L3F2CD;
+    if (*(signed char *)key_down_lshift != 0) goto L3F2CD;
 L3F2CB:;
     goto L3F2D4;
 L3F2CD:;
-    func_0004FF57(0);
+    game_exit(0);
 L3F2D4:;
-    func_0003F358();
-    func_00081425();
+    msgbox_update();
+    player_movement_update();
     func_000CDD81(1);
-    if (((struct bf8_0_4 *)&D_001959AC)->f != 0) goto L3F2F6;
+    if (((struct bf8_0_4 *)&frame_counter)->f != 0) goto L3F2F6;
     func_0006987B();
 L3F2F6:;
     goto L3F27D;
 L3F2F8:;
     l_18 = 1132;
     *(int *)D_00195C40 = *(int *)((char *)l_18);
-    if (*(int *)D_0019965C == 0) goto L3F31E;
-    if (*(int *)D_0019965C != (-1751672937)) goto L3F320;
+    if (*(int *)msgbox_saved_screen == 0) goto L3F31E;
+    if (*(int *)msgbox_saved_screen != (-1751672937)) goto L3F320;
 L3F31E:;
     goto L3F33E;
 L3F320:;
-    func_000A0024(*(int *)D_0019965C, (int)D_00170D55, 893);
-    *(int *)D_0019965C = -1751672937;
+    func_000A0024(*(int *)msgbox_saved_screen, (int)D_00170D55, 893);
+    *(int *)msgbox_saved_screen = -1751672937;
 L3F33E:;
-    if (*(signed char *)D_0012AC00 == 0) return;
+    if (*(signed char *)mouse_buttons == 0) return;
     func_0012B136();
     goto L3F33E;
 }
 
-void func_0003F358(void)
+void msgbox_update(void)
 {
     int l_18;
 
-    if (((int)(unsigned char)*(signed char *)D_00196270) == 4) goto L3F37E;
-    if (((int)(unsigned char)*(signed char *)D_00196274) != 8) goto L3F380;
+    if (((int)(unsigned char)*(signed char *)msgbox_kind) == 4) goto L3F37E;
+    if (((int)(unsigned char)*(signed char *)game_mode) != 8) goto L3F380;
 L3F37E:;
     goto L3F385;
 L3F380:;
@@ -374,116 +374,116 @@ L3F380:;
 L3F385:;
     *(signed char *)D_0012B508 = 146;
     if (((struct bf8_6_1 *)&D_001940D5)->f == 0) goto L3F3D4;
-    func_00144FB4(160 - (((int)(short)*(short *)D_00199668) >> 1), ((int)(short)*(short *)D_00195F34) - ((int)(short)*(short *)D_0019966A), (int)(short)*(short *)D_00199668, (int)(short)*(short *)D_0019966A, *(int *)D_00199654);
+    func_00144FB4(160 - (((int)(short)*(short *)D_00199668) >> 1), ((int)(short)*(short *)D_00195F34) - ((int)(short)*(short *)D_0019966A), (int)(short)*(short *)D_00199668, (int)(short)*(short *)D_0019966A, *(int *)msgbox_image);
     goto L3F40F;
 L3F3D4:;
-    func_00144FB4(160 - (((int)(short)*(short *)D_00199668) >> 1), 100 - (((int)(short)*(short *)D_0019966A) >> 1), (int)(short)*(short *)D_00199668, (int)(short)*(short *)D_0019966A, *(int *)D_00199654);
+    func_00144FB4(160 - (((int)(short)*(short *)D_00199668) >> 1), 100 - (((int)(short)*(short *)D_0019966A) >> 1), (int)(short)*(short *)D_00199668, (int)(short)*(short *)D_0019966A, *(int *)msgbox_image);
 L3F40F:;
-    if (((int)(unsigned char)*(signed char *)D_00196270) != 1) goto L3F4A0;
+    if (((int)(unsigned char)*(signed char *)msgbox_kind) != 1) goto L3F4A0;
     if (*(short *)D_00195F2E == 0) goto L3F43A;
     (*(short *)D_00195F2E)--;
     if (*(short *)D_00195F2E == 0) goto L3F47F;
 L3F43A:;
     if (((struct bf8_0_1 *)&D_001940D5)->f == 0) goto L3F453;
-    if (((int)(unsigned char)(*(signed char *)D_0012AC00 & 3)) == 0) goto L3F455;
+    if (((int)(unsigned char)(*(signed char *)mouse_buttons & 3)) == 0) goto L3F455;
 L3F453:;
     goto L3F457;
 L3F455:;
     goto L3F47F;
 L3F457:;
-    if (func_0007D068(28) != 0) goto L3F47F;
-    if (*(signed char *)D_0012AC00 == 0) return;
-    if (*(signed char *)D_00196279 != 0) return;
+    if (key_pressed_once(28) != 0) goto L3F47F;
+    if (*(signed char *)mouse_buttons == 0) return;
+    if (*(signed char *)mouse_buttons_prev != 0) return;
 L3F47F:;
-    *(signed char *)D_00196279 = 0;
-    func_0003F557();
+    *(signed char *)mouse_buttons_prev = 0;
+    msgbox_close();
 L3F48B:;
-    if (*(signed char *)D_0012AC00 == 0) goto L3F49B;
+    if (*(signed char *)mouse_buttons == 0) goto L3F49B;
     func_0012B136();
     goto L3F48B;
 L3F49B:;
     return;
 L3F4A0:;
-    if (((int)(unsigned char)*(signed char *)D_00196270) != 2) goto L3F4C9;
-    if ((*(signed char *)D_0019966C = func_0008C5C9()) == 0) goto L3F4C4;
-    func_0003F557();
+    if (((int)(unsigned char)*(signed char *)msgbox_kind) != 2) goto L3F4C9;
+    if ((*(signed char *)D_0019966C = inpstr_update()) == 0) goto L3F4C4;
+    msgbox_close();
 L3F4C4:;
     return;
 L3F4C9:;
-    if (((int)(unsigned char)*(signed char *)D_00196270) != 4) goto L3F4DE;
+    if (((int)(unsigned char)*(signed char *)msgbox_kind) != 4) goto L3F4DE;
     if (((struct bf8_5_1 *)&D_001940D5)->f != 0) goto L3F4E0;
 L3F4DE:;
     goto L3F4E7;
 L3F4E0:;
-    func_0003F557();
+    msgbox_close();
     return;
 L3F4E7:;
-    if (((int)(unsigned char)*(signed char *)D_00196270) != 5) return;
+    if (((int)(unsigned char)*(signed char *)msgbox_kind) != 5) return;
     if (((struct bf8_0_1 *)&D_001940D4)->f == 0) goto L3F505;
-    if (*(signed char *)D_00142309 != 0) goto L3F507;
+    if (*(signed char *)key_down_esc != 0) goto L3F507;
 L3F505:;
     goto L3F50E;
 L3F507:;
-    func_0003F557();
+    msgbox_close();
     return;
 L3F50E:;
-    l_18 = func_0003F89F((int)(short)*(short *)D_0012AC04, (int)(short)*(short *)D_0012AC06);
+    l_18 = msgbox_button_at((int)(short)*(short *)mouse_x, (int)(short)*(short *)mouse_y);
     if (*(short *)&l_18 == 0) return;
-    func_00069938(203, *(int *)D_00195AA4, 110);
+    sound_play(203, *(int *)player_object, 110);
     *(signed char *)D_00196271 = *(signed char *)&l_18;
-    func_0003F557();
+    msgbox_close();
 }
 
-void func_0003F557(void)
+void msgbox_close(void)
 {
-    if (*(int *)D_00199654 == 0) return;
+    if (*(int *)msgbox_image == 0) return;
     *(signed char *)D_001940D5 &= 158;
-    if (*(int *)D_00199654 == 0) goto L3F58E;
-    if (*(int *)D_00199654 != (-1751672937)) goto L3F590;
+    if (*(int *)msgbox_image == 0) goto L3F58E;
+    if (*(int *)msgbox_image != (-1751672937)) goto L3F590;
 L3F58E:;
     goto L3F5AE;
 L3F590:;
-    func_000A0024(*(int *)D_00199654, (int)D_00170D55, 950);
-    *(int *)D_00199654 = -1751672937;
+    func_000A0024(*(int *)msgbox_image, (int)D_00170D55, 950);
+    *(int *)msgbox_image = -1751672937;
 L3F5AE:;
-    *(int *)D_00199654 = 0;
-    *(signed char *)D_00196270 = 0;
-    func_0007D12D();
+    *(int *)msgbox_image = 0;
+    *(signed char *)msgbox_kind = 0;
+    mode_pop();
 L3F5C4:;
-    if (*(signed char *)D_0012AC00 == 0) goto L3F5D4;
+    if (*(signed char *)mouse_buttons == 0) goto L3F5D4;
     func_0012B136();
     goto L3F5C4;
 L3F5D4:;
-    *(signed char *)D_0012AC00 = (*(signed char *)D_00196279 = 0);
+    *(signed char *)mouse_buttons = (*(signed char *)mouse_buttons_prev = 0);
 }
 
-void func_0003F5EF(void)
+void msgbox_load_borders(void)
 {
-    *(int *)D_00199648 = func_0006CB53((int)D_00170DAE, 0);
-    *(int *)D_0019964C = func_0006CB53((int)D_00170DB7, 0);
+    *(int *)msgbox_spop_tiles = disk_read_file((int)D_00170DAE, 0);
+    *(int *)msgbox_mpop_tiles = disk_read_file((int)D_00170DB7, 0);
     func_0003F630(0);
 }
 
 void func_0003F699(void)
 {
-    if (*(int *)D_00199648 == 0) goto L3F6BC;
-    if (*(int *)D_00199648 != (-1751672937)) goto L3F6BE;
+    if (*(int *)msgbox_spop_tiles == 0) goto L3F6BC;
+    if (*(int *)msgbox_spop_tiles != (-1751672937)) goto L3F6BE;
 L3F6BC:;
     goto L3F6DC;
 L3F6BE:;
-    func_000A0024(*(int *)D_00199648, (int)D_00170D55, 977);
-    *(int *)D_00199648 = -1751672937;
+    func_000A0024(*(int *)msgbox_spop_tiles, (int)D_00170D55, 977);
+    *(int *)msgbox_spop_tiles = -1751672937;
 L3F6DC:;
-    if (*(int *)D_0019964C == 0) goto L3F6F1;
-    if (*(int *)D_0019964C != (-1751672937)) goto L3F6F3;
+    if (*(int *)msgbox_mpop_tiles == 0) goto L3F6F1;
+    if (*(int *)msgbox_mpop_tiles != (-1751672937)) goto L3F6F3;
 L3F6F1:;
     return;
 L3F6F3:;
-    func_000A0024(*(int *)D_0019964C, (int)D_00170D55, 978);
-    *(int *)D_0019964C = -1751672937;
+    func_000A0024(*(int *)msgbox_mpop_tiles, (int)D_00170D55, 978);
+    *(int *)msgbox_mpop_tiles = -1751672937;
 }
 
-void func_0003F71B(short a1)
+void msgbox_draw_buttons(short a1)
 {
     if (((struct bf8_6_1 *)&D_001940D5)->f == 0) goto L3F767;
     *(short *)D_00195F38 = ((int)(short)a1) + ((((int)(short)*(short *)D_00195F34) - ((int)(short)*(short *)D_0019966A)) - (100 - (((int)(short)*(short *)D_0019966A) >> 1)));
@@ -492,36 +492,36 @@ L3F767:;
     *(short *)D_00195F38 = *(int *)&a1;
 L3F770:;
     if (*(signed char *)D_00196090 != 0) goto L3F7AA;
-    func_00144F68(144, (int)(short)a1, 32, 16, (int)(*(char **)D_00195B90 + ((((int)(unsigned char)*(signed char *)D_0019608F) - 1) << 9)));
+    func_00144F68(144, (int)(short)a1, 32, 16, (int)(*(char **)buttons_rci + ((((int)(unsigned char)*(signed char *)msgbox_button_ids) - 1) << 9)));
     return;
 L3F7AA:;
     if (*(signed char *)D_00196091 != 0) goto L3F811;
-    func_00144F68(112, (int)(short)a1, 32, 16, (int)(*(char **)D_00195B90 + ((((int)(unsigned char)*(signed char *)D_0019608F) - 1) << 9)));
-    func_00144F68(176, (int)(short)a1, 32, 16, (int)(*(char **)D_00195B90 + ((((int)(unsigned char)*(signed char *)D_00196090) - 1) << 9)));
+    func_00144F68(112, (int)(short)a1, 32, 16, (int)(*(char **)buttons_rci + ((((int)(unsigned char)*(signed char *)msgbox_button_ids) - 1) << 9)));
+    func_00144F68(176, (int)(short)a1, 32, 16, (int)(*(char **)buttons_rci + ((((int)(unsigned char)*(signed char *)D_00196090) - 1) << 9)));
     return;
 L3F811:;
-    func_00144F68(96, (int)(short)a1, 32, 16, (int)(*(char **)D_00195B90 + ((((int)(unsigned char)*(signed char *)D_0019608F) - 1) << 9)));
-    func_00144F68(144, (int)(short)a1, 32, 16, (int)(*(char **)D_00195B90 + ((((int)(unsigned char)*(signed char *)D_00196090) - 1) << 9)));
-    func_00144F68(192, (int)(short)a1, 32, 16, (int)(*(char **)D_00195B90 + ((((int)(unsigned char)*(signed char *)D_00196091) - 1) << 9)));
+    func_00144F68(96, (int)(short)a1, 32, 16, (int)(*(char **)buttons_rci + ((((int)(unsigned char)*(signed char *)msgbox_button_ids) - 1) << 9)));
+    func_00144F68(144, (int)(short)a1, 32, 16, (int)(*(char **)buttons_rci + ((((int)(unsigned char)*(signed char *)D_00196090) - 1) << 9)));
+    func_00144F68(192, (int)(short)a1, 32, 16, (int)(*(char **)buttons_rci + ((((int)(unsigned char)*(signed char *)D_00196091) - 1) << 9)));
 }
 
-int func_0003F89F(short a1, short a2)
+int msgbox_button_at(short a1, short a2)
 {
     if (*(signed char *)D_00196090 != 0) goto L3F96B;
-    if (*(signed char *)D_00196033 == 0) goto L3F8D8;
-    if (*(signed char *)(D_00142308 + ((int)(unsigned char)*(signed char *)D_00196033)) != 0) goto L3F8DA;
+    if (*(signed char *)msgbox_button_keys == 0) goto L3F8D8;
+    if (*(signed char *)(key_down + ((int)(unsigned char)*(signed char *)msgbox_button_keys)) != 0) goto L3F8DA;
 L3F8D8:;
     goto L3F8E6;
 L3F8DA:;
     return 1;
 L3F8E6:;
-    if (*(signed char *)D_0012AC00 != 0) goto L3F8FB;
+    if (*(signed char *)mouse_buttons != 0) goto L3F8FB;
     return 0;
 L3F8FB:;
-    if (*(signed char *)D_00196279 == 0) goto L3F910;
+    if (*(signed char *)mouse_buttons_prev == 0) goto L3F910;
     return 0;
 L3F910:;
-    if (*(signed char *)D_0012AC00 == 0) goto L3F924;
+    if (*(signed char *)mouse_buttons == 0) goto L3F924;
     if (((int)(short)a1) > 144) goto L3F926;
 L3F924:;
     goto L3F936;
@@ -543,27 +543,27 @@ L3F966:;
     goto L3FC38;
 L3F96B:;
     if (*(signed char *)D_00196091 != 0) goto L3FA9F;
-    if (*(signed char *)D_00196033 == 0) goto L3F991;
-    if (*(signed char *)(D_00142308 + ((int)(unsigned char)*(signed char *)D_00196033)) != 0) goto L3F993;
+    if (*(signed char *)msgbox_button_keys == 0) goto L3F991;
+    if (*(signed char *)(key_down + ((int)(unsigned char)*(signed char *)msgbox_button_keys)) != 0) goto L3F993;
 L3F991:;
     goto L3F99F;
 L3F993:;
     return 1;
 L3F99F:;
     if (*(signed char *)D_00196034 == 0) goto L3F9B8;
-    if (*(signed char *)(D_00142308 + ((int)(unsigned char)*(signed char *)D_00196034)) != 0) goto L3F9BA;
+    if (*(signed char *)(key_down + ((int)(unsigned char)*(signed char *)D_00196034)) != 0) goto L3F9BA;
 L3F9B8:;
     goto L3F9C6;
 L3F9BA:;
     return 2;
 L3F9C6:;
-    if (*(signed char *)D_0012AC00 != 0) goto L3F9DB;
+    if (*(signed char *)mouse_buttons != 0) goto L3F9DB;
     return 0;
 L3F9DB:;
-    if (*(signed char *)D_00196279 == 0) goto L3F9F0;
+    if (*(signed char *)mouse_buttons_prev == 0) goto L3F9F0;
     return 0;
 L3F9F0:;
-    if (*(signed char *)D_0012AC00 == 0) goto L3FA02;
+    if (*(signed char *)mouse_buttons == 0) goto L3FA02;
     if (((int)(short)a1) > 112) goto L3FA04;
 L3FA02:;
     goto L3FA14;
@@ -582,7 +582,7 @@ L3FA36:;
 L3FA38:;
     return 1;
 L3FA44:;
-    if (*(signed char *)D_0012AC00 == 0) goto L3FA58;
+    if (*(signed char *)mouse_buttons == 0) goto L3FA58;
     if (((int)(short)a1) > 176) goto L3FA5A;
 L3FA58:;
     goto L3FA6A;
@@ -603,34 +603,34 @@ L3FA8E:;
 L3FA9A:;
     goto L3FC38;
 L3FA9F:;
-    if (*(signed char *)D_00196033 == 0) goto L3FAB8;
-    if (*(signed char *)(D_00142308 + ((int)(unsigned char)*(signed char *)D_00196033)) != 0) goto L3FABA;
+    if (*(signed char *)msgbox_button_keys == 0) goto L3FAB8;
+    if (*(signed char *)(key_down + ((int)(unsigned char)*(signed char *)msgbox_button_keys)) != 0) goto L3FABA;
 L3FAB8:;
     goto L3FAC6;
 L3FABA:;
     return 1;
 L3FAC6:;
     if (*(signed char *)D_00196034 == 0) goto L3FADF;
-    if (*(signed char *)(D_00142308 + ((int)(unsigned char)*(signed char *)D_00196034)) != 0) goto L3FAE1;
+    if (*(signed char *)(key_down + ((int)(unsigned char)*(signed char *)D_00196034)) != 0) goto L3FAE1;
 L3FADF:;
     goto L3FAED;
 L3FAE1:;
     return 2;
 L3FAED:;
     if (*(signed char *)D_00196035 == 0) goto L3FB06;
-    if (*(signed char *)(D_00142308 + ((int)(unsigned char)*(signed char *)D_00196035)) != 0) goto L3FB08;
+    if (*(signed char *)(key_down + ((int)(unsigned char)*(signed char *)D_00196035)) != 0) goto L3FB08;
 L3FB06:;
     goto L3FB14;
 L3FB08:;
     return 3;
 L3FB14:;
-    if (*(signed char *)D_0012AC00 != 0) goto L3FB29;
+    if (*(signed char *)mouse_buttons != 0) goto L3FB29;
     return 0;
 L3FB29:;
-    if (*(signed char *)D_00196279 == 0) goto L3FB3E;
+    if (*(signed char *)mouse_buttons_prev == 0) goto L3FB3E;
     return 0;
 L3FB3E:;
-    if (*(signed char *)D_0012AC00 == 0) goto L3FB50;
+    if (*(signed char *)mouse_buttons == 0) goto L3FB50;
     if (((int)(short)a1) > 96) goto L3FB52;
 L3FB50:;
     goto L3FB62;
@@ -649,7 +649,7 @@ L3FB84:;
 L3FB86:;
     return 1;
 L3FB92:;
-    if (*(signed char *)D_0012AC00 == 0) goto L3FBA6;
+    if (*(signed char *)mouse_buttons == 0) goto L3FBA6;
     if (((int)(short)a1) > 144) goto L3FBA8;
 L3FBA6:;
     goto L3FBB8;
@@ -668,7 +668,7 @@ L3FBDA:;
 L3FBDC:;
     return 2;
 L3FBE5:;
-    if (*(signed char *)D_0012AC00 == 0) goto L3FBF9;
+    if (*(signed char *)mouse_buttons == 0) goto L3FBF9;
     if (((int)(short)a1) > 192) goto L3FBFB;
 L3FBF9:;
     goto L3FC0B;
@@ -690,12 +690,12 @@ L3FC38:;
     return 0;
 }
 
-void func_0003FC4B(void)
+void people_spawn_tick(void)
 {
     int l_18;
 
-    *(int *)D_001996E8 = func_0004037E();
-    if (*(int *)D_001996F4 != 0) goto L3FC75;
+    *(int *)D_001996E8 = people_max_count();
+    if (*(int *)people_count != 0) goto L3FC75;
     if (*(int *)D_001996E8 == 0) goto L3FC77;
 L3FC75:;
     goto L3FC79;
@@ -703,7 +703,7 @@ L3FC77:;
     return;
 L3FC79:;
     func_000405EB();
-    l_18 = *(int *)D_001996F4;
+    l_18 = *(int *)people_count;
 L3FC86:;
     if (l_18 < *(int *)D_001996E8) goto L3FC9B;
     return;
@@ -711,36 +711,36 @@ L3FC93:;
     l_18++;
     goto L3FC86;
 L3FC9B:;
-    func_000401F1(func_0008DCE3(*(int *)D_00195AC4, 0, 3));
+    person_place(object_create_child(*(int *)D_00195AC4, 0, 3));
     goto L3FC93;
 }
 
-void func_0003FCBD(void)
+void people_update(void)
 {
     int l_20;
     int l_1C;
     int l_18;
 
-    if (*(int *)D_001996F4 == 0) return;
+    if (*(int *)people_count == 0) return;
     *(int *)D_001996EC = 0;
     l_20 = 0;
 L3FCE9:;
-    if (l_20 < *(int *)D_001996F4) goto L3FD01;
+    if (l_20 < *(int *)people_count) goto L3FD01;
     return;
 L3FCF9:;
     l_20++;
     goto L3FCE9;
 L3FD01:;
-    if (*(int *)(D_00199670 + (l_20 << 2)) == 0) goto L3FCF9;
-    l_18 = *(int *)(D_00199670 + (l_20 << 2));
-    l_1C = func_000C7FD9(*(int *)((char *)l_18 + 7), *(int *)((char *)l_18 + 15), *(int *)(*(char **)D_00195AA4 + 7), *(int *)(*(char **)D_00195AA4 + 15));
-    if (l_1C <= *(int *)D_001996F0) goto L3FD82;
-    if (*(int *)D_001996F4 > *(int *)D_001996E8) goto L3FD65;
-    func_000401F1(l_18);
+    if (*(int *)(people_list + (l_20 << 2)) == 0) goto L3FCF9;
+    l_18 = *(int *)(people_list + (l_20 << 2));
+    l_1C = func_000C7FD9(*(int *)((char *)l_18 + 7), *(int *)((char *)l_18 + 15), *(int *)(*(char **)player_object + 7), *(int *)(*(char **)player_object + 15));
+    if (l_1C <= *(int *)people_spawn_range) goto L3FD82;
+    if (*(int *)people_count > *(int *)D_001996E8) goto L3FD65;
+    person_place(l_18);
     goto L3FD82;
 L3FD65:;
-    func_0008DA91(l_18);
-    *(int *)(D_00199670 + (l_20 << 2)) = 0;
+    object_delete(l_18);
+    *(int *)(people_list + (l_20 << 2)) = 0;
     goto L3FCF9;
 L3FD82:;
     if (func_0003FDD2(l_18, l_1C) != 0) goto L3FDC3;
@@ -768,7 +768,7 @@ int func_0003FDD2(int a1, int a2)
 
     l_30 = 0;
     l_18 = 75;
-    if (*(int *)D_00195B14 != 0) goto L3FE05;
+    if (*(int *)creature_count != 0) goto L3FE05;
     if (a2 < 192) goto L3FE07;
 L3FE05:;
     goto L3FE10;
@@ -789,7 +789,7 @@ L3FE28:;
 L3FE3D:;
     goto L3FE51;
 L3FE3F:;
-    if (((int)(unsigned char)*(signed char *)(*(char **)D_00195BE0 + 67)) < 9) goto L3FE53;
+    if (((int)(unsigned char)*(signed char *)(*(char **)player_character + 67)) < 9) goto L3FE53;
 L3FE51:;
     goto L3FE97;
 L3FE53:;
@@ -849,7 +849,7 @@ L400D6:;
 L400EA:;
     *(int *)((char *)a1 + 15) = (*(int *)((char *)a1 + 15) & -64) + 32;
 L400FC:;
-    l_28 = func_000C808D(*(int *)((char *)a1 + 7), *(int *)((char *)a1 + 15), *(int *)(*(char **)D_00195AA4 + 7), *(int *)(*(char **)D_00195AA4 + 15));
+    l_28 = func_000C808D(*(int *)((char *)a1 + 7), *(int *)((char *)a1 + 15), *(int *)(*(char **)player_object + 7), *(int *)(*(char **)player_object + 15));
     l_24 = (((int)(short)*(short *)((char *)a1 + 3)) + 128) & 2047;
     l_2C = (l_24 - l_28) & 2047;
     l_2C >>= 8;
@@ -873,7 +873,7 @@ L401DE:;
     return 1;
 }
 
-void func_000401F1(int a1)
+void person_place(int a1)
 {
     int l_34;
     int l_30;
@@ -888,12 +888,12 @@ void func_000401F1(int a1)
     l_18 = a1 + 71;
     *(signed char *)((char *)a1) = 53;
     *(signed char *)((char *)a1 + 21) |= 1;
-    *(short *)((char *)a1 + 23) = func_0009DC25() % ((int)(unsigned short)*(short *)(*(char **)D_00195BDC + 41));
-    *(int *)((char *)a1 + 31) = func_0008EB88(((unsigned)*(int *)(*(char **)D_00195AC4 + 31)) >> 16);
+    *(short *)((char *)a1 + 23) = func_0009DC25() % ((int)(unsigned short)*(short *)(*(char **)current_location + 41));
+    *(int *)((char *)a1 + 31) = object_new_id(((unsigned)*(int *)(*(char **)D_00195AC4 + 31)) >> 16);
     *(short *)((char *)a1 + 29) = 0;
     *(short *)((char *)a1 + 25) = 0;
-    *(short *)((char *)l_18) = *(short *)((char *)func_000191DA((int)(short)((int)(unsigned char)*(signed char *)D_00196268), 15) + 33);
-    func_000410D7(a1);
+    *(short *)((char *)l_18) = *(short *)((char *)faction_find_type_in_region((int)(short)((int)(unsigned char)*(signed char *)current_region), 15) + 33);
+    person_pick_sprite(a1);
     l_1C = *(int *)D_000CEA24 >> 8;
     if (l_1C <= 1536) goto L402AA;
     l_1C = 1536;
@@ -901,9 +901,9 @@ void func_000401F1(int a1)
 L402AA:;
     l_1C = 1024;
 L402B1:;
-    func_000CE6E2(func_0007D6AE(0, 2047), l_1C, a1 + 7, a1 + 15);
-    *(int *)((char *)a1 + 7) += *(int *)(*(char **)D_00195AA4 + 7);
-    *(int *)((char *)a1 + 15) += *(int *)(*(char **)D_00195AA4 + 15);
+    func_000CE6E2(rand_range(0, 2047), l_1C, a1 + 7, a1 + 15);
+    *(int *)((char *)a1 + 7) += *(int *)(*(char **)player_object + 7);
+    *(int *)((char *)a1 + 15) += *(int *)(*(char **)player_object + 15);
     *(int *)((char *)a1 + 11) = func_0014B45B(*(int *)((char *)a1 + 7), *(int *)((char *)a1 + 15));
     l_28 = func_0004083A(a1, *(int *)((char *)a1 + 7) - *(int *)(*(char **)D_00195AC4 + 7), *(int *)((char *)a1 + 15) - *(int *)(*(char **)D_00195AC4 + 15));
     if (l_28 != 0) goto L4034C;
@@ -915,38 +915,38 @@ L4034C:;
     *(int *)((char *)a1 + 7) = *(int *)((char *)a1 + 11);
 }
 
-int func_0004037E(void)
+int people_max_count(void)
 {
     int l_1C;
 
     if (((int)(unsigned short)*(short *)(*(char **)D_00195AC4 + 27)) != 65535) goto L403AD;
     return 0;
 L403AD:;
-    if (((int)(unsigned char)*(signed char *)D_001789FA) == 1) goto L403C5;
+    if (((int)(unsigned char)*(signed char *)player_environment) == 1) goto L403C5;
     return 0;
 L403C5:;
-    if (((int)(unsigned char)*(signed char *)(*(char **)D_00195BDC + 34)) == 4) goto L403E9;
-    if (((int)(unsigned char)*(signed char *)(*(char **)D_00195BDC + 34)) != 7) goto L403EB;
+    if (((int)(unsigned char)*(signed char *)(*(char **)current_location + 34)) == 4) goto L403E9;
+    if (((int)(unsigned char)*(signed char *)(*(char **)current_location + 34)) != 7) goto L403EB;
 L403E9:;
     goto L403FD;
 L403EB:;
-    if (((int)(unsigned char)*(signed char *)(*(char **)D_00195BDC + 34)) <= 8) goto L40409;
+    if (((int)(unsigned char)*(signed char *)(*(char **)current_location + 34)) <= 8) goto L40409;
 L403FD:;
     return 0;
 L40409:;
-    if (((int)(unsigned char)*(signed char *)(*(char **)D_00195BE0 + 67)) <= 8) goto L40427;
+    if (((int)(unsigned char)*(signed char *)(*(char **)player_character + 67)) <= 8) goto L40427;
     return 0;
 L40427:;
-    if (*(int *)D_00195B14 == 0) goto L4043C;
+    if (*(int *)creature_count == 0) goto L4043C;
     return 0;
 L4043C:;
-    if (func_0008661C(*(int *)(*(char **)D_00195AA4 + 7), *(int *)(*(char **)D_00195AA4 + 15)) != 0) goto L40461;
+    if (location_contains(*(int *)(*(char **)player_object + 7), *(int *)(*(char **)player_object + 15)) != 0) goto L40461;
     return 0;
 L40461:;
     if (*(int *)D_00199808 != 0) goto L40473;
     return 0;
 L40473:;
-    l_1C = (((int)(unsigned char)*(signed char *)(*(char **)D_00195BDC + 32)) * ((int)(unsigned char)*(signed char *)(*(char **)D_00195BDC + 33))) * 2;
+    l_1C = (((int)(unsigned char)*(signed char *)(*(char **)current_location + 32)) * ((int)(unsigned char)*(signed char *)(*(char **)current_location + 33))) * 2;
     if (l_1C >= 8) goto L404A1;
     l_1C = 8;
     goto L404AE;
@@ -954,7 +954,7 @@ L404A1:;
     if (l_1C <= 30) goto L404AE;
     l_1C = 30;
 L404AE:;
-    if (((int)(unsigned char)*(signed char *)(D_00195E2A + func_0001FFF1())) < 3) goto L404C6;
+    if (((int)(unsigned char)*(signed char *)(climate_weathers + climate_category())) < 3) goto L404C6;
     l_1C >>= 1;
 L404C6:;
     return l_1C;
@@ -963,23 +963,23 @@ L404C6:;
 void func_000405EB(void)
 {
     if (((int)(unsigned short)*(short *)(*(char **)D_00195AC4 + 27)) != 65535) goto L4061A;
-    *(int *)D_001996F0 = 1;
+    *(int *)people_spawn_range = 1;
     return;
 L4061A:;
-    *(int *)D_001996F0 = 3100;
+    *(int *)people_spawn_range = 3100;
 }
 
-int func_0004062E(void)
+int player_in_town_area(void)
 {
     int l_28;
     int l_24;
     int l_20;
     int l_1C;
 
-    l_28 = *(int *)(*(char **)D_00195AA4 + 7) - *(int *)(*(char **)D_00195AC4 + 7);
-    l_24 = *(int *)(*(char **)D_00195AA4 + 15) - *(int *)(*(char **)D_00195AC4 + 15);
-    l_20 = (((int)(unsigned char)*(signed char *)(*(char **)D_00195BDC + 32)) << 12) + 2048;
-    l_1C = (((int)(unsigned char)*(signed char *)(*(char **)D_00195BDC + 33)) << 12) + 2048;
+    l_28 = *(int *)(*(char **)player_object + 7) - *(int *)(*(char **)D_00195AC4 + 7);
+    l_24 = *(int *)(*(char **)player_object + 15) - *(int *)(*(char **)D_00195AC4 + 15);
+    l_20 = (((int)(unsigned char)*(signed char *)(*(char **)current_location + 32)) << 12) + 2048;
+    l_1C = (((int)(unsigned char)*(signed char *)(*(char **)current_location + 33)) << 12) + 2048;
     if (l_28 < (-2048)) goto L406A5;
     if (l_28 <= l_20) goto L406AE;
 L406A5:;
@@ -1004,18 +1004,18 @@ int func_000406DC(int a1, int a2)
     l_1C = *(int *)((char *)a1 + 15);
     l_24 = 0;
 L40708:;
-    if (l_24 < *(int *)D_001996F4) goto L40720;
+    if (l_24 < *(int *)people_count) goto L40720;
     goto L40781;
 L40718:;
     l_24++;
     goto L40708;
 L40720:;
-    if (*(int *)(D_00199670 + (l_24 << 2)) == 0) goto L40740;
-    if (*(int *)(D_00199670 + (l_24 << 2)) != a1) goto L40742;
+    if (*(int *)(people_list + (l_24 << 2)) == 0) goto L40740;
+    if (*(int *)(people_list + (l_24 << 2)) != a1) goto L40742;
 L40740:;
     goto L40718;
 L40742:;
-    l_18 = func_000C7FD9(l_20, l_1C, *(int *)(*(char **)(D_00199670 + (l_24 << 2)) + 7), *(int *)(*(char **)(D_00199670 + (l_24 << 2)) + 15));
+    l_18 = func_000C7FD9(l_20, l_1C, *(int *)(*(char **)(people_list + (l_24 << 2)) + 7), *(int *)(*(char **)(people_list + (l_24 << 2)) + 15));
     if (l_18 >= a2) goto L4077F;
     return 0;
 L4077F:;
@@ -1036,8 +1036,8 @@ L407C2:;
 L407E4:;
     return 0;
 L407ED:;
-    if ((((int)(unsigned char)*(signed char *)(*(char **)D_00195BDC + 32)) << 12) <= a1) goto L40817;
-    if ((((int)(unsigned char)*(signed char *)(*(char **)D_00195BDC + 33)) << 12) > a2) goto L40820;
+    if ((((int)(unsigned char)*(signed char *)(*(char **)current_location + 32)) << 12) <= a1) goto L40817;
+    if ((((int)(unsigned char)*(signed char *)(*(char **)current_location + 33)) << 12) > a2) goto L40820;
 L40817:;
     return 0;
 L40820:;
@@ -1055,8 +1055,8 @@ int func_0004083A(int a1, int a2, int a3)
 L4085B:;
     return 0;
 L40867:;
-    if ((((int)(unsigned char)*(signed char *)(*(char **)D_00195BDC + 32)) << 12) <= a2) goto L40891;
-    if ((((int)(unsigned char)*(signed char *)(*(char **)D_00195BDC + 33)) << 12) > a3) goto L4089D;
+    if ((((int)(unsigned char)*(signed char *)(*(char **)current_location + 32)) << 12) <= a2) goto L40891;
+    if ((((int)(unsigned char)*(signed char *)(*(char **)current_location + 33)) << 12) > a3) goto L4089D;
 L40891:;
     return 0;
 L4089D:;
@@ -1072,8 +1072,8 @@ L40902:;
     if (func_00023DE0(a1, a1 + 7) == 0) goto L4091D;
     return 0;
 L4091D:;
-    l_1C = func_000C808D(*(int *)(*(char **)D_00195AA4 + 7), *(int *)(*(char **)D_00195AA4 + 15), *(int *)((char *)a1 + 7), *(int *)((char *)a1 + 15));
-    l_18 = func_00062EF7((int)(short)*(short *)(*(char **)D_00195AA4 + 3), l_1C, (int)&l_14);
+    l_1C = func_000C808D(*(int *)(*(char **)player_object + 7), *(int *)(*(char **)player_object + 15), *(int *)((char *)a1 + 7), *(int *)((char *)a1 + 15));
+    l_18 = ai_angle_diff((int)(short)*(short *)(*(char **)player_object + 3), l_1C, (int)&l_14);
     if (l_18 <= 400) goto L4096A;
     return 1;
 L4096A:;
@@ -1094,12 +1094,12 @@ int func_00040983(int a1, int a2)
 
     a1 >>= 6;
     a2 >>= 6;
-    a2 = ((((int)(unsigned char)*(signed char *)(*(char **)D_00195BDC + 33)) << 6) - a2) - 1;
-    l_38 = *(int *)(*(char **)D_00195AA4 + 7) - *(int *)(*(char **)D_00195AC4 + 7);
-    l_34 = *(int *)(*(char **)D_00195AA4 + 15) - *(int *)(*(char **)D_00195AC4 + 15);
+    a2 = ((((int)(unsigned char)*(signed char *)(*(char **)current_location + 33)) << 6) - a2) - 1;
+    l_38 = *(int *)(*(char **)player_object + 7) - *(int *)(*(char **)D_00195AC4 + 7);
+    l_34 = *(int *)(*(char **)player_object + 15) - *(int *)(*(char **)D_00195AC4 + 15);
     l_38 >>= 6;
     l_34 >>= 6;
-    l_34 = ((((int)(unsigned char)*(signed char *)(*(char **)D_00195BDC + 33)) << 6) - l_34) - 1;
+    l_34 = ((((int)(unsigned char)*(signed char *)(*(char **)current_location + 33)) << 6) - l_34) - 1;
     l_30 = a1 - l_38;
     l_2C = a2 - l_34;
     l_28 = ((func_0009DEAC(l_30) > func_0009DEAC(l_2C)) ? func_0009DEAC(l_30) : func_0009DEAC(l_2C));
@@ -1113,7 +1113,7 @@ L40A6D:;
     l_24++;
     goto L40A5F;
 L40A75:;
-    l_14 = *(signed char *)((char *)(int)(*(char **)D_00196DA4 + (((((int)(unsigned char)*(signed char *)(*(char **)D_00195BDC + 32)) << 6) * l_34) + l_38)));
+    l_14 = *(signed char *)((char *)(int)(*(char **)D_00196DA4 + (((((int)(unsigned char)*(signed char *)(*(char **)current_location + 32)) << 6) * l_34) + l_38)));
     if (l_14 == 0) goto L40AA9;
     if (((int)(unsigned char)l_14) < 100) goto L40AAB;
 L40AA9:;
@@ -1128,13 +1128,13 @@ L40AEA:;
     return 0;
 }
 
-int func_00040AFD(void)
+int guards_are_present(void)
 {
     int l_1C;
 
     l_1C = 0;
 L40B12:;
-    if (l_1C < *(int *)D_00195B14) goto L40B27;
+    if (l_1C < *(int *)creature_count) goto L40B27;
     goto L40B6F;
 L40B1F:;
     l_1C++;
@@ -1152,26 +1152,26 @@ L40B6F:;
     return 0;
 }
 
-int func_00040B83(int a1)
+int is_guard_sprite(int a1)
 {
     return (((((int)(unsigned short)*(short *)((char *)a1 + 27)) >> 7) == 399) ? 1 : 0);
 }
 
-int func_00040BCD(void)
+int creatures_guard_mix(void)
 {
     int l_20;
     int l_1C;
 
-    if (*(int *)D_00195B14 != 0) goto L40BF0;
+    if (*(int *)creature_count != 0) goto L40BF0;
     return 0;
 L40BF0:;
-    if (((int)(unsigned char)*(signed char *)D_001789FA) == 1) goto L40C08;
+    if (((int)(unsigned char)*(signed char *)player_environment) == 1) goto L40C08;
     return 2;
 L40C08:;
     l_1C = 0;
     l_20 = l_1C;
 L40C15:;
-    if (l_1C < *(int *)D_00195B14) goto L40C2A;
+    if (l_1C < *(int *)creature_count) goto L40C2A;
     goto L40C50;
 L40C22:;
     l_1C++;
@@ -1185,25 +1185,25 @@ L40C50:;
     if (l_20 != 0) goto L40C5F;
     return 1;
 L40C5F:;
-    if (l_20 == *(int *)D_00195B14) goto L40C73;
+    if (l_20 == *(int *)creature_count) goto L40C73;
     return 3;
 L40C73:;
     return 2;
 }
 
-void func_00040E9D(int a1)
+void guard_spawn(int a1)
 {
     int l_18;
 
-    l_18 = func_0008DCE3(*(int *)(*(char **)D_00195AA4 + 67), 0, 659);
-    if (*(int *)D_00195B14 <= 10) goto L40EDB;
-    func_0008DA91(l_18);
+    l_18 = object_create_child(*(int *)(*(char **)player_object + 67), 0, 659);
+    if (*(int *)creature_count <= 10) goto L40EDB;
+    object_delete(l_18);
     return;
 L40EDB:;
     *(signed char *)((char *)l_18) = 18;
     *(signed char *)((char *)l_18 + 21) |= 1;
-    *(int *)((char *)l_18 + 31) = func_0008EB88(((unsigned)*(int *)(*(char **)D_00195AC4 + 31)) >> 16);
-    func_00078566(l_18, 146);
+    *(int *)((char *)l_18 + 31) = object_new_id(((unsigned)*(int *)(*(char **)D_00195AC4 + 31)) >> 16);
+    monster_init(l_18, 146);
     *(signed char *)((char *)l_18 + 624) = *(signed char *)D_0017B6CD;
     if (a1 == 0) goto L40F48;
     *(int *)((char *)l_18 + 7) = *(int *)((char *)a1 + 7);
@@ -1211,14 +1211,14 @@ L40EDB:;
     *(int *)((char *)l_18 + 15) = *(int *)((char *)a1 + 15);
     goto L40F6D;
 L40F48:;
-    if (func_00077960(l_18, 512, 2048) != 0) goto L40F6D;
-    func_0008DA91(l_18);
+    if (spawn_find_point(l_18, 512, 2048) != 0) goto L40F6D;
+    object_delete(l_18);
     l_18 = 0;
 L40F6D:;
     *(int *)D_00195AA8 = l_18;
 }
 
-void func_00040F7F(void)
+void guards_timer_tick(void)
 {
     if (*(int *)D_00178A14 < 0) return;
     if (*(int *)D_00178A14 <= 0) goto L40FA7;
@@ -1226,5 +1226,5 @@ void func_00040F7F(void)
     return;
 L40FA7:;
     (*(int *)D_00178A14)--;
-    func_00040C87(1);
+    guards_summon(1);
 }

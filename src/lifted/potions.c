@@ -2,69 +2,69 @@
  * do not edit: move a function to src/potions.c to work on it by hand) */
 
 extern char D_0012B508[];
-extern char D_00142309[];
+extern char key_down_esc[];
 extern char D_00176E94[];
 extern char D_00176E9E[];
 extern char D_00176EBA[];
 extern char D_00176ED0[];
 extern char D_00176EDF[];
 extern char D_00176EFB[];
-extern char D_00180B3A[];
+extern char potion_recipes[];
 extern char D_00180B42[];
 extern char D_00180B7D[];
 extern char D_00190BE4[];
-extern char D_00190DE4[];
+extern char text_macro_fpc[];
 extern char D_001959E4[];
-extern char D_00195AA0[];
-extern char D_00195AA4[];
+extern char player_entity[];
+extern char player_object[];
 extern char D_00195AC4[];
 extern char D_00195B84[];
-extern char D_00195BE8[];
+extern char window_image[];
 extern char D_00195F28[];
-extern char D_00196036[];
+extern char spellmaker_spell[];
 extern char D_0019626D[];
 extern char D_0019626E[];
 extern char D_0019626F[];
 extern char D_00196272[];
-extern char D_00196274[];
+extern char game_mode[];
 extern char D_0019629A[];
 extern char D_001A9B8C[];
 extern char D_001A9B94[];
 extern char D_001A9BAC[];
 extern char D_001A9BB4[];
-extern char D_001A9BBC[];
-extern char D_001A9BDC[];
-extern char D_001AA3DC[];
-extern char D_001AA3E4[];
-extern char D_001AA3E8[];
-extern char D_001AA3EC[];
+extern char potion_cauldron[];
+extern char potion_ingredients[];
+extern char potion_ingredient_scroll[];
+extern char potion_ingredient_count[];
+extern char potion_name[];
+extern char potion_cauldron_count[];
 
-extern int func_0005AE5F(int);
-extern int func_00069938(int, int, int);
-extern int func_0006CB53(int, int);
-extern int func_0008DA91(int);
-extern int func_0008DCE3(int, int, int);
-extern int func_0008EB88(int);
-extern int func_0008FE48(int);
+extern int cast_player_spell(int);
+extern int sound_play(int, int, int);
+extern int disk_read_file(int, int);
+extern int object_delete(int);
+extern int object_create_child(int, int, int);
+extern int object_new_id(int);
+extern int potion_mix_unknown(int);
 extern int func_000A0024();
 extern int func_000A0040();
 extern int func_000A1023();
 extern int func_000A1079();
-extern void func_0003EC2A(int, int);
-extern void func_0005E540(int, int, int);
-extern void func_0007D3CA(int);
-extern void func_0008E3F7(int, int);
-extern void func_0008E4A8(int, int);
-extern void func_00097101(int);
-int func_0008FCE7(int, int, int, int);
-int func_0009046D(int);
-void func_0008F11D(int);
-void func_0008F89A(int);
+extern void msgbox_show_string(int, int);
+extern void item_make(int, int, int);
+extern void picklist_open(int);
+extern void object_foreach(int, int);
+extern void object_foreach_open(int, int);
+extern void inv_store_item(int);
+int potion_match_recipe(int, int, int, int);
+int potion_have_recipe_ingredients(int);
+void potion_recipe_list_cb(int);
+void potionmaker_add_ingredient(int);
 void func_0008FBE8(int);
-void func_00090426(int);
-void func_00090572(int);
+void potion_make(int);
+void potion_load_recipe(int);
 
-void func_0008EEBC(void)
+void potionmaker_mix(void)
 {
     int l_20;
     int l_1C;
@@ -77,24 +77,24 @@ L8EED1:;
 L8EEE4:;
     goto L8F014;
 L8EEE9:;
-    if (func_0008FCE7(((int)D_00180B3A) + (l_20 * 109), (int)D_001A9BB4, (int)D_001A9BAC, (int)&l_1C) == 0) goto L8F009;
-    l_18 = func_0008DCE3(*(int *)D_00195AC4, 0, 107);
+    if (potion_match_recipe(((int)potion_recipes) + (l_20 * 109), (int)D_001A9BB4, (int)D_001A9BAC, (int)&l_1C) == 0) goto L8F009;
+    l_18 = object_create_child(*(int *)D_00195AC4, 0, 107);
     *(signed char *)((char *)l_18) = 2;
     *(signed char *)((char *)l_18 + 21) |= 1;
-    func_0005E540(1, 1, l_18 + 71);
+    item_make(1, 1, l_18 + 71);
     *(int *)((char *)l_18 + 107) = (int)(unsigned short)*(short *)(D_00180B42 + (l_20 * 109));
     *(signed char *)((char *)l_18 + 120) = *(signed char *)&l_20;
-    func_00097101(l_18);
-    l_18 = func_0008DCE3(l_18, 0, 109);
+    inv_store_item(l_18);
+    l_18 = object_create_child(l_18, 0, 109);
     *(signed char *)((char *)l_18) = 31;
-    func_000A1023(l_18 + 71, ((int)D_00180B3A) + (l_20 * 109), 109, (int)D_00176E94, 69, 4);
+    func_000A1023(l_18 + 71, ((int)potion_recipes) + (l_20 * 109), 109, (int)D_00176E94, 69, 4);
     l_20 = 0;
-    func_0003EC2A((int)D_00176E9E, 1);
-    func_00069938(208, *(int *)D_00195AA4, 100);
+    msgbox_show_string((int)D_00176E9E, 1);
+    sound_play(208, *(int *)player_object, 100);
 L8EFCF:;
-    if (*(int *)(D_001A9BBC + (l_20 << 2)) == 0) goto L8F004;
-    func_0008DA91(*(int *)(D_001A9BBC + (l_20 << 2)));
-    *(int *)(D_001A9BBC + (l_20++ << 2)) = 0;
+    if (*(int *)(potion_cauldron + (l_20 << 2)) == 0) goto L8F004;
+    object_delete(*(int *)(potion_cauldron + (l_20 << 2)));
+    *(int *)(potion_cauldron + (l_20++ << 2)) = 0;
     goto L8EFCF;
 L8F004:;
     return;
@@ -102,32 +102,32 @@ L8F009:;
     l_20++;
     goto L8EED1;
 L8F014:;
-    if (func_0008FE48((int)D_00196036) == 0) return;
-    l_18 = func_0008DCE3(*(int *)D_00195AC4, 0, 107);
+    if (potion_mix_unknown((int)spellmaker_spell) == 0) return;
+    l_18 = object_create_child(*(int *)D_00195AC4, 0, 107);
     *(signed char *)((char *)l_18) = 2;
     *(signed char *)((char *)l_18 + 21) |= 1;
-    func_0005E540(1, 1, l_18 + 71);
+    item_make(1, 1, l_18 + 71);
     *(int *)((char *)l_18 + 107) = 0;
     *(signed char *)((char *)l_18 + 120) = 255;
-    func_00097101(l_18);
-    l_18 = func_0008DCE3(l_18, 0, 109);
+    inv_store_item(l_18);
+    l_18 = object_create_child(l_18, 0, 109);
     *(signed char *)((char *)l_18) = 31;
-    func_000A1023(l_18 + 91, (int)D_00196036, 89, (int)D_00176E94, 94, 4);
+    func_000A1023(l_18 + 91, (int)spellmaker_spell, 89, (int)D_00176E94, 94, 4);
     l_20 = 0;
-    func_0003EC2A((int)D_00176E9E, 1);
-    func_00069938(208, *(int *)D_00195AA4, 100);
+    msgbox_show_string((int)D_00176E9E, 1);
+    sound_play(208, *(int *)player_object, 100);
 L8F0D6:;
-    if (*(int *)(D_001A9BBC + (l_20 << 2)) == 0) goto L8F0EB;
+    if (*(int *)(potion_cauldron + (l_20 << 2)) == 0) goto L8F0EB;
     if (l_20 < 8) goto L8F0ED;
 L8F0EB:;
     return;
 L8F0ED:;
-    func_0008DA91(*(int *)(D_001A9BBC + (l_20 << 2)));
-    *(int *)(D_001A9BBC + (l_20++ << 2)) = 0;
+    object_delete(*(int *)(potion_cauldron + (l_20 << 2)));
+    *(int *)(potion_cauldron + (l_20++ << 2)) = 0;
     goto L8F0D6;
 }
 
-void func_0008F11D(int a1)
+void potion_recipe_list_cb(int a1)
 {
     int l_18;
 
@@ -139,44 +139,44 @@ L8F168:;
     return;
 L8F16A:;
     *(int *)(D_00190BE4 + (*(int *)D_00195B84 << 2)) = l_18;
-    *(int *)(D_00190DE4 + ((*(int *)D_00195B84)++ << 2)) = (((int)D_00180B3A) + (((int)(unsigned char)*(signed char *)((char *)l_18 + 49)) * 109)) + 67;
+    *(int *)(text_macro_fpc + ((*(int *)D_00195B84)++ << 2)) = (((int)potion_recipes) + (((int)(unsigned char)*(signed char *)((char *)l_18 + 49)) * 109)) + 67;
 }
 
-void func_0008F1B2(void)
+void potionmaker_recipes(void)
 {
     *(int *)D_00195B84 = 0;
-    func_0008E3F7(*(int *)(*(char **)D_00195AA0 + 63), (int)func_0008F11D);
+    object_foreach(*(int *)(*(char **)player_entity + 63), (int)potion_recipe_list_cb);
     if (*(int *)D_00195B84 != 0) goto L8F1F6;
-    func_0003EC2A((int)D_00176EBA, 1);
+    msgbox_show_string((int)D_00176EBA, 1);
     return;
 L8F1F6:;
     if (*(int *)D_00195B84 != 1) goto L8F20B;
-    func_00090426(*(int *)D_00190BE4);
+    potion_make(*(int *)D_00190BE4);
     return;
 L8F20B:;
-    *(int *)(D_00190DE4 + (*(int *)D_00195B84 << 2)) = 0;
-    func_0007D3CA((int)D_00190DE4);
-    func_00069938(205, *(int *)D_00195AA4, 100);
+    *(int *)(text_macro_fpc + (*(int *)D_00195B84 << 2)) = 0;
+    picklist_open((int)text_macro_fpc);
+    sound_play(205, *(int *)player_object, 100);
 }
 
-int func_0008F246(int a1)
+int potionmaker_open(int a1)
 {
     if (((int)(unsigned char)*(signed char *)D_0019626F) != 1) goto L8F26F;
     return 1;
 L8F26F:;
     if (a1 == 0) goto L8F2F0;
-    *(int *)D_001AA3E8 = (int)D_00176ED0;
-    *(signed char *)D_00196274 = 1;
-    *(int *)D_00195BE8 = func_0006CB53((int)D_00176EDF, 0);
-    *(short *)D_001AA3EC = (*(int *)D_001AA3DC = 0);
+    *(int *)potion_name = (int)D_00176ED0;
+    *(signed char *)game_mode = 1;
+    *(int *)window_image = disk_read_file((int)D_00176EDF, 0);
+    *(short *)potion_cauldron_count = (*(int *)potion_ingredient_scroll = 0);
     *(signed char *)D_00196272 = 1;
-    func_000A0040((int)D_001A9BBC, 0, 32, (int)D_00176E94, 156, 32);
+    func_000A0040((int)potion_cauldron, 0, 32, (int)D_00176E94, 156, 32);
     func_000A0040((int)D_001A9BB4, 254, 8, (int)D_00176E94, 157, 8);
 L8F2F0:;
-    return ((((int)(unsigned char)*(signed char *)D_00196274) == 1) ? 1 : 0);
+    return ((((int)(unsigned char)*(signed char *)game_mode) == 1) ? 1 : 0);
 }
 
-void func_0008F89A(int a1)
+void potionmaker_add_ingredient(int a1)
 {
     int l_18;
 {
@@ -184,12 +184,12 @@ void func_0008F89A(int a1)
 
     *(int *)((char *)l_8C + 108) = 0;
 L8F8B2:;
-    if (*(int *)(D_001A9BBC + (*(int *)((char *)l_8C + 108) << 2)) == 0) goto L8F8C9;
+    if (*(int *)(potion_cauldron + (*(int *)((char *)l_8C + 108) << 2)) == 0) goto L8F8C9;
     (*(int *)((char *)l_8C + 108))++;
     goto L8F8B2;
 L8F8C9:;
-    l_18 = (*(int *)(D_001A9BBC + (*(int *)((char *)l_8C + 108) << 2)) = *(int *)(D_001A9BDC + (a1 << 2)));
-    func_0005E540((int)(unsigned short)*(short *)((char *)l_18 + 103), (int)(unsigned short)*(short *)((char *)l_18 + 105), (int)l_8C);
+    l_18 = (*(int *)(potion_cauldron + (*(int *)((char *)l_8C + 108) << 2)) = *(int *)(potion_ingredients + (a1 << 2)));
+    item_make((int)(unsigned short)*(short *)((char *)l_18 + 103), (int)(unsigned short)*(short *)((char *)l_18 + 105), (int)l_8C);
     *(signed char *)(D_001A9BB4 + *(int *)((char *)l_8C + 108)) = *(signed char *)((char *)l_8C + 65);
     *(signed char *)(D_001A9BAC + *(int *)((char *)l_8C + 108)) = *(signed char *)D_0019626D;
     *(signed char *)(D_001A9B8C + *(int *)((char *)l_8C + 108)) = *(signed char *)D_00195F28;
@@ -197,7 +197,7 @@ L8F8C9:;
 }
 }
 
-int func_0008F94D(int a1, int a2)
+int potionmaker_in_cauldron(int a1, int a2)
 {
     short l_14;
     short l_18;
@@ -210,8 +210,8 @@ L8F972:;
     (*(int *)&l_14)++;
     goto L8F967;
 L8F97A:;
-    *(int *)&l_18 = *(int *)(D_001A9BBC + (((int)(short)l_14) << 2)) + 71;
-    if (*(int *)(D_001A9BBC + (((int)(short)l_14) << 2)) == 0) goto L8F9AE;
+    *(int *)&l_18 = *(int *)(potion_cauldron + (((int)(short)l_14) << 2)) + 71;
+    if (*(int *)(potion_cauldron + (((int)(short)l_14) << 2)) == 0) goto L8F9AE;
     if (((int)(unsigned short)*(short *)(*(char **)&l_18 + 34)) == a2) goto L8F9B0;
 L8F9AE:;
     goto L8F9C1;
@@ -234,34 +234,34 @@ void func_0008FBE8(int a1)
     if (((int)(unsigned char)*(signed char *)((char *)a1)) != 2) return;
     *(int *)&l_18 = a1 + 71;
     if (((int)(unsigned short)(*(short *)(*(char **)&l_18 + 42) & 1)) == 0) return;
-    *(int *)D_001AA3E4 = 1;
+    *(int *)potion_ingredient_count = 1;
 }
 
 int func_0008FC3A(void)
 {
-    *(int *)D_001AA3E4 = 0;
-    func_0008E4A8(*(int *)(*(char **)D_001959E4 + 63), (int)func_0008FBE8);
-    return *(int *)D_001AA3E4;
+    *(int *)potion_ingredient_count = 0;
+    object_foreach_open(*(int *)(*(char **)D_001959E4 + 63), (int)func_0008FBE8);
+    return *(int *)potion_ingredient_count;
 }
 
-int func_0008FC79(void)
+int potionmaker_close(void)
 {
 L8FC87:;
-    if (*(signed char *)D_00142309 != 0) goto L8FC87;
-    *(signed char *)D_00196274 = 0;
-    if (*(int *)D_00195BE8 == 0) goto L8FCAC;
-    if (*(int *)D_00195BE8 != (-1751672937)) goto L8FCAE;
+    if (*(signed char *)key_down_esc != 0) goto L8FC87;
+    *(signed char *)game_mode = 0;
+    if (*(int *)window_image == 0) goto L8FCAC;
+    if (*(int *)window_image != (-1751672937)) goto L8FCAE;
 L8FCAC:;
     goto L8FCCC;
 L8FCAE:;
-    func_000A0024(*(int *)D_00195BE8, (int)D_00176E94, 359);
-    *(int *)D_00195BE8 = -1751672937;
+    func_000A0024(*(int *)window_image, (int)D_00176E94, 359);
+    *(int *)window_image = -1751672937;
 L8FCCC:;
     *(signed char *)D_00196272 = 0;
     return 1;
 }
 
-int func_0008FCE7(int a1, int a2, int a3, int a4)
+int potion_match_recipe(int a1, int a2, int a3, int a4)
 {
     int l_10;
     int l_24;
@@ -282,7 +282,7 @@ L8FD1D:;
     goto L8FD15;
 L8FD25:;
     if (((int)(signed char)*(signed char *)((char *)(a1 + l_10))) == (-2)) goto L8FD76;
-    func_0005E540((int)(unsigned short)(short)*(signed char *)((char *)(a1 + l_10) + 10), (int)(signed char)*(signed char *)((char *)(a1 + l_10)), (int)l_A4);
+    item_make((int)(unsigned short)(short)*(signed char *)((char *)(a1 + l_10) + 10), (int)(signed char)*(signed char *)((char *)(a1 + l_10)), (int)l_A4);
     *(signed char *)((char *)l_38 + l_10) = *(signed char *)((char *)l_A4 + 65);
     *(int *)((char *)a4) += (int)(unsigned char)*(signed char *)D_0019626D;
     l_24++;
@@ -361,34 +361,34 @@ L9037B:;
     goto L90290;
 }
 
-void func_0009038D(int a1)
+void potion_drink(int a1)
 {
     int l_1C;
     int l_18;
 
-    l_1C = func_0008DCE3(*(int *)D_00195AC4, 0, 89);
+    l_1C = object_create_child(*(int *)D_00195AC4, 0, 89);
     l_18 = (int)(unsigned char)*(signed char *)D_0019629A;
     *(signed char *)((char *)l_1C) = 9;
     *(signed char *)((char *)l_1C + 21) |= 1;
-    *(int *)((char *)l_1C + 31) = func_0008EB88(801);
+    *(int *)((char *)l_1C + 31) = object_new_id(801);
     func_000A1023(l_1C + 71, a1 + 91, 89, (int)D_00176E94, 540, 4);
     *(signed char *)D_0019629A = 1;
-    func_0005AE5F(l_1C);
+    cast_player_spell(l_1C);
     *(signed char *)D_0019629A = *(signed char *)&l_18;
-    func_0008DA91(l_1C);
+    object_delete(l_1C);
 }
 
-void func_00090426(int a1)
+void potion_make(int a1)
 {
     *(signed char *)D_0012B508 = 146;
-    if (func_0009046D(a1) == 0) goto L90454;
-    func_00090572(a1);
+    if (potion_have_recipe_ingredients(a1) == 0) goto L90454;
+    potion_load_recipe(a1);
     return;
 L90454:;
-    func_0003EC2A((int)D_00176EFB, 1);
+    msgbox_show_string((int)D_00176EFB, 1);
 }
 
-int func_0009046D(int a1)
+int potion_have_recipe_ingredients(int a1)
 {
     int l_28;
     int l_24;
@@ -396,22 +396,22 @@ int func_0009046D(int a1)
     int l_1C;
 
     l_24 = 0;
-    func_000A0040((int)D_001A9BBC, 0, 32, (int)D_00176E94, 566, 32);
-    l_1C = ((int)D_00180B3A) + (((int)(unsigned char)*(signed char *)((char *)a1 + 49)) * 109);
-    *(int *)D_001AA3E8 = l_1C + 67;
+    func_000A0040((int)potion_cauldron, 0, 32, (int)D_00176E94, 566, 32);
+    l_1C = ((int)potion_recipes) + (((int)(unsigned char)*(signed char *)((char *)a1 + 49)) * 109);
+    *(int *)potion_name = l_1C + 67;
 L904C5:;
     if (((int)(signed char)*(signed char *)((char *)(l_1C + l_24))) == (-2)) goto L9055E;
     l_28 = 0;
     l_20 = l_28;
 L904E4:;
-    if (l_28 < *(int *)D_001AA3E4) goto L904F9;
+    if (l_28 < *(int *)potion_ingredient_count) goto L904F9;
     goto L90544;
 L904F1:;
     l_28++;
     goto L904E4;
 L904F9:;
-    if (*(unsigned short *)(*(char **)(D_001A9BDC + (l_28 << 2)) + 103) != *(signed char *)((char *)(l_1C + l_24) + 10)) goto L90538;
-    if (*(unsigned short *)(*(char **)(D_001A9BDC + (l_28 << 2)) + 105) == *(signed char *)((char *)(l_1C + l_24))) goto L9053A;
+    if (*(unsigned short *)(*(char **)(potion_ingredients + (l_28 << 2)) + 103) != *(signed char *)((char *)(l_1C + l_24) + 10)) goto L90538;
+    if (*(unsigned short *)(*(char **)(potion_ingredients + (l_28 << 2)) + 105) == *(signed char *)((char *)(l_1C + l_24))) goto L9053A;
 L90538:;
     goto L90542;
 L9053A:;
@@ -429,31 +429,31 @@ L9055E:;
     return 1;
 }
 
-void func_00090572(int a1)
+void potion_load_recipe(int a1)
 {
     int l_20;
     int l_1C;
     int l_18;
 
     l_1C = 0;
-    l_18 = ((int)D_00180B3A) + (((int)(unsigned char)*(signed char *)((char *)a1 + 49)) * 109);
-    *(int *)D_001AA3E8 = l_18 + 67;
+    l_18 = ((int)potion_recipes) + (((int)(unsigned char)*(signed char *)((char *)a1 + 49)) * 109);
+    *(int *)potion_name = l_18 + 67;
 L905AD:;
     if (((int)(signed char)*(signed char *)((char *)(l_18 + l_1C))) == (-2)) return;
     l_20 = 0;
 L905C6:;
-    if (l_20 < *(int *)D_001AA3E4) goto L905DB;
+    if (l_20 < *(int *)potion_ingredient_count) goto L905DB;
     goto L90628;
 L905D3:;
     l_20++;
     goto L905C6;
 L905DB:;
-    if (*(unsigned short *)(*(char **)(D_001A9BDC + (l_20 << 2)) + 103) != *(signed char *)((char *)(l_18 + l_1C) + 10)) goto L9061A;
-    if (*(unsigned short *)(*(char **)(D_001A9BDC + (l_20 << 2)) + 105) == *(signed char *)((char *)(l_18 + l_1C))) goto L9061C;
+    if (*(unsigned short *)(*(char **)(potion_ingredients + (l_20 << 2)) + 103) != *(signed char *)((char *)(l_18 + l_1C) + 10)) goto L9061A;
+    if (*(unsigned short *)(*(char **)(potion_ingredients + (l_20 << 2)) + 105) == *(signed char *)((char *)(l_18 + l_1C))) goto L9061C;
 L9061A:;
     goto L90626;
 L9061C:;
-    func_0008F89A(l_20);
+    potionmaker_add_ingredient(l_20);
     goto L90628;
 L90626:;
     goto L905D3;

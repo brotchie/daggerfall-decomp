@@ -2,15 +2,15 @@
  * do not edit: move a function to src/talk.c to work on it by hand) */
 
 extern char D_001703F0[];
-extern char D_00190FE4[];
-extern char D_00196588[];
-extern char D_001965A8[];
-extern char D_001965B4[];
+extern char text_rsc_buffer[];
+extern char talk_answer_lines[];
+extern char talk_answer_line_count[];
+extern char talk_answer_scroll[];
 
 extern int func_000A0AD9();
-extern void func_0007CA1F(int, int, int, int, unsigned char);
+extern void text_draw_colored(int, int, int, int, unsigned char);
 
-void func_00016E61(int a1, int a2, int a3, int a4)
+void talk_draw_answer(int a1, int a2, int a3, int a4)
 {
     int l_20;
     int l_1C;
@@ -20,27 +20,27 @@ void func_00016E61(int a1, int a2, int a3, int a4)
     int l_C;
 
     l_1C = 0;
-    if (*(int *)D_001965A8 == 0) return;
+    if (*(int *)talk_answer_line_count == 0) return;
     l_20 = a4 - (a2 / 7);
-    l_18 = *(int *)D_001965B4;
+    l_18 = *(int *)talk_answer_scroll;
 L16EAC:;
-    if (l_18 >= *(int *)D_001965A8) return;
-    func_000A0AD9((int)D_00190FE4, *(int *)((char *)(int)(*(char **)D_00196588 + (l_18++ << 2))), 2048, (int)D_001703F0, 1192);
-    if (((int)(unsigned char)(*(signed char *)D_00190FE4 & 128)) == 0) goto L16F00;
+    if (l_18 >= *(int *)talk_answer_line_count) return;
+    func_000A0AD9((int)text_rsc_buffer, *(int *)((char *)(int)(*(char **)talk_answer_lines + (l_18++ << 2))), 2048, (int)D_001703F0, 1192);
+    if (((int)(unsigned char)(*(signed char *)text_rsc_buffer & 128)) == 0) goto L16F00;
     l_14 = 96;
     goto L16F07;
 L16F00:;
     l_14 = 145;
 L16F07:;
-    *(signed char *)D_00190FE4 &= 127;
+    *(signed char *)text_rsc_buffer &= 127;
     l_10 = 0;
 L16F15:;
-    if (((int)(unsigned char)*(signed char *)(D_00190FE4 + l_10)) != 32) goto L16F30;
+    if (((int)(unsigned char)*(signed char *)(text_rsc_buffer + l_10)) != 32) goto L16F30;
     l_10++;
     goto L16F15;
 L16F30:;
     l_C = a2 + (l_1C * 7);
-    func_0007CA1F(((int)D_00190FE4) + l_10, (int)(short)*(short *)&a1, (int)(short)*(short *)&l_C, (int)(short)*(short *)&l_14, 156);
+    text_draw_colored(((int)text_rsc_buffer) + l_10, (int)(short)*(short *)&a1, (int)(short)*(short *)&l_C, (int)(short)*(short *)&l_14, 156);
     l_1C++;
     if (l_C < a4) goto L16EAC;
 }

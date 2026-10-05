@@ -1,6 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x00012BBB */
 #pragma aux sosconv "*" parm caller [] value [eax] modify [eax ebx ecx edx];
-#pragma aux (sosconv) func_00012BBB;
+#pragma aux (sosconv) profile_add_item_number;
 extern char D_00170129[];
 
 #pragma pack(1)
@@ -18,18 +18,18 @@ struct stream {
 extern char *func_000A0DD9(int, char *, int);
 extern int func_000A0DF4(char *);
 extern int func_000A0E0D();
-extern int func_00011E36(struct stream *, ...);
-extern int func_000122F1(struct stream *, ...);
+extern int profile_find_item(struct stream *, ...);
+extern int profile_set_number(struct stream *, ...);
 
-int func_00012BBB(struct stream *s, char *key, int val, int width, int radix)
+int profile_add_item_number(struct stream *s, char *key, int val, int width, int radix)
 {
     char buf[32];
     char *dst;
     int n;
     int i;
 
-    if ((short)func_00011E36(s, key) != 0) {
-        func_000122F1(s, val);
+    if ((short)profile_find_item(s, key) != 0) {
+        profile_set_number(s, val);
         return 1;
     }
     if (radix == 16) {

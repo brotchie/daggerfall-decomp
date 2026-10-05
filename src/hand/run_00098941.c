@@ -2,38 +2,38 @@
 struct bits8 { unsigned char b0:1, b1:1, b2:1, b3:1, b4:1, b5:1, b6:1, b7:1; };
 struct button { short x0, y0, x1, y1; void (*fn)(int); };
 #define FREED ((char *)0x97979797)
-extern char D_0012AC00;
-extern short D_0012AC04;
-extern short D_0012AC06;
+extern char mouse_buttons;
+extern short mouse_x;
+extern short mouse_y;
 extern char D_0017704C[];
 extern char D_0017729E[];
 extern char D_001772BC[];
 extern char D_001772E6[];
 extern char D_001772F3[];
-extern unsigned char D_001789FA;
+extern unsigned char player_environment;
 extern char *D_001832B4;
 extern char *D_001832BC;
-extern struct button D_00188641[];
+extern struct button transport_buttons[];
 extern signed char D_00190D16;
-extern unsigned char D_001940DB;
-extern unsigned char *D_00195B20;
+extern unsigned char player_motion_flags;
+extern unsigned char *inv_right_container;
 extern char *D_00195B5C;
 extern char *D_00195B60;
-extern char *D_00195BE0;
-extern int D_00195BF4;
-extern unsigned char D_00196268;
-extern char D_00196279;
-extern unsigned char *D_001AA55C;
-extern void func_0003EC2A(char *, int);
-extern int func_0004A98C(int, int);
-extern char *func_0006CB53(char *, int);
-extern int func_0007CBA1(char *);
-extern int func_0007F2A8(int);
-extern void func_0008059B(void);
-extern void func_00082487(void);
+extern char *player_character;
+extern int game_minutes;
+extern unsigned char current_region;
+extern char mouse_buttons_prev;
+extern unsigned char *inv_selected_item;
+extern void msgbox_show_string(char *, int);
+extern int holiday_today(int, int);
+extern char *disk_read_file(char *, int);
+extern int hud_message_add(char *);
+extern int gold_can_afford(int);
+extern void cursor_draw_arrow(void);
+extern void player_horse_sounds_stop(void);
 extern int func_00098B20(void);
 extern void func_00098A15(void);
-extern void func_0009D39E(void);
+extern void travel_find_transport(void);
 extern int func_000A0024(char *, char *, int);
 extern int func_000CDD81();
 extern int func_0012B136();
@@ -43,7 +43,7 @@ void func_00098538(void)
 {
     unsigned char *l_18;
 
-    l_18 = *(unsigned char **)(D_00195B20 + 63);
+    l_18 = *(unsigned char **)(inv_right_container + 63);
     while (l_18 != 0) {
         l_18[113] |= 32;
         l_18 = *(unsigned char **)(l_18 + 55);
@@ -56,25 +56,25 @@ int func_00098573(void)
     int l_20;
     int l_1C;
 
-    l_24 = D_001AA55C + 71;
+    l_24 = inv_selected_item + 71;
     if (*(short *)(l_24 + 67) != -1) {
         if (*(unsigned short *)(l_24 + 42) & 32) {
-            func_0003EC2A(D_001832BC, 1);
+            msgbox_show_string(D_001832BC, 1);
             return 0;
         }
-        l_20 = func_0004A98C(D_00195BF4, D_00196268);
+        l_20 = holiday_today(game_minutes, current_region);
         l_1C = (unsigned)(*(int *)(l_24 + 36) * 25) >> 8;
-        if (l_20 != 43 && func_0007F2A8(l_1C) == 0 && ((struct bits8 *)&D_001940DB)->b7 == 0) {
-            func_0003EC2A(D_0017729E, 1);
+        if (l_20 != 43 && gold_can_afford(l_1C) == 0 && ((struct bits8 *)&player_motion_flags)->b7 == 0) {
+            msgbox_show_string(D_0017729E, 1);
             return 0;
         }
         return 1;
     }
-    func_0003EC2A(D_001832B4, 1);
+    msgbox_show_string(D_001832B4, 1);
     return 0;
 }
 
-void func_00098651(void)
+void transport_menu(void)
 {
     int l_20;
     int l_1C;
@@ -82,39 +82,39 @@ void func_00098651(void)
 
     l_20 = 0;
     l_18 = 17;
-    if (D_001789FA != 1) {
-        func_0007CBA1(D_001772BC);
+    if (player_environment != 1) {
+        hud_message_add(D_001772BC);
         return;
     }
-    D_00195B5C = func_0006CB53(D_001772E6, 0);
-    D_00195B60 = func_0006CB53(D_001772F3, 0);
+    D_00195B5C = disk_read_file(D_001772E6, 0);
+    D_00195B60 = disk_read_file(D_001772F3, 0);
     D_00190D16 = 0;
-    func_0009D39E();
+    travel_find_transport();
     if (func_00098B20() != 0) {
         l_18 = 24;
     } else {
-        if ((D_00190D16 & 2) && D_001789FA == 1)
+        if ((D_00190D16 & 2) && player_environment == 1)
             l_18 |= 2;
-        if ((D_00190D16 & 1) && D_001789FA == 1)
+        if ((D_00190D16 & 1) && player_environment == 1)
             l_18 |= 4;
-        if (*(int *)(D_00195BE0 + 120) != 0 && D_001789FA != 3)
+        if (*(int *)(player_character + 120) != 0 && player_environment != 3)
             l_18 |= 8;
     }
     while (l_20 == 0) {
-        D_00196279 = D_0012AC00;
+        mouse_buttons_prev = mouse_buttons;
         func_0012B136();
         func_00144F68(*(unsigned short *)D_00195B5C, *(unsigned short *)(D_00195B5C + 2), *(unsigned short *)(D_00195B5C + 4), *(unsigned short *)(D_00195B5C + 6), D_00195B5C + 12);
         for (l_1C = 0; l_1C < 4; l_1C++) {
             if (((1 << l_1C) & l_18) == 0)
-                func_00144F68(D_00188641[l_1C].x0, D_00188641[l_1C].y0, *(unsigned short *)(D_00195B60 + 4), 9, D_00195B60 + 12 + l_1C * (*(unsigned short *)(D_00195B60 + 4) * 9));
+                func_00144F68(transport_buttons[l_1C].x0, transport_buttons[l_1C].y0, *(unsigned short *)(D_00195B60 + 4), 9, D_00195B60 + 12 + l_1C * (*(unsigned short *)(D_00195B60 + 4) * 9));
         }
-        func_0008059B();
-        if (D_0012AC00 != 0 && D_00196279 == 0) {
+        cursor_draw_arrow();
+        if (mouse_buttons != 0 && mouse_buttons_prev == 0) {
             for (l_1C = 0; l_1C < 5; l_1C++) {
                 if ((1 << l_1C) & l_18) {
-                    if (D_0012AC04 > D_00188641[l_1C].x0 && D_0012AC04 < D_00188641[l_1C].x1 && D_0012AC06 > D_00188641[l_1C].y0 && D_0012AC06 < D_00188641[l_1C].y1) {
-                        if (D_00188641[l_1C].fn != 0)
-                            D_00188641[l_1C].fn(l_1C);
+                    if (mouse_x > transport_buttons[l_1C].x0 && mouse_x < transport_buttons[l_1C].x1 && mouse_y > transport_buttons[l_1C].y0 && mouse_y < transport_buttons[l_1C].y1) {
+                        if (transport_buttons[l_1C].fn != 0)
+                            transport_buttons[l_1C].fn(l_1C);
                         l_20 = 1;
                     }
                 }
@@ -132,35 +132,35 @@ void func_00098651(void)
     }
 }
 
-void func_00098941(int a1)
+void transport_choose(int a1)
 {
     switch (a1) {
     case 0:
-        D_00195BE0[65] &= 249;
-        func_00082487();
+        player_character[65] &= 249;
+        player_horse_sounds_stop();
         break;
     case 1:
         D_00190D16 = 0;
-        func_0009D39E();
+        travel_find_transport();
         if (D_00190D16 & 2) {
-            D_00195BE0[65] |= 2;
-            D_00195BE0[65] &= 251;
-            D_001940DB &= 251;
+            player_character[65] |= 2;
+            player_character[65] &= 251;
+            player_motion_flags &= 251;
         }
         break;
     case 2:
         D_00190D16 = 0;
-        func_0009D39E();
+        travel_find_transport();
         if (D_00190D16 & 1) {
-            D_00195BE0[65] |= 4;
-            D_00195BE0[65] &= 253;
-            D_001940DB &= 251;
+            player_character[65] |= 4;
+            player_character[65] &= 253;
+            player_motion_flags &= 251;
         }
         break;
     case 3:
-        D_00195BE0[65] &= 249;
+        player_character[65] &= 249;
         func_00098A15();
-        func_00082487();
+        player_horse_sounds_stop();
         break;
     }
 }

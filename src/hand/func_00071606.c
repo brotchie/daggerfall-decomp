@@ -22,13 +22,13 @@ struct pc {
     char pad9f[0x1fd - 0x9f];
     int f1fd;
 };
-extern struct pc *D_00195BE0;
-extern int D_00195BF4;
-extern void func_0003D01C(int, int);
-extern int func_0004B192(void);
-extern void func_0007242F(int);
+extern struct pc *player_character;
+extern int game_minutes;
+extern void skill_add_uses(int, int);
+extern int player_in_daylight(void);
+extern void fatigue_add(int);
 
-void func_00071606(char *a1)
+void rest_recover(char *a1)
 {
     struct mob *m;
     struct ext *e;
@@ -36,26 +36,26 @@ void func_00071606(char *a1)
 
     m = (struct mob *)(a1 + 71);
     e = (struct ext *)((char *)m + 560);
-    if (m->f43 == 8 && (unsigned)(D_00195BF4 - D_00195BE0->f1fd) > 960)
+    if (m->f43 == 8 && (unsigned)(game_minutes - player_character->f1fd) > 960)
         return;
     v = 60;
     if (e->f6 != 0) {
         if (e->f6 & 4)
             v += 40;
-        else if ((e->f6 & 1) && func_0004B192() != 0)
+        else if ((e->f6 & 1) && player_in_daylight() != 0)
             v += 40;
-        else if ((e->f6 & 2) && func_0004B192() == 0)
+        else if ((e->f6 & 2) && player_in_daylight() == 0)
             v += 40;
     }
-    v += D_00195BE0->f9d;
-    func_0003D01C(0, 1);
+    v += player_character->f9d;
+    skill_add_uses(0, 1);
     v = m->maxhp * v / 1000 + (m->f28 - 50) / 10;
     if (v < 1)
         v = 1;
     m->hp += v;
     if (m->hp > m->maxhp)
         m->hp = m->maxhp;
-    func_0007242F((D_00195BE0->f30 + D_00195BE0->f38) << 6 >> 3);
+    fatigue_add((player_character->f30 + player_character->f38) << 6 >> 3);
     if (!(e->f4 & 8) && m->f8d < m->f8f) {
         m->f8d += m->f8f >> 3;
         if (m->f8d > m->f8f)

@@ -13,121 +13,121 @@ struct cur { unsigned char f0; char f1; unsigned char f2; short f3; int f5; };
 extern char D_00175EAA[];        /* __FILE__ */
 extern char D_00176089[];
 extern char D_00176096[];
-extern char D_001788DF[];
-extern char D_001789FA[];
-extern struct thing *D_00195AA0;
-extern char D_00195BE0[];
-extern int D_00195BF4;
+extern char trade_price_scale[];
+extern char player_environment[];
+extern struct thing *player_entity;
+extern char player_character[];
+extern int game_minutes;
 extern char D_00195D2C[];
 extern char D_00195D30[];
 extern char D_001960D9[];
 extern char D_001961F5[];
-extern struct cur *D_001A4A14;
-extern void func_0003F09F(short, int);
+extern struct cur *guild_membership;
+extern void msgbox_show_rsc(short, int);
 extern void func_0005F401(int);
-extern int func_00070B9C(struct mobile *, int);
-extern void func_0007F1E3(int);
-extern int func_0007F2A8(int);
-extern void func_0008AF3E(int, int);
-extern void func_0008DA1C(int);
-extern struct thing *func_0008DCE3(struct thing *, int, int);
-extern void func_000922F6(int, int, int);
-extern int func_0009784E(int, int);
+extern int blessing_apply(struct mobile *, int);
+extern void gold_spend(int);
+extern int gold_can_afford(int);
+extern void spfx_cure_disease(int, int);
+extern void object_free_children(int);
+extern struct thing *object_create_child(struct thing *, int, int);
+extern void inventory_open_container(int, int, int);
+extern int trade_adjust_price(int, int);
 extern void func_00097A85(void);
 extern int func_00097B2A(void);
 extern int func_00097BD9(int);
-extern int func_0009A993(int);
+extern int travel_map_open(int);
 extern int func_000A0AD9();
-void func_00070624(int, unsigned char);
-int func_0007069D(int);
+void guild_add_membership(int, unsigned char);
+int guild_confirm_price(int);
 
-void func_00070496(void)
+void guild_check_invitations(void)
 {
-    if (((int)(unsigned char)*(signed char *)(*(char **)D_00195BE0 + 546)) == 100) goto L704C7;
-    if (*(int *)(*(char **)D_00195BE0 + 529) != 0) goto L704C9;
+    if (((int)(unsigned char)*(signed char *)(*(char **)player_character + 546)) == 100) goto L704C7;
+    if (*(int *)(*(char **)player_character + 529) != 0) goto L704C9;
 L704C7:;
     goto L704DC;
 L704C9:;
-    if (((unsigned)*(int *)(*(char **)D_00195BE0 + 529)) < D_00195BF4) goto L704DE;
+    if (((unsigned)*(int *)(*(char **)player_character + 529)) < game_minutes) goto L704DE;
 L704DC:;
     goto L704EA;
 L704DE:;
-    if (((int)(unsigned char)*(signed char *)D_001789FA) == 1) goto L704EC;
+    if (((int)(unsigned char)*(signed char *)player_environment) == 1) goto L704EC;
 L704EA:;
     goto L70525;
 L704EC:;
-    *(signed char *)(*(char **)D_00195BE0 + 546) = 100;
-    *(int *)(*(char **)D_00195BE0 + 529) = 0;
+    *(signed char *)(*(char **)player_character + 546) = 100;
+    *(int *)(*(char **)player_character + 529) = 0;
     func_000A0AD9((int)D_001961F5, (int)D_00176089, 13, (int)D_00175EAA, 1233);
 L70525:;
-    if (((int)(unsigned char)*(signed char *)(*(char **)D_00195BE0 + 543)) == 100) goto L70548;
-    if (*(int *)(*(char **)D_00195BE0 + 533) != 0) goto L7054A;
+    if (((int)(unsigned char)*(signed char *)(*(char **)player_character + 543)) == 100) goto L70548;
+    if (*(int *)(*(char **)player_character + 533) != 0) goto L7054A;
 L70548:;
     goto L7055D;
 L7054A:;
-    if (((unsigned)*(int *)(*(char **)D_00195BE0 + 533)) < D_00195BF4) goto L7055F;
+    if (((unsigned)*(int *)(*(char **)player_character + 533)) < game_minutes) goto L7055F;
 L7055D:;
     goto L7056B;
 L7055F:;
-    if (((int)(unsigned char)*(signed char *)D_001789FA) == 1) goto L7056D;
+    if (((int)(unsigned char)*(signed char *)player_environment) == 1) goto L7056D;
 L7056B:;
     return;
 L7056D:;
-    *(signed char *)(*(char **)D_00195BE0 + 543) = 100;
-    *(int *)(*(char **)D_00195BE0 + 533) = 0;
+    *(signed char *)(*(char **)player_character + 543) = 100;
+    *(int *)(*(char **)player_character + 533) = 0;
     func_000A0AD9((int)D_001961F5, (int)D_00176096, 13, (int)D_00175EAA, 1243);
 }
 
-void func_000705B0(void)
+void guild_teleport(void)
 {
-    *(signed char *)D_001789FA = 1;
-    func_0009A993(100);
+    *(signed char *)player_environment = 1;
+    travel_map_open(100);
 }
 
-void func_000705D9(void)
+void guild_join_dark_brotherhood(void)
 {
-    func_00070624(108, 0);
+    guild_add_membership(108, 0);
 }
 
-void func_000705FD(void)
+void guild_join_thieves_guild(void)
 {
-    func_00070624(42, 3);
+    guild_add_membership(42, 3);
 }
 
-void func_00070624(int a1, unsigned char a2)
+void guild_add_membership(int a1, unsigned char a2)
 {
 {
     int l_1C;
 
-    l_1C = (int)func_0008DCE3(D_00195AA0, 0, 13);
+    l_1C = (int)object_create_child(player_entity, 0, 13);
     *(signed char *)((char *)l_1C) = 10;
     *(short *)((char *)l_1C + 21) = 3;
-    (D_001A4A14 = (struct cur *)(l_1C + 71))->f3 = a1;
-    D_001A4A14->f2 = a2;
-    D_001A4A14->f5 = D_00195BF4;
-    D_001A4A14->f0 = 0;
+    (guild_membership = (struct cur *)(l_1C + 71))->f3 = a1;
+    guild_membership->f2 = a2;
+    guild_membership->f5 = game_minutes;
+    guild_membership->f0 = 0;
 }
 }
 
-int func_0007069D(int a1)
+int guild_confirm_price(int a1)
 {
     int l_1C;
 
     *(int *)D_00195D2C = func_00097BD9((*(int *)D_00195D2C = a1));
-    *(int *)D_00195D30 = ((*(int *)D_00195D30 = func_0009784E(*(int *)D_00195D2C, 0)) * *(int *)D_001788DF) / 256;
+    *(int *)D_00195D30 = ((*(int *)D_00195D30 = trade_adjust_price(*(int *)D_00195D2C, 0)) * *(int *)trade_price_scale) / 256;
     func_00097A85();
     l_1C = func_00097B2A();
     return l_1C;
 }
 
-void func_00070715(void)
+void guild_buy_soulgems(void)
 {
-    func_0008DA1C((int)D_001960D9);
+    object_free_children((int)D_001960D9);
     func_0005F401((int)D_001960D9);
-    func_000922F6((int)D_001960D9, 1, 4);
+    inventory_open_container((int)D_001960D9, 1, 4);
 }
 
-void func_00070755(void)
+void guild_cure_diseases(void)
 {
     int l_24;
     int l_20;
@@ -135,7 +135,7 @@ void func_00070755(void)
     int l_18;
 
     l_20 = 0;
-    l_24 = (int)D_00195AA0->child;
+    l_24 = (int)player_entity->child;
 L70775:;
     if (l_24 == 0) goto L707B3;
     if (((int)(unsigned char)*(signed char *)((char *)l_24)) != 11) goto L707A8;
@@ -146,28 +146,28 @@ L707A8:;
     l_24 = *(int *)((char *)l_24 + 55);
     goto L70775;
 L707B3:;
-    if (*(int *)(*(char **)D_00195BE0 + 499) == 0) goto L707C7;
+    if (*(int *)(*(char **)player_character + 499) == 0) goto L707C7;
     l_20++;
 L707C7:;
     if (l_20 != 0) goto L707E1;
-    func_0003F09F(30, 1);
+    msgbox_show_rsc(30, 1);
     return;
 L707E1:;
     l_1C = l_20 * 250;
-    if (D_001A4A14->f2 != 142) goto L70837;
-    l_1C = (l_1C * (((10 - D_001A4A14->f0) << 8) / 10)) / 256;
+    if (guild_membership->f2 != 142) goto L70837;
+    l_1C = (l_1C * (((10 - guild_membership->f0) << 8) / 10)) / 256;
 L70837:;
-    l_1C = func_0007069D(l_1C);
+    l_1C = guild_confirm_price(l_1C);
     if (l_1C < 1) return;
-    if (func_0007F2A8(l_1C) != 0) goto L70865;
-    func_0003F09F(454, 1);
+    if (gold_can_afford(l_1C) != 0) goto L70865;
+    msgbox_show_rsc(454, 1);
     return;
 L70865:;
-    func_0007F1E3(l_1C);
-    func_0008AF3E((int)D_00195AA0, *(int *)D_00195BE0);
+    gold_spend(l_1C);
+    spfx_cure_disease((int)player_entity, *(int *)player_character);
 }
 
-void func_00070887(void)
+void guild_buy_blessing(void)
 {
     struct thing *t;
     int n;
@@ -176,27 +176,27 @@ void func_00070887(void)
 
     msg = 0;
     m = 0;
-    if (D_001A4A14->f2 == 142)
+    if (guild_membership->f2 == 142)
         return;
-    t = D_00195AA0->child;
+    t = player_entity->child;
     while (t != 0) {
         if (t->type == 30) {
-            func_0003F09F(454, 1);
+            msgbox_show_rsc(454, 1);
             return;
         }
         t = t->next;
     }
-    n = func_0007069D(100);
+    n = guild_confirm_price(100);
     if (n < 1)
         return;
-    if (func_0007F2A8(n) == 0) {
-        func_0003F09F(454, 1);
+    if (gold_can_afford(n) == 0) {
+        msgbox_show_rsc(454, 1);
         return;
     }
-    func_0007F1E3(n);
-    t = func_0008DCE3(D_00195AA0, 0, 7);
+    gold_spend(n);
+    t = object_create_child(player_entity, 0, 7);
     m = &t->mob;
-    switch (D_001A4A14->f2) {
+    switch (guild_membership->f2) {
     case 143:
         m->f0 = 14;
         msg = 705;
@@ -226,8 +226,8 @@ void func_00070887(void)
         msg = 717;
         break;
     }
-    m->f2 = (D_001A4A14 != 0 ? D_001A4A14->f0 + 4 : 4) * 1440 + D_00195BF4;
-    m->f1 = func_00070B9C(m, D_001A4A14 != 0 ? D_001A4A14->f0 + 10 : 8);
+    m->f2 = (guild_membership != 0 ? guild_membership->f0 + 4 : 4) * 1440 + game_minutes;
+    m->f1 = blessing_apply(m, guild_membership != 0 ? guild_membership->f0 + 10 : 8);
     if (msg != 0)
-        func_0003F09F(msg, 1);
+        msgbox_show_rsc(msg, 1);
 }

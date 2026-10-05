@@ -24,7 +24,7 @@ extern int func_000A0F5C(char *, char *, ...);
 extern int func_000A13DA(char *, int, struct find_t *);
 extern int func_000A13F7(struct find_t *);
 
-void func_0006D6A4(char *a1)
+void file_index_scan(char *a1)
 {
     int rc;
     int i;
@@ -53,7 +53,7 @@ void func_0006D6A4(char *a1)
             }
             func_0006D430(ff.name);
             func_000A0AD9(&path[func_000A0DF4(path) - 3], ff.name, 4, D_00175D00, 359);
-            func_0006D6A4(path);
+            file_index_scan(path);
             i = func_000A0DF4(path) - 1;
             while (i != 0 && path[i] != '\\')
                 i--;

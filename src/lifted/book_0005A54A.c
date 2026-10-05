@@ -4,7 +4,7 @@
 
 extern int func_0012DBCC();
 
-void func_0005A54A(int a1, short a2, short a3)
+void text_draw(int a1, short a2, short a3)
 {
     func_0012DBCC((int)(short)a2, (int)(short)a3, a1);
 }

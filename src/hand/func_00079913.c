@@ -16,15 +16,15 @@ struct mobile {
     unsigned char f67;          /* 0x43 */
 };
 struct thing { unsigned char type; char pad[70]; struct mobile mob; };
-extern unsigned char D_00187A62[];
+extern unsigned char monster_language_skill[];
 extern struct bits8 D_001940D6;
-extern int D_00195AA0;
-extern struct player *D_00195BE0;
-extern void func_0003D01C(int, int);
-extern int func_0007D6AE(int, int);
-extern int func_0008B29A(int, unsigned char, unsigned char);
+extern int player_entity;
+extern struct player *player_character;
+extern void skill_add_uses(int, int);
+extern int rand_range(int, int);
+extern int spell_active_chance(int, unsigned char, unsigned char);
 
-void func_00079913(struct thing *a1)
+void monster_pacify_check(struct thing *a1)
 {
     struct mobile *m;
     int chance;
@@ -33,16 +33,16 @@ void func_00079913(struct thing *a1)
     m = &a1->mob;
     chance = D_001940D6.b6 ? -25 : 10;
     if (m->f67 >= 43)
-        chance += D_00195BE0->f42 / 5 + D_00195BE0->skills[1].v / 10;
+        chance += player_character->f42 / 5 + player_character->skills[1].v / 10;
     else {
-        sk = D_00187A62[m->f67];
+        sk = monster_language_skill[m->f67];
         if (sk != 0) {
-            chance += D_00195BE0->skills[sk].v;
-            func_0003D01C(sk, 1);
+            chance += player_character->skills[sk].v;
+            skill_add_uses(sk, 1);
         }
-        chance += func_0008B29A(D_00195AA0, 44, 255);
-        chance += D_00195BE0->f42 / 5;
+        chance += spell_active_chance(player_entity, 44, 255);
+        chance += player_character->f42 / 5;
     }
-    if (func_0007D6AE(1, 200) <= chance)
+    if (rand_range(1, 200) <= chance)
         m->f65.b7 = 1;
 }

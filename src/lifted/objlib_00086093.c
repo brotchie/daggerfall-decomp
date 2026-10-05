@@ -2,14 +2,14 @@
  * do not edit: move a function to src/objlib.c to work on it by hand) */
 
 
-extern int func_0007D6AE(int, int);
+extern int rand_range(int, int);
 
 short func_00086093(int a1)
 {
     int l_20;
     int l_1C;
 
-    l_20 = func_0007D6AE(0, (int)(short)*(short *)((char *)a1 + 2));
+    l_20 = rand_range(0, (int)(short)*(short *)((char *)a1 + 2));
 L860B5:;
     l_1C = 2;
 L860BC:;
@@ -35,6 +35,6 @@ L86111:;
 L86124:;
     goto L860C7;
 L86126:;
-    l_20 = func_0007D6AE(0, (int)(short)*(short *)((char *)a1 + 2));
+    l_20 = rand_range(0, (int)(short)*(short *)((char *)a1 + 2));
     goto L860B5;
 }

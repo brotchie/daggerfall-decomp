@@ -15,66 +15,66 @@ extern char D_00175AC3[];
 extern char D_0018DC64[];
 extern char D_0018DD54[];
 extern char D_0018DD5C[];
-extern char D_001903A4[];
-extern char D_00195A9C[];
+extern char text_buffer[];
+extern char current_building[];
 extern char D_00195C44[];
-extern char D_00196033[];
+extern char msgbox_button_keys[];
 extern char D_00196034[];
 extern char D_00196035[];
-extern char D_0019608F[];
+extern char msgbox_button_ids[];
 extern char D_00196090[];
 extern char D_00196091[];
 extern char D_00196271[];
 extern char D_001A3AAC[];
-extern char D_001A3AB4[];
+extern char trade_haggle_asking[];
 extern char D_001A3AC4[];
 extern char D_001A3ACC[];
 extern char D_001A3AD4[];
 extern char D_001A3ADC[];
 extern char D_001A3AE0[];
-extern char D_001A3AE8[];
+extern char sound_channels[];
 extern char D_001A3BD8[];
 extern char D_001A3F3C[];
 extern char D_001A3F40[];
-extern char D_001A3F44[];
-extern char D_001A3F5D[];
+extern char midi_bsa[];
+extern char sound_enabled[];
 
-extern int func_00011016(int, ...);
-extern int func_000112A1(void);
-extern int func_0001149A(int, ...);
-extern int func_00012E04(int, int, int);
+extern int sos_init(int, ...);
+extern int sos_shutdown(void);
+extern int sos_read_settings(int, ...);
+extern int archive_open(int, int, int);
 extern int func_00069B0E(int, int);
-extern int func_000994F0(int, int);
-extern int func_0009957D(int, int);
+extern int dpmi_lock_region(int, int);
+extern int dpmi_unlock_region(int, int);
 extern int func_000A0DF4();
 extern int func_000A0ED9(int, int);
 extern int func_000A0F5C(int, ...);
 extern int func_000A1D3C();
-extern void func_00012F27(int);
-extern void func_0003EC2A(int, int);
-extern void func_000696A3(int);
-extern void func_000697E3(void);
+extern void archive_close(int);
+extern void msgbox_show_string(int, int);
+extern void sound_stop_channel(int);
+extern void music_stop(void);
 extern void func_00069B53(int);
-extern void func_0008C4E4(int);
+extern void inpstr_begin_number(int);
 void func_0006899B(void);
 #pragma aux func_000A0ED9 parm routine [];
 
-void func_00068731(void)
+void trade_haggle_show_offer(void)
 {
     *(signed char *)D_00196271 = 0;
     *(signed char *)D_0012B508 = 146;
-    *(signed char *)D_0019608F = 1;
+    *(signed char *)msgbox_button_ids = 1;
     *(signed char *)D_00196090 = 2;
     *(signed char *)D_00196091 = 12;
-    *(signed char *)D_00196033 = 30;
+    *(signed char *)msgbox_button_keys = 30;
     *(signed char *)D_00196034 = 19;
     *(signed char *)D_00196035 = 46;
     func_000A0ED9(131, (int)D_00175A30);
-    func_000A0F5C((int)D_001903A4, (int)D_00175A38, (int)*(double *)D_001A3AB4);
-    func_0003EC2A((int)D_001903A4, 5);
+    func_000A0F5C((int)text_buffer, (int)D_00175A38, (int)*(double *)trade_haggle_asking);
+    msgbox_show_string((int)text_buffer, 5);
 }
 
-void func_000687C5(void)
+void trade_counter_offer(void)
 {
     int l_18;
 
@@ -83,8 +83,8 @@ void func_000687C5(void)
     func_000A0ED9(141, (int)D_00175A30);
     func_000A0F5C(l_18, (int)D_00175A6A);
     *(signed char *)((char *)(func_000A0DF4(l_18) + l_18) + 1) = 0;
-    func_0003EC2A(l_18, 2);
-    func_0008C4E4((int)*(double *)D_001A3AB4);
+    msgbox_show_string(l_18, 2);
+    inpstr_begin_number((int)*(double *)trade_haggle_asking);
 }
 
 int func_00068845(int a1)
@@ -93,7 +93,7 @@ int func_00068845(int a1)
     return 0;
 L6886D:;
     *(int *)D_001A3ADC = a1;
-    *(double *)D_001A3ACC = *(double *)D_001A3AB4 - *(double *)D_001A3AD4;
+    *(double *)D_001A3ACC = *(double *)trade_haggle_asking - *(double *)D_001A3AD4;
     *(double *)D_001A3AC4 = *(double *)D_001A3AAC + *(double *)D_001A3AD4;
     if (*(double *)D_001A3ACC >= *(double *)D_001A3AC4) goto L688B8;
     if (a1 > *(double *)D_001A3AAC) goto L688BA;
@@ -120,10 +120,10 @@ L68922:;
 L6893E:;
     goto L68964;
 L68940:;
-    *(double *)D_001A3AB4 -= *(double *)D_001A3AD4;
+    *(double *)trade_haggle_asking -= *(double *)D_001A3AD4;
     *(double *)D_001A3AAC = *(double *)D_001A3AD4 + *(double *)D_001A3AAC;
 L68964:;
-    if (((int)*(double *)D_001A3AB4) != a1) goto L68982;
+    if (((int)*(double *)trade_haggle_asking) != a1) goto L68982;
     return a1;
 L68982:;
     func_0006899B();
@@ -132,22 +132,22 @@ L68982:;
 
 void func_0006899B(void)
 {
-    *(double *)D_001A3AD4 = ((((*(double *)D_00175A9E - ((short)((int)(unsigned char)*(signed char *)(*(char **)D_00195A9C + 25)) * *(double *)D_00175A96)) + (*(short *)(*(char **)D_001A3AE0 + 283) * *(double *)D_00175AA6)) + (*(short *)(*(char **)D_001A3AE0 + 42) * *(double *)D_00175AA6)) + (*(short *)(*(char **)D_001A3AE0 + 147) * *(double *)D_00175AAE)) * (*(double *)D_001A3AB4 - *(double *)D_001A3AAC);
+    *(double *)D_001A3AD4 = ((((*(double *)D_00175A9E - ((short)((int)(unsigned char)*(signed char *)(*(char **)current_building + 25)) * *(double *)D_00175A96)) + (*(short *)(*(char **)D_001A3AE0 + 283) * *(double *)D_00175AA6)) + (*(short *)(*(char **)D_001A3AE0 + 42) * *(double *)D_00175AA6)) + (*(short *)(*(char **)D_001A3AE0 + 147) * *(double *)D_00175AAE)) * (*(double *)trade_haggle_asking - *(double *)D_001A3AAC);
 }
 
 int func_00068A1D(void)
 {
     int l_1C;
 
-    if ((short)func_0001149A((int)D_00175AB8) != 0) goto L68A4A;
+    if ((short)sos_read_settings((int)D_00175AB8) != 0) goto L68A4A;
     return 0;
 L68A4A:;
-    if (func_00011016(*(int *)D_0018DD5C, *(int *)D_0018DD54) == 0) goto L68A6E;
+    if (sos_init(*(int *)D_0018DD5C, *(int *)D_0018DD54) == 0) goto L68A6E;
     return 0;
 L68A6E:;
     *(int *)D_0018DC64 = 2048;
     func_000A1D3C(127);
-    *(int *)D_001A3F44 = func_00012E04((int)D_00175AC3, 0, 0);
+    *(int *)midi_bsa = archive_open((int)D_00175AC3, 0, 0);
     l_1C = 0;
 L68A9C:;
     if (l_1C < 4) goto L68AAC;
@@ -159,10 +159,10 @@ L68AAC:;
     *(int *)(D_001A3BD8 + (l_1C * 268)) = 305419896;
     goto L68AA4;
 L68ABF:;
-    *(signed char *)D_001A3F5D = 1;
-    func_000994F0((int)D_001A3AE8, 5168);
-    func_000994F0((int)D_000CDDA8, 4096);
-    func_000994F0((int)D_001A3F40, 4096);
+    *(signed char *)sound_enabled = 1;
+    dpmi_lock_region((int)sound_channels, 5168);
+    dpmi_lock_region((int)D_000CDDA8, 4096);
+    dpmi_lock_region((int)D_001A3F40, 4096);
     *(int *)D_001A3F3C = func_00069B0E((int)D_000CDDA8, 140);
     return 1;
 }
@@ -171,10 +171,10 @@ void func_00068B1B(void)
 {
     int l_18;
 
-    if (*(signed char *)D_001A3F5D == 0) return;
+    if (*(signed char *)sound_enabled == 0) return;
     func_00069B53(*(int *)D_001A3F3C);
-    func_000697E3();
-    func_00012F27(*(int *)D_001A3F44);
+    music_stop();
+    archive_close(*(int *)midi_bsa);
     l_18 = 0;
 L68B52:;
     if (l_18 < 4) goto L68B62;
@@ -183,11 +183,11 @@ L68B5A:;
     l_18++;
     goto L68B52;
 L68B62:;
-    func_000696A3(l_18);
+    sound_stop_channel(l_18);
     goto L68B5A;
 L68B6C:;
-    func_000112A1();
-    func_0009957D((int)D_001A3AE8, 5168);
-    func_0009957D((int)D_000CDDA8, 4096);
-    func_0009957D((int)D_001A3F40, 4096);
+    sos_shutdown();
+    dpmi_unlock_region((int)sound_channels, 5168);
+    dpmi_unlock_region((int)D_000CDDA8, 4096);
+    dpmi_unlock_region((int)D_001A3F40, 4096);
 }

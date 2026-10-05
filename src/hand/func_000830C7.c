@@ -48,22 +48,22 @@ struct bits2 { unsigned char b0:1, b1:1, b2:1; };
 extern int D_000C5404;
 extern int D_001343C0;
 struct race { unsigned short flags; char pad[27]; };
-extern struct race D_0018487E[];
-extern short D_001959AC;
-extern unsigned char D_0019627B;
+extern struct race monster_table_flags[];
+extern short frame_counter;
+extern unsigned char current_climate;
 extern int D_00199808;
-extern char D_001A5C25;
+extern char cfg_show_markers;
 extern struct flame D_001A945E;
 extern unsigned char D_001A949C;
 extern char D_001A949D;
-extern void func_0005C6A2(struct obj *);
+extern void spell_area_effect(struct obj *);
 extern void func_00073ADF(struct obj *);
-extern int func_00073B3E(struct obj *);
-extern void func_0007D6EA(struct obj *);
+extern int weapon_arrow_update(struct obj *);
+extern void object_free_later(struct obj *);
 extern int func_0007E1A7(struct obj *);
 extern void func_0007E246(struct obj *);
-extern int func_0008523E(unsigned short, int, int);
-extern void func_00085DE4(int, int, int, int, int);
+extern int model_get(unsigned short, int, int);
+extern void flat_animal_sound(int, int, int, int, int);
 extern int func_000C013B();
 extern int func_000C5280();
 extern int func_000C7F14();
@@ -73,7 +73,7 @@ extern int func_00136AD8();
 extern int func_001401D4();
 extern int func_00154D00();
 
-int func_000830C7(struct obj *a1)
+int object_draw_cb(struct obj *a1)
 {
     struct flame *l_4C;
     unsigned char *l_48;
@@ -97,7 +97,7 @@ int func_000830C7(struct obj *a1)
     D_000C5404 = 0;
     switch (a1->type) {
     case 18:
-        a1->x1 = D_001959AC;
+        a1->x1 = frame_counter;
         l_38 = (unsigned char *)a1 + 705;
         func_000C013B(l_38);
         a1->snd = (a1->snd & -128) | (l_38[22] + l_38[21]);
@@ -114,7 +114,7 @@ int func_000830C7(struct obj *a1)
             l_34 = 1;
         l_24 = a1->data;
         if (((struct bits2 *)(l_24 + 137))->b2 == 0) {
-            if ((D_0018487E[l_24[67]].flags & 1) && l_24[67] != 29 && a1->y - 90 > *(int *)(l_24 + 88))
+            if ((monster_table_flags[l_24[67]].flags & 1) && l_24[67] != 29 && a1->y - 90 > *(int *)(l_24 + 88))
                 a1->handle = func_00154D00(a1->x, a1->y - 30, a1->z, a1->snd, *(short *)l_38, (*(unsigned short *)(l_38 + 16) >> 10) & 32 | 4, l_30 + 256);
             else
                 a1->handle = func_00154D00(a1->x, a1->y, a1->z, a1->snd, *(short *)l_38, (*(unsigned short *)(l_38 + 16) >> 10) & 32 | 4, l_30 + 256);
@@ -122,14 +122,14 @@ int func_000830C7(struct obj *a1)
         break;
     case 42:
         if (func_0007E1A7(a1) != 0) {
-            func_0007D6EA(a1);
+            object_free_later(a1);
             break;
         }
         a1->handle = func_00154D00(a1->x, a1->y, a1->z, a1->snd, a1->f23, 1, 256);
         func_0007E246(a1);
         break;
     case 53:
-        a1->x1 = D_001959AC;
+        a1->x1 = frame_counter;
         if (a1->flags & 16384)
             l_34 = 36;
         else
@@ -140,7 +140,7 @@ int func_000830C7(struct obj *a1)
             a1->handle = func_00154D00(a1->x, a1->y, a1->z, a1->snd, -1, l_34, 256);
         break;
     case 8:
-        a1->x1 = D_001959AC;
+        a1->x1 = frame_counter;
         if (a1->snd == 0 || a1->snd == 65535) {
             l_34 = 1;
             break;
@@ -150,12 +150,12 @@ int func_000830C7(struct obj *a1)
     case 2:
         if (a1->f29 == 998 && a1->snd == 0) {
             l_4C = &D_001A945E;
-            l_4C->handle = func_0008523E(a1->f29, a1->snd, (D_0019627B << 2) + D_001A949C);
+            l_4C->handle = model_get(a1->f29, a1->snd, (current_climate << 2) + D_001A949C);
             if (l_4C->handle != 0) {
                 l_4C->x = a1->x;
                 l_4C->y = a1->y;
                 l_4C->z = a1->z;
-                if (func_00073B3E(a1) == 0)
+                if (weapon_arrow_update(a1) == 0)
                     break;
                 func_00073ADF(a1);
                 l_4C->f44 = a1->f23;
@@ -165,7 +165,7 @@ int func_000830C7(struct obj *a1)
                 break;
             }
         }
-        a1->x1 = D_001959AC;
+        a1->x1 = frame_counter;
         if (a1->snd == 0 || a1->snd == 65535 || a1->snd == 200)
             break;
         if ((a1->snd >> 7) == 210)
@@ -175,11 +175,11 @@ int func_000830C7(struct obj *a1)
         a1->handle = func_00154D00(a1->x, a1->y, a1->z, a1->snd, -1, 4, (l_30 << 16) + 256);
         break;
     case 34:
-        if (D_001A5C25 == 0)
+        if (cfg_show_markers == 0)
             break;
     case 33:
     case 44:
-        a1->x1 = D_001959AC;
+        a1->x1 = frame_counter;
         if (a1->snd == 0 || a1->snd == 65535 || a1->snd == 200)
             break;
         if ((a1->snd >> 7) == 210)
@@ -192,7 +192,7 @@ int func_000830C7(struct obj *a1)
         if (a1->flags & 8192) {
             if (a1->f29 & 32768) {
                 if (a1->f29 == 32768)
-                    func_0005C6A2(a1);
+                    spell_area_effect(a1);
                 l_3C = (unsigned char *)func_00135DE4(a1->f23 >> 7, a1->f23 & 127);
                 if ((int)((struct stat15 *)&a1->f29)->f >= (int)*(unsigned short *)(l_3C + 20)) {
                     a1->f29 = 36863;
@@ -222,14 +222,14 @@ int func_000830C7(struct obj *a1)
         l_40 = *(struct anim **)(l_48 + 5);
         l_44 = *(struct light **)(l_48 + 9);
         for (l_34 = 0; l_48[0] > l_34; l_34++, l_40++) {
-            l_40->handle = func_0008523E(l_40->id, l_40->rec, (D_0019627B << 2) + D_001A949C);
+            l_40->handle = model_get(l_40->id, l_40->rec, (current_climate << 2) + D_001A949C);
             if (l_40->handle != 0)
                 func_001401D4(&l_40->handle, 0);
         }
         for (l_34 = 0; l_48[1] > l_34; l_34++, l_44++) {
             if (l_44->snd == 0 || l_44->snd == 65535)
                 continue;
-            if ((l_44->snd >> 7) == 199 && D_001A5C25 == 0)
+            if ((l_44->snd >> 7) == 199 && cfg_show_markers == 0)
                 continue;
             if ((l_44->snd >> 7) == 210) {
                 func_00136AD8(l_44->x, l_44->y - 16, l_44->z, l_44->f14 & 255, l_44->f14 >> 8, 0);
@@ -245,13 +245,13 @@ int func_000830C7(struct obj *a1)
         if (a1->f29 == 0)
             break;
         l_4C = (struct flame *)a1->data;
-        l_4C->handle = func_0008523E(a1->f29, a1->snd, (D_0019627B << 2) + D_001A949C);
+        l_4C->handle = model_get(a1->f29, a1->snd, (current_climate << 2) + D_001A949C);
         if (l_4C->handle != 0) {
             l_4C->x = a1->x;
             l_4C->y = a1->y;
             l_4C->z = a1->z;
             if (a1->f29 == 998) {
-                if (func_00073B3E(a1) == 0)
+                if (weapon_arrow_update(a1) == 0)
                     break;
                 func_00073ADF(a1);
                 l_4C->f44 = a1->f23;
@@ -271,14 +271,14 @@ int func_000830C7(struct obj *a1)
         l_40 = (struct anim *)a1->data;
         l_44 = (struct light *)(l_40 + a1->snd);
         for (l_34 = 0; a1->snd > l_34; l_34++, l_40++) {
-            l_40->handle = func_0008523E(l_40->id, l_40->rec, (D_0019627B << 2) + D_001A949C);
+            l_40->handle = model_get(l_40->id, l_40->rec, (current_climate << 2) + D_001A949C);
             if (l_40->handle != 0)
                 func_001401D4(&l_40->handle, 0);
         }
         for (l_34 = 0; a1->f23 > l_34; l_34++, l_44++) {
             if (l_44->snd == 0 || l_44->snd == 65535)
                 continue;
-            if ((l_44->snd >> 7) == 199 && D_001A5C25 == 0)
+            if ((l_44->snd >> 7) == 199 && cfg_show_markers == 0)
                 continue;
             if (l_44->f14 == 0) {
                 if ((l_44->snd >> 7) == 210 && D_00199808 == 0) {
@@ -292,7 +292,7 @@ int func_000830C7(struct obj *a1)
                     l_30 = 0;
                 }
                 func_00154D00(l_44->x, l_44->y, l_44->z, l_44->snd, -1, 4, (l_30 << 16) + 256);
-                func_00085DE4(l_44->x, l_44->y, l_44->z, l_44->snd >> 7, l_44->snd & 127);
+                flat_animal_sound(l_44->x, l_44->y, l_44->z, l_44->snd >> 7, l_44->snd & 127);
             }
         }
         break;
