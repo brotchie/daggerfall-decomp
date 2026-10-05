@@ -26,6 +26,7 @@ global,0x000C1105,xn_vid_sample_rate,strong,Word: 1000000/(256 - rate byte) from
 global,0x000C1112,xn_vid_audio_buf_a,strong,"Dword: the first 4000h audio buffer (allocated and locked by C1654, freed by C1844); its length in D_000C1116."
 global,0x000C111A,xn_vid_audio_buf_b,strong,Dword: the second 4000h audio buffer; its length in D_000C111E.
 global,0x000C1125,xn_vid_palette,strong,"768 bytes: the movie's palette (chunk type 2), set as the game palette by 12D851 at the end of xn_vid_play."
+global,0x000C1425,xn_vid_dest_offset,strong,"int: row offset + x of the movie in screen_buffer (C1758 mov [0C1425h],eax; C18AA adds screen_buffer); xn_vid_player+0x326"
 global,0x000C1429,xn_vid_frames_left,strong,Word: frames still to decode; at 0 C18A3 finishes the movie.
 global,0x000C142B,xn_vid_file,strong,Word: the movie's DOS file handle (0 when closed).
 global,0x000C1431,xn_vid_buf,strong,"Dword: start of the read buffer (big_buffer); D_000C1439 = its end (+FA00h), D_000C143D = end - 81h (refill point)."
@@ -37,9 +38,14 @@ global,0x000C14ED,xn_vid_skippable,strong,Dword: the fourth argument of xn_vid_p
 global,0x000C2300,xn_world_msg_out_of_memory,confirmed,"'WORLD: Out of memory.' + CRLF$ (C2D00, C322D)."
 global,0x000C2318,xn_world_msg_open_failed,confirmed,'WORLD: Error opening WorldFile.' + CRLF$ (C310F).
 global,0x000C233A,xn_world_file,strong,Dword: DOS handle of the world file (WOODS.WLD) opened by C310F.
+global,0x000C2342,xn_world_offsets_window_bytes,strong,"Dword: bytes of the WOODS.WLD offset table held in the window = min(window max, header offsets_size) (C3260; C3275 read size; C332D)"
+global,0x000C2346,xn_world_offsets_window_max,strong,Dword 4000h: capacity of the offset-table window (C324E)
+global,0x000C234A,xn_world_offsets_window_count,strong,"Dword: offset entries in the window, bytes/4 (C32B1, C3307, C3321)"
+global,0x000C234E,xn_world_offsets_window_first,strong,"Dword: first cell index in the window (C32B6, C3346, C3382); record 0x53565 = cell 0x53D65 - 800h"
 global,0x000C2352,xn_world_lone_tile_table,strong,"16 bytes: replacement tile for class self surrounded by class n, at n*4+self (identity on the diagonal), used by C3C3C."
 global,0x000C2362,xn_world_tile_class,strong,"65 bytes: class 0..3 of a ground tile 0..63 (FFh = not a base tile): 0,1,2,3 and the transition tiles; C3C3C, C3EFE."
 global,0x000C23A3,xn_world_dir_dx,strong,"8 bytes: x steps of the 8 neighbour directions (1,1,0,-1,-1,-1,0,1); y steps in D_000C23AB. Used by C3B1D."
+global,0x000C23AB,xn_world_dir_dy,strong,"8 bytes: y steps of the 8 neighbour directions (0,1,1,1,0,-1,-1,-1), with xn_world_dir_dx (C3B32, C3B5A)"
 global,0x000C23B8,xn_cam_pitch,confirmed,Camera pitch 0..2047: world_render and sky_update store (camera_object->angle_x + view_look_pitch) & 2047 and pass it to 0x137000.
 global,0x000C23BC,xn_cam_yaw,confirmed,Camera yaw 0..2047: world_render and sky_update store (camera_object->yaw + D_001959BC) & 2047; read by 12F59C.
 global,0x000C23C0,xn_cam_roll,confirmed,Camera roll: world_render stores camera_object->angle_z (plus a sway table entry in water); sky_update stores 0.
@@ -50,6 +56,8 @@ global,0x000C23D0,xn_world_size_x,strong,"Dword: world width in units (cells << 
 global,0x000C23D4,xn_world_size_z,strong,"Dword: world depth in units (rows << 15); rows count from the north as size_z - z (C2D8F, C2DB8, 14B45B, 13E69C)."
 global,0x000C23D8,xn_world_eye_sub_x,strong,Dword: the eye's x inside its cell in 256-unit steps 0..127 (C2DB8); C2E05 compares it with 17/111.
 global,0x000C23DC,xn_world_eye_sub_z,strong,Dword: the eye's position from the north edge of its cell in 256-unit steps 0..127 (C2DB8).
+global,0x000C23E0,xn_world_eye_col,strong,"Dword: cell column (x>>15) of the last xn_world_cell_index query, the eye's in C2E05/C2FF5 (C2DAC; C2EE1, C2F27 test the map edge)"
+global,0x000C23E4,xn_world_eye_row,strong,"Dword: cell row from the north ((size_z - z)>>15) of the last xn_world_cell_index query (C2D9C; C2F66, C2FB1)"
 global,0x000C23E8,xn_world_loaded_dirs,strong,"Byte: cells C2E05 loaded this frame: 1 west, 2 east, 4 north, 8 south."
 global,0x000C23E9,xn_world_height_bands,strong,"400h bytes from WOODS.WLD (C31AE): four height thresholds per climate, band 0 the water level; climates 0-2 are (3,15,75,110), (3,20,90,110), (3,10,20,60). C3B87, C3C3C, C3A60."
 global,0x000C27E9,xn_world_header,strong,"90h bytes: the WOODS.WLD header (C322D): +0 offset-table size (2000000), +4 width, +8 height, +0Ch (in memory: offset table pointer), +10h height-band table offset."
@@ -62,24 +70,36 @@ global,0x000C287D,xn_world_nature_archive,strong,"Word (cell header +4, 0 in WOO
 global,0x000C287F,xn_world_ground_archive,strong,Word (cell header +6): WOODS.WLD holds 2/102/302/402 there (the climate's ground archive); world_render overwrites it with ground_texture_archive each frame; the terrain (13EFD7) reads it.
 global,0x000C2881,xn_world_cell_climate,strong,"Byte (cell header +8): the cell's climate 0..2 in WOODS.WLD, the index into D_000C23E9's bands (C3B87, C3C3C, C3A60)."
 global,0x000C2882,xn_world_cell_noise,strong,Byte (header +9): bits 5-7 the fractal noise amplitude (32..192 in WOODS.WLD); bits 0-4 non-zero would mean full 128x128 layers (no WOODS.WLD record has them: all are 47 bytes).
+global,0x000C2883,xn_world_cell_path_starts,candidate,6 words of xn_world_cell_header (+0Ah): 0-terminated path start points read only by the dead path pass C3DA9 (which first writes 410h); zero in WOODS.WLD
 global,0x000C2893,xn_world_slot_cells,strong,"4 dwords: the cell held by each slot of the 2x2 window (-1 none); terrain_update_cells, func_0002021B and town_block_apply_ground search it."
 global,0x000C28A3,xn_world_noise_amp,strong,"Dword: fractal noise amplitude of the cell (header+9 >> 5); D_000C28A7 = half of it, the bias."
+global,0x000C28A7,xn_world_noise_bias,strong,"Dword: half the noise amplitude (C33ED), subtracted from each 0..amp roll of the midpoint displacement (C3632, C36E6)"
 global,0x000C28AB,xn_world_edge_near,strong,Dword 17: C2E05 loads the west/north neighbour when the eye's step in the cell is <= this.
 global,0x000C28AF,xn_world_edge_far,strong,Dword 111: C2E05 loads the east/south neighbour when the eye's step in the cell is >= this.
+global,0x000C28B3,xn_world_update_pass,strong,"Byte: xn_world_update's pass counter, two passes over the four edge tests (C2E0D, C2EB9, C2EBF)"
+global,0x000C28B4,xn_world_rand_elev_min,candidate,Dword 7Fh: lower clamp of the dead editor's xn_world_random_elevations (C352D)
+global,0x000C28B8,xn_world_rand_elev_max,candidate,Dword 7Fh: upper clamp of xn_world_random_elevations (C353A)
 global,0x000C28BC,xn_world_height_layer,strong,"Pointer: 256x256 heights of the 2x2 cell window (0..127, bit 7 = non-planar square); 14B45B, 13E8C8 and terrain_update_cells read it."
 global,0x000C28C0,xn_world_flat_layer,strong,"Pointer: 256x256 bytes: bits 0-1 tile orientation (C3EFE), bits 2-7 nature flat number (C3A60); 13E69C draws the flats."
 global,0x000C28C4,xn_world_tile_layer,strong,"Pointer: 256x256 ground tiles (C3B87, C3C3C, C3EFE); ground_tile_at (func_0002021B) reads & 63."
 global,0x000C28C8,xn_world_water_layer,candidate,"Pointer: 256x256 bytes holding the generated values below 80h (sea level), 0 on land (C355D)."
 global,0x000C28CC,xn_world_layers_alloc,strong,"Dword: the 40020h-byte allocation the four layers are cut from (C2D00, freed by C2D62)."
+global,0x000C28D4,xn_world_gen_step,strong,"Dword: the midpoint-displacement square size in squares, 32 halving to 1 (C3575, C39DF, C39E5)"
+global,0x000C28D8,xn_world_gen_count,strong,"Dword: squares per side at the current step, 4 doubling to 128 (C357F, C3596, C39D9)"
 global,0x000C28DC,xn_world_scratch_x,candidate,"Dword scratch: a grid column in C355D; 14B45B, 13EFD7 and 13F3C1 keep an x in it too."
+global,0x000C28E0,xn_world_scratch_x2,strong,"Dword: the right column of the current square in xn_world_gen_heightmap (C35C7, C35EF)"
 global,0x000C28E4,xn_world_scratch_y,candidate,"Dword scratch: a grid row in C355D; 14B45B (size_z - z), 13EFD7 and 13F3C1 use it too."
+global,0x000C28E8,xn_world_scratch_y2,strong,"Dword: the bottom row of the current square in xn_world_gen_heightmap (C35D1, C35E6)"
 global,0x000C28F4,xn_world_slot,strong,Dword: byte offset 0/4/8/12 of the slot being loaded or generated (C2DB8 and the load routines set it).
 global,0x000C28F8,xn_world_slot_x0,strong,"4 dwords 0,128,0,128: x origin of each slot in the 256x256 layers; y origins in D_000C2908 (0,0,128,128)."
 global,0x000C2908,xn_world_slot_y0,strong,"4 dwords 0,0,128,128: row origin of each slot in the 256x256 layers."
+global,0x000C2918,xn_world_grid_x,strong,"int[4][5]: per slot the x of the 5 control columns, x0 + 0,32,..,128; only [0] is used, by xn_world_unpack_cell C347F"
+global,0x000C2968,xn_world_grid_y,strong,"int[4][5]: per slot the row of the 5 control rows, y0 + 0,32,..,128; only [0] is used (C3476)"
 global,0x000C29B8,xn_world_height_scale,strong,"128 dwords: world height of each terrain height step (0, 40, 40, 40, 80 ... 7760); 14B45B, 13E84F, C3FCB."
 global,0x000C2BB8,xn_world_nature_flat_odds,strong,"129 bytes: +0 flat density in percent, then 4 height bands of 32 cumulative odds for flats 1..32 (FFh unused); climate_set_textures copies region_flats into it; C3A60."
 global,0x000C4100,xn_noise_values,strong,"513 dwords (with D_000C4500): 256 random values 0..255, repeated, plus a wrap entry; the hash and lattice table of xn_rand_noise_2d."
 global,0x000C4500,xn_noise_values_copy,strong,The second copy of the noise values (C5200) that lets C5280 index past 255 without masking.
+global,0x000C4904,xn_noise_fade_table,strong,int[512]: the smoothstep table indexed -256..255 whose centre is xn_noise_fade 0xC4D04 (C526E)
 global,0x000C4D04,xn_noise_fade,strong,Centre of a 512-dword smoothstep table indexed -256..255 (C524A); xn_rand_noise_2d interpolates with it.
 global,0x000C5400,xn_snow_turn_shift,strong,"sideways snow shift this frame: steer_turn_left/right and steer_forward_left/right set +-8, steer_slide_* +-4, player_mouse_look +-8; C9A89 adds it (<<6) to every flake and clears it"
 global,0x000C5404,xn_model_angle_or_bits,candidate,ORed into the three base angles by C7F14; object_draw_cb sets 3 for model 610 image 32 and 0 otherwise (automap_draw_object_cb the same)
@@ -155,12 +175,17 @@ global,0x000DB320,xn_render_poly_pool,strong,"pool of 100-byte polygon records (
 global,0x000F39E0,xn_render_span_sentinel,strong,"16-byte span node that ends every row list: next = itself, x from the clip right edge, poly = the background record"
 global,0x000F39F0,xn_render_span_rows,strong,"one 16-byte list head per screen row (next, x_end word +4, x_start word +6, 1/z +8, poly +0Ch), followed by the span node pool"
 global,0x00116C80,xn_render_light_list_pool,strong,"pool of per-object light lists (light ptr, x, y, z in object space, radius, intensity<<4; -1 ends) reset by 12A4F0"
+global,0x00120280,xn_render_light_list_pool_start,candidate,"dword 01116C80h = xn_render_light_list_pool, an initialised pointer (LE fixup) with no reader; with 0x120284 it bounds the light-list pool"
+global,0x00120284,xn_render_light_list_pool_end,candidate,"dword 01119200h: the end of the light-list pool (400 entries of 24 bytes); no reader, so the pool is unchecked; 0x119200..0x12027F after it is 28800 zero bytes nothing addresses"
 global,0x00120288,xn_pick_view_x,candidate,"x of the shared (x,y,z) view-space point whose z is pick_distance: xn_render_pick leaves the picked point's view x here (func_0001449D reads it); flats, the sphere test and the model code also use it as scratch"
 global,0x0012028C,xn_pick_view_y,candidate,y of the same point: (y - centre_y)*z/focal_y after xn_render_pick
 global,0x00120290,pick_distance,strong,distance to the clicked object: every click handler refuses beyond 128/150/160/256 with 'You are too far away...'
+global,0x00120294,xn_scratch_vec_b,strong,"xn_vec3: second shared scratch vector (struct xn_scratch.b): 13FFCB/13FFD8/13FFE5 (uv axes e2), 140886.. (face normal cross input), 12A653/12A641 (xn_render_pick: the screen point from xn_flat_pick), 155508/15550D (written by xn_flat_pick), 13EB87 (terrain)"
 global,0x001202A0,xn_pick_flat_x,candidate,view x of the flat hit by xn_flat_pick (copied to xn_pick_view_x when it is the nearer hit)
 global,0x001202A4,xn_pick_flat_y,candidate,view y of the flat hit by xn_flat_pick
 global,0x001202A8,xn_pick_flat_z,candidate,"depth of the flat hit by xn_flat_pick, compared with pick_distance in xn_render_pick"
+global,0x001202AC,xn_model_uv_len2,strong,"int: |e1|^2 >> 8 of the face's first edge in xn_model_calc_face_uv_axes (13FFBF write, 14001E/14005E read); only user"
+global,0x001202B0,xn_model_uv_t,strong,"int: 16.16 projection (e1.e2)/|e1|^2 in xn_model_calc_face_uv_axes (140024 write, 140121/14017A read); only user"
 global,0x001202C0,xn_cam_dir_x_table,strong,"1024 dwords (i<<18)/focal_x for i = -512..511, built by 12A3AC; indexed from its middle 0x120AC0"
 global,0x00120AC0,xn_cam_dir_x_mid,strong,"entry 0 of xn_cam_dir_x_table: x/focal per screen column offset, read by the span routines 155920 156A94"
 global,0x001212C0,xn_cam_dir_y_table,strong,"768 dwords (i<<18)/focal_y for i = -384..383, built by 12A3AC; indexed from its middle 0x1218C0"
@@ -244,6 +269,7 @@ global,0x00134378,xn_tex_path,strong,path buffer: cfg path + backslash + texture
 global,0x001343B9,xn_tex_file_size,strong,length of the archive being loaded (filelength)
 global,0x001343C0,xn_anim_ticks,strong,engine animation clock: frame_ticks_update adds the frame's ticks; texture animation (135D00) and ASCR scripts (C019C) and weapons read it
 global,0x001343C4,xn_tex_heap_size,strong,size of the texture heap (cfg_texture_memory<<10)
+global,0x001343C8,xn_tex_heap_request,strong,"the size xn_tex_heap_alloc was asked for (1360F3 mov [1343C8h],eax); nothing reads it"
 global,0x001343D0,xn_tex_unpack_buffer,strong,0xC0000-byte buffer of decoded animation frames (256-byte rows)
 global,0x001343DC,xn_tex_heap_base,strong,texture heap allocation
 global,0x001343E0,xn_tex_heap_free_bytes,strong,free bytes in the texture heap
@@ -265,6 +291,7 @@ global,0x00136911,xn_light_ambient,strong,"ambient shade row *256 (0 bright .. 0
 global,0x00136915,xn_shade_table,strong,16K-aligned shade table: 64 rows of 256 colours from SHADE.nnn
 global,0x00136919,xn_shade_table_alloc,strong,allocation behind xn_shade_table
 global,0x0013691D,xn_shade_table_last_row,strong,xn_shade_table + 0x3F00: clamp for lit shade rows
+global,0x00136921,xn_shade_blend_tables,strong,"pointer table indexed by a texture directory entry's word +0Ah (154E38/154E3C mov ebx,[ebx*4+136921h]); [1] is xn_shade_translucent_table 0x136925 (CDC4B builds it, CDC99 sets the word to 1 for the ghost and wraith archives); [0] is never written (0)"
 global,0x00136925,xn_shade_translucent_table,strong,pointer (entry 1 of the remap-table list D_00136921 the flat setup 154E20 indexes by record+0x0A) to the 16x256 table CDC4B builds; init_game_data aligns and fills it
 global,0x0013695D,xn_water_tint_table,strong,256-aligned colour table init_game_data loads from water.tbl; xn_water_span maps pixels through it
 global,0x00136E00,xn_cam_rotation,strong,3x3 2.28 eye rotation: world_render builds it from pitch/yaw/roll (137000)
@@ -379,12 +406,35 @@ global,0x0014A1B8,xn_collide_hit_t,candidate,t of the last segment-plane hit (14
 global,0x0014A1BC,xn_collide_mode,strong,collision mode: 0 build the hit list 1 any hit 2 bounding test only
 global,0x0014A1C0,xn_collide_local_pos,candidate,vec3: sphere-set position (14AA92) or the flat's centre offset (14B1E0)
 global,0x0014A1CC,xn_collide_rel_matrix,candidate,3x3 product (15D170) of the inverse model matrix and xn_collide_matrix_b
+global,0x0014A1F0,xn_collide_build_cell,candidate,int: cell size r * sqrt 2 (0x16A0A >> 16) of the dead sphere builder 14B58E (14B68E); struct xn_collide_scratch +0x0F0
+global,0x0014A1F4,xn_collide_build_radius,candidate,"int: 14B58E's edx (cell radius), then * 1.2 (0x133 >> 8, 14B6AB): the built spheres' radius (dead)"
+global,0x0014A1F8,xn_collide_build_cells,candidate,"int[3]: cells along x, y, z = extent / cell + 1 (14B6C3/14B6DB/14B6F3) (dead 14B58E)"
+global,0x0014A204,xn_collide_build_first,candidate,xn_vec3: the first cell's centre (14B750/14B775/14B79A) (dead 14B58E)
+global,0x0014A210,xn_collide_build_centre,candidate,"xn_vec3: the current cell's centre, 14C711's sphere (14B755, 14B7CA, 14B8F9) (dead 14B58E)"
+global,0x0014A21C,xn_collide_build_cell_list,candidate,"int *: big_buffer cell list cursor (14B71D, 14B8F2 add 4) (dead 14B58E)"
+global,0x0014A220,xn_collide_build_left,candidate,"int[3]: x, y, z loop counters (14B7F3/14B7E7/14B7DB, 14B8FF dec) (dead 14B58E)"
+global,0x0014A22C,xn_collide_build_out,candidate,"char *: 14B58E's ebx, the output spheres (14B59F, 14B99C) (dead)"
+global,0x0014A230,xn_collide_build_min,candidate,"xn_vec3: the points' minimum (14B5D9 = 0x800000, 14B625..) (dead 14B58E)"
+global,0x0014A23C,xn_collide_build_max,candidate,"xn_vec3: the points' maximum (14B5F7 = 0xFF800000, 14B632..) (dead 14B58E)"
 global,0x0014A249,xn_collide_flat_anchor_shift,candidate,byte pairs indexed by (flags>>1)&15 (odd bytes read): shift giving the flat's centre height (1 centred 31 standing) in 14B1E0
 global,0x0014A68F,xn_collide_seg_points,candidate,14A300: the model's point list (model + [model+30h])
 global,0x0014A693,xn_collide_seg_normals,candidate,14A300: the model's normal list (model + [model+34h])
+global,0x0014A697,xn_collide_seg_model,strong,"struct xn_model *: 14A300's model base, face offsets of the sphere lists are added to it (14A400 write, 14A57B/14A5D2 read); in code after 14A300's ret (struct xn_collide_seg_state +0x08)"
+global,0x0014A69B,xn_collide_seg_normal,strong,"xn_vec3 *: the normal of the face under test in 14A300 (14A58C write, 14A5CA/14A633 read); xn_collide_seg_state +0x0C"
+global,0x0014A69F,xn_collide_seg_list,strong,"struct xn_model_sphere_face *: the merged face list (big_buffer +0x2000/+0x3000, swapped per merge) in 14A300 (14A411, 14A49A, 14A546, 14A566); xn_collide_seg_state +0x10"
+global,0x0014A6A3,xn_collide_seg_list_next,strong,"struct xn_model_sphere_face *: the merge output in 14A300 (14A41D, 14A4B7, 14A54C); xn_collide_seg_state +0x14"
 global,0x0014A6A7,xn_collide_seg_plane_count,candidate,14A300: planes in the merged list gathered from the hit spheres
 global,0x0014A6AB,xn_collide_seg_hits,candidate,14A300: the hit list (big_buffer: count then 30-byte records) returned to the caller
+global,0x0014A6AF,xn_collide_seg_hit_next,strong,"struct xn_collide_hit *: where 14A300 writes the next hit (14A442 = big_buffer + 4, 14A5F2 read, 14A669 add 0x1e); xn_collide_seg_state +0x20"
+global,0x0014AF0C,xn_collide_sph_points,strong,"xn_vec3 *: model + point_offset in 14AA92 (14AC4F write, 14ADED/14AE6B read); struct xn_collide_sph_state +0x00, in code after 14AA92's ret"
+global,0x0014AF10,xn_collide_sph_normals,strong,"xn_vec3 *: model + normal_offset in 14AA92 (14AC5A write, 14ADFA/14AE65/14AEB7 read); xn_collide_sph_state +0x04"
+global,0x0014AF14,xn_collide_sph_model,strong,"struct xn_model *: 14AA92's model base for the face offsets (14AC60 write, 14ADE2/14AE56 read); xn_collide_sph_state +0x08"
 global,0x0014AF18,xn_collide_sph_hits,candidate,14AA92: the hit list (big_buffer) returned to the caller
+global,0x0014AF1C,xn_collide_sph_hit_next,strong,"struct xn_collide_hit *: next hit in 14AA92 (14ACA2 write, 14AE9F read, 14AEDA add 0x1e); xn_collide_sph_state +0x10"
+global,0x0014AF20,xn_collide_sph_list,strong,"struct xn_model_sphere_face *: merged face list in 14AA92 (14AC71 big_buffer + 0x2000, 14AD0E, 14ADBA swap, 14ADDB); xn_collide_sph_state +0x14"
+global,0x0014AF24,xn_collide_sph_list_next,strong,"struct xn_model_sphere_face *: merge output in 14AA92 (14AC7D big_buffer + 0x3000, 14AD2B, 14ADC0); xn_collide_sph_state +0x18"
+global,0x0014AF28,xn_collide_sph_list_count,strong,"int: entries in xn_collide_sph_list (14AC83 = 0, 14AD47 inc, 14ADCD read); xn_collide_sph_state +0x1C"
+global,0x0014AF2C,xn_collide_sph_probe_count,strong,int: probe spheres that met the model's bounding sphere (14AB36 write; 14ABF2/14ACC7/14AE1D loop counts); xn_collide_sph_state +0x20
 global,0x0014BB00,xn_math_tri_edges,candidate,two edge vectors and the query offset used by 14C021 and 14BF41
 global,0x0014BB3C,xn_collide_normal,candidate,vec3 (BB3C/40/44): plane normal kept by the plane and sphere tests (14C2AD 14C711 ...)
 global,0x0014BB48,xn_collide_vec_a,candidate,vec3: point minus segment start in 14C7E5 14C904
@@ -443,6 +493,7 @@ global,0x00154C50,xn_flat_half_w,candidate,half width of the quad being built (t
 global,0x00154C54,xn_flat_tex_w,candidate,texture width of the flat being drawn
 global,0x00154C58,xn_flat_half_h,candidate,half height (or height) of the quad being built
 global,0x00154C5C,xn_flat_tex_h,candidate,texture height of the flat being drawn
+global,0x00154C60,xn_flat_ignore_pitch,candidate,"Byte: 64h makes xn_flat_begin_frame build the flat matrix without the camera pitch (15541B); no writer, 0 in the records"
 global,0x00154C61,xn_flat_matrix,strong,3x3 rotation from the camera pitch (155415) applied to the corner offsets (1553D8)
 global,0x00154C85,xn_flat_proj_matrix,candidate,xn_flat_matrix rows scaled by the projection factors D_000CEA99/9D (third row halved)
 global,0x00155860,xn_span_solid_lit_tail_offsets,strong,"16 words 0,9,..,135: offset of pixel n's step in 0x155880, where 0x155920 plants a ret"
@@ -489,13 +540,23 @@ global,0x00158EA0,xn_poly_vertex_buf_a,strong,"32 x 16-byte vertices (x, y, z or
 global,0x001590A0,xn_poly_vertex_buf_b,strong,Second 32-vertex buffer (D_00158EA0+200h) the clipper alternates with
 global,0x00159294,xn_poly_ring_a,strong,By vertex count: pointer to a vertex ring (vertex pointers into buffer A repeated) the rasterizer 0x15B9A0 walks both ways from the top vertex
 global,0x001592FC,xn_poly_ring_b,strong,"Same rings for buffer B (D_001590A0), used when the clipped polygon ended there"
+global,0x00159380,xn_poly_ring_tables,strong,"the vertex-pointer tables the rings point at (after ring_b, which ends at 0x159370, and 4 filler dwords; the n = 3 table of ring a starts at 0x159380: 3n+1 pointers per n); data, built into the binary"
 global,0x0015B980,xn_span_dzdx,strong,"d(1/z)/dx of the polygon being rasterized, set by the terrain/model code and used by 0x158D04"
 global,0x0015B984,xn_poly_vertex_count,strong,Vertex count of the polygon being rasterized (counted down by 0x15B9A0)
 global,0x0015C100,xn_tmap_msg_no_memory,strong,"'XnGine: Out of memory for Shaders.' then 'XnGine: Out of space for Shaders.' ($-terminated), printed by 0x15C200"
 global,0x0015C14C,xn_tmap_pool_block,strong,Block returned by malloc for the instance pool (freed by 0x15C260)
 global,0x0015C150,xn_tmap_pool,strong,32-byte-aligned base of the compiled texture mapper instances (418 bytes each)
+global,0x0015C154,xn_tmap_pool_end,candidate,xn_tmap_pool + 0x10000 (15C224); never read
 global,0x0015C158,xn_tmap_pool_count,strong,Number of compiled instances (max 768)
+global,0x0015C500,xn_collide_edge_v0,strong,"xn_vec3: edge start minus the test point in xn_collide_point_in_face 15CB00 (15CBB3 x, 15CB51 y, 15CB74 z); also 15CC36/15CD33 (dead)"
+global,0x0015C50C,xn_collide_edge_v1,strong,"xn_vec3: edge end minus the test point (15CB9C x, 15CB82 y, 15CB5F z) in 15CB00"
+global,0x0015C518,xn_collide_test_point,strong,"xn_vec3: the point tested by xn_collide_point_in_face (15CB01/15CB06/15CB0C from eax, edx, ebx)"
 global,0x0015C524,xn_face_edge_tables,strong,"By vertex count: tables of vertex-slot offsets giving each edge of an n-gon, used by 0x15CB00/0x15CC36/0x15CD33"
+global,0x0015C588,xn_face_edge_slots,strong,"int[319]: the 22 tables (3..24 points) xn_face_edge_tables points at: n+1 point slot offsets 0, 8, .., 8(n-1), 0 (memory dump); 15CB2D/15CB30 read them"
+global,0x0015CC2E,xn_collide_face_normal_ptr,strong,"xn_vec3 *: the face normal (edi) for 15CB00's sign test (15CB12 write, 15CBF2 read); in code after 15CB00's ret"
+global,0x0015CC32,xn_collide_face_points,strong,"xn_vec3 *: the model's point list (esi) for 15CB00 (15CB18 write, 15CB3C/15CB42 add)"
+global,0x0015CED6,xn_collide_edge_first,strong,"struct xn_model_face_point *: the face's first point, for the closing edge in xn_collide_face_test_edges 15CE7E (15CE8D, 15CEA4); in code"
+global,0x0015CEDA,xn_collide_edge_points,strong,"xn_vec3 *: the point list in 15CE7E (15CE7F write, 15CE99/15CEAF add)"
 global,0x0015DC00,xn_math_asin_table,strong,"512 dwords asin(i/512) in 2048-per-turn units (0..491), read by the math code 0x1371AB/0x1371D5/0x1372BF"
 global,0x0015E500,xn_math_sqrt_table,strong,4096 bytes 4*sqrt(i) for 0x15F50C
 global,0x0015F604,xn_timer_zen_saved_flags,candidate,Zen timer (unreachable code at 0x15F800): high byte of the caller's flags saved by the start routine
@@ -2217,8 +2278,528 @@ field,wav_header+0x16,channels,strong,short: sos_load_sample copies it to the sa
 field,wav_header+0x18,rate,strong,int samples per second: sos_load_sample copies it to the sample's rate
 field,wav_header+0x22,bits,strong,"short bits per sample: sos_load_sample copies it, 8 -> format 0x8000"
 field,wav_header+0x28,data_size,strong,int: sos_load_sample sets the sample's length to data_size - 44
+field,xn_anim+0x00,frame,confirmed,"C0206 mov [esi],ax (frame byte -b-1); C0288 opcode 3; C011C reset; object_draw_cb passes it to xn_flat_add"
+field,xn_anim+0x02,frame_copy,strong,C0202 and C0284 write the frame here too; C0118 reset; no reader (records.h pad02)
+field,xn_anim+0x04,script,confirmed,"C016C mov ebx,[eax+4] then the state table at +6; C0221/C026B/C02A0 gotos; monster_init stores the ASCR record"
+field,xn_anim+0x08,pos,confirmed,"C0187 mov [eax+8],ebx; C01D6/C01DE opcode loop; C0141 test (0 = idle); C012C reset"
+field,xn_anim+0x0C,tick_divisor,confirmed,"C01AE movzx ebx,word [esi+0Ch] divides xn_anim_ticks (C01B5); the game copies the image frame_time here (records.h frame_count); records 0x101"
+field,xn_anim+0x0E,last_step,confirmed,"C01BA cmp ax,[esi+0Eh] / C01C0 store: the last ticks/divisor quotient (records.h timer)"
+field,xn_anim+0x10,events,confirmed,C023F opcode 2 or word; C0256/C0260 opcode 9 bit 15 mirror; C02C9 opcode 8 test; C011F reset; game anim_events/anim_flags
+field,xn_anim+0x12,wait,confirmed,C01C4..C01D1 count down (FFh hold); C0297 opcode 3 sets it; C014A update; C0123 reset
+field,xn_anim+0x13,opcode10_byte,strong,C024B opcode 10 stores its operand; C0114 reset to FFh; no reader
+field,xn_anim+0x14,request,confirmed,"C013B cmp [eax+14h],0FFh; C0165 read; C018C set FFh; monster_set_action writes it"
+field,xn_anim+0x15,facing,strong,C0126 reset clears it; the game's monster_set_action writes 0..4; object_draw_cb adds it to the record
+field,xn_anim+0x16,record_group,confirmed,"C02E5 opcode 11 mov [esi+16h],al; C0129 reset; object_draw_cb image = group + facing"
+field,xn_anim+0x17,state,confirmed,"C0169 mov [eax+17h],dl: the state started (game anim_current)"
+field,xn_ascr+0x00,size,confirmed,static: = the BSA record length in all 60 ASCR records; no engine reader
+field,xn_ascr+0x02,restart,strong,"C026E movzx eax,word [edi+2] (opcode 5); = state_entry[0] in all records"
+field,xn_ascr+0x04,state_count,confirmed,static: 98 (120 in ASCR0029); the scripts start at 6+3*count; no engine reader
+field,xn_ascr+0x06,state_entry,confirmed,"C016F add ebx,6 / C0172 movzx ebx,word [ebx+edx*2]; 8000h -> C0180 word [ebx+6]"
+field,xn_collide_hit+0x00,x,confirmed,"14A62B mov dword ptr [esi], eax (model matrix * local hit, rounded >> 8, + handle x); colstuff.c hits[j].y floor height"
+field,xn_collide_hit+0x04,y,confirmed,"14A62D mov dword ptr [esi + 4], edx"
+field,xn_collide_hit+0x08,z,confirmed,"14A630 mov dword ptr [esi + 8], ebx"
+field,xn_collide_hit+0x0C,face,confirmed,"14A656 mov dword ptr [esi + 0xc], eax; 14AEA7 mov [ecx + 0xc], eax (the sphere list entry); colstuff.c *model + hits[0].face"
+field,xn_collide_hit+0x10,nx,confirmed,"14A64A mov dword ptr [esi + 0x10], eax; 14AED1 mov [ecx + 0x10], eax (normal through the model matrix, not shifted); func_000234EB hits[i].nx"
+field,xn_collide_hit+0x14,ny,confirmed,"14A64D mov dword ptr [esi + 0x14], edx; 14AED4"
+field,xn_collide_hit+0x18,nz,confirmed,"14A650 mov dword ptr [esi + 0x18], ebx; 14AED7"
+field,xn_collide_hit+0x1C,t_half,strong,"14A65E sar eax, 1 / 14A660 mov word ptr [esi + 0x1c], ax (xn_collide_hit_t); 14AEAA mov word ptr [ecx + 0x1c], 0xffff; t = 16.16 from 14C38C idiv; structs.h pad1C"
+field,xn_collide_hits+0x00,count,confirmed,"14A439 mov dword ptr [edx], 0; 14A670 inc dword ptr [eax]; 14A681 cmp dword ptr [eax], 1; 14AEE7; colstuff.c D_00196D48->count"
+field,xn_collide_hits+0x04,hits,confirmed,"14A43F add edx, 4; 14A669 add dword ptr [0x14a6af], 0x1e; 14AC9F; 14AEDA"
+field,xn_collide_probe+0x00,position,confirmed,"14AAB3 mov ecx, dword ptr [edx] / 14AAB5 [edx + 4] / 14AAB8 [edx + 8]; 14AB70 mov eax, [edi]; game: D_00196D4C->position = request x, y, z"
+field,xn_collide_probe+0x0C,angle_x,strong,"14ABAB mov eax, dword ptr [esi + 0xc] -> 137000; 14AF50 (dead); game: pad0C (0)"
+field,xn_collide_probe+0x10,yaw,strong,"14ABAE mov edx, dword ptr [esi + 0x10]; 14AF53"
+field,xn_collide_probe+0x14,angle_z,strong,"14ABB1 mov ebx, dword ptr [esi + 0x14]; 14AF56"
+field,xn_collide_probe+0x18,sphere_count,confirmed,"14AAA7 movzx ebp, word ptr [edx + 0x18]; 14AFD6; names.csv collide_probe+0x18"
+field,xn_collide_probe+0x1A,spheres,confirmed,"14AACD add edx, 0x1a; 14AFDE add ecx, 0x1a"
+field,xn_collide_probe_sphere+0x00,x,confirmed,"14AAEF mov eax, dword ptr [edx] (+ position); 14ABFB mov eax, [esi] (<< 8, rotated); structs.h probe_sphere; D_00187B44 (0, -55, 0, 22)"
+field,xn_collide_probe_sphere+0x04,y,confirmed,"14AAF4 mov edx, dword ptr [edx + 4]; 14ABFD"
+field,xn_collide_probe_sphere+0x08,z,confirmed,"14AAF1 mov ebx, dword ptr [edx + 8]; 14AC00"
+field,xn_collide_probe_sphere+0x0C,radius,confirmed,"14AAEC mov ecx, dword ptr [edx + 0xc]; 14AC30 mov eax, [esi + 0xc] / shl eax, 8; stride 0x14AB28 add edx, 0x10"
+field,xn_collide_scratch+0x000,probe_matrix,strong,"14ABB4 mov ecx, 0x14a100 (137000 of probe +0x0C..+0x14); 14ABC3 mov edi, 0x14a100 (15D170 input)"
+field,xn_collide_scratch+0x024,pad_024,candidate,0x14A124..0x14A13B: no absolute reference in listing.txt
+field,xn_collide_scratch+0x03C,flat_normal,strong,"14B341 mov dword ptr [0x14a13c], eax / 14B346 [0x14a140] / 14B34C [0x14a144]; 14B3F6 read (xn_collide_segment_flat)"
+field,xn_collide_scratch+0x048,model_matrix,confirmed,"14A359 mov ecx, 0x14a148 -> 137000(handle +0x2C..); 14A392 137514; 14A5F8 13749E (hit point back to world); 14AEC6"
+field,xn_collide_scratch+0x06C,model_matrix_inv,confirmed,"14AB5A mov edx, 0x14a16c (15D2EC transpose); 14AB8A 13749E (probe position into object space)"
+field,xn_collide_scratch+0x090,model,confirmed,"14A303 mov dword ptr [0x14a190], eax; 14AA96; 14A602 mov ecx, [0x14a190] -> [ecx + 0x20]"
+field,xn_collide_scratch+0x094,probe,confirmed,"14AA9B mov dword ptr [0x14a194], edx; 14ABA5 mov esi, [0x14a194] -> [esi + 0xc]"
+field,xn_collide_scratch+0x098,seg_end,confirmed,"14A30E mov dword ptr [0x14a198], ebx; 14A36C mov edi, [0x14a198] -> [edi], [edi + 4], [edi + 8]"
+field,xn_collide_scratch+0x09C,seg_start,confirmed,"14A308 mov dword ptr [0x14a19c], edx; 14A3AD"
+field,xn_collide_scratch+0x0A0,local_end,confirmed,"14A39C mov dword ptr [0x14a1a0], eax (.. 0x14a1a8); 14AB94 (probe position); 14A469 mov edi, 0x14a1a0 (-> 14C7E5)"
+field,xn_collide_scratch+0x0AC,local_start,confirmed,"14A3D2 mov dword ptr [0x14a1ac], eax (.. 0x14a1b4); 14A464 mov esi, 0x14a1ac"
+field,xn_collide_scratch+0x0B8,hit_t,strong,"14A5B1 mov dword ptr [0x14a1b8], ecx (14C2AD's t, -1 none); 14A659 read, sar 1 -> hit +0x1C"
+field,xn_collide_scratch+0x0BC,mode,confirmed,"14A314 mov dword ptr [0x14a1bc], ecx; 14A346 cmp [0x14a1bc], 2; 14A48B cmp, 1; game passes 0 (colstuff.c) or 2 (collide_gather_cb)"
+field,xn_collide_scratch+0x0C0,local_pos,strong,"14AABB mov dword ptr [0x14a1c0], ecx (probe position, world); 14AAF7 add eax, [0x14a1c0]"
+field,xn_collide_scratch+0x0CC,rel_matrix,strong,"14ABC8 mov ebx, 0x14a1cc (15D170 output); 14AC0C mov ecx, 0x14a1cc -> 13749E"
+field,xn_collide_scratch+0x0F0,build_cell,candidate,"14B68E mov dword ptr [0x14a1f0], eax (r * 0x16A0A >> 16); 14B6BC idiv (dead 14B58E)"
+field,xn_collide_scratch+0x0F4,build_radius,candidate,"14B599 mov dword ptr [0x14a1f4], edx; 14B6AB (* 0x133 >> 8) (dead)"
+field,xn_collide_scratch+0x0F8,build_cells,candidate,"14B6C3 mov dword ptr [0x14a1f8], eax / 14B6DB [0x14a1fc] / 14B6F3 [0x14a200] (extent / cell + 1) (dead)"
+field,xn_collide_scratch+0x104,build_first,candidate,"14B750 mov dword ptr [0x14a204], eax / 14B775 [0x14a208] / 14B79A [0x14a20c] (dead)"
+field,xn_collide_scratch+0x110,build_centre,candidate,"14B755 mov dword ptr [0x14a210], eax; 14B7CA mov esi, 0x14a210 (sphere centre for 14C711) (dead)"
+field,xn_collide_scratch+0x11C,build_cell_list,candidate,"14B71D mov dword ptr [0x14a21c], esi (big_buffer); 14B8F2 add [0x14a21c], 4 (dead)"
+field,xn_collide_scratch+0x120,build_left,candidate,"14B7F3 mov dword ptr [0x14a220], ebp / 14B7E7 [0x14a224] / 14B7DB [0x14a228]; 14B8FF dec (dead)"
+field,xn_collide_scratch+0x12C,build_out,candidate,"14B59F mov dword ptr [0x14a22c], ebx; 14B99C (dead)"
+field,xn_collide_scratch+0x130,build_min,candidate,"14B5D9 mov dword ptr [0x14a230], 0x800000; 14B625 min of the points (dead)"
+field,xn_collide_scratch+0x13C,build_max,candidate,"14B5F7 mov dword ptr [0x14a23c], 0xff800000; 14B632 max (dead)"
+field,xn_collide_seg_state+0x00,points,strong,"14A3EF mov dword ptr [0x14a68f], edx (model + [model + 0x30]); 14A598 add ecx, [0x14a68f]"
+field,xn_collide_seg_state+0x04,normals,strong,"14A3FA mov dword ptr [0x14a693], edx; 14A586 add ebx, [0x14a693]"
+field,xn_collide_seg_state+0x08,model,strong,"14A400 mov dword ptr [0x14a697], eax; 14A57B mov edx, [0x14a697] / add edx, [ecx] (face)"
+field,xn_collide_seg_state+0x0C,normal,strong,"14A58C mov dword ptr [0x14a69b], ebx; 14A633 mov eax, [0x14a69b] (hit normal)"
+field,xn_collide_seg_state+0x10,list,strong,"14A411 mov dword ptr [0x14a69f], edx (big_buffer + 0x2000); 14A546 swap; 14A566 mov ecx, [0x14a69f]"
+field,xn_collide_seg_state+0x14,list_next,strong,"14A41D mov dword ptr [0x14a6a3], edx (big_buffer + 0x3000); 14A54C"
+field,xn_collide_seg_state+0x18,list_count,strong,"14A423 mov dword ptr [0x14a6a7], 0; 14A4D3 inc; 14A558 mov ebp, [0x14a6a7]"
+field,xn_collide_seg_state+0x1C,hits,strong,"14A433 mov dword ptr [0x14a6ab], edx (big_buffer); 14A664 / 14A670 inc dword ptr [eax]; 14A67C"
+field,xn_collide_seg_state+0x20,hit_next,strong,"14A442 mov dword ptr [0x14a6af], edx (big_buffer + 4); 14A5F2 mov esi, [0x14a6af]; 14A669 add 0x1e"
+field,xn_collide_sph_state+0x00,points,strong,"14AC4F mov dword ptr [0x14af0c], edx; 14ADED add ecx, [0x14af0c]"
+field,xn_collide_sph_state+0x04,normals,strong,"14AC5A mov dword ptr [0x14af10], edx; 14ADFA; 14AEB7"
+field,xn_collide_sph_state+0x08,model,strong,"14AC60 mov dword ptr [0x14af14], eax; 14ADE2 mov edx, [0x14af14]"
+field,xn_collide_sph_state+0x0C,hits,strong,"14AC93 mov dword ptr [0x14af18], edx (big_buffer); 14AEE1; 14AEF8"
+field,xn_collide_sph_state+0x10,hit_next,strong,"14ACA2 mov dword ptr [0x14af1c], edx; 14AE9F; 14AEDA add 0x1e"
+field,xn_collide_sph_state+0x14,list,strong,"14AC71 mov dword ptr [0x14af20], edx (big_buffer + 0x2000); 14ADDB"
+field,xn_collide_sph_state+0x18,list_next,strong,"14AC7D mov dword ptr [0x14af24], edx (big_buffer + 0x3000); 14ADC0"
+field,xn_collide_sph_state+0x1C,list_count,strong,"14AC83 mov dword ptr [0x14af28], 0; 14AD47 inc; 14ADCD"
+field,xn_collide_sph_state+0x20,probe_count,strong,"14AB36 mov dword ptr [0x14af2c], ecx; 14ABF2; 14ACC7; 14AE1D"
+field,xn_flat+0x00,image,confirmed,"154D72 pop [edi] (ecx arg); 154DC5; 154E20 shr eax,7 / and edx,7Fh; records 0xFA9C"
+field,xn_flat+0x04,object,confirmed,"154D83 / 154DDE mov [edi+4],0: xn_pick_hit.model 0 = a flat"
+field,xn_flat+0x08,du_dx,confirmed,"155116 mov [edi+8],edx; 1551D4 neg (mirror); span 157654 reads it; records 0x369C"
+field,xn_flat+0x0C,dv_dx,strong,"155156 mov [edi+0Ch],edx; span 15765D imul ecx,[esi+0Ch]"
+field,xn_flat+0x10,shade_row,confirmed,"1556A9 (light row) / 15571A (fog row); spans 157855, 157B7B read; record = fog row"
+field,xn_flat+0x14,flags,confirmed,154D77 (arg) / 154DCE = 4; 154E7B and 1Fh -> xn_flat_quad_table; 1551CB test 20h mirror
+field,xn_flat+0x18,u_offset,strong,"15515C store; 1551E0/1551E6 mirror; span 15763E sub eax,[esi+18h]"
+field,xn_flat+0x1C,v_offset,strong,"15518D store; span 15764E sub ebx,[esi+1Ch]"
+field,xn_flat+0x24,u_dx,confirmed,"15511C (du_dx >> 3); 1551D7 neg; span 157632 imul eax,[esi+24h]; records 0x6D3"
+field,xn_flat+0x28,u_dy,strong,155126 store; 155190/155195 patched into the row loop
+field,xn_flat+0x2C,u_c,strong,"155130 store; 1551A4 add [edi+2Ch],edx (top row); span 157636"
+field,xn_flat+0x30,v_dx,strong,15515F (dv_dx >> 3); span 157641
+field,xn_flat+0x34,v_dy,strong,155169 store; 1551B0 read for the row step
+field,xn_flat+0x38,v_c,strong,155173 store; 1551BF add; span 157648
+field,xn_flat+0x3C,span,confirmed,154ECD = 155610; 1556AC/1556D0/1556EF/155713/15571E install the span routines; 15527B call [esi+3Ch]
+field,xn_flat+0x40,texels,confirmed,"154E5B mov [edi+40h],esi (image + data_offset); span 15766C mov esi,[esi+40h]"
+field,xn_flat+0x44,scale,confirmed,"154D9E pop [edi+44h]; 154E4F add bp,[eax+18h] (x_scale) / 154E5E; 1550FD and 155557 and 0FFFFh; records 0x100 -> 0x180"
+field,xn_flat+0x46,light,strong,"15561D mov ebp,[esi+44h] / 155625 shr 8 / 15562E and 0FF00h: base shade row; object_draw_cb passes 64<<16"
+field,xn_flat+0x47,unknown_47,strong,written with +44h by 154D9E (the argument's top byte); 15562E masks it off
+field,xn_flat+0x4C,frame,confirmed,"154D74 mov [edi+4Ch],ebp (frame arg) / 154DC7 = 0; 154E2A passes it to 135D00 (negative = by the clock)"
+field,xn_flat+0x50,view_x,confirmed,154D7A / 154DD5 store; 154F13 and 155666 read
+field,xn_flat+0x54,view_y,confirmed,154D7D / 154DD8 store; 154F16 read
+field,xn_flat+0x58,view_z,confirmed,154D80 / 154DDB store; 154D97 sort key -z; 1556B3 fog distance
+field,xn_fnt_file+0x00,space_width,confirmed,"12DB6D movzx eax,word [esi] -> font_space_width"
+field,xn_fnt_file+0x02,height,confirmed,"12DB75 movzx eax,word [esi+2] -> font_height"
+field,xn_fnt_file+0x04,glyphs,confirmed,"12DBE7 shl ecx,2; add ecx,[font_glyphs]; [ecx+4]"
+field,xn_fnt_glyph+0x00,offset,confirmed,"12DBF0 movzx esi,word [ecx+4] (entry + 4 = file + 4 + 4 (c - 21h)); add esi,[font_glyphs]"
+field,xn_fnt_glyph+0x02,width,confirmed,"12DBFA movzx ebx,word [ecx+6]; 12DD2A"
+field,xn_font_state+0x00,text_x0,confirmed,"12DBD0 mov [12DA38h],eax; 12DC23"
+field,xn_font_state+0x04,text_y0,strong,"12DBD5 mov [12DA3Ch],edx (never read)"
+field,xn_font_state+0x08,space_width,confirmed,"12DB70 mov [12DA40h],eax"
+field,xn_font_state+0x0C,height,confirmed,"12DB79 mov [12DA44h],eax"
+field,xn_font_state+0x10,char_spacing,confirmed,"12DB0F mov [12DA48h],1; 12DC05"
+field,xn_font_state+0x14,line_gap,confirmed,"12DB19 mov [12DA4Ch],1; 12DC35"
+field,xn_font_state+0x18,current,confirmed,"12DB5B mov [12DA50h],eax"
+field,xn_font_state+0x1C,table,confirmed,"12DB01 (clears 8); 12DB45 mov [edx*4+12DA54h],eax"
+field,xn_font_state+0x3C,glyphs,confirmed,"12DB67 mov [12DA74h],esi"
+field,xn_gfx_state+0x00,mode,confirmed,"14388E mov [14291Bh],13h"
+field,xn_gfx_state+0x04,saved_mode,confirmed,"143889 mov [14291Fh],eax (int 10h 0Fh)"
+field,xn_gfx_state+0x08,driver,confirmed,"1436E7 mov [142923h],0; 143701 mov eax,[142923h]"
+field,xn_gfx_state+0x0D,pen_x,strong,"1532BD mov eax,[142928h]; 1532D4"
+field,xn_gfx_state+0x11,pen_y,strong,"1532C2 mov edx,[14292Ch]; 1532DA"
+field,xn_gfx_state+0x15,width,confirmed,"14389F mov [142930h],140h"
+field,xn_gfx_state+0x19,height,confirmed,"1438A9 mov [142934h],0C8h"
+field,xn_gfx_state+0x1D,screen_size,confirmed,"1438B3 mov [142938h],0FA00h"
+field,xn_gfx_state+0x21,page_count,confirmed,"1436C3 mov [14293Ch],1"
+field,xn_gfx_state+0x25,clip_left,confirmed,"1438FC mov [142940h],eax; 12A60B"
+field,xn_gfx_state+0x29,clip_top,confirmed,"143901 mov [142944h],edx"
+field,xn_gfx_state+0x2D,clip_right,confirmed,"143907 mov [142948h],ebx (= width); 12A617 cmp eax,[142948h]; jge out"
+field,xn_gfx_state+0x31,clip_bottom,confirmed,"14390D mov [14294Ch],ecx"
+field,xn_gfx_state+0x35,row_offset,confirmed,"1438DF mov edi,142950h; ecx = 300h"
+field,xn_gfx_state+0xC35,screen_buffer,confirmed,"1436A6 mov [143550h],eax"
+field,xn_gfx_state+0xC39,buffer_base,confirmed,"1436AB mov [143554h],eax"
+field,xn_gfx_state+0xC3D,buffer_alloc,confirmed,"14369B mov [143558h],eax; 14370C (freed)"
+field,xn_gfx_state+0xC41,present_mode,confirmed,"143601 mov [14355Ch],dl; 14365D (3)"
+field,xn_gfx_state+0xC42,fill_scratch,candidate,only the dead FPU copy 1443D0 (names.csv)
+field,xn_gfx_state+0xC46,copy_clear_fn,strong,names.csv xn_gfx_copy_clear_fn (143B80); snapshot build/xngine/bases/snap_cheat_dorian.snap
+field,xn_gfx_state+0xC4A,drv_shutdown,confirmed,143706 call [eax+143565h]
+field,xn_gfx_state+0xC4E,drv_present,strong,names.csv; 14395C calls it
+field,xn_gfx_state+0xC52,drv_clear,confirmed,14391B call [ebx+14356Dh]
+field,xn_joy_axes+0x00,center_x,confirmed,"152C9D add [152A04h],eax; 152DD3 sub eax,[152A04h]"
+field,xn_joy_axes+0x04,center_y,confirmed,"152CA8 add [152A08h],eax; 152E2E"
+field,xn_joy_state+0x00,axis_mask,confirmed,"152B4F mov [152A00h],ah"
+field,xn_joy_state+0x01,installed,confirmed,"152B0E mov byte [152A01h],1"
+field,xn_joy_state+0x02,status,confirmed,"152B55 mov byte [152A02h],2; 152D29 cmp"
+field,xn_joy_state+0x04,center,confirmed,"152C60 mov [152A04h],0"
+field,xn_joy_state+0x0C,dead_zone,confirmed,"152DF1 sub edx,[152A0Ch]; options.c 10/20/40"
+field,xn_joy_state+0x10,min_x,confirmed,"152BDC mov [152A10h],7D00h; 152D63"
+field,xn_joy_state+0x14,max_x,confirmed,"152D71 mov [152A14h],esi"
+field,xn_joy_state+0x18,min_y,confirmed,"152D7F mov [152A18h],edi"
+field,xn_joy_state+0x1C,max_y,confirmed,"152D8D mov [152A1Ch],edi"
+field,xn_joy_state+0x20,x,confirmed,"152E21 mov [152A20h],eax (clamped -4095..4095)"
+field,xn_joy_state+0x24,y,confirmed,"152E7C mov [152A24h],eax"
+field,xn_joy_state+0x28,raw_x,confirmed,"152EFA mov [152A28h],esi"
+field,xn_joy_state+0x2C,raw_y,confirmed,"152F00 mov [152A2Ch],edi"
+field,xn_joy_state+0x30,button1,confirmed,152F33 sete [152A30h]
+field,xn_joy_state+0x31,button2,confirmed,152F2A sete [152A31h]
+field,xn_joy_state+0x34,center_b,confirmed,"152CB3 add [152A34h],eax"
+field,xn_joy_state+0x40,min_x_b,confirmed,"152C04 mov [152A40h],7D00h; 152D9B"
+field,xn_joy_state+0x44,max_x_b,confirmed,152DA9
+field,xn_joy_state+0x48,min_y_b,confirmed,152DB7
+field,xn_joy_state+0x4C,max_y_b,confirmed,152DC5
+field,xn_joy_state+0x50,x_b,confirmed,"152D15 mov [152A50h],0 only"
+field,xn_joy_state+0x54,y_b,confirmed,"152D1F mov [152A54h],0 only"
+field,xn_joy_state+0x58,raw_x_b,confirmed,"152F06 mov [152A58h],ebx"
+field,xn_joy_state+0x5C,raw_y_b,confirmed,"152F0C mov [152A5Ch],ecx"
+field,xn_joy_state+0x60,button3,confirmed,152F21 sete [152A60h]
+field,xn_joy_state+0x61,button4,confirmed,152F18 sete [152A61h]
+field,xn_joy_state+0x62,old_int1c_sel,confirmed,"152B67 mov [152A62h],dx"
+field,xn_joy_state+0x64,old_int1c_off,confirmed,"152B6E mov [152A64h],eax"
+field,xn_kbd_state+0x00,old_int9_offset,confirmed,"14271B mov [142300h],eax"
+field,xn_kbd_state+0x04,old_int9_selector,confirmed,"142720 mov [142304h],dx"
+field,xn_kbd_state+0x06,installed,confirmed,"14270A mov byte [142306h],1"
+field,xn_kbd_state+0x07,last_scancode,confirmed,"142892 mov [142307h],bl; 1428D4 (0 on break); 1427B2"
+field,xn_kbd_state+0x08,key_down,confirmed,"142898 mov byte [ebx+142308h],1; 1428DB; 142791 (flush 20h dwords)"
+field,xn_kbd_state+0x88,shift_flags,confirmed,"142867 or [142388h],8; 142873 (1); 14287F (2); 14288B (4); 1427C4 test [142388h],1"
+field,xn_kbd_state+0x93,keymap,confirmed,"142757 mov [142393h],142397h; 1427BE add eax,[142393h]"
+field,xn_kbd_state+0x97,ascii,confirmed,"1427E6 mov al,[eax+ebx] (ebx = 80h with Shift)"
+field,xn_light+0x00,x,confirmed,"136B21 mov [edi],eax; 136C1F mov [esi],eax (view space << 8); 140657 mov eax,[esi]; 15565E (flats)"
+field,xn_light+0x04,y,confirmed,"136B23 mov [edi+4],edx; 136C21"
+field,xn_light+0x08,z,confirmed,"136B26 mov [edi+8],ebx; 136C24"
+field,xn_light+0x0C,intensity,confirmed,"136ABF mov [edi+0Ch],-1 (reset); 136B1E mov [edi+0Ch],ecx (clamped to 20h at 136B11); 14064D cmp [esi+0Ch],0; jle (end of the scan); 1406B2; 13E67E; 155694 imul [edi+0Ch]; 1556DB"
+field,xn_light+0x10,reach,confirmed,"136B41 mov [edi+10h],ecx; 136B69 mov ecx,[edi+10h]; shl ecx,6 (cull sphere radius); records: 1024 = 8 * 128"
+field,xn_light+0x14,range_sq,confirmed,"136B4B mov [edi+14h],ebp; 14068F sub ebp,[esi+14h]; 1406B8 (<< 4 into the list); 155685 cmp eax,[edi+14h]; records: 131072"
+field,xn_light+0x18,type,confirmed,"136B1B mov [edi+18h],esi; 136B29 cmp esi,8; 14065F cmp [esi+18h],8; 13E65B; 155654; 15BC80 mov eax,[eax+17h] after inc eax (the list entry's light + 18h) -> call [eax+158C0Ch]"
+field,xn_light_point_slots+0x00,intensity,confirmed,"15BFBF mov [ebp+158C28h],eax; 15BD2E"
+field,xn_light_point_slots+0x0C,falloff,confirmed,"15BFD5 mov [ebp+158C34h],eax (2^30/d^2); 15BD33"
+field,xn_light_point_slots+0x18,x,confirmed,"15C023 mov [ebp+158C40h],eax (view space >> 8); 15BCF7"
+field,xn_light_point_slots+0x24,y,confirmed,"15C029 mov [ebp+158C4Ch],edx; 15BCFC"
+field,xn_light_point_slots+0x30,z,confirmed,"15C02F mov [ebp+158C58h],ebx; 15BD02"
+field,xn_light_point_slots+0x3C,shade_row,confirmed,"15BC70 mov [158C64h],ebx; 15BCBD; 15C071 add [158C64h],eax; 15BCE8 mov eax,[158C64h]"
+field,xn_light_ref+0x00,light,confirmed,"1406A7 mov [edi],esi; 13E67C; 15BC7B mov eax,[esi]; inc eax; je end; 1406C9 stosd -1"
+field,xn_light_ref+0x04,x,confirmed,"1406A9 mov [edi+4],eax (after xn_mat_transform_transposed with xn_model_rot_matrix); 13E673 (terrain: through xn_cam_rotation); 15BF80 imul eax,[esi+4]; 15C049; 15C08C"
+field,xn_light_ref+0x08,y,confirmed,"1406AC mov [edi+8],edx; 13E676; 15BF84"
+field,xn_light_ref+0x0C,z,confirmed,"1406AF mov [edi+0Ch],ebx; 13E679; 15BF88"
+field,xn_light_ref+0x10,intensity,confirmed,"1406B5 mov [edi+10h],eax; 13E683 (negated); 15BFB0 imul eax,[esi+10h]; 15C065; 15C0A7"
+field,xn_light_ref+0x14,range_sq,confirmed,"1406BE mov [edi+14h],eax (light +14h << 4); 15BF9F mov eax,[esi+14h]; cmp edx,eax"
+field,xn_model+0x00,version,confirmed,"13FE16 cmp dword ptr [eax], 0x362e3276 (""v2.6""): below it the vertex offsets are made *3 (13FE40); records: model 634 is ""v2.6"", 10109 of 10251 ARCH3D.BSA records ""v2.7""; DFU Version (v2.5 offsets * 3)"
+field,xn_model+0x04,point_count,confirmed,"13FE1E cmp dword ptr [eax + 4], 0x400; 1407E1 loop count of the radius; 1403AF mov ebx, [esi + 4] (vertex flags to clear); 0C80ED idiv [ebx + 4]; record 140284: 0x203 for model 634 = (face_offset - point_offset)/12"
+field,xn_model+0x08,face_count,confirmed,"13FE2E/13FF3F/1403EE/140791/140825 loop counts over the faces; 140911 cmp dword ptr [esi + 8], 4 (occlusion only above 4 faces); 1403F1 adds it to xn_render_poly_count; record: 0x12E = normals and face data sizes / 12 and / 24"
+field,xn_model+0x0C,radius,confirmed,"140817 mov dword ptr [esi + 0xc], ebp (max isqrt64 |p|^2); 140217 cull radius; 140628 r^2 for the light range; 1409B8 projected bounds; 14A32D/14AAD4 shr 8 for the bounding test; record: 0xA3CB3 = file value = recomputed max |p|"
+field,xn_model+0x10,frame_count,strong,"13FF14 cmp dword ptr [esi + 0x10], 0; 13FF5E loop end; 140339 mov ebx, [esi + 0x10] (frame selection when nonzero); 0 in every ARCH3D.BSA record (DFU NullValue1)"
+field,xn_model+0x14,frame_table_offset,strong,"13FF1F add eax, dword ptr [esi + 0x14] (frame * 16); 140390 add eax, [esi + 0x14]"
+field,xn_model+0x18,face_data_offset,confirmed,"13FF32 mov dword ptr [esi + 0x18], edx (from the frame); 13FF35 mov edi, [esi + 0x18]; 14079A; 1403A4; record: 0x5FF4 = normals + 12 * faces; DFU PlaneDataOffset"
+field,xn_model+0x1C,sphere_offset,confirmed,"14A448 mov esi, dword ptr [eax + 0x1c]; 14ACA8; record: 0x7C44 = face data end; DFU ObjectDataOffset"
+field,xn_model+0x20,sphere_count,confirmed,"14A44D mov ebp, dword ptr [eax + 0x20]; 14ACAD; record: 10; DFU ObjectDataCount"
+field,xn_model+0x24,unknown_24,candidate,DFU Unknown2 (674 distinct values in ARCH3D.BSA); no read in object 2 found
+field,xn_model+0x30,point_offset,confirmed,"13FE95/13FF67/1403D3/140794/1407E4/140854/1408D8/14A3EA/0C80D2 add the model address to [model + 0x30]; 13FF26/140396 mov [esi + 0x30], edx (frame); record: 0x40"
+field,xn_model+0x34,normal_offset,confirmed,"1403EB mov ebx, dword ptr [esi + 0x34]; 140797; 140822; 14A3F5; 14AC55; 13FF2C/14039D (frame); record: 0x51CC"
+field,xn_model+0x38,unknown_38,candidate,DFU Unknown3 (0 in 10232 records); no read in object 2 found
+field,xn_model+0x3C,face_offset,confirmed,13FE31/13FE73/13FE92/13FF3A/140401/14079D/14081F add the model address to [model + 0x3c]; record: 0x1864 = point_offset + 12 * point_count
+field,xn_model_draw_state+0x00,handle,strong,"140297 mov dword ptr [0x140497], edi; 140494 mov dword ptr [edi + 4], imm (patched); 140606 mov edi, dword ptr [0x140497]"
+field,xn_model_draw_state+0x04,rel,confirmed,"1402E1 mov dword ptr [0x14040b], eax / 1402E6 [0x14052d] (and y, z); record: patches = handle +0x14..+0x1C after draw"
+field,xn_model_draw_state+0x10,matrix,confirmed,"140333 mov dword ptr [0x14053e], ebx; record: 0x10D7AC0"
+field,xn_model_draw_state+0x14,dz_row,strong,"140312 mov dword ptr [0x140446], edx (row 0 * 0x14030A); 14031D [0x14044d]; 140328 [0x140454]; 140444..14046F use"
+field,xn_model_draw_state+0x20,points,confirmed,"1403D6 mov dword ptr [0x14051c], eax (+4 0x140522, +8 0x140528); 14051A mov eax, dword ptr [edi + disp]"
+field,xn_model_draw_state+0x24,normals_end,confirmed,"140404 mov dword ptr [0x1404eb], eax; 1404E9 cmp ebx, imm; record: 0x1839F38 = normals end = face data start"
+field,xn_model_draw_state+0x28,world,strong,"140615 mov dword ptr [0x140666], eax / 14061A [0x14066c] / 140620 [0x140672]; 140665 sub eax, imm"
+field,xn_model_draw_state+0x34,radius_sq,strong,"140639 mov dword ptr [0x14068b], eax ((r*r + 0x8000) >> 16); 140689 sub ebp, imm; record: 6868064 for radius 670899"
+field,xn_model_face+0x00,point_count,confirmed,"13FE38 movzx ecx, byte ptr [esi]; 13FE7C cmp eax, 0x18; 1404DF/1407D0 lea esi, [esi + eax*8 + 8]; 1404FA; 158420; record: 6, 16, 12"
+field,xn_model_face+0x01,shade,strong,"15BC5C mov bh, byte ptr [eax + 1] (eax = poly +0 = the face): shade row + byte*256; DFU Unknown1 (0 in 201212 of 204479 faces)"
+field,xn_model_face+0x02,texture,confirmed,"13FF42 cmp word ptr [ebx + 2], 0x100; 1404B6 mov ax, [esi + 2] -> 135D00(ax >> 7, ax & 0x7F); record: 0x303; structs.h arch3d_plane.texture"
+field,xn_model_face+0x04,unknown_04,candidate,DFU PlaneHeader Unknown2; structs.h floor_sound; no read in object 2 found
+field,xn_model_face+0x08,points,confirmed,"13FE3B add esi, 8; 140848 add edx, 8; 158423 add esi, 8; stride 8 (13FE45, 1405E2)"
+field,xn_model_face_data+0x00,u_axis,confirmed,"140145 mov dword ptr [ebp], edx / 14015C [ebp + 4] / 14016F [ebp + 8] (13FF65); read 15BAC0 mov eax, [edx] / 15BACD [edx + 4] / 15BAD0 [edx + 8]; record: model 634 face 0 (-0x18000000, 0, -0x18000000) = DFU PlaneData"
+field,xn_model_face_data+0x0C,v_axis,confirmed,"14019E mov dword ptr [ebp + 0xc], edx / 1401B5 [ebp + 0x10] / 1401C8 [ebp + 0x14]; read 15BB27 [edx + 0xc] / 15BB2A [edx + 0x10] / 15BB37 [edx + 0x14]; record: (0, 0x1FC00000, 0)"
+field,xn_model_face_point+0x00,vertex,confirmed,"13FE3E mov eax, dword ptr [esi] (*3 for v2.5); 13FEA8 div by 12 (validation); 140502 mov edi, [esi + 8]; 15844D mov ebx, [esi]; record: 0xC0, 0x90, 0xD8 = multiples of 12"
+field,xn_model_face_point+0x04,uv_packed,confirmed,"13FE78 shl dword ptr [esi + 0xc], 4 (point 0); 15BC2D mov edx, [edx + 0xc]; record: file (u 0, v 2048) -> 0x80000000, (5124, 4096) -> 0x00014040"
+field,xn_model_frame+0x00,point_offset,strong,"13FF24 mov edx, dword ptr [eax] -> [esi + 0x30]; 140393 mov edx, [esi + eax]"
+field,xn_model_frame+0x04,normal_offset,strong,"13FF29 mov edx, dword ptr [eax + 4] -> [esi + 0x34]; 140399"
+field,xn_model_frame+0x08,face_data_offset,strong,"13FF2F mov edx, dword ptr [eax + 8] -> [esi + 0x18]; 1403A0"
+field,xn_model_handle+0x00,model,confirmed,"140284 mov esi, dword ptr [edi]; 140215 mov ecx, [edi] -> [ecx + 0xc] radius; 14A32B mov esi, [esi]; 14AAD0; game: instance->model = model_get(...), xn_model_submit(&model->model); record: 0x833F44 = an ARCH3D record (""v2.6"")"
+field,xn_model_handle+0x04,lights,confirmed,"140648 mov dword ptr [edi + 4], eax (xn_render_light_list_next); 15BC78 mov esi, dword ptr [esi + 4] (handle from poly +4); record: 0x116C84 in the light-list pool, entry 0 -> xn_light_table, then -1"
+field,xn_model_handle+0x08,matrix,confirmed,"140330 mov dword ptr [edi + 8], ebx (xn_render_matrix_next); 15BBD0 mov ecx, dword ptr [ecx + 8] (tex gradients); 15C00C mov ecx, [ecx + 8] then add ecx, 0x1c20; record: 0xD7AC0, 0xD7B08"
+field,xn_model_handle+0x0C,pad_0c,candidate,never addressed: C7F07 / C7F14 / C7F98 get handle + 0x0C (records.h instance->angles) and use +2..+6 and +0x20..+0x28 from it
+field,xn_model_handle+0x0E,base_angle_x,strong,"0C7F07 mov word ptr [ecx + 2], ax (ecx = instance->angles = handle + 0x0C); 0C7F22 movzx eax, word ptr [eax + 2]; 0C7FA4; game: rdb x_rotation, player marker angle_x"
+field,xn_model_handle+0x10,base_yaw,confirmed,"0C7F0B mov word ptr [ecx + 4], dx; 0C7F1E movzx edx, word ptr [eax + 4]; 0C7FA0 (+ the yaw offset); records: C7F07 (dx 0x201, ecx = handle + 0x0C) writes handle +0x10 = 0x0201; C7F98 copies +0x10 = 0xE400 to +0x30"
+field,xn_model_handle+0x12,base_angle_z,strong,"0C7F0F mov word ptr [ecx + 6], bx; 0C7F1A movzx ebx, word ptr [eax + 6]; 0C7F9C"
+field,xn_model_handle+0x14,rel_x,confirmed,"14020C mov dword ptr [edi + 0x14], eax ((x - xn_cam_x) << 8); 1402C5 read, 1402D8 mov [edi + 0x14], eax (object axes); 15C003 sub eax, [ecx + 0x14]; record: entry 0xFFFC8400, after draw 0x9C00 = patch 0x14040B"
+field,xn_model_handle+0x18,rel_y,confirmed,"14020F mov dword ptr [edi + 0x18], edx; 1402DB; 15C006 sub edx, [ecx + 0x18]"
+field,xn_model_handle+0x1C,rel_z,confirmed,"140212 mov dword ptr [edi + 0x1c], ebx; 1402DE; 15C009 sub ebx, [ecx + 0x1c]"
+field,xn_model_handle+0x20,x,confirmed,"1401E8 mov eax, dword ptr [edi + 0x20] (- xn_cam_x); 14060C (light list); 140982 (bounds); 14A322 / 14A380 / 14A622 (collision); game: instance->x = object->x; record: 0x00C6C480"
+field,xn_model_handle+0x24,y,confirmed,"1401EB mov edx, dword ptr [edi + 0x24]; 14060F; 140985; 14A325; record: -726"
+field,xn_model_handle+0x28,z,confirmed,"1401EE mov ebx, dword ptr [edi + 0x28]; 140612; 140988; 14A328"
+field,xn_model_handle+0x2C,angle_x,confirmed,"14029D mov eax, dword ptr [edi + 0x2c] -> 137000 pitch; 14A35E; 14AB42; 0C8112 mov eax, [ecx + 0x2c]; 0C7F70 mov [ecx + 0x20], eax (ecx = handle + 0x0C); records.h missile_angles[0]"
+field,xn_model_handle+0x30,yaw,confirmed,"1402A0 mov edx, dword ptr [edi + 0x30]; 14A361; 14AB45; 0C7F73 / 0C7FAE mov [ecx + 0x24], edx; block_model +0x34 yaw; record: 0x200, 0x240"
+field,xn_model_handle+0x34,angle_z,confirmed,"1402A3 mov ebx, dword ptr [edi + 0x34]; 14A364; 14AB48; 0C7F76 mov [ecx + 0x28], ebx"
+field,xn_model_handle+0x38,frame,strong,"1401E1 mov byte ptr [edi + 0x38], al (submit's edx); 140340 movzx eax, byte ptr [edi + 0x38] -> 14037A (when frame_count != 0)"
+field,xn_model_handle+0x39,flags,confirmed,"1401E4 mov byte ptr [edi + 0x39], 0; 140363 or byte ptr [edi + 0x39], 1 (occluded); 15BC48 or byte ptr [eax + 0x39], 2 (eax = poly +4); record: entry 0x02, cleared at submit"
+field,xn_model_matrix_pool+0x0000,view,confirmed,"12A4F1 mov dword ptr [0xcea70], 0xd7ac0; 14035A add dword ptr [0xcea70], 0x24"
+field,xn_model_matrix_pool+0x1C20,light,confirmed,"1406F1 mov dword ptr [esi + 0x1c20], eax; 140778 lea edi, [esi + 0x1c38] (row 2 copied); 15C00F add ecx, 0x1c20"
+field,xn_model_matrix_slot+0x00,m,confirmed,"1402C0 137804 product into [0xcea70]; 14053E patched ecx for 13749E; 1406E6..140787 rescale (+0x1C20 copy); 15BAD5 imul dword ptr [ecx] (tex gradients); 15C015 13749E with ecx = slot + 0x1C20; record: copy rows of length 2^28, slot row 2 = copy row 2 * 2"
+field,xn_model_sphere+0x00,x,strong,"14A459 mov eax, dword ptr [esi] (sphere centre to 14C7E5); 14ACCF via the probe; record model 634: -114688"
+field,xn_model_sphere+0x04,y,strong,"14A45B mov edx, dword ptr [esi + 4]"
+field,xn_model_sphere+0x08,z,strong,"14A45E mov ebx, dword ptr [esi + 8]"
+field,xn_model_sphere+0x0C,radius,strong,"14A461 mov ecx, dword ptr [esi + 0xc]; 14ACB8 mov edi, [esi + 0xc]; record: 241357"
+field,xn_model_sphere+0x10,face_count,confirmed,"14A478 movzx edi, word ptr [esi + 0x10]; lea esi, [esi + edi*6 + 0x12]; 14ACEB; record: 8"
+field,xn_model_sphere+0x12,faces,confirmed,"14A4B4 add esi, 0x12; 14AD28"
+field,xn_model_sphere_face+0x00,face,confirmed,"14A584 add edx, dword ptr [ecx] (model + face offset); 14A654 -> hit +0x0C; 14A4C3 cmp eax, [esi] (merge, descending); ARCH3D.BSA: 669678 of 698716 entries are face offsets from the model start"
+field,xn_model_sphere_face+0x04,normal4,confirmed,"14A577 movzx ebx, word ptr [ecx + 4]; lea ebx, [ebx + ebx*2] + normals; 14ADF3; ARCH3D.BSA: equals face index * 4 in all but 23 entries"
+field,xn_mouse_press+0x00,tick,confirmed,"12B1E9 sub eax,[12AF24h]; 12B232 mov [12AF24h],edx (BIOS tick)"
+field,xn_mouse_press+0x04,x,confirmed,"12B1FA mov ax,[12AF28h]; 12B23E"
+field,xn_mouse_press+0x06,y,confirmed,"12B212 mov ax,[12AF2Ah]; 12B24A"
+field,xn_mouse_state+0x00,buttons,confirmed,"12B1AA mov [12AC00h],bl (int 33h 3)"
+field,xn_mouse_state+0x01,buttons_prev,confirmed,"12B19E mov [12AC01h],al"
+field,xn_mouse_state+0x02,double_click,confirmed,"12B1BE mov word [12AC02h],0; 12B22A or word [12AC02h],1; 12B2AC (2)"
+field,xn_mouse_state+0x04,x,confirmed,"12B1B0 mov [12AC04h],cx; 12B162 (clamped)"
+field,xn_mouse_state+0x06,y,confirmed,"12B1B7 mov [12AC06h],dx"
+field,xn_mouse_state+0x08,cursor_x,confirmed,"12B35A mov [12AC08h],eax; 12B406"
+field,xn_mouse_state+0x0C,cursor_y,confirmed,"12B39C mov [12AC0Ch],eax"
+field,xn_mouse_state+0x10,under,confirmed,"12B41F mov edi,12AC10h -> xn_draw_get_rect_regs; 12B318 (restore)"
+field,xn_mouse_state+0x110,clipped,confirmed,"12B3D2 mov edi,12AD10h; 12B44F"
+field,xn_mouse_state+0x210,image,confirmed,"12B460 mov edi,12AE10h (rep movsd 40h); 12B3D7"
+field,xn_mouse_state+0x314,cursor_w,confirmed,"12B329 mov word [12AF14h],10h"
+field,xn_mouse_state+0x316,cursor_h,confirmed,"12B332 mov word [12AF16h],10h"
+field,xn_mouse_state+0x318,hotspot_x,confirmed,"12B46C mov [12AF18h],dx; 12B342; 12B381 (read for y: a bug)"
+field,xn_mouse_state+0x31A,hotspot_y,confirmed,"12B473 mov [12AF1Ah],bx; never read"
+field,xn_mouse_state+0x31C,under_x,confirmed,"12B426 mov [12AF1Ch],eax; 12B2FF"
+field,xn_mouse_state+0x320,under_y,confirmed,"12B42B mov [12AF20h],edx"
+field,xn_mouse_state+0x324,press,confirmed,12B1E9 / 12B26B
+field,xn_mouse_state+0x334,x_min,confirmed,"12B142 cmp ax,[12AF34h]"
+field,xn_mouse_state+0x336,x_max,confirmed,"12B153 cmp ax,[12AF36h]"
+field,xn_mouse_state+0x338,y_min,confirmed,"12B16E cmp ax,[12AF38h]"
+field,xn_mouse_state+0x33A,y_max,confirmed,"12B17F cmp ax,[12AF3Ah]"
 field,xn_pick_hit+0x00,plane,strong,engine_pick_object copies it to click_face_texture
 field,xn_pick_hit+0x04,model,strong,"engine_pick_object: 1 nothing, 0 a flat (the record is the flat's draw handle), else the hit model's slot (pick_model_cb compares &instance.model)"
+field,xn_poly+0x00,face,confirmed,"1403AF/14048F mov [edi],esi (the face); 15BC58 mov eax,[edi]; mov bh,[eax+1] (base shade row); 15BBC5 [edx+1Ch] axes; 15BC2D [edx+0Ch] origin; flats: 154D20 image; records: 12A870 cheat_dorian__walk / cheat_gash__swing decoded with render/poolscan.py and poolscan2.py: 0182C906 = a face of model 82B06A"
+field,xn_poly+0x04,handle,confirmed,"140494 mov [edi+4],imm (patch_140497 = the handle); 13EC17 mov [edi+4],1 (terrain); 15BC42 mov eax,[edi+4]; or byte [eax+39h],2; 15BBCA [ecx+8] matrix; engsupp.c pick_hit->model == 1; records: 01967214 (a handle), 1 (terrain)"
+field,xn_poly+0x08,shader_falloff,strong,"15BD41 mov [edi+8],edx; 15BE16 mov [edi+0Ch],edx; 15BF3E mov [edi+10h],edx (xn_light_point_falloff[k]); the templates read them through patched addresses (15BD44 lea ebx,[edi+8] -> 136C57); records: 00048D15 in lit faces"
+field,xn_poly+0x14,light_list,confirmed,"(union with shade_row, shader) 13EC14 mov [edi+14h],edx (xn_render_light_list_next: terrain); 15BCC2 mov esi,[edi+14h] (15BC9C walks it); 15BCED mov [edi+14h],eax (xn_light_shade_row, index 4); 15BD5A mov [edi+14h],edx (xn_light_code_next, index 8); 155820 / 155920 call [esi+14h]; 156A9C mov eax,[esi+14h]; records: 01116C80 terrain, 01248800 shade row, 0120913C shader in big_buffer"
+field,xn_poly+0x18,cam_x,confirmed,"(union with tex_u0) 1404AD mov [edi+18h],ecx (the face's first vertex from xn_vert_cam); 15BBDB imul esi,[edi+18h],imm (read before setup); 15BC37 mov [edi+18h],edx (packed origin); terrain 13F4ED mov [edi+18h],ecx and 13F5A5 mov word [edi+1Ah],cx; span routines 155D9F mov eax,[esi+18h]; records: B8919C02 after setup"
+field,xn_poly+0x1C,cam_y,strong,"1404B0 mov [edi+1Ch],edx; 15BBE2 imul ecx,[edi+1Ch],imm (half height)"
+field,xn_poly+0x20,cam_z,strong,"1404B3 mov [edi+20h],ebx; 15BBD8 mov ebx,[edi+20h]; 15BBFE imul [edi+20h]"
+field,xn_poly+0x24,u_dx,confirmed,"15BAF2 mov [edi+24h],ebp (= [+50h] >> 3); 13F4D2 (terrain); 155D60 imul ebx,[esi+24h] (ebx = x - centre x); 156AEA"
+field,xn_poly+0x28,u_dy,confirmed,"15BB08 mov [edi+28h],ebp; 155D64 imul eax,[esi+28h] (eax = xn_render_row_y)"
+field,xn_poly+0x2C,u_c,confirmed,"15BB24 mov [edi+2Ch],ebp; 155D68 add eax,[esi+2Ch]"
+field,xn_poly+0x30,v_dx,confirmed,"15BB57 mov [edi+30h],ebp; 13F58A; 155D41 imul eax,[esi+30h]"
+field,xn_poly+0x34,v_dy,confirmed,"15BB72 mov [edi+34h],ebp; 155D45 imul edx,[esi+34h]"
+field,xn_poly+0x38,v_c,confirmed,"15BB88 mov [edi+38h],ebp; 155D49 add edx,[esi+38h]"
+field,xn_poly+0x3C,span_fn,confirmed,"12A939 call [eax+3Ch] (eax = the polygon); 1404DA mov [edi+3Ch],ebx (xn_render_span_setups[entry+10h]); 13F067 (terrain, patched); 15BBC7 / 12A716 / 12A75D store the real routine; 15BC3E jmp [eax+3Ch]; records: 0112A740, 011566C4, 01156A94"
+field,xn_poly+0x40,tex,confirmed,"(union with texels, colour4) 1404D1 mov [edi+40h],eax (xn_tex_cache_lookup's entry); 15BB90 mov esi,[eax+40h]; mov esi,[esi+0Ch]; 15BBA6 mov [edi+40h],esi (texels); 12A723 mov [edi+40h],eax (xn_colour_fill_table); 12A74F (terrain texels); 155DC2 mov esi,[esi+40h]; 155803 mov eax,[eax+40h]"
+field,xn_poly+0x44,tmap,confirmed,"15BBA0 mov [edi+44h],eax (image +0Ah); 156A97 mov edx,[eax+44h] -> xn_span_tex_lit_tmap; records: 017AB096 in the tmap pool"
+field,xn_poly+0x48,normal,confirmed,"14046C mov [edi+48h],esi (the normal walked 12 bytes per face); 15BF75 mov ebx,[edi+48h]; 15C046 mov ecx,[edi+48h]; C810C reads pick+48h; records: 0183025A"
+field,xn_poly+0x4C,wrap_mask,confirmed,"15BBA3 mov [edi+4Ch],ebx (image +0); 155DBF mov ebp,[esi+4Ch]; and ebx,ebp (155E32); records: 7FFF3FFF (u mask 3Fh, v mask 7Fh)"
+field,xn_poly+0x50,u_step,confirmed,"(union with nx) 15BAEC mov [edi+50h],ebp; 155D8E mov eax,[esi+50h]; 155F60 shl [eax+50h],1; terrain 13EBD9 mov [edi+50h],ebp (normal), 15C095 imul eax,[edi+50h], 12A772 mov [edi+50h],eax"
+field,xn_poly+0x54,v_step,confirmed,"(union with ny) 15BB51 mov [edi+54h],ebp; 13EBD3; 15C099; 12A775"
+field,xn_poly+0x58,inv_z_step,confirmed,"(union with nz) 140466 mov [edi+58h],eax; 155D85 mov eax,[esi+58h]; 155ECE add ecx,[esi+58h]; terrain 13EBD6 / 15C09D / 12A778"
+field,xn_poly+0x5C,inv_z_dx,confirmed,"14046F mov [edi+5Ch],eax (= [+58h] >> 3; also xn_span_dzdx 140472); 13EC06 (terrain); 158D30 imul edx,[eax+5Ch] (the S-buffer's depth test); 12A67A (pick); 15BBAE (the 16-px choice); 155A39"
+field,xn_poly+0x60,dx_per_inv_z,confirmed,"15BC55 mov [edi+60h],eax (2^32 / [+5Ch] by idiv with edx = 1); 15BCA8; records: FFFDE5CA"
+field,xn_poly_clip_state+0x00,src,confirmed,"158360 mov [158200h],esi; 1587DD; 158836 xchg (ping-pong)"
+field,xn_poly_clip_state+0x04,dst,confirmed,"15837D mov [158204h],eax (src + 200h); 1587FA"
+field,xn_poly_clip_state+0x08,src_end,confirmed,"158370; 1587F3 add [158208h],10h; 15882B"
+field,xn_poly_clip_state+0x0C,intersect,confirmed,"158686 mov [15820Ch],158A90h; 15884C call [15820Ch]"
+field,xn_poly_clip_state+0x10,outcode_and,confirmed,"15842F mov [158210h],bx (and, or as a word); 1587D4 mov word [158210h],7Fh; 158821 and [158210h],al"
+field,xn_poly_clip_state+0x11,outcode_or,confirmed,"158369 test byte [158211h],0FFh; 15881B or [158211h],al; 15CF8C mov [158211h],cl (cull sphere)"
+field,xn_poly_vertex+0x00,x,confirmed,"15846A mov [edi],eax (xn_vert_cam x); 1583AB mov eax,[esi]; ... shr edx,3; mov [esi],edx (screen x << 5); 15B9E0 mov edx,[ecx]"
+field,xn_poly_vertex+0x04,y,confirmed,"15846C; 1583C0 mov eax,[esi+4] ... shr edx,8; mov [esi+4],edx (the row); 15B9D5 mov di,[ecx+4]"
+field,xn_poly_vertex+0x08,z,confirmed,"15846F; 15839A mov ebx,[esi+8]; div ebx (edx = 100h); mov [esi+8],eax (2^40/z); 15B9E2 mov eax,[ecx+8]"
+field,xn_poly_vertex+0x0C,outcode,confirmed,"158472 mov [edi+0Ch],ch; 15880D mov al,[esi+0Ch]; 1588DA mov [edi+0Ch],cl; 155020 (flat quads)"
+field,xn_rm_regs+0x00,edi,strong,DPMI 0300h
+field,xn_rm_regs+0x04,esi,strong,DPMI
+field,xn_rm_regs+0x08,ebp,strong,DPMI
+field,xn_rm_regs+0x0C,reserved,strong,DPMI
+field,xn_rm_regs+0x10,ebx,strong,"15FCBF mov eax,[15FA18h]"
+field,xn_rm_regs+0x14,edx,strong,15FA1C referenced twice
+field,xn_rm_regs+0x18,ecx,strong,15FA20
+field,xn_rm_regs+0x1C,eax,strong,15FA24
+field,xn_rm_regs+0x20,flags,strong,DPMI
+field,xn_rm_regs+0x22,es,strong,"15FC20 mov [15FA2Ah],ax"
+field,xn_rm_regs+0x24,ds,strong,"15FC1A mov [15FA2Ch],ax"
+field,xn_rm_regs+0x26,fs,strong,DPMI
+field,xn_rm_regs+0x28,gs,strong,DPMI
+field,xn_rm_regs+0x2A,ip,strong,DPMI
+field,xn_rm_regs+0x2C,cs,strong,DPMI
+field,xn_rm_regs+0x2E,sp,strong,DPMI
+field,xn_rm_regs+0x30,ss,strong,DPMI
+field,xn_scratch+0x00,a,confirmed,"15CF6B mov dword ptr [0x120288], edx / 15CF78 [0x12028c] / 15CF7E [0x120290]; 140245 / 14024A / 14023B read (queue key); 13FF7E; 140867; 12A6A6"
+field,xn_scratch+0x0C,b,strong,"13FFCB mov dword ptr [0x120294], eax / 13FFD8 [0x120298] / 13FFE5 [0x12029c]; 140886; 12A653 (pick screen x)"
+field,xn_scratch+0x18,flat,strong,"names.csv xn_pick_flat_x/y/z; 1555A6 mov dword ptr [0x1202a0], eax; 12A6C8; 15CC37"
+field,xn_scratch+0x24,len2,strong,"13FFBF mov dword ptr [0x1202ac], edx (|e1|^2 >> 8); 14001E idiv dword ptr [0x1202ac]; 14005E"
+field,xn_scratch+0x28,t,strong,"140024 mov dword ptr [0x1202b0], eax; 140121 imul dword ptr [0x1202b0]; 14017A"
+field,xn_sky_star+0x00,x,strong,"C81DC mov [edi],eax (length 2^20 vector from C82C2)"
+field,xn_sky_star+0x04,y,strong,"C81DE mov [edi+4],edx"
+field,xn_sky_star+0x08,z,strong,"C81E1 mov [edi+8],ebx"
+field,xn_snow_flake+0x00,x,strong,"C9C51 mov [esi],dx (x<<6); C9AA4 add turn shift; C9B59"
+field,xn_snow_flake+0x02,y,strong,"C9C2A mov [esi+2],dx (y<<6); C9B5C"
+field,xn_snow_flake+0x04,drift,strong,"C9C64 mov [esi+4],cx (+1/-1); C9B3C test; C9B51 neg"
+field,xn_sort_pair+0x00,key,confirmed,"15812A mov ebp,[eax+ebp]; 15812D cmp [esi+eax],ebp (signed: jge)"
+field,xn_sort_pair+0x04,value,confirmed,"15814E mov ecx,[esi+eax+4]; 12A7FD mov edi,[esi+4] (-> xn_model_draw); 12A848 (-> xn_flat_draw)"
+field,xn_span+0x00,next,confirmed,"12A53C mov [edi],edi (sentinel); 12A55B mov [eax],edi (row heads); 158D06 mov esi,[esi]; 158DA8 mov [eax],esi; 12A91E push [esi]"
+field,xn_span+0x04,x_end,confirmed,"12A549 mov [edi+4],ax (clip right + 1); 158D08 mov edx,[esi+4]; cmp dx,bp; 158DDF mov [eax+4],ebp (bx | bp << 16); 12A924 mov bp,[esi+4]; sub ebp,ebx (pixel count)"
+field,xn_span+0x06,x_start,confirmed,"12A543 mov [edi+6],ax (clip right); 158D10 shr edx,16; 12A920 mov bx,[esi+6]; add edi,ebx"
+field,xn_span+0x08,inv_z,confirmed,"158DE2 mov [eax+8],ecx; 158D34 add edx,[esi+8]; 155D20 mov ecx,[esi+8]; shr ecx,0Dh (reciprocal table index); 12A67E"
+field,xn_span+0x0C,poly,confirmed,"158DE5 mov [eax+0Ch],edi (xn_render_poly_next: the polygon being built); 12A54D (sentinel -> background record); 12A928 mov eax,[esi+0Ch]; 12A673 (pick returns it)"
+field,xn_terrain_vert_coord+0x00,value,confirmed,13E9EB/13E9F1 store the unscaled camera x/y; 13EB33/13EB39 and 13EBE3/13EBF3 read
+field,xn_terrain_vert_coord+0x04,pad_04,strong,no instruction addresses +4/+8 of an entry: the 12-byte stride is the vertex index of xn_vert_cam (13EAE0)
+field,xn_tex_archive+0x00,record_count,confirmed,"135F48 movzx ecx,word [eax] (the directory loop count)"
+field,xn_tex_archive+0x02,name,confirmed,DFU Name; records show the names
+field,xn_tex_archive+0x1A,entries,confirmed,"135F4B add eax,1Ah; 135D55 add ecx,1Ah"
+field,xn_tex_block+0x00,next,confirmed,"1361F1 mov ecx,[edx]; 1361F5 mov [edx],ebx; 136184..1361AD walk"
+field,xn_tex_block+0x04,prev,confirmed,"1361F7 mov [ebx+4],edx; 13625F mov ebx,[eax+4]; 135E64 mov [eax+4],1343E4h"
+field,xn_tex_block+0x08,size,confirmed,"1361D0 cmp [edx+8],eax; 136206 mov [ebx+8],ecx; 136237"
+field,xn_tex_block+0x0C,flags,confirmed,"136209 or word [edx+0Ch],1; 136232 and word [eax+0Ch],0FFFEh; 136184 test word [edx+0Ch],1"
+field,xn_tex_block+0x0E,slot,confirmed,"135F2F mov [eax-8],edx (eax = data = block + 16h); 136159 mov ecx,[edx+0Eh]; mov [ecx],0; 136191"
+field,xn_tex_block+0x12,last_tick,confirmed,"135D5A mov [ecx-1Eh],eax (ecx = archive + 1Ah); 13618C cmp eax,[edx+12h]"
+field,xn_tex_entry+0x00,type1_lo,candidate,DFU Type1 (low byte); not read by the engine
+field,xn_tex_entry+0x01,solid_colour,strong,"12A719 mov bl,[esi+1] (esi = [poly+40h]) -> xn_colour_fill_table; 12A7B9; records: 6Ah, 45h (TEXTURE.004)"
+field,xn_tex_entry+0x02,image,confirmed,"135F5E add [eax+2],edx (offset -> pointer); 135D64 mov edx,[ecx+2]; 135E2E; 15C29E"
+field,xn_tex_entry+0x06,type2,candidate,DFU Type2; not read by the engine
+field,xn_tex_entry+0x08,unknown_08,candidate,DFU Unknown1 (low word); not read
+field,xn_tex_entry+0x0A,blend_index,confirmed,"CDC99 mov word [eax+0Ah],1 (every entry of the archive, eax = archive + 1Ah + 14h k); 154E38 movzx ebx,word [eax+0Ah] (eax = xn_tex_cache_lookup's entry); 154E3C mov ebx,[ebx*4+136921h]"
+field,xn_tex_entry+0x0C,current,confirmed,"135DD7 mov [ecx+0Ch],edx; 15BB95 mov esi,[esi+0Ch]; 12A749 mov ecx,[ebx+0Ch]; records"
+field,xn_tex_entry+0x10,kind,confirmed,"135F4E mov [eax+10h],0; 135FB0 mov [eax+10h],4; 1404CE mov ebx,[eax+10h] -> xn_render_span_setups[ebx]"
+field,xn_tex_frame+0x00,width,strong,"136287 movzx eax,word [esi]"
+field,xn_tex_frame+0x02,height,strong,"13628A movzx edx,word [esi+2]"
+field,xn_tex_frame+0x04,data,strong,"1362A1 mov cl,[esi] (zero run); 1362B4 (copy count)"
+field,xn_tex_image+0x00,x,confirmed,"(union with wrap_mask) 135F98 mov [ebx],edx (masks from xn_tex_size_mask); 15BB98 mov ebx,[esi]; records: 3FFF3FFF, 7FFF3FFF"
+field,xn_tex_image+0x02,y,strong,DFU OffsetY (inside wrap_mask)
+field,xn_tex_image+0x04,width,confirmed,"135F85 movzx ecx,word [ebx+4]; 13600D"
+field,xn_tex_image+0x06,height,confirmed,"135F7B movzx ecx,word [ebx+6]; 135FD0"
+field,xn_tex_image+0x08,flags,confirmed,"135F64 test word [ebx+8],1000h; 136005 and word [ebx+8],0FEFFh; 13601E or word [ebx+8],100h"
+field,xn_tex_image+0x0A,size,confirmed,"(union with tmap) 135FAA mov [ebx+0Ah],eax (xn_tmap_compile); 135DBD mov esi,[edx+0Ah]; 15BB9A mov eax,[esi+0Ah]"
+field,xn_tex_image+0x0E,data_offset,confirmed,"135DD3 mov [edx+0Eh],eax (decoded frame - header); 15BB9D add esi,[esi+0Eh]; 15C2A6"
+field,xn_tex_image+0x12,is_normal,candidate,DFU IsNormal; not read
+field,xn_tex_image+0x14,frame_count,confirmed,"135D6F cmp word [edx+14h],1; 135D8B"
+field,xn_tex_image+0x16,frame_time,confirmed,"135D7F movzx ebx,word [edx+16h]; div (ticks)"
+field,xn_tex_image+0x18,x_scale,strong,"DFU XScale; 154E4F add bp,[eax+18h] (xn_flat_draw adds it to the flat's scale)"
+field,xn_tex_image+0x1A,y_scale,candidate,DFU YScale
+field,xn_tex_image+0x1C,frame_offsets,confirmed,"135D9E lea esi,[edx+1Ch]; mov esi,[esi+ebx*4]; lea esi,[esi+edx+1Ch]"
+field,xn_tex_unpack_entry+0x00,key,strong,"136393 mov [ecx+134C02h],ebp (ebp = (archive << 7 | record) << 16 | frame, 1362D9..1362EB); 1363DB cmp [ecx+134C02h],ebp"
+field,xn_tex_unpack_entry+0x04,pixels,strong,"136399 mov [ecx+134C06h],edi; 1363E3"
+field,xn_tex_unpack_strip+0x00,width_left,strong,"13630D cmp [edi],ax; 136323 sub [edi],ax; 136347 mov word [edi],100h"
+field,xn_tex_unpack_strip+0x02,start,strong,"136320 add ecx,[edi+2]; 136344 mov [edi+2],ecx"
+field,xn_tex_unpack_strip+0x06,height,strong,"136312 cmp [edi+6],dx; 136340 mov [edi+6],dx"
+field,xn_tmap_copy+0x00,steps,confirmed,"15C2B5 add ebx,34h; 15C2B8 loop 8"
+field,xn_tmap_copy+0x1A0,tail,confirmed,"15C4A0 ret (C3h) and a 00h; 15C2C2 mov ecx,1A2h"
+field,xn_tmap_step+0x00,code_00,confirmed,"15C300 bswap eax; mov ah,bh; mov edx,esi; and eax,"
+field,xn_tmap_step+0x07,wrap_mask_a,confirmed,"15C2AC mov [ebx+7],edx (v mask << 8 | u mask)"
+field,xn_tmap_step+0x0B,code_0b,confirmed,"15C30B add ebx,ecx; mov dl,[eax+"
+field,xn_tmap_step+0x0F,texels_a,confirmed,"15C2A9 mov [ebx+0Fh],eax (image + data_offset); 15C2E2 mov [eax+0Fh],edx"
+field,xn_tmap_step+0x13,code_13,confirmed,15C313..15C320
+field,xn_tmap_step+0x21,wrap_mask_b,confirmed,"15C2B2 mov [ebx+21h],edx"
+field,xn_tmap_step+0x25,code_25,confirmed,15C325
+field,xn_tmap_step+0x29,texels_b,confirmed,"15C2AF mov [ebx+29h],eax; 15C2E5"
+field,xn_tmap_step+0x2D,code_2d,confirmed,15C32D..15C333
+field,xn_vert_cam+0x00,x,confirmed,"140547 mov [edi+0CEAC0h],eax; 13EA01; 158458 mov eax,[ebx+0CEAC0h]"
+field,xn_vert_cam+0x04,y,confirmed,"14054D mov [edi+0CEAC4h],edx; 13EA12"
+field,xn_vert_cam+0x08,z,confirmed,"140553 mov [edi+0CEAC8h],ebx; 13EA18; 13EB3F"
+field,xn_vert_flags+0x00,done,strong,"(union with terrain_flat) 140505 test byte [edi+0D4AC0h],1; 140513 mov byte [edi+0D4AC0h],1; 140A28 mov [edi+100h],al (edi = 0D49C0h); terrain 13EABC mov [edi+0D4AC0h],al, 13F074 mov bl,[esi+0D4AC0h]"
+field,xn_vert_flags+0x01,terrain_outcode,strong,"13EAB2 mov word [edi+0D4AC1h],cx; 13EEA1 mov al,[esi+0D4AC1h]; 13E6FA test byte [edi+0D4AC1h],10h"
+field,xn_vert_flags+0x02,outcode,strong,"(union with terrain_tile) 140594 mov [edi+0D4AC2h],cl (models' outcode); 158452 mov ch,[ebx+0D4AC2h]; terrain 13F06E mov dl,[esi+0D4AC2h] (written with +1 by 13EAB2)"
+field,xn_vert_screen+0x00,sx,confirmed,"1405C4 mov [edi+0D1AC0h],edx (after shr edx,3); 158541 mov edx,[edi+0D1AC0h]"
+field,xn_vert_screen+0x04,sy,confirmed,"1405DB mov [edi+0D1AC4h],edx (after shr edx,8); 158552"
+field,xn_vert_screen+0x08,inv_z,confirmed,"1405AB mov [edi+0D1AC8h],eax (div with edx = 100h); 158549"
+field,xn_vesa_mode_info+0x12,x_resolution,strong,"15FD16 movzx eax,word [15FA7Fh]"
+field,xn_vesa_mode_info+0x14,y_resolution,strong,"15FD22 movzx edx,word [15FA81h]"
+field,xn_vesa_mode_info+0x1D,image_pages,strong,15FD5C inc byte [15FA8Ah]; 143647
+field,xn_vesa_mode_info+0x28,phys_base,strong,"15FCF7 cmp dword [15FA95h],0; 15FD45"
+field,xn_vid_header+0x00,magic,strong,the file ('VID'); not checked
+field,xn_vid_header+0x04,version,strong,"C1960 cmp byte [0C1004h],2"
+field,xn_vid_header+0x05,frames,confirmed,"C177A mov ax,[0C1005h]"
+field,xn_vid_header+0x07,width,confirmed,"C1786 movzx eax,word [0C1007h]"
+field,xn_vid_header+0x09,height,confirmed,"C1798 mov ax,[0C1009h]"
+field,xn_vid_header+0x0B,frame_delay,strong,"C1BBE add ax,[0C100Bh]"
+field,xn_vid_header+0x0D,flags,strong,"C176E mov ax,[0C100Dh]; C187F test [0C1460h],1"
+field,xn_vid_player+0x00,audio_state,confirmed,"C1670 mov byte [0C10FFh],0; C1BD5 inc; C17E0 cmp byte [0C10FFh],3"
+field,xn_vid_player+0x01,audio_buffer,strong,C1CC7 inc byte [0C1100h]; and 1; C1C8E
+field,xn_vid_player+0x02,sample_handle,strong,"C1E00 mov [0C1101h],eax; C1D62"
+field,xn_vid_player+0x06,sample_rate,candidate,"C1C1D mov [0C1105h],ax; C1DB7"
+field,xn_vid_player+0x08,audio_delay,candidate,"C1BFF mov [0C1107h],ax; C1C2F -> audio_ticks"
+field,xn_vid_player+0x0A,audio_left,strong,"C1C56 mov [0C1109h],eax; C1C83 sub [0C1109h],ecx"
+field,xn_vid_player+0x0E,rate_byte,candidate,"C1C08 mov [0C110Dh],al"
+field,xn_vid_player+0x0F,audio_size,strong,"C1C51 mov [0C110Eh],eax; C1C63"
+field,xn_vid_player+0x13,audio_buf_a,confirmed,"C169F mov [0C1112h],eax (4000h)"
+field,xn_vid_player+0x17,audio_len_a,strong,"C1C9D mov [0C1116h],eax; C1D36"
+field,xn_vid_player+0x1B,audio_buf_b,confirmed,"C16B8 mov [0C111Ah],eax"
+field,xn_vid_player+0x1F,audio_len_b,strong,"C1CAA mov [0C111Eh],eax; C1D29"
+field,xn_vid_player+0x23,frame_waits,candidate,"C19FB mov byte [0C1122h],1; C181A"
+field,xn_vid_player+0x24,sample_done,candidate,"C1D41 mov byte [0C1123h],1; C17E9"
+field,xn_vid_player+0x25,sample_restart,candidate,"C1D12 mov byte [0C1124h],1; C17F9"
+field,xn_vid_player+0x26,palette,confirmed,"C1AEA mov edi,0C1125h; C160F (set at the end)"
+field,xn_vid_player+0x326,dest_offset,confirmed,"C1758 mov [0C1425h],eax (row offset + x); C18AA"
+field,xn_vid_player+0x32A,frames_left,confirmed,"C1780 mov [0C1429h],ax; C19DD dec"
+field,xn_vid_player+0x32C,file,confirmed,"C1726 mov [0C142Bh],ax (int 21h 3Dh)"
+field,xn_vid_player+0x32E,file_pos,strong,"C1655 mov [0C142Dh],0; C1B64 add"
+field,xn_vid_player+0x332,buf,confirmed,"C167C mov [0C1431h],eax (big_buffer)"
+field,xn_vid_player+0x336,read_ptr,confirmed,"C18A4 mov esi,[0C1435h]; C19D0"
+field,xn_vid_player+0x33A,buf_end,confirmed,"C1686 mov [0C1439h],eax (+0FA00h)"
+field,xn_vid_player+0x33E,refill_mark,confirmed,"C1690 mov [0C143Dh],eax (end - 81h); C192B"
+field,xn_vid_player+0x342,frames_done,strong,"C17AA mov word [0C1441h],0; C19D6 inc"
+field,xn_vid_player+0x344,x,confirmed,"C165F mov [0C1443h],eax; C1591 (clip)"
+field,xn_vid_player+0x348,y,confirmed,"C1664 mov [0C1447h],edx"
+field,xn_vid_player+0x34C,path_arg,strong,"C166A mov [0C144Bh],ebx; C1710 mov edx,[0C144Bh] (open)"
+field,xn_vid_player+0x350,width,strong,"C1792 mov [0C144Fh],ax"
+field,xn_vid_player+0x352,height,strong,"C17A4 mov [0C1451h],ax"
+field,xn_vid_player+0x354,done,confirmed,"C1891 mov byte [0C1453h],1; C1601"
+field,xn_vid_player+0x355,dest_skip,confirmed,"C1769 mov [0C1454h],eax (screen width - width); C196C"
+field,xn_vid_player+0x359,row_width,confirmed,"C178D mov [0C1458h],eax; C18C2"
+field,xn_vid_player+0x35D,rows_left,confirmed,"C18BC mov [0C145Ch],ax; C1957 dec"
+field,xn_vid_player+0x35F,rows,confirmed,"C179E mov [0C145Eh],ax"
+field,xn_vid_player+0x361,flags,strong,"C1774 mov [0C1460h],ax; C187F test 1"
+field,xn_vid_player+0x363,timer,confirmed,"C170B mov [0C1462h],eax (sound_timer_add); C1588 cmp -1"
+field,xn_vid_player+0x367,frame_ticks,confirmed,"C1BC5 add [0C1466h],ax; C1CDC dec (60 Hz); C1810 cmp 0"
+field,xn_vid_player+0x369,audio_ticks,strong,"C1C35 mov [0C1468h],ax; C1CED dec"
+field,xn_vid_player+0x36B,audio_waiting,strong,"C1BE6 mov word [0C146Ah],1; C1CE3"
+field,xn_vid_player+0x36D,path,confirmed,"C1548 mov edx,0C146Ch (xn_str_copy)"
+field,xn_vid_player+0x3EE,skippable,confirmed,"C1540 mov [0C14EDh],ecx; C15CF"
+field,xn_view+0x00,near_z,confirmed,"158311 cmp ebx,[0CEA20h]; init_video sets 2560"
+field,xn_view+0x04,far_z,confirmed,"15831C cmp ebx,[0CEA24h]; 14D24B (fog)"
+field,xn_view+0x08,half_width,confirmed,"12A2D1 mov [0CEA28h],eax"
+field,xn_view+0x0C,half_height,confirmed,"12A2D6 mov [0CEA2Ch],edx"
+field,xn_view+0x10,centre_x,confirmed,"12A2DC mov [0CEA30h],ebx; 12A698 sub eax,[0CEA30h]"
+field,xn_view+0x14,centre_y,confirmed,"12A2E2 mov [0CEA34h],ecx; 12A8B6"
+field,xn_view+0x18,focal_x,confirmed,"12A275 mov [0CEA38h],eax; 12A6A0 idiv [0CEA38h]"
+field,xn_view+0x1C,inv_focal_x,confirmed,"12A287 div [0CEA38h] (edx = 40h); 12A28D mov [0CEA3Ch],eax; 13EBFE imul [0CEA3Ch]"
+field,xn_view+0x20,focal_y,confirmed,"12A27A mov [0CEA40h],edx"
+field,xn_view+0x24,inv_focal_y,confirmed,"12A29F mov [0CEA44h],eax"
+field,xn_view+0x28,render_mode,confirmed,"12A257 mov [0CEA48h],eax"
+field,xn_view+0x2C,poly_count,confirmed,"1403F1 add [0CEA4Ch],eax (the model's face count); 12A59A mov [0CEA4Ch],0; records: 1015"
+field,xn_view+0x30,unknown_30,candidate,no reference
+field,xn_view+0x34,unknown_34,candidate,"12A5A4 mov [0CEA54h],0 only"
+field,xn_view+0x38,span_hook,confirmed,"14D2C1 mov [0CEA58h],150040h; 12A940 call [0CEA58h]"
+field,xn_view+0x3C,frame_flags,confirmed,"12A871 mov [0CEA5Ch],eax; 12A98B test [0CEA5Ch],2"
+field,xn_view+0x40,span_next,confirmed,"12A563 mov [0CEA60h],eax; 158D89 add [0CEA60h],10h"
+field,xn_view+0x44,poly_next,confirmed,"12A4FB mov [0CEA64h],0DB320h; 140488 add [0CEA64h],64h"
+field,xn_view+0x48,light_list_next,confirmed,"12A505 mov [0CEA68h],116C80h; 1406CF"
+field,xn_view+0x4C,row_y,confirmed,"12A8BC mov [0CEA6Ch],eax (clip top - centre_y); 12A957 inc [0CEA6Ch]; 155D3B mov edx,[0CEA6Ch]"
+field,xn_view+0x50,matrix_next,confirmed,"12A4F1 mov [0CEA70h],0D7AC0h"
+field,xn_view+0x54,unknown_54,candidate,no reference
+field,xn_view+0x58,scale_x,confirmed,"12A3BE mov [0CEA78h],eax (focal_x << 14 / half_width); 13772A mov ebx,[0CEA78h] (xn_cam_scale_matrix)"
+field,xn_view+0x5C,inv_scale_x,confirmed,"12A3CE mov [0CEA7Ch],eax; 15CF65 imul [0CEA7Ch]"
+field,xn_view+0x60,scale_y,confirmed,"12A3EA mov [0CEA80h],eax; 137752"
+field,xn_view+0x64,inv_scale_y,confirmed,"12A3FA mov [0CEA84h],eax; 15CF72"
+field,xn_view+0x68,hfov_cos,confirmed,"12A467 mov [0CEA88h],eax (xn_vec_normalize(focal_x, half_width)); 15CFCC"
+field,xn_view+0x6C,hfov_sin,confirmed,"12A46C mov [0CEA8Ch],ebx; 15CFD1"
+field,xn_view+0x70,vfov_cos,confirmed,"12A484 mov [0CEA90h],eax; 15D004"
+field,xn_view+0x74,vfov_sin,confirmed,"12A489 mov [0CEA94h],edx"
+field,xn_view+0x78,pick_skip_flats,strong,"155513 test byte [0CEA98h],0FFh"
+field,xn_view+0x79,flat_scale_x,confirmed,"12A435 mov [0CEA99h],eax ((half_width << 32) / focal_x^2 >> 1); snapshot build/xngine/bases/snap_cheat_dorian.snap: 8589934"
+field,xn_view+0x7D,flat_scale_y,confirmed,"12A450 mov [0CEA9Dh],eax"
+field,xn_view+0x81,unknown_81,candidate,no reference
+field,xn_view+0x85,recip_table,confirmed,"12A181 mov [0CEAA5h],eax (malloc 40004h); 12A21D [n] = 2^37 / (2^13 n) = 2^24/n; 12A245 (freed)"
+field,xn_wld_bands+0x00,threshold,confirmed,"C3BC9 cmp al,[ecx+esi+0xc23e9] (class); C3BE9 [i-1]; C3C8E water level; C3ACB/C3AD4 flat range; file (3,15,75,110)..."
+field,xn_wld_cell+0x00,header,confirmed,C33AE..C33B8 reads 16h bytes to xn_world_cell_header
+field,xn_wld_cell+0x16,elevation,confirmed,"C33BD..C33D6 read 19h bytes to big_buffer; C3473 lodsb / C3474 add al,80h / C348B planted every 32 squares"
+field,xn_wld_cell_header+0x00,seed,confirmed,"C356B mov eax,[0xc2879] / C3570 into xn_rand_seed; record 0xFA7"
+field,xn_wld_cell_header+0x04,nature_archive,confirmed,"13E69C cmp word [0xc287d],1; 13E70C archive<<7; 0 in the file, world_render writes it"
+field,xn_wld_cell_header+0x06,ground_archive,confirmed,"13EFDC movzx eax,word [0xc287f] -> 135D00; file 2/102/302/402 (DFU FileIndex)"
+field,xn_wld_cell_header+0x08,climate,confirmed,C3BBD/C3C84/C3AC4 movzx [0xc2881]*4 indexes the band table (DFU Climate)
+field,xn_wld_cell_header+0x09,noise,confirmed,C33C8/C355D and 1Fh (full layers); C33DB shr 5 = noise amplitude; record 0x40 (DFU ClimateNoise)
+field,xn_wld_cell_header+0x0A,path_starts,strong,"dead C3DA9 mov word [0xc2883],410h; C3DD7/C3DE2 [ecx+0xc2883] 0-terminated; zero in WOODS.WLD"
+field,xn_wld_header+0x00,offsets_size,confirmed,"C3253 cmp eax,[0xc27e9] (window size); C3318 >>2 = cells; file 2000000; DFU OffsetSize"
+field,xn_wld_header+0x04,width,confirmed,"C2DA2 imul ebx,[0xc27ed]; C3147 size_x = width<<15; file 1000; DFU Width"
+field,xn_wld_header+0x08,height,confirmed,C3154 size_z = height<<15; C2FAB; file 500; DFU Height
+field,xn_wld_header+0x0C,offsets,confirmed,"C326E mov [0xc27f5],eax (the malloc'd offset window); C3388/C3370 read; 0 in the file (DFU NullValue1)"
+field,xn_wld_header+0x10,bands_offset,confirmed,"C31AE mov edx,[0xc27f9] seek; file 0x1E8510; DFU DataSection1Offset"
+field,xn_wld_header+0x14,unknown_14,candidate,file 1 (DFU Unknown1); no reader
+field,xn_wld_header+0x18,unknown_18,candidate,file 22 = the cell header size read by C33B3 (DFU Unknown2); no reader
+field,xn_wld_header+0x1C,height_map_offset,confirmed,"file 0x1E8910, the 1000x500 byte map before the first record 0x262A30 (DFU HeightMapOffset); no XnGine reader"
+field,xn_wld_header+0x20,pad_20,confirmed,file zero (DFU NullValue2[28]); C3244 reads 90h bytes
+field,xn_world_nature_odds+0x00,density,confirmed,"C3AA2 cmp al,[ebp] (0..100 roll); copied from region_flats by climate_set_textures; record 0x32"
+field,xn_world_nature_odds+0x01,odds,confirmed,"C3ADD and ebx,0FFFFFFE0h (height & 60h row); C3AE7 FFh ends; C3AED roll < odds -> flat index+1 (C3AF9)"
 field,xz_step+0x00,dx,strong,short: D_0017B657[yaw >> 9]: the pedestrians' look-ahead (pedestrian_can_stand_at)
 field,xz_step+0x02,dz,strong,short
 func,0x00010010,main,strong,"entry from the C runtime with (argc, argv); setup, then the endless frame loop that calls game_frame and bumps frame_counter"

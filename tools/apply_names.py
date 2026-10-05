@@ -35,13 +35,12 @@ ADDRESS = re.compile(r"^(func|D)_([0-9A-F]{8})$")
 
 
 def sources():
-    """The C of FALL.EXE's build (src/xngine_c/ is the XnGine translation, generated with the
-    names already: tools/xn_c.py)."""
+    """The C of FALL.EXE's build: src/lifted/, src/hand/ and the units in src/ (XnGine's C,
+    src/xngine_c/ and src/engine/, is written with the names already)."""
     out = []
-    for d, _sub, files in os.walk(os.path.join(ROOT, "src")):
-        if os.path.relpath(d, os.path.join(ROOT, "src")).split(os.sep)[0] == "xngine_c":
-            continue
-        out += [os.path.join(d, f) for f in files if f.endswith(".c")]
+    for sub in ("lifted", "hand", ""):
+        d = os.path.join(ROOT, "src", sub)
+        out += [os.path.join(d, f) for f in os.listdir(d) if f.endswith(".c")]
     inc = os.path.join(ROOT, "include")
     out += [os.path.join(inc, f) for f in os.listdir(inc) if f.endswith(".h")]
     return sorted(out)

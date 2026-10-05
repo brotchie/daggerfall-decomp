@@ -169,13 +169,14 @@ def main():
     syms = load_symbols()
     default = match.default_flags()
 
-    # src/xngine/ is object 2, assembled with TASM by tools/xn_link.py below; src/xngine_c/ is
-    # its C translation (tools/xn_c.py), a separate product that is not part of FALL.EXE
-    xngine = os.path.join(ROOT, "src", "xngine") + os.sep
-    xngine_c = os.path.join(ROOT, "src", "xngine_c") + os.sep
-    srcs = sorted(p for p in glob.glob(os.path.join(ROOT, "src", "**", "*.c"), recursive=True) +
-                  glob.glob(os.path.join(ROOT, "src", "**", "*.asm"), recursive=True)
-                  if not p.startswith(xngine) and not p.startswith(xngine_c))
+    # the game's own code: src/lifted/, src/hand/ and the units in src/. The other folders are
+    # not part of FALL.EXE's object 1: src/xngine/ is object 2, assembled with TASM by
+    # tools/xn_link.py below; src/xngine_c/ and src/engine/ are XnGine as C (tools/xn_c.py,
+    # tools/xn_rc.py), separate products
+    srcs = sorted(glob.glob(os.path.join(ROOT, "src", "lifted", "*.c")) +
+                  glob.glob(os.path.join(ROOT, "src", "hand", "*.c")) +
+                  glob.glob(os.path.join(ROOT, "src", "*.c")) +
+                  glob.glob(os.path.join(ROOT, "src", "*.asm")))
     matched, errors = [], []
     objdir = os.path.join(ROOT, "build", "obj")
     os.makedirs(objdir, exist_ok=True)
