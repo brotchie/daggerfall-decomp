@@ -169,11 +169,13 @@ def main():
     syms = load_symbols()
     default = match.default_flags()
 
-    # src/xngine/ is object 2, assembled with TASM by tools/xn_link.py below
+    # src/xngine/ is object 2, assembled with TASM by tools/xn_link.py below; src/xngine_c/ is
+    # its C translation (tools/xn_c.py), a separate product that is not part of FALL.EXE
     xngine = os.path.join(ROOT, "src", "xngine") + os.sep
+    xngine_c = os.path.join(ROOT, "src", "xngine_c") + os.sep
     srcs = sorted(p for p in glob.glob(os.path.join(ROOT, "src", "**", "*.c"), recursive=True) +
                   glob.glob(os.path.join(ROOT, "src", "**", "*.asm"), recursive=True)
-                  if not p.startswith(xngine))
+                  if not p.startswith(xngine) and not p.startswith(xngine_c))
     matched, errors = [], []
     objdir = os.path.join(ROOT, "build", "obj")
     os.makedirs(objdir, exist_ok=True)
