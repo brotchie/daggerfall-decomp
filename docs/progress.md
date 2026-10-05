@@ -1522,3 +1522,14 @@ that gives more evidence.
 - Put the names and record structs into the source, with the matching build checking each
   step.
 - XnGine.
+
+**Names into the source, and src/lifted/ frozen** (2026-10-04):
+- apply_names.py wrote 2508 confirmed and strong names into the C. config/symbols.txt
+  carries them for the build, and FALL.EXE stays byte-identical.
+- libmatch.py named 233 library functions against Watcom 10.0a's own libraries.
+- src/lifted/ is now ordinary source rather than lifter output. Record structs need edits
+  a regenerator would overwrite, and every function is already matched. promote_lifted.py
+  refuses to overwrite it. The lifted originals are in git history (before 9bd35ae).
+- A pilot rewrote disease_infect's record accesses with include/records.h's
+  `struct record` and compiled to the same bytes.
+

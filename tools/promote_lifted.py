@@ -52,6 +52,10 @@ def main():
         unit, _certain, _nxt = unit_of(int(name[5:], 16), units)
         by_unit.setdefault(unit, []).append(name)
 
+    if os.path.isdir(OUT) and "--force" not in sys.argv:
+        raise SystemExit("src/lifted/ is ordinary source now (frozen 2026-10-04: names and record "
+                         "structs are edited into it); promoting would overwrite that work. "
+                         "Lift into build/lift and compare instead, or pass --force on purpose.")
     if os.path.isdir(OUT):
         shutil.rmtree(OUT)
     os.makedirs(OUT)
